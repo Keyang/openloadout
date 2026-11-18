@@ -305,3 +305,74 @@ for (const kind of ['high', 'thump', 'full']) {
     if (kind === 'high') assert.ok(cs[0] > 1500, msg);
   });
 }
+
+// ---- near-pure tones: a brighter look must sound brighter even with nothing up top to boost ------
+// Margins. The spectral centroid tracks perceived brightness; differences of a few percent sit
+// near the threshold of hearing a timbre change, so the full setting (+1) must move it by at
+// least 20% (clearly audible) and the moderate one (+0.4) by at least 5%. Going duller can only
+// take away partials above the lowest one, so the centroid can fall at most to the lowest partial:
+// at -1 at least 40% of that headroom must go (a triangle has only ~1.5% of its power above the
+// fundamental, so a fixed percentage would ask for the impossible), and -0.4 must sit in between.
+// A pure sine has only one partial: nothing can be taken away, so it only has to not get brighter.
+
+function tone(kind) {
+  const n = Math.round(SR * 0.6), x = new Float32Array(n);
+  for (let i = 0; i < n; i++) {
+    const t = i / SR, env = Math.min(1, t / 0.005) * Math.exp(-t * 4);
+    let v;
+    if (kind === 'sine') v = Math.sin(2 * Math.PI * 880 * t);
+    else if (kind === 'triangle') { const ph = (220 * t) % 1; v = 4 * Math.abs(ph - 0.5) - 1; }
+    else v = Math.sin(2 * Math.PI * 1200 * t) + 0.5 * Math.exp(-t * 6) * Math.sin(2 * Math.PI * 3270 * t);   // a bell: two partials
+    x[i] = 0.5 * v * env;
+  }
+  return { samples: x, channels: [x], sampleRate: SR, duration: n / SR, loop: false };
+}
+
+for (const kind of ['sine', 'triangle', 'bell']) {
+  test(`near-pure tone (${kind === 'sine' ? '880 Hz sine' : kind === 'triangle' ? '220 Hz triangle' : 'two-partial bell'}): brighter is audibly brighter, duller is duller, loudness and peak kept`, () => {
+    const r = tone(kind), r0 = rmsOf(r), c0 = centroid(r);
+    const c = {};
+    for (const b of [-1, -0.4, 0.4, 1]) {
+      const out = applySound(r, { pitch: 0, brightness: b });
+      const db = 20 * Math.log10(rmsOf(out) / r0);
+      assert.ok(Math.abs(db) <= 3, `${kind} brightness ${b}: RMS moved ${db.toFixed(2)} dB`);
+      assert.ok(peakOf(out) < 1, `${kind} brightness ${b}: peak ${peakOf(out)}`);
+      assert.equal(out.samples.length, r.samples.length, 'brightness never changes the length (pitch untouched)');
+      c[b] = centroid(out);
+    }
+    const msg = `${kind}: centroid ${c0.toFixed(0)}; -1 ${c[-1].toFixed(0)}, -0.4 ${c[-0.4].toFixed(0)}, +0.4 ${c[0.4].toFixed(0)}, +1 ${c[1].toFixed(0)}`;
+    assert.ok(c[0.4] >= c0 * 1.05, `+0.4 at least 5% brighter: ${msg}`);
+    assert.ok(c[1] >= c0 * 1.2, `+1 at least 20% brighter: ${msg}`);
+    assert.ok(c[1] > c[0.4], `+1 brighter than +0.4: ${msg}`);
+    if (kind === 'sine') {
+      assert.ok(c[-0.4] <= c0 * 1.001 && c[-1] <= c0 * 1.001, `duller is never brighter: ${msg}`);
+    } else {
+      const f1 = kind === 'triangle' ? 220 : 1200, room = c0 - f1;
+      assert.ok(c[-1] - f1 <= 0.6 * room, `-1 takes away at least 40% of the brightness above the lowest partial: ${msg}`);
+      assert.ok(c[-0.4] < c0 && c[-0.4] > c[-1], `-0.4 sits between: ${msg}`);
+    }
+  });
+}
+
+test('the added brightness stays below the top of hearing range: no folded-back tones from a high pure tone', () => {
+  // A 9 kHz tone: its octave (18 kHz) is fine, but anything made at 3x (27 kHz) would fold back to 17.1 kHz.
+  const n = SR / 2, x = new Float32Array(n);
+  for (let i = 0; i < n; i++) x[i] = 0.4 * Math.sin(2 * Math.PI * 9000 * i / SR) * Math.min(1, i / 200);
+  const r = { samples: x, channels: [x], sampleRate: SR, duration: n / SR, loop: false };
+  const out = applySound(r, { pitch: 0, brightness: 1 });
+  const frames = spectrogram(out.samples, 1024, 256), hz = SR / 1024;
+  let main = 0, folded = 0;
+  for (const f of frames) for (let k = 1; k < 512; k++) { const p = f[k] * f[k], fr = k * hz; if (Math.abs(fr - 9000) < 300) main += p; else if (fr > 16600 && fr < 17600) folded += p; }
+  assert.ok(folded < main * 1e-3, `folded energy ${(10 * Math.log10(folded / main)).toFixed(1)} dB below the tone`);
+});
+
+test('a looping near-pure tone still wraps cleanly when brightened', () => {
+  const n = 44100, x = new Float32Array(n);
+  for (let i = 0; i < n; i++) x[i] = 0.4 * Math.sin(2 * Math.PI * 441 * (i / SR));   // 441 whole cycles: a seamless loop
+  const r = { samples: x, channels: [x], sampleRate: SR, duration: n / SR, loop: true };
+  const out = applySound(r, { pitch: 0, brightness: 1 }).samples;
+  let maxStep = 0;
+  for (let i = 1; i < out.length; i++) maxStep = Math.max(maxStep, Math.abs(out[i] - out[i - 1]));
+  const seam = Math.abs(out[0] - out[out.length - 1]);
+  assert.ok(seam <= maxStep * 1.05, `seam jump ${seam.toFixed(4)} vs largest step inside ${maxStep.toFixed(4)}`);
+});

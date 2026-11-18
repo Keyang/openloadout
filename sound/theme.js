@@ -52,9 +52,10 @@ function onePole(x, sr, hz, warm) {
 // "Duller ice" is still ice, and loudness stays put without extreme gain.
 const DULL_TOP_HZ = 12000;
 const DULL_HZ = 700;
-const DULL_FLOOR = 0.45;
+const DULL_FLOOR = 0.38;
 const BRIGHT_HZ = 1500;
 const BRIGHT_BOOST = 2;
+/** The low-pass corner in Hz for dullness k (0 = untouched .. 1 = dullest), never below what a sound of this typical frequency can lose. */
 export const dullCutoff = (k, typicalHz = 0) => Math.max(DULL_TOP_HZ * (DULL_HZ / DULL_TOP_HZ) ** k, typicalHz * DULL_FLOOR ** k);
 const brightCorner = (typicalHz) => Math.min(Math.max(BRIGHT_HZ, typicalHz), 12000);
 
@@ -70,6 +71,30 @@ export function typicalHz(channels, sr) {
   return (sr / Math.PI) * Math.asin(Math.min(1, Math.sqrt(sd / sx) / 2));
 }
 
+// A near-pure tone (a chime, a blip, a bell) has almost nothing above its own range for the
+// shelf to boost, so "brighter" would only make it louder. Then upper harmonics are added:
+// the band-limited tone squared (an even waveshaper: for a pure tone exactly its octave,
+// never more than twice the highest frequency it is given), with its slow part removed, mixed
+// in just enough to lift the sound's typical frequency to (1 + BRIGHT_RISE x brightness)
+// times where it was. A sound the shelf already brightens that far gets nothing added.
+const BRIGHT_RISE = 0.35;
+const SHAPER_BAND = 0.2;   // the waveshaper hears only what is below this fraction of the sample rate, so its octave stays below the top
+
+const energy = (x) => { let s = 0; for (let i = 0; i < x.length; i++) s += x[i] * x[i]; return s; };
+const highPass = (x, sr, hz, warm) => { const lp = onePole(onePole(x, sr, hz, warm), sr, hz, warm), out = new Float32Array(x.length); for (let i = 0; i < x.length; i++) out[i] = x[i] - lp[i]; return out; };
+
+/** Upper harmonics of x: its band-limited square, without the slow part (the loudness contour and its constant offset). */
+function harmonics(x, sr, warm, typical) {
+  let b = x;
+  for (let i = 0; i < 4; i++) b = onePole(b, sr, sr * SHAPER_BAND, warm);
+  let peak = 0;
+  for (let i = 0; i < b.length; i++) peak = Math.max(peak, Math.abs(b[i]));
+  if (peak < 1e-9) return null;
+  const sq = new Float32Array(b.length);
+  for (let i = 0; i < b.length; i++) sq[i] = (b[i] * b[i]) / peak;
+  return highPass(sq, sr, Math.max(40, typical), warm);
+}
+
 function brighten(x, sr, amount, warm, typical) {
   if (amount < 0) {
     const hz = dullCutoff(-amount, typical);
@@ -77,6 +102,17 @@ function brighten(x, sr, amount, warm, typical) {
   }
   const lp = onePole(x, sr, brightCorner(typical), warm), k = amount * BRIGHT_BOOST, out = new Float32Array(x.length);
   for (let i = 0; i < x.length; i++) out[i] = x[i] + (x[i] - lp[i]) * k;
+  // How far the shelf got, against where this brightness should get to.
+  const reached = typicalHz([out], sr), target = typical * (1 + BRIGHT_RISE * amount);
+  if (!(typical > 0) || reached >= target) return out;
+  const h = harmonics(x, sr, warm, typical);
+  if (!h) return out;
+  const eh = energy(h), fh = typicalHz([h], sr), eo = energy(out);
+  if (!(eh > 1e-12) || fh <= target) return out;
+  // Typical frequency squared is power-weighted, and the octave is unrelated to the tone, so the
+  // mix lands at (eo*reached^2 + w^2*eh*fh^2) / (eo + w^2*eh) = target^2.
+  const w = Math.sqrt((eo * (target * target - reached * reached)) / (eh * (fh * fh - target * target)));
+  for (let i = 0; i < out.length; i++) out[i] += w * h[i];
   return out;
 }
 
