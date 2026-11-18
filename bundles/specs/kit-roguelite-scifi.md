@@ -1,6 +1,6 @@
 # Derelict Station roguelite kit: specification (`kit-roguelite-scifi`)
 
-Written 2026-11-18 by the art director (task W3-S); revised the same day after the independent review (`when` on controls and cues, named palette colours and the player's trim, clip order of props with states, never-empty frames, originality, batch order). It goes with `kit-roguelite-scifi.plan.json`; the two always agree. **Read `docs/style-guide.md` first**: it fixes frame sizes, clip names, frame counts, cue frames, part names, control names and the palette. This file says what each asset is.
+Written 2026-11-18 by the art director (task W3-S); revised the same day after the independent review (`when` on controls and cues, named palette colours and the player's trim, clip order of props with states, never-empty frames, originality, batch order). It goes with `kit-roguelite-scifi.plan.json`; the two always agree. **Brought in line with the built library on 2026-11-18: every row below describes the file as it was built and reviewed.** Where a row and a file ever disagree again, the file is right and the row is corrected. **Read `docs/style-guide.md` first**: it fixes frame sizes, clip names, frame counts, cue frames, part names, control names and the palette. This file says what each asset is.
 
 | | |
 |---|---|
@@ -110,7 +110,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Parts:** **headgear**: `headgear` (antenna | dish | cap | none), `headgearSize`; **held**: `held` (none | sign | tray), `heldSize`.
 - **Controls (9 + 4 in parts):** `size`, `shape` (choice of body: boxy | round | capsule), `eyes` (choice of screen face: smile | dots | visor | one eye), `arms` (toggle: two thin jointed arms), `body` (default panel), `accent` (default teal), `glow` (the screen: default cyan), `bob`, `speed`.
 - **Sounds:** `talk` frame 0 and 4 → `tech-click` style "Hover", volume 0.6 · `sell` frame 3 → `credit-pickup` style "Credit chip", volume 0.7.
-- **Look and motion:** A friendly shop robot that hovers in place, always facing the camera (no direction clips): a floating vending kiosk. By default a boxy cabinet body with rounded corners, a screen for a face in its upper half, a coin slot and a serving hatch below it, bobbing 2 px over a small thruster glow (not a smooth white egg with two blue eyes: style guide, section 13). `talk`: the face flickers between two expressions and an arm gestures. `sell`: a tray slides out with a glinting item on it.
+- **Look and motion:** A friendly shop robot that hovers in place, always facing the camera (no direction clips): a floating vending kiosk, drawn on a rig of its own (`rigs/kiosk.js`; `node tools/rig.mjs kiosk` lists what it offers). By default a boxy cabinet body with rounded corners, a screen for a face in its upper half, a coin slot and a serving hatch below it, bobbing 2 px over a small thruster glow (not a smooth white egg with two blue eyes: style guide, section 13). `talk`: the face flickers between two expressions and an arm gestures. `sell`: a tray slides out with a glinting item on it.
 
 #### `crawler-bug` · Crawler
 
@@ -218,11 +218,11 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 
 - **Meta:** type `tileset`, role `world/tile`, view `top-down`, themes `sci-fi`, `space`. Batch **S13**.
 - **Frame:** 32x32, pivot [16, 16].
-- **Clips (22):** the block `pit-*` with its seven narrow pieces (20 clips, 8 frames each, loop; no fill versions: the drifting depth hides the grid) · `pit-deco-a` 1 · `pit-deco-b` 8 loop.
+- **Clips (24):** the block `pit-*` with its seven narrow pieces and three fills (22 clips, 8 frames each, loop, except `pit-fill`, the bare version of the depth, which is 1 frame) · `pit-deco-a` 1 · `pit-deco-b` 8 loop.
 - **Parts:** none.
 - **Controls (7):** `below` (choice of what is down there: space | mist | reactor), `land` (colour of the floor's cut edge: default deck), `hull` (colour of the inner wall: default hull), `glow` (the warning light along the rim: default amber), `pieces` (slider "Specks": Few / Many: the stars, the wisps of mist or the sparks of the reactor, whatever `below` is), `height` (slider "Depth": Shallow / Deep: the inner wall is 6 to 14 px), `speed`.
 - **Sounds:** none.
-- **Look and motion:** Holes in the floor as a "hole" block, all tiles 8 frames. `pit-fill` is the depth: near-black `void` with a few stars drifting slowly (or mist, or a red reactor glow). The north edge shows the inner wall dropping away; the south edge is a thin lit lip. A dashed warning light runs along every rim. Decals: `-a` a broken girder jutting over the edge, `-b` cables that hang and sway.
+- **Look and motion:** Holes in the floor as a "hole" block, all tiles 8 frames. `pit-fill` is the bare depth, near-black `void`; its two other versions carry the few stars drifting slowly (or the mist, or the red reactor glow), mixed in by position. The north edge shows the inner wall dropping away; the south edge is a thin lit lip. A dashed warning light runs along every rim. Decals: `-a` a broken girder jutting over the edge, `-b` cables that hang and sway.
 
 ### Props (top-down, three-quarter view)
 
@@ -293,7 +293,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Clips (3):** `idle` 8 loop · `charge` 8 loop · `activate` 10 (label "Warp").
 - **Parts:** none.
 - **Controls (8):** `size`, `style` (choice: round | hex | pylons), `rings` (choice: one | two | three), `body` (default hull), `accent` (default teal), `glow` (default cyan), `flicker`, `speed`.
-- **Sounds:** `charge` frame 0 → `spaceship-hum` style "Cruise", volume 0.35 · `activate` frame 2 → `warp-out` style "Warp out".
+- **Sounds:** `charge` frame 0 → `spaceship-hum` style "Cruise", volume 0.35 · `activate` frame 2 → `warp-out` style "Warp out", volume 0.8.
 - **Look and motion:** The exit to the next floor: a low round platform seen from above (an ellipse 56 px wide), with a ring of lights. `idle`: the lights chase round. `charge`: rings of light rise from it. `activate`: a column of light shoots up to 1 px below the top of the frame, flashes white, and collapses.
 
 #### `tech-chest` · Loot cache
@@ -334,7 +334,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 32x32, pivot [16, 30], `grounded: false`.
 - **Clips (2):** `idle` 8 loop · `collect` 8.
 - **Parts:** none.
-- **Controls (9):** `size`, `shape` (choice: cell | syringe | cross pack), `level` (slider "Fill"), `sparkle`, `body` (the casing: default panel), `glow` (default heal), `bob`, `pop`, `speed`.
+- **Controls (9):** `size`, `shape` (choice "Shape": cell | syringe | cross-pack), `level` (slider "Fill"), `sparkle`, `body` (the casing: default panel), `glow` (default heal), `bob`, `pop`, `speed`.
 - **Sounds:** `collect` frame 1 → `upgrade-get` style "Health cell", volume 0.7.
 - **Look and motion:** Health: a capsule with metal ends and a green glowing middle that beats twice per loop like the fantasy heart.
 
@@ -488,7 +488,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 96x96, pivot [48, 48], `grounded: false`.
 - **Clips (2):** `burst` 12 · `smoke` 8 loop.
 - **Parts:** none.
-- **Controls (9):** `size`, `pieces`, `spread`, `lobes` (slider: Few / Many bulges in the fireball), `style` (choice: fire | plasma | shock ring), `soot` (toggle: dark smoke in the last frames), `core` (default cream), `edge` (default amber), `speed`.
+- **Controls (9):** `size`, `pieces`, `spread`, `lobes` (slider: Few / Many bulges in the fireball), `style` (choice "Style": fire | plasma | shock-ring), `soot` (toggle: dark smoke in the last frames), `core` (default cream), `edge` (default amber), `speed`.
 - **Sounds:** `burst` frame 0 → `explosion` style "Grenade".
 - **Look and motion:** Barrels and bosses. Frames 0 to 1 a white flash filling half the frame; 2 to 5 a fireball of overlapping lobes in three tones growing to 80 px; 6 to 8 it tears open from the middle into a ring; 9 to 11 dark smoke puffs and falling sparks. `smoke`: a loose column of puffs that rises and loops, for wreckage.
 
@@ -530,7 +530,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 320x180, pivot [160, 180].
 - **Clips (3):** `far` 1 · `mid` 8 loop · `near` 1.
 - **Parts:** none.
-- **Controls (7):** `sky` (space: default plate; void is background only and never a swatch), `haze` (colour of the nebula: default nebula), `land` (colour of the `near` shape, planet or wreckage: default teal), `stars` (slider: Few / Many), `sparkle` (toggle: stars twinkle), `style` (choice of `near`: planet edge | ringed planet | wreckage), `speed`.
+- **Controls (7):** `style` (choice "Style": planet | ringed | wreckage), `stars` (slider: Few / Many), `sparkle` (toggle: stars twinkle), `sky` (space: default plate; void is background only and never a swatch), `haze` (colour of the nebula: default nebula), `land` (colour of the `near` shape, planet or wreckage: default teal), `speed`.
 - **Sounds:** none.
 - **Look and motion:** Space, for menus, station windows and the gaps between rooms. `far`: three bands of dark blue with dim one-pixel stars and soft nebula patches; opaque. `mid`: brighter stars of two or three pixels, some twinkling over the 8 frames; to span the full width it also carries a faint band of dust along its bottom rows. `near`: the curved edge of a planet along the bottom (or drifting wreckage). The one background where `near` may be lighter than `far`.
 
@@ -570,7 +570,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 32x32, pivot [16, 16].
 - **Clips (4):** `idle` 8 loop · `shoot` 4 (label "Firing") · `reload` 8 loop · `hit` 4.
 - **Parts:** none.
-- **Controls (8):** `style` (choice: cross | circle | brackets | chevrons), `size`, `gap` (slider: Tight / Open), `thickness`, `spin` (toggle: turns slowly in `idle`), `body` (default cream), `accent` (the hit marker: default red), `speed`.
+- **Controls (8):** `style` (choice: cross | circle | brackets | chevrons), `size`, `gap` (slider: Tight / Open), `thickness`, `spin` (toggle "Spin": off by default; **when** `{ style: ['cross', 'circle', 'chevrons'] }`), `body` (default cream), `accent` (the hit marker: default red), `speed`.
 - **Sounds:** none.
 - **Look and motion:** The aiming cursor; the pivot is the exact centre, and so is its exported `tip` socket (the hot spot: style guide, section 8). `idle` breathes 1 px. `shoot` kicks the marks outward 3 px and back. `reload` sweeps an arc round once. `hit` flashes four diagonal ticks in the accent colour.
 
@@ -766,7 +766,7 @@ Exactly 2. New tracks follow the Music section of `SOUND.md` and the style guide
 
 - **Role:** `music/boss`. Batch **S22**. **Use:** The hive mother and the warden mech.
 - **Tempo:** 164 bpm by default, range 150 to 180. **Key:** C minor. **Mood:** Relentless, distorted and alarm-like: no rest until it is over.
-- **Chords (8 bars, one per bar):** Cm, Cm, Ab, Bb, Cm, Eb, F, G (i, i, VI, VII, i, III, IV, V).
+- **Chords (8 bars, one per bar):** Cm, Cm, Fm, Gm, Cm, Eb, F#dim, G (i, i, iv, v, i, III, sharp-iv diminished, V). Changed while composing: the first plan (Cm, Cm, Ab, Bb, Cm, Eb, F, G) was, step for step, the chord order of `hearthvale-battle`, and no two tracks of the library may share one.
 - **Layers:** (1) Bass: a saw through a `shaper`, 8th notes jumping between the root and its octave. (2) Drums: kick and snare at half time, turning to a kick on every 8th; crushed noise hats in 16ths. (3) Alarm: a two-note stab a semitone apart on the first beat of every second bar. (4) Chords: short gated saw chords on the off-beats. (5) Melody. (6) A sub drop on the first beat of each section.
 - **Intensity:** 0 to 0.3: bass and hats (the boss appears). 0.3 to 0.6: add half-time kick and snare, and the alarm. 0.6 to 0.85: the kick goes to every 8th and the gated chords come in. 0.85 to 1: add the melody and crush on the drums (the boss is enraged).
 - **Length:** 8, 16, 24 or 32 bars; default 8. Longer versions open with bass and alarm, add drums, then chords, then the full band.
@@ -777,7 +777,7 @@ Exactly 2. New tracks follow the Music section of `SOUND.md` and the style guide
 
 ## Batch plan
 
-A batch starts when its helpers exist and every batch in its "Needs first" cell has passed review; batches of other kits (P.., R..) count too. **Order** is one more than the highest order among the batches it waits for. Sound batches come first because a sprite cannot cue a sound that does not exist. **This kit waits on the other two for conventions:** S04 (the player) starts after R03, the first top-down character; S03 (the floor) starts after R04, the first top-down tileset; its bosses, pickups, projectiles, effects and background start after the pathfinders P08, P11, P12 and P14.
+**A record of how the kit was built; every batch below is finished and passed review.** It is kept because the order shows which asset is the worked example for which (a later batch read the earlier one's report). A batch started when its helpers exist and every batch in its "Needs first" cell has passed review; batches of other kits (P.., R..) count too. **Order** is one more than the highest order among the batches it waits for. Sound batches come first because a sprite cannot cue a sound that does not exist. **This kit waits on the other two for conventions:** S04 (the player) starts after R03, the first top-down character; S03 (the floor) starts after R04, the first top-down tileset; its bosses, pickups, projectiles, effects and background start after the pathfinders P08, P11, P12 and P14.
 
 | Order | Batch | Kind | Assets | Needs first |
 |---|---|---|---|---|

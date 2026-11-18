@@ -74,6 +74,18 @@
         {
           "name": "hurt",
           "frames": 4
+        },
+        {
+          "name": "die",
+          "frames": 8
+        },
+        {
+          "name": "block",
+          "frames": 6
+        },
+        {
+          "name": "victory",
+          "frames": 8
         }
       ],
       "parts": [
@@ -119,9 +131,25 @@
         {
           "name": "hurt",
           "frames": 4
+        },
+        {
+          "name": "die",
+          "frames": 8
+        },
+        {
+          "name": "victory",
+          "frames": 8
+        },
+        {
+          "name": "talk",
+          "frames": 8
         }
       ],
-      "parts": [],
+      "parts": [
+        "weapon",
+        "headgear",
+        "beard"
+      ],
       "reuse": true,
       "batch": null
     },
@@ -151,6 +179,10 @@
         {
           "name": "hurt",
           "frames": 4
+        },
+        {
+          "name": "die",
+          "frames": 8
         }
       ],
       "parts": [],
@@ -183,6 +215,10 @@
         {
           "name": "hurt",
           "frames": 4
+        },
+        {
+          "name": "die",
+          "frames": 8
         }
       ],
       "parts": [],
@@ -219,6 +255,10 @@
         {
           "name": "hurt",
           "frames": 4
+        },
+        {
+          "name": "die",
+          "frames": 8
         }
       ],
       "parts": [],
@@ -1362,6 +1402,31 @@
         },
         {
           "name": "water-fill",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "water-fill-b",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "water-fill-c",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "water-fill-d",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "water-fill-e",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "water-fill-f",
           "frames": 8,
           "loop": true
         },
@@ -3579,23 +3644,23 @@
   "reusedChanges": [
     {
       "id": "knight",
-      "change": "As asked for in the platformer kit: add `die` (the knock-out), `block` (the Defend command) and `victory`."
+      "change": "Done. As asked for in the platformer kit: add `die` (the knock-out), `block` (the Defend command) and `victory`."
     },
     {
       "id": "wizard",
-      "change": "As asked for in the platformer kit: add `die`, `victory`, `talk`; declare parts."
+      "change": "Done. As asked for in the platformer kit: add `die`, `victory`, `talk`; declare parts."
     },
     {
       "id": "slime",
-      "change": "Add `die` (asked for in the platformer kit)."
+      "change": "Done. Add `die` (asked for in the platformer kit)."
     },
     {
       "id": "bat",
-      "change": "Add `die` (asked for in the platformer kit)."
+      "change": "Done. Add `die` (asked for in the platformer kit)."
     },
     {
       "id": "wolf",
-      "change": "Add `die` (asked for in the platformer kit)."
+      "change": "Done. Add `die` (asked for in the platformer kit)."
     }
   ]
 }

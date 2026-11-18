@@ -1,10 +1,8 @@
 # Loadout: style guide
 
-Written 2026-11-18 by the art director (task W3-S). **Every asset builder reads this before the bundle specification.** It is the set of rules that makes assets from forty builders look and sound like one library. Where this guide and a bundle specification (`bundles/specs/<id>.md`) disagree, the specification wins for that asset; where either disagrees with `docs/architecture.md` or `docs/quality-bar.md`, say so in your report and follow the contract.
+**This guide describes the Loadout library as it is built.** Three kits exist (`kit-platformer-fantasy`, `kit-rpg-fantasy`, `kit-roguelite-scifi`: 47, 49 and 48 sprites, 20 sounds and 2 music tracks each), every asset passed independent review, and these are the rules that make them look and sound like one library. **Read it before you make or change an asset.** Each kit has a specification (`bundles/specs/<id>.md`) that lists its assets row by row as built. Where this guide, a specification and a built file disagree, the file was reviewed and is right: correct the text. Where anything disagrees with `docs/architecture.md` or `docs/quality-bar.md`, say so in your report and follow the contract.
 
 All paths are relative to the project folder `lab/sprite-forge/`, with one exception: the skill lives at the workspace root, two folders up. How to write a sprite is in `../../skills/sprite-forge/SKILL.md` and how to write a sound or a track is in `../../skills/sprite-forge/SOUND.md` (both paths as seen from the project folder); this guide only fixes the choices those files leave open. An asset is one file and nothing else: there is no list to add it to and no registration step (the build finds assets by scanning `sprites/` and `sounds/`).
-
-Revised 2026-11-18 after the independent review of the art direction. What changed: the palettes (section 3: seven hex values changed, seven named colours added), `when` on controls and sound cues (sections 9 to 11), the checker's real rule for a visible control (section 10), clip order for props with states and the never-empty-frame rule (section 4), the tile names a level is built from (section 6), jingles (sections 11 and 13) and originality (section 13).
 
 Contents: [1 Pixel scale](#1-pixel-scale) · [2 Line and light](#2-line-and-light) · [3 Colour](#3-colour) · [4 Animation](#4-animation) · [5 Top-down direction clips](#5-top-down-direction-clips) · [6 Tilesets](#6-tilesets) · [7 Backgrounds](#7-backgrounds) · [8 Interface pieces and icons](#8-interface-pieces-and-icons) · [9 Parts](#9-parts) · [10 Controls](#10-controls) · [11 Sound](#11-sound) · [12 Music](#12-music) · [13 Metadata](#13-metadata) · [14 Shared helpers](#14-shared-helpers) · [15 Before you ask for review](#15-before-you-ask-for-review)
 
@@ -62,17 +60,17 @@ Other rules of scale:
 
 | Rule | What to do |
 |---|---|
-| Outline | Every character, creature, prop, pickup, projectile, icon and interface piece gets `g.outline(INK)` once, after the whole body is drawn. `INK` is `#231b33` from `engine/color.js`. Never choose another outline colour in a sprite (the bundle theme can recolour it later) |
+| Outline | Every character, creature, prop, pickup, projectile, icon and interface piece gets `g.outline(INK)` once, after the whole body is drawn. `INK` is `#231b33` from `engine/color.js`. Never choose another outline colour in a sprite (a whole-bundle look can recolour it) |
 | No outline | Backgrounds have **no** outline anywhere: that is what keeps them behind the game. Glow, fire, sparks, smoke, trails, beams and other light are drawn **after** `g.outline` and are rimmed with a darker tone of their own colour instead (`tone(colour, -1)`), as `campfire` does |
 | Tiles | The inside of a tile has no ink. The exposed edge of solid ground or a wall (where it meets air or floor) gets a 1 px `INK` line: **things you can bump into are inked**. A floor-on-floor change (path on grass) uses the material's `deep` tone instead |
 | Light | From the top right, always: the engine default (`g.shadow = [-1, 1]`). Do not change it, except for one recessed shape at a time as `coin` does. Top-down sprites use the same light in all three directions |
 | Shading depth | Three tones per material from `ramp(colour)`: `light`, `base`, `dark`. `deep` is only for creases and for things on the far side (`farRamp`). Shadow band 1 px (`shade: 2` on shapes wider than 14 px). A highlight band (`light: 1`) only on metal, glass, wet or round glossy things |
 | Forbidden | Dithering, gradients, anti-aliasing, single stray pixels, pure black, pure white as a body colour (white is for glints, eyes and flashes) |
 | Bodies | Several shapes that make one body are painted with `g.blob`, so the body has one shadow band and no seams |
-| Colour count | Colours in one clip at the default look, by kind (the number in brackets is where the checker warns, `THRESHOLDS.colours` in `quality/sprite.js`). Character, creature, boss: 8 to 20 (32), at most five materials. Prop: 6 to 16 (24). Tileset: at most 12 per block (24 per tile). **Pickup: 6 to 12 (16); a tiny 16x16 pickup 4 to 6.** **Projectile: 3 to 8 (12).** Effect: 3 to 12 (24). Background: at most 8 per layer for the landscape, lights not counted (32). Icon and interface piece: at most 10 (16). A specification may ask for fewer (things shown by the hundred), never for more |
+| Colour count | Colours in one clip at the default look, by kind (the number in brackets is where the checker warns, `THRESHOLDS.colours` in `quality/sprite.js`). Character, creature, boss: 8 to 20 (32), at most five materials. Prop: 6 to 16 (24). Tileset: at most 12 per block (24 per tile). **Pickup: 6 to 12 (16); a tiny 16x16 pickup 4 to 6.** **Projectile: 3 to 8 (12).** Effect: 3 to 12 (24). Background: at most 8 per layer for the landscape, lights not counted (32). Icon and interface piece: at most 10 (16). **Portrait: up to 16 (16)**, because a face needs skin, hair, cloth and metal each in their tones. A specification may ask for fewer (things shown by the hundred), never for more |
 | Readability | Parts are told apart by value (light against dark), not only by hue. Eyes, teeth and markings use `pick(bodyColour, '#ffffff', INK)` so they survive any colour the user chooses |
 
-**Drawing so that other styles stay possible (Contract 12).** An asset may later be offered in more than one style; the three bundles are pixel only, but a sprite written today must not shut the others out. Two rules: **a sprite draws only through the surface's documented calls**, never reading pixels back from the surface and never writing its pixel buffer directly; and **body shapes go through the shape calls** (`ellipse`, `capsule`, `limb`, `poly`, `arc`), with single pixels and pixel rectangles kept for detail (eyes, highlights, trim).
+**Drawing so that other styles stay possible (Contract 12).** An asset may be offered in more than one style; the three kits are pixel only, and a sprite must not shut the other styles out. Two rules: **a sprite draws only through the surface's documented calls**, never reading pixels back from the surface and never writing its pixel buffer directly; and **body shapes go through the shape calls** (`ellipse`, `capsule`, `limb`, `poly`, `arc`), with single pixels and pixel rectangles kept for detail (eyes, highlights, trim).
 
 ---
 
@@ -80,7 +78,7 @@ Other rules of scale:
 
 ### How a sprite's colour controls relate to its bundle's palette
 
-Each bundle has one named palette (the tables below). They live in `engine/palettes.js` (helper `palettes`, section 14), and **a colour is always written `PALETTE.<palette>.<name>`**: `PALETTE.thornwood.grass`, `PALETTE.hearthvale.wheat`, `PALETTE.derelict.cyan`. The palette keys are `thornwood`, `hearthvale` and `derelict`. The code also accepts the bundle ids (`PALETTE['kit-platformer-fantasy']`) and the short names `platformer`, `rpg`, `roguelite` and `scifi` as aliases for the same three objects; this guide and the specifications use only the palette keys, and so should a sprite. A specification that says "default grass" means `PALETTE.<that bundle's palette>.grass`.
+Each kit has one named palette (the tables below). They live in `engine/palettes.js` (helper `palettes`, section 14), and **a colour is always written `PALETTE.<palette>.<name>`**: `PALETTE.thornwood.grass`, `PALETTE.hearthvale.wheat`, `PALETTE.derelict.cyan`. The palette keys are `thornwood`, `hearthvale` and `derelict`. The code also accepts the bundle ids (`PALETTE['kit-platformer-fantasy']`) and the short names `platformer`, `rpg`, `roguelite` and `scifi` as aliases for the same three objects; this guide and the specifications use only the palette keys, and so should a sprite. A specification that says "default grass" means `PALETTE.<that bundle's palette>.grass`.
 
 1. **Defaults come from the bundle palette.** The default of every colour control is a palette colour **by name**, and the specification says which. A specification never asks for "a darker slate" or "a dull purple": if a default is not in the table, the table gets a new named row first.
 2. **Swatches start with the palette.** A colour control offers 4 to 8 swatches from `swatches(palette, material, { lead })` (below). The first three or more are palette colours that suit that material; the rest may come from the engine lists (`SKIN`, `HAIR`, `CLOTH`, `METAL`). Every swatch must look right with every other control's swatches, because random looks combine them.
@@ -207,25 +205,7 @@ Cold steel station, lit by small strong lights. Station bodies are dark and desa
 | cream | `#f0ead8` | the white-hot core of shots, flashes and explosions |
 | skin | `#f6d3b0` | human skin |
 
-### What changed in the palettes on 2026-11-18 (after review)
-
-`engine/palettes.js` follows these tables (a unit test reads them). Sprites built before the change pick the new values up through `PALETTE`, because no sprite types a palette hex.
-
-| Palette | Name | Was | Now | Why |
-|---|---|---|---|---|
-| Thornwood | cavern | (new) | `#3f5068` | named the "darker slate" the cave tileset asked for |
-| Thornwood | dusk | (new) | `#8696dc` | named the "dusk" sky the castle backdrop asked for |
-| Hearthvale | ice | `#8fd8f0` | `#7aa0f4` | was almost the sky colour: the ice spell vanished against the battle sky |
-| Hearthvale | panel | `#2b3a67` | `#4a609c` | its `dark` tone was darker than the outline (first lifted to `#3f5490`, then again after the second review; panel faces also stop using `dark`) |
-| Hearthvale | pine | (new) | `#357a4c` | named the "darker leaf" of the pine tree |
-| Hearthvale | flagstone | (new) | `#7e84a0` | named the "lighter slate" of dungeon floors |
-| Hearthvale | rust | (new) | `#a8806a` | named the "rusty steel" of the skeleton |
-| Derelict | signal | `#f08a2c` | `#3f6fd1` | was almost hazard amber; the hue wheel has no free warm slot between amber and hostile red, so the player's trim moved to the cool side |
-| Derelict | plate | `#353d57` | `#434d6d` | its `dark` tone was as dark as the outline |
-| Derelict | deck | `#4a5470` | `#566182` | moved up with `plate`, so the inset plating still reads darker than the floor |
-| Derelict | chitin | `#6a3a7a` | `#ca9eda` | its `dark` tone was close to the outline, and at its first fix (`#74489c`, brightness 0.37) it had the same value as the floor `deck` (0.38): bugs vanished in the Mono look. Now 0.70 |
-| Derelict | membrane | (new) | `#a87894` | named the hive floor colour (first `#803668`, brightness 0.32, too close to `plate` and `deck`; now 0.54, at least 0.15 from both floors and from `chitin`) |
-| Derelict | nebula | (new) | `#6660b6` | named the "dull xp" of the starfield's nebula |
+`engine/palettes.js` holds exactly these tables (a unit test reads them out of this file), and no sprite types a palette hex: a colour changed here and there reaches every sprite.
 
 ---
 
@@ -425,7 +405,8 @@ fill versions:   <p>-fill-b   <p>-fill-c         the same fill with other marks,
 |---|---|
 | The 13 | **Always.** A prefix with `-top` but not all 13 is not a block |
 | The 7 narrow pieces | **Always, in the three kits**, so that every one of the 16 edge combinations has its own piece: side-view ground, top-down walls (room walls are one tile thick), paths (one tile wide) and holes (a trench, a stream). A block outside the kits may leave them out; the picker then uses the nearest of the 13 |
-| `-fill-b`, `-fill-c` | **For every fill that covers an area and does not move:** side-view ground, second grounds (path, cobbles, plating) and the lone floor fills (`grass-fill`, `floor-fill`, a back wall's `brick-fill`). **Not** for a top-down wall's cap, and not for animated blocks (water, pits), whose motion hides the grid |
+| `-fill-b`, `-fill-c` (up to `-fill-f`) | **For every fill that covers an area, moving or not:** side-view ground, second grounds (path, cobbles, plating), the lone floor fills (`grass-fill`, `floor-fill`, a back wall's `brick-fill`) and the body of water and pits. Moving water does **not** hide the grid: `tiles-shore` has six water fills, `tiles-water` and `tiles-pit` three. **Not** for a top-down wall's cap |
+| The 9 lane pieces: `-elbow-tl`, `-elbow-tr`, `-elbow-bl`, `-elbow-br`, `-tee-t`, `-tee-r`, `-tee-b`, `-tee-l`, `-cross` | **Optional.** For a lane one tile wide that bends, forks and crosses itself (a path, a road, a corridor): each carries the rim round the cut corners between its arms, so a wide border shows no notch at a bend. Without them a bend gets the plain corner piece |
 | `-thin-l`, `-thin-m`, `-thin-r`; slopes; decals | As the specification lists |
 
 Rules for a block:
@@ -433,13 +414,13 @@ Rules for a block:
 - **The block's outline runs along the tile boundary**, pulled in by at most 3 px for bumps, ragged edges and rounded corners. **Whatever is outside the outline is see-through**, so an edge tile sits over sky, or over any ground in a top-down game. A hole's edge tiles are the exception: they draw the bank or inner wall right up to the tile boundary.
 - **The edge band is at the same place on every tile of a block**, so edges continue from tile to tile: the top edge (grass cap, trim course, lit rim) occupies rows 0 to `edge` of `-top`, `-left` and `-right`; the side edge occupies the outer `edge` columns of the side and corner tiles. `edge` is a control (3 to 9 px).
 - **Never name a tile `-top`, `-left`, `-right` or `-fill` unless it is that tile of a block.** The checker will test it against the block and fail it. A column's capital is `pillar-cap`, not `pillar-top`.
-- **No grid showing.** Over an area of 10x6 tiles no 32 px grid may show. That is what `-fill-b` and `-fill-c` are for: the picker mixes the three versions **by the cell's position**, so the same map always looks the same; `on` decals scattered by position do the rest. Fill marks use the ramp's `dark` tone (softer tones vanish under the whole-bundle looks) and must stay visible but calm **for every swatch** of the material's colour control.
+- **No grid showing.** Over an area of 10x6 tiles no 32 px grid may show. That is what the fill versions are for: the picker mixes them **by the cell's position**, so the same map always looks the same; `on` decals scattered by position do the rest. **Version 0 (`<p>-fill` itself) is kept bare**, with no marks at all, because the picker puts it in four cells in ten: marks on it would make a dot lattice. The other versions carry the marks, in the ramp's `dark` tone (softer tones vanish under the whole-bundle looks), visible but calm **for every swatch** of the material's colour control.
 - **Calm texture.** At most six small marks per fill tile, none on the outer 2 px, nothing brighter than `light` or darker than `dark`. A screen of fill must not show a blotch repeating every 32 px.
 - **Every one of the 16 edge combinations resolves to a piece** (above, below, left and right each being the block or not): nine come from the 13 pieces and seven from the narrow pieces, so a level never has a cell without a piece of its own. A strip that is stood on from above and should look like a plank or a ledge is drawn with the `thin` pieces instead.
 - **Slope edges are as deep as flat-top edges where they meet**, so the grass cap or trim course runs on without a step.
 - **A top-down wall may be one tile thick because it has the narrow pieces.** A wall one tile wide north to south uses `col-t`, `col-m` (cap) and `col-b` (face); a wall one tile deep west to east uses `strip-l`, `strip-m`, `strip-r` or `single`, which are the face under an 8 px sliver of cap. Use two rows where a wall should look full height. A top-down tileset's sample room, rendered with the tile map tool, **must include a doorway**.
 - **Joins are tested exactly:** the checker requires the outline and the edge band of neighbouring pieces to line up to the pixel, at every value of every choice control, not only at the default.
-- Animated blocks (water, void): every piece of the block, narrow pieces included, has 8 frames.
+- Animated blocks (water, void): every piece that moves has the same frame count (8), narrow pieces included. A bare fill that does not move may be one frame (`pit-fill`).
 
 ### What a tileset must contain
 
@@ -463,7 +444,18 @@ Rules for a block:
 | A hole as a block (`pit`, `water`) | 20 | `-fill` is the depth. `-top` shows the inner wall going down (6 to 14 px); `-bottom` is only a thin lip |
 | `<p>-deco-a` ... | 3 to 6 | Floor decals: cracks, grates, flowers, splats |
 
-**A tileset holds at most three blocks and at most 64 clips.** (The forest ground has 30; a village with two blocks and a floor has 48.) A world that needs more is split into two tilesets that share their colours.
+**A tileset holds at most three blocks and at most 64 clips.** (The forest ground has 30, the shore 29, the village and the dungeon 48.) A world that needs more is split into two tilesets that share their colours.
+
+**A prefix belongs to one tileset in a scene.** When several tilesets are laid in one map, the first tileset to use a clip name keeps it, and a block, platform, slope pair or stack belongs whole to the first tileset that has its prefix. So two tilesets meant for one scene never share a prefix. **Known limit:** both sci-fi wall sets, `tiles-station-walls` and `tiles-hive`, name their block `wall` (the wall word is what makes it a wall). Today they are kept apart by using one wall set per room: list the one whose walls you want first, and the other's `wall` block is not placed (its floor, `hive-fill`, and its decals still are). A room that needs both walls cannot be laid automatically yet.
+
+### Looking at tiles in use
+
+| Tool | Shows |
+|---|---|
+| `node tools/tilemap.mjs <id>` | The joins of **one** tileset on a sample map: every piece next to its neighbours, a thin platform, decals, and for a top-down set a room with a doorway |
+| `node tools/scene.mjs <scene.json>` | Whether a **set of assets belongs together**: a map from one or more tilesets with props and characters standing on it, under one or more whole-bundle looks (`--looks original,night,mono,handheld,frost,sunset`). Use it to check values under every look, a floor without a dot lattice, a lane without a notch and a hero that does not vanish into the ground |
+
+A scene's map is rows of letters. Its `legend` gives your own letters a meaning; besides a clip name or a prefix a value may be `block:<prefix>`, `floor:<prefix>`, `thin:<prefix>`, `stack:<prefix>`, and four more that are easy to miss: **`liquid:<prefix>`** (water: its surface where nothing of it is above, its body below), **`back:<prefix>`** (that fill behind the rest of the cell: put it behind a bank or an edge tile so no backdrop shows through the see-through outside), **`part:<prefix>:<clip>`** (the cell counts as the block for its neighbours but is drawn with your clip) and **`open:<prefix>:<clip>`** (the same, but not solid: an archway, a doorway). A list of values draws several things in one cell. The tool's header is the full description.
 
 ### How a level is built from these names
 
@@ -499,6 +491,7 @@ The four neighbours decide the piece (16 combinations, each of which resolves to
 | Top-down | floor | a prefix that has **nothing but fills** (`grass-fill`, `grass-fill-b`, `grass-fill-c`): it is laid under everything |
 | Top-down | wall | a block whose prefix has `wall`, `cliff`, `hedge` or `fence` in it. **In the three kits every top-down wall block is named `wall`** |
 | Top-down | hole | a block whose prefix starts with `pit`, `hole`, `water`, `void`, `lava`, `acid`, `pool`, `pond` or `chasm`. It blocks the way |
+| Either | liquid | a prefix with only `-top` and `-fill` (and fill versions): its surface goes where nothing of it is above, its body below. A lone `<p>-foot` is where it lands (a waterfall is `fall-top`, `fall-fill`, `fall-foot`) |
 | Top-down | second ground | any other block (`path`, `cobble`, `plate`): laid over the floor |
 
 So: give a top-down wall a wall word in its prefix (a hive wall is `wall-*`, not `growth-*`), never start the prefix of walkable ground with one of the hole words, never put a wall word in it, and in a side-view tileset list the ground block before anything else that has a `-top` and a `-fill`. (A block may also state its kind to the helper, which then wins over its name: see the helper's header.) Things that repeat up and down use `-cap`, `-mid`, `-foot` (`ladder-cap`, `pillar-mid`); those, and every other name (`bridge-h`, `stairs-down`, `window`), are placed by hand.
@@ -515,7 +508,7 @@ A background is one sprite with `meta.type: 'background'`, frame 320x180, drawn 
 | `far` | Fully opaque: sky or back wall in three or four flat bands (lightest at the horizon), plus the most distant shapes |
 | `mid`, `near` | See-through above their shapes. Shapes rise from the bottom edge. Each layer draws a strip at least 8 rows high across its whole bottom edge, so it spans the full width (the checker fails a layer that does not reach column 0 and column 319) |
 | Wrapping | The right edge continues into the left edge (checked). Build every outline from waves with a whole number of cycles across 320 px, and place scattered things at positions taken modulo 320 |
-| Receding | `far` is the lightest, coolest and flattest (the tones of its land shapes within 15% brightness of each other); `near` is the darkest. Each land shape uses at most three tones. **The step in value from `far` to `mid` is about as large as the step from `mid` to `near`**: a pale `mid` merges with the mountains behind it (the first forest did) |
+| Receding | `far` is the lightest, coolest and flattest (the tones of its land shapes within 15% brightness of each other); `near` is the darkest. **A dark interior runs the other way: dark to light from far to near** (the far wall of a dungeon sinks into black and the floor under the fighters is the lightest thing), and the starfield's `near` may be lighter than its `far`. Each land shape uses at most three tones. **The step in value from `far` to `mid` is about as large as the step from `mid` to `near`**: a pale `mid` merges with the mountains behind it (the first forest did) |
 | Colours per layer | **At most 8 per layer for the landscape** (sky bands, land, trees, buildings). Stars, the moon, the sun and lit windows do not count. The checker only warns above 32 |
 | Staying behind | No outline. No pure palette colours: mix every colour 35% or more towards the air colour (`recede()` in the helper). Nothing as dark as `INK`. **Nothing in `mid` or `near` is brighter than the horizon band of the sky**, except small lights (windows, a moon) that cover under 2% of the layer. Clouds may be lighter than the sky band they sit in |
 | Smallest detail | 3 px, so nothing flickers when the layer scrolls. **Stars and lights may be 2x2 px**, but never an isolated single pixel |
@@ -523,7 +516,7 @@ A background is one sprite with `meta.type: 'background'`, frame 320x180, drawn 
 | Not repeating too soon | **`mid` and `near` do not repeat a shape more often than every 160 px**: at most two of the same tower, arch or tree clump across the 320 px, or the scroll reads as a pattern |
 | Repeating | No landmark so distinctive that the 320 px repeat is obvious: no single castle, moon or tree in `mid` or `near`. One sun, moon or far landmark is allowed in `far`, which scrolls slowest |
 | Scroll speeds | Say them in the `blurb`: far 0.1, mid 0.4, near 0.7 of the camera's speed |
-| Battle backdrops | `near` is the ground the fighters stand on: opaque from row 132 down; fighters' feet stand on row 150 |
+| Battle backdrops | `near` is the ground the fighters stand on: opaque from row 132 down; fighters' feet stand on row 150. **The standing band is calm:** the rows round the feet (146 to 153) carry no marks, tufts or joints strong enough to cut through a fighter's legs; scuffs and paving go above and below it. Everything a battle backdrop is furnished with (trees, fences, arches, pillars, torches and their light patches, paved floors, the calm band) is in `engine/scenery.js`; the worked examples are `sprites/bg-battle-field.js` and `sprites/bg-battle-dungeon.js` |
 | Controls | 6 to 8: see section 10 |
 
 **How to build one** (from the builder of the first two; the worked examples are `sprites/bg-forest.js` and `sprites/bg-castle.js`, the helper is `engine/backdrop.js`):
@@ -546,9 +539,9 @@ A background is one sprite with `meta.type: 'background'`, frame 320x180, drawn 
 | Glyph set | 16x16 | one clip per glyph, named for the thing and its state (`heart-full`, `heart-half`, `heart-empty`) | Up to 14x14 px of art. Full and empty versions have the same outline |
 | Cursor, crosshair | 32x32 | `idle` and named states | The hot spot is exported as a **`tip` socket**; the pivot stays where the helper puts it (the frame centre for a crosshair, whose `tip` is then the centre too) |
 | Icon set | 32x32 | one clip per icon | One idea per icon, 20 to 26 px, drawn tilted the same way (handle bottom left, point top right). Every icon in a set has a different silhouette. 6 to 10 icons per set |
-| Portrait set | 48x48 | `<who>-<mood>` (`hero-neutral`, `hero-happy`) | Head and shoulders, facing three-quarters right, the same colours as that character's sprite |
+| Portrait set | 48x48 | `<who>-<mood>` (`hero-neutral`, `hero-happy`) | Head and shoulders, facing three-quarters right, the same colours as that character's sprite. Up to 16 colours |
 
-All of them: `INK` outline; 1 px empty border; no words or letters drawn (digits are their own asset; the one exception is a "miss" mark, below); at most 10 colours; `meta.view: 'none'` (portraits: `'front'`).
+All of them: `INK` outline; 1 px empty border; no words or letters drawn (digits are their own asset; the one exception is a "miss" mark, below); at most 10 colours (portraits: up to 16); `meta.view: 'none'` (portraits: `'front'`).
 
 ### What the review of the first interface sprites settled
 
@@ -578,7 +571,11 @@ How to build one:
 
 ## 9. Parts
 
-Parts are Contract 3: what a sprite holds or wears, each with settings of its own. `sprites/knight.js` is the worked example.
+Parts are Contract 3: what a sprite holds or wears, each with settings of its own.
+
+**Find out what a rig offers before you write anything.** `node tools/rig.mjs` lists the rigs that describe themselves; `node tools/rig.mjs <rig>` prints one as tables (poses, body, hair, every part with its options, held kinds, sockets), and `--sheet` draws every part and held kind. The same facts as data are in `rigs/<rig>-describe.js` (`humanoid`, `topdown`, `kiosk`), and unit tests keep each description true.
+
+**The worked example is `sprites/rogue-battler.js`**, written as a definition (Contract 13: which rig, proportions and colours, which clips, which parts with their controls) on `rigs/humanoid-figure.js`, with no drawing code of its own. Write a new character that way. **The Hero (`sprites/knight.js`) and the Wizard (`sprites/wizard.js`) are older sprites that still hold their own drawing**: copy their `parts`, `when` and sound declarations if you like, not their structure.
 
 **Who must declare parts**
 
@@ -612,6 +609,7 @@ Rules:
 - Size and length settings are multipliers with default 1 (`range('Length', 1, { min: 0.65, max: 1.35, step: 0.05 })`), as on `knight`. Labels inside a part are short ("Length", "Size"), because the site shows the part's name above them.
 - **On a character built on a body rig, the parts are the rig's.** Capes, helmets, crowns, hoods, robes, belts and trim are drawn by `rigs/topdown.js` and `rigs/humanoid.js`, not in the sprite file, so every character wears them the same way and in the right depth order for each direction. The same goes for held things: the kinds the rigs provide include weapons, a staff, a bow, a gun, a lantern and a cane. **Ask the rig for its list** (see the rig's header and its worked example); if the kind or the option you need is missing, add it to the rig (Contract 11, section 14), not to your sprite.
 - **Every option of every part is checked in every direction** the sprite is drawn in (`_down`, `_up`, `_side`): attached, in front of or behind the body as it should be, and still visible.
+- **Trim worn on cloth is painted, by the rig, in the tone of its colour that stands clear of that cloth.** A scarf, belt, kerchief or boot takes the trim colour's shadow tone unless that lands within 0.12 in brightness of the cloth under it, and then the tone furthest from the cloth (`bandTone` in `engine/tones.js`, one rule for both character rigs). So a maker keeps the trim default that suits the character (the Rogue's `slate`, the bandit's `wood`) and does not pick a pale one to make it show.
 - A part of a sprite that is not on a rig (a creature's horns, a prop's lock) is drawn by its own function from an attach point, a direction and its settings, and is attached to a joint every frame.
 - A part set to `none` leaves nothing behind: no empty hand held out, no gap in the outline, **and no frame left empty** (section 4).
 - **A part's sound goes with the part, and that takes a `when` on the cue.** Taking a part off hides its settings by itself (the part's `none` does that), but it does nothing to the sprite's sounds: a blade's slash would still play over a bare fist. Every cue that belongs to a part, or to one option of it, carries `when` (section 11), and the specification writes it out.
@@ -801,7 +799,7 @@ A sound shared by two bundles gets one style per bundle.
 | Looping prop (`idle` of a torch, a pool, a gate) | 0, a looping sound | 0.35 |
 | Interface `pressed` | 0 | 0.6 |
 
-Rules: every action clip has a sound at the default look and `idle` is silent (except looping props). A cue names a sound that exists and one of its styles exactly (the specification's "style" is the cue's `preset`); **the sound batches of a bundle are built before the sprite batches that cue them**. A looping sound goes only on a looping clip. Use the sounds the specification lists for your sprite; do not invent pairings.
+Rules: every action clip has a sound at the default look and `idle` is silent (except looping props). A cue names a sound that exists and one of its styles exactly (the specification's "style" is the cue's `preset`); **a sound is made before the sprite that cues it** (the checker refuses a cue to a sound or style that is not in `sounds/`). A looping sound goes only on a looping clip. Use the sounds the specification lists for your sprite; do not invent pairings.
 
 **Sounds that only apply sometimes: `when` on the cue.** A cue plays whatever the look, unless it says otherwise. A sound that belongs to a part, or to one option of a control, carries the same `when` as a control does (section 10: an object is all of, a list is any of, and a control it names must itself be in effect). The site, the playground and the export leave the cue out while its `when` does not hold; the checker still checks that its sound and style exist.
 
@@ -841,12 +839,12 @@ At most 10 controls. Stereo, looping, `"wrap": true`. Three styles per track, na
 
 | Bundle | Track | Role | Tempo (range, default) | Key | Mood |
 |---|---|---|---|---|---|
-| Platformer | `thornwood-overworld` (new) | music/exploration | 120 to 156, 138 | G major | Bright, bouncy, adventurous: chiptune-leaning |
-| Platformer | `battle-theme` (existing) | music/battle, used for the boss | 130 to 190, 160 | D minor | Fast and tense |
-| RPG | `hearthvale-village` (new) | music/exploration | 80 to 108, 92 | F major | Warm, gentle, homely: plucked strings and flute |
-| RPG | `hearthvale-battle` (new) | music/battle | 140 to 172, 152 | A minor (Dorian) | Heroic, galloping, urgent |
-| Roguelite | `derelict-run` (new) | music/exploration | 112 to 140, 126 | E minor | Dark, driving synthwave; tension that builds with the floor number |
-| Roguelite | `derelict-boss` (new) | music/boss | 150 to 180, 164 | C minor | Relentless, distorted, alarm-like |
+| Platformer | `thornwood-overworld` | music/exploration | 120 to 156, 138 | G major | Bright, bouncy, adventurous: chiptune-leaning |
+| Platformer | `battle-theme` | music/battle, used for the boss | 130 to 190, 160 | D minor | Fast and tense |
+| RPG | `hearthvale-village` | music/exploration | 80 to 108, 92 | F major | Warm, gentle, homely: plucked strings and flute |
+| RPG | `hearthvale-battle` | music/battle | 140 to 172, 152 | A minor (Dorian) | Heroic, galloping, urgent |
+| Roguelite | `derelict-run` | music/exploration | 112 to 140, 126 | E minor | Dark, driving synthwave; tension that builds with the floor number |
+| Roguelite | `derelict-boss` | music/boss | 150 to 180, 164 | C minor | Relentless, distorted, alarm-like |
 
 Rules for every new track: one 16th-note clock drives everything; the chords the specification writes are the chords the checker must find in each bar; kick, bass and snare are the same in both channels; the melody is worth humming (a phrase of 2 or 4 bars that returns; mostly steps and one leap is the default, not a ban: **a hook that runs up or down a chord is allowed when the specification asks for one**); no two tracks in the library share a melody or a chord order.
 
@@ -854,8 +852,10 @@ Also settled by the review of the music kit:
 
 - **The melody's range is at most two octaves**, and inside the playable range of each of the five instruments (see the kit's header).
 - **The melody stays audible under every look.** A whole-bundle look may set `intensity` as low as 0.5 and raise the tempo by 5%; choose the track's intensity steps so the tune is still playing at 0.5, and check the top tempo plus 5%.
-- **The kit is `tools/compose/kit.mjs`, and `tools/compose/thornwood_overworld.mjs` is the template**: copy it for a new track.
-- **Until the checker's chord check lands, the composer runs `tools/compose/verify_music.mjs`** on the track and puts its result in the report.
+- **The kit is `sound/compose.js`** (with `tools/compose/kit.mjs` as its command line), **and `tools/compose/thornwood_overworld.mjs` is the template**: copy it for a new track. The five tracks of the kits are `tools/compose/<track>.mjs`.
+- **The kit's convention** (the header of `sound/compose.js` states it in full): three kinds of building block, one way to call each. *The piece* (clock, chords, arrangement, bus, parameters) is called with what is written and options, and has no id; *rows* (drum rows, note rows, the melody) are called with an id, then the music itself, then options; *voices and effects* are called with an id and named options only, and the same option has the same name everywhere (`trig`, `pitch`, `input`, `attack`, `decay`...). A voice's finished sound is `<id>O`. Older spellings still work and are marked deprecated; write new tracks the new way.
+- **No two tracks share a chord order or a melody, and a test says so.** `tests/unit/compose-library.test.mjs` compares every track of the library with every other, counting chords from the first bar's root, so the same progression in another key is still a clash. `derelict-boss` was given its own chords for this reason. Run it when you add a track.
+- **The checker tests the chords:** at least three bars in four must sound the chord written for them (two of the bar's three strongest notes belong to it), and it warns when more than a fifth of the pitched energy is on notes no written chord uses. `tools/compose/verify_music.mjs` shows the detail bar by bar; put its result in the report.
 - **Experiments write to a scratch file, never into `sounds/`**: the build picks up every file in that folder.
 
 ---
@@ -888,7 +888,7 @@ Combinations that are ruled out, because each one is a famous design (this list 
 | A plump five-pointed star with two eyes as a power-up | A star with sharp points and no face, or another charm altogether |
 | A teardrop blob with a wide smile; a round pink thing that puffs up; a yellow disc with a wedge mouth | A blob with its own outline and face |
 | A victory tune made of quick repeated pick-up notes rising to long held brass chords, or one ending flat-six, flat-seven, home | A tune with another contour, another rhythm and another instrument family |
-| A rising four-note brass "item found" flourish; a two-note square-wave "coin" ping whose second note is a fourth above the first | Bell or plucked arpeggios of the kit's own house sound, with their own intervals (the existing `coin-pickup` is that ping and is to be changed: see the platformer specification) |
+| A rising four-note brass "item found" flourish; a two-note square-wave "coin" ping whose second note is a fourth above the first | Bell or plucked arpeggios of the kit's own house sound, with their own intervals (the library's `coin-pickup` was that ping and was given its own three-note tune for this reason) |
 | A white-gloved pointing hand as a menu cursor; a revive item that is a long feather; a wooden crate stamped with an arrow that bounces the player | A plain arrow or diamond cursor; another object; another stamp |
 | A plumber's cap, a green pointed cap and tunic with a sword, an orange armoured suit with a round visor and an arm cannon | The kit's own heroes, as specified |
 
@@ -902,16 +902,22 @@ When a specification's wording is close to something famous, say so in your repo
 
 The helpers are the framework (Contract 11). When an asset needs generic code a helper lacks (a shape, pose, particle, tile piece, synthesis block), add it to that framework module, not to the asset file: a new export at the end of the module with a one-line doc comment listing its arguments, plus a unit test in `tests/unit/`. Additions only; existing exports keep their behaviour and every existing asset renders the same. Additions appear on `window.loadout.framework` and in `generated/api.json`. Generic code inside an asset file is a review finding; list what you added in your report.
 
-| Helper | File | What it must do | Needed by |
-|---|---|---|---|
-| `palettes` | `engine/palettes.js` | Export the three palettes of section 3 as `PALETTE.thornwood.<name>`, `PALETTE.hearthvale.<name>` and `PALETTE.derelict.<name>` (the bundle ids and `platformer`, `rpg`, `roguelite`, `scifi` are aliases), exactly as the tables of section 3 write them (a unit test reads the tables); `swatches(palette, material, { lead })` returning the swatch list for a colour control (palette colours first) and `materials(palette)` listing the material words it accepts (section 3) | every sprite batch |
-| `tile-helper` | `engine/tiles.js` | `TILE = 32`. `blockClips(prefix, { frames })` returns the 13 clip entries; `drawBlock(g, piece, material, t)` draws any piece of a block from one material description (a fill pattern that repeats every 32 px, an edge with a profile that repeats along its length, the ink line on exposed edges, the front face for top-down walls); `tileNoise(x, y, seed)` repeating every 32 px; `thin`, `slope` and decal helpers. Plus `tools/tilemap.mjs <id>`: renders a sample map (a block with an inner corner, a thin platform, decals; for a top-down tileset a room with a doorway) so joins can be seen. Its picker and classifier are the only ones: the checker, the preview tool and the playground use them. The exact call names are in the helper's header and its worked example | every tileset batch |
-| `topdown-rig` | `rigs/topdown.js` | The top-down partner of `rigs/humanoid.js`: 48x48, `PIVOT [24, 42]`; `clips(speedOf, { action, extra })` returning the section 5 table; `dims(p)` from `height`, `build`, `head`; `pose(action, direction, t, m, d)` for idle, walk, run, attack, shoot, cast, block, dodge, talk, hurt, die in three directions; `draw(g, direction, P, d, look, hooks)` with the same hooks as the side rig, called in the right depth order for each direction; `sockets(...)` with `hand`, `offhand`, `head`, `back`, `feet`, `muzzle`; held-item helpers that take a direction. The exact call names are in the helper's header and its worked example | every top-down character |
-| `humanoid-poses` | `rigs/humanoid.js` (extended) | Add the section 4 poses the side rig lacks: `die`, `block`, `victory`, `talk`, `shoot`, and a thrusting `attack` variant, with their standard clip entries, so no two characters invent their own fall. The exact call names are in the helper's header and its worked example | new side-view characters; the changes to `knight` and `wizard` |
-| `backdrop-helper` | `engine/backdrop.js` | `LAYER = [320, 180]`; ridge and treeline outlines that wrap at 320 px; `scatter(count, seed)` wrapping positions; `recede(colour, depth, sky)`; `layerClips()` | every background |
-| `ui-helper` | `engine/ui.js` | `panel9(g, x, y, w, h, { face, frame, border, corner })` with the section 8 bevel; the button states; the bar housing and fill | interface batches |
-| `fx-helper` | `engine/fx.js` | Looping and one-shot particles (`life = fract(t + hash(i))`), `twinkle`, rings, shards, smoke puffs, the white-core-to-dark-rim colour steps of an effect (`steps`, `particles`, `sparkles`, `ring`, `shards`, `smoke`, `glow`, `twinkle`). Its one-shot helpers keep every piece inside the frame, so no frame comes out empty | **required** by every effect and projectile batch (it is in their `needs`): an effect is built from these helpers, so all effects of all three kits share one look. |
-| `compose-kit` | `tools/compose/kit.mjs` | Template: `tools/compose/thornwood_overworld.mjs`. The parts every track repeats: the 16th clock, the bar counter and section gates for `bars`, the five level-matched melody instruments behind `inst`, the limiter and stereo bus, `key` and `bpm` wiring. The exact call names are in the helper's header and its worked example | every music batch |
+**Look before you write.** The framework grew to about eighty modules while the kits were made. `generated/api.json` and `docs/framework-api.md` list every function with its arguments and a one-line description, and each module's header has a short example. The modules a maker meets first:
+
+| For | Modules | Worked example |
+|---|---|---|
+| Colours | `engine/palettes.js` (the three palettes of section 3 and `swatches`), `engine/color.js` (`ramp`, `tone`, `mix`, `pick`) | any sprite |
+| Characters, side view | `rigs/humanoid.js` with `rigs/humanoid-figure.js` (a character written as a definition); `node tools/rig.mjs humanoid` | `sprites/rogue-battler.js` |
+| Characters, top-down | `rigs/topdown.js` (with `topdown-riot.js`, `topdown-sneak.js`); `node tools/rig.mjs topdown` | `sprites/hero-walker.js` |
+| Other bodies | `rigs/quadruped.js`, `rigs/creature-topdown.js`, `rigs/crawler.js`, `rigs/hive-bug.js`, `rigs/bigbody.js`, `rigs/mech-walker.js`, `rigs/guard-bot.js`, `rigs/kiosk.js`, `rigs/brood-queen.js` | the creature or boss that uses each |
+| Tilesets | `engine/tiles.js` (pieces, picker, classifier), with material modules such as `engine/ground.js`, `engine/paving.js`, `engine/water.js`, `engine/plating.js`; `tools/tilemap.mjs`, `tools/scene.mjs` | `sprites/tiles-forest.js` (side view), `sprites/tiles-station-walls.js` (top-down walls) |
+| Backgrounds | `engine/backdrop.js`, `engine/scenery.js` (battle screens), `engine/space.js` | `sprites/bg-forest.js`, `sprites/bg-battle-dungeon.js` |
+| Interface and icons | `engine/ui.js`, `engine/ui-wood.js`, `engine/glyphs.js`, `engine/icons.js`, `engine/faces.js` (portraits) | `sprites/ui-dialogue.js`, `sprites/ui-bars-rpg.js` |
+| Effects and projectiles | `engine/fx.js` (every effect and projectile is built from it, so they all share one look), `engine/bursts.js`, `engine/blast.js`, `engine/spells.js`, `engine/shots.js` | `sprites/hit-spark.js`, `sprites/fx-fire-spell.js` |
+| Props and pickups | `engine/pickups.js`, `engine/breaking.js`, `engine/buildings.js`, `engine/gadgets.js`, `engine/foliage.js` | `sprites/gem.js`, `sprites/crate.js`, `sprites/cottage.js` |
+| Music | `sound/compose.js` (the kit), `tools/compose/kit.mjs` (its command line) | `tools/compose/thornwood_overworld.mjs` |
+
+The exact call names are in each module's header and its worked example; this guide does not repeat them.
 
 ---
 

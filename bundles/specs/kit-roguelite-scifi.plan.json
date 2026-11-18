@@ -1164,6 +1164,16 @@
         },
         {
           "name": "pit-fill",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "pit-fill-b",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "pit-fill-c",
           "frames": 8,
           "loop": true
         },

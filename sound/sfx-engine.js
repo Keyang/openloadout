@@ -225,9 +225,12 @@ export const NODE_TYPES = {
   },
   noise: {
     doc: 'Noise source, -1..1.',
-    fields: { color: ['enum', 'white', 'white | pink | brown', ['white', 'pink', 'brown']] },
+    fields: {
+      color: ['enum', 'white', 'white | pink | brown', ['white', 'pink', 'brown']],
+      seed: ['con', null, 'Optional fixed seed (a whole number): the noise is then the same on every take, whatever seed the player renders with (jingles and interface sounds that must never vary). Left out, the noise changes with each take.'],
+    },
     make(h) {
-      const r = h.rng(), color = h.def.color || 'white';
+      const r = h.def.seed === undefined ? h.rng() : h.fixedRng(h.con('seed', 0)()), color = h.def.color || 'white';
       if (color === 'white') return () => r() * 2 - 1;
       if (color === 'pink') {
         let b0 = 0, b1 = 0, b2 = 0;
@@ -697,6 +700,7 @@ export function createVoice(patch, opts = {}) {
       con: (field, dflt) => getter(def[field], dflt, `${where}.${field}`, true),
       conOf: (v, label) => getter(v, undefined, `${where}.${label}`, true),
       rng: () => mulberry32(hash2(seed, i * 16 + k++)),
+      fixedRng: (s) => mulberry32(hash2(Math.round(s) >>> 0, 0x5EED)), // independent of the take's seed
     };
     return type.make(h);
   });

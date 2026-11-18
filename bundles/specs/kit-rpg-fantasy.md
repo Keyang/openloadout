@@ -1,6 +1,6 @@
 # Hearthvale turn-based RPG kit: specification (`kit-rpg-fantasy`)
 
-Written 2026-11-18 by the art director (task W3-S); revised the same day after the independent review (`when` on controls and cues, named palette colours, portrait roles, originality, batch order). It goes with `kit-rpg-fantasy.plan.json`; the two always agree. **Read `docs/style-guide.md` first**: it fixes frame sizes, clip names, frame counts, cue frames, part names, control names and the palette. This file says what each asset is.
+Written 2026-11-18 by the art director (task W3-S); revised the same day after the independent review (`when` on controls and cues, named palette colours, portrait roles, originality, batch order). It goes with `kit-rpg-fantasy.plan.json`; the two always agree. **Brought in line with the built library on 2026-11-18: every row below describes the file as it was built and reviewed.** Where a row and a file ever disagree again, the file is right and the row is corrected. **Read `docs/style-guide.md` first**: it fixes frame sizes, clip names, frame counts, cue frames, part names, control names and the palette. This file says what each asset is.
 
 | | |
 |---|---|
@@ -74,15 +74,15 @@ Contents: [Asset list](#asset-list) · [Reused assets](#reused-assets) · [New s
 
 ## Reused assets
 
-Seven existing sprites are used on the battle screen and at camp. They count towards the 49. The additions in the last column are asked for once, in the platformer kit (batch P00, task W3-X).
+Seven sprites that existed before the kit are used on the battle screen and at camp. They count towards the 49. The additions were made once, for both kits.
 
-| id | Used here as | Clips it has today | Change asked for (done by task W3-X, not by a bundle batch) |
+| id | Used here as | Clips | Added for the kits |
 |---|---|---|---|
-| `knight` | The hero on the battle screen | idle, walk, run, jump, attack, hurt | As asked for in the platformer kit: add `die` (the knock-out), `block` (the Defend command) and `victory`. |
-| `wizard` | The mage on the battle screen | idle, walk, run, jump, cast, hurt | As asked for in the platformer kit: add `die`, `victory`, `talk`; declare parts. |
-| `slime` | Battle enemy: the first, weakest monster | idle, hop, attack, hurt | Add `die` (asked for in the platformer kit). |
-| `bat` | Battle enemy in the dungeon | idle, fly, attack, hurt | Add `die` (asked for in the platformer kit). |
-| `wolf` | Battle enemy in the fields | idle, walk, run, attack, hurt | Add `die` (asked for in the platformer kit). |
+| `knight` | The hero on the battle screen | idle, walk, run, jump, attack, hurt, die, block, victory | `die` (the knock-out), `block` (the Defend command) and `victory` |
+| `wizard` | The mage on the battle screen | idle, walk, run, jump, cast, hurt, die, victory, talk | `die`, `victory`, `talk`; parts declared (weapon, headgear, beard) |
+| `slime` | Battle enemy: the first, weakest monster | idle, hop, attack, hurt, die | `die` |
+| `bat` | Battle enemy in the dungeon | idle, fly, attack, hurt, die | `die` |
+| `wolf` | Battle enemy in the fields | idle, walk, run, attack, hurt, die | `die` |
 | `coin` | Gold: battle rewards and shop prices | spin, collect | none |
 | `campfire` | The camp where the party rests | burn, ignite | none |
 
@@ -200,13 +200,13 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 48x48, pivot [24, 24], `grounded: false`.
 - **Clips (6):** `idle` 8 loop (label "Hover") · `fly` 8 loop · `attack` 8 (label "Claw") · `cast` 8 (label "Hex") · `hurt` 4 · `die` 8.
 - **Parts:** **wings**: `wings` (leaf | bat | moth | none), `wingSpan`; **horns**: `horns` (none | nubs | curled | twig), `hornLength`; **tail**: `tail` (none | thin | leafy), `tailLength`.
-- **Controls (10 + 6 in parts):** `size`, `belly` (slider: Slim / Round), `ears` (slider: Small / Huge), `eyes` (choice: sly | wide | angry), `body` (default leaf), `accent` (wings, tail tip and the insides of the ears, so it shows with both parts off: default mage), `glow` (the eyes and the hex ball of `cast`: default mage), `flap`, `bob`, `speed`.
+- **Controls (10 + 6 in parts):** `size`, `belly` (slider: Slim / Round), `ears` (slider: Small / Huge), `eyes` (choice: sly | wide | angry), `body` (default leaf), `accent` (wings, tail tip and the insides of the ears, so it shows with both parts off: default mage), `glow` (the eyes and the hex ball of `cast`: default mage), `flap` (slider "Flap": Small / Wide; **when** `{ wings: ['leaf', 'bat', 'moth'] }`), `bob`, `speed`.
 - **Sounds:** `fly` frame 1 → `whoosh` style "Quick swipe", volume 0.35, **when** `{ wings: ['leaf', 'bat', 'moth'] }` · `attack` frame 3 → `whoosh` style "Quick swipe", volume 0.7 · `cast` frame 2 → `magic-spell` style "Curse", volume 0.8 · `hurt` frame 0 → `punch` style "Light jab", volume 0.9 · `die` frame 0 → `monster-fade` style "Monster fades".
 - **Look and motion:** A small flying trickster of the woods: pot belly, big ears, a grin, wings like leaves. It hovers with a quick flutter. `cast` holds both hands up while a ball of glow grows between them and is thrown forward on frame 5. With `wings: none` it bobs on a puff of glow instead.
 
 #### `ember-wyrm` · Ember wyrm
 
-- **Meta:** type `creature`, role `characters/boss`, view `side`, themes `fantasy`. Batch **R14**.
+- **Meta:** type `creature`, role `characters/boss`, view `side`, themes `fantasy`, `dungeon`. Batch **R14**.
 - **Frame:** 128x96, pivot [56, 90].
 - **Clips (6):** `idle` 8 loop · `attack` 12 (label "Bite") · `breath` 12 (label "Fire breath") · `buffet` 10 (label "Wing buffet") · `hurt` 4 · `die` 12.
 - **Parts:** **wings**: `wings` (large | small | tattered | none), `wingSpan`; **horns**: `horns` (swept | ram | crown | none), `hornLength`; **tail**: `tail` (spade | club | flame), `tailLength`.
@@ -250,11 +250,11 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 
 - **Meta:** type `tileset`, role `world/tile`, view `top-down`, themes `fantasy`, `forest`. Batch **R10**.
 - **Frame:** 32x32, pivot [16, 16].
-- **Clips (24):** the block `water-*` with its seven narrow pieces (20 clips, 8 frames each, loop; no fill versions: the moving water hides the grid) · `bridge-h` 1 · `bridge-v` 1 · `water-deco-a` 8 loop · `water-deco-b` 1.
+- **Clips (29):** the block `water-*` with its seven narrow pieces and six fills (25 clips, 8 frames each, loop: `water-fill` is still water and `-fill-b` to `-fill-f` carry the ripples and glints) · `bridge-h` 1 · `bridge-v` 1 · `water-deco-a` 8 loop · `water-deco-b` 1.
 - **Parts:** none.
 - **Controls (8):** `water` (default water), `foam` (default cream), `land` (the bank: default path), `wood` (the bridge: default wood), `edge` (the width of the bank), `waves` (slider: Calm / Choppy), `sparkle`, `speed`.
 - **Sounds:** none.
-- **Look and motion:** Ponds, rivers and coast as a "hole" block. `water-fill` is deep water with slow light streaks. The north edge (`water-top` and the top corners) shows a bank 6 to 10 px high dropping into the water with a foam line that pulses in and out; the south edge is a thin lip. Edges are inked: water blocks the way. `bridge-h` and `bridge-v` are plank bridges that repeat along their length. Decals: a lily pad that bobs, a rock.
+- **Look and motion:** Ponds, rivers and coast as a "hole" block. `water-fill` is deep, still water, kept bare because it lands in four cells in ten; five more versions of it carry the slow light streaks, mixed in by position so a lake shows no grid. The north edge (`water-top` and the top corners) shows a bank 6 to 10 px high dropping into the water with a foam line that pulses in and out; the south edge is a thin lip. Edges are inked: water blocks the way. `bridge-h` and `bridge-v` are plank bridges that repeat along their length. Decals: a lily pad that bobs, a rock.
 
 #### `tiles-village` · Village ground and walls
 
@@ -429,7 +429,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Clips (2):** `burst` 10 · `cast` 8.
 - **Parts:** none.
 - **Controls (8):** `size`, `height`, `pieces` (the number of spikes: 3 to 7), `style` (choice: spikes | crystal | snowflake), `mist` (toggle: a low frost cloud), `core` (default cream), `edge` (default ice), `speed`.
-- **Sounds:** `cast` frame 1 → `magic-spell` style "Quick zap", volume 0.8 · `burst` frame 2 → `ice-shatter` style "Ice spell".
+- **Sounds:** `burst` frame 2 → `ice-shatter` style "Ice spell", volume 0.85 · `cast` frame 1 → `magic-spell` style "Quick zap", volume 0.8.
 - **Look and motion:** `cast` (the second clip): frost motes spiral inward. `burst`: sharp ice spikes jut up from the ground on frames 0 to 3, hold with a glint on 4 to 5, and shatter into shards that fly outward on 6 to 9. Hard highlight bands: ice is glossy.
 
 #### `fx-thunder-spell` · Thunder spell
@@ -449,7 +449,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Clips (2):** `burst` 10 · `loop` 8 loop (label "Regenerate").
 - **Parts:** none.
 - **Controls (8):** `size`, `pieces` (the number of rising motes), `rise` (slider: how high they go), `style` (choice of mote: plus | leaf | star | heart), `rings` (toggle: a ring of light on the ground), `core` (default cream), `edge` (default heal), `speed`.
-- **Sounds:** `burst` frame 0 → `heal-shimmer` style "Heal".
+- **Sounds:** `burst` frame 0 → `heal-shimmer` style "Heal", volume 0.8.
 - **Look and motion:** Gentle, upward, soft-edged: the opposite of the attack spells. A ring opens on the ground, motes rise in a loose column, each fading at a different height. `loop` is a slow version for a lasting effect.
 
 ### Battle backdrops
@@ -693,7 +693,7 @@ Exactly 2. New tracks follow the Music section of `SOUND.md` and the style guide
 
 ## Batch plan
 
-A batch starts when its helpers exist and every batch in its "Needs first" cell has passed review; batches of other kits (P.., S..) count too. **Order** is one more than the highest order among the batches it waits for. Sound batches come first because a sprite cannot cue a sound that does not exist. **R03 (the first top-down character) and R04 (the first top-down tileset) are pathfinders** (`"pathfinder": true` in the plan file) for this kit and the roguelite kit. This kit's boss, effects and backdrops wait for the platformer kit's pathfinders P08, P12 and P14. R09 and R11 cue two sounds made in the platformer kit (batch P02).
+**A record of how the kit was built; every batch below is finished and passed review.** It is kept because the order shows which asset is the worked example for which (a later batch read the earlier one's report). A batch started when its helpers exist and every batch in its "Needs first" cell has passed review; batches of other kits (P.., S..) count too. **Order** is one more than the highest order among the batches it waits for. Sound batches come first because a sprite cannot cue a sound that does not exist. **R03 (the first top-down character) and R04 (the first top-down tileset) are pathfinders** (`"pathfinder": true` in the plan file) for this kit and the roguelite kit. This kit's boss, effects and backdrops wait for the platformer kit's pathfinders P08, P12 and P14. R09 and R11 cue two sounds made in the platformer kit (batch P02).
 
 | Order | Batch | Kind | Assets | Needs first |
 |---|---|---|---|---|

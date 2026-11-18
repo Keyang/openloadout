@@ -119,6 +119,54 @@ export const inkOf = (locator, hex) => locator.evaluate((cv, c) => {
   return n;
 }, hex);
 
+// ---- the bag's pictures, frame by frame --------------------------------------------------------------------
+
+const BAG_PICTURES = () => {
+  const out = { unpainted: 0, noWave: 0 };
+  for (const row of document.querySelectorAll('.bag-item')) {
+    const cv = row.querySelector('canvas.tile');
+    if (!cv) continue;
+    const d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data;
+    if (d[3] !== 255) out.unpainted++;
+    if (row.querySelector('.bag-kind')?.textContent !== 'Sound') continue;
+    let ink = 0;
+    for (let i = 0; i < d.length; i += 4) if (d[i] === 0x23 && d[i + 1] === 0x1b && d[i + 2] === 0x33) ink++;
+    if (ink <= 64 * 2) out.noWave++;                     // a flat line: the waveform is not there
+  }
+  return out;
+};
+/** Wait until every picture on the bag page is painted and every sound shows its waveform. */
+export const bagPicturesDrawn = (page, timeout = 60_000) => expect.poll(() => page.evaluate(BAG_PICTURES), { message: 'every picture in the bag is drawn', timeout }).toEqual({ unpainted: 0, noWave: 0 });
+/**
+ * Look at the bag's pictures on every frame the browser paints, from now until the function this returns is called.
+ * It answers { frames, unpainted, noWave }: how many painted frames showed a picture that was empty, and how many
+ * showed a sound without its waveform. (It runs after the page's own drawing in each frame, so it sees what is shown.)
+ */
+export async function watchBagPictures(page) {
+  // (the page's content policy allows no code made from text, so the reading above is written out again here)
+  await page.evaluate(() => {
+    const s = window.__bagWatch = { on: true, frames: 0, unpainted: 0, noWave: 0 };
+    const tick = () => {
+      if (!s.on) return;
+      let unpainted = 0, noWave = 0;
+      for (const row of document.querySelectorAll('.bag-item')) {
+        const cv = row.querySelector('canvas.tile');
+        if (!cv) continue;
+        const d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data;
+        if (d[3] !== 255) unpainted++;
+        if (row.querySelector('.bag-kind')?.textContent !== 'Sound') continue;
+        let ink = 0;
+        for (let i = 0; i < d.length; i += 4) if (d[i] === 0x23 && d[i + 1] === 0x1b && d[i + 2] === 0x33) ink++;
+        if (ink <= 64 * 2) noWave++;
+      }
+      s.frames++; if (unpainted) s.unpainted++; if (noWave) s.noWave++;
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  });
+  return () => page.evaluate(() => { const s = window.__bagWatch; s.on = false; return { frames: s.frames, unpainted: s.unpainted, noWave: s.noWave }; });
+}
+
 // ---- the playground (read only: what the page itself reports about its scene) ---------------------------
 
 /** Wait until the playground has built its scene. */

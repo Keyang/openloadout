@@ -13,7 +13,8 @@ import { defineSprite, range, choice, color, toggle } from '../engine/sprite.js'
 import { lerp, wave } from '../engine/motion.js';
 import { ramp, tone, INK } from '../engine/color.js';
 import { PALETTE, swatches } from '../engine/palettes.js';
-import { panel9, highlight, triangle, slice9, panelSwatches, PANEL_STYLES } from '../engine/ui.js';
+import { Surface } from '../engine/surface.js';
+import { panel9, highlight, triangle, slice9, panelSwatches, borderPx, PANEL_STYLES } from '../engine/ui.js';
 
 const P = PALETTE.hearthvale;
 // Face and frame swatches come from the helper: it keeps only colours on which white text holds 4.5 to 1 and
@@ -24,6 +25,8 @@ const TAG = { x: 20, y: 14, w: 56, h: 20 };        // the name tag, centred in t
 const ROW_H = 14;
 
 const fps = (base) => (p) => base * lerp(0.65, 1.45, p.speed);
+const lookOf = (p) => ({ style: p.style, corner: p.corner, border: p.border, shadow: p.shadow, face: p.face, frame: p.frame, accent: p.accent });
+const BOX = { x: 1, y: 1, w: SIZE[0] - 2, h: SIZE[1] - 2 };
 
 export default defineSprite({
   id: 'ui-dialogue',
@@ -55,15 +58,22 @@ export default defineSprite({
     box: { frames: 1, fps: 8, loop: true },
     'name-tag': { frames: 1, fps: 8, loop: true, label: 'Name tag' },
     choice: { frames: 1, fps: 8, loop: true },
-    next: { frames: 8, fps: fps(8), loop: true, label: 'More text' },
+    next: { frames: 8, fps: fps(8), loop: true, label: 'More text', noText: true },
+  },
+  // where text goes on each clip, and one pixel of the frame band (the contrast rules are checked there)
+  textArea(clip, p) {
+    const r = clip === 'name-tag' ? TAG : BOX;
+    const out = panel9(new Surface(...SIZE), r.x, r.y, r.w, r.h, lookOf(p));
+    if (clip === 'choice') return { x: out.inner.x + 4, y: out.inner.y + 5, w: out.inner.w - 8, h: ROW_H - 6 };   // inside the highlighted row
+    return { ...out.inner, edge: { x: r.x + (r.w >> 1), y: out.body.y + (p.style === 'scroll' ? 2 : borderPx(p.border)) } };
   },
 
   render(g, { clip, t, p }) {
-    const look = { style: p.style, corner: p.corner, border: p.border, shadow: p.shadow, face: p.face, frame: p.frame, accent: p.accent };
-    if (clip === 'box') { panel9(g, 1, 1, SIZE[0] - 2, SIZE[1] - 2, look); return; }
+    const look = lookOf(p);
+    if (clip === 'box') { panel9(g, BOX.x, BOX.y, BOX.w, BOX.h, look); return; }
     if (clip === 'name-tag') { panel9(g, TAG.x, TAG.y, TAG.w, TAG.h, look); return; }
     if (clip === 'choice') {
-      const { inner } = panel9(g, 1, 1, SIZE[0] - 2, SIZE[1] - 2, look);
+      const { inner } = panel9(g, BOX.x, BOX.y, BOX.w, BOX.h, look);
       // the chosen row: a ring of the accent colour round a darker tone of the face, so white text still reads
       highlight(g, inner.x + 1, inner.y + 2, inner.w - 2, ROW_H, { colour: p.accent, fill: tone(p.face, -0.6), corner: p.corner });
       return;

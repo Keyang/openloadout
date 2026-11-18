@@ -12,7 +12,8 @@ import { defineSprite, range, choice, color } from '../engine/sprite.js';
 import { lerp, wave, PI } from '../engine/motion.js';
 import { ramp, tone, INK } from '../engine/color.js';
 import { PALETTE, swatches } from '../engine/palettes.js';
-import { panel9, highlight, triangle, slice9, panelSwatches, PANEL_STYLES } from '../engine/ui.js';
+import { Surface } from '../engine/surface.js';
+import { panel9, highlight, triangle, slice9, panelSwatches, borderPx, PANEL_STYLES } from '../engine/ui.js';
 
 const P = PALETTE.hearthvale;
 // Face and frame swatches come from the helper: it keeps only colours on which white text holds 4.5 to 1 and
@@ -55,8 +56,14 @@ export default defineSprite({
   clips: {
     panel: { frames: 1, fps: 8, loop: true },
     row: { frames: 1, fps: 8, loop: true, label: 'Highlight' },
-    cursor: { frames: 8, fps: fps(8), loop: true },
-    'turn-marker': { frames: 8, fps: fps(8), loop: true, label: 'Turn marker' },
+    cursor: { frames: 8, fps: fps(8), loop: true, noText: true },
+    'turn-marker': { frames: 8, fps: fps(8), loop: true, label: 'Turn marker', noText: true },
+  },
+  // where text goes on each clip, and one pixel of the frame band (the contrast rules are checked there)
+  textArea(clip, p) {
+    if (clip === 'row') return { x: ROW.x + 3, y: ROW.y + 3, w: ROW.w - 6, h: ROW.h - 6 };
+    const out = panel9(new Surface(...SIZE), 1, 1, SIZE[0] - 2, SIZE[1] - 2, { style: p.style, corner: p.corner, border: p.border, face: p.face, frame: p.frame, accent: p.accent });
+    return { ...out.inner, edge: { x: SIZE[0] >> 1, y: out.body.y + (p.style === 'scroll' ? 2 : borderPx(p.border)) } };
   },
 
   render(g, { clip, t, p }) {

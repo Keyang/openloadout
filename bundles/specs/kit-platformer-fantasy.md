@@ -1,6 +1,6 @@
 # Thornwood Keep platformer kit: specification (`kit-platformer-fantasy`)
 
-Written 2026-11-18 by the art director (task W3-S); revised the same day after the independent review (clip order of props with states, `when` on controls and cues, named palette colours, originality, batch order). It goes with `kit-platformer-fantasy.plan.json`; the two always agree. **Read `docs/style-guide.md` first**: it fixes frame sizes, clip names, frame counts, cue frames, part names, control names and the palette. This file says what each asset is.
+Written 2026-11-18 by the art director (task W3-S); revised the same day after the independent review (clip order of props with states, `when` on controls and cues, named palette colours, originality, batch order). It goes with `kit-platformer-fantasy.plan.json`; the two always agree. **Brought in line with the built library on 2026-11-18: every row below describes the file as it was built and reviewed.** Where a row and a file ever disagree again, the file is right and the row is corrected. **Read `docs/style-guide.md` first**: it fixes frame sizes, clip names, frame counts, cue frames, part names, control names and the palette. This file says what each asset is.
 
 | | |
 |---|---|
@@ -72,16 +72,16 @@ Contents: [Asset list](#asset-list) · [Reused assets](#reused-assets) · [New s
 
 ## Reused assets
 
-Seven existing sprites are used as they are. They count towards the 47. The last column lists small additions that make them complete for this kit; those are done once by task W3-X (they also serve the RPG kit).
+Seven sprites that existed before the kit are part of it. They count towards the 47. The additions the kit asked for have been made (they also serve the RPG kit).
 
-| id | Used here as | Clips it has today | Change asked for (done by task W3-X, not by a bundle batch) |
+| id | Used here as | Clips | Added for the kits |
 |---|---|---|---|
-| `knight` | The player | idle, walk, run, jump, attack, hurt | Add `die` (8), `block` (6) and `victory` (8, loop) from the `humanoid-poses` helper. Cue `land-thud` style "Armoured" on `jump` frame 6 in place of the footstep. |
-| `wizard` | The guide who stands at checkpoints and the level start (a townsperson here; a second playable hero if wanted) | idle, walk, run, jump, cast, hurt | Add `die` (8), `victory` (8, loop) and `talk` (8, loop). Declare its parts: `headgear` (the hat), `beard`, `weapon` (the staff). |
-| `slime` | Basic ground enemy: hops back and forth | idle, hop, attack, hurt | Add `die` (8): flattens and bursts into droplets; cue `enemy-squish` style "Squish" on frame 0. |
-| `bat` | Basic flying enemy in caves and the castle | idle, fly, attack, hurt | Add `die` (8): wings fold, it drops and pops; cue `enemy-squish` style "Pop" on frame 0. |
-| `wolf` | Fast ground enemy that charges | idle, walk, run, attack, hurt | Add `die` (8): stumbles and lies down; cue `punch` style "Heavy body blow" on frame 0. |
-| `coin` | The main thing to collect | spin, collect | none for the sprite. Its sound `coin-pickup` gets a new interval and voice in the same task (originality: Sound effects, row 7) |
+| `knight` | The player | idle, walk, run, jump, attack, hurt, die, block, victory | `die` (8), `block` (6) and `victory` (8, loop); `land-thud` style "Armoured" on `jump` frame 6. Parts: hair, headgear, weapon, cape |
+| `wizard` | The guide who stands at checkpoints and the level start (a townsperson here; a second playable hero if wanted) | idle, walk, run, jump, cast, hurt, die, victory, talk | `die` (8), `victory` (8, loop) and `talk` (8, loop); its parts are declared: weapon (the staff), headgear (the hat), beard |
+| `slime` | Basic ground enemy: hops back and forth | idle, hop, attack, hurt, die | `die` (8): flattens and bursts into droplets |
+| `bat` | Basic flying enemy in caves and the castle | idle, fly, attack, hurt, die | `die` (8): wings fold, it drops and pops |
+| `wolf` | Fast ground enemy that charges | idle, walk, run, attack, hurt, die | `die` (8): stumbles and lies down |
+| `coin` | The main thing to collect | spin, collect | nothing on the sprite; its sound `coin-pickup` was given a tune of its own (Sound effects, row 7) |
 | `campfire` | Rest spot beside a checkpoint | burn, ignite | none |
 
 ## New sprites
@@ -134,11 +134,11 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 
 - **Meta:** type `tileset`, role `world/tile`, view `side`, themes `fantasy`, `forest`. Batch **P05**.
 - **Frame:** 32x32, pivot [16, 16].
-- **Clips (5):** `water-top` 8 loop · `water-fill` 8 loop · `fall-top` 8 loop · `fall-fill` 8 loop · `fall-foot` 8 loop.
+- **Clips (7):** `water-top` 8 loop · `water-fill`, `-fill-b`, `-fill-c` 8 loop each · `fall-top` 8 loop · `fall-fill` 8 loop · `fall-foot` 8 loop.
 - **Parts:** none.
 - **Controls (6):** `liquid` (choice: water | lava | swamp: changes the surface shape and the motion: ripples, slow bubbles and crust, lily pads and blips), `water` (colour: default water; ember and moss are swatches for lava and swamp), `foam` (colour: default cream), `waves` (slider: Calm / Choppy), `sparkle`, `speed`.
 - **Sounds:** none.
-- **Look and motion:** Liquid the player swims in or dies in. `water-top` is the surface: see-through above a waterline at row 6, with a foam line whose crests travel sideways and loop. `water-fill` is the body: opaque, two tones, slow light streaks. `fall-fill` is falling streaks that move down and loop up and down; `fall-top` is the lip where water tips over; `fall-foot` is the foam where it lands. All five clips have 8 frames so the joins hold on every frame.
+- **Look and motion:** Liquid the player swims in or dies in. `water-top` is the surface: see-through above a waterline at row 6, with a foam line whose crests travel sideways and loop. `water-fill` is the body: opaque, two tones, slow light streaks. `fall-fill` is falling streaks that move down and loop up and down; `fall-top` is the lip where water tips over; `fall-foot` is the foam where it lands. All seven clips have 8 frames so the joins hold on every frame; the body of the pool has three versions (`water-fill` is the bare one), mixed by position so a deep pool shows no grid.
 
 ### Enemies and the boss
 
@@ -230,7 +230,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 32x32, pivot [16, 30].
 - **Clips (4), in this order:** `idle` 1 · `retract` 6 · `warn` 4 loop · `attack` 6 (label "Extend").
 - **Parts:** none.
-- **Controls (7):** `style` (choice: metal | bone | thorn | crystal), `count` (choice: three | four | five spikes), `length`, `base` (toggle: a base plate), `metal` (default steel), `accent` (the tips: default crimson), `speed`.
+- **Controls (7):** `style` (choice: metal | bone | thorn | crystal), `count` (choice "Spikes": three | four | five; starts on four), `length`, `base` (toggle: a base plate), `metal` (default steel), `accent` (the tips: default crimson), `speed`.
 - **Sounds:** `attack` frame 1 → `sword-slash` style "Quick dagger", volume 0.7.
 - **Look and motion:** A row of spikes across one tile, 30 px wide. The clips are one cycle: `idle` is fully out; `retract` pulls the spikes down slowly and ends on the tips (its last frame is the first frame of `warn`); `warn` shows only the tips, twitching; `attack` snaps them out in two frames with a 2 px overshoot and ends on `idle`. **The tips never sink below 3 px above the ground line, at any `length` and with `base` off**, so the trap is never an empty frame: retracted, it is a row of tips (and, with `base` on, the plate under them).
 
@@ -282,7 +282,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 32x32, pivot [16, 30].
 - **Clips (3), in this order:** `off` 1 · `pull` 6 · `on` 1.
 - **Parts:** none.
-- **Controls (7):** `style` (choice: floor lever | wall switch | crank), `length` (the handle), `knob` (toggle: a ball on the end), `stone` (the base: default stone), `metal` (default steel), `accent` (the knob and the "on" light: default crimson), `speed`.
+- **Controls (7):** `style` (choice "Style": floor | wall | crank), `length` (the handle), `knob` (toggle: a ball on the end), `stone` (the base: default stone), `metal` (default steel), `accent` (the knob and the "on" light: default crimson), `speed`.
 - **Sounds:** `pull` frame 2 → `lever-clank` style "Lever", volume 0.8.
 - **Look and motion:** A handle on a base. `off` leans left, `on` leans right with a lit mark on the base. `pull` goes from off to on with a 2 px overshoot and settle, and its last frame is `on`; a game plays it backwards to switch off.
 
@@ -293,7 +293,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Clips (3), in this order:** `down` 1 (label "Inactive") · `raise` 8 · `up` 8 loop (label "Active"). (The flying flag is `up`, not `idle`: `idle` is only ever a first clip.)
 - **Parts:** **emblem**: `emblem` (none | star | skull | sun), `emblemColour` (default gold).
 - **Controls (7 + 2 in parts):** `height` (the pole), `shape` (choice of flag: pennant | banner | swallowtail), `finial` (toggle: a ball on top of the pole, at least 4x4 px), `cloth` (default hero), `wood` (the pole: default wood), `sway`, `speed`.
-- **Sounds:** `raise` frame 1 → `whoosh` style "Quick swipe", volume 0.7 · `raise` frame 6 → `chime-success` style "Quick confirm".
+- **Sounds:** `raise` frame 1 → `whoosh` style "Quick swipe", volume 0.7 · `raise` frame 6 → `chime-success` style "Quick confirm", volume 0.8.
 - **Look and motion:** A flag on a pole. `down`: the flag hangs furled at the bottom, dull. `raise`: it runs up the pole and snaps open with a flash. `up`: it waves in three folds that travel along the cloth.
 
 #### `crate` · Breakable crate
@@ -340,7 +340,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 
 #### `gold-key` · Key
 
-- **Meta:** type `pickup`, role `items/key`, view `front`, themes `fantasy`, `forest`. Batch **P11**.
+- **Meta:** type `pickup`, role `items/key`, view `front`, themes `fantasy`, `forest`, `dungeon`. Batch **P11**.
 - **Frame:** 32x32, pivot [16, 30], `grounded: false`.
 - **Clips (2):** `idle` 8 loop · `collect` 8.
 - **Parts:** none.
@@ -350,7 +350,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 
 #### `potion` · Potion
 
-- **Meta:** type `pickup`, role `items/food`, view `front`, themes `fantasy`, `forest`. Batch **P11**.
+- **Meta:** type `pickup`, role `items/food`, view `front`, themes `fantasy`, `forest`, `dungeon`. Batch **P11**.
 - **Frame:** 32x32, pivot [16, 30], `grounded: false`.
 - **Clips (2):** `idle` 8 loop · `collect` 8.
 - **Parts:** none.
@@ -514,7 +514,7 @@ Exactly 20. New sounds follow `../../skills/sprite-forge/SOUND.md` (the skill is
 | 4 | `punch` | Punch | sfx | actions/hit | reused (existing) | every `hurt` frame 0 |
 | 5 | `whoosh` | Whoosh | sfx | actions/dash | reused (existing) | enemy attacks, dives, the banner rising, the golem's roar |
 | 6 | `metal-hit` | Metal hit | sfx | effects/impact | reused (existing) | a hit that lands on armour or shell, with `hit-spark`; `thorn-beetle` `block` |
-| 7 | `coin-pickup` | Coin pickup | sfx | items/pickup | reused (existing) | `coin` `collect` frame 1. **Change asked for (originality, task W3-X):** today it is a two-note square blip with the second note a fourth up, which is the best-known coin sound in games. Give it its own interval and voice (for example a major sixth on a triangle with a short bell), keeping its id and its styles "Gem" and "Dull token" |
+| 7 | `coin-pickup` | Coin pickup | sfx | items/pickup | reused (existing) | `coin` `collect` frame 1. Changed for originality: it is now a three-note tune (a low grace note, then a leap of a major sixth struck twice, on a triangle with a short bell), no longer the two-note square blip a fourth apart. Styles "Gem" and "Dull token" |
 | 8 | `powerup` | Power-up | sfx | items/consume | reused (existing) | `potion` and `star-charm` `collect` |
 | 9 | `chime-success` | Success chime | jingle | interface/reward | reused (existing) | `checkpoint-banner` `raise` frame 6; level complete |
 | 10 | `wind` | Wind | ambience | environment/weather | reused (existing) | the forest levels, looped under the music |
@@ -634,7 +634,7 @@ Exactly 2. New tracks follow the Music section of `SOUND.md` and the style guide
 
 ## Batch plan
 
-A batch starts when its helpers exist and every batch in its "Needs first" cell has passed review; batches of other kits (R.., S..) count too. **Order** is one more than the highest order among the batches it waits for, so order 1 batches wait for nothing. **Sound batches come first because a sprite cannot cue a sound that does not exist.** A **pathfinder** is the first batch of its kind in the whole library (`"pathfinder": true` in the plan file): the batches of that kind in all three kits start after it and read its report. P03 is the pathfinder for tilesets, P08 for bosses, P11 for pickups, P12 for projectiles and effects, P14 for backgrounds. A batch is sized for one builder in one sitting, with review.
+**A record of how the kit was built; every batch below is finished and passed review.** It is kept because the order shows which asset is the worked example for which (a later batch read the earlier one's report). A batch started when its helpers exist and every batch in its "Needs first" cell has passed review; batches of other kits (R.., S..) count too. **Order** is one more than the highest order among the batches it waits for, so order 1 batches wait for nothing. **Sound batches come first because a sprite cannot cue a sound that does not exist.** A **pathfinder** is the first batch of its kind in the whole library (`"pathfinder": true` in the plan file): the batches of that kind in all three kits start after it and read its report. P03 is the pathfinder for tilesets, P08 for bosses, P11 for pickups, P12 for projectiles and effects, P14 for backgrounds. A batch is sized for one builder in one sitting, with review.
 
 | Order | Batch | Kind | Assets | Needs first |
 |---|---|---|---|---|

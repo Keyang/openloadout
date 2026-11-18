@@ -67,6 +67,18 @@
         {
           "name": "hurt",
           "frames": 4
+        },
+        {
+          "name": "die",
+          "frames": 8
+        },
+        {
+          "name": "block",
+          "frames": 6
+        },
+        {
+          "name": "victory",
+          "frames": 8
         }
       ],
       "parts": [
@@ -112,9 +124,25 @@
         {
           "name": "hurt",
           "frames": 4
+        },
+        {
+          "name": "die",
+          "frames": 8
+        },
+        {
+          "name": "victory",
+          "frames": 8
+        },
+        {
+          "name": "talk",
+          "frames": 8
         }
       ],
-      "parts": [],
+      "parts": [
+        "weapon",
+        "headgear",
+        "beard"
+      ],
       "reuse": true,
       "batch": null
     },
@@ -144,6 +172,10 @@
         {
           "name": "hurt",
           "frames": 4
+        },
+        {
+          "name": "die",
+          "frames": 8
         }
       ],
       "parts": [],
@@ -176,6 +208,10 @@
         {
           "name": "hurt",
           "frames": 4
+        },
+        {
+          "name": "die",
+          "frames": 8
         }
       ],
       "parts": [],
@@ -212,6 +248,10 @@
         {
           "name": "hurt",
           "frames": 4
+        },
+        {
+          "name": "die",
+          "frames": 8
         }
       ],
       "parts": [],
@@ -913,6 +953,16 @@
         },
         {
           "name": "water-fill",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "water-fill-b",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "water-fill-c",
           "frames": 8,
           "loop": true
         },
@@ -2703,27 +2753,27 @@
   "reusedChanges": [
     {
       "id": "knight",
-      "change": "Add `die` (8), `block` (6) and `victory` (8, loop) from the `humanoid-poses` helper. Cue `land-thud` style \"Armoured\" on `jump` frame 6 in place of the footstep."
+      "change": "Done. Add `die` (8), `block` (6) and `victory` (8, loop) from the `humanoid-poses` helper. Cue `land-thud` style \"Armoured\" on `jump` frame 6 in place of the footstep."
     },
     {
       "id": "wizard",
-      "change": "Add `die` (8), `victory` (8, loop) and `talk` (8, loop). Declare its parts: `headgear` (the hat), `beard`, `weapon` (the staff)."
+      "change": "Done. Add `die` (8), `victory` (8, loop) and `talk` (8, loop). Declare its parts: `headgear` (the hat), `beard`, `weapon` (the staff)."
     },
     {
       "id": "slime",
-      "change": "Add `die` (8): flattens and bursts into droplets; cue `enemy-squish` style \"Squish\" on frame 0."
+      "change": "Done. Add `die` (8): flattens and bursts into droplets; cue `enemy-squish` style \"Squish\" on frame 0."
     },
     {
       "id": "bat",
-      "change": "Add `die` (8): wings fold, it drops and pops; cue `enemy-squish` style \"Pop\" on frame 0."
+      "change": "Done. Add `die` (8): wings fold, it drops and pops; cue `enemy-squish` style \"Pop\" on frame 0."
     },
     {
       "id": "wolf",
-      "change": "Add `die` (8): stumbles and lies down; cue `punch` style \"Heavy body blow\" on frame 0."
+      "change": "Done. Add `die` (8): stumbles and lies down; cue `punch` style \"Heavy body blow\" on frame 0."
     },
     {
       "id": "coin-pickup",
-      "change": "Originality: today it is a two-note square blip with the second note a fourth up, the best-known coin sound in games. Give it its own interval and voice (for example a major sixth on a triangle with a short bell), keeping its id and its styles \"Gem\" and \"Dull token\"."
+      "change": "Done. Originality: today it is a two-note square blip with the second note a fourth up, the best-known coin sound in games. Give it its own interval and voice (for example a major sixth on a triangle with a short bell), keeping its id and its styles \"Gem\" and \"Dull token\"."
     }
   ]
 }
