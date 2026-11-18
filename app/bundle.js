@@ -1,9 +1,11 @@
-// Builds what people download: a sprite sheet with its sounds, one sound, a whole kit,
-// or the bag as one game resource package (architecture.md, Contract 8).
+// Builds what people download: a sprite sheet with its sounds, or the bag (or a bundle) as one game
+// resource package (architecture.md, Contract 8). Which assets exist comes from the catalogue
+// (app/catalog.js); a sprite's own program is loaded when it is first needed.
 import { renderSheet, defaultParams, cleanParams, cueInEffect } from '../engine/sprite.js';
 import { defaultTheme, normalizeTheme, applyColour, themedParams } from '../engine/theme.js';
 import { applySound, themedSoundParams, soundSettingsFor } from '../sound/theme.js';
 import { soundById, soundParams, rendered, renderAsync, wavBytes, isMusic } from './audio.js';
+import { loadCatalog, assetById, loadSprite } from './catalog.js';
 
 const enc = new TextEncoder();
 
@@ -31,9 +33,12 @@ export function defaultCues(sprite) {
   return out;
 }
 
-/** True when a bag item's kind matches its asset: a crafted link must not export a sound as music. */
-export function kindMatches(kind, id, spriteById) {
-  if (kind === 'sprite') return !!spriteById[id];
+/**
+ * True when a bag item's kind matches its asset: a crafted link must not export a sound as music.
+ * Sprites are looked up in the catalogue (their programs may not be loaded yet); sounds in the sound library.
+ */
+export function kindMatches(kind, id) {
+  if (kind === 'sprite') return assetById(id)?.kind === 'sprite';
   const patch = soundById[id];
   return !!patch && (kind === 'music') === isMusic(patch);
 }
@@ -95,30 +100,6 @@ export async function spriteFiles(sprite, p, cues, scale = 1, theme = null) {
   return files;
 }
 
-/** Files for a kit: one folder per sprite, plus the kit's extra sounds. */
-export async function kitFiles(kit, spriteById) {
-  const files = [];
-  for (const id of kit.sprites) {
-    const sprite = spriteById[id];
-    if (!sprite) continue;
-    for (const f of await spriteFiles(sprite, defaultParams(sprite), defaultCues(sprite))) files.push({ name: `${id}/${f.name}`, data: f.data });
-  }
-  for (const id of kit.sounds) {
-    const patch = soundById[id];
-    if (!patch) continue;
-    files.push({ name: `sounds/${id}.wav`, data: wavBytes(rendered(patch, soundParams(patch), 1)) });
-    for (const preset of Object.keys(patch.presets ?? {})) {
-      files.push({ name: `sounds/${id} (${preset.toLowerCase()}).wav`, data: wavBytes(rendered(patch, soundParams(patch, preset), 1)) });
-    }
-  }
-  for (const id of kit.music ?? []) {
-    const patch = soundById[id];
-    if (patch) files.push({ name: `music/${id}.wav`, data: wavBytes(await renderAsync(patch, soundParams(patch), 1)) });
-  }
-  files.push({ name: 'read-me.txt', data: enc.encode(`${kit.name} — made with Loadout\n\n${kit.blurb}\n\nEach sprite has its own folder with a sprite sheet (PNG), an animation list (JSON), the sounds that go with its\nanimations, and a short guide. The sounds folder holds every sound in the kit, including each sound's other styles.${(kit.music ?? []).length ? ' The music folder holds one loop per track: set it to repeat in your game.' : ''}\n`) });
-  return files;
-}
-
 function howTo(sprite, meta) {
   const rows = Object.entries(meta.animations).map(([name, a]) => `  row ${a.row + 1}: ${name} — ${a.frames} frames, ${a.fps} frames per second, ${a.loop ? 'loops' : 'plays once'}`).join('\n');
   const soundRows = Object.entries(meta.sounds).flatMap(([clip, list]) => list.map((c) => `  ${clip}: ${c.file} — ${c.loop ? 'loops for as long as the animation plays' : `starts on frame ${c.frame + 1} (${c.timeMs} ms in)`}${c.volume !== 1 ? `, volume ${Math.round(c.volume * 100)}%` : ''}`));
@@ -160,15 +141,8 @@ Keep pixel art sharp: always turn smoothing or filtering off, and scale by whole
 
 // ---- the bag as one package (Contract 8) -------------------------------------------
 
-let catalogInfo = null;
 /** Name, role and type of every catalogue asset, by id. Empty when the catalogue file is not there. */
-function catalogue() {
-  catalogInfo = catalogInfo ?? fetch('generated/catalog.json')
-    .then((r) => (r.ok ? r.json() : { assets: [] }))
-    .then((c) => Object.fromEntries((c.assets ?? []).map((a) => [a.id, a])))
-    .catch(() => ({}));
-  return catalogInfo;
-}
+const catalogue = () => loadCatalog().then((c) => Object.fromEntries((c.assets ?? []).map((a) => [a.id, a]))).catch(() => ({}));
 
 const KIND_WORD = { sprite: 'sprite', sound: 'sound effect', music: 'music track' };
 
@@ -186,13 +160,13 @@ function unique(taken, base, ext = '') {
  *   sounds/<id>.wav    music/<id>.wav    manifest.json    read-me.txt
  * items: bag items { key, kind, id, settings }; theme: the bag's theme, applied to everything;
  * scale: pixel size for sprites whose settings do not choose one.
- * Optional: catalog ({ id: { name, role, type } }), spriteById, onProgress(text).
+ * Optional: catalog ({ id: { name, role, type } }), onProgress(text).
+ * An item whose asset is not on the site, or whose own file cannot be loaded, is left out and named under "missing".
  * Returns [{ name, data: Uint8Array }] for zip().
  */
-export async function packageFiles({ items, theme = null, scale = 1, catalog = null, spriteById = null, onProgress = () => {} }) {
+export async function packageFiles({ items, theme = null, scale = 1, catalog = null, onProgress = () => {} }) {
   const t = activeTheme(theme);
   const info = catalog ?? await catalogue();
-  const sprites = spriteById ?? (await import('../sprites/index.js')).byId;
   const files = [], assets = [], missing = [];
   const folders = new Set(), soundNames = new Set(), musicNames = new Set();
   let done = 0;
@@ -201,9 +175,10 @@ export async function packageFiles({ items, theme = null, scale = 1, catalog = n
     const s = item.settings ?? {};
     const about = info[item.id] ?? {};
     const entry = (name, meta) => ({ key: item.key, id: item.id, kind: item.kind, name: about.name ?? name, role: about.role ?? meta?.role ?? null, type: about.type ?? meta?.type ?? null, files: [], settings: s });
-    if (!kindMatches(item.kind, item.id, sprites)) { missing.push(item.id); continue; }
+    // a sprite's own program is loaded here, when the package needs it
+    const sprite = item.kind === 'sprite' && kindMatches(item.kind, item.id) ? await loadSprite(item.id).catch(() => null) : null;
+    if (item.kind === 'sprite' ? !sprite : !kindMatches(item.kind, item.id)) { missing.push(item.id); continue; }
     if (item.kind === 'sprite') {
-      const sprite = sprites[item.id];
       const folder = unique(folders, item.id);
       const a = entry(sprite.name, sprite.meta);
       a.folder = `sprites/${folder}/`;

@@ -3,7 +3,6 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { loadAssets } from '../../tools/lib/assets.mjs';
 import { validateMeta, validateBundle, WORDS_MIN, WORDS_MAX } from '../../catalog/schema.js';
-import { kits } from '../../kits/index.js';
 
 const { sprites, sounds, bundles } = await loadAssets();
 
@@ -55,19 +54,5 @@ test('every bundle file is valid and refers only to assets that exist', () => {
     const { file, ...data } = b;
     const r = validateBundle(data, known);
     assert.ok(r.ok, `${file}:\n  ${r.errors.join('\n  ')}`);
-  }
-});
-
-test('the three kits were migrated to bundle files with the same ids and members', () => {
-  for (const k of kits) {
-    const b = bundles.find((x) => x.id === k.id);
-    assert.ok(b, `bundles/${k.id}.json is missing`);
-    assert.equal(b.name, k.name);
-    assert.equal(b.blurb, k.blurb);
-    assert.deepEqual(b.sprites, k.sprites);
-    assert.deepEqual(b.sounds, k.sounds);
-    assert.deepEqual(b.music, k.music ?? []);
-    assert.equal(typeof b.gameType, 'string');
-    assert.deepEqual(b.theme, {});
   }
 });

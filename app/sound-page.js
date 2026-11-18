@@ -1,9 +1,8 @@
 // One sound: hear it, change it with sliders, download it.
-import { sprites } from '../sprites/index.js';
-import { kits } from '../kits/index.js';
 import { el, header, saveBlob, SOUND_BG, cap } from './ui.js';
 import { soundParams, randomSoundParams, rendered, playRendered, wavBytes, toUnit, toValue, drawWave } from './audio.js';
 import { addToBag, keepBag } from './add-to-bag.js';
+import { goesWith, moreLikeThis } from './related.js';
 
 const INK = '#231b33';
 const fmt = (d, v) => {
@@ -109,9 +108,6 @@ export function soundPage(app, patch, query) {
     catch { say('Copy the address in your browser bar to share this exact sound.'); }
   }
 
-  const usedBy = sprites.filter((s) => Object.values(s.sounds).some((list) => list.some((c) => c.sound === patch.id)));
-  const inKits = kits.filter((k) => k.sounds.includes(patch.id));
-
   if (Number(query.seed) >= 1) st.seed = Math.round(Number(query.seed));   // a variation opened from the bag
   const bagBox = addToBag('sound', patch.id, () => ({ params: { ...st.p }, style: st.preset, seed: st.seed }), query);
   render(); syncPlay(); syncStyle();
@@ -123,9 +119,7 @@ export function soundPage(app, patch, query) {
         el('div', { class: 'stage-card' }, wrap, el('div', { class: 'stage-tools' }, el('div', { class: 'tools-left' }, playBtn, lengthNote),
           el('button', { type: 'button', class: 'ghost', onclick: () => { st.seed = 1 + Math.floor(Math.random() * 9999); changed(true); } }, 'Play a variation'))),
         el('div', { class: 'under' }, el('span', { class: 'label' }, 'Style'), styleBar),
-        usedBy.length || inKits.length ? el('p', { class: 'used' },
-          usedBy.length ? ['Used by ', usedBy.map((s, i) => [i ? ', ' : '', el('a', { href: `#/sprite/${s.id}` }, s.name)]), '. '] : null,
-          inKits.length ? ['In ', inKits.map((k, i) => [i ? ', ' : '', el('a', { href: `#/kit/${k.id}` }, k.name)]), '.'] : null) : null),
+        goesWith(patch.id)),      // the sprites that use it and the bundles it is in, from the catalogue
       el('div', { class: 'panel' },
         el('div', { class: 'panel-actions' },
           el('button', { type: 'button', class: 'btn', onclick: () => { st.p = soundParams(patch, null, randomSoundParams(patch)); st.custom = true; syncSliders(); changed(true); } }, 'Surprise me'),
@@ -135,7 +129,8 @@ export function soundPage(app, patch, query) {
         bagBox,
         el('button', { type: 'button', class: 'btn big', onclick: download }, 'Download sound'),
         el('button', { type: 'button', class: 'ghost', onclick: copyLink }, 'Copy link'),
-        status)));
+        status),
+      moreLikeThis(patch.id)));
 
   const ro = new ResizeObserver(fit);
   ro.observe(wrap);

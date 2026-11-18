@@ -2,7 +2,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { defineSprite, defaultParams, cleanParams, randomParams, renderFrame, renderSheet, range, choice, color, toggle, clipFps } from '../../engine/sprite.js';
-import { sprites } from '../../sprites/index.js';
+import { loadSprites } from '../../tools/lib/assets.mjs';
+
+// every sprite in sprites/ (there is no list: the folder is scanned)
+const sprites = (await loadSprites()).map((s) => s.def);
 
 const base = () => ({
   id: 'test-blob', name: 'Test blob', size: [16, 16], pivot: [8, 15],

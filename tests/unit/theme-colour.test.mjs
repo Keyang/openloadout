@@ -7,7 +7,11 @@ import {
 } from '../../engine/theme.js';
 import { pack, col, INK, rgbToHsl } from '../../engine/color.js';
 import { renderFrame, defaultParams, cleanParams } from '../../engine/sprite.js';
-import { sprites, byId } from '../../sprites/index.js';
+import { loadSprites } from '../../tools/lib/assets.mjs';
+
+// every sprite in sprites/ (there is no list: the folder is scanned)
+const sprites = (await loadSprites()).map((s) => s.def);
+const byId = Object.fromEntries(sprites.map((s) => [s.id, s]));
 
 const unpack = (v) => [v & 255, (v >>> 8) & 255, (v >>> 16) & 255, v >>> 24];
 const colour = (over) => ({ ...defaultTheme().colour, ...over });
@@ -260,12 +264,13 @@ test('themedParams always gives valid controls for every sprite over 50 seeds', 
         if (d.kind === 'range') assert.ok(p[k] >= d.min && p[k] <= d.max, `${s.id}.${k}`);
         if (d.kind === 'choice') assert.ok(d.options.some((o) => o.value === p[k]), `${s.id}.${k}`);
       }
-      // Every frame of every clip draws something and stays clear of the frame edge.
-      const [w, h] = s.size;
+      // Every frame of every clip draws something and stays clear of the frame edge
+      // (tiles, backgrounds, interface pieces and icons may reach the edge: the same rule as quality/sprite.js).
+      const [w, h] = s.size, mayTouch = ['tileset', 'background', 'ui', 'icon'].includes(s.meta?.type);
       for (const clip of Object.keys(s.clips)) for (let f = 0; f < s.clips[clip].frames; f++) {
         const b = renderFrame(s, clip, f, p).bounds();
         assert.ok(b, `${s.id} seed ${seed} ${clip} ${f} drew nothing`);
-        assert.ok(b.x0 > 0 && b.y0 > 0 && b.x1 < w - 1 && b.y1 < h - 1, `${s.id} seed ${seed} ${clip} frame ${f} touches the edge: ${JSON.stringify(b)}`);
+        assert.ok(mayTouch || (b.x0 > 0 && b.y0 > 0 && b.x1 < w - 1 && b.y1 < h - 1), `${s.id} seed ${seed} ${clip} frame ${f} touches the edge: ${JSON.stringify(b)}`);
       }
     }
   }

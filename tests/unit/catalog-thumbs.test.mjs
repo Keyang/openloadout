@@ -15,8 +15,9 @@ test('sprite thumbnail: a valid PNG of one frame at 2x, with something drawn', (
     assert.equal(img.h, def.size[1] * 2, id);
     assert.ok(t.frame >= 0 && t.frame < def.clips[def.preview].frames, id);
     assert.ok(opaqueCount(img) > 40, `${id}: thumbnail is nearly empty`);
-    // transparent background: the corners are see-through
-    assert.equal(img.rgba[3], 0, `${id}: top-left corner should be transparent`);
+    // transparent background: the corners are see-through (backgrounds, tiles and panels fill their frame)
+    const fillsFrame = ['background', 'tileset', 'ui'].includes(def.meta?.type);
+    if (!fillsFrame) assert.equal(img.rgba[3], 0, `${id}: top-left corner should be transparent`);
     // 2x: every pixel is doubled
     for (let y = 0; y < img.h; y += 2) for (let x = 0; x < img.w; x += 2) {
       const a = (y * img.w + x) * 4, b = a + 4, c = a + img.w * 4;

@@ -1,8 +1,8 @@
 // One music track: play it live, move its sliders while it plays, download it.
-import { kits } from '../kits/index.js';
 import { el, header, saveBlob } from './ui.js';
 import { soundParams, randomSoundParams, renderAsync, playRendered, playLive, wavBytes, toUnit, toValue, isChoice, choicesOf, lengthOf } from './audio.js';
 import { addToBag, keepBag } from './add-to-bag.js';
+import { goesWith, moreLikeThis } from './related.js';
 
 const fmt = (d, v) => {
   const n = Math.abs(v) >= 100 ? Math.round(v) : Math.abs(v) >= 10 ? Math.round(v * 10) / 10 : Math.round(v * 100) / 100;
@@ -120,7 +120,6 @@ export function musicPage(app, patch, query) {
     catch { say('Copy the address in your browser bar to share this exact version.'); }
   }
 
-  const inKits = kits.filter((k) => (k.music ?? []).includes(patch.id));
   syncPlay(); syncStyle(); syncLength();
   app.replaceChildren(
     header('music'),
@@ -129,15 +128,16 @@ export function musicPage(app, patch, query) {
         el('div', { class: 'title-row' }, el('h1', {}, patch.name), el('p', { class: 'blurb' }, patch.description ?? '')),
         el('div', { class: 'stage-card' }, el('div', { class: 'stage-tools plain' }, el('div', { class: 'tools-left' }, playBtn, lengthNote))),
         el('div', { class: 'under' }, el('span', { class: 'label' }, 'Style'), styleBar),
-        el('p', { class: 'used' }, 'Press Play, then move the sliders: the music changes while it plays, the way a game would change it during a fight. ',
-          inKits.length ? ['In ', inKits.map((k, i) => [i ? ', ' : '', el('a', { href: `#/kit/${k.id}` }, k.name)]), '.'] : null)),
+        el('p', { class: 'used' }, 'Press Play, then move the sliders: the music changes while it plays, the way a game would change it during a fight.'),
+        goesWith(patch.id)),      // the bundles it is in, from the catalogue
       el('div', { class: 'panel' },
         el('div', { class: 'panel-actions' },
           el('button', { type: 'button', class: 'btn', onclick: () => { const keep = Object.fromEntries(patch.params.filter((d) => d.step && !d.options).map((d) => [d.id, st.p[d.id]])); st.p = soundParams(patch, null, { ...randomSoundParams(patch), ...keep }); st.custom = true; syncSliders(); pushAll(); changed(); } }, 'Surprise me'),
           el('button', { type: 'button', class: 'ghost', onclick: () => setStyle(null, false) }, 'Start over')),
         choiceFields.length ? el('section', { class: 'group' }, el('h2', {}, 'Arrangement'), choiceFields) : null,
         el('section', { class: 'group' }, el('h2', {}, 'Sound'), fields)),
-      el('div', { class: 'get' }, addToBag('music', patch.id, () => ({ params: { ...st.p }, style: st.preset }), query), dlBtn, el('button', { type: 'button', class: 'ghost', onclick: copyLink }, 'Copy link'), status)));
+      el('div', { class: 'get' }, addToBag('music', patch.id, () => ({ params: { ...st.p }, style: st.preset }), query), dlBtn, el('button', { type: 'button', class: 'ghost', onclick: copyLink }, 'Copy link'), status),
+      moreLikeThis(patch.id)));
 
   return () => { st.gone = true; clearTimeout(urlTimer); stop(); };
 }

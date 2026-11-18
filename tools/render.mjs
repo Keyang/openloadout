@@ -11,9 +11,8 @@
 // --set applies to the clips sheet and --clip close-ups; the variants sheet always uses its own looks.
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { encodePNG } from './png.mjs';
-import { sprites } from '../sprites/index.js';
 import { renderFrame, renderSheet, defaultParams, cleanParams, randomParams } from '../engine/sprite.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -25,10 +24,15 @@ args.forEach((a, i) => { if (a === '--set') { const [k, ...v] = args[i + 1].spli
 const defaultScale = Number(flag('scale', 4));
 const scale = defaultScale;
 
-// a sprite does not have to be in the gallery list yet: sprites/<id>.js is loaded directly
-let sprite = sprites.find((s) => s.id === id);
-if (!sprite && id && fs.existsSync(path.join(root, 'sprites', `${id}.js`))) sprite = (await import(`../sprites/${id}.js`)).default;
-if (!sprite) { console.error(`Unknown sprite "${id}". Known: ${sprites.map((s) => s.id).join(', ')}`); process.exit(1); }
+// there is no list of sprites: sprites/<id>.js is the sprite, and it is loaded directly
+const spriteFile = id && /^[a-z0-9][a-z0-9-]*$/.test(id) ? path.join(root, 'sprites', `${id}.js`) : null;
+let sprite = null;
+if (spriteFile && fs.existsSync(spriteFile)) sprite = (await import(pathToFileURL(spriteFile).href)).default;
+if (!sprite) {
+  const known = fs.readdirSync(path.join(root, 'sprites')).filter((f) => f.endsWith('.js') && !f.startsWith('_')).map((f) => f.slice(0, -3)).sort();
+  console.error(`Unknown sprite "${id}". Known: ${known.join(', ')}`);
+  process.exit(1);
+}
 
 const BG_A = [0x8b, 0x93, 0xa7, 255], BG_B = [0x7c, 0x84, 0x99, 255];
 

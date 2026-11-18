@@ -6,6 +6,7 @@ import { el, header, Frames, travel, hover, shadow, saveBlob, store, cap } from 
 import { sounds, soundById, soundParams, rendered, playRendered, soundState, setSoundOn, toUnit, toValue } from './audio.js';
 import { spriteFiles, defaultCues } from './bundle.js';
 import { addToBag, keepBag } from './add-to-bag.js';
+import { goesWith, moreLikeThis } from './related.js';
 
 /**
  * The sprite's own sounds, as defaultCues gives them, each keeping its `when` (the settings it plays at):
@@ -378,14 +379,16 @@ export function spritePage(app, sprite, query) {
         el('div', { class: 'stage-card' }, stageWrap, el('div', { class: 'stage-tools' }, sceneBar, playBtn)),
         el('div', { class: 'under' }, el('span', { class: 'label' }, 'Animation'), clipBar),
         strip,
-        cueBox),
+        cueBox,
+        goesWith(sprite.id)),     // the sounds it uses and the bundles it is in, from the catalogue
       panel,
       el('div', { class: 'get' },
         addToBag('sprite', sprite.id, () => ({ params: { ...st.p }, cues: st.cues, scale: st.scale }), query),
         el('button', { type: 'button', class: 'btn big', onclick: download }, 'Download sprite and sounds'),
         el('button', { type: 'button', class: 'ghost', onclick: copyLink }, 'Copy link'),
         el('div', { class: 'size' }, el('span', { class: 'label' }, 'Pixel size'), sizeBar, sizeNote),
-        status)));
+        status),
+      moreLikeThis(sprite.id)));
 
   // ---- animation loop
   const ctx = stage.getContext('2d');

@@ -1,7 +1,19 @@
 // Sprite page: preview, animation buttons, sliders, Surprise me / Start over, link, sounds, download, phone width.
 import { test, expect, openRoute, canvasStats, canvasGroupStats, setRange, downloadFrom, readZip, hasHorizontalScroll, waitForDrawn } from '../helpers/test.mjs';
+import { readCatalogue, catalogueOf } from '../helpers/catalog.mjs';
 
-const SPRITES = ['knight', 'wizard', 'wolf', 'slime', 'bat', 'coin', 'campfire'];
+// The sprites come from the catalogue (generated/catalog.json): there is no other list.
+const C = catalogueOf(readCatalogue());
+// The full set of checks below runs on sprites with several animations and sliders. The seven that shipped first are
+// that regression net, while they exist; a catalogue without them gets the first few characters and creatures instead.
+const FIRST = ['knight', 'wizard', 'wolf', 'slime', 'bat', 'coin', 'campfire'].filter((id) => C.byId[id]?.kind === 'sprite');
+const SPRITES = FIRST.length ? FIRST : C.sprites.filter((a) => ['character', 'creature'].includes(a.type)).slice(0, 4).map((a) => a.id);
+// The two checks every kind of sprite must pass (its sounds are listed; its download is whole) also run on one sprite
+// of each type the catalogue holds, so a new kind of asset (a tileset, a background, an interface piece) is covered when it is added.
+const ONE_OF_EACH = [...new Set(C.sprites.map((a) => a.type))].map((type) => C.sprites.find((a) => a.type === type).id);
+const EVERY_KIND = [...new Set([...SPRITES, ...ONE_OF_EACH])];
+/** A sprite's own program, loaded from its file. */
+const spriteProgram = async (id) => (await import(`../../sprites/${id}.js`)).default;
 
 const stage = (page) => page.locator('canvas.stage');
 const strip = (page) => page.locator('.strip .cell canvas');
@@ -138,10 +150,9 @@ test.describe('sprite sounds', () => {
     await expect(cueRows(page)).toHaveCount(n0);
   });
 
-  for (const id of SPRITES) {
+  for (const id of EVERY_KIND) {
     test(`${id}: the number of listed sounds matches the sounds the sprite ships with`, async ({ page }) => {
-      const { sprites } = await import('../../sprites/index.js');
-      const sprite = sprites.find((s) => s.id === id);
+      const sprite = await spriteProgram(id);
       await openRoute(page, `/sprite/${id}`);
       const clips = Object.keys(sprite.clips);
       for (const clip of clips) {
@@ -154,10 +165,9 @@ test.describe('sprite sounds', () => {
 });
 
 test.describe('sprite download', () => {
-  for (const id of SPRITES) {
+  for (const id of EVERY_KIND) {
     test(`${id}: Download sprite and sounds gives a zip with the PNG, JSON, a WAV and the guide`, async ({ page }) => {
-      const { sprites } = await import('../../sprites/index.js');
-      const sprite = sprites.find((s) => s.id === id);
+      const sprite = await spriteProgram(id);
       await openRoute(page, `/sprite/${id}`);
       const { name, bytes } = await downloadFrom(page, () => page.getByRole('button', { name: 'Download sprite and sounds' }).click());
       expect(name).toBe(`${id}-sprite-and-sounds.zip`);

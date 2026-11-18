@@ -5,18 +5,16 @@
 //   node tools/sfx.mjs check  <patch.json> [more.json ...] [--json] [--no-cache]   the quality bar (quality/sound.js, cached in .cache/quality.json): validate, render, measure, test every parameter
 //   node tools/sfx.mjs render <patch.json> [-o out.wav] [--png out.png] [--set id=value ...] [--preset name] [--seed n]
 //   node tools/sfx.mjs nodes                                 print the node and expression reference
-//   node tools/sfx.mjs index  [sounds-dir]                   rebuild sounds/index.json for the website
+// There is no list of sounds to rebuild: the site build (node tools/build.mjs) finds every sounds/<id>.json by itself.
 
 import fs from 'node:fs';
 import path from 'node:path';
 import zlib from 'node:zlib';
-import { fileURLToPath } from 'node:url';
 import { validatePatch, renderPatch, defaultParams, NODE_TYPES, EXPRESSION_FUNCTIONS, FORMAT } from '../sound/sfx-engine.js';
 import { analyze, spectrogram } from '../sound/analyze.js';
 import { runQuality } from './lib/quality-run.mjs';
 import { encodeWav } from '../sound/wav.js';
 
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const [cmd, ...args] = process.argv.slice(2);
 
 function load(file) {
@@ -103,7 +101,7 @@ if (cmd === 'check') {
   const json = args.includes('--json');
   const ci = args.indexOf('--cache-file');
   const cacheFile = ci >= 0 ? path.resolve(args[ci + 1]) : undefined;
-  const files = args.filter((a, i) => !a.startsWith('--') && !(ci >= 0 && i === ci + 1) && path.basename(a) !== 'index.json');
+  const files = args.filter((a, i) => !a.startsWith('--') && !(ci >= 0 && i === ci + 1));
   if (!files.length) fail('usage: sfx.mjs check <patch.json> [...] [--json] [--no-cache] [--cache-file <path>]');
   for (const f of files) if (!fs.existsSync(f)) fail(`cannot read ${f}`);
   const run = await runQuality({ sprites: [], sounds: files, cache: !args.includes('--no-cache'), cacheFile });
@@ -139,18 +137,7 @@ if (cmd === 'check') {
   console.log(`Expression functions: ${EXPRESSION_FUNCTIONS.join(', ')}`);
   console.log('Expression names: any parameter id, any node id (its current output), t (seconds since start), dur (patch duration), sr, pi, tau.');
   console.log('Operators: + - * / % ^  < > <= >= == !=  && ||  cond ? a : b');
-} else if (cmd === 'index') {
-  const dir = path.resolve(args[0] || path.join(ROOT, 'sounds'));
-  const files = fs.readdirSync(dir).filter((f) => f.endsWith('.json') && f !== 'index.json').sort();
-  const list = [];
-  for (const f of files) {
-    const p = load(path.join(dir, f)); const v = validatePatch(p);
-    if (!v.ok) { console.error(`skipping ${f}: ${v.errors[0]}`); continue; }
-    list.push({ file: f, id: p.id, name: p.name, category: p.category || 'other', loop: !!p.loop });
-  }
-  fs.writeFileSync(path.join(dir, 'index.json'), JSON.stringify({ format: FORMAT, patches: list }, null, 2) + '\n');
-  console.log(`indexed ${list.length} patches → ${path.join(dir, 'index.json')}`);
 } else {
-  console.log('usage: sfx.mjs check|render|nodes|index — see the header of this file');
+  console.log('usage: sfx.mjs check|render|nodes — see the header of this file');
   process.exit(cmd ? 1 : 0);
 }

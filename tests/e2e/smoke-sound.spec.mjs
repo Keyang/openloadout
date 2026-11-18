@@ -1,11 +1,15 @@
-// Sound, music and kit pages.
-import fs from 'node:fs';
+// Sound, music and kit pages. The sounds are picked from the catalogue (generated/catalog.json): there is no other list.
 import { test, expect, openRoute, setRange, downloadFrom, readZip, hasHorizontalScroll } from '../helpers/test.mjs';
+import { readCatalogue, catalogueOf } from '../helpers/catalog.mjs';
 
-const index = JSON.parse(fs.readFileSync(new URL('../../sounds/index.json', import.meta.url), 'utf8')).patches;
-const effects = index.filter((p) => p.category !== 'music');
-const oneShot = effects.find((p) => p.id === 'coin-pickup') ?? effects.find((p) => !p.loop);
-const looping = effects.find((p) => p.loop);
+const C = catalogueOf(readCatalogue());
+const effects = C.sounds;
+// a short sound with styles and at least two sliders (the first-shipped coin pickup while it exists), and one that loops
+const rich = (a) => !a.tech.loop && a.tech.styles.length >= 1 && a.tech.controls >= 2;
+const oneShot = effects.find((a) => a.id === 'coin-pickup' && rich(a)) ?? effects.find(rich);
+const looping = effects.find((a) => a.tech.loop);
+// the first-shipped track has the Length and Melody instrument choices the music test looks at
+const TRACK = C.byId['battle-theme'] ?? C.music[0];
 
 const play = (page) => page.locator('.stage-tools .tools-left button');
 
@@ -100,11 +104,12 @@ test.describe('sound page', () => {
 });
 
 test.describe('music page', () => {
-  const route = '/music/battle-theme';
+  const route = `/music/${TRACK.id}`;
 
   test('has no waveform canvas, and Length and Melody instrument choices', async ({ page }) => {
     await openRoute(page, route);
-    await expect(page.locator('canvas')).toHaveCount(0);
+    await expect(page.locator('.stage-card')).toBeVisible();
+    await expect(page.locator('.stage-card canvas, canvas.stage')).toHaveCount(0);
     const length = page.getByRole('group', { name: 'Length' }).getByRole('button');
     expect(await length.count()).toBeGreaterThanOrEqual(2);
     await expect(length.first()).toContainText('seconds');
@@ -134,49 +139,59 @@ test.describe('music page', () => {
 });
 
 // Kits became bundles: old kit addresses lead to the bundle pages (their own tests are in bundle.spec.mjs).
+// The bundles, and what each one holds, are read from the catalogue.
+const BUNDLES = C.catalog.bundles;
+const size = (b) => b.sprites.length + b.sounds.length + b.music.length;
+// the smallest bundle that has sprites, sounds and music (a download of it stays quick)
+const KIT = BUNDLES.filter((b) => b.sprites.length && b.sounds.length && b.music.length).sort((x, y) => size(x) - size(y))[0];
+
 test.describe('kit pages', () => {
   test('every kit lists its sprites and sounds', async ({ page }) => {
+    test.setTimeout(30_000 + BUNDLES.length * 15_000);
     await openRoute(page, '/kits');
     await expect.poll(() => page.evaluate(() => location.hash)).toBe('#/bundles');
     const hrefs = await page.locator('a.card.kit').evaluateAll((as) => as.map((a) => a.getAttribute('href')));
-    expect(hrefs.length).toBeGreaterThanOrEqual(3);
-    for (const href of hrefs) {
-      await openRoute(page, href.replace(/^#/, ''));
-      await expect(page.locator('h1')).not.toBeEmpty();
+    expect(hrefs.sort()).toEqual(BUNDLES.map((b) => `#/bundle/${b.id}`).sort());
+    for (const b of BUNDLES) {
+      await openRoute(page, `/bundle/${b.id}`);
+      await expect(page.locator('h1')).toHaveText(b.name);
       await expect(page.locator('main.bundle-page')).toBeVisible();
-      expect(await page.locator('.bundle-sprite a[href^="#/sprite/"]').count(), href).toBeGreaterThanOrEqual(1);
-      expect(await page.locator('.bundle-sound a[href^="#/sound/"]').count(), href).toBeGreaterThanOrEqual(1);
+      await expect(page.locator('.bundle-sprite a.bundle-name[href^="#/sprite/"]'), b.id).toHaveCount(b.sprites.length);
+      await expect(page.locator('.bundle-sound a[href^="#/sound/"]'), b.id).toHaveCount(b.sounds.length);
+      await expect(page.locator('.bundle-music a[href^="#/music/"]'), b.id).toHaveCount(b.music.length);
       await expect(page.getByRole('button', { name: 'Download this bundle' })).toBeEnabled();
     }
   });
 
-  test('Dungeon starter lists sprites, sounds and a music track', async ({ page }) => {
-    await openRoute(page, '/kit/dungeon-starter');
-    await expect.poll(() => page.evaluate(() => location.hash)).toBe('#/bundle/dungeon-starter');
+  test('an old kit address opens the bundle, with its sprites, sounds and music track', async ({ page }) => {
+    expect(KIT, 'a bundle with sprites, sounds and music').toBeTruthy();
+    await openRoute(page, `/kit/${KIT.id}`);
+    await expect.poll(() => page.evaluate(() => location.hash)).toBe(`#/bundle/${KIT.id}`);
     await expect(page.locator('main.bundle-page')).toBeVisible();
-    expect(await page.locator('.bundle-sprite').count()).toBeGreaterThanOrEqual(4);
-    expect(await page.locator('.bundle-sound a[href^="#/sound/"]').count()).toBeGreaterThanOrEqual(7);
-    expect(await page.locator('.bundle-music a[href^="#/music/"]').count()).toBeGreaterThanOrEqual(1);
+    await expect(page.locator('.bundle-sprite')).toHaveCount(KIT.sprites.length);
+    await expect(page.locator('.bundle-sound a[href^="#/sound/"]')).toHaveCount(KIT.sounds.length);
+    await expect(page.locator('.bundle-music a[href^="#/music/"]')).toHaveCount(KIT.music.length);
   });
 
   test('Download the whole kit gives a zip with a sheet per sprite and sound files', async ({ page }) => {
     test.setTimeout(150_000);
-    await openRoute(page, '/kit/dungeon-starter');
+    await openRoute(page, `/kit/${KIT.id}`);
     await expect(page.locator('main.bundle-page')).toBeVisible();
     const ids = await page.locator('.bundle-sprite a.bundle-name').evaluateAll((as) => as.map((a) => a.getAttribute('href').split('/').pop()));
-    expect(ids.length).toBeGreaterThanOrEqual(4);
+    expect(ids.sort()).toEqual([...KIT.sprites].sort());
     const { name, bytes } = await downloadFrom(page, () => page.getByRole('button', { name: 'Download this bundle' }).click(), { timeout: 120_000 });
     expect(name).toMatch(/\.zip$/);
     const names = readZip(new Uint8Array(bytes)).map((f) => f.name);
     for (const id of ids) expect(names, `sheet for ${id}`).toContain(`sprites/${id}/${id}.png`);
-    expect(names.filter((n) => n.endsWith('.wav')).length).toBeGreaterThanOrEqual(ids.length);
+    for (const id of KIT.sounds) expect(names, `sound ${id}`).toContain(`sounds/${id}.wav`);
+    for (const id of KIT.music) expect(names, `track ${id}`).toContain(`music/${id}.wav`);
     await expect(page.locator('.status').first()).toContainText('Downloaded');
   });
 });
 
 test.describe('phone width', () => {
   test.use({ viewport: { width: 375, height: 800 } });
-  for (const [label, route] of [['sound', `/sound/${oneShot.id}`], ['music', '/music/battle-theme'], ['kit', '/kit/dungeon-starter']]) {
+  for (const [label, route] of [['sound', `/sound/${oneShot.id}`], ['music', `/music/${TRACK.id}`], ['kit', `/kit/${KIT.id}`]]) {
     test(`${label} page has no sideways scroll`, async ({ page }) => {
       await openRoute(page, route);
       expect(await hasHorizontalScroll(page)).toBe(false);

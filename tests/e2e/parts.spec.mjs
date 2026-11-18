@@ -372,8 +372,8 @@ test.describe('phone width: the preview stays in view', () => {
   test('scrolling down to the last controls keeps the preview on screen', async ({ page }) => {
     await openRoute(page, '/sprite/knight');
     await page.waitForSelector('.strip .cell canvas');
-    await page.locator('#c-speed').scrollIntoViewIfNeeded();
-    await page.evaluate(() => window.scrollBy(0, 200));
+    // bring the last control to the bottom of the screen (the page continues below it with related assets)
+    await page.locator('#c-speed').evaluate((e) => e.scrollIntoView({ block: 'end' }));
     await expect(page.locator('#c-speed')).toBeInViewport();
     await expect(page.locator('canvas.stage')).toBeInViewport({ ratio: 0.9 });
     // and it does not cover the control being used

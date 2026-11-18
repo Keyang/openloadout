@@ -1,10 +1,10 @@
 // The bag page (#/bag): everything the visitor collected, each drawn or played
 // with its own settings and the bag's theme, and one download for all of it.
-import { byId as spriteById } from '../sprites/index.js';
+import { assetById, spriteNow, loadSprites } from './catalog.js';   // W2-G: which sprites exist comes from the catalogue; their programs are loaded when the bag needs them
 import { defaultParams, cleanParams, clipFps } from '../engine/sprite.js';
 import { renderThemedFrame } from '../engine/theme.js';
 import { applySound, themedSoundParams, soundSettingsFor } from '../sound/theme.js';
-import { el, header, saveBlob, SPRITE_BG, SOUND_BG, drawSpriteOnTile, reduceMotion } from './ui.js';
+import { el, header, saveBlob, SPRITE_BG, SOUND_BG, TILE_BG, drawSpriteOnTile, reduceMotion } from './ui.js';
 import { soundById, soundParams, rendered, renderAsync, playRendered, playLive, drawWave } from './audio.js';
 import { bag } from './bag.js';
 import { packageFiles, defaultCues, activeTheme, kindMatches } from './bundle.js';
@@ -26,7 +26,7 @@ function packCues(cues) {
 
 /** Each asset's standard settings, so bag links can leave them out (bag.toLink). */
 function standardSettings(kind, id, settings) {
-  if (kind === 'sprite') { const sprite = spriteById[id]; return sprite ? { params: defaultParams(sprite), cues: defaultCues(sprite) } : null; }
+  if (kind === 'sprite') { const sprite = spriteNow(id); return sprite ? { params: defaultParams(sprite), cues: defaultCues(sprite) } : null; }
   const patch = soundById[id];
   return patch ? { params: soundParams(patch, settings && settings.style) } : null;
 }
@@ -36,7 +36,7 @@ bag.setStandard(standardSettings);
 export function changeLink(item) {
   const s = item.settings ?? {}, q = new URLSearchParams();
   if (item.kind === 'sprite') {
-    const sprite = spriteById[item.id];
+    const sprite = spriteNow(item.id);
     if (sprite) {
       const def = defaultParams(sprite), p = cleanParams(sprite, s.params ?? {});
       for (const [k, v] of Object.entries(p)) if (v !== def[k]) q.set(k, String(v));
@@ -88,7 +88,7 @@ function spritePicture(sprite, settings, theme) {
       }
       if (f === last) return;
       last = f;
-      const [sky, ground, edge] = SPRITE_BG[sprite.kind] ?? SPRITE_BG.Character;
+      const [sky, ground, edge] = TILE_BG[assetById(sprite.id)?.type] ?? SPRITE_BG[sprite.kind] ?? SPRITE_BG.Character;
       g.fillStyle = sky; g.fillRect(0, 0, 80, 72);
       g.fillStyle = ground; g.fillRect(0, 60, 80, 12);
       g.fillStyle = edge; g.fillRect(0, 60, 80, 1);
@@ -192,7 +192,7 @@ function musicPicture(patch, settings, theme) {
 function describe(item) {
   const s = item.settings ?? {};
   if (item.kind === 'sprite') {
-    const sprite = spriteById[item.id];
+    const sprite = spriteNow(item.id);
     const own = sprite && !same(cleanParams(sprite, s.params ?? {}), defaultParams(sprite));
     return [own ? 'Your own look' : 'Standard look', s.scale > 1 ? `pixel size ${s.scale}×` : null].filter(Boolean).join(', ');
   }
@@ -201,8 +201,24 @@ function describe(item) {
   return [s.style ? `${s.style} style` : 'Standard style', own ? 'your own changes' : null].filter(Boolean).join(', ');
 }
 
-export function bagPage(app, query = {}) {
+export function bagPage(app, query = {}, isCurrent = () => true) {
   document.title = 'Your bag · Loadout';
+  // ==== W2-G: sprite programs are loaded when the bag first shows them (app/catalog.js) ====
+  // asked: sprites sent for; lost: ones whose file did not load (shown as missing). here(): false once the page is left.
+  const asked = new Set(), lost = new Set();
+  let left = false;
+  const here = () => !left && isCurrent();
+  const pendingSprite = (item) => item.kind === 'sprite' && kindMatches(item.kind, item.id) && !spriteNow(item.id) && !lost.has(item.id);
+  function fetchSprites(items) {
+    const ids = [...new Set(items.filter(pendingSprite).map((i) => i.id))].filter((id) => !asked.has(id));
+    if (!ids.length) return;
+    for (const id of ids) asked.add(id);
+    loadSprites(ids).then((got) => {
+      for (const id of ids) { asked.delete(id); if (!got[id]) lost.add(id); }
+      if (here()) build();       // late: the visitor may have gone elsewhere, and then nothing is drawn
+    });
+  }
+  // ==== end W2-G ====
   let pictures = [], raf = 0, confirming = false, busy = false;
   const status = el('p', { class: 'status', role: 'status' });
   const say = (msg) => { status.textContent = msg; };
@@ -249,11 +265,16 @@ export function bagPage(app, query = {}) {
   }
 
   function row(item, theme) {
-    const sprite = item.kind === 'sprite' ? spriteById[item.id] : null;
+    const sprite = item.kind === 'sprite' ? spriteNow(item.id) : null;
     const patch = item.kind !== 'sprite' ? soundById[item.id] : null;
+    const pending = pendingSprite(item);      // W2-G: its own file is on its way; the row is drawn again when it arrives
     // a crafted link can name a sound as music (or the reverse): such an item is treated as missing
-    const gone = !kindMatches(item.kind, item.id, spriteById);
+    const gone = !pending && (!kindMatches(item.kind, item.id) || (item.kind === 'sprite' && !sprite));
     let pic = null;
+    if (pending) return el('li', { class: 'bag-item', 'data-key': item.key },
+      el('div', { class: 'bag-pic pending' }),
+      el('div', { class: 'bag-text' }, el('span', { class: 'bag-name' }, assetById(item.id)?.name ?? item.id), el('span', { class: 'bag-kind' }, KIND_LABEL[item.kind]), el('span', { class: 'hint' }, 'Loading…')),
+      el('div', { class: 'bag-actions' }, el('button', { type: 'button', class: 'ghost', onclick: () => { bag.remove(item.key); } }, 'Remove')));
     if (!gone && sprite) pic = spritePicture(sprite, item.settings, theme);
     else if (!gone) pic = item.kind === 'music' ? musicPicture(patch, item.settings, theme) : soundPicture(patch, item.settings, theme);
     if (pic) pictures.push(pic);
@@ -290,8 +311,10 @@ export function bagPage(app, query = {}) {
       el('label', { for: 'pkg-zip' }, zipChoice, ' Zip package'),
       el('label', { for: 'pkg-unity', class: 'soon' }, unityChoice, ' Unity package (coming later)')),
     el('p', { class: 'hint' }, 'One zip with every sprite sheet, sound and music track in your bag, a list of what is in it, and a short guide. It works in Unity, Godot and web games.'),
-    dlBtn, status);
-  const exportable = () => bag.items().filter((i) => kindMatches(i.kind, i.id, spriteById)).length;
+    dlBtn,
+    el('a', { class: 'btn plain play-try', href: '#/play' }, 'Try these in the playground'),   // W2-E: the playground (app/play-page.js)
+    status);
+  const exportable = () => bag.items().filter((i) => kindMatches(i.kind, i.id) && !lost.has(i.id)).length;
   const syncDownload = () => {
     const n = exportable();
     dlBtn.disabled = busy || !n;
@@ -347,6 +370,7 @@ export function bagPage(app, query = {}) {
   function build() {
     stopPictures();
     const items = bag.items(), theme = bag.theme();
+    fetchSprites(items);   // W2-G
     if (!items.length) confirming = false;
     const counts = ['sprite', 'sound', 'music'].map((k) => [k, items.filter((i) => i.kind === k).length]).filter(([, c]) => c);
     main.replaceChildren(...[
@@ -373,5 +397,5 @@ export function bagPage(app, query = {}) {
   raf = requestAnimationFrame(loop);
   build();
   const off = bag.onChange(build);
-  return () => { off(); cancelAnimationFrame(raf); stopPictures(); };
+  return () => { left = true; off(); cancelAnimationFrame(raf); stopPictures(); };
 }
