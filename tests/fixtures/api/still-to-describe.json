@@ -1,29 +1,12 @@
 {
  "about": "Exported framework functions that had no one-line description on 2026-11-18, in files other builders were editing. tests/unit/api-descriptions.test.mjs fails when an entry here is described or gone, so this list only shrinks. To take one off: write the comment above the export (docs/framework-api.md), then delete its name here.",
  "exports": {
-  "engine/sprite.js": [
-   "range",
-   "choice",
-   "color",
-   "toggle",
-   "defineSprite",
-   "defaultParams",
-   "clipFps"
-  ],
   "rigs/humanoid.js": [
    "dims",
-   "drawHair",
    "sword",
    "axe",
    "spear",
    "staff"
-  ],
-  "sound/theme.js": [
-   "dullCutoff"
-  ],
-  "quality/sprite.js": [
-   "spriteType",
-   "checkSprite"
   ]
  }
 }

@@ -2,10 +2,13 @@
 // A card costs nothing until it is looked at: it shows the build's thumbnail, and only loads more
 // (a strip picture to animate, one sound to play) when the visitor hovers or presses it.
 // No sprite program is ever loaded for a card.
+// The one exception is an asset made on this visit (Contract 11): the build never saw it, so its row has no
+// pictures (thumb: null) and its card draws from the sprite or the sound itself, which is already in memory.
 import { labelFor } from '../catalog/schema.js';
 import { el, TILE_BG, ROLE_BG } from './ui.js';
-import { assetById, loadSound } from './catalog.js';
-import { soundById, soundParams, renderAsync, playRendered, playLive } from './audio.js';
+import { assetById, loadSound, loadSprite } from './catalog.js';
+import { soundById, soundParams, renderAsync, playRendered, playLive, whenRendered, drawWave } from './audio.js';
+import { renderFrame, defaultParams } from '../engine/sprite.js';
 import { bag } from './bag.js';
 
 // Pixel art is always shown at a whole-number scale: 3x on a wide screen, 2x on a phone, less when a frame is big.
@@ -36,7 +39,8 @@ function addButton(row) {
   return btn;
 }
 
-const cell = (row, card) => el('div', { class: 'card-cell' }, card, addButton(row));
+// a draft (made on this visit, not yet through the quality bar) cannot go in the bag, so its card has no button
+const cell = (row, card) => el('div', { class: 'card-cell' }, card, row.runtime && row.ok === false ? null : addButton(row));
 const text = (row, kind) => [el('span', { class: 'card-name' }, row.name), el('span', { class: 'card-kind' }, kind)];
 
 /** A sprite: its thumbnail, and on hover or focus its preview animation played from the strip picture. */
@@ -53,19 +57,33 @@ export function spriteCard(asset) {
   const g = canvas.getContext('2d');
   g.imageSmoothingEnabled = false;
   let strip = null, raf = 0, playing = false, shown = -1, t0 = 0;
+  // no built picture (made on this visit): the canvas is the picture, drawn from the sprite itself, frame by frame as needed
+  const live = !row.thumb && row.runtime === true;
+  let sprite = null;
+  const cells = [];
+  const liveFrame = (f) => (cells[f] ??= new ImageData(new Uint8ClampedArray(renderFrame(sprite, row.stripClip ?? sprite.preview, f, defaultParams(sprite)).data.buffer), fw, fh));
+  const still = () => { if (sprite) { g.putImageData(liveFrame(0), 0, 0); shown = 0; } };
+  if (live) {
+    canvas.hidden = false;
+    loadSprite(row.id).then((s) => { sprite = s; still(); }).catch((e) => console.warn(`Loadout: the card for "${row.id}" could not be drawn.`, e));
+  }
   const want = { hover: false, focus: false };
   const draw = (now) => {
     const f = Math.floor((Math.max(0, now - t0) / 1000) * fps) % frames;      // a frame's clock can read a little before t0
-    if (f !== shown) { shown = f; g.clearRect(0, 0, fw, fh); g.drawImage(strip, f * fw, 0, fw, fh, 0, 0, fw, fh); }
+    if (f !== shown) {
+      shown = f;
+      if (live) g.putImageData(liveFrame(f), 0, 0);
+      else { g.clearRect(0, 0, fw, fh); g.drawImage(strip, f * fw, 0, fw, fh, 0, 0, fw, fh); }
+    }
     raf = requestAnimationFrame(draw);
   };
-  const rest = () => { playing = false; cancelAnimationFrame(raf); canvas.hidden = true; if (thumb) thumb.hidden = false; };
+  const rest = () => { playing = false; cancelAnimationFrame(raf); if (live) { still(); return; } canvas.hidden = true; if (thumb) thumb.hidden = false; };
   async function sync() {
     const on = want.hover || want.focus;
     if (!on) { rest(); return; }
-    if (playing || !row.strip || frames < 2) return;
+    if (playing || (live ? !sprite : !row.strip) || frames < 2) return;
     playing = true;
-    if (!strip) {
+    if (!live && !strip) {
       const img = new Image();
       img.src = row.strip;
       try { await img.decode(); } catch { playing = false; return; }     // no strip: the still picture stays
@@ -119,8 +137,14 @@ function audioCard(row, { tile, href, kind, begin }) {
 export function soundCard(asset) {
   const row = rowOf(asset);
   const top = String(row.role ?? '').split('/')[0];
+  // no built waveform (made on this visit): draw it from the sound itself, when the page has a quiet moment
+  let wave = null;
+  if (!row.thumb && row.runtime === true && soundById[row.id]) {
+    wave = el('canvas', { class: 'thumb pic wave', width: 64, height: 40, 'aria-hidden': 'true' });
+    whenRendered(soundById[row.id], (r) => drawWave(wave.getContext('2d'), r.samples, 0, 20, 64, 36, row.thumbInk ?? '#231b33'));
+  }
   const tile = el('span', { class: 'pic-tile', style: `${sizes(64, 40)};--sky:${ROLE_BG[top] ?? '#e6e9f2'}` },
-    row.thumb ? el('img', { class: 'thumb pic wave', src: row.thumb, alt: '', width: 64, height: 40, decoding: 'async', draggable: 'false' }) : null,
+    row.thumb ? el('img', { class: 'thumb pic wave', src: row.thumb, alt: '', width: 64, height: 40, decoding: 'async', draggable: 'false' }) : wave,
     el('span', { class: 'play-mark', 'aria-hidden': 'true' }));
   const loops = row.tech?.loop && row.type === 'sfx';
   return audioCard(row, {

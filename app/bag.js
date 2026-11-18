@@ -2,10 +2,22 @@
 // each with its own settings, plus one theme (Contract 7) applied to all of
 // them on export. Kept in the browser's storage; the whole bag also travels
 // in one link. No DOM here: createBag runs in Node for the unit tests.
+//
+// An asset made on a visit (window.loadout.make, Contract 11) is not in the catalogue, so its bag item carries
+// its whole definition: { source } (a sprite's module text) or { patch } (a sound or a track). That is what
+// brings it back after a reload, and what a shared link has to hold. Catalogue items have no definition.
 import { defaultTheme, normalizeTheme } from '../engine/theme.js';
 
 export const BAG_KEY = 'loadout-bag-v1';
 export const KINDS = ['sprite', 'sound', 'music'];
+/** The most a sprite's source text may be, in characters (the largest file in sprites/ is a tenth of this). */
+export const MAX_SOURCE = 400_000;
+/**
+ * The longest bag link the site hands out, in characters. A link is made of the bag's items, and an item made on
+ * a visit brings its whole source. Browsers open far longer addresses, but chat and mail apps cut long ones short,
+ * and a cut link opens as "damaged". Over this the bag page says so and points at the download instead.
+ */
+export const LINK_LIMIT = 8000;
 
 /** Storage that lives only as long as the page (used when the browser's storage is unavailable). */
 export function memoryStorage() {
@@ -55,9 +67,20 @@ export function cleanSettings(kind, settings) {
   return { params, style };
 }
 
+/** The definition of an asset made on a visit, as plain data: sprite { source }, sound and music { patch }. null for anything else. */
+export function cleanDefinition(kind, definition) {
+  if (!isObj(definition)) return null;
+  if (kind === 'sprite') return typeof definition.source === 'string' && definition.source.trim() && definition.source.length <= MAX_SOURCE ? { source: definition.source } : null;
+  if (!isObj(definition.patch)) return null;
+  try { return { patch: clone(definition.patch) }; } catch { return null; }
+}
+
 function cleanItem(raw) {
   if (!isObj(raw) || !KINDS.includes(raw.kind) || typeof raw.id !== 'string' || !/^[a-z0-9][a-z0-9-]*$/.test(raw.id)) return null;
-  return { kind: raw.kind, id: raw.id, settings: cleanSettings(raw.kind, raw.settings) };
+  const item = { kind: raw.kind, id: raw.id, settings: cleanSettings(raw.kind, raw.settings) };
+  const definition = cleanDefinition(raw.kind, raw.definition);
+  if (definition) item.definition = definition;
+  return item;
 }
 
 // ---- links: base64url of compact JSON ---------------------------------------------
@@ -93,6 +116,7 @@ function payloadOf(text) {
 export function createBag(storage, { now = () => Date.now(), standard = null } = {}) {
   let state = load();
   let standardOf = standard;
+  let definitionOf = null;
   const listeners = new Set();
 
   function load() {
@@ -132,6 +156,12 @@ export function createBag(storage, { now = () => Date.now(), standard = null } =
   function put(raw, addedAt) {
     const it = cleanItem(raw);
     if (!it) throw new Error(`the bag holds sprites, sounds and music; got ${JSON.stringify(raw && { kind: raw.kind, id: raw.id })}`);
+    // an asset made on this visit goes in with its definition, whoever adds it (a card, its page, a copy of a bag row)
+    if (!it.definition && definitionOf) {
+      let d = null;
+      try { d = cleanDefinition(it.kind, definitionOf(it.kind, it.id)); } catch { d = null; }
+      if (d) it.definition = d;
+    }
     const item = { key: newKey(), ...it, addedAt };
     state.items.push(item);
     return item.key;
@@ -157,7 +187,8 @@ export function createBag(storage, { now = () => Date.now(), standard = null } =
       data = JSON.parse(fromB64(p));
     } catch { return null; }
     if (!isObj(data) || !Array.isArray(data.i)) return null;
-    const list = data.i.map((r) => (Array.isArray(r) ? cleanItem({ kind: KIND_OF[r[0]], id: r[1], settings: r[2] }) : null)).filter(Boolean);
+    // a fourth entry is the definition of an asset made on a visit: { s: source } or { p: patch }
+    const list = data.i.map((r) => (Array.isArray(r) ? cleanItem({ kind: KIND_OF[r[0]], id: r[1], settings: r[2], definition: isObj(r[3]) ? { source: r[3].s, patch: r[3].p } : null }) : null)).filter(Boolean);
     if (list.length !== data.i.length && !list.length) return null;
     return { list, theme: isObj(data.t) ? normalizeTheme(data.t) : defaultTheme() };
   }
@@ -202,18 +233,45 @@ export function createBag(storage, { now = () => Date.now(), standard = null } =
     /** Call fn(bag) after every change. Returns a function that stops it. */
     onChange(fn) { listeners.add(fn); return () => listeners.delete(fn); },
     /** What a link holds, without loading it: { count } or null when it is not a bag link. */
-    peekLink(text) { const got = parseLink(text); return got ? { count: got.list.length } : null; },
+    // made: how many of them were made on a visit and come with their definition; code: how many of those are sprites,
+    // whose definition is a program that runs when the bag is opened. Both are left out when there are none.
+    peekLink(text) {
+      const got = parseLink(text);
+      if (!got) return null;
+      const made = got.list.filter((i) => i.definition).length;
+      return made ? { count: got.list.length, made, code: got.list.filter((i) => i.definition && i.kind === 'sprite').length } : { count: got.list.length };
+    },
     /**
      * Tell the bag each asset's standard settings, so links can leave them out:
      * fn(kind, id, settings) -> { params, cues? } or null when unknown.
      */
     setStandard(fn) { standardOf = typeof fn === 'function' ? fn : null; },
+    /**
+     * Tell the bag where the definitions of assets made on this visit are, so every add() stores one:
+     * fn(kind, id) -> { source } | { patch }, or null for a catalogue asset.
+     */
+    setDefinitions(fn) { definitionOf = typeof fn === 'function' ? fn : null; },
+    /** An asset made on this visit was made again: give every bag item of it the new definition. Returns how many changed. */
+    redefine(id, definition) {
+      let n = 0;
+      for (const it of state.items) {
+        if (it.id !== id) continue;
+        const d = cleanDefinition(it.kind, definition);
+        if (!d || sameAs(d, it.definition)) continue;
+        it.definition = d;
+        n++;
+      }
+      if (n) changed();
+      return n;
+    },
+    /** How many items were made on a visit (they carry their definition). */
+    madeCount: () => state.items.filter((i) => i.definition).length,
     /** Read the storage again (another tab changed it). */
     reload() { state = load(); for (const fn of [...listeners]) { try { fn(api); } catch (e) { console.error('bag listener:', e); } } },
 
     /** The whole bag as an address hash: '#/bag?load=...'. */
     toLink() {
-      const data = { v: 1, i: state.items.map((it) => [LETTER[it.kind], it.id, compact(it)]) };
+      const data = { v: 1, i: state.items.map((it) => (it.definition ? [LETTER[it.kind], it.id, compact(it), it.kind === 'sprite' ? { s: it.definition.source } : { p: it.definition.patch }] : [LETTER[it.kind], it.id, compact(it)])) };
       if (!sameAs(state.theme, defaultTheme())) data.t = state.theme;
       return '#/bag?load=' + toB64(JSON.stringify(data));
     },

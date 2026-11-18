@@ -61,8 +61,8 @@ export class Pad {
 const root = scratch();
 test.after(() => fs.rmSync(root, { recursive: true, force: true }));
 
-test('the framework folders are engine, rigs, sound and quality', () => {
-  assert.deepEqual(FRAMEWORK_FOLDERS, ['engine', 'rigs', 'sound', 'quality']);
+test('the framework folders are engine, rigs, sound, quality and catalog (the metadata rules)', () => {
+  assert.deepEqual(FRAMEWORK_FOLDERS, ['engine', 'rigs', 'sound', 'quality', 'catalog']);
 });
 
 test('the module rule: exports something and does not need a page, a worker or Web Audio', () => {
@@ -88,10 +88,10 @@ test('finds the modules of a scratch project by scanning, and leaves the page gl
 });
 
 test('the naming rule', () => {
-  const names = shortNames(['engine/sprite.js', 'engine/theme.js', 'engine/big-thing.js', 'rigs/topdown.js', 'sound/sfx-engine.js', 'sound/theme.js', 'sound/wav.js', 'quality/sprite.js', 'quality/sound.js']);
+  const names = shortNames(['engine/sprite.js', 'engine/theme.js', 'engine/big-thing.js', 'rigs/topdown.js', 'sound/sfx-engine.js', 'sound/theme.js', 'sound/wav.js', 'quality/sprite.js', 'quality/sound.js', 'catalog/schema.js']);
   assert.deepEqual(names, {
     'engine/sprite.js': 'sprite', 'engine/theme.js': 'theme', 'engine/big-thing.js': 'bigThing', 'rigs/topdown.js': 'topdown',
-    'sound/sfx-engine.js': 'sfx', 'sound/theme.js': 'soundTheme', 'sound/wav.js': 'wav', 'quality/sprite.js': 'checkSprite', 'quality/sound.js': 'checkSound',
+    'sound/sfx-engine.js': 'sfx', 'sound/theme.js': 'soundTheme', 'sound/wav.js': 'wav', 'quality/sprite.js': 'checkSprite', 'quality/sound.js': 'checkSound', 'catalog/schema.js': 'schema',
   });
 });
 
@@ -184,11 +184,36 @@ test('a project with no framework folders still builds', async () => {
   } finally { fs.rmSync(empty, { recursive: true, force: true }); }
 });
 
+test('a module that cannot be loaded is left out and named, and the rest is still described', async () => {
+  fs.writeFileSync(path.join(root, 'engine', 'broken.js'), "// Needs a file this copy does not have.\nimport { gone } from '../nowhere/gone.js';\n/** Uses it. */\nexport const use = () => gone;\n");
+  try {
+    const made = await buildApi({ root });
+    assert.deepEqual(made.notLoaded.map((n) => n.file), ['engine/broken.js']);
+    assert.match(made.notLoaded[0].why, /gone\.js/);
+    assert.ok(!made.modules.some((m) => m.file === 'engine/broken.js'));
+    assert.ok(made.modules.some((m) => m.name === 'shapes'));
+    assert.match(await writeApi({ root }), /1 left out \(could not be loaded: engine\/broken\.js\)/);
+    assert.ok(!fs.readFileSync(path.join(root, 'generated', 'framework.js'), 'utf8').includes('broken'));
+  } finally { fs.rmSync(path.join(root, 'engine', 'broken.js')); }
+  await writeApi({ root });
+});
+
+test('the build writes the reference to generated/api.md, never into docs/', async () => {
+  fs.mkdirSync(path.join(root, 'docs'), { recursive: true });
+  const guide = '# Guide\n\nWritten by hand.\n';
+  fs.writeFileSync(path.join(root, 'docs', 'framework-api.md'), guide);
+  await writeApi({ root });
+  const made = await buildApi({ root });
+  assert.equal(fs.readFileSync(path.join(root, 'generated', 'api.md'), 'utf8'), referenceMarkdown(made) + '\n');
+  assert.equal(fs.readFileSync(path.join(root, 'docs', 'framework-api.md'), 'utf8'), guide, 'the hand-written guide is left alone');
+});
+
 // ---- the real project ---------------------------------------------------------------------------
 
 const api = await buildApi({ root: REAL });
 
 test('the real project: every entry is a real export and every real export has an entry', async () => {
+  assert.equal(api.notLoaded, undefined, `every framework module of the real project loads: ${JSON.stringify(api.notLoaded)}`);
   assert.ok(api.modules.length >= 15, `found ${api.modules.length} modules`);
   for (const m of api.modules) {
     const real = await import(pathToFileURL(path.join(REAL, m.file)).href);
@@ -206,7 +231,7 @@ test('the real project: every entry is a real export and every real export has a
 
 test('the real project: the names an asset maker expects are there, and no page glue', () => {
   const names = api.modules.map((m) => m.name);
-  for (const n of ['sprite', 'surface', 'color', 'motion', 'theme', 'sfx', 'soundTheme', 'analyze', 'wav', 'checkSprite', 'checkSound']) assert.ok(names.includes(n), `${n} is missing from ${names.join(', ')}`);
+  for (const n of ['sprite', 'surface', 'color', 'motion', 'theme', 'sfx', 'soundTheme', 'analyze', 'wav', 'checkSprite', 'checkSound', 'schema']) assert.ok(names.includes(n), `${n} is missing from ${names.join(', ')}`);
   assert.equal(new Set(names).size, names.length, 'every module has its own name');
   for (const m of api.modules) assert.ok(!/player|worklet|worker/.test(m.file), `${m.file} is page glue`);
   const files = new Set(api.modules.map((m) => m.file));
@@ -228,9 +253,8 @@ test('the reference table is made from api.json and names every module and expor
   for (const a of api.actions) assert.ok(md.includes(a.name), a.name);
 });
 
-test('docs/framework-api.md carries the current reference', () => {
+test('the hand-written guide points at the generated reference and holds no generated table', () => {
   const doc = fs.readFileSync(path.join(REAL, 'docs', 'framework-api.md'), 'utf8');
-  const m = /<!-- generated reference: start[^>]*-->\n([\s\S]*?)\n<!-- generated reference: end -->/.exec(doc);
-  assert.ok(m, 'the guide has the two marker comments');
-  assert.equal(m[1].trim(), referenceMarkdown(api).trim(), 'the reference is out of date: run "node tools/build.mjs" (or "node tools/lib/api.mjs")');
+  assert.match(doc, /generated\/api\.md/);
+  assert.ok(!/\| Export \| Kind \|/.test(doc), 'the export tables belong in generated/api.md');
 });

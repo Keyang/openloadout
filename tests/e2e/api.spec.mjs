@@ -29,7 +29,7 @@ test('window.loadout has the Contract 11 members, and the home page does not pay
     bag: Object.keys(window.loadout.bag).sort(),
   }));
   expect(shape.top).toEqual(['api', 'assets', 'bag', 'call', 'check', 'framework', 'go', 'make', 'render']);
-  expect(shape.assets).toEqual(['get', 'list', 'search', 'similar']);
+  expect(shape.assets).toEqual(['get', 'list', 'remove', 'search', 'similar']);
   expect(shape.make).toEqual(['sound', 'sprite']);
   expect(shape.bag).toEqual(['add', 'download', 'items', 'remove', 'setLook']);
 
@@ -43,10 +43,8 @@ test('window.loadout has the Contract 11 members, and the home page does not pay
     const fw = await window.loadout.framework;
     const missing = [];
     for (const m of api.modules) for (const e of m.exports) if (!(fw[m.name] && e.name in fw[m.name])) missing.push(`${m.name}.${e.name}`);
-    const extra = [];
-    for (const [name, mod] of Object.entries(fw)) for (const k of Object.keys(mod)) if (!api.modules.find((m) => m.name === name)?.exports.some((e) => e.name === k)) extra.push(`${name}.${k}`);
     return {
-      modules: api.modules.map((m) => m.name), frameworkKeys: Object.keys(fw), missing, extra,
+      modules: api.modules.map((m) => m.name), frameworkKeys: Object.keys(fw), missing,
       actions: api.actions.map((a) => a.name),
       direct: typeof window.loadout.framework.sprite.defineSprite,      // after the first await it is there without waiting
       sameAgain: (await window.loadout.framework) === fw && (await window.loadout.api) === api,
@@ -54,8 +52,10 @@ test('window.loadout has the Contract 11 members, and the home page does not pay
   });
   expect(got.modules.length).toBeGreaterThanOrEqual(15);
   expect(got.frameworkKeys.sort()).toEqual([...got.modules].sort());
+  // api.json is from the last build and the framework is the live code, which other people add to between builds:
+  // everything described must exist (additions never remove), but the live code may already hold more.
+  // That generated/api.json lists exactly the real exports is the unit test's job (tests/unit/api-generator.test.mjs).
   expect(got.missing, 'every export in api.json is on loadout.framework').toEqual([]);
-  expect(got.extra, 'everything on loadout.framework is in api.json').toEqual([]);
   expect(got.actions).toEqual(expect.arrayContaining(['assets_list', 'assets_search', 'make_sprite', 'make_sound', 'check', 'render', 'bag_add', 'go']));
   expect(got.direct).toBe('function');
   expect(got.sameAgain).toBe(true);
@@ -280,7 +280,7 @@ test('(f) junk never throws: every action answers { ok: false, errors }', async 
     const L = window.loadout;
     const out = { threw: [], bad: [] };
     const junk = [undefined, null, 42, '', 'no such thing!', {}, [], true, () => 1];
-    const calls = { 'assets.get': L.assets.get, 'assets.similar': L.assets.similar, 'make.sprite': L.make.sprite, 'make.sound': L.make.sound, check: L.check, render: L.render, 'bag.add': L.bag.add, 'bag.remove': L.bag.remove, go: L.go, call: L.call };
+    const calls = { 'assets.get': L.assets.get, 'assets.similar': L.assets.similar, 'assets.remove': L.assets.remove, 'make.sprite': L.make.sprite, 'make.sound': L.make.sound, check: L.check, render: L.render, 'bag.add': L.bag.add, 'bag.remove': L.bag.remove, go: L.go, call: L.call };
     for (const [name, fn] of Object.entries(calls)) {
       for (const j of junk) {
         if (name === 'go' && j === '') continue;                              // '' is the home page
@@ -339,7 +339,7 @@ test('(f) junk never throws: every action answers { ok: false, errors }', async 
 
 test('the bag: add, list, look, remove, and the package', async ({ page }) => {
   await openRoute(page, '/');
-  const r = await page.evaluate(async (src) => {
+  const r = await page.evaluate(async ([src, faulty]) => {
     const L = window.loadout;
     const first = await L.bag.add('coin', { params: { size: 1 }, scale: 2 });
     const second = await L.bag.add('coin-pickup');
@@ -347,11 +347,13 @@ test('the bag: add, list, look, remove, and the package', async ({ page }) => {
     const look = await L.bag.setLook({ colour: { hue: 30 }, mood: 'sunny' });
     const built = await L.bag.download({ save: false, data: true });
     await L.make.sprite(src);
-    const mine = await L.bag.add('api-test-gem');
+    const mine = await L.bag.add('api-test-gem', { params: { cut: 'round' } });
+    const draft = await L.make.sprite(faulty);
+    const refused = await L.bag.add(draft.id);
     const removed = await L.bag.remove(second.key);
     const twice = await L.bag.remove(second.key);
-    return { first, second, items, look, built, mine, removed, twice, after: await L.bag.items(), header: document.querySelector('header .bag-count')?.textContent };
-  }, GOOD_SPRITE);
+    return { first, second, items, look, built, mine, refused, removed, twice, after: await L.bag.items(), header: document.querySelector('header .bag-count')?.textContent };
+  }, [GOOD_SPRITE, DEAD_CONTROL]);
   expect(r.first).toMatchObject({ ok: true, count: 1 });
   expect(r.first.item).toMatchObject({ kind: 'sprite', id: 'coin', settings: { params: { size: 1 }, scale: 2 } });
   expect(r.second).toMatchObject({ ok: true, count: 2 });
@@ -362,18 +364,21 @@ test('the bag: add, list, look, remove, and the package', async ({ page }) => {
   expect(r.built).toMatchObject({ ok: true, name: 'loadout-package.zip', saved: false });
   expect(r.built.files).toEqual(expect.arrayContaining(['sprites/coin/coin.png', 'sprites/coin/coin.json', 'sounds/coin-pickup.wav', 'manifest.json']));
   expect(r.built.zip).toMatch(/^data:application\/zip;base64,UEsD/);       // "PK"
-  // phase 1: an asset made on this visit cannot go in the bag yet, and the answer says so
-  expect(r.mine.ok).toBe(false);
-  expect(r.mine.errors[0]).toMatch(/made on this visit/);
-  expect(r.removed).toEqual({ ok: true, count: 1 });
+  // an asset made on this visit goes in with its whole definition; a draft that fails the quality bar is refused
+  expect(r.mine).toMatchObject({ ok: true, count: 3 });
+  expect(r.mine.item).toMatchObject({ kind: 'sprite', id: GOOD_ID, settings: { params: { cut: 'round' } }, definition: { source: GOOD_SPRITE } });
+  expect(r.refused.ok).toBe(false);
+  expect(r.refused.errors[0]).toMatch(/quality bar/);
+  expect(r.refused.errors[0]).toMatch(/weight/i);
+  expect(r.removed).toEqual({ ok: true, count: 2 });
   expect(r.twice.ok).toBe(false);
-  expect(r.after.count).toBe(1);
-  expect(r.header, 'the page header follows the bag').toBe('1');
+  expect(r.after.count).toBe(2);
+  expect(r.header, 'the page header follows the bag').toBe('2');
 
   // download() starts the browser download of the same package
   const file = await downloadFrom(page, () => page.evaluate(() => window.loadout.bag.download()));
   expect(file.name).toBe('loadout-package.zip');
-  expect(readZip(file.bytes).map((f) => f.name)).toEqual(expect.arrayContaining(['sprites/coin/coin.png', 'manifest.json']));
+  expect(readZip(file.bytes).map((f) => f.name)).toEqual(expect.arrayContaining(['sprites/coin/coin.png', `sprites/${GOOD_ID}/${GOOD_ID}.png`, `sprites/${GOOD_ID}/${GOOD_ID}.source.js`, 'manifest.json']));
 });
 
 test('go opens a page of the site', async ({ page }) => {

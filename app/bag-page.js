@@ -1,12 +1,13 @@
 // The bag page (#/bag): everything the visitor collected, each drawn or played
 // with its own settings and the bag's theme, and one download for all of it.
-import { assetById, spriteNow, loadSprites } from './catalog.js';   // W2-G: which sprites exist comes from the catalogue; their programs are loaded when the bag needs them
+import { assetById, spriteNow, loadSprites, onCatalogChange } from './catalog.js';   // W2-G: which sprites exist comes from the catalogue; their programs are loaded when the bag needs them
 import { defaultParams, cleanParams, clipFps } from '../engine/sprite.js';
 import { renderThemedFrame } from '../engine/theme.js';
 import { applySound, themedSoundParams, soundSettingsFor } from '../sound/theme.js';
 import { el, header, saveBlob, SPRITE_BG, SOUND_BG, TILE_BG, drawSpriteOnTile, reduceMotion } from './ui.js';
 import { soundById, soundParams, rendered, renderAsync, playRendered, playLive, drawWave } from './audio.js';
-import { bag } from './bag.js';
+import { bag, LINK_LIMIT } from './bag.js';
+import { restoringRuntime, restoreRuntime } from './api.js';      // W5-A: assets made on a visit come back from the definitions the bag holds
 import { packageFiles, defaultCues, activeTheme, kindMatches } from './bundle.js';
 import { zip } from './zip.js';
 import { themeControls } from './theme-controls.js';   // W2-D2
@@ -208,9 +209,11 @@ export function bagPage(app, query = {}, isCurrent = () => true) {
   const asked = new Set(), lost = new Set();
   let left = false;
   const here = () => !left && isCurrent();
-  const pendingSprite = (item) => item.kind === 'sprite' && kindMatches(item.kind, item.id) && !spriteNow(item.id) && !lost.has(item.id);
+  // W5-A: an item made on a visit whose definition is still being brought back is on its way too, not missing
+  const pendingMade = (item) => !!item.definition && !assetById(item.id) && restoringRuntime();
+  const pendingSprite = (item) => pendingMade(item) || (item.kind === 'sprite' && kindMatches(item.kind, item.id) && !spriteNow(item.id) && !lost.has(item.id));
   function fetchSprites(items) {
-    const ids = [...new Set(items.filter(pendingSprite).map((i) => i.id))].filter((id) => !asked.has(id));
+    const ids = [...new Set(items.filter((i) => pendingSprite(i) && !pendingMade(i)).map((i) => i.id))].filter((id) => !asked.has(id));
     if (!ids.length) return;
     for (const id of ids) asked.add(id);
     loadSprites(ids).then((got) => {
@@ -229,6 +232,8 @@ export function bagPage(app, query = {}, isCurrent = () => true) {
   if (query.load) {
     const peek = bag.peekLink(query.load);
     if (!peek) linkNote.textContent = 'That bag link is damaged, so nothing was added.';
+    // W5-A: a sprite made on someone's visit is a small program. It is not run until the visitor says so.
+    else if (peek.code) offer = { text: query.load, count: peek.count, code: peek.code, alone: !bag.count() };
     else if (!bag.count()) {
       const n = bag.fromLink(query.load);
       linkNote.textContent = `Opened a shared bag with ${n} item${n === 1 ? '' : 's'}.`;
@@ -253,12 +258,18 @@ export function bagPage(app, query = {}, isCurrent = () => true) {
     if (!offer) return null;
     const take = (mode) => {
       const n = bag.fromLink(offer.text, { mode });
+      const alone = offer.alone;
       offer = null;
-      linkNote.textContent = n === null ? 'That bag link is damaged, so nothing was added.' : mode === 'add' ? `Added ${n} item${n === 1 ? '' : 's'} from the shared bag.` : `Your bag now holds the shared bag's ${n} item${n === 1 ? '' : 's'}.`;
+      linkNote.textContent = n === null ? 'That bag link is damaged, so nothing was added.' : alone ? `Opened a shared bag with ${n} item${n === 1 ? '' : 's'}.` : mode === 'add' ? `Added ${n} item${n === 1 ? '' : 's'} from the shared bag.` : `Your bag now holds the shared bag's ${n} item${n === 1 ? '' : 's'}.`;
       build();
     };
+    const made = offer.code ? el('p', {}, `${offer.code === 1 ? 'One of them was' : `${offer.code} of them were`} made by whoever shared the link, and ${offer.code === 1 ? 'is a small program that runs' : 'are small programs that run'} in this page once the bag is opened. Open it only if you trust who sent it.`) : null;
+    if (offer.alone) return el('div', { class: 'bag-offer' },
+      el('p', {}, `This link holds a bag with ${offer.count} item${offer.count === 1 ? '' : 's'}.`), made,
+      el('button', { type: 'button', class: 'btn', onclick: () => take('replace') }, 'Open the bag'),
+      el('button', { type: 'button', class: 'ghost', onclick: () => { offer = null; build(); } }, 'Ignore the link'));
     return el('div', { class: 'bag-offer' },
-      el('p', {}, `This link holds a bag with ${offer.count} item${offer.count === 1 ? '' : 's'}. Your own bag already has things in it.`),
+      el('p', {}, `This link holds a bag with ${offer.count} item${offer.count === 1 ? '' : 's'}. Your own bag already has things in it.`), made,
       el('button', { type: 'button', class: 'btn', onclick: () => take('add') }, 'Add them to my bag'),
       el('button', { type: 'button', class: 'ghost', onclick: () => take('replace') }, 'Replace my bag'),
       el('button', { type: 'button', class: 'ghost', onclick: () => { offer = null; build(); } }, 'Ignore the link'));
@@ -284,14 +295,14 @@ export function bagPage(app, query = {}, isCurrent = () => true) {
       el('div', { class: 'bag-text' },
         el('span', { class: 'bag-name' }, name),
         el('span', { class: 'bag-kind' }, KIND_LABEL[item.kind]),
-        el('span', { class: 'hint' }, gone ? 'This is no longer on the site and will be left out of the download.' : describe(item)),
+        el('span', { class: 'hint' }, gone ? (item.definition ? 'This was made on another visit and could not be brought back. It will be left out of the download.' : 'This is no longer on the site and will be left out of the download.') : describe(item)),
         flash && flash.key === item.key ? el('span', { class: 'row-note', role: 'status' }, flash.text) : null),
       el('div', { class: 'bag-actions' },
         gone ? null : el('a', { class: 'btn plain', href: changeLink(item) }, 'Change'),
         gone ? null : el('button', { type: 'button', class: 'ghost', onclick: () => {
           // copies go at the end of the bag; the note goes on the new row
           flash = { key: null, text: `Added another copy of ${name}.` };
-          flash.key = bag.add({ kind: item.kind, id: item.id, settings: item.settings });
+          flash.key = bag.add({ kind: item.kind, id: item.id, settings: item.settings, definition: item.definition });
           build();
         } }, 'Add another copy'),
         el('button', { type: 'button', class: 'ghost', onclick: () => {
@@ -341,6 +352,11 @@ export function bagPage(app, query = {}, isCurrent = () => true) {
 
   async function copyLink() {
     const url = `${location.origin}${location.pathname}${bag.toLink()}`;
+    // W5-A: an item made on a visit travels with its whole source, which can make the link longer than a link can safely be
+    if (bag.madeCount() && url.length > LINK_LIMIT) {
+      linkNote.textContent = `This bag is too long for a link: it holds ${bag.madeCount() === 1 ? 'something' : 'things'} made on a visit, which travel${bag.madeCount() === 1 ? 's' : ''} with ${bag.madeCount() === 1 ? 'its' : 'their'} whole source, and the link would be ${url.length.toLocaleString('en')} characters long. Chat and mail apps cut links over ${LINK_LIMIT.toLocaleString('en')} characters short, so no link was made. Download the package instead: it holds everything, the source too.`;
+      return;
+    }
     try { await navigator.clipboard.writeText(url); linkNote.textContent = 'Link copied. Anyone who opens it gets a bag with these same items and settings.'; }
     catch { linkNote.textContent = 'Your browser did not allow copying. Select the link below and copy it.'; linkNote.append(el('input', { class: 'bag-link-text', readonly: true, value: url, 'aria-label': 'Link to this bag' })); }
   }
@@ -371,6 +387,7 @@ export function bagPage(app, query = {}, isCurrent = () => true) {
     stopPictures();
     const items = bag.items(), theme = bag.theme();
     fetchSprites(items);   // W2-G
+    if (items.some(pendingMade)) restoreRuntime().then(() => { if (here()) build(); });      // W5-A: drawn again once they are back, or known to be lost
     if (!items.length) confirming = false;
     const counts = ['sprite', 'sound', 'music'].map((k) => [k, items.filter((i) => i.kind === k).length]).filter(([, c]) => c);
     main.replaceChildren(...[
@@ -397,5 +414,6 @@ export function bagPage(app, query = {}, isCurrent = () => true) {
   raf = requestAnimationFrame(loop);
   build();
   const off = bag.onChange(build);
-  return () => { left = true; off(); cancelAnimationFrame(raf); stopPictures(); };
+  const offMade = onCatalogChange(() => { if (here()) build(); });      // W5-A: an asset made on a visit has been brought back (or made again)
+  return () => { left = true; off(); offMade(); cancelAnimationFrame(raf); stopPictures(); };
 }

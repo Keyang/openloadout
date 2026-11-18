@@ -65,7 +65,7 @@ test('api.json lists the actions in the shape MCP tool listings use', () => {
 
 test('the Contract 11 members are all there', () => {
   const calls = api.actions.map((a) => a.call);
-  for (const c of ['assets.list', 'assets.get', 'assets.search', 'assets.similar', 'make.sprite', 'make.sound', 'check', 'render', 'bag.add', 'bag.items', 'bag.remove', 'bag.setLook', 'bag.download', 'go']) assert.ok(calls.includes(c), `${c} is missing`);
+  for (const c of ['assets.list', 'assets.get', 'assets.search', 'assets.similar', 'assets.remove', 'make.sprite', 'make.sound', 'check', 'render', 'bag.add', 'bag.items', 'bag.remove', 'bag.setLook', 'bag.download', 'go']) assert.ok(calls.includes(c), `${c} is missing`);
 });
 
 test('every listed action is a function on the object, and every function on the object is listed', () => {

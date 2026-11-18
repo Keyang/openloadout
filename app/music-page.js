@@ -3,6 +3,7 @@ import { el, header, saveBlob } from './ui.js';
 import { soundParams, randomSoundParams, renderAsync, playRendered, playLive, wavBytes, toUnit, toValue, isChoice, choicesOf, lengthOf } from './audio.js';
 import { addToBag, keepBag } from './add-to-bag.js';
 import { goesWith, moreLikeThis } from './related.js';
+import { madeNote } from './catalog.js';      // W5-A: a track made on this visit says so, and a draft cannot go in the bag
 
 const fmt = (d, v) => {
   const n = Math.abs(v) >= 100 ? Math.round(v) : Math.abs(v) >= 10 ? Math.round(v * 10) / 10 : Math.round(v * 100) / 100;
@@ -126,6 +127,7 @@ export function musicPage(app, patch, query) {
     el('main', { class: 'editor' },
       el('div', { class: 'left' },
         el('div', { class: 'title-row' }, el('h1', {}, patch.name), el('p', { class: 'blurb' }, patch.description ?? '')),
+        madeNote(patch.id) ? el('p', { class: 'hint made-here' }, madeNote(patch.id).text) : null,
         el('div', { class: 'stage-card' }, el('div', { class: 'stage-tools plain' }, el('div', { class: 'tools-left' }, playBtn, lengthNote))),
         el('div', { class: 'under' }, el('span', { class: 'label' }, 'Style'), styleBar),
         el('p', { class: 'used' }, 'Press Play, then move the sliders: the music changes while it plays, the way a game would change it during a fight.'),
@@ -136,7 +138,7 @@ export function musicPage(app, patch, query) {
           el('button', { type: 'button', class: 'ghost', onclick: () => setStyle(null, false) }, 'Start over')),
         choiceFields.length ? el('section', { class: 'group' }, el('h2', {}, 'Arrangement'), choiceFields) : null,
         el('section', { class: 'group' }, el('h2', {}, 'Sound'), fields)),
-      el('div', { class: 'get' }, addToBag('music', patch.id, () => ({ params: { ...st.p }, style: st.preset }), query), dlBtn, el('button', { type: 'button', class: 'ghost', onclick: copyLink }, 'Copy link'), status),
+      el('div', { class: 'get' }, madeNote(patch.id)?.draft ? null : addToBag('music', patch.id, () => ({ params: { ...st.p }, style: st.preset }), query), dlBtn, el('button', { type: 'button', class: 'ghost', onclick: copyLink }, 'Copy link'), status),
       moreLikeThis(patch.id)));
 
   return () => { st.gone = true; clearTimeout(urlTimer); stop(); };

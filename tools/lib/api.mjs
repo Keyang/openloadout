@@ -7,13 +7,14 @@
 //                             (name, description, inputSchema), copied from ACTIONS in app/api.js
 //   generated/framework.js    one module that re-exports every framework module under its short name; the site
 //                             loads it as window.loadout.framework
-//   docs/framework-api.md     the reference between its two marker comments (the guide above them is hand-written)
+//   generated/api.md          the same description as a page to read: every action, module and export in tables
+//                             (docs/framework-api.md is the hand-written guide and points here)
 //
 //   node tools/lib/api.mjs [--root <dir>]      write the three files (the build does this in its "framework" step)
 //   node tools/lib/api.mjs --undescribed       print the exported functions that have no description, as JSON
 //
-// WHICH FILES ARE FRAMEWORK. There is no list. A `.js` file directly in engine/, rigs/, sound/ or quality/ whose
-// name does not start with "_" is a framework module when both are true:
+// WHICH FILES ARE FRAMEWORK. There is no list. A `.js` file directly in engine/, rigs/, sound/, quality/ or catalog/
+// (the metadata rules) whose name does not start with "_" is a framework module when both are true:
 //   1. it exports something, and
 //   2. it runs anywhere: its code does not use a page (window. / document.), a worker's message port
 //      (self.onmessage, self.postMessage, importScripts) or Web Audio (AudioContext, AudioWorklet*, registerProcessor).
@@ -23,8 +24,8 @@
 //
 // SHORT NAMES. One rule: the file name without ".js" and without a trailing "-engine", in camelCase
 // (sfx-engine.js -> sfx). Modules in quality/ get the prefix "check" (quality/sprite.js -> checkSprite). If two
-// modules would still share a name, the one in the later folder (order: engine, rigs, sound, quality) gets its
-// folder name in front (sound/theme.js -> soundTheme).
+// modules would still share a name, the one in the later folder (order: engine, rigs, sound, quality, catalog) gets its
+// folder name in front (sound/theme.js -> soundTheme). catalog/schema.js is `schema`.
 //
 // DESCRIPTIONS. The one line comes from the comment directly above the export (no blank line between):
 //   /** One sentence that says what it does. Then its arguments, as many lines as needed. */
@@ -38,11 +39,8 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { ACTIONS, maskSource } from '../../app/api.js';
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-export const FRAMEWORK_FOLDERS = ['engine', 'rigs', 'sound', 'quality'];
+export const FRAMEWORK_FOLDERS = ['engine', 'rigs', 'sound', 'quality', 'catalog'];
 export const API_VERSION = 1;
-const DOC = 'docs/framework-api.md';
-const MARK_START = '<!-- generated reference: start (written by tools/lib/api.mjs from generated/api.json; do not edit by hand) -->';
-const MARK_END = '<!-- generated reference: end -->';
 
 // ---- which files ------------------------------------------------------------------------------------------
 
@@ -262,15 +260,18 @@ function purposeOf(text) {
 
 /**
  * Describe a project's framework: { version, window, modules: [{ name, file, purpose, exports }], actions }.
- * Every module is loaded for real, so what is listed is what exists.
+ * Every module is loaded for real, so what is listed is what exists. One that cannot be loaded is left out
+ * and listed under `notLoaded` ([{ file, why }]), which is only there when there is one.
  */
 export async function buildApi({ root = ROOT } = {}) {
-  const modules = [];
+  const modules = [], notLoaded = [];
   for (const m of findFrameworkModules(root)) {
     const abs = path.join(root, m.file);
     const text = fs.readFileSync(abs, 'utf8');
     let real;
-    try { real = await import(pathToFileURL(abs).href); } catch (e) { throw new Error(`${m.file}: could not be loaded (${e.message})`); }
+    // A module that cannot be loaded (a partial copy of the project, where a file it imports is missing) is left out
+    // and named in `notLoaded`, so the rest is still described. In the real project the unit test allows none.
+    try { real = await import(pathToFileURL(abs).href); } catch (e) { notLoaded.push({ file: m.file, why: String(e.message).split('\n')[0].replace(root, '.') }); continue; }
     modules.push({ name: m.name, file: m.file, purpose: purposeOf(text), exports: describeSource(text, real), real });
   }
   // an export that is another module's export passed on (export { ramp } from '../engine/color.js') is described where it is defined
@@ -288,6 +289,7 @@ export async function buildApi({ root = ROOT } = {}) {
     about: 'Loadout\'s framework and actions (docs/architecture.md, Contract 11). modules: everything on window.loadout.framework, as loadout.framework.<module>.<export>. actions: the high-level actions on window.loadout, as MCP tools; call one with loadout.<call>(...args) or loadout.call(name, input). Written by the build; see docs/framework-api.md.',
     window: 'loadout',
     modules,
+    ...(notLoaded.length ? { notLoaded } : {}),
     actions: JSON.parse(JSON.stringify(ACTIONS)),
   };
 }
@@ -310,9 +312,9 @@ export function frameworkSource(modules) {
 const cell = (s) => String(s).replace(/\|/g, '\\|').replace(/\n/g, ' ');
 const code = (s) => `\`${String(s).replace(/`/g, "'")}\``;
 
-/** The reference part of docs/framework-api.md, written from the description alone. */
+/** The text of generated/api.md: the description as a page to read, written from the description alone. */
 export function referenceMarkdown(api) {
-  const out = [];
+  const out = ['# Loadout framework reference', '', 'Written by the build (`tools/lib/api.mjs`) from the code; every build rewrites it. The guide is `docs/framework-api.md`.', ''];
   const nExports = api.modules.reduce((n, m) => n + m.exports.length, 0);
   out.push(`${api.modules.length} framework modules, ${nExports} exports, ${api.actions.length} actions.`, '');
   out.push('### Actions', '', 'Each is on `window.loadout` and in `generated/api.json` under `actions` with its full input schema.', '');
@@ -333,8 +335,7 @@ export function referenceMarkdown(api) {
 }
 
 /**
- * Write generated/api.json and generated/framework.js for a project, and bring the reference in its
- * docs/framework-api.md up to date (when that file is there and has the two marker comments).
+ * Write generated/api.json, generated/framework.js and generated/api.md for a project.
  * Returns one line for the build's summary.
  */
 export async function writeApi({ root = ROOT } = {}) {
@@ -345,19 +346,11 @@ export async function writeApi({ root = ROOT } = {}) {
   const json = JSON.stringify(api, null, 1) + '\n';
   put(path.join(dir, 'api.json'), json);
   put(path.join(dir, 'framework.js'), frameworkSource(api.modules));
-  let docNote = '';
-  const docFile = path.join(root, DOC);
-  if (fs.existsSync(docFile)) {
-    const doc = fs.readFileSync(docFile, 'utf8');
-    const a = doc.indexOf('<!-- generated reference: start'), b = doc.indexOf(MARK_END);
-    if (a >= 0 && b > a) {
-      const next = `${doc.slice(0, a)}${MARK_START}\n${referenceMarkdown(api)}\n${doc.slice(b)}`;
-      if (next !== doc) { fs.writeFileSync(docFile, next); docNote = `, ${DOC} updated`; }
-    }
-  }
+  put(path.join(dir, 'api.md'), referenceMarkdown(api) + '\n');
   const nExports = api.modules.reduce((n, m) => n + m.exports.length, 0);
   const waiting = undescribed(api).length;
-  return `${api.modules.length} modules, ${nExports} exports${waiting ? ` (${waiting} functions not described yet)` : ''}, ${api.actions.length} actions -> generated/api.json (${(json.length / 1024).toFixed(1)} KB), generated/framework.js${docNote}`;
+  const left = api.notLoaded ? `, ${api.notLoaded.length} left out (could not be loaded: ${api.notLoaded.map((n) => n.file).join(', ')})` : '';
+  return `${api.modules.length} modules${left}, ${nExports} exports${waiting ? ` (${waiting} functions not described yet)` : ''}, ${api.actions.length} actions -> generated/api.json (${(json.length / 1024).toFixed(1)} KB), generated/framework.js, generated/api.md`;
 }
 
 // ---- command line -----------------------------------------------------------------------------------------------

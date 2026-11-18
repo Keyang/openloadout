@@ -162,6 +162,8 @@ function unique(taken, base, ext = '') {
  * scale: pixel size for sprites whose settings do not choose one.
  * Optional: catalog ({ id: { name, role, type } }), onProgress(text).
  * An item whose asset is not on the site, or whose own file cannot be loaded, is left out and named under "missing".
+ * An item made on a visit (it carries `definition`, Contract 11) is packaged like any other; its source goes in next to it
+ * (<id>.source.js for a sprite, <id>.source.json for a sound or a track) and the manifest marks it madeOnThisVisit.
  * Returns [{ name, data: Uint8Array }] for zip().
  */
 export async function packageFiles({ items, theme = null, scale = 1, catalog = null, onProgress = () => {} }) {
@@ -191,6 +193,12 @@ export async function packageFiles({ items, theme = null, scale = 1, catalog = n
       }
       a.sheet = `sprites/${folder}/${sprite.id}.png`;
       a.animations = `sprites/${folder}/${sprite.id}.json`;
+      if (typeof item.definition?.source === 'string') {
+        a.madeOnThisVisit = true;
+        a.source = `sprites/${folder}/${sprite.id}.source.js`;
+        files.push({ name: a.source, data: enc.encode(item.definition.source) });
+        a.files.push(a.source);
+      }
       assets.push(a);
     } else {
       const patch = soundById[item.id];
@@ -208,6 +216,12 @@ export async function packageFiles({ items, theme = null, scale = 1, catalog = n
       a.files.push(name);
       a.seconds = Math.round(r.duration * 100) / 100;
       a.loop = !!(r.loop ?? patch.loop);
+      if (item.definition?.patch) {
+        a.madeOnThisVisit = true;
+        a.source = name.replace(/\.wav$/, '.source.json');
+        files.push({ name: a.source, data: enc.encode(JSON.stringify(item.definition.patch, null, 1)) });
+        a.files.push(a.source);
+      }
       assets.push(a);
     }
   }
@@ -239,6 +253,6 @@ Using it in Unity
   Sounds and music: they import as Audio Clips. Tick Loop on the music and on any sound listed as a loop.
 
 Keep pixel art sharp: turn smoothing or filtering off, and scale by whole numbers (2x, 3x, 4x).
-Made with Loadout.
+${manifest.assets.some((a) => a.madeOnThisVisit) ? `\nMade on your visit: ${manifest.assets.filter((a) => a.madeOnThisVisit).map((a) => a.name).join(', ')}.\n  These are not in Loadout's catalogue. Each comes with its source (the .source file next to it), which is what\n  Loadout needs to make it again: keep it if you want to change the asset later.\n` : ''}Made with Loadout.
 `;
 }

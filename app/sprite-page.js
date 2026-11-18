@@ -7,6 +7,7 @@ import { sounds, soundById, soundParams, rendered, playRendered, soundState, set
 import { spriteFiles, defaultCues } from './bundle.js';
 import { addToBag, keepBag } from './add-to-bag.js';
 import { goesWith, moreLikeThis } from './related.js';
+import { madeNote } from './catalog.js';      // W5-A: a sprite made on this visit says so, and a draft cannot go in the bag
 
 /**
  * The sprite's own sounds, as defaultCues gives them, each keeping its `when` (the settings it plays at):
@@ -371,11 +372,13 @@ export function spritePage(app, sprite, query) {
   buildStrip();
   buildCues();
 
+  const made = madeNote(sprite.id);
   app.replaceChildren(
     header('sprites'),
     el('main', { class: 'editor' },
       el('div', { class: 'left' },
         el('div', { class: 'title-row' }, el('h1', {}, sprite.name), el('p', { class: 'blurb' }, sprite.blurb ?? '')),
+        made ? el('p', { class: 'hint made-here' }, made.text) : null,
         el('div', { class: 'stage-card' }, stageWrap, el('div', { class: 'stage-tools' }, sceneBar, playBtn)),
         el('div', { class: 'under' }, el('span', { class: 'label' }, 'Animation'), clipBar),
         strip,
@@ -383,7 +386,7 @@ export function spritePage(app, sprite, query) {
         goesWith(sprite.id)),     // the sounds it uses and the bundles it is in, from the catalogue
       panel,
       el('div', { class: 'get' },
-        addToBag('sprite', sprite.id, () => ({ params: { ...st.p }, cues: st.cues, scale: st.scale }), query),
+        made?.draft ? null : addToBag('sprite', sprite.id, () => ({ params: { ...st.p }, cues: st.cues, scale: st.scale }), query),
         el('button', { type: 'button', class: 'btn big', onclick: download }, 'Download sprite and sounds'),
         el('button', { type: 'button', class: 'ghost', onclick: copyLink }, 'Copy link'),
         el('div', { class: 'size' }, el('span', { class: 'label' }, 'Pixel size'), sizeBar, sizeNote),

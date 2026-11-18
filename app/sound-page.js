@@ -3,6 +3,7 @@ import { el, header, saveBlob, SOUND_BG, cap } from './ui.js';
 import { soundParams, randomSoundParams, rendered, playRendered, wavBytes, toUnit, toValue, drawWave } from './audio.js';
 import { addToBag, keepBag } from './add-to-bag.js';
 import { goesWith, moreLikeThis } from './related.js';
+import { madeNote } from './catalog.js';      // W5-A: a sound made on this visit says so, and a draft cannot go in the bag
 
 const INK = '#231b33';
 const fmt = (d, v) => {
@@ -109,13 +110,15 @@ export function soundPage(app, patch, query) {
   }
 
   if (Number(query.seed) >= 1) st.seed = Math.round(Number(query.seed));   // a variation opened from the bag
-  const bagBox = addToBag('sound', patch.id, () => ({ params: { ...st.p }, style: st.preset, seed: st.seed }), query);
+  const made = madeNote(patch.id);
+  const bagBox = made?.draft ? null : addToBag('sound', patch.id, () => ({ params: { ...st.p }, style: st.preset, seed: st.seed }), query);
   render(); syncPlay(); syncStyle();
   app.replaceChildren(
     header('sounds'),
     el('main', { class: 'editor' },
       el('div', { class: 'left' },
         el('div', { class: 'title-row' }, el('h1', {}, patch.name), el('p', { class: 'blurb' }, patch.description ?? '')),
+        made ? el('p', { class: 'hint made-here' }, made.text) : null,
         el('div', { class: 'stage-card' }, wrap, el('div', { class: 'stage-tools' }, el('div', { class: 'tools-left' }, playBtn, lengthNote),
           el('button', { type: 'button', class: 'ghost', onclick: () => { st.seed = 1 + Math.floor(Math.random() * 9999); changed(true); } }, 'Play a variation'))),
         el('div', { class: 'under' }, el('span', { class: 'label' }, 'Style'), styleBar),

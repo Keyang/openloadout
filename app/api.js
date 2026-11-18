@@ -20,8 +20,10 @@
 // (new Worker(import.meta.url): it answers check and render jobs), and by Node (the build and the unit tests read
 // ACTIONS, maskSource and rewriteImports; nothing here touches a page until an action is called).
 //
-// Phase 1 (2026-11-18): assets made with loadout.make live in a run-time registry kept here. They can be checked,
-// drawn and listed; pages, the bag and the export learn about them in phase 2 (see catalogHook below).
+// Assets made with loadout.make are kept in a registry here and handed to app/catalog.js (addRuntimeAsset) and
+// app/audio.js (addSound), so for the rest of the visit they have pages, go in the bag, play in the playground
+// and are exported like catalogue assets. A bag item of one carries its whole definition (app/bag.js); when the
+// site starts, restoreRuntime() brings the bag's made assets back from those definitions.
 
 // ---- the actions, as an MCP server lists tools -------------------------------------------------------------
 // name: the tool name. call: where it is on window.loadout. args: the properties of the input, in call order,
@@ -70,13 +72,18 @@ export const ACTIONS = [
     inputSchema: { type: 'object', properties: { id: ID('The asset to start from'), count: { type: 'integer', minimum: 1, maximum: 50, description: 'How many (6 unless given)' } }, required: ['id'], additionalProperties: false },
   },
   {
+    name: 'assets_remove', call: 'assets.remove', args: ['id'],
+    description: 'Forget an asset made on this visit with make_sprite or make_sound. Catalogue assets cannot be removed, and an asset that is in the bag has to be taken out of the bag first.',
+    inputSchema: { type: 'object', properties: { id: ID('The id of an asset made on this visit') }, required: ['id'], additionalProperties: false },
+  },
+  {
     name: 'make_sprite', call: 'make.sprite', args: ['source'],
-    description: 'Define a new sprite on this visit from source text: one ES module written exactly like a file in sprites/, importing the framework by its usual paths (\'../engine/sprite.js\', \'../engine/fx.js\', \'../rigs/humanoid.js\') and ending in "export default defineSprite({ ... })". The quality bar runs on it and its verdict comes back as { id, ok, errors, warnings }. The id must not be one the catalogue already uses; making the same new id again replaces it.',
+    description: 'Define a new sprite on this visit from source text: one ES module written exactly like a file in sprites/, importing the framework by its usual paths (\'../engine/sprite.js\', \'../engine/fx.js\', \'../rigs/humanoid.js\') and ending in "export default defineSprite({ ... })". The quality bar runs on it and its verdict comes back as { id, ok, errors, warnings }. From then on it behaves like a catalogue asset on this visit: it has a page, can be rendered, put in the bag and exported. One with errors is kept as a draft (it can be rendered and has a page, but cannot go in the bag): fix the source and make it again under the same id, which replaces it. The id must not be one the catalogue already uses.',
     inputSchema: { type: 'object', properties: { source: { type: 'string', minLength: 1, description: 'The module source text' } }, required: ['source'], additionalProperties: false },
   },
   {
     name: 'make_sound', call: 'make.sound', args: ['patch'],
-    description: 'Define a new sound effect or music track on this visit from a synthesis patch (the JSON of a file in sounds/; music has "category": "music"). The quality bar runs on it and its verdict comes back as { id, ok, errors, warnings, notes }. A music track takes minutes to check.',
+    description: 'Define a new sound effect or music track on this visit from a synthesis patch (the JSON of a file in sounds/; music has "category": "music"). The quality bar runs on it and its verdict comes back as { id, ok, errors, warnings, notes }. From then on it behaves like a catalogue sound on this visit, and a sprite made afterwards can cue it by its id. One with errors is kept as a draft that cannot go in the bag; making the same id again replaces it. A music track takes minutes to check.',
     inputSchema: { type: 'object', properties: { patch: { oneOf: [{ type: 'object', additionalProperties: true }, { type: 'string' }], description: 'The patch object, or its JSON text' } }, required: ['patch'], additionalProperties: false },
   },
   {
@@ -112,7 +119,7 @@ export const ACTIONS = [
   },
   {
     name: 'bag_add', call: 'bag.add', args: ['id', 'settings'],
-    description: 'Put a catalogue asset in the visitor\'s bag with its settings. Returns the new item\'s key. The same asset may be added more than once with different settings.',
+    description: 'Put an asset in the visitor\'s bag with its settings: a catalogue asset, or one made on this visit that passes the quality bar (warnings do not block; a draft with errors is refused). An asset made on this visit goes in with its whole definition, so it is still in the bag after a reload. Returns the new item\'s key. The same asset may be added more than once with different settings.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -139,7 +146,7 @@ export const ACTIONS = [
   },
   {
     name: 'bag_download', call: 'bag.download', args: ['options'],
-    description: 'Build the bag as one zip package (sprite sheets, their JSON, WAV files, a manifest and a guide) and start the browser download. Returns the file names and the size.',
+    description: 'Build the bag as one zip package (sprite sheets, their JSON, WAV files, a manifest and a guide; for an asset made on this visit also its source) and start the browser download. Returns the file names and the size.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -163,6 +170,8 @@ export const ACTIONS = [
 ];
 
 // ---- small things ---------------------------------------------------------------------------------------
+
+const INTERNAL = Symbol('loadout internals');
 
 /** The refusal every action uses: { ok: false, ...extra, errors: [...] }. errors: one message or a list. */
 export const fail = (errors, extra = {}) => ({ ok: false, ...extra, errors: [].concat(errors) });
@@ -388,6 +397,7 @@ export function createLoadout(env = {}) {
   const lib = {
     catalog: once(async () => { const m = await import('./catalog.js'); await m.loadCatalog(); return m; }),
     sounds: once(async () => { const m = await import('./audio.js'); await m.loadSounds(); return m; }),
+    audio: once(() => import('./audio.js')),
     bag: once(() => import('./bag.js')),
     browse: once(() => import('./browse.js')),
     bundle: once(() => import('./bundle.js')),
@@ -428,10 +438,22 @@ export function createLoadout(env = {}) {
   const runtime = new Map();
   const runtimeRows = () => [...runtime.values()].map((e) => e.row);
   /**
-   * Phase 2: when app/catalog.js exports addRuntimeAsset(row, definition) the registry is handed to it here, so
-   * assetById / loadSprite / loadSound, and with them the pages, the bag and the export, see run-time assets.
+   * Keep an asset for the visit: in the registry, in the catalogue module (assetById / loadSprite / loadSound, and with
+   * them the pages, the bag, the playground and the export) and, for a sound, in the sound library the pages play from.
+   * An earlier one with the same id is replaced.
    */
-  const catalogHook = (c, entry) => { if (typeof c.addRuntimeAsset === 'function') c.addRuntimeAsset(entry.row, entry.kind === 'sprite' ? entry.def : entry.patch); };
+  async function keep(entry) {
+    const c = await lib.catalog();
+    const earlier = runtime.get(entry.id);
+    if (earlier && earlier.url !== entry.url) forget(earlier);
+    if (earlier && earlier.kind !== 'sprite') (await lib.audio()).removeSound(entry.id);
+    runtime.set(entry.id, entry);
+    if (entry.kind !== 'sprite') (await lib.audio()).addSound(entry.patch);
+    c.addRuntimeAsset(entry.row, entry.kind === 'sprite' ? entry.def : entry.patch);
+    return !!earlier;
+  }
+  /** What a bag item of this asset carries: { source } or { patch }. null for a catalogue asset. */
+  const definitionOf = (kind, id) => { const e = runtime.get(id); return e && e.kind === kind ? (kind === 'sprite' ? { source: e.source } : { patch: e.patch }) : null; };
 
   const noAsset = (id) => new Problem(`There is no asset "${id}". loadout.assets.list() names every asset; loadout.assets.search(text) finds one by words.`);
   const idOf = (v, where) => { if (typeof v !== 'string' || !ID_RE.test(v)) throw new Problem(`${where} takes an asset id: lowercase text such as "knight" or "coin-pickup". Got ${say(v)}.`); return v; };
@@ -472,7 +494,9 @@ export function createLoadout(env = {}) {
     const m = isObj(meta) ? meta : {};
     return { type: m.type ?? null, role: m.role ?? null, themes: list(m.themes), gameTypes: list(m.gameTypes), view: isSprite ? m.view ?? null : null, words: list(m.words), license: m.license ?? null };
   };
-  async function spriteRow(def, ok) {
+  // a draft (one that fails the quality bar) says so in its row: ok: false and the errors, which its page shows
+  const verdictFields = (verdict) => (verdict.ok ? { runtime: true, ok: true } : { runtime: true, ok: false, errors: [...verdict.errors] });
+  async function spriteRow(def, verdict) {
     const S = await lib.sprite();
     const p = S.defaultParams(def);
     const soundIds = [...new Set(Object.values(def.sounds ?? {}).flat().map((c) => c.sound))].sort();
@@ -481,16 +505,16 @@ export function createLoadout(env = {}) {
     return {
       id: def.id, kind: 'sprite', name: String(def.name), description: String(def.blurb ?? ''), ...metaFields(def.meta, true), bundles: [], src: null,
       tech: { frame: [def.size[0], def.size[1]], pivot: [def.pivot[0], def.pivot[1]], grounded: def.grounded !== false, clips, controls: Object.keys(def.params).length, parts: Object.keys(def.parts ?? {}), sounds: soundIds.length, soundIds },
-      thumb: null, strip: null, stripClip: preview.name, stripFrames: preview.frames, stripFps: preview.fps, runtime: true, ok,
+      thumb: null, strip: null, stripClip: preview.name, stripFrames: preview.frames, stripFps: preview.fps, ...verdictFields(verdict),
     };
   }
-  async function soundRow(patch, kind, ok) {
+  async function soundRow(patch, kind, verdict) {
     const { createVoice } = await lib.sfx();
     const bpm = list(patch.params).find((x) => x.id === 'bpm');
     return {
       id: patch.id, kind, name: String(patch.name ?? patch.id), description: String(patch.description ?? ''), ...metaFields(patch.meta, false), bundles: [], src: null,
       tech: { seconds: Math.round(createVoice(patch).duration * 100) / 100, loop: !!patch.loop, stereo: Array.isArray(patch.out), bpm: bpm ? bpm.default : null, controls: list(patch.params).length, styles: Object.keys(patch.presets ?? {}) },
-      thumb: null, strip: null, runtime: true, ok,
+      thumb: null, strip: null, ...verdictFields(verdict),
     };
   }
 
@@ -633,21 +657,34 @@ export function createLoadout(env = {}) {
       return { ok: true, id, assets: plain(ids.map((x) => rows.find((r) => r.id === x)).filter((r) => r && r.id !== id).slice(0, n)) };
     },
 
+    'assets.remove': async (id) => {
+      const entry = runtime.get(idOf(id, 'loadout.assets.remove(id)'));
+      const c = await lib.catalog();
+      if (!entry) throw c.assetById(id) ? new Problem(`"${id}" is a catalogue asset. Only assets made on this visit can be removed.`) : noAsset(id);
+      const { bag } = await lib.bag();
+      const held = bag.items().filter((i) => i.id === id).map((i) => i.key);
+      if (held.length) throw new Problem(`"${id}" is in the bag (item ${held.join(', ')}). Take it out first: loadout.bag.remove("${held[0]}").`);
+      runtime.delete(id);
+      forget(entry);
+      c.removeRuntimeAsset(id);
+      if (entry.kind !== 'sprite') (await lib.audio()).removeSound(id);
+      return { ok: true, id, kind: entry.kind };
+    },
+
     'make.sprite': async (source) => {
       const { url, def } = await loadSource(source, 'loadout.make.sprite(source)');
       const id = def.id;
       try {
         const c = await lib.catalog();
-        const taken = c.assetById(id), mine = runtime.get(id);
+        const taken = c.currentCatalog().assets.find((x) => x.id === id), mine = runtime.get(id);
         if (taken) throw Object.assign(new Problem(`"${id}" is already an asset in the catalogue (a ${taken.kind}): give the new sprite an id of its own.`), { id });
         if (mine && mine.kind !== 'sprite') throw Object.assign(new Problem(`"${id}" is already a ${mine.kind} made on this visit: give the sprite an id of its own.`), { id });
         const verdict = verdictOf(await checkSpriteAt(url));
-        const entry = { id, kind: 'sprite', source, url, def, verdict, row: await spriteRow(def, verdict.ok) };
-        forget(mine);
-        runtime.set(id, entry);
-        catalogHook(c, entry);
-        return { id, kind: 'sprite', ...verdict, kept: true, replaced: !!mine };
-      } catch (e) { win.URL.revokeObjectURL(url); throw e; }
+        const replaced = await keep({ id, kind: 'sprite', source, url, def, verdict, row: await spriteRow(def, verdict) });
+        // bag items of it follow the newest version that passes
+        if (replaced && verdict.ok) (await lib.bag()).bag.redefine(id, { source });
+        return { id, kind: 'sprite', ...verdict, kept: true, replaced };
+      } catch (e) { if (runtime.get(id)?.url !== url) win.URL.revokeObjectURL(url); throw e; }
     },
 
     'make.sound': async (input) => {
@@ -659,17 +696,16 @@ export function createLoadout(env = {}) {
       patch = plain(patch);
       const kind = patch.category === 'music' ? 'music' : 'sound';
       const c = await lib.catalog();
-      const taken = c.assetById(id), mine = runtime.get(id);
+      const taken = c.currentCatalog().assets.find((x) => x.id === id), mine = runtime.get(id);
       if (taken) throw Object.assign(new Problem(`"${id}" is already an asset in the catalogue (a ${taken.kind}): give the new sound an id of its own.`), { id });
       if (mine && mine.kind === 'sprite') throw Object.assign(new Problem(`"${id}" is already a sprite made on this visit: give the sound an id of its own.`), { id });
       const r = await work({ type: 'checkSound', patch });
       const verdict = verdictOf(r);
       // a patch the engine cannot run at all is not kept: there would be nothing to play
       if (!r.metrics?.valid) return { id, kind, ...verdict, kept: false, replaced: false };
-      const entry = { id, kind, patch, verdict, row: await soundRow(patch, kind, verdict.ok) };
-      runtime.set(id, entry);
-      catalogHook(c, entry);
-      return { id, kind, ...verdict, kept: true, replaced: !!mine };
+      const replaced = await keep({ id, kind, patch, verdict, row: await soundRow(patch, kind, verdict) });
+      if (replaced && verdict.ok) (await lib.bag()).bag.redefine(id, { patch });
+      return { id, kind, ...verdict, kept: true, replaced };
     },
 
     check: async (what) => {
@@ -715,12 +751,11 @@ export function createLoadout(env = {}) {
       const a = await find(idOf(id, 'loadout.bag.add(id, settings)'));
       if (!a) throw noAsset(id);
       if (settings !== undefined && settings !== null && !isObj(settings)) throw new Problem(`settings must be an object such as { params: { ... } }, or left out. Got ${say(settings)}.`);
-      const c = await lib.catalog();
-      // phase 2 (Contract 11): the bag keeps a run-time asset's whole definition. Until the catalogue takes run-time assets, refuse.
-      if (a.entry && typeof c.addRuntimeAsset !== 'function') throw new Problem(`"${id}" was made on this visit. Assets made on a visit cannot go in the bag yet; catalogue assets can. loadout.render("${id}") gives its picture or sound meanwhile.`);
-      if (a.entry && !a.entry.verdict.ok) throw new Problem(`"${id}" does not pass the quality bar yet, so it cannot go in the bag. loadout.check("${id}") lists what to fix.`);
+      // the quality bar applies to everything that goes in the bag: a draft with errors is refused (warnings do not block)
+      if (a.entry && !a.entry.verdict.ok) throw new Problem(`"${id}" does not pass the quality bar yet, so it cannot go in the bag. Fix it and make it again under the same id. Its errors: ${a.entry.verdict.errors.join(' | ')}`);
       const { bag } = await lib.bag();
-      const key = bag.add({ kind: a.kind, id, settings: settings ?? {} });
+      // an asset made on this visit goes in with its whole definition, so the bag still has it after a reload
+      const key = bag.add({ kind: a.kind, id, settings: settings ?? {}, ...(a.entry ? { definition: definitionOf(a.kind, id) } : {}) });
       return { ok: true, key, count: bag.count(), item: plain(bag.get(key)) };
     },
 
@@ -775,7 +810,7 @@ export function createLoadout(env = {}) {
         const a = await find(id);
         if (!a) throw noAsset(id);
         if ((page === 'sprite') !== (a.kind === 'sprite')) throw new Problem(`"${id}" is a ${a.kind}: its page is "/${a.kind}/${id}".`);
-        if (a.entry && typeof (await lib.catalog()).addRuntimeAsset !== 'function') throw new Problem(`"${id}" was made on this visit and has no page yet. loadout.render("${id}") gives its picture or sound meanwhile.`);
+        if (a.kind !== 'sprite') await lib.sounds();          // the sound pages read the sound library
       }
       needPage();
       const hash = `#${path}${query ? `?${query}` : ''}`;
@@ -783,6 +818,50 @@ export function createLoadout(env = {}) {
       return { ok: true, route: hash };
     },
   };
+
+  // ---- bringing back what the bag holds ----
+  // A bag item of an asset made on a visit carries its definition. When the site starts, and whenever the bag gains
+  // items (a shared link, another tab), those assets are made known again, without running the quality bar a second
+  // time: they passed it to get into the bag. One whose definition no longer loads is left out and shown as missing.
+  const lost = new Set();
+  let busy = 0, queue = Promise.resolve(), listening = false;
+  async function adopt() {
+    const [{ bag }, c] = await Promise.all([lib.bag(), lib.catalog()]);
+    for (const item of bag.items()) {
+      if (!item.definition || runtime.has(item.id) || lost.has(item.id) || c.currentCatalog().assets.some((a) => a.id === item.id)) continue;
+      const verdict = { ok: true, errors: [], warnings: ['Brought back from the bag and not checked again on this visit. loadout.check(id) checks it.'] };
+      busy++;
+      try {
+        if (item.kind === 'sprite') {
+          const { url, def } = await loadSource(item.definition.source, 'the bag');
+          if (def.id !== item.id) { win.URL.revokeObjectURL(url); throw new Error(`its source defines "${def.id}"`); }
+          await keep({ id: def.id, kind: 'sprite', source: item.definition.source, url, def, verdict, row: await spriteRow(def, verdict) });
+        } else {
+          const patch = item.definition.patch;
+          const sound = (await lib.sfx()).validatePatch(patch);
+          if (patch.id !== item.id || !sound.ok) throw new Error(sound.errors?.[0] ?? `its patch defines "${patch.id}"`);
+          const kind = patch.category === 'music' ? 'music' : 'sound';
+          await keep({ id: patch.id, kind, patch, verdict, row: await soundRow(patch, kind, verdict) });
+        }
+      } catch (e) {
+        lost.add(item.id);
+        console.warn(`Loadout: "${item.id}" in the bag was made on another visit and could not be brought back.`, e instanceof Problem ? (e.errors ?? [e.message]).join(' ') : e);
+      } finally { busy--; }
+    }
+  }
+  /** Make the bag's made assets known again. Resolves when every one has been tried. Safe to call again. */
+  async function restore() {
+    if (!doc) return;
+    const { bag } = await lib.bag();
+    if (!listening) {
+      listening = true;
+      bag.setDefinitions(definitionOf);
+      bag.onChange(() => { if (bag.madeCount()) restore(); });
+    }
+    if (!bag.madeCount()) return;
+    queue = queue.then(adopt, adopt);
+    await queue;
+  }
 
   // an action never throws: whatever goes wrong inside comes back as { ok: false, errors }
   const safe = (fn) => async (...args) => {
@@ -809,6 +888,7 @@ export function createLoadout(env = {}) {
   });
   Object.defineProperty(loadout, 'framework', { get: framework, enumerable: true });
   Object.defineProperty(loadout, 'api', { get: api, enumerable: true });
+  Object.defineProperty(loadout, INTERNAL, { value: { restore, restoring: () => busy > 0 } });
   for (const group of ['assets', 'make', 'bag']) Object.freeze(loadout[group]);      // not Object.values(loadout): reading framework or api starts their download
   return Object.freeze(loadout);
 }
@@ -827,3 +907,13 @@ if (typeof WorkerGlobalScope !== 'undefined' && globalThis instanceof WorkerGlob
 } else if (typeof window !== 'undefined' && typeof document !== 'undefined' && !window.loadout) {
   window.loadout = createLoadout({ window });
 }
+
+const installed = () => (typeof window !== 'undefined' && window.loadout && window.loadout[INTERNAL]) || null;
+/**
+ * The site calls this once its catalogue is in, before it draws the first page: assets made on an earlier visit
+ * that are in the bag are made known again from the definitions the bag holds. Resolves when that is done.
+ */
+export const restoreRuntime = () => Promise.resolve(installed()?.restore()).catch((e) => { console.warn('Loadout: what the bag holds from an earlier visit could not be brought back.', e); });
+/** True while an asset from the bag is still being brought back (the bag page shows it as loading, not missing). */
+export const restoringRuntime = () => !!installed()?.restoring();
+

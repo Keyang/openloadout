@@ -114,7 +114,9 @@ export const THEME_FIELDS = ['seed', 'colour', 'sound', 'music', 'shapes'];
 
 // ---- helpers for the site --------------------------------------------------------
 
+/** The meta.type values an asset of this kind ('sprite', 'sound' or 'music') may have. */
 export const typesFor = (kind) => (kind === 'sprite' ? SPRITE_TYPES : kind === 'music' ? MUSIC_TYPES : SOUND_TYPES);
+/** The meta.role paths an asset of this kind ('sprite', 'sound' or 'music') may have. */
 export const rolesFor = (kind) => (kind === 'sprite' ? SPRITE_ROLES : kind === 'music' ? MUSIC_ROLES : SOUND_ROLES);
 
 const cap = (s) => s[0].toUpperCase() + s.slice(1);

@@ -11,7 +11,7 @@ import { rewriteImports } from '../../app/api.js';
 import { checkSprite } from '../../quality/sprite.js';
 import { checkSound } from '../../quality/sound.js';
 import { validateMeta } from '../../catalog/schema.js';
-import { GOOD_SPRITE, GOOD_ID, EMPTY_FRAME, DEAD_CONTROL, NO_META, GOOD_SOUND } from '../fixtures/api/sources.mjs';
+import { GOOD_SPRITE, GOOD_ID, EMPTY_FRAME, DEAD_CONTROL, NO_META, GOOD_SOUND, starSprite, chimePatch, STAR_ID, CHIME_ID } from '../fixtures/api/sources.mjs';
 
 const REAL = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'loadout-api-src-'));
@@ -46,4 +46,18 @@ test('an empty frame, a control that does nothing and missing metadata each fail
 test('the good sound patch passes the bar', () => {
   const r = checkSound(GOOD_SOUND, { validateMeta });
   assert.deepEqual(r.errors, []);
+});
+
+test('route 2: the star fails on its first try, passes once fixed, and passes with its chime cued', async () => {
+  const first = await check(starSprite({ broken: true }));
+  assert.ok(first.errors.some((e) => /weight/i.test(e)), first.errors.join('\n'));
+  const fixed = await check(starSprite());
+  assert.deepEqual(fixed.errors, []);
+  const chime = chimePatch();
+  assert.deepEqual(checkSound(chime, { validateMeta }).errors, []);
+  const def = await load(starSprite({ cue: CHIME_ID }));
+  assert.equal(def.id, STAR_ID);
+  const cued = checkSprite(def, { validateMeta, soundIndex: new Map([[CHIME_ID, chime]]) });
+  assert.deepEqual(cued.errors, []);
+  assert.deepEqual(def.sounds.collect.map((c) => c.sound), [CHIME_ID]);
 });

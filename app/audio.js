@@ -32,6 +32,31 @@ export function loadSounds() {
   return loading;
 }
 
+/**
+ * Take in a sound or a music track made on this visit (window.loadout.make.sound, Contract 11), so every page
+ * finds it like one from the library. The same id again replaces the earlier one, and what was rendered from
+ * the earlier one is forgotten. A sound the library itself holds is never replaced (returns false).
+ */
+const madeHere = new Set();
+export function addSound(patch) {
+  if (!patch || typeof patch.id !== 'string') return false;
+  if (soundById[patch.id] && !madeHere.has(patch.id)) return false;
+  removeSound(patch.id);
+  madeHere.add(patch.id);
+  (isMusic(patch) ? music : sounds).push(patch);
+  soundById[patch.id] = patch;
+  return true;
+}
+/** Forget a sound made on this visit. Returns false when there is none with that id. */
+export function removeSound(id) {
+  if (!madeHere.has(id)) return false;
+  madeHere.delete(id);
+  for (const list of [sounds, music]) { const i = list.findIndex((p) => p.id === id); if (i >= 0) list.splice(i, 1); }
+  delete soundById[id];
+  for (const key of [...cache.keys()]) if (key.startsWith(`${id}|`)) cache.delete(key);
+  return true;
+}
+
 // ---- parameters ------------------------------------------------------------
 
 /** A parameter that is a set of choices, not a slider: named options, or a few evenly spaced values. */

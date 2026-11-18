@@ -20,9 +20,13 @@ const only = (o) => {
   return extra;
 };
 
+/** A slider control. def: its default; o: { min = 0, max = 1, step = 0.01, lo, hi (the words shown at each end), group, when }. */
 export const range = (label, def, o = {}) => ({ kind: 'range', label, def, min: o.min ?? 0, max: o.max ?? 1, step: o.step ?? 0.01, lo: o.lo ?? '', hi: o.hi ?? '', group: o.group ?? 'Look', ...only(o) });
+/** A pick-one control. options: values, or { value, label } pairs; def: the default value; o: { group, when, was }. */
 export const choice = (label, def, options, o = {}) => ({ kind: 'choice', label, def, options: options.map((x) => (typeof x === 'string' ? { value: x, label: x[0].toUpperCase() + x.slice(1) } : x)), group: o.group ?? 'Look', ...only(o) });
+/** A colour control. def: the default '#rrggbb'; swatches: the colours offered (see swatches() in palettes.js); o: { group, when }. */
 export const color = (label, def, swatches, o = {}) => ({ kind: 'color', label, def, swatches, group: o.group ?? 'Colors', ...only(o) });
+/** An on/off control. def: true or false; o: { group, when }. */
 export const toggle = (label, def, o = {}) => ({ kind: 'toggle', label, def, group: o.group ?? 'Look', ...only(o) });
 
 export const SKIN = ['#f6d3b0', '#e8b088', '#c98a5c', '#9a6240', '#6e4428', '#9bd18a', '#b9a7e0'];
@@ -33,6 +37,8 @@ export const METAL = ['#c2c9d6', '#8f97a8', '#e6c545', '#c98a4a', '#5d6475'];
 // ---- definition ------------------------------------------------------------
 
 /**
+ * Define a sprite: checks the definition, fills in its defaults and returns it. Every sprite file's default export.
+ *
  * defineSprite({
  *   id, name, kind: 'Character' | 'Creature' | 'Item' | 'Effect', blurb,
  *   size: [w, h], pivot: [x, y],           // pivot = where the sprite touches the ground
@@ -251,6 +257,7 @@ export function activeParams(sprite, p) {
   return Object.keys(sprite.params).filter((k) => inEffect(sprite, k, p));
 }
 
+/** A sprite's controls at their defaults: { key: value }. */
 export function defaultParams(sprite) {
   const p = {};
   for (const [k, d] of Object.entries(sprite.params)) p[k] = d.def;
@@ -288,6 +295,7 @@ export function randomParams(sprite, seed = Date.now()) {
   return p;
 }
 
+/** Frames per second of one clip at these settings (a clip's fps may depend on them), as a whole number, 1 or more. */
 export const clipFps = (sprite, clip, p) => {
   const f = sprite.clips[clip].fps;
   return Math.max(1, Math.round(typeof f === 'function' ? f(p) : f));

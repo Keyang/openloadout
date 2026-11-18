@@ -78,3 +78,73 @@ export function goodSound(id = 'api-test-blip') {
   return { ...patch, id, name: 'Test blip' };
 }
 export const GOOD_SOUND = goodSound();
+
+// ---- route 2: what an agent writes against the framework during one visit (tests/e2e/route2.spec.mjs) ----------
+
+export const STAR_ID = 'route2-star', CHIME_ID = 'route2-chime';
+
+/**
+ * A star pickup with an idle clip and a collect clip, written against the framework (palettes, fx).
+ * broken: the first try, with a "Weight" slider that does nothing; cue: the id of the sound its collect clip plays.
+ */
+export const starSprite = ({ id = STAR_ID, broken = false, cue = null } = {}) => `// A star to collect: it floats, and bursts into sparks when taken.
+import { defineSprite, range, choice, color, toggle } from '../engine/sprite.js';
+import { lerp, wave, clamp, TAU } from '../engine/motion.js';
+import { ramp, INK } from '../engine/color.js';
+import { PALETTE, swatches } from '../engine/palettes.js';
+import { sparkles, particles, steps } from '../engine/fx.js';
+
+const P = PALETTE.thornwood;
+const CX = 16, CY = 16;
+const star = (cx, cy, r, points, turn) => Array.from({ length: points * 2 }, (_, i) => {
+  const a = turn + (i * TAU) / (points * 2), d = i % 2 ? r * 0.48 : r;
+  return [cx + Math.sin(a) * d, cy - Math.cos(a) * d];
+});
+
+export default defineSprite({
+  id: '${id}',
+  name: 'Wish star',
+  kind: 'Item',
+  blurb: 'A star to collect. It floats, and bursts into sparks when it is taken.',
+  meta: { type: 'pickup', role: 'items/pickup', themes: ['fantasy'], gameTypes: ['platformer'], view: 'front', words: ['star', 'wish', 'collect', 'pickup', 'bonus', 'treasure', 'sparkle'], license: 'draft' },
+  size: [32, 32],
+  pivot: [16, 28],
+  grounded: false,
+  preview: 'idle',${cue ? `\n  sounds: { collect: [{ sound: '${cue}', frame: 0 }] },` : ''}
+  params: {
+    size: range('Size', 0.5, { lo: 'Small', hi: 'Big' }),
+    points: choice('Points', 'five', ['four', 'five', 'six']),
+    colour: color('Colour', swatches('thornwood', 'gem')[4], swatches('thornwood', 'gem')),
+    glint: toggle('Glints', true),${broken ? "\n    weight: range('Weight', 0.5, { lo: 'Light', hi: 'Heavy' })," : ''}
+    bob: range('Float', 0.5, { lo: 'Still', hi: 'Floaty', group: 'Motion' }),
+    speed: range('Speed', 0.5, { lo: 'Slow', hi: 'Fast', group: 'Motion' }),
+  },
+  clips: {
+    idle: { frames: 8, fps: (p) => 8 * lerp(0.65, 1.45, p.speed), loop: true },
+    collect: { frames: 6, fps: (p) => 12 * lerp(0.65, 1.45, p.speed), loop: false },
+  },
+  render(g, { clip, t, p }) {
+    const n = { four: 4, five: 5, six: 6 }[p.points];
+    const full = lerp(7, 11, p.size);
+    const m = ramp(p.colour);
+    if (clip === 'idle') {
+      const cy = CY - Math.round(lerp(0, 2, p.bob) * wave(t));
+      g.poly(star(CX, cy, full, n, 0), m, { shade: 1, light: 1 });
+      g.outline(INK);
+      if (p.glint) sparkles(g, { t, count: 3, seed: 5, big: false, colours: steps(P.gold), area: [CX - 12, CY - 13, CX + 13, CY + 12] });
+      return;
+    }
+    // collect: the star shrinks away while sparks fly out and settle
+    const r = full * (1 - clamp(t * 1.4));
+    if (r > 2) { g.poly(star(CX, CY, r, n, t * 2), m, { shade: 1, light: 1 }); g.outline(INK); }
+    particles(g, { t, x: CX, y: CY, count: 8, seed: 2, loop: false, arc: TAU, dist: lerp(8, 12, p.size), size: 2, colours: steps(p.colour) });
+    if (p.glint && t < 0.5) sparkles(g, { t, count: 2, seed: 9, big: false, colours: steps(P.gold), area: [CX - 8, CY - 8, CX + 9, CY + 9] });
+  },
+});
+`;
+
+/** A two-note chime for the star, as a patch written for the visit. */
+export function chimePatch(id = CHIME_ID) {
+  const patch = JSON.parse(fs.readFileSync(new URL('../../../sounds/coin-pickup.json', import.meta.url), 'utf8'));
+  return { ...patch, id, name: 'Wish chime', description: 'A two-note chime for a collected star.', meta: { ...patch.meta, words: ['star', 'wish', 'chime', 'collect', 'pickup', 'bonus', 'ding'] } };
+}

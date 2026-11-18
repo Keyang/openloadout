@@ -7,7 +7,7 @@ import { loadSounds, soundById, stopAll, isMusic } from './audio.js';
 import { homePage, browsePage, bundlesPage } from './home.js';
 import { kitAddress } from './kit-page.js';
 import { standInCatalog, configureSearch } from './browse.js';
-import './api.js';      // W5-A: installs window.loadout (Contract 11); loads nothing else until it is used
+import { restoreRuntime } from './api.js';      // W5-A: installs window.loadout (Contract 11); loads nothing else until it is used
 
 const app = document.getElementById('app');
 let teardown = () => {};
@@ -104,6 +104,7 @@ const catalogue = loadCatalog(standIn);      // nothing named: the usual generat
 
 try {
   await catalogue;
+  await restoreRuntime();      // W5-A: assets made on an earlier visit that are in the bag are known again before the first page is drawn
   window.addEventListener('hashchange', route);
   route();
   // fetch the sound library in a quiet moment, so the first asset page opens at once
