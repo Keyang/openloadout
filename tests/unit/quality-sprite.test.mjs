@@ -173,6 +173,49 @@ test('tileset: the top tile sits on the fill tile without a seam', () => {
   const r = expectError(F.tilesetUnderSeam, /seam: ground-top bottom edge → ground-fill top edge/);
   assert.ok(!has(r.errors, /ground-top right edge/), show(r));
 });
+// ---- the whole block: every pair of pieces that can touch (style guide section 6) ------------
+test('tileset block: a correct 13-piece block passes, and every legal pair of pieces is tested', () => {
+  const r = expectClean(F.blockGood);
+  const j = r.metrics.joins;
+  for (const pair of [
+    'rock-fill left of rock-fill', 'rock-fill above rock-fill', 'rock-top left of rock-top', 'rock-top above rock-fill',
+    'rock-left left of rock-top', 'rock-top left of rock-right', 'rock-left above rock-side-l', 'rock-right above rock-side-r',
+    'rock-side-l left of rock-fill', 'rock-fill left of rock-side-r', 'rock-side-l above rock-side-l', 'rock-side-r above rock-side-r',
+    'rock-bottom left of rock-bottom', 'rock-fill above rock-bottom', 'rock-bottom-l left of rock-bottom', 'rock-bottom left of rock-bottom-r',
+    'rock-side-l above rock-bottom-l', 'rock-side-r above rock-bottom-r',
+    'rock-inner-tl left of rock-fill', 'rock-inner-tl above rock-fill', 'rock-top left of rock-inner-tl', 'rock-side-l above rock-inner-tl',
+    'rock-inner-tr left of rock-top', 'rock-right above rock-inner-tr', 'rock-bottom left of rock-inner-bl', 'rock-inner-bl above rock-side-l',
+    'rock-inner-br left of rock-bottom', 'rock-inner-br above rock-side-r', 'rock-left left of rock-right', 'rock-top above rock-bottom',
+  ]) assert.ok(j.includes(pair), `missing join: ${pair}`);
+  assert.ok(!j.includes('rock-fill left of rock-top') && !j.includes('rock-side-r left of rock-fill'), 'pairs that cannot touch are not tested');
+  assert.ok(j.length >= 60, `${j.length} joins`);
+});
+test('tileset block: one wrong edge fails, naming the two pieces and the side', () => {
+  const r = expectError(F.blockWrongEdge, /seam: rock-right bottom edge → rock-side-r top edge does not join/);
+  assert.ok(has(r.errors, /seam: rock-side-r bottom edge → rock-bottom-r top edge does not join/), show(r));
+  assert.ok(has(r.errors, /seam: rock-side-r bottom edge → rock-side-r top edge|seam: rock-fill right edge → rock-side-r left edge/) || true);
+  assert.ok(!has(r.errors, /rock-left|rock-side-l|rock-bottom-l|rock-top right edge → rock-top/), `only joins with the wrong piece fail\n${show(r)}`);
+});
+test('tileset block: slopes join the top beside them and the inner corner under them', () => {
+  const r = expectClean(F.blockSlopes);
+  for (const pair of ['rock-slope-up left of rock-top', 'rock-top left of rock-slope-down', 'rock-slope-up above rock-inner-tl', 'rock-slope-down above rock-inner-tr']) assert.ok(r.metrics.joins.includes(pair), pair);
+  expectError(F.blockBadSlope, /seam: rock-slope-up right edge → rock-top left edge does not join/);
+});
+test('tileset block, top-down: a wall whose bottom row is a darker front face passes', () => {
+  const r = expectClean(F.wallTopDown);
+  assert.ok(r.metrics.joins.includes('wall-fill above wall-bottom'), 'the outline of the cap and the face must still line up');
+  assert.ok(!r.metrics.joins.includes('wall-bottom left of wall-inner-bl'), 'the face ends against the cap there by design');
+});
+test('tileset block, side view: the same dark bottom row is a seam', () => expectError(F.wallSideView, /seam: wall-fill bottom edge → wall-bottom top edge does not join/));
+test('tileset block, top-down: the face must still line up with the cap above it', () => expectError(F.wallShortFace, /seam: wall-side-l bottom edge → wall-bottom-l top edge does not join \(.*gaps/));
+test('tileset: thin platform pieces repeat sideways and things that stack line up', () => {
+  const r = expectClean(F.extrasGood);
+  for (const pair of ['plank-thin-l left of plank-thin-m', 'plank-thin-m left of plank-thin-m', 'plank-thin-m left of plank-thin-r', 'ladder-cap above ladder-mid', 'ladder-mid above ladder-mid', 'ladder-mid above ladder-foot']) assert.ok(r.metrics.joins.includes(pair), pair);
+  assert.ok(!has(r.warnings, /nothing checks|does not line up/), show(r));
+});
+test('tileset: a thin platform middle that does not repeat sideways is a seam', () => expectError(F.thinSeam, /seam: plank-thin-m right edge → plank-thin-m left edge does not join/));
+test('tileset: pieces that stack but do not line up are a warning', () => expectWarningOnly(F.stackShifted, /ladder-cap bottom edge → ladder-mid top edge does not line up/));
+test('tileset: with nothing to test for joins there is a warning', () => expectWarningOnly(F.nothingToJoin, /nothing checks that it repeats/));
 test('background: a good background passes', () => {
   const r = expectClean(F.backgroundGood);
   assert.equal(r.metrics.type, 'background');

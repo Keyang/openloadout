@@ -50,7 +50,7 @@ export const METAL = ['#c2c9d6', '#8f97a8', '#e6c545', '#c98a4a', '#5d6475'];
  *                                           // none is the selector value that removes the part (a toggle part: false)
  *   sockets(clip, t, p) { return { hand: { x, y, angle } }; },
  *                                           // optional: named attach points for a frame, in frame pixels and rig angles
- *                                           // (0 = down, PI/2 = forward, PI = up); exported per frame so a game can attach parts
+ *                                           // (0 = down, PI/2 = picture-right, PI = up); exported per frame so a game can attach parts
  *   render(g, { clip, t, frame, frames, p }) { ...draw on Surface g... },
  * })
  */
@@ -309,7 +309,7 @@ export function renderFrame(sprite, clip, frame, p) {
 
 /**
  * Attach points of one frame: { name: { x, y, angle } } in frame pixels, or null when the sprite declares none.
- * Angles use the rig convention: 0 = down, PI/2 = forward (the way the sprite faces), PI = up.
+ * Angles use the rig convention: 0 = down, PI/2 = picture-right (the way a side-view sprite faces), PI = up. Mirror a frame with x' = 2 * pivotX - x, angle' = -angle.
  */
 export function frameSockets(sprite, clip, frame, p) {
   const c = sprite.clips[clip];
@@ -319,11 +319,52 @@ export function frameSockets(sprite, clip, frame, p) {
 }
 
 /**
+ * What a game needs to stretch one clip of a sprite, from the sprite's optional `slice`
+ * (docs/architecture.md, Contract 8), in frame pixels; null when the clip declares nothing.
+ *
+ *   slice: { box: { left: 8, top: 8, right: 8, bottom: 8 },                  // per clip
+ *            tag: { rect: { x, y, w, h }, left: 7, top: 7, right: 7, bottom: 7 },
+ *            fill: (p) => ({ left: 16, top: 8, right: 16, bottom: 8, opening: { x, y, w, h } }) }
+ *   slice: (clip, p) => ({ ... }) | undefined                                // or one function
+ *
+ * Returns { border?, rect?, opening?, tile? }:
+ *   border  { left, bottom, right, top } (Unity's order): how far the corners reach in from each
+ *           side of `rect`, or of the frame when there is no rect. Between them the piece repeats.
+ *   rect    { x, y, w, h }: where the piece sits in its frame, when it does not fill it.
+ *   opening { x, y, w, h }: the trough of a bar housing, and where its fill strips lie.
+ *   tile    { x, w }: for a piece whose middle is a repeating pattern (so it has no border):
+ *           columns x .. x + w - 1 are one repeat; insert whole copies of them to lengthen it.
+ */
+export function clipStretch(sprite, clip, p) {
+  const all = sprite.slice;
+  if (all === undefined || all === null) return null;
+  let s = typeof all === 'function' ? all(clip, p) : all[clip];
+  if (typeof s === 'function') s = s(p);
+  if (s === undefined || s === null) return null;
+  const out = {};
+  const box = (r) => ({ x: r.x, y: r.y, w: r.w, h: r.h });
+  if (s.left !== undefined || s.top !== undefined || s.right !== undefined || s.bottom !== undefined) {
+    const b = { left: s.left ?? 0, bottom: s.bottom ?? 0, right: s.right ?? 0, top: s.top ?? 0 };
+    const w = s.rect ? s.rect.w : sprite.size[0], h = s.rect ? s.rect.h : sprite.size[1];
+    if (b.left + b.right > w) throw new Error(`sprite ${sprite.id}: slice of clip "${clip}" leaves nothing: left + right (${b.left + b.right}) is more than its width (${w})`);
+    if (b.top + b.bottom > h) throw new Error(`sprite ${sprite.id}: slice of clip "${clip}" leaves nothing: top + bottom (${b.top + b.bottom}) is more than its height (${h})`);
+    out.border = b;
+  }
+  if (s.rect) out.rect = box(s.rect);
+  if (s.opening) out.opening = box(s.opening);
+  if (s.tile) out.tile = { x: s.tile.x, w: s.tile.w };
+  return Object.keys(out).length ? out : null;
+}
+
+/**
  * Render the full sprite sheet: one row per clip, one column per frame.
  * Returns { w, h, data: Uint32Array (ABGR), meta } where meta is the JSON
  * that ships next to the PNG. meta.parts lists what the sprite holds or wears;
  * when the sprite has sockets(), every entry of meta.frames carries that frame's
- * attach points, so a game can attach or swap a part at run time.
+ * attach points, so a game can attach or swap a part at run time. When the sprite
+ * declares `slice`, the clips it names (and each of their frames) also carry
+ * `border`, `rect`, `opening` and `tile` in sheet pixels: see clipStretch().
+ * A sprite with no `slice` gets none of these keys.
  */
 export function renderSheet(sprite, p, { scale = 1, clips = Object.keys(sprite.clips) } = {}) {
   const [fw, fh] = sprite.size;
@@ -350,12 +391,18 @@ export function renderSheet(sprite, p, { scale = 1, clips = Object.keys(sprite.c
     frames: [],
   };
   const hasSockets = typeof sprite.sockets === 'function';
-  if (hasSockets) meta.socketAngle = 'radians: 0 points down the image, PI/2 the way the sprite faces, PI up';
+  if (hasSockets) meta.socketAngle = 'radians: 0 points down the image, PI/2 to the right of the image (the way a side-view sprite faces), PI up; to mirror a frame use x = 2*pivotX - x and angle = -angle';
   const r2 = (v) => Math.round(v * 100) / 100, r3 = (v) => Math.round(v * 1000) / 1000;
+  if (sprite.slice && typeof sprite.slice === 'object') for (const k of Object.keys(sprite.slice)) if (!sprite.clips[k]) throw new Error(`sprite ${sprite.id}: slice names clip "${k}", which does not exist`);
+  const scaled = (o) => Object.fromEntries(Object.entries(o).map(([k, v]) => [k, v * scale]));
   clips.forEach((name, row) => {
     const c = sprite.clips[name];
     const fps = clipFps(sprite, name, p);
     meta.animations[name] = { row, frames: c.frames, fps, loop: c.loop };
+    // stretch information (only for a clip the sprite's `slice` names), in sheet pixels
+    const st = clipStretch(sprite, name, p);
+    const stretch = st ? Object.fromEntries(Object.entries(st).map(([k, v]) => [k, scaled(v)])) : null;
+    if (stretch) Object.assign(meta.animations[name], stretch);
     for (let f = 0; f < c.frames; f++) {
       const g = renderFrame(sprite, name, f, p);
       for (let y = 0; y < fh; y++) for (let x = 0; x < fw; x++) {
@@ -365,6 +412,7 @@ export function renderSheet(sprite, p, { scale = 1, clips = Object.keys(sprite.c
         for (let sy = 0; sy < scale; sy++) for (let sx = 0; sx < scale; sx++) data[(oy + sy) * W + ox + sx] = v;
       }
       const entry = { name: `${name}_${f}`, animation: name, x: f * fw * scale, y: row * fh * scale, w: fw * scale, h: fh * scale, duration: Math.round(1000 / fps) };
+      if (stretch) for (const [k, v] of Object.entries(stretch)) entry[k] = { ...v };
       if (hasSockets) {
         // attach points, measured like the pivot: sheet pixels from the frame's top-left corner
         entry.sockets = Object.fromEntries(Object.entries(frameSockets(sprite, name, f, p) ?? {}).map(([k, s]) => [k, { x: r2(s.x * scale), y: r2(s.y * scale), angle: r3(s.angle ?? 0) }]));

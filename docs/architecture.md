@@ -112,7 +112,7 @@ hair:  color('Hair', '#5a3a22', HAIR, { when: { headgear: ['none', 'crown'] } })
 
 **Sounds that only apply sometimes.** An entry in a sprite's `sounds` list may carry the same `when`: `{ sound: 'sword-slash', frame: 3, when: { weapon: ['sword', 'axe', 'spear'] } }`. `cueInEffect(sprite, cue, p)` tells the site and the export whether to play or include it.
 
-**What the export says about parts.** `renderSheet` writes `parts: { weapon: { label, socket, present, settings } }` and, when the sprite provides `sockets(clip, t, p)`, a `sockets` object on every frame: `{ hand: { x, y, angle }, ... }` in sheet pixels from the frame's top-left, angle in radians (0 down, PI/2 facing, PI up). A game can attach or swap a part at run time from these.
+**What the export says about parts.** `renderSheet` writes `parts: { weapon: { label, socket, present, settings } }` and, when the sprite provides `sockets(clip, t, p)`, a `sockets` object on every frame: `{ hand: { x, y, angle }, ... }` in sheet pixels from the frame's top-left, angle in radians as a frame angle (0 down, PI/2 picture-right, PI up). In side-view clips and `_side` clips picture-right is the way the sprite faces. A game that mirrors a frame uses x' = 2 * pivotX - x and angle' = -angle. A game can attach or swap a part at run time from these.
 
 ## Contract 4: the catalogue file
 
@@ -193,6 +193,17 @@ theme = {
 ## Contract 8: export
 
 `app/bundle.js` builds every download in the browser: `packageFiles({ items, theme, scale })` returns the files for a zip with `sprites/<id>/` (sheet, JSON, the sprite's sounds), `sounds/`, `music/`, one `manifest.json` describing every asset with its role, and a guide. The export choice shows "Zip package" and "Unity package (coming later)", the second disabled.
+
+**Stretchable pieces.** A sprite may declare `slice`: one entry per clip a game may stretch (an object, or a function of the settings), or one function `(clip, p)`. `renderSheet` (`engine/sprite.js`, `clipStretch`) then writes these fields into the sheet JSON, on the clip's entry in `animations` and on each of its frames, in sheet pixels (they scale with the sheet). A sprite with no `slice` gets none of them and its sheet is unchanged.
+
+| Field | Shape | Meaning |
+|---|---|---|
+| `border` | `{ left, bottom, right, top }` (Unity's order) | How far the corners reach in from each side of `rect`, or of the frame when there is no `rect`. Keep the corners; repeat the edges along their length and the middle both ways. From `slice[clip].left / top / right / bottom` |
+| `rect` | `{ x, y, w, h }` | Where the piece sits in its frame, when it does not fill it (a name tag, a highlight row). Cut this out first; `border` is measured from it |
+| `opening` | `{ x, y, w, h }` | A bar: the trough of the housing, which is exactly where its fill strips lie. It moves with the bar's settings |
+| `tile` | `{ x, w }` | Instead of `border`, for a middle that repeats a pattern (a segmented bar): columns `x` to `x + w - 1` are one repeat. Insert whole copies of them to lengthen the piece; never stretch it |
+
+A cursor's hot spot is a socket named `tip` on each frame (`sockets`, Contract 3); the pivot is not moved to it. `engine/ui.js` has the helpers (`slice9`, `barOpening`) and its header repeats this table.
 
 ## Contract 9: the playground
 

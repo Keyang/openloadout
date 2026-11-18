@@ -14,6 +14,10 @@
 
 import { renderFrame, defaultParams, cleanParams, randomParams, clipFps, inEffect, partList } from '../engine/sprite.js';
 import { brightness, hexToRgb } from '../engine/color.js';
+import { blockJoins, pieceOf } from '../engine/tiles.js';
+import { THEME_PRESETS, applyColour } from '../engine/theme.js';
+
+const BLOCK_JOINS = blockJoins();    // every pair of the 13 block pieces that can touch: [[a, axis, b], ...]
 
 export const THRESHOLDS = {
   randomLooks: 12,          // seeded random looks drawn on top of default, all-low, all-high, every choice option and every toggle flipped
@@ -30,6 +34,19 @@ export const THRESHOLDS = {
   seamBreakFloor: 1, seamJumpFloor: 0.08,    // tile and background seams: see seamCheck()
   sampleFrames: 4,          // frames per clip used when testing what a control does
   tileSizes: [16, 32],
+  // Survives every look (S-survives-looks): under each whole-bundle look (THEME_PRESETS in engine/theme.js)
+  // at least this share of a clip's edges must be left. An edge is two neighbouring pixels that differ; it is
+  // left when they still differ after the look. Edges between drawn and see-through pixels are always left.
+  // Measured 2026-11-18 over every clip of the 16 sprites in sprites/ under the 13 looks (the two backdrops and the
+  // forest tiles as they stood before they were fixed), each picture judged by eye. Clips that still read: 0.60 and
+  // up (the Hero 0.88 to 0.96; every character, creature, pickup and interface piece 0.78 or more). Clips whose
+  // shapes had merged: 0.63 and down (the forest backdrop's far layer, ridge lost in the sky: 0.41 to 0.63 under six
+  // looks). The two groups overlap between 0.55 and 0.65, so this is a warning: look at the picture.
+  // An error level would go at 0.5: nothing judged readable scored under 0.6, and under 0.5 a layer is one flat shape
+  // (it would have failed the forest backdrop and the forest tiles before their fix, and fails no sprite after it).
+  // Counting colours kept instead does not separate them (the bat keeps 47% of its colours and reads; the bad far
+  // layer kept 63%), and counting only the edges inside the outline fails layers that keep a clear silhouette.
+  lookEdgesWarn: 0.65,
 };
 
 // def.kind (older sprites) -> meta.type, used when a sprite has no meta yet
@@ -74,11 +91,16 @@ function step(a, b) {
   }
   return { breaks, jump: both ? jump / both : 0 };
 }
+const stepCache = new WeakMap();      // a tile is tested against many neighbours: its own largest step is worked out once
 function largestStep(g, axis) {
+  const known = stepCache.get(g);
+  if (known && known[axis]) return known[axis];
   const n = axis === 'x' ? g.w : g.h;
   let breaks = 0, jump = 0;
   for (let i = 0; i + 1 < n; i++) { const s = step(line(g, axis, i), line(g, axis, i + 1)); breaks = Math.max(breaks, s.breaks); jump = Math.max(jump, s.jump); }
-  return { breaks, jump };
+  const out = { breaks, jump };
+  stepCache.set(g, { ...known, [axis]: out });
+  return out;
 }
 /**
  * Seam test, used for tiles and background layers. A is on the left (or on top), B on
@@ -460,32 +482,74 @@ export function checkSprite(def, { soundIndex, validateMeta } = {}) {
   const joinLooks = [['default', dflt], ['all-low', allLow], ['all-high', allHigh]];
   if (type === 'tileset') {
     if (W !== H || !T.tileSizes.includes(W)) warn(`tiles are ${W}x${H}; tilesets use 16x16 or 32x32`);
-    const named = (re) => clipNames.filter((c) => re.test(c));
-    const fills = named(/(^|-)fill$/), tops = named(/(^|-)top$/), lefts = named(/-left$/), rights = named(/-right$/);
-    const prefix = (c) => c.replace(/-?(fill|top|left|right)$/, '');
-    const partner = (c, list) => list.find((x) => prefix(x) === prefix(c)) ?? list[0];
-    const joins = [];
-    for (const f of fills) joins.push([f, 'x', f], [f, 'y', f]);
-    for (const t of tops) { joins.push([t, 'x', t]); if (fills.length) joins.push([t, 'y', partner(t, fills)]); }
-    for (const l of lefts) if (tops.length) joins.push([l, 'x', partner(l, tops)]);
-    for (const r of rights) if (tops.length) joins.push([partner(r, tops), 'x', r]);
-    if (!fills.length) warn('tileset has no fill tile (a clip named "...-fill"), so nothing checks that it repeats');
+    // Which tiles sit next to which is read from the clip names (docs/style-guide.md, section 6).
+    // A block is up to 13 clips under one prefix; every pair of its pieces that can touch is a join.
+    const topDown = def.meta?.view === 'top-down';
+    const blocks = new Map(), thins = new Map(), slopes = new Map(), stacks = new Map();
+    const kinds = { block: blocks, thin: thins, slope: slopes, stack: stacks };
+    for (const c of clipNames) {
+      const k = pieceOf(c);
+      const map = k && kinds[k.kind];
+      if (!map) continue;
+      if (!map.has(k.prefix)) map.set(k.prefix, {});
+      map.get(k.prefix)[k.piece] = c;
+    }
+    const every = (piece) => [...blocks.values()].map((b) => b[piece]).filter(Boolean);
+    const fills = every('fill'), tops = every('top');
+    const frontRow = (piece) => piece.startsWith('bottom');
+    const joins = [];                               // [a, axis, b, test]: a is left of b (axis x) or above it (axis y)
+    for (const b of blocks.values()) {
+      for (const [pa, axis, pb] of BLOCK_JOINS) {
+        if (!b[pa] || !b[pb]) continue;
+        // Top-down: the bottom row of a wall is its front face, darker than the cap by design. Against the
+        // rows above it only the outline has to line up; beside an inner corner the face simply ends.
+        if (topDown && frontRow(pa) !== frontRow(pb)) { if (axis === 'y') joins.push([b[pa], axis, b[pb], 'outline']); continue; }
+        joins.push([b[pa], axis, b[pb], 'seam']);
+      }
+      // a top, left or right with no partner under its own prefix is tested against the first one there is
+      if (b.top && !b.fill && fills.length) joins.push([b.top, 'y', fills[0], 'seam']);
+      if (b.left && !b.top && tops.length) joins.push([b.left, 'x', tops[0], 'seam']);
+      if (b.right && !b.top && tops.length) joins.push([tops[0], 'x', b.right, 'seam']);
+    }
+    for (const t of thins.values()) {
+      if (t.l && t.m) joins.push([t.l, 'x', t.m, 'seam']);
+      if (t.m) joins.push([t.m, 'x', t.m, 'seam']);
+      if (t.m && t.r) joins.push([t.m, 'x', t.r, 'seam']);
+      if (t.l && t.r) joins.push([t.l, 'x', t.r, 'seam']);
+    }
+    for (const [prefix, sl] of slopes) {
+      const b = blocks.get(prefix) ?? {};
+      if (sl.up && b.top) joins.push([sl.up, 'x', b.top, 'seam']);
+      if (sl.up && b['inner-tl']) joins.push([sl.up, 'y', b['inner-tl'], 'seam']);
+      if (sl.down && b.top) joins.push([b.top, 'x', sl.down, 'seam']);
+      if (sl.down && b['inner-tr']) joins.push([sl.down, 'y', b['inner-tr'], 'seam']);
+    }
+    // things that repeat up and down (ladders, pillars, posts): -cap over -mid over -foot. These names are
+    // not fixed by the style guide, so a miss is a warning.
+    for (const st of stacks.values()) {
+      if (st.cap && st.mid) joins.push([st.cap, 'y', st.mid, 'stack']);
+      if (st.mid) joins.push([st.mid, 'y', st.mid, 'stack']);
+      if (st.mid && st.foot) joins.push([st.mid, 'y', st.foot, 'stack']);
+    }
+    if (!joins.length) warn('tileset has no fill tile (a clip named "...-fill") and no other pieces the checker knows by name, so nothing checks that it repeats');
     metrics.joins = joins.map(([a, ax, b]) => `${a} ${ax === 'x' ? 'left of' : 'above'} ${b}`);
     for (const [lname, p] of joinLooks) {
       for (const f of fills) for (let i = 0; i < clips[f].frames; i++) {
         const g = render(f, i, p);
         if (!(g instanceof Error) && g.data.some((v) => (v >>> 24) !== 255)) error(`${f}: fill tile is not fully opaque (frame ${i} / ${lname})`, `opaque:${f}`);
       }
-      for (const [a, axis, b] of joins) {
+      for (const [a, axis, b, test] of joins) {
         const n = Math.min(clips[a].frames, clips[b].frames);
         for (let i = 0; i < n; i++) {
           const A = render(a, i, p), B = render(b, i, p);
           if (A instanceof Error || B instanceof Error) continue;
           const s = seamCheck(A, B, axis);
-          if (!s.ok) {
-            const ea = axis === 'x' ? 'right edge' : 'bottom edge', eb = axis === 'x' ? 'left edge' : 'top edge';
-            error(`seam: ${a} ${ea} → ${b} ${eb} does not join (${lname}, frame ${i}: ${s.breaks} gaps vs ${s.maxBreaks} allowed, brightness step ${s.jump.toFixed(2)} vs ${s.maxJump.toFixed(2)} allowed)`, `seam:${a}:${axis}:${b}`);
-          }
+          const ok = test === 'outline' ? s.breaks <= s.maxBreaks : s.ok;
+          if (ok) continue;
+          const ea = axis === 'x' ? 'right edge' : 'bottom edge', eb = axis === 'x' ? 'left edge' : 'top edge';
+          const gaps = `${s.breaks} gaps vs ${s.maxBreaks} allowed`, bright = `brightness step ${s.jump.toFixed(2)} vs ${s.maxJump.toFixed(2)} allowed`;
+          if (test === 'stack') warn(`${a} ${ea} → ${b} ${eb} does not line up, so the stack shows a break (${lname}, frame ${i}: ${gaps}, ${bright})`, `seam:${a}:${axis}:${b}`);
+          else error(`seam: ${a} ${ea} → ${b} ${eb} does not join (${lname}, frame ${i}: ${test === 'outline' ? gaps : `${gaps}, ${bright}`})`, `seam:${a}:${axis}:${b}`);
         }
       }
     }
@@ -499,6 +563,81 @@ export function checkSprite(def, { soundIndex, validateMeta } = {}) {
     }
     const far = clipNames[0];
     if (far) { const g = render(far, 0, dflt); if (!(g instanceof Error) && g.data.some((v) => (v >>> 24) !== 255)) warn(`${far}: the farthest layer has see-through pixels; a game needs a solid colour behind it`); }
+  }
+
+  // ---- survives every look ------------------------------------------------------------------------
+  // A whole-bundle look (THEME_PRESETS in engine/theme.js) recolours a finished frame: every colour
+  // becomes one other colour. Two colours that become the same colour stop being two shapes. Per clip,
+  // over every frame at the default settings: count the edges (neighbouring pixels that differ), then,
+  // for each look, the share of them that is left. Colours are mapped once per look, not per pixel.
+  {
+    const t1 = now();
+    const seen = new Map(), colours = [];            // every colour drawn at the default settings -> its number
+    const perClip = [];
+    for (const cname of clipNames) {
+      const pairs = new Map(), used = new Set();     // pairs: two colours' numbers -> how many edges lie between them
+      let outline = 0, lastV = 0, lastN = -1;
+      const number = (v) => {
+        if (v === lastV) return lastN;
+        let n = seen.get(v);
+        if (n === undefined) { n = colours.length; seen.set(v, n); colours.push(v); }
+        used.add(n);
+        lastV = v; lastN = n;
+        return n;
+      };
+      const edge = (a, b) => {
+        const da = a >>> 24 !== 0, db = b >>> 24 !== 0;
+        if (!da && !db) return;
+        if (!da || !db) { outline++; number(da ? a : b); return; }
+        const i = number(a), j = number(b), key = i < j ? i * 0x200000 + j : j * 0x200000 + i;
+        pairs.set(key, (pairs.get(key) ?? 0) + 1);
+      };
+      for (let f = 0; f < clips[cname].frames; f++) {
+        const g = render(cname, f, dflt);
+        if (g instanceof Error) continue;
+        const { w, h, data } = g;
+        for (let y = 0, i = 0; y < h; y++) for (let x = 0; x < w; x++, i++) {
+          const v = data[i];
+          if (x + 1 < w && data[i + 1] !== v) edge(v, data[i + 1]);
+          if (y + 1 < h && data[i + w] !== v) edge(v, data[i + w]);
+        }
+      }
+      let inside = 0;
+      for (const n of pairs.values()) inside += n;
+      perClip.push({ cname, pairs, used, outline, inside, merged: [] });
+    }
+    const hexOf = (v) => `#${[v & 255, (v >>> 8) & 255, (v >>> 16) & 255].map((c) => c.toString(16).padStart(2, '0')).join('')}`;
+    const from = Uint32Array.from(colours);
+    let tested = 0, lowest = { share: 1, clip: null, look: null };
+    for (const look of THEME_PRESETS) {
+      const to = applyColour(Uint32Array.from(from), look.theme.colour);
+      if (to.every((v, i) => v === from[i])) continue;             // this look changes no colour here ("Original")
+      tested++;
+      for (const c of perClip) {
+        if (!c.inside) continue;                                    // one colour: nothing can merge
+        let gone = 0, most = 0, pair = null;
+        for (const [key, n] of c.pairs) {
+          const i = Math.floor(key / 0x200000), j = key % 0x200000;
+          if (to[i] !== to[j]) continue;
+          gone += n;
+          if (n > most) { most = n; pair = [i, j]; }
+        }
+        const share = (c.outline + c.inside - gone) / (c.outline + c.inside);
+        if (share < lowest.share) lowest = { share, clip: c.cname, look: look.id };
+        if (share < T.lookEdgesWarn) c.merged.push({ look, share, a: from[pair[0]], b: from[pair[1]], into: to[pair[0]], left: new Set([...c.used].map((i) => to[i])).size });
+      }
+    }
+    // One message per cause (the same two colours merging under the same look), from the clip where it is worst.
+    for (const c of perClip) c.merged.sort((a, b) => a.share - b.share);   // worst look first; ties stay in THEME_PRESETS order
+    for (const c of perClip.filter((x) => x.merged.length).sort((x, y) => x.merged[0].share - y.merged[0].share)) {
+      const [worst, ...rest] = c.merged;
+      const pc = (m) => `${Math.round(m.share * 100)}%`;
+      const { a, b } = worst;
+      const also = rest.length ? ` Also under ${rest.map((m) => `${m.look.name} (${pc(m)})`).join(', ')}.` : '';
+      warn(`${c.cname}: shapes merge under the "${worst.look.name}" look: ${pc(worst)} of the edges are left (outline and lines between colours; at least ${Math.round(T.lookEdgesWarn * 100)}% needed). ${hexOf(a)} and ${hexOf(b)} (brightness ${lum(a).toFixed(2)} and ${lum(b).toFixed(2)}) both turn into ${hexOf(worst.into)}, and ${c.used.size} colours become ${worst.left}.${also} Make neighbouring materials differ in lightness, not only in hue: one clearly lighter or darker than the other`,
+        `looks:${worst.look.id}:${a}:${b}`);
+    }
+    metrics.themes = { tested, lowest: Math.round(lowest.share * 1000) / 1000, clip: lowest.clip, look: lowest.look, ms: Math.round((now() - t1) * 10) / 10 };
   }
 
   return finish();

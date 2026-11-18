@@ -241,6 +241,125 @@ export const tilesetTopSeam = () => defineSprite(tileDef({ slopedTop: true }));
 // the top tile sits on the fill tile without a seam (a dark band along the top tile's bottom edge)
 export const tilesetUnderSeam = () => defineSprite(tileDef({ shadowBottom: true }));
 
+// ---- a whole block: the 13 pieces of style guide section 6 ------------------------
+// Drawn by hand (not with engine/tiles.js) so the checker is tested on its own: a flat
+// body, an ink line on every side that faces the outside, a lighter band under the top.
+const B = 32;
+const FACES = {
+  left: 'NW', top: 'N', right: 'NE', 'side-l': 'W', fill: '', 'side-r': 'E', 'bottom-l': 'SW', bottom: 'S', 'bottom-r': 'SE',
+  'inner-tl': '', 'inner-tr': '', 'inner-bl': '', 'inner-br': '',
+};
+const CORNER = { 'inner-tl': [0, 0], 'inner-tr': [B - 1, 0], 'inner-bl': [0, B - 1], 'inner-br': [B - 1, B - 1] };
+function blockDef(opts = {}) {
+  const prefix = opts.prefix ?? 'rock';
+  const one = { frames: 1, fps: 1, loop: false };
+  const clips = Object.fromEntries(Object.keys(FACES).map((k) => [`${prefix}-${k}`, { ...one }]));
+  if (opts.slopes) { clips[`${prefix}-slope-up`] = { ...one }; clips[`${prefix}-slope-down`] = { ...one }; }
+  return {
+    id: 'q-block', name: 'Test block', kind: 'Item',
+    meta: { ...META, type: 'tileset', role: 'world/tile', view: opts.view ?? 'side' },
+    size: [B, B], pivot: [16, 16], grounded: false,
+    params: {
+      edge: range('Edge', 4, { min: 3, max: 6, step: 1, lo: 'Thin', hi: 'Deep' }),
+      speckles: toggle('Stones', true),
+      body: color('Rock', '#8f97a8', ['#8f97a8', '#7a4f33', '#c9a06a']),
+      trim: color('Trim', '#c2c9d6', ['#c2c9d6', '#a4c44a', '#f0ead8']),
+    },
+    clips,
+    render(g, { clip, p }) {
+      const piece = clip.slice(prefix.length + 1);
+      const body = (x, y) => (p.speckles && x % 8 === 3 && y % 8 === 5 ? '#5d6475' : p.body);
+      if (piece === 'slope-up' || piece === 'slope-down') {
+        const drop = opts.badSlope && piece === 'slope-up' ? 3 : 0;
+        for (let x = 0; x < B; x++) {
+          const top = (piece === 'slope-up' ? B - 1 - x : x) + drop;
+          for (let y = top; y < B; y++) g.dot(x, y, y === top ? INK : y - top <= p.edge ? p.trim : body(x, y));
+        }
+        return;
+      }
+      const faces = FACES[piece];
+      // the wall of a top-down block: its bottom row is the front face, darker than the cap
+      if (opts.face && piece.startsWith('bottom')) {
+        const x0 = faces.includes('W') ? (opts.faceShort ? 3 : 0) : 0, x1 = faces.includes('E') ? B - 1 : B - 1;
+        for (let y = 0; y < B - 2; y++) for (let x = x0; x <= x1; x++) {
+          const end = (faces.includes('W') && x === x0) || (faces.includes('E') && x === x1);
+          g.dot(x, y, end || y === B - 3 ? INK : '#4a5068');
+        }
+        return;
+      }
+      let west = faces.includes('W'), east = faces.includes('E');
+      if (opts.face && piece === 'inner-bl') west = true;
+      if (opts.face && piece === 'inner-br') east = true;
+      const pull = opts.badSideR && piece === 'side-r' ? 2 : 0;      // the wrong edge: this side's line sits 2 px in
+      for (let y = 0; y < B; y++) for (let x = 0; x < B - pull; x++) {
+        const n = faces.includes('N') ? y : 99, s = faces.includes('S') ? B - 1 - y : 99;
+        const w = west ? x : 99, e = east ? B - 1 - pull - x : 99;
+        const c = CORNER[piece];
+        const line = Math.min(n, s, w, e) === 0 || (c && !opts.face && x === c[0] && y === c[1]) || (c && opts.face && piece.startsWith('inner-t') && x === c[0] && y === c[1]);
+        g.dot(x, y, line ? INK : n <= p.edge ? p.trim : body(x, y));
+      }
+    },
+  };
+}
+// (passes) a correct 13-piece block
+export const blockGood = () => defineSprite(blockDef());
+// one wrong edge: the right side's outline sits 2 px inside the tile, so it meets neither the corner above nor the one below
+export const blockWrongEdge = () => defineSprite(blockDef({ badSideR: true }));
+// (passes) a block with its two slopes
+export const blockSlopes = () => defineSprite(blockDef({ slopes: true }));
+// the slope that rises to the right ends 3 px below the top tile it leads to
+export const blockBadSlope = () => defineSprite(blockDef({ slopes: true, badSlope: true }));
+// (passes) a top-down wall: the cap is light and its front face (the bottom row) is dark by design
+export const wallTopDown = () => defineSprite(blockDef({ prefix: 'wall', view: 'top-down', face: true }));
+// the same drawing in a side-view tileset: there the dark bottom row is a seam under the fill
+export const wallSideView = () => defineSprite(blockDef({ prefix: 'wall', view: 'side', face: true }));
+// a top-down wall whose face is 3 px narrower than the cap above it: the outlines do not line up
+export const wallShortFace = () => defineSprite(blockDef({ prefix: 'wall', view: 'top-down', face: true, faceShort: true }));
+
+// ---- thin platforms and things that stack ---------------------------------------
+function extrasDef(opts = {}) {
+  const one = { frames: 1, fps: 1, loop: false };
+  const names = opts.only ?? ['plank-thin-l', 'plank-thin-m', 'plank-thin-r', 'ladder-cap', 'ladder-mid', 'ladder-foot'];
+  return {
+    id: 'q-extras', name: 'Test platforms', kind: 'Item',
+    meta: { ...META, type: 'tileset', role: 'world/platform', view: 'side' },
+    size: [B, B], pivot: [16, 16], grounded: false,
+    params: {
+      thickness: range('Thickness', 10, { min: 8, max: 12, step: 1, lo: 'Thin', hi: 'Chunky' }),
+      wood: color('Wood', '#a06a3c', ['#a06a3c', '#7a4f33', '#f0ead8']),
+      rope: color('Rope', '#f0ead8', ['#f0ead8', '#c9a06a', '#8f97a8']),
+      nails: toggle('Nails', true),
+    },
+    clips: Object.fromEntries(names.map((k) => [k, { ...one }])),
+    render(g, { clip, p }) {
+      if (clip.startsWith('plank')) {
+        const x0 = clip.endsWith('-l') ? 2 : 0, x1 = clip.endsWith('-r') ? B - 3 : B - 1;
+        for (let x = x0; x <= x1; x++) {
+          const th = p.thickness + (opts.rampPlank && clip.endsWith('-m') ? Math.floor(x / 8) : 0);   // a ramp: 3 px taller at the right edge than at the left
+          for (let y = 0; y < th; y++) g.dot(x, y, y === 0 || y === th - 1 || x === x0 || x === x1 ? INK : p.nails && y === 3 && x % 8 === 4 ? '#c2c9d6' : p.wood);
+        }
+        for (let x = 8; x < 24; x += 15) for (let y = 2; y < 6; y++) g.dot(x, y, p.rope);
+        return;
+      }
+      if (clip === 'window') { g.rect(8, 8, 16, 16, p.wood); g.rect(10, 10, 12, 12, p.nails ? '#3f6fd1' : p.rope); g.rect(15, 8, 2, p.thickness, p.rope); return; }
+      // a ladder: two rails and rungs; the cap's rails start lower, the foot's end higher
+      const shift = opts.shiftedMid && clip === 'ladder-mid' ? 3 : 0;
+      const y0 = clip === 'ladder-cap' ? 6 : 0, y1 = clip === 'ladder-foot' ? B - 4 : B - 1;
+      const rails = shift ? [12, 13, 14, 15, 24, 25, 26, 27] : [9, 10, 21, 22];           // the shifted middle also has thicker rails
+      for (let y = y0; y <= y1; y++) for (const x of rails) g.dot(x, y, p.rope);
+      for (let y = 8; y < B; y += Math.max(6, p.thickness)) for (let x = 11 + shift; x < 21 + shift; x++) { g.dot(x, y, p.wood); g.dot(x, y + 1, p.nails ? INK : p.wood); }
+    },
+  };
+}
+// (passes, no warnings about joins) thin platform pieces and a ladder that stacks
+export const extrasGood = () => defineSprite(extrasDef());
+// the middle of the thin platform gets thicker to the right, so it does not repeat sideways
+export const thinSeam = () => defineSprite(extrasDef({ rampPlank: true }));
+// the ladder's middle piece is drawn 3 px to the right of its cap and foot, with thicker rails: a warning
+export const stackShifted = () => defineSprite(extrasDef({ shiftedMid: true }));
+// a tileset with nothing the checker can test for joins
+export const nothingToJoin = () => defineSprite(extrasDef({ only: ['window'] }));
+
 // ---- backgrounds ---------------------------------------------------------------
 const BW = 48, BH = 24;
 function bgDef(opts = {}) {

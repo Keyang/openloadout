@@ -1,6 +1,6 @@
 # Loadout
 
-Named Loadout on 2026-11-18 (it started as "Sprite Forge"). A loadout is the set of gear you choose and adjust before you play, which is what the site offers a game maker. The folder (`lab/sprite-forge`), the skill id (`sprite-forge`) and the preview server entry still use the old name; they were left alone because other sessions were working in the folder.
+Named Loadout on 2026-11-18 (it started as "Sprite Forge"). A loadout is the set of gear you choose and adjust before you play, which is what the site offers a game maker. The folder (`lab/sprite-forge`), the skill id (`sprite-forge`) and the preview server entry keep the old name: Keyang decided on 2026-11-18 to leave them as they are.
 
 A personal lab experiment (not part of the Innovation Lab project): a catalogue website of game-ready **pixel-art sprites, sound effects and music that are made by code**. Each one is a small program with sliders, not a fixed file. A non-technical person picks a sprite or a sound, changes it, pairs sprites with sounds on the right animation frames, and downloads the result.
 
