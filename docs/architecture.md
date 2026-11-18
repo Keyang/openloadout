@@ -244,6 +244,37 @@ A run-time asset that fails the quality bar is kept as a draft: it can be render
 
 Every high-level action returns plain data (no DOM nodes, no class instances) and never throws for a bad asset: it returns `{ ok: false, errors: [...] }` with messages an agent can act on.
 
+## Contract 12: styles (more than one way to draw and export an asset)
+
+Decision from Keyang, 2026-11-18 18:40, after `docs/sprite-styles.md` and `docs/sprite-data.md`: one asset may be offered in several styles; the user chooses the style to synthesize and export. A style that is not technically possible for an asset, or makes no sense for it, is simply not offered for that asset. Not a priority for the three bundles (they are pixel art only), but the framework must be built so that a new rendering pipeline and a new export pipeline plug in without changing the assets that do not use them. Status: **designed, the seam is not built yet** (task W6-A, after the run-time asset work lands).
+
+What a style is: a named pipeline with three parts.
+
+| Part | What it does | Pixel style (today's behaviour, unchanged) |
+|---|---|---|
+| Drawing surface | Turns a sprite's drawing calls (`g.ellipse`, `g.limb`, `g.rect`, ...) into a picture | The pixel grid in `engine/surface.js` |
+| Finish | Steps applied after drawing: outline, shading depth, palette, grid size | Dark 1 px outline, three tones, the bundle palette |
+| Exporter | Turns frames into files | Sheet PNG plus JSON (Contract 8) |
+
+Names reserved now, so nothing built today has to be renamed later:
+
+| Where | Field | Meaning | Default |
+|---|---|---|---|
+| Sprite file | `styles: ['pixel', ...]` | The styles this asset supports, best first | `['pixel']` |
+| `render(g, ctx)` | `ctx.style` | The style being drawn; a sprite may branch on it for its detail layer (a one-pixel eye in `pixel`, a drawn eye in `flat`) | `'pixel'` |
+| Framework | `engine/styles.js`: `defineStyle({ id, label, makeSurface, finish, exporters })`, `styleById`, `stylesOf(sprite)` | The registry every renderer and exporter goes through | `pixel` registered |
+| Catalogue row | `styles` | For the style filter (FIND-4) and the style choice on a sprite page | `['pixel']` |
+| Bag item, page link | `style` | The chosen style, stored like any other setting | omitted = first supported |
+| Sheet JSON, `manifest.json` | `style` | Which pipeline made the files | `pixel` |
+| `window.loadout` | `render(id, { style })`, `api.styles` | Route 2 can ask for any supported style | |
+
+Rules for asset makers today (they keep the second level in `sprite-styles.md` possible):
+
+- A sprite draws only through the surface's documented calls. It never reads pixels back and never writes the pixel buffer directly; helpers that must (noise, pattern fills) live in the framework and say which styles they suit.
+- Body shapes go through shape calls (`ellipse`, `capsule`, `limb`, `poly`, `arc`); single pixels and pixel rectangles are for detail (eyes, highlights, trim). A later style redraws the detail layer, not the body.
+
+Three levels, from `sprite-styles.md`: (1) the same drawing with a different finish (palette, outline, flat or three-tone, silhouette, 1-bit): a setting, on every sprite; (2) the same rig through a different surface (flat or vector, cel-shaded, cut-out parts for a skeletal export): a second pipeline plus a per-style detail layer on each sprite that opts in; (3) hand-painted, true hand-drawn, pre-rendered 3D: not possible from shapes in code, never listed. The quality bar runs once per style a sprite declares.
+
 ## Routes of the site (after wave 2)
 
 `#/` home (search first, bundles, start from a game type) · `#/browse?...` results with filters · `#/sprite/<id>` · `#/sound/<id>` · `#/music/<id>` · `#/bundle/<id>` · `#/bag` · `#/play`. Old links (`#/kit/...`, `#/sprites`) keep working.
