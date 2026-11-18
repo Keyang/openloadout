@@ -8,11 +8,16 @@ import path from 'node:path';
 import { validatePatch, createVoice, renderPatch } from '../../sound/sfx-engine.js';
 import { lengthControl, instrumentControl, writtenTempo } from '../../quality/sound.js';
 import { validateMeta } from '../../catalog/schema.js';
+import { fileURLToPath } from 'node:url';
 import {
-  INSTRUMENTS, LENGTHS, LOOP_STEPS, KitError,
+  INSTRUMENTS, INSTRUMENT_RANGES, LENGTHS, LOOP_STEPS, KitError,
   clock, chords, arrangement, sectionAt, layerPlays, drumRow, noteRow, melody, instruments, bus,
-  assemble, lint, writePatch, measureInstruments, matchGains, measureSections,
+  assemble, lint, tuneFit, writePatch, run, measureInstruments, matchGains, measureSections, measureLayers,
 } from '../../tools/compose/kit.mjs';
+import * as kit from '../../tools/compose/kit.mjs';
+import * as compose from '../../sound/compose.js';
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 
 const META = { type: 'music', role: 'music/menu', themes: ['neutral'], gameTypes: ['arcade'], words: ['test', 'tune', 'tiny', 'loop', 'menu', 'jolly'], license: 'draft' };
 const LAYERS = { drums: { section: 2, intensity: [0.25, 0.35] }, tune: { section: 3, intensity: [0.5, 0.6] }, pad: { section: 4, intensity: [0.75, 0.85] } };
@@ -31,7 +36,7 @@ function tiny(opts = {}) {
   if (!made.has(key)) made.set(key, build(opts));
   return structuredClone(made.get(key));
 }
-function build({ gains, swing = false, extraNodes = [], over = {} } = {}) {
+function build({ gains, swing = false, extraNodes = [], over = {}, tune = TUNE } = {}) {
   return assemble({
     id: 'tiny-tune', name: 'Tiny tune', description: 'A four-chord test piece.', meta: META,
     tempo: [100, 140, 120],
@@ -45,7 +50,7 @@ function build({ gains, swing = false, extraNodes = [], over = {} } = {}) {
       { id: 'kA', type: 'ad', trig: 'kT', attack: 0.001, decay: 0.15 },
       { id: 'kO', type: 'osc', freq: '45 + kA*120' },
       { id: 'bO', type: 'osc', wave: 'tri', freq: 'midi(36 + tr)' },
-      melody('l', TUNE),
+      melody('l', tune),
       instruments('l', gains ? { gains } : {}),
       { id: 'pO', type: 'osc', wave: 'tri', freq: 'midi(60 + tr + third)' },
       ...extraNodes,
@@ -213,6 +218,7 @@ test('the kit refuses pattern lengths that do not divide the loop', () => {
   assert.throws(() => drumRow('kT', ['X...x...X...x..']), (e) => e instanceof KitError && /bar 1.*15.*16/.test(e.message));
   assert.throws(() => drumRow('kT', ['X...x...X...x...', 'X...x...X...x...', 'X...x...X...x...']), /3 bars.*divide/);
   assert.throws(() => drumRow('kT', 'X..x..x..x..'), /12 steps.*divide/);
+  assert.throws(() => drumRow('kT', 'X..x..x..x..'), (e) => /must divide 128/.test(e.message) && /1, 2, 4, 8, 16, 32, 64 or 128 steps/.test(e.message) && !/2, 4 or 8 steps\)/.test(e.message), 'the message says what is allowed');
   assert.throws(() => noteRow('bS', '0 _ 12 _ 7'), /5 steps.*divide/);
   assert.throws(() => noteRow('bS', '0 5 7 0 5', { every: 16 }), /divide/);
   assert.throws(() => chords('C F G', { tonic: 'C' }), /3 bars.*divide/);
@@ -243,6 +249,7 @@ test('chords: names become a root, a third and a fifth for each bar, relative to
   assert.equal(by.fifth.steps, '7 7 7 7 | 7 7 7 7');
   assert.deepEqual([by.root.trig, by.root.every, by.root.loop], ['c16', 16, true]);
   assert.equal(by.tr.expr, 'round(key) + root');
+  assert.equal(by.tonic.expr, '7', 'the tonic, as semitones above C, so a patch says what key it is in');
   assert.deepEqual(nodes.bars.map((b) => b.name), ['G', 'G', 'C', 'D', 'Em', 'C', 'D', 'D']);
   // where the roots sit can be chosen: low is the lowest root allowed, in semitones from the tonic
   assert.equal(Object.fromEntries(chords('G G C D | Em C D D', { tonic: 'G', low: 0 }).map((n) => [n.id, n])).root.steps, '0 0 5 7 | 9 5 7 7');
@@ -270,7 +277,7 @@ test('melody: note names become a gate row and a note row of the same length', (
 
 test('melody: a second line can follow the first later and higher (an echo)', () => {
   const a = Object.fromEntries(melody('l', TUNE).map((n) => [n.id, n]));
-  const e = Object.fromEntries(melody('e', TUNE, { shift: 4, transpose: 12, vel: false }).map((n) => [n.id, n]));
+  const e = Object.fromEntries(melody('e', TUNE, { shift: 4, transpose: 12, vel: false, voice: [43, 108] }).map((n) => [n.id, n]));
   const flat = (s) => s.replace(/[|\s]/g, '');
   const nums = (s) => s.replace(/\|/g, ' ').trim().split(/\s+/).map(Number);
   const g0 = flat(a.lG.steps), g1 = flat(e.eG.steps), s0 = nums(a.lS.steps), s1 = nums(e.eS.steps);
@@ -381,4 +388,168 @@ test('measureSections reports a level for every section of every length, and lon
   const last = (bars) => s[bars][s[bars].length - 1];
   assert.ok(s[32][0] < s[32][1] && s[32][1] < s[32][2] && s[32][2] < s[32][3], `32 bars gets louder section by section: ${s[32].map((d) => d.toFixed(1)).join(' ')}`);
   for (const bars of LENGTHS) assert.ok(Math.abs(last(bars) - last(8)) < 0.5, `the last section of ${bars} bars is the full band`);
+});
+
+// ---- Contract 11: the composing functions are framework code, loadable in a browser ------------------------------
+
+const exportsOf = (src) => [...src.matchAll(/^export\s+(?:async\s+)?(?:function\*?|const|let|class)\s+([A-Za-z_$][\w$]*)/gm)].map((m) => ({ name: m[1], at: m.index }));
+function undocumented(src) {
+  const lines = src.split('\n');
+  return exportsOf(src).filter(({ at }) => {
+    const row = src.slice(0, at).split('\n').length - 1, above = (lines[row - 1] || '').trim();
+    return !(above.endsWith('*/') || above.startsWith('//'));
+  }).map((e) => e.name);
+}
+
+test('sound/compose.js runs in a browser: no Node imports, no process, no file access', () => {
+  const src = fs.readFileSync(path.join(ROOT, 'sound', 'compose.js'), 'utf8');
+  const code = src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+  const imports = [...code.matchAll(/\bimport\b[^;]*?from\s*['"]([^'"]+)['"]/g)].map((m) => m[1]);
+  assert.ok(imports.length > 0);
+  for (const from of imports) assert.match(from, /^\.{1,2}\/.*\.js$/, `"${from}" is not a relative browser module`);
+  for (const from of imports) assert.ok(fs.existsSync(path.resolve(ROOT, 'sound', from)), `${from} does not exist`);
+  assert.ok(!/\bnode:/.test(code), 'no node: modules');
+  assert.ok(!/\bprocess\s*\./.test(code), 'no process');
+  assert.ok(!/\brequire\s*\(/.test(code), 'no require');
+  assert.ok(!/\b(?:window|document)\s*\./.test(code), 'no page either: it must also run in Node and in a worker');
+  for (const dep of imports) {
+    const depCode = fs.readFileSync(path.resolve(ROOT, 'sound', dep), 'utf8');
+    assert.ok(!/from\s*['"]node:/.test(depCode), `${dep} imports a node: module`);
+  }
+});
+
+test('the kit passes the framework on unchanged, and a tune assembled through either is the same', () => {
+  for (const name of ['clock', 'chords', 'arrangement', 'sectionAt', 'layerPlays', 'drumRow', 'noteRow', 'melody', 'instruments', 'bus', 'assemble', 'lint', 'tuneFit', 'param', 'standardParams',
+    'measureInstruments', 'matchGains', 'measureSections', 'measureIntensity', 'measureLayers', 'report', 'KitError', 'INSTRUMENTS', 'LENGTHS']) {
+    assert.ok(compose[name] !== undefined, `sound/compose.js exports ${name}`);
+    assert.equal(kit[name], compose[name], `the kit re-exports ${name}`);
+  }
+  for (const name of ['writePatch', 'run', 'main']) { assert.equal(typeof kit[name], 'function'); assert.equal(compose[name], undefined, `${name} touches files: it stays in the kit`); }
+  const piece = (c) => c.assemble({
+    id: 'tiny-tune', name: 'Tiny tune', description: 'A four-chord test piece.', meta: META, tempo: [100, 140, 120], defaults: { intensity: 1, bars: 8, inst: 'Flute' },
+    nodes: [c.clock(), c.chords('C F | G C', { tonic: 'C' }), c.arrangement(LAYERS), c.drumRow('kT', ['X...x...X...x...']),
+      { id: 'kA', type: 'ad', trig: 'kT', attack: 0.001, decay: 0.15 }, { id: 'kO', type: 'osc', freq: '45 + kA*120' },
+      c.melody('l', TUNE), c.instruments('l'), c.bus({ centre: 'kO*kA*0.6*gDrums', left: 'lF*0.7*gTune', right: 'lF*0.7*gTune', duck: 'kA' })],
+    presets: { Calm: { intensity: 0.2 }, Walk: { intensity: 0.6 }, Run: { intensity: 1, bpm: 136 } },
+  });
+  assert.deepEqual(piece(compose), piece(kit));
+});
+
+test('every export of the framework module and of the kit has a comment directly above it', () => {
+  for (const file of ['sound/compose.js', 'tools/compose/kit.mjs']) {
+    const src = fs.readFileSync(path.join(ROOT, file), 'utf8');
+    assert.ok(exportsOf(src).length > 0, file);
+    assert.deepEqual(undocumented(src), [], `${file}: no comment above these exports`);
+  }
+  // the kit's header names every function a composer calls
+  const head = fs.readFileSync(path.join(ROOT, 'sound', 'compose.js'), 'utf8').split('\nimport ')[0];
+  for (const name of ['param', 'standardParams', 'clock', 'chords', 'arrangement', 'sectionAt', 'layerPlays', 'drumRow', 'noteRow', 'melody', 'instruments', 'bus', 'assemble', 'lint', 'tuneFit',
+    'measureInstruments', 'matchGains', 'measureSections', 'measureIntensity', 'measureLayers', 'report']) assert.ok(new RegExp(`\\b${name}\\b`).test(head), `the header of sound/compose.js does not mention ${name}`);
+  const kitHead = fs.readFileSync(path.join(ROOT, 'tools', 'compose', 'kit.mjs'), 'utf8').split('\nimport ')[0];
+  for (const name of ['writePatch', 'run', 'main', '--out', '--dry']) assert.ok(kitHead.includes(name), `the header of kit.mjs does not mention ${name}`);
+});
+
+// ---- the generator's command line: nothing reaches sounds/ unless asked ----------------------------------------------
+
+test('run: --out writes to the file given, --dry and --help write nothing, and an unknown option is refused', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'compose-run-'));
+  const real = path.join(ROOT, 'sounds', 'tiny-tune.json');
+  const said = [], log = (m) => said.push(String(m));
+  try {
+    const out = path.join(dir, 'try.json');
+    const r = run(() => tiny(), ['--out', out], { log });
+    assert.equal(r.action, 'write');
+    assert.equal(r.file, out);
+    assert.deepEqual(JSON.parse(fs.readFileSync(out, 'utf8')), JSON.parse(JSON.stringify(tiny())));
+    assert.ok(said.some((m) => m.includes(out)), 'it says where it wrote');
+    assert.equal(run(() => tiny(), ['--dry'], { log }).action, 'dry');
+    assert.equal(run(() => tiny(), ['--dry', '--out', path.join(dir, 'no.json')], { log }).action, 'dry');
+    assert.equal(run(() => { throw new Error('built'); }, ['--help'], { log }).action, 'help');
+    assert.throws(() => run(() => tiny(), ['--owt', out], { log }), (e) => e instanceof KitError && /--owt/.test(e.message));
+    assert.throws(() => run(() => tiny(), ['--out'], { log }), /--out/);
+    assert.throws(() => run(() => tiny(), ['extra'], { log }), /extra/);
+    assert.deepEqual(fs.readdirSync(dir), ['try.json'], 'only the file asked for');
+    assert.ok(!fs.existsSync(real), 'nothing reached sounds/');
+  } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+});
+
+// ---- notes an instrument can play; a tune that fits its chords -----------------------------------------------------------
+
+test('melody refuses notes no instrument can play, naming the note and the bar', () => {
+  const bars = (third) => [TUNE[0], TUNE[1], third, TUNE[3]];
+  assert.throws(() => melody('l', bars('D5 _ G5 _ C9 _ _ _ G5 _ _ _ D5 _ _ _')), (e) => e instanceof KitError && /bar 3/.test(e.message) && /C9/.test(e.message) && /high/.test(e.message));
+  assert.throws(() => melody('l', bars('D5 _ G5 _ C1 _ _ _ G5 _ _ _ D5 _ _ _')), (e) => /bar 3/.test(e.message) && /C1/.test(e.message) && /low/.test(e.message));
+  // the Key control moves the tune 5 down and 6 up: every key must stay playable on all five
+  assert.deepEqual(Object.keys(INSTRUMENT_RANGES), INSTRUMENTS);
+  const lowest = Math.max(...Object.values(INSTRUMENT_RANGES).map((r) => r[0])) + 5, highest = Math.min(...Object.values(INSTRUMENT_RANGES).map((r) => r[1])) - 6;
+  const name = (m) => ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'][m % 12] + (Math.floor(m / 12) - 1);
+  const one = (note) => [`${note} _ _ _ _ _ _ _ _ _ _ _ _ _ _ _`];
+  assert.doesNotThrow(() => melody('l', one(name(lowest))));
+  assert.doesNotThrow(() => melody('l', one(name(highest))));
+  assert.throws(() => melody('l', one(name(lowest - 1))), /low/);
+  assert.throws(() => melody('l', one(name(highest + 1))), /high/);
+  // one instrument, or a voice of your own with its own range
+  assert.doesNotThrow(() => melody('l', one('A3'), { voice: 'Synth lead' }));
+  assert.throws(() => melody('l', one('A3'), { voice: 'Flute' }), /Flute/);
+  assert.doesNotThrow(() => melody('e', one('C6'), { transpose: 12, voice: [43, 108] }));
+  assert.throws(() => melody('e', one('C6'), { transpose: 12 }), /C7/, 'the transposed note is the one judged and named');
+  assert.throws(() => melody('l', one('C5'), { voice: 'Kazoo' }), /Kazoo/);
+});
+
+const SHARP = { C: 'C#', 'C#': 'D', D: 'D#', 'D#': 'E', E: 'F', F: 'F#', 'F#': 'G', G: 'G#', 'G#': 'A', A: 'A#', 'A#': 'B' };
+const semitoneUp = (bar) => bar.split(' ').map((t) => { const m = /^([A-G]#?)(\d)(-*)$/.exec(t); return m ? (m[1] === 'B' ? `C${Number(m[2]) + 1}${m[3]}` : `${SHARP[m[1]]}${m[2]}${m[3]}`) : t; }).join(' ');
+
+test('tuneFit and lint: a tune in the key of its chords passes; the same tune a semitone off is caught', () => {
+  const good = tuneFit(tiny());
+  assert.equal(good.tonic, 0);
+  assert.equal(good.lines.length, 1);
+  assert.equal(good.lines[0].id, 'l');
+  assert.ok(good.lines[0].onBeat >= 8);
+  assert.ok(good.lines[0].chordShare >= 0.8, `chord share ${good.lines[0].chordShare}`);
+  assert.equal(good.lines[0].scaleShare, 1);
+  assert.deepEqual(lint(tiny()), []);
+  const off = build({ over: {} , tune: TUNE.map(semitoneUp) });
+  const bad = tuneFit(off).lines[0];
+  assert.ok(bad.chordShare < 0.2, `a semitone off, chord share ${bad.chordShare}`);
+  assert.ok(bad.scaleShare < 0.5, `a semitone off, scale share ${bad.scaleShare}`);
+  const said = lint(off);
+  assert.ok(said.some((m) => /melody "l"/.test(m) && /chord/.test(m)), said.join('\n'));
+  // a patch that does not say its key is not judged
+  const noKey = tiny(); noKey.nodes = noKey.nodes.filter((n) => n.id !== 'tonic');
+  assert.deepEqual(tuneFit(noKey).lines, []);
+  assert.ok(tuneFit(noKey).reason);
+});
+
+// ---- the plucked string -----------------------------------------------------------------------------------------------
+
+test('the plucked string has no DC offset, nothing below 80 Hz, and is not much peakier than the others', () => {
+  const p = tiny();
+  const expr = p.nodes.find((n) => n.id === 'lIn').expr;
+  assert.ok(!/clamp\(/.test(expr), 'the pluck is not clipped');
+  const pl = p.nodes.find((n) => n.id === 'lPl');
+  assert.equal(pl.type, 'pluck');
+  assert.ok(pl.in, 'the string is excited by a pulse the kit shapes, not by the full-scale burst built into the node');
+  assert.ok(p.nodes.some((n) => n.type === 'filter' && n.mode === 'hp' && n.in === 'lPl'), 'a DC block follows the string');
+  const m = measureInstruments(p, { node: 'lF', params: { bpm: 140 } });
+  for (const l of m) {
+    assert.ok(Math.abs(l.dc) < 0.01, `${l.name}: DC offset ${l.dc} of its RMS`);
+    assert.ok(l.sub80 < 0.01, `${l.name}: ${(l.sub80 * 100).toFixed(1)}% of its energy is below 80 Hz`);
+    assert.ok(Number.isFinite(l.peak) && Number.isFinite(l.crestDb));
+  }
+  const others = Math.max(...m.slice(0, 4).map((l) => l.crestDb));
+  assert.ok(m[4].crestDb < others + 4, `pluck crest ${m[4].crestDb.toFixed(1)} dB against ${others.toFixed(1)} dB for the peakiest of the others`);
+});
+
+// ---- measuring a layer against the others -----------------------------------------------------------------------------------
+
+test('measureLayers gives the level of any part of the mix, in the whole band or in a band of your choice', () => {
+  const p = tiny();
+  const all = measureLayers(p, { tune: 'lF*0.7*gTune', bass: 'bO*0.3' }, { sampleRate: 22050, params: { bpm: 140 } });
+  assert.deepEqual(Object.keys(all), ['tune', 'bass']);
+  assert.ok(Math.abs(all.bass.db - (20 * Math.log10(0.3 / Math.sqrt(3)))) < 0.3, `a triangle at 0.3 is ${(20 * Math.log10(0.3 / Math.sqrt(3))).toFixed(1)} dB RMS, got ${all.bass.db}`);
+  assert.ok(Math.abs(all.bass.peak - 0.3) < 0.01);
+  const mid = measureLayers(p, { tune: 'lF*0.7*gTune', bass: 'bO*0.3' }, { band: [300, 1200], sampleRate: 22050, params: { bpm: 140 } });
+  assert.ok(mid.bass.db < all.bass.db - 12, 'the bass (65 to 100 Hz) has little between 300 and 1200 Hz');
+  assert.ok(mid.tune.db > all.tune.db - 6, 'the tune lives there');
+  assert.throws(() => measureLayers(p, { x: 'noSuchNode*2' }), (e) => e instanceof KitError && /noSuchNode/.test(e.message));
 });

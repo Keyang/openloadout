@@ -7,8 +7,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createVoice, renderPatch, validatePatch } from '../../sound/sfx-engine.js';
 import { validateMeta } from '../../catalog/schema.js';
-import { INSTRUMENTS, LENGTHS, lint, sectionAt, layerPlays } from '../../tools/compose/kit.mjs';
-import { build, LAYERS, TUNE, CHORDS } from '../../tools/compose/thornwood_overworld.mjs';
+import { THEME_PRESETS } from '../../engine/theme.js';
+import { INSTRUMENTS, LENGTHS, lint, tuneFit, sectionAt, layerPlays, measureLayers, measureSections } from '../../tools/compose/kit.mjs';
+import { build, LAYERS, TUNE, CHORDS, PARTS } from '../../tools/compose/thornwood_overworld.mjs';
 
 const SOUNDS = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..', 'sounds');
 const read = (id) => JSON.parse(fs.readFileSync(path.join(SOUNDS, `${id}.json`), 'utf8'));
@@ -57,6 +58,12 @@ test('nine controls: the standard seven, then Melody and Bounce', () => {
 test('three styles with the names the specification fixes', () => {
   assert.deepEqual(Object.keys(patch.presets), ['Morning stroll', 'Adventure', 'Hurry up']);
   assert.ok(patch.presets['Hurry up'].bpm > patch.presets['Adventure'].bpm && patch.presets['Adventure'].bpm > patch.presets['Morning stroll'].bpm);
+  // a look may speed the music up or slow it down by 5% (Candy, Vivid, Sunset, Faded): no style sits where that is cut off
+  const bpm = patch.params.find((p) => p.id === 'bpm');
+  for (const [name, set] of Object.entries(patch.presets)) {
+    assert.ok((set.bpm ?? bpm.default) * 1.05 <= bpm.max, `"${name}" has no room to speed up by 5%`);
+    assert.ok((set.bpm ?? bpm.default) * 0.95 >= bpm.min, `"${name}" has no room to slow down by 5%`);
+  }
 });
 
 test('the chords are G G C D | Em C D D, one per bar', () => {
@@ -138,9 +145,36 @@ test('intensity brings the layers in, in the order the specification gives', () 
   const on = (g) => Object.keys(GATES).filter((k) => g[k] > 0.99).join(' ');
   const off = (g) => Object.keys(GATES).filter((k) => g[k] < 0.01).join(' ');
   for (const i of [0, 0.1, 0.25]) { const g = gatesAt({ intensity: i, bars: 8 }); assert.equal(off(g), 'beat snare tune full busy', `intensity ${i}: bass and arpeggio only`); assert.ok(g.bed >= 0.8, 'still music at 0'); }
-  for (const i of [0.36, 0.5]) { const g = gatesAt({ intensity: i, bars: 8 }); assert.equal(on(g), 'beat', `intensity ${i}: kick and hat added`); assert.equal(off(g), 'snare tune full busy'); }
-  for (const i of [0.61, 0.75]) { const g = gatesAt({ intensity: i, bars: 8 }); assert.equal(on(g), 'beat snare tune', `intensity ${i}: snare and melody added`); assert.equal(off(g), 'full busy'); }
+  // the melody comes in from 0.3 and is all there by 0.4 (the specification says 0.5; looks set intensity from 0.4 up and must keep the tune)
+  { const g = gatesAt({ intensity: 0.3, bars: 8 }); assert.equal(off(g), 'snare tune full busy', 'intensity 0.3: kick and hat coming in, no melody yet'); assert.ok(g.beat > 0 && g.beat < 1); }
+  for (const i of [0.4, 0.5]) { const g = gatesAt({ intensity: i, bars: 8 }); assert.equal(on(g), 'beat tune', `intensity ${i}: kick, hat and melody`); assert.equal(off(g), 'snare full busy'); }
+  for (const i of [0.61, 0.75]) { const g = gatesAt({ intensity: i, bars: 8 }); assert.equal(on(g), 'beat snare tune', `intensity ${i}: snare added`); assert.equal(off(g), 'full busy'); }
   for (const i of [0.86, 1]) assert.equal(on(gatesAt({ intensity: i, bars: 8 })), 'beat snare tune full busy', `intensity ${i}: harmony and echo added, the hat goes to 16ths`);
+});
+
+test('every look keeps the melody', () => {
+  const set = THEME_PRESETS.map((p) => [p.name, p.theme?.music?.intensity]).filter(([, i]) => i !== null && i !== undefined);
+  assert.ok(set.length >= 2, 'some looks set the intensity');
+  for (const [name, intensity] of [...set, ['the lowest a random look draws', 0.4]]) {
+    const g = gatesAt({ intensity, bars: 8 });
+    assert.ok(g.tune > 0.99, `"${name}" sets intensity ${intensity}, where the melody is at ${g.tune}`);
+  }
+});
+
+test('the tune fits its chords, and stands clear of the accompaniment where they overlap', () => {
+  const fit = tuneFit(patch).lines.find((l) => l.id === 'l');
+  assert.equal(tuneFit(patch).tonic, 7, 'G');
+  assert.ok(fit.chordShare >= 0.8, `chord share ${fit.chordShare}`);
+  assert.equal(fit.scaleShare, 1);
+  // 300 to 1200 Hz is where the tune, the arpeggio and the harmony all sit: the tune leads by 6 dB or more
+  const m = measureLayers(patch, { tune: PARTS.tune, backing: PARTS.backing }, { band: [300, 1200], sampleRate: 22050 });
+  assert.ok(m.tune.db - m.backing.db >= 6, `tune ${m.tune.db.toFixed(1)} dB against arpeggio and harmony ${m.backing.db.toFixed(1)} dB`);
+});
+
+test('the drums are heard when they come in: the second section of the 32-bar version is clearly louder', () => {
+  const s = measureSections(patch, { sampleRate: 11025, params: { bpm: 156 } })[32];
+  assert.ok(s[1] - s[0] >= 1.5, `section 2 is ${(s[1] - s[0]).toFixed(1)} dB above section 1`);
+  assert.ok(s[2] > s[1] && s[3] > s[2], `sections keep climbing: ${s.map((d) => d.toFixed(1)).join(' ')}`);
 });
 
 test('a longer version builds up from the front: bass and arpeggio, then drums, then melody, then everything', () => {
