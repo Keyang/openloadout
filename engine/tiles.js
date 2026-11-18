@@ -287,17 +287,27 @@ const BY_SIDES = {
 // what to use when a tileset has only the 13 pieces
 const NEAREST = { 'strip-m': 'top', 'strip-l': 'left', 'strip-r': 'right', 'col-t': 'left', 'col-m': 'side-l', 'col-b': 'bottom-l', single: 'left', 'inner-tl': 'fill', 'inner-tr': 'fill', 'inner-bl': 'fill', 'inner-br': 'fill' };
 
+// Which sides and corners of a slope cell are filled, as seen from the cell beside it. A slope that rises to the
+// right is filled underneath and on its right; its left side and its top are open, and so is its top left corner.
+const SLOPE_FILLED = {
+  'slope-up': { N: 0, E: 1, S: 1, W: 0, NE: 1, SE: 1, SW: 1, NW: 0 },
+  'slope-down': { N: 0, E: 0, S: 1, W: 1, NE: 0, SE: 1, SW: 1, NW: 1 },
+};
 /**
  * The piece of a block for one cell, whatever is round it: never null for a cell of the block. solid(x, y): true
- * where there is more of the block (count slopes as solid). x, y: the cell. has: the pieces the tileset has (an
- * object keyed by piece, such as a block's `pieces`); without the narrow pieces the nearest of the 13 is returned.
- * A side that faces out always wins; with all four sides solid one cut corner gives its inner piece (top corners first).
+ * where there is more of the block, 'slope-up' or 'slope-down' where one of its slopes is (a neighbour then counts
+ * only on the sides a slope fills: a block beside a slope's low end, or resting on a slope, is closed there), false
+ * elsewhere. x, y: the cell. has: the pieces the tileset has (an object keyed by piece, such as a block's `pieces`);
+ * without the narrow pieces the nearest of the 13 is returned. A side that faces out always wins; with all four
+ * sides solid one cut corner gives its inner piece (top corners first).
  */
 export function pickPiece(solid, x, y, has) {
   if (!solid(x, y)) return null;
-  const N = !solid(x, y - 1), E = !solid(x + 1, y), S = !solid(x, y + 1), W = !solid(x - 1, y);
+  // is the neighbour at (dx, dy) filled on the side (or corner) that faces this cell?
+  const full = (dx, dy, facing) => { const v = solid(x + dx, y + dy); return SLOPE_FILLED[v] ? !!SLOPE_FILLED[v][facing] : !!v; };
+  const N = !full(0, -1, 'S'), E = !full(1, 0, 'W'), S = !full(0, 1, 'N'), W = !full(-1, 0, 'E');
   let piece = BY_SIDES[`${N ? 'N' : ''}${E ? 'E' : ''}${S ? 'S' : ''}${W ? 'W' : ''}`];
-  if (piece === 'fill') piece = !solid(x - 1, y - 1) ? 'inner-tl' : !solid(x + 1, y - 1) ? 'inner-tr' : !solid(x - 1, y + 1) ? 'inner-bl' : !solid(x + 1, y + 1) ? 'inner-br' : 'fill';
+  if (piece === 'fill') piece = !full(-1, -1, 'SE') ? 'inner-tl' : !full(1, -1, 'SW') ? 'inner-tr' : !full(-1, 1, 'NE') ? 'inner-bl' : !full(1, 1, 'NW') ? 'inner-br' : 'fill';
   if (has && !has[piece] && NEAREST[piece]) piece = NEAREST[piece];
   return piece;
 }
@@ -352,7 +362,7 @@ export function pickStack(stack, x, y) {
  *             an empty cell); '0'..'9' the clips the helper has no name for; '.' or a space: nothing
  * The map carries on past its edges as its edge cells. tiles: [{ clip, col, row, layer }] in drawing order.
  * cells[row][col]: { kind, prefix, solid, things } (side: blocks and slopes are solid; top-down: walls and holes).
- * notes: what could not be placed.
+ * notes: what could not be placed, and slopes whose high side ends at a drop (no piece closes that side).
  */
 export function layoutTiles(rows, clips, opts = {}) {
   const T = clips && Array.isArray(clips.blocks) && Array.isArray(clips.decals) ? clips : classifyTiles(clips);
@@ -429,13 +439,17 @@ export function layoutTiles(rows, clips, opts = {}) {
       const { kind, prefix } = thing;
       if (kind === 'floor') { const f = byPrefix(T.floors, prefix); put(f && f.fills[fillVariant(c, r, f.fills.length)], c, r, LAYER.floor, `no lone fill "${prefix}-fill"`); }
       if (kind === 'block') {
-        const b = byPrefix(T.blocks, prefix), part = (x, y) => has(x, y, SOLID, prefix);
+        // more of this block, or one of its slopes (pickPiece knows which sides of a slope are filled)
+        const b = byPrefix(T.blocks, prefix), part = (x, y) => (has(x, y, ['block'], prefix) ? true : has(x, y, ['slope-up'], prefix) ? 'slope-up' : has(x, y, ['slope-down'], prefix) ? 'slope-down' : false);
         if (!b) put(null, c, r, 0, `no block "${prefix}"`);
         else put(pickClip(b, part, c, r), c, r, LAYER[b.kind], `${b.prefix}: no piece for the cell at ${c},${r} (${pickPiece(part, c, r)})`);
       }
       if (kind === 'slope-up' || kind === 'slope-down') {
         const sl = byPrefix(T.slopes, prefix);
         put(sl && sl[kind.slice(6)], c, r, LAYER.ground, `no slope pieces "${prefix}-slope-up" and "-slope-down"`);
+        // a slope piece has no outline on its high side: it has to end on more ground (a block or another slope)
+        const hx = kind === 'slope-up' ? c + 1 : c - 1;
+        if (inside(hx, r) && !has(hx, r, SOLID)) put(null, c, r, 0, `the slope at ${c},${r} ends at a drop: no piece closes a slope's high side, so put a block there`);
       }
       if (kind === 'thin') {
         const t = byPrefix(T.thins, prefix);

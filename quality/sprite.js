@@ -694,9 +694,14 @@ export function checkSprite(def, { soundIndex, validateMeta } = {}) {
       }
       // a decal that stands on the block (or hangs under it) touches that side of its cell, over pixels of the block
       for (const d of sets.decals) {
-        if (d.place === 'on') continue;
         const g = render(d.clip, 0, p, pk), box = g instanceof Error ? null : g.bounds();
         if (!box) continue;
+        if (d.place === 'on') {
+          // drawn like something that stands on the block (or hangs under it), but placed over a fill tile
+          const stands = box.y1 === H - 1 && box.y0 >= H / 2, hangs = box.y0 === 0 && box.y1 < H / 2;
+          if (stands || hangs) warn(`${d.clip}: its place is 'on' (over a fill tile), but it is drawn ${stands ? 'standing on the bottom' : 'hanging from the top'} of its cell: should its place be '${stands ? 'above' : 'below'}'? (decoClips in engine/tiles.js)`, `decalplace:${d.clip}`);
+          continue;
+        }
         const above = d.place === 'above', gap = above ? H - 1 - box.y1 : box.y0;
         if (gap) { error(`${d.clip}: floats: its ${above ? 'lowest' : 'highest'} pixel is ${gap} px ${above ? 'above the bottom' : 'below the top'} of its cell, and it ${above ? 'stands on the tile below' : 'hangs from the tile above'} (${lname})`, `decal:${d.clip}`); continue; }
         const under = blockOf(d.prefix)[above ? 'top' : 'bottom'];

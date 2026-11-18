@@ -90,6 +90,46 @@ test('pickPiece: the usual cells, and a block with only the 13 pieces still gets
   assert.ok(['inner-tl', 'inner-tr'].includes(pickPiece((x, y) => !(y === -1 && x !== 0), 0, 0)));
 });
 
+test('pickPiece knows which sides of a slope are filled: its low side and its top are open', () => {
+  // cells: '#' block, '/' slope-up (filled on its right and underneath), '\\' slope-down (filled on its left and underneath)
+  const of = (rows) => (x, y) => { const ch = rows[y]?.[x]; return ch === '#' ? true : ch === '/' ? 'slope-up' : ch === '\\' ? 'slope-down' : false; };
+  // 1. a block beside a slope's low end is closed on that side
+  assert.equal(pickPiece(of(['....', '.#/.', '.###']), 1, 1), 'col-t');
+  assert.equal(pickPiece(of(['.#..', '.#/.', '.###']), 1, 1), 'col-m');
+  assert.equal(pickPiece(of(['....', '##/.', '####']), 1, 1), 'right');
+  assert.equal(pickPiece(of(['....', '.\\##', '####']), 2, 1), 'left');
+  // ... and still open towards a slope's high end
+  assert.equal(pickPiece(of(['....', './##', '####']), 2, 1), 'top');
+  assert.equal(pickPiece(of(['....', '##\\.', '####']), 1, 1), 'top');
+  // 2. under a slope that ends at a drop, beside the next slope's low end: a closed side, not an inner corner
+  assert.equal(pickPiece(of(['./..', '##/#', '####']), 1, 1), 'side-r');
+  assert.equal(pickPiece(of(['..\\.', '#\\##', '####']), 2, 1), 'side-l');
+  // 3. a block resting on a slope is closed underneath
+  assert.equal(pickPiece(of(['.##.', '.##.', '.#/#', '####']), 2, 1), 'bottom-r');
+  assert.equal(pickPiece(of(['###', '###', '#/#', '###']), 1, 1), 'bottom');
+  // a cell under a slope is still covered by it; corners: only a slope's empty top corner counts as cut
+  assert.equal(pickPiece(of(['./#', '###', '###']), 1, 1), 'inner-tl');
+  assert.equal(pickPiece(of(['##/', '###', '###']), 1, 1), 'fill', 'the foot of a slope fills the corner');
+  assert.equal(pickPiece(of(['###', '###', '##/']), 1, 1), 'inner-br', 'the open top corner of a slope is a cut corner');
+  assert.equal(pickPiece(of(['###', '###', '##\\']), 1, 1), 'fill');
+  // plain true and false behave as before
+  assert.equal(pickPiece((x, y) => y >= 1, 1, 1), 'top');
+});
+test('layoutTiles closes blocks towards the open sides of slopes, and says when a slope ends at a drop', () => {
+  const rows = ['........', '........', '...#....', '...#/...', '##.##/##', '########'];
+  const L = layoutTiles(rows, FOREST);
+  const at = (c, r) => L.tiles.filter((t) => t.col === c && t.row === r).map((t) => t.clip);
+  assert.deepEqual(at(3, 2), ['grass-col-t']);
+  assert.deepEqual(at(3, 3), ['grass-col-m'], 'beside the slope\'s low end');
+  assert.deepEqual(at(4, 4), ['grass-side-r'], 'under one slope, beside the low end of the next');
+  assert.deepEqual(at(6, 4), ['grass-top'], 'beside a slope\'s high end');
+  assert.ok(L.notes.some((n) => /slope.*4,3.*drop/.test(n)), L.notes.join('; '));
+  const resting = layoutTiles(['....', '.##.', '.##.', '.#/#', '####'], FOREST);
+  assert.deepEqual(resting.tiles.filter((t) => t.col === 2 && t.row === 2).map((t) => t.clip), ['grass-bottom-r']);
+  // a hill whose slopes all end on blocks has nothing to report
+  assert.deepEqual(layoutTiles(['../\\..', './##\\.', '######'], FOREST).notes, []);
+});
+
 // ---- one classifier ---------------------------------------------------------------------------
 test('blockKind: one list of words for walls and holes, and the hint from blockClips wins', () => {
   for (const w of ['wall', 'brick-wall', 'cliff', 'hedge', 'fence']) assert.equal(blockKind(w), 'wall', w);

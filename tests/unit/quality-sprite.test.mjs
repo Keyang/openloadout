@@ -241,7 +241,9 @@ test('tileset: a decal that stands on the block reaches the bottom of its cell a
   expectError(F.blockDecalFloats, /rock-deco-a: floats: .*3 px above the bottom of its cell/);
   expectError(F.blockDecalOverDip, /rock-deco-a: floats: .*rock-top.*column/);
   expectClean(F.blockDecalBesideDip);
+  assert.ok(!has(run(F.blockDecal).warnings, /place/), show(run(F.blockDecal)));
 });
+test('tileset: a decal placed over a fill tile but drawn standing on the bottom of its cell is a warning', () => expectWarningOnly(F.blockDecalWrongPlace, /rock-deco-a: its place is 'on'.*'above'/));
 test('tileset: fill texture that a look turns into the fill colour is a warning, for every swatch', () => {
   const r = expectWarningOnly(F.blockFaintStones, /rock-fill: .*texture.*look/);
   assert.ok(!has(run(F.blockGood).warnings, /texture/), show(run(F.blockGood)));
