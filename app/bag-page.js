@@ -2,6 +2,7 @@
 // with its own settings and the bag's theme, and one download for all of it.
 import { assetById, spriteNow, loadSprites, onCatalogChange } from './catalog.js';   // W2-G: which sprites exist comes from the catalogue; their programs are loaded when the bag needs them
 import { defaultParams, cleanParams, clipFps } from '../engine/sprite.js';
+import { artStyleOf, stylesOf, styleById, pixelsOf } from '../engine/styles.js';   // W6-A: an item is shown in its art style (Contract 12)
 import { renderThemedFrame } from '../engine/theme.js';
 import { applySound, themedSoundParams, soundSettingsFor } from '../sound/theme.js';
 import { el, header, saveBlob, SPRITE_BG, SOUND_BG, TILE_BG, drawSpriteOnTile, reduceMotion } from './ui.js';
@@ -27,7 +28,7 @@ function packCues(cues) {
 
 /** Each asset's standard settings, so bag links can leave them out (bag.toLink). */
 function standardSettings(kind, id, settings) {
-  if (kind === 'sprite') { const sprite = spriteNow(id); return sprite ? { params: defaultParams(sprite), cues: defaultCues(sprite) } : null; }
+  if (kind === 'sprite') { const sprite = spriteNow(id); return sprite ? { params: defaultParams(sprite), cues: defaultCues(sprite), artStyle: stylesOf(sprite)[0] } : null; }
   const patch = soundById[id];
   return patch ? { params: soundParams(patch, settings && settings.style) } : null;
 }
@@ -44,6 +45,7 @@ export function changeLink(item) {
       if (s.cues && !same(s.cues, plainCues(defaultCues(sprite)))) q.set('sfx', packCues(s.cues));
     }
     if (s.scale && s.scale !== 1) q.set('scale', String(s.scale));
+    if (sprite && artStyleOf(sprite, s.artStyle) !== stylesOf(sprite)[0]) q.set('artstyle', s.artStyle);
   } else {
     const patch = soundById[item.id];
     if (patch) {
@@ -65,10 +67,12 @@ function spritePicture(sprite, settings, theme) {
   const tile = el('canvas', { class: 'tile', width: 80, height: 72, role: 'img', 'aria-label': `${sprite.name}, as you set it up` });
   const p = cleanParams(sprite, settings.params ?? {});
   const clip = sprite.preview, frames = new Map(), start = performance.now();
+  // in the item's art style; one that is not the sprite's first may draw on another kind of surface, shown by its pixel picture
+  const first = stylesOf(sprite)[0], style = artStyleOf(sprite, settings.artStyle);
   const frame = (f) => {
     let cv = frames.get(f);
     if (!cv) {
-      const g = renderThemedFrame(sprite, clip, f, p, theme);
+      const g = style === first && style === 'pixel' ? renderThemedFrame(sprite, clip, f, p, theme) : pixelsOf(renderThemedFrame(sprite, clip, f, p, theme, { style }), style);
       cv = document.createElement('canvas');
       cv.width = g.w; cv.height = g.h;
       cv.getContext('2d').putImageData(new ImageData(g.bytes(), g.w, g.h), 0, 0);
@@ -195,7 +199,8 @@ function describe(item) {
   if (item.kind === 'sprite') {
     const sprite = spriteNow(item.id);
     const own = sprite && !same(cleanParams(sprite, s.params ?? {}), defaultParams(sprite));
-    return [own ? 'Your own look' : 'Standard look', s.scale > 1 ? `pixel size ${s.scale}×` : null].filter(Boolean).join(', ');
+    const style = sprite ? artStyleOf(sprite, s.artStyle) : null;
+    return [own ? 'Your own look' : 'Standard look', style && style !== stylesOf(sprite)[0] ? `${styleById(style).label} style` : null, s.scale > 1 ? `pixel size ${s.scale}×` : null].filter(Boolean).join(', ');
   }
   const patch = soundById[item.id];
   const own = patch && !same(soundParams(patch, s.style, s.params), soundParams(patch, s.style));

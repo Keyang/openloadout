@@ -8,7 +8,7 @@ import { labelFor } from '../catalog/schema.js';
 import { el, TILE_BG, ROLE_BG } from './ui.js';
 import { assetById, loadSound, loadSprite } from './catalog.js';
 import { soundById, soundParams, renderAsync, playRendered, playLive, whenRendered, drawWave } from './audio.js';
-import { renderFrame, defaultParams } from '../engine/sprite.js';
+import { renderPixels, defaultParams } from '../engine/sprite.js';
 import { bag } from './bag.js';
 
 // Pixel art is always shown at a whole-number scale: 3x on a wide screen, 2x on a phone, less when a frame is big.
@@ -61,7 +61,7 @@ export function spriteCard(asset) {
   const live = !row.thumb && row.runtime === true;
   let sprite = null;
   const cells = [];
-  const liveFrame = (f) => (cells[f] ??= new ImageData(new Uint8ClampedArray(renderFrame(sprite, row.stripClip ?? sprite.preview, f, defaultParams(sprite)).data.buffer), fw, fh));
+  const liveFrame = (f) => (cells[f] ??= new ImageData(new Uint8ClampedArray(renderPixels(sprite, row.stripClip ?? sprite.preview, f, defaultParams(sprite)).data.buffer), fw, fh));
   const still = () => { if (sprite) { g.putImageData(liveFrame(0), 0, 0); shown = 0; } };
   if (live) {
     canvas.hidden = false;

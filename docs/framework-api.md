@@ -96,7 +96,7 @@ await loadout.assets.remove('my-star');                             // forget an
 await loadout.make.sprite(sourceText);     // { id, kind, ok, errors, warnings, kept, replaced }
 await loadout.make.sound(patchObject);     // { id, kind, ok, errors, warnings, notes, kept, replaced }
 await loadout.check('knight');             // { id, kind, ok, errors, warnings, metrics }; also takes source text or a patch
-await loadout.render('coin', { clip: 'spin', scale: 4 });           // { ok, png, style, width, height, frames, opaque, ... }; { style } picks one of the sprite's styles
+await loadout.render('coin', { clip: 'spin', scale: 4 });           // { ok, png, artStyle, width, height, frames, opaque, ... }; { artStyle } picks one of the sprite's art styles
 await loadout.render('coin-pickup', { style: 'Gem' });              // { ok, wav, seconds, sampleRate, peak, ... }
 
 await loadout.bag.add('knight', { params: { height: 0.8 } });       // { ok, key, count, item }
@@ -194,7 +194,7 @@ export default defineSprite({
 
 - List a style only if the sprite reads well in it. A sprite drawn mostly with single pixels (`dot`, `line`) does not list a style whose surface drops them; the site then never offers that style for it.
 - Branch on `ctx.style` for the detail layer only (eyes, highlights, trim), and keep the pixel branch as the `else`, so the pixel drawing is never at risk.
-- With more than one style, no control may have the key `style` (the page link and the bag use it for the chosen style). `defineSprite` refuses the sprite.
+- A control may have the key `style`. The chosen art style never uses that name where a control's key can appear: it is `artStyle` in a bag item, in `loadout.render` and `loadout.bag.add`, in the sheet JSON and the manifest, and `artstyle=` in a page link. Inside `render(g, ctx)` the art style is `ctx.style` and a control called `style` is `ctx.p.style`.
 - Asking for a style a sprite does not list is an error everywhere (`renderFrame`, `renderSheet`, `exportSheet`, `loadout.render`, `loadout.bag.add`); nothing falls back to another style.
 
 ### What it costs
@@ -202,9 +202,9 @@ export default defineSprite({
 - **The quality bar runs once per listed style**, on that style's pixel picture, and the sprite must pass in each. Its messages name the style: `style "flat": hop frame 2 / all-high: drawing touches the frame edge`. The checking time is multiplied by the number of styles.
 - **Every control must change the picture in every listed style.** A colour control does nothing in a one-colour finish, and that is an error for that style. There is no way yet to declare a control for some styles only, so such a sprite cannot list such a style.
 - **Read-backs lock a sprite to the pixel grid.** A sprite, or a rig it uses, that reads pixels back (`g.get`, `g.bounds`, `g.data`) or pastes its own pixel layer (`new Surface`, `blit`, `tilt`, `lean`) cannot be drawn on a surface that keeps shapes. The bar warns when the sprite's own code reads back from the surface it is handed ("draws outside the surface's calls", with the file and line); it does not see reads from a layer the sprite made itself. `rigs/humanoid.js` reads pixels back too, so today no sprite on that rig can take such a style.
-- **The exports differ.** A pixel sheet's JSON has no `style` (a file without it is pixel, so nothing made before styles changed); any other style's JSON, and its entry in a package's `manifest.json`, says `style`.
+- **The exports differ.** A pixel sheet's JSON has no `artStyle` (a file without it is pixel, so nothing made before styles changed); any other style's JSON, and its entry in a package's `manifest.json`, says `artStyle`.
 
-On the page: `loadout.render(id, { style })` draws in a style, `loadout.bag.add(id, { style })` stores it, `(await loadout.api).styles` lists what is registered, and `(await loadout.assets.get(id)).asset.styles` is what one sprite offers.
+On the page: `loadout.render(id, { artStyle })` draws in an art style, `loadout.bag.add(id, { artStyle })` stores it, `(await loadout.api).styles` lists what is registered, and `(await loadout.assets.get(id)).asset.styles` is what one sprite offers.
 
 ## Reference
 

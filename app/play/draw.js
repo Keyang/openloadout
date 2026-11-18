@@ -3,6 +3,7 @@
 // The bag's look (its colour settings) is applied to every sprite frame, and to the plain
 // ground and sky the playground draws when the bag has no tiles or background.
 import { renderFrame, clipFps } from '../../engine/sprite.js';
+import { artStyleOf, pixelsOf, recolourFrame } from '../../engine/styles.js';
 import { applyColour } from '../../engine/theme.js';
 import { hexToRgb, rgbToHex, pack } from '../../engine/color.js';
 import { hash } from '../../engine/motion.js';
@@ -21,7 +22,7 @@ const PLAIN = {
 };
 
 /**
- * sprites: { key: { sprite, params } } for every sprite entry that is drawn.
+ * sprites: { key: { sprite, params, artStyle? } } for every sprite entry that is drawn (artStyle: the bag item's art style, Contract 12).
  * colour: the bag look's colour settings (theme.colour).
  * tiles: what level.js tileIndex made of the bag's tilesets, or null with none.
  */
@@ -46,9 +47,11 @@ export function createPainter({ sprites, colour, tiles: tileSets = null }) {
     const id = key + '|' + clip + '|' + f;
     let cv = cache.get(id);
     if (!cv) {
-      const { sprite, params } = sprites[key];
-      const g = renderFrame(sprite, clip, f, params);
-      applyColour(g.data, colour);
+      const { sprite, params, artStyle } = sprites[key];
+      const style = artStyleOf(sprite, artStyle);
+      let g;
+      if (style === 'pixel') { g = renderFrame(sprite, clip, f, params); applyColour(g.data, colour); }
+      else g = pixelsOf(recolourFrame(renderFrame(sprite, clip, f, params, { style }), style, (pixels) => applyColour(pixels, colour)), style);
       cv = document.createElement('canvas');
       cv.width = g.w; cv.height = g.h;
       cv.getContext('2d').putImageData(new ImageData(g.bytes(), g.w, g.h), 0, 0);

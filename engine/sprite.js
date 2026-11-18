@@ -57,8 +57,9 @@ export const METAL = ['#c2c9d6', '#8f97a8', '#e6c545', '#c98a4a', '#5d6475'];
  *   sockets(clip, t, p) { return { hand: { x, y, angle } }; },
  *                                           // optional: named attach points for a frame, in frame pixels and rig angles
  *                                           // (0 = down, PI/2 = picture-right, PI = up); exported per frame so a game can attach parts
- *   styles: ['pixel'],                      // optional: the styles it can be drawn and exported in, best first (engine/styles.js,
- *                                           // Contract 12). Left out: ['pixel']. With more than one, no control may have the key "style"
+ *   styles: ['pixel'],                      // optional: the art styles it can be drawn and exported in, best first (engine/styles.js,
+ *                                           // Contract 12). Left out: ['pixel']. The chosen one is called `artStyle` wherever a
+ *                                           // control's key can appear (links, the bag, exports), so a control may be called "style"
  *   render(g, { clip, t, frame, frames, p, style }) { ...draw on Surface g... },
  *                                           // style: the id of the style being drawn; branch on it for the detail layer only
  * })
@@ -96,10 +97,8 @@ export function defineSprite(def) {
   }
   defineParts(def);
   rejectLoops(def);
-  // styles (Contract 12): which pipelines can draw and export it. The chosen one travels as `style` in a page link
-  // and in a bag item, next to the controls, so once there is a choice no control may use that key.
+  // styles (Contract 12): which pipelines can draw and export it
   def.styles = cleanStyles(def.styles, `sprite ${def.id}`);
-  if (def.styles.length > 1 && def.params.style) throw new Error(`sprite ${def.id}: with more than one style, no control may have the key "style" (links and the bag use it for the chosen style); give the control another key, such as "kind" or "shape"`);
   return def;
 }
 
@@ -396,7 +395,7 @@ export function clipStretch(sprite, clip, p) {
  * declares `slice`, the clips it names (and each of their frames) also carry
  * `border`, `rect`, `opening` and `tile` in sheet pixels: see clipStretch().
  * A sprite with no `slice` gets none of these keys.
- * style: the style to draw in (the sprite's first when left out). meta says `style` only when it is not pixel, so
+ * style: the style to draw in (the sprite's first when left out). meta says `artStyle` only when it is not pixel, so
  * a pixel sheet's JSON is what it always was. A style that does not draw on the pixel grid has no sheet picture:
  * the result is then { w, h, data: null, meta, surfaces }, with no meta.image, and surfaces holding each frame as
  * that style drew it, in the order of meta.frames, for the style's exporter to turn into files.
@@ -412,7 +411,7 @@ export function renderSheet(sprite, p, { scale = 1, clips = Object.keys(sprite.c
   const surfaces = [];
   const meta = {
     app: 'Loadout', version: 1, sprite: sprite.id, name: sprite.name,
-    ...(st.id === 'pixel' ? {} : { style: st.id }),
+    ...(st.id === 'pixel' ? {} : { artStyle: st.id }),
     ...(grid ? { image: `${sprite.id}.png` } : {}),
     frameWidth: fw * scale, frameHeight: fh * scale, scale,
     pivot: { x: sprite.pivot[0] * scale, y: sprite.pivot[1] * scale },

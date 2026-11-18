@@ -21,7 +21,7 @@ test('the first style is used when none is asked for; pixel: one PNG sheet and t
   assert.equal(out.files[0].type, 'image/png');
   assert.ok(out.files[0].bytes.length > 100);
   assert.deepEqual(out.data, renderSheet(blob, p).meta);
-  assert.ok(!('style' in out.data));
+  assert.ok(!('artStyle' in out.data));
   assert.equal(out.data.image, 'style-blob.png');
 });
 
@@ -29,7 +29,7 @@ test('a finish-only style exports the same kind of sheet, marked with its style'
   const p = defaultParams(blob);
   const out = await exportSheet(blob, p, { style: 'silhouette', scale: 2, encodePng });
   assert.deepEqual(out.files.map((f) => [f.name, f.type]), [['style-blob.png', 'image/png']]);
-  assert.equal(out.data.style, 'silhouette');
+  assert.equal(out.data.artStyle, 'silhouette');
   assert.equal(out.data.image, 'style-blob.png');
   assert.equal(out.data.frames.length, frameCount(blob));
   assert.equal(out.data.frameWidth, 64);
@@ -55,7 +55,7 @@ test('another export pipeline: the shape style makes one SVG file per frame, and
   for (const tag of ['<ellipse ', '<polygon ', '<rect ', '<path ', '<circle ']) assert.ok(svg.includes(tag), tag);
   assert.ok(svg.includes('stroke-width="2"'), 'the outline is the shapes again, one pixel bigger, underneath');
   assert.match(svg, /<\/svg>\n$/);
-  assert.equal(out.data.style, 'outline-svg');
+  assert.equal(out.data.artStyle, 'outline-svg');
   assert.ok(!('image' in out.data), 'there is no sheet picture');
   assert.deepEqual(out.data.frames.map((f) => f.file), out.files.map((f) => f.name));
   assert.deepEqual(Object.keys(out.data.animations), ['idle', 'hop'], 'the clips are still described');
@@ -79,5 +79,5 @@ test('a style the sprite does not list is refused with a clear message; so is a 
   await assert.rejects(() => exportSheet(sparkle, p, { style: 'nope', encodePng }), /"nope"/);
   await assert.rejects(() => exportSheet(sparkle, p, {}), /encodePng/);
   const ok = await exportSheet(sparkle, p, { style: 'silhouette', encodePng });
-  assert.equal(ok.data.style, 'silhouette');
+  assert.equal(ok.data.artStyle, 'silhouette');
 });

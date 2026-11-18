@@ -82,7 +82,7 @@ test('the pixel exporter hands back exactly the old sheet: the same PNG bytes, t
     assert.deepEqual(out.files.map((f) => [f.name, f.type]), [[`${id}.png`, 'image/png']], id);
     assert.ok(Buffer.from(out.files[0].bytes).equals(png(before)), `${id}: PNG bytes`);
     assert.equal(JSON.stringify(out.data, null, 2), JSON.stringify(before.meta, null, 2), `${id}: JSON text`);
-    assert.ok(!('style' in out.data), `${id}: a pixel sheet does not say "style" (absent means pixel)`);
+    assert.ok(!('artStyle' in out.data) && !('style' in out.data), `${id}: a pixel sheet names no art style (absent means pixel)`);
     n++;
   }
   assert.ok(n >= 6, `at least six sprites exported (${n})`);

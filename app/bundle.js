@@ -66,7 +66,7 @@ function themedSound(patch, params, seed, t) {
  * cues: { clip: [{ sound, frame, preset, params, volume }] }
  * theme (optional, Contract 7): recolours the pictures and the sounds, and with `shapes` varies the sprite's own controls.
  * style (optional, Contract 12): the style to export in, one the sprite lists (its first when left out). It rejects,
- * naming the sprite's styles, for one it does not list. The JSON says `style` only when it is not pixel.
+ * naming the sprite's styles, for one it does not list. The JSON says `artStyle` only when it is not pixel.
  */
 export async function spriteFiles(sprite, p, cues, scale = 1, theme = null, style = undefined) {
   const t = activeTheme(theme);
@@ -192,9 +192,9 @@ function unique(taken, base, ext = '') {
  * An item whose asset is not on the site, or whose own file cannot be loaded, is left out and named under "missing".
  * An item made on a visit (it carries `definition`, Contract 11) is packaged like any other; its source goes in next to it
  * (<id>.source.js for a sprite, <id>.source.json for a sound or a track) and the manifest marks it madeOnThisVisit.
- * A sprite item whose settings name a style (Contract 12) is exported in that style, and its manifest entry says
- * `style`; an entry without it is pixel. One that asks for a style its sprite does not list is left out and named
- * under "unsupported" (never quietly exported in another style).
+ * A sprite item whose settings name an art style (`artStyle`, Contract 12) is exported in that style, and its manifest
+ * entry says `artStyle`; an entry without it is pixel. One that asks for a style its sprite does not list is left out
+ * and named under "unsupported" (never quietly exported in another style).
  * Returns [{ name, data: Uint8Array }] for zip().
  */
 export async function packageFiles({ items, theme = null, scale = 1, catalog = null, onProgress = () => {} }) {
@@ -212,8 +212,8 @@ export async function packageFiles({ items, theme = null, scale = 1, catalog = n
     const sprite = item.kind === 'sprite' && kindMatches(item.kind, item.id) ? await loadSprite(item.id).catch(() => null) : null;
     if (item.kind === 'sprite' ? !sprite : !kindMatches(item.kind, item.id)) { missing.push(item.id); continue; }
     if (item.kind === 'sprite') {
-      const style = typeof s.style === 'string' && s.style ? s.style : stylesOf(sprite)[0];
-      if (!supports(sprite, style) || !styleById(style)) { unsupported.push({ id: item.id, style }); continue; }
+      const style = typeof s.artStyle === 'string' && s.artStyle ? s.artStyle : stylesOf(sprite)[0];
+      if (!supports(sprite, style) || !styleById(style)) { unsupported.push({ id: item.id, artStyle: style }); continue; }
       const folder = unique(folders, item.id);
       const a = entry(sprite.name, sprite.meta);
       a.folder = `sprites/${folder}/`;
@@ -227,7 +227,7 @@ export async function packageFiles({ items, theme = null, scale = 1, catalog = n
       // `sheet` is the PNG sheet, for the styles that make one; every style has the animation list
       if (a.files.includes(`sprites/${folder}/${sprite.id}.png`)) a.sheet = `sprites/${folder}/${sprite.id}.png`;
       a.animations = `sprites/${folder}/${sprite.id}.json`;
-      if (style !== 'pixel') a.style = style;
+      if (style !== 'pixel') a.artStyle = style;
       if (typeof item.definition?.source === 'string') {
         a.madeOnThisVisit = true;
         a.source = `sprites/${folder}/${sprite.id}.source.js`;
@@ -274,7 +274,7 @@ function packageGuide(manifest, themed) {
   return `Your Loadout package
 
 This package holds ${manifest.assets.length} asset${manifest.assets.length === 1 ? '' : 's'}, each exactly as you set it up in your bag${themed ? ', with the bag\'s look applied to all of them so they match' : ''}.
-${manifest.missing ? `\nNot included (no longer on the site): ${manifest.missing.join(', ')}\n` : ''}${manifest.unsupported ? `\nNot included (asked for in a style it cannot be drawn in): ${manifest.unsupported.map((u) => `${u.id} (${u.style})`).join(', ')}\n` : ''}
+${manifest.missing ? `\nNot included (no longer on the site): ${manifest.missing.join(', ')}\n` : ''}${manifest.unsupported ? `\nNot included (asked for in a style it cannot be drawn in): ${manifest.unsupported.map((u) => `${u.id} (${u.artStyle})`).join(', ')}\n` : ''}
 What is in it
 ${list}
 

@@ -73,6 +73,16 @@ export function stylesOf(sprite) {
   return Array.isArray(own) && own.length ? [...own] : ['pixel'];
 }
 
+/**
+ * The art style to draw a stored choice in, without ever failing: the one named when the sprite lists it, otherwise
+ * the sprite's first. For pictures of things already kept (a bag item, the playground); an export or a request
+ * uses styleFor, which refuses. sprite: a sprite definition; id: a style id, or nothing.
+ */
+export function artStyleOf(sprite, id) {
+  const own = stylesOf(sprite);
+  return typeof id === 'string' && own.includes(id) && registry.has(id) ? id : own[0];
+}
+
 /** True when the sprite lists this style. sprite: a sprite definition; id: a style id. */
 export function supports(sprite, id) {
   return stylesOf(sprite).includes(id);
@@ -151,7 +161,7 @@ export async function exportSheet(sprite, params, options = {}) {
 
 /**
  * The sheet exporter of every style that draws on the pixel grid: one PNG with a row per clip, and the sheet's
- * JSON (renderSheet's meta, which says `style` when it is not pixel). Returns { files: [{ name, bytes, type }], data }.
+ * JSON (renderSheet's meta, which says `artStyle` when it is not pixel). Returns { files: [{ name, bytes, type }], data }.
  * sprite, params: the sprite and its settings; options: { style, scale, clips, recolour, encodePng } as exportSheet passes them.
  */
 export async function pngSheet(sprite, params, { style = 'pixel', scale = 1, clips, recolour = null, encodePng } = {}) {

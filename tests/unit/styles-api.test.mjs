@@ -9,11 +9,12 @@ import { ROOT } from '../../tools/lib/assets.mjs';
 
 test('the render and bag_add actions accept a style', () => {
   const render = ACTIONS.find((a) => a.name === 'render'), add = ACTIONS.find((a) => a.name === 'bag_add');
-  const style = render.inputSchema.properties.options.properties.style;
-  assert.equal(style.type, 'string');
-  assert.match(style.description, /Sprites: .*style/i);
-  assert.match(style.description, /Sounds: /, 'and still a sound\'s named style');
-  assert.match(add.inputSchema.properties.settings.description, /Sprite: \{ params, cues, scale, style \}/);
+  const { artStyle, style } = render.inputSchema.properties.options.properties;
+  assert.equal(artStyle.type, 'string');
+  assert.match(artStyle.description, /^Sprites: .*art style/);
+  assert.match(style.description, /^Sounds: /, '`style` is still a sound\'s named style, and nothing else');
+  assert.ok(!/sprite/i.test(style.description));
+  assert.match(add.inputSchema.properties.settings.description, /Sprite: \{ params, cues, scale, artStyle \}/);
 });
 
 test('api.json describes the registered styles: on the shipped site that is pixel alone', async () => {

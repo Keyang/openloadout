@@ -21,7 +21,7 @@ export default defineSprite({
   params: {
     count: range('Sparks', 0.5, { lo: 'Few', hi: 'Many' }),
     spread: range('Spread', 0.5, { lo: 'Tight', hi: 'Wide' }),
-    shape: choice('Shape', 'ring', ['ring', 'cross', 'spiral']),
+    style: choice('Style', 'ring', ['ring', 'cross', 'spiral']),      // a control may be called `style`: the art style travels as `artStyle`
     speed: range('Speed', 0.5, { lo: 'Slow', hi: 'Fast', group: 'Motion' }),
   },
   clips: {
@@ -33,8 +33,8 @@ export default defineSprite({
     for (let i = 0; i < n; i++) {
       const k = i / n, turn = t / n;                                // one step round per loop, so the loop closes
       let x, y;
-      if (p.shape === 'ring') { const a = TAU * (k + turn); x = Math.sin(a) * reach; y = Math.cos(a) * reach; }
-      else if (p.shape === 'cross') { const d = reach * (0.3 + 0.7 * ((k * 4) % 1)), a = (TAU / 4) * Math.floor(k * 4) + TAU * turn; x = Math.sin(a) * d; y = Math.cos(a) * d; }
+      if (p.style === 'ring') { const a = TAU * (k + turn); x = Math.sin(a) * reach; y = Math.cos(a) * reach; }
+      else if (p.style === 'cross') { const d = reach * (0.3 + 0.7 * ((k * 4) % 1)), a = (TAU / 4) * Math.floor(k * 4) + TAU * turn; x = Math.sin(a) * d; y = Math.cos(a) * d; }
       else { const a = TAU * (k * 2 + turn), d = reach * (0.25 + 0.75 * k); x = Math.sin(a) * d; y = Math.cos(a) * d; }
       const lit = hash(i, Math.floor(t * 6)) > 0.35;                // each spark blinks
       if (lit) g.dot(CX + x, CY + y, i % 2 ? HOT : WARM);

@@ -85,7 +85,7 @@ export async function playPage(app) {
     const drawn = {};
     for (const e of entries) {
       if (!e.sprite) continue;
-      drawn[e.key] = { sprite: e.sprite, params: themedParams(e.sprite, cleanParams(e.sprite, e.settings.params ?? {}), theme) };
+      drawn[e.key] = { sprite: e.sprite, params: themedParams(e.sprite, cleanParams(e.sprite, e.settings.params ?? {}), theme), artStyle: e.settings.artStyle };
       e.soundIds = soundIdsOf(e.sprite, e.settings.cues ?? null, drawn[e.key].params).filter((id) => patchOf(id));
     }
     const plan = planScene(entries, picks);

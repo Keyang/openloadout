@@ -31,8 +31,9 @@ test('styles is declared on the sprite, not in its meta, and the message says wh
 test('a sprite item in the bag keeps its style; one without a style is stored exactly as before', () => {
   assert.deepEqual(cleanSettings('sprite', { params: { size: 1 }, cues: null, scale: 2 }), { params: { size: 1 }, cues: null, scale: 2 });
   assert.deepEqual(Object.keys(cleanSettings('sprite', {})), ['params', 'cues', 'scale']);
-  assert.deepEqual(cleanSettings('sprite', { params: {}, style: 'silhouette' }), { params: {}, cues: null, scale: 1, style: 'silhouette' });
-  for (const bad of [null, '', 7, 'Not An Id', { id: 'x' }]) assert.ok(!('style' in cleanSettings('sprite', { style: bad })), String(bad));
+  assert.deepEqual(cleanSettings('sprite', { params: {}, artStyle: 'silhouette' }), { params: {}, cues: null, scale: 1, artStyle: 'silhouette' });
+  assert.ok(!('style' in cleanSettings('sprite', { style: 'silhouette' })), 'a sprite item has no `style`: that word is a sound\'s named style, and a control\'s key');
+  for (const bad of [null, '', 7, 'Not An Id', { id: 'x' }]) assert.ok(!('artStyle' in cleanSettings('sprite', { artStyle: bad })), String(bad));
   // sounds: `style` is the sound's named style, as it always was
   assert.deepEqual(cleanSettings('sound', { style: 'Gem' }), { params: {}, style: 'Gem', seed: 1 });
 });
@@ -40,32 +41,32 @@ test('a sprite item in the bag keeps its style; one without a style is stored ex
 test('the style survives storage, a reload, an update and a shared link', () => {
   const storage = memoryStorage();
   const bag = createBag(storage);
-  const a = bag.add({ kind: 'sprite', id: 'style-blob', settings: { params: { size: 0.8 }, cues: null, scale: 2, style: 'outline-svg' } });
+  const a = bag.add({ kind: 'sprite', id: 'style-blob', settings: { params: { size: 0.8 }, cues: null, scale: 2, artStyle: 'outline-svg' } });
   const b = bag.add({ kind: 'sprite', id: 'knight', settings: { params: {}, cues: null, scale: 1 } });
-  assert.equal(bag.get(a).settings.style, 'outline-svg');
-  assert.ok(!('style' in bag.get(b).settings));
+  assert.equal(bag.get(a).settings.artStyle, 'outline-svg');
+  assert.ok(!('artStyle' in bag.get(b).settings));
   const again = createBag(storage);                         // the page was reloaded
-  assert.equal(again.get(a).settings.style, 'outline-svg');
+  assert.equal(again.get(a).settings.artStyle, 'outline-svg');
   assert.deepEqual(again.get(b).settings, { params: {}, cues: null, scale: 1 });
-  again.update(a, { ...again.get(a).settings, style: 'silhouette' });
-  assert.equal(createBag(storage).get(a).settings.style, 'silhouette');
+  again.update(a, { ...again.get(a).settings, artStyle: 'silhouette' });
+  assert.equal(createBag(storage).get(a).settings.artStyle, 'silhouette');
   const link = again.toLink();
   const other = createBag(memoryStorage());
   assert.equal(other.fromLink(link), 2);
-  assert.deepEqual(other.items().map((i) => [i.id, i.settings.style ?? null]), [['style-blob', 'silhouette'], ['knight', null]]);
-  assert.deepEqual(other.items()[0].settings, { params: { size: 0.8 }, cues: null, scale: 2, style: 'silhouette' });
+  assert.deepEqual(other.items().map((i) => [i.id, i.settings.artStyle ?? null]), [['style-blob', 'silhouette'], ['knight', null]]);
+  assert.deepEqual(other.items()[0].settings, { params: { size: 0.8 }, cues: null, scale: 2, artStyle: 'silhouette' });
 });
 
 test('a link leaves the style out when it is the asset\'s standard one', () => {
-  const bag = createBag(memoryStorage(), { standard: (kind) => (kind === 'sprite' ? { params: {}, style: 'pixel' } : null) });
-  bag.add({ kind: 'sprite', id: 'style-blob', settings: { params: {}, style: 'pixel' } });
+  const bag = createBag(memoryStorage(), { standard: (kind) => (kind === 'sprite' ? { params: {}, artStyle: 'pixel' } : null) });
+  bag.add({ kind: 'sprite', id: 'style-blob', settings: { params: {}, artStyle: 'pixel' } });
   const plain = createBag(memoryStorage());
   plain.add({ kind: 'sprite', id: 'style-blob', settings: { params: {} } });
   const to = createBag(memoryStorage());
   to.fromLink(bag.toLink());
-  assert.ok(!('style' in to.items()[0].settings));
+  assert.ok(!('artStyle' in to.items()[0].settings));
   bag.clear();
-  bag.add({ kind: 'sprite', id: 'style-blob', settings: { params: {}, style: 'silhouette' } });
+  bag.add({ kind: 'sprite', id: 'style-blob', settings: { params: {}, artStyle: 'silhouette' } });
   to.fromLink(bag.toLink());
-  assert.equal(to.items()[0].settings.style, 'silhouette');
+  assert.equal(to.items()[0].settings.artStyle, 'silhouette');
 });

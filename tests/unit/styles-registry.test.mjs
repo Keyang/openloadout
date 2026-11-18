@@ -68,10 +68,23 @@ test('defineSprite refuses a bad styles list', () => {
   assert.throws(() => defineSprite(tiny({ styles: 'pixel' })), /styles.*list/);
   assert.throws(() => defineSprite(tiny({ styles: ['pixel', 'watercolour'] })), /"watercolour" is not a style.*pixel/s);
   assert.throws(() => defineSprite(tiny({ styles: ['pixel', 'silhouette', 'pixel'] })), /"pixel".*twice/);
-  // the page link and the bag use `style` for the chosen style, so a control cannot have that key once there is a choice
+});
+
+test('a control may have the key "style", on a sprite with several art styles too (the chosen art style travels as artStyle)', () => {
   const withStyleControl = { size: range('Size', 0.5), style: choice('Style', 'a', ['a', 'b']) };
-  assert.throws(() => defineSprite(tiny({ styles: ['pixel', 'silhouette'], params: withStyleControl })), /control.*"style"/);
-  assert.doesNotThrow(() => defineSprite(tiny({ params: withStyleControl })), 'fine while the sprite has one style');
+  const s = defineSprite(tiny({ styles: ['pixel', 'silhouette'], params: withStyleControl, render(g, { p, style }) { g.rect(2, 2, p.style === 'a' ? 4 : 8, style === 'pixel' ? 4 : 6, '#00ff00'); } }));
+  assert.deepEqual(s.styles, ['pixel', 'silhouette']);
+  const count = (g) => g.data.filter(Boolean).length;
+  // the control and the art style are told apart: p.style is the control, ctx.style the art style
+  assert.equal(count(renderFrame(s, 'idle', 0, { size: 0.5, style: 'a' })), 16);
+  assert.equal(count(renderFrame(s, 'idle', 0, { size: 0.5, style: 'b' })), 32);
+  assert.equal(count(renderFrame(s, 'idle', 0, { size: 0.5, style: 'b' }, { style: 'silhouette' })), 48);
+  assert.ok('style' in sparkle.params && stylesOf(sparkle).length === 2, 'the fixture has both');
+  const sheet = renderSheet(sparkle, { ...defaultParams(sparkle), style: 'cross' }, { style: 'silhouette' });
+  assert.equal(sheet.meta.artStyle, 'silhouette');
+  assert.equal(sheet.meta.params.style, 'cross');
+  assert.ok(!('style' in sheet.meta));
+  assert.ok(!('artStyle' in renderSheet(sparkle, defaultParams(sparkle)).meta), 'a pixel sheet names no art style');
 });
 
 test('render(g, ctx) is told the style, and a default call draws exactly what it drew before the seam', () => {

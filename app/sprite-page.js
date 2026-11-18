@@ -92,7 +92,8 @@ export function spritePage(app, sprite, query) {
   if (!styles.length) styles.push('pixel');
   const choice = styles.length > 1;
   const held = choice && query.bag ? bag.get(query.bag) : null;
-  const askedStyle = choice ? query.style ?? (held && held.kind === 'sprite' && held.id === sprite.id ? held.settings.style : undefined) : undefined;
+  // (the link's key is `artstyle`: `style` may be one of the sprite's own controls)
+  const askedStyle = choice ? query.artstyle ?? (held && held.kind === 'sprite' && held.id === sprite.id ? held.settings.artStyle : undefined) : undefined;
   const st = {
     style: styles.includes(askedStyle) ? askedStyle : styles[0],
     p: cleanParams(sprite, query),
@@ -380,7 +381,7 @@ export function spritePage(app, sprite, query) {
     for (const [k, v] of Object.entries(st.p)) if (v !== def[k]) q.set(k, typeof v === 'number' ? String(Math.round(v * 100) / 100) : String(v));
     if (st.clip !== sprite.preview) q.set('clip', st.clip);
     if (st.scale !== 1) q.set('scale', String(st.scale));
-    if (st.style !== styles[0]) q.set('style', st.style);        // like any other setting: only when it is not the usual one
+    if (st.style !== styles[0]) q.set('artstyle', st.style);     // like any other setting: only when it is not the usual one
     const packed = packCues(sprite, st.cues);
     if (packed) q.set('sfx', packed);
     const qs = q.toString();
@@ -440,7 +441,7 @@ export function spritePage(app, sprite, query) {
         goesWith(sprite.id)),     // the sounds it uses and the bundles it is in, from the catalogue
       panel,
       el('div', { class: 'get' },
-        made?.draft ? null : addToBag('sprite', sprite.id, () => ({ params: { ...st.p }, cues: st.cues, scale: st.scale, ...(st.style !== styles[0] ? { style: st.style } : {}) }), query),
+        made?.draft ? null : addToBag('sprite', sprite.id, () => ({ params: { ...st.p }, cues: st.cues, scale: st.scale, ...(st.style !== styles[0] ? { artStyle: st.style } : {}) }), query),
         el('button', { type: 'button', class: 'btn big', onclick: download }, 'Download sprite and sounds'),
         el('button', { type: 'button', class: 'ghost', onclick: copyLink }, 'Copy link'),
         el('div', { class: 'size' }, el('span', { class: 'label' }, 'Pixel size'), sizeBar, sizeNote),
