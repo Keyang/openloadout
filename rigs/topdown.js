@@ -486,9 +486,8 @@ const tiltX = (P, d, gy, x, y) => x + P.tilt * (gy - y) - P.tilt * d.tall * 0.35
  * In `die` the body tips over and ends lying down: asked with solve()'s J (as a sprite's sockets() does), the points are
  * where they are in the frame; asked from inside a hook (with the J the hook was given) they are on the standing picture
  * the hook draws on. A game that mirrors a frame uses x' = 2 * pivotX - x and angle' = -angle.
- * A lying body with something big on it (a pack, a shield) is moved by draw() to stay inside the frame; sockets asked
- * afterwards of the same pose (F.draw(), then F.sockets()) move with it. Asked without drawing they are where the body
- * would lie unmoved, a few pixels off for those looks.
+ * A lying body with something big on it (a pack, a shield: frame()'s `far`) is moved to stay inside the frame when the pose
+ * is fitted, so the picture and these points agree whichever is asked for first.
  */
 export function sockets(J, P, d, opt = {}) {
   const r = P.reach ?? 1, len = (opt.muzzle ?? 6) * r;
@@ -504,7 +503,7 @@ export function sockets(J, P, d, opt = {}) {
   if (J.inner || !(P.lie || P.tilt)) return out;      // J.inner: asked from inside a hook, which draws on the standing picture
   if (!P.lie) { for (const sk of Object.values(out)) sk.x = tiltX(P, d, J.gy, sk.x, sk.y); return out; }
   const map = lieMap(P, d);
-  const [mx, my] = P.lieShift ?? [0, 0];      // set by draw() when the lying body had to be moved to stay in the frame
+  const [mx, my] = P.lieShift ?? [0, 0];      // set by fit() when the lying body has to be moved to stay in the frame
   for (const sk of Object.values(out)) { [sk.x, sk.y] = map(sk.x, sk.y); sk.x += mx; sk.y += my; sk.angle -= PI / 2; }
   out.feet = { x: J.bx, y: GROUND, angle: 0 };
   return out;
@@ -576,16 +575,22 @@ export function fit(direction, P, d, opt = {}) {
 }
 
 function fitLying(direction, P, d, item, points, margin) {
-  // a body on the ground: tall headgear moves the whole body along; a weapon that still sticks out is drawn shorter
+  // a body on the ground: tall headgear moves the whole body along, something that reaches far to one side (a pack, a
+  // shield: frame()'s `far`) moves it up or down the picture; a weapon that still sticks out is drawn shorter.
+  // The move up or down is P.lieShift, which draw() and sockets() both use: the layout is settled here, once.
   const J = solve(direction, P, d);
+  delete P.lieShift;
   if (points) {
-    const xs = points(J, P).map(([x, y]) => lieMap(P, d)(x, y)[0]);
+    const at = points(J, P).map(([x, y]) => lieMap(P, d)(x, y)), xs = at.map((q) => q[0]), ys = at.map((q) => q[1]);
     const lo = Math.min(...xs), hi = Math.max(...xs);
     if (hi > SIZE[0] - margin) P.rootX -= Math.ceil(hi - (SIZE[0] - margin));
     else if (lo < margin) P.rootX += Math.ceil(margin - lo);
+    const top = Math.min(...ys), bottom = Math.max(...ys), yMax = SIZE[1] - margin;      // far points are outer edges: the last pixel is a row inside them
+    const dy = bottom > yMax ? -Math.ceil(bottom - yMax) : top < margin ? Math.ceil(margin - top) : 0;
+    if (dy) P.lieShift = [0, dy];
   }
   if (item) {
-    const [hx, hy] = lieMap(P, d)(J.armF.hand[0], J.armF.hand[1]), pad = item.pad ?? 1;
+    const [hx, hy0] = lieMap(P, d)(J.armF.hand[0], J.armF.hand[1]), pad = item.pad ?? 1, hy = hy0 + (P.lieShift?.[1] ?? 0);
     const sn = Math.sin(P.item - PI / 2), c = Math.cos(P.item - PI / 2);
     const room = (v, max, dv) => (dv > 0 ? (max - margin - pad - v) / dv : dv < 0 ? (v - margin - pad) / -dv : Infinity);
     const r = Math.min(room(hx, SIZE[0], sn * item.length), room(hy, SIZE[1], c * item.length));
@@ -858,17 +863,9 @@ function drawLying(g, direction, P, d, look, C, hooks) {
   const J = solve(view, P, d);
   J.inner = true;
   drawFront(tmp, J, P, d, look, C, hooks, view === 'up');
-  let X0 = lieX0(P, d), Y0 = lieY0(P, d);
-  // whatever the body wears or holds (a pack, a shield, a long gun) lies down with it: if any of it would leave the
-  // frame, the whole picture is moved back inside (2 px clear, one of them for the outline)
-  const b = tmp.bounds();
-  delete P.lieShift;
-  if (b) {
-    const lo = [X0 + GROUND - 1 - b.y1, Y0 + b.x0 - CX], hi = [X0 + GROUND - 1 - b.y0, Y0 + b.x1 - CX];
-    const into = (a, z, max) => (z > max - 3 ? Math.max(2 - a, max - 3 - z) : a < 2 ? 2 - a : 0);
-    const mx = into(lo[0], hi[0], g.w), my = into(lo[1], hi[1], g.h);
-    if (mx || my) { P.lieShift = [mx, my]; X0 += mx; Y0 += my; }
-  }
+  // where it lies was settled when the pose was fitted (fit(): P.rootX along the body, P.lieShift up or down), so the
+  // picture and the sockets agree whichever is asked for first
+  const X0 = lieX0(P, d) + (P.lieShift?.[0] ?? 0), Y0 = lieY0(P, d) + (P.lieShift?.[1] ?? 0);
   for (let y = 0; y < tmp.h; y++) for (let x = 0; x < tmp.w; x++) {
     const v = tmp.data[y * tmp.w + x];
     if (!v) continue;
@@ -1051,6 +1048,8 @@ export function hat(g, J, P, d, opt = {}) {
  * One frame of a character, posed and fitted once, so the picture and the exported sockets cannot disagree. clip, t: as a sprite's render() and sockets() get them; p: the sprite's values (height, build, head, bounce, stride are read from it).
  * opt: { item: itemSize(kind, scale) of what the weapon hand holds, or null (an `attack` with nothing held becomes a punch);
  *        rise: pixels the headgear rises above the head (headgearRise()); points: (J, P) => [[x, y]] other far points for fit();
+ *        far: (J, P, d) => [[x, y]] the outermost points of what is worn or carried to one side (packFar() for a pack): what
+ *             fit() needs to keep a body that lies down in `die` inside the frame with it on;
  *        carry: 'up' | 'upright' | 'low' | 'hang' (CARRY); tall: [shortest, tallest] body (dims); muzzle: pixels from hand to muzzle (default: the item's length) }.
  * Returns F = { clip, action, direction, d, P, item, poseAt(u), sockets(), hand(J), draw(g, look, hooks), finish(g, { trail, flash, outline }) }:
  *   F.sockets()             what the sprite's sockets(clip, t, p) returns
@@ -1063,7 +1062,8 @@ export function frame(clip, t, p = {}, opt = {}) {
   const d = dims(p, { tall: opt.tall });
   const item = opt.item && opt.item.length > 0 ? opt.item : null;
   const m = { bounce: p.bounce, stride: p.stride, armed: !!item, carry: opt.carry };
-  const points = opt.points ?? (opt.rise ? (J) => [[J.head[0], J.headTop - opt.rise]] : null);
+  const high = opt.points ?? (opt.rise ? (J) => [[J.head[0], J.headTop - opt.rise]] : null);
+  const points = opt.far ? (J, P) => [...(high ? high(J, P) : []), ...opt.far(J, P, d)] : high;
   const poseAt = (u) => fit(direction, pose(!item && action === 'attack' ? 'punch' : action, direction, u, m, d), d, { item, points });
   const P = poseAt(t);
   return {
@@ -2488,4 +2488,22 @@ export function drawOver(g, draw, rim = INK) {
   }
   for (const [x, y] of edge) g.dot(x, y, rim);
   for (let i = 0; i < tmp.data.length; i++) if (tmp.data[i]) g.data[i] = tmp.data[i];
+}
+
+
+// ---- additions of W3-H3 (the rig), fall fix 2: what reaches far to one side, for frame()'s `far` ------
+
+/** Returns the `far` of a pack for frame(): a function (J, P, d) giving the outermost points of the pack pack() draws, so a body that lies down in `die` with it on stays inside the frame. kind: one of PACK_KINDS (anything else: no points); size: its Size setting. */
+export function packFar(kind, size = 1) {
+  return (J, P, d) => {
+    if (J.dir === 'side' || !PACK_KINDS.includes(kind)) return [];
+    const bx = J.bx, top = J.shoulderY + d.chin, off = -J.s;
+    if (kind === 'tank') {
+      const r = 2.9 + 0.9 * size, hx = bx + off * (d.headR + 0.6 + 0.9 * size), fx = bx - off * 1.5, fy = top + 3 + 5 * size;
+      return [[hx + off * r, top - 1], [hx, top - 1 - r], [fx - off * r, fy], [fx, fy + r]];
+    }
+    if (kind === 'antenna') return [[bx + off * (d.headR + 4.2 + size), J.headTop - packRise(kind, size) - 0.5], [bx - off * 4, top]];
+    const e = d.chestR + d.armW - 1, pw = size < 0.85 ? 2 : size < 1.2 ? 3 : 4, y0 = top - 2, h = Math.round(6 * size);
+    return [[bx - e - pw - 1, y0], [bx + e + pw + 1, y0], [bx - e - pw - 1, y0 + h + 4], [bx + e + pw + 1, y0 + h + 4]];
+  };
 }

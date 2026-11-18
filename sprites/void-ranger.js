@@ -30,7 +30,8 @@ function riseOf(p) {
 /** One frame of the Ranger: the rig's pose with the gun held in both hands (a shove in place of a shot when nothing is held). */
 function rangerFrame(clip, t, p) {
   const item = T.gunSize(p.weapon, p.weaponLength);
-  return T.bracedFrame(item ? clip : clip.replace(/^shoot_/, 'attack_'), t, p, { item, rise: riseOf(p) });
+  // far: how far the pack reaches to one side, so the body that lies down in `die` stays inside the frame with it on
+  return T.bracedFrame(item ? clip : clip.replace(/^shoot_/, 'attack_'), t, p, { item, rise: riseOf(p), far: T.packFar(p.pack, p.packSize) });
 }
 
 const STEPS = () => [{ sound: 'footstep-metal', frame: 0, preset: 'Boots on deck', volume: 0.45 }, { sound: 'footstep-metal', frame: 4, preset: 'Boots on deck', volume: 0.45 }];
