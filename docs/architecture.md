@@ -231,7 +231,7 @@ Rules:
 
 | Member | What it is |
 |---|---|
-| `loadout.framework.<module>.<function>` | Every export of every framework module (for example `loadout.framework.sprite.defineSprite`, `loadout.framework.fx.ring`, `loadout.framework.topdown.pose`) |
+| `(await loadout.framework).<module>.<function>` | Every export of every framework module (for example `sprite.defineSprite`, `fx.ring`, `topdown.pose`). Loaded on first use, so it is asynchronous: `const fw = await loadout.framework`. Modules are found by folder scan (`engine/`, `rigs/`, `sound/`, `quality/`, `catalog/`); the rule is in the header of `tools/lib/api.mjs` |
 | `loadout.api` | The contents of `generated/api.json` (what exists, with descriptions) |
 | `loadout.assets.list(filter)`, `.get(id)`, `.search(text, filters)`, `.similar(id)` | The catalogue and search (Contracts 4 and 5) |
 | `loadout.make.sprite(source)`, `loadout.make.sound(patch)` | Define a new asset at run time from sprite source text (an ES module, as in `sprites/<id>.js`, importing the framework by its usual paths) or a sound patch object. Returns `{ id, ok, errors, warnings }` after running the quality bar on it (Contract 10). The asset then behaves like a catalogue asset on this visit: it can be opened, drawn, played, customised, put in the bag and exported |
@@ -239,6 +239,8 @@ Rules:
 | `loadout.render(id, { clip, frame, params, look, scale })` | A picture (PNG data address) of a frame or a whole clip strip; for a sound, its samples or a WAV |
 | `loadout.bag.add(id, settings)`, `.items()`, `.remove(key)`, `.setLook(theme)`, `.download()` | The bag and the export (Contracts 6, 7, 8). The bag stores run-time assets with their full definition |
 | `loadout.go(route)` | Open a page of the site |
+
+A run-time asset that fails the quality bar is kept as a draft: it can be rendered, checked and replaced by calling `make` again with the same id, but `bag.add` refuses it while it has errors (the quality bar applies to everything an agent adds to the bag; warnings do not block). `loadout.call(name, input)` runs any action by its name in `generated/api.json`.
 
 Every high-level action returns plain data (no DOM nodes, no class instances) and never throws for a bad asset: it returns `{ ok: false, errors: [...] }` with messages an agent can act on.
 
