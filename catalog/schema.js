@@ -171,7 +171,9 @@ export function validateMeta(meta, kind) {
   if (!isObj(meta)) return { ok: false, errors: [`meta must be an object with ${list(need)}; got ${q(meta)}`] };
 
   for (const k of Object.keys(meta)) {
-    if (DERIVED_FIELDS.includes(k)) errors.push(`meta.${k}: is derived by the build from the asset itself; remove it`);
+    // a sprite's styles (Contract 12) are declared on the sprite, next to its clips; the build copies them into its catalogue row
+    if (k === 'styles' && kind === 'sprite') errors.push("meta.styles: the styles a sprite can be drawn in go on the sprite itself, not in meta: defineSprite({ styles: ['pixel'], ... }); remove it from meta");
+    else if (DERIVED_FIELDS.includes(k)) errors.push(`meta.${k}: is derived by the build from the asset itself; remove it`);
     else if (!META_FIELDS.includes(k)) errors.push(`meta.${k}: is not a known field; meta takes ${list(need)}`);
   }
 

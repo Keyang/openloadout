@@ -1,8 +1,8 @@
 // Sprite definition, parameters, and rendering frames / sprite sheets.
 // Pure JavaScript: runs the same in the browser and in Node.
 
-import { Surface } from './surface.js';
 import { rng } from './motion.js';
+import { styleFor, cleanStyles, pixelsOf } from './styles.js';   // styles.js imports this file too; neither uses the other until a call
 
 // ---- parameter kinds -------------------------------------------------------
 // Each parameter is one control a non-technical person sees. `label`, `lo` and
@@ -57,7 +57,10 @@ export const METAL = ['#c2c9d6', '#8f97a8', '#e6c545', '#c98a4a', '#5d6475'];
  *   sockets(clip, t, p) { return { hand: { x, y, angle } }; },
  *                                           // optional: named attach points for a frame, in frame pixels and rig angles
  *                                           // (0 = down, PI/2 = picture-right, PI = up); exported per frame so a game can attach parts
- *   render(g, { clip, t, frame, frames, p }) { ...draw on Surface g... },
+ *   styles: ['pixel'],                      // optional: the styles it can be drawn and exported in, best first (engine/styles.js,
+ *                                           // Contract 12). Left out: ['pixel']. With more than one, no control may have the key "style"
+ *   render(g, { clip, t, frame, frames, p, style }) { ...draw on Surface g... },
+ *                                           // style: the id of the style being drawn; branch on it for the detail layer only
  * })
  */
 export function defineSprite(def) {
@@ -93,6 +96,10 @@ export function defineSprite(def) {
   }
   defineParts(def);
   rejectLoops(def);
+  // styles (Contract 12): which pipelines can draw and export it. The chosen one travels as `style` in a page link
+  // and in a bag item, next to the controls, so once there is a choice no control may use that key.
+  def.styles = cleanStyles(def.styles, `sprite ${def.id}`);
+  if (def.styles.length > 1 && def.params.style) throw new Error(`sprite ${def.id}: with more than one style, no control may have the key "style" (links and the bag use it for the chosen style); give the control another key, such as "kind" or "shape"`);
   return def;
 }
 
@@ -306,13 +313,29 @@ export const clipFps = (sprite, clip, p) => {
 /** Phase 0..1 of a frame: loops stop short of 1, one-shot clips end on it. */
 const phase = (c, frame) => (c.loop ? frame / c.frames : c.frames > 1 ? frame / (c.frames - 1) : 0);
 
-/** Render one frame of one clip to a new Surface. */
-export function renderFrame(sprite, clip, frame, p) {
+/**
+ * Render one frame of one clip to a new surface and return it: a pixel Surface in the pixel style.
+ * style: the style to draw in (one the sprite lists; its first when left out). It throws for a style the sprite does not list.
+ */
+export function renderFrame(sprite, clip, frame, p, { style } = {}) {
   const c = sprite.clips[clip];
   if (!c) throw new Error(`sprite ${sprite.id}: no clip "${clip}"`);
-  const g = new Surface(sprite.size[0], sprite.size[1]);
-  sprite.render(g, { clip, t: phase(c, frame), frame, frames: c.frames, loop: c.loop, p });
-  return g;
+  const st = styleFor(sprite, style);
+  const ctx = { clip, t: phase(c, frame), frame, frames: c.frames, loop: c.loop, p, style: st.id };
+  const g = st.makeSurface(sprite.size[0], sprite.size[1], ctx);
+  sprite.render(g, ctx);
+  return st.finish ? st.finish(g, { sprite, ...ctx }) ?? g : g;
+}
+
+/**
+ * Render one frame as pixels, whatever the style: the frame itself where the style draws on the pixel grid,
+ * otherwise that style's pixel picture of it. For previews and for the quality bar.
+ * sprite, clip, frame, p: as renderFrame; style: the style to draw in (the sprite's first when left out).
+ */
+export function renderPixels(sprite, clip, frame, p, { style } = {}) {
+  const st = styleFor(sprite, style);
+  const g = renderFrame(sprite, clip, frame, p, { style: st.id });
+  return st.toPixels ? pixelsOf(g, st.id) : g;
 }
 
 /**
@@ -373,15 +396,24 @@ export function clipStretch(sprite, clip, p) {
  * declares `slice`, the clips it names (and each of their frames) also carry
  * `border`, `rect`, `opening` and `tile` in sheet pixels: see clipStretch().
  * A sprite with no `slice` gets none of these keys.
+ * style: the style to draw in (the sprite's first when left out). meta says `style` only when it is not pixel, so
+ * a pixel sheet's JSON is what it always was. A style that does not draw on the pixel grid has no sheet picture:
+ * the result is then { w, h, data: null, meta, surfaces }, with no meta.image, and surfaces holding each frame as
+ * that style drew it, in the order of meta.frames, for the style's exporter to turn into files.
  */
-export function renderSheet(sprite, p, { scale = 1, clips = Object.keys(sprite.clips) } = {}) {
+export function renderSheet(sprite, p, { scale = 1, clips = Object.keys(sprite.clips), style } = {}) {
+  const st = styleFor(sprite, style);
+  const grid = !st.toPixels;                       // the style draws on the pixel grid, so there is one sheet picture
+  const frameOpt = { style: st.id };
   const [fw, fh] = sprite.size;
   const cols = Math.max(...clips.map((c) => sprite.clips[c].frames));
   const W = cols * fw * scale, H = clips.length * fh * scale;
-  const data = new Uint32Array(W * H);
+  const data = grid ? new Uint32Array(W * H) : null;
+  const surfaces = [];
   const meta = {
     app: 'Loadout', version: 1, sprite: sprite.id, name: sprite.name,
-    image: `${sprite.id}.png`,
+    ...(st.id === 'pixel' ? {} : { style: st.id }),
+    ...(grid ? { image: `${sprite.id}.png` } : {}),
     frameWidth: fw * scale, frameHeight: fh * scale, scale,
     pivot: { x: sprite.pivot[0] * scale, y: sprite.pivot[1] * scale },
     facing: 'right',
@@ -412,8 +444,9 @@ export function renderSheet(sprite, p, { scale = 1, clips = Object.keys(sprite.c
     const stretch = st ? Object.fromEntries(Object.entries(st).map(([k, v]) => [k, scaled(v)])) : null;
     if (stretch) Object.assign(meta.animations[name], stretch);
     for (let f = 0; f < c.frames; f++) {
-      const g = renderFrame(sprite, name, f, p);
-      for (let y = 0; y < fh; y++) for (let x = 0; x < fw; x++) {
+      const g = renderFrame(sprite, name, f, p, frameOpt);
+      if (!grid) surfaces.push(g);
+      else for (let y = 0; y < fh; y++) for (let x = 0; x < fw; x++) {
         const v = g.data[y * fw + x];
         if (!v) continue;
         const ox = (f * fw + x) * scale, oy = (row * fh + y) * scale;
@@ -428,5 +461,5 @@ export function renderSheet(sprite, p, { scale = 1, clips = Object.keys(sprite.c
       meta.frames.push(entry);
     }
   });
-  return { w: W, h: H, data, meta };
+  return grid ? { w: W, h: H, data, meta } : { w: W, h: H, data, meta, surfaces };
 }

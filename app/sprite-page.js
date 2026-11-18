@@ -1,5 +1,7 @@
 // One sprite: preview, sliders, the sounds that play with each animation, download.
-import { defaultParams, cleanParams, randomParams, clipFps, partList, partRemoved, inEffect, cueInEffect } from '../engine/sprite.js';
+import { defaultParams, cleanParams, randomParams, clipFps, partList, partRemoved, inEffect, cueInEffect, renderPixels } from '../engine/sprite.js';
+import { stylesOf, styleById } from '../engine/styles.js';     // W6-A: a sprite may offer more than one style (Contract 12)
+import { bag } from './bag.js';
 import { drawStage, STAGES } from './stage.js';
 import { zip } from './zip.js';
 import { el, header, Frames, travel, hover, shadow, saveBlob, store, cap } from './ui.js';
@@ -59,10 +61,40 @@ function unpackCues(sprite, text) {
 
 const MAX_CUES = 8;   // sounds per animation; links keep at most this many
 
+/**
+ * Frames of one sprite in one of its styles, drawn on demand and kept: what app/ui.js Frames is, for a sprite that
+ * offers a choice of style. A style that does not draw on the pixel grid is shown by its pixel picture.
+ */
+class StyleFrames {
+  constructor(sprite, p, style) { this.sprite = sprite; this.p = p; this.style = style; this.map = new Map(); }
+  set(p) { this.p = p; this.map.clear(); }
+  setStyle(style) { this.style = style; this.map.clear(); }
+  get(clip, f) {
+    const key = clip + ':' + f;
+    let cv = this.map.get(key);
+    if (!cv) {
+      const g = renderPixels(this.sprite, clip, f, this.p, { style: this.style });
+      cv = document.createElement('canvas');
+      cv.width = g.w; cv.height = g.h;
+      cv.getContext('2d').putImageData(new ImageData(g.bytes(), g.w, g.h), 0, 0);
+      this.map.set(key, cv);
+    }
+    return cv;
+  }
+}
+
 export function spritePage(app, sprite, query) {
   document.title = `${sprite.name} · Loadout`;
   const clipNames = Object.keys(sprite.clips);
+  // The styles this sprite can be drawn in (Contract 12). With one, nothing on this page is different. With more, the
+  // page opens in the style its link names; opened from the bag ("Change"), in the item's style; otherwise the first.
+  const styles = stylesOf(sprite).filter((id) => styleById(id));
+  if (!styles.length) styles.push('pixel');
+  const choice = styles.length > 1;
+  const held = choice && query.bag ? bag.get(query.bag) : null;
+  const askedStyle = choice ? query.style ?? (held && held.kind === 'sprite' && held.id === sprite.id ? held.settings.style : undefined) : undefined;
   const st = {
+    style: styles.includes(askedStyle) ? askedStyle : styles[0],
     p: cleanParams(sprite, query),
     clip: clipNames.includes(query.clip) ? query.clip : sprite.preview,
     cues: (query.sfx && unpackCues(sprite, query.sfx)) || spriteCues(sprite),
@@ -70,7 +102,7 @@ export function spritePage(app, sprite, query) {
     stage: STAGES.some((s) => s.id === store.get('stage')) ? store.get('stage') : 'meadow',
     scale: [1, 2, 4].includes(Number(query.scale)) ? Number(query.scale) : 1, start: performance.now(), frame: 0, lastFrame: -1, scroll: 0,
   };
-  const frames = new Frames(sprite, st.p);
+  const frames = choice ? new StyleFrames(sprite, st.p, st.style) : new Frames(sprite, st.p);
 
   // A link from before an option was renamed (cape=false) opens with the new option; put the new name in the address too.
   {
@@ -317,11 +349,28 @@ export function spritePage(app, sprite, query) {
     return p;
   };
 
+  // the style choice, above every other control: only for a sprite that can be drawn in more than one style
+  let setStyle = () => {};
+  const styleBlock = () => {
+    const about = el('p', { class: 'hint style-about' }, styleById(st.style).about);
+    const row = el('div', { class: 'pills', role: 'group', 'aria-label': 'Style' },
+      styles.map((id) => el('button', { type: 'button', class: 'pill', 'data-style': id, 'aria-pressed': String(id === st.style), onclick: () => setStyle(id) }, styleById(id).label)));
+    setStyle = (id) => {
+      st.style = id;
+      frames.setStyle(id);
+      for (const b of row.children) b.setAttribute('aria-pressed', String(b.dataset.style === id));
+      about.textContent = styleById(id).about;
+      buildStrip(); saveUrl();
+    };
+    return el('section', { class: 'group style-choice' }, el('h2', {}, 'Style'), el('div', { class: 'field' }, row), about);
+  };
+
   panel.replaceChildren(
-    el('div', { class: 'panel-actions' },
-      el('button', { type: 'button', class: 'btn', onclick: () => { st.p = surprise(); syncControls(); changed(); } }, 'Surprise me'),
-      el('button', { type: 'button', class: 'ghost', onclick: () => { st.p = defaultParams(sprite); st.cues = spriteCues(sprite); syncControls(); changed(); cuesChanged(true); } }, 'Start over')),
-    ...[group('Look'), ...parts.map(partBlock), group('Colors'), group('Motion')].filter(Boolean));
+    ...[choice ? styleBlock() : null,
+      el('div', { class: 'panel-actions' },
+        el('button', { type: 'button', class: 'btn', onclick: () => { st.p = surprise(); syncControls(); changed(); } }, 'Surprise me'),
+        el('button', { type: 'button', class: 'ghost', onclick: () => { st.p = defaultParams(sprite); st.cues = spriteCues(sprite); setStyle(styles[0]); syncControls(); changed(); cuesChanged(true); } }, 'Start over')),
+      group('Look'), ...parts.map(partBlock), group('Colors'), group('Motion')].filter(Boolean));
   syncShown();
 
   // ---- link and download
@@ -331,6 +380,7 @@ export function spritePage(app, sprite, query) {
     for (const [k, v] of Object.entries(st.p)) if (v !== def[k]) q.set(k, typeof v === 'number' ? String(Math.round(v * 100) / 100) : String(v));
     if (st.clip !== sprite.preview) q.set('clip', st.clip);
     if (st.scale !== 1) q.set('scale', String(st.scale));
+    if (st.style !== styles[0]) q.set('style', st.style);        // like any other setting: only when it is not the usual one
     const packed = packCues(sprite, st.cues);
     if (packed) q.set('sfx', packed);
     const qs = q.toString();
@@ -354,10 +404,14 @@ export function spritePage(app, sprite, query) {
     try {
       // only the sounds that play at these settings go in the package
       const playing = Object.fromEntries(Object.entries(st.cues).map(([clip, list]) => [clip, list.filter(applies)]));
-      const files = await spriteFiles(sprite, st.p, playing, st.scale);
+      const files = await spriteFiles(sprite, st.p, playing, st.scale, null, st.style);
       const nSounds = files.filter((f) => f.name.endsWith('.wav')).length;
       saveBlob(zip(files), `${sprite.id}-sprite-and-sounds.zip`);
-      say(`Downloaded ${sprite.id}-sprite-and-sounds.zip: the sprite sheet, ${nSounds} sound${nSounds === 1 ? '' : 's'}, the animation list, and a short guide.`);
+      // what the pictures are depends on the style: a sheet for pixel art, perhaps one file per frame for another
+      const sheet = files.some((f) => f.name === `${sprite.id}.png`);
+      const nPictures = files.filter((f) => !f.name.endsWith('.wav') && !f.name.endsWith('.json') && !f.name.endsWith('.txt')).length;
+      const pictures = sheet ? 'the sprite sheet' : `${nPictures} picture${nPictures === 1 ? '' : 's'} in the "${styleById(st.style).label}" style`;
+      say(`Downloaded ${sprite.id}-sprite-and-sounds.zip: ${pictures}, ${nSounds} sound${nSounds === 1 ? '' : 's'}, the animation list, and a short guide.`);
     } catch (e) {
       say(`The download did not start: ${e.message}. Try again, or use a different browser.`);
     }
@@ -386,7 +440,7 @@ export function spritePage(app, sprite, query) {
         goesWith(sprite.id)),     // the sounds it uses and the bundles it is in, from the catalogue
       panel,
       el('div', { class: 'get' },
-        made?.draft ? null : addToBag('sprite', sprite.id, () => ({ params: { ...st.p }, cues: st.cues, scale: st.scale }), query),
+        made?.draft ? null : addToBag('sprite', sprite.id, () => ({ params: { ...st.p }, cues: st.cues, scale: st.scale, ...(st.style !== styles[0] ? { style: st.style } : {}) }), query),
         el('button', { type: 'button', class: 'btn big', onclick: download }, 'Download sprite and sounds'),
         el('button', { type: 'button', class: 'ghost', onclick: copyLink }, 'Copy link'),
         el('div', { class: 'size' }, el('span', { class: 'label' }, 'Pixel size'), sizeBar, sizeNote),

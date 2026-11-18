@@ -1,0 +1,30 @@
+// Styles on window.loadout (Contracts 11 and 12): the action schemas accept a style, and generated/api.json lists
+// the registered styles. This file must not load the test styles (tests/fixtures/styles/): it checks that the
+// build knows `pixel` and nothing else.
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { ACTIONS } from '../../app/api.js';
+import { buildApi, referenceMarkdown } from '../../tools/lib/api.mjs';
+import { ROOT } from '../../tools/lib/assets.mjs';
+
+test('the render and bag_add actions accept a style', () => {
+  const render = ACTIONS.find((a) => a.name === 'render'), add = ACTIONS.find((a) => a.name === 'bag_add');
+  const style = render.inputSchema.properties.options.properties.style;
+  assert.equal(style.type, 'string');
+  assert.match(style.description, /Sprites: .*style/i);
+  assert.match(style.description, /Sounds: /, 'and still a sound\'s named style');
+  assert.match(add.inputSchema.properties.settings.description, /Sprite: \{ params, cues, scale, style \}/);
+});
+
+test('api.json describes the registered styles: on the shipped site that is pixel alone', async () => {
+  const api = await buildApi({ root: ROOT });
+  assert.ok(Array.isArray(api.styles));
+  assert.deepEqual(api.styles.map((s) => s.id), ['pixel'], 'the test styles are never part of the build');
+  const [pixel] = api.styles;
+  assert.ok(pixel.label && pixel.about);
+  assert.deepEqual(pixel.exports, ['sheet']);
+  assert.ok(api.modules.some((m) => m.name === 'styles' && m.file === 'engine/styles.js'));
+  const names = api.modules.find((m) => m.name === 'styles').exports.map((e) => e.name);
+  for (const n of ['defineStyle', 'styleById', 'styleIds', 'stylesOf', 'supports']) assert.ok(names.includes(n), n);
+  assert.match(referenceMarkdown(api), /### Styles/);
+});

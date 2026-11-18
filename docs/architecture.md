@@ -125,6 +125,7 @@ hair:  color('Hair', '#5a3a22', HAIR, { when: { headgear: ['none', 'crown'] } })
     id: 'knight', kind: 'sprite',            // kind: sprite | sound | music
     name: 'Hero', description: 'A brave adventurer...',
     type: 'character', role: 'characters/player', themes: [...], gameTypes: [...], view: 'side', words: [...], license: 'draft',
+    styles: ['pixel'],                        // sprites only: the styles it can be drawn and exported in, best first (Contract 12); from the sprite's `styles`
     bundles: ['fantasy-platformer'],          // filled in from bundles/*.json
     src: 'sprites/knight.js',
     tech: {                                   // derived, never hand-written
@@ -254,32 +255,75 @@ Every high-level action returns plain data (no DOM nodes, no class instances) an
 
 ## Contract 12: styles (more than one way to draw and export an asset)
 
-Decision from Keyang, 2026-11-18 18:40, after `docs/sprite-styles.md` and `docs/sprite-data.md`: one asset may be offered in several styles; the user chooses the style to synthesize and export. A style that is not technically possible for an asset, or makes no sense for it, is simply not offered for that asset. Not a priority for the three bundles (they are pixel art only), but the framework must be built so that a new rendering pipeline and a new export pipeline plug in without changing the assets that do not use them. Status: **designed, the seam is not built yet** (task W6-A, after the run-time asset work lands).
+Decision from Keyang, 2026-11-18 18:40, after `docs/sprite-styles.md` and `docs/sprite-data.md`: one asset may be offered in several styles; the user chooses the style to synthesize and export. A style that is not technically possible for an asset, or makes no sense for it, is simply not offered for that asset. Not a priority for the three bundles (they are pixel art only), but the framework must be built so that a new rendering pipeline and a new export pipeline plug in without changing the assets that do not use them. Status: **the seam is built (task W6-A, 2026-11-18). `pixel` is the only style on the site and no real asset lists a second one.** That the seam carries another rendering pipeline and another export pipeline is proven on test fixtures only (`tests/fixtures/styles/`: a finish-only `silhouette` and an `outline-svg` that records shapes and exports one SVG per frame). Every existing sprite draws and exports byte for byte as before (`tests/unit/styles-identical.test.mjs`, `tests/e2e/styles.spec.mjs`).
 
-What a style is: a named pipeline with three parts.
+What a style is: a named pipeline, registered with `defineStyle` in `engine/styles.js`. Three parts were designed; building the second surface showed two more are needed whenever the surface is not a pixel grid.
 
-| Part | What it does | Pixel style (today's behaviour, unchanged) |
-|---|---|---|
-| Drawing surface | Turns a sprite's drawing calls (`g.ellipse`, `g.limb`, `g.rect`, ...) into a picture | The pixel grid in `engine/surface.js` |
-| Finish | Steps applied after drawing: outline, shading depth, palette, grid size | Dark 1 px outline, three tones, the bundle palette |
-| Exporter | Turns frames into files | Sheet PNG plus JSON (Contract 8) |
+| Part | In `defineStyle` | What it does | Pixel style (unchanged behaviour) |
+|---|---|---|---|
+| Drawing surface | `makeSurface(width, height, options)` | A new surface for one frame; it turns a sprite's drawing calls (`g.ellipse`, `g.limb`, `g.rect`, ...) into a picture | The pixel grid in `engine/surface.js` |
+| Finish | `finish(surface, context)`, optional | What is done to a frame after the sprite drew it (flatten, palette, outline) | None: the outline and the three tones are drawn by the sprite itself, as before |
+| Pixel picture | `toPixels(surface)`, only for a surface that is not a pixel grid | A pixel `Surface` of a finished frame: what the site previews and what the quality bar looks at | Not needed |
+| Look | `recolour(surface, apply)`, only for a surface that is not a pixel grid | How a whole-bundle look (Contract 7) recolours a finished frame | Not needed: the look recolours the pixels |
+| Exporter | `exporters: { sheet(sprite, params, options) }` | Turns a sprite into files: `{ files: [{ name, bytes, type }], data }`, where `data` is the JSON that ships with them | `pngSheet`: sheet PNG plus JSON (Contract 8) |
 
-Names reserved now, so nothing built today has to be renamed later:
+```js
+defineStyle({ id, label, about, makeSurface(width, height, options), finish(surface, context), toPixels(surface), recolour(surface, apply),
+              exporters: { sheet(sprite, params, { style, scale, clips, recolour, encodePng }) } })
+styleById(id)   styleIds()   stylesOf(sprite)   supports(sprite, id)   styleFor(sprite, id)   // styleFor throws for a style the sprite does not list
+exportSheet(sprite, params, options)   pixelsOf(surface, id)   recolourFrame(surface, id, apply)   pngSheet   // pngSheet: the exporter of every pixel-grid style
+```
+
+Everything that makes a frame goes through the registry: `renderFrame(sprite, clip, frame, p, { style })`, `renderPixels(...)` (the same frame as pixels, whatever the style), `renderSheet(sprite, p, { scale, clips, style })`, `renderThemedFrame(sprite, clip, frame, p, theme, { style })`. Left out, `style` is the sprite's first. **A style the sprite does not list is an error that names the styles it has, never a fallback to another style.** The PNG writer is handed to the exporter (`encodePng`: a canvas in the browser, `tools/png.mjs` in Node), which is how a pixel export stays the same bytes as before.
+
+Style as data, as built:
 
 | Where | Field | Meaning | Default |
 |---|---|---|---|
-| Sprite file | `styles: ['pixel', ...]` | The styles this asset supports, best first | `['pixel']` |
-| `render(g, ctx)` | `ctx.style` | The style being drawn; a sprite may branch on it for its detail layer (a one-pixel eye in `pixel`, a drawn eye in `flat`) | `'pixel'` |
-| Framework | `engine/styles.js`: `defineStyle({ id, label, makeSurface, finish, exporters })`, `styleById`, `stylesOf(sprite)` | The registry every renderer and exporter goes through | `pixel` registered |
-| Catalogue row | `styles` | For the style filter (FIND-4) and the style choice on a sprite page | `['pixel']` |
-| Bag item, page link | `style` | The chosen style, stored like any other setting | omitted = first supported |
-| Sheet JSON, `manifest.json` | `style` | Which pipeline made the files | `pixel` |
-| `window.loadout` | `render(id, { style })`, `api.styles` | Route 2 can ask for any supported style | |
+| Sprite file | `styles: ['pixel', ...]` | The styles this asset supports, best first. `defineSprite` checks it: known ids, no repeats, not empty | `['pixel']` |
+| `render(g, ctx)` | `ctx.style` | The id of the style being drawn; a sprite may branch on it for its detail layer (a one-pixel eye in `pixel`, a drawn eye in `flat`) | `'pixel'` |
+| Framework | `engine/styles.js` | The registry every renderer and exporter goes through | `pixel` registered |
+| Catalogue row | `styles` | For the style filter (FIND-4) and the style choice on a sprite page. Sprite rows only (a sound's named styles are `tech.styles`, a different thing) | `['pixel']` |
+| Bag item | `settings.style` | The chosen style, stored like any other setting. Left out when it is the sprite's first style, so every item made before styles is unchanged | omitted = first supported |
+| Sprite page link | `style=<id>` | The same, in the address | omitted = first supported |
+| Sheet JSON, `manifest.json` entry | `style` | Which pipeline made the files. **Written only when it is not `pixel`**: adding the key would change every existing export, so a file without it is pixel | absent = `pixel` |
+| `generated/api.json` | `styles: [{ id, label, about, exports }]` | What is registered, read from the registry by the build | `pixel` |
+| `window.loadout` | `render(id, { style })`, `bag.add(id, { style })`, `(await loadout.api).styles`, `assets.get(id).asset.styles` | Route 2 can ask for any style a sprite lists; another is refused with `{ ok: false, errors }` | |
+
+Two consequences of using the name `style`:
+
+- **A sprite with more than one style may not have a control whose key is `style`** (the page link and the bag use that key for the chosen style). `defineSprite` refuses it. This collides with what makers already do: on 2026-11-18, 28 of the 78 sprites had a control with that key (`arrow`, `crate`, `lever`, `ui-dialogue`, `wooden-door` and 23 more). Each would need the control renamed, with a link migration, before it can be given a second style. Either new sprites name such a control `kind` or `shape` from now on, or this contract's link key is changed (the bag item is not affected: there the controls are nested under `params`). **Open: to be decided before the first real second style.**
+- A sound's bag item and the `render` action already had a `style` (the name of one of a sound's named styles). The two do not collide, because one is on sprites and the other on sounds, but the word now means two things.
+
+On the site: a sprite that lists more than one style shows a "Style" choice above its other controls (each style's `label`, and its `about` under the choice); the preview, the frame strip, the link, the bag item and the download follow it. A sprite with one style shows nothing new. Not yet following the style (files outside task W6-A): the small picture on the bag page, the "Change" link from the bag (the sprite page makes up for it by reading the item's style), the playground, and cards.
+
+Export per style: `app/bundle.js` asks the chosen style's exporter for the picture files and adds the sounds, the JSON and a guide around them, so a style can export something other than a PNG sheet. A bag item that names a style its sprite does not list is left out of the package and named under `unsupported` in `manifest.json`.
+
+Quality bar per style: `checkSprite` runs once for every style a sprite lists, on that style's pixel picture of each frame. With `pixel` alone it runs once and reports exactly what it did before. With more styles, each message about a drawing starts with `style "<id>": `, faults of the sprite itself (controls, metadata, sounds) are reported once, and `metrics.styles` holds each style's numbers. The cached result is still one per sprite file and its key is unchanged (the file's text, which holds the `styles` list, plus everything in `engine/`, `rigs/`, `sound/`, `quality/`): a style defined outside those folders, as the test styles are, is not part of the key. Every listed style costs a full pass (the three-style test sprite: 18 ms, 10 ms and 12 ms).
 
 Rules for asset makers today (they keep the second level in `sprite-styles.md` possible):
 
-- A sprite draws only through the surface's documented calls. It never reads pixels back and never writes the pixel buffer directly; helpers that must (noise, pattern fills) live in the framework and say which styles they suit.
+- A sprite draws only through the surface's documented calls. It never reads pixels back and never writes the pixel buffer directly; helpers that must (noise, pattern fills) live in the framework and say which styles they suit. The quality bar warns when a sprite's own code does: "draws outside the surface's calls", with the file and line (`metrics.outsideCalls`). It finds this by drawing a sample of frames on a stand-in for the surface and tracing each read-back to its file. Two limits: it can miss code that runs only for one option on one middle frame, and it sees only the surface the sprite is handed, not pixels read from a layer the sprite made itself (`new Surface`).
 - Body shapes go through shape calls (`ellipse`, `capsule`, `limb`, `poly`, `arc`); single pixels and pixel rectangles are for detail (eyes, highlights, trim). A later style redraws the detail layer, not the body.
+- A control must do something in every style the sprite lists. A colour control does nothing to a silhouette, so a sprite with colour controls fails the bar in such a style; there is no way yet to say "this control applies in these styles only".
+
+**The surface interface today.** There is no written interface: a surface is whatever `engine/surface.js`'s `Surface` answers. A second surface has to answer the calls below. Counted 2026-11-18 over 76 files in `sprites/`, 5 in `rigs/` and 18 helper modules in `engine/`: call sites in the source, and calls made from outside `surface.js` while drawing all 1,969 frames at default settings.
+
+| Call | Call sites | Calls made | Carries over to a surface that keeps shapes? |
+|---|---|---|---|
+| `rect` | 641 | 22,425 | Yes as a shape, but most are one or two pixels of detail and become specks |
+| `ellipse`, `capsule`, `limb`, `poly`, `arc` | 85, 40, 65, 50, 15 | 1,840, 1,000, 4,839, 1,598, 105 | Yes. `limb` snaps its ends to the pixel grid, which another surface ignores |
+| `outline` (rim round everything drawn so far) | 92 | 1,865 | Yes: the same shapes underneath, one pixel bigger |
+| `tint` (hit flash) | 29 | 48 | Yes: recolour what was recorded |
+| `dot`, `line` (one pixel wide) | 366, 56 | 308,276, 2,732 | **No.** A one-pixel eye becomes a speck; the detail layer has to be drawn again for the style |
+| `fill`, `blob` with a test function, and the shape tests `ellipseIn`, `capsuleIn`, `polyIn`, `rectIn` | 41 `blob`; 262 shape tests | `fill` 12,446; `blob` 1,033 | **No, as they are.** The test is a function of a pixel centre. A `blob` of the four known shape tests could carry over if the tests were data, not functions |
+| Options `shade`, `light` and a ramp as the paint (the three tones), and `g.shadow` | 44 uses of `shadow` | `shade` given 12,996 times; a ramp 19,249 times | **No.** The bands are a pixel offset test. A smooth style needs its own shading |
+| Option `clip` (a test function), `minus` | | `clip` 5,327; `minus` 14 | **No** |
+| Option `outline` on one shape | | 668 | Yes: a stroke |
+| `get`, `bounds`, `bytes`, `.data` (reading pixels back, or the buffer itself) | 9 `bounds`, 66 `.data` | `get` 1,046,256 (713,717 from `rigs/`, 322,951 from helpers, 9,588 from sprites); `.data` 12 million, nearly all from helpers | **No.** `rigs/humanoid.js` reads pixels back hundreds of times a frame (about 390 for the Hero), so every sprite on that rig is tied to the pixel grid until the rig is changed |
+| `blit`, with `new Surface`, `tilt`, `lean` (a sprite or helper draws on its own pixel layer and pastes it) | 46, 48, 11 | 453 | **No**: the layer is pixels. 27 of the 48 own layers are made in sprite files |
+
+What the first real second style still needs, which the seam does not give: (1) a written surface interface, with `blob` and `clip` taking shapes as data; (2) the humanoid rig and the helpers drawing without reading pixels back; (3) a way for a control to say which styles it applies in; (4) shading for a smooth surface; (5) curves (`sprite-styles.md`); (6) a frame size per style (a smooth style is not 64 pixels) and quality rules of its own, because the bar only sees a pixel picture; (7) the bag page, the playground, cards and thumbnails drawing the chosen style, and the style filter (FIND-4).
 
 Three levels, from `sprite-styles.md`: (1) the same drawing with a different finish (palette, outline, flat or three-tone, silhouette, 1-bit): a setting, on every sprite; (2) the same rig through a different surface (flat or vector, cel-shaded, cut-out parts for a skeletal export): a second pipeline plus a per-style detail layer on each sprite that opts in; (3) hand-painted, true hand-drawn, pre-rendered 3D: not possible from shapes in code, never listed. The quality bar runs once per style a sprite declares.
 

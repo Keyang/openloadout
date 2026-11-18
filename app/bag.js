@@ -27,6 +27,7 @@ export function memoryStorage() {
 
 const isObj = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
 const clone = (v) => JSON.parse(JSON.stringify(v));
+const STYLE_ID = /^[a-z][a-z0-9-]{0,39}$/;     // a drawing style's id, as engine/styles.js names them
 
 /** A plain-data copy of a cue list, keeping only what a download uses. */
 function cleanCues(cues) {
@@ -52,7 +53,10 @@ function cleanCues(cues) {
 
 /**
  * Settings by kind, as plain data:
- *   sprite { params, cues, scale }   sound { params, style, seed }   music { params, style }
+ *   sprite { params, cues, scale, style? }   sound { params, style, seed }   music { params, style }
+ * A sprite's `style` is the id of the style it is drawn and exported in (Contract 12). It is there only when one was
+ * chosen: the page leaves it out for the sprite's first style, so an item without it is stored exactly as before.
+ * (A sound's `style` is something else: the name of one of its named styles.)
  * Unknown fields are dropped, so whatever a page hands over cannot bloat the bag or its link.
  */
 export function cleanSettings(kind, settings) {
@@ -61,7 +65,9 @@ export function cleanSettings(kind, settings) {
   const style = typeof s.style === 'string' && s.style ? s.style : null;
   if (kind === 'sprite') {
     const scale = [1, 2, 3, 4, 6, 8].includes(Number(s.scale)) ? Number(s.scale) : 1;
-    return { params, cues: cleanCues(s.cues), scale };
+    const out = { params, cues: cleanCues(s.cues), scale };
+    if (typeof s.style === 'string' && STYLE_ID.test(s.style)) out.style = s.style;
+    return out;
   }
   if (kind === 'sound') return { params, style, seed: Number.isFinite(Number(s.seed)) && Number(s.seed) >= 1 ? Math.round(Number(s.seed)) : 1 };
   return { params, style };
@@ -175,6 +181,7 @@ export function createBag(storage, { now = () => Date.now(), standard = null } =
     const s = clone(it.settings);
     if (isObj(base.params)) for (const [k, v] of Object.entries(s.params)) if (k in base.params && sameAs(base.params[k], v)) delete s.params[k];
     if (it.kind === 'sprite' && s.cues && base.cues !== undefined && sameAs(cleanCues(base.cues), s.cues)) s.cues = null;
+    if (it.kind === 'sprite' && s.style !== undefined && s.style === base.style) delete s.style;
     return s;
   }
 
@@ -243,7 +250,7 @@ export function createBag(storage, { now = () => Date.now(), standard = null } =
     },
     /**
      * Tell the bag each asset's standard settings, so links can leave them out:
-     * fn(kind, id, settings) -> { params, cues? } or null when unknown.
+     * fn(kind, id, settings) -> { params, cues?, style? (a sprite's first style) } or null when unknown.
      */
     setStandard(fn) { standardOf = typeof fn === 'function' ? fn : null; },
     /**

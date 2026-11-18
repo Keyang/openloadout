@@ -1,7 +1,10 @@
 // Builds what people download: a sprite sheet with its sounds, or the bag (or a bundle) as one game
 // resource package (architecture.md, Contract 8). Which assets exist comes from the catalogue
 // (app/catalog.js); a sprite's own program is loaded when it is first needed.
-import { renderSheet, defaultParams, cleanParams, cueInEffect } from '../engine/sprite.js';
+// Which files a sprite becomes is decided by the style it is exported in (engine/styles.js, Contract 12): this
+// file asks that style's exporter, and adds the sounds, the JSON and the guide around what it returns.
+import { cleanParams, cueInEffect } from '../engine/sprite.js';
+import { exportSheet, styleById, stylesOf, supports } from '../engine/styles.js';
 import { defaultTheme, normalizeTheme, applyColour, themedParams } from '../engine/theme.js';
 import { applySound, themedSoundParams, soundSettingsFor } from '../sound/theme.js';
 import { soundById, soundParams, rendered, renderAsync, wavBytes, isMusic } from './audio.js';
@@ -9,10 +12,11 @@ import { loadCatalog, assetById, loadSprite } from './catalog.js';
 
 const enc = new TextEncoder();
 
-async function sheetPng(sheet) {
+/** The browser's PNG writer, as the PNG sheet exporter asks for it: (width, height, RGBA bytes) -> PNG bytes. */
+async function pngBytes(w, h, rgba) {
   const cv = document.createElement('canvas');
-  cv.width = sheet.w; cv.height = sheet.h;
-  cv.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(sheet.data.buffer), sheet.w, sheet.h), 0, 0);
+  cv.width = w; cv.height = h;
+  cv.getContext('2d').putImageData(new ImageData(rgba, w, h), 0, 0);
   const blob = await new Promise((r) => cv.toBlob(r, 'image/png'));
   return new Uint8Array(await blob.arrayBuffer());
 }
@@ -57,15 +61,18 @@ function themedSound(patch, params, seed, t) {
 }
 
 /**
- * Files for one sprite: <id>.png, <id>.json, sounds/*.wav, how-to-use.txt.
+ * Files for one sprite. In the pixel style: <id>.png, <id>.json, sounds/*.wav, how-to-use.txt. Another style's
+ * exporter may make other picture files (one SVG per frame, say); the JSON, the sounds and the guide are always there.
  * cues: { clip: [{ sound, frame, preset, params, volume }] }
- * theme (optional, Contract 7): recolours the sheet and its sounds, and with `shapes` varies the sprite's own controls.
+ * theme (optional, Contract 7): recolours the pictures and the sounds, and with `shapes` varies the sprite's own controls.
+ * style (optional, Contract 12): the style to export in, one the sprite lists (its first when left out). It rejects,
+ * naming the sprite's styles, for one it does not list. The JSON says `style` only when it is not pixel.
  */
-export async function spriteFiles(sprite, p, cues, scale = 1, theme = null) {
+export async function spriteFiles(sprite, p, cues, scale = 1, theme = null, style = undefined) {
   const t = activeTheme(theme);
   const drawn = t ? themedParams(sprite, cleanParams(sprite, p), t) : p;
-  const sheet = renderSheet(sprite, drawn, { scale });
-  if (t) applyColour(sheet.data, t.colour);
+  const made = await exportSheet(sprite, drawn, { style: style ?? undefined, scale, recolour: t ? (pixels) => applyColour(pixels, t.colour) : null, encodePng: pngBytes });
+  const sheet = { meta: made.data };
   const files = [], wavs = new Map();
   sheet.meta.sounds = {};
   for (const [clip, all] of Object.entries(cues)) {
@@ -93,11 +100,32 @@ export async function spriteFiles(sprite, p, cues, scale = 1, theme = null) {
       };
     });
   }
-  files.push({ name: `${sprite.id}.png`, data: await sheetPng(sheet) });
+  for (const f of made.files) files.push({ name: f.name, data: f.bytes });
   files.push({ name: `${sprite.id}.json`, data: enc.encode(JSON.stringify(sheet.meta, null, 2)) });
   for (const w of wavs.values()) files.push({ name: `sounds/${w.name}`, data: w.data });
-  files.push({ name: 'how-to-use.txt', data: enc.encode(howTo(sprite, sheet.meta)) });
+  // the guide below is about a PNG sheet; a style that makes other files gets a short one that lists them
+  files.push({ name: 'how-to-use.txt', data: enc.encode(sheet.meta.image ? howTo(sprite, sheet.meta) : howToOther(sprite, sheet.meta, made)) });
   return files;
+}
+
+/** The guide for a style that does not make a PNG sheet: what the files are, and where the animation list is. */
+function howToOther(sprite, meta, made) {
+  const style = styleById(made.style);
+  const rows = Object.entries(meta.animations).map(([name, a]) => `  ${name}: ${a.frames} frames, ${a.fps} frames per second, ${a.loop ? 'loops' : 'plays once'}`).join('\n');
+  const shown = made.files.slice(0, 6).map((f) => `  ${f.name}`).join('\n');
+  return `${sprite.name} — made with Loadout, in the "${style.label}" style
+
+${style.about}
+
+What is in this folder
+${shown}${made.files.length > 6 ? `\n  ... ${made.files.length} picture files in all` : ''}
+  ${sprite.id}.json  the animation list: every frame, its file, how long it shows, and the settings used${Object.keys(meta.sounds).length ? '\n  sounds/        one WAV file per sound; the JSON lists them under "sounds" with the frame each starts on' : ''}
+
+Animations
+${rows}
+  The sprite faces right. Flip it in your game to face left.
+  The point that touches the ground is ${meta.pivot.x}, ${meta.pivot.y} inside each frame.
+`;
 }
 
 function howTo(sprite, meta) {
@@ -164,12 +192,15 @@ function unique(taken, base, ext = '') {
  * An item whose asset is not on the site, or whose own file cannot be loaded, is left out and named under "missing".
  * An item made on a visit (it carries `definition`, Contract 11) is packaged like any other; its source goes in next to it
  * (<id>.source.js for a sprite, <id>.source.json for a sound or a track) and the manifest marks it madeOnThisVisit.
+ * A sprite item whose settings name a style (Contract 12) is exported in that style, and its manifest entry says
+ * `style`; an entry without it is pixel. One that asks for a style its sprite does not list is left out and named
+ * under "unsupported" (never quietly exported in another style).
  * Returns [{ name, data: Uint8Array }] for zip().
  */
 export async function packageFiles({ items, theme = null, scale = 1, catalog = null, onProgress = () => {} }) {
   const t = activeTheme(theme);
   const info = catalog ?? await catalogue();
-  const files = [], assets = [], missing = [];
+  const files = [], assets = [], missing = [], unsupported = [];
   const folders = new Set(), soundNames = new Set(), musicNames = new Set();
   let done = 0;
   for (const item of items) {
@@ -181,18 +212,22 @@ export async function packageFiles({ items, theme = null, scale = 1, catalog = n
     const sprite = item.kind === 'sprite' && kindMatches(item.kind, item.id) ? await loadSprite(item.id).catch(() => null) : null;
     if (item.kind === 'sprite' ? !sprite : !kindMatches(item.kind, item.id)) { missing.push(item.id); continue; }
     if (item.kind === 'sprite') {
+      const style = typeof s.style === 'string' && s.style ? s.style : stylesOf(sprite)[0];
+      if (!supports(sprite, style) || !styleById(style)) { unsupported.push({ id: item.id, style }); continue; }
       const folder = unique(folders, item.id);
       const a = entry(sprite.name, sprite.meta);
       a.folder = `sprites/${folder}/`;
       const p = cleanParams(sprite, s.params ?? {});
       const cues = s.cues ?? defaultCues(sprite);
-      for (const f of await spriteFiles(sprite, p, cues, s.scale ?? scale, t)) {
+      for (const f of await spriteFiles(sprite, p, cues, s.scale ?? scale, t, style)) {
         const name = `sprites/${folder}/${f.name}`;
         files.push({ name, data: f.data });
         a.files.push(name);
       }
-      a.sheet = `sprites/${folder}/${sprite.id}.png`;
+      // `sheet` is the PNG sheet, for the styles that make one; every style has the animation list
+      if (a.files.includes(`sprites/${folder}/${sprite.id}.png`)) a.sheet = `sprites/${folder}/${sprite.id}.png`;
       a.animations = `sprites/${folder}/${sprite.id}.json`;
+      if (style !== 'pixel') a.style = style;
       if (typeof item.definition?.source === 'string') {
         a.madeOnThisVisit = true;
         a.source = `sprites/${folder}/${sprite.id}.source.js`;
@@ -227,6 +262,7 @@ export async function packageFiles({ items, theme = null, scale = 1, catalog = n
   }
   const manifest = { app: 'Loadout', format: 'loadout-package', version: 1, theme: normalizeTheme(t ?? {}), assets };
   if (missing.length) manifest.missing = missing;
+  if (unsupported.length) manifest.unsupported = unsupported;
   files.push({ name: 'manifest.json', data: enc.encode(JSON.stringify(manifest, null, 2)) });
   files.push({ name: 'read-me.txt', data: enc.encode(packageGuide(manifest, !!t)) });
   return files;
@@ -238,7 +274,7 @@ function packageGuide(manifest, themed) {
   return `Your Loadout package
 
 This package holds ${manifest.assets.length} asset${manifest.assets.length === 1 ? '' : 's'}, each exactly as you set it up in your bag${themed ? ', with the bag\'s look applied to all of them so they match' : ''}.
-${manifest.missing ? `\nNot included (no longer on the site): ${manifest.missing.join(', ')}\n` : ''}
+${manifest.missing ? `\nNot included (no longer on the site): ${manifest.missing.join(', ')}\n` : ''}${manifest.unsupported ? `\nNot included (asked for in a style it cannot be drawn in): ${manifest.unsupported.map((u) => `${u.id} (${u.style})`).join(', ')}\n` : ''}
 What is in it
 ${list}
 

@@ -8,6 +8,7 @@
 import { rgbToHsl, hslToRgb, hexToRgb, col, INK } from './color.js';
 import { rng } from './motion.js';
 import { renderFrame, cleanParams } from './sprite.js';
+import { styleFor } from './styles.js';
 
 // ---- the theme -------------------------------------------------------------
 
@@ -288,10 +289,16 @@ export function randomTheme(seed = 0, { shapes = false } = {}) {
   return t;
 }
 
-/** Render one frame with the theme's controls and colours. Returns a Surface. */
-export function renderThemedFrame(sprite, clip, frame, baseParams, theme) {
+/**
+ * Render one frame with the theme's controls and colours. Returns what renderFrame returns: a Surface in the pixel style.
+ * style: the style to draw in (one the sprite lists; its first when left out).
+ */
+export function renderThemedFrame(sprite, clip, frame, baseParams, theme, { style } = {}) {
   const t = normalizeTheme(theme);
-  const g = renderFrame(sprite, clip, frame, themedParams(sprite, cleanParams(sprite, baseParams || {}), t));
-  applyColour(g.data, t.colour);
+  const st = styleFor(sprite, style);
+  const g = renderFrame(sprite, clip, frame, themedParams(sprite, cleanParams(sprite, baseParams || {}), t), { style: st.id });
+  // a surface that is not a pixel grid says how a look recolours it (engine/styles.js, defineStyle)
+  if (st.recolour) st.recolour(g, (pixels) => applyColour(pixels, t.colour));
+  else applyColour(g.data, t.colour);
   return g;
 }

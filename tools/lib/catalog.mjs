@@ -1,6 +1,7 @@
 // Builds the catalogue object (docs/architecture.md, Contract 4) from the loaded assets.
 // Hand-written facts come from each asset's meta; measurable facts (tech) are derived here.
 import { defaultParams, clipFps } from '../../engine/sprite.js';
+import { stylesOf } from '../../engine/styles.js';
 import { createVoice } from '../../sound/sfx-engine.js';
 
 export const CATALOG_VERSION = 1;
@@ -82,6 +83,7 @@ export function buildCatalog({ sprites = [], sounds = [], bundles = [] }) {
     assets.push({
       id, kind: 'sprite', name: def.name, description: def.blurb ?? '',
       ...metaFields(def.meta, true),
+      styles: stylesOf(def),          // the styles it can be drawn and exported in, best first (Contract 12)
       bundles: [],
       src: file,
       tech,

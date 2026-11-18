@@ -1,0 +1,126 @@
+{
+ "about": "Taken 2026-11-18 in the browser named below, with the export as it was BEFORE the style seam (task W6-A), by tests/fixtures/styles/export-hashes.mjs. A sprite whose file has changed since, or another browser version (its PNG writer may differ), is not compared.",
+ "browser": "Chrome/159.0.8154.6",
+ "sprites": {
+  "knight": {
+   "source": "dd9c266af15167c3bb6164817c1b92a99cc08bd0",
+   "png": "5bd62f3a9ad03d39438b3856c2862ed13b83625a",
+   "json": "8d9ecce2676b6a335096c9dc4a0aae528bd066aa",
+   "png2": "ee21452a4b757f560d4a045cc8191746499fa7f3",
+   "json2": "f05a1cca98de9572d9d211432a091d26c5832a49",
+   "files": [
+    "knight.png",
+    "knight.json",
+    "how-to-use.txt"
+   ]
+  },
+  "coin": {
+   "source": "0effdce6c578579d9c564b1f41bb5912921ecb8f",
+   "png": "9a7aac3efaaa6699e2077731e8adbcf6b9e5cd3f",
+   "json": "f09385e3fa512280f45ab04a47a9542ad3354bf1",
+   "png2": "d323955cb10219d8ef4d0b7bec7043d6d05255b5",
+   "json2": "d1257b8107ca7fa080a688f81fb9a48de5331883",
+   "files": [
+    "coin.png",
+    "coin.json",
+    "how-to-use.txt"
+   ]
+  },
+  "slime": {
+   "source": "377eefcf643103e26d4bba16466d4f9cb28b6339",
+   "png": "fde2e1ec1143eaa56863d296738171750d56da8d",
+   "json": "26dab5cf4c61e346b2c592f55a5f2217a3397f93",
+   "png2": "dcef6572c6846ce57e88e038a93fa34a0ca75159",
+   "json2": "15ea552a2b8bfa59813e8794acd635f8ab229e17",
+   "files": [
+    "slime.png",
+    "slime.json",
+    "how-to-use.txt"
+   ]
+  },
+  "bat": {
+   "source": "95bd3384c986a33c350e987c7a603bea64062b3d",
+   "png": "9a3cc2b0ec13d24660cf4e9dfb69c822216645e0",
+   "json": "14726d533a4a8f766580b95357f99b4ce63f8c40",
+   "png2": "f1fa94496ee960ff9ba96efe1961c097560c7ba1",
+   "json2": "4e79d1dfc1895d09e6c51c421b0b17abb02d65c3",
+   "files": [
+    "bat.png",
+    "bat.json",
+    "how-to-use.txt"
+   ]
+  },
+  "tiles-forest": {
+   "source": "d8421f4201661464b034dbac7fc539d3841e5453",
+   "png": "ba11eb96dddab39bff78658574a39e1838abab55",
+   "json": "38b901a8f9a0c425ab5cc892fb5a433b24a9ab27",
+   "png2": "ac673f8a6d8d38b5763f55d33c9ebd51a38fe3f5",
+   "json2": "39af8f1ba49821941d5a4f8d04f5565d4e7f1890",
+   "files": [
+    "tiles-forest.png",
+    "tiles-forest.json",
+    "how-to-use.txt"
+   ]
+  },
+  "bg-forest": {
+   "source": "fd47a46bd49fd9c1916984daab1a6fb7377f20ee",
+   "png": "512d535448ac83476eda6b3f1330ecbd13e9f348",
+   "json": "2ea3be2f54a5ad00ab3f07303f62988dc218e271",
+   "png2": "e4746fb3a7b5911c9bf7c92252d22524801b52bf",
+   "json2": "ab0d3a25ba98bb00ec7538cda232eea23ecf87a1",
+   "files": [
+    "bg-forest.png",
+    "bg-forest.json",
+    "how-to-use.txt"
+   ]
+  },
+  "ui-dialogue": {
+   "source": "adb1c8b79fdd3c9fdbc1956f18c115f21d78a921",
+   "png": "6de9912ad2982eaaa315f1fe97866102d2819087",
+   "json": "c4929b26a713583850353a1c748e51d01053640e",
+   "png2": "db04dcfcf1f104313ca6baed52f0ea0f82960e00",
+   "json2": "5afe46f4317e958f2a0e81d0a5f144218f525903",
+   "files": [
+    "ui-dialogue.png",
+    "ui-dialogue.json",
+    "how-to-use.txt"
+   ]
+  },
+  "campfire": {
+   "source": "c184c6355d2b8d400e85aee8633b15c4b03f6f73",
+   "png": "c475784a23dc4645810e4e03bb9f6a0c397f08ce",
+   "json": "841372503b3a6a94b969a3ea827d185a6030fff2",
+   "png2": "db158db3be4350e3114fc831dea66315a549af7b",
+   "json2": "b4536287ccbe78f5a5a4a088aaf69d16244cbde1",
+   "files": [
+    "campfire.png",
+    "campfire.json",
+    "how-to-use.txt"
+   ]
+  },
+  "wolf": {
+   "source": "87e205ac33b95aca3fdd882706feb85da4a34324",
+   "png": "f7b5fc042f0d39cee7dd580da1a4e81e243ed941",
+   "json": "090b2999633c883cba6a1a6f3286a64ce6f1dbb6",
+   "png2": "b3294de072d838f0f13d97e74c7c1af94748550a",
+   "json2": "5df8f70e3770eb66ca4b0d507aa2ea955560de47",
+   "files": [
+    "wolf.png",
+    "wolf.json",
+    "how-to-use.txt"
+   ]
+  },
+  "gem": {
+   "source": "d34039c07385b6493aaebc0f336ac25ff4fd598d",
+   "png": "d199ad0db9d554cc52b581ad3746a867c27dee52",
+   "json": "84a09b869053c61cf138f5d22ea4ed629670e07e",
+   "png2": "3f4661e356d4a1eb4f9069eaab99502571141ddb",
+   "json2": "96265a4b721e3a8c216f4f6d9bc7bec0057ae194",
+   "files": [
+    "gem.png",
+    "gem.json",
+    "how-to-use.txt"
+   ]
+  }
+ }
+}

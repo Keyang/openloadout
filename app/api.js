@@ -6,6 +6,7 @@
 //   await loadout.assets.search('money', { kind: 'sprite' })
 //   await loadout.make.sprite(sourceText)               // -> { id, ok, errors, warnings }: the quality bar's verdict
 //   await loadout.render('coin', { clip: 'spin', scale: 4 })   // -> { ok, png: 'data:image/png;base64,...' }
+//   (await loadout.api).styles                          // the ways a sprite can be drawn (Contract 12); render and bag.add take { style }
 //   await loadout.call('make_sound', { patch })         // the same actions by their tool name (what an MCP server does)
 //
 // What this file keeps to:
@@ -51,7 +52,7 @@ export const ACTIONS = [
   },
   {
     name: 'assets_get', call: 'assets.get', args: ['id'],
-    description: 'Everything about one asset: its catalogue row plus its controls (the settings render and the bag accept), its clips or styles, and for an asset made on this visit its last quality verdict.',
+    description: 'Everything about one asset: its catalogue row plus its controls (the settings render and the bag accept), its clips or styles, and for an asset made on this visit its last quality verdict. A sprite\'s "styles" are the ways it can be drawn and exported, best first (render and bag_add take one as "style"); a sound\'s "styles" are its named variations.',
     inputSchema: { type: 'object', properties: { id: ID('The asset id, for example "knight" or "coin-pickup"') }, required: ['id'], additionalProperties: false },
   },
   {
@@ -93,7 +94,7 @@ export const ACTIONS = [
   },
   {
     name: 'render', call: 'render', args: ['id', 'options'],
-    description: 'Draw or play an asset and return the result as data. A sprite gives a PNG data address of one frame, or of a whole clip in one row when frame is left out, with its size and how many pixels are drawn. A sound or music track gives a WAV data address, or its samples.',
+    description: 'Draw or play an asset and return the result as data. A sprite gives a PNG data address of one frame, or of a whole clip in one row when frame is left out, with its size and how many pixels are drawn, in the style asked for (its first style unless given). A sound or music track gives a WAV data address, or its samples.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -106,7 +107,7 @@ export const ACTIONS = [
             scale: { type: 'integer', minimum: 1, maximum: 8, description: 'Sprites: whole-number pixel size (1 unless given)' },
             params: { type: 'object', additionalProperties: true, description: 'Settings for the asset\'s controls, by key (assets_get lists them). Left-out controls stay at their defaults' },
             look: LOOK,
-            style: { type: 'string', description: 'Sounds: one of the sound\'s named styles' },
+            style: { type: 'string', description: 'Sprites: the style to draw it in, one of the styles the sprite lists (assets_get shows them; its first unless given). Asking for one it does not list is refused. Sounds: one of the sound\'s named styles' },
             seed: { type: 'integer', minimum: 1, description: 'Sounds: which take (1 unless given); another seed is another variation' },
             format: { type: 'string', enum: ['wav', 'samples'], description: 'Sounds: "wav" (a data address, the default) or "samples" (one list of numbers per channel)' },
             maxSeconds: { type: 'number', minimum: 0.05, description: 'Sounds: stop after this long' },
@@ -124,7 +125,7 @@ export const ACTIONS = [
       type: 'object',
       properties: {
         id: ID('The asset id'),
-        settings: { type: 'object', additionalProperties: true, description: 'Sprite: { params, cues, scale }. Sound: { params, style, seed }. Music: { params, style }. Leave out for the asset as it comes' },
+        settings: { type: 'object', additionalProperties: true, description: 'Sprite: { params, cues, scale, style } (style: one of the styles the sprite lists; left out, or its first, means its first). Sound: { params, style, seed } (style: one of its named styles). Music: { params, style }. Leave out for the asset as it comes' },
       },
       required: ['id'], additionalProperties: false,
     },
@@ -405,6 +406,7 @@ export function createLoadout(env = {}) {
     ui: once(() => import('./ui.js')),
     core: once(() => import('../search/core.js')),
     sprite: once(() => import('../engine/sprite.js')),
+    styles: once(() => import('../engine/styles.js')),
     theme: once(() => import('../engine/theme.js')),
     sfx: once(() => import('../sound/sfx-engine.js')),
     wav: once(() => import('../sound/wav.js')),
@@ -497,13 +499,13 @@ export function createLoadout(env = {}) {
   // a draft (one that fails the quality bar) says so in its row: ok: false and the errors, which its page shows
   const verdictFields = (verdict) => (verdict.ok ? { runtime: true, ok: true } : { runtime: true, ok: false, errors: [...verdict.errors] });
   async function spriteRow(def, verdict) {
-    const S = await lib.sprite();
+    const [S, { stylesOf }] = await Promise.all([lib.sprite(), lib.styles()]);
     const p = S.defaultParams(def);
     const soundIds = [...new Set(Object.values(def.sounds ?? {}).flat().map((c) => c.sound))].sort();
     const clips = Object.entries(def.clips).map(([name, c]) => ({ name, label: c.label, frames: c.frames, loop: c.loop, fps: S.clipFps(def, name, p) }));
     const preview = clips.find((c) => c.name === def.preview) ?? clips[0];
     return {
-      id: def.id, kind: 'sprite', name: String(def.name), description: String(def.blurb ?? ''), ...metaFields(def.meta, true), bundles: [], src: null,
+      id: def.id, kind: 'sprite', name: String(def.name), description: String(def.blurb ?? ''), ...metaFields(def.meta, true), styles: stylesOf(def), bundles: [], src: null,
       tech: { frame: [def.size[0], def.size[1]], pivot: [def.pivot[0], def.pivot[1]], grounded: def.grounded !== false, clips, controls: Object.keys(def.params).length, parts: Object.keys(def.parts ?? {}), sounds: soundIds.length, soundIds },
       thumb: null, strip: null, stripClip: preview.name, stripFrames: preview.frames, stripFps: preview.fps, ...verdictFields(verdict),
     };
@@ -550,7 +552,8 @@ export function createLoadout(env = {}) {
   // ---- drawing ----
   async function renderSprite(a, o) {
     needPage();
-    const [S, def] = await Promise.all([lib.sprite(), defOf(a)]);
+    const [S, def, Y] = await Promise.all([lib.sprite(), defOf(a), lib.styles()]);
+    const style = styleOf(Y, def, a.id, o.style);
     const clip = o.clip ?? def.preview;
     if (typeof clip !== 'string' || !def.clips[clip]) throw new Problem(`"${a.id}" has no clip ${say(o.clip)}. Its clips are: ${Object.keys(def.clips).join(', ')}.`);
     const count = def.clips[clip].frames;
@@ -569,7 +572,8 @@ export function createLoadout(env = {}) {
     let opaque = 0, last = performance.now();
     for (let n = 0; n < frames.length; n++) {
       let g;
-      try { g = T ? T.renderThemedFrame(def, clip, frames[n], p, o.look) : S.renderFrame(def, clip, frames[n], p); } catch (e) { throw new Problem(`The sprite's render() failed on clip "${clip}", frame ${frames[n]}: ${messageOf(e)}`); }
+      // the picture is the style's own pixels, or its pixel picture of a frame it drew on another kind of surface
+      try { g = Y.pixelsOf(T ? T.renderThemedFrame(def, clip, frames[n], p, o.look, { style }) : S.renderFrame(def, clip, frames[n], p, { style }), style); } catch (e) { throw new Problem(`The sprite's render() failed on clip "${clip}", frame ${frames[n]}${style === 'pixel' ? '' : `, in the style "${style}"`}: ${messageOf(e)}`); }
       for (let y = 0; y < fh; y++) for (let x = 0; x < fw; x++) {
         const v = g.data[y * fw + x];
         if (!v) continue;
@@ -582,7 +586,15 @@ export function createLoadout(env = {}) {
     const cv = doc.createElement('canvas');
     cv.width = W; cv.height = H;
     cv.getContext('2d').putImageData(new win.ImageData(new Uint8ClampedArray(px.buffer), W, H), 0, 0);
-    return { ok: true, id: a.id, kind: 'sprite', clip, frame: frames.length === 1 && o.frame !== undefined && o.frame !== null ? o.frame : null, frames: frames.length, fps: S.clipFps(def, clip, p), width: W, height: H, scale, opaque, params: plain(p), warnings, png: cv.toDataURL('image/png') };
+    return { ok: true, id: a.id, kind: 'sprite', style, clip, frame: frames.length === 1 && o.frame !== undefined && o.frame !== null ? o.frame : null, frames: frames.length, fps: S.clipFps(def, clip, p), width: W, height: H, scale, opaque, params: plain(p), warnings, png: cv.toDataURL('image/png') };
+  }
+
+  /** The style to draw or export a sprite in: the one asked for when the sprite lists it, its first when none is asked for. Anything else is refused, never swapped for another. */
+  function styleOf(Y, def, id, asked) {
+    const own = Y.stylesOf(def);
+    if (asked === undefined || asked === null) return own[0];
+    if (typeof asked !== 'string' || !own.includes(asked) || !Y.styleById(asked)) throw new Problem(`"${id}" cannot be drawn in the style ${say(asked)}. Its styles are: ${own.join(', ')}.`);
+    return asked;
   }
 
   async function renderSound(a, o) {
@@ -623,6 +635,7 @@ export function createLoadout(env = {}) {
         asset.controls = Object.entries(def.params).map(([key, d]) => plain({ key, kind: d.kind, label: d.label, default: d.def, min: d.min, max: d.max, step: d.step, low: d.lo || undefined, high: d.hi || undefined, options: d.options?.map((o) => o.value), swatches: d.swatches, group: d.group, when: d.when, part: S.partOf(def, key)?.name }));
         asset.clips = Object.entries(def.clips).map(([name, c]) => ({ name, label: c.label, frames: c.frames, loop: c.loop }));
         asset.preview = def.preview;
+        asset.styles = (await lib.styles()).stylesOf(def);        // the ways it can be drawn and exported, best first (a catalogue built before styles has no such field)
       } else {
         const patch = await patchOf(a);
         if (!patch) throw noAsset(id);
@@ -743,7 +756,7 @@ export function createLoadout(env = {}) {
       const a = await find(idOf(id, 'loadout.render(id, options)'));
       if (!a) throw noAsset(id);
       const sprite = a.kind === 'sprite';
-      const o = optionsOf(options, `loadout.render("${id}", options)`, sprite ? ['clip', 'frame', 'scale', 'params', 'look'] : ['params', 'style', 'seed', 'look', 'format', 'maxSeconds']);
+      const o = optionsOf(options, `loadout.render("${id}", options)`, sprite ? ['clip', 'frame', 'scale', 'params', 'look', 'style'] : ['params', 'style', 'seed', 'look', 'format', 'maxSeconds']);
       return sprite ? renderSprite(a, o) : renderSound(a, o);
     },
 
@@ -754,8 +767,16 @@ export function createLoadout(env = {}) {
       // the quality bar applies to everything that goes in the bag: a draft with errors is refused (warnings do not block)
       if (a.entry && !a.entry.verdict.ok) throw new Problem(`"${id}" does not pass the quality bar yet, so it cannot go in the bag. Fix it and make it again under the same id. Its errors: ${a.entry.verdict.errors.join(' | ')}`);
       const { bag } = await lib.bag();
+      // a sprite's style (Contract 12) must be one it lists; its first style is the same as none, so it is not stored
+      let kept = settings ?? {};
+      if (a.kind === 'sprite' && kept.style !== undefined && kept.style !== null) {
+        const [Y, def] = await Promise.all([lib.styles(), defOf(a)]);
+        const style = styleOf(Y, def, id, kept.style);
+        kept = { ...kept };
+        if (style === Y.stylesOf(def)[0]) delete kept.style;
+      }
       // an asset made on this visit goes in with its whole definition, so the bag still has it after a reload
-      const key = bag.add({ kind: a.kind, id, settings: settings ?? {}, ...(a.entry ? { definition: definitionOf(a.kind, id) } : {}) });
+      const key = bag.add({ kind: a.kind, id, settings: kept, ...(a.entry ? { definition: definitionOf(a.kind, id) } : {}) });
       return { ok: true, key, count: bag.count(), item: plain(bag.get(key)) };
     },
 

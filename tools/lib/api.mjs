@@ -4,7 +4,9 @@
 //
 //   generated/api.json        every module (name, file, one-line purpose) and every export (name, kind, arguments,
 //                             one-line description), plus the site's high-level actions as MCP tools
-//                             (name, description, inputSchema), copied from ACTIONS in app/api.js
+//                             (name, description, inputSchema), copied from ACTIONS in app/api.js, plus the
+//                             styles a sprite can be drawn and exported in (id, label, about, exports), read
+//                             from the registry in engine/styles.js (Contract 12)
 //   generated/framework.js    one module that re-exports every framework module under its short name; the site
 //                             loads it as window.loadout.framework
 //   generated/api.md          the same description as a page to read: every action, module and export in tables
@@ -259,12 +261,14 @@ function purposeOf(text) {
 // ---- the whole description ------------------------------------------------------------------------------------
 
 /**
- * Describe a project's framework: { version, window, modules: [{ name, file, purpose, exports }], actions }.
+ * Describe a project's framework: { version, window, modules: [{ name, file, purpose, exports }], styles, actions }.
+ * styles: what engine/styles.js has registered, [{ id, label, about, exports: ['sheet', ...] }] ([] in a project without it).
  * Every module is loaded for real, so what is listed is what exists. One that cannot be loaded is left out
  * and listed under `notLoaded` ([{ file, why }]), which is only there when there is one.
  */
 export async function buildApi({ root = ROOT } = {}) {
   const modules = [], notLoaded = [];
+  let styles = [];
   for (const m of findFrameworkModules(root)) {
     const abs = path.join(root, m.file);
     const text = fs.readFileSync(abs, 'utf8');
@@ -273,6 +277,10 @@ export async function buildApi({ root = ROOT } = {}) {
     // and named in `notLoaded`, so the rest is still described. In the real project the unit test allows none.
     try { real = await import(pathToFileURL(abs).href); } catch (e) { notLoaded.push({ file: m.file, why: String(e.message).split('\n')[0].replace(root, '.') }); continue; }
     modules.push({ name: m.name, file: m.file, purpose: purposeOf(text), exports: describeSource(text, real), real });
+    // the style registry describes itself: every style registered once the framework modules are loaded
+    if (m.file === 'engine/styles.js' && typeof real.styleIds === 'function' && typeof real.styleById === 'function') {
+      styles = real.styleIds().map((id) => { const s = real.styleById(id); return { id: s.id, label: s.label, about: s.about, exports: Object.keys(s.exporters) }; });
+    }
   }
   // an export that is another module's export passed on (export { ramp } from '../engine/color.js') is described where it is defined
   const home = new Map();
@@ -286,9 +294,10 @@ export async function buildApi({ root = ROOT } = {}) {
   }
   return {
     version: API_VERSION,
-    about: 'Loadout\'s framework and actions (docs/architecture.md, Contract 11). modules: everything on window.loadout.framework, as loadout.framework.<module>.<export>. actions: the high-level actions on window.loadout, as MCP tools; call one with loadout.<call>(...args) or loadout.call(name, input). Written by the build; see docs/framework-api.md.',
+    about: 'Loadout\'s framework and actions (docs/architecture.md, Contract 11). modules: everything on window.loadout.framework, as loadout.framework.<module>.<export>. styles: the ways a sprite can be drawn and exported (Contract 12); a sprite\'s own list is in its catalogue row. actions: the high-level actions on window.loadout, as MCP tools; call one with loadout.<call>(...args) or loadout.call(name, input). Written by the build; see docs/framework-api.md.',
     window: 'loadout',
     modules,
+    styles,
     ...(notLoaded.length ? { notLoaded } : {}),
     actions: JSON.parse(JSON.stringify(ACTIONS)),
   };
@@ -320,6 +329,11 @@ export function referenceMarkdown(api) {
   out.push('### Actions', '', 'Each is on `window.loadout` and in `generated/api.json` under `actions` with its full input schema.', '');
   out.push('| Tool name | On the page | What it does |', '|---|---|---|');
   for (const a of api.actions) out.push(`| ${code(a.name)} | ${code(`loadout.${a.call}(${a.args.join(', ')})`)} | ${cell(a.description)} |`);
+  if ((api.styles ?? []).length) {
+    out.push('', '### Styles', '', 'The ways a sprite can be drawn and exported (`engine/styles.js`). A sprite lists the ones it supports; `render` and `bag_add` take one as `style`.', '');
+    out.push('| Style | Name on the site | What it looks like | Exports |', '|---|---|---|---|');
+    for (const s of api.styles) out.push(`| ${code(s.id)} | ${cell(s.label)} | ${cell(s.about)} | ${cell(s.exports.join(', '))} |`);
+  }
   out.push('', '### Framework modules', '');
   out.push('| Module | File | What it is |', '|---|---|---|');
   for (const m of api.modules) out.push(`| ${code(`loadout.framework.${m.name}`)} | ${code(m.file)} | ${cell(m.purpose)} |`);
@@ -350,7 +364,7 @@ export async function writeApi({ root = ROOT } = {}) {
   const nExports = api.modules.reduce((n, m) => n + m.exports.length, 0);
   const waiting = undescribed(api).length;
   const left = api.notLoaded ? `, ${api.notLoaded.length} left out (could not be loaded: ${api.notLoaded.map((n) => n.file).join(', ')})` : '';
-  return `${api.modules.length} modules${left}, ${nExports} exports${waiting ? ` (${waiting} functions not described yet)` : ''}, ${api.actions.length} actions -> generated/api.json (${(json.length / 1024).toFixed(1)} KB), generated/framework.js, generated/api.md`;
+  return `${api.modules.length} modules${left}, ${nExports} exports${waiting ? ` (${waiting} functions not described yet)` : ''}, ${api.styles.length} style${api.styles.length === 1 ? '' : 's'}, ${api.actions.length} actions -> generated/api.json (${(json.length / 1024).toFixed(1)} KB), generated/framework.js, generated/api.md`;
 }
 
 // ---- command line -----------------------------------------------------------------------------------------------

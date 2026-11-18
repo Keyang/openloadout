@@ -1,0 +1,405 @@
+{
+ "about": "Taken 2026-11-18 with the renderer as it was BEFORE the style seam (task W6-A). Per sprite: source = SHA-1 of its file that day; frames = SHA-1 over every frame of every clip at the defaults; png, json = the sheet at 1x with the defaults (PNG from tools/png.mjs, JSON as written to disk); png2, json2 = the sheet at 2x with randomParams(sprite, 4242). A sprite whose file has changed since is not compared (its pictures are meant to differ).",
+ "sprites": {
+  "arrow": {
+   "source": "629e0eb4a0cb96709c48ee27daf596b8bbdd7ebb",
+   "frames": "443212ba280b9cabccce68b13fa75075d0aee089",
+   "png": "fa3431edd4c85e69697e57251bf0e4f7db045b2e",
+   "json": "12b89e49d82237277bd56b00728c643926b963f8",
+   "png2": "fd30659b03173a362cc73d9664194294c8046934",
+   "json2": "4938ab865b341b467c61276a61a810b63d203d88"
+  },
+  "bat": {
+   "source": "95bd3384c986a33c350e987c7a603bea64062b3d",
+   "frames": "80fdd607ede84c80460845837094bfdd44062eb0",
+   "png": "2160a63a4827cc986f930491eed50c8d92facba5",
+   "json": "14726d533a4a8f766580b95357f99b4ce63f8c40",
+   "png2": "4a8268c77e8259b82600ffdb0033c660e47bd05c",
+   "json2": "4e79d1dfc1895d09e6c51c421b0b17abb02d65c3"
+  },
+  "bg-castle": {
+   "source": "973e87ed20238a75ad4b036a95691bdf561575d5",
+   "frames": "378d5fda377a9add0af8b4dc42401b38b0b4f970",
+   "png": "a6e02cca98e7172a41f44ea381fe3cca280dae2a",
+   "json": "60c4237a5ac42c938d015b077cc9c9c9b574c23b",
+   "png2": "cdb64153c5cc7e8eb0eb0a1fa5849124efa89817",
+   "json2": "09e08c9c4fd75bc02327ce206544f56606d44de2"
+  },
+  "bg-forest": {
+   "source": "fd47a46bd49fd9c1916984daab1a6fb7377f20ee",
+   "frames": "d007ffdc91cf631b57b6adefc78a368de12757fb",
+   "png": "455f6c24eee520f1abe4b74b76a5a30ecdb42894",
+   "json": "2ea3be2f54a5ad00ab3f07303f62988dc218e271",
+   "png2": "ff91a812a71a10c3e1bb2143a568894e0a9b03df",
+   "json2": "ab0d3a25ba98bb00ec7538cda232eea23ecf87a1"
+  },
+  "boulder-chunk": {
+   "source": "de80edec7271c70f545edc0f09b383284bce711b",
+   "frames": "935fc9bb8fa29c5c3248258dddb21aad6dccd53c",
+   "png": "ecff30bcfa72a1c818b6ad0b12fa7a11529aae61",
+   "json": "3541956540a1d4cf137206a98dd5d255bb9ddd39",
+   "png2": "58ffe7f4aacf9c35c2f9d94e462dbcd0fda6c034",
+   "json2": "1743d92e532c31de0d1791502ffee8cda526bcfb"
+  },
+  "campfire": {
+   "source": "c184c6355d2b8d400e85aee8633b15c4b03f6f73",
+   "frames": "8ea16b9758069f864206f3a8d6685c04ab46f7dc",
+   "png": "305daf89d3c9dac9964d4d4a1c77a38c5afd2333",
+   "json": "841372503b3a6a94b969a3ea827d185a6030fff2",
+   "png2": "aa05a1f58b66ad835e79a69d8c1805fae9958571",
+   "json2": "b4536287ccbe78f5a5a4a088aaf69d16244cbde1"
+  },
+  "checkpoint-banner": {
+   "source": "4611e26fd6983dfc7de19af170c984f41656810b",
+   "frames": "6e364971f1d444ae852d1aceb3ede85c99daed62",
+   "png": "d8256c6be44f85b32e8244cb1dd744646e185c48",
+   "json": "3f40a84685264725ca5a6c544c477bb67adb375a",
+   "png2": "c0e59f8838dd96092f4c7e46233efe6a34f7f8b9",
+   "json2": "5d367b31516a443041f0f2d7b891d452f2763f26"
+  },
+  "coin": {
+   "source": "0effdce6c578579d9c564b1f41bb5912921ecb8f",
+   "frames": "616bb9271c63a864cb81c229af8935b752d9a184",
+   "png": "e78b367a6cc30623de99369221f481b5dfb6c09e",
+   "json": "f09385e3fa512280f45ab04a47a9542ad3354bf1",
+   "png2": "5b6bf772210b2a5ae6f5830e09107ecc1a27d235",
+   "json2": "d1257b8107ca7fa080a688f81fb9a48de5331883"
+  },
+  "cottage": {
+   "source": "89e3999efe03780abf92996e0b747a5c3f8c92ed",
+   "frames": "4b389df5f7265d879a1846f0c42a882ccdc8cf1f",
+   "png": "7ce0bd103d9531d0942a4a5bf3c1b29d9e2baf18",
+   "json": "c96f3dfd9e13caeb6f80f5589bdf1fac4e845678",
+   "png2": "2c8f3d9f4a490a93d4937a9180b04309f5d8147c",
+   "json2": "b495cf673b73d99864bce959e666fc254258c05c"
+  },
+  "crate": {
+   "source": "b08b78cc81e3a341b1ac522ff0d39597eb3197dd",
+   "frames": "2d3801bafa6fec6476608d5daf36b0b3f3e81047",
+   "png": "3625bf88e3e52e223478690939153c279efe98e9",
+   "json": "4e49146059d8b04ea680398acb52952db29fe0b3",
+   "png2": "68eddddc0baab62fbc8b631114934ebd7cf21342",
+   "json2": "6868290a0b668ff3419a0a03bd183bf4224e49a9"
+  },
+  "crow-scout": {
+   "source": "1e9667365b4836d91f1171e320f8b0377368e836",
+   "frames": "a7cafca7b94a2a55b55ebaadf6aa29f6df690d27",
+   "png": "659932e5f2b15249d36239917e5b5079632809f8",
+   "json": "99af8b1a7e907dae9a3e7863ce122195fe59b146",
+   "png2": "bc909b084d1f8b2501371087ca12c15c9d4385f2",
+   "json2": "3190c7e318df48939ef8ee7412cd1b791f187073"
+  },
+  "crumble-block": {
+   "source": "71a8833eb3c116a9efa9cc1fcf2e08ad2b65b939",
+   "frames": "11ffcd5cb725d822554bca643652329aea07ef84",
+   "png": "663d692fa3232f7ddcb12c2f4aff105923384f05",
+   "json": "5f421cf67d657e3f51a4c9c45c8b644a5ecbc9ad",
+   "png2": "60d902394c36f11dc25ec60f59433be8a0c69cf4",
+   "json2": "afd7581ae8b2b3df4204f10a198651b0b285e447"
+  },
+  "dust-puff": {
+   "source": "68e40571df4a1d52a48bd41b653b95983a3f55cc",
+   "frames": "e34bd27f53b7acfa9a624de78ded478e25fad667",
+   "png": "513c1866872584c27c3c7f90d69b6845bd086fe1",
+   "json": "fcc056692542fa140c4567a24ec3a7dbf5c459a1",
+   "png2": "c4d4cc436c7edd720c9881f2a3cd8e52072de22f",
+   "json2": "c667680ac85f88d887109725d6c46d38a81c9e77"
+  },
+  "farm-kid": {
+   "source": "8856f9124619610d4f70377c5062025cb5c45703",
+   "frames": "5d849eb4d43fa2359a31154196e54832134c3075",
+   "png": "d1b09ed24e431a951209c1c55cc739156d2b6483",
+   "json": "8bd8cd89a9e96eea179848defcc68f42ca807f7e",
+   "png2": "abf47d7454f0ec69a2ded69e08bf63e3b7134e84",
+   "json2": "1bcbe3c8d47c2b5939020d10e571555e36abe9d3"
+  },
+  "fireball": {
+   "source": "1411713a54623f50ed77a5aa6ad8dea2cd7a6993",
+   "frames": "daa9b71a08c5efc3965eeb5042edd63cb0d28783",
+   "png": "ad640f60034063b8c0b7d5ece564db596492f965",
+   "json": "7c3f0ff97a6a20988202ce4c7151122ad1814eea",
+   "png2": "ff48fa21cde71d6d7f0a3ee784783ed8754ab333",
+   "json2": "7679bd6117809bd3a855327d251b908c23cedf75"
+  },
+  "gem": {
+   "source": "d34039c07385b6493aaebc0f336ac25ff4fd598d",
+   "frames": "530dd0a750155ab1395e1a80cba31c093a463b04",
+   "png": "7d03ac444933488326ed1bd3f171626054a83341",
+   "json": "84a09b869053c61cf138f5d22ea4ed629670e07e",
+   "png2": "bf443f5d46b96023e0c12fa04cb2ded769f3e33d",
+   "json2": "96265a4b721e3a8c216f4f6d9bc7bec0057ae194"
+  },
+  "gold-key": {
+   "source": "99517bed0f3165da2253220ffa73816772c79c95",
+   "frames": "2656ef61fb22a41fa6db2310692b8062f81fd492",
+   "png": "6ee05ba193a651a366241d6c535594ef68cc7ee1",
+   "json": "b04fcdabfe45c1de4c36fd1461624d0d830e9e13",
+   "png2": "5c3ab6f2e9cdd441460450570918e10b799a2ee4",
+   "json2": "77bb94da694e31ae996c368083555c0f7eaab852"
+  },
+  "heart": {
+   "source": "bb17b8836668fa77b849e661e0d01ae83f3e0a0e",
+   "frames": "d46fa3dc0274c1a03c87b6b02fe737580c06e03b",
+   "png": "e07733fa7693b0a6459955f28737e854014eecbf",
+   "json": "835e2cfffdd26e3471c38dde110502a7b9dbb1f9",
+   "png2": "1d2446992821dc2957a49f294235679affd27bb6",
+   "json2": "5ba69a9824a27392fa5061d6118d546ceb8926fb"
+  },
+  "hero-walker": {
+   "source": "65171297c34c5a22b570456563ecfddd69666478",
+   "frames": "34a6b5d145da6fa8c4fa2f521610cba2490f8687",
+   "png": "d025cbfc98fe1d81ace389f01e258df7581edbc7",
+   "json": "249a3bba555ba43f705e329f9986bd4010efa7b5",
+   "png2": "deecb7c943b4921913a08d4d6a5d600a8e399929",
+   "json2": "133d45391bd399d8950aa201f58d36b7d373480c"
+  },
+  "hit-spark": {
+   "source": "2a76ac07161fee9cfaeb56e4ceb4d4ec88c7066b",
+   "frames": "696bc4ddc6fc068ffcf2864c46c61262357cd368",
+   "png": "472fee9ddd0286358cff73bcca69804ceb8a9872",
+   "json": "7e04dfee393602c6120952970e52e57cc92881e9",
+   "png2": "3600aae66da3f7e12415dfec1fa9aab148233304",
+   "json2": "4a6e31043c81589c2a506d5f574370b192ef5937"
+  },
+  "icons-consumables": {
+   "source": "66cb262d85508fe03260af228ec71bb6ef6fd91c",
+   "frames": "3625880b149eb2f86f990dcfb74e00a76450e226",
+   "png": "ecc10c9ce1acd86f3061604f201898f5c2cfffa7",
+   "json": "3a3283ef6d792d5d292c40468fefc05edaaf0401",
+   "png2": "a0ae1d00fee7447b5088b6f79a015bc0d131b4d7",
+   "json2": "4132a3b7a89ef27239764bbf9e8bce8573cf43bd"
+  },
+  "icons-key-items": {
+   "source": "40fda47fa5abf5e079af6d748c891703672c2654",
+   "frames": "94e79b4ce1a2dd2a54f2e1feba3d15c215b6bd48",
+   "png": "88d0ea45b48a7537f92a0fe27cd2da47b7cb89d1",
+   "json": "2f8cb4463faa0bb113f46e2490a53cec91d3849c",
+   "png2": "e484289ffd187a0b15b319cf9ca80bb07c9be040",
+   "json2": "54f5e43f8dd0282ec1611d73a85c98869376701b"
+  },
+  "inn": {
+   "source": "5599756998911158513f4420058b25cd4b560a8f",
+   "frames": "45bc442dad7a4abad9c029659918aef2e4fd0aa1",
+   "png": "ed38e7d6eb3143198ee13c97d800f206f6ee6152",
+   "json": "1030fc5adf3870f1c3bc197c10341e59a56140d9",
+   "png2": "7879df5ac55635ec5092c1609bbfc5f88dd21ddb",
+   "json2": "cf4471f52404f15e4764f85d45fd607504861c2d"
+  },
+  "knight": {
+   "source": "dd9c266af15167c3bb6164817c1b92a99cc08bd0",
+   "frames": "e7a84bc4740fbeb8474c7fbf2e0b87bdfa7fe679",
+   "png": "a3054b7f109e79c2fcad1cc26158686353270c82",
+   "json": "8d9ecce2676b6a335096c9dc4a0aae528bd066aa",
+   "png2": "1b6f11972e56ab8b91006594eed60de007395684",
+   "json2": "f05a1cca98de9572d9d211432a091d26c5832a49"
+  },
+  "lever": {
+   "source": "e005db9004ab6c6b2696c568d052b72072a68aeb",
+   "frames": "cf39e16492d597e3382ad8612a3032f7d8941879",
+   "png": "60c9464f47629e3baf2d06f231182a6620c3b895",
+   "json": "7751072878716fb2331f9acb7a8c4084064aff5f",
+   "png2": "b7aa37c2fe20976b3b8523aa5fc60c35c42ea12e",
+   "json2": "3c4a74472dfd3282f179ea46487c437fa3f21e0f"
+  },
+  "mage-walker": {
+   "source": "22f20e15385488a49ace0a96c21e36002bac6ef4",
+   "frames": "8aeec5a022ca078a90c608cf7048f73f28586941",
+   "png": "5694b58e3c0f017d8d0734c10a775cf68f7eb764",
+   "json": "e038d41a09aa8d042a4a1e2e75497f9bb586efc9",
+   "png2": "48f8784c409b2e6f66bfc6278dd030854a86b851",
+   "json2": "8a2fbad7c234e3b1a62a896b41ceb746d3899859"
+  },
+  "moss-golem": {
+   "source": "10bbfdb3e24e7a961b8a172c4f6d0851f85c3a82",
+   "frames": "0d642a453dc55773cd1a24a994416a229553a728",
+   "png": "315cedd868d243653bdfa62ba60b41a677ba59be",
+   "json": "6ebef2e955282a29dc2f024827a2026f70e60f67",
+   "png2": "5d04289b8ec29d21d903562fd8433f2942d84a6f",
+   "json2": "165f444e5fb19bf3a31b1ba3f01ebd798e001247"
+  },
+  "moving-platform": {
+   "source": "f8868b0bd796e7fc80114791b85ea570482b0746",
+   "frames": "163a59bd4804fe3ec48f518780093460813dbcc6",
+   "png": "97009b222bedc5fece1c13eaceb9b65686849af0",
+   "json": "0e0677a323d5cfc4846eec3b4ad740d9e4e85dc0",
+   "png2": "564a016ae6cdda4eaa16dd1594f799401b7c6c55",
+   "json2": "c77237d1e730fe36de4bf9123139a4913bfe4851"
+  },
+  "potion": {
+   "source": "1b7c739eebb243eee79eb80539c96aee74446b02",
+   "frames": "24837ea27c877d8569cc894413bfaf965de98e63",
+   "png": "16d5a021f77d8ff59e5d2a7a183e555fb21f4826",
+   "json": "ce82459ec1eb50d44f9c4fb2c23e9d5d2cba2ef5",
+   "png2": "690cbfbc3256f7c7302de00fdc22d7a8338228a5",
+   "json2": "7a211d3a8448d75f87490d2ca9cf61aa64397266"
+  },
+  "rogue-walker": {
+   "source": "e4d63cdc88ed5c4f2ae20909053718f41b6816d6",
+   "frames": "6773a491e808037620be52dc88173b979195b8d5",
+   "png": "8467cd6a3bcf95ddcb0a47bfc91e6614a1c6db0d",
+   "json": "72f69e134c2b1b21644f25fc67d97809ea0dc97a",
+   "png2": "c21921335a3ad2fb501960cbfeb11df65dd8fb1d",
+   "json2": "f8ca3496a333ff9bf700858a2490363e88bd8c44"
+  },
+  "saw-blade": {
+   "source": "4fbd289c3eb988b3b21f095a89216dd36820f21c",
+   "frames": "5835c7e43b0e68dfac54d304d83c3dae84c3f4ce",
+   "png": "02b4d0d7fb140e112aac1ecdeea39cc875780238",
+   "json": "428916249f1f12b0b5e67686704b45d686539dfe",
+   "png2": "9953d4ddd5c719609547d65f583a0f7ffe0982ce",
+   "json2": "dd515adcf1ef57f26cd8e003b8c5a6dae4ff00ca"
+  },
+  "signpost": {
+   "source": "f6dc001dcbbfaafa1a5161cb11cd0c5e492d7602",
+   "frames": "8bcb95b771b393b34a8d2375d99130373c14b06a",
+   "png": "076dde47a3e1d348ac5f3875e6af20e84a7b168d",
+   "json": "2dfba6e0cbe9646df3ffb9de8d5ff97412878a88",
+   "png2": "1641c4d773894e552a994bed4e2a95ce6450b6ef",
+   "json2": "e31ffb77b5c8f76bf91bb8ec86b3b0c934b70f48"
+  },
+  "slime": {
+   "source": "377eefcf643103e26d4bba16466d4f9cb28b6339",
+   "frames": "18f96ea613514925d05815d0e289af4ba652993c",
+   "png": "921b845c21be5ab7794f7908c9defccaaf888bf3",
+   "json": "26dab5cf4c61e346b2c592f55a5f2217a3397f93",
+   "png2": "266c6a72589eb5934c5efb07916feee17ca5282e",
+   "json2": "15ea552a2b8bfa59813e8794acd635f8ab229e17"
+  },
+  "spear-goblin": {
+   "source": "9a96b9cef62d3212237e29baca90d062548085ab",
+   "frames": "9a0ed5d2c5385a0692d1b906bd099175a7607a33",
+   "png": "bec8715bc12ffc9b4938c2c55f31b03aed761a3c",
+   "json": "28bc901782badb77b933a7cc1f70a86069588351",
+   "png2": "b213884307a1d1f7201a9cfe5efbb45e01e03748",
+   "json2": "803d082b7abd20419f5fb94ffc456a062fce14f3"
+  },
+  "spike-trap": {
+   "source": "c839987cee5cb2ca5b714198e4a8fe84146e2ea5",
+   "frames": "c25d32eb8dcfb4ed27d7eccca20fc56954ad16b4",
+   "png": "e615f7bd610c06a403957b4ce3725ebcce88c262",
+   "json": "9c2f337789ba27cb7deb7c5cbde4abd60ca27d18",
+   "png2": "e23d84c468c4bf45a0e03e762164607a175ac851",
+   "json2": "4fc596e20ee31622837d1541a8525d9c310da2a6"
+  },
+  "spore-hopper": {
+   "source": "37cdb2e2896a3ec6daf04066b622e93dbf79c22b",
+   "frames": "205c676ce89ec895b1c584ee82db72b23dc485dc",
+   "png": "cbb64b352ac813f85b769a2aa04be278c0886a22",
+   "json": "2d2f7bc80fc97807b668b55bcd87aaf261292e83",
+   "png2": "1017f786657b8c04623e434c926086533041ac31",
+   "json2": "f79eb381f15f3a322b3916b7149a7e6a3d7e5664"
+  },
+  "spring-pad": {
+   "source": "350263bcdf330630c2a2013d3aeb06d14a86352e",
+   "frames": "4807584ff4e5eec75f490fd153cc8defcaebe2d7",
+   "png": "9033adba66a4ccde2a08ff44f3e3051bda37ff53",
+   "json": "08c17aa2989f32daa9dbbe097aced29a13758e0c",
+   "png2": "dea37140532b5c6f845d7589386c4dc5610306fc",
+   "json2": "bf43d6b1fb8e277f02e2e36b64495c01311987d1"
+  },
+  "star-charm": {
+   "source": "7c9fc6857fb40126af9dd4511a8e6fb38e3ee082",
+   "frames": "a0bd90154f2790b29b7bb12bdcb75b1a8c5d21df",
+   "png": "259d13b80197565ae9b86f4aa69fa8529457e449",
+   "json": "d58bc6f05a58fd6bba8c3b80367bdf6f2ed25308",
+   "png2": "703a4e2fd20c6fd354534033d4cb1638107bb601",
+   "json2": "811f1e75dc69b8b755b772fd4786b8c967d0f66f"
+  },
+  "thorn-beetle": {
+   "source": "88630761203ea76217c62f44e4069200b982a0d9",
+   "frames": "f1c25e00a8dc6b9c48ee54ad3e6a26d824f71aff",
+   "png": "4dd1324e72b1cffe7203a4fdef3b76c8632748ed",
+   "json": "6af95186964288d7d88e75adcbc2bfe333cb35b9",
+   "png2": "5bd836d5cc0f048b8941b81728a1ad0ee1bdcfcb",
+   "json2": "0c4f60b03cde68e5dd7c320cd7d65d1d50620a1f"
+  },
+  "tiles-forest": {
+   "source": "d8421f4201661464b034dbac7fc539d3841e5453",
+   "frames": "f91275428d2edd449ce30bcd91519c3ffb05505e",
+   "png": "a3810aec8378d4414c53c84facf8ec99f22302a3",
+   "json": "38b901a8f9a0c425ab5cc892fb5a433b24a9ab27",
+   "png2": "25be85677e6c55fe5e061cd44276b594c7291475",
+   "json2": "39af8f1ba49821941d5a4f8d04f5565d4e7f1890"
+  },
+  "tiles-platforms": {
+   "source": "27f14e0d3fb6c550cd79bd1455fbfefc0bfeecea",
+   "frames": "87112757e68ec0ea12e2c9f6665f0d80f2a54a52",
+   "png": "8b58d60dd2f78c17e7c286714e2ab3a01e70e4da",
+   "json": "a0cb023f8a6268234f963fc73fe9fed7f7426617",
+   "png2": "0465ad55699b8f8eacd64c95f700dd124f79eed8",
+   "json2": "3f880559977ca77db442372de8eabc6973030ba4"
+  },
+  "town-guard": {
+   "source": "7e396547aa7a29ab68542215f319e0d70b801ce1",
+   "frames": "4cc05deb9b41724f75a2aa16bab414a6f079dd35",
+   "png": "d860da6d4193413205d217250318a460aaa89a9e",
+   "json": "b07d6a7001ab24915eb11260965a7a55e0cafb25",
+   "png2": "3023314733ac112a68d45c0b790d8a4c85d19be6",
+   "json2": "6ae7bb587e2eaf8d9d6cad79a9ba32ea45f78b46"
+  },
+  "treasure-chest": {
+   "source": "5cb60da99c5488cfc282228ead228f0e792898a2",
+   "frames": "8ad10bcc411d40eb34e5c5c14f10240c7da403a6",
+   "png": "dca0f1add0a3817eebac2c59774cf0bff144e35d",
+   "json": "e459aa55d1c24a98a307c2fa888f79a97d3830c0",
+   "png2": "751edc1e3c3342dd487fd11a43ea8d4920c2bb76",
+   "json2": "06471a8769cd269d9c55417d45900a4df94829d7"
+  },
+  "ui-bars-rpg": {
+   "source": "b92634fc52f828382981baa3e6bea5e9373d46d2",
+   "frames": "7c51eff4f8abad12ae4da66a3d68e0991b95fb6c",
+   "png": "51a0b990be9c1be4d4874fd9fe1fec9cb99efbf4",
+   "json": "43b0fd40c63b57028a202bd8077ff439ea614ff4",
+   "png2": "81f4a0198dfd317051cb7c9e86cab2ebb5d11763",
+   "json2": "7f21c22d2d5a73a90497d63a61bf6e4a758fe2c6"
+  },
+  "ui-battle-menu": {
+   "source": "ad4caba40334a4bbf1958a0ea7a189cb00c24a62",
+   "frames": "57bbb7366771a921e5a9232ceeab442f2d3982c1",
+   "png": "f33235a353ed5041f246512abcd208e46d1d4340",
+   "json": "a55fef073b7f08914af9e7ab3570db2cc6a4192a",
+   "png2": "ab82f3a49d1c6205f7653b6fd5431d409875dc26",
+   "json2": "bc3ed8ee745997891b9bb6a0b659c1418ccbc815"
+  },
+  "ui-damage-digits": {
+   "source": "51eee2f520bb00263d0dbc48baaeac54f6e3139f",
+   "frames": "f6ac5706891a2381350ca0098e4f70bfc3a9409d",
+   "png": "7a59df8dcee03a3a841c14b3d417c617425d70af",
+   "json": "50ae98056390f7d13dddc1408bf8adccbae33ff8",
+   "png2": "19bedd44fd6f18fc40336569a1e4d7d090781a14",
+   "json2": "654a64b46334780584a2f15a3c634ae4fa62fedc"
+  },
+  "ui-dialogue": {
+   "source": "adb1c8b79fdd3c9fdbc1956f18c115f21d78a921",
+   "frames": "3aa747fdbd156bea4bcb958fbc4aa4c746bfd3ce",
+   "png": "718e832ee53b8b66279aa5b60c771e93e3072c06",
+   "json": "c4929b26a713583850353a1c748e51d01053640e",
+   "png2": "4d999814cbd77ded3b46985351353707474bce6d",
+   "json2": "5afe46f4317e958f2a0e81d0a5f144218f525903"
+  },
+  "void-ranger": {
+   "source": "7d9ebc43c9af8fc8fc2b00eccba80e837559aae7",
+   "frames": "e486e856dd5da4f3a88a1a0e6ac3eec9ecadf5ae",
+   "png": "9d06971fb3eb2a3dce21cf193f86cc5a179be78d",
+   "json": "f6c2675b3788d9526a5dcf3fb605dd0dda34002c",
+   "png2": "25f6716abd221a3b90813d02c0f35d058ef53126",
+   "json2": "fb2727c67420a52f56ad2da9355e66b1b2d547fd"
+  },
+  "wizard": {
+   "source": "9ba1fa25f425db4a01a3802577205eb6cd1bcf26",
+   "frames": "bfeb1403108def4d870cab524f7a1091d5c912cd",
+   "png": "2cf6e7c8cc4b3ac74386441c5d3f69079399d0fb",
+   "json": "0fd32c2dce0afa2efe49c51012e7148c1a2068b3",
+   "png2": "5ca220fb7012c7756e70836f691d822e901f79e2",
+   "json2": "25a8ed66445ab65d4d99562cd0523ccff8e36ec0"
+  },
+  "wolf": {
+   "source": "87e205ac33b95aca3fdd882706feb85da4a34324",
+   "frames": "b4c1ad0da4b3da51fbe753fe0e46ba8472a11312",
+   "png": "25f5401eef830a8ed393ba4166bcaddebabf07df",
+   "json": "090b2999633c883cba6a1a6f3286a64ce6f1dbb6",
+   "png2": "3db586f3f0667e5752161ede658ed83ce044e8aa",
+   "json2": "5df8f70e3770eb66ca4b0d507aa2ea955560de47"
+  }
+ }
+}

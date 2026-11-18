@@ -96,7 +96,7 @@ await loadout.assets.remove('my-star');                             // forget an
 await loadout.make.sprite(sourceText);     // { id, kind, ok, errors, warnings, kept, replaced }
 await loadout.make.sound(patchObject);     // { id, kind, ok, errors, warnings, notes, kept, replaced }
 await loadout.check('knight');             // { id, kind, ok, errors, warnings, metrics }; also takes source text or a patch
-await loadout.render('coin', { clip: 'spin', scale: 4 });           // { ok, png, width, height, frames, opaque, ... }
+await loadout.render('coin', { clip: 'spin', scale: 4 });           // { ok, png, style, width, height, frames, opaque, ... }; { style } picks one of the sprite's styles
 await loadout.render('coin-pickup', { style: 'Gem' });              // { ok, wav, seconds, sampleRate, peak, ... }
 
 await loadout.bag.add('knight', { params: { height: 0.8 } });       // { ok, key, count, item }
@@ -144,6 +144,67 @@ const result = await window.loadout.call(name, input);
 `loadout.call` refuses an unknown tool or an unknown input property with `{ ok: false, errors }`, like every other action. The result is plain data and can be returned as the tool result as it is. Pictures and sounds come back as `data:` addresses (`png`, `wav`, `zip`).
 
 The framework functions are not tools. An agent uses them by writing sprite source text for `make_sprite` that imports them, or by evaluating code in the page against `await loadout.framework`. `(await loadout.api).modules` is what to show the agent so it knows what exists.
+
+## Styles
+
+A style is one way to draw and export a sprite (Contract 12 of `docs/architecture.md`). The site has one, `pixel`, and every sprite has it. The registry is `engine/styles.js`; every renderer and exporter goes through it. No real sprite has a second style yet: what follows was proven with two test styles in `tests/fixtures/styles/styles.js`, which are the worked examples to copy from.
+
+### What a style is made of
+
+```js
+import { defineStyle, pngSheet } from '../engine/styles.js';
+
+defineStyle({
+  id: 'flat',                                  // what a sprite writes in `styles`, and what links and files carry
+  label: 'Flat shapes',                        // the name on the site
+  about: 'Clean shapes in solid colours.',     // one plain sentence, shown under the choice
+  makeSurface: (width, height, options) => new Surface(width, height),      // 1. the surface
+  finish: (surface, context) => { ... },       // 2. the finish (optional)
+  exporters: { sheet: pngSheet },              // 3. the exporter
+  // only when the surface is not a pixel grid:
+  toPixels: (surface) => aPixelSurface,        // what the site previews and the quality bar looks at
+  recolour: (surface, apply) => { ... },       // how a whole-bundle look reaches it
+});
+```
+
+| Part | What to write | The two test styles |
+|---|---|---|
+| **Surface** | `makeSurface(width, height, options)` returns a new surface for one frame. `options` is the frame being drawn: `{ clip, t, frame, frames, loop, p, style }`. Use `new Surface(width, height)` for a style that keeps the pixel grid. Any other surface answers the same calls as `engine/surface.js`'s `Surface` (the table in Contract 12 lists them and which can carry over); a call it cannot carry should do nothing and return the surface, and reading pixels (`data`, `get`, `bounds`, `bytes`) should throw with a plain message | `silhouette`: the pixel surface. `outline-svg`: `ShapeRecorder`, which keeps `ellipse`, `capsule`, `limb`, `poly`, `arc`, `rect` and `outline` as a list and drops the rest |
+| **Finish** | `finish(surface, context)` runs after the sprite has drawn a frame. Change the surface in place, or return another. `context` is `options` plus `sprite`. Leave it out when the sprite's own drawing is the finished frame, as in `pixel` | `silhouette`: `surface.tint(INK)`, every drawn pixel one colour. `outline-svg`: none |
+| **Exporter** | `exporters.sheet(sprite, params, options)` returns, or resolves to, `{ files: [{ name, bytes, type }], data }`. `files` are the pictures; `data` is the JSON that ships with them and must keep `animations` (the export times sounds from it). `options`: `{ style, scale, clips, recolour, encodePng }`. Call `renderSheet(sprite, params, { scale, clips, style })` for the frames and their JSON; when the style is not a pixel grid it returns `surfaces` (each frame as the style drew it) and no sheet picture. A style on the pixel grid uses `pngSheet` as it is | `silhouette`: `pngSheet`. `outline-svg`: one `frames/<clip>_<n>.svg` per frame, and each frame of the JSON gets `file` |
+| **Pixel picture** and **look** | `toPixels(surface)` and `recolour(surface, apply)`, where `apply` recolours a `Uint32Array` of packed colours in place. Both are required in practice for a surface that is not a pixel grid: without the first the site cannot preview the sprite and the quality bar cannot look at it; without the second a bag's look does not reach it | `outline-svg`: `replay` draws the recorded shapes on a `Surface`; `recolour` maps each shape's colour |
+
+A style registers itself when its file is loaded. Put a real style in its own module in `engine/` and import that module at the end of `engine/styles.js`, so it is known everywhere the engine is (the build then lists it in `generated/api.json` under `styles`, and it is in the quality bar's cache key). The test styles are deliberately not imported there: a sprite that lists one imports the style's file itself.
+
+### How a sprite opts in
+
+```js
+export default defineSprite({
+  id: 'blob', ...
+  styles: ['pixel', 'flat'],                   // best first; left out means ['pixel']
+  render(g, { clip, t, p, style }) {
+    g.ellipse(CX, cy, r, ry, BODY);            // the body: shape calls, shared by every style
+    // the detail layer: the pixel version is the usual case, and other styles branch off it
+    if (style === 'flat') g.ellipse(CX - 2.5, ey, 1, 1.4, INK);       // a drawn eye
+    else g.dot(CX - 3, ey, INK);                                       // a one-pixel eye
+    g.outline(INK);
+  },
+});
+```
+
+- List a style only if the sprite reads well in it. A sprite drawn mostly with single pixels (`dot`, `line`) does not list a style whose surface drops them; the site then never offers that style for it.
+- Branch on `ctx.style` for the detail layer only (eyes, highlights, trim), and keep the pixel branch as the `else`, so the pixel drawing is never at risk.
+- With more than one style, no control may have the key `style` (the page link and the bag use it for the chosen style). `defineSprite` refuses the sprite.
+- Asking for a style a sprite does not list is an error everywhere (`renderFrame`, `renderSheet`, `exportSheet`, `loadout.render`, `loadout.bag.add`); nothing falls back to another style.
+
+### What it costs
+
+- **The quality bar runs once per listed style**, on that style's pixel picture, and the sprite must pass in each. Its messages name the style: `style "flat": hop frame 2 / all-high: drawing touches the frame edge`. The checking time is multiplied by the number of styles.
+- **Every control must change the picture in every listed style.** A colour control does nothing in a one-colour finish, and that is an error for that style. There is no way yet to declare a control for some styles only, so such a sprite cannot list such a style.
+- **Read-backs lock a sprite to the pixel grid.** A sprite, or a rig it uses, that reads pixels back (`g.get`, `g.bounds`, `g.data`) or pastes its own pixel layer (`new Surface`, `blit`, `tilt`, `lean`) cannot be drawn on a surface that keeps shapes. The bar warns when the sprite's own code reads back from the surface it is handed ("draws outside the surface's calls", with the file and line); it does not see reads from a layer the sprite made itself. `rigs/humanoid.js` reads pixels back too, so today no sprite on that rig can take such a style.
+- **The exports differ.** A pixel sheet's JSON has no `style` (a file without it is pixel, so nothing made before styles changed); any other style's JSON, and its entry in a package's `manifest.json`, says `style`.
+
+On the page: `loadout.render(id, { style })` draws in a style, `loadout.bag.add(id, { style })` stores it, `(await loadout.api).styles` lists what is registered, and `(await loadout.assets.get(id)).asset.styles` is what one sprite offers.
 
 ## Reference
 
