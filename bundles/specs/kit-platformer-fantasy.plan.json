@@ -1,0 +1,2559 @@
+{
+  "id": "kit-platformer-fantasy",
+  "name": "Thornwood Keep platformer kit",
+  "gameType": "platformer",
+  "theme": "fantasy",
+  "view": "side",
+  "palette": {
+    "name": "Thornwood",
+    "colours": {
+      "ink": "#231b33",
+      "grass": "#6aa83e",
+      "leaf": "#3f8a4f",
+      "moss": "#a4c44a",
+      "soil": "#7a4f33",
+      "wood": "#a06a3c",
+      "stone": "#8f97a8",
+      "slate": "#5d6475",
+      "water": "#3f9fd1",
+      "sky": "#8fd0f0",
+      "haze": "#7fb0b8",
+      "cream": "#f0ead8",
+      "hero": "#3f6fd1",
+      "crimson": "#c9423a",
+      "gold": "#f2c230",
+      "steel": "#c2c9d6",
+      "thorn": "#7a4fc4",
+      "goblin": "#9bd18a",
+      "ember": "#e08a2c",
+      "magic": "#4fd8ee",
+      "skin": "#f6d3b0"
+    }
+  },
+  "sprites": [
+    {
+      "id": "knight",
+      "name": "Hero",
+      "type": "character",
+      "role": "characters/player",
+      "view": "side",
+      "frame": [
+        64,
+        64
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8
+        },
+        {
+          "name": "walk",
+          "frames": 8
+        },
+        {
+          "name": "run",
+          "frames": 8
+        },
+        {
+          "name": "jump",
+          "frames": 8
+        },
+        {
+          "name": "attack",
+          "frames": 8
+        },
+        {
+          "name": "hurt",
+          "frames": 4
+        }
+      ],
+      "parts": [
+        "hair",
+        "headgear",
+        "weapon",
+        "cape"
+      ],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "wizard",
+      "name": "Wizard",
+      "type": "character",
+      "role": "characters/player",
+      "view": "side",
+      "frame": [
+        64,
+        64
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8
+        },
+        {
+          "name": "walk",
+          "frames": 8
+        },
+        {
+          "name": "run",
+          "frames": 8
+        },
+        {
+          "name": "jump",
+          "frames": 8
+        },
+        {
+          "name": "cast",
+          "frames": 8
+        },
+        {
+          "name": "hurt",
+          "frames": 4
+        }
+      ],
+      "parts": [],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "slime",
+      "name": "Slime",
+      "type": "creature",
+      "role": "characters/enemy",
+      "view": "side",
+      "frame": [
+        48,
+        48
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8
+        },
+        {
+          "name": "hop",
+          "frames": 8
+        },
+        {
+          "name": "attack",
+          "frames": 8
+        },
+        {
+          "name": "hurt",
+          "frames": 4
+        }
+      ],
+      "parts": [],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "bat",
+      "name": "Bat",
+      "type": "creature",
+      "role": "characters/enemy",
+      "view": "side",
+      "frame": [
+        48,
+        48
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8
+        },
+        {
+          "name": "fly",
+          "frames": 8
+        },
+        {
+          "name": "attack",
+          "frames": 8
+        },
+        {
+          "name": "hurt",
+          "frames": 4
+        }
+      ],
+      "parts": [],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "wolf",
+      "name": "Wolf",
+      "type": "creature",
+      "role": "characters/enemy",
+      "view": "side",
+      "frame": [
+        64,
+        48
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8
+        },
+        {
+          "name": "walk",
+          "frames": 8
+        },
+        {
+          "name": "run",
+          "frames": 8
+        },
+        {
+          "name": "attack",
+          "frames": 8
+        },
+        {
+          "name": "hurt",
+          "frames": 4
+        }
+      ],
+      "parts": [],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "coin",
+      "name": "Coin",
+      "type": "pickup",
+      "role": "items/pickup",
+      "view": "front",
+      "frame": [
+        32,
+        32
+      ],
+      "clips": [
+        {
+          "name": "spin",
+          "frames": 8
+        },
+        {
+          "name": "collect",
+          "frames": 8
+        }
+      ],
+      "parts": [],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "campfire",
+      "name": "Campfire",
+      "type": "prop",
+      "role": "world/prop",
+      "view": "side",
+      "frame": [
+        48,
+        48
+      ],
+      "clips": [
+        {
+          "name": "burn",
+          "frames": 8
+        },
+        {
+          "name": "ignite",
+          "frames": 8
+        }
+      ],
+      "parts": [],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "tiles-forest",
+      "name": "Forest ground tiles",
+      "type": "tileset",
+      "role": "world/tile",
+      "view": "side",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        16
+      ],
+      "clips": [
+        {
+          "name": "grass-fill",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "grass-top",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "grass-left",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "grass-right",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "grass-side-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "grass-side-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "grass-bottom",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "grass-bottom-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "grass-bottom-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "grass-inner-tl",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "grass-inner-tr",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "grass-inner-bl",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "grass-inner-br",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "grass-thin-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "grass-thin-m",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "grass-thin-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "grass-slope-up",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "grass-slope-down",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "grass-deco-a",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "grass-deco-b",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "grass-deco-c",
+          "frames": 1,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "P03"
+    },
+    {
+      "id": "tiles-platforms",
+      "name": "Wooden platforms and ladders",
+      "type": "tileset",
+      "role": "world/platform",
+      "view": "side",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        16
+      ],
+      "clips": [
+        {
+          "name": "plank-thin-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "plank-thin-m",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "plank-thin-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "ladder-cap",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "ladder-mid",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "ladder-foot",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "vine-cap",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "vine-mid",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "vine-foot",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "post-cap",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "post-mid",
+          "frames": 1,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "P03"
+    },
+    {
+      "id": "tiles-castle",
+      "name": "Castle stone tiles",
+      "type": "tileset",
+      "role": "world/tile",
+      "view": "side",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        16
+      ],
+      "clips": [
+        {
+          "name": "stone-fill",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "stone-top",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "stone-left",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "stone-right",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "stone-side-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "stone-side-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "stone-bottom",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "stone-bottom-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "stone-bottom-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "stone-inner-tl",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "stone-inner-tr",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "stone-inner-bl",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "stone-inner-br",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "stone-thin-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "stone-thin-m",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "stone-thin-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "brick-fill",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "pillar-cap",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "pillar-mid",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "pillar-foot",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "window",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "battlement",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "arch-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "arch-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "stone-deco-a",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "stone-deco-b",
+          "frames": 1,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "P04"
+    },
+    {
+      "id": "tiles-cave",
+      "name": "Cave rock tiles",
+      "type": "tileset",
+      "role": "world/tile",
+      "view": "side",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        16
+      ],
+      "clips": [
+        {
+          "name": "rock-fill",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "rock-top",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "rock-left",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "rock-right",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "rock-side-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "rock-side-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "rock-bottom",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "rock-bottom-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "rock-bottom-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "rock-inner-tl",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "rock-inner-tr",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "rock-inner-bl",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "rock-inner-br",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "rock-thin-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "rock-thin-m",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "rock-thin-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "dark-fill",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "rock-deco-a",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "rock-deco-b",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "rock-deco-c",
+          "frames": 1,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "P05"
+    },
+    {
+      "id": "tiles-water",
+      "name": "Water and waterfalls",
+      "type": "tileset",
+      "role": "world/tile",
+      "view": "side",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        16
+      ],
+      "clips": [
+        {
+          "name": "water-top",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "water-fill",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "fall-top",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "fall-fill",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "fall-foot",
+          "frames": 8,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "P05"
+    },
+    {
+      "id": "spear-goblin",
+      "name": "Spear goblin",
+      "type": "character",
+      "role": "characters/enemy",
+      "view": "side",
+      "frame": [
+        64,
+        64
+      ],
+      "pivot": [
+        28,
+        58
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "walk",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "run",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "attack",
+          "frames": 8,
+          "loop": false
+        },
+        {
+          "name": "hurt",
+          "frames": 4,
+          "loop": false
+        },
+        {
+          "name": "die",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [
+        "weapon",
+        "headgear"
+      ],
+      "reuse": false,
+      "batch": "P06"
+    },
+    {
+      "id": "thorn-beetle",
+      "name": "Thorn beetle",
+      "type": "creature",
+      "role": "characters/enemy",
+      "view": "side",
+      "frame": [
+        48,
+        48
+      ],
+      "pivot": [
+        24,
+        42
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "walk",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "attack",
+          "frames": 8,
+          "loop": false
+        },
+        {
+          "name": "block",
+          "frames": 6,
+          "loop": false
+        },
+        {
+          "name": "hurt",
+          "frames": 4,
+          "loop": false
+        },
+        {
+          "name": "die",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [
+        "horns"
+      ],
+      "reuse": false,
+      "batch": "P06"
+    },
+    {
+      "id": "spore-hopper",
+      "name": "Spore hopper",
+      "type": "creature",
+      "role": "characters/enemy",
+      "view": "side",
+      "frame": [
+        48,
+        48
+      ],
+      "pivot": [
+        24,
+        42
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "hop",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "attack",
+          "frames": 8,
+          "loop": false
+        },
+        {
+          "name": "hurt",
+          "frames": 4,
+          "loop": false
+        },
+        {
+          "name": "die",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [
+        "cap"
+      ],
+      "reuse": false,
+      "batch": "P07"
+    },
+    {
+      "id": "crow-scout",
+      "name": "Crow scout",
+      "type": "creature",
+      "role": "characters/enemy",
+      "view": "side",
+      "frame": [
+        48,
+        48
+      ],
+      "pivot": [
+        24,
+        24
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "fly",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "attack",
+          "frames": 8,
+          "loop": false
+        },
+        {
+          "name": "hurt",
+          "frames": 4,
+          "loop": false
+        },
+        {
+          "name": "die",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [
+        "held"
+      ],
+      "reuse": false,
+      "batch": "P07"
+    },
+    {
+      "id": "moss-golem",
+      "name": "Moss golem",
+      "type": "creature",
+      "role": "characters/boss",
+      "view": "side",
+      "frame": [
+        96,
+        96
+      ],
+      "pivot": [
+        44,
+        90
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "walk",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "attack",
+          "frames": 12,
+          "loop": false
+        },
+        {
+          "name": "roar",
+          "frames": 10,
+          "loop": false
+        },
+        {
+          "name": "hurt",
+          "frames": 4,
+          "loop": false
+        },
+        {
+          "name": "stagger",
+          "frames": 8,
+          "loop": false
+        },
+        {
+          "name": "die",
+          "frames": 12,
+          "loop": false
+        }
+      ],
+      "parts": [
+        "growth",
+        "core"
+      ],
+      "reuse": false,
+      "batch": "P08"
+    },
+    {
+      "id": "moving-platform",
+      "name": "Moving platform",
+      "type": "prop",
+      "role": "world/platform",
+      "view": "side",
+      "frame": [
+        64,
+        32
+      ],
+      "pivot": [
+        32,
+        8
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "move",
+          "frames": 8,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "P10"
+    },
+    {
+      "id": "crumble-block",
+      "name": "Crumbling block",
+      "type": "prop",
+      "role": "world/platform",
+      "view": "side",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        30
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "shake",
+          "frames": 6,
+          "loop": true
+        },
+        {
+          "name": "break",
+          "frames": 8,
+          "loop": false
+        },
+        {
+          "name": "respawn",
+          "frames": 6,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "P10"
+    },
+    {
+      "id": "spring-pad",
+      "name": "Spring pad",
+      "type": "prop",
+      "role": "world/platform",
+      "view": "side",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        30
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "bounce",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "P10"
+    },
+    {
+      "id": "spike-trap",
+      "name": "Spike trap",
+      "type": "prop",
+      "role": "world/hazard",
+      "view": "side",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        30
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "warn",
+          "frames": 4,
+          "loop": true
+        },
+        {
+          "name": "attack",
+          "frames": 6,
+          "loop": false
+        },
+        {
+          "name": "retract",
+          "frames": 6,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "P10"
+    },
+    {
+      "id": "saw-blade",
+      "name": "Saw blade",
+      "type": "prop",
+      "role": "world/hazard",
+      "view": "side",
+      "frame": [
+        48,
+        48
+      ],
+      "pivot": [
+        24,
+        24
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "grind",
+          "frames": 8,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "P10"
+    },
+    {
+      "id": "wooden-door",
+      "name": "Wooden door",
+      "type": "prop",
+      "role": "world/door",
+      "view": "side",
+      "frame": [
+        48,
+        64
+      ],
+      "pivot": [
+        24,
+        62
+      ],
+      "clips": [
+        {
+          "name": "closed",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "open",
+          "frames": 6,
+          "loop": false
+        },
+        {
+          "name": "locked",
+          "frames": 4,
+          "loop": false
+        }
+      ],
+      "parts": [
+        "lock"
+      ],
+      "reuse": false,
+      "batch": "P04"
+    },
+    {
+      "id": "wall-torch",
+      "name": "Wall torch",
+      "type": "prop",
+      "role": "world/prop",
+      "view": "side",
+      "frame": [
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        34
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "ignite",
+          "frames": 6,
+          "loop": false
+        },
+        {
+          "name": "out",
+          "frames": 1,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "P04"
+    },
+    {
+      "id": "treasure-chest",
+      "name": "Treasure chest",
+      "type": "prop",
+      "role": "world/prop",
+      "view": "side",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        30
+      ],
+      "clips": [
+        {
+          "name": "closed",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "open",
+          "frames": 8,
+          "loop": false
+        },
+        {
+          "name": "empty",
+          "frames": 1,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "P09"
+    },
+    {
+      "id": "lever",
+      "name": "Lever",
+      "type": "prop",
+      "role": "world/prop",
+      "view": "side",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        30
+      ],
+      "clips": [
+        {
+          "name": "off",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "on",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "pull",
+          "frames": 6,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "P09"
+    },
+    {
+      "id": "checkpoint-banner",
+      "name": "Checkpoint banner",
+      "type": "prop",
+      "role": "world/prop",
+      "view": "side",
+      "frame": [
+        32,
+        64
+      ],
+      "pivot": [
+        16,
+        62
+      ],
+      "clips": [
+        {
+          "name": "down",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "raise",
+          "frames": 8,
+          "loop": false
+        },
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true
+        }
+      ],
+      "parts": [
+        "emblem"
+      ],
+      "reuse": false,
+      "batch": "P09"
+    },
+    {
+      "id": "crate",
+      "name": "Breakable crate",
+      "type": "prop",
+      "role": "world/prop",
+      "view": "side",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        30
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "hurt",
+          "frames": 4,
+          "loop": false
+        },
+        {
+          "name": "break",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "P09"
+    },
+    {
+      "id": "signpost",
+      "name": "Signpost",
+      "type": "prop",
+      "role": "world/prop",
+      "view": "side",
+      "frame": [
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wobble",
+          "frames": 6,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "P09"
+    },
+    {
+      "id": "gem",
+      "name": "Gem",
+      "type": "pickup",
+      "role": "items/pickup",
+      "view": "front",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        30
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "collect",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "P11"
+    },
+    {
+      "id": "heart",
+      "name": "Heart",
+      "type": "pickup",
+      "role": "items/pickup",
+      "view": "front",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        30
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "collect",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "P11"
+    },
+    {
+      "id": "gold-key",
+      "name": "Key",
+      "type": "pickup",
+      "role": "items/key",
+      "view": "front",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        30
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "collect",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "P11"
+    },
+    {
+      "id": "potion",
+      "name": "Potion",
+      "type": "pickup",
+      "role": "items/food",
+      "view": "front",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        30
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "collect",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "P11"
+    },
+    {
+      "id": "star-charm",
+      "name": "Star charm",
+      "type": "pickup",
+      "role": "items/pickup",
+      "view": "front",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        30
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "collect",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "P11"
+    },
+    {
+      "id": "arrow",
+      "name": "Arrow",
+      "type": "projectile",
+      "role": "effects/projectile",
+      "view": "side",
+      "frame": [
+        32,
+        16
+      ],
+      "pivot": [
+        16,
+        8
+      ],
+      "clips": [
+        {
+          "name": "fly",
+          "frames": 4,
+          "loop": true
+        },
+        {
+          "name": "hit",
+          "frames": 6,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "P12"
+    },
+    {
+      "id": "fireball",
+      "name": "Fireball",
+      "type": "projectile",
+      "role": "effects/projectile",
+      "view": "side",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        16
+      ],
+      "clips": [
+        {
+          "name": "fly",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "hit",
+          "frames": 6,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "P12"
+    },
+    {
+      "id": "boulder-chunk",
+      "name": "Boss rock",
+      "type": "projectile",
+      "role": "effects/projectile",
+      "view": "side",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        16
+      ],
+      "clips": [
+        {
+          "name": "fly",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "hit",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "P12"
+    },
+    {
+      "id": "dust-puff",
+      "name": "Dust puff",
+      "type": "effect",
+      "role": "effects/dust",
+      "view": "side",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        30
+      ],
+      "clips": [
+        {
+          "name": "burst",
+          "frames": 6,
+          "loop": false
+        },
+        {
+          "name": "kick",
+          "frames": 4,
+          "loop": false
+        },
+        {
+          "name": "slide",
+          "frames": 6,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "P12"
+    },
+    {
+      "id": "hit-spark",
+      "name": "Hit spark",
+      "type": "effect",
+      "role": "effects/spark",
+      "view": "none",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        16
+      ],
+      "clips": [
+        {
+          "name": "burst",
+          "frames": 5,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "P12"
+    },
+    {
+      "id": "pickup-sparkle",
+      "name": "Pickup sparkle",
+      "type": "effect",
+      "role": "effects/spark",
+      "view": "none",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        16
+      ],
+      "clips": [
+        {
+          "name": "burst",
+          "frames": 8,
+          "loop": false
+        },
+        {
+          "name": "loop",
+          "frames": 8,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "P13"
+    },
+    {
+      "id": "enemy-poof",
+      "name": "Defeat poof",
+      "type": "effect",
+      "role": "effects/dust",
+      "view": "none",
+      "frame": [
+        48,
+        48
+      ],
+      "pivot": [
+        24,
+        24
+      ],
+      "clips": [
+        {
+          "name": "burst",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "P13"
+    },
+    {
+      "id": "explosion-small",
+      "name": "Small explosion",
+      "type": "effect",
+      "role": "effects/explosion",
+      "view": "none",
+      "frame": [
+        48,
+        48
+      ],
+      "pivot": [
+        24,
+        24
+      ],
+      "clips": [
+        {
+          "name": "burst",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "P13"
+    },
+    {
+      "id": "bg-forest",
+      "name": "Forest backdrop",
+      "type": "background",
+      "role": "environment/background",
+      "view": "side",
+      "frame": [
+        320,
+        180
+      ],
+      "pivot": [
+        160,
+        180
+      ],
+      "clips": [
+        {
+          "name": "far",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "mid",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "near",
+          "frames": 1,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "P14"
+    },
+    {
+      "id": "bg-castle",
+      "name": "Castle backdrop",
+      "type": "background",
+      "role": "environment/background",
+      "view": "side",
+      "frame": [
+        320,
+        180
+      ],
+      "pivot": [
+        160,
+        180
+      ],
+      "clips": [
+        {
+          "name": "far",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "mid",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "near",
+          "frames": 1,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "P14"
+    },
+    {
+      "id": "ui-hud-platformer",
+      "name": "Platformer HUD",
+      "type": "ui",
+      "role": "interface/bar",
+      "view": "none",
+      "frame": [
+        16,
+        16
+      ],
+      "pivot": [
+        8,
+        8
+      ],
+      "clips": [
+        {
+          "name": "heart-full",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "heart-half",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "heart-empty",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "coin",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "key",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "key-empty",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "star",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "star-empty",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "gem",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "heart-lose",
+          "frames": 4,
+          "loop": false
+        },
+        {
+          "name": "heart-gain",
+          "frames": 4,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "P13"
+    },
+    {
+      "id": "ui-buttons-wood",
+      "name": "Wooden buttons",
+      "type": "ui",
+      "role": "interface/button",
+      "view": "none",
+      "frame": [
+        96,
+        32
+      ],
+      "pivot": [
+        48,
+        16
+      ],
+      "clips": [
+        {
+          "name": "normal",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "hover",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "pressed",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "disabled",
+          "frames": 1,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "P13"
+    },
+    {
+      "id": "ui-panel-wood",
+      "name": "Wooden panels",
+      "type": "ui",
+      "role": "interface/panel",
+      "view": "none",
+      "frame": [
+        96,
+        64
+      ],
+      "pivot": [
+        48,
+        32
+      ],
+      "clips": [
+        {
+          "name": "panel",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "panel-title",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "panel-scroll",
+          "frames": 1,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "P13"
+    }
+  ],
+  "sounds": [
+    {
+      "id": "jump",
+      "name": "Jump",
+      "type": "sfx",
+      "role": "actions/jump",
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "footstep-gravel",
+      "name": "Footstep on gravel",
+      "type": "sfx",
+      "role": "characters/footstep",
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "sword-slash",
+      "name": "Sword slash",
+      "type": "sfx",
+      "role": "actions/swing",
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "punch",
+      "name": "Punch",
+      "type": "sfx",
+      "role": "actions/hit",
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "whoosh",
+      "name": "Whoosh",
+      "type": "sfx",
+      "role": "actions/dash",
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "metal-hit",
+      "name": "Metal hit",
+      "type": "sfx",
+      "role": "effects/impact",
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "coin-pickup",
+      "name": "Coin pickup",
+      "type": "sfx",
+      "role": "items/pickup",
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "powerup",
+      "name": "Power-up",
+      "type": "sfx",
+      "role": "items/consume",
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "chime-success",
+      "name": "Success chime",
+      "type": "jingle",
+      "role": "interface/reward",
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "wind",
+      "name": "Wind",
+      "type": "ambience",
+      "role": "environment/weather",
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "ui-click",
+      "name": "UI click",
+      "type": "sfx",
+      "role": "interface/click",
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "land-thud",
+      "name": "Landing thud",
+      "type": "sfx",
+      "role": "actions/land",
+      "styles": [
+        "Soft landing",
+        "Heavy landing",
+        "Armoured"
+      ],
+      "reuse": false,
+      "batch": "P01"
+    },
+    {
+      "id": "enemy-squish",
+      "name": "Enemy squish",
+      "type": "sfx",
+      "role": "characters/death",
+      "styles": [
+        "Squish",
+        "Pop",
+        "Crunch"
+      ],
+      "reuse": false,
+      "batch": "P01"
+    },
+    {
+      "id": "golem-slam",
+      "name": "Ground slam",
+      "type": "sfx",
+      "role": "effects/impact",
+      "styles": [
+        "Boss slam",
+        "Boulder drop",
+        "Distant quake"
+      ],
+      "reuse": false,
+      "batch": "P01"
+    },
+    {
+      "id": "gem-pickup",
+      "name": "Gem pickup",
+      "type": "sfx",
+      "role": "items/pickup",
+      "styles": [
+        "Gem",
+        "Heart",
+        "Key"
+      ],
+      "reuse": false,
+      "batch": "P01"
+    },
+    {
+      "id": "spring-boing",
+      "name": "Spring",
+      "type": "sfx",
+      "role": "world/machine",
+      "styles": [
+        "Spring pad",
+        "Big trampoline",
+        "Tiny bounce"
+      ],
+      "reuse": false,
+      "batch": "P01"
+    },
+    {
+      "id": "chest-open",
+      "name": "Chest opening",
+      "type": "sfx",
+      "role": "world/chest",
+      "styles": [
+        "Treasure chest",
+        "Small box",
+        "Heavy lid"
+      ],
+      "reuse": false,
+      "batch": "P02"
+    },
+    {
+      "id": "door-creak",
+      "name": "Door creak",
+      "type": "sfx",
+      "role": "world/door",
+      "styles": [
+        "Wooden door",
+        "Rusty gate",
+        "Quick hatch"
+      ],
+      "reuse": false,
+      "batch": "P02"
+    },
+    {
+      "id": "lever-clank",
+      "name": "Lever",
+      "type": "sfx",
+      "role": "world/lever",
+      "styles": [
+        "Lever",
+        "Switch",
+        "Heavy gear"
+      ],
+      "reuse": false,
+      "batch": "P02"
+    },
+    {
+      "id": "crate-break",
+      "name": "Crate breaking",
+      "type": "sfx",
+      "role": "world/break",
+      "styles": [
+        "Crate",
+        "Barrel",
+        "Twig snap"
+      ],
+      "reuse": false,
+      "batch": "P02"
+    }
+  ],
+  "music": [
+    {
+      "id": "thornwood-overworld",
+      "name": "Forest trail theme",
+      "role": "music/exploration",
+      "bpm": 138,
+      "key": "G major",
+      "reuse": false,
+      "batch": "P15"
+    },
+    {
+      "id": "battle-theme",
+      "name": "Battle theme",
+      "role": "music/battle",
+      "reuse": true,
+      "batch": null
+    }
+  ],
+  "batches": [
+    {
+      "id": "P00",
+      "kind": "upgrade",
+      "assets": [
+        "knight",
+        "wizard",
+        "slime",
+        "bat",
+        "wolf"
+      ],
+      "needs": [
+        "humanoid-poses"
+      ],
+      "after": [],
+      "order": 1
+    },
+    {
+      "id": "P01",
+      "kind": "sounds",
+      "assets": [
+        "land-thud",
+        "enemy-squish",
+        "golem-slam",
+        "gem-pickup",
+        "spring-boing"
+      ],
+      "needs": [],
+      "after": [],
+      "order": 1
+    },
+    {
+      "id": "P02",
+      "kind": "sounds",
+      "assets": [
+        "chest-open",
+        "door-creak",
+        "lever-clank",
+        "crate-break"
+      ],
+      "needs": [],
+      "after": [],
+      "order": 1
+    },
+    {
+      "id": "P03",
+      "kind": "tileset",
+      "assets": [
+        "tiles-forest",
+        "tiles-platforms"
+      ],
+      "needs": [
+        "palettes",
+        "tile-helper"
+      ],
+      "after": [],
+      "order": 1
+    },
+    {
+      "id": "P04",
+      "kind": "tileset and props",
+      "assets": [
+        "tiles-castle",
+        "wooden-door",
+        "wall-torch"
+      ],
+      "needs": [
+        "palettes",
+        "tile-helper"
+      ],
+      "after": [
+        "P02",
+        "P03"
+      ],
+      "order": 2
+    },
+    {
+      "id": "P05",
+      "kind": "tilesets",
+      "assets": [
+        "tiles-cave",
+        "tiles-water"
+      ],
+      "needs": [
+        "palettes",
+        "tile-helper"
+      ],
+      "after": [
+        "P03"
+      ],
+      "order": 2
+    },
+    {
+      "id": "P06",
+      "kind": "characters",
+      "assets": [
+        "spear-goblin",
+        "thorn-beetle"
+      ],
+      "needs": [
+        "palettes",
+        "humanoid-poses"
+      ],
+      "after": [
+        "P01"
+      ],
+      "order": 2
+    },
+    {
+      "id": "P07",
+      "kind": "creatures",
+      "assets": [
+        "spore-hopper",
+        "crow-scout"
+      ],
+      "needs": [
+        "palettes"
+      ],
+      "after": [
+        "P01"
+      ],
+      "order": 2
+    },
+    {
+      "id": "P08",
+      "kind": "boss",
+      "assets": [
+        "moss-golem"
+      ],
+      "needs": [
+        "palettes"
+      ],
+      "after": [
+        "P01",
+        "P02"
+      ],
+      "order": 2
+    },
+    {
+      "id": "P09",
+      "kind": "props",
+      "assets": [
+        "treasure-chest",
+        "lever",
+        "checkpoint-banner",
+        "crate",
+        "signpost"
+      ],
+      "needs": [
+        "palettes"
+      ],
+      "after": [
+        "P02"
+      ],
+      "order": 2
+    },
+    {
+      "id": "P10",
+      "kind": "props",
+      "assets": [
+        "moving-platform",
+        "crumble-block",
+        "spring-pad",
+        "spike-trap",
+        "saw-blade"
+      ],
+      "needs": [
+        "palettes"
+      ],
+      "after": [
+        "P01",
+        "P02"
+      ],
+      "order": 2
+    },
+    {
+      "id": "P11",
+      "kind": "pickups",
+      "assets": [
+        "gem",
+        "heart",
+        "gold-key",
+        "potion",
+        "star-charm"
+      ],
+      "needs": [
+        "palettes"
+      ],
+      "after": [
+        "P01"
+      ],
+      "order": 2
+    },
+    {
+      "id": "P12",
+      "kind": "projectiles and effects",
+      "assets": [
+        "arrow",
+        "fireball",
+        "boulder-chunk",
+        "dust-puff",
+        "hit-spark"
+      ],
+      "needs": [
+        "palettes",
+        "fx-helper"
+      ],
+      "after": [
+        "P01"
+      ],
+      "order": 2
+    },
+    {
+      "id": "P13",
+      "kind": "effects and interface",
+      "assets": [
+        "pickup-sparkle",
+        "enemy-poof",
+        "explosion-small",
+        "ui-hud-platformer",
+        "ui-buttons-wood",
+        "ui-panel-wood"
+      ],
+      "needs": [
+        "palettes",
+        "fx-helper",
+        "ui-helper"
+      ],
+      "after": [],
+      "order": 2
+    },
+    {
+      "id": "P14",
+      "kind": "backgrounds",
+      "assets": [
+        "bg-forest",
+        "bg-castle"
+      ],
+      "needs": [
+        "palettes",
+        "backdrop-helper"
+      ],
+      "after": [],
+      "order": 2
+    },
+    {
+      "id": "P15",
+      "kind": "music",
+      "assets": [
+        "thornwood-overworld"
+      ],
+      "needs": [
+        "compose-kit"
+      ],
+      "after": [],
+      "order": 1
+    }
+  ],
+  "reusedChanges": [
+    {
+      "id": "knight",
+      "change": "Add `die` (8), `block` (6) and `victory` (8, loop) from the `humanoid-poses` helper. Cue `land-thud` style \"Armoured\" on `jump` frame 6 in place of the footstep."
+    },
+    {
+      "id": "wizard",
+      "change": "Add `die` (8), `victory` (8, loop) and `talk` (8, loop). Declare its parts: `headgear` (the hat), `beard`, `weapon` (the staff)."
+    },
+    {
+      "id": "slime",
+      "change": "Add `die` (8): flattens and bursts into droplets; cue `enemy-squish` style \"Squish\" on frame 0."
+    },
+    {
+      "id": "bat",
+      "change": "Add `die` (8): wings fold, it drops and pops; cue `enemy-squish` style \"Pop\" on frame 0."
+    },
+    {
+      "id": "wolf",
+      "change": "Add `die` (8): stumbles and lies down; cue `punch` style \"Heavy body blow\" on frame 0."
+    }
+  ]
+}

@@ -8,7 +8,7 @@ Started 2026-11-18 16:06. The orchestrator updates this file at every step. A ne
 |---|---|---|---|
 | G1 | Three asset bundles for the top three 2D game types, each with 40–50 sprites, 20 sounds, 2 music tracks | Bundle manifests resolve; every asset passes the quality bar and review | Not started |
 | G2 | End to end: search, customise, add to bag, play in the playground, export (zip; Unity shown as coming later) | Browser test that walks the whole path | Not started |
-| G3 | Build and search system ready for more assets and bundles | Dropping a new asset file in and running the build makes it searchable with no other edit; tests pass | Half: catalogue and thumbnails done and proven; search index pending (W1-B) |
+| G3 | Build and search system ready for more assets and bundles | Dropping a new asset file in and running the build makes it searchable with no other edit; tests pass | Built and committed: one build writes catalogue, thumbnails, sounds file, search index and vendor files. End-to-end proof through the site's search box pending W2-A |
 | G4 | Whole-bundle customisation | Browser test: one change restyles every asset in a bundle, in previews, playground and export | Built, in review: bundle page restyles every asset; bag and download follow. Playground carry-through pending |
 
 ## Decisions from Keyang (2026-11-18)
@@ -41,7 +41,7 @@ Status: todo · building · review · fixing · done · blocked
 |---|---|---|---|---|---|
 | W1-R | Research top 100 2D games, pick three game types, outline each bundle | G1, D7 | opus | done | `docs/game-types-research.md`. Top three of 100: platformer 25, turn-based RPG 10, roguelike action 8 (tied with adventure / visual novel at 8; chosen because it is rising on Steam and needs more sprites). Two of the three are top-down |
 | W1-A | Metadata schema, backfill 27 assets, bundles format, build → catalogue, thumbnails, strips | FIND-1, BASE-8, BAG-6 | opus | done | Committed `ed82fe5`. 50 tests. Review passed after one round of fixes. Game types are now `platformer`, `turn-based-rpg`, `roguelike-action` plus six others |
-| W1-B | Search: index builder, keyword + meaning search library, browser client, test set and evaluation | FIND-2, 8, 9, 10 | fable | fixing | Review round 1: FAIL on four small fixes (a filter-name crash, a leak when closed during loading, junk input returning everything, the evaluation summary overstating the gain). Everything else confirmed: accuracy figures reproduced exactly, fallbacks work, sub-folder hosting works. Reviewer's own 25 untuned searches: top 5 is 96% with or without the model; first place 84% against 92%. **Decision revised: search by meaning is OFF by default and offered as a switch** (38.5 MB for little gain on untuned searches) |
+| W1-B | Search: index builder, keyword + meaning search library, browser client, test set and evaluation | FIND-2, 8, 9, 10 | fable | done | Committed `32217a7`. 42 unit and 11 browser tests. Review FAIL on four small fixes, all fixed and verified by the orchestrator. Search by meaning is opt-in, off by default (38.5 MB for little gain on untuned searches); with it off the site downloads 1.5 MB of SQLite and no model |
 | W1-C | Test setup: static server, Playwright harness, smoke tests of today's pages, engine unit tests | BASE-7 | sonnet | done | Committed `99c2ea0`. 53 unit and 70 browser tests. Three review rounds; round 2 caught all 5 planted bugs and found one flaky test, since fixed and repeated 84 times clean by the orchestrator |
 | W1-D | Quality bar as a shared library, new checks, written bar and review protocol | ASSET-1, 12, 13 | opus | done | Committed `99c4008`. 83 tests. Two review rounds plus a final fix verified by the orchestrator. All 7 existing sprites pass; full sound run in progress |
 
@@ -50,20 +50,20 @@ Status: todo · building · review · fixing · done · blocked
 | Id | Task | Features | Status |
 |---|---|---|---|
 | W2-A | Site reads the catalogue; search-first home, results with filters, sticky style filter, cards that load nothing until seen (fable) | FIND-2, 3, 4, 5, 7 | building |
-| W2-B | Parts in the framework and on the sprite page; Hero's weapon as the worked example (fable) | MAKE-8, EDIT-7 | fixing — review round 1: FAIL on small defects. Confirmed by the reviewer: weapon stays in the hand in every clip at every setting; sockets on all frames within 0.67 px of the hand; clear part blocks. To fix: chained `when`, any-of `when` (added to Contract 3), the Wizard's hood, old links, a socket named without positions, two weak tests, phone layout |
+| W2-B | Parts in the framework and on the sprite page; Hero's weapon as the worked example (fable) | MAKE-8, EDIT-7 | done — committed `ac6d784`. 62 unit and 21 browser tests. Review FAIL on small defects; ten fixes made and verified (the orchestrator viewed the hairless hood and the new punch) |
 | W2-C | Bag and export chooser (opus) | BAG-1, BAG-2 | done — committed `d46d72e` (bag page and wiring in shared files follow with the site refactor). 23 unit and 13 browser tests. Review passed; follow-up round done: wired into the sprite page, sounds that do not apply are left out of exports, duplicate-on-reload bug fixed, shorter links |
-| W2-D | Themes. D1 engines — done (`ed2a65e`). D2: bundle page with whole-bundle controls, also on the bag page (opus) — review. Builder done (14.5 min, 248k tokens): 8 unit and 10 browser tests; 14 named looks, Surprise me, optional shape changes, fine-tuning; a look change takes 2.7 ms for 50 sprites; orchestrator viewed the page under the Handheld look | EDIT-6, BAG-6 | review |
+| W2-D | Themes. D1 engines — done (`ed2a65e`). D2: bundle page with whole-bundle controls (opus) — fixing after review: looks, bag carry-through, downloads, links and cleanup all passed; a sound replayed after a look change stayed unstyled, small sprites drew at 1x, shaped sprites could be cropped, live music ignored brightness | EDIT-6, BAG-6 | fixing |
 | W2-E | Playground: side view and top-down, roles from metadata (fable) | BAG-3 | building |
-| W2-F | Skill update: metadata, parts, new asset kinds, quality bar | MAKE-1 | todo |
+| W2-F | Skill rewrite for today's contracts, tested on a fresh agent (opus) | MAKE-1 | building |
 
 ### Wave 3: content (after W1-R, W1-A, W1-D, W2-B, W2-F)
 
 | Id | Task | Status |
 |---|---|---|
-| W3-S | Art direction: global style guide, one specification and batch plan per bundle (fable) | building |
-| W3-H | Shared helpers the specs call for (top-down body rig, tile helper, ...) | todo |
+| W3-S | Art direction: global style guide, one specification and batch plan per bundle (fable) | review — done by the builder (36 min, 449k tokens): 130 new sprites, 37 new sounds, 5 new tracks in 59 batches; 21 existing assets reused. Independent review running |
+| W3-H | Shared helpers, each with its first batch as the worked example: H1 palettes and effects; H2 tiles + forest and platform tilesets; H3 top-down rig + hero-walker; H4 backdrops + two backgrounds; H5 interface + RPG interface set; H6 music kit + first track; H7 side-view poses + changes to the five reused sprites | building (7 agents) |
 | W3-X | Fix the existing sprites that fail the new bar | done: all 7 pass; slime and wolf keep small warnings |
-| W3-P | Production: batches of builders, each with an independent reviewer | todo |
+| W3-P | Production: batches of builders, each with an independent reviewer and up to two fix rounds (workflow `loadout-produce`) | run 1 started: six sound batches, 37 sounds (sonnet builders, opus reviewers) |
 
 Per bundle: a specification and style guide, then batches of builders with an independent reviewer per batch. 40–50 sprites, 20 sounds, 2 tracks each.
 
@@ -102,3 +102,4 @@ Times are read from the clock or from commit times. Entries before 16:27 were fi
 | 17:04 | W2-D2 bundle page builder finished; orchestrator viewed it; reviewer launched. Catalogue rows now also carry the preview clip's name, the pivot and whether the sprite stands on the ground. |
 | 17:05 | W2-C follow-up verified by the orchestrator (23 unit, 13 browser tests) and committed (`d46d72e`). |
 | 17:06 | W1-D final fix verified (83 tests, 7 of 7 sprites pass) and committed (`99c4008`). Full sound check started in the background. Four of five wave-1 tasks are committed; search is in its fix round. |
+| 17:17 | W1-B and W2-B fixes verified and committed (`32217a7`, `ac6d784`): all five wave-1 tasks are done. W3-S specs finished; reviewer launched. Seven helper builders launched (W3-H1 to H7), each with its first batch. W2-F skill rewrite launched. Production run 1 launched: six sound batches. W2-D2 review: FAIL on a stale-sound bug and three smaller defects; sent back. A music builder's run of `battle_theme.py` stripped the track's metadata and broke the build; restored from git and the builder told. |

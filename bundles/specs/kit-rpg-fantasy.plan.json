@@ -1,0 +1,3324 @@
+{
+  "id": "kit-rpg-fantasy",
+  "name": "Hearthvale turn-based RPG kit",
+  "gameType": "turn-based-rpg",
+  "theme": "fantasy",
+  "view": "top-down",
+  "palette": {
+    "name": "Hearthvale",
+    "colours": {
+      "ink": "#231b33",
+      "meadow": "#7fbf5a",
+      "leaf": "#4f9d57",
+      "wheat": "#e6c96a",
+      "path": "#c9a06a",
+      "wood": "#9a6a3e",
+      "cobble": "#a8a4a0",
+      "slate": "#5a5f7a",
+      "roof": "#c8553a",
+      "water": "#4fa8d8",
+      "sky": "#9fd8f4",
+      "haze": "#a8c8d8",
+      "cream": "#f0ead8",
+      "hero": "#3f6fd1",
+      "mage": "#7a4fc4",
+      "rogue": "#2f8f9d",
+      "crimson": "#c9423a",
+      "bandit": "#8e3a4a",
+      "gold": "#f2c230",
+      "steel": "#c2c9d6",
+      "fire": "#e8662c",
+      "ice": "#8fd8f0",
+      "thunder": "#f4e06a",
+      "heal": "#7fe0a0",
+      "magic": "#4fd8ee",
+      "panel": "#2b3a67",
+      "skin": "#f6d3b0"
+    }
+  },
+  "sprites": [
+    {
+      "id": "knight",
+      "name": "Hero",
+      "type": "character",
+      "role": "characters/player",
+      "view": "side",
+      "frame": [
+        64,
+        64
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8
+        },
+        {
+          "name": "walk",
+          "frames": 8
+        },
+        {
+          "name": "run",
+          "frames": 8
+        },
+        {
+          "name": "jump",
+          "frames": 8
+        },
+        {
+          "name": "attack",
+          "frames": 8
+        },
+        {
+          "name": "hurt",
+          "frames": 4
+        }
+      ],
+      "parts": [
+        "hair",
+        "headgear",
+        "weapon",
+        "cape"
+      ],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "wizard",
+      "name": "Wizard",
+      "type": "character",
+      "role": "characters/player",
+      "view": "side",
+      "frame": [
+        64,
+        64
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8
+        },
+        {
+          "name": "walk",
+          "frames": 8
+        },
+        {
+          "name": "run",
+          "frames": 8
+        },
+        {
+          "name": "jump",
+          "frames": 8
+        },
+        {
+          "name": "cast",
+          "frames": 8
+        },
+        {
+          "name": "hurt",
+          "frames": 4
+        }
+      ],
+      "parts": [],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "slime",
+      "name": "Slime",
+      "type": "creature",
+      "role": "characters/enemy",
+      "view": "side",
+      "frame": [
+        48,
+        48
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8
+        },
+        {
+          "name": "hop",
+          "frames": 8
+        },
+        {
+          "name": "attack",
+          "frames": 8
+        },
+        {
+          "name": "hurt",
+          "frames": 4
+        }
+      ],
+      "parts": [],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "bat",
+      "name": "Bat",
+      "type": "creature",
+      "role": "characters/enemy",
+      "view": "side",
+      "frame": [
+        48,
+        48
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8
+        },
+        {
+          "name": "fly",
+          "frames": 8
+        },
+        {
+          "name": "attack",
+          "frames": 8
+        },
+        {
+          "name": "hurt",
+          "frames": 4
+        }
+      ],
+      "parts": [],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "wolf",
+      "name": "Wolf",
+      "type": "creature",
+      "role": "characters/enemy",
+      "view": "side",
+      "frame": [
+        64,
+        48
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8
+        },
+        {
+          "name": "walk",
+          "frames": 8
+        },
+        {
+          "name": "run",
+          "frames": 8
+        },
+        {
+          "name": "attack",
+          "frames": 8
+        },
+        {
+          "name": "hurt",
+          "frames": 4
+        }
+      ],
+      "parts": [],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "coin",
+      "name": "Coin",
+      "type": "pickup",
+      "role": "items/pickup",
+      "view": "front",
+      "frame": [
+        32,
+        32
+      ],
+      "clips": [
+        {
+          "name": "spin",
+          "frames": 8
+        },
+        {
+          "name": "collect",
+          "frames": 8
+        }
+      ],
+      "parts": [],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "campfire",
+      "name": "Campfire",
+      "type": "prop",
+      "role": "world/prop",
+      "view": "side",
+      "frame": [
+        48,
+        48
+      ],
+      "clips": [
+        {
+          "name": "burn",
+          "frames": 8
+        },
+        {
+          "name": "ignite",
+          "frames": 8
+        }
+      ],
+      "parts": [],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "hero-walker",
+      "name": "Hero (map)",
+      "type": "character",
+      "role": "characters/player",
+      "view": "top-down",
+      "frame": [
+        48,
+        48
+      ],
+      "pivot": [
+        24,
+        42
+      ],
+      "clips": [
+        {
+          "name": "idle_down",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "idle_up",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "idle_side",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "walk_down",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "walk_up",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "walk_side",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "attack_down",
+          "frames": 8,
+          "loop": false
+        },
+        {
+          "name": "attack_up",
+          "frames": 8,
+          "loop": false
+        },
+        {
+          "name": "attack_side",
+          "frames": 8,
+          "loop": false
+        },
+        {
+          "name": "hurt",
+          "frames": 4,
+          "loop": false
+        },
+        {
+          "name": "die",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [
+        "weapon",
+        "headgear",
+        "cape"
+      ],
+      "reuse": false,
+      "batch": "R03"
+    },
+    {
+      "id": "mage-walker",
+      "name": "Mage (map)",
+      "type": "character",
+      "role": "characters/player",
+      "view": "top-down",
+      "frame": [
+        48,
+        48
+      ],
+      "pivot": [
+        24,
+        42
+      ],
+      "clips": [
+        {
+          "name": "idle_down",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "idle_up",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "idle_side",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "walk_down",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "walk_up",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "walk_side",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "cast",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [
+        "headgear",
+        "weapon",
+        "beard"
+      ],
+      "reuse": false,
+      "batch": "R05"
+    },
+    {
+      "id": "rogue-walker",
+      "name": "Rogue (map)",
+      "type": "character",
+      "role": "characters/player",
+      "view": "top-down",
+      "frame": [
+        48,
+        48
+      ],
+      "pivot": [
+        24,
+        42
+      ],
+      "clips": [
+        {
+          "name": "idle_down",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "idle_up",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "idle_side",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "walk_down",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "walk_up",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "walk_side",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "run_down",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "run_up",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "run_side",
+          "frames": 8,
+          "loop": true
+        }
+      ],
+      "parts": [
+        "headgear",
+        "scarf",
+        "weapon"
+      ],
+      "reuse": false,
+      "batch": "R05"
+    },
+    {
+      "id": "village-elder",
+      "name": "Village elder",
+      "type": "character",
+      "role": "characters/npc",
+      "view": "top-down",
+      "frame": [
+        48,
+        48
+      ],
+      "pivot": [
+        24,
+        42
+      ],
+      "clips": [
+        {
+          "name": "idle_down",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "idle_up",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "idle_side",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "walk_down",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "walk_up",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "walk_side",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "talk",
+          "frames": 8,
+          "loop": true
+        }
+      ],
+      "parts": [
+        "held",
+        "beard",
+        "headgear"
+      ],
+      "reuse": false,
+      "batch": "R06"
+    },
+    {
+      "id": "merchant",
+      "name": "Merchant",
+      "type": "character",
+      "role": "characters/npc",
+      "view": "top-down",
+      "frame": [
+        48,
+        48
+      ],
+      "pivot": [
+        24,
+        42
+      ],
+      "clips": [
+        {
+          "name": "idle_down",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "idle_up",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "idle_side",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "talk",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "wave",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [
+        "pack",
+        "headgear",
+        "held"
+      ],
+      "reuse": false,
+      "batch": "R06"
+    },
+    {
+      "id": "town-guard",
+      "name": "Town guard",
+      "type": "character",
+      "role": "characters/npc",
+      "view": "top-down",
+      "frame": [
+        48,
+        48
+      ],
+      "pivot": [
+        24,
+        42
+      ],
+      "clips": [
+        {
+          "name": "idle_down",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "idle_up",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "idle_side",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "walk_down",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "walk_up",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "walk_side",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "block",
+          "frames": 6,
+          "loop": false
+        }
+      ],
+      "parts": [
+        "weapon",
+        "shield",
+        "headgear"
+      ],
+      "reuse": false,
+      "batch": "R07"
+    },
+    {
+      "id": "farm-kid",
+      "name": "Village child",
+      "type": "character",
+      "role": "characters/npc",
+      "view": "top-down",
+      "frame": [
+        48,
+        48
+      ],
+      "pivot": [
+        24,
+        42
+      ],
+      "clips": [
+        {
+          "name": "idle_down",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "idle_up",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "idle_side",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "walk_down",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "walk_up",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "walk_side",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "run_down",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "run_up",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "run_side",
+          "frames": 8,
+          "loop": true
+        }
+      ],
+      "parts": [
+        "held",
+        "headgear"
+      ],
+      "reuse": false,
+      "batch": "R07"
+    },
+    {
+      "id": "rogue-battler",
+      "name": "Rogue",
+      "type": "character",
+      "role": "characters/player",
+      "view": "side",
+      "frame": [
+        64,
+        64
+      ],
+      "pivot": [
+        28,
+        58
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "walk",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "run",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "jump",
+          "frames": 8,
+          "loop": false
+        },
+        {
+          "name": "attack",
+          "frames": 8,
+          "loop": false
+        },
+        {
+          "name": "shoot",
+          "frames": 6,
+          "loop": false
+        },
+        {
+          "name": "hurt",
+          "frames": 4,
+          "loop": false
+        },
+        {
+          "name": "die",
+          "frames": 8,
+          "loop": false
+        },
+        {
+          "name": "victory",
+          "frames": 8,
+          "loop": true
+        }
+      ],
+      "parts": [
+        "weapon",
+        "headgear",
+        "scarf"
+      ],
+      "reuse": false,
+      "batch": "R12"
+    },
+    {
+      "id": "road-bandit",
+      "name": "Bandit",
+      "type": "character",
+      "role": "characters/enemy",
+      "view": "side",
+      "frame": [
+        64,
+        64
+      ],
+      "pivot": [
+        28,
+        58
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "walk",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "attack",
+          "frames": 8,
+          "loop": false
+        },
+        {
+          "name": "steal",
+          "frames": 8,
+          "loop": false
+        },
+        {
+          "name": "hurt",
+          "frames": 4,
+          "loop": false
+        },
+        {
+          "name": "die",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [
+        "weapon",
+        "headgear",
+        "pack"
+      ],
+      "reuse": false,
+      "batch": "R12"
+    },
+    {
+      "id": "bone-soldier",
+      "name": "Skeleton soldier",
+      "type": "creature",
+      "role": "characters/enemy",
+      "view": "side",
+      "frame": [
+        64,
+        64
+      ],
+      "pivot": [
+        28,
+        58
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "walk",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "attack",
+          "frames": 8,
+          "loop": false
+        },
+        {
+          "name": "block",
+          "frames": 6,
+          "loop": false
+        },
+        {
+          "name": "hurt",
+          "frames": 4,
+          "loop": false
+        },
+        {
+          "name": "die",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [
+        "weapon",
+        "shield",
+        "headgear"
+      ],
+      "reuse": false,
+      "batch": "R13"
+    },
+    {
+      "id": "thicket-imp",
+      "name": "Thicket imp",
+      "type": "creature",
+      "role": "characters/enemy",
+      "view": "side",
+      "frame": [
+        48,
+        48
+      ],
+      "pivot": [
+        24,
+        24
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "fly",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "attack",
+          "frames": 8,
+          "loop": false
+        },
+        {
+          "name": "cast",
+          "frames": 8,
+          "loop": false
+        },
+        {
+          "name": "hurt",
+          "frames": 4,
+          "loop": false
+        },
+        {
+          "name": "die",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [
+        "wings",
+        "horns",
+        "tail"
+      ],
+      "reuse": false,
+      "batch": "R13"
+    },
+    {
+      "id": "ember-wyrm",
+      "name": "Ember wyrm",
+      "type": "creature",
+      "role": "characters/boss",
+      "view": "side",
+      "frame": [
+        128,
+        96
+      ],
+      "pivot": [
+        56,
+        90
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "attack",
+          "frames": 12,
+          "loop": false
+        },
+        {
+          "name": "breath",
+          "frames": 12,
+          "loop": false
+        },
+        {
+          "name": "buffet",
+          "frames": 10,
+          "loop": false
+        },
+        {
+          "name": "hurt",
+          "frames": 4,
+          "loop": false
+        },
+        {
+          "name": "die",
+          "frames": 12,
+          "loop": false
+        }
+      ],
+      "parts": [
+        "wings",
+        "horns",
+        "tail"
+      ],
+      "reuse": false,
+      "batch": "R14"
+    },
+    {
+      "id": "portraits-party",
+      "name": "Party portraits",
+      "type": "icon",
+      "role": "characters/player",
+      "view": "front",
+      "frame": [
+        48,
+        48
+      ],
+      "pivot": [
+        24,
+        24
+      ],
+      "clips": [
+        {
+          "name": "hero-neutral",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "hero-happy",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "hero-hurt",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "hero-talk",
+          "frames": 4,
+          "loop": true
+        },
+        {
+          "name": "mage-neutral",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "mage-happy",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "mage-hurt",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "mage-talk",
+          "frames": 4,
+          "loop": true
+        },
+        {
+          "name": "rogue-neutral",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "rogue-happy",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "rogue-hurt",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "rogue-talk",
+          "frames": 4,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "R15"
+    },
+    {
+      "id": "portraits-village",
+      "name": "Villager portraits",
+      "type": "icon",
+      "role": "characters/npc",
+      "view": "front",
+      "frame": [
+        48,
+        48
+      ],
+      "pivot": [
+        24,
+        24
+      ],
+      "clips": [
+        {
+          "name": "elder-neutral",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "elder-happy",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "elder-worried",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "merchant-neutral",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "merchant-happy",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "merchant-worried",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "guard-neutral",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "guard-happy",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "guard-worried",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "kid-neutral",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "kid-happy",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "kid-worried",
+          "frames": 1,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "R15"
+    },
+    {
+      "id": "tiles-meadow",
+      "name": "Meadow and paths",
+      "type": "tileset",
+      "role": "world/tile",
+      "view": "top-down",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        16
+      ],
+      "clips": [
+        {
+          "name": "grass-fill",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "path-fill",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "path-top",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "path-left",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "path-right",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "path-side-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "path-side-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "path-bottom",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "path-bottom-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "path-bottom-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "path-inner-tl",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "path-inner-tr",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "path-inner-bl",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "path-inner-br",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "grass-deco-a",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "grass-deco-b",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "grass-deco-c",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "grass-deco-d",
+          "frames": 1,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "R04"
+    },
+    {
+      "id": "tiles-shore",
+      "name": "Water and shore",
+      "type": "tileset",
+      "role": "world/tile",
+      "view": "top-down",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        16
+      ],
+      "clips": [
+        {
+          "name": "water-fill",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "water-top",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "water-left",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "water-right",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "water-side-l",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "water-side-r",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "water-bottom",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "water-bottom-l",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "water-bottom-r",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "water-inner-tl",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "water-inner-tr",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "water-inner-bl",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "water-inner-br",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "bridge-h",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "bridge-v",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "water-deco-a",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "water-deco-b",
+          "frames": 1,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "R10"
+    },
+    {
+      "id": "tiles-village",
+      "name": "Village ground and walls",
+      "type": "tileset",
+      "role": "world/tile",
+      "view": "top-down",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        16
+      ],
+      "clips": [
+        {
+          "name": "cobble-fill",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "cobble-top",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "cobble-left",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "cobble-right",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "cobble-side-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "cobble-side-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "cobble-bottom",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "cobble-bottom-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "cobble-bottom-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "cobble-inner-tl",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "cobble-inner-tr",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "cobble-inner-bl",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "cobble-inner-br",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "plank-fill",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-fill",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-top",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-left",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-right",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-side-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-side-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-bottom",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-bottom-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-bottom-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-inner-tl",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-inner-tr",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-inner-bl",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-inner-br",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "fence-h",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "fence-v",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "fence-post",
+          "frames": 1,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "R08"
+    },
+    {
+      "id": "tiles-dungeon",
+      "name": "Dungeon tiles",
+      "type": "tileset",
+      "role": "world/tile",
+      "view": "top-down",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        16
+      ],
+      "clips": [
+        {
+          "name": "floor-fill",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-fill",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-top",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-left",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-right",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-side-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-side-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-bottom",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-bottom-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-bottom-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-inner-tl",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-inner-tr",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-inner-bl",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-inner-br",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "pit-fill",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "pit-top",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "pit-left",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "pit-right",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "pit-side-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "pit-side-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "pit-bottom",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "pit-bottom-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "pit-bottom-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "pit-inner-tl",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "pit-inner-tr",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "pit-inner-bl",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "pit-inner-br",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "stairs-down",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "stairs-up",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "floor-deco-a",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "floor-deco-b",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "floor-deco-c",
+          "frames": 1,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "R09"
+    },
+    {
+      "id": "tree-oak",
+      "name": "Oak tree",
+      "type": "prop",
+      "role": "world/prop",
+      "view": "top-down",
+      "frame": [
+        64,
+        80
+      ],
+      "pivot": [
+        32,
+        76
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "sway",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "shake",
+          "frames": 6,
+          "loop": false
+        }
+      ],
+      "parts": [
+        "fruit"
+      ],
+      "reuse": false,
+      "batch": "R04"
+    },
+    {
+      "id": "tree-pine",
+      "name": "Pine tree",
+      "type": "prop",
+      "role": "world/prop",
+      "view": "top-down",
+      "frame": [
+        48,
+        80
+      ],
+      "pivot": [
+        24,
+        76
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "sway",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "shake",
+          "frames": 6,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "R04"
+    },
+    {
+      "id": "boulder",
+      "name": "Boulder",
+      "type": "prop",
+      "role": "world/prop",
+      "view": "top-down",
+      "frame": [
+        48,
+        48
+      ],
+      "pivot": [
+        24,
+        44
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "hurt",
+          "frames": 4,
+          "loop": false
+        },
+        {
+          "name": "break",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "R09"
+    },
+    {
+      "id": "cottage",
+      "name": "Cottage",
+      "type": "prop",
+      "role": "world/building",
+      "view": "top-down",
+      "frame": [
+        96,
+        96
+      ],
+      "pivot": [
+        48,
+        92
+      ],
+      "clips": [
+        {
+          "name": "closed",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "open",
+          "frames": 6,
+          "loop": false
+        },
+        {
+          "name": "lit",
+          "frames": 8,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "R11"
+    },
+    {
+      "id": "inn",
+      "name": "Inn",
+      "type": "prop",
+      "role": "world/building",
+      "view": "top-down",
+      "frame": [
+        128,
+        96
+      ],
+      "pivot": [
+        64,
+        92
+      ],
+      "clips": [
+        {
+          "name": "closed",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "open",
+          "frames": 6,
+          "loop": false
+        },
+        {
+          "name": "lit",
+          "frames": 8,
+          "loop": true
+        }
+      ],
+      "parts": [
+        "sign"
+      ],
+      "reuse": false,
+      "batch": "R11"
+    },
+    {
+      "id": "market-stall",
+      "name": "Market stall",
+      "type": "prop",
+      "role": "world/building",
+      "view": "top-down",
+      "frame": [
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        60
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "flap",
+          "frames": 8,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "R08"
+    },
+    {
+      "id": "chest-topdown",
+      "name": "Chest (top-down)",
+      "type": "prop",
+      "role": "world/prop",
+      "view": "top-down",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        30
+      ],
+      "clips": [
+        {
+          "name": "closed",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "open",
+          "frames": 8,
+          "loop": false
+        },
+        {
+          "name": "empty",
+          "frames": 1,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "R09"
+    },
+    {
+      "id": "dungeon-door",
+      "name": "Dungeon door",
+      "type": "prop",
+      "role": "world/door",
+      "view": "top-down",
+      "frame": [
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "clips": [
+        {
+          "name": "closed",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "open",
+          "frames": 6,
+          "loop": false
+        },
+        {
+          "name": "locked",
+          "frames": 4,
+          "loop": false
+        },
+        {
+          "name": "sealed",
+          "frames": 8,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "R09"
+    },
+    {
+      "id": "save-crystal",
+      "name": "Save crystal",
+      "type": "prop",
+      "role": "world/prop",
+      "view": "top-down",
+      "frame": [
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "activate",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [
+        "pedestal"
+      ],
+      "reuse": false,
+      "batch": "R10"
+    },
+    {
+      "id": "icons-consumables",
+      "name": "Consumable icons",
+      "type": "icon",
+      "role": "items/icon",
+      "view": "none",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        16
+      ],
+      "clips": [
+        {
+          "name": "potion",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "mana-flask",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "antidote",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "bread",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "herb",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "revive-feather",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "bomb",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "tent",
+          "frames": 1,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "R16"
+    },
+    {
+      "id": "icons-gear",
+      "name": "Equipment icons",
+      "type": "icon",
+      "role": "items/weapon",
+      "view": "none",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        16
+      ],
+      "clips": [
+        {
+          "name": "sword",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "staff",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "dagger",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "bow",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "shield",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "helm",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "armour",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "ring",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "boots",
+          "frames": 1,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "R17"
+    },
+    {
+      "id": "icons-key-items",
+      "name": "Key item icons",
+      "type": "icon",
+      "role": "items/key",
+      "view": "none",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        16
+      ],
+      "clips": [
+        {
+          "name": "key",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "map",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "letter",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "crystal-shard",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "coin-pouch",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "lantern",
+          "frames": 1,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "R16"
+    },
+    {
+      "id": "fx-slash",
+      "name": "Slash",
+      "type": "effect",
+      "role": "effects/spark",
+      "view": "side",
+      "frame": [
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        32
+      ],
+      "clips": [
+        {
+          "name": "burst",
+          "frames": 6,
+          "loop": false
+        },
+        {
+          "name": "cross",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "R18"
+    },
+    {
+      "id": "fx-fire-spell",
+      "name": "Fire spell",
+      "type": "effect",
+      "role": "effects/magic",
+      "view": "side",
+      "frame": [
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        58
+      ],
+      "clips": [
+        {
+          "name": "burst",
+          "frames": 10,
+          "loop": false
+        },
+        {
+          "name": "cast",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "R18"
+    },
+    {
+      "id": "fx-ice-spell",
+      "name": "Ice spell",
+      "type": "effect",
+      "role": "effects/magic",
+      "view": "side",
+      "frame": [
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        58
+      ],
+      "clips": [
+        {
+          "name": "burst",
+          "frames": 10,
+          "loop": false
+        },
+        {
+          "name": "cast",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "R18"
+    },
+    {
+      "id": "fx-thunder-spell",
+      "name": "Thunder spell",
+      "type": "effect",
+      "role": "effects/magic",
+      "view": "side",
+      "frame": [
+        64,
+        96
+      ],
+      "pivot": [
+        32,
+        90
+      ],
+      "clips": [
+        {
+          "name": "burst",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "R18"
+    },
+    {
+      "id": "fx-heal",
+      "name": "Heal",
+      "type": "effect",
+      "role": "effects/magic",
+      "view": "side",
+      "frame": [
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        58
+      ],
+      "clips": [
+        {
+          "name": "burst",
+          "frames": 10,
+          "loop": false
+        },
+        {
+          "name": "loop",
+          "frames": 8,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "R18"
+    },
+    {
+      "id": "bg-battle-field",
+      "name": "Field battle backdrop",
+      "type": "background",
+      "role": "environment/background",
+      "view": "side",
+      "frame": [
+        320,
+        180
+      ],
+      "pivot": [
+        160,
+        180
+      ],
+      "clips": [
+        {
+          "name": "far",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "mid",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "near",
+          "frames": 1,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "R19"
+    },
+    {
+      "id": "bg-battle-dungeon",
+      "name": "Dungeon battle backdrop",
+      "type": "background",
+      "role": "environment/background",
+      "view": "side",
+      "frame": [
+        320,
+        180
+      ],
+      "pivot": [
+        160,
+        180
+      ],
+      "clips": [
+        {
+          "name": "far",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "mid",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "near",
+          "frames": 1,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "R19"
+    },
+    {
+      "id": "ui-dialogue",
+      "name": "Dialogue box",
+      "type": "ui",
+      "role": "interface/panel",
+      "view": "none",
+      "frame": [
+        96,
+        48
+      ],
+      "pivot": [
+        48,
+        24
+      ],
+      "clips": [
+        {
+          "name": "box",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "name-tag",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "choice",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "next",
+          "frames": 8,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "R20"
+    },
+    {
+      "id": "ui-battle-menu",
+      "name": "Battle menu",
+      "type": "ui",
+      "role": "interface/panel",
+      "view": "none",
+      "frame": [
+        96,
+        64
+      ],
+      "pivot": [
+        48,
+        32
+      ],
+      "clips": [
+        {
+          "name": "panel",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "row",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "cursor",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "turn-marker",
+          "frames": 8,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "R20"
+    },
+    {
+      "id": "ui-bars-rpg",
+      "name": "Health and magic bars",
+      "type": "ui",
+      "role": "interface/bar",
+      "view": "none",
+      "frame": [
+        64,
+        16
+      ],
+      "pivot": [
+        32,
+        8
+      ],
+      "clips": [
+        {
+          "name": "frame",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "fill",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "fill-b",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "fill-c",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "flash",
+          "frames": 4,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "R20"
+    },
+    {
+      "id": "ui-status-icons",
+      "name": "Status marks",
+      "type": "ui",
+      "role": "interface/icon",
+      "view": "none",
+      "frame": [
+        16,
+        16
+      ],
+      "pivot": [
+        8,
+        8
+      ],
+      "clips": [
+        {
+          "name": "poison",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "sleep",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "stun",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "burn",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "freeze",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "attack-up",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "defence-up",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "attack-down",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "defence-down",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "haste",
+          "frames": 1,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "R17"
+    },
+    {
+      "id": "ui-damage-digits",
+      "name": "Damage numbers",
+      "type": "ui",
+      "role": "interface/icon",
+      "view": "none",
+      "frame": [
+        16,
+        16
+      ],
+      "pivot": [
+        8,
+        8
+      ],
+      "clips": [
+        {
+          "name": "digit-0",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "digit-1",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "digit-2",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "digit-3",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "digit-4",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "digit-5",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "digit-6",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "digit-7",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "digit-8",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "digit-9",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "plus",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "minus",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "crit",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "miss",
+          "frames": 1,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "R20"
+    }
+  ],
+  "sounds": [
+    {
+      "id": "sword-slash",
+      "name": "Sword slash",
+      "type": "sfx",
+      "role": "actions/swing",
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "punch",
+      "name": "Punch",
+      "type": "sfx",
+      "role": "actions/hit",
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "magic-spell",
+      "name": "Magic spell",
+      "type": "sfx",
+      "role": "actions/cast",
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "coin-pickup",
+      "name": "Coin pickup",
+      "type": "sfx",
+      "role": "items/pickup",
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "fire",
+      "name": "Campfire",
+      "type": "ambience",
+      "role": "environment/ambience",
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "error-buzz",
+      "name": "Error buzz",
+      "type": "sfx",
+      "role": "interface/error",
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "chest-open",
+      "name": "Chest opening",
+      "type": "sfx",
+      "role": "world/chest",
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "door-creak",
+      "name": "Door creak",
+      "type": "sfx",
+      "role": "world/door",
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "footstep-grass",
+      "name": "Footstep on grass",
+      "type": "sfx",
+      "role": "characters/footstep",
+      "styles": [
+        "Grass",
+        "Tall grass",
+        "Dirt path"
+      ],
+      "reuse": false,
+      "batch": "R01"
+    },
+    {
+      "id": "text-blip",
+      "name": "Text blip",
+      "type": "sfx",
+      "role": "interface/click",
+      "styles": [
+        "Narrator",
+        "Small voice",
+        "Deep voice"
+      ],
+      "reuse": false,
+      "batch": "R01"
+    },
+    {
+      "id": "menu-move",
+      "name": "Menu move",
+      "type": "sfx",
+      "role": "interface/hover",
+      "styles": [
+        "Cursor",
+        "Page turn",
+        "Tab"
+      ],
+      "reuse": false,
+      "batch": "R01"
+    },
+    {
+      "id": "menu-confirm",
+      "name": "Menu confirm",
+      "type": "sfx",
+      "role": "interface/confirm",
+      "styles": [
+        "Confirm",
+        "Big confirm",
+        "Soft tick"
+      ],
+      "reuse": false,
+      "batch": "R01"
+    },
+    {
+      "id": "save-chime",
+      "name": "Save chime",
+      "type": "jingle",
+      "role": "interface/reward",
+      "styles": [
+        "Save point",
+        "Level up",
+        "Item found"
+      ],
+      "reuse": false,
+      "batch": "R01"
+    },
+    {
+      "id": "stone-door",
+      "name": "Stone door",
+      "type": "sfx",
+      "role": "world/door",
+      "styles": [
+        "Dungeon door",
+        "Sealed gate",
+        "Secret wall"
+      ],
+      "reuse": false,
+      "batch": "R01"
+    },
+    {
+      "id": "ice-shatter",
+      "name": "Ice shatter",
+      "type": "sfx",
+      "role": "effects/magic",
+      "styles": [
+        "Ice spell",
+        "Frost nova",
+        "Glass break"
+      ],
+      "reuse": false,
+      "batch": "R02"
+    },
+    {
+      "id": "thunder-crack",
+      "name": "Thunder crack",
+      "type": "sfx",
+      "role": "effects/magic",
+      "styles": [
+        "Thunder spell",
+        "Small spark",
+        "Storm strike"
+      ],
+      "reuse": false,
+      "batch": "R02"
+    },
+    {
+      "id": "heal-shimmer",
+      "name": "Heal shimmer",
+      "type": "sfx",
+      "role": "effects/magic",
+      "styles": [
+        "Heal",
+        "Revive",
+        "Cure"
+      ],
+      "reuse": false,
+      "batch": "R02"
+    },
+    {
+      "id": "monster-fade",
+      "name": "Monster defeated",
+      "type": "sfx",
+      "role": "characters/death",
+      "styles": [
+        "Monster fades",
+        "Bones collapse",
+        "Big beast falls"
+      ],
+      "reuse": false,
+      "batch": "R02"
+    },
+    {
+      "id": "wyrm-roar",
+      "name": "Wyrm roar",
+      "type": "sfx",
+      "role": "characters/voice",
+      "styles": [
+        "Wyrm roar",
+        "Fire breath",
+        "Distant growl"
+      ],
+      "reuse": false,
+      "batch": "R02"
+    },
+    {
+      "id": "victory-fanfare",
+      "name": "Victory fanfare",
+      "type": "jingle",
+      "role": "music/victory",
+      "styles": [
+        "Victory",
+        "Small win",
+        "Grand finale"
+      ],
+      "reuse": false,
+      "batch": "R02"
+    }
+  ],
+  "music": [
+    {
+      "id": "hearthvale-village",
+      "name": "Village and fields theme",
+      "role": "music/exploration",
+      "bpm": 92,
+      "key": "F major",
+      "reuse": false,
+      "batch": "R21"
+    },
+    {
+      "id": "hearthvale-battle",
+      "name": "Party battle theme",
+      "role": "music/battle",
+      "bpm": 152,
+      "key": "A minor (Dorian: F sharp in the melody and a D major chord)",
+      "reuse": false,
+      "batch": "R22"
+    }
+  ],
+  "batches": [
+    {
+      "id": "R01",
+      "kind": "sounds",
+      "assets": [
+        "footstep-grass",
+        "text-blip",
+        "menu-move",
+        "menu-confirm",
+        "save-chime",
+        "stone-door"
+      ],
+      "needs": [],
+      "after": [],
+      "order": 1
+    },
+    {
+      "id": "R02",
+      "kind": "sounds",
+      "assets": [
+        "ice-shatter",
+        "thunder-crack",
+        "heal-shimmer",
+        "monster-fade",
+        "wyrm-roar",
+        "victory-fanfare"
+      ],
+      "needs": [],
+      "after": [],
+      "order": 1
+    },
+    {
+      "id": "R03",
+      "kind": "character",
+      "assets": [
+        "hero-walker"
+      ],
+      "needs": [
+        "palettes",
+        "topdown-rig"
+      ],
+      "after": [
+        "R01"
+      ],
+      "order": 1
+    },
+    {
+      "id": "R04",
+      "kind": "tileset and props",
+      "assets": [
+        "tiles-meadow",
+        "tree-oak",
+        "tree-pine"
+      ],
+      "needs": [
+        "palettes",
+        "tile-helper"
+      ],
+      "after": [
+        "R01"
+      ],
+      "order": 1
+    },
+    {
+      "id": "R05",
+      "kind": "characters",
+      "assets": [
+        "mage-walker",
+        "rogue-walker"
+      ],
+      "needs": [
+        "palettes",
+        "topdown-rig"
+      ],
+      "after": [
+        "R01",
+        "R03"
+      ],
+      "order": 2
+    },
+    {
+      "id": "R06",
+      "kind": "characters",
+      "assets": [
+        "village-elder",
+        "merchant"
+      ],
+      "needs": [
+        "palettes",
+        "topdown-rig"
+      ],
+      "after": [
+        "R01",
+        "R03"
+      ],
+      "order": 2
+    },
+    {
+      "id": "R07",
+      "kind": "characters",
+      "assets": [
+        "town-guard",
+        "farm-kid"
+      ],
+      "needs": [
+        "palettes",
+        "topdown-rig"
+      ],
+      "after": [
+        "R01",
+        "R03"
+      ],
+      "order": 2
+    },
+    {
+      "id": "R08",
+      "kind": "tileset and props",
+      "assets": [
+        "tiles-village",
+        "market-stall"
+      ],
+      "needs": [
+        "palettes",
+        "tile-helper"
+      ],
+      "after": [
+        "R04"
+      ],
+      "order": 2
+    },
+    {
+      "id": "R09",
+      "kind": "tileset and props",
+      "assets": [
+        "tiles-dungeon",
+        "dungeon-door",
+        "chest-topdown",
+        "boulder"
+      ],
+      "needs": [
+        "palettes",
+        "tile-helper"
+      ],
+      "after": [
+        "R01",
+        "R04",
+        "P02"
+      ],
+      "order": 2
+    },
+    {
+      "id": "R10",
+      "kind": "tileset and props",
+      "assets": [
+        "tiles-shore",
+        "save-crystal"
+      ],
+      "needs": [
+        "palettes",
+        "tile-helper"
+      ],
+      "after": [
+        "R01",
+        "R04"
+      ],
+      "order": 2
+    },
+    {
+      "id": "R11",
+      "kind": "props",
+      "assets": [
+        "cottage",
+        "inn"
+      ],
+      "needs": [
+        "palettes"
+      ],
+      "after": [
+        "P02"
+      ],
+      "order": 2
+    },
+    {
+      "id": "R12",
+      "kind": "characters",
+      "assets": [
+        "rogue-battler",
+        "road-bandit"
+      ],
+      "needs": [
+        "palettes",
+        "humanoid-poses"
+      ],
+      "after": [
+        "R02"
+      ],
+      "order": 2
+    },
+    {
+      "id": "R13",
+      "kind": "creatures",
+      "assets": [
+        "bone-soldier",
+        "thicket-imp"
+      ],
+      "needs": [
+        "palettes",
+        "humanoid-poses"
+      ],
+      "after": [
+        "R02"
+      ],
+      "order": 2
+    },
+    {
+      "id": "R14",
+      "kind": "boss",
+      "assets": [
+        "ember-wyrm"
+      ],
+      "needs": [
+        "palettes"
+      ],
+      "after": [
+        "R02"
+      ],
+      "order": 2
+    },
+    {
+      "id": "R15",
+      "kind": "portraits",
+      "assets": [
+        "portraits-party",
+        "portraits-village"
+      ],
+      "needs": [
+        "palettes"
+      ],
+      "after": [
+        "R03"
+      ],
+      "order": 2
+    },
+    {
+      "id": "R16",
+      "kind": "icons",
+      "assets": [
+        "icons-consumables",
+        "icons-key-items"
+      ],
+      "needs": [
+        "palettes"
+      ],
+      "after": [],
+      "order": 2
+    },
+    {
+      "id": "R17",
+      "kind": "icons",
+      "assets": [
+        "icons-gear",
+        "ui-status-icons"
+      ],
+      "needs": [
+        "palettes"
+      ],
+      "after": [],
+      "order": 2
+    },
+    {
+      "id": "R18",
+      "kind": "effects",
+      "assets": [
+        "fx-slash",
+        "fx-fire-spell",
+        "fx-ice-spell",
+        "fx-thunder-spell",
+        "fx-heal"
+      ],
+      "needs": [
+        "palettes",
+        "fx-helper"
+      ],
+      "after": [
+        "R02"
+      ],
+      "order": 2
+    },
+    {
+      "id": "R19",
+      "kind": "backgrounds",
+      "assets": [
+        "bg-battle-field",
+        "bg-battle-dungeon"
+      ],
+      "needs": [
+        "palettes",
+        "backdrop-helper"
+      ],
+      "after": [],
+      "order": 2
+    },
+    {
+      "id": "R20",
+      "kind": "interface",
+      "assets": [
+        "ui-dialogue",
+        "ui-battle-menu",
+        "ui-bars-rpg",
+        "ui-damage-digits"
+      ],
+      "needs": [
+        "palettes",
+        "ui-helper"
+      ],
+      "after": [],
+      "order": 2
+    },
+    {
+      "id": "R21",
+      "kind": "music",
+      "assets": [
+        "hearthvale-village"
+      ],
+      "needs": [
+        "compose-kit"
+      ],
+      "after": [],
+      "order": 1
+    },
+    {
+      "id": "R22",
+      "kind": "music",
+      "assets": [
+        "hearthvale-battle"
+      ],
+      "needs": [
+        "compose-kit"
+      ],
+      "after": [],
+      "order": 1
+    }
+  ],
+  "reusedChanges": [
+    {
+      "id": "knight",
+      "change": "As asked for in the platformer kit: add `die` (the knock-out), `block` (the Defend command) and `victory`."
+    },
+    {
+      "id": "wizard",
+      "change": "As asked for in the platformer kit: add `die`, `victory`, `talk`; declare parts."
+    },
+    {
+      "id": "slime",
+      "change": "Add `die` (asked for in the platformer kit)."
+    },
+    {
+      "id": "bat",
+      "change": "Add `die` (asked for in the platformer kit)."
+    },
+    {
+      "id": "wolf",
+      "change": "Add `die` (asked for in the platformer kit)."
+    }
+  ]
+}

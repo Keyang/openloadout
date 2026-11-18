@@ -1,0 +1,2931 @@
+{
+  "id": "kit-roguelite-scifi",
+  "name": "Derelict Station roguelite kit",
+  "gameType": "roguelike-action",
+  "theme": "sci-fi",
+  "view": "top-down",
+  "palette": {
+    "name": "Derelict",
+    "colours": {
+      "ink": "#231b33",
+      "void": "#141a33",
+      "plate": "#353d57",
+      "deck": "#4a5470",
+      "hull": "#6b7896",
+      "panel": "#9aa6c0",
+      "steel": "#c2c9d6",
+      "suit": "#e8ecf2",
+      "signal": "#f08a2c",
+      "cyan": "#5fe0f0",
+      "teal": "#2fb3a8",
+      "amber": "#f2a030",
+      "red": "#e2473f",
+      "flesh": "#b04a8a",
+      "chitin": "#6a3a7a",
+      "acid": "#9fe040",
+      "gold": "#f2c230",
+      "heal": "#5fd47a",
+      "shield": "#4f9ff0",
+      "xp": "#b48af8",
+      "cream": "#f0ead8",
+      "skin": "#f6d3b0"
+    }
+  },
+  "sprites": [
+    {
+      "id": "void-ranger",
+      "name": "Ranger",
+      "type": "character",
+      "role": "characters/player",
+      "view": "top-down",
+      "frame": [
+        48,
+        48
+      ],
+      "pivot": [
+        24,
+        42
+      ],
+      "clips": [
+        {
+          "name": "idle_down",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "idle_up",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "idle_side",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "walk_down",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "walk_up",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "walk_side",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "shoot_down",
+          "frames": 6,
+          "loop": false
+        },
+        {
+          "name": "shoot_up",
+          "frames": 6,
+          "loop": false
+        },
+        {
+          "name": "shoot_side",
+          "frames": 6,
+          "loop": false
+        },
+        {
+          "name": "dodge",
+          "frames": 8,
+          "loop": false
+        },
+        {
+          "name": "hurt",
+          "frames": 4,
+          "loop": false
+        },
+        {
+          "name": "die",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [
+        "weapon",
+        "headgear",
+        "pack"
+      ],
+      "reuse": false,
+      "batch": "S04"
+    },
+    {
+      "id": "shield-trooper",
+      "name": "Shield trooper",
+      "type": "character",
+      "role": "characters/enemy",
+      "view": "top-down",
+      "frame": [
+        48,
+        48
+      ],
+      "pivot": [
+        24,
+        42
+      ],
+      "clips": [
+        {
+          "name": "idle_down",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "idle_up",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "idle_side",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "walk_down",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "walk_up",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "walk_side",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "shoot_down",
+          "frames": 6,
+          "loop": false
+        },
+        {
+          "name": "shoot_up",
+          "frames": 6,
+          "loop": false
+        },
+        {
+          "name": "shoot_side",
+          "frames": 6,
+          "loop": false
+        },
+        {
+          "name": "block",
+          "frames": 6,
+          "loop": false
+        },
+        {
+          "name": "hurt",
+          "frames": 4,
+          "loop": false
+        },
+        {
+          "name": "die",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [
+        "shield",
+        "weapon",
+        "headgear"
+      ],
+      "reuse": false,
+      "batch": "S05"
+    },
+    {
+      "id": "vendor-bot",
+      "name": "Vendor bot",
+      "type": "character",
+      "role": "characters/npc",
+      "view": "top-down",
+      "frame": [
+        48,
+        48
+      ],
+      "pivot": [
+        24,
+        42
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "talk",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "sell",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [
+        "headgear",
+        "held"
+      ],
+      "reuse": false,
+      "batch": "S05"
+    },
+    {
+      "id": "crawler-bug",
+      "name": "Crawler",
+      "type": "creature",
+      "role": "characters/enemy",
+      "view": "top-down",
+      "frame": [
+        48,
+        48
+      ],
+      "pivot": [
+        24,
+        40
+      ],
+      "clips": [
+        {
+          "name": "idle_down",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "walk_down",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "walk_up",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "walk_side",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "attack_down",
+          "frames": 8,
+          "loop": false
+        },
+        {
+          "name": "attack_up",
+          "frames": 8,
+          "loop": false
+        },
+        {
+          "name": "attack_side",
+          "frames": 8,
+          "loop": false
+        },
+        {
+          "name": "hurt",
+          "frames": 4,
+          "loop": false
+        },
+        {
+          "name": "die",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [
+        "horns",
+        "tail"
+      ],
+      "reuse": false,
+      "batch": "S06"
+    },
+    {
+      "id": "swarm-mite",
+      "name": "Swarm mite",
+      "type": "creature",
+      "role": "characters/enemy",
+      "view": "top-down",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        28
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "walk",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "attack",
+          "frames": 6,
+          "loop": false
+        },
+        {
+          "name": "hurt",
+          "frames": 4,
+          "loop": false
+        },
+        {
+          "name": "die",
+          "frames": 6,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "S06"
+    },
+    {
+      "id": "spitter-bug",
+      "name": "Spitter",
+      "type": "creature",
+      "role": "characters/enemy",
+      "view": "top-down",
+      "frame": [
+        48,
+        48
+      ],
+      "pivot": [
+        24,
+        42
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "shoot",
+          "frames": 8,
+          "loop": false
+        },
+        {
+          "name": "burrow",
+          "frames": 8,
+          "loop": false
+        },
+        {
+          "name": "hurt",
+          "frames": 4,
+          "loop": false
+        },
+        {
+          "name": "die",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [
+        "horns"
+      ],
+      "reuse": false,
+      "batch": "S07"
+    },
+    {
+      "id": "scout-drone",
+      "name": "Scout drone",
+      "type": "creature",
+      "role": "characters/enemy",
+      "view": "top-down",
+      "frame": [
+        48,
+        48
+      ],
+      "pivot": [
+        24,
+        24
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "alert",
+          "frames": 6,
+          "loop": false
+        },
+        {
+          "name": "shoot",
+          "frames": 6,
+          "loop": false
+        },
+        {
+          "name": "hurt",
+          "frames": 4,
+          "loop": false
+        },
+        {
+          "name": "die",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [
+        "weapon",
+        "wings"
+      ],
+      "reuse": false,
+      "batch": "S07"
+    },
+    {
+      "id": "security-bot",
+      "name": "Security bot",
+      "type": "creature",
+      "role": "characters/enemy",
+      "view": "top-down",
+      "frame": [
+        48,
+        48
+      ],
+      "pivot": [
+        24,
+        42
+      ],
+      "clips": [
+        {
+          "name": "idle_down",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "walk_down",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "walk_up",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "walk_side",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "attack_down",
+          "frames": 8,
+          "loop": false
+        },
+        {
+          "name": "attack_up",
+          "frames": 8,
+          "loop": false
+        },
+        {
+          "name": "attack_side",
+          "frames": 8,
+          "loop": false
+        },
+        {
+          "name": "shoot_down",
+          "frames": 6,
+          "loop": false
+        },
+        {
+          "name": "shoot_up",
+          "frames": 6,
+          "loop": false
+        },
+        {
+          "name": "shoot_side",
+          "frames": 6,
+          "loop": false
+        },
+        {
+          "name": "hurt",
+          "frames": 4,
+          "loop": false
+        },
+        {
+          "name": "die",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [
+        "weapon",
+        "pack"
+      ],
+      "reuse": false,
+      "batch": "S08"
+    },
+    {
+      "id": "hive-mother",
+      "name": "Hive mother",
+      "type": "creature",
+      "role": "characters/boss",
+      "view": "top-down",
+      "frame": [
+        96,
+        96
+      ],
+      "pivot": [
+        48,
+        88
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "attack",
+          "frames": 10,
+          "loop": false
+        },
+        {
+          "name": "shoot",
+          "frames": 12,
+          "loop": false
+        },
+        {
+          "name": "spawn",
+          "frames": 10,
+          "loop": false
+        },
+        {
+          "name": "enrage",
+          "frames": 10,
+          "loop": false
+        },
+        {
+          "name": "hurt",
+          "frames": 4,
+          "loop": false
+        },
+        {
+          "name": "die",
+          "frames": 12,
+          "loop": false
+        }
+      ],
+      "parts": [
+        "horns",
+        "wings"
+      ],
+      "reuse": false,
+      "batch": "S09"
+    },
+    {
+      "id": "warden-mech",
+      "name": "Warden mech",
+      "type": "creature",
+      "role": "characters/boss",
+      "view": "top-down",
+      "frame": [
+        96,
+        96
+      ],
+      "pivot": [
+        48,
+        88
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "walk",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "shoot",
+          "frames": 12,
+          "loop": false
+        },
+        {
+          "name": "beam",
+          "frames": 12,
+          "loop": false
+        },
+        {
+          "name": "overheat",
+          "frames": 10,
+          "loop": false
+        },
+        {
+          "name": "hurt",
+          "frames": 4,
+          "loop": false
+        },
+        {
+          "name": "die",
+          "frames": 12,
+          "loop": false
+        }
+      ],
+      "parts": [
+        "weapon",
+        "pack"
+      ],
+      "reuse": false,
+      "batch": "S10"
+    },
+    {
+      "id": "tiles-station-floor",
+      "name": "Station floor",
+      "type": "tileset",
+      "role": "world/tile",
+      "view": "top-down",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        16
+      ],
+      "clips": [
+        {
+          "name": "floor-fill",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "plate-fill",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "plate-top",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "plate-left",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "plate-right",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "plate-side-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "plate-side-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "plate-bottom",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "plate-bottom-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "plate-bottom-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "plate-inner-tl",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "plate-inner-tr",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "plate-inner-bl",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "plate-inner-br",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "floor-deco-a",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "floor-deco-b",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "floor-deco-c",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "floor-deco-d",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "floor-deco-e",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "floor-deco-f",
+          "frames": 8,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "S03"
+    },
+    {
+      "id": "tiles-station-walls",
+      "name": "Station walls",
+      "type": "tileset",
+      "role": "world/tile",
+      "view": "top-down",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        16
+      ],
+      "clips": [
+        {
+          "name": "wall-fill",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-top",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-left",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-right",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-side-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-side-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-bottom",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-bottom-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-bottom-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-inner-tl",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-inner-tr",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-inner-bl",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-inner-br",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-deco-a",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-deco-b",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-deco-c",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-deco-d",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "doorway-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "doorway-r",
+          "frames": 1,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "S11"
+    },
+    {
+      "id": "tiles-hive",
+      "name": "Hive growth",
+      "type": "tileset",
+      "role": "world/tile",
+      "view": "top-down",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        16
+      ],
+      "clips": [
+        {
+          "name": "hive-fill",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "growth-fill",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "growth-top",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "growth-left",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "growth-right",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "growth-side-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "growth-side-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "growth-bottom",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "growth-bottom-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "growth-bottom-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "growth-inner-tl",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "growth-inner-tr",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "growth-inner-bl",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "growth-inner-br",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "hive-deco-a",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "hive-deco-b",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "hive-deco-c",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "hive-deco-d",
+          "frames": 1,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "S12"
+    },
+    {
+      "id": "tiles-pit",
+      "name": "Pits and the void",
+      "type": "tileset",
+      "role": "world/tile",
+      "view": "top-down",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        16
+      ],
+      "clips": [
+        {
+          "name": "pit-fill",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "pit-top",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "pit-left",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "pit-right",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "pit-side-l",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "pit-side-r",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "pit-bottom",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "pit-bottom-l",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "pit-bottom-r",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "pit-inner-tl",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "pit-inner-tr",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "pit-inner-bl",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "pit-inner-br",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "pit-deco-a",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "pit-deco-b",
+          "frames": 8,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "S13"
+    },
+    {
+      "id": "blast-door",
+      "name": "Blast door",
+      "type": "prop",
+      "role": "world/door",
+      "view": "top-down",
+      "frame": [
+        64,
+        48
+      ],
+      "pivot": [
+        32,
+        46
+      ],
+      "clips": [
+        {
+          "name": "closed",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "open",
+          "frames": 8,
+          "loop": false
+        },
+        {
+          "name": "locked",
+          "frames": 8,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "S11"
+    },
+    {
+      "id": "supply-crate",
+      "name": "Supply crate",
+      "type": "prop",
+      "role": "world/prop",
+      "view": "top-down",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        30
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "hurt",
+          "frames": 4,
+          "loop": false
+        },
+        {
+          "name": "break",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "S14"
+    },
+    {
+      "id": "fuel-barrel",
+      "name": "Fuel barrel",
+      "type": "prop",
+      "role": "world/hazard",
+      "view": "top-down",
+      "frame": [
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "hurt",
+          "frames": 4,
+          "loop": false
+        },
+        {
+          "name": "fuse",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "break",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "S14"
+    },
+    {
+      "id": "acid-pool",
+      "name": "Acid pool",
+      "type": "prop",
+      "role": "world/hazard",
+      "view": "top-down",
+      "frame": [
+        48,
+        32
+      ],
+      "pivot": [
+        24,
+        16
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "spawn",
+          "frames": 8,
+          "loop": false
+        },
+        {
+          "name": "fade",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "S12"
+    },
+    {
+      "id": "laser-gate",
+      "name": "Laser gate",
+      "type": "prop",
+      "role": "world/hazard",
+      "view": "top-down",
+      "frame": [
+        64,
+        48
+      ],
+      "pivot": [
+        32,
+        46
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "warn",
+          "frames": 6,
+          "loop": true
+        },
+        {
+          "name": "off",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "open",
+          "frames": 6,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "S11"
+    },
+    {
+      "id": "wall-terminal",
+      "name": "Terminal",
+      "type": "prop",
+      "role": "world/prop",
+      "view": "top-down",
+      "frame": [
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "activate",
+          "frames": 8,
+          "loop": false
+        },
+        {
+          "name": "off",
+          "frames": 1,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "S11"
+    },
+    {
+      "id": "warp-pad",
+      "name": "Warp pad",
+      "type": "prop",
+      "role": "world/prop",
+      "view": "top-down",
+      "frame": [
+        64,
+        48
+      ],
+      "pivot": [
+        32,
+        40
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "charge",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "activate",
+          "frames": 10,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "S13"
+    },
+    {
+      "id": "tech-chest",
+      "name": "Loot cache",
+      "type": "prop",
+      "role": "world/prop",
+      "view": "top-down",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        30
+      ],
+      "clips": [
+        {
+          "name": "closed",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "open",
+          "frames": 8,
+          "loop": false
+        },
+        {
+          "name": "empty",
+          "frames": 1,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "S14"
+    },
+    {
+      "id": "upgrade-pedestal",
+      "name": "Upgrade pedestal",
+      "type": "prop",
+      "role": "world/prop",
+      "view": "top-down",
+      "frame": [
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "activate",
+          "frames": 8,
+          "loop": false
+        },
+        {
+          "name": "taken",
+          "frames": 1,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "S14"
+    },
+    {
+      "id": "credit-chip",
+      "name": "Credit chip",
+      "type": "pickup",
+      "role": "items/pickup",
+      "view": "front",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        30
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "collect",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "S15"
+    },
+    {
+      "id": "health-cell",
+      "name": "Health cell",
+      "type": "pickup",
+      "role": "items/food",
+      "view": "front",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        30
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "collect",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "S15"
+    },
+    {
+      "id": "shield-cell",
+      "name": "Shield cell",
+      "type": "pickup",
+      "role": "items/pickup",
+      "view": "front",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        30
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "collect",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "S15"
+    },
+    {
+      "id": "xp-shard",
+      "name": "XP shard",
+      "type": "pickup",
+      "role": "items/pickup",
+      "view": "front",
+      "frame": [
+        16,
+        16
+      ],
+      "pivot": [
+        8,
+        8
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "attract",
+          "frames": 6,
+          "loop": true
+        },
+        {
+          "name": "collect",
+          "frames": 6,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "S15"
+    },
+    {
+      "id": "keycard",
+      "name": "Keycard",
+      "type": "pickup",
+      "role": "items/key",
+      "view": "front",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        30
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "collect",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "S15"
+    },
+    {
+      "id": "icons-upgrades",
+      "name": "Upgrade icons",
+      "type": "icon",
+      "role": "items/icon",
+      "view": "none",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        16
+      ],
+      "clips": [
+        {
+          "name": "damage",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "fire-rate",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "speed",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "multishot",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "pierce",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "magnet",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "shield",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "crit",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "regen",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "dash",
+          "frames": 1,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "S16"
+    },
+    {
+      "id": "icons-weapons",
+      "name": "Weapon icons",
+      "type": "icon",
+      "role": "items/weapon",
+      "view": "none",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        16
+      ],
+      "clips": [
+        {
+          "name": "blaster",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "scatter",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "beam",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "rocket",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "orbit-blades",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "mine",
+          "frames": 1,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "S16"
+    },
+    {
+      "id": "blaster-bolt",
+      "name": "Blaster bolt",
+      "type": "projectile",
+      "role": "effects/projectile",
+      "view": "top-down",
+      "frame": [
+        32,
+        16
+      ],
+      "pivot": [
+        16,
+        8
+      ],
+      "clips": [
+        {
+          "name": "fly",
+          "frames": 4,
+          "loop": true
+        },
+        {
+          "name": "hit",
+          "frames": 5,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "S17"
+    },
+    {
+      "id": "scatter-pellet",
+      "name": "Scatter pellet",
+      "type": "projectile",
+      "role": "effects/projectile",
+      "view": "top-down",
+      "frame": [
+        16,
+        16
+      ],
+      "pivot": [
+        8,
+        8
+      ],
+      "clips": [
+        {
+          "name": "fly",
+          "frames": 4,
+          "loop": true
+        },
+        {
+          "name": "hit",
+          "frames": 4,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "S17"
+    },
+    {
+      "id": "micro-rocket",
+      "name": "Micro rocket",
+      "type": "projectile",
+      "role": "effects/projectile",
+      "view": "top-down",
+      "frame": [
+        32,
+        16
+      ],
+      "pivot": [
+        16,
+        8
+      ],
+      "clips": [
+        {
+          "name": "fly",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "hit",
+          "frames": 6,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "S17"
+    },
+    {
+      "id": "plasma-orb",
+      "name": "Enemy plasma orb",
+      "type": "projectile",
+      "role": "effects/projectile",
+      "view": "top-down",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        16
+      ],
+      "clips": [
+        {
+          "name": "fly",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "hit",
+          "frames": 6,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "S17"
+    },
+    {
+      "id": "acid-glob",
+      "name": "Acid glob",
+      "type": "projectile",
+      "role": "effects/projectile",
+      "view": "top-down",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        16
+      ],
+      "clips": [
+        {
+          "name": "fly",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "hit",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "S17"
+    },
+    {
+      "id": "orbit-blade",
+      "name": "Orbit blade",
+      "type": "projectile",
+      "role": "effects/projectile",
+      "view": "top-down",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        16
+      ],
+      "clips": [
+        {
+          "name": "fly",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "hit",
+          "frames": 4,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "S17"
+    },
+    {
+      "id": "muzzle-flash",
+      "name": "Muzzle flash",
+      "type": "effect",
+      "role": "effects/spark",
+      "view": "top-down",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        8,
+        16
+      ],
+      "clips": [
+        {
+          "name": "burst",
+          "frames": 4,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "S18"
+    },
+    {
+      "id": "hit-flash",
+      "name": "Energy hit",
+      "type": "effect",
+      "role": "effects/spark",
+      "view": "none",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        16
+      ],
+      "clips": [
+        {
+          "name": "burst",
+          "frames": 5,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "S18"
+    },
+    {
+      "id": "plasma-burst",
+      "name": "Small plasma blast",
+      "type": "effect",
+      "role": "effects/explosion",
+      "view": "none",
+      "frame": [
+        48,
+        48
+      ],
+      "pivot": [
+        24,
+        24
+      ],
+      "clips": [
+        {
+          "name": "burst",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "S18"
+    },
+    {
+      "id": "explosion-large",
+      "name": "Large explosion",
+      "type": "effect",
+      "role": "effects/explosion",
+      "view": "none",
+      "frame": [
+        96,
+        96
+      ],
+      "pivot": [
+        48,
+        48
+      ],
+      "clips": [
+        {
+          "name": "burst",
+          "frames": 12,
+          "loop": false
+        },
+        {
+          "name": "smoke",
+          "frames": 8,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "S18"
+    },
+    {
+      "id": "dodge-trail",
+      "name": "Dodge trail",
+      "type": "effect",
+      "role": "effects/dust",
+      "view": "top-down",
+      "frame": [
+        48,
+        48
+      ],
+      "pivot": [
+        24,
+        24
+      ],
+      "clips": [
+        {
+          "name": "burst",
+          "frames": 6,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "S19"
+    },
+    {
+      "id": "spawn-warp",
+      "name": "Spawn warning",
+      "type": "effect",
+      "role": "effects/magic",
+      "view": "top-down",
+      "frame": [
+        48,
+        48
+      ],
+      "pivot": [
+        24,
+        24
+      ],
+      "clips": [
+        {
+          "name": "warn",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "burst",
+          "frames": 8,
+          "loop": false
+        },
+        {
+          "name": "close",
+          "frames": 6,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "S19"
+    },
+    {
+      "id": "debris-burst",
+      "name": "Debris",
+      "type": "effect",
+      "role": "effects/dust",
+      "view": "top-down",
+      "frame": [
+        48,
+        48
+      ],
+      "pivot": [
+        24,
+        24
+      ],
+      "clips": [
+        {
+          "name": "burst",
+          "frames": 8,
+          "loop": false
+        },
+        {
+          "name": "goo",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "S19"
+    },
+    {
+      "id": "bg-starfield",
+      "name": "Starfield",
+      "type": "background",
+      "role": "environment/background",
+      "view": "none",
+      "frame": [
+        320,
+        180
+      ],
+      "pivot": [
+        160,
+        180
+      ],
+      "clips": [
+        {
+          "name": "far",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "mid",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "near",
+          "frames": 1,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "S13"
+    },
+    {
+      "id": "ui-hud-roguelite",
+      "name": "Roguelite HUD",
+      "type": "ui",
+      "role": "interface/bar",
+      "view": "none",
+      "frame": [
+        16,
+        16
+      ],
+      "pivot": [
+        8,
+        8
+      ],
+      "clips": [
+        {
+          "name": "hp-full",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "hp-half",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "hp-empty",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "shield-full",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "shield-empty",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "credit",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "key",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "room",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "room-current",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "room-boss",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "room-shop",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "room-unknown",
+          "frames": 1,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "S20"
+    },
+    {
+      "id": "ui-bars-tech",
+      "name": "Tech bars",
+      "type": "ui",
+      "role": "interface/bar",
+      "view": "none",
+      "frame": [
+        64,
+        16
+      ],
+      "pivot": [
+        32,
+        8
+      ],
+      "clips": [
+        {
+          "name": "frame",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "fill",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "fill-b",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "fill-c",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "flash",
+          "frames": 4,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "S20"
+    },
+    {
+      "id": "ui-upgrade-card",
+      "name": "Upgrade card",
+      "type": "ui",
+      "role": "interface/panel",
+      "view": "none",
+      "frame": [
+        64,
+        96
+      ],
+      "pivot": [
+        32,
+        48
+      ],
+      "clips": [
+        {
+          "name": "normal",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "hover",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "pressed",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "disabled",
+          "frames": 1,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "S20"
+    },
+    {
+      "id": "ui-crosshair",
+      "name": "Crosshair",
+      "type": "ui",
+      "role": "interface/cursor",
+      "view": "none",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        16
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "shoot",
+          "frames": 4,
+          "loop": false
+        },
+        {
+          "name": "reload",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "hit",
+          "frames": 4,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "S20"
+    }
+  ],
+  "sounds": [
+    {
+      "id": "laser-shot",
+      "name": "Laser shot",
+      "type": "sfx",
+      "role": "actions/shoot",
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "explosion",
+      "name": "Explosion",
+      "type": "sfx",
+      "role": "effects/explosion",
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "spaceship-hum",
+      "name": "Spaceship hum",
+      "type": "sfx",
+      "role": "world/machine",
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "bubbles",
+      "name": "Bubbles",
+      "type": "ambience",
+      "role": "environment/ambience",
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "scatter-blast",
+      "name": "Scatter gun",
+      "type": "sfx",
+      "role": "actions/shoot",
+      "styles": [
+        "Scatter gun",
+        "Heavy slug",
+        "Sawed-off"
+      ],
+      "reuse": false,
+      "batch": "S01"
+    },
+    {
+      "id": "rocket-launch",
+      "name": "Rocket launch",
+      "type": "sfx",
+      "role": "actions/shoot",
+      "styles": [
+        "Micro rocket",
+        "Missile volley",
+        "Flare"
+      ],
+      "reuse": false,
+      "batch": "S01"
+    },
+    {
+      "id": "bolt-impact",
+      "name": "Bolt impact",
+      "type": "sfx",
+      "role": "actions/hit",
+      "styles": [
+        "On metal",
+        "On flesh",
+        "Ricochet"
+      ],
+      "reuse": false,
+      "batch": "S01"
+    },
+    {
+      "id": "footstep-metal",
+      "name": "Footstep on metal",
+      "type": "sfx",
+      "role": "characters/footstep",
+      "styles": [
+        "Boots on deck",
+        "Heavy mech",
+        "Light scuttle"
+      ],
+      "reuse": false,
+      "batch": "S01"
+    },
+    {
+      "id": "dodge-dash",
+      "name": "Dodge dash",
+      "type": "sfx",
+      "role": "actions/dash",
+      "styles": [
+        "Dodge roll",
+        "Thruster dash",
+        "Blink"
+      ],
+      "reuse": false,
+      "batch": "S01"
+    },
+    {
+      "id": "ranger-hurt",
+      "name": "Ranger hurt",
+      "type": "sfx",
+      "role": "characters/hurt",
+      "styles": [
+        "Hit",
+        "Shield hit",
+        "Critical"
+      ],
+      "reuse": false,
+      "batch": "S01"
+    },
+    {
+      "id": "shield-break",
+      "name": "Shield break",
+      "type": "sfx",
+      "role": "effects/impact",
+      "styles": [
+        "Shield break",
+        "Small crack",
+        "Overload"
+      ],
+      "reuse": false,
+      "batch": "S01"
+    },
+    {
+      "id": "tech-click",
+      "name": "Tech click",
+      "type": "sfx",
+      "role": "interface/click",
+      "styles": [
+        "Select",
+        "Hover",
+        "Confirm"
+      ],
+      "reuse": false,
+      "batch": "S01"
+    },
+    {
+      "id": "bug-splat",
+      "name": "Bug splat",
+      "type": "sfx",
+      "role": "characters/death",
+      "styles": [
+        "Crawler",
+        "Mite pop",
+        "Big burst"
+      ],
+      "reuse": false,
+      "batch": "S02"
+    },
+    {
+      "id": "bot-shutdown",
+      "name": "Robot shutdown",
+      "type": "sfx",
+      "role": "characters/death",
+      "styles": [
+        "Drone down",
+        "Bot shutdown",
+        "Mech collapse"
+      ],
+      "reuse": false,
+      "batch": "S02"
+    },
+    {
+      "id": "hive-shriek",
+      "name": "Hive shriek",
+      "type": "sfx",
+      "role": "characters/voice",
+      "styles": [
+        "Hive mother",
+        "Small screech",
+        "Enraged"
+      ],
+      "reuse": false,
+      "batch": "S02"
+    },
+    {
+      "id": "credit-pickup",
+      "name": "Credit pickup",
+      "type": "sfx",
+      "role": "items/pickup",
+      "styles": [
+        "Credit chip",
+        "Keycard",
+        "Big payout"
+      ],
+      "reuse": false,
+      "batch": "S02"
+    },
+    {
+      "id": "xp-blip",
+      "name": "XP blip",
+      "type": "sfx",
+      "role": "items/pickup",
+      "styles": [
+        "XP shard",
+        "Tiny tick",
+        "Combo high"
+      ],
+      "reuse": false,
+      "batch": "S02"
+    },
+    {
+      "id": "upgrade-get",
+      "name": "Upgrade",
+      "type": "sfx",
+      "role": "items/equip",
+      "styles": [
+        "Upgrade",
+        "Health cell",
+        "Shield cell"
+      ],
+      "reuse": false,
+      "batch": "S02"
+    },
+    {
+      "id": "door-hiss",
+      "name": "Blast door",
+      "type": "sfx",
+      "role": "world/door",
+      "styles": [
+        "Blast door",
+        "Loot cache",
+        "Airlock"
+      ],
+      "reuse": false,
+      "batch": "S02"
+    },
+    {
+      "id": "warp-out",
+      "name": "Warp",
+      "type": "sfx",
+      "role": "world/machine",
+      "styles": [
+        "Warp out",
+        "Spawn in",
+        "Teleport blink"
+      ],
+      "reuse": false,
+      "batch": "S02"
+    }
+  ],
+  "music": [
+    {
+      "id": "derelict-run",
+      "name": "Station run theme",
+      "role": "music/exploration",
+      "bpm": 126,
+      "key": "E minor (the F major chord in bar 8 gives a darker, Phrygian colour)",
+      "reuse": false,
+      "batch": "S21"
+    },
+    {
+      "id": "derelict-boss",
+      "name": "Station boss theme",
+      "role": "music/boss",
+      "bpm": 164,
+      "key": "C minor",
+      "reuse": false,
+      "batch": "S22"
+    }
+  ],
+  "batches": [
+    {
+      "id": "S01",
+      "kind": "sounds",
+      "assets": [
+        "scatter-blast",
+        "rocket-launch",
+        "bolt-impact",
+        "footstep-metal",
+        "dodge-dash",
+        "ranger-hurt",
+        "shield-break",
+        "tech-click"
+      ],
+      "needs": [],
+      "after": [],
+      "order": 1
+    },
+    {
+      "id": "S02",
+      "kind": "sounds",
+      "assets": [
+        "bug-splat",
+        "bot-shutdown",
+        "hive-shriek",
+        "credit-pickup",
+        "xp-blip",
+        "upgrade-get",
+        "door-hiss",
+        "warp-out"
+      ],
+      "needs": [],
+      "after": [],
+      "order": 1
+    },
+    {
+      "id": "S03",
+      "kind": "tileset",
+      "assets": [
+        "tiles-station-floor"
+      ],
+      "needs": [
+        "palettes",
+        "tile-helper"
+      ],
+      "after": [
+        "R04"
+      ],
+      "order": 2
+    },
+    {
+      "id": "S04",
+      "kind": "character",
+      "assets": [
+        "void-ranger"
+      ],
+      "needs": [
+        "palettes",
+        "topdown-rig"
+      ],
+      "after": [
+        "S01",
+        "R03"
+      ],
+      "order": 2
+    },
+    {
+      "id": "S05",
+      "kind": "characters",
+      "assets": [
+        "shield-trooper",
+        "vendor-bot"
+      ],
+      "needs": [
+        "palettes",
+        "topdown-rig"
+      ],
+      "after": [
+        "S01",
+        "S02",
+        "S04"
+      ],
+      "order": 3
+    },
+    {
+      "id": "S06",
+      "kind": "creatures",
+      "assets": [
+        "crawler-bug",
+        "swarm-mite"
+      ],
+      "needs": [
+        "palettes"
+      ],
+      "after": [
+        "S01",
+        "S02",
+        "R03"
+      ],
+      "order": 2
+    },
+    {
+      "id": "S07",
+      "kind": "creatures",
+      "assets": [
+        "spitter-bug",
+        "scout-drone"
+      ],
+      "needs": [
+        "palettes"
+      ],
+      "after": [
+        "S01",
+        "S02"
+      ],
+      "order": 2
+    },
+    {
+      "id": "S08",
+      "kind": "creature",
+      "assets": [
+        "security-bot"
+      ],
+      "needs": [
+        "palettes"
+      ],
+      "after": [
+        "S01",
+        "S02",
+        "R03"
+      ],
+      "order": 2
+    },
+    {
+      "id": "S09",
+      "kind": "boss",
+      "assets": [
+        "hive-mother"
+      ],
+      "needs": [
+        "palettes"
+      ],
+      "after": [
+        "S01",
+        "S02"
+      ],
+      "order": 2
+    },
+    {
+      "id": "S10",
+      "kind": "boss",
+      "assets": [
+        "warden-mech"
+      ],
+      "needs": [
+        "palettes"
+      ],
+      "after": [
+        "S01",
+        "S02"
+      ],
+      "order": 2
+    },
+    {
+      "id": "S11",
+      "kind": "tileset and props",
+      "assets": [
+        "tiles-station-walls",
+        "blast-door",
+        "wall-terminal",
+        "laser-gate"
+      ],
+      "needs": [
+        "palettes",
+        "tile-helper"
+      ],
+      "after": [
+        "S01",
+        "S02",
+        "S03"
+      ],
+      "order": 3
+    },
+    {
+      "id": "S12",
+      "kind": "tileset and props",
+      "assets": [
+        "tiles-hive",
+        "acid-pool"
+      ],
+      "needs": [
+        "palettes",
+        "tile-helper"
+      ],
+      "after": [
+        "S03"
+      ],
+      "order": 3
+    },
+    {
+      "id": "S13",
+      "kind": "tileset, prop and background",
+      "assets": [
+        "tiles-pit",
+        "warp-pad",
+        "bg-starfield"
+      ],
+      "needs": [
+        "palettes",
+        "tile-helper",
+        "backdrop-helper"
+      ],
+      "after": [
+        "S02",
+        "S03"
+      ],
+      "order": 3
+    },
+    {
+      "id": "S14",
+      "kind": "props",
+      "assets": [
+        "supply-crate",
+        "fuel-barrel",
+        "tech-chest",
+        "upgrade-pedestal"
+      ],
+      "needs": [
+        "palettes"
+      ],
+      "after": [
+        "S01",
+        "S02"
+      ],
+      "order": 2
+    },
+    {
+      "id": "S15",
+      "kind": "pickups",
+      "assets": [
+        "credit-chip",
+        "health-cell",
+        "shield-cell",
+        "xp-shard",
+        "keycard"
+      ],
+      "needs": [
+        "palettes"
+      ],
+      "after": [
+        "S02"
+      ],
+      "order": 2
+    },
+    {
+      "id": "S16",
+      "kind": "icons",
+      "assets": [
+        "icons-upgrades",
+        "icons-weapons"
+      ],
+      "needs": [
+        "palettes"
+      ],
+      "after": [],
+      "order": 2
+    },
+    {
+      "id": "S17",
+      "kind": "projectiles",
+      "assets": [
+        "blaster-bolt",
+        "scatter-pellet",
+        "micro-rocket",
+        "plasma-orb",
+        "acid-glob",
+        "orbit-blade"
+      ],
+      "needs": [
+        "palettes",
+        "fx-helper"
+      ],
+      "after": [
+        "S02"
+      ],
+      "order": 2
+    },
+    {
+      "id": "S18",
+      "kind": "effects",
+      "assets": [
+        "muzzle-flash",
+        "hit-flash",
+        "plasma-burst",
+        "explosion-large"
+      ],
+      "needs": [
+        "palettes",
+        "fx-helper"
+      ],
+      "after": [],
+      "order": 2
+    },
+    {
+      "id": "S19",
+      "kind": "effects",
+      "assets": [
+        "dodge-trail",
+        "spawn-warp",
+        "debris-burst"
+      ],
+      "needs": [
+        "palettes",
+        "fx-helper"
+      ],
+      "after": [
+        "S01",
+        "S02"
+      ],
+      "order": 2
+    },
+    {
+      "id": "S20",
+      "kind": "interface",
+      "assets": [
+        "ui-hud-roguelite",
+        "ui-bars-tech",
+        "ui-upgrade-card",
+        "ui-crosshair"
+      ],
+      "needs": [
+        "palettes",
+        "ui-helper"
+      ],
+      "after": [
+        "S01"
+      ],
+      "order": 2
+    },
+    {
+      "id": "S21",
+      "kind": "music",
+      "assets": [
+        "derelict-run"
+      ],
+      "needs": [
+        "compose-kit"
+      ],
+      "after": [],
+      "order": 1
+    },
+    {
+      "id": "S22",
+      "kind": "music",
+      "assets": [
+        "derelict-boss"
+      ],
+      "needs": [
+        "compose-kit"
+      ],
+      "after": [],
+      "order": 1
+    }
+  ],
+  "reusedChanges": []
+}
