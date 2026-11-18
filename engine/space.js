@@ -87,3 +87,54 @@ export function nebula(g, x, y, w, h, tones, seed = 0, { lobes = 11 } = {}) {
   });
   return g;
 }
+
+// ---- added with batch S13, fix round 1: tones for a backdrop that is lit against the dark ---------------------
+// backdrop.js standOut moves a shape's colour darker whenever anything behind it is as light as it is, which is
+// right under a daytime sky and wrong in space: there the dark is behind everything, a shape in front of it is lit,
+// and a tone pushed darker ends up as dark as the outline ink (style guide section 7: nothing as dark as INK).
+//
+//   const dust = lighterThan(recede(p.haze, 0.5, sky.air), [sky.bands[2]]);                   // a band of dust on the lowest band of space
+//   const land = lighterThan(recede(p.land, 0.1, sky.air), [sky.bands[2], dust]);             // a planet in front of both
+//   const shade = noDarkerThan(tone(land, -1));                                               // its night side: dark, never ink
+
+import { tone as toneOf, brightness as brightnessOf, col as colOf, hexToRgb, rgbToHsl, hsl as hslOf } from './color.js';
+import { PALETTES, applyColour } from './theme.js';
+
+const lifted = new Map();
+const underPalettes = (hex) => PALETTES.map((pal) => applyColour(new Uint32Array([colOf(hex)]), { palette: pal.name })[0]);
+
+/**
+ * A shape's colour, moved lighter until it is a clear step of value above everything it is drawn against and still a different colour under every palette of the site: backdrop.js standOut for a shape that must be the lighter one (a sunlit planet, dust or a cloud against dark space), which never goes darker.
+ * Arguments: colour (the shape's own colour, already receded); behind (the colours it is seen against: it stays `step` of brightness above each and a different colour from each under every site palette); options { step (the least difference in brightness, default 0.08), also (colours it only has to keep the brightness step above) }.
+ * A colour that is already clear comes back unchanged. When no lighter tone is clear (everything behind it is near white) the lightest tone tried comes back.
+ */
+export function lighterThan(colour, behind = [], { step = 0.08, also = [] } = {}) {
+  if (!behind.length && !also.length) return colour;
+  const key = `${colour}|${behind.join('|')}|${also.join('|')}|${step}`;
+  let out = lifted.get(key);
+  if (out !== undefined) return out;
+  const theirs = behind.map(underPalettes), all = [...behind, ...also];
+  const clear = (c) => {
+    const v = brightnessOf(c);
+    if (all.some((o) => v - brightnessOf(o) < step - 1e-9)) return false;
+    const mine = underPalettes(c);
+    return theirs.every((t) => mine.every((m, k) => m !== t[k]));
+  };
+  out = colour;
+  for (let k = 1; k <= 48 && !clear(out); k++) out = toneOf(colour, k * 0.06);
+  lifted.set(key, out);
+  return out;
+}
+
+/**
+ * A colour lifted, if it has to be, until it is at least `least` bright: for the darkest tone of a backdrop shape (a night side, a shaded face, a window slot), which may be dark but never as dark as the outline ink.
+ * Arguments: colour (the tone wanted); least (the brightness it must reach, 0 to 1; default 0.18, the darkest a swatch may be, clear of INK at 0.13).
+ * A colour that is bright enough comes back unchanged; a lifted one keeps its hue.
+ */
+export function noDarkerThan(colour, least = 0.18) {
+  if (brightnessOf(colour) >= least) return colour;
+  const [h, s, l] = rgbToHsl(...hexToRgb(colour));
+  let out = colour;
+  for (let k = 1; k <= 100 && brightnessOf(out) < least; k++) out = hslOf(h, s, Math.min(1, l + k * 0.01));
+  return out;
+}

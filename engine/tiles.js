@@ -173,6 +173,7 @@ export function slopeClips(prefix, opts = {}) {
  *   'above'  in the empty cell above a top tile, standing on the top line (a tuft, a stalagmite)
  *   'below'  in the empty cell under a bottom tile, hanging from it (a stalactite, a root)
  *   'face'   over a tile of a top-down wall that shows its front face (a window, a sign, a wall light): FACE_PIECES
+ *   'rim'    over a tile of the block that has its north edge, hanging from it (a girder or cables over a pit): RIM_PIECES
  * An entry may also be { place, label }. The place is kept on the clip as `place`.
  */
 export function decoClips(prefix, places = ['on', 'on'], opts = {}) {
@@ -286,7 +287,7 @@ export function blockKind(prefix, hint) {
  *   floors  [{ prefix, fill, fills, decals }]   a prefix with nothing but fills: the ground everything else sits on
  *   thins   [{ prefix, pieces: { l, m, r } }]     slopes [{ prefix, up, down }]     stacks [{ prefix, pieces: { cap, mid, foot } }]
  *   decals  [{ clip, prefix, place }]            extras [clip]  names the helper does not know
- *           (a decal declared 'face' lies over a cell of its block like an 'on' decal, so its place is 'on', with only: 'face')
+ *           (a decal declared 'face' or 'rim' lies over a cell of its block like an 'on' decal, so its place is 'on', with only: 'face' or only: 'rim')
  * Several tilesets at once (what a bag holds): pass [{ key, clips, names }] (key: your name for the tileset; clips: its
  * clip table; names: optional, its clip names in order). Every block, floor, thin, slope, stack and decal then has
  * `set` (the key of the tileset it came from) and the result has `from` ({ clip: key }). The first tileset to use a
@@ -308,7 +309,7 @@ export function classifyTiles(clips) {
     if (many && group && group.has(k.prefix) && group.get(k.prefix).set !== c.set) continue;   // ... and a prefix stays with one tileset
     if (many) from[c.name] = c.set;
     if (!k) extras.push(c.name);
-    else if (k.kind === 'deco') decals.push(tag({ clip: c.name, prefix: k.prefix, place: c.place === 'above' || c.place === 'below' ? c.place : 'on', ...(c.place === 'face' ? { only: 'face' } : {}) }, c.set));
+    else if (k.kind === 'deco') decals.push(tag({ clip: c.name, prefix: k.prefix, place: c.place === 'above' || c.place === 'below' ? c.place : 'on', ...(c.place === 'face' || c.place === 'rim' ? { only: c.place } : {}) }, c.set));
     else if (k.kind === 'thin') of(thins, k.prefix, () => tag({ prefix: k.prefix, pieces: {} }, c.set)).pieces[k.piece] = c.name;
     else if (k.kind === 'slope') of(slopes, k.prefix, () => tag({ prefix: k.prefix }, c.set))[k.piece] = c.name;
     else if (k.kind === 'stack') of(stacks, k.prefix, () => tag({ prefix: k.prefix, pieces: {} }, c.set)).pieces[k.piece] = c.name;
@@ -422,15 +423,16 @@ export function pickClip(block, solid, x, y) {
   return block.pieces[piece] ?? null;
 }
 
-/** How often a cell that may hold a decal gets one, by where it goes: on a block's fill, on bare floor (top-down), above a top, under a bottom, on a top-down wall's front face (one face cell in three). */
-export const DECAL_CHANCE = { on: 0.25, floor: 0.12, above: 0.3, below: 0.5, face: 0.33 };
+/** How often a cell that may hold a decal gets one, by where it goes: on a block's fill, on bare floor (top-down), above a top, under a bottom, on a top-down wall's front face (one face cell in three), on a piece with the block's north edge ('rim'). */
+export const DECAL_CHANCE = { on: 0.25, floor: 0.12, above: 0.3, below: 0.5, face: 0.33, rim: 0.3 };
 
 /**
  * Which decal, if any, goes in a cell: a clip name or null, the same every time for the same cell. decals: the
  * decals that may go there, [{ clip, place }] (a block's or a floor's `decals`). place: 'on' (the cell is a fill
  * piece of the block, or bare floor), 'above' (an empty cell over the block's `top` piece) or 'below' (an empty
  * cell under its `bottom` piece) or 'face' (the cell is a piece of a top-down wall that shows its front face,
- * FACE_PIECES: only the decals declared 'face', which 'on' never picks). x, y: the cell. chance: 0..1, default DECAL_CHANCE[place].
+ * FACE_PIECES: only the decals declared 'face', which 'on' never picks) or 'rim' (the cell is a piece of the block that
+ * has its north edge, RIM_PIECES: only the decals declared 'rim'). x, y: the cell. chance: 0..1, default DECAL_CHANCE[place].
  */
 export function pickDecal(decals, place, x, y, chance = DECAL_CHANCE[place]) {
   const list = (decals ?? []).filter((d) => (d.only ?? d.place) === place);
@@ -465,7 +467,8 @@ export function pickStack(stack, x, y) {
  *   'part:p:clip'    a cell of block p for its neighbours (they are not outlined against it), drawn with `clip`
  *   'open:p:clip'    the same, but not solid: an archway, a doorway
  * or a list of those for a cell that holds several things, drawn in layer order. opts.decals: true to scatter the tileset's decals by pickDecal's rule
- * over the cells the map leaves free (or { on, floor, above, below, face } chances in place of DECAL_CHANCE). A decal
+ * over the cells the map leaves free (or { on, floor, above, below, face, rim } chances in place of DECAL_CHANCE; a decal
+ * declared 'rim' goes only on the block's RIM_PIECES, scattered or written, as a 'face' decal goes on a face). A decal
  * declared 'face' goes only on a top-down wall's FACE_PIECES: scattered there, and left out (with a note) when a map
  * writes its letter in a cell of the wall that shows no face.
  *   side      '#' the first block, 'I' the second (else the first), '/' '\' its slopes, '~' the first liquid, '=' the first thin platform,
@@ -623,7 +626,9 @@ export function layoutTiles(rows, clips, opts = {}) {
       }
       if (kind === 'decal') {
         const on = pieces.get(`${c},${r}`), faceless = thing.decal.only === 'face' && view === 'top-down' && on && !FACE_PIECES.includes(on.piece);
-        put(faceless ? null : thing.decal.clip, c, r, LAYER.decal, `${thing.decal.clip} at ${c},${r}: it goes on a wall's front face, and this cell of the wall (${on?.piece}) shows none`);
+        const rimless = thing.decal.only === 'rim' && on && !RIM_PIECES.includes(on.piece);
+        if (rimless) put(null, c, r, LAYER.decal, `${thing.decal.clip} at ${c},${r}: it hangs from the block's north edge, and this cell (${on.piece}) has none`);
+        else put(faceless ? null : thing.decal.clip, c, r, LAYER.decal, `${thing.decal.clip} at ${c},${r}: it goes on a wall's front face, and this cell of the wall (${on?.piece}) shows none`);
       }
       if (kind === 'clip') put(thing.clip, c, r, LAYER.decal);
     }
@@ -637,6 +642,7 @@ export function layoutTiles(rows, clips, opts = {}) {
       if (here) {
         if (here.piece === 'fill') put(pickDecal(here.block.decals, 'on', c, r, chance.on), c, r, LAYER.decal);
         else if (view === 'top-down' && here.block.kind === 'wall' && FACE_PIECES.includes(here.piece)) put(pickDecal(here.block.decals, 'face', c, r, chance.face), c, r, LAYER.decal);
+        else if (RIM_PIECES.includes(here.piece)) put(pickDecal(here.block.decals, 'rim', c, r, chance.rim), c, r, LAYER.decal);
         continue;
       }
       if (things.length) continue;
@@ -1499,3 +1505,20 @@ export function coursedFace({ rows = 29, course = 7, joints = [], body, top = bo
 
 /** The pieces of a top-down wall block that show its front face, where a decal declared with place 'face' may go: a full face ('bottom', 'bottom-l', 'bottom-r', 'col-b') or a face under a sliver of cap ('strip-l', 'strip-m', 'strip-r', 'single'). No arguments: a frozen list. */
 export const FACE_PIECES = Object.freeze(['bottom', 'bottom-l', 'bottom-r', 'col-b', 'strip-l', 'strip-m', 'strip-r', 'single']);
+
+// ---- added with batch S13, fix round 1 (pits): the decal place 'rim' ----
+// Something that hangs from a block's north edge (a broken girder jutting over a pit, cut cables, roots over a
+// cliff's lip) is a decal declared with place 'rim':
+//
+//   const decals = decoClips('pit', [{ place: 'rim', label: 'Broken girder' }, { place: 'rim', label: 'Hanging cables' }]);
+//
+// Like a 'face' decal it lies over a cell of its block, so classifyTiles keeps its place as 'on' and marks it
+// only: 'rim'. pickDecal(decals, 'on', ...) never picks it, so it is never scattered over a fill, where it would
+// float with nothing to hang from; layoutTiles scatters it (pickDecal(decals, 'rim', ...), DECAL_CHANCE.rim) over the
+// cells whose piece is one of RIM_PIECES, and leaves it out, with a note, when a map writes its letter on any other
+// cell. On a top-down wall the pieces that show the front face keep their 'face' decals: a 'rim' decal goes on the
+// rest. Draw such a decal from row 0 down, clear of columns 0 to 2 and 29 to 31, where a corner piece has its side.
+// Worked example: sprites/tiles-pit.js.
+
+/** The pieces of a block that have the block's north edge (its top line; on a hole, the rim with the inner wall under it), where a decal declared with place 'rim' may go: 'top', the two top corners, the strip, 'col-t', 'single', and the lane pieces closed on top. No arguments: a frozen list. */
+export const RIM_PIECES = Object.freeze(Object.keys(SIGNATURE).filter((k) => SIGNATURE[k].N === 0));

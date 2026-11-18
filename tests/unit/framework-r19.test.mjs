@@ -9,18 +9,20 @@
 //                      arcade                 the outline of a row of round-headed openings
 //                      pillar, wallTorch, wallRing, lightPatch   a pillar, the torch on it, a ring and chain, the wall it lights
 //                      pavedFloor             a paved floor seen from the side of a battle screen
+//                      moon                   a full moon: a disc with three craters inside it
+//                      cloudBank              several clouds as one sky: they join where they overlap, no shade band across a cloud
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { Surface } from '../../engine/surface.js';
 import { col, brightness, rgbToHex, INK } from '../../engine/color.js';
 import { renderFrame, defaultParams, cleanParams } from '../../engine/sprite.js';
 import { PALETTE } from '../../engine/palettes.js';
-import { LAYER, PIVOT, TIMES, standOut, skyLook } from '../../engine/backdrop.js';
+import { LAYER, PIVOT, TIMES, standOut, skyLook, cloud } from '../../engine/backdrop.js';
 import { steps } from '../../engine/fx.js';
 import { THEME_PRESETS, PALETTES, applyColour } from '../../engine/theme.js';
 import { checkSprite, seamCheck } from '../../quality/sprite.js';
 import { validateMeta } from '../../catalog/schema.js';
-import { BATTLE, standApart, standOutLighter, roundTree, farHouse, railFence, tufts, groundMarks, arcade, pillar, wallTorch, wallRing, lightPatch, pavedFloor } from '../../engine/scenery.js';
+import { BATTLE, standApart, standOutLighter, roundTree, farHouse, railFence, tufts, groundMarks, arcade, pillar, wallTorch, wallRing, lightPatch, pavedFloor, moon, cloudBank } from '../../engine/scenery.js';
 import field from '../../sprites/bg-battle-field.js';
 import dungeon from '../../sprites/bg-battle-dungeon.js';
 
@@ -456,4 +458,102 @@ test('bg-battle-dungeon: the torches flicker through 8 different frames and the 
   assert.ok(count({ torches: 1 }) === 4 && count({ torches: 0 }) === 1, 'the Torches slider runs from one to all of them');
   assert.equal(count({ density: 1, torches: 1 }), 5);
   assert.equal(dungeon.clips.mid.fps({ ...p, speed: 0.5 }) > dungeon.clips.mid.fps({ ...p, speed: 0 }), true, 'Speed drives the flicker');
+});
+
+// ---- added in fix round 1: the moon and the clouds ---------------------------------------------------------------
+
+test('moon: a disc of radius r with three craters inside it, the usual three at seed 0, wrapping', () => {
+  const r = 9, g = layer((s) => moon(s, 100, 42, r, D, B));
+  onlyColours(g, [D, B], 'moon');
+  // the disc: every drawn pixel within r of the middle, and the same pixels a plain disc of that radius fills
+  const plain = layer((s) => s.ellipse(100, 42, r, r, D));
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    assert.equal(g.get(x, y) !== 0, plain.get(x, y) !== 0, `pixel ${x},${y}: the moon is the disc of radius ${r}, no more and no less`);
+    if (g.get(x, y)) assert.ok((x + 0.5 - 100) ** 2 + (y + 0.5 - 42) ** 2 <= r * r + 1e-9);
+  }
+  // the craters: three separate patches, each 2 px across or more, covering a small share of the disc
+  const dark = (s) => { let n = 0; for (const v of s.data) if (v === col(B)) n++; return n; };
+  assert.ok(dark(g) >= 20 && dark(g) < lit(g) * 0.25, `craters cover ${dark(g)} of ${lit(g)} px`);
+  const seen = new Set(); let patches = 0;
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    if (g.get(x, y) !== col(B) || seen.has(y * W + x)) continue;
+    patches++;
+    const todo = [[x, y]]; let n = 0;
+    while (todo.length) { const [px, py] = todo.pop(); if (g.get(px, py) !== col(B) || seen.has(py * W + px)) continue; seen.add(py * W + px); n++; todo.push([px + 1, py], [px - 1, py], [px, py + 1], [px, py - 1]); }
+    assert.ok(n >= 4, `a crater of ${n} px`);
+  }
+  assert.equal(patches, 3);
+  // what the three backdrops drew by hand before it (bg-forest, bg-castle, bg-battle-field): the same pixels at r = 9
+  const byHand = layer((s) => s.ellipse(100, 42, 9, 9, D).ellipse(97, 39, 2.4, 2.4, B).ellipse(104, 45, 2.6, 2.2, B).ellipse(102, 36, 1.5, 1.5, B));
+  assert.deepEqual(g.data, byHand.data);
+  // other radii scale; a seed turns the craters and keeps them on the moon; no shadow given: a darker tone of the moon
+  for (const rr of [6, 12, 20]) for (const seed of [0, 3, 8]) {
+    const m = layer((s) => moon(s, 160, 60, rr, D, B, { seed })), p = layer((s) => s.ellipse(160, 60, rr, rr, D));
+    for (let i = 0; i < m.data.length; i++) assert.equal(m.data[i] !== 0, p.data[i] !== 0, `r ${rr}, seed ${seed}: a crater pokes out of the disc`);
+    assert.ok(dark(m) > 0);
+  }
+  assert.notDeepEqual(layer((s) => moon(s, 160, 60, 12, D, B, { seed: 3 })).data, layer((s) => moon(s, 160, 60, 12, D, B)).data);
+  assert.equal(coloursOf(layer((s) => moon(s, 160, 60, 12, D))).size, 2);
+  // across the join
+  wrapsRound((s, x) => moon(s, x, 42, r, D, B), 100, 216, 'moon');
+  const cut = layer((s) => moon(s, 318, 42, r, D, B));
+  assert.ok(cut.get(0, 42) === col(D) && cut.get(319, 42) === col(D), 'a moon on the join shows on both sides');
+});
+
+test('cloudBank: clouds apart are cloud() one by one; clouds that overlap join, and no shade band cuts across a cloud', () => {
+  // shade pixels with cloud body within 3 rows both above and below them in their column: a stripe through a cloud
+  const stripes = (g, body, shade) => {
+    let n = 0;
+    for (let x = 0; x < W; x++) for (let y = 3; y < H - 3; y++) {
+      if (g.get(x, y) !== col(shade)) continue;
+      let above = false, below = false;
+      for (let k = 1; k <= 3; k++) { if (g.get(x, y - k) === col(body)) above = true; if (g.get(x, y + k) === col(body)) below = true; }
+      if (above && below) n++;
+    }
+    return n;
+  };
+  const apart = [{ x: 40, y: 30, w: 44, seed: 1 }, { x: 150, y: 50, w: 36, seed: 2 }, { x: 250, y: 22, w: 52, seed: 3 }];
+  const oneByOne = (list) => layer((g) => { for (const c of list) cloud(g, c.x, c.y, c.w, D, B, c.seed); });
+  assert.deepEqual(layer((g) => cloudBank(g, apart, D, B)).data, oneByOne(apart).data, 'clouds that do not touch: exactly cloud()');
+  // two that overlap on different rows, the lower one's body under the upper one's underside
+  const over = [{ x: 100, y: 30, w: 50, seed: 1 }, { x: 122, y: 40, w: 50, seed: 2 }];
+  assert.ok(stripes(oneByOne(over), D, B) > 0 || stripes(oneByOne([...over].reverse()), D, B) > 0, 'drawn one by one, a shade band crosses a cloud');
+  const bank = layer((g) => cloudBank(g, over, D, B));
+  assert.equal(stripes(bank, D, B), 0);
+  assert.deepEqual(layer((g) => cloudBank(g, [...over].reverse(), D, B)).data, bank.data, 'the order of the list does not matter');
+  onlyColours(bank, [D, B], 'cloudBank');
+  // it is the same silhouette as the two clouds, and each still has shade on the part of its underside that is over open sky
+  const sil = oneByOne(over);
+  for (let i = 0; i < bank.data.length; i++) assert.equal(bank.data[i] !== 0, sil.data[i] !== 0);
+  const shadeOn = (row) => { let n = 0; for (let x = 0; x < W; x++) if (bank.get(x, row) === col(B)) n++; return n; };
+  assert.ok(shadeOn(29) >= 8 && shadeOn(39) >= 30, `shade on the upper cloud ${shadeOn(29)} px, on the lower ${shadeOn(39)} px`);
+  // many clouds on rows 5 px apart (what a "Clouds" slider at its top gives), wrapping, with and without a shade
+  const many = Array.from({ length: 14 }, (_, i) => ({ x: (i * 97) % W, y: 14 + (i % 5) * 5, w: 34 + (i % 3) * 9, seed: i }));
+  assert.equal(stripes(layer((g) => cloudBank(g, many, D, B)), D, B), 0);
+  assert.deepEqual([...coloursOf(layer((g) => cloudBank(g, many, D)))], [D]);
+  wrapsRound((g, x) => cloudBank(g, over.map((c) => ({ ...c, x: c.x + x })), D, B), 0, 205, 'cloudBank');
+  // it draws over what is there and leaves the rest alone
+  const sky = layer((g) => { g.rect(0, 0, W, H, A); cloudBank(g, over, D, B); });
+  assert.deepEqual([...coloursOf(sky)].sort(), [A, B, D].sort());
+});
+
+test('bg-battle-field: with the clouds at any setting, at any time of day, no shade band cuts across a cloud; the moon is the framework\'s', () => {
+  for (const time of TIMES) for (const clouds of [0, 0.45, 0.74, 1]) {
+    const p = cleanParams(field, { ...defaultParams(field), time, clouds }), sky = skyLook(p.sky, p.time), g = renderFrame(field, 'far', 0, p);
+    const body = col(sky.cloud), shade = col(sky.cloudShade);
+    let n = 0, some = 0;
+    for (let x = 0; x < W; x++) for (let y = 3; y < 80; y++) {
+      if (g.get(x, y) !== shade) continue;
+      let above = false, below = false;
+      for (let k = 1; k <= 3; k++) { if (g.get(x, y - k) === body) above = true; if (g.get(x, y + k) === body) below = true; }
+      if (above) some++;
+      if (above && below) n++;
+    }
+    assert.equal(n, 0, `${time}, clouds ${clouds}: ${n} shade pixels inside a cloud`);
+    assert.ok(some > 20, `${time}, clouds ${clouds}: the clouds keep their shaded undersides`);
+  }
+  const p = cleanParams(field, { ...defaultParams(field), time: 'night', clouds: 0 }), sky = skyLook(p.sky, p.time), g = renderFrame(field, 'far', 0, p);
+  let craters = 0;
+  for (let y = 33; y <= 51; y++) for (let x = 275; x <= 293; x++) if (g.get(x, y) !== col(sky.glow) && (x + 0.5 - 284) ** 2 + (y + 0.5 - 42) ** 2 <= 81) craters++;
+  assert.ok(craters >= 20, `the night moon has craters (${craters} px)`);
 });

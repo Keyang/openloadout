@@ -4,7 +4,7 @@
  "name": "Victory fanfare",
  "category": "jingle",
  "tags": ["victory", "win", "jingle", "pluck", "flute", "bell", "dance"],
- "description": "The battle is won: a skipping seven-note dance tune in three-time for plucked strings and a breathy wooden flute, falling from the high home note and leaping back to it over two plucked home chords, answered by a soft bell; change the key, speed, brightness, ring and room. The same every time.",
+ "description": "The battle is won: a skipping seven-note dance tune in three-time for plucked strings and a breathy wooden flute, starting on the high home note, stepping down to the fifth, dipping to the third and leaping up a sixth to settle on the home note over two plucked home chords, answered by a soft bell an octave higher; change the key, speed, brightness, ring and room. The same every time.",
  "meta": {
   "type": "jingle",
   "role": "music/victory",
@@ -43,10 +43,8 @@
   { "id": "vibAmt", "type": "env", "points": [[0, 0], ["3/speed + 0.12", 0], ["3/speed + 0.45", 1]] },
   { "id": "fTone", "type": "osc", "wave": "tri", "freq": "hz*(1 + 0.004*vib*vibAmt)" },
   { "id": "fOv", "type": "osc", "freq": "hz*2*(1 + 0.004*vib*vibAmt)" },
-  { "id": "nB", "type": "osc", "freq": 5211 },
-  { "id": "nA", "type": "osc", "freq": 1373.3, "pm": "nB*3.1" },
-  { "id": "nC", "type": "osc", "wave": "saw", "freq": 3117.7, "pm": "nA*6.3" },
-  { "id": "breath", "type": "filter", "mode": "bp", "in": "nC", "freq": "hz*2.2", "q": 2.5 },
+  { "id": "air", "type": "noise", "seed": 7 },
+  { "id": "breath", "type": "filter", "mode": "bp", "in": "air", "freq": "hz*2.2", "q": 2.5 },
   { "id": "flute", "type": "expr", "expr": "(fTone*0.8 + fOv*(0.08 + bright*0.16) + breath*(0.05 + bright*0.06))*fLag" },
 
   { "id": "cDec", "type": "env", "points": [[0, 0.9], ["3/speed - 0.005", 0.9], ["3/speed", "ring*1.05"]] },
@@ -73,7 +71,7 @@
  "out": "verb*(1 - smooth(dur - 0.35, dur - 0.01, t))",
  "presets": {
   "Victory": { "pitch": 440, "speed": 3, "bright": 0.55, "ring": 1.1, "space": 0.22 },
-  "Small win": { "pitch": 440, "speed": 3.5, "bright": 0.4, "ring": 0.7, "space": 0.12 },
-  "Grand finale": { "pitch": 440, "speed": 2.6, "bright": 0.85, "ring": 1.4, "space": 0.38 }
+  "Small win": { "pitch": 440, "speed": 3.5, "bright": 0.4, "ring": 0.9, "space": 0.12 },
+  "Grand finale": { "pitch": 440, "speed": 2.6, "bright": 0.85, "ring": 1.3, "space": 0.38 }
  }
 }
