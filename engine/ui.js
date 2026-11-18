@@ -50,6 +50,16 @@
 // The two defaults are kept as given; every other swatch is kept only if it holds both rules under
 // every look, a near miss comes back as a darker (face) or lighter (frame) tone of itself, and the
 // rest are dropped. SW.failing names any rule the defaults themselves break (it should be empty).
+// The rules are checked on the drawn pixels by contrastFaults(sprite), which tests/unit/ui-contrast.test.mjs
+// runs over every sprite of type `ui` it finds. So a sprite with a colour control named `face` says
+// where its text goes and where its frame (or lit edge) is:
+//   textArea: (clip, p) => ({ x, y, w, h, edge: { x, y } })   // the text rectangle; one pixel of the frame band or lit edge
+// (`edge` may be left out for a piece with no frame, such as a highlight row), and a clip that never
+// carries text says so in its clip entry: `cursor: { frames: 8, fps, loop: true, noText: true }`.
+// noText is for arrows, cursors and markers, and for a plate that only sits behind a glyph (the
+// plate of a status mark is not a text area, so its colour is free). A sprite with no `face` control
+// (a glyph set, a bar) is not checked. A frame is measured where it is drawn: a sci-fi panel's frame
+// is its thin lit edge, a lighter tone of the frame colour, and that is the pixel `edge` names.
 //
 // DIGITS. digitSize(size, style) gives the three sizes every digit set uses; digitBody(n, size) the
 // strokes of a digit; rimmed(g, body, x, y, { colour, edge, shadow }) draws any small glyph as body,
@@ -61,6 +71,7 @@
 import { Surface } from './surface.js';
 import { ramp, tone, mix, brightness, rgbToHex, hexToRgb, col, INK } from './color.js';
 import { THEME_PRESETS, normalizeTheme, applyColour } from './theme.js';
+import { renderFrame, defaultParams, cleanParams } from './sprite.js';
 import { PALETTE, paletteName, swatches } from './palettes.js';
 
 /** The nine-slice border, in pixels from the frame edge: corners and borders end inside it. */
@@ -825,4 +836,74 @@ export function panelSwatches(bundle, opt = {}) {
   if (worstContrast('#ffffff', face[0]) < 4.5) failing.push({ rule: 'text', face: face[0], ratio: r2(worstContrast('#ffffff', face[0])) });
   for (const f of face) if (worstContrast(frame[0], f) < 3) failing.push({ rule: 'frame', face: f, frame: frame[0], ratio: r2(worstContrast(frame[0], f)) });
   return { face, frame, failing };
+}
+
+const LOOK_NAMES = ['as made', ...THEME_PRESETS.map((t) => t.name)];
+// The lowest contrast of two colours over the looks, and the look where it happens.
+function worstLook(a, b) {
+  const A = underLooks(a), B = underLooks(b);
+  let ratio = Infinity, look = '';
+  for (let i = 0; i < A.length; i++) { const c = contrast(A[i], B[i]); if (c < ratio) { ratio = c; look = LOOK_NAMES[i]; } }
+  return { ratio, look };
+}
+
+/**
+ * The contrast faults of an interface sprite, as a list of sentences (empty: none). Checked on the
+ * drawn pixels of every clip not marked `noText`, for every option of `style`, every face swatch
+ * with every frame swatch, and every swatch of the sprite's other colours, as made and under every
+ * whole-bundle look:
+ *   every colour inside the clip's text area (sprite.textArea(clip, p)) takes white text at 4.5 to 1;
+ *   the pixel that textArea names as `edge` (the frame band, or a lit edge) holds 3 to 1 against them.
+ * A sprite that is not of type `ui`, or has no colour control named `face`, has no faults. A clip
+ * with a face colour that neither gives a text area nor says `noText: true` is a fault itself.
+ * opt: text (default white), textMin (4.5), edgeMin (3).
+ */
+export function contrastFaults(sprite, { text = '#ffffff', textMin = 4.5, edgeMin = 3 } = {}) {
+  const P = sprite?.params ?? {};
+  if (sprite?.meta?.type !== 'ui' || P.face?.kind !== 'color') return [];
+  const faults = new Map();
+  const say = (key, msg) => { if (!faults.has(key)) faults.set(key, msg); };
+  const base = defaultParams(sprite);
+  const styles = P.style?.kind === 'choice' ? P.style.options.map((o) => o.value) : [undefined];
+  const frames = P.frame?.kind === 'color' ? P.frame.swatches : [undefined];
+  const others = Object.entries(P).filter(([k, d]) => d.kind === 'color' && k !== 'face' && k !== 'frame');
+  const hexOf = (v) => rgbToHex(v & 255, (v >>> 8) & 255, (v >>> 16) & 255);
+  const frameWord = P.frame ? 'frame' : 'edge';
+  for (const [clip, c] of Object.entries(sprite.clips)) {
+    if (c.noText) continue;
+    const settings = [];
+    for (const style of styles) {
+      for (const face of P.face.swatches) for (const frame of frames) settings.push({ style, face, frame });
+      for (const [k, d] of others) for (const v of d.swatches) settings.push({ style, face: base.face, frame: base.frame, [k]: v, other: `${k} ${v}` });
+    }
+    for (const set of settings) {
+      const over = { ...base };
+      for (const [k, v] of Object.entries(set)) if (v !== undefined && k !== 'other') over[k] = v;
+      const p = cleanParams(sprite, over);
+      const area = typeof sprite.textArea === 'function' ? sprite.textArea(clip, p) : null;
+      if (!area) {
+        say(`${clip}|undeclared`, `${clip}: the sprite has a face colour but does not say where text goes on this clip: give the sprite textArea(clip, p), or mark the clip noText: true`);
+        break;
+      }
+      const g = renderFrame(sprite, clip, 0, p);
+      const where = `face ${p.face}${set.style ? `, style ${set.style}` : ''}${set.other ? `, ${set.other}` : ''}`;
+      const inArea = new Set();
+      for (let y = area.y; y < area.y + (area.h ?? 1); y++) for (let x = area.x; x < area.x + (area.w ?? 1); x++) { const v = g.get(x, y); if (v) inArea.add(hexOf(v)); }
+      if (!inArea.size) { say(`${clip}|empty`, `${clip}: nothing is drawn in its text area (${JSON.stringify({ x: area.x, y: area.y, w: area.w, h: area.h })})`); continue; }
+      for (const tc of inArea) {
+        const t = worstLook(text, tc);
+        if (t.ratio < textMin) say(`${clip}|text|${p.face}|${tc}|${set.style}`, `${clip}: white text on ${tc} (${where}) is ${t.ratio.toFixed(2)} to 1 under ${t.look}; ${textMin} to 1 is needed`);
+      }
+      if (area.edge) {
+        const ev = g.get(area.edge.x, area.edge.y);
+        if (!ev) { say(`${clip}|noedge`, `${clip}: nothing is drawn at the edge pixel ${area.edge.x},${area.edge.y}`); continue; }
+        const ec = hexOf(ev);
+        for (const tc of inArea) {
+          const e = worstLook(ec, tc);
+          if (e.ratio < edgeMin) say(`${clip}|edge|${p.frame}|${p.face}|${set.style}|${set.other}`, `${clip}: the ${frameWord}${p.frame ? ` ${p.frame}` : ''} (drawn ${ec}) against ${tc} (${where}) is ${e.ratio.toFixed(2)} to 1 under ${e.look}; ${edgeMin} to 1 is needed`);
+        }
+      }
+    }
+  }
+  return [...faults.values()];
 }

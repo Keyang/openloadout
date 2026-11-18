@@ -76,6 +76,10 @@ export default defineSprite({
   preview: 'normal',
   slice,
   sockets: (clip) => { const L = layout(clip); return { icon: { ...L.icon, angle: 0 }, text: { x: L.text.x, y: L.text.y, angle: 0 } }; },
+  // The contrast rules are checked here (engine/ui.js, CONTRAST): white text on the text area, and the card's
+  // frame where it is drawn. A sci-fi card has no broad contrasting band: its frame is the thin lit edge just
+  // inside the ink line (a lighter tone of the frame colour, or of the glow on a hologram), so that is the pixel named.
+  textArea(clip) { const t = layout(clip).text; return { ...t, edge: { x: 2, y: t.y + (t.h >> 1) } }; },
   params: {
     style: choice('Style', 'plate', TECH_STYLES),
     rarity: choice('Rarity', 'common', ['common', 'rare', 'epic']),

@@ -57,7 +57,9 @@ export default defineSprite({
     good: color('Boost', P.heal, [P.heal, P.meadow, P.magic, P.thunder, P.gold, P.ice]),
     bad: color('Ailment', P.mage, [P.mage, P.crimson, P.fire, P.bandit, P.roof]),
   },
-  clips: iconClips(Object.entries(MARKS).map(([name, m]) => [name, m.label])),
+  // noText: the plate only sits behind a mark and never carries text, so the text-contrast rule does not
+  // apply to its colour (engine/ui.js, CONTRAST); the mark keeps its own ink outline on any plate
+  clips: Object.fromEntries(Object.entries(iconClips(Object.entries(MARKS).map(([name, m]) => [name, m.label]))).map(([name, c]) => [name, { ...c, noText: true }])),
 
   render(g, { clip, p }) {
     const mark = MARKS[clip], picture = statusMark(clip, { bold: p.bold });
