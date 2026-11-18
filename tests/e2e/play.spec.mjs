@@ -443,6 +443,79 @@ test('the platformer assets together: every side-view tileset builds one scene, 
   expect((await state(page)).player.x).toBeGreaterThan(25 * 32);
 });
 
+test('side view: the hero wades in the pool, with the water drawn in front of its legs', async ({ page }) => {
+  test.skip(!['tiles-forest', 'tiles-water'].every(exists), 'the forest and water tilesets are not both there yet');
+  await openPlay(page, [HERO]);
+  await addSprites(page, ['tiles-forest', 'tiles-water']);
+  expect((await state(page)).map).toContain('liquid:water');
+  await page.keyboard.down('Shift');
+  await page.keyboard.down('ArrowRight');
+  let stuck = 0, last = -1;
+  for (let i = 0; i < 160; i++) {
+    const p = (await state(page)).player;
+    if (p.wading) break;
+    if (Math.abs(p.x - last) < 1 && ++stuck % 2) await page.keyboard.press('Space');
+    last = p.x;
+    await page.waitForTimeout(120);
+  }
+  await page.keyboard.up('ArrowRight');
+  await page.keyboard.up('Shift');
+  await expect.poll(async () => { const p = (await state(page)).player; return p.wading && p.onGround; }).toBe(true);
+  const p = (await state(page)).player;
+  expect(p.y).toBe(7 * 32 + 20);                           // legs under the surface, body above it
+  expect(p.hp).toBe(3);                                    // water does no harm
+  // The liquid is drawn in front of what stands in it: under the surface line the picture is the same with the hero
+  // there as with the hero gone, and above it the hero shows. (Paused, so the water itself holds still.)
+  await page.getByRole('button', { name: 'Pause' }).click();
+  const region = (x0, y0, w, h) => stage(page).evaluate((cv, r) => {
+    const s = window.__loadoutPlay.state(), z = s.zoom;
+    const camX = Math.max(0, Math.min(s.width - s.view.w, Math.round(s.player.x - s.view.w / 2)));
+    const camY = Math.max(0, Math.min(Math.min(s.height - s.view.h, 7 * 32 + 40 - s.view.h), Math.round(s.player.y - s.view.h * 0.62)));
+    const d = cv.getContext('2d').getImageData((r.x0 - camX) * z, (r.y0 - camY) * z, r.w * z, r.h * z).data;
+    let h = 2166136261;
+    for (let i = 0; i < d.length; i++) h = Math.imul(h ^ d[i], 16777619);
+    return h >>> 0;
+  }, { x0, y0, w, h });
+  await page.evaluate(() => window.__loadoutPlay.put(19.5 * 32, 7 * 32 + 20));       // the middle of the pool, clear of the banks
+  const x0 = Math.round(19.5 * 32) - 6;
+  await page.waitForTimeout(200);
+  const legs = await region(x0, 7 * 32 + 9, 12, 10), head = await region(x0, 7 * 32 - 20, 12, 14);
+  await page.evaluate(() => window.__loadoutPlay.put(16.5 * 32, 7 * 32));
+  await page.waitForTimeout(200);
+  expect(await region(x0, 7 * 32 + 9, 12, 10)).toBe(legs);
+  expect(await region(x0, 7 * 32 - 20, 12, 14)).not.toBe(head);
+});
+
+test('top-down: trees and houses block the way at their base, and the hero walks behind them', async ({ page }) => {
+  test.skip(!['hero-walker', 'tree-oak', 'tiles-meadow'].every(exists), 'the meadow, the hero and the oak are not all there yet');
+  await openPlay(page, []);
+  await addSprites(page, ['tiles-meadow', 'hero-walker', 'tree-oak']);
+  const tree = (await state(page)).things.find((t) => t.id === 'tree-oak');
+  expect(tree).toBeTruthy();
+  // walk at the trunk from below: the hero stops at its foot
+  const walkTo = async (key, done, ms = 6000) => {
+    await page.keyboard.down('Shift'); await page.keyboard.down(key);
+    const t0 = Date.now(); let last = null, still = 0;
+    while (Date.now() - t0 < ms) {
+      const p = (await state(page)).player;
+      if (done(p)) break;
+      still = last && Math.abs(p.x - last.x) + Math.abs(p.y - last.y) < 0.5 ? still + 1 : 0;
+      if (still > 4) break;
+      last = p; await page.waitForTimeout(80);
+    }
+    await page.keyboard.up(key); await page.keyboard.up('Shift');
+    return (await state(page)).player;
+  };
+  // line up under the trunk, south of it
+  let p = (await state(page)).player;
+  if (p.y < tree.y + 30) p = await walkTo('ArrowDown', (q) => q.y >= tree.y + 30);
+  p = await walkTo(p.x < tree.x ? 'ArrowRight' : 'ArrowLeft', (q) => Math.abs(q.x - tree.x) < 3);
+  expect(Math.abs(p.x - tree.x)).toBeLessThan(6);
+  p = await walkTo('ArrowUp', (q) => q.y < tree.y - 20, 4000);
+  expect(p.y).toBeGreaterThan(tree.y);                     // stopped below the trunk: it did not walk through the tree
+  expect(p.y).toBeLessThan(tree.y + 12);
+});
+
 test('the role-playing assets together: a top-down village where water blocks the way', async ({ page }) => {
   test.skip(!RPG.every(exists), 'not every role-playing sprite is there yet');
   await openPlay(page, []);

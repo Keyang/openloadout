@@ -10,7 +10,7 @@ import { soundById, soundState, setSoundOn, toUnit, toValue, isChoice } from './
 import { cleanParams, clipFps, clipStretch } from '../engine/sprite.js';
 import { normalizeTheme, themedParams } from '../engine/theme.js';
 import { rowFromSprite, rowFromPatch, planScene, SCENE_ROLES } from './play/roles.js';
-import { buildKind, soundIdsOf, isCustom } from './play/kinds.js';
+import { buildKind, soundIdsOf, isCustom, harmfulLiquid } from './play/kinds.js';
 import { extraActions, lookupClip } from './play/clips.js';
 import { makeLevel, levelFeatures, tileIndex, levelText } from './play/level.js';
 import { createWorld, resetWorld, step, spawn, removeOne, countOf, snapshot, activeLoops } from './play/world.js';
@@ -111,6 +111,7 @@ export async function playPage(app) {
 
     const blocks = [];
     let stateOf = () => blankState();
+    let putPlayer = () => false;
 
     // ---- the scene
     if (!plan.soundsOnly) {
@@ -124,7 +125,13 @@ export async function playPage(app) {
       });
       // every tileset in the bag is read together: one may hold the floor, another the walls
       const tiles = tileIndex(plan.tilesets.map((key) => ({ key, names: Object.keys(drawn[key].sprite.clips), size: drawn[key].sprite.size[0], clips: drawn[key].sprite.clips })));
-      const level = makeLevel(plan.mode, levelFeatures(tiles, plan.mode));
+      const features = levelFeatures(tiles, plan.mode);
+      const level = makeLevel(plan.mode, features);
+      // a pool of lava or acid hurts; water does not (kinds.js harmfulLiquid: told by the liquid's words and settings)
+      if (features.pool) {
+        const from = drawn[tiles.tiles.blocks.find((b) => b.prefix === features.pool)?.set];
+        level.harmful = harmfulLiquid(features.pool, from?.sprite ?? null, from?.params ?? {});
+      }
       // the level as text: a creator can copy it and open it in their own tool (engine/maptext.js reads it back)
       const mapText = levelText(level, plan.tilesets.map((key) => byKey[key].row.id));
       const world = createWorld({ mode: plan.mode, level, kinds, player: plan.player });
@@ -282,6 +289,7 @@ export async function playPage(app) {
         map: mapText,
         plan: { mode: plan.mode, player: plan.player, tilesets: plan.tilesets, background: plan.background, scene: plan.scene, display: plan.display, board: plan.board, music: plan.music },
       });
+      putPlayer = (x, y) => { if (!world.player) return false; Object.assign(world.player, { x, y, vx: 0, vy: 0, onGround: plan.mode === 'top' }); cam = null; return true; };
       // start once the page is in place, so the scene knows how wide it can be
       queueMicrotask(() => { if (gone) return; ro.observe(wrap); fit(); raf = requestAnimationFrame(tick); });
     } else {
@@ -367,7 +375,7 @@ export async function playPage(app) {
         el('p', { class: 'lede' }, 'Try the things in your bag together before you download them. Each one does what its kind does: a character is yours to move, creatures wander, pickups can be collected, sounds play when they should.')),
       ...blocks,
       el('p', { class: 'play-foot' }, el('a', { class: 'btn plain', href: '#/bag' }, 'Back to your bag'), el('span', { class: 'hint' }, 'The look you set for your bag is used here too: colours, sound and music.')));
-    return { stop() { for (const s of stops) s(); }, state: () => stateOf() };
+    return { stop() { for (const s of stops) s(); }, state: () => stateOf(), put: (x, y) => putPlayer(x, y) };
   }
 
   function blankState() {
@@ -400,6 +408,8 @@ export async function playPage(app) {
     ready: false,
     /** The scene as plain data: mode, player, things, collected, paused, muted, the sounds that fired. */
     state: () => (scene ? scene.state() : blankState()),
+    /** Put the player somewhere in the scene (for the browser tests and for taking pictures). Returns false with no player. */
+    put: (x, y) => (scene && scene.put ? scene.put(x, y) : false),
     /** Try assets that are not in the catalogue: sprite definitions or sound patches. They are treated like bag items. */
     async addAssets(list) { guests.push(...list); await build(); },
   };

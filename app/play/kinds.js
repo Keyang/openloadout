@@ -2,6 +2,23 @@
 // sprite and the visitor's settings: its clips and their speeds, the sounds on its frames, how
 // big its body is, where it stands, where a projectile leaves it. The scene itself (world.js)
 // then needs no sprite code.
+//
+// WHAT BLOCKS THE WAY IN A TOP-DOWN SCENE (footprintOf)
+//   A prop blocks when its type is `prop` and its role is `world/prop` (a tree, a rock, a crate, a chest, a sign) or
+//   `world/building` (a house, a stall). Platforms, hazards, doors and crops (world/platform, world/hazard,
+//   world/door, world/crop), pickups, effects and everything that moves are walked over or through.
+//   What blocks is its footprint, the part that stands on the ground, measured from the drawing itself:
+//     how wide   the pixels of its resting clip in the six rows above the pivot row: a tree's trunk, a crate's
+//                whole width, a house's walls
+//     how deep   six pixels up from the pivot row; a building, 40% of its drawn height (12 to 48 px), so nobody
+//                walks into a house from behind
+//   Everything above the footprint is only a picture: whoever stands north of the pivot row is drawn behind it
+//   (things are drawn in the order of their pivot rows), so the player walks behind a tree's crown and a roof.
+//   So: put the pivot on the ground line at the middle of what stands on the ground, and draw nothing in the six
+//   rows above it that should not block (roots that spread, a shadow, grass at the foot).
+//   A sprite cannot yet say its footprint itself. One that needs to (an arch you walk through, an L-shaped house,
+//   a tree with wide roots) would need a field such as `footprint: { left, right, depth }` in pixels from the pivot
+//   in defineSprite, carried to the catalogue's `tech`: proposed, not in the engine.
 // Pure JavaScript: no DOM.
 import { cleanParams, defaultParams, clipFps, renderFrame, frameSockets, cueInEffect } from '../../engine/sprite.js';
 import { clipSpeed, restClip, actionOf, STATES } from './clips.js';
@@ -53,6 +70,42 @@ export function bodyBox(sprite, clip, params, pivot = sprite.pivot) {
   return { l: Math.max(1, px - b.x0), r: Math.max(1, b.x1 + 1 - px), t: Math.max(1, py - b.y0), b: Math.max(0, b.y1 + 1 - py) };
 }
 
+const BLOCKING_ROLES = ['world/prop', 'world/building'];
+const BASE_ROWS = 6;
+
+/**
+ * What a prop blocks in a top-down scene: { l, r, d } in pixels from its pivot (left, right, and how deep, going up
+ * from the pivot row), or null for something that is walked over or through. The rule is in this file's header.
+ * meta: { type, role } (the catalogue row, or the sprite's own meta). clip: its resting clip.
+ */
+export function footprintOf(sprite, clip, params, meta = sprite.meta ?? {}, pivot = sprite.pivot) {
+  if (meta.type !== 'prop' || !BLOCKING_ROLES.includes(meta.role)) return null;
+  const g = renderFrame(sprite, clip, 0, params), [px, py] = pivot;
+  let x0 = Infinity, x1 = -Infinity;
+  for (let y = Math.max(0, py - BASE_ROWS); y < Math.min(g.h, py); y++) for (let x = 0; x < g.w; x++) {
+    if (!g.data[y * g.w + x]) continue;
+    if (x < x0) x0 = x;
+    if (x > x1) x1 = x;
+  }
+  if (x1 < x0) return null;
+  const b = g.bounds();
+  const d = meta.role === 'world/building' ? Math.max(12, Math.min(48, Math.round((py - b.y0) * 0.4))) : BASE_ROWS;
+  return { l: Math.max(1, px - x0), r: Math.max(1, x1 + 1 - px), d };
+}
+
+const HARMFUL = /\b(lava|acid|magma|poison)\b/i;
+/**
+ * True for a liquid that hurts whoever stands in it. It is told by its words: lava, acid, magma or poison in the
+ * block's prefix, in the tileset's name, or in what one of its controls is set to (the Liquid control of
+ * sprites/tiles-water.js set to "lava"). Search words (meta.words) do not count.
+ * prefix: the liquid block's prefix. sprite: its tileset (may be null). params: the tileset's settings.
+ */
+export function harmfulLiquid(prefix, sprite, params = {}) {
+  if (HARMFUL.test(String(prefix).replace(/-/g, ' '))) return true;
+  if (sprite && HARMFUL.test(sprite.name ?? '')) return true;
+  return Object.values(params ?? {}).some((v) => typeof v === 'string' && HARMFUL.test(v));
+}
+
 /** The frame of a clip on which a hit lands or a shot leaves: where its first sound is, or the middle. */
 const hitFrame = (info, cues) => { const cue = (cues ?? []).find((c) => !c.loop); return cue ? cue.frame : Math.floor(info.frames / 2); };
 const isAttack = (name) => STATES.action.includes(actionOf(name));
@@ -82,6 +135,7 @@ export function makeKind(spec) {
     rest: clipNames.includes(spec.rest) ? spec.rest : restClip(clipNames, preview, role),
     moves: [...new Set(moves)],
     box: { l: 6, r: 6, t: 12, b: 0, ...(spec.box ?? {}) },
+    footprint: spec.footprint ?? null,             // top-down: what it blocks at its base ({ l, r, d }), or null
     flying: !!spec.flying,                         // not on the ground: it hovers and does not fall
     lift: spec.lift ?? 0,                          // how far above its ground point it is drawn
     hp: spec.hp ?? (role === 'creature' || role === 'player' ? 3 : 1),   // hits before it dies
@@ -128,6 +182,7 @@ export function buildKind(entry, role, { isLoop = () => false, hostile, hp } = {
   return makeKind({
     key: entry.key, id: sprite.id, name: sprite.name, role, view: entry.row?.view ?? sprite.meta?.view ?? null,
     size: [...sprite.size], pivot, params, clips, cues, preview, rest, box,
+    footprint: role === 'prop' ? footprintOf(sprite, rest, params, { type: entry.row?.type ?? sprite.meta?.type, role: entry.row?.role ?? sprite.meta?.role }, pivot) : null,
     flying: !grounded, lift, hostile, hp,
   });
 }

@@ -4,7 +4,7 @@
 // Everything here works from plain data (kinds.js), so it runs in Node for the unit tests.
 import { pickClip, lookupClip, actionOf, nextInOrder } from './clips.js';
 import { createAnim, advance, seek, restOf, cuesAt } from './anim.js';
-import { supportAt, surfaceBelow, solidAt, hitsWall } from './level.js';
+import { supportAt, surfaceBelow, solidAt, hitsWall, wetAt } from './level.js';
 import { rng } from '../../engine/motion.js';
 
 export const GRAVITY = 900;      // pixels a second, each second
@@ -12,6 +12,8 @@ export const JUMP_V = 380;       // take-off speed: about 80 pixels high (two an
 const MIN_WALK = 24, MIN_RUN = 56, DASH = 120;
 const CLIMB = 8;                 // the player walks up anything this low (a slope); higher is a wall
 const REACH = 20;                // how far in front of its body the player's action reaches
+const WADE = 0.6;                // how much of its speed the player keeps in a liquid
+const WADE_OUT = 24;             // and how high a bank it wades up without a jump
 const WANDER = 40;               // how far a creature strays from where it was put
 const RESPAWN = 6;               // seconds before a collected pickup comes back
 const START_COUNT = { pickup: 3, creature: 1, npc: 1, prop: 1, effect: 1 };
@@ -60,7 +62,7 @@ function revive(world, p) {
   const k = world.kinds[p.kind];
   Object.assign(p, {
     x: world.level.start.x, y: world.level.start.y, vx: 0, vy: 0, knock: 0, onGround: true, state: 'idle', busy: null,
-    jumped: false, airborne: false, invuln: 0, hp: k.hp, facing: 1, dir: world.mode === 'top' ? 'down' : 'right',
+    jumped: false, airborne: false, wading: false, invuln: 0, hp: k.hp, facing: 1, dir: world.mode === 'top' ? 'down' : 'right',
   });
   p.anim = null;
   setAnim(p, pickClip(k.clipNames, 'idle', ctxOf(world, p, k)));
@@ -182,11 +184,29 @@ export function rectOf(world, t) {
 const overlap = (a, b) => a.x0 < b.x1 && a.x1 > b.x0 && a.y0 < b.y1 && a.y1 > b.y0;
 const grow = (r, by) => ({ x0: r.x0 - by, y0: r.y0 - by, x1: r.x1 + by, y1: r.y1 + by });
 
-/** Keep a top-down thing out of the walls: try the move one axis at a time. Returns true when it moved at all. */
-function walk(level, t, dx, dy, half) {
+/**
+ * Top-down: what stands in the way besides walls: the wood of fences, and the footprint of every prop that has one
+ * (a tree's trunk, a house's base: kinds.js says which). Whoever stands north of a footprint is drawn behind the thing.
+ */
+function obstacles(world, self) {
+  const out = [...(world.level.blocks ?? [])];
+  for (const o of world.things) {
+    const f = world.kinds[o.kind].footprint;
+    if (f && o !== self && !o.passing) out.push({ x0: o.x - f.l, x1: o.x + f.r, y0: o.y - f.d, y1: o.y });
+  }
+  return out;
+}
+
+/** Keep a top-down thing out of the walls and off what blocks the way: try the move one axis at a time. Returns true when it moved at all. */
+function walk(world, t, dx, dy, half) {
+  const { level } = world, solid = obstacles(world, t);
+  const feet = (x, y) => ({ x0: x - half, x1: x + half, y0: y - 6, y1: y });
+  const now = feet(t.x, t.y);
+  // something it already stands in (a thing was put on top of it) does not hold it: it can always walk out
+  const free = (x, y) => !hitsWall(level, x - half, y - 6, x + half, y) && !solid.some((r) => overlap(r, feet(x, y)) && !overlap(r, now));
   let moved = false;
-  if (dx && !hitsWall(level, t.x + dx - half, t.y - 6, t.x + dx + half, t.y)) { t.x += dx; moved = true; }
-  if (dy && !hitsWall(level, t.x - half, t.y + dy - 6, t.x + half, t.y + dy)) { t.y += dy; moved = true; }
+  if (dx && free(t.x + dx, t.y)) { t.x += dx; moved = true; }
+  if (dy && free(t.x, t.y + dy)) { t.y += dy; moved = true; }
   return moved;
 }
 const halfOf = (k) => Math.max(2, Math.min(7, k.box.l, k.box.r));
@@ -252,6 +272,13 @@ function stepPlayer(world, p, input, edge, dt, ev) {
   const natural = Math.max(k.clips[moveSel.clip].speed, MIN_WALK);
   let speed = running ? Math.max(natural, MIN_RUN) : natural;
   const rate = clamp(speed / natural, 1, 1.6);          // no run clip: the walk clip plays faster
+  // in a pool it wades: slower; and lava or acid hurts for as long as it stands in it
+  p.wading = wetAt(level, p.x, p.y);
+  if (p.wading) {
+    speed *= WADE;
+    if (level.harmful) hurtPlayer(world, p.x, ev);
+    if (p.busy?.type === 'die') return;
+  }
 
   // ---- start an action, a block, a dodge or an extra move
   const begin = (type, sel, more = {}) => { setAnim(p, sel, { restart: true }); p.busy = { type, ...more }; p.airborne = false; };
@@ -277,15 +304,16 @@ function stepPlayer(world, p, input, edge, dt, ev) {
   if (p.knock) { p.knock *= Math.pow(0.02, dt); if (Math.abs(p.knock) < 6) p.knock = 0; }
   if (top) {
     const norm = mx && my ? Math.SQRT1_2 : 1;
-    walk(level, p, (mx * speed * norm + kx) * dt, my * speed * norm * dt, halfOf(k));
+    walk(world, p, (mx * speed * norm + kx) * dt, my * speed * norm * dt, halfOf(k));
   } else {
     if (edge.jump && p.onGround && !p.busy) { p.vy = -JUMP_V; p.onGround = false; p.jumped = true; }
     const dx = (mx * speed + kx) * dt;
     let nx = clamp(p.x + dx, k.box.l, level.width - k.box.r);
     if (p.onGround) {
       // a slope is walked up; anything higher than that is a wall
-      if (dx && solidAt(level, nx + sign(dx) * halfOf(k), p.y - CLIMB - 1)) nx = p.x;
-      const s = surfaceBelow(level, nx, p.y - CLIMB);
+      const climb = p.wading ? WADE_OUT : CLIMB;         // out of a pool it wades up the bank
+      if (dx && solidAt(level, nx + sign(dx) * halfOf(k), p.y - climb - 1)) nx = p.x;
+      const s = surfaceBelow(level, nx, p.y - climb);
       p.x = nx;
       if (s.y <= p.y + CLIMB) p.y = s.y;
       else { p.onGround = false; p.vy = 0; p.jumped = false; }        // walked off an edge
@@ -451,7 +479,7 @@ function stepMover(world, t, dt, ev) {
   t.cool = Math.max(0, t.cool - dt);
   if (t.knock) {
     const dx = t.knock * dt;
-    if (top) walk(level, t, dx, 0, halfOf(k));
+    if (top) walk(world, t, dx, 0, halfOf(k));
     else t.x = clamp(t.x + dx, (t.span?.x0 ?? 0) + k.box.l, (t.span?.x1 ?? level.width) - k.box.r);
     t.knock *= Math.pow(0.02, dt);
     if (Math.abs(t.knock) < 6) t.knock = 0;
@@ -529,7 +557,7 @@ function stepMover(world, t, dt, ev) {
     if (top) {
       const [dx, dy] = DIR_V[t.dir];
       t.timer -= dt;
-      if (!walk(level, t, dx * v * dt, dy * v * dt, halfOf(k)) || t.timer <= 0) { t.state = 'idle'; t.timer = 0.5 + world.rand() * 1.2; }
+      if (!walk(world, t, dx * v * dt, dy * v * dt, halfOf(k)) || t.timer <= 0) { t.state = 'idle'; t.timer = 0.5 + world.rand() * 1.2; }
     } else {
       t.x += t.facing * v * dt;
       if ((t.facing > 0 && t.x >= t.target) || (t.facing < 0 && t.x <= t.target)) { t.x = t.target; t.state = 'idle'; t.timer = 0.6 + world.rand() * 1.2; }
@@ -646,7 +674,7 @@ export function snapshot(world) {
   return {
     mode: world.mode, time: round(world.time), width: world.level.width, height: world.level.height,
     collected: world.collected, collectedBy: { ...world.collectedBy },
-    player: p ? { ...view(world, p), onGround: p.onGround, vy: round(p.vy), hp: p.hp, maxHp: world.kinds[p.kind].hp } : null,
+    player: p ? { ...view(world, p), onGround: p.onGround, vy: round(p.vy), hp: p.hp, maxHp: world.kinds[p.kind].hp, wading: !!p.wading } : null,
     things: world.things.map((t) => view(world, t)),
   };
 }

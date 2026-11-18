@@ -108,8 +108,19 @@ export function createPainter({ sprites, colour, tiles: tileSets = null }) {
     if (laid.plain.includes('wall')) plainWalls(g, level);
     for (const t of laid.tiles) if (t.over) tile(t);
     groundFor = beat; groundCanvas = cv;
+    // the liquid of a side-view pool or waterfall, on a sheet of its own: it is drawn again in front of whoever
+    // stands in it, so they wade (the body under the surface line is covered) instead of standing in front of it
+    const wet = laid.tiles.filter((t) => t.front);
+    if (wet.length) {
+      frontCanvas = frontCanvas ?? document.createElement('canvas');
+      if (frontCanvas.width !== level.width || frontCanvas.height !== level.height) { frontCanvas.width = level.width; frontCanvas.height = level.height; }
+      const f = frontCanvas.getContext('2d');
+      f.clearRect(0, 0, level.width, level.height);
+      for (const t of wet) { const { sprite, params } = sprites[t.key], c = sprite.clips[t.clip]; f.drawImage(frame(t.key, t.clip, c.frames > 1 ? Math.floor(time * clipFps(sprite, t.clip, params)) % c.frames : 0), t.x, t.y); }
+    } else frontCanvas = null;
     return cv;
   }
+  let frontCanvas = null;
 
   function plainGround(g, level) {
     const T = level.tile;
@@ -286,6 +297,7 @@ export function createPainter({ sprites, colour, tiles: tileSets = null }) {
     if (level.mode === 'top') { g.fillStyle = C.outside; g.fillRect(0, 0, view.w, view.h); if (plan.background) backdrop(g, view, c, level, plan.background, world.time, 0); } else backdrop(g, view, c, level, plan.background, world.time, Math.max(0, cameraFloor(level, view) - cy));
     g.drawImage(ground(level, world.time), -cx, -cy);
     for (const t of drawOrder(world.player ? [...world.things, world.player] : world.things, level.mode)) thing(g, world, t, c);
+    if (frontCanvas) g.drawImage(frontCanvas, -cx, -cy);
   }
 
   return { frame, allFrames, draw, look };

@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createAnim, advance, seek, cuesAt } from '../../app/play/anim.js';
-import { activeCues, buildKind, makeKind } from '../../app/play/kinds.js';
+import { activeCues, buildKind, makeKind, footprintOf, harmfulLiquid } from '../../app/play/kinds.js';
 import { defineSprite, choice } from '../../engine/sprite.js';
 import { walker } from '../fixtures/play/index.js';
 import { rowFromSprite } from '../../app/play/roles.js';
@@ -137,4 +137,36 @@ test('where a thing stands comes from its pivot and whether it is on the ground'
   const k = buildKind({ key: 'e', sprite: coin, row: { stripClip: 'spin', tech: { pivot: [16, 30], grounded: false } }, settings: {} }, 'pickup');
   assert.equal(k.rest, 'spin');
   assert.ok(k.lift >= 6 && k.lift <= 10);
+});
+
+test('what blocks the way in a top-down scene: the part of a prop that stands on the ground', () => {
+  // a tree: a wide crown on a narrow trunk. Only the trunk blocks, a few pixels deep
+  const tree = shape({ size: [64, 80], pivot: [32, 76], render(g) { g.rect(8, 6, 48, 44, '#4f9d57'); g.rect(28, 50, 8, 26, '#8a5a34'); } });
+  assert.deepEqual(footprintOf(tree, 'idle', {}, { role: 'world/prop', type: 'prop' }), { l: 4, r: 4, d: 6 });
+  // a crate: as wide at the ground as anywhere. Its whole width blocks, still only a few pixels deep
+  const crate = shape({ size: [32, 32], pivot: [16, 30], render(g) { g.rect(4, 6, 24, 24, '#b07a50'); } });
+  assert.deepEqual(footprintOf(crate, 'idle', {}, { role: 'world/prop', type: 'prop' }), { l: 12, r: 12, d: 6 });
+  // a building: its walls stand on the ground, and it is deep: you cannot walk into the house from behind
+  const house = shape({ size: [96, 96], pivot: [48, 92], render(g) { g.rect(4, 8, 88, 40, '#c9423a'); g.rect(12, 48, 72, 44, '#f0ead8'); } });
+  const f = footprintOf(house, 'idle', {}, { role: 'world/building', type: 'prop' });
+  assert.deepEqual([f.l, f.r], [36, 36]);
+  assert.ok(f.d >= 28 && f.d <= 40, `a building is deep (${f.d})`);
+  // things you walk over or through have none
+  for (const role of ['world/platform', 'world/hazard', 'world/door', 'world/crop', 'items/pickup', 'effects/spark']) assert.equal(footprintOf(crate, 'idle', {}, { role, type: 'prop' }), null, role);
+  assert.equal(footprintOf(crate, 'idle', {}, { role: 'characters/enemy', type: 'creature' }), null);
+  // a built kind carries it
+  const k = buildKind({ key: 't', sprite: tree, row: { type: 'prop', role: 'world/prop', view: 'top-down' }, settings: {} }, 'prop');
+  assert.deepEqual(k.footprint, { l: 4, r: 4, d: 6 });
+  assert.equal(buildKind({ key: 'c', sprite: crate, row: { type: 'pickup', role: 'items/pickup' }, settings: {} }, 'pickup').footprint, null);
+});
+
+test('a liquid that hurts is told by its words: lava, acid, magma, poison, in its name or in what it is set to', () => {
+  const water = { id: 'tiles-water', name: 'Water and waterfalls', meta: { words: ['water', 'pool'] }, params: { liquid: { kind: 'choice' } } };
+  assert.equal(harmfulLiquid('water', water, { liquid: 'water' }), false);
+  assert.equal(harmfulLiquid('water', water, { liquid: 'swamp' }), false);
+  assert.equal(harmfulLiquid('water', water, { liquid: 'lava' }), true, 'the Liquid control set to lava');
+  assert.equal(harmfulLiquid('lava', water, {}), true, 'a block called lava');
+  assert.equal(harmfulLiquid('acid-pool', null, {}), true);
+  assert.equal(harmfulLiquid('goo', { id: 'tiles-hive', name: 'Poison pools', meta: { words: [] }, params: {} }, {}), true);
+  assert.equal(harmfulLiquid('water', { id: 'x', name: 'Lake', meta: { words: ['lake', 'lava lamp'] }, params: {} }, {}), false, 'a search word alone does not make water burn');
 });

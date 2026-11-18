@@ -531,6 +531,75 @@ test('top-down: big things are put where they fit: clear of the walls, of each o
   }
 });
 
+test('side view: the player wades through a pool, slower than it walks; lava hurts', () => {
+  const pool = () => makeLevel('side', { ground: 'grass', pool: 'water' });
+  const dry = sideWorld([hero()]);
+  dry.player.x = 300;
+  run(dry, { right: true }, 0.5);
+  const walked = dry.player.x - 300;
+  const w = createWorld({ mode: 'side', level: pool(), kinds: [hero()], player: 'hero' });
+  w.player.x = 19.3 * 32; w.player.y = 6 * 32; w.player.onGround = false;
+  run(w, {}, 1);
+  assert.equal(w.player.y, 7 * 32 + 20, 'it stands in the pool, legs under the surface');
+  assert.equal(w.player.wading, true);
+  assert.equal(snapshot(w).player.wading, true);
+  const x0 = w.player.x;
+  run(w, { right: true }, 0.5);
+  assert.ok(w.player.x - x0 > 2 && w.player.x - x0 < walked * 0.8, `it wades slower (${w.player.x - x0} against ${walked})`);
+  assert.equal(w.player.hp, 3, 'water does no harm');
+  // out again: it wades up the bank without having to jump
+  w.player.x = 21.6 * 32;
+  run(w, { right: true }, 2);
+  assert.equal(w.player.y, w.level.groundY);
+  assert.ok(w.player.x > 22 * 32);
+  assert.equal(w.player.wading, false);
+  // lava, acid: standing in it hurts, again and again
+  const level = pool(); level.harmful = true;
+  const hot = createWorld({ mode: 'side', level, kinds: [hero({ hp: 5 })], player: 'hero' });
+  hot.player.x = 20 * 32; hot.player.y = 7 * 32 + 20;
+  const ev = run(hot, {}, 4);
+  assert.ok(ev.filter((e) => e.type === 'hurt').length >= 2);
+  assert.ok(hot.player.hp <= 3);
+});
+
+test('top-down: a tree, a house and a fence block the way at their base, and the player walks behind the rest', () => {
+  const thing = (key, footprint) => makeKind({ key, role: 'prop', box: { l: 30, r: 30, t: 70, b: 0 }, footprint, clips: { idle: { frames: 1, fps: 1 } } });
+  const level = makeLevel('top');
+  const w = createWorld({ mode: 'top', level, kinds: [scout(), thing('tree', { l: 5, r: 5, d: 6 }), thing('house', { l: 30, r: 30, d: 30 })], player: 'hero' });
+  const tree = first(w, 'tree'), house = first(w, 'house');
+  tree.x = 300; tree.y = 300; house.x = 500; house.y = 300;
+  const go = (x, y, input, seconds) => { w.player.x = x; w.player.y = y; run(w, input, seconds); return { x: w.player.x, y: w.player.y }; };
+  // from the south, straight at the trunk: stopped at its foot
+  assert.ok(go(300, 340, { up: true, run: true }, 2).y > 300, 'stopped below the trunk');
+  // a little to the side of the trunk it walks past, up under the leaves, and is then behind the tree
+  const past = go(318, 340, { up: true, run: true }, 2);
+  assert.ok(past.y < 290, 'walked past the trunk');
+  // from the north, down at the trunk: stopped above it, standing behind the tree
+  const behind = go(300, 250, { down: true, run: true }, 2);
+  assert.ok(behind.y <= 300 - 6 && behind.y > 280, `stopped just behind the trunk (${behind.y})`);
+  // a house blocks along its whole base, and deeper
+  assert.ok(go(520, 340, { up: true, run: true }, 2).y > 300);
+  assert.ok(go(500, 220, { down: true, run: true }, 2).y <= 300 - 30);
+  assert.ok(go(430, 290, { right: true, run: true }, 2).x < 500 - 30, 'and from the side');
+  // a thing put on top of the player does not trap it: it can always walk out
+  tree.x = 300; tree.y = 300;
+  assert.ok(go(300, 298, { down: true, run: true }, 1).y > 310);
+  // a fence: the wood blocks
+  const fenced = makeLevel('top'); fenced.blocks = [{ x0: 200, y0: 248, x1: 328, y1: 256 }];
+  const f = createWorld({ mode: 'top', level: fenced, kinds: [scout(), slime()], player: 'hero' });
+  f.player.x = 260; f.player.y = 290;
+  run(f, { up: true, run: true }, 2);
+  assert.ok(f.player.y >= 256, 'stopped at the rail');
+  f.player.x = 180; f.player.y = 290;
+  run(f, { up: true, run: true }, 2);
+  assert.ok(f.player.y < 240, 'and walks round its end');
+  // in side view nothing of this applies: props are walked past
+  const s = sideWorld([hero(), thing('tree', { l: 5, r: 5, d: 6 })]);
+  first(s, 'tree').x = s.player.x + 30;
+  run(s, { right: true, run: true }, 2);
+  assert.ok(s.player.x > first(s, 'tree').x + 20);
+});
+
 test('a snapshot is plain data', () => {
   const w = sideWorld([hero(), slime(), coin()]);
   run(w, { right: true }, 0.3);

@@ -7,7 +7,8 @@
 //               window and battlements where the tileset has those clips)
 //   top-down    a walled room on the first floor in the bag: walls with faces, a wall one tile thick, a lane of
 //               second ground with a crossing and a bend that leads to a square, a pond or pit that cannot be walked
-//               into (a bridge over it where the tileset has one), a second pit, a patch of any other floor
+//               into (a bridge over it where the tileset has one), a second pit, a patch of any other floor, and a
+//               rail fence round a yard where the tileset has one (its wood blocks the way)
 //
 // NOTHING ABOUT TILES IS DECIDED HERE. It is all asked of the tile helper, engine/tiles.js, the same code the
 // preview tool (tools/tilemap.mjs), the scene tool (tools/scene.mjs) and the checker use:
@@ -22,10 +23,12 @@
 // Pure JavaScript: no DOM.
 import { TILE, classifyTiles, layoutTiles } from '../../engine/tiles.js';
 import { writeMap } from '../../engine/maptext.js';
+import { FENCE } from '../../engine/fences.js';
 
 export const UNIT = TILE;
 const EMPTY = 0, SOLID = 1, UP = 2, DOWN = 3;     // side view cells (UP: a slope rising to the right)
 const FLOOR = 0, WALL = 1, HOLE = 2, PATH = 3;     // top-down cells
+const WADE_DEPTH = 20;                             // how far under the top of a pool's first cell a wader's feet are
 const NO_TILES = classifyTiles({});                // a map can be read for what is solid with no tiles at all
 
 // The maps. The letters are layoutTiles' own: side view '#' the ground, 'I' a second block, '/' '\' slopes,
@@ -115,17 +118,18 @@ function sideMap(f) {
     const S = it.block ? L.S : '#', R = it.block ? L.R : '#';
     if (it.block) { legend[L.S] = `block:${it.block}`; legend[L.R] = [`back:${it.floor}`, `block:${it.block}`]; }
     legend[L.K] = `floor:${it.floor}`;
-    set(x + 1, x + 6, 2, 2, S);                                                              // the roof, two deep: the lower
-    set(x + 1, x + 1, 3, 5, S); set(x + 2, x + 6, 3, 3, R);                                  // row has the wall behind it
-    set(x + 2, x + 2, 4, 5, R); set(x + 6, x + 6, 4, 5, R);                                  // the tower's inner side; the end wall
-    set(x + 3, x + 5, 4, 6, L.K); set(x + 6, x + 6, 6, 6, L.K);                              // the back wall; a way out
+    // Its top is at row 3, inside the view when the player stands on the ground (the view shows from row 2.6 down).
+    set(x + 1, x + 1, 4, 5, S);                                                              // the tower's outer side
+    set(x + 2, x + 6, 4, 4, R);                                                              // the roof, with the wall behind it
+    set(x + 2, x + 2, 5, 5, R); set(x + 6, x + 6, 5, 5, R);                                  // the tower's inner side; the end wall
+    set(x + 3, x + 5, 5, 6, L.K); set(x + 6, x + 6, 6, 6, L.K);                              // the back wall; a way out
     set(x + 1, x + 2, 6, 6, L.K);
     if (it.archL && it.archR && it.block) {
       legend[L.A] = [`back:${it.floor}`, `open:${it.block}:${it.archL}`]; legend[L.Z] = [`back:${it.floor}`, `open:${it.block}:${it.archR}`];
       map[6][x + 1] = L.A; map[6][x + 2] = L.Z;
     }
-    if (it.window) { legend[L.N] = it.window; map[4][x + 4] = L.N; }
-    if (it.battlement) { legend[L.M] = it.battlement; set(x + 1, x + 6, 1, 1, L.M); }
+    if (it.window) { legend[L.N] = it.window; map[5][x + 4] = L.N; }
+    if (it.battlement) { legend[L.M] = it.battlement; set(x + 1, x + 6, 3, 3, L.M); }
   });
   return { map, legend, stacks };
 }
@@ -155,6 +159,13 @@ function topMap(f) {
   if (holes.length > 1) { if (holes[1]) legend.X = `block:${holes[1]}`; set(19, 21, 3, 4, holes[1] ? 'X' : 'O'); }
   // any other floor in the bag (the planks of a house): a patch of it
   if (floors[1]) { legend.L = `floor:${floors[1]}`; set(6, 9, 10, 11, 'L'); }
+  // a rail fence round the yard (the fence helper's recipe: a post, a run of rails along the top, a column down each
+  // side); the south side is left open, the way in
+  if (f.fence) {
+    legend.T = f.fence.post; legend.Y = f.fence.h; legend.J = f.fence.v;
+    map[9][5] = 'T'; set(6, 9, 9, 9, 'Y'); set(5, 5, 10, 11, 'J');
+    if (floors[1]) { legend.N = [`floor:${floors[1]}`, f.fence.v]; set(9, 9, 10, 11, 'N'); } else set(9, 9, 10, 11, 'J');
+  }
   return { map, legend, stacks: [] };
 }
 
@@ -165,7 +176,10 @@ function topMap(f) {
  *   strip: the bag has a block but no platform pieces, so the platform is a strip of the block (solid).
  *   stacks: how many columns to stand, or their prefixes. pool, fall: the prefixes of a liquid and of a waterfall.
  *   interiors: [{ floor, block, archL, archR, window, battlement }], a tower and hall for each back wall.
- *   top-down: wall (prefix); grounds, holes, floors (prefixes, or path / hole: true for one); liquid; bridge (a clip).
+ *   top-down: wall (prefix); grounds, holes, floors (prefixes, or path / hole: true for one); liquid; bridge (a clip);
+ *   fence: { h, v, post } (clips).
+ * Also on the level: wet (a Set of 'col,row': the cells of liquid), blocks ([{ x0, y0, x1, y1 }]: the wood of fences,
+ * which cannot be walked through), harmful (set by the page: the pool's liquid hurts).
  * What is solid, a slope or a platform is read from layoutTiles' cells for the map, not worked out here.
  * Returns { mode, tile, cols, rows, width, height, map (the letters), legend, cells, start, spots } and, side view,
  * { groundY, slopes, thins: [{ c0, c1, r, x0, x1, y }], stacks: [{ c, r0, r1 }] }.
@@ -178,6 +192,20 @@ export function makeLevel(mode, f = {}) {
   const level = { mode: top ? 'top' : 'side', tile: T, cols, rows, width: cols * T, height: rows * T, map, legend };
   // the helper says what each cell is: a block, a slope, a platform, a liquid; and, top-down, a wall, a hole or ground
   const cells = layoutTiles(map.map((r) => r.join('')), f.tiles ?? NO_TILES, { view: top ? 'top-down' : 'side', legend }).cells;
+  level.wet = new Set();
+  level.blocks = [];
+  level.harmful = false;
+  cells.forEach((row, r) => row.forEach((cell, c) => {
+    if (cell.kind === 'liquid') level.wet.add(`${c},${r}`);
+    // a fence blocks where its wood stands (engine/fences.js says where): the rails of a run, the strip of a column, a post
+    for (const t of cell.things) {
+      if (t.kind !== 'clip' || !f.fence) continue;
+      const x = c * T, y = r * T, [px0, px1, , py1] = FENCE.post;
+      if (t.clip === f.fence.h) level.blocks.push({ x0: x, x1: x + T, y0: y + FENCE.rails[1], y1: y + py1 + 1 });
+      else if (t.clip === f.fence.v) level.blocks.push({ x0: x + FENCE.strip[0] - 1, x1: x + px1 + 1, y0: y, y1: y + T });
+      else if (t.clip === f.fence.post) level.blocks.push({ x0: x + px0, x1: x + px1 + 1, y0: y + FENCE.rails[1], y1: y + py1 + 1 });
+    }
+  }));
 
   if (top) {
     const kindOf = (prefix) => (f.tiles ?? NO_TILES).blocks.find((b) => b.prefix === prefix)?.kind;
@@ -253,6 +281,7 @@ export function levelFeatures(index, mode) {
       liquid: liquid?.prefix ?? null,
       floors: T.floors.map((x) => x.prefix),
       bridge: holes.length || liquid ? of('bridge-h') : null,
+      fence: of('fence-h') && of('fence-v') && of('fence-post') ? { h: 'fence-h', v: 'fence-v', post: 'fence-post' } : null,
     };
   }
   const solid = T.blocks.filter((b) => !b.liquid), first = solid[0];
@@ -315,6 +344,13 @@ export function surfaceBelow(level, x, y) {
     break;
   }
   for (const p of level.thins ?? []) if (x >= p.x0 && x <= p.x1 && p.y >= y - 0.001 && p.y < best) { best = p.y; thin = true; }
+  // in a liquid, whoever falls in does not sink to the bottom: it stands a little under the surface and wades
+  for (let r = Math.max(0, Math.floor((y - 0.001) / T)); r < level.rows; r++) {
+    if (!level.wet || !level.wet.has(`${c},${r}`) || level.wet.has(`${c},${r - 1}`)) continue;
+    const s = r * T + WADE_DEPTH;
+    if (s >= y - 0.001 && s < best) { best = s; thin = false; }
+    break;
+  }
   return { y: best, thin };
 }
 
@@ -332,6 +368,11 @@ export function spanAt(level, x, y) {
 export function supportAt(level, x, y) {
   const s = surfaceBelow(level, x, y);
   return { y: s.y, ...spanAt(level, x, s.y) };
+}
+
+/** Side view: true when whoever has its feet at (x, y) stands in a liquid (it wades; the page draws the liquid in front of it). */
+export function wetAt(level, x, y) {
+  return level.mode === 'side' && level.wet.has(`${Math.floor(x / level.tile)},${Math.floor((y - 1) / level.tile)}`);
 }
 
 /** Top-down: true for a cell that cannot be walked on: a wall or a hole (outside the room counts as wall). */
@@ -378,24 +419,30 @@ export function levelText(level, tilesets = []) {
 
 /**
  * Every tile to draw for a level, exactly as layoutTiles lays it out (decals scattered by its rule):
- * { tiles: [{ key, clip, x, y, layer, over }], plain, open }. tiles are in drawing order; key is the bag item the
- * clip is from; `over` marks walls, platforms and decals, which are drawn after the page's plain walls.
+ * { tiles: [{ key, clip, x, y, layer, over, front }], plain, open }. tiles are in drawing order; key is the bag item
+ * the clip is from; `over` marks walls, platforms and decals, which are drawn after the page's plain walls; `front`
+ * marks the liquid of a side-view pool or waterfall, which the page draws again in front of whoever stands in it.
  * plain: what the bag has no tiles for at all, which the page draws plainly: 'ground' (no block), 'thin' (no
  * platform pieces) in side view; 'floor' (no lone fill), 'wall' (no wall block) top-down.
- * opts.seeThrough(key, clip): true for a tile with see-through pixels. Top-down, the floor is left out under a pit
- * or pond whose own tile is see-through, so what is behind the scene (the bag's background) shows through it;
- * open: a Set of 'col,row' for those cells.
+ * opts.seeThrough(key, clip): true for a tile with see-through pixels. Top-down, the floor is left out under the
+ * inside of a pit or pond (its fill) when that is see-through, so what is behind the scene (the bag's background)
+ * shows through it; open: a Set of 'col,row' for those cells. The floor always stays under the edge and corner
+ * pieces, which are see-through outside their rounded outline.
  */
 export function levelTiles(level, index, { seeThrough = null } = {}) {
   const top = level.mode === 'top', T = index?.tiles;
   const map = levelMap(level);
   const laid = T ? layoutTiles(map.rows, T, { view: map.view, legend: map.legend, decals: true }) : { tiles: [] };
-  let tiles = laid.tiles.map((t) => ({ key: t.set ?? T.from?.[t.clip], clip: t.clip, x: t.col * TILE, y: t.row * TILE, layer: t.layer, over: t.layer >= WALL_LAYER }));
+  let tiles = laid.tiles.map((t) => ({
+    key: t.set ?? T.from?.[t.clip], clip: t.clip, x: t.col * TILE, y: t.row * TILE, layer: t.layer, over: t.layer >= WALL_LAYER,
+    front: !top && t.layer === LIQUID_LAYER && level.wet.has(`${t.col},${t.row}`),
+  }));
   const open = new Set();
-  if (top && seeThrough) {
+  if (T && top && seeThrough) {
+    const inside = new Set(T.blocks.filter((b) => b.kind === 'hole' || b.liquid).flatMap((b) => b.fills));      // the fills of pits and ponds
     for (const t of tiles) {
       const c = t.x / TILE, r = t.y / TILE;
-      if (t.layer > FLOOR_LAYER && t.layer < WALL_LAYER && level.cells[r * level.cols + c] === HOLE && seeThrough(t.key, t.clip)) open.add(`${c},${r}`);
+      if (inside.has(t.clip) && t.layer > FLOOR_LAYER && level.cells[r * level.cols + c] === HOLE && seeThrough(t.key, t.clip)) open.add(`${c},${r}`);
     }
     tiles = tiles.filter((t) => t.layer !== FLOOR_LAYER || !open.has(`${t.x / TILE},${t.y / TILE}`));
   }
@@ -410,7 +457,7 @@ export function levelTiles(level, index, { seeThrough = null } = {}) {
   return { tiles, plain, open };
 }
 // layoutTiles sorts its tiles into layers: 0 floors and back fills, 1 stacks and liquids, 2 ground, 3 holes, 4 walls, 5 thin platforms, 6 decals
-const FLOOR_LAYER = 0, WALL_LAYER = 4;
+const FLOOR_LAYER = 0, LIQUID_LAYER = 1, WALL_LAYER = 4;
 
 /** The kinds of cell, for the page's plain drawing. */
 export const CELL = { EMPTY, SOLID, UP, DOWN, FLOOR, WALL, HOLE, PATH };
