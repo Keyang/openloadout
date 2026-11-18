@@ -183,3 +183,35 @@ test('NEVER_SWATCH is frozen all the way down', () => {
   assert.ok(Object.isFrozen(NEVER_SWATCH));
   for (const v of Object.values(NEVER_SWATCH)) assert.ok(Object.isFrozen(v));
 });
+
+// ---- palettes final (2026-11-18) ------------------------------------------------
+
+test('materials() is exactly the word list of style guide section 3 "What swatches accepts"', () => {
+  const every = ['skin', 'hair', 'outfit', 'trim', 'metal', 'wood', 'stone', 'body', 'accent', 'glow', 'core', 'edge', 'sky', 'land', 'haze', 'gem', 'shell', 'grass', 'leaf', 'ground', 'water', 'face', 'frame'];
+  const same = ['rock', 'wall', 'cloth', 'fur', 'light', 'energy', 'crystal', 'liquid', 'growth', 'foliage', 'earth', 'dirt', 'floor'];
+  const only = { thornwood: [], hearthvale: ['roof'], derelict: ['floor', 'wall', 'flesh'] };
+  for (const name of ['thornwood', 'hearthvale', 'derelict']) {
+    assert.deepEqual([...materials(name)].sort(), [...new Set([...every, ...same, ...only[name]])].sort(), name);
+  }
+  // the words the guide gives as the same lists
+  assert.deepEqual(swatches('thornwood', 'wall'), swatches('thornwood', 'stone'));
+  assert.deepEqual(swatches('thornwood', 'floor'), swatches('thornwood', 'ground'));
+  assert.deepEqual(swatches('hearthvale', 'dirt'), swatches('hearthvale', 'ground'));
+  assert.notDeepEqual(swatches('derelict', 'wall'), swatches('derelict', 'stone'));
+});
+
+test('the guide\'s example calls work, and the named colours added after review are offered where they fit', () => {
+  assert.equal(swatches('thornwood', 'stone', { lead: 'cavern' })[0], PALETTE.thornwood.cavern);
+  assert.equal(swatches('thornwood', 'shell')[0], PALETTE.thornwood.thorn);
+  const has = (pal, mat, colour) => assert.ok(swatches(pal, mat).includes(PALETTE[pal][colour]), `${pal} ${mat} offers ${colour}`);
+  has('thornwood', 'stone', 'cavern');
+  has('thornwood', 'sky', 'dusk');
+  has('hearthvale', 'leaf', 'pine');
+  has('hearthvale', 'stone', 'flagstone');
+  has('hearthvale', 'metal', 'rust');
+  has('derelict', 'flesh', 'membrane');
+  has('derelict', 'haze', 'nebula');
+  // the player's cloth is the same blue in all three palettes
+  assert.equal(PALETTE.thornwood.hero, PALETTE.derelict.signal);
+  assert.equal(swatches('derelict', 'trim')[0], PALETTE.derelict.signal);
+});
