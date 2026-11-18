@@ -140,6 +140,13 @@ patch = {
     "format": "sfxpatch/0.1", "id": "battle-theme", "name": "Battle theme", "category": "music",
     "tags": ["music", "boss", "combat", "adaptive", "loop"],
     "description": "Fast D-minor battle music, 8 to 32 bars long. Intensity brings in the snare, the brass stabs, then the melody and double-time kick, so a game can drive it live. Longer versions build up section by section, and the melody can be played by five instruments.",
+    # the catalogue rejects an asset with no metadata, so the generator writes it: running this is always safe
+    "meta": {
+        "type": "music", "role": "music/battle", "themes": ["fantasy", "neutral"],
+        "gameTypes": ["platformer", "turn-based-rpg", "shooter", "arcade"],
+        "words": ["battle", "fight", "combat", "boss", "action", "danger", "intense", "epic", "war", "enemy", "music", "bgm", "soundtrack"],
+        "license": "draft",
+    },
     "loop": True, "wrap": True, "normalize": False, "gain": 0.85,
     "duration": "round(bars/8)*8*4*60/bpm",
     "params": [
