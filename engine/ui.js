@@ -54,6 +54,7 @@
 // runs over every sprite of type `ui` it finds. So a sprite with a colour control named `face` says
 // where its text goes and where its frame (or lit edge) is:
 //   textArea: (clip, p) => ({ x, y, w, h, edge: { x, y } })   // the text rectangle; one pixel of the frame band or lit edge
+// (a list of these for a clip with several text areas; `text: '#231b33'` on an area meant for dark text, such as parchment)
 // (`edge` may be left out for a piece with no frame, such as a highlight row), and a clip that never
 // carries text says so in its clip entry: `cursor: { frames: 8, fps, loop: true, noText: true }`.
 // noText is for arrows, cursors and markers, and for a plate that only sits behind a glyph (the
@@ -852,7 +853,8 @@ function worstLook(a, b) {
  * drawn pixels of every clip not marked `noText`, for every option of `style`, every face swatch
  * with every frame swatch, and every swatch of the sprite's other colours, as made and under every
  * whole-bundle look:
- *   every colour inside the clip's text area (sprite.textArea(clip, p)) takes white text at 4.5 to 1;
+ *   every colour inside each of the clip's text areas (sprite.textArea(clip, p): one area or a list) takes
+ *   white text at 4.5 to 1, or the area's own `text` colour when it is meant for dark text;
  *   the pixel that textArea names as `edge` (the frame band, or a lit edge) holds 3 to 1 against them.
  * A sprite that is not of type `ui`, or has no colour control named `face`, has no faults. A clip
  * with a face colour that neither gives a text area nor says `noText: true` is a fault itself.
@@ -880,30 +882,35 @@ export function contrastFaults(sprite, { text = '#ffffff', textMin = 4.5, edgeMi
       const over = { ...base };
       for (const [k, v] of Object.entries(set)) if (v !== undefined && k !== 'other') over[k] = v;
       const p = cleanParams(sprite, over);
-      const area = typeof sprite.textArea === 'function' ? sprite.textArea(clip, p) : null;
-      if (!area) {
+      const areas = typeof sprite.textArea === 'function' ? sprite.textArea(clip, p) : null;
+      if (!areas || (Array.isArray(areas) && !areas.length)) {
         say(`${clip}|undeclared`, `${clip}: the sprite has a face colour but does not say where text goes on this clip: give the sprite textArea(clip, p), or mark the clip noText: true`);
         break;
       }
       const g = renderFrame(sprite, clip, 0, p);
       const where = `face ${p.face}${set.style ? `, style ${set.style}` : ''}${set.other ? `, ${set.other}` : ''}`;
-      const inArea = new Set();
-      for (let y = area.y; y < area.y + (area.h ?? 1); y++) for (let x = area.x; x < area.x + (area.w ?? 1); x++) { const v = g.get(x, y); if (v) inArea.add(hexOf(v)); }
-      if (!inArea.size) { say(`${clip}|empty`, `${clip}: nothing is drawn in its text area (${JSON.stringify({ x: area.x, y: area.y, w: area.w, h: area.h })})`); continue; }
-      for (const tc of inArea) {
-        const t = worstLook(text, tc);
-        if (t.ratio < textMin) say(`${clip}|text|${p.face}|${tc}|${set.style}`, `${clip}: white text on ${tc} (${where}) is ${t.ratio.toFixed(2)} to 1 under ${t.look}; ${textMin} to 1 is needed`);
-      }
-      if (area.edge) {
-        const ev = g.get(area.edge.x, area.edge.y);
-        if (!ev) { say(`${clip}|noedge`, `${clip}: nothing is drawn at the edge pixel ${area.edge.x},${area.edge.y}`); continue; }
-        const ec = hexOf(ev);
-        for (const tc of inArea) {
-          const e = worstLook(ec, tc);
-          if (e.ratio < edgeMin) say(`${clip}|edge|${p.frame}|${p.face}|${set.style}|${set.other}`, `${clip}: the ${frameWord}${p.frame ? ` ${p.frame}` : ''} (drawn ${ec}) against ${tc} (${where}) is ${e.ratio.toFixed(2)} to 1 under ${e.look}; ${edgeMin} to 1 is needed`);
-        }
-      }
+      for (const area of Array.isArray(areas) ? areas : [areas]) checkArea(clip, g, p, set, where, area);
     }
   }
   return [...faults.values()];
+
+  function checkArea(clip, g, p, set, where, area) {
+    const ink = (area.text ?? text).toLowerCase(), inkName = ink === '#ffffff' ? 'white text' : `text ${ink}`;
+    const inArea = new Set();
+    for (let y = area.y; y < area.y + (area.h ?? 1); y++) for (let x = area.x; x < area.x + (area.w ?? 1); x++) { const v = g.get(x, y); if (v) inArea.add(hexOf(v)); }
+    if (!inArea.size) { say(`${clip}|empty`, `${clip}: nothing is drawn in its text area (${JSON.stringify({ x: area.x, y: area.y, w: area.w, h: area.h })})`); return; }
+    for (const tc of inArea) {
+      const t = worstLook(ink, tc);
+      if (t.ratio < textMin) say(`${clip}|text|${ink}|${p.face}|${tc}|${set.style}`, `${clip}: ${inkName} on ${tc} (${where}) is ${t.ratio.toFixed(2)} to 1 under ${t.look}; ${textMin} to 1 is needed`);
+    }
+    if (area.edge) {
+      const ev = g.get(area.edge.x, area.edge.y);
+      if (!ev) { say(`${clip}|noedge`, `${clip}: nothing is drawn at the edge pixel ${area.edge.x},${area.edge.y}`); return; }
+      const ec = hexOf(ev);
+      for (const tc of inArea) {
+        const e = worstLook(ec, tc);
+        if (e.ratio < edgeMin) say(`${clip}|edge|${ink}|${p.frame}|${p.face}|${set.style}|${set.other}`, `${clip}: the ${frameWord}${p.frame ? ` ${p.frame}` : ''} (drawn ${ec}) against ${tc} (${where}) is ${e.ratio.toFixed(2)} to 1 under ${e.look}; ${edgeMin} to 1 is needed`);
+      }
+    }
+  }
 }

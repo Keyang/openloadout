@@ -12,13 +12,15 @@
 // in every state, and the pale carved edge keeps 3 to 1 against it for every frame colour, under every
 // whole-bundle look.
 import { defineSprite, range, choice, color, toggle } from '../engine/sprite.js';
+import { Surface } from '../engine/surface.js';
 import { PALETTE } from '../engine/palettes.js';
-import { buttonClips } from '../engine/ui.js';
+import { buttonClips, LIP } from '../engine/ui.js';
 import { WOOD_STYLES, woodButton } from '../engine/ui-wood.js';
 
 const P = PALETTE.thornwood;
 const SIZE = [96, 32];
 const REST = { left: 8, top: 7, right: 8, bottom: 7 };
+const board = (p) => ({ style: p.style, face: p.face, frame: p.frame, border: p.border, corner: p.corner, texture: p.texture, nails: p.nails, nail: P.steel });
 
 export default defineSprite({
   id: 'ui-buttons-wood',
@@ -46,9 +48,15 @@ export default defineSprite({
     frame: color('Frame', P.soil, [P.soil, P.gold, P.steel, P.slate, P.crimson, P.cream]),
   },
   clips: buttonClips(),
+  // Where the label goes in each state, and one pixel of the frame where it is drawn: the pale carved edge
+  // just inside the ink line along the top (the contrast rules are checked there: engine/ui.js, CONTRAST).
+  textArea(clip, p) {
+    const { text } = woodButton(new Surface(...SIZE), 1, 1, SIZE[0] - 2, SIZE[1] - 2, clip, board(p));
+    return { ...text, edge: { x: SIZE[0] >> 1, y: 2 + (clip === 'pressed' ? LIP : 0) } };
+  },
   sounds: { pressed: [{ sound: 'ui-click', preset: 'Soft tap', frame: 0, volume: 0.6 }] },
 
   render(g, { clip, p }) {
-    woodButton(g, 1, 1, SIZE[0] - 2, SIZE[1] - 2, clip, { style: p.style, face: p.face, frame: p.frame, border: p.border, corner: p.corner, texture: p.texture, nails: p.nails, nail: P.steel });
+    woodButton(g, 1, 1, SIZE[0] - 2, SIZE[1] - 2, clip, board(p));
   },
 });

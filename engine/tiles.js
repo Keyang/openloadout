@@ -422,8 +422,8 @@ export function pickClip(block, solid, x, y) {
   return block.pieces[piece] ?? null;
 }
 
-/** How often a cell that may hold a decal gets one, by where it goes: on a block's fill, on bare floor (top-down), above a top, under a bottom. */
-export const DECAL_CHANCE = { on: 0.25, floor: 0.12, above: 0.3, below: 0.5, face: 0.2 };
+/** How often a cell that may hold a decal gets one, by where it goes: on a block's fill, on bare floor (top-down), above a top, under a bottom, on a top-down wall's front face (one face cell in three). */
+export const DECAL_CHANCE = { on: 0.25, floor: 0.12, above: 0.3, below: 0.5, face: 0.33 };
 
 /**
  * Which decal, if any, goes in a cell: a clip name or null, the same every time for the same cell. decals: the

@@ -79,6 +79,27 @@ test('a text area need not be one colour, but every colour in it must take white
   assert.deepEqual(contrastFaults(defineSprite({ id: 'fixture-hero', name: 'H', size: [16, 16], pivot: [8, 8], meta: { type: 'character' }, params: { face: color('Face', '#f0ead8', ['#f0ead8', '#f2c230', '#c9423a']) }, clips: { a: { frames: 1, fps: 1 } }, render(g) { g.rect(4, 4, 8, 8, '#ffffff'); } })), [], 'only interface sprites are checked');
 });
 
+test('a clip may have several text areas, and an area may be meant for dark text', () => {
+  // a board with a pale heading strip: white text on the board, dark text on the strip
+  const titled = (stripText) => made({
+    textArea(clip, p) {
+      const out = panel9(new Surface(48, 32), 1, 1, 46, 30, { face: p.face, frame: p.frame });
+      return [{ x: out.inner.x, y: out.inner.y + 8, w: out.inner.w, h: out.inner.h - 8, edge: { x: 24, y: 2 } }, { x: out.inner.x, y: out.inner.y, w: out.inner.w, h: 6, ...(stripText ? { text: stripText } : {}) }];
+    },
+    render(g, { clip, p }) {
+      if (clip === 'arrow') { g.rect(20, 12, 8, 8, '#f2c230'); return; }
+      const out = panel9(g, 1, 1, 46, 30, { face: p.face, frame: p.frame });
+      g.rect(out.inner.x, out.inner.y, out.inner.w, 6, '#f0ead8');
+    },
+  });
+  assert.deepEqual(contrastFaults(titled('#231b33')), [], 'dark text on the pale strip, white text on the board');
+  const wrong = contrastFaults(titled(null));
+  assert.ok(wrong.length >= 1 && wrong.every((f) => f.includes('white text on #f0ead8')), wrong.join('\n'));
+  // dark text on a dark board is a fault too, and the message names the text colour
+  const dark = made({ textArea: () => ({ x: 12, y: 12, w: 20, h: 8, text: '#231b33' }) });
+  assert.match(contrastFaults(dark)[0], /panel: text #231b33 on #3a3350.*4\.5 to 1 is needed/);
+});
+
 // ---- every interface sprite in sprites/ ------------------------------------------------------
 
 const dir = new URL('../../sprites/', import.meta.url);
