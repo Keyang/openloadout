@@ -1,6 +1,6 @@
 # Hearthvale turn-based RPG kit: specification (`kit-rpg-fantasy`)
 
-Written 2026-11-18 by the art director (task W3-S). Generated together with `kit-rpg-fantasy.plan.json`; the two always agree. **Read `docs/style-guide.md` first**: it fixes frame sizes, clip names, frame counts, cue frames, part names, control names and the palette. This file says what each asset is.
+Written 2026-11-18 by the art director (task W3-S); revised the same day after the independent review (`when` on controls and cues, named palette colours, portrait roles, originality, batch order). It goes with `kit-rpg-fantasy.plan.json`; the two always agree. **Read `docs/style-guide.md` first**: it fixes frame sizes, clip names, frame counts, cue frames, part names, control names and the palette. This file says what each asset is.
 
 | | |
 |---|---|
@@ -41,8 +41,8 @@ Contents: [Asset list](#asset-list) · [Reused assets](#reused-assets) · [New s
 | 17 | `bone-soldier` | Skeleton soldier | creature | characters/enemy | side | 64x64 | R13 |
 | 18 | `thicket-imp` | Thicket imp | creature | characters/enemy | side | 48x48 | R13 |
 | 19 | `ember-wyrm` | Ember wyrm | creature | characters/boss | side | 128x96 | R14 |
-| 20 | `portraits-party` | Party portraits | icon | characters/player | front | 48x48 | R15 |
-| 21 | `portraits-village` | Villager portraits | icon | characters/npc | front | 48x48 | R15 |
+| 20 | `portraits-party` | Party portraits | icon | interface/icon | front | 48x48 | R15 |
+| 21 | `portraits-village` | Villager portraits | icon | interface/icon | front | 48x48 | R15 |
 | 22 | `tiles-meadow` | Meadow and paths | tileset | world/tile | top-down | 32x32 | R04 |
 | 23 | `tiles-shore` | Water and shore | tileset | world/tile | top-down | 32x32 | R10 |
 | 24 | `tiles-village` | Village ground and walls | tileset | world/tile | top-down | 32x32 | R08 |
@@ -88,7 +88,7 @@ Seven existing sprites are used on the battle screen and at camp. They count tow
 
 ## New sprites
 
-How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and what must happen in each clip are in the style guide, section 4 (a label in brackets is the button text). **Parts:** each part with its selector's options, then its other settings. **Controls:** the sprite's own controls by key (labels and end words for standard keys are in the style guide, section 10; non-standard keys carry a note). **Sounds:** clip, frame, sound id and style; write the cue exactly so. Default colours are names from the "Hearthvale" palette.
+How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and what must happen in each clip are in the style guide, section 4 (a label in brackets is the button text). **Parts:** each part with its selector's options, then its other settings. **Controls:** the sprite's own controls by key (labels and end words for standard keys are in the style guide, section 10; non-standard keys carry a note). **Sounds:** clip, frame, sound id and style; write the cue exactly so (the "style" is the cue's `preset`). **when:** a control or a cue followed by **when** and a `{ ... }` is in effect only for those values of other controls; copy it exactly into the control's options or the cue (style guide, sections 10 and 11). Default colours are names from the "Hearthvale" palette: "default meadow" is `PALETTE.hearthvale.meadow`.
 
 ### People on the map (top-down)
 
@@ -98,8 +98,8 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 48x48, pivot [24, 42].
 - **Clips (11):** `idle_down`, `idle_up`, `idle_side` 8 loop each · `walk_down`, `walk_up`, `walk_side` 8 loop each · `attack_down`, `attack_up`, `attack_side` 8 each · `hurt` 4 · `die` 8.
 - **Parts:** **weapon**: `weapon` (sword | axe | spear | none), `weaponLength`; **headgear**: `headgear` (helmet | crown | none), `headgearSize`; **cape**: `cape` (plain | tattered | none), `capeLength`.
-- **Controls (11 + 6 in parts):** `height`, `build`, `hairStyle` (choice: short | long | spiky | ponytail: hair shows under every headgear), `skin`, `hair` (colour), `outfit` (default hero), `trim` (default crimson), `metal` (default steel), `bounce`, `stride`, `speed`.
-- **Sounds:** `walk_*` frame 0 and 4 → `footstep-grass` style "Grass", volume 0.45 · `attack_*` frame 3 → `sword-slash` style "Quick dagger", volume 0.7 · `hurt` frame 0 → `punch` style "Light jab", volume 0.9 · `die` frame 0 → `punch` style "Heavy body blow".
+- **Controls (11 + 6 in parts):** `height`, `build`, `hairStyle` (choice: short | long | spiky | ponytail: hair shows under every headgear), `skin`, `hair` (colour), `outfit` (default hero), `trim` (the cape, the helmet's plume and the hem and cuffs of the tunic, so it always shows: default crimson), `metal` (weapon, helmet and crown: default steel; **when** `[{ weapon: ['sword', 'axe', 'spear'] }, { headgear: ['helmet', 'crown'] }]`), `bounce`, `stride`, `speed`.
+- **Sounds:** `walk_*` frame 0 and 4 → `footstep-grass` style "Grass", volume 0.45 · `attack_*` frame 3 → `sword-slash` style "Quick dagger", volume 0.7, **when** `{ weapon: ['sword', 'axe', 'spear'] }` · `attack_*` frame 3 → `whoosh` style "Quick swipe", volume 0.7, **when** `{ weapon: ['none'] }` (a bare fist) · `hurt` frame 0 → `punch` style "Light jab", volume 0.9 · `die` frame 0 → `punch` style "Heavy body blow".
 - **Look and motion:** **The first top-down character: it sets the conventions for every other one**, and it is the same person as `knight`: same default colours (blue outfit, red cape, steel helmet with a red plume), the same weapon and headgear options, so the hero on the map and the hero in battle match. Level "Full" (style guide, section 5). Chibi proportions: head 12 to 13 px across, body 30 px tall. The attack is a quarter-circle swing towards the facing direction with a white arc drawn after the outline.
 
 #### `mage-walker` · Mage (map)
@@ -108,7 +108,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 48x48, pivot [24, 42].
 - **Clips (7):** `idle_down`, `idle_up`, `idle_side` 8 loop each · `walk_down`, `walk_up`, `walk_side` 8 loop each · `cast` 8.
 - **Parts:** **headgear**: `headgear` (pointed | wide | hood | none), `headgearSize`; **weapon**: `weapon` (staff | wand | orb | none), `weaponLength`; **beard**: `beard` (long | short | none), `beardLength`.
-- **Controls (10 + 6 in parts):** `height`, `build`, `length` (slider "Robe": Knee / Floor), `skin`, `hair` (beard and hair: default cream), `outfit` (the robe: default mage), `trim` (default gold), `glow` (default magic), `bounce`, `speed`.
+- **Controls (10 + 6 in parts):** `height`, `build`, `length` (slider "Robe": Knee / Floor), `skin`, `hair` (beard and hair; the hair shows at the temples and neck under every headgear, so it is always in effect: default cream), `outfit` (the robe: default mage), `trim` (the robe's hem, cuffs and sash: default gold), `glow` (the light of the weapon's tip and of the `cast` clip, so it is in effect with any weapon and with none: default magic), `bounce`, `speed`.
 - **Sounds:** `walk_*` frame 0 and 4 → `footstep-grass` style "Grass", volume 0.45 · `cast` frame 2 → `magic-spell` style "Quick zap", volume 0.8.
 - **Look and motion:** The same person as `wizard`: purple robe, pointed hat, long pale beard, staff with a glowing orb. Level "Walker" plus `cast`. The robe hides the legs: the hem sways left and right with each step instead. In `_up` clips the hat and the back of the robe fill the silhouette; the staff shows beside the body.
 
@@ -118,7 +118,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 48x48, pivot [24, 42].
 - **Clips (9):** `idle_down`, `idle_up`, `idle_side` 8 loop each · `walk_down`, `walk_up`, `walk_side` 8 loop each · `run_down`, `run_up`, `run_side` 8 loop each.
 - **Parts:** **headgear**: `headgear` (hood | bandana | mask | none), `headgearSize`; **scarf**: `scarf` (short | long | none), `scarfLength`; **weapon**: `weapon` (daggers | short sword | claws | none), `weaponLength`.
-- **Controls (10 + 6 in parts):** `height`, `build`, `hairStyle` (choice: short | long | spiky | ponytail), `skin`, `hair`, `outfit` (default rogue), `trim` (default slate), `bounce`, `stride`, `speed`.
+- **Controls (10 + 6 in parts):** `height`, `build`, `hairStyle` (choice: short | long | spiky | ponytail; **when** `{ headgear: ['bandana', 'mask', 'none'] }`: the hood hides the hair), `skin`, `hair` (**when** `{ headgear: ['bandana', 'mask', 'none'] }`), `outfit` (default rogue), `trim` (the scarf, the belt and the boots, so it shows with `scarf: none` too: default slate), `bounce`, `stride`, `speed`.
 - **Sounds:** `walk_*` frame 0 and 4 → `footstep-grass` style "Grass", volume 0.45 · `run_*` frame 0 and 4 → `footstep-grass` style "Tall grass", volume 0.45.
 - **Look and motion:** The same person as `rogue-battler`: teal hood, long scarf trailing behind, daggers at the hips. Level "Walker" plus `run_*` (a low, leaning dash). The scarf lags and whips; it is the feature that tells this silhouette from the hero's.
 
@@ -138,9 +138,9 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 48x48, pivot [24, 42].
 - **Clips (5):** `idle_down`, `idle_up`, `idle_side` 8 loop each · `talk` 8 loop · `wave` 8.
 - **Parts:** **pack**: `pack` (backpack | crate | sack | none), `packSize`; **headgear**: `headgear` (turban | cap | straw hat | none), `headgearSize`; **held**: `held` (none | coin purse | scale), `heldSize`.
-- **Controls (9 + 6 in parts):** `height`, `build`, `moustache` (toggle: a wide moustache, at least 8 px across), `skin`, `hair`, `outfit` (default wheat), `accent` (the apron: default roof), `bounce`, `speed`.
+- **Controls (9 + 6 in parts):** `height`, `build`, `spectacles` (toggle: round spectacles, at least 8 px across), `skin`, `hair` (it shows below every headgear), `outfit` (default wheat), `accent` (the apron: default roof), `bounce`, `speed`.
 - **Sounds:** none.
-- **Look and motion:** A round, cheerful trader who stands at a stall and does not walk. A huge pack rises above the head from behind (it is the silhouette). `wave` raises one arm high and swings it twice; `talk` rubs the hands together.
+- **Look and motion:** A tall, lean trader with a long neck and a long apron, who stands at a stall and does not walk (not the round, moustached pedlar under a giant backpack that a famous RPG series made its own: style guide, section 13). The pack (a framed backpack, a crate or a sack) is hung with a rolled rug and a lantern and shows over one shoulder, no taller than the head. `wave` raises one arm high and swings it twice; `talk` counts on the fingers of one hand.
 
 #### `town-guard` · Town guard
 
@@ -148,8 +148,8 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 48x48, pivot [24, 42].
 - **Clips (7):** `idle_down`, `idle_up`, `idle_side` 8 loop each · `walk_down`, `walk_up`, `walk_side` 8 loop each · `block` 6.
 - **Parts:** **weapon**: `weapon` (halberd | spear | sword | none), `weaponLength`; **shield**: `shield` (none | round | kite), `shieldSize`; **headgear**: `headgear` (helmet | kettle hat | none), `headgearSize`.
-- **Controls (9 + 6 in parts):** `height`, `build`, `skin`, `outfit` (the tabard: default hero), `trim` (default wheat), `metal` (default steel), `bounce`, `stride`, `speed`.
-- **Sounds:** `walk_*` frame 0 and 4 → `footstep-gravel` style "Boots", volume 0.45 · `block` frame 1 → `metal-hit` style "Tin can", volume 0.7.
+- **Controls (9 + 6 in parts):** `height`, `build`, `skin`, `outfit` (the tabard: default hero), `trim` (the tabard's border and the belt: default wheat), `metal` (weapon, shield and headgear: default steel; **when** `[{ weapon: ['halberd', 'spear', 'sword'] }, { shield: ['round', 'kite'] }, { headgear: ['helmet', 'kettle hat'] }]`), `bounce`, `stride`, `speed`.
+- **Sounds:** `walk_*` frame 0 and 4 → `footstep-gravel` style "Boots", volume 0.45 · `block` frame 1 → `metal-hit` style "Tin can", volume 0.7, **when** `[{ weapon: ['halberd', 'spear', 'sword'] }, { shield: ['round', 'kite'] }]` (with neither, the guard bars the way with an arm, in silence).
 - **Look and motion:** A soldier at a gate. Stiff, upright, a pole weapon taller than he is held upright at his side (it sets the silhouette). The helmet is open-faced so skin always shows. `block` swings the weapon across the body to bar the way.
 
 #### `farm-kid` · Village child
@@ -158,7 +158,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 48x48, pivot [24, 42].
 - **Clips (9):** `idle_down`, `idle_up`, `idle_side` 8 loop each · `walk_down`, `walk_up`, `walk_side` 8 loop each · `run_down`, `run_up`, `run_side` 8 loop each.
 - **Parts:** **held**: `held` (none | stick | basket | flower), `heldSize`; **headgear**: `headgear` (none | straw hat | cap | bow), `headgearSize`.
-- **Controls (10 + 4 in parts):** `height` (a child: 22 to 27 px), `head`, `hairStyle` (choice: short | bowl | pigtails | spiky), `skin`, `hair`, `outfit` (default wheat), `accent` (default roof), `bounce`, `stride`, `speed`.
+- **Controls (10 + 4 in parts):** `height` (a child: 22 to 27 px), `head`, `hairStyle` (choice: short | bowl | pigtails | spiky; **when** `{ headgear: ['none', 'bow'] }`: under a straw hat or a cap the hair is drawn short), `skin`, `hair` (it shows below every headgear), `outfit` (default wheat), `accent` (collar, belt and shoes: default roof), `bounce`, `stride`, `speed`.
 - **Sounds:** `walk_*` frame 0 and 4 → `footstep-grass` style "Grass", volume 0.45 · `run_*` frame 0 and 4 → `footstep-grass` style "Grass", volume 0.3.
 - **Look and motion:** A child, three quarters of an adult's height with a bigger head. Bouncier than anyone else: the idle rocks on its heels, the run flails both arms.
 
@@ -170,9 +170,9 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 64x64, pivot [28, 58].
 - **Clips (9):** `idle` 8 loop · `walk` 8 loop · `run` 8 loop · `jump` 8 · `attack` 8 (label "Stab") · `shoot` 6 (label "Throw") · `hurt` 4 · `die` 8 · `victory` 8 loop.
 - **Parts:** **weapon**: `weapon` (daggers | short sword | claws | none), `weaponLength`, `weaponAngle`; **headgear**: `headgear` (hood | bandana | mask | none), `headgearSize`; **scarf**: `scarf` (short | long | none), `scarfLength`.
-- **Controls (10 + 7 in parts):** `height`, `build`, `head`, `skin`, `outfit` (default rogue), `trim` (default slate), `metal` (default steel), `bounce`, `stride`, `speed`.
-- **Sounds:** `walk` frame 0 and 4 → `footstep-gravel` style "Sneaking", volume 0.45 · `run` frame 0 and 4 → `footstep-gravel` style "Sneaking", volume 0.45 · `jump` frame 2 → `jump` style "Tiny hop", volume 0.7 · `attack` frame 3 → `sword-slash` style "Quick dagger", volume 0.7 · `shoot` frame 1 → `whoosh` style "Quick swipe", volume 0.85 · `hurt` frame 0 → `punch` style "Light jab", volume 0.9 · `die` frame 0 → `punch` style "Heavy body blow".
-- **Look and motion:** The third party member, on the humanoid rig: slim, crouched, a blade in each hand, hood up and a long scarf. Full side-view clip set so it also works as a platformer hero. `attack` is two fast jabs (frames 3 and 5). `shoot` flicks a dagger forward from the `muzzle` socket. `victory` tosses a dagger and catches it.
+- **Controls (10 + 7 in parts):** `height`, `build`, `head`, `skin`, `outfit` (default rogue), `trim` (the scarf, the belt and the boots: default slate), `metal` (the blades: default steel; **when** `{ weapon: ['daggers', 'short sword', 'claws'] }`), `bounce`, `stride`, `speed`.
+- **Sounds:** `walk` frame 0 and 4 → `footstep-gravel` style "Sneaking", volume 0.45 · `run` frame 0 and 4 → `footstep-gravel` style "Sneaking", volume 0.45 · `jump` frame 2 → `jump` style "Tiny hop", volume 0.7 · `attack` frame 3 → `sword-slash` style "Quick dagger", volume 0.7, **when** `{ weapon: ['daggers', 'short sword', 'claws'] }` · `attack` frame 3 → `whoosh` style "Quick swipe", volume 0.7, **when** `{ weapon: ['none'] }` · `shoot` frame 1 → `whoosh` style "Quick swipe", volume 0.85 · `hurt` frame 0 → `punch` style "Light jab", volume 0.9 · `die` frame 0 → `punch` style "Heavy body blow".
+- **Look and motion:** The third party member, on the humanoid rig: slim, crouched, a blade in each hand, hood up and a long scarf. Full side-view clip set so it also works as a platformer hero. `attack` is two fast jabs (frames 3 and 5). `shoot` flicks a small throwing knife from the belt forward from the `muzzle` socket (the same with every `weapon`, also `none`, so its sound has no `when`). `victory` tosses a dagger and catches it.
 
 #### `road-bandit` · Bandit
 
@@ -190,8 +190,8 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 64x64, pivot [28, 58].
 - **Clips (6):** `idle` 8 loop · `walk` 8 loop · `attack` 8 · `block` 6 · `hurt` 4 · `die` 8 (label "Collapse").
 - **Parts:** **weapon**: `weapon` (sword | axe | spear | none), `weaponLength`, `weaponAngle`; **shield**: `shield` (round | kite | broken | none), `shieldSize`; **headgear**: `headgear` (none | helmet | crown | horned), `headgearSize`.
-- **Controls (8 + 7 in parts):** `height`, `thickness` (slider "Bones": Thin / Thick), `head` (the skull), `body` (the bone: default cream), `glow` (the eyes: default magic), `metal` (default a rusty steel swatch), `wobble` (slider "Rattle": how much the bones jitter), `speed`.
-- **Sounds:** `walk` frame 0 and 4 → `footstep-gravel` style "Sneaking", volume 0.45 · `attack` frame 3 → `sword-slash` style "Heavy blade", volume 0.7 · `block` frame 1 → `metal-hit` style "Tin can", volume 0.7 · `hurt` frame 0 → `punch` style "Light jab", volume 0.9 · `die` frame 0 → `monster-fade` style "Bones collapse".
+- **Controls (8 + 7 in parts):** `height`, `thickness` (slider "Bones": Thin / Thick), `head` (the skull), `body` (the bone: default cream), `glow` (the eyes: default magic), `metal` (weapon, shield and headgear: default rust; **when** `[{ weapon: ['sword', 'axe', 'spear'] }, { shield: ['round', 'kite', 'broken'] }, { headgear: ['helmet', 'crown', 'horned'] }]`), `wobble` (slider "Rattle": how much the bones jitter), `speed`.
+- **Sounds:** `walk` frame 0 and 4 → `footstep-gravel` style "Sneaking", volume 0.45 · `attack` frame 3 → `sword-slash` style "Heavy blade", volume 0.7, **when** `{ weapon: ['sword', 'axe', 'spear'] }` · `attack` frame 3 → `whoosh` style "Quick swipe", volume 0.7, **when** `{ weapon: ['none'] }` (it claws) · `block` frame 1 → `metal-hit` style "Tin can", volume 0.7, **when** `[{ shield: ['round', 'kite', 'broken'] }, { weapon: ['sword', 'axe', 'spear'] }]` (it blocks with the shield or, without one, with the weapon; with neither it crosses its arms in silence) · `hurt` frame 0 → `punch` style "Light jab", volume 0.9 · `die` frame 0 → `monster-fade` style "Bones collapse".
 - **Look and motion:** A skeleton that uses the humanoid rig's joints (`H.solve`) but draws bones, not a body: 2 px limbs with knobs at the joints, a rib cage with three dark gaps, a skull with two glowing eye sockets and a jaw that drops open on `attack` and `hurt`. Every bone jitters a pixel out of step (the rattle). It dies by falling straight down into a heap with the skull on top.
 
 #### `thicket-imp` · Thicket imp
@@ -200,8 +200,8 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 48x48, pivot [24, 24], `grounded: false`.
 - **Clips (6):** `idle` 8 loop (label "Hover") · `fly` 8 loop · `attack` 8 (label "Claw") · `cast` 8 (label "Hex") · `hurt` 4 · `die` 8.
 - **Parts:** **wings**: `wings` (leaf | bat | moth | none), `wingSpan`; **horns**: `horns` (none | nubs | curled | twig), `hornLength`; **tail**: `tail` (none | thin | leafy), `tailLength`.
-- **Controls (10 + 6 in parts):** `size`, `belly` (slider: Slim / Round), `ears` (slider: Small / Huge), `eyes` (choice: sly | wide | angry), `body` (default leaf), `accent` (wings and tail tip: default mage), `glow` (default mage), `flap`, `bob`, `speed`.
-- **Sounds:** `fly` frame 1 → `whoosh` style "Quick swipe", volume 0.35 · `attack` frame 3 → `whoosh` style "Quick swipe", volume 0.7 · `cast` frame 2 → `magic-spell` style "Curse", volume 0.8 · `hurt` frame 0 → `punch` style "Light jab", volume 0.9 · `die` frame 0 → `monster-fade` style "Monster fades".
+- **Controls (10 + 6 in parts):** `size`, `belly` (slider: Slim / Round), `ears` (slider: Small / Huge), `eyes` (choice: sly | wide | angry), `body` (default leaf), `accent` (wings, tail tip and the insides of the ears, so it shows with both parts off: default mage), `glow` (the eyes and the hex ball of `cast`: default mage), `flap`, `bob`, `speed`.
+- **Sounds:** `fly` frame 1 → `whoosh` style "Quick swipe", volume 0.35, **when** `{ wings: ['leaf', 'bat', 'moth'] }` · `attack` frame 3 → `whoosh` style "Quick swipe", volume 0.7 · `cast` frame 2 → `magic-spell` style "Curse", volume 0.8 · `hurt` frame 0 → `punch` style "Light jab", volume 0.9 · `die` frame 0 → `monster-fade` style "Monster fades".
 - **Look and motion:** A small flying trickster of the woods: pot belly, big ears, a grin, wings like leaves. It hovers with a quick flutter. `cast` holds both hands up while a ball of glow grows between them and is thrown forward on frame 5. With `wings: none` it bobs on a puff of glow instead.
 
 #### `ember-wyrm` · Ember wyrm
@@ -212,25 +212,25 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Parts:** **wings**: `wings` (large | small | tattered | none), `wingSpan`; **horns**: `horns` (swept | ram | crown | none), `hornLength`; **tail**: `tail` (spade | club | flame), `tailLength`.
 - **Controls (9 + 6 in parts):** `size`, `length` (slider "Neck": Short / Long), `bulk` (slider: Lean / Heavy), `spines` (choice: none | ridge | sails), `body` (default crimson), `accent` (belly and wing skin: default wheat), `glow` (fire, eyes and throat: default fire), `bounce` (how deeply it breathes), `speed`.
 - **Sounds:** `attack` frame 7 → `punch` style "Heavy body blow" · `breath` frame 1 → `wyrm-roar` style "Fire breath" · `buffet` frame 4 → `whoosh` style "Heavy swing" · `hurt` frame 0 → `punch` style "Heavy body blow", volume 0.9 · `die` frame 0 → `wyrm-roar` style "Distant growl" · `die` frame 8 → `monster-fade` style "Big beast falls".
-- **Look and motion:** The boss: a long-necked dragon facing right, crouched on four legs, about two tiles tall at the shoulder, wings half open behind, tail curling up at the left. Body painted as one `g.blob`; belly plates in the accent colour. Idle: the chest swells, smoke curls from the nostrils, the tail tip sways. `breath`: the neck pulls back and the throat glows for four frames (the warning), then a cone of flame in three tones pours right for five frames, drawn after the outline. `buffet` beats both wings forward. It dies with the neck sinking to the ground and the glow going out.
+- **Look and motion:** The boss: a long-necked dragon facing right, crouched on four legs, about two tiles tall at the shoulder, wings half open behind, tail curling up at the left. Body painted as one `g.blob`; belly plates in the accent colour. Idle: the chest swells, smoke curls from the nostrils, the tail tip sways. `breath`: the neck pulls back and the throat glows for four frames (the warning), then a cone of flame in three tones pours right for five frames, drawn after the outline. `buffet` beats both wings forward (with `wings: none` it rears and stamps both forelegs instead: the same timing and the same sound). It dies with the neck sinking to the ground and the glow going out.
 
 #### `portraits-party` · Party portraits
 
-- **Meta:** type `icon`, role `characters/player`, view `front`, themes `fantasy`. Batch **R15**.
+- **Meta:** type `icon`, role `interface/icon`, view `front`, themes `fantasy`. Batch **R15**. (Not `characters/player`: that role would make the playground move the portrait about as the player.)
 - **Frame:** 48x48, pivot [24, 24].
 - **Clips (12):** `hero-neutral` 1 · `hero-happy` 1 · `hero-hurt` 1 · `hero-talk` 4 loop · `mage-neutral` 1 · `mage-happy` 1 · `mage-hurt` 1 · `mage-talk` 4 loop · `rogue-neutral` 1 · `rogue-happy` 1 · `rogue-hurt` 1 · `rogue-talk` 4 loop.
 - **Parts:** none.
-- **Controls (7):** `frame` (choice of border: none | round | square), `backing` (colour behind the head: default panel), `skin`, `hero` (the hero's colour: default hero), `mage` (default mage), `rogue` (default rogue), `size` (slider "Zoom": Head and shoulders / Face).
+- **Controls (7):** `frame` (choice of border: none | round | square), `backing` (colour behind the head: default panel; **when** `{ frame: ['round', 'square'] }`: with no border the portrait has no backing), `skin`, `hero` (the hero's colour: default hero), `mage` (default mage), `rogue` (default rogue), `size` (slider "Zoom": Head and shoulders / Face). No `speed`: the three `talk` clips have 4 frames and play at a fixed 8 fps (style guide, section 10).
 - **Sounds:** none.
 - **Look and motion:** Faces for dialogue boxes and the battle status row: the hero (helmet, plume), the mage (hat, beard) and the rogue (hood, scarf), each recognisably the same person as their sprite. Moods differ in brows and mouth, and in `hurt` a tilted head and one closed eye. `talk` opens and closes the mouth.
 
 #### `portraits-village` · Villager portraits
 
-- **Meta:** type `icon`, role `characters/npc`, view `front`, themes `fantasy`, `farm`. Batch **R15**.
+- **Meta:** type `icon`, role `interface/icon`, view `front`, themes `fantasy`, `farm`. Batch **R15**.
 - **Frame:** 48x48, pivot [24, 24].
 - **Clips (12):** `elder-neutral` 1 · `elder-happy` 1 · `elder-worried` 1 · `merchant-neutral` 1 · `merchant-happy` 1 · `merchant-worried` 1 · `guard-neutral` 1 · `guard-happy` 1 · `guard-worried` 1 · `kid-neutral` 1 · `kid-happy` 1 · `kid-worried` 1.
 - **Parts:** none.
-- **Controls (8):** `frame` (choice: none | round | square), `backing` (default panel), `skin`, `elder` (default cobble), `merchant` (default wheat), `guard` (default hero), `kid` (default roof), `size` (slider "Zoom").
+- **Controls (8):** `frame` (choice: none | round | square), `backing` (default panel; **when** `{ frame: ['round', 'square'] }`), `skin`, `elder` (default cobble), `merchant` (default wheat), `guard` (default hero), `kid` (default roof), `size` (slider "Zoom").
 - **Sounds:** none.
 - **Look and motion:** Faces of the four townsfolk, built with the same face-drawing code as `portraits-party` (same batch), matching `village-elder`, `merchant`, `town-guard` and `farm-kid`.
 
@@ -272,7 +272,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 32x32, pivot [16, 16].
 - **Clips (32):** `floor-fill` 1 · the 13-tile block `wall-*` · the 13-tile block `pit-*` · `stairs-down` 1 · `stairs-up` 1 · `floor-deco-a` 1 · `floor-deco-b` 1 · `floor-deco-c` 1.
 - **Parts:** none.
-- **Controls (8):** `stone` (walls: default slate), `floor` (colour: a lighter slate swatch), `growth` (slime and moss: default leaf), `style` (choice: slabs | bricks | cobbles), `edge`, `texture`, `wear`, `damp` (toggle: wet highlights and a puddle decal).
+- **Controls (8):** `stone` (walls: default slate), `floor` (colour: default flagstone), `growth` (slime and moss: default leaf), `style` (choice: slabs | bricks | cobbles), `edge`, `texture`, `wear`, `damp` (toggle: wet highlights and a puddle decal).
 - **Sounds:** none.
 - **Look and motion:** Rooms and corridors under the ground. `floor-fill` is large flagstones with dark joints. The wall block: a dark cap with a lighter rim, and a brick face one tile high on the bottom row, ending in a base line and floor shadow. The pit block: black depth, an inner wall showing on the north edge. Stairs fill one tile: steps getting darker going down, lighter going up. Decals: cracks, scattered bones, an iron grate.
 
@@ -294,7 +294,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 48x80, pivot [24, 76].
 - **Clips (3):** `idle` 1 · `sway` 8 loop · `shake` 6.
 - **Parts:** none.
-- **Controls (8):** `size`, `shape` (choice of height: short | medium | tall: three, four or five tiers), `width`, `snowy` (toggle: snow on every tier), `leaf` (default a darker leaf swatch), `wood` (default wood), `sway`, `speed`.
+- **Controls (8):** `size`, `shape` (choice of height: short | medium | tall: three, four or five tiers), `width`, `snowy` (toggle: snow on every tier), `leaf` (default pine), `wood` (default wood), `sway`, `speed`.
 - **Sounds:** `shake` frame 0 → `footstep-grass` style "Tall grass", volume 0.6.
 - **Look and motion:** A pointed fir: stacked tiers with jagged lower edges, each tier shading the one below. The tip sways most.
 
@@ -304,7 +304,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 48x48, pivot [24, 44].
 - **Clips (3):** `idle` 1 · `hurt` 4 · `break` 8.
 - **Parts:** none.
-- **Controls (8):** `size`, `shape` (choice: round | slab | cluster), `mossy` (toggle), `wear` (cracks), `pieces`, `stone` (default cobble), `accent` (the moss: default leaf), `speed`.
+- **Controls (8):** `size`, `shape` (choice: round | slab | cluster), `mossy` (toggle), `wear` (cracks), `pieces`, `stone` (default cobble), `accent` (the moss: default leaf; **when** `{ mossy: [true] }`), `speed`.
 - **Sounds:** `hurt` frame 0 → `punch` style "Light jab", volume 0.9 · `break` frame 0 → `stone-door` style "Secret wall", volume 0.7.
 - **Look and motion:** A rock that blocks a path until it is broken. Three or four flat planes, lit from the top right. `break` splits it along its cracks into chunks that tumble and fade.
 
@@ -334,7 +334,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 64x64, pivot [32, 60].
 - **Clips (2):** `idle` 1 · `flap` 8 loop.
 - **Parts:** none.
-- **Controls (8):** `style` (choice of awning: striped | plain | scalloped), `shape` (choice of goods on the counter: fruit | potions | weapons | bread), `width`, `cloth` (default roof), `accent` (the stripes: default cream), `wood` (default wood), `sway`, `speed`.
+- **Controls (8):** `style` (choice of awning: striped | plain | scalloped), `shape` (choice of goods on the counter: fruit | potions | weapons | bread), `width`, `cloth` (default roof), `accent` (the stripes of the striped awning, and the edging band of the plain and scalloped ones, so it shows with every `style`: default cream), `wood` (default wood), `sway`, `speed`.
 - **Sounds:** none.
 - **Look and motion:** A wooden counter under a cloth awning on four poles; goods laid out on the counter. `flap` ripples the awning's front edge. `merchant` stands behind it.
 
@@ -354,7 +354,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 32x48, pivot [16, 46].
 - **Clips (4):** `closed` 1 · `open` 6 · `locked` 4 · `sealed` 8 loop.
 - **Parts:** none.
-- **Controls (8):** `style` (choice: wood | iron | stone), `corner` (slider "Arch": Square / Round top), `bars` (toggle), `body` (the door: default wood), `metal` (default steel), `stone` (the frame: default slate), `glow` (the seal: default mage), `speed`.
+- **Controls (8):** `style` (choice: wood | iron | stone), `corner` (slider "Arch": Square / Round top), `bars` (toggle), `body` (the door: default wood), `metal` (bands and studs, which every style has, and the bars: default steel), `stone` (the frame: default slate), `glow` (the seal, seen in `sealed`: default mage), `speed`.
 - **Sounds:** `open` frame 0 → `stone-door` style "Dungeon door", volume 0.8 · `locked` frame 0 → `error-buzz` style "Soft no", volume 0.6.
 - **Look and motion:** A door set in a wall face: one tile wide, one and a half tall so it overlaps the wall cap above. `open` slides it up into the wall. `sealed`: a glowing rune circle turns slowly over it.
 
@@ -363,10 +363,10 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Meta:** type `prop`, role `world/prop`, view `top-down`, themes `fantasy`. Batch **R10**.
 - **Frame:** 32x48, pivot [16, 46].
 - **Clips (2):** `idle` 8 loop (label "Glow") · `activate` 8.
-- **Parts:** **pedestal**: `pedestal` (stone | roots | none), `pedestalSize`.
-- **Controls (9 + 2 in parts):** `size`, `shape` (choice of cut: shard | prism | orb | star), `rings` (toggle: a thin ring orbits the crystal), `body` (the crystal: default magic), `glow` (default cream), `stone` (the pedestal: default cobble), `bob`, `flicker` (how strongly it pulses), `speed`.
+- **Parts:** **pedestal**: `pedestal` (stone | roots | none), `pedestalSize`, `pedestalColour` (default cobble).
+- **Controls (8 + 3 in parts):** `size`, `shape` (choice of cut: shard | prism | orb | star), `rings` (toggle: a thin ring orbits the crystal), `body` (the crystal: default magic), `glow` (default cream), `bob`, `flicker` (how strongly it pulses), `speed`.
 - **Sounds:** `activate` frame 1 → `save-chime` style "Save point", volume 0.8.
-- **Look and motion:** A crystal floating 3 px above a low pedestal, turning slowly so a glint crosses its faces. `activate`: it flashes white, two rings of light rise from the pedestal and fade, and it settles.
+- **Look and motion:** A crystal floating 3 px above a low pedestal, turning slowly so a glint crosses its faces. `activate`: it flashes white, two rings of light rise from under it and fade, and it settles. The crystal itself is in every frame, so nothing is empty with `pedestal: none`.
 
 ### Icons
 
@@ -374,11 +374,11 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 
 - **Meta:** type `icon`, role `items/icon`, view `none`, themes `fantasy`. Batch **R16**.
 - **Frame:** 32x32, pivot [16, 16].
-- **Clips (8):** `potion` 1 · `mana-flask` 1 · `antidote` 1 · `bread` 1 · `herb` 1 · `revive-feather` 1 · `bomb` 1 · `tent` 1.
+- **Clips (8):** `potion` 1 · `mana-flask` 1 · `antidote` 1 · `bread` 1 · `herb` 1 · `revive-candle` 1 · `bomb` 1 · `tent` 1.
 - **Parts:** none.
-- **Controls (7):** `shade` (toggle: a second shadow tone), `shine`, `tilt` (toggle: tilted or upright), `size`, `body` (health things: default crimson), `accent` (mana things: default hero), `cloth` (bread, tent, feather: default wheat).
+- **Controls (7):** `shade` (toggle: a second shadow tone), `shine`, `tilt` (toggle: tilted or upright), `size`, `body` (health things: default crimson), `accent` (mana things: default hero), `cloth` (bread, tent and candle wax: default wheat).
 - **Sounds:** none.
-- **Look and motion:** Things used from the item menu. Each has its own outline: round bottle, tall flask, small square vial, loaf, leaf sprig, long feather, round bomb with a fuse, triangular tent.
+- **Look and motion:** Things used from the item menu. Each has its own outline: round bottle, tall flask, small square vial, loaf, leaf sprig, a lit candle stub in a dish (the revive item: not a feather, which belongs to a famous series), round bomb with a fuse, triangular tent.
 
 #### `icons-gear` · Equipment icons
 
@@ -470,7 +470,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 320x180, pivot [160, 180].
 - **Clips (3):** `far` 1 · `mid` 8 loop · `near` 1.
 - **Parts:** none.
-- **Controls (8):** `stone` (default slate), `floor` (colour: a lighter slate swatch), `glow` (torch light: default fire), `torches` (slider: Few / Many), `height` (the arches), `density` (the pillars), `haze`, `speed`.
+- **Controls (8):** `stone` (default slate), `floor` (colour: default flagstone), `glow` (torch light: default fire), `torches` (slider: Few / Many), `height` (the arches), `density` (the pillars), `haze`, `speed`.
 - **Sounds:** `mid` frame 0 → `fire` style "Torch", volume 0.35.
 - **Look and motion:** `far`: a dark wall of arches fading into black-blue. `mid`: evenly spaced pillars with a torch on every second one; the flames flicker (8 frames) and each lights a soft-edged patch of wall. `near`: a flagstone floor, opaque from row 132 down. The floor's tile pattern matches `tiles-dungeon`.
 
@@ -494,7 +494,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Parts:** none.
 - **Controls (7):** `style` (choice: plain | ornate | scroll), `corner`, `border`, `face` (default panel), `frame` (default cream), `accent` (default gold), `speed`.
 - **Sounds:** none.
-- **Look and motion:** The command list (Attack, Magic, Item, Defend: the words are the game's). `panel` matches `ui-dialogue`. `row` is the highlight bar behind the chosen command. `cursor` is a pointing hand that slides 2 px left and right. `turn-marker` is a small triangle that bounces over whoever acts next.
+- **Look and motion:** The command list (Attack, Magic, Item, Defend: the words are the game's). `panel` matches `ui-dialogue`. `row` is the highlight bar behind the chosen command. `cursor` is a small diamond-headed arrow that slides 2 px left and right (not a pointing gloved hand: style guide, section 13); it exports a `tip` socket at its point. `turn-marker` is a small triangle that bounces over whoever acts next.
 
 #### `ui-bars-rpg` · Health and magic bars
 
@@ -502,7 +502,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 64x16, pivot [32, 8].
 - **Clips (5):** `frame` 1 · `fill` 1 · `fill-b` 1 · `fill-c` 1 · `flash` 4.
 - **Parts:** none.
-- **Controls (8):** `style` (choice: solid | segmented | ornate), `corner`, `border`, `shine`, `frame` (the housing: default cream), `fill` (health: default heal), `fillB` (magic: default hero), `fillC` (the turn or limit gauge: default gold).
+- **Controls (8):** `style` (choice: solid | segmented | ornate), `corner`, `border`, `shine`, `frame` (the housing: default cream), `fill` (health: default heal), `fillB` (magic: default hero), `fillC` (the turn or limit gauge: default gold). No `speed`: `flash` has 4 frames and plays at a fixed 8 fps (style guide, section 10).
 - **Sounds:** none.
 - **Look and motion:** Bars for the battle status row, as the style guide, section 8. `fill` is health, `fill-b` magic, `fill-c` a third gauge.
 
@@ -512,7 +512,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 16x16, pivot [8, 8].
 - **Clips (10):** `poison` 1 · `sleep` 1 · `stun` 1 · `burn` 1 · `freeze` 1 · `attack-up` 1 · `defence-up` 1 · `attack-down` 1 · `defence-down` 1 · `haste` 1.
 - **Parts:** none.
-- **Controls (6):** `backing` (choice: none | round | square), `bold` (toggle: thicker glyphs), `shine`, `face` (the plate: default panel), `good` (colour of buffs: default heal), `bad` (colour of ailments: default mage).
+- **Controls (6):** `backing` (choice: none | round | square), `bold` (toggle: thicker glyphs), `shine`, `face` (the plate: default panel; **when** `{ backing: ['round', 'square'] }`), `good` (colour of buffs: default heal), `bad` (colour of ailments: default mage).
 - **Sounds:** none.
 - **Look and motion:** Tiny marks shown beside a fighter. A drop, "z z", a ring of stars, a flame, a snowflake, a blade or a shield with an arrow up or down, a winged boot. Each must read at 14 px by outline alone.
 
@@ -524,11 +524,11 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Parts:** none.
 - **Controls (6):** `style` (choice: chunky | slim | rounded), `slant` (toggle: leaning digits), `shadow` (toggle), `size`, `body` (default cream), `edge` (the rim inside the ink outline: default fire).
 - **Sounds:** none.
-- **Look and motion:** Digits a game strings together into pop-up numbers (it tints them: red for damage, green for healing). Thick, inked, 10 px wide so numbers stay readable over a busy battle. `crit` is a starburst, `miss` a curved dash.
+- **Look and motion:** Digits a game strings together into pop-up numbers (it tints them: red for damage, green for healing). Thick, inked, 10 px wide so numbers stay readable over a busy battle. `crit` is a starburst; `miss` must read as a dodge at 1x: a swoosh with motion lines, or the word itself (style guide, section 8). Digit sizes come from the interface helper, and every digit differs from every other by more than 2 body pixels.
 
 ## Sound effects
 
-Exactly 20. New sounds follow `skills/sprite-forge/SOUND.md` and the style guide, section 11. The style names are fixed: sprites cue them by name. Every new sound also has `meta.themes` and `meta.gameTypes` chosen by the style guide, section 13.
+Exactly 20. New sounds follow `../../skills/sprite-forge/SOUND.md` (the skill is at the workspace root) and the style guide, section 11. The style names are fixed: sprites cue them by name. Every new sound also has `meta.themes` and `meta.gameTypes` chosen by the style guide, section 13.
 
 | # | id | Name | type | role | Batch | Pairs with |
 |---|---|---|---|---|---|---|
@@ -551,7 +551,7 @@ Exactly 20. New sounds follow `skills/sprite-forge/SOUND.md` and the style guide
 | 17 | `heal-shimmer` | Heal shimmer | sfx | effects/magic | R02 | `fx-heal` `burst` frame 0. |
 | 18 | `monster-fade` | Monster defeated | sfx | characters/death | R02 | `die` frame 0 of `road-bandit`, `bone-soldier`, `thicket-imp`; `ember-wyrm` `die` frame 8. |
 | 19 | `wyrm-roar` | Wyrm roar | sfx | characters/voice | R02 | `ember-wyrm` `breath` frame 1 and `die` frame 0; `fx-fire-spell` `burst`. |
-| 20 | `victory-fanfare` | Victory fanfare | jingle | music/victory | R02 | the end of a battle, with the fighters' `victory` clips; the battle music stops first. |
+| 20 | `victory-fanfare` | Victory fanfare | jingle | music/victory | R02 | the end of a battle, with the fighters' `victory` clips; the battle music stops first. **Redesigned after review: a patch built from the earlier brass fanfare is rebuilt to the text below.** |
 
 #### `footstep-grass` · Footstep on grass
 
@@ -591,10 +591,10 @@ Exactly 20. New sounds follow `skills/sprite-forge/SOUND.md` and the style guide
 
 #### `save-chime` · Save chime
 
-- **Meta:** type `jingle`, role `interface/reward`. Batch **R01**.
+- **Meta:** type `jingle`, role `interface/reward`; the patch says `"category": "jingle"`. Batch **R01**.
 - **Length:** 1.2 to 1.8 s.
 - **What makes the sound, and how it moves:** The game is saved. Four rising bell notes of a major chord with an added ninth, each a glassy `modal` bell, in a long shimmering room; the last note is held. A tune: identical every time.
-- **Controls (5):** `pitch`, `speed`, `ring`, `shimmer` (slider: Plain / Shimmering), `space`.
+- **Controls (5):** `pitch`, `speed`, `ring`, `shimmer` (slider: Plain / Shimmering), `space`. Brightness: `shimmer` (this sound has no `bright`).
 - **Styles:** "Save point", "Level up", "Item found". "Level up" is faster and brighter with a fifth note; "Item found" is three notes.
 - **Pairs with:** `save-crystal` `activate` frame 1; a level gained; a key item found.
 
@@ -603,7 +603,7 @@ Exactly 20. New sounds follow `skills/sprite-forge/SOUND.md` and the style guide
 - **Meta:** type `sfx`, role `world/door`. Batch **R01**.
 - **Length:** 0.8 to 1.4 s.
 - **What makes the sound, and how it moves:** A heavy slab grinding open. Brown noise through a low band-pass (150 to 400 Hz) with a slow rumbling tremor, steady for most of the length, ending in one deep thud and a little room echo. Needs a gritty mid-range scrape on top so it is heard on a phone.
-- **Controls (5):** `length`, `weight`, `grit` (slider "Grind"), `thump` (the final thud), `space`.
+- **Controls (5):** `length`, `weight`, `grit` (slider "Grind"), `thump` (the final thud), `space`. Brightness: `grit` (this sound has no `bright`).
 - **Styles:** "Dungeon door", "Sealed gate", "Secret wall". "Secret wall" is short and ends in falling rubble (also used for breaking rock).
 - **Pairs with:** `dungeon-door` `open`; `boulder` `break`.
 
@@ -630,7 +630,7 @@ Exactly 20. New sounds follow `skills/sprite-forge/SOUND.md` and the style guide
 - **Meta:** type `sfx`, role `effects/magic`. Batch **R02**.
 - **Length:** 0.8 to 1.2 s.
 - **What makes the sound, and how it moves:** A gentle upward glow. A slow-starting soft pad, and over it a rising run of five or six sine bell notes of a major chord, each quieter and higher, with an airy shimmer. No hard start: this is the one sound allowed a slow attack (about 40 ms).
-- **Controls (5):** `pitch`, `rise`, `sparkle` (slider: the bell notes), `length`, `space`.
+- **Controls (5):** `pitch`, `rise`, `sparkle` (slider: the bell notes), `length`, `space`. Brightness: `sparkle` (this sound has no `bright`).
 - **Styles:** "Heal", "Revive", "Cure". "Revive" is longer and climbs two octaves; "Cure" is short, three notes.
 - **Pairs with:** `fx-heal` `burst` frame 0.
 
@@ -654,10 +654,10 @@ Exactly 20. New sounds follow `skills/sprite-forge/SOUND.md` and the style guide
 
 #### `victory-fanfare` · Victory fanfare
 
-- **Meta:** type `jingle`, role `music/victory`. Batch **R02**.
+- **Meta:** type `jingle`, role `music/victory`; the patch says `"category": "jingle"`, never `"music"` (style guide, section 11). Batch **R02**.
 - **Length:** 2.0 to 2.8 s.
-- **What makes the sound, and how it moves:** The battle is won. A short brass-like tune of six or seven notes: three quick pick-up notes rising to a held major chord, on square and saw waves through a filter that opens, with a snare roll under the pick-up and a soft noise swell on the last chord. Ends on the home note of A major (the battle music's key turned bright). An original tune: identical every time.
-- **Controls (5):** `pitch` (the key), `speed`, `bright`, `ring` (how long the last chord holds), `space`.
+- **What makes the sound, and how it moves:** The battle is won. **A skipping dance tune for plucked strings and a wooden flute, with no brass, no drum roll and no repeated-note pick-up**: the best-known RPG victory tune is quick repeated notes rising to held brass chords, and this one must not be heard as it. Seven notes in three-time, in a long-short lilt: it starts on the high home note, falls by step to the fifth (three notes), dips to the third, leaps up a sixth and settles on the home note, where a soft `modal` bell an octave higher answers and rings. Under it only two plucked chords, the home chord on the first beat and again at the end (never a flat-six, flat-seven, home ending). Melody: `pluck` doubled by a breathy triangle "flute". Ends on the home note of A major (the battle music's key turned bright). An original tune: identical every time.
+- **Controls (5):** `pitch` (the key), `speed`, `bright`, `ring` (how long the last note and its bell ring), `space`.
 - **Styles:** "Victory", "Small win", "Grand finale".
 - **Pairs with:** the end of a battle, with the fighters' `victory` clips; the battle music stops first.
 
@@ -693,42 +693,42 @@ Exactly 2. New tracks follow the Music section of `SOUND.md` and the style guide
 
 ## Batch plan
 
-Order 1 batches start as soon as their helpers exist; order 2 batches start when the batches they name have passed review. Sound batches come first because a sprite cannot cue a sound that does not exist. **R03 (the first top-down character) and R04 (the first top-down tileset) set conventions** for this kit and the roguelite kit. R09 and R11 cue two sounds made in the platformer kit (batch P02).
+A batch starts when its helpers exist and every batch in its "Needs first" cell has passed review; batches of other kits (P.., S..) count too. **Order** is one more than the highest order among the batches it waits for. Sound batches come first because a sprite cannot cue a sound that does not exist. **R03 (the first top-down character) and R04 (the first top-down tileset) are pathfinders** (`"pathfinder": true` in the plan file) for this kit and the roguelite kit. This kit's boss, effects and backdrops wait for the platformer kit's pathfinders P08, P12 and P14. R09 and R11 cue two sounds made in the platformer kit (batch P02).
 
 | Order | Batch | Kind | Assets | Needs first |
 |---|---|---|---|---|
 | 1 | **R01** | sounds | `footstep-grass`, `text-blip`, `menu-move`, `menu-confirm`, `save-chime`, `stone-door` | nothing |
 | 1 | **R02** | sounds | `ice-shatter`, `thunder-crack`, `heal-shimmer`, `monster-fade`, `wyrm-roar`, `victory-fanfare` | nothing |
-| 1 | **R03** | character | `hero-walker` | palettes, topdown-rig, R01. Sets the top-down character conventions for this kit and the roguelite kit; its report is read before R05 to R07 and S04 start. It may start before R01 passes and add its footstep cues last |
-| 1 | **R04** | tileset and props | `tiles-meadow`, `tree-oak`, `tree-pine` | palettes, tile-helper, R01. Sets the top-down tile conventions; its report is read before the other top-down tilesets start |
+| 1 | **R16** | icons | `icons-consumables`, `icons-key-items` | palettes |
+| 1 | **R17** | icons | `icons-gear`, `ui-status-icons` | palettes |
+| 1 | **R20** | interface | `ui-dialogue`, `ui-battle-menu`, `ui-bars-rpg`, `ui-damage-digits` | palettes, ui-helper |
 | 1 | **R21** | music | `hearthvale-village` | compose-kit |
 | 1 | **R22** | music | `hearthvale-battle` | compose-kit |
-| 2 | **R05** | characters | `mage-walker`, `rogue-walker` | palettes, topdown-rig, R01, R03 |
-| 2 | **R06** | characters | `village-elder`, `merchant` | palettes, topdown-rig, R01, R03 |
-| 2 | **R07** | characters | `town-guard`, `farm-kid` | palettes, topdown-rig, R01, R03 |
-| 2 | **R08** | tileset and props | `tiles-village`, `market-stall` | palettes, tile-helper, R04 |
-| 2 | **R09** | tileset and props | `tiles-dungeon`, `dungeon-door`, `chest-topdown`, `boulder` | palettes, tile-helper, R01, R04, P02 |
-| 2 | **R10** | tileset and props | `tiles-shore`, `save-crystal` | palettes, tile-helper, R01, R04 |
+| 2 | **R03** | character | `hero-walker` | palettes, topdown-rig, R01. **Pathfinder for top-down characters.** Sets the top-down character conventions for this kit and the roguelite kit; its report is read before R05 to R07 and S04 start. It may start before R01 passes and add its footstep cues last |
+| 2 | **R04** | tileset and props | `tiles-meadow`, `tree-oak`, `tree-pine` | palettes, tile-helper, R01. **Pathfinder for top-down tilesets.** Sets the top-down tile conventions; its report is read before the other top-down tilesets start |
 | 2 | **R11** | props | `cottage`, `inn` | palettes, P02 |
-| 2 | **R12** | characters | `rogue-battler`, `road-bandit` | palettes, humanoid-poses, R02 |
 | 2 | **R13** | creatures | `bone-soldier`, `thicket-imp` | palettes, humanoid-poses, R02 |
-| 2 | **R14** | boss | `ember-wyrm` | palettes, R02 |
-| 2 | **R15** | portraits | `portraits-party`, `portraits-village` | palettes, R03. The builder writes one face-drawing function and uses it in both files |
-| 2 | **R16** | icons | `icons-consumables`, `icons-key-items` | palettes |
-| 2 | **R17** | icons | `icons-gear`, `ui-status-icons` | palettes |
-| 2 | **R18** | effects | `fx-slash`, `fx-fire-spell`, `fx-ice-spell`, `fx-thunder-spell`, `fx-heal` | palettes, fx-helper, R02 |
-| 2 | **R19** | backgrounds | `bg-battle-field`, `bg-battle-dungeon` | palettes, backdrop-helper |
-| 2 | **R20** | interface | `ui-dialogue`, `ui-battle-menu`, `ui-bars-rpg`, `ui-damage-digits` | palettes, ui-helper |
+| 3 | **R05** | characters | `mage-walker`, `rogue-walker` | palettes, topdown-rig, R01, R03, P00. After P00: `mage-walker` is the same person as `wizard`, whose parts P00 declares |
+| 3 | **R06** | characters | `village-elder`, `merchant` | palettes, topdown-rig, R01, R03 |
+| 3 | **R07** | characters | `town-guard`, `farm-kid` | palettes, topdown-rig, R01, R03 |
+| 3 | **R08** | tileset and props | `tiles-village`, `market-stall` | palettes, tile-helper, R04 |
+| 3 | **R09** | tileset and props | `tiles-dungeon`, `dungeon-door`, `chest-topdown`, `boulder` | palettes, tile-helper, R01, R04, P02, P09. After P09: `chest-topdown` is `treasure-chest` seen from above; read that sprite first |
+| 3 | **R10** | tileset and props | `tiles-shore`, `save-crystal` | palettes, tile-helper, R01, R04 |
+| 3 | **R14** | boss | `ember-wyrm` | palettes, R02, P08. After P08, the pathfinder for bosses |
+| 3 | **R18** | effects | `fx-slash`, `fx-fire-spell`, `fx-ice-spell`, `fx-thunder-spell`, `fx-heal` | palettes, fx-helper, R02, P12. After P12, the pathfinder for effects |
+| 4 | **R12** | characters | `rogue-battler`, `road-bandit` | palettes, humanoid-poses, R02, R05. After R05: `rogue-battler` is the same person as `rogue-walker` |
+| 4 | **R19** | backgrounds | `bg-battle-field`, `bg-battle-dungeon` | palettes, backdrop-helper, R09, P14. After R09: the dungeon backdrop's floor matches `tiles-dungeon`. After P14, the pathfinder for backgrounds |
+| 5 | **R15** | portraits | `portraits-party`, `portraits-village` | palettes, R03, R05, R06, R07, R12. After R05, R06, R07 and R12: a portrait copies the finished sprite of each person. The builder writes one face-drawing function and uses it in both files |
 
 ### Helpers this bundle waits on
 
 | Helper | What it must do | Batches that wait |
 |---|---|---|
-| `palettes` | The three palettes as named colours and swatch lists (style guide, section 14). | R03, R04, R05, R06, R07, R08, R09, R10, R11, R12, R13, R14, R15, R16, R17, R18, R19, R20 |
-| `topdown-rig` | The top-down body rig: three directions, the standard poses, hooks in the right depth order, sockets. | R03, R05, R06, R07 |
-| `tile-helper` | Draws the 13-tile block (including top-down wall faces and holes) and decals; renders a sample map. | R04, R08, R09, R10 |
+| `palettes` | The three palettes as named colours and swatch lists (style guide, sections 3 and 14). | R03, R04, R05, R06, R07, R08, R09, R10, R11, R12, R13, R14, R15, R16, R17, R18, R19, R20 |
+| `tile-helper` | Draws the 13-tile block (top-down wall faces and holes included), thin pieces, slopes and decals so texture repeats and edges meet; renders a sample map. | R04, R08, R09, R10 |
+| `topdown-rig` | The top-down body rig: three directions, the standard poses (`shoot` and `dodge` included), hooks in the right depth order, sockets with `muzzle`. | R03, R05, R06, R07 |
 | `humanoid-poses` | Adds `die`, `block`, `victory`, `talk`, `shoot` and a thrust to the side-view rig. | R12, R13 |
-| `fx-helper` | Shared particles, twinkles, rings, shards and effect colour steps (recommended). | R18 |
-| `backdrop-helper` | Wrapping outlines and scatter for 320x180 layers; `recede()`. | R19 |
+| `fx-helper` | Shared particles, twinkles, rings, shards, smoke and effect colour steps. **Required**: every effect and projectile is built from it, so all effects share one look. | R18 |
 | `ui-helper` | Nine-slice panel, button states, bar housing and fill. | R20 |
+| `backdrop-helper` | Wrapping outlines and scatter for 320x180 layers; `recede()`. | R19 |
 | `compose-kit` | The clock, section gates, five melody instruments and limiter every track shares. | R21, R22 |

@@ -1,6 +1,6 @@
 # Derelict Station roguelite kit: specification (`kit-roguelite-scifi`)
 
-Written 2026-11-18 by the art director (task W3-S). Generated together with `kit-roguelite-scifi.plan.json`; the two always agree. **Read `docs/style-guide.md` first**: it fixes frame sizes, clip names, frame counts, cue frames, part names, control names and the palette. This file says what each asset is.
+Written 2026-11-18 by the art director (task W3-S); revised the same day after the independent review (`when` on controls and cues, named palette colours and the player's trim, clip order of props with states, never-empty frames, originality, batch order). It goes with `kit-roguelite-scifi.plan.json`; the two always agree. **Read `docs/style-guide.md` first**: it fixes frame sizes, clip names, frame counts, cue frames, part names, control names and the palette. This file says what each asset is.
 
 | | |
 |---|---|
@@ -14,7 +14,7 @@ Written 2026-11-18 by the art director (task W3-S). Generated together with `kit
 | Music tracks | **2** (2 new, 0 reused) |
 | Batches | 22 |
 
-Everything here is new. Two families of enemy must read as different at a glance: **bugs** are organic, purple and pink with acid-green glow, all curves; **machines** are grey steel with amber stripes and red lights, all straight edges. The player is the one pale body, with cyan light. Colour of energy says whose it is: cyan friendly, red hostile, green acid. The kit covers both room-clearing with a gun and the "horde survival" style (through `swarm-mite`, `xp-shard`, `orbit-blade` and the upgrade cards), so several assets are drawn small and simple on purpose, to be shown by the hundred.
+Everything here is new. Two families of enemy must read as different at a glance: **bugs** are organic, purple and pink with acid-green glow, all curves; **machines** are grey steel with amber stripes and red lights, all straight edges. The player is the one pale body, with blue trim and cyan light: cool colours are the player's, warm colours are warnings (amber) and enemies (red). Colour of energy says whose it is: cyan friendly, red hostile, green acid. The kit covers both room-clearing with a gun and the "horde survival" style (through `swarm-mite`, `xp-shard`, `orbit-blade` and the upgrade cards), so several assets are drawn small and simple on purpose, to be shown by the hundred.
 
 Contents: [Asset list](#asset-list) · [Reused assets](#reused-assets) · [New sprites](#new-sprites) · [Sound effects](#sound-effects) · [Music](#music) · [Batch plan](#batch-plan)
 
@@ -78,7 +78,7 @@ No existing sprite fits this world, so none is reused. Four existing sounds are.
 
 ## New sprites
 
-How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and what must happen in each clip are in the style guide, section 4 (a label in brackets is the button text). **Parts:** each part with its selector's options, then its other settings. **Controls:** the sprite's own controls by key (labels and end words for standard keys are in the style guide, section 10; non-standard keys carry a note). **Sounds:** clip, frame, sound id and style; write the cue exactly so. Default colours are names from the "Derelict" palette.
+How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and what must happen in each clip are in the style guide, section 4 (a label in brackets is the button text). **Parts:** each part with its selector's options, then its other settings. **Controls:** the sprite's own controls by key (labels and end words for standard keys are in the style guide, section 10; non-standard keys carry a note). **Sounds:** clip, frame, sound id and style; write the cue exactly so (the "style" is the cue's `preset`). **when:** a control or a cue followed by **when** and a `{ ... }` is in effect only for those values of other controls; copy it exactly into the control's options or the cue (style guide, sections 10 and 11). Default colours are names from the "Derelict" palette: "default deck" is `PALETTE.derelict.deck`.
 
 ### The player, enemies and bosses (top-down)
 
@@ -88,9 +88,9 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 48x48, pivot [24, 42].
 - **Clips (12):** `idle_down`, `idle_up`, `idle_side` 8 loop each · `walk_down`, `walk_up`, `walk_side` 8 loop each · `shoot_down`, `shoot_up`, `shoot_side` 6 each · `dodge` 8 · `hurt` 4 · `die` 8.
 - **Parts:** **weapon**: `weapon` (blaster | scatter | beam | none), `weaponLength`; **headgear**: `headgear` (helmet | visor | hood | none), `headgearSize`; **pack**: `pack` (none | tank | antenna | jet), `packSize`.
-- **Controls (9 + 6 in parts):** `height`, `build`, `skin`, `outfit` (the suit: default suit), `trim` (stripes, gloves and boots: default signal), `glow` (visor and suit lights: default cyan), `bounce`, `stride`, `speed`.
-- **Sounds:** `walk_*` frame 0 and 4 → `footstep-metal` style "Boots on deck", volume 0.45 · `shoot_*` frame 1 → `laser-shot` style "Pew", volume 0.85 · `dodge` frame 1 → `dodge-dash` style "Dodge roll", volume 0.7 · `hurt` frame 0 → `ranger-hurt` style "Hit", volume 0.9 · `die` frame 0 → `ranger-hurt` style "Critical" · `die` frame 5 → `footstep-metal` style "Heavy mech", volume 0.8.
-- **Look and motion:** The player: a salvager in a pale padded suit with orange stripes, on the top-down rig, level "Full" with `shoot_*` as the directed action. The pale suit is the brightest body in the kit, so the player is never lost on the dark floor. The helmet is open at the jaw, so skin always shows. The gun is held in both hands and points the way the body faces; the `muzzle` socket is its tip. `dodge` tucks into a roll with two afterimage streaks. Read `hero-walker` and its report first.
+- **Controls (9 + 6 in parts):** `height`, `build`, `skin`, `outfit` (the suit: default suit), `trim` (stripes, gloves and boots: default signal), `glow` (the visor and the chest and shoulder lights of the suit, which show with every headgear and with none: default cyan), `bounce`, `stride`, `speed`.
+- **Sounds:** `walk_*` frame 0 and 4 → `footstep-metal` style "Boots on deck", volume 0.45 · `shoot_*` frame 1 → `laser-shot` style "Pew", volume 0.85, **when** `{ weapon: ['blaster', 'beam'] }` · `shoot_*` frame 1 → `scatter-blast` style "Scatter gun", volume 0.85, **when** `{ weapon: ['scatter'] }` (with `weapon: none` the `shoot_*` clips are a shove and are silent) · `dodge` frame 1 → `dodge-dash` style "Dodge roll", volume 0.7 · `hurt` frame 0 → `ranger-hurt` style "Hit", volume 0.9 · `die` frame 0 → `ranger-hurt` style "Critical" · `die` frame 5 → `footstep-metal` style "Heavy mech", volume 0.8.
+- **Look and motion:** The player: a salvager in a pale padded suit with blue stripes, gloves and boots (`signal`; nothing on the ranger is orange, which in this kit means hazard), on the top-down rig, level "Full" with `shoot_*` as the directed action. The pale suit is the brightest body in the kit, so the player is never lost on the dark floor. The helmet is open at the jaw, so skin always shows. The gun is held in both hands and points the way the body faces; the `muzzle` socket is its tip. `dodge` tucks into a roll with two afterimage streaks. Read `hero-walker` and its report first.
 
 #### `shield-trooper` · Shield trooper
 
@@ -98,8 +98,8 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 48x48, pivot [24, 42].
 - **Clips (12):** `idle_down`, `idle_up`, `idle_side` 8 loop each · `walk_down`, `walk_up`, `walk_side` 8 loop each · `shoot_down`, `shoot_up`, `shoot_side` 6 each · `block` 6 · `hurt` 4 · `die` 8.
 - **Parts:** **shield**: `shield` (riot | energy | round | none), `shieldSize`; **weapon**: `weapon` (rifle | pistol | baton | none), `weaponLength`; **headgear**: `headgear` (helmet | mask | none), `headgearSize`.
-- **Controls (9 + 6 in parts):** `height`, `build`, `skin`, `outfit` (the armour: default hull), `trim` (default plate), `glow` (visor and shield edge: default red), `bounce`, `stride`, `speed`.
-- **Sounds:** `walk_*` frame 0 and 4 → `footstep-metal` style "Boots on deck", volume 0.45 · `shoot_*` frame 1 → `laser-shot` style "Heavy cannon", volume 0.85 · `block` frame 1 → `bolt-impact` style "On metal", volume 0.7 · `hurt` frame 0 → `bolt-impact` style "On flesh", volume 0.9 · `die` frame 0 → `ranger-hurt` style "Critical".
+- **Controls (9 + 6 in parts):** `height`, `build`, `skin`, `outfit` (the armour: default hull), `trim` (default plate), `glow` (the visor or mask lights and the shield's edge: default red; **when** `[{ headgear: ['helmet', 'mask'] }, { shield: ['riot', 'energy', 'round'] }]`), `bounce`, `stride`, `speed`.
+- **Sounds:** `walk_*` frame 0 and 4 → `footstep-metal` style "Boots on deck", volume 0.45 · `shoot_*` frame 1 → `laser-shot` style "Heavy cannon", volume 0.85, **when** `{ weapon: ['rifle', 'pistol'] }` · `shoot_*` frame 2 → `bolt-impact` style "On metal", volume 0.7, **when** `{ weapon: ['baton', 'none'] }` (a baton jab or a shove with the shield, not a shot) · `block` frame 1 → `bolt-impact` style "On metal", volume 0.7, **when** `{ shield: ['riot', 'energy', 'round'] }` · `hurt` frame 0 → `bolt-impact` style "On flesh", volume 0.9 · `die` frame 0 → `ranger-hurt` style "Critical".
 - **Look and motion:** A human enemy in dark armour behind a shield as tall as its body. Stockier than the ranger, dark where the ranger is pale, red lights where the ranger's are cyan. The shield covers the front in `_down`, shows edge-on in `_side`, and is hidden behind the body in `_up`. `block` plants the shield and crouches behind it.
 
 #### `vendor-bot` · Vendor bot
@@ -108,9 +108,9 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 48x48, pivot [24, 42].
 - **Clips (3):** `idle` 8 loop · `talk` 8 loop · `sell` 8.
 - **Parts:** **headgear**: `headgear` (antenna | dish | cap | none), `headgearSize`; **held**: `held` (none | sign | tray), `heldSize`.
-- **Controls (9 + 4 in parts):** `size`, `shape` (choice of body: round | boxy | capsule), `eyes` (choice of screen face: smile | dots | visor | one eye), `arms` (toggle: two thin jointed arms), `body` (default panel), `accent` (default teal), `glow` (the screen: default cyan), `bob`, `speed`.
+- **Controls (9 + 4 in parts):** `size`, `shape` (choice of body: boxy | round | capsule), `eyes` (choice of screen face: smile | dots | visor | one eye), `arms` (toggle: two thin jointed arms), `body` (default panel), `accent` (default teal), `glow` (the screen: default cyan), `bob`, `speed`.
 - **Sounds:** `talk` frame 0 and 4 → `tech-click` style "Hover", volume 0.6 · `sell` frame 3 → `credit-pickup` style "Credit chip", volume 0.7.
-- **Look and motion:** A friendly shop robot that hovers in place, always facing the camera (no direction clips). A rounded body with a screen for a face, bobbing 2 px over a small thruster glow. `talk`: the face flickers between two expressions and an arm gestures. `sell`: a tray slides out with a glinting item on it.
+- **Look and motion:** A friendly shop robot that hovers in place, always facing the camera (no direction clips): a floating vending kiosk. By default a boxy cabinet body with rounded corners, a screen for a face in its upper half, a coin slot and a serving hatch below it, bobbing 2 px over a small thruster glow (not a smooth white egg with two blue eyes: style guide, section 13). `talk`: the face flickers between two expressions and an arm gestures. `sell`: a tray slides out with a glinting item on it.
 
 #### `crawler-bug` · Crawler
 
@@ -130,7 +130,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Parts:** none.
 - **Controls (8):** `size`, `legs` (choice: four | six | eight), `shape` (choice: round | long | spiky), `eyes` (choice: one | two | many), `body` (default flesh), `glow` (default acid), `bounce`, `speed`.
 - **Sounds:** `die` frame 0 → `bug-splat` style "Mite pop", volume 0.7. Only `die` has a sound: fifty of these on screen must not make fifty footsteps.
-- **Look and motion:** A tiny bug drawn for crowds of fifty: 12 to 18 px, one strong shape, bright eyes, no direction clips (the same from every side). Kept to eight colours. The skitter is fast and jittery, the body tilting left and right.
+- **Look and motion:** A tiny bug drawn for crowds of fifty: a 12 to 18 px body, 16 to 20 px across with its legs, one strong shape, bright eyes, no direction clips (the same from every side). Kept to eight colours. The skitter is fast and jittery, the body tilting left and right.
 
 #### `spitter-bug` · Spitter
 
@@ -140,7 +140,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Parts:** **horns**: `horns` (none | crest | spines), `hornLength`.
 - **Controls (8 + 2 in parts):** `size`, `bulk` (slider "Sac": Small / Bloated), `shape` (choice of mouth: round | three-way | slit), `body` (default chitin), `accent` (the sac: default flesh), `glow` (the acid inside: default acid), `bounce` (how much the sac pulses), `speed`.
 - **Sounds:** `shoot` frame 4 → `laser-shot` style "Alien ray", volume 0.7 · `hurt` frame 0 → `bolt-impact` style "On flesh", volume 0.9 · `die` frame 0 → `bug-splat` style "Big burst".
-- **Look and motion:** A ranged enemy that sits still: a squat body with a swollen, half see-through acid sac on its back that pulses with light. No direction clips. `shoot` (8 frames, longer than the standard 6 because the warning matters): the sac swells for three frames, the mouth opens, and it spits on frame 4. `burrow` sinks it into the floor in a ring of debris.
+- **Look and motion:** A ranged enemy that sits still: a squat body with a swollen, half see-through acid sac on its back that pulses with light. No direction clips. `shoot` (8 frames, longer than the standard 6 because the warning matters): the sac swells for three frames, the mouth opens, and it spits on frame 4. `burrow` sinks it into the floor in a ring of debris; **its last frame is never empty**: a ring of rubble round a dark hole, with the top 3 px of the glowing sac still showing in it. A game plays `burrow` backwards to bring it up again.
 
 #### `scout-drone` · Scout drone
 
@@ -149,8 +149,8 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Clips (5):** `idle` 8 loop (label "Hover") · `alert` 6 · `shoot` 6 · `hurt` 4 · `die` 8.
 - **Parts:** **weapon**: `weapon` (blaster | stinger | none), `weaponLength`; **wings**: `wings` (rotors | fins | ring | none), `wingSpan`.
 - **Controls (8 + 4 in parts):** `size`, `shape` (choice of body: round | wedge | box), `eyes` (choice of lens: single | visor | triple), `body` (default panel), `accent` (default amber), `glow` (default red), `bob`, `speed`.
-- **Sounds:** `alert` frame 0 → `tech-click` style "Confirm", volume 0.6 · `shoot` frame 1 → `laser-shot` style "Pew", volume 0.7 · `hurt` frame 0 → `bolt-impact` style "On metal", volume 0.9 · `die` frame 0 → `bot-shutdown` style "Drone down".
-- **Look and motion:** A small flying machine with one red eye. It hovers with a steady bob, rotors a blur of two alternating frames. `alert`: the eye flares and the body tilts towards the player. It dies by sparking, spinning and breaking into three pieces.
+- **Sounds:** `alert` frame 0 → `tech-click` style "Confirm", volume 0.6 · `shoot` frame 1 → `laser-shot` style "Pew", volume 0.7, **when** `{ weapon: ['blaster', 'stinger'] }` · `hurt` frame 0 → `bolt-impact` style "On metal", volume 0.9 · `die` frame 0 → `bot-shutdown` style "Drone down".
+- **Look and motion:** A small flying machine with one red eye. It hovers with a steady bob, rotors a blur of two alternating frames. `alert`: the eye flares and the body tilts towards the player. It dies by sparking, spinning and breaking into three pieces, which stay in the last frame.
 
 #### `security-bot` · Security bot
 
@@ -159,7 +159,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Clips (12):** `idle_down` 8 loop · `walk_down`, `walk_up`, `walk_side` 8 loop each · `attack_down`, `attack_up`, `attack_side` 8 each (label "Charge") · `shoot_down`, `shoot_up`, `shoot_side` 6 each · `hurt` 4 · `die` 8.
 - **Parts:** **weapon**: `weapon` (cannon | saw | claw | none), `weaponLength`; **pack**: `pack` (none | siren | exhaust), `packSize`.
 - **Controls (9 + 4 in parts):** `size`, `bulk` (slider: Light / Heavy), `legs` (choice: treads | legs), `shape` (choice of head: dome | block | sensor), `body` (default hull), `accent` (hazard stripes: default amber), `glow` (default red), `bounce` (how much it rumbles), `speed`.
-- **Sounds:** `walk_*` frame 0 and 4 → `footstep-metal` style "Heavy mech", volume 0.45 · `attack_*` frame 3 → `dodge-dash` style "Thruster dash", volume 0.7 · `attack_*` frame 5 → `bolt-impact` style "On metal", volume 0.85 · `shoot_*` frame 1 → `scatter-blast` style "Heavy slug", volume 0.85 · `hurt` frame 0 → `bolt-impact` style "On metal", volume 0.9 · `die` frame 0 → `bot-shutdown` style "Bot shutdown".
+- **Sounds:** `walk_*` frame 0 and 4 → `footstep-metal` style "Heavy mech", volume 0.45 · `attack_*` frame 3 → `dodge-dash` style "Thruster dash", volume 0.7 · `attack_*` frame 5 → `bolt-impact` style "On metal", volume 0.85 · `shoot_*` frame 1 → `scatter-blast` style "Heavy slug", volume 0.85, **when** `{ weapon: ['cannon'] }` (only the cannon shoots; with a saw, a claw or nothing a game uses `attack_*`, and `shoot_*` is a silent feint) · `hurt` frame 0 → `bolt-impact` style "On metal", volume 0.9 · `die` frame 0 → `bot-shutdown` style "Bot shutdown".
 - **Look and motion:** A heavy robot guard, wider than it is tall, in three directions (drawn from shapes, no rig). Boxy armour with hazard stripes, a small head with one red sensor, a weapon arm. The charge: it lowers itself for three frames (lights flashing), then rams 8 px forward and brakes.
 
 #### `hive-mother` · Hive mother
@@ -180,7 +180,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Parts:** **weapon**: `weapon` (cannon arms | claws | drills), `weaponLength`; **pack**: `pack` (missile pods | radiators | none), `packSize`.
 - **Controls (9 + 4 in parts):** `size`, `bulk` (slider: Light / Heavy), `legs` (slider: Short / Long), `shape` (choice of head: cockpit | sensor | skull plate), `body` (default hull), `accent` (default amber), `glow` (the reactor and eyes: default red), `bounce` (how heavily it stomps), `speed`.
 - **Sounds:** `walk` frame 0 and 4 → `footstep-metal` style "Heavy mech", volume 0.8 · `shoot` frame 4 → `rocket-launch` style "Missile volley" · `beam` frame 6 → `laser-shot` style "Heavy cannon" · `overheat` frame 0 → `door-hiss` style "Airlock" · `hurt` frame 0 → `bolt-impact` style "On metal", volume 0.9 · `die` frame 0 → `bot-shutdown` style "Mech collapse" · `die` frame 8 → `explosion` style "Grenade".
-- **Look and motion:** The second boss: a walking war machine facing the camera, two thick legs, a broad chest with a glowing reactor (the weak point), heavy arms; the arms part cannot be removed. `walk` stomps on the spot, the body dropping 2 px on each step. `shoot`: shoulder pods open and fire four missiles upward in turn. `beam`: the reactor charges for six frames (rings closing in), then a thick beam fires downward and sweeps. `overheat`: it slumps, vents steam from both shoulders and the reactor is exposed. It dies in a chain of small blasts and falls to its knees.
+- **Look and motion:** The second boss: a walking war machine facing the camera, two thick legs, a broad chest with a glowing reactor (the weak point), heavy arms; the arms part cannot be removed. `walk` stomps on the spot, the body dropping 2 px on each step. `shoot`: four missiles fire upward in turn, from the pods of the pack when it is `missile pods` and from hatches that open in the shoulders otherwise, so the clip and its sound are the same with every `pack`. `beam`: the reactor charges for six frames (rings closing in), then a thick beam fires downward and sweeps. `overheat`: it slumps, vents steam from both shoulders and the reactor is exposed. It dies in a chain of small blasts and falls to its knees.
 
 ### Tilesets (top-down)
 
@@ -208,11 +208,11 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 
 - **Meta:** type `tileset`, role `world/tile`, view `top-down`, themes `sci-fi`, `space`, `horror`. Batch **S12**.
 - **Frame:** 32x32, pivot [16, 16].
-- **Clips (18):** `hive-fill` 1 · the 13-tile block `growth-*` · `hive-deco-a` 1 · `hive-deco-b` 8 loop · `hive-deco-c` 1 · `hive-deco-d` 1.
+- **Clips (18):** `hive-fill` 1 · the 13-tile block `wall-*` · `hive-deco-a` 1 · `hive-deco-b` 8 loop · `hive-deco-c` 1 · `hive-deco-d` 1.
 - **Parts:** none.
-- **Controls (8):** `flesh` (colour of the floor: default a darker flesh swatch), `growth` (colour of the walls: default flesh), `glow` (default acid), `veins` (slider: Few / Many), `edge`, `texture`, `wet` (toggle: glossy highlights), `speed`.
+- **Controls (8):** `flesh` (colour of the floor: default membrane), `growth` (colour of the walls: default flesh), `glow` (default acid), `veins` (slider: Few / Many), `edge`, `texture`, `wet` (toggle: glossy highlights), `speed`.
 - **Sounds:** none.
-- **Look and motion:** The infested part of the station. `hive-fill`: a soft membrane floor with a few branching veins. The growth block is a wall of bulging organic mass: rounded cap lobes, and a dripping, ribbed face on the bottom row. No straight lines anywhere: the opposite of the station tiles. Decals: `-a` a cluster of eggs, `-b` a vein knot that pulses with glow (8 frames), `-c` an empty husk, `-d` a ragged creep patch for laying over station floor at the border.
+- **Look and motion:** The infested part of the station. `hive-fill`: a soft membrane floor with a few branching veins. The wall block (`wall-*`: a top-down wall always has the prefix `wall`, or a level cannot tell it from a second floor; style guide, section 6) is a wall of bulging organic mass: rounded cap lobes, and a dripping, ribbed face on the bottom row. No straight lines anywhere: the opposite of the station tiles. Decals: `-a` a cluster of eggs, `-b` a vein knot that pulses with glow (8 frames), `-c` an empty husk, `-d` a ragged creep patch for laying over station floor at the border.
 
 #### `tiles-pit` · Pits and the void
 
@@ -220,7 +220,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 32x32, pivot [16, 16].
 - **Clips (15):** the 13-tile block `pit-*` (8 frames each, loop) · `pit-deco-a` 1 · `pit-deco-b` 8 loop.
 - **Parts:** none.
-- **Controls (7):** `below` (choice of what is down there: space | mist | reactor), `land` (colour of the floor's cut edge: default deck), `hull` (colour of the inner wall: default hull), `glow` (the warning light along the rim: default amber), `pieces` (slider "Stars": Few / Many), `height` (slider "Depth": Shallow / Deep: the inner wall is 6 to 14 px), `speed`.
+- **Controls (7):** `below` (choice of what is down there: space | mist | reactor), `land` (colour of the floor's cut edge: default deck), `hull` (colour of the inner wall: default hull), `glow` (the warning light along the rim: default amber), `pieces` (slider "Specks": Few / Many: the stars, the wisps of mist or the sparks of the reactor, whatever `below` is), `height` (slider "Depth": Shallow / Deep: the inner wall is 6 to 14 px), `speed`.
 - **Sounds:** none.
 - **Look and motion:** Holes in the floor as a "hole" block, all tiles 8 frames. `pit-fill` is the depth: near-black `void` with a few stars drifting slowly (or mist, or a red reactor glow). The north edge shows the inner wall dropping away; the south edge is a thin lit lip. A dashed warning light runs along every rim. Decals: `-a` a broken girder jutting over the edge, `-b` cables that hang and sway.
 
@@ -230,9 +230,9 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 
 - **Meta:** type `prop`, role `world/door`, view `top-down`, themes `sci-fi`, `space`. Batch **S11**.
 - **Frame:** 64x48, pivot [32, 46].
-- **Clips (3):** `closed` 1 · `open` 8 · `locked` 8 loop.
+- **Clips (3), in this order:** `closed` 1 · `open` 8 · `locked` 8 loop.
 - **Parts:** none.
-- **Controls (8):** `style` (choice: split | iris | shutter), `pieces` (slider "Panels": Few / Many seams), `stripes` (toggle: hazard stripes), `body` (default hull), `accent` (default amber), `glow` (the status light: default teal; red in `locked`), `hull` (the frame: default plate), `speed`.
+- **Controls (8):** `style` (choice: split | iris | shutter), `pieces` (slider "Panels": Few / Many seams), `stripes` (toggle: hazard stripes), `body` (default hull), `accent` (the hazard stripes: default amber; **when** `{ stripes: [true] }`), `glow` (the status light: default teal; `locked` and the first frame of `open` show it in the fixed palette colour red instead), `hull` (the frame: default plate), `speed`.
 - **Sounds:** `open` frame 0 → `door-hiss` style "Blast door", volume 0.8.
 - **Look and motion:** A heavy door two tiles wide, set in a wall face. `open`: a light turns from red to the glow colour, the two halves jolt and slide apart into the frame; the last frame is the open doorway. `locked`: the status light blinks red.
 
@@ -242,7 +242,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 32x32, pivot [16, 30].
 - **Clips (3):** `idle` 1 · `hurt` 4 · `break` 8.
 - **Parts:** none.
-- **Controls (8):** `size`, `style` (choice: crate | canister | locker), `straps` (toggle), `mark` (choice of label: none | cross | bolt | skull), `pieces`, `body` (default hull), `accent` (the label: default amber), `speed`.
+- **Controls (8):** `size`, `style` (choice: crate | canister | locker), `straps` (toggle), `mark` (choice of label: none | cross | bolt | skull), `pieces`, `body` (default hull), `accent` (the label: default amber; **when** `{ mark: ['cross', 'bolt', 'skull'] }`), `speed`.
 - **Sounds:** `hurt` frame 0 → `bolt-impact` style "On metal", volume 0.9 · `break` frame 0 → `shield-break` style "Small crack", volume 0.8.
 - **Look and motion:** A metal box to shoot open. Three-quarter view: lid on top, front face below. `break` pops the lid and splits the sides into four panels that spin away.
 
@@ -260,21 +260,21 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 
 - **Meta:** type `prop`, role `world/hazard`, view `top-down`, themes `sci-fi`, `space`, `horror`. Batch **S12**.
 - **Frame:** 48x32, pivot [24, 16], `grounded: false`.
-- **Clips (3):** `idle` 8 loop · `spawn` 8 · `fade` 8.
+- **Clips (3), in this order:** `idle` 8 loop · `fade` 8 · `spawn` 8.
 - **Parts:** none.
 - **Controls (8):** `size`, `shape` (choice: round | splat | long), `pieces` (slider "Bubbles": Few / Many), `crust` (toggle: a darker rim), `body` (default acid), `glow` (the highlights: default cream), `wobble`, `speed`.
 - **Sounds:** `idle` frame 0 → `bubbles` style "Boiling", volume 0.35.
-- **Look and motion:** A flat puddle of acid on the floor, seen from above. Bubbles rise and pop, each on its own timing, and the edge wobbles. `spawn` spreads it from a central splat; `fade` shrinks it to a stain.
+- **Look and motion:** A flat puddle of acid on the floor, seen from above. Bubbles rise and pop, each on its own timing, and the edge wobbles. `fade` shrinks it to a dark stain, which stays in its last frame; `spawn` starts on a central splat the size of that stain (never an empty frame) and spreads to the full pool.
 
 #### `laser-gate` · Laser gate
 
 - **Meta:** type `prop`, role `world/hazard`, view `top-down`, themes `sci-fi`, `space`. Batch **S11**.
 - **Frame:** 64x48, pivot [32, 46].
-- **Clips (4):** `idle` 8 loop (label "On") · `warn` 6 loop · `off` 1 · `open` 6 (label "Power down").
+- **Clips (4), in this order:** `idle` 8 loop (label "On") · `open` 6 (label "Power down") · `off` 1 · `warn` 6 loop.
 - **Parts:** none.
 - **Controls (8):** `width` (the gap between the posts), `style` (choice of posts: pylon | orb | wall mount), `beams` (choice: one | two | three), `body` (default hull), `accent` (default amber), `glow` (the beam: default red), `flicker`, `speed`.
 - **Sounds:** `idle` frame 0 → `spaceship-hum` style "Idle", volume 0.35 · `open` frame 0 → `tech-click` style "Confirm", volume 0.6.
-- **Look and motion:** Two posts with a beam between them, across two tiles. The beam is drawn after the outline: a white core with a coloured rim, flickering in thickness. `warn`: a thin, blinking line before it switches on. `open`: the beam thins, breaks and goes out; the last frame equals `off`.
+- **Look and motion:** Two posts with a beam between them, across two tiles. The beam is drawn after the outline: a white core with a coloured rim, flickering in thickness. The clips are one cycle: on, powering down, off, about to switch on. `open`: the beam thins, breaks and goes out; the last frame equals `off`. `off` is the two posts with dark emitters (the posts are in every frame). `warn`: a thin, blinking line before it switches on.
 
 #### `wall-terminal` · Terminal
 
@@ -302,7 +302,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 32x32, pivot [16, 30].
 - **Clips (3):** `closed` 8 loop · `open` 8 · `empty` 1.
 - **Parts:** none.
-- **Controls (8):** `size`, `style` (choice: cache | pod | locker), `lid` (slider: Flat / Domed), `stripes` (choice of rarity marks: none | one | two), `body` (default hull), `accent` (default amber), `glow` (default cyan), `speed`.
+- **Controls (8):** `size`, `style` (choice: cache | pod | locker), `lid` (slider: Flat / Domed), `stripes` (choice of rarity marks: none | one | two), `body` (default hull), `accent` (the rarity marks: default amber; **when** `{ stripes: ['one', 'two'] }`), `glow` (default cyan), `speed`.
 - **Sounds:** `open` frame 0 → `door-hiss` style "Loot cache", volume 0.8 · `open` frame 5 → `credit-pickup` style "Big payout", volume 0.7.
 - **Look and motion:** The sci-fi chest. `closed`: a status light blinks. `open`: the lid splits down the middle and slides apart with a hiss, and a beam of light rises with a small glinting shape in it. Same timing as `treasure-chest` in the platformer kit.
 
@@ -314,7 +314,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Parts:** none.
 - **Controls (8):** `size`, `style` (choice: pillar | ring | claw), `shape` (choice of hologram: cube | orb | arrow | star), `body` (default hull), `accent` (default teal), `glow` (default xp), `bob`, `speed`.
 - **Sounds:** `activate` frame 1 → `upgrade-get` style "Upgrade".
-- **Look and motion:** A stand offering an upgrade: a short pedestal with a hologram floating and turning above it, drawn after the outline in two tones of glow with a scan line moving up it. `activate`: the hologram streaks upward and is gone; the last frame equals `taken` (dark, empty).
+- **Look and motion:** A stand offering an upgrade: a short pedestal with a hologram floating and turning above it, drawn after the outline in two tones of glow with a scan line moving up it. `activate`: the hologram streaks upward and is gone; the last frame equals `taken` (the bare, dark pedestal).
 
 ### Pickups and icons
 
@@ -324,7 +324,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 32x32, pivot [16, 30], `grounded: false`.
 - **Clips (2):** `idle` 8 loop · `collect` 8.
 - **Parts:** none.
-- **Controls (10):** `size`, `shape` (choice: hex | round | bar), `thickness`, `mark` (choice: circuit | star | plain), `sparkle`, `metal` (default gold), `glow` (the circuit lines: default cyan), `bob`, `pop`, `speed`.
+- **Controls (10):** `size`, `shape` (choice: hex | round | bar), `thickness`, `mark` (choice: circuit | star | plain), `sparkle`, `metal` (default gold), `glow` (the lit circuit lines or star: default cyan; **when** `{ mark: ['circuit', 'star'] }`), `bob`, `pop`, `speed`.
 - **Sounds:** `collect` frame 1 → `credit-pickup` style "Credit chip", volume 0.7.
 - **Look and motion:** Money: the coin of this kit, and built the same way (it turns around its upright axis, edge-on in the middle of the loop), but six-sided with a lit circuit line on its face. Read `sprites/coin.js` first.
 
@@ -374,7 +374,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 32x32, pivot [16, 16].
 - **Clips (10):** `damage` 1 · `fire-rate` 1 · `speed` 1 · `multishot` 1 · `pierce` 1 · `magnet` 1 · `shield` 1 · `crit` 1 · `regen` 1 · `dash` 1.
 - **Parts:** none.
-- **Controls (7):** `backing` (choice of plate: none | hex | circle), `bold` (toggle: thicker shapes), `shine`, `size`, `face` (the plate: default plate), `body` (the picture: default cyan), `accent` (default amber).
+- **Controls (7):** `backing` (choice of plate: none | hex | circle), `bold` (toggle: thicker shapes), `shine`, `size`, `face` (the plate: default plate; **when** `{ backing: ['hex', 'circle'] }`), `body` (the picture: default cyan), `accent` (the second tone of each picture: default amber).
 - **Sounds:** none.
 - **Look and motion:** Pictures for upgrade cards: a burst, three stacked bolts, a winged boot, three arrows fanning, an arrow through a ring, a horseshoe magnet, a shield, a cross-hair star, a heart with a plus, a streak with an arrow. Flat two-tone shapes on a plate: simpler than the fantasy icons, like signs.
 
@@ -384,7 +384,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 32x32, pivot [16, 16].
 - **Clips (6):** `blaster` 1 · `scatter` 1 · `beam` 1 · `rocket` 1 · `orbit-blades` 1 · `mine` 1.
 - **Parts:** none.
-- **Controls (7):** `backing` (choice: none | hex | circle), `shine`, `tilt` (toggle), `size`, `face` (default plate), `body` (the gun metal: default panel), `glow` (default cyan).
+- **Controls (7):** `backing` (choice: none | hex | circle), `shine`, `tilt` (toggle), `size`, `face` (the plate: default plate; **when** `{ backing: ['hex', 'circle'] }`), `body` (the gun metal: default panel), `glow` (default cyan).
 - **Sounds:** none.
 - **Look and motion:** The weapons a run can find, each a side-on silhouette pointing right: a pistol, a wide double barrel, a long emitter with rings, a tube launcher, three blades round a core, a disc mine. The first three match the `void-ranger` weapon options.
 
@@ -406,9 +406,9 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 16x16, pivot [8, 8], `grounded: false`.
 - **Clips (2):** `fly` 4 loop · `hit` 4.
 - **Parts:** none.
-- **Controls (7):** `size`, `shape` (choice: round | shard | spark), `length` (the tail), `core` (default cream), `glow` (default signal), `flicker`, `speed`.
+- **Controls (7):** `size`, `shape` (choice: round | shard | spark), `length` (the tail), `core` (default cream), `glow` (default signal, the player's blue), `flicker`, `speed`.
 - **Sounds:** none.
-- **Look and motion:** One of many pellets from the scatter gun: a 6 to 9 px dot with a short tail to the left. At most five colours.
+- **Look and motion:** One of many pellets from the scatter gun: a 5 to 7 px dot with a short tail to the left, 8 to 12 px long in all. At most five colours.
 
 #### `micro-rocket` · Micro rocket
 
@@ -416,7 +416,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 32x16, pivot [16, 8], `grounded: false`.
 - **Clips (2):** `fly` 8 loop · `hit` 6.
 - **Parts:** none.
-- **Controls (9):** `length`, `shape` (choice of nose: round | pointed | flat), `fins` (choice: none | small | swept), `smoke` (toggle: puffs trail behind), `body` (default panel), `accent` (a stripe: default amber), `glow` (the flame: default signal), `wobble`, `speed`.
+- **Controls (9):** `length`, `shape` (choice of nose: round | pointed | flat), `fins` (choice: none | small | swept), `smoke` (toggle: puffs trail behind), `body` (default panel), `accent` (a stripe: default teal), `glow` (the flame: default amber), `wobble`, `speed`.
 - **Sounds:** `hit` frame 0 → `explosion` style "Fireworks pop", volume 0.8.
 - **Look and motion:** A small missile with an inked metal body, a flame at the back (after the outline) and smoke puffs that fall behind and shrink. It wobbles a pixel from side to side. `hit` is a small flash; the game plays `plasma-burst` over it.
 
@@ -478,7 +478,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 48x48, pivot [24, 24], `grounded: false`.
 - **Clips (1):** `burst` 8.
 - **Parts:** none.
-- **Controls (8):** `size`, `pieces`, `spread`, `style` (choice: round | ring | shards), `smoke` (toggle), `core` (default cream), `edge` (default signal), `speed`.
+- **Controls (8):** `size`, `pieces`, `spread`, `style` (choice: round | ring | shards), `smoke` (toggle), `core` (default cream), `edge` (default amber), `speed`.
 - **Sounds:** `burst` frame 0 → `explosion` style "Fireworks pop", volume 0.8.
 - **Look and motion:** A small explosion: rockets, drones, crates. White disc; a ball with a hard-edged rim; a ring that opens and breaks into arcs; a few sparks. Cleaner and more geometric than the fantasy `explosion-small`.
 
@@ -530,7 +530,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 320x180, pivot [160, 180].
 - **Clips (3):** `far` 1 · `mid` 8 loop · `near` 1.
 - **Parts:** none.
-- **Controls (7):** `sky` (space: default a plate swatch, never void), `haze` (colour of the nebula: default a dull xp swatch), `land` (colour of the planet edge: default teal), `stars` (slider: Few / Many), `sparkle` (toggle: stars twinkle), `style` (choice of `near`: planet edge | ringed planet | wreckage), `speed`.
+- **Controls (7):** `sky` (space: default plate; void is background only and never a swatch), `haze` (colour of the nebula: default nebula), `land` (colour of the `near` shape, planet or wreckage: default teal), `stars` (slider: Few / Many), `sparkle` (toggle: stars twinkle), `style` (choice of `near`: planet edge | ringed planet | wreckage), `speed`.
 - **Sounds:** none.
 - **Look and motion:** Space, for menus, station windows and the gaps between rooms. `far`: three bands of dark blue with dim one-pixel stars and soft nebula patches; opaque. `mid`: brighter stars of two or three pixels, some twinkling over the 8 frames; to span the full width it also carries a faint band of dust along its bottom rows. `near`: the curved edge of a planet along the bottom (or drifting wreckage). The one background where `near` may be lighter than `far`.
 
@@ -550,7 +550,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 64x16, pivot [32, 8].
 - **Clips (5):** `frame` 1 · `fill` 1 · `fill-b` 1 · `fill-c` 1 · `flash` 4.
 - **Parts:** none.
-- **Controls (8):** `style` (choice: solid | segmented | slanted), `corner`, `border`, `ticks` (toggle: tick marks along the housing), `frame` (the housing: default hull), `fill` (health: default heal), `fillB` (shield: default shield), `fillC` (experience: default xp).
+- **Controls (8):** `style` (choice: solid | segmented | slanted), `corner`, `border`, `ticks` (toggle: tick marks along the housing), `frame` (the housing: default hull), `fill` (health: default heal), `fillB` (shield: default shield), `fillC` (experience: default xp). No `speed`: `flash` has 4 frames and plays at a fixed 8 fps (style guide, section 10).
 - **Sounds:** none.
 - **Look and motion:** Bars as the style guide, section 8: a boss's health, the player's shield, the experience bar. Angular: cut corners instead of round ones.
 
@@ -572,11 +572,11 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Parts:** none.
 - **Controls (8):** `style` (choice: cross | circle | brackets | chevrons), `size`, `gap` (slider: Tight / Open), `thickness`, `spin` (toggle: turns slowly in `idle`), `body` (default cream), `accent` (the hit marker: default red), `speed`.
 - **Sounds:** none.
-- **Look and motion:** The aiming cursor; the pivot is the exact centre. `idle` breathes 1 px. `shoot` kicks the marks outward 3 px and back. `reload` sweeps an arc round once. `hit` flashes four diagonal ticks in the accent colour.
+- **Look and motion:** The aiming cursor; the pivot is the exact centre, and so is its exported `tip` socket (the hot spot: style guide, section 8). `idle` breathes 1 px. `shoot` kicks the marks outward 3 px and back. `reload` sweeps an arc round once. `hit` flashes four diagonal ticks in the accent colour.
 
 ## Sound effects
 
-Exactly 20. New sounds follow `skills/sprite-forge/SOUND.md` and the style guide, section 11. The style names are fixed: sprites cue them by name. Every new sound also has `meta.themes` and `meta.gameTypes` chosen by the style guide, section 13.
+Exactly 20. New sounds follow `../../skills/sprite-forge/SOUND.md` (the skill is at the workspace root) and the style guide, section 11. The style names are fixed: sprites cue them by name. Every new sound also has `meta.themes` and `meta.gameTypes` chosen by the style guide, section 13.
 
 | # | id | Name | type | role | Batch | Pairs with |
 |---|---|---|---|---|---|---|
@@ -584,7 +584,7 @@ Exactly 20. New sounds follow `skills/sprite-forge/SOUND.md` and the style guide
 | 2 | `explosion` | Explosion | sfx | effects/explosion | reused (existing) | `fuel-barrel` `break`; `explosion-large`; `plasma-burst`; `micro-rocket` `hit` |
 | 3 | `spaceship-hum` | Spaceship hum | sfx | world/machine | reused (existing) | every room, looped quietly; `laser-gate` `idle`; `warp-pad` `charge` |
 | 4 | `bubbles` | Bubbles | ambience | environment/ambience | reused (existing) | `acid-pool` `idle`; hive rooms |
-| 5 | `scatter-blast` | Scatter gun | sfx | actions/shoot | S01 | `void-ranger` with `weapon: scatter`; `security-bot` `shoot_*`. |
+| 5 | `scatter-blast` | Scatter gun | sfx | actions/shoot | S01 | `void-ranger` `shoot_*` frame 1 **when** `{ weapon: ['scatter'] }`; `security-bot` `shoot_*` **when** `{ weapon: ['cannon'] }`. |
 | 6 | `rocket-launch` | Rocket launch | sfx | actions/shoot | S01 | `micro-rocket` fired; `warden-mech` `shoot` frame 4. |
 | 7 | `bolt-impact` | Bolt impact | sfx | actions/hit | S01 | every `hurt` frame 0 in this kit, with `hit-flash`; melee hits landing. |
 | 8 | `footstep-metal` | Footstep on metal | sfx | characters/footstep | S01 | every `walk_*`, frames 0 and 4. |
@@ -608,7 +608,7 @@ Exactly 20. New sounds follow `skills/sprite-forge/SOUND.md` and the style guide
 - **What makes the sound, and how it moves:** A wide, blunt shot. A broad noise burst (band-pass 600 Hz to 3 kHz), a low thump (sine 120 Hz falling to 50 Hz), and a crushed click at the very start. All three start together; gone in a quarter of a second. Dry. Varies from take to take.
 - **Controls (5):** `weight`, `spread` (slider "Width": Tight / Wide noise), `length`, `grit`, `bright`.
 - **Styles:** "Scatter gun", "Heavy slug", "Sawed-off".
-- **Pairs with:** `void-ranger` with `weapon: scatter`; `security-bot` `shoot_*`.
+- **Pairs with:** `void-ranger` `shoot_*` frame 1 **when** `{ weapon: ['scatter'] }`; `security-bot` `shoot_*` **when** `{ weapon: ['cannon'] }`.
 
 #### `rocket-launch` · Rocket launch
 
@@ -624,7 +624,7 @@ Exactly 20. New sounds follow `skills/sprite-forge/SOUND.md` and the style guide
 - **Meta:** type `sfx`, role `actions/hit`. Batch **S01**.
 - **Length:** 0.08 to 0.18 s.
 - **What makes the sound, and how it moves:** A shot landing. A sharp falling blip (2 kHz to 400 Hz in 40 ms), a short inharmonic metal ping, and a noise tick. Very short and dry: it plays many times a second. Varies from take to take.
-- **Controls (5):** `pitch`, `ring`, `snap`, `grit`, `weight`.
+- **Controls (5):** `pitch`, `ring` (it sets the length), `snap`, `grit`, `weight`. Brightness: `grit` (this sound has no `bright`).
 - **Styles:** "On metal", "On flesh", "Ricochet". "On flesh" has no ping and a wet thud instead; "Ricochet" lets the ping ring and slide up.
 - **Pairs with:** every `hurt` frame 0 in this kit, with `hit-flash`; melee hits landing.
 
@@ -651,7 +651,7 @@ Exactly 20. New sounds follow `skills/sprite-forge/SOUND.md` and the style guide
 - **Meta:** type `sfx`, role `characters/hurt`. Batch **S01**.
 - **Length:** 0.20 to 0.35 s.
 - **What makes the sound, and how it moves:** The player is hit. A low thud, a distorted square buzz falling from 400 Hz to 150 Hz, and a short two-tone alarm blip at the end. Unpleasant on purpose, and unlike every enemy sound, so the player always knows it was them.
-- **Controls (5):** `weight`, `pitch`, `grit`, `length`, `alarm` (slider: the alarm blip).
+- **Controls (5):** `weight`, `pitch`, `grit`, `length`, `alarm` (slider: the alarm blip). Brightness: `grit` (this sound has no `bright`).
 - **Styles:** "Hit", "Shield hit", "Critical". "Critical" is longer and lower with a falling tail: also the death sound.
 - **Pairs with:** `void-ranger` `hurt` and `die`.
 
@@ -687,7 +687,7 @@ Exactly 20. New sounds follow `skills/sprite-forge/SOUND.md` and the style guide
 - **Meta:** type `sfx`, role `characters/death`. Batch **S02**.
 - **Length:** 0.5 to 0.9 s.
 - **What makes the sound, and how it moves:** A machine dying. A pulse tone gliding down from 600 Hz to 40 Hz through a bit-crusher, its level chopped by a stutter that slows, ending in a crackle of sparks (`dust`).
-- **Controls (5):** `pitch`, `length`, `stutter`, `sparks`, `grit`.
+- **Controls (5):** `pitch`, `length`, `stutter`, `sparks`, `grit`. Brightness: `grit` (this sound has no `bright`).
 - **Styles:** "Drone down", "Bot shutdown", "Mech collapse".
 - **Pairs with:** `die` of `scout-drone`, `security-bot`, `warden-mech`, with `debris-burst`.
 
@@ -705,7 +705,7 @@ Exactly 20. New sounds follow `skills/sprite-forge/SOUND.md` and the style guide
 - **Meta:** type `sfx`, role `items/pickup`. Batch **S02**.
 - **Length:** 0.15 to 0.30 s.
 - **What makes the sound, and how it moves:** The coin sound of this kit. Two quick FM blips, the second higher, with a crushed sparkle on the second. Digital where the fantasy coin is a bell. Identical every time.
-- **Controls (5):** `pitch`, `spread` (slider "Interval"), `speed`, `ring`, `grit`.
+- **Controls (5):** `pitch`, `spread` (slider "Interval"), `speed`, `ring`, `grit`. Brightness: `grit` (this sound has no `bright`).
 - **Styles:** "Credit chip", "Keycard", "Big payout". "Big payout" is a run of five rising blips.
 - **Pairs with:** `credit-chip` and `keycard` `collect`; `tech-chest` `open` frame 5; `vendor-bot` `sell`.
 
@@ -741,7 +741,7 @@ Exactly 20. New sounds follow `skills/sprite-forge/SOUND.md` and the style guide
 - **Meta:** type `sfx`, role `world/machine`. Batch **S02**.
 - **Length:** 0.9 to 1.4 s.
 - **What makes the sound, and how it moves:** Teleporting away. A stack of sines gliding up two octaves with a slow chorus, noise swelling under them, cut off suddenly with a sub thump. The pitch only rises; the end is abrupt on purpose (the checker will flag the cut-off: keep a 60 ms fade so it passes).
-- **Controls (5):** `length`, `pitch`, `rise`, `shimmer`, `thump`.
+- **Controls (5):** `length`, `pitch`, `rise`, `shimmer`, `thump`. Brightness: `shimmer` (this sound has no `bright`).
 - **Styles:** "Warp out", "Spawn in", "Teleport blink". "Spawn in" runs the other way: it starts with the thump and glides down.
 - **Pairs with:** `warp-pad` `activate` frame 2; `spawn-warp` `burst`.
 
@@ -777,41 +777,41 @@ Exactly 2. New tracks follow the Music section of `SOUND.md` and the style guide
 
 ## Batch plan
 
-Order 1 batches start as soon as their helpers exist; later orders start when the batches they name have passed review. Sound batches come first because a sprite cannot cue a sound that does not exist. **This kit waits on the RPG kit for conventions:** S04 (the player) starts after R03, the first top-down character; S03 (the floor) starts after R04, the first top-down tileset.
+A batch starts when its helpers exist and every batch in its "Needs first" cell has passed review; batches of other kits (P.., R..) count too. **Order** is one more than the highest order among the batches it waits for. Sound batches come first because a sprite cannot cue a sound that does not exist. **This kit waits on the other two for conventions:** S04 (the player) starts after R03, the first top-down character; S03 (the floor) starts after R04, the first top-down tileset; its bosses, pickups, projectiles, effects and background start after the pathfinders P08, P11, P12 and P14.
 
 | Order | Batch | Kind | Assets | Needs first |
 |---|---|---|---|---|
 | 1 | **S01** | sounds | `scatter-blast`, `rocket-launch`, `bolt-impact`, `footstep-metal`, `dodge-dash`, `ranger-hurt`, `shield-break`, `tech-click` | nothing |
 | 1 | **S02** | sounds | `bug-splat`, `bot-shutdown`, `hive-shriek`, `credit-pickup`, `xp-blip`, `upgrade-get`, `door-hiss`, `warp-out` | nothing |
+| 1 | **S16** | icons | `icons-upgrades`, `icons-weapons` | palettes |
 | 1 | **S21** | music | `derelict-run` | compose-kit |
 | 1 | **S22** | music | `derelict-boss` | compose-kit |
-| 2 | **S03** | tileset | `tiles-station-floor` | palettes, tile-helper, R04. The first sci-fi tileset: starts when the first top-down tileset (R04) has passed, and sets the look for S11 to S13 |
-| 2 | **S04** | character | `void-ranger` | palettes, topdown-rig, S01, R03. Starts when the first top-down character (R03) has passed |
-| 2 | **S06** | creatures | `crawler-bug`, `swarm-mite` | palettes, S01, S02, R03 |
 | 2 | **S07** | creatures | `spitter-bug`, `scout-drone` | palettes, S01, S02 |
-| 2 | **S08** | creature | `security-bot` | palettes, S01, S02, R03 |
-| 2 | **S09** | boss | `hive-mother` | palettes, S01, S02 |
-| 2 | **S10** | boss | `warden-mech` | palettes, S01, S02 |
 | 2 | **S14** | props | `supply-crate`, `fuel-barrel`, `tech-chest`, `upgrade-pedestal` | palettes, S01, S02 |
-| 2 | **S15** | pickups | `credit-chip`, `health-cell`, `shield-cell`, `xp-shard`, `keycard` | palettes, S02 |
-| 2 | **S16** | icons | `icons-upgrades`, `icons-weapons` | palettes |
-| 2 | **S17** | projectiles | `blaster-bolt`, `scatter-pellet`, `micro-rocket`, `plasma-orb`, `acid-glob`, `orbit-blade` | palettes, fx-helper, S02 |
-| 2 | **S18** | effects | `muzzle-flash`, `hit-flash`, `plasma-burst`, `explosion-large` | palettes, fx-helper |
-| 2 | **S19** | effects | `dodge-trail`, `spawn-warp`, `debris-burst` | palettes, fx-helper, S01, S02 |
 | 2 | **S20** | interface | `ui-hud-roguelite`, `ui-bars-tech`, `ui-upgrade-card`, `ui-crosshair` | palettes, ui-helper, S01 |
-| 3 | **S05** | characters | `shield-trooper`, `vendor-bot` | palettes, topdown-rig, S01, S02, S04 |
-| 3 | **S11** | tileset and props | `tiles-station-walls`, `blast-door`, `wall-terminal`, `laser-gate` | palettes, tile-helper, S01, S02, S03 |
-| 3 | **S12** | tileset and props | `tiles-hive`, `acid-pool` | palettes, tile-helper, S03 |
-| 3 | **S13** | tileset, prop and background | `tiles-pit`, `warp-pad`, `bg-starfield` | palettes, tile-helper, backdrop-helper, S02, S03 |
+| 3 | **S03** | tileset | `tiles-station-floor` | palettes, tile-helper, R04. The first sci-fi tileset: starts when the first top-down tileset (R04) has passed, and sets the look for S11 to S13 |
+| 3 | **S04** | character | `void-ranger` | palettes, topdown-rig, S01, R03. Starts when the first top-down character (R03) has passed |
+| 3 | **S06** | creatures | `crawler-bug`, `swarm-mite` | palettes, S01, S02, R03 |
+| 3 | **S08** | creature | `security-bot` | palettes, S01, S02, R03 |
+| 3 | **S09** | boss | `hive-mother` | palettes, S01, S02, P08. After P08, the pathfinder for bosses |
+| 3 | **S10** | boss | `warden-mech` | palettes, S01, S02, P08. After P08, the pathfinder for bosses |
+| 3 | **S15** | pickups | `credit-chip`, `health-cell`, `shield-cell`, `xp-shard`, `keycard` | palettes, S02, P11. After P11, the pathfinder for pickups |
+| 3 | **S17** | projectiles | `blaster-bolt`, `scatter-pellet`, `micro-rocket`, `plasma-orb`, `acid-glob`, `orbit-blade` | palettes, fx-helper, S02, P12. After P12, the pathfinder for projectiles and effects |
+| 3 | **S18** | effects | `muzzle-flash`, `hit-flash`, `plasma-burst`, `explosion-large` | palettes, fx-helper, P12. After P12, the pathfinder for projectiles and effects |
+| 3 | **S19** | effects | `dodge-trail`, `spawn-warp`, `debris-burst` | palettes, fx-helper, S01, S02, P12. After P12, the pathfinder for projectiles and effects |
+| 4 | **S05** | characters | `shield-trooper`, `vendor-bot` | palettes, topdown-rig, S01, S02, S04 |
+| 4 | **S11** | tileset and props | `tiles-station-walls`, `blast-door`, `wall-terminal`, `laser-gate` | palettes, tile-helper, S01, S02, S03 |
+| 4 | **S12** | tileset and props | `tiles-hive`, `acid-pool` | palettes, tile-helper, S03 |
+| 4 | **S13** | tileset, prop and background | `tiles-pit`, `warp-pad`, `bg-starfield` | palettes, tile-helper, backdrop-helper, S02, S03, P14. After P14, the pathfinder for backgrounds |
 
 ### Helpers this bundle waits on
 
 | Helper | What it must do | Batches that wait |
 |---|---|---|
-| `palettes` | The three palettes as named colours and swatch lists (style guide, section 14). | S03, S04, S05, S06, S07, S08, S09, S10, S11, S12, S13, S14, S15, S16, S17, S18, S19, S20 |
-| `topdown-rig` | The top-down body rig: three directions, the standard poses including `shoot` and `dodge`, the `muzzle` socket. | S04, S05 |
-| `tile-helper` | Draws the 13-tile block (including wall faces and animated holes) and decals; renders a sample map. | S03, S11, S12, S13 |
-| `fx-helper` | Shared particles, rings, shards and effect colour steps (recommended). | S17, S18, S19 |
-| `backdrop-helper` | Wrapping scatter for 320x180 layers. | S13 |
+| `palettes` | The three palettes as named colours and swatch lists (style guide, sections 3 and 14). | S03, S04, S05, S06, S07, S08, S09, S10, S11, S12, S13, S14, S15, S16, S17, S18, S19, S20 |
+| `tile-helper` | Draws the 13-tile block (top-down wall faces and holes included), thin pieces, slopes and decals so texture repeats and edges meet; renders a sample map. | S03, S11, S12, S13 |
+| `topdown-rig` | The top-down body rig: three directions, the standard poses (`shoot` and `dodge` included), hooks in the right depth order, sockets with `muzzle`. | S04, S05 |
+| `fx-helper` | Shared particles, twinkles, rings, shards, smoke and effect colour steps. **Required**: every effect and projectile is built from it, so all effects share one look. | S17, S18, S19 |
 | `ui-helper` | Nine-slice panel, button states, bar housing and fill. | S20 |
+| `backdrop-helper` | Wrapping outlines and scatter for 320x180 layers; `recede()`. | S13 |
 | `compose-kit` | The clock, section gates, five melody instruments and limiter every track shares. | S21, S22 |

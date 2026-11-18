@@ -128,7 +128,7 @@ hair:  color('Hair', '#5a3a22', HAIR, { when: { headgear: ['none', 'crown'] } })
     bundles: ['fantasy-platformer'],          // filled in from bundles/*.json
     src: 'sprites/knight.js',
     tech: {                                   // derived, never hand-written
-      // sprite: frame: [64, 64], pivot: [28, 58], grounded: true, clips: [{ name, label, frames, loop, fps }], controls: 15, parts: ['weapon'], sounds: 4 (distinct sounds used)
+      // sprite: frame: [64, 64], pivot: [28, 58], grounded: true, clips: [{ name, label, frames, loop, fps }], controls: 15, parts: ['weapon'], sounds: 4 (distinct sounds used), soundIds: ['footstep-gravel', ...] (their ids, sorted: what a sound's page uses for "Used by")
       // audio:  seconds: 0.37, loop: false, stereo: false, bpm: null, controls: 5, styles: ['Heavy blade', ...]
     },
     thumb: 'generated/thumbs/knight.png',     // sprite: one frame, 2x. sound: waveform. music: none
@@ -201,6 +201,35 @@ theme = {
 ## Contract 10: the quality bar
 
 `quality/sprite.js` exports `checkSprite(def, { soundIndex, validateMeta }) -> { errors: [], warnings: [], metrics: {} }` and `quality/sound.js` exports `checkSound(patch, { validateMeta }) -> { errors, warnings, notes, metrics }`. `validateMeta` is `catalog/schema.js`'s function, called with the kind `'sprite'`, `'sound'` or `'music'`. Pure JS, no file access, so the same checks run in the build and in a browser. `tools/check.mjs` and `tools/sfx.mjs` are thin command-line wrappers. `docs/quality-bar.md` is the written bar; `docs/review-protocol.md` is how an independent reviewer judges look and sound from renders and measurements.
+
+## Contract 11: two layers, and the framework on `window`
+
+Decision from Keyang, 2026-11-18 17:50. Loadout has two layers:
+
+1. **The framework** (the foundation): the code every asset is written with. Drawing (`engine/`), body rigs (`rigs/`), sound and music synthesis (`sound/`, and the music-writing kit), the quality bar (`quality/`), looks (`engine/theme.js`, `sound/theme.js`).
+2. **The assets**: one file each (`sprites/<id>.js`, `sounds/<id>.json`), synthesized on demand by the framework. An asset file holds only what is particular to that asset.
+
+Rules:
+
+- **The framework grows while assets are made.** It starts simple. When an asset needs something the framework lacks (a shape, a pose, a rig, a pattern, a synthesis block, a measuring tool), the maker **adds it to the framework**, not to the asset file, so the next asset can use it. Generic drawing or synthesis code written inside an asset file is a review finding.
+- **Additions are additive.** A new exported function or a new module, with a doc comment that says in one line what it does and lists its arguments, and at least one unit test. Existing exports keep their behaviour and every existing asset renders the same (the tests pin this). A change to existing behaviour is a separate task with its own review.
+- **Everything in the framework is on `window`.** The site exposes the whole framework as `window.loadout`, built from the framework modules themselves, with no hand-kept list: a function added to a framework module appears there after the next build. This is what an agent driving the live site (route 2, later through an MCP server) builds assets with.
+- **The framework describes itself.** The build writes `generated/api.json`: every framework function with its module, name, arguments and one-line description, plus the high-level actions below in a form an MCP server can list as tools (name, description, input schema). A unit test fails if an exported framework function has no description.
+
+`window.loadout`:
+
+| Member | What it is |
+|---|---|
+| `loadout.framework.<module>.<function>` | Every export of every framework module (for example `loadout.framework.sprite.defineSprite`, `loadout.framework.fx.ring`, `loadout.framework.topdown.pose`) |
+| `loadout.api` | The contents of `generated/api.json` (what exists, with descriptions) |
+| `loadout.assets.list(filter)`, `.get(id)`, `.search(text, filters)`, `.similar(id)` | The catalogue and search (Contracts 4 and 5) |
+| `loadout.make.sprite(source)`, `loadout.make.sound(patch)` | Define a new asset at run time from sprite source text (an ES module, as in `sprites/<id>.js`, importing the framework by its usual paths) or a sound patch object. Returns `{ id, ok, errors, warnings }` after running the quality bar on it (Contract 10). The asset then behaves like a catalogue asset on this visit: it can be opened, drawn, played, customised, put in the bag and exported |
+| `loadout.check(idOrDefinition)` | The quality bar's verdict for an asset |
+| `loadout.render(id, { clip, frame, params, look, scale })` | A picture (PNG data address) of a frame or a whole clip strip; for a sound, its samples or a WAV |
+| `loadout.bag.add(id, settings)`, `.items()`, `.remove(key)`, `.setLook(theme)`, `.download()` | The bag and the export (Contracts 6, 7, 8). The bag stores run-time assets with their full definition |
+| `loadout.go(route)` | Open a page of the site |
+
+Every high-level action returns plain data (no DOM nodes, no class instances) and never throws for a bad asset: it returns `{ ok: false, errors: [...] }` with messages an agent can act on.
 
 ## Routes of the site (after wave 2)
 

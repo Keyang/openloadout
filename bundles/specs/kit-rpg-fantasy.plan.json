@@ -10,11 +10,13 @@
       "ink": "#231b33",
       "meadow": "#7fbf5a",
       "leaf": "#4f9d57",
+      "pine": "#357a4c",
       "wheat": "#e6c96a",
       "path": "#c9a06a",
       "wood": "#9a6a3e",
       "cobble": "#a8a4a0",
       "slate": "#5a5f7a",
+      "flagstone": "#7e84a0",
       "roof": "#c8553a",
       "water": "#4fa8d8",
       "sky": "#9fd8f4",
@@ -27,12 +29,13 @@
       "bandit": "#8e3a4a",
       "gold": "#f2c230",
       "steel": "#c2c9d6",
+      "rust": "#a8806a",
       "fire": "#e8662c",
-      "ice": "#8fd8f0",
+      "ice": "#7aa0f4",
       "thunder": "#f4e06a",
       "heal": "#7fe0a0",
       "magic": "#4fd8ee",
-      "panel": "#2b3a67",
+      "panel": "#3f5490",
       "skin": "#f6d3b0"
     }
   },
@@ -1001,7 +1004,7 @@
       "id": "portraits-party",
       "name": "Party portraits",
       "type": "icon",
-      "role": "characters/player",
+      "role": "interface/icon",
       "view": "front",
       "frame": [
         48,
@@ -1081,7 +1084,7 @@
       "id": "portraits-village",
       "name": "Villager portraits",
       "type": "icon",
-      "role": "characters/npc",
+      "role": "interface/icon",
       "view": "front",
       "frame": [
         48,
@@ -2079,7 +2082,7 @@
           "loop": true
         },
         {
-          "name": "revive-feather",
+          "name": "revive-candle",
           "frames": 1,
           "loop": true
         },
@@ -3000,7 +3003,8 @@
       "after": [
         "R01"
       ],
-      "order": 1
+      "order": 2,
+      "pathfinder": true
     },
     {
       "id": "R04",
@@ -3017,7 +3021,8 @@
       "after": [
         "R01"
       ],
-      "order": 1
+      "order": 2,
+      "pathfinder": true
     },
     {
       "id": "R05",
@@ -3032,9 +3037,10 @@
       ],
       "after": [
         "R01",
-        "R03"
+        "R03",
+        "P00"
       ],
-      "order": 2
+      "order": 3
     },
     {
       "id": "R06",
@@ -3051,7 +3057,7 @@
         "R01",
         "R03"
       ],
-      "order": 2
+      "order": 3
     },
     {
       "id": "R07",
@@ -3068,7 +3074,7 @@
         "R01",
         "R03"
       ],
-      "order": 2
+      "order": 3
     },
     {
       "id": "R08",
@@ -3084,7 +3090,7 @@
       "after": [
         "R04"
       ],
-      "order": 2
+      "order": 3
     },
     {
       "id": "R09",
@@ -3102,9 +3108,10 @@
       "after": [
         "R01",
         "R04",
-        "P02"
+        "P02",
+        "P09"
       ],
-      "order": 2
+      "order": 3
     },
     {
       "id": "R10",
@@ -3121,7 +3128,7 @@
         "R01",
         "R04"
       ],
-      "order": 2
+      "order": 3
     },
     {
       "id": "R11",
@@ -3150,9 +3157,10 @@
         "humanoid-poses"
       ],
       "after": [
-        "R02"
+        "R02",
+        "R05"
       ],
-      "order": 2
+      "order": 4
     },
     {
       "id": "R13",
@@ -3180,9 +3188,10 @@
         "palettes"
       ],
       "after": [
-        "R02"
+        "R02",
+        "P08"
       ],
-      "order": 2
+      "order": 3
     },
     {
       "id": "R15",
@@ -3195,9 +3204,13 @@
         "palettes"
       ],
       "after": [
-        "R03"
+        "R03",
+        "R05",
+        "R06",
+        "R07",
+        "R12"
       ],
-      "order": 2
+      "order": 5
     },
     {
       "id": "R16",
@@ -3210,7 +3223,7 @@
         "palettes"
       ],
       "after": [],
-      "order": 2
+      "order": 1
     },
     {
       "id": "R17",
@@ -3223,7 +3236,7 @@
         "palettes"
       ],
       "after": [],
-      "order": 2
+      "order": 1
     },
     {
       "id": "R18",
@@ -3240,9 +3253,10 @@
         "fx-helper"
       ],
       "after": [
-        "R02"
+        "R02",
+        "P12"
       ],
-      "order": 2
+      "order": 3
     },
     {
       "id": "R19",
@@ -3255,8 +3269,11 @@
         "palettes",
         "backdrop-helper"
       ],
-      "after": [],
-      "order": 2
+      "after": [
+        "R09",
+        "P14"
+      ],
+      "order": 4
     },
     {
       "id": "R20",
@@ -3272,7 +3289,7 @@
         "ui-helper"
       ],
       "after": [],
-      "order": 2
+      "order": 1
     },
     {
       "id": "R21",

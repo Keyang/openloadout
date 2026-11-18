@@ -15,8 +15,10 @@
       "wood": "#a06a3c",
       "stone": "#8f97a8",
       "slate": "#5d6475",
+      "cavern": "#3f5068",
       "water": "#3f9fd1",
       "sky": "#8fd0f0",
+      "dusk": "#8696dc",
       "haze": "#7fb0b8",
       "cream": "#f0ead8",
       "hero": "#3f6fd1",
@@ -926,7 +928,7 @@
         }
       ],
       "parts": [
-        "cap"
+        "ruff"
       ],
       "reuse": false,
       "batch": "P07"
@@ -1157,17 +1159,17 @@
           "loop": true
         },
         {
+          "name": "retract",
+          "frames": 6,
+          "loop": false
+        },
+        {
           "name": "warn",
           "frames": 4,
           "loop": true
         },
         {
           "name": "attack",
-          "frames": 6,
-          "loop": false
-        },
-        {
-          "name": "retract",
           "frames": 6,
           "loop": false
         }
@@ -1264,14 +1266,14 @@
           "loop": true
         },
         {
-          "name": "ignite",
-          "frames": 6,
-          "loop": false
-        },
-        {
           "name": "out",
           "frames": 1,
           "loop": true
+        },
+        {
+          "name": "ignite",
+          "frames": 6,
+          "loop": false
         }
       ],
       "parts": [],
@@ -1334,14 +1336,14 @@
           "loop": true
         },
         {
-          "name": "on",
-          "frames": 1,
-          "loop": true
-        },
-        {
           "name": "pull",
           "frames": 6,
           "loop": false
+        },
+        {
+          "name": "on",
+          "frames": 1,
+          "loop": true
         }
       ],
       "parts": [],
@@ -1374,7 +1376,7 @@
           "loop": false
         },
         {
-          "name": "idle",
+          "name": "up",
           "frames": 8,
           "loop": true
         }
@@ -2332,7 +2334,8 @@
         "tile-helper"
       ],
       "after": [],
-      "order": 1
+      "order": 1,
+      "pathfinder": true
     },
     {
       "id": "P04",
@@ -2412,7 +2415,8 @@
         "P01",
         "P02"
       ],
-      "order": 2
+      "order": 2,
+      "pathfinder": true
     },
     {
       "id": "P09",
@@ -2467,7 +2471,8 @@
       "after": [
         "P01"
       ],
-      "order": 2
+      "order": 2,
+      "pathfinder": true
     },
     {
       "id": "P12",
@@ -2486,7 +2491,8 @@
       "after": [
         "P01"
       ],
-      "order": 2
+      "order": 2,
+      "pathfinder": true
     },
     {
       "id": "P13",
@@ -2504,8 +2510,11 @@
         "fx-helper",
         "ui-helper"
       ],
-      "after": [],
-      "order": 2
+      "after": [
+        "P11",
+        "P12"
+      ],
+      "order": 3
     },
     {
       "id": "P14",
@@ -2519,7 +2528,8 @@
         "backdrop-helper"
       ],
       "after": [],
-      "order": 2
+      "order": 1,
+      "pathfinder": true
     },
     {
       "id": "P15",

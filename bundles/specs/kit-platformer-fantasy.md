@@ -1,6 +1,6 @@
 # Thornwood Keep platformer kit: specification (`kit-platformer-fantasy`)
 
-Written 2026-11-18 by the art director (task W3-S). Generated together with `kit-platformer-fantasy.plan.json`; the two always agree. **Read `docs/style-guide.md` first**: it fixes frame sizes, clip names, frame counts, cue frames, part names, control names and the palette. This file says what each asset is.
+Written 2026-11-18 by the art director (task W3-S); revised the same day after the independent review (clip order of props with states, `when` on controls and cues, named palette colours, originality, batch order). It goes with `kit-platformer-fantasy.plan.json`; the two always agree. **Read `docs/style-guide.md` first**: it fixes frame sizes, clip names, frame counts, cue frames, part names, control names and the palette. This file says what each asset is.
 
 | | |
 |---|---|
@@ -86,7 +86,7 @@ Seven existing sprites are used as they are. They count towards the 47. The last
 
 ## New sprites
 
-How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and what must happen in each clip are in the style guide, section 4 (a label in brackets is the button text). **Parts:** each part with its selector's options, then its other settings. **Controls:** the sprite's own controls by key (labels and end words for standard keys are in the style guide, section 10; non-standard keys carry a note). **Sounds:** clip, frame, sound id and style; write the cue exactly so. Default colours are names from the "Thornwood" palette.
+How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and what must happen in each clip are in the style guide, section 4 (a label in brackets is the button text). **Parts:** each part with its selector's options, then its other settings. **Controls:** the sprite's own controls by key (labels and end words for standard keys are in the style guide, section 10; non-standard keys carry a note). **Sounds:** clip, frame, sound id and style; write the cue exactly so (the "style" is the cue's `preset`). **when:** a control or a cue followed by **when** and a `{ ... }` is in effect only for those values of other controls; copy it exactly into the control's options or the cue (style guide, sections 10 and 11). Default colours are names from the "Thornwood" palette: "default grass" is `PALETTE.thornwood.grass`.
 
 ### Tilesets
 
@@ -126,7 +126,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 32x32, pivot [16, 16].
 - **Clips (20):** the 13-tile block `rock-*` · `rock-thin-l`, `-thin-m`, `-thin-r` · `dark-fill` 1 · `rock-deco-a` 1 · `rock-deco-b` 1 · `rock-deco-c` 1.
 - **Parts:** none.
-- **Controls (8):** `rock` (colour: default slate), `shade` (colour of the deep-cave back fill `dark-fill`: default a darker slate swatch), `crystal` (colour of the crystal decal: default magic), `edge` (depth of the lighter rim on exposed rock), `jagged` (slider "Edges": Smooth / Jagged), `texture`, `wear` (cracks), `damp` (toggle: wet highlights and a drip on the underside).
+- **Controls (8):** `rock` (colour: default slate), `shade` (colour of the deep-cave back fill `dark-fill`: default cavern), `crystal` (colour of the crystal decal: default magic), `edge` (depth of the lighter rim on exposed rock), `jagged` (slider "Edges": Smooth / Jagged), `texture`, `wear` (cracks), `damp` (toggle: wet highlights and a drip on the underside).
 - **Sounds:** none.
 - **Look and motion:** Rough rock for caves and the inside of hills. Angular facets instead of bricks: three or four large flat planes per tile, lit from the top right. Exposed edges are broken and uneven; the underside has short points. `dark-fill` is the far cave wall, nearly flat. Decals: `-deco-a` a stalactite that hangs from a `rock-bottom`, `-deco-b` a stalagmite on a `rock-top`, `-deco-c` a small cluster of glowing crystals.
 
@@ -167,10 +167,10 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Meta:** type `creature`, role `characters/enemy`, view `side`, themes `fantasy`, `forest`. Batch **P07**.
 - **Frame:** 48x48, pivot [24, 42].
 - **Clips (5):** `idle` 8 loop · `hop` 8 loop · `attack` 8 (label "Spore puff") · `hurt` 4 · `die` 8.
-- **Parts:** **cap**: `cap` (round | flat | pointed | none), `capSize`, `capColour` (default crimson).
-- **Controls (9 + 3 in parts):** `size`, `stalk` (slider: Short / Tall), `eyes` (choice: cute | sleepy | angry), `spots` (toggle: pale spots on the cap, at least six), `body` (the stalk: default cream), `glow` (the spore cloud: default moss), `hop`, `wobble`, `speed`.
+- **Parts:** **ruff**: `ruff` (leaves | petals | thorns | none), `ruffSize`, `ruffColour` (default leaf).
+- **Controls (9 + 3 in parts):** `size`, `bulk` (slider "Pod": Slim / Plump), `eyes` (choice: round | sleepy | angry), `ribs` (toggle: four raised ribs running down the pod, each at least 8 px long), `body` (the pod: default moss), `glow` (the spore cloud: default thorn), `hop`, `wobble`, `speed`.
 - **Sounds:** `hop` frame 1 → `jump` style "Tiny hop", volume 0.5 · `hop` frame 6 → `footstep-gravel` style "Sneaking", volume 0.5 · `attack` frame 4 → `whoosh` style "Quick swipe", volume 0.7 · `hurt` frame 0 → `punch` style "Light jab", volume 0.9 · `die` frame 0 → `enemy-squish` style "Pop".
-- **Look and motion:** A walking mushroom: a fat pale stalk with two stub feet and a face, under a wide cap that squashes and stretches opposite to the body when it hops. To attack it crouches (cap pulled down, frames 1 to 3) and puffs a cloud of 8 to 12 spore dots upward and forward on frame 4, drawn after the outline. With `cap: none` it is a round-headed sprout.
+- **Look and motion:** **A hopping seed pod, not a mushroom** (no cap, no spots, no stalk, no feet: style guide, section 13). A plump green pod shaped like an onion bulb, widest low down and drawn up to a puckered vent at the top, standing on one thick coiled root that works as its spring. A ruff of three to five pointed leaves sits round its neck (the `ruff` part), and two small eyes sit low on the pod, half under the ruff. When it hops the root presses flat and then stretches to twice its length, and the ruff flaps up as the pod comes down. To attack it swells (frames 1 to 3) and puffs a cloud of 8 to 12 spore dots up and forward from the vent on frame 4, drawn after the outline. With `ruff: none` it is a bare bulb. It dies by splitting open down a rib and wilting; the last frame is the limp husk on its root.
 
 #### `crow-scout` · Crow scout
 
@@ -200,7 +200,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 64x32, pivot [32, 8], `grounded: false`.
 - **Clips (2):** `idle` 8 loop · `move` 8 loop.
 - **Parts:** none.
-- **Controls (7):** `width` (slider: 40 to 62 px), `style` (choice: wood | stone | metal), `chains` (toggle: two chains rise from the ends to 1 px below the top of the frame), `wood` (the deck: default wood), `metal` (fittings and the gear: default steel), `bob`, `speed`.
+- **Controls (7):** `width` (slider: 40 to 62 px), `style` (choice: wood | stone | metal), `chains` (toggle: two chains rise from the ends to 1 px below the top of the frame), `wood` (the deck, whatever its `style`: default wood), `metal` (fittings and the gear, which every style has: default steel), `bob`, `speed`.
 - **Sounds:** none.
 - **Look and motion:** A floating platform the player rides. A flat deck 10 px thick with end caps and a small gear or rune underneath. In `idle` the gear turns slowly and the deck bobs 1 px; in `move` the gear spins three times as fast and the chains sway. The pivot is on the walking surface (row 8), not at the bottom.
 
@@ -212,7 +212,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Parts:** none.
 - **Controls (7):** `style` (choice: stone | wood | ice | cloud), `wear` (cracks at rest), `pieces`, `body` (default stone), `accent` (crack and edge colour: default slate), `wobble` (how hard it shakes), `speed`.
 - **Sounds:** `shake` frame 0 → `crate-break` style "Twig snap", volume 0.5 · `break` frame 0 → `crate-break` style "Crate", volume 0.8.
-- **Look and motion:** A 30x28 block that falls apart when stood on. `shake` jitters 1 to 2 px with cracks spreading; `break` splits it into 4 to 8 chunks that fall and fade to crumbs; `respawn` grows it back from the centre.
+- **Look and motion:** A 30x28 block that falls apart when stood on. `shake` jitters 1 to 2 px with cracks spreading; `break` splits it into 4 to 8 chunks that fall; its last frame keeps a row of four or more crumbs on the ground line. **`respawn` starts on that same picture of crumbs (frame 0 is never empty)**, the block then rises out of them from the ground line upward and settles on `idle`. Clip order is the cycle: whole, shaking, broken, growing back.
 
 #### `spring-pad` · Spring pad
 
@@ -220,19 +220,19 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 32x32, pivot [16, 30].
 - **Clips (2):** `idle` 1 · `bounce` 8.
 - **Parts:** none.
-- **Controls (8):** `style` (choice of pad: mushroom | plate | drum), `width`, `height` (rest height), `coils` (slider: Few / Many: 2 to 4), `body` (the pad: default crimson), `metal` (the spring: default steel), `bounce` (how far it stretches), `speed`.
+- **Controls (8):** `style` (choice of pad: plate | leaf | drum), `width`, `height` (rest height), `coils` (slider: Few / Many: 2 to 4), `body` (the pad: default hero, the colour of friendly things), `metal` (the spring: default steel), `bounce` (how far it stretches), `speed`.
 - **Sounds:** `bounce` frame 1 → `spring-boing` style "Spring pad", volume 0.8.
-- **Look and motion:** A pad on a coil spring. `bounce`: pressed flat on frame 1, shoots up to nearly the top of the frame on 2 to 3 (the coil stretches thin), then wobbles down to rest.
+- **Look and motion:** A pad on a coil spring: a studded wooden plate, a broad curled leaf or a small drum (none of them a mushroom, and not a red disc). `bounce`: pressed flat on frame 1, shoots up to nearly the top of the frame on 2 to 3 (the coil stretches thin), then wobbles down to rest.
 
 #### `spike-trap` · Spike trap
 
 - **Meta:** type `prop`, role `world/hazard`, view `side`, themes `fantasy`, `forest`. Batch **P10**.
 - **Frame:** 32x32, pivot [16, 30].
-- **Clips (4):** `idle` 1 · `warn` 4 loop · `attack` 6 (label "Extend") · `retract` 6.
+- **Clips (4), in this order:** `idle` 1 · `retract` 6 · `warn` 4 loop · `attack` 6 (label "Extend").
 - **Parts:** none.
 - **Controls (7):** `style` (choice: metal | bone | thorn | crystal), `count` (choice: three | four | five spikes), `length`, `base` (toggle: a base plate), `metal` (default steel), `accent` (the tips: default crimson), `speed`.
 - **Sounds:** `attack` frame 1 → `sword-slash` style "Quick dagger", volume 0.7.
-- **Look and motion:** A row of spikes across one tile, 30 px wide. `idle` is fully out. `warn` shows only the tips, twitching. `attack` snaps them out in two frames with a 2 px overshoot; `retract` pulls them down slowly.
+- **Look and motion:** A row of spikes across one tile, 30 px wide. The clips are one cycle: `idle` is fully out; `retract` pulls the spikes down slowly and ends on the tips (its last frame is the first frame of `warn`); `warn` shows only the tips, twitching; `attack` snaps them out in two frames with a 2 px overshoot and ends on `idle`. **The tips never sink below 3 px above the ground line, at any `length` and with `base` off**, so the trap is never an empty frame: retracted, it is a row of tips (and, with `base` on, the plate under them).
 
 #### `saw-blade` · Saw blade
 
@@ -240,7 +240,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 48x48, pivot [24, 24], `grounded: false`.
 - **Clips (2):** `idle` 8 loop (label "Spin") · `grind` 8 loop.
 - **Parts:** none.
-- **Controls (8):** `size`, `style` (choice: classic | jagged | ring), `teeth` (slider: Few / Many: 6 to 12), `hub` (toggle: a bolted hub plate), `metal` (default steel), `accent` (the hub: default crimson), `wobble`, `speed`.
+- **Controls (8):** `size`, `style` (choice: classic | jagged | ring), `teeth` (slider: Few / Many: 6 to 12), `hub` (toggle: a bolted hub plate), `metal` (default steel), `accent` (the hub plate: default crimson; **when** `{ hub: [true] }`), `wobble`, `speed`.
 - **Sounds:** none.
 - **Look and motion:** A spinning circular blade. The teeth rotate one tooth per loop so the loop closes; a curved glint stays fixed at the top right while the teeth pass under it; two short white motion arcs are drawn after the outline. `grind` adds a spray of sparks from the bottom edge.
 
@@ -260,11 +260,11 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 
 - **Meta:** type `prop`, role `world/prop`, view `side`, themes `fantasy`, `dungeon`. Batch **P04**.
 - **Frame:** 32x48, pivot [16, 34], `grounded: false`.
-- **Clips (3):** `idle` 8 loop (label "Burn") · `ignite` 6 · `out` 1 (label "Unlit").
+- **Clips (3), in this order:** `idle` 8 loop (label "Burn") · `out` 1 (label "Unlit") · `ignite` 6.
 - **Parts:** none.
 - **Controls (8):** `style` (choice of bracket: iron | wood | sconce), `height` (the flame), `halo` (toggle: a ring of glow pixels round the flame), `sparks` (toggle), `glow` (the fire: default ember), `metal` (default steel), `flicker`, `speed`.
 - **Sounds:** `idle` frame 0 → `fire` style "Torch", volume 0.35 · `ignite` frame 1 → `whoosh` style "Quick swipe", volume 0.7.
-- **Look and motion:** A torch in a wall bracket. The flame is built like the campfire's (three tones, drawn after the outline with its own darker rim) so the two match. The pivot is where the bracket meets the wall.
+- **Look and motion:** A torch in a wall bracket. The flame is built like the campfire's (three tones, drawn after the outline with its own darker rim) so the two match. `out` is the bracket with a charred torch head and no flame. `ignite` starts on `out`, flares, and ends on the first frame of `idle`. The pivot is where the bracket meets the wall.
 
 #### `treasure-chest` · Treasure chest
 
@@ -280,21 +280,21 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 
 - **Meta:** type `prop`, role `world/prop`, view `side`, themes `fantasy`, `forest`. Batch **P09**.
 - **Frame:** 32x32, pivot [16, 30].
-- **Clips (3):** `off` 1 · `on` 1 · `pull` 6.
+- **Clips (3), in this order:** `off` 1 · `pull` 6 · `on` 1.
 - **Parts:** none.
 - **Controls (7):** `style` (choice: floor lever | wall switch | crank), `length` (the handle), `knob` (toggle: a ball on the end), `stone` (the base: default stone), `metal` (default steel), `accent` (the knob and the "on" light: default crimson), `speed`.
 - **Sounds:** `pull` frame 2 → `lever-clank` style "Lever", volume 0.8.
-- **Look and motion:** A handle on a base. `off` leans left, `on` leans right with a lit mark on the base. `pull` goes from off to on with a 2 px overshoot and settle; a game plays it backwards to switch off.
+- **Look and motion:** A handle on a base. `off` leans left, `on` leans right with a lit mark on the base. `pull` goes from off to on with a 2 px overshoot and settle, and its last frame is `on`; a game plays it backwards to switch off.
 
 #### `checkpoint-banner` · Checkpoint banner
 
 - **Meta:** type `prop`, role `world/prop`, view `side`, themes `fantasy`, `forest`. Batch **P09**.
 - **Frame:** 32x64, pivot [16, 62].
-- **Clips (3):** `down` 1 (label "Inactive") · `raise` 8 · `idle` 8 loop (label "Active").
+- **Clips (3), in this order:** `down` 1 (label "Inactive") · `raise` 8 · `up` 8 loop (label "Active"). (The flying flag is `up`, not `idle`: `idle` is only ever a first clip.)
 - **Parts:** **emblem**: `emblem` (none | star | skull | sun), `emblemColour` (default gold).
-- **Controls (7 + 2 in parts):** `height` (the pole), `shape` (choice of flag: pennant | banner | swallowtail), `finial` (toggle: a ball on top of the pole), `cloth` (default hero), `wood` (the pole: default wood), `sway`, `speed`.
+- **Controls (7 + 2 in parts):** `height` (the pole), `shape` (choice of flag: pennant | banner | swallowtail), `finial` (toggle: a ball on top of the pole, at least 4x4 px), `cloth` (default hero), `wood` (the pole: default wood), `sway`, `speed`.
 - **Sounds:** `raise` frame 1 → `whoosh` style "Quick swipe", volume 0.7 · `raise` frame 6 → `chime-success` style "Quick confirm".
-- **Look and motion:** A flag on a pole. `down`: the flag hangs furled at the bottom, dull. `raise`: it runs up the pole and snaps open with a flash. `idle`: it waves in three folds that travel along the cloth.
+- **Look and motion:** A flag on a pole. `down`: the flag hangs furled at the bottom, dull. `raise`: it runs up the pole and snaps open with a flash. `up`: it waves in three folds that travel along the cloth.
 
 #### `crate` · Breakable crate
 
@@ -302,7 +302,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 32x32, pivot [16, 30].
 - **Clips (3):** `idle` 1 · `hurt` 4 · `break` 8.
 - **Parts:** none.
-- **Controls (8):** `size`, `style` (choice: crate | barrel | pot), `bands` (toggle: metal bands), `mark` (choice of stamp: none | arrow | skull | star), `pieces`, `wood` (default wood), `metal` (default steel), `speed`.
+- **Controls (8):** `size`, `style` (choice: crate | barrel | pot), `bands` (toggle: metal bands), `mark` (choice of stamp: none | leaf | skull | star), `pieces`, `wood` (default wood), `metal` (the bands: default steel; **when** `{ bands: [true] }`), `speed`.
 - **Sounds:** `hurt` frame 0 → `punch` style "Light jab", volume 0.9 · `break` frame 0 → `crate-break` style "Crate", volume 0.8.
 - **Look and motion:** A box to smash. `hurt` flashes white and rocks. `break` bursts it into planks and splinters that fly up and out and fall; the last frame keeps a few splinters on the ground.
 
@@ -312,7 +312,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 32x48, pivot [16, 46].
 - **Clips (2):** `idle` 1 · `wobble` 6.
 - **Parts:** none.
-- **Controls (7):** `style` (choice: arrow | board | hanging), `points` (choice: right | left | both), `mark` (choice of picture: none | arrow | skull | exclaim), `height`, `mossy` (toggle: moss on the post and board), `wood` (default wood), `wear`.
+- **Controls (8):** `style` (choice: arrow | board | hanging), `points` (choice: right | left | both), `mark` (choice of picture: none | arrow | skull | exclaim), `height`, `mossy` (toggle: moss on the post and board), `wood` (default wood), `wear`, `speed` (it has an animated clip).
 - **Sounds:** none.
 - **Look and motion:** A wooden sign on a post, about 30 px tall. No words: only a picture mark. `wobble` rocks it when bumped and settles.
 
@@ -364,9 +364,9 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 32x32, pivot [16, 30], `grounded: false`.
 - **Clips (2):** `idle` 8 loop · `collect` 8.
 - **Parts:** none.
-- **Controls (10):** `size`, `shape` (choice of points: four | five | six | eight), `face` (toggle: a simple face of two eyes at least 2x3 px each), `halo` (toggle: a ring that pulses), `sparkle`, `body` (default gold), `glow` (default cream), `bob`, `pop`, `speed`.
+- **Controls (10):** `size`, `shape` (choice of points: four | five | six | eight), `jewel` (toggle: a round jewel set in the middle, at least 4x4 px, in the `glow` colour), `halo` (toggle: a ring that pulses), `sparkle`, `body` (the metal: default gold), `glow` (jewel, halo and twinkles: default magic), `bob`, `pop`, `speed`.
 - **Sounds:** `collect` frame 1 → `powerup` style "Charge", volume 0.7.
-- **Look and motion:** The power-up. A plump star that rocks from side to side and pulses 1 px, trailing two or three twinkles.
+- **Look and motion:** The power-up: **a star-shaped medallion, not a cartoon star** (no face, no eyes, no plump rounded points: style guide, section 13). A flat gold badge with sharp straight points, a bevelled rim one tone lighter and a jewel in the middle, hanging from a small loop at its top point. It swings a few degrees from side to side like a charm on a chain and turns edge-on once per loop (as the coin does), trailing two or three twinkles that are always drawn, whatever `jewel` and `halo` are.
 
 ### Projectiles and effects
 
@@ -396,7 +396,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 32x32, pivot [16, 16], `grounded: false`.
 - **Clips (2):** `fly` 8 loop · `hit` 8.
 - **Parts:** none.
-- **Controls (8):** `size`, `shape` (choice: round | jagged | slab), `mossy` (toggle), `wear` (cracks), `pieces`, `stone` (default stone), `accent` (the moss: default moss), `speed`.
+- **Controls (8):** `size`, `shape` (choice: round | jagged | slab), `mossy` (toggle), `wear` (cracks), `pieces`, `stone` (default stone), `accent` (the moss: default moss; **when** `{ mossy: [true] }`), `speed`.
 - **Sounds:** `hit` frame 0 → `golem-slam` style "Boulder drop", volume 0.7.
 - **Look and motion:** A rock thrown by the golem, made of the same stone. It tumbles one full turn per loop (the moss patch shows the turn). `hit` shatters it into shards and dust.
 
@@ -468,7 +468,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 - **Frame:** 320x180, pivot [160, 180].
 - **Clips (3):** `far` 1 · `mid` 1 · `near` 1.
 - **Parts:** none.
-- **Controls (8):** `sky` (default a dusk swatch mixed from sky and thorn), `land` (the stone: default slate), `accent` (banners: default crimson), `time` (choice: day | dusk | night), `windows` (slider: Few / Many lit windows), `height` (the walls), `density` (the columns), `haze`.
+- **Controls (8):** `sky` (default dusk), `land` (the stone: default slate), `accent` (banners: default crimson), `time` (choice: day | dusk | night), `windows` (slider: Few / Many lit windows), `height` (the walls), `density` (the columns), `haze`.
 - **Sounds:** none.
 - **Look and motion:** `far`: a dusk sky with a moon and a far range of towers on crags (a row of several, so no single one marks the repeat). `mid`: a long castle wall with evenly spaced arches, buttresses and a line of battlements. `near`: dark interior columns and hanging banners rising from and dropping to the edges.
 
@@ -504,7 +504,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 
 ## Sound effects
 
-Exactly 20. New sounds follow `skills/sprite-forge/SOUND.md` and the style guide, section 11. The style names are fixed: sprites cue them by name. Every new sound also has `meta.themes` and `meta.gameTypes` chosen by the style guide, section 13.
+Exactly 20. New sounds follow `../../skills/sprite-forge/SOUND.md` (the skill is at the workspace root) and the style guide, section 11. The style names are fixed: sprites cue them by name. Every new sound also has `meta.themes` and `meta.gameTypes` chosen by the style guide, section 13.
 
 | # | id | Name | type | role | Batch | Pairs with |
 |---|---|---|---|---|---|---|
@@ -514,7 +514,7 @@ Exactly 20. New sounds follow `skills/sprite-forge/SOUND.md` and the style guide
 | 4 | `punch` | Punch | sfx | actions/hit | reused (existing) | every `hurt` frame 0 |
 | 5 | `whoosh` | Whoosh | sfx | actions/dash | reused (existing) | enemy attacks, dives, the banner rising, the golem's roar |
 | 6 | `metal-hit` | Metal hit | sfx | effects/impact | reused (existing) | a hit that lands on armour or shell, with `hit-spark`; `thorn-beetle` `block` |
-| 7 | `coin-pickup` | Coin pickup | sfx | items/pickup | reused (existing) | `coin` `collect` frame 1 |
+| 7 | `coin-pickup` | Coin pickup | sfx | items/pickup | reused (existing) | `coin` `collect` frame 1. **Change asked for (originality, task W3-X):** today it is a two-note square blip with the second note a fourth up, which is the best-known coin sound in games. Give it its own interval and voice (for example a major sixth on a triangle with a short bell), keeping its id and its styles "Gem" and "Dull token" |
 | 8 | `powerup` | Power-up | sfx | items/consume | reused (existing) | `potion` and `star-charm` `collect` |
 | 9 | `chime-success` | Success chime | jingle | interface/reward | reused (existing) | `checkpoint-banner` `raise` frame 6; level complete |
 | 10 | `wind` | Wind | ambience | environment/weather | reused (existing) | the forest levels, looped under the music |
@@ -561,7 +561,7 @@ Exactly 20. New sounds follow `skills/sprite-forge/SOUND.md` and the style guide
 - **Meta:** type `sfx`, role `items/pickup`. Batch **P01**.
 - **Length:** 0.35 to 0.6 s.
 - **What makes the sound, and how it moves:** A richer cousin of the coin sound. Three rising notes of a major chord on a triangle and a quiet square, each with a glassy `modal` ping on top; the last note rings. Identical every time.
-- **Controls (5):** `pitch`, `spread` (slider "Interval": how far apart the three notes are), `speed`, `ring`, `shine`.
+- **Controls (5):** `pitch`, `spread` (slider "Interval": how far apart the three notes are), `speed`, `ring`, `shine`. Brightness: `shine` (this sound has no `bright`).
 - **Styles:** "Gem", "Heart", "Key". "Heart" is lower, slower and rounder; "Key" is two notes with a metal ping.
 - **Pairs with:** `collect` frame 1 of `gem`, `heart`, `gold-key`, with `pickup-sparkle`.
 
@@ -579,7 +579,7 @@ Exactly 20. New sounds follow `skills/sprite-forge/SOUND.md` and the style guide
 - **Meta:** type `sfx`, role `world/chest`. Batch **P02**. **Shared:** also in `kit-rpg-fantasy`.
 - **Length:** 0.6 to 0.9 s.
 - **What makes the sound, and how it moves:** A lid creaks open and treasure shines. First 0.3 s: a wooden creak (a saw wave at 90 to 200 Hz with a jittering pitch, through a resonant band-pass that rises). Then a latch click. Last 0.3 s: two bright rising bell notes. The reward is part of the sound, so a sprite cues it once on frame 0.
-- **Controls (5):** `creak` (slider: Short / Long creak), `pitch`, `latch` (slider "Click"), `sparkle` (the two bell notes: None / Bright), `bright`.
+- **Controls (5):** `creak` (slider: Short / Long creak: it sets the length), `pitch`, `latch` (slider "Click"), `sparkle` (the two bell notes: None / Bright), `bright`.
 - **Styles:** "Treasure chest", "Small box", "Heavy lid".
 - **Pairs with:** `treasure-chest` `open` frame 0. In the RPG kit: `chest-topdown` `open` frame 0.
 
@@ -597,7 +597,7 @@ Exactly 20. New sounds follow `skills/sprite-forge/SOUND.md` and the style guide
 - **Meta:** type `sfx`, role `world/lever`. Batch **P02**.
 - **Length:** 0.15 to 0.3 s.
 - **What makes the sound, and how it moves:** A ratchet and a stop. Two short metal clicks (inharmonic `modal`, very short decay) a few hundredths of a second apart, over a low wooden knock on the second. Dry.
-- **Controls (5):** `pitch`, `gap` (the time between the two clicks), `ring`, `weight`, `bright`.
+- **Controls (5):** `pitch`, `gap` (the time between the two clicks), `ring` (it sets the length), `weight`, `bright`.
 - **Styles:** "Lever", "Switch", "Heavy gear". "Switch" is one light click.
 - **Pairs with:** `lever` `pull` frame 2; `wooden-door` `locked`.
 
@@ -634,35 +634,35 @@ Exactly 2. New tracks follow the Music section of `SOUND.md` and the style guide
 
 ## Batch plan
 
-Order 1 batches start as soon as their helpers exist; order 2 batches start when the order 1 batches they name have passed review. **Sound batches come first because a sprite cannot cue a sound that does not exist.** P03 is the convention-setting tileset for the whole library. A batch is sized for one builder in one sitting, with review.
+A batch starts when its helpers exist and every batch in its "Needs first" cell has passed review; batches of other kits (R.., S..) count too. **Order** is one more than the highest order among the batches it waits for, so order 1 batches wait for nothing. **Sound batches come first because a sprite cannot cue a sound that does not exist.** A **pathfinder** is the first batch of its kind in the whole library (`"pathfinder": true` in the plan file): the batches of that kind in all three kits start after it and read its report. P03 is the pathfinder for tilesets, P08 for bosses, P11 for pickups, P12 for projectiles and effects, P14 for backgrounds. A batch is sized for one builder in one sitting, with review.
 
 | Order | Batch | Kind | Assets | Needs first |
 |---|---|---|---|---|
 | 1 | **P00** | upgrade | `knight`, `wizard`, `slime`, `bat`, `wolf` | humanoid-poses. Task W3-X, not a production batch: the changes listed under Reused assets |
 | 1 | **P01** | sounds | `land-thud`, `enemy-squish`, `golem-slam`, `gem-pickup`, `spring-boing` | nothing |
 | 1 | **P02** | sounds | `chest-open`, `door-creak`, `lever-clank`, `crate-break` | nothing. Two of these are shared with the RPG kit |
-| 1 | **P03** | tileset | `tiles-forest`, `tiles-platforms` | palettes, tile-helper. Sets the tile conventions for all three kits; its report is read before P04, P05 start |
+| 1 | **P03** | tileset | `tiles-forest`, `tiles-platforms` | palettes, tile-helper. **Pathfinder for tilesets.** Sets the tile conventions for all three kits; its report is read before P04, P05 start |
+| 1 | **P14** | backgrounds | `bg-forest`, `bg-castle` | palettes, backdrop-helper. **Pathfinder for backgrounds.** R19 and S13 wait for it and read its report. The style guide, section 7, carries its advice |
 | 1 | **P15** | music | `thornwood-overworld` | compose-kit |
 | 2 | **P04** | tileset and props | `tiles-castle`, `wooden-door`, `wall-torch` | palettes, tile-helper, P02, P03 |
 | 2 | **P05** | tilesets | `tiles-cave`, `tiles-water` | palettes, tile-helper, P03 |
 | 2 | **P06** | characters | `spear-goblin`, `thorn-beetle` | palettes, humanoid-poses, P01 |
 | 2 | **P07** | creatures | `spore-hopper`, `crow-scout` | palettes, P01 |
-| 2 | **P08** | boss | `moss-golem` | palettes, P01, P02 |
+| 2 | **P08** | boss | `moss-golem` | palettes, P01, P02. **Pathfinder for bosses.** R14, S09 and S10 wait for it and read its report |
 | 2 | **P09** | props | `treasure-chest`, `lever`, `checkpoint-banner`, `crate`, `signpost` | palettes, P02 |
 | 2 | **P10** | props | `moving-platform`, `crumble-block`, `spring-pad`, `spike-trap`, `saw-blade` | palettes, P01, P02 |
-| 2 | **P11** | pickups | `gem`, `heart`, `gold-key`, `potion`, `star-charm` | palettes, P01 |
-| 2 | **P12** | projectiles and effects | `arrow`, `fireball`, `boulder-chunk`, `dust-puff`, `hit-spark` | palettes, fx-helper, P01 |
-| 2 | **P13** | effects and interface | `pickup-sparkle`, `enemy-poof`, `explosion-small`, `ui-hud-platformer`, `ui-buttons-wood`, `ui-panel-wood` | palettes, fx-helper, ui-helper |
-| 2 | **P14** | backgrounds | `bg-forest`, `bg-castle` | palettes, backdrop-helper |
+| 2 | **P11** | pickups | `gem`, `heart`, `gold-key`, `potion`, `star-charm` | palettes, P01. **Pathfinder for pickups.** P13 and S15 wait for it and read its report |
+| 2 | **P12** | projectiles and effects | `arrow`, `fireball`, `boulder-chunk`, `dust-puff`, `hit-spark` | palettes, fx-helper, P01. **Pathfinder for projectiles and effects.** P13, R18, S17, S18 and S19 wait for it and read its report |
+| 3 | **P13** | effects and interface | `pickup-sparkle`, `enemy-poof`, `explosion-small`, `ui-hud-platformer`, `ui-buttons-wood`, `ui-panel-wood` | palettes, fx-helper, ui-helper, P11, P12. After P11 so that `pickup-sparkle` matches the end of the pickups' own `collect` clips |
 
 ### Helpers this bundle waits on
 
 | Helper | What it must do | Batches that wait |
 |---|---|---|
-| `palettes` | The three palettes as named colours and swatch lists (style guide, section 14). | P03, P04, P05, P06, P07, P08, P09, P10, P11, P12, P13, P14 |
-| `tile-helper` | Draws the 13-tile block, thin pieces, slopes and decals so texture repeats and edges meet; renders a sample map. | P03, P04, P05 |
+| `palettes` | The three palettes as named colours and swatch lists (style guide, sections 3 and 14). | P03, P04, P05, P06, P07, P08, P09, P10, P11, P12, P13, P14 |
+| `tile-helper` | Draws the 13-tile block (top-down wall faces and holes included), thin pieces, slopes and decals so texture repeats and edges meet; renders a sample map. | P03, P04, P05 |
 | `humanoid-poses` | Adds `die`, `block`, `victory`, `talk`, `shoot` and a thrust to the side-view rig. | P00, P06 |
-| `fx-helper` | Shared particles, twinkles, rings and effect colour steps (recommended). | P12, P13 |
-| `ui-helper` | Nine-slice panel, button states, bar housing. | P13 |
-| `backdrop-helper` | Wrapping ridges and scatter for 320x180 layers; `recede()`. | P14 |
+| `fx-helper` | Shared particles, twinkles, rings, shards, smoke and effect colour steps. **Required**: every effect and projectile is built from it, so all effects share one look. | P12, P13 |
+| `ui-helper` | Nine-slice panel, button states, bar housing and fill. | P13 |
+| `backdrop-helper` | Wrapping outlines and scatter for 320x180 layers; `recede()`. | P14 |
 | `compose-kit` | The clock, section gates, five melody instruments and limiter every track shares. | P15 |

@@ -9,24 +9,26 @@
     "colours": {
       "ink": "#231b33",
       "void": "#141a33",
-      "plate": "#353d57",
-      "deck": "#4a5470",
+      "plate": "#434d6d",
+      "deck": "#566182",
       "hull": "#6b7896",
       "panel": "#9aa6c0",
       "steel": "#c2c9d6",
       "suit": "#e8ecf2",
-      "signal": "#f08a2c",
+      "signal": "#3f6fd1",
       "cyan": "#5fe0f0",
       "teal": "#2fb3a8",
       "amber": "#f2a030",
       "red": "#e2473f",
       "flesh": "#b04a8a",
-      "chitin": "#6a3a7a",
+      "membrane": "#803668",
+      "chitin": "#74489c",
       "acid": "#9fe040",
       "gold": "#f2c230",
       "heal": "#5fd47a",
       "shield": "#4f9ff0",
       "xp": "#b48af8",
+      "nebula": "#6660b6",
       "cream": "#f0ead8",
       "skin": "#f6d3b0"
     }
@@ -901,67 +903,67 @@
           "loop": true
         },
         {
-          "name": "growth-fill",
+          "name": "wall-fill",
           "frames": 1,
           "loop": true
         },
         {
-          "name": "growth-top",
+          "name": "wall-top",
           "frames": 1,
           "loop": true
         },
         {
-          "name": "growth-left",
+          "name": "wall-left",
           "frames": 1,
           "loop": true
         },
         {
-          "name": "growth-right",
+          "name": "wall-right",
           "frames": 1,
           "loop": true
         },
         {
-          "name": "growth-side-l",
+          "name": "wall-side-l",
           "frames": 1,
           "loop": true
         },
         {
-          "name": "growth-side-r",
+          "name": "wall-side-r",
           "frames": 1,
           "loop": true
         },
         {
-          "name": "growth-bottom",
+          "name": "wall-bottom",
           "frames": 1,
           "loop": true
         },
         {
-          "name": "growth-bottom-l",
+          "name": "wall-bottom-l",
           "frames": 1,
           "loop": true
         },
         {
-          "name": "growth-bottom-r",
+          "name": "wall-bottom-r",
           "frames": 1,
           "loop": true
         },
         {
-          "name": "growth-inner-tl",
+          "name": "wall-inner-tl",
           "frames": 1,
           "loop": true
         },
         {
-          "name": "growth-inner-tr",
+          "name": "wall-inner-tr",
           "frames": 1,
           "loop": true
         },
         {
-          "name": "growth-inner-bl",
+          "name": "wall-inner-bl",
           "frames": 1,
           "loop": true
         },
         {
-          "name": "growth-inner-br",
+          "name": "wall-inner-br",
           "frames": 1,
           "loop": true
         },
@@ -1216,12 +1218,12 @@
           "loop": true
         },
         {
-          "name": "spawn",
+          "name": "fade",
           "frames": 8,
           "loop": false
         },
         {
-          "name": "fade",
+          "name": "spawn",
           "frames": 8,
           "loop": false
         }
@@ -1251,9 +1253,9 @@
           "loop": true
         },
         {
-          "name": "warn",
+          "name": "open",
           "frames": 6,
-          "loop": true
+          "loop": false
         },
         {
           "name": "off",
@@ -1261,9 +1263,9 @@
           "loop": true
         },
         {
-          "name": "open",
+          "name": "warn",
           "frames": 6,
-          "loop": false
+          "loop": true
         }
       ],
       "parts": [],
@@ -2611,7 +2613,7 @@
       "after": [
         "R04"
       ],
-      "order": 2
+      "order": 3
     },
     {
       "id": "S04",
@@ -2627,7 +2629,7 @@
         "S01",
         "R03"
       ],
-      "order": 2
+      "order": 3
     },
     {
       "id": "S05",
@@ -2645,7 +2647,7 @@
         "S02",
         "S04"
       ],
-      "order": 3
+      "order": 4
     },
     {
       "id": "S06",
@@ -2662,7 +2664,7 @@
         "S02",
         "R03"
       ],
-      "order": 2
+      "order": 3
     },
     {
       "id": "S07",
@@ -2694,7 +2696,7 @@
         "S02",
         "R03"
       ],
-      "order": 2
+      "order": 3
     },
     {
       "id": "S09",
@@ -2707,9 +2709,10 @@
       ],
       "after": [
         "S01",
-        "S02"
+        "S02",
+        "P08"
       ],
-      "order": 2
+      "order": 3
     },
     {
       "id": "S10",
@@ -2722,9 +2725,10 @@
       ],
       "after": [
         "S01",
-        "S02"
+        "S02",
+        "P08"
       ],
-      "order": 2
+      "order": 3
     },
     {
       "id": "S11",
@@ -2744,7 +2748,7 @@
         "S02",
         "S03"
       ],
-      "order": 3
+      "order": 4
     },
     {
       "id": "S12",
@@ -2760,7 +2764,7 @@
       "after": [
         "S03"
       ],
-      "order": 3
+      "order": 4
     },
     {
       "id": "S13",
@@ -2777,9 +2781,10 @@
       ],
       "after": [
         "S02",
-        "S03"
+        "S03",
+        "P14"
       ],
-      "order": 3
+      "order": 4
     },
     {
       "id": "S14",
@@ -2813,9 +2818,10 @@
         "palettes"
       ],
       "after": [
-        "S02"
+        "S02",
+        "P11"
       ],
-      "order": 2
+      "order": 3
     },
     {
       "id": "S16",
@@ -2828,7 +2834,7 @@
         "palettes"
       ],
       "after": [],
-      "order": 2
+      "order": 1
     },
     {
       "id": "S17",
@@ -2846,9 +2852,10 @@
         "fx-helper"
       ],
       "after": [
-        "S02"
+        "S02",
+        "P12"
       ],
-      "order": 2
+      "order": 3
     },
     {
       "id": "S18",
@@ -2863,8 +2870,10 @@
         "palettes",
         "fx-helper"
       ],
-      "after": [],
-      "order": 2
+      "after": [
+        "P12"
+      ],
+      "order": 3
     },
     {
       "id": "S19",
@@ -2880,9 +2889,10 @@
       ],
       "after": [
         "S01",
-        "S02"
+        "S02",
+        "P12"
       ],
-      "order": 2
+      "order": 3
     },
     {
       "id": "S20",
