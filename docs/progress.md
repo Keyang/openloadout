@@ -18,7 +18,7 @@ Started 2026-11-18 16:06. The orchestrator updates this file at every step. A ne
 - "Play" is a playground for trying bag assets, not fixed template games.
 - Export: the user chooses zip or Unity package; Unity is "coming later" and not built in this loop.
 - Git: local commits allowed, no pushing. Dependencies and one embedding-model download allowed.
-- Search defaults accepted: SQLite file, English, model served from the site, background download.
+- Search defaults accepted: SQLite file, English, model served from the site, background download. After measurement and review (2026-11-18 17:00) the orchestrator made search by meaning an opt-in switch, off by default: it missed the pass mark and costs 38.5 MB. Keyang can reverse this.
 - Out of this loop: MCP route, studio, physics, 3D, hosting, accounts.
 - In this loop: parts, the automatic quality bar with an independent reviewer.
 - No ceiling on time or spend. The project is called Loadout.
@@ -41,17 +41,17 @@ Status: todo · building · review · fixing · done · blocked
 |---|---|---|---|---|---|
 | W1-R | Research top 100 2D games, pick three game types, outline each bundle | G1, D7 | opus | done | `docs/game-types-research.md`. Top three of 100: platformer 25, turn-based RPG 10, roguelike action 8 (tied with adventure / visual novel at 8; chosen because it is rising on Steam and needs more sprites). Two of the three are top-down |
 | W1-A | Metadata schema, backfill 27 assets, bundles format, build → catalogue, thumbnails, strips | FIND-1, BASE-8, BAG-6 | opus | done | Committed `ed82fe5`. 50 tests. Review passed after one round of fixes. Game types are now `platformer`, `turn-based-rpg`, `roguelike-action` plus six others |
-| W1-B | Search: index builder, keyword + meaning search library, browser client, test set and evaluation | FIND-2, 8, 9, 10 | fable | review | Builder done (38 min, 335k tokens): 35 unit and 6 browser tests. Top-5 on 100 test searches: keywords 91%, keywords plus model 98%. The model missed the design's pass mark (+14 where +15 was asked and 14 was the ceiling; +5 on 40 held-out searches). Meaning level costs 38.5 MB (model 23.7, runtime 14.3). Orchestrator decision: ship the meaning level, loaded only when someone searches; a static 8 MB model at 96% is the follow-up. Wired into the build by the orchestrator |
+| W1-B | Search: index builder, keyword + meaning search library, browser client, test set and evaluation | FIND-2, 8, 9, 10 | fable | fixing | Review round 1: FAIL on four small fixes (a filter-name crash, a leak when closed during loading, junk input returning everything, the evaluation summary overstating the gain). Everything else confirmed: accuracy figures reproduced exactly, fallbacks work, sub-folder hosting works. Reviewer's own 25 untuned searches: top 5 is 96% with or without the model; first place 84% against 92%. **Decision revised: search by meaning is OFF by default and offered as a switch** (38.5 MB for little gain on untuned searches) |
 | W1-C | Test setup: static server, Playwright harness, smoke tests of today's pages, engine unit tests | BASE-7 | sonnet | done | Committed `99c2ea0`. 53 unit and 70 browser tests. Three review rounds; round 2 caught all 5 planted bugs and found one flaky test, since fixed and repeated 84 times clean by the orchestrator |
-| W1-D | Quality bar as a shared library, new checks, written bar and review protocol | ASSET-1, 12, 13 | opus | fixing | Review round 1: FAIL with ten required fixes (pixel thresholds that scale with sprite size, dead-control rule with `when`, seam rule, grouped errors, speed with workers and a cache, gaps in both documents). Sent back with two additions |
+| W1-D | Quality bar as a shared library, new checks, written bar and review protocol | ASSET-1, 12, 13 | opus | review | Round 2 with the reviewer. Builder fixed all ten items plus two additions (12 min): 74 tests pass; checker now runs on worker threads with a cache (7 sprites 3.8 s cold, 0.06 s cached). All 7 existing sprites pass after the orchestrator declared `when` on three controls (campfire wood, coin emblem colour, wolf belly) |
 
 ### Wave 2: the product (after wave 1)
 
 | Id | Task | Features | Status |
 |---|---|---|---|
 | W2-A | Site reads the catalogue; search-first home, results with filters, sticky style filter, cards that load nothing until seen (fable) | FIND-2, 3, 4, 5, 7 | building |
-| W2-B | Parts in the framework and on the sprite page; Hero's weapon as the worked example (fable) | MAKE-8, EDIT-7 | review — builder done (26 min, 375k tokens): 51 unit and 66 browser tests; Hero and Wizard pass the checker; orchestrator viewed the Hero's attack with a long, angled sword |
-| W2-C | Bag and export chooser (opus) | BAG-1, BAG-2 | review — builder done (12.5 min, 220k tokens): bag kept in the browser, add / update / remove, shareable bag link, zip package with a manifest and the look applied, Unity option shown as unavailable; 19 unit and 8 browser tests. Not yet wired into the sprite page |
+| W2-B | Parts in the framework and on the sprite page; Hero's weapon as the worked example (fable) | MAKE-8, EDIT-7 | fixing — review round 1: FAIL on small defects. Confirmed by the reviewer: weapon stays in the hand in every clip at every setting; sockets on all frames within 0.67 px of the hand; clear part blocks. To fix: chained `when`, any-of `when` (added to Contract 3), the Wizard's hood, old links, a socket named without positions, two weak tests, phone layout |
+| W2-C | Bag and export chooser (opus) | BAG-1, BAG-2 | review passed, follow-up round running — reviewer found no blocking fix: tests stable over 48 repeats; a themed 4-item package was unpacked and checked (layout, manifest, guide, themed pixels, valid WAVs, stereo music); 60-item bag opens in 0.85 s. Follow-up: wire into the sprite page, leave out sounds that do not apply, six smaller fixes |
 | W2-D | Themes. D1 engines — done (`ed2a65e`). D2: bundle page with whole-bundle controls, also on the bag page (opus) — building | EDIT-6, BAG-6 | building |
 | W2-E | Playground: side view and top-down, roles from metadata (fable) | BAG-3 | building |
 | W2-F | Skill update: metadata, parts, new asset kinds, quality bar | MAKE-1 | todo |
@@ -62,7 +62,7 @@ Status: todo · building · review · fixing · done · blocked
 |---|---|---|
 | W3-S | Art direction: global style guide, one specification and batch plan per bundle (fable) | building |
 | W3-H | Shared helpers the specs call for (top-down body rig, tile helper, ...) | todo |
-| W3-X | Fix the existing 5 sprites that fail the new bar | todo |
+| W3-X | Fix the existing sprites that fail the new bar | done: all 7 pass; slime and wolf keep small warnings |
 | W3-P | Production: batches of builders, each with an independent reviewer | todo |
 
 Per bundle: a specification and style guide, then batches of builders with an independent reviewer per batch. 40–50 sprites, 20 sounds, 2 tracks each.
@@ -94,3 +94,7 @@ Times are read from the clock or from commit times. Entries before 16:27 were fi
 | 16:44 | W1-D review: FAIL with ten fixes; sent back. Contract 3 extended (`when` on controls and on sounds; `none` may be a list). W2-B first pass finished (19 min, 329k tokens) and resumed for the extension. W2-D1 fixes verified (34 tests) and committed (`ed2a65e`). |
 | 16:49 | W2-C builder finished; orchestrator re-ran its tests; reviewer launched. Orchestrator wrote `app/catalog.js` (the one reader of the catalogue) and lazy routes for `#/bundle/<id>` and `#/play`. Launched W2-D2 bundle page and W2-E playground. |
 | 16:54 | W1-B search and W2-B parts builders finished; reviewers launched for both. Orchestrator wired the embedding model and a combined `generated/sounds.json` into the build (27 assets index in 0.2 s, 128 KB). W2-A catalogue-driven site launched. A permanent test server now runs on port 5199 because parallel test runs were stopping each other's. Unit suite: 297 of 303 pass; the 6 failures are the quality-bar command-line tests, whose builder is mid-fix. |
+| 16:57 | W1-D fixes done; orchestrator re-ran its 74 tests and the checker: all 7 sprites pass. Sent to the reviewer for round 2. |
+| 16:57 | W2-C review: PASS with no blocking fixes. Follow-up round sent to the builder (sprite-page wiring, conditional sounds in exports, six smaller fixes). |
+| 17:01 | W1-B review: FAIL on four small fixes; sent back with five extras. Search by meaning made opt-in (reverses the orchestrator's earlier choice to keep it on); W2-A builder told to add the switch. Package versions pinned. |
+| 17:01 | W2-B review: FAIL on small defects; ten fixes sent to the builder. Contract 3 extended again: `when` may be a list meaning any-of. |

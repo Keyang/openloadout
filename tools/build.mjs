@@ -146,7 +146,7 @@ await step('vendor', async () => {
   if (has('--skip-vendor')) return 'skipped (--skip-vendor)';
   if (!exists('tools/lib/vendor.mjs')) return 'not run: tools/lib/vendor.mjs does not exist yet';
   const { vendorAll } = await importFrom('tools/lib/vendor.mjs');
-  await vendorAll({ root });
+  await vendorAll({ root, meaning: !has('--no-meaning') });
   return 'done';
 });
 
