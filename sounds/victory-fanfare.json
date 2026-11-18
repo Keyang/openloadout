@@ -1,0 +1,79 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "victory-fanfare",
+ "name": "Victory fanfare",
+ "category": "jingle",
+ "tags": ["victory", "win", "jingle", "pluck", "flute", "bell", "dance"],
+ "description": "The battle is won: a skipping seven-note dance tune in three-time for plucked strings and a breathy wooden flute, falling from the high home note and leaping back to it over two plucked home chords, answered by a soft bell; change the key, speed, brightness, ring and room. The same every time.",
+ "meta": {
+  "type": "jingle",
+  "role": "music/victory",
+  "themes": ["fantasy"],
+  "gameTypes": ["turn-based-rpg", "top-down-rpg"],
+  "words": ["victory", "win", "won", "battle won", "triumph", "tune", "sting", "celebrate", "level clear", "reward", "lute", "flute", "bell", "cheerful"],
+  "license": "draft"
+ },
+ "duration": "3/speed + ring + 0.3",
+ "params": [
+  { "id": "pitch", "label": "Key", "min": 330, "max": 587, "default": 440, "unit": "Hz", "scale": "log" },
+  { "id": "speed", "label": "Speed", "min": 2.4, "max": 3.6, "default": 3, "unit": "beats/s" },
+  { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.55 },
+  { "id": "ring", "label": "Ring", "min": 0.6, "max": 1.4, "default": 1.1, "unit": "s" },
+  { "id": "space", "label": "Room", "min": 0, "max": 0.45, "default": 0.22 }
+ ],
+ "nodes": [
+  { "id": "clk", "type": "clock", "rate": "speed*3", "count": 10 },
+  { "id": "mHit", "type": "pattern", "trig": "clk", "steps": "X.x X.x X.x X" },
+  { "id": "fHit", "type": "pattern", "trig": "clk", "steps": "X.x X.x X.x ." },
+  { "id": "cHit", "type": "pattern", "trig": "clk", "steps": "X.. ... ... X" },
+  { "id": "note", "type": "seq", "steps": [12, 11, 9, 7, 4, 12, 12], "trig": "mHit" },
+  { "id": "hz", "type": "expr", "expr": "pitch*semi(note)" },
+  { "id": "endClk", "type": "clock", "rate": 1, "count": 1, "delay": "3/speed" },
+  { "id": "bellClk", "type": "clock", "rate": 1, "count": 1, "delay": "3/speed + 0.33/speed" },
+
+  { "id": "pDec", "type": "env", "points": [[0, 0.55], ["3/speed - 0.005", 0.55], ["3/speed", "ring"]] },
+  { "id": "mExc", "type": "ad", "attack": 0.0001, "decay": "0.0007 - bright*0.0005", "curve": 1.5, "trig": "mHit" },
+  { "id": "mExcH", "type": "filter", "mode": "hp", "in": "mExc", "freq": "hz*0.5", "q": 0.7 },
+  { "id": "mPluck", "type": "pluck", "freq": "hz", "decay": "pDec", "damp": "0.5 - bright*0.4", "in": "mExcH", "trig": 0 },
+
+  { "id": "fAmp", "type": "ad", "attack": 0.022, "hold": "0.22/speed", "decay": "0.42/speed", "curve": 1.4, "trig": "fHit" },
+  { "id": "fEnd", "type": "ad", "attack": 0.025, "hold": "ring*0.18", "decay": "ring*0.72", "curve": 1.8, "trig": "endClk" },
+  { "id": "fLag", "type": "lag", "in": "fAmp*0.85 + fEnd", "time": 0.008 },
+  { "id": "vib", "type": "osc", "freq": 5.3 },
+  { "id": "vibAmt", "type": "env", "points": [[0, 0], ["3/speed + 0.12", 0], ["3/speed + 0.45", 1]] },
+  { "id": "fTone", "type": "osc", "wave": "tri", "freq": "hz*(1 + 0.004*vib*vibAmt)" },
+  { "id": "fOv", "type": "osc", "freq": "hz*2*(1 + 0.004*vib*vibAmt)" },
+  { "id": "nB", "type": "osc", "freq": 5211 },
+  { "id": "nA", "type": "osc", "freq": 1373.3, "pm": "nB*3.1" },
+  { "id": "nC", "type": "osc", "wave": "saw", "freq": 3117.7, "pm": "nA*6.3" },
+  { "id": "breath", "type": "filter", "mode": "bp", "in": "nC", "freq": "hz*2.2", "q": 2.5 },
+  { "id": "flute", "type": "expr", "expr": "(fTone*0.8 + fOv*(0.08 + bright*0.16) + breath*(0.05 + bright*0.06))*fLag" },
+
+  { "id": "cDec", "type": "env", "points": [[0, 0.9], ["3/speed - 0.005", 0.9], ["3/speed", "ring*1.05"]] },
+  { "id": "cExc", "type": "ad", "attack": 0.0002, "decay": "0.001 - bright*0.0006", "curve": 1.5, "trig": "cHit" },
+  { "id": "cExcH", "type": "filter", "mode": "hp", "in": "cExc", "freq": "pitch*0.3", "q": 0.7 },
+  { "id": "cExc1", "type": "delay", "in": "cExcH", "time": 0.014, "mix": 1, "max": 0.1 },
+  { "id": "cExc2", "type": "delay", "in": "cExcH", "time": 0.028, "mix": 1, "max": 0.1 },
+  { "id": "cExc3", "type": "delay", "in": "cExcH", "time": 0.042, "mix": 1, "max": 0.1 },
+  { "id": "s0", "type": "pluck", "freq": "pitch*0.5", "decay": "cDec", "damp": "0.6 - bright*0.35", "in": "cExcH", "trig": 0 },
+  { "id": "s1", "type": "pluck", "freq": "pitch*semi(-5)", "decay": "cDec", "damp": "0.58 - bright*0.35", "in": "cExc1", "trig": 0 },
+  { "id": "s2", "type": "pluck", "freq": "pitch", "decay": "cDec", "damp": "0.56 - bright*0.35", "in": "cExc2", "trig": 0 },
+  { "id": "s3", "type": "pluck", "freq": "pitch*semi(4)", "decay": "cDec", "damp": "0.54 - bright*0.35", "in": "cExc3", "trig": 0 },
+  { "id": "chord", "type": "expr", "expr": "s0*0.9 + s1*0.75 + s2*0.7 + s3*0.65" },
+
+  { "id": "bExc", "type": "ad", "attack": 0.0008, "decay": 0.002, "curve": 1.5, "trig": "bellClk" },
+  { "id": "bExcH", "type": "filter", "mode": "hp", "in": "bExc", "freq": "pitch*2", "q": 0.7 },
+  { "id": "bell", "type": "modal", "in": "bExcH", "freq": "pitch*4", "ratios": [1, 2.0, 2.76, 4.07], "gains": [1, "0.3 + bright*0.3", "0.15 + bright*0.25", "0.05 + bright*0.15"], "decay": "ring*1.1", "tilt": 0.6 },
+
+  { "id": "dry", "type": "expr", "expr": "mPluck*6 + flute*0.8 + chord*2.2 + bell*0.55" },
+  { "id": "tone", "type": "filter", "mode": "lp", "in": "dry", "freq": "2600 + bright*7000", "q": 0.6 },
+  { "id": "hpf", "type": "filter", "mode": "hp", "in": "tone", "freq": 90 },
+  { "id": "verb", "type": "reverb", "in": "hpf", "size": 0.7, "damp": 0.4, "mix": "space" }
+ ],
+ "out": "verb*(1 - smooth(dur - 0.35, dur - 0.01, t))",
+ "presets": {
+  "Victory": { "pitch": 440, "speed": 3, "bright": 0.55, "ring": 1.1, "space": 0.22 },
+  "Small win": { "pitch": 440, "speed": 3.5, "bright": 0.4, "ring": 0.7, "space": 0.12 },
+  "Grand finale": { "pitch": 440, "speed": 2.6, "bright": 0.85, "ring": 1.4, "space": 0.38 }
+ }
+}

@@ -8,7 +8,7 @@
   "reward",
   "arcade"
  ],
- "description": "Two-note square blip, the second note a fourth up.",
+ "description": "A quick three-note chiptune tune for a collected coin: a low grace note, then a leap of a major sixth that is struck twice, a triangle with a thin pulse edge and a short bell on top, the last note ringing. Change its pitch, interval, speed, ring and shine. Identical every time.",
  "meta": {
   "type": "sfx",
   "role": "items/pickup",
@@ -38,47 +38,48 @@
   ],
   "license": "draft"
  },
- "duration": "speed + ring + 0.02",
+ "duration": "speed*2 + ring + 0.02",
  "params": [
   {
    "id": "pitch",
    "label": "Pitch",
    "min": 500,
-   "max": 2400,
-   "default": 988,
+   "max": 2000,
+   "default": 880,
    "unit": "Hz",
    "scale": "log"
   },
   {
    "id": "interval",
    "label": "Interval",
-   "min": 0,
+   "min": 2,
    "max": 12,
-   "default": 5,
+   "default": 9,
    "unit": "semitones"
   },
   {
    "id": "speed",
-   "label": "First note",
-   "min": 0.03,
-   "max": 0.15,
-   "default": 0.07,
+   "label": "Speed",
+   "min": 0.035,
+   "max": 0.11,
+   "default": 0.055,
    "unit": "s"
   },
   {
    "id": "ring",
    "label": "Ring",
-   "min": 0.1,
-   "max": 0.9,
-   "default": 0.35,
-   "unit": "s"
+   "min": 0.12,
+   "max": 0.6,
+   "default": 0.3,
+   "unit": "s",
+   "scale": "log"
   },
   {
    "id": "shine",
    "label": "Shine",
    "min": 0,
    "max": 1,
-   "default": 0.4
+   "default": 0.5
   }
  ],
  "nodes": [
@@ -86,22 +87,50 @@
    "id": "clk",
    "type": "clock",
    "rate": "1/speed",
-   "count": 2
+   "count": 3
   },
   {
    "id": "note",
    "type": "seq",
    "steps": [
     "pitch",
+    "pitch*semi(interval)",
     "pitch*semi(interval)"
    ],
    "trig": "clk"
   },
   {
-   "id": "sq",
-   "type": "osc",
-   "wave": "square",
-   "freq": "note"
+   "id": "lastClk",
+   "type": "clock",
+   "rate": 1,
+   "count": 1,
+   "delay": "speed*2"
+  },
+  {
+   "id": "ampShort",
+   "type": "ad",
+   "attack": 0.002,
+   "decay": "speed*0.95",
+   "curve": 1.6,
+   "trig": "clk"
+  },
+  {
+   "id": "ampLast",
+   "type": "ad",
+   "attack": 0.002,
+   "decay": "ring",
+   "curve": 2.2,
+   "trig": "lastClk"
+  },
+  {
+   "id": "isLast",
+   "type": "expr",
+   "expr": "t >= speed*2 - 0.0005 ? 1 : 0"
+  },
+  {
+   "id": "amp",
+   "type": "expr",
+   "expr": "isLast ? ampLast : ampShort*(note > pitch*1.01 ? 1 : 0.85)"
   },
   {
    "id": "tr",
@@ -110,33 +139,58 @@
    "freq": "note"
   },
   {
-   "id": "hi",
+   "id": "pl",
    "type": "osc",
-   "freq": "note*3"
+   "wave": "pulse",
+   "width": 0.2,
+   "freq": "note"
   },
   {
-   "id": "amp",
-   "type": "ad",
-   "attack": 0.002,
-   "decay": "ring",
-   "curve": 2.2,
-   "trig": "clk"
+   "id": "bell",
+   "type": "modal",
+   "in": "clk*(note > pitch*1.01 ? 1 : 0)",
+   "freq": "note*2",
+   "ratios": [
+    1,
+    2.76,
+    5.4
+   ],
+   "gains": [
+    1,
+    0.45,
+    0.2
+   ],
+   "decay": "isLast ? ring*0.7 : speed*1.2",
+   "tilt": 0.5
+  },
+  {
+   "id": "sum",
+   "type": "expr",
+   "expr": "(tr*0.8 + pl*(0.06 + shine*0.22))*amp + bell*shine*0.2"
+  },
+  {
+   "id": "clean",
+   "type": "filter",
+   "mode": "hp",
+   "in": "sum",
+   "freq": 150,
+   "q": 0.7
   }
  ],
- "out": "(sq*0.35 + tr*0.6 + hi*shine*0.5) * amp",
+ "out": "clean",
  "presets": {
   "Gem": {
-   "pitch": 1400,
-   "interval": 7,
-   "speed": 0.05,
-   "ring": 0.6,
+   "pitch": 1250,
+   "interval": 12,
+   "speed": 0.045,
+   "ring": 0.36,
    "shine": 1
   },
   "Dull token": {
    "pitch": 620,
    "interval": 3,
-   "speed": 0.09,
-   "ring": 0.2,
+   "speed": 0.08,
+   "ring": 0.18,
    "shine": 0
   }
  }
