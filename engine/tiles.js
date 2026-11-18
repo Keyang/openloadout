@@ -66,7 +66,23 @@
 // Pieces. The 13 of style guide section 6 cover ground two tiles thick or more. blockClips(prefix, { narrow: true })
 // adds seven for ground one tile thick (strip-l, strip-m, strip-r; col-t, col-m, col-b; single), drawn from the same
 // material; { fills: 3 } adds fill-b and fill-c, other versions of the fill that a level mixes by position.
+// { lanes: true } adds nine for a lane one tile wide that bends, forks and crosses (elbow-tl/tr/bl/br, tee-t/r/b/l,
+// cross): each carries the rim round the cut corners between its arms, so a wide border shows no notch there. The
+// picker uses them only for a tileset that has them; without them a bend gets the plain corner piece, as before.
 // Decals: decoClips says where each goes ('on', 'above', 'below'); stand 'above' decals where the top line is level.
+//
+// Liquids. A prefix with only '-top' and '-fill' (liquidClips) is a liquid: classifyTiles marks it, and layoutTiles
+// lays it with its top where nothing of it is above and its body below ('~', or 'liquid:<prefix>' in a legend).
+// A lone '<prefix>-foot' under the same prefix is the liquid's last piece, where it lands with nothing of it
+// below: a waterfall is 'fall-top', 'fall-fill', 'fall-foot'. (A '-foot' with no '-cap' or '-mid' and no liquid
+// of its prefix is a stack that is only a foot: it is drawn in the bottom cell of its run, and nothing above.)
+// Edge tiles are see-through outside their outline: where ground meets water or a back wall, put the fill behind
+// the bank in the same cell (a legend entry ['back:water', 'block:grass']) so no backdrop shows between them.
+//
+// Courses (bricks, planks, stone rows) in a fill or a face: no joint row may lie on the tile's first or last row.
+// A joint there meets the next tile's edge row and the checker's seam test fails it by rounding, most often at the
+// all-high look. Shift the courses so the tile boundary cuts through the middle of a course: courseShift(heights)
+// gives the shift for drawCourses.
 //
 // Animated blocks: blockClips(prefix, { frames: 8, fps }) and use t in fill, inset or paint.
 //

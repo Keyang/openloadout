@@ -20,11 +20,11 @@
 import { renderFrame, defaultParams, cleanParams, randomParams, clipFps, inEffect, partList } from '../engine/sprite.js';
 import { brightness, hexToRgb, rgbToHsl } from '../engine/color.js';
 import { blockJoins, classifyTiles } from '../engine/tiles.js';
-import { THEME_PRESETS, applyColour } from '../engine/theme.js';
+import { THEME_PRESETS, applyColour, themedParams } from '../engine/theme.js';
 import { stylesOf, styleById, styleIds } from '../engine/styles.js';
 import { Surface } from '../engine/surface.js';
 
-const BLOCK_JOINS = blockJoins({ narrow: true });    // every pair of block pieces (the 13, and the 7 narrow ones) that can touch: [[a, axis, b], ...]
+const BLOCK_JOINS = blockJoins({ narrow: true, lanes: true });    // every pair of block pieces (the 13, the 7 narrow ones, the 9 lane ones) that can touch: [[a, axis, b], ...]
 
 export const THRESHOLDS = {
   randomLooks: 12,          // seeded random looks drawn on top of default, all-low, all-high, every choice option and every toggle flipped
@@ -58,6 +58,17 @@ export const THRESHOLDS = {
   // Counting colours kept instead does not separate them (the bat keeps 47% of its colours and reads; the bad far
   // layer kept 63%), and counting only the edges inside the outline fails layers that keep a clear silhouette.
   lookEdgesWarn: 0.65,
+  // Inside the frame under a look that varies shapes (S-inside-frame-shapes): seeds 0 to shapeSeeds - 1 of
+  // themedParams (engine/theme.js) are drawn. The two faults that led to this check (2026-11-18: void-ranger `die`
+  // frame 5 and muzzle-flash `burst` frame 3, found by the 50-seed sweep in tests/unit/theme-colour.test.mjs) showed
+  // at seed 8 only, and at seeds 3, 5, 9, 10 and nine more: 9 seeds is the fewest that catch both, 12 leaves a
+  // margin. A fault that 1 seed in 50 shows is mostly missed by any small number: that test stays the wider net.
+  shapeSeeds: 12,
+  // ... and of each clip, the frames that reach furthest at the default, all-low and all-high settings are drawn
+  // first (45% of all frames), the rest only when one of those comes this near the frame edge, in pixels. Measured
+  // over the 330 clips of every sprite then in sprites/ x 12 seeds x 4 sides: those frames gave the true reach
+  // exactly in 97.2% of cases, within 1 pixel in 99.6% and within 2 in 99.8%.
+  shapeNear: 2,
 };
 
 // def.kind (older sprites) -> meta.type, used when a sprite has no meta yet
@@ -814,6 +825,11 @@ function checkStyle(def, { soundIndex, validateMeta } = {}, pass) {
     }
     // things that repeat up and down (ladders, pillars, posts): -cap over -mid over -foot. These names are
     // not fixed by the style guide, so a miss is a warning.
+    // a liquid that lands (a waterfall): its foot under its body, under its top when it is two tiles tall, and beside itself
+    for (const b of sets.blocks) if (b.liquid && b.pieces.foot) {
+      for (const f of b.fills) join(f, 'y', b.pieces.foot, 'stack');
+      join(b.pieces.top, 'y', b.pieces.foot, 'stack'); join(b.pieces.foot, 'x', b.pieces.foot, 'stack');
+    }
     for (const st of sets.stacks) {
       const { cap, mid, foot } = st.pieces;
       join(cap, 'y', mid, 'stack'); join(mid, 'y', mid, 'stack'); join(mid, 'y', foot, 'stack');
@@ -951,6 +967,117 @@ function checkStyle(def, { soundIndex, validateMeta } = {}, pass) {
     }
     const far = clipNames[0];
     if (far) { const g = render(far, 0, dflt); if (!(g instanceof Error) && g.data.some((v) => (v >>> 24) !== 255)) warn(`${far}: the farthest layer has see-through pixels; a game needs a solid colour behind it`); }
+  }
+
+  // ---- inside the frame at the far ends, and under a look that varies shapes ----------------------------------
+  // Two sets of settings the looks above do not reach, tested for the frame edge only (and for a render that fails).
+  // The far ends: all sliders low, and all high, with each other value of each choice and each on/off control
+  // flipped, one at a time (a held sign at its largest on the biggest body); and each option of each part with the
+  // part's own sliders low, and high, on the default body. To keep this cheap, only what can matter is drawn again:
+  //   - an option is drawn at the two ends only in the clips, and towards the sides (left, up, right, down), where
+  //     that option alone sticks out: reaches further than the option of the same control that reaches least
+  //     (eyes inside the body are never drawn again; a spear and a sword both are, against no weapon);
+  //   - of such a clip, only the frames that reach furthest towards those sides, with that option alone and with
+  //     all sliders at that end (both drawn above), so one or two frames a side;
+  //   - a part with its sliders at an end: the frames that reach furthest each way with that option alone.
+  // Shapes: a whole-bundle look can vary every control of every sprite from its seed (themedParams). Seeds 0 to
+  // shapeSeeds - 1 are drawn: of each clip, first the frames that reach furthest each way at the default, all-low and
+  // all-high settings; when one of them comes within shapeNear pixels of the frame edge, the rest of that clip too.
+  // Both report under the same cause as every other frame-edge fault, so a sprite gets one such message, from the
+  // first place it was seen; metrics.edgeEnds and metrics.shapes say what each of the two found.
+  {
+    const t1 = now();
+    const ends = { looks: 0, renders: 0, touched: 0, first: null, ms: 0 }, shapes = { seeds: 0, renders: 0, touched: 0, first: null, ms: 0 };
+    metrics.edgeEnds = ends; metrics.shapes = shapes;
+    if (!EDGE_FREE.has(type) && clipNames.length) {
+      const onEdge = (b) => b.x0 === 0 || b.y0 === 0 || b.x1 === W - 1 || b.y1 === H - 1;
+      const box = (b) => `box ${b.x0},${b.y0}..${b.x1},${b.y1}`;
+      const reach = new Map();
+      // At a setting drawn before, per side (left, up, right, down): how far a clip reaches (smaller is further) and its first frame to get there.
+      const reachOf = (cname, p) => {
+        const key = `${cname}\u0002${lookKey(p)}`;
+        let out = reach.get(key);
+        if (out) return out;
+        out = { most: [Infinity, Infinity, Infinity, Infinity], at: [-1, -1, -1, -1] };
+        for (let f = 0; f < clips[cname].frames; f++) {
+          const g = render(cname, f, p);
+          const b = g instanceof Error ? null : g.bounds();
+          if (b) [b.x0, b.y0, -b.x1, -b.y1].forEach((v, i) => { if (v < out.most[i]) { out.most[i] = v; out.at[i] = f; } });
+        }
+        reach.set(key, out);
+        return out;
+      };
+      const SIDES = [0, 1, 2, 3];
+      const extra = [], listed = new Set(bases.map(([, p]) => lookKey(p)));      // extra: [name, settings, [[clip, frames], ...]]
+      const add = (name, p, plan) => { const k = lookKey(p); if (listed.has(k) || !plan.length) return; listed.add(k); extra.push([name, p, plan]); };
+      const framesOf = (cname, sides, sources) => [...new Set(sources.flatMap((q) => sides.map((i) => reachOf(cname, q).at[i])))].filter((f) => f >= 0).sort((a, b) => a - b);
+      for (const [k, d] of Object.entries(params)) {
+        const values = d.kind === 'choice' ? d.options.map((o) => o.value) : d.kind === 'toggle' ? [false, true] : [];
+        for (const v of values.filter((x) => x !== dflt[k])) {
+          const alone = { ...dflt, [k]: v };
+          // where this option sticks out: further than the option of this control that reaches least (the sprite without the thing)
+          const least = (cname, i) => Math.max(...values.map((x) => reachOf(cname, { ...dflt, [k]: x }).most[i]));
+          const further = clipNames.map((cname) => [cname, SIDES.filter((i) => reachOf(cname, alone).most[i] < least(cname, i))]).filter(([, sides]) => sides.length);
+          for (const [ename, end] of [['all-low', allLow], ['all-high', allHigh]]) add(`${ename} + ${k}=${fmt(v)}`, { ...end, [k]: v }, further.map(([cname, sides]) => [cname, framesOf(cname, sides, [alone, end])]));
+        }
+      }
+      for (const part of parts) {
+        const own = part.controls.filter((k) => params[k].kind === 'range');
+        if (!own.length) continue;
+        const sel = params[part.selector], none = part.none === undefined ? [] : Array.isArray(part.none) ? part.none : [part.none];
+        for (const v of (sel.kind === 'toggle' ? [true] : sel.options.map((o) => o.value)).filter((x) => !none.includes(x))) {
+          const alone = { ...dflt, [part.selector]: v };
+          for (const [word, side] of [['low', 'min'], ['high', 'max']]) {
+            const p = { ...alone };
+            for (const k of own) p[k] = params[k][side];
+            add(`${part.selector}=${fmt(v)} + part "${part.name}" sliders ${word}`, p, clipNames.map((cname) => [cname, framesOf(cname, SIDES, [alone])]));
+          }
+        }
+      }
+      let drawn = metrics.renders;
+      for (const [lname, p, plan] of extra) {
+        ends.looks++;
+        for (const [cname, frames] of plan) {
+          for (const f of frames) {
+            const g = draw(cname, f, p);
+            if (g instanceof Error) { error(`${cname} frame ${f} / ${lname}: render threw ${g.message}`, `threw:${g.message}`); break; }
+            const b = g.bounds();
+            if (b && onEdge(b)) { ends.touched++; ends.first ??= { look: lname, clip: cname, frame: f }; error(`${cname} frame ${f} / ${lname}: drawing touches the frame edge (clipped), ${box(b)}`, 'edge'); }
+          }
+        }
+      }
+      ends.renders = metrics.renders - drawn;
+      ends.ms = Math.round((now() - t1) * 10) / 10;
+
+      const t2 = now();
+      drawn = metrics.renders;
+      const likely = clipNames.map((cname) => [cname, framesOf(cname, SIDES, [dflt, allLow, allHigh])]);
+      for (let seed = 0; seed < T.shapeSeeds; seed++) {
+        const p = themedParams(def, dflt, { seed, shapes: true });
+        shapes.seeds++;
+        for (const [cname, first] of likely) {
+          // one frame: its smallest distance to the frame edge (0 = touching, reported), Infinity when nothing is drawn, null when it could not be drawn
+          const one = (f) => {
+            const g = draw(cname, f, p);
+            if (g instanceof Error) { error(`${cname} frame ${f} / shapes seed ${seed}: render threw ${g.message}`, `threw:${g.message}`); return null; }
+            const b = g.bounds();
+            if (!b) return Infinity;
+            if (onEdge(b)) {
+              shapes.touched++;
+              shapes.first ??= { seed, clip: cname, frame: f };
+              const sets = keys.filter((k) => fmt(p[k]) !== fmt(dflt[k])).map((k) => ` --set ${k}=${fmt(p[k])}`).join('');
+              error(`${cname} frame ${f} / shapes seed ${seed}: drawing touches the frame edge (clipped), ${box(b)}. A whole-bundle look that also varies shapes gives this sprite these settings (themedParams in engine/theme.js, seed ${seed}); to see it: node tools/render.mjs ${def.id} --clip ${cname}${sets}`, 'edge');
+            }
+            return Math.min(b.x0, b.y0, W - 1 - b.x1, H - 1 - b.y1);
+          };
+          let near = false, failed = false;
+          for (const f of first) { const m = one(f); if (m === null) { failed = true; break; } if (m <= T.shapeNear) near = true; }
+          if (near && !failed) for (let f = 0; f < clips[cname].frames; f++) if (!first.includes(f) && one(f) === null) break;
+        }
+      }
+      shapes.renders = metrics.renders - drawn;
+      shapes.ms = Math.round((now() - t2) * 10) / 10;
+    }
   }
 
   // ---- survives every look ------------------------------------------------------------------------

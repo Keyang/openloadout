@@ -7,7 +7,10 @@
 //   node tools/tilemap.mjs <id> --set edge=9 --set roots=true     override controls
 //   node tools/tilemap.mjs <id> --with <id2>    use another tileset's pieces too (the ground under a set of
 //                                               platforms and ladders, say)
-//   node tools/tilemap.mjs <id> --map my.txt    your own map, written as letters -> out/<id>-map-my.png
+//   node tools/tilemap.mjs <id> --map my.txt    your own map, written as letters -> out/<id>-map-my.png. The file may
+//                                               carry its own legend and view on '@' lines (engine/maptext.js):
+//                                               '@ g = back:water, block:grass' puts water behind a bank
+//   node tools/tilemap.mjs <id> --frame 3       which frame of animated tiles to show (default 0)
 //   node tools/tilemap.mjs <id> --crop 0,5,6,4  only the tiles from column 0, row 5, six wide and four high, at 6x
 //                                               -> out/<id>-map-crop.png: for looking closely at one join
 //   node tools/tilemap.mjs <id> --scatter       scatter the decals by the helper's rule (pickDecal), as a game or the
@@ -32,12 +35,13 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { encodePNG } from './png.mjs';
 import { renderFrame, defaultParams, cleanParams } from '../engine/sprite.js';
 import { TILE, classifyTiles, layoutTiles, pieceOf } from '../engine/tiles.js';
+import { readMap } from '../engine/maptext.js';
 import { hexToRgb } from '../engine/color.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
 const flag = (n, d) => { const i = args.indexOf('--' + n); return i < 0 ? d : args[i + 1]; };
-const valued = new Set(['look', 'set', 'with', 'file', 'scale', 'bg', 'out', 'crop', 'map', 'view']);
+const valued = new Set(['look', 'set', 'with', 'file', 'scale', 'bg', 'out', 'crop', 'map', 'view', 'frame']);
 const id = args.find((a, i) => !a.startsWith('--') && !(i > 0 && args[i - 1].startsWith('--') && valued.has(args[i - 1].slice(2))));
 const sets = {};
 args.forEach((a, i) => { if (a === '--set') { const [k, ...v] = args[i + 1].split('='); sets[k] = v.join('='); } });
@@ -67,7 +71,9 @@ for (const s of [sprite, partner]) {
   for (const [name, c] of Object.entries(s.clips)) if (!owner.has(name)) { owner.set(name, { sprite: s, p }); clips.push({ name, place: c.place, block: c.block }); }
 }
 const tiles = classifyTiles(clips);
-const view = flag('view', sprite.meta?.view === 'top-down' ? 'top-down' : 'side');
+const mapFile = flag('map');
+const written = mapFile ? readMap(fs.readFileSync(path.resolve(mapFile), 'utf8')) : null;
+const view = flag('view', written?.view ?? (sprite.meta?.view === 'top-down' ? 'top-down' : 'side'));
 
 // ---- the sample maps ---------------------------------------------------------------------------
 const SIDE = [
@@ -139,14 +145,8 @@ function sampleMap() {
   return rows.map((r) => r.join(''));
 }
 
-const mapFile = flag('map');
-let rows;
-if (mapFile) {
-  rows = fs.readFileSync(path.resolve(mapFile), 'utf8').split('\n').map((l) => l.replace(/\r$/, '')).filter((l) => l.length && !l.startsWith(';'));
-  const width = Math.max(...rows.map((r) => r.length));
-  rows = rows.map((r) => r.padEnd(width, '.'));
-} else rows = sampleMap();
-const layout = layoutTiles(rows, tiles, { view, decals: args.includes('--scatter') });
+const rows = written ? written.rows : sampleMap();
+const layout = layoutTiles(rows, tiles, { view, legend: written?.legend, decals: args.includes('--scatter') });
 
 // ---- the picture ---------------------------------------------------------------------------
 const COLS = layout.cols, ROWS = layout.rows;
@@ -159,7 +159,7 @@ const canvas = new Uint8ClampedArray(COLS * TILE * ROWS * TILE * 4);
 }
 const drawn = new Map();
 for (const t of layout.tiles) {
-  if (!drawn.has(t.clip)) { const o = owner.get(t.clip); drawn.set(t.clip, renderFrame(o.sprite, t.clip, 0, o.p)); }
+  if (!drawn.has(t.clip)) { const o = owner.get(t.clip); drawn.set(t.clip, renderFrame(o.sprite, t.clip, (Number(flag('frame', 0)) || 0) % (o.sprite.clips[t.clip].frames ?? 1), o.p)); }
   const s = drawn.get(t.clip), bytes = s.bytes(), W = COLS * TILE;
   for (let y = 0; y < s.h; y++) for (let x = 0; x < s.w; x++) {
     const i = (y * s.w + x) * 4;
