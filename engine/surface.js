@@ -266,3 +266,150 @@ export class Surface {
     return new Uint8ClampedArray(this.data.buffer, this.data.byteOffset, this.data.length * 4);
   }
 }
+
+/**
+ * Returns a copy of a Surface leaned by a small angle round (px, py), made only by sliding whole rows sideways and whole columns up or down, so every pixel is kept and no edge turns soft: a rocking crate, a wobbling signpost.
+ * Arguments: src (the Surface to copy; it is not changed), px, py (the point that stays put, usually the foot), angle (radians, positive leans the top to the right; keep it under about 0.3).
+ */
+export function tilt(src, px, py, angle) {
+  const out = new Surface(src.w, src.h);
+  out.shadow = src.shadow;
+  const k = Math.tan(angle);
+  for (let y = 0; y < src.h; y++) for (let x = 0; x < src.w; x++) {
+    // undo the column slide (things right of the point sink), then the row slide (things above it move right)
+    const sy = y - Math.round((x + 0.5 - px) * k);
+    const sx = x - Math.round((py - (sy + 0.5)) * k);
+    const c = src.get(sx, sy);
+    if (c) out.data[y * src.w + x] = c;
+  }
+  return out;
+}
+
+/**
+ * Returns a copy of a Surface leaned sideways by sliding whole rows only: each row moves `slope` px for every pixel it stands above row py, so a thin post, pole or stalk sways without breaking up and its foot stays where it is.
+ * Arguments: src (the Surface to copy; it is not changed), py (the row that stays put, usually the ground line), slope (px sideways per px of height, positive to the right; 0.1 moves a point 30 px up by 3 px).
+ */
+export function lean(src, py, slope) {
+  const out = new Surface(src.w, src.h);
+  out.shadow = src.shadow;
+  for (let y = 0; y < src.h; y++) {
+    const dx = Math.round((py - (y + 0.5)) * slope);
+    for (let x = 0; x < src.w; x++) {
+      const c = src.get(x - dx, y);
+      if (c) out.data[y * src.w + x] = c;
+    }
+  }
+  return out;
+}
+
+/**
+ * Returns a copy of one upright strip of a Surface squeezed towards its hinge column by leaving out whole columns and rows, so every pixel stays hard: a door leaf, shutter or lid seen turning away on its hinge.
+ * Arguments: src (the Surface holding the leaf; it is not changed), hinge (the column that stays put), width (how many columns the leaf has from the hinge: positive lies to its right, negative to its left), k (0..1: the share of its width that is still seen; 1 is face on), lift (px the bottom of the free edge rises, default 0), drop (px the top of the free edge falls, default 0).
+ * Only the leaf is copied (what else is on src is left out), never thinner than one column; its top and bottom rows are those of its drawn pixels. Column d of the turned leaf (0 at the hinge) shows the leaf's own column floor((d + 0.5) * width / seen), where seen = round(width * k) is how many columns are left.
+ */
+export function swing(src, hinge, width, k, lift = 0, drop = 0) {
+  const out = new Surface(src.w, src.h);
+  out.shadow = src.shadow;
+  const dir = width < 0 ? -1 : 1, W = Math.max(1, Math.abs(Math.round(width)));
+  const vis = Math.max(1, Math.round(W * Math.min(1, Math.max(0, k))));
+  let top = src.h, bottom = -1;
+  for (let i = 0; i < W; i++) for (let y = 0; y < src.h; y++) if (src.get(hinge + dir * i, y)) { if (y < top) top = y; if (y > bottom) bottom = y; }
+  if (bottom < 0) return out;
+  const H = bottom - top + 1;
+  for (let d = 0; d < vis; d++) {
+    const f = vis > 1 ? d / (vis - 1) : 0, x = hinge + dir * d;
+    const sx = hinge + dir * Math.min(W - 1, Math.floor(((d + 0.5) * W) / vis));
+    const a = top + Math.round(drop * f), b = Math.max(a, bottom - Math.round(lift * f)), h = b - a + 1;
+    if (x < 0 || x >= out.w) continue;
+    for (let y = a; y <= b; y++) {
+      const c = src.get(sx, top + Math.min(H - 1, Math.floor(((y - a + 0.5) * H) / h)));
+      if (c && y >= 0 && y < out.h) out.data[y * out.w + x] = c;
+    }
+  }
+  return out;
+}
+
+/**
+ * Returns a copy of a Surface that keeps only the pixels inside a box, each where it was: one half of a lid that slides apart, one side of a thing that splits in two, a turned layer held inside the frame's border.
+ * Arguments: src (the Surface to copy; it is not changed), x0, y0, x1, y1 (the box: columns x0 <= x < x1 and rows y0 <= y < y1 are kept).
+ */
+export function cropped(src, x0, y0, x1, y1) {
+  const out = new Surface(src.w, src.h);
+  out.shadow = src.shadow;
+  const ax = Math.max(0, Math.floor(x0)), ay = Math.max(0, Math.floor(y0)), bx = Math.min(src.w, Math.floor(x1)), by = Math.min(src.h, Math.floor(y1));
+  for (let y = ay; y < by; y++) for (let x = ax; x < bx; x++) out.data[y * src.w + x] = src.data[y * src.w + x];
+  return out;
+}
+
+/**
+ * Returns a copy of a Surface that keeps only the pixels a shape test allows, each where it was: a door leaf seen through its arched doorway, a picture inside a round frame, a layer held inside any outline.
+ * Arguments: src (the Surface to copy; it is not changed), inside (a shape test (px, py) asked at each pixel's centre, such as ellipseIn or a sprite's own).
+ */
+export function masked(src, inside) {
+  const out = new Surface(src.w, src.h);
+  out.shadow = src.shadow;
+  for (let y = 0; y < src.h; y++) for (let x = 0; x < src.w; x++) {
+    const c = src.data[y * src.w + x];
+    if (c && inside(x + 0.5, y + 0.5)) out.data[y * src.w + x] = c;
+  }
+  return out;
+}
+
+/**
+ * Returns a copy of a Surface without its specks: every group of touching pixels (side by side or one above the other; corners do not count) smaller than `min` pixels is left out, so a layer of smoke, sparks or debris leaves no stray pixels.
+ * Arguments: src (the Surface to copy; it is not changed), min (the fewest pixels a group needs to stay, default 4). Reads pixels back, so it suits the pixel style only.
+ */
+export function despeckle(src, min = 4) {
+  const out = new Surface(src.w, src.h);
+  out.shadow = src.shadow;
+  const { w, h, data } = src, seen = new Uint8Array(w * h);
+  for (let start = 0; start < w * h; start++) {
+    if (seen[start] || !data[start]) continue;
+    const group = [start];
+    seen[start] = 1;
+    for (let k = 0; k < group.length; k++) {
+      const i = group[k], x = i % w;
+      for (const j of [x > 0 ? i - 1 : -1, x < w - 1 ? i + 1 : -1, i - w, i + w]) {
+        if (j < 0 || j >= w * h || seen[j] || !data[j]) continue;
+        seen[j] = 1;
+        group.push(j);
+      }
+    }
+    if (group.length >= min) for (const i of group) out.data[i] = data[i];
+  }
+  return out;
+}
+
+/**
+ * Draws a connected line one pixel wide through a list of points, each joined to the next by a straight 1 px line: a crease, crack, seam, wire or kinked stroke; returns the Surface.
+ * Arguments: g (the Surface), pts ([[x, y], ...]: the points in order; one point draws one pixel, none draws nothing), colour (one flat colour, as g.line takes), options { closed (true also joins the last point back to the first) }.
+ */
+export function polyline(g, pts, colour, { closed = false } = {}) {
+  if (pts.length === 1) g.dot(Math.floor(pts[0][0]), Math.floor(pts[0][1]), colour);
+  for (let i = 1; i < pts.length; i++) g.line(pts[i - 1][0], pts[i - 1][1], pts[i][0], pts[i][1], colour);
+  if (closed && pts.length > 2) g.line(pts[pts.length - 1][0], pts[pts.length - 1][1], pts[0][0], pts[0][1], colour);
+  return g;
+}
+
+/**
+ * The steepest slope lean() can be given before a Surface's picture comes within `margin` px of the left or right side of its frame: how far a sign, post or pole may sway and keep its border.
+ * Arguments: src (the Surface holding the upright picture; it is only measured), py (the row that stays put, as lean takes it), margin (px to keep clear at each side, default 2: the outline and the empty border). Returns px sideways per px of height, 0 or more (0 when nothing is drawn above py).
+ */
+export function leanRoom(src, py, margin = 2) {
+  const b = src.bounds();
+  if (!b || py - b.y0 <= 0) return 0;
+  return Math.max(0, Math.min(b.x0 - margin, src.w - margin - 1 - b.x1)) / (py - b.y0);
+}
+
+/**
+ * Pastes a layer onto a Surface, moved by the least whole number of pixels that keeps its picture `margin` px clear of every side of the frame: a leaned, thrown or shaken layer that must never be clipped. Returns [dx, dy], the shift it used. Reads pixels back, so it suits the pixel style only.
+ * Arguments: g (the Surface to paste onto); src (the layer; it is not changed); margin (px to keep clear on every side, default 2: the outline and the empty border); options { dx, dy (where the layer would go if it fitted, default 0 and 0) }.
+ */
+export function blitInside(g, src, margin = 2, { dx = 0, dy = 0 } = {}) {
+  const b = src.bounds();
+  if (!b) return [0, 0];
+  const keep = (v, lo, hi) => Math.round(v < lo ? lo : v > hi ? hi : v);
+  const sx = keep(dx, margin - b.x0, g.w - 1 - margin - b.x1), sy = keep(dy, margin - b.y0, g.h - 1 - margin - b.y1);
+  g.blit(src, sx, sy);
+  return [sx, sy];
+}

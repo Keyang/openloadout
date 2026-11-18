@@ -1257,3 +1257,115 @@ export function fillBehind(piece, n = 3) {
   const count = Math.max(1, Math.floor(n) || 1);
   return (FILL_BEHIND[name] ?? 0) % count;
 }
+
+// ---- added with batch P04, fix round 1 (castle tiles): stoneSpot, stoneTuft ----
+// Marks on the stones drawCourses returns: where a pit, a chip or a stain may go, and growth lying on a stone.
+//
+//   const stones = drawCourses(s, courses, { joint, lit, shift });
+//   stones.slice(0, 3).forEach((st, i) => { const at = stoneSpot(st, i, seed); if (at) s.rect(at[0], at[1], 2, 1, joint); });   // pits
+//   const beds = stones.filter((st) => st.inner && st.w >= 6);
+//   if (beds.length) stoneTuft(s, beds[0], ramp(p.growth), { big: p.overgrowth > 0.7 });
+
+/**
+ * Picks a place for a small mark (a pit, a chip, a stain) on the face of a stone drawCourses returned, clear of its joints and `margin` px or more from every edge of the tile; returns [x, y], or null when the stone has no room.
+ * Arguments: stone ({ x, y, w, h }: a stone's face as drawCourses returns it; it may go round the edge of the tile, the mark never does); i (which mark or which stone this is: another number, another place; default 0); seed (changes every place at once, default 0); options { margin (px to keep off each edge of the tile, default 3: what a version of a fill must leave alone), w, h (the size of the mark in px, default 2 by 1; [x, y] is its top-left pixel) }.
+ * The mark keeps a pixel of stone on its left, on its right and under it, and two rows over it. The same arguments always give the same place.
+ */
+export function stoneSpot(stone, i = 0, seed = 0, { margin = 3, w = 2, h = 1 } = {}) {
+  const xs = [], ys = [];
+  for (let k = 1; k < stone.w - w; k++) { const x = wrap(stone.x + k); if (x >= margin && x <= TILE - margin - w) xs.push(x); }
+  for (let k = 2; k < stone.h - h; k++) { const y = wrap(stone.y + k); if (y >= margin && y <= TILE - margin - h) ys.push(y); }
+  return xs.length && ys.length ? [xs[Math.floor(hash(i, seed) * xs.length)], ys[Math.floor(hash(i, seed + 5) * ys.length)]] : null;
+}
+
+/**
+ * Draws a tuft of growth (moss, slime, snow) lying on the top of a stone: a row along the top of its face, a shorter row over the joint above it with one lit pixel, and a few pixels hanging down the face; returns the Surface.
+ * Arguments: s (the Surface a pattern is drawn on, as patternFill hands it to its drawing, or any Surface); stone ({ x, y, w }: the top-left pixel and width of the stone's face, as drawCourses returns it; the tuft is not taken round the edge of the tile, so pick a stone that lies inside it with a row free above); tones ({ light, base, dark }: the growth's colours, a ramp from engine/color.js will do; dark is the tone that lies on the stone); options { big (true: 9 px wide in place of 6, and more of it hangs down; default false), seed (moves the tuft along the stone, default 0) }.
+ * The tuft is never wider than the stone less 2 px, so it stays a pixel inside each upright joint.
+ */
+export function stoneTuft(s, stone, tones, { big = false, seed = 0 } = {}) {
+  const w = Math.min(stone.w - 2, big ? 9 : 6), x = stone.x + 1 + Math.round(hash(stone.x + seed * 131, stone.y) * (stone.w - 2 - w));
+  s.rect(x + 1, stone.y - 1, w - 2, 1, tones.base);
+  s.rect(x, stone.y, w, 1, tones.dark);
+  for (let i = 1; i < w - 1; i++) if (hash(x + i, 7) > (big ? 0.35 : 0.55)) s.dot(x + i, stone.y + 1, tones.dark);
+  s.dot(x + 2, stone.y - 1, tones.light);
+  return s;
+}
+
+// ---- added with batch P05, fix round 2 (water and waterfalls): liquidMarks ----
+// What moves inside the body of a liquid, worked out in one place so that every liquid moves the same way and a
+// tileset keeps only the table of its marks. Worked example: sprites/tiles-water.js (water, lava and a swamp).
+//
+//   const MARKS = [['dash', 'light', 6, 13, 7, 0], ['dash', 'dark', 18, 11, 5, 0.7], ['bubble', 'light', 22, 27, 2, 0.1]];
+//   const made = [];                                     // one fill per version for this frame, not one per pixel
+//   const body = (x, y, tt, v) => (made[v] ??= liquidMarks(p.water, MARKS, t, { tones: { light, dark }, stir: 2, glints: [[22, 19, 0.25, 1]], glint: p.foam }))(x, y);
+//   drawLiquid(g, 'fill', { body }, t);
+import { wave as markWave, fract as markFract } from './motion.js';
+import { twinkle as markGlint } from './fx.js';
+
+/**
+ * Makes the body of a liquid for one frame, with marks that move in it (level streaks that slide to and fro, patches that swell and shrink, bubbles that rise and burst) and glints that flash; returns fill(x, y), as a liquid's body or a material's fill takes it.
+ * Arguments: base (the body's colour); marks ([[kind, tone, x, y, size, when], ...], below; none gives the plain body); t (the clip phase: everything repeats once per clip, so t = 1 draws what t = 0 does); options { tones ({ name: colour }: the colours that marks name in `tone`; a tone may also be a '#rrggbb' colour itself), stir (how far the marks move: 1 calm, the default, to 3 choppy), glints ([[x, y, when, size], ...], below), glint (the glints' colour, default white; their heart is white), margin (px every mark keeps from the tile's edges on every frame, default 3: what a version of a fill must leave alone, so any version joins any other), top (the row where bubbles burst, default 5) }.
+ *   kind 'dash'    a level streak `size` px long that starts at column x of row y; it slides `stir` px each way and is a pixel longer or shorter by turns
+ *   kind 'blob'    a flat oval patch about `size` px across with its middle at x, y; it swells and shrinks, further with more stir
+ *   kind 'bubble'  a square `size` px across that rises from row y and is gone once it has passed `top`, until the clip comes round
+ *   when           0 to 1: how far through its own cycle a mark is at t = 0; give marks different values so that they do not move in step
+ *   a glint        flashes once a clip at x, y: one pixel for the eighth of a clip before `when`, then `size` (0 a pixel, 1 a plus, 2 a big plus) for an eighth, a plus for an eighth, a pixel for an eighth, then nothing
+ * A mark put too near an edge is moved in, never cut. The fill is drawn when this is called: call it once per frame and version, not once per pixel.
+ */
+export function liquidMarks(base, marks, t = 0, { tones = {}, stir = 1, glints = [], glint = '#ffffff', margin = 3, top = 5 } = {}) {
+  const u = markFract(t);
+  const lo = clampInt(margin, 0, 12), hi = TILE - lo, burst = Math.max(lo, Math.round(top));       // marks stay in lo .. hi - 1
+  const within = (v, a, b) => Math.min(b, Math.max(a, v));
+  const colourOf = (tone) => {
+    const c = tones[tone] ?? (/^#[0-9a-f]{6}$/i.test(tone) ? tone : null);
+    if (!c) throw new Error(`liquidMarks: "${tone}" is not a tone it was given (${Object.keys(tones).join(', ') || 'none'}) or a colour`);
+    return c;
+  };
+  return patternFill(base, (s) => {
+    for (const [kind, tone, x, y, size, when = 0] of marks ?? []) {
+      const c = colourOf(tone), ph = u + when;
+      if (kind === 'dash') {
+        const len = Math.min(hi - lo, size + Math.round(markWave(ph + 0.25))), x0 = Math.min(hi - len, Math.max(lo, x + Math.round(stir * markWave(ph))));
+        s.rect(x0, within(y, lo, hi - 1), len, 1, c);
+      } else if (kind === 'blob') {
+        const r = size / 2 * (0.6 + 0.15 * stir * (0.5 + 0.5 * markWave(ph))), rx = Math.max(1.4, r * 1.5), ry = Math.max(0.9, r * 0.8);
+        s.ellipse(within(x + 0.5, lo + rx, hi - rx), within(y + 0.5, lo + ry, hi - ry), rx, ry, c, { shade: 0 });
+      } else if (kind === 'bubble') {
+        const from = within(y, burst, hi - size), yy = from - Math.round(markFract(ph) * (from - burst - 1) * 1.1);
+        if (yy >= burst) s.rect(within(x, lo, hi - size), yy, size, size, c);                           // above `top` it has burst
+      } else throw new Error(`liquidMarks: "${kind}" is not a kind of mark (dash, blob, bubble)`);
+    }
+    for (const [x, y, when = 0, big = 1] of glints ?? []) {
+      const life = markFract(u - when), size = life < 0.125 ? big : life < 0.25 ? 1 : life < 0.375 ? 0 : life >= 0.875 ? 0 : -1;
+      const reach = Math.max(1, Math.round(big));                                                        // the furthest its arms get
+      if (size >= 0) markGlint(s, within(x, lo + reach, hi - 1 - reach), within(y, lo + reach, hi - 1 - reach), size, glint);
+    }
+  });
+}
+
+// ---- added with batch R08, fix round 1 (village walls): coursedFace ----
+// The paint of a top-down wall's front face (material.face.paint), worked out in one place so that every wall face is
+// laid the same way and a tileset keeps only its table of joints. Worked example: sprites/tiles-village.js.
+//
+//   const face = (rows) => coursedFace({ rows, course: 7, joints: [[4, 15, 26], [9, 20, 30]], body, top, joint, foot: MOSS, footColour, chips: worn ? CHIPS : [] });
+//   const wall = (rows) => ({ fill: cap, top: capEdge, face: { paint: face(rows), shadow } });
+//   const tall = wall(29), low = wall(21);     // 29 rows of face on bottom, bottom-l, bottom-r and col-b; 21 under the 8 px sliver of cap of strip-l, strip-m, strip-r and single
+
+/**
+ * Makes the paint of a top-down wall's front face: courses of stones or bricks with upright joints, each stone lit along its first row, the lowest course running down to the base line, with optional growth at the foot and chipped mortar; returns paint(x, y) for material.face.
+ * Arguments: options { rows (px of face above its base line: 29 on the bottom pieces of a wall, 21 on the pieces that are a face under a sliver of cap; default 29), course (px per course, its last row being the joint under it; default 7; the rows left over go to the lowest course, which has no joint under it), joints ([[x, ...], ...]: the columns 0..31 of the upright joints of each course from the top down, used in turn; default none), body (the stones' colour), top (the colour of each stone's first row, where the light catches it; left out: body), lit (how many courses from the top are lit that way; default all), joint (the joints' colour), foot (px of growth standing on the base line at each column, a list that repeats along the wall; left out: none), footColour (the growth's colour; left out: joint), footTip (the colour of the top pixel of a clump 2 px high or more; left out: footColour), chips ([[course, column, row], ...]: where the mortar is chipped, each a mark in the joint colour on that row of that course; default none), chip (px each chip is wide, default 2) }.
+ * Faces of different heights end the same way on the base line (the foot's growth is counted up from it), and the pattern repeats every 32 px along the wall when `foot` has 32 entries, so every face piece of a wall joins every other.
+ */
+export function coursedFace({ rows = 29, course = 7, joints = [], body, top = body, lit = Infinity, joint, foot = null, footColour = joint, footTip = footColour, chips = [], chip = 2 } = {}) {
+  const high = Math.max(2, Math.round(course)), n = Math.max(1, Math.floor(rows / high));
+  return (x, y) => {
+    const u = wrap(x), c = Math.min(Math.floor(y / high), n - 1), row = y - c * high;
+    const m = foot && foot.length ? foot[u % foot.length] : 0;
+    if (m > 0 && rows - y <= m) return rows - y === m && m > 1 ? footTip : footColour;
+    if (c < n - 1 && row === high - 1) return joint;
+    if (joints.length && joints[c % joints.length].includes(u)) return joint;
+    if (chips.some(([cc, cx, r]) => cc === c && r === row && u >= cx && u < cx + chip)) return joint;
+    return row === 0 && c < lit ? top : body;
+  };
+}

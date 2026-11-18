@@ -503,3 +503,239 @@ export function rimmed(g, body, x, y, opt = {}) {
   g.blit(s);
   return g;
 }
+
+// ---- sci-fi (tech) pieces: cut corners, a thin lit edge, scan lines (batch S20) ------------
+// The partner of the bevel above for station and space interfaces. THE TECH BEVEL, from the outside in:
+//   1 px INK  ·  the band, 1 to 3 px (`border`): its outer pixel is the LIT EDGE, the light tone of the
+//   frame colour all the way round, the rest is the frame colour, darker along the bottom and left
+//   ·  1 px INK  ·  the face, flat. Corners are cut at 45 degrees (`cut`), each by its own amount.
+// The lit edge is what keeps a tech frame apart from its face: the light tone of any frame colour
+// keeps 3 to 1 against a dark face under every whole-bundle look, where a mid-grey band does not.
+//
+//   const card = techPanel(g, 1, 1, 62, 94, { face: p.face, frame: p.frame, glow: p.glow, border: p.border, cut: p.corner, lip: 2 });
+//   scanLines(g, card.inner.x, card.inner.y, card.inner.w, 20, tone(p.face, 0.4), { pitch: 3, over: p.face });
+//   const o = techBarHousing(g, 1, 1, 62, 14, { frame: p.frame, border: p.border, cut: p.corner, caps: 4, segments: 7, slant: 0.5 });
+//   techBarFill(g, o, 1, { fill: p.fill, segments: 7, slant: 0.5 });      // the same segments and slant as the housing
+
+/** The looks techPanel draws: plate (a bevelled metal band), hologram (lines of light round a tinted face, corner brackets), glass (a pale rim with no line between it and the face, its inner edge lit along the top and right, a glare in the corner). No arguments: a frozen list. */
+export const TECH_STYLES = Object.freeze(['plate', 'hologram', 'glass']);
+
+/** Slider value (Square 0 .. Cut 1) to the size of a cut corner in pixels, 0 to 4. Arguments: corner (0..1, default 0.5). */
+export const cutPx = (corner = 0.5) => Math.round(clamp01(corner) * 4);
+
+// One cut for all four corners, or [top left, top right, bottom right, bottom left].
+const fourCuts = (cut) => (Array.isArray(cut) ? [0, 1, 2, 3].map((i) => Math.max(0, Math.round(cut[i] ?? 0))) : Array(4).fill(Math.max(0, Math.round(cut ?? 0))));
+
+/**
+ * Shape test for a rectangle whose corners are cut off at 45 degrees, as a clean one-pixel staircase (use with g.fill or g.blob): the outline of a sci-fi panel, bar, card or plate.
+ * Arguments: x, y, w, h (the rectangle, whole pixels); cut (pixels taken off along each side of a corner: one number for all four, or [top left, top right, bottom right, bottom left]; default 0).
+ */
+export function cutRectIn(x, y, w, h, cut = 0) {
+  const [tl, tr, br, bl] = fourCuts(cut);
+  return (px, py) => {
+    const ix = Math.floor(px - x), iy = Math.floor(py - y);
+    if (ix < 0 || iy < 0 || ix >= w || iy >= h) return false;
+    const rx = w - 1 - ix, ry = h - 1 - iy;
+    return ix + iy >= tl && rx + iy >= tr && rx + ry >= br && ix + ry >= bl;
+  };
+}
+
+// How deep each pixel of a shape lies: 0 outside, 1 on its edge, 2 one pixel in, and so on up to `max`.
+function depthMap(W, H, inside, max) {
+  const d = new Uint8Array(W * H);
+  for (let py = 0; py < H; py++) for (let px = 0; px < W; px++) if (inside(px + 0.5, py + 0.5)) d[py * W + px] = 1;
+  for (let k = 1; k < max; k++) {
+    const next = [];
+    for (let py = 1; py < H - 1; py++) for (let px = 1; px < W - 1; px++) {
+      const i = py * W + px;
+      if (d[i] === k && d[i - 1] >= k && d[i + 1] >= k && d[i - W] >= k && d[i + W] >= k) next.push(i);
+    }
+    for (const i of next) d[i] = k + 1;
+  }
+  return d;
+}
+
+/**
+ * A stretchable sci-fi panel drawn to fill exactly the rectangle (x, y, w, h), its ink outline and its lip included: cut corners, a thin lit edge all round, a flat face. Returns { body, face, inner, slice, tones }, in the manner of panel9.
+ * Arguments: g (the Surface); x, y, w, h (in a sprite: the frame minus its 1 px empty border); opt { face, frame (colours; required), glow (the colour of its light: a hologram's lines, a lit frame; default the frame colour), style (one of TECH_STYLES, default 'plate'), border (0..1, Thin to Thick) or borderPx (1 to 3), cut (0..1, Square to Cut) or cutPx (pixels: one number or [top left, top right, bottom right, bottom left]), lip (pixels of the slab's side showing under the body, default 0; the body is that much shorter), tab ({ inset, rise }: the top edge stands `rise` px higher between `inset` px from each side, default none), lights ([top left, top right, bottom right, bottom left], true for each corner of the face that carries a small light of the glow colour: a triangle, or a stripe along a cut corner; never inside `inner`), lit (true: the frame and the lights take the bright glow colour, as when pointed at), off (true: no colour, as when disabled), ink }.
+ * In the result `body` is the panel without its lip, `face` the rectangle of the face under the top edge, `inner` the flat one-colour middle (put text here), `slice` how far corners, borders and lights reach in from each side of the rectangle given (7 px, so 8 with a frame's empty border; more beside a corner cut deeper than 6 px or a corner light), and `tones` the colours it used ({ edge, band, face, side, glow, glowLow: the light and its darker partner }), so that what a sprite adds matches the look, lit or greyed.
+ */
+export function techPanel(g, x, y, w, h, opt = {}) {
+  const { face, frame, glow = frame, style = 'plate', ink = INK } = opt;
+  if (!TECH_STYLES.includes(style)) throw new Error(`techPanel: style "${style}" is not one of ${TECH_STYLES.join(', ')}`);
+  if (!face || !frame) throw new Error('techPanel: needs a face and a frame colour');
+  const b = Math.max(1, Math.min(3, opt.borderPx ?? borderPx(opt.border)));
+  const cuts = fourCuts(opt.cutPx ?? cutPx(opt.cut));
+  const lip = Math.max(0, Math.round(opt.lip ?? 0));
+  const rise = opt.tab ? Math.max(0, Math.round(opt.tab.rise ?? 2)) : 0, tabIn = opt.tab ? Math.round(opt.tab.inset ?? 12) : 0;
+  const off = !!opt.off, lit = !!opt.lit && !off;
+  const bh = h - lip, W = g.w, H = g.h;
+  const shape = (dy) => {
+    const main = cutRectIn(x, y + dy + rise, w, bh - rise, cuts);
+    if (!rise) return main;
+    const tab = cutRectIn(x + tabIn, y + dy, w - 2 * tabIn, rise + 1, [rise, rise, 0, 0]);
+    return (px, py) => main(px, py) || tab(px, py);
+  };
+
+  // the colours of this look; a greyed panel loses its colour last, so its tones stay pure grey
+  const F = ramp(frame), G = ramp(glow);
+  let edge = F.light, band = F.base, bandDark = F.dark, faceC = face, side = F.dark;
+  // (a hologram that is switched off has no light in its face)
+  if (style === 'hologram') { edge = G.light; band = G.dark; bandDark = G.dark; faceC = off ? face : mix(face, glow, 0.14); }
+  if (style === 'glass') { band = tone(face, 0.85); bandDark = band; }
+  if (lit) {
+    edge = style === 'hologram' ? mix(G.light, '#ffffff', 0.6) : G.light;
+    band = G.base; bandDark = style === 'plate' ? G.dark : G.base;
+  }
+  let shine = tone(faceC, 0.45), dim = tone(faceC, -0.5), light = lit ? G.light : G.base, lightLow = lit ? G.base : G.dark;
+  if (off) [edge, band, bandDark, faceC, side, shine, dim, light, lightLow] = [edge, band, bandDark, faceC, side, shine, dim, light, lightLow].map(desaturate);
+
+  // the lip: the slab's side, showing under the body and in its cut bottom corners
+  if (lip) {
+    const d = depthMap(W, H, shape(lip), 2);
+    for (let i = 0; i < d.length; i++) if (d[i]) g.dot(i % W, (i - (i % W)) / W, d[i] === 1 ? ink : side);
+  }
+  const d = depthMap(W, H, shape(0), 4 + b);
+  const at = (px, py) => (px < 0 || py < 0 || px >= W || py >= H ? 0 : d[py * W + px]);
+  // a hologram keeps its band only round the corners, as brackets
+  const reach = SLICE - 1;
+  const bracket = (px, py) => Math.min(px - x, x + w - 1 - px) < reach && Math.min(py - y - rise, y + bh - 1 - py) < reach;
+  for (let py = 0; py < H; py++) for (let px = 0; px < W; px++) {
+    const k = d[py * W + px];
+    if (!k) continue;
+    let c;
+    if (k === 1) c = ink;
+    // a pane of glass has no line between its rim and its face: the rim's inner edge catches the light instead (dark along the bottom and the left)
+    else if (k === 2 + b) c = style !== 'glass' ? ink : at(px - 1, py + 1) < 2 + b ? dim : shine;
+    else if (k === 2) c = edge;
+    else if (k <= 1 + b) c = style === 'hologram' && !bracket(px, py) ? ink : style === 'plate' && at(px - 1, py + 1) <= 2 ? bandDark : band;
+    else c = faceC;
+    g.dot(px, py, c);
+  }
+  // the body's own bottom line joins the lip, so the lip is `lip` px of colour
+  if (lip) { const row = y + bh - 1, sideC = g.get(x + (w >> 1), row + 1); for (let px = x + 1; px < x + w - 1; px++) if (g.get(px, row) && g.get(px, row + 1) === sideC) g.dot(px, row, side); }
+
+  const fx = x + 2 + b, fy = y + rise + 2 + b, fw = w - 2 * (2 + b), fh = bh - rise - 2 * (2 + b);
+  let topIn = Math.max(SLICE - 1, 2 + b, Math.ceil((Math.max(...cuts) + 2 + b) / 2));
+  const m = topIn;
+  if (style === 'glass') {
+    // the glare: two short streaks leaning with the light, near the top right corner of the face
+    for (const [sx, n] of [[fx + fw - 4, 4], [fx + fw - 8, 2]]) for (let i = 0; i < n; i++) if (at(sx - i, fy + 3 + i) > 3 + b) g.dot(sx - i, fy + 3 + i, shine);
+    topIn = Math.max(m, 2 + b + 7);
+  }
+  // how far what is not flat reaches in from each side of the body (left, top, right, bottom): a cut corner, then a light, may reach further than the bevel
+  const need = [m, m, m, m];
+  cuts.forEach((c, i) => { need[i === 0 || i === 3 ? 0 : 2] = Math.max(need[i === 0 || i === 3 ? 0 : 2], c + 1); need[i < 2 ? 1 : 3] = Math.max(need[i < 2 ? 1 : 3], c + 1); });
+  // corner lights: the corner of the face in the glow colour, kept out of the flat middle
+  (opt.lights ?? []).forEach((on, i) => {
+    if (!on) return;
+    const reach = Math.min(Math.max(5, cuts[i] - (2 + b) + 2), 2 * (m - 2 - b)), right = i === 1 || i === 2, low = i >= 2;
+    for (let j = 0; j < reach; j++) for (let k = 0; k < reach - j; k++) {
+      const px = right ? fx + fw - 1 - k : fx + k, py = low ? fy + fh - 1 - j : fy + j;
+      if (at(px, py) < 3 + b) continue;
+      g.dot(px, py, light);
+      need[right ? 2 : 0] = Math.max(need[right ? 2 : 0], 3 + b + k);
+      need[low ? 3 : 1] = Math.max(need[low ? 3 : 1], 3 + b + j);
+    }
+  });
+  return {
+    body: { x, y, w, h: bh },
+    face: { x: fx, y: fy, w: fw, h: fh },
+    inner: { x: x + m, y: y + rise + topIn, w: w - 2 * m, h: bh - rise - topIn - m },
+    slice: { left: need[0], top: rise + Math.max(topIn, need[1]), right: need[2], bottom: need[3] + lip },
+    tones: { edge, band, face: faceC, side, glow: light, glowLow: lightLow },
+  };
+}
+
+/**
+ * Thin horizontal lines every few rows inside a rectangle: scan lines on a screen, vents on a panel, ruled lines on a card.
+ * Arguments: g (the Surface); x, y, w, h (the rectangle); colour; options { pitch (rows from one line to the next, default 3), phase (the row of the first line inside the rectangle, default 0), over (a colour: paint only pixels that have exactly this colour, so the lines never cross a frame or a mark), skip (a rectangle { x, y, w, h } left clear) }.
+ */
+export function scanLines(g, x, y, w, h, colour, { pitch = 3, phase = 0, over, skip } = {}) {
+  const only = over === undefined ? null : g.get.bind(g), want = over === undefined ? 0 : new Surface(1, 1).dot(0, 0, over).get(0, 0);
+  for (let py = y + phase; py < y + h; py += Math.max(1, pitch)) for (let px = x; px < x + w; px++) {
+    if (skip && px >= skip.x && px < skip.x + skip.w && py >= skip.y && py < skip.y + skip.h) continue;
+    if (only && only(px, py) !== want) continue;
+    g.dot(px, py, colour);
+  }
+  return g;
+}
+
+// Is column i of row j of a bar's opening a line between two compartments? `slant` leans the lines
+// (pixels sideways per row; 0.5 is one pixel every two rows), right at the top, about the upright line's place.
+function techGap(w, h, segments, slant) {
+  if (!(segments > 1)) return () => false;
+  const cols = gapColumns(w, segments);
+  const lean = (j) => (slant ? Math.floor((h - 1 - j) * slant) - Math.floor(Math.floor((h - 1) * slant) / 2) : 0);
+  const out = (i, j) => cols.has(i - lean(j));
+  out.cols = cols; out.lean = lean;
+  return out;
+}
+
+/**
+ * The empty housing of a sci-fi bar (a 64x16 frame: 1, 1, 62, 14): cut corners and the lit edge of the tech bevel round a dark trough, with upright or leaning compartments and tick marks if asked. Returns the opening { x, y, w, h }, which is barOpening() of the same options.
+ * Arguments: g (the Surface); x, y, w, h; opt { frame (colour; required), border or borderPx, caps (as barOpening), cut (0..1) or cutPx (pixels: one number or four, as cutRectIn; kept clear of the trough), back (the trough colour; default a dark tone made from the frame colour), segments (this many compartments), slant (how far their dividing lines lean, pixels sideways per row: 0 upright, 0.5 one pixel every two rows), ticks (pixels from one tick mark to the next along the band above and below the trough; with compartments the ticks continue their lines instead; default none), ink }. Pass the same segments and slant to techBarFill.
+ */
+export function techBarHousing(g, x, y, w, h, opt = {}) {
+  if (!opt.frame) throw new Error('techBarHousing: needs a frame colour');
+  const ink = opt.ink ?? INK, F = ramp(opt.frame);
+  const b = Math.max(1, Math.min(3, opt.borderPx ?? borderPx(opt.border))), caps = Math.max(0, opt.caps ?? 0);
+  const cuts = fourCuts(opt.cutPx ?? cutPx(opt.cut)).map((c) => Math.min(c, 2 + 2 * b + caps));
+  const back = opt.back ?? mix(ink, opt.frame, 0.2);
+  const o = barOpening(x, y, w, h, opt);
+  const W = g.w, H = g.h, d = depthMap(W, H, cutRectIn(x, y, w, h, cuts), 3);
+  for (let py = 0; py < H; py++) for (let px = 0; px < W; px++) {
+    const k = d[py * W + px];
+    if (k) g.dot(px, py, k === 1 ? ink : k === 2 ? F.light : px > 0 && py < H - 1 && d[(py + 1) * W + px - 1] <= 2 ? F.dark : F.base);
+  }
+  g.rect(o.x - 1, o.y - 1, o.w + 2, o.h + 2, ink);
+  const keep = g.shadow;
+  g.shadow = [1, -1];
+  g.rect(o.x, o.y, o.w, o.h, { base: back, dark: tone(back, -1), light: back }, { shade: 1 });
+  g.shadow = keep;
+  const gap = techGap(o.w, o.h, opt.segments, opt.slant ?? 0);
+  if (gap.cols) for (let j = 0; j < o.h; j++) for (const c of gap.cols) g.dot(o.x + c + gap.lean(j), o.y + j, ink);
+  if (opt.ticks > 0) {
+    const cols = gap.cols ? [...gap.cols] : [];
+    if (!gap.cols) {
+      // as many ticks as fit, one pitch apart, with what is left over shared between the two ends
+      const n = Math.max(1, Math.floor((o.w - 2) / opt.ticks)), first = Math.floor((o.w - 1 - (n - 1) * opt.ticks) / 2);
+      for (let k = 0; k < n; k++) cols.push(first + k * opt.ticks);
+    }
+    const lean = gap.lean ?? (() => 0);
+    for (const c of cols) {
+      for (let py = y + 1; py < o.y - 1; py++) g.dot(o.x + c + lean(0), py, ink);
+      for (let py = o.y + o.h + 1; py < y + h - 1; py++) g.dot(o.x + c + lean(o.h - 1), py, ink);
+    }
+  }
+  return o;
+}
+
+/**
+ * The fill strip of a sci-fi bar, cropped to `value` (0 empty .. 1 full), inside `opening` (from techBarHousing or barOpening): light along its top, dark along its bottom, with the same upright or leaning gaps as the housing's compartments. It never draws outside the opening; a `fill` clip passes 1 and lets the game crop the strip.
+ * Arguments: g (the Surface); opening ({ x, y, w, h }); value (0..1); opt { fill (colour; required), segments, slant (as techBarHousing), flash (0..1: how far the strip has turned white) }.
+ */
+export function techBarFill(g, opening, value, opt = {}) {
+  if (!opt.fill) throw new Error('techBarFill: needs a fill colour');
+  const o = opening, n = Math.round(o.w * clamp01(value));
+  if (n <= 0 || o.h <= 0) return g;
+  const flash = clamp01(opt.flash ?? 0), r = ramp(opt.fill);
+  const lit = (c) => (flash ? mix(c, '#ffffff', flash) : c);
+  const gap = techGap(o.w, o.h, opt.segments, opt.slant ?? 0);
+  for (let i = 0; i < n; i++) for (let j = 0; j < o.h; j++) {
+    if (gap(i, j)) continue;
+    g.dot(o.x + i, o.y + j, lit(j === 0 ? r.light : o.h >= 3 && j === o.h - 1 ? r.dark : r.base));
+  }
+  return g;
+}
+
+/**
+ * Finishes a small mark drawn on a layer of its own (a HUD pip, a map square, a status glyph): an ink line round it, an optional ink drop shadow down and to the left, then the mark itself on top.
+ * Arguments: g (the Surface to draw on); layer (a Surface of the same size holding the mark, with no outline yet; it is outlined in place); options { heavy (true: the ink line also fills the corners, for a bolder mark), shadow (pixels the shadow falls down and to the left, default 0), ink }.
+ */
+export function stampGlyph(g, layer, { heavy = false, shadow = 0, ink = INK } = {}) {
+  layer.outline(ink, { corners: heavy });
+  if (shadow > 0) for (let py = 0; py < layer.h; py++) for (let px = 0; px < layer.w; px++) if (layer.data[py * layer.w + px]) g.dot(px - shadow, py + shadow, ink);
+  g.blit(layer);
+  return g;
+}

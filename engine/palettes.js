@@ -234,3 +234,15 @@ export function swatches(bundle, material, { lead } = {}) {
   }
   return out;
 }
+
+/** Returns a swatch list like swatches(), merged from several materials and kept to a brightness band, so two materials that touch (plaster and beams) can be given lists that never share a colour or a value. Arguments: bundle: palette key or alias; materials: one word or a list of words that swatches() accepts; options { lead, min, max }: lead: a colour name or hex to put first; min, max: the lowest and highest brightness (0 to 1) a swatch may have. */
+export function swatchesBetween(bundle, materials, { lead, min = MIN_BRIGHTNESS, max = 1 } = {}) {
+  const words = Array.isArray(materials) ? materials : [materials];
+  const all = [];
+  words.forEach((word, i) => { for (const c of swatches(bundle, word, i === 0 && lead !== undefined ? { lead } : {})) if (!all.includes(c)) all.push(c); });
+  const fits = (c) => brightness(c) >= min && brightness(c) <= max;
+  if (lead !== undefined && !fits(all[0])) throw new Error(`palettes: lead ${lead} (brightness ${brightness(all[0]).toFixed(2)}) is outside ${min} to ${max}`);
+  const out = all.filter(fits).slice(0, 8);
+  if (out.length < 3) throw new Error(`palettes: fewer than 3 swatches of ${words.join(' + ')} lie between brightness ${min} and ${max} (${out.length}); widen the band or add a material`);
+  return out;
+}
