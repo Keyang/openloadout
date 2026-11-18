@@ -615,8 +615,8 @@ Exactly 20. New sounds follow `../../skills/sprite-forge/SOUND.md` (the skill is
 - **Meta:** type `sfx`, role `actions/shoot`. Batch **S01**.
 - **Length:** 0.5 to 0.8 s.
 - **What makes the sound, and how it moves:** A small rocket leaving. An ignition pop, then a rush of noise through a band-pass that climbs from 300 Hz to 2.5 kHz as it flies away, over a low burning tone (a saw at 80 Hz roughened by noise). Fades as it rises.
-- **Controls (5):** `length`, `pitch`, `burn` (slider: the low burning tone), `snap` (the ignition pop), `bright`.
-- **Styles:** "Micro rocket", "Missile volley", "Flare". "Missile volley" is four quick launches in a row.
+- **Controls (6):** `length`, `pitch`, `burn` (slider: the low burning tone), `snap` (the ignition pop), `bright`, `volley` (slider "Rockets": 1 to 4 launches in a row).
+- **Styles:** "Micro rocket", "Missile volley", "Flare". "Missile volley" is four quick launches in a row (`volley` at 4).
 - **Pairs with:** `micro-rocket` fired; `warden-mech` `shoot` frame 4.
 
 #### `bolt-impact` · Bolt impact
@@ -670,7 +670,7 @@ Exactly 20. New sounds follow `../../skills/sprite-forge/SOUND.md` (the skill is
 - **Length:** 0.03 to 0.08 s.
 - **What makes the sound, and how it moves:** A clean interface blip. A short sine with a little FM on its first few milliseconds and a tiny high tick. Identical every time.
 - **Controls (5):** `pitch`, `length`, `bright`, `snap`, `drop`.
-- **Styles:** "Select", "Hover", "Confirm". "Confirm" is two quick rising blips.
+- **Styles:** "Select", "Hover", "Confirm". "Confirm" is one longer blip that rises (a negative `drop`); a game that wants two blips plays it twice.
 - **Pairs with:** `ui-upgrade-card`; `wall-terminal`; `vendor-bot` `talk`; `spawn-warp` `warn`.
 
 #### `bug-splat` · Bug splat
@@ -705,8 +705,8 @@ Exactly 20. New sounds follow `../../skills/sprite-forge/SOUND.md` (the skill is
 - **Meta:** type `sfx`, role `items/pickup`. Batch **S02**.
 - **Length:** 0.15 to 0.30 s.
 - **What makes the sound, and how it moves:** The coin sound of this kit. Two quick FM blips, the second higher, with a crushed sparkle on the second. Digital where the fantasy coin is a bell. Identical every time.
-- **Controls (5):** `pitch`, `spread` (slider "Interval"), `speed`, `ring`, `grit`. Brightness: `grit` (this sound has no `bright`).
-- **Styles:** "Credit chip", "Keycard", "Big payout". "Big payout" is a run of five rising blips.
+- **Controls (5):** `pitch`, `spread` (slider "Interval": with a very wide interval the two blips become a run of five rising ones), `speed`, `ring`, `grit`. Brightness: `grit` (this sound has no `bright`).
+- **Styles:** "Credit chip", "Keycard", "Big payout". "Big payout" is the run of five rising blips at the wide end of `spread`.
 - **Pairs with:** `credit-chip` and `keycard` `collect`; `tech-chest` `open` frame 5; `vendor-bot` `sell`.
 
 #### `xp-blip` · XP blip
@@ -723,8 +723,8 @@ Exactly 20. New sounds follow `../../skills/sprite-forge/SOUND.md` (the skill is
 - **Meta:** type `sfx`, role `items/equip`. Batch **S02**.
 - **Length:** 0.7 to 1.1 s.
 - **What makes the sound, and how it moves:** Power gained. Four rising synth notes, a saw swell rising under them through an opening filter, and a bright held chord at the end. The big reward sound of the kit.
-- **Controls (5):** `pitch`, `speed`, `rise`, `bright`, `space`.
-- **Styles:** "Upgrade", "Health cell", "Shield cell". The two "cell" styles are short (0.3 s): two notes, soft for health, glassy for shield.
+- **Controls (5):** `pitch`, `speed` (a fast speed shrinks the four notes to a two-note cell pickup), `rise`, `bright`, `space`.
+- **Styles:** "Upgrade", "Health cell", "Shield cell". The two "cell" styles are the short two-note end of `speed`: dull and dry for health, bright for shield.
 - **Pairs with:** `upgrade-pedestal` `activate`; a card chosen; `health-cell` and `shield-cell` `collect`.
 
 #### `door-hiss` · Blast door
@@ -741,8 +741,8 @@ Exactly 20. New sounds follow `../../skills/sprite-forge/SOUND.md` (the skill is
 - **Meta:** type `sfx`, role `world/machine`. Batch **S02**.
 - **Length:** 0.9 to 1.4 s.
 - **What makes the sound, and how it moves:** Teleporting away. A stack of sines gliding up two octaves with a slow chorus, noise swelling under them, cut off suddenly with a sub thump. The pitch only rises; the end is abrupt on purpose (the checker will flag the cut-off: keep a 60 ms fade so it passes).
-- **Controls (5):** `length`, `pitch`, `rise`, `shimmer`, `thump`. Brightness: `shimmer` (this sound has no `bright`).
-- **Styles:** "Warp out", "Spawn in", "Teleport blink". "Spawn in" runs the other way: it starts with the thump and glides down.
+- **Controls (5):** `length`, `pitch`, `rise` (-24 to 24 semitones: a negative rise runs the sound the other way), `shimmer`, `thump`. Brightness: `shimmer` (this sound has no `bright`).
+- **Styles:** "Warp out", "Spawn in", "Teleport blink". "Spawn in" runs the other way through a negative `rise`: it starts with the thump and glides down.
 - **Pairs with:** `warp-pad` `activate` frame 2; `spawn-warp` `burst`.
 
 ## Music

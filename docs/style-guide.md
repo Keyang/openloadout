@@ -254,7 +254,15 @@ Frames per second are at `speed` 0.5. **Every animated clip's `fps` is `(p) => b
 | `dodge` | 8 | 14 | no | 1 crouch, 2 to 5 tucked roll or streak, 6 rise, 7 idle | dash on 1 |
 | Boss moves (`slam`, `roar`, `breath`, ...) | 10 or 12 | 10 to 12 | no | At least three frames of wind-up that a player can read as a warning; the hit lands about 60% through; ends on idle | on the wind-up and on the hit |
 
-Every enemy has at least `idle`, one way of moving (`walk`, `hop` or `fly`), `attack` (or `shoot` or `cast`), `hurt` and `die`. Every player character has at least `idle`, `walk`, `attack` (or `shoot` or `cast`), `hurt` and `die`; side-view players also `run` and `jump`. Clips start from and end on the idle pose, except `hurt` (starts on the recoil) and `die` (ends on the remains).
+Every enemy has at least `idle`, one way of moving (`walk`, `hop` or `fly`), `attack` (or `shoot` or `cast`), `hurt` and `die`. Every player character has at least `idle`, `walk`, `attack` (or `shoot` or `cast`), `hurt` and `die`; side-view players also `run` and `jump`. Clips start from and end on the idle pose, except `hurt` (starts on the recoil), `die` (ends on the remains) and `shoot` (starts with the arm already half raised; it still ends on idle).
+
+**Settled by the review of the side-view poses** (the rigs draw these; see the rig's header and its worked example, `sprites/knight.js`):
+
+- **A fallen body lies face up:** in the last frames of `die` the head, and any headgear on it, is turned to face up, not pressed into the ground.
+- **In `victory` no arm crosses the face.** The raised weapon or fist goes up beside or behind the head.
+- **`shoot` frame 0 shows the arm half raised** (this overrides "clips start on idle" for `shoot` only), and **a bow has a draw frame before the release**.
+- **`block` holds the weapon upright** in front of the body.
+- **Frame rates:** the speed formula rounds, so a clip written as "fps 10" plays at 11 at the default `speed` (10 x 1.05 = 10.5, rounded). That is accepted; do not correct for it.
 
 ### Everything else
 
@@ -360,6 +368,16 @@ Rules:
 7. The held item is drawn **behind** the body in `_up` clips and **in front** in `_down` and `_side`; the off-hand item swaps sides. The top-down rig does this for you.
 8. Diagonals are not drawn.
 
+**Settled by the review of the top-down rig** (the rig does these for a character built on it; a creature drawn without the rig must do them itself; see the rig's header and its worked example, `sprites/hero-walker.js`):
+
+- **Legs show below a cape in `_up` clips**, by at least 4 px: the back view is never a legless bell.
+- **The held item stays visible in every `_up` clip:** the hand comes out to the side, so the weapon is not hidden behind the body.
+- **A bald or hooded `_up` shows no face.** The back of a head is hair, hood or skin, never eyes.
+- **Walk cycles have a clear contact, pass and lift**, and the arms swing opposite the legs by at least 2 px.
+- **An attack's follow-through never crosses the legs**, and the arm recovers the short way round.
+- **A `dodge` shows travel:** the body visibly moves across the frame and back, it does not spin on the spot.
+- **Sockets are mirrored with the frame.** Socket angles are frame angles (Contract 3): 0 is down, PI/2 is picture-right, PI is up. In side-view clips and in `_side` clips picture-right is the facing direction. When a game mirrors a frame to face left it mirrors the sockets too: `x' = 2 * pivotX - x`, `angle' = -angle`.
+
 ---
 
 ## 6. Tilesets
@@ -393,9 +411,12 @@ Rules for a block:
 - **The block's outline runs along the tile boundary**, pulled in by at most 3 px for bumps, ragged edges and rounded corners. **Whatever is outside the outline is see-through**, so an edge tile sits over sky, or over any ground in a top-down game. A hole's edge tiles are the exception: they draw the bank or inner wall right up to the tile boundary.
 - **The edge band is at the same place on every tile of a block**, so edges continue from tile to tile: the top edge (grass cap, trim course, lit rim) occupies rows 0 to `edge` of `-top`, `-left` and `-right`; the side edge occupies the outer `edge` columns of the side and corner tiles. `edge` is a control (3 to 9 px).
 - **Never name a tile `-top`, `-left`, `-right` or `-fill` unless it is that tile of a block.** The checker will test it against the block and fail it. A column's capital is `pillar-cap`, not `pillar-top`.
-- **One fill per block.** Variety comes from decal clips (`<p>-deco-a`, `-b`, ...: see-through pictures placed over a fill tile), never from a second fill that would have to join the first.
+- **One fill name per block, and no grid showing.** The block has one `<p>-fill` that every edge piece joins. **Over an area of 10x6 tiles no 32 px grid may show:** either the fill has at least two variants that join each other and every edge piece, or `on` decals are scattered over it; in both cases which one a cell gets is **chosen by the cell's position**, so the same map always looks the same (the helper's header says how variants are named and picked). Fill texture uses the ramp's `dark` tone and must stay visible but calm **for every swatch** of the material's colour control.
 - **Calm texture.** At most six small marks per fill tile, none on the outer 2 px, nothing brighter than `light` or darker than `dark`. A screen of fill must not show a blotch repeating every 32 px.
-- A block is at least two tiles wide and two high when used. One-tile-wide strips are covered only by the `thin` pieces below.
+- **Every one of the 16 edge combinations resolves to a piece** (above, below, left and right each being the block or not): the 13 pieces cover a mass two tiles wide and high or more, and the helper also resolves **one-tile-wide columns, one-tile-high strips and single tiles**, so a level never has a cell without a piece. A one-tile-high strip that is stood on from above is still better drawn with the `thin` pieces.
+- **Slope edges are as deep as flat-top edges where they meet**, so the grass cap or trim course runs on without a step.
+- **Top-down walls may be one tile thick only if the tileset draws the pieces for it** (the helper says which pieces those are). A top-down tileset's sample room, rendered with the tile map tool, **must include a doorway**.
+- **Joins are tested exactly:** the checker requires the outline and the edge band of neighbouring pieces to line up to the pixel, at every value of every choice control, not only at the default.
 - Animated blocks (water, void): all 13 clips have 8 frames.
 
 ### What a tileset must contain
@@ -424,7 +445,7 @@ A tileset holds one or two blocks and at most 32 clips.
 
 ### How a level is built from these names
 
-This is what the playground does (`app/play/level.js`) and what a game is expected to do. A tileset that follows it can be dropped into a level with no set-up; a tile with any other name is never placed automatically.
+**One picker and one classifier in `engine/tiles.js` decide which piece goes in a cell and which prefixes are ground, wall, hole, platform and decal, and the checker, the preview tool (`tools/tilemap.mjs`) and the playground all use them.** There is no second copy of these rules; the tables below describe them, and the helper's header is the exact statement. A tileset that follows them can be dropped into a level with no set-up; a tile with any other name is never placed automatically.
 
 **The exact piece names** (the same list as `BLOCK_PIECES` in `engine/tiles.js`; `<p>` is the block's prefix):
 
@@ -441,7 +462,7 @@ This is what the playground does (`app/play/level.js`) and what a game is expect
 | `<p>-slope-up`, `<p>-slope-down` | a 45 degree slope rising or falling to the right |
 | `<p>-deco-a`, `-deco-b`, ... | decals, scattered over fill tiles of the same prefix (the tile helper's `place` says `on` a fill tile, `above` a top tile or `below` a bottom tile) |
 
-"Nothing above" is checked first, then "nothing below", then the sides, then the diagonals. A piece that a tileset does not have is replaced by the nearest one (a corner by its edge, an edge by the fill), so a block with all 13 is never patched.
+The four neighbours decide the piece (16 combinations, each of which resolves to one piece: see the rules of a block above); the diagonals only decide between `-fill` and an inner corner.
 
 **Which block is used for what**, read from the prefix:
 
@@ -564,7 +585,9 @@ Parts are Contract 3: what a sprite holds or wears, each with settings of its ow
 Rules:
 
 - Size and length settings are multipliers with default 1 (`range('Length', 1, { min: 0.65, max: 1.35, step: 0.05 })`), as on `knight`. Labels inside a part are short ("Length", "Size"), because the site shows the part's name above them.
-- Each part is drawn by its own function from an attach point, a direction and its settings, and is attached to a joint every frame.
+- **On a character built on a body rig, the parts are the rig's.** Capes, helmets, crowns, hoods, robes, belts and trim are drawn by `rigs/topdown.js` and `rigs/humanoid.js`, not in the sprite file, so every character wears them the same way and in the right depth order for each direction. The same goes for held things: the kinds the rigs provide include weapons, a staff, a bow, a gun, a lantern and a cane. **Ask the rig for its list** (see the rig's header and its worked example); if the kind or the option you need is missing, add it to the rig (Contract 11, section 14), not to your sprite.
+- **Every option of every part is checked in every direction** the sprite is drawn in (`_down`, `_up`, `_side`): attached, in front of or behind the body as it should be, and still visible.
+- A part of a sprite that is not on a rig (a creature's horns, a prop's lock) is drawn by its own function from an attach point, a direction and its settings, and is attached to a joint every frame.
 - A part set to `none` leaves nothing behind: no empty hand held out, no gap in the outline, **and no frame left empty** (section 4).
 - **A part's sound goes with the part, and that takes a `when` on the cue.** Taking a part off hides its settings by itself (the part's `none` does that), but it does nothing to the sprite's sounds: a blade's slash would still play over a bare fist. Every cue that belongs to a part, or to one option of it, carries `when` (section 11), and the specification writes it out.
 - A part gets its own colour setting (`<part>Colour`) only when no sprite colour already covers it. `metal` covers weapons, shields and helmets; `trim` covers capes and scarves. **A sprite colour that only shows on parts is not in effect when all of those parts are off, and must say so with `when`** (section 10): `metal` on a character whose only metal is a weapon and a helmet is the standard case, and `sprites/knight.js` shows it.
@@ -724,6 +747,7 @@ A sound shared by two bundles gets one style per bundle.
 
   The other one to three controls are the sound's own character. The specification's control list is exact: build those ids, no more and no fewer.
 - No volume control: renders are normalised and the game sets volume.
+- **A style can only set the controls the sound declares.** A style that needs a different number of notes, an extra layer or the sound run backwards is only possible if a control does that, so the row lists that control (`notes`, a `volley` count, a `rise` that goes negative, an interval that at its far end changes the tune). A specification never describes a style that its listed controls cannot reach.
 - **2 or 3 styles** (`presets`), named in Title case for a use, not a setting ("Heavy landing", not "Low and long"). The specification fixes the names, because sprites refer to them. Do not rename them.
 - **Sounds that repeat vary.** Footsteps, hits, shots, splats and breaks use `rnd()`, `noise` or `dust` so two takes differ by more than 0.2 dB. Interface sounds, pickups and jingles are identical every time.
 - **Phone speakers.** At least 40% of the energy above 300 Hz. A heavy sound still needs a mid-range crack so it survives small speakers.
@@ -779,14 +803,14 @@ Every track is a patch with `"category": "music"`, built like `sounds/battle-the
 
 | id | Label | Range | Notes |
 |---|---|---|---|
-| `intensity` | Intensity | 0 to 1 | Brings the layers in, in the order the specification gives. At 0 the track is still music (never silence); at 1 everything plays |
+| `intensity` | Intensity | 0 to 1, default 0.85 | Brings the layers in, in the order the specification gives. At 0 the track is still music (never silence); at 1 everything plays |
 | `bpm` | Tempo | the track's range | The written tempo is the default; the checker detects it |
 | `key` | Key | -5 to 6 semitones | |
 | `bars` | Length | 8, 16, 24, 32 (`"step": 8`) | **Every track offers these four lengths.** A longer version builds up section by section (8 bars each) and its last section is the full band; it is never the short version repeated |
 | `inst` | Melody instrument | `"options"`, 5 names | **Every track offers these five, in this order: "Synth lead", "Flute", "Chiptune", "Bell", "Plucked string".** The specification gives the default. All five are level-matched by measurement |
-| `bright` | Brightness | 0 to 1 | |
-| `space` | Room | 0 to 0.5 | |
-| one or two more | | | The track's own (melody level `lead`, `grit`, `swing`) |
+| `bright` | Brightness | 0 to 1, default 0.6 | |
+| `space` | Room | 0 to 0.5, default 0.08 (the specification may ask for more room) | |
+| one or two more | | | The track's own: melody level `lead` (0 to 1, default 0.8), `swing` (label "Bounce" or as the specification says, default 0.35), `grit`. The defaults in this table are those of `tools/compose/thornwood_overworld.mjs`; a track keeps them unless its specification gives others |
 
 At most 10 controls. Stereo, looping, `"wrap": true`. Three styles per track, named for game moments.
 
@@ -799,7 +823,15 @@ At most 10 controls. Stereo, looping, `"wrap": true`. Three styles per track, na
 | Roguelite | `derelict-run` (new) | music/exploration | 112 to 140, 126 | E minor | Dark, driving synthwave; tension that builds with the floor number |
 | Roguelite | `derelict-boss` (new) | music/boss | 150 to 180, 164 | C minor | Relentless, distorted, alarm-like |
 
-Rules for every new track: one 16th-note clock drives everything; the chords the specification writes are the chords the checker must find in each bar; kick, bass and snare are the same in both channels; the melody is worth humming (a phrase of 2 or 4 bars that returns, mostly steps, one leap); no two tracks in the library share a melody or a chord order.
+Rules for every new track: one 16th-note clock drives everything; the chords the specification writes are the chords the checker must find in each bar; kick, bass and snare are the same in both channels; the melody is worth humming (a phrase of 2 or 4 bars that returns; mostly steps and one leap is the default, not a ban: **a hook that runs up or down a chord is allowed when the specification asks for one**); no two tracks in the library share a melody or a chord order.
+
+Also settled by the review of the music kit:
+
+- **The melody's range is at most two octaves**, and inside the playable range of each of the five instruments (see the kit's header).
+- **The melody stays audible under every look.** A whole-bundle look may set `intensity` as low as 0.5 and raise the tempo by 5%; choose the track's intensity steps so the tune is still playing at 0.5, and check the top tempo plus 5%.
+- **The kit is `tools/compose/kit.mjs`, and `tools/compose/thornwood_overworld.mjs` is the template**: copy it for a new track.
+- **Until the checker's chord check lands, the composer runs `tools/compose/verify_music.mjs`** on the track and puts its result in the report.
+- **Experiments write to a scratch file, never into `sounds/`**: the build picks up every file in that folder.
 
 ---
 
@@ -848,13 +880,13 @@ The helpers are the framework (Contract 11). When an asset needs generic code a 
 | Helper | File | What it must do | Needed by |
 |---|---|---|---|
 | `palettes` | `engine/palettes.js` | Export the three palettes of section 3 as `PALETTE.thornwood.<name>`, `PALETTE.hearthvale.<name>` and `PALETTE.derelict.<name>` (the bundle ids and `platformer`, `rpg`, `roguelite`, `scifi` are aliases), exactly as the tables of section 3 write them (a unit test reads the tables); `swatches(palette, material, { lead })` returning the swatch list for a colour control (palette colours first) and `materials(palette)` listing the material words it accepts (section 3) | every sprite batch |
-| `tile-helper` | `engine/tiles.js` | `TILE = 32`. `blockClips(prefix, { frames })` returns the 13 clip entries; `drawBlock(g, piece, material, t)` draws any piece of a block from one material description (a fill pattern that repeats every 32 px, an edge with a profile that repeats along its length, the ink line on exposed edges, the front face for top-down walls); `tileNoise(x, y, seed)` repeating every 32 px; `thin`, `slope` and decal helpers. Plus `tools/tilemap.mjs <id>`: renders a sample map (a 5x4 block with an inner corner, a thin platform, decals) so joins can be seen | every tileset batch |
-| `topdown-rig` | `rigs/topdown.js` | The top-down partner of `rigs/humanoid.js`: 48x48, `PIVOT [24, 42]`; `clips(speedOf, { action, extra })` returning the section 5 table; `dims(p)` from `height`, `build`, `head`; `pose(action, direction, t, m, d)` for idle, walk, run, attack, shoot, cast, block, dodge, talk, hurt, die in three directions; `draw(g, direction, P, d, look, hooks)` with the same hooks as the side rig, called in the right depth order for each direction; `sockets(...)` with `hand`, `offhand`, `head`, `back`, `feet`, `muzzle`; held-item helpers that take a direction | every top-down character |
-| `humanoid-poses` | `rigs/humanoid.js` (extended) | Add the section 4 poses the side rig lacks: `die`, `block`, `victory`, `talk`, `shoot`, and a thrusting `attack` variant, with their standard clip entries, so no two characters invent their own fall | new side-view characters; the changes to `knight` and `wizard` |
+| `tile-helper` | `engine/tiles.js` | `TILE = 32`. `blockClips(prefix, { frames })` returns the 13 clip entries; `drawBlock(g, piece, material, t)` draws any piece of a block from one material description (a fill pattern that repeats every 32 px, an edge with a profile that repeats along its length, the ink line on exposed edges, the front face for top-down walls); `tileNoise(x, y, seed)` repeating every 32 px; `thin`, `slope` and decal helpers. Plus `tools/tilemap.mjs <id>`: renders a sample map (a block with an inner corner, a thin platform, decals; for a top-down tileset a room with a doorway) so joins can be seen. Its picker and classifier are the only ones: the checker, the preview tool and the playground use them. The exact call names are in the helper's header and its worked example | every tileset batch |
+| `topdown-rig` | `rigs/topdown.js` | The top-down partner of `rigs/humanoid.js`: 48x48, `PIVOT [24, 42]`; `clips(speedOf, { action, extra })` returning the section 5 table; `dims(p)` from `height`, `build`, `head`; `pose(action, direction, t, m, d)` for idle, walk, run, attack, shoot, cast, block, dodge, talk, hurt, die in three directions; `draw(g, direction, P, d, look, hooks)` with the same hooks as the side rig, called in the right depth order for each direction; `sockets(...)` with `hand`, `offhand`, `head`, `back`, `feet`, `muzzle`; held-item helpers that take a direction. The exact call names are in the helper's header and its worked example | every top-down character |
+| `humanoid-poses` | `rigs/humanoid.js` (extended) | Add the section 4 poses the side rig lacks: `die`, `block`, `victory`, `talk`, `shoot`, and a thrusting `attack` variant, with their standard clip entries, so no two characters invent their own fall. The exact call names are in the helper's header and its worked example | new side-view characters; the changes to `knight` and `wizard` |
 | `backdrop-helper` | `engine/backdrop.js` | `LAYER = [320, 180]`; ridge and treeline outlines that wrap at 320 px; `scatter(count, seed)` wrapping positions; `recede(colour, depth, sky)`; `layerClips()` | every background |
 | `ui-helper` | `engine/ui.js` | `panel9(g, x, y, w, h, { face, frame, border, corner })` with the section 8 bevel; the button states; the bar housing and fill | interface batches |
 | `fx-helper` | `engine/fx.js` | Looping and one-shot particles (`life = fract(t + hash(i))`), `twinkle`, rings, shards, smoke puffs, the white-core-to-dark-rim colour steps of an effect (`steps`, `particles`, `sparkles`, `ring`, `shards`, `smoke`, `glow`, `twinkle`). Its one-shot helpers keep every piece inside the frame, so no frame comes out empty | **required** by every effect and projectile batch (it is in their `needs`): an effect is built from these helpers, so all effects of all three kits share one look. |
-| `compose-kit` | `tools/compose/kit.mjs` | The parts of `battle_theme.py` every track repeats: the 16th clock, the bar counter and section gates for `bars`, the five level-matched melody instruments behind `inst`, the limiter and stereo bus, `key` and `bpm` wiring | every music batch |
+| `compose-kit` | `tools/compose/kit.mjs` | Template: `tools/compose/thornwood_overworld.mjs`. The parts every track repeats: the 16th clock, the bar counter and section gates for `bars`, the five level-matched melody instruments behind `inst`, the limiter and stereo bus, `key` and `bpm` wiring. The exact call names are in the helper's header and its worked example | every music batch |
 
 ---
 

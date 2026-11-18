@@ -594,8 +594,8 @@ Exactly 20. New sounds follow `../../skills/sprite-forge/SOUND.md` (the skill is
 - **Meta:** type `jingle`, role `interface/reward`; the patch says `"category": "jingle"`. Batch **R01**.
 - **Length:** 1.2 to 1.8 s.
 - **What makes the sound, and how it moves:** The game is saved. Four rising bell notes of a major chord with an added ninth, each a glassy `modal` bell, in a long shimmering room; the last note is held. A tune: identical every time.
-- **Controls (5):** `pitch`, `speed`, `ring`, `shimmer` (slider: Plain / Shimmering), `space`. Brightness: `shimmer` (this sound has no `bright`).
-- **Styles:** "Save point", "Level up", "Item found". "Level up" is faster and brighter with a fifth note; "Item found" is three notes.
+- **Controls (6):** `pitch`, `notes` (how many notes: 3 to 5), `speed`, `ring`, `shimmer` (slider: Plain / Shimmering), `space`. Brightness: `shimmer` (this sound has no `bright`).
+- **Styles:** "Save point", "Level up", "Item found". "Save point" is four notes; "Level up" is faster and brighter with a fifth note; "Item found" is three notes (all through `notes`).
 - **Pairs with:** `save-crystal` `activate` frame 1; a level gained; a key item found.
 
 #### `stone-door` · Stone door
@@ -613,7 +613,7 @@ Exactly 20. New sounds follow `../../skills/sprite-forge/SOUND.md` (the skill is
 - **Length:** 0.6 to 0.9 s.
 - **What makes the sound, and how it moves:** Ice forms and breaks. First 0.25 s: a rising airy hiss with a climbing sine (the spikes growing). Then a hard crack and a spray of glass: many short high `modal` pings (3 to 8 kHz) set off by `dust`, thinning out. Brightest sound in the kit.
 - **Controls (5):** `pitch`, `shards` (slider: Few / Many), `length`, `bright`, `space`.
-- **Styles:** "Ice spell", "Frost nova", "Glass break". "Glass break" has no rising start.
+- **Styles:** "Ice spell", "Frost nova", "Glass break". "Glass break" is the shortest and brightest, all shards (as built it keeps a short rising start: no listed control removes it).
 - **Pairs with:** `fx-ice-spell` `burst` frame 2 (the crack then lands on frame 6).
 
 #### `thunder-crack` · Thunder crack
@@ -639,8 +639,8 @@ Exactly 20. New sounds follow `../../skills/sprite-forge/SOUND.md` (the skill is
 - **Meta:** type `sfx`, role `characters/death`. Batch **R02**.
 - **Length:** 0.5 to 0.8 s.
 - **What makes the sound, and how it moves:** A beaten monster dissolving. Noise through a band-pass that slides down, with a falling pair of detuned saw notes under it and a crumble of `dust` at the end. Falls in pitch from start to finish. Varies from take to take.
-- **Controls (5):** `pitch`, `drop`, `length`, `grit`, `bright`.
-- **Styles:** "Monster fades", "Bones collapse", "Big beast falls". "Bones collapse" is a dry clatter of short wooden `modal` knocks; "Big beast falls" is low and ends with a thud.
+- **Controls (5):** `pitch`, `drop`, `length`, `grit` (at its top it turns the dissolve into a dry clatter of bones), `bright`.
+- **Styles:** "Monster fades", "Bones collapse", "Big beast falls". "Bones collapse" is full `grit` with a small `drop`; "Big beast falls" is low, long and dull, with the largest `drop`.
 - **Pairs with:** `die` frame 0 of `road-bandit`, `bone-soldier`, `thicket-imp`; `ember-wyrm` `die` frame 8.
 
 #### `wyrm-roar` · Wyrm roar

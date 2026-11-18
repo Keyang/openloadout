@@ -535,7 +535,7 @@ Exactly 20. New sounds follow `../../skills/sprite-forge/SOUND.md` (the skill is
 - **Length:** 0.12 to 0.25 s.
 - **What makes the sound, and how it moves:** Boots hitting earth. A sine that drops from about 160 Hz to 60 Hz in 50 ms (the weight), a band-passed noise slap at 1 to 3 kHz lasting 30 ms (the contact), and a short hiss of dust after it. Loudest in the first 5 ms, gone by the end; pitch only falls; dull, with just enough mid-range to be heard on a phone. Varies from take to take.
 - **Controls (5):** `weight`, `length`, `bright`, `grit` (the dust hiss), `snap`.
-- **Styles:** "Soft landing", "Heavy landing", "Armoured". "Armoured" adds a faint metal rattle.
+- **Styles:** "Soft landing", "Heavy landing", "Armoured". "Armoured" is heavy with the dust and grit turned up (as built: there is no separate rattle layer, because a style can only set the listed controls).
 - **Pairs with:** `knight` `jump` frame 6, with `dust-puff` `burst`.
 
 #### `enemy-squish` · Enemy squish
@@ -561,8 +561,8 @@ Exactly 20. New sounds follow `../../skills/sprite-forge/SOUND.md` (the skill is
 - **Meta:** type `sfx`, role `items/pickup`. Batch **P01**.
 - **Length:** 0.35 to 0.6 s.
 - **What makes the sound, and how it moves:** A richer cousin of the coin sound. Three rising notes of a major chord on a triangle and a quiet square, each with a glassy `modal` ping on top; the last note rings. Identical every time.
-- **Controls (5):** `pitch`, `spread` (slider "Interval": how far apart the three notes are), `speed`, `ring`, `shine`. Brightness: `shine` (this sound has no `bright`).
-- **Styles:** "Gem", "Heart", "Key". "Heart" is lower, slower and rounder; "Key" is two notes with a metal ping.
+- **Controls (5):** `pitch`, `spread` (slider "Interval": it steps through voicings of the chord, from open fifths to a wide triad, and at its far end the tune becomes two notes, the note and a fifth above), `speed`, `ring`, `shine`. Brightness: `shine` (this sound has no `bright`).
+- **Styles:** "Gem", "Heart", "Key". "Heart" is lower, slower and rounder; "Key" is the two-note end of `spread`, with full `shine`.
 - **Pairs with:** `collect` frame 1 of `gem`, `heart`, `gold-key`, with `pickup-sparkle`.
 
 #### `spring-boing` · Spring
@@ -623,9 +623,9 @@ Exactly 2. New tracks follow the Music section of `SOUND.md` and the style guide
 - **Intensity:** 0 to 0.25: bass and arpeggio only. 0.25 to 0.5: add kick and hat. 0.5 to 0.75: add snare and melody. 0.75 to 1: add harmony and the echo line, and the hat goes to 16ths.
 - **Length:** 8, 16, 24 or 32 bars; default 16. Sections of 8 bars are added from the front: 32 bars is arpeggio and bass, then drums, then melody, then everything.
 - **Melody instrument:** The five standard choices; default "Chiptune".
-- **Other controls:** `lead` (melody level) and `swing` (slider "Bounce": straight to shuffled 16ths), 9 controls in all.
+- **Other controls:** `lead` (melody level, default 0.8) and `swing` (slider "Bounce": straight to shuffled 16ths, default 0.35), 9 controls in all. Defaults: `intensity` 0.85, `bright` 0.6, `space` 0.08.
 - **Styles:** "Morning stroll", "Adventure", "Hurry up".
-- **Melody:** A four-bar phrase that hops up the G major chord and steps back down, answered by a four-bar phrase that ends on D; original, nothing borrowed.
+- **Melody:** A chord hook is asked for here (style guide, section 12): a four-bar phrase that hops up the G major chord and steps back down, answered by a four-bar phrase that ends on D; original, nothing borrowed.
 
 #### `battle-theme` · Battle theme (reused, existing)
 
