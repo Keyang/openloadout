@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Search test page</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  body { font: 15px/1.4 system-ui, sans-serif; margin: 24px; max-width: 760px; }
+  #q { font: inherit; padding: 6px 10px; width: 60%; }
+  li { margin: 2px 0; } small { color: #666; }
+</style>
+</head>
+<body>
+<h1>Search test page</h1>
+<p>Loads <code>search/client.js</code> against the stand-in catalogue. Used by <code>tests/e2e/search.spec.mjs</code>.
+Options in the address: <code>?db=none|missing|keywords-only</code>, <code>?meaning=off|eager|on-search</code> (off when left out), <code>?device=auto|wasm|webgpu</code>, <code>?close=now</code> (close straight after creating).</p>
+<p><label><input type="checkbox" id="meaning"> Search by meaning</label></p>
+<p><input id="q" placeholder="Search the stand-in catalogue" autofocus> <span id="level"></span></p>
+<ol id="results"></ol>
+<script type="module">
+  import { createSearch } from '../../../search/client.js';
+  const params = new URLSearchParams(location.search);
+  const catalog = await (await fetch('./catalog.json')).json();
+  const db = params.get('db');
+  const dbUrl = db === 'none' ? null : db === 'missing' ? './generated/no-such-file.sqlite' : db === 'keywords-only' ? './generated/keywords-only.sqlite' : './generated/search.sqlite';
+  const levels = [];
+  const s = await createSearch({
+    catalog, dbUrl, vendorBase: params.get('vendor') || '/vendor/',
+    ...(params.get('meaning') ? { meaning: params.get('meaning') } : {}), device: params.get('device') || 'wasm',
+  });
+  if (params.get('close') === 'now') s.close();
+  s.onLevel((level) => { levels.push(level); show(); });
+  // a search made straight away must be answered by whatever level is there
+  const firstLevel = s.level;
+  const first = await s.search('wizard', { limit: 5 });
+  Object.assign(window, { search: s, catalog, levels, firstLevel, first, ready: true });
+
+  const byId = new Map(catalog.assets.map((a) => [a.id, a]));
+  const input = document.getElementById('q'), list = document.getElementById('results');
+  function show() { document.getElementById('level').textContent = 'Level: ' + s.level; }
+  input.addEventListener('input', async () => {
+    const rows = await s.search(input.value, { limit: 10 });
+    list.replaceChildren(...rows.map((r) => {
+      const li = document.createElement('li'); const a = byId.get(r.id);
+      li.innerHTML = `<b></b> <small></small>`;
+      li.querySelector('b').textContent = a.name; li.querySelector('small').textContent = `${a.kind} · ${a.role} · ${r.id}`;
+      return li;
+    }));
+    show();
+  });
+  const toggle = document.getElementById('meaning');
+  toggle.addEventListener('change', async () => { if (toggle.checked) await s.enableMeaning(); else s.disableMeaning(); show(); });
+  show();
+</script>
+</body>
+</html>
