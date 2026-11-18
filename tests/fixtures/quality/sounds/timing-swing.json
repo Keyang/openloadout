@@ -1,0 +1,81 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "q-swing",
+ "name": "Swing ticks",
+ "category": "ambience",
+ "description": "Test loop: ticks on a clock; Swing delays every second tick by up to a third of a step, Fine does almost nothing.",
+ "meta": {
+  "type": "ambience",
+  "role": "environment/ambience",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "platformer"
+  ],
+  "words": [
+   "blip",
+   "beep",
+   "tick",
+   "tone",
+   "click",
+   "note"
+  ],
+  "license": "draft"
+ },
+ "loop": true,
+ "duration": 6,
+ "params": [
+  {
+   "id": "pitch",
+   "label": "Pitch",
+   "min": 300,
+   "max": 2000,
+   "default": 900,
+   "scale": "log"
+  },
+  {
+   "id": "swing",
+   "label": "Swing",
+   "min": 0,
+   "max": 1,
+   "default": 0.3
+  },
+  {
+   "id": "fine",
+   "label": "Fine",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  }
+ ],
+ "nodes": [
+  {
+   "id": "c16",
+   "type": "clock",
+   "rate": "8 / (1 + swing/3*(1 - 2*c16p))"
+  },
+  {
+   "id": "c16p",
+   "type": "seq",
+   "trig": "c16",
+   "loop": true,
+   "steps": "1 0"
+  },
+  {
+   "id": "amp",
+   "type": "ad",
+   "attack": 0.001,
+   "decay": 0.05,
+   "curve": 3,
+   "trig": "c16"
+  },
+  {
+   "id": "tone",
+   "type": "osc",
+   "wave": "tri",
+   "freq": "pitch*(1 + fine*0.0003)"
+  }
+ ],
+ "out": "tone*amp"
+}

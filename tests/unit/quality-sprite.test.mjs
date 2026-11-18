@@ -207,7 +207,7 @@ test('tileset block, top-down: a wall whose bottom row is a darker front face pa
   assert.ok(!r.metrics.joins.includes('wall-bottom left of wall-inner-bl'), 'the face ends against the cap there by design');
 });
 test('tileset block, side view: the same dark bottom row is a seam', () => expectError(F.wallSideView, /seam: wall-fill bottom edge → wall-bottom top edge does not join/));
-test('tileset block, top-down: the face must still line up with the cap above it', () => expectError(F.wallShortFace, /seam: wall-side-l bottom edge → wall-bottom-l top edge does not join \(.*gaps/));
+test('tileset block, top-down: the face must still line up with the cap above it', () => expectError(F.wallShortFace, /seam: wall-side-l bottom edge → wall-bottom-l top edge does not join \(.*outlines differ by 3 px/));
 test('tileset: thin platform pieces repeat sideways and things that stack line up', () => {
   const r = expectClean(F.extrasGood);
   for (const pair of ['plank-thin-l left of plank-thin-m', 'plank-thin-m left of plank-thin-m', 'plank-thin-m left of plank-thin-r', 'ladder-cap above ladder-mid', 'ladder-mid above ladder-mid', 'ladder-mid above ladder-foot']) assert.ok(r.metrics.joins.includes(pair), pair);
@@ -215,6 +215,44 @@ test('tileset: thin platform pieces repeat sideways and things that stack line u
 });
 test('tileset: a thin platform middle that does not repeat sideways is a seam', () => expectError(F.thinSeam, /seam: plank-thin-m right edge → plank-thin-m left edge does not join/));
 test('tileset: pieces that stack but do not line up are a warning', () => expectWarningOnly(F.stackShifted, /ladder-cap bottom edge → ladder-mid top edge does not line up/));
+// ---- exact checks at a join, more joins, more looks -------------------------------------------------------
+test('tileset block: the seven narrow pieces and a second fill are tested like the rest', () => {
+  const r = expectClean(F.blockNarrow);
+  for (const pair of ['rock-strip-l left of rock-strip-m', 'rock-strip-m left of rock-strip-m', 'rock-col-t above rock-col-m', 'rock-col-m above rock-col-b', 'rock-fill left of rock-fill-b', 'rock-fill-b above rock-fill-b', 'rock-top above rock-fill-b', 'rock-fill-b left of rock-side-r']) assert.ok(r.metrics.joins.includes(pair), pair);
+  assert.ok(!has(r.warnings, /join|seam|line up|texture/), show(r));
+});
+test('tileset: another version of the fill has the same four edges as the fill', () => expectError(F.blockFillEdgeMark, /rock-fill-b: its left column is not the same as rock-fill's/));
+test('tileset: the outline must meet exactly at a tile boundary, even one pixel', () => {
+  const r = expectError(F.blockOutlineOff, /seam: rock-top right edge → rock-top left edge does not join \(.*outline.*1 px/);
+  assert.ok(has(r.errors, /rock-top right edge → rock-right left edge/), show(r));
+});
+test('tileset: the edge band must be as deep on both sides of a join', () => {
+  const r = expectError(F.blockBandJump, /seam: rock-top right edge → rock-top left edge does not join \(.*edge band/);
+  assert.ok(!has(r.errors, /rock-fill|rock-side-l bottom edge → rock-side-l/), show(r));
+});
+test('tileset: joins are tested at every choice and on/off setting, not only the default', () => expectError(F.blockSeamWhenToggled, /seam: rock-right bottom edge → rock-side-r top edge does not join \(speckles=false/));
+test('tileset: slopes are tested beside the corner tile, at a peak and in a valley, and for a nub on their line', () => {
+  const r = expectClean(F.blockSlopes);
+  for (const pair of ['rock-slope-up left of rock-inner-tl', 'rock-inner-tr left of rock-slope-down', 'rock-slope-up left of rock-slope-down', 'rock-slope-down left of rock-slope-up']) assert.ok(r.metrics.joins.includes(pair), pair);
+  expectError(F.blockSlopeNub, /rock-inner-tl.*nub on the slope/);
+});
+test('tileset: a decal that stands on the block reaches the bottom of its cell and has the top line under it', () => {
+  expectClean(F.blockDecal);
+  expectError(F.blockDecalFloats, /rock-deco-a: floats: .*3 px above the bottom of its cell/);
+  expectError(F.blockDecalOverDip, /rock-deco-a: floats: .*rock-top.*column/);
+  expectClean(F.blockDecalBesideDip);
+});
+test('tileset: fill texture that a look turns into the fill colour is a warning, for every swatch', () => {
+  const r = expectWarningOnly(F.blockFaintStones, /rock-fill: .*texture.*look/);
+  assert.ok(!has(run(F.blockGood).warnings, /texture/), show(run(F.blockGood)));
+  assert.equal(r.metrics.fillTexture.tested, 3, 'every swatch that changes the fill is tried');
+  assert.ok(r.metrics.fillTexture.lost.length >= 1);
+});
+test('tileset: something that repeats along a platform or up a ladder must fit 32 px a whole number of times', () => {
+  expectWarningOnly(F.thinRhythm, /plank-thin-m: .*every 9 px.*join/);
+  expectWarningOnly(F.stackRhythm, /ladder-mid: .*15 px.*join/);
+  assert.ok(!has(run(F.extrasGood).warnings, /every \d+ px/), show(run(F.extrasGood)));
+});
 test('tileset: with nothing to test for joins there is a warning', () => expectWarningOnly(F.nothingToJoin, /nothing checks that it repeats/));
 test('background: a good background passes', () => {
   const r = expectClean(F.backgroundGood);

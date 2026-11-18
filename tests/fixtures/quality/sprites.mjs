@@ -4,7 +4,7 @@
 // on the object it is given.
 import { defineSprite, range, choice, color, toggle } from '../../../engine/sprite.js';
 import { lerp, pulse } from '../../../engine/motion.js';
-import { INK } from '../../../engine/color.js';
+import { INK, mix, hexToRgb } from '../../../engine/color.js';
 
 const W = 32, GROUND = 28, CX = 16;
 
@@ -250,11 +250,14 @@ const FACES = {
   'inner-tl': '', 'inner-tr': '', 'inner-bl': '', 'inner-br': '',
 };
 const CORNER = { 'inner-tl': [0, 0], 'inner-tr': [B - 1, 0], 'inner-bl': [0, B - 1], 'inner-br': [B - 1, B - 1] };
+const NARROW = { 'strip-l': 'NSW', 'strip-m': 'NS', 'strip-r': 'NSE', 'col-t': 'NWE', 'col-m': 'WE', 'col-b': 'SWE', single: 'NSWE', 'fill-b': '' };
 function blockDef(opts = {}) {
   const prefix = opts.prefix ?? 'rock';
   const one = { frames: 1, fps: 1, loop: false };
   const clips = Object.fromEntries(Object.keys(FACES).map((k) => [`${prefix}-${k}`, { ...one }]));
+  if (opts.narrow) for (const k of Object.keys(NARROW)) clips[`${prefix}-${k}`] = { ...one };
   if (opts.slopes) { clips[`${prefix}-slope-up`] = { ...one }; clips[`${prefix}-slope-down`] = { ...one }; }
+  if (opts.decal) clips[`${prefix}-deco-a`] = { ...one, place: 'above' };
   return {
     id: 'q-block', name: 'Test block', kind: 'Item',
     meta: { ...META, type: 'tileset', role: 'world/tile', view: opts.view ?? 'side' },
@@ -268,7 +271,15 @@ function blockDef(opts = {}) {
     clips,
     render(g, { clip, p }) {
       const piece = clip.slice(prefix.length + 1);
-      const body = (x, y) => (p.speckles && x % 8 === 3 && y % 8 === 5 ? '#5d6475' : p.body);
+      // the stones: a clear step darker than the rock, or (faint) so near it that a look merges the two
+      const stone = opts.faintStones ? `#${hexToRgb(p.body).map((v) => Math.max(0, v - 9).toString(16).padStart(2, '0')).join('')}` : mix(p.body, '#231b33', 0.55);
+      const shift = piece === 'fill-b' ? (opts.fillEdgeMark ? 3 : 2) : 0;   // the second fill has its stones somewhere else (3: one column of them lies on the tile's left edge)
+      const body = (x, y) => (p.speckles && (x + shift) % 8 === 3 && (y + shift) % 8 === 5 ? stone : p.body);
+      if (piece === 'deco-a') {                                      // a stub that stands on the top line
+        const lift = opts.decalLift ?? 0;
+        g.rect(opts.decalOverDip ? 18 : 8, B - 6 - lift, 6, 6, p.trim); g.rect(opts.decalOverDip ? 19 : 9, B - 9 - lift, 4, 3, p.speckles ? stone : p.trim);
+        return;
+      }
       if (piece === 'slope-up' || piece === 'slope-down') {
         const drop = opts.badSlope && piece === 'slope-up' ? 3 : 0;
         for (let x = 0; x < B; x++) {
@@ -277,7 +288,7 @@ function blockDef(opts = {}) {
         }
         return;
       }
-      const faces = FACES[piece];
+      const faces = FACES[piece] ?? NARROW[piece];
       // the wall of a top-down block: its bottom row is the front face, darker than the cap
       if (opts.face && piece.startsWith('bottom')) {
         const x0 = faces.includes('W') ? (opts.faceShort ? 3 : 0) : 0, x1 = faces.includes('E') ? B - 1 : B - 1;
@@ -290,13 +301,20 @@ function blockDef(opts = {}) {
       let west = faces.includes('W'), east = faces.includes('E');
       if (opts.face && piece === 'inner-bl') west = true;
       if (opts.face && piece === 'inner-br') east = true;
-      const pull = opts.badSideR && piece === 'side-r' ? 2 : 0;      // the wrong edge: this side's line sits 2 px in
+      // the wrong edge: this side's line sits 2 px in (always, or only with the stones switched off)
+      const pull = piece === 'side-r' && (opts.badSideR || (opts.badWithoutStones && !p.speckles)) ? 2 : 0;
+      const hasN = faces.includes('N');
       for (let y = 0; y < B; y++) for (let x = 0; x < B - pull; x++) {
-        const n = faces.includes('N') ? y : 99, s = faces.includes('S') ? B - 1 - y : 99;
+        if (opts.topNotch && piece === 'top' && x === B - 1 && y === 0) continue;                 // one pixel missing from the outline at the tile's edge
+        if (opts.dip && hasN && y === 0 && x >= 19 && x <= 22) continue;                            // a dip in the top line, mid-tile
+        const top = opts.dip && hasN && x >= 19 && x <= 22 ? 1 : 0;
+        const n = hasN ? y - top : 99, s = faces.includes('S') ? B - 1 - y : 99;
         const w = west ? x : 99, e = east ? B - 1 - pull - x : 99;
         const c = CORNER[piece];
-        const line = Math.min(n, s, w, e) === 0 || (c && !opts.face && x === c[0] && y === c[1]) || (c && opts.face && piece.startsWith('inner-t') && x === c[0] && y === c[1]);
-        g.dot(x, y, line ? INK : n <= p.edge ? p.trim : body(x, y));
+        const cornerLine = c && x === c[0] && y === c[1] && (opts.face ? piece.startsWith('inner-t') : !(opts.slopes && !opts.nub && piece.startsWith('inner-t')));
+        const line = Math.min(n, s, w, e) === 0 || cornerLine;
+        const deep = p.edge + (opts.bandJump ? Math.floor(x / 11) : 0);                             // the band under the top: 2 px deeper at the right edge than at the left
+        g.dot(x, y, line ? INK : n <= deep ? p.trim : body(x, y));
       }
     },
   };
@@ -309,6 +327,28 @@ export const blockWrongEdge = () => defineSprite(blockDef({ badSideR: true }));
 export const blockSlopes = () => defineSprite(blockDef({ slopes: true }));
 // the slope that rises to the right ends 3 px below the top tile it leads to
 export const blockBadSlope = () => defineSprite(blockDef({ slopes: true, badSlope: true }));
+// (passes) a block with the seven narrow pieces and a second fill
+export const blockNarrow = () => defineSprite(blockDef({ narrow: true }));
+// the second fill has stones on its left edge, where the plain fill has none: it cannot stand in for the fill everywhere
+export const blockFillEdgeMark = () => defineSprite(blockDef({ narrow: true, fillEdgeMark: true }));
+// one pixel of the top's outline is missing in its last column: the outline must meet exactly at a tile boundary
+export const blockOutlineOff = () => defineSprite(blockDef({ topNotch: true }));
+// the band under the top is 2 px deeper at the tile's right edge than at its left: it jumps where two tiles join
+export const blockBandJump = () => defineSprite(blockDef({ bandJump: true }));
+// a seam that is there only with a control away from its default (the stones switched off)
+export const blockSeamWhenToggled = () => defineSprite(blockDef({ badWithoutStones: true }));
+// the tile under a slope starts with the outline colour at its corner: a nub on the slope's line
+export const blockSlopeNub = () => defineSprite(blockDef({ slopes: true, nub: true }));
+// (passes) a decal that stands on the top line
+export const blockDecal = () => defineSprite(blockDef({ decal: true }));
+// a decal that stops 3 px above the bottom of its cell: it floats over the block
+export const blockDecalFloats = () => defineSprite(blockDef({ decal: true, decalLift: 3 }));
+// a decal that stands where the top line dips: it floats over the dip
+export const blockDecalOverDip = () => defineSprite(blockDef({ decal: true, dip: true, decalOverDip: true }));
+// (passes) the same dip with the decal on the level part
+export const blockDecalBesideDip = () => defineSprite(blockDef({ decal: true, dip: true }));
+// stones so near the rock's own colour that a whole-bundle look turns them into rock: the fill goes plain
+export const blockFaintStones = () => defineSprite(blockDef({ faintStones: true }));
 // (passes) a top-down wall: the cap is light and its front face (the bottom row) is dark by design
 export const wallTopDown = () => defineSprite(blockDef({ prefix: 'wall', view: 'top-down', face: true }));
 // the same drawing in a side-view tileset: there the dark bottom row is a seam under the fill
@@ -336,9 +376,9 @@ function extrasDef(opts = {}) {
         const x0 = clip.endsWith('-l') ? 2 : 0, x1 = clip.endsWith('-r') ? B - 3 : B - 1;
         for (let x = x0; x <= x1; x++) {
           const th = p.thickness + (opts.rampPlank && clip.endsWith('-m') ? Math.floor(x / 8) : 0);   // a ramp: 3 px taller at the right edge than at the left
-          for (let y = 0; y < th; y++) g.dot(x, y, y === 0 || y === th - 1 || x === x0 || x === x1 ? INK : p.nails && y === 3 && x % 8 === 4 ? '#c2c9d6' : p.wood);
+          for (let y = 0; y < th; y++) g.dot(x, y, y === 0 || y === th - 1 || x === x0 || x === x1 ? INK : p.nails && (y === 3 || y === 4) && x % (opts.nailEvery ?? 8) === 4 ? '#c2c9d6' : p.wood);
         }
-        for (let x = 8; x < 24; x += 15) for (let y = 2; y < 6; y++) g.dot(x, y, p.rope);
+        for (const x of [8, 24]) for (let y = 5; y < 7; y++) g.dot(x, y, p.rope);
         return;
       }
       if (clip === 'window') { g.rect(8, 8, 16, 16, p.wood); g.rect(10, 10, 12, 12, p.nails ? '#3f6fd1' : p.rope); g.rect(15, 8, 2, p.thickness, p.rope); return; }
@@ -347,7 +387,7 @@ function extrasDef(opts = {}) {
       const y0 = clip === 'ladder-cap' ? 6 : 0, y1 = clip === 'ladder-foot' ? B - 4 : B - 1;
       const rails = shift ? [12, 13, 14, 15, 24, 25, 26, 27] : [9, 10, 21, 22];           // the shifted middle also has thicker rails
       for (let y = y0; y <= y1; y++) for (const x of rails) g.dot(x, y, p.rope);
-      for (let y = 8; y < B; y += Math.max(6, p.thickness)) for (let x = 11 + shift; x < 21 + shift; x++) { g.dot(x, y, p.wood); g.dot(x, y + 1, p.nails ? INK : p.wood); }
+      for (let y = 8; y < B - 2; y += opts.rungEvery ?? 16) for (let x = 11 + shift; x < 21 + shift; x++) { g.dot(x, y, p.wood); g.dot(x, y + 1, p.nails ? INK : p.wood); }
     },
   };
 }
@@ -357,6 +397,10 @@ export const extrasGood = () => defineSprite(extrasDef());
 export const thinSeam = () => defineSprite(extrasDef({ rampPlank: true }));
 // the ladder's middle piece is drawn 3 px to the right of its cap and foot, with thicker rails: a warning
 export const stackShifted = () => defineSprite(extrasDef({ shiftedMid: true }));
+// nails every 9 px along the platform: three gaps of 9 and one of 5 where the tile repeats
+export const thinRhythm = () => defineSprite(extrasDef({ nailEvery: 9 }));
+// ladder rungs 15 px apart: 15 then 17 where the tile repeats
+export const stackRhythm = () => defineSprite(extrasDef({ rungEvery: 15 }));
 // a tileset with nothing the checker can test for joins
 export const nothingToJoin = () => defineSprite(extrasDef({ only: ['window'] }));
 

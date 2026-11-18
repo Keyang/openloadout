@@ -1,0 +1,78 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "q-low-thud",
+ "name": "Low thud",
+ "category": "impact",
+ "description": "Breaks: a thud with almost nothing above 300 Hz.",
+ "meta": {
+  "type": "sfx",
+  "role": "actions/land",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "platformer"
+  ],
+  "words": [
+   "blip",
+   "beep",
+   "tick",
+   "tone",
+   "click",
+   "note"
+  ],
+  "license": "draft"
+ },
+ "duration": "length + 0.05",
+ "params": [
+  {
+   "id": "weight",
+   "label": "Weight",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  },
+  {
+   "id": "length",
+   "label": "Length",
+   "min": 0.15,
+   "max": 0.5,
+   "default": 0.25,
+   "scale": "log"
+  },
+  {
+   "id": "snap",
+   "label": "Snap",
+   "min": 0,
+   "max": 1,
+   "default": 0.3
+  }
+ ],
+ "nodes": [
+  {
+   "id": "amp",
+   "type": "ad",
+   "attack": 0.002,
+   "decay": "length",
+   "curve": 3
+  },
+  {
+   "id": "body",
+   "type": "osc",
+   "wave": "sine",
+   "freq": "140 - weight*80"
+  },
+  {
+   "id": "tick",
+   "type": "ad",
+   "attack": 0.0005,
+   "decay": 0.01,
+   "curve": 3
+  },
+  {
+   "id": "hiss",
+   "type": "noise"
+  }
+ ],
+ "out": "body*amp + hiss*tick*snap*0.2"
+}

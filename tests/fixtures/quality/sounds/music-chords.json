@@ -1,0 +1,193 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "q-chords",
+ "name": "Chord song",
+ "category": "music",
+ "description": "Test track in C major: C, F, G, C, with a bass, a pad and a tune written to those chords.",
+ "meta": {
+  "type": "music",
+  "role": "music/battle",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "platformer"
+  ],
+  "words": [
+   "blip",
+   "beep",
+   "tick",
+   "tone",
+   "click",
+   "note"
+  ],
+  "license": "draft"
+ },
+ "loop": true,
+ "wrap": true,
+ "normalize": false,
+ "gain": 0.8,
+ "duration": "bars*4*60/bpm",
+ "params": [
+  {
+   "id": "bpm",
+   "label": "Tempo",
+   "min": 100,
+   "max": 140,
+   "default": 120,
+   "unit": "bpm"
+  },
+  {
+   "id": "bars",
+   "label": "Length",
+   "min": 4,
+   "max": 8,
+   "default": 4,
+   "unit": "bars",
+   "step": 4
+  },
+  {
+   "id": "inst",
+   "label": "Melody instrument",
+   "min": 0,
+   "max": 1,
+   "default": 0,
+   "options": [
+    "Soft",
+    "Buzzy"
+   ]
+  }
+ ],
+ "nodes": [
+  {
+   "id": "c16",
+   "type": "clock",
+   "rate": "bpm/60*4"
+  },
+  {
+   "id": "tonic",
+   "type": "expr",
+   "expr": "0"
+  },
+  {
+   "id": "root",
+   "type": "seq",
+   "trig": "c16",
+   "every": 16,
+   "loop": true,
+   "steps": "0 5 7 0"
+  },
+  {
+   "id": "third",
+   "type": "seq",
+   "trig": "c16",
+   "every": 16,
+   "loop": true,
+   "steps": "4 4 4 4"
+  },
+  {
+   "id": "fifth",
+   "type": "seq",
+   "trig": "c16",
+   "every": 16,
+   "loop": true,
+   "steps": "7 7 7 7"
+  },
+  {
+   "id": "tr",
+   "type": "expr",
+   "expr": "root"
+  },
+  {
+   "id": "kick",
+   "type": "pattern",
+   "trig": "c16",
+   "steps": "X...x...X...x..."
+  },
+  {
+   "id": "kenv",
+   "type": "ad",
+   "attack": 0.001,
+   "decay": 0.15,
+   "trig": "kick"
+  },
+  {
+   "id": "kosc",
+   "type": "osc",
+   "freq": "50 + 80*kenv"
+  },
+  {
+   "id": "bG",
+   "type": "pattern",
+   "trig": "c16",
+   "steps": "X.x.X.x.X.x.X.x."
+  },
+  {
+   "id": "bA",
+   "type": "ad",
+   "attack": 0.002,
+   "decay": 0.2,
+   "trig": "bG"
+  },
+  {
+   "id": "bO",
+   "type": "osc",
+   "wave": "tri",
+   "freq": "midi(48 + tr)"
+  },
+  {
+   "id": "p1",
+   "type": "osc",
+   "wave": "tri",
+   "freq": "midi(60 + tr)"
+  },
+  {
+   "id": "p2",
+   "type": "osc",
+   "wave": "tri",
+   "freq": "midi(60 + tr + third)"
+  },
+  {
+   "id": "p3",
+   "type": "osc",
+   "wave": "tri",
+   "freq": "midi(60 + tr + fifth)"
+  },
+  {
+   "id": "lG",
+   "type": "pattern",
+   "trig": "c16",
+   "steps": "x.x.x...x.x.x..."
+  },
+  {
+   "id": "lS",
+   "type": "seq",
+   "trig": "c16",
+   "loop": true,
+   "steps": "12 _ 16 _ 19 _ _ _ 16 _ 14 _ 12 _ _ _ | 17 _ 21 _ 24 _ _ _ 21 _ 19 _ 17 _ _ _ | 19 _ 23 _ 26 _ _ _ 23 _ 21 _ 19 _ _ _ | 24 _ 19 _ 16 _ _ _ 19 _ 14 _ 12 _ _ _"
+  },
+  {
+   "id": "lA",
+   "type": "ad",
+   "attack": 0.005,
+   "decay": 0.2,
+   "trig": "lG"
+  },
+  {
+   "id": "soft",
+   "type": "osc",
+   "wave": "tri",
+   "freq": "midi(60 + lS)"
+  },
+  {
+   "id": "buzzy",
+   "type": "osc",
+   "wave": "square",
+   "freq": "midi(60 + lS)"
+  }
+ ],
+ "out": [
+  "0.3*kosc*kenv + 0.2*bO*bA + 0.1*(p1 + p2) + 0.3*lA*(inst < 0.5 ? soft : buzzy*0.6)",
+  "0.3*kosc*kenv + 0.2*bO*bA + 0.1*(p1 + p3) + 0.3*lA*(inst < 0.5 ? soft : buzzy*0.6)"
+ ]
+}

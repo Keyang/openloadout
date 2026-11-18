@@ -1,0 +1,88 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "q-late-peak",
+ "name": "Late peak",
+ "category": "pickup",
+ "description": "Test chime: starts at once, but its second note is the loudest.",
+ "meta": {
+  "type": "sfx",
+  "role": "items/pickup",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "platformer"
+  ],
+  "words": [
+   "blip",
+   "beep",
+   "tick",
+   "tone",
+   "click",
+   "note"
+  ],
+  "license": "draft"
+ },
+ "duration": "gap + ring + 0.05",
+ "params": [
+  {
+   "id": "pitch",
+   "label": "Pitch",
+   "min": 400,
+   "max": 1600,
+   "default": 800,
+   "scale": "log"
+  },
+  {
+   "id": "gap",
+   "label": "Gap",
+   "min": 0.1,
+   "max": 0.25,
+   "default": 0.15
+  },
+  {
+   "id": "ring",
+   "label": "Ring",
+   "min": 0.08,
+   "max": 0.3,
+   "default": 0.15
+  }
+ ],
+ "nodes": [
+  {
+   "id": "a1",
+   "type": "ad",
+   "attack": 0.001,
+   "decay": "ring",
+   "curve": 3
+  },
+  {
+   "id": "t2",
+   "type": "clock",
+   "rate": 1,
+   "delay": "gap",
+   "count": 1
+  },
+  {
+   "id": "a2",
+   "type": "ad",
+   "attack": 0.001,
+   "decay": "ring",
+   "curve": 3,
+   "trig": "t2"
+  },
+  {
+   "id": "n1",
+   "type": "osc",
+   "wave": "tri",
+   "freq": "pitch"
+  },
+  {
+   "id": "n2",
+   "type": "osc",
+   "wave": "tri",
+   "freq": "pitch*1.5"
+  }
+ ],
+ "out": "n1*a1*0.5 + n2*a2"
+}

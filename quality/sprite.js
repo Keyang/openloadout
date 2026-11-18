@@ -13,11 +13,11 @@
 // written down in docs/quality-bar.md.
 
 import { renderFrame, defaultParams, cleanParams, randomParams, clipFps, inEffect, partList } from '../engine/sprite.js';
-import { brightness, hexToRgb } from '../engine/color.js';
-import { blockJoins, pieceOf } from '../engine/tiles.js';
+import { brightness, hexToRgb, rgbToHsl } from '../engine/color.js';
+import { blockJoins, classifyTiles } from '../engine/tiles.js';
 import { THEME_PRESETS, applyColour } from '../engine/theme.js';
 
-const BLOCK_JOINS = blockJoins();    // every pair of the 13 block pieces that can touch: [[a, axis, b], ...]
+const BLOCK_JOINS = blockJoins({ narrow: true });    // every pair of block pieces (the 13, and the 7 narrow ones) that can touch: [[a, axis, b], ...]
 
 export const THRESHOLDS = {
   randomLooks: 12,          // seeded random looks drawn on top of default, all-low, all-high, every choice option and every toggle flipped
@@ -32,6 +32,10 @@ export const THRESHOLDS = {
   feetSlack: 2,             // lowest pixel of the first clip may sit this far from the pivot line
   loopSeamFactor: 2.5, loopSeamSlack: 8,
   seamBreakFloor: 1, seamJumpFloor: 0.08,    // tile and background seams: see seamCheck()
+  tileOutlineGaps: 0,       // tiles: the outlines on the two sides of a join may differ by this many pixels (backgrounds use seamBreakFloor)
+  joinRandomLooks: 6,       // tile joins are tested at every tested setting and at this many of the random looks
+  textureMinPixels: 4,      // a fill's texture colour counts from this many pixels
+  textureHue: 35,           // ... and is a tone of the fill colour when its hue is within this many degrees (or both are grey)
   sampleFrames: 4,          // frames per clip used when testing what a control does
   tileSizes: [16, 32],
   // Survives every look (S-survives-looks): under each whole-bundle look (THEME_PRESETS in engine/theme.js)
@@ -57,6 +61,7 @@ const FILLS_FRAME = new Set(['tileset', 'background']);
 const EDGE_FREE = new Set(['tileset', 'background', 'ui', 'icon']);
 const NO_GROUND = new Set(['tileset', 'background', 'ui', 'icon']);
 
+/** What a sprite is, for the bar's per-type rules: its meta.type, or from its older `kind` ('Item' -> 'pickup'). */
 export function spriteType(def) {
   return (def.meta && typeof def.meta.type === 'string' && def.meta.type) || KIND_TO_TYPE[def.kind] || String(def.kind || 'character').toLowerCase();
 }
@@ -117,6 +122,103 @@ export function seamCheck(A, B, axis) {
   return { ok: s.breaks <= maxBreaks && s.jump <= maxJump, breaks: s.breaks, jump: s.jump, maxBreaks, maxJump };
 }
 
+// ---- tiles: exact tests at a join -------------------------------------------------------------------
+const firstDrawn = (l) => { for (let i = 0; i < l.length; i++) if (l[i] !== 0) return i; return l.length; };
+// How far a line differs from the block's fill, counted in from each end: the depth of the edge band there
+// (see-through pixels outside the outline count too). ref: the same line of the fill tile.
+function bandRuns(l, ref) {
+  let a = 0, b = 0;
+  while (a < l.length && l[a] !== ref[a]) a++;
+  while (b < l.length && l[l.length - 1 - b] !== ref[l.length - 1 - b]) b++;
+  return [a, b];
+}
+const bandCache = new WeakMap();
+// the largest change of band depth between neighbouring lines inside one tile, per end: [fromStart, fromEnd]
+function bandSteps(g, F, axis) {
+  let known = bandCache.get(g);
+  if (!known) bandCache.set(g, known = new Map());
+  let per = known.get(F);
+  if (!per) known.set(F, per = {});
+  if (per[axis]) return per[axis];
+  const n = axis === 'x' ? g.w : g.h, out = [0, 0];
+  let prev = bandRuns(line(g, axis, 0), line(F, axis, 0));
+  for (let i = 1; i < n; i++) {
+    const cur = bandRuns(line(g, axis, i), line(F, axis, i));
+    out[0] = Math.max(out[0], Math.abs(cur[0] - prev[0])); out[1] = Math.max(out[1], Math.abs(cur[1] - prev[1]));
+    prev = cur;
+  }
+  return (per[axis] = out);
+}
+/**
+ * Edge band test for two pieces of one block. A is left of B (axis 'x') or above it ('y'); F is the block's fill.
+ * The band's depth on A's last line and on B's first may differ by no more than it changes between neighbouring
+ * lines inside either tile (the smaller of the two tiles' largest changes). Returns { ok, step, allowed, end }.
+ */
+export function bandCheck(A, B, F, axis) {
+  const n = axis === 'x' ? A.w : A.h;
+  const a = bandRuns(line(A, axis, n - 1), line(F, axis, n - 1)), b = bandRuns(line(B, axis, 0), line(F, axis, 0));
+  const sa = bandSteps(A, F, axis), sb = A === B ? sa : bandSteps(B, F, axis);
+  let worst = { ok: true, step: 0, allowed: 0, end: 0 };
+  for (const end of [0, 1]) {
+    const step = Math.abs(a[end] - b[end]), allowed = Math.min(sa[end], sb[end]);
+    if (step > allowed && step - allowed >= worst.step - worst.allowed) worst = { ok: false, step, allowed, end };
+  }
+  return worst;
+}
+/**
+ * Something that repeats along a line of a tile that itself repeats (a platform's middle, a ladder's middle) must fit
+ * the tile a whole number of times. Looks at every line along the axis for drawn marks of the same colours and
+ * length, in the same places on two neighbouring lines: three or more whose usual spacing does not divide the tile's
+ * length (board joints every 9 px), and, with `pairs`, two marks two or more pixels long that are not half a tile
+ * apart (rungs 15 px apart).
+ * Returns { step, at, count } for the first one found, or null.
+ */
+export function unevenRepeat(g, axis, { pairs = false } = {}) {
+  const n = axis === 'x' ? g.w : g.h, m = axis === 'x' ? g.h : g.w;
+  // one line: the marks whose spacing does not fit, as { step, count, key } (key: where they are)
+  const along = (j) => {
+    const px = (i) => (axis === 'x' ? g.data[j * g.w + (i % n)] : g.data[(i % n) * g.w + j]);
+    const count = new Map();
+    for (let i = 0; i < n; i++) count.set(px(i), (count.get(px(i)) ?? 0) + 1);
+    if (count.size < 2) return [];
+    const mode = [...count].sort((x, y) => y[1] - x[1])[0][0];
+    let start = 0;
+    while (px(start) !== mode) start++;
+    const marks = new Map();                       // colours of a mark -> where each one starts
+    for (let i = start; i < start + n; i++) {
+      if (px(i) === mode) continue;
+      const from = i, key = [];
+      while (px(i) !== mode) key.push(px(i++));
+      if (key.every((v) => v === 0)) continue;     // a gap in the drawing is not a mark
+      const k = key.join(',');
+      if (!marks.has(k)) marks.set(k, { at: [], size: key.length });
+      marks.get(k).at.push(from % n);
+    }
+    const found = [];
+    for (const { at, size } of marks.values()) {
+      if (at.length < 2) continue;
+      at.sort((x, y) => x - y);
+      const gaps = at.map((v, i) => (i + 1 < at.length ? at[i + 1] - v : at[0] + n - v));
+      if (at.length === 2) { if (pairs && size >= 2 && gaps[0] !== gaps[1]) found.push({ step: Math.min(...gaps), count: 2, key: at.join(',') }); continue; }
+      // the usual spacing: the gap most of the marks share, at least twice in a row
+      const tally = new Map();
+      for (const gap of gaps) tally.set(gap, (tally.get(gap) ?? 0) + 1);
+      const [step, times] = [...tally].sort((x, y) => y[1] - x[1])[0];
+      const inARow = gaps.some((gap, i) => gap === step && gaps[(i + 1) % gaps.length] === step);
+      if (times >= Math.max(2, Math.ceil(at.length / 2)) && inARow && n % step !== 0) found.push({ step, count: at.length, key: at.join(',') });
+    }
+    return found;
+  };
+  // a real rhythm (board joints, rungs) is more than one pixel thick: two neighbouring lines show the same marks
+  let prev = along(0);
+  for (let j = 1; j < m; j++) {
+    const cur = along(j);
+    for (const f of cur) if (prev.some((q) => q.key === f.key)) return { step: f.step, at: j - 1, count: f.count };
+    prev = cur;
+  }
+  return null;
+}
+
 function farthestPair(swatches) {
   let best = null, bd = -1;
   const rgb = swatches.map((c) => (/^#[0-9a-f]{6}$/i.test(c) ? hexToRgb(c) : [0, 0, 0]));
@@ -168,6 +270,11 @@ export function whenHint(res, params, dflt) {
 }
 const settingName = (bn) => (bn === 'default' ? 'everything else is at its default' : bn === 'all-low' ? 'all sliders low' : bn === 'all-high' ? 'all sliders high' : bn);
 
+/**
+ * Run the sprite quality bar on a definition. Returns { errors, warnings, metrics }; no errors means it passes.
+ * soundIndex: Map or object of sound id -> patch (left out: sound cues are not checked);
+ * validateMeta: (meta, kind) -> { ok, errors } from catalog/schema.js (left out: metadata is not checked).
+ */
 export function checkSprite(def, { soundIndex, validateMeta } = {}) {
   const t0 = now();
   const T = THRESHOLDS;
@@ -479,83 +586,175 @@ export function checkSprite(def, { soundIndex, validateMeta } = {}) {
   }
 
   // ---- kind-specific rules (Contract 2) ---------------------------------------------------------
-  const joinLooks = [['default', dflt], ['all-low', allLow], ['all-high', allHigh]];
+  const wrapLooks = [['default', dflt], ['all-low', allLow], ['all-high', allHigh]];
   if (type === 'tileset') {
     if (W !== H || !T.tileSizes.includes(W)) warn(`tiles are ${W}x${H}; tilesets use 16x16 or 32x32`);
-    // Which tiles sit next to which is read from the clip names (docs/style-guide.md, section 6).
-    // A block is up to 13 clips under one prefix; every pair of its pieces that can touch is a join.
+    // Which tiles sit next to which is read from the clip names (docs/style-guide.md, section 6), by the same
+    // classifier the map tool and the playground use. A block is 13 clips under one prefix (20 with the narrow
+    // pieces, more with other versions of the fill); every pair of its pieces that can touch is a join.
     const topDown = def.meta?.view === 'top-down';
-    const blocks = new Map(), thins = new Map(), slopes = new Map(), stacks = new Map();
-    const kinds = { block: blocks, thin: thins, slope: slopes, stack: stacks };
-    for (const c of clipNames) {
-      const k = pieceOf(c);
-      const map = k && kinds[k.kind];
-      if (!map) continue;
-      if (!map.has(k.prefix)) map.set(k.prefix, {});
-      map.get(k.prefix)[k.piece] = c;
-    }
-    const every = (piece) => [...blocks.values()].map((b) => b[piece]).filter(Boolean);
-    const fills = every('fill'), tops = every('top');
-    const frontRow = (piece) => piece.startsWith('bottom');
-    const joins = [];                               // [a, axis, b, test]: a is left of b (axis x) or above it (axis y)
-    for (const b of blocks.values()) {
-      for (const [pa, axis, pb] of BLOCK_JOINS) {
-        if (!b[pa] || !b[pb]) continue;
+    const sets = classifyTiles(clips);
+    const groups = [...sets.blocks, ...sets.floors.map((f) => ({ prefix: f.prefix, pieces: { fill: f.fill }, fills: f.fills }))];
+    const fills = groups.flatMap((b) => b.fills), tops = sets.blocks.map((b) => b.pieces.top).filter(Boolean);
+    // top-down: the pieces that are a wall's front face (the bottom row; and all of a wall one tile deep)
+    const FRONT = new Set(['bottom', 'bottom-l', 'bottom-r', 'col-b', 'strip-l', 'strip-m', 'strip-r', 'single']);
+    const joins = [];                               // { a, axis, b, test, fill }: a is left of b (axis x) or above it (axis y)
+    const join = (a, axis, b, test, fill = null) => { if (a && b) joins.push({ a, axis, b, test, fill }); };
+    for (const b of groups) {
+      const versions = (piece) => (piece === 'fill' ? b.fills : b.pieces[piece] ? [b.pieces[piece]] : []);
+      for (const [pa, axis, pb] of BLOCK_JOINS) for (const ca of versions(pa)) for (const cb of versions(pb)) {
         // Top-down: the bottom row of a wall is its front face, darker than the cap by design. Against the
         // rows above it only the outline has to line up; beside an inner corner the face simply ends.
-        if (topDown && frontRow(pa) !== frontRow(pb)) { if (axis === 'y') joins.push([b[pa], axis, b[pb], 'outline']); continue; }
-        joins.push([b[pa], axis, b[pb], 'seam']);
+        if (topDown && FRONT.has(pa) !== FRONT.has(pb)) { if (axis === 'y') join(ca, axis, cb, 'outline'); continue; }
+        // an edge band may end or turn in an inner corner, so its depth is compared only where an edge runs straight on
+        join(ca, axis, cb, 'seam', pa.startsWith('inner') || pb.startsWith('inner') ? null : b.pieces.fill ?? null);
       }
       // a top, left or right with no partner under its own prefix is tested against the first one there is
-      if (b.top && !b.fill && fills.length) joins.push([b.top, 'y', fills[0], 'seam']);
-      if (b.left && !b.top && tops.length) joins.push([b.left, 'x', tops[0], 'seam']);
-      if (b.right && !b.top && tops.length) joins.push([tops[0], 'x', b.right, 'seam']);
+      if (b.pieces.top && !b.pieces.fill && fills.length) join(b.pieces.top, 'y', fills[0], 'seam');
+      if (b.pieces.left && !b.pieces.top && tops.length) join(b.pieces.left, 'x', tops[0], 'seam');
+      if (b.pieces.right && !b.pieces.top && tops.length) join(tops[0], 'x', b.pieces.right, 'seam');
     }
-    for (const t of thins.values()) {
-      if (t.l && t.m) joins.push([t.l, 'x', t.m, 'seam']);
-      if (t.m) joins.push([t.m, 'x', t.m, 'seam']);
-      if (t.m && t.r) joins.push([t.m, 'x', t.r, 'seam']);
-      if (t.l && t.r) joins.push([t.l, 'x', t.r, 'seam']);
+    const blockOf = (prefix) => sets.blocks.find((b) => b.prefix === prefix)?.pieces ?? {};
+    for (const t of sets.thins) {
+      const { l, m, r } = t.pieces, b = blockOf(t.prefix);
+      join(l, 'x', m, 'seam'); join(m, 'x', m, 'seam'); join(m, 'x', r, 'seam'); join(l, 'x', r, 'seam');
+      // a platform that runs into its own block: its surface is level with the block's top
+      join(m, 'x', b.top, 'level'); join(b.top, 'x', m, 'level');
     }
-    for (const [prefix, sl] of slopes) {
-      const b = blocks.get(prefix) ?? {};
-      if (sl.up && b.top) joins.push([sl.up, 'x', b.top, 'seam']);
-      if (sl.up && b['inner-tl']) joins.push([sl.up, 'y', b['inner-tl'], 'seam']);
-      if (sl.down && b.top) joins.push([b.top, 'x', sl.down, 'seam']);
-      if (sl.down && b['inner-tr']) joins.push([sl.down, 'y', b['inner-tr'], 'seam']);
+    for (const sl of sets.slopes) {
+      const b = blockOf(sl.prefix), f = b.fill ?? null;
+      join(sl.up, 'x', b.top, 'seam', f); join(b.top, 'x', sl.down, 'seam', f);                 // the slope's upper end meets a top
+      join(sl.up, 'y', b['inner-tl'], 'seam'); join(sl.down, 'y', b['inner-tr'], 'seam');      // its foot sits on a corner tile
+      join(sl.up, 'x', b['inner-tl'], 'seam'); join(b['inner-tr'], 'x', sl.down, 'seam');      // two slopes corner to corner: the corner tile is beside the lower one
+      join(sl.up, 'x', sl.down, 'seam', f); join(sl.down, 'x', sl.up, 'seam', f);              // a peak, a valley
     }
     // things that repeat up and down (ladders, pillars, posts): -cap over -mid over -foot. These names are
     // not fixed by the style guide, so a miss is a warning.
-    for (const st of stacks.values()) {
-      if (st.cap && st.mid) joins.push([st.cap, 'y', st.mid, 'stack']);
-      if (st.mid) joins.push([st.mid, 'y', st.mid, 'stack']);
-      if (st.mid && st.foot) joins.push([st.mid, 'y', st.foot, 'stack']);
+    for (const st of sets.stacks) {
+      const { cap, mid, foot } = st.pieces;
+      join(cap, 'y', mid, 'stack'); join(mid, 'y', mid, 'stack'); join(mid, 'y', foot, 'stack');
     }
     if (!joins.length) warn('tileset has no fill tile (a clip named "...-fill") and no other pieces the checker knows by name, so nothing checks that it repeats');
-    metrics.joins = joins.map(([a, ax, b]) => `${a} ${ax === 'x' ? 'left of' : 'above'} ${b}`);
+    metrics.joins = joins.map(({ a, axis, b }) => `${a} ${axis === 'x' ? 'left of' : 'above'} ${b}`);
+
+    // Joins are tested at every tested setting (default, all-low, all-high, each choice, each on/off flipped)
+    // and at some of the random looks, which also change the colours.
+    const joinLooks = [...bases, ...looks.slice(bases.length, bases.length + T.joinRandomLooks)];
+    const tested = new Set(bases.map(([name]) => name));
     for (const [lname, p] of joinLooks) {
+      const pk = lookKey(p);
       for (const f of fills) for (let i = 0; i < clips[f].frames; i++) {
-        const g = render(f, i, p);
+        const g = render(f, i, p, pk);
         if (!(g instanceof Error) && g.data.some((v) => (v >>> 24) !== 255)) error(`${f}: fill tile is not fully opaque (frame ${i} / ${lname})`, `opaque:${f}`);
       }
-      for (const [a, axis, b, test] of joins) {
-        const n = Math.min(clips[a].frames, clips[b].frames);
-        for (let i = 0; i < n; i++) {
-          const A = render(a, i, p), B = render(b, i, p);
-          if (A instanceof Error || B instanceof Error) continue;
-          const s = seamCheck(A, B, axis);
-          const ok = test === 'outline' ? s.breaks <= s.maxBreaks : s.ok;
-          if (ok) continue;
-          const ea = axis === 'x' ? 'right edge' : 'bottom edge', eb = axis === 'x' ? 'left edge' : 'top edge';
-          const gaps = `${s.breaks} gaps vs ${s.maxBreaks} allowed`, bright = `brightness step ${s.jump.toFixed(2)} vs ${s.maxJump.toFixed(2)} allowed`;
-          if (test === 'stack') warn(`${a} ${ea} → ${b} ${eb} does not line up, so the stack shows a break (${lname}, frame ${i}: ${gaps}, ${bright})`, `seam:${a}:${axis}:${b}`);
-          else error(`seam: ${a} ${ea} → ${b} ${eb} does not join (${lname}, frame ${i}: ${test === 'outline' ? gaps : `${gaps}, ${bright}`})`, `seam:${a}:${axis}:${b}`);
+      // another version of the fill stands in for the fill anywhere, so its four edges are the fill's own
+      for (const g of groups) for (const v of g.fills.slice(1)) {
+        const F = render(g.fills[0], 0, p, pk), V = render(v, 0, p, pk);
+        if (F instanceof Error || V instanceof Error) continue;
+        for (const [axis, i, name] of [['x', 0, 'left column'], ['x', W - 1, 'right column'], ['y', 0, 'top row'], ['y', H - 1, 'bottom row']]) {
+          const lf = line(F, axis, i), lv = line(V, axis, i);
+          if (lf.some((c, k) => c !== lv[k])) error(`seam: ${v}: its ${name} is not the same as ${g.fills[0]}'s (${lname}); keep the marks of a fill version off the tile's edges, so it joins whatever the fill joins`, `fillversion:${v}`);
         }
       }
+      for (const { a, axis, b, test, fill } of joins) {
+        const n = Math.min(clips[a].frames, clips[b].frames);
+        for (let i = 0; i < n; i++) {
+          const A = render(a, i, p, pk), B = render(b, i, p, pk);
+          if (A instanceof Error || B instanceof Error) continue;
+          const ea = axis === 'x' ? 'right edge' : 'bottom edge', eb = axis === 'x' ? 'left edge' : 'top edge';
+          const la = line(A, axis, (axis === 'x' ? A.w : A.h) - 1), lb = line(B, axis, 0);
+          if (test === 'level') {
+            const ya = firstDrawn(la), yb = firstDrawn(lb);
+            if (ya !== yb) error(`seam: ${a} ${ea} → ${b} ${eb} is not level (${lname}, frame ${i}: one starts on row ${ya}, the other on row ${yb}); a platform that runs into a block has its surface on the block's top line`, `seam:${a}:${axis}:${b}`);
+            continue;
+          }
+          const s = seamCheck(A, B, axis);
+          const why = [];
+          // exact: the two outlines meet pixel for pixel (an outline is pinned to the tile boundary at both ends of an edge)
+          if (s.breaks > T.tileOutlineGaps) why.push(`the outlines differ by ${s.breaks} px; an outline must meet exactly at a tile boundary`);
+          // exact: the edge band is as deep on both sides as it is anywhere inside
+          if (test === 'seam' && fill && clips[fill].frames > i) {
+            const F = render(fill, i, p, pk);
+            const band = F instanceof Error ? { ok: true } : bandCheck(A, B, F, axis);
+            if (!band.ok) why.push(`the edge band is ${band.step} px deeper on one side, measured from the ${axis === 'x' ? (band.end ? 'bottom' : 'top') : (band.end ? 'right' : 'left')} (inside these tiles it changes by at most ${band.allowed} px from one ${axis === 'x' ? 'column' : 'row'} to the next)`);
+          }
+          // the brightness step is judged in the colours the tiles were designed in, not with random swatches
+          if (test !== 'outline' && tested.has(lname) && s.jump > s.maxJump) why.push(`brightness step ${s.jump.toFixed(2)} vs ${s.maxJump.toFixed(2)} allowed`);
+          if (!why.length) continue;
+          if (test === 'stack') warn(`${a} ${ea} → ${b} ${eb} does not line up, so the stack shows a break (${lname}, frame ${i}: ${why.join('; ')})`, `seam:${a}:${axis}:${b}`);
+          else error(`seam: ${a} ${ea} → ${b} ${eb} does not join (${lname}, frame ${i}: ${why.join('; ')})`, `seam:${a}:${axis}:${b}`);
+        }
+      }
+      // a platform's middle and a ladder's middle repeat with themselves: what repeats inside them must fit the tile
+      for (const [c, axis] of [...sets.thins.map((t) => [t.pieces.m, 'x']), ...sets.stacks.map((st) => [st.pieces.mid, 'y'])]) {
+        if (!c) continue;
+        const g = render(c, 0, p, pk);
+        const u = g instanceof Error ? null : unevenRepeat(g, axis, { pairs: axis === 'y' });
+        if (u) warn(`${c}: a mark repeats every ${u.step} px along ${axis === 'x' ? `row ${u.at}` : `column ${u.at}`} (${u.count} of them; ${lname}), which does not fit ${axis === 'x' ? W : H} px a whole number of times, so the spacing breaks where two tiles join`, `rhythm:${c}`);
+      }
+      // a decal that stands on the block (or hangs under it) touches that side of its cell, over pixels of the block
+      for (const d of sets.decals) {
+        if (d.place === 'on') continue;
+        const g = render(d.clip, 0, p, pk), box = g instanceof Error ? null : g.bounds();
+        if (!box) continue;
+        const above = d.place === 'above', gap = above ? H - 1 - box.y1 : box.y0;
+        if (gap) { error(`${d.clip}: floats: its ${above ? 'lowest' : 'highest'} pixel is ${gap} px ${above ? 'above the bottom' : 'below the top'} of its cell, and it ${above ? 'stands on the tile below' : 'hangs from the tile above'} (${lname})`, `decal:${d.clip}`); continue; }
+        const under = blockOf(d.prefix)[above ? 'top' : 'bottom'];
+        const U = under ? render(under, 0, p, pk) : null;
+        if (!U || U instanceof Error) continue;
+        const bare = [];
+        for (let x = 0; x < W; x++) if (g.get(x, above ? H - 1 : 0) && !U.get(x, above ? 0 : H - 1)) bare.push(x);
+        if (bare.length) error(`${d.clip}: floats: ${under} is pulled in where it stands, so there is a gap under it in column ${bare[0]}${bare.length > 1 ? ` and ${bare.length - 1} more` : ''} (${lname}); stand it where the block's outline is on the tile boundary`, `decal:${d.clip}`);
+      }
+    }
+    // a slope's line passes the corner tile under its foot: that tile's corner pixel must not be outline
+    for (const sl of sets.slopes) {
+      const b = blockOf(sl.prefix);
+      for (const [slope, corner, x] of [[sl.up, b['inner-tl'], 0], [sl.down, b['inner-tr'], W - 1]]) {
+        if (!slope || !corner) continue;
+        const S = render(slope, 0, dflt), C = render(corner, 0, dflt);
+        if (S instanceof Error || C instanceof Error) continue;
+        const ink = S.get(W - 1 - x, 0);                              // the slope's line at its upper end
+        if (ink && C.get(x, 0) === ink && S.get(W - 1 - x, 1) !== ink) error(`${corner}: its top ${x ? 'right' : 'left'} pixel is the outline colour; under ${slope}, or beside it, that leaves a nub on the slope's line (leave the pixel to the band under the outline: in the tile helper, give the top edge \`tuck\`)`, `nub:${corner}`);
+      }
+    }
+    // Fill texture must survive every whole-bundle look with every swatch: a mark that is a tone of the fill
+    // colour and turns into it leaves the fill plain. (Marks of another material, such as pebbles, are not judged.)
+    {
+      const hexOf = (v) => `#${[v & 255, (v >>> 8) & 255, (v >>> 16) & 255].map((c) => c.toString(16).padStart(2, '0')).join('')}`;
+      const hsl = (v) => rgbToHsl(v & 255, (v >>> 8) & 255, (v >>> 16) & 255);
+      const sameFamily = (a, b) => { const A = hsl(a), B = hsl(b); if (A[1] < 0.15 || B[1] < 0.15) return A[1] < 0.15 && B[1] < 0.15; const d = Math.abs(A[0] - B[0]) % 360; return Math.min(d, 360 - d) <= T.textureHue; };
+      const settings = [['the default colours', dflt]];
+      for (const [k, d] of Object.entries(params)) if (d.kind === 'color') for (const sw of d.swatches ?? []) if (sw !== dflt[k]) settings.push([`${d.label} ${sw}`, { ...dflt, [k]: sw }]);
+      let tested = 0;
+      const lost = [];
+      for (const f of fills) {
+        const seen = new Set();
+        for (const [sname, p] of settings) {
+          const g = render(f, 0, p);
+          if (g instanceof Error) continue;
+          const count = new Map();
+          for (const v of g.data) count.set(v, (count.get(v) ?? 0) + 1);
+          const order = [...count].sort((x, y) => y[1] - x[1]), base = order[0][0];
+          const marks = order.slice(1).filter(([v, n]) => n >= T.textureMinPixels && sameFamily(v, base)).map(([v]) => v);
+          const sig = [base, ...marks].join(',');
+          if (!marks.length || seen.has(sig)) continue;                // a swatch that does not change this fill adds nothing
+          seen.add(sig); tested++;
+          const from = Uint32Array.from([base, ...marks]);
+          const gone = [];
+          for (const look of THEME_PRESETS) {
+            const to = applyColour(Uint32Array.from(from), look.theme.colour);
+            const i = marks.findIndex((_, k) => to[k + 1] === to[0]);
+            if (i >= 0) gone.push({ look: look.name, mark: marks[i] });
+          }
+          if (gone.length) { lost.push({ clip: f, setting: sname, looks: gone.map((x) => x.look) }); warn(`${f}: with ${sname} its texture colour ${hexOf(gone[0].mark)} turns into the fill colour ${hexOf(base)} under the "${gone[0].look}" look${gone.length > 1 ? ` and ${gone.length - 1} more` : ''}, leaving the fill plain; draw fill marks in the dark of the colour's ramp (textureTone in engine/tiles.js)`, `texture:${f}`); }
+        }
+      }
+      metrics.fillTexture = { tested, lost };
     }
   }
   if (type === 'background') {
-    for (const [lname, p] of joinLooks) for (const c of clipNames) for (let i = 0; i < clips[c].frames; i++) {
+    for (const [lname, p] of wrapLooks) for (const c of clipNames) for (let i = 0; i < clips[c].frames; i++) {
       const g = render(c, i, p);
       if (g instanceof Error) continue;
       const s = seamCheck(g, g, 'x');
