@@ -445,7 +445,10 @@ export default defineSprite({
 
       front(g, J) {
         // talking, the free hand reaches out past the staff: it is shown in front of it, under the staff arm
-        if (P.point > 0.25) sleeve(g, J.armB, d, robeFar, trimFar.base, skinFar, null);
+        if (P.point > 0.25) {
+          sleeve(g, J.armB, d, robeFar, trimFar.base, skinFar, null);
+          g.ellipse(J.armB.hand[0] + 0.5, J.armB.hand[1], 1.8, 1.8, skinFar, { shade: 0 });      // an open hand, big enough to read
+        }
         sleeve(g, J.armF, d, robe, trim.base, skin.base, robe.deep, lie > 0 ? J.gy - 1 : Infinity);      // one row less: its dark rim is drawn outside it
       },
     });

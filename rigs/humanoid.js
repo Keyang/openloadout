@@ -9,6 +9,7 @@
 //   sockets(J, P, d, opt)    named attach points for parts: hand, offhand, head, back, feet (and muzzle when asked for)
 //   muzzleFlash(g, at, size) the light of a shot at the muzzle socket, drawn after the outline
 //   heldItem(g, at, item)    a held thing drawn from an attach point and its own settings: sword, axe, spear, staff, bow, gun
+//   bowGrip(J, P, len)       where a bow is held and which way it stands (upright in the far hand; flat on the ground when lying)
 //   fit(P, d, opt)           keeps a pose with a long weapon or tall headgear inside the frame
 //
 // A new character is usually ~100 lines: a look, a few hooks, and the shared clips.
@@ -23,7 +24,7 @@
 //             with it, and cuts off what ends up under the ground. Here g is a layer of its own and J.head is where
 //             the head is on that layer, so use only the J you are given, and draw only what turns with the head
 //   item      after the head, under the near hand: the thing held (attach to sockets(J, P, d).hand). A bow is drawn here
-//             too, at sockets(J, P, d).offhand: the far hand holds it, in front of the body
+//             too, at bowGrip(J, P): the far hand holds it, in front of the body
 //   front     last, over the near arm: sleeves, anything nearest the viewer
 // J = { gy, hip, neck, head, shoulder, legF, legB: { hip, knee, ankle, lifted }, armF, armB: { shoulder, elbow, hand, angle } },
 // every point as [x, y]; gy is the ground row under the feet. P also carries flags (see pose()): flash, lie, headTurn,
@@ -120,7 +121,7 @@ export const scaleFrom = (rest, v, k) => (k === 1 ? v : rest + (v - rest) * k);
  *    pull   1 while a bow is drawn (shoot with shot: 'bow', frame 0): run the string to the near hand and show the arrow
  * `shoot` takes m.shot: leave it out for something held out and fired (a gun, a wand, a thrown knife): frame 0 is the arm
  *    half raised, frame 1 it is level and fires. shot: 'bow' is an archer: the far arm holds the bow out (draw it in the
- *    item hook, at the offhand socket), the near hand has the string drawn to the chin on frame 0 and lets go on frame 1.
+ *    item hook, at bowGrip(J, P)), the near hand has the string drawn to the chin on frame 0 and lets go on frame 1.
  * Angles: 0 = down, PI/2 = forward, PI = up. Foot x/y are relative to the
  * ground point under the hips (y negative = lifted).
  */
@@ -632,11 +633,11 @@ export function drawHair(g, J, P, d, style, hair) {
  * look: { skin, top, bottom, boots, hair, hairStyle, bareArms }
  * hooks (all optional, each receives (g, J, P, d); the header of this file says what each is given and when):
  *   behind – drawn first (capes, wings, tails)
- *   offhand – after the far arm (shields, lanterns, bows)
+ *   offhand – after the far arm (shields, lanterns)
  *   torso – after the body (belts, armour, robes)
  *   head – after hair (hats, helmets, horns, beards), drawn upright; the rig turns it with the head when the pose
  *          says so (P.headTurn). Set look.hairStyle 'bald' to hide hair under a full helmet
- *   item – the thing in the front hand, drawn under the hand (weapons, staffs)
+ *   item – the thing in the front hand, drawn under the hand (weapons, staffs); a bow too, at bowGrip(J, P)
  *   front – drawn last
  * Returns the joints J.
  */
@@ -812,7 +813,20 @@ export function bow(g, at, len, wood, opt = {}) {
   g.dot(at.x + ux, at.y + uy, wood.light);                               // the grip
 }
 
-/** Kinds heldItem() can draw. A bow is held in the far hand: draw it at sockets().offhand, in the item hook so it is in front of the body. */
+/**
+ * Where and how a bow is held, as an attach point { x, y, angle } for heldItem: in the far hand, standing upright whether
+ * carried or aimed, going over with the body in `die` and laid flat on the ground at the end, never in the ground.
+ * Arguments: J (joints), P (pose), len (the bow, tip to tip; default the standard bow).
+ */
+export function bowGrip(J, P, len = 15) {
+  const angle = (PI / 2) * (1 - (P.lie || 0));                     // PI/2: the bow stands on end; 0: it lies along the ground
+  const half = len / 2, sweep = len * 0.2, s = Math.sin(angle), c = Math.cos(angle);
+  const low = Math.max(s * half - c * sweep, -s * half - c * sweep, c * 0.4) + 0.6;    // how far below the grip its lowest pixel is
+  const lie = P.lie || 0;                                           // going down, it leaves the height of the hand for the ground
+  return { x: J.armB.hand[0], y: Math.min(lie ? lerp(J.armB.hand[1], J.gy, lie) : J.armB.hand[1], J.gy - 1 - low), angle };
+}
+
+/** Kinds heldItem() can draw. A bow is held in the far hand: draw it at bowGrip(J, P), in the item hook so it is in front of the body. */
 export const ITEM_KINDS = ['sword', 'axe', 'spear', 'staff', 'bow', 'gun'];
 
 /**

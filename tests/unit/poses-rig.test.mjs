@@ -48,7 +48,7 @@ const doll = defineSprite({
       item: (g, J) => {
         if (item) H.heldItem(g, H.sockets(J, P, d).hand, { kind: p.weapon, length: item.length });
         // the bow is in the far hand, drawn in front of the body and under the near (string) hand
-        if (clip === 'bowshot') H.heldItem(g, H.sockets(J, P, d).offhand, { kind: 'bow', length: H.ITEMS.bow.length, nock: P.pull ? H.sockets(J, P, d).hand : null, arrow: P.pull > 0 });
+        if (clip === 'bowshot') H.heldItem(g, H.bowGrip(J, P), { kind: 'bow', length: H.ITEMS.bow.length, nock: P.pull ? H.sockets(J, P, d).hand : null, arrow: P.pull > 0 });
       },
     });
     if (P.flash) g.tint('#ffffff');
@@ -390,6 +390,32 @@ test('shoot with a bow: drawn on frame 0, loosed on frame 1, the bow arm out lev
   const sx = (g) => { const xs = string(g).map((q) => q[0]); return Math.max(...xs) - Math.min(...xs) + 1; };
   assert.ok(string(drawn).length >= 6 && string(loosed).length >= 6, 'no string');
   assert.ok(sx(drawn) >= sx(loosed) + 3, `the drawn string spans ${sx(drawn)} px sideways, the loosed one ${sx(loosed)}`);
+});
+
+test('bowGrip: a carried bow stands upright in the far hand, is aimed when shooting, and is laid on the ground when lying', () => {
+  const L = H.ITEMS.bow.length;
+  const shape = (at) => { const g = new Surface(64, 64); H.heldItem(g, at, { kind: 'bow', length: L }); const b = g.bounds(); return { w: b.x1 - b.x0 + 1, h: b.y1 - b.y0 + 1, y1: b.y1 }; };
+  for (const [what, body] of BODIES) {
+    const p = look({ ...body, weapon: 'none' });
+    for (const clip of ['idle', 'walk', 'block', 'hurt', 'victory', 'talk', 'bowshot']) for (const f of frames(clip)) {
+      const { P, J } = poseAt(clip, f, p), at = H.bowGrip(J, P, L), where = `${what} ${clip} frame ${f}`;
+      assert.ok(Math.abs(at.angle - PI / 2) < 0.3, `${where}: the bow points ${at.angle.toFixed(2)}; it should stand upright`);
+      assert.ok(Math.abs(at.x - J.armB.hand[0]) < 1e-9 && Math.abs(at.y - J.armB.hand[1]) < 2.01, `${where}: the bow is not in the far hand`);
+      const b = shape(at);
+      assert.ok(b.h >= L - 3 && b.h > b.w * 2, `${where}: drawn ${b.w} wide and ${b.h} tall`);
+      assert.ok(b.y1 < H.GROUND, `${where}: the bow goes into the ground (row ${b.y1})`);
+    }
+    // shooting, it is exactly the aim
+    for (const f of [0, 1]) assert.ok(Math.abs(H.bowGrip(poseAt('bowshot', f, p).J, poseAt('bowshot', f, p).P, L).angle - PI / 2) < 0.05, `${what}: aim on frame ${f}`);
+    // dying: it goes over with the body, never into the ground, and ends flat on it
+    for (const f of frames('die')) {
+      const { P, J } = poseAt('die', f, p), b = shape(H.bowGrip(J, P, L));
+      assert.ok(b.y1 < H.GROUND, `${what} die frame ${f}: the bow goes into the ground (row ${b.y1})`);
+    }
+    const end = poseAt('die', 7, p), flat = shape(H.bowGrip(end.J, end.P, L));
+    assert.ok(flat.w >= L - 3 && flat.w > flat.h * 2.5, `${what}: at the end the bow is ${flat.w} wide and ${flat.h} tall: not lying flat`);
+    assert.ok(flat.y1 >= H.GROUND - 2, `${what}: the lying bow floats (lowest row ${flat.y1})`);
+  }
 });
 
 test('heldItem draws a bow and a gun from an attach point, like the other kinds', () => {
