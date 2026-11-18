@@ -246,7 +246,7 @@ export const RIG = {
 
   duplicates: [
     {
-      what: 'Six functions draw held things, in two chains that each fall through to the next; no one function draws every kind, so a sprite must know which wrapper has its kind. Six size tables and six size functions go with them, and "pistol" is in two tables.',
+      what: 'Six functions draw held things, each passing what it does not know on to another (tradeItem to smallItem to heldItem; riotItem to heldGun to heldItem; townItem to heldItem). No one function draws every kind, so a sprite must know which wrapper has its kind. Six size tables and six size functions go with them, and "pistol" is in two tables.',
       calls: ['topdown.heldItem', 'topdown.smallItem', 'topdown.tradeItem', 'topdown.townItem', 'topdown.heldGun', 'topdownRiot.riotItem', 'topdown.itemSize', 'topdown.smallItemSize', 'topdown.tradeItemSize', 'topdown.townItemSize', 'topdown.gunSize', 'topdownRiot.riotItemSize', 'topdown.ITEMS', 'topdown.SMALL_ITEMS', 'topdown.TRADE_ITEMS', 'topdown.TOWN_ITEMS', 'topdown.GUNS', 'topdownRiot.RIOT_ITEMS', 'topdown.ITEM_KINDS', 'topdown.TOWN_ITEM_KINDS', 'topdown.GUN_KINDS'],
       merge: 'One registry of held kinds { kind: { length, back, pad, carry, hangs, long, melee, draw } }, one size function and one draw function; a side module registers its kinds instead of wrapping.',
     },
@@ -266,7 +266,7 @@ export const RIG = {
       merge: 'One MANNERS table by name (dash, walkingStick, braced, carryShield, stoop, plantStick join it), so a definition can name a manner; CARRY written as one table.',
     },
     {
-      what: 'Fourteen pieces of headgear and six ways to ask how far one rises: headgearRise(kind) knows four of them under names of its own ("hat-wide"), five have a function each, and the kettle hat has none (the sprite borrows the wide hat\'s). hat kind "cap" and peakedCap are two caps.',
+      what: 'Fourteen pieces of headgear, each a function of its own, and five functions that say how far one rises: headgearRise(kind) knows four of them under names of its own ("hat-wide"), four have a function each, the kettle hat has none (the sprite borrows the wide hat\'s), and packRise is the same idea for a pack. hat kind "cap" and peakedCap are two caps.',
       calls: ['topdown.headgearRise', 'topdown.hairBowRise', 'topdown.visorHelmetRise', 'topdown.peakedCapRise', 'topdown.turbanRise', 'topdown.packRise', 'topdown.hat', 'topdown.peakedCap', 'topdown.kettleHat'],
       merge: 'One registry of headgear { name: { draw, rise(size), hatted } } and one headgear(g, J, P, d, { kind, size, ... }), as rigs/humanoid-figure.js has wear().',
     },

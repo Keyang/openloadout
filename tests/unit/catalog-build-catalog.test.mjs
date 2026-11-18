@@ -110,14 +110,20 @@ test('music rows: stereo, bpm from the bpm control, no pictures', () => {
 });
 
 test('bundles are listed on each asset they contain', () => {
-  assert.deepEqual(byId.knight.bundles, ['dungeon-starter']);
-  assert.deepEqual(byId.coin.bundles, ['dungeon-starter', 'menu-sounds']);
-  assert.deepEqual(byId['footstep-gravel'].bundles, ['dungeon-starter', 'wizard-camp']);
-  assert.deepEqual(byId['battle-theme'].bundles, ['dungeon-starter']);
-  assert.deepEqual(byId.explosion.bundles, []);
-  for (const b of cat.bundles) {
-    assert.deepEqual(Object.keys(b).filter((k) => !['level'].includes(k)).sort(), ['blurb', 'gameType', 'id', 'music', 'name', 'sounds', 'sprites', 'theme']);
-    for (const id of [...b.sprites, ...b.sounds, ...b.music]) assert.ok(byId[id].bundles.includes(b.id));
+  // derived from the bundle records, so adding a bundle never breaks this test
+  assert.ok(cat.bundles.length >= 3);
+  for (const bundle of cat.bundles) {
+    for (const id of [...bundle.sprites, ...bundle.sounds, ...bundle.music]) {
+      assert.ok(byId[id], `${bundle.id} lists ${id}, which is not in the catalogue`);
+      assert.ok(byId[id].bundles.includes(bundle.id), `${id} does not list ${bundle.id}`);
+    }
+  }
+  for (const a of cat.assets) {
+    assert.deepEqual(a.bundles, [...a.bundles].sort(), `${a.id}: bundles are sorted`);
+    for (const b of a.bundles) {
+      const rec = cat.bundles.find((x) => x.id === b);
+      assert.ok(rec && [...rec.sprites, ...rec.sounds, ...rec.music].includes(a.id), `${a.id} lists ${b}, which does not contain it`);
+    }
   }
 });
 

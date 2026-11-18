@@ -11,7 +11,7 @@
 // The shape of a description is written out in docs/framework-api.md, section "Rigs".
 
 const num = (min, max, def, what) => ({ min, max, default: def, ...(what ? { what } : {}) });
-const SIZE = num(0.65, 1.35, 1, 'its Size setting; 1 = standard');
+const GEAR = num(0.65, 1.35, 1, 'its Size setting; 1 = standard');
 const FRONT = ['front'];
 
 /** The kiosk robot rig described as data: id, view, frame, poses, body, parts, held kinds, sockets, and what overlaps. No arguments: a constant. */
@@ -64,15 +64,15 @@ export const RIG = {
   hair: [],
 
   parts: [
-    { name: 'antenna', fn: 'kiosk.draw', via: { option: 'headgear' }, list: 'kiosk.HEADGEAR', layer: 'top', socket: 'head', directions: FRONT, options: { size: SIZE }, what: 'A rod with a ball on top of the cabinet; it lags as the machine bobs.' },
-    { name: 'dish', fn: 'kiosk.draw', via: { option: 'headgear' }, list: 'kiosk.HEADGEAR', layer: 'top', socket: 'head', directions: FRONT, options: { size: SIZE }, what: 'A small dish on a mast.' },
-    { name: 'cap', fn: 'kiosk.draw', via: { option: 'headgear' }, list: 'kiosk.HEADGEAR', layer: 'top', socket: 'head', directions: FRONT, options: { size: SIZE }, what: "A shopkeeper's peaked cap." },
+    { name: 'antenna', fn: 'kiosk.draw', via: { option: 'headgear' }, list: 'kiosk.HEADGEAR', layer: 'top', socket: 'head', directions: FRONT, options: { size: GEAR }, what: 'A rod with a ball on top of the cabinet; it lags as the machine bobs.' },
+    { name: 'dish', fn: 'kiosk.draw', via: { option: 'headgear' }, list: 'kiosk.HEADGEAR', layer: 'top', socket: 'head', directions: FRONT, options: { size: GEAR }, what: 'A small dish on a mast.' },
+    { name: 'cap', fn: 'kiosk.draw', via: { option: 'headgear' }, list: 'kiosk.HEADGEAR', layer: 'top', socket: 'head', directions: FRONT, options: { size: GEAR }, what: "A shopkeeper's peaked cap." },
     { name: 'arms', fn: 'kiosk.draw', via: { option: 'arms', value: true, bare: false }, layer: 'arms', socket: 'offhand', directions: FRONT, options: {}, what: 'Two thin arms; the free one waves in talk and points at the hatch in sell. Without them a held thing sits on a bracket.' },
   ],
 
   held: [
-    { name: 'sign', fn: 'kiosk.draw', via: { option: 'held' }, list: 'kiosk.HELD', layer: 'held', socket: 'hand', directions: FRONT, length: SIZE, clips: ['idle', 'talk', 'sell'], what: 'A plate on a pole with a coin on it.' },
-    { name: 'tray', fn: 'kiosk.draw', via: { option: 'held' }, list: 'kiosk.HELD', layer: 'held', socket: 'hand', directions: FRONT, length: SIZE, clips: ['idle', 'talk', 'sell'], what: 'A tray of goods.' },
+    { name: 'sign', fn: 'kiosk.draw', via: { option: 'held' }, list: 'kiosk.HELD', layer: 'held', socket: 'hand', directions: FRONT, length: GEAR, clips: ['idle', 'talk', 'sell'], what: 'A plate on a pole with a coin on it.' },
+    { name: 'tray', fn: 'kiosk.draw', via: { option: 'held' }, list: 'kiosk.HELD', layer: 'held', socket: 'hand', directions: FRONT, length: GEAR, clips: ['idle', 'talk', 'sell'], what: 'A tray of goods.' },
   ],
 
   effects: [

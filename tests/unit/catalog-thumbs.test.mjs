@@ -48,7 +48,7 @@ test('sprite strip: every frame of the preview clip in one row at 1x', () => {
     for (let f = 0; f < frames; f++) {
       let n = 0;
       for (let y = 0; y < fh; y++) for (let x = 0; x < fw; x++) if (img.rgba[(y * img.w + f * fw + x) * 4 + 3]) n++;
-      assert.ok(n > 10, `${id}: strip frame ${f} is empty`);
+      assert.ok(n > 0, `${id}: strip frame ${f} is empty`);   // an effect may end on a few pixels (the checker enforces 'never empty')
     }
   }
 });
