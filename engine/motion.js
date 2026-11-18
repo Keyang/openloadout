@@ -1,14 +1,20 @@
 // Motion helpers: everything an animation needs is a pure function of the
 // clip phase t (0..1) and the sprite's parameters.
 
-export const TAU = Math.PI * 2;
-export const PI = Math.PI;
+export const TAU = Math.PI * 2;   // a full turn, in radians
+export const PI = Math.PI;        // half a turn, in radians
 
+/** The value t of the way from a to b: t = 0 gives a, t = 1 gives b. */
 export const lerp = (a, b, t) => a + (b - a) * t;
+/** Keep v between lo and hi (0 and 1 unless given). */
 export const clamp = (v, lo = 0, hi = 1) => (v < lo ? lo : v > hi ? hi : v);
+/** Ease in and out: 0..1 -> 0..1, slow at both ends (smoothstep). t is clamped. */
 export const smooth = (t) => { t = clamp(t); return t * t * (3 - 2 * t); };
+/** Ease in: 0..1 -> 0..1, starting slow and ending fast. t is clamped. */
 export const easeIn = (t) => clamp(t) ** 2;
+/** Ease out: 0..1 -> 0..1, starting fast and ending slow. t is clamped. */
 export const easeOut = (t) => 1 - (1 - clamp(t)) ** 2;
+/** The part of t after the decimal point, always 0 up to 1 (fract(-0.25) is 0.75): wraps a phase round a loop. */
 export const fract = (t) => t - Math.floor(t);
 
 /** Sine wave, one cycle per clip. phase is in cycles (0.25 = quarter turn). */

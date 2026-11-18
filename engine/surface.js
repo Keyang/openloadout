@@ -12,8 +12,10 @@ import { col } from './color.js';
 // Each returns inside(px, py). Combine several with g.blob([...]) to paint them
 // as ONE body: one shade band around the whole group and no seams at the joins.
 
+/** Shape test for an ellipse centred on (cx, cy) with radii rx, ry: returns inside(px, py). */
 export const ellipseIn = (cx, cy, rx, ry) => (px, py) => ((px - cx) / rx) ** 2 + ((py - cy) / ry) ** 2 <= 1;
 
+/** Shape test for a thick line with round ends from (x0, y0) to (x1, y1); its radius goes from r0 to r1. Returns inside(px, py). */
 export function capsuleIn(x0, y0, x1, y1, r0, r1 = r0) {
   const dx = x1 - x0, dy = y1 - y0, len2 = dx * dx + dy * dy || 1e-6;
   return (px, py) => {
@@ -25,6 +27,7 @@ export function capsuleIn(x0, y0, x1, y1, r0, r1 = r0) {
   };
 }
 
+/** Shape test for a polygon; pts = [[x, y], ...]. Returns inside(px, py). */
 export function polyIn(pts) {
   const n = pts.length;
   return (px, py) => {
@@ -37,8 +40,13 @@ export function polyIn(pts) {
   };
 }
 
+/** Shape test for a rectangle with its top-left corner at (x, y), w wide and h tall. Returns inside(px, py). */
 export const rectIn = (x, y, w, h) => (px, py) => px >= x && px < x + w && py >= y && py < y + h;
 
+/**
+ * A grid of w x h pixels to draw on, all see-through to begin with. Every drawing call returns the Surface,
+ * so calls chain. `data` holds one packed colour per pixel (0 = see-through); `shadow` is the way shade falls.
+ */
 export class Surface {
   constructor(w, h) {
     this.w = w;
@@ -48,8 +56,10 @@ export class Surface {
     this.shadow = [-1, 1];
   }
 
+  /** Make every pixel see-through again. */
   clear() { this.data.fill(0); return this; }
 
+  /** The packed colour of one pixel; 0 when it is see-through or outside the grid. */
   get(x, y) {
     if (x < 0 || y < 0 || x >= this.w || y >= this.h) return 0;
     return this.data[y * this.w + x];
@@ -118,6 +128,7 @@ export class Surface {
     return this.fill(0, 0, this.w, this.h, inside, paint, opt);
   }
 
+  /** Rectangle with its top-left corner at (x, y), w wide and h tall. */
   rect(x, y, w, h, paint, opt) {
     return this.fill(x, y, x + w, y + h, (cx, cy) => cx >= x && cx < x + w && cy >= y && cy < y + h, paint, opt);
   }

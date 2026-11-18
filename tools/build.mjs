@@ -94,6 +94,10 @@ await step('catalogue', async () => {
   return `${catalog.assets.length} assets, ${catalog.bundles.length} bundles -> ${rel(out)} (${(fs.statSync(out).size / 1024).toFixed(1)} KB), ${rel(all)} (${(fs.statSync(all).size / 1024).toFixed(1)} KB)`;
 });
 
+// ==== W5-A: the framework describes itself (Contract 11): generated/api.json, generated/framework.js ====
+await step('framework', async () => (await import(pathToFileURL(path.join(ROOT, 'tools', 'lib', 'api.mjs')).href)).writeApi({ root }));
+// ==== end W5-A ====
+
 // ---- thumbnails and strips -------------------------------------------------------------
 await step('thumbnails', async () => {
   const r = writeImages({ root, sprites: loaded.sprites, sounds: loaded.sounds, force: has('--force') });

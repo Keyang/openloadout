@@ -3,10 +3,12 @@
 
 const packed = new Map();
 
+/** Pack red, green, blue and alpha (0..255 each) into the one 32-bit number a Surface stores per pixel. */
 export function pack(r, g, b, a = 255) {
   return ((a << 24) | (b << 16) | (g << 8) | r) >>> 0;
 }
 
+/** '#rrggbb' (or '#rgb') -> [r, g, b], each 0..255. */
 export function hexToRgb(hex) {
   let h = hex.replace('#', '');
   if (h.length === 3) h = h.split('').map((x) => x + x).join('');
@@ -14,6 +16,7 @@ export function hexToRgb(hex) {
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
 }
 
+/** Red, green, blue (0..255, rounded and clamped) -> '#rrggbb'. */
 export function rgbToHex(r, g, b) {
   const c = (v) => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0');
   return '#' + c(r) + c(g) + c(b);
@@ -31,6 +34,7 @@ export function col(c) {
   return v;
 }
 
+/** Red, green, blue (0..255) -> [hue in degrees 0..360, saturation 0..1, lightness 0..1]. */
 export function rgbToHsl(r, g, b) {
   r /= 255; g /= 255; b /= 255;
   const max = Math.max(r, g, b), min = Math.min(r, g, b);
@@ -45,6 +49,7 @@ export function rgbToHsl(r, g, b) {
   return [h * 60, s, l];
 }
 
+/** Hue (degrees, any number), saturation and lightness (0..1) -> [r, g, b], each 0..255 and not rounded. */
 export function hslToRgb(h, s, l) {
   h = ((h % 360) + 360) % 360;
   const c = (1 - Math.abs(2 * l - 1)) * s;
@@ -60,6 +65,7 @@ export function hslToRgb(h, s, l) {
   return [(r + m) * 255, (g + m) * 255, (b + m) * 255];
 }
 
+/** Hue (degrees), saturation and lightness (0..1) -> '#rrggbb'. */
 export const hsl = (h, s, l) => rgbToHex(...hslToRgb(h, s, l));
 
 /** Move hue `h` up to `deg` degrees toward `target` along the short way round. */
@@ -69,6 +75,7 @@ function hueToward(h, target, deg) {
   return h + Math.sign(d) * deg;
 }
 
+/** Blend two '#rrggbb' colours: t = 0 gives a, t = 1 gives b. */
 export function mix(a, b, t) {
   const A = hexToRgb(a), B = hexToRgb(b);
   return rgbToHex(A[0] + (B[0] - A[0]) * t, A[1] + (B[1] - A[1]) * t, A[2] + (B[2] - A[2]) * t);

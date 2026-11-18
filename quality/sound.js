@@ -12,6 +12,7 @@
 import { validatePatch, renderPatch, createVoice } from '../sound/sfx-engine.js';
 import { analyze, critique, fingerprint, fingerprintDistance, pulse, seam } from '../sound/analyze.js';
 
+/** Every number the sound quality bar judges by (written down in docs/quality-bar.md). */
 export const THRESHOLDS = {
   silentDb: -40,            // peak below this is silence
   audibleChangeDb: 1.5,     // a control should move the fingerprint by more than this between its ends (warning)
@@ -27,6 +28,7 @@ export const THRESHOLDS = {
 
 const now = () => (typeof performance !== 'undefined' ? performance : Date).now();
 
+/** What kind of audio a patch is: its meta.type, or from its category: 'sfx', 'ambience', 'jingle' or 'music'. */
 export function soundType(patch) {
   if (patch?.meta && typeof patch.meta.type === 'string') return patch.meta.type;
   const c = patch?.category;
@@ -48,6 +50,11 @@ export function writtenTempo(patch) {
   return typeof patch.bpm === 'number' ? patch.bpm : null;
 }
 
+/**
+ * Run the sound and music quality bar on a patch. Returns { errors, warnings, notes, metrics }; no errors means it passes.
+ * validateMeta: (meta, kind) -> { ok, errors } from catalog/schema.js; when left out, metadata is not checked.
+ * Renders the patch many times (every control at both ends, every style), so a music track takes minutes.
+ */
 export function checkSound(patch, { validateMeta } = {}) {
   const t0 = now();
   const T = THRESHOLDS;

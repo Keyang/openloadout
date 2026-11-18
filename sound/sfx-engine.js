@@ -4,9 +4,10 @@
 // (agent-side validation). A sound is a JSON "patch": named parameters, a list
 // of DSP nodes, and expressions that wire them together.
 
-export const FORMAT = 'sfxpatch/0.1';
+export const FORMAT = 'sfxpatch/0.1';   // what a patch's "format" field says
 const TAU = Math.PI * 2;
 
+/** The error the engine throws for a patch it cannot run; its message says which field is wrong. */
 export class PatchError extends Error {}
 
 // ---------------------------------------------------------------- random
@@ -43,7 +44,9 @@ const FUNCS = {
   smooth: [3, (e0, e1, x) => { let u = (x - e0) / (e1 - e0); u = u < 0 ? 0 : u > 1 ? 1 : u; return u * u * (3 - 2 * u); }],
 };
 const BUILTIN_NAMES = ['t', 'dur', 'sr', 'pi', 'tau', 'rnd'];
+/** The functions a patch's expressions may call (sin, clamp, lerp, ...), by name. */
 export const EXPRESSION_FUNCTIONS = Object.keys(FUNCS).concat(['rnd']);
+/** Names a control or a node may not use as its id: the built-in values (t, dur, sr, pi, tau, rnd) and the expression functions. */
 export const RESERVED = new Set([...BUILTIN_NAMES, ...Object.keys(FUNCS)]);
 
 function tokenize(src) {
@@ -188,6 +191,7 @@ function trigger(h) {
   return () => { const x = tr(); const fire = x > 0 && prev <= 0; prev = x; return fire; };
 }
 
+/** Every synthesis block a patch can use, by type name: each has `doc` (what it does) and the fields it takes. */
 export const NODE_TYPES = {
   osc: {
     doc: 'Oscillator. Band-limited saw/square/pulse.',
@@ -614,6 +618,7 @@ export const NODE_TYPES = {
 // choices instead of a slider — "step": n snaps it to min, min+n, ...; "options": [names]
 // makes it 0..names.length-1 with a name per value (a melody instrument, say).
 // Longest render: 30 s for sound effects, 120 s for music (Loadout addition; the experiment caps both at 30).
+/** The longest a render of this patch may be, in seconds: 120 for music, 30 for everything else. */
 export const maxSecondsFor = (patch) => (patch && patch.category === 'music' ? 120 : 30);
 const isStepped = (p) => !!(p.options || p.step);
 function clampParam(p, v) {
@@ -624,6 +629,7 @@ function clampParam(p, v) {
   return v < p.min ? p.min : v > p.max ? p.max : v;
 }
 
+/** A patch's controls at their defaults: { id: value }. */
 export function defaultParams(patch) {
   const o = {};
   for (const p of patch.params || []) o[p.id] = p.default;
@@ -797,6 +803,10 @@ const TOP_FIELDS = new Set(['format', 'id', 'name', 'category', 'tags', 'descrip
 const PARAM_FIELDS = new Set(['id', 'label', 'min', 'max', 'default', 'unit', 'scale', 'step', 'hint', 'options']);
 const ID_RE = /^[A-Za-z_][A-Za-z0-9_]*$/;
 
+/**
+ * Check that a patch is well formed without rendering it: fields, controls, nodes, wiring and expressions.
+ * Returns { ok, errors, warnings }; each message names the field and what to write instead.
+ */
 export function validatePatch(patch) {
   const errors = [], warnings = [];
   const err = (m) => errors.push(m), warn = (m) => warnings.push(m);

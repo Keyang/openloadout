@@ -1,6 +1,7 @@
 // analyze.js — measurements of a rendered sound, so an agent (or a test) can
 // check a patch without listening to it. Pure JS; shared by the CLI and the site.
 
+/** Fast Fourier transform, in place: re and im are arrays of the same power-of-two length and are overwritten with the result. */
 export function fft(re, im) {
   const n = re.length;
   for (let i = 1, j = 0; i < n; i++) {
@@ -43,6 +44,10 @@ const BANDS = [['sub <80', 0, 80], ['low 80-300', 80, 300], ['lowmid 300-1k', 30
 const SPARK = '▁▂▃▄▅▆▇█';
 const dB = (x) => (x > 1e-9 ? 20 * Math.log10(x) : -180);
 
+/**
+ * Measure a rendered sound: length, peak and loudness in dB, clipped samples, where the energy sits by band,
+ * brightness, how it starts and ends. samples: one channel; sr: its sample rate. Returns plain numbers and short text.
+ */
 export function analyze(samples, sr) {
   const n = samples.length;
   let peak = 0, sum = 0, sq = 0, clipped = 0;
@@ -125,6 +130,7 @@ export function fingerprint(samples, sr, seconds, T = 24, B = 20) {
   }
   return out;
 }
+/** How different two fingerprints are, as the mean gap in dB over the cells where either one is audible (0 = the same). */
 export function fingerprintDistance(a, b) {
   let s = 0, c = 0;
   for (let i = 0; i < a.length; i++) { if (a[i] > -65 || b[i] > -65) { s += Math.abs(a[i] - b[i]); c++; } }
@@ -150,6 +156,7 @@ export function critique(a, patch) {
 // Music checks. pulse(): finds the strongest repeating beat periods from the
 // onset pattern (spectral flux autocorrelation); returns candidates as BPM.
 // Half and double tempo show up too, so read the list, not just the first entry.
+/** The strongest repeating beats in a render, as tempo candidates: up to four { bpm, strength }, strongest first (half and double tempo show up too). */
 export function pulse(samples, sr) {
   const hop = 256, frames = spectrogram(samples, 1024, hop), F = frames.length, fr = sr / hop;
   const flux = new Float32Array(F);
