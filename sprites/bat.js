@@ -5,6 +5,7 @@
 import { defineSprite, range, choice, color, toggle } from '../engine/sprite.js';
 import { lerp, clamp, wave, pulse, keys } from '../engine/motion.js';
 import { ramp, farRamp, tone, INK } from '../engine/color.js';
+import { Surface, blitInside } from '../engine/surface.js';
 
 const W = 48, CX = 25, CY = 25;
 const FUR = ['#5b4a78', '#3a3350', '#6b4a3a', '#8a93a6', '#c9423a', '#3f7a5e', '#e9e2d0', '#3f5fa8'];
@@ -110,7 +111,12 @@ export default defineSprite({
     die: { frames: 8, fps: fps(10), loop: false },
   },
 
-  render(g, { clip, t, p }) {
+  render(frame, { clip, t, p }) {
+    // Outside `die` (which keeps itself inside), the bat is drawn on a layer bigger than the frame by ROOM on every side and
+    // then set into the frame: a picture that fits lands exactly where it was drawn; one whose wing would pass the edge (the
+    // widest wings at the far end of the lunge) is moved back by the pixels it needs.
+    const ROOM = clip === 'die' ? 0 : 10;
+    const g = ROOM ? new Surface(W + 2 * ROOM, W + 2 * ROOM) : frame;
     const r = lerp(4.5, 8, p.size);
     const L = lerp(10, 16, p.span);
     const earH = lerp(3, 9.5, p.ears);
@@ -168,7 +174,7 @@ export default defineSprite({
       mood = 'hurt';
     }
 
-    const cx = Math.round(CX + dx), cy = Math.round(CY + dy);
+    const cx = Math.round(CX + dx) + ROOM, cy = Math.round(CY + dy) + ROOM;
     const rx = r * (1 + sq), ry = r * 1.06 * (1 - sq);
     const fur = ramp(p.body), skin = ramp(p.membrane);
 
@@ -282,5 +288,6 @@ export default defineSprite({
       const sx = cx + Math.round(rx) + 2, sy = my;
       g.line(sx, sy - 2, sx + 2, sy - 3, '#ffffff'); g.line(sx + 1, sy, sx + 3, sy, '#ffffff'); g.line(sx, sy + 2, sx + 2, sy + 3, '#ffffff');
     }
+    if (ROOM) blitInside(frame, g, 1, { dx: -ROOM, dy: -ROOM });
   },
 });

@@ -132,6 +132,14 @@ test('the new clips stay inside the frame and never draw an empty frame, at ever
   }
 });
 
+test('slime and bat: no clip reaches the frame edge at any tested setting, the far ends of every slider with every choice included', () => {
+  for (const s of [slime, bat]) for (const [what, p] of testedLooks(s)) for (const clip of Object.keys(s.clips)) for (const f of frames(s, clip)) {
+    const b = renderFrame(s, clip, f, p).bounds();
+    assert.ok(b, `${s.id}, ${what}: ${clip} frame ${f} is empty`);
+    assert.ok(b.x0 > 0 && b.y0 > 0 && b.x1 < s.size[0] - 1 && b.y1 < s.size[1] - 1, `${s.id}, ${what}: ${clip} frame ${f} touches the frame edge (box ${b.x0},${b.y0}..${b.x1},${b.y1})`);
+  }
+});
+
 test('the new clips are animations: no frame repeats the one before, and the loops close', () => {
   for (const [id, s] of Object.entries(SPRITES)) for (const clip of Object.keys(ASKED[id])) {
     const p = defaultParams(s), n = s.clips[clip].frames;

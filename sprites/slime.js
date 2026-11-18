@@ -3,8 +3,10 @@
 import { defineSprite, range, choice, color, toggle } from '../engine/sprite.js';
 import { lerp, wave, pulse, keys, clamp } from '../engine/motion.js';
 import { ramp, tone, INK } from '../engine/color.js';
+import { Surface, blitInside } from '../engine/surface.js';
 
 const W = 48, GROUND = 42, CX = 22;
+const HEADROOM = 14;       // rows of spare room above the frame while drawing: the tallest, bounciest slime with something on top needs them
 const GOO = ['#5fc46b', '#3fb3c9', '#4f7fe0', '#9a62d6', '#e0609a', '#e2574c', '#e89a35', '#e6cf4a', '#8a93a6'];
 
 export default defineSprite({
@@ -37,7 +39,10 @@ export default defineSprite({
     die: { frames: 8, fps: (p) => 10 * lerp(0.65, 1.45, p.speed), loop: false },
   },
 
-  render(g, { clip, t, p }) {
+  render(frame, { clip, t, p }) {
+    // Drawn on a layer with room above the frame, then set into the frame. A picture that fits lands exactly where it was
+    // drawn; one that would leave the top (the biggest slime at the top of its highest hop) is lowered by the rows it needs.
+    const g = new Surface(W, W + HEADROOM), FLOOR = GROUND + HEADROOM;
     const r = lerp(6, 11, p.size);                 // base radius
     const tall = lerp(0.72, 1.12, p.shape);
     const wob = lerp(0.5, 1.6, p.wobble);
@@ -70,7 +75,7 @@ export default defineSprite({
       burst = clamp((t - 0.43) / 0.57);              // 0 until it bursts, then 0..1 over frames 4 to 7
     }
 
-    const cx = CX + dx, base = GROUND - lift;
+    const cx = CX + dx, base = FLOOR - lift;
     const wide = clip === 'die' ? cx - 3 : Infinity;      // dying, it spreads out: never past the frame edge
     // after the burst the body is a puddle: a low dome that spreads and settles
     const puddle = burst > 0;
@@ -157,7 +162,8 @@ export default defineSprite({
 
     // landing splat drops, drawn after the outline so they stay crisp single pixels
     if (clip === 'hop' && t > 0.84) {
-      g.dot(cx - rx - 2, GROUND - 2, goo.base); g.dot(cx + rx + 2, GROUND - 2, goo.base);
+      g.dot(cx - rx - 2, FLOOR - 2, goo.base); g.dot(cx + rx + 2, FLOOR - 2, goo.base);
     }
+    blitInside(frame, g, 1, { dy: -HEADROOM });
   },
 });
