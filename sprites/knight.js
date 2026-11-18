@@ -1,10 +1,87 @@
 // Hero: a two-legged adventurer built on the shared humanoid rig.
-import { defineSprite, range, choice, color, toggle, SKIN, HAIR, CLOTH, METAL } from '../engine/sprite.js';
-import { lerp, reach, PI } from '../engine/motion.js';
+// The worked example for parts (docs/architecture.md, Contract 3): the weapon, headgear, cape and hair are each
+// declared in `parts` with settings of their own, drawn from an attach point, and exported with the sprite.
+import { defineSprite, range, choice, color, SKIN, HAIR, CLOTH, METAL } from '../engine/sprite.js';
 import * as H from '../rigs/humanoid.js';
 import { ramp, farRamp, tone, INK } from '../engine/color.js';
 
-const WEAPON_LEN = { sword: 13, axe: 12, spear: 15, none: 0 };
+const WEAPON_KINDS = ['sword', 'axe', 'spear'];          // sizes come from the rig (H.ITEMS), shared by every character
+const NO_METAL = '#c2c9d6';                               // the belt buckle's colour when nothing else metal is worn or held
+
+/** Hand-to-tip length of the weapon in pixels for these settings; 0 when no weapon is held. */
+export const weaponReach = (p) => H.itemSize(p.weapon, p.weaponLength)?.length ?? 0;
+
+/** How far the headgear rises above the top of the head, in pixels. */
+function headgearRise(p, d) {
+  if (p.headgear === 'helmet') return 3 + 2.5 * p.headgearSize + 1.6 * Math.sqrt(p.headgearSize);
+  if (p.headgear === 'crown') return 1 + crownBand(p) + crownPoints(p);
+  return 0;
+}
+const crownBand = (p) => Math.max(1, Math.round(2 * p.headgearSize));
+const crownPoints = (p) => Math.max(1, Math.round(p.headgearSize));
+
+/** The Hero's pose for a frame: the rig's pose with the weapon's own settings, kept inside the frame. */
+function heroPose(clip, t, p, d) {
+  const w = H.itemSize(p.weapon, p.weaponLength);
+  const m = {
+    bounce: p.bounce, stride: p.stride, armed: !!w,
+    hold: w ? H.holdAngle(p.weaponAngle) : 0,       // the Hold angle slider is in degrees
+    swing: w ? p.weaponSwing : 1,
+  };
+  const P = H.pose(!w && clip === 'attack' ? 'punch' : clip, t, m, d);   // no weapon: an unarmed attack
+  const rise = headgearRise(p, d);
+  return H.fit(P, d, {
+    item: w,
+    points: rise ? (J) => [[J.head[0], J.head[1] - d.headR - rise]] : null,
+  });
+}
+
+// ---- parts: each is drawn from an attach point and its own settings ----
+
+function drawCape(g, J, P, d, { kind, length, colour }) {
+  const [nx, ny] = J.neck, s = P.sway;
+  const hemY = (k) => Math.min(J.hip[1] + d.leg * k * length, J.gy - 1);
+  const back = [nx - d.chestR - 3 - s * 2.5, hemY(0.45)], front = [nx - d.chestR + 1.5 - s * 1.5, hemY(0.55)];
+  const pts = [[nx + 1, ny + 1], [nx - d.chestR - 0.5, ny + 1], back];
+  if (kind === 'tattered') {
+    // a torn hem: two bites out of the bottom edge
+    const at = (k, up) => [back[0] + (front[0] - back[0]) * k, back[1] + (front[1] - back[1]) * k - up];
+    pts.push(at(0.2, 0), at(0.35, 3.5), at(0.5, 0), at(0.68, 3), at(0.85, 0));
+  }
+  pts.push(front);
+  g.poly(pts, farRamp(colour));
+}
+
+function drawHeadgear(g, J, P, d, { kind, size, metal, trim }) {
+  const [hx, hy] = J.head, R = d.headR;
+  if (kind === 'helmet') {
+    const shell = (px, py) => {
+      if (((px - hx) / (R + 1)) ** 2 + ((py - hy) / (R + 1)) ** 2 > 1) return false;
+      if (py < hy - R * 0.3) return true;          // dome
+      return px < hx - R * 0.15;                    // back and cheek guard
+    };
+    g.fill(hx - R - 2, hy - R - 2, hx + R + 2, hy + R + 2, shell, metal, { light: 1 });
+    g.rect(Math.round(hx - R * 0.1), Math.round(hy - R * 0.3) - 1, Math.ceil(R * 1.1) + 1, 1, metal.dark);
+    // plume: Size makes it longer and fuller
+    const x0 = hx - 0.5, y0 = hy - R - 0.5, w = Math.sqrt(size);
+    g.capsule(x0, y0, H.scaleFrom(x0, hx - R * 0.9 - P.sway * 1.5, size), H.scaleFrom(y0, hy - R - 2.5, size), 1.6 * w, 0.9 * w, trim);
+  } else if (kind === 'crown') {
+    // Size makes the band deeper and the points taller
+    const band = Math.max(1, Math.round(2 * size)), points = Math.max(1, Math.round(size));
+    const y = Math.round(hy - R - 1) + 2 - band, x = Math.round(hx - R * 0.55), w = Math.round(R * 1.2);
+    const gold = ramp('#e6c545');
+    g.rect(x, y, w, band, gold);
+    for (let i = 0; i < w; i += 2) for (let j = 1; j <= points; j++) g.dot(x + i, y - j, gold.light);
+    g.dot(x + Math.floor(w / 2), y + Math.floor((band - 1) / 2), trim.base);
+  }
+}
+
+/** Hair that shows below the back of a helmet, so the hair colour still reads with the helmet on. */
+function drawNapeHair(g, J, d, style, hair) {
+  if (style !== 'short' && style !== 'spiky') return;      // long hair and ponytails already hang out; bald has none
+  const [hx, hy] = J.head, R = d.headR;
+  g.fill(hx - R - 2, hy, hx, hy + R + 1, (px, py) => ((px - hx) / (R + 0.8)) ** 2 + ((py - hy) / (R + 0.7)) ** 2 <= 1 && px < hx - R * 0.45 && py > hy + R * 0.2 && py < hy + R * 0.62, hair, { shade: 0 });
+}
 
 export default defineSprite({
   id: 'knight',
@@ -15,34 +92,58 @@ export default defineSprite({
   size: H.SIZE,
   pivot: H.PIVOT,
   preview: 'walk',
-  // sounds that play with each animation: frame is counted from 0; preset is one of the sound's named styles
-  sounds: { walk: [{ sound: 'footstep-gravel', frame: 0, preset: 'Boots' }, { sound: 'footstep-gravel', frame: 4, preset: 'Boots' }], run: [{ sound: 'footstep-gravel', frame: 0, preset: 'Boots' }, { sound: 'footstep-gravel', frame: 4, preset: 'Boots' }], jump: [{ sound: 'jump', frame: 2, preset: 'Big leap' }, { sound: 'footstep-gravel', frame: 6, preset: 'Boots' }], attack: [{ sound: 'sword-slash', frame: 3, preset: 'Heavy blade' }], hurt: [{ sound: 'punch', frame: 0, preset: 'Light jab' }] },
+  // sounds that play with each animation: frame is counted from 0; preset is one of the sound's named styles;
+  // `when` limits a sound to some settings (the blade is heard only when a weapon is held; a bare fist swishes instead)
+  sounds: { walk: [{ sound: 'footstep-gravel', frame: 0, preset: 'Boots' }, { sound: 'footstep-gravel', frame: 4, preset: 'Boots' }], run: [{ sound: 'footstep-gravel', frame: 0, preset: 'Boots' }, { sound: 'footstep-gravel', frame: 4, preset: 'Boots' }], jump: [{ sound: 'jump', frame: 2, preset: 'Big leap' }, { sound: 'footstep-gravel', frame: 6, preset: 'Boots' }], attack: [{ sound: 'sword-slash', frame: 3, preset: 'Heavy blade', when: { weapon: WEAPON_KINDS } }, { sound: 'whoosh', frame: 3, preset: 'Quick swipe', when: { weapon: ['none'] } }], hurt: [{ sound: 'punch', frame: 0, preset: 'Light jab' }] },
   params: {
     height: range('Height', 0.5, { lo: 'Short', hi: 'Tall' }),
     build: range('Build', 0.5, { lo: 'Slim', hi: 'Stocky' }),
     head: range('Head', 0.55, { lo: 'Small', hi: 'Big' }),
+    // hair
     hairStyle: choice('Hair', 'short', H.HAIR_STYLES),
-    headgear: choice('Headgear', 'helmet', ['none', 'helmet', 'crown']),
-    weapon: choice('Weapon', 'sword', ['sword', 'axe', 'spear', 'none']),
-    cape: toggle('Cape', true),
+    hair: color('Color', HAIR[1], HAIR),
+    // headgear
+    headgear: choice('Headgear', 'helmet', ['helmet', 'crown', 'none']),
+    headgearSize: range('Size', 1, { min: 0.5, max: 1.8, step: 0.05, lo: 'Small', hi: 'Big' }),
+    // weapon
+    weapon: choice('Weapon', 'sword', [...WEAPON_KINDS, 'none']),
+    weaponLength: range('Length', 1, { min: 0.65, max: 1.35, step: 0.05, lo: 'Short', hi: 'Long' }),
+    weaponAngle: range('Hold angle', 0, { min: -10, max: 40, step: 1, lo: 'Upright', hi: 'Forward' }),
+    weaponSwing: range('Swing', 1, { min: 0.5, max: 1.3, step: 0.05, lo: 'Short chop', hi: 'Wide sweep' }),
+    // cape
+    cape: choice('Cape', 'plain', ['plain', 'tattered', 'none'], { was: { false: 'none', true: 'plain' } }),   // the cape used to be on/off: old links still work
+    capeLength: range('Length', 1, { min: 0.3, max: 1.8, step: 0.05, lo: 'Short', hi: 'Long' }),
     skin: color('Skin', SKIN[0], SKIN),
-    hair: color('Hair', HAIR[1], HAIR),
     outfit: color('Outfit', CLOTH[5], CLOTH),
     trim: color('Cape and trim', CLOTH[0], CLOTH),
-    metal: color('Metal', METAL[0], METAL),
+    // metal is the helmet and the weapon: with neither there is nothing for it to colour
+    metal: color('Metal', METAL[0], METAL, { when: [{ weapon: WEAPON_KINDS }, { headgear: ['helmet'] }] }),
     bounce: range('Bounce', 0.5, { lo: 'Calm', hi: 'Bouncy', group: 'Motion' }),
     stride: range('Stride', 0.5, { lo: 'Small steps', hi: 'Big steps', group: 'Motion' }),
     speed: range('Speed', 0.5, { lo: 'Slow', hi: 'Fast', group: 'Motion' }),
   },
+  // What the Hero holds and wears. The first key of each list picks which one (or none); the rest are that part's own settings.
+  parts: {
+    hair: { label: 'Hair', params: ['hairStyle', 'hair'], none: 'bald', socket: 'head' },
+    headgear: { label: 'Headgear', params: ['headgear', 'headgearSize'], none: 'none', socket: 'head' },
+    weapon: { label: 'Weapon', params: ['weapon', 'weaponLength', 'weaponAngle', 'weaponSwing'], none: 'none', socket: 'hand' },
+    cape: { label: 'Cape', params: ['cape', 'capeLength'], none: 'none', socket: 'back' },
+  },
   clips: H.clips((p) => p.speed),
+
+  // attach points for every frame (hand, offhand, head, back, feet), exported so a game can attach or swap parts
+  sockets(clip, t, p) {
+    const d = H.dims(p);
+    const P = heroPose(clip, t, p, d);
+    return H.sockets(H.solve(P, d), P, d);
+  },
 
   render(g, { clip, t, p }) {
     const d = H.dims(p);
-    const m = { bounce: p.bounce, stride: p.stride, armed: p.weapon !== 'none' };
-    const poseAt = (u) => H.pose(clip, u, m, d);
+    const poseAt = (u) => heroPose(clip, u, p, d);
     const P = poseAt(t);
-    const metal = ramp(p.metal), trim = ramp(p.trim), wood = '#8a5a34';
-    const len = WEAPON_LEN[p.weapon];
+    const metal = ramp(p.metal), trim = ramp(p.trim);
+    const armed = p.weapon !== 'none';
     const look = {
       skin: p.skin, top: p.outfit, bottom: tone(p.outfit, -0.6), boots: '#5b3d2e',
       hair: p.hair, hairStyle: p.hairStyle,
@@ -50,50 +151,26 @@ export default defineSprite({
 
     H.draw(g, P, d, look, {
       behind(g, J) {
-        if (!p.cape) return;
-        const [nx, ny] = J.neck, s = P.sway;
-        const back = farRamp(p.trim);
-        g.poly([
-          [nx + 1, ny + 1], [nx - d.chestR - 0.5, ny + 1],
-          [nx - d.chestR - 3 - s * 2.5, J.hip[1] + d.leg * 0.45],
-          [nx - d.chestR + 1.5 - s * 1.5, J.hip[1] + d.leg * 0.55],
-        ], back);
+        if (p.cape !== 'none') drawCape(g, J, P, d, { kind: p.cape, length: p.capeLength, colour: p.trim });
       },
       torso(g, J) {
         // belt
         const hx = Math.round(J.hip[0]), hy = Math.round(J.hip[1]);
         g.rect(hx - Math.round(d.hipR), hy - 2, Math.round(d.hipR) * 2, 1, trim.dark);
-        g.dot(hx + 1, hy - 2, metal.light);
+        g.dot(hx + 1, hy - 2, armed || p.headgear === 'helmet' ? metal.light : ramp(NO_METAL).light);
       },
       head(g, J) {
-        const [hx, hy] = J.head, R = d.headR;
-        if (p.headgear === 'helmet') {
-          const shell = (px, py) => {
-            if (((px - hx) / (R + 1)) ** 2 + ((py - hy) / (R + 1)) ** 2 > 1) return false;
-            if (py < hy - R * 0.3) return true;          // dome
-            return px < hx - R * 0.15;                    // back and cheek guard
-          };
-          g.fill(hx - R - 2, hy - R - 2, hx + R + 2, hy + R + 2, shell, metal, { light: 1 });
-          g.rect(Math.round(hx - R * 0.1), Math.round(hy - R * 0.3) - 1, Math.ceil(R * 1.1) + 1, 1, metal.dark);
-          // plume
-          g.capsule(hx - 0.5, hy - R - 0.5, hx - R * 0.9 - P.sway * 1.5, hy - R - 2.5, 1.6, 0.9, trim);
-        } else if (p.headgear === 'crown') {
-          const y = Math.round(hy - R - 1), x = Math.round(hx - R * 0.55), w = Math.round(R * 1.2);
-          const gold = ramp('#e6c545');
-          g.rect(x, y, w, 2, gold);
-          for (let i = 0; i < w; i += 2) g.dot(x + i, y - 1, gold.light);
-          g.dot(x + Math.floor(w / 2), y, trim.base);
-        }
+        if (p.headgear === 'none') return;
+        drawHeadgear(g, J, P, d, { kind: p.headgear, size: p.headgearSize, metal, trim });
+        if (p.headgear === 'helmet') drawNapeHair(g, J, d, p.hairStyle, ramp(p.hair));
       },
       item(g, J) {
-        if (p.weapon === 'sword') H.sword(g, J, P, len, metal, '#e6c545');
-        else if (p.weapon === 'axe') H.axe(g, J, P, len, metal, wood);
-        else if (p.weapon === 'spear') H.spear(g, J, P, len, metal, wood);
+        if (armed) H.heldItem(g, H.sockets(J, P, d).hand, { kind: p.weapon, length: weaponReach(p), metal, wood: '#8a5a34', hilt: '#e6c545' });
       },
     });
 
     if (P.flash) g.tint('#ffffff');
     g.outline(INK);
-    if (clip === 'attack' && len) H.slashTrail(g, poseAt, t, d, len, '#ffffff');
+    if (clip === 'attack' && armed) H.slashTrail(g, poseAt, t, d, weaponReach(p), '#ffffff');
   },
 });

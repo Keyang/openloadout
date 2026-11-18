@@ -1,31 +1,55 @@
 // One sprite: preview, sliders, the sounds that play with each animation, download.
-import { defaultParams, cleanParams, randomParams, clipFps } from '../engine/sprite.js';
+import { defaultParams, cleanParams, randomParams, clipFps, partList, partRemoved, inEffect, cueInEffect } from '../engine/sprite.js';
 import { drawStage, STAGES } from './stage.js';
 import { zip } from './zip.js';
 import { el, header, Frames, travel, hover, shadow, saveBlob, store, cap } from './ui.js';
 import { sounds, soundById, soundParams, rendered, playRendered, soundState, setSoundOn, toUnit, toValue } from './audio.js';
 import { spriteFiles, defaultCues } from './bundle.js';
+import { addToBag, keepBag } from './add-to-bag.js';
 
-// Sounds travel in the link as a compact list: { clip: [[sound, frame, style, volume, changes], ...] }.
+/**
+ * The sprite's own sounds, as defaultCues gives them, each keeping its `when` (the settings it plays at):
+ * a blade sound that belongs to a held weapon must stay silent when the weapon is taken off.
+ */
+function spriteCues(sprite) {
+  const out = defaultCues(sprite);
+  for (const clip of Object.keys(out)) {
+    const own = (sprite.sounds[clip] ?? []).filter((c) => soundById[c.sound]);
+    out[clip].forEach((cue, i) => { if (own[i] && own[i].sound === cue.sound && own[i].when) cue.when = own[i].when; });
+  }
+  return out;
+}
+/** A `when` read from a link: kept only if it names real controls with lists of values. */
+function linkWhen(sprite, when) {
+  if (!when || typeof when !== 'object' || Array.isArray(when)) return null;
+  const ok = Object.entries(when).every(([k, v]) => sprite.params[k] && Array.isArray(v));
+  return ok && Object.keys(when).length ? when : null;
+}
+
+// Sounds travel in the link as a compact list: { clip: [[sound, frame, style, volume, changes, when], ...] }.
 // Only animations whose sounds differ from the sprite's own are written.
-const packClip = (list) => JSON.stringify(list.map((c) => [c.sound, c.frame, c.preset ?? 0, c.volume ?? 1, c.params ?? 0]));
+const packClip = (list) => JSON.stringify(list.map((c) => { const row = [c.sound, c.frame, c.preset ?? 0, c.volume ?? 1, c.params ?? 0]; if (c.when) row.push(c.when); return row; }));
 function packCues(sprite, cues) {
-  const base = defaultCues(sprite), out = {};
+  const base = spriteCues(sprite), out = {};
   for (const clip of Object.keys(sprite.clips)) if (packClip(cues[clip] ?? []) !== packClip(base[clip] ?? [])) out[clip] = JSON.parse(packClip(cues[clip] ?? []));
   return Object.keys(out).length ? JSON.stringify(out) : '';
 }
 function unpackCues(sprite, text) {
   try {
-    const raw = JSON.parse(text), out = defaultCues(sprite);
+    const raw = JSON.parse(text), out = spriteCues(sprite);
     for (const clip of Object.keys(sprite.clips)) {
       if (!Array.isArray(raw[clip])) continue;
-      out[clip] = raw[clip].filter((c) => Array.isArray(c) && soundById[c[0]]).slice(0, MAX_CUES).map(([sound, frame, preset, volume, params]) => ({
-        sound,
-        frame: Math.max(0, Math.min(sprite.clips[clip].frames - 1, Math.round(Number(frame)) || 0)),
-        preset: preset && soundById[sound].presets && soundById[sound].presets[preset] ? preset : null,
-        volume: Math.max(0, Math.min(1, Number(volume) || 0)),
-        params: params && typeof params === 'object' ? params : null,
-      }));
+      out[clip] = raw[clip].filter((c) => Array.isArray(c) && soundById[c[0]]).slice(0, MAX_CUES).map(([sound, frame, preset, volume, params, when]) => {
+        const cue = {
+          sound,
+          frame: Math.max(0, Math.min(sprite.clips[clip].frames - 1, Math.round(Number(frame)) || 0)),
+          preset: preset && soundById[sound].presets && soundById[sound].presets[preset] ? preset : null,
+          volume: Math.max(0, Math.min(1, Number(volume) || 0)),
+          params: params && typeof params === 'object' ? params : null,
+        };
+        if (linkWhen(sprite, when)) cue.when = when;
+        return cue;
+      });
     }
     return out;
   } catch { return null; }
@@ -39,12 +63,25 @@ export function spritePage(app, sprite, query) {
   const st = {
     p: cleanParams(sprite, query),
     clip: clipNames.includes(query.clip) ? query.clip : sprite.preview,
-    cues: (query.sfx && unpackCues(sprite, query.sfx)) || defaultCues(sprite),
+    cues: (query.sfx && unpackCues(sprite, query.sfx)) || spriteCues(sprite),
     playing: true,
     stage: STAGES.some((s) => s.id === store.get('stage')) ? store.get('stage') : 'meadow',
-    scale: 1, start: performance.now(), frame: 0, lastFrame: -1, scroll: 0,
+    scale: [1, 2, 4].includes(Number(query.scale)) ? Number(query.scale) : 1, start: performance.now(), frame: 0, lastFrame: -1, scroll: 0,
   };
   const frames = new Frames(sprite, st.p);
+
+  // A link from before an option was renamed (cape=false) opens with the new option; put the new name in the address too.
+  {
+    const [path, qs = ''] = location.hash.split('?');
+    const q = new URLSearchParams(qs), def = defaultParams(sprite);
+    let renamed = false;
+    for (const [k, d] of Object.entries(sprite.params)) {
+      if (!d.was || !q.has(k) || !Object.hasOwn(d.was, q.get(k)) || d.options.some((o) => o.value === q.get(k))) continue;
+      if (st.p[k] === def[k]) q.delete(k); else q.set(k, String(st.p[k]));
+      renamed = true;
+    }
+    if (renamed) history.replaceState(null, '', `${path}${q.toString() ? '?' + q : ''}`);
+  }
 
   // ---- sound playback
   let loops = [];
@@ -54,10 +91,14 @@ export function spritePage(app, sprite, query) {
     return rendered(patch, soundParams(patch, cue.preset, cue.params), vary ? 1 + cue.n : 1);
   };
   const playCue = (cue, force) => playRendered(cueRender(cue, true), { volume: cue.volume, force });
+  // a sound may belong to some settings only (a blade sound needs a weapon): it is silent at the others
+  const applies = (cue) => cueInEffect(sprite, cue, st.p);
+  const cueSig = () => (st.cues[st.clip] ?? []).map((c) => (applies(c) ? '1' : '0')).join('');
+  let shownSig = '';
   function fire(frame, force) {
     for (const cue of st.cues[st.clip] ?? []) {
       const patch = soundById[cue.sound];
-      if (patch && !patch.loop && cue.frame === frame) playCue(cue, force);
+      if (patch && !patch.loop && cue.frame === frame && applies(cue)) playCue(cue, force);
     }
   }
   function syncLoops() {
@@ -66,7 +107,7 @@ export function spritePage(app, sprite, query) {
     if (!st.playing || !soundState.on) return;
     for (const cue of st.cues[st.clip] ?? []) {
       const patch = soundById[cue.sound];
-      if (!patch || !patch.loop) continue;
+      if (!patch || !patch.loop || !applies(cue)) continue;
       const h = playRendered(cueRender(cue, false), { loop: true, volume: cue.volume });
       if (h) loops.push(h);
     }
@@ -101,7 +142,7 @@ export function spritePage(app, sprite, query) {
 
   function buildStrip() {
     const n = sprite.clips[st.clip].frames;
-    const marked = new Set((st.cues[st.clip] ?? []).filter((c) => soundById[c.sound] && !soundById[c.sound].loop).map((c) => c.frame));
+    const marked = new Set((st.cues[st.clip] ?? []).filter((c) => soundById[c.sound] && !soundById[c.sound].loop && applies(c)).map((c) => c.frame));
     strip.replaceChildren(...Array.from({ length: n }, (_, f) => {
       const c = el('canvas', { width: sprite.size[0], height: sprite.size[1] });
       c.getContext('2d').drawImage(frames.get(st.clip, f), 0, 0);
@@ -137,6 +178,7 @@ export function spritePage(app, sprite, query) {
       el('button', { type: 'button', class: 'ghost', disabled: list.length >= MAX_CUES, title: list.length >= MAX_CUES ? `An animation can have up to ${MAX_CUES} sounds` : null, onclick: () => {
         // a copy with the same sound, style, changes and volume, on the next frame that has no sound yet
         const copy = { sound: cue.sound, frame: cue.frame, preset: cue.preset, params: cue.params ? { ...cue.params } : null, volume: cue.volume, open: false };
+        if (cue.when) copy.when = cue.when;
         if (!patch.loop) {
           const taken = new Set(list.filter((c) => soundById[c.sound] && !soundById[c.sound].loop).map((c) => c.frame));
           for (let i = 1; i < n; i++) { const f = (cue.frame + i) % n; if (!taken.has(f)) { copy.frame = f; break; } }
@@ -145,7 +187,9 @@ export function spritePage(app, sprite, query) {
         cuesChanged(true); playCue(copy, true);
       } }, 'Duplicate'),
       el('button', { type: 'button', class: 'ghost', onclick: () => { list.splice(list.indexOf(cue), 1); cuesChanged(true); } }, 'Remove'));
-    if (!cue.open) return el('li', { class: 'cue' }, head);
+    const on = applies(cue);
+    if (!on) head.append(el('span', { class: 'cue-note' }, 'Does not play with the current look.'));
+    if (!cue.open) return el('li', { class: on ? 'cue' : 'cue off' }, head);
     const vals = soundParams(patch, cue.preset, cue.params);
     const sliders = [
       el('div', { class: 'field' }, el('label', {}, 'Volume'), el('input', { type: 'range', min: 0, max: 1, step: 0.05, value: cue.volume, 'aria-label': 'Volume', oninput: (e) => { cue.volume = Number(e.target.value); }, onchange: () => { cuesChanged(false); playCue(cue, true); } })),
@@ -154,11 +198,12 @@ export function spritePage(app, sprite, query) {
           oninput: (e) => { cue.params = { ...soundParams(patch, cue.preset, cue.params), [d.id]: toValue(d, Number(e.target.value)) }; },
           onchange: () => { cuesChanged(false); playCue(cue, true); if (styleSel.value !== '*') buildCues(); } }))),
     ];
-    return el('li', { class: 'cue open' }, head, el('div', { class: 'cue-sliders' }, sliders));
+    return el('li', { class: on ? 'cue open' : 'cue open off' }, head, el('div', { class: 'cue-sliders' }, sliders));
   }
 
   function buildCues() {
     const list = st.cues[st.clip] ?? (st.cues[st.clip] = []);
+    shownSig = cueSig();
     const soundSwitch = el('input', { id: 'sound-on', type: 'checkbox', onchange: (e) => { setSoundOn(e.target.checked); syncLoops(); } });
     soundSwitch.checked = soundState.on;
     cueBox.replaceChildren(
@@ -173,15 +218,34 @@ export function spritePage(app, sprite, query) {
         const cue = { sound: pick.id, frame: st.playing ? 0 : st.frame, preset: null, params: null, volume: 1, open: false };
         list.push(cue); cuesChanged(true); playCue(cue, true);
       } }, 'Add a sound'),
-      list.length >= MAX_CUES ? el('span', { class: 'hint' }, ` An animation can have up to ${MAX_CUES} sounds. Remove one to add another.`) : null);
+      list.length >= MAX_CUES ? el('span', { class: 'hint' }, ` An animation can have up to ${MAX_CUES} sounds. Remove one to add another.`) : '');
   }
 
-  // ---- look and motion controls
+  // ---- look and motion controls, and one block per part (what the sprite holds or wears)
   const panel = el('div', { class: 'panel' });
   const controls = {};
-  const changed = () => { frames.set(st.p); buildStrip(); saveUrl(); };
+  const parts = partList(sprite);
+  const fields = {};          // control key -> its element in the panel
+  const sections = [];        // { box, keys, part }: the titled groups and part blocks
+  // A control that does nothing right now is hidden: a part's settings while the part is taken off, and any control
+  // whose `when` does not hold. A block with nothing left to show hides its title too.
+  const syncShown = () => {
+    for (const [key, node] of Object.entries(fields)) node.hidden = !inEffect(sprite, key, st.p);
+    for (const { box, keys, part } of sections) {
+      box.hidden = keys.every((k) => fields[k].hidden);
+      if (part) box.classList.toggle('off', partRemoved(sprite, part.name, st.p));
+    }
+  };
+  const changed = () => {
+    syncShown(); frames.set(st.p); buildStrip(); saveUrl();
+    // sounds that depend on the settings: refresh the list and anything looping when what applies has changed
+    if (cueSig() !== shownSig) { buildCues(); syncLoops(); }
+  };
+  const keep = (key, node) => { node.setAttribute('data-control', key); fields[key] = node; return node; };
 
-  function control(key, d) {
+  // `title`: the control is the first one in a block that already carries its name, so the name is not shown twice
+  function control(key, d, title) { return keep(key, controlBody(key, d, title)); }
+  function controlBody(key, d, title) {
     const id = `c-${key}`;
     if (d.kind === 'range') {
       const input = el('input', { id, type: 'range', min: d.min, max: d.max, step: d.step, value: st.p[key], oninput: (e) => { st.p[key] = Number(e.target.value); changed(); } });
@@ -194,13 +258,13 @@ export function spritePage(app, sprite, query) {
         d.options.map((o) => el('button', { type: 'button', class: 'pill', 'data-v': o.value, onclick: () => { st.p[key] = o.value; controls[key](); changed(); } }, o.label)));
       controls[key] = () => { for (const b of row.children) b.setAttribute('aria-pressed', String(b.dataset.v === st.p[key])); };
       controls[key]();
-      return el('div', { class: 'field' }, el('span', { class: 'label' }, d.label), row);
+      return el('div', { class: 'field' }, title ? null : el('span', { class: 'label' }, d.label), row);
     }
     if (d.kind === 'toggle') {
-      const input = el('input', { id, type: 'checkbox', onchange: (e) => { st.p[key] = e.target.checked; changed(); } });
+      const input = el('input', { id, type: 'checkbox', 'aria-label': title ? d.label : null, onchange: (e) => { st.p[key] = e.target.checked; changed(); } });
       input.checked = st.p[key];
       controls[key] = () => { input.checked = st.p[key]; };
-      return el('div', { class: 'field toggle' }, el('label', { for: id }, d.label), el('span', { class: 'switch' }, input, el('span', { class: 'knob', 'aria-hidden': 'true' })));
+      return el('div', { class: 'field toggle' }, el('label', { for: id }, title ? 'Show' : d.label), el('span', { class: 'switch' }, input, el('span', { class: 'knob', 'aria-hidden': 'true' })));
     }
     const custom = el('input', { type: 'color', value: st.p[key], 'aria-label': `${d.label}: pick any colour`, oninput: (e) => { st.p[key] = e.target.value.toLowerCase(); controls[key](); changed(); } });
     const row = el('div', { class: 'swatches', role: 'group', 'aria-label': d.label },
@@ -218,14 +282,45 @@ export function spritePage(app, sprite, query) {
   }
   const syncControls = () => { for (const k of Object.keys(controls)) controls[k](); };
 
+  // the sprite's own controls, in their three groups; a control that belongs to a part is shown in that part's block
+  const inPart = new Set(parts.flatMap((part) => part.params));
+  const group = (gname) => {
+    const entries = Object.entries(sprite.params).filter(([key, d]) => d.group === gname && !inPart.has(key));
+    if (!entries.length) return null;
+    const box = el('section', { class: 'group' }, el('h2', {}, gname), entries.map(([key, d]) => control(key, d)));
+    sections.push({ box, keys: entries.map(([key]) => key) });
+    return box;
+  };
+  // one level below: a titled block per part, selector first, then the part's own settings
+  const partBlock = (part) => {
+    // the title is a button that folds the block shut, so a long panel can be tidied (handy on a phone)
+    const title = el('button', { type: 'button', class: 'fold', 'aria-expanded': 'true', onclick: () => {
+      title.setAttribute('aria-expanded', String(!box.classList.toggle('folded')));
+    } }, part.label, el('span', { class: 'fold-mark', 'aria-hidden': 'true' }));
+    const box = el('section', { class: 'group part', 'data-part': part.name },
+      el('h2', {}, title),
+      control(part.selector, sprite.params[part.selector], true),
+      part.controls.map((key) => control(key, sprite.params[key])));
+    sections.push({ box, keys: part.params, part });
+    return box;
+  };
+  // "Surprise me" changes only what can be seen: a control that ends up not in effect goes back to its usual value,
+  // so nothing hidden is left changed (in the picture or in the link)
+  const surprise = () => {
+    const p = randomParams(sprite, Math.floor(Math.random() * 1e9)), def = defaultParams(sprite);
+    for (let pass = 0, again = true; again && pass < 8; pass++) {
+      again = false;
+      for (const k of Object.keys(p)) if (p[k] !== def[k] && !inEffect(sprite, k, p)) { p[k] = def[k]; again = true; }
+    }
+    return p;
+  };
+
   panel.replaceChildren(
     el('div', { class: 'panel-actions' },
-      el('button', { type: 'button', class: 'btn', onclick: () => { st.p = randomParams(sprite, Math.floor(Math.random() * 1e9)); syncControls(); changed(); } }, 'Surprise me'),
-      el('button', { type: 'button', class: 'ghost', onclick: () => { st.p = defaultParams(sprite); st.cues = defaultCues(sprite); syncControls(); changed(); cuesChanged(true); } }, 'Start over')),
-    ...['Look', 'Colors', 'Motion'].map((gname) => {
-      const entries = Object.entries(sprite.params).filter(([, d]) => d.group === gname);
-      return entries.length ? el('section', { class: 'group' }, el('h2', {}, gname), entries.map(([key, d]) => control(key, d))) : null;
-    }).filter(Boolean));
+      el('button', { type: 'button', class: 'btn', onclick: () => { st.p = surprise(); syncControls(); changed(); } }, 'Surprise me'),
+      el('button', { type: 'button', class: 'ghost', onclick: () => { st.p = defaultParams(sprite); st.cues = spriteCues(sprite); syncControls(); changed(); cuesChanged(true); } }, 'Start over')),
+    ...[group('Look'), ...parts.map(partBlock), group('Colors'), group('Motion')].filter(Boolean));
+  syncShown();
 
   // ---- link and download
   let urlTimer = 0;
@@ -233,27 +328,31 @@ export function spritePage(app, sprite, query) {
     const def = defaultParams(sprite), q = new URLSearchParams();
     for (const [k, v] of Object.entries(st.p)) if (v !== def[k]) q.set(k, typeof v === 'number' ? String(Math.round(v * 100) / 100) : String(v));
     if (st.clip !== sprite.preview) q.set('clip', st.clip);
+    if (st.scale !== 1) q.set('scale', String(st.scale));
     const packed = packCues(sprite, st.cues);
     if (packed) q.set('sfx', packed);
     const qs = q.toString();
     return `#/sprite/${sprite.id}${qs ? '?' + qs : ''}`;
   }
-  function saveUrl() { clearTimeout(urlTimer); urlTimer = setTimeout(() => history.replaceState(null, '', link()), 200); }
+  function saveUrl() { clearTimeout(urlTimer); urlTimer = setTimeout(() => history.replaceState(null, '', keepBag(link(), query)), 200); }
 
   const status = el('p', { class: 'status', role: 'status' });
   const say = (msg) => { status.textContent = msg; };
   const sizeText = () => `Each frame is ${sprite.size[0] * st.scale} × ${sprite.size[1] * st.scale} pixels.`;
   const sizeNote = el('span', { class: 'hint' }, sizeText());
   const sizeBar = el('div', { class: 'pills small', role: 'group', 'aria-label': 'Pixel size' },
-    [1, 2, 4].map((s) => el('button', { type: 'button', class: 'pill', 'aria-pressed': String(s === 1), onclick: (e) => {
+    [1, 2, 4].map((s) => el('button', { type: 'button', class: 'pill', 'aria-pressed': String(s === st.scale), onclick: (e) => {
       st.scale = s;
       for (const b of sizeBar.children) b.setAttribute('aria-pressed', String(b === e.currentTarget));
       sizeNote.textContent = sizeText();
+      saveUrl();
     } }, `${s}×`)));
 
   async function download() {
     try {
-      const files = await spriteFiles(sprite, st.p, st.cues, st.scale);
+      // only the sounds that play at these settings go in the package
+      const playing = Object.fromEntries(Object.entries(st.cues).map(([clip, list]) => [clip, list.filter(applies)]));
+      const files = await spriteFiles(sprite, st.p, playing, st.scale);
       const nSounds = files.filter((f) => f.name.endsWith('.wav')).length;
       saveBlob(zip(files), `${sprite.id}-sprite-and-sounds.zip`);
       say(`Downloaded ${sprite.id}-sprite-and-sounds.zip: the sprite sheet, ${nSounds} sound${nSounds === 1 ? '' : 's'}, the animation list, and a short guide.`);
@@ -282,6 +381,7 @@ export function spritePage(app, sprite, query) {
         cueBox),
       panel,
       el('div', { class: 'get' },
+        addToBag('sprite', sprite.id, () => ({ params: { ...st.p }, cues: st.cues, scale: st.scale }), query),
         el('button', { type: 'button', class: 'btn big', onclick: download }, 'Download sprite and sounds'),
         el('button', { type: 'button', class: 'ghost', onclick: copyLink }, 'Copy link'),
         el('div', { class: 'size' }, el('span', { class: 'label' }, 'Pixel size'), sizeBar, sizeNote),
