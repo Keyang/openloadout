@@ -42,18 +42,40 @@ function onePole(x, sr, hz, warm) {
 // removes more of the top and the sound only ever gets duller.
 // Brightness above 0: adds back the part above BRIGHT_HZ, up to BRIGHT_BOOST
 // times (+1 = highs about 3x louder, roughly +9.5 dB).
+//
+// Both corners are also relative to the sound itself, so any spectrum copes: a sound
+// with nothing below a few kHz (breaking ice, a hiss) would lose almost everything to
+// a fixed 700 Hz low-pass, and a sound with everything above 1.5 kHz would just get
+// louder, not brighter. So the low-pass corner never goes below DULL_FLOOR^k times the
+// sound's own typical frequency (k = how dull, 0..1), and the "highs" that brightness
+// boosts start at the sound's typical frequency when that is above BRIGHT_HZ.
+// "Duller ice" is still ice, and loudness stays put without extreme gain.
 const DULL_TOP_HZ = 12000;
 const DULL_HZ = 700;
+const DULL_FLOOR = 0.45;
 const BRIGHT_HZ = 1500;
 const BRIGHT_BOOST = 2;
-export const dullCutoff = (k) => DULL_TOP_HZ * (DULL_HZ / DULL_TOP_HZ) ** k;
+export const dullCutoff = (k, typicalHz = 0) => Math.max(DULL_TOP_HZ * (DULL_HZ / DULL_TOP_HZ) ** k, typicalHz * DULL_FLOOR ** k);
+const brightCorner = (typicalHz) => Math.min(Math.max(BRIGHT_HZ, typicalHz), 12000);
 
-function brighten(x, sr, amount, warm) {
+/**
+ * A sound's typical frequency in Hz: the power-weighted spread of its spectrum (its RMS
+ * frequency), from how fast it changes sample to sample. Exact for a pure tone; for white
+ * noise it gives a quarter of the sample rate. Cheap: one pass, no FFT.
+ */
+export function typicalHz(channels, sr) {
+  let sx = 0, sd = 0;
+  for (const c of channels) for (let i = 1; i < c.length; i++) { const d = c[i] - c[i - 1]; sx += c[i] * c[i]; sd += d * d; }
+  if (sx <= 1e-12) return 0;
+  return (sr / Math.PI) * Math.asin(Math.min(1, Math.sqrt(sd / sx) / 2));
+}
+
+function brighten(x, sr, amount, warm, typical) {
   if (amount < 0) {
-    const hz = dullCutoff(-amount);
+    const hz = dullCutoff(-amount, typical);
     return onePole(onePole(x, sr, hz, warm), sr, hz, warm);
   }
-  const lp = onePole(x, sr, BRIGHT_HZ, warm), k = amount * BRIGHT_BOOST, out = new Float32Array(x.length);
+  const lp = onePole(x, sr, brightCorner(typical), warm), k = amount * BRIGHT_BOOST, out = new Float32Array(x.length);
   for (let i = 0; i < x.length; i++) out[i] = x[i] + (x[i] - lp[i]) * k;
   return out;
 }
@@ -129,11 +151,12 @@ export function applySound(rendered, sound) {
   if (pitch === 0 && bright === 0) chs = ins.map((c) => c.slice());
   else {
     const warm = loop ? 4096 : 0;
-    chs = ins.map((c) => {
-      let y = pitch !== 0 ? repitch(c, sr, pitch, loop) : c;
-      if (bright !== 0) y = brighten(y, sr, bright, warm);
-      return y === c ? c.slice() : y;
-    });
+    chs = ins.map((c) => (pitch !== 0 ? repitch(c, sr, pitch, loop) : c));
+    if (bright !== 0) {
+      const typical = typicalHz(chs, sr);   // one value for every channel, so stereo stays matched
+      chs = chs.map((y) => brighten(y, sr, bright, warm, typical));
+    }
+    chs = chs.map((y, i) => (y === ins[i] ? y.slice() : y));
     const rIn = rmsOf(ins), rOut = rmsOf(chs);
     const g = rOut > 1e-9 ? Math.min(8, rIn / rOut) : 1;
     for (const c of chs) for (let i = 0; i < c.length; i++) c[i] = limit(c[i] * g);
@@ -141,7 +164,12 @@ export function applySound(rendered, sound) {
   const n = chs[0].length;
   let samples = chs[0];
   if (chs.length === 2) { samples = new Float32Array(n); for (let i = 0; i < n; i++) samples[i] = (chs[0][i] + chs[1][i]) * 0.5; }
-  return { ...rendered, samples, channels: chs, duration: n / sr };
+  // Only the documented fields: never spread `rendered`, which may carry things a player cached on it
+  // (app/audio.js keeps the Web Audio buffer as `buffer`), or the themed sound would play the unstyled one.
+  const out = { samples, channels: chs, sampleRate: sr, duration: n / sr };
+  for (const k of ['rawPeak', 'appliedGain', 'badSamples']) if (rendered[k] !== undefined) out[k] = rendered[k];
+  out.loop = rendered.loop;
+  return out;
 }
 
 // ---- controls ------------------------------------------------------------------------

@@ -249,3 +249,59 @@ test('shapes on: sound effects pick one of their named styles from the seed', ()
   const plain = { ...laser, presets: undefined };
   assert.deepEqual(themedSoundParams(plain, base, on(4)), base);
 });
+
+test('applySound returns only the documented fields: nothing cached on the input (an audio buffer) comes along', () => {
+  const r = render('coin-pickup');
+  const withCache = { ...r, buffer: { fake: 'audio buffer of the unstyled sound' }, extra: 1 };
+  for (const s of [{ pitch: 0, brightness: 0 }, { pitch: -2, brightness: -0.4 }, { pitch: 3 }]) {
+    const out = applySound(withCache, s);
+    assert.equal('buffer' in out, false);
+    assert.equal('extra' in out, false);
+    for (const k of Object.keys(out)) assert.ok(['samples', 'channels', 'sampleRate', 'duration', 'rawPeak', 'appliedGain', 'badSamples', 'loop'].includes(k), k);
+    assert.equal(out.sampleRate, r.sampleRate);
+    assert.equal(out.loop, r.loop);
+    assert.equal(out.rawPeak, r.rawPeak);
+  }
+});
+
+// ---- any spectrum: synthetic sounds that do not depend on which sounds exist --------------------
+
+const SR = 44100;
+function synth(kind) {
+  const n = Math.round(SR * 0.5), x = new Float32Array(n);
+  let seed = 12345;
+  const rand = () => { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed / 2 ** 31 - 1; };
+  for (let i = 0; i < n; i++) {
+    const t = i / SR, env = Math.exp(-t * 6) * Math.min(1, i / 64);
+    x[i] = kind === 'thump' ? Math.sin(2 * Math.PI * 60 * t) * env : rand() * env;
+  }
+  if (kind === 'high') {   // high-passed at 3 kHz, four poles: nothing left below 1 kHz to speak of
+    for (let pass = 0; pass < 4; pass++) {
+      const a = Math.exp((-2 * Math.PI * 3000) / SR);
+      let y = 0;
+      for (let i = 0; i < n; i++) { y = (1 - a) * x[i] + a * y; x[i] -= y; }
+    }
+  }
+  let peak = 0;
+  for (const v of x) peak = Math.max(peak, Math.abs(v));
+  for (let i = 0; i < n; i++) x[i] *= 0.6 / peak;
+  return { samples: x, channels: [x], sampleRate: SR, duration: n / SR, loop: false };
+}
+
+for (const kind of ['high', 'thump', 'full']) {
+  test(`any spectrum (${kind === 'high' ? 'noise above 3 kHz' : kind === 'thump' ? '60 Hz thump' : 'full-band burst'}): brightness keeps loudness within 3 dB, peak below 1, and moves the centroid in order`, () => {
+    const r = synth(kind), r0 = rmsOf(r);
+    const cs = [];
+    for (const b of [-1, -0.4, 0, 0.4, 1]) {
+      const out = b === 0 ? r : applySound(r, { pitch: 0, brightness: b });
+      const db = 20 * Math.log10(rmsOf(out) / r0);
+      assert.ok(Math.abs(db) <= 3, `${kind} brightness ${b}: RMS moved ${db.toFixed(2)} dB`);
+      assert.ok(peakOf(out) < 1, `${kind} brightness ${b}: peak ${peakOf(out)}`);
+      cs.push(centroid(out));
+    }
+    const msg = `${kind}: centroids at -1, -0.4, 0, 0.4, 1: ${cs.map((c) => c.toFixed(0)).join(', ')}`;
+    for (let i = 1; i < cs.length; i++) assert.ok(cs[i] > cs[i - 1], msg);
+    // "Duller" keeps the sound's own character: high noise stays mostly high.
+    if (kind === 'high') assert.ok(cs[0] > 1500, msg);
+  });
+}
