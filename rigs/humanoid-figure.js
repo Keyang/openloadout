@@ -39,6 +39,7 @@ import { lerp, clamp, keys, pulse, wave, reach, TAU, PI } from '../engine/motion
 import { ramp, tone, brightness, INK } from '../engine/color.js';
 import { capsuleIn, ellipseIn, polyIn } from '../engine/surface.js';
 import { twinkle } from '../engine/fx.js';
+import { bandTone } from '../engine/tones.js';
 import * as H from './humanoid.js';
 
 const [W, FRAME_H] = H.SIZE;
@@ -329,13 +330,16 @@ export function wearReach(kind, size = 1, d = H.dims()) {
 
 /**
  * Draws a belt across the hips, for the `torso` hook: one row of leather with a buckle at the front, which turns with the body when it lies down.
- * Arguments: g, J, P, d (as the hook receives them), opt { colour (the leather: its shadow tone is used), buckle (a colour; left out: no buckle) }.
+ * Arguments: g, J, P, d (as the hook receives them), opt { colour (the leather: its shadow tone is used, or a lighter tone of it where the shadow tone would merge with the cloth under the belt: engine/tones.js, bandTone), buckle (a colour; left out: no buckle) }.
  */
 export function belt(g, J, P, d, opt = {}) {
   const c = paintOf(opt.colour, '#5a5f7a'), [bx, by] = backOf(J), half = Math.round(d.hipR);
   const cx = Math.round(J.hip[0]) - by * 1.5, cy = Math.round(J.hip[1]) - 1.5 + bx * 1.5 + (P.lie > 0.5 ? 1.5 : 0);
   const clip = (px, py) => py < J.gy - 1;
-  g.limb(cx + bx * half, cy + by * half, cx - bx * (half - 1), cy - by * (half - 1), 1, c.dark, { shade: 0, clip });
+  // what is already drawn where the belt will lie: the cloth it has to stand clear of
+  const under = [];
+  for (let k = -(half - 1); k <= half; k++) under.push(g.get(Math.floor(cx + bx * k), Math.floor(cy + by * k)));
+  g.limb(cx + bx * half, cy + by * half, cx - bx * (half - 1), cy - by * (half - 1), 1, bandTone(c, under), { shade: 0, clip });
   if (opt.buckle) g.limb(cx - bx * 1.5, cy - by * 1.5, cx - bx * 1.5, cy - by * 1.5, 1, opt.buckle, { shade: 0, clip });
 }
 

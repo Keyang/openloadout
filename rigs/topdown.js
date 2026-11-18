@@ -43,6 +43,7 @@
 import { lerp, clamp, wave, pulse, keys, loopKeys, smooth, reach, fract, TAU, PI } from '../engine/motion.js';
 import { ramp, farRamp, mix, brightness, INK } from '../engine/color.js';
 import { Surface, capsuleIn } from '../engine/surface.js';
+import { bandTone } from '../engine/tones.js';
 
 /** The frame of every top-down character, [width, height] in pixels. */
 export const SIZE = [48, 48];
@@ -940,9 +941,13 @@ function band(g, J, d, up, colour, mark) {
   if (mark && J.dir === 'down') g.dot(x, hip - up, mark);
 }
 
-/** A belt across the waist, for the `torso` hook. opt: { colour, buckle (colour, or null for none) }. */
+/** A belt across the waist, for the `torso` hook, in the tone of its colour that stands clear of the cloth under it: the shadow tone, or a lighter tone of it where that would merge with the tunic (engine/tones.js: bandTone). opt: { colour, buckle (colour, or null for none) }. */
 export function belt(g, J, P, d, opt = {}) {
-  band(g, J, d, 3, ramp(opt.colour ?? '#9a6a3e').dark, opt.buckle ?? null);
+  // what is already drawn on the row the belt will cover: the cloth it has to stand clear of
+  const hip = Math.round(J.hip[1]), wide = J.dir === 'side' ? Math.round(d.chestR * 1.7) : Math.floor(d.chestR) * 2 + 1;
+  const x0 = J.dir === 'side' ? Math.round(J.hip[0] - wide / 2 + 0.3) : Math.floor(J.bx) - Math.floor(d.chestR), under = [];
+  for (let x = x0; x < x0 + wide; x++) under.push(g.get(x, hip - 3));
+  band(g, J, d, 3, bandTone(opt.colour ?? '#9a6a3e', under), opt.buckle ?? null);
 }
 
 /** A band of colour along the hem of the tunic, for the `torso` hook. opt: { colour }. */
