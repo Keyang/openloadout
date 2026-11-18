@@ -373,7 +373,7 @@ test('topdown rig: when shooting, the item points the way the body faces and the
   for (const [dir, want] of [['down', [0, 1]], ['up', [0, -1]], ['side', [1, 0]]]) {
     const P = T.pose('shoot', dir, 0.2, {}, d), J = T.solve(dir, P, d), s = T.sockets(J, P, d, { muzzle: 8 });
     const v = [s.muzzle.x - s.hand.x, s.muzzle.y - s.hand.y];
-    assert.ok(v[0] * want[0] + v[1] * want[1] > 4, `${dir}: muzzle offset ${v}`);
+    assert.ok(v[0] * want[0] + v[1] * want[1] > (dir === 'down' ? 2.5 : 4), `${dir}: muzzle offset ${v}`);      // at the camera it is drawn short
   }
   // recoil: on frame 2 the hand is pulled back from where it was on frame 1
   for (const dir of T.DIRECTIONS) assert.ok(T.pose('shoot', dir, 0.4, {}, d).armF.f < T.pose('shoot', dir, 0.2, {}, d).armF.f - 1, `${dir}: no recoil`);
@@ -463,7 +463,7 @@ test('topdown rig: reach shortens a held item that points at the camera, never b
 
 test('topdown rig: fit keeps the longest weapon and the tallest headgear inside the frame, and leaves a pose that fits alone', () => {
   const big = T.dims({ height: 1, build: 1, head: 1 });
-  for (const kind of T.ITEM_KINDS) {
+  for (const kind of ['sword', 'axe', 'spear', 'staff', 'gun', 'pistol']) {      // carried tip up; a lantern and a cane have their own carry and their own test
     const item = T.itemSize(kind, 1.35);
     for (const dir of T.DIRECTIONS) for (const a of ['idle', 'walk', 'attack', 'hurt', 'die', 'block', 'shoot', 'cast', 'dodge']) for (const t of phases(a)) {
       const P = T.fit(dir, T.pose(a, dir, t, { armed: true }, big), big, { item, points: (J) => [[J.head[0], J.head[1] - big.headH / 2 - 7]] });
@@ -749,7 +749,7 @@ test('topdown rig: cuffs come with the look, on both arms, in every direction', 
 });
 
 test('topdown rig: lantern, cane and gun are held kinds with sizes; a lantern hangs straight down and a gun points where the hand points', () => {
-  assert.deepEqual(T.ITEM_KINDS, ['sword', 'axe', 'spear', 'staff', 'lantern', 'cane', 'gun']);
+  assert.deepEqual(T.ITEM_KINDS, ['sword', 'axe', 'spear', 'staff', 'lantern', 'cane', 'gun', 'pistol']);
   for (const kind of ['lantern', 'cane', 'gun']) {
     const size = T.itemSize(kind, 1);
     assert.ok(size.length >= 6 && size.length <= 14, `${kind}: ${JSON.stringify(size)}`);
@@ -795,4 +795,98 @@ test('topdown rig: a lantern, a cane and a gun stay inside the frame in every ac
     const b = F.finish(g).bounds();
     assert.ok(b.x0 > 0 && b.y0 > 0 && b.x1 < W - 1 && b.y1 < H - 1, `${kind} ${name} ${clip} frame ${f} leaves the frame (${b.x0},${b.y0}..${b.x1},${b.y1})`);
   }
+});
+
+// ---- fix round 3: guns, the muzzle flash, the hood -------------------------------------------------------
+
+test('topdown rig: shooting at the camera, a gun is held in front of the chest and drawn short: its muzzle is at chest or hip height, not at the boots', () => {
+  for (const dimsOf of Object.values(BODIES)) for (const kind of ['gun', 'pistol']) for (const t of [0, 0.2]) {
+    const F = T.frame('shoot_down', t, dimsOf, { item: T.itemSize(kind, 1), carry: 'low' }), J = T.solve('down', F.P, F.d), s = F.sockets();
+    assert.ok(s.muzzle.y <= J.hip[1] + 1.5 && s.muzzle.y > J.shoulderY + F.d.chin, `${kind}: muzzle at y ${s.muzzle.y.toFixed(1)}, hip ${J.hip[1]}`);
+    assert.ok(Math.abs(s.hand.x - J.bx) <= 3.5, `${kind}: the hand (${s.hand.x.toFixed(1)}) is not in front of the chest`);
+    assert.ok(s.muzzle.y > s.hand.y + 1.5, `${kind}: it does not point at the camera`);
+    assert.ok(F.P.reach <= 0.7, `${kind}: it is not drawn short (reach ${F.P.reach})`);
+  }
+  // both hands are on a gun that is aimed down the screen
+  const d = T.dims({}), P = T.pose('shoot', 'down', 0.2, { armed: true, carry: 'low' }, d), J = T.solve('down', P, d);
+  assert.ok(Math.abs(J.armB.hand[0] - J.armF.hand[0]) <= 5, 'the other hand supports it');
+});
+
+test('topdown rig: muzzleFlash draws the light of a shot along the muzzle, and frame().finish() draws it on the fire frame in all three directions', () => {
+  for (const angle of [0, Math.PI / 2, Math.PI]) {
+    const g = new Surface(W, H);
+    T.muzzleFlash(g, { x: 24, y: 24, angle }, 4, '#ffffff');
+    const px = lit(g, '#ffffff'), far = px.map(([x, y]) => (x + 0.5 - 24) * Math.sin(angle) + (y + 0.5 - 24) * Math.cos(angle));
+    assert.ok(px.length >= 6 && Math.max(...far) >= 3.5 && Math.min(...far) > -1.5, `angle ${angle}: ${px.length} pixels, ${Math.min(...far)}..${Math.max(...far)} along the muzzle`);
+  }
+  const edge = new Surface(W, H);
+  T.muzzleFlash(edge, { x: 46, y: 1, angle: Math.PI / 2 }, 6);
+  for (const [x, y] of lit(edge)) assert.ok(x >= 1 && y >= 1 && x <= W - 2 && y <= H - 2, 'the flash touches the frame edge');
+  for (const dir of T.DIRECTIONS) for (const kind of ['gun', 'pistol']) {
+    const shot = (t, o) => { const F = T.frame(`shoot_${dir}`, t, {}, { item: T.itemSize(kind, 1), carry: 'low' }), g = new Surface(W, H); F.draw(g, LOOK); F.finish(g, o); return { g, F }; };
+    const white = (t, o) => lit(shot(t, o).g, '#ffffff').length;
+    assert.ok(white(0.2) - white(0) >= 5, `${kind} shoot_${dir}: no flash on frame 1`);
+    assert.equal(white(0.4), white(0), `${kind} shoot_${dir}: a flash on frame 2`);
+    assert.equal(white(0.2, { flash: false }), white(0), `${kind} shoot_${dir}: flash: false still flashes`);
+    assert.ok(lit(shot(0.2, { flash: '#5fe0f0' }).g, '#5fe0f0').length >= 5, `${kind} shoot_${dir}: the flash takes a colour`);
+    // it is at the muzzle socket, and it shows (facing away, the muzzle is beside the head, not behind it)
+    const { g, F } = shot(0.2), m = F.sockets().muzzle;
+    assert.ok(lit(g, '#ffffff').some(([x, y]) => Math.hypot(x + 0.5 - m.x, y + 0.5 - m.y) <= 2.5), `${kind} shoot_${dir}: the flash is not at the muzzle`);
+    const b = g.bounds();
+    assert.ok(b.x0 > 0 && b.y0 > 0 && b.x1 < W - 1 && b.y1 < H - 1);
+  }
+});
+
+test('topdown rig: a gun looks like a gun: a stock, a body with a magazine under it, a thin barrel; a pistol is the sidearm', () => {
+  assert.ok(T.ITEM_KINDS.includes('gun') && T.ITEM_KINDS.includes('pistol'));
+  const long = T.itemSize('gun', 1), side = T.itemSize('pistol', 1);
+  assert.ok(long.length >= 9 && long.back >= 3 && side.length <= 6 && side.length >= 4, `${JSON.stringify(long)} ${JSON.stringify(side)}`);
+  const pic = (kind, size, dir = 'side') => { const g = new Surface(W, H); T.heldItem(g, dir, { x: 20, y: 24, angle: Math.PI / 2 }, { kind, length: size.length, metal: '#c2c9d6', glow: '#5fe0f0' }); return g; };
+  const col_ = (g, x) => { let n = 0; for (let y = 0; y < H; y++) if (g.get(x, y)) n++; return n; };
+  const below = (g, x) => { let n = 0; for (let y = 26; y < H; y++) if (g.get(x, y)) n++; return n; };
+  const g = pic('gun', long), b = g.bounds();
+  assert.ok(b.x0 <= 20 - long.back + 1 && b.x1 >= 20 + long.length - 2, `the gun spans ${b.x0}..${b.x1}`);
+  assert.ok(col_(g, b.x1) <= 2 && col_(g, b.x1 - 2) <= 2, 'the barrel is thin');
+  assert.ok(col_(g, 22) >= 3, 'the body is thick');
+  const under = Array.from({ length: b.x1 - b.x0 + 1 }, (_, i) => below(g, b.x0 + i));
+  assert.ok(Math.max(...under.slice(long.back + 1, long.back + 6)) >= 2, `a magazine or grip hangs under the body (${under})`);
+  assert.ok(under.slice(-3).every((n) => n === 0), 'nothing hangs under the barrel');
+  assert.ok(lit(g, '#5fe0f0').length >= 1, 'the cell glows');
+  const s = pic('pistol', side), sb = s.bounds();
+  assert.ok(sb.x1 - sb.x0 + 1 <= 8 && sb.x1 - sb.x0 + 1 < b.x1 - b.x0 - 3, 'a pistol is much shorter than a gun');
+  assert.ok(sb.y1 >= 26, 'a pistol has a grip under it');
+  for (const dir of ['down', 'up']) assert.ok(lit(pic('gun', long, dir)).length >= 14, `${dir}: the gun draws`);
+  assert.notDeepEqual(Array.from(pic('gun', long).data), Array.from(pic('spear', T.itemSize('spear', 1)).data));
+});
+
+test('topdown rig: a hood is open down to the chin going down: nothing of it crosses the face', () => {
+  for (const dimsOf of Object.values(BODIES)) for (const depth of [0, 1, 2]) {
+    const C = '#357a4c', own = new Set(tones(C));
+    const { g, J, d } = body('idle', 'down', 0, dimsOf, { outline: false, look: { ...LOOK, hairStyle: 'bald' }, hooks: { head: (gg, JJ, P, dd) => T.hood(gg, JJ, P, dd, { colour: C, depth }) } });
+    const x = Math.floor(J.head[0]), bottom = J.headTop + d.headH - 1;
+    for (let y = J.brow + 3; y <= bottom; y++) for (const dx of [-2, -1, 0, 1, 2]) assert.ok(!own.has(g.get(x + dx, y)), `depth ${depth}: the hood crosses the face at row ${y - J.headTop} of ${d.headH}`);
+    assert.ok(own.has(g.get(x - Math.floor(d.headW / 2), J.brow + 2)) && own.has(g.get(x, J.headTop)), 'the hood still frames the face');
+  }
+});
+
+test('topdown rig: under a cape of standard length at least 4 px of leg show, standing and walking away', () => {
+  const C = '#c9423a', own = new Set(tones(C));
+  for (const dimsOf of Object.values(BODIES)) for (const [a, t] of [['idle', 0], ...phases('walk').map((u) => ['walk', u])]) {
+    const { g, J } = body(a, 'up', t, dimsOf, { outline: false, hooks: { behind: (gg, JJ, P, dd) => T.cape(gg, JJ, P, dd, { length: 1, colour: C }) } });
+    let hem = 0;
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (own.has(g.get(x, y))) hem = Math.max(hem, y);
+    const sole = Math.max(J.legF.soleY, J.legB.soleY) - 1;
+    assert.ok(sole - hem >= 4, `${a} at ${t}: ${sole - hem} px of leg below the cape`);
+  }
+});
+
+test('topdown rig: dodging at the camera the body travels 6 px in all, back first and then forward; a lantern is big enough to see', () => {
+  const d = T.dims({});
+  const ys = phases('dodge').map((t) => T.solve('down', T.pose('dodge', 'down', t, {}, d), d).gy);
+  assert.ok(Math.max(...ys) - Math.min(...ys) >= 6, `travels ${Math.max(...ys) - Math.min(...ys)} px`);
+  assert.ok(Math.max(...ys) <= T.GROUND + 4 && ys.at(-1) === T.GROUND);
+  const g = new Surface(W, H);
+  T.heldItem(g, 'down', { x: 24, y: 20, angle: 0 }, { kind: 'lantern', length: T.itemSize('lantern', 1).length, metal: '#5a5f7a', glow: '#f4e06a' });
+  const b = g.bounds();
+  assert.ok(b.x1 - b.x0 + 1 >= 7 && b.y1 - b.y0 + 1 >= 9, `the lantern is ${b.x1 - b.x0 + 1} x ${b.y1 - b.y0 + 1}`);
 });

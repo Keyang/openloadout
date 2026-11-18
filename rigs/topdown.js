@@ -10,10 +10,10 @@
 //
 //   clips(speedOf, { action, plain, extra })    the section 5 clip table: idle_*, walk_*, <action>_*, then clips with no direction
 //   frame(clip, t, p, { item, rise, carry })    ONE FRAME, posed and fitted once: F.draw(), F.sockets(), F.finish(). Start here
-//   parseClip, dims, pose, solve, fit, draw, sockets, slashTrail      what frame() is made of, for a pose of your own
+//   parseClip, dims, pose, solve, fit, draw, sockets, slashTrail, muzzleFlash      what frame() is made of, for a pose of your own
 //   worn parts (called from hooks)              cape, mantle, belt, hem, robe (torso and back); helmet, crown, hood, hat (head);
 //                                               look.cuffs; headgearRise(kind, size) for frame()'s `rise`
-//   heldItem(g, direction, at, item)            held kinds: sword, axe, spear, staff, lantern, cane, gun (ITEMS has their sizes,
+//   heldItem(g, direction, at, item)            held kinds: sword, axe, spear, staff, lantern, cane, gun, pistol (ITEMS has their sizes,
 //                                               CARRY how each rests: 'up', 'upright', 'low', 'hang')
 //
 // A new top-down character is a look, a few parts and the clip table:
@@ -285,8 +285,12 @@ export function pose(action, direction, t, m = {}, d = dims()) {
       // starts aimed (frame 0), fires on frame 1, kicks back on frame 2, recovers, and ends standing
       const aim = keys(t, [[0, 1], [0.7, 1], [1, 0]]);
       const kick = keys(t, [[0, 0], [0.2, 0], [0.4, 1], [0.8, 0.15], [1, 0]]);
-      P.armF.f = 4 * aim - 2.4 * kick; P.armF.u = 2.5 * aim + 0.6 * kick; P.armF.o = side ? 0 : (up ? 3.5 : -0.5) * aim;       // facing away, the hand comes out to the side so the whole barrel shows past the head
-      P.armB.f = 1.5 * aim - 1 * kick; P.armB.u = 1.5 * aim; P.armB.o = side ? 0 : -1 * aim;
+      // side: the arm is level. up (facing away): the hand comes out to the side so the whole barrel shows past the head.
+      // down (at the camera): both hands bring it in front of the chest and it is drawn short, its muzzle at the hip
+      const front = !side && !up;
+      P.armF.f = (front ? 3 : 4) * aim - 2.4 * kick; P.armF.u = (front ? 4.5 : 2.5) * aim + 0.6 * kick; P.armF.o = side ? 0 : (up ? 3.5 : -3.5) * aim;
+      P.armB.f = 1.5 * aim - 1 * kick; P.armB.u = (front ? 4 : 1.5) * aim; P.armB.o = side ? 0 : (front ? -3 : -1) * aim;
+      if (front) P.reach = 1 - 0.6 * aim;
       P.item = turn(rest, ahead, aim) - (side ? 0.25 : 0) * kick;
       P.lunge = -2 * kick;
       P.lean = 0.6 * aim - 1.2 * kick;
@@ -326,7 +330,7 @@ export function pose(action, direction, t, m = {}, d = dims()) {
       P.tuck = tuck;
       P.bob = d.leg * 0.45 * tuck;
       P.headDy = 2 * tuck;
-      P.lunge = keys(t, [[0, 0], [0.143, -1], [0.286, 3], [0.43, 6], [0.571, 7], [0.714, 5], [0.857, 2], [1, 0]]);
+      P.lunge = keys(t, [[0, 0], [0.143, -3], [0.286, 3], [0.43, 6], [0.571, 7], [0.714, 5], [0.857, 2], [1, 0]]);      // back first, then the dash
       if (side) P.lift = 1.5 * pulse(clamp((t - 0.2) / 0.5));
       P.armF.u = 2 * tuck; P.armF.f = 1.5 * tuck; P.armF.o = side ? 0 : -1 * tuck;
       P.armB.u = 2 * tuck; P.armB.f = 1.5 * tuck; P.armB.o = side ? 0 : -1 * tuck;
@@ -527,13 +531,20 @@ export function fit(direction, P, d, opt = {}) {
     if (over > 0) { P.lunge = Math.max(0, P.lunge - Math.ceil(over) / 0.7); J = solve(direction, P, d); }
   }
   if (item) {
-    const [, hy] = J.armF.hand, pad = item.pad ?? 1, c = Math.cos(P.item), len = item.length;
+    const c = Math.cos(P.item), len = item.length;
+    // a thing that hangs (a lantern) is wide across, not along: it ends where its length ends
+    const pad = item.hangs ? 2.5 : item.pad ?? 1;
+    const roomAt = () => (c < 0 ? J.armF.hand[1] - margin - pad : yMax - pad - J.armF.hand[1]);
     // up and down: draw it shorter, never below half
-    const room = c < 0 ? hy - margin - pad : yMax - pad - hy;
-    const need = Math.abs(c) * len * (P.reach ?? 1);
-    if (need > room) {
-      const r = Math.max(0.5, room / (Math.abs(c) * len));
+    if (Math.abs(c) * len * (P.reach ?? 1) > roomAt()) {
+      const r = Math.max(0.5, roomAt() / (Math.abs(c) * len));
       if (r < (P.reach ?? 1)) P.reach = r;
+      if (item.hangs && c * len * P.reach > roomAt()) {
+        // a thing that hangs straight down and still has no room (a lantern over a kneeling body): the hand lifts it
+        P.armF.u += Math.ceil(c * len * P.reach - roomAt());
+        J = solve(direction, P, d);
+      }
+      const room = roomAt();
       if (Math.abs(c) * len * P.reach > room) {
         // still too long: turn it towards level, on the side it already leans
         const lim = Math.acos(clamp(room / (len * P.reach), -1, 1));
@@ -855,11 +866,11 @@ function drawLying(g, direction, P, d, look, C, hooks) {
 // direction in J.dir. Colours are '#rrggbb'. Which hook: cape -> behind; mantle, belt, hem, robe -> torso;
 // helmet, crown, hood, hat -> head (set look.hatted for helmet, hood and hat, so no hair pokes through).
 
-/** A cape on the back, for the `behind` hook: behind the body going down and sideways, over the back going up. opt: { kind: 'plain' | 'tattered', length (1 = to the shins, 0.3 to 1.8), colour }. */
+/** A cape on the back, for the `behind` hook: behind the body going down and sideways, over the back going up. opt: { kind: 'plain' | 'tattered', length (1 = to above the knee, 1.8 = to the floor; 0.3 to 1.8), colour }. */
 export function cape(g, J, P, d, opt = {}) {
   const { kind = 'plain', length = 1, colour = '#c9423a' } = opt;
   const bx = J.bx, top = J.shoulderY + d.chin, s = P.sway ?? 0;
-  const hem = Math.min(J.gy - 1, Math.round(top + (d.torso - d.chin + d.leg * 0.45) * length));
+  const hem = Math.min(J.gy - 1, Math.round(top + (d.torso - d.chin + d.leg * 0.25) * length));      // length 1: to above the knee, so the legs show walking away
   // the bottom edge from x0 to x1: straight, or with bites torn out of it
   const edge = (x0, x1, y0, y1 = y0) => {
     if (kind !== 'tattered') return [[x0, y0], [x1, y1]];
@@ -989,10 +1000,11 @@ export function crown(g, J, P, d, opt = {}) {
 /** A hood, for the `head` hook (set look.hairStyle 'bald' or look.hatted): cloth round the head with the face showing going down and sideways, the whole back of the head going up. opt: { colour, depth (0 = pushed back, 2 = pulled low over the brow) }. */
 export function hood(g, J, P, d, opt = {}) {
   const { colour = '#357a4c', depth = 1 } = opt;
-  const c = ramp(colour), out = headIn(J, d, 1.2), face = headIn(J, d, -1.5);
+  const c = ramp(colour), out = headIn(J, d, 1.2);
   const [cx, cy] = J.head, box = [cx - d.headW / 2 - 3, cy - d.headH / 2 - 3, cx + d.headW / 2 + 3, cy + d.headH / 2 + 5];
   const brow = J.brow - 1 + Math.round(depth);
-  if (J.dir === 'down') g.fill(...box, (px, py) => out(px, py) && !(face(px, py) && py > brow), c);
+  // going down it is open from the brow to the chin: cloth on both sides of the face, nothing across it
+  if (J.dir === 'down') g.fill(...box, (px, py) => out(px, py) && !(py > brow && Math.abs(px - cx) < d.headW / 2 - 1.5), c);
   else if (J.dir === 'up') { g.fill(...box, out, c, { shade: 2 }); g.capsule(cx, cy + 2, cx + (P.sway ?? 0) * 0.5, cy + d.headH / 2 + 2, 2.5, 1.5, c); }
   else g.fill(...box, (px, py) => out(px, py) && !(px > cx + 1 - Math.round(depth) + 1 && py > brow), c);
 }
@@ -1023,10 +1035,11 @@ export function hat(g, J, P, d, opt = {}) {
  * opt: { item: itemSize(kind, scale) of what the weapon hand holds, or null (an `attack` with nothing held becomes a punch);
  *        rise: pixels the headgear rises above the head (headgearRise()); points: (J, P) => [[x, y]] other far points for fit();
  *        carry: 'up' | 'upright' | 'low' | 'hang' (CARRY); tall: [shortest, tallest] body (dims); muzzle: pixels from hand to muzzle (default: the item's length) }.
- * Returns F = { clip, action, direction, d, P, item, poseAt(u), sockets(), hand(J), draw(g, look, hooks), finish(g, { trail, outline }) }:
+ * Returns F = { clip, action, direction, d, P, item, poseAt(u), sockets(), hand(J), draw(g, look, hooks), finish(g, { trail, flash, outline }) }:
  *   F.sockets()             what the sprite's sockets(clip, t, p) returns
  *   F.draw(g, look, hooks)  draw() for this pose; inside a hook F.hand(J) is where the held thing attaches
- *   F.finish(g, { trail })  the white hurt frame, the outline, then (trail: a colour) the swing arc of an armed attack
+ *   F.finish(g, { trail })  the white hurt frame, the outline, then (trail: a colour) the swing arc of an armed attack, and on the
+ *                           fire frame of `shoot` the muzzle flash at the muzzle socket (flash: a colour; false for none)
  */
 export function frame(clip, t, p = {}, opt = {}) {
   const { action, direction } = parseClip(clip);
@@ -1045,6 +1058,7 @@ export function frame(clip, t, p = {}, opt = {}) {
       if (P.flash) g.tint('#ffffff');
       g.outline(o.outline ?? INK);
       if (o.trail && action === 'attack' && item) slashTrail(g, direction, poseAt, t, d, item.length, o.trail);
+      if (P.fire && item && o.flash !== false) muzzleFlash(g, this.sockets().muzzle, 3, typeof o.flash === 'string' ? o.flash : '#ffffff');
       return g;
     },
   };
@@ -1052,8 +1066,8 @@ export function frame(clip, t, p = {}, opt = {}) {
 
 // ---- held items -----------------------------------------------------------------------------------
 
-/** The kinds heldItem() can draw. Carry: sword, axe, spear 'up'; staff 'upright'; cane and gun 'low'; lantern 'hang'. */
-export const ITEM_KINDS = ['sword', 'axe', 'spear', 'staff', 'lantern', 'cane', 'gun'];
+/** The kinds heldItem() can draw. Carry: sword, axe, spear 'up'; staff 'upright'; cane, gun (a long gun) and pistol (a sidearm) 'low'; lantern 'hang'. */
+export const ITEM_KINDS = ['sword', 'axe', 'spear', 'staff', 'lantern', 'cane', 'gun', 'pistol'];
 
 /**
  * The standard sizes of the held kinds on this body, in pixels, so every top-down character's sword is the same sword.
@@ -1065,13 +1079,14 @@ export const ITEMS = {
   axe: { length: 10, back: 2, pad: 4.5 },
   spear: { length: 14, back: 4, pad: 1 },
   staff: { length: 12, back: 9, pad: 3 },
-  lantern: { length: 8, back: 0, pad: 3.5 },
+  lantern: { length: 10, back: 0, pad: 4.5, hangs: true },
   cane: { length: 11, back: 2, pad: 1.5 },
-  gun: { length: 9, back: 3, pad: 2.5 },
+  gun: { length: 10, back: 3, pad: 3.5 },
+  pistol: { length: 5, back: 1, pad: 3 },
 };
 
 /** The size { length, back, pad } of a held kind at a length setting, ready for frame(), fit() and heldItem(); null for 'none' or an unknown kind. kind: one of ITEM_KINDS; scale: 1 = standard. */
-export const itemSize = (kind, scale = 1) => (ITEMS[kind] ? { length: ITEMS[kind].length * scale, back: ITEMS[kind].back, pad: ITEMS[kind].pad } : null);
+export const itemSize = (kind, scale = 1) => (ITEMS[kind] ? { length: ITEMS[kind].length * scale, back: ITEMS[kind].back, pad: ITEMS[kind].pad, ...(ITEMS[kind].hangs ? { hangs: true } : {}) } : null);
 
 /** The far end [x, y] of a thing of length len held in the weapon hand. J = solve(), P = the pose. */
 export const itemTip = (J, P, len) => reach(J.armF.hand[0], J.armF.hand[1], P.item, len * (P.reach ?? 1));
@@ -1126,14 +1141,29 @@ export function heldItem(g, direction, at, item) {
     g.line(bx, by, tx, ty, wood);
     g.line(bx, by, kx, ky, wood);                                    // the crook, over the hand
   } else if (item.kind === 'gun') {
-    // a stock behind the hand, a body, a thinner barrel; item.glow lights a cell on the body
-    const [sx, sy] = to(3 * (at.reach ?? 1), PI), [mx, my] = to(len * 0.55), [tx, ty] = to(len);
+    // a long gun: a stock behind the hand, a thick body with a magazine under it, a thin barrel; item.glow lights a cell
+    const r = at.reach ?? 1, [sx, sy] = to(3 * r, PI), [bx, by] = to(0.5, PI), [mx, my] = to(len * 0.5), [tx, ty] = to(len);
     g.line(mx, my, tx, ty, metal.dark);
-    g.limb(sx, sy, mx, my, 3, metal);
-    const [gx, gy] = to(2.4, direction === 'side' ? -PI / 2 : PI / 2, [sx, sy]);
-    g.line(sx, sy, gx, gy, metal.dark);
-    if (typeof item.glow === 'string') { const [cx, cy] = to(len * 0.3); g.dot(cx, cy, item.glow); }
+    g.limb(sx, sy, bx, by, 2, metal.dark);
+    g.limb(bx, by, mx, my, 3, metal);
+    const [cx, cy] = to(len * 0.3), [ux, uy] = to(3.3, -PI / 2, [cx, cy]);
+    g.limb(cx, cy, ux, uy, 2, metal.dark);                              // the magazine, on the under side
+    if (typeof item.glow === 'string') { const [lx, ly] = to(len * 0.12); g.dot(lx, ly, item.glow); }
+  } else if (item.kind === 'pistol') {
+    // a sidearm: a short body with a grip under the hand
+    const [bx, by] = to(1, PI), [tx, ty] = to(len), [ux, uy] = to(2.8, -PI / 2);
+    g.limb(hx, hy, ux, uy, 2, metal.dark);
+    g.limb(bx, by, tx, ty, 2, metal);
+    if (typeof item.glow === 'string') { const [lx, ly] = to(len * 0.5); g.dot(lx, ly, item.glow); }
   }
+}
+
+/** Draws the light of a shot, a short ray the way the muzzle points with a small cross behind its tip; call it AFTER g.outline() on the frame where the pose says `fire` (frame().finish does). at: { x, y, angle }, the `muzzle` socket; size: the length of the ray in pixels; colour. Never touches the frame edge. */
+export function muzzleFlash(g, at, size = 3, colour = '#ffffff') {
+  const put = (x, y) => { x = Math.floor(x); y = Math.floor(y); if (x >= 1 && y >= 1 && x <= SIZE[0] - 2 && y <= SIZE[1] - 2) g.dot(x, y, colour); };
+  const ux = Math.sin(at.angle), uy = Math.cos(at.angle), arm = Math.max(1, size * 0.5);
+  for (let r = 0.5; r <= arm; r += 0.5) for (const k of [-1, 1]) put(at.x + ux - uy * r * k, at.y + uy + ux * r * k);
+  for (let r = 0; r <= size; r += 0.5) put(at.x + ux * r, at.y + uy * r);
 }
 
 /**
