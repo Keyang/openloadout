@@ -37,22 +37,29 @@ function formatCheck(file, patch, r) {
     return lines.join('\n');
   }
   const a = m.analysis;
-  lines.push(`  render   ${a.seconds.toFixed(2)} s in ${m.renderMs} ms (${m.realtime.toFixed(0)}x realtime) · raw peak ${m.rawPeak.toFixed(2)} · rms ${a.rmsDb.toFixed(1)} dBFS after normalise`);
+  lines.push(`  render   ${a.seconds.toFixed(2)} s in ${m.renderMs} ms (${m.realtime.toFixed(0)}x realtime) · raw peak ${m.rawPeak.toFixed(2)} · rms ${a.rmsDb.toFixed(1)} dBFS after normalise · crest ${a.crestDb.toFixed(1)} dB (peak over average level${m.kind ? `; a ${m.kind} should be above 10 dB` : ''})`);
   lines.push(`  loudness ${a.contour}   (time →, 6 dB per step)`);
-  lines.push(`  timing   attack ${a.attackMs.toFixed(0)} ms · sounding ${a.soundingSeconds.toFixed(2)} s · end level ${a.endLevelDb.toFixed(0)} dB`);
+  lines.push(`  timing   ${a.onsetMs === undefined ? '' : `onset ${a.onsetMs.toFixed(1)} ms${m.kind ? ` (a ${m.kind} starts within 10 ms)` : ''} · `}attack ${a.attackMs.toFixed(0)} ms (time to the loudest moment) · sounding ${a.soundingSeconds.toFixed(2)} s · end level ${a.endLevelDb.toFixed(0)} dB`);
   lines.push(`  spectrum centroid ${hz(a.centroidHz.start)} → ${hz(a.centroidHz.middle)} → ${hz(a.centroidHz.end)} Hz · strongest ${hz(a.dominantHz.start)} → ${hz(a.dominantHz.middle)} → ${hz(a.dominantHz.end)} Hz (start → middle → end)`);
-  lines.push(`  bands    ${Object.entries(a.bands).map(([k, x]) => `${k} ${pct(x)}`).join(' · ')}`);
+  lines.push(`  bands    ${Object.entries(a.bands).map(([k, x]) => `${k} ${pct(x)}`).join(' · ')}${a.above300 === undefined ? '' : ` · above 300 Hz ${pct(a.above300)}${m.rumble ? ' (says it is a rumble)' : m.type === 'music' ? '' : ' (at least 40%)'}`}`);
   const fmt = (x) => (x >= 100 ? x.toFixed(0) : x >= 10 ? x.toFixed(1) : x.toFixed(2));
   lines.push(`  nodes    peak |value|: ${m.nodes.map((n) => `${n.id} ${fmt(n.peak)}`).join(' · ')}`);
   if (m.loopSeam) {
     const pl = m.pulse || [];
     lines.push(`  loop     seam jump ${m.loopSeam.factor.toFixed(1)}x typical${m.loopSeam.factor > 8 ? ' (may click)' : ''} · ${m.stereo ? 'stereo' : 'mono'}${pl.length ? ` · pulse ${pl.map((p) => `${p.bpm} bpm (${p.strength})`).join(', ')}` : ' · no steady pulse'}`);
   }
+  if (m.music?.chords) {
+    const c = m.music.chords;
+    lines.push(`  chords   ${c.matched} of ${c.counted} bars sound their written chord (2 of the 3 strongest notes; at least 75% of bars) · ${pct(c.outOfKey)} of the pitched sound on notes no chord uses (20% or less) · tonic ${c.tonic}${c.tonicFrom === 'bass' ? ' (taken from the bass: the patch has no "tonic" node)' : ''}`);
+    for (const b of c.bars) lines.push(`    bar ${String(b.bar).padStart(2)}  ${b.written.padEnd(9)} ${b.match ? ' ' : b.pitched ? '✗' : '-'} ${b.top.map((n, i) => `${n} ${pct(b.topShares[i])}`).join('  ')}`);
+  }
   if (m.music) lines.push(`  music    tempo written ${m.music.writtenBpm ?? '?'} bpm, detected ${m.music.detectedBpm ?? 'none'} · length control ${m.music.lengthControl ?? 'none'} · melody instrument control ${m.music.instrumentControl ?? 'none'}`);
   if (m.params.length) lines.push('  params   change from min → max (average dB of spectral change; below 1.5 is barely audible)');
-  for (const p of m.params) lines.push(`    ${p.id.padEnd(12)} ${p.distance.toFixed(1).padStart(5)} dB  (${p.min}..${p.max}, default ${p.default})${p.flags.length ? '  ← ' + p.flags.join('; ') : ''}`);
+  const second = (p) => [p.onsetShiftMs === undefined ? '' : `note starts move ${p.onsetShiftMs.toFixed(0)} ms (10 or more is heard)`, p.seeds ? `${p.seeds.count} seeds: ${p.seeds.distance.toFixed(1)} dB on a typical take, takes differ by ${p.seeds.takesAtMin.toFixed(1)} dB at min and ${p.seeds.takesAtMax.toFixed(1)} dB at max` : ''].filter(Boolean).join('; ');
+  for (const p of m.params) lines.push(`    ${p.id.padEnd(12)} ${p.distance.toFixed(1).padStart(5)} dB  (${p.min}..${p.max}, default ${p.default})${p.audibleBy ? `  ← heard as ${p.audibleBy}: ${second(p)}` : p.flags.length ? '  ← ' + p.flags.join('; ') + (second(p) ? ` [${second(p)}]` : '') : ''}`);
   lines.push(`  variation seed 1 vs seed 2: ${m.variation.toFixed(1)} dB${m.variation < 0.2 ? ' (identical every time — use rnd(lo, hi) or noise if repeats should differ)' : ''}`);
   if (m.presets.length) lines.push(`  presets  ${m.presets.join(', ')}`);
+  (m.styles ?? []).forEach((x, i) => lines.push(`  ${i ? '      ' : 'styles'}   ${x.name}: ${x.seconds.toFixed(2)} s · above 300 Hz ${pct(x.above300)} · onset ${x.onsetMs.toFixed(1)} ms · crest ${x.crestDb.toFixed(1)} dB · end level ${x.endLevelDb.toFixed(0)} dB · raw peak ${x.rawPeak.toFixed(2)}${x.flags.length ? '  ← ' + x.flags.join('; ') : ''}`));
   for (const e of r.errors) lines.push(`  ERROR: ${e}`);
   for (const w of r.warnings) lines.push(`  WARN: ${w}`);
   for (const n of r.notes) lines.push(`  NOTE: ${n}`);

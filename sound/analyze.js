@@ -108,7 +108,90 @@ export function analyze(samples, sr) {
     centroidHz: { all: centroidOf(0, F), start: centroidOf(0, third), middle: centroidOf(third, Math.min(F, 2 * third)), end: centroidOf(Math.min(F - 1, 2 * third), F) },
     dominantHz: { start: domOf(0, third), middle: domOf(third, Math.min(F, 2 * third)), end: domOf(Math.min(F - 1, 2 * third), F) },
     bands: Object.fromEntries(BANDS.map((b, i) => [b[0], total > 0 ? bandPow[i] / total : 0])),
+    onsetMs: onsetMs(samples, sr),
+    above300: total > 0 ? 1 - (bandPow[0] + bandPow[1]) / total : 0,
   };
+}
+
+/**
+ * Where a sound starts: milliseconds from the start of the render to the first sample within `db` of the loudest one.
+ * samples: one channel; sr: its sample rate; db: how far below the peak counts as started (default -20, a tenth of
+ * the peak). Unlike attackMs (time to the loudest moment) it does not grow when a later note or thud is louder. 0 for silence.
+ */
+export function onsetMs(samples, sr, db = -20) {
+  let peak = 0;
+  for (let i = 0; i < samples.length; i++) { const a = Math.abs(samples[i]); if (a > peak) peak = a; }
+  if (peak < 1e-9) return 0;
+  const thr = peak * Math.pow(10, db / 20);
+  for (let i = 0; i < samples.length; i++) if (Math.abs(samples[i]) >= thr) return (i / sr) * 1000;
+  return 0;
+}
+
+/**
+ * The note starts in a render, in seconds: the moments where the spectrum jumps (peaks of spectral flux), about 1.5 ms apart at best.
+ * samples: one channel; sr: its sample rate; floor: a peak counts when it is at least this share of the biggest jump
+ * (default 0.1); gapMs: two starts are at least this far apart (default 30). Every time is late by the same few
+ * milliseconds, so compare two renders with onsetShift rather than reading one list as exact.
+ */
+export function onsets(samples, sr, { floor = 0.1, gapMs = 30 } = {}) {
+  const hop = 64, frames = spectrogram(samples, 512, hop), F = frames.length, flux = new Float32Array(F);
+  let max = 0;
+  for (let f = 1; f < F; f++) {
+    let s = 0; const a = frames[f], b = frames[f - 1];
+    for (let k = 1; k < a.length; k++) { const d = a[k] - b[k]; if (d > 0) s += d; }
+    flux[f] = s; if (s > max) max = s;
+  }
+  if (max < 1e-9) return [];
+  const w = Math.max(1, Math.round(((gapMs / 1000) * sr) / hop)), out = [];
+  for (let f = 1; f < F; f++) {
+    if (flux[f] < max * floor) continue;
+    let top = true;
+    for (let g = Math.max(1, f - w); g <= Math.min(F - 1, f + w) && top; g++) if (flux[g] > flux[f] || (flux[g] === flux[f] && g < f)) top = false;
+    if (top) out.push((f * hop) / sr);
+  }
+  return out;
+}
+
+/**
+ * How far note starts move between two renders of the same sound. a, b: two lists from onsets(), in seconds.
+ * Returns { ms, moved, count }: each start is paired with the nearest start in the other list; ms is the distance that
+ * one start in ten exceeds (the 90th percentile), moved the share of starts 10 ms or more from their partner, count the starts compared.
+ */
+export function onsetShift(a, b) {
+  const near = (x, list) => { let d = Infinity; for (const y of list) { const e = Math.abs(x - y); if (e < d) d = e; } return d; };
+  const ds = [...a.map((x) => near(x, b)), ...b.map((x) => near(x, a))].filter(Number.isFinite).sort((p, q) => p - q);
+  if (!ds.length) return { ms: 0, moved: 0, count: 0 };
+  return { ms: ds[Math.min(ds.length - 1, Math.floor(ds.length * 0.9))] * 1000, moved: ds.filter((d) => d >= 0.01).length / ds.length, count: ds.length };
+}
+
+/** The twelve note names, C first: the index is the pitch class barPitchClasses reports. */
+export const PITCH_NAMES = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
+
+/**
+ * Which notes sound in each bar: for every bar, the share of pitched energy on each of the 12 notes (index 0 is C; see PITCH_NAMES).
+ * samples: one channel of a whole number of bars; sr: its sample rate; bars: how many bars it holds.
+ * Each bar is windowed whole and only spectral peaks between 100 Hz and 2 kHz are counted, so drums and hiss add little.
+ * Returns a list with one array of 12 shares per bar (they add up to 1; all 0 for a silent bar).
+ */
+export function barPitchClasses(samples, sr, bars) {
+  const barLen = Math.floor(samples.length / bars), out = [];
+  let N = 32768; while (N < barLen) N *= 2;
+  const re = new Float32Array(N), im = new Float32Array(N);
+  for (let b = 0; b < bars; b++) {
+    re.fill(0); im.fill(0);
+    for (let i = 0; i < barLen; i++) re[i] = samples[b * barLen + i] * (0.5 - 0.5 * Math.cos((2 * Math.PI * i) / barLen));
+    fft(re, im);
+    const pc = new Array(12).fill(0);
+    let ml = Math.hypot(re[1], im[1]), m = Math.hypot(re[2], im[2]);
+    for (let k = 2; k < N / 2 - 1; k++) {
+      const mr = Math.hypot(re[k + 1], im[k + 1]), f = (k * sr) / N;
+      if (f >= 100 && f <= 2000 && m > ml && m >= mr) pc[((Math.round(69 + 12 * Math.log2(f / 440)) % 12) + 12) % 12] += m * m;  // spectral peaks only
+      ml = m; m = mr;
+    }
+    const tot = pc.reduce((a, v) => a + v, 0);
+    out.push(tot > 0 ? pc.map((v) => v / tot) : pc);
+  }
+  return out;
 }
 
 // Coarse log-frequency "fingerprint" (time × band, dB) used to measure how

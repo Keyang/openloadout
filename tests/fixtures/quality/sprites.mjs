@@ -257,7 +257,7 @@ function blockDef(opts = {}) {
   const clips = Object.fromEntries(Object.keys(FACES).map((k) => [`${prefix}-${k}`, { ...one }]));
   if (opts.narrow) for (const k of Object.keys(NARROW)) clips[`${prefix}-${k}`] = { ...one };
   if (opts.slopes) { clips[`${prefix}-slope-up`] = { ...one }; clips[`${prefix}-slope-down`] = { ...one }; }
-  if (opts.decal) clips[`${prefix}-deco-a`] = { ...one, place: 'above' };
+  if (opts.decal) clips[`${prefix}-deco-a`] = { ...one, place: opts.decalPlace ?? 'above' };
   return {
     id: 'q-block', name: 'Test block', kind: 'Item',
     meta: { ...META, type: 'tileset', role: 'world/tile', view: opts.view ?? 'side' },
@@ -343,6 +343,8 @@ export const blockSlopeNub = () => defineSprite(blockDef({ slopes: true, nub: tr
 export const blockDecal = () => defineSprite(blockDef({ decal: true }));
 // a decal that stops 3 px above the bottom of its cell: it floats over the block
 export const blockDecalFloats = () => defineSprite(blockDef({ decal: true, decalLift: 3 }));
+// a decal drawn standing on the bottom of its cell but placed 'on' (over a fill tile): the place is probably wrong
+export const blockDecalWrongPlace = () => defineSprite(blockDef({ decal: true, decalPlace: 'on' }));
 // a decal that stands where the top line dips: it floats over the dip
 export const blockDecalOverDip = () => defineSprite(blockDef({ decal: true, dip: true, decalOverDip: true }));
 // (passes) the same dip with the decal on the level part

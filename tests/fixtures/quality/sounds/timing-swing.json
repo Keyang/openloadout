@@ -66,7 +66,7 @@
    "id": "amp",
    "type": "ad",
    "attack": 0.001,
-   "decay": 0.05,
+   "decay": "0.05 + fine*0.005",
    "curve": 3,
    "trig": "c16"
   },
@@ -74,7 +74,7 @@
    "id": "tone",
    "type": "osc",
    "wave": "tri",
-   "freq": "pitch*(1 + fine*0.0003)"
+   "freq": "pitch"
   }
  ],
  "out": "tone*amp"
