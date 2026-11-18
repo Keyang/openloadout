@@ -43,6 +43,14 @@
 //   },
 // A cursor exports its hot spot as a `tip` socket: sockets: (clip, t, p) => ({ tip: { x, y, angle } }).
 //
+// CONTRAST (style guide, section 8). White text must keep 4.5 to 1 on a text face, and a frame 3 to 1
+// against its face, under every whole-bundle look. Do not pick face and frame swatches by eye:
+//   const SW = panelSwatches('hearthvale', { face: 'panel', frame: 'cream' });
+//   face: color('Face', SW.face[0], SW.face),  frame: color('Frame', SW.frame[0], SW.frame),
+// The two defaults are kept as given; every other swatch is kept only if it holds both rules under
+// every look, a near miss comes back as a darker (face) or lighter (frame) tone of itself, and the
+// rest are dropped. SW.failing names any rule the defaults themselves break (it should be empty).
+//
 // DIGITS. digitSize(size, style) gives the three sizes every digit set uses; digitBody(n, size) the
 // strokes of a digit; rimmed(g, body, x, y, { colour, edge, shadow }) draws any small glyph as body,
 // rim, ink (and inks its holes). Every digit differs from every other by more than 2 body pixels.
@@ -51,7 +59,9 @@
 // Pass `cornerPx` (0 to 4) or `borderPx` (1 to 3) instead to give pixels directly.
 
 import { Surface } from './surface.js';
-import { ramp, tone, mix, brightness, rgbToHex, hexToRgb, INK } from './color.js';
+import { ramp, tone, mix, brightness, rgbToHex, hexToRgb, col, INK } from './color.js';
+import { THEME_PRESETS, normalizeTheme, applyColour } from './theme.js';
+import { PALETTE, paletteName, swatches } from './palettes.js';
 
 /** The nine-slice border, in pixels from the frame edge: corners and borders end inside it. */
 export const SLICE = 8;
@@ -738,4 +748,81 @@ export function stampGlyph(g, layer, { heavy = false, shadow = 0, ink = INK } = 
   if (shadow > 0) for (let py = 0; py < layer.h; py++) for (let px = 0; px < layer.w; px++) if (layer.data[py * layer.w + px]) g.dot(px - shadow, py + shadow, ink);
   g.blit(layer);
   return g;
+}
+
+// ---- swatch lists that keep their contrast under every whole-bundle look ---------------------
+
+const LOOK_COLOURS = [null, ...THEME_PRESETS.map((t) => normalizeTheme(t.theme).colour)];
+const lookMemo = new Map();
+
+/** A colour as made, then as each whole-bundle look (THEME_PRESETS) turns it: 1 + THEME_PRESETS.length colours. */
+export function underLooks(hex) {
+  const key = hex.toLowerCase();
+  let out = lookMemo.get(key);
+  if (!out) {
+    out = LOOK_COLOURS.map((c) => {
+      if (!c) return key;
+      const px = applyColour(new Uint32Array([col(key)]), c)[0];
+      return rgbToHex(px & 255, (px >>> 8) & 255, (px >>> 16) & 255);
+    });
+    lookMemo.set(key, out);
+  }
+  return [...out];
+}
+
+/** The lowest contrast two colours have with each other, as made and under every whole-bundle look. */
+export function worstContrast(a, b) {
+  const A = underLooks(a), B = underLooks(b);
+  let least = Infinity;
+  for (let i = 0; i < A.length; i++) least = Math.min(least, contrast(A[i], B[i]));
+  return least;
+}
+
+// The first colour is kept as it is. Each other one is kept if it passes; else the first of its tones
+// (by the amounts given) that passes takes its place; else it is dropped. Untouched colours come first.
+function fit(list, passes, amounts) {
+  const kept = [list[0].toLowerCase()], moved = [];
+  for (const raw of list.slice(1)) {
+    const c = raw.toLowerCase();
+    if (passes(c)) { kept.push(c); continue; }
+    for (const a of amounts) { const t = tone(c, a); if (brightness(t) >= 0.18 && passes(t)) { moved.push(t); break; } }
+  }
+  return [...new Set([...kept, ...moved])].slice(0, 8);
+}
+
+/**
+ * Face swatches that text can be read on: `min` to 1 (4.5) against `text` (white) under every look.
+ * The first candidate (the default) is returned unchanged; a failing one comes back darker or not at all.
+ */
+export function textFaces(candidates, { text = '#ffffff', min = 4.5 } = {}) {
+  return fit(candidates, (c) => worstContrast(text, c) >= min, [-0.3, -0.6, -0.9, -1.2]);
+}
+
+/**
+ * Frame swatches that stand out from every one of `faces`: `min` to 1 (3) under every look.
+ * The first candidate (the default) is returned unchanged; a failing one comes back lighter or not at all.
+ */
+export function framesFor(faces, candidates, { min = 3 } = {}) {
+  return fit(candidates, (c) => faces.every((f) => worstContrast(c, f) >= min), [0.3, 0.6, 0.9, 1.2, 1.5]);
+}
+
+/**
+ * Both swatch lists for a panel, a button or a bar of one bundle: { face, frame, failing }.
+ * opt.face, opt.frame: palette colour names of the two defaults (kept first, unchanged).
+ * opt.faces, opt.frames: palette colour names (or '#rrggbb') to offer besides them; left out, the
+ * bundle's own `face` and `frame` swatch groups are used.
+ * failing: [{ rule: 'text' | 'frame', face, frame?, ratio }] for every rule the DEFAULTS break
+ * (nothing else in the lists can break one). Empty is what a specification should give.
+ */
+export function panelSwatches(bundle, opt = {}) {
+  const name = paletteName(bundle), P = PALETTE[name];
+  const hex = (c) => { if (/^#[0-9a-f]{6}$/i.test(c)) return c.toLowerCase(); if (!P[c]) throw new Error(`panelSwatches: "${c}" is not a ${name} colour`); return P[c]; };
+  if (!opt.face || !opt.frame) throw new Error('panelSwatches: name the default face and frame colours');
+  const faceList = [hex(opt.face), ...(opt.faces ? opt.faces.map(hex) : swatches(name, 'face', { lead: opt.face }).slice(1))];
+  const frameList = [hex(opt.frame), ...(opt.frames ? opt.frames.map(hex) : swatches(name, 'frame', { lead: opt.frame }).slice(1))];
+  const face = textFaces(faceList), frame = framesFor(face, frameList);
+  const failing = [], r2 = (v) => Math.round(v * 100) / 100;
+  if (worstContrast('#ffffff', face[0]) < 4.5) failing.push({ rule: 'text', face: face[0], ratio: r2(worstContrast('#ffffff', face[0])) });
+  for (const f of face) if (worstContrast(frame[0], f) < 3) failing.push({ rule: 'frame', face: f, frame: frame[0], ratio: r2(worstContrast(frame[0], f)) });
+  return { face, frame, failing };
 }

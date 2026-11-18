@@ -2,12 +2,15 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { Surface } from '../../engine/surface.js';
+import { THEME_PRESETS } from '../../engine/theme.js';
+import { PALETTE } from '../../engine/palettes.js';
 import { INK, col, brightness, rgbToHsl, tone } from '../../engine/color.js';
 import {
   SLICE, EDGE, SHADOW, LIP, BUTTON_STATES, PANEL_STYLES,
   cornerPx, borderPx, roundRectIn, slice9, panel9, button, buttonClips,
   barOpening, barHousing, barFill, desaturate, triangle, highlight, contrast,
   DIGIT_SIZES, digitSize, digitBody, rimmed,
+  underLooks, worstContrast, textFaces, framesFor, panelSwatches,
 } from '../../engine/ui.js';
 
 const FACE = '#2b3a67', FRAME = '#f0ead8', GOLD = '#f2c230', HEAL = '#7fe0a0';
@@ -475,4 +478,70 @@ test('deterministic: the same call draws the same pixels', () => {
   const g = new Surface(96, 48);
   panel9(g, 1, 1, 94, 46, { face: FACE, frame: FRAME });
   assert.deepEqual(g.shadow, [-1, 1]);
+});
+
+// ---- swatch lists that keep their contrast under every whole-bundle look ----------------
+
+test('underLooks gives a colour as made and under every preset look; worstContrast is the lowest ratio over them', () => {
+  const all = underLooks('#4a609c');
+  assert.equal(all.length, THEME_PRESETS.length + 1);
+  assert.equal(all[0], '#4a609c', 'first: as made');
+  for (const c of all) assert.match(c, /^#[0-9a-f]{6}$/);
+  assert.equal(worstContrast('#4a609c', '#4a609c'), 1);
+  assert.ok(worstContrast('#ffffff', '#4a609c') <= contrast('#ffffff', '#4a609c'));
+  assert.ok(worstContrast('#ffffff', '#231b33') > 10);
+  assert.equal(worstContrast('#c2c9d6', '#4a609c'), worstContrast('#4a609c', '#c2c9d6'));
+});
+
+test('textFaces keeps the default, keeps what already works, darkens what nearly works and drops the rest', () => {
+  const H = PALETTE.hearthvale;
+  const out = textFaces([H.panel, H.slate, H.mage, H.cream, H.slate, '#3a3350']);
+  assert.equal(out[0], H.panel, 'the default is never changed');
+  assert.ok(out.includes(H.slate) && out.includes('#3a3350'), 'colours that pass are kept as they are');
+  assert.equal(out.filter((c) => c === H.slate).length, 1, 'no colour twice');
+  assert.ok(!out.includes(H.cream), 'a pale colour cannot be a text face');
+  for (const c of out.slice(1)) {
+    assert.ok(worstContrast('#ffffff', c) >= 4.5, `${c}: white text ${worstContrast('#ffffff', c).toFixed(2)}`);
+    assert.ok(brightness(c) >= 0.18, `${c} is not so dark that it reads as the outline`);
+  }
+  if (worstContrast('#ffffff', H.mage) < 4.5) assert.ok(out.length >= 4 && !out.includes(H.mage), 'mage came back as a darker tone of itself');
+  assert.deepEqual(textFaces([H.panel, H.slate]), textFaces([H.panel, H.slate]), 'the same list every time');
+});
+
+test('framesFor keeps the default and returns only frames that hold 3 to 1 against every face under every look', () => {
+  const H = PALETTE.hearthvale;
+  const faces = textFaces([H.panel, H.slate, H.bandit, '#3a3350']);
+  const out = framesFor(faces, [H.cream, H.steel, H.thunder, H.skin, H.sky, H.gold, H.panel]);
+  assert.equal(out[0], H.cream);
+  assert.ok(out.length >= 4, `${out.length} frames`);
+  assert.equal(new Set(out).size, out.length);
+  for (const fr of out) for (const f of faces) assert.ok(worstContrast(fr, f) >= 3, `frame ${fr} on face ${f}: ${worstContrast(fr, f).toFixed(2)}`);
+  assert.ok(!out.includes(H.panel), 'a colour that can never stand out from the faces is dropped');
+  // a colour that already works comes back untouched
+  for (const c of [H.cream, H.steel, H.thunder, H.skin, H.sky]) if (faces.every((f) => worstContrast(c, f) >= 3)) assert.ok(out.includes(c), `${c} kept as it is`);
+});
+
+test('panelSwatches builds both lists for a bundle, defaults first, and they keep both contrast rules', () => {
+  for (const [bundle, face, frame] of [['hearthvale', 'panel', 'cream'], ['derelict', 'plate', 'teal'], ['thornwood', 'wood', 'soil']]) {
+    const sw = panelSwatches(bundle, { face, frame });
+    assert.equal(sw.face[0], PALETTE[bundle][face]);
+    assert.equal(sw.frame[0], PALETTE[bundle][frame]);
+    assert.ok(sw.face.length >= 3 && sw.face.length <= 8 && sw.frame.length >= 1 && sw.frame.length <= 8, `${bundle}: ${sw.face.length} faces, ${sw.frame.length} frames`);
+    // a bundle whose defaults keep the rules gets full lists (one whose default face is too light for white text cannot)
+    if (!sw.failing.length) assert.ok(sw.frame.length >= 4, `${bundle}: ${sw.frame.length} frames`);
+    // everything but the two defaults is guaranteed (a default is the specification's choice: failing() names it)
+    for (const f of sw.face.slice(1)) assert.ok(worstContrast('#ffffff', f) >= 4.5, `${bundle} face ${f}`);
+    for (const fr of sw.frame.slice(1)) for (const f of sw.face) assert.ok(worstContrast(fr, f) >= 3, `${bundle} frame ${fr} on ${f}: ${worstContrast(fr, f).toFixed(2)}`);
+    assert.ok(Array.isArray(sw.failing));
+  }
+  // defaults that break a rule are named, never silently changed
+  assert.ok(panelSwatches('thornwood', { face: 'wood', frame: 'soil' }).failing.some((x) => x.rule === 'text' && x.face === PALETTE.thornwood.wood));
+  const rpg = panelSwatches('hearthvale', { face: 'panel', frame: 'cream' });
+  assert.deepEqual(rpg.failing, [], 'the Hearthvale defaults keep both rules');
+  for (const fr of rpg.frame) for (const f of rpg.face) assert.ok(worstContrast(fr, f) >= 3, `${fr} on ${f}`);
+  // candidates can be named
+  const own = panelSwatches('hearthvale', { face: 'panel', frame: 'cream', faces: ['slate', 'bandit'], frames: ['skin', 'steel'] });
+  assert.equal(own.face[0], PALETTE.hearthvale.panel);
+  assert.ok(own.face.includes(PALETTE.hearthvale.bandit));
+  assert.ok(own.frame.includes(PALETTE.hearthvale.skin));
 });

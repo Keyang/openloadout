@@ -14,9 +14,12 @@
 import { defineSprite, range, choice, color, toggle } from '../engine/sprite.js';
 import { ramp, INK } from '../engine/color.js';
 import { PALETTE } from '../engine/palettes.js';
-import { barHousing, barOpening, barFill, borderPx } from '../engine/ui.js';
+import { barHousing, barOpening, barFill, borderPx, panelSwatches } from '../engine/ui.js';
 
 const P = PALETTE.hearthvale;
+// Face and frame swatches come from the helper: it keeps only colours on which white text holds 4.5 to 1 and
+// against which the frame holds 3 to 1 under every whole-bundle look (the defaults, panel and cream, stay as they are).
+const SW = panelSwatches('hearthvale', { face: 'panel', frame: 'cream', faces: ['slate', 'bandit', 'mage', 'rogue'], frames: ['skin', 'steel', 'thunder', 'sky'] });
 const SIZE = [64, 16];
 const CAPS = 5;                                     // ornate: solid frame at each end, with a rivet
 // Segmented: five compartments. The opening must hold them exactly, so each border width gets the
@@ -55,7 +58,7 @@ export default defineSprite({
     corner: range('Corner', 0.5, { lo: 'Square', hi: 'Round' }),
     border: range('Border', 0.5, { lo: 'Thin', hi: 'Thick' }),
     shine: toggle('Shine', true),
-    frame: color('Frame', P.cream, [P.cream, P.steel, P.thunder, P.skin, P.sky]),
+    frame: color('Frame', P.cream, SW.frame),
     fill: color('Health', P.heal, [P.heal, P.meadow, P.crimson, P.roof, P.thunder, P.magic]),
     fillB: color('Magic', P.hero, [P.hero, P.mage, P.water, P.rogue, P.magic, P.ice]),
     fillC: color('Gauge', P.gold, [P.gold, P.fire, P.thunder, P.wheat, P.cream, P.steel]),

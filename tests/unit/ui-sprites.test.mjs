@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { renderFrame, defaultParams, cleanParams } from '../../engine/sprite.js';
 import { col, INK } from '../../engine/color.js';
 import { PALETTE } from '../../engine/palettes.js';
-import { barOpening, contrast, digitSize, digitBody } from '../../engine/ui.js';
+import { barOpening, contrast, digitSize, digitBody, panelSwatches } from '../../engine/ui.js';
 import { THEME_PRESETS, normalizeTheme, applyColour } from '../../engine/theme.js';
 import { validateMeta } from '../../catalog/schema.js';
 import dialogue from '../../sprites/ui-dialogue.js';
@@ -83,7 +83,8 @@ test('default colours are the Hearthvale palette colours the specification names
     assert.equal(s.params[k].def, hex, `${s.id}.${k}`);
     assert.equal(s.params[k].swatches[0], hex, `${s.id}.${k} leads its swatches`);
     assert.ok(s.params[k].swatches.length >= 4 && s.params[k].swatches.length <= 8, `${s.id}.${k} has 4 to 8 swatches`);
-    for (const c of s.params[k].swatches.slice(0, 3)) assert.ok(palette.has(c), `${s.id}.${k}: ${c} is a palette colour`);
+    // palette colours first (a frame has only two that keep their contrast on every face; the rest are tones of palette colours)
+    for (const c of s.params[k].swatches.slice(0, k === 'frame' ? 2 : 3)) assert.ok(palette.has(c), `${s.id}.${k}: ${c} is a palette colour`);
   }
 });
 
@@ -343,4 +344,17 @@ test('the highlighted row is a text area too: white text keeps 4.5 to 1 on it fo
     for (let y = 8; y < 24 && !found; y++) if (hexOf(choice.get(48, y)) === rowText) found = true;
     assert.ok(found, `choice row matches the menu row (face ${face}, ${name})`);
   }
+});
+
+test('face and frame swatches come from the helper, so a palette change cannot break the contrast rules', () => {
+  const sw = panelSwatches('hearthvale', { face: 'panel', frame: 'cream', faces: ['slate', 'bandit', 'mage', 'rogue'], frames: ['skin', 'steel', 'thunder', 'sky'] });
+  assert.deepEqual(sw.failing, []);
+  for (const s of [dialogue, menu]) {
+    assert.deepEqual(s.params.face.swatches, sw.face, `${s.id} face`);
+    assert.deepEqual(s.params.frame.swatches, sw.frame, `${s.id} frame`);
+    assert.ok(s.params.face.swatches.length >= 4 && s.params.frame.swatches.length >= 4);
+  }
+  assert.deepEqual(bars.params.frame.swatches, sw.frame, 'the bars take the same frames as the panels they sit on');
+  // the defaults did not move
+  assert.deepEqual([dialogue.params.face.def, dialogue.params.frame.def, dialogue.params.accent.def], [P.panel, P.cream, P.gold]);
 });

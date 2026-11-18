@@ -13,9 +13,12 @@ import { defineSprite, range, choice, color, toggle } from '../engine/sprite.js'
 import { lerp, wave } from '../engine/motion.js';
 import { ramp, tone, INK } from '../engine/color.js';
 import { PALETTE, swatches } from '../engine/palettes.js';
-import { panel9, highlight, triangle, slice9, PANEL_STYLES } from '../engine/ui.js';
+import { panel9, highlight, triangle, slice9, panelSwatches, PANEL_STYLES } from '../engine/ui.js';
 
 const P = PALETTE.hearthvale;
+// Face and frame swatches come from the helper: it keeps only colours on which white text holds 4.5 to 1 and
+// against which the frame holds 3 to 1 under every whole-bundle look (the defaults, panel and cream, stay as they are).
+const SW = panelSwatches('hearthvale', { face: 'panel', frame: 'cream', faces: ['slate', 'bandit', 'mage', 'rogue'], frames: ['skin', 'steel', 'thunder', 'sky'] });
 const SIZE = [96, 48];
 const TAG = { x: 20, y: 14, w: 56, h: 20 };        // the name tag, centred in the frame
 const ROW_H = 14;
@@ -43,9 +46,8 @@ export default defineSprite({
     border: range('Border', 0.5, { lo: 'Thin', hi: 'Thick' }),
     shadow: toggle('Shadow', false),
     // dark faces only: white text must keep its contrast on every one of them
-    face: color('Face', P.panel, [P.panel, P.slate, P.bandit, '#3a3350']),
-    // light frames only: each stands out from every face, whatever the look
-    frame: color('Frame', P.cream, [P.cream, P.steel, P.thunder, P.skin, P.sky]),
+    face: color('Face', P.panel, SW.face),
+    frame: color('Frame', P.cream, SW.frame),
     accent: color('Accent', P.gold, swatches('hearthvale', 'accent', { lead: 'gold' })),
     speed: range('Speed', 0.5, { lo: 'Slow', hi: 'Fast', group: 'Motion' }),
   },
