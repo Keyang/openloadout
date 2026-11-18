@@ -1,0 +1,40 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "text-blip",
+ "name": "Text blip",
+ "category": "ui",
+ "tags": ["dialogue", "text", "voice", "blip"],
+ "description": "One letter of dialogue appearing: a short soft triangle note whose pitch lands somewhere new each time, so a line of text murmurs like a voice.",
+ "meta": {
+  "type": "sfx",
+  "role": "interface/click",
+  "themes": ["fantasy", "neutral"],
+  "gameTypes": ["turn-based-rpg", "top-down-rpg", "roguelike-action", "platformer", "arcade"],
+  "words": ["text", "blip", "dialogue", "talk", "speech", "letter", "typewriter", "voice", "murmur", "chat", "subtitle", "npc"],
+  "license": "draft"
+ },
+ "duration": "length + 0.005",
+ "params": [
+  { "id": "pitch", "label": "Pitch", "min": 180, "max": 1200, "default": 520, "unit": "Hz", "scale": "log" },
+  { "id": "spread", "label": "Sing-song", "min": 0, "max": 1, "default": 0.35 },
+  { "id": "length", "label": "Length", "min": 0.03, "max": 0.06, "default": 0.045, "unit": "s" },
+  { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.4 },
+  { "id": "soft", "label": "Softness", "min": 0, "max": 1, "default": 0.4 }
+ ],
+ "nodes": [
+  { "id": "note", "type": "expr", "expr": "pitch*semi(rnd(-1, 1)*(0.3 + spread*8))" },
+  { "id": "lilt", "type": "env", "points": [[0, 1], ["length", "semi(spread*3)", "exp"]] },
+  { "id": "body", "type": "osc", "wave": "tri", "freq": "note*lilt" },
+  { "id": "over", "type": "osc", "wave": "tri", "freq": "note*lilt*3" },
+  { "id": "top", "type": "osc", "wave": "tri", "freq": "note*lilt*5" },
+  { "id": "amp", "type": "ad", "attack": "0.002 + soft*0.01", "decay": "length - 0.002 - soft*0.01", "curve": 1.6 },
+  { "id": "voice", "type": "expr", "expr": "body*0.8 + over*bright*0.7 + top*bright*bright*0.45" },
+  { "id": "clean", "type": "filter", "mode": "hp", "in": "voice*amp", "freq": 70 }
+ ],
+ "out": "clean",
+ "presets": {
+  "Narrator": { "pitch": 520, "spread": 0.35, "length": 0.045, "bright": 0.4, "soft": 0.4 },
+  "Small voice": { "pitch": 900, "spread": 0.6, "length": 0.032, "bright": 0.3, "soft": 0.2 },
+  "Deep voice": { "pitch": 260, "spread": 0.25, "length": 0.058, "bright": 1, "soft": 0.6 }
+ }
+}

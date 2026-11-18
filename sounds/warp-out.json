@@ -1,0 +1,58 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "warp-out",
+  "name": "Warp",
+  "category": "vehicle",
+  "tags": ["sci-fi", "teleport", "warp", "machine"],
+  "description": "Teleporting away: a stack of sines gliding up with a slow chorus and noise swelling under them, cut off suddenly by a sub thump. A negative rise runs it the other way: it starts with the thump and glides down. Length, pitch, rise, shimmer and thump can be changed.",
+  "meta": {
+    "type": "sfx",
+    "role": "world/machine",
+    "themes": ["sci-fi", "space"],
+    "gameTypes": ["roguelike-action", "shooter", "arcade"],
+    "words": ["warp", "teleport", "portal", "beam", "transport", "jump", "spawn", "blink", "pad", "exit", "arrive", "sweep", "hyperspace"],
+    "license": "draft"
+  },
+  "duration": "length",
+  "params": [
+    { "id": "length", "label": "Length", "min": 0.55, "max": 1.4, "default": 1.1, "unit": "s", "scale": "log" },
+    { "id": "pitch", "label": "Pitch", "min": 150, "max": 700, "default": 300, "unit": "Hz", "scale": "log" },
+    { "id": "rise", "label": "Rise", "min": -24, "max": 24, "default": 24, "unit": "semitones" },
+    { "id": "shimmer", "label": "Shimmer", "min": 0, "max": 1, "default": 0.6 },
+    { "id": "thump", "label": "Thump", "min": 0, "max": 1, "default": 0.7 }
+  ],
+  "nodes": [
+    { "id": "glide", "type": "env", "points": [[0, "rise < 0 ? pitch*semi(-rise) : pitch"], ["length*(rise < 0 ? 0.96 : 0.82)", "rise < 0 ? pitch : pitch*semi(rise)", "exp"]] },
+    { "id": "lfoA", "type": "osc", "wave": "sine", "freq": "0.9 + shimmer*2.2" },
+    { "id": "lfoB", "type": "osc", "wave": "sine", "freq": "1.4 + shimmer*3.1", "phase": 0.3 },
+    { "id": "s1", "type": "osc", "wave": "sine", "freq": "glide*(1 + 0.007*shimmer*lfoA)" },
+    { "id": "s2", "type": "osc", "wave": "sine", "freq": "glide*(1 - 0.007*shimmer*lfoB)*1.002" },
+    { "id": "s3", "type": "osc", "wave": "sine", "freq": "glide*2*(1 + 0.005*shimmer*lfoB)" },
+    { "id": "s4", "type": "osc", "wave": "sine", "freq": "glide*1.5*(1 - 0.005*shimmer*lfoA)" },
+    { "id": "s5", "type": "osc", "wave": "tri", "freq": "glide*3" },
+    { "id": "stack", "type": "expr", "expr": "s1*0.55 + s2*0.5 + s3*0.4 + s4*0.3 + s5*0.12*(0.3 + shimmer)" },
+    { "id": "trem", "type": "expr", "expr": "1 - shimmer*0.18*(0.5 - 0.5*lfoB)" },
+    { "id": "sAmp", "type": "env", "points": [[0, "rise < 0 ? 1 : 0"], ["length*0.15", "rise < 0 ? 0.9 : 0.35"], ["length*(rise < 0 ? 0.96 : 0.8)", "rise < 0 ? 0 : 1", 1.5]] },
+    { "id": "nz", "type": "noise" },
+    { "id": "nzBp", "type": "filter", "mode": "bp", "in": "nz", "freq": "glide*3 + 300", "q": 0.9 },
+    { "id": "nzAmp", "type": "env", "points": [[0, "rise < 0 ? 1 : 0.05"], ["length*(rise < 0 ? 0.96 : 0.8)", "rise < 0 ? 0.05 : 1", 1.6]] },
+    { "id": "swell", "type": "expr", "expr": "nzBp*nzAmp" },
+    { "id": "cut", "type": "env", "points": [[0, 1], ["length*0.8", 1], ["length*0.8 + 0.06", "rise < 0 ? 1 : 0"]] },
+    { "id": "clk", "type": "clock", "rate": 1, "count": 1, "delay": "rise < 0 ? 0 : length*0.8" },
+    { "id": "thF", "type": "env", "points": [[0, 130], [0.1, 42, "exp"]], "trig": "clk" },
+    { "id": "thO", "type": "osc", "wave": "sine", "freq": "thF" },
+    { "id": "thAd", "type": "ad", "attack": 0.002, "decay": 0.18, "curve": 2, "trig": "clk" },
+    { "id": "thMid", "type": "filter", "mode": "bp", "in": "nz", "freq": 900, "q": 1.2 },
+    { "id": "thMidAd", "type": "ad", "attack": 0.0005, "decay": 0.03, "curve": 2.5, "trig": "clk" },
+    { "id": "boom", "type": "expr", "expr": "(thO*thAd + thMid*thMidAd*0.5)*thump" },
+    { "id": "sum", "type": "expr", "expr": "(stack*sAmp*trem*0.8 + swell*0.35)*cut + boom*1.2" },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "sum", "freq": 40, "q": 0.7 },
+    { "id": "fade", "type": "env", "points": [[0, 1], ["length - 0.06", 1], ["length", 0]] }
+  ],
+  "out": "clean*fade",
+  "presets": {
+    "Warp out": { "length": 1.1, "pitch": 300, "rise": 24, "shimmer": 0.6, "thump": 0.7 },
+    "Spawn in": { "length": 0.9, "pitch": 320, "rise": -20, "shimmer": 0.5, "thump": 0.9 },
+    "Teleport blink": { "length": 0.6, "pitch": 420, "rise": 14, "shimmer": 0.3, "thump": 0.5 }
+  }
+}

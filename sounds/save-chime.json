@@ -1,0 +1,48 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "save-chime",
+ "name": "Save chime",
+ "category": "jingle",
+ "tags": ["save", "checkpoint", "reward", "bell", "jingle"],
+ "description": "The game is saved: a few rising glassy bell notes of a major chord with an added ninth, the last one held in a long shimmering room. A small tune, the same every time.",
+ "meta": {
+  "type": "jingle",
+  "role": "interface/reward",
+  "themes": ["fantasy", "neutral"],
+  "gameTypes": ["turn-based-rpg", "top-down-rpg", "roguelike-action", "platformer", "farming-sim", "puzzle", "arcade"],
+  "words": ["save", "checkpoint", "chime", "bell", "reward", "level up", "found", "unlock", "crystal", "magic", "sparkle", "success"],
+  "license": "draft"
+ },
+ "duration": "(notes-1)/speed + ring*1.8 + 0.2 + space*0.9",
+ "params": [
+  { "id": "pitch", "label": "Pitch", "min": 260, "max": 800, "default": 392, "unit": "Hz", "scale": "log" },
+  { "id": "notes", "label": "Notes", "min": 3, "max": 5, "default": 4, "step": 1 },
+  { "id": "speed", "label": "Speed", "min": 3.5, "max": 11, "default": 6, "unit": "notes/s" },
+  { "id": "ring", "label": "Ring", "min": 0.3, "max": 0.8, "default": 0.45, "unit": "s" },
+  { "id": "shimmer", "label": "Shimmer", "min": 0, "max": 1, "default": 0.5 },
+  { "id": "space", "label": "Room", "min": 0.1, "max": 0.5, "default": 0.3 }
+ ],
+ "nodes": [
+  { "id": "clk", "type": "clock", "rate": "speed", "count": "notes" },
+  { "id": "note", "type": "seq", "steps": [0, "notes < 3.5 ? 7 : 4", "notes < 3.5 ? 12 : 7", 12, 24], "trig": "clk" },
+  { "id": "hz", "type": "expr", "expr": "pitch*semi(note)" },
+  { "id": "amp", "type": "ad", "attack": 0.004, "decay": "ring", "curve": 2.4, "trig": "clk" },
+  { "id": "last", "type": "clock", "rate": 1, "count": 1, "delay": "(notes-1)/speed" },
+  { "id": "holdAmp", "type": "ad", "attack": 0.01, "decay": "ring*3", "curve": 1.6, "trig": "last" },
+  { "id": "ninthAmp", "type": "ad", "attack": 0.02, "decay": "ring*1.6", "curve": 2.2, "trig": "last" },
+  { "id": "sine", "type": "osc", "freq": "hz" },
+  { "id": "sineB", "type": "osc", "freq": "hz*1.0045" },
+  { "id": "tri", "type": "osc", "wave": "tri", "freq": "hz*2" },
+  { "id": "glass", "type": "modal", "in": "clk", "freq": "hz*2", "ratios": [1, 2.76, 5.4, 8.93], "gains": [0.8, 0.7, 0.8, 0.7], "decay": "ring*1.4", "tilt": 0 },
+  { "id": "ninth", "type": "osc", "freq": "pitch*semi(26)" },
+  { "id": "dry", "type": "expr", "expr": "(sine*0.55 + sineB*shimmer*0.5 + tri*0.1)*(amp + holdAmp*1.0) + glass*(0.12 + shimmer*0.7) + ninth*ninthAmp*0.08" },
+  { "id": "wet", "type": "reverb", "in": "dry", "size": 0.85, "damp": 0.35, "mix": "space" },
+  { "id": "clean", "type": "filter", "mode": "hp", "in": "wet", "freq": 80 }
+ ],
+ "out": "clean*(1 - smooth(dur - 0.5, dur - 0.02, t))",
+ "presets": {
+  "Save point": { "pitch": 392, "notes": 4, "speed": 6, "ring": 0.45, "shimmer": 0.5, "space": 0.3 },
+  "Level up": { "pitch": 466, "notes": 5, "speed": 10, "ring": 0.45, "shimmer": 0.8, "space": 0.25 },
+  "Item found": { "pitch": 523, "notes": 3, "speed": 6.5, "ring": 0.4, "shimmer": 0.3, "space": 0.3 }
+ }
+}

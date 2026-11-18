@@ -1,0 +1,433 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "heal-shimmer",
+ "name": "Heal shimmer",
+ "category": "magic",
+ "tags": [
+  "heal",
+  "restore",
+  "shimmer",
+  "bell",
+  "spell"
+ ],
+ "description": "A soft rising pad with a run of sine bell notes of a major chord, each quieter and higher, over an airy shimmer.",
+ "meta": {
+  "type": "sfx",
+  "role": "effects/magic",
+  "themes": [
+   "fantasy"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "platformer",
+   "top-down-rpg"
+  ],
+  "words": [
+   "heal",
+   "healing",
+   "cure",
+   "restore",
+   "revive",
+   "recover",
+   "shimmer",
+   "sparkle",
+   "magic",
+   "spell",
+   "bell",
+   "glow"
+  ],
+  "license": "draft"
+ },
+ "duration": "length",
+ "params": [
+  {
+   "id": "pitch",
+   "label": "Pitch",
+   "min": 260,
+   "max": 1050,
+   "default": 523,
+   "unit": "Hz",
+   "scale": "log"
+  },
+  {
+   "id": "rise",
+   "label": "Rise",
+   "min": 16,
+   "max": 24,
+   "default": 16,
+   "unit": "semitones"
+  },
+  {
+   "id": "sparkle",
+   "label": "Bell notes",
+   "min": 3,
+   "max": 6,
+   "default": 5
+  },
+  {
+   "id": "length",
+   "label": "Length",
+   "min": 0.8,
+   "max": 1.2,
+   "default": 1,
+   "unit": "s",
+   "scale": "log"
+  },
+  {
+   "id": "space",
+   "label": "Room",
+   "min": 0,
+   "max": 0.5,
+   "default": 0.22
+  }
+ ],
+ "nodes": [
+  {
+   "id": "n",
+   "type": "noise"
+  },
+  {
+   "id": "padEnv",
+   "type": "env",
+   "points": [
+    [
+     0,
+     0.12
+    ],
+    [
+     0.04,
+     1
+    ],
+    [
+     0.16,
+     0.6
+    ],
+    [
+     "length*0.55",
+     0.8
+    ],
+    [
+     "length*0.9",
+     0
+    ]
+   ]
+  },
+  {
+   "id": "p1",
+   "type": "osc",
+   "freq": "pitch*1.0015"
+  },
+  {
+   "id": "p3",
+   "type": "osc",
+   "freq": "pitch*semi(4)*1.0015"
+  },
+  {
+   "id": "p5",
+   "type": "osc",
+   "wave": "tri",
+   "freq": "pitch*semi(7)*0.9985"
+  },
+  {
+   "id": "pad",
+   "type": "expr",
+   "expr": "(p1 + p3*0.8 + p5*0.4)*padEnv*0.6"
+  },
+  {
+   "id": "airEnv",
+   "type": "env",
+   "points": [
+    [
+     0,
+     0.1
+    ],
+    [
+     "length*0.45",
+     1
+    ],
+    [
+     "length*0.9",
+     0
+    ]
+   ]
+  },
+  {
+   "id": "airBp",
+   "type": "filter",
+   "mode": "bp",
+   "in": "n",
+   "freq": "pitch*8",
+   "q": 1.2
+  },
+  {
+   "id": "air",
+   "type": "expr",
+   "expr": "airBp*airEnv"
+  },
+  {
+   "id": "topIdx",
+   "type": "expr",
+   "expr": "3 + (rise>=16 ? 1 : 0) + (rise>=19 ? 1 : 0) + (rise>=24 ? 1 : 0)"
+  },
+  {
+   "id": "s0",
+   "type": "expr",
+   "expr": "((floor(0*topIdx/max(sparkle-1,1)+0.5))<0.5 ? 0 : (floor(0*topIdx/max(sparkle-1,1)+0.5))<1.5 ? 4 : (floor(0*topIdx/max(sparkle-1,1)+0.5))<2.5 ? 7 : (floor(0*topIdx/max(sparkle-1,1)+0.5))<3.5 ? 12 : (floor(0*topIdx/max(sparkle-1,1)+0.5))<4.5 ? 16 : (floor(0*topIdx/max(sparkle-1,1)+0.5))<5.5 ? 19 : 24)"
+  },
+  {
+   "id": "c0",
+   "type": "clock",
+   "rate": 1,
+   "count": 1,
+   "delay": "(0.03 + min(0/max(sparkle-1,1),1)*length*0.5)"
+  },
+  {
+   "id": "e0",
+   "type": "ad",
+   "attack": 0.025,
+   "decay": 0.15,
+   "curve": 2.2,
+   "trig": "c0"
+  },
+  {
+   "id": "b0",
+   "type": "osc",
+   "freq": "pitch*2*semi(s0)"
+  },
+  {
+   "id": "h0",
+   "type": "osc",
+   "freq": "pitch*4*semi(s0)"
+  },
+  {
+   "id": "s1",
+   "type": "expr",
+   "expr": "((floor(1*topIdx/max(sparkle-1,1)+0.5))<0.5 ? 0 : (floor(1*topIdx/max(sparkle-1,1)+0.5))<1.5 ? 4 : (floor(1*topIdx/max(sparkle-1,1)+0.5))<2.5 ? 7 : (floor(1*topIdx/max(sparkle-1,1)+0.5))<3.5 ? 12 : (floor(1*topIdx/max(sparkle-1,1)+0.5))<4.5 ? 16 : (floor(1*topIdx/max(sparkle-1,1)+0.5))<5.5 ? 19 : 24)"
+  },
+  {
+   "id": "c1",
+   "type": "clock",
+   "rate": 1,
+   "count": 1,
+   "delay": "(0.03 + min(1/max(sparkle-1,1),1)*length*0.5)"
+  },
+  {
+   "id": "e1",
+   "type": "ad",
+   "attack": 0.005,
+   "decay": 0.15,
+   "curve": 2.2,
+   "trig": "c1"
+  },
+  {
+   "id": "b1",
+   "type": "osc",
+   "freq": "pitch*2*semi(s1)"
+  },
+  {
+   "id": "h1",
+   "type": "osc",
+   "freq": "pitch*4*semi(s1)"
+  },
+  {
+   "id": "s2",
+   "type": "expr",
+   "expr": "((floor(2*topIdx/max(sparkle-1,1)+0.5))<0.5 ? 0 : (floor(2*topIdx/max(sparkle-1,1)+0.5))<1.5 ? 4 : (floor(2*topIdx/max(sparkle-1,1)+0.5))<2.5 ? 7 : (floor(2*topIdx/max(sparkle-1,1)+0.5))<3.5 ? 12 : (floor(2*topIdx/max(sparkle-1,1)+0.5))<4.5 ? 16 : (floor(2*topIdx/max(sparkle-1,1)+0.5))<5.5 ? 19 : 24)"
+  },
+  {
+   "id": "c2",
+   "type": "clock",
+   "rate": 1,
+   "count": 1,
+   "delay": "(0.03 + min(2/max(sparkle-1,1),1)*length*0.5)"
+  },
+  {
+   "id": "e2",
+   "type": "ad",
+   "attack": 0.005,
+   "decay": 0.15,
+   "curve": 2.2,
+   "trig": "c2"
+  },
+  {
+   "id": "b2",
+   "type": "osc",
+   "freq": "pitch*2*semi(s2)"
+  },
+  {
+   "id": "h2",
+   "type": "osc",
+   "freq": "pitch*4*semi(s2)"
+  },
+  {
+   "id": "s3",
+   "type": "expr",
+   "expr": "((floor(3*topIdx/max(sparkle-1,1)+0.5))<0.5 ? 0 : (floor(3*topIdx/max(sparkle-1,1)+0.5))<1.5 ? 4 : (floor(3*topIdx/max(sparkle-1,1)+0.5))<2.5 ? 7 : (floor(3*topIdx/max(sparkle-1,1)+0.5))<3.5 ? 12 : (floor(3*topIdx/max(sparkle-1,1)+0.5))<4.5 ? 16 : (floor(3*topIdx/max(sparkle-1,1)+0.5))<5.5 ? 19 : 24)"
+  },
+  {
+   "id": "c3",
+   "type": "clock",
+   "rate": 1,
+   "count": 1,
+   "delay": "(0.03 + min(3/max(sparkle-1,1),1)*length*0.5)"
+  },
+  {
+   "id": "e3",
+   "type": "ad",
+   "attack": 0.005,
+   "decay": 0.15,
+   "curve": 2.2,
+   "trig": "c3"
+  },
+  {
+   "id": "b3",
+   "type": "osc",
+   "freq": "pitch*2*semi(s3)"
+  },
+  {
+   "id": "h3",
+   "type": "osc",
+   "freq": "pitch*4*semi(s3)"
+  },
+  {
+   "id": "s4",
+   "type": "expr",
+   "expr": "((floor(4*topIdx/max(sparkle-1,1)+0.5))<0.5 ? 0 : (floor(4*topIdx/max(sparkle-1,1)+0.5))<1.5 ? 4 : (floor(4*topIdx/max(sparkle-1,1)+0.5))<2.5 ? 7 : (floor(4*topIdx/max(sparkle-1,1)+0.5))<3.5 ? 12 : (floor(4*topIdx/max(sparkle-1,1)+0.5))<4.5 ? 16 : (floor(4*topIdx/max(sparkle-1,1)+0.5))<5.5 ? 19 : 24)"
+  },
+  {
+   "id": "c4",
+   "type": "clock",
+   "rate": 1,
+   "count": 1,
+   "delay": "(0.03 + min(4/max(sparkle-1,1),1)*length*0.5)"
+  },
+  {
+   "id": "e4",
+   "type": "ad",
+   "attack": 0.005,
+   "decay": 0.15,
+   "curve": 2.2,
+   "trig": "c4"
+  },
+  {
+   "id": "b4",
+   "type": "osc",
+   "freq": "pitch*2*semi(s4)"
+  },
+  {
+   "id": "h4",
+   "type": "osc",
+   "freq": "pitch*4*semi(s4)"
+  },
+  {
+   "id": "s5",
+   "type": "expr",
+   "expr": "((floor(5*topIdx/max(sparkle-1,1)+0.5))<0.5 ? 0 : (floor(5*topIdx/max(sparkle-1,1)+0.5))<1.5 ? 4 : (floor(5*topIdx/max(sparkle-1,1)+0.5))<2.5 ? 7 : (floor(5*topIdx/max(sparkle-1,1)+0.5))<3.5 ? 12 : (floor(5*topIdx/max(sparkle-1,1)+0.5))<4.5 ? 16 : (floor(5*topIdx/max(sparkle-1,1)+0.5))<5.5 ? 19 : 24)"
+  },
+  {
+   "id": "c5",
+   "type": "clock",
+   "rate": 1,
+   "count": 1,
+   "delay": "(0.03 + min(5/max(sparkle-1,1),1)*length*0.5)"
+  },
+  {
+   "id": "e5",
+   "type": "ad",
+   "attack": 0.005,
+   "decay": 0.15,
+   "curve": 2.2,
+   "trig": "c5"
+  },
+  {
+   "id": "b5",
+   "type": "osc",
+   "freq": "pitch*2*semi(s5)"
+  },
+  {
+   "id": "h5",
+   "type": "osc",
+   "freq": "pitch*4*semi(s5)"
+  },
+  {
+   "id": "bells",
+   "type": "expr",
+   "expr": "(b0 + h0*0.22)*e0*clamp(sparkle-0,0,1)*1.12 + (b1 + h1*0.22)*e1*clamp(sparkle-1,0,1)*pow(0.66,1) + (b2 + h2*0.22)*e2*clamp(sparkle-2,0,1)*pow(0.66,2) + (b3 + h3*0.22)*e3*clamp(sparkle-3,0,1)*pow(0.66,3) + (b4 + h4*0.22)*e4*clamp(sparkle-4,0,1)*pow(0.66,4) + (b5 + h5*0.22)*e5*clamp(sparkle-5,0,1)*pow(0.66,5)"
+  },
+  {
+   "id": "tot",
+   "type": "env",
+   "points": [
+    [
+     0,
+     1
+    ],
+    [
+     "length*0.65",
+     1
+    ],
+    [
+     "length*0.85",
+     0,
+     1.6
+    ]
+   ]
+  },
+  {
+   "id": "dry",
+   "type": "expr",
+   "expr": "(pad*0.1 + bells*0.7 + air*0.12)*tot"
+  },
+  {
+   "id": "fin",
+   "type": "env",
+   "points": [
+    [
+     0,
+     1
+    ],
+    [
+     "length*0.78",
+     1
+    ],
+    [
+     "length*0.99",
+     0,
+     1.6
+    ]
+   ]
+  },
+  {
+   "id": "verb",
+   "type": "reverb",
+   "in": "dry",
+   "size": 0.7,
+   "damp": 0.3,
+   "mix": "space"
+  }
+ ],
+ "out": "verb*fin",
+ "presets": {
+  "Heal": {
+   "pitch": 523,
+   "rise": 16,
+   "sparkle": 5,
+   "length": 1,
+   "space": 0.22
+  },
+  "Revive": {
+   "pitch": 392,
+   "rise": 24,
+   "sparkle": 6,
+   "length": 1.2,
+   "space": 0.3
+  },
+  "Cure": {
+   "pitch": 659,
+   "rise": 16,
+   "sparkle": 3,
+   "length": 0.8,
+   "space": 0.18
+  }
+ }
+}

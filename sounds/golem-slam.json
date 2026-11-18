@@ -1,0 +1,52 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "golem-slam",
+  "name": "Ground slam",
+  "category": "impact",
+  "tags": ["boss", "slam", "quake", "rubble"],
+  "description": "Something huge hitting the ground: a deep falling thump, a hard crack and a tail of falling rubble in a small hall. Weight, length, rubble, brightness and room can be changed.",
+  "meta": {
+    "type": "sfx",
+    "role": "effects/impact",
+    "themes": ["fantasy", "dungeon", "forest"],
+    "gameTypes": ["platformer", "turn-based-rpg", "roguelike-action", "arcade"],
+    "words": ["slam", "ground pound", "boss", "golem", "giant", "quake", "boulder", "smash", "stomp", "rubble", "impact", "earthquake", "crash"],
+    "license": "draft"
+  },
+  "duration": "length",
+  "params": [
+    { "id": "weight", "label": "Weight", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "length", "label": "Length", "unit": "s", "min": 0.7, "max": 1.2, "default": 0.95, "scale": "log" },
+    { "id": "rubble", "label": "Clean / Rubble", "min": 0, "max": 1, "default": 0.6 },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "space", "label": "Room", "min": 0, "max": 0.5, "default": 0.2 }
+  ],
+  "nodes": [
+    { "id": "sweep", "type": "env", "points": [[0, "130*pow(0.5,weight)*rnd(0.96,1.04)"], [0.16, "54*pow(0.5,weight)", "exp"]] },
+    { "id": "sub", "type": "osc", "wave": "sine", "freq": "sweep" },
+    { "id": "subAmp", "type": "ad", "attack": 0.002, "decay": "length*0.55", "curve": 2.2 },
+    { "id": "subSat", "type": "shaper", "in": "sub*subAmp", "drive": 2.2 },
+    { "id": "n", "type": "noise", "color": "white" },
+    { "id": "crackF", "type": "filter", "mode": "bp", "in": "n", "freq": "(380 + bright*900)*(1.6 - weight*1.0)", "q": 0.8 },
+    { "id": "crackAmp", "type": "ad", "attack": 0.0005, "decay": "0.05 + weight*0.04", "curve": 2 },
+    { "id": "midF", "type": "filter", "mode": "bp", "in": "n", "freq": "(600 + bright*1400)*(1.5 - weight*0.8)", "q": 0.6 },
+    { "id": "midAmp", "type": "ad", "attack": 0.001, "decay": "0.12 + length*0.18", "curve": 2.2 },
+    { "id": "rumF", "type": "noise", "color": "brown" },
+    { "id": "rumLp", "type": "filter", "mode": "lp", "in": "rumF", "freq": "180 + bright*220", "q": 0.7 },
+    { "id": "rumAmp", "type": "ad", "attack": 0.006, "decay": "length*0.45", "curve": 2.4 },
+    { "id": "rClk", "type": "clock", "rate": 1, "count": 1, "delay": 0.03 },
+    { "id": "rubDens", "type": "expr", "expr": "700*pow(max(0.02, 1 - t/(length*0.85)), 2.2)" },
+    { "id": "d", "type": "dust", "density": "rubDens", "spread": 1 },
+    { "id": "rubF", "type": "filter", "mode": "bp", "in": "d", "freq": "(500 + bright*1700)*(1.5 - weight*0.9)", "q": 1.6 },
+    { "id": "rubAmp", "type": "ad", "attack": 0.004, "decay": "length*0.85", "curve": 1.4, "trig": "rClk" },
+    { "id": "dry", "type": "expr", "expr": "subSat*(0.85 - weight*0.45) + midF*midAmp*3.9 + crackF*crackAmp*5.8 + rumLp*rumAmp*3.2 + rubF*rubAmp*rubble*22" },
+    { "id": "room", "type": "reverb", "in": "dry", "size": 0.55, "damp": 0.5, "mix": "space*0.9" },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "room", "freq": 25, "q": 0.7 }
+  ],
+  "out": "clean",
+  "presets": {
+    "Boss slam": { "weight": 0.85, "length": 1.15, "rubble": 0.7, "bright": 0.7, "space": 0.3 },
+    "Boulder drop": { "weight": 0.5, "length": 0.9, "rubble": 0.95, "bright": 0.6, "space": 0.15 },
+    "Distant quake": { "weight": 0.7, "length": 0.72, "rubble": 0.25, "bright": 0.4, "space": 0.1 }
+  }
+}

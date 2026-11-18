@@ -1,0 +1,301 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "ice-shatter",
+ "name": "Ice shatter",
+ "category": "magic",
+ "tags": [
+  "ice",
+  "frost",
+  "glass",
+  "shatter",
+  "spell"
+ ],
+ "description": "Ice grows with a rising hiss and climbing tone, then cracks and sprays glass pings that thin out.",
+ "meta": {
+  "type": "sfx",
+  "role": "effects/magic",
+  "themes": [
+   "fantasy",
+   "dungeon"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "platformer",
+   "top-down-rpg"
+  ],
+  "words": [
+   "ice",
+   "frost",
+   "freeze",
+   "shatter",
+   "glass",
+   "crack",
+   "spell",
+   "magic",
+   "blizzard",
+   "break",
+   "cold",
+   "crystal"
+  ],
+  "license": "draft"
+ },
+ "duration": "length",
+ "params": [
+  {
+   "id": "pitch",
+   "label": "Pitch",
+   "min": 600,
+   "max": 2400,
+   "default": 1200,
+   "unit": "Hz",
+   "scale": "log"
+  },
+  {
+   "id": "shards",
+   "label": "Shards",
+   "min": 0,
+   "max": 1,
+   "default": 0.6
+  },
+  {
+   "id": "length",
+   "label": "Length",
+   "min": 0.6,
+   "max": 0.9,
+   "default": 0.75,
+   "unit": "s",
+   "scale": "log"
+  },
+  {
+   "id": "bright",
+   "label": "Brightness",
+   "min": 0,
+   "max": 1,
+   "default": 0.7
+  },
+  {
+   "id": "space",
+   "label": "Room",
+   "min": 0,
+   "max": 0.5,
+   "default": 0.2
+  }
+ ],
+ "nodes": [
+  {
+   "id": "n",
+   "type": "noise"
+  },
+  {
+   "id": "n2",
+   "type": "noise"
+  },
+  {
+   "id": "gate",
+   "type": "expr",
+   "expr": "t < (0.26*smooth(0.6,0.7,length)) ? 1 : 0"
+  },
+  {
+   "id": "growAmp",
+   "type": "env",
+   "points": [
+    [
+     0,
+     0.3
+    ],
+    [
+     "(0.26*smooth(0.6,0.7,length))",
+     1
+    ]
+   ]
+  },
+  {
+   "id": "growSweep",
+   "type": "env",
+   "points": [
+    [
+     0,
+     "pitch*3"
+    ],
+    [
+     "(0.26*smooth(0.6,0.7,length))",
+     "pitch*6",
+     "exp"
+    ]
+   ]
+  },
+  {
+   "id": "hiss",
+   "type": "filter",
+   "mode": "bp",
+   "in": "n",
+   "freq": "growSweep",
+   "q": 1.5
+  },
+  {
+   "id": "climbF",
+   "type": "env",
+   "points": [
+    [
+     0,
+     "pitch*0.9"
+    ],
+    [
+     "(0.26*smooth(0.6,0.7,length))",
+     "pitch*2.4",
+     "exp"
+    ]
+   ]
+  },
+  {
+   "id": "climb",
+   "type": "osc",
+   "freq": "climbF"
+  },
+  {
+   "id": "cr",
+   "type": "clock",
+   "rate": 1,
+   "count": 1,
+   "delay": "(0.26*smooth(0.6,0.7,length))"
+  },
+  {
+   "id": "crackEnv",
+   "type": "ad",
+   "attack": 0.0003,
+   "decay": 0.014,
+   "curve": 2,
+   "trig": "cr"
+  },
+  {
+   "id": "crackHi",
+   "type": "filter",
+   "mode": "hp",
+   "in": "n2*crackEnv",
+   "freq": 1800
+  },
+  {
+   "id": "thunkF",
+   "type": "env",
+   "points": [
+    [
+     0,
+     "pitch*3.5"
+    ],
+    [
+     0.035,
+     "pitch*1.1",
+     "exp"
+    ]
+   ],
+   "trig": "cr"
+  },
+  {
+   "id": "thunkEnv",
+   "type": "ad",
+   "attack": 0.0005,
+   "decay": 0.05,
+   "curve": 2,
+   "trig": "cr"
+  },
+  {
+   "id": "thunk",
+   "type": "osc",
+   "freq": "thunkF"
+  },
+  {
+   "id": "shEnv",
+   "type": "ad",
+   "attack": 0.001,
+   "decay": "length-(0.26*smooth(0.6,0.7,length))-0.04",
+   "curve": 2.2,
+   "trig": "cr"
+  },
+  {
+   "id": "dst",
+   "type": "dust",
+   "density": "60 + shards*700",
+   "spread": 1
+  },
+  {
+   "id": "exc",
+   "type": "expr",
+   "expr": "dst*shEnv"
+  },
+  {
+   "id": "fq",
+   "type": "expr",
+   "expr": "3000*pow(pitch/1200,0.5)*(1+bright*1.1)"
+  },
+  {
+   "id": "pingA",
+   "type": "modal",
+   "in": "exc",
+   "freq": "fq",
+   "ratios": [
+    1,
+    1.45,
+    2.1
+   ],
+   "decay": 0.05,
+   "tilt": 0.5
+  },
+  {
+   "id": "pingB",
+   "type": "modal",
+   "in": "exc",
+   "freq": "fq*0.71",
+   "ratios": [
+    1,
+    1.52,
+    2.3
+   ],
+   "decay": 0.08,
+   "tilt": 0.5
+  },
+  {
+   "id": "sum",
+   "type": "expr",
+   "expr": "(hiss*growAmp*gate*0.3 + climb*growAmp*gate*0.12 + crackHi*1.6 + thunk*thunkEnv*0.7 + pingA*0.35 + pingB*0.3)"
+  },
+  {
+   "id": "tone",
+   "type": "filter",
+   "mode": "lp",
+   "in": "sum",
+   "freq": "4000 + bright*14000"
+  },
+  {
+   "id": "verb",
+   "type": "reverb",
+   "in": "tone",
+   "size": 0.55,
+   "damp": 0.2,
+   "mix": "space"
+  }
+ ],
+ "out": "verb",
+ "presets": {
+  "Ice spell": {
+   "pitch": 1200,
+   "shards": 0.6,
+   "length": 0.75,
+   "bright": 0.7,
+   "space": 0.2
+  },
+  "Frost nova": {
+   "pitch": 900,
+   "shards": 0.9,
+   "length": 0.9,
+   "bright": 0.85,
+   "space": 0.3
+  },
+  "Glass break": {
+   "pitch": 1700,
+   "shards": 1,
+   "length": 0.6,
+   "bright": 1,
+   "space": 0.15
+  }
+ }
+}

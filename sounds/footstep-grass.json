@@ -1,0 +1,224 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "footstep-grass",
+ "name": "Footstep on grass",
+ "category": "movement",
+ "tags": [
+  "walk",
+  "step",
+  "foley",
+  "grass"
+ ],
+ "description": "A soft step on grass: a faint thump under a brush of rustling blades. Every take is a different step; sliders change weight, rustle and damp.",
+ "meta": {
+  "type": "sfx",
+  "role": "characters/footstep",
+  "themes": [
+   "fantasy",
+   "forest",
+   "farm"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "top-down-rpg",
+   "farming-sim",
+   "platformer"
+  ],
+  "words": [
+   "footstep",
+   "footsteps",
+   "step",
+   "walk",
+   "run",
+   "grass",
+   "meadow",
+   "rustle",
+   "boots",
+   "path",
+   "shake",
+   "field"
+  ],
+  "license": "draft"
+ },
+ "duration": "length + 0.03",
+ "params": [
+  {
+   "id": "weight",
+   "label": "Weight",
+   "min": 0.5,
+   "max": 2,
+   "default": 1
+  },
+  {
+   "id": "length",
+   "label": "Length",
+   "min": 0.08,
+   "max": 0.2,
+   "default": 0.13,
+   "unit": "s",
+   "scale": "log"
+  },
+  {
+   "id": "bright",
+   "label": "Brightness",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  },
+  {
+   "id": "grit",
+   "label": "Rustle",
+   "min": 0,
+   "max": 1,
+   "default": 0.6
+  },
+  {
+   "id": "wet",
+   "label": "Damp",
+   "min": 0,
+   "max": 1,
+   "default": 0.15
+  }
+ ],
+ "nodes": [
+  {
+   "id": "thumpPitch",
+   "type": "env",
+   "points": [
+    [
+     0,
+     "rnd(115, 140)/pow(weight, 0.6)"
+    ],
+    [
+     0.07,
+     "70/pow(weight, 0.6)",
+     "exp"
+    ]
+   ]
+  },
+  {
+   "id": "thump",
+   "type": "osc",
+   "freq": "thumpPitch"
+  },
+  {
+   "id": "thumpAmp",
+   "type": "ad",
+   "attack": 0.003,
+   "decay": "0.07*weight",
+   "curve": 2
+  },
+  {
+   "id": "grains",
+   "type": "dust",
+   "density": "700 + grit*900",
+   "spread": 1
+  },
+  {
+   "id": "grainAmp",
+   "type": "ad",
+   "attack": 0.003,
+   "decay": "length",
+   "curve": 3
+  },
+  {
+   "id": "blades",
+   "type": "filter",
+   "mode": "bp",
+   "in": "grains*grainAmp",
+   "freq": "1800 + bright*3200 + rnd(-300, 300)",
+   "q": 0.9
+  },
+  {
+   "id": "first",
+   "type": "clock",
+   "rate": 1,
+   "count": 1
+  },
+  {
+   "id": "onset",
+   "type": "filter",
+   "mode": "bp",
+   "in": "first",
+   "freq": "2600 + bright*2200",
+   "q": 1.1
+  },
+  {
+   "id": "n",
+   "type": "noise",
+   "color": "pink"
+  },
+  {
+   "id": "swish",
+   "type": "filter",
+   "mode": "bp",
+   "in": "n*grainAmp",
+   "freq": "1500 + bright*2500 + rnd(-200, 200)",
+   "q": 0.8
+  },
+  {
+   "id": "squelchAmp",
+   "type": "ad",
+   "attack": 0.006,
+   "decay": "0.05 + 0.04*weight",
+   "curve": 2
+  },
+  {
+   "id": "squelchTone",
+   "type": "filter",
+   "mode": "lp",
+   "in": "n",
+   "freq": "500 + bright*500",
+   "q": 1.2
+  },
+  {
+   "id": "tapTone",
+   "type": "filter",
+   "mode": "bp",
+   "in": "n",
+   "freq": "650 + bright*400",
+   "q": 0.9
+  },
+  {
+   "id": "ground",
+   "type": "expr",
+   "expr": "thump*thumpAmp*0.2 + tapTone*thumpAmp*0.35"
+  },
+  {
+   "id": "sumBus",
+   "type": "expr",
+   "expr": "ground + onset*0.5 + blades*grit*9 + swish*(0.2 + grit*0.4) + squelchTone*squelchAmp*wet*0.7"
+  },
+  {
+   "id": "soft",
+   "type": "shaper",
+   "in": "sumBus*2.2",
+   "drive": 1.2,
+   "mode": "tanh"
+  }
+ ],
+ "out": "soft",
+ "presets": {
+  "Grass": {
+   "weight": 1,
+   "length": 0.13,
+   "bright": 0.5,
+   "grit": 0.6,
+   "wet": 0.15
+  },
+  "Tall grass": {
+   "weight": 0.7,
+   "length": 0.15,
+   "bright": 0.6,
+   "grit": 1,
+   "wet": 0.1
+  },
+  "Dirt path": {
+   "weight": 1.4,
+   "length": 0.08,
+   "bright": 0.4,
+   "grit": 0.5,
+   "wet": 0
+  }
+ }
+}

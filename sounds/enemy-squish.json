@@ -1,0 +1,49 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "enemy-squish",
+  "name": "Enemy squish",
+  "category": "impact",
+  "tags": ["defeat", "enemy", "splat", "cartoon"],
+  "description": "A cartoon defeat: a toy-like blip sliding down, a wet splat under its start and a tiny pop at the end. Pitch, drop, squelch, brightness and length can be changed.",
+  "meta": {
+    "type": "sfx",
+    "role": "characters/death",
+    "themes": ["fantasy", "forest", "dungeon"],
+    "gameTypes": ["platformer", "turn-based-rpg", "arcade"],
+    "words": ["squish", "squash", "splat", "defeat", "enemy", "die", "death", "stomp", "pop", "crunch", "kill", "cartoon"],
+    "license": "draft"
+  },
+  "duration": "length",
+  "params": [
+    { "id": "pitch", "label": "Start pitch", "unit": "Hz", "min": 350, "max": 1400, "default": 600, "scale": "log" },
+    { "id": "drop", "label": "Drop", "unit": "semitones", "min": 6, "max": 36, "default": 24 },
+    { "id": "length", "label": "Length", "unit": "s", "min": 0.25, "max": 0.45, "default": 0.34, "scale": "log" },
+    { "id": "wet", "label": "Squelch", "min": 0, "max": 1, "default": 0.7 },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 }
+  ],
+  "nodes": [
+    { "id": "slide", "type": "env", "points": [[0, "pitch*rnd(0.97,1.03)"], ["length*0.8", "pitch*semi(-drop)", "exp"]] },
+    { "id": "pul", "type": "osc", "wave": "pulse", "freq": "slide", "width": "0.2 + bright*0.2" },
+    { "id": "blipAmp", "type": "ad", "attack": 0.002, "decay": "length*0.75", "curve": 1.7 },
+    { "id": "blipF", "type": "filter", "mode": "lp", "in": "pul*blipAmp", "freq": "1800 + bright*6000", "q": 0.8 },
+    { "id": "n", "type": "noise", "color": "white" },
+    { "id": "wsweep", "type": "env", "points": [[0, 2600], [0.12, 500, "exp"]] },
+    { "id": "splat", "type": "filter", "mode": "bp", "in": "n", "freq": "wsweep*(0.7 + bright*0.6)", "q": 3.5 },
+    { "id": "splatAmp", "type": "ad", "attack": 0.002, "decay": "0.07 + length*0.2", "curve": 2 },
+    { "id": "crackF", "type": "filter", "mode": "hp", "in": "n", "freq": 2500, "q": 0.8 },
+    { "id": "crackAmp", "type": "ad", "attack": 0.0005, "decay": 0.018, "curve": 2.5 },
+    { "id": "crack", "type": "shaper", "in": "crackF*crackAmp", "drive": 3, "mode": "clip" },
+    { "id": "pClk", "type": "clock", "rate": 1, "count": 1, "delay": "length*0.72" },
+    { "id": "pSweep", "type": "env", "points": [[0, "pitch*0.9"], [0.035, "pitch*2.2", "exp"]], "trig": "pClk" },
+    { "id": "pop", "type": "osc", "wave": "sine", "freq": "pSweep" },
+    { "id": "popAmp", "type": "ad", "attack": 0.002, "decay": 0.04, "curve": 1.8, "trig": "pClk" },
+    { "id": "sum", "type": "expr", "expr": "blipF*1.0 + splat*splatAmp*wet*3.2 + crack*(1-wet)*0.9 + pop*popAmp*0.5" },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "sum", "freq": 40, "q": 0.7 }
+  ],
+  "out": "clean",
+  "presets": {
+    "Squish": { "pitch": 600, "drop": 24, "length": 0.36, "wet": 0.75, "bright": 0.5 },
+    "Pop": { "pitch": 1100, "drop": 14, "length": 0.26, "wet": 0.25, "bright": 0.75 },
+    "Crunch": { "pitch": 450, "drop": 20, "length": 0.3, "wet": 0, "bright": 0.6 }
+  }
+}

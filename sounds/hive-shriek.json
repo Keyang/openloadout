@@ -1,0 +1,59 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "hive-shriek",
+  "name": "Hive shriek",
+  "category": "impact",
+  "tags": ["sci-fi", "alien", "scream", "boss"],
+  "description": "A stylised alien scream: two detuned pulse waves rising with a fast vibrato through a filter that opens like a mouth, rasping noise on top, ending in a dry clicking rattle. Pitch, length, rasp, vibrato and brightness can be changed.",
+  "meta": {
+    "type": "sfx",
+    "role": "characters/voice",
+    "themes": ["sci-fi", "space", "horror"],
+    "gameTypes": ["roguelike-action", "shooter", "arcade"],
+    "words": ["shriek", "scream", "screech", "alien", "monster", "boss", "roar", "enrage", "howl", "creature", "voice", "hive", "rattle"],
+    "license": "draft"
+  },
+  "duration": "length",
+  "params": [
+    { "id": "pitch", "label": "Pitch", "min": 300, "max": 1000, "default": 500, "unit": "Hz", "scale": "log" },
+    { "id": "length", "label": "Length", "min": 0.85, "max": 1.5, "default": 1.1, "unit": "s", "scale": "log" },
+    { "id": "grit", "label": "Rasp", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "wobble", "label": "Vibrato", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 }
+  ],
+  "nodes": [
+    { "id": "jit", "type": "expr", "expr": "rnd(0.97, 1.04)" },
+    { "id": "rise", "type": "env", "points": [[0, "pitch"], ["length*0.62", "pitch*3.6", "exp"], ["length*0.78", "pitch*3.3", "lin"]] },
+    { "id": "vibLfo", "type": "osc", "wave": "sine", "freq": 11 },
+    { "id": "vibDepth", "type": "env", "points": [[0, 0.3], ["length*0.5", 1], ["length*0.78", 1]] },
+    { "id": "f0", "type": "expr", "expr": "rise*jit*(1 + vibLfo*vibDepth*wobble*0.16)" },
+    { "id": "pA", "type": "osc", "wave": "pulse", "width": 0.3, "freq": "f0" },
+    { "id": "pB", "type": "osc", "wave": "pulse", "width": 0.42, "freq": "f0*1.013" },
+    { "id": "voice", "type": "expr", "expr": "pA*0.6 + pB*0.5" },
+    { "id": "mouthF", "type": "env", "points": [[0, "600 + 300*bright"], ["length*0.5", "2200 + 1800*bright"], ["length*0.78", "1500 + 1200*bright"]] },
+    { "id": "mouth", "type": "filter", "mode": "bp", "in": "voice", "freq": "mouthF", "q": 2.2 },
+    { "id": "open", "type": "filter", "mode": "lp", "in": "voice", "freq": "mouthF*1.5", "q": 0.8 },
+    { "id": "vox", "type": "expr", "expr": "mouth*1.1 + open*0.35" },
+    { "id": "nz", "type": "noise" },
+    { "id": "rough", "type": "osc", "wave": "square", "freq": "58 + 20*grit" },
+    { "id": "nzBand", "type": "filter", "mode": "bp", "in": "nz", "freq": "mouthF*1.3", "q": 1.4 },
+    { "id": "rasp", "type": "expr", "expr": "nzBand*(0.6 + 0.4*rough)*grit" },
+    { "id": "amp", "type": "env", "points": [[0, 0], [0.05, 1, "lin"], ["length*0.7", 1], ["length*0.78", 0, 3]] },
+    { "id": "voiced", "type": "expr", "expr": "(vox + rasp*1.3)*amp*(1 - wobble*0.35*(0.5 - 0.5*vibLfo))" },
+    { "id": "rattleClk", "type": "clock", "rate": 36, "jitter": 0.35, "delay": "length*0.76", "count": 6 },
+    { "id": "rattleAd", "type": "ad", "attack": 0.0006, "decay": 0.016, "curve": 2.5, "trig": "rattleClk" },
+    { "id": "rattleFade", "type": "env", "points": [[0, 1], ["length", 0.35]] },
+    { "id": "rattleNz", "type": "filter", "mode": "bp", "in": "nz", "freq": "1600 + 1800*bright", "q": 2.5 },
+    { "id": "rattle", "type": "expr", "expr": "rattleNz*rattleAd*(0.8 + 0.2*grit)*1.6" },
+    { "id": "sum", "type": "expr", "expr": "voiced + rattle" },
+    { "id": "dirty", "type": "shaper", "in": "sum", "drive": "1.3 + grit*3.2", "mode": "tanh" },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "dirty", "freq": 140, "q": 0.7 },
+    { "id": "fade", "type": "env", "points": [[0, 1], ["length-0.05", 1], ["length", 0]] }
+  ],
+  "out": "clean*fade",
+  "presets": {
+    "Hive mother": { "pitch": 420, "length": 1.3, "grit": 0.6, "wobble": 0.5, "bright": 0.45 },
+    "Small screech": { "pitch": 820, "length": 0.9, "grit": 0.3, "wobble": 0.7, "bright": 0.7 },
+    "Enraged": { "pitch": 520, "length": 1.1, "grit": 1, "wobble": 0.9, "bright": 0.6 }
+  }
+}

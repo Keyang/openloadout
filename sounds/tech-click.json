@@ -1,0 +1,215 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "tech-click",
+ "name": "Tech click",
+ "category": "ui",
+ "tags": [
+  "sci-fi",
+  "interface",
+  "click",
+  "blip"
+ ],
+ "description": "A clean interface blip: a short sine with a little FM on its first few milliseconds and a tiny high tick. Identical every time.",
+ "meta": {
+  "type": "sfx",
+  "role": "interface/click",
+  "themes": [
+   "sci-fi",
+   "neutral"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "arcade"
+  ],
+  "words": [
+   "click",
+   "blip",
+   "select",
+   "button",
+   "menu",
+   "interface",
+   "hover",
+   "confirm",
+   "beep",
+   "terminal",
+   "tick"
+  ],
+  "license": "draft"
+ },
+ "duration": "length+0.005",
+ "params": [
+  {
+   "id": "pitch",
+   "label": "Pitch",
+   "min": 600,
+   "max": 3000,
+   "default": 1400,
+   "unit": "Hz",
+   "scale": "log"
+  },
+  {
+   "id": "length",
+   "label": "Length",
+   "min": 0.03,
+   "max": 0.08,
+   "default": 0.045,
+   "unit": "s"
+  },
+  {
+   "id": "bright",
+   "label": "Brightness",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  },
+  {
+   "id": "snap",
+   "label": "Snap",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  },
+  {
+   "id": "drop",
+   "label": "Drop",
+   "min": -12,
+   "max": 12,
+   "default": 3,
+   "unit": "semitones"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "f1",
+   "type": "env",
+   "points": [
+    [
+     0,
+     "pitch"
+    ],
+    [
+     "length/(1+0.9*(drop<-1))",
+     "pitch*semi(-drop*(1-(drop<-1)))",
+     "exp"
+    ]
+   ]
+  },
+  {
+   "id": "m1",
+   "type": "osc",
+   "freq": "pitch*2"
+  },
+  {
+   "id": "fmEnv",
+   "type": "ad",
+   "attack": 0.0003,
+   "decay": 0.006,
+   "curve": 2
+  },
+  {
+   "id": "o1",
+   "type": "osc",
+   "freq": "f1",
+   "pm": "m1*fmEnv*snap*0.8"
+  },
+  {
+   "id": "a1",
+   "type": "ad",
+   "attack": 0.0005,
+   "decay": "length/(1+0.9*(drop<-1))",
+   "curve": 2.2
+  },
+  {
+   "id": "c2",
+   "type": "clock",
+   "rate": 1,
+   "count": 1,
+   "delay": "(length/(1+0.9*(drop<-1)))*0.9"
+  },
+  {
+   "id": "f2",
+   "type": "env",
+   "points": [
+    [
+     0,
+     "pitch*semi(-drop)"
+    ],
+    [
+     "length/(1+0.9*(drop<-1))",
+     "pitch*semi(-drop)*0.99",
+     "exp"
+    ]
+   ],
+   "trig": "c2",
+   "start": "pitch"
+  },
+  {
+   "id": "m2",
+   "type": "osc",
+   "freq": "pitch*semi(-drop)*2"
+  },
+  {
+   "id": "o2",
+   "type": "osc",
+   "freq": "f2",
+   "pm": "m2*fmEnv*0.2*snap"
+  },
+  {
+   "id": "a2",
+   "type": "ad",
+   "attack": 0.0005,
+   "decay": "length/(1+0.9*(drop<-1))",
+   "curve": 2.2,
+   "trig": "c2"
+  },
+  {
+   "id": "tk",
+   "type": "osc",
+   "wave": "square",
+   "freq": "6200"
+  },
+  {
+   "id": "tkA",
+   "type": "ad",
+   "attack": 0.0002,
+   "decay": 0.003,
+   "curve": 2
+  },
+  {
+   "id": "sum",
+   "type": "expr",
+   "expr": "o1*a1 + o2*a2*(drop<-1) + tk*tkA*bright*0.6"
+  },
+  {
+   "id": "clean",
+   "type": "filter",
+   "mode": "hp",
+   "in": "sum",
+   "freq": 40
+  }
+ ],
+ "out": "clean",
+ "presets": {
+  "Select": {
+   "pitch": 1400,
+   "length": 0.045,
+   "bright": 0.5,
+   "snap": 0.5,
+   "drop": 3
+  },
+  "Hover": {
+   "pitch": 2200,
+   "length": 0.03,
+   "bright": 0.2,
+   "snap": 0.2,
+   "drop": 0
+  },
+  "Confirm": {
+   "pitch": 1200,
+   "length": 0.075,
+   "bright": 0.5,
+   "snap": 0.5,
+   "drop": -5
+  }
+ }
+}

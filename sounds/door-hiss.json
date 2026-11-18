@@ -1,0 +1,55 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "door-hiss",
+  "name": "Blast door",
+  "category": "impact",
+  "tags": ["sci-fi", "door", "pressure", "machine"],
+  "description": "A pressure door opening: a hiss of air that starts at once and fades slowly, a servo whine gliding up, and a clunk as it stops. Length, hiss, servo, clunk and brightness can be changed.",
+  "meta": {
+    "type": "sfx",
+    "role": "world/door",
+    "themes": ["sci-fi", "space"],
+    "gameTypes": ["roguelike-action", "shooter", "arcade"],
+    "words": ["door", "blast door", "airlock", "hiss", "steam", "pressure", "open", "servo", "hatch", "vent", "chest", "cache", "machine"],
+    "license": "draft"
+  },
+  "duration": "length + 0.04",
+  "params": [
+    { "id": "length", "label": "Length", "min": 0.55, "max": 1.05, "default": 0.8, "unit": "s", "scale": "log" },
+    { "id": "air", "label": "Hiss", "min": 0, "max": 1, "default": 0.6 },
+    { "id": "whine", "label": "Servo", "min": 0, "max": 1, "default": 0.6 },
+    { "id": "thump", "label": "Clunk", "min": 0, "max": 1, "default": 0.6 },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 }
+  ],
+  "nodes": [
+    { "id": "jit", "type": "expr", "expr": "rnd(0.96, 1.05)" },
+    { "id": "nz", "type": "noise" },
+    { "id": "hissHp", "type": "filter", "mode": "hp", "in": "nz", "freq": "2600 + 2800*bright", "q": 0.8 },
+    { "id": "hissAd", "type": "ad", "attack": 0.002, "decay": "length*1.05", "curve": 1.7 },
+    { "id": "hissBody", "type": "filter", "mode": "bp", "in": "nz", "freq": "900 + 600*bright", "q": 0.6 },
+    { "id": "hiss", "type": "expr", "expr": "(hissHp*0.9 + hissBody*0.25)*hissAd*air" },
+    { "id": "sFreq", "type": "env", "points": [[0, 200], ["length*0.8", 500, "lin"]] },
+    { "id": "sOsc", "type": "osc", "wave": "saw", "freq": "sFreq*jit" },
+    { "id": "sOsc2", "type": "osc", "wave": "square", "freq": "sFreq*jit*2.003" },
+    { "id": "sLp", "type": "filter", "mode": "lp", "in": "sOsc*0.7 + sOsc2*0.2", "freq": "1100 + 2200*bright", "q": 2.2 },
+    { "id": "sAmp", "type": "env", "points": [[0, 0], [0.06, 1], ["length*0.8", 1.0], ["length*0.8 + 0.012", 0]] },
+    { "id": "servo", "type": "expr", "expr": "sLp*sAmp*whine" },
+    { "id": "clk", "type": "clock", "rate": 1, "count": 1, "delay": "length*0.8" },
+    { "id": "thF", "type": "env", "points": [[0, 150], [0.08, 55, "exp"]], "trig": "clk" },
+    { "id": "thO", "type": "osc", "wave": "sine", "freq": "thF" },
+    { "id": "thAd", "type": "ad", "attack": 0.001, "decay": 0.13, "curve": 2, "trig": "clk" },
+    { "id": "knock", "type": "filter", "mode": "bp", "in": "nz", "freq": "700 + 900*bright", "q": 1.4 },
+    { "id": "knAd", "type": "ad", "attack": 0.0005, "decay": 0.03, "curve": 2.5, "trig": "clk" },
+    { "id": "clunk", "type": "expr", "expr": "(thO*thAd*0.9 + knock*knAd*0.9)*thump" },
+    { "id": "sum", "type": "expr", "expr": "hiss*0.85 + servo*0.55 + clunk*1.0" },
+    { "id": "dirty", "type": "shaper", "in": "sum", "drive": 1.3, "mode": "tanh" },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "dirty", "freq": 45, "q": 0.7 },
+    { "id": "fade", "type": "env", "points": [[0, 1], ["length+0.01", 1], ["length+0.04", 0]] }
+  ],
+  "out": "clean*fade",
+  "presets": {
+    "Blast door": { "length": 0.8, "air": 0.6, "whine": 0.6, "thump": 0.7, "bright": 0.5 },
+    "Loot cache": { "length": 0.6, "air": 0.35, "whine": 0.8, "thump": 0.5, "bright": 0.7 },
+    "Airlock": { "length": 1.0, "air": 1, "whine": 0.15, "thump": 0.3, "bright": 0.45 }
+  }
+}

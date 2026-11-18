@@ -1,0 +1,417 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "monster-fade",
+ "name": "Monster defeated",
+ "category": "impact",
+ "tags": [
+  "defeat",
+  "death",
+  "monster",
+  "dissolve",
+  "bones"
+ ],
+ "description": "A beaten monster dissolves: sliding noise and a falling saw pair end in a crumble of dust. Grit turns it into a clatter of bones.",
+ "meta": {
+  "type": "sfx",
+  "role": "characters/death",
+  "themes": [
+   "fantasy",
+   "dungeon"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "platformer",
+   "top-down-rpg"
+  ],
+  "words": [
+   "monster",
+   "defeat",
+   "death",
+   "die",
+   "dissolve",
+   "fade",
+   "enemy",
+   "beast",
+   "bones",
+   "collapse",
+   "crumble",
+   "falls"
+  ],
+  "license": "draft"
+ },
+ "duration": "length",
+ "params": [
+  {
+   "id": "pitch",
+   "label": "Pitch",
+   "min": 70,
+   "max": 400,
+   "default": 180,
+   "unit": "Hz",
+   "scale": "log"
+  },
+  {
+   "id": "drop",
+   "label": "Drop",
+   "min": 5,
+   "max": 24,
+   "default": 14,
+   "unit": "semitones"
+  },
+  {
+   "id": "length",
+   "label": "Length",
+   "min": 0.5,
+   "max": 0.8,
+   "default": 0.65,
+   "unit": "s",
+   "scale": "log"
+  },
+  {
+   "id": "grit",
+   "label": "Grit",
+   "min": 0,
+   "max": 1,
+   "default": 0.4
+  },
+  {
+   "id": "bright",
+   "label": "Brightness",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  }
+ ],
+ "nodes": [
+  {
+   "id": "n",
+   "type": "noise"
+  },
+  {
+   "id": "rv",
+   "type": "rand",
+   "lo": -1,
+   "hi": 1
+  },
+  {
+   "id": "rv2",
+   "type": "rand",
+   "lo": 0,
+   "hi": 1
+  },
+  {
+   "id": "f",
+   "type": "env",
+   "points": [
+    [
+     0,
+     "pitch"
+    ],
+    [
+     "length*0.85",
+     "pitch*semi(-drop)",
+     "exp"
+    ]
+   ]
+  },
+  {
+   "id": "fv",
+   "type": "expr",
+   "expr": "f*(1 + rv*0.05)"
+  },
+  {
+   "id": "s1",
+   "type": "osc",
+   "wave": "saw",
+   "freq": "fv"
+  },
+  {
+   "id": "s2",
+   "type": "osc",
+   "wave": "saw",
+   "freq": "fv*1.013"
+  },
+  {
+   "id": "toneCut",
+   "type": "env",
+   "points": [
+    [
+     0,
+     "700 + bright*4500"
+    ],
+    [
+     "length*0.9",
+     250,
+     "exp"
+    ]
+   ]
+  },
+  {
+   "id": "toneLp",
+   "type": "filter",
+   "mode": "lp",
+   "in": "(s1 + s2)*0.5",
+   "freq": "toneCut",
+   "q": 1.1
+  },
+  {
+   "id": "toneAmp",
+   "type": "ad",
+   "attack": 0.004,
+   "decay": "length*0.95",
+   "curve": 1.5
+  },
+  {
+   "id": "tone",
+   "type": "expr",
+   "expr": "toneLp*toneAmp*(1 - 0.9*smooth(0.55,0.9,grit))"
+  },
+  {
+   "id": "nCut",
+   "type": "env",
+   "points": [
+    [
+     0,
+     "2500 + bright*5000"
+    ],
+    [
+     "length*0.9",
+     280,
+     "exp"
+    ]
+   ]
+  },
+  {
+   "id": "nBp",
+   "type": "filter",
+   "mode": "bp",
+   "in": "n",
+   "freq": "nCut",
+   "q": 2.2
+  },
+  {
+   "id": "nAmp",
+   "type": "ad",
+   "attack": 0.003,
+   "decay": "length*0.85",
+   "curve": 1.8
+  },
+  {
+   "id": "slide",
+   "type": "expr",
+   "expr": "nBp*nAmp*(1 - 0.85*smooth(0.55,0.9,grit))"
+  },
+  {
+   "id": "crEnv",
+   "type": "env",
+   "points": [
+    [
+     0,
+     0.15
+    ],
+    [
+     "length*0.45",
+     0.5
+    ],
+    [
+     "length*0.72",
+     1
+    ],
+    [
+     "length*0.98",
+     0,
+     1.5
+    ]
+   ]
+  },
+  {
+   "id": "dst",
+   "type": "dust",
+   "density": "120 + grit*500",
+   "spread": 1
+  },
+  {
+   "id": "dstBp",
+   "type": "filter",
+   "mode": "bp",
+   "in": "dst*crEnv",
+   "freq": "1800 + bright*3000",
+   "q": 0.9
+  },
+  {
+   "id": "crumble",
+   "type": "expr",
+   "expr": "dstBp*(0.8 + grit*1.2)"
+  },
+  {
+   "id": "kEnv",
+   "type": "env",
+   "points": [
+    [
+     0,
+     1
+    ],
+    [
+     "length*0.5",
+     0.6
+    ],
+    [
+     "length*0.95",
+     0,
+     1.5
+    ]
+   ]
+  },
+  {
+   "id": "kd",
+   "type": "dust",
+   "density": "35 + grit*10",
+   "spread": 1
+  },
+  {
+   "id": "k0",
+   "type": "clock",
+   "rate": 1,
+   "count": 1
+  },
+  {
+   "id": "kex",
+   "type": "expr",
+   "expr": "kd*kEnv + k0"
+  },
+  {
+   "id": "k1",
+   "type": "modal",
+   "in": "kex",
+   "freq": "pitch*2.2*(0.8+bright*0.6)",
+   "ratios": [
+    1,
+    2.3,
+    4.1
+   ],
+   "decay": 0.06,
+   "tilt": 0.8
+  },
+  {
+   "id": "k2",
+   "type": "modal",
+   "in": "kex",
+   "freq": "pitch*2.9*(0.8+bright*0.6)",
+   "ratios": [
+    1,
+    2.1,
+    3.7
+   ],
+   "decay": 0.045,
+   "tilt": 0.8
+  },
+  {
+   "id": "knock",
+   "type": "expr",
+   "expr": "(k1 + k2*0.8)*smooth(0.55,0.9,grit)"
+  },
+  {
+   "id": "th",
+   "type": "clock",
+   "rate": 1,
+   "count": 1,
+   "delay": "length*0.72"
+  },
+  {
+   "id": "thF",
+   "type": "env",
+   "points": [
+    [
+     0,
+     85
+    ],
+    [
+     0.12,
+     38,
+     "exp"
+    ]
+   ],
+   "trig": "th"
+  },
+  {
+   "id": "thEnv",
+   "type": "ad",
+   "attack": 0.002,
+   "decay": 0.16,
+   "curve": 2,
+   "trig": "th"
+  },
+  {
+   "id": "thSine",
+   "type": "osc",
+   "freq": "thF"
+  },
+  {
+   "id": "thNoise",
+   "type": "filter",
+   "mode": "lp",
+   "in": "n*thEnv",
+   "freq": 900
+  },
+  {
+   "id": "thud",
+   "type": "expr",
+   "expr": "(thSine*thEnv + thNoise*0.5)*smooth(170,95,pitch)"
+  },
+  {
+   "id": "sum",
+   "type": "expr",
+   "expr": "tone*0.55 + slide*0.9 + crumble*0.8 + knock*1.4 + thud*0.9"
+  },
+  {
+   "id": "hpf",
+   "type": "filter",
+   "mode": "hp",
+   "in": "sum",
+   "freq": 40
+  },
+  {
+   "id": "fin",
+   "type": "env",
+   "points": [
+    [
+     0,
+     1
+    ],
+    [
+     "length*0.9",
+     1
+    ],
+    [
+     "length*0.999",
+     0,
+     1.5
+    ]
+   ]
+  }
+ ],
+ "out": "hpf*fin",
+ "presets": {
+  "Monster fades": {
+   "pitch": 180,
+   "drop": 14,
+   "length": 0.65,
+   "grit": 0.4,
+   "bright": 0.5
+  },
+  "Bones collapse": {
+   "pitch": 260,
+   "drop": 6,
+   "length": 0.6,
+   "grit": 1,
+   "bright": 0.6
+  },
+  "Big beast falls": {
+   "pitch": 80,
+   "drop": 20,
+   "length": 0.8,
+   "grit": 0.3,
+   "bright": 0.2
+  }
+ }
+}

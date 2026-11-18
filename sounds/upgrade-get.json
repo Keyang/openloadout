@@ -1,0 +1,60 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "upgrade-get",
+  "name": "Upgrade",
+  "category": "pickup",
+  "tags": ["sci-fi", "powerup", "reward", "fanfare"],
+  "description": "Power gained: four rising synth notes over a saw swell that opens up, ending on a bright held chord. A fast speed shrinks it to a two-note cell pickup. Pitch, speed, rise, brightness and room can be changed.",
+  "meta": {
+    "type": "sfx",
+    "role": "items/equip",
+    "themes": ["sci-fi", "space"],
+    "gameTypes": ["roguelike-action", "shooter", "arcade"],
+    "words": ["upgrade", "power up", "powerup", "level up", "reward", "equip", "card", "health", "shield", "pedestal", "fanfare", "gain", "boost", "heal"],
+    "license": "draft"
+  },
+  "duration": "(2 + 2*step(0.1, speed))*speed + 0.14 + 0.33*step(0.1, speed) + space*0.5",
+  "params": [
+    { "id": "pitch", "label": "Pitch", "min": 200, "max": 900, "default": 440, "unit": "Hz", "scale": "log" },
+    { "id": "speed", "label": "Speed", "min": 0.05, "max": 0.16, "default": 0.12, "unit": "s", "scale": "log" },
+    { "id": "rise", "label": "Rise", "min": 5, "max": 24, "default": 12, "unit": "semitones" },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.55 },
+    { "id": "space", "label": "Room", "min": 0, "max": 0.5, "default": 0.15 }
+  ],
+  "nodes": [
+    { "id": "clk", "type": "clock", "rate": "1/speed", "count": "2 + 2*step(0.1, speed)" },
+    { "id": "note", "type": "seq", "steps": ["pitch", "pitch*semi((4 + 3*(1 - step(0.1, speed)))*rise/12)", "pitch*semi(7*rise/12)", "pitch*semi(rise)"], "trig": "clk" },
+    { "id": "nAd", "type": "ad", "attack": 0.002, "decay": "speed*1.9 + 0.04", "curve": 2, "trig": "clk" },
+    { "id": "nSaw", "type": "osc", "wave": "saw", "freq": "note" },
+    { "id": "nPul", "type": "osc", "wave": "pulse", "width": 0.35, "freq": "note*1.006" },
+    { "id": "nSin", "type": "osc", "wave": "sine", "freq": "note" },
+    { "id": "nGlass", "type": "osc", "wave": "sine", "freq": "note*3.01" },
+    { "id": "nTone", "type": "expr", "expr": "nSin*(0.9 - bright*0.4) + (nSaw*0.4 + nPul*0.35)*bright + nGlass*bright*bright*0.35" },
+    { "id": "nLp", "type": "filter", "mode": "lp", "in": "nTone", "freq": "note*(2 + bright*7)", "q": 1 },
+    { "id": "notes", "type": "expr", "expr": "nLp*nAd" },
+    { "id": "swFreq", "type": "env", "points": [[0, "pitch*0.5"], ["4*speed", "pitch*0.5*semi(rise)", "exp"]] },
+    { "id": "swOsc", "type": "osc", "wave": "saw", "freq": "swFreq" },
+    { "id": "swOsc2", "type": "osc", "wave": "saw", "freq": "swFreq*1.007" },
+    { "id": "swCut", "type": "env", "points": [[0, 350], ["4*speed", "1200 + 5000*bright", "exp"]] },
+    { "id": "swLp", "type": "filter", "mode": "lp", "in": "swOsc + swOsc2", "freq": "swCut", "q": 2 },
+    { "id": "swAmp", "type": "env", "points": [[0, 0], ["3.5*speed", 1, 2], ["4*speed + 0.18", 0, 1]] },
+    { "id": "swell", "type": "expr", "expr": "swLp*swAmp*step(0.1, speed)" },
+    { "id": "chClk", "type": "clock", "rate": 1, "count": 1, "delay": "4*speed - 0.02" },
+    { "id": "chAd", "type": "ad", "attack": 0.006, "hold": 0.2, "decay": 0.26, "curve": 1.8, "trig": "chClk" },
+    { "id": "c1", "type": "osc", "wave": "saw", "freq": "pitch*2" },
+    { "id": "c2", "type": "osc", "wave": "saw", "freq": "pitch*2*semi(4)*1.004" },
+    { "id": "c3", "type": "osc", "wave": "saw", "freq": "pitch*2*semi(7)" },
+    { "id": "c4", "type": "osc", "wave": "pulse", "width": 0.4, "freq": "pitch*4*1.003" },
+    { "id": "chLp", "type": "filter", "mode": "lp", "in": "c1 + c2 + c3 + c4*0.8", "freq": "1500 + 6000*bright", "q": 0.8 },
+    { "id": "chord", "type": "expr", "expr": "chLp*chAd*step(0.1, speed)" },
+    { "id": "dry", "type": "expr", "expr": "notes*1.5 + swell*0.16 + chord*0.2" },
+    { "id": "wet", "type": "reverb", "in": "dry", "size": 0.5, "damp": 0.5, "mix": "space*1.6" },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "wet", "freq": 120, "q": 0.7 }
+  ],
+  "out": "clean",
+  "presets": {
+    "Upgrade": { "pitch": 440, "speed": 0.12, "rise": 12, "bright": 0.6, "space": 0.15 },
+    "Health cell": { "pitch": 392, "speed": 0.075, "rise": 12, "bright": 0.1, "space": 0.05 },
+    "Shield cell": { "pitch": 660, "speed": 0.065, "rise": 12, "bright": 1, "space": 0.08 }
+  }
+}

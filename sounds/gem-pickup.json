@@ -1,0 +1,208 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "gem-pickup",
+ "name": "Gem pickup",
+ "category": "pickup",
+ "tags": [
+  "collect",
+  "reward",
+  "gem",
+  "arcade"
+ ],
+ "description": "Three rising chime notes of a major chord with a glassy ping on each; the last one rings. Interval steps between chord voicings (open fifths, close triad, triad to octave, wide) and at the far end becomes a two-note key jingle (the note, then a fifth above).",
+ "meta": {
+  "type": "sfx",
+  "role": "items/pickup",
+  "themes": [
+   "fantasy",
+   "forest",
+   "dungeon"
+  ],
+  "gameTypes": [
+   "platformer",
+   "turn-based-rpg",
+   "arcade",
+   "puzzle"
+  ],
+  "words": [
+   "gem",
+   "jewel",
+   "crystal",
+   "diamond",
+   "heart",
+   "key",
+   "pickup",
+   "collect",
+   "reward",
+   "treasure",
+   "sparkle",
+   "chime",
+   "loot"
+  ],
+  "license": "draft"
+ },
+ "duration": "speed*(2 - (spread > 1.6 ? 1 : 0)) + ring + 0.01",
+ "params": [
+  {
+   "id": "pitch",
+   "label": "Pitch",
+   "unit": "Hz",
+   "min": 500,
+   "max": 2000,
+   "default": 1175,
+   "scale": "log"
+  },
+  {
+   "id": "spread",
+   "label": "Interval",
+   "min": 0.4,
+   "max": 1.75,
+   "default": 1
+  },
+  {
+   "id": "speed",
+   "label": "Speed",
+   "unit": "s",
+   "min": 0.05,
+   "max": 0.09,
+   "default": 0.065,
+   "scale": "log"
+  },
+  {
+   "id": "ring",
+   "label": "Ring",
+   "unit": "s",
+   "min": 0.25,
+   "max": 0.42,
+   "default": 0.32,
+   "scale": "log"
+  },
+  {
+   "id": "shine",
+   "label": "Shine",
+   "min": 0,
+   "max": 1,
+   "default": 0.6
+  }
+ ],
+ "nodes": [
+  {
+   "id": "clk",
+   "type": "clock",
+   "rate": "1/speed",
+   "count": "3 - (spread > 1.6 ? 1 : 0)"
+  },
+  {
+   "id": "note",
+   "type": "seq",
+   "steps": [
+    "pitch*semi(spread < 0.6 ? 0 : (spread < 1.15 ? 0 : (spread < 1.45 ? 0 : (spread <= 1.6 ? 0 : 0))))",
+    "pitch*semi(spread < 0.6 ? 7 : (spread < 1.15 ? 4 : (spread < 1.45 ? 4 : (spread <= 1.6 ? 7 : 7))))",
+    "pitch*semi(spread < 0.6 ? 12 : (spread < 1.15 ? 7 : (spread < 1.45 ? 12 : (spread <= 1.6 ? 16 : 7))))"
+   ],
+   "trig": "clk"
+  },
+  {
+   "id": "lastClk",
+   "type": "clock",
+   "rate": 1,
+   "count": 1,
+   "delay": "speed*(2 - (spread > 1.6 ? 1 : 0))"
+  },
+  {
+   "id": "ampShort",
+   "type": "ad",
+   "attack": 0.002,
+   "decay": "speed*1.05",
+   "curve": 1.6,
+   "trig": "clk"
+  },
+  {
+   "id": "ampLast",
+   "type": "ad",
+   "attack": 0.002,
+   "decay": "ring",
+   "curve": 2.2,
+   "trig": "lastClk"
+  },
+  {
+   "id": "isLast",
+   "type": "expr",
+   "expr": "t >= speed*(2 - (spread > 1.6 ? 1 : 0)) - 0.0005 ? 1 : 0"
+  },
+  {
+   "id": "amp",
+   "type": "expr",
+   "expr": "isLast ? ampLast*0.85 : ampShort"
+  },
+  {
+   "id": "tr",
+   "type": "osc",
+   "wave": "tri",
+   "freq": "note"
+  },
+  {
+   "id": "sq",
+   "type": "osc",
+   "wave": "square",
+   "freq": "note"
+  },
+  {
+   "id": "ping",
+   "type": "modal",
+   "in": "clk*(1 - 0.25*(1-isLast))",
+   "freq": "note*2",
+   "ratios": [
+    1,
+    2.32,
+    4.25,
+    6.63
+   ],
+   "gains": [
+    1,
+    0.7,
+    0.5,
+    0.3
+   ],
+   "decay": "isLast ? ring*0.9 : speed*1.0",
+   "tilt": 0.6
+  },
+  {
+   "id": "sum",
+   "type": "expr",
+   "expr": "(tr*0.75 + sq*0.16)*amp + ping*shine*0.11"
+  },
+  {
+   "id": "clean",
+   "type": "filter",
+   "mode": "hp",
+   "in": "sum",
+   "freq": 120,
+   "q": 0.7
+  }
+ ],
+ "out": "clean",
+ "presets": {
+  "Gem": {
+   "pitch": 1175,
+   "spread": 1,
+   "speed": 0.06,
+   "ring": 0.33,
+   "shine": 0.8
+  },
+  "Heart": {
+   "pitch": 740,
+   "spread": 0.8,
+   "speed": 0.085,
+   "ring": 0.4,
+   "shine": 0.2
+  },
+  "Key": {
+   "pitch": 1000,
+   "spread": 1.74,
+   "speed": 0.075,
+   "ring": 0.3,
+   "shine": 1
+  }
+ }
+}

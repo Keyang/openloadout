@@ -1,0 +1,51 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "land-thud",
+  "name": "Landing thud",
+  "category": "movement",
+  "tags": ["land", "jump", "platformer", "thud"],
+  "description": "Boots hitting earth: a falling low thump, a short mid slap and a puff of dust. Weight, length, brightness, dust and snap can all be changed.",
+  "meta": {
+    "type": "sfx",
+    "role": "actions/land",
+    "themes": ["fantasy", "forest", "dungeon"],
+    "gameTypes": ["platformer", "turn-based-rpg", "arcade"],
+    "words": ["land", "landing", "thud", "thump", "footfall", "stomp", "jump", "fall", "boots", "ground", "drop", "armour"],
+    "license": "draft"
+  },
+  "duration": "length",
+  "params": [
+    { "id": "weight", "label": "Weight", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "length", "label": "Length", "unit": "s", "min": 0.12, "max": 0.25, "default": 0.17, "scale": "log" },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "grit", "label": "Dust and grit", "min": 0, "max": 1, "default": 0.35 },
+    { "id": "snap", "label": "Snap", "min": 0, "max": 1, "default": 0.5 }
+  ],
+  "nodes": [
+    { "id": "j1", "type": "rand", "lo": 0.95, "hi": 1.05 },
+    { "id": "j2", "type": "rand", "lo": 0.88, "hi": 1.12 },
+    { "id": "sweep", "type": "env", "points": [[0, "220*pow(0.5,weight)*rnd(0.95,1.05)"], [0.05, "85*pow(0.5,weight)*rnd(0.95,1.05)", "exp"]] },
+    { "id": "thud", "type": "osc", "wave": "sine", "freq": "sweep" },
+    { "id": "thudAmp", "type": "ad", "attack": 0.001, "decay": "length*0.85", "curve": 2.4 },
+    { "id": "thudSat", "type": "shaper", "in": "thud*thudAmp", "drive": "2 + snap*2" },
+    { "id": "n", "type": "noise", "color": "white" },
+    { "id": "slapF", "type": "filter", "mode": "bp", "in": "n", "freq": "(900 + bright*1900)*j2", "q": 0.9 },
+    { "id": "slapAmp", "type": "ad", "attack": 0.0005, "decay": "0.02 + snap*0.015", "curve": 2 },
+    { "id": "bodyF", "type": "filter", "mode": "lp", "in": "n", "freq": "600 + bright*700 - weight*200", "q": 1 },
+    { "id": "bodyAmp", "type": "ad", "attack": 0.001, "decay": "length*0.4", "curve": 2.2 },
+    { "id": "dClk", "type": "clock", "rate": 1, "count": 1, "delay": 0.012 },
+    { "id": "dustF", "type": "filter", "mode": "bp", "in": "n", "freq": "2800 + bright*3000", "q": 0.7 },
+    { "id": "dustAmp", "type": "ad", "attack": 0.004, "decay": "length*0.8", "curve": 2, "trig": "dClk" },
+    { "id": "rClk", "type": "clock", "rate": 1, "count": 1, "delay": 0.004 },
+    { "id": "rKick", "type": "ad", "attack": 0.0005, "decay": 0.004, "curve": 1.5, "trig": "rClk" },
+    { "id": "rattle", "type": "modal", "in": "n*rKick", "freq": "3100*j2", "ratios": [1, 1.47, 2.09, 2.56], "decay": "length*0.8", "tilt": 0.6 },
+    { "id": "sum", "type": "expr", "expr": "thudSat*0.4 + slapF*slapAmp*(2.2 + snap*3.0) + bodyF*bodyAmp*2.6 + dustF*dustAmp*grit*3.0 + rattle*smooth(0.55,0.9,grit)*0.03" },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "sum", "freq": 30, "q": 0.7 }
+  ],
+  "out": "clean",
+  "presets": {
+    "Soft landing": { "weight": 0.2, "length": 0.13, "bright": 0.6, "grit": 0.3, "snap": 0.3 },
+    "Heavy landing": { "weight": 0.9, "length": 0.23, "bright": 0.4, "grit": 0.55, "snap": 0.7 },
+    "Armoured": { "weight": 0.75, "length": 0.22, "bright": 0.5, "grit": 0.75, "snap": 0.6 }
+  }
+}

@@ -1,0 +1,584 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "rocket-launch",
+ "name": "Rocket launch",
+ "category": "weapon",
+ "tags": [
+  "sci-fi",
+  "rocket",
+  "missile",
+  "launch"
+ ],
+ "description": "A small rocket leaving: an ignition pop, then a rush of noise that climbs as it flies away over a low burning tone. One control makes it a volley of up to four.",
+ "meta": {
+  "type": "sfx",
+  "role": "actions/shoot",
+  "themes": [
+   "sci-fi",
+   "space"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "shooter"
+  ],
+  "words": [
+   "rocket",
+   "missile",
+   "launch",
+   "fire",
+   "whoosh",
+   "launcher",
+   "explosive",
+   "shoot",
+   "volley",
+   "projectile",
+   "weapon"
+  ],
+  "license": "draft"
+ },
+ "duration": "length/(1+0.6*(volley-1))+(volley-1)*0.1+0.08",
+ "params": [
+  {
+   "id": "length",
+   "label": "Length",
+   "min": 0.42,
+   "max": 0.72,
+   "default": 0.55,
+   "unit": "s"
+  },
+  {
+   "id": "pitch",
+   "label": "Pitch",
+   "min": 50,
+   "max": 160,
+   "default": 80,
+   "unit": "Hz",
+   "scale": "log"
+  },
+  {
+   "id": "burn",
+   "label": "Burn",
+   "min": 0,
+   "max": 1,
+   "default": 0.55
+  },
+  {
+   "id": "snap",
+   "label": "Ignition",
+   "min": 0,
+   "max": 1,
+   "default": 0.6
+  },
+  {
+   "id": "bright",
+   "label": "Brightness",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  },
+  {
+   "id": "volley",
+   "label": "Rockets",
+   "min": 1,
+   "max": 4,
+   "default": 1,
+   "step": 1
+  }
+ ],
+ "nodes": [
+  {
+   "id": "pn0",
+   "type": "noise"
+  },
+  {
+   "id": "pb0",
+   "type": "filter",
+   "mode": "bp",
+   "in": "pn0",
+   "freq": "1100+bright*1500",
+   "q": 0.9
+  },
+  {
+   "id": "pa0",
+   "type": "ad",
+   "attack": 0.0006,
+   "decay": "0.012+snap*0.02",
+   "curve": 2
+  },
+  {
+   "id": "pf0",
+   "type": "env",
+   "points": [
+    [
+     0,
+     "150*rnd(0.92,1.08)"
+    ],
+    [
+     0.03,
+     60,
+     "exp"
+    ]
+   ]
+  },
+  {
+   "id": "po0",
+   "type": "osc",
+   "freq": "pf0"
+  },
+  {
+   "id": "rf0",
+   "type": "env",
+   "points": [
+    [
+     0,
+     "300*rnd(0.9,1.1)"
+    ],
+    [
+     "(length/(1+0.6*(volley-1)))",
+     "1300+bright*2200",
+     "exp"
+    ]
+   ]
+  },
+  {
+   "id": "ra0",
+   "type": "env",
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     0.012,
+     1
+    ],
+    [
+     "(length/(1+0.6*(volley-1)))",
+     0,
+     2.5
+    ]
+   ]
+  },
+  {
+   "id": "rn0",
+   "type": "noise"
+  },
+  {
+   "id": "rb0",
+   "type": "filter",
+   "mode": "bp",
+   "in": "rn0",
+   "freq": "rf0",
+   "q": 1.1
+  },
+  {
+   "id": "bs0",
+   "type": "osc",
+   "wave": "saw",
+   "freq": "pitch*(1+0.15*rn0)*(1+rf0/6000)"
+  },
+  {
+   "id": "bl0",
+   "type": "filter",
+   "mode": "lp",
+   "in": "bs0",
+   "freq": "250+rf0*0.6",
+   "q": 0.8
+  },
+  {
+   "id": "v0",
+   "type": "expr",
+   "expr": "1*( (pb0*pa0*4.5 + po0*pa0*1.6)*(0.15+snap*1.6) + rb0*ra0*3.6 + bl0*ra0*burn*0.45 )"
+  },
+  {
+   "id": "c1",
+   "type": "clock",
+   "rate": 1,
+   "count": 1,
+   "delay": "1*0.1"
+  },
+  {
+   "id": "pn1",
+   "type": "noise"
+  },
+  {
+   "id": "pb1",
+   "type": "filter",
+   "mode": "bp",
+   "in": "pn1",
+   "freq": "1100+bright*1500",
+   "q": 0.9
+  },
+  {
+   "id": "pa1",
+   "type": "ad",
+   "attack": 0.0006,
+   "decay": "0.012+snap*0.02",
+   "curve": 2,
+   "trig": "c1"
+  },
+  {
+   "id": "pf1",
+   "type": "env",
+   "points": [
+    [
+     0,
+     "150*rnd(0.92,1.08)"
+    ],
+    [
+     0.03,
+     60,
+     "exp"
+    ]
+   ],
+   "trig": "c1"
+  },
+  {
+   "id": "po1",
+   "type": "osc",
+   "freq": "pf1"
+  },
+  {
+   "id": "rf1",
+   "type": "env",
+   "points": [
+    [
+     0,
+     "300*rnd(0.9,1.1)"
+    ],
+    [
+     "(length/(1+0.6*(volley-1)))",
+     "1300+bright*2200",
+     "exp"
+    ]
+   ],
+   "trig": "c1"
+  },
+  {
+   "id": "ra1",
+   "type": "env",
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     0.012,
+     1
+    ],
+    [
+     "(length/(1+0.6*(volley-1)))",
+     0,
+     2.5
+    ]
+   ],
+   "trig": "c1"
+  },
+  {
+   "id": "rn1",
+   "type": "noise"
+  },
+  {
+   "id": "rb1",
+   "type": "filter",
+   "mode": "bp",
+   "in": "rn1",
+   "freq": "rf1",
+   "q": 1.1
+  },
+  {
+   "id": "bs1",
+   "type": "osc",
+   "wave": "saw",
+   "freq": "pitch*(1+0.15*rn1)*(1+rf1/6000)"
+  },
+  {
+   "id": "bl1",
+   "type": "filter",
+   "mode": "lp",
+   "in": "bs1",
+   "freq": "250+rf1*0.6",
+   "q": 0.8
+  },
+  {
+   "id": "v1",
+   "type": "expr",
+   "expr": "(volley>1)*( (pb1*pa1*4.5 + po1*pa1*1.6)*(0.15+snap*1.6) + rb1*ra1*3.6 + bl1*ra1*burn*0.45 )"
+  },
+  {
+   "id": "c2",
+   "type": "clock",
+   "rate": 1,
+   "count": 1,
+   "delay": "2*0.1"
+  },
+  {
+   "id": "pn2",
+   "type": "noise"
+  },
+  {
+   "id": "pb2",
+   "type": "filter",
+   "mode": "bp",
+   "in": "pn2",
+   "freq": "1100+bright*1500",
+   "q": 0.9
+  },
+  {
+   "id": "pa2",
+   "type": "ad",
+   "attack": 0.0006,
+   "decay": "0.012+snap*0.02",
+   "curve": 2,
+   "trig": "c2"
+  },
+  {
+   "id": "pf2",
+   "type": "env",
+   "points": [
+    [
+     0,
+     "150*rnd(0.92,1.08)"
+    ],
+    [
+     0.03,
+     60,
+     "exp"
+    ]
+   ],
+   "trig": "c2"
+  },
+  {
+   "id": "po2",
+   "type": "osc",
+   "freq": "pf2"
+  },
+  {
+   "id": "rf2",
+   "type": "env",
+   "points": [
+    [
+     0,
+     "300*rnd(0.9,1.1)"
+    ],
+    [
+     "(length/(1+0.6*(volley-1)))",
+     "1300+bright*2200",
+     "exp"
+    ]
+   ],
+   "trig": "c2"
+  },
+  {
+   "id": "ra2",
+   "type": "env",
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     0.012,
+     1
+    ],
+    [
+     "(length/(1+0.6*(volley-1)))",
+     0,
+     2.5
+    ]
+   ],
+   "trig": "c2"
+  },
+  {
+   "id": "rn2",
+   "type": "noise"
+  },
+  {
+   "id": "rb2",
+   "type": "filter",
+   "mode": "bp",
+   "in": "rn2",
+   "freq": "rf2",
+   "q": 1.1
+  },
+  {
+   "id": "bs2",
+   "type": "osc",
+   "wave": "saw",
+   "freq": "pitch*(1+0.15*rn2)*(1+rf2/6000)"
+  },
+  {
+   "id": "bl2",
+   "type": "filter",
+   "mode": "lp",
+   "in": "bs2",
+   "freq": "250+rf2*0.6",
+   "q": 0.8
+  },
+  {
+   "id": "v2",
+   "type": "expr",
+   "expr": "(volley>2)*( (pb2*pa2*4.5 + po2*pa2*1.6)*(0.15+snap*1.6) + rb2*ra2*3.6 + bl2*ra2*burn*0.45 )"
+  },
+  {
+   "id": "c3",
+   "type": "clock",
+   "rate": 1,
+   "count": 1,
+   "delay": "3*0.1"
+  },
+  {
+   "id": "pn3",
+   "type": "noise"
+  },
+  {
+   "id": "pb3",
+   "type": "filter",
+   "mode": "bp",
+   "in": "pn3",
+   "freq": "1100+bright*1500",
+   "q": 0.9
+  },
+  {
+   "id": "pa3",
+   "type": "ad",
+   "attack": 0.0006,
+   "decay": "0.012+snap*0.02",
+   "curve": 2,
+   "trig": "c3"
+  },
+  {
+   "id": "pf3",
+   "type": "env",
+   "points": [
+    [
+     0,
+     "150*rnd(0.92,1.08)"
+    ],
+    [
+     0.03,
+     60,
+     "exp"
+    ]
+   ],
+   "trig": "c3"
+  },
+  {
+   "id": "po3",
+   "type": "osc",
+   "freq": "pf3"
+  },
+  {
+   "id": "rf3",
+   "type": "env",
+   "points": [
+    [
+     0,
+     "300*rnd(0.9,1.1)"
+    ],
+    [
+     "(length/(1+0.6*(volley-1)))",
+     "1300+bright*2200",
+     "exp"
+    ]
+   ],
+   "trig": "c3"
+  },
+  {
+   "id": "ra3",
+   "type": "env",
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     0.012,
+     1
+    ],
+    [
+     "(length/(1+0.6*(volley-1)))",
+     0,
+     2.5
+    ]
+   ],
+   "trig": "c3"
+  },
+  {
+   "id": "rn3",
+   "type": "noise"
+  },
+  {
+   "id": "rb3",
+   "type": "filter",
+   "mode": "bp",
+   "in": "rn3",
+   "freq": "rf3",
+   "q": 1.1
+  },
+  {
+   "id": "bs3",
+   "type": "osc",
+   "wave": "saw",
+   "freq": "pitch*(1+0.15*rn3)*(1+rf3/6000)"
+  },
+  {
+   "id": "bl3",
+   "type": "filter",
+   "mode": "lp",
+   "in": "bs3",
+   "freq": "250+rf3*0.6",
+   "q": 0.8
+  },
+  {
+   "id": "v3",
+   "type": "expr",
+   "expr": "(volley>3)*( (pb3*pa3*4.5 + po3*pa3*1.6)*(0.15+snap*1.6) + rb3*ra3*3.6 + bl3*ra3*burn*0.45 )"
+  },
+  {
+   "id": "sum",
+   "type": "expr",
+   "expr": "v0 + v1 + v2 + v3"
+  },
+  {
+   "id": "sat",
+   "type": "shaper",
+   "in": "sum*0.8",
+   "drive": 1.6
+  },
+  {
+   "id": "clean",
+   "type": "filter",
+   "mode": "hp",
+   "in": "sat",
+   "freq": 30
+  }
+ ],
+ "out": "clean",
+ "presets": {
+  "Micro rocket": {
+   "length": 0.55,
+   "pitch": 80,
+   "burn": 0.55,
+   "snap": 0.6,
+   "bright": 0.5,
+   "volley": 1
+  },
+  "Missile volley": {
+   "length": 0.62,
+   "pitch": 65,
+   "burn": 0.7,
+   "snap": 0.5,
+   "bright": 0.4,
+   "volley": 4
+  },
+  "Flare": {
+   "length": 0.7,
+   "pitch": 130,
+   "burn": 0.2,
+   "snap": 0.2,
+   "bright": 0.95,
+   "volley": 1
+  }
+ }
+}

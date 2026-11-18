@@ -1,0 +1,60 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "bug-splat",
+  "name": "Bug splat",
+  "category": "impact",
+  "tags": ["sci-fi", "gritty", "creature", "death"],
+  "description": "A bug bursting: a bubbling wet squelch, a falling squeal and a soft thump. Size, squelch, squeal, length and brightness can be changed; every take differs a little.",
+  "meta": {
+    "type": "sfx",
+    "role": "characters/death",
+    "themes": ["sci-fi", "space", "horror"],
+    "gameTypes": ["roguelike-action", "shooter", "arcade"],
+    "words": ["bug", "splat", "squish", "squelch", "burst", "pop", "insect", "alien", "goo", "die", "death", "kill", "gore", "slime"],
+    "license": "draft"
+  },
+  "duration": "length + 0.03",
+  "params": [
+    { "id": "size", "label": "Size", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "wet", "label": "Squelch", "min": 0, "max": 1, "default": 0.6 },
+    { "id": "squeal", "label": "Squeal", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "length", "label": "Length", "min": 0.08, "max": 0.5, "default": 0.32, "unit": "s", "scale": "log" },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 }
+  ],
+  "nodes": [
+    { "id": "jit", "type": "expr", "expr": "rnd(0.88, 1.14)" },
+    { "id": "bubRate", "type": "expr", "expr": "(20 + 20*wet*jit) * jit" },
+    { "id": "lfo", "type": "osc", "wave": "sine", "freq": "bubRate", "phase": 0.25 },
+    { "id": "lfo2", "type": "osc", "wave": "sine", "freq": "bubRate*1.7", "phase": 0.6 },
+    { "id": "bub", "type": "expr", "expr": "clamp(0.5 + 0.5*(lfo*0.7 + lfo2*0.3), 0, 1)" },
+    { "id": "wetNoise", "type": "noise", "color": "pink" },
+    { "id": "cutSweep", "type": "env", "points": [[0, "(1400 + 2800*bright) * 2^(-size*0.8)"], ["length", "(300 + 400*bright) * 2^(-size*0.8)", "exp"]] },
+    { "id": "squelchF", "type": "filter", "mode": "bp", "in": "wetNoise", "freq": "cutSweep * (0.7 + 0.6*bub*wet)", "q": 1.6 },
+    { "id": "squelchAd", "type": "ad", "attack": 0.002, "decay": "length*0.95", "curve": 1.8 },
+    { "id": "squelch", "type": "expr", "expr": "squelchF * squelchAd * (1 - wet*0.85 + wet*0.85*bub*bub*1.6)" },
+    { "id": "sqFreq", "type": "env", "points": [[0, "2000 * 2^(-size*1.1)"], ["length*0.7", "600 * 2^(-size*1.1)", "exp"]] },
+    { "id": "vib", "type": "osc", "wave": "sine", "freq": "38" },
+    { "id": "sqOsc", "type": "osc", "wave": "tri", "freq": "sqFreq*jit", "pm": "vib*0.15*squeal" },
+    { "id": "sqOsc2", "type": "osc", "wave": "saw", "freq": "sqFreq*jit*1.5" },
+    { "id": "sqAd", "type": "ad", "attack": 0.004, "hold": 0.01, "decay": "length*0.55", "curve": 2 },
+    { "id": "sqF", "type": "filter", "mode": "lp", "in": "sqOsc*0.8 + sqOsc2*0.25*bright", "freq": "1800 + 5000*bright", "q": 1 },
+    { "id": "sq", "type": "expr", "expr": "sqF * sqAd * squeal" },
+    { "id": "thumpF", "type": "env", "points": [[0, "190 * 2^(-size*1.2)"], [0.06, "55 * 2^(-size*0.8)", "exp"]] },
+    { "id": "thumpO", "type": "osc", "wave": "sine", "freq": "thumpF" },
+    { "id": "thumpAd", "type": "ad", "attack": 0.001, "decay": "0.05 + 0.07*size", "curve": 2 },
+    { "id": "thump", "type": "expr", "expr": "thumpO * thumpAd" },
+    { "id": "crack", "type": "noise" },
+    { "id": "crackF", "type": "filter", "mode": "bp", "in": "crack", "freq": "1800 + 2600*bright", "q": 1.2 },
+    { "id": "crackAd", "type": "ad", "attack": 0.0005, "decay": 0.018, "curve": 2.5 },
+    { "id": "crackSig", "type": "expr", "expr": "crackF * crackAd" },
+    { "id": "sum", "type": "expr", "expr": "squelch*1.1 + sq*1.5 + thump*0.5 + crackSig*0.7" },
+    { "id": "gloop", "type": "shaper", "in": "sum", "drive": "1.4 + wet*1.2" },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "gloop", "freq": 45, "q": 0.7 }
+  ],
+  "out": "clean",
+  "presets": {
+    "Crawler": { "size": 0.5, "wet": 0.6, "squeal": 0.5, "length": 0.32, "bright": 0.5 },
+    "Mite pop": { "size": 0.05, "wet": 0.3, "squeal": 0.35, "length": 0.1, "bright": 0.75 },
+    "Big burst": { "size": 0.95, "wet": 0.9, "squeal": 0.6, "length": 0.45, "bright": 0.35 }
+  }
+}

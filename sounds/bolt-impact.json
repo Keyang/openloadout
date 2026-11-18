@@ -1,0 +1,256 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "bolt-impact",
+ "name": "Bolt impact",
+ "category": "impact",
+ "tags": [
+  "sci-fi",
+  "hit",
+  "impact",
+  "ping"
+ ],
+ "description": "A shot landing: a sharp falling blip, a short metal ping and a noise tick, dry enough to play many times a second.",
+ "meta": {
+  "type": "sfx",
+  "role": "actions/hit",
+  "themes": [
+   "sci-fi",
+   "space"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "shooter"
+  ],
+  "words": [
+   "hit",
+   "impact",
+   "bolt",
+   "ping",
+   "damage",
+   "hurt",
+   "ricochet",
+   "metal",
+   "thud",
+   "shot",
+   "strike"
+  ],
+  "license": "draft"
+ },
+ "duration": "0.07+ring*0.9",
+ "params": [
+  {
+   "id": "pitch",
+   "label": "Pitch",
+   "min": 800,
+   "max": 4000,
+   "default": 2000,
+   "unit": "Hz",
+   "scale": "log"
+  },
+  {
+   "id": "ring",
+   "label": "Ring",
+   "min": 0.003,
+   "max": 0.12,
+   "default": 0.04,
+   "unit": "s",
+   "scale": "log"
+  },
+  {
+   "id": "snap",
+   "label": "Snap",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  },
+  {
+   "id": "grit",
+   "label": "Grit",
+   "min": 0,
+   "max": 1,
+   "default": 0.3
+  },
+  {
+   "id": "weight",
+   "label": "Weight",
+   "min": 0.6,
+   "max": 1.8,
+   "default": 1
+  }
+ ],
+ "nodes": [
+  {
+   "id": "bf",
+   "type": "env",
+   "points": [
+    [
+     0,
+     "pitch*rnd(0.95,1.05)"
+    ],
+    [
+     0.04,
+     "pitch/5",
+     "exp"
+    ]
+   ]
+  },
+  {
+   "id": "blip",
+   "type": "osc",
+   "freq": "bf"
+  },
+  {
+   "id": "bAmp",
+   "type": "ad",
+   "attack": 0.0006,
+   "decay": 0.05,
+   "curve": 2
+  },
+  {
+   "id": "pn",
+   "type": "noise"
+  },
+  {
+   "id": "pk",
+   "type": "ad",
+   "attack": 0.0003,
+   "decay": 0.002,
+   "curve": 1.5
+  },
+  {
+   "id": "slide",
+   "type": "env",
+   "points": [
+    [
+     0,
+     1
+    ],
+    [
+     "ring*1.3",
+     "1+ring*5"
+    ]
+   ]
+  },
+  {
+   "id": "ping",
+   "type": "modal",
+   "in": "pn*pk",
+   "freq": "1750*rnd(0.9,1.1)*slide",
+   "ratios": [
+    1,
+    2.32,
+    4.17,
+    6.4
+   ],
+   "decay": "ring*1.6",
+   "tilt": 0.5
+  },
+  {
+   "id": "pingG",
+   "type": "expr",
+   "expr": "smooth(0.012,0.035,ring)"
+  },
+  {
+   "id": "tn",
+   "type": "noise"
+  },
+  {
+   "id": "tf",
+   "type": "env",
+   "points": [
+    [
+     0,
+     "190/weight"
+    ],
+    [
+     0.035,
+     "75/weight",
+     "exp"
+    ]
+   ]
+  },
+  {
+   "id": "th",
+   "type": "osc",
+   "freq": "tf"
+  },
+  {
+   "id": "thLp",
+   "type": "filter",
+   "mode": "lp",
+   "in": "tn",
+   "freq": "500/weight+350",
+   "q": 0.9
+  },
+  {
+   "id": "thAmp",
+   "type": "ad",
+   "attack": 0.001,
+   "decay": "0.025+0.03*weight",
+   "curve": 2
+  },
+  {
+   "id": "tk",
+   "type": "filter",
+   "mode": "hp",
+   "in": "tn",
+   "freq": 3500
+  },
+  {
+   "id": "tkAmp",
+   "type": "ad",
+   "attack": 0.0003,
+   "decay": 0.004,
+   "curve": 2
+  },
+  {
+   "id": "tkCr",
+   "type": "crush",
+   "in": "tk*tkAmp",
+   "bits": "10-grit*6",
+   "rate": "16000-grit*10000"
+  },
+  {
+   "id": "sum",
+   "type": "expr",
+   "expr": "blip*bAmp*0.9 + ping*pingG*0.22 + (th*0.6+thLp*0.9)*thAmp*weight*0.6 + tkCr*(0.05+snap*5)"
+  },
+  {
+   "id": "sat",
+   "type": "shaper",
+   "in": "sum",
+   "drive": "1.2+grit*3"
+  },
+  {
+   "id": "clean",
+   "type": "filter",
+   "mode": "hp",
+   "in": "sat",
+   "freq": 40
+  }
+ ],
+ "out": "clean",
+ "presets": {
+  "On metal": {
+   "pitch": 2000,
+   "ring": 0.045,
+   "snap": 0.55,
+   "grit": 0.3,
+   "weight": 1
+  },
+  "On flesh": {
+   "pitch": 900,
+   "ring": 0.003,
+   "snap": 0.25,
+   "grit": 0.15,
+   "weight": 1.7
+  },
+  "Ricochet": {
+   "pitch": 3200,
+   "ring": 0.12,
+   "snap": 0.7,
+   "grit": 0.15,
+   "weight": 0.7
+  }
+ }
+}

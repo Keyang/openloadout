@@ -1,0 +1,43 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "spring-boing",
+  "name": "Spring",
+  "category": "movement",
+  "tags": ["spring", "bounce", "boing", "cartoon"],
+  "description": "A cartoon spring: the pitch leaps up an octave, then wobbles and settles, over a short metallic twang. Pitch, wobble, length, brightness and metal can be changed.",
+  "meta": {
+    "type": "sfx",
+    "role": "world/machine",
+    "themes": ["fantasy", "forest", "dungeon"],
+    "gameTypes": ["platformer", "arcade", "puzzle"],
+    "words": ["spring", "boing", "bounce", "trampoline", "launch", "bouncy", "jump pad", "spring pad", "cartoon", "boost", "hop"],
+    "license": "draft"
+  },
+  "duration": "length",
+  "params": [
+    { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 180, "max": 900, "default": 360, "scale": "log" },
+    { "id": "wobble", "label": "Wobble", "min": 0, "max": 1, "default": 0.6 },
+    { "id": "length", "label": "Length", "unit": "s", "min": 0.3, "max": 0.5, "default": 0.4, "scale": "log" },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "twang", "label": "Metal", "min": 0, "max": 1, "default": 0.5 }
+  ],
+  "nodes": [
+    { "id": "leap", "type": "env", "points": [[0, "pitch*rnd(0.99,1.01)"], [0.04, "pitch*2", "exp"]] },
+    { "id": "lfoF", "type": "expr", "expr": "rnd(21,25)*exp(-t*2.2/length)" },
+    { "id": "lfo", "type": "osc", "wave": "sine", "freq": "lfoF" },
+    { "id": "depth", "type": "expr", "expr": "wobble*0.4*exp(-t*3.2/length)*smooth(0.025,0.05,t)" },
+    { "id": "pul", "type": "osc", "wave": "pulse", "freq": "leap*(1 + lfo*depth)", "width": "0.3 + bright*0.15" },
+    { "id": "amp", "type": "ad", "attack": 0.002, "hold": "length*0.08", "decay": "length*0.8", "curve": 1.9 },
+    { "id": "tone", "type": "filter", "mode": "lp", "in": "pul*amp", "freq": "1400 + bright*6500", "q": 0.8 },
+    { "id": "tw", "type": "pluck", "freq": "pitch*rnd(1.98,2.04)", "decay": "0.1 + length*0.3", "damp": 0.05 },
+    { "id": "twAmp", "type": "ad", "attack": 0.001, "decay": "0.12 + length*0.2", "curve": 2 },
+    { "id": "sum", "type": "expr", "expr": "tone*1.0 + tw*twAmp*twang*1.6" },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "sum", "freq": 80, "q": 0.7 }
+  ],
+  "out": "clean",
+  "presets": {
+    "Spring pad": { "pitch": 360, "wobble": 0.6, "length": 0.4, "bright": 0.5, "twang": 0.5 },
+    "Big trampoline": { "pitch": 220, "wobble": 0.9, "length": 0.5, "bright": 0.35, "twang": 0.3 },
+    "Tiny bounce": { "pitch": 700, "wobble": 0.3, "length": 0.3, "bright": 0.7, "twang": 0.7 }
+  }
+}

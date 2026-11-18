@@ -1,0 +1,283 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "thunder-crack",
+ "name": "Thunder crack",
+ "category": "magic",
+ "tags": [
+  "thunder",
+  "lightning",
+  "storm",
+  "spell",
+  "electric"
+ ],
+ "description": "A clipped crack, an electric buzz, then a rolling rumble that fades in a room.",
+ "meta": {
+  "type": "sfx",
+  "role": "effects/magic",
+  "themes": [
+   "fantasy",
+   "dungeon"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "platformer",
+   "top-down-rpg"
+  ],
+  "words": [
+   "thunder",
+   "lightning",
+   "storm",
+   "crack",
+   "bolt",
+   "strike",
+   "spell",
+   "magic",
+   "electric",
+   "shock",
+   "zap",
+   "rumble"
+  ],
+  "license": "draft"
+ },
+ "duration": "length",
+ "params": [
+  {
+   "id": "snap",
+   "label": "Crack",
+   "min": 0,
+   "max": 1,
+   "default": 0.7
+  },
+  {
+   "id": "rumble",
+   "label": "Rumble",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  },
+  {
+   "id": "length",
+   "label": "Length",
+   "min": 0.8,
+   "max": 1.4,
+   "default": 1.1,
+   "unit": "s",
+   "scale": "log"
+  },
+  {
+   "id": "bright",
+   "label": "Brightness",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  },
+  {
+   "id": "grit",
+   "label": "Buzz",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  }
+ ],
+ "nodes": [
+  {
+   "id": "n",
+   "type": "noise"
+  },
+  {
+   "id": "nb",
+   "type": "noise",
+   "color": "brown"
+  },
+  {
+   "id": "np",
+   "type": "noise",
+   "color": "pink"
+  },
+  {
+   "id": "cEnv",
+   "type": "ad",
+   "attack": 0.0002,
+   "decay": 0.005,
+   "curve": 1.5
+  },
+  {
+   "id": "crack",
+   "type": "filter",
+   "mode": "hp",
+   "in": "n*cEnv",
+   "freq": "500 + bright*2500"
+  },
+  {
+   "id": "bEnv",
+   "type": "env",
+   "points": [
+    [
+     0,
+     1
+    ],
+    [
+     0.15,
+     0.7,
+     "hold"
+    ],
+    [
+     0.19,
+     0,
+     1
+    ]
+   ]
+  },
+  {
+   "id": "bF",
+   "type": "env",
+   "points": [
+    [
+     0,
+     120
+    ],
+    [
+     0.15,
+     60,
+     "exp"
+    ]
+   ]
+  },
+  {
+   "id": "saw",
+   "type": "osc",
+   "wave": "saw",
+   "freq": "bF"
+  },
+  {
+   "id": "dist",
+   "type": "shaper",
+   "in": "saw",
+   "drive": "2 + grit*30",
+   "mode": "clip"
+  },
+  {
+   "id": "buzzBp",
+   "type": "filter",
+   "mode": "bp",
+   "in": "dist",
+   "freq": "300 + bright*1200",
+   "q": 0.8
+  },
+  {
+   "id": "buzz",
+   "type": "expr",
+   "expr": "(dist*0.3 + buzzBp*0.7)*bEnv*(0.1 + grit*1.5)"
+  },
+  {
+   "id": "rAmp",
+   "type": "env",
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     0.02,
+     1
+    ],
+    [
+     "length*0.92",
+     0.14,
+     "exp"
+    ],
+    [
+     "length*0.99",
+     0.05,
+     1
+    ]
+   ]
+  },
+  {
+   "id": "wob",
+   "type": "osc",
+   "freq": 2.2,
+   "phase": 0.25
+  },
+  {
+   "id": "rCut",
+   "type": "env",
+   "points": [
+    [
+     0,
+     "300 + bright*450 + rumble*150"
+    ],
+    [
+     "length*0.92",
+     140,
+     "exp"
+    ]
+   ]
+  },
+  {
+   "id": "rumLow",
+   "type": "filter",
+   "mode": "lp",
+   "in": "nb",
+   "freq": "rCut",
+   "q": 1.2
+  },
+  {
+   "id": "rumMid",
+   "type": "filter",
+   "mode": "bp",
+   "in": "np",
+   "freq": "rCut*2.2",
+   "q": 1.4
+  },
+  {
+   "id": "roll",
+   "type": "expr",
+   "expr": "(rumLow*1.8 + rumMid*1.6)*rAmp*(0.9 + rumble*0.9)*(0.55 + 0.45*wob)"
+  },
+  {
+   "id": "sum",
+   "type": "expr",
+   "expr": "crack*(0.5 + snap*1.6) + buzz*1.1 + roll*0.9"
+  },
+  {
+   "id": "hpf",
+   "type": "filter",
+   "mode": "hp",
+   "in": "sum",
+   "freq": 35
+  },
+  {
+   "id": "verb",
+   "type": "reverb",
+   "in": "hpf",
+   "size": 0.6,
+   "damp": 0.4,
+   "mix": 0.18
+  }
+ ],
+ "out": "verb",
+ "presets": {
+  "Thunder spell": {
+   "snap": 0.7,
+   "rumble": 0.5,
+   "length": 1.1,
+   "bright": 0.5,
+   "grit": 0.5
+  },
+  "Small spark": {
+   "snap": 1,
+   "rumble": 0,
+   "length": 0.8,
+   "bright": 0.9,
+   "grit": 0.2
+  },
+  "Storm strike": {
+   "snap": 0.9,
+   "rumble": 1,
+   "length": 1.4,
+   "bright": 0.3,
+   "grit": 0.9
+  }
+ }
+}

@@ -1,0 +1,38 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "xp-blip",
+  "name": "XP blip",
+  "category": "pickup",
+  "tags": ["sci-fi", "collect", "experience", "chain"],
+  "description": "One experience shard collected: a tiny sine and triangle blip that chirps upward. Made to be chained, so a game can raise the pitch a step for each shard in a streak. Identical every time.",
+  "meta": {
+    "type": "sfx",
+    "role": "items/pickup",
+    "themes": ["sci-fi", "space"],
+    "gameTypes": ["roguelike-action", "shooter", "arcade"],
+    "words": ["xp", "experience", "shard", "gem", "blip", "collect", "pickup", "chirp", "tick", "level up", "orb", "streak", "combo"],
+    "license": "draft"
+  },
+  "duration": "length + 0.01",
+  "params": [
+    { "id": "pitch", "label": "Pitch", "min": 800, "max": 3500, "default": 1500, "unit": "Hz", "scale": "log" },
+    { "id": "rise", "label": "Rise", "min": 0, "max": 12, "default": 5, "unit": "semitones" },
+    { "id": "length", "label": "Length", "min": 0.05, "max": 0.1, "default": 0.07, "unit": "s", "scale": "log" },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "soft", "label": "Softness", "min": 0, "max": 1, "default": 0.15 }
+  ],
+  "nodes": [
+    { "id": "chirp", "type": "env", "points": [[0, "pitch"], ["length*0.75", "pitch*semi(rise)", "exp"]] },
+    { "id": "sn", "type": "osc", "wave": "sine", "freq": "chirp" },
+    { "id": "tr", "type": "osc", "wave": "tri", "freq": "chirp*2" },
+    { "id": "amp", "type": "ad", "attack": "0.0008 + soft*0.012", "decay": "length", "curve": 1.8 },
+    { "id": "sum", "type": "expr", "expr": "(sn*0.75 + tr*(0.1 + bright*0.55))*amp" },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "sum", "freq": 300, "q": 0.7 }
+  ],
+  "out": "clean",
+  "presets": {
+    "XP shard": { "pitch": 1500, "rise": 5, "length": 0.07, "bright": 0.5, "soft": 0.15 },
+    "Tiny tick": { "pitch": 2600, "rise": 2, "length": 0.05, "bright": 0.3, "soft": 0 },
+    "Combo high": { "pitch": 2800, "rise": 8, "length": 0.085, "bright": 0.8, "soft": 0.3 }
+  }
+}

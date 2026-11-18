@@ -1,0 +1,39 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "menu-confirm",
+ "name": "Menu confirm",
+ "category": "ui",
+ "tags": ["menu", "confirm", "select", "bell"],
+ "description": "Choosing a command: two soft bell notes a fifth apart, the second higher, with a short glassy shimmer. Warm, round and the same every time.",
+ "meta": {
+  "type": "sfx",
+  "role": "interface/confirm",
+  "themes": ["fantasy", "neutral"],
+  "gameTypes": ["turn-based-rpg", "top-down-rpg", "roguelike-action", "card-game", "puzzle", "platformer", "arcade"],
+  "words": ["confirm", "select", "accept", "choose", "ok", "menu", "command", "bell", "chime", "yes", "button", "decide"],
+  "license": "draft"
+ },
+ "duration": "1/speed + ring*0.85 + 0.015",
+ "params": [
+  { "id": "pitch", "label": "Pitch", "min": 300, "max": 1200, "default": 520, "unit": "Hz", "scale": "log" },
+  { "id": "spread", "label": "Interval", "min": 2, "max": 12, "default": 7, "unit": "semitones" },
+  { "id": "speed", "label": "Speed", "min": 7, "max": 22, "default": 12, "unit": "notes/s" },
+  { "id": "ring", "label": "Ring", "min": 0.06, "max": 0.2, "default": 0.12, "unit": "s" },
+  { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.45 }
+ ],
+ "nodes": [
+  { "id": "clk", "type": "clock", "rate": "speed", "count": 2 },
+  { "id": "note", "type": "seq", "steps": ["pitch", "pitch*semi(spread)"], "trig": "clk" },
+  { "id": "amp", "type": "ad", "attack": 0.003, "decay": "ring", "curve": 2.6, "trig": "clk" },
+  { "id": "sine", "type": "osc", "freq": "note" },
+  { "id": "tri", "type": "osc", "wave": "tri", "freq": "note*2" },
+  { "id": "shimmer", "type": "modal", "in": "clk", "freq": "note*2", "ratios": [1, 2.76, 5.4], "gains": [1, 0.5, 0.25], "decay": "ring*0.9", "tilt": 0.8 },
+  { "id": "bell", "type": "expr", "expr": "sine*0.6 + tri*0.18*(0.3 + bright)" }
+ ],
+ "out": "bell*amp + shimmer*(0.04 + bright*0.2)",
+ "presets": {
+  "Confirm": { "pitch": 520, "spread": 7, "speed": 12, "ring": 0.12, "bright": 0.45 },
+  "Big confirm": { "pitch": 400, "spread": 7, "speed": 11, "ring": 0.15, "bright": 0.7 },
+  "Soft tick": { "pitch": 780, "spread": 4, "speed": 17, "ring": 0.09, "bright": 0.2 }
+ }
+}

@@ -1,0 +1,232 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "lever-clank",
+ "name": "Lever",
+ "category": "impact",
+ "tags": [
+  "lever",
+  "switch",
+  "ratchet",
+  "metal"
+ ],
+ "description": "A ratchet and a stop: two short metal clicks over a low wooden knock; change the pitch, gap, ring, weight and brightness.",
+ "meta": {
+  "type": "sfx",
+  "role": "world/lever",
+  "themes": [
+   "fantasy",
+   "dungeon"
+  ],
+  "gameTypes": [
+   "platformer",
+   "turn-based-rpg",
+   "puzzle"
+  ],
+  "words": [
+   "lever",
+   "switch",
+   "pull",
+   "clank",
+   "click",
+   "ratchet",
+   "gear",
+   "trap",
+   "lock",
+   "metal",
+   "activate",
+   "toggle"
+  ],
+  "license": "draft"
+ },
+ "duration": "max(0.15, gap + ring*0.65 + 0.03)",
+ "params": [
+  {
+   "id": "pitch",
+   "label": "Pitch",
+   "unit": "Hz",
+   "min": 500,
+   "max": 2400,
+   "default": 1100,
+   "scale": "log"
+  },
+  {
+   "id": "gap",
+   "label": "Gap",
+   "unit": "s",
+   "min": 0.02,
+   "max": 0.1,
+   "default": 0.06
+  },
+  {
+   "id": "ring",
+   "label": "Ring",
+   "unit": "s",
+   "min": 0.08,
+   "max": 0.3,
+   "default": 0.14,
+   "scale": "log"
+  },
+  {
+   "id": "weight",
+   "label": "Weight",
+   "min": 0,
+   "max": 1,
+   "default": 0.6
+  },
+  {
+   "id": "bright",
+   "label": "Brightness",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  }
+ ],
+ "nodes": [
+  {
+   "id": "c1",
+   "type": "clock",
+   "rate": 1,
+   "count": 1
+  },
+  {
+   "id": "c2",
+   "type": "clock",
+   "rate": 1,
+   "count": 1,
+   "delay": "gap*smooth(0.02,0.045,gap)"
+  },
+  {
+   "id": "n",
+   "type": "noise"
+  },
+  {
+   "id": "e1",
+   "type": "ad",
+   "attack": 0.0003,
+   "decay": 0.004,
+   "curve": 2,
+   "trig": "c1"
+  },
+  {
+   "id": "e2",
+   "type": "ad",
+   "attack": 0.0003,
+   "decay": 0.005,
+   "curve": 2,
+   "trig": "c2"
+  },
+  {
+   "id": "x1",
+   "type": "filter",
+   "mode": "lp",
+   "in": "n*e1",
+   "freq": "2500+9000*bright"
+  },
+  {
+   "id": "x2",
+   "type": "filter",
+   "mode": "lp",
+   "in": "n*e2",
+   "freq": "3500+9000*bright"
+  },
+  {
+   "id": "m1",
+   "type": "modal",
+   "in": "x1",
+   "freq": "pitch*1.15",
+   "ratios": [
+    1,
+    2.76,
+    5.4,
+    8.93
+   ],
+   "decay": "ring*0.45",
+   "tilt": 0.6
+  },
+  {
+   "id": "m2",
+   "type": "modal",
+   "in": "x2",
+   "freq": "pitch",
+   "ratios": [
+    1,
+    2.76,
+    5.4,
+    8.93
+   ],
+   "decay": "ring",
+   "tilt": 0.6
+  },
+  {
+   "id": "k1",
+   "type": "expr",
+   "expr": "smooth(0.02,0.045,gap)"
+  },
+  {
+   "id": "kf",
+   "type": "env",
+   "points": [
+    [
+     0,
+     190
+    ],
+    [
+     0.05,
+     80,
+     "exp"
+    ]
+   ],
+   "trig": "c2"
+  },
+  {
+   "id": "ko",
+   "type": "osc",
+   "wave": "tri",
+   "freq": "kf"
+  },
+  {
+   "id": "ka",
+   "type": "ad",
+   "attack": 0.0006,
+   "decay": "0.05+0.05*weight",
+   "curve": 2.2,
+   "trig": "c2"
+  },
+  {
+   "id": "summ",
+   "type": "expr",
+   "expr": "m1*0.5*k1 + m2*0.7 + (x1*k1*0.5 + x2*0.7) + ko*ka*weight*1.4"
+  },
+  {
+   "id": "hp",
+   "type": "filter",
+   "mode": "hp",
+   "in": "summ",
+   "freq": 40
+  }
+ ],
+ "out": "hp",
+ "presets": {
+  "Lever": {
+   "pitch": 1100,
+   "gap": 0.06,
+   "ring": 0.14,
+   "weight": 0.6,
+   "bright": 0.5
+  },
+  "Switch": {
+   "pitch": 1700,
+   "gap": 0.02,
+   "ring": 0.17,
+   "weight": 0,
+   "bright": 0.7
+  },
+  "Heavy gear": {
+   "pitch": 600,
+   "gap": 0.09,
+   "ring": 0.28,
+   "weight": 1,
+   "bright": 0.3
+  }
+ }
+}

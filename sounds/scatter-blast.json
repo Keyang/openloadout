@@ -1,0 +1,191 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "scatter-blast",
+ "name": "Scatter gun",
+ "category": "weapon",
+ "tags": [
+  "sci-fi",
+  "shotgun",
+  "blast"
+ ],
+ "description": "A wide, blunt shot: a broad noise burst, a low thump and a crushed click, all starting together and gone in a quarter of a second.",
+ "meta": {
+  "type": "sfx",
+  "role": "actions/shoot",
+  "themes": [
+   "sci-fi",
+   "space"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "shooter"
+  ],
+  "words": [
+   "scatter",
+   "shotgun",
+   "blast",
+   "shoot",
+   "gun",
+   "spread",
+   "boom",
+   "blunt",
+   "weapon",
+   "fire"
+  ],
+  "license": "draft"
+ },
+ "duration": "length+0.02",
+ "params": [
+  {
+   "id": "weight",
+   "label": "Weight",
+   "min": 0.6,
+   "max": 1.8,
+   "default": 1
+  },
+  {
+   "id": "spread",
+   "label": "Width",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  },
+  {
+   "id": "length",
+   "label": "Length",
+   "min": 0.16,
+   "max": 0.28,
+   "default": 0.22,
+   "unit": "s"
+  },
+  {
+   "id": "grit",
+   "label": "Grit",
+   "min": 0,
+   "max": 1,
+   "default": 0.4
+  },
+  {
+   "id": "bright",
+   "label": "Brightness",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  }
+ ],
+ "nodes": [
+  {
+   "id": "n",
+   "type": "noise"
+  },
+  {
+   "id": "band",
+   "type": "filter",
+   "mode": "bp",
+   "in": "n",
+   "freq": "(650+bright*1900)*rnd(0.93,1.07)",
+   "q": "1.8-spread*1.4"
+  },
+  {
+   "id": "nAmp",
+   "type": "ad",
+   "attack": 0.0008,
+   "decay": "length*0.85",
+   "curve": 2.4
+  },
+  {
+   "id": "tf",
+   "type": "env",
+   "points": [
+    [
+     0,
+     "130/weight*rnd(0.94,1.06)"
+    ],
+    [
+     0.07,
+     "50/weight",
+     "exp"
+    ]
+   ]
+  },
+  {
+   "id": "thump",
+   "type": "osc",
+   "freq": "tf"
+  },
+  {
+   "id": "tAmp",
+   "type": "ad",
+   "attack": 0.001,
+   "decay": "0.07+0.1*weight*length",
+   "curve": 2
+  },
+  {
+   "id": "ck",
+   "type": "noise"
+  },
+  {
+   "id": "ckHp",
+   "type": "filter",
+   "mode": "hp",
+   "in": "ck",
+   "freq": 1800
+  },
+  {
+   "id": "ckAmp",
+   "type": "ad",
+   "attack": 0.0003,
+   "decay": 0.006,
+   "curve": 2
+  },
+  {
+   "id": "ckCr",
+   "type": "crush",
+   "in": "ckHp*ckAmp",
+   "bits": "9-grit*5",
+   "rate": "14000-grit*9000"
+  },
+  {
+   "id": "sum",
+   "type": "expr",
+   "expr": "band*nAmp*(1.5+spread*0.8) + thump*tAmp*0.85 + ckCr*1.6"
+  },
+  {
+   "id": "sat",
+   "type": "shaper",
+   "in": "sum",
+   "drive": "1.4+grit*4"
+  },
+  {
+   "id": "clean",
+   "type": "filter",
+   "mode": "hp",
+   "in": "sat",
+   "freq": 30
+  }
+ ],
+ "out": "clean",
+ "presets": {
+  "Scatter gun": {
+   "weight": 1,
+   "spread": 0.5,
+   "length": 0.22,
+   "grit": 0.4,
+   "bright": 0.5
+  },
+  "Heavy slug": {
+   "weight": 1.7,
+   "spread": 0.1,
+   "length": 0.27,
+   "grit": 0.55,
+   "bright": 0.3
+  },
+  "Sawed-off": {
+   "weight": 1.25,
+   "spread": 1,
+   "length": 0.26,
+   "grit": 0.75,
+   "bright": 0.75
+  }
+ }
+}

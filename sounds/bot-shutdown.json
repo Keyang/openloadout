@@ -1,0 +1,57 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "bot-shutdown",
+  "name": "Robot shutdown",
+  "category": "impact",
+  "tags": ["sci-fi", "gritty", "robot", "death"],
+  "description": "A machine dying: a crushed pulse tone gliding down, chopped by a stutter that slows, ending in a crackle of sparks. Pitch, length, stutter, sparks and grit can be changed.",
+  "meta": {
+    "type": "sfx",
+    "role": "characters/death",
+    "themes": ["sci-fi", "space"],
+    "gameTypes": ["roguelike-action", "shooter", "arcade"],
+    "words": ["robot", "bot", "machine", "shutdown", "power down", "die", "death", "destroyed", "drone", "mech", "sparks", "malfunction", "crash"],
+    "license": "draft"
+  },
+  "duration": "length",
+  "params": [
+    { "id": "pitch", "label": "Pitch", "min": 250, "max": 1200, "default": 600, "unit": "Hz", "scale": "log" },
+    { "id": "length", "label": "Length", "min": 0.45, "max": 1.0, "default": 0.7, "unit": "s", "scale": "log" },
+    { "id": "stutter", "label": "Stutter", "min": 0, "max": 1, "default": 0.6 },
+    { "id": "sparks", "label": "Sparks", "min": 0, "max": 1, "default": 0.6 },
+    { "id": "grit", "label": "Grit", "min": 0, "max": 1, "default": 0.5 }
+  ],
+  "nodes": [
+    { "id": "glide", "type": "env", "points": [[0, "pitch"], ["length*0.8", "pitch/15", "exp"]] },
+    { "id": "wob", "type": "osc", "wave": "sine", "freq": 7 },
+    { "id": "jit", "type": "expr", "expr": "rnd(0.95, 1.06)" },
+    { "id": "pulseA", "type": "osc", "wave": "pulse", "width": 0.25, "freq": "glide*jit*(1 + wob*0.012)" },
+    { "id": "pulseB", "type": "osc", "wave": "saw", "freq": "glide*0.5" },
+    { "id": "tone", "type": "expr", "expr": "pulseA*0.8 + pulseB*0.2" },
+    { "id": "toneBrite", "type": "filter", "mode": "lp", "in": "tone", "freq": "glide*16 + 1800", "q": 1.2 },
+    { "id": "crushed", "type": "crush", "in": "toneBrite", "bits": "10 - grit*6.5", "rate": "9000 - grit*5500" },
+    { "id": "stutRate", "type": "env", "points": [[0, 34], ["length*0.8", 15, "exp"]] },
+    { "id": "stutSq", "type": "osc", "wave": "pulse", "width": "0.8 - 0.5*stutter", "freq": "stutRate" },
+    { "id": "gate", "type": "expr", "expr": "(1 - 0.45*stutter)*(1 - sqrt(stutter)*(0.5 - 0.5*stutSq))" },
+    { "id": "body", "type": "env", "points": [[0, 1], ["length*0.55", 0.85], ["length*0.8", 0.0]] },
+    { "id": "midBuzz", "type": "filter", "mode": "hp", "in": "crushed", "freq": 450, "q": 0.9 },
+    { "id": "main", "type": "expr", "expr": "(crushed*0.7 + midBuzz*1.1)*body" },
+    { "id": "spk", "type": "dust", "density": "(90 + 240*sparks) * (0.4 + 0.6*smooth(0.25, 0.7, t/length))", "spread": 1 },
+    { "id": "spkRing", "type": "filter", "mode": "bp", "in": "spk*2.5", "freq": 3600, "q": 3 },
+    { "id": "noiseBed", "type": "noise" },
+    { "id": "spkEnv", "type": "env", "points": [[0, 0.05], ["length*0.35", 0.18], ["length*0.62", 1], ["length*0.92", 0.5], ["length", 0, "exp"]] },
+    { "id": "spkSig", "type": "expr", "expr": "spkRing*spkEnv*sparks" },
+    { "id": "hit", "type": "ad", "attack": 0.0008, "decay": 0.02, "curve": 2.5 },
+    { "id": "click", "type": "expr", "expr": "noiseBed*hit*0.5" },
+    { "id": "sum", "type": "expr", "expr": "main*1.0 + spkSig*0.6 + click" },
+    { "id": "dirty", "type": "shaper", "in": "sum", "drive": "1.2 + grit*1.5", "mode": "tanh" },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "dirty", "freq": 30, "q": 0.7 },
+    { "id": "fade", "type": "env", "points": [[0, 1], ["length-0.06", 1], ["length", 0, "lin"]] }
+  ],
+  "out": "clean*gate*fade",
+  "presets": {
+    "Drone down": { "pitch": 1000, "length": 0.5, "stutter": 0.4, "sparks": 0.4, "grit": 0.3 },
+    "Bot shutdown": { "pitch": 600, "length": 0.7, "stutter": 0.6, "sparks": 0.6, "grit": 0.5 },
+    "Mech collapse": { "pitch": 320, "length": 0.95, "stutter": 0.8, "sparks": 0.9, "grit": 0.8 }
+  }
+}

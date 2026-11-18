@@ -1,0 +1,39 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "menu-move",
+ "name": "Menu move",
+ "category": "ui",
+ "tags": ["menu", "cursor", "tick", "hover"],
+ "description": "The cursor stepping to the next row: a tiny dry sine tick over a short wooden knock. Quiet, and the same every time.",
+ "meta": {
+  "type": "sfx",
+  "role": "interface/hover",
+  "themes": ["fantasy", "neutral"],
+  "gameTypes": ["turn-based-rpg", "top-down-rpg", "roguelike-action", "card-game", "puzzle", "platformer", "arcade"],
+  "words": ["menu", "cursor", "move", "hover", "tick", "select", "scroll", "tab", "page", "navigate", "highlight", "wooden"],
+  "license": "draft"
+ },
+ "duration": "length + 0.012",
+ "params": [
+  { "id": "pitch", "label": "Pitch", "min": 500, "max": 2400, "default": 1100, "unit": "Hz", "scale": "log" },
+  { "id": "length", "label": "Length", "min": 0.02, "max": 0.04, "default": 0.03, "unit": "s" },
+  { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.45 },
+  { "id": "snap", "label": "Snap", "min": 0, "max": 1, "default": 0.4 }
+ ],
+ "nodes": [
+  { "id": "blipAmp", "type": "ad", "attack": 0.0012, "decay": "length", "curve": 2.2 },
+  { "id": "blip", "type": "osc", "freq": "pitch" },
+  { "id": "blip2", "type": "osc", "freq": "pitch*2" },
+  { "id": "first", "type": "clock", "rate": 1, "count": 1 },
+  { "id": "knock", "type": "modal", "in": "first", "freq": "pitch*0.42", "ratios": [1, 2.4, 4.1], "gains": [1, 0.6, 0.3], "decay": "length*0.8", "tilt": 0.9 },
+  { "id": "hiss", "type": "noise" },
+  { "id": "brushAmp", "type": "ad", "attack": 0.002, "decay": "length*0.85", "curve": 1.6 },
+  { "id": "brush", "type": "filter", "mode": "bp", "in": "hiss*brushAmp", "freq": "2500 + bright*3000", "q": 0.9 }
+ ],
+ "out": "blip*blipAmp*0.55 + blip2*blipAmp*bright*0.2 + knock*(0.3 + snap*0.5) + brush*snap*snap*1.4",
+ "presets": {
+  "Cursor": { "pitch": 1100, "length": 0.03, "bright": 0.45, "snap": 0.4 },
+  "Page turn": { "pitch": 700, "length": 0.04, "bright": 0.8, "snap": 1 },
+  "Tab": { "pitch": 1700, "length": 0.025, "bright": 0.3, "snap": 0.2 }
+ }
+}

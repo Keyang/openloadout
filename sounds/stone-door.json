@@ -1,0 +1,52 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "stone-door",
+ "name": "Stone door",
+ "category": "impact",
+ "tags": ["door", "stone", "grind", "dungeon", "rumble"],
+ "description": "A heavy stone slab grinding open: a low rumble with a gritty scrape on top and a slow tremor, ending in one deep thud and a little room echo.",
+ "meta": {
+  "type": "sfx",
+  "role": "world/door",
+  "themes": ["fantasy", "dungeon"],
+  "gameTypes": ["turn-based-rpg", "top-down-rpg", "roguelike-action", "platformer"],
+  "words": ["door", "stone", "slab", "gate", "grind", "rumble", "open", "dungeon", "secret", "wall", "rock", "heavy", "boulder", "break"],
+  "license": "draft"
+ },
+ "duration": "length + 0.2 + space*0.5",
+ "params": [
+  { "id": "length", "label": "Length", "min": 0.45, "max": 1, "default": 0.8, "unit": "s", "scale": "log" },
+  { "id": "weight", "label": "Weight", "min": 0.6, "max": 1.6, "default": 1 },
+  { "id": "grit", "label": "Grind", "min": 0, "max": 1, "default": 0.6 },
+  { "id": "thump", "label": "Thud", "min": 0, "max": 1, "default": 0.7 },
+  { "id": "space", "label": "Room", "min": 0.05, "max": 0.45, "default": 0.2 }
+ ],
+ "nodes": [
+  { "id": "swell", "type": "env", "points": [[0, 0], [0.07, 1], ["length - 0.06", 0.9], ["length", 0, "exp"]] },
+  { "id": "n", "type": "noise", "color": "brown" },
+  { "id": "w", "type": "noise" },
+  { "id": "trem", "type": "osc", "freq": "rnd(3, 5)" },
+  { "id": "stutter", "type": "lag", "in": "w", "time": 0.012 },
+  { "id": "shake", "type": "expr", "expr": "0.55 + 0.4*trem + stutter*grit*0.5" },
+  { "id": "rumble", "type": "filter", "mode": "bp", "in": "n*swell*shake", "freq": "270/weight", "q": 1.4 },
+  { "id": "scrapeSrc", "type": "filter", "mode": "bp", "in": "w*swell*shake*shake", "freq": "(1300 + rnd(-150, 150))/pow(weight, 0.4)", "q": 1.6 },
+  { "id": "thudAt", "type": "clock", "rate": 1, "count": 1, "delay": "length" },
+  { "id": "thudPitch", "type": "env", "points": [[0, "95/pow(weight, 0.7)"], [0.12, "42/pow(weight, 0.7)", "exp"]], "trig": "thudAt" },
+  { "id": "thudOsc", "type": "osc", "freq": "thudPitch" },
+  { "id": "thudAmp", "type": "ad", "attack": 0.002, "decay": "0.16*weight", "curve": 2.2, "trig": "thudAt" },
+  { "id": "slapAmp", "type": "ad", "attack": 0.001, "decay": 0.04, "curve": 2, "trig": "thudAt" },
+  { "id": "slap", "type": "filter", "mode": "bp", "in": "w*slapAmp", "freq": 700, "q": 0.9 },
+  { "id": "rubbleDust", "type": "dust", "density": 220, "spread": 1 },
+  { "id": "rubbleAmp", "type": "ad", "attack": 0.01, "decay": "0.07 + grit*0.1", "curve": 1.6, "trig": "thudAt" },
+  { "id": "rubble", "type": "filter", "mode": "bp", "in": "rubbleDust*rubbleAmp", "freq": 2400, "q": 0.9 },
+  { "id": "dry", "type": "expr", "expr": "rumble*1.1 + scrapeSrc*(0.45 + grit*0.75)*pow(weight, 1.5) + thudOsc*thudAmp*thump*0.9 + slap*thump*0.5 + rubble*grit*grit*8" },
+  { "id": "wet", "type": "reverb", "in": "dry", "size": 0.7, "damp": 0.5, "mix": "space" },
+  { "id": "clean", "type": "filter", "mode": "hp", "in": "wet", "freq": 30 }
+ ],
+ "out": "clean*(1 - smooth(dur - 0.15, dur - 0.005, t))",
+ "presets": {
+  "Dungeon door": { "length": 0.8, "weight": 1, "grit": 0.6, "thump": 0.7, "space": 0.2 },
+  "Sealed gate": { "length": 1, "weight": 1.5, "grit": 0.45, "thump": 1, "space": 0.35 },
+  "Secret wall": { "length": 0.48, "weight": 0.75, "grit": 1, "thump": 0.45, "space": 0.1 }
+ }
+}

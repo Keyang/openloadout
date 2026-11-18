@@ -1,0 +1,270 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "shield-break",
+ "name": "Shield break",
+ "category": "impact",
+ "tags": [
+  "sci-fi",
+  "shield",
+  "break",
+  "glass"
+ ],
+ "description": "An energy shield failing: a crushed saw sweeping down, a spray of glassy shards and a sub drop at the start.",
+ "meta": {
+  "type": "sfx",
+  "role": "effects/impact",
+  "themes": [
+   "sci-fi",
+   "space"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "shooter"
+  ],
+  "words": [
+   "shield",
+   "break",
+   "shatter",
+   "crack",
+   "glass",
+   "energy",
+   "overload",
+   "crate",
+   "fail",
+   "smash",
+   "barrier"
+  ],
+  "license": "draft"
+ },
+ "duration": "length+0.05",
+ "params": [
+  {
+   "id": "pitch",
+   "label": "Pitch",
+   "min": 600,
+   "max": 3000,
+   "default": 1500,
+   "unit": "Hz",
+   "scale": "log"
+  },
+  {
+   "id": "length",
+   "label": "Length",
+   "min": 0.15,
+   "max": 0.72,
+   "default": 0.55,
+   "unit": "s",
+   "scale": "log"
+  },
+  {
+   "id": "shards",
+   "label": "Shards",
+   "min": 0.1,
+   "max": 1,
+   "default": 0.6
+  },
+  {
+   "id": "grit",
+   "label": "Grit",
+   "min": 0,
+   "max": 1,
+   "default": 0.4
+  },
+  {
+   "id": "bright",
+   "label": "Brightness",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  }
+ ],
+ "nodes": [
+  {
+   "id": "sw",
+   "type": "env",
+   "points": [
+    [
+     0,
+     "pitch"
+    ],
+    [
+     "length",
+     "pitch/15",
+     "exp"
+    ]
+   ]
+  },
+  {
+   "id": "saw",
+   "type": "osc",
+   "wave": "saw",
+   "freq": "sw"
+  },
+  {
+   "id": "sAmp",
+   "type": "ad",
+   "attack": 0.002,
+   "decay": "length*0.95",
+   "curve": 1.8
+  },
+  {
+   "id": "cr",
+   "type": "crush",
+   "in": "saw*sAmp",
+   "bits": "10-grit*6",
+   "rate": "20000-grit*14000"
+  },
+  {
+   "id": "sf",
+   "type": "env",
+   "points": [
+    [
+     0,
+     "1500+bright*5000"
+    ],
+    [
+     "length",
+     "300",
+     "exp"
+    ]
+   ]
+  },
+  {
+   "id": "sl",
+   "type": "filter",
+   "mode": "lp",
+   "in": "cr",
+   "freq": "sf",
+   "q": 0.8
+  },
+  {
+   "id": "dst",
+   "type": "dust",
+   "density": "8+shards*70",
+   "spread": 1
+  },
+  {
+   "id": "dAmp",
+   "type": "env",
+   "points": [
+    [
+     0,
+     1
+    ],
+    [
+     "length",
+     0,
+     1.5
+    ]
+   ]
+  },
+  {
+   "id": "g1",
+   "type": "modal",
+   "in": "dst*dAmp",
+   "freq": "3100*rnd(0.9,1.1)",
+   "ratios": [
+    1,
+    2.14,
+    3.9,
+    5.7
+   ],
+   "decay": 0.12,
+   "tilt": 0.6
+  },
+  {
+   "id": "g2",
+   "type": "modal",
+   "in": "dst*dAmp",
+   "freq": "5200*rnd(0.9,1.1)",
+   "ratios": [
+    1,
+    1.8,
+    3.1,
+    4.4
+   ],
+   "decay": 0.09,
+   "tilt": 0.6
+  },
+  {
+   "id": "sf2",
+   "type": "env",
+   "points": [
+    [
+     0,
+     "140"
+    ],
+    [
+     0.14,
+     "38",
+     "exp"
+    ]
+   ]
+  },
+  {
+   "id": "sub",
+   "type": "osc",
+   "freq": "sf2"
+  },
+  {
+   "id": "subAmp",
+   "type": "ad",
+   "attack": 0.001,
+   "decay": "0.14",
+   "curve": 2
+  },
+  {
+   "id": "pn",
+   "type": "noise"
+  },
+  {
+   "id": "pk",
+   "type": "ad",
+   "attack": 0.0004,
+   "decay": 0.008,
+   "curve": 2
+  },
+  {
+   "id": "sum",
+   "type": "expr",
+   "expr": "sl*sAmp*1.2 + (g1+g2*bright)*shards*0.9 + sub*subAmp*1.1 + pn*pk*0.6"
+  },
+  {
+   "id": "sat",
+   "type": "shaper",
+   "in": "sum",
+   "drive": "1.2+grit*2.5"
+  },
+  {
+   "id": "clean",
+   "type": "filter",
+   "mode": "hp",
+   "in": "sat",
+   "freq": 30
+  }
+ ],
+ "out": "clean",
+ "presets": {
+  "Shield break": {
+   "pitch": 1500,
+   "length": 0.55,
+   "shards": 0.6,
+   "grit": 0.4,
+   "bright": 0.5
+  },
+  "Small crack": {
+   "pitch": 1800,
+   "length": 0.16,
+   "shards": 0.8,
+   "grit": 0.2,
+   "bright": 0.8
+  },
+  "Overload": {
+   "pitch": 2300,
+   "length": 0.72,
+   "shards": 0.3,
+   "grit": 0.95,
+   "bright": 0.6
+  }
+ }
+}

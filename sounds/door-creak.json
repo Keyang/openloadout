@@ -1,0 +1,320 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "door-creak",
+ "name": "Door creak",
+ "category": "movement",
+ "tags": [
+  "door",
+  "creak",
+  "hinge",
+  "wood"
+ ],
+ "description": "An old door swinging on dry hinges that ends in a low wooden thunk; change the length, pitch, squeak, thunk and brightness.",
+ "meta": {
+  "type": "sfx",
+  "role": "world/door",
+  "themes": [
+   "fantasy",
+   "dungeon"
+  ],
+  "gameTypes": [
+   "platformer",
+   "turn-based-rpg",
+   "top-down-rpg"
+  ],
+  "words": [
+   "door",
+   "creak",
+   "hinge",
+   "open",
+   "squeak",
+   "gate",
+   "wooden",
+   "spooky",
+   "thunk",
+   "entrance",
+   "enter",
+   "hatch"
+  ],
+  "license": "draft"
+ },
+ "duration": "length",
+ "params": [
+  {
+   "id": "length",
+   "label": "Length",
+   "unit": "s",
+   "min": 0.5,
+   "max": 1,
+   "default": 0.75,
+   "scale": "log"
+  },
+  {
+   "id": "pitch",
+   "label": "Pitch",
+   "unit": "Hz",
+   "min": 90,
+   "max": 200,
+   "default": 130,
+   "scale": "log"
+  },
+  {
+   "id": "squeak",
+   "label": "Squeak",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  },
+  {
+   "id": "thunk",
+   "label": "Thunk",
+   "min": 0,
+   "max": 1,
+   "default": 0.7
+  },
+  {
+   "id": "bright",
+   "label": "Brightness",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  }
+ ],
+ "nodes": [
+  {
+   "id": "ck",
+   "type": "clock",
+   "rate": 30,
+   "jitter": 0.5
+  },
+  {
+   "id": "wr",
+   "type": "rand",
+   "lo": -1,
+   "hi": 1,
+   "trig": "ck"
+  },
+  {
+   "id": "wl",
+   "type": "lag",
+   "in": "wr",
+   "time": 0.035
+  },
+  {
+   "id": "gr",
+   "type": "rand",
+   "lo": 0.3,
+   "hi": 1,
+   "trig": "ck"
+  },
+  {
+   "id": "gl",
+   "type": "lag",
+   "in": "gr",
+   "time": 0.007
+  },
+  {
+   "id": "cf",
+   "type": "env",
+   "points": [
+    [
+     0,
+     "pitch*0.85"
+    ],
+    [
+     "(length-0.13)*0.5",
+     "pitch*1.25",
+     "lin"
+    ],
+    [
+     "(length-0.13)",
+     "pitch*0.95",
+     "lin"
+    ]
+   ]
+  },
+  {
+   "id": "pw",
+   "type": "osc",
+   "wave": "pulse",
+   "freq": "cf*(1+0.3*wl)",
+   "width": "0.12+0.2*(1-squeak)"
+  },
+  {
+   "id": "bf",
+   "type": "env",
+   "points": [
+    [
+     0,
+     "800+300*bright"
+    ],
+    [
+     "(length-0.13)*0.5",
+     "1100+700*squeak+800*bright",
+     "lin"
+    ],
+    [
+     "(length-0.13)",
+     "850+300*bright",
+     "lin"
+    ]
+   ]
+  },
+  {
+   "id": "band",
+   "type": "filter",
+   "mode": "bp",
+   "in": "pw",
+   "freq": "bf*(1+0.15*wl)",
+   "q": "3+7*squeak"
+  },
+  {
+   "id": "amp",
+   "type": "env",
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     "(length-0.13)*0.3",
+     1,
+     "lin"
+    ],
+    [
+     "(length-0.13)*0.6",
+     0.85,
+     "lin"
+    ],
+    [
+     "(length-0.13)",
+     0.1,
+     "lin"
+    ],
+    [
+     "(length-0.13)+0.015",
+     0,
+     "lin"
+    ]
+   ]
+  },
+  {
+   "id": "creakSig",
+   "type": "expr",
+   "expr": "band*amp*gl"
+  },
+  {
+   "id": "tc",
+   "type": "clock",
+   "rate": 1,
+   "count": 1,
+   "delay": "(length-0.13)+0.01"
+  },
+  {
+   "id": "tf",
+   "type": "env",
+   "points": [
+    [
+     0,
+     "pitch*0.7"
+    ],
+    [
+     0.12,
+     "pitch*0.33",
+     "exp"
+    ]
+   ],
+   "trig": "tc"
+  },
+  {
+   "id": "tsine",
+   "type": "osc",
+   "wave": "sine",
+   "freq": "tf"
+  },
+  {
+   "id": "tamp",
+   "type": "ad",
+   "attack": 0.0008,
+   "decay": 0.12,
+   "curve": 2.2,
+   "trig": "tc"
+  },
+  {
+   "id": "tn",
+   "type": "noise"
+  },
+  {
+   "id": "tex",
+   "type": "ad",
+   "attack": 0.0004,
+   "decay": 0.01,
+   "curve": 2,
+   "trig": "tc"
+  },
+  {
+   "id": "tknock",
+   "type": "modal",
+   "in": "tn*tex",
+   "freq": "pitch*2.4",
+   "ratios": [
+    1,
+    2.2,
+    3.7
+   ],
+   "decay": 0.1,
+   "tilt": 0.9
+  },
+  {
+   "id": "tclick",
+   "type": "filter",
+   "mode": "bp",
+   "in": "tn*tex",
+   "freq": 1800,
+   "q": 1.5
+  },
+  {
+   "id": "summ",
+   "type": "expr",
+   "expr": "creakSig*1.6 + (tsine*tamp*0.9 + tknock*0.5 + tclick*0.5)*thunk"
+  },
+  {
+   "id": "lp",
+   "type": "filter",
+   "mode": "lp",
+   "in": "summ",
+   "freq": "3000+9000*bright"
+  },
+  {
+   "id": "hp",
+   "type": "filter",
+   "mode": "hp",
+   "in": "lp",
+   "freq": 40
+  }
+ ],
+ "out": "hp",
+ "presets": {
+  "Wooden door": {
+   "length": 0.75,
+   "pitch": 130,
+   "squeak": 0.5,
+   "thunk": 0.7,
+   "bright": 0.5
+  },
+  "Rusty gate": {
+   "length": 1,
+   "pitch": 170,
+   "squeak": 1,
+   "thunk": 0.2,
+   "bright": 0.8
+  },
+  "Quick hatch": {
+   "length": 0.5,
+   "pitch": 100,
+   "squeak": 0.2,
+   "thunk": 1,
+   "bright": 0.35
+  }
+ }
+}
