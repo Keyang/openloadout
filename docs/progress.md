@@ -41,19 +41,19 @@ Status: todo · building · review · fixing · done · blocked
 |---|---|---|---|---|---|
 | W1-R | Research top 100 2D games, pick three game types, outline each bundle | G1, D7 | opus | done | `docs/game-types-research.md`. Top three of 100: platformer 25, turn-based RPG 10, roguelike action 8 (tied with adventure / visual novel at 8; chosen because it is rising on Steam and needs more sprites). Two of the three are top-down |
 | W1-A | Metadata schema, backfill 27 assets, bundles format, build → catalogue, thumbnails, strips | FIND-1, BASE-8, BAG-6 | opus | done | Committed `ed82fe5`. 50 tests. Review passed after one round of fixes. Game types are now `platformer`, `turn-based-rpg`, `roguelike-action` plus six others |
-| W1-B | Search: index builder, keyword + meaning search library, browser client, test set and evaluation | FIND-2, 8, 9, 10 | fable | building | |
+| W1-B | Search: index builder, keyword + meaning search library, browser client, test set and evaluation | FIND-2, 8, 9, 10 | fable | review | Builder done (38 min, 335k tokens): 35 unit and 6 browser tests. Top-5 on 100 test searches: keywords 91%, keywords plus model 98%. The model missed the design's pass mark (+14 where +15 was asked and 14 was the ceiling; +5 on 40 held-out searches). Meaning level costs 38.5 MB (model 23.7, runtime 14.3). Orchestrator decision: ship the meaning level, loaded only when someone searches; a static 8 MB model at 96% is the follow-up. Wired into the build by the orchestrator |
 | W1-C | Test setup: static server, Playwright harness, smoke tests of today's pages, engine unit tests | BASE-7 | sonnet | done | Committed `99c2ea0`. 53 unit and 70 browser tests. Three review rounds; round 2 caught all 5 planted bugs and found one flaky test, since fixed and repeated 84 times clean by the orchestrator |
-| W1-D | Quality bar as a shared library, new checks, written bar and review protocol | ASSET-1, 12, 13 | opus | review | Builder done (19 min, 269k tokens): 52 tests pass; the new checker fails 5 of the 7 existing sprites on real issues (controls that do nothing in some settings, changes too small to see). Independent reviewer running |
+| W1-D | Quality bar as a shared library, new checks, written bar and review protocol | ASSET-1, 12, 13 | opus | fixing | Review round 1: FAIL with ten required fixes (pixel thresholds that scale with sprite size, dead-control rule with `when`, seam rule, grouped errors, speed with workers and a cache, gaps in both documents). Sent back with two additions |
 
 ### Wave 2: the product (after wave 1)
 
 | Id | Task | Features | Status |
 |---|---|---|---|
-| W2-A | Site reads the catalogue; search-first home, results with filters, sticky style filter, "goes with" | FIND-2, 3, 4, 5, 7 | todo |
-| W2-B | Parts in the framework and on the sprite page; Hero's weapon as the worked example (fable) | MAKE-8, EDIT-7 | building |
-| W2-C | Bag and export chooser (opus) | BAG-1, BAG-2 | building |
-| W2-D | Themes. D1: colour and sound engines (opus) — in review: 31 tests pass; 14 presets and 11 palettes; the orchestrator looked at the Hero and Slime under every preset and they read well. D2: bundle page with whole-bundle controls — todo | EDIT-6, BAG-6 | review |
-| W2-E | Playground | BAG-3 | todo |
+| W2-A | Site reads the catalogue; search-first home, results with filters, sticky style filter, cards that load nothing until seen (fable) | FIND-2, 3, 4, 5, 7 | building |
+| W2-B | Parts in the framework and on the sprite page; Hero's weapon as the worked example (fable) | MAKE-8, EDIT-7 | review — builder done (26 min, 375k tokens): 51 unit and 66 browser tests; Hero and Wizard pass the checker; orchestrator viewed the Hero's attack with a long, angled sword |
+| W2-C | Bag and export chooser (opus) | BAG-1, BAG-2 | review — builder done (12.5 min, 220k tokens): bag kept in the browser, add / update / remove, shareable bag link, zip package with a manifest and the look applied, Unity option shown as unavailable; 19 unit and 8 browser tests. Not yet wired into the sprite page |
+| W2-D | Themes. D1 engines — done (`ed2a65e`). D2: bundle page with whole-bundle controls, also on the bag page (opus) — building | EDIT-6, BAG-6 | building |
+| W2-E | Playground: side view and top-down, roles from metadata (fable) | BAG-3 | building |
 | W2-F | Skill update: metadata, parts, new asset kinds, quality bar | MAKE-1 | todo |
 
 ### Wave 3: content (after W1-R, W1-A, W1-D, W2-B, W2-F)
@@ -90,3 +90,7 @@ Times are read from the clock or from commit times. Entries before 16:27 were fi
 | 16:32 | W1-D builder finished; orchestrator re-ran its 52 tests and the checker (2 of 7 existing sprites pass the new bar). Reviewer launched. W3-S art direction launched: style guide plus one specification and batch plan per bundle. |
 | 16:34 | W2-D1 theme engines finished (8.5 min, 188k tokens); 31 tests pass; orchestrator viewed the preset sheet. Reviewer launched. W2-C bag and export launched. |
 | 16:37 | W1-C committed (`99c2ea0`) after the flaky reload test was fixed and verified (84 repeats clean, full suite 70 pass). |
+| 16:39 | W2-D1 review: FAIL, narrowly. Sound brightness is not monotonic for 4 of 19 sounds and shifts loudness by up to 12 dB. Six fixes sent to the builder. |
+| 16:44 | W1-D review: FAIL with ten fixes; sent back. Contract 3 extended (`when` on controls and on sounds; `none` may be a list). W2-B first pass finished (19 min, 329k tokens) and resumed for the extension. W2-D1 fixes verified (34 tests) and committed (`ed2a65e`). |
+| 16:49 | W2-C builder finished; orchestrator re-ran its tests; reviewer launched. Orchestrator wrote `app/catalog.js` (the one reader of the catalogue) and lazy routes for `#/bundle/<id>` and `#/play`. Launched W2-D2 bundle page and W2-E playground. |
+| 16:54 | W1-B search and W2-B parts builders finished; reviewers launched for both. Orchestrator wired the embedding model and a combined `generated/sounds.json` into the build (27 assets index in 0.2 s, 128 KB). W2-A catalogue-driven site launched. A permanent test server now runs on port 5199 because parallel test runs were stopping each other's. Unit suite: 297 of 303 pass; the 6 failures are the quality-bar command-line tests, whose builder is mid-fix. |

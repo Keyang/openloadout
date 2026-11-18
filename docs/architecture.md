@@ -77,7 +77,7 @@ Tilesets, backgrounds, interface pieces, projectiles and icons use the same `def
 | Asset | How it is expressed |
 |---|---|
 | Static prop or icon | One clip with `frames: 1` (give it a second animated clip when it makes sense: a chest has `closed` and `open`) |
-| Tileset | One clip per tile (`ground-top`, `ground-fill`, `ledge-left`, `ledge-right`, `wall`, ...), 16x16 or 32x32 frames. `meta.type: 'tileset'`. Tiles must join seamlessly with their neighbours |
+| Tileset | One clip per tile (`ground-top`, `ground-fill`, `ledge-left`, `ledge-right`, `wall`, ...), 16x16 or 32x32 frames. `meta.type: 'tileset'`. Tiles must join seamlessly with their neighbours. The checker works out which tiles sit next to which from the clip names (`-fill`, `-top`, `-left`, `-right`); `docs/style-guide.md` lists the exact names |
 | Background layer | A wide frame (for example 192x108) that tiles horizontally; clips are layers (`far`, `mid`, `near`) |
 | Interface piece | Clips are states (`normal`, `hover`, `pressed`) |
 | Top-down character | Clips per direction: `idle_down`, `walk_down`, `walk_up`, `walk_side` (side faces right; games mirror it) |
@@ -97,7 +97,22 @@ parts: {
 },
 ```
 
-The site shows each part as its own block of controls under the sprite's, and hides a part's other controls when its selector is at the `none` value. The checker confirms every listed key exists and that each part control changes the picture.
+`none` may be one value or a list of values. The selector is a choice or an on/off control (for an on/off control the part is removed when it is off).
+
+The site shows each part as its own block of controls under the sprite's, and hides a part's other controls when its selector is at a `none` value. The checker confirms every listed key exists and that each part control changes the picture.
+
+**Controls that only matter sometimes.** Any control, in a part or not, may say when it is in effect:
+
+```js
+inlay: color('Emblem colour', '#c9423a', [...], { when: { emblem: ['star', 'heart', 'gem'] } }),   // only when emblem is one of these
+hair:  color('Hair', '#5a3a22', HAIR, { when: { headgear: ['none', 'crown'] } }),                  // hidden under a full helmet
+```
+
+`when` maps other control keys to the values (a list) for which this control is in effect; every listed key must match. `engine/sprite.js` exports `inEffect(sprite, key, p)` and `activeParams(sprite, p)`, which take both parts and `when` into account. The site hides a control that is not in effect. The checker requires a control to change the picture whenever it is in effect, and accepts no change when it is not. A control that does nothing in some setting and does not declare it is an error: either make it do something or declare `when`.
+
+**Sounds that only apply sometimes.** An entry in a sprite's `sounds` list may carry the same `when`: `{ sound: 'sword-slash', frame: 3, when: { weapon: ['sword', 'axe', 'spear'] } }`. `cueInEffect(sprite, cue, p)` tells the site and the export whether to play or include it.
+
+**What the export says about parts.** `renderSheet` writes `parts: { weapon: { label, socket, present, settings } }` and, when the sprite provides `sockets(clip, t, p)`, a `sockets` object on every frame: `{ hand: { x, y, angle }, ... }` in sheet pixels from the frame's top-left, angle in radians (0 down, PI/2 facing, PI up). A game can attach or swap a part at run time from these.
 
 ## Contract 4: the catalogue file
 
@@ -185,7 +200,7 @@ theme = {
 
 ## Contract 10: the quality bar
 
-`quality/sprite.js` exports `checkSprite(def, { soundIndex }) -> { errors: [], warnings: [], metrics: {} }` and `quality/sound.js` exports `checkSound(patch) -> { errors, warnings, metrics }`. Pure JS, no file access, so the same checks run in the build and in a browser. `tools/check.mjs` and `tools/sfx.mjs` are thin command-line wrappers. `docs/quality-bar.md` is the written bar; `docs/review-protocol.md` is how an independent reviewer judges look and sound from renders and measurements.
+`quality/sprite.js` exports `checkSprite(def, { soundIndex, validateMeta }) -> { errors: [], warnings: [], metrics: {} }` and `quality/sound.js` exports `checkSound(patch, { validateMeta }) -> { errors, warnings, notes, metrics }`. `validateMeta` is `catalog/schema.js`'s function, called with the kind `'sprite'`, `'sound'` or `'music'`. Pure JS, no file access, so the same checks run in the build and in a browser. `tools/check.mjs` and `tools/sfx.mjs` are thin command-line wrappers. `docs/quality-bar.md` is the written bar; `docs/review-protocol.md` is how an independent reviewer judges look and sound from renders and measurements.
 
 ## Routes of the site (after wave 2)
 

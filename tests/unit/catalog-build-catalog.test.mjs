@@ -59,9 +59,9 @@ test('sprite rows: src, description from blurb, derived tech, thumb and strip', 
     assert.ok(Number.isInteger(c.fps) && c.fps >= 1);
   }
   assert.equal(k.tech.controls, Object.keys(def.params).length);
-  assert.deepEqual(k.tech.parts, []);
-  // distinct sound ids used by the sprite's animations: footstep-gravel, jump, sword-slash, punch
-  assert.equal(k.tech.sounds, 4);
+  // parts and sounds are derived from the sprite's own declaration, whatever it currently is
+  assert.deepEqual(k.tech.parts, Object.keys(def.parts ?? {}));
+  assert.equal(k.tech.sounds, new Set(Object.values(def.sounds ?? {}).flat().map((c) => c.sound)).size);
   assert.equal(k.thumb, 'generated/thumbs/knight.png');
   assert.equal(k.strip, 'generated/strips/knight.png');
   assert.equal(k.stripFrames, def.clips[def.preview].frames);

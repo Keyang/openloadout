@@ -9,7 +9,7 @@
 //   vendor      vendor/, when tools/lib/vendor.mjs exists
 //   dist        with --dist: the publishable site copied to dist/
 //
-//   node tools/build.mjs [--root <dir>] [--dist] [--skip-quality] [--skip-search] [--skip-vendor] [--force]
+//   node tools/build.mjs [--root <dir>] [--dist] [--skip-quality] [--no-cache] [--skip-search] [--skip-vendor] [--force]
 //
 // --root builds another copy of the project (the tests use it). --force redraws every picture.
 import fs from 'node:fs';
@@ -22,7 +22,7 @@ import { validateMeta, validateBundle } from '../catalog/schema.js';
 
 const args = process.argv.slice(2);
 const has = (f) => args.includes(f);
-const USAGE = 'usage: node tools/build.mjs [--root <folder>] [--dist] [--skip-quality] [--skip-search] [--skip-vendor] [--force]';
+const USAGE = 'usage: node tools/build.mjs [--root <folder>] [--dist] [--skip-quality] [--no-cache] [--skip-search] [--no-meaning] [--skip-vendor] [--force]';
 const rootArg = args.indexOf('--root');
 if (rootArg >= 0 && (!args[rootArg + 1] || args[rootArg + 1].startsWith('--'))) {
   console.error(`--root needs a folder.\n${USAGE}`);
@@ -88,7 +88,10 @@ await step('catalogue', async () => {
   const out = path.join(root, 'generated', 'catalog.json');
   fs.mkdirSync(path.dirname(out), { recursive: true });
   fs.writeFileSync(out, JSON.stringify(catalog) + '\n');
-  return `${catalog.assets.length} assets, ${catalog.bundles.length} bundles -> ${rel(out)} (${(fs.statSync(out).size / 1024).toFixed(1)} KB)`;
+  // every sound and music patch in one file, so the site makes one request instead of one per sound
+  const all = path.join(root, 'generated', 'sounds.json');
+  fs.writeFileSync(all, JSON.stringify({ version: 1, patches: loaded.sounds.map((s) => s.patch) }) + '\n');
+  return `${catalog.assets.length} assets, ${catalog.bundles.length} bundles -> ${rel(out)} (${(fs.statSync(out).size / 1024).toFixed(1)} KB), ${rel(all)} (${(fs.statSync(all).size / 1024).toFixed(1)} KB)`;
 });
 
 // ---- thumbnails and strips -------------------------------------------------------------
@@ -100,24 +103,19 @@ await step('thumbnails', async () => {
 // ---- quality -----------------------------------------------------------------------
 await step('quality', async () => {
   if (has('--skip-quality')) return 'skipped (--skip-quality)';
-  if (!exists('quality/sprite.js')) return 'not run: quality/sprite.js does not exist yet';
-  const { checkSprite } = await importFrom('quality/sprite.js');
-  const checkSound = exists('quality/sound.js') ? (await importFrom('quality/sound.js')).checkSound : null;
-  const soundIndex = new Map(loaded.sounds.map((s) => [s.id, s.patch]));
+  if (!exists('quality/sprite.js') || !exists('quality/sound.js')) return 'not run: quality/sprite.js or quality/sound.js does not exist yet';
+  // worker threads, and a cache keyed by each asset and the code it depends on (tools/lib/quality-run.mjs)
+  const { runQuality } = await import(pathToFileURL(path.join(ROOT, 'tools', 'lib', 'quality-run.mjs')).href);
+  const run = await runQuality({ root, cache: !has('--no-cache') });
   const errors = [];
-  let warnings = 0, checked = 0;
-  for (const s of loaded.sprites) {
-    const r = checkSprite(s.def, { soundIndex });
-    checked++; warnings += r.warnings?.length ?? 0;
-    for (const e of r.errors ?? []) errors.push(`${s.file}: ${e}`);
+  let warnings = 0;
+  for (const r of run.results) {
+    warnings += r.warnings?.length ?? 0;
+    for (const e of r.errors ?? []) errors.push(`${r.file}: ${e}`);
   }
-  if (checkSound) for (const s of loaded.sounds) {
-    const r = checkSound(s.patch);
-    checked++; warnings += r.warnings?.length ?? 0;
-    for (const e of r.errors ?? []) errors.push(`${s.file}: ${e}`);
-  }
-  if (errors.length) stop(`${errors.length} asset${errors.length > 1 ? 's do' : ' does'} not meet the quality bar`, errors);
-  return `${checked} assets checked, ${warnings} warnings`;
+  if (errors.length) stop(`${errors.length} problem${errors.length > 1 ? 's' : ''} with the quality bar`, errors);
+  const cached = run.results.filter((r) => r.cached).length;
+  return `${run.results.length} assets checked (${cached} unchanged, from the cache), ${warnings} warnings${run.notice ? `; ${run.notice}` : ''}`;
 });
 
 // ---- search index ----------------------------------------------------------------------
@@ -126,8 +124,21 @@ await step('search', async () => {
   if (!exists('tools/lib/search-index.mjs')) return 'not built: tools/lib/search-index.mjs does not exist yet';
   const { buildSearchIndex } = await importFrom('tools/lib/search-index.mjs');
   const outFile = path.join(root, 'generated', 'search.sqlite');
-  await buildSearchIndex({ assets: catalog.assets, outFile });
-  return `-> ${rel(outFile)} (${(fs.statSync(outFile).size / 1024).toFixed(1)} KB)`;
+  // Search by meaning needs one vector per asset from the embedding model (tools/lib/embed.mjs).
+  // --no-meaning builds a keyword-only index; the site then stops at the keywords level.
+  let embed = null, note = 'keywords only';
+  if (!has('--no-meaning') && exists('tools/lib/embed.mjs')) {
+    try {
+      const { createEmbedder } = await importFrom('tools/lib/embed.mjs');
+      const e = await createEmbedder();
+      embed = e.embed;
+      note = 'keywords and meaning';
+    } catch (e) {
+      note = `keywords only (the embedding model could not be loaded: ${e.message})`;
+    }
+  }
+  await buildSearchIndex({ assets: catalog.assets, outFile, embed });
+  return `-> ${rel(outFile)} (${(fs.statSync(outFile).size / 1024).toFixed(1)} KB, ${note})`;
 });
 
 // ---- vendor ----------------------------------------------------------------------------
