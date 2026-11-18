@@ -13,7 +13,7 @@ Started 2026-11-18 16:05. The orchestrator updates this file at every step. A ne
 
 ## Decisions from Keyang (2026-11-18)
 
-- Game types: chosen by research on the top 100 2D games (task W1-R).
+- Game types: chosen by research on the top 100 2D games (task W1-R). Result: **platformer** (side view, fantasy), **turn-based RPG** (top-down overworld, side-view battles, fantasy), **roguelike action** (top-down, sci-fi). Bundle ids: `kit-platformer-fantasy`, `kit-rpg-fantasy`, `kit-roguelite-scifi`.
 - Bundle size: 40–50 sprites, 20 sounds, 2 music tracks each.
 - "Play" is a playground for trying bag assets, not fixed template games.
 - Export: the user chooses zip or Unity package; Unity is "coming later" and not built in this loop.
@@ -39,11 +39,11 @@ Status: todo · building · review · fixing · done · blocked
 
 | Id | Task | Features | Owner model | Status | Notes |
 |---|---|---|---|---|---|
-| W1-R | Research top 100 2D games, pick three game types, outline each bundle | G1, D7 | opus | todo | |
-| W1-A | Metadata schema, backfill 27 assets, bundles format, build → catalogue, thumbnails, strips | FIND-1, BASE-8, BAG-6 | opus | todo | |
-| W1-B | Search: index builder, keyword + meaning search library, browser client, test set and evaluation | FIND-2, 8, 9, 10 | fable | todo | |
-| W1-C | Test setup: static server, Playwright harness, smoke tests of today's pages, engine unit tests | BASE-7 | sonnet | todo | |
-| W1-D | Quality bar as a shared library, new checks, written bar and review protocol | ASSET-1, 12, 13 | opus | todo | |
+| W1-R | Research top 100 2D games, pick three game types, outline each bundle | G1, D7 | opus | done | `docs/game-types-research.md`. Top three of 100: platformer 25, turn-based RPG 10, roguelike action 8 (tied with adventure / visual novel at 8; chosen because it is rising on Steam and needs more sprites). Two of the three are top-down |
+| W1-A | Metadata schema, backfill 27 assets, bundles format, build → catalogue, thumbnails, strips | FIND-1, BASE-8, BAG-6 | opus | building | |
+| W1-B | Search: index builder, keyword + meaning search library, browser client, test set and evaluation | FIND-2, 8, 9, 10 | fable | building | |
+| W1-C | Test setup: static server, Playwright harness, smoke tests of today's pages, engine unit tests | BASE-7 | sonnet | review | Builder done: 53 unit tests and 58 browser tests pass (re-run by the orchestrator). Independent reviewer running, with a mutation check |
+| W1-D | Quality bar as a shared library, new checks, written bar and review protocol | ASSET-1, 12, 13 | opus | building | |
 
 ### Wave 2: the product (after wave 1)
 
@@ -69,3 +69,6 @@ End-to-end browser tests for G2 and G4, full build, final review, README and fea
 | Time | Event |
 |---|---|
 | 16:05 | Loop started. Baseline committed. Dependencies installed. Architecture and this file written. |
+| 16:25 | Setup committed (`bc573f8`). Wave 1 launched: five agents in parallel (W1-R research, W1-A metadata and build, W1-B search, W1-C tests, W1-D quality bar). |
+| 16:33 | W1-C builder finished (4.5 min, 187k tokens). Orchestrator re-ran both suites: all pass. Reviewer launched. |
+| 16:40 | W1-R research finished (7 min, 142k tokens). All 100 rows come from two lists read today (Steam250 2D tag, Wikipedia's games considered the best); type and view columns are the researcher's classification. Top-down sprites are now required: characters get clips per direction (Contract 2), and the playground must handle top-down movement. |

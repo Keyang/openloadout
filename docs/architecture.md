@@ -179,7 +179,7 @@ theme = {
 
 ## Contract 9: the playground
 
-`#/play`. A sandbox where the visitor tries what is in their bag. It is not three fixed games: it works with whatever is there. A sprite's role decides what it does: a player sprite is moved with the keyboard (its clips are picked by name: idle, walk, run, jump, attack...; its sounds fire on their frames); enemies and creatures move by themselves; pickups can be collected (their collect clip and sound play); tiles make the ground; background layers scroll; a music track plays with its controls; sound effects get buttons. The bag's theme applies to everything.
+`#/play`. A sandbox where the visitor tries what is in their bag. It has two modes chosen from the player sprite's `meta.view`: side view (walk, jump, gravity, ground tiles) and top-down (walk in four directions over floor tiles, using the direction clips of Contract 2). It is not three fixed games: it works with whatever is there. A sprite's role decides what it does: a player sprite is moved with the keyboard (its clips are picked by name: idle, walk, run, jump, attack...; its sounds fire on their frames); enemies and creatures move by themselves; pickups can be collected (their collect clip and sound play); tiles make the ground; background layers scroll; a music track plays with its controls; sound effects get buttons. The bag's theme applies to everything.
 
 ## Contract 10: the quality bar
 
