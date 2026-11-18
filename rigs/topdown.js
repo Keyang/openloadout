@@ -217,7 +217,7 @@ export function pose(action, direction, t, m = {}, d = dims()) {
       P.bob = lerp(0.6, 1.9, bounce) * (0.5 + 0.5 * Math.cos(2 * TAU * t)) ** 2;      // dips on the two contacts
       P.lean = 0.3 + 0.4 * stride;
       const A = lerp(2.8, 4.8, (bounce + stride) / 2);                 // the hands swing at least 2 px each way, opposite the legs
-      P.armF.f = -A * Math.cos(TAU * t) * (m.carry === 'upright' ? 0.25 : m.armed ? 0.8 : 1);      // a staff is carried steady
+      P.armF.f = -A * Math.cos(TAU * t) * (m.carry === 'upright' ? 0.25 : m.carry === 'ready' ? 0.35 : m.armed ? 0.8 : 1);      // a staff is carried steady, and so is a gun at the ready
       P.armB.f = A * Math.cos(TAU * t);
       P.item = rest + 0.1 * Math.cos(TAU * t) * (side ? 1 : 0.6);
       P.sway = wave(t * 2);
@@ -288,8 +288,8 @@ export function pose(action, direction, t, m = {}, d = dims()) {
       // side: the arm is level. up (facing away): the hand comes out to the side so the whole barrel shows past the head.
       // down (at the camera): both hands bring it in front of the chest and it is drawn short, its muzzle at the hip
       const front = !side && !up;
-      P.armF.f = (front ? 3 : 4) * aim - 2.4 * kick; P.armF.u = (front ? 4.5 : 2.5) * aim + 0.6 * kick; P.armF.o = side ? 0 : (up ? 3.5 : -3.5) * aim;
-      P.armB.f = 1.5 * aim - 1 * kick; P.armB.u = (front ? 4 : 1.5) * aim; P.armB.o = side ? 0 : (front ? -3 : -1) * aim;
+      P.armF.f = (front ? 3 : 4) * aim - 2.4 * kick; P.armF.u = (front ? 3.5 : 2.5) * aim + 0.6 * kick; P.armF.o = side ? 0 : (up ? 5.5 : -3.5) * aim;
+      P.armB.f = (side ? 4.5 : 1.5) * aim - 1 * kick; P.armB.u = (front ? 3 : side ? 2.5 : 1.5) * aim; P.armB.o = side ? 0 : (front ? -3 : -1) * aim;      // side: the other hand comes forward under the barrel
       if (front) P.reach = 1 - 0.6 * aim;
       P.item = turn(rest, ahead, aim) - (side ? 0.25 : 0) * kick;
       P.lunge = -2 * kick;
@@ -1196,3 +1196,1279 @@ export function slashTrail(g, direction, poseAt, t, d, len, colour = '#ffffff', 
 }
 
 export { ramp, farRamp, mix, brightness, INK } from '../engine/color.js';
+
+// ---- additions of batch R05 (mage-walker, rogue-walker) -------------------------------------------
+// Worn: beard, bandana, mask (the `head` hook); scarf (the `behind` hook) with scarfWrap (the `torso` hook).
+// Held: the small kinds wand, orb, dagger and claws (SMALL_ITEMS, smallItemSize, smallItem), and offGrip for a
+// character with a thing in each hand. Nothing above this line was changed.
+import { polyIn as polyInR05, ellipseIn as ellipseInR05 } from '../engine/surface.js';
+
+/** Draws a beard, for the `head` hook: over the jaw and down the chest facing down, on the front of the chin facing sideways, nothing facing away. opt: { kind: 'long' | 'short', length (a multiplier, 0.65 to 1.35), colour }. */
+export function beard(g, J, P, d, opt = {}) {
+  const { kind = 'long', length = 1, colour = '#f0ead8' } = opt;
+  if (J.dir === 'up') return;
+  const c = ramp(colour), cx = J.head[0], rx = d.headW / 2, sway = P.sway ?? 0, inH = headIn(J, d);
+  const top = J.brow + 4, chin = J.headTop + d.headH;          // the mouth row (eyes are on brow + 1 and + 2); the first row under the head
+  const hang = kind === 'long' ? Math.max(3, Math.round((d.torso - d.chin) * 0.75 * length)) : Math.max(1, Math.round(2 * length));
+  const parts = [];
+  if (J.dir === 'down') {
+    // the jaw from the mouth row down, joined to the hair by a sideburn on each side
+    parts.push((px, py) => inH(px, py) && (py >= top || (py >= top - 1 && Math.abs(px - cx) > rx - 2)));
+    if (kind === 'long') { const tip = cx + sway * 0.8; parts.push(polyInR05([[cx - rx + 1.5, chin - 1], [cx + rx - 1.5, chin - 1], [tip + 1, chin + hang], [tip - 1, chin + hang]])); }
+    else parts.push(ellipseInR05(cx, chin - 0.5, rx - 1.5, hang + 0.5));
+  } else {
+    parts.push((px, py) => inH(px, py) && py >= top && px > cx - 1.5);
+    if (kind === 'long') { const tip = cx + rx * 0.45 - sway * 1.2; parts.push(polyInR05([[cx - 1.5, chin - 1], [cx + rx - 0.4, chin - 1.5], [tip + 1, chin + hang], [tip - 1, chin + hang]])); }
+    else parts.push(ellipseInR05(cx + rx * 0.35, chin - 0.5, rx * 0.6, hang + 0.5));
+  }
+  g.blob(parts, c);
+  // the moustache: one row in the shadow tone where the beard meets the face, so a pale beard stays apart from pale skin
+  const box = headBox(J, d);
+  g.fill(...box, (px, py) => inH(px, py) && py >= top && py < top + 1 && (J.dir === 'down' ? Math.abs(px - cx) < rx - 2 : px > cx - 0.5), c.dark, { shade: 0 });
+  if (P.mouth && J.dir === 'down') g.rect(Math.floor(cx), top, 1, 2, c.deep);       // talking: the mouth opens in the beard
+}
+
+/** Draws a bandana, for the `head` hook: a band of cloth over the brow with hair showing above it, knotted at the back with two short tails. opt: { colour, size (a deeper band and longer tails; 0.5 to 1.8) }. */
+export function bandana(g, J, P, d, opt = {}) {
+  const { colour = '#2f8f9d', size = 1 } = opt;
+  const c = ramp(colour), [cx] = J.head, rx = d.headW / 2, dir = J.dir, sway = P.sway ?? 0, inH = headIn(J, d);
+  const deep = clamp(Math.round(2 * size), 1, 3), y1 = J.brow, y0 = y1 - deep, tail = 2.5 + 2 * size, mid = (y0 + y1) / 2;
+  const box = headBox(J, d, 1);
+  g.fill(...box, (px, py) => inH(px, py) && py >= y0 && py < y1, c, { shade: 0 });
+  if (deep > 1) g.fill(...box, (px, py) => inH(px, py) && py >= y1 - 1 && py < y1, c.dark, { shade: 0 });      // the fold along its lower edge
+  if (dir === 'up') {
+    // the knot in the middle of the back of the head, the tails down over the hair
+    const x0 = Math.floor(cx);
+    g.capsule(cx - 0.5, y1, cx - 2 + sway, y1 + tail, 1, 0.7, c);
+    g.capsule(cx + 0.5, y1, cx + 2.2 + sway, y1 + tail * 0.75, 1, 0.7, c);
+    g.rect(x0 - 1, y0, 3, deep + 1, c.dark, { shade: 0 });
+  } else if (dir === 'side') {
+    const kx = cx - rx + 0.5;
+    g.capsule(kx, mid, kx - 3 - sway * 1.5, mid + tail * 0.7, 1.1, 0.7, c);
+    g.capsule(kx, mid, kx - 1.5 - sway, mid + tail, 1.1, 0.7, c);
+  } else {
+    // facing the camera the knot is behind the head: the tails show past one side of it
+    const kx = cx + rx - 0.3;
+    g.capsule(kx, mid, kx + 3 + sway, mid + tail * 0.7, 1.1, 0.7, c);
+    g.capsule(kx, mid, kx + 1.5 + sway * 0.6, mid + tail, 1.1, 0.7, c);
+  }
+}
+
+/** Draws a cloth mask over the mouth and chin, for the `head` hook: the eyes stay clear, and from behind only its tie shows. opt: { colour, size (under 0.8 it sits below the nose; over 1 it also hangs over the neck; 0.5 to 1.8) }. */
+export function mask(g, J, P, d, opt = {}) {
+  const { colour = '#5a5f7a', size = 1 } = opt;
+  const c = ramp(colour), [cx] = J.head, rx = d.headW / 2, dir = J.dir, inH = headIn(J, d), box = headBox(J, d, 4);
+  const top = J.brow + (size < 0.8 ? 4 : 3), chin = J.headTop + d.headH, drape = Math.max(0, Math.round((size - 1) * 4));
+  const x0 = Math.floor(cx);
+  if (dir === 'up') {
+    g.fill(...box, (px, py) => inH(px, py) && py >= top && py < top + (size > 1.3 ? 2 : 1), c, { shade: 0 });
+    g.rect(x0 - 1, top, 3, 2, c.dark, { shade: 0 });                               // the knot
+    g.rect(x0 - 2, top + 2, 1, 2, c.base); g.rect(x0 + 2, top + 2, 1, 1 + Math.round(size), c.base);      // its two ends
+    return;
+  }
+  const parts = [];
+  if (dir === 'down') {
+    parts.push((px, py) => inH(px, py) && py >= top);
+    if (drape) parts.push(polyInR05([[cx - rx + 1.5, chin - 1], [cx + rx - 1.5, chin - 1], [cx + 2, chin + drape], [cx - 2, chin + drape]]));
+  } else {
+    parts.push((px, py) => inH(px, py) && py >= top && px > cx - 1);
+    if (drape) parts.push(polyInR05([[cx - 1, chin - 1], [cx + rx - 0.5, chin - 1], [cx + rx - 2, chin + drape], [cx, chin + drape]]));
+  }
+  g.blob(parts, c);
+  if (dir === 'side') {
+    // the tie runs back over the hair to a knot behind the head
+    g.fill(...box, (px, py) => inH(px, py) && py >= top && py < top + 1 && px <= cx - 1, c.dark, { shade: 0 });
+    g.rect(Math.round(cx - rx) - 1, top, 2, 2, c.base, { shade: 0 });
+  }
+}
+
+/** Draws the tail of a scarf, for the `behind` hook: it streams back from the neck (to the left facing sideways, past one shoulder facing down, down the back facing away) and never leaves the frame. opt: { colour, length (pixels; 0 draws nothing), flow (0 hanging to 1 streaming straight back), wave (list of -1..1 from the neck to the tip: how far each part is thrown sideways; default [P.sway]) }. */
+export function scarf(g, J, P, d, opt = {}) {
+  const { colour = '#5a5f7a', length = 10, flow = 0.3 } = opt;
+  if (!(length > 0)) return;
+  const wave = opt.wave && opt.wave.length ? opt.wave : [P.sway ?? 0];
+  const c = ramp(colour), dir = J.dir, top = J.shoulderY + d.chin, f = clamp(flow);
+  let ax, ay, a;
+  if (dir === 'side') { ax = J.neck[0] - d.chestR * 0.6; ay = top + 0.5; a = -lerp(0.3, 1.5, f); }
+  else if (dir === 'up') { ax = J.bx + 1; ay = top + 1; a = 0.12; }
+  else { ax = J.bx + d.chestR - 1; ay = top + 0.5; a = lerp(1.25, 1.65, f); }      // facing the camera it stays at shoulder height, clear of whatever the hands hold
+  const amp = dir === 'up' ? 1.2 + 1.6 * f : 0.8 + 1.8 * f, N = 6, sag = dir === 'up' ? 0 : (1 - f) * (dir === 'side' ? 0.45 : 0.25);      // cloth that is not streaming droops towards its end
+  const thrown = (k) => { const u = k * (wave.length - 1), i = Math.min(wave.length - 1, Math.floor(u)), j = Math.min(wave.length - 1, i + 1); return lerp(wave[i], wave[j], u - i); };
+  const at = (k, L) => { const off = amp * k * thrown(k); return [ax + Math.sin(a) * L * k + Math.cos(a) * off, ay + Math.cos(a) * L * k - Math.sin(a) * off + sag * L * k * k]; };
+  // too long for the room it has: it is drawn shorter
+  const fits = (L) => { for (let i = 1; i <= N; i++) { const [x, y] = at(i / N, L); if (x < 3.5 || x > SIZE[0] - 3.5 || y < 3.5 || y > GROUND - 2.5) return false; } return true; };
+  let L = length;
+  while (L > 2 && !fits(L)) L -= 1;
+  const parts = [];
+  for (let i = 0; i < N; i++) {
+    const [x0, y0] = at(i / N, L), [x1, y1] = at((i + 1) / N, L);
+    parts.push(capsuleIn(x0, y0, x1, y1, i ? 1.5 : 1.2, i === N - 1 ? 1.2 : 1.5));      // a ribbon three pixels wide, a little narrower where it is tied and at its loose end
+  }
+  const keep = (px, py) => px > 2 && px < SIZE[0] - 2 && py > 2 && py < GROUND - 1;
+  // a dark cloth carries its form with its light and base tones (its shadow tone is as dark as the outline): style guide section 3, rule 4
+  const paint = brightness(colour) < 0.4 ? { isRamp: true, light: c.light, base: c.light, dark: c.base, deep: c.dark } : c;
+  g.fill(Math.min(ax, at(1, L)[0]) - 6, Math.min(ay, at(1, L)[1]) - 6, Math.max(ax, at(1, L)[0]) + 6, Math.max(ay, at(1, L)[1]) + 6, (px, py) => keep(px, py) && parts.some((s) => s(px, py)), paint);
+}
+
+/** Draws the part of a scarf that goes round the neck, for the `torso` hook: two rows of cloth under the chin, a little wider than the chest. opt: { colour }. */
+export function scarfWrap(g, J, P, d, opt = {}) {
+  const colour = opt.colour ?? '#5a5f7a', c = ramp(colour), top = J.shoulderY + d.chin;
+  const [hi, lo] = brightness(colour) < 0.4 ? [c.light, c.base] : [c.base, c.dark];      // a dark cloth: light and base, as the tail
+  if (J.dir === 'side') {
+    const wide = Math.round(d.chestR * 1.7) + 1, x = Math.round(J.neck[0] - d.chestR * 0.85) - 1;
+    g.rect(x, top - 1, wide, 2, hi); g.rect(x, top + 1, wide, 1, lo);
+    return;
+  }
+  const half = Math.floor(d.chestR) + 1, x = Math.floor(J.bx);
+  g.rect(x - half, top - 1, half * 2 + 1, 2, hi);
+  g.rect(x - half, top + 1, half * 2 + 1, 1, lo);
+}
+
+/** The sizes { length, back, pad } in pixels of the small held kinds smallItem() draws: wand (hand to its lit tip), orb (hand to the middle of a ball that floats over it), dagger, claws. No arguments: a frozen object. */
+export const SMALL_ITEMS = Object.freeze({
+  wand: Object.freeze({ length: 9, back: 1.5, pad: 1.5 }),
+  orb: Object.freeze({ length: 5, back: 0, pad: 3 }),
+  dagger: Object.freeze({ length: 7, back: 1.5, pad: 1 }),
+  claws: Object.freeze({ length: 5, back: 0, pad: 2.5 }),
+});
+
+/** Returns the size { length, back, pad } of a small held kind at a length setting, or itemSize()'s answer for the standard kinds; null for 'none'. kind: a key of SMALL_ITEMS or ITEMS; scale: 1 = standard. */
+export const smallItemSize = (kind, scale = 1) => (SMALL_ITEMS[kind] ? { length: SMALL_ITEMS[kind].length * scale, back: SMALL_ITEMS[kind].back, pad: SMALL_ITEMS[kind].pad } : itemSize(kind, scale));
+
+/** Draws a small held thing (wand, orb, dagger, claws) from an attach point, and hands every other kind to heldItem(). direction: 'down' | 'up' | 'side'; at: { x, y, angle, reach }; item: { kind, length, metal, wood, hilt, orb (colours), glow: 0..1 (a bigger orb or wand tip) }. */
+export function smallItem(g, direction, at, item) {
+  if (!SMALL_ITEMS[item.kind]) return heldItem(g, direction, at, item);
+  const metal = typeof item.metal === 'string' ? ramp(item.metal) : item.metal ?? ramp('#c2c9d6');
+  const wood = item.wood ?? '#9a6a3e', hilt = item.hilt ?? '#f2c230';
+  const light = typeof item.orb === 'string' ? ramp(item.orb) : item.orb ?? ramp('#4fd8ee');
+  const a = at.angle, len = item.length * (at.reach ?? 1), hx = at.x, hy = at.y;
+  const to = (dist, turn = 0, from = [hx, hy]) => reach(from[0], from[1], a + turn, dist);
+  if (item.kind === 'wand') {
+    const [bx, by] = to(1.5, PI), [tx, ty] = to(len);
+    g.line(bx, by, tx, ty, wood);
+    const r = 1.4 + (item.glow ?? 0) * 0.6;
+    g.ellipse(Math.floor(tx) + 0.5, Math.floor(ty) + 0.5, r, r, light, { light: 1 });
+  } else if (item.kind === 'orb') {
+    const [tx, ty] = to(len), r = 2.4 + (item.glow ?? 0) * 0.6;
+    g.ellipse(Math.round(tx) + 0.5, Math.round(ty) + 0.5, r, r, light, { light: 1 });
+  } else if (item.kind === 'dagger') {
+    const [gx, gy] = to(1.5), [tx, ty] = to(len);
+    g.limb(gx, gy, tx, ty, 2, metal);
+    g.dot(tx, ty, metal.light);
+    const [ax, ay] = to(1.6, PI / 2, [gx, gy]), [bx, by] = to(1.6, -PI / 2, [gx, gy]);
+    g.line(ax, ay, bx, by, hilt);
+    const [px, py] = to(1.2, PI);
+    g.dot(px, py, hilt);
+  } else {
+    // claws: three thin blades that fan out from the fist
+    for (const i of [-1, 1, 0]) {
+      const [sx, sy] = to(1.3 * Math.abs(i), i * PI / 2), [tx, ty] = to(len - Math.abs(i), i * 0.22, [sx, sy]);
+      g.line(sx, sy, tx, ty, i ? metal.base : metal.light);
+    }
+  }
+}
+
+/** Returns the attach point { x, y, angle, reach } of a second thing held in the other hand: mirrored across the body facing down or up, parallel to the first facing sideways. J = solve() or the J a hook gets; P: the pose. */
+export const offGrip = (J, P) => ({ x: J.armB.hand[0], y: J.armB.hand[1], angle: J.dir === 'side' ? P.item : -P.item, reach: P.reach ?? 1 });
+
+// ---- additions of batch R07 (town-guard, farm-kid) ------------------------------------------------------
+// A manner of moving laid over a standard pose (frameWith, MANNERS); more worn parts (tabard, kettleHat, shield,
+// hairBow, hairdo); and the things townsfolk hold (TOWN_ITEMS, townItemSize, townItem). All additive: nothing
+// above this line reads them.
+
+/**
+ * One frame as frame() makes it, with a manner of moving laid over the standard pose and the result fitted again: a child's rocking idle, a guard's barring arm.
+ * clip, t, p, opt: as frame(); opt.manner: (P, F, t) => void, or a list of them, each changing the pose P in place (MANNERS has ready-made ones; F.action, F.direction, F.d, F.item and F.carry say what is being posed).
+ * Returns the same F as frame(): the picture and the sockets both use the changed pose (the swing arc of an armed attack still follows the standard one).
+ */
+export function frameWith(clip, t, p = {}, opt = {}) {
+  const F = frame(clip, t, p, opt), manners = [].concat(opt.manner ?? []);
+  if (!manners.length || F.P.lie) return F;
+  const before = JSON.stringify(F.P);
+  F.carry = opt.carry;
+  for (const manner of manners) manner(F.P, F, t);
+  if (JSON.stringify(F.P) === before) return F;                       // no manner had anything to say about this action
+  fit(F.direction, F.P, F.d, { item: F.item, points: opt.points ?? (opt.rise ? (J) => [[J.head[0], J.headTop - opt.rise]] : null) });
+  return F;
+}
+
+/**
+ * Ready-made manners for frameWith(), each (P, F, t) and each acting on one action only, so the whole list can be passed for every clip.
+ *   rock   idle: rocks from heel to toe with both hands swinging together, and the head tips from side to side: a child who cannot stand still
+ *   flail  run: both hands above the shoulders, waving in turn (from the side: thrown out level, ahead and behind); a hand that holds something keeps the run's own swing
+ *   bar    block with nothing held: the weapon arm is held out level to bar the way and the other arm hangs; with a pole weapon (carry 'upright'): the pole is brought level across the body
+ *   attention  with something held: at rest it is carried twice as close to upright (a guard's pole weapon, standing straight at his side); from the side a quarter closer, so it stays clear of the face
+ */
+export const MANNERS = {
+  rock(P, F, t) {
+    if (F.action !== 'idle') return;
+    const w = wave(t), side = F.direction === 'side';
+    P.lean += (side ? 1.4 : 2.2) * w;
+    if (!side) P.headDx += Math.round(0.9 * wave(t, 0.25));
+    P.armF.f += 1.6 * w; P.armB.f += 1.6 * w;
+    P.sway = wave(t, -0.15);
+  },
+  flail(P, F, t) {
+    if (F.action !== 'run') return;
+    const w = wave(t * 2);
+    const arms = F.item ? [[P.armB, -1]] : [[P.armF, 1], [P.armB, -1]];          // a hand that holds something keeps the run's own swing
+    for (const [A, sg] of arms) {
+      if (F.direction === 'side') {
+        // from the side the arms are thrown out level, one ahead and one behind, so the near one never crosses the face
+        A.u = F.d.arm - 0.5 + sg * w; A.f *= 1.3; A.o = 0;
+      } else {
+        A.u = F.d.arm + 3 + sg * 1.5 * w; A.f *= 0.3; A.o = 2.5 + sg * 1.5 * wave(t * 2, 0.25);
+      }
+    }
+  },
+  bar(P, F, t) {
+    if (F.action !== 'block' || (F.item && F.carry !== 'upright')) return;
+    const b = keys(t, [[0, 0], [0.2, 1], [0.8, 1], [1, 0]]), side = F.direction === 'side', out = (F.d.arm + 1) * b;
+    if (F.item) {
+      // a pole weapon is brought level across the body (behind it going up); from the side the guard is the pose's own
+      if (side) return;
+      P.item = lerp(P.item, F.direction === 'up' ? 1.5 * PI - 0.2 : 0.5 * PI + 0.2, b);
+      // level, a long pole is as wide as the frame: it is drawn a little shorter, as if it pointed a little at the camera
+      const room = SIZE[0] - 5 - (F.item.pad ?? 1) - (F.item.back ?? 0);
+      P.reach = Math.min(P.reach ?? 1, lerp(1, room / F.item.length, b));
+      return;
+    }
+    P.armF.u = F.d.arm * b; P.armF.f = side ? out : 0; P.armF.o = side ? 0 : out;
+    P.armB.f = 0; P.armB.u = 0; P.armB.o = 0;
+  },
+  attention(P, F) {
+    if (!F.item) return;
+    // only while the thing is at (or near) the angle it rests at, so a swing or a guard is left as the pose has it
+    const rest = (CARRY[F.carry] ?? CARRY.up)[F.direction], near = smooth(clamp(1 - Math.abs(P.item - rest) / 0.8));
+    P.item += (PI - rest) * (F.direction === 'side' ? 0.25 : 0.5) * near;
+  },
+};
+
+/** A tabard for the `torso` hook: a sleeveless panel of cloth over the chest and back that hangs from the shoulders to the knee, so the sleeves and legs keep the look's colours. opt: { colour, border (colour of its edges and hem, or null for none), length (0 = to the hip, 1 = to the knee) }. */
+export function tabard(g, J, P, d, opt = {}) {
+  const { colour = '#3f6fd1', border = null, length = 1 } = opt;
+  const c = ramp(colour), side = J.dir === 'side', y0 = J.shoulderY + d.chin - 1, hip = Math.round(J.hip[1]);
+  const y1 = Math.min(J.gy - 3, hip + Math.round(d.leg * 0.45 * clamp(length)));          // the hem
+  const sw = Math.round((P.sway ?? 0) * 0.8);                                             // the hanging part swings a pixel
+  let span;                                                                               // the first and last column of a row
+  if (side) {
+    const wide = Math.round(d.chestR * 1.7), nx = J.neck[0], hx = J.hip[0];
+    span = (row) => { const l = Math.round(lerp(nx, hx, clamp((row + 0.5 - y0) / Math.max(1, hip - y0))) - wide / 2 + 0.3) + (row > hip ? sw : 0); return [l, l + wide - 1]; };
+  } else {
+    const x = Math.floor(J.bx), half = Math.max(1, Math.floor(d.chestR) - 1);              // between the arms
+    span = (row) => [x - half + (row > hip ? sw : 0), x + half + (row > hip ? sw : 0)];
+  }
+  const inside = (px, py) => { if (py < y0 || py >= y1) return false; const [a, b] = span(Math.floor(py)); return px > a && px < b + 1; };
+  const box = [J.bx - 14, y0, J.bx + 14, y1];
+  g.fill(...box, inside, c);
+  if (!border) return;
+  // the border: along the hem and up the edges (from the side: the hem and the front edge)
+  g.fill(...box, (px, py) => inside(px, py) && (py >= y1 - 1 || !inside(px + 1, py) || (!side && !inside(px - 1, py))), border, { shade: 0 });
+}
+
+/** A kettle hat for the `head` hook (set look.hatted): a round steel bowl with a wide brim all the way round, a tone darker than the metal like the helmet, the face open below it. opt: { size (the brim: 0.5 to 1.8), metal }. */
+export function kettleHat(g, J, P, d, opt = {}) {
+  const { size = 1 } = opt;
+  const m = ramp(opt.metal ?? '#c2c9d6'), steel = { isRamp: true, light: m.base, base: m.dark, dark: m.deep, deep: m.deep };
+  const [cx, cy] = J.head, rx = d.headW / 2, ry = d.headH / 2, brim = J.brow - 2, bowl = headIn(J, d, 0.9);
+  g.fill(cx - rx - 2, cy - ry - 2, cx + rx + 2, brim, (px, py) => bowl(px, py) && py < brim, steel, { light: 1 });
+  g.ellipse(cx, brim + 0.5, rx + 1 + 1.7 * size, 1.6, steel, { shade: 1, light: 1 });       // the brim: three rows, lit along the top
+  g.fill(cx - rx - 2, brim - 2, cx + rx + 2, brim, (px, py) => bowl(px, py) && py >= brim - 1 && py < brim, m.deep, { shade: 0 });      // where the bowl meets the brim
+}
+
+/** The kinds shield() draws. */
+export const SHIELD_KINDS = ['round', 'kite'];
+
+/** A shield on the other arm, for the `offhand` hook: in front of the arm going down, behind the body going up (its inner side, a tone down), and showing ahead of the body from the side. opt: { kind: 'round' | 'kite', size (0.65 to 1.35), metal, boss (colour of the stud or cross on its face, or null for none) }. */
+export function shield(g, J, P, d, opt = {}) {
+  const { kind = 'round', size = 1, boss = null } = opt;
+  const m = ramp(opt.metal ?? '#c2c9d6'), dir = J.dir, [hx, hy] = J.armB.hand, out = -J.s;      // out: the off-hand side on the screen
+  // from the side it is held up ahead of the chest, where it shows past the near arm, and is turned half away
+  const cx = Math.floor(hx + (dir === 'side' ? 5 : out * (dir === 'up' ? 2 : 1))) + 0.5, cy = Math.floor(hy - (dir === 'side' ? 4 : 2.5)) + 0.5;
+  const thin = dir === 'side' ? 0.75 : 1;
+  let inside, box;
+  if (kind === 'kite') {
+    const w = 3.9 * size * thin, top = cy - 4.4 * size, tip = cy + 6.2 * size;
+    inside = (px, py) => {
+      const ax = Math.abs(px - cx);
+      if (py < top || py > tip) return false;
+      return py <= cy ? ax <= w && !(py < top + 1 && ax > w - 1) : ax <= w * (tip - py) / (tip - cy);
+    };
+    box = [cx - w - 1, top - 1, cx + w + 1, tip + 1];
+  } else {
+    const r = 4.4 * size;
+    inside = (px, py) => ((px - cx) / (r * thin)) ** 2 + ((py - cy) / r) ** 2 <= 1;
+    box = [cx - r - 1, cy - r - 1, cx + r + 1, cy + r + 1];
+  }
+  // a rim one pixel wide all round: darker than the face on the front; on the far side (going up and from the side)
+  // the face is a tone down, so a blade held in front of it still shows, and the rim catches the light
+  const rim = (px, py) => inside(px, py) && !(inside(px + 1, py) && inside(px - 1, py) && inside(px, py + 1) && inside(px, py - 1));
+  if (dir !== 'down') { g.fill(...box, inside, dim(m)); g.fill(...box, rim, m.base, { shade: 0 }); return; }
+  over(g, inside, box, m, m.deep, { light: 1 });
+  g.fill(...box, rim, m.dark, { shade: 0 });
+  if (!boss) return;
+  const x = Math.floor(cx), y = Math.floor(cy);
+  if (kind === 'kite') {
+    g.fill(...box, (px, py) => inside(px, py) && inside(px, py + 1.5) && inside(px, py - 1.5) && Math.floor(px) === x, boss, { shade: 0 });
+    g.fill(...box, (px, py) => inside(px - 1.5, py) && inside(px + 1.5, py) && Math.floor(py) === y - Math.round(1.4 * size), boss, { shade: 0 });
+  } else {
+    g.rect(x, y - 1, 1, 3, boss); g.rect(x - 1, y, 3, 1, boss);
+  }
+}
+
+/** How far a hair bow rises above the top of the head, in pixels, for frame()'s `rise`. size: its Size setting. */
+export const hairBowRise = (size = 1) => 1 + Math.ceil(2.2 * Math.sqrt(size));
+
+/** A ribbon bow on top of the head, for the `head` hook: two loops and a knot, a little to one side going down and up, at the back of the crown from the side. opt: { size (0.5 to 1.8), colour }. */
+export function hairBow(g, J, P, d, opt = {}) {
+  const { size = 1, colour = '#c8553a' } = opt;
+  const c = ramp(colour), w = Math.sqrt(size), dir = J.dir;
+  const kx = Math.floor(J.head[0] + (dir === 'down' ? 2 : dir === 'up' ? -2 : -1.5)) + 0.5, ky = J.headTop + 0.5;
+  const lx = 3.7 * w * (dir === 'side' ? 0.75 : 1), ly = 2.2 * w;
+  for (const sg of [-1, 1]) g.poly([[kx, ky - 0.6], [kx + sg * lx, ky - ly], [kx + sg * lx, ky + ly * 0.8], [kx, ky + 0.6]], c);
+  g.rect(Math.floor(kx), Math.floor(ky) - 1, 1, 2, c.dark);                                  // the knot
+}
+
+/** The styles hairdo() adds over the rig's short hair. */
+export const HAIRDOS = ['bowl', 'pigtails'];
+
+/** Two more hair styles, drawn in the `head` hook over look.hairStyle 'short': 'bowl' (a round cap of hair cut straight above the eyes and round the back) and 'pigtails' (a bunch at each ear, which lags the head). Any other style adds nothing. opt: { style, colour (the hair colour), tie (colour of the pigtails' ties, or null for none) }. */
+export function hairdo(g, J, P, d, opt = {}) {
+  const { style, tie = null } = opt;
+  if (!HAIRDOS.includes(style)) return;
+  const hair = ramp(opt.colour ?? '#5a3a22'), [cx, cy] = J.head, rx = d.headW / 2, ry = d.headH / 2, dir = J.dir, sway = P.sway ?? 0;
+  if (style === 'bowl') {
+    const cap = headIn(J, d, 0.8), box = headBox(J, d, 2), nape = cy + ry * 0.75;
+    if (dir === 'down') g.fill(...box, (px, py) => cap(px, py) && (py < J.brow + 1 || (Math.abs(px - cx) > rx - 1.6 && py < J.brow + 4)), hair);
+    else if (dir === 'up') g.fill(...box, (px, py) => cap(px, py) && py < nape, hair, { shade: 2 });
+    else g.fill(...box, (px, py) => cap(px, py) && (py < J.brow + 1 || (px < cx - 0.5 && py < nape)), hair);
+    return;
+  }
+  for (const sg of dir === 'side' ? [-1] : [-1, 1]) {
+    const x0 = cx + sg * (rx - (dir === 'side' ? 1.5 : 0.5)), y0 = cy + 0.5;
+    g.capsule(x0, y0, cx + sg * (rx + 2.4) + sway * 0.8, cy + 3.6, 1.7, 1.1, hair);
+    if (tie) g.rect(Math.floor(x0 + sg * 1.2), Math.floor(y0) - 1, 1, 2, tie);
+  }
+}
+
+/** The kinds townItem() draws itself; any other kind it passes on to heldItem(). Carry: halberd and pike (a spear taller than its bearer) 'upright'; stick and flower 'up'; basket 'hang'. */
+export const TOWN_ITEM_KINDS = ['halberd', 'pike', 'stick', 'basket', 'flower'];
+
+/** The sizes { length, back, pad } of what townsfolk hold, in pixels, read as ITEMS: a halberd's shaft goes 11 px below the hand, so held at the hip it stands on the ground and its blade clears the head. */
+export const TOWN_ITEMS = {
+  halberd: { length: 24, back: 11, pad: 3 },
+  pike: { length: 23, back: 11, pad: 1.5 },
+  stick: { length: 9, back: 1.5, pad: 1.5 },
+  basket: { length: 7, back: 0, pad: 4 },
+  flower: { length: 8, back: 1, pad: 2.5 },
+};
+
+/** The size { length, back, pad } of a held kind at a length setting, for frame(), fit() and townItem(): the kinds of TOWN_ITEMS, else whatever itemSize() says. kind: a held kind; scale: 1 = standard. */
+export const townItemSize = (kind, scale = 1) => (TOWN_ITEMS[kind] ? { length: TOWN_ITEMS[kind].length * scale, back: TOWN_ITEMS[kind].back, pad: TOWN_ITEMS[kind].pad } : itemSize(kind, scale));
+
+/**
+ * Draws what townsfolk hold from an attach point and its own settings, as heldItem() does; a kind that is not in TOWN_ITEMS is passed on to heldItem().
+ *   direction: 'down' | 'up' | 'side' (a halberd's blade faces away from the body); at: { x, y, angle, reach }, for example F.hand(J)
+ *   item: { kind, length, and per kind: halberd and pike { metal, wood }; stick { wood }; basket { wood (the wicker), fill (colour of what is in it, or null for an empty one) }; flower { stem, petal, heart } }
+ */
+export function townItem(g, direction, at, item) {
+  if (!TOWN_ITEMS[item.kind]) return heldItem(g, direction, at, item);
+  const a = at.angle, r = at.reach ?? 1, len = item.length * r, hx = at.x, hy = at.y;
+  const to = (dist, turn = 0, from = [hx, hy]) => reach(from[0], from[1], a + turn, dist);
+  const wood = item.wood ?? '#9a6a3e';
+  if (item.kind === 'halberd') {
+    const metal = typeof item.metal === 'string' ? ramp(item.metal) : item.metal ?? ramp('#c2c9d6');
+    const [bx, by] = to(TOWN_ITEMS.halberd.back * r, PI), [tx, ty] = to(len);
+    g.line(bx, by, tx, ty, wood);
+    const lead = direction === 'down' ? PI / 2 : -PI / 2;                                   // the blade faces away from the body
+    const [mx, my] = to(Math.max(2, len - 5.5)), [ox, oy] = to(1.2, lead, [mx, my]);
+    const nx = Math.sin(a + lead), ny = Math.cos(a + lead);
+    g.ellipse(ox, oy, 3.4, 3.4, metal, { light: 1, clip: (px, py) => (px - mx) * nx + (py - my) * ny > 0.4 });
+    const [kx, ky] = to(2.2, -lead, [mx, my]);
+    g.line(mx, my, kx, ky, metal.dark);                                                     // the hook on its back
+    const [sx, sy] = to(Math.max(1, len - 3.5));
+    g.capsule(sx, sy, tx, ty, 1.4, 0.5, metal);                                             // the spike
+  } else if (item.kind === 'pike') {
+    const metal = typeof item.metal === 'string' ? ramp(item.metal) : item.metal ?? ramp('#c2c9d6');
+    const [bx, by] = to(TOWN_ITEMS.pike.back * r, PI), [tx, ty] = to(len), [sx, sy] = to(Math.max(1, len - 4.5)), [cx, cy] = to(Math.max(1, len - 6));
+    g.line(bx, by, tx, ty, wood);
+    g.capsule(sx, sy, tx, ty, 1.9, 0.5, metal, { light: 1 });                                  // a long leaf-shaped head
+    g.dot(cx, cy, metal.dark);                                                              // the socket it sits in
+  } else if (item.kind === 'stick') {
+    const [bx, by] = to(1.5 * r, PI), [tx, ty] = to(len), [mx, my] = to(len * 0.6), [kx, ky] = to(2.4, direction === 'up' ? -0.9 : 0.9, [mx, my]);
+    g.line(bx, by, tx, ty, wood);
+    g.line(mx, my, kx, ky, wood);                                                           // a twig
+  } else if (item.kind === 'basket') {
+    // hangs from the hand by its handle: a rim, a woven tub, a narrower foot
+    const wick = typeof wood === 'string' ? ramp(wood) : wood;
+    const h = Math.max(3, Math.round(len) - 3), w = len >= 8.5 ? 9 : 7, [lx, ly] = to(3);
+    const x = Math.floor(lx) - (w - 1) / 2, y = Math.round(ly);
+    g.line(hx, hy, x + 0.5, y + 0.5, wick.dark); g.line(hx, hy, x + w - 0.5, y + 0.5, wick.dark);
+    if (item.fill) for (let i = 1; i < w - 1; i++) if (i % 3) g.dot(x + i, y - 1, item.fill);
+    g.rect(x, y + 1, w, h - 1, wick.base, { shade: 0 });
+    g.rect(x, y + 1 + Math.floor((h - 1) / 2), w, 1, wick.dark);
+    g.rect(x, y, w, 1, wick.light);
+    g.rect(x + 1, y + h, w - 2, 1, wick.dark);
+  } else {
+    // a flower: a stem with a leaf, and a round bloom at the far end
+    const stem = item.stem ?? '#4f9d57', petal = typeof item.petal === 'string' ? ramp(item.petal) : item.petal ?? ramp('#c8553a');
+    const [bx, by] = to(r, PI), [tx, ty] = to(len), [mx, my] = to(len * 0.45), [lx, ly] = to(1.9, direction === 'up' ? -1.2 : 1.2, [mx, my]);
+    g.line(bx, by, tx, ty, stem);
+    g.line(mx, my, lx, ly, stem);
+    const fx = Math.floor(tx) + 0.5, fy = Math.floor(ty) + 0.5;
+    g.ellipse(fx, fy, 2.4, 2.4, petal);
+    g.dot(fx, fy, item.heart ?? '#f2c230');
+  }
+}
+
+// ---- additions of batch S04 (void-ranger) ---------------------------------------------------------
+// Sci-fi wear and guns for any character on this rig (the ranger, the troopers).
+// Worn: visorHelmet and visor (the `head` hook; visorHelmetRise for frame()'s `rise`); pack (the `behind` hook) with
+// packStraps (the `torso` hook) and packRise; stripe and spine (the `torso` hook); gloves and suitLights, which are called from
+// more than one hook and told which with `layer`. Held: the gun kinds blaster, scatter and beam (GUNS, gunSize, heldGun).
+// After the outline: muzzleFlare (the light of an energy shot) and dashStreaks (the afterimages of a dodge). Carry: 'ready'
+// (CARRY_READY), a gun held at the hip. The sections further down marked S04 are part of this batch.
+// Three lines above this one were changed, all for a body that holds a gun (hero-walker and the rig's tests are unchanged):
+// in pose() `shoot`, aimed at the camera the hands are a row lower (the chest shows above them), facing away the hand comes
+// two pixels further out (a gun clears a helmet), and from the side the other hand comes forward under the barrel; in
+// `walk`, the weapon arm swings less under carry 'ready'.
+import { capsuleIn as capsuleInS04 } from '../engine/surface.js';
+import { tone as toneS04 } from '../engine/color.js';
+
+/** Returns how far a visorHelmet() of a Size setting stands off the skull all round, in pixels: pass it as frame()'s `rise`. size: 0.5 (a snug cap) to 1.8 (a big bubble). */
+export const visorHelmetRise = (size = 1) => 0.3 + 0.9 * size;
+
+/** Draws a closed helmet with a lit visor over the eyes and the jaw left open, for the `head` hook (set look.hatted): the whole back of the head facing away, with a small light. opt: { size (0.5 to 1.8: how far it stands off the skull), shell (colour), visor (colour of the glass), light (colour of the light on the back, default the visor's; null for none) }. */
+export function visorHelmet(g, J, P, d, opt = {}) {
+  const { size = 1 } = opt;
+  const c = ramp(opt.shell ?? '#e8ecf2'), v = ramp(opt.visor ?? '#5fe0f0'), light = opt.light === undefined ? v.base : opt.light;
+  const [cx, cy] = J.head, rx = d.headW / 2, ry = d.headH / 2, dir = J.dir, x0 = Math.floor(cx);
+  const out = headIn(J, d, visorHelmetRise(size)), box = [cx - rx - 4, cy - ry - 4, cx + rx + 4, cy + ry + 4];
+  const brow = J.brow, low = brow + 3, foot = Math.round(cy + ry * 0.5);       // the glass: three rows from the brow; the shell ends at `foot`, the jaw shows below
+  const front = dir === 'down' ? (px) => Math.abs(px - cx) < rx - 1 : dir === 'side' ? (px) => px > cx - 1.5 : () => false;
+  const shell = (px, py) => out(px, py) && py < foot + (dir === 'down' ? 0 : 1) && !(py >= brow && front(px));
+  const glass = (px, py) => out(px, py) && py >= brow && py < low && front(px);
+  g.fill(...box, shell, c, { light: 1 });
+  g.fill(...box, (px, py) => shell(px, py) && !shell(px, py + 1), c.dark, { shade: 0 });        // the rim, and the brow over the glass
+  if (dir === 'up') {
+    g.rect(x0 - 2, Math.round(cy), 5, 1, c.dark);                                            // a seam across the back, with the light under it
+    if (light) g.rect(x0 - 1, Math.round(cy) + 1, 3, 1, light);
+    return;
+  }
+  g.fill(...box, glass, v.base, { shade: 0 });
+  g.fill(...box, (px, py) => glass(px, py) && py > brow + 1, v.dark, { shade: 0 });         // lit along its top, dark below: it stays a band in a look with no hue
+  const gx = dir === 'side' ? Math.floor(cx + rx) - 2 : x0 + 2;
+  g.rect(gx, brow, 2, 1, v.light);                                                           // the glint, on the side the light comes from
+}
+
+/** Draws a visor (a band of lit glass over the eyes, on a strap), for the `head` hook: hair shows above it, and from behind only the strap. opt: { size (0.5 to 1.8: two to four rows deep, and wider), colour (the glass), strap (colour) }. */
+export function visor(g, J, P, d, opt = {}) {
+  const { size = 1, strap = '#434d6d' } = opt;
+  const v = ramp(opt.colour ?? '#5fe0f0'), [cx] = J.head, rx = d.headW / 2, dir = J.dir;
+  const rows = size < 0.8 ? 2 : size < 1.4 ? 3 : 4, y0 = J.brow + (rows === 2 ? 1 : 0), y1 = y0 + rows;
+  const inH = headIn(J, d), out = headIn(J, d, 0.2 + 0.5 * size), box = headBox(J, d, 3);
+  const band = rows > 2 ? 2 : 1;
+  if (dir === 'up') { g.fill(...box, (px, py) => inH(px, py) && py >= J.brow + 1 && py < J.brow + 1 + band, strap, { shade: 0 }); return; }
+  const front = dir === 'side' ? (px) => px > cx - 1.5 : () => true;
+  const glass = (px, py) => out(px, py) && py >= y0 && py < y1 && front(px);
+  if (dir === 'side') g.fill(...box, (px, py) => inH(px, py) && py >= J.brow + 1 && py < J.brow + 1 + band && !front(px), strap, { shade: 0 });
+  g.fill(...box, glass, v.base, { shade: 0 });
+  g.fill(...box, (px, py) => glass(px, py) && py > y0 + 1, v.dark, { shade: 0 });
+  g.rect(dir === 'side' ? Math.floor(cx + rx) - 2 : Math.floor(cx) + 2, y0, 2, 1, v.light);
+}
+
+/** The kinds pack() can draw: a tank slung across the back, a radio with a whip antenna, a jet pack with a pod behind each shoulder. */
+export const PACK_KINDS = ['tank', 'antenna', 'jet'];
+
+/** Returns how far a pack rises above the top of the head, in pixels, for frame()'s `rise` (only the antenna does). kind: one of PACK_KINDS; size: its Size setting. */
+export const packRise = (kind, size = 1) => (kind === 'antenna' ? 1 + 3 * size : 0);
+
+/** Draws a pack on the back, for the `behind` hook: over the back facing away, behind the body facing down and sideways, where the part that reaches past the shoulders still shows. opt: { kind: one of PACK_KINDS, size (0.65 to 1.35), colour (its casing), glow (colour of its light and flame), thrust (0..1: the flame of a jet) }. */
+export function pack(g, J, P, d, opt = {}) {
+  const { kind = 'tank', size = 1, thrust = 0 } = opt;
+  const c = ramp(opt.colour ?? '#9aa6c0'), glow = ramp(opt.glow ?? '#5fe0f0');
+  const dir = J.dir, bx = J.bx, x0 = Math.floor(bx), top = J.shoulderY + d.chin, sway = P.sway ?? 0;
+  const off = -J.s;                                         // the side of the free hand on the screen: the tank's top and the antenna are over that shoulder
+  const back = J.neck[0] - d.chestR * 0.85;                 // side clips: the column of the back
+  const floor = J.gy - 1;                                   // nothing of a pack hangs below the feet, however far the body is tucked
+  const flame = (x, y, w) => { const n = Math.min(1 + Math.round(2 * clamp(thrust)), floor - y); for (let i = 0; i < n; i++) g.rect(x + (i > 1 ? 1 : 0), y + i, i > 1 ? Math.max(1, w - 2) : w, 1, i ? glow.base : glow.light); };
+  if (kind === 'tank') {
+    const r = 1.9 + 0.9 * size;
+    const [fx, fy, hx, hy] = dir === 'side'
+      ? [back - 0.5, top + 3 + 5 * size, back - 2 - size, top - 1]
+      : [bx - off * 1.5, top + 3 + 5 * size, bx + off * (d.headR + 0.6 + 0.9 * size), top - 1];
+    over(g, capsuleInS04(fx, fy, hx, hy, r, r), [Math.min(fx, hx) - r - 1, Math.min(fy, hy) - r - 1, Math.max(fx, hx) + r + 1, Math.max(fy, hy) + r + 1], c, dir === 'up' ? c.deep : null, { light: 1, clip: (px, py) => py < floor });
+    const mx = Math.round((fx + hx) / 2 - 0.5), my = Math.round((fy + hy) / 2);
+    g.rect(mx - 1, my, 3, 1, c.dark);                                                        // a band round its middle
+    g.rect(Math.round(hx - 0.5), Math.round(hy - 0.5) - 1, 1, 2, glow.base);                 // the valve light at its top
+  } else if (kind === 'antenna') {
+    const h = Math.min(Math.max(3, Math.round(5 * size)), floor - top), rise = packRise(kind, size);
+    const tipY = J.headTop - rise + 0.5;
+    if (dir === 'side') {
+      g.rect(Math.round(back) - 3, top, 4, h, c);
+      g.line(back - 2, top, back - 4 - size - sway * 1.5, tipY, c.dark);
+      g.rect(Math.floor(back - 4 - size - sway * 1.5), Math.floor(tipY) - 1, 1, 2, glow.base);
+      g.dot(Math.round(back) - 2, top + 1, glow.base);
+      return;
+    }
+    over(g, (px, py) => Math.abs(px - bx) < 3.5 && py >= top && py < top + h, [bx - 4, top, bx + 4, top + h], c, dir === 'up' ? c.deep : null);
+    g.rect(x0 - 2, top + h - 2, 5, 1, c.dark);
+    g.rect(x0 + off * 2, top + 1, 1, 1, glow.base);
+    const tx = bx + off * (d.headR + 2 + size) + sway * 1.2;
+    g.line(bx + off * 3, top, tx, tipY, c.dark);
+    g.rect(Math.floor(tx), Math.floor(tipY) - 1, 1, 2, glow.base);
+  } else if (kind === 'jet') {
+    const pw = size < 0.85 ? 2 : size < 1.2 ? 3 : 4, y0 = top - 2, h = Math.max(2, Math.min(Math.round(6 * size), floor - 2 - y0));
+    if (dir === 'side') {
+      const x = Math.round(back) - pw - 1;
+      g.rect(x, y0 + 1, pw + 2, h - 1, c, { light: 1 });
+      g.rect(x + 1, y0, pw, 1, c.base);
+      g.rect(x, y0 + h, pw, 1, c.deep);
+      flame(x, y0 + h + 1, pw);
+      g.rect(x + 1, y0 + 2, 1, 2, glow.base);
+      return;
+    }
+    if (dir === 'up') {
+      // the housing between the pods, over the back
+      const hh = Math.max(3, Math.round(4 * size));
+      over(g, (px, py) => Math.abs(px - bx) < 3.5 && py >= top && py < top + hh, [bx - 4, top, bx + 4, top + hh], c, c.deep);
+      g.rect(x0 - 1, top + 1, 3, 1, glow.base);
+    }
+    const e = d.chestR + d.armW - 1;
+    for (const sg of [-1, 1]) {
+      const x = sg < 0 ? Math.round(bx - e) - pw : Math.round(bx + e);
+      g.rect(x, y0 + 1, pw, h - 1, c, { light: 1 });
+      g.rect(x + (pw > 2 ? 1 : 0), y0, pw > 2 ? pw - 2 : pw, 1, c.base);                       // a rounded top
+      g.rect(x, y0 + h, pw, 1, c.deep);
+      flame(x, y0 + h + 1, pw);
+    }
+  }
+}
+
+/** Draws the straps of a pack over the chest, for the `torso` hook: two down the front, one seen from the side, nothing from behind. opt: { colour }. */
+export function packStraps(g, J, P, d, opt = {}) {
+  const colour = opt.colour ?? '#6b7896', top = J.shoulderY + d.chin, len = Math.max(2, Math.round(J.hip[1]) - 3 - top);
+  if (J.dir === 'up') return;
+  if (J.dir === 'side') { g.rect(Math.round(J.neck[0] - Math.round(d.chestR * 1.7) / 2 + 0.3), top, 1, len, colour); return; }      // along the back, clear of the near arm
+  const x = Math.floor(J.bx), half = Math.floor(d.chestR) - 1;
+  g.rect(x - half, top, 1, len, colour); g.rect(x + half, top, 1, len, colour);
+}
+
+/** Draws one row of colour across the body, for the `torso` hook: a belt in its own colour, a stripe across the chest. opt: { colour, up (rows above the hip: 2 is a belt), mark (colour of a buckle or badge in its middle, or null) }. */
+export function stripe(g, J, P, d, opt = {}) {
+  band(g, J, d, opt.up ?? 2, opt.colour ?? '#3f6fd1', opt.mark ?? null);
+}
+
+/** Paints gloves over the hands; call it from the `offhand`, `torso` and `front` hooks with that hook's name as `layer`, and it paints the hands that are on top at that depth for the direction. opt: { colour, layer: 'offhand' | 'torso' | 'front' }. */
+export function gloves(g, J, P, d, opt = {}) {
+  const { colour = '#3f6fd1', layer = 'front' } = opt;
+  const hand = (A, paint) => { const w = d.armW, x = w % 2 ? Math.floor(A.hand[0]) - (w - 1) / 2 : Math.round(A.hand[0]) - w / 2; g.rect(x, Math.round(A.hand[1]) - 1, w, 2, paint, { shade: 0 }); };
+  if (J.dir === 'side') {
+    if (layer === 'offhand') hand(J.armB, toneS04(colour, -0.6));
+    if (layer === 'front') hand(J.armF, colour);
+  } else if (layer === (J.dir === 'up' ? 'torso' : 'front')) { hand(J.armB, colour); hand(J.armF, colour); }
+}
+
+/** Draws the small lights of a suit or armour: one on the chest (not from behind) and one on each shoulder; call it from the `torso` hook and again from the `front` hook with `layer: 'front'` (the near shoulder of a side clip is drawn there). opt: { colour, layer: 'torso' | 'front', chest: false for none, shoulders: false for none }. */
+export function suitLights(g, J, P, d, opt = {}) {
+  const { layer = 'torso', chest = true, shoulders = true } = opt;
+  const c = ramp(opt.colour ?? '#5fe0f0'), top = J.shoulderY + d.chin, dir = J.dir;
+  if (dir === 'side') {
+    if (layer === 'front') { if (shoulders) g.rect(Math.floor(J.armF.shoulder[0]) - 1, Math.round(J.armF.shoulder[1] - 0.5) - 1, 2, 1, c.base); return; }
+    if (chest) { const x = Math.round(J.neck[0] - Math.round(d.chestR * 1.7) / 2 + 0.3) + Math.round(d.chestR * 1.7) - 2; g.rect(x, top + 1, 2, 2, c.base); g.dot(x + 1, top + 1, c.light); }
+    return;
+  }
+  if (layer !== 'torso') return;
+  if (shoulders) for (const [A, sg] of [[J.armF, J.s], [J.armB, -J.s]]) { const x = Math.floor(A.shoulder[0]); g.rect(Math.min(x, x + sg), Math.round(A.shoulder[1] - 0.5), 2, 1, c.base); }
+  if (chest && dir === 'down') { const x = Math.floor(J.bx); g.rect(x - 1, top + 1, 3, 2, c.base); g.dot(x + 1, top + 1, c.light); }
+}
+
+/** The gun kinds heldGun() draws: blaster (a chunky sidearm with a lit cell), scatter (a wide double barrel on a stock), beam (a long emitter with rings and a lit tip). All are carried 'low'. */
+export const GUN_KINDS = ['blaster', 'scatter', 'beam'];
+
+/** The sizes { length, back, pad } in pixels of the gun kinds, as ITEMS has them for the standard kinds: length = hand to muzzle. No arguments: a frozen object. */
+export const GUNS = Object.freeze({
+  blaster: Object.freeze({ length: 8, back: 2, pad: 3 }),
+  scatter: Object.freeze({ length: 9, back: 3, pad: 3.5 }),
+  beam: Object.freeze({ length: 13, back: 3, pad: 3 }),
+});
+
+/** Returns the size { length, back, pad } of a gun kind at a length setting, or itemSize()'s answer for the standard kinds; null for 'none'. kind: a key of GUNS or ITEMS; scale: 1 = standard. */
+export const gunSize = (kind, scale = 1) => (GUNS[kind] ? { length: GUNS[kind].length * scale, back: GUNS[kind].back, pad: GUNS[kind].pad } : itemSize(kind, scale));
+
+/** Draws a held gun (blaster, scatter, beam) from an attach point, and hands every other kind to heldItem(). direction: 'down' | 'up' | 'side'; at: { x, y, angle, reach }; item: { kind, length, metal (colour or ramp), glow (colour of its lit cell and of a beam's tip, or none) }. */
+export function heldGun(g, direction, at, item) {
+  if (!GUNS[item.kind]) return heldItem(g, direction, at, item);
+  const metal = typeof item.metal === 'string' ? ramp(item.metal) : item.metal ?? ramp('#9aa6c0');
+  const a = at.angle, r = at.reach ?? 1, len = item.length * r, hx = at.x, hy = at.y;
+  const to = (dist, turn = 0, from = [hx, hy]) => reach(from[0], from[1], a + turn, dist);
+  const under = direction === 'up' ? PI / 2 : -PI / 2;                 // the side the grip is on: away from the body
+  const lit = typeof item.glow === 'string' ? item.glow : null;
+  if (r < 0.7 && direction === 'down' && Math.abs(Math.sin(a)) < 0.3 && Math.cos(a) > 0) {
+    // pointing at the camera: seen end on, a short thick block with the muzzle in its face
+    const wide = item.kind === 'scatter' ? 5 : item.kind === 'beam' ? 3 : 4, end = Math.max(len, 4.5), [tx, ty] = to(end), [ex, ey] = to(end - 0.5);
+    // ringed with the outline colour where it lies over the body, so it stands out from a chest of any colour
+    over(g, limbIn(hx, hy, tx, ty, wide), [Math.min(hx, tx) - wide, Math.min(hy, ty) - wide, Math.max(hx, tx) + wide, Math.max(hy, ty) + wide], metal, INK, { shade: 0 });
+    const bore = (x, y, c) => { const [qx, qy] = to(1, PI, [x, y]); g.dot(x, y, c); g.dot(qx, qy, c); };      // two pixels deep
+    if (item.kind === 'scatter') { for (const k of [-1, 1]) bore(...to(1.3, k * PI / 2, [ex, ey]), metal.deep); }
+    else { const [qx, qy] = to(0.5, -PI / 2, [ex, ey]), [px, py] = to(0.5, PI / 2, [ex, ey]); bore(qx, qy, item.kind === 'beam' && lit ? lit : metal.deep); bore(px, py, item.kind === 'beam' && lit ? lit : metal.deep); }
+    if (lit && item.kind !== 'beam') { const [lx, ly] = to(end - 3); g.dot(lx, ly, lit); }
+    return;
+  }
+  if (item.kind === 'blaster') {
+    const [bx, by] = to(2 * r, PI), [mx, my] = to(Math.max(2, len - 2.5)), [tx, ty] = to(len), [ux, uy] = to(2.6, under);
+    g.limb(hx, hy, ux, uy, 2, metal.dark);                              // the grip
+    g.limb(mx, my, tx, ty, 2, metal.dark);                              // the muzzle, with a bright tip
+    g.dot(tx, ty, metal.light);
+    g.limb(bx, by, mx, my, 3, metal);
+    if (lit) { const [lx, ly] = to(len * 0.25), [kx, ky] = to(len * 0.25 + 1); g.dot(lx, ly, lit); g.dot(kx, ky, lit); }
+  } else if (item.kind === 'scatter') {
+    const [sx, sy] = to(3 * r, PI), [bx, by] = to(0.5, PI), [mx, my] = to(len * 0.4), [tx, ty] = to(len);
+    g.limb(sx, sy, bx, by, 2, metal.dark);                              // the stock
+    g.limb(mx, my, tx, ty, 3, { isRamp: true, light: metal.light, base: metal.light, dark: metal.base, deep: metal.dark });
+    g.line(mx, my, tx, ty, metal.deep);                                 // the gap between its two barrels
+    g.limb(bx, by, mx, my, 3, metal);
+    const [px, py] = to(len * 0.62), [qx, qy] = to(2, under, [px, py]);
+    g.line(px, py, qx, qy, metal.dark);                                 // the pump under the barrels
+    if (lit) { const [lx, ly] = to(len * 0.18); g.dot(lx, ly, lit); }
+  } else {
+    const [sx, sy] = to(3 * r, PI), [mx, my] = to(len * 0.36), [tx, ty] = to(len), [ux, uy] = to(2.4, under, to(len * 0.12));
+    g.limb(...to(len * 0.12), ux, uy, 2, metal.dark);                   // the grip
+    g.limb(sx, sy, hx, hy, 2, metal.dark);
+    g.line(mx, my, tx, ty, metal.light);                                // the emitter rod
+    for (const k of [0.56, 0.78]) { const [ax, ay] = to(1.2, PI / 2, to(len * k)), [cx, cy] = to(1.2, -PI / 2, to(len * k)); g.line(ax, ay, cx, cy, metal.base); }      // its rings
+    g.limb(hx, hy, mx, my, 3, metal);
+    if (lit) { const [lx, ly] = to(len * 0.2); g.dot(lx, ly, lit); g.dot(tx, ty, lit); }
+  }
+}
+
+/** How far a peaked cap rises above the top of the head, in pixels, for frame()'s `rise`. size: its Size setting. */
+export const peakedCapRise = (size = 1) => Math.ceil(0.2 + 0.7 * size);
+
+/** A soft cap with a peak, for the `head` hook (set look.hatted): a crown that puffs up with size, a peak over the brow going down and out in front from the side, a band round the back going up. opt: { size (0.5 to 1.8), colour }. */
+export function peakedCap(g, J, P, d, opt = {}) {
+  const { size = 1, colour = '#c8553a' } = opt;
+  const c = ramp(colour), [cx, cy] = J.head, rx = d.headW / 2, ry = d.headH / 2, dir = J.dir, brim = J.brow - 1, x0 = Math.floor(cx);
+  const crown = headIn(J, d, 0.2 + 0.7 * size), peak = 1 + Math.round(1.6 * size), box = [cx - rx - 3, cy - ry - 3, cx + rx + 3, brim];
+  g.fill(...box, (px, py) => crown(px, py) && py < brim, c);
+  if (dir === 'down') g.rect(x0 - 1 - peak, brim, 3 + 2 * peak, 1, c.dark);
+  else if (dir === 'side') g.rect(Math.floor(cx + rx) - 2, brim - 1, 2 + peak, 2, c.dark, { shade: 0 });
+  else g.fill(...box, (px, py) => crown(px, py) && py >= brim - 1 && py < brim, c.dark, { shade: 0 });
+}
+
+// ---- additions of batch S04 (void-ranger), continued ------------------------------------------------
+
+/** Draws the flare of an energy shot at a muzzle: a four-point star with a hot centre and, when `ray` is set, a ray the way the gun points; call it AFTER the outline on the frame where the pose says `fire`, in place of muzzleFlash (give frame().finish `flash: false`). at: { x, y, angle }, the `muzzle` socket; opt: { size (the star's arms in pixels, default 2), colour, core (the colour of its centre), ray (false when the gun points at the camera) }. Never touches the frame edge. */
+export function muzzleFlare(g, at, opt = {}) {
+  const { size = 2, colour = '#5fe0f0', core = '#ffffff', ray = true } = opt;
+  const put = (x, y, c) => { x = Math.floor(x); y = Math.floor(y); if (x >= 1 && y >= 1 && x <= SIZE[0] - 2 && y <= SIZE[1] - 2) g.dot(x, y, c); };
+  const ux = Math.sin(at.angle), uy = Math.cos(at.angle);
+  const cx = Math.floor(at.x + ux * 1.5) + 0.5, cy = Math.floor(at.y + uy * 1.5) + 0.5;          // just beyond the muzzle
+  if (ray) for (let r = 1; r <= size * 2 + 1; r += 0.5) put(cx + ux * r, cy + uy * r, colour);
+  for (let i = size; i >= 1; i--) for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) put(cx + dx * i, cy + dy * i, i === 1 ? core : colour);
+  put(cx, cy, core);
+}
+
+// ---- additions of batch R05 (mage-walker, rogue-walker), continued: two manners for frameWith() -------
+
+/** A manner for frameWith(): turns `run` into a low, leaning dash, the body dropped and tipped forward, both arms swept back and whatever the hands hold trailing behind. Arguments: P (the pose, changed in place), F (the frame: its action and direction), t (the clip phase, 0..1). */
+export function dashManner(P, F, t) {
+  if (F.action !== 'run') return;
+  const c = Math.cos(TAU * t), side = F.direction === 'side';
+  P.bob += 2; P.lean += 1; P.headDy += 1;
+  P.armF = { f: -3.2 - 0.9 * c, u: 1.5, o: side ? 0 : 1.2 };
+  P.armB = { f: -3.2 + 0.9 * c, u: 1.5, o: side ? 0 : 1.2 };
+  P.item = side ? -0.95 + 0.12 * c : (F.direction === 'up' ? 1 : -1) * (0.95 + 0.1 * c);
+}
+
+/** A manner for frameWith(): in `walk`, a thing carried upright (a staff) is used as a walking stick, lifted with one step and planted with the next. Arguments: P (the pose, changed in place), F (the frame: its action, item and carry), t (the clip phase, 0..1). */
+export function walkingStickManner(P, F, t) {
+  if (F.action !== 'walk' || !F.item || F.carry !== 'upright') return;
+  P.armF.u += 1.8 * Math.max(0, Math.sin(TAU * t));
+}
+
+/**
+ * Adds the carry 'ready' to CARRY: a gun held at the hip, pointing ahead and a little down (side: 1.2, nearly level, with the hand
+ * held forward; down and up: tip down and out). Pass carry: 'ready' to frame() or as m.carry to pose();
+ * the weapon arm then swings less in `walk`, so the gun is carried steady. No arguments: a constant, the angles of the new carry.
+ */
+export const CARRY_READY = Object.freeze({ down: -0.6, up: 0.6, side: 1.2 });
+CARRY.ready = CARRY_READY;
+CARRY_HAND.ready = { side: { f: 2.5 } };
+
+/** Draws the afterimage streaks of a dash: two bars that trail from a tucked body, opposite the way it faces (up the screen behind a body dashing at the camera, to the left in a side clip); call it AFTER the outline while the pose is tucked. J = what draw() returned; opt: { colour, core (the colour of the end nearest the body), length (pixels, default 8), fade (0..1: how far the dash has run; the bars shorten to nothing), rise (pixels the headgear stands above the head) }. Never touches the frame edge. */
+export function dashStreaks(g, J, P, d, opt = {}) {
+  const { colour = '#5fe0f0', core = '#ffffff', length = 8, fade = 0, rise = 0 } = opt;
+  const len = Math.round(length * (1 - clamp(fade)));
+  if (len < 1) return;
+  const put = (x, y, c) => { if (x >= 1 && y >= 1 && x <= SIZE[0] - 2 && y <= SIZE[1] - 2) g.dot(x, y, c); };
+  const at = (k) => (k < Math.max(1, len * 0.3) ? core : k >= len - 1 && len > 2 ? toneS04(colour, -1) : colour);
+  const x0 = Math.floor(J.bx), far = Math.max(2, Math.floor(d.headR) - 2);
+  for (const [i, sg] of [[0, -1], [1, 1]]) {
+    const n = Math.max(1, len - i * 2);                                  // the second bar is a little shorter
+    for (let k = 0; k < n; k++) for (const w of [0, 1]) {
+      if (J.dir === 'side') put(Math.floor(J.neck[0] - d.chestR) - 3 - k, Math.round(J.shoulderY + d.chin) + (sg < 0 ? 0 : 5) + w, at(k));
+      else if (J.dir === 'up') put(x0 + sg * far + (sg < 0 ? -w : w), J.gy + 2 + k, at(k));
+      else put(x0 + sg * far + (sg < 0 ? -w : w), Math.floor(J.headTop - rise) - 2 - k, at(k));
+    }
+  }
+}
+
+// ---- additions of batch R06 (village-elder, merchant) ---------------------------------------------
+// A frame with a pose or a body of its own: poseFrame (frameWith() plus a pose function and other measurements),
+// gesture ('wave', 'count'), and two things to do in a manner: stoop (an old back; hunch draws it) and plantStick
+// (a walking stick whose tip stands on the ground). Worn: baldingHair, circlet, turban (turbanRise for frame()'s
+// `rise`), spectacles (the `head` hook); neck, apron (the `torso` hook); travelPack (the `behind` hook; packStraps
+// goes with it); fingers (the `front` hook, with gesture 'count'); waveArm (the `front` hook, with gesture 'wave':
+// the raised forearm and hand; waveHand says where they are; both are at the end of the file). Held: purse and
+// scale (TRADE_ITEMS, tradeItemSize, tradeItem). Nothing above this line was changed.
+import { ellipseIn as ellipseInR06, rectIn as rectInR06 } from '../engine/surface.js';
+
+/**
+ * Builds one frame like frameWith(), for a character with a pose or a body shape of its own: an action the standard table lacks, or other measurements.
+ * clip, t, p and opt.item, rise, points, carry, tall, muzzle: as frame(). opt.pose: (action, direction, u, m, d) => P, or nothing for the standard pose (gesture() goes here);
+ * opt.dims: (d) => d changes the measurements (longer arms); opt.manner: (P, F, u) => void or a list of them, as frameWith() (F: { action, direction, d, item }), applied before the one fit().
+ * Returns the same F as frame(): { clip, action, direction, d, P, item, poseAt(u), sockets(), hand(J), draw(g, look, hooks), finish(g, { trail, flash, outline }) }.
+ */
+export function poseFrame(clip, t, p = {}, opt = {}) {
+  const { action, direction } = parseClip(clip);
+  let d = dims(p, { tall: opt.tall });
+  if (opt.dims) d = opt.dims(d) ?? d;
+  const item = opt.item && opt.item.length > 0 ? opt.item : null;
+  const m = { bounce: p.bounce, stride: p.stride, armed: !!item, carry: opt.carry };
+  const points = opt.points ?? (opt.rise ? (J) => [[J.head[0], J.headTop - opt.rise]] : null), manners = [].concat(opt.manner ?? []);
+  const poseAt = (u) => {
+    const P = opt.pose?.(action, direction, u, m, d) ?? pose(!item && action === 'attack' ? 'punch' : action, direction, u, m, d);
+    for (const manner of manners) manner(P, { clip, action, direction, d, item }, u);
+    return fit(direction, P, d, { item, points });
+  };
+  const P = poseAt(t);
+  return {
+    clip, action, direction, d, P, item, poseAt,
+    sockets: () => {
+      const J = solve(direction, P, d), out = sockets(J, P, d, { muzzle: opt.muzzle ?? item?.length }), H = waveHand(J, P, d);
+      // a waving arm bends at the elbow: the off hand is the raised hand, not the end of the rig's arm
+      if (H) { const x = H.x + H.w / 2, y = H.y + H.h / 2; out.offhand = { x, y, angle: Math.atan2(x - H.elbow[0], y - H.elbow[1]) }; }
+      return out;
+    },
+    hand: (J) => sockets(J, P, d).hand,
+    draw: (g, look, hooks) => draw(g, direction, P, d, look, hooks),
+    finish(g, o = {}) {
+      if (P.flash) g.tint('#ffffff');
+      g.outline(o.outline ?? INK);
+      if (o.trail && action === 'attack' && item) slashTrail(g, direction, poseAt, t, d, item.length, o.trail);
+      if (P.fire && item && o.flash !== false) muzzleFlash(g, this.sockets().muzzle, 3, typeof o.flash === 'string' ? o.flash : '#ffffff');
+      return g;
+    },
+  };
+}
+
+/** The gestures gesture() can pose: 'wave' (a one-shot of 8 frames) and 'count' (a loop of 8 frames). */
+export const GESTURES = ['wave', 'count'];
+
+/**
+ * Returns the pose of a gesture the standard actions lack, in pose()'s terms: 'wave' raises the free arm high, bent at the elbow, and swings the hand twice beside the head (it starts and ends standing; it sets P.wave, and waveArm() in the `front` hook draws the forearm and the hand); 'count' holds the free hand up and ticks off one, two, three fingers (P.count, drawn by fingers()).
+ * action: one of GESTURES; direction, t (0..1), m, d: as pose(). Pass it as poseFrame()'s opt.pose for the clips that use it.
+ */
+export function gesture(action, direction, t, m = {}, d = dims()) {
+  if (!GESTURES.includes(action)) throw new Error(`topdown rig: no gesture "${action}" (${GESTURES.join(', ')})`);
+  const side = direction === 'side';
+  const P = pose('idle', direction, 0, m, d);                 // standing: the frame every one-shot starts from and ends on
+  P.blink = false;
+  if (action === 'wave') {
+    // 0 standing, 1 the arm goes up, 2 to 5 out, in, out, in, 6 it comes down, 7 standing
+    const up = keys(t, [[0, 0], [0.286, 1], [0.714, 1], [1, 0]]);
+    const swing = keys(t, [[0.143, 0], [0.286, 1], [0.429, -1], [0.571, 1], [0.714, -1], [0.857, 0]], (x) => x);
+    // A straight arm cannot reach past a head this big without crossing the face, so the arm bends: the rig's own arm
+    // is the upper arm, out beside the shoulder to the elbow (ahead of the chest seen from the side), and the forearm
+    // and the open hand stand up from there, beside the head (P.wave; waveHand() places them, waveArm() draws them)
+    const reach = d.headW / 2 + 5 - (side ? 0 : d.chestR + d.armW / 2 - 1);      // the elbow is under the hand's swing
+    P.armB.u += (d.arm + 1.5) * up;
+    if (side) P.armB.f = reach * up; else P.armB.o = reach * up;
+    P.wave = { raise: up, swing };
+    P.headDy = up > 0.5 ? -1 : 0;                             // the chin comes up
+    P.mouth = up > 0.9 && swing > 0.5;                        // calling out on the two outward swings
+    P.sway = swing * up;
+  } else {
+    // four beats: one, two, three fingers go up, then the hand closes; the mouth moves on frames 2 and 6
+    const beat = Math.floor(fract(t) * 4 + 1e-6), early = fract(t * 4 + 1e-6) < 0.5, talk = fract(t * 2);
+    P.count = (beat + 1) % 4;
+    P.armB.u = d.arm - 1.5 + (P.count ? (early ? 1.5 : 0.5) : -0.5);      // the hand jerks up as each finger goes out
+    P.armB.o = 4.5;
+    P.armB.f = side ? 3 : 0;
+    P.mouth = talk >= 0.5 && talk < 0.75;
+    P.headDy = P.mouth ? 1 : 0;
+    P.blink = t >= 0.5 && t < 0.62;
+    P.sway = 0.5 * wave(fract(t));
+  }
+  if (m.carry === 'hang') { P.item = 0.12 * P.sway; P.reach = 1; }
+  return P;
+}
+
+/**
+ * Bends a pose forward into an old person's stoop: the shoulders tip forward, the knees give a little and the head sinks towards the chest. Call it from a manner (frameWith(), poseFrame()); hunch() draws the rounded back that goes with it.
+ * P: the pose (changed in place and returned); direction: 'down' | 'up' | 'side'; amount: 0 (upright) to 1 (bent low). Sets P.stoop to the amount.
+ */
+export function stoop(P, direction, amount = 0.5) {
+  const a = clamp(amount);
+  if (P.lie || a <= 0) return P;
+  if (direction === 'side') { P.lean += 3.2 * a; P.headDx = (P.headDx ?? 0) + 1.6 * a; P.headDy = (P.headDy ?? 0) + 2.2 * a; P.bob += 1.4 * a; }
+  else { P.headDy = (P.headDy ?? 0) + 3 * a; P.bob += 2 * a; }
+  P.stoop = a;
+  return P;
+}
+
+/**
+ * Draws the rounded back of a stooped body: a hump behind the neck seen from the side (the `torso` hook), and shoulders that rise over the bottom of the head seen from behind (the `front` hook). Nothing facing down.
+ * g, J, P, d: as a hook gets them; opt: { colour (the cloth of the back), amount (0..1; default P.stoop), front: true when called from the `front` hook (it then draws only the view from behind; without it only the side view) }.
+ */
+export function hunch(g, J, P, d, opt = {}) {
+  const a = clamp(opt.amount ?? P.stoop ?? 0);
+  if (a < 0.15 || J.dir === 'down' || (J.dir === 'up') !== !!opt.front) return;
+  const c = ramp(opt.colour ?? '#a8a4a0'), top = J.shoulderY + d.chin;
+  if (J.dir === 'side') {
+    const wide = Math.round(d.chestR * 1.7), x = J.neck[0] - wide / 2 + 0.6, rx = 1.2 + 1.6 * a, ry = 2.2 + 1.4 * a;
+    g.ellipse(x, top + 1.6, rx, ry, c);
+    return;
+  }
+  // the shoulders, rounded, up over the bottom of the head, and the back below them down to where the head ends
+  const rx = d.chestR + d.armW - 0.6, ry = 0.8 + 2.6 * a, round = ellipseInR06(J.bx, top + 1, rx, ry), low = J.headTop + d.headH + 1;
+  g.fill(J.bx - rx - 1, top - ry - 1, J.bx + rx + 1, low, (px, py) => (py < top + 1 ? round(px, py) : Math.abs(px - J.bx) < d.headW / 2 + 0.5), c.base, { shade: 0 });
+}
+
+/**
+ * Plants a walking stick: puts the weapon hand on top of a stick whose tip stands on the ground beside the body, and in a walk lifts and plants it between the footfalls (in the air on frames 1 and 5 of 8, down on 2 and 6). A stick too short for the hand bends the knees. Call it from a manner (frameWith(), poseFrame()), after stoop().
+ * P: the pose (changed in place and returned: armF, item, reach, bob); direction; d: dims; opt: { action, t (the frame's phase), length (the stick, hand to tip, in pixels), step (how far the tip travels each way, default 2), lift (how high it is lifted, default 2) }.
+ */
+export function plantStick(P, direction, d, opt = {}) {
+  if (P.lie) return P;
+  const { action = 'idle', t = 0, length = 11, step = 2, lift = 2 } = opt;
+  const side = direction === 'side', up = direction === 'up';
+  // the tip is a third foot that steps twice as often as the feet
+  let f = 0, air = 0, far = 0;
+  if (action === 'walk' || action === 'run') {
+    const u = fract(2 * t);
+    if (u < 0.5) { f = lerp(-step, step, smooth(u * 2)); air = lift * Math.sin(PI * u * 2); } else f = lerp(step, -step, (u - 0.5) * 2);
+    far = K * (up ? step + f : step - f);                     // facing down or up, a tip that is further from the camera is higher on the screen
+  }
+  // the hand: out to its side (ahead of the body seen from the side), and still while the other arm swings
+  const out = side ? 5 : 2;
+  P.armF.o = side ? 0 : out; P.armF.f = side ? out : 0;
+  const place = () => {
+    P.armF.u = 0;
+    const J = solve(direction, P, d), [sx, sy] = J.armF.shoulder, hx = J.armF.hand[0];
+    const tip = side ? [sx + out + 1.5 + f, J.gy - 0.5 - air] : [sx + J.s * (out + 1.5), J.gy - 0.5 - air - far];
+    const handY = tip[1] - Math.sqrt(Math.max(1, length * length - (tip[0] - hx) ** 2));      // where the hand must be for the stick to reach the ground
+    const low = sy + Math.sqrt(Math.max(1, (d.arm + 1.2) ** 2 - out * out));                   // the lowest the hand can go
+    P.armF.u = sy + d.arm - Math.min(handY, low);
+    return { tip, short: handY - low };
+  };
+  let at = place();
+  if (at.short > 0.5) { P.bob += Math.min(3, Math.round(at.short)); at = place(); }              // a short stick: the body comes down to it
+  const [hx, hy] = solve(direction, P, d).armF.hand;
+  P.item = Math.atan2(at.tip[0] - hx, at.tip[1] - hy);
+  P.reach = Math.hypot(at.tip[0] - hx, at.tip[1] - hy) / length;
+  return P;
+}
+
+/** Draws a bald crown ringed with hair, for the `head` hook (set look.hairStyle 'bald'): hair at the temples with a tuft over each ear facing down, a band round the back of the head facing away. opt: { colour }. */
+export function baldingHair(g, J, P, d, opt = {}) {
+  const c = ramp(opt.colour ?? '#f0ead8'), [cx, cy] = J.head, rx = d.headW / 2, ry = d.headH / 2, inH = headIn(J, d), box = headBox(J, d, 3);
+  const top = J.brow - 2, bottom = J.brow + 3;
+  if (J.dir === 'side') {
+    g.fill(...box, (px, py) => inH(px, py) && py >= top + 1 && py < bottom + 1 && px < cx - rx * 0.4, c);
+    g.ellipse(cx - rx + 0.2, J.brow + 1.5, 1.6, 2.1, c);
+    return;
+  }
+  if (J.dir === 'up') g.fill(...box, (px, py) => inH(px, py) && py >= cy - 1.5 && py < cy + ry * 0.55, c);
+  else g.fill(...box, (px, py) => inH(px, py) && py >= top && py < bottom && Math.abs(px - cx) > rx - 2.2, c);
+  for (const sg of [-1, 1]) g.ellipse(cx + sg * (rx - 0.2), J.brow + 0.5, 1.6, 2.1, c);
+}
+
+/** Draws a circlet, for the `head` hook: a thin band of metal round the brow with a stone at the front, hair or skin showing above it. opt: { size (0.5 to 1.8: a deeper band and a bigger stone), metal, gem (colour, or null for none) }. */
+export function circlet(g, J, P, d, opt = {}) {
+  const { size = 1, gem = null } = opt;
+  const m = ramp(opt.metal ?? '#f2c230'), [cx] = J.head, rx = d.headW / 2, dir = J.dir, inH = headIn(J, d, 0.6), box = headBox(J, d, 2);
+  const deep = size >= 1.25 ? 2 : 1, y1 = J.brow - 1, y0 = y1 - deep;
+  g.fill(...box, (px, py) => inH(px, py) && py >= y0 && py < y1, m.base, { shade: 0 });
+  if (deep > 1) g.fill(...box, (px, py) => inH(px, py) && py >= y1 - 1 && py < y1, m.dark, { shade: 0 });
+  g.fill(...box, (px, py) => inH(px, py) && py >= y0 && py < y0 + 1 && px > cx + rx * 0.2, m.light, { shade: 0 });      // lit from the top right
+  if (!gem || dir === 'up') return;
+  const w = size < 0.8 ? 1 : size < 1.5 ? 2 : 3, h = deep + (w > 1 ? 1 : 0);
+  const x = dir === 'side' ? Math.floor(cx + rx) - w : Math.floor(cx) - Math.floor((w - 1) / 2);
+  g.rect(x, y1 - h, w, h, gem, { shade: 0 });
+}
+
+/** Returns how far a turban() rises above the top of the head, in pixels, for frame()'s `rise`. size: its Size setting. */
+export const turbanRise = (size = 1) => 2 + 2 * size;
+
+/** Draws a turban, for the `head` hook (set look.hatted): wound cloth that bulges wider than the head, with the lines of its folds, a jewel at the front and a short loose end behind (seen from the side). opt: { size (0.5 to 1.8: taller and wider), colour, band (colour of the cap that shows along its lower edge, or null), jewel (colour, or null for none) }. */
+export function turban(g, J, P, d, opt = {}) {
+  const { size = 1, colour = '#f0ead8', band: under = null, jewel = '#f2c230' } = opt;
+  const c = ramp(colour), [cx, cy] = J.head, rx = d.headW / 2, dir = J.dir, sway = P.sway ?? 0;
+  const edge = dir === 'up' ? Math.round(cy) + 1 : J.brow - 1, top = J.headTop - Math.round(turbanRise(size));
+  const wide = rx + 0.7 + 0.5 * size, my = (top + edge) / 2 + 0.3, ry = edge - my + 0.6, shell = headIn(J, d, 0.5);
+  const body = (px, py) => py < edge && py >= top && (shell(px, py) || Math.abs((px - cx) / wide) ** 2.4 + Math.abs((py - my) / ry) ** 2.4 <= 1);
+  const box = [cx - wide - 4, top - 1, cx + wide + 3, edge + 8];
+  // the loose end first, so the wound cloth lies over where it is tucked in
+  const tail = 1.5 + 1.5 * size;
+  if (dir === 'side') g.capsule(cx - wide + 1.2, edge - 1.5, cx - wide + 0.2 - sway, edge + tail, 1.3, 0.9, c);
+  g.fill(...box, body, c, { shade: 2 });
+  // the folds: the cloth is wound in layers round its knot (at the middle of the brow; at the crown, seen from behind)
+  const [kx, ky] = dir === 'side' ? [cx + wide - 1.5, edge - 1] : dir === 'up' ? [cx, top + 0.5] : [cx, edge - 1];
+  const fold = (px, py) => { const v = Math.hypot((px - kx) / 1.5, py - ky); return Math.abs(v - 2.6) < 0.5 || Math.abs(v - 5.2) < 0.5; };
+  g.fill(...box, (px, py) => body(px, py) && body(px, py - 1) && body(px - 1, py) && body(px + 1, py) && fold(px, py), c.dark, { shade: 0 });
+  if (under) g.fill(...box, (px, py) => body(px, py) && !body(px, py + 1), under, { shade: 0 });
+  if (!jewel || dir === 'up') return;
+  const w = size > 1.3 ? 3 : 1;
+  if (dir === 'side') g.rect(Math.floor(cx + wide) - 2, edge - 3, 2, 2, jewel, { shade: 0 });
+  else g.rect(Math.floor(cx) - (w - 1) / 2, edge - 3, w, 2, jewel, { shade: 0 });
+}
+
+/** Draws round spectacles, for the `head` hook: two rings joined across the nose facing down (9 to 11 px across), one ring and its arm facing sideways, nothing facing away. opt: { frame (colour of the wire), lens (colour of the glint on each glass) }. */
+export function spectacles(g, J, P, d, opt = {}) {
+  const { frame: wire = '#5a5f7a', lens = '#f0ead8' } = opt;
+  if (J.dir === 'up') return;
+  const col0 = Math.floor(J.head[0]), ex = d.headW >= 13 ? 3 : 2, ey = J.brow + 1;
+  // one glass: the eye keeps its column, the glint is on the column outside it (sg: which way is outside)
+  const glass = (x, sg) => {
+    const x0 = Math.min(x, x + sg);
+    g.rect(x0, ey - 1, 2, 1, wire); g.rect(x0, ey + 2, 2, 1, wire);
+    g.rect(x0 - 1, ey, 1, 2, wire); g.rect(x0 + 2, ey, 1, 2, wire);
+    g.dot(x + sg, ey, lens);
+  };
+  if (J.dir === 'side') {
+    glass(col0 + ex, 1);
+    g.rect(col0 - 2, ey, ex + 1, 1, wire);                     // the arm, back to the ear
+    return;
+  }
+  glass(col0 - ex, -1); glass(col0 + ex, 1);
+  g.rect(col0 - ex + 2, ey, 2 * ex - 3, 1, wire);              // the bridge
+}
+
+/** Draws the neck of a head carried high, for the `torso` hook: skin in the chin's shadow from under the head to the collar. Raise the head first (P.headDy below 0, in a manner); with no gap it draws nothing. opt: { skin }. */
+export function neck(g, J, P, d, opt = {}) {
+  const c = ramp(opt.skin ?? '#f6d3b0'), y0 = J.headTop + d.headH, y1 = J.shoulderY + d.chin - 1;
+  if (y1 <= y0) return;
+  g.rect(Math.floor(J.dir === 'side' ? J.neck[0] + 0.5 : J.bx) - 1, y0 - 1, 3, y1 - y0 + 2, c.dark, { shade: 0 });
+}
+
+/** Draws an apron, for the `torso` hook: a bib on the chest and a panel down the legs, narrower than the body, with a tie at the waist and a pocket facing down; its front edge facing sideways; only its strings and bow facing away. opt: { colour, length (0..1: how far down the legs it comes; default 0.7) }. */
+export function apron(g, J, P, d, opt = {}) {
+  const { colour = '#c8553a', length = 0.7 } = opt;
+  const c = ramp(colour), dir = J.dir, hip = Math.round(J.hip[1]), top = J.shoulderY + d.chin + 1, waist = hip - 3;
+  const hemY = Math.max(hip + 1, Math.min(J.gy - 3, hip + Math.round((J.gy - hip) * clamp(length))));
+  const x = Math.floor(J.bx), half = Math.floor(d.chestR);
+  if (dir === 'side') {
+    const wide = Math.round(d.chestR * 1.7), y0 = J.shoulderY + d.chin - 1;
+    const front = (py) => Math.round(lerp(J.neck[0], J.hip[0], clamp((py - y0) / (hip - y0))) - wide / 2 + 0.3) + wide;      // the first column in front of the chest
+    g.fill(J.bx - 10, top, J.bx + 12, hemY, (px, py) => py >= top && py < hemY && px >= front(Math.min(py, hip)) - 2 && px < front(Math.min(py, hip)) + 1, c);
+    const back = front(waist) - wide;
+    g.rect(back, waist, wide - 2, 1, c.dark, { shade: 0 });
+    g.rect(back - 1, waist, 1, 2, c.base, { shade: 0 });                 // the bow, behind
+    return;
+  }
+  if (dir === 'up') {
+    g.rect(x - half, waist, 2 * half + 1, 1, c.base, { shade: 0 });      // the strings
+    g.rect(x - 1, waist, 3, 1, c.dark, { shade: 0 });                    // the bow and its two ends
+    g.rect(x - 1, waist + 1, 1, 2, c.base, { shade: 0 }); g.rect(x + 1, waist + 1, 1, 2, c.base, { shade: 0 });
+    return;
+  }
+  const bib = Math.max(2, half - 2), skirt = Math.max(bib, half - 1);
+  g.blob([rectInR06(x - bib, top, 2 * bib + 1, waist - top), rectInR06(x - skirt, waist, 2 * skirt + 1, hemY - waist)], c);
+  g.rect(x - bib, top - 1, 1, 1, c.base, { shade: 0 }); g.rect(x + bib, top - 1, 1, 1, c.base, { shade: 0 });      // the straps over the shoulders
+  g.rect(x - skirt, waist, 2 * skirt + 1, 1, c.dark, { shade: 0 });      // the tie
+  if (hemY - waist > 5) g.rect(x, waist + 3, 3, 1, c.dark, { shade: 0 });      // a pocket
+}
+
+/** The kinds travelPack() can draw: a framed backpack, a wooden crate, a tied sack. */
+export const TRAVEL_PACK_KINDS = ['backpack', 'crate', 'sack'];
+
+/**
+ * Draws a traveller's pack carried on the back over the shoulder of the weapon hand, for the `behind` hook (packStraps() draws its straps): beside the head facing down, over the back facing away, behind the body facing sideways; never taller than the head. A rolled rug can lie across its top and a lantern hang from it.
+ * g, J, P, d: as a hook gets them; opt: { kind: one of TRAVEL_PACK_KINDS, size (0.65 to 1.35), colour (the cloth of a backpack or sack), wood (the frame or the crate, and the lantern's fittings), rug (colour of the roll, or null), lantern (colour of its light, or null) }.
+ */
+export function travelPack(g, J, P, d, opt = {}) {
+  const { kind = 'backpack', size = 1, colour = '#c9a06a', wood = '#9a6a3e', rug = null, lantern = null } = opt;
+  if (!TRAVEL_PACK_KINDS.includes(kind)) return;
+  const c = ramp(colour), w = ramp(wood), dir = J.dir, sway = P.sway ?? 0;
+  const shoulder = J.shoulderY + d.chin, bottom = Math.round(J.hip[1]);
+  const top = Math.max(J.headTop + 4, shoulder - Math.round((kind === 'crate' ? 2 : 4) * size));      // a crate is squat; the others reach the ears
+  // the box the pack fills, in whole pixels: [x0, x1) by [top, bottom); `outer` is its free side (-1 left, 1 right)
+  let x0, x1, outer;
+  if (dir === 'side') { x1 = Math.round(J.neck[0] - d.chestR * 0.85) + 1; x0 = x1 - Math.round(5 + 2 * size); outer = -1; }
+  else { outer = J.s; const mid = Math.floor(J.bx) + outer * 4, wide = Math.round(9 + 3 * size); x0 = mid - Math.floor(wide / 2); x1 = x0 + wide; }
+  const W = x1 - x0, H = bottom - top, mx = (x0 + x1) / 2;
+  if (kind === 'crate') {
+    g.rect(x0, top, W, H, w, { shade: 2 });
+    g.rect(x0, top, W, 1, w.dark, { shade: 0 }); g.rect(x0, bottom - 1, W, 1, w.dark, { shade: 0 });
+    g.rect(x0, top, 1, H, w.dark, { shade: 0 }); g.rect(x1 - 1, top, 1, H, w.dark, { shade: 0 });
+    for (let y = top + 3; y < bottom - 2; y += 3) g.rect(x0 + 1, y, W - 2, 1, w.dark, { shade: 0 });      // the planks
+  } else if (kind === 'sack') {
+    g.blob([ellipseInR06(mx, top + H * 0.56, W / 2, H * 0.48), rectInR06(Math.floor(mx) - 1, top - 1, 3, 3)], c, { shade: 2 });
+    g.rect(Math.floor(mx) - 1, top + 1, 3, 1, w.dark, { shade: 0 });                                       // the cord round its neck
+    g.rect(x0 + 2, top + Math.round(H * 0.55), 2, 2, c.dark, { shade: 0 });                                // a patch
+  } else {
+    // a bag on a wooden frame whose two poles stand above it
+    g.rect(x0, top - 2, 1, H + 2, w.dark, { shade: 0 }); g.rect(x1 - 1, top - 2, 1, H + 2, w.dark, { shade: 0 });
+    g.rect(x0 + 1, top, W - 2, H, c, { shade: 2 });
+    const flap = top + Math.max(2, Math.round(H * 0.35));
+    g.rect(x0 + 1, flap, W - 2, 1, c.dark, { shade: 0 });
+    g.dot(Math.floor(mx), flap + 1, w.dark);                                                               // the buckle
+  }
+  if (rug) {
+    // a roll lying across the top (seen end-on from the side), a ring of its darker tone at each end
+    const r = ramp(rug), ry = top - (kind === 'sack' ? 0.5 : 1.5);
+    if (dir === 'side') { g.ellipse(mx, ry, 2.4, 2.4, r.base, { shade: 0 }); g.dot(Math.floor(mx), Math.floor(ry), r.dark); }
+    else {
+      const a = x0 - (outer < 0 ? 1.5 : 0) + 1.5, b = x1 + (outer > 0 ? 1.5 : 0) - 1.5;
+      g.capsule(a, ry, b, ry, 2.1, 2.1, r.base, { shade: 0 });
+      for (let sx = Math.round(a) + 1; sx < b; sx += 3) g.rect(sx, Math.round(ry - 2), 1, 4, r.dark, { shade: 0 });
+    }
+  }
+  if (lantern) {
+    // a small lantern on a hook at the pack's free side
+    const lx = (outer > 0 ? x1 : x0 - 1) + Math.round(sway * 0.6) * (dir === 'side' ? -1 : 1), ly = top + 3, light = ramp(lantern);
+    g.rect(outer > 0 ? x1 - 1 : x0 - 1, top + 1, 2, 1, w.dark, { shade: 0 });
+    g.rect(lx, top + 1, 1, 2, w.dark, { shade: 0 });
+    g.rect(lx - 1, ly, 3, 1, w.dark, { shade: 0 });
+    g.rect(lx - 1, ly + 1, 3, 2, light.base, { shade: 0 });
+    g.rect(lx - 1, ly + 3, 3, 1, w.dark, { shade: 0 });
+  }
+}
+
+/** Draws the raised fingers of the free hand, for the `front` hook: one to three thin fingers above the fist, a pixel apart so they can be counted. opt: { skin, count (default P.count, which gesture('count') sets) }. */
+export function fingers(g, J, P, d, opt = {}) {
+  const n = Math.min(3, Math.round(opt.count ?? P.count ?? 0));
+  if (!(n > 0) || P.lie) return;
+  const c = ramp(opt.skin ?? '#f6d3b0'), A = J.armB, w = d.armW;
+  const x = w % 2 ? Math.floor(A.hand[0]) - (w - 1) / 2 : Math.round(A.hand[0]) - w / 2, y = Math.round(A.hand[1]) - 1;      // the fist, as the rig draws it
+  const mid = x + Math.floor((w - 1) / 2), tone = J.dir === 'side' ? c.dark : c.base;
+  for (let i = 0; i < n; i++) g.rect(mid - 2 + 2 * i, y - 2, 1, 2, tone, { shade: 0 });
+}
+
+/** The sizes { length, back, pad, hangs } in pixels of the trade goods tradeItem() draws, both hanging from the hand: purse (hand to the bottom of the bag) and scale (hand to its pans). No arguments: a frozen object. */
+export const TRADE_ITEMS = Object.freeze({
+  purse: Object.freeze({ length: 7, back: 0, pad: 3, hangs: true }),
+  scale: Object.freeze({ length: 8, back: 0, pad: 5.5, hangs: true }),
+});
+
+/** Returns the size { length, back, pad, hangs } of a trade good at a size setting, or smallItemSize()'s answer for every other kind; null for 'none'. kind: a key of TRADE_ITEMS, SMALL_ITEMS or ITEMS; scale: 1 = standard. */
+export const tradeItemSize = (kind, scale = 1) => (TRADE_ITEMS[kind] ? { length: TRADE_ITEMS[kind].length * scale, back: 0, pad: TRADE_ITEMS[kind].pad * scale, hangs: true } : smallItemSize(kind, scale));
+
+/** Draws a trade good hanging from the hand (a coin purse, or a balance scale whose beam tips as it swings), and hands every other kind to smallItem(). direction: 'down' | 'up' | 'side'; at: { x, y, angle, reach }; item: { kind, length, metal (the scale), wood (the purse's leather), hilt (the coins) }. */
+export function tradeItem(g, direction, at, item) {
+  if (!TRADE_ITEMS[item.kind]) return smallItem(g, direction, at, item);
+  const metal = typeof item.metal === 'string' ? ramp(item.metal) : item.metal ?? ramp('#f2c230');
+  const len = item.length * (at.reach ?? 1), x = Math.floor(at.x), y = Math.round(at.y), lean = Math.sin(at.angle);
+  if (item.kind === 'purse') {
+    const leather = ramp(item.wood ?? '#9a6a3e'), r = Math.max(1.9, len * 0.36), cx = x + 0.5 + Math.round(lean * len), cy = at.y + len - r;
+    g.line(at.x, at.y, cx, cy - r, leather.dark);                                         // the drawstring
+    g.ellipse(cx, cy, r, r, leather, { light: 1 });
+    g.rect(Math.floor(cx) - 1, Math.round(cy - r) - 1, 3, 1, item.hilt ?? '#f2c230', { shade: 0 });      // coins at its mouth
+    g.rect(Math.floor(cx) - 1, Math.round(cy - r), 3, 1, leather.dark, { shade: 0 });     // the gathered neck
+    return;
+  }
+  // scale: a ring in the hand, a beam under it, a pan on two strings at each end
+  // it never hangs level: one pan is a pixel or two lower, and they change places as it swings
+  const half = Math.max(3, Math.round(len * 0.55)), drop = Math.max(2, Math.round(len * 0.5) - 2), tip = lean < -0.03 ? -1 : 1;
+  g.rect(x, y, 1, 2, metal.dark, { shade: 0 });
+  g.line(x - half + 0.5, y + 2.5 - tip, x + half + 0.5, y + 2.5 + tip, metal.base);
+  for (const sg of [-1, 1]) {
+    const ex = x + sg * half, ey = y + 2 + sg * tip;
+    g.rect(ex, ey + 1, 1, drop, metal.dark, { shade: 0 });
+    g.rect(ex - 2, ey + 1 + drop, 5, 1, metal.base, { shade: 0 });
+    g.rect(ex - 1, ey + 2 + drop, 3, 1, metal.dark, { shade: 0 });
+  }
+}
+
+/** Draws a stripe down the middle of the back, for the `torso` hook: from the collar to the belt, seen only from behind (a pack drawn by the `behind` hook covers it). opt: { colour, wide (pixels across: 1 or 3, default 1) }. */
+export function spine(g, J, P, d, opt = {}) {
+  if (J.dir !== 'up') return;
+  const top = J.shoulderY + d.chin, wide = opt.wide === 3 ? 3 : 1;
+  g.rect(Math.floor(J.bx) - (wide - 1) / 2, top, wide, Math.max(2, Math.round(J.hip[1]) - 2 - top), opt.colour ?? '#3f6fd1');
+}
+
+// ---- additions of batch R06, continued: the bent arm of gesture('wave') ------------------------------
+
+/**
+ * Returns where the raised forearm and the open hand of a waving free arm are, in frame pixels, or null when the pose is not waving: the rig's own arm ends at the elbow, the forearm stands up from there, and the hand is held beside the head with its top above the eyes and at least one free column between it and the head (seen from the side: in front of the face).
+ * J: the solved joints; P: a pose with P.wave = { raise (0 hanging to 1 up), swing (-1 in to 1 out), clear (optional: more columns to stay out from the head, for a hat with a wide brim; a manner sets it) }, as gesture('wave') sets it; d: dims. Placed from the head as it is in J, so a head a manner has lifted is followed.
+ * Returns { elbow: [x, y], wrist: [x, y], x, y, w, h (the hand: left column, top row, width and height, whole pixels), out (-1 | 1: which way on the screen the hand swings out) }.
+ */
+export function waveHand(J, P, d) {
+  const wv = P.wave;
+  if (!wv || !(wv.raise > 0) || P.lie) return null;
+  const r = clamp(wv.raise), swing = clamp(wv.swing ?? 0, -1, 1), out = J.dir === 'side' ? 1 : -J.s;
+  const [ex, ey] = J.armB.hand, w = 3, h = 3;
+  // fully raised: 'in' the hand is 3 columns clear of the head (room for a ponytail or a hat's edge and the outline), 'out' 3 more;
+  // its top is a row above the brow coming in and on the brow going out, so it is never below the eyes
+  const cx1 = J.head[0] + out * (d.headW / 2 + 6 + 1.5 * swing + Math.max(0, Math.round(wv.clear ?? 0))), top1 = J.brow - 1 + (swing > 0 ? 1 : 0);
+  // on the way up and down the hand is part of the way from the end of the arm to there
+  const x = Math.floor(lerp(ex, cx1, r)) - 1, y = Math.round(lerp(ey - 2, top1, r));
+  return { elbow: [ex, ey], wrist: [x + w / 2, y + h + 0.5], x, y, w, h, out };
+}
+
+/**
+ * Draws the raised forearm and the open hand of a waving free arm, for the `front` hook (it is what gesture('wave') needs drawn): the fist the rig drew at the end of its arm becomes the elbow, a sleeve stands up from it, and a 3 x 3 hand tops it with the cuff under it on the wrist. Nothing when the pose is not waving. Seen from the side it is the far arm, a tone down.
+ * g, J, P, d: as a hook gets them; opt: { sleeve (colour of the arm's cloth: look.top), skin, cuff (colour of the band at the wrist, as look.cuffs, or nothing for none) }.
+ */
+export function waveArm(g, J, P, d, opt = {}) {
+  const H = waveHand(J, P, d);
+  if (!H) return;
+  const far = J.dir === 'side', aw = d.armW;
+  const sleeve = far ? dim(ramp(opt.sleeve ?? '#3f6fd1')) : ramp(opt.sleeve ?? '#3f6fd1'), skin = far ? dim(ramp(opt.skin ?? '#f6d3b0')) : ramp(opt.skin ?? '#f6d3b0');
+  const cuff = opt.cuff ? ramp(opt.cuff) : null, [ex, ey] = H.elbow, [wx, wy] = H.wrist;
+  // the fist (and the cuff above it) at the end of the rig's arm, as fist() places it: now cloth
+  const fx = aw % 2 ? Math.floor(ex) - (aw - 1) / 2 : Math.round(ex) - aw / 2, fy = Math.round(ey) - 1;
+  g.rect(fx, fy - 1, aw, 3, sleeve.base, { shade: 0 });
+  g.fill(Math.min(ex, wx) - 3, Math.min(ey, wy) - 3, Math.max(ex, wx) + 3, Math.max(ey, wy) + 3, limbIn(ex, ey, wx, wy, aw), sleeve);
+  g.rect(H.x, H.y + H.h, H.w, 1, cuff ? (far ? cuff.dark : cuff.base) : sleeve.base, { shade: 0 });
+  g.rect(H.x, H.y, H.w, H.h, skin.base, { shade: 0 });
+}
+
+// ---- additions of batch S04 (void-ranger), fix round 1: a long gun carried in both hands -------------
+// The carry 'braced' (CARRY_BRACED); holdWith, which puts the free hand on what the weapon hand holds; bracedManner,
+// the manner that does it for every standing action; bracedFrame, the one call a sprite makes (its F.grip(J) is where
+// the free hand is when the body hides its arm); handAt, a gloved hand at a point; backOver, for a body seen from
+// behind whose arms reach in front of it; and drawOver, which rims a thing where it lies over the body. Nothing above
+// this line was changed: the carry 'ready' is still the one-handed hip carry (for a body whose other hand holds a shield).
+
+/**
+ * The angles of the carry 'braced', added to CARRY: a long gun held in both hands, pointing the way the body faces. No arguments: a constant.
+ * down: across the belly, tip down and towards the free side; up: tip up and out, beside the weapon shoulder; side: level, a little down.
+ * Pass carry: 'braced' with bracedManner to frameWith(), or call bracedFrame(), which does both.
+ */
+export const CARRY_BRACED = Object.freeze({ down: -0.7, up: PI - 0.5, side: PI / 2 - 0.15 });
+CARRY.braced = CARRY_BRACED;
+
+/**
+ * Puts the free hand on what the weapon hand holds: sets P.armB so that hand lands on the held thing, and where the arm is too short the weapon hand brings the thing across the body until it reaches.
+ * P: the pose (changed in place); direction: 'down' | 'up' | 'side'; d: dims.
+ * opt: { along (pixels from the weapon hand along the thing to where the free hand grips, default 3; negative = behind the hand),
+ *        beside (pixels to the free hand's side of the thing's centre line, default 0), slack (how far from that point the free hand may stay, default 1),
+ *        give (the most the weapon hand may move for it, default 4; 0 = the free arm only reaches as far as it can) }.
+ * Returns the distance left between the free hand and the point it was to grip, in pixels (0 for a body lying down, which is left alone).
+ */
+export function holdWith(P, direction, d, opt = {}) {
+  const { along = 3, beside = 0, slack = 1, give = 4 } = opt;
+  if (P.lie) return 0;
+  const side = direction === 'side';
+  let gap = 0, moved = 0;
+  for (let i = 0; i < 8; i++) {
+    const J = solve(direction, P, d), r = P.reach ?? 1, [hx, hy] = J.armF.hand, [sx, sy] = J.armB.shoulder;
+    const ux = Math.sin(P.item), uy = Math.cos(P.item);
+    let nx = uy, ny = -ux;                                              // across the thing, towards the free shoulder
+    if ((sx - hx) * nx + (sy - hy) * ny < 0) { nx = -nx; ny = -ny; }
+    const tx = hx + ux * along * r + nx * beside, ty = hy + uy * along * r + ny * beside;
+    P.armB = side ? { f: tx - sx, u: d.arm - (ty - sy), o: 0 } : { f: 0, u: d.arm - (ty - sy), o: -J.s * (tx - sx) };
+    const [bx, by] = solve(direction, P, d).armB.hand, gx = bx - tx, gy = by - ty;
+    gap = Math.hypot(gx, gy);
+    if (gap <= slack || moved >= give - 0.01) break;
+    const k = Math.min(gap - slack * 0.7, give - moved) / gap;          // the weapon hand gives way by what is missing
+    const [wx, wy] = J.armF.hand;
+    if (side) P.armF.f += gx * k; else P.armF.o += J.s * gx * k;
+    P.armF.u -= gy * k;
+    const [vx, vy] = solve(direction, P, d).armF.hand, went = Math.hypot(vx - wx, vy - wy);
+    // at the end of its own reach the weapon arm cannot give sideways: both hands come up instead, where arms reach further across
+    if (went < 0.5 * gap * k) { P.armF.u += 1; moved += 1; } else moved += went;
+  }
+  return gap;
+}
+
+/**
+ * A manner for frameWith() and poseFrame(), for a long gun under carry 'braced': in idle, walk, run, shoot, dodge and talk both hands stay on the gun, and `hurt` ends back in that hold.
+ * The weapon hand holds the grip and the free hand the fore-end; a shot is aimed from that hold and returns to it, so no frame turns the gun far. Other actions are left as the pose has them.
+ * Facing away the gun is beside the body and the free arm goes round the front of it, out of sight: the pose then carries P.grip = { along, beside }, the place on the gun
+ * where that hand is (bracedFrame() reports it as the `offhand` socket and backOver() hides the arm).
+ * Arguments: P (the pose, changed in place), F (the frame: its action, direction, d and item), t (the clip phase, 0..1).
+ */
+export function bracedManner(P, F, t) {
+  const a = F.action, dir = F.direction;
+  if (!F.item || P.lie || !['idle', 'walk', 'run', 'shoot', 'dodge', 'hurt', 'talk'].includes(a)) return;
+  const side = dir === 'side', up = dir === 'up', d = F.d, len = F.item.length;
+  // where the weapon hand holds the grip at rest, from hanging: the elbow bent, the hand in front of its own hip (from behind: out beside it)
+  const home = side ? { f: 2.5, u: 0.35 * d.arm, o: 0 } : up ? { f: 1.5, u: 0.25 * d.arm, o: 2.5 } : { f: 1, u: 0.4, o: -2.5 };
+  const near = side || up ? 1 : 0.9;                                    // pointing a little at the camera, it looks shorter
+  const aim = a === 'shoot' ? keys(t, [[0, 1], [0.7, 1], [1, 0]]) : 0;
+  const part = a === 'idle' || a === 'shoot' ? 1 : a === 'hurt' ? 0.4 : a === 'dodge' ? 0.5 : 0.25;      // how much of the pose's own arm movement is kept
+  const own = P.armF, ownB = P.armB, w = 1 - aim;
+  P.armF = { f: home.f * w + own.f * part, u: home.u * w + own.u * part, o: home.o * w + own.o * part };
+  if (a === 'dodge') P.item = CARRY_BRACED[dir];                       // clutched through the roll
+  P.reach = (P.reach ?? 1) * lerp(near, 1, aim);
+  if (up) {
+    // the free arm reaches round the front of the body as far as it goes; its hand is on the fore-end, past what the body hides
+    P.grip = { along: Math.min(0.45 * len, 4), beside: 0 };
+    holdWith(P, dir, d, { along: P.grip.along, give: 0 });
+  } else if (side) holdWith(P, dir, d, { along: Math.min(0.5 * len, 4.5) });
+  // aimed at the camera the gun is seen end on and the free hand is beside it
+  else holdWith(P, dir, d, { along: lerp(-0.7 * (F.item.back ?? 2), 1.5, aim), beside: 1.5, slack: 0.4 });
+  if (a === 'hurt') {
+    // the blow knocks the free hand off and throws both arms out, as the pose has them; they come back to the hold as it ends
+    const loose = keys(t, [[0, 0.7], [0.33, 1], [1, 0]]), mixArm = (A, B) => ({ f: lerp(A.f, B.f, loose), u: lerp(A.u, B.u, loose), o: lerp(A.o, B.o, loose) });
+    P.armF = mixArm(P.armF, own); P.armB = mixArm(P.armB, ownB);
+    if (P.grip && loose > 0.5) delete P.grip;
+  }
+}
+
+/**
+ * One frame of a character who carries a long gun in both hands: frameWith() under the carry 'braced' with bracedManner, so a sprite makes one call.
+ * clip, t, p, opt: as frame() (opt.item: gunSize(kind, scale); opt.manner: further manners, applied after). With nothing held, and in `die`
+ * (the gun is let go), it is the one-handed frame under opt.carry (default 'ready').
+ * Returns the same F as frame(), and F.grip(J): inside a hook, the point { x, y, angle } where the free hand holds the gun when its arm is hidden by the body
+ * (facing away), or null when the hand is where the arm puts it. F.sockets().offhand is that same point.
+ */
+export function bracedFrame(clip, t, p = {}, opt = {}) {
+  const held = opt.item && opt.item.length > 0 && parseClip(clip).action !== 'die';
+  if (!held) return Object.assign(frameWith(clip, t, p, { ...opt, carry: opt.carry ?? 'ready' }), { grip: () => null });
+  const F = frameWith(clip, t, p, { ...opt, carry: 'braced', manner: [bracedManner, ...[].concat(opt.manner ?? [])] });
+  const at = (hand) => {
+    const G = F.P.grip;
+    if (!G || F.P.lie) return null;
+    const r = hand.reach ?? 1, ux = Math.sin(hand.angle), uy = Math.cos(hand.angle);
+    return { x: hand.x + ux * G.along * r + uy * G.beside, y: hand.y + uy * G.along * r - ux * G.beside, angle: hand.angle };
+  };
+  const plain = F.sockets;
+  F.grip = (J) => at(F.hand(J));
+  F.sockets = () => { const out = plain(), g = at(out.hand); if (g) out.offhand = g; return out; };
+  return F;
+}
+
+/** Paints a hand at a point, the block the rig draws for a fist: for a hand that is not at the end of a drawn arm (bracedFrame()'s F.grip(J)). g: the surface; at: { x, y }; d: dims; opt: { colour (a glove, or the skin) }. */
+export function handAt(g, at, d, opt = {}) {
+  const w = d.armW, x = w % 2 ? Math.floor(at.x) - (w - 1) / 2 : Math.round(at.x) - w / 2;
+  g.rect(x, Math.round(at.y) - 1, w, 2, opt.colour ?? '#f6d3b0', { shade: 0 });
+}
+
+/**
+ * Hides what a body seen from behind holds in front of itself: repaints the middle of the back over the arms and hands drawn on it. For the `torso` hook,
+ * called before anything else that hook draws on the back (belts, stripes, lights); it does nothing facing down or sideways.
+ * g, J, P, d: as a hook gets them; opt: { colour (the top, as look.top), inset (pixels at each edge of the back left as drawn, where a hanging arm lies; default 2) }.
+ */
+export function backOver(g, J, P, d, opt = {}) {
+  if (J.dir !== 'up') return;
+  const tmp = new Surface(g.w, g.h), half = d.chestR - (opt.inset ?? 2);
+  tmp.shadow = g.shadow;
+  torsoFront(tmp, J, d, ramp(opt.colour ?? '#e8ecf2'));
+  for (let y = 0; y < tmp.h; y++) for (let x = 0; x < tmp.w; x++) {
+    const v = tmp.data[y * tmp.w + x];
+    if (v && Math.abs(x + 0.5 - J.bx) <= half) g.data[y * g.w + x] = v;
+  }
+}
+
+/**
+ * Draws a thing over what is already on the surface, with a 1 px rim wherever it lies over pixels already drawn: what keeps a gun held across the chest apart from the suit under it.
+ * g: the surface; draw: (s) => void, which draws the thing on the surface it is given; rim: a colour ('#rrggbb'), or null for no rim.
+ */
+export function drawOver(g, draw, rim = INK) {
+  const tmp = new Surface(g.w, g.h), w = g.w, h = g.h;
+  tmp.shadow = g.shadow;
+  draw(tmp);
+  const on = (x, y) => x >= 0 && y >= 0 && x < w && y < h && tmp.data[y * w + x] !== 0;
+  const edge = [];
+  if (rim) for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    if (g.data[y * w + x] !== 0 && !on(x, y) && (on(x + 1, y) || on(x - 1, y) || on(x, y + 1) || on(x, y - 1))) edge.push([x, y]);
+  }
+  for (const [x, y] of edge) g.dot(x, y, rim);
+  for (let i = 0; i < tmp.data.length; i++) if (tmp.data[i]) g.data[i] = tmp.data[i];
+}
