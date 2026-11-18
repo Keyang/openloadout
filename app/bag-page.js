@@ -8,7 +8,7 @@ import { applySound, themedSoundParams, soundSettingsFor } from '../sound/theme.
 import { el, header, saveBlob, SPRITE_BG, SOUND_BG, TILE_BG, drawSpriteOnTile, reduceMotion } from './ui.js';
 import { soundById, soundParams, rendered, renderAsync, playRendered, playLive, drawWave } from './audio.js';
 import { bag, LINK_LIMIT } from './bag.js';
-import { restoringRuntime, restoreRuntime } from './api.js';      // W5-A: assets made on a visit come back from the definitions the bag holds
+import { restoreRuntime, madeItemState } from './api.js';      // W5-A, W5-B: what the bag holds that was made on a visit is checked again, off the page, before it is shown
 import { packageFiles, defaultCues, activeTheme, kindMatches } from './bundle.js';
 import { zip } from './zip.js';
 import { themeControls } from './theme-controls.js';   // W2-D2
@@ -83,8 +83,11 @@ function spritePicture(sprite, settings, theme) {
   const g = tile.getContext('2d');
   const c = sprite.clips[clip], fps = clipFps(sprite, clip, p);
   let last = -1;
+  // W5-B: a sprite made on a visit is drawn in a worker and its frames arrive later: what was drawn meanwhile is dropped then
+  const offFrames = typeof sprite.onFrames === 'function' ? sprite.onFrames(() => { frames.clear(); last = -1; }) : null;
   return {
     node: tile,
+    stop() { if (offFrames) offFrames(); },
     tick(now) {
       let f = 0;
       if (!reduceMotion.matches) {
@@ -215,7 +218,9 @@ export function bagPage(app, query = {}, isCurrent = () => true) {
   let left = false;
   const here = () => !left && isCurrent();
   // W5-A: an item made on a visit whose definition is still being brought back is on its way too, not missing
-  const pendingMade = (item) => !!item.definition && !assetById(item.id) && restoringRuntime();
+  // W5-B: an item made on a visit is "checking" until it has been loaded and checked again in a worker; one that fails "needs re-making"
+  const pendingMade = (item) => madeItemState(item)?.state === 'checking';
+  const remake = (item) => { const st = madeItemState(item); return st && st.state === 'needs re-making' ? st : null; };
   const pendingSprite = (item) => pendingMade(item) || (item.kind === 'sprite' && kindMatches(item.kind, item.id) && !spriteNow(item.id) && !lost.has(item.id));
   function fetchSprites(items) {
     const ids = [...new Set(items.filter((i) => pendingSprite(i) && !pendingMade(i)).map((i) => i.id))].filter((id) => !asked.has(id));
@@ -287,9 +292,18 @@ export function bagPage(app, query = {}, isCurrent = () => true) {
     // a crafted link can name a sound as music (or the reverse): such an item is treated as missing
     const gone = !pending && (!kindMatches(item.kind, item.id) || (item.kind === 'sprite' && !sprite));
     let pic = null;
+    // W5-B: it did not pass when it was checked again (or took too long): it is named, with why, and nothing of it is drawn
+    const again = remake(item);
+    if (again) return el('li', { class: 'bag-item remake', 'data-key': item.key },
+      el('div', { class: 'bag-pic gone' }),
+      el('div', { class: 'bag-text' },
+        el('span', { class: 'bag-name' }, again.name && again.name !== item.id ? `${again.name} (${item.id})` : item.id),
+        el('span', { class: 'bag-kind' }, KIND_LABEL[item.kind]),
+        el('span', { class: 'hint' }, `Needs re-making. It was made on a visit and did not pass when it was checked again, so it is not shown and will be left out of the download. ${again.reason ?? ''}`)),
+      el('div', { class: 'bag-actions' }, el('button', { type: 'button', class: 'ghost', onclick: () => { bag.remove(item.key); } }, 'Remove')));
     if (pending) return el('li', { class: 'bag-item', 'data-key': item.key },
       el('div', { class: 'bag-pic pending' }),
-      el('div', { class: 'bag-text' }, el('span', { class: 'bag-name' }, assetById(item.id)?.name ?? item.id), el('span', { class: 'bag-kind' }, KIND_LABEL[item.kind]), el('span', { class: 'hint' }, 'Loading…')),
+      el('div', { class: 'bag-text' }, el('span', { class: 'bag-name' }, assetById(item.id)?.name ?? item.id), el('span', { class: 'bag-kind' }, KIND_LABEL[item.kind]), el('span', { class: 'hint' }, pendingMade(item) ? 'Checking… It was made on a visit, so it is checked again before it is shown.' : 'Loading…')),
       el('div', { class: 'bag-actions' }, el('button', { type: 'button', class: 'ghost', onclick: () => { bag.remove(item.key); } }, 'Remove')));
     if (!gone && sprite) pic = spritePicture(sprite, item.settings, theme);
     else if (!gone) pic = item.kind === 'music' ? musicPicture(patch, item.settings, theme) : soundPicture(patch, item.settings, theme);
@@ -330,7 +344,7 @@ export function bagPage(app, query = {}, isCurrent = () => true) {
     dlBtn,
     el('a', { class: 'btn plain play-try', href: '#/play' }, 'Try these in the playground'),   // W2-E: the playground (app/play-page.js)
     status);
-  const exportable = () => bag.items().filter((i) => kindMatches(i.kind, i.id) && !lost.has(i.id)).length;
+  const exportable = () => bag.items().filter((i) => kindMatches(i.kind, i.id) && !lost.has(i.id) && !remake(i)).length;
   const syncDownload = () => {
     const n = exportable();
     dlBtn.disabled = busy || !n;
@@ -392,11 +406,13 @@ export function bagPage(app, query = {}, isCurrent = () => true) {
     stopPictures();
     const items = bag.items(), theme = bag.theme();
     fetchSprites(items);   // W2-G
-    if (items.some(pendingMade)) restoreRuntime().then(() => { if (here()) build(); });      // W5-A: drawn again once they are back, or known to be lost
+    if (items.some(pendingMade)) restoreRuntime(true).then(() => { if (here() && !bag.items().some(pendingMade)) build(); });      // W5-B: drawn again once each is back, or known to need re-making
     if (!items.length) confirming = false;
     const counts = ['sprite', 'sound', 'music'].map((k) => [k, items.filter((i) => i.kind === k).length]).filter(([, c]) => c);
     main.replaceChildren(...[
       el('h1', { class: 'small' }, 'Your bag'),
+      // W5-B: a save the browser refused is said, not swallowed
+      bag.saved() ? null : el('p', { class: 'status bag-unsaved', role: 'alert' }, 'Your bag could not be saved: this browser\'s storage for the site is full. What is in it now will be gone when you reload or close the page. Download it now, or take things out until this message goes away.'),
       offerBox(),
       items.length
         ? [

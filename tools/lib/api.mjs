@@ -38,7 +38,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { ACTIONS, maskSource } from '../../app/api.js';
+import { ACTIONS } from '../../app/api-actions.js';
+import { maskSource } from '../../app/api-source.js';
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 export const FRAMEWORK_FOLDERS = ['engine', 'rigs', 'sound', 'quality', 'catalog'];

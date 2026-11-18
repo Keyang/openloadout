@@ -376,6 +376,9 @@ input[type='range']::-moz-range-thumb { width: 14px; height: 18px; border-radius
 .play-piece .play-pic { max-width: 100%; height: auto; }
 .play-tag { display: inline-block; margin-left: 8px; padding: 0 6px; font: 700 12px/1.5 var(--body); color: var(--grape); border: 2px solid var(--grape); text-transform: uppercase; letter-spacing: 0.03em; vertical-align: middle; white-space: nowrap; }
 .play-howto { margin: 8px 0 0; font-weight: 600; }
+.play-copied { margin: 6px 0 0; }
+.play-copied:empty { display: none; }
+.play-map { display: block; width: 100%; margin-top: 6px; font: 13px/1.25 ui-monospace, 'SF Mono', Menlo, Consolas, monospace; white-space: pre; overflow: auto; border: var(--line); padding: 6px 8px; }
 .play-stage-wrap { width: 100%; overflow: hidden; background: var(--ink); border: var(--line); line-height: 0; }
 .play-stage { margin: 0 auto; max-width: 100%; }
 .play-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 18px; margin-top: 10px; }

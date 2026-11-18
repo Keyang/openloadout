@@ -232,3 +232,69 @@ test('touch tells listeners to look again without changing or saving anything', 
   assert.equal(told, 1);
   assert.equal(storage.getItem('loadout-bag-v1'), before);
 });
+
+// ---- art styles (Contract 12): what a made sprite drew on a surface that is not a pixel grid arrives as data --------
+
+test('a made sprite in another art style: the surface data is checked, copied onto the page\'s own surface, and finished there', async () => {
+  await import('../fixtures/styles/styles.js');            // two test styles: a finish on pixels, and a surface that records shapes
+  const d = cleanDescription(described({ styles: ['pixel', 'silhouette', 'outline-svg'] })).description;
+  const drawn = (style) => (style === 'pixel' ? new Uint32Array(16).fill(7).buffer
+    : style === 'silhouette' ? { w: 4, h: 4, data: new Uint32Array(16).fill(7), shadow: [-1, 1] }
+      : { w: 4, h: 4, shadow: [-1, 1], ops: [{ kind: 'rect', x: 0, y: 0, w: 2, h: 2, c: 4278190335, r1: undefined }], skipped: {} });
+  const asked = [];
+  const sandbox = { frames: async ({ clips, style }) => { asked.push(style); return { clips: Object.fromEntries(clips.map((c) => [c, { fps: 8, frames: Array.from({ length: c === 'idle' ? 2 : 3 }, () => drawn(style)) }])) }; } };
+  const def = standIn({ description: d, engine, sandbox, styles: d.styles, onProblem: () => {} });
+  assert.deepEqual(def.styles, ['pixel', 'silhouette', 'outline-svg']);
+  const p = engine.defaultParams(def);
+  const count = (style) => engine.renderPixels(def, 'idle', 0, p, { style }).data.filter(Boolean).length;
+  assert.equal(count('outline-svg'), 0, 'not here yet, and what another style drew never stands in for it');
+  for (const style of d.styles) await def.prepare(p, { style });
+  assert.deepEqual(asked.slice(-3), ['pixel', 'silhouette', 'outline-svg']);
+  assert.equal(count('pixel'), 16);
+  assert.equal(count('silhouette'), 16);
+  assert.equal(engine.renderPixels(def, 'idle', 0, p, { style: 'silhouette' }).data[0], engine.renderPixels(def, 'idle', 1, p, { style: 'silhouette' }).data[0], 'the style\'s finish ran on the page: one colour');
+  assert.notEqual(engine.renderPixels(def, 'idle', 0, p, { style: 'silhouette' }).data[0], 7);
+  assert.equal(count('outline-svg'), 4);
+  // drawing twice does not wear the kept copy
+  engine.renderFrame(def, 'idle', 0, p, { style: 'outline-svg' }).ops.length = 0;
+  assert.equal(count('outline-svg'), 4);
+  await assert.rejects(def.prepare(p, { style: 'no-such-style' }), /cannot be drawn in the style "no-such-style"/);
+});
+
+test('surface data that is not plain drawing data is refused: markup, functions, odd objects, too much', async () => {
+  await import('../fixtures/styles/styles.js');
+  const d = cleanDescription(described({ styles: ['pixel', 'outline-svg'] })).description;
+  const tryWith = async (state) => {
+    const sandbox = { frames: async ({ clips, style }) => ({ clips: Object.fromEntries(clips.map((c) => [c, { fps: 8, frames: Array.from({ length: c === 'idle' ? 2 : 3 }, () => (style === 'pixel' ? new Uint32Array(16).buffer : state)) }])) }) };
+    const def = standIn({ description: d, engine, sandbox, styles: d.styles, onProblem: () => {} });
+    return def.prepare(null, { style: 'outline-svg' });
+  };
+  await tryWith({ w: 4, h: 4, ops: [{ kind: 'rect', c: 1, note: 'M 0 0 L 4 4 Z #ff0000 rgb(1, 2, 3)' }] });
+  for (const bad of [
+    { ops: [{ kind: '"><script>alert(1)</script>' }] },
+    { ops: [{ kind: 'rect', c: "red' onload='x" }] },
+    { ops: [{ ['a"b']: 1 }] },
+    { ops: [new Map()] },
+    { when: new Date(0) },
+    { text: 'x'.repeat(201) },
+    { ops: Array.from({ length: 300_000 }, () => 1) },
+    { a: { a: { a: { a: { a: { a: { a: { a: { a: { a: 1 } } } } } } } } } },
+    'just text', 7, null, [1, 2], new Uint32Array(16).buffer,
+  ]) await assert.rejects(tryWith(bad), /not plain drawing data/, JSON.stringify(bad)?.slice(0, 60));
+});
+
+test('prepareAround brings what one more click could ask for, and isFor tells an arrival for the settings on screen from the rest', async () => {
+  const sandbox = pretendSandbox();
+  const def = standIn({ description: cleanDescription(described({ params: { size: engine.range('Size', 0.5), glint: engine.toggle('Glints', true), cut: engine.choice('Cut', 'a', ['a', 'b', 'c']) } })).description, engine, sandbox });
+  const p = engine.defaultParams(def);
+  const heard = [];
+  def.onFrames((e) => heard.push(def.isFor(e, p)));
+  await def.prepare(p);
+  await def.prepareAround(p);
+  assert.deepEqual(sandbox.calls.slice(1).map((c) => [c.params.cut, c.params.glint]), [['a', false], ['b', true], ['c', true]], 'the switch flipped, and each other option; sliders are not guessed at');
+  assert.deepEqual(heard, [true, false, false, false]);
+  assert.equal(def.has({ ...p, cut: 'c' }), true);
+  const before = sandbox.calls.length;
+  await def.prepareAround(p);
+  assert.equal(sandbox.calls.length, before, 'what is here is not asked for again');
+});

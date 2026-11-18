@@ -7,7 +7,7 @@ import { loadSounds, soundById, stopAll, isMusic } from './audio.js';
 import { homePage, browsePage, bundlesPage } from './home.js';
 import { kitAddress } from './kit-page.js';
 import { standInCatalog, configureSearch } from './browse.js';
-import { restoreRuntime } from './api.js';      // W5-A: installs window.loadout (Contract 11); loads nothing else until it is used
+import { restoreRuntime, madePending } from './api.js';      // W5-A: installs window.loadout (Contract 11); loads nothing else until it is used
 
 const app = document.getElementById('app');
 let teardown = () => {};
@@ -69,6 +69,8 @@ function route() {
   const { parts, query } = parseHash();
   const [a, b] = parts;
   const here = location.hash;
+  // W5-A: something made on an earlier visit that the bag holds is checked again off the page, after the page has drawn; its own page waits for that
+  if (b && madePending(b)) { waiting(); restoreRuntime(true).then(() => { if (location.hash === here) route(); }); return; }
   if (!LISTS.has(a ?? '') && !(a === 'music' && !b) && !soundsIn) {
     waiting();
     sounds().then(() => { if (location.hash === here) route(); });
@@ -104,9 +106,9 @@ const catalogue = loadCatalog(standIn);      // nothing named: the usual generat
 
 try {
   await catalogue;
-  await restoreRuntime();      // W5-A: assets made on an earlier visit that are in the bag are known again before the first page is drawn
   window.addEventListener('hashchange', route);
   route();
+  setTimeout(() => restoreRuntime(), 0);      // W5-A: after the first page is up, what the bag holds from an earlier visit is checked again (in workers, never here)
   // fetch the sound library in a quiet moment, so the first asset page opens at once
   if (window.requestIdleCallback) window.requestIdleCallback(() => sounds()); else setTimeout(sounds, 400);
 } catch (e) {

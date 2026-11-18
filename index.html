@@ -3,6 +3,17 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!--
+    The site's content policy (docs/architecture.md, Contract 11, "Safety of run-time assets"). The site is static, so it
+    is sent here and not as a header. Everything comes from the site itself:
+      script-src   its own files; blob: for the worker a sprite made on a visit runs in (started from memory so that it
+                   carries this policy); 'wasm-unsafe-eval' for the search library and the search model, which are WebAssembly.
+                   No eval, no inline script, no other site.
+      connect-src  the site only: nothing on the page, and nothing in that worker, can call another site.
+      img-src      the site, plus pictures made in memory (data: and blob:).
+      style-src    the site's style sheets, plus style attributes the pages set themselves.
+  -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' blob: 'wasm-unsafe-eval'; worker-src 'self' blob:; connect-src 'self'; img-src 'self' data: blob:; media-src 'self' data: blob:; font-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; frame-src 'none'; base-uri 'self'; form-action 'none'">
   <title>Loadout</title>
   <link rel="stylesheet" href="vendor/fonts/fonts.css">
   <link rel="stylesheet" href="app/style.css">

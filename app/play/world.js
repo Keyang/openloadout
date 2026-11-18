@@ -88,6 +88,14 @@ function place(world, kind, at = null) {
       const x = spot.x + lap * 26;
       if (level.mode === 'top' ? !hitsWall(level, x - 8, spot.y - 8, x + 8, spot.y) : Math.abs(surfaceBelow(level, x, spot.y - 4).y - spot.y) < 1) spot.x = x;
     }
+    if (level.mode === 'top') {
+      // big things (a house, a tree) take the first spot where they stand clear of the walls, of the player and of
+      // what is already there
+      const at = (s) => ({ x0: s.x - kind.box.l, x1: s.x + kind.box.r, y0: s.y - kind.lift - kind.box.t, y1: s.y - kind.lift + kind.box.b });
+      const fits = (s) => !hitsWall(level, s.x - kind.box.l, s.y - Math.min(kind.box.t, 16), s.x + kind.box.r, s.y)
+        && ![...world.things, ...(world.player ? [world.player] : [])].some((t) => overlap(grow(rectOf(world, t), 6), at(s)));
+      for (let k = 0; k < list.length && !fits(spot); k++) spot = { ...list[(i + 1 + k) % list.length] };
+    }
     if (level.mode === 'side') {
       // wide things (a boss, a house) move along until they stand clear of what is already there
       const span = supportAt(level, spot.x, spot.y);

@@ -8,12 +8,9 @@ import { applyColour } from '../../engine/theme.js';
 import { hexToRgb, rgbToHex, pack } from '../../engine/color.js';
 import { hash } from '../../engine/motion.js';
 import { levelTiles, surfaceBelow, CELL } from './level.js';
-import { layerSpeed, layerShift } from './layers.js';
+import { layerSpeed, layerShift, drawOrder } from './layers.js';
 
 const mod = (a, n) => ((a % n) + n) % n;
-// what is drawn first (behind) to last (in front) in side view
-const LAYER = { prop: 0, effect: 0, pickup: 1, npc: 2, creature: 2, player: 3, projectile: 4 };
-
 const PLAIN = {
   sky: '#bfe6f7', skyLow: '#d3eef9', cloud: '#ffffff', hill: '#a5dba6',
   grass: '#6cc06a', grassEdge: '#4f9d57', dirt: '#b07a50', dirtSpeck: '#8f5f3c',
@@ -73,10 +70,23 @@ export function createPainter({ sprites, colour, tiles: tileSets = null }) {
 
   // ---- the ground: made once for a level (again when a moving tile such as water changes frame), then copied each frame
 
+  // a tile with see-through pixels (a pit that shows what is behind the scene)
+  const clear = new Map();
+  const seeThrough = (key, clip) => {
+    const id = key + '|' + clip;
+    if (!clear.has(id)) {
+      const cv = frame(key, clip, 0), d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data;
+      let holes = 0;
+      for (let i = 3; i < d.length; i += 4) if (!d[i]) holes++;
+      clear.set(id, holes > 0);
+    }
+    return clear.get(id);
+  };
+
   let groundFor = null, groundCanvas = null, laid = null;
   function ground(level, time) {
     if (!laid || laid.level !== level) {
-      laid = { level, ...levelTiles(level, tileSets) };
+      laid = { level, ...levelTiles(level, tileSets, { seeThrough }) };
       laid.moving = laid.tiles.some((t) => sprites[t.key].sprite.clips[t.clip].frames > 1);
       groundFor = null;
     }
@@ -91,7 +101,7 @@ export function createPainter({ sprites, colour, tiles: tileSets = null }) {
       g.drawImage(frame(t.key, t.clip, c.frames > 1 ? Math.floor(time * clipFps(sprite, t.clip, params)) % c.frames : 0), t.x, t.y);
     };
     // what the bag has no tiles for at all is drawn plainly
-    if (laid.plain.includes('floor')) plainFloor(g, level);
+    if (laid.plain.includes('floor')) plainFloor(g, level, laid.open);
     if (laid.plain.includes('ground')) plainGround(g, level);
     if (laid.plain.includes('thin')) plainThin(g, level);
     for (const t of laid.tiles) if (!t.over) tile(t);
@@ -142,11 +152,12 @@ export function createPainter({ sprites, colour, tiles: tileSets = null }) {
     }
   }
 
-  function plainFloor(g, level) {
+  function plainFloor(g, level, open) {
     const T = level.tile;
-    g.fillStyle = C.floor; g.fillRect(0, 0, level.width, level.height);
-    g.fillStyle = C.floorSpeck;
-    for (let r = 0; r < level.rows; r++) for (let c = 0; c < level.cols; c++) if ((r + c) % 2) g.fillRect(c * T, r * T, T, T);
+    for (let r = 0; r < level.rows; r++) for (let c = 0; c < level.cols; c++) {
+      if (open.has(`${c},${r}`)) continue;             // a see-through pit: what is behind the scene shows there
+      g.fillStyle = (r + c) % 2 ? C.floorSpeck : C.floor; g.fillRect(c * T, r * T, T, T);
+    }
   }
 
   /** Plain walls, seen from the south: a lit top, and a darker front face on the cells with floor below them. */
@@ -168,6 +179,17 @@ export function createPainter({ sprites, colour, tiles: tileSets = null }) {
 
   let skyTop = null;
   function backdrop(g, view, cam, level, backgroundKey, time, rise) {
+    if (backgroundKey && level.mode === 'top') {
+      // top-down: the layers lie behind the whole room and slide as the view moves, to be seen through a pit
+      const { sprite, params } = sprites[backgroundKey];
+      const layers = Object.keys(sprite.clips);
+      layers.forEach((clip, i) => {
+        const c = sprite.clips[clip], speed = layerSpeed(clip, i, layers.length);
+        const img = frame(backgroundKey, clip, c.frames > 1 ? Math.floor(time * clipFps(sprite, clip, params)) % c.frames : 0);
+        for (let y = -layerShift(cam.y, speed, img.height); y < view.h; y += img.height) for (let x = -layerShift(cam.x, speed, img.width); x < view.w; x += img.width) g.drawImage(img, x, y);
+      });
+      return;
+    }
     if (backgroundKey) {
       // The background's clips are its layers, far first. Each is one screen (320 x 180) that repeats sideways and
       // slides at its own share of the camera's speed; when the view climbs, the layers sink a little and the top
@@ -261,12 +283,9 @@ export function createPainter({ sprites, colour, tiles: tileSets = null }) {
     g.imageSmoothingEnabled = false;
     const cx = Math.round(cam.x), cy = Math.round(cam.y);
     const c = { x: cx, y: cy };
-    if (level.mode === 'top') { g.fillStyle = C.outside; g.fillRect(0, 0, view.w, view.h); } else backdrop(g, view, c, level, plan.background, world.time, Math.max(0, cameraFloor(level, view) - cy));
+    if (level.mode === 'top') { g.fillStyle = C.outside; g.fillRect(0, 0, view.w, view.h); if (plan.background) backdrop(g, view, c, level, plan.background, world.time, 0); } else backdrop(g, view, c, level, plan.background, world.time, Math.max(0, cameraFloor(level, view) - cy));
     g.drawImage(ground(level, world.time), -cx, -cy);
-    const list = world.player ? [...world.things, world.player] : [...world.things];
-    if (level.mode === 'top') list.sort((a, b) => a.y - b.y || a.n - b.n);
-    else list.sort((a, b) => (a.passing ? 5 : LAYER[a.role]) - (b.passing ? 5 : LAYER[b.role]) || a.n - b.n);
-    for (const t of list) thing(g, world, t, c);
+    for (const t of drawOrder(world.player ? [...world.things, world.player] : world.things, level.mode)) thing(g, world, t, c);
   }
 
   return { frame, allFrames, draw, look };

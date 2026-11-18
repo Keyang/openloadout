@@ -9,6 +9,7 @@ import { defaultTheme, normalizeTheme, applyColour, themedParams } from '../engi
 import { applySound, themedSoundParams, soundSettingsFor } from '../sound/theme.js';
 import { soundById, soundParams, rendered, renderAsync, wavBytes, isMusic } from './audio.js';
 import { loadCatalog, assetById, loadSprite } from './catalog.js';
+import { restoreRuntime, madeItemState } from './api.js';      // W5-B: an item made on a visit is exported only once it has been checked again, and only as the bag stored it
 
 const enc = new TextEncoder();
 
@@ -71,6 +72,8 @@ function themedSound(patch, params, seed, t) {
 export async function spriteFiles(sprite, p, cues, scale = 1, theme = null, style = undefined) {
   const t = activeTheme(theme);
   const drawn = t ? themedParams(sprite, cleanParams(sprite, p), t) : p;
+  // W5-B: a sprite made on a visit is drawn in a worker of its own; its frames at these settings are brought first (a catalogue sprite has no prepare)
+  if (typeof sprite.prepare === 'function') await sprite.prepare(drawn, { style: style ?? undefined });
   const made = await exportSheet(sprite, drawn, { style: style ?? undefined, scale, recolour: t ? (pixels) => applyColour(pixels, t.colour) : null, encodePng: pngBytes });
   const sheet = { meta: made.data };
   const files = [], wavs = new Map();
@@ -192,6 +195,8 @@ function unique(taken, base, ext = '') {
  * An item whose asset is not on the site, or whose own file cannot be loaded, is left out and named under "missing".
  * An item made on a visit (it carries `definition`, Contract 11) is packaged like any other; its source goes in next to it
  * (<id>.source.js for a sprite, <id>.source.json for a sound or a track) and the manifest marks it madeOnThisVisit.
+ * It is packaged from its own definition: only when that definition has been checked again and is the one the site
+ * draws under its id. Otherwise nothing of it goes in, and it is named under "needsRemaking".
  * A sprite item whose settings name an art style (`artStyle`, Contract 12) is exported in that style, and its manifest
  * entry says `artStyle`; an entry without it is pixel. One that asks for a style its sprite does not list is left out
  * and named under "unsupported" (never quietly exported in another style).
@@ -200,11 +205,14 @@ function unique(taken, base, ext = '') {
 export async function packageFiles({ items, theme = null, scale = 1, catalog = null, onProgress = () => {} }) {
   const t = activeTheme(theme);
   const info = catalog ?? await catalogue();
-  const files = [], assets = [], missing = [], unsupported = [];
+  const files = [], assets = [], missing = [], unsupported = [], needsRemaking = [];
   const folders = new Set(), soundNames = new Set(), musicNames = new Set();
   let done = 0;
+  if (items.some((i) => i.definition)) { onProgress('Checking what was made on a visit…'); await restoreRuntime(true); }
   for (const item of items) {
     onProgress(`Building ${++done} of ${items.length}…`);
+    const made = madeItemState(item);
+    if (made && made.state !== 'ready') { needsRemaking.push(item.id); continue; }
     const s = item.settings ?? {};
     const about = info[item.id] ?? {};
     const entry = (name, meta) => ({ key: item.key, id: item.id, kind: item.kind, name: about.name ?? name, role: about.role ?? meta?.role ?? null, type: about.type ?? meta?.type ?? null, files: [], settings: s });
@@ -263,6 +271,7 @@ export async function packageFiles({ items, theme = null, scale = 1, catalog = n
   const manifest = { app: 'Loadout', format: 'loadout-package', version: 1, theme: normalizeTheme(t ?? {}), assets };
   if (missing.length) manifest.missing = missing;
   if (unsupported.length) manifest.unsupported = unsupported;
+  if (needsRemaking.length) manifest.needsRemaking = needsRemaking;
   files.push({ name: 'manifest.json', data: enc.encode(JSON.stringify(manifest, null, 2)) });
   files.push({ name: 'read-me.txt', data: enc.encode(packageGuide(manifest, !!t)) });
   return files;
@@ -274,7 +283,7 @@ function packageGuide(manifest, themed) {
   return `Your Loadout package
 
 This package holds ${manifest.assets.length} asset${manifest.assets.length === 1 ? '' : 's'}, each exactly as you set it up in your bag${themed ? ', with the bag\'s look applied to all of them so they match' : ''}.
-${manifest.missing ? `\nNot included (no longer on the site): ${manifest.missing.join(', ')}\n` : ''}${manifest.unsupported ? `\nNot included (asked for in a style it cannot be drawn in): ${manifest.unsupported.map((u) => `${u.id} (${u.artStyle})`).join(', ')}\n` : ''}
+${manifest.missing ? `\nNot included (no longer on the site): ${manifest.missing.join(', ')}\n` : ''}${manifest.needsRemaking ? `\nNot included (made on a visit, and in need of re-making): ${manifest.needsRemaking.join(', ')}\n` : ''}${manifest.unsupported ? `\nNot included (asked for in a style it cannot be drawn in): ${manifest.unsupported.map((u) => `${u.id} (${u.artStyle})`).join(', ')}\n` : ''}
 What is in it
 ${list}
 

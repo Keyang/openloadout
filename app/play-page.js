@@ -12,7 +12,7 @@ import { normalizeTheme, themedParams } from '../engine/theme.js';
 import { rowFromSprite, rowFromPatch, planScene, SCENE_ROLES } from './play/roles.js';
 import { buildKind, soundIdsOf, isCustom } from './play/kinds.js';
 import { extraActions, lookupClip } from './play/clips.js';
-import { makeLevel, levelFeatures, tileIndex } from './play/level.js';
+import { makeLevel, levelFeatures, tileIndex, levelText } from './play/level.js';
 import { createWorld, resetWorld, step, spawn, removeOne, countOf, snapshot, activeLoops } from './play/world.js';
 import { createPainter, cameraFor } from './play/draw.js';
 import { createInput } from './play/input.js';
@@ -125,6 +125,8 @@ export async function playPage(app) {
       // every tileset in the bag is read together: one may hold the floor, another the walls
       const tiles = tileIndex(plan.tilesets.map((key) => ({ key, names: Object.keys(drawn[key].sprite.clips), size: drawn[key].sprite.size[0], clips: drawn[key].sprite.clips })));
       const level = makeLevel(plan.mode, levelFeatures(tiles, plan.mode));
+      // the level as text: a creator can copy it and open it in their own tool (engine/maptext.js reads it back)
+      const mapText = levelText(level, plan.tilesets.map((key) => byKey[key].row.id));
       const world = createWorld({ mode: plan.mode, level, kinds, player: plan.player });
       const painter = createPainter({ sprites: drawn, colour: theme.colour, tiles });
       sounds.warm(kinds.flatMap((k) => Object.values(k.cues).flat()));
@@ -179,9 +181,22 @@ export async function playPage(app) {
       const tools = el('div', { class: 'play-tools' },
         muteBtn, pauseBtn,
         el('button', { type: 'button', class: 'ghost', onclick: () => { resetWorld(world); free.x = level.start.x; free.y = level.start.y; cam = null; syncCounts(); } }, 'Reset the scene'),
+        el('button', { type: 'button', class: 'ghost play-copy', onclick: copyLevel }, 'Copy this level'),
         extras.length ? el('span', { class: 'play-extras' }, el('span', { class: 'label' }, 'Other moves'),
           el('span', { class: 'pills small' }, extras.map((action) => el('button', { type: 'button', class: 'pill', onclick: () => { pendingClip = action; } }, labelOf(action))))) : null);
 
+      // "Copy this level": the map text on the clipboard; where the browser will not allow that, in a box to copy from
+      const copyNote = el('p', { class: 'hint play-copied', role: 'status' });
+      async function copyLevel() {
+        try {
+          await navigator.clipboard.writeText(mapText);
+          copyNote.replaceChildren('Copied. This is the level as text: the letters are tiles, one for each square. Paste it into a text file or your own level tool.');
+        } catch {
+          const box = el('textarea', { class: 'play-map', readonly: true, rows: Math.min(16, mapText.split('\n').length), 'aria-label': 'This level as text' }, mapText);
+          copyNote.replaceChildren('Your browser did not allow copying. Select the text in this box and copy it: ', box);
+          box.select();
+        }
+      }
       const keysNote = el('p', { class: 'play-keys' }, keysLine({ mode: plan.mode, player: !!player, block: has('block'), dodge: has('dodge') }));
       // one line for someone who has never played on a keyboard, from what is really in the scene
       const nameOf = (test) => { const k = kinds.find(test); return k ? byKey[k.key].row.name : null; };
@@ -198,7 +213,8 @@ export async function playPage(app) {
         const role = plan.roles[e.key];
         // a sprite the visitor changed says so, so it is clear this is their version and not the one in the catalogue
         const mine = isCustom(e.sprite, e.settings) ? el('span', { class: 'play-tag' }, 'your version') : null;
-        const row = el('li', {}, el('span', { class: 'play-name' }, e.row.name, mine), el('span', { class: 'hint' }, roleNote(role, { player: !!player })));
+        const unused = plan.otherTiles.includes(e.key) ? `Made for ${top ? 'side view' : 'top-down'}, so it is not used in this scene.` : null;
+        const row = el('li', {}, el('span', { class: 'play-name' }, e.row.name, mine), el('span', { class: 'hint' }, unused ?? roleNote(role, { player: !!player })));
         if (SCENE_ROLES.includes(role)) {
           const n = el('span', { class: 'play-n', 'aria-label': `${e.row.name} in the scene` });
           counters.push([e.key, n]);
@@ -214,10 +230,10 @@ export async function playPage(app) {
         el('span', { class: 'pills small', role: 'group', 'aria-label': label }, list.map((key) => el('button', { type: 'button', class: 'pill', 'aria-pressed': String(plan[field] === key), onclick: () => { picks[field] = key; build(); } }, byKey[key].row.name)))));
       const notes = [];
       if (!player) notes.push(el('p', { class: 'hint' }, 'There is no character to play as in your bag, so the arrow keys only move the view. ', el('a', { href: '#/browse?kind=sprite' }, 'Find a character')));
-      if (top && plan.backgrounds.length) notes.push(el('p', { class: 'hint' }, 'Backgrounds show in side view only.'));
+      if (top && plan.backgrounds.length) notes.push(el('p', { class: 'hint' }, 'Seen from above, the background lies under the room: it only shows through a pit you can see into.'));
       if (missing) notes.push(el('p', { class: 'hint' }, `${missing} thing${missing === 1 ? '' : 's'} in your bag could not be found, so ${missing === 1 ? 'it is' : 'they are'} not here.`));
 
-      blocks.push(el('div', { class: 'play-card' }, hud, wrap, pad, tools, howNote, keysNote));
+      blocks.push(el('div', { class: 'play-card' }, hud, wrap, pad, tools, copyNote, howNote, keysNote));
       blocks.push(el('section', { class: 'play-things' }, el('h2', {}, 'In the scene'),
         choice('Play as', 'player', plan.players), choice('Background', 'background', plan.backgrounds),
         el('ul', {}, rows), notes));
@@ -263,6 +279,7 @@ export async function playPage(app) {
       stateOf = () => ({
         ...snapshot(world), paused: keep.paused, muted: !soundState.on, zoom: view.zoom, view: { w: view.w, h: view.h },
         heard: [...heard], heardTotal, music: tracks.some((t) => t.playing() || t.starting()),
+        map: mapText,
         plan: { mode: plan.mode, player: plan.player, tilesets: plan.tilesets, background: plan.background, scene: plan.scene, display: plan.display, board: plan.board, music: plan.music },
       });
       // start once the page is in place, so the scene knows how wide it can be

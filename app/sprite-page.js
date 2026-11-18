@@ -104,6 +104,21 @@ export function spritePage(app, sprite, query) {
     scale: [1, 2, 4].includes(Number(query.scale)) ? Number(query.scale) : 1, start: performance.now(), frame: 0, lastFrame: -1, scroll: 0,
   };
   const frames = choice ? new StyleFrames(sprite, st.p, st.style) : new Frames(sprite, st.p);
+  // W5-B: a sprite made on a visit is drawn in a worker of its own, and its frames for new settings arrive a moment later:
+  // what was drawn meanwhile (the last look) is dropped then, and the stage and the strip draw again
+  const offFrames = typeof sprite.onFrames === 'function' ? sprite.onFrames((e) => { if (sprite.isFor(e, st.p, st.style)) { frames.set(st.p); buildStrip(); } }) : null;
+  // and what one more click could ask for (each option, each switch, each other style) is brought ahead, so a click draws at once
+  // (a click starts that at once; while a slider is being dragged it waits until the drag rests)
+  let aheadTimer = 0, aheadAt = -1e9;
+  const ahead = () => {
+    if (typeof sprite.prepareAround !== 'function') return;
+    const go = () => sprite.prepareAround(st.p, { style: st.style });
+    const now = performance.now(), dragging = now - aheadAt < 60;
+    aheadAt = now;
+    clearTimeout(aheadTimer);
+    if (dragging) aheadTimer = setTimeout(go, 120); else go();
+  };
+  ahead();
 
   // A link from before an option was renamed (cape=false) opens with the new option; put the new name in the address too.
   {
@@ -272,7 +287,7 @@ export function spritePage(app, sprite, query) {
     }
   };
   const changed = () => {
-    syncShown(); frames.set(st.p); buildStrip(); saveUrl();
+    syncShown(); frames.set(st.p); buildStrip(); saveUrl(); ahead();
     // sounds that depend on the settings: refresh the list and anything looping when what applies has changed
     if (cueSig() !== shownSig) { buildCues(); syncLoops(); }
   };
@@ -358,7 +373,7 @@ export function spritePage(app, sprite, query) {
       styles.map((id) => el('button', { type: 'button', class: 'pill', 'data-style': id, 'aria-pressed': String(id === st.style), onclick: () => setStyle(id) }, styleById(id).label)));
     setStyle = (id) => {
       st.style = id;
-      frames.setStyle(id);
+      frames.setStyle(id); ahead();
       for (const b of row.children) b.setAttribute('aria-pressed', String(b.dataset.style === id));
       about.textContent = styleById(id).about;
       buildStrip(); saveUrl();
@@ -490,6 +505,8 @@ export function spritePage(app, sprite, query) {
   syncLoops();
   return () => {
     cancelAnimationFrame(raf); ro.disconnect(); clearTimeout(urlTimer);
+    if (offFrames) offFrames();
+    clearTimeout(aheadTimer);
     window.removeEventListener('sf-audio-ready', syncLoops);
     for (const h of loops) h.stop();
   };

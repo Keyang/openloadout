@@ -107,6 +107,9 @@ function tell(what) { for (const fn of [...watchers]) { try { fn(what); } catch 
  * Once the catalogue is in, an id it does not list as a sprite is refused without asking for a file.
  */
 export function loadSprite(id) {
+  // a sprite made on this visit is drawn in a worker: each time it is asked for, what the bag will draw of it is brought first
+  const mine = made.get(id);
+  if (mine && mine.row.kind === 'sprite' && assetById(id) === mine.row) return Promise.resolve(typeof mine.definition.whenReady === 'function' ? mine.definition.whenReady() : null).then(() => mine.definition);
   if (!sprites.has(id)) {
     if (catalog && assetById(id)?.kind !== 'sprite') return Promise.reject(new Error(`"${id}" is not a sprite on this site`));
     const p = import(`../sprites/${id}.js`).then((m) => { arrived.set(id, m.default); return m.default; });

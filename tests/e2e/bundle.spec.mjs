@@ -22,7 +22,9 @@ test.use({ reducedMotion: 'reduce' });
 const allIds = () => [...BUNDLE.sprites, ...BUNDLE.sounds, ...BUNDLE.music];
 const pics = (page) => page.locator('canvas.bundle-sprite-pic');
 const count = (page) => page.locator('header .bag-count');
-const bagApi = (page, fn) => page.evaluate(async (f) => { const { bag } = await import('/app/bag.js'); return new Function('bag', `return (${f})(bag)`)(bag); }, fn.toString());
+// the site's content policy allows no eval in the page, so the bag is reached by named calls, not by code sent as text
+const bagItems = (page) => page.evaluate(async () => (await import('/app/bag.js')).bag.items());
+const bagTheme = (page) => page.evaluate(async () => (await import('/app/bag.js')).bag.theme());
 const presetTheme = (page, id) => page.evaluate(async (pid) => (await import('/engine/theme.js')).THEME_PRESETS.find((p) => p.id === pid).theme, id);
 
 /** Wait until every sprite preview has been drawn with the page's current look. */
@@ -194,7 +196,7 @@ test('bag page: with a brightness change, music plays the rendered, styled loop 
   await recordPlayed(page);
   await openRoute(page, '/');
   const id = BUNDLE.music[0];
-  await bagApi(page, new Function(`return (bag) => { bag.add({ kind: 'music', id: '${id}', settings: {} }); bag.setTheme({ sound: { brightness: -0.4 }, music: { tempo: 0.92 } }); }`)());
+  await page.evaluate(async (mid) => { const { bag } = await import('/app/bag.js'); bag.add({ kind: 'music', id: mid, settings: {} }); bag.setTheme({ sound: { brightness: -0.4 }, music: { tempo: 0.92 } }); }, id);
   await openRoute(page, '/bag');
   const row = page.locator('.bag-item').first();
   await row.getByRole('button', { name: /^Play/ }).click();
@@ -245,10 +247,10 @@ test('"Add the whole bundle to my bag" adds every asset once with this look, and
   await page.getByRole('button', { name: 'Add the whole bundle to my bag' }).click();
   const n = allIds().length;
   await expect(count(page)).toHaveText(String(n));
-  const items = await bagApi(page, (bag) => bag.items());
+  const items = await bagItems(page);
   expect(items.map((i) => i.id).sort()).toEqual(allIds().sort());
   expect(items.filter((i) => i.kind === 'sprite').map((i) => i.id)).toEqual(BUNDLE.sprites);
-  expect(await bagApi(page, (bag) => bag.theme())).toEqual(await presetTheme(page, 'frost'));
+  expect(await bagTheme(page)).toEqual(await presetTheme(page, 'frost'));
 
   // the bag is no longer empty: the page asks
   await page.getByRole('button', { name: 'Toxic', exact: true }).click();
@@ -256,7 +258,7 @@ test('"Add the whole bundle to my bag" adds every asset once with this look, and
   await expect(page.locator('.bundle-ask')).toContainText('already');
   await page.getByRole('button', { name: 'Replace what is in my bag' }).click();
   await expect(count(page)).toHaveText(String(n));
-  expect(await bagApi(page, (bag) => bag.theme())).toEqual(await presetTheme(page, 'toxic'));
+  expect(await bagTheme(page)).toEqual(await presetTheme(page, 'toxic'));
   await page.getByRole('button', { name: 'Add the whole bundle to my bag' }).click();
   await page.getByRole('button', { name: 'Add to what is in my bag' }).click();
   await expect(count(page)).toHaveText(String(2 * n));
@@ -270,7 +272,7 @@ test('the bag page has the same controls, and its pictures follow the look', asy
   const tile = page.locator('.bag-item').first().locator('canvas.tile');
   const before = await canvasStats(tile);
   await page.getByRole('button', { name: 'Handheld', exact: true }).click();
-  await expect.poll(() => bagApi(page, (bag) => bag.theme().colour.palette)).toBe('Pocket');
+  await expect.poll(async () => (await bagTheme(page)).colour.palette).toBe('Pocket');
   await expect.poll(async () => (await canvasStats(page.locator('.bag-item').first().locator('canvas.tile'))).hash).not.toBe(before.hash);
   await expect(page.getByRole('button', { name: 'Handheld', exact: true })).toHaveAttribute('aria-pressed', 'true');
   await page.reload();

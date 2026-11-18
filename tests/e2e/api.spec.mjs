@@ -31,18 +31,20 @@ test('window.loadout has the Contract 11 members, and the home page does not pay
   expect(shape.top).toEqual(['api', 'assets', 'bag', 'call', 'check', 'framework', 'go', 'make', 'render']);
   expect(shape.assets).toEqual(['get', 'list', 'remove', 'search', 'similar']);
   expect(shape.make).toEqual(['sound', 'sprite']);
-  expect(shape.bag).toEqual(['add', 'download', 'items', 'remove', 'setLook']);
+  expect(shape.bag).toEqual(['add', 'clear', 'download', 'items', 'link', 'remove', 'setLook', 'update']);
 
   // nothing of the framework's own has been asked for yet
   const before = await loaded(page);
-  for (const f of ['/generated/framework.js', '/generated/api.json', '/quality/sprite.js', '/quality/sound.js', '/rigs/humanoid.js']) expect(before, `${f} should load on first use`).not.toContain(f);
+  for (const f of ['/app/api-core.js', '/app/api-actions.js', '/app/made.js', '/generated/framework.js', '/generated/api.json', '/quality/sprite.js', '/quality/sound.js', '/rigs/humanoid.js']) expect(before, `${f} should load on first use`).not.toContain(f);
 
   // first use: the description, then the framework itself, built from the same list
   const got = await page.evaluate(async () => {
     const api = await window.loadout.api;
     const fw = await window.loadout.framework;
-    const missing = [];
-    for (const m of api.modules) for (const e of m.exports) if (!(fw[m.name] && e.name in fw[m.name])) missing.push(`${m.name}.${e.name}`);
+    // api.json and framework.js are written by the same build, so they name the same modules. What each module
+    // exports is the live code, which other people change between builds: that api.json lists exactly the real
+    // exports is the unit test's job (tests/unit/api-generator.test.mjs), with the code and the list read together.
+    const missing = api.modules.filter((m) => !fw[m.name] || typeof fw[m.name] !== 'object').map((m) => m.name);
     return {
       modules: api.modules.map((m) => m.name), frameworkKeys: Object.keys(fw), missing,
       actions: api.actions.map((a) => a.name),
@@ -52,10 +54,7 @@ test('window.loadout has the Contract 11 members, and the home page does not pay
   });
   expect(got.modules.length).toBeGreaterThanOrEqual(15);
   expect(got.frameworkKeys.sort()).toEqual([...got.modules].sort());
-  // api.json is from the last build and the framework is the live code, which other people add to between builds:
-  // everything described must exist (additions never remove), but the live code may already hold more.
-  // That generated/api.json lists exactly the real exports is the unit test's job (tests/unit/api-generator.test.mjs).
-  expect(got.missing, 'every export in api.json is on loadout.framework').toEqual([]);
+  expect(got.missing, 'every module in api.json is on loadout.framework').toEqual([]);
   expect(got.actions).toEqual(expect.arrayContaining(['assets_list', 'assets_search', 'make_sprite', 'make_sound', 'check', 'render', 'bag_add', 'go']));
   expect(got.direct).toBe('function');
   expect(got.sameAgain).toBe(true);
@@ -143,16 +142,18 @@ test('check takes a sound patch or a sprite definition made in the page, and kee
   expect(r.kept).toBe(0);
 });
 
-test('with no background worker the check still runs, and says it ran on the page', async ({ page }) => {
+test('with no background workers a sound is still checked (on the page, and it says so); a sprite is refused, because its source never runs in the page', async ({ page }) => {
   await page.addInitScript(() => { delete window.Worker; });
   await openRoute(page, '/');
   const r = await page.evaluate(async ([src, patch]) => {
     const L = window.loadout;
-    return { sprite: await L.make.sprite(src), sound: await L.make.sound(patch), wav: await L.render(patch.id) };
+    return { sprite: await L.make.sprite(src), sound: await L.make.sound(patch), wav: await L.render(patch.id), listed: (await L.assets.list({ runtime: true })).assets.map((a) => a.id) };
   }, [GOOD_SPRITE, GOOD_SOUND]);
-  expect(r.sprite).toMatchObject({ id: GOOD_ID, ok: true, errors: [] });
-  expect(r.sprite.warnings.join('\n')).toMatch(/on the page itself/);
+  expect(r.sprite.ok).toBe(false);
+  expect(r.sprite.errors[0]).toMatch(/no background workers.*never in the page/);
+  expect(r.listed).toEqual([GOOD_SOUND.id]);
   expect(r.sound.ok).toBe(true);
+  expect(r.sound.warnings.join('\n')).toMatch(/on the page itself/);
   expect(r.wav.ok).toBe(true);
   expect(r.wav.wav).toMatch(/^data:audio\/wav;base64,UklGR/);
 });

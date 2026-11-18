@@ -145,8 +145,12 @@ export function createBag(storage, { now = () => Date.now(), standard = null } =
     return { items, theme: isObj(raw.theme) ? normalizeTheme(raw.theme) : defaultTheme(), next };
   }
 
+  // saved: did the last change reach the storage? When the browser refuses (its storage for the site is full) the bag
+  // lives on in memory for this visit, and whoever shows or fills it can find out and say so (Contract 11: a failed
+  // save is reported, never swallowed).
+  let saved = true;
   function save() {
-    try { storage.setItem(BAG_KEY, JSON.stringify({ version: 1, ...state })); } catch { /* private window or full: the bag lives on in memory */ }
+    try { storage.setItem(BAG_KEY, JSON.stringify({ version: 1, ...state })); saved = true; } catch { saved = false; }
   }
 
   function changed() {
@@ -271,6 +275,10 @@ export function createBag(storage, { now = () => Date.now(), standard = null } =
       if (n) changed();
       return n;
     },
+    /** false when the last change could not be written to the browser's storage: the bag then holds it for this visit only. */
+    saved: () => saved,
+    /** Tell every listener to look again, though nothing in the bag changed (what is known about its items did). */
+    touch() { for (const fn of [...listeners]) { try { fn(api); } catch (e) { console.error('bag listener:', e); } } },
     /** How many items were made on a visit (they carry their definition). */
     madeCount: () => state.items.filter((i) => i.definition).length,
     /** Read the storage again (another tab changed it). */
@@ -303,11 +311,12 @@ export function createBag(storage, { now = () => Date.now(), standard = null } =
 
 /** The browser's storage when it works, otherwise memory (private windows, blocked storage, Node). */
 function siteStorage() {
+  // Usable means readable. Writing is not tried here: when the browser's storage for the site is full a write fails,
+  // but the bag already stored is still there to read, and each failed save is reported (saved()).
   try {
     if (typeof window === 'undefined' || !window.localStorage) return memoryStorage();
-    const s = window.localStorage, probe = BAG_KEY + '-probe';
-    s.setItem(probe, '1'); s.removeItem(probe);
-    return s;
+    window.localStorage.getItem(BAG_KEY);
+    return window.localStorage;
   } catch { return memoryStorage(); }
 }
 

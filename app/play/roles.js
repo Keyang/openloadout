@@ -5,7 +5,9 @@
 //   kind music, or type music                              -> music: plays, with its main sliders
 //   kind sound                                             -> a button on the sound board, unless a sprite in the bag plays it
 //   role characters/player                                 -> the player (one is picked; the others walk around)
-//   type tileset, or role world/tile                       -> the ground (every tileset in the bag is used: see level.js)
+//   type tileset, or role world/tile                       -> the ground: every tileset made for the scene's view is used,
+//                                                             together (view side in a side-view scene, top-down in a
+//                                                             top-down one, any other view in both; see level.js)
 //   type background, or a role under environment/          -> layers behind the scene (far, mid, near)
 //   type ui or icon, a role under interface/, items/icon   -> the on-screen display (never the player, whatever it shows)
 //   role characters/enemy, boss or animal, or type creature -> moves by itself; the action hurts it. An animal never
@@ -93,7 +95,7 @@ const pick = (list, wanted) => (list.includes(wanted) ? wanted : list[0] ?? null
  * Returns {
  *   mode: 'side' | 'top',            // from the player's view; with no player, from the other sprites
  *   player, players,                  // the key in use and every playable character
- *   tilesets,                         // every tileset: they are used together
+ *   tilesets, otherTiles,             // the tilesets made for this scene's view (used together); those made for the other view
  *   background, backgrounds,
  *   scene,                            // keys of the things that stand or move in the scene, in bag order
  *   projectile,                       // the key the player's action fires, or null
@@ -118,13 +120,16 @@ export function planScene(entries, picks = {}) {
     const views = entries.filter((e) => SCENE_ROLES.includes(roles[e.key]) || roles[e.key] === 'tiles').map((e) => e.row.view);
     if (views.includes('top-down') && !views.includes('side')) mode = 'top';
   }
+  // a tileset drawn for the other view would lay the wrong ground: side-view grass is not a top-down floor
+  const wrong = mode === 'top' ? 'side' : 'top-down';
+  const fits = (key) => viewOf(key) !== wrong;
 
   const used = new Set(entries.filter((e) => e.row.kind === 'sprite').flatMap((e) => e.soundIds ?? []));
   const sounds = entries.filter((e) => roles[e.key] === 'sound');
   const sprites = entries.filter((e) => e.row.kind === 'sprite');
   return {
     mode, player, players,
-    tilesets: by('tiles'),
+    tilesets: by('tiles').filter(fits), otherTiles: by('tiles').filter((k) => !fits(k)),
     background: pick(backgrounds, picks.background), backgrounds,
     scene: entries.filter((e) => SCENE_ROLES.includes(roles[e.key])).map((e) => e.key),
     projectile: by('projectile')[0] ?? null,
