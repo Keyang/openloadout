@@ -14,11 +14,13 @@ test.beforeAll(() => {
   }
 });
 
+// a sprite from the catalogue as it is today (any will do; the last one, so nothing depends on what comes first)
+const aSprite = () => JSON.parse(fs.readFileSync(new URL('generated/catalog.json', ROOT), 'utf8')).assets.filter((a) => a.kind === 'sprite').at(-1).id;
 const PAGES = [
-  ['home', '/', 'ul.results > li'],
-  ['results', '/browse?q=coin', 'ul.results > li'],
-  ['a sprite page', '/sprite/knight', 'canvas.stage'],
-  ['the playground', '/play', 'main'],
+  ['home', () => '/', 'ul.results > li'],
+  ['results', () => '/browse?kind=sprite', 'ul.results > li'],
+  ['a sprite page', () => `/sprite/${aSprite()}`, 'canvas.stage'],
+  ['the playground', () => '/play', 'main'],
 ];
 
 for (const [name, route, drawn] of PAGES) {
@@ -26,7 +28,7 @@ for (const [name, route, drawn] of PAGES) {
     const here = new URL(baseURL).origin;
     const asked = [];
     page.on('request', (r) => asked.push(r.url()));
-    await page.goto(`/index.html#${route}`);
+    await page.goto(`/index.html#${route()}`);
     await page.locator(drawn).first().waitFor();
     await page.waitForFunction(() => !/^Loading/.test(document.querySelector('#app main').textContent.trim()));
     await page.evaluate(() => document.fonts.ready);

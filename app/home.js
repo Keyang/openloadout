@@ -169,7 +169,7 @@ function resultsView(query, { home = false, onSearching = () => {} } = {}) {
     const q = state.q.trim(), on = activeFilters(state, catalog.bundles);
     const tips = [];
     if (q) tips.push('Try a shorter or more common word, like "coin" or "jump", and check the spelling.');
-    if (q && /\s/.test(q) && !smart.on) tips.push('Describing what you need? Switch on Smarter search above.');
+    if (q && /\s/.test(q) && !smart.on && smart.bytes > 0) tips.push('Describing what you need? Switch on Smarter search above.');      // only when this build offers it
     if (on.length) tips.push(q ? 'A filter may also be hiding what you want.' : 'Try removing a filter.');
     if (!q && !on.length) tips.push('The library has nothing in it yet.');
     empty.replaceChildren(

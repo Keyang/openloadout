@@ -1,6 +1,12 @@
 // Home page: loads clean, shows every kind of card, search and kind filters work.
 // (The finer points of searching and filtering are in browse.spec.mjs.)
+// Nothing here depends on how many assets the library has or on their order: numbers come from the
+// catalogue file, and a card is brought on screen before it is looked at (cards are made only near the screen).
+import fs from 'node:fs';
 import { test, expect, openRoute } from '../helpers/test.mjs';
+
+const CATALOG = () => JSON.parse(fs.readFileSync(new URL('../../generated/catalog.json', import.meta.url), 'utf8'));
+const count = (kind) => CATALOG().assets.filter((a) => a.kind === kind).length;
 
 const shelf = (page) => page.locator('ul.results > li');
 const places = (page, kind) => page.locator(`ul.results > li[data-kind="${kind}"]`);
@@ -16,32 +22,37 @@ test.beforeEach(async ({ page }) => { await openRoute(page, '/'); });
 
 test('home loads and shows sprites, sounds, music and kits', async ({ page }) => {
   await expect(page.locator('h1')).toBeVisible();
-  expect(await places(page, 'sprite').count()).toBeGreaterThanOrEqual(7);
-  expect(await places(page, 'sound').count()).toBeGreaterThanOrEqual(10);
-  expect(await places(page, 'music').count()).toBeGreaterThanOrEqual(1);
-  expect(await kitCards(page).count()).toBeGreaterThanOrEqual(3);
-  await expect(page.getByRole('navigation', { name: 'Main' }).getByRole('link')).toHaveText(['Sprites', 'Sounds', 'Music', 'Bundles', 'Play']);
-  // a card is made when its place comes near the screen: one of each kind is really there
-  for (const [kind, cards] of [['sprite', spriteCards], ['sound', soundCards], ['music', musicCards]]) {
-    await places(page, kind).last().scrollIntoViewIfNeeded();
-    await expect(cards(page).last()).toBeVisible();
+  for (const kind of ['sprite', 'sound', 'music']) {
+    expect(count(kind), `the library has at least one ${kind}`).toBeGreaterThanOrEqual(1);
+    await expect(places(page, kind)).toHaveCount(count(kind));
   }
-  await shelf(page).last().scrollIntoViewIfNeeded();
-  // by the end every place has its card
+  await expect(kitCards(page)).toHaveCount(CATALOG().bundles.filter((b) => b.level === 'kit').length);
+  await expect(page.getByRole('navigation', { name: 'Main' }).getByRole('link')).toHaveText(['Sprites', 'Sounds', 'Music', 'Bundles', 'Play']);
+  // a card is made when its place comes near the screen: the last of each kind is really there once scrolled to
+  for (const [kind, cards] of [['sprite', spriteCards], ['sound', soundCards], ['music', musicCards]]) {
+    const last = places(page, kind).last();
+    await last.scrollIntoViewIfNeeded();
+    await expect(last.locator('.card').first()).toBeVisible();
+    expect(await cards(page).count()).toBeGreaterThanOrEqual(1);
+  }
+  // walking down the whole page, every place gets its card, of the right kind
   for (const li of await shelf(page).all()) await li.scrollIntoViewIfNeeded();
   await expect(page.locator('ul.results > li > .card-cell')).toHaveCount(await shelf(page).count());
-  expect(await spriteCards(page).count()).toBeGreaterThanOrEqual(7);
-  expect(await soundCards(page).count()).toBeGreaterThanOrEqual(10);
-  expect(await musicCards(page).count()).toBeGreaterThanOrEqual(1);
+  expect(await spriteCards(page).count()).toBe(count('sprite'));
+  expect(await soundCards(page).count()).toBe(count('sound'));
+  expect(await musicCards(page).count()).toBe(count('music'));
 });
 
 test('the search box narrows the cards and says so when nothing matches', async ({ page }) => {
   const all = await shelf(page).count();
   const search = page.getByRole('searchbox', { name: 'Search' });
-  await search.fill('wolf');
+  const sprite = CATALOG().assets.filter((a) => a.kind === 'sprite').at(-1);         // the last sprite: far down the page
+  await search.fill(sprite.name);
   await expect.poll(() => shelf(page).count()).toBeLessThan(all);
-  expect(await shelf(page).count()).toBeGreaterThanOrEqual(1);
-  await expect(spriteCards(page).filter({ hasText: 'Wolf' })).toHaveCount(1);
+  const place = page.locator(`ul.results > li[data-id="${sprite.id}"]`);
+  await expect(place).toHaveCount(1);
+  await place.scrollIntoViewIfNeeded();
+  await expect(place.locator(`a.card[href="#/sprite/${sprite.id}"]`)).toContainText(sprite.name);
   await search.fill('zzzqqq-nothing');
   await expect(shelf(page)).toHaveCount(0);
   await expect(page.locator('.empty')).toBeVisible();
@@ -61,7 +72,8 @@ test('kind and type choices narrow the shelf, and letting go brings everything b
   await expect(music).toHaveAttribute('aria-pressed', 'true');
   await expect.poll(() => shelf(page).count()).toBeLessThan(all);
   expect(await kindsOf(page)).toEqual(['music']);
-  expect(await musicCards(page).count()).toBe(await shelf(page).count());
+  await expect(musicCards(page).first()).toBeVisible();
+  expect(await page.locator('ul.results .card').count()).toBe(await musicCards(page).count());      // every card made is a music card
   await music.click();
   await expect(shelf(page)).toHaveCount(all);
 
@@ -70,7 +82,8 @@ test('kind and type choices narrow the shelf, and letting go brings everything b
   await expect(character).toHaveAttribute('aria-pressed', 'true');
   await expect.poll(() => kindsOf(page)).toEqual(['sprite']);
   expect(await shelf(page).count()).toBeGreaterThanOrEqual(1);
-  expect(await spriteCards(page).count()).toBe(await shelf(page).count());
+  await expect(spriteCards(page).first()).toBeVisible();
+  expect(await page.locator('ul.results .card').count()).toBe(await spriteCards(page).count());     // every card made is a sprite card
   await character.click();
   await expect(shelf(page)).toHaveCount(all);
 
@@ -81,7 +94,7 @@ test('kind and type choices narrow the shelf, and letting go brings everything b
     const labels = await choices(page, name).locator('.fl').allTextContents();
     expect(labels.length).toBeGreaterThanOrEqual(3);
     for (const label of labels) {
-      const one = choices(page, name).filter({ has: page.locator('.fl', { hasText: new RegExp(`^${label}$`) }) });
+      const one = choices(page, name).filter({ has: page.locator('.fl', { hasText: new RegExp(`^${label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`) }) });
       const promised = Number(await one.locator('.n').textContent());
       await one.click();
       await expect(one).toHaveAttribute('aria-pressed', 'true');
@@ -94,16 +107,12 @@ test('kind and type choices narrow the shelf, and letting go brings everything b
 });
 
 test('the browse pages show one type each', async ({ page }) => {
-  await openRoute(page, '/sprites');
-  await expect.poll(() => kindsOf(page)).toEqual(['sprite']);
-  expect(await spriteCards(page).count()).toBeGreaterThanOrEqual(7);
-  expect(await soundCards(page).count()).toBe(0);
-  await openRoute(page, '/sounds');
-  await expect.poll(() => kindsOf(page)).toEqual(['sound']);
-  expect(await places(page, 'sound').count()).toBeGreaterThanOrEqual(10);
-  expect(await soundCards(page).count()).toBeGreaterThanOrEqual(6);
-  expect(await spriteCards(page).count()).toBe(0);
-  await openRoute(page, '/music');
-  await expect.poll(() => kindsOf(page)).toEqual(['music']);
-  expect(await musicCards(page).count()).toBeGreaterThanOrEqual(1);
+  for (const [route, kind, cards] of [['/sprites', 'sprite', spriteCards], ['/sounds', 'sound', soundCards], ['/music', 'music', musicCards]]) {
+    await openRoute(page, route);
+    await expect.poll(() => kindsOf(page)).toEqual([kind]);
+    await expect(shelf(page)).toHaveCount(count(kind));
+    await expect(cards(page).first()).toBeVisible();
+    // every card that has been made is of this kind
+    expect(await page.locator('ul.results .card').count()).toBe(await cards(page).count());
+  }
 });
