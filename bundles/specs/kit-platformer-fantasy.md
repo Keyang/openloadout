@@ -81,7 +81,7 @@ Seven existing sprites are used as they are. They count towards the 47. The last
 | `slime` | Basic ground enemy: hops back and forth | idle, hop, attack, hurt | Add `die` (8): flattens and bursts into droplets; cue `enemy-squish` style "Squish" on frame 0. |
 | `bat` | Basic flying enemy in caves and the castle | idle, fly, attack, hurt | Add `die` (8): wings fold, it drops and pops; cue `enemy-squish` style "Pop" on frame 0. |
 | `wolf` | Fast ground enemy that charges | idle, walk, run, attack, hurt | Add `die` (8): stumbles and lies down; cue `punch` style "Heavy body blow" on frame 0. |
-| `coin` | The main thing to collect | spin, collect | none |
+| `coin` | The main thing to collect | spin, collect | none for the sprite. Its sound `coin-pickup` gets a new interval and voice in the same task (originality: Sound effects, row 7) |
 | `campfire` | Rest spot beside a checkpoint | burn, ignite | none |
 
 ## New sprites
@@ -638,7 +638,7 @@ A batch starts when its helpers exist and every batch in its "Needs first" cell 
 
 | Order | Batch | Kind | Assets | Needs first |
 |---|---|---|---|---|
-| 1 | **P00** | upgrade | `knight`, `wizard`, `slime`, `bat`, `wolf` | humanoid-poses. Task W3-X, not a production batch: the changes listed under Reused assets |
+| 1 | **P00** | upgrade | `knight`, `wizard`, `slime`, `bat`, `wolf`, `coin-pickup` | humanoid-poses. Task W3-X, not a production batch: the changes listed under Reused assets, and the new voice of `coin-pickup` (Sound effects, row 7) |
 | 1 | **P01** | sounds | `land-thud`, `enemy-squish`, `golem-slam`, `gem-pickup`, `spring-boing` | nothing |
 | 1 | **P02** | sounds | `chest-open`, `door-creak`, `lever-clank`, `crate-break` | nothing. Two of these are shared with the RPG kit |
 | 1 | **P03** | tileset | `tiles-forest`, `tiles-platforms` | palettes, tile-helper. **Pathfinder for tilesets.** Sets the tile conventions for all three kits; its report is read before P04, P05 start |

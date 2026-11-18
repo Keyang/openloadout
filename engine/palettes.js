@@ -43,17 +43,17 @@ const hearthvale = {
   wood: '#9a6a3e', cobble: '#a8a4a0', slate: '#5a5f7a', flagstone: '#7e84a0', roof: '#c8553a', water: '#4fa8d8',
   sky: '#9fd8f4', haze: '#a8c8d8', cream: '#f0ead8', hero: '#3f6fd1', mage: '#7a4fc4', rogue: '#2f8f9d',
   crimson: '#c9423a', bandit: '#8e3a4a', gold: '#f2c230', steel: '#c2c9d6', rust: '#a8806a', fire: '#e8662c',
-  ice: '#7aa0f4', thunder: '#f4e06a', heal: '#7fe0a0', magic: '#4fd8ee', panel: '#3f5490', skin: '#f6d3b0',
+  ice: '#7aa0f4', thunder: '#f4e06a', heal: '#7fe0a0', magic: '#4fd8ee', panel: '#4a609c', skin: '#f6d3b0',
 };
 
 const derelict = {
   ink: '#231b33', void: '#141a33', plate: '#434d6d', deck: '#566182', hull: '#6b7896', panel: '#9aa6c0',
   steel: '#c2c9d6', suit: '#e8ecf2', signal: '#3f6fd1', cyan: '#5fe0f0', teal: '#2fb3a8', amber: '#f2a030',
-  red: '#e2473f', flesh: '#b04a8a', membrane: '#803668', chitin: '#74489c', acid: '#9fe040', gold: '#f2c230',
+  red: '#e2473f', flesh: '#b04a8a', membrane: '#a87894', chitin: '#ca9eda', acid: '#9fe040', gold: '#f2c230',
   heal: '#5fd47a', shield: '#4f9ff0', xp: '#b48af8', nebula: '#6660b6', cream: '#f0ead8', skin: '#f6d3b0',
 };
 
-/** Bundle id -> palette key. */
+/** Maps each bundle id to its palette key ('kit-platformer-fantasy' -> 'thornwood'). No arguments: a frozen object. */
 export const BUNDLE_PALETTE = Object.freeze({
   'kit-platformer-fantasy': 'thornwood',
   'kit-rpg-fantasy': 'hearthvale',
@@ -65,10 +65,10 @@ const ALIASES = { ...BUNDLE_PALETTE, platformer: 'thornwood', rpg: 'hearthvale',
 const P = { thornwood: Object.freeze(thornwood), hearthvale: Object.freeze(hearthvale), derelict: Object.freeze(derelict) };
 for (const [alias, name] of Object.entries(ALIASES)) Object.defineProperty(P, alias, { value: P[name], enumerable: false });
 
-/** PALETTE.thornwood.grass, PALETTE['kit-rpg-fantasy'].wheat, PALETTE.derelict.cyan ... */
+/** The three palettes as frozen { name: '#rrggbb' } objects, keyed thornwood, hearthvale, derelict (aliases: bundle ids, platformer, rpg, roguelite, scifi). No arguments. */
 export const PALETTE = Object.freeze(P);
 
-/** Colours that are never swatches: the outline, and colours the guide marks "background only". */
+/** Per palette key, the colour names that are never swatches: the outline and "background only" colours. No arguments: frozen lists. */
 export const NEVER_SWATCH = Object.freeze({ thornwood: Object.freeze(['ink']), hearthvale: Object.freeze(['ink']), derelict: Object.freeze(['ink', 'void']) });
 
 // ---- swatch groups -----------------------------------------------------------
@@ -147,15 +147,15 @@ const GROUPS = {
     edge: ['cyan', 'red', 'acid', 'amber', 'xp', 'shield'],
     gem: ['xp', 'cyan', 'gold', 'acid', 'red'],
     shell: ['chitin', 'flesh', 'membrane', 'hull', 'acid', 'panel'],
-    grass: ['acid', 'flesh', 'chitin', 'teal'],
-    leaf: ['acid', 'flesh', 'chitin', 'teal'],
+    grass: ['acid', 'flesh', 'membrane', 'teal'],
+    leaf: ['acid', 'flesh', 'membrane', 'teal'],
     ground: ['deck', 'plate', 'hull', 'panel'],
     water: ['acid', 'teal', 'shield', 'cyan', 'flesh'],
     floor: ['deck', 'plate', 'hull', 'panel'],
     wall: ['hull', 'deck', 'panel', 'plate'],
     flesh: ['flesh', 'membrane', 'chitin', 'acid', 'xp', 'red'],
     // void is the space colour of a backdrop but never a swatch, so `sky` starts with plate
-    sky: ['plate', 'deck', 'nebula', 'chitin', 'hull', 'xp'],
+    sky: ['plate', 'deck', 'nebula', 'hull', 'membrane'],
     land: ['hull', 'deck', 'plate', 'teal', 'chitin'],
     haze: ['nebula', 'xp', 'hull', 'panel', 'teal', 'deck'],
     face: ['plate', 'deck', 'hull', 'teal', 'panel'],
@@ -169,7 +169,7 @@ const SAME_AS = { rock: 'stone', cloth: 'outfit', fur: 'body', light: 'glow', en
 const MIN_BRIGHTNESS = 0.18;
 const HEX = /^#[0-9a-f]{6}$/i;
 
-/** The palette key ('thornwood', 'hearthvale', 'derelict') for a palette key, bundle id or short name. */
+/** Returns the palette key ('thornwood', 'hearthvale', 'derelict'); throws for an unknown name. Arguments: bundle: a palette key, bundle id or short name, any case. */
 export function paletteName(bundle) {
   const key = String(bundle).toLowerCase();
   if (key in GROUPS) return key;
@@ -177,10 +177,10 @@ export function paletteName(bundle) {
   throw new Error(`unknown bundle "${bundle}": use thornwood, hearthvale, derelict or a bundle id (${Object.keys(BUNDLE_PALETTE).join(', ')})`);
 }
 
-/** The palette object for a palette key, bundle id or short name. */
+/** Returns the frozen palette object. Arguments: bundle: a palette key, bundle id or short name, any case. */
 export const palette = (bundle) => PALETTE[paletteName(bundle)];
 
-/** Material names that swatches() knows for this bundle (palette colour names also work). */
+/** Lists the material words swatches() accepts for a palette (its colour names also work). Arguments: bundle: a palette key, bundle id or short name. */
 export function materials(bundle) {
   const name = paletteName(bundle);
   const own = Object.keys(GROUPS[name]);
@@ -194,7 +194,7 @@ function resolve(name, entry) {
   return c;
 }
 
-/** Swatch list for a colour control: 4 to 8 colours, palette colours first. See the top of this file. */
+/** Returns a new swatch list for a colour control: 4 to 8 colours, palette colours first, none darker than 0.18. Arguments: bundle: palette key or alias; material: a word from materials() or a palette colour name; options { lead }: a colour name or hex to put first. */
 export function swatches(bundle, material, { lead } = {}) {
   const name = paletteName(bundle);
   material = String(material).toLowerCase();

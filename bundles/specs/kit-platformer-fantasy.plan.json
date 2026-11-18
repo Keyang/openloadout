@@ -2287,7 +2287,8 @@
         "wizard",
         "slime",
         "bat",
-        "wolf"
+        "wolf",
+        "coin-pickup"
       ],
       "needs": [
         "humanoid-poses"
@@ -2564,6 +2565,10 @@
     {
       "id": "wolf",
       "change": "Add `die` (8): stumbles and lies down; cue `punch` style \"Heavy body blow\" on frame 0."
+    },
+    {
+      "id": "coin-pickup",
+      "change": "Originality: today it is a two-note square blip with the second note a fourth up, the best-known coin sound in games. Give it its own interval and voice (for example a major sixth on a triangle with a short bell), keeping its id and its styles \"Gem\" and \"Dull token\"."
     }
   ]
 }

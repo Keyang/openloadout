@@ -38,6 +38,7 @@ import { hash, fract, clamp, lerp, easeOut, TAU, PI } from './motion.js';
  * [white, core, mid, edge, rim] where rim = tone(edge, -1).
  * opt.core: the inside colour (default: edge lightened toward yellow).
  * opt.white: false drops the white step (smoke, slime: things that are not hot).
+ * Arguments: edge: the effect's outer colour; options { core, white }.
  */
 export function steps(edge, { core, white = true } = {}) {
   const c = core ?? tone(edge, 1.6);
@@ -45,7 +46,10 @@ export function steps(edge, { core, white = true } = {}) {
   return white ? ['#ffffff', ...list] : list;
 }
 
-/** Pick a step by heat: 1 = the hottest (first), 0 = the rim (last). */
+/**
+ * Pick a step by heat: 1 = the hottest (first), 0 = the rim (last).
+ * Arguments: list: colour steps, hottest first; heat: 0..1.
+ */
 export function stepAt(list, heat) {
   const k = clamp(heat);
   return list[Math.round((1 - k) * (list.length - 1))];
@@ -64,6 +68,7 @@ const inside01 = (v, lo, hi) => Math.min(Math.max(v, lo + 0.01), hi - 0.01);
  * one-shot (loop: false): each particle waits at 0 (in the hot core) for a delay of up to
  * `stagger` of the clip, then ages, reaching 1 exactly at t = 1. So frame 0 of a burst is the
  * whole cluster at its brightest.
+ * Arguments: t: clip phase; i: particle index; options { seed, loop, cycles, stagger }.
  */
 export function lifeOf(t, i, { seed = 0, loop = true, cycles = 1, stagger = 0.6 } = {}) {
   const h = hash(i, seed * 64 + 1);
@@ -108,6 +113,7 @@ function disc(g, B, cx, cy, r, c) {
 /**
  * A four-point sparkle at (x, y). size 0 = one pixel, 1 = a plus, 2 = a big plus.
  * The centre is white (opt.core) from size 1 up.
+ * Arguments: g: the Surface; x, y: centre; size: 0, 1 or 2; colour: a colour or a steps list; options { core, box }.
  */
 export function twinkle(g, x, y, size, colour, { core = '#ffffff', box } = {}) {
   const B = boxOf(g, box);
@@ -121,6 +127,7 @@ export function twinkle(g, x, y, size, colour, { core = '#ffffff', box } = {}) {
 /**
  * Concentric hard discs from the rim (radius r, 1 px wide) in to a white centre:
  * the brightest frame of a burst, a muzzle flash, a glowing orb. colours: hottest first.
+ * Arguments: g: the Surface; x, y: centre; r: outer radius; colours: a steps list or one colour; options { box }.
  */
 export function glow(g, x, y, r, colours, { box } = {}) {
   const B = boxOf(g, box);
@@ -144,6 +151,7 @@ export function glow(g, x, y, r, colours, { box } = {}) {
  * wobble: px of side-to-side sway; lifespan (loops): fraction of the cycle a particle is seen.
  * A particle's colour runs through the steps from hot to rim as it ages. A one-shot ends
  * with every particle as one rim-coloured pixel, so the last frame is never empty.
+ * Arguments: g: the Surface; o: { t, x, y, count, seed, loop, cycles, stagger, angle, arc, dist, gravity, size, spread, wobble, lifespan, colour | colours, white, box }.
  */
 export function particles(g, o) {
   const { t = 0, x, y, count = 8, seed = 0, loop = true, cycles = 1, stagger = 0.6, angle = PI, arc = PI / 2, dist = 12, gravity = 0, size = 2, spread = 0, wobble = 0, lifespan = 1 } = o;
@@ -172,6 +180,7 @@ export function particles(g, o) {
  * Twinkles scattered over an area (default: the whole box), each on its own repeating
  * timer: off, a pixel, a plus, a big plus, back down. A looping glint field for gems,
  * stars, magic. area: [x0, y0, x1, y1]; `big`: false keeps them to pluses.
+ * Arguments: g: the Surface; o: { t, count, seed, cycles, big, area, colour | colours, white, box }.
  */
 export function sparkles(g, o) {
   const { t = 0, count = 5, seed = 0, cycles = 1, big = true } = o;
@@ -196,6 +205,7 @@ export function sparkles(g, o) {
  * One-shot over the clip: radius r0 -> r1 easing out, `thick` px thinning to 1, colour from hot
  * to rim, with a 1 px rim on its outside while it is thick enough. From t = 0.6 it breaks into
  * arcs that thin away; the last frame keeps a few rim pixels.
+ * Arguments: g: the Surface; o: { t, x, y, r0, r1, thick, squash, seed, colour | colours, white, box }.
  */
 export function ring(g, o) {
   const { t = 0, x, y, r0 = 2, r1 = 12, thick = 3, squash = 1, seed = 0 } = o;
@@ -233,6 +243,7 @@ export function ring(g, o) {
  * Each is a small spinning triangle `size` px long, shaded with the surface light and rimmed
  * with tone(colour, -1). They fly `dist` px (outward along angle / arc), fall `gravity` px by
  * the end, shrink a little, and land as one or two pixels each. One-shot over the clip.
+ * Arguments: g: the Surface; o: { t, x, y, count, seed, dist, gravity, size, angle, arc, spin, colour | colours, box }.
  */
 export function shards(g, o) {
   const { t = 0, x, y, count = 6, seed = 0, dist = 14, gravity = 8, size = 3, angle = PI, arc = 2 * PI, spin = 1.5 } = o;
@@ -279,6 +290,7 @@ export function shards(g, o) {
  * Young puffs are lighter, old ones darker; each is shaded by the surface light and rimmed with
  * tone(its colour, -1). loop (default): puffs vanish to nothing at the end of their life, so the
  * loop closes; one-shot: they end as small dark wisps.
+ * Arguments: g: the Surface; o: { t, x, y, count, seed, loop, cycles, stagger, rise, drift, size, colour | colours, box }.
  */
 export function smoke(g, o) {
   const { t = 0, x, y, count = 5, seed = 0, loop = true, cycles = 1, stagger = 0.5, rise = 14, drift = 3, size = 4 } = o;

@@ -83,7 +83,7 @@ Each bundle has one named palette (the tables below). They live in `engine/palet
 1. **Defaults come from the bundle palette.** The default of every colour control is a palette colour **by name**, and the specification says which. A specification never asks for "a darker slate" or "a dull purple": if a default is not in the table, the table gets a new named row first.
 2. **Swatches start with the palette.** A colour control offers 4 to 8 swatches from `swatches(palette, material, { lead })` (below). The first three or more are palette colours that suit that material; the rest may come from the engine lists (`SKIN`, `HAIR`, `CLOTH`, `METAL`). Every swatch must look right with every other control's swatches, because random looks combine them.
 3. **Fixed colours come only from the palette.** A colour that is not a control (a wooden handle, a boot, a rivet) is a palette colour by name, never a new hex.
-4. **Tones are derived, never typed.** Use `ramp`, `farRamp`, `tone` and `mix` on the base colour. Do not type a shadow hex. On a base darker than brightness 0.35 (`slate`, `cavern`, `panel`, `plate`, `deck`, `chitin`, `membrane`) the `dark` tone comes close to the outline: carry the form with `light` and `base`, and keep `dark` for creases one pixel wide.
+4. **Tones are derived, never typed.** Use `ramp`, `farRamp`, `tone` and `mix` on the base colour. Do not type a shadow hex. On a base darker than brightness 0.4 (`slate`, `cavern`, `panel`, `plate`, `deck`) the `dark` tone comes close to the outline: carry the form with `light` and `base`, and keep `dark` for creases one pixel wide. **Interface panel faces in `panel` use the base and light tones only, never `dark`.**
 5. **No swatch darker than brightness 0.18** (the checker warns under 0.14: the shape turns into a black blob). Palette colours marked "background only" are never swatches.
 6. **2 to 5 colour controls per sprite.**
 7. **The same four colours mean the same thing in every bundle:** ink `#231b33`; reward gold `#f2c230`; steel `#c2c9d6`; skin `#f6d3b0`. Danger is always a red, healing always a green, friendly energy always a cyan, and the player's own cloth is the same blue `#3f6fd1` in all three (`hero` in the fantasy palettes, `signal` in Derelict).
@@ -171,12 +171,12 @@ The same people as Thornwood in a softer, warmer world: meadow, wheat, terracott
 | thunder | `#f4e06a` | thunder spell |
 | heal | `#7fe0a0` | healing, buffs |
 | magic | `#4fd8ee` | save crystal, spell glow |
-| panel | `#3f5490` | interface panel faces |
+| panel | `#4a609c` | interface panel faces (base and light tones only; white text on it keeps more than 4.5 to 1) |
 | skin | `#f6d3b0` | human skin |
 
 ### Palette "Derelict" (`kit-roguelite-scifi`)
 
-Cold steel station, lit by small strong lights. Bodies are dark and desaturated; **only energy is saturated**, and its colour says whose it is. **Cool colours are the player's** (pale suit, blue trim, cyan light); **warm colours are warnings** (amber) **and enemies** (red). Nothing the player wears or fires is orange.
+Cold steel station, lit by small strong lights. Station bodies are dark and desaturated, hive bodies are pale lilac over dark pink, and both stand apart from the floors by value; **only energy is saturated**, and its colour says whose it is. **Cool colours are the player's** (pale suit, blue trim, cyan light); **warm colours are warnings** (amber) **and enemies** (red). Nothing the player wears or fires is orange.
 
 | Name | Hex | Used for |
 |---|---|---|
@@ -194,8 +194,8 @@ Cold steel station, lit by small strong lights. Bodies are dark and desaturated;
 | amber | `#f2a030` | hazard stripes, warnings, explosives, rocket flame |
 | red | `#e2473f` | **hostile energy**: enemy lights and shots, locked doors |
 | flesh | `#b04a8a` | hive bodies and growth |
-| membrane | `#803668` | hive floors: darker and duller than the growth and the bugs on it |
-| chitin | `#74489c` | bug shells |
+| membrane | `#a87894` | hive floors: a dull mauve, clearly lighter than the station floors (`deck`, `plate`), duller than the growth, and darker than the bugs on it |
+| chitin | `#ca9eda` | bug shells: a pale lilac, lighter than every floor (`plate`, `deck`, `membrane`) by 0.15 or more in brightness, so bugs show in every look, Mono included. Still far darker and more purple than the ranger's `suit` |
 | acid | `#9fe040` | acid, goo, bug glow |
 | gold | `#f2c230` | credits |
 | heal | `#5fd47a` | health |
@@ -214,15 +214,15 @@ Cold steel station, lit by small strong lights. Bodies are dark and desaturated;
 | Thornwood | cavern | (new) | `#3f5068` | named the "darker slate" the cave tileset asked for |
 | Thornwood | dusk | (new) | `#8696dc` | named the "dusk" sky the castle backdrop asked for |
 | Hearthvale | ice | `#8fd8f0` | `#7aa0f4` | was almost the sky colour: the ice spell vanished against the battle sky |
-| Hearthvale | panel | `#2b3a67` | `#3f5490` | its `dark` tone was darker than the outline |
+| Hearthvale | panel | `#2b3a67` | `#4a609c` | its `dark` tone was darker than the outline (first lifted to `#3f5490`, then again after the second review; panel faces also stop using `dark`) |
 | Hearthvale | pine | (new) | `#357a4c` | named the "darker leaf" of the pine tree |
 | Hearthvale | flagstone | (new) | `#7e84a0` | named the "lighter slate" of dungeon floors |
 | Hearthvale | rust | (new) | `#a8806a` | named the "rusty steel" of the skeleton |
 | Derelict | signal | `#f08a2c` | `#3f6fd1` | was almost hazard amber; the hue wheel has no free warm slot between amber and hostile red, so the player's trim moved to the cool side |
 | Derelict | plate | `#353d57` | `#434d6d` | its `dark` tone was as dark as the outline |
 | Derelict | deck | `#4a5470` | `#566182` | moved up with `plate`, so the inset plating still reads darker than the floor |
-| Derelict | chitin | `#6a3a7a` | `#74489c` | its `dark` tone was close to the outline; also moved away from `flesh` |
-| Derelict | membrane | (new) | `#803668` | named the "darker flesh" of the hive floor |
+| Derelict | chitin | `#6a3a7a` | `#ca9eda` | its `dark` tone was close to the outline, and at its first fix (`#74489c`, brightness 0.37) it had the same value as the floor `deck` (0.38): bugs vanished in the Mono look. Now 0.70 |
+| Derelict | membrane | (new) | `#a87894` | named the hive floor colour (first `#803668`, brightness 0.32, too close to `plate` and `deck`; now 0.54, at least 0.15 from both floors and from `chitin`) |
 | Derelict | nebula | (new) | `#6660b6` | named the "dull xp" of the starfield's nebula |
 
 ---
@@ -569,7 +569,7 @@ Rules:
 - **A part's sound goes with the part, and that takes a `when` on the cue.** Taking a part off hides its settings by itself (the part's `none` does that), but it does nothing to the sprite's sounds: a blade's slash would still play over a bare fist. Every cue that belongs to a part, or to one option of it, carries `when` (section 11), and the specification writes it out.
 - A part gets its own colour setting (`<part>Colour`) only when no sprite colour already covers it. `metal` covers weapons, shields and helmets; `trim` covers capes and scarves. **A sprite colour that only shows on parts is not in effect when all of those parts are off, and must say so with `when`** (section 10): `metal` on a character whose only metal is a weapon and a helmet is the standard case, and `sprites/knight.js` shows it.
 - Headgear either leaves the things other controls change in view (a helmet open at the face shows skin; a hat sits above the fringe), or the hidden control declares `when`. A control that is hidden and does not say so is reported by the checker as dead.
-- A sprite with parts exports `sockets(clip, t, p)`. Socket names: `hand`, `offhand`, `head`, `back`, `feet`, plus `tail` where there is one and **`muzzle`** on anything that shoots (where the projectile and the muzzle flash appear).
+- A sprite with parts exports `sockets(clip, t, p)`. Socket names: `hand`, `offhand`, `head`, `back`, `feet`, plus `tail` where there is one, **`muzzle`** on anything that shoots (where the projectile and the muzzle flash appear) and **`tip`** on a cursor or pointer (its hot spot: section 8).
 
 ---
 
@@ -843,7 +843,7 @@ When a specification's wording is close to something famous, say so in your repo
 
 ## 14. Shared helpers
 
-Written once (task W3-H) before the batches that need them. Builders use them and do not edit them; if one is missing something, write it in your own file and report it.
+The helpers are the framework (Contract 11). When an asset needs generic code a helper lacks (a shape, pose, particle, tile piece, synthesis block), add it to that framework module, not to the asset file: a new export at the end of the module with a one-line doc comment listing its arguments, plus a unit test in `tests/unit/`. Additions only; existing exports keep their behaviour and every existing asset renders the same. Additions appear on `window.loadout.framework` and in `generated/api.json`. Generic code inside an asset file is a review finding; list what you added in your report.
 
 | Helper | File | What it must do | Needed by |
 |---|---|---|---|
@@ -853,8 +853,8 @@ Written once (task W3-H) before the batches that need them. Builders use them an
 | `humanoid-poses` | `rigs/humanoid.js` (extended) | Add the section 4 poses the side rig lacks: `die`, `block`, `victory`, `talk`, `shoot`, and a thrusting `attack` variant, with their standard clip entries, so no two characters invent their own fall | new side-view characters; the changes to `knight` and `wizard` |
 | `backdrop-helper` | `engine/backdrop.js` | `LAYER = [320, 180]`; ridge and treeline outlines that wrap at 320 px; `scatter(count, seed)` wrapping positions; `recede(colour, depth, sky)`; `layerClips()` | every background |
 | `ui-helper` | `engine/ui.js` | `panel9(g, x, y, w, h, { face, frame, border, corner })` with the section 8 bevel; the button states; the bar housing and fill | interface batches |
-| `fx-helper` | `engine/fx.js` | Looping and one-shot particles (`life = fract(t + hash(i))`), `twinkle`, rings, shards, smoke puffs, the white-core-to-dark-rim colour steps of an effect (`steps`, `particles`, `sparkles`, `ring`, `shards`, `smoke`, `glow`, `twinkle`). Its one-shot helpers keep every piece inside the frame, so no frame comes out empty | **required** by every effect and projectile batch (it is in their `needs`): an effect is built from these helpers, so all effects of all three kits share one look. What a helper cannot do is written in the sprite's own file and reported |
-| `compose-kit` | `tools/compose/kit.py` (or `.mjs`) | The parts of `battle_theme.py` every track repeats: the 16th clock, the bar counter and section gates for `bars`, the five level-matched melody instruments behind `inst`, the limiter and stereo bus, `key` and `bpm` wiring | every music batch |
+| `fx-helper` | `engine/fx.js` | Looping and one-shot particles (`life = fract(t + hash(i))`), `twinkle`, rings, shards, smoke puffs, the white-core-to-dark-rim colour steps of an effect (`steps`, `particles`, `sparkles`, `ring`, `shards`, `smoke`, `glow`, `twinkle`). Its one-shot helpers keep every piece inside the frame, so no frame comes out empty | **required** by every effect and projectile batch (it is in their `needs`): an effect is built from these helpers, so all effects of all three kits share one look. |
+| `compose-kit` | `tools/compose/kit.mjs` | The parts of `battle_theme.py` every track repeats: the 16th clock, the bar counter and section gates for `bars`, the five level-matched melody instruments behind `inst`, the limiter and stereo bus, `key` and `bpm` wiring | every music batch |
 
 ---
 
@@ -869,4 +869,4 @@ Written once (task W3-H) before the batches that need them. Builders use them an
 7. Every control and cue that only matters sometimes has the `when` the specification gives; you added one wherever the checker asked for it.
 8. Looked at under the whole-bundle looks Sunset, Night, Handheld and Mono: neighbouring materials still differ.
 9. Described in one sentence, the asset is not a famous character, item or tune (section 13).
-10. Your report says: what the specification got wrong or left open, and what you decided.
+10. Your report says: what the specification got wrong or left open, what you decided, and every export you added to the framework (section 14).
