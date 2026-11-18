@@ -250,12 +250,15 @@ const FACES = {
   'inner-tl': '', 'inner-tr': '', 'inner-bl': '', 'inner-br': '',
 };
 const CORNER = { 'inner-tl': [0, 0], 'inner-tr': [B - 1, 0], 'inner-bl': [0, B - 1], 'inner-br': [B - 1, B - 1] };
+// the lane pieces: their open sides, and the cut corners between their arms (each has the outline's corner pixel)
+const LANE = { 'elbow-tl': ['NW', ['br']], 'elbow-tr': ['NE', ['bl']], 'elbow-bl': ['SW', ['tr']], 'elbow-br': ['SE', ['tl']], 'tee-t': ['N', ['bl', 'br']], 'tee-r': ['E', ['tl', 'bl']], 'tee-b': ['S', ['tl', 'tr']], 'tee-l': ['W', ['tr', 'br']], cross: ['', ['tl', 'tr', 'bl', 'br']] };
 const NARROW = { 'strip-l': 'NSW', 'strip-m': 'NS', 'strip-r': 'NSE', 'col-t': 'NWE', 'col-m': 'WE', 'col-b': 'SWE', single: 'NSWE', 'fill-b': '' };
 function blockDef(opts = {}) {
   const prefix = opts.prefix ?? 'rock';
   const one = { frames: 1, fps: 1, loop: false };
   const clips = Object.fromEntries(Object.keys(FACES).map((k) => [`${prefix}-${k}`, { ...one }]));
   if (opts.narrow) for (const k of Object.keys(NARROW)) clips[`${prefix}-${k}`] = { ...one };
+  if (opts.lanes) for (const k of Object.keys(LANE)) clips[`${prefix}-${k}`] = { ...one };
   if (opts.slopes) { clips[`${prefix}-slope-up`] = { ...one }; clips[`${prefix}-slope-down`] = { ...one }; }
   if (opts.decal) clips[`${prefix}-deco-a`] = { ...one, place: opts.decalPlace ?? 'above' };
   return {
@@ -288,7 +291,8 @@ function blockDef(opts = {}) {
         }
         return;
       }
-      const faces = FACES[piece] ?? NARROW[piece];
+      const faces = FACES[piece] ?? NARROW[piece] ?? LANE[piece][0];
+      const cuts = LANE[piece] && !(opts.badElbow && piece === 'elbow-tl') ? LANE[piece][1] : [];        // badElbow: this bend has no pixel in its cut corner
       // the wall of a top-down block: its bottom row is the front face, darker than the cap
       if (opts.face && piece.startsWith('bottom')) {
         const x0 = faces.includes('W') ? (opts.faceShort ? 3 : 0) : 0, x1 = faces.includes('E') ? B - 1 : B - 1;
@@ -312,9 +316,11 @@ function blockDef(opts = {}) {
         const w = west ? x : 99, e = east ? B - 1 - pull - x : 99;
         const c = CORNER[piece];
         const cornerLine = c && x === c[0] && y === c[1] && (opts.face ? piece.startsWith('inner-t') : !(opts.slopes && !opts.nub && piece.startsWith('inner-t')));
-        const line = Math.min(n, s, w, e) === 0 || cornerLine;
+        const line = Math.min(n, s, w, e) === 0 || cornerLine || cuts.some((k) => x === (k[1] === 'l' ? 0 : B - 1) && y === (k[0] === 't' ? 0 : B - 1));
         const deep = p.edge + (opts.bandJump ? Math.floor(x / 11) : 0);                             // the band under the top: 2 px deeper at the right edge than at the left
-        g.dot(x, y, line ? INK : n <= deep ? p.trim : body(x, y));
+        // the band under the top turns a cut top corner with the outline: a square of it, as deep as it is
+        const turned = cuts.some((k) => k[0] === 't' && y >= 1 && y <= deep && (k[1] === 'l' ? x <= deep : x >= B - 1 - deep));
+        g.dot(x, y, line ? INK : n <= deep || turned ? p.trim : body(x, y));
       }
     },
   };
@@ -327,6 +333,10 @@ export const blockWrongEdge = () => defineSprite(blockDef({ badSideR: true }));
 export const blockSlopes = () => defineSprite(blockDef({ slopes: true }));
 // the slope that rises to the right ends 3 px below the top tile it leads to
 export const blockBadSlope = () => defineSprite(blockDef({ slopes: true, badSlope: true }));
+// (passes) a block with the narrow pieces and the nine lane pieces: bends, forks and a crossing
+export const blockLanes = () => defineSprite(blockDef({ narrow: true, lanes: true }));
+// one bend has no outline pixel in its cut corner, so the border of the lane it turns into stops short there
+export const blockBadElbow = () => defineSprite(blockDef({ narrow: true, lanes: true, badElbow: true }));
 // (passes) a block with the seven narrow pieces and a second fill
 export const blockNarrow = () => defineSprite(blockDef({ narrow: true }));
 // the second fill has stones on its left edge, where the plain fill has none: it cannot stand in for the fill everywhere

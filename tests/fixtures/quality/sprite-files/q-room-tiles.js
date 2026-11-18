@@ -71,7 +71,7 @@ export default defineSprite({
   },
   clips: {
     'floor-fill': { ...one, label: 'Floor' },
-    ...blockClips('path', { kind: 'ground' }),
+    ...blockClips('path', { kind: 'ground', narrow: true, lanes: true }),      // lanes: a path one tile wide bends, forks and crosses with its rim unbroken
     ...blockClips('wall', { kind: 'wall', narrow: true }),
     ...blockClips('pit', { kind: 'hole' }),
     ...decoClips('floor', ['on']),
