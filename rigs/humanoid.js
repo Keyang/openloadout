@@ -34,9 +34,11 @@ import { lerp, clamp, wave, pulse, keys, ik2, smooth, reach, fract, TAU, PI } fr
 import { ramp, farRamp, mix, INK } from '../engine/color.js';
 import { Surface } from '../engine/surface.js';
 
+/** The frame of every side-view character, [width, height] in pixels. */
 export const SIZE = [64, 64];
 export const GROUND = 58;        // feet rest on the row above this line
 export const CX = 28;            // body centre; left of middle so swings in front have room
+/** Where a game anchors the sprite, [x, y]: the ground under the middle of the body. */
 export const PIVOT = [CX, GROUND];
 
 /** Standard clip table. Pass a speed 0..1 to scale playback rate. */
@@ -79,6 +81,7 @@ export function clipsFor(names, speedOf = () => 0.5) {
 /** Every name pose() knows. */
 export const POSES = ['idle', 'walk', 'run', 'jump', 'attack', 'punch', 'thrust', 'shoot', 'cast', 'block', 'hurt', 'die', 'victory', 'talk'];
 
+/** Returns the body measurements in pixels from the Height, Build and Head sliders: { leg, torso, arm, headR, hipR, chestR, armW, legW, foot }. Arguments: p ({ height, build, head }, each 0..1; missing = 0.5). */
 export function dims(p = {}) {
   const h = p.height ?? 0.5, b = p.build ?? 0.5, hd = p.head ?? 0.5;
   return {
@@ -731,6 +734,7 @@ function stampTurned(g, layer, from, to, turn, floorY) {
 /** Tip position of an item of length len held in the front hand. */
 export const itemTip = (J, P, len) => reach(J.armF.hand[0], J.armF.hand[1], P.item, len);
 
+/** Draws a sword in the near hand: a blade along the item angle, a cross-guard and a grip. Arguments: g, J, P, len (hand to tip), metal (a ramp), hilt (a colour). heldItem() draws the same from an attach point. */
 export function sword(g, J, P, len, metal, hilt) {
   const [hx, hy] = J.armF.hand;
   const [gx, gy] = reach(hx, hy, P.item, 1.5);
@@ -743,6 +747,7 @@ export function sword(g, J, P, len, metal, hilt) {
   g.dot(px, py, hilt);
 }
 
+/** Draws an axe in the near hand: a shaft with a blade at its end. Arguments: g, J, P, len (hand to tip), metal (a ramp), wood (a colour). heldItem() draws the same from an attach point. */
 export function axe(g, J, P, len, metal, wood) {
   const [hx, hy] = J.armF.hand;
   const [bx, by] = reach(hx, hy, P.item + PI, 2);
@@ -753,6 +758,7 @@ export function axe(g, J, P, len, metal, wood) {
   g.ellipse(ox, oy, 3, 3, metal, { clip: (px, py) => (px - mx) * Math.sin(P.item - PI / 2) + (py - my) * Math.cos(P.item - PI / 2) > -0.6 });
 }
 
+/** Draws a spear in the near hand: a shaft that reaches behind the hand, with a point. Arguments: g, J, P, len (hand to tip), metal (a ramp), wood (a colour). heldItem() draws the same from an attach point. */
 export function spear(g, J, P, len, metal, wood) {
   const [hx, hy] = J.armF.hand;
   const [bx, by] = reach(hx, hy, P.item + PI, 4);
@@ -762,6 +768,7 @@ export function spear(g, J, P, len, metal, wood) {
   g.capsule(sx, sy, tx, ty, 1.5, 0.5, metal);
 }
 
+/** Draws a staff in the near hand: a shaft topped by an orb that grows with glow. Arguments: g, J, P, len (the whole staff: 0.55 of it is below the hand and the orb is 0.45 of it above), wood (a ramp), orb (a ramp), glow (0..1). heldItem() draws the same from an attach point. */
 export function staff(g, J, P, len, wood, orb, glow = 0) {
   const [hx, hy] = J.armF.hand;
   const [bx, by] = reach(hx, hy, P.item + PI, len * 0.55);

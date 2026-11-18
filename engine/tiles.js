@@ -172,6 +172,7 @@ export function slopeClips(prefix, opts = {}) {
  *   'on'     over a fill tile of the block (a crack, a pebble, a floor grate). The default.
  *   'above'  in the empty cell above a top tile, standing on the top line (a tuft, a stalagmite)
  *   'below'  in the empty cell under a bottom tile, hanging from it (a stalactite, a root)
+ *   'face'   over a tile of a top-down wall that shows its front face (a window, a sign, a wall light): FACE_PIECES
  * An entry may also be { place, label }. The place is kept on the clip as `place`.
  */
 export function decoClips(prefix, places = ['on', 'on'], opts = {}) {
@@ -285,6 +286,7 @@ export function blockKind(prefix, hint) {
  *   floors  [{ prefix, fill, fills, decals }]   a prefix with nothing but fills: the ground everything else sits on
  *   thins   [{ prefix, pieces: { l, m, r } }]     slopes [{ prefix, up, down }]     stacks [{ prefix, pieces: { cap, mid, foot } }]
  *   decals  [{ clip, prefix, place }]            extras [clip]  names the helper does not know
+ *           (a decal declared 'face' lies over a cell of its block like an 'on' decal, so its place is 'on', with only: 'face')
  * Several tilesets at once (what a bag holds): pass [{ key, clips, names }] (key: your name for the tileset; clips: its
  * clip table; names: optional, its clip names in order). Every block, floor, thin, slope, stack and decal then has
  * `set` (the key of the tileset it came from) and the result has `from` ({ clip: key }). The first tileset to use a
@@ -306,7 +308,7 @@ export function classifyTiles(clips) {
     if (many && group && group.has(k.prefix) && group.get(k.prefix).set !== c.set) continue;   // ... and a prefix stays with one tileset
     if (many) from[c.name] = c.set;
     if (!k) extras.push(c.name);
-    else if (k.kind === 'deco') decals.push(tag({ clip: c.name, prefix: k.prefix, place: c.place === 'above' || c.place === 'below' ? c.place : 'on' }, c.set));
+    else if (k.kind === 'deco') decals.push(tag({ clip: c.name, prefix: k.prefix, place: c.place === 'above' || c.place === 'below' ? c.place : 'on', ...(c.place === 'face' ? { only: 'face' } : {}) }, c.set));
     else if (k.kind === 'thin') of(thins, k.prefix, () => tag({ prefix: k.prefix, pieces: {} }, c.set)).pieces[k.piece] = c.name;
     else if (k.kind === 'slope') of(slopes, k.prefix, () => tag({ prefix: k.prefix }, c.set))[k.piece] = c.name;
     else if (k.kind === 'stack') of(stacks, k.prefix, () => tag({ prefix: k.prefix, pieces: {} }, c.set)).pieces[k.piece] = c.name;
@@ -421,16 +423,17 @@ export function pickClip(block, solid, x, y) {
 }
 
 /** How often a cell that may hold a decal gets one, by where it goes: on a block's fill, on bare floor (top-down), above a top, under a bottom. */
-export const DECAL_CHANCE = { on: 0.25, floor: 0.12, above: 0.3, below: 0.5 };
+export const DECAL_CHANCE = { on: 0.25, floor: 0.12, above: 0.3, below: 0.5, face: 0.2 };
 
 /**
  * Which decal, if any, goes in a cell: a clip name or null, the same every time for the same cell. decals: the
  * decals that may go there, [{ clip, place }] (a block's or a floor's `decals`). place: 'on' (the cell is a fill
  * piece of the block, or bare floor), 'above' (an empty cell over the block's `top` piece) or 'below' (an empty
- * cell under its `bottom` piece). x, y: the cell. chance: 0..1, default DECAL_CHANCE[place].
+ * cell under its `bottom` piece) or 'face' (the cell is a piece of a top-down wall that shows its front face,
+ * FACE_PIECES: only the decals declared 'face', which 'on' never picks). x, y: the cell. chance: 0..1, default DECAL_CHANCE[place].
  */
 export function pickDecal(decals, place, x, y, chance = DECAL_CHANCE[place]) {
-  const list = (decals ?? []).filter((d) => d.place === place);
+  const list = (decals ?? []).filter((d) => (d.only ?? d.place) === place);
   if (!list.length || !(hash(x * 7 + 3, y * 13 + 5) < chance)) return null;
   return list[Math.floor(hash(x * 11 + 1, y * 17 + 9) * list.length)].clip;
 }
@@ -462,7 +465,9 @@ export function pickStack(stack, x, y) {
  *   'part:p:clip'    a cell of block p for its neighbours (they are not outlined against it), drawn with `clip`
  *   'open:p:clip'    the same, but not solid: an archway, a doorway
  * or a list of those for a cell that holds several things, drawn in layer order. opts.decals: true to scatter the tileset's decals by pickDecal's rule
- * over the cells the map leaves free (or { on, floor, above, below } chances in place of DECAL_CHANCE).
+ * over the cells the map leaves free (or { on, floor, above, below, face } chances in place of DECAL_CHANCE). A decal
+ * declared 'face' goes only on a top-down wall's FACE_PIECES: scattered there, and left out (with a note) when a map
+ * writes its letter in a cell of the wall that shows no face.
  *   side      '#' the first block, 'I' the second (else the first), '/' '\' its slopes, '~' the first liquid, '=' the first thin platform,
  *             '-' the second, '|' ':' '!' the first three things that stack, 'H' 'Y' 'T' the same three standing
  *             behind the first platform (their top piece shares its cell), 'F' the first lone fill (a back wall)
@@ -616,7 +621,10 @@ export function layoutTiles(rows, clips, opts = {}) {
         if (st) put(st.pieces[k] ?? st.pieces.mid ?? (k === 'foot' ? null : st.pieces.cap), c, r, LAYER.stack);
         else put(null, c, r, LAYER.stack, `nothing that stacks called "${prefix}"`);
       }
-      if (kind === 'decal') put(thing.decal.clip, c, r, LAYER.decal);
+      if (kind === 'decal') {
+        const on = pieces.get(`${c},${r}`), faceless = thing.decal.only === 'face' && view === 'top-down' && on && !FACE_PIECES.includes(on.piece);
+        put(faceless ? null : thing.decal.clip, c, r, LAYER.decal, `${thing.decal.clip} at ${c},${r}: it goes on a wall's front face, and this cell of the wall (${on?.piece}) shows none`);
+      }
       if (kind === 'clip') put(thing.clip, c, r, LAYER.decal);
     }
   }
@@ -626,7 +634,11 @@ export function layoutTiles(rows, clips, opts = {}) {
     for (let r = 0; r < R; r++) for (let c = 0; c < C; c++) {
       const things = cells[r][c].things, here = pieces.get(`${c},${r}`);
       if (things.some((t) => t.kind === 'decal' || t.kind === 'clip')) continue;
-      if (here) { if (here.piece === 'fill') put(pickDecal(here.block.decals, 'on', c, r, chance.on), c, r, LAYER.decal); continue; }
+      if (here) {
+        if (here.piece === 'fill') put(pickDecal(here.block.decals, 'on', c, r, chance.on), c, r, LAYER.decal);
+        else if (view === 'top-down' && here.block.kind === 'wall' && FACE_PIECES.includes(here.piece)) put(pickDecal(here.block.decals, 'face', c, r, chance.face), c, r, LAYER.decal);
+        continue;
+      }
       if (things.length) continue;
       if (floor) { put(pickDecal(floor.decals, 'on', c, r, chance.floor), c, r, LAYER.decal); continue; }
       const under = pieces.get(`${c},${r + 1}`), over = pieces.get(`${c},${r - 1}`);
@@ -1472,3 +1484,18 @@ export function coursedFace({ rows = 29, course = 7, joints = [], body, top = bo
     return row === 0 && c < lit ? top : body;
   };
 }
+
+// ---- added with batch S11, fix round 1 (station walls): the decal place 'face' ----
+// A fixture on a wall's front face (a window, a pipe junction, a sign, a lamp) is a decal declared with place 'face':
+//
+//   const decals = decoClips('wall', [{ place: 'face', label: 'Window' }, { place: 'face', label: 'Wall light' }]);
+//
+// It lies over a cell of its block, as an 'on' decal does, so classifyTiles keeps its place as 'on' (what the checker
+// and the map tool read) and marks it only: 'face'. pickDecal(decals, 'on', ...) never picks it, and layoutTiles
+// scatters it (pickDecal(decals, 'face', ...), DECAL_CHANCE.face) over the cells of a top-down wall whose piece is one
+// of FACE_PIECES, never over the cap. Keep such a decal to the rows that are face on every piece (8 to 28 of the
+// tile, under the 8 px sliver of cap of the low pieces) and to columns 2 to 29, clear of the outline at a wall's ends.
+// Worked example: sprites/tiles-station-walls.js.
+
+/** The pieces of a top-down wall block that show its front face, where a decal declared with place 'face' may go: a full face ('bottom', 'bottom-l', 'bottom-r', 'col-b') or a face under a sliver of cap ('strip-l', 'strip-m', 'strip-r', 'single'). No arguments: a frozen list. */
+export const FACE_PIECES = Object.freeze(['bottom', 'bottom-l', 'bottom-r', 'col-b', 'strip-l', 'strip-m', 'strip-r', 'single']);

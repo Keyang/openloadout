@@ -4,7 +4,7 @@
 // is the worked example for the wall, sprites/blast-door.js, wall-terminal.js and laser-gate.js for the machines.
 //
 //   import { patternFill, drawBlock, textureTone, textureLight } from '../engine/tiles.js';
-//   import { shadeTo, drawBulkhead, doorLeaves, screenIn, laserBeam } from '../engine/bulkhead.js';
+//   import { shadeTo, drawBulkhead, doorLeaves, screenIn, laserBeam, machineTones, drawCasing, hazardBand } from '../engine/bulkhead.js';
 //
 //   // the front face of a top-down wall block: bands stacked from the foot up, so a low wall is a tall one cut short
 //   const face = patternFill(p.hull, (s) => drawBulkhead(s, { rows: 29, style: 'panels', tones, light: { on: p.glow } }));
@@ -17,12 +17,19 @@
 //   g.fill(x, y, x + w, y + h, screenIn('graph', x, y, w, h, t), p.glow);
 //   // a beam of light between two emitters, after g.outline
 //   laserBeam(g, { x0: 12, x1: 51, y: 20, thick: 3, colours: steps(p.glow), cut: 0.2, phase: t });
+//   // a machine built of boxes: its tones from one colour, each box with a lit top face, warning paint on a foot
+//   const T = machineTones(p.body);
+//   drawCasing(g, T, 8, 31, 16, 12, 0); drawCasing(g, T, 4, 10, 24, 20);
+//   hazardBand(g, 6, 42, 8, 3, { dark: T.dark, paint: p.accent });
 //
 // Everything here is pure and repeatable (no Math.random, no state between calls) and draws with hard pixel edges
 // through Surface.rect and Surface.dot only: it suits the pixel style.
 
 import { hash, clamp, fract } from './motion.js';
 import { tone, brightness } from './color.js';
+import { rectIn } from './surface.js';
+import { stripesIn } from './solids.js';
+import { textureTone, textureLight } from './tiles.js';
 
 const T = 32;
 
@@ -153,12 +160,16 @@ export function doorLeaves(style, x, y, w, h, open = 0, { stub = 2, slant = 0.5,
 
 // ---- what a screen shows ---------------------------------------------------------------------------
 
+// The four lines of text a screen scrolls: [how much of the width the line takes, where along it the gap between its
+// two words falls (0 to 1)]. A fixed list, so the lines differ in length on a screen of any width (8 px: 6, 4, 5, 3).
+const TEXT_LINES = [[1, 0.6], [0.62, 0.4], [0.85, 0.5], [0.45, 0.5]];
+
 /** The pictures screenIn knows: text (lines of writing that scroll), graph (bars that rise and fall), map (rooms joined by corridors, one marked), skull (a warning), tick (accepted). No arguments: a frozen list. */
 export const SCREEN_PICTURES = Object.freeze(['text', 'graph', 'map', 'skull', 'tick']);
 
 /**
  * Shape test for what a small computer screen shows, drawn in whole pixels inside the screen's box: lines of text, a bar graph, a floor map, a skull or a tick; returns inside(px, py).
- * Arguments: kind (one of SCREEN_PICTURES); x, y, w, h (the lit part of the screen, in whole pixels; 8 by 6 or more); phase (0 to 1, once round a loop: the text scrolls up eight rows, which is four lines, and is then where it began; the bars of the graph rise and fall; the marker of the map blinks; the skull and the tick do not move).
+ * Arguments: kind (one of SCREEN_PICTURES); x, y, w, h (the lit part of the screen, in whole pixels; 8 by 6 or more); phase (0 to 1, once round a loop: the text scrolls up eight rows, which is four lines of four different lengths, and is then where it began; the bars of the graph rise and fall; the marker of the map blinks; the skull and the tick do not move).
  */
 export function screenIn(kind, x, y, w, h, phase = 0) {
   if (!SCREEN_PICTURES.includes(kind)) throw new Error(`screenIn: "${kind}" is not a screen picture (${SCREEN_PICTURES.join(', ')})`);
@@ -166,14 +177,14 @@ export function screenIn(kind, x, y, w, h, phase = 0) {
   const t = fract(phase);
   let at;
   if (kind === 'text') {
-    // lines two rows apart, each of its own length and with one gap between two words; four different lines come
-    // round, and they climb all four (eight rows) in one loop, so the loop closes
-    const LINES = 4, step = Math.floor(t * 2 * LINES + 1e-6);
+    // lines two rows apart, each of its own length; a line of five px or more is two words with a gap between them.
+    // Four different lines come round, and they climb all four (eight rows) in one loop, so the loop closes
+    const LINES = TEXT_LINES.length, step = Math.floor(t * 2 * LINES + 1e-6), most = Math.max(4, w - 2);
     at = (i, j) => {
-      const v = j + step, line = Math.floor(v / 2) % LINES;
+      const v = j + step, [share, split] = TEXT_LINES[Math.floor(v / 2) % LINES];
       if (v % 2 || i < 1) return false;
-      const len = Math.max(3, Math.round((w - 2) * (0.45 + 0.55 * hash(line, 5))));
-      const gap = 2 + Math.floor(hash(line, 9) * Math.max(1, len - 3));
+      const len = Math.max(2, Math.round(most * share));
+      const gap = len >= 5 ? 2 + Math.round((len - 4) * split) : 0;
       return i <= len && i !== gap;
     };
   } else if (kind === 'graph') {
@@ -244,4 +255,39 @@ export function laserBeam(g, o) {
     }
   }
   return count;
+}
+
+// ---- added with batch S11, fix round 1: the casing of a machine, and warning paint -------------------------
+
+/**
+ * The six tones a metal machine is drawn in, all from its one colour: the body, its brightest edge, a softer light for top faces and lit sides, the grooves, and a darker metal for recesses (a bezel, a nozzle, the band under warning paint) with that metal's own lit edge.
+ * Arguments: colour ('#rrggbb': the body); options { drop (how much darker than the body the recess metal is, in brightness, default 0.2), floor (the darkest the recess metal may get, so it stays clear of the outline; default 0.17) }.
+ * Returns { base, lit, soft, seam, dark, darkLit }. base, lit, soft and seam are what drawCasing takes; they are also the tones drawBulkhead and drawGrate ask for.
+ */
+export function machineTones(colour, { drop = 0.2, floor = 0.17 } = {}) {
+  const dark = shadeTo(colour, Math.max(floor, brightness(colour) - drop));
+  return { base: colour, lit: textureLight(colour), soft: textureLight(colour, colour, 0.4), seam: textureTone(colour), dark, darkLit: textureLight(dark, dark, 0.4) };
+}
+
+/**
+ * Draws a box of a machine seen from the south, in whole pixels: a lit top face over a front that is lit down its right edge and dark down its left. Stack several for a cabinet, a pillar, a post; draw the ones behind first.
+ * Arguments: g (the Surface); tones ({ base, lit, soft, seam }, as machineTones gives them: the front, the far edge of the top face, the top face and the lit side, the dark side); x, y, w, h (the box: its top-left corner and its size, the top face included); top (rows of top face, default 2; 0: a front alone, for a box that stands under another).
+ */
+export function drawCasing(g, tones, x, y, w, h, top = 2) {
+  g.rect(x, y, w, top, tones.soft); g.rect(x, y, w, 1, tones.lit);
+  g.rect(x, y + top, w, h - top, tones.base);
+  g.rect(x + w - 1, y + top, 1, h - top, tones.soft);
+  g.rect(x, y + top, 1, h - top, tones.seam);
+  return g;
+}
+
+/**
+ * Paints a band of warning stripes in whole pixels: a dark band with slanted stripes of the warning colour across it (the foot of a post, the bottom of a door, a door post).
+ * Arguments: g (the Surface); x, y, w, h (the band: its top-left corner and its size); options { dark (the colour between the stripes), paint (the stripes' colour), pitch (px from one stripe to the next, default 4), slant (px a stripe moves sideways per row down, default 1; negative leans the other way), duty (the share of the pitch that is stripe, default 0.5), phase (px to slide the stripes sideways, default 0) }.
+ */
+export function hazardBand(g, x, y, w, h, { dark, paint, pitch = 4, slant = 1, duty = 0.5, phase = 0 } = {}) {
+  const band = rectIn(x, y, w, h);
+  g.fill(x, y, x + w, y + h, band, dark);
+  g.fill(x, y, x + w, y + h, stripesIn(band, { pitch, slant, duty, phase }), paint);
+  return g;
 }

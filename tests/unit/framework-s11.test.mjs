@@ -5,12 +5,18 @@
 //   DOOR_STYLES, doorLeaves         the leaves of a sliding door (split, iris, shutter) at one moment of its opening
 //   SCREEN_PICTURES, screenIn       what a small screen shows: text, a graph, a map, a skull, a tick
 //   laserBeam                       a level beam of light that can thin, break and go out
+//   machineTones, drawCasing        the tones of a metal machine from one colour, and a box of it seen from the south
+//   hazardBand                      a dark band with slanted warning stripes
+// and one in engine/tiles.js:
+//   FACE_PIECES, the decal place 'face'   a fixture on a top-down wall's front face: scattered over face cells only
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { Surface } from '../../engine/surface.js';
 import { col, brightness } from '../../engine/color.js';
-import { TILE, patternFill, drawBlock } from '../../engine/tiles.js';
-import { shadeTo, BULKHEAD_STYLES, drawBulkhead, DOOR_STYLES, doorLeaves, SCREEN_PICTURES, screenIn, laserBeam } from '../../engine/bulkhead.js';
+import { TILE, patternFill, drawBlock, blockClips, decoClips, classifyTiles, pickDecal, layoutTiles, pieceOf, DECAL_CHANCE, FACE_PIECES, textureTone, textureLight } from '../../engine/tiles.js';
+import { stripesIn } from '../../engine/solids.js';
+import { rectIn } from '../../engine/surface.js';
+import { shadeTo, BULKHEAD_STYLES, drawBulkhead, DOOR_STYLES, doorLeaves, SCREEN_PICTURES, screenIn, laserBeam, machineTones, drawCasing, hazardBand } from '../../engine/bulkhead.js';
 
 const TONES = { base: '#6b7896', lit: '#9db2c5', soft: '#7f8fa9', seam: '#424672', skirt: '#575f84', dark: '#2f3059' };
 const GLOW = '#2fb3a8', OFF = '#101020';
@@ -135,6 +141,183 @@ test('screenIn: text, graph and map move and their loops close; the skull and th
   // the text climbs one row per eighth of the loop
   const rowsOf = (list) => [...new Set(list.map((k) => Number(k.split(',')[1])))];
   assert.notDeepEqual(rowsOf(lit('text', 0)), rowsOf(lit('text', 0.125)));
+});
+
+// the lit px of each row of a screen of text, top row first (0 for a row between two lines)
+const textRows = (phase, w, h = 9) => { const f = screenIn('text', 0, 0, w, h, phase); return Array.from({ length: h }, (_, y) => Array.from({ length: w }, (_, x) => (f(x + 0.5, y + 0.5) ? '#' : '.')).join('')); };
+
+test('screenIn: the four lines of text differ in length on a screen of any width, the narrowest included', () => {
+  for (const w of [8, 10, 14, 16, 24]) {
+    const rows = textRows(0, w).filter((r) => r.includes('#'));
+    const lengths = rows.slice(0, 4).map((r) => r.lastIndexOf('#') - r.indexOf('#') + 1);
+    assert.equal(rows.length >= 4, true, `${w} px: four lines or more in nine rows`);
+    assert.ok(new Set(lengths).size >= 3, `${w} px wide: lengths ${lengths.join(', ')}`);
+    assert.ok(Math.max(...lengths) <= w - 2 && Math.min(...lengths) >= 2, `${w} px: ${lengths.join(', ')} keep a column free on each side`);
+    assert.ok(new Set(rows.slice(0, 4)).size === 4, `${w} px: no two of the four lines are the same`);
+  }
+  assert.deepEqual(textRows(0, 8).slice(0, 8), ['.##.###.', '........', '.####...', '........', '.##.##..', '........', '.###....', '........']);
+  // a line of five px or more is two words; a shorter one is one word, never two dots
+  for (const w of [8, 14, 16]) for (const r of textRows(0, w).filter((x) => x.includes('#'))) {
+    const words = r.split('.').filter(Boolean);
+    assert.ok(words.length <= 2 && words.every((x) => x.length >= 2), `${w} px: "${r}"`);
+  }
+});
+
+test('screenIn: text scrolls: from one eighth of the loop to the next the lines move up a row, and the top line gives way to the next', () => {
+  for (const w of [8, 14, 16]) {
+    for (let k = 0; k < 8; k++) {
+      const a = textRows(k / 8, w), b = textRows((k + 1) / 8, w);
+      assert.notDeepEqual(a, b, `${w} px, step ${k}`);
+      assert.deepEqual(b.slice(0, 8), a.slice(1, 9), `${w} px, step ${k}: every row has moved up one`);
+    }
+    // so two frames apart the picture is not the same picture: other line lengths stand on the same rows
+    assert.notDeepEqual(textRows(0, w), textRows(0.25, w));
+    assert.deepEqual(textRows(0, w), textRows(1, w), 'the loop closes');
+  }
+});
+
+// ---- the casing of a machine, and warning paint ----------------------------------------------------------
+
+test('machineTones: six tones from one colour; the recess metal is darker by the drop asked for, never under the floor', () => {
+  for (const c of ['#6b7896', '#434d6d', '#a87894', '#2f3059']) {
+    const T = machineTones(c);
+    assert.deepEqual(Object.keys(T), ['base', 'lit', 'soft', 'seam', 'dark', 'darkLit']);
+    assert.equal(T.base, c);
+    assert.equal(T.lit, textureLight(c)); assert.equal(T.soft, textureLight(c, c, 0.4)); assert.equal(T.seam, textureTone(c));
+    assert.ok(brightness(T.lit) >= brightness(T.soft) && brightness(T.soft) > brightness(c) && brightness(T.seam) < brightness(c), c);
+    assert.ok(Math.abs(brightness(T.dark) - Math.max(0.17, brightness(c) - 0.2)) < 0.02, `${c}: ${brightness(T.dark).toFixed(3)}`);
+    assert.ok(brightness(T.darkLit) > brightness(T.dark));
+    assert.deepEqual(machineTones(c), T, 'the same every time');
+  }
+  assert.ok(brightness(machineTones('#6b7896', { drop: 0.1 }).dark) > brightness(machineTones('#6b7896').dark));
+  assert.ok(Math.abs(brightness(machineTones('#2f3059', { floor: 0.1 }).dark) - 0.1) < 0.02);
+});
+
+test('drawCasing: a lit top face over a front that is lit down its right edge and dark down its left; nothing outside the box', () => {
+  const T = { base: '#6b7896', lit: '#c0d0e0', soft: '#8fa0b9', seam: '#424672' };
+  const g = new Surface(24, 24);
+  assert.equal(drawCasing(g, T, 4, 5, 10, 12, 3), g);
+  assert.deepEqual(g.bounds(), { x0: 4, y0: 5, x1: 13, y1: 16 });
+  for (let x = 4; x < 14; x++) { assert.equal(at(g, x, 5), col(T.lit), 'the far edge of the top face'); assert.equal(at(g, x, 6), col(T.soft)); assert.equal(at(g, x, 7), col(T.soft)); }
+  for (let y = 8; y < 17; y++) { assert.equal(at(g, 4, y), col(T.seam)); assert.equal(at(g, 13, y), col(T.soft)); for (let x = 5; x < 13; x++) assert.equal(at(g, x, y), col(T.base)); }
+  // top left out: two rows; top 0: a front alone
+  const two = drawCasing(new Surface(24, 24), T, 4, 5, 10, 12);
+  assert.equal(at(two, 6, 6), col(T.soft)); assert.equal(at(two, 6, 7), col(T.base));
+  const none = drawCasing(new Surface(24, 24), T, 4, 5, 10, 12, 0);
+  assert.equal(at(none, 6, 5), col(T.base)); assert.equal(at(none, 4, 5), col(T.seam)); assert.equal(at(none, 13, 5), col(T.soft));
+  assert.equal(count(none, T.lit), 0);
+});
+
+test('hazardBand: a dark band with slanted stripes of the paint, half and half, that fills its box and nothing else', () => {
+  const DARK = '#2f3059', PAINT = '#f0a030';
+  const g = new Surface(40, 16);
+  assert.equal(hazardBand(g, 3, 4, 32, 8, { dark: DARK, paint: PAINT, pitch: 8 }), g);
+  assert.deepEqual(g.bounds(), { x0: 3, y0: 4, x1: 34, y1: 11 });
+  assert.equal(count(g, PAINT) + count(g, DARK), 32 * 8);
+  assert.equal(count(g, PAINT), 16 * 8, 'half of it is stripe');
+  // the same picture as the shape test it is made of
+  const stripes = stripesIn(rectIn(3, 4, 32, 8), { pitch: 8, slant: 1, duty: 0.5 });
+  for (let y = 4; y < 12; y++) for (let x = 3; x < 35; x++) assert.equal(at(g, x, y), col(stripes(x + 0.5, y + 0.5) ? PAINT : DARK), `${x},${y}`);
+  // the stripes lean: a row down, they have moved a px; the other slant mirrors that; phase slides them
+  const row = (s, y) => Array.from({ length: 32 }, (_, i) => (at(s, 3 + i, y) === col(PAINT) ? '#' : '.')).join('');
+  assert.equal(row(g, 5).slice(0, 31), row(g, 4).slice(1));
+  const back = hazardBand(new Surface(40, 16), 3, 4, 32, 8, { dark: DARK, paint: PAINT, pitch: 8, slant: -1 });
+  assert.equal(row(back, 4).slice(0, 31), row(back, 5).slice(1));
+  assert.notEqual(row(hazardBand(new Surface(40, 16), 3, 4, 32, 8, { dark: DARK, paint: PAINT, pitch: 8, phase: 2 }), 4), row(g, 4));
+  assert.equal(count(hazardBand(new Surface(40, 16), 3, 4, 32, 8, { dark: DARK, paint: PAINT }), PAINT), 16 * 8, 'pitch 4 by default');
+});
+
+// ---- fixtures on a wall's face: the decal place 'face' (engine/tiles.js) -----------------------------------
+
+const WALLS = { 'floor-fill': {}, ...blockClips('wall', { kind: 'wall', narrow: true }), ...decoClips('wall', ['face', { place: 'face', label: 'Sign' }, 'on']), ...decoClips('floor', ['on']) };
+const ROOM = [
+  'WWWWWWWWWWWWWWWWWWWWWWWW',
+  'WWWWWWWWWWWWWWWWWWWWWWWW',
+  'WW....................WW',
+  'WW....WWWWWWWWWW......WW',
+  'WW....................WW',
+  'WW..WWWW......W.......WW',
+  'WW..WWWW......W...W...WW',
+  'WW..WWWW..............WW',
+  'WW....................WW',
+  'WWWWWWWWWWWWWWWWWWWWWWWW',
+  'WWWWWWWWWWWWWWWWWWWWWWWW',
+];
+
+test("the decal place 'face': decoClips keeps it, classifyTiles reads it as an 'on' decal for face cells only, pickDecal keeps the two apart", () => {
+  assert.equal(WALLS['wall-deco-a'].place, 'face'); assert.equal(WALLS['wall-deco-b'].label, 'Sign'); assert.equal(WALLS['wall-deco-c'].place, 'on');
+  const T = classifyTiles(WALLS), wall = T.blocks.find((b) => b.prefix === 'wall');
+  assert.deepEqual(wall.decals, [{ clip: 'wall-deco-a', prefix: 'wall', place: 'on', only: 'face' }, { clip: 'wall-deco-b', prefix: 'wall', place: 'on', only: 'face' }, { clip: 'wall-deco-c', prefix: 'wall', place: 'on' }]);
+  assert.deepEqual(T.floors[0].decals, [{ clip: 'floor-deco-a', prefix: 'floor', place: 'on' }], 'other decals are as they were');
+  const seen = { on: new Set(), face: new Set() };
+  let n = 0;
+  for (let y = 0; y < 40; y++) for (let x = 0; x < 40; x++) {
+    const f = pickDecal(wall.decals, 'face', x, y), o = pickDecal(wall.decals, 'on', x, y, 1);
+    if (f) { n++; seen.face.add(f); }
+    seen.on.add(o);
+  }
+  assert.deepEqual([...seen.face].sort(), ['wall-deco-a', 'wall-deco-b']);
+  assert.deepEqual([...seen.on], ['wall-deco-c'], "'on' never picks a face decal");
+  assert.equal(DECAL_CHANCE.face, 0.2);
+  assert.ok(Math.abs(n / 1600 - DECAL_CHANCE.face) < 0.06, `${n} of 1600`);
+  assert.equal(pickDecal([{ clip: 'x-deco-a', place: 'face' }], 'face', 3, 3, 1), 'x-deco-a', 'a list written by hand may say place: face');
+  assert.deepEqual([...FACE_PIECES].sort(), ['bottom', 'bottom-l', 'bottom-r', 'col-b', 'single', 'strip-l', 'strip-m', 'strip-r']);
+  assert.ok(Object.isFrozen(FACE_PIECES));
+});
+
+test("layoutTiles scatters 'face' decals over the cells of a top-down wall that show its face, and nowhere else", () => {
+  const L = layoutTiles(ROOM, WALLS, { view: 'top-down', decals: true });
+  const pieceAt = (c, r) => { const t = L.tiles.find((x) => x.col === c && x.row === r && pieceOf(x.clip)?.kind === 'block' && pieceOf(x.clip).prefix === 'wall'); return t ? pieceOf(t.clip).piece : null; };
+  const placed = L.tiles.filter((t) => /^wall-deco-/.test(t.clip));
+  const faces = placed.filter((t) => t.clip !== 'wall-deco-c'), caps = placed.filter((t) => t.clip === 'wall-deco-c');
+  assert.ok(faces.length >= 2 && faces.length <= 12, `${faces.length} fixtures on the faces: about one face cell in five`);
+  for (const t of faces) assert.ok(FACE_PIECES.includes(pieceAt(t.col, t.row)), `${t.clip} at ${t.col},${t.row} is on ${pieceAt(t.col, t.row)}`);
+  const more = layoutTiles(ROOM, WALLS, { view: 'top-down', decals: { face: 0.6 } }).tiles.filter((t) => /^wall-deco-[ab]$/.test(t.clip));
+  assert.ok(more.length > faces.length && more.some((t) => t.clip === 'wall-deco-a') && more.some((t) => t.clip === 'wall-deco-b'), 'a higher chance gives more, and both are used');
+  for (const t of more) assert.ok(FACE_PIECES.includes(pieceAt(t.col, t.row)), `${t.clip} at ${t.col},${t.row} is on ${pieceAt(t.col, t.row)}`);
+  assert.ok(caps.length > 0, "the wall's 'on' decal still goes on its cap");
+  for (const t of caps) assert.equal(pieceAt(t.col, t.row), 'fill', `${t.clip} at ${t.col},${t.row}`);
+  for (const t of L.tiles.filter((x) => x.clip === 'floor-deco-a')) assert.equal(pieceAt(t.col, t.row), null, 'floor decals stay on the floor');
+  // at most one decal to a cell, and the same map every time
+  assert.equal(new Set(placed.map((t) => `${t.col},${t.row}`)).size, placed.length);
+  assert.deepEqual(layoutTiles(ROOM, WALLS, { view: 'top-down', decals: true }).tiles, L.tiles);
+  // a chance of 1 fills every face cell and no other; a chance of 0 none
+  const all = layoutTiles(ROOM, WALLS, { view: 'top-down', decals: { face: 1, on: 0, floor: 0 } });
+  const onFace = all.tiles.filter((t) => /^wall-deco-/.test(t.clip)).map((t) => `${t.col},${t.row}`).sort();
+  const faceCells = [];
+  for (let r = 0; r < ROOM.length; r++) for (let c = 0; c < ROOM[0].length; c++) if (FACE_PIECES.includes(pieceAt(c, r))) faceCells.push(`${c},${r}`);
+  assert.deepEqual(onFace, faceCells.sort());
+  assert.ok(faceCells.length >= 20);
+  assert.equal(layoutTiles(ROOM, WALLS, { view: 'top-down', decals: { face: 0 } }).tiles.filter((t) => /^wall-deco-[ab]$/.test(t.clip)).length, 0);
+  // not scattered at all without decals: true, and never in side view (a block's underside is no face)
+  assert.equal(layoutTiles(ROOM, WALLS, { view: 'top-down' }).tiles.filter((t) => /-deco-/.test(t.clip)).length, 0);
+  const side = layoutTiles(['....', '####', '####', '....'], { ...blockClips('wall', { kind: 'wall' }), ...decoClips('wall', ['face']) }, { decals: { face: 1 } });
+  assert.equal(side.tiles.filter((t) => /-deco-/.test(t.clip)).length, 0);
+});
+
+test("layoutTiles: a 'face' decal written in a map is drawn on a face cell and left out, with a note, on a cell of the cap", () => {
+  const rows = ['........', '.WWWWW..', '.WWaWW..', '.WbWWW..', '........', '......a.', '........'];
+  const L = layoutTiles(rows, WALLS, { view: 'top-down' });
+  const at = (c, r) => L.tiles.filter((t) => t.col === c && t.row === r).map((t) => t.clip);
+  assert.deepEqual(at(2, 3), ['floor-fill', 'wall-bottom', 'wall-deco-b'], 'on the bottom row of the wall: its face');
+  assert.deepEqual(at(6, 5), ['floor-fill', 'wall-single', 'wall-deco-a'], 'on its own on the floor: a piece of wall with a face under it');
+  assert.deepEqual(at(3, 2), ['floor-fill', 'wall-fill'], 'in the middle of the cap: the cap, and no fixture');
+  assert.equal(L.cells[2][3].solid, true); assert.equal(L.cells[5][6].solid, true);
+  assert.deepEqual(L.notes, ["wall-deco-a at 3,2: it goes on a wall's front face, and this cell of the wall (fill) shows none"]);
+  // an 'on' decal of the same wall is drawn wherever it is written, as before
+  const on = layoutTiles(['.....', '.WWW.', '.WcW.', '.WWW.', '.....'], WALLS, { view: 'top-down' });
+  assert.ok(on.tiles.some((t) => t.clip === 'wall-deco-c' && t.col === 2 && t.row === 2)); assert.deepEqual(on.notes, []);
+});
+
+test("the station walls: every fixture is a 'face' decal, and a room built from letters puts them on face cells only", async () => {
+  const walls = (await import('../../sprites/tiles-station-walls.js')).default, floor = (await import('../../sprites/tiles-station-floor.js')).default;
+  for (const k of ['a', 'b', 'c', 'd']) assert.equal(walls.clips[`wall-deco-${k}`].place, 'face');
+  const T = classifyTiles([{ key: 'walls', clips: walls.clips }, { key: 'floor', clips: floor.clips }]);
+  const L = layoutTiles(ROOM, T, { view: 'top-down', decals: true });
+  const pieceAt = (c, r) => { const t = L.tiles.find((x) => x.col === c && x.row === r && /^wall-/.test(x.clip) && pieceOf(x.clip)?.kind === 'block'); return t ? pieceOf(t.clip).piece : null; };
+  const fixtures = L.tiles.filter((t) => /^wall-deco-/.test(t.clip));
+  assert.ok(fixtures.length >= 2, `${fixtures.length} fixtures`);
+  for (const t of fixtures) assert.ok(FACE_PIECES.includes(pieceAt(t.col, t.row)), `${t.clip} at ${t.col},${t.row} is on ${pieceAt(t.col, t.row)}`);
 });
 
 // ---- the beam -------------------------------------------------------------------------------------

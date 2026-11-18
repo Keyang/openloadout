@@ -248,3 +248,94 @@ export function scallops(notches, deep = 2, { width = 3, sharp = 1.6 } = {}) {
   }
   return out;
 }
+
+// ---- veins that stand proud, pulses and pores (added in S12's fix round) -------------------------------
+
+/**
+ * Works out the pixels of a vein without drawing it: the paths drawVein would draw, for laying out several veins before any is drawn (drawVeins).
+ * Arguments: x, y (where it starts); angle (the way it sets off: 0 = down, PI/2 = right, PI = up); length (px along the main line); options (drawVein's: seed, forks, wander, spread, branch, box; the box defaults to one 32 px tile).
+ * Returns [[[x, y], ...], ...]: the main line first, then each branch.
+ */
+export function veinPaths(x, y, angle, length, options = {}) {
+  return drawVein({ w: TILE, h: TILE, dot() {} }, x, y, angle, length, null, options);
+}
+
+/**
+ * Draws veins that stand proud of a surface lit from the top right (veins in a membrane, roots, cables, the lips of a crack): each line in its colour, an unbroken line of shade beside it on the side away from the light, a wet glint every few pixels, and tips that fade into the surface.
+ * Arguments: g (the Surface); veins (a list of veins, each the paths drawVein or veinPaths returns); colour (of the lines);
+ * options { shade (the colour of the shade line; left out: none), dx, dy (where the shade lies from its line, default -1, 1: down and to the left), run (the shortest run of shade that is kept, in px, default 2: a shorter one would be a stray speck),
+ * shine (the colour of the glints on each vein's main line; left out: none), shineEvery (px from one glint to the next, default 5), shineFrom (the first glint's place along the line, default 2),
+ * tip (the colour of the last pixels of every line, where it thins into the surface; left out: none), tipLength (how many pixels, default 2; never more than half a line),
+ * keep (a shape test: only pixels whose centre is inside are drawn), box ([x0, y0, x1, y1]: nothing is drawn outside; default the Surface) }.
+ * Shade never lands on a line, its own or another vein's, so veins may cross. Returns g.
+ */
+export function drawVeins(g, veins, colour, { shade = null, dx = -1, dy = 1, run = 2, shine = null, shineEvery = 5, shineFrom = 2, tip = null, tipLength = 2, keep = null, box = null } = {}) {
+  const B = box ?? [0, 0, g.w, g.h];
+  const ok = (x, y) => x >= B[0] && y >= B[1] && x < B[2] && y < B[3] && (!keep || keep(x + 0.5, y + 0.5));
+  const key = (x, y) => `${x},${y}`;
+  const line = new Set();
+  for (const paths of veins ?? []) for (const path of paths) for (const [x, y] of path) if (ok(x, y)) line.add(key(x, y));
+  if (shade) {
+    const cast = new Map();
+    for (const paths of veins) for (const path of paths) for (const [x, y] of path) {
+      const sx = x + dx, sy = y + dy;
+      if (ok(x, y) && ok(sx, sy) && !line.has(key(sx, sy))) cast.set(key(sx, sy), [sx, sy]);
+    }
+    // the shade in runs of pixels that touch; a run shorter than `run` is left out
+    const seen = new Set();
+    for (const [k, start] of cast) {
+      if (seen.has(k)) continue;
+      const group = [], todo = [start];
+      seen.add(k);
+      while (todo.length) {
+        const [x, y] = todo.pop();
+        group.push([x, y]);
+        for (let oy = -1; oy <= 1; oy++) for (let ox = -1; ox <= 1; ox++) { const n = key(x + ox, y + oy); if (cast.has(n) && !seen.has(n)) { seen.add(n); todo.push(cast.get(n)); } }
+      }
+      if (group.length >= Math.max(1, run)) for (const [x, y] of group) g.dot(x, y, shade);
+    }
+  }
+  const tipped = (path) => (tip ? Math.max(path.length - Math.max(0, Math.round(tipLength)), Math.ceil(path.length / 2)) : path.length);
+  for (const paths of veins ?? []) for (const path of paths) { const from = tipped(path); path.forEach(([x, y], k) => { if (ok(x, y)) g.dot(x, y, k >= from ? tip : colour); }); }
+  if (shine) for (const paths of veins ?? []) {
+    const main = paths[0] ?? [], from = tipped(main), every = Math.max(1, Math.round(shineEvery));
+    main.forEach(([x, y], k) => { if (k >= shineFrom && k < from && (k - shineFrom) % every === 0 && ok(x, y)) g.dot(x, y, shine); });
+  }
+  return g;
+}
+
+/**
+ * Lights a short run of pixels at one place along a vein's main line: move the place with the clip and a pulse travels down it (a heartbeat in a vessel, a signal along a cable, a spark along a fuse).
+ * Arguments: g (the Surface); paths (one vein, as drawVein or veinPaths returns it); at (how many px along the main line the head of the run is; a fraction is rounded); colours ([head, the pixel behind it, ...]: one colour per pixel of the run);
+ * options { from (no pixel nearer the root than this place is lit, default 0: for a root hidden under something), keep (a shape test: only pixels whose centre is inside are lit) }.
+ * Returns how many pixels it lit: 0 once the whole run has left the line.
+ */
+export function drawVeinPulse(g, paths, at, colours, { from = 0, keep = null } = {}) {
+  const main = paths?.[0] ?? [], head = Math.round(at);
+  let lit = 0;
+  (colours ?? []).forEach((colour, i) => {
+    const k = head - i;
+    if (k < Math.max(0, from) || k >= main.length || !colour) return;
+    const [x, y] = main[k];
+    if (keep && !keep(x + 0.5, y + 0.5)) return;
+    g.dot(x, y, colour);
+    lit++;
+  });
+  return lit;
+}
+
+/**
+ * Draws a pore or small pit in a soft surface lit from the top right: a cluster of dark pixels that touch (never fewer than three, so it does not read as a stray speck) with a lit lip against its lower left side.
+ * Arguments: g (the Surface); x, y (the top left pixel of the pit's square); dark (the colour of the pit); lit (the colour of the lip; left out: no lip); options { size (2 or 3: px across the pit, default 2) }.
+ * The lip lies one row below the pit and one column to its left, so the whole mark is size + 1 px each way. Returns g.
+ */
+export function drawPore(g, x, y, dark, lit = null, { size = 2 } = {}) {
+  if (size >= 3) {
+    g.rect(x + 1, y, 2, 1, dark); g.rect(x, y + 1, 3, 1, dark); g.rect(x, y + 2, 2, 1, dark);
+    if (lit) { g.dot(x - 1, y + 2, lit); g.rect(x, y + 3, 2, 1, lit); }
+    return g;
+  }
+  g.rect(x, y, 2, 1, dark); g.dot(x + 1, y + 1, dark);
+  if (lit) { g.dot(x, y + 1, lit); g.rect(x, y + 2, 2, 1, lit); }
+  return g;
+}
