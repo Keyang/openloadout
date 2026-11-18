@@ -1,89 +1,279 @@
-// Home and the catalogue: everything on one searchable shelf.
-import { sprites } from '../sprites/index.js';
-import { kits } from '../kits/index.js';
-import { el, header, cap } from './ui.js';
-import { sounds, music } from './audio.js';
-import { spriteCard, soundCard, musicCard, kitCard, runCards } from './cards.js';
+// The front door: the home page, the results view (search and filters over the whole catalogue),
+// and the list of bundles. Everything here is drawn from the catalogue; no asset file is loaded to list it.
+import { labelFor, BUNDLE_LEVELS } from '../catalog/schema.js';
+import { matchesFilters } from '../search/core.js';
+import { el, header, markNav } from './ui.js';
+import { currentCatalog } from './catalog.js';
+import { cardFor, bundleCard } from './cards.js';
+import {
+  FILTER_GROUPS, STYLE_KEYS, stateFromQuery, queryFromState, hashFromState, filtersFor, optionsFor, roleTree, activeFilters,
+  pickResults, resultLine, styleMemory, finder, smart, setSmartSearch, onSearchChange,
+} from './browse.js';
 
-/** type: 'all' | 'sprites' | 'sounds' | 'music'. Returns a teardown function. */
-export function catalogue(app, type, query) {
-  const isHome = type === 'all';
-  document.title = isHome ? 'Loadout' : `${cap(type)} · Loadout`;
+const EXAMPLES = ['coin', 'sword', 'jump', 'magic', 'footsteps', 'explosion', 'battle music'];
+const EAGER = 12;        // cards made straight away; the rest are made when they scroll near the screen
+const NEAR = '500px';    // how near
+const SHOWN = 6;         // choices a filter lists before "Show more"
+const NAV = { sprite: 'sprites', sound: 'sounds', music: 'music' };
+const SMART_NOTE = {
+  off: 'Understands descriptions like "something for when the player dies". Downloads about 38 MB once.',
+  loading: 'Getting smarter search ready…',
+  ready: 'On. Describe what you need in your own words.',
+  failed: 'Smarter search could not be loaded. Normal search still works.',
+};
 
-  const items = [
-    ...sprites.map((s) => ({ type: 'sprites', group: s.kind, text: `${s.name} ${s.kind} ${s.blurb ?? ''}`.toLowerCase(), make: () => spriteCard(s) })),
-    ...sounds.map((p) => ({ type: 'sounds', group: cap(p.category), text: `${p.name} ${p.category} ${(p.tags ?? []).join(' ')} ${p.description ?? ''}`.toLowerCase(), make: () => soundCard(p) })),
-    ...music.map((p) => ({ type: 'music', group: 'Music', text: `${p.name} music ${(p.tags ?? []).join(' ')} ${p.description ?? ''}`.toLowerCase(), make: () => musicCard(p) })),
-  ].filter((it) => type === 'all' || it.type === type);
-
-  const state = { type: 'all', group: 'All', q: query.q ?? '' };
-  const grid = el('ul', { class: 'gallery' });
-  const empty = el('p', { class: 'empty', hidden: true });
-  const groups = ['All', ...new Set(items.map((it) => it.group))];
-  const groupBar = el('div', { class: 'pills', role: 'group', 'aria-label': 'Kind' },
-    groups.map((gname) => el('button', { type: 'button', class: 'pill', 'aria-pressed': String(gname === 'All'), onclick: (e) => {
-      state.group = gname;
-      for (const b of groupBar.children) b.setAttribute('aria-pressed', String(b === e.currentTarget));
-      show();
-    } }, gname)));
-  const search = el('input', { type: 'search', class: 'search', placeholder: isHome ? 'Search sprites, sounds and music' : `Search ${type}`, 'aria-label': 'Search', value: state.q, oninput: (e) => { state.q = e.target.value; show(); } });
-
-  let stop = () => {};
-  function show() {
-    stop();
-    const q = state.q.trim().toLowerCase();
-    const hits = items.filter((it) => (state.group === 'All' || it.group === state.group) && (!q || q.split(/\s+/).every((w) => it.text.includes(w))));
-    const cards = hits.map((it) => it.make());
-    grid.replaceChildren(...cards.map((c) => el('li', {}, c.node)));
-    empty.hidden = hits.length > 0;
-    empty.textContent = hits.length ? '' : `Nothing matches "${state.q}". Try a shorter word, or clear the search to see everything.`;
-    stop = runCards(cards);
-  }
-
-  const kitCards = isHome ? kits.map(kitCard) : [];
-  const stopKits = runCards(kitCards);
-
-  const intro = isHome
-    ? [
-      el('h1', {}, 'Pixel sprites, sound effects and music you can make your own'),
-      el('p', { class: 'lede' }, 'Everything here is a small program, not a fixed file. Pick a sprite, a sound or a music track, move a few sliders, pair them up, and download the result ready for your game. No drawing, no recording, no code.'),
-      el('p', { class: 'cta' },
-        el('a', { class: 'btn big', href: '#/sprites' }, `Browse ${sprites.length} sprites`),
-        el('a', { class: 'btn big plain', href: '#/sounds' }, `Browse ${sounds.length} sounds`),
-        music.length ? el('a', { class: 'btn big plain', href: '#/music' }, music.length === 1 ? 'Hear the music' : `Browse ${music.length} tracks`) : null),
-      el('ol', { class: 'steps' },
-        el('li', {}, el('strong', {}, 'Pick'), ' a sprite, a sound, a music track, or a kit that has all three.'),
-        el('li', {}, el('strong', {}, 'Change'), ' its shape, colours, motion or tone with sliders. Every frame and every sound redraws to match.'),
-        el('li', {}, el('strong', {}, 'Download'), ' a sprite sheet with its sounds attached to the right animation frames.')),
-      el('h2', { class: 'shelf' }, 'Kits'),
-      el('p', { class: 'shelf-note' }, 'Sprites, sounds and music that belong together, in one download.'),
-      el('ul', { class: 'gallery kits' }, kitCards.map((c) => el('li', {}, c.node))),
-      el('h2', { class: 'shelf' }, 'Everything'),
-    ]
-    : [
-      el('h1', { class: 'small' }, cap(type)),
-      el('p', { class: 'lede' }, type === 'sprites'
-        ? 'Animated pixel characters, creatures, items and effects. Open one to change how it looks and moves, and to choose its sounds.'
-        : type === 'sounds'
-          ? 'Sound effects made by a small synthesiser, not recordings. Press a card to hear it, or open it to change its tone.'
-          : 'Looping game music played by the same synthesiser. Open a track to change its tempo, key and intensity while it plays.'),
-    ];
-
-  app.replaceChildren(
-    header(isHome ? 'home' : type),
-    el('main', { class: 'home' }, intro, el('div', { class: 'filters' }, groups.length > 2 ? groupBar : el('span'), search), grid, empty));
-  show();
-  return () => { stop(); stopKits(); };
+/** A list whose cards are only made when their place scrolls near the screen. */
+function lazyGallery(list, rowOf) {
+  const cells = new Map();          // id -> <li>, kept so a card is made once
+  let shown = [];
+  const fill = (li) => {
+    watch.unobserve(li);
+    if (li.firstChild) return;
+    li.card = cardFor(rowOf(li.dataset.id));
+    li.append(li.card.node);
+  };
+  const watch = new IntersectionObserver((entries) => { for (const e of entries) if (e.isIntersecting) fill(e.target); }, { rootMargin: `${NEAR} 0px` });
+  return {
+    set(ids) {
+      if (ids.length === shown.length && ids.every((id, i) => id === shown[i])) return;
+      const next = new Set(ids);
+      for (const id of shown) if (!next.has(id)) cells.get(id)?.card?.stop();        // a card that leaves goes quiet
+      shown = ids;
+      const lis = ids.map((id) => {
+        let li = cells.get(id);
+        if (!li) { li = el('li', { 'data-id': id, 'data-kind': rowOf(id).kind }); cells.set(id, li); }
+        return li;
+      });
+      list.replaceChildren(...lis);
+      watch.disconnect();
+      lis.slice(0, EAGER).forEach(fill);
+      for (const li of lis) if (!li.firstChild) watch.observe(li);
+    },
+    stop() { watch.disconnect(); for (const li of cells.values()) li.card?.stop(); },
+  };
 }
 
-export function kitsPage(app) {
-  document.title = 'Kits · Loadout';
-  const cards = kits.map(kitCard);
-  app.replaceChildren(
-    header('kits'),
-    el('main', { class: 'home' },
-      el('h1', { class: 'small' }, 'Kits'),
-      el('p', { class: 'lede' }, 'Sprites, sounds and music that belong together. Download a whole kit at once, or open any piece to change it first.'),
-      el('ul', { class: 'gallery kits' }, cards.map((c) => el('li', {}, c.node)))));
-  return runCards(cards);
+/**
+ * The results view: one search box, filters built from what the catalogue holds, and the matching cards.
+ * Returns { box (the search box and its switch), node (filters and results), search(words), stop() }.
+ * The address bar follows the search and filters, so a link shows the same results.
+ */
+function resultsView(query, { home = false, onSearching = () => {} } = {}) {
+  const catalog = currentCatalog();
+  const byId = new Map(catalog.assets.map((a) => [a.id, a]));
+  const memory = styleMemory();
+  let state = memory.apply(stateFromQuery(query));
+  let seq = 0, alive = true, painted = false, lastCounts = null;
+  const more = new Set();           // filters showing every choice
+
+  // ---- the search box and the "Smarter search" switch
+  const input = el('input', { type: 'search', class: 'search find', placeholder: 'Search sprites, sounds and music', 'aria-label': 'Search', autocomplete: 'off', spellcheck: 'false', enterkeyhint: 'search' });
+  input.value = state.q;
+  input.addEventListener('input', () => { state = { ...state, q: input.value.slice(0, 120) }; changed(performance.now()); });
+  const smartInput = el('input', { type: 'checkbox', role: 'switch', id: 'smart-search', 'aria-label': 'Smarter search', 'aria-describedby': 'smart-note' });
+  const smartNote = el('span', { class: 'smart-note', id: 'smart-note', role: 'status' });
+  const smartBox = el('div', { class: 'smart' },
+    el('label', { class: 'switch' }, smartInput, el('span', { class: 'knob' })),
+    el('span', { class: 'smart-text' }, el('label', { class: 'smart-name', for: 'smart-search' }, 'Smarter search'), smartNote));
+  smartInput.addEventListener('change', () => { setSmartSearch(smartInput.checked); });
+  function syncSmart() {
+    smartInput.checked = smart.on;
+    smartBox.dataset.state = smart.state;
+    if (smartNote.textContent !== SMART_NOTE[smart.state]) smartNote.textContent = SMART_NOTE[smart.state];
+  }
+  const box = el('div', { class: 'find-box' }, input, smartBox);
+
+  // ---- filters and results
+  const line = el('p', { class: 'result-line', role: 'status' });
+  const chips = el('div', { class: 'chips', hidden: true });
+  const list = el('ul', { class: 'gallery results' });
+  const empty = el('div', { class: 'empty', hidden: true });
+  const panel = el('div', { class: 'filter-panel', id: 'filter-panel' });
+  const toggleCount = el('span', { class: 'n', hidden: true });
+  const toggle = el('button', { type: 'button', class: 'filters-toggle', 'aria-expanded': 'false', 'aria-controls': 'filter-panel', onclick: () => {
+    const open = !side.classList.contains('open');
+    side.classList.toggle('open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+  } }, 'Filters', toggleCount);
+  const side = el('aside', { class: 'finder-side', 'aria-label': 'Filters' }, toggle, panel);
+  const node = el('section', { class: 'finder' }, side, el('div', { class: 'finder-main' }, line, chips, list, empty));
+  const gallery = lazyGallery(list, (id) => byId.get(id));
+
+  // ---- changes
+  function writeAddress() {
+    const target = queryFromState(state) ? hashFromState(state) : home ? '#/' : '#/browse';
+    if (location.hash !== target && !(target === '#/' && location.hash === '')) history.replaceState(null, '', target);
+  }
+  function changed(typedAt) { writeAddress(); update(typedAt); }
+  function setFilter(key, value) {
+    state = { ...state, [key]: state[key] === value ? null : value };
+    if (STYLE_KEYS.includes(key)) memory.remember(state);
+    changed();
+  }
+  function clearFilters(keys) {
+    state = { ...state, ...Object.fromEntries(keys.map((k) => [k, null])) };
+    if (keys.some((k) => STYLE_KEYS.includes(k))) memory.remember(state);
+    changed();
+  }
+  function search(text) { input.value = text; state = { ...state, q: text }; changed(); }
+
+  // ---- drawing
+  async function update(typedAt) {
+    const mine = ++seq;
+    const q = state.q, typed = q.trim() !== '';
+    const direct = await finder.direct(q);                                           // at once
+    if (mine !== seq || !alive) return;
+    await draw(mine, direct, direct, typedAt);
+    if (mine !== seq || !alive || !typed || !finder.deeper()) return;
+    const ranked = await finder.ranked(q);                                           // smarter search: more, in a better order, follows
+    if (mine !== seq || !alive) return;
+    await draw(mine, ranked, direct);
+  }
+
+  async function draw(mine, ranked, direct, typedAt) {
+    const filters = filtersFor(state), typed = state.q.trim() !== '';
+    const found = pickResults({ ranked, direct });
+    const counts = await finder.counts(filters, typed ? found : null);
+    if (mine !== seq || !alive) return;
+    const main = found.filter((id) => byId.has(id) && matchesFilters(byId.get(id), filters));
+
+    line.textContent = resultLine(main.length, state);
+    gallery.set(main);
+    drawEmpty(main.length === 0);
+    drawFilters(counts);
+    drawChips();
+    const searching = typed || FILTER_GROUPS.some((g) => !g.sticky && state[g.key]);
+    markNav(state.kind ? NAV[state.kind] : '');
+    onSearching(searching);
+    syncSmart();
+
+    // for the speed tests: when the first results were on screen, and how long the last key press took
+    const after = (fn) => requestAnimationFrame(() => setTimeout(fn, 0));
+    if (!painted) { painted = true; after(() => performance.mark('loadout-results')); }
+    if (typedAt != null) after(() => { performance.clearMeasures('loadout-typed'); performance.measure('loadout-typed', { start: typedAt, end: performance.now() }); });
+  }
+
+  function drawEmpty(show) {
+    empty.hidden = !show;
+    if (!show) return;
+    const q = state.q.trim(), on = activeFilters(state, catalog.bundles);
+    const tips = [];
+    if (q) tips.push('Try a shorter or more common word, like "coin" or "jump", and check the spelling.');
+    if (q && /\s/.test(q) && !smart.on) tips.push('Describing what you need? Switch on Smarter search above.');
+    if (on.length) tips.push(q ? 'A filter may also be hiding what you want.' : 'Try removing a filter.');
+    if (!q && !on.length) tips.push('The library has nothing in it yet.');
+    empty.replaceChildren(
+      el('p', {}, tips.join(' ')),
+      el('p', { class: 'empty-do' },
+        q ? el('button', { type: 'button', class: 'btn plain', onclick: () => { search(''); input.focus(); } }, 'Clear the search') : null,
+        on.length ? el('button', { type: 'button', class: 'btn plain', onclick: () => clearFilters(on.map((c) => c.key)) }, on.length === 1 ? `Remove "${on[0].label}"` : 'Remove all filters') : null));
+  }
+
+  const choice = (key, o, extra = '') => el('button', {
+    type: 'button', class: `fopt ${extra}`.trim(), 'aria-pressed': String(o.on), 'data-fkey': key, 'data-fval': o.value, onclick: () => setFilter(key, o.value),
+  }, el('span', { class: 'fl' }, o.label), el('span', { class: 'n' }, String(o.count)));
+
+  function groupNode(g, counts) {
+    let rows;
+    if (g.key === 'role') {
+      rows = roleTree(counts.role, state.role).flatMap((t) => [
+        choice('role', { value: t.id, label: t.label, count: t.count, on: t.on }, t.open ? 'branch open' : 'branch'),
+        ...(t.open ? t.children.map((c) => choice('role', { value: c.id, label: c.label, count: c.count, on: c.on }, 'leaf')) : []),
+      ]);
+    } else {
+      const all = optionsFor(g.key, counts, state, catalog.bundles);
+      const cut = more.has(g.key) || all.length <= SHOWN + 1 ? all : all.filter((o, i) => i < SHOWN || o.on);
+      rows = cut.map((o) => choice(g.key, o));
+      if (cut.length < all.length) rows.push(el('button', { type: 'button', class: 'ghost fmore', onclick: () => { more.add(g.key); drawFilters(lastCounts); } }, `Show ${all.length - cut.length} more`));
+    }
+    if (!rows.length) return null;
+    return el('div', { class: g.sticky ? 'fgroup sticky' : 'fgroup', role: 'group', 'aria-label': g.label },
+      el('h3', { class: 'fname' }, g.label, g.sticky ? el('span', { class: 'kept' }, 'remembered') : null),
+      el('ul', { class: 'fopts' }, rows.map((r) => el('li', {}, r))));
+  }
+
+  function drawFilters(counts) {
+    lastCounts = counts;
+    const at = document.activeElement, hold = at && panel.contains(at) && at.dataset.fkey ? at.dataset : null;
+    const groups = FILTER_GROUPS.map((g) => groupNode(g, counts)).filter(Boolean);
+    panel.replaceChildren(...(groups.length ? groups : [el('p', { class: 'hint' }, 'Nothing to narrow down.')]));
+    if (hold) [...panel.querySelectorAll('.fopt')].find((b) => b.dataset.fkey === hold.fkey && b.dataset.fval === hold.fval)?.focus();
+    const n = activeFilters(state).length;
+    toggleCount.textContent = String(n);
+    toggleCount.hidden = n === 0;
+  }
+
+  function drawChips() {
+    const on = activeFilters(state, catalog.bundles);
+    chips.hidden = on.length === 0;
+    const made = on.map((c) => el('span', { class: c.sticky ? 'chip sticky' : 'chip', title: c.sticky ? 'Remembered while you browse, so everything you find matches your game' : null },
+      c.sticky ? el('span', { class: 'chip-kept' }, 'Your game') : null,
+      el('span', { class: 'chip-label' }, c.label),
+      el('button', { type: 'button', 'aria-label': `Remove ${c.label}`, onclick: () => clearFilters([c.key]) }, '×')));
+    if (on.length > 1) made.push(el('button', { type: 'button', class: 'ghost', onclick: () => clearFilters(on.map((c) => c.key)) }, 'Remove all'));
+    chips.replaceChildren(...made);
+  }
+
+  const unwatch = onSearchChange(() => { if (!alive) return; syncSmart(); update(); });
+  syncSmart();
+  update();
+  return {
+    box, node, search,
+    stop() { alive = false; unwatch(); gallery.stop(); },
+  };
+}
+
+/** Home: the search box with a few example searches, game kits to start from, then everything. */
+export function homePage(app, query) {
+  document.title = 'Loadout';
+  const catalog = currentCatalog();
+  const kits = catalog.bundles.filter((b) => b.level === 'kit');
+  const kitShelf = kits.length ? el('section', { class: 'kit-shelf' },
+    el('h2', { class: 'shelf' }, 'Start from a kind of game'),
+    el('p', { class: 'shelf-note' }, 'Sprites, sounds and music that already belong together. Open one to restyle it as a whole, try it out and download it.'),
+    el('ul', { class: 'gallery kits' }, kits.map((b) => el('li', {}, bundleCard(b).node)))) : null;
+  const shelf = el('h2', { class: 'shelf' }, 'Everything');
+  const view = resultsView(query, { home: true, onSearching(on) {
+    if (kitShelf) kitShelf.hidden = on;
+    shelf.textContent = on ? 'Results' : 'Everything';
+  } });
+  const examples = el('div', { class: 'examples', role: 'group', 'aria-label': 'Example searches' },
+    el('span', { class: 'hint' }, 'Try'),
+    EXAMPLES.map((text) => {
+      const btn = el('button', { type: 'button', class: 'pill', onclick: () => view.search(text) }, text);
+      finder.direct(text).then((ids) => { if (!ids.length) btn.remove(); }).catch(() => {});      // only examples that find something
+      return btn;
+    }));
+  app.replaceChildren(header('home'), el('main', { class: 'home front' },
+    el('h1', {}, 'Pixel sprites, sound effects and music you can make your own'),
+    el('p', { class: 'lede' }, 'Find what your game needs, change it with a few sliders, and download it ready to use. No drawing, no recording, no code.'),
+    view.box, examples, kitShelf, shelf, view.node));
+  return view.stop;
+}
+
+/** #/browse: the results view by itself. */
+export function browsePage(app, query) {
+  document.title = 'Find · Loadout';
+  const view = resultsView(query);
+  app.replaceChildren(header(''), el('main', { class: 'home browse' },
+    el('h1', { class: 'small' }, 'Find sprites, sounds and music'),
+    view.box, view.node));
+  return view.stop;
+}
+
+/** #/bundles: every bundle, game kits first. */
+export function bundlesPage(app) {
+  document.title = 'Bundles · Loadout';
+  const { bundles } = currentCatalog();
+  const levels = [...BUNDLE_LEVELS].reverse();               // kit, character, object
+  const groups = [...levels.map((level) => [`${labelFor('level', level)}s`, bundles.filter((b) => b.level === level)]),
+    ['Other bundles', bundles.filter((b) => !levels.includes(b.level))]].filter(([, list]) => list.length);
+  app.replaceChildren(header('bundles'), el('main', { class: 'home' },
+    el('h1', { class: 'small' }, 'Bundles'),
+    el('p', { class: 'lede' }, 'Sprites, sounds and music that belong together. Open a bundle to restyle everything in it at once, try it out, and download it or add it to your bag.'),
+    groups.length ? groups.map(([title, list]) => [
+      groups.length > 1 ? el('h2', { class: 'shelf' }, title) : null,
+      el('ul', { class: 'gallery kits' }, list.map((b) => el('li', {}, bundleCard(b).node)))])
+      : el('p', { class: 'empty' }, 'There are no bundles yet.')));
+  return () => {};
 }

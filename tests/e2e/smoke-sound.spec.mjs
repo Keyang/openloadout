@@ -133,37 +133,44 @@ test.describe('music page', () => {
   });
 });
 
+// Kits became bundles: old kit addresses lead to the bundle pages (their own tests are in bundle.spec.mjs).
 test.describe('kit pages', () => {
   test('every kit lists its sprites and sounds', async ({ page }) => {
     await openRoute(page, '/kits');
+    await expect.poll(() => page.evaluate(() => location.hash)).toBe('#/bundles');
     const hrefs = await page.locator('a.card.kit').evaluateAll((as) => as.map((a) => a.getAttribute('href')));
     expect(hrefs.length).toBeGreaterThanOrEqual(3);
     for (const href of hrefs) {
       await openRoute(page, href.replace(/^#/, ''));
       await expect(page.locator('h1')).not.toBeEmpty();
-      expect(await page.locator('a.card[href^="#/sprite/"]').count(), href).toBeGreaterThanOrEqual(1);
-      expect(await page.locator('.card.sound a[href^="#/sound/"]').count(), href).toBeGreaterThanOrEqual(1);
-      await expect(page.getByRole('button', { name: 'Download the whole kit' })).toBeEnabled();
+      await expect(page.locator('main.bundle-page')).toBeVisible();
+      expect(await page.locator('.bundle-sprite a[href^="#/sprite/"]').count(), href).toBeGreaterThanOrEqual(1);
+      expect(await page.locator('.bundle-sound a[href^="#/sound/"]').count(), href).toBeGreaterThanOrEqual(1);
+      await expect(page.getByRole('button', { name: 'Download this bundle' })).toBeEnabled();
     }
   });
 
   test('Dungeon starter lists sprites, sounds and a music track', async ({ page }) => {
     await openRoute(page, '/kit/dungeon-starter');
-    expect(await page.locator('a.card[href^="#/sprite/"]').count()).toBeGreaterThanOrEqual(4);
-    expect(await page.locator('.card.sound a[href^="#/sound/"]').count()).toBeGreaterThanOrEqual(7);
-    expect(await page.locator('.card.sound a[href^="#/music/"]').count()).toBeGreaterThanOrEqual(1);
+    await expect.poll(() => page.evaluate(() => location.hash)).toBe('#/bundle/dungeon-starter');
+    await expect(page.locator('main.bundle-page')).toBeVisible();
+    expect(await page.locator('.bundle-sprite').count()).toBeGreaterThanOrEqual(4);
+    expect(await page.locator('.bundle-sound a[href^="#/sound/"]').count()).toBeGreaterThanOrEqual(7);
+    expect(await page.locator('.bundle-music a[href^="#/music/"]').count()).toBeGreaterThanOrEqual(1);
   });
 
   test('Download the whole kit gives a zip with a sheet per sprite and sound files', async ({ page }) => {
     test.setTimeout(150_000);
     await openRoute(page, '/kit/dungeon-starter');
-    const ids = await page.locator('a.card[href^="#/sprite/"]').evaluateAll((as) => as.map((a) => a.getAttribute('href').split('/').pop()));
-    const { name, bytes } = await downloadFrom(page, () => page.getByRole('button', { name: 'Download the whole kit' }).click(), { timeout: 120_000 });
+    await expect(page.locator('main.bundle-page')).toBeVisible();
+    const ids = await page.locator('.bundle-sprite a.bundle-name').evaluateAll((as) => as.map((a) => a.getAttribute('href').split('/').pop()));
+    expect(ids.length).toBeGreaterThanOrEqual(4);
+    const { name, bytes } = await downloadFrom(page, () => page.getByRole('button', { name: 'Download this bundle' }).click(), { timeout: 120_000 });
     expect(name).toMatch(/\.zip$/);
     const names = readZip(new Uint8Array(bytes)).map((f) => f.name);
-    for (const id of ids) expect(names, `sheet for ${id}`).toContain(`${id}/${id}.png`);
+    for (const id of ids) expect(names, `sheet for ${id}`).toContain(`sprites/${id}/${id}.png`);
     expect(names.filter((n) => n.endsWith('.wav')).length).toBeGreaterThanOrEqual(ids.length);
-    await expect(page.locator('.status')).toContainText('Downloaded');
+    await expect(page.locator('.status').first()).toContainText('Downloaded');
   });
 });
 

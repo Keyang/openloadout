@@ -10,11 +10,26 @@ export const music = [];       // music loops (same patch format, category "musi
 export const soundById = {};   // both, by id
 export const isMusic = (patch) => patch.category === 'music';
 
-export async function loadSounds() {
-  const index = await (await fetch('sounds/index.json')).json();
-  const list = await Promise.all(index.patches.map((e) => fetch('sounds/' + e.file).then((r) => r.json())));
-  for (const patch of list) { (isMusic(patch) ? music : sounds).push(patch); soundById[patch.id] = patch; }
-  sounds.sort((a, b) => a.category.localeCompare(b.category) || a.name.localeCompare(b.name));
+/**
+ * Load every sound and music patch, in one request (generated/sounds.json, written by the build).
+ * Safe to call from anywhere, any number of times: the file is fetched once.
+ */
+let loading = null;
+export function loadSounds() {
+  if (!loading) {
+    loading = fetch('generated/sounds.json').then((r) => {
+      if (!r.ok) throw new Error(`The sound library is missing (generated/sounds.json: ${r.status}). Run "npm run build" first.`);
+      return r.json();
+    }).then((file) => {
+      for (const patch of file.patches) {
+        if (soundById[patch.id]) continue;
+        (isMusic(patch) ? music : sounds).push(patch);
+        soundById[patch.id] = patch;
+      }
+      sounds.sort((a, b) => a.category.localeCompare(b.category) || a.name.localeCompare(b.name));
+    }).catch((e) => { loading = null; throw e; });      // a later call may try again
+  }
+  return loading;
 }
 
 // ---- parameters ------------------------------------------------------------

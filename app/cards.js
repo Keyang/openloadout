@@ -1,145 +1,176 @@
-// Catalogue cards for sprites, sounds and kits, and the loop that animates them.
-import { defaultParams, clipFps } from '../engine/sprite.js';
-import { byId as spriteById } from '../sprites/index.js';
-import { el, Frames, SPRITE_BG, SOUND_BG, cap, drawSpriteOnTile, reduceMotion } from './ui.js';
-import { soundParams, rendered, playRendered, playLive, whenRendered, drawWave } from './audio.js';
+// Cards for sprites, sounds, music and bundles, made from catalogue rows (generated/catalog.json).
+// A card costs nothing until it is looked at: it shows the build's thumbnail, and only loads more
+// (a strip picture to animate, one sound to play) when the visitor hovers or presses it.
+// No sprite program is ever loaded for a card.
+import { labelFor } from '../catalog/schema.js';
+import { el, TILE_BG, ROLE_BG } from './ui.js';
+import { assetById, loadSound } from './catalog.js';
+import { soundById, soundParams, renderAsync, playRendered, playLive } from './audio.js';
+import { bag } from './bag.js';
 
-const INK = '#231b33';
+// Pixel art is always shown at a whole-number scale: 3x on a wide screen, 2x on a phone, less when a frame is big.
+const fit = (fw, fh, w, h, most) => { const f = Math.min(w / fw, h / fh); return f >= 1 ? Math.min(most, Math.floor(f)) : 1 / Math.ceil(1 / f); };
+const sizes = (fw, fh) => `--fw:${fw};--fh:${fh};--k:${fit(fw, fh, 232, 192, 3)};--kp:${fit(fw, fh, 148, 128, 2)}`;
+const plural = (n, one, many = one + 's') => `${n} ${n === 1 ? one : many}`;
 
-function frameAt(c, now) {
-  const { sprite } = c;
-  const clip = sprite.clips[c.clip];
-  const fps = clipFps(sprite, c.clip, c.frames.p);
-  const n = Math.floor(((now - c.start) / 1000) * fps);
-  if (reduceMotion.matches && !c.hot) return 0;
-  if (clip.loop) return n % clip.frames;
-  const span = clip.frames + Math.round(fps * 0.6);
-  return Math.min(clip.frames - 1, n % span);
-}
+/** A catalogue row for whatever was handed in: a row, an id, or an asset's own object (a sprite program or a patch). */
+const rowOf = (x) => (typeof x === 'string' ? assetById(x) : x && x.kind && x.src ? x : (x && assetById(x.id)) || x);
 
-export function spriteCard(sprite) {
-  const tile = el('canvas', { class: 'tile', width: 80, height: 72, 'aria-hidden': 'true' });
-  const node = el('a', { class: 'card', href: `#/sprite/${sprite.id}` },
-    tile,
-    el('span', { class: 'card-text' }, el('span', { class: 'card-name' }, sprite.name), el('span', { class: 'card-kind' }, sprite.kind)));
-  const clips = Object.keys(sprite.clips);
-  const c = { sprite, frames: new Frames(sprite, defaultParams(sprite)), clip: sprite.preview, hot: false, start: 0 };
-  const alt = clips.find((x) => /attack|cast|collect|ignite|open/.test(x)) ?? clips[clips.length - 1];
-  const enter = () => { c.hot = true; c.clip = alt; c.start = performance.now(); };
-  const leave = () => { c.hot = false; c.clip = sprite.preview; c.start = performance.now(); };
-  node.addEventListener('pointerenter', enter); node.addEventListener('pointerleave', leave);
-  node.addEventListener('focus', enter); node.addEventListener('blur', leave);
-  const g = tile.getContext('2d');
-  return {
-    node,
-    tick(now) {
-      const [sky, ground, edge] = SPRITE_BG[sprite.kind] ?? SPRITE_BG.Character;
-      g.fillStyle = sky; g.fillRect(0, 0, 80, 72);
-      g.fillStyle = ground; g.fillRect(0, 60, 80, 12);
-      g.fillStyle = edge; g.fillRect(0, 60, 80, 1);
-      const cx = 40 + Math.round((sprite.pivot[0] - sprite.size[0] / 2) * 0.5);
-      drawSpriteOnTile(g, sprite, c.frames.get(c.clip, frameAt(c, now)), cx, 60);
-    },
-  };
-}
+// Only one card makes sound at a time.
+let sounding = null;
+function takeTurn(card) { if (sounding && sounding !== card) sounding.quiet(); sounding = card; }
 
-/** A music track: no picture, just a tile that plays the track live when pressed. */
-export function musicCard(patch) {
-  const tile = el('canvas', { class: 'tile', width: 80, height: 72, 'aria-hidden': 'true' });
-  const btn = el('button', { class: 'tile-btn', type: 'button', 'aria-label': `Play ${patch.name}` }, tile);
-  const node = el('div', { class: 'card sound' }, btn,
-    el('a', { class: 'card-text', href: `#/music/${patch.id}` }, el('span', { class: 'card-name' }, patch.name), el('span', { class: 'card-kind' }, 'Music')));
-  const g = tile.getContext('2d');
-  let voice = null, starting = false, gone = false, dirty = true;
-  btn.addEventListener('click', async () => {
-    if (voice) { voice.stop(); voice = null; dirty = true; return; }
-    if (starting) return;
-    starting = true; dirty = true;
-    try {
-      const v = await playLive(patch, soundParams(patch));
-      if (gone) v.stop(); else voice = v;
-    } catch (e) { console.error(`music ${patch.id}:`, e); }
-    starting = false; dirty = true;
-  });
-  return {
-    node,
-    stop() { gone = true; if (voice) voice.stop(); voice = null; },
-    tick() {
-      if (!dirty) return;
-      dirty = false;
-      g.fillStyle = SOUND_BG.music; g.fillRect(0, 0, 80, 72);
-      // one large play / stop mark in the middle
-      g.fillStyle = INK; g.fillRect(27, 23, 26, 26);
-      g.fillStyle = '#ffcf3f'; g.fillRect(29, 25, 22, 22);
-      g.fillStyle = INK;
-      if (voice || starting) g.fillRect(35, 31, 10, 10);
-      else for (let i = 0; i < 8; i++) g.fillRect(36 + i, 29 + i, 1, 15 - i * 2);
-    },
-  };
-}
-
-export function soundCard(patch) {
-  const tile = el('canvas', { class: 'tile', width: 80, height: 72, 'aria-hidden': 'true' });
-  const btn = el('button', { class: 'tile-btn', type: 'button', 'aria-label': `Play ${patch.name}` }, tile);
-  const node = el('div', { class: 'card sound' }, btn,
-    el('a', { class: 'card-text', href: `#/sound/${patch.id}` }, el('span', { class: 'card-name' }, patch.name), el('span', { class: 'card-kind' }, cap(patch.category) + (patch.loop ? ', loop' : ''))));
-  const g = tile.getContext('2d');
-  let r = null, handle = null, dirty = true;
-  whenRendered(patch, (res) => { r = res; dirty = true; });
+/** The small "Add to bag" action every card has. The asset goes in with its standard settings. */
+function addButton(row) {
+  const word = el('span', { class: 'add-word' }, 'Add to bag');
+  const btn = el('button', { type: 'button', class: 'card-add', 'aria-label': `Add ${row.name} to bag`, title: 'Add to your bag with its standard settings' },
+    el('span', { class: 'add-plus', 'aria-hidden': 'true' }, '+'), word);
+  let timer = 0;
   btn.addEventListener('click', () => {
-    if (handle) { handle.stop(); handle = null; dirty = true; return; }
-    r = r ?? rendered(patch, soundParams(patch));
-    handle = playRendered(r, { force: true, onended: () => { handle = null; dirty = true; } });
-    dirty = true;
+    bag.add({ kind: row.kind, id: row.id, settings: {} });
+    btn.classList.add('done');
+    word.textContent = 'Added';
+    clearTimeout(timer);
+    timer = setTimeout(() => { btn.classList.remove('done'); word.textContent = 'Add to bag'; }, 1400);
   });
-  return {
-    node,
-    stop() { if (handle) handle.stop(); },
-    tick() {
-      if (!dirty && !handle) return;
-      dirty = false;
-      g.fillStyle = SOUND_BG[patch.category] ?? '#e6e9f2'; g.fillRect(0, 0, 80, 72);
-      g.fillStyle = 'rgba(35, 27, 51, 0.12)'; g.fillRect(8, 33, 64, 1);
-      if (r) {
-        const played = handle ? Math.floor(Math.min(1, (handle.now() - handle.startedAt) / handle.duration) * 64) : -1;
-        drawWave(g, r.samples, 8, 34, 64, 40, INK, played, '#5a48e0');
-      }
-      // play / stop mark in the corner
-      g.fillStyle = INK; g.fillRect(4, 58, 11, 11);
-      g.fillStyle = '#ffcf3f'; g.fillRect(5, 59, 9, 9);
-      g.fillStyle = INK;
-      if (handle) g.fillRect(7, 61, 5, 5);
-      else for (let i = 0; i < 4; i++) g.fillRect(8 + i, 60 + i, 1, 7 - i * 2);
-    },
-  };
+  return btn;
 }
 
-export function kitCard(kit) {
-  const tile = el('canvas', { class: 'tile wide', width: 164, height: 72, 'aria-hidden': 'true' });
-  const members = kit.sprites.map((id) => spriteById[id]).filter(Boolean);
-  const node = el('a', { class: 'card kit', href: `#/kit/${kit.id}` },
-    tile,
-    el('span', { class: 'card-text' }, el('span', { class: 'card-name' }, kit.name), el('span', { class: 'card-kind' }, `${members.length} sprite${members.length === 1 ? '' : 's'}, ${kit.sounds.length} sounds${(kit.music ?? []).length ? `, ${kit.music.length} track${kit.music.length === 1 ? '' : 's'}` : ''}`)));
-  const cs = members.map((sprite) => ({ sprite, frames: new Frames(sprite, defaultParams(sprite)), clip: sprite.preview, hot: false, start: 0 }));
-  const g = tile.getContext('2d');
-  return {
-    node,
-    tick(now) {
-      g.fillStyle = '#bfe6f7'; g.fillRect(0, 0, 164, 72);
-      g.fillStyle = '#6cc06a'; g.fillRect(0, 60, 164, 12);
-      g.fillStyle = '#4f9d57'; g.fillRect(0, 60, 164, 1);
-      cs.forEach((c, i) => {
-        const cx = Math.round((164 / (cs.length + 1)) * (i + 1));
-        drawSpriteOnTile(g, c.sprite, c.frames.get(c.clip, frameAt(c, now)), cx, 60);
-      });
-    },
+const cell = (row, card) => el('div', { class: 'card-cell' }, card, addButton(row));
+const text = (row, kind) => [el('span', { class: 'card-name' }, row.name), el('span', { class: 'card-kind' }, kind)];
+
+/** A sprite: its thumbnail, and on hover or focus its preview animation played from the strip picture. */
+export function spriteCard(asset) {
+  const row = rowOf(asset);
+  const [fw, fh] = row.tech?.frame ?? [64, 64];
+  const [sky, ground, edge] = TILE_BG[row.type] ?? TILE_BG.character;
+  const thumb = row.thumb ? el('img', { class: 'thumb pic', src: row.thumb, alt: '', width: fw, height: fh, decoding: 'async', draggable: 'false' }) : null;
+  const canvas = el('canvas', { class: 'anim pic', width: fw, height: fh, hidden: true, 'aria-hidden': 'true' });
+  const tile = el('span', { class: 'pic-tile on-ground', style: `${sizes(fw, fh)};--sky:${sky};--ground:${ground};--edge:${edge}` }, thumb, canvas);
+  const card = el('a', { class: 'card', href: `#/sprite/${row.id}` }, tile, el('span', { class: 'card-text' }, text(row, labelFor('type', row.type))));
+
+  const frames = row.stripFrames || 1, fps = row.stripFps || 10;
+  const g = canvas.getContext('2d');
+  g.imageSmoothingEnabled = false;
+  let strip = null, raf = 0, playing = false, shown = -1, t0 = 0;
+  const want = { hover: false, focus: false };
+  const draw = (now) => {
+    const f = Math.floor((Math.max(0, now - t0) / 1000) * fps) % frames;      // a frame's clock can read a little before t0
+    if (f !== shown) { shown = f; g.clearRect(0, 0, fw, fh); g.drawImage(strip, f * fw, 0, fw, fh, 0, 0, fw, fh); }
+    raf = requestAnimationFrame(draw);
   };
+  const rest = () => { playing = false; cancelAnimationFrame(raf); canvas.hidden = true; if (thumb) thumb.hidden = false; };
+  async function sync() {
+    const on = want.hover || want.focus;
+    if (!on) { rest(); return; }
+    if (playing || !row.strip || frames < 2) return;
+    playing = true;
+    if (!strip) {
+      const img = new Image();
+      img.src = row.strip;
+      try { await img.decode(); } catch { playing = false; return; }     // no strip: the still picture stays
+      strip = img;
+    }
+    if (!playing) return;                                                  // left while the picture loaded
+    t0 = performance.now(); shown = -1;
+    canvas.hidden = false; if (thumb) thumb.hidden = true;
+    draw(t0);
+  }
+  card.addEventListener('pointerenter', () => { want.hover = true; sync(); });
+  card.addEventListener('pointerleave', () => { want.hover = false; sync(); });
+  card.addEventListener('focus', () => { want.focus = true; sync(); });
+  card.addEventListener('blur', () => { want.focus = false; sync(); });
+  return { node: cell(row, card), stop() { want.hover = want.focus = false; rest(); }, tick() {} };
 }
 
-/** Animate a set of cards until the returned function is called. */
+/** What a sound or music card shares: a tile that is a button, Play and Stop, one thing sounding at a time. */
+function audioCard(row, { tile, href, kind, begin }) {
+  const btn = el('button', { class: 'tile-btn', type: 'button', 'aria-label': `Play ${row.name}` }, tile);
+  const card = el('div', { class: 'card sound' }, btn, el('a', { class: 'card-text', href }, text(row, kind)));
+  let voice = null, busy = false, turn = 0;
+  const show = () => {
+    card.classList.toggle('playing', !!voice);
+    card.classList.toggle('loading', busy);
+    btn.setAttribute('aria-label', `${voice ? 'Stop' : 'Play'} ${row.name}`);
+  };
+  // quiet(): stop what plays, and drop anything still loading
+  const me = { quiet() { turn++; if (voice) voice.stop(); voice = null; show(); } };
+  btn.addEventListener('click', async () => {
+    if (voice) { me.quiet(); return; }
+    if (busy) return;
+    const mine = ++turn;
+    busy = true; show();
+    try {
+      const patch = soundById[row.id] ?? await loadSound(row.id);       // just this one sound
+      takeTurn(me);
+      const v = await begin(patch, () => { voice = null; show(); });
+      if (mine === turn) voice = v; else if (v) v.stop();               // stopped, or the page moved on, while it loaded
+      btn.removeAttribute('title');
+    } catch (e) {
+      console.error(`${row.kind} ${row.id}:`, e);
+      btn.setAttribute('title', 'This could not be played. Reload the page and try again.');
+    }
+    busy = false; show();
+  });
+  return { node: cell(row, card), stop: me.quiet, tick() {} };
+}
+
+/** A sound effect: its waveform on a light tile. Pressing it loads that one sound and plays it. */
+export function soundCard(asset) {
+  const row = rowOf(asset);
+  const top = String(row.role ?? '').split('/')[0];
+  const tile = el('span', { class: 'pic-tile', style: `${sizes(64, 40)};--sky:${ROLE_BG[top] ?? '#e6e9f2'}` },
+    row.thumb ? el('img', { class: 'thumb pic wave', src: row.thumb, alt: '', width: 64, height: 40, decoding: 'async', draggable: 'false' }) : null,
+    el('span', { class: 'play-mark', 'aria-hidden': 'true' }));
+  const loops = row.tech?.loop && row.type === 'sfx';
+  return audioCard(row, {
+    tile, href: `#/sound/${row.id}`, kind: labelFor('type', row.type) + (loops ? ', loops' : ''),
+    begin: async (patch, ended) => playRendered(await renderAsync(patch, soundParams(patch)), { force: true, onended: ended }),
+  });
+}
+
+/** A music track: no picture, a tile that plays the track when pressed. */
+export function musicCard(asset) {
+  const row = rowOf(asset);
+  const tile = el('span', { class: 'pic-tile music', style: `--sky:${ROLE_BG.music}` }, el('span', { class: 'play-mark big', 'aria-hidden': 'true' }));
+  const bpm = row.tech?.bpm ? `, ${row.tech.bpm} beats a minute` : '';
+  return audioCard(row, {
+    tile, href: `#/music/${row.id}`, kind: labelFor('type', row.type) + bpm,
+    begin: (patch) => playLive(patch, soundParams(patch)),
+  });
+}
+
+/** The right card for a catalogue row. Returns { node, stop() }. */
+export const cardFor = (row) => (row.kind === 'sprite' ? spriteCard(row) : row.kind === 'music' ? musicCard(row) : soundCard(row));
+
+/** A bundle (a game kit, a character set, an object set): a few of its sprites, what it is for, and what is in it. */
+export function bundleCard(bundle) {
+  const pics = [];
+  let width = 0;
+  for (const id of bundle.sprites ?? []) {
+    const row = assetById(id);
+    if (!row || !row.thumb) continue;
+    const [fw, fh] = row.tech?.frame ?? [64, 64];
+    if (fh > 96) continue;                                   // tall pictures (backgrounds) do not sit on the ground line
+    width += fw * 2 + 6;
+    if (width > 340) break;                                  // what fits the narrowest card on a wide screen
+    pics.push(el('img', { class: 'pic', src: row.thumb, alt: '', width: fw * 2, height: fh * 2, loading: 'lazy', decoding: 'async', draggable: 'false' }));
+  }
+  const n = { sprites: (bundle.sprites ?? []).length, sounds: (bundle.sounds ?? []).length, music: (bundle.music ?? []).length };
+  const holds = [n.sprites && plural(n.sprites, 'sprite'), n.sounds && plural(n.sounds, 'sound'), n.music && plural(n.music, 'track')].filter(Boolean).join(', ');
+  const [sky, ground, edge] = TILE_BG.character;
+  const node = el('a', { class: 'card kit', href: `#/bundle/${bundle.id}` },
+    el('span', { class: 'pic-tile wide on-ground', style: `--sky:${sky};--ground:${ground};--edge:${edge}` }, pics),
+    el('span', { class: 'kit-text' },
+      bundle.gameType ? el('span', { class: 'kit-for' }, bundle.gameType === 'any' ? 'For any game' : labelFor('gameType', bundle.gameType)) : null,
+      el('span', { class: 'card-name' }, bundle.name),
+      bundle.blurb ? el('span', { class: 'kit-blurb' }, bundle.blurb) : null,
+      el('span', { class: 'card-kind' }, holds)));
+  return { node, stop() {}, tick() {} };
+}
+export const kitCard = bundleCard;
+
+/** Kept for pages written against the first cards: cards now run themselves. Returns a function that stops them. */
 export function runCards(cards) {
-  let raf = 0;
-  const loop = (now) => { for (const c of cards) c.tick(now); raf = requestAnimationFrame(loop); };
-  raf = requestAnimationFrame(loop);
-  return () => { cancelAnimationFrame(raf); for (const c of cards) if (c.stop) c.stop(); };
+  return () => { for (const c of cards) if (c && c.stop) c.stop(); };
 }

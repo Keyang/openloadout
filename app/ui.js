@@ -1,5 +1,6 @@
 // Small shared pieces for every page.
 import { renderFrame } from '../engine/sprite.js';
+import { bag } from './bag.js';
 
 export const el = (tag, attrs = {}, ...kids) => {
   const n = document.createElement(tag);
@@ -58,6 +59,17 @@ export const SPRITE_BG = { Character: ['#bfe6f7', '#6cc06a', '#4f9d57'], Creatur
 export const SOUND_BG = { music: '#ffe0ef', weapon: '#ffd9b8', impact: '#f6c9c9', pickup: '#fff0b8', movement: '#cdeccf', ui: '#d9dcff', magic: '#ecd3ff', vehicle: '#d5dbe6', ambience: '#bfe6f7' };
 export const cap = (s) => (s === 'ui' ? 'Menu' : s[0].toUpperCase() + s.slice(1));
 
+// Card tiles by what the catalogue says an asset is: [sky, ground, ground edge] per sprite type, one light colour per sound use.
+const MEADOW = SPRITE_BG.Character, CLAY = SPRITE_BG.Creature, MINT = SPRITE_BG.Item, NIGHT = SPRITE_BG.Effect;
+export const TILE_BG = {
+  character: MEADOW, creature: CLAY, pickup: MINT, prop: MINT, icon: MINT, tileset: ['#d5dbe6', '#aab3c7', '#8791a8'],
+  background: ['#bfe6f7', '#9fd4ee', '#7fbfe0'], ui: ['#d9dcff', '#b9bdf0', '#9a9fe0'], effect: NIGHT, projectile: NIGHT,
+};
+export const ROLE_BG = {
+  characters: SOUND_BG.movement, actions: SOUND_BG.weapon, items: SOUND_BG.pickup, world: SOUND_BG.vehicle,
+  effects: SOUND_BG.impact, environment: SOUND_BG.ambience, interface: SOUND_BG.ui, music: SOUND_BG.music,
+};
+
 /** Draw one sprite frame standing on a ground line inside a tile. */
 export function drawSpriteOnTile(ctx, sprite, frame, cx, gy) {
   const x = Math.round(cx - sprite.pivot[0]);
@@ -77,14 +89,27 @@ export const store = {
   set(k, v) { try { localStorage.setItem('sf-' + k, v); } catch { /* private window */ } },
 };
 
-/** The page header with the main navigation. */
+// The header's bag count follows the bag on every page.
+bag.onChange(() => { for (const n of document.querySelectorAll('header .bag-count')) n.textContent = String(bag.count()); });
+
+/** The page header with the main navigation. `current`: home | sprites | sounds | music | bundles | bag | ''. */
 export function header(current) {
-  const link = (href, label, key) => el('a', { href, 'aria-current': current === key ? 'page' : null }, label);
+  const on = current === 'kits' ? 'bundles' : current;      // kits are bundles now
+  const link = (href, label, key) => el('a', { href, 'data-key': key, 'aria-current': on === key ? 'page' : null }, label);
   return el('header', { class: 'top' },
     el('a', { class: 'brand', href: '#/' }, 'Loadout'),
-    el('nav', { 'aria-label': 'Main' },
-      link('#/sprites', 'Sprites', 'sprites'),
-      link('#/sounds', 'Sounds', 'sounds'),
-      link('#/music', 'Music', 'music'),
-      link('#/kits', 'Kits', 'kits')));
+    el('div', { class: 'top-right' },
+      el('nav', { 'aria-label': 'Main' },
+        link('#/browse?kind=sprite', 'Sprites', 'sprites'),
+        link('#/browse?kind=sound', 'Sounds', 'sounds'),
+        link('#/browse?kind=music', 'Music', 'music'),
+        link('#/bundles', 'Bundles', 'bundles')),
+      el('a', { class: 'bag-link', href: '#/bag', 'aria-current': current === 'bag' ? 'page' : null }, 'Bag ', el('span', { class: 'bag-count' }, String(bag.count())))));
+}
+
+/** Move the "you are here" mark in the header without redrawing it (the results view changes kind in place). */
+export function markNav(key) {
+  for (const a of document.querySelectorAll('header.top nav a')) {
+    if (a.dataset.key === key) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+  }
 }
