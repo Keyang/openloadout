@@ -9,6 +9,35 @@
   "arcade"
  ],
  "description": "Two-note square blip, the second note a fourth up.",
+ "meta": {
+  "type": "sfx",
+  "role": "items/pickup",
+  "themes": [
+   "neutral",
+   "fantasy"
+  ],
+  "gameTypes": [
+   "platformer",
+   "turn-based-rpg",
+   "arcade",
+   "puzzle"
+  ],
+  "words": [
+   "coin",
+   "gold",
+   "money",
+   "cash",
+   "collect",
+   "pickup",
+   "grab",
+   "loot",
+   "treasure",
+   "score",
+   "blip",
+   "ding"
+  ],
+  "license": "draft"
+ },
  "duration": "speed + ring + 0.02",
  "params": [
   {

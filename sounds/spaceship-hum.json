@@ -11,6 +11,34 @@
   "live"
  ],
  "description": "Continuous engine loop; pitch, brightness and loudness all follow the thrust parameter (drive it live).",
+ "meta": {
+  "type": "sfx",
+  "role": "world/machine",
+  "themes": [
+   "sci-fi",
+   "space"
+  ],
+  "gameTypes": [
+   "shooter",
+   "arcade",
+   "racing"
+  ],
+  "words": [
+   "spaceship",
+   "ship",
+   "spacecraft",
+   "rocket",
+   "ufo",
+   "engine",
+   "thruster",
+   "thrust",
+   "hum",
+   "hover",
+   "drone",
+   "fly"
+  ],
+  "license": "draft"
+ },
  "loop": true,
  "normalize": false,
  "duration": 4,

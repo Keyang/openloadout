@@ -11,6 +11,7 @@ export default defineSprite({
   name: 'Hero',
   kind: 'Character',
   blurb: 'A brave adventurer. Change the build, hair, gear and how they move.',
+  meta: { type: 'character', role: 'characters/player', themes: ['fantasy', 'dungeon'], gameTypes: ['platformer', 'turn-based-rpg'], view: 'side', words: ['knight', 'hero', 'warrior', 'adventurer', 'player', 'paladin', 'soldier', 'sword', 'armor', 'fighter', 'attack', 'walk', 'run', 'jump'], license: 'draft' },
   size: H.SIZE,
   pivot: H.PIVOT,
   preview: 'walk',

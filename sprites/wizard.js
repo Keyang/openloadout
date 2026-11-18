@@ -108,6 +108,7 @@ export default defineSprite({
   name: 'Wizard',
   kind: 'Character',
   blurb: 'A robed spell-caster with a glowing staff. Change the hat, beard, robe and magic.',
+  meta: { type: 'character', role: 'characters/player', themes: ['fantasy', 'dungeon', 'forest'], gameTypes: ['platformer', 'turn-based-rpg'], view: 'side', words: ['wizard', 'mage', 'sorcerer', 'magician', 'witch', 'spellcaster', 'necromancer', 'staff', 'magic', 'spell', 'cast', 'robe', 'hero'], license: 'draft' },
   size: H.SIZE,
   pivot: H.PIVOT,
   preview: 'cast',

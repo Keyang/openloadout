@@ -10,6 +10,40 @@
   "buzzer"
  ],
  "description": "Two short falling dissonant buzzes: wrong answer / action not allowed.",
+ "meta": {
+  "type": "sfx",
+  "role": "interface/error",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "platformer",
+   "turn-based-rpg",
+   "top-down-rpg",
+   "farming-sim",
+   "shooter",
+   "racing",
+   "puzzle",
+   "card-game",
+   "arcade",
+   "roguelike-action"
+  ],
+  "words": [
+   "error",
+   "wrong",
+   "fail",
+   "denied",
+   "invalid",
+   "incorrect",
+   "mistake",
+   "no",
+   "buzzer",
+   "locked",
+   "cancel",
+   "blocked"
+  ],
+  "license": "draft"
+ },
  "duration": "beep*2 + 0.08",
  "params": [
   {

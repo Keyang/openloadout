@@ -29,12 +29,15 @@ export const METAL = ['#c2c9d6', '#8f97a8', '#e6c545', '#c98a4a', '#5d6475'];
  *   preview: 'walk',                        // clip shown in the gallery
  *   sounds: { attack: [{ sound: 'sword-slash', frame: 3, preset: 'Heavy blade', volume: 1 }] },
  *                                           // optional: sounds (ids from sounds/) that play on a frame of a clip
+ *   meta: { type, role, themes, gameTypes, view, words, license },
+ *                                           // catalogue metadata, kept as written; checked by catalog/schema.js
  *   render(g, { clip, t, frame, frames, p }) { ...draw on Surface g... },
  * })
  */
 export function defineSprite(def) {
   const need = ['id', 'name', 'size', 'pivot', 'params', 'clips', 'render'];
   for (const k of need) if (def[k] === undefined) throw new Error(`sprite ${def.id ?? '?'}: missing "${k}"`);
+  if (def.meta !== undefined && (def.meta === null || typeof def.meta !== 'object' || Array.isArray(def.meta))) throw new Error(`sprite ${def.id}: "meta" must be an object`);
   if (!/^[a-z][a-z0-9-]*$/.test(def.id)) throw new Error(`sprite id "${def.id}" must be lowercase letters, digits, dashes`);
   for (const [name, c] of Object.entries(def.clips)) {
     if (!(c.frames >= 1)) throw new Error(`sprite ${def.id}: clip ${name} needs frames >= 1`);

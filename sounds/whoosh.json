@@ -10,6 +10,34 @@
   "air"
  ],
  "description": "Band-passed noise that swells and sweeps: swings, dashes, menu transitions.",
+ "meta": {
+  "type": "sfx",
+  "role": "actions/dash",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "platformer",
+   "turn-based-rpg",
+   "top-down-rpg",
+   "arcade"
+  ],
+  "words": [
+   "whoosh",
+   "swoosh",
+   "woosh",
+   "swipe",
+   "swing",
+   "dash",
+   "dodge",
+   "throw",
+   "fast",
+   "air",
+   "transition",
+   "swish"
+  ],
+  "license": "draft"
+ },
  "duration": "length + 0.02",
  "params": [
   {

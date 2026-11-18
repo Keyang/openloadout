@@ -9,6 +9,36 @@
   "destroy"
  ],
  "description": "Sub thump, filtered noise blast, rumble tail and scattered debris.",
+ "meta": {
+  "type": "sfx",
+  "role": "effects/explosion",
+  "themes": [
+   "neutral",
+   "sci-fi",
+   "fantasy"
+  ],
+  "gameTypes": [
+   "shooter",
+   "platformer",
+   "arcade",
+   "turn-based-rpg"
+  ],
+  "words": [
+   "explosion",
+   "explode",
+   "boom",
+   "blast",
+   "bomb",
+   "grenade",
+   "detonate",
+   "destroy",
+   "kaboom",
+   "burst",
+   "debris",
+   "crash"
+  ],
+  "license": "draft"
+ },
  "duration": "length + 0.1",
  "params": [
   {

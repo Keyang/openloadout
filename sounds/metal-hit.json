@@ -11,6 +11,34 @@
   "modal"
  ],
  "description": "Modal resonator struck by a noise burst. Slide Inharmonic from tuned bell to clangy pipe.",
+ "meta": {
+  "type": "sfx",
+  "role": "effects/impact",
+  "themes": [
+   "fantasy",
+   "neutral"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "platformer",
+   "top-down-rpg"
+  ],
+  "words": [
+   "metal",
+   "clang",
+   "hit",
+   "clash",
+   "strike",
+   "block",
+   "parry",
+   "anvil",
+   "sword",
+   "bell",
+   "pipe",
+   "armor"
+  ],
+  "license": "draft"
+ },
  "duration": "ring*0.6 + 0.08",
  "params": [
   {

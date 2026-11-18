@@ -10,6 +10,33 @@
   "loop"
  ],
  "description": "Four-stroke style engine. Run it live and drive the RPM and throttle sliders.",
+ "meta": {
+  "type": "sfx",
+  "role": "world/machine",
+  "themes": [
+   "city",
+   "neutral"
+  ],
+  "gameTypes": [
+   "racing",
+   "arcade"
+  ],
+  "words": [
+   "engine",
+   "car",
+   "motor",
+   "kart",
+   "truck",
+   "motorbike",
+   "vehicle",
+   "drive",
+   "rev",
+   "idle",
+   "race",
+   "accelerate"
+  ],
+  "license": "draft"
+ },
  "loop": true,
  "duration": 3,
  "normalize": false,

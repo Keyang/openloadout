@@ -9,6 +9,30 @@
   "retro"
  ],
  "description": "Rising pulse-wave chirp.",
+ "meta": {
+  "type": "sfx",
+  "role": "actions/jump",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "platformer",
+   "arcade"
+  ],
+  "words": [
+   "jump",
+   "hop",
+   "leap",
+   "bounce",
+   "spring",
+   "boing",
+   "double jump",
+   "retro",
+   "chiptune",
+   "8-bit"
+  ],
+  "license": "draft"
+ },
  "duration": "length + 0.02",
  "params": [
   {

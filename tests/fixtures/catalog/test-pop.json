@@ -1,0 +1,64 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "test-pop",
+ "name": "Test pop",
+ "category": "pickup",
+ "tags": [
+  "pop"
+ ],
+ "description": "A short sine blip used by the build tests.",
+ "meta": {
+  "type": "sfx",
+  "role": "items/pickup",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "platformer"
+  ],
+  "words": [
+   "pop",
+   "blip",
+   "collect",
+   "pickup",
+   "bubble",
+   "tap"
+  ],
+  "license": "draft"
+ },
+ "duration": 0.15,
+ "params": [
+  {
+   "id": "pitch",
+   "label": "Pitch",
+   "unit": "Hz",
+   "min": 300,
+   "max": 1200,
+   "default": 600,
+   "scale": "log"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "o",
+   "type": "osc",
+   "wave": "sine",
+   "freq": "pitch"
+  },
+  {
+   "id": "e",
+   "type": "env",
+   "points": [
+    [
+     0,
+     1
+    ],
+    [
+     0.15,
+     0
+    ]
+   ]
+  }
+ ],
+ "out": "o*e"
+}

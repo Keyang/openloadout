@@ -9,6 +9,35 @@
   "loop"
  ],
  "description": "Gusting filtered noise with an optional whistle.",
+ "meta": {
+  "type": "ambience",
+  "role": "environment/weather",
+  "themes": [
+   "neutral",
+   "forest"
+  ],
+  "gameTypes": [
+   "platformer",
+   "turn-based-rpg",
+   "top-down-rpg",
+   "farming-sim"
+  ],
+  "words": [
+   "wind",
+   "breeze",
+   "gust",
+   "storm",
+   "blizzard",
+   "weather",
+   "howl",
+   "whistle",
+   "outdoor",
+   "mountain",
+   "desert",
+   "air"
+  ],
+  "license": "draft"
+ },
  "loop": true,
  "duration": 8,
  "params": [

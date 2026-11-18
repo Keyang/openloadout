@@ -12,6 +12,7 @@ export default defineSprite({
   name: 'Slime',
   kind: 'Creature',
   blurb: 'A bouncy blob. Pick a colour, a face and something to wear.',
+  meta: { type: 'creature', role: 'characters/enemy', themes: ['fantasy', 'dungeon', 'candy'], gameTypes: ['platformer', 'turn-based-rpg'], view: 'side', words: ['slime', 'blob', 'goo', 'jelly', 'ooze', 'gel', 'enemy', 'monster', 'bounce', 'hop', 'squish', 'jump'], license: 'draft' },
   size: [W, W],
   pivot: [CX, GROUND],
   preview: 'hop',

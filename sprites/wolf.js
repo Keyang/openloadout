@@ -156,6 +156,7 @@ export default defineSprite({
   name: 'Wolf',
   kind: 'Creature',
   blurb: 'A four-legged hunter. Reshape it into a wolf, a fox or a husky.',
+  meta: { type: 'creature', role: 'characters/enemy', themes: ['fantasy', 'forest'], gameTypes: ['platformer', 'turn-based-rpg'], view: 'side', words: ['wolf', 'fox', 'husky', 'dog', 'beast', 'animal', 'enemy', 'monster', 'hunter', 'predator', 'run', 'bite', 'pounce'], license: 'draft' },
   size: [W, H],
   pivot: [CX, GY],
   grounded: true,

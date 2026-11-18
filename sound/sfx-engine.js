@@ -793,7 +793,7 @@ export function renderPatch(patch, opts = {}) {
 
 // ---------------------------------------------------------------- validation
 
-const TOP_FIELDS = new Set(['format', 'id', 'name', 'category', 'tags', 'description', 'duration', 'loop', 'params', 'nodes', 'out', 'gain', 'normalize', 'wrap', 'presets', 'author']);
+const TOP_FIELDS = new Set(['format', 'id', 'name', 'category', 'tags', 'description', 'duration', 'loop', 'params', 'nodes', 'out', 'gain', 'normalize', 'wrap', 'presets', 'author', 'meta']);
 const PARAM_FIELDS = new Set(['id', 'label', 'min', 'max', 'default', 'unit', 'scale', 'step', 'hint', 'options']);
 const ID_RE = /^[A-Za-z_][A-Za-z0-9_]*$/;
 

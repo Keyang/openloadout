@@ -10,6 +10,34 @@
   "loop"
  ],
  "description": "Stream of chirping sine blobs with random pitch. A loop you can run live.",
+ "meta": {
+  "type": "ambience",
+  "role": "environment/ambience",
+  "themes": [
+   "underwater",
+   "fantasy"
+  ],
+  "gameTypes": [
+   "platformer",
+   "turn-based-rpg",
+   "puzzle"
+  ],
+  "words": [
+   "bubbles",
+   "bubble",
+   "underwater",
+   "water",
+   "potion",
+   "cauldron",
+   "boil",
+   "brew",
+   "fizz",
+   "gurgle",
+   "swim",
+   "lab"
+  ],
+  "license": "draft"
+ },
  "loop": true,
  "duration": 4,
  "params": [

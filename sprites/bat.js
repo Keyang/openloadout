@@ -81,6 +81,7 @@ export default defineSprite({
   name: 'Bat',
   kind: 'Creature',
   blurb: 'A flapping cave bat. Change the wings, ears and colours to make imps, moths and other flyers.',
+  meta: { type: 'creature', role: 'characters/enemy', themes: ['fantasy', 'dungeon', 'horror'], gameTypes: ['platformer', 'turn-based-rpg'], view: 'side', words: ['bat', 'vampire', 'imp', 'moth', 'flyer', 'flying', 'fly', 'flap', 'wings', 'cave', 'enemy', 'monster', 'swoop'], license: 'draft' },
   size: [W, W],
   pivot: [CX, CY],
   grounded: false,

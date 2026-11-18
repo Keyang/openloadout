@@ -1,0 +1,19 @@
+{
+  "id": "menu-sounds",
+  "name": "Menu sounds",
+  "gameType": "any",
+  "level": "kit",
+  "blurb": "Clicks, confirms, errors and rewards for buttons and menus.",
+  "sprites": [
+    "coin"
+  ],
+  "sounds": [
+    "ui-click",
+    "chime-success",
+    "error-buzz",
+    "powerup",
+    "coin-pickup"
+  ],
+  "music": [],
+  "theme": {}
+}

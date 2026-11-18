@@ -10,6 +10,34 @@
   "thud"
  ],
  "description": "Body thud with a pitch drop, a mid slap and saturated noise.",
+ "meta": {
+  "type": "sfx",
+  "role": "actions/hit",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "platformer",
+   "turn-based-rpg",
+   "top-down-rpg",
+   "arcade"
+  ],
+  "words": [
+   "punch",
+   "hit",
+   "hurt",
+   "damage",
+   "impact",
+   "kick",
+   "smack",
+   "thud",
+   "blow",
+   "fight",
+   "melee",
+   "beat"
+  ],
+  "license": "draft"
+ },
  "duration": "length + 0.04",
  "params": [
   {

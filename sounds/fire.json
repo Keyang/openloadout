@@ -9,6 +9,34 @@
   "loop"
  ],
  "description": "Low roar, flickering mids, crackles and the occasional pop.",
+ "meta": {
+  "type": "ambience",
+  "role": "environment/ambience",
+  "themes": [
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "platformer",
+   "turn-based-rpg",
+   "top-down-rpg",
+   "farming-sim"
+  ],
+  "words": [
+   "fire",
+   "campfire",
+   "bonfire",
+   "fireplace",
+   "torch",
+   "flame",
+   "burn",
+   "crackle",
+   "embers",
+   "heat",
+   "camp"
+  ],
+  "license": "draft"
+ },
  "loop": true,
  "duration": 6,
  "params": [

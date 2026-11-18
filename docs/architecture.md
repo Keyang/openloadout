@@ -48,7 +48,7 @@ meta: {
                                 // audio:   sfx | ambience | music | jingle
   role: 'characters/player',    // a path in the role tree (below)
   themes: ['fantasy'],          // fantasy | sci-fi | space | dungeon | forest | farm | city | horror | underwater | candy | neutral ...
-  gameTypes: ['platformer'],    // ids from bundles and research; an asset may fit several
+  gameTypes: ['platformer'],    // platformer | turn-based-rpg | roguelike-action (the three bundle types) | farming-sim | shooter | racing | puzzle | card-game | arcade; an asset may fit several. `catalog/schema.js` holds the list
   view: 'side',                 // sprites only: side | top-down | front | none
   words: ['knight', 'hero', 'sword', 'fight'],   // what people type to find it: nouns, verbs, events, synonyms. Lowercase
   license: 'draft',
@@ -113,13 +113,14 @@ The site shows each part as its own block of controls under the sprite's, and hi
     bundles: ['fantasy-platformer'],          // filled in from bundles/*.json
     src: 'sprites/knight.js',
     tech: {                                   // derived, never hand-written
-      // sprite: frame: [64, 64], clips: [{ name, label, frames, loop }], controls: 15, parts: ['weapon'], sounds: 7
+      // sprite: frame: [64, 64], clips: [{ name, label, frames, loop, fps }], controls: 15, parts: ['weapon'], sounds: 4 (distinct sounds used)
       // audio:  seconds: 0.37, loop: false, stereo: false, bpm: null, controls: 5, styles: ['Heavy blade', ...]
     },
     thumb: 'generated/thumbs/knight.png',     // sprite: one frame, 2x. sound: waveform. music: none
     strip: 'generated/strips/knight.png',     // sprites: the preview clip's frames in one row, 1x. stripFrames, stripFps alongside
+    // audio assets have view: null
   }],
-  bundles: [{ id, name, gameType, blurb, sprites: [ids], sounds: [ids], music: [ids], theme: {...} }],
+  bundles: [{ id, name, gameType, level, blurb, sprites: [ids], sounds: [ids], music: [ids], theme: {...} }],   // level: object | character | kit; gameType may be 'any'
 }
 ```
 

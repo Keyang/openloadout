@@ -1,0 +1,26 @@
+{
+  "id": "dungeon-starter",
+  "name": "Dungeon starter",
+  "gameType": "platformer",
+  "level": "kit",
+  "blurb": "A hero, two enemies and a coin to collect, with the footsteps, sword, hits, pickup sounds and battle music a first level needs.",
+  "sprites": [
+    "knight",
+    "slime",
+    "bat",
+    "coin"
+  ],
+  "sounds": [
+    "sword-slash",
+    "footstep-gravel",
+    "jump",
+    "punch",
+    "coin-pickup",
+    "metal-hit",
+    "whoosh"
+  ],
+  "music": [
+    "battle-theme"
+  ],
+  "theme": {}
+}

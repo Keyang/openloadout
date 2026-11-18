@@ -9,6 +9,33 @@
   "zap"
  ],
  "description": "Pitch-dropping blaster zap with a noisy muzzle click.",
+ "meta": {
+  "type": "sfx",
+  "role": "actions/shoot",
+  "themes": [
+   "sci-fi",
+   "space"
+  ],
+  "gameTypes": [
+   "shooter",
+   "arcade"
+  ],
+  "words": [
+   "laser",
+   "shoot",
+   "shot",
+   "bullet",
+   "blaster",
+   "gun",
+   "zap",
+   "pew",
+   "ray",
+   "beam",
+   "cannon",
+   "weapon"
+  ],
+  "license": "draft"
+ },
  "duration": "length + 0.03",
  "params": [
   {

@@ -9,6 +9,36 @@
   "foley"
  ],
  "description": "Heel thump plus a burst of crunching grains. Every seed is a different step.",
+ "meta": {
+  "type": "sfx",
+  "role": "characters/footstep",
+  "themes": [
+   "neutral",
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "platformer",
+   "turn-based-rpg",
+   "top-down-rpg",
+   "farming-sim"
+  ],
+  "words": [
+   "footstep",
+   "footsteps",
+   "step",
+   "walk",
+   "run",
+   "gravel",
+   "stone",
+   "dirt",
+   "path",
+   "boots",
+   "sneak",
+   "crunch"
+  ],
+  "license": "draft"
+ },
  "duration": "length + 0.05",
  "params": [
   {

@@ -10,6 +10,33 @@
   "heal"
  ],
  "description": "Gliding FM pad with random harmonic sparkles and a reverb tail.",
+ "meta": {
+  "type": "sfx",
+  "role": "actions/cast",
+  "themes": [
+   "fantasy"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "platformer",
+   "top-down-rpg"
+  ],
+  "words": [
+   "magic",
+   "spell",
+   "cast",
+   "heal",
+   "curse",
+   "enchant",
+   "buff",
+   "mana",
+   "sparkle",
+   "shimmer",
+   "wizard",
+   "potion"
+  ],
+  "license": "draft"
+ },
  "duration": "length + 0.3 + shimmer*1.5",
  "params": [
   {

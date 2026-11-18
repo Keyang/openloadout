@@ -1,0 +1,23 @@
+{
+  "id": "wizard-camp",
+  "name": "Wizard camp",
+  "gameType": "turn-based-rpg",
+  "level": "kit",
+  "blurb": "A wizard, a wolf and a campfire for a night scene, with spell, fire and wind sounds.",
+  "sprites": [
+    "wizard",
+    "wolf",
+    "campfire"
+  ],
+  "sounds": [
+    "magic-spell",
+    "fire",
+    "wind",
+    "footstep-gravel",
+    "whoosh",
+    "punch",
+    "chime-success"
+  ],
+  "music": [],
+  "theme": {}
+}

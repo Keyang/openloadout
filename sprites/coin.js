@@ -104,6 +104,7 @@ export default defineSprite({
   name: 'Coin',
   kind: 'Item',
   blurb: 'A spinning pickup. Make it a gold coin, a shop token or a gem medal.',
+  meta: { type: 'pickup', role: 'items/pickup', themes: ['fantasy', 'neutral'], gameTypes: ['platformer', 'turn-based-rpg', 'arcade', 'puzzle'], view: 'front', words: ['coin', 'gold', 'money', 'cash', 'currency', 'treasure', 'loot', 'token', 'gem', 'medal', 'collect', 'pickup', 'spin', 'score'], license: 'draft' },
   size: [W, W],
   pivot: [16, GROUND],
   grounded: false,

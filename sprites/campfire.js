@@ -32,6 +32,7 @@ export default defineSprite({
   name: 'Campfire',
   kind: 'Effect',
   blurb: 'A crackling fire. Change its colour for magic or poison flames.',
+  meta: { type: 'prop', role: 'world/prop', themes: ['fantasy', 'forest'], gameTypes: ['platformer', 'turn-based-rpg'], view: 'side', words: ['campfire', 'fire', 'flame', 'bonfire', 'torch', 'burn', 'flicker', 'camp', 'checkpoint', 'rest', 'warmth', 'magic fire'], license: 'draft' },
   size: [W, W],
   pivot: [CX, GROUND],
   preview: 'burn',

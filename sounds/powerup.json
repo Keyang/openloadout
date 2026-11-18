@@ -9,6 +9,33 @@
   "rise"
  ],
  "description": "Looping arpeggio that glides upward, with a short echo.",
+ "meta": {
+  "type": "sfx",
+  "role": "items/consume",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "platformer",
+   "arcade",
+   "shooter"
+  ],
+  "words": [
+   "powerup",
+   "power up",
+   "upgrade",
+   "boost",
+   "buff",
+   "level up",
+   "1-up",
+   "extra life",
+   "bonus",
+   "charge",
+   "grow",
+   "star"
+  ],
+  "license": "draft"
+ },
  "duration": "length + 0.25",
  "params": [
   {

@@ -11,6 +11,36 @@
   "loop"
  ],
  "description": "Fast D-minor battle music, 8 to 32 bars long. Intensity brings in the snare, the brass stabs, then the melody and double-time kick, so a game can drive it live. Longer versions build up section by section, and the melody can be played by five instruments.",
+ "meta": {
+  "type": "music",
+  "role": "music/battle",
+  "themes": [
+   "fantasy",
+   "neutral"
+  ],
+  "gameTypes": [
+   "platformer",
+   "turn-based-rpg",
+   "shooter",
+   "arcade"
+  ],
+  "words": [
+   "battle",
+   "fight",
+   "combat",
+   "boss",
+   "action",
+   "danger",
+   "intense",
+   "epic",
+   "war",
+   "enemy",
+   "music",
+   "bgm",
+   "soundtrack"
+  ],
+  "license": "draft"
+ },
  "loop": true,
  "wrap": true,
  "normalize": false,

@@ -10,6 +10,33 @@
   "metal"
  ],
  "description": "Fast blade swing through air that ends in a short metallic ring.",
+ "meta": {
+  "type": "sfx",
+  "role": "actions/swing",
+  "themes": [
+   "fantasy"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "platformer",
+   "top-down-rpg"
+  ],
+  "words": [
+   "sword",
+   "slash",
+   "swing",
+   "blade",
+   "cut",
+   "slice",
+   "attack",
+   "strike",
+   "melee",
+   "dagger",
+   "knife",
+   "swoosh"
+  ],
+  "license": "draft"
+ },
  "duration": "swing + ring*0.6 + 0.03",
  "params": [
   {

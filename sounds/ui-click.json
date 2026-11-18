@@ -9,6 +9,40 @@
   "tap"
  ],
  "description": "Short, dry button tick: a pitched blip with a noisy snap and an optional woody knock.",
+ "meta": {
+  "type": "sfx",
+  "role": "interface/click",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "platformer",
+   "turn-based-rpg",
+   "top-down-rpg",
+   "farming-sim",
+   "shooter",
+   "racing",
+   "puzzle",
+   "card-game",
+   "arcade",
+   "roguelike-action"
+  ],
+  "words": [
+   "click",
+   "button",
+   "tap",
+   "press",
+   "select",
+   "tick",
+   "menu",
+   "ui",
+   "interface",
+   "toggle",
+   "cursor",
+   "blip"
+  ],
+  "license": "draft"
+ },
  "duration": "length + 0.03",
  "params": [
   {
