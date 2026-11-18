@@ -2,10 +2,20 @@
   "name": "loadout",
   "private": true,
   "type": "module",
-  "description": "Procedural pixel-art sprites drawn in code, with live parameters and sprite-sheet export.",
+  "description": "Loadout: procedurally made, customisable, game-ready sprites, sound effects and music, served as a static site.",
   "scripts": {
-    "serve": "python3 -m http.server 5178",
+    "serve": "node tools/serve.mjs",
+    "build": "node tools/build.mjs",
     "check": "node tools/check.mjs",
-    "render": "node tools/render.mjs"
+    "render": "node tools/render.mjs",
+    "test": "node --test tests/unit/",
+    "e2e": "playwright test"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "^4.2.0",
+    "@sqlite.org/sqlite-wasm": "*"
+  },
+  "devDependencies": {
+    "@playwright/test": "*"
   }
 }
