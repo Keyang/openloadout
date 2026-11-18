@@ -7,34 +7,22 @@ import { el, header } from './ui.js';
 import { bag } from './bag.js';
 import { loadCatalog, currentCatalog, assetById, loadSprite, loadSound } from './catalog.js';
 import { soundById, soundState, setSoundOn, toUnit, toValue, isChoice } from './audio.js';
-import { cleanParams, clipFps } from '../engine/sprite.js';
+import { cleanParams, clipFps, clipStretch } from '../engine/sprite.js';
 import { normalizeTheme, themedParams } from '../engine/theme.js';
 import { rowFromSprite, rowFromPatch, planScene, SCENE_ROLES } from './play/roles.js';
-import { buildKind, soundIdsOf } from './play/kinds.js';
-import { extraActions, lookupClip, restClip } from './play/clips.js';
+import { buildKind, soundIdsOf, isCustom } from './play/kinds.js';
+import { extraActions, lookupClip } from './play/clips.js';
 import { makeLevel, levelFeatures, tileIndex } from './play/level.js';
 import { createWorld, resetWorld, step, spawn, removeOne, countOf, snapshot, activeLoops } from './play/world.js';
 import { createPainter, cameraFor } from './play/draw.js';
 import { createInput } from './play/input.js';
 import { createSounds } from './play/sound.js';
+import { displayPlan, fillSpan } from './play/display.js';
+import { howTo, roleNote, keysLine } from './play/words.js';
 
 const VIEW_H = 180;      // the scene is this many sprite pixels high: one background layer (320 x 180) fills it
 const HEARD_MAX = 60;
 const BOSS_HP = 8;
-
-// what each kind of thing does, in the list under the scene
-const ROLE_NOTE = {
-  player: 'You move this one.',
-  npc: 'Walks around by itself, and talks when you stand next to it.',
-  creature: 'Moves by itself. Your action hurts it; hit it enough and it is gone.',
-  pickup: 'Walk into it to collect it.',
-  prop: 'Stands in the scene. Use your action next to it to play its next move.',
-  effect: 'Plays in the scene, and where your hits land.',
-  projectile: 'Flies out when you use your action.',
-  tiles: 'Makes the ground.',
-  background: 'Scrolls behind the scene.',
-  display: 'Shown in the on-screen display.',
-};
 
 export async function playPage(app) {
   document.title = 'Playground · Loadout';
@@ -105,7 +93,7 @@ export async function playPage(app) {
     const stops = [];
 
     if (plan.empty) {
-      main.replaceChildren(...emptyView());
+      main.replaceChildren(...emptyView(missing));
       return { stop() {}, state: () => blankState() };
     }
 
@@ -166,14 +154,17 @@ export async function playPage(app) {
       const input = createInput({ pad });
       stops.push(() => input.destroy());
 
-      // the on-screen display: the counter and the player's health, then the bag's interface pieces and icons
+      // score and health: what was collected (when there is something to collect) and the player's health,
+      // then the bag's interface pieces and icons
       const countText = el('strong', {}, '0'), healthText = el('strong', {}, '');
       const firstPickup = kinds.find((k) => k.role === 'pickup');
-      const count = el('span', { class: 'play-count play-collected' }, firstPickup ? picture(painter, firstPickup.key, drawn[firstPickup.key].sprite, firstPickup.rest) : null, 'Collected: ', countText);
+      const count = firstPickup ? el('span', { class: 'play-count play-collected' }, picture(painter, firstPickup.key, drawn[firstPickup.key].sprite, firstPickup.rest), 'Collected: ', countText) : null;
       const health = player ? el('span', { class: 'play-count play-health' }, 'Health: ', healthText) : null;
       const healthNow = () => (world.player ? { hp: world.player.hp, max: player.hp } : { hp: 3, max: 3 });
       const pieces = plan.display.map((key) => displayPiece(painter, key, byKey[key].row.name, drawn[key].sprite, drawn[key].params, healthNow));
-      const hud = el('div', { class: 'play-hud', 'aria-label': 'On-screen display' }, el('span', { class: 'play-hud-title' }, 'On-screen display'), count, health, pieces.map((p) => p.node));
+      const hud = count || health || pieces.length
+        ? el('div', { class: 'play-hud', 'aria-label': 'Score and health' }, el('span', { class: 'play-hud-title' }, 'Score and health'), count, health, pieces.map((p) => p.node))
+        : null;
 
       // tools
       const pauseBtn = el('button', { type: 'button', class: 'ghost', onclick: () => { keep.paused = !keep.paused; syncPause(); } });
@@ -188,24 +179,26 @@ export async function playPage(app) {
       const tools = el('div', { class: 'play-tools' },
         muteBtn, pauseBtn,
         el('button', { type: 'button', class: 'ghost', onclick: () => { resetWorld(world); free.x = level.start.x; free.y = level.start.y; cam = null; syncCounts(); } }, 'Reset the scene'),
-        extras.length ? el('span', { class: 'play-extras' }, el('span', { class: 'label' }, 'More moves'),
+        extras.length ? el('span', { class: 'play-extras' }, el('span', { class: 'label' }, 'Other moves'),
           el('span', { class: 'pills small' }, extras.map((action) => el('button', { type: 'button', class: 'pill', onclick: () => { pendingClip = action; } }, labelOf(action))))) : null);
 
-      const keys = [];
-      if (player && top) keys.push('Arrow keys or W, A, S and D to walk. X for your action.');
-      else if (player) keys.push('Arrow keys or A and D to walk. Space to jump. X for your action.');
-      else keys.push('Arrow keys move the view.');
-      if (has('block')) keys.push('C to block.');
-      if (has('dodge')) keys.push('V to dodge.');
-      if (player) keys.push('Hold Shift to run. On a phone, use the buttons under the scene.');
-      const keysLine = el('p', { class: 'play-keys' }, keys.join(' '));
+      const keysNote = el('p', { class: 'play-keys' }, keysLine({ mode: plan.mode, player: !!player, block: has('block'), dodge: has('dodge') }));
+      // one line for someone who has never played on a keyboard, from what is really in the scene
+      const nameOf = (test) => { const k = kinds.find(test); return k ? byKey[k.key].row.name : null; };
+      const tip = howTo({
+        mode: plan.mode, player: !!player, ledges: !top,
+        pickup: nameOf((k) => k.role === 'pickup'), enemy: nameOf((k) => k.hittable && k.key !== plan.player), prop: nameOf((k) => k.role === 'prop'),
+      });
+      const howNote = tip ? el('p', { class: 'play-howto' }, tip) : null;
 
       // what is in the scene, with add one / remove one
       const counters = [];
       const syncCounts = () => { for (const [key, node] of counters) node.textContent = String(countOf(world, key)); };
       const rows = entries.filter((e) => e.sprite).map((e) => {
         const role = plan.roles[e.key];
-        const row = el('li', {}, el('span', { class: 'play-name' }, e.row.name), el('span', { class: 'hint' }, ROLE_NOTE[role] ?? ''));
+        // a sprite the visitor changed says so, so it is clear this is their version and not the one in the catalogue
+        const mine = isCustom(e.sprite, e.settings) ? el('span', { class: 'play-tag' }, 'your version') : null;
+        const row = el('li', {}, el('span', { class: 'play-name' }, e.row.name, mine), el('span', { class: 'hint' }, roleNote(role, { player: !!player })));
         if (SCENE_ROLES.includes(role)) {
           const n = el('span', { class: 'play-n', 'aria-label': `${e.row.name} in the scene` });
           counters.push([e.key, n]);
@@ -224,9 +217,9 @@ export async function playPage(app) {
       if (top && plan.backgrounds.length) notes.push(el('p', { class: 'hint' }, 'Backgrounds show in side view only.'));
       if (missing) notes.push(el('p', { class: 'hint' }, `${missing} thing${missing === 1 ? '' : 's'} in your bag could not be found, so ${missing === 1 ? 'it is' : 'they are'} not here.`));
 
-      blocks.push(el('div', { class: 'play-card' }, hud, wrap, pad, tools, keysLine));
+      blocks.push(el('div', { class: 'play-card' }, hud, wrap, pad, tools, howNote, keysNote));
       blocks.push(el('section', { class: 'play-things' }, el('h2', {}, 'In the scene'),
-        choice('Play as', 'player', plan.players), choice('Behind the scene', 'background', plan.backgrounds),
+        choice('Play as', 'player', plan.players), choice('Background', 'background', plan.backgrounds),
         el('ul', {}, rows), notes));
 
       // ---- the loop
@@ -364,10 +357,18 @@ export async function playPage(app) {
     return { mode: null, player: null, things: [], collected: 0, paused: keep.paused, muted: !soundState.on, heard: [...heard], heardTotal, music: false };
   }
 
-  function emptyView() {
+  function emptyView(missing = 0) {
     const bundles = currentCatalog()?.bundles ?? [];
     const playable = (b) => b.sprites.some((id) => assetById(id)?.role === 'characters/player');
     const bundle = bundles.find(playable) ?? bundles[0];
+    if (missing) {
+      // the bag is not empty: what is in it is no longer on the site (an old link, a renamed asset)
+      return [
+        el('h1', { class: 'small' }, 'Playground'),
+        el('p', { class: 'lede' }, `${missing === 1 ? 'The one thing' : `None of the ${missing} things`} in your bag could be found on the site any more, so there is nothing to try here. Take ${missing === 1 ? 'it' : 'them'} out of your bag and add something from the catalogue.`),
+        el('p', { class: 'play-foot' }, el('a', { class: 'btn', href: '#/bag' }, 'Open your bag'), el('a', { class: 'btn plain', href: '#/' }, 'Browse everything')),
+      ];
+    }
     return [
       el('h1', { class: 'small' }, 'Playground'),
       el('p', { class: 'lede' }, 'Your bag is empty, so there is nothing to try yet. Put a character, some creatures, things to collect, sounds or music in your bag, then come back here to see and hear them together before you download them.'),
@@ -403,12 +404,6 @@ export async function playPage(app) {
 
 // ---- small pictures for the on-screen display ----------------------------------------------------------
 
-const pieceScale = (sprite) => (Math.max(sprite.size[0], sprite.size[1]) <= 32 ? 2 : 1);     // always a whole number
-function pieceCanvas(sprite, name, cells = 1) {
-  const s = pieceScale(sprite);
-  return el('canvas', { class: 'play-pic', width: sprite.size[0] * s * cells, height: sprite.size[1] * s, role: 'img', 'aria-label': name, title: name });
-}
-
 /** One still frame of a sprite, at a whole-number size. */
 function picture(painter, key, sprite, clip) {
   const scale = sprite.size[1] <= 20 ? 2 : 1;
@@ -419,81 +414,74 @@ function picture(painter, key, sprite, clip) {
   return cv;
 }
 
+const pieceScale = (sprite) => (Math.max(sprite.size[0], sprite.size[1]) <= 32 ? 2 : 1);     // always a whole number
+
 /**
- * An interface piece or icon in the on-screen display, by its clip names (docs/style-guide.md section 8):
- *   frame + fill              a bar: the fill is cropped to the player's health
- *   <name>-full, <name>-empty glyphs: one for each point of the player's health
- *   normal, hover, pressed    a button: it shows the state under the pointer
- *   several one-frame clips   an icon or glyph set: every clip, side by side
- *   anything else             its resting clip, animated
+ * An interface piece or icon in the "Score and health" strip. What it shows comes from its clip names
+ * (app/play/display.js): a bar filled to the player's health inside its opening, glyphs for each point of
+ * health, a button with its states, or a set: every clip side by side. Each clip is its own small canvas,
+ * so a long set wraps onto the next line instead of pushing the page wider than the screen.
  * health(): { hp, max } now.
  */
 function displayPiece(painter, key, name, sprite, params, health) {
-  const names = Object.keys(sprite.clips);
+  const plan = displayPlan(sprite.clips);
   const s = pieceScale(sprite), [w, h] = sprite.size;
+  const node = el('span', { class: 'play-piece', role: 'img', 'aria-label': name, title: name });
+  const cell = () => { const cv = el('canvas', { class: 'play-pic', width: w * s, height: h * s }); node.append(cv); return cv.getContext('2d'); };
   const frameOf = (clip, time) => {
     const c = sprite.clips[clip], fps = clipFps(sprite, clip, params);
     return c.frames > 1 ? (c.loop ? Math.floor(time * fps) % c.frames : Math.min(c.frames - 1, Math.floor(time * fps) % (c.frames + fps))) : 0;
   };
-  const paint = (g, clip, f, cell = 0, crop = 1) => {
+  // draw columns x .. x + cw of one frame (the whole frame when not given)
+  const paint = (g, clip, f, x = 0, cw = w) => {
     g.imageSmoothingEnabled = false;
-    const cw = Math.round(w * crop);
-    if (cw > 0) g.drawImage(painter.frame(key, clip, f), 0, 0, cw, h, cell * w * s, 0, cw * s, h * s);
+    if (cw > 0) g.drawImage(painter.frame(key, clip, f), x, 0, cw, h, x * s, 0, cw * s, h * s);
   };
+  const wipe = (g) => g.clearRect(0, 0, w * s, h * s);
+  let shown = null;
+  const changed = (id) => { if (id === shown) return false; shown = id; return true; };
 
-  if (names.includes('frame') && names.includes('fill')) {
-    const cv = pieceCanvas(sprite, name), g = cv.getContext('2d');
-    let shown = '';
-    return { node: cv, tick() {
-      const { hp, max } = health(), id = hp + '/' + max;
-      if (id === shown) return;
-      shown = id;
-      g.clearRect(0, 0, cv.width, cv.height);
-      paint(g, 'frame', 0);
-      paint(g, 'fill', 0, 0, Math.max(0, hp) / Math.max(1, max));
+  if (plan.kind === 'bar') {
+    // the housing says where its trough is (the sprite's `slice`, Contract 8); the fill strip is cut to the health
+    const opening = clipStretch(sprite, plan.frame, params)?.opening ?? null;
+    const g = cell();
+    return { node, tick() {
+      const { hp, max } = health();
+      if (!changed(hp + '/' + max)) return;
+      const span = fillSpan(opening, w, Math.max(0, hp) / Math.max(1, max));
+      wipe(g); paint(g, plan.frame, 0); paint(g, plan.fill, 0, span.x, span.w);
     } };
   }
-
-  const full = names.find((n) => n.endsWith('-full') && names.includes(n.slice(0, -5) + '-empty'));
-  if (full) {
-    const empty = full.slice(0, -5) + '-empty';
-    const cv = pieceCanvas(sprite, name, health().max), g = cv.getContext('2d');
-    let shown = '';
-    return { node: cv, tick() {
-      const { hp, max } = health(), id = hp + '/' + max;
-      if (id === shown) return;
-      shown = id;
-      g.clearRect(0, 0, cv.width, cv.height);
-      for (let i = 0; i < max; i++) paint(g, i < hp ? full : empty, 0, i);
+  if (plan.kind === 'glyphs') {
+    const cells = Array.from({ length: health().max }, cell);
+    return { node, tick() {
+      const { hp } = health();
+      if (!changed(hp)) return;
+      cells.forEach((g, i) => { wipe(g); paint(g, i < hp ? plan.full : plan.empty, 0); });
     } };
   }
-
-  if (names.includes('normal')) {
-    const cv = pieceCanvas(sprite, name), g = cv.getContext('2d');
-    let clip = 'normal', over = false, shown = '';
-    const pickNow = (pressed) => { clip = pressed && names.includes('pressed') ? 'pressed' : over && names.includes('hover') ? 'hover' : 'normal'; };
-    cv.addEventListener('pointerenter', () => { over = true; pickNow(false); });
-    cv.addEventListener('pointerleave', () => { over = false; pickNow(false); });
-    cv.addEventListener('pointerdown', () => pickNow(true));
-    cv.addEventListener('pointerup', () => pickNow(false));
-    return { node: cv, tick(time) {
-      const id = clip + ':' + frameOf(clip, time);
-      if (id === shown) return;
-      shown = id;
-      g.clearRect(0, 0, cv.width, cv.height);
-      paint(g, clip, frameOf(clip, time));
+  if (plan.kind === 'button') {
+    const g = cell();
+    let clip = plan.rest, over = false;
+    const pickNow = (pressed) => { clip = pressed && plan.pressed ? plan.pressed : over && plan.hover ? plan.hover : plan.rest; };
+    node.addEventListener('pointerenter', () => { over = true; pickNow(false); });
+    node.addEventListener('pointerleave', () => { over = false; pickNow(false); });
+    node.addEventListener('pointerdown', () => pickNow(true));
+    node.addEventListener('pointerup', () => pickNow(false));
+    return { node, tick(time) {
+      const f = frameOf(clip, time);
+      if (!changed(clip + ':' + f)) return;
+      wipe(g); paint(g, clip, f);
     } };
   }
-
-  // a set (several clips) shows them all; a single piece shows its resting clip
-  const list = names.length > 1 && names.every((n) => sprite.clips[n].frames === 1) ? names.slice(0, 12) : [restClip(names, sprite.preview)];
-  const cv = pieceCanvas(sprite, name, list.length), g = cv.getContext('2d');
-  let shown = '';
-  return { node: cv, tick(time) {
-    const id = list.map((clip) => frameOf(clip, time)).join(',');
-    if (id === shown) return;
-    shown = id;
-    g.clearRect(0, 0, cv.width, cv.height);
-    list.forEach((clip, i) => paint(g, clip, frameOf(clip, time), i));
+  // a set: every clip (none left out), each on its own canvas; the ones that move, move
+  const cells = plan.clips.map((clip) => ({ clip, g: cell(), f: -1 }));
+  return { node, tick(time) {
+    for (const c of cells) {
+      const f = frameOf(c.clip, time);
+      if (f === c.f) continue;
+      c.f = f;
+      wipe(c.g); paint(c.g, c.clip, f);
+    }
   } };
 }

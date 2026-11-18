@@ -371,6 +371,11 @@ input[type='range']::-moz-range-thumb { width: 14px; height: 18px; border-radius
 .play-count { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; background: var(--paper); border: var(--line); padding: 2px 10px 2px 6px; min-height: 36px; }
 .play-count strong { font: 700 20px/1 var(--display); min-width: 1.2em; }
 .play-pic { flex: none; }
+/* an interface piece: one small canvas for each clip, wrapping so a long set never makes the page wider than the screen */
+.play-piece { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px; max-width: 100%; min-width: 0; }
+.play-piece .play-pic { max-width: 100%; height: auto; }
+.play-tag { display: inline-block; margin-left: 8px; padding: 0 6px; font: 700 12px/1.5 var(--body); color: var(--grape); border: 2px solid var(--grape); text-transform: uppercase; letter-spacing: 0.03em; vertical-align: middle; white-space: nowrap; }
+.play-howto { margin: 8px 0 0; font-weight: 600; }
 .play-stage-wrap { width: 100%; overflow: hidden; background: var(--ink); border: var(--line); line-height: 0; }
 .play-stage { margin: 0 auto; max-width: 100%; }
 .play-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 18px; margin-top: 10px; }

@@ -63,6 +63,18 @@ test('top-down: the look-up order is action_direction, action_down, action, idle
   assert.equal(top(WALKER, 'die', 'up'), null);
 });
 
+test('top-down: action_down is tried before the plain action, and the direction before both', () => {
+  // all three are there: each step of the order must win over the next
+  const all = ['idle_down', 'walk_up', 'walk_down', 'walk'];
+  is(top(all, 'walk', 'up'), 'walk_up');
+  is(top(['idle_down', 'walk_down', 'walk'], 'walk', 'up'), 'walk_down');
+  is(top(['idle_down', 'walk', 'walk_down'], 'walk', 'left'), 'walk_down');
+  is(top(['idle_down', 'walk'], 'walk', 'up'), 'walk');
+  is(top(['idle_down', 'idle', 'attack', 'attack_down'], 'action', 'up'), 'attack_down');
+  is(top(['idle', 'idle_down'], 'idle', 'up'), 'idle_down');
+  is(lookupClip(['roar', 'roar_down'], 'roar', { mode: 'top', dir: 'left', view: 'top-down' }), 'roar_down');
+});
+
 test('top-down: a sprite with no direction clips uses its plain clips', () => {
   // a blob or a drone looks the same from every side: nothing is mirrored
   is(top(BLOB, 'walk', 'left', -1), 'hop');

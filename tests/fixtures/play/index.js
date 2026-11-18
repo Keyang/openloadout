@@ -8,8 +8,12 @@ import tilesSide from './tiles-side.js';
 import tilesTop from './tiles-top.js';
 import backdrop from './backdrop.js';
 
-export { walker, tilesSide, tilesTop, backdrop };
-export const all = [walker, tilesSide, tilesTop, backdrop];
+import { icons, bar, menu } from './ui.js';
+
+export { walker, tilesSide, tilesTop, backdrop, icons, bar, menu };
+export const all = [walker, tilesSide, tilesTop, backdrop, icons, bar, menu];
+/** Interface pieces for the score and health strip. */
+export const display = [icons, bar, menu];
 /** A top-down scene: the walker as the player in the fixture room. */
 export const topDown = [walker, tilesTop];
 /** Extras for a side-view scene: ground tiles and background layers. */

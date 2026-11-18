@@ -161,6 +161,39 @@ test('a decal goes where its clip says: on a fill tile, above a top tile or unde
   for (const d of of('moss-deco-c')) assert.match(tileAt(tiles, d.x / 32, d.y / 32 - 1)[0], /^moss-bottom/);
 });
 
+test('every prefix with thin pieces gets a platform, and every cap, mid, foot set stands as a column', () => {
+  const ground = setOf('g', [...block('grass'), 'grass-thin-l', 'grass-thin-m', 'grass-thin-r']);
+  const extra = setOf('p', ['plank-thin-l', 'plank-thin-m', 'plank-thin-r', 'ladder-cap', 'ladder-mid', 'ladder-foot', 'vine-cap', 'vine-mid', 'vine-foot', 'post-cap', 'post-mid']);
+  const index = tileIndex([ground, extra]);
+  const set = sideSet(index);
+  assert.deepEqual(set.thins.map((b) => b.prefix), ['grass', 'plank'], "the ground's own platform first, then every other");
+  assert.deepEqual(set.stacks.map((b) => b.prefix), ['ladder', 'vine', 'post']);
+  const features = levelFeatures(index, 'side');
+  assert.deepEqual([features.thins, features.stacks], [2, 3]);
+  const level = makeLevel('side', features);
+  assert.equal(level.thins.length, 2, 'a second floating platform');
+  assert.equal(level.stacks.length, 3);
+  const { tiles } = levelTiles(level, index);
+  const has = (clip) => tiles.filter((t) => t.clip === clip).length;
+  assert.ok(has('grass-thin-m') && has('plank-thin-m') && has('plank-thin-l') && has('plank-thin-r'));
+  for (const clip of ['ladder-cap', 'ladder-mid', 'ladder-foot', 'vine-cap', 'vine-mid', 'vine-foot', 'post-cap', 'post-mid']) assert.ok(has(clip), clip + ' is placed');
+  // a column stands on the ground: foot at the bottom (or mid when there is no foot), cap on top, in one column of empty cells
+  for (const [prefix, bottom] of [['ladder', 'ladder-foot'], ['post', 'post-mid']]) {
+    const col = tiles.filter((t) => t.clip.startsWith(prefix + '-')).sort((a, b) => a.y - b.y);
+    assert.equal(new Set(col.map((t) => t.x)).size, 1);
+    assert.equal(col[0].clip, prefix + '-cap');
+    assert.equal(col.at(-1).clip, bottom);
+    assert.equal(col.at(-1).y + 32, surfaceBelow(level, col[0].x + 16, col.at(-1).y).y, 'its foot is on the ground');
+    for (const t of col) assert.equal(solidAt(level, t.x + 16, t.y + 16), false);
+  }
+  // the second platform can be stood on, and nothing else was moved
+  const second = level.thins[1];
+  assert.equal(surfaceBelow(level, (second.x0 + second.x1) / 2, second.y - 10).y, second.y);
+  assert.deepEqual(makeLevel('side').thins, [level.thins[0]]);
+  // with only the extra tileset in the bag its platform is the first one
+  assert.deepEqual(sideSet(tileIndex([extra])).thins.map((b) => b.prefix), ['plank']);
+});
+
 test('several tilesets in the bag are used together, and a second ground is laid over the floor', () => {
   const index = tileIndex([setOf('a', ['grass-fill', ...block('path'), 'grass-deco-a']), setOf('b', block('wall')), setOf('c', block('water'))]);
   const set = topSet(index);
@@ -187,21 +220,27 @@ test('smaller tiles make the same sized scene', () => {
 });
 
 // The first real tilesets, when they are there (they are being made alongside the playground).
-for (const id of ['tiles-forest', 'tiles-platforms']) {
-  const file = new URL(`../../sprites/${id}.js`, import.meta.url);
-  test(`the real tileset ${id} tiles a side-view level with no fallbacks for the block`, { skip: !fs.existsSync(file) && `sprites/${id}.js is not there yet` }, async () => {
-    const def = (await import(file.href)).default;
-    const index = tileIndex([setOf(id, Object.keys(def.clips), def.size[0])]);
-    const set = sideSet(index);
-    assert.ok(set.ground || set.thin, 'it has a block or thin platforms');
-    const level = makeLevel('side', levelFeatures(index, 'side'));
-    const { tiles } = levelTiles(level, index);
-    assert.ok(tiles.length > 0);
-    for (const t of tiles) assert.ok(def.clips[t.clip], `${t.clip} is one of its clips`);
-    if (set.ground && BLOCK.every((s) => set.ground.pieces[s])) {
-      const at = (c, r) => tileAt(tiles, c, r)[0], p = set.ground.prefix;
-      assert.deepEqual([at(13, 5), at(13, 6), at(13, 7), at(1, 8), at(19, 4)], [`${p}-left`, `${p}-side-l`, `${p}-inner-tl`, `${p}-fill`, `${p}-bottom`]);
-    }
-    if (set.thin) assert.ok(tiles.some((t) => /-thin-m$/.test(t.clip)));
-  });
-}
+const real = (id) => new URL(`../../sprites/${id}.js`, import.meta.url);
+const load = async (id) => { const def = (await import(real(id).href)).default; return { def, set: { key: id, names: Object.keys(def.clips), size: def.size[0], clips: def.clips } }; };
+
+test('the real tileset tiles-forest tiles a side-view level with no fallbacks for the block', { skip: !fs.existsSync(real('tiles-forest')) && 'sprites/tiles-forest.js is not there yet' }, async () => {
+  const { def, set: forest } = await load('tiles-forest');
+  const index = tileIndex([forest]);
+  const set = sideSet(index);
+  const level = makeLevel('side', levelFeatures(index, 'side'));
+  const { tiles } = levelTiles(level, index);
+  for (const t of tiles) assert.ok(def.clips[t.clip], `${t.clip} is one of its clips`);
+  assert.ok(BLOCK.every((s) => set.ground.pieces[s]));
+  const at = (c, r) => tileAt(tiles, c, r)[0], p = set.ground.prefix;
+  assert.deepEqual([at(13, 5), at(13, 6), at(13, 7), at(1, 8), at(19, 4)], [`${p}-left`, `${p}-side-l`, `${p}-inner-tl`, `${p}-fill`, `${p}-bottom`]);
+});
+
+test('tiles-forest and tiles-platforms together: both platforms, the ladder, the vine and the post all appear', { skip: !(fs.existsSync(real('tiles-forest')) && fs.existsSync(real('tiles-platforms'))) && 'the two real tilesets are not both there yet' }, async () => {
+  const forest = await load('tiles-forest'), platforms = await load('tiles-platforms');
+  const index = tileIndex([forest.set, platforms.set]);
+  const level = makeLevel('side', levelFeatures(index, 'side'));
+  const { tiles } = levelTiles(level, index);
+  const used = new Set(tiles.filter((t) => t.key === 'tiles-platforms').map((t) => t.clip));
+  for (const clip of Object.keys(platforms.def.clips)) assert.ok(used.has(clip), `${clip} of tiles-platforms is placed`);
+  assert.ok(tiles.some((t) => t.key === 'tiles-forest' && /-thin-m$/.test(t.clip)), 'and the forest keeps its own platform');
+});

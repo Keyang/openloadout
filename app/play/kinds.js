@@ -3,7 +3,7 @@
 // big its body is, where it stands, where a projectile leaves it. The scene itself (world.js)
 // then needs no sprite code.
 // Pure JavaScript: no DOM.
-import { cleanParams, clipFps, renderFrame, frameSockets, cueInEffect } from '../../engine/sprite.js';
+import { cleanParams, defaultParams, clipFps, renderFrame, frameSockets, cueInEffect } from '../../engine/sprite.js';
 import { clipSpeed, restClip, actionOf, STATES } from './clips.js';
 
 /**
@@ -27,6 +27,19 @@ export function activeCues(sprite, stored, params) {
 /** The ids of the sounds a sprite plays at these settings. */
 export function soundIdsOf(sprite, stored, params) {
   return [...new Set(Object.values(activeCues(sprite, stored, cleanParams(sprite, params ?? {}))).flat().map((c) => c.sound))];
+}
+
+/**
+ * True when the visitor changed this sprite: a control away from where it was made, or sounds that are not the
+ * sprite's own. settings: the bag item's { params, cues }.
+ */
+export function isCustom(sprite, settings = {}) {
+  const made = defaultParams(sprite), now = cleanParams(sprite, settings?.params ?? {});
+  if (Object.keys(made).some((k) => made[k] !== now[k])) return true;
+  const stored = settings?.cues;
+  if (!stored || typeof stored !== 'object') return false;
+  const plain = (list) => JSON.stringify(list.map((c) => [c.sound, c.frame, c.preset ?? null, c.params ?? null, c.volume ?? 1]));
+  return Object.keys(sprite.clips).some((clip) => Array.isArray(stored[clip]) && plain(stored[clip]) !== plain(sprite.sounds?.[clip] ?? []));
 }
 
 /**

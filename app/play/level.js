@@ -11,6 +11,8 @@
 //                <p>-inner-tl -tr -bl -br                inside corners
 //   platforms:   <p>-thin-l <p>-thin-m <p>-thin-r        one tile high, stood on from above
 //   slopes:      <p>-slope-up <p>-slope-down             45 degrees, rising and falling to the right
+//   columns:     <p>-cap <p>-mid <p>-foot                things that repeat up and down (a ladder, a vine, a post):
+//                                                        one column of each stands in a side-view scene
 //   decals:      <p>-deco-a ...                          scattered over fill tiles of the same prefix; a decal whose clip
 //                                                        says place 'above' or 'below' (engine/tiles.js decoClips) goes in
 //                                                        the empty cell above a top tile or under a bottom tile instead
@@ -19,9 +21,9 @@
 //   Top-down, which block is what: a prefix with only <p>-fill is the floor; a prefix containing
 //   "wall" is the wall; a prefix starting pit, water, hole, void, lava, acid or pool is a hole
 //   (it blocks the way); any other block is a second ground laid over the floor.
-//   Which block is the side-view ground: the first with both -top and -fill. Platforms: the first prefix with
-//   -thin-m (the ground's own if it has one). Slopes: the first prefix with both slopes.
-//   Other clip names (pillar-cap, ladder-mid, bridge-h, stairs-down, ...) are not placed.
+//   Which block is the side-view ground: the first with both -top and -fill. Platforms: every prefix with
+//   -thin-m gets a floating platform of its own (the ground's first). Slopes: the first prefix with both slopes.
+//   Other clip names (bridge-h, stairs-down, window, ...) are not placed.
 // Pure JavaScript: no DOM.
 import { hash } from '../../engine/motion.js';
 
@@ -29,17 +31,21 @@ export const UNIT = 32;
 const EMPTY = 0, SOLID = 1, UP = 2, DOWN = 3;     // side view cells (UP: a slope rising to the right)
 const FLOOR = 0, WALL = 1, HOLE = 2, PATH = 3;     // top-down cells
 const SIDE = { cols: 24, rows: 9 };                // in 32 px units
+const THIN_SPOTS = [[4, 6, 5], [9, 11, 3], [21, 23, 5], [0, 2, 3]];     // floating platforms: first column, last column, row
+const STACK_COLS = [2, 12, 17, 7];                 // where columns (ladders, vines, posts) stand
 const TOP = { cols: 20, rows: 12 };
 
 /**
  * The level for a mode.
  *   tile: the tile size (the tileset's frame width; 32 with no tileset).
  *   slopes: build the mound (side view). hole, path: build the pit and the patch of second ground (top-down).
+ *   thins: how many floating platforms (side view; one for each kind of platform in the bag, at least one).
+ *   stacks: how many columns to stand (side view; one for each ladder, vine or post in the bag).
  * side: { mode, tile, cols, rows, width, height, groundY, cells, thins: [{ c0, c1, r, x0, x1, y }], start, spots }
  * top:  { mode, tile, cols, rows, width, height, cells, start, spots }
  * spots: { pickup, prop, mover }: where the first things of each sort are put ({ x, y } of their ground point).
  */
-export function makeLevel(mode, { tile = UNIT, slopes = false, hole = false, path = false } = {}) {
+export function makeLevel(mode, { tile = UNIT, slopes = false, hole = false, path = false, thins = 1, stacks = 0 } = {}) {
   const T = Math.max(8, Math.round(tile));
   const k = Math.max(1, Math.round(UNIT / T));        // cells for each 32 px unit
   const size = mode === 'top' ? TOP : SIDE;
@@ -73,7 +79,10 @@ export function makeLevel(mode, { tile = UNIT, slopes = false, hole = false, pat
   level.slopes = !!slopes && k === 1;
   if (level.slopes) { box(8, 6, 8, 6, UP); box(9, 6, 10, 6, SOLID); box(11, 6, 11, 6, DOWN); }
   level.groundY = 7 * U;
-  level.thins = [{ c0: 4 * k, c1: 7 * k - 1, r: 5 * k, x0: 4 * U, x1: 7 * U, y: 5 * U }];
+  // floating platforms: the first is always there; the others only when the bag has more kinds of platform
+  level.thins = THIN_SPOTS.slice(0, Math.max(1, Math.min(THIN_SPOTS.length, thins))).map(([c0, c1, r]) => ({ c0: c0 * k, c1: (c1 + 1) * k - 1, r: r * k, x0: c0 * U, x1: (c1 + 1) * U, y: r * U }));
+  // columns three tiles tall, standing on the ground in the gaps between the other things
+  level.stacks = k === 1 ? STACK_COLS.slice(0, Math.max(0, stacks)).map((c) => ({ c, r0: 4, r1: 6 })) : [];
   level.start = { x: 40, y: level.groundY };
   const on = (x, from = 0) => ({ x, y: surfaceBelow(level, x, from).y });
   const low = level.groundY - 40;                      // "on the ground": below the platforms
@@ -89,7 +98,8 @@ export function makeLevel(mode, { tile = UNIT, slopes = false, hole = false, pat
 export function levelFeatures(index, mode) {
   if (!index) return { tile: UNIT };
   if (mode === 'top') { const s = topSet(index); return { tile: index.tile, hole: !!s.hole, path: !!s.path }; }
-  return { tile: index.tile, slopes: !!sideSet(index).slope };
+  const set = sideSet(index);
+  return { tile: index.tile, slopes: !!set.slope, thins: Math.max(1, set.thins.length), stacks: set.stacks.length };
 }
 
 // ---- where things can stand ---------------------------------------------------------------------
@@ -166,7 +176,7 @@ export function hitsWall(level, x0, y0, x1, y1) {
 
 // ---- tiles ------------------------------------------------------------------------------------------
 
-const SUFFIX = /-(inner-(?:tl|tr|bl|br)|bottom-(?:l|r)|side-(?:l|r)|thin-(?:l|m|r)|slope-(?:up|down)|deco-[a-z0-9]+|fill|top|left|right|bottom)$/;
+const SUFFIX = /-(inner-(?:tl|tr|bl|br)|bottom-(?:l|r)|side-(?:l|r)|thin-(?:l|m|r)|slope-(?:up|down)|deco-[a-z0-9]+|fill|top|left|right|bottom|cap|mid|foot)$/;
 const HOLE_NAME = /^(pit|water|hole|void|lava|acid|pool)/;
 const WALL_NAME = /wall/;
 // a missing piece falls back to the nearest one it can stand in for
@@ -175,6 +185,7 @@ const FALLBACK = {
   'side-l': ['fill'], 'side-r': ['fill'], bottom: ['fill'], 'bottom-l': ['bottom', 'side-l', 'fill'], 'bottom-r': ['bottom', 'side-r', 'fill'],
   'inner-tl': ['fill'], 'inner-tr': ['fill'], 'inner-bl': ['fill'], 'inner-br': ['fill'],
   'thin-l': ['thin-m', 'left', 'top'], 'thin-m': ['top'], 'thin-r': ['thin-m', 'right', 'top'],
+  cap: ['mid', 'foot'], mid: ['cap', 'foot'], foot: ['mid', 'cap'],
 };
 
 /**
@@ -213,15 +224,22 @@ function pieceOf(block, name) {
 }
 const isBlock = (b) => !!(b.pieces.top || b.pieces.fill);
 
-/** Side view: which blocks make the ground, the thin platforms and the slopes. */
+/**
+ * Side view: which blocks make the ground, the thin platforms, the slopes and the columns.
+ * thins: every prefix with thin pieces, the ground's own first; each gets a floating platform, so every kind of
+ * platform in the bag is seen. stacks: every prefix with cap, mid or foot pieces (a ladder, a vine, a post).
+ */
 export function sideSet(index) {
   const real = index.blocks.filter(isBlock);
   const ground = real.find((b) => b.pieces.top && b.pieces.fill) ?? real[0] ?? null;
   const first = (test) => (ground && test(ground) ? ground : index.blocks.find(test) ?? null);
+  const hasThin = (b) => !!(b.pieces['thin-m'] || b.pieces['thin-l']);
+  const thins = index.blocks.filter(hasThin).sort((a, b) => (b === ground) - (a === ground));
   return {
-    ground,
-    thin: first((b) => b.pieces['thin-m'] || b.pieces['thin-l']),
+    ground, thins,
+    thin: thins[0] ?? null,
     slope: first((b) => b.pieces['slope-up'] && b.pieces['slope-down']),
+    stacks: index.blocks.filter((b) => b.pieces.cap || b.pieces.mid || b.pieces.foot),
   };
 }
 
@@ -312,10 +330,18 @@ export function levelTiles(level, index) {
       if (name.startsWith('bottom') && at(c, r + 1) === EMPTY && !thinHere(c, r + 1)) decal(set.ground, 'below', c, r + 1, 0.6);
     }
   }
-  const thin = set.thin ?? set.ground;
-  if (thin) for (const p of level.thins) {
+  // each floating platform is made of the next kind of platform in the bag (with none: of the ground's top pieces)
+  const kinds = set.thins?.length ? set.thins : set.ground ? [set.ground] : [];
+  if (kinds.length) level.thins.forEach((p, i) => {
+    const thin = kinds[i % kinds.length];
     for (let c = p.c0; c <= p.c1; c++) put(pieceOf(thin, c === p.c0 ? 'thin-l' : c === p.c1 ? 'thin-r' : 'thin-m'), c, p.r);
-  }
+  });
+  // one column of each ladder, vine or post: cap on top, foot on the ground, mid between
+  (level.stacks ?? []).forEach((col, i) => {
+    const stack = set.stacks?.[i];
+    if (!stack) return;
+    for (let r = col.r0; r <= col.r1; r++) put(pieceOf(stack, r === col.r0 ? 'cap' : r === col.r1 ? 'foot' : 'mid'), col.c, r);
+  });
   return { tiles, plain };
 }
 

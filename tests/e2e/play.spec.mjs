@@ -333,6 +333,66 @@ test('the real top-down hero walks its direction clips', async ({ page }) => {
   await expect.poll(async () => (await state(page)).player.clip).toBe('idle_side');
 });
 
+test('the two real tilesets together: the second one\'s platform and its ladder, vine and post are in the scene', async ({ page }) => {
+  test.skip(!exists('tiles-forest') || !exists('tiles-platforms'), 'the two real tilesets are not both there yet');
+  await openPlay(page, [HERO]);
+  await page.getByRole('button', { name: 'Pause' }).click();
+  await addSprites(page, ['tiles-forest']);
+  await page.waitForTimeout(300);
+  const one = await canvasStats(stage(page));
+  await addSprites(page, ['tiles-platforms']);
+  await expect.poll(async () => (await canvasStats(stage(page))).hash).not.toBe(one.hash);       // the column next to the start is on screen
+  expect((await state(page)).plan.tilesets.length).toBe(2);
+});
+
+test('interface pieces: a set shows every clip, a panel set its clips side by side, a bar is filled inside its opening', async ({ page }) => {
+  await openPlay(page, [HERO]);
+  await addFixtures(page, 'display');
+  const hud = page.locator('.play-hud');
+  await expect(hud).toContainText('Score and health');
+  await expect(hud.getByRole('img', { name: 'Test icons' }).locator('canvas')).toHaveCount(10);
+  const menu = hud.getByRole('img', { name: 'Test menu' }).locator('canvas');
+  await expect(menu).toHaveCount(2);
+  for (let i = 0; i < 2; i++) expect((await canvasStats(menu.nth(i))).opaque).toBeGreaterThan(50);
+  expect((await canvasStats(menu.nth(0))).hash).not.toBe((await canvasStats(menu.nth(1))).hash);
+  // full health: the fill covers the whole opening (50 of the bar's 64 columns) and nothing outside it
+  const fillColumns = await hud.getByRole('img', { name: 'Test bar' }).locator('canvas').evaluate((cv) => {
+    const d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data, cols = new Set();
+    for (let i = 0; i < d.length; i += 4) if (d[i] === 0x3f && d[i + 1] === 0xbf && d[i + 2] === 0x6f) cols.add((i / 4) % cv.width);
+    return [cols.size, Math.min(...cols), cv.width];
+  });
+  expect(fillColumns).toEqual([50, 6, 64]);
+});
+
+test('the page says only what can happen, and marks a sprite the visitor changed', async ({ page }) => {
+  await openPlay(page, [HERO, SLIME, COIN]);
+  await expect(page.locator('.play-howto')).toHaveText('Jump onto the ledges, collect the coins, press X next to the slime.');
+  await expect(page.locator('.play-keys')).toContainText('X to attack or use things');
+  await expect(page.locator('.play-collected')).toHaveCount(1);
+  await expect(page.locator('.play-things li', { hasText: 'Slime' })).toContainText('hurts it');
+  await expect(page.locator('.play-tag')).toHaveCount(0);
+
+  // no pickups: no "Collected"; a changed Hero is marked as the visitor's version
+  await openPlay(page, [{ kind: 'sprite', id: 'knight', settings: { params: { weapon: 'axe' }, cues: null, scale: 1 } }]);
+  await expect(page.locator('.play-collected')).toHaveCount(0);
+  await expect(page.locator('.play-health')).toBeVisible();
+  await expect(page.locator('.play-things li', { hasText: 'Hero' }).locator('.play-tag')).toHaveText(/your version/i);
+  await expect(page.locator('.play-howto')).toHaveText('Jump onto the ledges.');
+
+  // nobody to play: nothing is said about attacking, and there is no line about keys to press
+  await openPlay(page, [SLIME]);
+  await expect(page.locator('.play-things li', { hasText: 'Slime' })).not.toContainText(/hurt|attack/);
+  await expect(page.locator('.play-howto')).toHaveCount(0);
+  await expect(page.locator('.play-health')).toHaveCount(0);
+});
+
+test('a bag whose things can no longer be found does not say it is empty', async ({ page }) => {
+  await openPlay(page, [SPRITE('no-such-sprite'), SOUND('no-such-sound')]);
+  await expect(page.locator('main')).not.toContainText(/bag is empty/i);
+  await expect(page.locator('main')).toContainText(/could be found/);
+  await expect(page.locator('main a[href="#/bag"]')).toBeVisible();
+});
+
 test.describe('on a phone', () => {
   test.use({ viewport: { width: 375, height: 740 }, hasTouch: true });
 
@@ -353,5 +413,15 @@ test.describe('on a phone', () => {
     const box = await stage(page).boundingBox();
     expect(box.width).toBeLessThanOrEqual(375);
     expect(await hasHorizontalScroll(page)).toBe(false);
+  });
+
+  test('a long icon or glyph set wraps instead of making the page scroll sideways', async ({ page }) => {
+    await openPlay(page, [HERO, COIN]);
+    await addFixtures(page, 'display');
+    if (exists('ui-damage-digits')) await addSprites(page, ['ui-damage-digits']);
+    await expect(page.locator('.play-hud').getByRole('img', { name: 'Test icons' }).locator('canvas')).toHaveCount(10);
+    expect(await hasHorizontalScroll(page)).toBe(false);
+    const widest = await page.evaluate(() => Math.max(...[...document.querySelectorAll('.play-hud *')].map((n) => n.getBoundingClientRect().right)));
+    expect(widest).toBeLessThanOrEqual(375);
   });
 });

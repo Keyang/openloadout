@@ -7,6 +7,7 @@ import { applyColour } from '../../engine/theme.js';
 import { hexToRgb, rgbToHex, pack } from '../../engine/color.js';
 import { hash } from '../../engine/motion.js';
 import { levelTiles, surfaceBelow, CELL } from './level.js';
+import { layerSpeed, layerShift } from './layers.js';
 
 const mod = (a, n) => ((a % n) + n) % n;
 // what is drawn first (behind) to last (in front) in side view
@@ -18,9 +19,6 @@ const PLAIN = {
   floor: '#d9dfc0', floorSpeck: '#c6cea9', wallTop: '#8a7fa8', wallFace: '#5d557f', wallEdge: '#231b33', outside: '#2d2646',
   shade: '#231b33',
 };
-
-// how fast each background layer slides, as a share of the camera's speed (docs/style-guide.md section 7)
-const SCROLL = { far: 0.1, mid: 0.4, near: 0.7 };
 
 /**
  * sprites: { key: { sprite, params } } for every sprite entry that is drawn.
@@ -181,9 +179,9 @@ export function createPainter({ sprites, colour, tiles: tileSets = null }) {
         const c = sprite.clips[clip];
         const f = c.frames > 1 ? Math.floor(time * clipFps(sprite, clip, params)) % c.frames : 0;
         const img = frame(backgroundKey, clip, f);
-        const speed = SCROLL[clip] ?? (n === 1 ? 0.1 : 0.1 + (0.6 * i) / (n - 1));
+        const speed = layerSpeed(clip, i, n);
         const y = view.h - img.height + Math.round(rise * speed);
-        for (let x = -mod(Math.floor(cam.x * speed), img.width); x < view.w; x += img.width) g.drawImage(img, x, y);
+        for (let x = -layerShift(cam.x, speed, img.width); x < view.w; x += img.width) g.drawImage(img, x, y);
       });
       return;
     }
