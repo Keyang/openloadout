@@ -372,10 +372,13 @@ export function pose(action, direction, t, m = {}, d = dims()) {
       P.lunge = -2.6 * h; P.lean = -1.6 * h + 2.4 * knees; P.headDy = -1 * h + 3 * knees;
       P.bob = 1.4 * h + d.leg * 0.5 * knees; P.tuck = 0.5 * knees;
       P.tilt = keys(t, [[0.143, 0], [0.286, 0.22], [0.43, 0.5]]);        // tipping over towards where the head will lie
-      P.armF.u = 2.5 * h * (1 - knees); P.armF.o = 2 * h; P.armF.f = -1 * h;
+      // the held thing goes down with the body in one path: as the knees give way it is swung out to the weapon side,
+      // level with the ground, which is where it lies once the body is down (facing away it is let fall beside the legs)
+      const aside = up ? CARRY.low.up : -PI / 2 - 0.3;
+      P.armF.u = 2.5 * h * (1 - knees) + (up ? 0 : 4 * knees); P.armF.o = 2 * h + (up ? 0 : 1.5 * knees); P.armF.f = -1 * h;
       P.armB.u = 3 * h * (1 - knees); P.armB.o = 2.2 * h; P.armB.f = -1 * h;
       P.footF.o = 1 * h; P.footB.o = 1 * h;
-      P.item = turn(rest + (side ? 0.8 : up ? -0.6 : 0.6) * h, CARRY.low[direction], knees);
+      P.item = turn(rest + (side ? 0.8 : up ? -0.6 : 0.6) * h, aside, knees);
       P.sway = -h;
       P.flash = t < 0.1;
       P.eyes = 'shut';
@@ -384,9 +387,9 @@ export function pose(action, direction, t, m = {}, d = dims()) {
         const down = keys(t, [[0.571, 2], [0.714, 0], [0.857, 1], [1, 0]]);
         Object.assign(P, { lie: 1, tilt: 0, lunge: 0, lean: 0, headDy: 0, bob: 0, tuck: 0, lift: down, rootX: 0 });
         const flop = keys(t, [[0.571, 1], [0.714, 0.3], [0.857, 0.7], [1, 0]]);
-        P.armF = { f: 0, u: 1 + 3 * flop, o: 1.5 + flop }; P.armB = { f: 0, u: 2 * flop, o: 1 + flop };
+        P.armF = { f: 0, u: up ? 1 + 3 * flop : flop, o: 1.5 + flop }; P.armB = { f: 0, u: 2 * flop, o: 1 + flop };
         P.footF = { f: 0, u: 0, o: 0.6 + 0.8 * flop }; P.footB = { f: 0, u: 0, o: 0.4 };
-        P.item = (up ? 0.12 : -0.12) * (1 + 2 * flop);                   // dropped, lying along the legs
+        P.item = up ? 0.12 * (1 + 2 * flop) : -0.3 * (1 + 0.4 * flop);   // beside the body on the weapon side, pointing at the feet: the way it was swung out, turned with the body
         P.sway = flop;
       }
       break;
@@ -483,6 +486,9 @@ const tiltX = (P, d, gy, x, y) => x + P.tilt * (gy - y) - P.tilt * d.tall * 0.35
  * In `die` the body tips over and ends lying down: asked with solve()'s J (as a sprite's sockets() does), the points are
  * where they are in the frame; asked from inside a hook (with the J the hook was given) they are on the standing picture
  * the hook draws on. A game that mirrors a frame uses x' = 2 * pivotX - x and angle' = -angle.
+ * A lying body with something big on it (a pack, a shield) is moved by draw() to stay inside the frame; sockets asked
+ * afterwards of the same pose (F.draw(), then F.sockets()) move with it. Asked without drawing they are where the body
+ * would lie unmoved, a few pixels off for those looks.
  */
 export function sockets(J, P, d, opt = {}) {
   const r = P.reach ?? 1, len = (opt.muzzle ?? 6) * r;
@@ -498,7 +504,8 @@ export function sockets(J, P, d, opt = {}) {
   if (J.inner || !(P.lie || P.tilt)) return out;      // J.inner: asked from inside a hook, which draws on the standing picture
   if (!P.lie) { for (const sk of Object.values(out)) sk.x = tiltX(P, d, J.gy, sk.x, sk.y); return out; }
   const map = lieMap(P, d);
-  for (const sk of Object.values(out)) { [sk.x, sk.y] = map(sk.x, sk.y); sk.angle -= PI / 2; }
+  const [mx, my] = P.lieShift ?? [0, 0];      // set by draw() when the lying body had to be moved to stay in the frame
+  for (const sk of Object.values(out)) { [sk.x, sk.y] = map(sk.x, sk.y); sk.x += mx; sk.y += my; sk.angle -= PI / 2; }
   out.feet = { x: J.bx, y: GROUND, angle: 0 };
   return out;
 }
@@ -851,7 +858,17 @@ function drawLying(g, direction, P, d, look, C, hooks) {
   const J = solve(view, P, d);
   J.inner = true;
   drawFront(tmp, J, P, d, look, C, hooks, view === 'up');
-  const X0 = lieX0(P, d), Y0 = lieY0(P, d);
+  let X0 = lieX0(P, d), Y0 = lieY0(P, d);
+  // whatever the body wears or holds (a pack, a shield, a long gun) lies down with it: if any of it would leave the
+  // frame, the whole picture is moved back inside (2 px clear, one of them for the outline)
+  const b = tmp.bounds();
+  delete P.lieShift;
+  if (b) {
+    const lo = [X0 + GROUND - 1 - b.y1, Y0 + b.x0 - CX], hi = [X0 + GROUND - 1 - b.y0, Y0 + b.x1 - CX];
+    const into = (a, z, max) => (z > max - 3 ? Math.max(2 - a, max - 3 - z) : a < 2 ? 2 - a : 0);
+    const mx = into(lo[0], hi[0], g.w), my = into(lo[1], hi[1], g.h);
+    if (mx || my) { P.lieShift = [mx, my]; X0 += mx; Y0 += my; }
+  }
   for (let y = 0; y < tmp.h; y++) for (let x = 0; x < tmp.w; x++) {
     const v = tmp.data[y * tmp.w + x];
     if (!v) continue;
