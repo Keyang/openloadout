@@ -701,3 +701,569 @@ export function report(patch, { node = 'lF', layers } = {}) {
   for (const n of lint(patch)) lines.push(`style guide: ${n}`);
   return lines.join('\n');
 }
+
+// ---- electronic voices and effects (added with batch S21, derelict-run) --------------------------------------------
+//
+// What a synth track needs beside the drums and bass further down (kickDrum, hatDrum, sawBass ...): an echo in
+// time with the music, a clap, a plucked bass that is one pure saw, a wide pad, a riser. Each returns a list of
+// nodes for assemble(); the finished voice is <id>O (the pad: <id>L and <id>R), at a peak of about 1, so the gain
+// you write in the mix is its level. A pitch, a cutoff or a level may be a number or an expression.
+
+const inParens = (x) => (typeof x === 'number' ? num(x) : `(${x})`);
+const need = (what, value, name, hint) => { if (value === undefined || value === null || value === '') fail(`${what}: give ${name} (${hint})`); };
+
+/**
+ * An echo in time with the music: the sound comes back a number of 16th notes later, again and again, each repeat quieter.
+ * Arguments: id; input: the sound to repeat (an expression); { steps: the gap in 16ths (3, a dotted 8th; 4 is a
+ * beat); feedback: how much of each repeat makes the next, 0 to 0.9 (0.4); tone: a low-pass on the repeats in Hz,
+ * a number or an expression, to set them behind the sound (none) }.
+ * Returns nodes ending in <id>O: the repeats alone, without the sound itself (put them beside the dry sound in
+ * the mix, usually more to one side). The gap follows the Tempo control.
+ */
+export function tempoEcho(id, input, { steps = 3, feedback = 0.4, tone } = {}) {
+  const what = `tempoEcho "${id}"`;
+  need(what, input, 'the input', 'the sound to repeat, as the second argument');
+  if (!(steps > 0 && steps <= STEPS_PER_BAR)) fail(`${what}: steps is the gap in 16th notes, from 1 to ${STEPS_PER_BAR} (3 is a dotted 8th), got ${steps}`);
+  if (!(feedback >= 0 && feedback <= 0.9)) fail(`${what}: feedback must be from 0 to 0.9 (above that the repeats never die away), got ${feedback}`);
+  // the buffer must hold the gap at the slowest tempo a track may have: 32 bars in MAX_SECONDS
+  const slowest = (LENGTHS[LENGTHS.length - 1] * 240) / MAX_SECONDS;
+  // the gap is rounded to a whole number of samples and a half: the delay node reads outside its buffer (and gives
+  // NaN from then on) when a gap is a hair over a whole number of samples, which a tempo-timed gap often is
+  const delay = { id: tone === undefined ? `${id}O` : `${id}D`, type: 'delay', in: input, time: `(floor(${num(steps * 15)}/bpm*sr) + 0.5)/sr`, feedback, mix: 1, max: Math.ceil(((steps * 15) / slowest) * 100 + 1) / 100 };
+  return tone === undefined ? [delay] : [delay, { id: `${id}O`, type: 'filter', mode: 'lp', in: `${id}D`, freq: tone, q: 0.7 }];
+}
+
+/**
+ * A hand clap: three quick bursts of band-passed noise, then a short tail. It has no pitch, so it fits any chord.
+ * Arguments: id; trig (a drumRow's id); { noise: the id of a white-noise node (without it one is added); freq: the
+ * centre of the band in Hz (1200); q: how narrow the band is (1.4); gap: seconds between the bursts (0.011);
+ * decay: seconds of tail (0.16) }.
+ * Returns <id>A (the three bursts and the tail), <id>N (the noise band) and <id>O, the clap.
+ */
+export function clap(id, trig, { noise, freq = 1200, q = 1.4, gap = 0.011, decay = 0.16 } = {}) {
+  const what = `clap "${id}"`;
+  need(what, trig, 'trig', 'the row that plays it, as the second argument');
+  const nz = noise || `${id}Nz`, r = (x) => Math.round(x * 1e6) / 1e6;
+  return [
+    ...(noise ? [] : [{ id: nz, type: 'noise' }]),
+    { id: `${id}A`, type: 'env', trig, points: [[0, 1], [r(gap * 0.8), 0.15], [r(gap), 1], [r(gap * 1.8), 0.15], [r(gap * 2), 1], [r(gap * 2 + decay), 0, 'exp']] },
+    { id: `${id}N`, type: 'filter', mode: 'bp', in: nz, freq, q },
+    { id: `${id}O`, type: 'expr', expr: `${id}N*${id}A*2` },
+  ];
+}
+
+/**
+ * A plucked synth bass: one pure saw through a low-pass that snaps open on every note and shuts again before the note ends.
+ * Beside sawBass (saw and square, a filter that follows the note's level, a shaper): this one has a filter envelope
+ * of its own, an accent opens the filter further instead of playing louder, and it stays clean.
+ * Arguments: id; trig (a drumRow's id); { pitch: in Hz, an expression ('midi(40 + tr + bS)'); floor: the filter's
+ * corner when shut, in Hz (150); open: how far above the floor a full note opens it, in Hz ('900 + bright*1800';
+ * 0 keeps it shut; multiply it by a gate to open the bass with Intensity); q: resonance (1.8); hold, decay: the
+ * length of a note in seconds (0.03, 0.09: a 16th at 126 bpm); snap: seconds the filter takes to shut (0.07) }.
+ * Returns <id>V (the strength of the note), <id>A, <id>E (the filter's envelope), <id>W (the saw), <id>L and <id>O, the bass
+ * (its peak is up to 1.8: the resonance). Shut, it is duller but about as loud: turn it down in the mix where it should recede.
+ */
+export function acidBass(id, trig, { pitch, floor = 150, open = '900 + bright*1800', q = 1.8, hold = 0.03, decay = 0.09, snap = 0.07 } = {}) {
+  const what = `acidBass "${id}"`;
+  need(what, trig, 'trig', 'the row that plays it, as the second argument');
+  need(what, pitch, 'pitch', "in Hz, for example 'midi(40 + tr)'");
+  return [
+    { id: `${id}V`, type: 'sah', in: trig, trig },
+    { id: `${id}A`, type: 'ad', trig, attack: 0.003, hold, decay, curve: 1.5 },
+    { id: `${id}E`, type: 'ad', trig, attack: 0.002, decay: snap, curve: 2 },
+    { id: `${id}W`, type: 'osc', wave: 'saw', freq: pitch },
+    { id: `${id}L`, type: 'filter', mode: 'lp', in: `${id}W`, freq: `${inParens(floor)} + ${inParens(open)}*${id}E*${id}V`, q },
+    { id: `${id}O`, type: 'expr', expr: `${id}L*${id}A` },
+  ];
+}
+
+/**
+ * A wide pad: for each note a pair of saws tuned slightly apart, one more to the left and one more to the right,
+ * that swells slowly each time it is triggered and then settles back.
+ * Arguments: id; notes: one to six pitches in Hz, as expressions (the chord: 'midi(52 + tr)', 'midi(52 + tr + third)',
+ * ...); { trig: the row that swells it again, usually once a bar (without one it swells once); detune: how far
+ * apart a pair is tuned (0.006: about 10 cents each way); attack: seconds a swell takes (0.35); sustain: the level
+ * it rests at between swells, 0 to 1 (0.6); bar: seconds from one swell to the next ('240/bpm': a bar);
+ * cutoff: a low-pass in Hz ('500 + bright*2500'); q (0.7) }.
+ * Returns <id>A (the swell), for each note <id>Hz1 (its pitch) and <id>W1a, <id>W1b (its two saws), and <id>L, <id>R:
+ * the pad on the left and on the right.
+ */
+export function sawPad(id, notes, { trig, detune = 0.006, attack = 0.35, sustain = 0.6, bar = '240/bpm', cutoff = '500 + bright*2500', q = 0.7 } = {}) {
+  const what = `sawPad "${id}"`;
+  if (!Array.isArray(notes) || notes.length < 1 || notes.length > 6) fail(`${what}: notes must be one to six pitches in Hz, for example ['midi(52 + tr)', 'midi(52 + tr + third)', 'midi(52 + tr + fifth)']`);
+  if (!(sustain >= 0 && sustain <= 1)) fail(`${what}: sustain is the level it rests at between swells, from 0 to 1, got ${sustain}`);
+  const nodes = [{ id: `${id}A`, type: 'env', ...(trig === undefined ? {} : { trig }), points: [[0, sustain], [attack, 1], [bar, sustain]] }];
+  const left = [], right = [];
+  notes.forEach((p, i) => {
+    const d = detune * (1 + 0.23 * i);   // every pair beats at its own speed, so the pad never pulses as one
+    const hz = `${id}Hz${i + 1}`, a = `${id}W${i + 1}a`, b = `${id}W${i + 1}b`;
+    nodes.push({ id: hz, type: 'expr', expr: String(p) });   // worked out once for the pair
+    nodes.push({ id: a, type: 'osc', wave: 'saw', freq: `${hz}*${num(1 - d)}`, phase: Number(num((0.11 + 0.29 * i) % 1)) });
+    nodes.push({ id: b, type: 'osc', wave: 'saw', freq: `${hz}*${num(1 + d)}`, phase: Number(num((0.57 + 0.37 * i) % 1)) });
+    left.push(`${a}*0.75 + ${b}*0.25`); right.push(`${a}*0.25 + ${b}*0.75`);
+  });
+  const k = num(1 / notes.length);
+  nodes.push({ id: `${id}L`, type: 'filter', mode: 'lp', in: `(${left.join(' + ')})*${id}A*${k}`, freq: cutoff, q });
+  nodes.push({ id: `${id}R`, type: 'filter', mode: 'lp', in: `(${right.join(' + ')})*${id}A*${k}`, freq: cutoff, q });
+  return nodes;
+}
+
+/**
+ * A riser: a hiss that climbs in pitch and in level through one bar and stops dead on the next bar line.
+ * Arguments: id; { noise: the id of a white-noise node (without it one is added); bar: the bar it fills, counted
+ * from 1 (8); of: out of every this many bars: 1, 2, 4 or 8 (8: the last bar of each section); low, high: the hiss
+ * climbs from and to these Hz (400, '4000 + bright*4000'); q: how narrow the hiss is (2) }.
+ * Returns <id>T (the row that starts it), <id>E (0 to 1 through the bar), <id>N (the hiss) and <id>O, the riser.
+ */
+export function riser(id, { noise, bar = SECTION_BARS, of = SECTION_BARS, low = 400, high = '4000 + bright*4000', q = 2 } = {}) {
+  const what = `riser "${id}"`;
+  if (![1, 2, 4, 8].includes(of)) fail(`${what}: of must be 1, 2, 4 or 8 bars, so the pattern divides the ${SECTION_BARS}-bar loop, got ${of}`);
+  if (!Number.isInteger(bar) || bar < 1 || bar > of) fail(`${what}: bar is the bar it fills, from 1 to ${of}, got ${bar}`);
+  const nz = noise || `${id}Nz`;
+  return [
+    ...(noise ? [] : [{ id: nz, type: 'noise' }]),
+    { id: `${id}T`, type: 'pattern', trig: 'c16', every: STEPS_PER_BAR, steps: Array.from({ length: of }, (_, i) => (i === bar - 1 ? 'X' : '.')).join('') },
+    { id: `${id}E`, type: 'env', trig: `${id}T`, points: [[0, 0], ['240/bpm', 1], ['240/bpm + 0.004', 0]] },
+    { id: `${id}N`, type: 'filter', mode: 'bp', in: nz, freq: `${inParens(low)}*pow(${inParens(high)}/${inParens(low)}, ${id}E)`, q },
+    { id: `${id}O`, type: 'expr', expr: `${id}N*${id}E*${id}E` },
+  ];
+}
+
+// ---- voices many tracks repeat: drums, a bass, strings, brass (added with hearthvale-battle, batch R22) ----------------
+// Each takes an id and returns its nodes; the comment names the node that carries the finished voice. The ids a
+// voice makes end in P, W, V, A, N, B, L, R, O, O1 to O4 or Hz: name your own rows otherwise (kT, bS, aD ...).
+
+const voiceId = (id, what) => { if (typeof id !== 'string' || !/^[A-Za-z][A-Za-z0-9]*$/.test(id)) fail(`${what}: the id must be letters and digits, got ${JSON.stringify(id)}`); return id; };
+
+/**
+ * Eight bars of a row made from one bar, with some bars replaced: eightBars('....X.......X...', { 8: '....X...x.x.XxXX' }).
+ * Arguments: bar (the usual bar: marks for drumRow, tokens for noteRow or melody); changes: { bar number, 1 to 8: the
+ * bar to play there instead }. Returns a list of eight strings.
+ */
+export function eightBars(bar, changes = {}) {
+  for (const k of Object.keys(changes)) if (!(Number.isInteger(Number(k)) && Number(k) >= 1 && Number(k) <= SECTION_BARS)) fail(`eightBars: "${k}" is not a bar number (1 to ${SECTION_BARS})`);
+  return Array.from({ length: SECTION_BARS }, (_, i) => changes[i + 1] ?? bar);
+}
+
+/**
+ * Turns a row of chord-tone numbers into semitones above the bar's root: 0 root, 1 third, 2 fifth, 3 octave, 4 third above, 5 fifth above.
+ * Arguments: id (the new node); pick: the id of a noteRow holding those numbers (or any expression that gives one).
+ * Needs chords(). Returns one expr node; midi(57 + tr + <id>) is then the note, in every chord and key.
+ */
+export function chordTone(id, pick) {
+  voiceId(id, 'chordTone');
+  const p = `(${pick})`;
+  return { id, type: 'expr', expr: `${p} < 0.5 ? 0 : ${p} < 1.5 ? third : ${p} < 2.5 ? fifth : ${p} < 3.5 ? 12 : ${p} < 4.5 ? 12 + third : 12 + fifth` };
+}
+
+/**
+ * A kick drum: a sine that falls onto the bar's chord root, kept inside one low octave, so it never sounds a wrong note.
+ * Arguments: id; trig (the id of a drumRow); { low: the lowest note it may land on, a MIDI number (28, E1: the root
+ * is folded into the octave from there up, whatever the chord and the Key control); from: how many times higher it
+ * starts (3); fall: seconds to land (0.06); hold, decay: seconds (0.02, 0.2); curve (2) }.
+ * Needs chords(). Returns <id>P (pitch), <id>W (the sine), <id>A (the envelope: give it to bus() as `duck`) and
+ * <id>O, the drum.
+ */
+export function kickDrum(id, trig, { low = 28, from = 3, fall = 0.06, hold = 0.02, decay = 0.2, curve = 2 } = {}) {
+  voiceId(id, 'kickDrum');
+  return [
+    { id: `${id}P`, type: 'env', trig, points: [[0, from], [fall, 1, 'exp']] },
+    { id: `${id}W`, type: 'osc', freq: `midi(${num(low)} + (tonic + tr + ${num(120 - low)}) % 12)*${id}P` },
+    { id: `${id}A`, type: 'ad', trig, attack: 0.001, hold, decay, curve },
+    { id: `${id}O`, type: 'expr', expr: `${id}W*${id}A` },
+  ];
+}
+
+/**
+ * A snare drum with no pitch of its own: a crack and a body, both band-passed noise.
+ * Arguments: id; trig; { noise: the id of a white-noise node the piece already has (without it one is added);
+ * crack, body: the two bands in Hz (1900, 420); decay: seconds (0.14); mix: [crack, body] levels ([1.85, 1.7]) }.
+ * Returns <id>A (envelope), <id>N (the crack: `<id>N*<id>A` is a good reverb send), <id>B (the body) and <id>O, the drum.
+ */
+export function snareDrum(id, trig, { noise, crack = 1900, body = 420, decay = 0.14, mix = [1.85, 1.7] } = {}) {
+  voiceId(id, 'snareDrum');
+  const nz = noise || `${id}Nz`;
+  return [
+    ...(noise ? [] : [{ id: nz, type: 'noise' }]),
+    { id: `${id}A`, type: 'ad', trig, attack: 0.001, hold: 0.01, decay, curve: 2.2 },
+    { id: `${id}N`, type: 'filter', mode: 'bp', in: nz, freq: crack, q: 0.8 },
+    { id: `${id}B`, type: 'filter', mode: 'bp', in: nz, freq: body, q: 0.9 },
+    { id: `${id}O`, type: 'expr', expr: `(${id}N*${num(mix[0])} + ${id}B*${num(mix[1])})*${id}A` },
+  ];
+}
+
+/**
+ * A closed hi-hat: high-passed noise, as loud as each mark of its row (X, x, o).
+ * Arguments: id; trig (a drumRow's id, or an expression that picks one: 'gBusy > 0.5 ? h16 : h8'); { noise: the id
+ * of a white-noise node (without it one is added); freq: the high-pass in Hz, a number or an expression
+ * ('7000 + bright*2500'); decay: seconds (0.03) }.
+ * Returns <id>V (the strength of the last hit), <id>A (envelope), <id>N and <id>O, the hat.
+ */
+export function hatDrum(id, trig, { noise, freq = '7000 + bright*2500', decay = 0.03 } = {}) {
+  voiceId(id, 'hatDrum');
+  const nz = noise || `${id}Nz`;
+  return [
+    ...(noise ? [] : [{ id: nz, type: 'noise' }]),
+    { id: `${id}V`, type: 'sah', in: trig, trig },
+    { id: `${id}A`, type: 'ad', trig, attack: 0.0005, decay, curve: 2 },
+    { id: `${id}N`, type: 'filter', mode: 'hp', in: nz, freq, q: 0.8 },
+    { id: `${id}O`, type: 'expr', expr: `${id}N*${id}A*${id}V` },
+  ];
+}
+
+/**
+ * A tom tuned to the bar's chord, for fills: a sine that drops onto its note, with a little skin noise.
+ * Arguments: id; trig; { note: the MIDI number of the chord root it plays, before the chord and key move it (45);
+ * semis: semitones above that root, a number or the id of a noteRow (use chord tones: 12, 7, 0 walks a fill down
+ * the chord); drop: how far above its note it starts, as a share (0.5); fall: seconds to land (0.07); decay: seconds
+ * (0.2); noise: the id of a white-noise node (without it one is added); skin: level of the noise (0.3) }.
+ * Needs chords(). Returns <id>P, <id>W (the sine), <id>V (hit strength), <id>A, <id>N and <id>O, the drum.
+ */
+export function tomDrum(id, trig, { note = 45, semis = 0, drop = 0.5, fall = 0.07, decay = 0.2, noise, skin = 0.3 } = {}) {
+  voiceId(id, 'tomDrum');
+  const nz = noise || `${id}Nz`;
+  return [
+    ...(noise ? [] : [{ id: nz, type: 'noise' }]),
+    { id: `${id}P`, type: 'env', trig, points: [[0, 1 + drop], [fall, 1, 'exp']] },
+    { id: `${id}W`, type: 'osc', freq: `midi(${num(note)} + tr + (${semis}))*${id}P` },
+    { id: `${id}V`, type: 'sah', in: trig, trig },
+    { id: `${id}A`, type: 'ad', trig, attack: 0.001, hold: 0.015, decay, curve: 2 },
+    { id: `${id}N`, type: 'filter', mode: 'bp', in: nz, freq: `midi(${num(note)} + tr + (${semis}))*4`, q: 1 },
+    { id: `${id}O`, type: 'expr', expr: `(${id}W + ${id}N*${num(skin)})*${id}A*${id}V` },
+  ];
+}
+
+/**
+ * A driving bass: a saw and a square on the chord root, through a low-pass that each note opens, then a shaper for edge.
+ * Arguments: id; trig (a drumRow: X is an accent); { note: the MIDI number of the root before the chord and key move
+ * it (45, A2); semis: semitones above the root, a number or the id of a noteRow (0, 12 and 7 are always chord
+ * tones); decay: seconds (0.13); cutoff: Hz when closed (180); open: how far a note opens it, Hz, a number or an
+ * expression ('900 + bright*2200'); drive: the shaper's drive, a number or an expression ('1.5 + grit*5'); q (2.2);
+ * accent: how much quieter a plain hit is than an accent, 0 to 1 (0.3) }.
+ * Needs chords(). Returns <id>Hz (the pitch), <id>O1, <id>O2, <id>V (hit strength), <id>A, <id>L and <id>O, the bass.
+ */
+export function sawBass(id, trig, { note = 45, semis = 0, decay = 0.13, cutoff = 180, open = '900 + bright*2200', drive = 1.5, q = 2.2, accent = 0.3 } = {}) {
+  voiceId(id, 'sawBass');
+  if (!(accent >= 0 && accent <= 1)) fail('sawBass: accent is from 0 (every hit as loud) to 1');
+  return [
+    { id: `${id}Hz`, type: 'expr', expr: `midi(${num(note)} + tr + (${semis}))` },
+    { id: `${id}O1`, type: 'osc', wave: 'saw', freq: `${id}Hz` },
+    { id: `${id}O2`, type: 'osc', wave: 'square', freq: `${id}Hz*1.005` },
+    { id: `${id}V`, type: 'sah', in: trig, trig },
+    { id: `${id}A`, type: 'ad', trig, attack: 0.002, decay, curve: 1.5 },
+    { id: `${id}L`, type: 'filter', mode: 'lp', in: `${id}O1*0.6 + ${id}O2*0.4`, freq: `${cutoff} + ${id}A*(${open})`, q },
+    // X is 1 and x is 0.7 in a row: (V - 0.7)/0.3 is 1 for an accent and 0 for a plain hit
+    { id: `${id}O`, type: 'shaper', in: `${id}L*${id}A*(${num(1 - accent)} + ${num(accent)}*clamp((${id}V - 0.7)/0.3, 0, 1))`, drive },
+  ];
+}
+
+/**
+ * A string-section line: two saws a few cents apart, one for each side, every note bowed by a short envelope.
+ * Arguments: id; freq: the pitch in Hz, an expression ('midi(57 + tr + aS)'); { trig: what starts a note ('c16':
+ * every 16th); detune: the ratio between the two saws (1.007); attack, decay: seconds (0.003, 0.11); curve (1.6);
+ * cutoff: the low-pass in Hz, a number or an expression ('900 + bright*3500'); open: Hz each note opens it by (1500); q (1.2) }.
+ * Returns <id>A (envelope), <id>O1, <id>O2 and <id>L, <id>R: the line on the left and on the right.
+ */
+export function stringPair(id, freq, { trig = 'c16', detune = 1.007, attack = 0.003, decay = 0.11, curve = 1.6, cutoff = '900 + bright*3500', open = 1500, q = 1.2 } = {}) {
+  voiceId(id, 'stringPair');
+  const f = `${cutoff} + ${id}A*(${open})`;
+  return [
+    { id: `${id}A`, type: 'ad', trig, attack, decay, curve },
+    { id: `${id}O1`, type: 'osc', wave: 'saw', freq: `(${freq})` },
+    { id: `${id}O2`, type: 'osc', wave: 'saw', freq: `(${freq})*${num(detune)}` },
+    { id: `${id}L`, type: 'filter', mode: 'lp', in: `${id}O1*${id}A`, freq: f, q },
+    { id: `${id}R`, type: 'filter', mode: 'lp', in: `${id}O2*${id}A`, freq: f, q },
+  ];
+}
+
+/**
+ * A brass-like chord stab: saws on the bar's root, third, fifth and octave through a low-pass that snaps open on each hit.
+ * Arguments: id; trig (a drumRow); { note: the MIDI number of the root before the chord and key move it (57, A3);
+ * attack, hold, decay: seconds (0.008, 0.03, 0.16); cutoff: Hz when closed (500); open: Hz a hit opens it by, a
+ * number or an expression ('1500 + bright*4000'); detune: ratio of the octave saw (1.006); q (1.5) }.
+ * Needs chords(). Returns <id>A, <id>O1 to <id>O4 and <id>L, <id>R: the third leans left, the fifth right.
+ */
+export function brassStab(id, trig, { note = 57, attack = 0.008, hold = 0.03, decay = 0.16, cutoff = 500, open = '1500 + bright*4000', detune = 1.006, q = 1.5 } = {}) {
+  voiceId(id, 'brassStab');
+  const n = num(note), f = `${cutoff} + ${id}A*(${open})`;
+  return [
+    { id: `${id}A`, type: 'ad', trig, attack, hold, decay, curve: 1.5 },
+    { id: `${id}O1`, type: 'osc', wave: 'saw', freq: `midi(${n} + tr)` },
+    { id: `${id}O2`, type: 'osc', wave: 'saw', freq: `midi(${n} + tr + third)` },
+    { id: `${id}O3`, type: 'osc', wave: 'saw', freq: `midi(${n} + tr + fifth)` },
+    { id: `${id}O4`, type: 'osc', wave: 'saw', freq: `midi(${num(note + 12)} + tr)*${num(detune)}` },
+    { id: `${id}L`, type: 'filter', mode: 'lp', in: `(${id}O1*0.5 + ${id}O2*0.6 + ${id}O3*0.25 + ${id}O4*0.35)*${id}A`, freq: f, q },
+    { id: `${id}R`, type: 'filter', mode: 'lp', in: `(${id}O1*0.5 + ${id}O2*0.25 + ${id}O3*0.6 + ${id}O4*0.35)*${id}A`, freq: f, q },
+  ];
+}
+
+// ---- swung 8ths, notes that ring over each other, and acoustic voices (added with hearthvale-village, batch R21) -----
+// A voice takes its id, then the row that plays it, then (a string, a bell) its pitch, then options by name. It
+// returns a list of nodes for assemble(); <id>O is the finished voice. The three helpers below are this block's own.
+
+const idR21 = (id, what) => { if (typeof id !== 'string' || !/^[A-Za-z][A-Za-z0-9]*$/.test(id)) fail(`${what}: the id must be letters and digits, got ${JSON.stringify(id)}`); return id; };
+const needR21 = (what, value, name, hint) => { if (value === undefined || value === null || value === '') fail(`${what}: give ${name} (${hint})`); };
+const exprR21 = (x) => (typeof x === 'number' ? num(x) : `(${x})`);
+
+/**
+ * The one clock of a track whose lilt is on the 8th notes: the 8th between two beats comes late, and the beats never move.
+ * Arguments: { swing }: an expression 0..1 (a control, or a share of one: 'swing*0.6'). 0 is straight; 1 is a full
+ * shuffle, where the 8th between two beats comes a third of an 8th late (two to one, a triplet feel). Use it in
+ * place of clock(), which swings only the 16ths between the 8ths and so leaves a piece written in 8ths as it was.
+ * Returns c16 and c16p as clock() does, c8p (1 during the first 8th of a beat, 0 during the second) and c8w (what
+ * the clock reads). The bar and the tempo stay exact.
+ */
+export function clockEighths({ swing } = {}) {
+  const base = 'bpm/60*4';
+  return [
+    // the clock reads c8w from the sample before its tick (0 before the first): the 16th now starting is a long one
+    // when c8w is 0, which is so for both 16ths of the first 8th of a beat
+    { id: 'c16', type: 'clock', rate: swing ? `${base} / (1 + (${swing})/3*(1 - 2*c8w))` : base },
+    { id: 'c16p', type: 'seq', trig: 'c16', loop: true, steps: '1 0' },
+    { id: 'c8w', type: 'seq', trig: 'c16', loop: true, steps: '0 1 1 0' },
+    { id: 'c8p', type: 'seq', trig: 'c16', loop: true, steps: '1 1 0 0' },
+  ];
+}
+
+/**
+ * A row of notes dealt in turn to several voices, so each note rings on while the next ones play (a harp, a lute, bells).
+ * Arguments: id; steps: one string, or a list with one string per bar, one token per 16th: a number (semitones)
+ * starts a note, "_" or "." leaves the step empty, and a note marked - is softer (0.7), -- softer still (0.4);
+ * { voices: how many take turns, 1 to 8 (2) }.
+ * Returns for each voice n (1, 2, ...) <id>G<n>, its gate row, and <id>S<n>, the note it holds: its own last note,
+ * which it keeps while the other voices play (and over the join of the loop). The list also has .counts: notes per voice.
+ */
+export function ringRows(id, steps, { voices = 2 } = {}) {
+  idR21(id, 'ringRows');
+  const what = `ring rows "${id}"`;
+  if (!Number.isInteger(voices) || voices < 1 || voices > 8) fail(`${what}: voices is how many take turns, from 1 to 8, got ${voices}`);
+  const toks = rowTokens(what, steps, words);
+  const notes = toks.map((x) => {
+    if (x === '_' || x === '.') return null;
+    const m = /^(-?\d+(?:\.\d+)?)(-{0,2})$/.exec(x);
+    if (!m) fail(`${what}: "${x}" is not a note (a number of semitones, with - for softer and -- for softer still) or an empty step ("_")`);
+    return { semis: Number(m[1]), mark: ['X', 'x', 'o'][m[2].length] };
+  });
+  const count = notes.filter(Boolean).length;
+  if (count < voices) fail(`${what}: ${count} note${count === 1 ? '' : 's'} for ${voices} voices; every voice needs a note, so write more notes or ask for fewer voices`);
+  const gates = Array.from({ length: voices }, () => toks.map(() => '.')), own = Array.from({ length: voices }, () => toks.map(() => null));
+  let k = 0;
+  notes.forEach((n, i) => { if (!n) return; const v = k++ % voices; gates[v][i] = n.mark; own[v][i] = n.semis; });
+  const out = [], counts = [];
+  for (let v = 0; v < voices; v++) {
+    // before its first note of the loop a voice still holds its last note of the loop
+    let cur = null;
+    for (let i = toks.length - 1; i >= 0; i--) if (own[v][i] !== null) { cur = own[v][i]; break; }
+    const held = own[v].map((x) => (cur = x === null ? cur : x));
+    counts.push(own[v].filter((x) => x !== null).length);
+    out.push({ id: `${id}G${v + 1}`, type: 'pattern', trig: 'c16', steps: group(gates[v], STEPS_PER_BAR, '|', '') });
+    out.push({ id: `${id}S${v + 1}`, type: 'seq', trig: 'c16', loop: true, steps: group(held, STEPS_PER_BAR, ' | ', ' ') });
+  }
+  out.counts = counts;
+  return out;
+}
+
+/**
+ * A plucked string for an accompaniment: the kit's clean pluck (one short pick, no burst of noise, no DC), as loud as each mark of its row.
+ * Arguments: id; trig (a gate row: a drumRow, or <id>G<n> of ringRows); freq: the pitch in Hz, an expression
+ * ('midi(53 + round(key) + rS1)'); { ring: seconds the string rings (1.6); damp: how dull it is, 0 to 0.9, a number
+ * or an expression ('0.3 - bright*0.15'); pick: seconds the pick lasts, shorter is brighter, a number or an
+ * expression of controls ('0.0018 - bright*0.0008') }.
+ * Returns <id>V (the strength of the last pluck), <id>X (the pick), <id>W (the string) and <id>O, the voice, at a peak near 1.
+ */
+export function pluckedString(id, trig, freq, { ring = 1.6, damp = '0.3 - bright*0.15', pick = '0.0018 - bright*0.0008' } = {}) {
+  idR21(id, 'pluckedString');
+  const what = `pluckedString "${id}"`;
+  needR21(what, trig, 'trig', 'the gate row that plucks it');
+  needR21(what, freq, 'freq', "the pitch in Hz, for example 'midi(53 + round(key) + rS1)'");
+  const p = exprR21(pick);
+  return [
+    { id: `${id}V`, type: 'sah', in: trig, trig },
+    // one swing up and one down, so the pick adds no DC; the string's own burst of noise is not used (trig: 0)
+    { id: `${id}X`, type: 'env', trig, points: [[0, 0], [`${p}*0.25`, 1], [`${p}*0.75`, -1], [p, 0]] },
+    { id: `${id}W`, type: 'pluck', trig: 0, in: `${id}X*${id}V`, freq, decay: ring, damp },
+    { id: `${id}O`, type: 'filter', mode: 'hp', in: `${id}W`, freq: `${exprR21(freq)}*0.5`, q: 0.7 },
+  ];
+}
+
+/**
+ * A struck bell or chime: a short tap into ringing partials (the `modal` node), as loud as each mark of its row.
+ * Arguments: id; trig (a gate row); freq: the pitch in Hz, an expression; { ring: seconds the lowest partial rings
+ * (1.4); ratios: the partials as multiples of the pitch ([1, 2, 3, 4.2]: a chime or celesta; [1, 2.76, 5.4, 8.93]
+ * is a church bell); gains: the level of each partial ([1, 0.4, 0.2, 0.1]); strike: seconds the tap lasts (0.0012:
+ * longer is softer and duller) }.
+ * Returns <id>V (the strength of the last strike), <id>X (the tap) and <id>O, the bell. The tap is scaled so a low
+ * bell peaks near 1; a high one is a little quieter. Give each bell that must ring over the next its own voice (ringRows).
+ */
+export function struckBell(id, trig, freq, { ring = 1.4, ratios = [1, 2, 3, 4.2], gains = [1, 0.4, 0.2, 0.1], strike = 0.0012 } = {}) {
+  idR21(id, 'struckBell');
+  const what = `struckBell "${id}"`;
+  needR21(what, trig, 'trig', 'the gate row that strikes it');
+  needR21(what, freq, 'freq', "the pitch in Hz, for example 'midi(77 + round(key) + qS1)'");
+  if (!Array.isArray(ratios) || !ratios.length || ratios.some((r) => !(r > 0))) fail(`${what}: ratios must be a list of positive multiples of the pitch, for example [1, 2, 3, 4.2]`);
+  if (!Array.isArray(gains) || gains.length !== ratios.length) fail(`${what}: gains needs one level per partial (${ratios.length}), got ${JSON.stringify(gains)}`);
+  if (!(strike > 0 && strike <= 0.02)) fail(`${what}: strike is the length of the tap in seconds, up to 0.02, got ${strike}`);
+  return [
+    { id: `${id}V`, type: 'sah', in: trig, trig },
+    { id: `${id}X`, type: 'env', trig, points: [[0, 0], [num(strike / 2), 1], [num(strike), 0]] },
+    // a partial answers a tap with a level equal to the tap's area in samples (strike*sr/2): divide by it
+    { id: `${id}O`, type: 'modal', in: `${id}X*${id}V*${num(2 / strike)}/sr`, freq, ratios: [...ratios], gains: [...gains], decay: ring },
+  ];
+}
+
+/**
+ * A round bass: a sine with a little triangle on the bar's chord root, every note a soft start, a short hold and a long fall.
+ * Arguments: id; trig (a drumRow: X, x and o set how loud); { note: the MIDI number of the root before the chord and
+ * key move it (41, F2); semis: semitones above the root, a number or the id of a noteRow (0, 7, -5 and 12 are
+ * always chord tones); edge: the level of the triangle, which is what a small speaker plays, a number or an
+ * expression ('0.25 + bright*0.3'); attack: seconds (0.008); hold, decay: seconds, numbers or expressions of
+ * controls ('30/bpm', '60/bpm': half a beat and a beat) }.
+ * Needs chords(). Returns <id>Hz (the pitch), <id>O1 (sine), <id>O2 (triangle), <id>V (hit strength), <id>A and <id>O, the bass.
+ */
+export function roundBass(id, trig, { note = 41, semis = 0, edge = '0.25 + bright*0.3', attack = 0.008, hold = '30/bpm', decay = '60/bpm' } = {}) {
+  idR21(id, 'roundBass');
+  needR21(`roundBass "${id}"`, trig, 'trig', 'the row that plays it');
+  return [
+    { id: `${id}Hz`, type: 'expr', expr: `midi(${num(note)} + tr + (${semis}))` },
+    { id: `${id}O1`, type: 'osc', freq: `${id}Hz` },
+    { id: `${id}O2`, type: 'osc', wave: 'tri', freq: `${id}Hz` },
+    { id: `${id}V`, type: 'sah', in: trig, trig },
+    { id: `${id}A`, type: 'ad', trig, attack, hold, decay, curve: 1.6 },
+    { id: `${id}O`, type: 'expr', expr: `(${id}O1 + ${id}O2*${exprR21(edge)})*${id}A*${id}V` },
+  ];
+}
+
+/**
+ * A hand drum (a frame drum, a soft conga): a low thump that falls onto its note and the slap of a palm, as loud as each mark of its row.
+ * Arguments: id; trig (a drumRow's id); { pitch: the note the thump lands on, in Hz (put it on the chord root, for
+ * example 'midi(41 + tr)', so it never sounds a note outside the chord); noise: the id of a white-noise node
+ * (without it one is added); drop: how far above its note the thump starts, as a share (0.6); fall: seconds to land
+ * (0.045); decay: seconds the thump rings (0.16); slap: the level of the palm (0.5); slapHz: the centre of the
+ * palm's band in Hz, a number or an expression (700); slapDecay: seconds (0.045) }.
+ * Returns <id>P (the fall), <id>W (the thump), <id>V (the strength of the hit), <id>A, <id>B (the palm's envelope), <id>N and <id>O, the drum.
+ */
+export function handDrum(id, trig, { pitch, noise, drop = 0.6, fall = 0.045, decay = 0.16, slap = 0.5, slapHz = 700, slapDecay = 0.045 } = {}) {
+  idR21(id, 'handDrum');
+  const what = `handDrum "${id}"`;
+  needR21(what, trig, 'trig', 'the row that plays it, as the second argument');
+  needR21(what, pitch, 'pitch', "the note the thump lands on in Hz, for example 'midi(41 + tr)'");
+  const nz = noise || `${id}Nz`;
+  return [
+    ...(noise ? [] : [{ id: nz, type: 'noise' }]),
+    { id: `${id}P`, type: 'env', trig, points: [[0, 1 + drop], [fall, 1, 'exp']] },
+    { id: `${id}W`, type: 'osc', freq: `${exprR21(pitch)}*${id}P` },
+    { id: `${id}V`, type: 'sah', in: trig, trig },
+    { id: `${id}A`, type: 'ad', trig, attack: 0.002, hold: 0.012, decay, curve: 2 },
+    { id: `${id}B`, type: 'ad', trig, attack: 0.001, decay: slapDecay, curve: 2 },
+    { id: `${id}N`, type: 'filter', mode: 'bp', in: nz, freq: slapHz, q: 1.1 },
+    { id: `${id}O`, type: 'expr', expr: `(${id}W*${id}A + ${id}N*${id}B*${exprR21(slap)})*${id}V` },
+  ];
+}
+
+/**
+ * A shaker: a short band of hiss with a soft start, as loud as each mark of its row; it has no pitch, so it fits any chord.
+ * Arguments: id; trig (a drumRow's id); { noise: the id of a white-noise node (without it one is added); freq: the
+ * centre of the hiss in Hz, a number or an expression ('5500 + bright*2500'); q: how narrow it is (1.2); attack:
+ * seconds the beads take to land (0.006: this is what tells a shaker from a hi-hat); decay: seconds (0.05) }.
+ * Returns <id>V (the strength of the shake), <id>A, <id>N and <id>O, the shaker.
+ */
+export function shaker(id, trig, { noise, freq = '5500 + bright*2500', q = 1.2, attack = 0.006, decay = 0.05 } = {}) {
+  idR21(id, 'shaker');
+  needR21(`shaker "${id}"`, trig, 'trig', 'the row that plays it, as the second argument');
+  const nz = noise || `${id}Nz`;
+  return [
+    ...(noise ? [] : [{ id: nz, type: 'noise' }]),
+    { id: `${id}V`, type: 'sah', in: trig, trig },
+    { id: `${id}A`, type: 'ad', trig, attack, decay, curve: 1.8 },
+    { id: `${id}N`, type: 'filter', mode: 'bp', in: nz, freq, q },
+    { id: `${id}O`, type: 'expr', expr: `${id}N*${id}A*${id}V` },
+  ];
+}
+
+// ---- a half-time beat, a sub drop, a chorus and an alarm (added with derelict-boss, batch S22) -------------------------
+// Each voice returns its nodes; the finished voice is <id>O (the chorus: <id>L and <id>R), between -1 and 1, so the
+// gain you write in the mix is its level.
+
+/**
+ * A half-time beat as drum rows: the snare on beat 3 only and a sparse kick, so a fast piece feels half as fast and twice as heavy.
+ * Arguments: { driving: true puts the kick on every 8th note instead (the snare stays on beat 3: the same beat,
+ * turned relentless); fill: false for no fills (by default bar 4 ends in one extra snare hit and bar 8 in a run of them) }.
+ * Returns { kick, snare }: two lists of eight 16-step bars, for drumRow('kT', beat.kick) and drumRow('sT', beat.snare).
+ */
+export function halfTimeBeat({ driving = false, fill = true } = {}) {
+  // the plain kick answers itself: a push before beat 3 in odd bars, one after it in even bars; never on beat 3
+  const kick = driving
+    ? eightBars('X.x.x.x.X.x.x.x.')
+    : ['X.....x.........', 'X.........x.....', 'X.....x.........', 'X.........x.....', 'X.....x.........', 'X.........x.....', 'X.....x.........', 'X.........x.....'];
+  const snare = eightBars('........X.......', fill ? { 4: '........X.....x.', 8: '........X...x.xx' } : {});
+  return { kick, snare };
+}
+
+/**
+ * A sub drop: a sine that falls from a pitch to octaves below it and dies away, to mark the first beat of a section.
+ * Arguments: id; trig: what starts it (for the first beat of every 8-bar section: drumRow('dT', 'X', { every: 128 }));
+ * { from: where it starts, in Hz, a number or an expression ('midi(48 + tr)': the bar's chord root, so it lands on
+ * that root, lower); octaves: how far it falls (2); fall: seconds the fall takes (0.5); decay: seconds it rings on
+ * after that (1.2) }.
+ * Returns <id>P (the fall, from 1 down), <id>W (the sine), <id>A (its envelope) and <id>O, the drop.
+ */
+export function subDrop(id, trig, { from = 'midi(48 + tr)', octaves = 2, fall = 0.5, decay = 1.2 } = {}) {
+  const what = `subDrop "${voiceId(id, 'subDrop')}"`;
+  need(what, trig, 'trig', "the row that starts it, as the second argument: drumRow('dT', 'X', { every: 128 }) is the first beat of every section");
+  if (!(octaves > 0 && octaves <= 4)) fail(`${what}: octaves is how far it falls, above 0 and up to 4, got ${octaves}`);
+  if (!(fall > 0) || !(decay > 0)) fail(`${what}: fall and decay are seconds above 0`);
+  return [
+    { id: `${id}P`, type: 'env', trig, points: [[0, 1], [fall, Number(num(2 ** -octaves)), 'exp']] },
+    { id: `${id}W`, type: 'osc', freq: `${inParens(from)}*${id}P` },
+    { id: `${id}A`, type: 'ad', trig, attack: 0.004, hold: Number(num(fall * 0.6)), decay, curve: 2 },
+    { id: `${id}O`, type: 'expr', expr: `${id}W*${id}A` },
+  ];
+}
+
+/**
+ * A chorus: two copies of any sound whose pitch drifts a few cents, one up while the other goes down, so one voice
+ * sounds like two detuned ones, a copy for each side. It works on whatever plays (all five melody instruments).
+ * Arguments: id; input: the sound to thicken, an expression ('lF', a melody bus); { depth: how far the copies
+ * drift, 0 to 1, a number or an expression ('0.5': about 12 cents each way at the default rate; 0 is no detune);
+ * rate: the speed of the drift in Hz (0.7); delay: seconds the copies sit behind the sound (0.012) }.
+ * Returns <id>D (the drift), <id>L and <id>R: the two copies alone, each at the level of the input. Put them beside
+ * the dry sound in the mix (left and right), or use them in its place for a voice with no centre.
+ */
+export function chorus(id, input, { depth = '0.5', rate = 0.7, delay = 0.012 } = {}) {
+  const what = `chorus "${voiceId(id, 'chorus')}"`;
+  need(what, input, 'the input', "the sound to thicken, as the second argument: 'lF' is the melody");
+  const swing = 0.003;   // seconds the delay moves each way at depth 1: 3 ms at 0.7 Hz bends the pitch 23 cents
+  if (!(delay >= swing + 0.001 && delay <= 0.05)) fail(`${what}: delay is from ${swing + 0.001} to 0.05 seconds (shorter and the drift has no room, longer and it is an echo), got ${delay}`);
+  if (!(rate > 0 && rate <= 8)) fail(`${what}: rate is the speed of the drift, above 0 and up to 8 Hz, got ${rate}`);
+  const d = `clamp(${inParens(depth)}, 0, 1)*${num(swing)}*${id}D`;
+  return [
+    { id: `${id}D`, type: 'osc', freq: rate },
+    { id: `${id}L`, type: 'delay', in: input, time: `${num(delay)} + ${d}`, feedback: 0, mix: 1, max: Number(num(delay + swing + 0.002)) },
+    { id: `${id}R`, type: 'delay', in: input, time: `${num(delay)} - ${d}`, feedback: 0, mix: 1, max: Number(num(delay + swing + 0.002)) },
+  ];
+}
+
+/**
+ * An alarm tone: a thin, hard pulse wave that sounds a short note on every hit of its row. It ignores the chords
+ * (a signal, not a part of the harmony) and follows only the Key control; two notes a semitone apart are a warning.
+ * Arguments: id; trig (a drumRow's id); { semis: semitones above `base`, a number or the id of a noteRow ('0 0 -1 -1'
+ * with a row of 'X.X.' is two notes a semitone apart); base: the MIDI number of its note before Key moves it (84,
+ * C6); width: the pulse width, 0 to 1 (0.22: thin and nasal); hold, decay: seconds (0.05, 0.07); grit: how harsh,
+ * 0 to 1, a number or an expression ('0.5': an octave saw is mixed in and the sum is pushed into a shaper) }.
+ * Returns <id>Hz (the pitch), <id>W1, <id>W2 (the pulse and the octave saw), <id>A (envelope), <id>B (the shaper) and <id>O, the alarm.
+ */
+export function alarmTone(id, trig, { semis = 0, base = 84, width = 0.22, hold = 0.05, decay = 0.07, grit = '0.5' } = {}) {
+  const what = `alarmTone "${voiceId(id, 'alarmTone')}"`;
+  need(what, trig, 'trig', 'the row that plays it, as the second argument');
+  if (!(width > 0 && width < 1)) fail(`${what}: width is the pulse width, between 0 and 1, got ${width}`);
+  const g = `clamp(${inParens(grit)}, 0, 1)`;
+  return [
+    { id: `${id}Hz`, type: 'expr', expr: `midi(${num(base)} + round(key) + (${semis}))` },
+    { id: `${id}W1`, type: 'osc', wave: 'pulse', width, freq: `${id}Hz` },
+    { id: `${id}W2`, type: 'osc', wave: 'saw', freq: `${id}Hz*2.004` },
+    { id: `${id}A`, type: 'ad', trig, attack: 0.002, hold, decay, curve: 1.6 },
+    // the shaper is leaned on harder as grit rises; the division after it keeps the level where it was
+    { id: `${id}B`, type: 'shaper', in: `(${id}W1*0.7 + ${id}W2*0.5*${g})*${id}A`, drive: `1 + 2*${g}` },
+    { id: `${id}O`, type: 'expr', expr: `${id}B/(0.78 + 0.45*${g})` },
+  ];
+}
