@@ -94,7 +94,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 
 - **Meta:** type `tileset`, role `world/tile`, view `side`, themes `fantasy`, `forest`. Batch **P03**.
 - **Frame:** 32x32, pivot [16, 16].
-- **Clips (21):** the 13-tile block `grass-*` · `grass-thin-l`, `-thin-m`, `-thin-r` · `grass-slope-up` 1 · `grass-slope-down` 1 · `grass-deco-a` 1 · `grass-deco-b` 1 · `grass-deco-c` 1.
+- **Clips (30):** the block `grass-*` with its seven narrow pieces and three fills (22 clips: style guide, section 6) · `grass-thin-l`, `-thin-m`, `-thin-r` · `grass-slope-up` 1 · `grass-slope-down` 1 · `grass-deco-a` 1 · `grass-deco-b` 1 · `grass-deco-c` 1. As built in `sprites/tiles-forest.js`.
 - **Parts:** none.
 - **Controls (8):** `grass` (colour: default grass), `soil` (colour: default soil), `stone` (colour of the pebbles in the soil: default stone), `flowers` (colour of the flower decal: default crimson), `edge` (depth of the grass cap: 5 to 9 px), `bumps` (slider "Surface": Flat / Lumpy: how far the top line wanders: 0 to 3 px), `texture`, `roots` (toggle: roots hang from the underside tiles).
 - **Sounds:** none.
@@ -114,7 +114,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 
 - **Meta:** type `tileset`, role `world/tile`, view `side`, themes `fantasy`, `dungeon`. Batch **P04**.
 - **Frame:** 32x32, pivot [16, 16].
-- **Clips (26):** the 13-tile block `stone-*` · `stone-thin-l`, `-thin-m`, `-thin-r` · `brick-fill` 1 · `pillar-cap` 1 · `pillar-mid` 1 · `pillar-foot` 1 · `window` 1 · `battlement` 1 · `arch-l` 1 · `arch-r` 1 · `stone-deco-a` 1 · `stone-deco-b` 1.
+- **Clips (37):** the block `stone-*` with its seven narrow pieces and three fills (22 clips) · `stone-thin-l`, `-thin-m`, `-thin-r` · `brick-fill`, `-fill-b`, `-fill-c` 1 each · `pillar-cap` 1 · `pillar-mid` 1 · `pillar-foot` 1 · `window` 1 · `battlement` 1 · `arch-l` 1 · `arch-r` 1 · `stone-deco-a` 1 · `stone-deco-b` 1.
 - **Parts:** none.
 - **Controls (8):** `stone` (colour: default stone), `wall` (colour of the back wall `brick-fill`: default slate), `growth` (colour of moss: default moss), `overgrowth` (slider "Moss": Clean / Overgrown), `style` (choice: blocks | cobbles | slabs: the stone pattern), `edge` (depth of the trim course along exposed edges), `texture`, `wear` (cracks and chipped corners).
 - **Sounds:** none.
@@ -124,7 +124,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 
 - **Meta:** type `tileset`, role `world/tile`, view `side`, themes `fantasy`, `dungeon`. Batch **P05**.
 - **Frame:** 32x32, pivot [16, 16].
-- **Clips (20):** the 13-tile block `rock-*` · `rock-thin-l`, `-thin-m`, `-thin-r` · `dark-fill` 1 · `rock-deco-a` 1 · `rock-deco-b` 1 · `rock-deco-c` 1.
+- **Clips (31):** the block `rock-*` with its seven narrow pieces and three fills (22 clips) · `rock-thin-l`, `-thin-m`, `-thin-r` · `dark-fill`, `-fill-b`, `-fill-c` 1 each · `rock-deco-a` 1 · `rock-deco-b` 1 · `rock-deco-c` 1.
 - **Parts:** none.
 - **Controls (8):** `rock` (colour: default slate), `shade` (colour of the deep-cave back fill `dark-fill`: default cavern), `crystal` (colour of the crystal decal: default magic), `edge` (depth of the lighter rim on exposed rock), `jagged` (slider "Edges": Smooth / Jagged), `texture`, `wear` (cracks), `damp` (toggle: wet highlights and a drip on the underside).
 - **Sounds:** none.
@@ -660,7 +660,7 @@ A batch starts when its helpers exist and every batch in its "Needs first" cell 
 | Helper | What it must do | Batches that wait |
 |---|---|---|
 | `palettes` | The three palettes as named colours and swatch lists (style guide, sections 3 and 14). | P03, P04, P05, P06, P07, P08, P09, P10, P11, P12, P13, P14 |
-| `tile-helper` | Draws the 13-tile block (top-down wall faces and holes included), thin pieces, slopes and decals so texture repeats and edges meet; renders a sample map. | P03, P04, P05 |
+| `tile-helper` | Draws every piece of a block (the 13, the seven narrow pieces and the fill versions; top-down wall faces and holes included), thin pieces, slopes and decals so texture repeats and edges meet; renders a sample map. | P03, P04, P05 |
 | `humanoid-poses` | Adds `die`, `block`, `victory`, `talk`, `shoot` and a thrust to the side-view rig. | P00, P06 |
 | `fx-helper` | Shared particles, twinkles, rings, shards, smoke and effect colour steps. **Required**: every effect and projectile is built from it, so all effects share one look. | P12, P13 |
 | `ui-helper` | Nine-slice panel, button states, bar housing and fill. | P13 |

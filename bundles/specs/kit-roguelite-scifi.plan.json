@@ -668,17 +668,22 @@
           "loop": true
         },
         {
-          "name": "plate-fill",
+          "name": "floor-fill-b",
           "frames": 1,
           "loop": true
         },
         {
-          "name": "plate-top",
+          "name": "floor-fill-c",
           "frames": 1,
           "loop": true
         },
         {
           "name": "plate-left",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "plate-top",
           "frames": 1,
           "loop": true
         },
@@ -693,17 +698,32 @@
           "loop": true
         },
         {
+          "name": "plate-fill",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "plate-fill-b",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "plate-fill-c",
+          "frames": 1,
+          "loop": true
+        },
+        {
           "name": "plate-side-r",
           "frames": 1,
           "loop": true
         },
         {
-          "name": "plate-bottom",
+          "name": "plate-bottom-l",
           "frames": 1,
           "loop": true
         },
         {
-          "name": "plate-bottom-l",
+          "name": "plate-bottom",
           "frames": 1,
           "loop": true
         },
@@ -729,6 +749,41 @@
         },
         {
           "name": "plate-inner-br",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "plate-strip-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "plate-strip-m",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "plate-strip-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "plate-col-t",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "plate-col-m",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "plate-col-b",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "plate-single",
           "frames": 1,
           "loop": true
         },
@@ -783,17 +838,12 @@
       ],
       "clips": [
         {
-          "name": "wall-fill",
+          "name": "wall-left",
           "frames": 1,
           "loop": true
         },
         {
           "name": "wall-top",
-          "frames": 1,
-          "loop": true
-        },
-        {
-          "name": "wall-left",
           "frames": 1,
           "loop": true
         },
@@ -808,17 +858,22 @@
           "loop": true
         },
         {
+          "name": "wall-fill",
+          "frames": 1,
+          "loop": true
+        },
+        {
           "name": "wall-side-r",
           "frames": 1,
           "loop": true
         },
         {
-          "name": "wall-bottom",
+          "name": "wall-bottom-l",
           "frames": 1,
           "loop": true
         },
         {
-          "name": "wall-bottom-l",
+          "name": "wall-bottom",
           "frames": 1,
           "loop": true
         },
@@ -844,6 +899,41 @@
         },
         {
           "name": "wall-inner-br",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-strip-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-strip-m",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-strip-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-col-t",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-col-m",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-col-b",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-single",
           "frames": 1,
           "loop": true
         },
@@ -903,17 +993,22 @@
           "loop": true
         },
         {
-          "name": "wall-fill",
+          "name": "hive-fill-b",
           "frames": 1,
           "loop": true
         },
         {
-          "name": "wall-top",
+          "name": "hive-fill-c",
           "frames": 1,
           "loop": true
         },
         {
           "name": "wall-left",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-top",
           "frames": 1,
           "loop": true
         },
@@ -928,17 +1023,22 @@
           "loop": true
         },
         {
+          "name": "wall-fill",
+          "frames": 1,
+          "loop": true
+        },
+        {
           "name": "wall-side-r",
           "frames": 1,
           "loop": true
         },
         {
-          "name": "wall-bottom",
+          "name": "wall-bottom-l",
           "frames": 1,
           "loop": true
         },
         {
-          "name": "wall-bottom-l",
+          "name": "wall-bottom",
           "frames": 1,
           "loop": true
         },
@@ -964,6 +1064,41 @@
         },
         {
           "name": "wall-inner-br",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-strip-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-strip-m",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-strip-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-col-t",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-col-m",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-col-b",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wall-single",
           "frames": 1,
           "loop": true
         },
@@ -1008,17 +1143,12 @@
       ],
       "clips": [
         {
-          "name": "pit-fill",
+          "name": "pit-left",
           "frames": 8,
           "loop": true
         },
         {
           "name": "pit-top",
-          "frames": 8,
-          "loop": true
-        },
-        {
-          "name": "pit-left",
           "frames": 8,
           "loop": true
         },
@@ -1033,17 +1163,22 @@
           "loop": true
         },
         {
+          "name": "pit-fill",
+          "frames": 8,
+          "loop": true
+        },
+        {
           "name": "pit-side-r",
           "frames": 8,
           "loop": true
         },
         {
-          "name": "pit-bottom",
+          "name": "pit-bottom-l",
           "frames": 8,
           "loop": true
         },
         {
-          "name": "pit-bottom-l",
+          "name": "pit-bottom",
           "frames": 8,
           "loop": true
         },
@@ -1069,6 +1204,41 @@
         },
         {
           "name": "pit-inner-br",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "pit-strip-l",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "pit-strip-m",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "pit-strip-r",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "pit-col-t",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "pit-col-m",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "pit-col-b",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "pit-single",
           "frames": 8,
           "loop": true
         },

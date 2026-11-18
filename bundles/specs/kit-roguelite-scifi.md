@@ -188,7 +188,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 
 - **Meta:** type `tileset`, role `world/tile`, view `top-down`, themes `sci-fi`, `space`. Batch **S03**.
 - **Frame:** 32x32, pivot [16, 16].
-- **Clips (20):** `floor-fill` 1 · the 13-tile block `plate-*` · `floor-deco-a` 1 · `floor-deco-b` 8 loop · `floor-deco-c` 1 · `floor-deco-d` 1 · `floor-deco-e` 1 · `floor-deco-f` 8 loop.
+- **Clips (31):** `floor-fill`, `-fill-b`, `-fill-c` 1 each · the block `plate-*` with its seven narrow pieces and three fills (22 clips) · `floor-deco-a` 1 · `floor-deco-b` 8 loop · `floor-deco-c` 1 · `floor-deco-d` 1 · `floor-deco-e` 1 · `floor-deco-f` 8 loop.
 - **Parts:** none.
 - **Controls (9):** `floor` (colour: default deck), `plate` (colour: default plate), `accent` (hazard paint: default amber), `glow` (floor lights: default teal), `style` (choice: panels | grid | hex), `edge` (the width of the plate's rim), `texture` (rivets and scuffs), `wear` (scratches and stains), `speed`.
 - **Sounds:** none.
@@ -198,7 +198,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 
 - **Meta:** type `tileset`, role `world/tile`, view `top-down`, themes `sci-fi`, `space`. Batch **S11**.
 - **Frame:** 32x32, pivot [16, 16].
-- **Clips (19):** the 13-tile block `wall-*` · `wall-deco-a` 1 · `wall-deco-b` 1 · `wall-deco-c` 1 · `wall-deco-d` 8 loop · `doorway-l` 1 · `doorway-r` 1.
+- **Clips (26):** the block `wall-*` with its seven narrow pieces (20 clips: room walls are one tile thick) · `wall-deco-a` 1 · `wall-deco-b` 1 · `wall-deco-c` 1 · `wall-deco-d` 8 loop · `doorway-l` 1 · `doorway-r` 1.
 - **Parts:** none.
 - **Controls (9):** `hull` (colour of the wall face: default hull), `plate` (colour of the cap: default plate), `accent` (default amber), `glow` (wall lights: default teal), `style` (choice: panels | ribbed | plated), `edge` (the width of the cap's lit rim), `texture`, `wear`, `speed`.
 - **Sounds:** none.
@@ -208,7 +208,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 
 - **Meta:** type `tileset`, role `world/tile`, view `top-down`, themes `sci-fi`, `space`, `horror`. Batch **S12**.
 - **Frame:** 32x32, pivot [16, 16].
-- **Clips (18):** `hive-fill` 1 · the 13-tile block `wall-*` · `hive-deco-a` 1 · `hive-deco-b` 8 loop · `hive-deco-c` 1 · `hive-deco-d` 1.
+- **Clips (27):** `hive-fill`, `-fill-b`, `-fill-c` 1 each · the block `wall-*` with its seven narrow pieces (20 clips) · `hive-deco-a` 1 · `hive-deco-b` 8 loop · `hive-deco-c` 1 · `hive-deco-d` 1.
 - **Parts:** none.
 - **Controls (8):** `flesh` (colour of the floor: default membrane), `growth` (colour of the walls: default flesh), `glow` (default acid), `veins` (slider: Few / Many), `edge`, `texture`, `wet` (toggle: glossy highlights), `speed`.
 - **Sounds:** none.
@@ -218,7 +218,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 
 - **Meta:** type `tileset`, role `world/tile`, view `top-down`, themes `sci-fi`, `space`. Batch **S13**.
 - **Frame:** 32x32, pivot [16, 16].
-- **Clips (15):** the 13-tile block `pit-*` (8 frames each, loop) · `pit-deco-a` 1 · `pit-deco-b` 8 loop.
+- **Clips (22):** the block `pit-*` with its seven narrow pieces (20 clips, 8 frames each, loop; no fill versions: the drifting depth hides the grid) · `pit-deco-a` 1 · `pit-deco-b` 8 loop.
 - **Parts:** none.
 - **Controls (7):** `below` (choice of what is down there: space | mist | reactor), `land` (colour of the floor's cut edge: default deck), `hull` (colour of the inner wall: default hull), `glow` (the warning light along the rim: default amber), `pieces` (slider "Specks": Few / Many: the stars, the wisps of mist or the sparks of the reactor, whatever `below` is), `height` (slider "Depth": Shallow / Deep: the inner wall is 6 to 14 px), `speed`.
 - **Sounds:** none.
@@ -809,7 +809,7 @@ A batch starts when its helpers exist and every batch in its "Needs first" cell 
 | Helper | What it must do | Batches that wait |
 |---|---|---|
 | `palettes` | The three palettes as named colours and swatch lists (style guide, sections 3 and 14). | S03, S04, S05, S06, S07, S08, S09, S10, S11, S12, S13, S14, S15, S16, S17, S18, S19, S20 |
-| `tile-helper` | Draws the 13-tile block (top-down wall faces and holes included), thin pieces, slopes and decals so texture repeats and edges meet; renders a sample map. | S03, S11, S12, S13 |
+| `tile-helper` | Draws every piece of a block (the 13, the seven narrow pieces and the fill versions; top-down wall faces and holes included), thin pieces, slopes and decals so texture repeats and edges meet; renders a sample map. | S03, S11, S12, S13 |
 | `topdown-rig` | The top-down body rig: three directions, the standard poses (`shoot` and `dodge` included), hooks in the right depth order, sockets with `muzzle`. | S04, S05 |
 | `fx-helper` | Shared particles, twinkles, rings, shards, smoke and effect colour steps. **Required**: every effect and projectile is built from it, so all effects share one look. | S17, S18, S19 |
 | `ui-helper` | Nine-slice panel, button states, bar housing and fill. | S20 |

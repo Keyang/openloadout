@@ -240,7 +240,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 
 - **Meta:** type `tileset`, role `world/tile`, view `top-down`, themes `fantasy`, `forest`, `farm`. Batch **R04**.
 - **Frame:** 32x32, pivot [16, 16].
-- **Clips (18):** `grass-fill` 1 · the 13-tile block `path-*` · `grass-deco-a` 1 · `grass-deco-b` 1 · `grass-deco-c` 1 · `grass-deco-d` 1.
+- **Clips (29):** `grass-fill`, `-fill-b`, `-fill-c` 1 each · the block `path-*` with its seven narrow pieces and three fills (22 clips: a path is often one tile wide) · `grass-deco-a` 1 · `grass-deco-b` 1 · `grass-deco-c` 1 · `grass-deco-d` 1.
 - **Parts:** none.
 - **Controls (7):** `grass` (default meadow), `path` (default path), `flowers` (colour of the flower decal: default roof), `edge` (how far the path's ragged border reaches: 3 to 7 px), `texture` (how many grass blades and path specks), `stones` (toggle: pebbles along the path edges), `wear` (ruts and bare patches in the path).
 - **Sounds:** none.
@@ -250,7 +250,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 
 - **Meta:** type `tileset`, role `world/tile`, view `top-down`, themes `fantasy`, `forest`. Batch **R10**.
 - **Frame:** 32x32, pivot [16, 16].
-- **Clips (17):** the 13-tile block `water-*` (8 frames each, loop) · `bridge-h` 1 · `bridge-v` 1 · `water-deco-a` 8 loop · `water-deco-b` 1.
+- **Clips (24):** the block `water-*` with its seven narrow pieces (20 clips, 8 frames each, loop; no fill versions: the moving water hides the grid) · `bridge-h` 1 · `bridge-v` 1 · `water-deco-a` 8 loop · `water-deco-b` 1.
 - **Parts:** none.
 - **Controls (8):** `water` (default water), `foam` (default cream), `land` (the bank: default path), `wood` (the bridge: default wood), `edge` (the width of the bank), `waves` (slider: Calm / Choppy), `sparkle`, `speed`.
 - **Sounds:** none.
@@ -260,7 +260,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 
 - **Meta:** type `tileset`, role `world/tile`, view `top-down`, themes `fantasy`, `farm`. Batch **R08**.
 - **Frame:** 32x32, pivot [16, 16].
-- **Clips (30):** the 13-tile block `cobble-*` · `plank-fill` 1 · the 13-tile block `wall-*` · `fence-h` 1 · `fence-v` 1 · `fence-post` 1.
+- **Clips (48):** the block `cobble-*` with its seven narrow pieces and three fills (22 clips) · `plank-fill`, `-fill-b`, `-fill-c` 1 each · the block `wall-*` with its seven narrow pieces (20 clips) · `fence-h` 1 · `fence-v` 1 · `fence-post` 1.
 - **Parts:** none.
 - **Controls (7):** `stone` (cobbles and walls: default cobble), `wood` (floors and fences: default wood), `growth` (moss between stones: default leaf), `style` (choice of cobbles: round | square | herringbone), `edge`, `texture`, `wear`.
 - **Sounds:** none.
@@ -270,7 +270,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 
 - **Meta:** type `tileset`, role `world/tile`, view `top-down`, themes `fantasy`, `dungeon`. Batch **R09**.
 - **Frame:** 32x32, pivot [16, 16].
-- **Clips (32):** `floor-fill` 1 · the 13-tile block `wall-*` · the 13-tile block `pit-*` · `stairs-down` 1 · `stairs-up` 1 · `floor-deco-a` 1 · `floor-deco-b` 1 · `floor-deco-c` 1.
+- **Clips (48):** `floor-fill`, `-fill-b`, `-fill-c` 1 each · the block `wall-*` with its seven narrow pieces (20 clips) · the block `pit-*` with its seven narrow pieces (20 clips) · `stairs-down` 1 · `stairs-up` 1 · `floor-deco-a` 1 · `floor-deco-b` 1 · `floor-deco-c` 1.
 - **Parts:** none.
 - **Controls (8):** `stone` (walls: default slate), `floor` (colour: default flagstone), `growth` (slime and moss: default leaf), `style` (choice: slabs | bricks | cobbles), `edge`, `texture`, `wear`, `damp` (toggle: wet highlights and a puddle decal).
 - **Sounds:** none.
@@ -725,7 +725,7 @@ A batch starts when its helpers exist and every batch in its "Needs first" cell 
 | Helper | What it must do | Batches that wait |
 |---|---|---|
 | `palettes` | The three palettes as named colours and swatch lists (style guide, sections 3 and 14). | R03, R04, R05, R06, R07, R08, R09, R10, R11, R12, R13, R14, R15, R16, R17, R18, R19, R20 |
-| `tile-helper` | Draws the 13-tile block (top-down wall faces and holes included), thin pieces, slopes and decals so texture repeats and edges meet; renders a sample map. | R04, R08, R09, R10 |
+| `tile-helper` | Draws every piece of a block (the 13, the seven narrow pieces and the fill versions; top-down wall faces and holes included), thin pieces, slopes and decals so texture repeats and edges meet; renders a sample map. | R04, R08, R09, R10 |
 | `topdown-rig` | The top-down body rig: three directions, the standard poses (`shoot` and `dodge` included), hooks in the right depth order, sockets with `muzzle`. | R03, R05, R06, R07 |
 | `humanoid-poses` | Adds `die`, `block`, `victory`, `talk`, `shoot` and a thrust to the side-view rig. | R12, R13 |
 | `fx-helper` | Shared particles, twinkles, rings, shards, smoke and effect colour steps. **Required**: every effect and projectile is built from it, so all effects share one look. | R18 |

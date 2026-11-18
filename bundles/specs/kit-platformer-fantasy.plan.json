@@ -282,17 +282,12 @@
       ],
       "clips": [
         {
-          "name": "grass-fill",
+          "name": "grass-left",
           "frames": 1,
           "loop": true
         },
         {
           "name": "grass-top",
-          "frames": 1,
-          "loop": true
-        },
-        {
-          "name": "grass-left",
           "frames": 1,
           "loop": true
         },
@@ -307,17 +302,32 @@
           "loop": true
         },
         {
+          "name": "grass-fill",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "grass-fill-b",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "grass-fill-c",
+          "frames": 1,
+          "loop": true
+        },
+        {
           "name": "grass-side-r",
           "frames": 1,
           "loop": true
         },
         {
-          "name": "grass-bottom",
+          "name": "grass-bottom-l",
           "frames": 1,
           "loop": true
         },
         {
-          "name": "grass-bottom-l",
+          "name": "grass-bottom",
           "frames": 1,
           "loop": true
         },
@@ -343,6 +353,41 @@
         },
         {
           "name": "grass-inner-br",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "grass-strip-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "grass-strip-m",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "grass-strip-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "grass-col-t",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "grass-col-m",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "grass-col-b",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "grass-single",
           "frames": 1,
           "loop": true
         },
@@ -482,17 +527,12 @@
       ],
       "clips": [
         {
-          "name": "stone-fill",
+          "name": "stone-left",
           "frames": 1,
           "loop": true
         },
         {
           "name": "stone-top",
-          "frames": 1,
-          "loop": true
-        },
-        {
-          "name": "stone-left",
           "frames": 1,
           "loop": true
         },
@@ -507,17 +547,32 @@
           "loop": true
         },
         {
+          "name": "stone-fill",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "stone-fill-b",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "stone-fill-c",
+          "frames": 1,
+          "loop": true
+        },
+        {
           "name": "stone-side-r",
           "frames": 1,
           "loop": true
         },
         {
-          "name": "stone-bottom",
+          "name": "stone-bottom-l",
           "frames": 1,
           "loop": true
         },
         {
-          "name": "stone-bottom-l",
+          "name": "stone-bottom",
           "frames": 1,
           "loop": true
         },
@@ -547,6 +602,41 @@
           "loop": true
         },
         {
+          "name": "stone-strip-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "stone-strip-m",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "stone-strip-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "stone-col-t",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "stone-col-m",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "stone-col-b",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "stone-single",
+          "frames": 1,
+          "loop": true
+        },
+        {
           "name": "stone-thin-l",
           "frames": 1,
           "loop": true
@@ -563,6 +653,16 @@
         },
         {
           "name": "brick-fill",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "brick-fill-b",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "brick-fill-c",
           "frames": 1,
           "loop": true
         },
@@ -632,17 +732,12 @@
       ],
       "clips": [
         {
-          "name": "rock-fill",
+          "name": "rock-left",
           "frames": 1,
           "loop": true
         },
         {
           "name": "rock-top",
-          "frames": 1,
-          "loop": true
-        },
-        {
-          "name": "rock-left",
           "frames": 1,
           "loop": true
         },
@@ -657,17 +752,32 @@
           "loop": true
         },
         {
+          "name": "rock-fill",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "rock-fill-b",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "rock-fill-c",
+          "frames": 1,
+          "loop": true
+        },
+        {
           "name": "rock-side-r",
           "frames": 1,
           "loop": true
         },
         {
-          "name": "rock-bottom",
+          "name": "rock-bottom-l",
           "frames": 1,
           "loop": true
         },
         {
-          "name": "rock-bottom-l",
+          "name": "rock-bottom",
           "frames": 1,
           "loop": true
         },
@@ -697,6 +807,41 @@
           "loop": true
         },
         {
+          "name": "rock-strip-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "rock-strip-m",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "rock-strip-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "rock-col-t",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "rock-col-m",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "rock-col-b",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "rock-single",
+          "frames": 1,
+          "loop": true
+        },
+        {
           "name": "rock-thin-l",
           "frames": 1,
           "loop": true
@@ -713,6 +858,16 @@
         },
         {
           "name": "dark-fill",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "dark-fill-b",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "dark-fill-c",
           "frames": 1,
           "loop": true
         },

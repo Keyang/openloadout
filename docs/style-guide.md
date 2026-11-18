@@ -72,6 +72,8 @@ Other rules of scale:
 | Colour count | Colours in one clip at the default look, by kind (the number in brackets is where the checker warns, `THRESHOLDS.colours` in `quality/sprite.js`). Character, creature, boss: 8 to 20 (32), at most five materials. Prop: 6 to 16 (24). Tileset: at most 12 per block (24 per tile). **Pickup: 6 to 12 (16); a tiny 16x16 pickup 4 to 6.** **Projectile: 3 to 8 (12).** Effect: 3 to 12 (24). Background: at most 8 per layer for the landscape, lights not counted (32). Icon and interface piece: at most 10 (16). A specification may ask for fewer (things shown by the hundred), never for more |
 | Readability | Parts are told apart by value (light against dark), not only by hue. Eyes, teeth and markings use `pick(bodyColour, '#ffffff', INK)` so they survive any colour the user chooses |
 
+**Drawing so that other styles stay possible (Contract 12).** An asset may later be offered in more than one style; the three bundles are pixel only, but a sprite written today must not shut the others out. Two rules: **a sprite draws only through the surface's documented calls**, never reading pixels back from the surface and never writing its pixel buffer directly; and **body shapes go through the shape calls** (`ellipse`, `capsule`, `limb`, `poly`, `arc`), with single pixels and pixel rectangles kept for detail (eyes, highlights, trim).
+
 ---
 
 ## 3. Colour
@@ -384,9 +386,9 @@ Rules:
 
 A tileset is one sprite with `meta.type: 'tileset'` and one clip per tile, 32x32, `pivot: [16, 16]`. Tiles fill the frame. Draw them with the tile helper (`engine/tiles.js`, section 14), which makes texture that repeats every 32 px and edges that meet.
 
-### The block: 13 tiles under one prefix
+### The block: 13 pieces, 7 narrow pieces and fill versions under one prefix
 
-Every terrain and every wall, in both views, is a **block** of 13 clips sharing a prefix (`grass`, `stone`, `wall`, `path`, `water`, `pit`). The names are fixed because three things read them and must agree: the quality checker (it tests a clip ending `-fill`, `-top`, `-left` or `-right` against its neighbours), the tile helper (`BLOCK_PIECES` in `engine/tiles.js` are these 13 names) and the playground, which builds its levels from them ("How a level is built from these names", below).
+Every terrain and every wall, in both views, is a **block**: 13 pieces, the seven narrow pieces and, where asked, two more versions of the fill, all sharing a prefix (`grass`, `stone`, `wall`, `path`, `water`, `pit`). The names are fixed because three things read them and must agree: the quality checker (it tests a clip ending `-fill`, `-top`, `-left` or `-right` against its neighbours), the tile helper (`BLOCK_PIECES` and `NARROW_PIECES` in `engine/tiles.js` are these names) and the playground, which builds its levels from them ("How a level is built from these names", below).
 
 ```
 <p>-left       <p>-top       <p>-right            outside the block: air (side view) or the ground around it (top-down)
@@ -394,6 +396,13 @@ Every terrain and every wall, in both views, is a **block** of 13 clips sharing 
 <p>-bottom-l   <p>-bottom    <p>-bottom-r
 
 inner corners, for where the block turns inwards:   <p>-inner-tl   <p>-inner-tr   <p>-inner-bl   <p>-inner-br
+
+narrow pieces, for ground one tile thick:
+<p>-strip-l   <p>-strip-m   <p>-strip-r        one tile high: outside above and below
+<p>-col-t     <p>-col-m     <p>-col-b          one tile wide: outside to the left and right
+<p>-single                                     one tile alone: outside on all four sides
+
+fill versions:   <p>-fill-b   <p>-fill-c         the same fill with other marks, mixed in by position
 ```
 
 | Clip | What it is | Must join (checked by the checker where marked) |
@@ -405,19 +414,32 @@ inner corners, for where the block turns inwards:   <p>-inner-tl   <p>-inner-tr 
 | `<p>-bottom` | The bottom edge. Side view: the underside. Top-down wall: **the wall's front face** (below) | itself sideways; `-fill` above |
 | `<p>-bottom-l`, `<p>-bottom-r` | The bottom corners | `-bottom` beside; `-side-l` / `-side-r` above |
 | `<p>-inner-tl`, `-tr`, `-bl`, `-br` | `-fill` with one corner cut away, for a step or an L-shape. `tl` means the outside shows at the top left | `-fill` on the two solid sides; `-top`, `-side-*` or `-bottom` on the other two |
+| `<p>-strip-l`, `-strip-m`, `-strip-r` | **Narrow.** A strip one tile high: its left end, repeating middle and right end. Top-down wall: the face under a sliver of cap (such a wall reads lower than one two tiles deep) | each other sideways |
+| `<p>-col-t`, `-col-m`, `-col-b` | **Narrow.** A column one tile wide: its top, repeating middle and bottom. Top-down wall: `col-t` and `col-m` are cap, `col-b` is the face | each other up and down |
+| `<p>-single` | **Narrow.** One tile with nothing of the block round it | nothing |
+| `<p>-fill-b`, `<p>-fill-c` | **Fill versions.** The fill with different marks, all kept off the outer 3 px | `-fill`, each other and every edge piece, on all four sides |
+
+**Which pieces a block must have:**
+
+| Pieces | Needed? |
+|---|---|
+| The 13 | **Always.** A prefix with `-top` but not all 13 is not a block |
+| The 7 narrow pieces | **Always, in the three kits**, so that every one of the 16 edge combinations has its own piece: side-view ground, top-down walls (room walls are one tile thick), paths (one tile wide) and holes (a trench, a stream). A block outside the kits may leave them out; the picker then uses the nearest of the 13 |
+| `-fill-b`, `-fill-c` | **For every fill that covers an area and does not move:** side-view ground, second grounds (path, cobbles, plating) and the lone floor fills (`grass-fill`, `floor-fill`, a back wall's `brick-fill`). **Not** for a top-down wall's cap, and not for animated blocks (water, pits), whose motion hides the grid |
+| `-thin-l`, `-thin-m`, `-thin-r`; slopes; decals | As the specification lists |
 
 Rules for a block:
 
 - **The block's outline runs along the tile boundary**, pulled in by at most 3 px for bumps, ragged edges and rounded corners. **Whatever is outside the outline is see-through**, so an edge tile sits over sky, or over any ground in a top-down game. A hole's edge tiles are the exception: they draw the bank or inner wall right up to the tile boundary.
 - **The edge band is at the same place on every tile of a block**, so edges continue from tile to tile: the top edge (grass cap, trim course, lit rim) occupies rows 0 to `edge` of `-top`, `-left` and `-right`; the side edge occupies the outer `edge` columns of the side and corner tiles. `edge` is a control (3 to 9 px).
 - **Never name a tile `-top`, `-left`, `-right` or `-fill` unless it is that tile of a block.** The checker will test it against the block and fail it. A column's capital is `pillar-cap`, not `pillar-top`.
-- **One fill name per block, and no grid showing.** The block has one `<p>-fill` that every edge piece joins. **Over an area of 10x6 tiles no 32 px grid may show:** either the fill has at least two variants that join each other and every edge piece, or `on` decals are scattered over it; in both cases which one a cell gets is **chosen by the cell's position**, so the same map always looks the same (the helper's header says how variants are named and picked). Fill texture uses the ramp's `dark` tone and must stay visible but calm **for every swatch** of the material's colour control.
+- **No grid showing.** Over an area of 10x6 tiles no 32 px grid may show. That is what `-fill-b` and `-fill-c` are for: the picker mixes the three versions **by the cell's position**, so the same map always looks the same; `on` decals scattered by position do the rest. Fill marks use the ramp's `dark` tone (softer tones vanish under the whole-bundle looks) and must stay visible but calm **for every swatch** of the material's colour control.
 - **Calm texture.** At most six small marks per fill tile, none on the outer 2 px, nothing brighter than `light` or darker than `dark`. A screen of fill must not show a blotch repeating every 32 px.
-- **Every one of the 16 edge combinations resolves to a piece** (above, below, left and right each being the block or not): the 13 pieces cover a mass two tiles wide and high or more, and the helper also resolves **one-tile-wide columns, one-tile-high strips and single tiles**, so a level never has a cell without a piece. A one-tile-high strip that is stood on from above is still better drawn with the `thin` pieces.
+- **Every one of the 16 edge combinations resolves to a piece** (above, below, left and right each being the block or not): nine come from the 13 pieces and seven from the narrow pieces, so a level never has a cell without a piece of its own. A strip that is stood on from above and should look like a plank or a ledge is drawn with the `thin` pieces instead.
 - **Slope edges are as deep as flat-top edges where they meet**, so the grass cap or trim course runs on without a step.
-- **Top-down walls may be one tile thick only if the tileset draws the pieces for it** (the helper says which pieces those are). A top-down tileset's sample room, rendered with the tile map tool, **must include a doorway**.
+- **A top-down wall may be one tile thick because it has the narrow pieces.** A wall one tile wide north to south uses `col-t`, `col-m` (cap) and `col-b` (face); a wall one tile deep west to east uses `strip-l`, `strip-m`, `strip-r` or `single`, which are the face under an 8 px sliver of cap. Use two rows where a wall should look full height. A top-down tileset's sample room, rendered with the tile map tool, **must include a doorway**.
 - **Joins are tested exactly:** the checker requires the outline and the edge band of neighbouring pieces to line up to the pixel, at every value of every choice control, not only at the default.
-- Animated blocks (water, void): all 13 clips have 8 frames.
+- Animated blocks (water, void): every piece of the block, narrow pieces included, has 8 frames.
 
 ### What a tileset must contain
 
@@ -425,7 +447,7 @@ Rules for a block:
 
 | Clips | Count | Notes |
 |---|---|---|
-| One block, 13 clips | 13 | The ground. `-bottom` row is the underside of a floating island |
+| One block with narrow pieces and three fills | 22 | The ground. `-bottom` row is the underside of a floating island |
 | `<p>-thin-l`, `<p>-thin-m`, `<p>-thin-r` | 3 | A platform one tile wide and 12 px thick, in the top of the tile; see-through below. `-thin-m` repeats sideways |
 | `<p>-slope-up`, `<p>-slope-down` | 2, optional | 45 degrees, rising and falling to the right |
 | `<p>-deco-a` ... | 2 to 4 | Decals: tufts, stones, cracks |
@@ -435,29 +457,32 @@ Rules for a block:
 
 | Clips | Count | Notes |
 |---|---|---|
-| A ground: `<p>-fill` alone | 1 | The base everything else sits on (`grass-fill`, `floor-fill`) |
-| A second ground as a block (path on grass, plating on floor) | 13 | Edge tiles are see-through outside, so they overlay the base |
-| A wall as a block | 13 | A raised mass seen from the south. `-fill`, `-top`, `-left`, `-right`, `-side-*` are its **cap** (the top surface, lit). **`-bottom`, `-bottom-l`, `-bottom-r` are its front face**: one full tile of wall face, darker than the cap, ending in a base line and a 2 px shadow on the floor |
-| A hole as a block (`pit`, `water`) | 13 | `-fill` is the depth. `-top` shows the inner wall going down (6 to 14 px); `-bottom` is only a thin lip |
+| A ground: `<p>-fill`, `-fill-b`, `-fill-c` and nothing else under that prefix | 3 | The base everything else sits on (`grass-fill`, `floor-fill`) |
+| A second ground as a block (path on grass, plating on floor) | 22 | Edge tiles are see-through outside, so they overlay the base |
+| A wall as a block | 20 | A raised mass seen from the south. `-fill`, `-top`, `-left`, `-right`, `-side-*` are its **cap** (the top surface, lit). **`-bottom`, `-bottom-l`, `-bottom-r` are its front face**: one full tile of wall face, darker than the cap, ending in a base line and a 2 px shadow on the floor |
+| A hole as a block (`pit`, `water`) | 20 | `-fill` is the depth. `-top` shows the inner wall going down (6 to 14 px); `-bottom` is only a thin lip |
 | `<p>-deco-a` ... | 3 to 6 | Floor decals: cracks, grates, flowers, splats |
 
-A tileset holds one or two blocks and at most 32 clips.
+**A tileset holds at most three blocks and at most 64 clips.** (The forest ground has 30; a village with two blocks and a floor has 48.) A world that needs more is split into two tilesets that share their colours.
 
 ### How a level is built from these names
 
 **One picker and one classifier in `engine/tiles.js` decide which piece goes in a cell and which prefixes are ground, wall, hole, platform and decal, and the checker, the preview tool (`tools/tilemap.mjs`) and the playground all use them.** There is no second copy of these rules; the tables below describe them, and the helper's header is the exact statement. A tileset that follows them can be dropped into a level with no set-up; a tile with any other name is never placed automatically.
 
-**The exact piece names** (the same list as `BLOCK_PIECES` in `engine/tiles.js`; `<p>` is the block's prefix):
+**The exact piece names** (`BLOCK_PIECES` and `NARROW_PIECES` in `engine/tiles.js`, plus the fill versions; `<p>` is the block's prefix):
 
 | Name | Placed where |
 |---|---|
-| `<p>-fill` | a cell with the block on all four sides (and all four diagonals) |
+| `<p>-fill`, `-fill-b`, `-fill-c` | a cell with the block on all four sides (and all four diagonals); which version, by the cell's position |
 | `<p>-top` | nothing above; the block to the left and to the right |
 | `<p>-left`, `<p>-right` | nothing above and nothing to the left (`-left`) or to the right (`-right`): the two **top corners** |
 | `<p>-side-l`, `<p>-side-r` | the block above and below; nothing to the left (`-side-l`) or to the right (`-side-r`) |
 | `<p>-bottom` | nothing below; the block to the left and to the right. **In a top-down wall this is the wall's front face** |
 | `<p>-bottom-l`, `<p>-bottom-r` | nothing below and nothing to the left or to the right: the two **bottom corners** (the ends of a top-down wall's front face) |
 | `<p>-inner-tl`, `-inner-tr`, `-inner-bl`, `-inner-br` | the block on all four sides, and only the one diagonal cell missing (`tl`: the cell up and to the left) |
+| `<p>-strip-m`; `<p>-strip-l`, `<p>-strip-r` | nothing above and nothing below; the ends also have nothing to the left (`-strip-l`) or to the right (`-strip-r`) |
+| `<p>-col-m`; `<p>-col-t`, `<p>-col-b` | nothing to the left and nothing to the right; the ends also have nothing above (`-col-t`) or below (`-col-b`) |
+| `<p>-single` | nothing on any of the four sides |
 | `<p>-thin-l`, `<p>-thin-m`, `<p>-thin-r` | a platform one tile high that is stood on from above: left end, repeating middle, right end |
 | `<p>-slope-up`, `<p>-slope-down` | a 45 degree slope rising or falling to the right |
 | `<p>-deco-a`, `-deco-b`, ... | decals, scattered over fill tiles of the same prefix (the tile helper's `place` says `on` a fill tile, `above` a top tile or `below` a bottom tile) |
@@ -471,12 +496,12 @@ The four neighbours decide the piece (16 combinations, each of which resolves to
 | Side | ground | the first block in the file that has both `-top` and `-fill` |
 | Side | floating platforms | the first prefix that has `-thin-m` (the ground's own, if it has one) |
 | Side | slopes | the first prefix that has both slopes |
-| Top-down | floor | a prefix that has **only** `-fill` (`grass-fill`, `floor-fill`): it is laid under everything |
-| Top-down | wall | a block whose prefix contains `wall`. **Name every top-down wall block `wall`** (or `<something>-wall`) |
-| Top-down | hole | a block whose prefix starts with `pit`, `water`, `hole`, `void`, `lava`, `acid` or `pool`. It blocks the way |
+| Top-down | floor | a prefix that has **nothing but fills** (`grass-fill`, `grass-fill-b`, `grass-fill-c`): it is laid under everything |
+| Top-down | wall | a block whose prefix has `wall`, `cliff`, `hedge` or `fence` in it. **In the three kits every top-down wall block is named `wall`** |
+| Top-down | hole | a block whose prefix starts with `pit`, `hole`, `water`, `void`, `lava`, `acid`, `pool`, `pond` or `chasm`. It blocks the way |
 | Top-down | second ground | any other block (`path`, `cobble`, `plate`): laid over the floor |
 
-So: never give a top-down wall another prefix (a hive wall is `wall-*`, not `growth-*`), never start the prefix of walkable ground with one of the hole words, and in a side-view tileset list the ground block before anything else that has a `-top` and a `-fill`. Things that repeat up and down use `-cap`, `-mid`, `-foot` (`ladder-cap`, `pillar-mid`); those, and every other name (`bridge-h`, `stairs-down`, `window`), are placed by hand.
+So: give a top-down wall a wall word in its prefix (a hive wall is `wall-*`, not `growth-*`), never start the prefix of walkable ground with one of the hole words, never put a wall word in it, and in a side-view tileset list the ground block before anything else that has a `-top` and a `-fill`. (A block may also state its kind to the helper, which then wins over its name: see the helper's header.) Things that repeat up and down use `-cap`, `-mid`, `-foot` (`ladder-cap`, `pillar-mid`); those, and every other name (`bridge-h`, `stairs-down`, `window`), are placed by hand.
 
 ---
 
