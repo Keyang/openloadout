@@ -9,7 +9,7 @@
 //   drawStairs(g, 'up', { tread: p.floor, wall: p.stone });                       // steps climbing to the north
 //   const pit = { ink: INK, fill: () => INK, top: { depth: 12, paint: sunkWall({ depth: 12, joints, tones: [{ body, joint }, { body: joint }] }) } };
 //   g.blob([boneIn(8, 20, 17, 16)], ramp(P.cream), { outline: tone(P.cream, -1.4) });   // a bone lying on the floor
-//   runeSeal(g, 16, 24, 10, t / 6, steps(p.glow));                                // after g.outline: it is light
+//   runeSeal(g, 16.5, 24.5, 9, t / 3, steps(p.glow));                             // after g.outline: it is light
 
 import { INK, ramp, mix, tone } from './color.js';
 import { ellipseIn, capsuleIn } from './surface.js';
@@ -88,7 +88,7 @@ export function boneIn(x0, y0, x1, y1, r = 0.8, knob = 1.5) {
 
 /**
  * Draws a rune seal seen face on, a thing made of light: an outer ring rimmed with a darker tone in place of an ink line, and inside it an inner ring, rune marks that turn between the two and a mark at the heart, through which what it lies on still shows. Draw it after g.outline. Returns g.
- * Arguments: g (the Surface); cx, cy (its middle; pixel centres are at .5); r (the outer ring's radius, 6 or more); turn (how far the marks have turned, in turns: with `marks` marks, going from 0 to 1 / marks over a loop closes it); colours (the steps of the light, hottest first, as steps() in engine/fx.js gives them: the marks take the first, the rings the middle one, the rim the last); options { marks (how many rune marks, default 6), heat (0..1: 1 makes the rings as hot as the marks, default 0), box ([x0, y0, x1, y1]: nothing is drawn outside it) }.
+ * Arguments: g (the Surface); cx, cy (its middle; pixel centres are at .5); r (the outer ring's radius, 6 or more); turn (how far the marks have turned, in turns; the marks are by turns a stroke and a dot, so going from 0 to 2 / marks over a loop closes it); colours (the steps of the light, hottest first, as steps() in engine/fx.js gives them: the marks take the first, the rings the middle one, the rim the last); options { marks (how many rune marks, default 6), heat (0..1: 1 makes the rings as hot as the marks, default 0), box ([x0, y0, x1, y1]: nothing is drawn outside it) }.
  */
 export function runeSeal(g, cx, cy, r, turn, colours, { marks = 6, heat = 0, box } = {}) {
   const C = Array.isArray(colours) ? colours : [tone(colours, 1.6), colours, tone(colours, -1)];

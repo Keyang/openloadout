@@ -14,10 +14,17 @@
 // "Share" always means a share of a path's length: 0 at its first point, 1 at its last.
 
 import { clamp, lerp, hash, PI } from './motion.js';
-import { capsuleIn, polyIn } from './surface.js';
+import { capsuleIn, polyIn as wholePolyIn } from './surface.js';
 import { hornPath } from './creature.js';
 
 const any = (tests) => (px, py) => { for (const f of tests) if (f(px, py)) return true; return false; };
+/** polyIn that answers at once outside the box of its own corners: these shapes are small and asked about over a whole body. */
+function polyIn(pts) {
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  for (const [x, y] of pts) { x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y); }
+  const inside = wholePolyIn(pts);
+  return (px, py) => px >= x0 && px <= x1 && py >= y0 && py <= y1 && inside(px, py);
+}
 /** The running length of a path at each of its points, and the whole length last. */
 function lengthsOf(pts) {
   const at = [0];

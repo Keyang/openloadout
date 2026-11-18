@@ -36,12 +36,9 @@ import { clamp, TAU } from './motion.js';
 const R = Math.round;
 /** A dark material painted without its darkest tone, which would sink into the outline. */
 const flatDark = (K) => ({ light: K.light, base: K.base, dark: K.base });
-/** How much flatter the camera sees a thing lying on the floor (the same 0.6 as rigs/creature-topdown.js). */
-const FLAT = 0.6;
 const RED = ['#ffffff', '#f0ead8', '#e98c8c', '#e2473f', tone('#e2473f', -1)];
 const newBox = () => [Infinity, Infinity, -Infinity, -Infinity];
 const grow = (E, x0, y0, x1, y1) => { E[0] = Math.min(E[0], Math.floor(x0)); E[1] = Math.min(E[1], Math.floor(y0)); E[2] = Math.max(E[2], Math.ceil(x1)); E[3] = Math.max(E[3], Math.ceil(y1)); return E; };
-const between = (p, q, k) => [p[0] + (q[0] - p[0]) * k, p[1] + (q[1] - p[1]) * k];
 /** The colour of a lens at a light level: off, dim, lit, flaring. */
 const lensOf = (L, K, level) => (level >= 1.5 ? L[1] : level >= 0.75 ? L[3] : level >= 0.25 ? L[4] : K.dark);
 
@@ -145,7 +142,7 @@ export function botHead(g, kind, V, o = {}) {
     const ey = R(cy - Math.max(1, up * 0.35));
     if (facing === 'down') {
       g.ellipse(mid + look, ey + 0.5, 2.4, 2.4, K.base, { shade: 0 });
-      g.ellipse(mid + look, ey + 0.5, 1.4, 1.4, lens, { shade: 0 });
+      g.rect(mx - 1 + look, ey - 1, 3, 3, lens);
       if (on) g.dot(mx + 1 + look, ey - 1, L[0]);
       eye = [mx + look, ey];
     } else if (facing === 'side') {
@@ -155,7 +152,7 @@ export function botHead(g, kind, V, o = {}) {
       eye = [x1 - 1, ey];
     } else g.rect(mx - 1, ey, 3, 2, K.base);                                      // a hatch in the back of the dome
   } else {
-    armourBlock(g, { x0, x1, top, face, bottom, inset: 1, paint: H, seam: o.seam });
+    armourBlock(g, { x0, x1, top, face, bottom, inset: w >= 7 ? 1 : 0, paint: H, seam: o.seam });
     const ly = face + Math.max(2, R(h * 0.45)), r = Math.max(2.4, w / 2 - 0.6);
     if (facing !== 'side') { for (const s of [-1, 1]) g.rect(s < 0 ? x0 - 1 : x1, ly - 1, 1, 3, K.base); left = x0 - 1; right = x1 + 1; }   // a pod at each side
     if (facing === 'down') {
@@ -200,29 +197,30 @@ export function botWeapon(g, kind, at, o = {}) {
   };
   let tip, tool;
   if (kind === 'cannon') {
-    const end = pt(far, mb, axis - droop), bw = Math.max(3, R(3 * k)), hb = bw / 2;
+    // a drooping barrel keeps its length: its tip comes back as it goes down
+    const run = Math.sqrt(Math.max(1, (L + 2) ** 2 - droop ** 2)), end = pt(ma + 1 + th + run, mb, axis - droop), bw = Math.max(3, R(3.4 * k)), hb = bw / 2;
     tip = end;
-    grow(E, Math.min(root[0], end[0]) - hb - 1, Math.min(root[1], end[1]) - hb - 2, Math.max(root[0], end[0]) + hb + 1, Math.max(root[1], end[1]) + hb + 1);
+    grow(E, Math.min(root[0], end[0]) - hb - 1, Math.min(root[1], end[1]) - hb - 3, Math.max(root[0], end[0]) + hb + 1, Math.max(root[1], end[1]) + hb + 1);
     tool = () => {
       g.limb(root[0], root[1], end[0], end[1], bw, M, { shade: 1 });
-      const q0 = between(root, end, 0.45), q1 = between(root, end, 0.7);
-      g.limb(q0[0], q0[1], q1[0], q1[1], bw, A.base, { shade: 0 });               // a band of the hazard colour
       const ex = R(end[0] - hb), ey = R(end[1]);
-      if (facing === 'down') { g.rect(ex - 1, ey - 2, bw + 2, 3, M.light); g.rect(ex, ey - 1, bw, 1, K.dark); }        // the muzzle looks at the camera
+      if (facing === 'down') { g.rect(ex - 1, ey - 3, bw + 2, 4, M.light); g.rect(ex, ey - 2, bw, 2, K.dark); }        // the muzzle looks at the camera
       else if (facing === 'side') g.rect(R(end[0]) - 2, R(end[1] - hb) - 1, 2, bw + 2, M.light);                       // a collar round the muzzle
       else g.rect(ex - 1, ey, bw + 2, 2, M.light);
     };
   } else if (kind === 'saw') {
-    const r = Math.max(3, L * 0.5), c0 = axis - droop, C = pt(far - r, mb, c0), ry = r * FLAT;
-    tip = pt(far, mb, c0);
-    const teeth = 8, wheel = toothedIn(0, 0, r, teeth, Math.min(1.6, r * 0.34), (work * TAU) / (teeth * 2), 'saw');
-    const blade = (px, py) => wheel(px - C[0], (py - C[1]) / FLAT);
-    grow(E, Math.min(root[0], C[0] - r) - 1, Math.min(root[1], C[1] - ry) - 1, Math.max(root[0], C[0] + r) + 1, Math.max(root[1], C[1] + ry) + 1);
+    // the blade lies flat: a disc of the machine's own space, as flat on the picture as the projector makes it
+    const r = Math.max(3, L * 0.62), c0 = axis - 1 - droop, C = pt(far - r, mb, c0), ea = pt(far, mb, c0), eb = pt(far - r, mb + r, c0);
+    const rx = Math.max(Math.abs(ea[0] - C[0]), Math.abs(eb[0] - C[0]), 1), ry = Math.max(Math.abs(ea[1] - C[1]), Math.abs(eb[1] - C[1]), 1);
+    tip = ea;
+    const teeth = 8, wheel = toothedIn(0, 0, r, teeth, Math.min(1.8, r * 0.36), (work * TAU) / (teeth * 2), 'saw');
+    const blade = (px, py) => wheel(((px - C[0]) * r) / rx, ((py - C[1]) * r) / ry);
+    grow(E, Math.min(root[0], C[0] - rx) - 1, Math.min(root[1], C[1] - ry) - 1, Math.max(root[0], C[0] + rx) + 1, Math.max(root[1], C[1] + ry) + 1);
     const arm = () => g.limb(root[0], root[1], C[0], C[1], 2, flatDark(K), { shade: 0 });
     const disc = () => {
-      g.fill(C[0] - r - 1, C[1] - ry - 1, C[0] + r + 1, C[1] + ry + 1, blade, M, { shade: 1, light: 1 });
+      g.fill(C[0] - rx - 1, C[1] - ry - 1, C[0] + rx + 1, C[1] + ry + 1, blade, { light: M.light, base: M.light, dark: M.base }, { shade: 1 });
       const a = (work * TAU) / 8;                                                  // a slot in the blade, turning with it
-      g.line(C[0], C[1], C[0] + Math.cos(a) * r * 0.62, C[1] + Math.sin(a) * ry * 0.62, M.dark);
+      g.line(C[0], C[1], C[0] + Math.cos(a) * rx * 0.62, C[1] + Math.sin(a) * ry * 0.62, M.dark);
       g.rect(Math.floor(C[0]) - 1, Math.floor(C[1]), 2, 1, A.base);
     };
     tool = facing === 'up' ? () => { disc(); arm(); } : () => { arm(); disc(); };

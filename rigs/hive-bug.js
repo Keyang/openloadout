@@ -139,12 +139,12 @@ export function crawlerDims(o = {}) {
   });
   // the legs grow from under the whole body, front pair behind the head, back pair under the last segment
   const n = B.segs.length, a0 = B.front - B.segs[0].len * 1.05, a1 = B.back + B.segs[n - 1].len * (n > 2 ? 0.75 : 0.42);
-  const splay = lerp(1.6, 3, legs) * k * (profile ? 1 : 1.8);      // seen from the front or the back the legs fan out, so each one shows
+  const splay = lerp(1.6, 3, legs) * k * (profile ? 1 : 2.5);      // seen from the front or the back the legs fan out, so each one shows
   for (let i = 0; i < 3; i++) {
     const u = i / 2, side = 1 - 2 * u;                       // 1 at the front pair .. -1 at the back pair
     B.hips[i] = lerp(a0, a1, u);
     B.feet[i] = B.hips[i] + side * splay;
-    B.spans[i] = span * (1 - 0.14 * side * side);
+    B.spans[i] = span * (1 - 0.2 * side * side);
   }
   B.hipB = B.wide * (profile ? 0.12 : 0.3);
   return { k, legs, length, direction, B, head: B.segs[0], last: B.segs[n - 1] };
@@ -198,8 +198,9 @@ function crawlerShapes(dir, P, d, opt, shift = [0, 0]) {
   const at = (i, a, b, c) => J.at(a, b + (bend[i] ?? 0), c);
   const curl = clamp(P.curl ?? 0), loose = roll * roll * (3 - 2 * roll), mixTo = (p, q) => [lerp(p[0], q[0], loose), lerp(p[1], q[1], loose)];
   const legs = J.legs.map((L) => {
-    const sgn = L.side === 'right' ? 1 : -1, f = P.feet?.[(sgn > 0 ? 0 : B.pairs) + L.i] ?? { x: 0 }, a = B.hips[L.i] + f.x, half = B.wide / 2, mid = B.top * 0.55;
-    const hip = at(0, a, sgn * half * 0.7, mid), knee = at(0, a, sgn * (half + lerp(3, 1.5, curl) * k), mid + 2 * k), foot = at(0, a, sgn * lerp(half + 5 * k, half * 0.3, curl), mid + lerp(4.5, 0.5, curl) * k);
+    const sgn = L.side === 'right' ? 1 : -1, f = P.feet?.[(sgn > 0 ? 0 : B.pairs) + L.i] ?? { x: 0 }, a = B.hips[L.i] + f.x, half = B.wide / 2, mid = B.top * 0.55, fan = 1 - L.i;
+    const hip = at(0, a, sgn * half * 0.7, mid), knee = at(0, a + fan * lerp(2.5, 1.5, curl) * k, sgn * (half + lerp(3, 2, curl) * k), mid + 1.5 * k);
+    const foot = at(0, a + fan * lerp(5, 1, curl) * k, sgn * lerp(half + 5.5 * k, half * 0.35, curl), mid + lerp(2.5, 0.5, curl) * k);
     const far = dir === 'side' && !L.near ? 1.5 * up : 0;     // from the side the far legs stand a little forward, so every leg reads
     // standing, the knee is well out from the body, so a leg is a thigh reaching out and a shin coming down
     const elbow = dir === 'side' ? L.knee[0] : lerp(L.hip[0], L.foot[0], 0.62);
@@ -223,12 +224,13 @@ function crawlerShapes(dir, P, d, opt, shift = [0, 0]) {
   if (tk === 'stinger' || tk === 'club') {
     const sway = (P.tail ?? 0) * 1.6, whip = P.whip ?? 0, c0 = last.c + last.tall * 0.1;
     const rise = (h) => c0 + h * tl * lerp(0.15, 1, up), out = (a) => B.back - a * tl * lerp(1.5, 1, up);
+    // each point of the tail: how far behind the tail end, how high above it, and how far it swings with the rest
     const stalk = tk === 'stinger'
-      ? [[B.back + 2, 0, c0], [out(2.6), sway * 0.3, rise(2.6)], [out(3.4) + whip * 1.5, sway * 0.7, rise(5.6)], [out(1.6) + whip * 3, sway, rise(7.8)]]
-      : [[B.back + 2, 0, c0], [out(2.8), sway * 0.5, rise(1.8)], [out(5), sway, rise(3.4)]];
-    const pts = stalk.map(([a, b, c]) => xy(at(n - 1, a, b, c)));
-    tail = { kind: tk, pts, w0: tk === 'stinger' ? 3.4 : 2.8, w1: tk === 'stinger' ? 2.4 : 2.2 };
-    if (tk === 'stinger') tail.barb = [pts.at(-1), xy(at(n - 1, out(-2.2) + whip * 4, sway, rise(6.4) - whip * 1.5))];
+      ? [[-1.5, 0.5, 0], [2.2, 2.7, 0.2], [3.4 - whip, 5.8, 0.45], [2 - whip * 2.5, 8.6, 0.75], [-1 - whip * 4.5, 9.8 - whip * 1.5, 1]]
+      : [[-2, 0, 0], [2.8, 1.8, 0.5], [5, 3.4, 1]];
+    const pts = stalk.map(([a, h, w]) => xy(at(n - 1, out(a), sway * w + 1.4 * w * w * up, rise(h))));
+    tail = { kind: tk, pts, w0: tk === 'stinger' ? 4 : 2.8, w1: tk === 'stinger' ? 3.4 : 2.2 };
+    if (tk === 'stinger') tail.barb = [pts.at(-1), xy(at(n - 1, out(-4.4 - whip * 6), sway + 1.4 * up, rise(7.8 - whip * 3)))];
     else {
       const r = 2.5 * Math.sqrt(tl), [bx, by] = pts.at(-1);
       tail.ball = { x: bx, y: by, r, knobs: [-0.9, 0.6, 2.3].map((a) => [bx + Math.cos(a) * (r + 0.6), by - Math.sin(a) * (r + 0.6)]) };
@@ -257,8 +259,8 @@ function crawlerMarks(S) {
   for (const L of S.J.legs) m.push([...L.knee, 1.2], [...L.foot, 1]);
   for (const h of S.horns) h.pts.forEach((q, i) => m.push([...q, i ? 0.8 : 1.4]));
   if (S.tail) {
-    S.tail.pts.forEach((q) => m.push([...q, S.tail.w0 / 2]));
-    if (S.tail.barb) m.push([...S.tail.barb[1], 0.6]);
+    S.tail.pts.forEach((q) => m.push([...q, S.tail.w0 / 2 + 0.3]));
+    if (S.tail.barb) m.push([...S.tail.barb[1], 0.8]);
     if (S.tail.ball) m.push([S.tail.ball.x, S.tail.ball.y, S.tail.ball.r + 1.4]);
   }
   for (const s of S.spikes) m.push([...s.tip, 0.5]);
@@ -323,6 +325,7 @@ function drawCrawler(g, S, P, d, look = {}) {
   const { dir, J, segs, roll } = S, k = d.k;
   const shell = ramp(look.body ?? '#ca9eda'), soft = ramp(look.accent ?? '#b04a8a'), softFar = farRamp(look.accent ?? '#b04a8a'), bone = ramp(look.bone ?? BONE);
   const under = softFar;                                       // the soft underside and the face: a tone darker than the legs
+  const belly = ramp(tone(look.accent ?? '#b04a8a', 0.55));    // what shows when it lies on its back: paler than the legs folded over it
   const over = roll > 0.5;                                     // on its back: the legs are above the belly
   const lumps = segs.map((s) => K.segmentIn(s));
   const whole = anyIn(lumps);
@@ -331,19 +334,14 @@ function drawCrawler(g, S, P, d, look = {}) {
   const paintTail = (onBody) => {
     const T = S.tail;
     if (!T) return;
-    const stalk = chainIn(T.pts, T.w0, T.w1), paint = over ? under : shell;
-    if (onBody) g.fill(0, 0, g.w, g.h, rimOn(stalk, whole), over ? under.dark : shell.dark);
+    const paint = over ? under : shell, n = T.pts.length;
+    // a stinger is a chain of beads, a club a smooth stalk
+    const stalk = T.barb ? anyIn(T.pts.map(([x, y], i) => ellipseIn(x, y, lerp(T.w0, T.w1, i / (n - 1)) / 2, lerp(T.w0, T.w1, i / (n - 1)) / 2)), chainIn(T.pts, 2, 2)) : chainIn(T.pts, T.w0, T.w1);
+    if (onBody) g.fill(0, 0, g.w, g.h, rimOn(stalk, whole), over ? soft.base : shell.dark);
+    if (T.barb) g.fill(0, 0, g.w, g.h, chainIn(T.barb, 2.4, 0.7), bone, { shade: 0 });
     g.fill(0, 0, g.w, g.h, stalk, paint, { shade: 1 });
-    for (const q of T.pts.slice(1, -1)) g.dot(q[0], q[1], paint.dark);          // its joints
-    if (T.barb) {
-      const [a, b] = T.barb;
-      g.fill(0, 0, g.w, g.h, anyIn(ellipseIn(a[0], a[1], 1.9 * Math.sqrt(k), 1.9 * Math.sqrt(k))), paint, { shade: 1 });
-      g.fill(0, 0, g.w, g.h, chainIn([a, b], 2.4, 0.7), bone, { shade: 0 });
-    }
-    if (T.ball) {
-      const B = T.ball;
-      g.blob([ellipseIn(B.x, B.y, B.r, B.r), ...B.knobs.map(([x, y]) => ellipseIn(x, y, 1.1, 1.1))], bone, { shade: 1 });
-    }
+    if (T.barb) for (let i = 1; i < n; i++) g.dot((T.pts[i - 1][0] + T.pts[i][0]) / 2, (T.pts[i - 1][1] + T.pts[i][1]) / 2, paint.dark);          // the joints between its beads
+    if (T.ball) g.blob([ellipseIn(T.ball.x, T.ball.y, T.ball.r, T.ball.r), ...T.ball.knobs.map(([x, y]) => ellipseIn(x, y, 1.1, 1.1))], bone, { shade: 1 });
   };
   const paintSpikes = (i) => {
     for (const s of S.spikes) {
@@ -355,8 +353,8 @@ function drawCrawler(g, S, P, d, look = {}) {
   const paintSegment = (s, behind) => {
     const lump = K.segmentIn(s), box = boxOf(s), head = s.i === 0;
     // the groove where this plate laps the one behind it
-    if (behind) g.fill(...box, rimOn(lump, behind), over ? under.deep : shell.dark);
-    g.fill(...box, lump, under, { shade: 1 });
+    if (behind) g.fill(...box, rimOn(lump, behind), over ? soft.base : shell.dark);
+    g.fill(...box, lump, over ? belly : under, { shade: 1 });      // on its back the pale belly shows; standing, only the dark underside of the rim
     // the armour: all of the lump but its underside; on the head it leaves the face open. It turns away as the body goes over
     const keep = dir === 'up' ? 0.86 : head ? (dir === 'down' ? 0.56 : 0.66) : 0.74;
     const [nx, ny] = head && dir === 'side' ? [0.85, 0.55] : [0, 1];
@@ -379,7 +377,7 @@ function drawCrawler(g, S, P, d, look = {}) {
 
   const legs = () => {
     if (dir === 'side' && !over) return K.drawLegs(g, J, softFar, { side: 'far', width: LEG });
-    return K.drawLegs(g, J, soft, { side: 'all', width: LEG });
+    return K.drawLegs(g, J, over ? under : soft, { side: 'all', width: LEG });       // folded over the belly they are the darker of the two
   };
   const body = () => { segs.forEach((s, j) => paintSegment(s, j ? anyIn(lumps.slice(0, j)) : null)); if (roll > 0.97) paintRim(); };
 
@@ -428,4 +426,201 @@ function crawlerEyes(g, S, P, d, look = {}) {
     eye(hs.x + hs.rx * 0.34, hs.y + hs.ry * 0.05, true);
     eye(hs.x + hs.rx * 0.34 - 2, hs.y + hs.ry * 0.05 - 1, false);
   }
+}
+
+// ---- the mite -----------------------------------------------------------------------------------------
+
+// segments, head first: how long, how wide, how tall (pixels at size 1)
+const MITE_PLANS = {
+  round: [{ len: 12, wide: 13.5, tall: 9.5 }],
+  long: [{ len: 7, wide: 9.5, tall: 7.5 }, { len: 12.5, wide: 11.5, tall: 9 }],
+  spiky: [{ len: 11, wide: 12, tall: 9 }],
+};
+const MITE_PAIRS = { four: 2, six: 3, eight: 4 };
+
+/**
+ * Measurements of a mite in pixels, from plain numbers: one small body (or a head and a body) on two, three or four pairs of thin legs that fan out all round it.
+ * Arguments: o { size (0..1: small to big), shape (one of MITE_SHAPES, default 'round'), legs (one of MITE_LEGS, default 'six') }.
+ * Returns { k (the scale), shape, pairs, B (the body, as rigs/creature-topdown.js body() gives it), main (the biggest segment of B.segs) }.
+ */
+export function miteDims(o = {}) {
+  const k = lerp(0.88, 1.16, clamp(o.size ?? 0.5)), shape = MITE_SHAPES.includes(o.shape) ? o.shape : 'round';
+  const pairs = MITE_PAIRS[o.legs] ?? 3, plan = MITE_PLANS[shape];
+  const wide = Math.max(...plan.map((s) => s.wide)) * k;
+  const B = K.body({ segments: plan.map((s) => ({ len: s.len * k, wide: s.wide * k, tall: s.tall * k })), overlap: 0.4, rise: 1.2 * k, pairs, span: wide / 2 + 2.7 * k, knee: 2.4 * k, legW: 1 });
+  const main = B.segs.reduce((best, s) => (s.len > best.len ? s : best), B.segs[0]);
+  // the legs fan out from under the body: the more of them, the wider the fan
+  const reach = lerp(3.4, 5.2, (pairs - 2) / 2) * k;
+  for (let i = 0; i < pairs; i++) {
+    const side = pairs === 1 ? 0 : 1 - (2 * i) / (pairs - 1);
+    B.hips[i] = main.a + side * main.len * 0.22;
+    B.feet[i] = main.a + side * (main.len * 0.22 + reach);
+    B.spans[i] = B.span * (1 - 0.22 * side * side);
+  }
+  B.hipB = wide * 0.3;
+  return { k, shape, pairs, B, main };
+}
+
+/**
+ * The pose of a mite at phase t (0..1) of an action: idle (breathes, taps a foot, blinks), walk (a skitter: two quick steps a clip, the body jolting and tilting left and right), attack (a nip: crouch, hop with the fangs wide, land and snap them shut; laid out for 6 frames), hurt, die (a pop: swells for two frames, bursts on frame 3 of 6, and leaves a puddle; laid out for 6 frames).
+ * Arguments: name (one of POSES; any other name gives the resting pose); t; m { bounce (0..1: how lively) }; d (from miteDims()).
+ * Returns the top-down creature rig's pose, plus { tilt (radians the body leans, clockwise on the picture), open (0..1: fangs apart), swell (the body's size, 1 at rest), burst (-1 until it pops, then 0..1) }.
+ */
+export function mitePose(name, t, m = {}, d = miteDims()) {
+  const bounce = m.bounce ?? 0.5, B = d.B;
+  const P = K.pose(name === 'idle' || name === 'hurt' ? name : 'rest', t, { bounce }, B);
+  Object.assign(P, { tilt: 0, open: 0.15, swell: 1, burst: -1 });
+  const each = (fn) => { for (let side = 0; side < 2; side++) for (let i = 0; i < B.pairs; i++) fn(P.feet[side * B.pairs + i], i, side); };
+  if (name === 'idle') {
+    P.open = 0.15 + 0.5 * pulse(t * 2, 0.15);
+    P.tilt = 0.14 * lerp(0.5, 1, bounce) * Math.sin(TAU * t) * (t > 0.5 ? 1 : 0);        // one twitch to the side and back
+  } else if (name === 'walk') {
+    const o = { stride: 1.8, lift: lerp(1.2, 2.2, bounce) };
+    each((f, i, side) => Object.assign(f, K.step(t * 2 + K.gait(i, side), o)));
+    P.drop = lerp(0.5, 1.4, bounce) * (0.5 + 0.5 * Math.cos(4 * TAU * t));               // a jolt on every frame of eight
+    P.tilt = lerp(0.14, 0.32, bounce) * Math.sin(TAU * t + 0.4);
+    P.sway = 0.9 * Math.sin(TAU * t + 0.4);
+  } else if (name === 'attack') {
+    // 0 rest, 1 crouch, 2 the hop, fangs wide, 3 it lands and the fangs snap shut, 4 recovers, 5 rest
+    P.squash = keys(t, [[0, 0], [0.2, 0.4], [0.4, -0.35], [0.6, 0.35], [0.8, 0.1], [1, 0]]);
+    P.lift = keys(t, [[0, 0], [0.2, 0], [0.4, lerp(2.4, 3.6, bounce)], [0.6, 0], [1, 0]]);
+    P.x = keys(t, [[0, 0], [0.2, -1.5], [0.4, 1], [0.6, 2.2], [0.8, 1], [1, 0]]);
+    P.open = keys(t, [[0, 0.15], [0.2, 0.5], [0.4, 1], [0.6, 0], [0.8, 0.1], [1, 0.15]]);
+    each((f) => { f.y = P.lift * 0.6; });
+  } else if (name === 'hurt') {
+    P.tilt = keys(t, [[0, -0.3], [0.5, 0.15], [1, 0]]);
+    P.open = 0.6 * (1 - t);
+  } else if (name === 'die') {
+    // 0 the hit (white), 1 to 2 it swells, 3 it bursts, 4 the splash falls, 5 a puddle and crumbs
+    P.flash = t < 0.1;
+    P.blink = false;
+    P.swell = keys(t, [[0, 0.92], [0.2, 1.16], [0.4, 1.34], [1, 1.34]]);
+    P.squash = keys(t, [[0, 0.35], [0.2, 0], [0.4, -0.15], [1, 0]]);
+    P.tilt = keys(t, [[0, -0.25], [0.2, 0.12], [0.4, 0], [1, 0]]);
+    P.open = 0.8;
+    P.burst = t >= 0.6 - 0.01 ? clamp((t - 0.6) / 0.4) : -1;
+  }
+  return P;
+}
+
+// Every shape of a mite for one pose, in frame pixels.
+function miteShapes(P, d, shift = [0, 0]) {
+  const B = d.B, k = d.k;
+  const J = K.solve('down', P, B, { cx: MITE_PIVOT[0] + shift[0], gy: MITE_GROUND + shift[1] });
+  const ms = J.segs.find((s) => s.i === d.main.i), hs = J.segs.find((s) => s.i === 0);
+  const cx = ms.x, cy = ms.y, tilt = P.tilt ?? 0, swell = P.swell ?? 1, c = Math.cos(tilt), sn = Math.sin(tilt);
+  const turn = (x, y) => [cx + (x - cx) * swell * c - (y - cy) * swell * sn, cy + (x - cx) * swell * sn + (y - cy) * swell * c];      // a point of the upright body, where the pose puts it
+  const lumps = J.segs.map((s) => ellipseIn(s.x - cx, s.y - cy, s.rx, s.ry));
+  const ruff = d.shape === 'spiky' ? fanIn(0, ms.ry * 0.3, PI - 1.35, PI + 1.35, 5, ms.ry * 1.3 + 3.4 * k, 3.6, { belly: 0.3, blunt: 0.8 }) : null;
+  const placed = (tests) => placedIn(tests, cx, cy, { angle: tilt, sx: swell });
+  // standing, the knee is well out from the body, so a leg is a thigh reaching out and a shin coming down
+  const legs = J.legs.map((L) => ({ ...L, knee: [lerp(L.hip[0], L.foot[0], 0.6), L.knee[1]] }));
+  const tips = d.shape === 'spiky' ? [-1.35, -0.675, 0, 0.675, 1.35].map((a) => turn(cx + Math.sin(PI + a) * (ms.ry * 1.3 + 3.4 * k), cy + ms.ry * 0.3 + Math.cos(PI + a) * (ms.ry * 1.3 + 3.4 * k))) : [];
+  // the face: on the head, toward the camera
+  const face = turn(hs.x, hs.y + hs.ry * 0.2), chin = (dx, dy) => turn(hs.x + dx, hs.y + hs.ry + dy);
+  const open = P.open ?? 0, fangs = [-1, 1].map((s) => [chin(s * 1.6 * k, -1.2), chin(s * (1.6 + 1.6 * open) * k, 0.6 + 1.2 * open)]);
+  return { J: { ...J, legs }, d, ms, hs, cx, cy, turn, lumps, ruff, placed, tips, face, fangs, swell, tilt };
+}
+
+function miteMarks(S) {
+  const m = [];
+  for (const s of S.J.segs) for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1], [0.7, 0.7], [-0.7, 0.7], [0.7, -0.7], [-0.7, -0.7]]) m.push(S.turn(s.x + dx * s.rx, s.y + dy * s.ry));
+  for (const L of S.J.legs) m.push([...L.knee, 1], [...L.foot, 1]);
+  for (const q of S.tips) m.push([...q, 0.5]);
+  for (const f of S.fangs) m.push([...f[1], 0.8]);
+  return m;
+}
+
+/**
+ * Builds one frame of a mite, posed and fitted once, so nothing reaches the frame edge at any setting and no frame is empty.
+ * Arguments: clip (a pose name from POSES); t (0..1); p (the sprite's values: size and bounce are read from it); opt { legs (one of MITE_LEGS), shape (one of MITE_SHAPES), eyes (one of MITE_EYES) }.
+ * Returns F = { name, d, P, S (its shapes), draw(g, look) (paints the mite; once it has popped, the puddle and the crumbs it leaves), finish(g, look) (the white flash of a hit, the outline, then the lit eyes and the flying splash) }; look is { body, glow (the eyes, and what is inside it), bone (the fangs; default cream) }.
+ */
+export function mite(clip, t, p = {}, opt = {}) {
+  const d = miteDims({ size: p.size, shape: opt.shape, legs: opt.legs });
+  const P = mitePose(clip, t, { bounce: p.bounce }, d);
+  let S = miteShapes(P, d);
+  const [dx, dy] = nudgeInside(miteMarks(S), MITE_SIZE[0], MITE_SIZE[1], 2);
+  if (dx || dy) S = miteShapes(P, d, [dx, dy]);
+  return {
+    name: clip, d, P, S,
+    draw(g, look) { drawMite(g, S, P, d, look); return S; },
+    finish(g, look = {}) {
+      if (P.flash) g.tint('#ffffff');
+      g.outline(look.outline ?? INK);
+      if (P.burst >= 0) miteSplash(g, S, P, d, look);
+      else if (!P.flash) miteEyes(g, S, P, d, look, opt.eyes);
+      return g;
+    },
+  };
+}
+
+// the floor under a mite, and the box its splash stays in
+const miteFloor = (S) => [S.J.origin[0], S.J.gy - 2.5];
+const MITE_BOX = [2, 2, MITE_SIZE[0] - 2, MITE_GROUND + 2];
+
+function drawMite(g, S, P, d, look = {}) {
+  const R = ramp(look.body ?? '#b04a8a'), bone = look.bone ?? BONE, lit = look.glow ?? '#9fe040', k = d.k;
+  if (P.burst >= 0) {
+    // popped: what was inside it spreads into a puddle, and bits of shell lie in it
+    const [fx, fy] = miteFloor(S), u = P.burst;
+    g.fill(0, 0, g.w, g.h, splatIn(fx, fy, lerp(3.2, 6.2, u) * k, { seed: 3, lobes: 5, drops: 3, squash: 0.5 }), { light: lit, base: lit, dark: tone(lit, -1) }, { shade: 1, clip: (px, py) => px > 2 && px < g.w - 2 && py < MITE_GROUND + 1 });
+    for (let i = 0; i < 3; i++) {
+      const a = PI * (0.15 + 0.35 * i) + hash(i, 9), far = lerp(2.5, 5.5 + 2 * hash(i, 4), u) * k, hop = 5 * k * Math.sin(PI * clamp(u * 1.4)) * (1 - 0.3 * i);
+      g.rect(Math.round(fx + Math.cos(a) * far) - 1, Math.round(fy - 0.5 - hop * (u < 0.72 ? 1 : 0)) - 1, 2, i ? 1 : 2, i === 1 ? R.dark : R.base);
+    }
+    return g;
+  }
+  K.drawLegs(g, S.J, R.dark, { side: 'all', width: LEG });
+  const all = S.placed([...S.lumps, ...(S.ruff ? [S.ruff] : [])]);
+  for (const f of S.fangs) g.fill(0, 0, g.w, g.h, chainIn(f, 1.8, 0.9), bone);
+  g.fill(0, 0, g.w, g.h, all, R, { shade: 1, light: 1 });                               // glossy: one lit rim, one shadow
+  // a mite with a head: the groove where the head laps the body behind it
+  if (S.lumps.length > 1) g.fill(0, 0, g.w, g.h, rimOn(S.placed([S.lumps.at(-1)]), S.placed(S.lumps.slice(0, -1))), R.dark);
+  return g;
+}
+
+// The lit eyes of a mite: light, so drawn after the outline, each with a rim of a darker tone of its own colour.
+function miteEyes(g, S, P, d, look = {}, kind = 'two') {
+  const lit = look.glow ?? '#9fe040', dim = tone(lit, -1), k = d.k, [x, y] = S.face;
+  const inside = S.placed(S.lumps);
+  const dot = (px, py, c) => { if (inside(Math.floor(px) + 0.5, Math.floor(py) + 0.5)) g.dot(px, py, c); };
+  const at = (dx, dy) => { const c = Math.cos(S.tilt), s = Math.sin(S.tilt); return [x + (dx * c - dy * s) * S.swell, y + (dx * s + dy * c) * S.swell]; };
+  if (kind === 'one') {
+    // one big eye: a lit disc with a slit pupil and a glint
+    const r = Math.max(2, 2.3 * k * S.swell), ex = Math.floor(x) + 0.5, ey = Math.floor(y) + 0.5;
+    if (P.blink) { for (let i = -2; i <= 2; i++) dot(ex + i, ey, dim); return; }
+    g.fill(ex - r - 2, ey - r - 2, ex + r + 2, ey + r + 2, (px, py) => inside(px, py) && (px - ex) ** 2 + (py - ey) ** 2 <= (r + 1) ** 2, dim);
+    g.fill(ex - r - 1, ey - r - 1, ex + r + 1, ey + r + 1, (px, py) => inside(px, py) && (px - ex) ** 2 + (py - ey) ** 2 <= r * r, lit);
+    dot(ex, ey, dim); dot(ex, ey + 1, dim);
+    dot(ex + 1, ey - 1, '#ffffff');
+  } else if (kind === 'many') {
+    // a cluster: two bigger eyes in the middle, four small ones round them
+    const spots = [[-1.5, 0.5, 2], [1.5, 0.5, 2], [-4, -0.5, 1], [4, -0.5, 1], [-2.5, -2, 1], [2.5, -2, 1]];
+    for (const [dx, dy, n] of spots) {
+      const [px, py] = at(dx * k - (n > 1 ? 0.5 : 0), dy * k), ex = Math.floor(px), ey = Math.floor(py);
+      if (P.blink) { dot(ex, ey + n - 1, dim); continue; }
+      dot(ex, ey, lit);
+      if (n > 1) { dot(ex + 1, ey, dx > 0 ? '#ffffff' : lit); dot(ex, ey + 1, lit); dot(ex + 1, ey + 1, lit); } else dot(ex, ey + 1, dim);
+    }
+  } else {
+    for (const s of [-1, 1]) {
+      const [px, py] = at(s * 2.6 * k, 0), ex = Math.floor(px - 0.5), ey = Math.floor(py - 0.5);
+      if (P.blink) { dot(ex, ey + 1, dim); dot(ex + 1, ey + 1, dim); continue; }
+      for (const [dx, dy] of [[-1, 0], [-1, 1], [2, 0], [2, 1], [0, -1], [1, -1], [0, 2], [1, 2]]) dot(ex + dx, ey + dy, dim);
+      for (const [dx, dy] of [[0, 0], [1, 0], [0, 1], [1, 1]]) dot(ex + dx, ey + dy, lit);
+      dot(ex + 1, ey, '#ffffff');
+    }
+  }
+}
+
+// What flies when a mite pops: a star of its insides on the first frame, then drops that arc out and fall.
+function miteSplash(g, S, P, d, look = {}) {
+  const lit = look.glow ?? '#9fe040', dim = tone(lit, -1), k = d.k, u = P.burst;
+  const x = Math.floor(S.cx) + 0.5, y = Math.floor(S.cy) + 0.5;
+  if (u < 0.05) {
+    starburst(g, { x, y, count: 8, r1: Math.min(9.5 * k, y - 3), width: 4.4, turn: PI + 0.25, colour: lit, rim: dim, box: MITE_BOX });
+    g.fill(x - 3, y - 3, x + 3, y + 3, (px, py) => (px - x) ** 2 + (py - y) ** 2 <= 5, '#ffffff');
+  }
+  particles(g, { t: u, x, y, count: 7, seed: 5, loop: false, stagger: 0.1, angle: PI, arc: TAU, dist: 9 * k, gravity: 7, size: 2.4, colours: ['#ffffff', lit, lit, dim], box: MITE_BOX });
 }

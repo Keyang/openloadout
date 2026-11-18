@@ -67,10 +67,12 @@ export const POSES = Object.freeze(['idle', 'walk', 'attack', 'shoot', 'hurt', '
 
 const R = Math.round;
 const odd = (v) => 2 * R((v - 1) / 2) + 1;
-const WEAPON_LENGTH = { cannon: 8, saw: 8, claw: 8 };
-const HEAD_SIZE = { dome: [9, 9, 5], block: [9.4, 7.4, 4.6], sensor: [6.6, 5.4, 7.4] };   // wide, len, tall
+const WEAPON_LENGTH = { cannon: 10, saw: 8, claw: 8 };
+const HEAD_SIZE = { dome: [9, 9, 6], block: [9.4, 7.4, 4.6], sensor: [6.6, 5.4, 7.4] };   // wide, len, tall
 /** How far the pieces of the picture are kept from the frame's edge: 2 px, the outline and the empty border. */
 const MARGIN = 2;
+/** Seen from the side, a wide machine is shown at about half its depth, as side views in three-quarter games are: its tracks and its flank stay the picture, not its roof. */
+const SIDE_DEPTH = 0.55;
 
 /**
  * Builds the clip table of a guard robot in the order given, with direction clips named and labelled as the top-down rigs name them.
@@ -88,7 +90,7 @@ export const clips = (speedOf = () => 0.5, entries = ['idle_down', 'walk*', 'att
 export function dims(p = {}, opt = {}) {
   const size = clamp(p.size ?? 0.5), bulk = clamp(p.bulk ?? 0.5), s = lerp(0.88, 1.12, size);
   const drive = DRIVES.includes(opt.drive) ? opt.drive : 'treads';
-  const wide = odd(lerp(14.4, 19.6, bulk) * s), len = odd(lerp(11.6, 14.4, bulk) * s), tall = R(lerp(5.6, 7.6, bulk) * s), rise = R(4.4 * s);
+  const wide = odd(lerp(14.4, 19.6, bulk) * s), len = odd(lerp(13.6, 16.4, bulk) * s), tall = R(lerp(5.6, 7.6, bulk) * s), rise = R(4.4 * s);
   const tw = R(lerp(4.8, 6.6, bulk) * s);
   const hk = HEADS.includes(opt.head) ? opt.head : 'block', [hw, hl, ht] = HEAD_SIZE[hk];
   const wk = WEAPONS.includes(opt.weapon?.kind) ? opt.weapon.kind : 'none', pk = PACKS.includes(opt.pack?.kind) ? opt.pack.kind : 'none';
@@ -107,12 +109,12 @@ export function dims(p = {}, opt = {}) {
 /**
  * Returns the pose of a guard robot at phase t (0..1) of an action, the same for every direction: solve() turns it into a picture for the direction faced.
  * Arguments: action (one of POSES; any other name gives the resting pose); t; m { bounce: 0..1, how much it rumbles }; d (dims()).
- * The pose: x (picture px it has travelled the way it faces; negative: backward), reach (the furthest forward this clip goes: the travel is scaled to the room the frame has), drop (px the hull has sunk on its springs), lift (px the whole machine is thrown up), sway (px the hull has shaken to its right), head ([a, b, c]: the head moved forward, to its right and up, in its own px), look (-1..1: where the lens looks), eye, lamps (0 off, 0.5 dim, 1 lit, 2 flaring), spin (a whole number: the siren's lamp turning), tread (whole px the tracks have turned), feet (four { x, y, out }: each foot forward of its resting spot, off the floor and further out; the right side's front and rear, then the left's), arm { thrust, droop, work, grip (as botWeapon takes them) }, fire (true on the frame the cannon fires), ram (0..1 while it charges, else -1), hit (true on the frame the charge lands), puff (null, or { t, loop, big }: the exhaust), sparks, smoke (0..1 while it sparks and smokes, else -1), dead (its lights are out for good), flash (tint this frame white).
+ * The pose: x (picture px it has travelled the way it faces; negative: backward), reach (the furthest forward this clip goes: the travel is scaled to the room the frame has), drop (px the hull has sunk on its springs), lift (px the whole machine is thrown up), sway (px the hull has shaken to its right), head ([a, b, c]: the head moved forward, to its right and up, in its own px), nod (0..1: the head tipped forward, so more of its top shows and less of its face), look (-1..1: where the lens looks), eye, lamps (0 off, 0.5 dim, 1 lit, 2 flaring), spin (a whole number: the siren's lamp turning), tread (whole px the tracks have turned), feet (four { x, y, out }: each foot forward of its resting spot, off the floor and further out; the right side's front and rear, then the left's), arm { thrust, droop, work, grip (as botWeapon takes them) }, fire (true on the frame the cannon fires), ram (0..1 while it charges, else -1), hit (true on the frame the charge lands), puff (null, or { t, loop, big }: the exhaust), sparks, smoke (0..1 while it sparks and smokes, else -1), dead (its lights are out for good), flash (tint this frame white).
  */
 export function pose(action, t, m = {}, d = dims()) {
   const bounce = clamp(m.bounce ?? 0.5), legs = d.drive === 'legs', gun = d.weapon.kind;
   const P = {
-    x: 0, reach: 0, drop: 0, lift: 0, sway: 0, head: [0, 0, 0], look: 0, eye: 1, lamps: 1, spin: 0, tread: 0,
+    x: 0, reach: 0, drop: 0, lift: 0, sway: 0, head: [0, 0, 0], nod: 0, look: 0, eye: 1, lamps: 1, spin: 0, tread: 0,
     feet: [0, 1, 2, 3].map(() => ({ x: 0, y: 0, out: 0 })), arm: { thrust: 0, droop: 0, work: 0, grip: null },
     fire: false, ram: -1, hit: false, puff: null, sparks: -1, smoke: -1, dead: false, flash: false,
   };
@@ -189,9 +191,10 @@ export function pose(action, t, m = {}, d = dims()) {
     const n = at(8);
     P.flash = n === 0;
     P.x = [-2, -2, -1, -1, -1, -1, -1, -1][n]; P.lift = [1, 0, 1, 0, 0, 0, 0, 0][n];
-    P.drop = [0, 0, 0, 2, 4, 3, 4, 4][n];
-    P.head = [[-1, 0, 0], [0, 0, 0], [0, 0, 0], [1, 0, 0], [2, 1, -1], [3, 2, -1], [3, 2, -2], [3, 2, -2]][n];
-    P.arm.droop = [0, 0, 1, 2, 4, 6, 6, 6][n]; P.arm.work = Math.min(n, 2); P.arm.grip = n >= 3 ? 2 : null;
+    P.drop = [0, 0, 0, 1, 3, 2, 3, 3][n];
+    P.head = [[-1, 0, 0], [0, 0, 0], [0, 0, 0], [1, 0, 0], [1, 1, 0], [2, 2, 0], [2, 2, 0], [2, 2, 0]][n];
+    P.nod = [0, 0, 0, 0.5, 1, 1, 1, 1][n];
+    P.arm.droop = [0, 0, 1, 2, 4, 5, 5, 5][n]; P.arm.work = Math.min(n, 2); P.arm.grip = n >= 3 ? 2 : null;
     P.eye = [0.5, 1, 0.5, 1, 0.5, 0, 0, 0][n]; P.lamps = [0.5, 1, 0.5, 0.5, 0, 0, 0, 0][n];
     P.spin = Math.min(n, 3);
     P.dead = n >= 5;
@@ -215,18 +218,19 @@ const FACE_ANGLE = { down: 0, up: PI, side: PI / 2 };
  */
 export function solve(direction, P, d, opt = {}) {
   const dir = K.DIRECTIONS.includes(direction) ? direction : 'down', cx = opt.cx ?? CX, gy = opt.gy ?? GROUND;
-  const treads = d.drive === 'treads', F = FORWARD[dir], Rt = RIGHT[dir];
+  const treads = d.drive === 'treads', F = FORWARD[dir], Rt = RIGHT[dir], deep = dir === 'side' ? SIDE_DEPTH : 1;
+  const project = (a, b, c, o) => K.project(dir, a, b * deep, c, o);
   const stand = treads ? [[d.tread.len / 2, d.tread.b + d.tread.wide / 2]] : [[d.leg.footA, d.wide / 2 + d.leg.out]];
   // the floor row: the lowest corner of what it stands on, at rest, is on the row above gy
   let low = -Infinity;
-  for (const [a, b] of stand) for (const sa of [-1, 1]) for (const sb of [-1, 1]) low = Math.max(low, K.project(dir, sa * a, sb * b, 0, [0, 0])[1]);
+  for (const [a, b] of stand) for (const sa of [-1, 1]) for (const sb of [-1, 1]) low = Math.max(low, project(sa * a, sb * b, 0, [0, 0])[1]);
   const origin = [cx + 0.5, gy - low];
-  const drop = Math.min(R(P.drop ?? 0), d.rise - 1), sway = R((P.sway ?? 0) * (dir === 'side' ? K.DEPTH : 1));
+  const drop = Math.min(R(P.drop ?? 0), d.rise - 1), sway = R((P.sway ?? 0) * (dir === 'side' ? K.DEPTH * SIDE_DEPTH : 1));
   const build = (travel, shift) => {
     const base = [R(F[0] * travel) + shift[0], R(F[1] * travel) - R(P.lift ?? 0) + shift[1]];
     const sprungBy = [base[0] + Rt[0] * (dir === 'side' ? 0 : sway), base[1] + (dir === 'side' ? sway : 0) + drop];
-    const floor = (a, b, c) => { const q = K.project(dir, a, b, c, origin); return [q[0] + base[0], q[1] + base[1], q[2]]; };
-    const at = (a, b, c) => { const q = K.project(dir, a, b, c, origin); return [q[0] + sprungBy[0], q[1] + sprungBy[1], q[2]]; };
+    const floor = (a, b, c) => { const q = project(a, b, c, origin); return [q[0] + base[0], q[1] + base[1], q[2]]; };
+    const at = (a, b, c) => { const q = project(a, b, c, origin); return [q[0] + sprungBy[0], q[1] + sprungBy[1], q[2]]; };
     const J = { dir, gy, origin, move: base, at, floor, treads: null, belly: null, legs: null, weapon: null, pack: null };
     const box = [Infinity, Infinity, -Infinity, -Infinity];
     const add = (x0, y0, x1, y1) => { box[0] = Math.min(box[0], x0); box[1] = Math.min(box[1], y0); box[2] = Math.max(box[2], x1); box[3] = Math.max(box[3], y1); };
@@ -247,7 +251,8 @@ export function solve(direction, P, d, opt = {}) {
       }
     }
     const h = P.head ?? [0, 0, 0];
-    J.head = boxView(at, { a: d.head.a + h[0], b: h[1], c: d.rise + d.tall + h[2], len: d.head.len, wide: d.head.wide, tall: d.head.tall });
+    const nod = R(2 * clamp(P.nod ?? 0));
+    J.head = boxView(at, { a: d.head.a + h[0], b: h[1], c: d.rise + d.tall + h[2], len: d.head.len + nod, wide: d.head.wide, tall: Math.max(2, d.head.tall - nod) });
     add(J.head.x0 - 1, J.head.top - 5, J.head.x1 + 1, J.head.bottom);
     if (d.weapon.kind !== 'none') { J.weapon = botWeapon(null, d.weapon.kind, at, weaponOf(dir, P, d)); add(...J.weapon.box); }
     if (d.pack.kind !== 'none') { J.pack = botPack(null, d.pack.kind, at, { mount: d.pack.mount, size: d.pack.size }); add(...J.pack.box); }
@@ -287,7 +292,7 @@ function paints(look = {}) {
   };
 }
 
-/** The hull: an armour block with a band of hazard stripes on the wall the camera sees, and a lamp at each end of the band (one, at the front end, seen from the side). */
+/** The hull: an armour block with a band of hazard stripes on the wall the camera sees, and a lamp at each end of the band (one, at the rear end, seen from the side: the weapon hides the front one). */
 function drawHull(g, J, P, d, C) {
   const V = J.hull, B = armourBlock(g, { ...V, inset: 1, cut: [1, 1], paint: C.body, shade: 2, seam: C.seam });
   // seen from the side, the near track hides the foot of the wall
@@ -297,7 +302,7 @@ function drawHull(g, J, P, d, C) {
   g.fill(V.x0, y0, V.x1, y0 + bh, band, C.K.base, { shade: 0 });
   g.fill(V.x0, y0, V.x1, y0 + bh, stripesIn(band, { pitch: 4, slant: 1, duty: 0.5, phase: V.x0 + V.face }), C.accent.base, { shade: 0 });
   const level = P.lamps ?? 1, lens = level >= 1.5 ? C.light[1] : level >= 0.75 ? C.light[3] : level >= 0.25 ? C.light[4] : C.K.dark;
-  J.lamps = (J.dir === 'side' ? [V.x1 - 2 - lw] : [V.x0 + 2, V.x1 - 2 - lw]).map((x) => ({ x, y: y0, w: lw, h: bh }));
+  J.lamps = (J.dir === 'side' ? [V.x0 + 2] : [V.x0 + 2, V.x1 - 2 - lw]).map((x) => ({ x, y: y0, w: lw, h: bh }));
   for (const Lm of J.lamps) {
     g.rect(Lm.x - 1, Lm.y, Lm.w + 2, Lm.h, C.K.base);
     g.rect(Lm.x, Lm.y, Lm.w, Lm.h, lens);
@@ -309,10 +314,10 @@ function drawHull(g, J, P, d, C) {
 
 /** One leg: a thick thigh up to a knee cap in the hazard colour, a steel shin down to a dark foot pad. */
 function drawLeg(g, Lg, d, C, far) {
-  K.drawLegs(g, { legs: [Lg] }, far ? C.far : C.body, { width: d.leg.w, toe: C.metal.base });
-  g.limb(Lg.knee[0], Lg.knee[1], Lg.foot[0], Lg.foot[1] - 1, Math.max(2, d.leg.w - 1), C.metal, { shade: 1 });
-  g.rect(Math.floor(Lg.knee[0]) - 1, Math.floor(Lg.knee[1]) - 1, 2, 2, C.accent.base);
   const fx = Math.floor(Lg.foot[0]), fy = R(Lg.foot[1] + 0.5);
+  g.limb(Lg.hip[0], Lg.hip[1], Lg.knee[0], Lg.knee[1], d.leg.w, far ? C.far : C.body, { shade: 0 });
+  g.limb(Lg.knee[0], Lg.knee[1], fx + 0.5, fy - 3, 2, C.metal, { shade: 1 });
+  g.rect(Math.floor(Lg.knee[0]) - 1, Math.floor(Lg.knee[1]) - 1, 2, 2, C.accent.base);
   g.rect(fx - 2, fy - 2, 5, 2, C.dark, { shade: 0 });
   g.rect(fx - 1, fy - 2, 3, 1, C.K.light);
 }
@@ -350,11 +355,11 @@ export function draw(g, J, P, d, look = {}) {
 export function lights(g, J, P, d, look = {}) {
   const C = paints(look), L = C.light, box = [MARGIN, MARGIN, g.w - MARGIN, g.h - MARGIN];
   const fire = steps(look.fire ?? '#f2a030', { core: look.core ?? '#f0ead8' });
-  const grey = look.smoke ?? look.dark ?? '#434d6d', fumes = [tone(grey, 1.6), tone(grey, 0.8), grey];
+  const grey = look.smoke ?? look.dark ?? '#434d6d', fumes = [tone(grey, 2), tone(grey, 1.2), tone(grey, 0.4)];
   const F = FORWARD[J.dir], V = J.hull, mid = [(V.x0 + V.x1) / 2, (V.top + V.bottom) / 2];
   // exhaust: a thin thread of smoke while the engine runs, a burst when it works hard
   if (P.puff && J.vents?.length && !P.dead) for (const [i, [vx, vy]] of J.vents.entries()) {
-    puffs(g, { t: P.puff.loop ? P.puff.t + i * 0.5 : P.puff.t, x: vx, y: vy, count: P.puff.big ? 3 : 2, seed: 11 + i, loop: !!P.puff.loop, angle: PI, arc: 0.7, dist: P.puff.big ? 6 : 4, rise: 3, size: P.puff.big ? 3 : 2, shape: 'round', colours: fumes, box });
+    puffs(g, { t: P.puff.loop ? P.puff.t + i * 0.5 : P.puff.t, x: vx, y: vy, count: 2, seed: 11 + i, loop: !!P.puff.loop, angle: PI, arc: 0.5, dist: P.puff.big ? 5 : 3, rise: 2, size: P.puff.big ? 2.4 : 1.5, shape: 'round', colours: fumes, box });
   }
   if ((P.eye ?? 1) >= 2 && J.eye) twinkle(g, J.eye[0], J.eye[1], 1, L[2], { core: L[0], box });
   if ((P.lamps ?? 1) >= 2) for (const Lm of J.lamps ?? []) lamp(g, Lm.x, Lm.y, Lm.w, Lm.h, L[3], 2, { box });
@@ -375,7 +380,7 @@ export function lights(g, J, P, d, look = {}) {
   }
   // the shutdown: sparks from its joints, then smoke from the dead machine
   if (P.sparks >= 0 && P.sparks < 1) particles(g, { t: P.sparks, x: mid[0] + 3, y: V.face, count: 7, seed: 9, loop: false, stagger: 0.5, angle: PI, arc: 4, dist: 11, gravity: 8, size: 2.4, colours: fire, box: [box[0], box[1], box[2], J.gy] });
-  if (P.smoke >= 0) puffs(g, { t: clamp(0.1 + P.smoke * 0.7), x: mid[0] - 2, y: V.top + 1, count: 3, seed: 21, loop: false, stagger: 0.5, angle: PI, arc: 0.8, dist: 9, rise: 5, size: 3.4, shape: 'round', lobes: 2, colours: [tone(grey, 0.9), grey, tone(grey, -0.8)], box });
+  if (P.smoke >= 0) puffs(g, { t: clamp(0.1 + P.smoke * 0.7), x: mid[0] + 4, y: V.top - 1, count: 3, seed: 21, loop: false, stagger: 0.6, angle: PI, arc: 0.6, dist: 8, rise: 5, size: 2.6, shape: 'round', colours: [tone(grey, 2), tone(grey, 1.2), tone(grey, 0.4)], box });
   return g;
 }
 

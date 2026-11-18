@@ -78,6 +78,11 @@ const R = Math.round;
 /** Turns a step [x, y] with the body when its front is lifted by p radians. */
 const turned = ([x, y], p) => [x * Math.cos(p) + y * Math.sin(p), -x * Math.sin(p) + y * Math.cos(p)];
 const WHITE = '#ffffff';
+/** The box round a list of points, grown by pad: [x0, y0, x1, y1]. */
+const around = (pts, pad = 0) => { let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity; for (const [x, y] of pts) { x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y); } return [x0 - pad, y0 - pad, x1 + pad, y1 + pad]; };
+const union = (...boxes) => [Math.min(...boxes.map((b) => b[0])), Math.min(...boxes.map((b) => b[1])), Math.max(...boxes.map((b) => b[2])), Math.max(...boxes.map((b) => b[3]))];
+/** A shape test that answers at once outside a box. */
+const kept = (test, b) => (px, py) => px >= b[0] && px <= b[2] && py >= b[1] && py <= b[3] && test(px, py);
 
 /**
  * Builds the clip table of a four-legged beast from pose names, with the frames, speed and looping the style guide gives them (idle and walk 8, looping; attack and breath 12; buffet 10; hurt 4; die 12).
@@ -200,13 +205,13 @@ export function pose(action, t, m = {}, d = dims()) {
     const f = (n) => n / 9;
     if (winged) {
       P.wing = {
-        raise: k([[0, 0], [f(1), 0.4], [f(2), 0.8], [f(3), 1], [f(4), 0.5], [f(5), 0], [f(6), -0.1], [f(8), 0], [1, 0]]),
-        open: k([[0, 0.55], [f(2), 0.9], [f(3), 1], [f(5), 1], [f(6), 0.85], [f(8), 0.6], [1, 0.55]]),
-        beat: k([[0, 0], [f(2), -0.2], [f(3), -0.3], [f(4), 1.5], [f(5), 3.1], [f(6), 3.35], [f(7), 2], [f(8), 0.6], [1, 0]]),
+        raise: k([[0, 0], [f(1), 0.4], [f(2), 0.8], [f(3), 1], [f(4), 0.3], [f(5), 0], [f(6), -0.1], [f(8), 0], [1, 0]]),
+        open: k([[0, 0.55], [f(2), 0.9], [f(3), 1], [f(5), 1], [f(6), 0.8], [f(7), 0.25], [f(8), 0.45], [1, 0.55]]),
+        beat: k([[0, 0], [f(2), -0.2], [f(3), -0.3], [f(4), 2.6], [f(5), 3.2], [f(6), 3.4], [f(7), 1.7], [f(8), 0.5], [1, 0]]),
       };
       P.by = k([[0, 0], [f(3), 2.5], [f(4), 0], [f(5), -2], [f(6), -1], [f(8), 0.5], [1, 0]]);
       P.pitch = k([[0, 0], [f(3), -0.04], [f(5), 0.12], [f(6), 0.1], [f(8), 0.02], [1, 0]]);
-      P.head = [k([[0, 0], [f(3), -4], [f(5), -2], [f(6), -2], [f(8), 0], [1, 0]]), k([[0, 0], [f(3), 3], [f(4), -3], [f(5), -6], [f(6), -5], [f(8), -1], [1, 0]])];
+      P.head = [k([[0, 0], [f(3), -4], [f(5), -2], [f(6), -2], [f(8), 0], [1, 0]]), k([[0, 0], [f(3), 3], [f(4), -6], [f(5), -7], [f(6), -6], [f(7), -2], [f(8), -1], [1, 0]])];
       P.gust = age(f(4.4), f(8.6));
     } else {
       P.pitch = k([[0, 0], [f(1), 0.12], [f(2), 0.26], [f(3), 0.34], [f(4), 0.12], [f(5), -0.05], [f(6), -0.02], [1, 0]]);
@@ -451,15 +456,20 @@ export function draw(g, J, look = {}) {
   const { d, P, H, C, gy: G } = J, s = d.s, T = paints(look), { A, K } = T, B = T.C;
   const [rx, ry] = J.chest, W = g.w, Hh = g.h;
   const Hd = { ...jawHead(J.head.x, J.head.y, J.head.angle, { size: d.headR, snout: d.snout, jaw: J.head.jaw }), angle: J.head.angle };
-  const fill = (test, paint, opt) => g.fill(0, 0, W, Hh, test, paint, opt);
+  // every piece is painted inside the box of its own joints, so a frame costs a few thousand shape tests, not a million
+  const fill = (test, paint, opt, box) => (box ? g.fill(box[0], box[1], box[2], box[3], kept(test, box), paint, opt) : g.fill(0, 0, W, Hh, test, paint, opt));
+  const headBox = around([[J.head.x, J.head.y]], 0.5 * d.headR + d.snout + 3), hornBox = around([[J.head.x, J.head.y]], d.headR + 19 * d.horn.length + 3);
+  const neckBox = around(J.neck, d.neckR0 + 9 * s), tailBox = around([...J.tail, [J.tip.x, J.tip.y]], d.tailR + 13 * d.tipK), trunkBox = around([H, C], Math.max(d.haunchR, J.chest[0], J.chest[1]) + 10 * s);
+  const bodyBox = union(headBox, neckBox, tailBox, trunkBox);
 
   // ---- behind the body: far wing, far horn, far legs, spines ----
-  const wingOn = (w, skin, bone) => { fill(w.skin, skin, { shade: 1 }); fill(w.bones, bone, { shade: 0 }); };
+  const wingBox = (w) => around([[w.sx, w.sy], w.root, ...w.marks], 3);
+  const wingOn = (w, skin, bone) => { fill(w.skin, skin, { shade: 1 }, wingBox(w)); fill(w.bones, bone, { shade: 0 }, wingBox(w)); };
   if (J.wings) wingOn(J.wings[1], T.farA, T.far);
   const horns = hornShapes(Hd, d, J.box);
-  if (horns.far) fill(horns.far, { light: K.base, base: K.dark, dark: K.deep }, { shade: 1 });
-  const legs = J.legs.map((L) => ({ L, ...legShapes(L, d) }));
-  for (const leg of legs) if (leg.L.far) { fill(leg.inside, T.far, { shade: 1 }); for (const c of leg.claws) g.poly(c, K.dark); }
+  if (horns.far) fill(horns.far, { light: K.base, base: K.dark, dark: K.deep }, { shade: 1 }, hornBox);
+  const legs = J.legs.map((L) => ({ L, ...legShapes(L, d), box: around([L.hip, L.knee, L.ankle, L.foot, L.toe], d.thighR * 1.4 + 2) }));
+  for (const leg of legs) if (leg.L.far) { fill(leg.inside, T.far, { shade: 1 }, leg.box); for (const c of leg.claws) g.poly(c, K.dark); }
 
   const neckR = (u) => lerp(d.neckR0, d.neckR1, u), tailU = (u) => J.tailR(u * (J.tail.length - 1));
   const back = [[H[0] - d.haunchR * 0.3, H[1]], [C[0] + rx * 0.2, C[1]]], backR = (u) => lerp(d.haunchR * 0.96, ry * 0.98, u);
@@ -469,29 +479,30 @@ export function draw(g, J, look = {}) {
       spikeRowIn(J.neck, { from: 0.24, to: 0.92, count: 4, height: h * 1.2, width: w * 1.1, lift: neckR, lean: -0.3, grade: mid }).inside,
       spikeRowIn(back, { from: 0, to: 1, count: 5, height: h * 1.15, width: w * 1.1, lift: backR, lean: -0.3, grade: mid }).inside,
       spikeRowIn(J.tail, { from: 0.1, to: 0.72, count: 5, height: h * 0.9, width: w * 0.9, side: -1, lift: tailU, lean: 0.3, grade: (v) => 1 - 0.5 * v }).inside,
-    ), K, { shade: 1 });
+    ), K, { shade: 1 }, bodyBox);
   } else if (d.spines === 'sails') {
     const fins = [
       sailIn(J.neck, { from: 0.14, to: 0.95, rays: 5, height: 7 * s, lift: neckR, lean: -0.35, scoop: 0.6 }),
       sailIn(back, { from: -0.05, to: 1, rays: 5, height: 8.5 * s, lift: backR, lean: -0.3, scoop: 0.6 }),
       sailIn(J.tail, { from: 0.08, to: 0.62, rays: 4, height: 5 * s, side: -1, lift: tailU, lean: 0.3, scoop: 0.6 }),
     ];
-    for (const f of fins) { fill(f.inside, A, { shade: 1 }); for (const r of f.rays) g.limb(r.base[0], r.base[1], r.tip[0], r.tip[1], 1, B.dark, { shade: 0 }); }
+    for (const f of fins) { fill(f.inside, A, { shade: 1 }, around([...f.tips, ...f.rays.map((r) => r.base)], 2)); for (const r of f.rays) g.limb(r.base[0], r.base[1], r.tip[0], r.tip[1], 1, B.dark, { shade: 0 }); }
   }
   const tipS = tailTipIn(d.tail.kind, J.tip.x, J.tip.y, J.tip.angle, d.tipK);
-  if (tipS.spikes) fill(tipS.spikes, K, { shade: 1 });
+  if (tipS.spikes) fill(tipS.spikes, K, { shade: 1 }, tailBox);
 
   // ---- the lower jaw and the inside of the mouth ----
   const lit = P.fire >= 0 || P.throat >= 0.95;
-  if (J.head.jaw > 0.08) fill(Hd.inside, lit ? T.fire[1] : B.deep, { shade: 0 });
-  fill(Hd.lower, B, { shade: 1 });
+  if (J.head.jaw > 0.08) fill(Hd.inside, lit ? T.fire[1] : B.deep, { shade: 0 }, headBox);
+  fill(Hd.lower, B, { shade: 1 }, headBox);
 
   // ---- the body: one blob, so one shadow band and no seams ----
   const neck = tubeIn(J.neck, d.neckR0, d.neckR1), tail = tubeIn(J.tail, 0, 0, { radius: tailU });
-  const trunk = anyIn(ellipseIn(H[0], H[1], d.haunchR, d.haunchR * 0.95), ellipseIn(C[0], C[1], rx, ry), capsuleIn(H[0], H[1], C[0], C[1], d.waistR, Math.min(d.waistR * 1.06, ry)));
-  const body = anyIn(trunk, neck, tail, Hd.upper, tipS.body ?? []), all = anyIn(body, Hd.lower);
-  fill(body, B, { shade: 2 });
-  seam(g, Hd.upper, B.dark, { clip: (px, py) => Hd.lower(px, py) && !Hd.upper(px, py) });
+  const upperHead = kept(Hd.upper, headBox), lowerHead = kept(Hd.lower, headBox);
+  const trunk = kept(anyIn(ellipseIn(H[0], H[1], d.haunchR, d.haunchR * 0.95), ellipseIn(C[0], C[1], rx, ry), capsuleIn(H[0], H[1], C[0], C[1], d.waistR, Math.min(d.waistR * 1.06, ry))), trunkBox);
+  const body = anyIn(trunk, neck, tail, upperHead, tipS.body ? kept(tipS.body, tailBox) : []), all = anyIn(body, lowerHead);
+  fill(body, B, { shade: 2 }, bodyBox);
+  seam(g, upperHead, B.dark, { box: headBox, clip: (px, py) => lowerHead(px, py) && !upperHead(px, py) });
   // scales: a few small dark marks in staggered rows on the flank, and one at each joint of the neck and the tail
   const scale = (x, y, inside) => { const qx = R(x), qy = R(y); for (const [dx, dy] of [[0, 0], [1, 1], [2, 0]]) if (inside(qx + dx + 0.5, qy + dy + 0.5) && inside(qx + dx + 0.5, qy + dy + 3.5)) g.dot(qx + dx, qy + dy, B.dark); };
   for (let r = 0; r < 3; r++) for (let c = 0; c < 6; c++) {
@@ -502,15 +513,15 @@ export function draw(g, J, look = {}) {
 
   // ---- belly plates: the accent colour along the underside of neck, chest, belly and tail ----
   const k1 = 3.2 * s, k2 = 3 * s;
-  const under = (px, py) => (trunk(px, py) || neck(px, py)) && !Hd.upper(px, py) && !Hd.lower(px, py) && (!all(px + 0.8 * s, py + k1) || !all(px + k2, py + 1 * s));
+  const under = (px, py) => (trunk(px, py) || neck(px, py)) && !upperHead(px, py) && !lowerHead(px, py) && (!all(px + 0.8 * s, py + k1) || !all(px + k2, py + 1 * s));
   // the tail's own underside is the outside of its curl
   const n = J.tail.length - 1, inner = J.tail.map((q, i) => { const Q = pathPoint(J.tail, i / n), w = Math.min(2.6 * s, J.tailR(i) * 0.75); return [q[0] - Q.nx * w, q[1] - Q.ny * w]; });
   const tailTop = tubeIn(inner, 0, 0, { radius: tailU });
   const tailUnder = (px, py) => tail(px, py) && !tailTop(px, py) && !trunk(px, py);
   const belly = (px, py) => under(px, py) || tailUnder(px, py);
-  fill(belly, A, { shade: 1 });
+  fill(belly, A, { shade: 1 }, bodyBox);
   // the lines between the plates: across the neck and the tail at their joints, and upright under the trunk
-  const tick = (from, to) => fill(capsuleIn(from[0], from[1], to[0], to[1], 0.55), A.dark, { shade: 0, clip: belly });
+  const tick = (from, to) => fill(capsuleIn(from[0], from[1], to[0], to[1], 0.55), A.dark, { shade: 0, clip: belly }, around([from, to], 1.5));
   for (let i = 1; i < J.neck.length - 1; i++) { const Q = pathPoint(J.neck, i / (J.neck.length - 1)), r = neckR(i / (J.neck.length - 1)); tick([Q.x - Q.nx * (r + 1), Q.y - Q.ny * (r + 1)], [Q.x - Q.nx * (r - 5 * s), Q.y - Q.ny * (r - 5 * s)]); }
   for (let i = 1; i < n; i++) { const Q = pathPoint(J.tail, i / n), r = J.tailR(i); if (r > 2) tick([Q.x + Q.nx * (r + 1), Q.y + Q.ny * (r + 1)], [Q.x + Q.nx * (r - 4 * s), Q.y + Q.ny * (r - 4 * s)]); }
   for (let x = R(H[0] - d.haunchR * 0.5); x <= C[0] + rx; x += Math.max(3, R(4 * s))) g.rect(x, Math.min(H[1], C[1]), 1, G - Math.min(H[1], C[1]), A.dark, { clip: under });
@@ -523,15 +534,16 @@ export function draw(g, J, look = {}) {
       if ((i + 0.5) / m > P.throat) break;
       const a = J.neck[i], b = J.neck[i + 1], seg = capsuleIn(a[0], a[1], b[0], b[1], neckR(i / m), neckR((i + 1) / m));
       const front = (i + 1.5) / m > P.throat;                          // the plate the glow has just reached is the hottest
-      fill((px, py) => seg(px, py) && neck(px, py) && !dorsal(px, py) && !Hd.upper(px, py) && !trunk(px, py), front ? T.fire[1] : T.fire[2], { shade: 0 });
-      fill((px, py) => seg(px, py) && under(px, py), front ? T.fire[0] : T.fire[1], { shade: 0 });
+      const segBox = around([a, b], d.neckR0 + 1);
+      fill((px, py) => seg(px, py) && neck(px, py) && !dorsal(px, py) && !upperHead(px, py) && !trunk(px, py), front ? T.fire[1] : T.fire[2], { shade: 0 }, segBox);
+      fill((px, py) => seg(px, py) && under(px, py), front ? T.fire[0] : T.fire[1], { shade: 0 }, segBox);
     }
   }
 
   // ---- near legs, each with a dark line where it lies on the body ----
   for (const leg of legs) if (!leg.L.far) {
-    seam(g, leg.inside, B.deep, { clip: all });
-    fill(leg.inside, B, { shade: 1 });
+    seam(g, leg.inside, B.deep, { box: leg.box, clip: all });
+    fill(leg.inside, B, { shade: 1 }, leg.box);
     for (const c of leg.claws) g.poly(c, K.base);
   }
 
@@ -542,10 +554,10 @@ export function draw(g, J, look = {}) {
   const socket = Hd.at(0.5 * d.headR, -0.36 * d.headR);
   g.rect(R(socket[0]) - 1, R(socket[1]) - 1, 2, 2, B.deep);
   g.dot(nx, ny, B.deep);
-  if (horns.near) { seam(g, horns.near, B.deep, { clip: body }); fill(horns.near, K, { shade: 1 }); }
+  if (horns.near) { seam(g, horns.near, B.deep, { box: hornBox, clip: body }); fill(horns.near, K, { shade: 1 }, hornBox); }
 
   // ---- the near wing, over everything ----
-  if (J.wings) { const w = J.wings[0]; seam(g, anyIn(w.skin, w.bones), B.deep, { clip: all }); wingOn(w, A, B); }
+  if (J.wings) { const w = J.wings[0]; seam(g, anyIn(w.skin, w.bones), B.deep, { box: wingBox(w), clip: all }); wingOn(w, A, B); }
   J.face = { ...Hd, eye: [ex, ey] };
   return J;
 }
@@ -569,7 +581,7 @@ export function lights(g, J, look = {}, opt = {}) {
     if (lvl < 0.25) { g.dot(R(fx), R(fy) - 1, F[3]); g.dot(R(fx) - 1, R(fy) - 1, F[3]); }
     else {
       const len = Math.min(lerp(4, 10.5, lvl / 1.3) * d.tipK, fy - 4), up = lerp(a, PI, 0.55);
-      flame(g, { t: opt.loop ? t : t * 2, x: fx, y: fy, tongues: [{ angle: up, length: len, width: 3.1 * d.tipK }, { angle: up - 0.5, length: len * 0.6, width: 2 * d.tipK, phase: 0.4 }], sway: 1.2, cycles: 2, heat: 0.55, colours: F, box: air });
+      flame(g, { t: opt.loop ? t : t * 2, x: fx, y: fy, tongues: [{ angle: up, length: len, width: 3.1 * d.tipK }, { angle: up - 0.5, length: len * 0.6, width: 2 * d.tipK, phase: 0.4 }], sway: 1.2, cycles: 2, heat: 0.55, colours: F, box: [Math.max(1, fx - 16), Math.max(1, fy - 16), Math.min(air[2], fx + 16), Math.min(air[3], fy + 16)] });
     }
   }
   // smoke curls from the nostrils
@@ -589,7 +601,7 @@ export function lights(g, J, look = {}, opt = {}) {
       { angle: a + 0.2, length: L * 0.86, width: wide * 0.8, phase: 0.71 },
     ];
     particles(g, { t: k, x: mx + 4, y: my, count: 9, seed: 6, cycles: 3, lifespan: 0.8, angle: a, arc: 0.9, dist: L * 1.05, gravity: -3, size: 2.2, colours: F, box: air });
-    flame(g, { t: k, x: mx - 1, y: my, tongues, sway: 2.2, cycles: 4, heat: lerp(0.35, 0.7, power), colours: F, box: air });
+    flame(g, { t: k, x: mx - 1, y: my, tongues, sway: 2.2, cycles: 4, heat: lerp(0.35, 0.7, power), colours: F, box: [Math.max(1, mx - 8), Math.max(1, my - 28), air[2], Math.min(air[3], my + 34)] });
   }
   // the jaws snap shut: a white star at the teeth
   if (P.bite >= 0 && P.bite < 0.75) {
