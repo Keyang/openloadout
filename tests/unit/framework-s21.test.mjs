@@ -330,27 +330,8 @@ test('derelict-run: the tune is a three-note figure that falls a step and a thir
   assert.equal(fit.lines[0].scaleShare, 1);
 });
 
-test('derelict-run: no other track in the library has its chords, its tune or its rhythms', () => {
-  const others = fs.readdirSync(SOUNDS).filter((f) => f.endsWith('.json')).map((f) => read(f.slice(0, -5))).filter((p) => p.category === 'music' && p.id !== 'derelict-run' && node(p, 'lS') && node(p, 'lG'));
-  for (const id of ['battle-theme', 'thornwood-overworld']) assert.ok(others.some((p) => p.id === id), `${id} is compared`);
-  // the rhythms of the tune: every bar with more than one note (a bar that is one held note belongs to nobody)
-  const mine = moves(track), myBars = barsOf(node(track, 'lG').steps).filter((b) => b.replace(/\./g, '').length > 1), myRoots = pcs(nums(node(track, 'root').steps)), myThirds = nums(node(track, 'third').steps);
-  const rel = (roots) => roots.map((r) => (r - roots[0] + 12) % 12).join(' ');
-  for (const p of others) {
-    const theirs = ' ' + moves(p).join(' ') + ' ';
-    assert.notEqual(mine.join(' '), moves(p).join(' '), `${p.id}: the same tune`);
-    // the whole first phrase (the two figures and the move between them: five moves) appears nowhere in the other tune
-    assert.ok(!theirs.includes(' ' + mine.slice(0, 5).join(' ') + ' '), `${p.id}: has the first two phrases, note for note`);
-    assert.ok(myBars.length >= 4, 'the figure is played four times');
-    const shared = myBars.filter((b) => barsOf(node(p, 'lG').steps).includes(b));
-    assert.equal(shared.length, 0, `${p.id}: a bar of the tune has a rhythm it uses too`);
-    if (node(p, 'root')) {
-      const roots = pcs(nums(node(p, 'root').steps));
-      assert.ok(rel(roots) !== rel(myRoots) || JSON.stringify(nums(node(p, 'third').steps)) !== JSON.stringify(myThirds), `${p.id}: the same chord order`);
-    }
-    assert.notEqual(track.params.find((q) => q.id === 'bpm').default, p.params.find((q) => q.id === 'bpm').default, `${p.id}: the same tempo`);
-  }
-});
+// (The check that no other track has this one's chords, tune or rhythms is library-wide now: it runs over every
+// track found in sounds/, in tests/unit/compose-library.test.mjs.)
 
 // ---- how intensity and length bring the layers in
 

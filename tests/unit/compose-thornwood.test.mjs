@@ -118,19 +118,8 @@ test('the tune hops up the G major chord, steps back down, and ends on D', () =>
   for (const x of s) assert.ok(scale.includes(((x % 12) + 12) % 12), `semitone ${x} is not in G major`);
 });
 
-test('it is a different piece from battle-theme: its own chords, tune and rhythm', () => {
-  const battle = read('battle-theme');
-  assert.notDeepEqual(nums(node(patch, 'root').steps).map((r) => ((r % 12) + 12) % 12), nums(node(battle, 'root').steps).map((r) => ((r % 12) + 12) % 12));
-  assert.notDeepEqual(nums(node(patch, 'third').steps), nums(node(battle, 'third').steps));
-  // the tune as steps between notes (so a transposed copy would still match) and its rhythm
-  const moves = (p, seq, gate) => { const s = nums(node(p, seq).steps), g = flat(node(p, gate).steps); const hit = s.filter((_, i) => g[i] !== '.'); return hit.slice(1).map((x, i) => x - hit[i]).join(' '); };
-  assert.notEqual(moves(patch, 'lS', 'lG'), moves(battle, 'lS', 'lG'));
-  const shared = barsOf(node(patch, 'lG').steps).filter((b) => barsOf(node(battle, 'lG').steps).includes(b));
-  assert.equal(shared.length, 0, 'no bar of the tune has a rhythm battle-theme uses');
-  assert.notEqual(flat(node(patch, 'kT').steps).slice(0, 16), flat(node(battle, 'kLo').steps).slice(0, 16));
-  assert.notEqual(flat(node(patch, 'bG').steps), flat(node(battle, 'bG').steps));
-  assert.notEqual(node(patch, 'aD').steps, node(battle, 'aD').steps);
-});
+// (The check that no other track has this one's chords, tune or rhythms is library-wide now: it runs over every
+// track found in sounds/, in tests/unit/compose-library.test.mjs.)
 
 // ---- how intensity and length bring the layers in -------------------------------------------------------
 

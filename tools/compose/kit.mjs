@@ -14,14 +14,17 @@
 //                                                             node tools/compose/kit.mjs measure /tmp/try/<id>.json
 //   node tools/compose/<track>.mjs --dry       build and check the piece, print its summary, write nothing
 //   node tools/compose/<track>.mjs --match     measure the five melody instruments and print the gains that level them
-//   node tools/compose/<track>.mjs --measure   print the report: instrument, section, intensity and layer levels
+//   node tools/compose/<track>.mjs --measure   print the quick report: instrument, section, intensity and layer levels,
+//                                              in under a minute on a busy machine (low sample rates, one pass)
+//   node tools/compose/<track>.mjs --measure --full   the full report: every length and every instrument at 44.1 kHz
+//                                              (about 45 loops of the piece: minutes)
 //   node tools/compose/<track>.mjs --help      print this list; writes nothing
 //   node tools/compose/<track>.mjs             only when the piece is ready: writes sounds/<id>.json
 //
 // An option the generator does not know is refused and nothing is written. Every patch the kit writes carries its
 // `meta` (assemble refuses a piece without it), so writing a track again is always safe.
 //
-//   node tools/compose/kit.mjs measure <patch.json> [--node lF]     the report for a patch file
+//   node tools/compose/kit.mjs measure <patch.json> [--node lF] [--full]     the quick (or full) report for a patch file
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -34,7 +37,8 @@ const USAGE = `usage: node tools/compose/<track>.mjs [option]
   --out <file>   write the patch to this file (use a scratch folder to experiment)
   --dry          build and check the piece, print its summary, write nothing
   --match        measure the five melody instruments and print the gains that level them
-  --measure      print instrument, section, intensity and layer levels
+  --measure      print instrument, section, intensity and layer levels, quickly (under a minute)
+  --measure --full   the same from full renders of every length and instrument (minutes)
   --help         print this
   (no option)    write sounds/<id>.json, the live library: only when the piece is ready`;
 
@@ -48,9 +52,9 @@ export function writePatch(patch, file = path.join(SOUNDS_DIR, `${patch.id}.json
 /**
  * What a generator's command line does: writes, measures or only checks the piece, and says what it did.
  * Arguments: build(gains), which returns the assembled patch (with the track's own gains when called with none);
- * args: the options (--out <file>, --dry, --match, --measure, --help; none writes sounds/<id>.json);
+ * args: the options (--out <file>, --dry, --match, --measure, --measure --full, --help; none writes sounds/<id>.json);
  * { log: where the text goes (console.log), node: the melody bus ('lF'), layers: { name: expression } for the report }.
- * Returns { action: 'write' | 'dry' | 'match' | 'measure' | 'help', file, patch }. An unknown option throws a
+ * Returns { action: 'write' | 'dry' | 'match' | 'measure' | 'help', file, patch, mode: 'quick' | 'full' }. An unknown option throws a
  * KitError before anything is built or written.
  */
 export function run(build, args = [], { log = console.log, node = 'lF', layers } = {}) {
@@ -61,10 +65,11 @@ export function run(build, args = [], { log = console.log, node = 'lF', layers }
     if (a === '--out') {
       out = args[++i];
       if (!out || out.startsWith('--')) throw new KitError(`--out needs a file: --out /tmp/try/<id>.json\n${USAGE}`);
-    } else if (['--dry', '--match', '--measure', '--help'].includes(a)) flags.add(a);
+    } else if (['--dry', '--match', '--measure', '--full', '--help'].includes(a)) flags.add(a);
     else throw new KitError(`"${a}" is not an option of a track generator; nothing was written.\n${USAGE}`);
   }
   if (flags.has('--help')) { log(USAGE); return { action: 'help' }; }
+  if (flags.has('--full') && !flags.has('--measure')) throw new KitError(`--full goes with --measure (the full report); nothing was written.\n${USAGE}`);
   if (flags.has('--match')) {
     const m = matchGains(build, { node });
     log(`before: ${m.before.map((l) => `${l.name} ${l.db.toFixed(1)}`).join(' · ')} dB`);
@@ -74,7 +79,11 @@ export function run(build, args = [], { log = console.log, node = 'lF', layers }
   }
   const patch = build();
   const summary = `${patch.id}: ${patch.nodes.length} nodes, ${patch.params.length} controls, ${JSON.stringify(patch).length} bytes`;
-  if (flags.has('--measure')) { log(report(patch, { node, layers })); return { action: 'measure', patch }; }
+  if (flags.has('--measure')) {
+    const mode = flags.has('--full') ? 'full' : 'quick';
+    log(report(patch, { node, layers, quick: mode === 'quick' }));
+    return { action: 'measure', patch, mode };
+  }
   if (flags.has('--dry')) {
     log(`dry run, nothing written. ${summary}`);
     for (const n of lint(patch)) log(`style guide: ${n}`);
@@ -103,10 +112,10 @@ export function main(build, url, opts = {}) {
   }
 }
 
-// node tools/compose/kit.mjs measure <patch.json> [--node lF]
+// node tools/compose/kit.mjs measure <patch.json> [--node lF] [--full]
 if (isMain(import.meta.url)) {
   const [cmd, file, ...rest] = process.argv.slice(2);
-  if (cmd !== 'measure' || !file) { console.log('usage: node tools/compose/kit.mjs measure <patch.json> [--node <melody bus, default lF>]'); process.exit(cmd ? 1 : 0); }
+  if (cmd !== 'measure' || !file) { console.log('usage: node tools/compose/kit.mjs measure <patch.json> [--node <melody bus, default lF>] [--full]'); process.exit(cmd ? 1 : 0); }
   const i = rest.indexOf('--node');
-  console.log(report(JSON.parse(fs.readFileSync(file, 'utf8')), i >= 0 ? { node: rest[i + 1] } : {}));
+  console.log(report(JSON.parse(fs.readFileSync(file, 'utf8')), { ...(i >= 0 ? { node: rest[i + 1] } : {}), quick: !rest.includes('--full') }));
 }

@@ -258,7 +258,7 @@ test("the decal place 'face': decoClips keeps it, classifyTiles reads it as an '
   }
   assert.deepEqual([...seen.face].sort(), ['wall-deco-a', 'wall-deco-b']);
   assert.deepEqual([...seen.on], ['wall-deco-c'], "'on' never picks a face decal");
-  assert.equal(DECAL_CHANCE.face, 0.2);
+  assert.equal(DECAL_CHANCE.face, 0.33);
   assert.ok(Math.abs(n / 1600 - DECAL_CHANCE.face) < 0.06, `${n} of 1600`);
   assert.equal(pickDecal([{ clip: 'x-deco-a', place: 'face' }], 'face', 3, 3, 1), 'x-deco-a', 'a list written by hand may say place: face');
   assert.deepEqual([...FACE_PIECES].sort(), ['bottom', 'bottom-l', 'bottom-r', 'col-b', 'single', 'strip-l', 'strip-m', 'strip-r']);
@@ -270,9 +270,9 @@ test("layoutTiles scatters 'face' decals over the cells of a top-down wall that 
   const pieceAt = (c, r) => { const t = L.tiles.find((x) => x.col === c && x.row === r && pieceOf(x.clip)?.kind === 'block' && pieceOf(x.clip).prefix === 'wall'); return t ? pieceOf(t.clip).piece : null; };
   const placed = L.tiles.filter((t) => /^wall-deco-/.test(t.clip));
   const faces = placed.filter((t) => t.clip !== 'wall-deco-c'), caps = placed.filter((t) => t.clip === 'wall-deco-c');
-  assert.ok(faces.length >= 2 && faces.length <= 12, `${faces.length} fixtures on the faces: about one face cell in five`);
+  assert.ok(faces.length >= 4 && faces.length <= 20, `${faces.length} fixtures on the faces: about one face cell in three`);
   for (const t of faces) assert.ok(FACE_PIECES.includes(pieceAt(t.col, t.row)), `${t.clip} at ${t.col},${t.row} is on ${pieceAt(t.col, t.row)}`);
-  const more = layoutTiles(ROOM, WALLS, { view: 'top-down', decals: { face: 0.6 } }).tiles.filter((t) => /^wall-deco-[ab]$/.test(t.clip));
+  const more = layoutTiles(ROOM, WALLS, { view: 'top-down', decals: { face: 0.7 } }).tiles.filter((t) => /^wall-deco-[ab]$/.test(t.clip));
   assert.ok(more.length > faces.length && more.some((t) => t.clip === 'wall-deco-a') && more.some((t) => t.clip === 'wall-deco-b'), 'a higher chance gives more, and both are used');
   for (const t of more) assert.ok(FACE_PIECES.includes(pieceAt(t.col, t.row)), `${t.clip} at ${t.col},${t.row} is on ${pieceAt(t.col, t.row)}`);
   assert.ok(caps.length > 0, "the wall's 'on' decal still goes on its cap");
@@ -316,7 +316,7 @@ test("the station walls: every fixture is a 'face' decal, and a room built from 
   const L = layoutTiles(ROOM, T, { view: 'top-down', decals: true });
   const pieceAt = (c, r) => { const t = L.tiles.find((x) => x.col === c && x.row === r && /^wall-/.test(x.clip) && pieceOf(x.clip)?.kind === 'block'); return t ? pieceOf(t.clip).piece : null; };
   const fixtures = L.tiles.filter((t) => /^wall-deco-/.test(t.clip));
-  assert.ok(fixtures.length >= 2, `${fixtures.length} fixtures`);
+  assert.ok(fixtures.length >= 4, `${fixtures.length} fixtures`);
   for (const t of fixtures) assert.ok(FACE_PIECES.includes(pieceAt(t.col, t.row)), `${t.clip} at ${t.col},${t.row} is on ${pieceAt(t.col, t.row)}`);
 });
 

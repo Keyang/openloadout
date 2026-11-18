@@ -2,44 +2,80 @@
 // (docs/style-guide.md, sections 12 and 14). Pure JavaScript with no Node or page APIs: it runs in the build, in
 // tests and in the browser (docs/architecture.md, Contract 11). tools/compose/kit.mjs adds the command line.
 //
-// A composer writes the music: the chords, the melody, the drum rows, the voices of each layer and the mix.
-// The kit supplies:
+// A composer writes the music: the chords, the melody, the drum rows, which voices play them, and the mix.
 //
-//   param(id, label, min, max, default, extra)   one control; standardParams({ tempo, defaults }) the seven every track has
-//   clock({ swing })               the one 16th-note clock from `bpm`: node c16 (and c16p, 1 on the 8ths, 0 on the 16ths between)
-//   chords(text, { tonic, low })   a chord progression, one name per bar: nodes tonic, root, third, fifth, tr (= round(key) + root)
-//   arrangement(layers)            the bar counter and the gates: for each layer `name`, a node g<Name> (0..1) that follows
-//                                  the `bars` length control (section by section) and the `intensity` control
-//   sectionAt(bar, bars), layerPlays(layer, bar, bars)     the same arrangement as plain functions, for tests and reports
-//   drumRow(id, bars)              a rhythm row, one character per 16th: X accent, x hit, o ghost, . rest
-//   noteRow(id, steps, { every })  a row of numbers (semitones, chord-tone numbers), "_" holds
-//   melody(id, bars, { shift, transpose, voice })   a tune in note names -> nodes <id>G gate, <id>S semitones, <id>V loudness,
-//                                  <id>P pitch in Hz; refuses notes the instruments cannot play
-//   instruments(id, { gains })     the five melody instruments behind `inst`, level-matched by `gains` -> node <id>F
-//   bus({ centre, left, right, duck })       ducking, one shared reverb on `space`, a soft limiter per channel -> nodes mL, mR
-//   assemble({...})                a checked patch with the standard controls and `meta`; refuses rows that do not divide the loop
-//   lint(patch), tuneFit(patch)    what the style guide asks for and the patch lacks; whether the tune fits its chords
-//   measureInstruments, matchGains, measureSections, measureIntensity, measureLayers, report     you cannot listen, so measure
+// THE CONVENTION. Three kinds of building block, one way to call each:
 //
-// Every row is checked against the loop: its length in steps must divide the shortest length (8 bars, 128 steps),
-// so the piece repeats exactly at 8, 16, 24 and 32 bars. `key` is added wherever a pitch is made (tr, <id>P): use
-// `tr` for anything that follows the chords and `round(key)` for anything else.
+//   the piece        name(what is written, { options })     no id: there is one of each in a piece
+//                    clock({ swing, on }) · chords(text, { tonic, low }) · arrangement(layers) · bus({ centre, left, right, duck })
+//                    standardParams({ tempo, defaults }) · param(id, label, min, max, default, extra) · assemble({ ... })
+//   rows             name(id, what is written, { options })   what is played: the music itself comes second
+//                    drumRow(id, bars) · noteRow(id, steps, { every }) · melody(id, bars, { shift, transpose, voice })
+//                    ringRows(id, steps, { voices }) · chordTone(id, pick) · eightBars(bar, changes) · halfTimeBeat({ driving, fill })
+//   voices, effects  name(id, { options })                  what plays it: everything after the id is given by name
+//
+// The options of voices and effects have one name each wherever they occur:
+//   trig          the row that plays the voice (a drumRow's id, a melody's <id>G, or an expression that picks a row)
+//   pitch         its note in Hz, an expression: 'midi(40 + tr + bS)', 'lP'
+//   note, semis   for a voice that follows the chords by itself: the MIDI number of the chord root before the chord
+//                 and the Key control move it, and semitones above that root (a number or a noteRow's id)
+//   input         the sound an effect works on, an expression
+//   noise         the id of a white-noise node the piece already has (without it the voice adds its own)
+//   attack, hold, decay   seconds;   cutoff, open, q   a low-pass: its corner when shut, how far a note opens it, resonance
+//   freq          the corner or centre of a band of noise in Hz (never a note)
+// The nodes a voice returns have one name each as well: its finished sound is <id>O, or <id>L and <id>R when it is
+// wide; <id>A is its envelope (give a kick's to bus() as `duck`), <id>V the strength of the last hit, <id>Hz its
+// pitch. The level of a finished voice is about 1, so the gain you write in the mix is its level. The one exception
+// is the oldest block: instruments(id) ends in <id>F, the melody bus, because every track and `--measure` name it.
+//
+// Deprecated, still accepted: the spellings from before this convention, which gave the row, the pitch or the input
+// by position (kickDrum(id, trig, { ... }), pluckedString(id, trig, pitch, { ... }), stringPair(id, pitch, { ... }),
+// sawPad(id, pitches, { ... }), tempoEcho(id, input, { ... })), the options `from` (subDrop) and `base` (alarmTone)
+// for `pitch` and `note`, and clockEighths() for clock({ on: 8 }). They give the same nodes: the tracks written with
+// them are regenerated byte for byte (tests/unit/compose-tracks.test.mjs). Write new tracks the new way.
+//
+// VOICES AND EFFECTS, by the house sound they were written for (any track may use any of them):
+//   every track         instruments(id, { gains }): the five melody instruments behind `inst` · doubling(id, { pitch })
+//   fantasy overworld   (thornwood-overworld: chiptune) kickDrum · snareDrum · hatDrum; its triangle bass, pulse
+//                       arpeggio and held pulses are plain osc nodes written in the track
+//   storybook village   (hearthvale-village) clock({ on: 8 }) · ringRows + pluckedString · struckBell · roundBass · handDrum · shaker · sawPad
+//   battle              (hearthvale-battle, battle-theme) kickDrum · snareDrum · hatDrum · tomDrum · sawBass · stringPair · brassStab
+//   electronic run      (derelict-run) kickDrum · hatDrum · clap · acidBass · sawPad · riser · tempoEcho
+//   electronic boss     (derelict-boss) halfTimeBeat · kickDrum · snareDrum · hatDrum · sawBass · brassStab · subDrop · chorus · alarmTone
+//
+// WHAT COMPOSERS LEARNED THE HARD WAY
+//   - An oscillator at an exact multiple of another's pitch (an octave doubling written 'lP*2') stays locked to it,
+//     wave for wave, and the two do not simply add: one track lost 3.4 dB of an instrument when its doubling came in.
+//     Tune a doubling a few cents off: doubling(id, { pitch: 'lP' }) does it, and lint() warns about an oscillator
+//     at an exact whole multiple of a tune that instruments() plays.
+//   - The tune's intensity window must end by 0.4: arrangement({ tune: { intensity: [0.3, 0.4] } }). Whole-bundle
+//     looks set Intensity anywhere from 0.4 up, and a look must keep the melody whatever the specification's bands say.
+//   - Looks also change the tempo by 5 to 10% and stop at the range: keep a fast style 5% under the fastest tempo.
+//   - A drum that rings on a note of its own is heard as a wrong note in every bar: kickDrum lands on the chord
+//     root; snareDrum, hatDrum, clap and shaker have no pitch.
+//   - instruments() cannot be re-voiced from outside without breaking its level matching. Shape what comes after it
+//     instead (a shaper, chorus, tempoEcho on <id>F), name the node you end on (main(build, url, { node: 'lX' })) and
+//     run `--match` again: it levels whatever node you name. Repeat it when the chain is not linear (a shaper).
+//   - Every row's length in steps must divide 128 (the 8-bar loop); a tune must fit the instruments (C4 to F#6 as
+//     written, for all five); `key` goes into every pitch (`tr` after the chords, `round(key)` anywhere else).
+//   - You cannot listen, so measure: measureInstruments · matchGains · measureSections · measureIntensity ·
+//     measureLayers · tuneFit · lint · report (quick by default from the command line; reportPlan says what it costs).
+//     sectionAt(bar, bars) and layerPlays(layer, bar, bars) are the arrangement as plain functions, for tests.
 //
 // A whole (tiny) piece, in tools/compose/tiny_tune.mjs:
 //
-//   import { clock, chords, arrangement, drumRow, melody, instruments, bus, assemble, main } from './kit.mjs';
+//   import { clock, chords, arrangement, drumRow, kickDrum, roundBass, melody, instruments, bus, assemble, main } from './kit.mjs';
 //   export const build = (gains) => assemble({
 //     id: 'tiny-tune', name: 'Tiny tune', description: 'A four-chord tune.', meta: { ... },
 //     tempo: [100, 140, 120], defaults: { intensity: 0.8, bars: 16, inst: 'Flute' },
 //     nodes: [
 //       clock(), chords('C F | G C', { tonic: 'C' }),
 //       arrangement({ drums: { section: 2, intensity: [0.2, 0.3] }, tune: { section: 3, intensity: [0.3, 0.4] } }),
-//       drumRow('kT', ['X...x...X...x...']),                                   // kick: one bar, repeated
-//       { id: 'kA', type: 'ad', trig: 'kT', attack: 0.001, decay: 0.15 }, { id: 'kO', type: 'osc', freq: '45 + kA*120' },
-//       { id: 'bO', type: 'osc', wave: 'tri', freq: 'midi(36 + tr)' },          // bass: the chord root
+//       drumRow('kT', ['X...x...X...x...']), kickDrum('k', { trig: 'kT' }),      // a row, and the voice that plays it
+//       drumRow('bT', 'X.......'), roundBass('b', { trig: 'bT', note: 36 }),     // the bass follows the chords
 //       melody('l', ['C5 _ E5 _ G5 _ _ _ E5 _ _ _ C5 _ _ _', 'F5 _ _ _ A5 _ F5 _ C5 _ _ _ _ _ D5- E5-']),
 //       instruments('l', { gains }),
-//       bus({ centre: 'kO*kA*0.6*gDrums + bO*0.3', left: 'lF*0.7*gTune', right: 'lF*0.7*gTune', duck: 'kA*gDrums' }),
+//       bus({ centre: 'kO*0.6*gDrums + bO*0.3', left: 'lF*0.7*gTune', right: 'lF*0.7*gTune', duck: 'kA*gDrums' }),
 //     ],
 //     presets: { Calm: { intensity: 0.2 }, Walk: { intensity: 0.6 }, Run: { intensity: 1, bpm: 132 } },
 //   });
@@ -96,6 +132,19 @@ export const SCALE_SHARE_MIN = 0.75;
 
 const cap = (s) => s[0].toUpperCase() + s.slice(1);
 const num = (x) => String(Math.round(x * 1e6) / 1e6);
+// ---- the small helpers every building block shares (one copy each) ---------------------------------------------------
+/** A number as text, or an expression in brackets, so either can be multiplied. */
+const inParens = (x) => (typeof x === 'number' ? num(x) : `(${x})`);
+/** Refuses a building block whose id is not letters and digits; returns the id. */
+const voiceId = (id, what) => { if (typeof id !== 'string' || !/^[A-Za-z][A-Za-z0-9]*$/.test(id)) fail(`${what}: the id must be letters and digits, got ${JSON.stringify(id)}`); return id; };
+/** Refuses a building block that was not given an option it cannot work without. */
+const need = (what, value, name, hint) => { if (value === undefined || value === null || value === '') fail(`${what}: give ${name} (${hint})`); };
+const isOptions = (x) => x !== null && typeof x === 'object' && !Array.isArray(x);
+/** True when a building block was called in its old spelling: something other than its options straight after the id. */
+const oldSpelling = (args) => args.length > 1 && args[1] !== undefined && !isOptions(args[1]);
+/** The options of an old-spelling call: what was given by position (`names`, in order) joined to the options after it. */
+const respelled = (args, names) => { const o = { ...(args[1 + names.length] || {}) }; names.forEach((n, i) => { if (args[1 + i] !== undefined) o[n] = args[1 + i]; }); return o; };
+
 const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 const noteName = (midi) => `${NOTE_NAMES[((midi % 12) + 12) % 12]}${Math.floor(midi / 12) - 1}`;
 
@@ -131,11 +180,25 @@ export function standardParams({ tempo, defaults = {} }) {
 
 /**
  * The one clock of a track: node c16 ticks on every 16th note, and c16p is 1 during the 16ths on an 8th note, 0 between.
- * Arguments: { swing }: an expression 0..1 (usually a control). 0 is straight; 1 is a full shuffle, where the 16ths
- * between come a third of a step late. 8th notes never move, so the bar and the tempo stay exact.
+ * Arguments: { swing, on }. swing: an expression 0..1 (usually a control, or a share of one: 'swing*0.6'). 0 is
+ * straight; 1 is a full shuffle, where the swung note comes a third of its length late. on: which note swings: 16
+ * (default: the 16th between two 8ths; the 8th notes never move) or 8 (the 8th between two beats; the beats never
+ * move: use it for a piece written in 8ths, which a 16th swing leaves as it was). The bar and the tempo stay exact.
+ * With on: 8 it also returns c8p (1 during the first 8th of a beat, 0 during the second) and c8w (what the clock reads).
  */
-export function clock({ swing } = {}) {
+export function clock({ swing, on = 16 } = {}) {
+  if (on !== 16 && on !== 8) fail(`clock: on is the note that swings: 16 (the 16th between two 8ths) or 8 (the 8th between two beats), got ${JSON.stringify(on)}`);
   const base = 'bpm/60*4';
+  if (on === 8) {
+    return [
+      // the clock reads c8w from the sample before its tick (0 before the first): the 16th now starting is a long one
+      // when c8w is 0, which is so for both 16ths of the first 8th of a beat
+      { id: 'c16', type: 'clock', rate: swing ? `${base} / (1 + (${swing})/3*(1 - 2*c8w))` : base },
+      { id: 'c16p', type: 'seq', trig: 'c16', loop: true, steps: '1 0' },
+      { id: 'c8w', type: 'seq', trig: 'c16', loop: true, steps: '0 1 1 0' },
+      { id: 'c8p', type: 'seq', trig: 'c16', loop: true, steps: '1 1 0 0' },
+    ];
+  }
   return [
     // the clock reads c16p from the sample before its tick: 0 when the 16th now starting falls on an 8th (a long step when swung)
     { id: 'c16', type: 'clock', rate: swing ? `${base} / (1 + (${swing})/3*(1 - 2*c16p))` : base },
@@ -538,6 +601,50 @@ export function tuneFit(patch) {
   return { tonic, lines };
 }
 
+/** The oscillators instruments(id) makes, as endings of their ids: an exact octave among these is part of an instrument's sound. */
+const INSTRUMENT_OSCILLATORS = ['O1', 'O2', 'FlO1', 'FlO2', 'ChO1', 'ChO2', 'BeM', 'BeC'];
+/** Splits an expression at its top-level * signs, after taking off brackets that wrap all of it. */
+function factors(expr) {
+  let e = String(expr).replace(/\s+/g, '');
+  const wrapped = (x) => { if (!(x.startsWith('(') && x.endsWith(')'))) return false; let d = 0; for (let i = 0; i < x.length; i++) { d += x[i] === '(' ? 1 : x[i] === ')' ? -1 : 0; if (d === 0 && i < x.length - 1) return false; } return true; };
+  while (wrapped(e)) e = e.slice(1, -1);
+  const out = []; let depth = 0, cur = '';
+  for (const c of e) { if (c === '(') depth++; else if (c === ')') depth--; if (c === '*' && depth === 0) { out.push(cur); cur = ''; } else cur += c; }
+  out.push(cur);
+  return out;
+}
+/** Reads a frequency as "a number times one tune's pitch": { pitch, times }, or null when it is anything else. */
+function multipleOf(expr, pitches, byId, depth = 0) {
+  let pitch = null, times = 1;
+  for (const f of factors(expr)) {
+    if (f !== '' && Number.isFinite(Number(f))) { times *= Number(f); continue; }
+    let part = null;
+    if (pitches.includes(f)) part = { pitch: f, times: 1 };
+    else if (/^[A-Za-z_]\w*$/.test(f) && byId[f]?.type === 'expr' && depth < 4) part = multipleOf(byId[f].expr, pitches, byId, depth + 1);
+    else if (f.startsWith('(') && depth < 4) part = multipleOf(f, pitches, byId, depth + 1);   // brackets round a product
+    if (!part || (pitch && part.pitch)) return null;
+    if (part.pitch) pitch = part.pitch;
+    times *= part.times;
+  }
+  return pitch ? { pitch, times } : null;
+}
+/**
+ * The oscillators of a patch that play at an exact whole multiple of a tune that instruments() also plays: [{ id, tune, times, freq }].
+ * Such an oscillator stays locked to the instrument and cancels or lifts part of it for good. Arguments: patch.
+ */
+export function lockedDoublings(patch) {
+  const nodes = patch.nodes || [], byId = Object.fromEntries(nodes.map((n) => [n.id, n]));
+  const tunes = nodes.filter((n) => /^midi\(60 \+ round\(key\) \+ [A-Za-z_]\w*S\)$/.test(typeof n.in === 'string' ? n.in : '') && n.id.endsWith('P') && byId[`${n.id.slice(0, -1)}In`]).map((n) => n.id.slice(0, -1));
+  const pitches = tunes.map((t) => `${t}P`), own = new Set(tunes.flatMap((t) => INSTRUMENT_OSCILLATORS.map((e) => t + e)));
+  const out = [];
+  for (const n of nodes) {
+    if (n.type !== 'osc' || typeof n.freq !== 'string' || own.has(n.id)) continue;
+    const m = multipleOf(n.freq, pitches, byId);
+    if (m && m.times >= 1 && Math.abs(m.times - Math.round(m.times)) < 1e-9) out.push({ id: n.id, tune: m.pitch.slice(0, -1), times: Math.round(m.times), freq: n.freq });
+  }
+  return out;
+}
+
 /** What the style guide (section 12) asks of a track and a patch lacks, as a list of sentences; empty is good. Arguments: patch. */
 export function lint(patch) {
   const out = [], ids = (patch.params || []).map((p) => p.id);
@@ -555,6 +662,7 @@ export function lint(patch) {
     if (l.onBeat >= 4 && l.chordShare < CHORD_SHARE_MIN) out.push(`melody "${l.id}": only ${pct(l.chordShare)} of its notes on the beat (${l.inChord} of ${l.onBeat}) belong to the bar's chord; at least ${pct(CHORD_SHARE_MIN)} is expected. Is the tune written in the key of the chords, and in the right bars?`);
     if (l.notes >= 4 && l.scaleShare < SCALE_SHARE_MIN) out.push(`melody "${l.id}": only ${pct(l.scaleShare)} of its notes (${l.inScale} of ${l.notes}) are notes the chords use; at least ${pct(SCALE_SHARE_MIN)} is expected. The tune may be a semitone off its chords`);
   }
+  for (const d of lockedDoublings(patch)) out.push(`oscillator "${d.id}" plays at exactly ${d.times === 1 ? 'the pitch' : `${d.times} times the pitch`} of the tune "${d.tune}" ("${d.freq}"): it stays locked to the melody instrument, wave for wave, and cancels or lifts part of it for good (3.4 dB of one instrument, on one track). Tune it a few cents off: doubling('${d.id.replace(/O\d*$/, '') || 'd'}', { pitch: '${d.tune}P' })`);
   return out;
 }
 
@@ -573,19 +681,68 @@ function twoPole(mode, hz, sr) {
 }
 
 /**
+ * A copy of a patch in which every melody instrument plays at once, each through its own copy of the nodes that lie
+ * between the `inst` choice and the melody bus: { patch, ids: the bus of each instrument }, or null when the bus
+ * does not depend on `inst` in a way that can be copied.
+ */
+function soloInstruments(patch, node, count) {
+  const nodes = patch.nodes, text = (n) => JSON.stringify({ ...n, id: null }), has = (n, id) => new RegExp(`(^|[^A-Za-z0-9_])${id}([^A-Za-z0-9_]|$)`).test(text(n));
+  if (!nodes.some((n) => n.id === node)) return null;
+  // everything the `inst` choice reaches ...
+  const after = new Set(nodes.filter((n) => has(n, 'inst')).map((n) => n.id));
+  for (let grew = true; grew;) { grew = false; for (const n of nodes) if (!after.has(n.id) && [...after].some((id) => has(n, id))) { after.add(n.id); grew = true; } }
+  // ... that the bus is made from
+  const before = new Set([node]);
+  for (let grew = true; grew;) { grew = false; for (const n of nodes) if (before.has(n.id)) for (const m of nodes) if (!before.has(m.id) && has(n, m.id)) { before.add(m.id); grew = true; } }
+  const chain = nodes.filter((n) => after.has(n.id) && before.has(n.id));
+  if (!chain.some((n) => n.id === node)) return null;
+  const swap = (value, i) => {
+    if (typeof value === 'string') {
+      let out = value.replace(/(^|[^A-Za-z0-9_])inst(?![A-Za-z0-9_])/g, `$1${i}`);
+      for (const c of chain) out = out.replace(new RegExp(`(^|[^A-Za-z0-9_])${c.id}(?![A-Za-z0-9_])`, 'g'), `$1${c.id}zz${i}`);
+      return out;
+    }
+    return Array.isArray(value) ? value.map((v) => swap(v, i)) : value;
+  };
+  const copies = [];
+  for (let i = 0; i < count; i++) for (const c of chain) copies.push(Object.fromEntries(Object.entries(c).map(([k, v]) => [k, k === 'id' ? `${v}zz${i}` : k === 'type' ? v : swap(v, i)])));
+  return { patch: { ...patch, nodes: [...nodes, ...copies] }, ids: Array.from({ length: count }, (_, i) => `${node}zz${i}`) };
+}
+
+/**
  * The level of each melody instrument: the melody bus (before any layer gain) over the 8-bar version, once per instrument.
- * Arguments: patch; { node: the melody bus ('lF': <id>F of instruments(id)), sampleRate, params }.
+ * Arguments: patch; { node: the melody bus ('lF': <id>F of instruments(id)), sampleRate, params, bars: how many
+ * bars from the start to measure (8: the whole tune; fewer is quicker and rougher), together: true to measure all
+ * the instruments in one pass instead of one pass each (the same numbers, a fifth of the rendering: each gets its
+ * own copy of the nodes between the `inst` choice and the bus) }.
  * Returns [{ name, db, peak, crestDb, dc, sub80 }]: RMS in dB, peak, peak over RMS in dB, mean as a share of the
  * RMS (a DC offset), and the share of the energy below 80 Hz. Level-matched means the db values are within 1 dB.
  */
-export function measureInstruments(patch, { node = 'lF', sampleRate = 44100, params = {} } = {}) {
+export function measureInstruments(patch, { node = 'lF', sampleRate = 44100, params = {}, bars = LENGTHS[0], together = false } = {}) {
   const inst = (patch.params || []).find((p) => p.id === 'inst');
   if (!inst?.options) fail('measureInstruments: the patch has no "inst" control with named options');
+  const solo = together ? soloInstruments(patch, node, inst.options.length) : null;   // null: the bus cannot be copied, so one pass each
+  let shared = null;   // with `together`: one voice, ticked once per sample by the first instrument's measure
   return inst.options.map((name, i) => {
+    if (solo) {
+      // every instrument's copy of the bus runs in the same voice: one pass measures them all
+      if (!shared) {
+        const voice = createVoice(solo.patch, { sampleRate, params: { ...params, bars: LENGTHS[0] } });
+        const idx = solo.ids.map((id) => voice.nodeIds.indexOf(id));
+        const n = Math.round((voice.duration * sampleRate * Math.min(bars, LENGTHS[0])) / LENGTHS[0]);
+        const acc = idx.map(() => ({ sq: 0, sum: 0, peak: 0, lowSq: 0, low: twoPole('lp', 80, sampleRate) }));
+        for (let s = 0; s < n; s++) {
+          voice.tick();
+          for (let j = 0; j < idx.length; j++) { const x = voice.nodeValues[idx[j]], a = Math.abs(x), l = acc[j].low(x); acc[j].sq += x * x; acc[j].sum += x; acc[j].lowSq += l * l; if (a > acc[j].peak) acc[j].peak = a; }
+        }
+        shared = acc.map((c) => { const rms = Math.sqrt(c.sq / n); return { db: dB(c.sq / n), peak: c.peak, crestDb: rms > 0 ? 20 * Math.log10(c.peak / rms) : 0, dc: rms > 0 ? c.sum / n / rms : 0, sub80: c.sq > 0 ? c.lowSq / c.sq : 0 }; });
+      }
+      return { name, ...shared[i] };
+    }
     const voice = createVoice(patch, { sampleRate, params: { ...params, bars: LENGTHS[0], inst: i } });
     const k = voice.nodeIds.indexOf(node);
     if (k < 0) fail(`measureInstruments: no node "${node}" (the melody bus is <id>F for instruments(id); nodes: ${voice.nodeIds.join(' ')})`);
-    const n = Math.round(voice.duration * sampleRate), low = twoPole('lp', 80, sampleRate);
+    const n = Math.round((voice.duration * sampleRate * Math.min(bars, LENGTHS[0])) / LENGTHS[0]), low = twoPole('lp', 80, sampleRate);
     let sq = 0, sum = 0, peak = 0, lowSq = 0;
     for (let s = 0; s < n; s++) {
       voice.tick();
@@ -638,39 +795,123 @@ export function measureIntensity(patch, { sampleRate = 44100, params = {}, value
   });
 }
 
-/**
- * The level of any parts of the mix, each given as an expression over the patch's nodes, over the 8-bar version at full intensity.
- * Arguments: patch; layers: { name: expression }, for example { tune: 'lF*0.8*lead*gTune', backing: 'aF*0.4*gBed + pL*0.3*gFull' };
- * { band: [low, high] in Hz to measure only that band (12 dB per octave edges); sampleRate; params }.
- * Returns { name: { db, peak } } (RMS in dB, and the largest sample). Use it to set a tune against its
- * accompaniment where they overlap (band [300, 1200]), a drum against the bed, or what reaches the limiter.
- */
-export function measureLayers(patch, layers, { band, sampleRate = 44100, params = {} } = {}) {
+/** One pass over a patch that measures each layer in each band: bands is a list of [low, high] or null (the whole band). */
+function layerLevels(patch, layers, { bands = [null], sampleRate = 44100, params = {}, bars = LENGTHS[0] } = {}) {
   const names = Object.keys(layers || {});
   if (!names.length) fail('measureLayers: give { name: expression }');
   const probe = { ...patch, nodes: [...patch.nodes, ...names.map((name, i) => ({ id: `zzLayer${i}`, type: 'expr', expr: String(layers[name]) }))] };
   let voice;
   try { voice = createVoice(probe, { sampleRate, params: { intensity: 1, ...params, bars: LENGTHS[0] } }); } catch (e) { fail(`measureLayers: ${e.message}`); }
   const idx = names.map((_, i) => voice.nodeIds.indexOf(`zzLayer${i}`));
-  const filters = names.map(() => (band ? [twoPole('hp', band[0], sampleRate), twoPole('lp', band[1], sampleRate)] : null));
-  const n = Math.round(voice.duration * sampleRate), sq = names.map(() => 0), peak = names.map(() => 0);
+  const filters = bands.map((band) => names.map(() => (band ? [twoPole('hp', band[0], sampleRate), twoPole('lp', band[1], sampleRate)] : null)));
+  const n = Math.round((voice.duration * sampleRate * Math.min(bars, LENGTHS[0])) / LENGTHS[0]);
+  const sq = bands.map(() => names.map(() => 0)), peak = bands.map(() => names.map(() => 0));
   for (let s = 0; s < n; s++) {
     voice.tick();
     for (let j = 0; j < idx.length; j++) {
-      let x = voice.nodeValues[idx[j]];
-      if (filters[j]) x = filters[j][1](filters[j][0](x));
-      sq[j] += x * x; const a = Math.abs(x); if (a > peak[j]) peak[j] = a;
+      const raw = voice.nodeValues[idx[j]];
+      for (let b = 0; b < bands.length; b++) {
+        const f = filters[b][j], x = f ? f[1](f[0](raw)) : raw, a = Math.abs(x);
+        sq[b][j] += x * x; if (a > peak[b][j]) peak[b][j] = a;
+      }
     }
   }
-  return Object.fromEntries(names.map((name, j) => [name, { db: dB(sq[j] / n), peak: peak[j] }]));
+  return bands.map((_, b) => Object.fromEntries(names.map((name, j) => [name, { db: dB(sq[b][j] / n), peak: peak[b][j] }])));
+}
+
+/**
+ * The level of any parts of the mix, each given as an expression over the patch's nodes, over the 8-bar version at full intensity.
+ * Arguments: patch; layers: { name: expression }, for example { tune: 'lF*0.8*lead*gTune', backing: 'aF*0.4*gBed + pL*0.3*gFull' };
+ * { band: [low, high] in Hz to measure only that band (12 dB per octave edges); sampleRate; params; bars: how many
+ * bars from the start to measure (8) }.
+ * Returns { name: { db, peak } } (RMS in dB, and the largest sample). Use it to set a tune against its
+ * accompaniment where they overlap (band [300, 1200]), a drum against the bed, or what reaches the limiter.
+ */
+export function measureLayers(patch, layers, { band, sampleRate = 44100, params = {}, bars = LENGTHS[0] } = {}) {
+  return layerLevels(patch, layers, { bands: [band || null], sampleRate, params, bars })[0];
+}
+
+/** What the quick report renders at: all five instruments in one pass (their levels need the real sample rate), low sample rates for the rest. */
+const QUICK = { instruments: { sampleRate: 44100, bars: 8, together: true }, sections: { sampleRate: 8000 }, intensity: { sampleRate: 8000, bars: 4 }, layers: { sampleRate: 16000, bars: 8 } };
+
+/**
+ * What a report will render, before it does: every render and its cost. Arguments: patch; { quick, layers } as for report.
+ * Returns { renders: [{ what, count, bars, passes, sampleRate, seconds, cost }], cost }. seconds is the sound each
+ * render makes at the written tempo; cost is seconds of rendering at 44.1 kHz in all, which on a machine that
+ * renders at real-time speed is the wait in seconds (a 90-node track renders at 1 to 2.5 times real time).
+ */
+export function reportPlan(patch, { quick = false, layers } = {}) {
+  const bpm = (patch.params || []).find((p) => p.id === 'bpm')?.default ?? 120, bar = 240 / bpm;
+  const insts = (patch.params || []).find((p) => p.id === 'inst')?.options?.length ?? INSTRUMENTS.length;
+  const r = (what, count, bars, passes, sampleRate) => { const seconds = count * bars * passes * bar; return { what, count, bars, passes, sampleRate, seconds, cost: (seconds * sampleRate) / 44100 }; };
+  const renders = quick
+    ? [
+      r('instruments', 1, QUICK.instruments.bars, 1, QUICK.instruments.sampleRate),
+      r('sections', 1, LENGTHS[LENGTHS.length - 1], 1, QUICK.sections.sampleRate),
+      r('intensity', 5, QUICK.intensity.bars, 1, QUICK.intensity.sampleRate),
+      ...(layers ? [r('layers', 1, QUICK.layers.bars, 1, QUICK.layers.sampleRate)] : []),
+    ]
+    : [
+      r('instruments', insts, 8, 1, 44100),
+      r('speed and peak', 1, 8, 2, 44100),
+      r('sections', 1, LENGTHS.reduce((a, b) => a + b, 0), 2, 44100),
+      r('intensity', 5, 8, 2, 44100),
+      ...(layers ? [r('layers', insts * 2, 8, 1, 44100)] : []),
+    ];
+  return { renders, cost: renders.reduce((a, x) => a + x.cost, 0) };
+}
+
+/** The quick report: one pass for the five instruments, one pass of the 32-bar version for the sections, low sample rates. */
+function quickReport(patch, { node, layers }) {
+  const f = (x) => x.toFixed(1), t0 = performance.now(), plan = reportPlan(patch, { quick: true, layers });
+  const lines = [`${patch.id}  "${patch.name}"  ${patch.nodes.length} nodes  ·  quick report: levels are within about 1 dB of the full one (--measure --full)`];
+  const inst = measureInstruments(patch, { node, ...QUICK.instruments });
+  const dbs = inst.map((l) => l.db), spread = Math.max(...dbs) - Math.min(...dbs);
+  lines.push(`melody instruments (RMS of ${node}, 8 bars, all five in one pass): ${inst.map((l) => `${l.name} ${f(l.db)} dB`).join(' · ')}`);
+  lines.push(`  spread ${spread.toFixed(2)} dB ${spread <= 1 ? '(matched within 1 dB)' : '(NOT matched: run your generator with --match and paste the gains in)'}`);
+  // sections: the 32-bar version once, from the start; shorter versions are its last sections
+  const sr = QUICK.sections.sampleRate, longest = LENGTHS[LENGTHS.length - 1], count = longest / SECTION_BARS;
+  const voice = createVoice(patch, { sampleRate: sr, params: { ...defaultParams(patch), bars: longest } });
+  const n = Math.round(voice.duration * sr), sq = Array(count).fill(0);
+  let peak = 0;
+  for (let s = 0; s < n; s++) {
+    const l = voice.tick(), r = voice.stereo ? voice.right : l, k = Math.min(count - 1, Math.floor((s * count) / n));
+    sq[k] += (l * l + r * r) / 2; const a = Math.max(Math.abs(l), Math.abs(r)); if (a > peak) peak = a;
+  }
+  const sec = sq.map((x) => dB(x / (n / count)));
+  lines.push(`section levels (RMS dBFS, at the defaults, one pass of the ${longest}-bar version at ${sr / 1000} kHz; a shorter version is its last sections):`);
+  for (const bars of LENGTHS) lines.push(`  ${String(bars).padStart(2)} bars: ${sec.slice(count - bars / SECTION_BARS).map(f).join('  ')}`);
+  lines.push(`  largest sample ${peak.toFixed(2)} (aim for 0.7 to 0.9 at the loudest setting)`);
+  const steps = [0, 0.25, 0.5, 0.75, 1].map((intensity) => {
+    const v = createVoice(patch, { sampleRate: QUICK.intensity.sampleRate, params: { ...defaultParams(patch), bars: LENGTHS[0], intensity } });
+    const m = Math.round((v.duration * QUICK.intensity.sampleRate * QUICK.intensity.bars) / LENGTHS[0]);
+    let q = 0;
+    for (let s = 0; s < m; s++) { const l = v.tick(), r = v.stereo ? v.right : l; q += (l * l + r * r) / 2; }
+    return `${intensity} → ${f(dB(q / m))} dB`;
+  });
+  lines.push(`intensity (first ${QUICK.intensity.bars} bars of the 8-bar version): ${steps.join(' · ')}`);
+  if (layers) {
+    const names = Object.keys(layers), [all, mid] = layerLevels(patch, layers, { bands: [null, [300, 1200]], ...QUICK.layers });
+    lines.push(`layers (RMS dB, 8 bars, intensity 1, the default instrument): whole band / 300 to 1200 Hz`);
+    lines.push(`  ${names.map((k) => `${k} ${f(all[k].db)} / ${f(mid[k].db)}`).join(' · ')}`);
+  }
+  const fit = tuneFit(patch);
+  for (const l of fit.lines) lines.push(`tune "${l.id}": ${l.inChord} of ${l.onBeat} notes on the beat are in the bar's chord (${Math.round(l.chordShare * 100)}%), ${l.inScale} of ${l.notes} notes are in the scale (${Math.round(l.scaleShare * 100)}%)`);
+  if (fit.reason) lines.push(`tune against chords: not judged: ${fit.reason}`);
+  for (const x of lint(patch)) lines.push(`style guide: ${x}`);
+  const took = (performance.now() - t0) / 1000;
+  lines.push(`measured in ${took.toFixed(0)} s (${(plan.cost / Math.max(took, 0.001)).toFixed(1)} times real time). Not in the quick report: every instrument against the layers, every length rendered by itself, and the exact peak: --measure --full (about ${Math.round(reportPlan(patch, { layers }).cost / plan.cost)} times the work).`);
+  return lines.join('\n');
 }
 
 /**
  * Everything a composer reports, as text: instrument levels, section levels, intensity levels, the tune against its chords, render time.
  * Arguments: patch; { node: the melody bus ('lF'); layers: { name: expression } to print each layer's level, whole
- * band and 300 to 1200 Hz, for every melody instrument }.
+ * band and 300 to 1200 Hz, for every melody instrument; quick: true for the report that takes under a minute on a
+ * busy machine (about a twentieth of the rendering: see reportPlan; levels within about 1 dB) }.
  */
-export function report(patch, { node = 'lF', layers } = {}) {
+export function report(patch, { node = 'lF', layers, quick = false } = {}) {
+  if (quick) return quickReport(patch, { node, layers });
   const lines = [`${patch.id}  "${patch.name}"  ${patch.nodes.length} nodes`];
   const f = (x) => x.toFixed(1);
   const inst = measureInstruments(patch, { node });
@@ -702,27 +943,25 @@ export function report(patch, { node = 'lF', layers } = {}) {
   return lines.join('\n');
 }
 
-// ---- electronic voices and effects (added with batch S21, derelict-run) --------------------------------------------
+// ---- electronic voices and effects (added with derelict-run) --------------------------------------------
 //
 // What a synth track needs beside the drums and bass further down (kickDrum, hatDrum, sawBass ...): an echo in
-// time with the music, a clap, a plucked bass that is one pure saw, a wide pad, a riser. Each returns a list of
-// nodes for assemble(); the finished voice is <id>O (the pad: <id>L and <id>R), at a peak of about 1, so the gain
-// you write in the mix is its level. A pitch, a cutoff or a level may be a number or an expression.
-
-const inParens = (x) => (typeof x === 'number' ? num(x) : `(${x})`);
-const need = (what, value, name, hint) => { if (value === undefined || value === null || value === '') fail(`${what}: give ${name} (${hint})`); };
+// time with the music, a clap, a plucked bass that is one pure saw, a wide pad, a riser. All follow the convention
+// in the header. A pitch, a cutoff or a level may be a number or an expression.
 
 /**
  * An echo in time with the music: the sound comes back a number of 16th notes later, again and again, each repeat quieter.
- * Arguments: id; input: the sound to repeat (an expression); { steps: the gap in 16ths (3, a dotted 8th; 4 is a
+ * Arguments: id; { input: the sound to repeat (an expression); steps: the gap in 16ths (3, a dotted 8th; 4 is a
  * beat); feedback: how much of each repeat makes the next, 0 to 0.9 (0.4); tone: a low-pass on the repeats in Hz,
  * a number or an expression, to set them behind the sound (none) }.
  * Returns nodes ending in <id>O: the repeats alone, without the sound itself (put them beside the dry sound in
  * the mix, usually more to one side). The gap follows the Tempo control.
+ * Deprecated spelling, still accepted (the tracks written before the convention call it): tempoEcho(id, input, { ... }).
  */
-export function tempoEcho(id, input, { steps = 3, feedback = 0.4, tone } = {}) {
-  const what = `tempoEcho "${id}"`;
-  need(what, input, 'the input', 'the sound to repeat, as the second argument');
+export function tempoEcho(id, { input, steps = 3, feedback = 0.4, tone } = {}) {
+  if (oldSpelling(arguments)) { return tempoEcho(id, respelled(arguments, ['input'])); }
+  const what = `tempoEcho "${voiceId(id, 'tempoEcho')}"`;
+  need(what, input, 'the input', "the sound to repeat, an expression: { input: 'lF' }");
   if (!(steps > 0 && steps <= STEPS_PER_BAR)) fail(`${what}: steps is the gap in 16th notes, from 1 to ${STEPS_PER_BAR} (3 is a dotted 8th), got ${steps}`);
   if (!(feedback >= 0 && feedback <= 0.9)) fail(`${what}: feedback must be from 0 to 0.9 (above that the repeats never die away), got ${feedback}`);
   // the buffer must hold the gap at the slowest tempo a track may have: 32 bars in MAX_SECONDS
@@ -735,15 +974,17 @@ export function tempoEcho(id, input, { steps = 3, feedback = 0.4, tone } = {}) {
 
 /**
  * A hand clap: three quick bursts of band-passed noise, then a short tail. It has no pitch, so it fits any chord.
- * Arguments: id; trig (a drumRow's id); { noise: the id of a white-noise node (without it one is added); freq: the
- * centre of the band in Hz (1200); q: how narrow the band is (1.4); gap: seconds between the bursts (0.011);
+ * Arguments: id; { trig: the row that plays it (a drumRow's id); noise: the id of a white-noise node (without it one
+ * is added); freq: the centre of the band in Hz (1200); q: how narrow the band is (1.4); gap: seconds between the bursts (0.011);
  * decay: seconds of tail (0.16) }.
  * Returns <id>A (the three bursts and the tail), <id>N (the noise band) and <id>O, the clap.
+ * Deprecated spelling, still accepted (the tracks written before the convention call it): clap(id, trig, { ... }).
  */
-export function clap(id, trig, { noise, freq = 1200, q = 1.4, gap = 0.011, decay = 0.16 } = {}) {
-  const what = `clap "${id}"`;
-  need(what, trig, 'trig', 'the row that plays it, as the second argument');
-  const nz = noise || `${id}Nz`, r = (x) => Math.round(x * 1e6) / 1e6;
+export function clap(id, { trig, noise, freq = 1200, q = 1.4, gap = 0.011, decay = 0.16 } = {}) {
+  if (oldSpelling(arguments)) { return clap(id, respelled(arguments, ['trig'])); }
+  const what = `clap "${voiceId(id, 'clap')}"`;
+  need(what, trig, 'trig', "the row that plays it: { trig: 'cT' }");
+  const nz = noise || `${id}Nz`, r = (x) => Number(num(x));
   return [
     ...(noise ? [] : [{ id: nz, type: 'noise' }]),
     { id: `${id}A`, type: 'env', trig, points: [[0, 1], [r(gap * 0.8), 0.15], [r(gap), 1], [r(gap * 1.8), 0.15], [r(gap * 2), 1], [r(gap * 2 + decay), 0, 'exp']] },
@@ -756,16 +997,18 @@ export function clap(id, trig, { noise, freq = 1200, q = 1.4, gap = 0.011, decay
  * A plucked synth bass: one pure saw through a low-pass that snaps open on every note and shuts again before the note ends.
  * Beside sawBass (saw and square, a filter that follows the note's level, a shaper): this one has a filter envelope
  * of its own, an accent opens the filter further instead of playing louder, and it stays clean.
- * Arguments: id; trig (a drumRow's id); { pitch: in Hz, an expression ('midi(40 + tr + bS)'); floor: the filter's
+ * Arguments: id; { trig: the row that plays it (a drumRow's id); pitch: in Hz, an expression ('midi(40 + tr + bS)'); floor: the filter's
  * corner when shut, in Hz (150); open: how far above the floor a full note opens it, in Hz ('900 + bright*1800';
  * 0 keeps it shut; multiply it by a gate to open the bass with Intensity); q: resonance (1.8); hold, decay: the
  * length of a note in seconds (0.03, 0.09: a 16th at 126 bpm); snap: seconds the filter takes to shut (0.07) }.
  * Returns <id>V (the strength of the note), <id>A, <id>E (the filter's envelope), <id>W (the saw), <id>L and <id>O, the bass
  * (its peak is up to 1.8: the resonance). Shut, it is duller but about as loud: turn it down in the mix where it should recede.
+ * Deprecated spelling, still accepted (the tracks written before the convention call it): acidBass(id, trig, { ... }).
  */
-export function acidBass(id, trig, { pitch, floor = 150, open = '900 + bright*1800', q = 1.8, hold = 0.03, decay = 0.09, snap = 0.07 } = {}) {
-  const what = `acidBass "${id}"`;
-  need(what, trig, 'trig', 'the row that plays it, as the second argument');
+export function acidBass(id, { trig, pitch, floor = 150, open = '900 + bright*1800', q = 1.8, hold = 0.03, decay = 0.09, snap = 0.07 } = {}) {
+  if (oldSpelling(arguments)) { return acidBass(id, respelled(arguments, ['trig'])); }
+  const what = `acidBass "${voiceId(id, 'acidBass')}"`;
+  need(what, trig, 'trig', "the row that plays it: { trig: 'bT' }");
   need(what, pitch, 'pitch', "in Hz, for example 'midi(40 + tr)'");
   return [
     { id: `${id}V`, type: 'sah', in: trig, trig },
@@ -780,17 +1023,19 @@ export function acidBass(id, trig, { pitch, floor = 150, open = '900 + bright*18
 /**
  * A wide pad: for each note a pair of saws tuned slightly apart, one more to the left and one more to the right,
  * that swells slowly each time it is triggered and then settles back.
- * Arguments: id; notes: one to six pitches in Hz, as expressions (the chord: 'midi(52 + tr)', 'midi(52 + tr + third)',
- * ...); { trig: the row that swells it again, usually once a bar (without one it swells once); detune: how far
+ * Arguments: id; { pitches: one to six pitches in Hz, as expressions (the chord: 'midi(52 + tr)',
+ * 'midi(52 + tr + third)', ...); trig: the row that swells it again, usually once a bar (without one it swells once); detune: how far
  * apart a pair is tuned (0.006: about 10 cents each way); attack: seconds a swell takes (0.35); sustain: the level
  * it rests at between swells, 0 to 1 (0.6); bar: seconds from one swell to the next ('240/bpm': a bar);
  * cutoff: a low-pass in Hz ('500 + bright*2500'); q (0.7) }.
  * Returns <id>A (the swell), for each note <id>Hz1 (its pitch) and <id>W1a, <id>W1b (its two saws), and <id>L, <id>R:
  * the pad on the left and on the right.
+ * Deprecated spelling, still accepted (the tracks written before the convention call it): sawPad(id, pitches, { ... }).
  */
-export function sawPad(id, notes, { trig, detune = 0.006, attack = 0.35, sustain = 0.6, bar = '240/bpm', cutoff = '500 + bright*2500', q = 0.7 } = {}) {
-  const what = `sawPad "${id}"`;
-  if (!Array.isArray(notes) || notes.length < 1 || notes.length > 6) fail(`${what}: notes must be one to six pitches in Hz, for example ['midi(52 + tr)', 'midi(52 + tr + third)', 'midi(52 + tr + fifth)']`);
+export function sawPad(id, { pitches, trig, detune = 0.006, attack = 0.35, sustain = 0.6, bar = '240/bpm', cutoff = '500 + bright*2500', q = 0.7 } = {}) {
+  if (oldSpelling(arguments)) { return sawPad(id, respelled(arguments, ['pitches'])); }
+  const what = `sawPad "${voiceId(id, 'sawPad')}"`, notes = pitches;
+  if (!Array.isArray(notes) || notes.length < 1 || notes.length > 6) fail(`${what}: pitches must be one to six pitches in Hz, for example { pitches: ['midi(52 + tr)', 'midi(52 + tr + third)', 'midi(52 + tr + fifth)'] }`);
   if (!(sustain >= 0 && sustain <= 1)) fail(`${what}: sustain is the level it rests at between swells, from 0 to 1, got ${sustain}`);
   const nodes = [{ id: `${id}A`, type: 'env', ...(trig === undefined ? {} : { trig }), points: [[0, sustain], [attack, 1], [bar, sustain]] }];
   const left = [], right = [];
@@ -816,7 +1061,7 @@ export function sawPad(id, notes, { trig, detune = 0.006, attack = 0.35, sustain
  * Returns <id>T (the row that starts it), <id>E (0 to 1 through the bar), <id>N (the hiss) and <id>O, the riser.
  */
 export function riser(id, { noise, bar = SECTION_BARS, of = SECTION_BARS, low = 400, high = '4000 + bright*4000', q = 2 } = {}) {
-  const what = `riser "${id}"`;
+  const what = `riser "${voiceId(id, 'riser')}"`;
   if (![1, 2, 4, 8].includes(of)) fail(`${what}: of must be 1, 2, 4 or 8 bars, so the pattern divides the ${SECTION_BARS}-bar loop, got ${of}`);
   if (!Number.isInteger(bar) || bar < 1 || bar > of) fail(`${what}: bar is the bar it fills, from 1 to ${of}, got ${bar}`);
   const nz = noise || `${id}Nz`;
@@ -829,11 +1074,11 @@ export function riser(id, { noise, bar = SECTION_BARS, of = SECTION_BARS, low = 
   ];
 }
 
-// ---- voices many tracks repeat: drums, a bass, strings, brass (added with hearthvale-battle, batch R22) ----------------
-// Each takes an id and returns its nodes; the comment names the node that carries the finished voice. The ids a
-// voice makes end in P, W, V, A, N, B, L, R, O, O1 to O4 or Hz: name your own rows otherwise (kT, bS, aD ...).
+// ---- voices many tracks repeat: drums, a bass, strings, brass (added with hearthvale-battle) ----------------
+// All follow the convention in the header. The ids a voice makes end in P, W, V, A, N, B, L, R, O, O1 to O4 or Hz
+// (in the older blocks an oscillator inside a voice is <id>O1, <id>O2; in the newer ones <id>W): name your own rows
+// otherwise (kT, bS, aD ...).
 
-const voiceId = (id, what) => { if (typeof id !== 'string' || !/^[A-Za-z][A-Za-z0-9]*$/.test(id)) fail(`${what}: the id must be letters and digits, got ${JSON.stringify(id)}`); return id; };
 
 /**
  * Eight bars of a row made from one bar, with some bars replaced: eightBars('....X.......X...', { 8: '....X...x.x.XxXX' }).
@@ -858,14 +1103,16 @@ export function chordTone(id, pick) {
 
 /**
  * A kick drum: a sine that falls onto the bar's chord root, kept inside one low octave, so it never sounds a wrong note.
- * Arguments: id; trig (the id of a drumRow); { low: the lowest note it may land on, a MIDI number (28, E1: the root
+ * Arguments: id; { trig: the row that plays it (the id of a drumRow); low: the lowest note it may land on, a MIDI number (28, E1: the root
  * is folded into the octave from there up, whatever the chord and the Key control); from: how many times higher it
  * starts (3); fall: seconds to land (0.06); hold, decay: seconds (0.02, 0.2); curve (2) }.
  * Needs chords(). Returns <id>P (pitch), <id>W (the sine), <id>A (the envelope: give it to bus() as `duck`) and
  * <id>O, the drum.
+ * Deprecated spelling, still accepted (the tracks written before the convention call it): kickDrum(id, trig, { ... }).
  */
-export function kickDrum(id, trig, { low = 28, from = 3, fall = 0.06, hold = 0.02, decay = 0.2, curve = 2 } = {}) {
-  voiceId(id, 'kickDrum');
+export function kickDrum(id, { trig, low = 28, from = 3, fall = 0.06, hold = 0.02, decay = 0.2, curve = 2 } = {}) {
+  if (oldSpelling(arguments)) { return kickDrum(id, respelled(arguments, ['trig'])); }
+  need(`kickDrum "${voiceId(id, 'kickDrum')}"`, trig, 'trig', "the row that plays it: { trig: 'kT' }");
   return [
     { id: `${id}P`, type: 'env', trig, points: [[0, from], [fall, 1, 'exp']] },
     { id: `${id}W`, type: 'osc', freq: `midi(${num(low)} + (tonic + tr + ${num(120 - low)}) % 12)*${id}P` },
@@ -876,12 +1123,14 @@ export function kickDrum(id, trig, { low = 28, from = 3, fall = 0.06, hold = 0.0
 
 /**
  * A snare drum with no pitch of its own: a crack and a body, both band-passed noise.
- * Arguments: id; trig; { noise: the id of a white-noise node the piece already has (without it one is added);
- * crack, body: the two bands in Hz (1900, 420); decay: seconds (0.14); mix: [crack, body] levels ([1.85, 1.7]) }.
+ * Arguments: id; { trig: the row that plays it; noise: the id of a white-noise node the piece already has (without
+ * it one is added); crack, body: the two bands in Hz (1900, 420); decay: seconds (0.14); mix: [crack, body] levels ([1.85, 1.7]) }.
  * Returns <id>A (envelope), <id>N (the crack: `<id>N*<id>A` is a good reverb send), <id>B (the body) and <id>O, the drum.
+ * Deprecated spelling, still accepted (the tracks written before the convention call it): snareDrum(id, trig, { ... }).
  */
-export function snareDrum(id, trig, { noise, crack = 1900, body = 420, decay = 0.14, mix = [1.85, 1.7] } = {}) {
-  voiceId(id, 'snareDrum');
+export function snareDrum(id, { trig, noise, crack = 1900, body = 420, decay = 0.14, mix = [1.85, 1.7] } = {}) {
+  if (oldSpelling(arguments)) { return snareDrum(id, respelled(arguments, ['trig'])); }
+  need(`snareDrum "${voiceId(id, 'snareDrum')}"`, trig, 'trig', "the row that plays it: { trig: 'sT' }");
   const nz = noise || `${id}Nz`;
   return [
     ...(noise ? [] : [{ id: nz, type: 'noise' }]),
@@ -894,13 +1143,15 @@ export function snareDrum(id, trig, { noise, crack = 1900, body = 420, decay = 0
 
 /**
  * A closed hi-hat: high-passed noise, as loud as each mark of its row (X, x, o).
- * Arguments: id; trig (a drumRow's id, or an expression that picks one: 'gBusy > 0.5 ? h16 : h8'); { noise: the id
- * of a white-noise node (without it one is added); freq: the high-pass in Hz, a number or an expression
+ * Arguments: id; { trig: the row that plays it (a drumRow's id, or an expression that picks one:
+ * 'gBusy > 0.5 ? h16 : h8'); noise: the id of a white-noise node (without it one is added); freq: the high-pass in Hz, a number or an expression
  * ('7000 + bright*2500'); decay: seconds (0.03) }.
  * Returns <id>V (the strength of the last hit), <id>A (envelope), <id>N and <id>O, the hat.
+ * Deprecated spelling, still accepted (the tracks written before the convention call it): hatDrum(id, trig, { ... }).
  */
-export function hatDrum(id, trig, { noise, freq = '7000 + bright*2500', decay = 0.03 } = {}) {
-  voiceId(id, 'hatDrum');
+export function hatDrum(id, { trig, noise, freq = '7000 + bright*2500', decay = 0.03 } = {}) {
+  if (oldSpelling(arguments)) { return hatDrum(id, respelled(arguments, ['trig'])); }
+  need(`hatDrum "${voiceId(id, 'hatDrum')}"`, trig, 'trig', "the row that plays it, or an expression that picks one: { trig: 'hT' }");
   const nz = noise || `${id}Nz`;
   return [
     ...(noise ? [] : [{ id: nz, type: 'noise' }]),
@@ -913,14 +1164,16 @@ export function hatDrum(id, trig, { noise, freq = '7000 + bright*2500', decay = 
 
 /**
  * A tom tuned to the bar's chord, for fills: a sine that drops onto its note, with a little skin noise.
- * Arguments: id; trig; { note: the MIDI number of the chord root it plays, before the chord and key move it (45);
+ * Arguments: id; { trig: the row that plays it; note: the MIDI number of the chord root it plays, before the chord and key move it (45);
  * semis: semitones above that root, a number or the id of a noteRow (use chord tones: 12, 7, 0 walks a fill down
  * the chord); drop: how far above its note it starts, as a share (0.5); fall: seconds to land (0.07); decay: seconds
  * (0.2); noise: the id of a white-noise node (without it one is added); skin: level of the noise (0.3) }.
  * Needs chords(). Returns <id>P, <id>W (the sine), <id>V (hit strength), <id>A, <id>N and <id>O, the drum.
+ * Deprecated spelling, still accepted (the tracks written before the convention call it): tomDrum(id, trig, { ... }).
  */
-export function tomDrum(id, trig, { note = 45, semis = 0, drop = 0.5, fall = 0.07, decay = 0.2, noise, skin = 0.3 } = {}) {
-  voiceId(id, 'tomDrum');
+export function tomDrum(id, { trig, note = 45, semis = 0, drop = 0.5, fall = 0.07, decay = 0.2, noise, skin = 0.3 } = {}) {
+  if (oldSpelling(arguments)) { return tomDrum(id, respelled(arguments, ['trig'])); }
+  need(`tomDrum "${voiceId(id, 'tomDrum')}"`, trig, 'trig', "the row that plays it: { trig: 'tT' }");
   const nz = noise || `${id}Nz`;
   return [
     ...(noise ? [] : [{ id: nz, type: 'noise' }]),
@@ -935,15 +1188,17 @@ export function tomDrum(id, trig, { note = 45, semis = 0, drop = 0.5, fall = 0.0
 
 /**
  * A driving bass: a saw and a square on the chord root, through a low-pass that each note opens, then a shaper for edge.
- * Arguments: id; trig (a drumRow: X is an accent); { note: the MIDI number of the root before the chord and key move
- * it (45, A2); semis: semitones above the root, a number or the id of a noteRow (0, 12 and 7 are always chord
+ * Arguments: id; { trig: the row that plays it (a drumRow: X is an accent); note: the MIDI number of the root before
+ * the chord and key move it (45, A2); semis: semitones above the root, a number or the id of a noteRow (0, 12 and 7 are always chord
  * tones); decay: seconds (0.13); cutoff: Hz when closed (180); open: how far a note opens it, Hz, a number or an
  * expression ('900 + bright*2200'); drive: the shaper's drive, a number or an expression ('1.5 + grit*5'); q (2.2);
  * accent: how much quieter a plain hit is than an accent, 0 to 1 (0.3) }.
  * Needs chords(). Returns <id>Hz (the pitch), <id>O1, <id>O2, <id>V (hit strength), <id>A, <id>L and <id>O, the bass.
+ * Deprecated spelling, still accepted (the tracks written before the convention call it): sawBass(id, trig, { ... }).
  */
-export function sawBass(id, trig, { note = 45, semis = 0, decay = 0.13, cutoff = 180, open = '900 + bright*2200', drive = 1.5, q = 2.2, accent = 0.3 } = {}) {
-  voiceId(id, 'sawBass');
+export function sawBass(id, { trig, note = 45, semis = 0, decay = 0.13, cutoff = 180, open = '900 + bright*2200', drive = 1.5, q = 2.2, accent = 0.3 } = {}) {
+  if (oldSpelling(arguments)) { return sawBass(id, respelled(arguments, ['trig'])); }
+  need(`sawBass "${voiceId(id, 'sawBass')}"`, trig, 'trig', "the row that plays it: { trig: 'bT' }");
   if (!(accent >= 0 && accent <= 1)) fail('sawBass: accent is from 0 (every hit as loud) to 1');
   return [
     { id: `${id}Hz`, type: 'expr', expr: `midi(${num(note)} + tr + (${semis}))` },
@@ -959,14 +1214,16 @@ export function sawBass(id, trig, { note = 45, semis = 0, decay = 0.13, cutoff =
 
 /**
  * A string-section line: two saws a few cents apart, one for each side, every note bowed by a short envelope.
- * Arguments: id; freq: the pitch in Hz, an expression ('midi(57 + tr + aS)'); { trig: what starts a note ('c16':
+ * Arguments: id; { pitch: the note in Hz, an expression ('midi(57 + tr + aS)'); trig: what starts a note ('c16':
  * every 16th); detune: the ratio between the two saws (1.007); attack, decay: seconds (0.003, 0.11); curve (1.6);
  * cutoff: the low-pass in Hz, a number or an expression ('900 + bright*3500'); open: Hz each note opens it by (1500); q (1.2) }.
  * Returns <id>A (envelope), <id>O1, <id>O2 and <id>L, <id>R: the line on the left and on the right.
+ * Deprecated spelling, still accepted (the tracks written before the convention call it): stringPair(id, pitch, { ... }).
  */
-export function stringPair(id, freq, { trig = 'c16', detune = 1.007, attack = 0.003, decay = 0.11, curve = 1.6, cutoff = '900 + bright*3500', open = 1500, q = 1.2 } = {}) {
-  voiceId(id, 'stringPair');
-  const f = `${cutoff} + ${id}A*(${open})`;
+export function stringPair(id, { pitch, trig = 'c16', detune = 1.007, attack = 0.003, decay = 0.11, curve = 1.6, cutoff = '900 + bright*3500', open = 1500, q = 1.2 } = {}) {
+  if (oldSpelling(arguments)) { return stringPair(id, respelled(arguments, ['pitch'])); }
+  need(`stringPair "${voiceId(id, 'stringPair')}"`, pitch, 'pitch', "the note in Hz, an expression: { pitch: 'midi(57 + tr + aS)' }");
+  const freq = pitch, f = `${cutoff} + ${id}A*(${open})`;
   return [
     { id: `${id}A`, type: 'ad', trig, attack, decay, curve },
     { id: `${id}O1`, type: 'osc', wave: 'saw', freq: `(${freq})` },
@@ -977,14 +1234,37 @@ export function stringPair(id, freq, { trig = 'c16', detune = 1.007, attack = 0.
 }
 
 /**
+ * A doubling that does not cancel: an oscillator at a whole multiple of another voice's pitch, tuned a few cents off it.
+ * At an exact multiple the two stay locked, wave for wave, and part of the voice is cancelled or pushed up for good
+ * (3.4 dB of one instrument, on one track); a few cents apart they drift past each other and simply add.
+ * Arguments: id; { pitch: the note it doubles, in Hz, an expression ('lP': the tune); times: the multiple, a whole
+ * number 1 to 8 (2: an octave up; 1: a unison beside the voice); cents: how far off the exact multiple, 2 to 30
+ * either way (7; negative is flat); wave: sine, tri, saw, square or pulse ('saw'); width: of a pulse }.
+ * Returns <id>Hz, the detuned pitch (give it to any other voice: stringPair('d', { pitch: 'dHz', trig: 'lG' })) and
+ * <id>O, the oscillator, which sounds all the time: multiply it by an envelope on the tune's gate.
+ */
+export function doubling(id, { pitch, times = 2, cents = 7, wave = 'saw', width } = {}) {
+  const what = `doubling "${voiceId(id, 'doubling')}"`;
+  need(what, pitch, 'pitch', "the note it doubles in Hz, an expression: { pitch: 'lP' } is the tune");
+  if (!Number.isInteger(times) || times < 1 || times > 8) fail(`${what}: times is the multiple of the pitch, a whole number from 1 to 8 (2 is an octave up), got ${times}`);
+  if (!(Math.abs(cents) >= 2 && Math.abs(cents) <= 30)) fail(`${what}: cents is how far off the exact multiple it is tuned, from 2 to 30 either way (7), got ${cents}; at 0 it locks to the voice it doubles and cancels part of it`);
+  return [
+    { id: `${id}Hz`, type: 'expr', expr: `${inParens(pitch)}*${num(times * 2 ** (cents / 1200))}` },
+    { id: `${id}O`, type: 'osc', wave, ...(wave === 'pulse' && width !== undefined ? { width } : {}), freq: `${id}Hz` },
+  ];
+}
+
+/**
  * A brass-like chord stab: saws on the bar's root, third, fifth and octave through a low-pass that snaps open on each hit.
- * Arguments: id; trig (a drumRow); { note: the MIDI number of the root before the chord and key move it (57, A3);
+ * Arguments: id; { trig: the row that plays it (a drumRow); note: the MIDI number of the root before the chord and key move it (57, A3);
  * attack, hold, decay: seconds (0.008, 0.03, 0.16); cutoff: Hz when closed (500); open: Hz a hit opens it by, a
  * number or an expression ('1500 + bright*4000'); detune: ratio of the octave saw (1.006); q (1.5) }.
  * Needs chords(). Returns <id>A, <id>O1 to <id>O4 and <id>L, <id>R: the third leans left, the fifth right.
+ * Deprecated spelling, still accepted (the tracks written before the convention call it): brassStab(id, trig, { ... }).
  */
-export function brassStab(id, trig, { note = 57, attack = 0.008, hold = 0.03, decay = 0.16, cutoff = 500, open = '1500 + bright*4000', detune = 1.006, q = 1.5 } = {}) {
-  voiceId(id, 'brassStab');
+export function brassStab(id, { trig, note = 57, attack = 0.008, hold = 0.03, decay = 0.16, cutoff = 500, open = '1500 + bright*4000', detune = 1.006, q = 1.5 } = {}) {
+  if (oldSpelling(arguments)) { return brassStab(id, respelled(arguments, ['trig'])); }
+  need(`brassStab "${voiceId(id, 'brassStab')}"`, trig, 'trig', "the row that plays it: { trig: 'stT' }");
   const n = num(note), f = `${cutoff} + ${id}A*(${open})`;
   return [
     { id: `${id}A`, type: 'ad', trig, attack, hold, decay, curve: 1.5 },
@@ -997,32 +1277,17 @@ export function brassStab(id, trig, { note = 57, attack = 0.008, hold = 0.03, de
   ];
 }
 
-// ---- swung 8ths, notes that ring over each other, and acoustic voices (added with hearthvale-village, batch R21) -----
-// A voice takes its id, then the row that plays it, then (a string, a bell) its pitch, then options by name. It
-// returns a list of nodes for assemble(); <id>O is the finished voice. The three helpers below are this block's own.
+// ---- notes that ring over each other, and acoustic voices (added with hearthvale-village) -----------------------------
+// Each returns a list of nodes for assemble(); <id>O is the finished voice.
 
-const idR21 = (id, what) => { if (typeof id !== 'string' || !/^[A-Za-z][A-Za-z0-9]*$/.test(id)) fail(`${what}: the id must be letters and digits, got ${JSON.stringify(id)}`); return id; };
-const needR21 = (what, value, name, hint) => { if (value === undefined || value === null || value === '') fail(`${what}: give ${name} (${hint})`); };
-const exprR21 = (x) => (typeof x === 'number' ? num(x) : `(${x})`);
 
 /**
- * The one clock of a track whose lilt is on the 8th notes: the 8th between two beats comes late, and the beats never move.
- * Arguments: { swing }: an expression 0..1 (a control, or a share of one: 'swing*0.6'). 0 is straight; 1 is a full
- * shuffle, where the 8th between two beats comes a third of an 8th late (two to one, a triplet feel). Use it in
- * place of clock(), which swings only the 16ths between the 8ths and so leaves a piece written in 8ths as it was.
- * Returns c16 and c16p as clock() does, c8p (1 during the first 8th of a beat, 0 during the second) and c8w (what
- * the clock reads). The bar and the tempo stay exact.
+ * The clock of a track whose lilt is on the 8th notes: the 8th between two beats comes late, and the beats never move.
+ * Deprecated: the old name of clock({ swing, on: 8 }), kept because hearthvale-village calls it; write clock({ on: 8 }).
+ * Arguments: { swing }: an expression 0..1 (a control, or a share of one: 'swing*0.6'). Returns what clock() returns.
  */
 export function clockEighths({ swing } = {}) {
-  const base = 'bpm/60*4';
-  return [
-    // the clock reads c8w from the sample before its tick (0 before the first): the 16th now starting is a long one
-    // when c8w is 0, which is so for both 16ths of the first 8th of a beat
-    { id: 'c16', type: 'clock', rate: swing ? `${base} / (1 + (${swing})/3*(1 - 2*c8w))` : base },
-    { id: 'c16p', type: 'seq', trig: 'c16', loop: true, steps: '1 0' },
-    { id: 'c8w', type: 'seq', trig: 'c16', loop: true, steps: '0 1 1 0' },
-    { id: 'c8p', type: 'seq', trig: 'c16', loop: true, steps: '1 1 0 0' },
-  ];
+  return clock({ swing, on: 8 });
 }
 
 /**
@@ -1034,7 +1299,7 @@ export function clockEighths({ swing } = {}) {
  * which it keeps while the other voices play (and over the join of the loop). The list also has .counts: notes per voice.
  */
 export function ringRows(id, steps, { voices = 2 } = {}) {
-  idR21(id, 'ringRows');
+  voiceId(id, 'ringRows');
   const what = `ring rows "${id}"`;
   if (!Number.isInteger(voices) || voices < 1 || voices > 8) fail(`${what}: voices is how many take turns, from 1 to 8, got ${voices}`);
   const toks = rowTokens(what, steps, words);
@@ -1065,41 +1330,45 @@ export function ringRows(id, steps, { voices = 2 } = {}) {
 
 /**
  * A plucked string for an accompaniment: the kit's clean pluck (one short pick, no burst of noise, no DC), as loud as each mark of its row.
- * Arguments: id; trig (a gate row: a drumRow, or <id>G<n> of ringRows); freq: the pitch in Hz, an expression
- * ('midi(53 + round(key) + rS1)'); { ring: seconds the string rings (1.6); damp: how dull it is, 0 to 0.9, a number
+ * Arguments: id; { trig: the row that plucks it (a drumRow, or <id>G<n> of ringRows); pitch: the note in Hz, an
+ * expression ('midi(53 + round(key) + rS1)'); ring: seconds the string rings (1.6); damp: how dull it is, 0 to 0.9, a number
  * or an expression ('0.3 - bright*0.15'); pick: seconds the pick lasts, shorter is brighter, a number or an
  * expression of controls ('0.0018 - bright*0.0008') }.
  * Returns <id>V (the strength of the last pluck), <id>X (the pick), <id>W (the string) and <id>O, the voice, at a peak near 1.
+ * Deprecated spelling, still accepted (the tracks written before the convention call it): pluckedString(id, trig, pitch, { ... }).
  */
-export function pluckedString(id, trig, freq, { ring = 1.6, damp = '0.3 - bright*0.15', pick = '0.0018 - bright*0.0008' } = {}) {
-  idR21(id, 'pluckedString');
-  const what = `pluckedString "${id}"`;
-  needR21(what, trig, 'trig', 'the gate row that plucks it');
-  needR21(what, freq, 'freq', "the pitch in Hz, for example 'midi(53 + round(key) + rS1)'");
-  const p = exprR21(pick);
+export function pluckedString(id, { trig, pitch, ring = 1.6, damp = '0.3 - bright*0.15', pick = '0.0018 - bright*0.0008' } = {}) {
+  if (oldSpelling(arguments)) { need(`pluckedString "${id}"`, arguments[2], 'freq', "the pitch in Hz, as the third argument of the old spelling"); return pluckedString(id, respelled(arguments, ['trig', 'pitch'])); }
+  voiceId(id, 'pluckedString');
+  const what = `pluckedString "${id}"`, freq = pitch;
+  need(what, trig, 'trig', 'the gate row that plucks it');
+  need(what, pitch, 'pitch', "the note in Hz, for example 'midi(53 + round(key) + rS1)'");
+  const p = inParens(pick);
   return [
     { id: `${id}V`, type: 'sah', in: trig, trig },
     // one swing up and one down, so the pick adds no DC; the string's own burst of noise is not used (trig: 0)
     { id: `${id}X`, type: 'env', trig, points: [[0, 0], [`${p}*0.25`, 1], [`${p}*0.75`, -1], [p, 0]] },
     { id: `${id}W`, type: 'pluck', trig: 0, in: `${id}X*${id}V`, freq, decay: ring, damp },
-    { id: `${id}O`, type: 'filter', mode: 'hp', in: `${id}W`, freq: `${exprR21(freq)}*0.5`, q: 0.7 },
+    { id: `${id}O`, type: 'filter', mode: 'hp', in: `${id}W`, freq: `${inParens(freq)}*0.5`, q: 0.7 },
   ];
 }
 
 /**
  * A struck bell or chime: a short tap into ringing partials (the `modal` node), as loud as each mark of its row.
- * Arguments: id; trig (a gate row); freq: the pitch in Hz, an expression; { ring: seconds the lowest partial rings
+ * Arguments: id; { trig: the row that strikes it; pitch: the note in Hz, an expression; ring: seconds the lowest partial rings
  * (1.4); ratios: the partials as multiples of the pitch ([1, 2, 3, 4.2]: a chime or celesta; [1, 2.76, 5.4, 8.93]
  * is a church bell); gains: the level of each partial ([1, 0.4, 0.2, 0.1]); strike: seconds the tap lasts (0.0012:
  * longer is softer and duller) }.
  * Returns <id>V (the strength of the last strike), <id>X (the tap) and <id>O, the bell. The tap is scaled so a low
  * bell peaks near 1; a high one is a little quieter. Give each bell that must ring over the next its own voice (ringRows).
+ * Deprecated spelling, still accepted (the tracks written before the convention call it): struckBell(id, trig, pitch, { ... }).
  */
-export function struckBell(id, trig, freq, { ring = 1.4, ratios = [1, 2, 3, 4.2], gains = [1, 0.4, 0.2, 0.1], strike = 0.0012 } = {}) {
-  idR21(id, 'struckBell');
-  const what = `struckBell "${id}"`;
-  needR21(what, trig, 'trig', 'the gate row that strikes it');
-  needR21(what, freq, 'freq', "the pitch in Hz, for example 'midi(77 + round(key) + qS1)'");
+export function struckBell(id, { trig, pitch, ring = 1.4, ratios = [1, 2, 3, 4.2], gains = [1, 0.4, 0.2, 0.1], strike = 0.0012 } = {}) {
+  if (oldSpelling(arguments)) { need(`struckBell "${id}"`, arguments[2], 'freq', "the pitch in Hz, as the third argument of the old spelling"); return struckBell(id, respelled(arguments, ['trig', 'pitch'])); }
+  voiceId(id, 'struckBell');
+  const what = `struckBell "${id}"`, freq = pitch;
+  need(what, trig, 'trig', 'the gate row that strikes it');
+  need(what, pitch, 'pitch', "the note in Hz, for example 'midi(77 + round(key) + qS1)'");
   if (!Array.isArray(ratios) || !ratios.length || ratios.some((r) => !(r > 0))) fail(`${what}: ratios must be a list of positive multiples of the pitch, for example [1, 2, 3, 4.2]`);
   if (!Array.isArray(gains) || gains.length !== ratios.length) fail(`${what}: gains needs one level per partial (${ratios.length}), got ${JSON.stringify(gains)}`);
   if (!(strike > 0 && strike <= 0.02)) fail(`${what}: strike is the length of the tap in seconds, up to 0.02, got ${strike}`);
@@ -1113,63 +1382,69 @@ export function struckBell(id, trig, freq, { ring = 1.4, ratios = [1, 2, 3, 4.2]
 
 /**
  * A round bass: a sine with a little triangle on the bar's chord root, every note a soft start, a short hold and a long fall.
- * Arguments: id; trig (a drumRow: X, x and o set how loud); { note: the MIDI number of the root before the chord and
- * key move it (41, F2); semis: semitones above the root, a number or the id of a noteRow (0, 7, -5 and 12 are
+ * Arguments: id; { trig: the row that plays it (a drumRow: X, x and o set how loud); note: the MIDI number of the
+ * root before the chord and key move it (41, F2); semis: semitones above the root, a number or the id of a noteRow (0, 7, -5 and 12 are
  * always chord tones); edge: the level of the triangle, which is what a small speaker plays, a number or an
  * expression ('0.25 + bright*0.3'); attack: seconds (0.008); hold, decay: seconds, numbers or expressions of
  * controls ('30/bpm', '60/bpm': half a beat and a beat) }.
  * Needs chords(). Returns <id>Hz (the pitch), <id>O1 (sine), <id>O2 (triangle), <id>V (hit strength), <id>A and <id>O, the bass.
+ * Deprecated spelling, still accepted (the tracks written before the convention call it): roundBass(id, trig, { ... }).
  */
-export function roundBass(id, trig, { note = 41, semis = 0, edge = '0.25 + bright*0.3', attack = 0.008, hold = '30/bpm', decay = '60/bpm' } = {}) {
-  idR21(id, 'roundBass');
-  needR21(`roundBass "${id}"`, trig, 'trig', 'the row that plays it');
+export function roundBass(id, { trig, note = 41, semis = 0, edge = '0.25 + bright*0.3', attack = 0.008, hold = '30/bpm', decay = '60/bpm' } = {}) {
+  if (oldSpelling(arguments)) { return roundBass(id, respelled(arguments, ['trig'])); }
+  voiceId(id, 'roundBass');
+  need(`roundBass "${id}"`, trig, 'trig', 'the row that plays it');
   return [
     { id: `${id}Hz`, type: 'expr', expr: `midi(${num(note)} + tr + (${semis}))` },
     { id: `${id}O1`, type: 'osc', freq: `${id}Hz` },
     { id: `${id}O2`, type: 'osc', wave: 'tri', freq: `${id}Hz` },
     { id: `${id}V`, type: 'sah', in: trig, trig },
     { id: `${id}A`, type: 'ad', trig, attack, hold, decay, curve: 1.6 },
-    { id: `${id}O`, type: 'expr', expr: `(${id}O1 + ${id}O2*${exprR21(edge)})*${id}A*${id}V` },
+    { id: `${id}O`, type: 'expr', expr: `(${id}O1 + ${id}O2*${inParens(edge)})*${id}A*${id}V` },
   ];
 }
 
 /**
  * A hand drum (a frame drum, a soft conga): a low thump that falls onto its note and the slap of a palm, as loud as each mark of its row.
- * Arguments: id; trig (a drumRow's id); { pitch: the note the thump lands on, in Hz (put it on the chord root, for
+ * Arguments: id; { trig: the row that plays it (a drumRow's id); pitch: the note the thump lands on, in Hz (put it on the chord root, for
  * example 'midi(41 + tr)', so it never sounds a note outside the chord); noise: the id of a white-noise node
  * (without it one is added); drop: how far above its note the thump starts, as a share (0.6); fall: seconds to land
  * (0.045); decay: seconds the thump rings (0.16); slap: the level of the palm (0.5); slapHz: the centre of the
  * palm's band in Hz, a number or an expression (700); slapDecay: seconds (0.045) }.
  * Returns <id>P (the fall), <id>W (the thump), <id>V (the strength of the hit), <id>A, <id>B (the palm's envelope), <id>N and <id>O, the drum.
+ * Deprecated spelling, still accepted (the tracks written before the convention call it): handDrum(id, trig, { ... }).
  */
-export function handDrum(id, trig, { pitch, noise, drop = 0.6, fall = 0.045, decay = 0.16, slap = 0.5, slapHz = 700, slapDecay = 0.045 } = {}) {
-  idR21(id, 'handDrum');
+export function handDrum(id, { trig, pitch, noise, drop = 0.6, fall = 0.045, decay = 0.16, slap = 0.5, slapHz = 700, slapDecay = 0.045 } = {}) {
+  if (oldSpelling(arguments)) { return handDrum(id, respelled(arguments, ['trig'])); }
+  voiceId(id, 'handDrum');
   const what = `handDrum "${id}"`;
-  needR21(what, trig, 'trig', 'the row that plays it, as the second argument');
-  needR21(what, pitch, 'pitch', "the note the thump lands on in Hz, for example 'midi(41 + tr)'");
+  need(what, trig, 'trig', "the row that plays it: { trig: 'dT' }");
+  need(what, pitch, 'pitch', "the note the thump lands on in Hz, for example 'midi(41 + tr)'");
   const nz = noise || `${id}Nz`;
   return [
     ...(noise ? [] : [{ id: nz, type: 'noise' }]),
     { id: `${id}P`, type: 'env', trig, points: [[0, 1 + drop], [fall, 1, 'exp']] },
-    { id: `${id}W`, type: 'osc', freq: `${exprR21(pitch)}*${id}P` },
+    { id: `${id}W`, type: 'osc', freq: `${inParens(pitch)}*${id}P` },
     { id: `${id}V`, type: 'sah', in: trig, trig },
     { id: `${id}A`, type: 'ad', trig, attack: 0.002, hold: 0.012, decay, curve: 2 },
     { id: `${id}B`, type: 'ad', trig, attack: 0.001, decay: slapDecay, curve: 2 },
     { id: `${id}N`, type: 'filter', mode: 'bp', in: nz, freq: slapHz, q: 1.1 },
-    { id: `${id}O`, type: 'expr', expr: `(${id}W*${id}A + ${id}N*${id}B*${exprR21(slap)})*${id}V` },
+    { id: `${id}O`, type: 'expr', expr: `(${id}W*${id}A + ${id}N*${id}B*${inParens(slap)})*${id}V` },
   ];
 }
 
 /**
  * A shaker: a short band of hiss with a soft start, as loud as each mark of its row; it has no pitch, so it fits any chord.
- * Arguments: id; trig (a drumRow's id); { noise: the id of a white-noise node (without it one is added); freq: the
- * centre of the hiss in Hz, a number or an expression ('5500 + bright*2500'); q: how narrow it is (1.2); attack:
+ * Arguments: id; { trig: the row that plays it (a drumRow's id); noise: the id of a white-noise node (without it one
+ * is added); freq: the centre of the hiss in Hz, a number or an expression ('5500 + bright*2500'); q: how narrow it is (1.2); attack:
  * seconds the beads take to land (0.006: this is what tells a shaker from a hi-hat); decay: seconds (0.05) }.
  * Returns <id>V (the strength of the shake), <id>A, <id>N and <id>O, the shaker.
+ * Deprecated spelling, still accepted (the tracks written before the convention call it): shaker(id, trig, { ... }).
  */
-export function shaker(id, trig, { noise, freq = '5500 + bright*2500', q = 1.2, attack = 0.006, decay = 0.05 } = {}) {
-  idR21(id, 'shaker');
-  needR21(`shaker "${id}"`, trig, 'trig', 'the row that plays it, as the second argument');
+export function shaker(id, { trig, noise, freq = '5500 + bright*2500', q = 1.2, attack = 0.006, decay = 0.05 } = {}) {
+  if (oldSpelling(arguments)) { return shaker(id, respelled(arguments, ['trig'])); }
+  voiceId(id, 'shaker');
+  need(`shaker "${id}"`, trig, 'trig', "the row that plays it: { trig: 'kT' }");
   const nz = noise || `${id}Nz`;
   return [
     ...(noise ? [] : [{ id: nz, type: 'noise' }]),
@@ -1180,9 +1455,8 @@ export function shaker(id, trig, { noise, freq = '5500 + bright*2500', q = 1.2, 
   ];
 }
 
-// ---- a half-time beat, a sub drop, a chorus and an alarm (added with derelict-boss, batch S22) -------------------------
-// Each voice returns its nodes; the finished voice is <id>O (the chorus: <id>L and <id>R), between -1 and 1, so the
-// gain you write in the mix is its level.
+// ---- a half-time beat, a sub drop, a chorus and an alarm (added with derelict-boss) -------------------------
+// All follow the convention in the header.
 
 /**
  * A half-time beat as drum rows: the snare on beat 3 only and a sparse kick, so a fast piece feels half as fast and twice as heavy.
@@ -1201,20 +1475,22 @@ export function halfTimeBeat({ driving = false, fill = true } = {}) {
 
 /**
  * A sub drop: a sine that falls from a pitch to octaves below it and dies away, to mark the first beat of a section.
- * Arguments: id; trig: what starts it (for the first beat of every 8-bar section: drumRow('dT', 'X', { every: 128 }));
- * { from: where it starts, in Hz, a number or an expression ('midi(48 + tr)': the bar's chord root, so it lands on
+ * Arguments: id; { trig: what starts it (for the first beat of every 8-bar section: drumRow('dT', 'X', { every: 128 }));
+ * pitch: where it starts, in Hz, a number or an expression ('midi(48 + tr)': the bar's chord root, so it lands on
  * that root, lower); octaves: how far it falls (2); fall: seconds the fall takes (0.5); decay: seconds it rings on
  * after that (1.2) }.
  * Returns <id>P (the fall, from 1 down), <id>W (the sine), <id>A (its envelope) and <id>O, the drop.
+ * Deprecated spelling, still accepted (the tracks written before the convention call it): subDrop(id, trig, { ... }), and `from` for `pitch`.
  */
-export function subDrop(id, trig, { from = 'midi(48 + tr)', octaves = 2, fall = 0.5, decay = 1.2 } = {}) {
+export function subDrop(id, { trig, pitch, from = 'midi(48 + tr)', octaves = 2, fall = 0.5, decay = 1.2 } = {}) {
+  if (oldSpelling(arguments)) { return subDrop(id, respelled(arguments, ['trig'])); }
   const what = `subDrop "${voiceId(id, 'subDrop')}"`;
-  need(what, trig, 'trig', "the row that starts it, as the second argument: drumRow('dT', 'X', { every: 128 }) is the first beat of every section");
+  need(what, trig, 'trig', "the row that starts it: drumRow('dT', 'X', { every: 128 }) is the first beat of every section");
   if (!(octaves > 0 && octaves <= 4)) fail(`${what}: octaves is how far it falls, above 0 and up to 4, got ${octaves}`);
   if (!(fall > 0) || !(decay > 0)) fail(`${what}: fall and decay are seconds above 0`);
   return [
     { id: `${id}P`, type: 'env', trig, points: [[0, 1], [fall, Number(num(2 ** -octaves)), 'exp']] },
-    { id: `${id}W`, type: 'osc', freq: `${inParens(from)}*${id}P` },
+    { id: `${id}W`, type: 'osc', freq: `${inParens(pitch ?? from)}*${id}P` },
     { id: `${id}A`, type: 'ad', trig, attack: 0.004, hold: Number(num(fall * 0.6)), decay, curve: 2 },
     { id: `${id}O`, type: 'expr', expr: `${id}W*${id}A` },
   ];
@@ -1223,15 +1499,17 @@ export function subDrop(id, trig, { from = 'midi(48 + tr)', octaves = 2, fall = 
 /**
  * A chorus: two copies of any sound whose pitch drifts a few cents, one up while the other goes down, so one voice
  * sounds like two detuned ones, a copy for each side. It works on whatever plays (all five melody instruments).
- * Arguments: id; input: the sound to thicken, an expression ('lF', a melody bus); { depth: how far the copies
+ * Arguments: id; { input: the sound to thicken, an expression ('lF', a melody bus); depth: how far the copies
  * drift, 0 to 1, a number or an expression ('0.5': about 12 cents each way at the default rate; 0 is no detune);
  * rate: the speed of the drift in Hz (0.7); delay: seconds the copies sit behind the sound (0.012) }.
  * Returns <id>D (the drift), <id>L and <id>R: the two copies alone, each at the level of the input. Put them beside
  * the dry sound in the mix (left and right), or use them in its place for a voice with no centre.
+ * Deprecated spelling, still accepted (the tracks written before the convention call it): chorus(id, input, { ... }).
  */
-export function chorus(id, input, { depth = '0.5', rate = 0.7, delay = 0.012 } = {}) {
+export function chorus(id, { input, depth = '0.5', rate = 0.7, delay = 0.012 } = {}) {
+  if (oldSpelling(arguments)) { return chorus(id, respelled(arguments, ['input'])); }
   const what = `chorus "${voiceId(id, 'chorus')}"`;
-  need(what, input, 'the input', "the sound to thicken, as the second argument: 'lF' is the melody");
+  need(what, input, 'the input', "the sound to thicken, an expression: { input: 'lF' } is the melody");
   const swing = 0.003;   // seconds the delay moves each way at depth 1: 3 ms at 0.7 Hz bends the pitch 23 cents
   if (!(delay >= swing + 0.001 && delay <= 0.05)) fail(`${what}: delay is from ${swing + 0.001} to 0.05 seconds (shorter and the drift has no room, longer and it is an echo), got ${delay}`);
   if (!(rate > 0 && rate <= 8)) fail(`${what}: rate is the speed of the drift, above 0 and up to 8 Hz, got ${rate}`);
@@ -1246,19 +1524,21 @@ export function chorus(id, input, { depth = '0.5', rate = 0.7, delay = 0.012 } =
 /**
  * An alarm tone: a thin, hard pulse wave that sounds a short note on every hit of its row. It ignores the chords
  * (a signal, not a part of the harmony) and follows only the Key control; two notes a semitone apart are a warning.
- * Arguments: id; trig (a drumRow's id); { semis: semitones above `base`, a number or the id of a noteRow ('0 0 -1 -1'
- * with a row of 'X.X.' is two notes a semitone apart); base: the MIDI number of its note before Key moves it (84,
- * C6); width: the pulse width, 0 to 1 (0.22: thin and nasal); hold, decay: seconds (0.05, 0.07); grit: how harsh,
+ * Arguments: id; { trig: the row that plays it (a drumRow's id); semis: semitones above `note`, a number or the id of
+ * a noteRow ('0 0 -1 -1' with a row of 'X.X.' is two notes a semitone apart); note: the MIDI number of its note
+ * before Key moves it (84, C6); width: the pulse width, 0 to 1 (0.22: thin and nasal); hold, decay: seconds (0.05, 0.07); grit: how harsh,
  * 0 to 1, a number or an expression ('0.5': an octave saw is mixed in and the sum is pushed into a shaper) }.
  * Returns <id>Hz (the pitch), <id>W1, <id>W2 (the pulse and the octave saw), <id>A (envelope), <id>B (the shaper) and <id>O, the alarm.
+ * Deprecated spelling, still accepted (the tracks written before the convention call it): alarmTone(id, trig, { ... }), and `base` for `note`.
  */
-export function alarmTone(id, trig, { semis = 0, base = 84, width = 0.22, hold = 0.05, decay = 0.07, grit = '0.5' } = {}) {
+export function alarmTone(id, { trig, semis = 0, note, base = 84, width = 0.22, hold = 0.05, decay = 0.07, grit = '0.5' } = {}) {
+  if (oldSpelling(arguments)) { return alarmTone(id, respelled(arguments, ['trig'])); }
   const what = `alarmTone "${voiceId(id, 'alarmTone')}"`;
-  need(what, trig, 'trig', 'the row that plays it, as the second argument');
+  need(what, trig, 'trig', "the row that plays it: { trig: 'alT' }");
   if (!(width > 0 && width < 1)) fail(`${what}: width is the pulse width, between 0 and 1, got ${width}`);
   const g = `clamp(${inParens(grit)}, 0, 1)`;
   return [
-    { id: `${id}Hz`, type: 'expr', expr: `midi(${num(base)} + round(key) + (${semis}))` },
+    { id: `${id}Hz`, type: 'expr', expr: `midi(${num(note ?? base)} + round(key) + (${semis}))` },
     { id: `${id}W1`, type: 'osc', wave: 'pulse', width, freq: `${id}Hz` },
     { id: `${id}W2`, type: 'osc', wave: 'saw', freq: `${id}Hz*2.004` },
     { id: `${id}A`, type: 'ad', trig, attack: 0.002, hold, decay, curve: 1.6 },

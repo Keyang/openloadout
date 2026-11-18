@@ -2,10 +2,15 @@
 // Writes sounds/derelict-boss.json: "Station boss theme", the boss music of the roguelite kit
 // (bundles/specs/kit-roguelite-scifi.md, batch S22). Built on the music kit (kit.mjs).
 //
-//   C minor, 164 bpm, 8 bars: Cm Cm Ab Bb | Cm Eb F G. Relentless, distorted, alarm-like: a driven saw bass jumping
+//   C minor, 164 bpm, 8 bars: Cm Cm Fm Gm | Cm Eb F#dim G. Relentless, distorted, alarm-like: a driven saw bass jumping
 //   between the root and its octave, crushed 16th hats, a half-time kick and snare that turn into a kick on every
 //   8th, a two-note alarm a semitone apart, gated saw chords on the off-beats, a sub drop at the top of every
 //   section, and a tune of short stabs that climbs to the G chord.
+//
+//   The chords are this track's own (the specification's Cm Cm Ab Bb | Cm Eb F G is, step for step, the chord order
+//   of hearthvale-battle, and no two tracks may share one): two bars of C minor, then the bass drops to F and G
+//   below it (i i iv v), and the second half climbs C, E flat, F sharp, G: minor thirds and a last semitone,
+//   through a diminished chord, into the only major chord of the piece.
 //
 //   node tools/compose/derelict_boss.mjs --out <scratch file>   write the patch somewhere to try it (see kit.mjs)
 //   node tools/compose/derelict_boss.mjs --match     measure the five melody instruments, print matching gains
@@ -20,21 +25,23 @@ import {
 // shaper, so one pass is not enough): all five within 1 dB on the melody bus lX.
 export const GAINS = [1, 0.714, 1.19, 0.961, 1.48];
 
-export const CHORDS = 'Cm Cm Ab Bb | Cm Eb F G';
+// A comma drops that bar's root an octave: the bass falls to F and G under the C it started on, then climbs.
+export const CHORDS = 'Cm Cm Fm, Gm, | Cm Eb F#dim G';
 
 // The tune, one token per 16th. Two stabs and nothing else: a leap up of two notes, and three notes that hammer
 // one pitch and step up off it, left hanging. Bars 1 to 4 trade them a bar each, after the alarm, landing on the
-// snare, and their top creeps up: G, A flat, A flat, then B flat breaking off to D. Bars 5 to 8 squeeze both into
+// snare, and their top creeps up: G, A flat, A flat (the third of F minor, reached from C), then B flat breaking
+// off to D (the third and fifth of G minor). Bars 5 to 8 squeeze both into
 // every bar, either side of the snare, and climb with the chords to the G chord, where the last note (E flat over
 // G) leans on the alarm's C in bar 1. The alarm has the first beat of every odd bar to itself.
 export const TUNE = [
   '_ _ _ _ _ _ Eb5- _ G5 _ _ _ _ _ _ _',          // Cm   the leap: E flat up to G, landing with the snare
   '_ _ _ _ _ _ G5- _ G5 _ Ab5 _ _ _ _ _',         // Cm   the hammer: G, G, and a semitone up to A flat
-  '_ _ _ _ _ _ Eb5- _ Ab5 _ _ _ _ _ _ _',         // Ab   the leap, a semitone wider
-  '_ _ _ _ _ _ Bb5- _ Bb5 _ D6 _ _ _ _ _',        // Bb   the hammer again, breaking off upward by a third
+  '_ _ _ _ _ _ C5- _ Ab5 _ _ _ _ _ _ _',          // Fm   the leap, wider: from the alarm's C up a sixth (E flat is not in F minor)
+  '_ _ _ _ _ _ Bb5- _ Bb5 _ D6 _ _ _ _ _',        // Gm   the hammer again, breaking off upward by a third
   '_ _ _ _ Eb5 _ G5 _ _ _ G5- _ G5 _ Ab5 _',      // Cm   both in one bar: bars 1 and 2 at twice the pace
   '_ _ _ _ G5 _ Bb5 _ _ _ Bb5- _ Bb5 _ C6 _',     // Eb   up with the chord
-  '_ _ _ _ A5 _ C6 _ _ _ C6- _ C6 _ D6 _',        // F    a step higher
+  '_ _ _ _ A5 _ C6 _ _ _ C6- _ C6 _ D6 _',        // F#dim  a step higher: A and C are both notes of the diminished chord
   '_ _ _ _ B5 _ D6 _ _ _ D6- _ D6 _ Eb6 _',       // G    a step higher: the top, on the leading note's chord
 ];
 
@@ -106,7 +113,7 @@ export function build(gains = GAINS) {
     ],
     nodes: [
       clock(),
-      chords(CHORDS, { tonic: 'C', low: -4 }),           // bass roots: C C Ab Bb (below) | C Eb F G (climbing)
+      chords(CHORDS, { tonic: 'C', low: -4 }),           // bass roots: C C F G (both below) | C Eb F# G (climbing)
       arrangement(LAYERS),
       { id: 'nz', type: 'noise' },
 
@@ -138,7 +145,7 @@ export function build(gains = GAINS) {
       subDrop('d', 'dT', { from: 'midi(48 + tr)', octaves: 2, fall: 0.45, decay: 0.8 }),
 
       // --- alarm: C then the B a semitone below it, on the first beat of every second bar. It ignores the chords
-      // (C belongs to all three chords it sounds over: Cm, A flat and F), and the tune leaves that beat to it
+      // (C belongs to all three chords it sounds over: Cm, F minor and F sharp diminished), and the tune leaves that beat to it
       drumRow('alT', ['X.X.............', '................']),
       noteRow('alS', '0 0 -1 -1'),
       alarmTone('al', 'alT', { semis: 'alS', base: 84, width: 0.22, hold: 0.06, decay: 0.08, grit: 'grit' }),

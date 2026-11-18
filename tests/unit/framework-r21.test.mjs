@@ -406,22 +406,8 @@ test('hearthvale-village: the tune rises a sixth, falls back by steps, begins ag
   assert.ok(rollTop <= Math.min(...all), 'the rolling strings never go above the tune\'s lowest note');
 });
 
-test('hearthvale-village: its own piece, not thornwood-overworld or battle-theme with new sounds', async () => {
-  const fs = await import('node:fs');
-  const read = (id) => JSON.parse(fs.readFileSync(new URL(`../../sounds/${id}.json`, import.meta.url), 'utf8'));
-  const moves = (p) => { const s = nums(p.nodes.find((n) => n.id === 'lS').steps), g = flat(p.nodes.find((n) => n.id === 'lG').steps); const hit = s.filter((_, i) => g[i] !== '.'); return hit.slice(1).map((x, i) => x - hit[i]); };
-  const mine = moves(vPatch);
-  for (const id of ['thornwood-overworld', 'battle-theme']) {
-    const other = read(id), theirs = moves(other);
-    // no run of five intervals in a row is shared (a transposed copy would share them all)
-    const runs = new Set(); for (let i = 0; i + 5 <= theirs.length; i++) runs.add(theirs.slice(i, i + 5).join(' '));
-    for (let i = 0; i + 5 <= mine.length; i++) assert.ok(!runs.has(mine.slice(i, i + 5).join(' ')), `${id}: shares the intervals ${mine.slice(i, i + 5).join(' ')}`);
-    const bars = (p) => p.nodes.find((n) => n.id === 'lG').steps.split('|');
-    assert.equal(bars(vPatch).filter((b) => bars(other).includes(b)).length, 0, `${id}: no bar of the tune has a rhythm it uses`);
-    const roots = (p) => nums(p.nodes.find((n) => n.id === 'root').steps).map((r) => ((r % 12) + 12) % 12).join(' ');
-    assert.notEqual(roots(vPatch), roots(other), `${id}: another chord order`);
-  }
-});
+// (The check that no other track has this one's chords, tune or rhythms is library-wide now: it runs over every
+// track found in sounds/, in tests/unit/compose-library.test.mjs.)
 
 const V_GATES = { pad: 'gPad', bass: 'gBass', tune: 'gTune', perc: 'gPerc', top: 'gTop' };
 function vGatesAt(params, seconds = 0.2, sr = 8000) {

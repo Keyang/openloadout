@@ -199,3 +199,127 @@ test('nebula: a patch in two or three tones that stays in its box and wraps', ()
   nebula(other, 160, 70, 150, 70, tones, 4);
   assert.ok(!same(g, other), 'another seed, another nebula');
 });
+
+// ---- added with batch S13, fix round 1 -------------------------------------------------------------------
+//   engine/space.js    lighterThan    a shape's colour moved lighter until it is clear of what is behind it (never darker)
+//                      noDarkerThan   a tone lifted to a least brightness: the darkest tone of a backdrop, clear of the ink
+//   engine/tiles.js    RIM_PIECES, the decal place 'rim'   something that hangs from a block's north edge: scattered over
+//                                     the pieces that have that edge, never over a fill
+
+const { lighterThan, noDarkerThan } = await import('../../engine/space.js');
+const { blockClips, decoClips, classifyTiles, pickDecal, layoutTiles, pieceOf, DECAL_CHANCE, RIM_PIECES, FACE_PIECES } = await import('../../engine/tiles.js');
+const { INK, tone } = await import('../../engine/color.js');
+
+test('lighterThan: a clear step of value above everything behind it, a different colour under every palette, and never darker', () => {
+  const band = '#2e3653', dark = '#191f39';
+  const under = (hex) => PALETTES.map((pal) => applyColour(new Uint32Array([col(hex)]), { palette: pal.name })[0]);
+  for (const c of ['#2e3653', '#2c3350', '#3f456d', '#2fb3a8', '#141a33', '#6660b6']) {
+    const out = lighterThan(c, [band], { also: [dark] });
+    assert.ok(brightness(out) >= brightness(c) - 1e-9, `${c} went darker: ${out}`);
+    assert.ok(brightness(out) - brightness(band) >= 0.08 - 1e-9, `${c} -> ${out} is not a step above the band`);
+    const mine = under(out), theirs = under(band);
+    assert.ok(mine.every((m, k) => m !== theirs[k]), `${c} -> ${out} turns into the band under a palette`);
+    assert.equal(lighterThan(c, [band], { also: [dark] }), out, 'the same every time');
+  }
+  assert.equal(lighterThan('#2fb3a8', [], {}), '#2fb3a8', 'nothing behind it: unchanged');
+  // `also` asks for the step of value only, and a smaller step is a fainter shape
+  const faint = lighterThan('#2f3754', [], { also: [band], step: 0.06 });
+  assert.ok(brightness(faint) - brightness(band) >= 0.06 - 1e-9 && brightness(faint) < brightness(lighterThan('#2f3754', [band])) + 1e-9);
+  const clear = lighterThan('#e8ecf2', [band]);
+  assert.equal(clear, '#e8ecf2', 'a colour that is already clear comes back unchanged');
+});
+
+test('noDarkerThan: lifts a tone that is as dark as the ink, keeps its hue, and leaves a lighter one alone', () => {
+  for (const c of ['#002a54', '#160743', '#000000', INK, tone('#2f8186', -2)]) {
+    const out = noDarkerThan(c);
+    assert.ok(brightness(out) >= 0.18, `${c} -> ${out} (${brightness(out)})`);
+    assert.ok(brightness(out) < 0.2, `${c} -> ${out}: lifted no further than it has to be`);
+    assert.ok(brightness(out) > brightness(INK) + 0.04, 'clear of the ink');
+  }
+  const [r, g, b] = [1, 3, 5].map((i) => parseInt(noDarkerThan('#002a54').slice(i, i + 2), 16));
+  assert.ok(b > g && g > r, 'a dark blue is still a blue');
+  assert.equal(noDarkerThan('#566182'), '#566182');
+  assert.ok(brightness(noDarkerThan('#141a33', 0.3)) >= 0.3, 'another floor');
+});
+
+const HOLES = { 'floor-fill': {}, ...blockClips('pit', { kind: 'hole', narrow: true, fills: 3 }), ...decoClips('pit', ['rim', { place: 'rim', label: 'Cables' }, 'on']), ...decoClips('floor', ['on']) };
+const DECK = [
+  '..............',
+  '.OOOOOOOOOO...',
+  '.OOOOOOOOOO.O.',
+  '.OOOOOOOOOO.O.',
+  '.OOOOOOOOOO.O.',
+  '.OOOOOOOOOO...',
+  '.OOOOOOOOOO...',
+  '......OOOOOO..',
+  '.O............',
+];
+
+test("the decal place 'rim': decoClips keeps it, classifyTiles reads it as an 'on' decal for rim cells only, pickDecal keeps the two apart", () => {
+  assert.equal(HOLES['pit-deco-a'].place, 'rim'); assert.equal(HOLES['pit-deco-b'].label, 'Cables'); assert.equal(HOLES['pit-deco-c'].place, 'on');
+  const T = classifyTiles(HOLES), pit = T.blocks.find((b) => b.prefix === 'pit');
+  assert.deepEqual(pit.decals, [{ clip: 'pit-deco-a', prefix: 'pit', place: 'on', only: 'rim' }, { clip: 'pit-deco-b', prefix: 'pit', place: 'on', only: 'rim' }, { clip: 'pit-deco-c', prefix: 'pit', place: 'on' }]);
+  const seen = { on: new Set(), rim: new Set() };
+  let n = 0;
+  for (let y = 0; y < 40; y++) for (let x = 0; x < 40; x++) {
+    const r = pickDecal(pit.decals, 'rim', x, y), o = pickDecal(pit.decals, 'on', x, y, 1);
+    if (r) { n++; seen.rim.add(r); }
+    seen.on.add(o);
+  }
+  assert.deepEqual([...seen.rim].sort(), ['pit-deco-a', 'pit-deco-b']);
+  assert.deepEqual([...seen.on], ['pit-deco-c'], "'on' never picks a rim decal");
+  assert.ok(Math.abs(n / 1600 - DECAL_CHANCE.rim) < 0.06, `${n} of 1600`);
+  assert.deepEqual([...RIM_PIECES].sort(), ['col-t', 'elbow-tl', 'elbow-tr', 'left', 'right', 'single', 'strip-l', 'strip-m', 'strip-r', 'tee-t', 'top']);
+  assert.ok(Object.isFrozen(RIM_PIECES));
+  assert.equal(DECAL_CHANCE.face, 0.33, 'the other chances are as they were');
+  assert.deepEqual([DECAL_CHANCE.on, DECAL_CHANCE.floor, DECAL_CHANCE.above, DECAL_CHANCE.below], [0.25, 0.12, 0.3, 0.5]);
+});
+
+test("layoutTiles scatters 'rim' decals over the cells of a block that have its north edge, and never over a fill", () => {
+  const pieceAt = (L, c, r) => { const t = L.tiles.find((x) => x.col === c && x.row === r && pieceOf(x.clip)?.kind === 'block' && pieceOf(x.clip).prefix === 'pit'); return t ? pieceOf(t.clip).piece : null; };
+  const L = layoutTiles(DECK, HOLES, { view: 'top-down', decals: true });
+  const placed = L.tiles.filter((t) => /^pit-deco-/.test(t.clip));
+  const rims = placed.filter((t) => t.clip !== 'pit-deco-c'), ons = placed.filter((t) => t.clip === 'pit-deco-c');
+  for (const t of rims) assert.ok(RIM_PIECES.includes(pieceAt(L, t.col, t.row)), `${t.clip} at ${t.col},${t.row} is on ${pieceAt(L, t.col, t.row)}`);
+  for (const t of ons) assert.ok(/^fill/.test(pieceAt(L, t.col, t.row)), `${t.clip} at ${t.col},${t.row} is on ${pieceAt(L, t.col, t.row)}`);
+  assert.ok(ons.length > 0, "the block's 'on' decal still goes on its fill");
+  // a chance of 1 fills every rim cell and no other; a chance of 0 none
+  const all = layoutTiles(DECK, HOLES, { view: 'top-down', decals: { rim: 1, on: 0, floor: 0 } });
+  const onRim = all.tiles.filter((t) => /^pit-deco-/.test(t.clip)).map((t) => `${t.col},${t.row}`).sort();
+  const rimCells = [];
+  for (let r = 0; r < DECK.length; r++) for (let c = 0; c < DECK[0].length; c++) if (RIM_PIECES.includes(pieceAt(all, c, r))) rimCells.push(`${c},${r}`);
+  assert.deepEqual(onRim, rimCells.sort());
+  assert.ok(rimCells.length >= 13, `${rimCells.length} rim cells: the top row of the big hole, the top of the slot, the hatch`);
+  assert.ok(all.tiles.some((t) => t.clip === 'pit-deco-a') && all.tiles.some((t) => t.clip === 'pit-deco-b'), 'both are used');
+  assert.equal(layoutTiles(DECK, HOLES, { view: 'top-down', decals: { rim: 0 } }).tiles.filter((t) => /^pit-deco-[ab]$/.test(t.clip)).length, 0);
+  // at most one decal to a cell, the same map every time, and none at all without decals: true
+  assert.equal(new Set(placed.map((t) => `${t.col},${t.row}`)).size, placed.length);
+  assert.deepEqual(layoutTiles(DECK, HOLES, { view: 'top-down', decals: true }).tiles, L.tiles);
+  assert.equal(layoutTiles(DECK, HOLES, { view: 'top-down' }).tiles.filter((t) => /-deco-/.test(t.clip)).length, 0);
+  // side view: the pieces with the block's top edge
+  const side = layoutTiles(['......', '.####.', '.####.', '.####.', '......'], { ...blockClips('rock'), ...decoClips('rock', ['rim']) }, { decals: { rim: 1 } });
+  assert.deepEqual(side.tiles.filter((t) => /-deco-/.test(t.clip)).map((t) => `${t.col},${t.row}`).sort(), ['1,1', '2,1', '3,1', '4,1']);
+});
+
+test("layoutTiles: a 'rim' decal written in a map is drawn on a rim cell and left out, with a note, on a fill", () => {
+  const rows = ['.......', '.OOaOO.', '.OObOO.', '.OOOOO.', '.......', '.....a.', '.......'];
+  const L = layoutTiles(rows, HOLES, { view: 'top-down' });
+  const at = (c, r) => L.tiles.filter((t) => t.col === c && t.row === r).map((t) => t.clip);
+  assert.deepEqual(at(3, 1), ['floor-fill', 'pit-top', 'pit-deco-a'], 'on the top row of the hole');
+  assert.deepEqual(at(5, 5), ['floor-fill', 'pit-single', 'pit-deco-a'], 'on its own: a hatch with the rim on every side');
+  assert.equal(at(3, 2).length, 2, 'in the middle of the hole: the depth, and nothing hanging in it');
+  assert.ok(/^pit-fill/.test(at(3, 2)[1]));
+  assert.equal(L.cells[2][3].solid, true);
+  assert.deepEqual(L.notes, ["pit-deco-b at 3,2: it hangs from the block's north edge, and this cell (fill) has none"]);
+});
+
+test("a wall's 'face' decals are scattered as before now that 'rim' exists, and a wall may have both", () => {
+  const WALLS = { 'floor-fill': {}, ...blockClips('wall', { kind: 'wall', narrow: true }), ...decoClips('wall', ['face', 'rim']) };
+  const rows = ['........', '.WWWWWW.', '.WWWWWW.', '.WWWWWW.', '........', '.WWWW...', '........'];
+  const pieceAt = (L, c, r) => { const t = L.tiles.find((x) => x.col === c && x.row === r && pieceOf(x.clip)?.kind === 'block' && pieceOf(x.clip).prefix === 'wall'); return t ? pieceOf(t.clip).piece : null; };
+  const L = layoutTiles(rows, WALLS, { view: 'top-down', decals: { face: 1, rim: 1 } });
+  for (const t of L.tiles.filter((x) => x.clip === 'wall-deco-a')) assert.ok(FACE_PIECES.includes(pieceAt(L, t.col, t.row)));
+  for (const t of L.tiles.filter((x) => x.clip === 'wall-deco-b')) assert.ok(RIM_PIECES.includes(pieceAt(L, t.col, t.row)) && !FACE_PIECES.includes(pieceAt(L, t.col, t.row)), 'where a piece shows both, the face decal has the cell');
+  assert.equal(L.tiles.filter((x) => x.clip === 'wall-deco-a').length, 6 + 4, 'every face cell: the bottom row and the low wall');
+  assert.equal(L.tiles.filter((x) => x.clip === 'wall-deco-b').length, 6, 'every cell of the cap\'s north edge');
+});

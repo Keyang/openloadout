@@ -304,34 +304,8 @@ test('hearthvale-battle: the tune is a call up a fifth that marches down, answer
   assert.equal(node(track, 'dA').trig, 'lG');
 });
 
-test('hearthvale-battle: no other track in the library has its chords, its tune or its rhythms', () => {
-  const others = fs.readdirSync(SOUNDS).filter((f) => f.endsWith('.json')).map((f) => read(f.slice(0, -5))).filter((p) => p.category === 'music' && p.id !== 'hearthvale-battle' && node(p, 'lS') && node(p, 'lG'));
-  assert.ok(others.some((p) => p.id === 'battle-theme'), 'battle-theme is compared');
-  const mine = moves(track).join(' '), myBars = barsOf(node(track, 'lG').steps), myRoots = pcs(nums(node(track, 'root').steps)), myThirds = nums(node(track, 'third').steps);
-  const rel = (roots) => roots.map((r) => (r - roots[0] + 12) % 12).join(' ');
-  for (const p of others) {
-    assert.notEqual(mine, moves(p).join(' '), `${p.id}: the same tune`);
-    if (node(p, 'root')) {
-      const roots = pcs(nums(node(p, 'root').steps));
-      assert.ok(rel(roots) !== rel(myRoots) || JSON.stringify(nums(node(p, 'third').steps)) !== JSON.stringify(myThirds), `${p.id}: the same chord order`);
-    }
-  }
-  // against the two tracks the library had when this one was written: no run of six notes moves the way six notes
-  // of theirs do, and at most one bar of the tune has a rhythm they use
-  for (const p of ['battle-theme', 'thornwood-overworld'].map(read)) {
-    const theirs = ' ' + moves(p).join(' ') + ' ', m = moves(track);
-    for (let i = 0; i + 5 <= m.length; i++) assert.ok(!theirs.includes(' ' + m.slice(i, i + 5).join(' ') + ' '), `${p.id}: six notes in a row move the same way (from note ${i + 1})`);
-    const shared = myBars.filter((bar) => barsOf(node(p, 'lG').steps).includes(bar));
-    assert.ok(shared.length <= 1, `${p.id}: ${shared.length} bars of the tune have a rhythm it uses too`);
-  }
-  // against battle-theme in particular: another key, another tempo, another tune rhythm, another ostinato, other stabs
-  const battle = read('battle-theme');
-  assert.equal(barsOf(node(track, 'lG').steps).filter((b) => barsOf(node(battle, 'lG').steps).includes(b)).length, 0, 'no bar of the tune has a rhythm battle-theme uses');
-  assert.notEqual(track.params.find((p) => p.id === 'bpm').default, battle.params.find((p) => p.id === 'bpm').default);
-  assert.notEqual(flat(node(track, 'aD').steps), flat(node(battle, 'aD').steps));
-  assert.notEqual(flat(node(track, 'stT').steps).slice(0, 32), flat(node(battle, 'stT').steps));
-  assert.notEqual(flat(node(track, 'bS').steps).slice(0, 16), flat(node(battle, 'bS').steps).slice(0, 16));
-});
+// (The check that no other track has this one's chords, tune or rhythms is library-wide now: it runs over every
+// track found in sounds/, in tests/unit/compose-library.test.mjs.)
 
 // ---- how intensity and length bring the layers in
 
