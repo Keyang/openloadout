@@ -242,6 +242,14 @@ Rules:
 
 A run-time asset that fails the quality bar is kept as a draft: it can be rendered, checked and replaced by calling `make` again with the same id, but `bag.add` refuses it while it has errors (the quality bar applies to everything an agent adds to the bag; warnings do not block). `loadout.call(name, input)` runs any action by its name in `generated/api.json`.
 
+**Safety of run-time assets (after the review of 2026-11-18; status: to build, task W5-B).** A sprite made at run time is a program. The review showed that importing it into the page lets it read storage, call other sites, change the page and hang it, and that a definition kept in the bag or carried by a link ran again on every load. The rules:
+
+- A made source never runs in the page. It is loaded, checked and drawn only inside a dedicated worker that the page can stop; the page receives pixels and data, never functions. Every call has a time limit (about 60 s for a check, far less for a frame) and a frame-size cap; on a limit the worker is stopped and the call returns `{ ok: false, errors }`.
+- The site sends a content policy that allows scripts, connections, images and fonts from the site itself only (plus in-memory scripts for the worker), so a made source cannot reach another site.
+- Anything that comes from storage or from a link is treated as untrusted: it is re-checked by the quality bar in the worker before it is accepted, a link still asks first in plain words, and an item that fails is listed as "needs re-making" and nothing of it is drawn or exported.
+- The bag exports what it stored: a package is built from the bag item's own definition, and replacing a bagged asset with a failing draft is refused.
+- A failed save (storage full) is reported, never swallowed.
+
 Every high-level action returns plain data (no DOM nodes, no class instances) and never throws for a bad asset: it returns `{ ok: false, errors: [...] }` with messages an agent can act on.
 
 ## Contract 12: styles (more than one way to draw and export an asset)
@@ -274,6 +282,53 @@ Rules for asset makers today (they keep the second level in `sprite-styles.md` p
 - Body shapes go through shape calls (`ellipse`, `capsule`, `limb`, `poly`, `arc`); single pixels and pixel rectangles are for detail (eyes, highlights, trim). A later style redraws the detail layer, not the body.
 
 Three levels, from `sprite-styles.md`: (1) the same drawing with a different finish (palette, outline, flat or three-tone, silhouette, 1-bit): a setting, on every sprite; (2) the same rig through a different surface (flat or vector, cel-shaded, cut-out parts for a skeletal export): a second pipeline plus a per-style detail layer on each sprite that opts in; (3) hand-painted, true hand-drawn, pre-rendered 3D: not possible from shapes in code, never listed. The quality bar runs once per style a sprite declares.
+
+## Contract 13: rigs are separate from sprite definitions
+
+Decision from Keyang, 2026-11-18 18:51: "we will need to separate rigs from sprites definition". It followed the question of whether a person could change a sprite's raw definition data (add a part, add an animation) and have the sprite redrawn. Status: **decided; the reading below is a proposal and nothing is built**. Not a priority for the three bundles.
+
+The reading (written by the session that took the decision, not yet confirmed by Keyang):
+
+| Thing | What it is | Holds |
+|---|---|---|
+| **Rig** | Code, in `rigs/` | The body and how it is drawn; the poses it knows; the parts it can wear or hold, each with its drawing and its options; attach points; the standard clips |
+| **Sprite definition** | Data only, no drawing code | Which rig; proportions and colours; which clips (pose names); which parts it offers, with their controls and defaults; tags; sounds |
+
+A generic renderer in the framework turns a definition plus its rig into frames. Adding a part the rig has, or an animation the rig knows, is then a change to data.
+
+What this buys:
+
+- A person in the studio (route 3) or an agent (routes 1 and 2) adds a part or a clip by editing data, not code.
+- A definition that is data is safe to put in a link or a bag; source code is not.
+- A fix or a new part in a rig reaches every sprite on that rig.
+- A new style (Contract 12) redraws the rig once, not every sprite on it.
+
+Where the code stands on 2026-11-18:
+
+| Fact | Count |
+|---|---|
+| Rigs, already separate files | 5 (`humanoid`, `topdown`, `creature-topdown`, `crawler`, `bigbody`), about 4,800 lines; no sprite uses `creature-topdown` yet |
+| Sprites that use a rig | 14 of 55 |
+| Sprites with no rig (tiles, backgrounds, interface pieces, effects, pickups, the slime) | 41 of 55 |
+
+So the files are separate today but the data is not. A rig sprite's file still holds three kinds of code:
+
+1. **Wiring**: which rig drawing to call on which layer, at which settings, with which options (`sprites/merchant.js`, `render`). This is nearly data already.
+2. **Pose adjustments**: for example the Hero's unarmed attack becoming a punch (`sprites/knight.js`, `heroPose`).
+3. **Drawing of its own**: for example the Hero's cape. By Contract 11 this belongs in the rig.
+
+What a rig does not have yet: a list, readable by a program, of its parts (name, layer, options, attach point) and its poses with their adjustments. `POSES` and the kind lists (`ITEM_KINDS`, `HEADGEAR_KINDS`) are a start.
+
+Sprites with no rig stay as code files. The same split could later apply to other generators (tiles, stretchable boxes), which is a separate decision.
+
+Open, for Keyang:
+
+| Id | Question |
+|---|---|
+| R1 | Is the reading above what was meant? |
+| R2 | Is a definition a JSON file, or a data object in a `.js` file as today? |
+| R3 | Are the 14 rig sprites converted, or only new ones written this way? |
+| R4 | New animations as key poses in data (a list of joint settings the engine blends between): in scope, or later? |
 
 ## Routes of the site (after wave 2)
 
