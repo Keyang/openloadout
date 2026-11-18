@@ -95,7 +95,7 @@ export const MISSILE_FINS = Object.freeze(['none', 'small', 'swept']);
 
 /**
  * Draws a small missile lying level with its nose to the right: a metal tube lit from the top right, with a nose, tail fins and an optional stripe round it; returns { nozzle: [x, y], tip: [x, y] }, the middle of its tail end and of its nose. Draw it before g.outline.
- * Arguments: g (the Surface); o: { x (its tail end, a whole number), y (its centre line: a whole number for an even width), length (px from tail to nose), width (px across the tube, default 4), nose (one of MISSILE_NOSES, default 'round'), fins (one of MISSILE_FINS, default 'small'), colour (the tube), finColour (default: the tube's), stripe (a colour for a band two px wide round the tube, with a seam of the tube's dark tone behind it; null for none), at (where the stripe sits along the tube, 0 tail to 1 nose, default 0.5), box }.
+ * Arguments: g (the Surface); o: { x (its tail end, a whole number), y (its centre line: a whole number for an even width), length (px from the tail to the end of a round nose: a dome half the width long; a flat nose is the tube cut square where the dome would begin, so it ends that much sooner; a pointed nose is a thin cone from there to a one-pixel tip 2 px past the dome), width (px across the tube, default 4), nose (one of MISSILE_NOSES, default 'round'), fins (one of MISSILE_FINS, default 'small'), colour (the tube), finColour (default: the tube's), stripe (a colour for a band two px wide round the tube, with a seam of the tube's dark tone behind it; null for none), at (where the stripe sits along the tube, 0 tail to 1 nose, default 0.5), box }.
  */
 export function missile(g, o) {
   const { nose = 'round', fins = 'small', colour = '#9aa6c0', stripe = null, at = 0.5 } = o;
@@ -105,27 +105,32 @@ export function missile(g, o) {
   const clip = (px, py) => px >= B[0] && py >= B[1] && px < B[2] && py < B[3];
   const x = Math.round(o.x), L = Math.max(4, Math.round(o.length ?? 12)), W = Math.max(2, Math.round(o.width ?? 4));
   const y = o.y, half = W / 2, top = y - half, x1 = x + L;
-  const nl = nose === 'round' ? half : nose === 'pointed' ? W * 0.75 : 0;        // px of nose
+  // the three noses are three lengths of the same tube, so they differ in outline and not just in a corner pixel:
+  // the straight tube ends at xs; flat stops there, round adds its dome (to x1), pointed a cone to a tip 2 px past the dome (xe)
+  const nl = half, xs = x1 - Math.round(half);
+  const xe = nose === 'flat' ? xs : nose === 'pointed' ? x1 + 2 : x1;
   const tube = (px, py) => {
-    if (px < x || px >= x1 || py < top || py >= top + W) return false;
-    if (px < x1 - nl) return true;
+    if (px < x || px >= xe || py < top || py >= top + W) return false;
     const dy = Math.abs(py - y);
-    if (nose === 'round') return ((px - (x1 - nl)) / nl) ** 2 + (dy / half) ** 2 <= 1;
-    return dy <= Math.max(0.5, (half * (x1 - px + 0.5)) / nl);
+    if (nose === 'round') return px < x1 - nl || ((px - (x1 - nl)) / nl) ** 2 + (dy / half) ** 2 <= 1;
+    if (px < xs) return true;
+    // pointed: a cone a pixel thinner than the tube on each side, down to one pixel (for an even width, the one above the centre line)
+    if (px >= xe - 1) return W % 2 ? dy < 0.5 : py < y && dy < 1;
+    return dy <= Math.max(0.5, ((half - 1) * (xe - px + 0.5)) / (xe - xs));
   };
   // fins: rows of pixels above and below the tail, the outer row set further back when they are swept
   const rows = fins === 'small' ? [[x, 3]] : fins === 'swept' ? [[x - 1, 5], [x - 2, 3]] : [];
   const fin = (px, py) => rows.some(([fx, fw], k) => px >= fx && px < fx + fw && (Math.floor(py) === Math.floor(top) - 1 - k || Math.floor(py) === Math.floor(top + W) + k));
   const R = ramp(colour);
   if (rows.length) g.fill(x - 3, top - 3, x + 6, top + W + 3, fin, ramp(o.finColour ?? colour), { shade: 1, clip });
-  g.fill(x, top, x1, top + W, tube, R, { shade: 1, light: 1, clip });
+  g.fill(x, top, xe, top + W, tube, R, { shade: 1, light: 1, clip });
   if (stripe) {
-    const sx = x + Math.round((L - nl - 2) * Math.min(1, Math.max(0, at)));
+    const sx = x + Math.round((L - nl - 2) * Math.min(1, Math.max(0, at)));               // on the straight tube, so it stays put when the nose changes
     // a seam of the tube's dark tone behind the band: it still shows where a look turns the stripe into the tube's own colour
     if (sx - 1 > x) g.fill(sx - 1, top, sx, top + W, (px, py) => px >= sx - 1 && px < sx && tube(px, py), R.dark, { clip });
     g.fill(sx, top, sx + 2, top + W, (px, py) => px >= sx && px < sx + 2 && tube(px, py), stripe, { clip });
   }
-  return { nozzle: [x, y], tip: [x1, y] };
+  return { nozzle: [x, y], tip: [xe, y] };
 }
 
 /**

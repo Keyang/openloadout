@@ -132,6 +132,29 @@ test('missile: every nose and every set of fins is its own shape', () => {
   assert.throws(() => rocket({ fins: 'big' }), /fins/);
 });
 
+test('missile: the three noses read in outline: flat cut square, round a dome, pointed a cone to a one-pixel tip 2 px past the dome', () => {
+  const inked = (nose) => { const { g, r } = rocket({ nose, fins: 'none' }); g.outline(INK); return { g, r }; };
+  const body = (g, x) => { let n = 0; for (let y = 0; y < 16; y++) if (at(g, x, y) && at(g, x, y) !== col(INK)) n++; return n; };
+  const round = inked('round'), pointed = inked('pointed'), flat = inked('flat');
+  assert.deepEqual(flat.r.tip, [20, 8], 'flat ends where the dome would begin');
+  assert.deepEqual([body(flat.g, 19), body(flat.g, 20)], [4, 0], 'and its end is square and full width');
+  assert.deepEqual([body(round.g, 20), body(round.g, 21), body(round.g, 22)], [4, 2, 0], 'round: a 2 px dome');
+  assert.deepEqual(pointed.r.tip, [24, 8], 'pointed reaches 2 px past the dome');
+  assert.deepEqual([19, 20, 21, 22, 23, 24].map((x) => body(pointed.g, x)), [4, 2, 2, 2, 1, 0], 'a cone 4 px long down to one pixel');
+  const sil = (a, b) => a.data.reduce((n, v, i) => n + (!!v !== !!b.data[i] ? 1 : 0), 0);
+  for (const [a, b, name] of [[round, pointed, 'round and pointed'], [round, flat, 'round and flat'], [pointed, flat, 'pointed and flat']]) {
+    assert.ok(diff(a.g, b.g) >= 12, `${name} differ by 12 px or more (${diff(a.g, b.g)})`);
+    assert.ok(sil(a.g, b.g) >= 4, `${name} differ in outline (${sil(a.g, b.g)})`);
+  }
+  // the stripe is on the straight tube, so it does not move when the nose changes
+  const stripeAt = (g) => { for (let x = 0; x < 32; x++) if (at(g, x, 7) === col('#2fb3a8')) return x; return -1; };
+  assert.equal(stripeAt(round.g), stripeAt(pointed.g)); assert.equal(stripeAt(round.g), stripeAt(flat.g));
+  // an odd width has its tip on the centre row
+  const odd = new Surface(32, 16); missile(odd, { x: 10, y: 8.5, length: 12, width: 5, nose: 'pointed', fins: 'none' });
+  assert.deepEqual(odd.bounds(), { x0: 10, y0: 6, x1: 23, y1: 10 });
+  assert.ok(at(odd, 23, 8) && !at(odd, 23, 7) && !at(odd, 23, 9));
+});
+
 test('missile: no stripe when none is asked for, and it keeps to its box', () => {
   assert.equal(count(rocket({ stripe: null }).g, '#2fb3a8'), 0);
   const { g } = rocket({ x: 24, fins: 'swept' });

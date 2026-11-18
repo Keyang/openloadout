@@ -30,6 +30,7 @@ import { ramp, tone } from './color.js';
 import { polyIn } from './surface.js';
 import { seam } from './rock.js';
 import { toothedIn } from './mech.js';
+import { stripesIn } from './solids.js';
 import { armourBlock } from './warmachine.js';
 import { clamp, TAU } from './motion.js';
 
@@ -43,7 +44,7 @@ const grow = (E, x0, y0, x1, y1) => { E[0] = Math.min(E[0], Math.floor(x0)); E[1
 const lensOf = (L, K, level) => (level >= 1.5 ? L[1] : level >= 0.75 ? L[3] : level >= 0.25 ? L[4] : K.dark);
 
 /**
- * Works out where a box of a machine's own space shows on the picture in three-quarter view: returns { x0, x1 (its left edge and the column after its right edge), top (the first row of its lit top face), face (the first row of the wall turned to the camera), bottom (the row after its last), z (how near the camera its nearest corner is: paint smaller z first), cx (its middle column) } in whole pixels.
+ * Works out where a box of a machine's own space shows on the picture in three-quarter view: its lit top face and the wall under it. Returns { x0, x1 (its left edge and the column after its right edge), top (the first row of its lit top face), face (the first row of the wall turned to the camera), bottom (the row after its last), z (how near the camera its nearest corner is: paint smaller z first), cx (its middle column) } in whole pixels.
  * Arguments: at ((a, b, c) => [x, y, z]: places a point of the machine's own space on the picture, for example K.project of rigs/creature-topdown.js with the direction filled in); box { a, b (the middle of its footprint: forward, and to the machine's right; default 0), c (how high its underside is off the floor, default 0), len (along the machine), wide (across it), tall }.
  */
 export function boxView(at, box) {
@@ -57,7 +58,7 @@ export function boxView(at, box) {
 }
 
 /**
- * Draws a caterpillar track filling a box view: seen end on (the track runs toward or away from the camera) it is a lit top run over the curve of its end, crossed by cleats; seen from the side it is a belt round a row of wheels. The cleats move with `phase`, so a walk clip shows it turning. Returns the view.
+ * Draws a caterpillar track filling a box view, seen end on or from the side, with cleats that move as it turns. Seen end on (the track runs toward or away from the camera) it is a lit top run over the curve of its end, crossed by cleats; seen from the side it is a belt round a row of wheels. The cleats move with `phase`, so a walk clip shows it turning. Returns the view.
  * Arguments: g (the Surface); V (a box view from boxView()); o { along ('depth': seen end on, the default; 'across': seen from the side), phase (whole px the belt has moved: positive moves the cleats down the picture when seen end on and to the right when seen from the side), pitch (px from one cleat to the next, default 4: a phase of one pitch is the same picture), paint (a ramp: the belt, a dark colour), wheel (a ramp: the wheels), seam (a colour: darkens what it sits on) }.
  */
 export function trackPod(g, V, o = {}) {
@@ -104,7 +105,7 @@ export function trackPod(g, V, o = {}) {
 export const BOT_HEADS = Object.freeze(['dome', 'block', 'sensor']);
 
 /**
- * Draws a small robot head filling a box view, with one lens that looks the way the machine faces: toward the camera, to picture-right, or (facing away) not seen at all, the back of the head showing a vent or hatch instead. Returns { eye ([x, y]: the lens, or null when it faces away), top (the row of its highest pixel), x0, x1 (its left edge and the column after its right edge, with what sticks out) }.
+ * Draws a small robot head filling a box view, with one lens that looks the way the machine faces. The lens looks toward the camera, to picture-right, or (facing away) is not seen at all, the back of the head showing a vent or hatch instead. Returns { eye ([x, y]: the lens, or null when it faces away), top (the row of its highest pixel), x0, x1 (its left edge and the column after its right edge, with what sticks out) }.
  * Arguments: g (the Surface); kind (one of BOT_HEADS); V (the head's box view from boxView(); give it an odd width); o { facing ('down', 'up' or 'side'), body, metal, dark (ramps: the armour, bright metal, dark fittings), colours (the light's colour steps, hottest first), level (the lens: 0 off, 0.5 dim, 1 lit, 2 flaring), look (-1..1: where the lens looks, sideways; only seen facing 'down'), seam (a colour: darkens what the head sits on) }.
  */
 export function botHead(g, kind, V, o = {}) {
@@ -153,7 +154,7 @@ export function botHead(g, kind, V, o = {}) {
     } else g.rect(mx - 1, ey, 3, 2, K.base);                                      // a hatch in the back of the dome
   } else {
     armourBlock(g, { x0, x1, top, face, bottom, inset: w >= 7 ? 1 : 0, paint: H, seam: o.seam });
-    const ly = face + Math.max(2, R(h * 0.45)), r = Math.max(2.4, w / 2 - 0.6);
+    const ly = face + Math.floor((h - 1) / 2), r = Math.max(1.4, Math.min(w / 2 - 0.6, h / 2 - 0.6));
     if (facing !== 'side') { for (const s of [-1, 1]) g.rect(s < 0 ? x0 - 1 : x1, ly - 1, 1, 3, K.base); left = x0 - 1; right = x1 + 1; }   // a pod at each side
     if (facing === 'down') {
       g.ellipse(mid, ly + 0.5, r, r, K.base, { shade: 0 });
@@ -175,12 +176,12 @@ export function botHead(g, kind, V, o = {}) {
   return { eye, top: hi, x0: left, x1: right };
 }
 
-/** The weapons botWeapon() can draw: cannon (a thick barrel with a muzzle ring), saw (a toothed blade lying flat on an arm, which turns), claw (two steel pincers that open and close). No arguments: a frozen list. */
+/** The weapons botWeapon() can draw: cannon (a thick barrel with a muzzle ring), saw (a toothed blade on an arm, facing forward, which turns), claw (two steel pincers that open and close). No arguments: a frozen list. */
 export const BOT_WEAPONS = Object.freeze(['cannon', 'saw', 'claw']);
 
 /**
- * Draws a weapon that points forward from a shoulder housing, placed by a projector so it is right for any direction: one of BOT_WEAPONS. Returns { hand ([x, y]: the top of the housing), tip ([x, y]: its far end, the muzzle), box ([x0, y0, x1, y1]: what it covers, the last column and row not included), z (how near the camera it is) }.
- * Arguments: g (the Surface, or null to measure it without drawing); kind (one of BOT_WEAPONS); at ((a, b, c) => [x, y, z], as boxView takes it); o { mount ([a, b, c]: the middle of the foot of its housing), length (px from the housing to its tip, in the machine's own space), facing ('down', 'up' or 'side': which end is nearer the camera), k (the scale of its thickness, default 1), thrust (px it is pushed forward out of the housing, negative pulled back), droop (px its tip hangs below its root), work (a whole number that goes up as it works: the saw turns a step, the claw opens and closes every eight), grip (0 shut .. 2 wide: the claw's opening, instead of what `work` gives), body, metal, dark, accent (ramps), seam (a colour: darkens what the housing sits on) }.
+ * Draws a weapon that points forward from a striped shoulder housing, placed by a projector so it is right for any direction. kind is one of BOT_WEAPONS. Returns { hand ([x, y]: the top of the housing), tip ([x, y]: its far end, the muzzle), box ([x0, y0, x1, y1]: what it covers, the last column and row not included), z (how near the camera it is) }.
+ * Arguments: g (the Surface, or null to measure it without drawing); kind (one of BOT_WEAPONS); at ((a, b, c) => [x, y, z], as boxView takes it); o { mount ([a, b, c]: the middle of the foot of its housing), length (px from the housing to its tip, in the machine's own space; a longer saw is mostly a bigger blade), facing ('down', 'up' or 'side': which end is nearer the camera), k (the scale of its thickness, default 1), thrust (px it is pushed forward out of the housing, negative pulled back), droop (px its tip hangs below its root), work (a whole number that goes up as it works: the saw turns half a tooth, the claw opens and closes every eight), grip (0 shut .. 2 wide: the claw's opening, instead of what `work` gives), body, metal, dark, accent (ramps), seam (a colour: darkens what the housing sits on) }.
  */
 export function botWeapon(g, kind, at, o = {}) {
   if (!BOT_WEAPONS.includes(kind)) throw new Error(`groundbot.botWeapon: no weapon "${kind}"; weapons: ${BOT_WEAPONS.join(', ')}`);
@@ -192,8 +193,11 @@ export function botWeapon(g, kind, at, o = {}) {
   const root = pt(ma + 1 + th, mb, axis), far = ma + 3 + th + L;
   const E = grow(newBox(), HV.x0, HV.top, HV.x1, HV.bottom);
   const housing = () => {
-    armourBlock(g, { ...HV, inset: 1, cut: [1, 1], paint: H, seam: o.seam });
-    g.rect(HV.x0 + 1, HV.bottom - 2, HV.x1 - HV.x0 - 2, 1, A.base);               // a band of the hazard colour round its foot
+    const B = armourBlock(g, { ...HV, inset: 1, cut: [1, 1], paint: H, seam: o.seam });
+    // hazard stripes across the wall the camera sees
+    const band = (px, py) => B.front(px, py) && py >= HV.face + 1 && py < HV.bottom - 1 && px >= HV.x0 + 1 && px < HV.x1 - 1;
+    g.fill(HV.x0, HV.face, HV.x1, HV.bottom, band, K.base, { shade: 0 });
+    g.fill(HV.x0, HV.face, HV.x1, HV.bottom, stripesIn(band, { pitch: 4, slant: 1, duty: 0.5, phase: HV.x0 + HV.face }), A.base, { shade: 0 });
   };
   let tip, tool;
   if (kind === 'cannon') {
@@ -209,15 +213,24 @@ export function botWeapon(g, kind, at, o = {}) {
       else g.rect(ex - 1, ey, bw + 2, 2, M.light);
     };
   } else if (kind === 'saw') {
-    // the blade lies flat: a disc of the machine's own space, as flat on the picture as the projector makes it
-    const r = Math.max(3, L * 0.62), c0 = axis - 1 - droop, C = pt(far - r, mb, c0), ea = pt(far, mb, c0), eb = pt(far - r, mb + r, c0);
-    const rx = Math.max(Math.abs(ea[0] - C[0]), Math.abs(eb[0] - C[0]), 1), ry = Math.max(Math.abs(ea[1] - C[1]), Math.abs(eb[1] - C[1]), 1);
-    tip = ea;
+    // the blade stands across the arm, facing forward: a disc of the machine's own space, a full circle when it comes at the camera and
+    // a sliver when it is seen from the side, as the projector makes it
+    const r = Math.max(3, L * 0.6), c0 = Math.max(r + 2, axis + 1 - droop), far2 = ma + 7 + th + 0.3 * L, C = pt(far2, mb, c0), eb = pt(far2, mb + r, c0), ec = pt(far2, mb, c0 + r);
+    const rx = Math.max(Math.abs(eb[0] - C[0]), Math.abs(ec[0] - C[0]), 1.2), ry = Math.max(Math.abs(eb[1] - C[1]), Math.abs(ec[1] - C[1]), 1.2);
+    tip = pt(far2 + 1, mb, c0);
     const teeth = 8, wheel = toothedIn(0, 0, r, teeth, Math.min(1.8, r * 0.36), (work * TAU) / (teeth * 2), 'saw');
     const blade = (px, py) => wheel(((px - C[0]) * r) / rx, ((py - C[1]) * r) / ry);
-    grow(E, Math.min(root[0], C[0] - rx) - 1, Math.min(root[1], C[1] - ry) - 1, Math.max(root[0], C[0] + rx) + 1, Math.max(root[1], C[1] + ry) + 1);
+    grow(E, Math.min(root[0], C[0] - rx) - 2, Math.min(root[1], C[1] - ry) - 1, Math.max(root[0], C[0] + rx) + 2, Math.max(root[1], C[1] + ry) + 1);
     const arm = () => g.limb(root[0], root[1], C[0], C[1], 2, flatDark(K), { shade: 0 });
     const disc = () => {
+      if (rx < 2) {
+        // edge on: a steel bar with its teeth along the leading edge, stepping as it turns
+        const x = R(C[0]) - 1, y0 = R(C[1] - ry), n = Math.max(2, R(2 * ry)), lead = facing === 'side' ? x + 2 : x - 1;
+        g.rect(x, y0, 2, n, { light: M.light, base: M.light, dark: M.base }, { shade: 1 });
+        for (let i = ((work % 2) + 2) % 2; i < n; i += 2) g.dot(lead, y0 + i, M.base);
+        g.rect(x, R(C[1]) - 1, 2, 2, A.base);
+        return;
+      }
       g.fill(C[0] - rx - 1, C[1] - ry - 1, C[0] + rx + 1, C[1] + ry + 1, blade, { light: M.light, base: M.light, dark: M.base }, { shade: 1 });
       const a = (work * TAU) / 8;                                                  // a slot in the blade, turning with it
       g.line(C[0], C[1], C[0] + Math.cos(a) * rx * 0.62, C[1] + Math.sin(a) * ry * 0.62, M.dark);
@@ -248,7 +261,7 @@ export function botWeapon(g, kind, at, o = {}) {
 export const BOT_PACKS = Object.freeze(['siren', 'exhaust']);
 
 /**
- * Draws what a machine carries on its rear deck, placed by a projector so it is right for any direction: one of BOT_PACKS. Returns { lamp ([x, y]: the middle of the siren's lamp, or null), vents ([[x, y], ...]: the mouth of each exhaust stack, where its smoke starts), box ([x0, y0, x1, y1]: what it covers, the last column and row not included), z }.
+ * Draws what a machine carries on its rear deck, placed by a projector so it is right for any direction. kind is one of BOT_PACKS. Returns { lamp ([x, y]: the middle of the siren's lamp, or null), vents ([[x, y], ...]: the mouth of each exhaust stack, where its smoke starts), box ([x0, y0, x1, y1]: what it covers, the last column and row not included), z }.
  * Arguments: g (the Surface, or null to measure it without drawing); kind (one of BOT_PACKS); at ((a, b, c) => [x, y, z], as boxView takes it); o { mount ([a, b, c]: where it stands, on the deck), size (a multiplier, default 1), level (the siren: 0 off, 0.5 dim, 1 lit, 2 flashing), spin (a whole number that goes up as the siren's lamp turns), hot (true: the mouths of the stacks glow), metal, dark (ramps), colours (the light's colour steps, hottest first), seam (a colour: darkens what it sits on) }.
  */
 export function botPack(g, kind, at, o = {}) {

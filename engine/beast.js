@@ -4,7 +4,7 @@
 // g.blob([...]) and a rig animates them by moving the joints. Nothing here draws or picks a colour.
 // Pure functions: Node and browser, no Math.random. The worked example is rigs/quadruped.js.
 //
-//   import { arcChain, tubeIn, pathPoint, spikeRowIn, jawHead } from '../engine/beast.js';
+//   import { arcChain, hookPath, tubeIn, pathPoint, spikeRowIn, jawHead } from '../engine/beast.js';
 //   const neck = arcChain(60, 55, 84, 33, 32);                       // 32 px of neck hung between the chest and the head
 //   const H = jawHead(84, 33, PI / 2 - 0.2, { size: 5, snout: 11, jaw: 0.6 });
 //   g.blob([tubeIn(neck, 7, 4), H.upper], ramp(body), { shade: 2 }); // one body: one shadow band, no seams
@@ -15,7 +15,6 @@
 
 import { clamp, lerp, hash, PI } from './motion.js';
 import { capsuleIn, polyIn as wholePolyIn } from './surface.js';
-import { hornPath } from './creature.js';
 
 const any = (tests) => (px, py) => { for (const f of tests) if (f(px, py)) return true; return false; };
 /** polyIn that answers at once outside the box of its own corners: these shapes are small and asked about over a whole body. */
@@ -74,20 +73,17 @@ export function arcChain(x0, y0, x1, y1, length, { bend = 1, steps = 6, least = 
 }
 
 /**
- * How tightly a curled tail, horn or tendril has to curl to stay inside a box: the asked curl when that fits, else the least stronger curl (same way round) that does, so a long tail coils up instead of leaving the frame.
- * Arguments: x, y, angle, length (as hornPath() in engine/creature.js); options { curl (radians it turns in all, as hornPath(); its sign is kept), steps (default 8), box ([x0, y0, x1, y1] every joint after the root must stay inside), pad (px to keep clear of the box, for the thickness; default 0), most (the strongest curl tried and the answer when nothing fits, default 6), by (how much stronger each try is, default 0.1) }.
- * Returns the curl to hand to hornPath().
+ * Joints of a tail, neck or stalk that turns sharply near its root and then runs on in a slow curl: a tail that leaves the body sideways, turns up within a few pixels and ends in a crook. Returns [[x, y], ...], steps + 1 points.
+ * Arguments: x, y (the root); angle (the rig angle it sets off at); length (px along it); options { turn (radians it turns in its first stretch; below 0 turns a path that sets off to the left upward), within (px of its length that turn takes, default 16), curl (radians the rest of it turns on top of that, tighter toward the end; default -0.5), steps (straight pieces, default 10) }.
  */
-export function curlToFit(x, y, angle, length, { curl = 0, steps = 8, box, pad = 0, most = 6, by = 0.1 } = {}) {
-  if (!box) return curl;
-  const sign = curl < 0 ? -1 : 1;
-  for (let c = Math.abs(curl); c <= most + 1e-9; c += by) {
-    const pts = hornPath(x, y, angle, length, { curl: sign * c, steps });
-    let ok = true;
-    for (let i = 1; i < pts.length && ok; i++) ok = pts[i][0] >= box[0] + pad && pts[i][0] <= box[2] - pad && pts[i][1] >= box[1] + pad && pts[i][1] <= box[3] - pad;
-    if (ok) return sign * c;
+export function hookPath(x, y, angle, length, { turn = -1.9, within = 16, curl = -0.5, steps = 10 } = {}) {
+  const n = Math.max(1, Math.round(steps)), first = Math.min(Math.max(1e-6, within), length), pts = [[x, y]];
+  for (let i = 0; i < n; i++) {
+    const at = ((i + 0.5) / n) * length, k = clamp(at / first), rest = length > first ? clamp((at - first) / (length - first)) : 0;
+    const a = angle + turn * (k * k * (3 - 2 * k)) + curl * rest ** 1.3, q = pts[i];
+    pts.push([q[0] + Math.sin(a) * (length / n), q[1] + Math.cos(a) * (length / n)]);
   }
-  return sign * most;
+  return pts;
 }
 
 // ---- shapes on a path ----------------------------------------------------------------
@@ -95,6 +91,7 @@ export function curlToFit(x, y, angle, length, { curl = 0, steps = 8, box, pad =
 /**
  * Shape test for a round tube through a list of joints that tapers from one end to the other: a neck, a tail, a tentacle, a trunk, a fat worm.
  * Arguments: pts ([[x, y], ...]: the joints); r0, r1 (half its thickness at the first and the last joint; r1 defaults to r0); options { bulge (px added to the half thickness in the middle of its length, default 0), radius ((u) => half thickness at a share of its length: replaces r0, r1 and bulge) }.
+ * The thickness is taken at each joint and runs straight from one to the next, so give a tube that bulges or follows a radius function several joints.
  */
 export function tubeIn(pts, r0, r1 = r0, { bulge = 0, radius = null } = {}) {
   const at = lengthsOf(pts), total = at[at.length - 1] || 1e-6;
@@ -167,16 +164,24 @@ export function sailIn(pts, { from = 0, to = 1, rays = 5, height = 6, side = 1, 
 
 /**
  * A skin wing with an elbow and a wrist, seen from the side: an upper arm, a forearm, long fingers fanned from the wrist and skin stretched from finger to finger and back to the body. Unlike membraneWing() the arm bends, so it can fold, rise and beat like a dragon's or a bat's.
- * Arguments: sx, sy (the shoulder); options { upper, fore (px of upper arm and forearm), finger (px of the longest finger), a1, a2 (rig angles of the upper arm and the forearm), fan ([first, last]: rig angles of the leading and the last finger), fingers (how many, default 3), taper (how much shorter the last finger is than the first, as a share; default 0.2), scoop (0 straight .. 1 deep scoops in the trailing edge, default 0.5), root ([x, y] where the trailing edge meets the body; default below the shoulder), tatter (0 whole .. 1 torn: notches in the edge and holes in the skin), seed (which tears), bone (half the thickness of the arm, default 1.5) }.
+ * Arguments: sx, sy (the shoulder); options { upper, fore (px of upper arm and forearm), finger (px of the longest finger), a1, a2 (rig angles of the upper arm and the forearm), fan ([first, last]: rig angles of the leading and the last finger), fingers (how many, default 3), taper (how much shorter the last finger is than the first, as a share; default 0.2), scoop (0 straight .. 1 deep scoops in the trailing edge, default 0.5), root ([x, y] where the trailing edge meets the body; default below the shoulder), tatter (0 whole .. 1 torn: notches in the edge and holes in the skin), seed (which tears), bone (half the thickness of the arm, default 1.5), floor, ceiling (the y of the ground and of the highest row it may reach: a forearm or a finger that would end beyond either is turned, the short way, to end on it instead, so a raised wing spreads wider where there is no room above; default none) }.
  * Returns { skin (shape test of the skin), bones (shape test of the arm, the fingers and the thumb claw: paint it over the skin), elbow, wrist, root ([x, y] each), tips ([[x, y], ...], leading finger first), marks (its outermost points, for keeping it in the frame) }.
  */
-export function jointedWing(sx, sy, { upper = 8, fore = 12, finger = 20, a1 = -PI + 0.35, a2 = -PI + 0.9, fan = [-PI + 1.4, -0.5], fingers = 3, taper = 0.2, scoop = 0.5, root = null, tatter = 0, seed = 0, bone = 1.5 } = {}) {
+export function jointedWing(sx, sy, { upper = 8, fore = 12, finger = 20, a1 = -PI + 0.35, a2 = -PI + 0.9, fan = [-PI + 1.4, -0.5], fingers = 3, taper = 0.2, scoop = 0.5, root = null, tatter = 0, seed = 0, bone = 1.5, floor = null, ceiling = null } = {}) {
   const n = Math.max(2, Math.round(fingers)), tear = clamp(tatter);
+  // a bone that would end below the floor or above the ceiling is turned, the short way, until its end lies on it
+  const above = (y0, a, len, pad) => {
+    const c = Math.cos(a), lo = ceiling === null ? -1 : (ceiling + pad - y0) / len, hi = floor === null ? 1 : (floor - pad - y0) / len;
+    if (lo > hi || (c >= lo && c <= hi)) return a;
+    const lie = Math.acos(clamp(clamp(c, lo, hi), -1, 1));
+    return Math.sin(a) < 0 ? -lie : lie;
+  };
   const elbow = [sx + Math.sin(a1) * upper, sy + Math.cos(a1) * upper];
-  const wrist = [elbow[0] + Math.sin(a2) * fore, elbow[1] + Math.cos(a2) * fore];
+  const fa = above(elbow[1], a2, fore, bone + 1);
+  const wrist = [elbow[0] + Math.sin(fa) * fore, elbow[1] + Math.cos(fa) * fore];
   const tips = [];
   for (let i = 0; i < n; i++) {
-    const u = i / (n - 1), a = lerp(fan[0], fan[1], u), L = finger * (1 - taper * u);
+    const u = i / (n - 1), L = finger * (1 - taper * u), a = above(wrist[1], lerp(fan[0], fan[1], u), L, 1);
     tips.push([wrist[0] + Math.sin(a) * L, wrist[1] + Math.cos(a) * L]);
   }
   const base = root ?? [sx + Math.sin(fan[1]) * finger * 0.4, sy + Math.cos(fan[1]) * finger * 0.4];
@@ -202,7 +207,7 @@ export function jointedWing(sx, sy, { upper = 8, fore = 12, finger = 20, a1 = -P
     for (const [x, y, r2] of cuts) if ((px - x) ** 2 + (py - y) ** 2 < r2) return false;
     return true;
   };
-  const thumb = [wrist[0] + Math.sin(a2 - 1) * (bone * 2 + 1), wrist[1] + Math.cos(a2 - 1) * (bone * 2 + 1)];
+  const thumb = [wrist[0] + Math.sin(fa - 1) * (bone * 2 + 1), Math.min(wrist[1] + Math.cos(fa - 1) * (bone * 2 + 1), floor ?? Infinity)];
   const bones = any([
     capsuleIn(sx, sy, elbow[0], elbow[1], bone * 1.25, bone), capsuleIn(elbow[0], elbow[1], wrist[0], wrist[1], bone, bone * 0.8),
     ...tips.map(([tx, ty]) => capsuleIn(wrist[0], wrist[1], tx, ty, bone * 0.62, 0.45)),

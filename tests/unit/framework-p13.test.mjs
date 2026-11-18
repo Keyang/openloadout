@@ -1,18 +1,23 @@
 // Framework additions of batch P13 (effects and interface of the platformer kit):
-//   engine/bursts.js    SPARK_STYLES, sparkMark, sparkRing, sparkOrbit, blastBall, driftUp
+//   engine/bursts.js    SPARK_STYLES, sparkMark, sparkRing, sparkOrbit, blastBall, driftUp,
+//                       and from the first fix round: sparkFlash, embers, puffRing, the `full` option of the
+//                       spark marks and the `box` option of driftUp
+//   engine/slots.js     socketTones, levelIn, slotFill (first fix round: the HUD's full, half and empty marks)
 //   engine/ui-wood.js   WOOD_STYLES, woodTones, woodPanel, woodButton
 // and what the six sprites of the batch promise in their headers (clips, slices, flat text areas, contrast).
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { Surface } from '../../engine/surface.js';
-import { col, INK } from '../../engine/color.js';
+import { col, ramp, mix, INK } from '../../engine/color.js';
 import { PALETTE } from '../../engine/palettes.js';
 import { steps } from '../../engine/fx.js';
 import { contrast, BUTTON_STATES } from '../../engine/ui.js';
 import { THEME_PRESETS, normalizeTheme, applyColour } from '../../engine/theme.js';
 import { renderFrame, renderSheet, defaultParams, cleanParams } from '../../engine/sprite.js';
 import { validateMeta } from '../../catalog/schema.js';
-import { SPARK_STYLES, sparkMark, sparkRing, sparkOrbit, blastBall, driftUp } from '../../engine/bursts.js';
+import { SPARK_STYLES, sparkMark, sparkRing, sparkOrbit, blastBall, driftUp, sparkFlash, embers, puffRing } from '../../engine/bursts.js';
+import { socketTones, levelIn, slotFill } from '../../engine/slots.js';
+import { heartIn, insetIn } from '../../engine/shapes.js';
 import { WOOD_STYLES, woodTones, woodPanel, woodButton } from '../../engine/ui-wood.js';
 import sparkle from '../../sprites/pickup-sparkle.js';
 import poof from '../../sprites/enemy-poof.js';
@@ -119,6 +124,152 @@ test('P13 driftUp: things set off one after another, climb and never come down',
   let last = 30; for (let i = 0; i <= 10; i++) { const s = at(0.5 + i * 0.05).find((q) => q.i === 1); assert.ok(s.y <= last + 1e-9, 'it only goes up'); last = s.y; }
   assert.deepEqual(at(0.8), at(0.8), 'repeatable');
   assert.equal(driftUp({ t: 0.5, x: 5, y: 0, count: 1, spread: 9, sway: 0 })[0].x, 5, 'one thing starts in the middle');
+});
+
+// ---- engine/bursts.js, first fix round ---------------------------------------------------------
+
+test('P13 sparkMark full: the core colour fills a plus up to its tips, and nothing else changes', () => {
+  const mark = (style, reach, opt) => { const g = new Surface(15, 15); sparkMark(g, 7.5, 7.5, reach, style, C, opt); return g; };
+  assert.equal(count(mark('plus', 2), P.cream), 1, 'as it was: only the middle of a reach-2 plus is the core colour');
+  assert.equal(count(mark('plus', 2, { full: true }), P.cream), 5, 'full: the middle and the inner pixel of each arm');
+  assert.equal(count(mark('plus', 2, { full: true }), C.at(-1)), 4, '... and the tips keep the rim colour');
+  assert.equal(count(mark('plus', 3, { full: true }), P.cream), 9);
+  assert.equal(count(mark('plus', 4, { full: true }), P.cream), 13);
+  for (const style of SPARK_STYLES) for (let r = 0; r <= 4; r++) {
+    assert.equal(lit(mark(style, r, { full: true })), lit(mark(style, r)), `${style} reach ${r}: the same pixels are painted`);
+    if (style !== 'plus' || r < 2) assert.deepEqual(mark(style, r, { full: true }).data, mark(style, r).data, `${style} reach ${r}: unchanged`);
+  }
+  const ring = (o) => { const g = new Surface(32, 32); sparkRing(g, { t: 0.3, x: 15.5, y: 15.5, count: 6, r0: 4, r1: 11, style: 'plus', reach: 2, colours: C, ...o }); return g; };
+  const orbit = (o) => { const g = new Surface(32, 32); sparkOrbit(g, { t: 0.125, x: 15.5, y: 16.5, count: 6, r: 9, style: 'plus', reach: 3, colours: C, ...o }); return g; };
+  assert.ok(count(ring({ full: true }), P.cream) >= count(ring({}), P.cream) + 12, 'sparkRing passes it on');
+  assert.ok(count(orbit({ full: true }), P.cream) > count(orbit({}), P.cream), 'sparkOrbit passes it on');
+});
+
+test('P13 driftUp box: every place stays inside the box, pad pixels from its sides, and is untouched when it already was', () => {
+  const o = { t: 1, x: 24, y: 30, count: 3, rise: 12, spread: 6, from: 0.5 };
+  assert.deepEqual(driftUp({ ...o, box: [1, 1, 47, 47], pad: 4 }), driftUp(o), 'a box that already holds everything changes nothing');
+  for (const pad of [0, 3, 5]) for (let f = 0; f <= 7; f++) {
+    for (const s of driftUp({ ...o, t: f / 7, from: 0, rise: 60, spread: 40, sway: 6, box: [1, 1, 47, 47], pad })) {
+      const cx = Math.floor(s.x), cy = Math.floor(s.y);
+      assert.ok(cx - pad >= 1 && cx + pad <= 46 && cy - pad >= 1 && cy + pad <= 46, `pad ${pad} frame ${f}: a mark of half size ${pad} at ${cx},${cy} is inside the box`);
+    }
+  }
+  const tight = driftUp({ ...o, box: [20, 20, 24, 24], pad: 3 });
+  for (const s of tight) assert.ok(s.x >= 20 && s.x <= 24 && s.y >= 20 && s.y <= 24, 'a box too small for the pad holds them at its middle');
+});
+
+test('P13 sparkFlash: a white star, lozenge or disc, lined with the core colour and rimmed with the edge colour', () => {
+  const flash = (style, r = 9, opt) => { const g = new Surface(32, 32); const n = sparkFlash(g, 15.5, 15.5, r, style, C, opt); return { g, n }; };
+  for (const style of SPARK_STYLES) {
+    const { g, n } = flash(style);
+    assert.equal(n, lit(g), `${style}: returns what it painted`);
+    assert.equal(g.get(15, 15), col('#ffffff'), `${style}: white in the middle`);
+    assert.ok(count(g, P.cream) >= 8 && count(g, P.gold) >= 12, `${style}: a lining of the core colour and a rim of the edge colour`);
+    assert.equal(count(g, '#ffffff') + count(g, P.cream) + count(g, P.gold), n, `${style}: only those three colours`);
+    for (let y = 0; y < 32; y++) for (let x = 0; x < 15; x++) assert.equal(g.get(x, y), g.get(30 - x, y), `${style}: the same left and right of its middle pixel`);
+    for (let y = 0; y < 15; y++) for (let x = 0; x < 32; x++) assert.equal(g.get(x, y), g.get(x, 30 - y), `${style}: the same above and below it`);
+    assert.ok(flash(style, 11).n > n && flash(style, 6).n < n, `${style}: r sets its size`);
+    assert.ok(borderEmpty(flash(style, 40).g), `${style}: never on the outermost row or column`);
+  }
+  const b = flash('plus').g.bounds();
+  assert.deepEqual([b.x0, b.x1, b.y0, b.y1], [5, 25, 5, 25], 'the star reaches r pixels from its middle pixel, plus its rim');
+  { const d = flash('diamond').g.bounds(), o = flash('dot').g.bounds(); assert.ok(d.x1 - d.x0 < b.x1 - b.x0 && o.x1 - o.x0 < d.x1 - d.x0, 'the star is the widest, then the lozenge, then the disc: about the same cover'); }
+  assert.ok(diff(flash('plus').g, flash('diamond').g) > 40 && diff(flash('diamond').g, flash('dot').g) > 24 && diff(flash('plus').g, flash('dot').g) > 40, 'the three styles differ');
+  assert.equal(flash('plus', 9, { core: P.sky }).g.get(15, 15), col(P.sky), 'the body colour can be given');
+  assert.equal(flash('plus', 0).n, 0);
+  assert.throws(() => sparkFlash(new Surface(8, 8), 4, 4, 3, 'star', C), /not one of/);
+});
+
+test('P13 embers: rimmed beads that fly outward from r0, never inside it, and end as one pixel each', () => {
+  const E = steps(P.ember, { core: P.cream, white: false });
+  const fly = (t, o = {}) => { const g = new Surface(48, 48); const n = embers(g, { t, x: 24, y: 24, count: 8, r0: 14, r1: 20, colours: E, ...o }); return { g, n }; };
+  const far = (g) => { let lo = 99, hi = 0; for (let y = 0; y < 48; y++) for (let x = 0; x < 48; x++) if (g.get(x, y)) { const d = Math.hypot(x + 0.5 - 24, y + 0.5 - 24); lo = Math.min(lo, d); hi = Math.max(hi, d); } return { lo, hi }; };
+  assert.equal(fly(0).n, 8, 'every bead is full size at the start');
+  assert.equal(count(fly(0, { tail: 0 }).g, P.cream), 8, 'one lit pixel of the hottest colour per bead');
+  assert.equal(lit(fly(0, { tail: 0 }).g), 8 * 12, 'a 2x2 bead in a rim of 8 pixels');
+  assert.equal(lit(fly(0, { tail: 0, size: 3 }).g), 8 * 21, 'a 3x3 bead in a rim of 12');
+  assert.ok(lit(fly(0).g) > lit(fly(0, { tail: 0 }).g), 'a streak behind each while it is fast');
+  assert.ok(far(fly(0, { tail: 0 }).g).lo >= 14 - 2.5, 'no bead starts nearer than r0');
+  for (let f = 0; f <= 4; f++) assert.ok(far(fly(f / 4, { tail: 0 }).g).lo >= 14 - 2.5, `frame ${f}: still outside r0`);
+  assert.ok(far(fly(0.5).g).hi > far(fly(0, { tail: 0 }).g).hi + 1, 'they fly outward');
+  assert.equal(fly(0.5).n, 8); assert.equal(fly(0.75).n, 0, 'after `hold` each is one pixel');
+  assert.equal(lit(fly(0.75).g), 8); assert.equal(lit(fly(1).g), 8, 'the last frame keeps one pixel per bead');
+  assert.equal(count(fly(1).g, E.at(-1)), 8, '... in the rim colour');
+  assert.equal(fly(0, { count: 12 }).n, 12);
+  for (let f = 0; f <= 4; f++) assert.ok(borderEmpty(fly(f / 4, { r0: 30, r1: 60, count: 12 }).g), `frame ${f}: inside the frame however far they are thrown`);
+  assert.deepEqual(fly(0.3).g.data, fly(0.3).g.data, 'repeatable');
+});
+
+test('P13 puffRing: a ring of puffs that widens and thins, joined or apart, clear in the middle, never empty', () => {
+  const S = [P.cream, P.stone, P.slate, INK];
+  const ringAt = (t, o = {}) => { const g = new Surface(48, 48); const n = puffRing(g, { t, x: 24, y: 24, count: 6, r0: 5, r1: 13, size: 5.5, colours: S, ...o }); return { g, n }; };
+  const nearest = (g) => { let lo = 99; for (let y = 0; y < 48; y++) for (let x = 0; x < 48; x++) if (g.get(x, y)) lo = Math.min(lo, Math.hypot(x + 0.5 - 24, y + 0.5 - 24)); return lo; };
+  const span = (g) => { const b = g.bounds(); return [b.x1 - b.x0 + 1, b.y1 - b.y0 + 1]; };
+  // held at full size the cloud only grows: wider, taller and more pixels from step to step
+  let last = null;
+  for (let i = 0; i <= 4; i++) {
+    const g = ringAt(i / 10, { hold: 0.4 }).g, cur = [...span(g), lit(g)];
+    if (last) assert.ok(cur[0] >= last[0] && cur[1] >= last[1] && cur[2] >= last[2], `step ${i}: ${cur} after ${last}`);
+    last = cur;
+  }
+  assert.notEqual(ringAt(0).g.get(24, 24), 0, 'puffs wider than the ring cover the middle at the start');
+  assert.equal(ringAt(0).n, 6); assert.equal(ringAt(1).n, 0, 'at the end every puff is a speck');
+  assert.equal(lit(ringAt(1).g), 6, 'the last frame keeps one pixel per puff');
+  assert.equal(lit(ringAt(1, { end: 1.5 }).g) > 6, true, '`end` leaves bigger dots');
+  assert.ok(lit(ringAt(0.6, { hold: 0.5 }).g) > lit(ringAt(0.6).g), '`hold` keeps them full for longer');
+  assert.ok(count(ringAt(0.3).g, P.cream) > 100 && count(ringAt(0.9, { cool: 0.5, end: 2 }).g, P.cream) === 0, 'after `cool` the light top is gone');
+  assert.ok(count(ringAt(0.9, { cool: 0.5, end: 2 }).g, P.stone) > 6);
+  // joined puffs are one cloud with one rim; apart, each keeps its own
+  const joined = ringAt(0.15).g, apart = ringAt(0.15, { apart: true }).g;
+  assert.deepEqual(joined.data.map((v) => (v ? 1 : 0)), apart.data.map((v) => (v ? 1 : 0)), 'the same outline either way');
+  assert.ok(count(apart, INK) > count(joined, INK) + 10, 'apart: rims between the puffs');
+  // the middle stays clear: nothing nearer than the ring less a puff and its rim
+  for (const lobes of [1, 2, 3]) for (const uneven of [0, 1]) for (let i = 0; i <= 4; i++) {
+    const g = ringAt(i / 4, { r0: 12, r1: 16, size: 3, lobes, uneven, rise: 0 }).g;
+    assert.ok(nearest(g) >= 12 * 0.92 - 3 * 1.12 * (lobes > 1 ? 1.6 : 1) - 1.5, `lobes ${lobes} uneven ${uneven} step ${i}: clear to ${nearest(g).toFixed(1)}`);
+    assert.ok(lit(g) >= 2 && borderEmpty(g));
+  }
+  assert.ok(diff(ringAt(0.5, { r0: 12, r1: 16, size: 3, lobes: 2 }).g, ringAt(0.5, { r0: 12, r1: 16, size: 3 }).g) > 12, 'lobes make ragged puffs');
+  assert.ok(ringAt(0.5, { rise: 6 }).g.bounds().y0 < ringAt(0.5).g.bounds().y0, 'rise lifts the ring');
+  assert.ok(borderEmpty(ringAt(0.5, { r0: 30, r1: 60 }).g), 'inside the frame however wide it is asked to be');
+  assert.deepEqual(ringAt(0.4).g.data, ringAt(0.4).g.data, 'repeatable');
+});
+
+// ---- engine/slots.js ---------------------------------------------------------------------------
+
+test('P13 slots: socketTones, levelIn and slotFill draw a mark full, part full or empty inside one outline', () => {
+  const T = socketTones(P.slate);
+  assert.deepEqual(T, { rim: P.slate, inside: mix(INK, P.slate, 0.3), mark: mix(INK, P.slate, 0.62) });
+  const bright = (hex) => { const v = col(hex); return (v & 255) * 0.299 + ((v >>> 8) & 255) * 0.587 + ((v >>> 16) & 255) * 0.114; };
+  assert.ok(bright(T.inside) < bright(T.mark) && bright(T.mark) < bright(T.rim), 'inside is the darkest, the rim the lightest');
+
+  assert.equal(levelIn(1)(3, 3), true); assert.equal(levelIn('full')(3, 3), true); assert.equal(levelIn(2)(3, 3), true);
+  assert.equal(levelIn(0)(3, 3), false); assert.equal(levelIn('empty')(3, 3), false); assert.equal(levelIn(-1)(3, 3), false);
+  const half = levelIn('half', { split: 9 });
+  assert.deepEqual([half(8.5, 2), half(9.5, 2)], [true, false], 'a half keeps the left of the split');
+  const lower = levelIn('half', { split: 8, half: 'lower' });
+  assert.deepEqual([lower(3, 7.5), lower(3, 8.5)], [false, true], '... or what is below it');
+  const some = levelIn(0.4, { top: 3, bottom: 13 });
+  assert.deepEqual([some(5, 8.5), some(5, 9.5)], [false, true], 'a number fills from the bottom row up: 40% of 13 down to 3 is row 9');
+
+  const H = heartIn(8.5, 7.5, 11, 9);
+  const mark = (opt) => slotFill(new Surface(16, 16), H, P.crimson, P.slate, opt);
+  const outline = (g) => g.data.map((v) => (v ? 1 : 0)).join('');
+  const full = mark(), empty = mark({ on: levelIn(0) }), halfHeart = mark({ on: half }), part = mark({ on: some });
+  assert.ok(lit(full) > 60);
+  for (const g of [empty, halfHeart, part]) assert.equal(outline(g), outline(full), 'full, half, part and empty fill the same pixels');
+  // by hand: the three fills it stands for
+  const byHand = new Surface(16, 16), R = ramp(P.crimson);
+  byHand.fill(0, 0, 16, 16, H, R, { shade: 1, light: 1 });
+  assert.deepEqual(full.data, byHand.data, 'a full mark is the lit body: three tones and a highlight band');
+  assert.equal(count(mark({ shine: false }), R.light), 0, 'shine off: no highlight band');
+  assert.equal(count(empty, R.base) + count(empty, R.dark) + count(empty, R.light), 0, 'an empty mark has none of the lit colour');
+  const inner = insetIn(H, 1);
+  for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) if (H(x + 0.5, y + 0.5)) assert.equal(empty.get(x, y), col(inner(x + 0.5, y + 0.5) ? T.inside : T.rim), `socket at ${x},${y}: a rim of the socket colour round a dark inside`);
+  for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) if (x !== 8) assert.equal(halfHeart.get(x, y), (x < 8 ? full : empty).get(x, y), `half at ${x},${y}: the full mark on the left, the socket on the right (column 8, the cut, is the lit half's own edge)`);
+  { const most = mark({ on: levelIn(0.7, { top: 3, bottom: 13 }) }); assert.ok(count(most, R.base) > 8 && count(most, T.inside) > 8 && count(part, T.inside) > count(most, T.inside), 'part full shows both, and a lower level leaves more socket'); }
+  const boxed = slotFill(new Surface(16, 16), H, P.crimson, P.slate, { box: [0, 0, 8, 16] });
+  assert.ok(lit(boxed) < lit(full) && boxed.bounds().x1 <= 8, 'a box limits where it fills');
 });
 
 // ---- engine/ui-wood.js -----------------------------------------------------------------------
@@ -297,5 +448,63 @@ test('P13 wood contrast: white text keeps 4.5 to 1 on every face in every state,
     const strip = under(draw(panels, 'panel-title', { accent }), colour), sheet = under(draw(panels, 'panel-scroll', { accent }), colour);
     const ink = hexOf(strip.get(1, 8));                       // the outline colour as this look draws it
     for (const [what, c] of [['strip', hexOf(strip.get(48, 10))], ['parchment', hexOf(sheet.get(48, 32))]]) assert.ok(contrast(ink, c) >= 4.5, `${what} ${accent}, ${name}: dark text ${contrast(ink, c).toFixed(2)}`);
+  }
+});
+
+// ---- what the first fix round promises about the three effects ----------------------------------
+
+test('P13 sparkle: frame 0 is the biggest picture, and the core colour shows as much as the edge colour', () => {
+  for (const style of SPARK_STYLES) for (const size of [0, 0.5, 1]) {
+    const n0 = lit(draw(sparkle, 'burst', { style, size }, 0)), b0 = draw(sparkle, 'burst', { style, size }, 0).bounds();
+    for (let f = 1; f < 8; f++) assert.ok(n0 >= lit(draw(sparkle, 'burst', { style, size }, f)), `${style} size ${size}: frame 0 has at least as many pixels as frame ${f}`);
+    const b1 = draw(sparkle, 'burst', { style, size }, 1).bounds();
+    if (style === 'plus') assert.ok(b0.x1 - b0.x0 >= b1.x1 - b1.x0 && b0.y1 - b0.y0 >= b1.y1 - b1.y0, `${style} size ${size}: the flash is as wide and as tall as the ring on frame 1`);
+  }
+  const [a, b] = [sparkle.params.core.swatches[0], P.sky];
+  const most = (clip) => Math.max(...[0, 1, 2, 3, 4, 5, 6, 7].map((f) => diff(draw(sparkle, clip, { core: a }, f), draw(sparkle, clip, { core: b }, f))));
+  assert.ok(most('burst') >= 12, `core changes ${most('burst')} pixels on a burst frame`);
+  assert.ok(most('loop') >= 6, `core changes ${most('loop')} pixels on a shimmer frame`);
+});
+
+test('P13 poof: it never shrinks from frame 0 to frame 4, and its stars and skulls stay apart', () => {
+  for (const o of [{}, { size: 0, pieces: 4, spread: 0 }, { size: 1, pieces: 8, spread: 1 }, { size: 0, pieces: 6 }, { size: 1, pieces: 5, spread: 0 }]) {
+    let last = null;
+    for (let f = 0; f <= 4; f++) {
+      const g = draw(poof, 'burst', o, f), bb = g.bounds(), cur = [bb.x1 - bb.x0 + 1, bb.y1 - bb.y0 + 1, lit(g)];
+      if (last) assert.ok(cur[0] >= last[0] && cur[1] >= last[1] && cur[2] >= last[2], `${JSON.stringify(o)} frame ${f}: ${cur} after ${last}`);
+      last = cur;
+    }
+  }
+  // the marks: on frames 5 to 7 the core colour is in the stars or skulls only (the puffs have cooled), and
+  // between two marks there is a column with none of it at least 3 px wide (their two outlines and a gap)
+  for (const style of ['stars', 'skulls']) for (const o of [{}, { size: 1, pieces: 8, spread: 1 }, { size: 0, pieces: 4, spread: 0 }]) for (let f = 5; f <= 7; f++) {
+    const g = draw(poof, 'burst', { style, ...o }, f), core = col(poof.params.core.default ?? P.cream);
+    const cols = []; for (let x = 0; x < 48; x++) { let n = 0; for (let y = 0; y < 48; y++) if (g.get(x, y) === core) n++; cols.push(n > 0); }
+    const runs = []; let start = -1;
+    for (let x = 0; x <= 48; x++) { if (cols[x] && start < 0) start = x; if (!cols[x] && start >= 0) { runs.push([start, x - 1]); start = -1; } }
+    const want = (o.pieces ?? 6) >= 6 ? 3 : 2;
+    assert.equal(runs.length, want, `${style} ${JSON.stringify(o)} frame ${f}: ${want} separate marks, found ${JSON.stringify(runs)}`);
+    for (let i = 1; i < runs.length; i++) assert.ok(runs[i][0] - runs[i - 1][1] - 1 >= 3, `${style} frame ${f}: a clear gap between marks ${i - 1} and ${i}`);
+  }
+});
+
+test('P13 explosion: embers fly outside the fire on frames 3 to 5, and the smoke is a late ring that leaves the middle clear', () => {
+  const core = col(P.cream), R = (size) => 8.5 + 2.5 * size, wide = (spread) => 0.92 + 0.18 * spread;
+  for (const [o, size, spread, pieces] of [[{}, 0.5, 0.5, 8], [{ size: 0, pieces: 4, spread: 0 }, 0, 0, 4], [{ style: 'star' }, 0.5, 0.5, 8]]) {
+    // frame 4: the fire ring holds no core colour, so every pixel of it is the lit corner of one ember
+    const g = draw(boom, 'burst', o, 4), outer = R(size) * 1.26 * wide(spread);
+    let out = 0;
+    for (let y = 0; y < 48; y++) for (let x = 0; x < 48; x++) if (g.get(x, y) === core && Math.hypot(x + 0.5 - 24, y + 0.5 - 24) > outer + 1) out++;
+    assert.equal(out, pieces, `${JSON.stringify(o)}: every ember is outside the ring on frame 4`);
+  }
+  const most = Math.max(...[0, 1, 2, 3, 4, 5, 6, 7].map((f) => diff(draw(boom, 'burst', { pieces: 4 }, f), draw(boom, 'burst', { pieces: 12 }, f))));
+  assert.ok(most >= 40, `Pieces changes ${most} pixels on one frame`);
+  for (const style of ['round', 'star', 'ring']) for (const size of [0, 0.5, 1]) for (const spread of [0, 1]) for (let f = 0; f < 8; f++) {
+    const on = draw(boom, 'burst', { style, size, spread, smoke: true }, f), off = draw(boom, 'burst', { style, size, spread, smoke: false }, f);
+    if (f <= 4) { assert.deepEqual(on.data, off.data, `${style} size ${size} frame ${f}: no smoke before frame 5`); continue; }
+    assert.ok(diff(on, off) > 20, `${style} size ${size} frame ${f}: the smoke shows`);
+    for (let y = 0; y < 48; y++) for (let x = 0; x < 48; x++) if (on.get(x, y) !== off.get(x, y) && on.get(x, y)) {
+      assert.ok(Math.hypot(x + 0.5 - 24, y + 0.5 - 24) >= R(size) * 0.5, `${style} size ${size} spread ${spread} frame ${f}: smoke at ${x},${y} is inside half the ball's radius`);
+    }
   }
 });

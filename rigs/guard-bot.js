@@ -15,26 +15,30 @@
 //   DRIVES, HEADS, WEAPONS, PACKS    the names of what it runs on, its heads, its weapons and what it carries
 //
 //   import * as B from '../rigs/guard-bot.js';
-//   const frameOf = (clip, t, p, frame) => B.frame(clip, t, p, { drive: p.legs, head: p.shape, frame,
+//   const frameOf = (clip, t, p) => B.frame(clip, t, p, { drive: p.legs, head: p.shape,
 //     weapon: { kind: p.weapon, length: p.weaponLength }, pack: { kind: p.pack, size: p.packSize } });
 //   // in defineSprite:  size: B.SIZE, pivot: B.PIVOT, clips: B.clips((p) => p.speed, ['idle_down', 'walk*', 'attack*', 'shoot*', 'hurt', 'die']),
 //   sockets: (clip, t, p) => frameOf(clip, t, p).sockets(),
-//   render(g, { clip, t, frame, p }) { const F = frameOf(clip, t, p, frame), look = { body: p.body, accent: p.accent, glow: p.glow }; F.draw(g, look); F.finish(g, look); }
+//   render(g, { clip, t, p }) { const F = frameOf(clip, t, p), look = { body: p.body, accent: p.accent, glow: p.glow }; F.draw(g, look); F.finish(g, look); }
 //
 // What it is made of, from the floor up: two caterpillar tracks with a dark underbody between them, or four jointed
 // legs; a broad armoured hull with a band of hazard stripes and a lamp at each end of it on the wall the camera sees;
 // a small head with one lens that looks the way it faces; a weapon on a housing at its right shoulder, pointing
 // forward (socket `hand`, its far end `muzzle`); and on the rear deck a siren, two exhaust stacks or nothing (`back`).
+// Facing the camera it shows its front, lens and both tracks; facing away its back, with no lens; from the side
+// (facing picture-right) its flank over the near track, at about half its depth, so the side view stays a machine
+// seen from the side and not its roof.
 //
 // The poses (POSES): idle (the engine rumbles, the lens scans, one blink), walk (the tracks turn or the legs trot in
 // two pairs; it dips on frames 0 and 4 of 8), attack (a charge: it lowers itself for three frames with its lights
 // flashing, rams forward on frames 4 and 5 and brakes), shoot (aim, fire on frame 1, recoil, recover; with a saw or a
 // claw the tool is thrust out instead, with no weapon it is a shove), hurt (white recoil), die (it shudders and
-// sparks, its lights go out, the hull drops, the head sags forward one way and the weapon hangs: a shutdown slump
-// that stays, smoking).
+// sparks, its lights die down, the hull gives way and lies lower, the head sags forward one way and the weapon
+// hangs: a shutdown slump that stays, smoking).
 //
-// How far a pose travels is in picture pixels along the way it faces, and is scaled down when the frame has less
-// room than the pose asks for, so a charge always shows and nothing ever reaches the frame's edge.
+// How far a pose travels is in picture pixels along the way it faces. When the frame has less room ahead than the
+// pose asks for, the machine goes less far forward and draws back further first, so a charge always shows and
+// nothing ever reaches the frame's edge.
 // Pure functions: Node and browser, no Math.random. Angles of sockets: 0 = down the picture, PI/2 = right, PI = up.
 
 import * as K from './creature-topdown.js';
@@ -67,7 +71,7 @@ export const POSES = Object.freeze(['idle', 'walk', 'attack', 'shoot', 'hurt', '
 
 const R = Math.round;
 const odd = (v) => 2 * R((v - 1) / 2) + 1;
-const WEAPON_LENGTH = { cannon: 10, saw: 8, claw: 8 };
+const WEAPON_LENGTH = { cannon: 9, saw: 8, claw: 8 };
 const HEAD_SIZE = { dome: [9, 9, 6], block: [9.4, 7.4, 4.6], sensor: [6.6, 5.4, 7.4] };   // wide, len, tall
 /** How far the pieces of the picture are kept from the frame's edge: 2 px, the outline and the empty border. */
 const MARGIN = 2;
@@ -99,7 +103,7 @@ export function dims(p = {}, opt = {}) {
     tread: { wide: tw, len: len + 2 * R(2.2 * s), tall: rise + 1, b: wide / 2 + tw / 2 - 1 },
     leg: { out: R(lerp(5, 6.4, bulk) * s), knee: rise + R(3.6 * s), w: R(lerp(2.4, 3.4, bulk)), hipA: len * 0.3, footA: len * 0.3 + 2.5 },
     head: { kind: hk, wide: odd(hw * s), len: odd(hl * s), tall: R(ht * s), a: 1 },
-    weapon: { kind: wk, length: (WEAPON_LENGTH[wk] ?? 0) * (opt.weapon?.length ?? 1) * s, k: s * lerp(0.92, 1.12, bulk), mount: [0, wide / 2 + 2, rise + 1] },
+    weapon: { kind: wk, length: (WEAPON_LENGTH[wk] ?? 0) * (opt.weapon?.length ?? 1), k: s * lerp(0.92, 1.12, bulk), mount: [0, wide / 2 + 2, rise + 1] },
     pack: { kind: pk, size: (opt.pack?.size ?? 1) * s, mount: [-(len / 2 - 2.5), -(wide / 2 - 3.5), rise + tall] },
   };
 }
@@ -109,12 +113,12 @@ export function dims(p = {}, opt = {}) {
 /**
  * Returns the pose of a guard robot at phase t (0..1) of an action, the same for every direction: solve() turns it into a picture for the direction faced.
  * Arguments: action (one of POSES; any other name gives the resting pose); t; m { bounce: 0..1, how much it rumbles }; d (dims()).
- * The pose: x (picture px it has travelled the way it faces; negative: backward), reach (the furthest forward this clip goes: the travel is scaled to the room the frame has), drop (px the hull has sunk on its springs), lift (px the whole machine is thrown up), sway (px the hull has shaken to its right), head ([a, b, c]: the head moved forward, to its right and up, in its own px), nod (0..1: the head tipped forward, so more of its top shows and less of its face), look (-1..1: where the lens looks), eye, lamps (0 off, 0.5 dim, 1 lit, 2 flaring), spin (a whole number: the siren's lamp turning), tread (whole px the tracks have turned), feet (four { x, y, out }: each foot forward of its resting spot, off the floor and further out; the right side's front and rear, then the left's), arm { thrust, droop, work, grip (as botWeapon takes them) }, fire (true on the frame the cannon fires), ram (0..1 while it charges, else -1), hit (true on the frame the charge lands), puff (null, or { t, loop, big }: the exhaust), sparks, smoke (0..1 while it sparks and smokes, else -1), dead (its lights are out for good), flash (tint this frame white).
+ * The pose: x (picture px it has travelled the way it faces; negative: backward), reach (the furthest forward this clip goes: the travel is scaled to the room the frame has), drop (px the hull has sunk on its springs), lift (px the whole machine is thrown up), sway (px the hull has shaken to its right), sag (0..1: the hull has given way and lies nose down, lower, with more of its deck showing and less of its front), head ([a, b, c]: the head moved forward, to its right and up, in its own px), nod (0..1: the head tipped forward, so more of its top shows and less of its face), look (-1..1: where the lens looks), eye, lamps (0 off, 0.5 dim, 1 lit, 2 flaring), spin (a whole number: the siren's lamp turning), tread (whole px the tracks have turned), feet (four { x, y, out }: each foot forward of its resting spot, off the floor and further out; the right side's front and rear, then the left's), arm { thrust, droop, work, grip (as botWeapon takes them) }, fire (true on the frame the cannon fires), ram (0..1 while it charges, else -1), hit (true on the frame the charge lands), puff (null, or { t, loop, big }: the exhaust), sparks, smoke (0..1 while it sparks and smokes, else -1), dead (its lights are out for good), flash (tint this frame white).
  */
 export function pose(action, t, m = {}, d = dims()) {
   const bounce = clamp(m.bounce ?? 0.5), legs = d.drive === 'legs', gun = d.weapon.kind;
   const P = {
-    x: 0, reach: 0, drop: 0, lift: 0, sway: 0, head: [0, 0, 0], nod: 0, look: 0, eye: 1, lamps: 1, spin: 0, tread: 0,
+    x: 0, reach: 0, drop: 0, lift: 0, sway: 0, sag: 0, head: [0, 0, 0], nod: 0, look: 0, eye: 1, lamps: 1, spin: 0, tread: 0,
     feet: [0, 1, 2, 3].map(() => ({ x: 0, y: 0, out: 0 })), arm: { thrust: 0, droop: 0, work: 0, grip: null },
     fire: false, ram: -1, hit: false, puff: null, sparks: -1, smoke: -1, dead: false, flash: false,
   };
@@ -134,9 +138,9 @@ export function pose(action, t, m = {}, d = dims()) {
     const n = Math.floor(t * 8 + 1e-6);
     P.tread = n;
     if (legs) each((f, i, side) => Object.assign(f, K.step(t + K.gait(i, side), { stride: 2.6, lift: lerp(1.6, 2.8, bounce) })));
-    P.drop = lerp(0.6, 2, bounce) * (0.5 + 0.5 * Math.cos(2 * TAU * t));
+    P.drop = lerp(0.8, 2.6, bounce) * (0.5 + 0.5 * Math.cos(2 * TAU * t));
     P.sway = legs ? Math.sin(TAU * t) * lerp(0.5, 1.2, bounce) : 0;
-    P.head = [0, 0, -(P.drop > 1 ? 0 : n % 4 === 1 ? 1 : 0)];                 // the head comes down a frame after the hull
+    P.head = [n % 4 === 1 ? 1 : 0, 0, 0];                                     // the head nods forward a frame after the hull lands
     P.look = 0.6 * wave(t);
     P.spin = n; P.arm.work = 2 * n;
     P.puff = { t, loop: true };
@@ -149,7 +153,7 @@ export function pose(action, t, m = {}, d = dims()) {
     P.eye = [1, 2, 0.5, 2, 2, 2, 1, 1][n]; P.lamps = [1, 2, 0.5, 2, 2, 1, 1, 1][n];
     P.tread = [0, -1, -2, -3, 1, 5, 7, 8][n];
     P.head = [[0, 0, 0], [-1, 0, 0], [-1, 0, 0], [-1, 0, 0], [0, 0, 0], [1, 0, 0], [2, 0, 0], [0, 0, 0]][n];
-    P.arm.thrust = [0, -1, -1, -1, 1, 2, 1, 0][n]; P.arm.work = 3 * n; P.spin = 2 * n;
+    P.arm.thrust = [0, -1, -1, -1, 0, 0, 0, 0][n]; P.arm.work = 3 * n; P.spin = 2 * n;
     P.ram = [-1, -1, -1, -1, 0.1, 0.45, 0.85, -1][n];
     P.hit = n === 5;
     P.puff = n >= 2 && n <= 6 ? { t: (n - 2) / 4, loop: false, big: true } : null;
@@ -194,8 +198,9 @@ export function pose(action, t, m = {}, d = dims()) {
     P.drop = [0, 0, 0, 1, 3, 2, 3, 3][n];
     P.head = [[-1, 0, 0], [0, 0, 0], [0, 0, 0], [1, 0, 0], [1, 1, 0], [2, 2, 0], [2, 2, 0], [2, 2, 0]][n];
     P.nod = [0, 0, 0, 0.5, 1, 1, 1, 1][n];
-    P.arm.droop = [0, 0, 1, 2, 4, 5, 5, 5][n]; P.arm.work = Math.min(n, 2); P.arm.grip = n >= 3 ? 2 : null;
-    P.eye = [0.5, 1, 0.5, 1, 0.5, 0, 0, 0][n]; P.lamps = [0.5, 1, 0.5, 0.5, 0, 0, 0, 0][n];
+    P.sag = [0, 0, 0, 0, 0.5, 1, 1, 1][n]; P.sway = [0, 1, -1, 0, 1, 1, 1, 1][n];
+    P.arm.droop = [0, 0, 1, 2, 3, 4, 4, 4][n]; P.arm.work = Math.min(n, 2); P.arm.grip = n >= 3 ? 2 : null;
+    P.eye = [0.5, 1, 0.5, 1, 0.5, 0.3, 0.3, 0.3][n]; P.lamps = [0.5, 1, 0.5, 0.5, 0.3, 0.3, 0.3, 0.3][n];
     P.spin = Math.min(n, 3);
     P.dead = n >= 5;
     P.sparks = n >= 1 && n <= 5 ? (n - 1) / 4 : -1;
@@ -214,7 +219,7 @@ const FACE_ANGLE = { down: 0, up: PI, side: PI / 2 };
 /**
  * Works out where every piece of a posed guard robot is for the direction it faces, in frame pixels, and keeps the whole machine inside the frame.
  * Arguments: direction ('down', 'up' or 'side'); P (a pose); d (dims()); opt { cx, gy (the pivot: default CX and GROUND) }.
- * Returns J { dir, gy, origin ([x, y]: the floor under its middle at rest), move ([dx, dy]: how far the pose has moved the whole machine), at(a, b, c) (a point of the sprung body, moved with the pose, as [x, y, z]), floor(a, b, c) (a point that stays with the tracks or the floor), hull, belly, treads ([left, right] or null), head (box views, as boxView of engine/groundbot.js returns them), legs ([{ i, side, near, hip, knee, foot, z }] or null), weapon, pack (what botWeapon and botPack measured, or null), box ([x0, y0, x1, y1]: everything it covers) }.
+ * Returns J { dir, gy, origin ([x, y]: the floor under its middle at rest), move ([dx, dy]: how far the pose has moved the whole machine), at(a, b, c) (a point of the sprung body, moved with the pose, as [x, y, z]), floor(a, b, c) (a point that stays with the tracks or the floor), hull, belly, treads ([left, right] or null), head (box views, as boxView of engine/groundbot.js returns them), deck ([a, b, c]: where the pack stands, in its own space), legs ([{ i, side, near, hip, knee, foot, z }] or null), weapon, pack (what botWeapon and botPack measured, or null), box ([x0, y0, x1, y1]: everything it covers) }.
  */
 export function solve(direction, P, d, opt = {}) {
   const dir = K.DIRECTIONS.includes(direction) ? direction : 'down', cx = opt.cx ?? CX, gy = opt.gy ?? GROUND;
@@ -235,7 +240,8 @@ export function solve(direction, P, d, opt = {}) {
     const box = [Infinity, Infinity, -Infinity, -Infinity];
     const add = (x0, y0, x1, y1) => { box[0] = Math.min(box[0], x0); box[1] = Math.min(box[1], y0); box[2] = Math.max(box[2], x1); box[3] = Math.max(box[3], y1); };
     const view = (V) => { add(V.x0, V.top, V.x1, V.bottom); return V; };
-    J.hull = view(boxView(at, { c: d.rise, len: d.len, wide: d.wide, tall: d.tall }));
+    const sag = R(2 * clamp(P.sag ?? 0)), deck = d.rise + d.tall - sag;
+    J.hull = view(boxView(at, { c: d.rise, len: d.len + sag, wide: d.wide, tall: d.tall - sag }));
     if (treads) {
       J.treads = [-1, 1].map((sgn) => view(boxView(floor, { b: sgn * d.tread.b, len: d.tread.len, wide: d.tread.wide, tall: d.tread.tall })));
       J.belly = view(boxView(floor, { c: 1, len: d.len - 4, wide: d.wide - 2, tall: d.rise }));
@@ -252,10 +258,11 @@ export function solve(direction, P, d, opt = {}) {
     }
     const h = P.head ?? [0, 0, 0];
     const nod = R(2 * clamp(P.nod ?? 0));
-    J.head = boxView(at, { a: d.head.a + h[0], b: h[1], c: d.rise + d.tall + h[2], len: d.head.len + nod, wide: d.head.wide, tall: Math.max(2, d.head.tall - nod) });
+    J.head = boxView(at, { a: d.head.a + h[0], b: h[1], c: deck + h[2], len: d.head.len + nod, wide: d.head.wide, tall: Math.max(2, d.head.tall - nod) });
     add(J.head.x0 - 1, J.head.top - 5, J.head.x1 + 1, J.head.bottom);
     if (d.weapon.kind !== 'none') { J.weapon = botWeapon(null, d.weapon.kind, at, weaponOf(dir, P, d)); add(...J.weapon.box); }
-    if (d.pack.kind !== 'none') { J.pack = botPack(null, d.pack.kind, at, { mount: d.pack.mount, size: d.pack.size }); add(...J.pack.box); }
+    J.deck = [d.pack.mount[0], d.pack.mount[1], deck];
+    if (d.pack.kind !== 'none') { J.pack = botPack(null, d.pack.kind, at, { mount: J.deck, size: d.pack.size }); add(...J.pack.box); }
     J.box = box;
     return J;
   };
@@ -263,7 +270,8 @@ export function solve(direction, P, d, opt = {}) {
   const rest = build(0, [0, 0]).box, W = opt.width ?? SIZE[0], H = opt.height ?? SIZE[1];
   const room = dir === 'down' ? H - MARGIN - rest[3] : dir === 'up' ? rest[1] - MARGIN : W - MARGIN - rest[2];
   const x = P.x ?? 0, reach = Math.max(P.reach ?? 0, x, 1e-6);
-  const travel = x > 0 ? x * Math.min(1, Math.max(0, room) / reach) : x;
+  // with little room ahead it goes less far forward and, to make up for it, draws back further before it goes
+  const fit = P.reach > 0 ? Math.min(1, Math.max(0, room) / reach) : 1, travel = x > 0 ? x * fit : x * (2 - fit);
   let J = build(travel, [0, 0]);
   // and whatever a pose or a part still pushes past the border moves the whole machine back inside it
   const dx = J.box[0] < MARGIN ? MARGIN - J.box[0] : J.box[2] > W - MARGIN ? W - MARGIN - J.box[2] : 0;
@@ -302,9 +310,9 @@ function drawHull(g, J, P, d, C) {
   g.fill(V.x0, y0, V.x1, y0 + bh, band, C.K.base, { shade: 0 });
   g.fill(V.x0, y0, V.x1, y0 + bh, stripesIn(band, { pitch: 4, slant: 1, duty: 0.5, phase: V.x0 + V.face }), C.accent.base, { shade: 0 });
   const level = P.lamps ?? 1, lens = level >= 1.5 ? C.light[1] : level >= 0.75 ? C.light[3] : level >= 0.25 ? C.light[4] : C.K.dark;
-  J.lamps = (J.dir === 'side' ? [V.x0 + 2] : [V.x0 + 2, V.x1 - 2 - lw]).map((x) => ({ x, y: y0, w: lw, h: bh }));
+  J.lamps = (J.dir === 'side' ? [V.x0 + 1] : [V.x0 + 2, V.x1 - 2 - lw]).map((x) => ({ x, y: y0, w: lw, h: bh }));
   for (const Lm of J.lamps) {
-    g.rect(Lm.x - 1, Lm.y, Lm.w + 2, Lm.h, C.K.base);
+    if (J.dir !== 'side') g.rect(Lm.x - 1, Lm.y, Lm.w + 2, Lm.h, C.K.base);
     g.rect(Lm.x, Lm.y, Lm.w, Lm.h, lens);
     if (level >= 0.75 && level < 1.5) g.dot(Lm.x + Lm.w - 1, Lm.y, C.light[2]);
   }
@@ -329,7 +337,8 @@ function drawLeg(g, Lg, d, C, far) {
 export function draw(g, J, P, d, look = {}) {
   const C = paints(look), dir = J.dir, low = [];
   if (J.belly) low.push([J.belly.z - 0.01, () => { const V = J.belly; g.rect(V.x0, V.top, V.x1 - V.x0, V.bottom - V.top, C.K.base); g.rect(V.x0, V.bottom - 1, V.x1 - V.x0, 1, C.K.dark); }]);
-  for (const V of J.treads ?? []) low.push([V.z, () => trackPod(g, V, { along: dir === 'side' ? 'across' : 'depth', phase: dir === 'up' ? -(P.tread ?? 0) : P.tread ?? 0, paint: C.K, wheel: C.metal, seam: C.seam })]);
+  // seen from the side, the far track is behind the hull: only the near one is painted
+  for (const V of (J.treads ?? []).slice(dir === 'side' ? 1 : 0)) low.push([V.z, () => trackPod(g, V, { along: dir === 'side' ? 'across' : 'depth', phase: dir === 'up' ? -(P.tread ?? 0) : P.tread ?? 0, paint: C.K, wheel: C.metal, seam: C.seam })]);
   for (const Lg of J.legs ?? []) low.push([Lg.z, () => drawLeg(g, Lg, d, C, dir === 'side' && !Lg.near)]);
   low.push([J.hull.z, () => drawHull(g, J, P, d, C)]);
   low.sort((p, q) => p[0] - q[0]).forEach(([, paint]) => paint());
@@ -341,7 +350,7 @@ export function draw(g, J, P, d, look = {}) {
   if (J.weapon) up.push([J.weapon.z, () => { J.tip = botWeapon(g, d.weapon.kind, J.at, weaponOf(dir, P, d, { body: C.body, metal: C.metal, dark: C.K, accent: C.accent, seam: C.seam })).tip; }]);
   if (J.pack) up.push([J.pack.z, () => {
     const lit = P.dead ? 0 : (P.lamps ?? 1) >= 2 ? 2 : (P.lamps ?? 1) < 0.75 ? 0.5 : R(P.spin ?? 0) % 4 === 3 ? 0.5 : 1;
-    const Pk = botPack(g, d.pack.kind, J.at, { mount: d.pack.mount, size: d.pack.size, level: lit, spin: P.spin ?? 0, hot: !!P.puff?.big, metal: C.metal, dark: C.K, colours: C.light, seam: C.seam });
+    const Pk = botPack(g, d.pack.kind, J.at, { mount: J.deck, size: d.pack.size, level: lit, spin: P.spin ?? 0, hot: !!P.puff?.big, metal: C.metal, dark: C.K, colours: C.light, seam: C.seam });
     J.vents = Pk.vents; J.siren = Pk.lamp && lit >= 2 ? Pk.lamp : null;
   }]);
   up.sort((p, q) => p[0] - q[0]).forEach(([, paint]) => paint());
@@ -349,17 +358,17 @@ export function draw(g, J, P, d, look = {}) {
 }
 
 /**
- * Adds the lights and loose effects of a guard robot; call it AFTER g.outline(): the flare of its lens, lamps and siren, the muzzle flash, the speed lines and the spark of a charge, exhaust smoke, and the sparks and smoke of a shutdown. Light is never inked. Nothing is drawn on the outermost two rows or columns.
+ * Adds the lights and loose effects of a guard robot; call it AFTER g.outline(). They are: the flare of its lens, lamps and siren, the muzzle flash, the speed lines and the spark of a charge, exhaust smoke, and the sparks and smoke of a shutdown. Light is never inked. Nothing is drawn on the outermost two rows or columns.
  * Arguments: g; J (what draw() returned); P (the pose); d (dims()); look { glow, core (as draw()), fire (sparks and the spark of the hit: default amber), smoke (default the dark fittings' colour) }.
  */
 export function lights(g, J, P, d, look = {}) {
   const C = paints(look), L = C.light, box = [MARGIN, MARGIN, g.w - MARGIN, g.h - MARGIN];
   const fire = steps(look.fire ?? '#f2a030', { core: look.core ?? '#f0ead8' });
-  const grey = look.smoke ?? look.dark ?? '#434d6d', fumes = [tone(grey, 2), tone(grey, 1.2), tone(grey, 0.4)];
+  const grey = look.smoke ?? look.dark ?? '#434d6d', fumes = [tone(grey, 1.5), tone(grey, 0.9), tone(grey, 0.3)];
   const F = FORWARD[J.dir], V = J.hull, mid = [(V.x0 + V.x1) / 2, (V.top + V.bottom) / 2];
   // exhaust: a thin thread of smoke while the engine runs, a burst when it works hard
   if (P.puff && J.vents?.length && !P.dead) for (const [i, [vx, vy]] of J.vents.entries()) {
-    puffs(g, { t: P.puff.loop ? P.puff.t + i * 0.5 : P.puff.t, x: vx, y: vy, count: 2, seed: 11 + i, loop: !!P.puff.loop, angle: PI, arc: 0.5, dist: P.puff.big ? 5 : 3, rise: 2, size: P.puff.big ? 2.4 : 1.5, shape: 'round', colours: fumes, box });
+    puffs(g, { t: P.puff.loop ? P.puff.t + i * 0.5 : P.puff.t, x: vx, y: vy, count: 2, seed: 11 + i, loop: !!P.puff.loop, angle: PI, arc: 0.5, dist: P.puff.big ? 5 : 3, rise: 2, size: P.puff.big ? 2.2 : 1.2, shape: 'round', colours: fumes, box });
   }
   if ((P.eye ?? 1) >= 2 && J.eye) twinkle(g, J.eye[0], J.eye[1], 1, L[2], { core: L[0], box });
   if ((P.lamps ?? 1) >= 2) for (const Lm of J.lamps ?? []) lamp(g, Lm.x, Lm.y, Lm.w, Lm.h, L[3], 2, { box });
@@ -380,18 +389,18 @@ export function lights(g, J, P, d, look = {}) {
   }
   // the shutdown: sparks from its joints, then smoke from the dead machine
   if (P.sparks >= 0 && P.sparks < 1) particles(g, { t: P.sparks, x: mid[0] + 3, y: V.face, count: 7, seed: 9, loop: false, stagger: 0.5, angle: PI, arc: 4, dist: 11, gravity: 8, size: 2.4, colours: fire, box: [box[0], box[1], box[2], J.gy] });
-  if (P.smoke >= 0) puffs(g, { t: clamp(0.1 + P.smoke * 0.7), x: mid[0] + 4, y: V.top - 1, count: 3, seed: 21, loop: false, stagger: 0.6, angle: PI, arc: 0.6, dist: 8, rise: 5, size: 2.6, shape: 'round', colours: [tone(grey, 2), tone(grey, 1.2), tone(grey, 0.4)], box });
+  if (P.smoke >= 0) puffs(g, { t: clamp(0.1 + P.smoke * 0.7), x: mid[0] + 4, y: V.top - 1, count: 3, seed: 21, loop: false, stagger: 0.6, angle: PI, arc: 0.6, dist: 8, rise: 5, size: 2.6, shape: 'round', colours: [tone(grey, 1.5), tone(grey, 0.3)], box });
   return g;
 }
 
 /**
- * Named attach points of a solved guard robot, { name: { x, y, angle } } in frame pixels: hand (the top of the weapon's housing, or the shoulder it would stand on), muzzle (the far end of the weapon; with no weapon, the front of the shoulder), head (its top), back (the rear deck, where the pack stands; angle: up), feet (the floor under it).
+ * Returns the named attach points of a solved guard robot, { name: { x, y, angle } } in frame pixels. They are: hand (the top of the weapon's housing, or the shoulder it would stand on), muzzle (the far end of the weapon; with no weapon, the front of the shoulder), head (its top), back (the rear deck, where the pack stands; angle: up), feet (the floor under it).
  * Arguments: J (from solve() or draw()); P (the pose); d (dims()). hand and muzzle point the way the machine faces.
  */
 export function sockets(J, P, d) {
   const face = FACE_ANGLE[J.dir], [ma, mb, mc] = d.weapon.mount;
   const hand = J.weapon ? J.weapon.hand : J.at(ma, mb, mc + 4), tip = J.weapon ? J.weapon.tip : J.at(ma + 3, mb, mc + 2.5);
-  const back = J.at(...d.pack.mount);
+  const back = J.at(...J.deck);
   return {
     hand: { x: hand[0], y: hand[1], angle: face },
     muzzle: { x: tip[0], y: tip[1], angle: face },
