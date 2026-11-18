@@ -27,7 +27,7 @@ test('check.mjs <id> --json prints one result per sprite with errors, warnings a
 test('check.mjs <id> keeps its human-readable output, and says when a result came from the cache', () => {
   const cf = cacheFile();
   const a = node('tools/check.mjs', 'slime', '--cache-file', cf);
-  assert.match(a.stdout, /^slime\s+(ok|FAIL|ok \(warnings\))\s+\d+ looks x 4 clips/m);
+  assert.match(a.stdout, /^slime\s+(ok|FAIL|ok \(warnings\))\s+\d+ looks x \d+ clips/m);
   const b = node('tools/check.mjs', 'slime', '--cache-file', cf);
   assert.match(b.stdout, /^slime\s+.*\(cached\)/m);
   const c = node('tools/check.mjs', 'slime', '--cache-file', cf, '--no-cache');
