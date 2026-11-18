@@ -285,9 +285,9 @@ Three levels, from `sprite-styles.md`: (1) the same drawing with a different fin
 
 ## Contract 13: rigs are separate from sprite definitions
 
-Decision from Keyang, 2026-11-18 18:51: "we will need to separate rigs from sprites definition". It followed the question of whether a person could change a sprite's raw definition data (add a part, add an animation) and have the sprite redrawn. Status: **decided; the reading below is a proposal and nothing is built**. Not a priority for the three bundles.
+Decision from Keyang, 2026-11-18 18:51: "we will need to separate rigs from sprites definition". It followed the question of whether a person could change a sprite's raw definition data (add a part, add an animation) and have the sprite redrawn. Status: **decided, and the reading below was confirmed by Keyang the same day; nothing is built**. Not a priority for the three bundles.
 
-The reading (written by the session that took the decision, not yet confirmed by Keyang):
+The reading (confirmed by Keyang, 2026-11-18):
 
 | Thing | What it is | Holds |
 |---|---|---|
@@ -325,7 +325,7 @@ Open, for Keyang:
 
 | Id | Question |
 |---|---|
-| R1 | Is the reading above what was meant? |
+| R1 | ~~Is the reading above what was meant?~~ Yes (Keyang, 2026-11-18) |
 | R2 | Is a definition a JSON file, or a data object in a `.js` file as today? |
 | R3 | Are the 14 rig sprites converted, or only new ones written this way? |
 | R4 | New animations as key poses in data (a list of joint settings the engine blends between): in scope, or later? |
