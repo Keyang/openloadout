@@ -105,7 +105,7 @@ export function dims(p = {}, opt = {}) {
     s, chest, waist: R(lerp(10, 13, bulk) * s), chestH: R(lerp(16, 18, bulk) * s), lid: R(5 * s), coreR: R(lerp(5, 6, bulk) * s),
     pelvisW: R(lerp(10, 12, bulk) * s), pelvisH: R(8 * s), hipX: R(lerp(9, 11, bulk) * s), stance: R(lerp(14, 17, bulk) * s),
     thigh: R(lerp(8, 12, legs) * s), shin: R(lerp(10, 16, legs) * s), foot: R(7 * s),
-    thighW: R(lerp(8, 10, bulk) * s), shinW, footW: shinW + 2, kneeR: Math.max(3, R(3.4 * s)),
+    thighW: even(lerp(8, 10, bulk) * s), shinW, footW: shinW + 2, kneeR: Math.max(3, R(3.4 * s)),
     shoulderW, shoulderH: R(13 * s), shoulderX, armX: shoulderX + 2, upper: R(6 * s),
     headW: even(14 * s), headH: R(12 * s), head,
     weapon: { kind: wk, length: R(WEAPON_LENGTH[wk] * (opt.weapon?.length ?? 1) * s), k: lerp(0.9, 1.15, bulk) * s, half: R((wk === 'claws' ? 10.5 : 5) * lerp(0.9, 1.15, bulk) * s) + 1 },
@@ -123,7 +123,7 @@ export function dims(p = {}, opt = {}) {
 /**
  * Returns the pose of a walking war machine at phase t (0..1) of an action, in the machine's own terms; solve(), draw(), lights() and sockets() take it.
  * Arguments: action (one of POSES); t; m { bounce: 0..1, how heavily it moves }; d (dims()).
- * The pose: bx, by (the body moved sideways and down, px), roll (px the picture's right shoulder hangs lower than the left), shrug (px both shoulders are raised), slump (px it has sagged forward), head ([dx, dy]), eye (0 off, 0.5 dim, 1 lit, 2 flaring), scan (-1..1: where the eye looks), core (the reactor: 0 dark .. 2 white hot), open (0..1: the reactor's shutters), burnt (true: the reactor has blown), feet ([left, right]: px each foot is off the floor), kneel (0..1: down on both knees), arms ([left, right], each { out, up }: px its weapon is swung outward and raised), work (a whole number that turns drills and works claws), hatch (0..1: the launchers open), fired (missiles gone), rockets ([{ i, age }]: the ones in the air and how many frames ago each left), kick (which launcher fired this frame: 0 left, 1 right, else -1), charge (0..1 while the reactor charges, else -1), beam (null, or { sweep: -1..1, power: 0..1 }), steam (0..1 while it vents, else -1), stomp ([left, right]: 0..1 since that foot came down, else -1), blasts ([{ at, age, big }]: the explosions on it), scrap (0..1 while armour flies from the last blast, else -1), smoke (0..1 while the wreck smokes, else -1), flash (tint this frame white).
+ * The pose: bx, by (the body moved sideways and down, px), roll (px the picture's right shoulder hangs lower than the left), shrug (px both shoulders are raised), slump (px it has sagged forward), head ([dx, dy]), eye (0 off, 0.5 dim, 1 lit, 2 flaring), scan (-1..1: where the eye looks), core (the reactor: 0 dark .. 2 white hot), open (0..1: the reactor's shutters), burnt (true: the reactor has blown), vent (which of the chest vents glow with heat: 0 none, 1 the lower pair, 2 the upper pair, 3 both), feet ([left, right]: px each foot is off the floor), kneel (0..1: down on both knees), arms ([left, right], each { out, up }: px its weapon is swung outward and raised), work (a whole number that turns drills and works claws), hatch (0..1: the launchers open), fired (missiles gone), rockets ([{ i, age }]: the ones in the air and how many frames ago each left), kick (which launcher fired this frame: 0 left, 1 right, else -1), charge (0..1 while the reactor charges, else -1), beam (null, or { sweep: -1..1, power: 0..1 }), steam (0..1 while it vents, else -1), stomp ([left, right]: 0..1 since that foot came down, else -1), blasts ([{ at, age, big }]: the explosions on it), scrap (0..1 while armour flies from the last blast, else -1), smoke (0..1 while the wreck smokes, else -1), flash (tint this frame white).
  */
 export function pose(action, t, m = {}, d = dims()) {
   if (!POSES.includes(action)) throw new Error(`mech-walker rig: no pose "${action}" (${POSES.join(', ')})`);
@@ -131,18 +131,20 @@ export function pose(action, t, m = {}, d = dims()) {
   const P = {
     bx: 0, by: 0, roll: 0, shrug: 0, slump: 0, head: [0, 0], eye: 1, scan: 0, core: 1, open: 0,
     feet: [0, 0], kneel: 0, arms: [{ out: 0, up: 0 }, { out: 0, up: 0 }], work: 0,
-    hatch: 0, fired: 0, rockets: [], kick: -1, charge: -1, beam: null, steam: -1, stomp: [-1, -1], blasts: [], scrap: -1, smoke: -1, burnt: false, flash: false,
+    vent: 0, hatch: 0, fired: 0, rockets: [], kick: -1, charge: -1, beam: null, steam: -1, stomp: [-1, -1], blasts: [], scrap: -1, smoke: -1, burnt: false, flash: false,
   };
   const k2 = (ks) => keys(t, ks);
   if (action === 'idle') {
-    // it breathes: the chest lifts, the shoulders follow a beat later; the reactor swells and sinks; one blink
-    const u = fract(t);
-    P.by = -lerp(0.7, 1.9, bounce) * pulse(u);
-    P.shrug = 0.9 * pulse(u, -0.16);
-    P.core = 1 + 0.55 * pulse(u, -0.06);
-    P.eye = u >= 0.74 && u < 0.86 ? 0 : u >= 0.86 ? 0.5 : 1;
-    P.scan = wave(u, 0.1);
-    P.work = Math.floor(u * 8 + 1e-6);
+    // it breathes: the reactor swells, the chest lifts, the shoulders follow a beat later, heat runs through the vents, one blink.
+    // On eight frames something changes on every one, so the machine never looks switched off
+    const u = fract(t), f = Math.floor(u * 8 + 1e-6) % 8;
+    P.by = -lerp(0.7, 1.9, bounce) * [0, 0, 0.6, 1, 1, 0.9, 0.45, 0][f];
+    P.shrug = [0, 0, 0, 1, 1, 1, 1, 1][f];
+    P.core = [1, 1.4, 1.6, 1.8, 1.6, 1.4, 1.1, 1][f];
+    P.vent = [0, 1, 3, 3, 2, 0, 0, 0][f];
+    P.eye = [1, 1, 1, 1, 1, 1, 0, 0.5][f];
+    P.scan = wave(u);
+    P.work = f;
   } else if (action === 'walk') {
     // it stomps on the spot: the left foot comes down at t = 0, the right at t = 0.5, and the body drops onto each
     const u = fract(t), lift = lerp(4, 8, bounce) * s, drop = lerp(1.6, 3.4, bounce);
@@ -169,7 +171,7 @@ export function pose(action, t, m = {}, d = dims()) {
     P.core = n >= 1 && n <= 8 ? 1.5 : 1;
     const out = k2([[0, 0], [f(3), 2], [f(8), 2], [f(10), 0], [1, 0]]);
     P.arms = [{ out, up: 0 }, { out, up: 0 }];
-    P.fired = clamp(n - FIRST + 1, 0, VOLLEY);
+    P.fired = n >= 10 ? 0 : clamp(n - FIRST + 1, 0, VOLLEY);                   // by frame 10 the tubes are loaded again
     if (n >= FIRST && n < FIRST + VOLLEY) { P.kick = (n - FIRST) % 2; P.roll = P.kick ? 1.6 : -1.6; }
     for (let i = 0; i < VOLLEY; i++) { const age = n - FIRST - i; if (age >= 0 && age <= 3 && n < 11) P.rockets.push({ i, age }); }
   } else if (action === 'beam') {
@@ -200,8 +202,9 @@ export function pose(action, t, m = {}, d = dims()) {
     P.open = k2([[0, 0], [f(1), 0.3], [f(2), 0.7], [f(3), 1], [f(6), 1], [f(7), 0.5], [f(8), 0], [1, 0]]);
     P.core = n === 0 ? 2 : n >= 9 ? 1 : n >= 2 && n <= 7 ? (n % 2 ? 2 : 1.5) : 1.5;
     P.eye = n >= 2 && n <= 7 ? 0.5 : 1;
-    P.arms = [0, 1].map(() => ({ out: -1 * down, up: -3 * down }));
+    P.arms = [0, 1].map(() => ({ out: 0 - down, up: 0 - 3 * down }));
     P.steam = n >= 1 && n <= 8 ? (n - 1) / 7 : -1;
+    P.vent = n >= 2 && n <= 7 ? 3 : 0;
   } else if (action === 'hurt') {
     // frames of 4: 0 knocked back, white; 1 it dips; 2 nearly back; 3 idle
     const n = R(t * 3);
@@ -251,8 +254,7 @@ export function solve(P, d, opt = {}) {
   const cx = cx0 + R(P.bx ?? 0);
   const standHip = G - d.foot - d.shin - d.thigh, kneelHip = G - d.kneeR - 1 - R(d.thigh * 0.8);
   // the hips never sink below what bent knees allow
-  const hipY = Math.min(R(lerp(standHip, kneelHip, kneel) + Math.max(0, by) * (1 - kneel) + Math.min(0, by) * 0.5), kneelHip);
-  const bodyY = hipY - standHip + (by < 0 ? R(by * 0.5) : 0);            // how far the torso has moved from where it stands at rest
+  const hipY = Math.min(R(lerp(standHip, kneelHip, kneel) + by * (by > 0 ? 1 - kneel : 1)), kneelHip);
   const legs = [-1, 1].map((sgn, i) => {
     const lift = (P.feet?.[i] ?? 0) * (1 - kneel), bend = Math.max(0, hipY - standHip) * (1 - kneel);
     const fx = cx0 + sgn * d.stance;
@@ -279,7 +281,7 @@ export function solve(P, d, opt = {}) {
   });
   const head = [cx + R(P.head?.[0] ?? 0), face + 2 + R(P.head?.[1] ?? 0) + R(slump * 0.7)];
   const back = [cx, top + 1 - R((P.shrug ?? 0) * 0.5) + R(slump * 0.3)];
-  const J = { cx, gy: G, hipY, kneel, bodyY, legs, pelvis, chest, core, shoulders, arms, head, back };
+  const J = { cx, gy: G, hipY, kneel, legs, pelvis, chest, core, shoulders, arms, head, back };
   J.pods = podsOf(J, d);
   J.launchers = launchersOf(J, d);
   return J;
@@ -331,7 +333,7 @@ function drawLeg(g, L, J, d, C) {
   const { sgn, hip, knee, ankle, sole } = L, kneeling = J.kneel > 0.5;
   const shin = () => {
     const ht = d.shinW - 1, hb = d.shinW, y0 = knee[1], y1 = Math.max(y0 + 2, ankle[1] + 1);
-    const plate = polyIn([[knee[0] - ht, y0], [knee[0] + ht, y0], [ankle[0] + hb, y1], [ankle[0] - hb, y1]]);
+    const e = 0.01, plate = polyIn([[knee[0] - ht + e, y0], [knee[0] + ht - e, y0], [ankle[0] + hb - e, y1], [ankle[0] - hb + e, y1]]);      // a hair narrower, so both legs come out alike
     g.fill(Math.min(knee[0], ankle[0]) - hb, y0, Math.max(knee[0], ankle[0]) + hb, y1, plate, C.body, { shade: 1, light: 1 });
     if (y1 - y0 >= 7) g.rect(R((knee[0] + ankle[0]) / 2) - 1, y0 + 4, 2, y1 - y0 - 6, C.body.dark, { clip: plate });      // the groove down the greave
   };
@@ -385,7 +387,7 @@ export function draw(g, P, d, look = {}, opt = {}) {
   armourBlock(g, { x0: px - d.pelvisW, x1: px + d.pelvisW, top: pTop, face: pTop + 1, bottom: pTop + ph, inset: 1, cut: [3, 3], paint: C.dark, lit: C.K.light, shade: 0, seam: C.seam });
   for (const sgn of [-1, 1]) g.rect(px + sgn * (d.pelvisW - 3) - 1, pTop + R(ph / 2) - 1, 2, 2, C.metal.base);          // the pin of each hip
   const pw = Math.max(3, R(d.pelvisW * 0.42));
-  g.poly([[px - pw, pTop + 1], [px + pw, pTop + 1], [px + pw, pTop + ph - 1], [px, Math.min(pTop + ph + 3, J.gy - 1)], [px - pw, pTop + ph - 1]], C.body, { shade: 1 });
+  g.poly([[px - pw, pTop + 1], [px + pw, pTop + 1], [px + pw, pTop + ph - 1], [px, Math.min(pTop + ph + 3, J.gy - 1) - 0.01], [px - pw, pTop + ph - 1]], C.body, { shade: 1 });
   // the chest: wide at the shoulders, cut in to the waist, with a lit top
   const Ch = J.chest;
   const B = armourBlock(g, { x0: Ch.x0, x1: Ch.x1, top: Ch.top, face: Ch.face, bottom: Ch.bottom, inset: 2, foot: [cx - d.waist, cx + d.waist], waist: Ch.waistY, paint: C.body, shade: 2, seam: C.seam });
@@ -393,7 +395,7 @@ export function draw(g, P, d, look = {}, opt = {}) {
   // plate lines: one across each side at the height of the reactor, and vents under them
   for (const sgn of [-1, 1]) {
     g.fill(Ch.x0, ky, Ch.x1, ky + 1, (qx, qy) => B.front(qx, qy) && Math.floor(qy) === ky && (qx - cx) * sgn > d.coreR + 3, C.body.dark, { shade: 0 });
-    for (let i = 0; i < 2; i++) { const vy = ky + 3 + i * 2, vx = cx + sgn * (d.coreR + 4); g.fill(Ch.x0, vy, Ch.x1, vy + 1, (qx, qy) => B.front(qx, qy) && B.front(qx + sgn * 2, qy) && Math.floor(qy) === vy && (qx - vx) * sgn >= 0 && (qx - vx) * sgn < 4, C.K.base, { shade: 0 }); }
+    for (let i = 0; i < 2; i++) { const vy = ky + 3 + i * 2, vx = cx + sgn * (d.coreR + 4), hot = ((P.vent ?? 0) >> (1 - i)) & 1; g.fill(Ch.x0, vy, Ch.x1, vy + 1, (qx, qy) => B.front(qx, qy) && B.front(qx + sgn * 2, qy) && Math.floor(qy) === vy && (qx - vx) * sgn >= 0 && (qx - vx) * sgn < 4, hot ? C.light[3] : C.K.base, { shade: 0 }); }
   }
   // the collar the head stands in
   g.rect(cx - d.headW / 2 - 1, Ch.face - 2, d.headW + 2, 3, C.K.base, { shade: 0 });

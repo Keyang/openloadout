@@ -42,7 +42,7 @@ const within = (v, lo, hi) => (hi < lo ? (lo + hi) / 2 : v < lo ? lo : v > hi ? 
 export const SPARK_STYLES = Object.freeze(['plus', 'diamond', 'dot']);
 
 /**
- * Draws one small mark of light at (x, y) in a named style, `reach` pixels from its middle to its tips: its arms or edge in the edge colour, its middle in the core colour.
+ * Draws one small mark of light at (x, y) in a named style, `reach` pixels from its middle to its tips: its arms or edge in the edge colour, its middle in the core colour, and from reach 2 its tips in the rim colour.
  * Arguments: g (the Surface); x, y (the middle); reach (0 one pixel, 1 to 4 bigger: a plus is 2 * reach + 1 across, a diamond the same, a dot reach + 1); style (one of SPARK_STYLES); colours (a steps list, hottest first with the rim last, or one colour for the arms); options { core (the colour of the middle; default the first of the list, or white), box }.
  */
 export function sparkMark(g, x, y, reach, style, colours, { core, box } = {}) {
@@ -51,6 +51,7 @@ export function sparkMark(g, x, y, reach, style, colours, { core, box } = {}) {
   const list = Array.isArray(colours) ? colours : null;
   const arm = list ? list.at(-2) ?? list[0] : colours;
   const mid = core ?? (list ? list[0] : '#ffffff');
+  const tip = list && list.length >= 3 ? list.at(-1) : arm;      // the tips of a bigger mark cool to the rim colour, so it also shows on a pale background
   const r = Math.max(0, Math.min(4, Math.round(reach)));
   x = Math.floor(x); y = Math.floor(y);
   if (r === 0) return put(g, B, x, y, arm);
@@ -60,6 +61,7 @@ export function sparkMark(g, x, y, reach, style, colours, { core, box } = {}) {
     for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) {
       const corner = (i === 0 || i === n - 1) && (j === 0 || j === n - 1);
       if (n >= 4 && corner) continue;
+      if (n >= 3 && (i === 0 || j === n - 1) && !(i === n - 1 || j === 0)) { put(g, B, x0 + i, y0 + j, tip); continue; }   // its shaded side, bottom left
       const lit = n === 2 ? i === 1 && j === 0 : n === 3 ? i >= 1 && j <= 1 : i >= 1 && i <= n - 2 && j >= 1 && j <= n - 2;
       put(g, B, x0 + i, y0 + j, lit ? mid : arm);
     }
@@ -68,13 +70,13 @@ export function sparkMark(g, x, y, reach, style, colours, { core, box } = {}) {
   if (style === 'diamond') {
     for (let j = -r; j <= r; j++) for (let i = -r; i <= r; i++) {
       const d = Math.abs(i) + Math.abs(j);
-      if (d <= r) put(g, B, x + i, y + j, d === r ? arm : mid);
+      if (d <= r) put(g, B, x + i, y + j, d < r ? mid : r >= 2 && (i === 0 || j === 0) ? tip : arm);
     }
     return;
   }
   // plus: four arms, a bright middle, and from reach 3 a small square body so it reads as a star
   for (let i = 1; i <= r; i++) {
-    const c = r >= 3 && i <= r - 2 ? mid : arm;
+    const c = r >= 3 && i <= r - 2 ? mid : r >= 2 && i === r ? tip : arm;
     put(g, B, x - i, y, c); put(g, B, x + i, y, c); put(g, B, x, y - i, c); put(g, B, x, y + i, c);
   }
   if (r >= 3) for (const [i, j] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) put(g, B, x + i, y + j, arm);

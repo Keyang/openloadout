@@ -2,7 +2,8 @@
 // credit chip, health cell, shield cell, keycard). A flat badge turned about its upright axis with a
 // raised rim (a chip, a token, a medal), a circuit mark to put on it, containers of glowing charge
 // (a power cell, a syringe, a med pack) with the charge itself, a hexagon lying on a flat side, a
-// chevron, a lean that keeps edges hard, and the short run of a shape's edge that a travelling light is made of.
+// chevron, a lean that keeps edges hard, the short run of a shape's edge that a travelling light is made of,
+// and two small solids: a crystal standing on a point and a cube seen from a corner.
 // Everything draws through the Surface's own calls (fill, line, dot), so it suits every style.
 // Pure functions: Node and browser, no Math.random.
 //
@@ -22,7 +23,7 @@
 import { ramp, tone, mix } from './color.js';
 import { clamp, TAU } from './motion.js';
 import { rectIn } from './surface.js';
-import { placedIn, insetIn, turnedIn, anyIn } from './shapes.js';
+import { placedIn, insetIn, turnedIn, anyIn, hexIn } from './shapes.js';
 import { roundRectIn } from './ui.js';
 
 // ---- shapes -------------------------------------------------------------------
@@ -206,5 +207,30 @@ export function meridianIn(cx, cy, rx, ry, turn = 0, thick = 2) {
     if (Math.abs(dx - k * rx * Math.sqrt(1 - yy * yy)) < half) return true;          // where the band runs up and down
     const u = reach > 1e-6 ? (dx * Math.sign(k)) / reach : -1;                         // where it runs across, near the poles
     return u >= 0 && u <= 1 && Math.abs(Math.abs(py - cy) - ry * Math.sqrt(1 - u * u)) < half;
+  };
+}
+
+// ---- two small solids: a crystal and a cube ------------------------------------------------
+
+/**
+ * Shape test for a crystal standing on a point: a point at each end, edges that slope one pixel across for one down, and upright flanks between them (a shard of experience, a mana crystal, a data spike). Its pixels come out exactly symmetrical.
+ * Arguments: cx, cy (centre: a whole number for an even size that way, ending in .5 for an odd one); w (width between the flanks, an even number of pixels on a whole-number cx); h (height from point to point; at least w, or it is a plain diamond).
+ */
+export function crystalIn(cx, cy, w, h) {
+  const a = w / 2, b = Math.max(h / 2, a);
+  return (px, py) => { const x = Math.abs(px - cx), y = Math.abs(py - cy); return x < a && x + y < b + 0.25; };
+}
+
+/**
+ * A cube seen from one corner, w wide and w tall, as three faces: returns { body, top, right, left, topY } (shape tests for the whole cube, its top face, a diamond, and the two sides under it; topY is the row the middle of the top face is on). Paint the left side in the base tone, the right side darker and the top lightest.
+ * Arguments: cx, cy (centre: whole numbers); w (width and height in pixels, an even number, 6 or more).
+ */
+export function cubeIn(cx, cy, w) {
+  const a = w / 2, r = w / 4, topY = cy - a + r, body = hexIn(cx, cy, w, w);
+  const top = (px, py) => body(px, py) && Math.abs(px - cx) / a + Math.abs(py - topY) / r <= 1.05;
+  return {
+    body, top, topY,
+    right: (px, py) => px > cx && body(px, py) && !top(px, py),
+    left: (px, py) => px < cx && body(px, py) && !top(px, py),
   };
 }

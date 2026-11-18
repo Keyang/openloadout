@@ -8,6 +8,10 @@
 //   engine/shapes.js  allIn, notIn                    what shape tests share; a shape test turned inside out
 //                     reachOf                         how near to a point and how far from it a shape comes
 //   engine/marks.js   SIGN_MARKS (question)           a question mark, the partner of `exclaim`
+// and, in fix round 2:
+//   engine/shapes.js  grownIn                         a shape test grown by whole pixels, corners included
+//                     strokeIn                        a straight bar with equal pixel steps and the same thickness in every column or row
+//                     cornerIn                        two such bars meeting at a tip: an L or a V that stays clean at any turn
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { Surface, rectIn } from '../../engine/surface.js';
@@ -582,4 +586,138 @@ test('S20 crosshair, fix round 1: neighbouring brackets and arrow heads never cl
     const heads = Array.from({ length: 8 }, (_, f) => { const g = drawS(crossS, 'reload', over, f); let sx = 0, sy = 0, n = 0; for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) if (g.get(x, y) === body) { sx += x - 15.5; sy += y - 15.5; n++; } return Math.atan2(sy / n, sx / n); });
     for (let f = 0; f < 8; f++) { const step = (((heads[(f + 1) % 8] - heads[f]) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI); assert.ok(Math.abs(step - Math.PI / 4) < 0.2, `${tag}: the head steps an eighth of a turn clockwise each frame (${step.toFixed(2)})`); }
   }
+});
+
+// ---- fix round 2 ---------------------------------------------------------------
+
+const { grownIn, strokeIn, cornerIn } = await import('../../engine/shapes.js');
+const { inEffect } = await import('../../engine/sprite.js');
+// the pixels a shape test covers in a 32x32 frame whose centre is (16, 16), as 'x,y' counted from that centre
+const cells = (test, half = 16) => { const out = new Set(); for (let y = -half; y < half; y++) for (let x = -half; x < half; x++) if (test(x + 0.5, y + 0.5)) out.add(`${x},${y}`); return out; };
+const perColumn = (set) => { const n = new Map(); for (const k of set) { const x = +k.split(',')[0]; n.set(x, (n.get(x) || 0) + 1); } return n; };
+const perRow = (set) => { const n = new Map(); for (const k of set) { const y = +k.split(',')[1]; n.set(y, (n.get(y) || 0) + 1); } return n; };
+
+test('S20 grownIn: a shape with a margin of whole pixels round it, corners included', () => {
+  const dot = rectIn(0, 0, 1, 1);
+  assert.equal(cells(grownIn(dot)).size, 9);
+  assert.ok(cells(grownIn(dot)).has('-1,-1') && cells(grownIn(dot)).has('1,1'), 'the corners too');
+  assert.equal(cells(grownIn(dot, 2)).size, 25);
+  assert.deepEqual([...cells(grownIn(dot, 0))], ['0,0'], 'grown by nothing it is the shape');
+  const bar = rectIn(-3, 2, 6, 2), grown = cells(grownIn(bar, 1));
+  assert.equal(grown.size, 8 * 4);
+  for (const k of cells(bar)) assert.ok(grown.has(k));
+});
+
+test('S20 strokeIn: equal steps that start full, and the same number of pixels in every column or row', () => {
+  // level: a plain bar
+  assert.deepEqual([...cells(strokeIn(2, 3, 5, 0, 2))].sort(), [...cells(rectIn(2, 3, 5, 2))].sort());
+  assert.deepEqual([...cells(strokeIn(2, 3, -5, 0, 2, -1))].sort(), [...cells(rectIn(-2, 2, 5, 2))].sort(), 'running left, thickened upward');
+  // one up for two along: runs of two from the first pixel, two pixels in every column
+  const slant = cells(strokeIn(0, 0, 6, -3, 2));
+  assert.deepEqual([...slant].sort(), ['0,0', '0,1', '1,0', '1,1', '2,-1', '2,0', '3,-1', '3,0', '4,-2', '4,-1', '5,-2', '5,-1'].sort());
+  for (const [, n] of perColumn(slant)) assert.equal(n, 2);
+  // steep: one pixel per row, thickened sideways
+  const steep = cells(strokeIn(0, 0, -2, 6, 3, -1));
+  assert.equal(perRow(steep).size, 6);
+  for (const [, n] of perRow(steep)) assert.equal(n, 3);
+  assert.ok(steep.has('0,0') && steep.has('-2,0') && steep.has('-1,3') && steep.has('-3,3') && !steep.has('1,0'), 'it steps left once every three rows and grows to the left');
+  // one up for three along, written as an angle: the rounding of the slope never breaks a run
+  const a = Math.atan(1 / 3), third = cells(strokeIn(0, 0, 9 * Math.cos(a), -9 * Math.sin(a), 1));
+  assert.deepEqual([...third].map((k) => +k.split(',')[1]).sort((p, q) => p - q), [-2, -2, -2, -1, -1, -1, 0, 0, 0]);
+  // a diagonal counts as level unless told otherwise; never fewer than one pixel
+  assert.deepEqual([...cells(strokeIn(0, 0, 3, 3, 2))].sort(), ['0,0', '0,1', '1,1', '1,2', '2,2', '2,3'].sort());
+  assert.deepEqual([...cells(strokeIn(0, 0, 3, 3, 2, 1, true))].sort(), ['0,0', '1,0', '1,1', '2,1', '2,2', '3,2'].sort());
+  assert.equal(cells(strokeIn(4, 4, 0.2, 0, 1)).size, 1);
+});
+
+test('S20 cornerIn: an L and a V from two clean bars, the same piece at any turn', () => {
+  // an upright L is the two rectangles
+  const L = cells(cornerIn(8.5, -8.5, -5, 0, 0, 5, 2));
+  assert.deepEqual([...L].sort(), [...cells((x, y) => rectIn(4, -9, 5, 2)(x, y) || rectIn(7, -9, 2, 5)(x, y))].sort());
+  // a V whose tip falls between two pixels mirrors exactly, with a tip two pixels wide
+  const V = cells(cornerIn(0, -4.5, 5, -5, -5, -5, Math.SQRT2));
+  for (const k of V) { const [x, y] = k.split(',').map(Number); assert.ok(V.has(`${-x - 1},${y}`), `${k} has its mirror`); }
+  assert.ok(V.has('0,-5') && V.has('-1,-5') && !V.has('0,-4'));
+  for (const [, n] of perColumn(V)) assert.equal(n, 2, 'two pixels in every column of a slanted arm');
+  assert.equal(perColumn(V).size, 10, 'five columns to each side');
+  // the same V on its side keeps its sharp tip: the arms are thickened along the middle line of the corner
+  const side = cells(cornerIn(4.5, 0, 5, -5, 5, 5, Math.SQRT2));
+  for (const k of side) { const [x, y] = k.split(',').map(Number); assert.ok(side.has(`${x},${-y - 1}`)); assert.ok(V.has(`${y},${-x - 1}`), 'it is the first V turned a quarter'); }
+  // turned an eighth, a V is an L with level and upright arms, thickness as asked
+  const c = Math.cos(Math.PI / 4), s = Math.sin(Math.PI / 4), turn = (x, y) => [x * c - y * s, x * s + y * c];
+  const eighth = cells(cornerIn(...turn(0, -4.5), ...turn(5, -5), ...turn(-5, -5), 2));
+  assert.deepEqual([...eighth].sort(), [...cells((x, y) => rectIn(3, -5, 7, 2)(x, y) || rectIn(3, -10, 2, 7)(x, y))].sort());
+  // turned by one for two, the arms step evenly: every column of the flatter arm and every row of the steeper one holds the same count
+  for (const thick of [2, 3]) for (const angle of [Math.atan(0.5), Math.atan(2), -Math.atan(0.5)]) {
+    const c2 = Math.cos(angle), s2 = Math.sin(angle), t2 = (x, y) => [x * c2 - y * s2, x * s2 + y * c2];
+    const [ax, ay] = t2(-24, 0), [bx, by] = t2(0, 24);
+    const flat = Math.abs(ax) > Math.abs(ay) ? [ax, ay] : [bx, by], steep = Math.abs(ax) > Math.abs(ay) ? [bx, by] : [ax, ay];
+    const piece = cells(cornerIn(...t2(4.5, -4.5), ax, ay, bx, by, thick), 40), tip = t2(4.5, -4.5).map(Math.floor);
+    assert.ok(piece.has(`${tip[0]},${tip[1]}`), 'the tip pixel is the one the tip falls in');
+    // away from the corner, in the columns and rows that only one arm passes through
+    const cols = [...perColumn(piece)].filter(([x]) => Math.abs(x - tip[0]) > thick + Math.abs(steep[0]) + 1 && Math.sign(x - tip[0]) === Math.sign(flat[0])).map(([, n]) => n);
+    const rows = [...perRow(piece)].filter(([y]) => Math.abs(y - tip[1]) > thick + Math.abs(flat[1]) + 1 && Math.sign(y - tip[1]) === Math.sign(steep[1])).map(([, n]) => n);
+    assert.ok(cols.length >= 3 && rows.length >= 3);
+    assert.ok(cols.every((n) => n === thick) && rows.every((n) => n === thick), `thick ${thick} at ${angle.toFixed(2)}: columns ${cols}, rows ${rows}`);
+  }
+  // a pixel count given outright is used at every slope
+  for (const [, n] of perColumn(cells(cornerIn(0, -4.5, 5, -5, -5, -5, 2, 4)))) assert.equal(n, 4);
+});
+
+test('S20 crosshair, fix round 2: spinning arrow heads keep their shape, brackets do not spin, and the hit ticks never touch the marks', () => {
+  const body = col(P.cream), white = col('#ffffff'), red = col(P.red);
+  const LOOKS4 = [{}, { size: 0, gap: 0, thickness: 0 }, { size: 1, gap: 1, thickness: 1 }];
+  for (const size of [0, 0.3, 0.6, 1]) for (const gap of [0, 0.35, 0.7, 1]) for (const thickness of [0, 1]) LOOKS4.push({ size, gap, thickness });
+  // the largest solid square that fits in a mark: 2 for a clean bar of 2 or 3 px, more for a lump
+  const lump = (g, mark) => { let t = 1; for (const k of mark.body) { const x = k % 32, y = (k / 32) | 0; for (let n = 2; n < 6; n++) { let ok = true; for (let dy = 0; dy < n && ok; dy++) for (let dx = 0; dx < n; dx++) if (g.get(x + dx, y + dy) !== body) { ok = false; break; } if (!ok) break; t = Math.max(t, n); } } return t; };
+  // the two farthest pixels of an arrow head are its wing tips: that distance over root two is the length of a wing
+  const wing = (mark) => { let far = 0; const px = [...mark.body]; for (const a of px) for (const b of px) far = Math.max(far, Math.hypot((a % 32) - (b % 32), ((a / 32) | 0) - ((b / 32) | 0))); return far / Math.SQRT2; };
+
+  // 1. brackets: Spin is not offered, and switching it on changes no pixel
+  assert.ok(inEffect(crossS, 'spin', cleanParams(crossS, { ...defaultParams(crossS), style: 'cross' })) && inEffect(crossS, 'spin', cleanParams(crossS, { ...defaultParams(crossS), style: 'chevrons' })));
+  assert.ok(!inEffect(crossS, 'spin', cleanParams(crossS, { ...defaultParams(crossS), style: 'brackets' })), 'Spin is not in effect for brackets');
+  for (const look of LOOKS4) for (const [clip, c] of Object.entries(crossS.clips)) for (let f = 0; f < c.frames; f++) assert.equal(diff(drawS(crossS, clip, { style: 'brackets', ...look, spin: true }, f), drawS(crossS, clip, { style: 'brackets', ...look }, f)), 0);
+
+  // 2. arrow heads, spinning: in every frame four pieces, each the V of frame 0: no lump, wings within 1 px of their length at rest, and every frame differs from the one before
+  for (const look of LOOKS4) {
+    const over = { style: 'chevrons', ...look, spin: true }, tag = JSON.stringify(over), frames = Array.from({ length: 8 }, (_, f) => drawS(crossS, 'idle', over, f));
+    const rest = groups(frames[0], (v) => v === body), lump0 = lump(frames[0], rest[0]), wing0 = wing(rest[0]);
+    assert.deepEqual(frames[0].data, drawS(crossS, 'idle', { ...over, spin: false }).data, 'frame 0 is the cursor at rest');
+    for (let f = 0; f < 8; f++) {
+      const g = frames[f], marks = groups(g, (v) => v === body);
+      assert.equal(marks.length, 4, `${tag} idle ${f}: four arrow heads`);
+      for (const m of marks) {
+        assert.ok(lump(g, m) <= lump0, `${tag} idle ${f}: a lump ${lump(g, m)} px square (at rest ${lump0})`);
+        assert.ok(Math.abs(wing(m) - wing0) <= 1, `${tag} idle ${f}: wings ${wing(m).toFixed(1)} px, at rest ${wing0.toFixed(1)}`);
+        assert.ok(m.body.size >= 0.75 * rest[0].body.size && m.body.size <= 1.3 * rest[0].body.size, `${tag} idle ${f}: ${m.body.size} px against ${rest[0].body.size}`);
+      }
+      for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) assert.equal(g.get(x, y), g.get(31 - x, 31 - y), `${tag} idle ${f}: the same turned half way round`);
+      assert.ok(diff(g, frames[(f + 1) % 8]) > 0, `${tag} idle ${f}: the next frame moves`);
+    }
+    // thin wings stay two pixels thick at every turn: no column and no row of a wing is a single pixel between two ink lines
+    if (!look.thickness) for (const f of [2, 4, 6]) {
+      const g = frames[f]; let hair = 0;
+      for (let y = 1; y < 31; y++) for (let x = 1; x < 31; x++) if (g.get(x, y) === body && g.get(x - 1, y) !== body && g.get(x + 1, y) !== body && g.get(x, y - 1) !== body && g.get(x, y + 1) !== body) hair++;
+      assert.equal(hair, 0, `${tag} idle ${f}: a pixel on its own`);
+    }
+  }
+
+  // 3. hit: in the three frames with ticks, no tick pixel touches a mark pixel, corners included, so ink or an empty pixel lies between; the ticks are there, and whole
+  for (const style of ['cross', 'circle', 'brackets', 'chevrons']) for (const look of LOOKS4) for (let f = 0; f < 3; f++) {
+    const over = { style, ...look }, tag = `${JSON.stringify(over)} hit ${f}`, g = drawS(crossS, 'hit', over, f), tick = f === 0 ? white : red;
+    let n = 0;
+    for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) {
+      if (g.get(x, y) !== tick || (x >= 15 && x <= 16 && y >= 15 && y <= 16)) continue;          // the dot in the middle is the accent colour too
+      n++;
+      for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) assert.notEqual(g.get(x + dx, y + dy), body, `${tag}: the tick at ${x},${y} touches a mark`);
+    }
+    assert.ok(n >= (f === 2 ? 16 : 36) && n % 4 === 0, `${tag}: ${n} tick pixels`);
+    assert.equal(lit(drawS(crossS, 'hit', over, 3)) > 0 && groups(g, (v) => v === body).length >= 1, true);
+    const b = g.bounds(); assert.ok(b.x0 >= 1 && b.y0 >= 1 && b.x1 <= 30 && b.y1 <= 30, `${tag}: ${JSON.stringify(b)}`);
+    // the marks are whole: the same pixels as in the last frame, where there are no ticks
+    const after = drawS(crossS, 'hit', over, 3);
+    for (let i = 0; i < g.data.length; i++) if (after.data[i] === body) assert.equal(g.data[i], body, `${tag}: a tick lies over a mark`);
+  }
+  assert.equal(count(drawS(crossS, 'hit', {}, 0), '#ffffff'), 60, 'the flash is white');
+  assert.equal(count(drawS(crossS, 'hit', {}, 0), P.red), 4, 'and only the dot is red in it');
 });

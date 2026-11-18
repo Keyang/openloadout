@@ -8,12 +8,13 @@
 //                      drawCharge                  the glowing fill of a window, to a level, brighter on a beat
 //                      haloIn                      the pixels just outside a thing's outline, beside its lit part
 //                      meridianIn                  a band from pole to pole over a ball that turns about its upright axis
+//                      crystalIn, cubeIn           a crystal standing on a point; a cube seen from a corner, as three faces
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { Surface, rectIn, ellipseIn } from '../../engine/surface.js';
 import { col, ramp } from '../../engine/color.js';
 import { hexIn, boundsOf } from '../../engine/shapes.js';
-import { flatHexIn, chevronIn, rimRunIn, leanedIn, drawToken, drawCircuit, CELL_SHAPES, cellIn, drawCharge, haloIn, meridianIn } from '../../engine/gadgets.js';
+import { flatHexIn, chevronIn, rimRunIn, leanedIn, drawToken, drawCircuit, CELL_SHAPES, cellIn, drawCharge, haloIn, meridianIn, crystalIn, cubeIn } from '../../engine/gadgets.js';
 
 const lit = (g) => g.data.reduce((n, v) => n + (v ? 1 : 0), 0);
 const count = (g, hex) => { const c = col(hex); return g.data.reduce((n, v) => n + (v === c ? 1 : 0), 0); };
@@ -224,4 +225,33 @@ test('meridianIn: a bar down the middle that crosses the ball to the right, once
     for (let y = 9; y < 23; y++) { let n = 0; for (let x = 0; x < 32; x++) if (band(x + 0.5, y + 0.5)) { n++; assert.ok(ball(x + 0.5, y + 0.5), 'on the ball'); } assert.ok(n >= 1, `turn ${turn}: row ${y} has band`); }
     for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) assert.equal(band(x + 0.5, y + 0.5), meridianIn(16, 16, 8, 8, turn + Math.PI)(x + 0.5, y + 0.5), 'half a turn on, the same picture');
   }
+});
+
+// ---- two small solids -------------------------------------------------------------------------
+
+test('crystalIn: a point at each end, upright flanks, exactly symmetrical', () => {
+  const c = crystalIn(8, 8, 6, 10);
+  assert.deepEqual(boundsOf(c, 16), { x0: 5, y0: 3, x1: 10, y1: 12 });
+  const row = (y) => { let n = 0; for (let x = 0; x < 16; x++) if (c(x + 0.5, y + 0.5)) n++; return n; };
+  assert.deepEqual([3, 4, 5, 6, 7].map(row), [2, 4, 6, 6, 6], 'it widens two pixels a row, then runs straight');
+  for (let y = 0; y < 16; y++) { assert.equal(row(y), row(15 - y), 'top and bottom match'); for (let x = 0; x < 8; x++) assert.equal(c(x + 0.5, y + 0.5), c(15 - x + 0.5, y + 0.5), 'left and right match'); }
+  // an odd height on a centre ending in .5
+  assert.deepEqual(boundsOf(crystalIn(8, 8.5, 6, 9), 16), { x0: 5, y0: 4, x1: 10, y1: 12 });
+  assert.equal(area(crystalIn(8, 8, 6, 4), 16), area(crystalIn(8, 8, 6, 6), 16), 'never shorter than it is wide');
+});
+
+test('cubeIn: three faces that share the cube between them', () => {
+  const C = cubeIn(8, 8, 10);
+  assert.deepEqual(boundsOf(C.body, 16), { x0: 3, y0: 3, x1: 12, y1: 12 });
+  for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) {
+    const p = [x + 0.5, y + 0.5], n = [C.top, C.left, C.right].filter((f) => f(...p)).length;
+    assert.equal(n, C.body(...p) ? 1 : 0, `pixel ${x},${y} belongs to exactly one face of the cube, or to none`);
+    assert.equal(C.top(...p), C.top(16 - p[0], p[1]), 'the top is symmetrical');
+    assert.equal(C.left(...p), C.right(16 - p[0], p[1]), 'the two sides mirror each other');
+  }
+  const top = boundsOf(C.top, 16);
+  assert.equal(top.y0, 3, 'the top face starts at the top');
+  assert.ok(top.y1 <= 8, 'and is a flat diamond over the two sides');
+  assert.ok(Math.abs((top.y0 + top.y1 + 1) / 2 - C.topY) <= 0.5, 'topY is its middle row');
+  assert.ok(area(C.left, 16) > area(C.top, 16) * 0.6, 'the sides are as big as the top or bigger');
 });

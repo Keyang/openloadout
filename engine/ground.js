@@ -9,7 +9,7 @@
 import { ramp, mix, brightness } from './color.js';
 
 /**
- * Lifts a ground colour towards its light tone so that it stands apart by value from the ground round it under every look: a full step for a mid colour, less for one that is light already, nothing for a very light one, which a full step would bleach.
+ * Lifts a ground colour towards its light tone so that it stands apart by value from the ground round it: a full step for a mid colour, less for a light one, nothing for a very light one (a full step would bleach it).
  * Arguments: colour (the ground's colour, '#rrggbb'); options { target (the brightness, 0 to 1, at and above which a colour is left alone, default 0.86), span (how far below the target a colour must be to get the whole step, default 0.2; in between it gets a share of it) }. Returns '#rrggbb'.
  */
 export function raisedGround(colour, { target = 0.86, span = 0.2 } = {}) {

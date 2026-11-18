@@ -35,12 +35,12 @@ const flatDark = (K) => ({ light: K.light, base: K.base, dark: K.base });
  */
 export function armourBlock(g, o) {
   const { x0, x1, top, face, bottom, inset = 1, cut = [0, 0], foot = null, paint, shade = 1 } = o;
-  const [cl, cr] = cut;
+  const [cl, cr] = cut, e = 0.01;      // slanted edges are moved in by a hair, so a pixel whose centre lies exactly on one falls outside on both sides alike
   const frontPts = foot
-    ? [[x0, face], [x1, face], [x1, o.waist ?? face], [foot[1], bottom], [foot[0], bottom], [x0, o.waist ?? face]]
-    : [[x0, face], [x1, face], [x1, bottom - cr], [x1 - cr, bottom], [x0 + cl, bottom], [x0, bottom - cl]];
+    ? [[x0, face], [x1, face], [x1, o.waist ?? face], [foot[1] - e, bottom], [foot[0] + e, bottom], [x0, o.waist ?? face]]
+    : [[x0, face], [x1, face], [x1, bottom - cr - (cr ? e : 0)], [x1 - cr - (cr ? e : 0), bottom], [x0 + cl + (cl ? e : 0), bottom], [x0, bottom - cl - (cl ? e : 0)]];
   const front = polyIn(frontPts);
-  const topIn = face > top ? polyIn([[x0 + inset, top], [x1 - inset, top], [x1, face], [x0, face]]) : () => false;
+  const topIn = face > top ? polyIn([[x0 + inset + e, top], [x1 - inset - e, top], [x1 - e, face], [x0 + e, face]]) : () => false;
   const all = (px, py) => front(px, py) || topIn(px, py);
   const box = [Math.min(x0, foot ? foot[0] : x0) - 1, top - 1, Math.max(x1, foot ? foot[1] : x1) + 1, bottom + 1];
   if (o.seam) seam(g, all, o.seam, { box });
@@ -189,11 +189,12 @@ export function armWeapon(g, kind, x, y, length, o = {}) {
     const a = Math.max(3, R(4 * k)), wrist = Math.max(4, R(L * 0.32)), grip = [0, 1, 2, 1][((Math.floor(work / 2) % 4) + 4) % 4];
     const span = L - wrist, back = { light: M.base, base: M.dark, dark: M.dark };
     // the short middle talon behind, then two heavy pincers that bow out and hook in, opening and closing
-    g.limb(x, y + wrist - 1, x, end - R(span * 0.4), 3, back, { shade: 0 });
+    g.limb(x, y + wrist - 1, x, end - R(span * 0.4), 2, back, { shade: 0 });
     for (const s of [-1, 1]) {
-      const kx = x + s * (a - 1), mx = x + s * (a + 1.5 + grip), my = y + wrist + span * 0.55, tx = x + s * (1.5 + grip * 0.7), ty = end - 1.5;
+      // a limb of odd width sits half a pixel to the right of its joints, so the right pincer's joints are set one pixel in
+      const kx = x + s * (a - 1), mx = x + s * (a + 2 + grip), my = R(y + wrist + span * 0.55), tx = x + s * (2 + R(grip * 0.7)), ty = end - 2, odd = s > 0 ? -1 : 0;
       g.limb(kx, y + wrist - 1, mx, my, 4, M, { shade: 1, light: 1 });
-      g.limb(mx, my, tx, ty, 3, M, { shade: 1 });
+      g.limb(mx + odd, my, tx + odd, ty, 3, M, { shade: 1 });
     }
     armourBlock(g, { x0: x - a - 1, x1: x + a + 1, top: y, face: y + 2, bottom: y + wrist, inset: 1, cut: [1, 1], paint: H, seam: o.seam });
     g.rect(x - a - 1, y + wrist - 2, 2 * a + 2, 1, A.base, { shade: 0 });

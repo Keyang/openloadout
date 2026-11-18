@@ -122,15 +122,16 @@ export function pose(name, t, m = {}, d = dims()) {
   };
   const both = (fn) => P.arms.forEach((a, i) => fn(a, i));
   const k2 = (ks) => keys(t, ks);
+  const br = lerp(0.03, 0.08, bounce);
+  // breathing: she swells and sinks, and the head follows a beat late; the phase keeps the two big moves off the loop's seam
+  const breath = (u) => ({ swell: 1 + br * wave(u, -0.2), wide: 1 - 0.35 * br * wave(u, -0.2), head: Math.round(0.9 * wave(u, -0.33)), wing: 0.5 * pulse(u, -0.35) });
   if (name === 'idle') {
-    const br = lerp(0.03, 0.08, bounce);
-    P.swell = 1 + br * wave(t, -0.2);                       // she swells and sinks; the phase keeps the two big moves off the loop's seam
-    P.wide = 1 - 0.35 * br * wave(t, -0.2);
-    P.head = [0, Math.round(0.9 * wave(t, -0.33))];         // the head follows the breath a beat late
+    const b = breath(t);
+    P.swell = b.swell; P.wide = b.wide; P.head = [0, b.head];
     P.jaw = t >= 0.36 && t < 0.62 ? 0.45 : 0;               // one twitch of the mandibles
     P.blink = t >= 0.74;                                    // frames 6 and 7 of 8
     P.arms[1].lift = 3 * Math.sin(PI * clamp((t - 0.1) / 0.3)) ** 2;      // one tap of a scythe
-    P.wing = 0.5 * pulse(t, -0.35);
+    P.wing = b.wing;
   } else if (name === 'attack') {
     const f = (n) => n / 9;
     const raise = k2([[0, 0], [f(1), 0.3], [f(2), 0.65], [f(3), 0.88], [f(4), 0.96], [f(5), 1], [f(5.4), 1], [f(6), 0], [1, 0]]);
@@ -220,6 +221,11 @@ export function pose(name, t, m = {}, d = dims()) {
       P.glow = 0;
       P.jaw = 0.5;
     }
+  }
+  // a move starts from and ends on the first frame of idle exactly (hurt only ends on it), mid-breath as that frame is
+  if (STANDARD[name] && !STANDARD[name].loop && name !== 'die') {
+    const n = STANDARD[name].frames - 1, e = clamp(1 - n * (name === 'hurt' ? 1 - t : Math.min(t, 1 - t))), b = breath(0);
+    P.swell *= lerp(1, b.swell, e); P.wide *= lerp(1, b.wide, e); P.head = [P.head[0], P.head[1] + b.head * e]; P.wing = Math.max(P.wing, b.wing * e);
   }
   return P;
 }
@@ -339,7 +345,7 @@ function headShapes(J) {
       horn.push(leafIn(rootX - Math.sin(a) * 2, rootY - Math.cos(a) * 2, rootX + Math.sin(a) * len, rootY + Math.cos(a) * len, 4 * k, { belly: 0.3, blunt: 0.85 }));
     }
   } else if (J.horns.kind === 'antlers') {
-    for (const s of [-1, 1]) horn.push(antlerIn(s * 4.5 * k, -4.5 * k, PI - s * 0.95, 15 * L, { curl: s * 0.75, width: 3.4 * k, tip: 1, tines: 2, spread: -s * 1.0, tineLength: 0.42 }));
+    for (const s of [-1, 1]) horn.push(antlerIn(s * 5 * k, -4 * k, PI - s * 1.3, 16 * L, { curl: s * 0.75, width: 3.8 * k, tip: 1.2, tines: 2, spread: s * 1.05, tineLength: 0.5 }));
   }
   return {
     skull: s2([ellipseIn(0, -1 * k, 10 * k, 6 * k), ellipseIn(0, 2.6 * k, 7.2 * k, 5 * k)]),
@@ -365,13 +371,26 @@ export function draw(g, J, look = {}) {
   const floor = (px, py) => py < G && px >= 2 && px < W - 2;
   // a near piece: a dark line round it wherever it crosses the body, then the piece itself
   const near = (test, paint, box, opt = {}) => {
-    g.fill(...box, around(test), INK, { clip: inBody });
+    g.fill(...box, around(test), look.outline ?? INK, { clip: inBody });
     g.fill(...box, test, paint, opt);
   };
   const leg = (L, r0, r1, paint) => {
     g.limb(L.hip[0], L.hip[1], L.knee[0], L.knee[1], 3, paint);
     g.capsule(L.knee[0], L.knee[1], L.foot[0], L.foot[1], r0, r1, paint, { shade: 0 });
     g.ellipse(L.knee[0], L.knee[1], 1.9 * k, 1.9 * k, paint, { shade: 0 });
+  };
+
+  // a scythe leg: the arm, the bowed blade and the knuckle between them
+  const arm = (A) => {
+    const box = [Math.min(A.hip[0], A.knee[0], A.tip[0]) - 4, Math.min(A.hip[1], A.knee[1], A.tip[1]) - 4, Math.max(A.hip[0], A.knee[0], A.tip[0]) + 4, Math.max(A.hip[1], A.knee[1], A.tip[1]) + 4];
+    near(capsuleIn(A.hip[0], A.hip[1], A.knee[0], A.knee[1], 1.9 * k), armour, box, { shade: 1 });
+    // the blade bows outward a little, like a scythe
+    const dx = A.tip[0] - A.knee[0], dy = A.tip[1] - A.knee[1], len = Math.hypot(dx, dy) || 1;
+    let nx = dy / len, ny = -dx / len;
+    if (nx * A.s - 0.3 * ny < 0) { nx = -nx; ny = -ny; }
+    const mid = [(A.knee[0] + A.tip[0]) / 2 + nx * 1.7 * k, (A.knee[1] + A.tip[1]) / 2 + ny * 1.7 * k];
+    near(anyIn(capsuleIn(A.knee[0], A.knee[1], mid[0], mid[1], 2.6 * k, 1.9 * k), capsuleIn(mid[0], mid[1], A.tip[0], A.tip[1], 1.9 * k, 0.55)), bone, box, { shade: 1 });
+    near(ellipseIn(A.knee[0], A.knee[1], 2.4 * k, 2.4 * k), armour, box, { shade: 1 });
   };
 
   if (!J.dead) {
@@ -409,6 +428,7 @@ export function draw(g, J, look = {}) {
     for (const L of J.legs) leg(L, 1.5 * k, 0.6, armour);
     g.fill(0, 0, W, Hh, splatIn(hk.x, hk.y, hk.r, { seed: 8, lobes: 9, drops: 0, squash: hk.squash }), skin, { shade: 1, clip: floor });
     g.ellipse(hk.x, hk.y + 1, hk.r * 0.55, Math.max(1.5, hk.r * hk.squash * 0.5), soft.dark, { shade: 0 });      // the hollow inside it
+    for (const A of J.arms) arm(A);                       // the scythes lie in the puddle, their tips clear of it
     const pd = R.puddle;
     g.fill(0, 0, W, Hh, splatIn(pd.x, pd.y, pd.r, { seed: 3, lobes: 6, drops: 4, squash: pd.squash }), { light: acid.light, base: acid.base, dark: acid.dark }, { shade: 1, clip: floor });
     // a few sacs lie in it, burst
@@ -416,24 +436,13 @@ export function draw(g, J, look = {}) {
   }
 
   // ---- the scythe legs (behind the head, unless they are stabbing in front of it), the horns, the mandibles and the head
-  const arm = (A) => {
-    const box = [Math.min(A.hip[0], A.knee[0], A.tip[0]) - 4, Math.min(A.hip[1], A.knee[1], A.tip[1]) - 4, Math.max(A.hip[0], A.knee[0], A.tip[0]) + 4, Math.max(A.hip[1], A.knee[1], A.tip[1]) + 4];
-    near(capsuleIn(A.hip[0], A.hip[1], A.knee[0], A.knee[1], 1.9 * k), armour, box, { shade: 1 });
-    // the blade bows outward a little, like a scythe
-    const dx = A.tip[0] - A.knee[0], dy = A.tip[1] - A.knee[1], len = Math.hypot(dx, dy) || 1;
-    let nx = dy / len, ny = -dx / len;
-    if (nx * A.s - 0.3 * ny < 0) { nx = -nx; ny = -ny; }
-    const mid = [(A.knee[0] + A.tip[0]) / 2 + nx * 1.7 * k, (A.knee[1] + A.tip[1]) / 2 + ny * 1.7 * k];
-    near(anyIn(capsuleIn(A.knee[0], A.knee[1], mid[0], mid[1], 2.6 * k, 1.9 * k), capsuleIn(mid[0], mid[1], A.tip[0], A.tip[1], 1.9 * k, 0.55)), bone, box, { shade: 1 });
-    near(ellipseIn(A.knee[0], A.knee[1], 2.4 * k, 2.4 * k), armour, box, { shade: 1 });
-  };
-  for (const A of J.arms) if (!A.front) arm(A);
+  if (!J.dead) for (const A of J.arms) if (!A.front) arm(A);
   const hb = [H.x - 30 * k, H.y - 30 * k, H.x + 30 * k, H.y + 18 * k];
   const lying = J.dead ? { clip: floor } : {};
   if (S.horns) near(S.horns, bone, hb, { shade: 1, ...lying });
   near(S.mandibles, bone, hb, { shade: 1, ...lying });
   near(S.skull, armour, hb, { shade: 1, light: 1, ...lying });
-  g.fill(...hb, S.mouth, armour.deep, { clip: S.skull });
+  if (!J.dead) g.fill(...hb, S.mouth, armour.deep, { clip: S.skull });
   g.fill(...hb, S.visor, armour.deep, { clip: S.skull });
   if (!J.dead) {
     if (H.jaw > 0.55 || J.P.charge > 0.3) g.rect(H.x - 1, Math.round(J.mouth[1]) - 1, 2, 2, J.P.charge > 0.6 || H.glow >= 1.5 ? acid.light : acid.base);
