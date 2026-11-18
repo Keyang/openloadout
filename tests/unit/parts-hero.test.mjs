@@ -15,10 +15,10 @@ const diff = (a, b) => { let n = 0; for (let i = 0; i < a.data.length; i++) if (
 /** Biggest per-frame pixel difference between two looks, over every frame of every clip. */
 const biggestChange = (s, a, b) => Math.max(...everyFrame(s).map(([clip, f]) => diff(renderFrame(s, clip, f, a), renderFrame(s, clip, f, b))));
 const ends = (s, key) => [s.params[key].min, s.params[key].max];
-/** One hash per clip over all its frames (same as the numbers recorded before parts were added). */
-function clipHashes(s, p) {
+/** One hash per clip over all its frames (same as the numbers recorded before parts were added), for the clips named. */
+function clipHashes(s, p, clips) {
   const out = {};
-  for (const clip of Object.keys(s.clips)) {
+  for (const clip of clips) {
     let h = 2166136261;
     for (const f of frames(s, clip)) for (const v of renderFrame(s, clip, f, p).data) { h = Math.imul(h ^ (v & 0xffff), 16777619); h = Math.imul(h ^ (v >>> 16), 16777619); }
     out[clip] = (h >>> 0).toString(16).padStart(8, '0');
@@ -264,31 +264,41 @@ const BEFORE = {
 test('Hero: at default part settings the picture is what it was before parts', () => {
   // The one deliberate change: short hair now shows under the helmet (the hair colour did nothing there before),
   // so the default look is compared without hair, and the hair styles are compared without that helmet.
-  assert.deepEqual(clipHashes(knight, look(knight, { hairStyle: 'bald' })), BEFORE['knight hairStyle=bald']);
-  assert.deepEqual(clipHashes(knight, look(knight, { headgear: 'none' })), BEFORE['knight headgear=none']);
-  assert.deepEqual(clipHashes(knight, look(knight, { headgear: 'crown' })), BEFORE['knight headgear=crown']);
-  assert.deepEqual(clipHashes(knight, look(knight, { hairStyle: 'long' })), BEFORE['knight hairStyle=long']);
-  assert.deepEqual(clipHashes(knight, look(knight, { height: 1, build: 1, head: 1, headgear: 'none' })), BEFORE['knight tall']);
+  assert.deepEqual(clipHashes(knight, look(knight, { hairStyle: 'bald' }), Object.keys(BEFORE['knight hairStyle=bald'])), BEFORE['knight hairStyle=bald']);
+  assert.deepEqual(clipHashes(knight, look(knight, { headgear: 'none' }), Object.keys(BEFORE['knight headgear=none'])), BEFORE['knight headgear=none']);
+  assert.deepEqual(clipHashes(knight, look(knight, { headgear: 'crown' }), Object.keys(BEFORE['knight headgear=crown'])), BEFORE['knight headgear=crown']);
+  assert.deepEqual(clipHashes(knight, look(knight, { hairStyle: 'long' }), Object.keys(BEFORE['knight hairStyle=long'])), BEFORE['knight hairStyle=long']);
+  assert.deepEqual(clipHashes(knight, look(knight, { height: 1, build: 1, head: 1, headgear: 'none' }), Object.keys(BEFORE['knight tall'])), BEFORE['knight tall']);
 });
 
 // ---- the Wizard --------------------------------------------------------------------------------
 
-test('Wizard: staff, hat and beard are parts; the staff has a length and a hold angle', () => {
+test('Wizard: the staff, the hat and the beard are the parts weapon, headgear and beard; the staff has a length and a hold angle', () => {
   const byName = Object.fromEntries(partList(wizard).map((p) => [p.name, p]));
-  assert.deepEqual(Object.keys(byName).sort(), ['beard', 'hat', 'staff']);
-  assert.deepEqual(byName.staff.params, ['staff', 'staffLength', 'staffAngle']);
-  assert.equal(byName.staff.socket, 'hand');
+  // the part names of the style guide (section 9); on screen they are still called Staff and Hat
+  assert.deepEqual(Object.keys(byName).sort(), ['beard', 'headgear', 'weapon']);
+  assert.equal(byName.weapon.label, 'Staff');
+  assert.equal(byName.headgear.label, 'Hat');
+  // the controls keep the keys they had, so links and bag items saved before the rename open the same wizard
+  assert.deepEqual(byName.weapon.params, ['staff', 'staffLength', 'staffAngle']);
+  assert.equal(byName.weapon.socket, 'hand');
   assert.equal(wizard.params.staffLength.label, 'Length');
   assert.equal(wizard.params.staffAngle.label, 'Hold angle');
-  assert.equal(byName.hat.selector, 'hat');
+  assert.equal(byName.headgear.selector, 'hat');
   assert.equal(byName.beard.selector, 'beard');
   assert.equal(byName.beard.none, 'none');
+  const old = { hat: 'hood', staff: 'crook', staffLength: 0.7, staffAngle: 10, beard: 'short' };
+  const p = cleanParams(wizard, old);
+  for (const [k, v] of Object.entries(old)) assert.equal(p[k], v, `a saved ${k} is kept`);
+  const m = renderSheet(wizard, p, { clips: ['idle'] }).meta;
+  assert.deepEqual(m.parts.weapon.settings, { staff: 'crook', staffLength: 0.7, staffAngle: 10 });
+  assert.deepEqual(m.parts.headgear.settings, { hat: 'hood' });
 });
 
 test('Wizard: default-settings renders are unchanged', () => {
-  assert.deepEqual(clipHashes(wizard, defaultParams(wizard)), BEFORE['wizard default']);
-  assert.deepEqual(clipHashes(wizard, look(wizard, { height: 1, build: 1, head: 1 })), BEFORE['wizard tall']);
-  assert.deepEqual(clipHashes(wizard, look(wizard, { hat: 'hood', beard: 'none' })), BEFORE['wizard hood'], 'the hood is hairless, as it was');
+  assert.deepEqual(clipHashes(wizard, defaultParams(wizard), Object.keys(BEFORE['wizard default'])), BEFORE['wizard default']);
+  assert.deepEqual(clipHashes(wizard, look(wizard, { height: 1, build: 1, head: 1 }), Object.keys(BEFORE['wizard tall'])), BEFORE['wizard tall']);
+  assert.deepEqual(clipHashes(wizard, look(wizard, { hat: 'hood', beard: 'none' }), Object.keys(BEFORE['wizard hood'])), BEFORE['wizard hood'], 'the hood is hairless, as it was');
 });
 
 test('Wizard: the hair and beard colour is in effect unless the hood hides the hair and there is no beard', () => {
@@ -321,8 +331,13 @@ test('Hero: the blade sound plays only when a weapon is held, and the unarmed at
   const bare = playing('none');
   assert.equal(bare.length, 1);
   assert.notEqual(bare[0], 'sword-slash');
+  // blocking: metal rings only when there is a weapon to take the blow; bare arms have a sound of their own (style guide, section 9)
+  const blocking = (weapon) => knight.sounds.block.filter((c) => cueInEffect(knight, c, look(knight, { weapon }))).map((c) => c.sound);
+  for (const weapon of ['sword', 'axe', 'spear']) assert.deepEqual(blocking(weapon), ['metal-hit'], weapon);
+  assert.equal(blocking('none').length, 1);
+  assert.notEqual(blocking('none')[0], 'metal-hit');
   // every other animation's sounds always play
-  for (const [clip, list] of Object.entries(knight.sounds)) if (clip !== 'attack') for (const c of list) assert.equal(c.when, undefined, clip);
+  for (const [clip, list] of Object.entries(knight.sounds)) if (clip !== 'attack' && clip !== 'block') for (const c of list) assert.equal(c.when, undefined, clip);
 });
 
 test('Wizard: staff length, hold angle and kind each change the picture', () => {
@@ -353,6 +368,8 @@ test('Wizard: the hand socket is where the hand is drawn, with the staff running
       // the staff runs through the hand along the socket's angle: wood above the hand, and below it past the hanging sleeve
       for (const along of [4, 7, -8]) {
         const x = s.hand.x + Math.sin(s.hand.angle) * along, y = s.hand.y + Math.cos(s.hand.angle) * along;
+        // talking, the free hand reaches out in front of the staff and covers that much of it
+        if (clip === 'talk' && Math.hypot(x - s.offhand.x, y - s.offhand.y) < 5) continue;
         assert.ok(near(g, x, y, 1, (v) => wood.has(v)), `${what}: no staff ${along} pixels along the socket angle`);
       }
     }

@@ -30,13 +30,29 @@ function heroPose(clip, t, p, d) {
   };
   const P = H.pose(!w && clip === 'attack' ? 'punch' : clip, t, m, d);   // no weapon: an unarmed attack
   const rise = headgearRise(p, d);
+  // the top of the headgear must stay inside the frame: above the head when he stands, behind it when he lies (the rig
+  // turns the head and everything on it by P.headTurn)
+  const top = d.headR + rise;
   return H.fit(P, d, {
-    item: w,
-    points: rise ? (J) => [[J.head[0], J.head[1] - d.headR - rise]] : null,
+    item: w && clip === 'die' ? { ...w, pad: w.pad + 1.5 } : w,       // lying beside him, a wide blade rests on the ground, not in it
+    points: rise ? (J, P) => [P.headTurn ? [J.head[0] - Math.sin(P.headTurn) * (top + 1), J.head[1] - Math.cos(P.headTurn) * top] : [J.head[0], J.head[1] - d.headR - rise]] : null,
   });
 }
 
 // ---- parts: each is drawn from an attach point and its own settings ----
+
+/** The cape under a body lying on its back: its edge shows along the ground from the shoulders toward the feet. */
+function drawCapeOnGround(g, J, P, d, { kind, length, colour }) {
+  const paint = ramp(colour);
+  const x0 = Math.round(J.neck[0] - d.chestR), x1 = Math.round(J.neck[0] + (d.torso + d.leg * 0.45) * Math.min(length, 1.5));
+  const y = Math.round(J.gy) - 1;
+  for (let x = x0; x <= x1; x++) {
+    const torn = kind === 'tattered' && ((x - x0) % 5 === 3 || x === x1 - 1);
+    g.dot(x, y, torn ? paint.dark : paint.base);
+    if (!torn && x < x1 - 1) g.dot(x, y - 1, x % 2 || kind !== 'tattered' ? paint.base : paint.dark);
+  }
+  g.dot(x0 - 1, y, paint.dark);
+}
 
 function drawCape(g, J, P, d, { kind, length, colour }) {
   const [nx, ny] = J.neck, s = P.sway;
@@ -93,8 +109,9 @@ export default defineSprite({
   pivot: H.PIVOT,
   preview: 'walk',
   // sounds that play with each animation: frame is counted from 0; preset is one of the sound's named styles;
-  // `when` limits a sound to some settings (the blade is heard only when a weapon is held; a bare fist swishes instead)
-  sounds: { walk: [{ sound: 'footstep-gravel', frame: 0, preset: 'Boots' }, { sound: 'footstep-gravel', frame: 4, preset: 'Boots' }], run: [{ sound: 'footstep-gravel', frame: 0, preset: 'Boots' }, { sound: 'footstep-gravel', frame: 4, preset: 'Boots' }], jump: [{ sound: 'jump', frame: 2, preset: 'Big leap' }, { sound: 'footstep-gravel', frame: 6, preset: 'Boots' }], attack: [{ sound: 'sword-slash', frame: 3, preset: 'Heavy blade', when: { weapon: WEAPON_KINDS } }, { sound: 'whoosh', frame: 3, preset: 'Quick swipe', when: { weapon: ['none'] } }], hurt: [{ sound: 'punch', frame: 0, preset: 'Light jab' }] },
+  // `when` limits a sound to some settings (the blade is heard only when a weapon is held; a bare fist swishes instead;
+  // a blocked blow rings on a weapon and thuds on bare arms)
+  sounds: { walk: [{ sound: 'footstep-gravel', frame: 0, preset: 'Boots' }, { sound: 'footstep-gravel', frame: 4, preset: 'Boots' }], run: [{ sound: 'footstep-gravel', frame: 0, preset: 'Boots' }, { sound: 'footstep-gravel', frame: 4, preset: 'Boots' }], jump: [{ sound: 'jump', frame: 2, preset: 'Big leap' }, { sound: 'land-thud', frame: 6, preset: 'Armoured', volume: 0.7 }], attack: [{ sound: 'sword-slash', frame: 3, preset: 'Heavy blade', when: { weapon: WEAPON_KINDS } }, { sound: 'whoosh', frame: 3, preset: 'Quick swipe', when: { weapon: ['none'] } }], hurt: [{ sound: 'punch', frame: 0, preset: 'Light jab' }], die: [{ sound: 'punch', frame: 0, preset: 'Heavy body blow', volume: 1 }, { sound: 'land-thud', frame: 5, preset: 'Armoured', volume: 1 }], block: [{ sound: 'metal-hit', frame: 1, preset: 'Sword clash', volume: 0.7, when: { weapon: WEAPON_KINDS } }, { sound: 'punch', frame: 1, preset: 'Light jab', volume: 0.7, when: { weapon: ['none'] } }] },
   params: {
     height: range('Height', 0.5, { lo: 'Short', hi: 'Tall' }),
     build: range('Build', 0.5, { lo: 'Slim', hi: 'Stocky' }),
@@ -129,7 +146,8 @@ export default defineSprite({
     weapon: { label: 'Weapon', params: ['weapon', 'weaponLength', 'weaponAngle', 'weaponSwing'], none: 'none', socket: 'hand' },
     cape: { label: 'Cape', params: ['cape', 'capeLength'], none: 'none', socket: 'back' },
   },
-  clips: H.clips((p) => p.speed),
+  // die, block and victory are the rig's standard poses (style guide, section 4)
+  clips: { ...H.clips((p) => p.speed), ...H.clipsFor(['die', 'block', 'victory'], (p) => p.speed) },
 
   // attach points for every frame (hand, offhand, head, back, feet), exported so a game can attach or swap parts
   sockets(clip, t, p) {
@@ -156,13 +174,23 @@ export default defineSprite({
       torso(g, J) {
         // belt
         const hx = Math.round(J.hip[0]), hy = Math.round(J.hip[1]);
+        const buckle = armed || p.headgear === 'helmet' ? metal.light : ramp(NO_METAL).light;
+        if (P.lie > 0.5) {
+          // lying down, the belt runs across the body, top to bottom
+          for (let y = hy - Math.round(d.hipR) - 1; y <= hy + Math.round(d.hipR); y++) if (g.get(hx - 2, y)) g.dot(hx - 2, y, trim.dark);
+          if (g.get(hx - 2, hy - 1)) g.dot(hx - 2, hy - 1, buckle);
+          return;
+        }
         g.rect(hx - Math.round(d.hipR), hy - 2, Math.round(d.hipR) * 2, 1, trim.dark);
-        g.dot(hx + 1, hy - 2, armed || p.headgear === 'helmet' ? metal.light : ramp(NO_METAL).light);
+        g.dot(hx + 1, hy - 2, buckle);
       },
       head(g, J) {
         if (p.headgear === 'none') return;
         drawHeadgear(g, J, P, d, { kind: p.headgear, size: p.headgearSize, metal, trim });
         if (p.headgear === 'helmet') drawNapeHair(g, J, d, p.hairStyle, ramp(p.hair));
+      },
+      front(g, J) {
+        if (p.cape !== 'none' && P.lie > 0.9) drawCapeOnGround(g, J, P, d, { kind: p.cape, length: p.capeLength, colour: p.trim });
       },
       item(g, J) {
         if (armed) H.heldItem(g, H.sockets(J, P, d).hand, { kind: p.weapon, length: weaponReach(p), metal, wood: '#8a5a34', hilt: '#e6c545' });

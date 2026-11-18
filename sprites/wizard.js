@@ -4,21 +4,24 @@
 // glows. `cast` replaces the sword attack.
 // Parts (docs/architecture.md, Contract 3): the staff, the hat and the beard. The staff has settings of its own:
 // which top it has, how long it is, and the angle it is held at.
+// `die`, `victory` and `talk` are the rig's standard poses, re-posed like the others so the hand never leaves the staff.
 import { defineSprite, range, choice, color, SKIN, HAIR, CLOTH } from '../engine/sprite.js';
 import { lerp, clamp, pulse, keys, reach, fract, hash, smooth, PI, TAU } from '../engine/motion.js';
 import * as H from '../rigs/humanoid.js';
-import { ramp, farRamp, tone, col, INK } from '../engine/color.js';
+import { ramp, farRamp, tone, col, pick, INK } from '../engine/color.js';
 
 const MAGIC = ['#4fd8ee', '#6fe86a', '#f4e04a', '#ff8a3c', '#ff5a8a', '#b98cff'];
 const TILT = PI - 0.3;                 // resting staff angle: almost upright, top a little forward
 const HOLD = { a: 0.7, e: 0.85 };      // resting staff arm: hand held out in front, clear of the face
-const LOOPS = { idle: true, walk: true, run: true };
+const LOOPS = { idle: true, walk: true, run: true, victory: true, talk: true };
 
 /**
  * The rig's pose, re-posed so the near arm carries a staff, plus a custom `cast`.
  * tilt is the staff's resting angle: TILT plus the staff's own Hold angle setting, which is added in every clip.
+ * S is what `die` needs to lay him down inside the frame: { above: the staff's length above the hand, clear: the room its
+ * top needs, hat: how far the hat reaches above the middle of the head }.
  */
-function wizPose(clip, t, m, d, tilt = TILT) {
+function wizPose(clip, t, m, d, tilt = TILT, S = { above: 16, clear: 3, hat: 0 }) {
   const P = H.pose(clip === 'cast' ? 'idle' : clip, clip === 'cast' ? 0 : t, m, d);
   const off = tilt - TILT;
   P.armF.a = HOLD.a; P.armF.e = HOLD.e; P.item = tilt;
@@ -77,6 +80,49 @@ function wizPose(clip, t, m, d, tilt = TILT) {
       P.item = tilt - 0.25 * h;
       break;
     }
+    case 'talk': {
+      // the staff stays planted. The free hand is mostly hidden behind the staff arm, so the wizard makes his points with the
+      // staff as well: on each beat it tips forward a little and its light swells
+      const rest = H.pose('idle', 0, m, d).armB.a, point = P.armB.a - rest;      // 0 at rest, so the clip still starts on the idle pose
+      P.armB.a = rest + 1.25 * point; P.armB.e = 0.2;                            // held straight out, to show past the staff
+      P.point = point;                                                           // how far out it is: drawn in front of the staff when it is
+      P.item = tilt - 0.09 * point;
+      P.glow = 0.6 * clamp(point / 1.3);
+      break;
+    }
+    case 'victory': {
+      // the staff is lifted off the ground and held high, the orb flares; a smaller hop than the Hero's (robes are heavy)
+      const up = keys(t, [[0, 0], [0.125, 0.3], [0.25, 0.85], [0.375, 1], [0.625, 1], [0.75, 0.8], [0.875, 0.35], [1, 0]]);
+      const air = P.lift > 0 ? 1 : 0;
+      P.lift *= 0.7;
+      P.armF.a = HOLD.a + 0.75 * up; P.armF.e = HOLD.e - 0.35 * up;
+      P.item = tilt + (PI - 0.06 - tilt) * up;
+      P.staffUp = 4 * up;
+      P.glow = 0.7 * up;
+      P.billow = 0.5 * air * up;
+      break;
+    }
+    case 'die': {
+      // he goes over backward with the staff still in his hand: it stays planted while he falls, then tips forward
+      // and comes to rest lying along him, its light going out
+      const floor = H.GROUND - 1;
+      const rest = H.solve(H.pose('die', 1, m, d), d).shoulder;                       // where the shoulder ends up
+      const handY = floor - 1.5 - (S.clear - 3);                                      // the hand comes to rest low, on the staff; higher for a big staff top
+      const aEnd = Math.acos(clamp((handY - rest[1]) / d.arm, -0.3, 1));
+      P.armF.a = keys(t, [[0, HOLD.a + 0.25], [0.143, HOLD.a + 0.45], [0.286, 1.5], [0.429, 1.9], [0.571, 1.6], [0.714, lerp(1.6, aEnd, 0.6)], [1, aEnd]]);
+      P.armF.e = keys(t, [[0, HOLD.e - 0.2], [0.286, 0.45], [0.571, 0.2], [0.857, 0], [1, 0]]);
+      // lying, the staff points at the feet and a little up, by enough for its top to clear the ground
+      const level = PI / 2 + Math.asin(clamp(1 / (S.above + 2.5), 0, 0.5)) + 0.03;
+      P.item = keys(t, [[0, tilt - 0.15], [0.143, tilt], [0.286, tilt - 0.1], [0.429, Math.max(level, 2.45)], [0.571, Math.max(level, 2.0)], [0.714, level + 0.14], [0.857, level - 0.03], [1, level]]);
+      // the end behind the hand never goes into the ground: as the hand sinks, the staff is turned level instead
+      const hy = H.solve(P, d).armF.hand[1];
+      P.item = Math.min(P.item, PI - Math.acos(clamp((floor - 0.5 - hy) / 9)));
+      // the rig turns the head as he goes down, and the hat with it: it ends up pointing along the ground behind him.
+      // The whole body gives way forward by whatever the hat would otherwise reach past the frame edge.
+      const tipX = H.solve(P, d).head[0] - Math.sin(P.headTurn) * (S.hat + 2);
+      if (tipX < 3) P.rootX += 3 - tipX;
+      break;
+    }
     default: break;
   }
   return P;
@@ -93,19 +139,19 @@ const capIn = (x0, y0, x1, y1, r0, r1) => {
 };
 
 /** A wide sleeve over one arm: flares toward the wrist and hangs open below it. */
-function sleeve(g, A, d, cloth, cuff, skin, rim) {
+function sleeve(g, A, d, cloth, cuff, skin, rim, floorY = Infinity) {
   const [sx, sy] = A.shoulder, [ex, ey] = A.elbow, [hx, hy] = A.hand;
   const w = d.armW / 2;
   const wx = lerp(ex, hx, 0.75), wy = lerp(ey, hy, 0.75);
   const upper = capIn(sx, sy, ex, ey, w + 0.3, w + 0.6);
   const fore = capIn(ex, ey, wx, wy, w + 0.6, w + 1.3);
   const drop = capIn(wx, wy, wx - 0.5, wy + 2.6, w + 0.9, 0.9);
-  const all = (px, py) => upper(px, py) || fore(px, py) || drop(px, py);
+  const all = (px, py) => py < floorY && (upper(px, py) || fore(px, py) || drop(px, py));      // floorY: nothing hangs below the ground when he lies on it
   const x0 = Math.min(sx, ex, hx) - 5, y0 = Math.min(sy, ey, hy) - 5, x1 = Math.max(sx, ex, hx) + 5, y1 = Math.max(sy, ey, hy) + 7;
   g.fill(x0, y0, x1, y1, all, cloth, rim ? { outline: rim } : {});
   // trim on the open end of the sleeve
   const fl = Math.hypot(hx - ex, hy - ey) || 1, ux = (hx - ex) / fl, uy = (hy - ey) / fl;
-  g.fill(x0, y0, x1, y1, (px, py) => (fore(px, py) || drop(px, py)) && !all(px + ux, py + uy) && Math.hypot(px - wx, py - wy) < w + 3.2, cuff, { shade: 0 });
+  g.fill(x0, y0, x1, y1, (px, py) => py < floorY && (fore(px, py) || drop(px, py)) && !all(px + ux, py + uy) && Math.hypot(px - wx, py - wy) < w + 3.2, cuff, { shade: 0 });
   g.limb(hx, hy, hx, hy, d.armW, skin, { shade: 0 });
 }
 
@@ -114,6 +160,12 @@ const staffTilt = (p) => TILT - p.staffAngle * PI / 180;
 
 // how far each staff top reaches beyond the edge of its light, in pixels (the crystal's point, the crook's curl)
 const STAFF_REACH = { orb: 0, crystal: 1, crook: 2.5 };
+
+/** How long the staff is above the hand, how much room its top needs around the middle of its light, and how far the hat reaches above the middle of the head. */
+const staffSize = (p, d) => ({
+  above: (d.arm * 0.4 + d.torso * 0.16 + d.headR * 1.25 + 4) * p.staffLength, clear: 3 + STAFF_REACH[p.staff],
+  hat: d.headR * (p.hat === 'pointed' ? 2 : p.hat === 'crooked' ? 1.6 : p.hat === 'wide' ? 1.5 : 1) + (p.hat === 'hood' ? 2.2 : 5),
+});
 
 /**
  * The top of the staff, drawn from the end of the shaft, its direction, and its own settings.
@@ -153,7 +205,7 @@ export default defineSprite({
   pivot: H.PIVOT,
   preview: 'cast',
   // sounds that play with each animation: frame is counted from 0; preset is one of the sound's named styles
-  sounds: { walk: [{ sound: 'footstep-gravel', frame: 0, preset: 'Sneaking' }, { sound: 'footstep-gravel', frame: 4, preset: 'Sneaking' }], run: [{ sound: 'footstep-gravel', frame: 0, preset: 'Sneaking' }, { sound: 'footstep-gravel', frame: 4, preset: 'Sneaking' }], jump: [{ sound: 'jump', frame: 2, preset: 'Tiny hop' }], cast: [{ sound: 'magic-spell', frame: 2 }], hurt: [{ sound: 'punch', frame: 0, preset: 'Light jab' }] },
+  sounds: { walk: [{ sound: 'footstep-gravel', frame: 0, preset: 'Sneaking' }, { sound: 'footstep-gravel', frame: 4, preset: 'Sneaking' }], run: [{ sound: 'footstep-gravel', frame: 0, preset: 'Sneaking' }, { sound: 'footstep-gravel', frame: 4, preset: 'Sneaking' }], jump: [{ sound: 'jump', frame: 2, preset: 'Tiny hop' }], cast: [{ sound: 'magic-spell', frame: 2 }], hurt: [{ sound: 'punch', frame: 0, preset: 'Light jab' }], die: [{ sound: 'punch', frame: 0, preset: 'Heavy body blow', volume: 1 }, { sound: 'land-thud', frame: 5, preset: 'Soft landing', volume: 1 }] },
   params: {
     height: range('Height', 0.5, { lo: 'Short', hi: 'Tall' }),
     build: range('Build', 0.5, { lo: 'Slim', hi: 'Stout' }),
@@ -178,19 +230,21 @@ export default defineSprite({
   },
   // What the Wizard holds and wears. The first key of each list picks which one; the rest are that part's own settings.
   parts: {
-    staff: { label: 'Staff', params: ['staff', 'staffLength', 'staffAngle'], socket: 'hand' },
-    hat: { label: 'Hat', params: ['hat'], socket: 'head' },
+    // named as the style guide names parts (section 9); the controls keep the keys they always had, so saved links
+    // and bag items still open the same wizard
+    weapon: { label: 'Staff', params: ['staff', 'staffLength', 'staffAngle'], socket: 'hand' },
+    headgear: { label: 'Hat', params: ['hat'], socket: 'head' },
     beard: { label: 'Beard', params: ['beard'], none: 'none', socket: 'head' },
   },
   clips: (() => {
     const c = H.clips((p) => p.speed, { cast: { frames: 8, fps: (p) => 11 * lerp(0.65, 1.45, p.speed), loop: false } });
-    return { idle: c.idle, walk: c.walk, run: c.run, jump: c.jump, cast: c.cast, hurt: c.hurt };
+    return { idle: c.idle, walk: c.walk, run: c.run, jump: c.jump, cast: c.cast, hurt: c.hurt, ...H.clipsFor(['die', 'victory', 'talk'], (p) => p.speed) };
   })(),
 
   // attach points for every frame (hand, offhand, head, back, feet); the staff passes through `hand` along its angle
   sockets(clip, t, p) {
     const d = H.dims(p);
-    const P = wizPose(clip, t, { bounce: p.bounce, stride: p.stride, armed: true }, d, staffTilt(p));
+    const P = wizPose(clip, t, { bounce: p.bounce, stride: p.stride, armed: true }, d, staffTilt(p), staffSize(p, d));
     return H.sockets(H.solve(P, d), P, d);
   },
 
@@ -198,10 +252,11 @@ export default defineSprite({
     const [CW, CH] = H.SIZE;
     const d = H.dims(p);
     const m = { bounce: p.bounce, stride: p.stride, armed: true };
-    const tilt = staffTilt(p);
-    const P = wizPose(clip, t, m, d, tilt);
+    const tilt = staffTilt(p), size = staffSize(p, d);
+    const P = wizPose(clip, t, m, d, tilt, size);
+    const lie = P.lie;                 // 0..1: how far he has gone down in `die`
     // cloth, beard and hat tip trail the body: the same sway, a little later
-    const swayAt = (dt) => wizPose(clip, LOOPS[clip] ? fract(t - dt) : Math.max(0, t - dt), m, d, tilt).sway;
+    const swayAt = (dt) => wizPose(clip, LOOPS[clip] ? fract(t - dt) : Math.max(0, t - dt), m, d, tilt, size).sway;
     const s1 = swayAt(0.1), s2 = swayAt(0.2);
 
     const robe = ramp(p.robe), robeFar = farRamp(p.robe);
@@ -211,13 +266,15 @@ export default defineSprite({
     const beard = ramp(p.beardColor);
     const magic = ramp(p.magic);
     const wood = ramp('#8a5a34');
-    const orbPaint = { light: '#ffffff', base: magic.light, dark: magic.base };
+    // the staff's light: white-hot; in `die` it dims once he is down (frame 5) and is out, a cold dark stone, by frame 6
+    const dim = clip === 'die' ? (t > 0.8 ? 2 : t > 0.65 ? 1 : 0) : 0;
+    const orbPaint = dim === 2 ? { light: magic.dark, base: magic.deep, dark: tone(p.magic, -2.6) } : dim === 1 ? { light: magic.light, base: magic.base, dark: magic.dark } : { light: '#ffffff', base: magic.light, dark: magic.base };
 
     // staff lengths: below the hand it reaches the ground when standing; above, it tops out beside the hat
     const hand0 = H.solve(wizPose('idle', 0, m, d, tilt), d).armF.hand;
     const floor = H.GROUND - 1;
     const below = (floor - hand0[1]) / -Math.cos(tilt);
-    const above = (d.arm * 0.4 + d.torso * 0.16 + d.headR * 1.25 + 4) * p.staffLength;
+    const above = size.above;
     let orb = [0, 0], orbR = 2.5, rimR = 1.3;
 
     const look = {
@@ -227,10 +284,33 @@ export default defineSprite({
 
     H.draw(g, P, d, look, {
       offhand(g, J) {
-        sleeve(g, J.armB, d, robeFar, trimFar.base, skinFar, null);
+        sleeve(g, J.armB, d, robeFar, trimFar.base, skinFar, null, lie > 0 ? J.gy : Infinity);
       },
 
       torso(g, J) {
+        if (lie > 0.25) {
+          // off his feet: the skirt follows the legs wherever they point, one piece of cloth between them
+          const reachK = lerp(0.55, 1, p.robeLen);
+          const top = [lerp(J.hip[0], J.neck[0], 0.1), lerp(J.hip[1], J.neck[1], 0.1)];
+          const endOf = (L) => [lerp(L.hip[0], L.ankle[0], reachK), lerp(L.hip[1], L.ankle[1], reachK)];
+          const eF = endOf(J.legF), eB = endOf(J.legB), mid = [(eF[0] + eB[0]) / 2, (eF[1] + eB[1]) / 2];
+          const r0 = d.hipR + 0.6, r1 = d.hipR * 0.7 + lerp(0.7, 1.6, p.robeLen);
+          const cF = capIn(top[0], top[1], eF[0], eF[1], r0, r1), cB = capIn(top[0], top[1], eB[0], eB[1], r0, r1);
+          const side = (a, b, px, py) => (b[0] - a[0]) * (py - a[1]) - (b[1] - a[1]) * (px - a[0]);
+          const between = (px, py) => { const a = side(top, eF, px, py), b = side(eF, eB, px, py), c = side(eB, top, px, py); return (a >= 0 && b >= 0 && c >= 0) || (a <= 0 && b <= 0 && c <= 0); };
+          const cloth = (px, py) => py < J.gy && (cF(px, py) || cB(px, py) || between(px, py));
+          const xs = [top[0], eF[0], eB[0]], ys = [top[1], eF[1], eB[1]];
+          const box = [Math.min(...xs) - r0 - 1, Math.min(...ys) - r0 - 1, Math.max(...xs) + r0 + 1, Math.max(...ys) + r0 + 1];
+          g.fill(...box, cloth, robe, { shade: 1 });
+          // trim along the hem: the far end of the cloth
+          const len = Math.hypot(mid[0] - top[0], mid[1] - top[1]) || 1, ux = (mid[0] - top[0]) / len, uy = (mid[1] - top[1]) / len;
+          const band = d.leg > 10.5 ? 2 : 1;
+          g.fill(...box, cloth, trim, { shade: 0, clip: (px, py) => !cloth(px + ux * band, py + uy * band) && (px - top[0]) * ux + (py - top[1]) * uy > len * 0.6 });
+          // sash, across the body
+          const sx = Math.round(top[0]);
+          for (let y = Math.floor(top[1] - r0 - 1); y <= top[1] + r0 + 1; y++) if (g.get(sx, y)) { g.dot(sx, y, trim.base); if (g.get(sx - 1, y)) g.dot(sx - 1, y, trim.dark); }
+          return;
+        }
         // the skirt of the robe: a bell from the waist to the hem, wide enough to cover both legs
         const wx = lerp(J.hip[0], J.neck[0], 0.22), wy = Math.round(lerp(J.hip[1], J.neck[1], 0.22));
         const hem = Math.round(Math.min(J.hip[1] + d.leg * 0.97 * lerp(0.55, 1, p.robeLen), J.gy - d.foot));
@@ -283,7 +363,13 @@ export default defineSprite({
           const jaw = (px, py) => ((px - hx) / (R + 0.7)) ** 2 + ((py - hy) / (R + 0.9)) ** 2 <= 1 && py > hy + R * 0.3 && px > hx - R * 0.5;
           g.poly([[hx - R * 0.45, hy + R * 0.5], [hx + R + 0.7, hy + R * 0.4], [hx + R * 0.45 - s1 * 1.5, hy + R + len]], beard);
           g.fill(hx - R - 1, hy, hx + R + 2, hy + R + 2, jaw, beard, { shade: 0 });
-          g.dot(Math.floor(hx + R * 0.55), ey + 3, beard.dark);   // mouth, under the moustache
+          const mx = Math.floor(hx + R * 0.55);
+          g.dot(mx, ey + 3, beard.dark);   // mouth, under the moustache
+          if (P.mouth) {
+            // talking: the mouth opens, a gap in the beard that shows on any beard colour
+            const gap = pick(p.beardColor, INK, '#ffffff');
+            for (const [x, y] of [[mx, ey + 3], [mx, ey + 4], [mx - 1, ey + 3], [mx - 1, ey + 4]]) if (g.get(x, y)) g.dot(x, y, gap);
+          }
         }
 
         const hat = robe;
@@ -334,6 +420,8 @@ export default defineSprite({
         const [hx, hy] = J.armF.hand;
         const sx = Math.sin(P.item), cy = Math.cos(P.item);
         let lo = below - P.staffUp, up = above + P.staffUp;
+        // down: he ends up holding it nearer its foot, so it lies along him and clear of his face
+        if (lie > 0) { const keep = Math.min(lo, lerp(lo, 9, lie)); up += lo - keep; lo = keep; }
         // planted: when the hand sinks, the staff slides up through it instead of going into the ground
         if (cy < -0.2 && hy - cy * lo > floor) { const l2 = (floor - hy) / -cy; up += lo - l2; lo = l2; }
         orbR = 2.5 + Math.round(P.glow * lerp(0.8, 1.8, p.spell));   // x.5 radii keep the disc round
@@ -345,6 +433,8 @@ export default defineSprite({
           const fit = (hy - 2.6 - orbR - STAFF_REACH[p.staff]) / -cy - 2.5;
           if (up > fit) { lo = Math.min(lo + up - fit, Math.max(lo, (floor - hy) / -cy)); up = fit; }
         }
+        // down: whatever the slides above did, its foot stays out of the ground (the staff is shown a little shorter instead)
+        if (lie > 0 && cy < 0 && hy - cy * lo > floor - 0.5) lo = (floor - 0.5 - hy) / -cy;
         const bx = hx - sx * lo, byy = hy - cy * lo, tx = hx + sx * up, ty = hy + cy * up;
         g.limb(bx, byy, tx, ty, 2, wood);
         const [ox, oy] = reach(tx, ty, P.item, 2.5);
@@ -354,7 +444,9 @@ export default defineSprite({
       },
 
       front(g, J) {
-        sleeve(g, J.armF, d, robe, trim.base, skin.base, robe.deep);
+        // talking, the free hand reaches out past the staff: it is shown in front of it, under the staff arm
+        if (P.point > 0.25) sleeve(g, J.armB, d, robeFar, trimFar.base, skinFar, null);
+        sleeve(g, J.armF, d, robe, trim.base, skin.base, robe.deep, lie > 0 ? J.gy - 1 : Infinity);      // one row less: its dark rim is drawn outside it
       },
     });
 
@@ -370,11 +462,13 @@ export default defineSprite({
     const fxRay = (a, r0, r1, c) => { for (let r = r0; r <= r1; r += 0.5) fxDot(ox + Math.sin(a) * r, oy + Math.cos(a) * r, c); };
 
     if (P.flash) return;
+    if (dim === 2) return;                        // out: no lit rim, no motes
     // the orb's rim is lit, not inked
     const ink = col(INK);
     for (let y = Math.floor(oy - orbR - 2); y <= oy + orbR + 2; y++) for (let x = Math.floor(ox - orbR - 2); x <= ox + orbR + 2; x++) {
       if (g.get(x, y) === ink && Math.hypot(x + 0.5 - ox, y + 0.5 - oy) < orbR + rimR) g.dot(x, y, magic.base);
     }
+    if (clip === 'die' && t > 0.6) return;        // down: the light has gone out
     if (clip !== 'cast' || P.glow < 0.05) {
       // motes drifting up from the orb
       const n = Math.round(lerp(2, 4, p.spell));

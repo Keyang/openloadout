@@ -1,17 +1,37 @@
 // Side-view two-legged character rig (faces right), on a 64x64 canvas.
 //
 //   dims(p)                  body measurements from the Height / Build / Head sliders
-//   pose(clip, t, m, d)      where every joint target is for idle / walk / run / jump / attack / punch / cast / hurt
+//   clips(speedOf, extra)    the six clips of the first characters; clipsFor(names, speedOf) any standard clips, in your order
+//   pose(clip, t, m, d)      where every joint target is, for every name in POSES:
+//                            idle / walk / run / jump / attack / punch / thrust / shoot / cast / block / hurt / die / victory / talk
 //   solve(P, d)              joint positions in pixels (legs use IK so feet stay planted)
 //   draw(g, P, d, look, hooks)   paints the body; hooks add hats, capes, weapons, robes
-//   sockets(J, P, d)         named attach points for parts: hand, offhand, head, back, feet
-//   heldItem(g, at, item)    a weapon drawn from an attach point and its own settings
+//   sockets(J, P, d, opt)    named attach points for parts: hand, offhand, head, back, feet (and muzzle when asked for)
+//   muzzleFlash(g, at, size) the light of a shot at the muzzle socket, drawn after the outline
+//   heldItem(g, at, item)    a held thing drawn from an attach point and its own settings: sword, axe, spear, staff, bow, gun
 //   fit(P, d, opt)           keeps a pose with a long weapon or tall headgear inside the frame
 //
 // A new character is usually ~100 lines: a look, a few hooks, and the shared clips.
+//
+// The hooks of draw(), in the order they are called. Each is optional and is called as hook(g, J, P, d):
+// g the Surface to draw on, J the joints in pixels (below), P the pose, d the body measurements of dims().
+//   behind    before anything else: capes, wings, tails, a pack
+//   offhand   after the far arm, behind the body: a shield, a lantern (attach to sockets(J, P, d).offhand)
+//   torso     after the legs and the body, before the head: belts, armour, the skirt of a robe
+//   head      after the head and its hair: hats, helmets, horns, beards. Draw them upright, as if the character stood:
+//             when the pose turns the head (P.headTurn, lying down in `die`) the rig turns everything this hook drew
+//             with it, and cuts off what ends up under the ground. Here g is a layer of its own and J.head is where
+//             the head is on that layer, so use only the J you are given, and draw only what turns with the head
+//   item      after the head, under the near hand: the thing held (attach to sockets(J, P, d).hand). A bow is drawn here
+//             too, at sockets(J, P, d).offhand: the far hand holds it, in front of the body
+//   front     last, over the near arm: sleeves, anything nearest the viewer
+// J = { gy, hip, neck, head, shoulder, legF, legB: { hip, knee, ankle, lifted }, armF, armB: { shoulder, elbow, hand, angle } },
+// every point as [x, y]; gy is the ground row under the feet. P also carries flags (see pose()): flash, lie, headTurn,
+// mouth, fire, pull.
 
 import { lerp, clamp, wave, pulse, keys, ik2, smooth, reach, fract, TAU, PI } from '../engine/motion.js';
 import { ramp, farRamp, mix, INK } from '../engine/color.js';
+import { Surface } from '../engine/surface.js';
 
 export const SIZE = [64, 64];
 export const GROUND = 58;        // feet rest on the row above this line
@@ -31,6 +51,32 @@ export function clips(speedOf = () => 0.5, extra = {}) {
     ...extra,
   };
 }
+
+/** The clips of the style guide, section 4, that this rig has a pose for: frames, frames per second at the middle speed, loop. */
+const CLIP_TABLE = {
+  idle: [8, 7, true], walk: [8, 10, true], run: [8, 14, true], jump: [8, 11, false], attack: [8, 13, false],
+  shoot: [6, 14, false], cast: [8, 10, false], block: [6, 10, false], hurt: [4, 9, false], die: [8, 10, false],
+  victory: [8, 8, true], talk: [8, 7, true],
+};
+
+/**
+ * Standard clip entries for the named clips, in the order given, so a character lists exactly the clips it has:
+ *   clips: H.clipsFor(['idle', 'walk', 'run', 'jump', 'attack', 'block', 'hurt', 'die', 'victory'], (p) => p.speed)
+ * Each clip is drawn with the pose of the same name. `attack` has three poses to choose from when rendering:
+ * 'attack' (a swing), 'thrust' (a lunge with the point) and 'punch' (nothing held).
+ */
+export function clipsFor(names, speedOf = () => 0.5) {
+  const out = {};
+  for (const name of names) {
+    const row = CLIP_TABLE[name];
+    if (!row) throw new Error(`rigs/humanoid.js: no standard clip "${name}" (it has: ${Object.keys(CLIP_TABLE).join(', ')})`);
+    out[name] = { frames: row[0], fps: (p) => row[1] * lerp(0.65, 1.45, speedOf(p) ?? 0.5), loop: row[2] };
+  }
+  return out;
+}
+
+/** Every name pose() knows. */
+export const POSES = ['idle', 'walk', 'run', 'jump', 'attack', 'punch', 'thrust', 'shoot', 'cast', 'block', 'hurt', 'die', 'victory', 'talk'];
 
 export function dims(p = {}) {
   const h = p.height ?? 0.5, b = p.build ?? 0.5, hd = p.head ?? 0.5;
@@ -59,6 +105,22 @@ export const scaleFrom = (rest, v, k) => (k === 1 ? v : rest + (v - rest) * k);
  *    hold:  the held item's own angle, in radians, ADDED to the pose's item angle in every clip (default 0).
  *    swing: how far the held item travels in the attack; 1 = the standard swing, 0.5 = a short chop (default 1).
  * `punch` is the unarmed attack: use it in place of `attack` when nothing is held.
+ * `thrust` is the attack for a point, not an edge (a spear, a rapier): use it in place of `attack`. The weapon is
+ *    levelled and drawn back, then the whole body lunges; it reaches further forward than the swing. `swing` scales the lunge.
+ * `block`, `victory` and `talk` start from the idle pose at t = 0 and are back on it at t = 1; `shoot` starts already
+ *    raising (the style guide's "0 aim") and ends on the idle pose.
+ * `die` starts on the recoil (flash) and ends lying on the ground, where the game holds it.
+ * Besides the joint targets the pose carries flags for the sprite to act on:
+ *    flash  tint this frame white (hurt and die, frame 0)
+ *    lie    0..1: how far the body has gone down in `die` (1 = flat on its back). Hooks use it to lay capes and robes down
+ *    headTurn  radians the head is turned back from upright (0 standing, PI/2 lying face up); draw() turns the head, its
+ *           hair and everything the head hook draws
+ *    mouth  the mouth is open (talk, frames 2 and 6); draw() paints it
+ *    fire   the shot leaves on this frame (shoot, frame 1): draw muzzleFlash() at the muzzle socket, after the outline
+ *    pull   1 while a bow is drawn (shoot with shot: 'bow', frame 0): run the string to the near hand and show the arrow
+ * `shoot` takes m.shot: leave it out for something held out and fired (a gun, a wand, a thrown knife): frame 0 is the arm
+ *    half raised, frame 1 it is level and fires. shot: 'bow' is an archer: the far arm holds the bow out (draw it in the
+ *    item hook, at the offhand socket), the near hand has the string drawn to the chin on frame 0 and lets go on frame 1.
  * Angles: 0 = down, PI/2 = forward, PI = up. Foot x/y are relative to the
  * ground point under the hips (y negative = lifted).
  */
@@ -74,7 +136,11 @@ export function pose(clip, t, m = {}, d = dims()) {
     sway: 0,        // -1..1 for hair, capes, tails
     glow: 0,        // 0..1 for spell effects
     blink: false, flash: false,
+    lie: 0, headTurn: 0, mouth: false, fire: false, pull: 0,
   };
+  // the idle pose at t = 0: where block, victory, talk and shoot start and end
+  const restA = 0.12 + 0.05 * wave(0, 0.1), restItem = 2.5 + 0.06 * wave(0, 0.1);
+  const fromRest = () => { P.armF.a = restA; P.armB.a = -0.12 - 0.05 * wave(0, 0.1); P.item = restItem; };
   switch (clip) {
     case 'idle': {
       P.crouch = pulse(t) * lerp(0.7, 1.7, bounce);
@@ -198,6 +264,182 @@ export function pose(clip, t, m = {}, d = dims()) {
       P.flash = t < 0.2;
       break;
     }
+    case 'thrust': {
+      // an attack with the point: level the weapon and draw it back (frames 1 to 2), lunge onto the front foot with the
+      // arm thrown straight out (3, landing on 4), hold the reach a moment, then step home
+      const wind = keys(t, [[0, 0], [0.143, 0.7], [0.286, 1], [0.43, 0.2], [0.5, 0], [1, 0]]);
+      const jab = keys(t, [[0, 0], [0.33, 0], [0.43, 0.55], [0.571, 1], [0.714, 0.9], [0.857, 0.3], [1, 0]]);
+      const level = keys(t, [[0, 0], [0.143, 0.65], [0.286, 1], [0.714, 1], [0.857, 0.5], [1, 0]]);
+      P.armF.a = 0.15 - 0.85 * wind + (PI / 2 - 0.2) * jab;
+      P.armF.e = 0.25 + 1.75 * wind - 0.25 * jab;
+      P.armB.a = -0.15 + 0.9 * wind - 0.9 * jab;
+      P.armB.e = 0.2 + 0.6 * wind + 0.3 * jab;
+      P.item = 2.5 + (PI / 2 - 2.5) * level;
+      P.lean = -0.18 * wind + 0.38 * jab;
+      P.headTilt = 0.08 * wind - 0.1 * jab;
+      P.rootX = (-2 * wind + 6 * jab) * swing;
+      P.crouch = 1.0 * wind + 2.4 * jab;
+      P.footF = { x: 1.5 + 7 * jab * swing - P.rootX, y: -2 * pulse(clamp((t - 0.38) / 0.19)) };
+      P.footB = { x: -1.5 - P.rootX, y: 0 };
+      P.sway = keys(t, [[0, 0], [0.3, -1], [0.6, 1], [1, 0]]);
+      break;
+    }
+    case 'shoot': {
+      const kick = keys(t, [[0, 0], [0.2, 0], [0.4, 1], [0.6, 0.4], [0.8, 0.1], [1, 0]]);
+      fromRest();
+      if (m.shot === 'bow') {
+        // an archer. 6 frames: 0 the bow is up and drawn (string hand at the chin, elbow out behind), 1 the arrow is loosed,
+        // 2 the string hand has flown back and the bow tips forward, 3 to 4 both arms come down, 5 idle
+        const up = keys(t, [[0, 1], [0.4, 1], [0.6, 0.8], [0.8, 0.35], [1, 0]]);
+        const loose = keys(t, [[0, 0], [0.2, 1], [0.4, 0.8], [0.6, 0.3], [1, 0]]);
+        P.armB.a += (PI / 2 + restA) * up - 0.12 * kick;        // the far arm holds the bow straight out
+        P.armB.e = 0.2 * (1 - up);
+        P.armF.a += (-1.75 - restA) * up - 0.3 * loose * up;    // the near elbow points back, the hand under the chin
+        P.armF.e = 0.25 + (PI / 2 + 1.75 - 0.25) * up + 0.55 * loose * up;
+        P.item += (PI / 2 - restItem) * up;                     // the near hand points the way the arrow will go
+        P.lean = -0.05 * up - 0.05 * kick;
+        P.rootX = -1 * kick;
+        P.crouch = 0.6 * up;
+        P.footF = { x: 1.5 + 1.5 * up - P.rootX, y: 0 };        // side on, feet apart
+        P.footB = { x: -1.5 - 1.5 * up - P.rootX, y: 0 };
+        P.sway = -kick;
+        P.pull = t < 0.1 ? 1 : 0;
+      } else {
+        // 6 frames: 0 the arm is half raised, 1 it is out level and the shot leaves, 2 the recoil (2 px back, muzzle up),
+        // 3 to 4 recover, 5 idle
+        const aim = keys(t, [[0, 0.5], [0.2, 1], [0.4, 1], [0.6, 0.85], [0.8, 0.4], [1, 0]]);
+        P.armF.a += (PI / 2 - restA) * aim + 0.2 * kick;
+        P.armF.e = 0.25 * (1 - aim) + 0.15 * kick;
+        P.item += (PI / 2 - restItem) * aim + 0.3 * kick;
+        P.armB.a += (1.25 + restA) * aim;                       // the other hand comes up to steady it
+        P.armB.e = 0.2 + 0.3 * aim;
+        P.lean = -0.04 * aim - 0.1 * kick;
+        P.headTilt = 0.06 * aim;
+        P.rootX = -2 * kick;
+        P.crouch = 0.8 * aim + 0.6 * kick;
+        P.footF = { x: 1.5 + aim - P.rootX, y: 0 };             // a wider stance; the feet stay planted through the recoil
+        P.footB = { x: -1.5 - aim - P.rootX, y: 0 };
+        P.sway = -kick;
+      }
+      P.fire = t >= 0.15 && t < 0.3;
+      break;
+    }
+    case 'block': {
+      // 6 frames: 1 the guard goes up (the blow lands on it: the sound is cued here), 2 to 4 held braced (the body gives on 2 and
+      // comes back), 5 idle
+      const up = keys(t, [[0, 0], [0.2, 1], [0.8, 1], [1, 0]]);
+      const hit = keys(t, [[0, 0], [0.2, 0], [0.4, 1], [0.6, 0.4], [0.8, 0.1], [1, 0]]);
+      fromRest();
+      P.armF.a += (1.15 - restA) * up + 0.1 * hit;            // the hand comes up and out in front of the chest, clear of the face
+      P.armF.e = 0.25 + 0.5 * up;
+      P.armB.a += (1.25 + restA) * up;                        // the other arm braces behind it (a shield goes here)
+      P.armB.e = 0.2 + 0.9 * up;
+      P.item += (PI + 0.06 - restItem) * up - 0.12 * hit;     // held upright between the body and the blow
+      P.lean = 0.03 * up - 0.1 * hit;
+      P.headTilt = 0.12 * up;                                 // chin down behind the guard
+      P.crouch = 2.2 * up + 0.8 * hit;
+      P.rootX = 0.5 * up - 1.6 * hit;
+      P.footF = { x: 1.5 + 2 * up - P.rootX, y: 0 };          // feet apart and planted
+      P.footB = { x: -1.5 - 2 * up - P.rootX, y: 0 };
+      P.sway = 0.6 * up - 1.4 * hit;
+      break;
+    }
+    case 'victory': {
+      // a looping cheer: crouch (1), hop with the weapon and the other fist thrown up (2 to 5, top on 4), land and squash (6), settle (7)
+      const top = lerp(3, 6, bounce);
+      const air = keys(t, [[0, 0], [0.125, 0], [0.25, 0.5], [0.375, 0.92], [0.5, 1], [0.625, 0.62], [0.75, 0], [1, 0]]);
+      const up = keys(t, [[0, 0], [0.125, 0.3], [0.25, 0.85], [0.375, 1], [0.625, 1], [0.75, 0.8], [0.875, 0.35], [1, 0]]);
+      fromRest();
+      P.lift = top * air;
+      P.crouch = keys(t, [[0, 0], [0.125, 2.6], [0.25, 0.3], [0.5, 0], [0.625, 0], [0.75, 2.8], [0.875, 1.0], [1, 0]]);
+      // The arm is shorter than the head is tall, so a fist cannot be raised past the face without crossing it. The near
+      // arm goes out under the chin and its forearm up in front of the face: as high as it can be while staying clear of
+      // the head, whatever the build. What is held goes straight up from there, well above the head.
+      const sx = -0.8, sy = 0.78 * d.headR + 0.16 * d.torso, half = d.arm / 2;                  // the shoulder, from the middle of the head
+      const clear = (x, y, pad) => (x / (d.headR + pad)) ** 2 + (y / (d.headR * 0.95 + pad)) ** 2 > 1;
+      let a1 = PI / 2 + 0.05;
+      while (a1 > 1.1 && !clear(sx + Math.sin(a1) * half, sy + Math.cos(a1) * half, 1.4)) a1 -= 0.05;
+      const ex = sx + Math.sin(a1) * half, ey = sy + Math.cos(a1) * half;
+      let a2 = 2.5;
+      while (a2 > a1 && !(clear(ex + Math.sin(a2) * half, ey + Math.cos(a2) * half, 2.2) && clear(ex + Math.sin(a2) * half * 0.5, ey + Math.cos(a2) * half * 0.5, 1.6))) a2 -= 0.05;
+      P.armF.a += (a1 - restA) * up;
+      P.armF.e = 0.25 + (a2 - a1 - 0.25) * up;
+      P.armB.a += (-1.9 + restA) * up;                        // the other arm is thrown up and out behind, where it shows
+      P.armB.e = 0.2 - 0.3 * up;
+      P.item += (PI - 0.08 - restItem) * up;                  // straight up at the top
+      P.lean = -0.08 * up;
+      P.headTilt = -0.14 * up;                                // head back
+      P.footF = { x: 1.5 + 1.5 * air, y: -2.2 * air };
+      P.footB = { x: -1.5 - 1.2 * air, y: -1.0 * air };
+      P.sway = t < 0.75 ? keys(t, [[0, 0], [0.3, 1], [0.6, -1], [0.75, -1]]) : wave(t);     // ends as idle's sway does, so trailing cloth joins up
+      break;
+    }
+    case 'talk': {
+      // a looping chat: two beats (frames 2 and 6); on each the mouth opens, the head nods and the free hand makes a point
+      const beat = (c) => { const u = (fract(t - c + 0.5) - 0.5) / 0.42; return Math.abs(u) < 0.5 ? Math.cos(PI * u) ** 2 : 0; };
+      const b1 = beat(0.25), b2 = beat(0.75);
+      fromRest();
+      P.crouch = 0.9 * pulse(2 * t);
+      P.headTilt = 0.16 * b1 - 0.12 * b2;                     // a nod down, then a lift of the chin
+      P.lean = 0.05 * b1 - 0.03 * b2;
+      // the free hand is held out in front, palm up, and goes down again: fully on the first beat, a smaller wave on the second
+      P.armB.a += 1.3 * b1 + (m.armed ? 1.0 : 0.3) * b2;
+      P.armB.e = 0.2 + 0.6 * b1 + (m.armed ? 0.9 : 0.2) * b2;
+      if (m.armed) P.item += 0.05 * (b1 - b2);
+      else { P.armF.a += 0.25 * b1 + 1.1 * b2; P.armF.e = 0.25 + 0.2 * b1 + 0.5 * b2; }     // empty hands: the near one makes the second point
+      P.sway = wave(t);                                       // as in idle, so cloth that trails the body joins up at the loop
+      P.mouth = Math.abs(t - 0.25) < 0.06 || Math.abs(t - 0.75) < 0.06;
+      P.blink = t >= 0.47 && t < 0.56;
+      break;
+    }
+    case 'die': {
+      // knocked off the feet: 0 the recoil (white), 1 staggering back, 2 the feet shoot out in front, 3 legs in the air,
+      // 4 the back hits the ground, 5 a small bounce, 6 the legs and arm drop, 7 lying still (the game holds this frame)
+      const fall = keys(t, [[0, 0], [0.143, 0.1], [0.286, 0.42], [0.429, 0.82], [0.571, 1], [1, 1]]);
+      const tip = keys(t, [[0, 0], [0.143, 0.12], [0.286, 0.5], [0.429, 0.86], [0.571, 1], [1, 1]]);      // the back goes over a little ahead of the hips
+      const rec = keys(t, [[0, 0.7], [0.143, 1], [0.35, 0.3], [0.5, 0], [1, 0]]);
+      const bump = keys(t, [[0, 0], [0.571, 0], [0.714, 1], [0.857, 0.15], [1, 0]]);
+      // where it ends: hips, chest and head resting on the ground row, on whole pixels so the body sits on the line at every build
+      const ankleY = GROUND - d.foot;
+      const neckY = Math.floor(GROUND + 0.4 - 1.55 * d.chestR);
+      const hipY1 = Math.floor(Math.min(GROUND + 0.4 - 0.8 * d.hipR, (GROUND + 0.9 - d.hipR - 0.12 * neckY) / 0.88, ankleY));
+      const headY = Math.floor(GROUND - 0.1 - d.headR) + 0.5;                   // the head lies on its back: its back rests on the ground
+      const lean1 = -Math.acos(clamp((hipY1 - neckY) / d.torso, -1, 1));
+      const tilt1 = -Math.acos(clamp((neckY - headY) / (d.headR * 0.78), -1, 1)) - lean1;
+      // the hips come forward as the head goes back, so that the lying body (with long hair behind it) is inside the frame
+      const behind = d.torso + d.headR * 2.28 + 2.7;
+      const x1 = Math.max(2, 2 + behind - CX);
+      P.rootX = keys(t, [[0, -2.1], [0.143, -3], [0.286, -2 + 0.3 * x1], [0.429, 0.7 * x1], [0.571, x1], [1, x1]]);
+      const down = d.leg * 0.97 - (ankleY - hipY1);
+      P.crouch = lerp(1.5 * rec, down, fall) - bump * Math.min(1, down);
+      P.lean = lerp(-0.35 * rec, lean1, tip) + 0.1 * bump;
+      P.headTilt = lerp(-0.25 * rec, tilt1, fall) + 0.35 * keys(t, [[0, 0], [0.286, 0], [0.5, 1], [0.714, 0.2], [1, 0]]);   // the chin comes down as the back lands
+      // legs: planted through the stagger, then each swings out from the hip, up into the air, and drops
+      const hipY = ankleY - d.leg * 0.97 + P.crouch;
+      const swingLeg = (phi, len) => {
+        const dy = Math.min(ankleY - hipY, -len * Math.sin(phi));
+        return { x: Math.sqrt(Math.max(1, len * len - dy * dy)), y: Math.min(0, hipY + dy - ankleY) };
+      };
+      const L = d.leg * 0.96;
+      const fly = keys(t, [[0, 0], [0.143, 0], [0.286, 1], [1, 1]]);
+      const legF = swingLeg(keys(t, [[0, -1.4], [0.143, -1.4], [0.286, -0.5], [0.429, 0.55], [0.571, 0.4], [0.714, 0.1], [0.857, -0.3], [1, -0.3]]), L);
+      const legB = swingLeg(keys(t, [[0, -1.4], [0.143, -1.4], [0.286, -0.8], [0.429, 0.3], [0.571, 0.62], [0.714, 0.28], [0.857, 0.02], [1, -0.3]]),
+        L * lerp(1, 0.76, keys(t, [[0, 0], [0.571, 0], [0.857, 1], [1, 1]])));                    // the far knee stays bent
+      P.footF = { x: lerp(1.5 + 2.4 * rec, legF.x, fly), y: legF.y * fly, up: fly > 0.5 };
+      P.footB = { x: lerp(-1.5 - rec, legB.x, fly), y: legB.y * fly, up: fly > 0.5 };
+      // arms and the held thing fly up as the body goes over, then drop along the body
+      P.armF.a = keys(t, [[0, 1.0], [0.143, 1.6], [0.286, 2.3], [0.429, 2.7], [0.571, 2.2], [0.714, 1.75], [0.857, 1.55], [1, 1.5]]);
+      P.armF.e = keys(t, [[0, 0.6], [0.286, 0.3], [0.571, 0.2], [1, 0.15]]);
+      P.armB.a = keys(t, [[0, 0.7], [0.143, 1.2], [0.286, 1.9], [0.429, 2.4], [0.571, 2.0], [0.714, 1.85], [1, 1.75]]);
+      P.armB.e = keys(t, [[0, 0.5], [0.571, 0.1], [1, -0.3]]);
+      P.item = keys(t, [[0, 2.98], [0.143, 3.3], [0.286, 3.6], [0.429, 3.3], [0.571, 2.2], [0.714, 1.62], [0.857, 1.42], [1, 1.5]]);
+      P.sway = keys(t, [[0, -0.7], [0.286, -1], [0.571, 0.8], [0.8, 0.2], [1, 0]]);
+      P.lie = fall;
+      P.headTurn = tip * PI / 2;                              // the head goes over with the back: face up once it is down
+      P.flash = t < 0.1;
+      P.blink = t > 0.2;
+      break;
+    }
     default: break;
   }
   if (m.hold) P.item += m.hold;
@@ -220,7 +462,12 @@ export function solve(P, d) {
     const h = [hip[0] + off, hip[1]];
     const ankle = [CX + P.rootX + f.x, ankleY + f.y];
     const s = ik2(h[0], h[1], ankle[0], ankle[1], d.leg / 2, d.leg / 2, 1);
-    return { hip: h, knee: s.mid, ankle: s.end, lifted: f.y < -0.5 };
+    let knee = s.mid;
+    if (f.up) {      // a leg lying on the ground or kicked into the air: the knee is on the upper side, never in the ground
+      const o = ik2(h[0], h[1], ankle[0], ankle[1], d.leg / 2, d.leg / 2, -1).mid;
+      if (o[1] < knee[1]) knee = o;
+    }
+    return { hip: h, knee, ankle: s.end, lifted: f.y < -0.5 };
   };
   const arm = (A) => {
     const elbow = reach(shoulder[0], shoulder[1], A.a, d.arm / 2);
@@ -237,18 +484,45 @@ export function solve(P, d) {
  *   head     the top of the head; angle = the way the head points (up when standing straight)
  *   back     between the shoulders, where a cape or pack hangs; angle = down the spine
  *   feet     the ground under the body
+ *   muzzle   only when opt.muzzle is given (the hand-to-tip length of the thing that shoots, 0 for a bare hand):
+ *            the tip of the held item, where a projectile and the muzzle flash appear; angle = the way it points.
+ *            opt.muzzleAt: 'offhand' measures from the far hand instead (a bow is held there)
  * Angles use the rig convention (0 = down, PI/2 = forward, PI = up). A sprite built on this rig returns
  * these from its own sockets(clip, t, p) so they are exported with every frame.
  */
-export function sockets(J, P, d) {
+export function sockets(J, P, d, opt = {}) {
   const hx = Math.round(J.head[0] * 2) / 2, hy = Math.round(J.head[1] * 2) / 2;   // the head is drawn on the half-pixel grid
-  return {
+  const turn = P.headTurn || 0;                                                   // lying down, the top of the head points back
+  const out = {
     hand: { x: J.armF.hand[0], y: J.armF.hand[1], angle: P.item },
     offhand: { x: J.armB.hand[0], y: J.armB.hand[1], angle: J.armB.angle },
-    head: { x: hx, y: hy - d.headR * 0.95, angle: PI - P.lean - P.headTilt },
+    head: { x: hx - Math.sin(turn) * d.headR * 0.95, y: hy - Math.cos(turn) * d.headR * 0.95, angle: PI - P.lean - P.headTilt },
     back: { x: J.neck[0], y: J.neck[1] + 1, angle: -P.lean },
     feet: { x: CX + P.rootX, y: J.gy, angle: 0 },
   };
+  if (opt.muzzle !== undefined) {
+    out.muzzle = opt.muzzleAt === 'offhand'
+      ? { x: out.offhand.x + Math.sin(out.offhand.angle) * opt.muzzle, y: out.offhand.y + Math.cos(out.offhand.angle) * opt.muzzle, angle: out.offhand.angle }
+      : muzzle(J, P, opt.muzzle);
+  }
+  return out;
+}
+
+/** The muzzle attach point: the tip of a held item of length len (0 = the hand itself), pointing the way the item points. */
+export const muzzle = (J, P, len = 0) => ({ x: J.armF.hand[0] + Math.sin(P.item) * len, y: J.armF.hand[1] + Math.cos(P.item) * len, angle: P.item });
+
+/**
+ * The light of a shot: a short ray the way the muzzle points with a small cross behind its tip.
+ * Call AFTER g.outline() on the frame where the pose says `fire`, so it glows instead of being inked.
+ *   at: { x, y, angle }, for example sockets(J, P, d, { muzzle: len }).muzzle;  size: length of the ray in pixels.
+ * Never touches the frame edge.
+ */
+export function muzzleFlash(g, at, size = 3, colour = '#ffffff') {
+  const put = (x, y, c) => { x = Math.floor(x); y = Math.floor(y); if (x >= 1 && y >= 1 && x <= SIZE[0] - 2 && y <= SIZE[1] - 2) g.dot(x, y, c); };
+  const ux = Math.sin(at.angle), uy = Math.cos(at.angle);
+  const arm = Math.max(1, size * 0.5);
+  for (let r = 0.5; r <= arm; r += 0.5) for (const k of [-1, 1]) put(at.x + ux - uy * r * k, at.y + uy + ux * r * k, colour);
+  for (let r = 0; r <= size; r += 0.5) put(at.x + ux * r, at.y + uy * r, colour);
 }
 
 /**
@@ -329,6 +603,7 @@ function drawArm(g, A, d, sleeve, skin, bare) {
 /** Hair styles drawn over the head. Exported so hooks can reuse or replace them. */
 export const HAIR_STYLES = ['short', 'long', 'spiky', 'ponytail', 'bald'];
 
+/** Draws one of HAIR_STYLES over the head. Arguments: g, J (joints), P (pose), d (dims), style, hair (a colour ramp). */
 export function drawHair(g, J, P, d, style, hair) {
   if (style === 'bald') return;
   const [hx, hy] = J.head, R = d.headR;
@@ -355,13 +630,15 @@ export function drawHair(g, J, P, d, style, hair) {
 /**
  * Paint the character.
  * look: { skin, top, bottom, boots, hair, hairStyle, bareArms }
- * hooks (all optional, each receives (g, J, P, d)):
+ * hooks (all optional, each receives (g, J, P, d); the header of this file says what each is given and when):
  *   behind – drawn first (capes, wings, tails)
- *   offhand – after the far arm (shields, lanterns)
+ *   offhand – after the far arm (shields, lanterns, bows)
  *   torso – after the body (belts, armour, robes)
- *   head – after hair (hats, helmets, horns); set look.hairStyle 'bald' to hide hair under a full helmet
+ *   head – after hair (hats, helmets, horns, beards), drawn upright; the rig turns it with the head when the pose
+ *          says so (P.headTurn). Set look.hairStyle 'bald' to hide hair under a full helmet
  *   item – the thing in the front hand, drawn under the hand (weapons, staffs)
  *   front – drawn last
+ * Returns the joints J.
  */
 export function draw(g, P, d, look, hooks = {}) {
   const J = solve(P, d);
@@ -387,17 +664,65 @@ export function draw(g, P, d, look, hooks = {}) {
   // head
   const [cx, cy] = [Math.round(J.head[0] * 2) / 2, Math.round(J.head[1] * 2) / 2];
   J.head = [cx, cy];
-  g.ellipse(cx, cy, d.headR, d.headR * 0.95, skin);
-  const ex = Math.floor(cx + d.headR * 0.42), ey = Math.floor(cy - 0.5);
-  if (P.blink) { g.dot(ex, ey + 1, INK); g.dot(ex + 1, ey + 1, INK); }
-  else { g.dot(ex, ey, INK); g.dot(ex, ey + 1, INK); if (d.headR >= 5.6) { g.dot(ex + 1, ey, INK); g.dot(ex + 1, ey + 1, INK); g.dot(ex + 1, ey, '#ffffff'); } }
-  drawHair(g, J, P, d, look.hairStyle ?? 'short', hair);
-  hooks.head?.(g, J, P, d);
+  const turn = P.headTurn || 0;
+  if (!turn) drawHead(g, J, P, d, look, skin, hair, hooks);
+  else {
+    // The head is turned (lying down): it, its hair and whatever the head hook adds are drawn upright on a layer of
+    // their own, lit so that the shade still falls down and to the left once turned, and the layer is turned onto the
+    // picture about the middle of the head. Nothing lands below the ground.
+    const layer = new Surface(HEAD_LAYER, HEAD_LAYER);
+    const ox = HEAD_LAYER / 2 - Math.floor(cx), oy = HEAD_LAYER / 2 - Math.floor(cy);      // whole pixels: drawn exactly as it would be in place
+    const cos = Math.cos(turn), sin = Math.sin(turn);
+    layer.shadow = [Math.round(-cos - sin) || 0, Math.round(cos - sin) || 0];
+    drawHead(layer, moveJoints(J, ox, oy), P, d, look, skin, hair, hooks);
+    stampTurned(g, layer, [HEAD_LAYER / 2 + 0.5, HEAD_LAYER / 2 + 0.5], [Math.floor(cx) + 0.5, Math.floor(cy) + 0.5], turn, J.gy);
+  }
 
   hooks.item?.(g, J, P, d);
   drawArm(g, J.armF, d, top, skin, look.bareArms);
   hooks.front?.(g, J, P, d);
   return J;
+}
+
+const HEAD_LAYER = 96;      // the head's own layer when it is turned: room for the tallest hat and the longest beard
+
+/** The head: skull, eye, mouth, hair, then the head hook. */
+function drawHead(g, J, P, d, look, skin, hair, hooks) {
+  const [cx, cy] = J.head;
+  g.ellipse(cx, cy, d.headR, d.headR * 0.95, skin);
+  const ex = Math.floor(cx + d.headR * 0.42), ey = Math.floor(cy - 0.5);
+  if (P.blink) { g.dot(ex, ey + 1, INK); g.dot(ex + 1, ey + 1, INK); }
+  else { g.dot(ex, ey, INK); g.dot(ex, ey + 1, INK); if (d.headR >= 5.6) { g.dot(ex + 1, ey, INK); g.dot(ex + 1, ey + 1, INK); g.dot(ex + 1, ey, '#ffffff'); } }
+  // an open mouth (talk): one or two dark pixels on the lower front of the face, never outside it
+  if (P.mouth) for (const mx of d.headR >= 5.6 ? [ex, ex + 1] : [ex]) if (g.get(mx, ey + 3)) g.dot(mx, ey + 3, INK);
+  drawHair(g, J, P, d, look.hairStyle ?? 'short', hair);
+  hooks.head?.(g, J, P, d);
+}
+
+/** A copy of the joints with every point moved by (ox, oy). */
+function moveJoints(J, ox, oy) {
+  const pt = (q) => [q[0] + ox, q[1] + oy];
+  const leg = (L) => ({ ...L, hip: pt(L.hip), knee: pt(L.knee), ankle: pt(L.ankle) });
+  const arm = (A) => ({ ...A, shoulder: pt(A.shoulder), elbow: pt(A.elbow), hand: pt(A.hand) });
+  return { ...J, gy: J.gy + oy, hip: pt(J.hip), neck: pt(J.neck), head: pt(J.head), shoulder: pt(J.shoulder), legF: leg(J.legF), legB: leg(J.legB), armF: arm(J.armF), armB: arm(J.armB) };
+}
+
+/**
+ * Copy `layer` onto g turned by `turn` radians (up goes toward the back), `from` on the layer landing on `to` on g.
+ * A quarter turn about a pixel centre moves every pixel to exactly one pixel, so nothing is lost or doubled.
+ * Rows from `floorY` down are left alone: what would be under the ground is cut off.
+ */
+function stampTurned(g, layer, from, to, turn, floorY) {
+  const quarter = Math.abs(turn - PI / 2) < 1e-9;
+  const cos = quarter ? 0 : Math.cos(turn), sin = quarter ? 1 : Math.sin(turn);
+  const reachPx = Math.ceil(layer.w * 0.75);
+  for (let y = Math.max(0, Math.floor(to[1] - reachPx)); y < Math.min(g.h, floorY, to[1] + reachPx); y++) {
+    for (let x = Math.max(0, Math.floor(to[0] - reachPx)); x < Math.min(g.w, to[0] + reachPx); x++) {
+      const dx = x + 0.5 - to[0], dy = y + 0.5 - to[1];
+      const c = layer.get(Math.floor(from[0] + dx * cos - dy * sin), Math.floor(from[1] + dx * sin + dy * cos));
+      if (c) g.data[y * g.w + x] = c;
+    }
+  }
 }
 
 // ---- held items ------------------------------------------------------------
@@ -444,8 +769,51 @@ export function staff(g, J, P, len, wood, orb, glow = 0) {
   g.ellipse(Math.round(tx) + 0.5, Math.round(ty) - 0.5, 2.5 + glow * 0.6, 2.5 + glow * 0.6, orb, { light: 1 });
 }
 
-/** Kinds heldItem() can draw. */
-export const ITEM_KINDS = ['sword', 'axe', 'spear', 'staff'];
+/** Draws a gun in the near hand: a barrel along the item angle, a grip below it. Arguments: g, J, P, len (hand to muzzle), metal (a ramp), grip (a colour). */
+export function gun(g, J, P, len, metal, grip) {
+  const [hx, hy] = J.armF.hand;
+  const [gx, gy] = reach(hx, hy, P.item - PI / 2 - 0.2, 2.6);          // the grip: below the barrel, raked back a little
+  g.limb(hx, hy, gx, gy, 2, grip, { shade: 0 });
+  const [bx, by] = reach(hx, hy, P.item + PI, 1.5), [tx, ty] = reach(hx, hy, P.item, len - 0.5);
+  g.limb(bx, by, tx, ty, 2, metal);
+  g.dot(tx, ty, metal.light);
+}
+
+/**
+ * Draws a bow at an attach point, standing across the way it points. Arguments: g, at ({ x, y, angle }: the grip and the aim),
+ * len (tip to tip), wood (a ramp), opt: { nock: { x, y } where the string is drawn back to (left out: a straight string),
+ * arrow: true to lay an arrow from the nock across the grip, string, metal }.
+ */
+export function bow(g, at, len, wood, opt = {}) {
+  const ux = Math.sin(at.angle), uy = Math.cos(at.angle);                 // the way the arrow flies
+  const px = Math.sin(at.angle + PI / 2), py = Math.cos(at.angle + PI / 2);   // along the bow
+  const half = len / 2 - 0.5, sweep = len * (opt.nock ? 0.2 : 0.1);       // the tips sweep back toward the archer; more when it is drawn
+  const tips = [1, -1].map((k) => [at.x + px * half * k - ux * sweep, at.y + py * half * k - uy * sweep]);
+  const string = opt.string ?? '#f0ead8';
+  const nock = opt.nock ? [opt.nock.x, opt.nock.y] : [at.x - ux * sweep, at.y - uy * sweep];
+  for (const tip of tips) g.line(tip[0], tip[1], nock[0], nock[1], string);
+  if (opt.arrow && opt.nock) {
+    const far = [at.x + ux * 3.5, at.y + uy * 3.5];
+    g.line(nock[0], nock[1], far[0], far[1], wood.light);
+    const metal = opt.metal ?? ramp('#c2c9d6');
+    g.dot(far[0], far[1], metal.base); g.dot(far[0] + ux, far[1] + uy, metal.light);
+  }
+  // the limbs: from the grip out to each tip, bellied forward
+  for (const [k, tip] of [[1, tips[0]], [-1, tips[1]]]) {
+    const mid = [at.x + px * half * 0.55 * k + ux * 0.4, at.y + py * half * 0.55 * k + uy * 0.4];
+    let last = [at.x, at.y];
+    for (let i = 1; i <= 6; i++) {
+      const v = i / 6, w = 1 - v;
+      const q = [w * w * at.x + 2 * w * v * mid[0] + v * v * tip[0], w * w * at.y + 2 * w * v * mid[1] + v * v * tip[1]];
+      g.line(last[0], last[1], q[0], q[1], i > 4 ? wood.dark : wood.base);
+      last = q;
+    }
+  }
+  g.dot(at.x + ux, at.y + uy, wood.light);                               // the grip
+}
+
+/** Kinds heldItem() can draw. A bow is held in the far hand: draw it at sockets().offhand, in the item hook so it is in front of the body. */
+export const ITEM_KINDS = ['sword', 'axe', 'spear', 'staff', 'bow', 'gun'];
 
 /**
  * Standard sizes of the held items, in pixels, so every character's sword is the same sword:
@@ -456,6 +824,8 @@ export const ITEMS = {
   axe: { length: 12, back: 2, pad: 4 },
   spear: { length: 15, back: 4, pad: 1 },
   staff: { length: 18, back: 10, pad: 3 },
+  bow: { length: 15, back: 5, pad: 8 },       // length = tip to tip; back = how far the string sits behind the grip
+  gun: { length: 8, back: 1.5, pad: 2 },      // length = hand to muzzle
 };
 
 /** { length, back, pad } of a kind at a length setting (1 = standard), ready for fit() and heldItem(); null when nothing is held. */
@@ -467,7 +837,7 @@ export const holdAngle = (degrees) => (degrees ? -degrees * PI / 180 : 0);
 /**
  * A held item drawn from an attach point and its own settings only, so the same item can go on any body.
  *   at:   { x, y, angle }, for example sockets(J, P, d).hand
- *   item: { kind: one of ITEM_KINDS, length, metal (a ramp), wood, hilt, orb, glow }
+ *   item: { kind: one of ITEM_KINDS, length, metal (a ramp), wood, hilt, orb, glow; for a bow also nock, arrow, string; for a gun grip }
  */
 export function heldItem(g, at, item) {
   const J = { armF: { hand: [at.x, at.y] } }, P = { item: at.angle };
@@ -477,6 +847,8 @@ export function heldItem(g, at, item) {
   else if (item.kind === 'axe') axe(g, J, P, item.length, metal, wood);
   else if (item.kind === 'spear') spear(g, J, P, item.length, metal, wood);
   else if (item.kind === 'staff') staff(g, J, P, item.length, typeof wood === 'string' ? ramp(wood) : wood, item.orb ?? ramp('#4fd8ee'), item.glow ?? 0);
+  else if (item.kind === 'bow') bow(g, at, item.length, typeof wood === 'string' ? ramp(wood) : wood, { nock: item.nock, arrow: item.arrow, string: item.string, metal: item.metal ? metal : undefined });
+  else if (item.kind === 'gun') gun(g, J, P, item.length, item.metal ? metal : ramp('#5d6475'), item.grip ?? wood);
 }
 
 /**

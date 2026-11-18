@@ -3,7 +3,7 @@
 // shoulder; the finger tips swing a little later than the arm, which gives the
 // whip of a real wing beat. The body bobs the opposite way to the wings.
 import { defineSprite, range, choice, color, toggle } from '../engine/sprite.js';
-import { lerp, wave, pulse, keys } from '../engine/motion.js';
+import { lerp, clamp, wave, pulse, keys } from '../engine/motion.js';
 import { ramp, farRamp, tone, INK } from '../engine/color.js';
 
 const W = 48, CX = 25, CY = 25;
@@ -87,7 +87,7 @@ export default defineSprite({
   grounded: false,
   preview: 'fly',
   // sounds that play with each animation: frame is counted from 0; preset is one of the sound's named styles
-  sounds: { fly: [{ sound: 'whoosh', frame: 1, preset: 'Quick swipe', volume: 0.5 }], attack: [{ sound: 'whoosh', frame: 2, preset: 'Heavy swing' }], hurt: [{ sound: 'punch', frame: 0, preset: 'Light jab' }] },
+  sounds: { fly: [{ sound: 'whoosh', frame: 1, preset: 'Quick swipe', volume: 0.5 }], attack: [{ sound: 'whoosh', frame: 2, preset: 'Heavy swing' }], hurt: [{ sound: 'punch', frame: 0, preset: 'Light jab' }], die: [{ sound: 'enemy-squish', frame: 0, preset: 'Pop', volume: 1 }] },
   params: {
     size: range('Body size', 0.5, { lo: 'Small', hi: 'Chubby' }),
     span: range('Wing span', 0.5, { lo: 'Stubby', hi: 'Wide' }),
@@ -107,6 +107,7 @@ export default defineSprite({
     fly: { frames: 8, fps: fps(14), loop: true },
     attack: { frames: 8, fps: fps(12), loop: false },
     hurt: { frames: 4, fps: fps(9), loop: false },
+    die: { frames: 8, fps: fps(10), loop: false },
   },
 
   render(g, { clip, t, p }) {
@@ -122,6 +123,7 @@ export default defineSprite({
     const a0 = glideA(0), f0 = glideF(0);
     let fold = 0;                                         // 0 = wing fully stretched, 1 = pulled in
     let a = a0, flex = f0, dx = 0, dy = 0, open = 0, sq = 0, mood = p.eyes, flash = false;
+    let tuck = 0;                                         // 0..1: wings folded right in against the body (die)
     if (clip === 'idle') {
       a = glideA(t); flex = glideF(t);
       dy = Math.max(1, bob * 0.6) * wave(t, -0.1);          // wings up -> body down
@@ -150,13 +152,59 @@ export default defineSprite({
       fold = keys(t, [[0, 0.5], [0.35, 0.8], [0.7, 0], [1, 0]]);
       flash = t < 0.2;
       if (t < 0.9) mood = 'hurt';
+    } else if (clip === 'die') {
+      // 0 the hit (white, wings thrown up), 1 the wings fold, 2 to 4 it drops like a stone, 5 it pops, 6 the puff spreads, 7 a few specks are left
+      tuck = keys(t, [[0, 0], [0.143, 0.6], [0.286, 1], [1, 1]]);
+      a = keys(t, [[0, 0.9], [0.143, -0.4], [0.286, -1.25], [0.571, -1.4], [1, -1.4]]);
+      flex = keys(t, [[0, 0.3], [0.143, -0.2], [0.286, -0.35], [1, -0.35]]);
+      fold = tuck;
+      // as far down as the frame allows for this body and these wings
+      const room = W - 3 - CY - Math.max(r * 1.06 + 3, L * 0.55 * 0.9 + r * 0.3 + 2);
+      const drop = Math.min(13, room);
+      dy = keys(t, [[0, -1], [0.143, 0], [0.286, drop * 0.3], [0.429, drop * 0.66], [0.571, drop], [1, drop]], (x) => x);
+      dx = keys(t, [[0, -1], [0.143, -3], [0.571, -4], [1, -4]]);
+      sq = keys(t, [[0, 0.2], [0.143, -0.05], [0.429, -0.14], [0.571, -0.14]]);        // stretched by the fall
+      flash = t < 0.1;
+      mood = 'hurt';
     }
 
     const cx = Math.round(CX + dx), cy = Math.round(CY + dy);
     const rx = r * (1 + sq), ry = r * 1.06 * (1 - sq);
     const fur = ramp(p.body), skin = ramp(p.membrane);
 
-    const Ln = L * (1 - 0.2 * fold);
+    if (clip === 'die' && t > 0.64) {
+      // the pop: a white flash and a ring of fur puffs (frame 5), the ring thins as it spreads and bits of wing fall (6),
+      // then a few fading specks (7). Kept inside the frame whatever the size.
+      const u = clamp((t - 0.64) / 0.36), last = t > 0.93;          // frames 5, 6, 7 are u = 0.2, 0.6, 1
+      const reachX = Math.min(lerp(5, 11, u) + r * 0.3, cx - 3, W - 4 - cx), up = Math.min(lerp(5, 11, u) + r * 0.3, cy - 3), down = Math.min(lerp(4, 8, u), W - 4 - cy);
+      const bits = [];
+      for (let i = 0; i < 8; i++) {
+        const ang = (i + 0.5) * Math.PI / 4, sx = Math.sin(ang), sy = -Math.cos(ang);
+        bits.push([cx + 0.5 + sx * reachX, cy + 0.5 + sy * (sy < 0 ? up : down) + u * u * 3 * (i % 2), i]);
+      }
+      if (last) {
+        // what is left: single pixels, not outlined, darker as they fade
+        for (const [x, y, i] of bits) if (i % 2 === 0 || i === 3) g.dot(x, Math.min(y, W - 3), i % 4 === 0 ? fur.base : i === 3 ? skin.dark : fur.dark);
+        return;
+      }
+      for (const [x, y, i] of bits) {
+        const big = lerp(2.1, 0.9, u) * (i % 2 ? 0.8 : 1);
+        if (i % 3 === 1 && u > 0.4) g.poly([[x - 2, y], [x + 1.5, y - 1], [x + 0.5, y + 2]], skin, { shade: 0 });   // a scrap of wing
+        else g.ellipse(x, y, big, big, fur, { shade: 0 });
+      }
+      if (u < 0.4) {
+        g.ellipse(cx + 0.5, cy + 0.5, r * 0.55, r * 0.55, fur.light, { shade: 0 });
+      }
+      g.outline(INK);
+      if (u < 0.4) {
+        // the flash in the middle, drawn after the outline so it is light, not ink
+        g.ellipse(cx + 0.5, cy + 0.5, Math.max(1.5, r * 0.4), Math.max(1.5, r * 0.4), '#ffffff', { shade: 0 });
+        for (const [sx, sy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) g.line(cx + sx * (r * 0.4 + 1), cy + sy * (r * 0.4 + 1), cx + sx * (r * 0.4 + 2.5), cy + sy * (r * 0.4 + 2.5), '#ffffff');
+      }
+      return;
+    }
+
+    const Ln = L * (1 - 0.2 * fold) * (1 - 0.3 * tuck);
     // wings: far one (on the right, the way it faces) first and darker
     wing(g, [cx + rx * 0.5, cy - ry * 0.25], [cx + rx * 0.35, cy + ry * 0.6], 1, Ln * 0.88, a, flex, p.wing, farRamp(p.membrane));
     wing(g, [cx - rx * 0.6, cy - ry * 0.25], [cx - rx * 0.45, cy + ry * 0.6], -1, Ln, a, flex, p.wing, skin);

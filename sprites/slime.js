@@ -17,7 +17,7 @@ export default defineSprite({
   pivot: [CX, GROUND],
   preview: 'hop',
   // sounds that play with each animation: frame is counted from 0; preset is one of the sound's named styles
-  sounds: { hop: [{ sound: 'jump', frame: 1, preset: 'Tiny hop' }, { sound: 'footstep-gravel', frame: 6, preset: 'Sneaking' }], attack: [{ sound: 'whoosh', frame: 3, preset: 'Quick swipe' }], hurt: [{ sound: 'punch', frame: 0, preset: 'Light jab' }] },
+  sounds: { hop: [{ sound: 'jump', frame: 1, preset: 'Tiny hop' }, { sound: 'footstep-gravel', frame: 6, preset: 'Sneaking' }], attack: [{ sound: 'whoosh', frame: 3, preset: 'Quick swipe' }], hurt: [{ sound: 'punch', frame: 0, preset: 'Light jab' }], die: [{ sound: 'enemy-squish', frame: 0, preset: 'Squish', volume: 1 }] },
   params: {
     size: range('Size', 0.5, { lo: 'Tiny', hi: 'Huge' }),
     shape: range('Shape', 0.5, { lo: 'Flat', hi: 'Tall' }),
@@ -34,6 +34,7 @@ export default defineSprite({
     hop: { frames: 8, fps: (p) => 11 * lerp(0.65, 1.45, p.speed), loop: true },
     attack: { frames: 8, fps: (p) => 13 * lerp(0.65, 1.45, p.speed), loop: false },
     hurt: { frames: 4, fps: (p) => 9 * lerp(0.65, 1.45, p.speed), loop: false },
+    die: { frames: 8, fps: (p) => 10 * lerp(0.65, 1.45, p.speed), loop: false },
   },
 
   render(g, { clip, t, p }) {
@@ -41,7 +42,7 @@ export default defineSprite({
     const tall = lerp(0.72, 1.12, p.shape);
     const wob = lerp(0.5, 1.6, p.wobble);
     // squash: >0 flatter and wider, <0 taller and thinner
-    let squash = 0, lift = 0, dx = 0, flash = false, mood = p.eyes, lean = 0;
+    let squash = 0, lift = 0, dx = 0, flash = false, mood = p.eyes, lean = 0, burst = 0;
     if (clip === 'idle') {
       squash = 0.1 * wob * wave(t);
     } else if (clip === 'hop') {
@@ -60,11 +61,22 @@ export default defineSprite({
       dx = keys(t, [[0, -1], [0.4, -4], [1, -1]]);
       flash = t < 0.2;
       mood = 'hurt';
+    } else if (clip === 'die') {
+      // 0 the hit (white), 1 to 3 it sags flatter and flatter, 4 it bursts and droplets fly, 5 to 6 they fall, 7 a puddle is left
+      squash = keys(t, [[0, 0.35], [0.143, 0.2], [0.286, 0.5], [0.429, lerp(0.64, 0.74, p.wobble)], [1, 0.74]]);
+      dx = keys(t, [[0, -1], [0.143, -3], [0.429, -2], [1, -2]]);
+      flash = t < 0.1;
+      mood = 'hurt';
+      burst = clamp((t - 0.43) / 0.57);              // 0 until it bursts, then 0..1 over frames 4 to 7
     }
 
-    const rx = r * (1 + squash) , ry = r * tall * (1 - squash) * 1.0;
     const cx = CX + dx, base = GROUND - lift;
-    const cy = base - ry * 0.82;                     // centre sits a little below the middle: flat-ish bottom
+    const wide = clip === 'die' ? cx - 3 : Infinity;      // dying, it spreads out: never past the frame edge
+    // after the burst the body is a puddle: a low dome that spreads and settles
+    const puddle = burst > 0;
+    const rx = puddle ? Math.min(r * lerp(1.45, 1.85, Math.sqrt(burst)), wide) : Math.min(r * (1 + squash), wide);
+    const ry = puddle ? Math.max(2.4, r * tall * lerp(0.36, 0.22, burst)) : r * tall * (1 - squash) * 1.0;
+    const cy = puddle ? base : base - ry * 0.82;     // centre sits a little below the middle: flat-ish bottom
     const goo = ramp(p.body);
     const body = (px, py) => {
       if (py > base) return false;
@@ -78,14 +90,31 @@ export default defineSprite({
 
     const topY = cy - ry, faceX = cx + rx * 0.22 + lean * ry * 0.8, faceY = cy - ry * 0.05;
     if (p.shine) {
-      const hx = Math.round(cx + rx * 0.45 + lean * ry), hy = Math.round(cy - ry * 0.55);
-      g.rect(hx, hy, 2, 1, goo.light); g.dot(hx + 1, hy + 1, goo.light);
-      if (r > 8) g.dot(hx - 2, hy - 1, goo.light);
+      const hx = Math.round(cx + rx * 0.45 + lean * ry), hy = puddle ? Math.round(base - ry * 0.55) - 1 : Math.round(cy - ry * 0.55);
+      g.rect(hx, hy, 2, 1, goo.light);
+      if (!puddle) g.dot(hx + 1, hy + 1, goo.light);            // the puddle is too thin for the second row
+      if (r > 8) g.dot(hx - 2, puddle ? hy : hy - 1, goo.light);
     }
 
-    // face
+    // droplets thrown out by the burst: each flies its own arc, lands, and stays as a speck beside the puddle
+    if (puddle) {
+      const apex = r * 0.8 + lerp(3, 8, p.hop);
+      // [side: -1 back .. 1 front, how high, size, when it lands (0..1 of the burst)]
+      for (const [side, high, big, lands] of [[-1, 0.8, 1.6, 1], [-0.6, 1.2, 1.2, 0.8], [-0.2, 1.45, 1.0, 1], [0.3, 1.5, 1.2, 0.8], [0.68, 1.15, 1.6, 1], [1, 0.75, 1.0, 0.8]]) {
+        const far = Math.min(rx + 6, side < 0 ? cx - 4 : W - 5 - cx);
+        const u = clamp(burst / lands);
+        const x = cx + side * far * lerp(0.35, 1, u);
+        if (u >= 1) { g.rect(Math.round(x) - 1, base - 1, big > 1.4 ? 3 : 2, 1, goo.base); continue; }
+        const y = base - ry - 1 - apex * high * (1 - (2 * u - 1) ** 2) * 0.9;
+        g.ellipse(x, y, big, big, goo, { shade: 0 });
+        g.dot(x, y - 0.5, goo.light);
+      }
+    }
+
+    // face (the puddle has none)
     const gap = Math.max(2, Math.round(rx * 0.42));
     const ex = Math.round(faceX), ey = Math.round(faceY);
+    const noFace = clip === 'die' && (puddle || ry < 3.2);      // too flat to hold a face
     const eye = (x) => {
       if (mood === 'hurt') { g.dot(x - 1, ey - 1, INK); g.dot(x, ey, INK); g.dot(x - 1, ey + 1, INK); return; }
       if (mood === 'sleepy') { g.rect(x - 1, ey, 2, 1, INK); return; }
@@ -94,7 +123,9 @@ export default defineSprite({
       if (mood === 'cute') g.dot(x, ey - 1, '#ffffff');
       if (mood === 'angry') { g.dot(x - 1, ey - 1, goo.base); g.dot(x - 1, ey - 2, INK); g.dot(x, ey - 2, INK); }
     };
-    if (mood === 'one') {
+    if (noFace) {
+      // nothing
+    } else if (mood === 'one') {
       g.ellipse(ex + 0.5, ey, 2.5, 2.5, '#ffffff'); g.rect(ex, ey - 1, 2, 2, INK);
     } else {
       eye(ex - Math.floor(gap / 2)); eye(ex + Math.ceil(gap / 2) + 1);

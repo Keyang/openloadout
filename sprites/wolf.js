@@ -65,6 +65,7 @@ function pose(clip, t, p, d) {
     bx: 0, by: 0, hip: 0, sh: 0, stretch: 0, arch: 0,
     neck: 0.74 * PI, neckLen: 0, snout: -0.2, jaw: 0, ear: 0, flick: 0,
     tailA: 0, tailCurl: 0, blink: false, squint: false, flash: false, snap: false,
+    down: 0,      // 0..1: lying on the ground (die): the tail lies flat and the hind legs lie forward, hocks up
     nh: [0, 0], nf: [0, 0], fh: [0, 0], ff: [0, 0],
   };
   const bounce = lerp(0.5, 1.5, p.bounce);
@@ -147,6 +148,32 @@ function pose(clip, t, p, d) {
     P.tailA = keys(t, [[0, 0.3], [0.35, 0.6], [1, 0]]);
     P.tailCurl = keys(t, [[0, 0.05], [0.35, 0.12], [1, 0]]);
     P.squint = t < 0.8;
+  } else if (clip === 'die') {
+    // 0 the hit (white), 1 to 3 it stumbles: the front legs give way and the chest and head go down, 4 the chest bumps
+    // the ground as the haunches follow, 5 it is down, 6 the head settles, 7 lying still, legs out in front and behind
+    const chest = keys(t, [[0, 0.05], [0.143, 0.15], [0.286, 0.6], [0.429, 1], [0.571, 0.84], [0.714, 1], [1, 1]]);
+    const rump = keys(t, [[0, 0], [0.286, 0.05], [0.429, 0.3], [0.571, 0.75], [0.714, 1], [0.857, 0.92], [1, 1]]);
+    // how far the chest and the haunch must drop to rest on the ground, and the neck angle that lays the head on it
+    // It lies on its folded legs, not flat as a rug: chest and haunch stop REST px above the ground, the head on its paws.
+    const REST = clamp(d.H * 0.12, 1, 1.8);
+    const dropS = d.footY + 0.4 - d.rc - 0.2 - d.syc - REST, dropH = d.footY + 0.4 - d.rh - d.hyc - REST;
+    const neckDown = Math.acos(clamp((1.45 * d.rc - d.R - 0.6 + REST - 1) / d.neck, -1, 1));
+    P.flash = t < 0.1;
+    P.sh = dropS * chest; P.hip = dropH * rump;
+    P.by = 0.55 * (1 - chest);
+    P.bx = keys(t, [[0, -1.5], [0.143, -2.5], [0.429, -1], [1, -1]]);
+    P.neck = keys(t, [[0, 0.8 * PI], [0.143, 0.7 * PI], [0.286, 0.6 * PI], [0.429, 0.5 * PI], [0.571, 0.56 * PI], [0.714, neckDown + 0.2], [0.857, neckDown - 0.04], [1, neckDown]]);
+    P.snout = keys(t, [[0, 0.15], [0.286, -0.1], [0.571, 0.12], [0.857, 0], [1, 0]]);
+    P.jaw = keys(t, [[0, 0.5], [0.286, 0.2], [0.429, 0], [1, 0]]);
+    P.ear = keys(t, [[0, 1], [0.571, 1], [0.857, 0.55], [1, 0.55]]);       // laid back by the hit, half up again once it is still
+    P.squint = true;
+    P.arch = -0.6 * rump;
+    P.down = rump;
+    const slide = keys(t, [[0, 0], [0.143, 0.1], [0.286, 0.5], [0.429, 0.85], [0.571, 1], [1, 1]]);
+    const trail = keys(t, [[0, 0], [0.429, 0.1], [0.571, 0.6], [0.714, 1], [1, 1]]);
+    P.nf = [d.frontLen * 0.8 * slide, 0]; P.ff = [d.frontLen * 0.7 * slide, 0];
+    P.nh = [d.hindLen * 0.62 * trail, 0]; P.fh = [d.hindLen * 0.5 * trail, 0];        // the hind legs fold forward along the belly
+    P.tailA = keys(t, [[0, 0.3], [0.286, 0.5], [0.571, 0.2], [1, 0]]) * (1 - rump);
   }
   return P;
 }
@@ -162,7 +189,7 @@ export default defineSprite({
   grounded: true,
   preview: 'run',
   // sounds that play with each animation: frame is counted from 0; preset is one of the sound's named styles
-  sounds: { walk: [{ sound: 'footstep-gravel', frame: 0, preset: 'Sneaking' }, { sound: 'footstep-gravel', frame: 4, preset: 'Sneaking' }], run: [{ sound: 'footstep-gravel', frame: 1, preset: 'Boots' }, { sound: 'footstep-gravel', frame: 5, preset: 'Boots' }], attack: [{ sound: 'whoosh', frame: 2, preset: 'Quick swipe' }, { sound: 'punch', frame: 4, preset: 'Light jab' }], hurt: [{ sound: 'punch', frame: 0, preset: 'Light jab' }] },
+  sounds: { walk: [{ sound: 'footstep-gravel', frame: 0, preset: 'Sneaking' }, { sound: 'footstep-gravel', frame: 4, preset: 'Sneaking' }], run: [{ sound: 'footstep-gravel', frame: 1, preset: 'Boots' }, { sound: 'footstep-gravel', frame: 5, preset: 'Boots' }], attack: [{ sound: 'whoosh', frame: 2, preset: 'Quick swipe' }, { sound: 'punch', frame: 4, preset: 'Light jab' }], hurt: [{ sound: 'punch', frame: 0, preset: 'Light jab' }], die: [{ sound: 'punch', frame: 0, preset: 'Heavy body blow', volume: 1 }, { sound: 'land-thud', frame: 5, preset: 'Heavy landing', volume: 1 }] },
   params: {
     size: range('Body size', 0.55, { lo: 'Small', hi: 'Big' }),
     legs: range('Leg length', 0.55, { lo: 'Short', hi: 'Long' }),
@@ -185,6 +212,7 @@ export default defineSprite({
     run: { frames: 8, fps: (p) => 14 * lerp(0.65, 1.45, p.speed), loop: true },
     attack: { frames: 8, fps: (p) => 12 * lerp(0.65, 1.45, p.speed), loop: false },
     hurt: { frames: 4, fps: (p) => 9 * lerp(0.65, 1.45, p.speed), loop: false },
+    die: { frames: 8, fps: (p) => 10 * lerp(0.65, 1.45, p.speed), loop: false },
   },
 
   render(g, { clip, t, p }) {
@@ -216,7 +244,9 @@ export default defineSprite({
     const tailR = lerp(1.3, 2.7, fl) * lerp(0.9, 1.1, p.size) * (style === 'brush' ? 1.2 : 1);
     const prof = style === 'brush' ? [[0, 0.5], [0.6, 1.15], [1, 0.5]] : style === 'curled' ? [[0, 0.7], [0.5, 1], [1, 0.6]] : [[0, 0.6], [0.55, 1], [1, 0.45]];
     let ta = (style === 'brush' ? -1.25 : style === 'curled' ? -2.3 : -0.95) + P.tailA * (style === 'curled' ? 0.5 : 1);
-    const tcurl = (style === 'brush' ? -0.06 : style === 'curled' ? -0.5 : 0.1) + P.tailCurl;
+    let tcurl = (style === 'brush' ? -0.06 : style === 'curled' ? -0.5 : 0.1) + P.tailCurl;
+    // lying down, a tail that hangs is laid out flat behind (a curled one stays curled over the back)
+    if (P.down && style !== 'curled') { ta = lerp(ta, -PI / 2 - 0.06, P.down); tcurl = lerp(tcurl, 0.01, P.down); }
     const N = 6, ta0 = ta;
     let tp, tLen = tailLen;
     for (let tries = 0; tries < 4; tries++) {            // shorten the tail if it would leave the frame
@@ -251,7 +281,8 @@ export default defineSprite({
 
     if (style !== 'curled') drawTail();
     // far legs, shifted a little forward so all four read
-    leg([hipJ[0] + 2.5, hipJ[1] - 0.5], foot(restH + 3.5 - d.hindBack, P.fh), d.hindLen, 0.92, -1, 1.3, furFar, hasSocks ? mkFar : furFar);
+    const hock = P.down > 0.5 ? 1 : -1;             // lying down, the hind legs point forward and bend upward, never into the ground
+    leg([hipJ[0] + 2.5, hipJ[1] - 0.5], foot(restH + 3.5 - d.hindBack, P.fh), d.hindLen, 0.92, hock, 1.3, furFar, hasSocks ? mkFar : furFar);
     leg([shJ[0] + 2, shJ[1] - 0.5], foot(restS + 3.5, P.ff), d.frontLen, 0.985, 1, 0.5, furFar, hasSocks ? mkFar : furFar);
 
     // ---- body: haunch + waist + chest + neck as one shaded shape ----
@@ -281,7 +312,7 @@ export default defineSprite({
     if (style === 'curled') drawTail();
 
     // near legs
-    leg(hipJ, foot(restH - 0.5 - d.hindBack, P.nh), d.hindLen, 0.92, -1, 1.3, fur, hasSocks ? mk : fur);
+    leg(hipJ, foot(restH - 0.5 - d.hindBack, P.nh), d.hindLen, 0.92, hock, 1.3, fur, hasSocks ? mk : fur);
     leg(shJ, foot(restS + 0.5, P.nf), d.frontLen, 0.985, 1, 0.5, fur, hasSocks ? mk : fur);
 
     // ---- head ----
