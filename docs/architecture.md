@@ -243,7 +243,7 @@ Rules:
 
 A run-time asset that fails the quality bar is kept as a draft: it can be rendered, checked and replaced by calling `make` again with the same id, but `bag.add` refuses it while it has errors (the quality bar applies to everything an agent adds to the bag; warnings do not block). `loadout.call(name, input)` runs any action by its name in `generated/api.json`.
 
-**Safety of run-time assets (after the review of 2026-11-18; status: to build, task W5-B).** A sprite made at run time is a program. The review showed that importing it into the page lets it read storage, call other sites, change the page and hang it, and that a definition kept in the bag or carried by a link ran again on every load. The rules:
+**Safety of run-time assets (after the review of 2026-11-18; status: built as task W5-B and reviewed twice; verified in Chromium only, see the list of what remains below and in `docs/framework-api.md`).** A sprite made at run time is a program. The review showed that importing it into the page lets it read storage, call other sites, change the page and hang it, and that a definition kept in the bag or carried by a link ran again on every load. The rules:
 
 - A made source never runs in the page. It is loaded, checked and drawn only inside a dedicated worker that the page can stop; the page receives pixels and data, never functions. Every call has a time limit (about 60 s for a check, far less for a frame) and a frame-size cap; on a limit the worker is stopped and the call returns `{ ok: false, errors }`.
 - The site sends a content policy that allows scripts, connections, images and fonts from the site itself only (plus in-memory scripts for the worker), so a made source cannot reach another site.
@@ -328,7 +328,7 @@ Three levels, from `sprite-styles.md`: (1) the same drawing with a different fin
 
 ## Contract 13: rigs are separate from sprite definitions
 
-Decision from Keyang, 2026-11-18 18:51: "we will need to separate rigs from sprites definition". It followed the question of whether a person could change a sprite's raw definition data (add a part, add an animation) and have the sprite redrawn. Status: **decided, and the reading below was confirmed by Keyang the same day; nothing is built**. Not a priority for the three bundles.
+Decision from Keyang, 2026-11-18 18:51: "we will need to separate rigs from sprites definition". It followed the question of whether a person could change a sprite's raw definition data (add a part, add an animation) and have the sprite redrawn. Status: **decided, and the reading below was confirmed by Keyang the same day; first steps exist, the renderer and the conversion do not**. Built on 2026-11-18 (see `docs/progress.md`): each character rig describes itself as data (`rigs/*-describe.js`, listed in `generated/api.json`, proved by `tests/unit/rig-describe-*.test.mjs`); a module that draws a side-view figure from a definition (`rigs/humanoid-figure.js`) with two sprites written that way (`sprites/rogue-battler.js`, `sprites/road-bandit.js`); the production rule that a rig sprite's file holds choices and thin wiring only. Not built: one generic renderer per rig, definitions as pure data, converting the older rig sprites. Not a priority for the three bundles.
 
 The reading (confirmed by Keyang, 2026-11-18):
 

@@ -20,6 +20,21 @@ import { buildCatalog } from './lib/catalog.mjs';
 import { writeImages } from './lib/thumbs.mjs';
 import { validateMeta, validateBundle } from '../catalog/schema.js';
 
+if (process.argv.includes('--help') || process.argv.includes('-h')) {
+  console.log(`node tools/build.mjs [options]
+  Validates every asset, then writes generated/ (catalogue, thumbnails, quality results, search index, framework description, vendored files).
+  --skip-quality   leave out the quality bar (minutes for sounds and music; use while iterating)
+  --no-cache       re-run the quality bar on everything, ignoring .cache/quality.json
+  --skip-search    leave out the search index
+  --no-meaning     search index with keywords only (no embedding model; the site then hides Smarter search)
+  --skip-vendor    do not copy libraries, model and fonts into vendor/
+  --root <dir>     build another copy of the site (default: this folder)
+  --dist <dir>     also write a deployable copy there
+  --force          rebuild thumbnails even when up to date`);
+  process.exit(0);
+}
+
+
 const args = process.argv.slice(2);
 const has = (f) => args.includes(f);
 const USAGE = 'usage: node tools/build.mjs [--root <folder>] [--dist] [--skip-quality] [--no-cache] [--skip-search] [--no-meaning] [--skip-vendor] [--force]';
