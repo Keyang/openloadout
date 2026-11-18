@@ -6,7 +6,7 @@
 import { el, header } from './ui.js';
 import { bag } from './bag.js';
 import { loadCatalog, currentCatalog, assetById, loadSprite, loadSound } from './catalog.js';
-import { soundById, soundState, setSoundOn, toUnit, toValue, isChoice } from './audio.js';
+import { soundById, soundState, stopAll, toUnit, toValue, isChoice } from './audio.js';
 import { cleanParams, clipFps, clipStretch } from '../engine/sprite.js';
 import { normalizeTheme, themedParams } from '../engine/theme.js';
 import { rowFromSprite, rowFromPatch, planScene, SCENE_ROLES } from './play/roles.js';
@@ -35,6 +35,9 @@ export async function playPage(app) {
   const heard = [];                  // the last sounds that fired, for the browser tests
   let heardTotal = 0;
   let scene = null, gone = false, builds = 0;
+  // Mute belongs to the playground: it is not remembered and nothing else on the site inherits it. The site's own
+  // sound setting (the switch on a sprite page) is taken as found, and put back when the playground is left.
+  const siteSound = soundState.on;
   const hear = (h) => { heard.push(h); heardTotal++; if (heard.length > HEARD_MAX) heard.shift(); };
 
   // ---- gather: every bag item with its catalogue row and its own file ---------------------------
@@ -104,7 +107,8 @@ export async function playPage(app) {
     const syncMute = () => { muteBtn.textContent = soundState.on ? 'Mute' : 'Unmute'; muteBtn.setAttribute('aria-pressed', String(!soundState.on)); };
     function setMuted(muted) {
       if (muted) { for (const t of tracks) t.stop(); for (const b of boards) b.stop(); sounds.stopLoops(); }
-      setSoundOn(!muted);
+      soundState.on = !muted;            // for this visit to the playground only: nothing is stored
+      if (muted) stopAll();
       syncMute();
     }
     syncMute();
@@ -423,6 +427,7 @@ export async function playPage(app) {
   const off = bag.onChange(() => { build(); });
   return () => {
     gone = true; off();
+    soundState.on = siteSound;
     main.removeEventListener('click', unfocus);
     if (scene) scene.stop();
     if (window.__loadoutPlay === api) delete window.__loadoutPlay;

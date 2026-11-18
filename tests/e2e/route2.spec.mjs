@@ -117,7 +117,7 @@ test('an agent makes a pickup and its sound, and they go through the bag, a relo
   await setRange(page.getByLabel('Size', { exact: true }), 1);
   await expect.poll(async () => (await canvasStats(stage)).hash).not.toBe(before.hash);
   await expect(page.locator('.related')).toContainText('Wish chime');            // "Sounds it uses"
-  await expect(page.getByRole('button', { name: 'Add to bag' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Add to my bag' })).toBeVisible();
   expect((await page.evaluate((id) => window.loadout.go(`/sound/${id}`), CHIME_ID)).ok).toBe(true);
   await expect(page.getByRole('heading', { name: 'Wish chime', level: 1 })).toBeVisible();
   await expect(page.locator('.related')).toContainText('Wish star');             // "Used by"
@@ -252,10 +252,10 @@ test('a card for an asset with no built picture draws it live, and a draft has n
   await expect.poll(async () => (await canvasStats(card('route2-star').locator('canvas').first())).opaque).toBeGreaterThan(20);
   await expect.poll(async () => (await canvasStats(card('route2-chime').locator('canvas').first())).opaque).toBeGreaterThan(5);
   await expect(card('route2-star').locator('img')).toHaveCount(0);
-  await expect(card('route2-star').getByRole('button', { name: /Add Wish star to bag/ })).toBeVisible();
+  await expect(card('route2-star').getByRole('button', { name: /Add Wish star to my bag/ })).toBeVisible();
   await expect(card('route2-draft').locator('.card-add')).toHaveCount(0);
   // the card's button stores the definition too
-  await card('route2-star').getByRole('button', { name: /Add Wish star to bag/ }).click();
+  await card('route2-star').getByRole('button', { name: /Add Wish star to my bag/ }).click();
   const items = await page.evaluate(() => window.loadout.bag.items());
   expect(items.items.map((i) => [i.id, typeof i.definition?.source])).toEqual([['route2-star', 'string']]);
   // a draft's own page says what is wrong and offers no "Add to bag"
@@ -263,5 +263,5 @@ test('a card for an asset with no built picture draws it live, and a draft has n
   await expect(page.getByRole('heading', { name: 'Wish star', level: 1 })).toBeVisible();
   await expect(page.locator('.made-here')).toContainText(/quality bar/);
   await expect(page.locator('.made-here')).toContainText(/Weight/i);
-  await expect(page.getByRole('button', { name: 'Add to bag' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Add to my bag' })).toHaveCount(0);
 });

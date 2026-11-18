@@ -9,19 +9,29 @@
 // The two things a browser test cannot do as a person does are observed, not driven:
 //   - hearing: every audio buffer the page starts is noted (recordPlayed); live music is read from its button;
 //   - the playground scene: read from what the page reports about itself (window.__loadoutPlay.state()).
+//
+// Five things the first walk of this path found awkward are checked on the way, each once, softly (the journey goes on
+// and reports every one that is not there yet): a way back to the results from an asset's page, bag rows that say what
+// was changed, one wording for the bag button, the playground's Mute not silencing other pages, and bag pictures that
+// stay while the bag's look changes. They are marked "AWKWARD 1" to "AWKWARD 5" below.
 // Run with: npx playwright test tests/e2e/journey.spec.mjs
 import { test, expect as baseExpect, waitForDrawn, canvasStats, canvasGroupStats, setRange, downloadFrom, hasHorizontalScroll, quietNetwork, collectErrors } from '../helpers/test.mjs';
 import {
   readCatalogue, readPatches, pickJourney, searchWord, ACTION_CLIP, recordPlayed, played, heardAfter, coloursOf, inkOf,
-  playReady, playState, touchHold, packageOf, isPng, isWav,
+  playReady, playState, touchHold, packageOf, isPng, isWav, bagPicturesDrawn, watchBagPictures,
 } from '../helpers/acceptance.mjs';
 
 // Many builders share this machine: anything the page is waited for gets 20 seconds, not the usual 5.
 const expect = baseExpect.configure({ timeout: 20_000 });
+// ... and a press on something that is not there gives up after 30 seconds instead of holding the whole test.
+test.use({ actionTimeout: 30_000 });
 
 const INK = '#231b33';
 const KIND_WORD = { sprite: 'Sprites', sound: 'Sounds', music: 'Music' };
 const literal = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const says = (words) => new RegExp(words.map(literal).join('|'), 'i');
+/** A link or button that takes the visitor back to what they searched for. */
+const BACK = /back\b.*\b(results|search)|\b(results|search)\b.*\bback\b|^\s*[←‹<]\s*(results|search)/i;
 
 const box = (page) => page.getByRole('searchbox', { name: 'Search' });
 const results = (page) => page.locator('ul.results > li');
@@ -49,8 +59,9 @@ async function journey({ page, browser, context }, ui) {
   const fits = async (where) => { if (ui.phone) expect(await hasHorizontalScroll(page), `no sideways scroll on ${where}`).toBe(false); };
   await recordPlayed(page);
 
-  /** From the home page: type a word, narrow by kind, and open the asset from its card. */
-  async function find(asset) {
+  const wordings = [];                  // every "add to the bag" button met on the way: { where, text }
+  /** From the home page: type a word, narrow by kind, and open the asset from its card. `back`: also try the way back to the results. */
+  async function find(asset, { back = false } = {}) {
     const { word, shared } = searchWord(asset, catalog);
     await ui.press(box(page));
     await box(page).fill(word);
@@ -73,9 +84,25 @@ async function journey({ page, browser, context }, ui) {
 
     const li = page.locator(`ul.results > li[data-id="${asset.id}"]`);
     await li.scrollIntoViewIfNeeded();
-    await ui.press(li.locator(`a[href="#/${asset.kind}/${asset.id}"]`));
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText(asset.name);
-    await waitForDrawn(page);
+    if (!wordings.length) wordings.push({ where: 'a card in the results', text: (await li.locator('.card-add .add-word').textContent()).trim() });
+    const open = async () => {
+      await ui.press(li.locator(`a[href="#/${asset.kind}/${asset.id}"]`));
+      await expect(page.getByRole('heading', { level: 1 })).toHaveText(asset.name);
+      await waitForDrawn(page);
+    };
+    await open();
+    if (!back) return;
+    // AWKWARD 1: from the asset's page there is a way back to these results (not only the logo, which starts again)
+    const way = page.getByRole('link', { name: BACK }).or(page.getByRole('button', { name: BACK }));
+    const ways = await way.count();
+    expect.soft(ways, `${asset.kind} page: a link or button back to the results (one that says "back to results" or "back to search")`).toBeGreaterThan(0);
+    if (!ways) return;
+    await ui.press(way.first());
+    await expect.soft(box(page), 'back at the results, the search is still there').toHaveValue(word);
+    await expect.soft(page.locator('.chips .chip').filter({ hasText: KIND_WORD[asset.kind] }), 'and so is the filter').toBeVisible();
+    await expect.poll(() => resultIds(page), { message: `back at the results, ${asset.id} is still among them` }).toContain(asset.id);
+    await li.scrollIntoViewIfNeeded();
+    await open();
   }
   const goHome = async () => {
     await ui.press(page.locator('header a.brand'));
@@ -91,7 +118,7 @@ async function journey({ page, browser, context }, ui) {
   await fits('the home page');
 
   // ================================================================= the sprite: found, changed three ways, added
-  await find(sprite);
+  await find(sprite, { back: true });
   await fits('the sprite page');
   const stage = page.locator('canvas.stage'), strip = page.locator('.strip .cell canvas');
   const firstClip = page.getByRole('group', { name: 'Animation' }).locator('button[aria-pressed="true"]');
@@ -110,8 +137,12 @@ async function journey({ page, browser, context }, ui) {
   // a slider
   const slider = page.locator('.panel input[type=range]:visible').first();
   const sliderKey = (await slider.getAttribute('id')).replace(/^c-/, '');
+  const sliderLabel = (await page.locator(`.panel label[for="c-${sliderKey}"]`).textContent()).trim();
   await setRange(slider, 'other');
   const sliderValue = Number(await slider.inputValue());
+  // the word at the end of the slider it was moved to ("Tall"): a row in the bag may say "Taller" rather than "Height"
+  const sliderEnd = await slider.evaluate((input) => { const ends = input.closest('.slider').querySelectorAll('.end'); return (Number(input.value) >= Number(input.max) ? ends[ends.length - 1] : ends[0])?.textContent ?? ''; });
+  const sliderWord = sliderEnd.trim().split(/\s+/)[0].replace(/y$/, '');
   await previewChanged(`the "${sliderKey}" slider`);
 
   // a colour
@@ -159,6 +190,7 @@ async function journey({ page, browser, context }, ui) {
   const shows = (tile) => expect.poll(async () => { const have = new Set(await coloursOf(tile)); return onlyMine.filter((c) => have.has(c)).length / onlyMine.length; },
     { message: 'the picture in the bag has the colours chosen on the sprite page', timeout: 15_000 }).toBeGreaterThanOrEqual(0.5);
 
+  wordings.push({ where: 'the sprite page', text: (await addButton(page).textContent()).trim() });
   await ui.press(addButton(page));
   await expect(bagCount(page)).toHaveText('1');
   await expect(page.locator('.add-to-bag')).toContainText('Added to your bag');
@@ -173,6 +205,7 @@ async function journey({ page, browser, context }, ui) {
   await expect(playSound).toHaveText('Play', { timeout: 20_000 });               // it ends by itself
   const soundSlider = page.locator('.panel input[type=range]').first();
   const soundKey = (await soundSlider.getAttribute('id')).replace(/^s-/, '');
+  const soundLabel = (await page.locator(`.panel label[for="s-${soundKey}"]`).textContent()).trim();
   const soundShown = page.locator('.panel .field').first().locator('.value');
   const shownBefore = await soundShown.textContent();
   const changedTake = await heardAfter(page, () => setRange(soundSlider, 'other'));      // letting go of the slider plays the sound
@@ -180,6 +213,7 @@ async function journey({ page, browser, context }, ui) {
   await expect(soundShown).not.toHaveText(shownBefore);
   await expect.poll(async () => queryOf(await hashQuery(page))[soundKey], { message: 'the address carries the slider' }).toBeTruthy();
   const soundValue = Number(queryOf(await hashQuery(page))[soundKey]);
+  wordings.push({ where: 'the sound page', text: (await addButton(page).textContent()).trim() });
   await ui.press(addButton(page));
   await expect(bagCount(page)).toHaveText('2');
 
@@ -209,6 +243,7 @@ async function journey({ page, browser, context }, ui) {
   await expect(playMusic).toHaveText('Play');
   await expect.poll(async () => queryOf(await hashQuery(page))[pick.instrument.id]).toBe(instrumentValue);
   expect(queryOf(await hashQuery(page))[pick.length.id]).toBe(shorter.value);
+  wordings.push({ where: 'the music page', text: (await addButton(page).textContent()).trim() });
   await ui.press(addButton(page));
   await expect(bagCount(page)).toHaveText('3');
 
@@ -220,13 +255,13 @@ async function journey({ page, browser, context }, ui) {
   const [spriteRow, soundRow, trackRow] = [0, 1, 2].map((i) => bagRows(page).nth(i));
   await expect(spriteRow.locator('.bag-name')).toHaveText(sprite.name);
   await expect(spriteRow.locator('.bag-kind')).toHaveText('Sprite');
-  await expect(spriteRow).toContainText('Your own look');
+  await expect(spriteRow.locator('.bag-text .hint')).not.toHaveText(/Standard look|your own/i);      // the row says what was changed, in plain words
   await expect(soundRow.locator('.bag-name')).toHaveText(sound.name);
   await expect(soundRow.locator('.bag-kind')).toHaveText('Sound');
-  await expect(soundRow).toContainText('your own changes');
+  await expect(soundRow.locator('.bag-text .hint')).toHaveText(/ style, .+/);      // the style, then what was changed
   await expect(trackRow.locator('.bag-name')).toHaveText(track.name);
   await expect(trackRow.locator('.bag-kind')).toHaveText('Music');
-  await expect(trackRow).toContainText('your own changes');
+  await expect(trackRow.locator('.bag-text .hint')).toHaveText(/ style, .+/);      // the style, then what was changed
   // "Change" leads back to each asset's page with exactly these settings
   await expect.poll(async () => (await rowFacts(page)).every((r) => r.change), { message: 'every row has its "Change" link' }).toBe(true);
   const facts = await rowFacts(page);
@@ -237,10 +272,37 @@ async function journey({ page, browser, context }, ui) {
   expect(Number(changeOf(1)[soundKey])).toBe(soundValue);
   expect(changeOf(2)[pick.length.id]).toBe(shorter.value);
   expect(changeOf(2)[pick.instrument.id]).toBe(instrumentValue);
+  // AWKWARD 2: each row says what was changed, in the words of the controls that were used
+  const told = async (row) => (await row.locator('.bag-text').textContent()).replace(/\s+/g, ' ');
+  test.info().annotations.push({ type: 'bag rows', description: [await told(spriteRow), await told(soundRow), await told(trackRow)].join(' | ') });
+  expect.soft(await told(spriteRow), `the sprite's row says the slider was moved ("${sliderLabel}", or towards "${sliderEnd}")`).toMatch(says([sliderLabel, sliderWord].filter(Boolean)));
+  expect.soft(await told(spriteRow), `the sprite's row names the part that was changed ("${part.title}" or "${part.label}")`).toMatch(says([part.title, part.label]));
+  expect.soft(await told(soundRow), `the sound's row names the slider that was moved ("${soundLabel}")`).toMatch(says([soundLabel]));
+  expect.soft(await told(trackRow), `the track's row names the instrument chosen ("${instrumentName}" or "${pick.instrument.label}")`).toMatch(says([instrumentName, pick.instrument.label]));
+  expect.soft(await told(trackRow), `the track's row says its length was changed ("${shorter.seconds} seconds", "${pick.length.label}", "shorter" or "longer")`).toMatch(says([`${shorter.seconds} seconds`, pick.length.label, 'shorter', 'longer']));
   // the pictures: the sprite in the colours chosen, the sound's waveform, the track's note
   await shows(spriteRow.locator('canvas.tile'));
   await expect.poll(() => inkOf(soundRow.locator('canvas.tile'), INK), { message: 'the sound has a waveform' }).toBeGreaterThan(64 * 2);
   await expect.poll(() => inkOf(trackRow.locator('canvas.tile'), INK), { message: 'the track has its picture' }).toBeGreaterThan(50);
+  // AWKWARD 5: a look for the whole bag, then "Start over": on no painted frame is a picture empty or a waveform gone
+  await bagPicturesDrawn(page);
+  const looks = page.locator('.bag-look .look-preset');
+  const watching = await watchBagPictures(page);
+  const frames = (n) => page.evaluate((count) => new Promise((done) => { const step = () => (count-- > 0 ? requestAnimationFrame(step) : done()); step(); }), n);
+  const plainTile = (await canvasStats(spriteRow.locator('canvas.tile'))).hash;
+  await ui.press(looks.nth(1));
+  await expect(looks.nth(1)).toHaveAttribute('aria-pressed', 'true');
+  await expect.poll(async () => (await canvasStats(spriteRow.locator('canvas.tile'))).hash, { message: 'the look changes the sprite in the bag' }).not.toBe(plainTile);
+  await frames(3);
+  await bagPicturesDrawn(page);
+  await ui.press(page.locator('.bag-look').getByRole('button', { name: 'Start over' }));
+  await expect(looks.nth(1)).toHaveAttribute('aria-pressed', 'false');
+  await frames(3);
+  await bagPicturesDrawn(page);
+  const watched = await watching();
+  expect(watched.frames, 'frames watched while the look changed').toBeGreaterThan(0);
+  expect.soft({ unpainted: watched.unpainted, noWave: watched.noWave }, `painted frames (of ${watched.frames}) with an empty bag picture, or a sound without its waveform, while the bag's look changed`).toEqual({ unpainted: 0, noWave: 0 });
+  await shows(spriteRow.locator('canvas.tile'));                                  // and the sprite is back in its own colours
   // the sound in the bag is the changed one
   expect(await heardAfter(page, () => ui.press(soundRow.getByRole('button', { name: `Play ${sound.name}` })))).toBe(changedTake);
 
@@ -297,9 +359,18 @@ async function journey({ page, browser, context }, ui) {
   await ui.press(page.getByRole('button', { name: 'Unmute', exact: true }));
   expect((await playState(page)).muted).toBe(false);
   await fits('the playground after playing');
-
-  // ================================================================= back to the bag: download
+  // AWKWARD 4: Mute belongs to the playground. Left muted, it does not switch sound off on the sprite's own page
+  await ui.press(page.getByRole('button', { name: 'Mute', exact: true }));
+  expect((await playState(page)).muted).toBe(true);
   await ui.press(page.getByRole('link', { name: 'Back to your bag' }));
+  await expect(bagRows(page)).toHaveCount(3);
+  await ui.press(bagRows(page).nth(0).getByRole('link', { name: 'Change' }));
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(sprite.name);
+  await expect.soft(page.getByRole('checkbox', { name: 'Sound', exact: true }), 'after Mute in the playground, the "Sound" switch on the sprite page is still on').toBeChecked({ timeout: 5000 });
+  await ui.press(page.locator('header a.bag-link'));
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Your bag');
+
+  // ================================================================= back in the bag: download
   await expect(bagRows(page)).toHaveCount(3);
   const zipChoice = page.getByRole('radio', { name: 'Zip package' });
   const unity = page.getByRole('radio', { name: 'Unity package (coming later)' });
@@ -385,6 +456,20 @@ async function journey({ page, browser, context }, ui) {
   } finally {
     await elsewhere.close();
   }
+
+  // ================================================================= AWKWARD 3: one wording for putting things in the bag
+  const toBundles = page.locator('header nav a[data-key="bundles"]');
+  if (!(await toBundles.isVisible())) await ui.press(page.locator('header').getByRole('button', { name: 'Menu', exact: true }));      // on a phone the pages are behind "Menu"
+  await ui.press(toBundles);
+  await expect(page.locator('a.card.kit').first()).toBeVisible();
+  await fits('the list of bundles');
+  await ui.press(page.locator('a.card.kit').first());
+  const whole = page.getByRole('button', { name: /whole bundle/i });
+  await expect(whole).toBeVisible();
+  await fits('a bundle page');
+  wordings.push({ where: 'a bundle page', text: (await whole.textContent()).trim() });
+  const withMy = wordings.filter((w) => /\bmy bag\b/i.test(w.text)), without = wordings.filter((w) => !/\bmy bag\b/i.test(w.text));
+  expect.soft(Math.min(withMy.length, without.length), `every button says "my bag" or every button says "bag": ${wordings.map((w) => `${w.where}: "${w.text}"`).join('; ')}`).toBe(0);
 }
 
 test('search, customise, add, play and export: a sprite, a sound and a track from the home page to the package', async ({ page, browser, context }) => {

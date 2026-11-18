@@ -13,12 +13,14 @@
 //   presses "Start over" on the bag    -> a fresh download is byte for byte the first original download.
 // The named look is chosen from the looks the site has (engine/theme.js): one that changes colours, sound and music.
 // Run with: npx playwright test tests/e2e/whole-bundle.spec.mjs
-import { test, expect as baseExpect, openRoute, waitForDrawn, canvasStats, downloadFrom } from '../helpers/test.mjs';
-import { readCatalogue, catalogueOf, recordPlayed, heardAfter, playReady, playState, packageOf, sameBytes } from '../helpers/acceptance.mjs';
+import { test, expect as baseExpect, openRoute, waitForDrawn, canvasStats, setRange, downloadFrom } from '../helpers/test.mjs';
+import { readCatalogue, readPatches, catalogueOf, recordPlayed, heardAfter, playReady, playState, packageOf, sameBytes } from '../helpers/acceptance.mjs';
 import { THEME_PRESETS, PALETTES, normalizeTheme, defaultTheme } from '../../engine/theme.js';
 
 // Many builders share this machine: anything the page is waited for gets 20 seconds, not the usual 5.
 const expect = baseExpect.configure({ timeout: 20_000 });
+// ... and a press on something that is not there gives up after 30 seconds instead of holding the whole test.
+test.use({ actionTimeout: 30_000 });
 
 // Pictures hold still on their first frame, so they can be compared.
 test.use({ reducedMotion: 'reduce' });
@@ -139,6 +141,41 @@ async function playgroundScene(page, palette) {
 const isAsset = (name) => /\.(png|wav)$/.test(name);
 const withoutKeys = (manifest) => ({ ...manifest, assets: manifest.assets.map(({ key, ...rest }) => rest) });
 
+// ---- the parts of a look, one at a time ------------------------------------------------------------------------------
+
+const isSheet = (name) => name.endsWith('.png');
+const isTrack = (name) => /^music\/.+\.wav$/.test(name);
+const isEffect = (name) => name.endsWith('.wav') && !isTrack(name);            // sounds/<id>.wav and a sprite's own sounds/
+const trackId = (name) => name.replace(/^music\//, '').replace(/(-\d+)?\.wav$/, '');
+const control = (page, label) => page.locator('.bundle-look').getByLabel(label, { exact: true });
+/**
+ * One change to the look, made with the page's own controls, and which files of the download it must change.
+ * (sound/theme.js: sound effects are re-pitched and made brighter or duller after they are made; a track takes the
+ * pitch through its "key" control and the speed through its "bpm" control, and brightness like any other sound.)
+ */
+const PARTS = [
+  {
+    name: 'colours only', address: ['colours'],
+    set: async (page) => { await control(page, 'Colour set').selectOption({ label: LOOK.theme.colour.palette }); },
+    changes: (name) => isSheet(name),
+  },
+  {
+    name: 'pitch only', address: ['pitch'],
+    set: async (page) => { await setRange(control(page, 'Pitch'), 2); },
+    changes: (name, patches) => isEffect(name) || (isTrack(name) && !!patches[trackId(name)]?.params.some((d) => d.id === 'key')),
+  },
+  {
+    name: 'brightness only', address: ['bright'],
+    set: async (page) => { await setRange(control(page, 'Brightness'), -0.4); },
+    changes: (name) => isEffect(name) || isTrack(name),
+  },
+  {
+    name: 'speed only', address: ['speed'],
+    set: async (page) => { await setRange(control(page, 'Speed'), 1.2); },
+    changes: (name, patches) => isTrack(name) && !!patches[trackId(name)]?.params.some((d) => d.id === 'bpm'),
+  },
+];
+
 // ---- one test per bundle ------------------------------------------------------------------------------------------
 
 const LISTED = readCatalogue().bundles;
@@ -237,11 +274,12 @@ for (const listed of LISTED) {
     await lookButton(look, OTHER).click();
     await expect(lookButton(look, OTHER)).toHaveAttribute('aria-pressed', 'true');
     await expect(lookButton(look, LOOK)).toHaveAttribute('aria-pressed', 'false');
-    const changed = await bagPictures(page, ids.length);
-    changed.forEach((p, i) => expect(p.hash, `${p.name} changed in the bag under ${OTHER.name}`).not.toBe(inBag[i].hash));
+    // (the pictures are waited for: a page may repaint them in place a moment after the look is chosen)
+    const stillAs = async (then) => (await bagPictures(page, ids.length)).filter((p, i) => p.hash === then[i].hash).map((p) => p.name);
+    await expect.poll(() => stillAs(inBag), { message: `sprites whose picture in the bag did not change under ${OTHER.name}`, timeout: 60_000 }).toEqual([]);
     await lookButton(look, LOOK).click();
     await expect(lookButton(look, LOOK)).toHaveAttribute('aria-pressed', 'true');
-    expect(await bagPictures(page, ids.length), `back to ${LOOK.name}: the same pictures as before`).toEqual(inBag);
+    await expect.poll(() => bagPictures(page, ids.length), { message: `back to ${LOOK.name}: the same pictures as before`, timeout: 60_000 }).toEqual(inBag);
 
     // ---------------------------------------------------------------- the playground has the same look
     const palette = paletteOf(LOOK);
@@ -269,8 +307,7 @@ for (const listed of LISTED) {
     await look.getByRole('button', { name: 'Start over' }).click();
     await expect(lookButton(look, LOOK)).toHaveAttribute('aria-pressed', 'false');
     await expect(lookButton(look, ORIGINAL)).toHaveAttribute('aria-pressed', 'true');
-    const plainAgain = await bagPictures(page, ids.length);
-    plainAgain.forEach((p, i) => expect(p.hash, `${p.name} changed back in the bag`).not.toBe(inBag[i].hash));
+    await expect.poll(() => stillAs(inBag), { message: `sprites whose picture in the bag still has the ${LOOK.name} look after Start over`, timeout: 60_000 }).toEqual([]);
     // a reload first, so nothing made earlier in this visit is reused: the bag kept its things and has no look
     await page.reload();
     await expect(page.locator('.bag-item')).toHaveCount(ids.length);
@@ -286,6 +323,43 @@ for (const listed of LISTED) {
     if (playedStyled && playedPlain) {
       expect(playedPlain.hash, 'the playground scene looks different without the look').not.toBe(playedStyled.hash);
       if (palette.size) expect(playedPlain.share, `without the look the scene is not in the ${LOOK.name} colours`).toBeLessThan(playedStyled.share);
+    }
+  });
+}
+
+for (const listed of LISTED) {
+  test(`${listed.id}: each part of a look (colours, pitch, brightness, speed) changes the files it should in the download, and no others`, async ({ page }) => {
+    const big = listed.sprites.length + listed.sounds.length + listed.music.length;
+    test.setTimeout(240_000 + big * 15_000);
+    const bundle = readCatalogue().bundles.find((b) => b.id === listed.id);
+    expect(bundle, `the bundle "${listed.id}" is still in generated/catalog.json`).toBeTruthy();
+    expect(typeof LOOK?.theme.colour.palette, 'a named look with a colour set, to take the colour set from').toBe('string');
+    const patches = readPatches();
+    const download = async () => packageOf(await downloadFrom(page, () => page.getByRole('button', { name: 'Download this bundle' }).click(), { timeout: 120_000 + big * 6000 }));
+
+    await openRoute(page, `/bundle/${bundle.id}`);
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(bundle.name);
+    await expect(page.locator('main.bundle-page')).toHaveAttribute('data-look', 'original');
+    const first = await download();
+    const assets = first.names.filter(isAsset);
+    expect(first.json('manifest.json').theme).toEqual(PLAIN);
+
+    for (const part of PARTS) {
+      await page.locator('.bundle-look').getByRole('button', { name: 'Start over' }).click();
+      expect(await lookInAddress(page)).toEqual({});
+      await part.set(page);
+      // the address says what the look is: this one thing and nothing else
+      await expect.poll(async () => Object.keys(await lookInAddress(page)), { message: `${part.name}: the look differs from the original in this alone` }).toEqual(part.address);
+      const zip = await download();
+      expect(zip.names.slice().sort(), `${part.name}: the same files as the original download`).toEqual(first.names.slice().sort());
+      const should = assets.filter((name) => part.changes(name, patches));
+      const did = assets.filter((name) => !sameBytes(zip.file(name), first.file(name)));
+      expect(should.filter((name) => !did.includes(name)), `${part.name}: files it should have changed and left as they were`).toEqual([]);
+      expect(did.filter((name) => !should.includes(name)), `${part.name}: files it changed and should have left byte for byte as they were`).toEqual([]);
+      // the list in the package records exactly this look
+      const theme = zip.json('manifest.json').theme;
+      const parts = { colours: differs(theme.colour, PLAIN.colour), sound: differs(theme.sound, PLAIN.sound), music: differs(theme.music, PLAIN.music) };
+      expect(parts, `${part.name}: what the package says the look changes`).toEqual({ colours: part.address[0] === 'colours', sound: ['pitch', 'bright'].includes(part.address[0]), music: part.address[0] === 'speed' });
     }
   });
 }

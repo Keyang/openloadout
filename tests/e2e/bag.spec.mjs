@@ -29,7 +29,7 @@ test('add a changed sound and a music track from their pages; the bag lists them
   const slider = page.locator('.panel input[type=range]').first();
   await setRange(slider, 'other');
   const changedValue = Number(await slider.inputValue());
-  await page.getByRole('button', { name: 'Add to bag' }).click();
+  await page.getByRole('button', { name: 'Add to my bag' }).click();
   await expect(count(page)).toHaveText('1');
   await expect(page.locator('.add-to-bag')).toContainText('Added');
   await expect(page.getByRole('link', { name: 'Go to bag' })).toHaveAttribute('href', '#/bag');
@@ -38,7 +38,7 @@ test('add a changed sound and a music track from their pages; the bag lists them
   const musicSlider = page.locator('.panel input[type=range]').first();
   await setRange(musicSlider, 'other');
   const musicValue = Number(await musicSlider.inputValue());
-  await page.getByRole('button', { name: 'Add to bag' }).click();
+  await page.getByRole('button', { name: 'Add to my bag' }).click();
   await expect(count(page)).toHaveText('2');
 
   await page.getByRole('link', { name: 'Go to bag' }).click();
@@ -57,16 +57,16 @@ test('add a changed sound and a music track from their pages; the bag lists them
   const before = await bagItems(page);
   await items(page).nth(0).getByRole('link', { name: 'Change' }).click();
   await expect(page).toHaveURL(new RegExp(`#/sound/${SOUND.id}\\?.*bag=`));
-  await expect(bagButton(page)).toHaveText('Update in bag');
-  await expect(page.getByRole('button', { name: 'Add to bag' })).toHaveCount(0);
+  await expect(bagButton(page)).toHaveText('Update');
+  await expect(page.getByRole('button', { name: 'Add to my bag' })).toHaveCount(0);
   expect(Math.abs(Number(await page.locator('.panel input[type=range]').first().inputValue()) - changedValue)).toBeLessThan(0.02);
   await setRange(page.locator('.panel input[type=range]').nth(1), 'other');
   // the page rewrites its address as you edit; after a reload it must still update the same item
   await reloadAfterEdit(page);
   await expect(page).toHaveURL(/bag=/);
-  await expect(bagButton(page)).toHaveText('Update in bag');
+  await expect(bagButton(page)).toHaveText('Update');
   await setRange(page.locator('.panel input[type=range]').nth(1), 'other');
-  await page.getByRole('button', { name: 'Update in bag' }).click();
+  await page.getByRole('button', { name: 'Update' }).click();
   await expect(page.locator('.add-to-bag')).toContainText('Updated');
   await expect(count(page)).toHaveText('2');
   const after = await bagItems(page);
@@ -78,11 +78,11 @@ test('add a changed sound and a music track from their pages; the bag lists them
   await openRoute(page, '/bag');
   await items(page).nth(1).getByRole('link', { name: 'Change' }).click();
   await expect(page).toHaveURL(new RegExp(`#/music/${MUSIC.id}\\?.*bag=`));
-  await expect(bagButton(page)).toHaveText('Update in bag');
+  await expect(bagButton(page)).toHaveText('Update');
   expect(Math.abs(Number(await page.locator('.panel input[type=range]').first().inputValue()) - musicValue)).toBeLessThan(0.02);
   await setRange(page.locator('.panel input[type=range]').nth(1), 'other');
   await reloadAfterEdit(page);
-  await expect(bagButton(page)).toHaveText('Update in bag');
+  await expect(bagButton(page)).toHaveText('Update');
   await setRange(page.locator('.panel input[type=range]').nth(1), 'other');
   await bagButton(page).click();
   await expect(page.locator('.add-to-bag')).toContainText('Updated');
@@ -199,7 +199,7 @@ test('a sprite in the bag is drawn on the bag page and its sheet is in the zip',
 
 test('an empty bag explains how to fill it; Empty the bag asks first', async ({ page }) => {
   await openRoute(page, '/bag');
-  await expect(page.locator('main')).toContainText('Add to bag');
+  await expect(page.locator('main')).toContainText('Add to my bag');
   await expect(page.getByRole('link', { name: 'Browse the catalogue' })).toHaveAttribute('href', '#/');
   await expect(page.getByRole('button', { name: 'Download', exact: true })).toHaveCount(0);
 
@@ -255,17 +255,17 @@ test('add the Hero with a changed slider and part from its page; Change reopens 
   await page.getByRole('group', { name: 'Weapon' }).getByRole('button', { name: 'Axe' }).click();
   await setRange(page.locator('#c-weaponLength'), 'max');
   await page.getByRole('group', { name: 'Pixel size' }).getByRole('button', { name: '2×' }).click();
-  await page.getByRole('button', { name: 'Add to bag' }).click();
+  await page.getByRole('button', { name: 'Add to my bag' }).click();
   await expect(count(page)).toHaveText('1');
   const [item] = await bagItems(page);
   expect(item).toMatchObject({ kind: 'sprite', id: 'knight', settings: { scale: 2, params: { height: 1, weapon: 'axe', weaponLength: 1.35 } } });
   expect(item.settings.cues.attack.find((c) => c.sound === 'sword-slash').when).toEqual({ weapon: ['sword', 'axe', 'spear'] });
 
   await openRoute(page, '/bag');
-  await expect(items(page).first()).toContainText('Your own look, pixel size 2×');
+  await expect(items(page).first()).toContainText('Height: taller, axe weapon, weapon length: longer, pixel size 2×');      // what was changed, in plain words
   await items(page).first().getByRole('link', { name: 'Change' }).click();
   await expect(page).toHaveURL(/#\/sprite\/knight\?.*bag=/);
-  await expect(bagButton(page)).toHaveText('Update in bag');
+  await expect(bagButton(page)).toHaveText('Update');
   await expect(page.getByRole('group', { name: 'Weapon' }).getByRole('button', { name: 'Axe' })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('#c-height')).toHaveValue('1');
   await expect(page.locator('#c-weaponLength')).toHaveValue('1.35');
@@ -273,7 +273,7 @@ test('add the Hero with a changed slider and part from its page; Change reopens 
 
   await page.getByRole('group', { name: 'Weapon' }).getByRole('button', { name: 'Spear' }).click();
   await reloadAfterEdit(page);
-  await expect(bagButton(page)).toHaveText('Update in bag');
+  await expect(bagButton(page)).toHaveText('Update');
   await expect(page.getByRole('group', { name: 'Weapon' }).getByRole('button', { name: 'Spear' })).toHaveAttribute('aria-pressed', 'true');
   await bagButton(page).click();
   await expect(page.locator('.add-to-bag')).toContainText('Updated');

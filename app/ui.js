@@ -1,6 +1,7 @@
 // Small shared pieces for every page.
 import { renderFrame } from '../engine/sprite.js';
 import { bag } from './bag.js';
+import { wayBack } from './back.js';
 
 export const el = (tag, attrs = {}, ...kids) => {
   const n = document.createElement(tag);
@@ -92,20 +93,44 @@ export const store = {
 // The header's bag count follows the bag on every page.
 bag.onChange(() => { for (const n of document.querySelectorAll('header .bag-count')) n.textContent = String(bag.count()); });
 
+// On a narrow screen the links sit behind one "Menu" button, so the header stays one row. Escape or a press elsewhere closes it.
+function closeMenus(except) {
+  for (const btn of document.querySelectorAll('header.top .menu-btn[aria-expanded="true"]')) {
+    if (btn === except) continue;
+    btn.setAttribute('aria-expanded', 'false');
+    btn.closest('header').classList.remove('menu-open');
+  }
+}
+if (typeof document !== 'undefined') {
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenus(); });
+  document.addEventListener('click', (e) => { const on = e.target instanceof Element ? e.target.closest('.menu-btn') : null; closeMenus(on); });
+}
+
 /** The page header with the main navigation. `current`: home | sprites | sounds | music | bundles | play | bag | ''. */
 export function header(current) {
   const on = current === 'kits' ? 'bundles' : current;      // kits are bundles now
   const link = (href, label, key) => el('a', { href, 'data-key': key, 'aria-current': on === key ? 'page' : null }, label);
-  return el('header', { class: 'top' },
+  const menu = el('button', { type: 'button', class: 'menu-btn', 'aria-expanded': 'false', 'aria-controls': 'main-nav' }, 'Menu');
+  // an asset page says the way back to where the visitor came from (app/back.js)
+  const back = wayBack();
+  const top = el('header', { class: 'top' },
     el('a', { class: 'brand', href: '#/' }, 'Loadout'),
     el('div', { class: 'top-right' },
-      el('nav', { 'aria-label': 'Main' },
+      menu,
+      el('nav', { id: 'main-nav', 'aria-label': 'Main' },
         link('#/browse?kind=sprite', 'Sprites', 'sprites'),
         link('#/browse?kind=sound', 'Sounds', 'sounds'),
         link('#/browse?kind=music', 'Music', 'music'),
         link('#/bundles', 'Bundles', 'bundles'),
         link('#/play', 'Play', 'play')),      // W2-G: the playground
-      el('a', { class: 'bag-link', href: '#/bag', 'aria-current': current === 'bag' ? 'page' : null }, 'Bag ', el('span', { class: 'bag-count' }, String(bag.count())))));
+      el('a', { class: 'bag-link', href: '#/bag', 'aria-current': current === 'bag' ? 'page' : null }, 'Bag ', el('span', { class: 'bag-count' }, String(bag.count())))),
+    back ? el('a', { class: 'back-link', href: back.href }, el('span', { 'aria-hidden': 'true' }, '‹'), back.label) : null);
+  menu.addEventListener('click', () => {
+    const open = menu.getAttribute('aria-expanded') !== 'true';
+    menu.setAttribute('aria-expanded', String(open));
+    top.classList.toggle('menu-open', open);
+  });
+  return top;
 }
 
 /** Move the "you are here" mark in the header without redrawing it (the results view changes kind in place). */

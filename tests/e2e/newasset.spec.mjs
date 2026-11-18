@@ -174,7 +174,7 @@ test('each opens on its own page, is changed, goes into the bag, is drawn there,
   await setRange(spriteSlider, 'other');
   const spriteValue = Number(await spriteSlider.inputValue());
   await expect.poll(() => page.evaluate(() => location.hash)).toContain(`${spriteKey}=`);
-  await page.getByRole('button', { name: 'Add to bag', exact: true }).click();
+  await page.getByRole('button', { name: 'Add to my bag', exact: true }).click();
   await expect(bagCount(page)).toHaveText('1');
 
   // ---- the sound: found, opened from its card, changed, played, added
@@ -190,7 +190,7 @@ test('each opens on its own page, is changed, goes into the bag, is drawn there,
   await expect.poll(() => page.evaluate(() => location.hash)).toContain(`${soundKey}=`);
   const playBtn = page.locator('.stage-tools .tools-left button');
   await expect(playBtn).toHaveText('Play', { timeout: 8000 });      // the change played it; it ends by itself
-  await page.getByRole('button', { name: 'Add to bag', exact: true }).click();
+  await page.getByRole('button', { name: 'Add to my bag', exact: true }).click();
   await expect(bagCount(page)).toHaveText('2');
 
   // what went into the bag is what was set on the pages
@@ -209,7 +209,7 @@ test('each opens on its own page, is changed, goes into the bag, is drawn there,
   const items = page.locator('.bag-item');
   await expect(items).toHaveCount(2);
   await expect(items.nth(0)).toContainText(NEW_SPRITE.name);
-  await expect(items.nth(0)).toContainText('Your own look');
+  await expect(items.nth(0).locator('.bag-text .hint')).not.toHaveText(/Standard look|your own/i);      // the row says what was changed
   await expect(items.nth(1)).toContainText(NEW_SOUND.name);
   await expect(page.locator('.bag-item .gone')).toHaveCount(0);
   await expect(page.locator('main')).not.toContainText('no longer on the site');

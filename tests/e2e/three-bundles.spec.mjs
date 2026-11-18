@@ -19,6 +19,8 @@ import { ROOT, readCatalogue, catalogueOf, playReady, playState } from '../helpe
 
 // Many builders share this machine: anything the page is waited for gets 20 seconds, not the usual 5.
 const expect = baseExpect.configure({ timeout: 20_000 });
+// ... and a press on something that is not there gives up after 30 seconds instead of holding the whole test.
+test.use({ actionTimeout: 30_000 });
 
 const NAMED = ['kit-platformer-fantasy', 'kit-rpg-fantasy', 'kit-roguelite-scifi'];      // docs/progress.md, "Decisions from Keyang"
 const SPECS = path.join(ROOT, 'bundles', 'specs');
@@ -93,7 +95,7 @@ for (const id of KITS) {
         await waitForDrawn(page);
         if (kind === 'music') await expect(page.locator('.stage-tools .tools-left button')).toHaveText('Play');
         else await expect.poll(async () => (await canvasStats(page.locator('canvas.stage'))).opaque, { message: `${a} is drawn`, timeout: 20_000 }).toBeGreaterThan(0);
-        await expect(page.locator('.add-to-bag button')).toHaveText('Add to bag');
+        await expect(page.locator('.add-to-bag button')).toHaveText(/^Add to (my )?bag$/);
       } catch (e) { problems.push(String(e.message).split('\n')[0]); }
       problems.push(...watch.errors.splice(0));
       if (problems.length) broken.push(`${kind} ${a}: ${problems.join(' | ')}`);

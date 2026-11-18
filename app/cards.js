@@ -23,19 +23,30 @@ const rowOf = (x) => (typeof x === 'string' ? assetById(x) : x && x.kind && x.sr
 let sounding = null;
 function takeTurn(card) { if (sounding && sounding !== card) sounding.quiet(); sounding = card; }
 
-/** The small "Add to bag" action every card has. The asset goes in with its standard settings. */
+/**
+ * The small "Add to my bag" action every card has. The asset goes in with its standard settings. Once it is in
+ * the bag the button says "In your bag" and leads there (the same two wordings as on the asset pages).
+ */
+function showInBag(btn, items) {
+  const { kind, id, name } = btn.dataset;
+  const yes = items.some((i) => i.kind === kind && i.id === id);
+  btn.classList.toggle('in-bag', yes);
+  btn.querySelector('.add-word').textContent = yes ? 'In your bag' : 'Add to my bag';
+  btn.querySelector('.add-plus').textContent = yes ? '✓' : '+';
+  btn.setAttribute('aria-label', yes ? `${name} is in your bag. Go to your bag` : `Add ${name} to my bag`);
+  btn.title = yes ? 'Go to your bag' : 'Add to your bag with its standard settings';
+}
+bag.onChange(() => { const items = bag.items(); for (const btn of document.querySelectorAll('.card-add')) showInBag(btn, items); });
 function addButton(row) {
-  const word = el('span', { class: 'add-word' }, 'Add to bag');
-  const btn = el('button', { type: 'button', class: 'card-add', 'aria-label': `Add ${row.name} to bag`, title: 'Add to your bag with its standard settings' },
-    el('span', { class: 'add-plus', 'aria-hidden': 'true' }, '+'), word);
-  let timer = 0;
+  const btn = el('button', { type: 'button', class: 'card-add', 'data-kind': row.kind, 'data-id': row.id, 'data-name': row.name },
+    el('span', { class: 'add-plus', 'aria-hidden': 'true' }), el('span', { class: 'add-word' }));
+  showInBag(btn, bag.items());
   btn.addEventListener('click', () => {
-    bag.add({ kind: row.kind, id: row.id, settings: {} });
-    btn.classList.add('done');
-    word.textContent = 'Added';
-    clearTimeout(timer);
-    timer = setTimeout(() => { btn.classList.remove('done'); word.textContent = 'Add to bag'; }, 1400);
+    if (btn.classList.contains('in-bag')) location.hash = '#/bag'; else bag.add({ kind: row.kind, id: row.id, settings: {} });
   });
+  // a card kept from before (the list was narrowed and widened again) may have missed a change to the bag
+  btn.addEventListener('pointerenter', () => showInBag(btn, bag.items()));
+  btn.addEventListener('focus', () => showInBag(btn, bag.items()));
   return btn;
 }
 

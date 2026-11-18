@@ -411,7 +411,7 @@ test('5: when the browser cannot save the bag, bag.add says so, nothing is half-
   expect(adds.now.items.map((i) => i.id), 'what the bag says it holds is what is saved').toEqual(['coin']);
   // the page's own "Add to bag" keeps the item for this visit and the bag page warns that it is not saved
   await page.evaluate(() => window.loadout.go('/sprite/knight'));
-  await page.getByRole('button', { name: 'Add to bag' }).click();
+  await page.getByRole('button', { name: 'Add to my bag' }).click();
   await page.evaluate(() => window.loadout.go('/bag'));
   await expect(page.locator('.bag-item')).toHaveCount(2);
   await expect(page.locator('.bag-unsaved')).toContainText(/could not be saved/);

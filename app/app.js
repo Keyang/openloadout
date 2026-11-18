@@ -6,6 +6,7 @@ import { loadCatalog, assetById, loadSprite } from './catalog.js';
 import { loadSounds, soundById, stopAll, isMusic } from './audio.js';
 import { homePage, browsePage, bundlesPage } from './home.js';
 import { kitAddress } from './kit-page.js';
+import { leaving, arrived } from './back.js';
 import { standInCatalog, configureSearch } from './browse.js';
 import { restoreRuntime, madePending } from './api.js';      // W5-A: installs window.loadout (Contract 11); loads nothing else until it is used
 
@@ -61,7 +62,9 @@ const openSprite = (id, query) => lazyPage('./sprite-page.js', async (m, still) 
   return still() ? m.spritePage(app, sprite, query) : null;
 }, 'sprite');
 
-function route() {
+function route(moved) {
+  // the way back from an asset page: where the visitor was is noted while that page is still on screen (app/back.js)
+  if (moved && moved.oldURL) leaving(new URL(moved.oldURL).hash, location.hash);
   teardown();
   teardown = () => {};
   stopAll();
@@ -94,6 +97,7 @@ function route() {
   else if (a === 'play') lazyPage('./play-page.js', (m, still) => m.playPage(app, query, still), 'playground');
   else if (kindOf(a) === 'sprite' && !b) openSprite(a, query);      // links from before sounds were added
   else teardown = notFound('page');
+  arrived();          // back on the list they left: its place on the page is put back
 }
 
 waiting();

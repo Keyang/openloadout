@@ -84,7 +84,7 @@ test('a sprite with one style shows nothing new: no Style choice, no style in it
   await openRoute(page, '/sprite/coin');
   await expect(page.locator('.style-choice')).toHaveCount(0);
   await expect(page.getByRole('heading', { name: 'Style', exact: true })).toHaveCount(0);
-  await page.getByRole('button', { name: 'Add to bag' }).click();
+  await page.getByRole('button', { name: 'Add to my bag' }).click();
   const item = await page.evaluate(async () => (await window.loadout.bag.items()).items[0]);
   expect(Object.keys(item.settings)).toEqual(['params', 'cues', 'scale']);
   expect(page.url()).not.toContain('artstyle=');
@@ -168,7 +168,7 @@ test('the style travels: in the link, in the bag item, through a reload and a sh
   expect(await stripColours(page)).toBe(1);
   const before = await strip(page);
 
-  await page.getByRole('button', { name: 'Add to bag' }).click();
+  await page.getByRole('button', { name: 'Add to my bag' }).click();
   await expect(page.locator('.add-note')).toContainText('Added to your bag');
   let item = await page.evaluate(async () => (await window.loadout.bag.items()).items[0]);
   expect(item.settings.artStyle).toBe('silhouette');
@@ -188,13 +188,13 @@ test('the style travels: in the link, in the bag item, through a reload and a sh
   await waitForDrawn(page);
   await expect(pressed(page)).toHaveText('Silhouette');
   await page.locator('.style-choice').getByRole('button', { name: 'Outlined shapes' }).click();
-  await page.getByRole('button', { name: 'Update in bag' }).click();
+  await page.getByRole('button', { name: 'Update' }).click();
   await expect(page.locator('.add-note')).toContainText('Updated in your bag');
   item = await page.evaluate(async () => (await window.loadout.bag.items()).items[0]);
   expect(item.settings.artStyle).toBe('outline-svg');
   // back to the first style: the item no longer names one
   await page.locator('.style-choice').getByRole('button', { name: 'Pixel art' }).click();
-  await page.getByRole('button', { name: 'Update in bag' }).click();
+  await page.getByRole('button', { name: 'Update' }).click();
   await expect.poll(async () => 'artStyle' in (await page.evaluate(async () => (await window.loadout.bag.items()).items[0])).settings).toBe(false);
 
   // the whole bag as a link, read back into an empty bag
@@ -372,7 +372,7 @@ test('a sprite with a control called "style" and two art styles: both travel in 
   expect((await strip(page)).hash).not.toBe(cross.hash);
   await expect.poll(() => page.url()).toContain('style=spiral');
   expect(page.url()).toContain('artstyle=silhouette');
-  await page.getByRole('button', { name: 'Add to bag' }).click();
+  await page.getByRole('button', { name: 'Add to my bag' }).click();
   const item = await page.evaluate(async () => (await window.loadout.bag.items()).items[0]);
   expect(item.settings.params.style).toBe('spiral');
   expect(item.settings.artStyle).toBe('silhouette');

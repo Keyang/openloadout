@@ -569,3 +569,41 @@ input[type='range']::-moz-range-thumb { width: 14px; height: 18px; border-radius
 /* a sprite in the bag whose own file is still on its way */
 .bag-pic.pending { height: 108px; border: 2px solid #c3c9dc; }
 /* ==== end how pages are tied together ==== */
+
+/* ==== the way back, a header that fits a phone, the bag button (app/back.js, app/ui.js, app/cards.js, app/add-to-bag.js) ==== */
+.top { flex-wrap: wrap; position: relative; }
+.top-right { position: relative; }
+.menu-btn { display: none; }
+/* an asset page's way back to the list the visitor came from: its own line under the header row */
+.back-link { flex: 0 0 100%; margin-top: 12px; color: var(--ink); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; line-height: 1.6; }
+.back-link:hover { color: var(--grape); }
+.back-link span { text-decoration: none; display: inline-block; margin-right: 6px; }
+/* "In your bag" beside the button, once the asset is there */
+.in-bag { font-weight: 700; color: var(--grape); }
+.in-bag::before { content: '✓ '; }
+.in-bag[hidden] { display: none; }
+/* on a card the bag button has a line to itself, so "Add to my bag" and the asset's kind both fit */
+.card-cell .card-kind { padding-right: 0; padding-bottom: 30px; }
+.card-add { right: auto; left: 11px; bottom: 10px; }
+.card-add.in-bag { background: var(--grape-soft); color: var(--ink); }
+.card-add.in-bag::before { content: none; }
+.gallery.results > li, .similar-list > li { min-height: 315px; }
+@media (max-width: 700px) {
+  /* one row: the name, a Menu button that opens the links, and the bag */
+  .top { align-items: center; }
+  .top-right { flex-wrap: nowrap; align-items: center; justify-content: flex-end; gap: 10px; }
+  .menu-btn { display: inline-flex; align-items: center; gap: 7px; background: var(--card); border: var(--line); padding: 4px 10px; font-weight: 700; line-height: 1.5; }
+  .menu-btn::after { content: ''; border-top: 6px solid currentColor; border-left: 4px solid transparent; border-right: 4px solid transparent; }
+  .menu-btn[aria-expanded='true'] { background: var(--ink); color: #fff; }
+  .menu-btn[aria-expanded='true']::after { transform: rotate(180deg); }
+  .top nav { display: none; position: absolute; right: 0; top: calc(100% + 8px); z-index: 30; width: max-content; min-width: 190px; flex-direction: column; flex-wrap: nowrap; gap: 0; background: var(--card); border: var(--line); box-shadow: var(--drop); padding: 4px; }
+  .top.menu-open nav { display: flex; }
+  .top nav a { padding: 8px 12px; min-height: 40px; display: flex; align-items: center; }
+  .back-link { padding: 5px 0; margin-top: 8px; }
+}
+@media (max-width: 560px) {
+  .card-cell .card-kind { padding-bottom: 28px; }
+  .card-add { left: 8px; bottom: 8px; }
+  .gallery.results > li, .similar-list > li { min-height: 240px; }
+}
+/* ==== end way back, header, bag button ==== */

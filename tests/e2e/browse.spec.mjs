@@ -80,6 +80,12 @@ test.beforeAll(async () => {
   await writeOnce(path.join(STAND_IN_DIR, 'generated', 'search.sqlite'), (tmp) => buildSearchIndex({ assets: BIG.assets, outFile: tmp }));
 });
 
+/** Reload once the page has finished fetching: a reload in the middle of a download would show up as failed requests. */
+async function reload(page) {
+  await page.waitForLoadState('networkidle');
+  await page.waitForFunction(() => [...document.images].every((img) => img.complete));
+  await page.reload();
+}
 const box = (page) => page.getByRole('searchbox', { name: 'Search' });
 const results = (page) => page.locator('ul.results > li');
 const resultIds = (page) => results(page).evaluateAll((lis) => lis.map((li) => li.dataset.id));
@@ -234,7 +240,7 @@ test('the search box takes exactly as much as is searched: 120 characters, typed
   const before = await resultIds(page);
 
   // a reload shows the same text and the same results: nothing was dropped out of sight
-  await page.reload();
+  await reload(page);
   await waitForDrawn(page);
   await expect(box(page)).toHaveValue(long.slice(0, 120));
   await expect.poll(() => resultIds(page)).toEqual(before);
@@ -360,7 +366,7 @@ test('the address bar holds the search and filters, so a reload or a copied link
   const before = await resultIds(page);
   expect(before).toContain(PICK.sound.id);
 
-  await page.reload();
+  await reload(page);
   await waitForDrawn(page);
   await expect(box(page)).toHaveValue(word);
   await expect(option(page, 'Kind', 'Sounds')).toHaveAttribute('aria-pressed', 'true');
@@ -428,7 +434,7 @@ test('a style chosen on the home page stays after visiting a sprite page, and ca
   await openRoute(page, '/browse?kind=sprite');
   await expect(chip(page, V)).toBeVisible();
   expect(await resultIds(page)).not.toContain(hidden[0].id);
-  await page.reload();
+  await reload(page);
   await waitForDrawn(page);
   await expect(chip(page, V)).toBeVisible();
 
@@ -535,15 +541,15 @@ test('hovering a sprite card plays its animation from the strip picture; nothing
   expect(asked).toContain(`/${sprite.strip}`);
 });
 
-test('"Add to bag" on a card raises the bag count in the header', async ({ page }) => {
+test('"Add to my bag" on a card raises the bag count in the header', async ({ page }) => {
   await openRoute(page, '/');
   await expect(bagCount(page)).toHaveText('0');
   const { sprite, sound } = PICK;
   // by scrolling to it
-  await (await place(page, sprite.id)).getByRole('button', { name: `Add ${sprite.name} to bag`, exact: true }).click();
+  await (await place(page, sprite.id)).getByRole('button', { name: `Add ${sprite.name} to my bag`, exact: true }).click();
   await expect(bagCount(page)).toHaveText('1');
   // and by looking it up
-  await (await lookUp(page, sound)).getByRole('button', { name: `Add ${sound.name} to bag`, exact: true }).click();
+  await (await lookUp(page, sound)).getByRole('button', { name: `Add ${sound.name} to my bag`, exact: true }).click();
   await expect(bagCount(page)).toHaveText('2');
   // each goes in with its standard settings
   const items = await page.evaluate(async () => (await import('/app/bag.js')).bag.items().map((i) => [i.kind, i.id, i.settings]));
@@ -658,8 +664,7 @@ plain('smarter search is off until asked for, then loads, and the choice is reme
   await expect.poll(() => resultIds(page)).toContain(finds);
 
   // the choice survives a reload (the browser keeps the download, so it is ready again without fetching it twice)
-  await page.waitForLoadState('networkidle');       // a reload in the middle of a download would show up as a failed request
-  await page.reload();
+  await reload(page);
   await waitForDrawn(page);
   await expect(page.getByRole('switch', { name: 'Smarter search' })).toBeChecked();
   await expect(page.locator('.smart')).toHaveAttribute('data-state', 'ready', { timeout: 240_000 });
@@ -669,8 +674,7 @@ plain('smarter search is off until asked for, then loads, and the choice is reme
   await expect(page.getByRole('switch', { name: 'Smarter search' })).not.toBeChecked();
   await expect(page.locator('.smart')).toHaveAttribute('data-state', 'off');
   await expect(page.locator('.smart')).toContainText(`${SMART_MB} MB`);
-  await page.waitForLoadState('networkidle');
-  await page.reload();
+  await reload(page);
   await waitForDrawn(page);
   asked.length = 0;
   await expect(page.getByRole('switch', { name: 'Smarter search' })).not.toBeChecked();
@@ -701,7 +705,7 @@ plain('if smarter search cannot load, the page says so in one line, switches it 
   // it is not tried again on the next visit
   const asked = [];
   page.on('request', (r) => asked.push(pathOf(r.url())));
-  await page.reload();
+  await reload(page);
   await waitForDrawn(page);
   await expect(page.getByRole('switch', { name: 'Smarter search' })).not.toBeChecked();
   await expect(page.locator('.smart')).toHaveAttribute('data-state', 'off');

@@ -12,6 +12,7 @@ import { restoreRuntime, madeItemState } from './api.js';      // W5-A, W5-B: wh
 import { packageFiles, defaultCues, activeTheme, kindMatches } from './bundle.js';
 import { zip } from './zip.js';
 import { themeControls } from './theme-controls.js';   // W2-D2
+import { spriteChanges, soundChanges, inWords } from './changes.js';   // what was changed, in plain words
 
 const INK = '#231b33';
 const KIND_LABEL = { sprite: 'Sprite', sound: 'Sound', music: 'Music' };
@@ -110,7 +111,7 @@ function soundPicture(patch, settings, theme) {
   const tile = el('canvas', { class: 'tile', width: 80, height: 72, 'aria-hidden': 'true' });
   const t = activeTheme(theme);
   const params = soundParams(patch, settings.style, settings.params);
-  let r = null, handle = null, dirty = true;
+  let r = null, handle = null, dirty = true, held = false;      // held: it shows the picture it had before, until the new waveform is ready
   const make = () => {
     if (!r) {
       const raw = rendered(patch, t ? themedSoundParams(patch, params, t) : params, settings.seed ?? 1);
@@ -118,7 +119,7 @@ function soundPicture(patch, settings, theme) {
     }
     return r;
   };
-  const timer = setTimeout(() => { try { make(); dirty = true; } catch (e) { console.error(`sound ${patch.id}:`, e); } }, 0);
+  const timer = setTimeout(() => { try { make(); dirty = true; } catch (e) { held = false; console.error(`sound ${patch.id}:`, e); } }, 0);
   const btn = el('button', { type: 'button', class: 'mini play', 'aria-label': `Play ${patch.name}` }, 'Play');
   const sync = () => { btn.textContent = handle ? 'Stop' : 'Play'; btn.setAttribute('aria-label', `${handle ? 'Stop' : 'Play'} ${patch.name}`); };
   btn.addEventListener('click', () => {
@@ -130,7 +131,9 @@ function soundPicture(patch, settings, theme) {
   return {
     node: el('div', { class: 'bag-pic' }, tile, btn),
     stop() { clearTimeout(timer); if (handle) handle.stop(); },
+    hold() { held = true; },
     tick() {
+      if (held && !r) return;
       if (!dirty && !handle) return;
       dirty = false;
       g.fillStyle = SOUND_BG[patch.category] ?? '#e6e9f2'; g.fillRect(0, 0, 80, 72);
@@ -197,17 +200,24 @@ function musicPicture(patch, settings, theme) {
 
 // ---- the page ----------------------------------------------------------------------
 
+/**
+ * What a row says about its item, in plain words: what was changed (at most three things, then how many more),
+ * built from each control's own words (app/changes.js). Returns { text, all }: `all` lists every change, for the row's tooltip.
+ */
 function describe(item) {
   const s = item.settings ?? {};
+  let changes = [], parts;
   if (item.kind === 'sprite') {
     const sprite = spriteNow(item.id);
-    const own = sprite && !same(cleanParams(sprite, s.params ?? {}), defaultParams(sprite));
+    if (sprite) changes = spriteChanges(sprite, s.params ?? {});
     const style = sprite ? artStyleOf(sprite, s.artStyle) : null;
-    return [own ? 'Your own look' : 'Standard look', style && style !== stylesOf(sprite)[0] ? `${styleById(style).label} style` : null, s.scale > 1 ? `pixel size ${s.scale}×` : null].filter(Boolean).join(', ');
+    parts = [changes.length ? inWords(changes) : 'Standard look', style && style !== stylesOf(sprite)[0] ? `${styleById(style).label} style` : null, s.scale > 1 ? `pixel size ${s.scale}×` : null];
+  } else {
+    const patch = soundById[item.id];
+    if (patch) changes = soundChanges(patch, s.style, soundParams(patch, s.style, s.params));
+    parts = [s.style ? `${s.style} style` : 'Standard style', changes.length ? inWords(changes).toLowerCase() : null];
   }
-  const patch = soundById[item.id];
-  const own = patch && !same(soundParams(patch, s.style, s.params), soundParams(patch, s.style));
-  return [s.style ? `${s.style} style` : 'Standard style', own ? 'your own changes' : null].filter(Boolean).join(', ');
+  return { text: parts.filter(Boolean).join(', '), all: changes.length > 3 ? inWords(changes, changes.length) : null };
 }
 
 export function bagPage(app, query = {}, isCurrent = () => true) {
@@ -315,12 +325,13 @@ export function bagPage(app, query = {}, isCurrent = () => true) {
     else if (!gone) pic = item.kind === 'music' ? musicPicture(patch, item.settings, theme) : soundPicture(patch, item.settings, theme);
     if (pic) pictures.push(pic);
     const name = sprite?.name ?? patch?.name ?? item.id;
+    const said = gone ? null : describe(item);
     return el('li', { class: 'bag-item', 'data-key': item.key },
       pic ? pic.node : el('div', { class: 'bag-pic gone' }),
       el('div', { class: 'bag-text' },
         el('span', { class: 'bag-name' }, name),
         el('span', { class: 'bag-kind' }, KIND_LABEL[item.kind]),
-        el('span', { class: 'hint' }, gone ? (item.definition ? 'This was made on another visit and could not be brought back. It will be left out of the download.' : 'This is no longer on the site and will be left out of the download.') : describe(item)),
+        el('span', { class: 'hint', title: said && said.all ? said.all : null }, gone ? (item.definition ? 'This was made on another visit and could not be brought back. It will be left out of the download.' : 'This is no longer on the site and will be left out of the download.') : said.text),
         flash && flash.key === item.key ? el('span', { class: 'row-note', role: 'status' }, flash.text) : null),
       el('div', { class: 'bag-actions' },
         gone ? null : el('a', { class: 'btn plain', href: changeLink(item) }, 'Change'),
@@ -409,6 +420,10 @@ export function bagPage(app, query = {}, isCurrent = () => true) {
   function stopPictures() { for (const p of pictures) if (p.stop) p.stop(); pictures = []; }
 
   function build() {
+    // the pictures on screen now, by item: a row that is rebuilt (a look change, a copy added) starts from the picture it had,
+    // so nothing goes blank while the new one is being made
+    const shown = new Map();
+    for (const li of main.querySelectorAll('.bag-item[data-key]')) { const cv = li.querySelector('canvas.tile'); if (cv) shown.set(li.dataset.key, cv); }
     stopPictures();
     const items = bag.items(), theme = bag.theme();
     fetchSprites(items);   // W2-G
@@ -430,10 +445,17 @@ export function bagPage(app, query = {}, isCurrent = () => true) {
           exportBox,
         ]
         : [
-          el('p', { class: 'lede' }, 'Your bag is empty. Open any sprite, sound or music track, change it until you like it, and press Add to bag. Everything you add waits here, with your changes, until you download it as one package.'),
+          el('p', { class: 'lede' }, 'Your bag is empty. Open any sprite, sound or music track, change it until you like it, and press Add to my bag. Everything you add waits here, with your changes, until you download it as one package.'),
           linkNote,
           el('p', {}, el('a', { class: 'btn', href: '#/' }, 'Browse the catalogue')),
         ]].flat(Infinity).filter((k) => k != null && k !== false));
+    for (const pic of pictures) {
+      const cv = pic.node.matches('canvas.tile') ? pic.node : pic.node.querySelector('canvas.tile');
+      const old = shown.get(pic.node.closest('.bag-item')?.dataset.key);
+      if (!cv || !old || old === cv || old.width !== cv.width || old.height !== cv.height) continue;
+      cv.getContext('2d').drawImage(old, 0, 0);
+      if (pic.hold) pic.hold();
+    }
     syncDownload();
   }
 
