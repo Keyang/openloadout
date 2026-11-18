@@ -7,21 +7,33 @@
 //   water-inner-tl -tr -bl -br       south; a thin lip elsewhere), an ink line on the waterline, shallow water
 //   water-strip-l -m -r              with a foam line that moves out and back, and the deep water with its streaks
 //   water-col-t -m -b, water-single  of light. The narrow pieces make a stream one tile wide and a lone pool
+//   water-fill, -fill-b ... -fill-f  the open water, in six versions: still water, and five with streaks of light in
+//                                    other places and other numbers. Whoever lays out a map mixes them by position
+//                                    (pickClip and fillVariant in engine/tiles.js), so a lake shows no 32 px grid
 //   bridge-h, bridge-v               plank bridges, laid over water tiles; each repeats along its length
-//   water-deco-a lily pads (they bob), water-deco-b a rock: laid over a water-fill tile
+//   water-deco-a lily pads (they bob), water-deco-b a rock: laid over a tile of open water
 //
-// The shore, the lapping water, the streaks, the lily pad and the bridge are the framework's (engine/water.js),
-// and so is the rule that lifts the bank's colour (engine/ground.js); this file says how wide each part of the
-// bank is, where the outline wanders and which colours go where.
+// The shore, the lapping water, the lily pad and the bridge are the framework's (engine/water.js), the streaks of
+// the open water too (engine/ripples.js), and so is the rule that lifts the bank's colour (engine/ground.js); this
+// file says how wide each part of the bank is, where the outline wanders, which version of the open water lies where
+// and which colours go where.
 //
 // What to copy for another top-down hole:
 //   - the water's body is drawn a step darker than its colour (waterTones): `water` and `meadow` are equally light
 //     in the palette, and most whole-bundle looks keep lightness and replace hue. The colour itself is the shallows
 //   - the bank is drawn a step lighter than its colour (raisedGround), exactly as the meadow's path is, so a path
 //     that runs down to the water meets sand of its own tone
-//   - open water carries nothing but its streaks, in a tone of the water itself: every tile of a lake is the same
-//     picture, so any mark brighter than that (a glint, a white tip) shows as a grid of dots across the lake.
-//     Sparkle therefore works through what is there already: it brightens the streaks and the foam line
+//   - moving water does NOT hide the grid. One fill tile laid in every cell of a lake shows whatever it holds as a
+//     lattice, a streak or a glint at the same place every 32 px, and the lattice moves in step. So the open water
+//     comes in versions, as a floor does, and the lessons of `tiles-meadow` hold: version 0 lies in four cells in
+//     ten, so anything in it shows as a row of marks wherever those cells touch, and it is bare (still water; its
+//     eight frames are one picture, which the checker notes); two more versions are too few, since each then lies in
+//     three cells in ten and the eye finds its marks again (tried: with three versions, and with four, rows of the
+//     same cluster still showed at 2x), so there are five with streaks; and every mark of every version keeps 3 px from the
+//     tile's edges on every frame (rippleVersion), so any version joins any other
+//   - a straight shore repeats along its length, so the water behind it is the still version; corners and narrow
+//     pieces carry streaks (BEHIND, below)
+//   - Sparkle works through what is there already: it brightens the streaks and the foam line
 //   - the lips run out at every tile corner (THIN is 0 at both ends), and once more along each edge so that those
 //     gaps are not the only ones: a stream one tile wide then bends and forks with no bite out of its bank
 import { defineSprite, range, color, toggle } from '../engine/sprite.js';
@@ -31,7 +43,8 @@ import { PALETTE, swatchesBetween } from '../engine/palettes.js';
 import { blockClips, pieceOf, drawDecal, textureLight } from '../engine/tiles.js';
 import { rock } from '../engine/fx.js';
 import { raisedGround } from '../engine/ground.js';
-import { waterTones, rippleFill, drawShore, wakeRing, lilyPad, plankBridge } from '../engine/water.js';
+import { waterTones, drawShore, wakeRing, lilyPad, plankBridge } from '../engine/water.js';
+import { rippleVersion } from '../engine/ripples.js';
 
 const HV = PALETTE.hearthvale;
 const speedOf = (p) => 6 * lerp(0.65, 1.45, p.speed);
@@ -57,19 +70,36 @@ function shoreOf(edge) {
   if (!SHORES.has(E)) SHORES.set(E, { round: 13, cap: 2, face: E - 2, lip: [E >= 9 ? 3 : 2, E >= 9 ? 2 : 1], thin: THIN, inset: INSET, lap: 5 });
   return SHORES.get(E);
 }
-// Which arrangement of streaks the open water has. Every tile of a lake shows the same one, so it was picked (of
-// 100, by measuring) for being even: on every frame, at every setting of Waves, about the same number of streaks
-// show, and no patch of the tile is left bare for the eye to count the tiles by.
-const STREAKS = 42;
+// The open water, in six versions: [arrangement, share of the streaks that Waves asks for, a second line under some].
+// Version 0 (water-fill) lies in four cells in ten, so it is bare: see the notes at the top. The arrangements of the
+// other five were picked together (of 240, by measuring with rippleEvenness): on every frame, at every setting of
+// Waves, each shows about the same number of lit pixels; few streaks of two versions share a row (4 of 28 at the
+// default); and over a loop every column between the margins is crossed. They differ in how many streaks they
+// hold, so a lake has busy patches, quiet patches and still water, and no two neighbours ripple alike.
+const OPEN = [null, [151, 1.15, false], [205, 0.8, true], [212, 1, false], [126, 0.65, true], [127, 1, false]];
+// Which version lies behind each piece that has a bank. A straight shore (top, bottom, the two sides) repeats along
+// its length, so it gets the still water: the foam and the froth are what moves there. A corner stands alone and a
+// narrow piece has too little water to show a grid, so those ripple, each with another version, and a pond of four
+// tiles or a stream is not left flat.
+const BEHIND = {
+  left: 1, right: 2, 'bottom-l': 3, 'bottom-r': 5, 'inner-tl': 5, 'inner-tr': 3, 'inner-bl': 2, 'inner-br': 1,
+  'strip-l': 2, 'strip-m': 4, 'strip-r': 5, 'col-t': 3, 'col-m': 2, 'col-b': 1, single: 5,
+};
+const versionOf = (piece) => (/^fill-[b-z]$/.test(piece) ? piece.charCodeAt(5) - 97 : BEHIND[piece] ?? 0);
 
-// Everything the framework needs to draw a water tile, from the controls.
-function paints(p, t) {
+// The block's clips. Version 0 of the open water says what it is, so nobody takes its flat tile for a fault.
+const WATER = blockClips('water', { kind: 'hole', narrow: true, fills: OPEN.length, frames: 8, fps: speedOf });
+WATER['water-fill'].label = 'Water: middle, still water';
+
+// Everything the framework needs to draw a water tile, from the controls. v: which version of the open water.
+function paints(p, t, v) {
   const W = waterTones(p.water, { foam: p.foam });
   const calm = 1 - p.waves;
   // the streaks: with Sparkle they catch the light (the water's light tone); without it they are a soft swell
-  const body = rippleFill(W.body, t, {
+  const [seed, share, under] = OPEN[v] ?? [0, 0, false];
+  const body = rippleVersion(W.body, t, {
     light: p.sparkle ? W.light : textureLight(W.body, W.body, 0.5),
-    count: Math.round(lerp(5, 9, p.waves)), length: lerp(5, 9, p.waves), stir: lerp(1, 4, p.waves), seed: STREAKS,
+    count: Math.round(lerp(4, 8, p.waves) * share), length: lerp(5, 9, p.waves), stir: lerp(1, 4, p.waves), seed, under,
   });
   // the bank: sand a step lighter than its colour (as the meadow's path), its face one step down, the foot of the
   // face and the lip on the side the light does not reach one more
@@ -82,7 +112,7 @@ function paints(p, t) {
   return { W, body, bank, lap, laps: { s: { foam: null, rows: 1 }, e: { foam: W.froth, froth: W.shallow, reach: 1, rows: 1 }, w: { foam: W.froth, froth: W.shallow, reach: 1, rows: 1 } } };
 }
 
-// ---- the decals: laid over a water-fill tile, see-through round them -----------------------------------------
+// ---- the decals: laid over a tile of open water, see-through round them ------------------------------------
 
 // Two lily pads, a big one in flower and a small one, each bobbing in its own time inside a ring of ripples.
 function lilies(g, p, t) {
@@ -131,7 +161,7 @@ export default defineSprite({
     speed: range('Speed', 0.5, { lo: 'Slow', hi: 'Fast', group: 'Motion' }),
   },
   clips: {
-    ...blockClips('water', { kind: 'hole', narrow: true, frames: 8, fps: speedOf }),
+    ...WATER,
     'bridge-h': { frames: 1, fps: 1, loop: true, label: 'Bridge, left to right' },
     'bridge-v': { frames: 1, fps: 1, loop: true, label: 'Bridge, up and down' },
     'water-deco-a': { frames: 8, fps: speedOf, loop: true, label: 'Lily pads', place: 'on' },
@@ -142,6 +172,7 @@ export default defineSprite({
     if (clip === 'bridge-v') return plankBridge(g, 'v', p.wood, { from: 4, to: 27 });
     if (clip === 'water-deco-a') return lilies(g, p, t);
     if (clip === 'water-deco-b') return boulder(g, p);
-    return drawShore(g, pieceOf(clip).piece, shoreOf(p.edge), paints(p, t), t);
+    const piece = pieceOf(clip).piece;
+    return drawShore(g, piece, shoreOf(p.edge), paints(p, t, versionOf(piece)), t);
   },
 });

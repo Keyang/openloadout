@@ -205,9 +205,39 @@
    "q": 1.5
   },
   {
+   "id": "crackAmp",
+   "type": "ad",
+   "attack": 0.0005,
+   "decay": "0.05 + length*0.04",
+   "curve": 3
+  },
+  {
+   "id": "crack",
+   "type": "filter",
+   "mode": "bp",
+   "in": "n",
+   "freq": "1300 + bright*2200",
+   "q": 0.9
+  },
+  {
+   "id": "roarAmp",
+   "type": "ad",
+   "attack": 0.004,
+   "decay": "length*0.55",
+   "curve": 2
+  },
+  {
+   "id": "roar",
+   "type": "filter",
+   "mode": "bp",
+   "in": "n",
+   "freq": "650/size + 250",
+   "q": 0.8
+  },
+  {
    "id": "sat",
    "type": "shaper",
-   "in": "boom*boomAmp*0.9 + blast*blastAmp*1.4 + rum*rumbleAmp*rumble*1.2 + debris*crackle*10",
+   "in": "boom*boomAmp*0.9 + blast*blastAmp*1.4 + rum*rumbleAmp*rumble*1.0 + debris*crackle*10 + crack*crackAmp*(2 + bright*1.5) + roar*roarAmp*2.1",
    "drive": 2.2
   }
  ],
@@ -222,7 +252,7 @@
   },
   "Distant blast": {
    "size": 1.6,
-   "length": 2.4,
+   "length": 1.85,
    "crackle": 0.1,
    "bright": 0.05,
    "rumble": 1

@@ -40,6 +40,7 @@
   "license": "draft"
  },
  "loop": true,
+ "wrap": true,
  "normalize": false,
  "duration": 4,
  "params": [
@@ -121,13 +122,13 @@
   {
    "id": "tone",
    "type": "expr",
-   "expr": "core*0.5 + half*0.3 + sub*0.6 + whine*0.25*thrust"
+   "expr": "core*0.5 + half*0.3 + sub*(0.25+0.7*rumble) + whine*0.25*thrust"
   },
   {
    "id": "grind",
    "type": "shaper",
    "in": "tone",
-   "drive": "1 + grit*3",
+   "drive": "1.5",
    "mode": "tanh"
   },
   {
@@ -135,8 +136,23 @@
    "type": "filter",
    "mode": "lp",
    "in": "grind",
-   "freq": "300 + thrust*thrust*4500",
+   "freq": "300 + thrust*thrust*4500 + grit*1500",
    "q": 0.8
+  },
+  {
+   "id": "buzz",
+   "type": "shaper",
+   "in": "tone",
+   "drive": 6,
+   "mode": "clip"
+  },
+  {
+   "id": "fizz",
+   "type": "filter",
+   "mode": "hp",
+   "in": "buzz",
+   "freq": "600 + thrust*800",
+   "q": 0.7
   },
   {
    "id": "n",
@@ -152,19 +168,27 @@
    "q": 0.7
   },
   {
+   "id": "glint",
+   "type": "filter",
+   "mode": "bp",
+   "in": "core",
+   "freq": "1000 + thrust*1500",
+   "q": 1.5
+  },
+  {
    "id": "dc",
    "type": "filter",
    "mode": "hp",
-   "in": "open*0.7 + air*rumble*(0.3+thrust)*1.5",
+   "in": "open*0.7 + air*rumble*(0.4+0.5*thrust)*4 + glint*2 + fizz*grit*1.4 + whine*(0.12 + 0.2*thrust)",
    "freq": 30
   },
   {
    "id": "level",
    "type": "expr",
-   "expr": "0.12 + 0.88*thrust^1.3 * (1 + slow*0.6*wobble)"
+   "expr": "0.3 + 0.7*thrust^1.2 * (1 + slow*0.6*wobble)"
   }
  ],
- "out": "dc*level",
+ "out": "dc*level*0.165",
  "presets": {
   "Idle": {
    "thrust": 0.05

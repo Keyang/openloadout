@@ -119,9 +119,15 @@
    "freq": "pitch * semi(note + clash)"
   },
   {
+   "id": "c",
+   "type": "osc",
+   "wave": "square",
+   "freq": "pitch * 2 * semi(note + clash*0.5)"
+  },
+  {
    "id": "pair",
    "type": "expr",
-   "expr": "a*0.5 + b*0.5"
+   "expr": "a*0.4 + b*0.4 + c*0.45"
   },
   {
    "id": "lp",

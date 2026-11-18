@@ -199,15 +199,15 @@
  "presets": {
   "Heal": {
    "pitch": 520,
-   "length": 1.6,
+   "length": 1.05,
    "rise": 1,
    "sparkle": 18,
-   "shimmer": 0.6,
+   "shimmer": 0.4,
    "glow": 0.9
   },
   "Curse": {
    "pitch": 900,
-   "length": 1.2,
+   "length": 1.0,
    "rise": -1.8,
    "sparkle": 45,
    "shimmer": 0.4,

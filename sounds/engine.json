@@ -33,14 +33,16 @@
    "rev",
    "idle",
    "race",
-   "accelerate"
+   "accelerate",
+   "rumble"
   ],
   "license": "draft"
  },
  "loop": true,
+ "wrap": true,
  "duration": 3,
  "normalize": false,
- "gain": 0.5,
+ "gain": 0.47,
  "params": [
   {
    "id": "rpm",
@@ -131,9 +133,25 @@
    "freq": "fire*6.02"
   },
   {
+   "id": "rasp",
+   "type": "filter",
+   "mode": "bp",
+   "in": "n*(0.4 + 0.6*pulse)",
+   "freq": "1100 + rpm*0.2 + throttle*900",
+   "q": 1.4
+  },
+  {
+   "id": "upper",
+   "type": "filter",
+   "mode": "hp",
+   "in": "pulse",
+   "freq": "700",
+   "q": 0.7
+  },
+  {
    "id": "drive",
    "type": "shaper",
-   "in": "body*(0.6 + throttle*0.6) + exhaust*(0.3 + throttle*0.6) + gear*whine*0.6",
+   "in": "body*(0.6 + throttle*0.6) + exhaust*(0.3 + throttle*0.6) + gear*whine*0.6 + rasp*(0.35 + throttle*0.3)*(0.5 + rough) + upper*0.2",
    "drive": "1.5 + throttle*3"
   },
   {

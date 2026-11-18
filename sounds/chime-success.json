@@ -2,7 +2,7 @@
  "format": "sfxpatch/0.1",
  "id": "chime-success",
  "name": "Success chime",
- "category": "ui",
+ "category": "jingle",
  "tags": [
   "confirm",
   "reward",
@@ -144,7 +144,7 @@
   "Quick confirm": {
    "root": 880,
    "speed": 18,
-   "ring": 0.3,
+   "ring": 0.75,
    "space": 0.1,
    "bright": 0.2
   },

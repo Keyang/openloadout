@@ -4,6 +4,7 @@
 // each clip uses, the colours and the parts with their settings. The body, every part and every pose are drawn by
 // rigs/humanoid-figure.js on the shared side-view rig (rigs/humanoid.js).
 import { defineSprite, range, choice, color } from '../engine/sprite.js';
+import { tone } from '../engine/color.js';
 import { PALETTE, swatches } from '../engine/palettes.js';
 import * as H from '../rigs/humanoid.js';
 import * as F from '../rigs/humanoid-figure.js';
@@ -17,8 +18,12 @@ const OUTFITS = swatches('hearthvale', 'outfit', { lead: 'bandit' }).filter((c) 
 /** What the Bandit is, for these settings: the definition rigs/humanoid-figure.js draws. */
 const bandit = (p) => {
   // the kerchief and the belt lie on the coat, and the kerchief on the face: they are painted in the nearest tone of their
-  // colour that is clearly lighter or darker than both, so that no whole-kit look merges them (style guide, section 3, rule 8)
+  // colour that is clearly lighter or darker than both, so that no whole-kit look merges them (style guide, section 3, rule 8).
+  // The default (wood) and roof are as dark as the bandit's coat and are lifted a tone off it; wheat and cream are as pale as
+  // the face and are taken down a tone; path is far enough from both and is painted as it is
   const kerchief = F.apart(p.trim, [[p.outfit, 0.3], [p.skin, 0.19]]), rope = F.apart(p.trim, [[p.outfit, 0.3]]);
+  // the loot sack is path cloth: the default wood shows on it as it is; a tie and a patch set to path itself are painted a tone darker, so the patch still shows
+  const patch = p.trim === HV.path ? tone(p.trim, -0.85) : p.trim;
   return {
     body: { height: p.height, build: p.build, head: p.head },
     stance: 'slouched',                                                   // heavy, the head hanging forward
@@ -30,7 +35,7 @@ const bandit = (p) => {
     headgear: { kind: p.headgear, size: p.headgearSize, colour: p.headgear === 'wide hat' ? p.trim : p.outfit, band: p.outfit },
     mask: { colour: kerchief, drape: 3 },                                 // the kerchief: worn whatever the headgear
     coat: { colour: p.outfit, belt: rope, ragged: 0.35, length: 0.42 },
-    pack: { kind: p.pack, size: p.packSize, colour: HV.path, trim: p.trim, leather: HV.wood, fletching: HV.cream, shaft: HV.rust },
+    pack: { kind: p.pack, size: p.packSize, colour: HV.path, trim: patch, leather: HV.wood, fletching: HV.cream, shaft: HV.rust },
     loot: { colour: HV.wheat, tie: HV.wood, glint: HV.gold },             // the coin bag of `steal`
   };
 };

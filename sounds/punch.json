@@ -95,7 +95,7 @@
    "id": "thudAmp",
    "type": "ad",
    "attack": 0.001,
-   "decay": "length",
+   "decay": "length*0.7",
    "curve": 2
   },
   {
@@ -132,13 +132,35 @@
    "decay": "length*0.7"
   },
   {
+   "id": "smack",
+   "type": "filter",
+   "mode": "bp",
+   "in": "n",
+   "freq": "700/pow(weight, 0.5) + 200",
+   "q": 0.9
+  },
+  {
+   "id": "smackAmp",
+   "type": "ad",
+   "attack": 0.0008,
+   "decay": "0.03 + length*0.6",
+   "curve": 2
+  },
+  {
    "id": "sat",
    "type": "shaper",
    "in": "thud*thudAmp*1.0 + slap*slapAmp*snap*3.5 + body*bodyAmp*1.2",
    "drive": "1.5 + crunch*6"
+  },
+  {
+   "id": "glue",
+   "type": "shaper",
+   "in": "(sat*0.5 + smack*smackAmp*(0.6 + weight*2.8) + slap*slapAmp*(0.2 + snap)*1.4)*0.5",
+   "drive": 1.6,
+   "mode": "tanh"
   }
  ],
- "out": "sat",
+ "out": "glue",
  "presets": {
   "Light jab": {
    "weight": 0.6,

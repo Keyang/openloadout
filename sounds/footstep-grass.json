@@ -182,7 +182,7 @@
   {
    "id": "ground",
    "type": "expr",
-   "expr": "thump*thumpAmp*0.2 + tapTone*thumpAmp*0.35"
+   "expr": "thump*thumpAmp*0.2 + tapTone*thumpAmp*0.45"
   },
   {
    "id": "sumBus",

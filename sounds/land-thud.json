@@ -39,7 +39,7 @@
     { "id": "rClk", "type": "clock", "rate": 1, "count": 1, "delay": 0.004 },
     { "id": "rKick", "type": "ad", "attack": 0.0005, "decay": 0.004, "curve": 1.5, "trig": "rClk" },
     { "id": "rattle", "type": "modal", "in": "n*rKick", "freq": "3100*j2", "ratios": [1, 1.47, 2.09, 2.56], "decay": "length*0.8", "tilt": 0.6 },
-    { "id": "sum", "type": "expr", "expr": "thudSat*0.4 + slapF*slapAmp*(2.2 + snap*3.0) + bodyF*bodyAmp*2.6 + dustF*dustAmp*grit*3.0 + rattle*smooth(0.55,0.9,grit)*0.03" },
+    { "id": "sum", "type": "expr", "expr": "thudSat*0.4 + slapF*slapAmp*(3.0 + snap*3.2) + bodyF*bodyAmp*2.6 + dustF*dustAmp*grit*3.0 + rattle*smooth(0.55,0.9,grit)*0.03" },
     { "id": "clean", "type": "filter", "mode": "hp", "in": "sum", "freq": 30, "q": 0.7 }
   ],
   "out": "clean",

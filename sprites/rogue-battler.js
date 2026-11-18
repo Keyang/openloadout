@@ -11,6 +11,9 @@ import * as F from '../rigs/humanoid-figure.js';
 
 const HV = PALETTE.hearthvale;
 const BLADES = ['daggers', 'short sword', 'claws'];
+// the scarf, belt and boots: dungeon slate first (the kit's default), then village stone and the rest of the kit's trim
+// colours; the same list as on the map
+const TRIMS = [HV.slate, HV.cobble, ...swatches('hearthvale', 'trim', { lead: 'slate' }).slice(1)].slice(0, 8);
 const SPEED = (p) => p.speed;
 const STEPS = [0, 4].map((frame) => ({ sound: 'footstep-gravel', frame, preset: 'Sneaking', volume: 0.45 }));
 
@@ -77,7 +80,7 @@ export default defineSprite({
     // the tunic, and the hood, bandana or mask
     outfit: color('Outfit', HV.rogue, swatches('hearthvale', 'outfit', { lead: 'rogue' })),
     // the scarf, the belt and the boots, so it shows with no scarf too
-    trim: color('Scarf and trim', HV.slate, swatches('hearthvale', 'trim', { lead: 'slate' })),
+    trim: color('Scarf and trim', HV.slate, TRIMS),
     // the blades: with none held there is nothing for it to colour
     metal: color('Metal', HV.steel, swatches('hearthvale', 'metal', { lead: 'steel' }), { when: { weapon: BLADES } }),
     bounce: range('Bounce', 0.5, { lo: 'Calm', hi: 'Bouncy', group: 'Motion' }),

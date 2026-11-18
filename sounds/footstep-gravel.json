@@ -168,9 +168,17 @@
    "mode": "hp",
    "in": "n",
    "freq": 2500
+  },
+  {
+   "id": "tap",
+   "type": "filter",
+   "mode": "bp",
+   "in": "n",
+   "freq": "(900 + bright*700)/pow(weight, 0.3)",
+   "q": 0.9
   }
  ],
- "out": "heel*heelAmp*0.45 + gravel*grit*6 + scuffTone*scuffAmp*scuff*0.35",
+ "out": "heel*heelAmp*0.4 + tap*heelAmp*1.8 + gravel*grit*6 + scuffTone*scuffAmp*scuff*0.35",
  "presets": {
   "Boots": {
    "weight": 1.8,

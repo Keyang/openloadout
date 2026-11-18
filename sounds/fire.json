@@ -147,7 +147,7 @@
    "tilt": 0.5
   }
  ],
- "out": "roar*(0.5 + size) + flk*0.25*(0.4 + g) + crk*crackle*8 + popRing*pops*1.5",
+ "out": "roar*(0.35 + size*0.9) + flk*0.8*(0.4 + g) + crk*crackle*8 + popRing*pops*1.5",
  "presets": {
   "Torch": {
    "size": 0.15,
