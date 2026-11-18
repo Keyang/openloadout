@@ -17,7 +17,7 @@ export default defineSprite({
   pivot: [16, 16],
   preview: 'stone-top',
   params: { stone: color('Stone', '#8a6fb0', ['#8a6fb0', '#b07a50', '#5f8a8f']) },
-  clips: { ...blockClips('stone'), 'stone-thin-l': clip(), 'stone-thin-m': clip(), 'stone-thin-r': clip(), 'stone-slope-up': clip(), 'stone-slope-down': clip(), 'stone-deco-a': clip() },
+  clips: { ...blockClips('stone', { narrow: true }), 'stone-thin-l': clip(), 'stone-thin-m': clip(), 'stone-thin-r': clip(), 'stone-slope-up': clip(), 'stone-slope-down': clip(), 'stone-deco-a': clip() },
   render(g, { clip: name, p }) {
     const c = { base: p.stone, edge: '#ffd94a', dark: tone(p.stone, -0.35) };
     const piece = name.slice('stone-'.length);

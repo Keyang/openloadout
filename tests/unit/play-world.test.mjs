@@ -124,7 +124,7 @@ test('the player can land on a thin platform and walk off it', () => {
 
 test('the step is a wall to walk into and a ledge to jump onto', () => {
   const w = sideWorld([hero()]);
-  const wall = 13 * 32;                               // the step starts here and is two tiles high
+  const wall = 12 * 32;                               // the step starts here and is two tiles high
   w.player.x = wall - 40;
   run(w, { right: true, run: true }, 2);
   assert.ok(w.player.x < wall, `stopped at the wall (x ${w.player.x})`);
@@ -137,10 +137,10 @@ test('the step is a wall to walk into and a ledge to jump onto', () => {
 
 test('slopes are walked up and down', () => {
   const w = createWorld({ mode: 'side', level: makeLevel('side', { slopes: true }), kinds: [hero()], player: 'hero' });
-  w.player.x = 8 * 32 - 10;
+  w.player.x = 7 * 32 - 10;
   const heights = new Set();
-  for (let i = 0; i < 60 * 6 && w.player.x < 12 * 32 + 10; i++) { step(w, { right: true, run: true }, DT); heights.add(Math.round(w.player.y)); assert.equal(w.player.onGround, true, 'it never leaves the ground'); }
-  assert.ok(w.player.x >= 12 * 32, 'it crossed the mound');
+  for (let i = 0; i < 60 * 6 && w.player.x < 11 * 32 + 10; i++) { step(w, { right: true, run: true }, DT); heights.add(Math.round(w.player.y)); assert.equal(w.player.onGround, true, 'it never leaves the ground'); }
+  assert.ok(w.player.x >= 11 * 32, 'it crossed the mound');
   assert.equal(Math.min(...heights), w.level.groundY - 32, 'over the top');
   assert.ok(heights.size > 10, 'step by step, not in one jump');
   assert.equal(w.player.y, w.level.groundY);

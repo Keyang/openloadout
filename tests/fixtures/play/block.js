@@ -1,10 +1,12 @@
 // Shared by the fixture tilesets: the 13 pieces of a block (docs/style-guide.md section 6), drawn very simply.
 // (The real helper is engine/tiles.js; fixtures keep their own so the playground tests do not depend on it.)
 export const PIECES = ['left', 'top', 'right', 'side-l', 'fill', 'side-r', 'bottom-l', 'bottom', 'bottom-r', 'inner-tl', 'inner-tr', 'inner-bl', 'inner-br'];
+/** The seven pieces for ground one tile thick, and a second version of the fill (engine/tiles.js NARROW_PIECES, fill-b). */
+export const NARROW = ['strip-l', 'strip-m', 'strip-r', 'col-t', 'col-m', 'col-b', 'single'];
 const one = () => ({ frames: 1, fps: 1, loop: true });
 
-/** The 13 clip entries of a block: { '<prefix>-left': {...}, ... }. */
-export const blockClips = (prefix) => Object.fromEntries(PIECES.map((p) => [`${prefix}-${p}`, one()]));
+/** The 13 clip entries of a block: { '<prefix>-left': {...}, ... }; with narrow: true also the seven narrow pieces and fill-b. */
+export const blockClips = (prefix, { narrow = false } = {}) => Object.fromEntries([...PIECES, ...(narrow ? [...NARROW, 'fill-b'] : [])].map((p) => [`${prefix}-${p}`, one()]));
 export const clip = one;
 
 /**
@@ -21,8 +23,11 @@ export function drawPiece(g, piece, c) {
   }
   g.rect(0, 0, T, T, c.base);
   g.dot(9, 12, c.dark); g.dot(22, 20, c.dark); g.dot(14, 26, c.dark);
-  const top = ['left', 'top', 'right'].includes(piece), bottom = piece.startsWith('bottom');
-  const left = ['left', 'side-l', 'bottom-l'].includes(piece), right = ['right', 'side-r', 'bottom-r'].includes(piece);
+  if (piece === 'fill-b') g.rect(12, 14, 6, 2, c.dark);                 // the second version of the fill: one more mark
+  const top = ['left', 'top', 'right', 'strip-l', 'strip-m', 'strip-r', 'col-t', 'single'].includes(piece);
+  const bottom = piece.startsWith('bottom') || ['strip-l', 'strip-m', 'strip-r', 'col-b', 'single'].includes(piece);
+  const left = ['left', 'side-l', 'bottom-l', 'strip-l', 'col-t', 'col-m', 'col-b', 'single'].includes(piece);
+  const right = ['right', 'side-r', 'bottom-r', 'strip-r', 'col-t', 'col-m', 'col-b', 'single'].includes(piece);
   if (top) g.rect(0, 0, T, E, c.edge);
   if (bottom) g.rect(0, T - E, T, E, c.dark);
   if (left) g.rect(0, 0, E, T, top ? c.edge : c.dark);

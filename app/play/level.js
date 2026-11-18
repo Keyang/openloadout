@@ -1,105 +1,138 @@
-// Playground: the ground of the scene, on a grid of tiles (32 px, docs/style-guide.md section 6).
-// Side view: ground, a raised step, a floating island, a thin platform and, when the bag's tiles
-// have slopes, a mound. Top-down: a walled room, with a pit or pond and a patch of second ground
-// when the bag's tiles have them. The layout is the same with or without tiles in the bag: tiles
-// only decide how it is drawn, and with none the page draws a plain ground instead.
+// Playground: the ground of the scene. A level is a small map of letters, one letter for each
+// 32 px cell (side view: ground, a step, an island, platforms, a strip, a pillar, a single block
+// and, when the bag's tiles have slopes, a mound; top-down: a walled room with walls inside it and,
+// when the bag's tiles have them, a pit or pond and a patch of second ground).
 //
-// THE TILE NAMES THE PLAYGROUND UNDERSTANDS (any prefix <p>; several tilesets in the bag are used together)
-//   the block:   <p>-left   <p>-top     <p>-right        top corners and top edge
-//                <p>-side-l <p>-fill    <p>-side-r       sides and inside
-//                <p>-bottom-l <p>-bottom <p>-bottom-r    underside (top-down wall: its front face)
-//                <p>-inner-tl -tr -bl -br                inside corners
-//   platforms:   <p>-thin-l <p>-thin-m <p>-thin-r        one tile high, stood on from above
-//   slopes:      <p>-slope-up <p>-slope-down             45 degrees, rising and falling to the right
-//   columns:     <p>-cap <p>-mid <p>-foot                things that repeat up and down (a ladder, a vine, a post):
-//                                                        one column of each stands in a side-view scene
-//   decals:      <p>-deco-a ...                          scattered over fill tiles of the same prefix; a decal whose clip
-//                                                        says place 'above' or 'below' (engine/tiles.js decoClips) goes in
-//                                                        the empty cell above a top tile or under a bottom tile instead
-//   Each cell's piece is picked from its neighbours. A missing piece falls back to the nearest one
-//   (a corner to its edge, an edge to the fill).
-//   Top-down, which block is what: a prefix with only <p>-fill is the floor; a prefix containing
-//   "wall" is the wall; a prefix starting pit, water, hole, void, lava, acid or pool is a hole
-//   (it blocks the way); any other block is a second ground laid over the floor.
-//   Which block is the side-view ground: the first with both -top and -fill. Platforms: every prefix with
-//   -thin-m gets a floating platform of its own (the ground's first). Slopes: the first prefix with both slopes.
-//   Other clip names (bridge-h, stairs-down, window, ...) are not placed.
+// WHICH TILE GOES WHERE IS NOT DECIDED HERE. It is decided by the tile helper, engine/tiles.js,
+// the same code the preview tool (tools/tilemap.mjs) and the checker use, so the three cannot disagree:
+//   classifyTiles(clips)   what a tileset has: blocks (each ground, wall or hole: blockKind), lone fills (floors),
+//                          thin platforms, slopes, things that stack (cap, mid, foot), decals and where they go
+//   layoutTiles(rows, ...) the clip for every cell of a map of letters: the 13 pieces of a block, the narrow
+//                          pieces (strip-l/m/r, col-t/m/b, single), fill versions, thin-l/m/r, slopes, stacks
+// The names a tileset must use are listed at the top of engine/tiles.js and in docs/style-guide.md section 6.
+// This file only: writes the map, says what is solid in it (for walking and jumping), scatters the
+// decals a tileset has over the cells the helper's rules allow, and joins several tilesets in the bag
+// into one list for the helper. With no tiles for something, the page draws it plainly instead.
 // Pure JavaScript: no DOM.
 import { hash } from '../../engine/motion.js';
+import { TILE, classifyTiles, layoutTiles, pickPiece } from '../../engine/tiles.js';
 
-export const UNIT = 32;
+export const UNIT = TILE;
 const EMPTY = 0, SOLID = 1, UP = 2, DOWN = 3;     // side view cells (UP: a slope rising to the right)
 const FLOOR = 0, WALL = 1, HOLE = 2, PATH = 3;     // top-down cells
-const SIDE = { cols: 24, rows: 9 };                // in 32 px units
-const THIN_SPOTS = [[4, 6, 5], [9, 11, 3], [21, 23, 5], [0, 2, 3]];     // floating platforms: first column, last column, row
-const STACK_COLS = [2, 12, 17, 7];                 // where columns (ladders, vines, posts) stand
-const TOP = { cols: 20, rows: 12 };
+
+// The maps. The letters are layoutTiles' own: side view '#' the first block, 'I' the second (else the first),
+// '/' '\' slopes, '=' '-' thin platforms, '|' ':' '!' things that stack; top-down 'W' the wall, 'O' the hole,
+// 'P' 'Q' other ground laid over the floor; '.' nothing.
+const SIDE_MAP = [
+  '........................',
+  '...#................####',     // a pillar one tile wide (col-t, col-m, col-b); a mass high up with a part hanging
+  '...#.........###....####',     // under it (bottom pieces, inner-bl, inner-br); a strip one tile high (strip-l/m/r)
+  '...#...#.........II..##.',     // a block on its own (single); the top of a small floating island
+  '.................II.....',
+  '............####........',     // a step up, two tiles high
+  '............####........',
+  '########################',     // the ground, two deep
+  '########################',
+];
+const TOP_MAP = [
+  'WWWWWWWWWWWWWWWWWWWW',         // the north wall is two deep, so its front face shows
+  'WWWWWWWWWWWWWWWWWWWW',
+  'W..................W',
+  'W...............W..W',         // a wall one tile thick
+  'W.......WWW.....W..W',         // a wall to walk round: its top, then its face
+  'W.......WWW.....W..W',
+  'W..................W',
+  'W..................W',
+  'W..................W',
+  'W..................W',
+  'W..................W',
+  'WWWWWWWWWWWWWWWWWWWW',
+];
+const THIN_SPOTS = [[4, 6, 5], [9, 11, 3], [20, 22, 5]];   // floating platforms: first column, last column, row
+const THIN_LETTERS = ['=', '-', '~'];                      // '~' is given to the helper in the legend
+const STACK_COLS = [2, 11, 16, 19];                        // where ladders, vines and posts stand, three tiles tall
+const STACK_LETTERS = ['|', ':', '!', '¦'];
+const DECAL_LETTERS = 'αβγδεζηθικλμνξοπρστυφχψω';          // private letters for decals, named in the legend
 
 /**
- * The level for a mode.
- *   tile: the tile size (the tileset's frame width; 32 with no tileset).
- *   slopes: build the mound (side view). hole, path: build the pit and the patch of second ground (top-down).
- *   thins: how many floating platforms (side view; one for each kind of platform in the bag, at least one).
- *   stacks: how many columns to stand (side view; one for each ladder, vine or post in the bag).
- * side: { mode, tile, cols, rows, width, height, groundY, cells, thins: [{ c0, c1, r, x0, x1, y }], start, spots }
- * top:  { mode, tile, cols, rows, width, height, cells, start, spots }
+ * The level for a mode ('side' or 'top'). What it has follows the bag's tiles (levelFeatures):
+ *   slopes: build the mound. thins: how many floating platforms (one for each kind of platform in the bag).
+ *   strip: the bag has a block but no platform pieces, so the platform is a strip of the block (solid).
+ *   stacks: how many columns to stand (one for each ladder, vine or post in the bag).
+ *   hole, path, path2: build the pit, and the patches of second and third ground (top-down).
+ * Returns { mode, tile, cols, rows, width, height, map (the letters), cells, start, spots } and, side view,
+ * { groundY, slopes, thins: [{ c0, c1, r, x0, x1, y }], stacks: [{ c, r0, r1 }] }.
  * spots: { pickup, prop, mover }: where the first things of each sort are put ({ x, y } of their ground point).
  */
-export function makeLevel(mode, { tile = UNIT, slopes = false, hole = false, path = false, thins = 1, stacks = 0 } = {}) {
-  const T = Math.max(8, Math.round(tile));
-  const k = Math.max(1, Math.round(UNIT / T));        // cells for each 32 px unit
-  const size = mode === 'top' ? TOP : SIDE;
-  const cols = size.cols * k, rows = size.rows * k;
-  const cells = new Uint8Array(cols * rows);
-  // fill a rectangle given in units
-  const box = (c0, r0, c1, r1, v) => { for (let r = r0 * k; r < (r1 + 1) * k; r++) for (let c = c0 * k; c < (c1 + 1) * k; c++) cells[r * cols + c] = v; };
-  const level = { mode: mode === 'top' ? 'top' : 'side', tile: T, cols, rows, width: cols * T, height: rows * T, cells };
-  const U = k * T;                                     // one unit in pixels
+export function makeLevel(mode, { slopes = false, thins = 1, strip = false, stacks = 0, hole = false, path = false, path2 = false } = {}) {
+  const T = TILE, top = mode === 'top';
+  const map = (top ? TOP_MAP : SIDE_MAP).map((row) => [...row]);
+  const rows = map.length, cols = map[0].length;
+  const set = (c0, c1, r0, r1, ch) => { for (let r = r0; r <= r1; r++) for (let c = c0; c <= c1; c++) map[r][c] = ch; };
+  const level = { mode: top ? 'top' : 'side', tile: T, cols, rows, width: cols * T, height: rows * T, map };
 
-  if (level.mode === 'top') {
-    box(0, 0, 19, 1, WALL); box(0, 11, 19, 11, WALL); box(0, 0, 0, 11, WALL); box(19, 0, 19, 11, WALL);   // the room: the north wall is two deep so its face shows
-    box(8, 4, 10, 5, WALL);                            // a wall to walk round
-    if (hole) box(13, 7, 15, 8, HOLE);
-    if (path) box(2, 7, 6, 9, PATH);
-    level.start = { x: Math.round(2.5 * U), y: Math.round(5.9 * U) };
+  if (top) {
+    if (hole) set(13, 15, 7, 8, 'O');
+    if (path) set(2, 6, 7, 9, 'P');
+    if (path2) set(9, 11, 9, 10, 'Q');
+    level.cells = Uint8Array.from(map.flat().map((ch) => (ch === 'W' ? WALL : ch === 'O' ? HOLE : ch === 'P' || ch === 'Q' ? PATH : FLOOR)));
+    level.start = { x: Math.round(2.5 * T), y: Math.round(5.9 * T) };
     const all = [];
     for (let r = 2; r <= 10; r++) for (let c = 1; c <= 18; c++) {
-      if ((c + r) % 2 || cells[r * k * cols + c * k] === WALL || cells[r * k * cols + c * k] === HOLE) continue;
-      const s = { x: Math.round((c + 0.5) * U), y: Math.round((r + 0.9) * U) };
-      if (Math.hypot(s.x - level.start.x, s.y - level.start.y) > U * 1.4) all.push(s);
+      if ((c + r) % 2 || isWall(level, c, r)) continue;
+      const s = { x: Math.round((c + 0.5) * T), y: Math.round((r + 0.9) * T) };
+      if (Math.hypot(s.x - level.start.x, s.y - level.start.y) > T * 1.4) all.push(s);
     }
     all.sort((a, b) => Math.hypot(a.x - level.start.x, a.y - level.start.y) - Math.hypot(b.x - level.start.x, b.y - level.start.y));
     level.spots = { pickup: all.filter((_, i) => i % 3 === 0), prop: all.filter((_, i) => i % 3 === 1), mover: all.filter((_, i) => i % 3 === 2) };
     return level;
   }
 
-  box(0, 7, 23, 8, SOLID);                             // the ground, two deep
-  box(13, 5, 16, 6, SOLID);                            // a step up
-  box(18, 3, 20, 4, SOLID);                            // a floating island
-  level.slopes = !!slopes && k === 1;
-  if (level.slopes) { box(8, 6, 8, 6, UP); box(9, 6, 10, 6, SOLID); box(11, 6, 11, 6, DOWN); }
-  level.groundY = 7 * U;
-  // floating platforms: the first is always there; the others only when the bag has more kinds of platform
-  level.thins = THIN_SPOTS.slice(0, Math.max(1, Math.min(THIN_SPOTS.length, thins))).map(([c0, c1, r]) => ({ c0: c0 * k, c1: (c1 + 1) * k - 1, r: r * k, x0: c0 * U, x1: (c1 + 1) * U, y: r * U }));
+  level.slopes = !!slopes;
+  if (level.slopes) { map[6][7] = '/'; map[6][8] = '#'; map[6][9] = '#'; map[6][10] = '\\'; }      // a mound to walk over
+  // floating platforms: thin ones (stood on from above) when the bag has platform pieces or no tiles at all;
+  // a strip of the block, one tile thick, when the bag has a block but no platform pieces
+  level.thins = [];
+  if (strip) set(THIN_SPOTS[0][0], THIN_SPOTS[0][1], THIN_SPOTS[0][2], THIN_SPOTS[0][2], '#');
+  else THIN_SPOTS.slice(0, Math.max(0, thins)).forEach(([c0, c1, r], i) => {
+    set(c0, c1, r, r, THIN_LETTERS[i]);
+    level.thins.push({ c0, c1, r, x0: c0 * T, x1: (c1 + 1) * T, y: r * T });
+  });
   // columns three tiles tall, standing on the ground in the gaps between the other things
-  level.stacks = k === 1 ? STACK_COLS.slice(0, Math.max(0, stacks)).map((c) => ({ c, r0: 4, r1: 6 })) : [];
+  level.stacks = STACK_COLS.slice(0, Math.max(0, stacks)).map((c, i) => { set(c, c, 4, 6, STACK_LETTERS[i]); return { c, r0: 4, r1: 6 }; });
+  level.cells = Uint8Array.from(map.flat().map((ch) => (ch === '#' || ch === 'I' ? SOLID : ch === '/' ? UP : ch === '\\' ? DOWN : EMPTY)));
+  level.groundY = 7 * T;
   level.start = { x: 40, y: level.groundY };
   const on = (x, from = 0) => ({ x, y: surfaceBelow(level, x, from).y });
   const low = level.groundY - 40;                      // "on the ground": below the platforms
   level.spots = {
-    pickup: [on(104, low), on(5.5 * U), on(9.9 * U, low), on(14.5 * U), on(19.5 * U), on(22 * U, low)],
-    prop: [on(76, low), on(236, low), on(12.5 * U, low), on(17.5 * U, low), on(23 * U, low)],
-    mover: [on(232, low), on(15 * U), on(21 * U, low), on(120, low)],
+    pickup: [on(104, low), on(5.5 * T, 4.5 * T), on(9 * T, low), on(13.5 * T, 3.5 * T), on(18 * T), on(21.5 * T, low)],
+    prop: [on(76, low), on(208, low), on(11.5 * T, low), on(16.5 * T, low), on(23.3 * T, low)],
+    mover: [on(190, low), on(14 * T, 3.5 * T), on(22.5 * T, low), on(120, low)],
   };
   return level;
 }
 
-/** What a level should have, from the bag's tiles: { tile, slopes, hole, path }. */
+/**
+ * What a level should have, from the bag's tiles as the helper sorted them (tileIndex), or null with none.
+ * Returns the options makeLevel takes.
+ */
 export function levelFeatures(index, mode) {
-  if (!index) return { tile: UNIT };
-  if (mode === 'top') { const s = topSet(index); return { tile: index.tile, hole: !!s.hole, path: !!s.path }; }
-  const set = sideSet(index);
-  return { tile: index.tile, slopes: !!set.slope, thins: Math.max(1, set.thins.length), stacks: set.stacks.length };
+  if (!index) return {};
+  const T = index.tiles;
+  if (mode === 'top') {
+    const grounds = T.blocks.filter((b) => b.kind === 'ground');
+    return { hole: T.blocks.some((b) => b.kind === 'hole'), path: grounds.length > 0, path2: grounds.length > 1 };
+  }
+  const first = T.blocks[0];
+  const slope = (first && T.slopes.find((s) => s.prefix === first.prefix)) || T.slopes[0];      // the helper's own choice for '/' and '\'
+  return {
+    slopes: !!(first && slope && slope.up && slope.down),
+    thins: T.thins.length ? Math.min(T.thins.length, THIN_SPOTS.length) : first ? 0 : 1,
+    strip: !T.thins.length && !!first,
+    stacks: Math.min(T.stacks.length, STACK_COLS.length),
+  };
 }
 
 // ---- where things can stand ---------------------------------------------------------------------
@@ -174,176 +207,99 @@ export function hitsWall(level, x0, y0, x1, y1) {
   return false;
 }
 
-// ---- tiles ------------------------------------------------------------------------------------------
-
-const SUFFIX = /-(inner-(?:tl|tr|bl|br)|bottom-(?:l|r)|side-(?:l|r)|thin-(?:l|m|r)|slope-(?:up|down)|deco-[a-z0-9]+|fill|top|left|right|bottom|cap|mid|foot)$/;
-const HOLE_NAME = /^(pit|water|hole|void|lava|acid|pool)/;
-const WALL_NAME = /wall/;
-// a missing piece falls back to the nearest one it can stand in for
-const FALLBACK = {
-  left: ['top', 'fill'], right: ['top', 'fill'], top: ['fill'], fill: ['top'],
-  'side-l': ['fill'], 'side-r': ['fill'], bottom: ['fill'], 'bottom-l': ['bottom', 'side-l', 'fill'], 'bottom-r': ['bottom', 'side-r', 'fill'],
-  'inner-tl': ['fill'], 'inner-tr': ['fill'], 'inner-bl': ['fill'], 'inner-br': ['fill'],
-  'thin-l': ['thin-m', 'left', 'top'], 'thin-m': ['top'], 'thin-r': ['thin-m', 'right', 'top'],
-  cap: ['mid', 'foot'], mid: ['cap', 'foot'], foot: ['mid', 'cap'],
-};
+// ---- tiles: everything here is asked of engine/tiles.js ------------------------------------------------
 
 /**
- * Read the tiles of every tileset in the bag. sets: [{ key, names, size, clips }] (key: the bag item; names: its clip
- * names in file order; clips: the sprite's own clip table, read for a decal's `place`).
- * Returns { tile, blocks: [{ prefix, pieces: { fill: { key, clip }, top: ..., 'thin-m': ..., 'slope-up': ... }, decos: [{ key, clip }] }], loose }
- * or null with no tileset. A tileset with none of the names is used whole: its first clip is every piece.
+ * Join the tilesets in the bag into one list and let the helper sort it.
+ * sets: [{ key, names, size, clips }] (key: the bag item; names: its clip names in file order; clips: the sprite's
+ * own clip table, where the helper's blockClips and decoClips leave a block's kind and a decal's place).
+ * Returns { tile, tiles (what classifyTiles returned), keyOf (clip name -> the bag item it came from) }, or null
+ * with no tileset. When two tilesets use the same clip name, the first one in the bag keeps it.
  */
 export function tileIndex(sets) {
   if (!sets || !sets.length) return null;
-  const blocks = new Map(), loose = [];
-  const block = (prefix) => { if (!blocks.has(prefix)) blocks.set(prefix, { prefix, pieces: {}, decos: [] }); return blocks.get(prefix); };
-  for (const set of sets) {
-    let known = 0;
-    for (const clip of set.names) {
-      const m = SUFFIX.exec(clip);
-      if (!m) { loose.push({ key: set.key, clip }); continue; }
-      known++;
-      const b = block(clip.slice(0, m.index));
-      if (m[1].startsWith('deco-')) b.decos.push({ key: set.key, clip, place: ['above', 'below'].includes(set.clips?.[clip]?.place) ? set.clips[clip].place : 'on' });
-      else if (!b.pieces[m[1]]) b.pieces[m[1]] = { key: set.key, clip };
-    }
-    if (!known && set.names.length) {
-      const b = block('');
-      if (!b.pieces.fill) b.pieces.fill = { key: set.key, clip: set.names[0] };
-    }
+  const keyOf = new Map(), list = [];
+  for (const set of sets) for (const name of set.names) {
+    if (keyOf.has(name)) continue;
+    keyOf.set(name, set.key);
+    list.push({ name, place: set.clips?.[name]?.place, block: set.clips?.[name]?.block });
   }
-  return { tile: sets[0].size ?? UNIT, blocks: [...blocks.values()], loose };
+  return { tile: TILE, tiles: classifyTiles(list), keyOf };
 }
-
-/** A piece of a block, or the nearest piece it has. */
-function pieceOf(block, name) {
-  if (block.pieces[name]) return block.pieces[name];
-  for (const alt of FALLBACK[name] ?? []) if (block.pieces[alt]) return block.pieces[alt];
-  return block.pieces.fill ?? block.pieces.top ?? null;
-}
-const isBlock = (b) => !!(b.pieces.top || b.pieces.fill);
 
 /**
- * Side view: which blocks make the ground, the thin platforms, the slopes and the columns.
- * thins: every prefix with thin pieces, the ground's own first; each gets a floating platform, so every kind of
- * platform in the bag is seen. stacks: every prefix with cap, mid or foot pieces (a ladder, a vine, a post).
+ * The level as the helper's layoutTiles takes it: { rows (strings of letters), legend, view }.
+ * The level's own letters are layoutTiles' standard ones. Added here: a letter for a third platform or a fourth
+ * column, and one private letter for each decal the bag has, scattered (the same way every time) over the cells
+ * the helper's rules allow: an 'on' decal over a fill cell of its block or over the floor, an 'above' decal in
+ * the empty cell over a top piece, a 'below' decal in the empty cell under a bottom piece.
  */
-export function sideSet(index) {
-  const real = index.blocks.filter(isBlock);
-  const ground = real.find((b) => b.pieces.top && b.pieces.fill) ?? real[0] ?? null;
-  const first = (test) => (ground && test(ground) ? ground : index.blocks.find(test) ?? null);
-  const hasThin = (b) => !!(b.pieces['thin-m'] || b.pieces['thin-l']);
-  const thins = index.blocks.filter(hasThin).sort((a, b) => (b === ground) - (a === ground));
-  return {
-    ground, thins,
-    thin: thins[0] ?? null,
-    slope: first((b) => b.pieces['slope-up'] && b.pieces['slope-down']),
-    stacks: index.blocks.filter((b) => b.pieces.cap || b.pieces.mid || b.pieces.foot),
-  };
-}
+export function levelMap(level, index) {
+  const view = level.mode === 'top' ? 'top-down' : 'side';
+  const map = level.map.map((row) => [...row]);
+  const legend = {};
+  if (!index) return { rows: map.map((r) => r.join('')), legend, view };
+  const T = index.tiles, { cols, rows } = level;
+  const letter = (c, r) => level.map[Math.max(0, Math.min(rows - 1, r))][Math.max(0, Math.min(cols - 1, c))];     // the map carries on past its edges
+  if (T.thins[2]) legend[THIN_LETTERS[2]] = `thin:${T.thins[2].prefix}`;
+  if (T.stacks[3]) legend[STACK_LETTERS[3]] = `stack:${T.stacks[3].prefix}`;
 
-/** Top-down: which block is the floor, the wall, the hole and the second ground. */
-export function topSet(index) {
-  const real = index.blocks.filter(isBlock);
-  const wall = real.find((b) => WALL_NAME.test(b.prefix)) ?? null;
-  const hole = real.find((b) => b !== wall && HOLE_NAME.test(b.prefix)) ?? null;
-  const ground = real.filter((b) => b !== wall && b !== hole);
-  const base = ground.find((b) => b.pieces.fill && !b.pieces.top) ?? null;
-  const path = ground.find((b) => b !== base && b.pieces.top) ?? null;
-  return { base: base ?? (path ? null : ground[0] ?? null), wall, hole, path };
-}
+  // which block each letter stands for, as layoutTiles reads them
+  const grounds = T.blocks.filter((b) => b.kind === 'ground');
+  const blockOf = view === 'side'
+    ? { '#': T.blocks[0], I: T.blocks[1] ?? T.blocks[0], '/': T.blocks[0], '\\': T.blocks[0] }
+    : { W: T.blocks.find((b) => b.kind === 'wall'), O: T.blocks.find((b) => b.kind === 'hole'), P: grounds[0], Q: grounds[1] };
+  const prefixAt = (c, r) => blockOf[letter(c, r)]?.prefix ?? null;
+  const pieceAt = (c, r) => { const p = prefixAt(c, r); return p === null ? null : pickPiece((x, y) => prefixAt(x, y) === p, c, r); };
+  const empty = (c, r) => r >= 0 && r < rows && c >= 0 && c < cols && level.map[r][c] === '.';
+  const floor = view === 'top-down' ? T.floors[0] : null;
 
-/**
- * The piece of a block for one cell, from its neighbours. inside(c, r): is that cell part of the same block.
- *   nothing above: left · top · right       nothing below: bottom-l · bottom · bottom-r
- *   between: side-l · side-r, or an inner corner where only a diagonal neighbour is missing, else fill
- */
-export function pieceFor(inside, c, r) {
-  const N = inside(c, r - 1), S = inside(c, r + 1), W = inside(c - 1, r), E = inside(c + 1, r);
-  if (!N) return !W && E ? 'left' : W && !E ? 'right' : 'top';
-  if (!S) return !W && E ? 'bottom-l' : W && !E ? 'bottom-r' : 'bottom';
-  if (!W && E) return 'side-l';
-  if (W && !E) return 'side-r';
-  if (!W && !E) return 'fill';
-  if (!inside(c - 1, r - 1)) return 'inner-tl';
-  if (!inside(c + 1, r - 1)) return 'inner-tr';
-  if (!inside(c - 1, r + 1)) return 'inner-bl';
-  if (!inside(c + 1, r + 1)) return 'inner-br';
-  return 'fill';
+  T.decals.slice(0, DECAL_LETTERS.length).forEach((d, i) => {
+    const ch = DECAL_LETTERS[i];
+    legend[ch] = d.clip;
+    const chance = d.place === 'on' ? (floor && d.prefix === floor.prefix ? 0.12 : 0.25) : d.place === 'above' ? 0.3 : 0.6;
+    for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+      if (map[r][c] !== level.map[r][c] || hash(c * 7 + 3 + i * 31, r * 13 + 5) >= chance) continue;      // one decal to a cell
+      const fits = d.place === 'on' ? (prefixAt(c, r) === d.prefix && pieceAt(c, r) === 'fill') || (!!floor && d.prefix === floor.prefix && empty(c, r))
+        : d.place === 'above' ? empty(c, r) && r + 1 < rows && prefixAt(c, r + 1) === d.prefix && pieceAt(c, r + 1) === 'top'
+          : empty(c, r) && r > 0 && prefixAt(c, r - 1) === d.prefix && String(pieceAt(c, r - 1)).startsWith('bottom');
+      if (fits) map[r][c] = ch;
+    }
+  });
+  return { rows: map.map((r) => r.join('')), legend, view };
 }
 
 /**
- * Every tile to draw for a level: { tiles: [{ key, clip, x, y, over }], plain }.
- * tiles are in drawing order; `over` marks the ones drawn after the plain walls (walls and their decals).
- * plain lists what the bag has no tiles for, which the page draws plainly: 'ground', 'thin' (side view), 'floor', 'wall' (top-down).
+ * Every tile to draw for a level, as layoutTiles lays it out: { tiles: [{ key, clip, x, y, over }], plain, bare }.
+ * tiles are in drawing order (key: the bag item the clip is from); `over` marks walls, platforms and decals, drawn
+ * after the page's plain walls. What the bag has no tiles for, the page draws plainly: plain lists which
+ * ('ground', 'thin' in side view; 'floor', 'wall' top-down) and bare (a Set of 'col,row') the ground or wall cells
+ * that got no tile.
  */
 export function levelTiles(level, index) {
-  const T = level.tile, tiles = [], plain = [];
-  const put = (piece, c, r, over = false) => { if (piece) tiles.push({ key: piece.key, clip: piece.clip, x: c * T, y: r * T, over }); };
-  const at = (c, r) => (c < 0 || r < 0 || c >= level.cols || r >= level.rows ? -1 : level.cells[r * level.cols + c]);
-  // a decal of one place ('on', 'above', 'below'), picked and scattered the same way every time
-  const decal = (block, place, c, r, chance, over = false) => {
-    const pool = block.decos.filter((d) => d.place === place);
-    if (!pool.length || hash(c * 7 + 3 + place.length, r * 13 + 5) >= chance) return;
-    put(pool[Math.floor(hash(c + 11, r + 17) * pool.length)], c, r, over);
-  };
-
-  if (level.mode === 'top') {
-    const set = index ? topSet(index) : {};
-    if (!set.base) plain.push('floor');
-    if (!set.wall) plain.push('wall');
-    const layer = (block, value, outside, over) => {
-      if (!block) return;
-      const inside = (c, r) => { const v = at(c, r); return v === -1 ? outside : v === value; };
-      for (let r = 0; r < level.rows; r++) for (let c = 0; c < level.cols; c++) {
-        if (at(c, r) !== value) continue;
-        const name = pieceFor(inside, c, r);
-        put(pieceOf(block, name), c, r, over);
-        if (name === (over ? 'bottom' : 'fill')) decal(block, 'on', c, r, over ? 0.3 : 0.2, over);      // a wall's decals go on its front face
-      }
-    };
-    if (set.base) {
-      for (let r = 0; r < level.rows; r++) for (let c = 0; c < level.cols; c++) { put(pieceOf(set.base, 'fill'), c, r); if (at(c, r) === FLOOR) decal(set.base, 'on', c, r, 0.12); }
-    }
-    layer(set.path, PATH, false, false);
-    layer(set.hole, HOLE, false, false);
-    layer(set.wall, WALL, true, true);
-    return { tiles, plain };
+  const top = level.mode === 'top';
+  const map = levelMap(level, index);
+  const laid = index ? layoutTiles(map.rows, index.tiles, { view: map.view, legend: map.legend }) : { tiles: [] };
+  const tiles = laid.tiles.map((t) => ({ key: index.keyOf.get(t.clip), clip: t.clip, x: t.col * TILE, y: t.row * TILE, over: t.layer >= WALL_LAYER }));
+  const covered = new Set(laid.tiles.filter((t) => t.layer === (top ? WALL_LAYER : GROUND_LAYER)).map((t) => `${t.col},${t.row}`));
+  const bare = new Set();
+  for (let r = 0; r < level.rows; r++) for (let c = 0; c < level.cols; c++) {
+    const v = level.cells[r * level.cols + c];
+    if ((top ? v === WALL : v !== EMPTY) && !covered.has(`${c},${r}`)) bare.add(`${c},${r}`);
   }
-
-  const set = index ? sideSet(index) : {};
-  if (!set.ground) plain.push('ground');
-  if (!set.thin && !set.ground) plain.push('thin');
-  if (set.ground) {
-    const ground = (c, r) => { if (r < 0) return false; const v = at(c, r); return v === -1 || v !== EMPTY; };
-    for (let r = 0; r < level.rows; r++) for (let c = 0; c < level.cols; c++) {
-      const v = at(c, r);
-      if (v === UP || v === DOWN) { put((set.slope ?? set.ground).pieces[v === UP ? 'slope-up' : 'slope-down'] ?? pieceOf(set.ground, 'top'), c, r); continue; }
-      if (v !== SOLID) continue;
-      const above = at(c, r - 1);
-      const name = above === UP || above === DOWN ? 'fill' : pieceFor(ground, c, r);
-      put(pieceOf(set.ground, name), c, r);
-      const thinHere = (cc, rr) => level.thins.some((p) => rr === p.r && cc >= p.c0 && cc <= p.c1);
-      if (name === 'fill') decal(set.ground, 'on', c, r, 0.25);
-      if (name === 'top' && at(c, r - 1) === EMPTY && !thinHere(c, r - 1)) decal(set.ground, 'above', c, r - 1, 0.3);
-      if (name.startsWith('bottom') && at(c, r + 1) === EMPTY && !thinHere(c, r + 1)) decal(set.ground, 'below', c, r + 1, 0.6);
-    }
+  const plain = [];
+  if (top) {
+    if (!index || !index.tiles.floors.length) plain.push('floor');
+    if (bare.size) plain.push('wall');
+  } else {
+    if (bare.size) plain.push('ground');
+    const thinTiles = new Set(laid.tiles.filter((t) => t.layer === THIN_LAYER).map((t) => `${t.col},${t.row}`));
+    if (level.thins.some((p) => !thinTiles.has(`${p.c0},${p.r}`))) plain.push('thin');
   }
-  // each floating platform is made of the next kind of platform in the bag (with none: of the ground's top pieces)
-  const kinds = set.thins?.length ? set.thins : set.ground ? [set.ground] : [];
-  if (kinds.length) level.thins.forEach((p, i) => {
-    const thin = kinds[i % kinds.length];
-    for (let c = p.c0; c <= p.c1; c++) put(pieceOf(thin, c === p.c0 ? 'thin-l' : c === p.c1 ? 'thin-r' : 'thin-m'), c, p.r);
-  });
-  // one column of each ladder, vine or post: cap on top, foot on the ground, mid between
-  (level.stacks ?? []).forEach((col, i) => {
-    const stack = set.stacks?.[i];
-    if (!stack) return;
-    for (let r = col.r0; r <= col.r1; r++) put(pieceOf(stack, r === col.r0 ? 'cap' : r === col.r1 ? 'foot' : 'mid'), col.c, r);
-  });
-  return { tiles, plain };
+  return { tiles, plain, bare };
 }
+// the layers layoutTiles sorts its tiles into (floor 0, stack 1, ground 2, hole 3, wall 4, thin 5, decal 6)
+const GROUND_LAYER = 2, WALL_LAYER = 4, THIN_LAYER = 5;
 
 /** The kinds of cell, for the page's plain drawing. */
 export const CELL = { EMPTY, SOLID, UP, DOWN, FLOOR, WALL, HOLE, PATH };
