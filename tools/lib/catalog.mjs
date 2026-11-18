@@ -35,6 +35,8 @@ export function spriteTech(def) {
   for (const list of Object.values(def.sounds ?? {})) for (const c of list) soundIds.add(c.sound);
   return {
     frame: [def.size[0], def.size[1]],
+    pivot: [def.pivot[0], def.pivot[1]],
+    grounded: def.grounded !== false,
     clips: Object.entries(def.clips).map(([name, c]) => ({ name, label: c.label, frames: c.frames, loop: c.loop, fps: clipFps(def, name, p) })),
     controls: Object.keys(def.params).length,
     parts: Object.keys(def.parts ?? {}),
@@ -84,6 +86,7 @@ export function buildCatalog({ sprites = [], sounds = [], bundles = [] }) {
       tech,
       thumb: thumbPath(id),
       strip: stripPath(id),
+      stripClip: preview.name,
       stripFrames: preview.frames,
       stripFps: preview.fps,
     });

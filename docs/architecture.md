@@ -128,11 +128,11 @@ hair:  color('Hair', '#5a3a22', HAIR, { when: { headgear: ['none', 'crown'] } })
     bundles: ['fantasy-platformer'],          // filled in from bundles/*.json
     src: 'sprites/knight.js',
     tech: {                                   // derived, never hand-written
-      // sprite: frame: [64, 64], clips: [{ name, label, frames, loop, fps }], controls: 15, parts: ['weapon'], sounds: 4 (distinct sounds used)
+      // sprite: frame: [64, 64], pivot: [28, 58], grounded: true, clips: [{ name, label, frames, loop, fps }], controls: 15, parts: ['weapon'], sounds: 4 (distinct sounds used)
       // audio:  seconds: 0.37, loop: false, stereo: false, bpm: null, controls: 5, styles: ['Heavy blade', ...]
     },
     thumb: 'generated/thumbs/knight.png',     // sprite: one frame, 2x. sound: waveform. music: none
-    strip: 'generated/strips/knight.png',     // sprites: the preview clip's frames in one row, 1x. stripFrames, stripFps alongside
+    strip: 'generated/strips/knight.png',     // sprites: the preview clip's frames in one row, 1x. stripClip (the clip's name), stripFrames, stripFps alongside
     // audio assets have view: null
   }],
   bundles: [{ id, name, gameType, level, blurb, sprites: [ids], sounds: [ids], music: [ids], theme: {...} }],   // level: object | character | kit; gameType may be 'any'
