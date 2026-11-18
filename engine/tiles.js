@@ -935,33 +935,35 @@ export function drawLiquid(g, piece, liquid, t = 0) {
 
 /**
  * Draws stone courses on a tile's pattern: rows of stones with 1 px joints that repeat every 32 px, so a wall of the tile shows unbroken courses; returns the face of every stone.
- * Arguments: s (the 32x32 Surface patternFill hands to its drawing, already filled with the stone's colour); courses ([{ h, joints }] from the top down: h px high each, its last row being the joint under it, the heights adding up to 32; joints: the columns of its upright joints, none for one unbroken stone); options { joint (the joints' colour; left out: nothing is drawn and only the stones are returned), lit (a colour for a short highlight along the top right of each stone, where the light catches it), glint (px of that highlight, default 3), round (true cuts the four corners of every stone: cobbles) }.
- * Returns [{ x, y, w, h, course, inner }]: the top-left pixel and size of each face (a stone that goes round the edge of the tile has x + w above 32); inner: it keeps 3 px off every edge of the tile, so a version of the fill may recolour or mark it.
- * Versions of a fill (fill-b, fill-c) must share the tile's four edge lines: give them the same heights and the same joints in the first course, and keep the joints they change more than `glint` px from the left edge.
+ * Arguments: s (the 32x32 Surface patternFill hands to its drawing, already filled with the stone's colour); courses ([{ h, joints }] from the top down: h px high each, its last row being the joint under it, the heights adding up to 32; joints: the columns of its upright joints, none for one unbroken stone); options { joint (the joints' colour; left out: nothing is drawn and only the stones are returned), lit (a colour for a short highlight along the top right of each stone, where the light catches it), glint (px of that highlight, default 3), round (true cuts the four corners of every stone: cobbles), shift (px the whole pattern is moved down, going round the bottom of the tile to its top; default 0) }.
+ * Returns [{ x, y, w, h, course, inner }]: the top-left pixel and size of each face (a stone that goes round the edge of the tile has x + w or y + h above 32); inner: it keeps 3 px off every edge of the tile, so a version of the fill may recolour or mark it.
+ * Give it a shift that puts the tile's top and bottom rows inside one course (no joint row on row 0 or 31): the checker allows no more of a step across a join than there is inside the tile, and a joint row on the boundary is that step.
+ * Versions of a fill (fill-b, fill-c) must share the tile's four edge lines: give them the same heights and shift, the same joints in the course that goes round the bottom of the tile, no joint on the first or last column, and keep the joints they change more than `glint` px from the left edge.
  */
-export function drawCourses(s, courses, { joint = null, lit = null, glint = 3, round = false } = {}) {
+export function drawCourses(s, courses, { joint = null, lit = null, glint = 3, round = false, shift = 0 } = {}) {
   const stones = [];
-  let y0 = 0;
+  const put = (x, y, c) => s.dot(wrap(x), wrap(y), c);
+  let y0 = wrap(Math.round(shift));
   courses.forEach((c, course) => {
     const h = Math.max(2, Math.round(c.h)), face = h - 1;
     const xs = [...new Set((c.joints ?? []).map((x) => wrap(Math.round(x))))].sort((a, b) => a - b), n = xs.length;
     if (joint) {
-      s.rect(0, y0 + face, TILE, 1, joint);
-      for (const x of xs) s.rect(x, y0, 1, face, joint);
+      for (let x = 0; x < TILE; x++) put(x, y0 + face, joint);
+      for (const x of xs) for (let y = 0; y < face; y++) put(x, y0 + y, joint);
     }
     for (let i = 0; i < Math.max(1, n); i++) {
       const a = n ? xs[i] + 1 : 0, w = n ? (xs[(i + 1) % n] - xs[i] - 1 + TILE) % TILE : TILE, end = a + w - 1;
       if (w < 1) continue;
       const cut = round && n && w >= 3 && face >= 3;
-      if (cut && joint) for (const [x, y] of [[a, y0], [end, y0], [a, y0 + face - 1], [end, y0 + face - 1]]) s.dot(wrap(x), y, joint);
+      if (cut && joint) for (const [x, y] of [[a, y0], [end, y0], [a, y0 + face - 1], [end, y0 + face - 1]]) put(x, y, joint);
       if (lit && n && w >= 3) {
         const last = end - (cut ? 1 : 0), run = Math.min(Math.round(glint), w - 2);
-        for (let k = 0; k < run; k++) if (last - k >= (end >= TILE ? TILE : 0)) s.dot(wrap(last - k), y0, lit);       // never round the edge of the tile
-        if (face >= 4) s.dot(wrap(end), y0 + 1, lit);
+        for (let k = 0; k < run; k++) if (last - k >= (end >= TILE ? TILE : 0)) put(last - k, y0, lit);                // never round the edge of the tile
+        if (face >= 4) put(end, y0 + 1, lit);
       }
       stones.push({ x: a, y: y0, w, h: face, course, inner: a >= 3 && a + w <= TILE - 3 && y0 >= 3 && y0 + face <= TILE - 3 });
     }
-    y0 += h;
+    y0 = wrap(y0 + h);
   });
   return stones;
 }
@@ -1083,7 +1085,7 @@ const softInset = (e, u, t) => { u = wrap(u); return e.inset ? Math.min(clampInt
  * Draw one piece of a block of soft ground (a path, sand, moss, the bank of a pond) on a 32x32 Surface: as drawBlock, but every outer corner is a true arc and the outline may wander up to 8 px in.
  * Arguments: g: the Surface. piece: a name from BLOCK_PIECES or NARROW_PIECES ('top', 'inner-tl', 'strip-l', ...), a
  * fill version ('fill-b') or a whole clip name ('path-top'). material: what drawBlock takes (fill, top, bottom,
- * side or left and right, ink, outside), read differently in four places (below). t: the clip phase, passed on to
+ * side or left and right, ink, outside), read differently in five places (below). t: the clip phase, passed on to
  * the material, so a bank or a foam line can move. Returns g.
  *   material.round    0..14: the radius in px of every outer corner (drawBlock cuts 3 px at most). The end of a strip
  *                     or a column is then a round cap, and a tile on its own a round patch
@@ -1093,6 +1095,8 @@ const softInset = (e, u, t) => { u = wrap(u); return e.inset ? Math.min(clampInt
  *   edge.paint        each open side of a piece offers its band, and a pixel takes the band it is nearest the start
  *                     of; in a corner's arc depth is measured from the arc. In an inner corner the two bands turn
  *                     round the corner in a quarter circle
+ *   outside(x, y, t, out)   also gets `out`, how many px beyond the outline the pixel is (1: the first one), so a
+ *                     pond can have a bank of a set width that follows its curve, see-through beyond it (return null)
  *   edge.wrap, edge.tuck, material.face   not used: soft ground has the same kind of edge all round and no front
  * With `ink: null` (floor on floor) the band starts on the outline itself: paint d = 1 is the line round the patch.
  * Pieces of one material join exactly in every arrangement blockJoins lists, at every radius.
@@ -1134,7 +1138,10 @@ export function drawSoftBlock(g, piece, material, t = 0) {
 
   for (let y = 0; y < TILE; y++) for (let x = 0; x < TILE; x++) {
     if (!at(x, y)) {
-      if (material.outside) { const c = material.outside(x, y, t); if (c !== null && c !== undefined) g.dot(x, y, c); }
+      if (material.outside) {
+        const d = rounded(reach(x, y)), c = material.outside(x, y, t, Math.ceil(-Math.min(d.N, d.S, d.W, d.E)));
+        if (c !== null && c !== undefined) g.dot(x, y, c);
+      }
       continue;
     }
     let colour = null;
@@ -1157,4 +1164,96 @@ export function drawSoftBlock(g, piece, material, t = 0) {
     g.dot(x, y, colour ?? material.fill(x, y, t, variant));
   }
   return g;
+}
+
+/**
+ * Give the marks of one colour in a tile pattern a lit lip: every `base` pixel just beside a `mark` pixel, on the side away from the light, turns `lit`, wrapping round the tile's edges (creases in rock, joints, cracks).
+ * Arguments: s: the Surface a pattern is drawn on (as patternFill hands it to `draw`). mark: the colour of the lines.
+ * base: the colour a lip may replace. lit: the lip's colour. opts.dx, opts.dy: where the lip lies from its mark
+ * (default -1, 1: down and to the left, for light from the top right). A mark that runs on into the next tile keeps
+ * its lip across the join, as long as it leaves every version of the fill at the same place. Returns s.
+ */
+export function lipMarks(s, mark, base, lit, { dx = -1, dy = 1 } = {}) {
+  const m = col(mark), b = col(base), at = (x, y) => s.data[(((y % s.h) + s.h) % s.h) * s.w + (((x % s.w) + s.w) % s.w)], hits = [];
+  for (let y = 0; y < s.h; y++) for (let x = 0; x < s.w; x++) if (at(x, y) === b && at(x - dx, y - dy) === m) hits.push(y * s.w + x);
+  for (const i of hits) s.data[i] = col(lit);
+  return s;
+}
+
+/**
+ * Works out how far to move stone courses down (the `shift` of drawCourses) so that no joint row lies on the tile's first or last row, and says which course then goes round the bottom of the tile.
+ * Arguments: heights (the courses' heights from the top down, adding up to 32, as drawCourses takes them); from (the smallest shift to try, default 1: the joint under the course that goes round then lands on row from - 1, so a trim band `from - 1` px deep along a top edge sits exactly on a course line).
+ * Returns { shift, round }: the first shift from `from` up that keeps every joint row off rows 0 and 31, and the index of the course whose faces cross the tile's bottom edge (every version of a fill must give that course the same joints).
+ */
+export function courseShift(heights, from = 1) {
+  for (let shift = Math.max(0, Math.round(from)); shift < Math.max(0, Math.round(from)) + 2 * TILE; shift++) {
+    let y = shift, round = -1, clear = true;
+    heights.forEach((h, i) => {
+      const joint = wrap(y + h - 1);
+      if (joint === 0 || joint === M) clear = false;
+      if (Math.floor(y / TILE) !== Math.floor((y + h - 2) / TILE)) round = i;
+      y += h;
+    });
+    if (clear && round >= 0) return { shift, round };
+  }
+  return { shift: 0, round: -1 };
+}
+
+// ---- marks in an edge band that have a top and a bottom (added with batch R04: stones along a path's border) ----
+// An edge's paint(d, u) counts d in from the outline and u along the edge, so the same mark comes out turned a
+// different way on each of the four edges. These two put a mark back upright, so it keeps the light on its top and
+// right whichever edge it lies along. They work in drawBlock and drawSoftBlock alike. Worked example: sprites/tiles-meadow.js.
+
+/**
+ * Turn a pixel of an edge band into a column and a row of a box lying in that band, counted from the box's top left on screen, so a mark drawn there stands upright on all four edges.
+ * Arguments: which: the edge, 'top', 'bottom', 'left' or 'right'. d, u: the band pixel, as an edge's paint(d, u)
+ * gets them (d: px in from the outline, 1 = the first; u: px along the edge, x for top and bottom, y for the sides).
+ * box: [u0, d0, along, across]: where the box starts along the edge (it may run on past 31 into the next tile), the
+ * depth of its row nearest the outline, how many px it covers along the edge and how many across it.
+ * Returns null outside the box, else { col, row, wide, tall }: col 0 is the box's left column and row 0 its top row
+ * as seen on screen; wide and tall are its size on screen (along and across swap on the two side edges).
+ */
+export function bandCell(which, d, u, box) {
+  const [u0, d0, along, across] = box;
+  const a = wrap(u - u0), b = Math.round(d) - d0;
+  if (a >= along || b < 0 || b >= across) return null;
+  if (which === 'top') return { col: a, row: b, wide: along, tall: across };
+  if (which === 'bottom') return { col: a, row: across - 1 - b, wide: along, tall: across };
+  if (which === 'left') return { col: b, row: a, wide: across, tall: along };
+  if (which === 'right') return { col: across - 1 - b, row: a, wide: across, tall: along };
+  throw new Error(`bandCell: "${which}" is not an edge (top, bottom, left, right)`);
+}
+
+/**
+ * The colour of a small half-buried stone at one pixel of an edge band, or null where no stone lies: each stone is lit along its top row and right column and dark along its bottom row on every edge, with its two top corners rounded off.
+ * Arguments: which, d, u: as bandCell (call it from an edge's paint and fall back to the band's own colour on null).
+ * stones: a list of boxes [u0, d0, along, across], as bandCell takes them; the first stone that covers the pixel
+ * wins. tones: { light, base, dark }, the stone's colours (a ramp from engine/color.js will do). A stone 2 px wide
+ * or less keeps its top corners.
+ */
+export function bandStone(which, d, u, stones, tones) {
+  for (const box of stones ?? []) {
+    const c = bandCell(which, d, u, box);
+    if (!c) continue;
+    if (c.row === 0 && c.wide > 2 && (c.col === 0 || c.col === c.wide - 1)) continue;          // round shoulders
+    return c.row === c.tall - 1 ? tones.dark : c.row === 0 || c.col === c.wide - 1 ? tones.light : tones.base;
+  }
+  return null;
+}
+
+// ---- added with batch P05, fix round 1 (cave rock): fillBehind ----
+// Every edge piece of a block is drawn over version 0 of the fill, so a wall, an underside or a small island
+// built mostly from edge pieces repeats that version's marks every 32 px. Versions of a fill share their four
+// edge lines and keep their marks off the outer 3 px, so any of them may lie behind any piece.
+const FILL_BEHIND = { 'side-l': 1, 'side-r': 2, bottom: 2, 'bottom-l': 1, 'bottom-r': 1, 'inner-tl': 2, 'inner-tr': 1, 'inner-bl': 1, 'inner-br': 2, 'col-m': 1, 'col-b': 2 };
+
+/**
+ * Says which version of the fill to draw behind an edge piece of a block (0 to n - 1, fixed per piece), so that the sides, underside and inner corners of a block do not all repeat version 0.
+ * Arguments: piece (a piece name such as 'side-l', or a whole clip name such as 'rock-side-l'), n (how many versions the fill has, default 3). The top row (top, left, right, the strip, col-t, single) and the fill itself get 0, the plainest, and so does any name that is not a block piece.
+ * Use it when building the material for one clip: `fill: (x, y, t, v) => versions[v || fillBehind(clip, versions.length)](x, y)`. It is safe only for versions that share their edge lines and keep their marks off the outer 3 px (the checker's S-tile-fill-versions).
+ */
+export function fillBehind(piece, n = 3) {
+  const name = FILL_BEHIND[piece] !== undefined ? piece : pieceOf(piece ?? '')?.piece;
+  const count = Math.max(1, Math.floor(n) || 1);
+  return (FILL_BEHIND[name] ?? 0) % count;
 }
