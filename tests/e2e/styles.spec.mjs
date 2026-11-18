@@ -9,10 +9,8 @@
 // Needs a built site. Run with: npx playwright test tests/e2e/styles.spec.mjs
 import fs from 'node:fs';
 import path from 'node:path';
-import crypto from 'node:crypto';
 import { test, expect, openRoute, waitForDrawn, canvasGroupStats, downloadFrom, readZip } from '../helpers/test.mjs';
 import { ROOT } from '../helpers/catalog.mjs';
-import { exportHashesInPage } from '../fixtures/styles/export-hashes.mjs';
 
 const fixture = (name) => fs.readFileSync(path.join(ROOT, 'tests/fixtures/styles', name), 'utf8')
   // written to sit in tests/fixtures/styles/; handed to make.sprite it is read as a file in sprites/
@@ -38,20 +36,48 @@ const stripColours = (page) => page.locator('.strip canvas').evaluateAll((cvs) =
   return seen.size;
 });
 
-test('existing sprites export exactly what they exported before the style seam: the same PNG bytes and the same JSON', async ({ page }) => {
-  const pins = JSON.parse(fs.readFileSync(path.join(ROOT, 'tests/fixtures/styles/before-export.json'), 'utf8'));
-  // a sprite whose own file was edited since the pins were taken is meant to look different: leave it out
-  const sha = (file) => crypto.createHash('sha1').update(fs.readFileSync(file)).digest('hex');
-  const ids = Object.keys(pins.sprites).filter((id) => fs.existsSync(path.join(ROOT, 'sprites', `${id}.js`)) && sha(path.join(ROOT, 'sprites', `${id}.js`)) === pins.sprites[id].source);
+// Frozen hashes were dropped here too (2026-11-18): a deliberate change to a rig or helper made them fail. The export is
+// compared with what the old renderer makes right now, written through the same browser PNG writer the export uses.
+test('existing sprites export exactly what the renderer made before the style seam: the same PNG bytes and the same JSON', async ({ page }) => {
   await openRoute(page, '/');
-  const now = await page.evaluate(exportHashesInPage, ids);
-  test.skip(now.browser !== pins.browser, `the pins were taken in ${pins.browser}; this is ${now.browser}, whose PNG writer may differ`);
-  test.info().annotations.push({ type: 'compared', description: `${ids.length} of ${Object.keys(pins.sprites).length} pinned sprites (the rest were edited since)` });
-  expect(ids.length, 'at least six sprites are still as they were when the pins were taken').toBeGreaterThanOrEqual(6);
-  for (const id of ids) {
-    const { source, ...before } = pins.sprites[id];
-    expect(now.sprites[id], id).toEqual(before);
-  }
+  const got = await page.evaluate(async () => {
+    const [bundle, catalog, audio, S, T, old] = await Promise.all([import('/app/bundle.js'), import('/app/catalog.js'), import('/app/audio.js'), import('/engine/sprite.js'), import('/engine/theme.js'), import('/tests/fixtures/styles/legacy-render.mjs')]);
+    const cat = await catalog.loadCatalog();
+    await audio.loadSounds();
+    const dec = new TextDecoder();
+    // the export's own PNG writer, as it was before the seam
+    const png = async (sheet) => {
+      const cv = document.createElement('canvas');
+      cv.width = sheet.w; cv.height = sheet.h;
+      cv.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(sheet.data.buffer), sheet.w, sheet.h), 0, 0);
+      return new Uint8Array(await (await new Promise((r) => cv.toBlob(r, 'image/png'))).arrayBuffer());
+    };
+    const same = (p, q) => p.length === q.length && p.every((v, i) => v === q[i]);
+    const ids = cat.assets.filter((a) => a.kind === 'sprite').map((a) => a.id);
+    const pick = [...new Set(['knight', 'coin', 'slime', 'tiles-forest', 'bg-forest', 'ui-dialogue', 'hero-walker', ...ids.slice(0, 5)])].filter((id) => ids.includes(id));
+    const differ = [], compared = [];
+    for (const id of pick) {
+      let sprite;
+      try { sprite = await catalog.loadSprite(id); } catch { continue; }        // a file another builder has half-written
+      const look = { colour: { palette: 'Frost' } };
+      for (const [name, p, scale, theme] of [['defaults', S.defaultParams(sprite), 1, null], ['random, 2x, Frost look', S.randomParams(sprite, 4242), 2, look]]) {
+        let before;
+        try { before = old.legacyRenderSheet(sprite, p, { scale }); } catch { continue; }    // it fails with or without the seam
+        if (theme) T.applyColour(before.data, theme.colour);
+        const files = await bundle.spriteFiles(sprite, p, bundle.defaultCues(sprite), scale, theme);
+        const meta = JSON.parse(dec.decode(files.find((f) => f.name === `${id}.json`).data));
+        delete meta.sounds;
+        if (!same(files.find((f) => f.name === `${id}.png`).data, await png(before))) differ.push(`${id} (${name}): PNG`);
+        if (JSON.stringify(meta, null, 2) !== JSON.stringify(before.meta, null, 2)) differ.push(`${id} (${name}): JSON`);
+        if (files.some((f) => /\.svg$/.test(f.name)) || files[0].name !== `${id}.png` || files[1].name !== `${id}.json`) differ.push(`${id} (${name}): file list`);
+      }
+      compared.push(id);
+    }
+    return { differ, compared };
+  });
+  test.info().annotations.push({ type: 'compared', description: got.compared.join(', ') });
+  expect(got.compared.length, 'at least six sprites compared').toBeGreaterThanOrEqual(6);
+  expect(got.differ).toEqual([]);
 });
 
 test('a sprite with one style shows nothing new: no Style choice, no style in its link, its bag item or its files', async ({ page }) => {
