@@ -68,12 +68,31 @@ test('a mixed bag is sorted into a scene', () => {
   assert.equal(plan.soundsOnly, false);
 });
 
-test('the visitor can pick another player; every tileset in the bag is used', () => {
+test('tiles made for the other view are left out of the scene', () => {
+  const entries = [
+    entry(sprite('hero', 'character', 'characters/player')),
+    entry(sprite('forest', 'tileset', 'world/tile', 'side')),
+    entry(sprite('meadow', 'tileset', 'world/tile', 'top-down')),
+    entry(sprite('any', 'tileset', 'world/tile', 'none')),
+  ];
+  const side = planScene(entries);
+  assert.equal(side.mode, 'side');
+  assert.deepEqual(side.tilesets, ['k-forest', 'k-any']);
+  assert.deepEqual(side.otherTiles, ['k-meadow']);
+  const top = planScene([entry(sprite('scout', 'character', 'characters/player', 'top-down')), ...entries.slice(1)]);
+  assert.deepEqual(top.tilesets, ['k-meadow', 'k-any']);
+  assert.deepEqual(top.otherTiles, ['k-forest']);
+  // with no player, tiles decide the view like everything else does
+  assert.equal(planScene([entry(sprite('meadow', 'tileset', 'world/tile', 'top-down'))]).mode, 'top');
+  assert.deepEqual(planScene([entry(sprite('meadow', 'tileset', 'world/tile', 'top-down'))]).tilesets, ['k-meadow']);
+});
+
+test('the visitor can pick another player; every tileset of the scene\'s view is used', () => {
   const entries = [
     entry(sprite('hero', 'character', 'characters/player')),
     entry(sprite('scout', 'character', 'characters/player', 'top-down')),
-    entry(sprite('bricks', 'tileset', 'world/tile')),
-    entry(sprite('grass', 'tileset', 'world/tile')),
+    entry(sprite('bricks', 'tileset', 'world/tile', 'top-down')),
+    entry(sprite('grass', 'tileset', 'world/tile', 'top-down')),
   ];
   const plan = planScene(entries, { player: 'k-scout' });
   assert.equal(plan.player, 'k-scout');

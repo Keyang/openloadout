@@ -3,7 +3,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { displayPlan, fillSpan } from '../../app/play/display.js';
-import { layerSpeed, layerShift } from '../../app/play/layers.js';
+import { layerSpeed, layerShift, drawOrder } from '../../app/play/layers.js';
 import { howTo, plural, roleNote, keysLine } from '../../app/play/words.js';
 import { isCustom } from '../../app/play/kinds.js';
 import { defineSprite, range, choice } from '../../engine/sprite.js';
@@ -49,6 +49,17 @@ test('background layers slide at different speeds: far 0.1, mid 0.4, near 0.7 of
   assert.deepEqual(['far', 'mid', 'near'].map((c, i) => layerShift(100, layerSpeed(c, i, 3), 320)), [10, 40, 70]);
   assert.equal(layerShift(3300, 0.1, 320), 10, 'and wrap at the width of a layer');
   assert.equal(layerShift(-10, 1, 320), 310);
+});
+
+test('top-down, things are drawn in the order of their pivot rows, so the player walks behind trees and buildings', () => {
+  const tree = { n: 1, role: 'prop', y: 200 }, house = { n: 2, role: 'prop', y: 120 }, coin = { n: 3, role: 'pickup', y: 200 };
+  const above = { n: 9, role: 'player', y: 180 }, below = { n: 9, role: 'player', y: 230 };
+  const order = (list) => drawOrder(list, 'top').map((t) => t.n);
+  assert.deepEqual(order([above, tree, house, coin]), [2, 9, 1, 3], 'a player above the foot of the tree is behind it');
+  assert.deepEqual(order([tree, below, house, coin]), [2, 1, 3, 9], 'a player below it is in front');
+  // side view keeps its layers: props behind pickups behind creatures behind the player, whatever their height
+  const side = drawOrder([{ n: 4, role: 'player', y: 10 }, { n: 1, role: 'creature', y: 300 }, { n: 2, role: 'prop', y: 500 }, { n: 3, role: 'pickup', y: 0 }, { n: 5, role: 'effect', y: 0, passing: 'burst' }], 'side');
+  assert.deepEqual(side.map((t) => t.n), [2, 3, 1, 4, 5]);
 });
 
 test('the line for someone who has never played is built from what is in the scene', () => {

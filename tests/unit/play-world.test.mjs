@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createWorld, step, resetWorld, spawn, removeOne, countOf, snapshot, activeLoops } from '../../app/play/world.js';
-import { makeLevel } from '../../app/play/level.js';
+import { makeLevel, isWall } from '../../app/play/level.js';
 import { makeKind, buildKind } from '../../app/play/kinds.js';
 import { walker } from '../fixtures/play/index.js';
 import { rowFromSprite } from '../../app/play/roles.js';
@@ -500,9 +500,9 @@ test('top-down: there is no gravity and no jump, and walls stop the player', () 
   run(w, { up: true, run: true }, 20);
   assert.ok(w.player.y > 2 * w.level.tile, 'stopped by the north wall, which is two tiles deep');
   const pit = createWorld({ mode: 'top', level: makeLevel('top', { hole: true }), kinds: [scout()], player: 'hero' });
-  pit.player.x = 12 * 32; pit.player.y = 8 * 32;
+  pit.player.x = 15 * 32; pit.player.y = 8 * 32;
   run(pit, { right: true, run: true }, 5);
-  assert.ok(pit.player.x < 13 * 32, 'a pit blocks the way');
+  assert.ok(pit.player.x < 16 * 32, 'a pit blocks the way');
 });
 
 test('top-down: pickups are collected and creatures wander inside the room', () => {
@@ -514,6 +514,21 @@ test('top-down: pickups are collected and creatures wander inside the room', () 
   const s = first(w, 'slime');
   run(w, {}, 10);
   assert.ok(s.x > w.level.tile && s.x < w.level.width - w.level.tile && s.y > w.level.tile && s.y < w.level.height);
+});
+
+test('top-down: big things are put where they fit: clear of the walls, of each other and of the player', () => {
+  const big = (key, w, h) => makeKind({ key, role: 'prop', box: { l: w / 2, r: w / 2, t: h, b: 0 }, clips: { idle: { frames: 1, fps: 1 } } });
+  const w = topWorld([scout(), big('cottage', 88, 86), big('inn', 120, 88), big('stall', 60, 56), big('oak', 56, 72), big('pine', 40, 72), coin(), slime()]);
+  const rect = (t) => { const k = w.kinds[t.kind]; return { x0: t.x - k.box.l, x1: t.x + k.box.r, y0: t.y - t.lift - k.box.t, y1: t.y - t.lift + k.box.b }; };
+  const hit = (a, b) => a.x0 < b.x1 && a.x1 > b.x0 && a.y0 < b.y1 && a.y1 > b.y0;
+  const props = w.things.filter((t) => t.role === 'prop');
+  assert.equal(props.length, 5);
+  for (const a of props) {
+    const k = w.kinds[a.kind], T = w.level.tile;
+    for (let x = a.x - k.box.l + 1; x < a.x + k.box.r; x += 8) assert.equal(isWall(w.level, Math.floor(x / T), Math.floor((a.y - 1) / T)), false, `${a.kind} does not stand in a wall`);
+    for (const b of props) if (a !== b) assert.equal(hit(rect(a), rect(b)), false, `${a.kind} and ${b.kind} do not overlap`);
+    assert.equal(hit(rect(a), rect(w.player)), false, `${a.kind} is not on top of the player`);
+  }
 });
 
 test('a snapshot is plain data', () => {

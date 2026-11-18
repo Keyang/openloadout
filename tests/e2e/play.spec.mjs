@@ -393,6 +393,72 @@ test('a bag whose things can no longer be found does not say it is empty', async
   await expect(page.locator('main a[href="#/bag"]')).toBeVisible();
 });
 
+test.describe('the level as text', () => {
+  test.use({ permissions: ['clipboard-read', 'clipboard-write'] });
+
+  test('"Copy this level" puts the map text on the clipboard', async ({ page }) => {
+    await openPlay(page, [HERO, COIN]);
+    await addFixtures(page, 'sideExtras');
+    const map = (await state(page)).map;
+    expect(map.startsWith('@ view = side\n')).toBe(true);
+    expect(map).toContain('@ tilesets = play-tiles');
+    expect(map).toContain('########################');
+    await page.getByRole('button', { name: 'Copy this level' }).click();
+    await expect(page.locator('.play-copied')).toContainText('Copied');
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(map);
+  });
+});
+
+const PLATFORMER = ['tiles-forest', 'tiles-platforms', 'tiles-cave', 'tiles-water', 'tiles-castle', 'bg-forest', 'knight', 'spear-goblin', 'thorn-beetle', 'slime', 'coin', 'gem', 'heart', 'treasure-chest', 'lever', 'crate', 'spring-pad', 'hit-spark'];
+const RPG = ['tiles-meadow', 'tiles-village', 'tiles-shore', 'hero-walker', 'merchant', 'village-elder', 'town-guard', 'cottage', 'inn', 'market-stall', 'tree-oak', 'tree-pine', 'save-crystal'];
+
+test('the platformer assets together: every side-view tileset builds one scene, and the level reads back', async ({ page }) => {
+  test.skip(!PLATFORMER.every(exists), 'not every platformer sprite is there yet');
+  await openPlay(page, []);
+  await addSprites(page, PLATFORMER);
+  const s = await state(page);
+  expect(s.mode).toBe('side');
+  expect(s.player.id).toBe('knight');
+  expect(s.plan.tilesets.length).toBe(5);
+  expect(s.width).toBe(40 * 32);                            // two halls: the cave's and the castle's
+  expect(s.map).toContain('liquid:water');
+  expect(s.map).toContain('liquid:fall');
+  expect(s.map).toContain('open:stone:arch-l');
+  expect(s.map).toContain('back:dark');
+  const { opaque, width, height } = await canvasStats(stage(page));
+  expect(opaque).toBe(width * height);
+  // the hero can run from one end to the other: over the mound, through the pool, past the step, under the arches
+  await page.keyboard.down('Shift');
+  await page.keyboard.down('ArrowRight');
+  let last = -1, stuck = 0;
+  for (let i = 0; i < 120 && stuck < 6; i++) {
+    const p = (await state(page)).player;
+    if (p.x > 25 * 32) break;
+    if (Math.abs(p.x - last) < 1) { stuck++; await page.keyboard.press('Space'); } else stuck = 0;
+    last = p.x;
+    await page.waitForTimeout(250);
+  }
+  await page.keyboard.up('ArrowRight');
+  await page.keyboard.up('Shift');
+  expect((await state(page)).player.x).toBeGreaterThan(25 * 32);
+});
+
+test('the role-playing assets together: a top-down village where water blocks the way', async ({ page }) => {
+  test.skip(!RPG.every(exists), 'not every role-playing sprite is there yet');
+  await openPlay(page, []);
+  await addSprites(page, RPG);
+  const s = await state(page);
+  expect(s.mode).toBe('top');
+  expect(s.player.id).toBe('hero-walker');
+  expect(s.plan.tilesets.length).toBe(3);
+  expect(s.map.startsWith('@ view = top-down\n')).toBe(true);
+  expect(s.map).toContain('bridge-h');
+  expect(s.things.filter((t) => t.id === 'tree-oak').length).toBe(1);
+  const { opaque, width, height } = await canvasStats(stage(page));
+  expect(opaque).toBe(width * height);
+  await expect(page.locator('.play-things')).toContainText('Cottage');
+});
+
 test.describe('on a phone', () => {
   test.use({ viewport: { width: 375, height: 740 }, hasTouch: true });
 
