@@ -98,7 +98,17 @@ export const BLOCK_PIECES = ['left', 'top', 'right', 'side-l', 'fill', 'side-r',
  */
 export const NARROW_PIECES = ['strip-l', 'strip-m', 'strip-r', 'col-t', 'col-m', 'col-b', 'single'];
 
+/**
+ * The nine lane pieces a block may add, for ground one tile wide that turns, forks and crosses itself (a path, a road
+ * with a kerb): a bend ('elbow-tl', '-tr', '-bl', '-br', named for its outer corner), a fork ('tee-t', '-r', '-b',
+ * '-l', named for its flat side) and a crossing ('cross'). Each is closed on its open sides and carries the rim
+ * round every cut corner between two arms.
+ */
+export const LANE_PIECES = ['elbow-tl', 'elbow-tr', 'elbow-bl', 'elbow-br', 'tee-t', 'tee-r', 'tee-b', 'tee-l', 'cross'];
+
 const PIECE_LABELS = {
+  'elbow-tl': 'lane, bend (corner top left)', 'elbow-tr': 'lane, bend (corner top right)', 'elbow-bl': 'lane, bend (corner bottom left)', 'elbow-br': 'lane, bend (corner bottom right)',
+  'tee-t': 'lane, fork (flat on top)', 'tee-r': 'lane, fork (flat on the right)', 'tee-b': 'lane, fork (flat underneath)', 'tee-l': 'lane, fork (flat on the left)', cross: 'lane, crossing',
   'strip-l': 'strip, left end', 'strip-m': 'strip, middle', 'strip-r': 'strip, right end',
   'col-t': 'column, top', 'col-m': 'column, middle', 'col-b': 'column, bottom', single: 'single tile',
   left: 'top left corner', top: 'top', right: 'top right corner',
@@ -116,7 +126,8 @@ const entry = (o, label, extra = {}) => ({ frames: o.frames ?? 1, fps: o.fps ?? 
  * opts.label (the word shown before each piece, default the prefix), opts.kind ('ground' | 'wall' | 'hole': kept on
  * each entry as `block`; see blockKind), opts.narrow (true: also the seven NARROW_PIECES, so the block can be one
  * tile thick), opts.fills (2 or 3: also '<prefix>-fill-b', '-fill-c', other versions of the fill that the picker
- * mixes in by position so a field of fill does not repeat every 32 px).
+ * mixes in by position so a field of fill does not repeat every 32 px), opts.lanes (true: also the nine LANE_PIECES,
+ * so a lane one tile wide can bend, fork and cross with its border unbroken; drawBlock draws them from the material).
  */
 export function blockClips(prefix, opts = {}) {
   const word = opts.label ?? title(prefix);
@@ -127,6 +138,7 @@ export function blockClips(prefix, opts = {}) {
     if (p === 'fill') for (let i = 1; i < Math.min(26, opts.fills ?? 1); i++) out[`${prefix}-fill-${String.fromCharCode(97 + i)}`] = entry(opts, `${word}: middle, version ${String.fromCharCode(65 + i)}`, extra);
   }
   if (opts.narrow) for (const p of NARROW_PIECES) out[`${prefix}-${p}`] = entry(opts, `${word}: ${PIECE_LABELS[p]}`, extra);
+  if (opts.lanes) for (const p of LANE_PIECES) out[`${prefix}-${p}`] = entry(opts, `${word}: ${PIECE_LABELS[p]}`, extra);
   return out;
 }
 /** The three pieces of a thin platform: '<prefix>-thin-l', '-thin-m' (repeats sideways), '-thin-r'. */
@@ -155,10 +167,10 @@ export function decoClips(prefix, places = ['on', 'on'], opts = {}) {
   }));
 }
 
-const BLOCK_RE = /^(?:(.*)-)?(inner-tl|inner-tr|inner-bl|inner-br|side-l|side-r|bottom-l|bottom-r|strip-[lmr]|col-[tmb]|single|bottom|left|top|right|fill-[b-z]|fill)$/;
+const BLOCK_RE = /^(?:(.*)-)?(inner-tl|inner-tr|inner-bl|inner-br|elbow-tl|elbow-tr|elbow-bl|elbow-br|tee-[trbl]|cross|side-l|side-r|bottom-l|bottom-r|strip-[lmr]|col-[tmb]|single|bottom|left|top|right|fill-[b-z]|fill)$/;
 /**
  * What a clip name says the tile is: { prefix, kind, piece } or null for a name the helper does not know. clip: the name.
- * kind 'block' (piece: one of BLOCK_PIECES or NARROW_PIECES, or a fill version 'fill-b', 'fill-c'), 'thin' (l, m, r),
+ * kind 'block' (piece: one of BLOCK_PIECES, NARROW_PIECES or LANE_PIECES, or a fill version 'fill-b', 'fill-c'), 'thin' (l, m, r),
  * 'slope' (up, down), 'deco' (a, b, ... or digits), 'stack' (cap, mid, foot: things that repeat up and down).
  */
 export function pieceOf(clip) {
@@ -195,6 +207,11 @@ const SIGNATURE = {
   'strip-l': { N: 0, S: 0, W: 0, E: 1 }, 'strip-m': { N: 0, S: 0, W: 1, E: 1 }, 'strip-r': { N: 0, S: 0, W: 1, E: 0 },
   'col-t': { N: 0, W: 0, E: 0, S: 1 }, 'col-m': { N: 1, W: 0, E: 0, S: 1 }, 'col-b': { N: 1, W: 0, E: 0, S: 0 },
   single: { N: 0, E: 0, S: 0, W: 0 },
+  'elbow-tl': { N: 0, W: 0, E: 1, S: 1, SE: 0 }, 'elbow-tr': { N: 0, E: 0, W: 1, S: 1, SW: 0 },
+  'elbow-bl': { S: 0, W: 0, N: 1, E: 1, NE: 0 }, 'elbow-br': { S: 0, E: 0, N: 1, W: 1, NW: 0 },
+  'tee-t': { N: 0, E: 1, S: 1, W: 1, SE: 0, SW: 0 }, 'tee-r': { E: 0, N: 1, S: 1, W: 1, NW: 0, SW: 0 },
+  'tee-b': { S: 0, N: 1, E: 1, W: 1, NE: 0, NW: 0 }, 'tee-l': { W: 0, N: 1, E: 1, S: 1, NE: 0, SE: 0 },
+  cross: { N: 1, E: 1, S: 1, W: 1, NE: 0, SE: 0, SW: 0, NW: 0 },
 };
 const agree = (a, b) => a === undefined || b === undefined || a === b;
 
@@ -202,10 +219,11 @@ const agree = (a, b) => a === undefined || b === undefined || a === b;
  * Every pair of block pieces that can sit next to each other in a block: [[a, axis, b], ...] where
  * axis 'x' means a is on the left of b and 'y' means a is above b. Worked out from what each piece needs
  * around it, so it holds the pairs the style guide lists and the ones that follow from them (a block two
- * tiles wide puts `left` beside `right`). opts.narrow (true): also the pairs among the NARROW_PIECES.
+ * tiles wide puts `left` beside `right`). opts.narrow (true): also the pairs with the NARROW_PIECES. opts.lanes
+ * (true): also the pairs with the LANE_PIECES.
  */
 export function blockJoins(opts = {}) {
-  const out = [], names = opts.narrow ? [...BLOCK_PIECES, ...NARROW_PIECES] : BLOCK_PIECES;
+  const out = [], names = [...BLOCK_PIECES, ...(opts.narrow ? NARROW_PIECES : []), ...(opts.lanes ? LANE_PIECES : [])];
   for (const a of names) for (const b of names) {
     const A = SIGNATURE[a], B = SIGNATURE[b];
     if (A.E === 1 && B.W === 1 && agree(A.N, B.NW) && agree(A.NE, B.N) && agree(A.S, B.SW) && agree(A.SE, B.S)) out.push([a, 'x', b]);
@@ -246,7 +264,8 @@ export function blockKind(prefix, hint) {
 /**
  * Sort a tileset's clips by what they are. clips: a sprite's `clips` object, a list of clip names, or a list of
  * { name, place, block } (anything else on an entry is ignored). Returns
- *   blocks  [{ prefix, kind, pieces: { piece: clip }, fills: [clip], decals }]  kind from blockKind; fills: 'fill' and its versions
+ *   blocks  [{ prefix, kind, pieces: { piece: clip }, fills: [clip], decals }]  kind from blockKind; fills: 'fill' and its versions.
+ *           A block with only '-top' and fills is a liquid (`liquid: true`); a lone '<prefix>-foot' is then its `pieces.foot`
  *   floors  [{ prefix, fill, fills, decals }]   a prefix with nothing but fills: the ground everything else sits on
  *   thins   [{ prefix, pieces: { l, m, r } }]     slopes [{ prefix, up, down }]     stacks [{ prefix, pieces: { cap, mid, foot } }]
  *   decals  [{ clip, prefix, place }]            extras [clip]  names the helper does not know
@@ -287,7 +306,14 @@ export function classifyTiles(clips) {
     const own = decals.filter((d) => d.prefix === b.prefix);
     if (!Object.keys(b.pieces).length) { floors.push(tag({ prefix: b.prefix, fill: b.fills[0], fills: b.fills, decals: own }, b.set)); continue; }
     if (b.fills.length) b.pieces.fill = b.fills[0];
-    blocks.push(tag({ prefix: b.prefix, kind: blockKind(b.prefix, b.hint), pieces: b.pieces, fills: b.fills, decals: own }, b.set));
+    const block = tag({ prefix: b.prefix, kind: blockKind(b.prefix, b.hint), pieces: b.pieces, fills: b.fills, decals: own }, b.set);
+    // a liquid: nothing but a surface and a body. A lone `-foot` under the same prefix is where it lands (a waterfall)
+    if (b.pieces.top && b.fills.length && Object.keys(b.pieces).every((k) => k === 'top' || k === 'fill')) {
+      block.liquid = true;
+      const foot = stacks.get(b.prefix)?.pieces;
+      if (foot && foot.foot && !foot.cap && !foot.mid) block.pieces.foot = foot.foot;
+    }
+    blocks.push(block);
   }
   const out = { blocks, floors, thins: [...thins.values()], slopes: [...slopes.values()], stacks: [...stacks.values()], decals, extras };
   return many ? { ...out, from } : out;
@@ -308,16 +334,23 @@ export function nearestPiece(piece, has) {
   if (has[piece] && SHAPES[piece]) return piece;
   const want = SHAPES[piece] ?? {}, worth = { N: 8, W: 4, E: 4, S: 2 };
   let best = null, top = -Infinity;
-  for (const name of [...BLOCK_PIECES, ...NARROW_PIECES]) {
+  const corners = (shape) => (shape.inner ? [].concat(shape.inner) : []);
+  for (const name of [...BLOCK_PIECES, ...NARROW_PIECES, ...LANE_PIECES]) {
     if (!has[name]) continue;
     const shape = SHAPES[name];
-    let score = shape.inner && shape.inner !== want.inner ? -1 : 0;
+    let score = corners(shape).some((k) => !corners(want).includes(k)) ? -50 : 0;       // a corner cut where none should be
     for (const side of ['N', 'E', 'S', 'W']) if (shape[side]) score += want[side] ? worth[side] : -100;
     if (score > top) { top = score; best = name; }
   }
   return best;
 }
 
+// the lane piece for each mix of open sides (written N E S W), and the corners that must be cut for it
+const LANES = {
+  NW: ['elbow-tl', ['br']], NE: ['elbow-tr', ['bl']], SW: ['elbow-bl', ['tr']], ES: ['elbow-br', ['tl']],
+  N: ['tee-t', ['bl', 'br']], E: ['tee-r', ['tl', 'bl']], S: ['tee-b', ['tl', 'tr']], W: ['tee-l', ['tr', 'br']],
+  '': ['cross', ['tl', 'tr', 'bl', 'br']],
+};
 // Which sides and corners of a slope cell are filled, as seen from the cell beside it. A slope that rises to the
 // right is filled underneath and on its right; its left side and its top are open, and so is its top left corner.
 const SLOPE_FILLED = {
@@ -331,13 +364,20 @@ const SLOPE_FILLED = {
  * elsewhere. x, y: the cell. has: the pieces the tileset has (an object keyed by piece, such as a block's `pieces`);
  * a piece it lacks is replaced by the closest it has (nearestPiece), so a block with only some pieces still draws.
  * A side that faces out always wins; with all four sides solid one cut corner gives its inner piece (top corners first).
+ * When `has` holds a lane piece (LANE_PIECES) it is used where a lane one tile wide bends, forks or crosses.
  */
 export function pickPiece(solid, x, y, has) {
   if (!solid(x, y)) return null;
   // is the neighbour at (dx, dy) filled on the side (or corner) that faces this cell?
   const full = (dx, dy, facing) => { const v = solid(x + dx, y + dy); return SLOPE_FILLED[v] ? !!SLOPE_FILLED[v][facing] : !!v; };
   const N = !full(0, -1, 'S'), E = !full(1, 0, 'W'), S = !full(0, 1, 'N'), W = !full(-1, 0, 'E');
-  let piece = BY_SIDES[`${N ? 'N' : ''}${E ? 'E' : ''}${S ? 'S' : ''}${W ? 'W' : ''}`];
+  const sides = `${N ? 'N' : ''}${E ? 'E' : ''}${S ? 'S' : ''}${W ? 'W' : ''}`;
+  if (has && LANES[sides] && has[LANES[sides][0]]) {
+    // a lane piece, when the tileset has it: every corner between two joined sides is cut (the lane is one tile wide)
+    const cut = { tl: !full(-1, -1, 'SE'), tr: !full(1, -1, 'SW'), bl: !full(-1, 1, 'NE'), br: !full(1, 1, 'NW') };
+    if (LANES[sides][1].every((k) => cut[k])) return LANES[sides][0];
+  }
+  let piece = BY_SIDES[sides];
   if (piece === 'fill') piece = !full(-1, -1, 'SE') ? 'inner-tl' : !full(1, -1, 'SW') ? 'inner-tr' : !full(-1, 1, 'NE') ? 'inner-bl' : !full(1, 1, 'NW') ? 'inner-br' : 'fill';
   if (has && !has[piece]) piece = nearestPiece(piece, has) ?? piece;
   return piece;
@@ -398,18 +438,26 @@ export function pickStack(stack, x, y) {
  * Lay out a map written as letters: returns { view, cols, rows, cells, tiles, notes }. rows: equal-length strings,
  * one letter per cell. clips: a tileset's clips (as classifyTiles takes them) or the result of classifyTiles.
  * opts.view: 'side' (default) or 'top-down'. opts.legend: { letter: what }, added to the letters below; `what` is a
- * clip name, a prefix, or 'block:p', 'thin:p', 'stack:p', 'slope-up:p', 'slope-down:p', 'floor:p', or a list of
- * those for a cell that holds several things. opts.decals: true to scatter the tileset's decals by pickDecal's rule
+ * clip name, a prefix, or 'block:p', 'thin:p', 'stack:p', 'slope-up:p', 'slope-down:p', 'floor:p', or
+ *   'liquid:p'       a liquid (a block with only p-top and p-fill): its top where nothing of it is above, its
+ *                    p-foot (when there is one: a waterfall) where nothing of it is below, else its body. Not solid
+ *   'back:p'         p's fill behind everything else in the cell (a liquid carries on, surface and all): put it
+ *                    in a list with what stands in front, so nothing shows through an edge tile's see-through part
+ *   'part:p:clip'    a cell of block p for its neighbours (they are not outlined against it), drawn with `clip`
+ *   'open:p:clip'    the same, but not solid: an archway, a doorway
+ * or a list of those for a cell that holds several things, drawn in layer order. opts.decals: true to scatter the tileset's decals by pickDecal's rule
  * over the cells the map leaves free (or { on, floor, above, below } chances in place of DECAL_CHANCE).
- *   side      '#' the first block, 'I' the second (else the first), '/' '\' its slopes, '=' the first thin platform,
+ *   side      '#' the first block, 'I' the second (else the first), '/' '\' its slopes, '~' the first liquid, '=' the first thin platform,
  *             '-' the second, '|' ':' '!' the first three things that stack, 'H' 'Y' 'T' the same three standing
  *             behind the first platform (their top piece shares its cell), 'F' the first lone fill (a back wall)
  *   top-down  the first floor lies under every cell; 'W' the wall, 'O' the hole, 'P' 'Q' the other blocks
  *   both      'a'..'z' the decal with that letter ('on': over a cell of its block or floor; 'above', 'below': in
  *             an empty cell); '0'..'9' the clips the helper has no name for; '.' or a space: nothing
- * The map carries on past its edges as its edge cells. tiles: [{ clip, col, row, layer }] in drawing order (with
+ * The map carries on past its edges as its edge cells. tiles: [{ clip, col, row, layer }] in drawing order (layers:
+ * 0 floors and 'back:' fills, 1 stacks and liquids, 2 ground, 3 holes, 4 walls, 5 thin platforms, 6 decals; with
  * `set`, the tileset's key, when clips came from classifyTiles with several tilesets).
- * cells[row][col]: { kind, prefix, solid, things } (side: blocks and slopes are solid; top-down: walls and holes).
+ * cells[row][col]: { kind, prefix, solid, things } (side: blocks and slopes are solid; top-down: walls and holes;
+ * kind is 'block', 'part', 'slope-up', 'slope-down', 'liquid', 'thin', 'stack', 'floor' or 'empty').
  * kind and solid come from the letters whether or not the tileset has tiles for them, so they can drive a game.
  * notes: what could not be placed, and slopes whose high side ends at a drop (no piece closes that side).
  */
@@ -426,19 +474,22 @@ export function layoutTiles(rows, clips, opts = {}) {
   const name = (kind, x) => (x ? `${kind}:${x.prefix}` : null);            // null: the letter is known but the tileset has nothing for it
   const behind = (stack) => (stack && T.thins[0] ? [name('stack', stack), name('thin', T.thins[0])] : name('thin', T.thins[0]));
   const legend = view === 'side'
-    ? { '#': name('block', first), I: name('block', T.blocks[1] ?? first), '/': name('slope-up', slopeOf(first)), '\\': name('slope-down', slopeOf(first)), '=': name('thin', T.thins[0]), '-': name('thin', T.thins[1] ?? T.thins[0]), '|': name('stack', T.stacks[0]), ':': name('stack', T.stacks[1]), '!': name('stack', T.stacks[2]), H: behind(T.stacks[0]), Y: behind(T.stacks[1]), T: behind(T.stacks[2]), F: name('floor', T.floors[0]) }
+    ? { '#': name('block', first), I: name('block', T.blocks[1] ?? first), '/': name('slope-up', slopeOf(first)), '\\': name('slope-down', slopeOf(first)), '=': name('thin', T.thins[0]), '-': name('thin', T.thins[1] ?? T.thins[0]), '|': name('stack', T.stacks[0]), ':': name('stack', T.stacks[1]), '!': name('stack', T.stacks[2]), H: behind(T.stacks[0]), Y: behind(T.stacks[1]), T: behind(T.stacks[2]), F: name('floor', T.floors[0]), '~': name('liquid', T.blocks.find((b) => b.liquid)) }
     : { W: name('block', wall), O: name('block', hole), P: name('block', grounds[0]), Q: name('block', grounds[1]) };
-  const WORDS = { '#': 'block', I: 'second block', '/': 'slope', '\\': 'slope', '=': 'thin platform', '-': 'thin platform', H: 'thin platform', Y: 'thin platform', T: 'thin platform', '|': 'stack', ':': 'second stack', '!': 'third stack', F: 'lone fill', W: 'wall block', O: 'hole block', P: 'ground block', Q: 'second ground block' };
+  const WORDS = { '#': 'block', I: 'second block', '/': 'slope', '\\': 'slope', '=': 'thin platform', '-': 'thin platform', H: 'thin platform', Y: 'thin platform', T: 'thin platform', '|': 'stack', ':': 'second stack', '!': 'third stack', F: 'lone fill', '~': 'liquid (a block with only -top and -fill)', W: 'wall block', O: 'hole block', P: 'ground block', Q: 'second ground block' };
   Object.assign(legend, opts.legend ?? {});
   const known = new Set([...T.blocks.flatMap((b) => [...Object.values(b.pieces), ...b.fills]), ...T.floors.flatMap((f) => f.fills), ...T.thins.flatMap((t) => Object.values(t.pieces)), ...T.slopes.flatMap((x) => [x.up, x.down]), ...T.stacks.flatMap((x) => Object.values(x.pieces)), ...T.decals.map((d) => d.clip), ...T.extras]);
 
   // what one thing in the legend stands for: { kind, prefix }, { kind: 'clip', clip } or { kind: 'decal', decal }
   // What the standard letters are, tiles or no tiles: a map says what is solid even when the tileset cannot draw it.
-  const STANDARD = { '#': ['block'], I: ['block'], '/': ['slope-up'], '\\': ['slope-down'], '=': ['thin'], '-': ['thin'], H: ['thin'], Y: ['thin'], T: ['thin'], '|': ['stack'], ':': ['stack'], '!': ['stack'], F: ['floor'], W: ['block', 'wall'], O: ['block', 'hole'], P: ['block', 'ground'], Q: ['block', 'ground'] };
+  const STANDARD = { '#': ['block'], I: ['block'], '/': ['slope-up'], '\\': ['slope-down'], '=': ['thin'], '-': ['thin'], H: ['thin'], Y: ['thin'], T: ['thin'], '|': ['stack'], ':': ['stack'], '!': ['stack'], F: ['floor'], '~': ['liquid'], W: ['block', 'wall'], O: ['block', 'hole'], P: ['block', 'ground'], Q: ['block', 'ground'] };
   const one = (ch, what) => {
     if (!what) return { kind: (STANDARD[ch] ?? ['empty'])[0], prefix: null, as: (STANDARD[ch] ?? [])[1], missing: !!STANDARD[ch], note: `"${ch}": the tileset has no ${WORDS[ch] ?? 'piece for it'}` };
-    const m = /^(block|thin|stack|slope-up|slope-down|floor):(.+)$/.exec(what);
+    const m = /^(block|thin|stack|slope-up|slope-down|floor|liquid|back):(.+)$/.exec(what);
     if (m) return { kind: m[1], prefix: m[2] };
+    // part of a block for its neighbours, but drawn with a clip of the caller's own (open: not solid: an archway)
+    const own = /^(part|open):([^:]+):(.+)$/.exec(what);
+    if (own) return known.has(own[3]) ? { kind: 'part', prefix: own[2], clip: own[3], open: own[1] === 'open' } : { kind: 'empty', note: `"${ch}": "${own[3]}" is not a clip of this tileset` };
     const decal = T.decals.find((d) => d.clip === what);
     if (decal) return { kind: 'decal', decal };
     if (known.has(what)) return { kind: 'clip', clip: what };
@@ -457,7 +508,7 @@ export function layoutTiles(rows, clips, opts = {}) {
     if (what === undefined) return [{ kind: 'empty', note: `"${ch}": no such letter in the legend` }];
     return (Array.isArray(what) ? what : [what]).map((w) => one(ch, w));
   };
-  const SOLID = ['block', 'slope-up', 'slope-down'];
+  const SOLID = ['block', 'slope-up', 'slope-down'], JOINED = [...SOLID, 'part'];
   const cells = [];
   for (let r = 0; r < R; r++) {
     cells.push([]);
@@ -465,18 +516,21 @@ export function layoutTiles(rows, clips, opts = {}) {
       const things = [];
       for (const m of meaning(rows[r][c])) {
         if (m.note) { if (!notes.includes(m.note)) notes.push(m.note); if (!m.missing) continue; }
-        if (m.kind === 'decal') {
-          // an "on" decal lies over a cell of its block (or of the floor); the others stand in an empty cell
-          const block = m.decal.place === 'on' ? byPrefix(T.blocks, m.decal.prefix) : null;
-          if (block && !things.some((t) => t.kind === 'block')) things.push({ kind: 'block', prefix: block.prefix });
+        if (m.kind === 'decal' && m.decal.place === 'on') {
+          // an "on" decal lies over a cell of its block, or over its lone fill (a back wall, a floor that is not
+          // already under everything): the fill is drawn under it. The other decals stand in an empty cell.
+          const block = byPrefix(T.blocks, m.decal.prefix), lone = byPrefix(T.floors, m.decal.prefix);
+          if (block) { if (!things.some((t) => t.kind === 'block')) things.push({ kind: 'block', prefix: block.prefix }); }
+          else if (lone && !(view === 'top-down' && lone === T.floors[0]) && !things.some((t) => (t.kind === 'floor' || t.kind === 'back') && t.prefix === lone.prefix)) things.push({ kind: 'floor', prefix: lone.prefix });
         }
         things.push(m);
       }
-      const main = things.find((t) => SOLID.includes(t.kind)) ?? things.find((t) => t.kind !== 'decal' && t.kind !== 'clip') ?? null;
+      const main = things.find((t) => JOINED.includes(t.kind)) ?? things.find((t) => t.kind !== 'decal' && t.kind !== 'clip' && t.kind !== 'back') ?? null;
       // solid: in side view every block and slope; top-down, walls and holes. Decided by the letter (or the block's
-      // name) even when the tileset has no such block, so a game's collisions and the picture agree.
-      const block = main && SOLID.includes(main.kind) ? byPrefix(T.blocks, main.prefix) : null;
-      const solid = !!main && SOLID.includes(main.kind) && (view === 'side' || (block ? block.kind : main.as ?? blockKind(main.prefix ?? '')) !== 'ground');
+      // name) even when the tileset has no such block, so a game's collisions and the picture agree. A cell joined
+      // to a block as an opening ("open:") is not solid; a liquid never is.
+      const block = main && JOINED.includes(main.kind) ? byPrefix(T.blocks, main.prefix) : null;
+      const solid = !!main && JOINED.includes(main.kind) && !main.open && (view === 'side' || (block ? block.kind : main.as ?? blockKind(main.prefix ?? '')) !== 'ground');
       cells[r].push({ kind: main ? main.kind : 'empty', prefix: main ? main.prefix : null, solid, things });
     }
   }
@@ -485,7 +539,15 @@ export function layoutTiles(rows, clips, opts = {}) {
   const inside = (c, r) => c >= 0 && c < C && r >= 0 && r < R;
   const put = (clip, col, row, layer, why) => { if (clip) tiles.push(T.from ? { clip, col, row, layer, set: T.from[clip] } : { clip, col, row, layer }); else if (why && !notes.includes(why)) notes.push(why); };
   const pieces = new Map();                                       // 'col,row' -> { block, piece } for the cells of blocks
-  const LAYER = { floor: 0, stack: 1, ground: 2, hole: 3, wall: 4, thin: 5, decal: 6 };
+  const LAYER = { floor: 0, back: 0, stack: 1, liquid: 1, ground: 2, hole: 3, wall: 4, thin: 5, decal: 6 };
+  // a liquid: its surface where nothing of it is above; for one laid as a liquid, its foot (if it has one) where
+  // nothing of it is below; else its body, the versions mixed by position
+  const wetWith = (prefix) => (x, y) => has(x, y, ['block', 'liquid', 'back'], prefix);
+  const liquidClip = (b, wet, c, r, foot) => {
+    if (!wet(c, r - 1) && b.pieces.top) return b.pieces.top;
+    if (foot && b.pieces.foot && !wet(c, r + 1)) return b.pieces.foot;
+    return b.fills.length ? b.fills[fillVariant(c, r, b.fills.length)] : b.pieces.fill ?? b.pieces.top ?? null;
+  };
   const floor = view === 'top-down' ? T.floors[0] : null;
   if (view === 'top-down' && !floor) notes.push('no floor: a top-down tileset needs a `<name>-fill` on its own to lie under everything');
   for (let r = 0; r < R; r++) for (let c = 0; c < C; c++) {
@@ -496,29 +558,47 @@ export function layoutTiles(rows, clips, opts = {}) {
       if (kind === 'floor') { const f = byPrefix(T.floors, prefix); put(f && f.fills[fillVariant(c, r, f.fills.length)], c, r, LAYER.floor, `no lone fill "${prefix}-fill"`); }
       if (kind === 'block') {
         // more of this block, or one of its slopes (pickPiece knows which sides of a slope are filled)
-        const b = byPrefix(T.blocks, prefix), part = (x, y) => (has(x, y, ['block'], prefix) ? true : has(x, y, ['slope-up'], prefix) ? 'slope-up' : has(x, y, ['slope-down'], prefix) ? 'slope-down' : false);
+        const b = byPrefix(T.blocks, prefix), part = (x, y) => (has(x, y, ['block', 'part'], prefix) ? true : has(x, y, ['slope-up'], prefix) ? 'slope-up' : has(x, y, ['slope-down'], prefix) ? 'slope-down' : false);
         if (!b) put(null, c, r, 0, `no block "${prefix}"`);
-        else {
+        else if (b.liquid) {
+          const wet = wetWith(prefix);
+          put(liquidClip(b, wet, c, r, false), c, r, LAYER[b.kind]);
+          pieces.set(`${c},${r}`, { block: b, piece: wet(c, r - 1) ? 'fill' : 'top' });
+        } else {
           put(pickClip(b, part, c, r), c, r, LAYER[b.kind], `${b.prefix}: no piece for the cell at ${c},${r} (${pickPiece(part, c, r)})`);
           pieces.set(`${c},${r}`, { block: b, piece: pickPiece(part, c, r, b.pieces) });
         }
       }
+      if (kind === 'liquid') {
+        const b = byPrefix(T.blocks, prefix), wet = wetWith(prefix);
+        put(b && liquidClip(b, wet, c, r, true), c, r, LAYER.liquid, `no liquid "${prefix}" (a block with only "${prefix}-top" and "${prefix}-fill")`);
+        if (b) pieces.set(`${c},${r}`, { block: b, piece: wet(c, r - 1) ? 'fill' : 'top' });
+      }
+      if (kind === 'back') {
+        // a fill behind whatever else the cell holds: a liquid carries on (surface and all), a lone fill or a block gives its fill
+        const b = byPrefix(T.blocks, prefix), lone = byPrefix(T.floors, prefix);
+        const fills = lone ? lone.fills : b ? b.fills : [];
+        put(b && b.liquid ? liquidClip(b, wetWith(prefix), c, r, true) : fills[fillVariant(c, r, fills.length)], c, r, LAYER.back, `"back:${prefix}": the tileset has no "${prefix}-fill"`);
+      }
+      if (kind === 'part') { const b = byPrefix(T.blocks, prefix); put(thing.clip, c, r, LAYER[b ? b.kind : 'ground']); }
       if (kind === 'slope-up' || kind === 'slope-down') {
         const sl = byPrefix(T.slopes, prefix);
         put(sl && sl[kind.slice(6)], c, r, LAYER.ground, `no slope pieces "${prefix}-slope-up" and "-slope-down"`);
         // a slope piece has no outline on its high side: it has to end on more ground (a block or another slope)
         const hx = kind === 'slope-up' ? c + 1 : c - 1;
-        if (inside(hx, r) && !has(hx, r, SOLID)) put(null, c, r, 0, `the slope at ${c},${r} ends at a drop: no piece closes a slope's high side, so put a block there`);
+        if (inside(hx, r) && !has(hx, r, JOINED)) put(null, c, r, 0, `the slope at ${c},${r} ends at a drop: no piece closes a slope's high side, so put a block there`);
       }
       if (kind === 'thin') {
         const t = byPrefix(T.thins, prefix);
-        const k = pickThin((x, y) => inside(x, y) && has(x, y, ['thin'], prefix), (x, y) => inside(x, y) && has(x, y, SOLID), c, r);
+        const k = pickThin((x, y) => inside(x, y) && has(x, y, ['thin'], prefix), (x, y) => inside(x, y) && has(x, y, JOINED), c, r);
         put(t && (t.pieces[k] ?? t.pieces.m), c, r, LAYER.thin, `no thin platform "${prefix}-thin-${k}"`);
       }
       if (kind === 'stack') {
         const st = byPrefix(T.stacks, prefix);
         const k = pickStack((x, y) => inside(x, y) && has(x, y, ['stack'], prefix), c, r);
-        put(st && (st.pieces[k] ?? st.pieces.mid ?? st.pieces.cap), c, r, LAYER.stack, `nothing that stacks called "${prefix}"`);
+        // a stack with only some pieces: a missing cap or foot is a mid; one that is only a foot shows at the bottom alone
+        if (st) put(st.pieces[k] ?? st.pieces.mid ?? (k === 'foot' ? null : st.pieces.cap), c, r, LAYER.stack);
+        else put(null, c, r, LAYER.stack, `nothing that stacks called "${prefix}"`);
       }
       if (kind === 'decal') put(thing.decal.clip, c, r, LAYER.decal);
       if (kind === 'clip') put(thing.clip, c, r, LAYER.decal);
@@ -632,6 +712,11 @@ const SHAPES = {
   'strip-l': { N: 1, S: 1, W: 1 }, 'strip-m': { N: 1, S: 1 }, 'strip-r': { N: 1, S: 1, E: 1 },
   'col-t': { N: 1, W: 1, E: 1 }, 'col-m': { W: 1, E: 1 }, 'col-b': { S: 1, W: 1, E: 1 },
   single: { N: 1, E: 1, S: 1, W: 1 },
+  'elbow-tl': { N: 1, W: 1, inner: ['br'] }, 'elbow-tr': { N: 1, E: 1, inner: ['bl'] },
+  'elbow-bl': { S: 1, W: 1, inner: ['tr'] }, 'elbow-br': { S: 1, E: 1, inner: ['tl'] },
+  'tee-t': { N: 1, inner: ['bl', 'br'] }, 'tee-r': { E: 1, inner: ['tl', 'bl'] },
+  'tee-b': { S: 1, inner: ['tl', 'tr'] }, 'tee-l': { W: 1, inner: ['tr', 'br'] },
+  cross: { inner: ['tl', 'tr', 'bl', 'br'] },
 };
 
 /**
@@ -656,24 +741,26 @@ function drawShape(g, material, t, shape) {
   const dE = (x, y) => (E ? M - x - iR(y) : FAR);
   // an inner corner: a = depth under (or over) its level edge, b = depth beside its upright edge. Outlines are
   // pinned to the tile boundary at the corner, so the piece is solid all over and insets play no part in it.
-  const innerA = (x, y) => (inner[0] === 't' ? y : M - y);
-  const innerB = (x, y) => (inner[1] === 'l' ? x : M - x);
+  // A piece may have several (the lane pieces): `inners` lists them.
+  const inners = inner ? [].concat(inner) : [];
+  const innerA = (k, x, y) => (k[0] === 't' ? y : M - y);
+  const innerB = (k, x, y) => (k[1] === 'l' ? x : M - x);
   const solid = (x, y) => {
     const n = dN(x, y), s = dS(x, y), w = dW(x, y), e = dE(x, y);
     if (n < 0 || s < 0 || w < 0 || e < 0) return false;
     if (round && Math.min(n + w, n + e, s + w, s + e) < round) return false;
-    if (inner && innerA(x, y) < 0 && innerB(x, y) < 0) return false;
+    for (const k of inners) if (innerA(k, x, y) < 0 && innerB(k, x, y) < 0) return false;
     return true;
   };
   // one ring of cells round the tile, so the outline knows what is past the tile's own edge
   const P = TILE + 2, mask = new Uint8Array(P * P);
   for (let y = -1; y <= TILE; y++) for (let x = -1; x <= TILE; x++) mask[(y + 1) * P + x + 1] = solid(x, y) ? 1 : 0;
   const at = (x, y) => mask[(y + 1) * P + x + 1];
-  const cx = inner ? (inner[1] === 'l' ? -1 : 1) : 0, cy = inner ? (inner[0] === 't' ? -1 : 1) : 0;
   const tuckOf = (edge) => (edge.tuck === true ? Math.round(edge.depth ?? 0) : edge.tuck ? Math.round(edge.tuck) : 0);
   // An inner corner's own pixel is outline where the rims meet in a mitre. Where a band tucks into the corner the
   // pixel belongs to the band: that is what lets a slope's line pass the corner with no nub.
-  const cornerInk = inner && !tuckOf(inner[0] === 't' ? eTop : eBot) && !tuckOf(inner[1] === 'l' ? eL : eR);
+  const inked = inners.filter((k) => !tuckOf(k[0] === 't' ? eTop : eBot) && !tuckOf(k[1] === 'l' ? eL : eR));
+  const cornerOut = (x, y) => inked.some((k) => !at(x + (k[1] === 'l' ? -1 : 1), y + (k[0] === 't' ? -1 : 1)));
 
   const band = (e, d, u, depth, first) => {
     d += add;
@@ -688,7 +775,7 @@ function drawShape(g, material, t, shape) {
       if (material.outside) { const c = material.outside(x, y, t); if (c !== null && c !== undefined) g.dot(x, y, c); }
       continue;
     }
-    if (ink && (!at(x - 1, y) || !at(x + 1, y) || !at(x, y - 1) || !at(x, y + 1) || (cornerInk && !at(x + cx, y + cy)))) { g.dot(x, y, ink); continue; }
+    if (ink && (!at(x - 1, y) || !at(x + 1, y) || !at(x, y - 1) || !at(x, y + 1) || cornerOut(x, y))) { g.dot(x, y, ink); continue; }
     const n = dN(x, y), s = dS(x, y), w = dW(x, y), e = dE(x, y);
     const found = [];
     const push = (b) => { if (b) found.push(b); };
@@ -708,15 +795,15 @@ function drawShape(g, material, t, shape) {
     if (s < FAR) push(band(eBot, s, x, depthAt(eBot, x, t) + droop(eBot, Math.min(w, e)), !!eBot.wrap));
     if (w < FAR) push(band(eL, w, y, depthAt(eL, y, t) + droop(eL, Math.min(n, s)), !!eL.wrap));
     if (e < FAR) push(band(eR, e, y, depthAt(eR, y, t) + droop(eR, Math.min(n, s)), !!eR.wrap));
-    if (inner) {
-      const a = innerA(x, y), b = innerB(x, y);
-      const A = inner[0] === 't' ? eTop : eBot, B = inner[1] === 'l' ? eL : eR;
+    for (const k of inners) {
+      const a = innerA(k, x, y), b = innerB(k, x, y);
+      const A = k[0] === 't' ? eTop : eBot, B = k[1] === 'l' ? eL : eR;
       if (a >= 0 && b >= 0) {
         // the corner itself. A band that tucks tapers across the corner (and so continues a slope above it);
         // otherwise the two bands meet in a mitre, each pixel taking the band it is deeper under.
         // (the tucked band is as deep everywhere as at the corner column, so its edge is one clean diagonal)
-        if (tuckOf(A)) push(band(A, a + b + 1 - add, x, Math.min(tuckOf(A), depthAt(A, inner[1] === 'l' ? 0 : M, t)), true));
-        else if (tuckOf(B)) push(band(B, a + b + 1 - add, y, Math.min(tuckOf(B), depthAt(B, inner[0] === 't' ? 0 : M, t)), true));
+        if (tuckOf(A)) push(band(A, a + b + 1 - add, x, Math.min(tuckOf(A), depthAt(A, k[1] === 'l' ? 0 : M, t)), true));
+        else if (tuckOf(B)) push(band(B, a + b + 1 - add, y, Math.min(tuckOf(B), depthAt(B, k[0] === 't' ? 0 : M, t)), true));
         else if (a >= b) push(band(A, a, x, depthAt(A, x, t), false));
         else push(band(B, b, y, depthAt(B, y, t), false));
       } else if (a < 0) push(band(B, b, y, depthAt(B, y, t), false));
@@ -759,15 +846,15 @@ function drawFace(g, material, t, ends) {
 }
 
 /**
- * Draw one piece of a block on a 32x32 Surface. g: the Surface. piece: a name from BLOCK_PIECES or NARROW_PIECES
- * ('top', 'inner-tl', 'col-m', ...) or a fill version ('fill-b'); a whole clip name ('grass-top') works too.
+ * Draw one piece of a block on a 32x32 Surface. g: the Surface. piece: a name from BLOCK_PIECES, NARROW_PIECES or
+ * LANE_PIECES ('top', 'inner-tl', 'col-m', 'elbow-tl', ...) or a fill version ('fill-b'); a whole clip name works too.
  * material: see the top of this file. t: the clip phase, passed on to the material for animated tiles.
  */
 export function drawBlock(g, piece, material, t = 0) {
   let name = SHAPES[piece] || /^fill-[b-z]$/.test(piece) ? piece : pieceOf(piece)?.piece;
   let variant = 0;
   if (name && name.startsWith('fill-')) { variant = name.charCodeAt(5) - 97; name = 'fill'; }
-  if (!SHAPES[name]) throw new Error(`drawBlock: "${piece}" is not a block piece (${[...BLOCK_PIECES, ...NARROW_PIECES].join(', ')})`);
+  if (!SHAPES[name]) throw new Error(`drawBlock: "${piece}" is not a block piece (${[...BLOCK_PIECES, ...NARROW_PIECES, ...LANE_PIECES].join(', ')})`);
   if (material.face) {
     if (FACES[name]) return drawFace(g, material, t, FACES[name]);
     // where the wall turns towards the camera, the cap's edge runs on beside the face

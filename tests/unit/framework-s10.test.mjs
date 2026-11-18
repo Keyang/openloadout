@@ -152,7 +152,7 @@ test('S10 radiatorFins: a fan that leans out to its side, with hot tips when ask
     assert.equal(count(g, GLOW), 0);
     const hot = new Surface(60, 40);
     W.radiatorFins(hot, 30, 34, { side, count: 3, length: 14, paint: S, hot: GLOW, slat: S.dark });
-    assert.ok(count(hot, GLOW) >= 6, 'the ends glow');
+    assert.ok(count(hot, GLOW) >= 6, 'the fins glow along their middle');
   }
   const a = new Surface(60, 40), b = new Surface(60, 40);
   W.radiatorFins(a, 30, 34, { side: -1, paint: S }); W.radiatorFins(b, 30, 34, { side: 1, paint: S });

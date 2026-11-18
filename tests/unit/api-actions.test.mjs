@@ -5,7 +5,9 @@ import assert from 'node:assert/strict';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildApi } from '../../tools/lib/api.mjs';
-import { ACTIONS, createLoadout, rewriteImports, fail } from '../../app/api.js';
+import { CALLS } from '../../app/api.js';
+import { ACTIONS, createLoadout, fail } from '../../app/api-core.js';
+import { rewriteImports } from '../../app/api-source.js';
 
 const REAL = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const api = await buildApi({ root: REAL });
@@ -110,6 +112,7 @@ test('fail() makes the refusal every action uses', () => {
 // ---- sprite source: import addresses ---------------------------------------------------------------
 const AT = { base: 'http://localhost:5199/sprites/', origin: 'http://localhost:5199' };
 
+
 test('rewriteImports turns the usual framework paths into full addresses', () => {
   const src = [
     "import { defineSprite, range } from '../engine/sprite.js';",
@@ -183,4 +186,20 @@ test('rewriteImports answers junk without throwing', () => {
     assert.equal(r.ok, false);
     assert.ok(r.errors[0].length > 10);
   }
+});
+
+test('rewriteImports keeps imports inside the site\'s own folder when it is told where that is', () => {
+  const at = { base: 'https://someone.example/loadout/sprites/', origin: 'https://someone.example', within: 'https://someone.example/loadout/' };
+  assert.equal(rewriteImports("import { defineSprite } from '../engine/sprite.js';", at).ok, true);
+  for (const spec of ['../../other-project/evil.js', '/other-project/evil.js', 'https://someone.example/evil.js']) {
+    const r = rewriteImports(`import x from '${spec}';`, at);
+    assert.equal(r.ok, false, spec);
+    assert.match(r.errors[0], /outside this site/, spec);
+  }
+});
+
+test('the bag actions for clearing, changing and linking are there', () => {
+  const calls = api.actions.map((a) => a.call);
+  for (const c of ['bag.update', 'bag.clear', 'bag.link']) assert.ok(calls.includes(c), `${c} is missing`);
+  assert.deepEqual([...CALLS].sort(), [...calls].sort(), 'app/api.js, the small file, names the same calls');
 });

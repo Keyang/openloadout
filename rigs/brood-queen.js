@@ -131,6 +131,7 @@ export function pose(name, t, m = {}, d = dims()) {
     P.jaw = t >= 0.36 && t < 0.62 ? 0.45 : 0;               // one twitch of the mandibles
     P.blink = t >= 0.74;                                    // frames 6 and 7 of 8
     P.arms[1].lift = 3 * Math.sin(PI * clamp((t - 0.1) / 0.3)) ** 2;      // one tap of a scythe
+    if (P.feet.length) P.feet[0].lift = 2.4 * Math.sin(PI * clamp((t - 0.5) / 0.3)) ** 2;      // and, later, of a walking leg on the other side
     P.wing = b.wing;
   } else if (name === 'attack') {
     const f = (n) => n / 9;
@@ -345,7 +346,7 @@ function headShapes(J) {
       horn.push(leafIn(rootX - Math.sin(a) * 2, rootY - Math.cos(a) * 2, rootX + Math.sin(a) * len, rootY + Math.cos(a) * len, 4 * k, { belly: 0.3, blunt: 0.85 }));
     }
   } else if (J.horns.kind === 'antlers') {
-    for (const s of [-1, 1]) horn.push(antlerIn(s * 5 * k, -4 * k, PI - s * 1.3, 16 * L, { curl: s * 0.75, width: 3.8 * k, tip: 1.2, tines: 2, spread: s * 1.05, tineLength: 0.5 }));
+    for (const s of [-1, 1]) horn.push(antlerIn(s * 5.5 * k, -3.5 * k, PI - s * 1.0, 21 * L, { curl: s * 0.9, width: 3.6 * k, tip: 1.2, tines: 2, spread: -s * 0.85, tineLength: 0.36, steps: 6 }));
   }
   return {
     skull: s2([ellipseIn(0, -1 * k, 10 * k, 6 * k), ellipseIn(0, 2.6 * k, 7.2 * k, 5 * k)]),
@@ -402,20 +403,22 @@ export function draw(g, J, look = {}) {
       g.fill(ab.x - ab.rx - reachAll, ab.y - ab.ry - reachAll, ab.x + ab.rx + reachAll, ab.y + ab.ry + reachAll, V.inside, soft, { shade: 1 });
       V.tips.forEach(([tx, ty], i) => { g.line(V.roots[i][0], V.roots[i][1], tx, ty, soft.dark); });
     } else if (J.wing?.kind === 'stubs') {
-      const blades = [];
+      const blades = [], veins = [];
       for (const s of [-1, 1]) STUB_AT.forEach((phi, j) => {
         const out = J.wing.reach * (j ? 0.85 : 1) + 0.9 * wave(J.P.beat, j * 0.3 + (s > 0 ? 0.12 : 0));
         const dir = [s * Math.sin(phi), -Math.cos(phi)];
         const tipX = ab.x + dir[0] * (ab.rx + out), tipY = ab.y + dir[1] * (ab.ry + out);
         blades.push(leafIn(ab.x + dir[0] * ab.rx * 0.45, ab.y + dir[1] * ab.ry * 0.45, tipX, tipY, (9 - 1.5 * j) * k, { belly: 0.72, blunt: 0.6 }));
+        veins.push([ab.x + dir[0] * ab.rx, ab.y + dir[1] * ab.ry, tipX - dir[0] * 2.5, tipY - dir[1] * 2.5]);
       });
       g.blob(blades, soft, { shade: 1 });
+      for (const v of veins) g.line(...v, soft.dark);            // the vein down the middle of each blade
     }
     // ---- the walking legs, then the abdomen over their hips
     for (const L of J.legs) leg(L, 1.5 * k, 0.6, armour);
     g.ellipse(ab.x, ab.y, ab.rx, ab.ry, skin, { shade: 2, light: 1 });
     g.fill(ab.x - ab.rx, ab.y - ab.ry, ab.x + ab.rx, ab.y + ab.ry, segmentRingsIn(ab.x, ab.y, ab.rx, ab.ry, [0.5, 0.76], { from: 0.34 }), skin.dark, { clip: inAb });
-    const hot = ramp(soft.light);          // a sac lit from inside, when every light flares
+    const hot = { light: soft.light, base: soft.light, dark: soft.base, deep: soft.dark };          // a sac lit from inside, when every light flares
     for (const s of J.sacs) blister(g, s.x, s.y, s.r, { skin: s.level >= 2 ? hot : soft, core: look.glow ?? '#9fe040', level: s.level, under: skin.dark, open: s.open });
     // ---- the soft chest (only when she rears), and the thorax with a crease where it sits on the abdomen
     if (inChest) g.fill(0, 0, W, Hh, inChest, soft, { shade: 1 });
@@ -494,9 +497,9 @@ export function lights(g, J, look = {}) {
   if (P.impact >= 0 && P.impact < 0.99) {
     // the scythes land: a flat ring of dust between the tips, and a spark on each
     const tips = J.arms.map((A) => A.tip), x = (tips[0][0] + tips[1][0]) / 2, y = Math.min(Hh - 6, Math.max(tips[0][1], tips[1][1]) - 2);
-    const dust = steps(look.dust ?? '#c2c9d6', { white: false });
-    ring(g, { t: P.impact, x, y, r0: 5, r1: 17 * k, thick: 3, squash: 0.3, colours: ['#ffffff', ...dust], box: air, seed: 2 });
-    if (P.impact < 0.4) for (const [tx, ty] of tips) twinkle(g, tx, ty - 2, P.impact < 0.1 ? 2 : 1, C[1], { box: air });
+    const dust = look.dust ?? '#c2c9d6';
+    ring(g, { t: P.impact, x, y, r0: 5, r1: 17 * k, thick: 3, squash: 0.3, colours: ['#ffffff', dust, tone(dust, -1)], box: air, seed: 2 });
+    if (P.impact < 0.4) for (const [tx, ty] of tips) twinkle(g, tx, ty - 2, P.impact < 0.1 ? 2 : 1, dust, { box: air });
   }
   if (P.pop >= 0 && P.pop < 0.99) {
     // the brood sacs burst: a flash on the first frame, then what was in them is thrown clear

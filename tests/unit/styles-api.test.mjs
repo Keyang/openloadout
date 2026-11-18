@@ -3,7 +3,7 @@
 // build knows `pixel` and nothing else.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { ACTIONS } from '../../app/api.js';
+import { ACTIONS } from '../../app/api-actions.js';
 import { buildApi, referenceMarkdown } from '../../tools/lib/api.mjs';
 import { ROOT } from '../../tools/lib/assets.mjs';
 

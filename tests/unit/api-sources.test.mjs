@@ -7,7 +7,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { rewriteImports } from '../../app/api.js';
+import { rewriteImports } from '../../app/api-source.js';
 import { checkSprite } from '../../quality/sprite.js';
 import { checkSound } from '../../quality/sound.js';
 import { validateMeta } from '../../catalog/schema.js';

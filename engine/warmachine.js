@@ -156,7 +156,8 @@ export function mechHead(g, kind, x, y, o = {}) {
     g.fill(x - a, y - h, x + a, y, S.sockets, K.dark, { shade: 0 });
     g.fill(x - a, y - h, x + a, y, S.nose, K.base, { shade: 0 });
     for (const [ex, ey] of S.eyes) {
-      if (level >= 0.25) { g.rect(Math.floor(ex) + (look > 0 ? 0 : -1) + (look === 0 ? 0 : 0), Math.floor(ey), 2, 1, lit); if (on) g.dot(Math.floor(ex) + look, Math.floor(ey) - 1, hot); }
+      // a slit of light low in each socket, and a hot point over it that follows where it looks
+      if (level >= 0.25) { g.rect(Math.floor(ex) - 1, Math.floor(ey), 2, 1, lit); if (on) g.dot(Math.floor(ex) + (look > 0 ? 0 : -1), Math.floor(ey) - 1, hot); }
       eyes.push([ex, ey]);
     }
     top = y - h - 1;
@@ -246,7 +247,7 @@ export function missileRack(g, x, y, o = {}) {
 
 /**
  * Draws cooling fins fanned out from a mount, the first nearly upright and each next one leaning further out; returns [[x, y], ...], the tip of each fin.
- * Arguments: g (the Surface); x, y (the mount: the foot of the first fin); o { side (-1: they fan to the picture's left, 1: to its right), count (default 3), length (px, default 12), spread (radians from the first fin to the last, default 0.9), lean (radians the first fin leans out, default 0.2), width (px, default 3), paint (a ramp), slat (a colour for a line along the middle of each fin, or null), hot (a colour for the last third of each fin, glowing with heat, or null), step (px from one fin's foot to the next, default 3) }.
+ * Arguments: g (the Surface); x, y (the mount: the foot of the first fin); o { side (-1: they fan to the picture's left, 1: to its right), count (default 3), length (px, default 12), spread (radians from the first fin to the last, default 0.9), lean (radians the first fin leans out, default 0.2), width (px, default 3), paint (a ramp), slat (a colour for the groove along the middle of each fin, or null), hot (a colour that replaces the groove when the fins glow with heat, or null), step (px from one fin's foot to the next, default 3) }.
  */
 export function radiatorFins(g, x, y, o = {}) {
   const { side = 1, count = 3, length = 12, spread = 0.9, lean = 0.2, width = 3, step = 3 } = o;
@@ -256,8 +257,8 @@ export function radiatorFins(g, x, y, o = {}) {
     const a = lean + (count > 1 ? (spread * i) / (count - 1) : 0), len = length * (1 - 0.12 * i);
     const fx = x + side * i * step, tx = fx + side * Math.sin(a) * len, ty = y - Math.cos(a) * len;
     g.limb(fx, y, tx, ty, width, paint, { shade: 1, light: 1 });
-    if (o.slat && width >= 3) g.line(lerp(fx, tx, 0.15), lerp(y, ty, 0.15), lerp(fx, tx, 0.8), lerp(y, ty, 0.8), o.slat);
-    if (o.hot) g.limb(lerp(fx, tx, 0.66), lerp(y, ty, 0.66), tx, ty, Math.max(1, width - 2), o.hot, { shade: 0 });
+    // the line along its middle: a groove, or the glow of the heat it sheds
+    if ((o.hot || o.slat) && width >= 3) g.limb(lerp(fx, tx, 0.2), lerp(y, ty, 0.2), lerp(fx, tx, 0.84), lerp(y, ty, 0.84), Math.max(1, width - 2), o.hot ?? o.slat, { shade: 0 });
     tips[i] = [tx, ty];
   }
   return tips;

@@ -154,6 +154,7 @@ export function pose(action, t, m = {}, d = dims()) {
     P.by = drop * keys(beat, [[0, 1], [0.25, 0.45], [0.5, 0], [0.75, -0.3], [1, 1]]);
     P.bx = -lerp(1, 2, bounce) * Math.sin(TAU * u);                    // its weight goes over the foot that stands
     P.roll = -Math.sin(TAU * u);                                       // and the shoulder over the lifted foot rises
+    P.shrug = -keys(fract(u * 2 - 0.125), [[0, 1], [0.3, 0], [0.8, 0], [1, 1]]);       // the shoulders sag a frame after each landing: the weight arrives late
     P.arms = [{ out: 0, up: -2 * Math.sin(TAU * u) }, { out: 0, up: 2 * Math.sin(TAU * u) }];
     P.head = [0, 0.9 * keys(fract(u * 2 - 0.12), [[0, 1], [0.3, 0.3], [0.6, 0], [1, 1]])];
     P.stomp = [u < 0.3 ? u / 0.3 : -1, u >= 0.5 && u < 0.8 ? (u - 0.5) / 0.3 : -1];
@@ -223,7 +224,8 @@ export function pose(action, t, m = {}, d = dims()) {
     P.by = [-2, -1, 1, 0, 0, 0, 1, 0, -1, 1, 0, 0][n];
     P.bx = [-2, 2, -2, 1, 0, 0, 0, 0, 0, 0, 0, 0][n];
     P.shrug = n === 0 ? 2 : 0;
-    P.slump = k2([[0, 0], [f(5), 0], [f(6), 2], [f(7), 5], [f(8), 6], [f(9), 7], [1, 7]]);
+    P.slump = k2([[0, 0], [f(5), 0], [f(6), 2], [f(7), 4], [f(8), 5], [1, 5]]);
+    if (n >= 1) P.head = [n >= 9 ? -1 : 0, n >= 7 ? -1 : 0];                       // the head hangs, but not over the hole where the reactor was
     P.roll = k2([[0, 0], [f(6), 0], [f(8), 2], [1, 2]]);
     P.core = [0.5, 1.5, 0.5, 2, 1, 2, 1.5, 2, 2, 0, 0, 0][n];
     P.eye = n < 2 ? 0.5 : n < 5 ? (n % 2 ? 0.5 : 1) : n < 8 ? 0.5 : 0;
@@ -235,7 +237,7 @@ export function pose(action, t, m = {}, d = dims()) {
       if (age >= 0 && age <= 1) P.blasts.push({ at, age, big: !!big });
     }
     P.scrap = n >= 8 ? (n - 8) / 3 : -1;
-    P.smoke = n >= 9 ? (n - 9) / 2 : -1;
+    P.smoke = n >= 10 ? (n - 10) * 0.6 + 0.1 : -1;
     P.burnt = n >= 9;
   }
   return P;
@@ -415,9 +417,9 @@ export function draw(g, P, d, look = {}, opt = {}) {
 
 /**
  * Adds the lights and loose effects of a walking war machine; call it AFTER g.outline(): the dust of a stomp, the flare of a hot reactor and of its eyes, the rings that close on a charging reactor, missiles climbing on their flames, the beam, steam, blasts with flying scrap, and the smoke of the wreck. Light is never inked: it is rimmed with its own dark tone. Nothing is drawn on the outermost row or column.
- * Arguments: g; J (what draw() returned); P (the pose); d (dims()); look { glow, core (as draw()), fire (blasts and missile flames: default amber), steam (default near white), dust (default the metal's colour) }; opt { frame (a whole number that changes every frame: flicker) }.
+ * Arguments: g; J (what draw() returned); P (the pose); d (dims()); look { glow, core, metal, body (as draw(); dust and steam take the metal's tones, flying scrap the body's), fire (blasts and missile flames: default amber), steam (the lightest tone of the steam: default white) }.
  */
-export function lights(g, J, P, d, look = {}, opt = {}) {
+export function lights(g, J, P, d, look = {}) {
   const C = paints(look), L = C.light, box = [1, 1, SIZE[0] - 1, SIZE[1] - 1], G = J.gy, s = d.s;
   const fire = steps(look.fire ?? '#f2a030', { core: look.core ?? '#f0ead8' });
   const metal = look.metal ?? '#c2c9d6', pale = [tone(metal, 0.85), metal, tone(metal, -1)];
@@ -467,7 +469,7 @@ export function lights(g, J, P, d, look = {}, opt = {}) {
     if (b.big && k > 0 && k < 1) ring(g, { t: k, x: bx, y: by, r0: r * 0.6, r1: r * 1.7, thick: 3, colours: fire, box, seed: 2 });
   }
   // the wreck smokes
-  if (P.smoke >= 0) puffs(g, { t: clamp(0.15 + P.smoke * 0.6), x: kx, y: ky - 4, count: 4, seed: 61, loop: false, stagger: 0.5, angle: PI, arc: 0.8, dist: 20 * s, rise: 8, size: 4.5, shape: 'round', lobes: 2, colours: [tone(metal, -0.6), tone(metal, -1), tone(metal, -1.8)], box });
+  if (P.smoke >= 0) puffs(g, { t: clamp(P.smoke), x: kx, y: ky - 4, count: 4, seed: 61, loop: false, stagger: 0.5, angle: PI, arc: 0.8, dist: 20 * s, rise: 8, size: 4.5, shape: 'round', lobes: 2, colours: [tone(metal, -0.6), tone(metal, -1), tone(metal, -1.8)], box });
 }
 
 /**
@@ -489,7 +491,7 @@ export function sockets(J, P, d) {
 
 /**
  * Builds one frame of a walking war machine, posed once, so the picture and the exported attach points cannot disagree.
- * Arguments: clip (a pose name, one of POSES); t (0..1); p (the sprite's values: size, bulk, legs and bounce are read from it); opt { head: one of HEADS, weapon: { kind: one of WEAPONS, length }, pack: { kind: one of PACKS or 'none', size }, frame (the frame number, for flicker) }.
+ * Arguments: clip (a pose name, one of POSES); t (0..1); p (the sprite's values: size, bulk, legs and bounce are read from it); opt { head: one of HEADS, weapon: { kind: one of WEAPONS, length }, pack: { kind: one of PACKS or 'none', size } }.
  * Returns F = { clip, d, P, draw(g, look) (paints it and returns the joints), finish(g, look) (the white of a hit, the outline, then the lights), sockets() }; look is draw()'s and lights()'s.
  */
 export function frame(clip, t, p = {}, opt = {}) {
@@ -503,7 +505,7 @@ export function frame(clip, t, p = {}, opt = {}) {
       if (!J) J = draw(g, P, d, look, opt);
       if (P.flash) g.tint('#ffffff');
       g.outline(look.outline ?? INK);
-      lights(g, J, P, d, look, { frame: opt.frame ?? 0 });
+      lights(g, J, P, d, look);
       return g;
     },
   };

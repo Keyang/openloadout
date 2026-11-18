@@ -222,6 +222,13 @@ test('tileset block: the seven narrow pieces and a second fill are tested like t
   assert.ok(!has(r.warnings, /join|seam|line up|texture/), show(r));
 });
 test('tileset: another version of the fill has the same four edges as the fill', () => expectError(F.blockFillEdgeMark, /rock-fill-b: its left column is not the same as rock-fill's/));
+test('tileset block: lane pieces (bends, forks, a crossing) are tested against everything they can touch', () => {
+  const r = expectClean(F.blockLanes);
+  for (const pair of ['rock-elbow-tl left of rock-strip-m', 'rock-strip-m left of rock-elbow-tr', 'rock-elbow-tr above rock-col-m', 'rock-strip-m left of rock-tee-t', 'rock-tee-t above rock-col-m', 'rock-strip-m left of rock-cross', 'rock-cross above rock-col-b', 'rock-elbow-bl left of rock-elbow-tr']) assert.ok(r.metrics.joins.includes(pair), pair);
+  assert.ok(!has(r.warnings, /join|seam|line up/), show(r));
+  const bad = expectError(F.blockBadElbow, /seam: rock-elbow-tl right edge → rock-strip-m left edge does not join \(.*edge band/);
+  assert.ok(bad.errors.every((e) => /rock-elbow-tl/.test(e)), `only joins with the wrong piece fail\n${show(bad)}`);
+});
 test('tileset: the outline must meet exactly at a tile boundary, even one pixel', () => {
   const r = expectError(F.blockOutlineOff, /seam: rock-top right edge → rock-top left edge does not join \(.*outline.*1 px/);
   assert.ok(has(r.errors, /rock-top right edge → rock-right left edge/), show(r));
