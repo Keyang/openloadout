@@ -273,7 +273,8 @@ export function bagPage(app, query = {}, isCurrent = () => true) {
       linkNote.textContent = n === null ? 'That bag link is damaged, so nothing was added.' : alone ? `Opened a shared bag with ${n} item${n === 1 ? '' : 's'}.` : mode === 'add' ? `Added ${n} item${n === 1 ? '' : 's'} from the shared bag.` : `Your bag now holds the shared bag's ${n} item${n === 1 ? '' : 's'}.`;
       build();
     };
-    const made = offer.code ? el('p', {}, `${offer.code === 1 ? 'One of them was' : `${offer.code} of them were`} made by whoever shared the link, and ${offer.code === 1 ? 'is a small program that runs' : 'are small programs that run'} in this page once the bag is opened. Open it only if you trust who sent it.`) : null;
+    // W5-B: what is true now, in plain words: it holds something a helper made, and that is checked in a closed box before anything of it is shown
+    const made = offer.code ? el('p', {}, `${offer.code === 1 ? 'One of them was' : `${offer.code} of them were`} made by whoever shared the link, with a helper, and ${offer.code === 1 ? 'is' : 'are'} not from this site. ${offer.code === 1 ? 'It is' : 'They are'} checked in a closed box before anything of ${offer.code === 1 ? 'it' : 'them'} is shown. Open the bag only if you trust who sent it.`) : null;
     if (offer.alone) return el('div', { class: 'bag-offer' },
       el('p', {}, `This link holds a bag with ${offer.count} item${offer.count === 1 ? '' : 's'}.`), made,
       el('button', { type: 'button', class: 'btn', onclick: () => take('replace') }, 'Open the bag'),
@@ -299,7 +300,12 @@ export function bagPage(app, query = {}, isCurrent = () => true) {
       el('div', { class: 'bag-text' },
         el('span', { class: 'bag-name' }, again.name && again.name !== item.id ? `${again.name} (${item.id})` : item.id),
         el('span', { class: 'bag-kind' }, KIND_LABEL[item.kind]),
-        el('span', { class: 'hint' }, `Needs re-making. It was made on a visit and did not pass when it was checked again, so it is not shown and will be left out of the download. ${again.reason ?? ''}`)),
+        el('span', { class: 'hint' },
+          el('strong', {}, 'Needs re-making. '),
+          item.from === 'link' ? 'This came broken from the link. Ask the sender for a new one.' : 'This was kept from an earlier visit and is broken now. Make it again, or remove it.',
+          ' It is not shown and will be left out of the download.'),
+        // what the check found is for whoever can re-make it, so it stays folded away
+        again.reason ? el('details', { class: 'hint remake-why' }, el('summary', {}, 'Details'), again.reason) : null),
       el('div', { class: 'bag-actions' }, el('button', { type: 'button', class: 'ghost', onclick: () => { bag.remove(item.key); } }, 'Remove')));
     if (pending) return el('li', { class: 'bag-item', 'data-key': item.key },
       el('div', { class: 'bag-pic pending' }),

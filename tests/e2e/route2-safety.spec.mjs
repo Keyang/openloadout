@@ -161,6 +161,8 @@ test('2: a link asks first; after one yes its source still never runs in the pag
   const otherReached = await watchOtherSite(other.context());
   await other.goto(`/index.html${link}`);
   await expect(other.locator('.bag-offer')).toContainText('made by whoever shared');
+  await expect(other.locator('.bag-offer')).toContainText('checked in a closed box before anything of them is shown');
+  await expect(other.locator('.bag-offer')).not.toContainText(/program|run in this page/);
   expect((await other.evaluate(() => localStorage.getItem('loadout-bag-v1')) ?? '').includes('rv-marks'), 'nothing is stored before the visitor agrees').toBe(false);
   await other.getByRole('button', { name: 'Open the bag' }).click();
   // the one that only leaves marks is an ordinary sprite and is accepted; the other cannot even load
@@ -210,6 +212,11 @@ test('3: a failing sprite from a link, or from edited storage, is not accepted, 
   await expect(page.locator('.bag-item.remake')).toHaveCount(2);
   await expect(page.locator('.bag-item.remake').first()).toContainText('Test gem');            // by its name, with why
   await expect(page.locator('.bag-item.remake').first()).toContainText(/needs re-making/i);
+  // in plain words for whoever is looking, with the checker's own words folded away
+  await expect(page.locator('.bag-item.remake').first()).toContainText('This was kept from an earlier visit and is broken now. Make it again, or remove it.');
+  await expect(page.locator('.bag-item.remake').first().locator('details')).not.toHaveAttribute('open', '');
+  await expect(page.locator('.bag-item.remake').first().locator('details summary')).toHaveText('Details');
+  await expect(page.locator('.bag-item.remake').first().locator('details')).toContainText(/empty|nothing drawn|no pixels/i);
 
   // (b) a passing one goes in properly, then its stored source is swapped by hand for a failing one
   await page.evaluate(async (src) => { const L = window.loadout; await L.bag.clear(); await L.make.sprite(src); await L.bag.add('rv-ls'); }, goodSprite('rv-ls'));
@@ -228,7 +235,9 @@ test('3: a failing sprite from a link, or from edited storage, is not accepted, 
   await other.goto(`/index.html${link}`);
   await other.getByRole('button', { name: 'Open the bag' }).click();
   await expect(other.locator('.bag-item.remake')).toHaveCount(1, { timeout: 30_000 });
-  await expect(other.locator('.bag-item.remake')).toContainText(/empty|nothing drawn|no pixels/i);          // what the quality bar found
+  await expect(other.locator('.bag-item.remake')).toContainText('This came broken from the link. Ask the sender for a new one.');
+  await expect(other.locator('.bag-item.remake details')).toContainText(/empty|nothing drawn|no pixels/i);          // what the quality bar found, behind "Details"
+  await expect(other.locator('.bag-item.remake .hint').first()).not.toContainText(/empty|nothing drawn|no pixels/i);
   const c = await other.evaluate(async () => ({ zip: await window.loadout.bag.download({ save: false }), ran: window.__ran ?? null }));
   expect(c.zip.ok).toBe(false);
   expect(c.ran).toBe(null);
@@ -282,6 +291,69 @@ test('3: two makes of one id at once end as one asset, the later one', async ({ 
   expect(r).toEqual({ x: [true, false], y: [true, true], name: 'Test gem two', list: ['rv-race'] });
 });
 
+test('3: the verdict cannot be forged: the bar judges frames in a worker the source never enters, and a draw looks like any other', async ({ page }) => {
+  await openRoute(page, '/');
+  // (a) the reviewer's sprite: frame 3 is empty unless the quality bar is on the call stack. It never is, where the source runs.
+  const a = await page.evaluate(async (src) => {
+    const L = window.loadout;
+    const made = await L.make.sprite(src);
+    return { made, add: await L.bag.add('rv-forge'), frame3: (await L.render('rv-forge', { clip: 'idle', frame: 3 })).opaque, again: await L.check('rv-forge'), zip: await L.bag.download({ save: false }) };
+  }, H.FORGE_BY_STACK());
+  expect(a.made.ok).toBe(false);
+  expect(a.made.errors.join('\n')).toMatch(/empty|nothing drawn|no pixels/i);
+  expect(a.add.ok).toBe(false);
+  expect(a.frame3).toBe(0);
+  expect(a.again.ok).toBe(false);
+  expect(a.zip.ok).toBe(false);
+
+  // (b) one that draws well wherever the bar looks and badly at one setting nobody samples: it is made, and can go in the bag,
+  //     but what the download is about to write is looked at again, frame by frame, and that setting is refused
+  const b = await page.evaluate(async (src) => {
+    const L = window.loadout;
+    const made = await L.make.sprite(src);
+    const good = await L.bag.add('rv-offgrid', { params: { size: 0.8 } });
+    const bad = await L.bag.add('rv-offgrid', { params: { size: 0.375 } });
+    await L.bag.add('coin');
+    const zip = await L.bag.download({ save: false, data: true });
+    return { made, good: good.ok, bad: bad.ok, badKey: bad.key, zip };
+  }, H.FORGE_OFF_GRID());
+  expect(b.made).toMatchObject({ id: 'rv-offgrid', ok: true });
+  expect(b.good && b.bad).toBe(true);
+  expect(b.zip.ok).toBe(true);
+  expect(b.zip.refused.map((r) => [r.key, r.id])).toEqual([[b.badKey, 'rv-offgrid']]);
+  expect(b.zip.refused[0].reason).toMatch(/empty|nothing drawn|no pixels/i);
+  const files = Object.fromEntries(readZip(Buffer.from(b.zip.zip.split(',')[1], 'base64')).map((f) => [f.name, f.data]));
+  expect(Object.keys(files).filter((n) => /rv-offgrid\/rv-offgrid\.png|rv-offgrid-2/.test(n))).toEqual(['sprites/rv-offgrid/rv-offgrid.png']);
+  const manifest = JSON.parse(new TextDecoder().decode(files['manifest.json']));
+  expect(manifest.refused.map((r) => r.id)).toEqual(['rv-offgrid']);
+  expect(manifest.assets.map((x) => x.id).sort()).toEqual(['coin', 'rv-offgrid']);
+  // the sheet that did go in has no empty frame
+  const sheetFrames = (bytes, n) => page.evaluate(async ([png, count]) => {
+    const img = await createImageBitmap(new Blob([new Uint8Array(png)], { type: 'image/png' }));
+    const cv = new OffscreenCanvas(img.width, img.height); const g = cv.getContext('2d'); g.drawImage(img, 0, 0);
+    return Array.from({ length: count }, (_, f) => { const d = g.getImageData(f * 32, 0, 32, 32).data; let k = 0; for (let i = 3; i < d.length; i += 4) if (d[i]) k++; return k; });
+  }, [[...bytes], n]);
+  expect((await sheetFrames(files['sprites/rv-offgrid/rv-offgrid.png'], 8)).every((k) => k > 20)).toBe(true);
+
+  // (c) one that draws well until it has been checked and badly ever after: what was checked is what is kept and written;
+  //     a setting first drawn afterwards is looked at before it is written, and refused
+  const c = await page.evaluate(async (src) => {
+    const L = window.loadout;
+    await L.bag.clear();
+    const made = await L.make.sprite(src);
+    const first = await L.bag.add('rv-count');
+    for (let i = 0; i < 420; i++) await L.render('rv-count', { clip: 'idle', params: { size: 0.1 + i / 1000 } });      // 3360 more frames
+    const later = await L.bag.add('rv-count', { params: { size: 0.61 } });
+    const shown = (await L.render('rv-count', { clip: 'idle', frame: 3 })).opaque;
+    return { made, first: first.key, later: later.key, shown, zip: await L.bag.download({ save: false, data: true }) };
+  }, H.FORGE_BY_COUNT());
+  expect(c.made).toMatchObject({ id: 'rv-count', ok: true });
+  expect(c.shown, 'the defaults still show what was checked').toBeGreaterThan(20);
+  expect(c.zip.refused.map((r) => r.key)).toEqual([c.later]);
+  const kept = Object.fromEntries(readZip(Buffer.from(c.zip.zip.split(',')[1], 'base64')).map((f) => [f.name, f.data]));
+  expect((await sheetFrames(kept['sprites/rv-count/rv-count.png'], 8))[3]).toBe(c.shown);
+});
+
 // ---- 4 ------------------------------------------------------------------------------------------------------
 
 test('4: sources that never finish, or ask for too much, are stopped quickly and the page keeps answering', async ({ page }) => {
@@ -312,11 +384,12 @@ test('4: sources that never finish, or ask for too much, are stopped quickly and
   expect(long.ok).toBe(false);
   expect(long.errors[0]).toMatch(/400,?000/);
 
-  // a loop only the quality bar meets (a control at its far end) is stopped by the check's own limit
+  // a loop only the quality bar meets (a control at its far end): the bar's frames are drawn like any others, so it is
+  // found by the same drawing limit, in seconds
   const late = await timed(H.LOOP_WHEN_BIG());
   expect(late.result.ok).toBe(false);
-  expect(late.result.errors[0]).toMatch(/60 seconds/);
-  expect(late.seconds).toBeLessThan(90);
+  expect(late.result.errors[0]).toMatch(/took too long/);
+  expect(late.seconds).toBeLessThan(20);
 
   for (const run of [top, loop, huge, many, late]) expect(run.worst, 'longest the page went without answering, ms').toBeLessThan(1500);
   // none of them was kept, nothing was drawn, and the next sprite is made as usual

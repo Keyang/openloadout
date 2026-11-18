@@ -298,3 +298,76 @@ test('prepareAround brings what one more click could ask for, and isFor tells an
   await def.prepareAround(p);
   assert.equal(sandbox.calls.length, before, 'what is here is not asked for again');
 });
+
+// ---- the quality bar judges frames (review round 2): app/api-worker.js with suppliedSprite ---------------------------
+
+test('suppliedSprite draws only what it was handed, and writes down what it was asked for and did not have', async () => {
+  const { suppliedSprite } = await import('../../app/made.js');
+  const s = suppliedSprite({ description: cleanDescription(described()).description, engine });
+  const p = engine.defaultParams(s.def), big = { ...p, size: 1 };
+  assert.deepEqual(s.missing(), [], 'defining it leaves nothing asked for');
+  assert.equal(engine.renderFrame(s.def, 'idle', 0, p).data[0], 0);
+  engine.renderFrame(s.def, 'pop', 1, p); engine.renderFrame(s.def, 'idle', 0, big);
+  assert.deepEqual(s.missing(), [{ params: p, style: 'pixel' }, { params: big, style: 'pixel' }], 'each setting once, whatever clip or frame was drawn');
+  assert.deepEqual(s.missing(), []);
+  s.supply({ params: p, style: 'pixel', clips: { idle: { fps: 9, frames: [new Uint32Array(16).fill(5), new Uint32Array(16).fill(6)] }, pop: { fps: 7, frames: [1, 2, 3].map((v) => new Uint32Array(16).fill(v)) } } });
+  assert.equal(engine.renderFrame(s.def, 'idle', 1, p).data[3], 6);
+  assert.equal(engine.renderFrame(s.def, 'pop', 2, p).data[0], 3);
+  assert.equal(engine.clipFps(s.def, 'idle', p), 9);
+  assert.deepEqual(s.missing(), []);
+  assert.equal(s.size(), 1);
+});
+
+test('the bar, run on frames in rounds, reaches the verdict it reaches on the sprite itself: a good one passes, an empty frame fails', async () => {
+  const fs = await import('node:fs'), os = await import('node:os'), path = await import('node:path'), { pathToFileURL, fileURLToPath } = await import('node:url');
+  const { rewriteImports } = await import('../../app/api-source.js');
+  const { runJob } = await import('../../app/api-worker.js');
+  const { checkSprite } = await import('../../quality/sprite.js');
+  const { validateMeta } = await import('../../catalog/schema.js');
+  const { goodSprite, EMPTY_FRAME } = await import('../fixtures/api/sources.mjs');
+  const REAL = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'loadout-frames-'));
+  let n = 0;
+  const load = async (source) => { const file = path.join(tmp, `s${n++}.mjs`); fs.writeFileSync(file, rewriteImports(source, { base: pathToFileURL(path.join(REAL, 'sprites') + path.sep).href, origin: 'null' }).source); return (await import(pathToFileURL(file).href)).default; };
+  // what the sprite's own worker does: every frame of every clip at one setting, as pixels
+  const draw = (real, params, style) => ({ params, style, clips: Object.fromEntries(Object.entries(real.clips).map(([name, c]) => [name, { fps: engine.clipFps(real, name, params), frames: Array.from({ length: c.frames }, (_, f) => engine.renderFrame(real, name, f, params).data.slice()) }])) });
+  const describe = (real) => cleanDescription(JSON.parse(JSON.stringify({ id: real.id, name: real.name, kind: real.kind, blurb: real.blurb, size: real.size, pivot: real.pivot, grounded: real.grounded, preview: real.preview, meta: real.meta, params: real.params, parts: real.parts, sounds: real.sounds, styles: real.styles, clips: Object.fromEntries(Object.entries(real.clips).map(([k, c]) => [k, { frames: c.frames, loop: c.loop, label: c.label }])) }))).description;
+  async function judge(real, session) {
+    let open = { description: describe(real), styles: ['pixel'], imports: [], sounds: [] }, add = [], drawn = 0;
+    for (let round = 0; round < 12; round++) {
+      const r = await runJob({ type: 'checkMade', session, open, add });
+      open = null;
+      if (r.verdict) return { ...r.verdict, rounds: round + 1, drawn };
+      add = r.missing.map((m) => draw(real, m.params, m.style));
+      drawn += add.length;
+    }
+    throw new Error('the bar never stopped asking');
+  }
+  try {
+    const good = await load(goodSprite('frames-good')), bad = await load(EMPTY_FRAME.replace(/api-test-empty/g, 'frames-empty'));
+    const a = await judge(good, 1), direct = checkSprite(good, { soundIndex: new Map(), validateMeta });
+    assert.deepEqual(a.errors, direct.errors);
+    assert.deepEqual(a.errors, []);
+    assert.deepEqual(a.warnings.filter((w) => !/outside the surface/.test(w)), direct.warnings.filter((w) => !/outside the surface/.test(w)), 'the same warnings about the pictures');
+    assert.ok(a.rounds >= 2 && a.rounds <= 6, `rounds: ${a.rounds}`);
+    assert.ok(a.drawn >= 10, `settings drawn for the bar: ${a.drawn}`);
+    const b = await judge(bad, 2), directBad = checkSprite(bad, { soundIndex: new Map(), validateMeta });
+    assert.deepEqual(b.errors, directBad.errors);
+    assert.ok(b.errors.some((e) => /empty|nothing drawn|no pixels/i.test(e)), b.errors.join('\n'));
+    // one setting about to be written: the same bar on exactly those frames
+    const look = (real, params) => runJob({ type: 'checkLook', description: describe(real), style: 'pixel', imports: [], clips: draw(real, params, 'pixel').clips, sounds: [] });
+    assert.deepEqual((await look(good, engine.cleanParams(good, { size: 0.375, cut: 'round' }))).errors, []);
+    assert.deepEqual((await look(good, engine.defaultParams(good))).errors, []);
+    assert.ok((await look(bad, engine.defaultParams(bad))).errors.some((e) => /empty|nothing drawn|no pixels/i.test(e)));
+    await assert.rejects(runJob({ type: 'checkMade', session: 99, add: [] }), /never started/);
+  } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
+});
+
+test('the worker a made sprite runs in only loads and draws: it has no way to be asked for a verdict', async () => {
+  const fs = await import('node:fs');
+  const text = fs.readFileSync(new URL('../../app/sandbox-worker.js', import.meta.url), 'utf8');
+  assert.ok(!/validateMeta|soundIndex|m\.t === 'check'/.test(text), 'no check job, no metadata rules, no sound lookups in the sandbox');
+  const { TAKEN } = await import('../../app/api-source.js');
+  for (const name of ['fetch', 'XMLHttpRequest', 'WebSocket', 'EventSource', 'importScripts', 'indexedDB', 'caches', 'BroadcastChannel', 'Worker', 'postMessage', 'navigator']) assert.ok(TAKEN.includes(name), name);
+  assert.match(text, /import \{ TAKEN \} from '\.\/api-source\.js'/);
+});

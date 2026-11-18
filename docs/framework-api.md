@@ -234,6 +234,9 @@ A sprite's source is a program, and whoever calls `make.sprite` may not have wri
 - **The page gets pixels and data, never functions.** The worker sends what the sprite says about itself (its controls, clips, metadata) as data, which the page checks field by field, and then frames as pixels. The page builds an ordinary sprite definition from that data (`app/made.js`), whose `render` copies those pixels in. Pages, cards, the bag, the playground and the exporter use it as they use a catalogue sprite. Catalogue sprites are untouched: they draw on the page as before.
 - **Art styles** (see "Styles" below). A made sprite may list several. For the pixel style the worker sends pixels. For a style whose surface is not a pixel grid it sends what the sprite drew on that surface as plain data: numbers, lists, and short text with nothing in it that could close a tag or a quote. The page checks it, copies it onto a surface of its own and runs the style's finish and exporters itself. A style is framework code: the page loads the site files the source imports (never the source) so that it knows the style, and imports are kept inside the site's own folder.
 - **Frames are cached by settings.** A setting that is not there yet is asked for and the last look drawn stands in until it arrives (about a millisecond for a small sprite). Code that draws once and keeps the result (the exporter, the playground) first waits for `sprite.prepare(settings)`, or `sprite.whenReady()`.
+- **The quality bar never runs next to the source.** The sprite's worker only loads and draws. The bar (`checkSprite`, unchanged) runs in the site's other background worker (`app/api-worker.js`), which never loads a made source, on a sprite that draws only frames it has been handed (`suppliedSprite` in `app/made.js`). It says which settings it looked at and had no frames for; the page has the sprite's worker draw those, as ordinary drawing requests (the same message a page sends when it draws, so the source cannot tell a check from a draw); and the bar runs again, until it has seen everything it asks for (two rounds and about 80 settings for a small sprite). Those frames stay on the page by settings, so what is shown later at those settings is what was judged.
+- **A download looks again at what it writes.** A bag item's settings are usually ones the bar never drew. So before a made sprite is written, the same bar is run on exactly the frames about to be written (every frame of every clip at the item's settings), and the sheet is made from those same frames. A setting that fails is left out of the package and named with the reason (`refused` in `manifest.json` and in what `bag.download()` returns).
+- **Advice about the code** (does it read pixels back, so that it could not be drawn in another art style) can only come from where the code runs. The sprite's worker gives it, as warnings for whoever wrote the source. It is never part of the verdict.
 - **Every call has a time limit.** Over it the worker is stopped, a fresh one is started for the next call, and the action answers `{ ok: false, errors }`.
 - **The site's content policy** (the `Content-Security-Policy` in `index.html`) allows scripts, connections, images, fonts and styles from the site itself only, plus scripts and workers made in memory (`blob:`) and WebAssembly (the search library). No `eval`, no inline script, no other site. The worker carries the same policy, so even a way out the worker forgot to take away does not reach another site.
 - **Sound patches are data** and are checked and rendered as before.
@@ -246,13 +249,33 @@ A sprite's source is a program, and whoever calls `make.sprite` may not have wri
 | Controls | 48 |
 | Reading the source (its top-level code and its imports) | 10 seconds |
 | Drawing | 300 ms a frame, and never less than 3 seconds for one request |
-| The quality bar on a sprite | 60 seconds |
+| The quality bar on a sprite, with all the drawing it asks for | 60 seconds, 600 settings, 12 rounds |
 | The quality bar on a sound effect, on a music track | 60 seconds, 10 minutes |
 | Made sprites kept running at once | 8 (the one used longest ago rests, and starts again when needed) |
 
-What a worker alone does not close: the worker belongs to the site's own origin, and the made source shares the worker with the code that reports on it. So (1) the worker's ways to the site's own storage (IndexedDB, the cache) are closed by taking them away, which is a list that has to be kept up as browsers add new ones, not a wall; (2) a made source can spoil its own worker and so lie about its own pictures and its own verdict, though about nothing else. Closing both would take a sandboxed frame with an origin of its own around the worker, which needs the host to send the framework files with cross-origin headers.
+What remains, stated plainly:
 
-Measured 2026-11-18 in Chromium, a 32 by 32 sprite with two clips and 14 frames: `make.sprite` 67 to 84 ms in all (worker start, reading the source, every default frame in 5 ms, the quality bar); one frame at a new setting 1 ms (5 ms at worst), and 0.1 ms once it is kept; a slider dragged through 61 steps in a second made 66 requests and 91 ms of worker time while the page kept every frame (16.7 ms median, 16.8 ms worst); the playground ran at 60 frames a second with it, the same as without, and asked the worker for nothing while playing.
+1. **Settings nobody looked at.** The bar samples settings (the defaults, both ends of every slider, every option, a dozen seeded mixes, the looks). A source can draw anything at a setting that was never drawn for the bar or for a download, and it can guess which settings those are, since the sampling is in the open. Such a frame can be shown on a page or in the playground. It cannot be downloaded: a download checks what it writes. This is a risk to what a picture looks like, not to the visitor's machine or data.
+2. **A source can tell that many settings are being drawn in a row**, and so guess that it is being checked, from the pattern of requests alone. It gains nothing by it: the frames it sends are the frames that are judged, kept and shown.
+3. **The worker belongs to the site's own origin.** Its ways to the site's own storage (IndexedDB, the cache) are closed by taking them away (`TAKEN` in `app/api-source.js`), which is a list to keep up as browsers add new ones, not a wall. A sandboxed frame with an origin of its own around the worker would be a wall; it needs the host to send the framework files with cross-origin headers.
+
+### Before a public release: Firefox and Safari
+
+Everything above was verified in Chromium only (the one browser installed where it was built, 2026-11-18). **Firefox and Safari have not been tested.** Two facts carry the safety of made sprites, and each must be seen to hold in each browser before the site is public:
+
+1. **A worker started from memory carries the page's content policy.** The policy is a `<meta>` tag, and the worker a made source runs in is started from a `blob:` address so that it inherits it. If a browser does not pass a `<meta>` policy on to such a worker, a made source could load a script from, or connect to, another site through anything the removal list misses. Check: in a module worker made from a `Blob`, `fetch`, `import()`, `XMLHttpRequest` and `WebSocket` to another site, and `eval` and `new Function`, are all refused.
+2. **Every name on the removal list is really gone.** For each name in `TAKEN`: it is `undefined` on the worker's global, and no object the global inherits from still has it (browsers put these on different prototypes). Also check that module workers can `import()` a `blob:` module at all, or `make.sprite` does not work there.
+
+Both are one command away, for every browser Playwright has installed (a missing browser is skipped, with the install command):
+
+```
+npx playwright install firefox webkit
+npx playwright test tests/e2e/route2-browsers.spec.mjs
+```
+
+If either fails in a browser, made sprites must be switched off there (answer `make.sprite` with `ok: false`) until it is fixed; the rest of the site does not depend on them.
+
+Measured 2026-11-18 in Chromium, a 32 by 32 sprite with two clips and 14 frames: `make.sprite` 220 to 235 ms in all (worker start, reading the source, the bar's two rounds in the other worker at 7 ms each, the 80 settings and 1,134 frames it asked to be drawn at about 110 ms, the advice run); with the bar next to the source it was 67 to 84 ms, so judging from frames costs about 150 ms a sprite. Checking it again, its frames already there: 51 ms. A download's look at one made sprite: 30 ms the first time, nothing after. One frame at a new setting 1 ms (5 ms at worst), and 0.1 ms once it is kept; a slider dragged through 61 steps in a second made 66 requests and 91 ms of worker time while the page kept every frame (16.7 ms median, 16.8 ms worst); the playground ran at 60 frames a second with it, the same as without, and asked the worker for nothing while playing.
 
 ### What an asset made on a visit can do
 
@@ -264,10 +287,10 @@ Once made, it behaves like a catalogue asset until the page is left. `app/api-co
 - **The bag**: `bag.add(id, settings)` stores the item with its whole definition (`definition: { source }` for a sprite, `{ patch }` for a sound or a track).
 - **The bag keeps what passed.** Making an asset again with a passing source updates its bag items. Making it again with a failing source while it is in the bag is refused (`ok: false`, `kept: false`): the asset and the bag stay as they were.
 - **A failed save is reported.** When the browser's storage for the site is full, `bag.add`, `bag.update` and `bag.setLook` answer `ok: false` and change nothing, and the bag page says that the bag could not be saved.
-- **After a reload, or from a link, nothing is trusted.** A stored definition is text that anyone could have put there. The site draws its pages first; then each such item is loaded and put through the whole quality bar again, in a worker, with the same limits. Until then it is "checking" (`bag.items()` waits for this). One that passes is known to the site again. One that fails, or runs over a limit, **needs re-making**: the bag page lists it by name with the reason, `bag.items()` gives it `state: 'needs re-making'` and `reason`, and nothing of it is drawn or exported.
+- **After a reload, or from a link, nothing is trusted.** (The bag page tells a visitor this in plain words: an item that came broken from a link says to ask the sender for a new one, with what the check found folded under "Details". The `errors` and `reason` in `window.loadout` results are the checker's own words, for whoever can re-make it.) A stored definition is text that anyone could have put there. The site draws its pages first; then each such item is loaded and put through the whole quality bar again, in a worker, with the same limits. Until then it is "checking" (`bag.items()` waits for this). One that passes is known to the site again. One that fails, or runs over a limit, **needs re-making**: the bag page lists it by name with the reason, `bag.items()` gives it `state: 'needs re-making'` and `reason`, and nothing of it is drawn or exported.
 - **A shared bag link** carries the definitions too. A link that holds a made sprite is never opened silently: the bag page says so and waits for the visitor to agree, and what arrives is then checked as above. A link is limited to 8,000 characters (`LINK_LIMIT` in `app/bag.js`), because chat and mail apps cut longer ones short; over that, "Copy link" and `bag.link()` explain and point at the download. Measured: a small pickup (2,800 characters of source) and its sound make a link of 6,700 characters, so a bag with more than one or two made assets is shared as a download, not a link.
 - **The playground** takes it from the bag like anything else: a pickup is collected and its cued sound plays.
-- **The download** holds what the bag stored. A made item goes in only when its own definition is the one that was checked; its sheet, JSON and WAV files are then made as for any asset, its source goes in next to them (`sprites/<id>/<id>.source.js`, `sounds/<id>.source.json`), and its entry in `manifest.json` has `madeOnThisVisit: true` and `source` (the path of that file). Items that need re-making are left out and named: `needsRemaking` in the manifest and in what `bag.download()` returns.
+- **The download** holds what the bag stored. A made item goes in only when its own definition is the one that was checked, and its frames at the item's settings pass the bar when they are about to be written (otherwise it is named under `refused`); its sheet, JSON and WAV files are then made as for any asset, its source goes in next to them (`sprites/<id>/<id>.source.js`, `sounds/<id>.source.json`), and its entry in `manifest.json` has `madeOnThisVisit: true` and `source` (the path of that file). Items that need re-making are left out and named: `needsRemaking` in the manifest and in what `bag.download()` returns.
 - **`assets.remove(id)`** forgets it and stops its worker. It refuses a catalogue asset, and an asset that is still in the bag.
 
 ### For an MCP server
@@ -348,6 +371,41 @@ export default defineSprite({
 - **The exports differ.** A pixel sheet's JSON has no `artStyle` (a file without it is pixel, so nothing made before styles changed); any other style's JSON, and its entry in a package's `manifest.json`, says `artStyle`.
 
 On the page: `loadout.render(id, { artStyle })` draws in an art style, `loadout.bag.add(id, { artStyle })` stores it, `(await loadout.api).styles` lists what is registered, and `(await loadout.assets.get(id)).asset.styles` is what one sprite offers.
+
+## Rigs
+
+A body rig describes itself (the first step of Contract 13 of `docs/architecture.md`; nothing else of that contract is built). Beside each character rig there is one module of plain data, no code:
+
+| Rig | Description | Covers |
+|---|---|---|
+| Side-view character | `rigs/humanoid-describe.js` | `rigs/humanoid.js`, `rigs/humanoid-figure.js` |
+| Top-down character | `rigs/topdown-describe.js` | `rigs/topdown.js`, `rigs/topdown-riot.js` |
+| Kiosk robot | `rigs/kiosk-describe.js` | `rigs/kiosk.js` |
+
+Where to read one: `generated/api.json` under `rigs` (`(await loadout.api).rigs`); on the page as `(await loadout.framework).topdownDescribe.RIG`; in a terminal with `node tools/rig.mjs <rig>` (tables) and `node tools/rig.mjs <rig> --sheet` (contact sheets in `out/` of every part and every held kind on a plain body, in each direction: look at these before you write a sprite). The files are named `<rig>-describe.js`, with a hyphen, so the folder scan gives them a usable name (`topdownDescribe`); the creature and boss rigs have none yet.
+
+What a description holds (`RIG`):
+
+| Field | What it lists |
+|---|---|
+| `id`, `view`, `size`, `pivot`, `ground`, `directions`, `modules` | The frame, and the files the description covers, by their name on `loadout.framework` |
+| `frames` | The functions that build one posed frame |
+| `layers` | The hooks of the rig's `draw()`, in the order they are called |
+| `poses` | Each pose: `fn`, `frames`, `fps`, `loop`, `directions`, `standardFor` (the clips it is the standard pose of), `options` |
+| `carries`, `manners`, `stances` | How a held thing rests; ways of moving laid over a pose; how the body is carried |
+| `body` | The proportion `controls` with their ranges, and the body `kinds` (human, skeleton, imp; adult, child) |
+| `hair` | Each hair style and the function that draws it |
+| `parts` | Each part it can wear: `fn`, `layer` (or `layers`), `socket`, `directions` (where it shows), `options` with ranges and choices, `rise` (how far it rises above the head, for the fit) |
+| `held` | Each held kind: `fn`, `size` (its size function), `px` (length, back, pad), `length` (the range of the length setting), `carry`, `clips` |
+| `effects` | Light drawn after the outline: trails, muzzle light |
+| `sockets` | The attach points it exports |
+| `helpers`, `drawingHelpers` | Every other export, so nothing is left out |
+| `duplicates` | Where the same idea exists more than once, with the calls a tidy-up would merge |
+| `inSprites` | What a sprite file on the rig still draws or poses itself |
+
+A name such as `topdown.cape` is `<module>.<export>`. An option is `{ min, max, default }`, `{ choices, default }`, `{ colour: true }`, `{ flag: true }` or `{ data }`.
+
+**When you add to one of these rigs, add to its description in the same change.** `tests/unit/rig-describe-data.test.mjs` fails for an export, a drawing function (first argument `g`), a name in an exported list, or a side module `rigs/<rig>-<name>.js` that the description does not list; `tests/unit/rig-describe-draw.test.mjs` draws every listed pose, part, held kind, hair style and effect through the function named, checks a part shows in exactly the directions given, and that both ends of every range stay inside the frame. A new part with a kind list needs the list exported (`PACK_KINDS`), or the tests cannot see a kind added later.
 
 ## Reference
 

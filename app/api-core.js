@@ -270,7 +270,7 @@ export function createLoadout(env = {}) {
     if (!rewritten.ok) throw Object.assign(new Problem(''), { errors: rewritten.errors });
     [engineNow, themeNow, bagNow, stylesNow] = await Promise.all([lib.sprite(), lib.theme(), lib.bag().then((m) => m.bag), lib.styles()]);
     const box = openSandbox({ env: { Worker: win.Worker, URL: win.URL, Blob: win.Blob }, workerUrl: at('app/sandbox-worker.js'), moduleText: rewritten.source });
-    const sandbox = { ...box, frames: (x) => { touch(box); return box.frames(x); }, check: (x) => { touch(box); return box.check(x); } };
+    const sandbox = { ...box, frames: (x) => { touch(box); return box.frames(x); } };
     try {
       const { description } = await sandbox.load();
       const clean = cleanDescription(description);
@@ -285,6 +285,9 @@ export function createLoadout(env = {}) {
       let def;
       try { def = standIn({ description: clean.description, engine: engineNow, sandbox, bagSettings, styles, onProblem: (e) => console.warn(`Loadout: the made sprite "${clean.description.id}" could not be drawn.`, e?.message ?? e) }); } catch (e) { throw new Problem(`The sprite is not put together right: ${messageOf(e)}`); }
       // the first drawing: every clip at its defaults. A render() that never ends is found here, within seconds.
+      about.set(def, { description: clean.description, imports: rewritten.imports });
+      // what a download is about to write of it is looked at first (app/bundle.js asks through this)
+      def.judgeLook = (params, options) => judgeLook(def, params, options);
       await def.prepare(null);
       return { sandbox, def };
     } catch (e) { box.stop(); throw e instanceof MadeError ? new Problem(e.message) : e; }
@@ -296,20 +299,83 @@ export function createLoadout(env = {}) {
     const warnings = r.onPage ? [...words(r.warnings), 'This browser has no background worker for Loadout, so the check ran on the page itself and the page was busy meanwhile.'] : words(r.warnings);
     return { ok: errors.length === 0, errors, warnings, ...(notes ? { notes } : {}), ...more };
   };
-  /** The quality bar on a made sprite, in its own worker. Resolves to { verdict, metrics }. */
-  async function judge(sandbox, def) {
+  /** The sounds a made sprite's clips play, for the bar to look up: [[id, patch]], or null when there is no library to look in. */
+  async function cuedSounds(def) {
     const cued = [...new Set(Object.values(def.sounds ?? {}).flat().map((c) => c.sound))];
-    let sounds = [];
-    if (cued.length) {
-      const library = await lib.sounds().catch(() => null);
-      if (!library) sounds = null;       // no sound library to look in: the cues are not checked, and the verdict says so
-      else for (const id of cued) { const patch = runtime.get(id)?.patch ?? library.soundById[id]; if (patch) sounds.push([id, patch]); }
+    if (!cued.length) return [];
+    const library = await lib.sounds().catch(() => null);
+    if (!library) return null;       // the cues are not checked, and the verdict says so
+    return cued.map((id) => [id, runtime.get(id)?.patch ?? library.soundById[id]]).filter(([, patch]) => patch);
+  }
+  // what the bar is handed about a made sprite, kept with its stand-in: { description, imports }
+  const about = new WeakMap();
+  let checkSession = 0;
+  /**
+   * The quality bar on a made sprite. It runs in the background worker that never loads the source, on frames:
+   * the bar looks at the settings it wants, the ones it had no frames for are drawn by the sprite's own worker
+   * (ordinary drawing requests: the source cannot tell them from a page drawing) and kept on the page by settings,
+   * and the bar runs again, until it has seen all it asks for. What the page later shows at those settings is
+   * those same frames. Resolves to { verdict, metrics }.
+   */
+  async function judge(sandbox, def, { tips = true } = {}) {
+    const info = about.get(def), session = ++checkSession, started = performance.now();
+    const sounds = await cuedSounds(def);
+    const left = () => LIMITS.checkMs - (performance.now() - started);
+    const late = () => new Problem(`The quality bar did not finish within ${LIMITS.checkMs / 1000} seconds. It looks at every clip at many settings: a render() that is very slow, or a sprite with very many controls, does this.`);
+    let open = { description: info.description, styles: [...def.styles ?? ['pixel']], imports: info.imports, sounds };
+    let add = [def.framesFor(null)].filter(Boolean), settings = add.length, bytes = 0;
+    try {
+      for (let round = 0; round <= LIMITS.checkRounds; round++) {
+        if (left() <= 0) throw late();
+        const r = await work({ type: 'checkMade', session, open, add }, Math.max(1000, left()));
+        open = null;
+        if (r.verdict) {
+          const verdict = verdictOf(r.verdict);
+          if (sounds === null) verdict.warnings.push('The sounds this sprite plays were not checked: the site\'s sound library could not be read.');
+          const metrics = plain({ ...r.verdict.metrics, settingsDrawn: r.settings, rounds: round + 1 });
+          // Advice about how the source's own code draws can only come from where it runs. It adds warnings for whoever
+          // wrote it; the verdict above was reached from frames and is not touched by it.
+          if (tips) {
+            const said = await sandbox.advice().catch(() => null);
+            for (const w of words(said?.warnings).slice(0, 4)) if (!verdict.warnings.includes(w)) verdict.warnings.push(w.slice(0, 600));
+            if (said && (said.outsideCalls === null || Array.isArray(said.outsideCalls))) metrics.outsideCalls = said.outsideCalls === null ? null : said.outsideCalls.filter((x) => typeof x === 'string').slice(0, 20);
+          }
+          return { verdict, metrics };
+        }
+        // draw what it asked for; each is every clip at one setting, as any page asks
+        add = [];
+        for (const want of list(r.missing)) {
+          if (left() <= 0) throw late();
+          if (++settings > LIMITS.checkSettings) throw new Problem(`The quality bar would have to draw this sprite at more than ${LIMITS.checkSettings} settings. Give it fewer controls, or fewer options.`);
+          try { await def.prepare(want.params, { style: want.style }); } catch (e) { throw new Problem(messageOf(e)); }
+          const frames = def.framesFor(want.params, want.style);
+          if (!frames) throw new Problem('The sprite did not draw the frames the quality bar asked for.');
+          bytes += def.size[0] * def.size[1] * 4 * Object.values(frames.clips).reduce((n, c) => n + c.frames.length, 0);
+          if (bytes > LIMITS.checkBytes) throw new Problem('The quality bar would have to look at more pixels than a sprite made on a visit may have (its frames are too big, or too many).');
+          add.push({ params: frames.params, style: frames.style, clips: frames.clips });
+        }
+      }
+      throw new Problem('The quality bar kept asking for new settings and was stopped. A sprite whose controls change what the bar looks at each time does this.');
+    } catch (e) {
+      work({ type: 'checkMade', session, close: true }, 5000).catch(() => {});
+      throw e instanceof MadeError ? new Problem(e.message) : e;
     }
-    let r;
-    try { r = await sandbox.check(sounds); } catch (e) { throw e instanceof MadeError ? new Problem(e.message) : e; }
-    const verdict = verdictOf(r);
-    if (sounds === null) verdict.warnings.push('The sounds this sprite plays were not checked: the site\'s sound library could not be read.');
-    return { verdict, metrics: plain(r.metrics ?? null) };
+  }
+  /**
+   * One setting of a made sprite, about to be written into a download: the same bar looks at exactly these frames
+   * (every frame of every clip, as kept on the page), and the download then writes those frames and no others.
+   * Resolves to { ok, errors, warnings }; the verdict stays with the frames.
+   */
+  async function judgeLook(def, params, { style } = {}) {
+    try { await def.prepare(params, { style }); } catch (e) { return { ok: false, errors: [messageOf(e)], warnings: [] }; }
+    const known = def.lookVerdict(params, style);
+    if (known) return known;
+    const frames = def.framesFor(params, style), info = about.get(def);
+    if (!frames) return { ok: false, errors: ['The sprite did not draw its frames at these settings.'], warnings: [] };
+    let verdict;
+    try { verdict = verdictOf(await work({ type: 'checkLook', description: info.description, style: frames.style, imports: info.imports, clips: frames.clips, sounds: await cuedSounds(def) }, LIMITS.checkMs)); } catch (e) { return { ok: false, errors: [`It could not be checked (${messageOf(e)}).`], warnings: [] }; }
+    def.keepLookVerdict(params, style, verdict);
+    return verdict;
   }
   const checkSpriteAt = (url) => work({ type: 'checkSprite', url, soundsUrl: at('generated/sounds.json'), sounds: runtimeSounds() }, 2 * LIMITS.checkMs);
 
@@ -619,8 +685,13 @@ export function createLoadout(env = {}) {
       const files = await bundle.packageFiles({ items, theme: bag.theme(), scale: 1 });
       const blob = zip(files);
       const name = 'loadout-package.zip';
+      // what the package itself says it left out: a made sprite whose frames, as set up in the bag, failed the bar when they were about to be written
+      let manifest = {};
+      try { manifest = JSON.parse(new TextDecoder().decode(files.find((f) => f.name === 'manifest.json').data)); } catch { /* no list to read */ }
+      const refused = list(manifest.refused);
+      if (!list(manifest.assets).length) throw new Problem(`Nothing in the bag could be downloaded. ${refused.map((r) => `"${r.id}" (item ${r.key}) does not pass the quality bar as it is set up: ${r.reason}`).join(' ')}${needsRemaking.length ? ` Needing re-making: ${needsRemaking.join(', ')}.` : ''}`);
       if (o.save !== false) ui.saveBlob(blob, name);
-      const out = { ok: true, name, bytes: blob.size, saved: o.save !== false, files: files.map((f) => f.name), ...(needsRemaking.length ? { needsRemaking } : {}) };
+      const out = { ok: true, name, bytes: blob.size, saved: o.save !== false, files: files.map((f) => f.name), ...(needsRemaking.length ? { needsRemaking } : {}), ...(refused.length ? { refused } : {}) };
       if (o.data === true) out.zip = `data:application/zip;base64,${base64(new Uint8Array(await blob.arrayBuffer()))}`;
       return out;
     },
@@ -719,7 +790,7 @@ export function createLoadout(env = {}) {
           sandbox = made.sandbox;
           name = made.def.name;
           if (made.def.id !== item.id) throw new Problem(`Its source defines "${made.def.id}", not "${item.id}".`);
-          const { verdict } = await judge(sandbox, made.def);
+          const { verdict } = await judge(sandbox, made.def, { tips: false });
           if (!verdict.ok) throw new Problem(verdict.errors[0]);
           await keep({ id: item.id, kind: 'sprite', source: item.definition.source, sandbox, def: made.def, verdict, row: await spriteRow(made.def, verdict) });
           kept = true;

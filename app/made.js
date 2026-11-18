@@ -26,7 +26,8 @@ const seconds = (ms) => `${Math.round(ms / 1000)} seconds`;
 /**
  * The worker for one made source. env: { Worker, URL, Blob } from the page; workerUrl: the address of
  * app/sandbox-worker.js; moduleText: the source with its imports already made into full addresses.
- * Returns { load(), frames({ clips, params }), check(sounds), stop(), alive() }. Every call resolves with data or
+ * Returns { load(), frames({ clips, params, style }), stop(), rest(), alive(), busy() }. Drawing is all it can be asked
+ * for: the quality bar is run elsewhere, on the frames (app/api-worker.js). Every call resolves with data or
  * rejects with a MadeError; one call runs at a time, in the order asked.
  */
 export function openSandbox({ env, workerUrl, moduleText, limits = LIMITS }) {
@@ -90,10 +91,10 @@ export function openSandbox({ env, workerUrl, moduleText, limits = LIMITS }) {
       const ms = Math.min(limits.checkMs, Math.max(limits.drawFloorMs, count * limits.frameMs));
       return ask({ t: 'frames', clips, params, style }, ms, `Drawing ${count} frame${count === 1 ? '' : 's'} took too long (over ${seconds(ms)}) and the sprite was stopped. Its render() must finish in well under ${limits.frameMs} ms a frame.`);
     },
-    /** The quality bar. sounds: [[id, patch]] for the sounds its clips play. */
-    async check(sounds) {
+    /** How the source's own code draws: { outsideCalls, warnings }. Advice for its maker; it is never part of a verdict. */
+    async advice() {
       await ready();
-      return ask({ t: 'check', sounds }, limits.checkMs, `The quality bar did not finish within ${seconds(limits.checkMs)} and the sprite was stopped. It draws every clip at many settings: a render() that loops or is very slow at some setting does this.`);
+      return ask({ t: 'advice' }, limits.adviceMs, 'Looking at how the source draws took too long and was given up.');
     },
     /** Stop the worker and let go of the source. Nothing can be asked afterwards. */
     stop() { closed = true; end(new MadeError('This sprite has been stopped.')); pump(); URL.revokeObjectURL(sourceUrl); URL.revokeObjectURL(bootUrl); },
@@ -131,7 +132,8 @@ function cleanState(v, budget, depth) {
  * bagSettings(def): the settings the bag holds for it right now, as a list of params (whenReady prepares them).
  * Throws what defineSprite throws when the description is not a valid sprite.
  * The result is an ordinary sprite plus: made (true), prepare(params, { clips, style }), prepareAround(params, { style }),
- * whenReady(), onFrames(fn), isFor(event, params, style), has(params, clip, style), stats().
+ * whenReady(), onFrames(fn), isFor(event, params, style), has(params, clip, style), framesFor(params, style),
+ * lookVerdict / keepLookVerdict, stats().
  */
 export function standIn({ description: d, engine, sandbox, bagSettings = () => [], styles = ['pixel'], limits = LIMITS, onProblem = () => {} }) {
   const { defineSprite, cleanParams, defaultParams } = engine;
@@ -151,6 +153,7 @@ export function standIn({ description: d, engine, sandbox, bagSettings = () => [
 
   const got = (key, clip) => { const e = cache.get(key); if (!e || !e.clips[clip]) return null; cache.delete(key); cache.set(key, e); return e.clips[clip]; };
   const peek = (key, clip) => cache.get(key)?.clips[clip] ?? null;
+  // (a setting whose frames passed the look check for a download is kept: the download writes exactly those frames)
   // the nearest thing there is while the right one is on its way: the last settings drawn, else the defaults
   // (in the same art style: what one style drew cannot stand in for another)
   const nearest = (clip, style = first) => peek(latest[`${style}|${clip}`], clip) ?? (style === first ? peek(baseKey, clip) : null);
@@ -177,7 +180,7 @@ export function standIn({ description: d, engine, sandbox, bagSettings = () => [
       stats.frames += frames.length;
     }
     // room for the newest: the settings used longest ago go first, the defaults never
-    for (const [k, old] of cache) { if (stats.bytes <= limits.cacheBytes) break; if (k === key || k === baseKey) continue; cache.delete(k); stats.bytes -= old.bytes; }
+    for (const [k, old] of cache) { if (stats.bytes <= limits.cacheBytes) break; if (k === key || k === baseKey || old.look) continue; cache.delete(k); stats.bytes -= old.bytes; }
   }
 
   /** Bring the frames of these clips at these settings (in this art style), unless they are here or already asked for. */
@@ -274,10 +277,76 @@ export function standIn({ description: d, engine, sandbox, bagSettings = () => [
       try { await fetchClips(q, names, s); } catch { return; }
     }
   };
+  /**
+   * What is kept for these settings in this style, to hand to the quality bar: { key, params, style, clips } (the
+   * frames themselves, not copies), or null when they are not here. Bring them with prepare() first.
+   */
+  def.framesFor = (params, style = first) => {
+    const p = cleanParams(def, params ?? {}), key = keyOf(p, style ?? first), e = cache.get(key);
+    return e && names.every((c) => e.clips[c]) ? { key, params: p, style: style ?? first, clips: e.clips } : null;
+  };
+  /** The verdict kept with these settings' frames (set when a download looked at them), or null; and a way to keep one. */
+  def.lookVerdict = (params, style = first) => cache.get(keyOf(cleanParams(def, params ?? {}), style ?? first))?.look ?? null;
+  def.keepLookVerdict = (params, style, verdict) => { const e = cache.get(keyOf(cleanParams(def, params ?? {}), style ?? first)); if (e) e.look = verdict; };
   /** Is this onFrames event the arrival of exactly these settings in this style? */
   def.isFor = (event, params, style = first) => !!event && event.key === keyOf(cleanParams(def, params ?? {}), style ?? first);
   def.has = (params, clip, style = first) => !!peek(keyOf(cleanParams(def, params ?? {}), style), clip ?? names[0]);
   def.stats = () => ({ ...stats, settings: cache.size });
   def.made = true;
   return def;
+}
+
+/**
+ * A sprite that draws only what it has been handed: the quality bar's view of a made sprite (app/api-worker.js).
+ * It is built from the same checked description as the page's stand-in, in a worker the source never enters, and
+ * holds no way to reach the source: frames are supplied by whoever runs the bar, and a setting that was not
+ * supplied draws nothing and is written down, so it can be supplied and the bar run again.
+ * description: from cleanDescription(); engine: engine/sprite.js; styles: the sprite's styles this place knows.
+ * Returns { def, supply({ params, style, clips }), missing(), size() }.
+ */
+export function suppliedSprite({ description: d, engine, styles = ['pixel'] }) {
+  const { defineSprite } = engine;
+  const names = Object.keys(d.clips), controls = Object.keys(d.params);
+  const first = styles[0] ?? 'pixel';
+  const keyOf = (p, style = first) => (style === first ? '' : `${style}|`) + JSON.stringify(controls.map((k) => p[k]));
+  const store = new Map(), missed = new Map();
+  const clipFor = (clip, p, style = first) => {
+    const key = keyOf(p, style), e = store.get(key);
+    if (e && e[clip]) return e[clip];
+    if (!missed.has(key)) missed.set(key, { params: { ...p }, style });
+    return null;
+  };
+  const frameAt = (c, t) => Math.max(0, Math.min(c.frames - 1, Math.round(c.loop ? t * c.frames : t * (c.frames - 1))));
+  const [fw, fh] = d.size;
+  const raw = {
+    id: d.id, name: d.name, size: d.size, pivot: d.pivot, params: d.params, parts: d.parts, sounds: d.sounds,
+    ...(d.kind ? { kind: d.kind } : {}), ...(d.blurb ? { blurb: d.blurb } : {}), ...(d.preview ? { preview: d.preview } : {}),
+    ...(d.meta ? { meta: d.meta } : {}), ...(d.grounded === false ? { grounded: false } : {}),
+    clips: Object.fromEntries(names.map((name) => [name, { frames: d.clips[name].frames, loop: d.clips[name].loop, ...(d.clips[name].label ? { label: d.clips[name].label } : {}), fps: (p) => clipFor(name, p)?.fps ?? 10 }])),
+    /** Lays the supplied frame onto the surface through the surface's own calls, as a drawing would. */
+    render(g, ctx) {
+      const style = ctx.style ?? first;
+      const drawn = clipFor(ctx.clip, ctx.p, style)?.frames[ctx.frame];
+      if (!drawn || !g) return;
+      const pixels = style === 'pixel' ? drawn : ArrayBuffer.isView(drawn.data) ? drawn.data : null;
+      if (pixels && typeof g.blit === 'function' && pixels.length === fw * fh) { g.blit({ w: fw, h: fh, data: pixels }); return; }
+      if (style !== 'pixel') for (const [k, v] of Object.entries(drawn)) { try { g[k] = structuredClone(v); } catch { /* a read-only part of the surface stays as it is */ } }
+    },
+  };
+  if (d.socketNames) {
+    const blank = Object.fromEntries(d.socketNames.map((n) => [n, { x: d.pivot[0], y: d.pivot[1], angle: 0 }]));
+    raw.sockets = (clip, t, p) => { const c = d.clips[clip] && p ? clipFor(clip, p) : null; return (c && c.sockets && c.sockets[frameAt(d.clips[clip], t)]) || blank; };
+  }
+  if (d.hasSlice) raw.slice = (clip, p) => (d.clips[clip] ? clipFor(clip, p)?.slice : null) ?? undefined;
+  if (styles.length > 1 || first !== 'pixel') raw.styles = [...styles];
+  const def = defineSprite(raw);
+  missed.clear();          // what defining it asked about (attach points at the defaults) is asked again by the bar itself
+  return {
+    def,
+    /** Hand over every clip's frames at one setting in one style. */
+    supply({ params, style = first, clips }) { store.set(keyOf(params, style ?? first), clips); missed.delete(keyOf(params, style ?? first)); },
+    /** The settings that were drawn without frames since the last call: [{ params, style }]. */
+    missing() { const out = [...missed.values()]; missed.clear(); return out; },
+    size: () => store.size,
+  };
 }

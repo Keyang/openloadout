@@ -13,12 +13,17 @@
 //   out  { job, result: { clips: { name: { fps, frames, sockets, slice } } } }
 //        frames: in the pixel style one ArrayBuffer of pixels per frame; in another style, what the sprite drew on that
 //        style's surface, as plain data (the page puts it on a surface of its own and finishes it there)
-//   in   { job, t: 'check', sounds: [[id, patch]] | null }   the quality bar (Contract 10); null: the cues are not checked
-//   out  { job, result: { errors, warnings, metrics } }
+//   in   { job, t: 'advice' }                             how the source's own code draws: warnings for its maker, never a verdict
+//   out  { job, result: { outsideCalls, warnings } }
 //   out  { job, error: 'message' }                       for any of them
 //
-// A source can still spoil its own worker (it shares it with this file), so it can lie about its own pictures
-// and its own verdict, and about nothing else. It cannot stay: the page stops the worker on a time limit.
+// Drawing is all this worker does. The quality bar never runs here: it judges the frames this worker sent, in a
+// worker the source never enters (app/api-worker.js), and the frames it asks for arrive as ordinary 'frames'
+// messages, the same as when a page draws. So a source cannot tell a check from a draw, and cannot write its
+// own verdict. It can still spoil its own worker (it shares it with this file) and so its own pictures, which
+// are then judged as they are. It cannot stay: the page stops the worker on a time limit.
+
+import { TAKEN } from './api-source.js';      // a file of the site, read before anything below runs
 
 // ---- first: keep the way out, then take everything away -------------------------------------------------------
 const scope = globalThis;
@@ -26,16 +31,6 @@ const post = scope.postMessage.bind(scope);
 const listen = scope.addEventListener.bind(scope);
 const clock = () => performance.now();
 
-const TAKEN = [
-  // the network
-  'fetch', 'XMLHttpRequest', 'WebSocket', 'WebSocketStream', 'EventSource', 'WebTransport', 'RTCPeerConnection', 'RTCDataChannel', 'importScripts', 'fetchLater',
-  // the site's storage, and other pages and workers of it
-  'indexedDB', 'caches', 'cookieStore', 'BroadcastChannel', 'MessageChannel', 'MessagePort', 'Worker', 'SharedWorker', 'ServiceWorkerRegistration', 'Notification', 'navigator', 'location', 'origin',
-  // the page: only this file answers it
-  'postMessage', 'onmessage', 'onmessageerror', 'close',
-  // files and devices
-  'FileReader', 'FileReaderSync', 'FileSystemHandle', 'FileSystemFileHandle', 'FileSystemDirectoryHandle', 'showOpenFilePicker', 'FontFace', 'fonts', 'OffscreenCanvas', 'createImageBitmap', 'ImageDecoder', 'VideoDecoder', 'AudioDecoder', 'WebAssembly',
-];
 for (const name of TAKEN) {
   for (let o = scope; o; o = Object.getPrototypeOf(o)) { try { delete o[name]; } catch { /* not ours to delete: covered below */ } }
   try { Object.defineProperty(scope, name, { value: undefined, writable: false, configurable: false, enumerable: false }); } catch { /* already gone */ }
@@ -116,12 +111,17 @@ function frames(m) {
   return { result: { clips: out, params: plain(p) }, moved };
 }
 
-async function check(m) {
+/**
+ * Advice for whoever wrote the source, about how its own code draws: does it read pixels back, or write the pixel
+ * buffer itself, so that it could never be drawn in another art style? Only the place the code runs can tell, by
+ * watching it draw, and it tells it with the quality bar's own tracer. This is advice and nothing more: what comes
+ * back is a few warnings. The verdict is reached elsewhere, from frames, and nothing said here can change it.
+ */
+async function advice() {
   if (!sprite) throw new Error('No sprite has been loaded here.');
-  const t0 = clock();
-  const [{ checkSprite }, { validateMeta }] = await Promise.all([import('../quality/sprite.js'), import('../catalog/schema.js')]);
-  const r = checkSprite(sprite, { soundIndex: Array.isArray(m.sounds) ? new Map(m.sounds) : undefined, validateMeta });
-  return { errors: r.errors.map(String), warnings: r.warnings.map(String), metrics: plain(r.metrics), ms: Math.round(clock() - t0) };
+  const { checkSprite } = await import('../quality/sprite.js');
+  const r = checkSprite(sprite, {});
+  return { outsideCalls: plain(r.metrics?.outsideCalls ?? null), warnings: r.warnings.map(String).filter((w) => w.includes('outside the surface')).slice(0, 4) };
 }
 
 listen('message', async (e) => {
@@ -129,7 +129,7 @@ listen('message', async (e) => {
   try {
     if (m.t === 'load') post({ job: m.job, result: await load(m) });
     else if (m.t === 'frames') { const { result, moved } = frames(m); post({ job: m.job, result }, moved); }
-    else if (m.t === 'check') post({ job: m.job, result: await check(m) });
+    else if (m.t === 'advice') post({ job: m.job, result: await advice() });
     else post({ job: m.job, error: `unknown job "${m.t}"` });
   } catch (err) { post({ job: m.job, error: messageOf(err) }); }
 });

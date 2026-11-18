@@ -17,7 +17,11 @@ export const LIMITS = Object.freeze({
   descriptionChars: 200_000,     // everything a sprite says about itself (controls, clips, parts, metadata), as JSON
   textChars: 2000,               // its name, or its one-sentence description
   loadMs: 10_000,                // reading the source: its own top-level code and the framework files it imports
-  checkMs: 60_000,               // the whole quality bar
+  checkMs: 60_000,               // the whole quality bar, with every frame it asks to be drawn
+  adviceMs: 10_000,              // looking at how the source's own code draws (advice for its maker; never part of the verdict)
+  checkRounds: 12,               // times the bar is run again after asking for more settings
+  checkSettings: 600,            // settings the bar may ask to be drawn for one sprite
+  checkBytes: 512 * 1024 * 1024, // pixels handed to the bar for one sprite
   frameMs: 300,                  // drawing one frame...
   drawFloorMs: 3_000,            // ...but never less than this for one request, so a slow start is not a false alarm
   soundCheckMs: 60_000,          // the quality bar on a sound effect
@@ -26,6 +30,22 @@ export const LIMITS = Object.freeze({
   cacheBytes: 96 * 1024 * 1024,  // pixels kept on the page for one made sprite, over all the settings it has been drawn at
   surfaceItems: 200_000,         // numbers, texts and lists in one frame drawn in an art style that is not a pixel grid
 });
+
+/**
+ * What the worker a made sprite runs in takes away before the source is read (app/sandbox-worker.js): every name
+ * by which a worker reaches the network, the site's storage, other workers, the page, files or devices. A browser
+ * that adds a new such name needs it added here; the content policy is what stops a call to another site even then.
+ */
+export const TAKEN = Object.freeze([
+  // the network
+  'fetch', 'XMLHttpRequest', 'WebSocket', 'WebSocketStream', 'EventSource', 'WebTransport', 'RTCPeerConnection', 'RTCDataChannel', 'importScripts', 'fetchLater',
+  // the site's storage, and other pages and workers of it
+  'indexedDB', 'caches', 'cookieStore', 'BroadcastChannel', 'MessageChannel', 'MessagePort', 'Worker', 'SharedWorker', 'ServiceWorkerRegistration', 'Notification', 'navigator', 'location', 'origin',
+  // the page: only this file answers it
+  'postMessage', 'onmessage', 'onmessageerror', 'close',
+  // files and devices
+  'FileReader', 'FileReaderSync', 'FileSystemHandle', 'FileSystemFileHandle', 'FileSystemDirectoryHandle', 'showOpenFilePicker', 'FontFace', 'fonts', 'OffscreenCanvas', 'createImageBitmap', 'ImageDecoder', 'VideoDecoder', 'AudioDecoder', 'WebAssembly',
+]);
 
 /** The refusal every action uses: { ok: false, ...extra, errors: [...] }. errors: one message or a list. */
 export const fail = (errors, extra = {}) => ({ ok: false, ...extra, errors: [].concat(errors) });

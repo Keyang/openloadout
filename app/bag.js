@@ -86,6 +86,8 @@ function cleanItem(raw) {
   const item = { kind: raw.kind, id: raw.id, settings: cleanSettings(raw.kind, raw.settings) };
   const definition = cleanDefinition(raw.kind, raw.definition);
   if (definition) item.definition = definition;
+  // where a made item came from, kept so the bag page can say whom to ask when it turns out broken
+  if (definition && raw.from === 'link') item.from = 'link';
   return item;
 }
 
@@ -301,7 +303,7 @@ export function createBag(storage, { now = () => Date.now(), standard = null } =
       const { list } = got;
       if (mode !== 'add') { state.items = []; state.theme = got.theme; }
       const t = now();
-      for (const it of list) put(it, t);
+      for (const it of list) put(it.definition ? { ...it, from: 'link' } : it, t);
       changed();
       return list.length;
     },

@@ -250,6 +250,8 @@ A run-time asset that fails the quality bar is kept as a draft: it can be render
 - Anything that comes from storage or from a link is treated as untrusted: it is re-checked by the quality bar in the worker before it is accepted, a link still asks first in plain words, and an item that fails is listed as "needs re-making" and nothing of it is drawn or exported.
 - The bag exports what it stored: a package is built from the bag item's own definition, and replacing a bagged asset with a failing draft is refused.
 - A failed save (storage full) is reported, never swallowed.
+- The quality bar never runs next to a made source (built in W5-B, round 2). The sprite's worker only loads and draws; the bar runs in the site's other worker, which never loads the source, on the frames; the frames it asks for are drawn by ordinary drawing requests, kept by settings, and are what the page shows at those settings. A download runs the bar again on exactly the frames it is about to write and leaves out a setting that fails (`refused`).
+- What remains (a risk to what a picture looks like, not to the machine): a setting the bar never sampled can draw anything on a page or in the playground, though not in a download, and a source can guess the sampling. The worker shares the site's origin, so its ways to the site's storage are closed by a removal list, not by a wall. Only Chromium has been verified; `docs/framework-api.md` says what to check in Firefox and Safari, and `tests/e2e/route2-browsers.spec.mjs` checks it in any installed browser.
 
 Every high-level action returns plain data (no DOM nodes, no class instances) and never throws for a bad asset: it returns `{ ok: false, errors: [...] }` with messages an agent can act on.
 

@@ -73,7 +73,15 @@ export const EMPTY = empty;
 /** Hangs the page it runs in, unless the address is a shared-bag link (so the link itself opens): the stored "brick". */
 export const BRICK = (id = 'rv-brick') => `if (!String(globalThis.location && globalThis.location.hash).includes('load=')) { const t = Date.now(); while (Date.now() - t < 1e9) {} }\n${goodSprite(id)}`;
 
-for (const [name, text] of Object.entries({ LOOP_IN_RENDER: LOOP_IN_RENDER(), LOOP_WHEN_BIG: LOOP_WHEN_BIG(), HUGE_FRAME: HUGE_FRAME(), MANY_FRAMES: MANY_FRAMES(), EVERY_WAY_OUT: EVERY_WAY_OUT() })) {
+// ---- forging the verdict (review round 2) ----
+/** Leaves frame 3 empty, except when it finds the quality bar on the call stack: it passed when the bar ran next to the source. */
+export const FORGE_BY_STACK = (id = 'rv-forge') => goodSprite(id).replace('render(g, { t, p }) {', "render(g, { t, p, frame }) {\n    if (frame === 3 && !String(new Error().stack).includes('quality/')) return;");
+/** Draws well everywhere the quality bar looks, and leaves frame 3 empty at one size nobody samples (0.375, between the steps of its slider). */
+export const FORGE_OFF_GRID = (id = 'rv-offgrid') => goodSprite(id).replace('render(g, { t, p }) {', 'render(g, { t, p, frame }) {\n    if (frame === 3 && Math.abs(p.size - 0.375) < 0.0001) return;');
+/** Draws well for its first 3000 frames (enough to be checked), then leaves frame 3 empty for good. */
+export const FORGE_BY_COUNT = (id = 'rv-count') => `let drawn = 0;\n${goodSprite(id).replace('render(g, { t, p }) {', 'render(g, { t, p, frame }) {\n    if (++drawn > 3000 && frame === 3) return;')}`;
+
+for (const [name, text] of Object.entries({ FORGE_BY_STACK: FORGE_BY_STACK(), FORGE_OFF_GRID: FORGE_OFF_GRID(), FORGE_BY_COUNT: FORGE_BY_COUNT().split('\n').slice(1).join('\n'), LOOP_IN_RENDER: LOOP_IN_RENDER(), LOOP_WHEN_BIG: LOOP_WHEN_BIG(), HUGE_FRAME: HUGE_FRAME(), MANY_FRAMES: MANY_FRAMES(), EVERY_WAY_OUT: EVERY_WAY_OUT() })) {
   if (text === goodSprite(text.match(/id: '([^']+)'/)[1])) throw new Error(`tests/fixtures/api/hostile.mjs: ${name} is the same as the good sprite; its replace() found nothing`);
 }
 if (!EVERY_WAY_OUT().includes('blurb: REPORT')) throw new Error('tests/fixtures/api/hostile.mjs: EVERY_WAY_OUT does not report');

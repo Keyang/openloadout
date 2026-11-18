@@ -74,6 +74,13 @@ export async function spriteFiles(sprite, p, cues, scale = 1, theme = null, styl
   const drawn = t ? themedParams(sprite, cleanParams(sprite, p), t) : p;
   // W5-B: a sprite made on a visit is drawn in a worker of its own; its frames at these settings are brought first (a catalogue sprite has no prepare)
   if (typeof sprite.prepare === 'function') await sprite.prepare(drawn, { style: style ?? undefined });
+  // W5-B: and what is about to be written of it is looked at first: the quality bar is run on exactly these frames
+  // (every frame of every clip at these settings), and the sheet below is made from those same frames. A setting
+  // that fails is not written (the error carries `refused` and the bar's own words in `reason`).
+  if (typeof sprite.judgeLook === 'function') {
+    const look = await sprite.judgeLook(drawn, { style: style ?? undefined });
+    if (!look.ok) throw Object.assign(new Error(`${sprite.name} does not pass the quality bar as it is set up here, so it was not made into files: ${look.errors[0]}`), { refused: true, reason: look.errors[0] });
+  }
   const made = await exportSheet(sprite, drawn, { style: style ?? undefined, scale, recolour: t ? (pixels) => applyColour(pixels, t.colour) : null, encodePng: pngBytes });
   const sheet = { meta: made.data };
   const files = [], wavs = new Map();
@@ -196,7 +203,9 @@ function unique(taken, base, ext = '') {
  * An item made on a visit (it carries `definition`, Contract 11) is packaged like any other; its source goes in next to it
  * (<id>.source.js for a sprite, <id>.source.json for a sound or a track) and the manifest marks it madeOnThisVisit.
  * It is packaged from its own definition: only when that definition has been checked again and is the one the site
- * draws under its id. Otherwise nothing of it goes in, and it is named under "needsRemaking".
+ * draws under its id. Otherwise nothing of it goes in, and it is named under "needsRemaking". A made sprite's frames
+ * at the item's settings are then put through the quality bar before they are written; one that fails there is left
+ * out and named under "refused" ([{ key, id, reason }]).
  * A sprite item whose settings name an art style (`artStyle`, Contract 12) is exported in that style, and its manifest
  * entry says `artStyle`; an entry without it is pixel. One that asks for a style its sprite does not list is left out
  * and named under "unsupported" (never quietly exported in another style).
@@ -205,7 +214,7 @@ function unique(taken, base, ext = '') {
 export async function packageFiles({ items, theme = null, scale = 1, catalog = null, onProgress = () => {} }) {
   const t = activeTheme(theme);
   const info = catalog ?? await catalogue();
-  const files = [], assets = [], missing = [], unsupported = [], needsRemaking = [];
+  const files = [], assets = [], missing = [], unsupported = [], needsRemaking = [], refused = [];
   const folders = new Set(), soundNames = new Set(), musicNames = new Set();
   let done = 0;
   if (items.some((i) => i.definition)) { onProgress('Checking what was made on a visit…'); await restoreRuntime(true); }
@@ -227,7 +236,15 @@ export async function packageFiles({ items, theme = null, scale = 1, catalog = n
       a.folder = `sprites/${folder}/`;
       const p = cleanParams(sprite, s.params ?? {});
       const cues = s.cues ?? defaultCues(sprite);
-      for (const f of await spriteFiles(sprite, p, cues, s.scale ?? scale, t, style)) {
+      let made;
+      // W5-B: a sprite made on a visit whose frames at these settings fail the quality bar is left out, and named with why
+      try { made = await spriteFiles(sprite, p, cues, s.scale ?? scale, t, style); } catch (e) {
+        if (!e || !e.refused) throw e;
+        folders.delete(folder);
+        refused.push({ key: item.key, id: item.id, reason: e.reason });
+        continue;
+      }
+      for (const f of made) {
         const name = `sprites/${folder}/${f.name}`;
         files.push({ name, data: f.data });
         a.files.push(name);
@@ -272,6 +289,7 @@ export async function packageFiles({ items, theme = null, scale = 1, catalog = n
   if (missing.length) manifest.missing = missing;
   if (unsupported.length) manifest.unsupported = unsupported;
   if (needsRemaking.length) manifest.needsRemaking = needsRemaking;
+  if (refused.length) manifest.refused = refused;
   files.push({ name: 'manifest.json', data: enc.encode(JSON.stringify(manifest, null, 2)) });
   files.push({ name: 'read-me.txt', data: enc.encode(packageGuide(manifest, !!t)) });
   return files;
@@ -283,7 +301,7 @@ function packageGuide(manifest, themed) {
   return `Your Loadout package
 
 This package holds ${manifest.assets.length} asset${manifest.assets.length === 1 ? '' : 's'}, each exactly as you set it up in your bag${themed ? ', with the bag\'s look applied to all of them so they match' : ''}.
-${manifest.missing ? `\nNot included (no longer on the site): ${manifest.missing.join(', ')}\n` : ''}${manifest.needsRemaking ? `\nNot included (made on a visit, and in need of re-making): ${manifest.needsRemaking.join(', ')}\n` : ''}${manifest.unsupported ? `\nNot included (asked for in a style it cannot be drawn in): ${manifest.unsupported.map((u) => `${u.id} (${u.artStyle})`).join(', ')}\n` : ''}
+${manifest.missing ? `\nNot included (no longer on the site): ${manifest.missing.join(', ')}\n` : ''}${manifest.refused ? `\nNot included (made on a visit, and not passing the quality bar as set up in the bag): ${manifest.refused.map((r) => r.id).join(', ')}\n` : ''}${manifest.needsRemaking ? `\nNot included (made on a visit, and in need of re-making): ${manifest.needsRemaking.join(', ')}\n` : ''}${manifest.unsupported ? `\nNot included (asked for in a style it cannot be drawn in): ${manifest.unsupported.map((u) => `${u.id} (${u.artStyle})`).join(', ')}\n` : ''}
 What is in it
 ${list}
 

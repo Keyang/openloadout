@@ -6,7 +6,8 @@
 //                             one-line description), plus the site's high-level actions as MCP tools
 //                             (name, description, inputSchema), copied from ACTIONS in app/api.js, plus the
 //                             styles a sprite can be drawn and exported in (id, label, about, exports), read
-//                             from the registry in engine/styles.js (Contract 12)
+//                             from the registry in engine/styles.js (Contract 12), plus the rigs that describe
+//                             themselves (poses, parts, held kinds, sockets), copied from rigs/<id>-describe.js (Contract 13)
 //   generated/framework.js    one module that re-exports every framework module under its short name; the site
 //                             loads it as window.loadout.framework
 //   generated/api.md          the same description as a page to read: every action, module and export in tables
@@ -259,11 +260,34 @@ function purposeOf(text) {
   return oneLine(head.join('\n'));
 }
 
+// ---- W7-A: rigs that describe themselves (Contract 13) --- start ---------------------------------------------
+// A framework module rigs/<id>-describe.js that exports RIG (plain data: poses, body, hair, parts, held kinds,
+// sockets, and what overlaps) is a rig's description. Each is copied into the `rigs` section, so an agent reads what
+// a rig can wear and hold from generated/api.json without loading code. tests/unit/rig-describe-*.test.mjs keep
+// every description true of the rig's code; tools/rig.mjs prints one as tables and draws its contact sheets.
+
+/** The rig descriptions among the loaded framework modules: [{ ...RIG, describedIn (its file), module (its name on loadout.framework) }]. modules: as buildApi() collects them, each with `real` (the module itself). */
+export function describedRigs(modules) {
+  return modules.filter((m) => /^rigs\/[\w-]+-describe\.js$/.test(m.file) && m.real?.RIG !== null && typeof m.real?.RIG === 'object')
+    .map((m) => ({ ...JSON.parse(JSON.stringify(m.real.RIG)), describedIn: m.file, module: m.name }));
+}
+
+/** The lines of the "Rigs" part of generated/api.md: one row per described rig, with what it has. api: as buildApi() returns it. */
+export function rigsMarkdown(api) {
+  if (!(api.rigs ?? []).length) return [];
+  const out = ['', '### Rigs', '', 'The body rigs that describe themselves (`rigs/<id>-describe.js`; in `generated/api.json` under `rigs`). `node tools/rig.mjs <id>` prints one in full; `--sheet` draws every part and held kind.', ''];
+  out.push('| Rig | View | Frame | Directions | What it has | Described in |', '|---|---|---|---|---|---|');
+  for (const r of api.rigs) out.push(`| \`${r.id}\` | ${r.view} | ${r.size.join(' x ')} | ${r.directions.join(', ')} | ${r.poses.length} poses, ${r.parts.length} parts, ${r.held.length} held kinds, ${r.hair.length} hair styles, ${r.sockets.length} sockets | \`${r.describedIn}\` |`);
+  return out;
+}
+// ---- W7-A --- end -----------------------------------------------------------------------------------------------
+
 // ---- the whole description ------------------------------------------------------------------------------------
 
 /**
- * Describe a project's framework: { version, window, modules: [{ name, file, purpose, exports }], styles, actions }.
+ * Describe a project's framework: { version, window, modules: [{ name, file, purpose, exports }], styles, rigs, actions }.
  * styles: what engine/styles.js has registered, [{ id, label, about, exports: ['sheet', ...] }] ([] in a project without it).
+ * rigs: the descriptions in rigs/<id>-describe.js, as describedRigs() returns them ([] in a project without any).
  * Every module is loaded for real, so what is listed is what exists. One that cannot be loaded is left out
  * and listed under `notLoaded` ([{ file, why }]), which is only there when there is one.
  */
@@ -283,6 +307,7 @@ export async function buildApi({ root = ROOT } = {}) {
       styles = real.styleIds().map((id) => { const s = real.styleById(id); return { id: s.id, label: s.label, about: s.about, exports: Object.keys(s.exporters) }; });
     }
   }
+  const rigs = describedRigs(modules);                                                     // W7-A: before `real` is dropped below
   // an export that is another module's export passed on (export { ramp } from '../engine/color.js') is described where it is defined
   const home = new Map();
   for (const m of modules) for (const e of m.exports) { const v = m.real[e.name]; if (e.description && (typeof v === 'function' || (v !== null && typeof v === 'object')) && !home.has(v)) home.set(v, { m, e }); }
@@ -295,10 +320,11 @@ export async function buildApi({ root = ROOT } = {}) {
   }
   return {
     version: API_VERSION,
-    about: 'Loadout\'s framework and actions (docs/architecture.md, Contract 11). modules: everything on window.loadout.framework, as loadout.framework.<module>.<export>. styles: the ways a sprite can be drawn and exported (Contract 12); a sprite\'s own list is in its catalogue row. actions: the high-level actions on window.loadout, as MCP tools; call one with loadout.<call>(...args) or loadout.call(name, input). Written by the build; see docs/framework-api.md.',
+    about: 'Loadout\'s framework and actions (docs/architecture.md, Contract 11). modules: everything on window.loadout.framework, as loadout.framework.<module>.<export>. styles: the ways a sprite can be drawn and exported (Contract 12); a sprite\'s own list is in its catalogue row. rigs: the body rigs that describe themselves, each with its poses, parts, held kinds and sockets (Contract 13). actions: the high-level actions on window.loadout, as MCP tools; call one with loadout.<call>(...args) or loadout.call(name, input). Written by the build; see docs/framework-api.md.',
     window: 'loadout',
     modules,
     styles,
+    rigs,                                                                                  // W7-A
     ...(notLoaded.length ? { notLoaded } : {}),
     actions: JSON.parse(JSON.stringify(ACTIONS)),
   };
@@ -335,6 +361,7 @@ export function referenceMarkdown(api) {
     out.push('| Style | Name on the site | What it looks like | Exports |', '|---|---|---|---|');
     for (const s of api.styles) out.push(`| ${code(s.id)} | ${cell(s.label)} | ${cell(s.about)} | ${cell(s.exports.join(', '))} |`);
   }
+  out.push(...rigsMarkdown(api));                                                          // W7-A
   out.push('', '### Framework modules', '');
   out.push('| Module | File | What it is |', '|---|---|---|');
   for (const m of api.modules) out.push(`| ${code(`loadout.framework.${m.name}`)} | ${code(m.file)} | ${cell(m.purpose)} |`);
