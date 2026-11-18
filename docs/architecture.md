@@ -78,7 +78,7 @@ Tilesets, backgrounds, interface pieces, projectiles and icons use the same `def
 |---|---|
 | Static prop or icon | One clip with `frames: 1` (give it a second animated clip when it makes sense: a chest has `closed` and `open`) |
 | Tileset | One clip per tile (`ground-top`, `ground-fill`, `ledge-left`, `ledge-right`, `wall`, ...), 16x16 or 32x32 frames. `meta.type: 'tileset'`. Tiles must join seamlessly with their neighbours. The checker works out which tiles sit next to which from the clip names (`-fill`, `-top`, `-left`, `-right`); `docs/style-guide.md` lists the exact names |
-| Background layer | A wide frame (for example 192x108) that tiles horizontally; clips are layers (`far`, `mid`, `near`) |
+| Background layer | A wide frame (320x180, see the style guide) that tiles horizontally; clips are layers (`far`, `mid`, `near`) |
 | Interface piece | Clips are states (`normal`, `hover`, `pressed`) |
 | Top-down character | Clips per direction: `idle_down`, `walk_down`, `walk_up`, `walk_side` (side faces right; games mirror it) |
 

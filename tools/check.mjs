@@ -14,7 +14,6 @@
 // catalog/schema.js's validateMeta when that file exists.
 import fs from 'node:fs';
 import path from 'node:path';
-import { pathToFileURL } from 'node:url';
 import { ROOT } from './lib/assets.mjs';
 import { runQuality, UnknownAsset } from './lib/quality-run.mjs';
 
@@ -33,15 +32,6 @@ try {
   throw e;
 }
 if (run.notice) say(`note: ${run.notice}`);
-
-// the gallery still lists sprites by hand in sprites/index.js; say when one is missing there
-if (!json && !ids.length && fs.existsSync(path.join(ROOT, 'sprites', 'index.js'))) {
-  try {
-    const { sprites } = await import(pathToFileURL(path.join(ROOT, 'sprites', 'index.js')).href);
-    const listed = new Set((sprites ?? []).map((s) => s.id));
-    for (const r of run.results) if (r.metrics?.looks && !listed.has(r.id)) say(`note: ${r.file} is not listed in sprites/index.js, so it will not show in the gallery`);
-  } catch { /* the gallery list is not this tool's concern */ }
-}
 
 for (const r of run.results) {
   const status = !r.ok ? 'FAIL' : r.warnings.length ? 'ok (warnings)' : 'ok';
