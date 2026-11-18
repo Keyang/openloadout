@@ -4,6 +4,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   stateFromQuery, queryFromState, hashFromState, sameState, filtersFor, createStyleMemory, pickResults, resultLine, standInCatalog, STYLE_KEY,
+  Q_MAX, shelfTitle, smartDownload, smartNote,
 } from '../../app/browse.js';
 import { matchesFilters } from '../../search/core.js';
 
@@ -42,7 +43,8 @@ test('values the site does not know are dropped, not passed on', () => {
   const s = stateFromQuery({ kind: 'banana', view: 'sideways', type: '<b>x</b>', role: '../etc', theme: 'Fantasy!', game: 'x y', bundle: 'a/b', q: 'ok' });
   assert.deepEqual(s, { ...stateFromQuery({}), q: 'ok' });
   assert.equal(stateFromQuery({ view: 'none' }).view, null, '"no view" is not a style to pick');
-  assert.equal(stateFromQuery({ q: 'x'.repeat(500) }).q.length, 120);
+  assert.equal(Q_MAX, 120);
+  assert.equal(stateFromQuery({ q: 'x'.repeat(500) }).q.length, Q_MAX, 'the page gives its search box the same limit');
   assert.equal(stateFromQuery({ role: 'characters' }).role, 'characters');
   assert.equal(stateFromQuery({ role: 'characters/player' }).role, 'characters/player');
 });
@@ -153,4 +155,61 @@ test('a stand-in catalogue is honoured only on a developer machine, and only for
   assert.equal(at('localhost', '?catalog=notes.txt'), null);
   assert.equal(at('localhost', ''), null);
   assert.equal(standInCatalog(null), null);
+});
+
+// ---- words on the page ----------------------------------------------------------------------------
+
+test('a long search is quoted short, so the line above the results stays readable', () => {
+  const none = stateFromQuery({});
+  const long = 'supercalifragilisticexpialidocious'.repeat(4);
+  const line = resultLine(0, { ...none, q: long });
+  assert.equal(line, `Nothing matches "${long.slice(0, 40)}…"`);
+  assert.equal(resultLine(2, { ...none, q: long }), `2 results for "${long.slice(0, 40)}…"`);
+  assert.equal(resultLine(2, { ...none, q: 'x'.repeat(40) }), `2 results for "${'x'.repeat(40)}"`, 'forty characters still fit');
+});
+
+test('the heading above the list only says "Everything" when it is everything', () => {
+  const none = stateFromQuery({});
+  assert.equal(shelfTitle(none), 'Everything');
+  assert.equal(shelfTitle({ ...none, view: 'side' }), 'Everything that fits your game', 'a remembered style hides some assets');
+  assert.equal(shelfTitle({ ...none, gameTypes: 'platformer' }), 'Everything that fits your game');
+  assert.equal(shelfTitle({ ...none, q: 'coin' }), 'Results');
+  assert.equal(shelfTitle({ ...none, kind: 'sound', view: 'side' }), 'Results');
+  assert.equal(shelfTitle({ ...none, q: '   ' }), 'Everything');
+});
+
+// ---- smarter search: how big the download is, and what the page says about it ------------------------
+
+const manifest = {
+  model: 'Some/model', meaning: true, bytes: 40_000_000,
+  files: [
+    { to: 'sqlite/index.mjs', bytes: 600_000 }, { to: 'sqlite/sqlite3.wasm', bytes: 900_000 },
+    { to: 'transformers/transformers.min.js', bytes: 600_000 }, { to: 'ort/ort.mjs', bytes: 20_000 }, { to: 'ort/ort.wasm', bytes: 14_300_000 },
+    { to: 'models/Some/model/config.json', bytes: 700 }, { to: 'models/Some/model/onnx/model_quantized.onnx', bytes: 23_000_000 },
+  ],
+};
+
+test('the size of the smarter-search download comes from the vendor list, without what every visitor already gets', () => {
+  const d = smartDownload(manifest, 'vendor/');
+  assert.equal(d.bytes, 600_000 + 20_000 + 14_300_000 + 700 + 23_000_000);
+  assert.deepEqual(d.files.map((f) => f.url), [
+    'vendor/transformers/transformers.min.js', 'vendor/ort/ort.mjs', 'vendor/ort/ort.wasm', 'vendor/models/Some/model/config.json', 'vendor/models/Some/model/onnx/model_quantized.onnx',
+  ]);
+  // a copy of the site built without the model has nothing to offer
+  assert.deepEqual(smartDownload({ model: null, meaning: false, files: manifest.files.slice(0, 2) }, 'vendor/'), { bytes: 0, files: [] });
+  assert.deepEqual(smartDownload(null, 'vendor/'), { bytes: 0, files: [] });
+  assert.deepEqual(smartDownload({ files: 'nonsense' }, 'vendor/'), { bytes: 0, files: [] });
+});
+
+test('the line under the switch: the size before, how much has arrived during, and plain words after', () => {
+  const bytes = 37_920_700;
+  assert.equal(smartNote({ state: 'off', bytes, got: 0 }), 'Understands descriptions like "something for when the player dies". Downloads about 38 MB once.');
+  assert.equal(smartNote({ state: 'off', bytes: 0, got: 0 }), 'Understands descriptions like "something for when the player dies".', 'no number is made up');
+  assert.equal(smartNote({ state: 'loading', bytes, got: 0 }), 'Downloading: 0 of 38 MB');
+  assert.equal(smartNote({ state: 'loading', bytes, got: 12_400_000 }), 'Downloading: 12 of 38 MB');
+  assert.equal(smartNote({ state: 'loading', bytes, got: bytes }), 'Getting smarter search ready…');
+  assert.equal(smartNote({ state: 'loading', bytes: 0, got: 0 }), 'Getting smarter search ready…');
+  assert.equal(smartNote({ state: 'ready', bytes, got: bytes }), 'On. Describe what you need in your own words.');
+  assert.equal(smartNote({ state: 'failed', bytes, got: 3 }), 'Smarter search could not be loaded, so it is switched off. Normal search still works.');
+  for (const state of ['off', 'loading', 'ready', 'failed']) assert.doesNotMatch(smartNote({ state, bytes, got: 1 }), /model|index|query|vendor/i);
 });

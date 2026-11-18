@@ -7,6 +7,7 @@ import { loadSounds, soundById, stopAll, isMusic } from './audio.js';
 import { homePage, browsePage, bundlesPage } from './home.js';
 import { kitAddress } from './kit-page.js';
 import { standInCatalog, configureSearch } from './browse.js';
+import './api.js';      // W5-A: installs window.loadout (Contract 11); loads nothing else until it is used
 
 const app = document.getElementById('app');
 let teardown = () => {};
@@ -29,6 +30,8 @@ const waiting = () => app.replaceChildren(el('main', { class: 'home' }, el('p', 
 
 // Pages that are loaded only when visited. The page function returns its teardown, or a promise of it.
 // open(module, still): still() is false once the visitor has moved on; a page that waits for something checks it before drawing.
+// W2-G: a page that waits inside itself (bag, bundle, playground) is handed still() as its last argument, to check before it draws;
+// still() stays right for the page's whole life (it turns false when the page is left, also after it has opened).
 function lazyPage(file, open, what) {
   const mine = Symbol('visit');
   lazyPage.current = mine;
@@ -37,7 +40,7 @@ function lazyPage(file, open, what) {
   import(file).then(async (m) => {
     if (!still()) return;                      // left before the page's code arrived: do not draw over where they went
     const stop = await open(m, still);
-    if (lazyPage.current === mine) teardown = stop || (() => {}); else if (stop) stop();   // the visitor already left
+    if (lazyPage.current === mine) teardown = () => { lazyPage.current = null; if (stop) stop(); }; else if (stop) stop();   // the visitor already left
   }).catch((e) => { console.error(e); if (lazyPage.current === mine) teardown = notFound(what); });
 }
 
@@ -84,25 +87,20 @@ function route() {
     else if (isMusic(soundById[b])) lazyPage('./music-page.js', (m) => m.musicPage(app, soundById[b], query), 'track');
     else lazyPage('./sound-page.js', (m) => m.soundPage(app, soundById[b], query), 'sound');
   }
-  else if (a === 'bag') lazyPage('./bag-page.js', (m) => m.bagPage(app, query), 'bag');
-  else if (a === 'bundle') lazyPage('./bundle-page.js', (m) => m.bundlePage(app, b, query), 'bundle page');
-  else if (a === 'play') lazyPage('./play-page.js', (m) => m.playPage(app, query), 'playground');
+  else if (a === 'bag') lazyPage('./bag-page.js', (m, still) => m.bagPage(app, query, still), 'bag');
+  else if (a === 'bundle') lazyPage('./bundle-page.js', (m, still) => m.bundlePage(app, b, query, still), 'bundle page');
+  else if (a === 'play') lazyPage('./play-page.js', (m, still) => m.playPage(app, query, still), 'playground');
   else if (kindOf(a) === 'sprite' && !b) openSprite(a, query);      // links from before sounds were added
   else teardown = notFound('page');
 }
 
 waiting();
-// Test-only: on a developer's machine "?catalog=<file>.json" swaps in a stand-in catalogue (see standInCatalog).
-// app/catalog.js reads one fixed address, so its request is pointed at the stand-in for this one call.
+// ==== W2-G: the catalogue's address ====
+// Test-only: on a developer's machine "?catalog=<file>.json" swaps in a stand-in catalogue (standInCatalog: localhost only).
 const standIn = standInCatalog();
-let catalogue;
-if (standIn) {
-  const real = window.fetch;
-  window.fetch = (url, ...rest) => real(url === 'generated/catalog.json' ? standIn : url, ...rest);
-  catalogue = loadCatalog();
-  window.fetch = real;
-  configureSearch({ dbUrl: new URL('generated/search.sqlite', new URL(standIn, location.href)).href });
-} else catalogue = loadCatalog();
+if (standIn) configureSearch({ dbUrl: new URL('generated/search.sqlite', new URL(standIn, location.href)).href });
+const catalogue = loadCatalog(standIn);      // nothing named: the usual generated/catalog.json
+// ==== end W2-G ====
 
 try {
   await catalogue;
@@ -111,9 +109,10 @@ try {
   // fetch the sound library in a quiet moment, so the first asset page opens at once
   if (window.requestIdleCallback) window.requestIdleCallback(() => sounds()); else setTimeout(sounds, 400);
 } catch (e) {
-  console.error(e);
+  // For whoever runs the site: the catalogue (generated/catalog.json) is written by "npm run build". A visitor cannot fix that, so the page does not ask them to.
+  console.error('Loadout could not start: the catalogue did not load. If this is your copy of the site, run "npm run build" and publish the generated/ folder.', e);
   app.replaceChildren(el('main', { class: 'home' },
-    el('h1', { class: 'small' }, 'The library has not been built yet'),
-    el('p', { class: 'lede' }, 'This copy of Loadout is missing its catalogue, the list of every sprite, sound and track (generated/catalog.json).'),
-    el('p', { class: 'lede' }, 'In the project folder, run "npm run build", then reload this page.')));
+    el('h1', { class: 'small' }, 'Something went wrong'),
+    el('p', { class: 'lede' }, 'This page could not load its list of assets. Please try again later.'),
+    el('p', {}, el('button', { type: 'button', class: 'btn', onclick: () => location.reload() }, 'Try again'))));
 }

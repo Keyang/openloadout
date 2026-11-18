@@ -81,7 +81,7 @@ test('vendorAll({ meaning: false }) copies SQLite only: no model, no model runne
   try {
     const r = await vendorAll({ root, meaning: false });
     assert.equal(r.dest, path.join(root, 'vendor'));
-    assert.deepEqual(fs.readdirSync(path.join(root, 'vendor')).sort(), ['manifest.json', 'sqlite']);
+    assert.deepEqual(fs.readdirSync(path.join(root, 'vendor')).sort(), ['fonts', 'manifest.json', 'sqlite']);      // fonts: the site's typefaces, always copied
     assert.ok(r.bytes < 2_000_000, `${r.bytes} bytes`);
     const manifest = JSON.parse(fs.readFileSync(path.join(root, 'vendor', 'manifest.json'), 'utf8'));
     assert.equal(manifest.meaning, false);

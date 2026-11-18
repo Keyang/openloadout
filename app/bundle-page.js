@@ -270,10 +270,14 @@ function musicTile(row, patch) {
 
 // ---- the page --------------------------------------------------------------------------------
 
-export async function bundlePage(app, id, query = {}) {
+// still(): handed over by the router (lazyPage in app.js); false once the visitor has gone elsewhere.
+// It is checked after every wait, so a bundle page that finishes loading late never draws over the page they went to.
+export async function bundlePage(app, id, query = {}, still = () => true) {
   try { await loadCatalog(); } catch (e) {
+    if (!still()) return null;
     return notHere(app, 'The catalogue is not built yet', 'This page needs the catalogue file. Run "npm run build", then reload.');
   }
+  if (!still()) return null;
   const bundle = bundleById(id);
   if (!bundle) return notHere(app, 'That bundle is not here', 'The link may be old or mistyped. Everything that exists is on the front page.');
   document.title = `${bundle.name} · Loadout`;
@@ -290,6 +294,7 @@ export async function bundlePage(app, id, query = {}) {
     if (row.kind === 'sprite') tiles.push(spriteTile(row, page));
     else {
       const patch = soundById[row.id] ?? await loadSound(row.id).catch(() => null);
+      if (!still()) { queue.stop(); for (const t of tiles) if (t.stop) t.stop(); return null; }
       if (!patch) continue;
       tiles.push(row.kind === 'music' ? musicTile(row, patch) : soundTile(row, patch, queue));
     }

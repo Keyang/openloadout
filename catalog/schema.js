@@ -14,12 +14,12 @@ export const TYPE_LABELS = {
   character: 'Character',
   creature: 'Creature',
   tileset: 'Tiles',
-  prop: 'Prop',
+  prop: 'Object',
   pickup: 'Pickup',
   projectile: 'Projectile',
   effect: 'Effect',
   background: 'Background',
-  ui: 'Interface',
+  ui: 'Menus and screens',
   icon: 'Icon',
   // audio
   sfx: 'Sound effect',
@@ -39,10 +39,10 @@ export const ROLE_TREE = {
   characters: { label: 'Characters', sprite: ['player', 'enemy', 'boss', 'npc', 'animal'], sound: ['footstep', 'voice', 'hurt', 'death'] },
   actions: { label: 'Actions', sprite: [], sound: ['swing', 'hit', 'jump', 'land', 'dash', 'shoot', 'cast'] },
   items: { label: 'Items and pickups', sprite: ['pickup', 'weapon', 'key', 'food', 'icon'], sound: ['pickup', 'equip', 'consume', 'drop'] },
-  world: { label: 'World', sprite: ['tile', 'prop', 'platform', 'hazard', 'door', 'building', 'crop'], sound: ['door', 'chest', 'lever', 'break', 'machine'] },
+  world: { label: 'Places and things', sprite: ['tile', 'prop', 'platform', 'hazard', 'door', 'building', 'crop'], sound: ['door', 'chest', 'lever', 'break', 'machine'] },
   effects: { label: 'Effects', sprite: ['explosion', 'spark', 'dust', 'magic', 'weather', 'projectile'], sound: ['explosion', 'magic', 'impact'] },
   environment: { label: 'Environment', sprite: ['background', 'lighting'], sound: ['ambience', 'weather'] },
-  interface: { label: 'Interface', sprite: ['button', 'panel', 'bar', 'cursor', 'icon'], sound: ['click', 'hover', 'confirm', 'error', 'reward'] },
+  interface: { label: 'Menus and screens', sprite: ['button', 'panel', 'bar', 'cursor', 'icon'], sound: ['click', 'hover', 'confirm', 'error', 'reward'] },
   music: { label: 'Music', sprite: [], sound: ['menu', 'exploration', 'battle', 'boss', 'shop', 'victory', 'gameover'] },
 };
 export const ROLE_TOPS = Object.keys(ROLE_TREE);
@@ -53,7 +53,7 @@ export const MUSIC_ROLES = SOUND_ROLES.filter((r) => r.startsWith('music/'));
 // Everyday names for the leaves (the ones that are not just the id with a capital letter).
 const ROLE_LEAF_LABELS = {
   npc: 'Townsfolk', gameover: 'Game over', footstep: 'Footsteps', ambience: 'Background loops', tile: 'Tiles', crop: 'Crops',
-  building: 'Buildings', prop: 'Props', door: 'Doors', key: 'Keys', icon: 'Icons', pickup: 'Pickups', weapon: 'Weapons', button: 'Buttons',
+  building: 'Buildings', prop: 'Objects', door: 'Doors', key: 'Keys', icon: 'Icons', pickup: 'Pickups', weapon: 'Weapons', button: 'Buttons',
   panel: 'Panels', bar: 'Bars', cursor: 'Cursors', platform: 'Platforms', hazard: 'Hazards', background: 'Backgrounds', enemy: 'Enemies',
   boss: 'Bosses', animal: 'Animals', spark: 'Sparks', explosion: 'Explosions', projectile: 'Projectiles', click: 'Clicks', machine: 'Machines',
 };

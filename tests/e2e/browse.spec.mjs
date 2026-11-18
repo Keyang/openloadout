@@ -13,7 +13,7 @@ const GENERATED = path.join(ROOT, 'generated');
 const STAND_IN_SRC = path.join(ROOT, 'tests', 'fixtures', 'search', 'catalog.json');
 const STAND_IN_DIR = path.join(ROOT, 'tests', 'fixtures', 'browse');
 const STAND_IN = 'tests/fixtures/browse/catalog.json';
-let CATALOG = null, BIG = null;
+let CATALOG = null, BIG = null, SMART_MB = 0;
 
 /** Write a file in one step, so two test workers preparing it at once never read half of it. */
 function writeOnce(file, make) {
@@ -29,6 +29,9 @@ test.beforeAll(async () => {
     execFileSync('node', ['tools/build.mjs', '--skip-quality'], { cwd: ROOT, stdio: 'ignore' });
   }
   CATALOG = JSON.parse(fs.readFileSync(path.join(GENERATED, 'catalog.json'), 'utf8'));
+  // what switching smarter search on downloads, as the build's own list of vendor files states it
+  const vendor = JSON.parse(fs.readFileSync(path.join(ROOT, 'vendor', 'manifest.json'), 'utf8'));
+  SMART_MB = Math.round(vendor.files.filter((f) => /^(transformers|ort|models)\//.test(f.to)).reduce((n, f) => n + f.bytes, 0) / 1e6);
   // the 490-entry stand-in catalogue (no art exists for it) and a keyword search file for it
   BIG = JSON.parse(fs.readFileSync(STAND_IN_SRC, 'utf8'));
   await writeOnce(path.join(STAND_IN_DIR, 'catalog.json'), (tmp) => fs.copyFileSync(STAND_IN_SRC, tmp));
@@ -91,12 +94,17 @@ test('home shows the search first, then game kits, then everything', async ({ pa
   expect(await results(page).count()).toBeGreaterThanOrEqual(1);
 });
 
-plain('a missing catalogue is explained in plain words', async ({ page }) => {
+plain('a site that cannot load its list of assets says so to the visitor, in plain words', async ({ page }) => {
   await quietNetwork(page);
   await page.route('**/generated/catalog.json', (r) => r.fulfill({ status: 404, contentType: 'text/plain', body: 'not found' }));
+  const said = [];
+  page.on('console', (m) => said.push(m.text()));
   await page.goto('/index.html#/');
-  await expect(page.locator('main')).toContainText('npm run build');
-  await expect(page.locator('main')).toContainText(/has not been built/i);
+  // the page speaks to a visitor; the hint for whoever runs the site is in the console only
+  await expect(page.locator('main')).toContainText('This page could not load its list of assets. Please try again later.');
+  await expect(page.locator('main')).not.toContainText(/npm|build|catalog/i);
+  await expect(page.getByRole('button', { name: 'Try again' })).toBeVisible();
+  expect(said.some((t) => t.includes('npm run build'))).toBe(true);
 });
 
 // ---- search ------------------------------------------------------------------------------
@@ -137,6 +145,83 @@ test('when nothing matches the page says so and what to try; junk input is handl
   await expect(box(page)).toHaveValue('');
   await expect(results(page)).toHaveCount(all);
   await expect(page.locator('.empty')).toBeHidden();
+});
+
+test('the search box takes exactly as much as is searched: 120 characters, typed, pasted or put in', async ({ page }) => {
+  await openRoute(page, '/browse');
+  const search = box(page);
+  await expect(search).toHaveAttribute('maxlength', '120');
+  const long = 'sword '.repeat(50);                     // 300 characters
+  await search.fill(long);                              // put in all at once
+  await expect(search).toHaveValue(long.slice(0, 120));
+  const typedQ = () => page.evaluate(() => new URLSearchParams(location.hash.split('?')[1] || '').get('q'));
+  await expect.poll(typedQ).toBe(long.slice(0, 120));     // the address holds the same 120 characters
+  expect((await resultIds(page))).toContain('sword-slash');
+  const before = await resultIds(page);
+
+  // a reload shows the same text and the same results: nothing was dropped out of sight
+  await page.reload();
+  await waitForDrawn(page);
+  await expect(box(page)).toHaveValue(long.slice(0, 120));
+  await expect.poll(() => resultIds(page)).toEqual(before);
+
+  // typing past the limit goes nowhere
+  await box(page).fill('');
+  await box(page).pressSequentially('z'.repeat(125));
+  await expect(box(page)).toHaveValue('z'.repeat(120));
+  // a link with a longer search is cut to the same length, and the box shows what is searched
+  await openRoute(page, `/browse?q=${'coin '.repeat(40).trim().replace(/ /g, '+')}`);
+  expect((await box(page).inputValue()).length).toBe(120);
+  expect(await resultIds(page)).toContain('coin');
+});
+
+test('Back from a search started on the front page returns to the front page as it was', async ({ page }) => {
+  await openRoute(page, '/bundles');
+  await page.locator('a.brand').click();
+  await waitForDrawn(page);
+  const all = await results(page).count();
+  await expect(page.getByRole('heading', { name: 'Start from a kind of game' })).toBeVisible();
+
+  await box(page).pressSequentially('fire', { delay: 10 });
+  await expect.poll(() => hash(page)).toBe('#/browse?q=fire');
+  await option(page, 'Kind', 'Sounds').click();
+  await expect.poll(() => hash(page)).toBe('#/browse?q=fire&kind=sound');
+  await expect(page.getByRole('heading', { name: 'Start from a kind of game' })).toBeHidden();
+
+  await page.goBack();                                   // one step back, however much was typed and filtered
+  await expect.poll(() => hash(page)).toBe('#/');
+  await waitForDrawn(page);
+  await expect(box(page)).toHaveValue('');
+  await expect(page.getByRole('heading', { name: 'Start from a kind of game' })).toBeVisible();
+  await expect(results(page)).toHaveCount(all);
+  await expect(page.locator('.chips .chip')).toHaveCount(0);
+
+  await page.goBack();                                   // and the page before the front page is still there
+  await expect.poll(() => hash(page)).toBe('#/bundles');
+  await page.goForward();
+  await page.goForward();                                // forward again: the search, on the results page
+  await expect.poll(() => hash(page)).toBe('#/browse?q=fire&kind=sound');
+  await waitForDrawn(page);
+  await expect(box(page)).toHaveValue('fire');
+  await expect(option(page, 'Kind', 'Sounds')).toHaveAttribute('aria-pressed', 'true');
+});
+
+test('a keyboard user can skip the choices and go straight to the results', async ({ page }) => {
+  await openRoute(page, '/browse');
+  const skip = page.getByRole('button', { name: 'Skip to results' });
+  await box(page).focus();
+  // after the search box and its switch, the next stop is the skip link, before any filter choice
+  await page.keyboard.press('Tab');
+  await expect(page.getByRole('switch', { name: 'Smarter search' })).toBeFocused();
+  await page.keyboard.press('Tab');
+  await expect(skip).toBeFocused();
+  await expect(skip).toBeInViewport();
+  const firstChoice = await option(page, 'Kind', 'Sprites').boundingBox();
+  expect((await skip.boundingBox()).y).toBeLessThan(firstChoice.y);
+  await page.keyboard.press('Enter');
+  const inResults = await page.evaluate(() => !!document.activeElement.closest('ul.results'));
+  expect(inResults).toBe(true);
+  await expect(page.locator('ul.results > li').first().locator('a, button').first()).toBeFocused();
 });
 
 // ---- filters -----------------------------------------------------------------------------
@@ -230,9 +315,21 @@ test('a style chosen on the home page stays after visiting a sprite page, and ca
   const notSide = CATALOG.assets.filter((a) => a.kind === 'sprite' && a.view !== 'side' && a.view !== 'none');
   expect(notSide.length, 'the catalogue has a sprite that is not side view').toBeGreaterThanOrEqual(1);
 
+  // the number next to a view is the number of results choosing it gives: its sprites and everything that has no view
+  await expect(group(page, 'View')).toContainText('Sounds and music have no view, so they always stay.');
+  const promised = {};
+  for (const label of ['Side view', 'Front view']) promised[label] = await countOf(option(page, 'View', label));
+  expect(promised['Side view']).toBe(all - notSide.length);
+  await option(page, 'View', 'Front view').click();
+  await expect(results(page)).toHaveCount(promised['Front view']);
+  expect(await countOf(option(page, 'View', 'Front view'))).toBe(promised['Front view']);
   await option(page, 'View', 'Side view').click();
-  await expect(results(page)).toHaveCount(all - notSide.length);
+  await expect(results(page)).toHaveCount(promised['Side view']);
+  expect(await countOf(option(page, 'View', 'Side view'))).toBe(promised['Side view']);
   await expect(chip(page, 'Side view')).toBeVisible();
+  // a remembered style hides some assets, so the heading no longer says "Everything"
+  await expect(page.getByRole('heading', { name: 'Everything that fits your game' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Everything', exact: true })).toHaveCount(0);
   // sounds have no view, so they stay
   expect((await resultIds(page))).toContain('coin-pickup');
   expect((await resultIds(page))).not.toContain(notSide[0].id);
@@ -261,6 +358,22 @@ test('a style chosen on the home page stays after visiting a sprite page, and ca
   await openRoute(page, '/');
   await expect(results(page)).toHaveCount(all);
   await expect(page.locator('.chips .chip')).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: 'Everything', exact: true })).toBeVisible();
+});
+
+test('the numbers next to the views follow a search and the other filters', async ({ page }) => {
+  await openRoute(page, '/browse?q=coin');
+  const views = group(page, 'View').locator('.fopt');
+  expect(await views.count()).toBeGreaterThanOrEqual(1);
+  for (const label of await views.locator('.fl').allTextContents()) {
+    const promised = await countOf(option(page, 'View', label));
+    await option(page, 'View', label).click();
+    await expect(results(page), label).toHaveCount(promised);
+    await option(page, 'View', label).click();
+  }
+  // with only sounds showing no view is on offer: nothing a view could narrow
+  await option(page, 'Kind', 'Sounds').click();
+  await expect(group(page, 'View')).toHaveCount(0);
 });
 
 test('a game type is kept the same way', async ({ page }) => {
@@ -409,7 +522,7 @@ plain('smarter search is off until asked for, then loads, and the choice is reme
   const sw = page.getByRole('switch', { name: 'Smarter search' });
   await expect(sw).toBeVisible();
   await expect(sw).not.toBeChecked();
-  await expect(page.locator('.smart')).toContainText('38 MB');
+  await expect(page.locator('.smart-note')).toHaveText(`Understands descriptions like "something for when the player dies". Downloads about ${SMART_MB} MB once.`);
   await box(page).fill(description);
   await expect.poll(() => results(page).count()).toBeGreaterThanOrEqual(1);
   await box(page).fill('coin');
@@ -417,11 +530,20 @@ plain('smarter search is off until asked for, then loads, and the choice is reme
   await page.waitForLoadState('networkidle');
   expect(heavy(), 'nothing big is downloaded while the switch is off').toEqual([]);
 
+  // while it downloads the line says how much has arrived
+  await page.locator('.smart-note').evaluate((note) => { window.__notes = []; new MutationObserver(() => window.__notes.push(note.textContent)).observe(note, { childList: true, characterData: true, subtree: true }); });
   await sw.click();
   await expect(sw).toBeChecked();
   await expect.poll(() => heavy().some((p) => p.startsWith('/vendor/ort/')), { timeout: 120_000 }).toBe(true);
   await expect.poll(() => heavy().some((p) => p.startsWith('/vendor/models/')), { timeout: 120_000 }).toBe(true);
   await expect(page.locator('.smart')).toHaveAttribute('data-state', 'ready', { timeout: 240_000 });
+  const notes = await page.evaluate(() => window.__notes);
+  const progress = notes.map((t) => /^Downloading: (\d+) of (\d+) MB$/.exec(t)).filter(Boolean);
+  expect(progress.length, `progress lines among: ${notes.join(' | ')}`).toBeGreaterThanOrEqual(2);
+  for (const m of progress) { expect(Number(m[2])).toBe(SMART_MB); expect(Number(m[1])).toBeLessThanOrEqual(SMART_MB); }
+  expect(progress.map((m) => Number(m[1]))).toEqual(progress.map((m) => Number(m[1])).sort((a, b) => a - b));       // it only goes up
+  expect(notes).toContain('Getting smarter search ready…');
+  await expect(page.locator('.smart-note')).toHaveText('On. Describe what you need in your own words.');
   await box(page).fill(description);
   await expect.poll(() => results(page).count()).toBeGreaterThanOrEqual(1);
   // typing still answers
@@ -439,7 +561,7 @@ plain('smarter search is off until asked for, then loads, and the choice is reme
   await page.getByRole('switch', { name: 'Smarter search' }).click();
   await expect(page.getByRole('switch', { name: 'Smarter search' })).not.toBeChecked();
   await expect(page.locator('.smart')).toHaveAttribute('data-state', 'off');
-  await expect(page.locator('.smart')).toContainText('38 MB');
+  await expect(page.locator('.smart')).toContainText(`${SMART_MB} MB`);
   await page.waitForLoadState('networkidle');
   await page.reload();
   await waitForDrawn(page);
@@ -452,17 +574,31 @@ plain('smarter search is off until asked for, then loads, and the choice is reme
   expect(errors, 'the page should log no errors').toEqual([]);
 });
 
-plain('if smarter search cannot load, the page says so in one line and normal search carries on', async ({ page }) => {
+plain('if smarter search cannot load, the page says so in one line, switches it back off, and normal search carries on', async ({ page }) => {
   plain.setTimeout(120_000);
   await quietNetwork(page);
   await page.route('**/vendor/models/**', (r) => r.fulfill({ status: 404, contentType: 'text/plain', body: 'not found' }));
   await page.goto('/index.html#/');
   await waitForDrawn(page);
-  await page.getByRole('switch', { name: 'Smarter search' }).click();
+  const sw = page.getByRole('switch', { name: 'Smarter search' });
+  await sw.click();
   await expect(page.locator('.smart')).toHaveAttribute('data-state', 'failed', { timeout: 90_000 });
-  await expect(page.locator('.smart-note')).toContainText(/could not/i);
+  await expect(page.locator('.smart-note')).toHaveText('Smarter search could not be loaded, so it is switched off. Normal search still works.');
+  await expect(sw).not.toBeChecked();
   await box(page).fill('money');
   await expect.poll(async () => (await page.locator('ul.results > li').evaluateAll((lis) => lis.map((li) => li.dataset.id))).slice(0, 4)).toContain('coin');
+
+  // it is not tried again on the next visit
+  const asked = [];
+  page.on('request', (r) => asked.push(pathOf(r.url())));
+  await page.reload();
+  await waitForDrawn(page);
+  await expect(page.getByRole('switch', { name: 'Smarter search' })).not.toBeChecked();
+  await expect(page.locator('.smart')).toHaveAttribute('data-state', 'off');
+  await box(page).fill('money');
+  await expect.poll(async () => (await page.locator('ul.results > li').evaluateAll((lis) => lis.map((li) => li.dataset.id))).slice(0, 4)).toContain('coin');
+  await page.waitForTimeout(500);
+  expect(asked.filter((p) => p.startsWith('/vendor/models/') || p.startsWith('/vendor/ort/') || p.startsWith('/vendor/transformers/'))).toEqual([]);
 });
 
 // ---- scale -------------------------------------------------------------------------------
@@ -531,7 +667,7 @@ test.describe('phone width', () => {
     const all = await results(page).count();
 
     // filters are tucked behind one button
-    const toggle = page.getByRole('button', { name: /^Filters/ });
+    const toggle = page.getByRole('button', { name: /^Narrow down/ });
     await expect(toggle).toBeVisible();
     await expect(toggle).toHaveAttribute('aria-expanded', 'false');
     await expect(group(page, 'Kind')).toBeHidden();
@@ -560,6 +696,23 @@ test.describe('phone width', () => {
     const boxes = await page.locator('ul.results > li').evaluateAll((lis) => lis.slice(0, 2).map((li) => { const r = li.getBoundingClientRect(); return [r.left, r.right, r.top]; }));
     expect(boxes[0][2]).toBe(boxes[1][2]);
     expect(boxes[1][1]).toBeLessThanOrEqual(375);
+  });
+
+  test('a long run of text with no spaces does not push the page sideways', async ({ page }) => {
+    await openRoute(page, '/');
+    const long = 'supercalifragilisticexpialidocious'.repeat(9);       // 306 characters, no spaces
+    await box(page).fill(long);
+    await expect(line(page)).toContainText('Nothing matches');
+    await expect(line(page)).toHaveText(`Nothing matches "${long.slice(0, 40)}…"`);
+    expect(await hasHorizontalScroll(page)).toBe(false);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(375);
+    // the same when it does match something and a filter is on
+    await box(page).fill('coin' + 'x'.repeat(100));
+    await page.getByRole('button', { name: /^Narrow down/ }).click();
+    expect(await hasHorizontalScroll(page)).toBe(false);
+    await openRoute(page, `/browse?q=${'w'.repeat(120)}&kind=sound&view=side`);
+    await expect(line(page)).toContainText('Nothing matches');
+    expect(await hasHorizontalScroll(page)).toBe(false);
   });
 
   test('the list of bundles has no sideways scroll', async ({ page }) => {

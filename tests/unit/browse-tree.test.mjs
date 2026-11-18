@@ -1,8 +1,9 @@
 // Finding things (W2-A): turning the counts from the search library into the filter lists the page shows.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { roleTree, optionsFor, activeFilters, stateFromQuery, FILTER_GROUPS } from '../../app/browse.js';
-import { countFacets } from '../../search/core.js';
+import { roleTree, optionsFor, activeFilters, stateFromQuery, filtersFor, viewCounts, FILTER_GROUPS } from '../../app/browse.js';
+import { countFacets, matchesFilters } from '../../search/core.js';
+import { labelFor } from '../../catalog/schema.js';
 
 const assets = [
   { id: 'knight', kind: 'sprite', type: 'character', role: 'characters/player', themes: ['fantasy'], gameTypes: ['platformer'], view: 'side', bundles: ['starter'] },
@@ -19,7 +20,7 @@ const counts = (filters = {}) => countFacets(assets, filters);
 test('roles are grouped under the shared top levels, in the taxonomy order', () => {
   const tree = roleTree(counts().role);
   assert.deepEqual(tree.map((t) => [t.id, t.label, t.count]), [
-    ['characters', 'Characters', 4], ['items', 'Items and pickups', 2], ['interface', 'Interface', 1], ['music', 'Music', 1],
+    ['characters', 'Characters', 4], ['items', 'Items and pickups', 2], ['interface', 'Menus and screens', 1], ['music', 'Music', 1],
   ]);
   // a sprite role and a sound role sit under the same top level
   assert.deepEqual(tree[0].children.map((c) => [c.id, c.label, c.count]), [
@@ -92,5 +93,46 @@ test('the chosen filters as chips: style choices first, each with a plain label'
     ['kind', 'Sounds', false], ['role', 'Items and pickups: Pickups', false], ['type', 'Sound effect', false], ['themes', 'Farm', false], ['bundle', 'Starter kit', false],
   ]);
   assert.deepEqual(activeFilters(stateFromQuery('q=coin')), []);
-  assert.equal(activeFilters(stateFromQuery('role=world'))[0].label, 'World');
+  assert.equal(activeFilters(stateFromQuery('role=world'))[0].label, 'Places and things');
+});
+
+// ---- the number next to a view is the number of results it gives ---------------------------------------
+
+test('choosing a view gives exactly as many results as the number next to it says', () => {
+  for (const address of ['', 'kind=sprite', 'kind=sound', 'theme=neutral', 'game=platformer&role=characters', 'view=side', 'view=top-down&kind=sprite']) {
+    const state = stateFromQuery(address);
+    const shown = viewCounts(assets, state);
+    for (const [view, n] of Object.entries(shown)) {
+      const results = assets.filter((a) => matchesFilters(a, filtersFor({ ...state, view })));
+      assert.equal(n, results.length, `"${address}": ${view}`);
+    }
+  }
+  // sounds, music and icons have no view, so they are in every view's number: 2 side sprites + icon + 2 sounds + 1 track
+  assert.deepEqual(viewCounts(assets, stateFromQuery('')), { side: 6, 'top-down': 5, front: 5 });
+  // a view is only offered when something really has it
+  assert.deepEqual(viewCounts(assets, stateFromQuery('kind=sound')), {});
+  assert.deepEqual(viewCounts(assets, stateFromQuery('theme=farm')), { 'top-down': 1 });
+  // the list the page shows uses these numbers
+  const state = stateFromQuery('');
+  const counts = { ...countFacets(assets, filtersFor(state)), view: viewCounts(assets, state) };
+  assert.deepEqual(optionsFor('view', counts, state).map((o) => [o.value, o.count]), [['side', 6], ['top-down', 5], ['front', 5]]);
+});
+
+test('the View filter says in plain words that sounds and music always stay', () => {
+  const view = FILTER_GROUPS.find((g) => g.key === 'view');
+  assert.match(view.note, /sounds and music/i);
+  assert.match(view.note, /stay/i);
+});
+
+// ---- everyday words ---------------------------------------------------------------------------------
+
+test('labels use everyday words; ids never change', () => {
+  assert.equal(labelFor('type', 'prop'), 'Object');
+  assert.equal(labelFor('type', 'ui'), 'Menus and screens');
+  assert.equal(labelFor('role', 'world'), 'Places and things');
+  assert.equal(labelFor('role', 'interface'), 'Menus and screens');
+  assert.equal(labelFor('role', 'world/prop'), 'Objects');
+  const c = countFacets([{ id: 'x', kind: 'sprite', type: 'prop', role: 'world/prop', themes: [], gameTypes: [], view: 'side', bundles: [] }]);
+  assert.deepEqual(optionsFor('type', c, stateFromQuery('')).map((o) => [o.value, o.label]), [['prop', 'Object']]);
+  assert.deepEqual(roleTree(c.role).map((t) => [t.id, t.label]), [['world', 'Places and things']]);
 });

@@ -20,7 +20,7 @@ test('home loads and shows sprites, sounds, music and kits', async ({ page }) =>
   expect(await places(page, 'sound').count()).toBeGreaterThanOrEqual(10);
   expect(await places(page, 'music').count()).toBeGreaterThanOrEqual(1);
   expect(await kitCards(page).count()).toBeGreaterThanOrEqual(3);
-  await expect(page.getByRole('navigation', { name: 'Main' }).getByRole('link')).toHaveCount(4);
+  await expect(page.getByRole('navigation', { name: 'Main' }).getByRole('link')).toHaveText(['Sprites', 'Sounds', 'Music', 'Bundles', 'Play']);
   // a card is made when its place comes near the screen: one of each kind is really there
   for (const [kind, cards] of [['sprite', spriteCards], ['sound', soundCards], ['music', musicCards]]) {
     await places(page, kind).last().scrollIntoViewIfNeeded();

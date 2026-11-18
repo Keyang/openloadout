@@ -373,12 +373,16 @@ input[type='range']::-moz-range-thumb { width: 14px; height: 18px; border-radius
 .play-pic { flex: none; }
 .play-stage-wrap { width: 100%; overflow: hidden; background: var(--ink); border: var(--line); line-height: 0; }
 .play-stage { margin: 0 auto; max-width: 100%; }
-.play-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 18px; margin-top: 8px; }
+.play-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 18px; margin-top: 10px; }
+.play-mute { font-size: 16px; padding: 4px 14px; min-width: 6.2em; }
+.play-mute[aria-pressed='true'] { background: var(--ink); color: #fff; }
+.play-music > .hint { margin: 12px 0 0; }
+.bag-export .play-try { font-size: 18px; }
 .play-extras { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .play-keys { margin: 6px 0 0; color: var(--soft); font-size: 15px; }
-.play-pad { display: none; justify-content: space-between; gap: 12px; margin-top: 10px; }
-.play-pad-group { display: flex; gap: 8px; }
-.play-key { min-width: 56px; min-height: 52px; padding: 6px 12px; font-weight: 700; font-size: 17px; background: var(--gold); border: var(--line); box-shadow: 3px 3px 0 var(--ink); touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+.play-pad { display: none; flex-wrap: wrap; justify-content: space-between; gap: 10px 12px; margin-top: 10px; }
+.play-pad-group { display: flex; flex-wrap: wrap; gap: 8px; }
+.play-key { min-width: 50px; min-height: 52px; padding: 6px 9px; font-weight: 700; font-size: 17px; background: var(--gold); border: var(--line); box-shadow: 3px 3px 0 var(--ink); touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
 .play-key.held, .play-key:active { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--ink); background: #ffdb6a; }
 @media (max-width: 700px), (pointer: coarse) { .play-pad { display: flex; } }
 
@@ -428,7 +432,7 @@ input[type='range']::-moz-range-thumb { width: 14px; height: 18px; border-radius
 .smart[data-state='failed'] .smart-note { color: #9c2a22; font-weight: 600; }
 .examples { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 4px; }
 .examples .hint { font-size: 15px; font-weight: 600; margin-right: 2px; }
-.kit-shelf[hidden] { display: none; }
+.kit-shelf[hidden], .smart[hidden] { display: none; }
 
 /* cards: a still picture until hovered or pressed */
 .card-cell { position: relative; width: 244px; transition: transform 80ms; }
@@ -488,10 +492,15 @@ input[type='range']::-moz-range-thumb { width: 14px; height: 18px; border-radius
 .fopt.branch.open .fl::before { transform: rotate(90deg); }
 .fopt.leaf { padding-left: 27px; font-weight: 500; }
 .fmore { font-size: 14px; padding: 4px 8px; }
+.fnote { margin: 6px 8px 0; font-size: 13px; line-height: 1.35; color: var(--soft); }
+/* shown only when reached with the keyboard */
+.skip-link { position: absolute; left: -9999px; grid-column: 1 / -1; justify-self: start; background: var(--gold); border: var(--line); padding: 6px 12px; font-weight: 700; }
+.skip-link:focus-visible { position: static; margin: 0 0 14px; }
 .filter-panel .hint { margin: 0; }
-.result-line { margin: 0 0 12px; font: 600 20px/1.2 var(--display); }
+.result-line { margin: 0 0 12px; font: 600 20px/1.2 var(--display); overflow-wrap: anywhere; }
 .chips { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 18px; }
 .chips[hidden] { display: none; }
+.chip-label { overflow-wrap: anywhere; }
 .chip { display: inline-flex; align-items: center; gap: 7px; background: var(--card); border: var(--line); padding: 1px 2px 1px 10px; font-weight: 600; font-size: 14px; }
 .chip.sticky { background: var(--grape-soft); }
 .chip-kept { font-weight: 700; font-size: 11px; color: var(--grape); text-transform: uppercase; letter-spacing: 0.05em; }
@@ -538,3 +547,17 @@ input[type='range']::-moz-range-thumb { width: 14px; height: 18px; border-radius
   .card-cell, .card-cell .card, .fopt.branch .fl::before { transition: none; }
 }
 /* ==== end finding things ==== */
+
+/* ==== how pages are tied together (W2-G: app/related.js on the sprite, sound and music pages) ==== */
+/* "goes with" lines: the sounds a sprite uses, the sprites that use a sound, the bundles it is in */
+.related { margin: 22px 0 0; display: grid; gap: 6px; }
+.related .rel { margin: 0; color: var(--soft); }
+.related .rel-label { font-weight: 700; font-size: 15px; color: var(--ink); margin-right: 4px; }
+.related a { color: var(--ink); font-weight: 600; text-underline-offset: 3px; }
+.related a:hover { color: var(--grape); }
+/* "More like this" runs under both columns of an asset page */
+.editor > .more-like { grid-column: 1 / -1; min-width: 0; margin-top: 8px; }
+.editor > .more-like[hidden] { display: none; }
+/* a sprite in the bag whose own file is still on its way */
+.bag-pic.pending { height: 108px; border: 2px solid #c3c9dc; }
+/* ==== end how pages are tied together ==== */

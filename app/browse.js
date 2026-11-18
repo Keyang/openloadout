@@ -1,10 +1,11 @@
 // Finding things: what sits behind the results view (app/home.js) and anything else that lists assets.
 //
 //   the address bar     stateFromQuery, queryFromState, hashFromState, sameState
-//   filters             FILTER_GROUPS, filtersFor, optionsFor, roleTree, activeFilters
+//   filters             FILTER_GROUPS, filtersFor, viewCounts, optionsFor, roleTree, activeFilters
 //   the style that stays  createStyleMemory, styleMemory   ("View" and "Game type" are remembered across visits)
-//   results             pickResults, resultLine
-//   search              finder (one shared search over the catalogue), smart, setSmartSearch, onSearchChange
+//   results             pickResults, resultLine, shelfTitle
+//   search              finder (one shared search over the catalogue), onSearchChange
+//   smarter search      smart, setSmartSearch, onSmartChange, smartDownload, smartNote   (the visitor's choice; a big download)
 //   for other pages     similarAssets(id) -> an element listing similar assets as cards
 //
 // Everything above "search" is plain data in, plain data out, and runs in Node for the unit tests; nothing in
@@ -13,6 +14,7 @@ import {
   KINDS, VIEWS, ROLE_TREE, ROLE_TOPS, SPRITE_TYPES, AUDIO_TYPES, THEMES, GAME_TYPES, TYPE_LABELS, THEME_LABELS, GAME_TYPE_LABELS, VIEW_LABELS, labelFor,
 } from '../catalog/schema.js';
 import { createSearch } from '../search/client.js';
+import { matchesFilters } from '../search/core.js';
 import { loadCatalog, assetById } from './catalog.js';
 
 // ---- the address bar ------------------------------------------------------------------------
@@ -24,13 +26,14 @@ export const FILTER_GROUPS = [
   { key: 'type', param: 'type', label: 'Type' },
   { key: 'themes', param: 'theme', label: 'Theme' },
   { key: 'gameTypes', param: 'game', label: 'Game type', sticky: true },
-  { key: 'view', param: 'view', label: 'View', sticky: true },
+  { key: 'view', param: 'view', label: 'View', sticky: true, note: 'Sounds and music have no view, so they always stay.' },
   { key: 'bundle', param: 'bundle', label: 'Bundle' },
 ];
 const ADDRESS_ORDER = ['kind', 'type', 'role', 'themes', 'gameTypes', 'view', 'bundle'];
 const GROUP = Object.fromEntries(FILTER_GROUPS.map((g) => [g.key, g]));
 export const STYLE_KEYS = FILTER_GROUPS.filter((g) => g.sticky).map((g) => g.key);
-const Q_MAX = 120;
+/** The longest search the site takes. The search box has the same limit, so what is typed is what is searched. */
+export const Q_MAX = 120;
 
 const ID = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 const ROLE = /^[a-z0-9]+(-[a-z0-9]+)*(\/[a-z0-9]+(-[a-z0-9]+)*)?$/;
@@ -79,6 +82,22 @@ export function filtersFor(state) {
     if (v) f[g.key] = g.key === 'view' ? [v, 'none', null] : v;
   }
   return f;
+}
+
+/**
+ * The number to show next to each view: how many of `assets` choosing it would leave, counted the way
+ * filtersFor filters (the view's own sprites plus everything that has no view). A view is only listed
+ * when at least one asset really has it. `assets`: catalogue rows (all of them, or a search's results).
+ */
+export function viewCounts(assets, state) {
+  const others = filtersFor({ ...state, view: null });
+  const own = {};
+  let free = 0;
+  for (const a of assets) {
+    if (!a || !matchesFilters(a, others)) continue;
+    if (a.view == null || a.view === 'none') free++; else own[a.view] = (own[a.view] || 0) + 1;
+  }
+  return Object.fromEntries(Object.entries(own).map(([view, n]) => [view, n + free]));
 }
 
 const KIND_LABEL = { sprite: 'Sprites', sound: 'Sounds', music: 'Music' };
@@ -195,12 +214,21 @@ export function pickResults({ ranked = [], direct = [] }) {
   return out;
 }
 
-/** The plain line above the results. */
+const QUOTE_MAX = 40;
+const quoted = (q) => `"${q.length > QUOTE_MAX ? q.slice(0, QUOTE_MAX) + '…' : q}"`;
+
+/** The plain line above the results. A long search is quoted short. */
 export function resultLine(n, state) {
   const q = String(state.q ?? '').trim();
-  if (n > 0) return `${n} result${n === 1 ? '' : 's'}${q ? ` for "${q}"` : ''}`;
-  if (q) return `Nothing matches "${q}"`;
+  if (n > 0) return `${n} result${n === 1 ? '' : 's'}${q ? ` for ${quoted(q)}` : ''}`;
+  if (q) return `Nothing matches ${quoted(q)}`;
   return FILTER_GROUPS.some((g) => state[g.key]) ? 'Nothing matches these filters' : 'Nothing here yet';
+}
+
+/** The heading above the list on the front page. It only says "Everything" when nothing is held back. */
+export function shelfTitle(state) {
+  if (String(state.q ?? '').trim() || FILTER_GROUPS.some((g) => !g.sticky && state[g.key])) return 'Results';
+  return STYLE_KEYS.some((key) => state[key]) ? 'Everything that fits your game' : 'Everything';
 }
 
 // ---- a stand-in catalogue, for tests ----------------------------------------------------------
@@ -219,56 +247,135 @@ export function standInCatalog(loc = globalThis.location) {
 // ---- search -----------------------------------------------------------------------------------
 // One search for the whole site (Contract 5). It answers at once from the catalogue, gets better without
 // a word when the search file has loaded, and can also match by meaning when the visitor switches
-// "Smarter search" on (a 38 MB download, so it is their choice and it is remembered).
+// "Smarter search" on (a large download, so it is their choice and it is remembered).
 
 export const SMART_KEY = 'loadout-smart-search';
-/** state: 'off' | 'loading' | 'ready' | 'failed'. */
-export const smart = { on: false, state: 'off' };
+/** state: 'off' | 'loading' | 'ready' | 'failed'. bytes: the size of the download (0 until known, or when this copy of the site has none); got: how much has arrived. */
+export const smart = { on: false, state: 'off', bytes: 0, got: 0, sized: false };      // sized: the size has been looked up
 
 const setup = { dbUrl: 'generated/search.sqlite', vendorBase: 'vendor/' };
 /** Where the search file and the vendor folder are (app.js sets these for a stand-in catalogue). */
 export function configureSearch(options) { Object.assign(setup, options); }
 
-const watchers = new Set();
-const tell = () => { for (const fn of [...watchers]) { try { fn(); } catch (e) { console.error(e); } } };
+const call = (set) => { for (const fn of [...set]) { try { fn(); } catch (e) { console.error(e); } } };
+const watchers = new Set(), smartWatchers = new Set();
+const tell = () => call(watchers);
+const tellSmart = () => call(smartWatchers);
 /** Call fn() whenever search results may have changed for the same words (a better level arrived, the switch moved). */
 export function onSearchChange(fn) { watchers.add(fn); return () => watchers.delete(fn); }
+/** Call fn() whenever `smart` changes: the switch, its state, the size, how much has arrived. */
+export function onSmartChange(fn) { smartWatchers.add(fn); return () => smartWatchers.delete(fn); }
 
-let catalog = null, full = null, wordsOnly = null, starting = null, round = 0;
+/**
+ * What switching smarter search on downloads, from the build's list of vendor files (vendor/manifest.json):
+ * { bytes, files: [{ url, bytes }] }. The search file and its reader are left out: every visitor has those already.
+ * Nothing (bytes 0) when this copy of the site was built without the part that understands descriptions.
+ */
+export function smartDownload(manifest, base = setup.vendorBase) {
+  const listed = manifest && manifest.meaning !== false && Array.isArray(manifest.files) ? manifest.files : [];
+  const files = listed.filter((f) => f && /^(transformers|ort|models)\//.test(f.to) && Number.isFinite(f.bytes)).map((f) => ({ url: base + f.to, bytes: f.bytes }));
+  return { bytes: files.reduce((sum, f) => sum + f.bytes, 0), files };
+}
+
+const megabytes = (bytes) => Math.round(bytes / 1e6);
+/** The one line under the switch. */
+export function smartNote({ state, bytes = 0, got = 0 }) {
+  if (state === 'loading') return bytes > 0 && got < bytes ? `Downloading: ${megabytes(got)} of ${megabytes(bytes)} MB` : 'Getting smarter search ready…';
+  if (state === 'ready') return 'On. Describe what you need in your own words.';
+  if (state === 'failed') return 'Smarter search could not be loaded, so it is switched off. Normal search still works.';
+  return `Understands descriptions like "something for when the player dies".${bytes > 0 ? ` Downloads about ${megabytes(bytes)} MB once.` : ''}`;
+}
+
+let catalog = null, full = null, wordsOnly = null, starting = null, round = 0, download = null;
+
+/** The download's size and files, read once from vendor/manifest.json. Also fills in smart.bytes. */
+function sizeUp() {
+  download ??= fetch(setup.vendorBase + 'manifest.json').then((r) => (r.ok ? r.json() : null)).catch(() => null).then((manifest) => {
+    const d = smartDownload(manifest);
+    smart.bytes = d.bytes;
+    smart.sized = true;
+    tellSmart();
+    return d;
+  });
+  return download;
+}
+
+/**
+ * Fetch the files once here, counting what arrives, so the page can say "12 of 39 MB". The browser keeps them,
+ * and the search then starts from that copy. (The search library does not report its own progress.)
+ */
+async function fetchCounted(files, still) {
+  let got = 0, shown = -1;
+  await Promise.all(files.map(async (f) => {
+    const r = await fetch(f.url);
+    if (!r.ok) throw new Error(`${f.url}: ${r.status}`);
+    const reader = r.body.getReader();
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (!still()) { reader.cancel().catch(() => {}); return; }
+      got += value.length;
+      smart.got = got;
+      if (megabytes(got) !== shown) { shown = megabytes(got); tellSmart(); }       // say so once per megabyte, not per piece
+    }
+  }));
+}
 
 function start() {
   if (!starting) {
     starting = (async () => {
       catalog = await loadCatalog();
-      const store = browserStorage();
       let wanted = false;
-      try { wanted = store.getItem(SMART_KEY) === 'on'; } catch { /* off */ }
+      try { wanted = browserStorage().getItem(SMART_KEY) === 'on'; } catch { /* off */ }
       full = await createSearch({ catalog, dbUrl: setup.dbUrl, vendorBase: setup.vendorBase, meaning: 'off' });
       full.onLevel(tell);
-      if (wanted) switchSmart(true, { save: false });
+      sizeUp();
+      // chosen on an earlier visit: the browser has the files already, so there is nothing to count
+      if (wanted) switchSmart(true, { save: false, count: false });
     })();
   }
   return starting;
 }
 
-async function switchSmart(on, { save = true } = {}) {
-  const mine = ++round;
+const remember = (on) => { try { browserStorage().setItem(SMART_KEY, on ? 'on' : 'off'); } catch { /* this visit only */ } };
+
+async function switchSmart(on, { save = true, count = true } = {}) {
+  const mine = ++round, still = () => mine === round;
   smart.on = on;
-  if (save) { try { browserStorage().setItem(SMART_KEY, on ? 'on' : 'off'); } catch { /* this visit only */ } }
+  smart.got = 0;
+  if (save) remember(on);
   if (!on) {
     full.disableMeaning();
     wordsOnly = null;
     smart.state = 'off';
-    tell();
+    tellSmart(); tell();
     return;
   }
   smart.state = 'loading';
-  tell();
+  tellSmart();
   let ok = false;
-  try { ok = await full.enableMeaning(); } catch (e) { console.warn('Loadout: smarter search did not load.', e); }
-  if (mine !== round) return;          // the switch moved again meanwhile
-  smart.state = ok ? 'ready' : 'failed';
-  tell();
+  try {
+    const d = await sizeUp();
+    if (!still()) return;
+    if (d.bytes > 0) {
+      if (count) await fetchCounted(d.files, still);
+      if (!still()) return;
+      smart.got = d.bytes;
+      tellSmart();
+      ok = await full.enableMeaning();
+    }
+  } catch (e) { console.warn('Loadout: smarter search did not load.', e); }
+  if (!still()) return;          // the switch moved again meanwhile
+  if (ok) smart.state = 'ready';
+  else {
+    // it cannot work here: switch it back off and remember that, so the next visit does not try again
+    full.disableMeaning();
+    wordsOnly = null;
+    smart.on = false;
+    smart.state = 'failed';
+    remember(false);
+  }
+  tellSmart(); tell();
 }
 
 /** Switch "Smarter search" on or off, and remember the choice. Resolves when it is ready, or has failed. */

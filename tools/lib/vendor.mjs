@@ -1,5 +1,6 @@
-// Copies what the browser needs for search out of node_modules and the model cache into vendor/.
-// The site never reads node_modules (docs/architecture.md, hard rule 3).
+// Copies what the browser needs out of node_modules and the model cache into vendor/: the search files and the
+// site's two typefaces. The site never reads node_modules (docs/architecture.md, hard rule 3) and never asks
+// another site for anything (hard rule 1), so the fonts are served from here too.
 //
 //   await vendorAll()                          -> { dest, files: [{ to, bytes }], bytes, copied }   writes vendor/ in this project
 //   await vendorAll({ root })                  writes <root>/vendor/ instead (the sources still come from this project)
@@ -11,7 +12,9 @@
 //   vendor/ort/ort-wasm-simd-threaded.{mjs,wasm}           the runtime that runs the model on the processor
 //   vendor/ort/ort-wasm-simd-threaded.asyncify.{mjs,wasm}  the same with WebGPU support; only with { webgpu: true }
 //   vendor/models/<model id>/...                           the embedding model: config, tokenizer, 8-bit weights
-//   vendor/manifest.json                                   what was copied, with sizes
+//   vendor/fonts/<family>-latin-<weight>-normal.woff2      Figtree and Pixelify Sans, only the weights the site uses
+//   vendor/fonts/fonts.css                                 their @font-face rules; index.html links it
+//   vendor/manifest.json                                   what was copied, with sizes (fonts listed apart, under "fonts")
 //
 // Only the keyword level's files (vendor/sqlite/, 1.5 MB) are fetched by every visitor. The rest is
 // fetched the first time someone searches, and only one of the two ort builds is ever fetched.
@@ -53,6 +56,35 @@ export function vendorPlan({ model = DEFAULT_MODEL, meaning = true, webgpu = VEN
   };
 }
 
+/** The site's typefaces: only the weights app/style.css uses, only the Latin files. */
+export const FONTS = [
+  { family: 'Figtree', pkg: '@fontsource/figtree', name: 'figtree', weights: [400, 500, 600, 700] },
+  { family: 'Pixelify Sans', pkg: '@fontsource/pixelify-sans', name: 'pixelify-sans', weights: [500, 600, 700] },
+];
+
+/** The font files to copy and the stylesheet that names them: { files: [{ from, to }], css, versions }. */
+export function fontPlan() {
+  const files = [], rules = [], versions = {};
+  for (const font of FONTS) {
+    const dir = path.join(NM, ...font.pkg.split('/'));
+    if (!fs.existsSync(path.join(dir, 'package.json'))) throw new Error(`${font.pkg} is not installed (the site's ${font.family} typeface). Run "npm install".`);
+    versions[font.pkg] = JSON.parse(fs.readFileSync(path.join(dir, 'package.json'), 'utf8')).version;
+    for (const weight of font.weights) {
+      const file = `${font.name}-latin-${weight}-normal.woff2`;
+      const from = path.join(dir, 'files', file);
+      if (!fs.existsSync(from)) throw new Error(`${font.pkg} has no ${file}: the ${font.family} typeface does not come in weight ${weight}`);
+      files.push({ from, to: `fonts/${file}` });
+      // the characters the Latin file holds, as the package's own stylesheet states them
+      const sheet = fs.readFileSync(path.join(dir, `${weight}.css`), 'utf8');
+      const block = sheet.split('@font-face').find((b) => b.includes(file)) || '';
+      const range = (block.match(/unicode-range:\s*([^;]+);/) || [])[1];
+      rules.push(`@font-face { font-family: '${font.family}'; font-style: normal; font-weight: ${weight}; font-display: swap; src: url(./${file}) format('woff2');${range ? ` unicode-range: ${range.trim()};` : ''} }`);
+    }
+  }
+  const css = `/* Written by tools/lib/vendor.mjs: the site's typefaces, served from this site. */\n${rules.join('\n')}\n`;
+  return { files, css, versions };
+}
+
 export async function vendorAll({ root = ROOT, model = DEFAULT_MODEL, meaning = true, webgpu = VENDOR_WEBGPU, cacheDir = CACHE_DIR, log = null } = {}) {
   const dest = path.join(path.resolve(root), 'vendor');
   if (!meaning) model = null;
@@ -75,11 +107,29 @@ export async function vendorAll({ root = ROOT, model = DEFAULT_MODEL, meaning = 
     files.push({ to: f.to, bytes: src.size });
     bytes += src.size;
   }
-  const manifest = { model: plan.model, meaning: plan.meaning, webgpu: plan.webgpu, versions: plan.versions, bytes, files };
+  // the typefaces: listed apart, so `files` and `bytes` stay what search needs
+  const fontSet = fontPlan();
+  const fonts = [];
+  for (const f of fontSet.files) {
+    const to = path.join(dest, f.to);
+    const src = fs.statSync(f.from);
+    if (!fs.existsSync(to) || fs.statSync(to).size !== src.size) {
+      fs.mkdirSync(path.dirname(to), { recursive: true });
+      const tmp = `${to}.tmp-${process.pid}`;
+      fs.copyFileSync(f.from, tmp);
+      fs.renameSync(tmp, to);
+      copied++;
+      if (log) log(`vendor/${f.to}  ${(src.size / 1e3).toFixed(0)} KB`);
+    }
+    fonts.push({ to: f.to, bytes: src.size });
+  }
+  const sheet = path.join(dest, 'fonts', 'fonts.css');
+  if (!fs.existsSync(sheet) || fs.readFileSync(sheet, 'utf8') !== fontSet.css) { fs.mkdirSync(path.dirname(sheet), { recursive: true }); fs.writeFileSync(sheet, fontSet.css); }
+  const manifest = { model: plan.model, meaning: plan.meaning, webgpu: plan.webgpu, versions: { ...plan.versions, ...fontSet.versions }, bytes, files, fonts };
   const text = JSON.stringify(manifest, null, 1) + '\n';
   const mf = path.join(dest, 'manifest.json');
   if (!fs.existsSync(mf) || fs.readFileSync(mf, 'utf8') !== text) fs.writeFileSync(mf, text);
-  return { dest, model: plan.model, meaning: plan.meaning, webgpu: plan.webgpu, files, bytes, copied };
+  return { dest, model: plan.model, meaning: plan.meaning, webgpu: plan.webgpu, files, bytes, fonts, copied };
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

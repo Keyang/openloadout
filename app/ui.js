@@ -92,7 +92,7 @@ export const store = {
 // The header's bag count follows the bag on every page.
 bag.onChange(() => { for (const n of document.querySelectorAll('header .bag-count')) n.textContent = String(bag.count()); });
 
-/** The page header with the main navigation. `current`: home | sprites | sounds | music | bundles | bag | ''. */
+/** The page header with the main navigation. `current`: home | sprites | sounds | music | bundles | play | bag | ''. */
 export function header(current) {
   const on = current === 'kits' ? 'bundles' : current;      // kits are bundles now
   const link = (href, label, key) => el('a', { href, 'data-key': key, 'aria-current': on === key ? 'page' : null }, label);
@@ -103,7 +103,8 @@ export function header(current) {
         link('#/browse?kind=sprite', 'Sprites', 'sprites'),
         link('#/browse?kind=sound', 'Sounds', 'sounds'),
         link('#/browse?kind=music', 'Music', 'music'),
-        link('#/bundles', 'Bundles', 'bundles')),
+        link('#/bundles', 'Bundles', 'bundles'),
+        link('#/play', 'Play', 'play')),      // W2-G: the playground
       el('a', { class: 'bag-link', href: '#/bag', 'aria-current': current === 'bag' ? 'page' : null }, 'Bag ', el('span', { class: 'bag-count' }, String(bag.count())))));
 }
 
