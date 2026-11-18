@@ -75,7 +75,7 @@ The taxonomy document is the specification for this area.
 
 | Id | Feature | Status | Size | Depends on | Notes |
 |---|---|---|---|---|---|
-| FIND-1 | **Asset metadata.** Every asset carries the taxonomy facets: asset type, role, theme, game type, style, technical specs, licence, plus action words and synonyms | Not started | M | — | Today sprites have only a kind, sounds a category and a few tags. Everything else in this area needs this first |
+| FIND-1 | **Asset metadata.** Every asset carries the taxonomy facets: asset type, role, theme, game type, style, technical specs, licence, plus action words and synonyms | Done | M | — | `catalog/schema.js` defines it; all assets carry it; the build rejects an asset without it. Technical specs are measured by the build, not written by hand |
 | FIND-2 | **Keyword search by the user's words.** Verbs and events ("jump", "chop", "level up"), synonyms (coin, gold, money), typo tolerance, results across all asset types. Instant, no model | Partly | M | FIND-1, FIND-8 | Today: exact substring match on name, kind and tags. Stage 1 in `search-design.md` |
 | FIND-3 | **Faceted filters.** Role tree in a sidebar, then theme, style and technical filters that combine | Partly | M | FIND-1 | Today: one row of kind buttons |
 | FIND-4 | **Sticky style filter.** Pick "16px, top-down, 4 directions" once and it stays applied across sprites, sounds and music | Not started | S | FIND-3 | The taxonomy calls this the most important filter, because mismatched assets are the main complaint about libraries |
@@ -178,8 +178,8 @@ Other parts work the same way: a hat, a shield, a cape, a wizard's staff, a wolf
 | BASE-4 | **Usage tracking.** What people search for, open, change, bag and download | Not started | S | BASE-2 | The cheapest way to test demand, which the scan rated weak. Searches with no result say what to build next. Needs a third-party analytics script |
 | BASE-5 | **Speed.** Long music builds in about half a minute; move heavy rendering off the page or pre-render it | Partly | M | BASE-2 | Music already renders on a background thread |
 | BASE-6 | **Calibrate the automatic bar.** Now and then a person looks at and listens to a sample of assets that passed, to confirm the automatic bar agrees with human judgement. Not a gate on any asset | Not started | S | ASSET-13 | Added by Claude, not in Keyang's brief. Nothing made so far has been judged by a person, so there is no evidence yet that passing the checks means good |
-| BASE-7 | **Automated site tests.** | Not started | S | — | Checked by hand in the browser so far |
-| BASE-8 | **Site build.** One command, also run automatically on every change, that checks every asset, builds the search index and thumbnails, and writes the folder to publish | Not started | M | — | Today there is no build step at all. The static rule makes this the place where all expensive work happens |
+| BASE-7 | **Automated site tests.** | Partly | S | — | 53 unit and 70 browser tests cover the pages and engines that existed on 2026-11-18 (`tests/`). New features add their own |
+| BASE-8 | **Site build.** One command, also run automatically on every change, that checks every asset, builds the search index and thumbnails, and writes the folder to publish | Partly | M | — | `npm run build` validates, writes the catalogue and thumbnails, and can write `dist/`. Search index and quality steps plug in as they land. Not yet run automatically on change |
 | BASE-9 | **Size and traffic budget.** Keep the site under 1 GB and the monthly traffic under 100 GB: thumbnail sizes, the embedding model, when to move large files elsewhere | Not started | S | BASE-8 | A 23 MB model allows about 4,300 first-time downloads a month within the traffic limit |
 
 ---

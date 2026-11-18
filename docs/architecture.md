@@ -171,8 +171,9 @@ theme = {
 }
 ```
 
-- `engine/theme.js`: `applyColour(rgbaPixels, theme.colour)` changes pixels in place; `themedParams(sprite, theme)` returns the asset's controls for this seed.
-- `sound/theme.js`: `applySound(rendered, theme.sound)` returns a new rendered sound; `themedSoundParams(patch, theme)`.
+- `engine/theme.js` (built in W2-D1): `defaultTheme()`, `normalizeTheme(theme)`, `applyColour(pixels, theme.colour)` (changes a Surface's `Uint32Array` or an RGBA byte array in place), `themedParams(sprite, baseParams, theme)` (returns `baseParams` unless `theme.shapes` is true), `renderThemedFrame(sprite, clip, frame, baseParams, theme)`, `randomTheme(seed, { shapes })`, `PALETTES` (11 named palettes), `THEME_PRESETS` (14 named whole-bundle looks: `{ id, name, blurb, theme }`).
+- `sound/theme.js`: `applySound(rendered, theme.sound)` (pitch by resampling, so length changes; brightness by filter), `themedSoundParams(patch, baseParams, theme)` (music: tempo, intensity and key go through the track's own controls), `shouldResample(patch)` (false for music), `soundSettingsFor(patch, theme)`.
+- `outline` replaces the standard outline colour everywhere it is used, which includes eyes and pupils.
 
 ## Contract 8: export
 
