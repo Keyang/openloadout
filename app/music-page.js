@@ -2,6 +2,7 @@
 import { kits } from '../kits/index.js';
 import { el, header, saveBlob } from './ui.js';
 import { soundParams, randomSoundParams, renderAsync, playRendered, playLive, wavBytes, toUnit, toValue, isChoice, choicesOf, lengthOf } from './audio.js';
+import { addToBag, keepBag } from './add-to-bag.js';
 
 const fmt = (d, v) => {
   const n = Math.abs(v) >= 100 ? Math.round(v) : Math.abs(v) >= 10 ? Math.round(v * 10) / 10 : Math.round(v * 100) / 100;
@@ -103,7 +104,7 @@ export function musicPage(app, patch, query) {
     const qs = q.toString();
     return `#/music/${patch.id}${qs ? '?' + qs : ''}`;
   }
-  function saveUrl() { clearTimeout(urlTimer); urlTimer = setTimeout(() => history.replaceState(null, '', link()), 200); }
+  function saveUrl() { clearTimeout(urlTimer); urlTimer = setTimeout(() => history.replaceState(null, '', keepBag(link(), query)), 200); }
   const dlBtn = el('button', { type: 'button', class: 'btn big', onclick: async () => {
     dlBtn.disabled = true; say(`Building the music file. This takes about ${Math.max(10, Math.round(lengthOf(patch, st.p) * 0.6 / 5) * 5)} seconds…`);
     try {
@@ -136,7 +137,7 @@ export function musicPage(app, patch, query) {
           el('button', { type: 'button', class: 'ghost', onclick: () => setStyle(null, false) }, 'Start over')),
         choiceFields.length ? el('section', { class: 'group' }, el('h2', {}, 'Arrangement'), choiceFields) : null,
         el('section', { class: 'group' }, el('h2', {}, 'Sound'), fields)),
-      el('div', { class: 'get' }, dlBtn, el('button', { type: 'button', class: 'ghost', onclick: copyLink }, 'Copy link'), status)));
+      el('div', { class: 'get' }, addToBag('music', patch.id, () => ({ params: { ...st.p }, style: st.preset }), query), dlBtn, el('button', { type: 'button', class: 'ghost', onclick: copyLink }, 'Copy link'), status)));
 
   return () => { st.gone = true; clearTimeout(urlTimer); stop(); };
 }

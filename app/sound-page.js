@@ -3,6 +3,7 @@ import { sprites } from '../sprites/index.js';
 import { kits } from '../kits/index.js';
 import { el, header, saveBlob, SOUND_BG, cap } from './ui.js';
 import { soundParams, randomSoundParams, rendered, playRendered, wavBytes, toUnit, toValue, drawWave } from './audio.js';
+import { addToBag, keepBag } from './add-to-bag.js';
 
 const INK = '#231b33';
 const fmt = (d, v) => {
@@ -94,7 +95,7 @@ export function soundPage(app, patch, query) {
     const qs = q.toString();
     return `#/sound/${patch.id}${qs ? '?' + qs : ''}`;
   }
-  function saveUrl() { clearTimeout(urlTimer); urlTimer = setTimeout(() => history.replaceState(null, '', link()), 200); }
+  function saveUrl() { clearTimeout(urlTimer); urlTimer = setTimeout(() => history.replaceState(null, '', keepBag(link(), query)), 200); }
   const status = el('p', { class: 'status', role: 'status' });
   const say = (msg) => { status.textContent = msg; };
   function download() {
@@ -111,6 +112,8 @@ export function soundPage(app, patch, query) {
   const usedBy = sprites.filter((s) => Object.values(s.sounds).some((list) => list.some((c) => c.sound === patch.id)));
   const inKits = kits.filter((k) => k.sounds.includes(patch.id));
 
+  if (Number(query.seed) >= 1) st.seed = Math.round(Number(query.seed));   // a variation opened from the bag
+  const bagBox = addToBag('sound', patch.id, () => ({ params: { ...st.p }, style: st.preset, seed: st.seed }), query);
   render(); syncPlay(); syncStyle();
   app.replaceChildren(
     header('sounds'),
@@ -129,6 +132,7 @@ export function soundPage(app, patch, query) {
           el('button', { type: 'button', class: 'ghost', onclick: () => setStyle(null) }, 'Start over')),
         el('section', { class: 'group' }, el('h2', {}, cap(patch.category) + ' sound'), fields)),
       el('div', { class: 'get' },
+        bagBox,
         el('button', { type: 'button', class: 'btn big', onclick: download }, 'Download sound'),
         el('button', { type: 'button', class: 'ghost', onclick: copyLink }, 'Copy link'),
         status)));
