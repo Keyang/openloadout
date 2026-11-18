@@ -1,0 +1,8 @@
+out/
+node_modules/
+generated/
+dist/
+.cache/
+test-results/
+playwright-report/
+*.log

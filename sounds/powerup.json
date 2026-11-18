@@ -1,0 +1,151 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "powerup",
+ "name": "Power-up",
+ "category": "pickup",
+ "tags": [
+  "upgrade",
+  "arcade",
+  "rise"
+ ],
+ "description": "Looping arpeggio that glides upward, with a short echo.",
+ "duration": "length + 0.25",
+ "params": [
+  {
+   "id": "pitch",
+   "label": "Pitch",
+   "min": 150,
+   "max": 800,
+   "default": 330,
+   "unit": "Hz",
+   "scale": "log"
+  },
+  {
+   "id": "speed",
+   "label": "Arp speed",
+   "min": 8,
+   "max": 40,
+   "default": 20,
+   "unit": "steps/s"
+  },
+  {
+   "id": "rise",
+   "label": "Rise",
+   "min": 0.5,
+   "max": 3,
+   "default": 1.5,
+   "unit": "oct"
+  },
+  {
+   "id": "length",
+   "label": "Length",
+   "min": 0.3,
+   "max": 1.5,
+   "default": 0.7,
+   "unit": "s"
+  },
+  {
+   "id": "duty",
+   "label": "Pulse width",
+   "min": 0.1,
+   "max": 0.5,
+   "default": 0.3
+  },
+  {
+   "id": "sparkle",
+   "label": "Sparkle",
+   "min": 0,
+   "max": 1,
+   "default": 0.4
+  }
+ ],
+ "nodes": [
+  {
+   "id": "arp",
+   "type": "seq",
+   "steps": [
+    1,
+    1.25,
+    1.5,
+    2
+   ],
+   "rate": "speed",
+   "loop": true
+  },
+  {
+   "id": "glide",
+   "type": "env",
+   "points": [
+    [
+     0,
+     1
+    ],
+    [
+     "length",
+     "2^rise",
+     "exp"
+    ]
+   ]
+  },
+  {
+   "id": "lead",
+   "type": "osc",
+   "wave": "pulse",
+   "freq": "pitch*arp*glide",
+   "width": "duty"
+  },
+  {
+   "id": "high",
+   "type": "osc",
+   "wave": "tri",
+   "freq": "pitch*arp*glide*2"
+  },
+  {
+   "id": "amp",
+   "type": "env",
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     0.01,
+     1
+    ],
+    [
+     "length*0.8",
+     0.8
+    ],
+    [
+     "length",
+     0
+    ]
+   ]
+  },
+  {
+   "id": "echo",
+   "type": "delay",
+   "in": "(lead*0.6 + high*sparkle*0.5)*amp",
+   "time": 0.09,
+   "feedback": 0.35,
+   "mix": 0.25
+  }
+ ],
+ "out": "echo",
+ "presets": {
+  "1-up": {
+   "pitch": 520,
+   "speed": 14,
+   "rise": 1,
+   "length": 0.45,
+   "sparkle": 0.8
+  },
+  "Charge": {
+   "pitch": 160,
+   "speed": 38,
+   "rise": 3,
+   "length": 1.4,
+   "duty": 0.15
+  }
+ }
+}

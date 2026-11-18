@@ -1,0 +1,356 @@
+// Wizard: a robed spell-caster built on the shared humanoid rig.
+// What makes it not-the-Hero: a long robe that hides the legs and sways, wide
+// sleeves, a pointed hat, a beard, and a staff planted on the ground whose orb
+// glows. `cast` replaces the sword attack.
+import { defineSprite, range, choice, color, SKIN, HAIR, CLOTH } from '../engine/sprite.js';
+import { lerp, clamp, pulse, keys, reach, fract, hash, smooth, PI, TAU } from '../engine/motion.js';
+import * as H from '../rigs/humanoid.js';
+import { ramp, farRamp, tone, col, INK } from '../engine/color.js';
+
+const MAGIC = ['#4fd8ee', '#6fe86a', '#f4e04a', '#ff8a3c', '#ff5a8a', '#b98cff'];
+const TILT = PI - 0.3;                 // resting staff angle: almost upright, top a little forward
+const HOLD = { a: 0.7, e: 0.85 };      // resting staff arm: hand held out in front, clear of the face
+const LOOPS = { idle: true, walk: true, run: true };
+
+/** The rig's pose, re-posed so the near arm carries a staff, plus a custom `cast`. */
+function wizPose(clip, t, m, d) {
+  const P = H.pose(clip === 'cast' ? 'idle' : clip, clip === 'cast' ? 0 : t, m, d);
+  P.armF.a = HOLD.a; P.armF.e = HOLD.e; P.item = TILT;
+  P.staffUp = 0;       // how far the staff is lifted through the hand, in pixels
+  P.billow = 0;        // 0..1: robe flares out (falling, lunging)
+  switch (clip) {
+    case 'walk': {
+      // the staff works like a walking stick: lifted and swung forward, then planted
+      const c = Math.cos(TAU * t);
+      P.armF.a = HOLD.a - 0.16 * c;
+      P.item = TILT - 0.2 * c;
+      P.staffUp = 2 * Math.max(0, Math.sin(TAU * t));
+      break;
+    }
+    case 'run': {
+      const c = Math.cos(TAU * t);
+      P.armF.a = 0.7 - 0.2 * c; P.armF.e = 1.0;
+      P.item = 2.5 + 0.1 * c;
+      P.staffUp = 3;
+      P.billow = 0.6;
+      break;
+    }
+    case 'jump': {
+      P.lift *= 0.8;   // robes are heavy
+      P.armB.a *= 0.55;   // the free hand lifts the robe a little instead of flying up past the face
+      P.armF.a = keys(t, [[0, HOLD.a], [0.18, 0.45], [0.42, 1.25], [0.62, 1.1], [0.84, 0.55], [1, HOLD.a]]);
+      P.armF.e = keys(t, [[0, HOLD.e], [0.18, 1.2], [0.42, 0.7], [0.62, 0.8], [0.84, 1.1], [1, HOLD.e]]);
+      P.item = keys(t, [[0, TILT], [0.18, TILT - 0.15], [0.42, 2.45], [0.62, 2.55], [0.84, TILT - 0.1], [1, TILT]]);
+      P.billow = keys(t, [[0, 0], [0.3, 0], [0.5, 0.4], [0.7, 1], [0.84, 0.3], [1, 0]]);
+      break;
+    }
+    case 'cast': {
+      const wind = keys(t, [[0, 0], [0.28, 1], [0.43, 1], [0.57, 0], [1, 0]]);
+      const thr = keys(t, [[0, 0], [0.43, 0], [0.57, 1], [0.75, 0.9], [1, 0]]);
+      P.armF.a = HOLD.a - 0.1 * wind + 0.65 * thr;
+      P.armF.e = HOLD.e + 0.65 * wind - 0.6 * thr;
+      P.item = TILT + 0.12 * wind - 0.5 * thr;
+      P.armB.a = keys(t, [[0, -0.15], [0.28, 0.9], [0.43, 1.0], [0.57, -0.7], [0.75, -0.6], [1, -0.15]]);
+      P.armB.e = 0.2 + 0.7 * wind + 0.2 * thr;
+      P.lean = -0.12 * wind + 0.2 * thr;
+      P.headTilt = -0.1 * wind + 0.1 * thr;
+      P.rootX = -1 * wind + 1.5 * thr;
+      P.crouch = 0.6 * wind + 1.6 * thr;
+      P.footF = { x: 1.5 + 3 * thr - P.rootX, y: -1.5 * pulse(clamp((t - 0.43) / 0.14)) };
+      P.footB = { x: -1.5 - P.rootX, y: 0 };
+      P.glow = keys(t, [[0, 0], [0.28, 0.6], [0.43, 1], [0.57, 1], [0.75, 0.5], [1, 0]]);
+      P.sway = keys(t, [[0, 0], [0.3, 0.6], [0.5, -0.3], [0.62, -1], [0.8, 0.4], [1, 0]]);
+      P.billow = 0.5 * thr;
+      P.blink = false;
+      break;
+    }
+    case 'hurt': {
+      // the body reels back but the hand keeps hold of the planted staff
+      const h = keys(t, [[0, 0.6], [0.33, 1], [1, 0.2]]);
+      P.armF.a = HOLD.a + 0.4 * h; P.armF.e = HOLD.e - 0.3 * h;
+      P.item = TILT - 0.25 * h;
+      break;
+    }
+    default: break;
+  }
+  return P;
+}
+
+/** inside() test for a tapered capsule, so several can be filled as one shape. */
+const capIn = (x0, y0, x1, y1, r0, r1) => {
+  const dx = x1 - x0, dy = y1 - y0, len2 = dx * dx + dy * dy || 1e-6;
+  return (px, py) => {
+    const k = clamp(((px - x0) * dx + (py - y0) * dy) / len2);
+    const r = r0 + (r1 - r0) * k;
+    return (px - x0 - dx * k) ** 2 + (py - y0 - dy * k) ** 2 <= r * r;
+  };
+};
+
+/** A wide sleeve over one arm: flares toward the wrist and hangs open below it. */
+function sleeve(g, A, d, cloth, cuff, skin, rim) {
+  const [sx, sy] = A.shoulder, [ex, ey] = A.elbow, [hx, hy] = A.hand;
+  const w = d.armW / 2;
+  const wx = lerp(ex, hx, 0.75), wy = lerp(ey, hy, 0.75);
+  const upper = capIn(sx, sy, ex, ey, w + 0.3, w + 0.6);
+  const fore = capIn(ex, ey, wx, wy, w + 0.6, w + 1.3);
+  const drop = capIn(wx, wy, wx - 0.5, wy + 2.6, w + 0.9, 0.9);
+  const all = (px, py) => upper(px, py) || fore(px, py) || drop(px, py);
+  const x0 = Math.min(sx, ex, hx) - 5, y0 = Math.min(sy, ey, hy) - 5, x1 = Math.max(sx, ex, hx) + 5, y1 = Math.max(sy, ey, hy) + 7;
+  g.fill(x0, y0, x1, y1, all, cloth, rim ? { outline: rim } : {});
+  // trim on the open end of the sleeve
+  const fl = Math.hypot(hx - ex, hy - ey) || 1, ux = (hx - ex) / fl, uy = (hy - ey) / fl;
+  g.fill(x0, y0, x1, y1, (px, py) => (fore(px, py) || drop(px, py)) && !all(px + ux, py + uy) && Math.hypot(px - wx, py - wy) < w + 3.2, cuff, { shade: 0 });
+  g.limb(hx, hy, hx, hy, d.armW, skin, { shade: 0 });
+}
+
+export default defineSprite({
+  id: 'wizard',
+  name: 'Wizard',
+  kind: 'Character',
+  blurb: 'A robed spell-caster with a glowing staff. Change the hat, beard, robe and magic.',
+  size: H.SIZE,
+  pivot: H.PIVOT,
+  preview: 'cast',
+  // sounds that play with each animation: frame is counted from 0; preset is one of the sound's named styles
+  sounds: { walk: [{ sound: 'footstep-gravel', frame: 0, preset: 'Sneaking' }, { sound: 'footstep-gravel', frame: 4, preset: 'Sneaking' }], run: [{ sound: 'footstep-gravel', frame: 0, preset: 'Sneaking' }, { sound: 'footstep-gravel', frame: 4, preset: 'Sneaking' }], jump: [{ sound: 'jump', frame: 2, preset: 'Tiny hop' }], cast: [{ sound: 'magic-spell', frame: 2 }], hurt: [{ sound: 'punch', frame: 0, preset: 'Light jab' }] },
+  params: {
+    height: range('Height', 0.5, { lo: 'Short', hi: 'Tall' }),
+    build: range('Build', 0.5, { lo: 'Slim', hi: 'Stout' }),
+    head: range('Head', 0.55, { lo: 'Small', hi: 'Big' }),
+    hat: choice('Hat', 'pointed', ['pointed', 'crooked', 'wide', 'hood']),
+    beard: choice('Beard', 'long', ['long', 'short', 'none']),
+    robeLen: range('Robe length', 0.85, { lo: 'Knee', hi: 'Floor' }),
+    skin: color('Skin', SKIN[0], SKIN),
+    beardColor: color('Hair and beard', HAIR[4], HAIR),
+    robe: color('Robe', CLOTH[6], CLOTH),
+    trim: color('Trim', CLOTH[2], CLOTH),
+    magic: color('Magic', MAGIC[0], MAGIC),
+    spell: range('Spell size', 0.5, { lo: 'Spark', hi: 'Blast', group: 'Motion' }),
+    bounce: range('Bounce', 0.4, { lo: 'Calm', hi: 'Bouncy', group: 'Motion' }),
+    stride: range('Stride', 0.5, { lo: 'Small steps', hi: 'Big steps', group: 'Motion' }),
+    speed: range('Speed', 0.5, { lo: 'Slow', hi: 'Fast', group: 'Motion' }),
+  },
+  clips: (() => {
+    const c = H.clips((p) => p.speed, { cast: { frames: 8, fps: (p) => 11 * lerp(0.65, 1.45, p.speed), loop: false } });
+    return { idle: c.idle, walk: c.walk, run: c.run, jump: c.jump, cast: c.cast, hurt: c.hurt };
+  })(),
+
+  render(g, { clip, t, p }) {
+    const [CW, CH] = H.SIZE;
+    const d = H.dims(p);
+    const m = { bounce: p.bounce, stride: p.stride, armed: true };
+    const P = wizPose(clip, t, m, d);
+    // cloth, beard and hat tip trail the body: the same sway, a little later
+    const swayAt = (dt) => wizPose(clip, LOOPS[clip] ? fract(t - dt) : Math.max(0, t - dt), m, d).sway;
+    const s1 = swayAt(0.1), s2 = swayAt(0.2);
+
+    const robe = ramp(p.robe), robeFar = farRamp(p.robe);
+    const trimHex = p.trim === p.robe ? tone(p.trim, -1) : p.trim;
+    const trim = ramp(trimHex), trimFar = farRamp(trimHex);
+    const skin = ramp(p.skin), skinFar = farRamp(p.skin);
+    const beard = ramp(p.beardColor);
+    const magic = ramp(p.magic);
+    const wood = ramp('#8a5a34');
+    const orbPaint = { light: '#ffffff', base: magic.light, dark: magic.base };
+
+    // staff lengths: below the hand it reaches the ground when standing; above, it tops out beside the hat
+    const hand0 = H.solve(wizPose('idle', 0, m, d), d).armF.hand;
+    const floor = H.GROUND - 1;
+    const below = (floor - hand0[1]) / -Math.cos(TILT);
+    const above = d.arm * 0.4 + d.torso * 0.16 + d.headR * 1.25 + 4;
+    let orb = [0, 0], orbR = 2.5;
+
+    const look = {
+      skin: p.skin, top: p.robe, bottom: tone(p.robe, -0.9), boots: '#5b3d2e',
+      hair: tone(p.beardColor, -0.7), hairStyle: p.hat === 'hood' ? 'bald' : 'long',
+    };
+
+    H.draw(g, P, d, look, {
+      offhand(g, J) {
+        sleeve(g, J.armB, d, robeFar, trimFar.base, skinFar, null);
+      },
+
+      torso(g, J) {
+        // the skirt of the robe: a bell from the waist to the hem, wide enough to cover both legs
+        const wx = lerp(J.hip[0], J.neck[0], 0.22), wy = Math.round(lerp(J.hip[1], J.neck[1], 0.22));
+        const hem = Math.round(Math.min(J.hip[1] + d.leg * 0.97 * lerp(0.55, 1, p.robeLen), J.gy - d.foot));
+        const reachX = (L) => lerp(L.hip[0], L.ankle[0], lerp(0.6, 1, p.robeLen));
+        const legs = [J.legF, J.legB].sort((a, b) => reachX(a) - reachX(b));
+        const backX = reachX(legs[0]), frontX = reachX(legs[1]);
+        // a lifted foot kicks its side of the hem up; a billowing robe rides higher, most at the back
+        const kick = (L) => Math.max(0, J.gy - d.foot - L.ankle[1]) * 0.6 * p.robeLen;
+        const hemYB = hem - kick(legs[0]) - P.billow * 3, hemYF = hem - kick(legs[1]) - P.billow * 1.5;
+        const flare = lerp(1.2, 2.8, p.robeLen) + P.billow * 2;
+        const waistB = wx - d.hipR - 0.8, waistF = wx + d.hipR + 0.8;
+        const hemF = Math.max(waistF + flare * 0.5, frontX + 2.5) - s1 * 0.8;
+        const hemB = Math.min(waistB - flare, backX - 2.5 - P.billow * 1.5) - s1 * 2.4 * p.robeLen;
+        const edges = (py) => {
+          const k = clamp((py - wy) / Math.max(1, hem - wy));
+          return [lerp(waistB, hemB, k ** 1.4), lerp(waistF, hemF, k ** 1.2)];
+        };
+        const hemAt = (px) => Math.round(lerp(hemYB, hemYF, clamp((px - hemB) / Math.max(1, hemF - hemB))));
+        const skirt = (px, py) => {
+          if (py < wy || py >= hemAt(px)) return false;
+          const [xl, xr] = edges(py);
+          return px >= xl && px <= xr;
+        };
+        const box = [Math.min(hemB, waistB) - 1, wy, Math.max(hemF, waistF) + 1, hem];
+        g.fill(...box, skirt, robe, { shade: hemF - hemB > 13 ? 2 : 1 });
+        // one fold line, hanging between the legs
+        for (let y = Math.round(lerp(wy, hem, 0.45)); y < hem - 2; y++) {
+          const [xl, xr] = edges(y + 0.5);
+          const fx = lerp(xl, xr, 0.42) - s2 * 0.6;
+          if (skirt(fx, y + 2.5)) g.dot(fx, y, robe.dark);
+        }
+        // trim along the hem
+        const band = d.leg > 10.5 ? 2 : 1;
+        g.fill(...box, skirt, trim, { clip: (px, py) => py > hemAt(px) - band });
+        // sash
+        const sx = Math.round(waistB), sw = Math.round(waistF) - sx;
+        g.rect(sx, wy - 1, sw, 2, trim, { shade: 0 });
+        g.rect(sx, wy, sw, 1, trim.dark);
+        g.rect(sx + sw - 2, wy + 1, 1, 3, trim.dark);
+      },
+
+      head(g, J) {
+        const [hx, hy] = J.head, R = d.headR;
+        const ey = Math.floor(hy - 0.5);
+        // nose
+        g.dot(Math.floor(hx + R + 0.1), ey + 2, skin.base);
+
+        if (p.beard !== 'none') {
+          const len = p.beard === 'long' ? lerp(4, 7.5, p.height) : 1.5;
+          const jaw = (px, py) => ((px - hx) / (R + 0.7)) ** 2 + ((py - hy) / (R + 0.9)) ** 2 <= 1 && py > hy + R * 0.3 && px > hx - R * 0.5;
+          g.poly([[hx - R * 0.45, hy + R * 0.5], [hx + R + 0.7, hy + R * 0.4], [hx + R * 0.45 - s1 * 1.5, hy + R + len]], beard);
+          g.fill(hx - R - 1, hy, hx + R + 2, hy + R + 2, jaw, beard, { shade: 0 });
+          g.dot(Math.floor(hx + R * 0.55), ey + 3, beard.dark);   // mouth, under the moustache
+        }
+
+        const hat = robe;
+        const tip = s2 * 1.5;
+        const by = Math.min(Math.round(hy - R * 0.5 - 0.5), ey - 2);   // brim row: always clear of the eye
+        const brim = (back, front) => {
+          const x0 = Math.round(hx - R - back), x1 = Math.round(hx + R + front);
+          g.rect(x0 + 1, by, x1 - x0 - 2, 1, hat.base);
+          g.rect(x0, by + 1, x1 - x0, 1, hat.dark);
+        };
+        const band = (cone) => {
+          g.poly(cone, trim, { clip: (px, py) => py > by - 2, shade: 0 });
+          g.dot(Math.round(hx + R * 0.25), by - 1, trim.light);
+        };
+        if (p.hat === 'pointed') {
+          const h1 = R * 1.5 + 3;
+          const cone = [[hx - R * 0.95, by], [hx + R * 0.9, by], [hx - R * 0.3 - tip, by - h1]];
+          g.poly(cone, hat, { shade: 2 });
+          band(cone);
+          brim(1.5, 2.5);
+        } else if (p.hat === 'crooked') {
+          const h1 = R * 1.1 + 2, w = R * 0.34;
+          const bx = hx - R * 0.35, byy = by - h1;
+          const cone = [[hx - R * 0.95, by], [hx + R * 0.9, by], [bx + w, byy], [bx - w, byy]];
+          g.capsule(bx, byy + 0.5, bx - R * 0.9 - tip * 1.4, byy + 1.5 + Math.abs(tip) * 0.4, w, 0.7, hat);
+          g.poly(cone, hat, { shade: 2 });
+          band(cone);
+          brim(1.5, 2.5);
+        } else if (p.hat === 'wide') {
+          const h1 = R * 1.0 + 2;
+          const cone = [[hx - R * 0.9, by], [hx + R * 0.85, by], [hx + R * 0.1 - tip * 0.6, by - h1], [hx - R * 0.45 - tip * 0.6, by - h1 + 0.5]];
+          g.poly(cone, hat, { shade: 2 });
+          band(cone);
+          brim(4, 5);
+        } else {
+          // hood: covers the top and back of the head, with a soft point behind
+          const shell = (px, py) => {
+            if (((px - hx) / (R + 1.2)) ** 2 + ((py - hy) / (R + 1.2)) ** 2 > 1) return false;
+            return py < hy - R * 0.4 || px < hx - R * 0.1;
+          };
+          g.capsule(hx - R * 0.6, hy - R * 0.5, hx - R - 2.5 - tip, hy - R * 0.1, R * 0.5, 0.8, hat);
+          g.fill(hx - R - 3, hy - R - 3, hx + R + 3, hy + R + 3, shell, hat, { shade: 2 });
+          g.fill(hx - R - 3, hy - R - 3, hx + R + 3, hy + R + 3, (px, py) => shell(px, py) && !shell(px + 1, py + 1) && px > hx - R * 0.3, trim, { shade: 0 });
+        }
+      },
+
+      item(g, J) {
+        const [hx, hy] = J.armF.hand;
+        const sx = Math.sin(P.item), cy = Math.cos(P.item);
+        let lo = below - P.staffUp, up = above + P.staffUp;
+        // planted: when the hand sinks, the staff slides up through it instead of going into the ground
+        if (cy < -0.2 && hy - cy * lo > floor) { const l2 = (floor - hy) / -cy; up += lo - l2; lo = l2; }
+        orbR = 2.5 + Math.round(P.glow * lerp(0.8, 1.8, p.spell));   // x.5 radii keep the disc round
+        // thrust forward by a tall wizard: slide the staff back through the hand rather than leave the frame
+        if (sx > 0.1) { const fit = Math.min(up, (CW - 4 - orbR - hx) / sx - 2.5); lo += up - fit; up = fit; }
+        const bx = hx - sx * lo, byy = hy - cy * lo, tx = hx + sx * up, ty = hy + cy * up;
+        g.limb(bx, byy, tx, ty, 2, wood);
+        for (const s of [-1, 1]) {
+          const [qx, qy] = reach(tx, ty, P.item + s * 1.0, 3);
+          g.line(tx, ty, qx, qy, wood.dark);
+        }
+        const [ox, oy] = reach(tx, ty, P.item, 2.5);
+        orb = [Math.round(ox) + 0.5, Math.round(oy) + 0.5];
+        g.ellipse(orb[0], orb[1], orbR, orbR, orbPaint, { light: 1 });
+      },
+
+      front(g, J) {
+        sleeve(g, J.armF, d, robe, trim.base, skin.base, robe.deep);
+      },
+    });
+
+    if (P.flash) g.tint('#ffffff');
+    g.outline(INK);
+
+    // ---- magic: drawn after the outline so it glows instead of looking solid ----
+    const [ox, oy] = orb;
+    const fxDot = (x, y, c) => { x = Math.floor(x); y = Math.floor(y); if (x >= 1 && y >= 1 && x <= CW - 2 && y <= CH - 2) g.dot(x, y, c); };
+    const safe = (px, py) => px > 1 && py > 1 && px < CW - 1 && py < CH - 1;
+    const fxRing = (r, thick, c) => g.fill(ox - r - thick, oy - r - thick, ox + r + thick, oy + r + thick,
+      (px, py) => Math.abs(Math.hypot(px - ox, py - oy) - r) <= thick / 2, c, { shade: 0, clip: safe });
+    const fxRay = (a, r0, r1, c) => { for (let r = r0; r <= r1; r += 0.5) fxDot(ox + Math.sin(a) * r, oy + Math.cos(a) * r, c); };
+
+    if (P.flash) return;
+    // the orb's rim is lit, not inked
+    const ink = col(INK);
+    for (let y = Math.floor(oy - orbR - 2); y <= oy + orbR + 2; y++) for (let x = Math.floor(ox - orbR - 2); x <= ox + orbR + 2; x++) {
+      if (g.get(x, y) === ink && Math.hypot(x + 0.5 - ox, y + 0.5 - oy) < orbR + 1.3) g.dot(x, y, magic.base);
+    }
+    if (clip !== 'cast' || P.glow < 0.05) {
+      // motes drifting up from the orb
+      const n = Math.round(lerp(2, 4, p.spell));
+      for (let i = 0; i < n; i++) {
+        const u = fract(t + i / n);
+        if (u > 0.7) continue;
+        fxDot(ox + (hash(i, 3) - 0.5) * 8, oy - orbR - 1 - u * 7, u < 0.35 ? magic.light : magic.base);
+      }
+    } else {
+      // the burst is as big as the Spell size asks for, but never bigger than the room around the orb
+      const big = Math.max(orbR + 3, Math.min(lerp(7, 12, p.spell), CW - 3 - ox, oy - 3));
+      if (t < 0.5) {
+        // charging: sparks spiral in toward the orb
+        const n = Math.round(lerp(5, 9, p.spell));
+        for (let i = 0; i < n; i++) {
+          const a = hash(i, 11) * TAU + t * 5;
+          const r = lerp(big, orbR + 1, fract(t * 2.3 + hash(i, 5)));
+          fxDot(ox + Math.sin(a) * r, oy + Math.cos(a) * r, '#ffffff');
+          fxDot(ox + Math.sin(a) * (r + 1.5), oy + Math.cos(a) * (r + 1.5), magic.light);
+        }
+      } else {
+        // release: a star flash, then a ring that grows and breaks into sparks
+        const u = clamp((t - 0.5) / 0.5);
+        const r = lerp(orbR + 1, big, smooth(u * 1.2));
+        if (u < 0.3) {
+          for (let i = 0; i < 8; i++) fxRay(i * TAU / 8, orbR + 1, orbR + (i % 2 ? big * 0.45 : big * 0.8), i % 2 ? magic.light : '#ffffff');
+          fxRing(orbR + 1, 1, '#ffffff');
+        } else if (u < 0.6) {
+          fxRing(r, 2, magic.light);
+        } else {
+          fxRing(r, 1, magic.base);
+        }
+        const n = Math.round(lerp(6, 10, p.spell));
+        for (let i = 0; i < n; i++) {
+          const a = (i + hash(i, 2) * 0.6) * TAU / n;
+          const rr = r + 1.5 + hash(i, 9) * 3 * u;
+          fxDot(ox + Math.sin(a) * rr, oy + Math.cos(a) * rr + u * u * 3, u < 0.5 ? '#ffffff' : magic.light);
+        }
+      }
+    }
+  },
+});

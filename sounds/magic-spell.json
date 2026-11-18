@@ -1,0 +1,198 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "magic-spell",
+ "name": "Magic spell",
+ "category": "magic",
+ "tags": [
+  "cast",
+  "sparkle",
+  "fantasy",
+  "heal"
+ ],
+ "description": "Gliding FM pad with random harmonic sparkles and a reverb tail.",
+ "duration": "length + 0.3 + shimmer*1.5",
+ "params": [
+  {
+   "id": "pitch",
+   "label": "Pitch",
+   "min": 300,
+   "max": 2000,
+   "default": 700,
+   "unit": "Hz",
+   "scale": "log"
+  },
+  {
+   "id": "length",
+   "label": "Length",
+   "min": 0.4,
+   "max": 2.5,
+   "default": 1.1,
+   "unit": "s"
+  },
+  {
+   "id": "rise",
+   "label": "Glide",
+   "min": -2,
+   "max": 2,
+   "default": 1.2,
+   "unit": "oct"
+  },
+  {
+   "id": "sparkle",
+   "label": "Sparkle rate",
+   "min": 5,
+   "max": 60,
+   "default": 28,
+   "unit": "/s"
+  },
+  {
+   "id": "shimmer",
+   "label": "Shimmer",
+   "min": 0,
+   "max": 0.7,
+   "default": 0.35
+  },
+  {
+   "id": "glow",
+   "label": "Glow",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  }
+ ],
+ "nodes": [
+  {
+   "id": "sweep",
+   "type": "env",
+   "points": [
+    [
+     0,
+     "pitch"
+    ],
+    [
+     "length",
+     "pitch * 2^rise",
+     "exp"
+    ]
+   ]
+  },
+  {
+   "id": "clk",
+   "type": "clock",
+   "rate": "sparkle",
+   "jitter": 0.5
+  },
+  {
+   "id": "rp",
+   "type": "rand",
+   "trig": "clk"
+  },
+  {
+   "id": "pingAmp",
+   "type": "ad",
+   "attack": 0.001,
+   "decay": 0.09,
+   "curve": 2,
+   "trig": "clk"
+  },
+  {
+   "id": "ping",
+   "type": "osc",
+   "freq": "sweep * (1 + floor(rp*5)*0.5)"
+  },
+  {
+   "id": "mod",
+   "type": "osc",
+   "freq": "sweep*2.01"
+  },
+  {
+   "id": "pad",
+   "type": "osc",
+   "freq": "sweep",
+   "pm": "mod*0.35*glow"
+  },
+  {
+   "id": "padAmp",
+   "type": "env",
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     "length*0.3",
+     1
+    ],
+    [
+     "length",
+     0
+    ]
+   ]
+  },
+  {
+   "id": "n",
+   "type": "noise"
+  },
+  {
+   "id": "airSweep",
+   "type": "filter",
+   "mode": "bp",
+   "in": "n",
+   "freq": "sweep*4",
+   "q": 6
+  },
+  {
+   "id": "total",
+   "type": "env",
+   "points": [
+    [
+     0,
+     1
+    ],
+    [
+     "length*0.7",
+     1
+    ],
+    [
+     "length",
+     0
+    ]
+   ]
+  },
+  {
+   "id": "space",
+   "type": "reverb",
+   "in": "(ping*pingAmp*0.7 + pad*padAmp*0.6*glow + airSweep*padAmp*0.15)*total",
+   "size": 0.8,
+   "damp": 0.25,
+   "mix": "shimmer"
+  }
+ ],
+ "out": "space",
+ "presets": {
+  "Heal": {
+   "pitch": 520,
+   "length": 1.6,
+   "rise": 1,
+   "sparkle": 18,
+   "shimmer": 0.6,
+   "glow": 0.9
+  },
+  "Curse": {
+   "pitch": 900,
+   "length": 1.2,
+   "rise": -1.8,
+   "sparkle": 45,
+   "shimmer": 0.4,
+   "glow": 0.3
+  },
+  "Quick zap": {
+   "pitch": 1400,
+   "length": 0.45,
+   "rise": 0.6,
+   "sparkle": 55,
+   "shimmer": 0.1,
+   "glow": 0.1
+  }
+ }
+}

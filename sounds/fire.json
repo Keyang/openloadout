@@ -1,0 +1,137 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "fire",
+ "name": "Campfire",
+ "category": "ambience",
+ "tags": [
+  "flame",
+  "torch",
+  "loop"
+ ],
+ "description": "Low roar, flickering mids, crackles and the occasional pop.",
+ "loop": true,
+ "duration": 6,
+ "params": [
+  {
+   "id": "size",
+   "label": "Fire size",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  },
+  {
+   "id": "crackle",
+   "label": "Crackle",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  },
+  {
+   "id": "bright",
+   "label": "Brightness",
+   "min": 0,
+   "max": 1,
+   "default": 0.4
+  },
+  {
+   "id": "pops",
+   "label": "Pops",
+   "min": 0,
+   "max": 1,
+   "default": 0.3
+  }
+ ],
+ "nodes": [
+  {
+   "id": "br",
+   "type": "noise",
+   "color": "brown"
+  },
+  {
+   "id": "roar",
+   "type": "filter",
+   "mode": "lp",
+   "in": "br",
+   "freq": "150 + size*500",
+   "q": 0.7
+  },
+  {
+   "id": "pk",
+   "type": "noise",
+   "color": "pink"
+  },
+  {
+   "id": "fclk",
+   "type": "clock",
+   "rate": 3,
+   "jitter": 0.7
+  },
+  {
+   "id": "fr",
+   "type": "rand",
+   "trig": "fclk"
+  },
+  {
+   "id": "g",
+   "type": "lag",
+   "in": "fr",
+   "time": 0.25
+  },
+  {
+   "id": "flk",
+   "type": "filter",
+   "mode": "bp",
+   "in": "pk",
+   "freq": "600 + bright*1500",
+   "q": 0.6
+  },
+  {
+   "id": "cr",
+   "type": "dust",
+   "density": "5 + crackle*120",
+   "spread": 1
+  },
+  {
+   "id": "crk",
+   "type": "filter",
+   "mode": "bp",
+   "in": "cr",
+   "freq": "2500 + bright*4000",
+   "q": 2
+  },
+  {
+   "id": "pp",
+   "type": "dust",
+   "density": "0.5 + pops*6",
+   "spread": 0.5
+  },
+  {
+   "id": "popRing",
+   "type": "modal",
+   "in": "pp",
+   "freq": "300 + rnd(0, 200)",
+   "ratios": [
+    1,
+    1.7,
+    2.9
+   ],
+   "decay": 0.04,
+   "tilt": 0.5
+  }
+ ],
+ "out": "roar*(0.5 + size) + flk*0.25*(0.4 + g) + crk*crackle*8 + popRing*pops*1.5",
+ "presets": {
+  "Torch": {
+   "size": 0.15,
+   "crackle": 0.2,
+   "bright": 0.7,
+   "pops": 0.05
+  },
+  "Bonfire": {
+   "size": 1,
+   "crackle": 0.9,
+   "bright": 0.3,
+   "pops": 0.8
+  }
+ }
+}

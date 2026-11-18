@@ -1,0 +1,11 @@
+{
+  "name": "loadout",
+  "private": true,
+  "type": "module",
+  "description": "Procedural pixel-art sprites drawn in code, with live parameters and sprite-sheet export.",
+  "scripts": {
+    "serve": "python3 -m http.server 5178",
+    "check": "node tools/check.mjs",
+    "render": "node tools/render.mjs"
+  }
+}

@@ -1,0 +1,127 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "error-buzz",
+ "name": "Error buzz",
+ "category": "ui",
+ "tags": [
+  "ui",
+  "error",
+  "denied",
+  "buzzer"
+ ],
+ "description": "Two short falling dissonant buzzes: wrong answer / action not allowed.",
+ "duration": "beep*2 + 0.08",
+ "params": [
+  {
+   "id": "pitch",
+   "label": "Pitch",
+   "unit": "Hz",
+   "min": 150,
+   "max": 450,
+   "default": 260,
+   "scale": "log"
+  },
+  {
+   "id": "beep",
+   "label": "Beep length",
+   "unit": "s",
+   "min": 0.07,
+   "max": 0.2,
+   "default": 0.11,
+   "scale": "log"
+  },
+  {
+   "id": "drop",
+   "label": "Fall",
+   "unit": "semitones",
+   "min": 1,
+   "max": 7,
+   "default": 4
+  },
+  {
+   "id": "bite",
+   "label": "Bite",
+   "unit": "Hz",
+   "min": 600,
+   "max": 3000,
+   "default": 1400,
+   "scale": "log"
+  },
+  {
+   "id": "clash",
+   "label": "Dissonance",
+   "unit": "semitones",
+   "min": 0.3,
+   "max": 1.5,
+   "default": 0.8
+  }
+ ],
+ "nodes": [
+  {
+   "id": "clk",
+   "type": "clock",
+   "rate": "1/beep",
+   "count": 2
+  },
+  {
+   "id": "note",
+   "type": "seq",
+   "steps": [
+    0,
+    "-drop"
+   ],
+   "trig": "clk"
+  },
+  {
+   "id": "a",
+   "type": "osc",
+   "wave": "square",
+   "freq": "pitch * semi(note)"
+  },
+  {
+   "id": "b",
+   "type": "osc",
+   "wave": "saw",
+   "freq": "pitch * semi(note + clash)"
+  },
+  {
+   "id": "pair",
+   "type": "expr",
+   "expr": "a*0.5 + b*0.5"
+  },
+  {
+   "id": "lp",
+   "type": "filter",
+   "mode": "lp",
+   "in": "pair",
+   "freq": "bite",
+   "q": 0.7
+  },
+  {
+   "id": "amp",
+   "type": "ad",
+   "attack": 0.004,
+   "hold": "beep*0.5",
+   "decay": "beep*0.4",
+   "curve": 1.5,
+   "trig": "clk"
+  }
+ ],
+ "out": "lp*amp",
+ "presets": {
+  "Soft no": {
+   "pitch": 190,
+   "beep": 0.15,
+   "drop": 3,
+   "bite": 800,
+   "clash": 0.5
+  },
+  "Sharp deny": {
+   "pitch": 340,
+   "beep": 0.08,
+   "drop": 6,
+   "bite": 2600,
+   "clash": 1.2
+  }
+ }
+}

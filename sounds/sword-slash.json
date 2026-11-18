@@ -1,0 +1,164 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "sword-slash",
+ "name": "Sword slash",
+ "category": "weapon",
+ "tags": [
+  "sword",
+  "melee",
+  "swing",
+  "metal"
+ ],
+ "description": "Fast blade swing through air that ends in a short metallic ring.",
+ "duration": "swing + ring*0.6 + 0.03",
+ "params": [
+  {
+   "id": "swing",
+   "label": "Swing time",
+   "unit": "s",
+   "min": 0.08,
+   "max": 0.35,
+   "default": 0.16,
+   "scale": "log"
+  },
+  {
+   "id": "air",
+   "label": "Air brightness",
+   "unit": "Hz",
+   "min": 1500,
+   "max": 6000,
+   "default": 3200,
+   "scale": "log"
+  },
+  {
+   "id": "pitch",
+   "label": "Blade pitch",
+   "unit": "Hz",
+   "min": 700,
+   "max": 2400,
+   "default": 1300,
+   "scale": "log"
+  },
+  {
+   "id": "ring",
+   "label": "Ring length",
+   "unit": "s",
+   "min": 0.1,
+   "max": 0.6,
+   "default": 0.3,
+   "scale": "log"
+  },
+  {
+   "id": "ringlvl",
+   "label": "Ring amount",
+   "min": 0.05,
+   "max": 0.5,
+   "default": 0.2
+  }
+ ],
+ "nodes": [
+  {
+   "id": "n",
+   "type": "noise",
+   "color": "white"
+  },
+  {
+   "id": "sweep",
+   "type": "env",
+   "points": [
+    [
+     0,
+     "air/4"
+    ],
+    [
+     "swing*0.7",
+     "air",
+     "exp"
+    ],
+    [
+     "swing",
+     "air/2",
+     "exp"
+    ]
+   ]
+  },
+  {
+   "id": "bp",
+   "type": "filter",
+   "mode": "bp",
+   "in": "n",
+   "freq": "sweep",
+   "q": 1.2
+  },
+  {
+   "id": "wamp",
+   "type": "env",
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     "swing*0.65",
+     1,
+     2
+    ],
+    [
+     "swing",
+     0,
+     0.5
+    ]
+   ]
+  },
+  {
+   "id": "hit",
+   "type": "clock",
+   "rate": 1,
+   "count": 1,
+   "delay": "swing*0.9"
+  },
+  {
+   "id": "burst",
+   "type": "ad",
+   "attack": 0.0005,
+   "decay": 0.004,
+   "trig": "hit"
+  },
+  {
+   "id": "click",
+   "type": "noise",
+   "color": "white"
+  },
+  {
+   "id": "bell",
+   "type": "modal",
+   "in": "click*burst",
+   "freq": "pitch",
+   "ratios": [
+    1,
+    2.76,
+    5.4,
+    8.93
+   ],
+   "decay": "ring",
+   "tilt": 0.5
+  }
+ ],
+ "out": "bp*wamp + bell*ringlvl*0.4",
+ "presets": {
+  "Heavy blade": {
+   "swing": 0.28,
+   "air": 1800,
+   "pitch": 800,
+   "ring": 0.5,
+   "ringlvl": 0.3
+  },
+  "Quick dagger": {
+   "swing": 0.09,
+   "air": 5000,
+   "pitch": 2200,
+   "ring": 0.15,
+   "ringlvl": 0.15
+  }
+ }
+}

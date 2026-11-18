@@ -1,0 +1,123 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "chime-success",
+ "name": "Success chime",
+ "category": "ui",
+ "tags": [
+  "confirm",
+  "reward",
+  "level-up",
+  "bell"
+ ],
+ "description": "Four-note major arpeggio on a soft FM bell, with room.",
+ "duration": "3/speed + ring + space*1.2",
+ "params": [
+  {
+   "id": "root",
+   "label": "Root note",
+   "min": 300,
+   "max": 1200,
+   "default": 660,
+   "unit": "Hz",
+   "scale": "log"
+  },
+  {
+   "id": "speed",
+   "label": "Speed",
+   "min": 4,
+   "max": 20,
+   "default": 10,
+   "unit": "notes/s"
+  },
+  {
+   "id": "bright",
+   "label": "Brightness",
+   "min": 0,
+   "max": 1,
+   "default": 0.4
+  },
+  {
+   "id": "ring",
+   "label": "Ring",
+   "min": 0.15,
+   "max": 1.5,
+   "default": 0.6,
+   "unit": "s"
+  },
+  {
+   "id": "space",
+   "label": "Room",
+   "min": 0,
+   "max": 0.6,
+   "default": 0.25
+  }
+ ],
+ "nodes": [
+  {
+   "id": "clk",
+   "type": "clock",
+   "rate": "speed",
+   "count": 4
+  },
+  {
+   "id": "note",
+   "type": "seq",
+   "steps": [
+    "root",
+    "root*semi(4)",
+    "root*semi(7)",
+    "root*2"
+   ],
+   "trig": "clk"
+  },
+  {
+   "id": "amp",
+   "type": "ad",
+   "attack": 0.002,
+   "decay": "ring",
+   "curve": 3,
+   "trig": "clk"
+  },
+  {
+   "id": "mod",
+   "type": "osc",
+   "freq": "note*3.5"
+  },
+  {
+   "id": "car",
+   "type": "osc",
+   "freq": "note",
+   "pm": "mod*amp*bright*0.6"
+  },
+  {
+   "id": "oct",
+   "type": "osc",
+   "freq": "note*2"
+  },
+  {
+   "id": "wet",
+   "type": "reverb",
+   "in": "(car + oct*0.25*bright)*amp",
+   "size": 0.7,
+   "damp": 0.3,
+   "mix": "space"
+  }
+ ],
+ "out": "wet",
+ "presets": {
+  "Quick confirm": {
+   "root": 880,
+   "speed": 18,
+   "ring": 0.3,
+   "space": 0.1,
+   "bright": 0.2
+  },
+  "Level up": {
+   "root": 520,
+   "speed": 7,
+   "ring": 1.2,
+   "space": 0.5,
+   "bright": 0.7
+  }
+ }
+}

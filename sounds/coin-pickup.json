@@ -1,0 +1,114 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "coin-pickup",
+ "name": "Coin pickup",
+ "category": "pickup",
+ "tags": [
+  "collect",
+  "reward",
+  "arcade"
+ ],
+ "description": "Two-note square blip, the second note a fourth up.",
+ "duration": "speed + ring + 0.02",
+ "params": [
+  {
+   "id": "pitch",
+   "label": "Pitch",
+   "min": 500,
+   "max": 2400,
+   "default": 988,
+   "unit": "Hz",
+   "scale": "log"
+  },
+  {
+   "id": "interval",
+   "label": "Interval",
+   "min": 0,
+   "max": 12,
+   "default": 5,
+   "unit": "semitones"
+  },
+  {
+   "id": "speed",
+   "label": "First note",
+   "min": 0.03,
+   "max": 0.15,
+   "default": 0.07,
+   "unit": "s"
+  },
+  {
+   "id": "ring",
+   "label": "Ring",
+   "min": 0.1,
+   "max": 0.9,
+   "default": 0.35,
+   "unit": "s"
+  },
+  {
+   "id": "shine",
+   "label": "Shine",
+   "min": 0,
+   "max": 1,
+   "default": 0.4
+  }
+ ],
+ "nodes": [
+  {
+   "id": "clk",
+   "type": "clock",
+   "rate": "1/speed",
+   "count": 2
+  },
+  {
+   "id": "note",
+   "type": "seq",
+   "steps": [
+    "pitch",
+    "pitch*semi(interval)"
+   ],
+   "trig": "clk"
+  },
+  {
+   "id": "sq",
+   "type": "osc",
+   "wave": "square",
+   "freq": "note"
+  },
+  {
+   "id": "tr",
+   "type": "osc",
+   "wave": "tri",
+   "freq": "note"
+  },
+  {
+   "id": "hi",
+   "type": "osc",
+   "freq": "note*3"
+  },
+  {
+   "id": "amp",
+   "type": "ad",
+   "attack": 0.002,
+   "decay": "ring",
+   "curve": 2.2,
+   "trig": "clk"
+  }
+ ],
+ "out": "(sq*0.35 + tr*0.6 + hi*shine*0.5) * amp",
+ "presets": {
+  "Gem": {
+   "pitch": 1400,
+   "interval": 7,
+   "speed": 0.05,
+   "ring": 0.6,
+   "shine": 1
+  },
+  "Dull token": {
+   "pitch": 620,
+   "interval": 3,
+   "speed": 0.09,
+   "ring": 0.2,
+   "shine": 0
+  }
+ }
+}

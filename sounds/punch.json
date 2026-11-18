@@ -1,0 +1,128 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "punch",
+ "name": "Punch",
+ "category": "impact",
+ "tags": [
+  "hit",
+  "hurt",
+  "melee",
+  "thud"
+ ],
+ "description": "Body thud with a pitch drop, a mid slap and saturated noise.",
+ "duration": "length + 0.04",
+ "params": [
+  {
+   "id": "weight",
+   "label": "Weight",
+   "min": 0.5,
+   "max": 2,
+   "default": 1
+  },
+  {
+   "id": "snap",
+   "label": "Slap",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  },
+  {
+   "id": "length",
+   "label": "Length",
+   "min": 0.08,
+   "max": 0.4,
+   "default": 0.18,
+   "unit": "s"
+  },
+  {
+   "id": "crunch",
+   "label": "Crunch",
+   "min": 0,
+   "max": 1,
+   "default": 0.3
+  }
+ ],
+ "nodes": [
+  {
+   "id": "drop",
+   "type": "env",
+   "points": [
+    [
+     0,
+     "220/weight"
+    ],
+    [
+     0.06,
+     "70/weight",
+     "exp"
+    ]
+   ]
+  },
+  {
+   "id": "thud",
+   "type": "osc",
+   "freq": "drop"
+  },
+  {
+   "id": "thudAmp",
+   "type": "ad",
+   "attack": 0.001,
+   "decay": "length",
+   "curve": 2
+  },
+  {
+   "id": "n",
+   "type": "noise"
+  },
+  {
+   "id": "slapAmp",
+   "type": "ad",
+   "attack": 0.0005,
+   "decay": "0.02 + length*0.25",
+   "curve": 2.5
+  },
+  {
+   "id": "slap",
+   "type": "filter",
+   "mode": "bp",
+   "in": "n",
+   "freq": "1800 + snap*2500",
+   "q": 0.8
+  },
+  {
+   "id": "body",
+   "type": "filter",
+   "mode": "lp",
+   "in": "n",
+   "freq": "500/weight + 200",
+   "q": 1
+  },
+  {
+   "id": "bodyAmp",
+   "type": "ad",
+   "attack": 0.002,
+   "decay": "length*0.7"
+  },
+  {
+   "id": "sat",
+   "type": "shaper",
+   "in": "thud*thudAmp*1.0 + slap*slapAmp*snap*3.5 + body*bodyAmp*1.2",
+   "drive": "1.5 + crunch*6"
+  }
+ ],
+ "out": "sat",
+ "presets": {
+  "Light jab": {
+   "weight": 0.6,
+   "snap": 0.8,
+   "length": 0.1,
+   "crunch": 0.1
+  },
+  "Heavy body blow": {
+   "weight": 1.9,
+   "snap": 0.2,
+   "length": 0.35,
+   "crunch": 0.7
+  }
+ }
+}

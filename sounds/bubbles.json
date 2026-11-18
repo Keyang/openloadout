@@ -1,0 +1,125 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "bubbles",
+ "name": "Bubbles",
+ "category": "ambience",
+ "tags": [
+  "water",
+  "underwater",
+  "potion",
+  "loop"
+ ],
+ "description": "Stream of chirping sine blobs with random pitch. A loop you can run live.",
+ "loop": true,
+ "duration": 4,
+ "params": [
+  {
+   "id": "rate",
+   "label": "Rate",
+   "min": 1,
+   "max": 25,
+   "default": 7,
+   "unit": "/s",
+   "scale": "log"
+  },
+  {
+   "id": "pitch",
+   "label": "Size",
+   "min": 200,
+   "max": 2000,
+   "default": 600,
+   "unit": "Hz",
+   "scale": "log"
+  },
+  {
+   "id": "chirp",
+   "label": "Chirp",
+   "min": 0,
+   "max": 2,
+   "default": 0.8,
+   "unit": "oct"
+  },
+  {
+   "id": "spread",
+   "label": "Pitch spread",
+   "min": 0,
+   "max": 1,
+   "default": 0.6
+  },
+  {
+   "id": "wet",
+   "label": "Room",
+   "min": 0,
+   "max": 0.6,
+   "default": 0.2
+  }
+ ],
+ "nodes": [
+  {
+   "id": "clk",
+   "type": "clock",
+   "rate": "rate",
+   "jitter": 0.8
+  },
+  {
+   "id": "rp",
+   "type": "rand",
+   "lo": "-spread",
+   "hi": "spread",
+   "trig": "clk"
+  },
+  {
+   "id": "up",
+   "type": "env",
+   "points": [
+    [
+     0,
+     1
+    ],
+    [
+     0.06,
+     "2^chirp",
+     "exp"
+    ]
+   ],
+   "trig": "clk"
+  },
+  {
+   "id": "amp",
+   "type": "ad",
+   "attack": 0.004,
+   "decay": 0.07,
+   "curve": 2,
+   "trig": "clk"
+  },
+  {
+   "id": "blob",
+   "type": "osc",
+   "freq": "pitch * 2^rp * up"
+  },
+  {
+   "id": "room",
+   "type": "reverb",
+   "in": "blob*amp",
+   "size": 0.5,
+   "damp": 0.6,
+   "mix": "wet"
+  }
+ ],
+ "out": "room",
+ "presets": {
+  "Boiling": {
+   "rate": 22,
+   "pitch": 350,
+   "chirp": 1.2,
+   "spread": 0.8
+  },
+  "Slow drips": {
+   "rate": 1.5,
+   "pitch": 1200,
+   "chirp": 0.3,
+   "spread": 0.3,
+   "wet": 0.5
+  }
+ }
+}

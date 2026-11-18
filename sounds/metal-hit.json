@@ -1,0 +1,127 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "metal-hit",
+ "name": "Metal hit",
+ "category": "impact",
+ "tags": [
+  "clang",
+  "bell",
+  "sword",
+  "pipe",
+  "modal"
+ ],
+ "description": "Modal resonator struck by a noise burst. Slide Inharmonic from tuned bell to clangy pipe.",
+ "duration": "ring*0.6 + 0.08",
+ "params": [
+  {
+   "id": "pitch",
+   "label": "Pitch",
+   "min": 150,
+   "max": 3000,
+   "default": 520,
+   "unit": "Hz",
+   "scale": "log"
+  },
+  {
+   "id": "ring",
+   "label": "Ring",
+   "min": 0.1,
+   "max": 4,
+   "default": 1.2,
+   "unit": "s",
+   "scale": "log"
+  },
+  {
+   "id": "hard",
+   "label": "Hardness",
+   "min": 0,
+   "max": 1,
+   "default": 0.6
+  },
+  {
+   "id": "inharm",
+   "label": "Inharmonic",
+   "min": 0,
+   "max": 1,
+   "default": 0.7
+  },
+  {
+   "id": "thud",
+   "label": "Body thud",
+   "min": 0,
+   "max": 1,
+   "default": 0.3
+  }
+ ],
+ "nodes": [
+  {
+   "id": "n",
+   "type": "noise"
+  },
+  {
+   "id": "strike",
+   "type": "ad",
+   "attack": 0.0003,
+   "decay": "0.002 + (1 - hard)*0.02",
+   "curve": 2
+  },
+  {
+   "id": "exc",
+   "type": "filter",
+   "mode": "lp",
+   "in": "n*strike",
+   "freq": "800 + hard*12000"
+  },
+  {
+   "id": "bell",
+   "type": "modal",
+   "in": "exc",
+   "freq": "pitch",
+   "ratios": [
+    1,
+    "mix(2, 2.76, inharm)",
+    "mix(3, 5.4, inharm)",
+    "mix(4, 8.93, inharm)",
+    "mix(5, 11.34, inharm)",
+    "mix(6, 14.42, inharm)"
+   ],
+   "decay": "ring",
+   "tilt": 0.8
+  },
+  {
+   "id": "bodyAmp",
+   "type": "ad",
+   "attack": 0.001,
+   "decay": 0.08
+  },
+  {
+   "id": "body",
+   "type": "osc",
+   "freq": "pitch*0.25"
+  }
+ ],
+ "out": "bell*0.2 + body*bodyAmp*thud*2 + exc*0.1",
+ "presets": {
+  "Sword clash": {
+   "pitch": 1900,
+   "ring": 0.5,
+   "hard": 1,
+   "inharm": 1,
+   "thud": 0
+  },
+  "Temple bell": {
+   "pitch": 220,
+   "ring": 3.5,
+   "hard": 0.3,
+   "inharm": 0.45,
+   "thud": 0.6
+  },
+  "Tin can": {
+   "pitch": 900,
+   "ring": 0.15,
+   "hard": 0.8,
+   "inharm": 0.9,
+   "thud": 0.2
+  }
+ }
+}

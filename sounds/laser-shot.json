@@ -1,0 +1,145 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "laser-shot",
+ "name": "Laser shot",
+ "category": "weapon",
+ "tags": [
+  "sci-fi",
+  "blaster",
+  "zap"
+ ],
+ "description": "Pitch-dropping blaster zap with a noisy muzzle click.",
+ "duration": "length + 0.03",
+ "params": [
+  {
+   "id": "pitch",
+   "label": "Start pitch",
+   "min": 400,
+   "max": 5000,
+   "default": 2200,
+   "unit": "Hz",
+   "scale": "log"
+  },
+  {
+   "id": "drop",
+   "label": "Pitch drop",
+   "min": 0.5,
+   "max": 5,
+   "default": 3,
+   "unit": "oct"
+  },
+  {
+   "id": "length",
+   "label": "Length",
+   "min": 0.06,
+   "max": 0.6,
+   "default": 0.22,
+   "unit": "s",
+   "scale": "log"
+  },
+  {
+   "id": "grit",
+   "label": "Grit",
+   "min": 0,
+   "max": 1,
+   "default": 0.35
+  },
+  {
+   "id": "wobble",
+   "label": "Wobble",
+   "min": 0,
+   "max": 1,
+   "default": 0.2
+  }
+ ],
+ "nodes": [
+  {
+   "id": "sweep",
+   "type": "env",
+   "points": [
+    [
+     0,
+     "pitch"
+    ],
+    [
+     "length",
+     "pitch / 2^drop",
+     "exp"
+    ]
+   ]
+  },
+  {
+   "id": "lfo",
+   "type": "osc",
+   "freq": "30 + 60*wobble"
+  },
+  {
+   "id": "body",
+   "type": "osc",
+   "wave": "saw",
+   "freq": "sweep * (1 + lfo*wobble*0.25)"
+  },
+  {
+   "id": "sub",
+   "type": "osc",
+   "wave": "square",
+   "freq": "sweep * 0.5"
+  },
+  {
+   "id": "amp",
+   "type": "ad",
+   "attack": 0.001,
+   "decay": "length",
+   "curve": 1.6
+  },
+  {
+   "id": "hiss",
+   "type": "noise"
+  },
+  {
+   "id": "click",
+   "type": "ad",
+   "attack": 0.0005,
+   "decay": 0.03,
+   "curve": 3
+  },
+  {
+   "id": "tone",
+   "type": "filter",
+   "mode": "lp",
+   "in": "body*0.7 + sub*0.35",
+   "freq": "min(sweep*4, 16000)",
+   "q": 1.5
+  },
+  {
+   "id": "dirty",
+   "type": "shaper",
+   "in": "tone",
+   "drive": "1 + grit*8"
+  }
+ ],
+ "out": "dirty*amp + hiss*click*0.4",
+ "presets": {
+  "Pew": {
+   "pitch": 3200,
+   "drop": 2.2,
+   "length": 0.12,
+   "grit": 0.1,
+   "wobble": 0
+  },
+  "Heavy cannon": {
+   "pitch": 900,
+   "drop": 3.5,
+   "length": 0.5,
+   "grit": 0.9,
+   "wobble": 0.35
+  },
+  "Alien ray": {
+   "pitch": 1600,
+   "drop": 1.2,
+   "length": 0.4,
+   "grit": 0.3,
+   "wobble": 1
+  }
+ }
+}

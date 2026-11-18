@@ -1,0 +1,158 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "footstep-gravel",
+ "name": "Footstep on gravel",
+ "category": "movement",
+ "tags": [
+  "walk",
+  "step",
+  "foley"
+ ],
+ "description": "Heel thump plus a burst of crunching grains. Every seed is a different step.",
+ "duration": "length + 0.05",
+ "params": [
+  {
+   "id": "weight",
+   "label": "Weight",
+   "min": 0.5,
+   "max": 2,
+   "default": 1
+  },
+  {
+   "id": "grit",
+   "label": "Gravel",
+   "min": 0,
+   "max": 1,
+   "default": 0.6
+  },
+  {
+   "id": "length",
+   "label": "Length",
+   "min": 0.08,
+   "max": 0.4,
+   "default": 0.2,
+   "unit": "s"
+  },
+  {
+   "id": "bright",
+   "label": "Brightness",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  },
+  {
+   "id": "scuff",
+   "label": "Scuff",
+   "min": 0,
+   "max": 1,
+   "default": 0.3
+  }
+ ],
+ "nodes": [
+  {
+   "id": "heelPitch",
+   "type": "env",
+   "points": [
+    [
+     0,
+     "140/weight"
+    ],
+    [
+     0.05,
+     "60/weight",
+     "exp"
+    ]
+   ]
+  },
+  {
+   "id": "heel",
+   "type": "osc",
+   "freq": "heelPitch"
+  },
+  {
+   "id": "heelAmp",
+   "type": "ad",
+   "attack": 0.002,
+   "decay": "0.06*weight",
+   "curve": 2
+  },
+  {
+   "id": "grains",
+   "type": "dust",
+   "density": "150 + grit*1500",
+   "spread": 1
+  },
+  {
+   "id": "grainAmp",
+   "type": "env",
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     0.015,
+     1
+    ],
+    [
+     "length",
+     0,
+     "exp"
+    ]
+   ]
+  },
+  {
+   "id": "gravel",
+   "type": "filter",
+   "mode": "bp",
+   "in": "grains*grainAmp",
+   "freq": "1500 + bright*3500 + rnd(-300, 300)",
+   "q": 1.2
+  },
+  {
+   "id": "n",
+   "type": "noise",
+   "color": "pink"
+  },
+  {
+   "id": "scuffAmp",
+   "type": "env",
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     "length*0.3",
+     1
+    ],
+    [
+     "length",
+     0
+    ]
+   ]
+  },
+  {
+   "id": "scuffTone",
+   "type": "filter",
+   "mode": "hp",
+   "in": "n",
+   "freq": 2500
+  }
+ ],
+ "out": "heel*heelAmp*0.45 + gravel*grit*6 + scuffTone*scuffAmp*scuff*0.35",
+ "presets": {
+  "Boots": {
+   "weight": 1.8,
+   "grit": 0.8,
+   "length": 0.3,
+   "bright": 0.3
+  },
+  "Sneaking": {
+   "weight": 0.6,
+   "grit": 0.25,
+   "length": 0.12,
+   "scuff": 0.6
+  }
+ }
+}

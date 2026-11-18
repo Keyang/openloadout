@@ -1,0 +1,129 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "ui-click",
+ "name": "UI click",
+ "category": "ui",
+ "tags": [
+  "button",
+  "tick",
+  "tap"
+ ],
+ "description": "Short, dry button tick: a pitched blip with a noisy snap and an optional woody knock.",
+ "duration": "length + 0.03",
+ "params": [
+  {
+   "id": "tone",
+   "label": "Tone",
+   "min": 500,
+   "max": 6000,
+   "default": 1800,
+   "unit": "Hz",
+   "scale": "log"
+  },
+  {
+   "id": "length",
+   "label": "Length",
+   "min": 0.01,
+   "max": 0.15,
+   "default": 0.04,
+   "unit": "s",
+   "scale": "log"
+  },
+  {
+   "id": "snap",
+   "label": "Snap",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  },
+  {
+   "id": "drop",
+   "label": "Pitch drop",
+   "min": 0,
+   "max": 1,
+   "default": 0.4
+  },
+  {
+   "id": "wood",
+   "label": "Woodiness",
+   "min": 0,
+   "max": 1,
+   "default": 0.3
+  }
+ ],
+ "nodes": [
+  {
+   "id": "pitch",
+   "type": "env",
+   "points": [
+    [
+     0,
+     "tone"
+    ],
+    [
+     "length",
+     "tone*(1 - drop*0.7)",
+     "exp"
+    ]
+   ]
+  },
+  {
+   "id": "blip",
+   "type": "osc",
+   "freq": "pitch"
+  },
+  {
+   "id": "amp",
+   "type": "ad",
+   "attack": 0.0008,
+   "decay": "length",
+   "curve": 3
+  },
+  {
+   "id": "hiss",
+   "type": "noise"
+  },
+  {
+   "id": "snapAmp",
+   "type": "ad",
+   "attack": 0.0003,
+   "decay": "0.004 + length*0.15",
+   "curve": 2
+  },
+  {
+   "id": "snapTone",
+   "type": "filter",
+   "mode": "hp",
+   "in": "hiss",
+   "freq": 3000
+  },
+  {
+   "id": "knock",
+   "type": "modal",
+   "in": "snapAmp*hiss",
+   "freq": "tone*0.45",
+   "ratios": [
+    1,
+    2.4,
+    4.1
+   ],
+   "decay": "length*1.5",
+   "tilt": 1
+  }
+ ],
+ "out": "blip*amp*(1 - wood*0.6) + snapTone*snapAmp*snap*0.6 + knock*wood*0.15",
+ "presets": {
+  "Soft tap": {
+   "tone": 900,
+   "snap": 0.15,
+   "length": 0.05,
+   "wood": 0.6
+  },
+  "Glass tick": {
+   "tone": 4200,
+   "length": 0.025,
+   "snap": 0.7,
+   "wood": 0
+  }
+ }
+}

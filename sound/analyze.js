@@ -1,0 +1,177 @@
+// analyze.js — measurements of a rendered sound, so an agent (or a test) can
+// check a patch without listening to it. Pure JS; shared by the CLI and the site.
+
+export function fft(re, im) {
+  const n = re.length;
+  for (let i = 1, j = 0; i < n; i++) {
+    let bit = n >> 1;
+    for (; j & bit; bit >>= 1) j ^= bit;
+    j ^= bit;
+    if (i < j) { let t = re[i]; re[i] = re[j]; re[j] = t; t = im[i]; im[i] = im[j]; im[j] = t; }
+  }
+  for (let len = 2; len <= n; len <<= 1) {
+    const ang = (-2 * Math.PI) / len, wr = Math.cos(ang), wi = Math.sin(ang);
+    for (let i = 0; i < n; i += len) {
+      let cr = 1, ci = 0;
+      for (let k = 0; k < len / 2; k++) {
+        const a = i + k, b = a + len / 2;
+        const xr = re[b] * cr - im[b] * ci, xi = re[b] * ci + im[b] * cr;
+        re[b] = re[a] - xr; im[b] = im[a] - xi; re[a] += xr; im[a] += xi;
+        const t = cr * wr - ci * wi; ci = cr * wi + ci * wr; cr = t;
+      }
+    }
+  }
+}
+
+// Magnitude spectrogram: frames[f][bin], linear magnitude.
+export function spectrogram(samples, size = 1024, hop = 256) {
+  const win = new Float32Array(size);
+  for (let i = 0; i < size; i++) win[i] = 0.5 - 0.5 * Math.cos((2 * Math.PI * i) / size);
+  const frames = [];
+  const re = new Float32Array(size), im = new Float32Array(size);
+  for (let s = -size / 2; s < samples.length - size / 2; s += hop) {
+    for (let i = 0; i < size; i++) { const j = s + i; re[i] = j >= 0 && j < samples.length ? samples[j] * win[i] : 0; im[i] = 0; }
+    fft(re, im);
+    const mag = new Float32Array(size / 2);
+    for (let i = 0; i < size / 2; i++) mag[i] = Math.hypot(re[i], im[i]) / (size / 4);
+    frames.push(mag);
+  }
+  return frames;
+}
+
+const BANDS = [['sub <80', 0, 80], ['low 80-300', 80, 300], ['lowmid 300-1k', 300, 1000], ['mid 1k-4k', 1000, 4000], ['high 4k-10k', 4000, 10000], ['air >10k', 10000, 1e9]];
+const SPARK = '▁▂▃▄▅▆▇█';
+const dB = (x) => (x > 1e-9 ? 20 * Math.log10(x) : -180);
+
+export function analyze(samples, sr) {
+  const n = samples.length;
+  let peak = 0, sum = 0, sq = 0, clipped = 0;
+  for (let i = 0; i < n; i++) {
+    const v = samples[i], a = Math.abs(v);
+    if (a > peak) peak = a;
+    if (a >= 0.999) clipped++;
+    sum += v; sq += v * v;
+  }
+  const rms = Math.sqrt(sq / n);
+  // Loudness contour: 32 RMS windows.
+  const W = 32, env = [];
+  for (let w = 0; w < W; w++) {
+    const a = Math.floor((w * n) / W), b = Math.floor(((w + 1) * n) / W);
+    let s = 0; for (let i = a; i < b; i++) s += samples[i] * samples[i];
+    env.push(Math.sqrt(s / Math.max(1, b - a)));
+  }
+  const envMax = Math.max(...env, 1e-9);
+  const contour = env.map((e) => SPARK[Math.max(0, Math.min(7, Math.round((1 + dB(e / envMax) / 48) * 7)))]).join('');
+  // Onset, attack and effective end (relative to peak).
+  const thr = peak * 0.01;
+  let first = 0, last = n - 1;
+  while (first < n && Math.abs(samples[first]) < thr) first++;
+  while (last > 0 && Math.abs(samples[last]) < thr) last--;
+  let tPeak = first;
+  for (let i = first; i < n; i++) if (Math.abs(samples[i]) >= peak * 0.9) { tPeak = i; break; }
+  // Spectrum.
+  const frames = spectrogram(samples, 1024, 256);
+  const bins = 512, hz = sr / 1024;
+  const centroidOf = (a, b) => {
+    let num = 0, den = 0;
+    for (let f = a; f < b; f++) for (let k = 1; k < bins; k++) { const p = frames[f][k] * frames[f][k]; num += p * k * hz; den += p; }
+    return den > 0 ? num / den : 0;
+  };
+  const domOf = (a, b) => {
+    const acc = new Float64Array(bins);
+    for (let f = a; f < b; f++) for (let k = 1; k < bins; k++) acc[k] += frames[f][k] * frames[f][k];
+    let best = 1; for (let k = 2; k < bins; k++) if (acc[k] > acc[best]) best = k;
+    return best * hz;
+  };
+  const F = frames.length, third = Math.max(1, Math.floor(F / 3));
+  const bandPow = BANDS.map(() => 0); let total = 0;
+  for (let f = 0; f < F; f++) for (let k = 1; k < bins; k++) {
+    const p = frames[f][k] * frames[f][k], fr = k * hz;
+    for (let b = 0; b < BANDS.length; b++) if (fr >= BANDS[b][1] && fr < BANDS[b][2]) { bandPow[b] += p; break; }
+    total += p;
+  }
+  return {
+    seconds: n / sr,
+    peakDb: dB(peak), rmsDb: dB(rms), crestDb: dB(peak) - dB(rms),
+    dcOffset: sum / n, clippedSamples: clipped,
+    leadSilenceMs: (first / sr) * 1000,
+    attackMs: ((tPeak - first) / sr) * 1000,
+    soundingSeconds: Math.max(0, (last - first) / sr),
+    tailSilenceMs: ((n - 1 - last) / sr) * 1000,
+    endLevelDb: dB(env[W - 1] / envMax),
+    contour,
+    centroidHz: { all: centroidOf(0, F), start: centroidOf(0, third), middle: centroidOf(third, Math.min(F, 2 * third)), end: centroidOf(Math.min(F - 1, 2 * third), F) },
+    dominantHz: { start: domOf(0, third), middle: domOf(third, Math.min(F, 2 * third)), end: domOf(Math.min(F - 1, 2 * third), F) },
+    bands: Object.fromEntries(BANDS.map((b, i) => [b[0], total > 0 ? bandPow[i] / total : 0])),
+  };
+}
+
+// Coarse log-frequency "fingerprint" (time × band, dB) used to measure how
+// different two renders are — e.g. a parameter at its minimum vs its maximum.
+export function fingerprint(samples, sr, seconds, T = 24, B = 20) {
+  const n = Math.round(seconds * sr);
+  const padded = new Float32Array(n); padded.set(samples.subarray(0, Math.min(n, samples.length)));
+  const frames = spectrogram(padded, 1024, 256), F = frames.length, hz = sr / 1024;
+  const out = new Float32Array(T * B), fmin = 40, fmax = Math.min(16000, sr / 2);
+  for (let t = 0; t < T; t++) {
+    const a = Math.floor((t * F) / T), b = Math.max(a + 1, Math.floor(((t + 1) * F) / T));
+    for (let k = 0; k < B; k++) {
+      const lo = fmin * Math.pow(fmax / fmin, k / B), hi = fmin * Math.pow(fmax / fmin, (k + 1) / B);
+      const k0 = Math.max(1, Math.floor(lo / hz)), k1 = Math.max(k0 + 1, Math.ceil(hi / hz));
+      let p = 0;
+      for (let f = a; f < b && f < F; f++) for (let i = k0; i < k1 && i < 512; i++) p += frames[f][i] * frames[f][i];
+      out[t * B + k] = Math.max(-70, 10 * Math.log10(p / ((b - a) * (k1 - k0)) + 1e-12));
+    }
+  }
+  return out;
+}
+export function fingerprintDistance(a, b) {
+  let s = 0, c = 0;
+  for (let i = 0; i < a.length; i++) { if (a[i] > -65 || b[i] > -65) { s += Math.abs(a[i] - b[i]); c++; } }
+  return c ? s / c : 0;
+}
+
+// Human/agent-readable findings from an analysis.
+export function critique(a, patch) {
+  const notes = [];
+  if (a.peakDb < -40) notes.push('ERROR: the render is silent (peak below -40 dBFS). Check that `out` reads a node that is actually producing signal and that envelopes are triggered.');
+  if (!patch.loop) {
+    if (a.leadSilenceMs > 30) notes.push(`WARN: ${a.leadSilenceMs.toFixed(0)} ms of silence before the sound starts — game SFX should start immediately.`);
+    if (a.tailSilenceMs > 150 && a.tailSilenceMs > a.seconds * 1000 * 0.25) notes.push(`WARN: the last ${a.tailSilenceMs.toFixed(0)} ms are silent — shorten duration.`);
+    if (a.endLevelDb > -18) notes.push(`WARN: the sound is still loud at the end (${a.endLevelDb.toFixed(0)} dB re. loudest window) — it will be cut off. Lengthen duration or shorten the decay.`);
+  }
+  if (Math.abs(a.dcOffset) > 0.05) notes.push(`WARN: DC offset ${a.dcOffset.toFixed(3)} — add a high-pass (filter mode hp, 30 Hz) before out.`);
+  if (a.bands['sub <80'] > 0.6) notes.push('WARN: over 60% of the energy is below 80 Hz — inaudible on phone/laptop speakers. Add mid/high content.');
+  else if (a.bands['sub <80'] + a.bands['low 80-300'] > 0.8) notes.push('NOTE: over 80% of the energy is below 300 Hz — fine for a rumble or thud, thin on phone speakers. Add a mid/high layer if it must read on small speakers.');
+  if (a.crestDb < 3 && !patch.loop) notes.push('NOTE: very low crest factor (near-square or heavily clipped signal).');
+  return notes;
+}
+
+// Music checks. pulse(): finds the strongest repeating beat periods from the
+// onset pattern (spectral flux autocorrelation); returns candidates as BPM.
+// Half and double tempo show up too, so read the list, not just the first entry.
+export function pulse(samples, sr) {
+  const hop = 256, frames = spectrogram(samples, 1024, hop), F = frames.length, fr = sr / hop;
+  const flux = new Float32Array(F);
+  for (let f = 1; f < F; f++) { let s = 0; for (let k = 1; k < 512; k++) { const d = frames[f][k] - frames[f - 1][k]; if (d > 0) s += d; } flux[f] = s; }
+  let mean = 0; for (const v of flux) mean += v; mean /= F;
+  let energy = 0; for (let i = 0; i < F; i++) { flux[i] -= mean; energy += flux[i] * flux[i]; }
+  if (energy < 1e-9) return [];
+  const score = (bpm) => {
+    const lag = (60 / bpm) * fr, l0 = Math.floor(lag), u = lag - l0; let s = 0;
+    for (let i = 0; i + l0 + 1 < F; i++) s += flux[i] * (flux[i + l0] * (1 - u) + flux[i + l0 + 1] * u);
+    return s / energy;
+  };
+  const cands = [];
+  for (let bpm = 50; bpm <= 220; bpm += 0.5) cands.push([bpm, score(bpm)]);
+  const peaks = cands.filter((c, i) => i > 0 && i < cands.length - 1 && c[1] > cands[i - 1][1] && c[1] >= cands[i + 1][1] && c[1] > 0.1);
+  return peaks.sort((x, y) => y[1] - x[1]).slice(0, 4).map(([bpm, strength]) => ({ bpm, strength: Math.round(strength * 100) / 100 }));
+}
+// seam(): how big the sample jump is where a loop wraps, relative to the
+// ordinary sample-to-sample movement just before it. Above ~8 it may click.
+export function seam(samples) {
+  const n = samples.length, w = Math.min(2000, n >> 2); let typical = 0;
+  for (let i = n - w; i < n; i++) typical += Math.abs(samples[i] - samples[i - 1]);
+  typical = typical / w + 1e-6;
+  return Math.abs(samples[0] - samples[n - 1]) / typical;
+}

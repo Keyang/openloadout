@@ -1,0 +1,153 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "spaceship-hum",
+ "name": "Spaceship hum",
+ "category": "vehicle",
+ "tags": [
+  "spaceship",
+  "engine",
+  "sci-fi",
+  "loop",
+  "live"
+ ],
+ "description": "Continuous engine loop; pitch, brightness and loudness all follow the thrust parameter (drive it live).",
+ "loop": true,
+ "normalize": false,
+ "duration": 4,
+ "params": [
+  {
+   "id": "thrust",
+   "label": "Thrust",
+   "min": 0,
+   "max": 1,
+   "default": 0.4
+  },
+  {
+   "id": "base",
+   "label": "Engine pitch",
+   "unit": "Hz",
+   "min": 40,
+   "max": 120,
+   "default": 70,
+   "scale": "log"
+  },
+  {
+   "id": "rumble",
+   "label": "Rumble",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  },
+  {
+   "id": "wobble",
+   "label": "Throb",
+   "min": 0,
+   "max": 1,
+   "default": 0.3
+  },
+  {
+   "id": "grit",
+   "label": "Grit",
+   "min": 0,
+   "max": 1,
+   "default": 0.3
+  }
+ ],
+ "nodes": [
+  {
+   "id": "slow",
+   "type": "osc",
+   "wave": "sine",
+   "freq": 0.5
+  },
+  {
+   "id": "f",
+   "type": "expr",
+   "expr": "base * (1 + thrust*2.2) * (1 + slow*0.05*wobble)"
+  },
+  {
+   "id": "core",
+   "type": "osc",
+   "wave": "saw",
+   "freq": "f"
+  },
+  {
+   "id": "half",
+   "type": "osc",
+   "wave": "pulse",
+   "width": 0.35,
+   "freq": "f*0.5"
+  },
+  {
+   "id": "sub",
+   "type": "osc",
+   "wave": "sine",
+   "freq": "f*0.5"
+  },
+  {
+   "id": "whine",
+   "type": "osc",
+   "wave": "tri",
+   "freq": "f*6"
+  },
+  {
+   "id": "tone",
+   "type": "expr",
+   "expr": "core*0.5 + half*0.3 + sub*0.6 + whine*0.25*thrust"
+  },
+  {
+   "id": "grind",
+   "type": "shaper",
+   "in": "tone",
+   "drive": "1 + grit*3",
+   "mode": "tanh"
+  },
+  {
+   "id": "open",
+   "type": "filter",
+   "mode": "lp",
+   "in": "grind",
+   "freq": "300 + thrust*thrust*4500",
+   "q": 0.8
+  },
+  {
+   "id": "n",
+   "type": "noise",
+   "color": "brown"
+  },
+  {
+   "id": "air",
+   "type": "filter",
+   "mode": "lp",
+   "in": "n",
+   "freq": "300 + thrust*2500",
+   "q": 0.7
+  },
+  {
+   "id": "dc",
+   "type": "filter",
+   "mode": "hp",
+   "in": "open*0.7 + air*rumble*(0.3+thrust)*1.5",
+   "freq": 30
+  },
+  {
+   "id": "level",
+   "type": "expr",
+   "expr": "0.12 + 0.88*thrust^1.3 * (1 + slow*0.6*wobble)"
+  }
+ ],
+ "out": "dc*level",
+ "presets": {
+  "Idle": {
+   "thrust": 0.05
+  },
+  "Cruise": {
+   "thrust": 0.45
+  },
+  "Full burn": {
+   "thrust": 1,
+   "grit": 0.6,
+   "rumble": 0.8
+  }
+ }
+}

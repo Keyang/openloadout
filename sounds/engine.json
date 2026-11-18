@@ -1,0 +1,139 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "engine",
+ "name": "Engine",
+ "category": "vehicle",
+ "tags": [
+  "car",
+  "motor",
+  "kart",
+  "loop"
+ ],
+ "description": "Four-stroke style engine. Run it live and drive the RPM and throttle sliders.",
+ "loop": true,
+ "duration": 3,
+ "normalize": false,
+ "gain": 0.5,
+ "params": [
+  {
+   "id": "rpm",
+   "label": "RPM",
+   "min": 700,
+   "max": 8000,
+   "default": 1500,
+   "unit": "rpm",
+   "scale": "log"
+  },
+  {
+   "id": "throttle",
+   "label": "Throttle",
+   "min": 0,
+   "max": 1,
+   "default": 0.4
+  },
+  {
+   "id": "rough",
+   "label": "Roughness",
+   "min": 0,
+   "max": 1,
+   "default": 0.4
+  },
+  {
+   "id": "size",
+   "label": "Engine size",
+   "min": 0.5,
+   "max": 2,
+   "default": 1
+  },
+  {
+   "id": "whine",
+   "label": "Gear whine",
+   "min": 0,
+   "max": 1,
+   "default": 0.15
+  }
+ ],
+ "nodes": [
+  {
+   "id": "jit",
+   "type": "noise",
+   "color": "brown"
+  },
+  {
+   "id": "fire",
+   "type": "expr",
+   "expr": "rpm/30/size * (1 + jit*rough*0.3)"
+  },
+  {
+   "id": "pulse",
+   "type": "osc",
+   "wave": "saw",
+   "freq": "fire"
+  },
+  {
+   "id": "half",
+   "type": "osc",
+   "wave": "pulse",
+   "freq": "fire*0.5",
+   "width": 0.3
+  },
+  {
+   "id": "n",
+   "type": "noise"
+  },
+  {
+   "id": "exhaust",
+   "type": "filter",
+   "mode": "lp",
+   "in": "n*(0.5 + 0.5*pulse)*(1 + rough)",
+   "freq": "300 + throttle*1800",
+   "q": 0.7
+  },
+  {
+   "id": "body",
+   "type": "filter",
+   "mode": "lp",
+   "in": "pulse*0.6 + half*0.5",
+   "freq": "400 + throttle*2500 + rpm*0.4",
+   "q": 1.2
+  },
+  {
+   "id": "gear",
+   "type": "osc",
+   "wave": "tri",
+   "freq": "fire*6.02"
+  },
+  {
+   "id": "drive",
+   "type": "shaper",
+   "in": "body*(0.6 + throttle*0.6) + exhaust*(0.3 + throttle*0.6) + gear*whine*0.6",
+   "drive": "1.5 + throttle*3"
+  },
+  {
+   "id": "clean",
+   "type": "filter",
+   "mode": "hp",
+   "in": "drive",
+   "freq": 35
+  }
+ ],
+ "out": "clean",
+ "presets": {
+  "Idle": {
+   "rpm": 800,
+   "throttle": 0.1
+  },
+  "Kart flat out": {
+   "rpm": 6500,
+   "throttle": 1,
+   "size": 0.6,
+   "whine": 0.5
+  },
+  "Truck": {
+   "rpm": 1100,
+   "throttle": 0.5,
+   "size": 1.9,
+   "rough": 0.8
+  }
+ }
+}

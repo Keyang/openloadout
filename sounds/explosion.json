@@ -1,0 +1,208 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "explosion",
+ "name": "Explosion",
+ "category": "impact",
+ "tags": [
+  "boom",
+  "blast",
+  "destroy"
+ ],
+ "description": "Sub thump, filtered noise blast, rumble tail and scattered debris.",
+ "duration": "length + 0.1",
+ "params": [
+  {
+   "id": "size",
+   "label": "Size",
+   "min": 0.5,
+   "max": 2,
+   "default": 1
+  },
+  {
+   "id": "length",
+   "label": "Length",
+   "min": 0.4,
+   "max": 3,
+   "default": 1.2,
+   "unit": "s",
+   "scale": "log"
+  },
+  {
+   "id": "crackle",
+   "label": "Debris",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  },
+  {
+   "id": "bright",
+   "label": "Brightness",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  },
+  {
+   "id": "rumble",
+   "label": "Rumble",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  }
+ ],
+ "nodes": [
+  {
+   "id": "n",
+   "type": "noise"
+  },
+  {
+   "id": "boomPitch",
+   "type": "env",
+   "points": [
+    [
+     0,
+     "150/size"
+    ],
+    [
+     0.3,
+     "38/size",
+     "exp"
+    ]
+   ]
+  },
+  {
+   "id": "boom",
+   "type": "osc",
+   "freq": "boomPitch"
+  },
+  {
+   "id": "boomAmp",
+   "type": "ad",
+   "attack": 0.002,
+   "decay": "0.35 + length*0.3",
+   "curve": 2
+  },
+  {
+   "id": "blastCut",
+   "type": "env",
+   "points": [
+    [
+     0,
+     "3000 + bright*9000"
+    ],
+    [
+     "length*0.6",
+     300,
+     "exp"
+    ]
+   ]
+  },
+  {
+   "id": "blast",
+   "type": "filter",
+   "mode": "lp",
+   "in": "n",
+   "freq": "blastCut",
+   "q": 0.7
+  },
+  {
+   "id": "blastAmp",
+   "type": "ad",
+   "attack": 0.003,
+   "decay": "length",
+   "curve": 2.5
+  },
+  {
+   "id": "br",
+   "type": "noise",
+   "color": "brown"
+  },
+  {
+   "id": "rumbleAmp",
+   "type": "env",
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     0.05,
+     1
+    ],
+    [
+     "length",
+     0
+    ]
+   ]
+  },
+  {
+   "id": "rum",
+   "type": "filter",
+   "mode": "lp",
+   "in": "br",
+   "freq": "120/size + 60"
+  },
+  {
+   "id": "deb",
+   "type": "dust",
+   "density": "20 + crackle*250",
+   "spread": 1
+  },
+  {
+   "id": "debAmp",
+   "type": "env",
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     0.04,
+     1
+    ],
+    [
+     "length*0.9",
+     0,
+     "exp"
+    ]
+   ]
+  },
+  {
+   "id": "debris",
+   "type": "filter",
+   "mode": "bp",
+   "in": "deb*debAmp",
+   "freq": "2000 + bright*3000",
+   "q": 1.5
+  },
+  {
+   "id": "sat",
+   "type": "shaper",
+   "in": "boom*boomAmp*0.9 + blast*blastAmp*1.4 + rum*rumbleAmp*rumble*1.2 + debris*crackle*10",
+   "drive": 2.2
+  }
+ ],
+ "out": "sat",
+ "presets": {
+  "Grenade": {
+   "size": 0.7,
+   "length": 0.7,
+   "crackle": 0.7,
+   "bright": 0.8,
+   "rumble": 0.2
+  },
+  "Distant blast": {
+   "size": 1.6,
+   "length": 2.4,
+   "crackle": 0.1,
+   "bright": 0.05,
+   "rumble": 1
+  },
+  "Fireworks pop": {
+   "size": 0.5,
+   "length": 0.5,
+   "crackle": 1,
+   "bright": 1,
+   "rumble": 0
+  }
+ }
+}
