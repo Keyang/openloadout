@@ -130,7 +130,7 @@ test('the step is a wall to walk into and a ledge to jump onto', () => {
   assert.ok(w.player.x < wall, `stopped at the wall (x ${w.player.x})`);
   assert.equal(w.player.y, w.level.groundY);
   step(w, { right: true, run: true, jump: true }, DT);
-  run(w, { right: true, run: true }, 1.5);
+  run(w, { right: true, run: true }, 1.1);
   assert.equal(w.player.y, w.level.groundY - 64, 'jumped up onto it');
   assert.ok(w.player.x > wall);
 });

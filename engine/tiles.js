@@ -250,20 +250,33 @@ export function blockKind(prefix, hint) {
  *   floors  [{ prefix, fill, fills, decals }]   a prefix with nothing but fills: the ground everything else sits on
  *   thins   [{ prefix, pieces: { l, m, r } }]     slopes [{ prefix, up, down }]     stacks [{ prefix, pieces: { cap, mid, foot } }]
  *   decals  [{ clip, prefix, place }]            extras [clip]  names the helper does not know
+ * Several tilesets at once (what a bag holds): pass [{ key, clips, names }] (key: your name for the tileset; clips: its
+ * clip table; names: optional, its clip names in order). Every block, floor, thin, slope, stack and decal then has
+ * `set` (the key of the tileset it came from) and the result has `from` ({ clip: key }). The first tileset to use a
+ * clip name keeps it, and a block, platform, slope pair or stack belongs whole to the first tileset with its prefix.
  */
 export function classifyTiles(clips) {
-  const list = Array.isArray(clips) ? clips.map((c) => (typeof c === 'string' ? { name: c } : c)) : Object.entries(clips).map(([name, c]) => ({ name, place: c?.place, block: c?.block }));
+  const many = Array.isArray(clips) && clips.length > 0 && clips.every((c) => c && typeof c === 'object' && 'key' in c && (c.clips !== undefined || Array.isArray(c.names)));
+  const entries = (table, names) => (names ?? Object.keys(table ?? {})).map((name) => ({ name, place: table?.[name]?.place, block: table?.[name]?.block }));
+  const list = many ? clips.flatMap((set) => entries(set.clips, set.names).map((c) => ({ ...c, set: set.key })))
+    : Array.isArray(clips) ? clips.map((c) => (typeof c === 'string' ? { name: c } : c)) : entries(clips);
   const groups = new Map(), thins = new Map(), slopes = new Map(), stacks = new Map(), decals = [], extras = [];
+  const from = {};
+  const tag = (o, set) => (many ? { ...o, set } : o);
   const of = (map, prefix, make) => { if (!map.has(prefix)) map.set(prefix, make()); return map.get(prefix); };
   for (const c of list) {
+    if (many && c.name in from) continue;                      // the first tileset to use a name keeps it
     const k = pieceOf(c.name);
+    const group = !k ? null : k.kind === 'thin' ? thins : k.kind === 'slope' ? slopes : k.kind === 'stack' ? stacks : k.kind === 'block' ? groups : null;
+    if (many && group && group.has(k.prefix) && group.get(k.prefix).set !== c.set) continue;   // ... and a prefix stays with one tileset
+    if (many) from[c.name] = c.set;
     if (!k) extras.push(c.name);
-    else if (k.kind === 'deco') decals.push({ clip: c.name, prefix: k.prefix, place: c.place === 'above' || c.place === 'below' ? c.place : 'on' });
-    else if (k.kind === 'thin') of(thins, k.prefix, () => ({ prefix: k.prefix, pieces: {} })).pieces[k.piece] = c.name;
-    else if (k.kind === 'slope') of(slopes, k.prefix, () => ({ prefix: k.prefix }))[k.piece] = c.name;
-    else if (k.kind === 'stack') of(stacks, k.prefix, () => ({ prefix: k.prefix, pieces: {} })).pieces[k.piece] = c.name;
+    else if (k.kind === 'deco') decals.push(tag({ clip: c.name, prefix: k.prefix, place: c.place === 'above' || c.place === 'below' ? c.place : 'on' }, c.set));
+    else if (k.kind === 'thin') of(thins, k.prefix, () => tag({ prefix: k.prefix, pieces: {} }, c.set)).pieces[k.piece] = c.name;
+    else if (k.kind === 'slope') of(slopes, k.prefix, () => tag({ prefix: k.prefix }, c.set))[k.piece] = c.name;
+    else if (k.kind === 'stack') of(stacks, k.prefix, () => tag({ prefix: k.prefix, pieces: {} }, c.set)).pieces[k.piece] = c.name;
     else {
-      const b = of(groups, k.prefix, () => ({ prefix: k.prefix, pieces: {}, fills: [], hint: undefined }));
+      const b = of(groups, k.prefix, () => ({ prefix: k.prefix, pieces: {}, fills: [], hint: undefined, set: c.set }));
       if (k.piece.startsWith('fill')) b.fills.push(c.name); else b.pieces[k.piece] = c.name;
       if (c.block) b.hint = c.block;
     }
@@ -272,11 +285,12 @@ export function classifyTiles(clips) {
   for (const b of groups.values()) {
     b.fills.sort((x, y) => (pieceOf(x).piece === 'fill' ? -1 : pieceOf(y).piece === 'fill' ? 1 : x < y ? -1 : 1));
     const own = decals.filter((d) => d.prefix === b.prefix);
-    if (!Object.keys(b.pieces).length) { floors.push({ prefix: b.prefix, fill: b.fills[0], fills: b.fills, decals: own }); continue; }
+    if (!Object.keys(b.pieces).length) { floors.push(tag({ prefix: b.prefix, fill: b.fills[0], fills: b.fills, decals: own }, b.set)); continue; }
     if (b.fills.length) b.pieces.fill = b.fills[0];
-    blocks.push({ prefix: b.prefix, kind: blockKind(b.prefix, b.hint), pieces: b.pieces, fills: b.fills, decals: own });
+    blocks.push(tag({ prefix: b.prefix, kind: blockKind(b.prefix, b.hint), pieces: b.pieces, fills: b.fills, decals: own }, b.set));
   }
-  return { blocks, floors, thins: [...thins.values()], slopes: [...slopes.values()], stacks: [...stacks.values()], decals, extras };
+  const out = { blocks, floors, thins: [...thins.values()], slopes: [...slopes.values()], stacks: [...stacks.values()], decals, extras };
+  return many ? { ...out, from } : out;
 }
 
 // the piece for each mix of sides that face out, written N E S W
@@ -284,8 +298,25 @@ const BY_SIDES = {
   '': 'fill', N: 'top', E: 'side-r', S: 'bottom', W: 'side-l', NW: 'left', NE: 'right', SW: 'bottom-l', ES: 'bottom-r',
   NS: 'strip-m', NSW: 'strip-l', NES: 'strip-r', EW: 'col-m', NEW: 'col-t', ESW: 'col-b', NESW: 'single',
 };
-// what to use when a tileset has only the 13 pieces
-const NEAREST = { 'strip-m': 'top', 'strip-l': 'left', 'strip-r': 'right', 'col-t': 'left', 'col-m': 'side-l', 'col-b': 'bottom-l', single: 'left', 'inner-tl': 'fill', 'inner-tr': 'fill', 'inner-bl': 'fill', 'inner-br': 'fill' };
+/**
+ * The closest piece a block has to the one a cell wants: `piece` itself when the block has it, else, in this order,
+ * the piece that closes the most of the same sides without closing any other (the top counts most, then the two
+ * sides, then the bottom), the fill, and last the piece that wrongly closes the fewest sides. Null for a block
+ * with no pieces. piece: the piece wanted. has: the pieces the block has (an object keyed by piece).
+ */
+export function nearestPiece(piece, has) {
+  if (has[piece] && SHAPES[piece]) return piece;
+  const want = SHAPES[piece] ?? {}, worth = { N: 8, W: 4, E: 4, S: 2 };
+  let best = null, top = -Infinity;
+  for (const name of [...BLOCK_PIECES, ...NARROW_PIECES]) {
+    if (!has[name]) continue;
+    const shape = SHAPES[name];
+    let score = shape.inner && shape.inner !== want.inner ? -1 : 0;
+    for (const side of ['N', 'E', 'S', 'W']) if (shape[side]) score += want[side] ? worth[side] : -100;
+    if (score > top) { top = score; best = name; }
+  }
+  return best;
+}
 
 // Which sides and corners of a slope cell are filled, as seen from the cell beside it. A slope that rises to the
 // right is filled underneath and on its right; its left side and its top are open, and so is its top left corner.
@@ -298,8 +329,8 @@ const SLOPE_FILLED = {
  * where there is more of the block, 'slope-up' or 'slope-down' where one of its slopes is (a neighbour then counts
  * only on the sides a slope fills: a block beside a slope's low end, or resting on a slope, is closed there), false
  * elsewhere. x, y: the cell. has: the pieces the tileset has (an object keyed by piece, such as a block's `pieces`);
- * without the narrow pieces the nearest of the 13 is returned. A side that faces out always wins; with all four
- * sides solid one cut corner gives its inner piece (top corners first).
+ * a piece it lacks is replaced by the closest it has (nearestPiece), so a block with only some pieces still draws.
+ * A side that faces out always wins; with all four sides solid one cut corner gives its inner piece (top corners first).
  */
 export function pickPiece(solid, x, y, has) {
   if (!solid(x, y)) return null;
@@ -308,7 +339,7 @@ export function pickPiece(solid, x, y, has) {
   const N = !full(0, -1, 'S'), E = !full(1, 0, 'W'), S = !full(0, 1, 'N'), W = !full(-1, 0, 'E');
   let piece = BY_SIDES[`${N ? 'N' : ''}${E ? 'E' : ''}${S ? 'S' : ''}${W ? 'W' : ''}`];
   if (piece === 'fill') piece = !full(-1, -1, 'SE') ? 'inner-tl' : !full(1, -1, 'SW') ? 'inner-tr' : !full(-1, 1, 'NE') ? 'inner-bl' : !full(1, 1, 'NW') ? 'inner-br' : 'fill';
-  if (has && !has[piece] && NEAREST[piece]) piece = NEAREST[piece];
+  if (has && !has[piece]) piece = nearestPiece(piece, has) ?? piece;
   return piece;
 }
 
@@ -333,6 +364,21 @@ export function pickClip(block, solid, x, y) {
   return block.pieces[piece] ?? null;
 }
 
+/** How often a cell that may hold a decal gets one, by where it goes: on a block's fill, on bare floor (top-down), above a top, under a bottom. */
+export const DECAL_CHANCE = { on: 0.25, floor: 0.12, above: 0.3, below: 0.5 };
+
+/**
+ * Which decal, if any, goes in a cell: a clip name or null, the same every time for the same cell. decals: the
+ * decals that may go there, [{ clip, place }] (a block's or a floor's `decals`). place: 'on' (the cell is a fill
+ * piece of the block, or bare floor), 'above' (an empty cell over the block's `top` piece) or 'below' (an empty
+ * cell under its `bottom` piece). x, y: the cell. chance: 0..1, default DECAL_CHANCE[place].
+ */
+export function pickDecal(decals, place, x, y, chance = DECAL_CHANCE[place]) {
+  const list = (decals ?? []).filter((d) => d.place === place);
+  if (!list.length || !(hash(x * 7 + 3, y * 13 + 5) < chance)) return null;
+  return list[Math.floor(hash(x * 11 + 1, y * 17 + 9) * list.length)].clip;
+}
+
 /**
  * Which piece of a thin platform goes in a cell: 'l', 'm' or 'r'. thin(x, y): true where the platform is.
  * solid(x, y): true where a block is. x, y: the cell. An end beside a block gets 'm', so the platform runs
@@ -353,15 +399,18 @@ export function pickStack(stack, x, y) {
  * one letter per cell. clips: a tileset's clips (as classifyTiles takes them) or the result of classifyTiles.
  * opts.view: 'side' (default) or 'top-down'. opts.legend: { letter: what }, added to the letters below; `what` is a
  * clip name, a prefix, or 'block:p', 'thin:p', 'stack:p', 'slope-up:p', 'slope-down:p', 'floor:p', or a list of
- * those for a cell that holds several things.
+ * those for a cell that holds several things. opts.decals: true to scatter the tileset's decals by pickDecal's rule
+ * over the cells the map leaves free (or { on, floor, above, below } chances in place of DECAL_CHANCE).
  *   side      '#' the first block, 'I' the second (else the first), '/' '\' its slopes, '=' the first thin platform,
  *             '-' the second, '|' ':' '!' the first three things that stack, 'H' 'Y' 'T' the same three standing
  *             behind the first platform (their top piece shares its cell), 'F' the first lone fill (a back wall)
  *   top-down  the first floor lies under every cell; 'W' the wall, 'O' the hole, 'P' 'Q' the other blocks
  *   both      'a'..'z' the decal with that letter ('on': over a cell of its block or floor; 'above', 'below': in
  *             an empty cell); '0'..'9' the clips the helper has no name for; '.' or a space: nothing
- * The map carries on past its edges as its edge cells. tiles: [{ clip, col, row, layer }] in drawing order.
+ * The map carries on past its edges as its edge cells. tiles: [{ clip, col, row, layer }] in drawing order (with
+ * `set`, the tileset's key, when clips came from classifyTiles with several tilesets).
  * cells[row][col]: { kind, prefix, solid, things } (side: blocks and slopes are solid; top-down: walls and holes).
+ * kind and solid come from the letters whether or not the tileset has tiles for them, so they can drive a game.
  * notes: what could not be placed, and slopes whose high side ends at a drop (no piece closes that side).
  */
 export function layoutTiles(rows, clips, opts = {}) {
@@ -384,8 +433,10 @@ export function layoutTiles(rows, clips, opts = {}) {
   const known = new Set([...T.blocks.flatMap((b) => [...Object.values(b.pieces), ...b.fills]), ...T.floors.flatMap((f) => f.fills), ...T.thins.flatMap((t) => Object.values(t.pieces)), ...T.slopes.flatMap((x) => [x.up, x.down]), ...T.stacks.flatMap((x) => Object.values(x.pieces)), ...T.decals.map((d) => d.clip), ...T.extras]);
 
   // what one thing in the legend stands for: { kind, prefix }, { kind: 'clip', clip } or { kind: 'decal', decal }
+  // What the standard letters are, tiles or no tiles: a map says what is solid even when the tileset cannot draw it.
+  const STANDARD = { '#': ['block'], I: ['block'], '/': ['slope-up'], '\\': ['slope-down'], '=': ['thin'], '-': ['thin'], H: ['thin'], Y: ['thin'], T: ['thin'], '|': ['stack'], ':': ['stack'], '!': ['stack'], F: ['floor'], W: ['block', 'wall'], O: ['block', 'hole'], P: ['block', 'ground'], Q: ['block', 'ground'] };
   const one = (ch, what) => {
-    if (!what) return { kind: 'empty', note: `"${ch}": the tileset has no ${WORDS[ch] ?? 'piece for it'}` };
+    if (!what) return { kind: (STANDARD[ch] ?? ['empty'])[0], prefix: null, as: (STANDARD[ch] ?? [])[1], missing: !!STANDARD[ch], note: `"${ch}": the tileset has no ${WORDS[ch] ?? 'piece for it'}` };
     const m = /^(block|thin|stack|slope-up|slope-down|floor):(.+)$/.exec(what);
     if (m) return { kind: m[1], prefix: m[2] };
     const decal = T.decals.find((d) => d.clip === what);
@@ -413,7 +464,7 @@ export function layoutTiles(rows, clips, opts = {}) {
     for (let c = 0; c < C; c++) {
       const things = [];
       for (const m of meaning(rows[r][c])) {
-        if (m.note) { if (!notes.includes(m.note)) notes.push(m.note); continue; }
+        if (m.note) { if (!notes.includes(m.note)) notes.push(m.note); if (!m.missing) continue; }
         if (m.kind === 'decal') {
           // an "on" decal lies over a cell of its block (or of the floor); the others stand in an empty cell
           const block = m.decal.place === 'on' ? byPrefix(T.blocks, m.decal.prefix) : null;
@@ -422,14 +473,18 @@ export function layoutTiles(rows, clips, opts = {}) {
         things.push(m);
       }
       const main = things.find((t) => SOLID.includes(t.kind)) ?? things.find((t) => t.kind !== 'decal' && t.kind !== 'clip') ?? null;
+      // solid: in side view every block and slope; top-down, walls and holes. Decided by the letter (or the block's
+      // name) even when the tileset has no such block, so a game's collisions and the picture agree.
       const block = main && SOLID.includes(main.kind) ? byPrefix(T.blocks, main.prefix) : null;
-      cells[r].push({ kind: main ? main.kind : 'empty', prefix: main ? main.prefix : null, solid: !!block && (view === 'side' || block.kind !== 'ground'), things });
+      const solid = !!main && SOLID.includes(main.kind) && (view === 'side' || (block ? block.kind : main.as ?? blockKind(main.prefix ?? '')) !== 'ground');
+      cells[r].push({ kind: main ? main.kind : 'empty', prefix: main ? main.prefix : null, solid, things });
     }
   }
   const at = (c, r) => (R && C ? cells[Math.max(0, Math.min(R - 1, r))][Math.max(0, Math.min(C - 1, c))] : { kind: 'empty', things: [] });
   const has = (c, r, kinds, prefix) => at(c, r).things.some((t) => kinds.includes(t.kind) && (prefix === undefined || t.prefix === prefix));
   const inside = (c, r) => c >= 0 && c < C && r >= 0 && r < R;
-  const put = (clip, col, row, layer, why) => { if (clip) tiles.push({ clip, col, row, layer }); else if (why && !notes.includes(why)) notes.push(why); };
+  const put = (clip, col, row, layer, why) => { if (clip) tiles.push(T.from ? { clip, col, row, layer, set: T.from[clip] } : { clip, col, row, layer }); else if (why && !notes.includes(why)) notes.push(why); };
+  const pieces = new Map();                                       // 'col,row' -> { block, piece } for the cells of blocks
   const LAYER = { floor: 0, stack: 1, ground: 2, hole: 3, wall: 4, thin: 5, decal: 6 };
   const floor = view === 'top-down' ? T.floors[0] : null;
   if (view === 'top-down' && !floor) notes.push('no floor: a top-down tileset needs a `<name>-fill` on its own to lie under everything');
@@ -437,12 +492,16 @@ export function layoutTiles(rows, clips, opts = {}) {
     if (floor) put(floor.fills[fillVariant(c, r, floor.fills.length)], c, r, LAYER.floor);
     for (const thing of cells[r][c].things) {
       const { kind, prefix } = thing;
+      if (thing.missing) continue;                                  // nothing to draw it with: already noted
       if (kind === 'floor') { const f = byPrefix(T.floors, prefix); put(f && f.fills[fillVariant(c, r, f.fills.length)], c, r, LAYER.floor, `no lone fill "${prefix}-fill"`); }
       if (kind === 'block') {
         // more of this block, or one of its slopes (pickPiece knows which sides of a slope are filled)
         const b = byPrefix(T.blocks, prefix), part = (x, y) => (has(x, y, ['block'], prefix) ? true : has(x, y, ['slope-up'], prefix) ? 'slope-up' : has(x, y, ['slope-down'], prefix) ? 'slope-down' : false);
         if (!b) put(null, c, r, 0, `no block "${prefix}"`);
-        else put(pickClip(b, part, c, r), c, r, LAYER[b.kind], `${b.prefix}: no piece for the cell at ${c},${r} (${pickPiece(part, c, r)})`);
+        else {
+          put(pickClip(b, part, c, r), c, r, LAYER[b.kind], `${b.prefix}: no piece for the cell at ${c},${r} (${pickPiece(part, c, r)})`);
+          pieces.set(`${c},${r}`, { block: b, piece: pickPiece(part, c, r, b.pieces) });
+        }
       }
       if (kind === 'slope-up' || kind === 'slope-down') {
         const sl = byPrefix(T.slopes, prefix);
@@ -463,6 +522,20 @@ export function layoutTiles(rows, clips, opts = {}) {
       }
       if (kind === 'decal') put(thing.decal.clip, c, r, LAYER.decal);
       if (kind === 'clip') put(thing.clip, c, r, LAYER.decal);
+    }
+  }
+  if (opts.decals) {
+    // scatter the decals the map does not place itself: one to a cell at most, by pickDecal's rule
+    const chance = { ...DECAL_CHANCE, ...(opts.decals === true ? {} : opts.decals) };
+    for (let r = 0; r < R; r++) for (let c = 0; c < C; c++) {
+      const things = cells[r][c].things, here = pieces.get(`${c},${r}`);
+      if (things.some((t) => t.kind === 'decal' || t.kind === 'clip')) continue;
+      if (here) { if (here.piece === 'fill') put(pickDecal(here.block.decals, 'on', c, r, chance.on), c, r, LAYER.decal); continue; }
+      if (things.length) continue;
+      if (floor) { put(pickDecal(floor.decals, 'on', c, r, chance.floor), c, r, LAYER.decal); continue; }
+      const under = pieces.get(`${c},${r + 1}`), over = pieces.get(`${c},${r - 1}`);
+      if (under && under.piece === 'top') put(pickDecal(under.block.decals, 'above', c, r, chance.above), c, r, LAYER.decal);
+      else if (over && over.piece === 'bottom') put(pickDecal(over.block.decals, 'below', c, r, chance.below), c, r, LAYER.decal);
     }
   }
   tiles.sort((a, b) => a.layer - b.layer);
@@ -754,5 +827,334 @@ export function drawDecal(g, draw, { ink = INK } = {}) {
   draw(s);
   if (ink) s.outline(ink);
   g.blit(s);
+  return g;
+}
+
+// ---- light marks, and liquids (added with batch P05: cave rock, water and waterfalls) ----------------------
+// A liquid is two pieces under one prefix: '<prefix>-top', the surface, see-through above a line that may wave,
+// and '<prefix>-fill', the body (with other versions, like a block's fill). It has no sides and no underside: it
+// lies in a basin of some block, whose own outline closes it. Worked example: sprites/tiles-water.js.
+
+const lightCache = new Map();
+/**
+ * The tone for light marks inside a fill (lit facets, glints, streaks on water): the light of the colour's ramp, or the next tone up if some whole-bundle look (engine/theme.js) would turn it into the fill's colour.
+ * Arguments: colour: the mark's material, '#rrggbb'. against: the fill's colour when the mark is of another material
+ * (default: colour). from: 0 to 1, where the search starts between the colour and its ramp's light (default 1, the
+ * light itself; 0.5 gives a softer tone for large lit areas, when that one survives every look).
+ */
+export function textureLight(colour, against = colour, from = 1) {
+  const start = Math.min(1, Math.max(0.1, Number(from) || 1));
+  const key = `${colour}/${against}/${start}`;
+  let tone = lightCache.get(key);
+  if (tone) return tone;
+  const light = ramp(colour).light, candidates = [];
+  for (let k = start; k < 1; k += 0.125) candidates.push(mix(colour, light, k));
+  candidates.push(light, mix(light, '#ffffff', 0.3), mix(light, '#ffffff', 0.6), '#ffffff');
+  const kept = (c) => col(c) !== col(against) && THEME_PRESETS.every((look) => { const to = applyColour(Uint32Array.from([col(against), col(c)]), look.theme.colour); return to[0] !== to[1]; });
+  tone = candidates.find(kept) ?? light;
+  lightCache.set(key, tone);
+  return tone;
+}
+
+/**
+ * The clip entries of a liquid (water, lava, a swamp): '<prefix>-top', its surface, and '<prefix>-fill', its body, animated; draw them with drawLiquid.
+ * Arguments: prefix: the liquid's prefix. opts.frames (default 8), opts.fps (number or (p) => number, default 6),
+ * opts.label (the word shown before each piece, default the prefix), opts.kind (kept on each entry as `block`, as
+ * blockClips does), opts.fills (2 or 3: also '<prefix>-fill-b', '-fill-c', other versions of the body that pickClip
+ * mixes in by position so a deep pool does not repeat every 32 px).
+ */
+export function liquidClips(prefix, opts = {}) {
+  const word = opts.label ?? title(prefix), o = { ...opts, frames: opts.frames ?? 8 };
+  const extra = opts.kind ? { block: opts.kind } : {};
+  const out = { [`${prefix}-top`]: entry(o, `${word}: surface`, extra), [`${prefix}-fill`]: entry(o, `${word}: body`, extra) };
+  for (let i = 1; i < Math.min(26, opts.fills ?? 1); i++) out[`${prefix}-fill-${String.fromCharCode(97 + i)}`] = entry(o, `${word}: body, version ${String.fromCharCode(65 + i)}`, extra);
+  return out;
+}
+
+/**
+ * Which piece of a liquid goes in a cell: 'top' (its surface: nothing of the liquid in the cell above) or 'fill' (its body); null for a cell with no liquid in it.
+ * Arguments: liquid(x, y): true where the liquid is. x, y: the cell. A liquid needs no other piece: whatever holds
+ * it closes its sides and its bed.
+ */
+export function pickLiquid(liquid, x, y) {
+  if (!liquid(x, y)) return null;
+  return liquid(x, y - 1) ? 'fill' : 'top';
+}
+
+// Columns are read in pairs that straddle the tile boundary (31 and 0, 1 and 2, ... 29 and 30), so the surface
+// line is as high on one side of a join as on the other whatever shape the wave has.
+const liquidColumn = (x) => (wrap(x + 1) >> 1) << 1;
+
+/**
+ * The row of a liquid's surface line at column x of its surface piece (0..31): where a float, a lily pad or the foot of a waterfall meets it.
+ * Arguments: liquid: what drawLiquid takes. x: the column (any whole number: the line repeats every 32 px).
+ * t: the clip phase.
+ */
+export function liquidLine(liquid, x, t = 0) {
+  const level = clampInt(liquid.level ?? 6, 0, M);
+  return liquid.rise ? clampInt(level - Math.round(liquid.rise(liquidColumn(x), t)), 0, M) : level;
+}
+
+/**
+ * Draw one piece of a liquid on a 32x32 Surface: 'fill' is the body, 'top' the surface, see-through above a line that may wave; pieces of one liquid join each other exactly on every frame.
+ * Arguments: g: the Surface. piece: 'top', 'fill', a version of the fill ('fill-b') or a whole clip name
+ * ('water-top'). liquid: { body, level, rise, surface } (below). t: the clip phase. Returns g.
+ *   liquid.body(x, y, t, v)        required. The colour of the body at x, y in 0..31; v is the fill version (0 under the
+ *                                  surface). Like a material's fill: it repeats every 32 px both ways, and other
+ *                                  versions keep their marks off the tile's edges on every frame
+ *   liquid.level                   the row of the surface line when the liquid lies still (default 6)
+ *   liquid.rise(u, t)              px the line stands above the level at column u (rounded; below 0 is a trough).
+ *                                  Asked at even columns only: columns u - 1 and u share a height, so a wave that
+ *                                  travels needs no pinning at the tile's ends. It must repeat every 32 px
+ *   liquid.surface(d, x, t, line)  the colour d px under the line (0: the line itself) at column x, or null to show
+ *                                  the body there. line: the row of the line at that column
+ * Things that float on it or stand out of it (a lily pad, a bubble) are the sprite's own: draw them afterwards,
+ * clear of the first and last column, and ask liquidLine where the surface is.
+ */
+export function drawLiquid(g, piece, liquid, t = 0) {
+  const k = piece === 'top' || /^fill(-[b-z])?$/.test(piece) ? piece : pieceOf(piece)?.piece;
+  if (k !== 'top' && !/^fill(-[b-z])?$/.test(k ?? '')) throw new Error(`drawLiquid: "${piece}" is not a piece of a liquid (top, fill, fill-b, ...)`);
+  const top = k === 'top', v = !top && k.length > 4 ? k.charCodeAt(5) - 97 : 0;
+  for (let x = 0; x < TILE; x++) {
+    const line = top ? liquidLine(liquid, x, t) : 0;
+    for (let y = line; y < TILE; y++) {
+      const c = top && liquid.surface ? liquid.surface(y - line, x, t, line) : null;
+      g.dot(x, y, c === null || c === undefined ? liquid.body(x, y, t, v) : c);
+    }
+  }
+  return g;
+}
+
+// ---- added with batch P04 (castle tiles): drawCourses, drawBattlement, drawArchway ----
+//
+//   const fill = patternFill(p.stone, (s) => drawCourses(s, [{ h: 11, joints: [9, 25] }, { h: 10, joints: [3, 17] }, { h: 11, joints: [12, 28] }], { joint: textureTone(p.stone) }));
+//   drawBattlement(g, material, t, { merlons: [[8, 23]], top: 10 });                 // one merlon and a gap; goes in the cell above a top tile
+//   drawArchway(g, material, t, { x0: 1, x1: 62, spring: 32, crown: 8, band });       // the left half of an archway two tiles wide
+//   drawArchway(g, material, t, { x0: -31, x1: 30, spring: 32, crown: 8, band });     // the right half
+//   drawArchway(g, backWall, t, { x0: 11, x1: 20, spring: 13, crown: 7, foot: 24 });  // a whole window in one tile
+
+/**
+ * Draws stone courses on a tile's pattern: rows of stones with 1 px joints that repeat every 32 px, so a wall of the tile shows unbroken courses; returns the face of every stone.
+ * Arguments: s (the 32x32 Surface patternFill hands to its drawing, already filled with the stone's colour); courses ([{ h, joints }] from the top down: h px high each, its last row being the joint under it, the heights adding up to 32; joints: the columns of its upright joints, none for one unbroken stone); options { joint (the joints' colour; left out: nothing is drawn and only the stones are returned), lit (a colour for a short highlight along the top right of each stone, where the light catches it), glint (px of that highlight, default 3), round (true cuts the four corners of every stone: cobbles) }.
+ * Returns [{ x, y, w, h, course, inner }]: the top-left pixel and size of each face (a stone that goes round the edge of the tile has x + w above 32); inner: it keeps 3 px off every edge of the tile, so a version of the fill may recolour or mark it.
+ * Versions of a fill (fill-b, fill-c) must share the tile's four edge lines: give them the same heights and the same joints in the first course, and keep the joints they change more than `glint` px from the left edge.
+ */
+export function drawCourses(s, courses, { joint = null, lit = null, glint = 3, round = false } = {}) {
+  const stones = [];
+  let y0 = 0;
+  courses.forEach((c, course) => {
+    const h = Math.max(2, Math.round(c.h)), face = h - 1;
+    const xs = [...new Set((c.joints ?? []).map((x) => wrap(Math.round(x))))].sort((a, b) => a - b), n = xs.length;
+    if (joint) {
+      s.rect(0, y0 + face, TILE, 1, joint);
+      for (const x of xs) s.rect(x, y0, 1, face, joint);
+    }
+    for (let i = 0; i < Math.max(1, n); i++) {
+      const a = n ? xs[i] + 1 : 0, w = n ? (xs[(i + 1) % n] - xs[i] - 1 + TILE) % TILE : TILE, end = a + w - 1;
+      if (w < 1) continue;
+      const cut = round && n && w >= 3 && face >= 3;
+      if (cut && joint) for (const [x, y] of [[a, y0], [end, y0], [a, y0 + face - 1], [end, y0 + face - 1]]) s.dot(wrap(x), y, joint);
+      if (lit && n && w >= 3) {
+        const last = end - (cut ? 1 : 0), run = Math.min(Math.round(glint), w - 2);
+        for (let k = 0; k < run; k++) if (last - k >= (end >= TILE ? TILE : 0)) s.dot(wrap(last - k), y0, lit);       // never round the edge of the tile
+        if (face >= 4) s.dot(wrap(end), y0 + 1, lit);
+      }
+      stones.push({ x: a, y: y0, w, h: face, course, inner: a >= 3 && a + w <= TILE - 3 && y0 >= 3 && y0 + face <= TILE - 3 });
+    }
+    y0 += h;
+  });
+  return stones;
+}
+
+/**
+ * Draws battlements from a block's material: merlons standing on the bottom of the tile, inked and banded along their tops and sides like the block itself, with an optional low parapet running between them.
+ * Arguments: g (the 32x32 Surface); material (as drawBlock takes it: its fill, ink, round, and the bands of its top, left and right edges; the top edge's inset and wrap are not used); t (the clip phase); options { merlons ([[x0, x1], ...]: the first and last column of each merlon, default [[8, 23]]), top (the row of the merlons' top line, default 8), sill (the row of the parapet's top line between the merlons; 32, the default, for no parapet) }.
+ * The piece repeats sideways and has no line along its bottom: it goes in the empty cell above a top tile, whose own outline closes it. A parapet runs off both edges of the tile.
+ */
+export function drawBattlement(g, material, t = 0, { merlons = [[8, 23]], top = 8, sill = TILE } = {}) {
+  const eTop = edgeOf(material, 'top'), eL = edgeOf(material, 'left'), eR = edgeOf(material, 'right');
+  const ink = material.ink === undefined ? INK : material.ink, add = ink ? 0 : 1;
+  const round = clampInt(material.round ?? 0, 0, 3);
+  const y0 = clampInt(top, 0, M), ys = clampInt(sill, y0, TILE);
+  const merlonAt = (x) => { const u = wrap(x); return merlons.find(([a, b]) => u >= a && u <= b) ?? null; };
+  const solid = (x, y) => {
+    if (y >= TILE) return true;
+    if (y < 0) return false;
+    const m = merlonAt(x);
+    if (!m) return y >= ys;
+    if (y < y0) return false;
+    return !(round && y < ys && Math.min(wrap(x) - m[0], m[1] - wrap(x)) + (y - y0) < round);
+  };
+  for (let y = 0; y < TILE; y++) for (let x = 0; x < TILE; x++) {
+    if (!solid(x, y)) continue;
+    const m = merlonAt(x);
+    const corner = m && ys < TILE && y === ys && (x === m[0] || x === m[1]);      // where a merlon's side meets the parapet
+    if (ink && (corner || !solid(x - 1, y) || !solid(x + 1, y) || !solid(x, y - 1))) { g.dot(x, y, ink); continue; }
+    let best = null;
+    const band = (e, d, u) => {
+      d += add;
+      const depth = depthAt(e, u, t);
+      if (!e.paint || d < 1 || d > depth || (best && best.d <= d)) return;
+      const c = e.paint(d, wrap(u), t, depth);
+      if (c !== null && c !== undefined) best = { c, d };
+    };
+    if (!m) band(eTop, y - ys, x);
+    else if (y < ys) { band(eTop, y - y0, x); band(eL, x - m[0], y); band(eR, m[1] - x, y); }
+    else {
+      // under the level of the parapet: the merlon's own top is far above; the parapet's top band and the merlon's
+      // side bands meet in a mitre, as the bands of a block do in an inner corner
+      const a = y - ys, bl = x - m[0], br = m[1] - x;
+      band(eTop, y - y0, x);
+      if (a >= Math.min(bl, br)) band(eTop, a, x); else band(bl <= br ? eL : eR, Math.min(bl, br), y);
+    }
+    g.dot(x, y, best ? best.c : material.fill(x, y, t, 0));
+  }
+  return g;
+}
+
+/**
+ * Draws a fill with an arch-headed opening cut through it: the opening is see-through, its edge takes the material's ink line, and a band can follow it round for the stones of an arch ring or a window's frame.
+ * Arguments: g (the 32x32 Surface); material (as drawBlock takes it; only its fill and ink are used: version 0 of the fill, and ink null for no line); t (the clip phase); options { x0, x1 (the first and last open column; they may lie outside 0..31, which is how one tile holds half of an archway two tiles wide), spring (the row the arch springs from: the opening is straight-sided from there down; 32 = the bottom of the tile), crown (the top row of the opening), foot (the last open row; default: the opening runs off the bottom of the tile), band ({ depth, paint(d, u, t, depth), joints: { every, colour } }: depth px of band round the opening; paint gets d px in from the line (1 = the first) and u px along the opening's outline measured from the crown, negative to its left; null from paint shows the fill; joints draws clean 1 px joints across the band every `every` px, counted from half a stone either side of the crown so a keystone sits on it) }.
+ * The tile's own edges get no line: it is laid among fill tiles, or inside an opening whose edge tiles are already inked.
+ */
+export function drawArchway(g, material, t = 0, { x0 = 1, x1 = 2 * TILE - 2, spring = TILE, crown = 8, foot = Infinity, band = null } = {}) {
+  const ink = material.ink === undefined ? INK : material.ink, add = ink ? 0 : 1;
+  const cx = (x0 + x1 + 1) / 2, rx = Math.max(0.5, (x1 + 1 - x0) / 2), ry = Math.max(0.5, spring - crown);
+  const open = (x, y) => {
+    const px = x + 0.5, py = y + 0.5;
+    if (px < x0 || px > x1 + 1 || py > foot + 1) return false;
+    return py >= spring || ((px - cx) / rx) ** 2 + ((py - spring) / ry) ** 2 < 1;
+  };
+  const depth = band ? Math.max(0, Math.round(band.depth ?? 0)) : 0, reach = depth + 1;
+  const R = (rx + ry) / 2, quarter = (Math.PI / 2) * R;
+  const along = (x, y) => { const px = x + 0.5, py = y + 0.5; return py >= spring ? Math.sign(px - cx) * (quarter + py - spring) : Math.atan2((px - cx) / rx, (spring - py) / ry) * R; };
+  const inBand = new Uint8Array(TILE * TILE);
+  for (let y = 0; y < TILE; y++) for (let x = 0; x < TILE; x++) {
+    if (open(x, y)) continue;
+    if (ink && (open(x - 1, y) || open(x + 1, y) || open(x, y - 1) || open(x, y + 1))) { g.dot(x, y, ink); continue; }
+    let c = null;
+    if (depth && band.paint) {
+      let near = Infinity;
+      for (let dy = -reach; dy <= reach; dy++) for (let dx = -reach; dx <= reach; dx++) if (dx * dx + dy * dy < near && open(x + dx, y + dy)) near = dx * dx + dy * dy;
+      const d = Math.ceil(Math.sqrt(near) - 1.01) + add;
+      if (d >= 1 && d <= depth) { c = band.paint(d, along(x, y), t, depth); if (c !== null && c !== undefined) inBand[y * TILE + x] = 1; }
+    }
+    g.dot(x, y, c ?? material.fill(x, y, t, 0));
+  }
+  if (depth && band.joints && band.joints.every >= 2) {
+    const { every, colour } = band.joints;
+    const mark = (x, y) => { if (x >= 0 && y >= 0 && x < TILE && y < TILE && inBand[y * TILE + x]) g.dot(x, y, colour); };
+    for (let s = every / 2; s < quarter + TILE; s += every) for (const side of [-1, 1]) {
+      if (s >= quarter) {
+        // down the jambs: a level joint
+        const y = Math.floor(spring + s - quarter);
+        if (y <= foot) for (let x = 0; x < TILE; x++) if (Math.sign(x + 0.5 - cx) === side) mark(x, y);
+        continue;
+      }
+      // across the ring: a straight line out from the opening, square to its edge
+      const a = (side * s) / R, bx = cx + rx * Math.sin(a), by = spring - ry * Math.cos(a);
+      let nx = Math.sin(a) / rx, ny = -Math.cos(a) / ry;
+      const len = Math.hypot(nx, ny); nx /= len; ny /= len;
+      let ax = Math.floor(bx), ay = Math.floor(by);
+      const ex = Math.floor(bx + nx * (depth + 2)), ey = Math.floor(by + ny * (depth + 2));
+      const dx = Math.abs(ex - ax), dy = -Math.abs(ey - ay), sx = ax < ex ? 1 : -1, sy = ay < ey ? 1 : -1;
+      for (let err = dx + dy; ;) {
+        mark(ax, ay);
+        if (ax === ex && ay === ey) break;
+        const e2 = 2 * err;
+        if (e2 >= dy) { err += dy; ax += sx; }
+        if (e2 <= dx) { err += dx; ay += sy; }
+      }
+    }
+  }
+  return g;
+}
+
+// ---- soft ground (added with batch R04: the meadow's paths) -------------------------------------------------
+// Ground laid on other ground on a top-down map (a dirt path, sand, a flower bed, a rug of moss) and the lip of a
+// pond want a softer line than a block of rock: corners that are true arcs, and an outline that wanders further in.
+// drawSoftBlock draws the same pieces as drawBlock, under the same names, from the same kind of material, so the
+// picker, the classifier and the checker need nothing new: build the clips with blockClips as usual.
+// Worked example: sprites/tiles-meadow.js.
+
+const softInset = (e, u, t) => { u = wrap(u); return e.inset ? Math.min(clampInt(e.inset(u, t), 0, 8), u, M - u) : 0; };
+
+/**
+ * Draw one piece of a block of soft ground (a path, sand, moss, the bank of a pond) on a 32x32 Surface: as drawBlock, but every outer corner is a true arc and the outline may wander up to 8 px in.
+ * Arguments: g: the Surface. piece: a name from BLOCK_PIECES or NARROW_PIECES ('top', 'inner-tl', 'strip-l', ...), a
+ * fill version ('fill-b') or a whole clip name ('path-top'). material: what drawBlock takes (fill, top, bottom,
+ * side or left and right, ink, outside), read differently in four places (below). t: the clip phase, passed on to
+ * the material, so a bank or a foam line can move. Returns g.
+ *   material.round    0..14: the radius in px of every outer corner (drawBlock cuts 3 px at most). The end of a strip
+ *                     or a column is then a round cap, and a tile on its own a round patch
+ *   edge.inset(u, t)  0..8 px (drawBlock: 0..3). It is still pinned to the tile boundary at both ends of every edge
+ *                     (0 px at u = 0 and 31, at most 1 px at 1 and 30, ...): that is what lets a path one tile wide
+ *                     turn a corner, fork and cross itself with the same 20 pieces
+ *   edge.paint        each open side of a piece offers its band, and a pixel takes the band it is nearest the start
+ *                     of; in a corner's arc depth is measured from the arc. In an inner corner the two bands turn
+ *                     round the corner in a quarter circle
+ *   edge.wrap, edge.tuck, material.face   not used: soft ground has the same kind of edge all round and no front
+ * With `ink: null` (floor on floor) the band starts on the outline itself: paint d = 1 is the line round the patch.
+ * Pieces of one material join exactly in every arrangement blockJoins lists, at every radius.
+ */
+export function drawSoftBlock(g, piece, material, t = 0) {
+  let name = SHAPES[piece] || /^fill-[b-z]$/.test(piece) ? piece : pieceOf(piece)?.piece;
+  let variant = 0;
+  if (name && name.startsWith('fill-')) { variant = name.charCodeAt(5) - 97; name = 'fill'; }
+  if (!SHAPES[name]) throw new Error(`drawSoftBlock: "${piece}" is not a block piece (${[...BLOCK_PIECES, ...NARROW_PIECES].join(', ')})`);
+  const { N, E, S, W, inner = null } = SHAPES[name];
+  const edges = { N: edgeOf(material, 'top'), S: edgeOf(material, 'bottom'), W: edgeOf(material, 'left'), E: edgeOf(material, 'right') };
+  const ink = material.ink === undefined ? INK : material.ink;
+  const R = Math.min(14, Math.max(0, Number(material.round) || 0));
+  const add = ink ? 0 : 1;                                   // with no ink line the band starts on the outline itself
+  // how far a pixel's centre is inside each open side, in px (under 0: outside it)
+  const reach = (x, y) => ({
+    N: N ? y + 0.5 - softInset(edges.N, x, t) : FAR, S: S ? M - y + 0.5 - softInset(edges.S, x, t) : FAR,
+    W: W ? x + 0.5 - softInset(edges.W, y, t) : FAR, E: E ? M - x + 0.5 - softInset(edges.E, y, t) : FAR,
+  });
+  const CORNERS = [['N', 'W'], ['N', 'E'], ['S', 'W'], ['S', 'E']];
+  // the same, measured from the arc wherever a pixel is in the corner square of two open sides
+  const rounded = (r) => {
+    const d = { ...r };
+    if (R) for (const [a, b] of CORNERS) if (r[a] < R && r[b] < R) { const c = R - Math.hypot(R - r[a], R - r[b]); d[a] = Math.min(d[a], c); d[b] = Math.min(d[b], c); }
+    return d;
+  };
+  const solid = (x, y) => { const d = rounded(reach(x, y)); return d.N >= 0 && d.S >= 0 && d.W >= 0 && d.E >= 0; };
+  // one ring of cells round the tile, so the outline knows what is past the tile's own edge
+  const P = TILE + 2, mask = new Uint8Array(P * P);
+  for (let y = -1; y <= TILE; y++) for (let x = -1; x <= TILE; x++) mask[(y + 1) * P + x + 1] = solid(x, y) ? 1 : 0;
+  const at = (x, y) => mask[(y + 1) * P + x + 1];
+  const band = (e, d, u) => {
+    const depth = depthAt(e, u, t);
+    d += add;
+    if (!e.paint || d < 1 || d > depth) return null;
+    const c = e.paint(d, wrap(u), t, depth);
+    return c === null || c === undefined ? null : c;
+  };
+
+  for (let y = 0; y < TILE; y++) for (let x = 0; x < TILE; x++) {
+    if (!at(x, y)) {
+      if (material.outside) { const c = material.outside(x, y, t); if (c !== null && c !== undefined) g.dot(x, y, c); }
+      continue;
+    }
+    let colour = null;
+    if (inner) {
+      // an inner corner: every pixel is solid, and depth is the distance from the one cell outside, at the corner
+      const a = inner[0] === 't' ? y : M - y, b = inner[1] === 'l' ? x : M - x;
+      const d = Math.floor(Math.hypot(a + 1, b + 1) - 1 + 1e-6);
+      if (ink && d === 0) { g.dot(x, y, ink); continue; }
+      colour = a >= b ? band(edges[inner[0] === 't' ? 'N' : 'S'], d, x) : band(edges[inner[1] === 'l' ? 'W' : 'E'], d, y);
+    } else {
+      if (ink && (!at(x - 1, y) || !at(x + 1, y) || !at(x, y - 1) || !at(x, y + 1))) { g.dot(x, y, ink); continue; }
+      const r = reach(x, y), d = rounded(r);
+      let best = FAR, near = FAR;
+      for (const k of ['N', 'S', 'W', 'E']) {
+        if (r[k] >= FAR) continue;
+        const depth = Math.floor(d[k]), c = band(edges[k], depth, k === 'N' || k === 'S' ? x : y);
+        if (c !== null && (depth < best || (depth === best && r[k] < near))) { best = depth; near = r[k]; colour = c; }
+      }
+    }
+    g.dot(x, y, colour ?? material.fill(x, y, t, variant));
+  }
   return g;
 }

@@ -6,7 +6,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { makeLevel, levelFeatures, tileIndex, levelMap, levelTiles, isWall, solidAt, surfaceBelow, supportAt, CELL } from '../../app/play/level.js';
-import { classifyTiles, layoutTiles, pickPiece, blockKind, BLOCK_PIECES } from '../../engine/tiles.js';
+import { classifyTiles, layoutTiles, pickPiece, nearestPiece, blockKind, BLOCK_PIECES } from '../../engine/tiles.js';
 import { tilesSide, tilesTop } from '../fixtures/play/index.js';
 
 const block = (p) => BLOCK_PIECES.map((s) => `${p}-${s}`);
@@ -36,12 +36,12 @@ test('side view: a ground, a step, an island, a platform, a strip, a pillar, a s
     assert.ok(list.length >= 3);
     for (const s of list) { assert.ok(s.x > 0 && s.x < level.width && s.y <= level.groundY && s.y > 0); assert.equal(solidAt(level, s.x, s.y - 1), false, 'on a surface, not inside the ground'); }
   }
-  const step = supportAt(level, 14 * 32, 3.5 * 32);
+  const step = supportAt(level, 13.5 * 32, 3.5 * 32);
   assert.equal(step.y, level.groundY - 64, 'the step is two tiles high');
-  assert.deepEqual([step.x0, step.x1], [12 * 32, 16 * 32]);
+  assert.deepEqual([step.x0, step.x1], [12 * 32, 15 * 32]);
   // ground one tile thick: a strip three wide, a pillar three tall, a block on its own
-  assert.deepEqual([13, 14, 15].map((c) => cell(level, c, 2)), [CELL.SOLID, CELL.SOLID, CELL.SOLID]);
-  assert.deepEqual([cell(level, 14, 1), cell(level, 14, 3)], [CELL.EMPTY, CELL.EMPTY]);
+  assert.deepEqual([12, 13, 14].map((c) => cell(level, c, 2)), [CELL.SOLID, CELL.SOLID, CELL.SOLID]);
+  assert.deepEqual([cell(level, 13, 1), cell(level, 13, 3)], [CELL.EMPTY, CELL.EMPTY]);
   assert.deepEqual([cell(level, 3, 1), cell(level, 3, 2), cell(level, 3, 3), cell(level, 3, 0), cell(level, 3, 4), cell(level, 2, 2), cell(level, 4, 2)], [CELL.SOLID, CELL.SOLID, CELL.SOLID, CELL.EMPTY, CELL.EMPTY, CELL.EMPTY, CELL.EMPTY]);
   assert.deepEqual([cell(level, 7, 3), cell(level, 6, 3), cell(level, 8, 3), cell(level, 7, 2), cell(level, 7, 4)], [CELL.SOLID, CELL.EMPTY, CELL.EMPTY, CELL.EMPTY, CELL.EMPTY]);
 });
@@ -52,7 +52,6 @@ test('with no tileset the level is the same, nothing is tiled and everything is 
   const s = levelTiles(side, null);
   assert.deepEqual(s.tiles, []);
   assert.deepEqual(s.plain, ['ground', 'thin']);
-  assert.equal(s.bare.size, [...side.cells].filter((v) => v === CELL.SOLID).length, 'every solid cell is drawn plainly');
   const room = makeLevel('top', levelFeatures(null, 'top'));
   const t = levelTiles(room, null);
   assert.deepEqual(t.tiles, []);
@@ -63,12 +62,13 @@ test('with no tileset the level is the same, nothing is tiled and everything is 
 test('the tiles are exactly what the tile helper lays out for the same map: the two can never disagree', () => {
   for (const [mode, index, def] of [['side', sideIndex, tilesSide], ['top', topIndex, tilesTop]]) {
     const { level, tiles } = build(mode, index);
-    const map = levelMap(level, index);
+    const map = levelMap(level);
     assert.equal(map.view, mode === 'top' ? 'top-down' : 'side');
     assert.equal(map.rows.length, level.rows);
     assert.ok(map.rows.every((r) => r.length === level.cols));
-    const want = layoutTiles(map.rows, classifyTiles(def.clips), { view: map.view, legend: map.legend });
-    assert.deepEqual(tiles.map((t) => [t.clip, t.x / 32, t.y / 32]), want.tiles.map((t) => [t.clip, t.col, t.row]));
+    const want = layoutTiles(map.rows, classifyTiles([{ key: mode === 'top' ? 't' : 's', clips: def.clips }]), { view: map.view, legend: map.legend, decals: true });
+    assert.deepEqual(tiles.map((t) => [t.clip, t.x / 32, t.y / 32, t.key]), want.tiles.map((t) => [t.clip, t.col, t.row, t.set]));
+    assert.deepEqual(want.notes, []);
     // and what is solid in the scene is what the helper calls solid
     for (let r = 0; r < level.rows; r++) for (let c = 0; c < level.cols; c++) {
       const mine = mode === 'top' ? isWall(level, c, r) : [CELL.SOLID, CELL.UP, CELL.DOWN].includes(cell(level, c, r));
@@ -80,54 +80,58 @@ test('the tiles are exactly what the tile helper lays out for the same map: the 
 test('side view tiles: every piece of the block, the narrow pieces, fill versions, thin platforms and slopes', () => {
   const T = sideIndex.tiles;
   assert.equal(T.blocks[0].prefix, 'stone');
-  const { level, tiles, plain, bare } = build('side', sideIndex);
+  const { level, tiles, plain } = build('side', sideIndex);
   assert.equal(level.slopes, true);
   assert.deepEqual(plain, []);
-  assert.equal(bare.size, 0);
   const at = (c, r) => tileAt(tiles, c, r)[0];
   assert.equal(at(1, 7), 'stone-top');
   assert.match(at(1, 8), /^stone-fill/);
   // the step, two tiles high on the ground: corners, sides, and inner corners where it meets the ground
-  assert.deepEqual([at(12, 5), at(13, 5), at(15, 5)], ['stone-left', 'stone-top', 'stone-right']);
-  assert.deepEqual([at(12, 6), at(15, 6)], ['stone-side-l', 'stone-side-r']);
+  assert.deepEqual([at(12, 5), at(13, 5), at(14, 5)], ['stone-left', 'stone-top', 'stone-right']);
+  assert.deepEqual([at(12, 6), at(14, 6)], ['stone-side-l', 'stone-side-r']);
   assert.match(at(13, 6), /^stone-fill/);
-  assert.deepEqual([at(12, 7), at(15, 7), at(11, 7)], ['stone-inner-tl', 'stone-inner-tr', 'stone-top']);
+  assert.deepEqual([at(12, 7), at(14, 7), at(15, 7)], ['stone-inner-tl', 'stone-inner-tr', 'stone-top']);
   // the small floating island, and the mass high up with a part hanging under it: undersides and bottom inner corners
-  assert.deepEqual([at(17, 3), at(18, 3), at(17, 4), at(18, 4)], ['stone-left', 'stone-right', 'stone-bottom-l', 'stone-bottom-r']);
-  assert.deepEqual([at(20, 1), at(21, 1), at(20, 2), at(21, 2), at(22, 2), at(23, 2)], ['stone-left', 'stone-top', 'stone-bottom-l', 'stone-inner-bl', 'stone-inner-br', 'stone-bottom']);
+  assert.deepEqual([at(16, 3), at(17, 3), at(16, 4), at(17, 4)], ['stone-left', 'stone-right', 'stone-bottom-l', 'stone-bottom-r']);
+  assert.deepEqual([at(19, 1), at(20, 1), at(19, 2), at(20, 2), at(21, 2), at(22, 2), at(23, 2)], ['stone-left', 'stone-top', 'stone-bottom-l', 'stone-bottom', 'stone-inner-bl', 'stone-inner-br', 'stone-bottom']);
   assert.deepEqual([at(21, 3), at(22, 3)], ['stone-bottom-l', 'stone-bottom-r']);
   // ground one tile thick uses the narrow pieces
-  assert.deepEqual([at(13, 2), at(14, 2), at(15, 2)], ['stone-strip-l', 'stone-strip-m', 'stone-strip-r']);
+  assert.deepEqual([at(12, 2), at(13, 2), at(14, 2)], ['stone-strip-l', 'stone-strip-m', 'stone-strip-r']);
   assert.deepEqual([at(3, 1), at(3, 2), at(3, 3)], ['stone-col-t', 'stone-col-m', 'stone-col-b']);
   assert.equal(at(7, 3), 'stone-single');
   // fill versions are mixed by position
   assert.ok(tiles.some((t) => t.clip === 'stone-fill') && tiles.some((t) => t.clip === 'stone-fill-b'));
   // the thin platform and the mound
   assert.deepEqual([at(4, 5), at(5, 5), at(6, 5)], ['stone-thin-l', 'stone-thin-m', 'stone-thin-r']);
-  assert.deepEqual([at(7, 6), at(8, 6), at(9, 6), at(10, 6)], ['stone-slope-up', 'stone-top', 'stone-top', 'stone-slope-down']);
+  assert.deepEqual([at(7, 6), at(10, 6)], ['stone-slope-up', 'stone-slope-down']);
+  assert.ok([at(8, 6), at(9, 6)].every((c) => /^stone-/.test(c)), 'the top of the mound');
   assert.equal(surfaceBelow(level, 7 * 32 + 16, 5 * 32).y, level.groundY - 16, 'half way up the slope');
   assert.equal(surfaceBelow(level, 9 * 32, 5 * 32).y, level.groundY - 32);
   // each piece is the one the helper picks for that cell
   const solid = (x, y) => { const cx = Math.max(0, Math.min(level.cols - 1, x)), cy = Math.max(0, Math.min(level.rows - 1, y)); return cell(level, cx, cy) !== CELL.EMPTY; };
-  for (const [c, r] of [[12, 5], [12, 7], [21, 2], [14, 2], [3, 2], [7, 3]]) assert.equal(at(c, r), 'stone-' + pickPiece(solid, c, r, T.blocks[0].pieces));
+  for (const [c, r] of [[12, 5], [12, 7], [21, 2], [13, 2], [3, 2], [7, 3]]) assert.equal(at(c, r), 'stone-' + pickPiece(solid, c, r, T.blocks[0].pieces));
   assert.ok(tiles.some((t) => t.clip === 'stone-deco-a'), 'decals lie over cells of their block');
   assert.ok(tiles.every((t) => t.key === 's'));
 });
 
-test('a tileset with only some pieces: the helper places what it has, and the rest of the ground is drawn plainly', () => {
+test('a tileset with only some pieces: every cell gets the nearest piece it has, so nothing is left as a hole', () => {
   const few = tileIndex([setOf('f', ['grass-top', 'grass-fill'])]);
-  const { level, tiles, bare } = build('side', few);
+  const { level, tiles, plain } = build('side', few);
   assert.equal(level.slopes, false);
+  assert.deepEqual(plain, [], 'nothing is left for the plain drawing');
+  const has = few.tiles.blocks[0].pieces;
   const at = (c, r) => tileAt(tiles, c, r)[0];
   assert.equal(at(1, 7), 'grass-top');
   assert.equal(at(1, 8), 'grass-fill');
-  assert.equal(at(12, 5), undefined, 'it has no corner piece');
-  assert.ok(bare.has('12,5') && bare.has('12,6') && !bare.has('1,7'), 'so that cell is drawn plainly, not left as a hole');
+  assert.equal(at(12, 5), 'grass-' + nearestPiece('left', has), 'a corner it does not have: the nearest piece it has');
+  assert.equal(at(12, 6), 'grass-' + nearestPiece('side-l', has));
+  assert.equal(at(20, 2), 'grass-' + nearestPiece('bottom', has));
+  for (let r = 0; r < level.rows; r++) for (let c = 0; c < level.cols; c++) if (cell(level, c, r) === CELL.SOLID) assert.ok(at(c, r), `cell ${c},${r} has a tile`);
   // no thin pieces: the platform is a strip of the block, one tile thick
   assert.deepEqual(level.thins, []);
   assert.deepEqual([4, 5, 6].map((c) => cell(level, c, 5)), [CELL.SOLID, CELL.SOLID, CELL.SOLID]);
-  assert.equal(at(5, 5), 'grass-top', 'without narrow pieces the helper gives the nearest of the thirteen');
-  // names the helper does not know are not placed
+  assert.equal(at(5, 5), 'grass-' + nearestPiece('strip-m', has));
+  // names the helper does not know are not placed: the ground is drawn plainly
   const odd = build('side', tileIndex([setOf('q', ['bricks', 'planks'])]));
   assert.deepEqual(odd.tiles, []);
   assert.deepEqual(odd.plain, ['ground', 'thin']);
@@ -202,12 +206,17 @@ test('a decal goes where its clip says: on a cell of its block, above a top tile
   const clips = { 'moss-deco-a': { place: 'on' }, 'moss-deco-b': { place: 'above' }, 'moss-deco-c': { place: 'below' } };
   const index = tileIndex([setOf('m', names, clips)]);
   assert.deepEqual(index.tiles.decals.map((d) => d.place), ['on', 'above', 'below']);
-  const { tiles } = build('side', index);
+  const { level, tiles } = build('side', index);
   const of = (clip) => tiles.filter((t) => t.clip === clip);
-  assert.ok(of('moss-deco-a').length && of('moss-deco-b').length && of('moss-deco-c').length);
+  assert.ok(of('moss-deco-a').length && of('moss-deco-b').length, 'the helper scatters them (pickDecal)');
   for (const d of of('moss-deco-a')) assert.equal(tileAt(tiles, d.x / 32, d.y / 32)[0], 'moss-fill');
   for (const d of of('moss-deco-b')) { assert.deepEqual(tileAt(tiles, d.x / 32, d.y / 32), ['moss-deco-b'], 'in an empty cell'); assert.equal(tileAt(tiles, d.x / 32, d.y / 32 + 1)[0], 'moss-top'); }
-  for (const d of of('moss-deco-c')) assert.match(tileAt(tiles, d.x / 32, d.y / 32 - 1)[0], /^moss-bottom/);
+  for (const d of of('moss-deco-c')) assert.equal(tileAt(tiles, d.x / 32, d.y / 32 - 1)[0], 'moss-bottom');
+  // exactly the cells pickDecal picks: nothing is placed by the playground itself
+  const map = levelMap(level);
+  assert.deepEqual(tiles.filter((t) => /-deco-/.test(t.clip)).map((t) => [t.clip, t.x / 32, t.y / 32]),
+    layoutTiles(map.rows, index.tiles, { view: 'side', legend: map.legend, decals: true }).tiles.filter((t) => /-deco-/.test(t.clip)).map((t) => [t.clip, t.col, t.row]));
+  assert.ok(map.rows.every((row) => !/[^.#I=|:!\/\\~¦-]/.test(row)), 'the map itself holds no decal letters');
 });
 
 test('every prefix with thin pieces gets a platform, and every cap, mid, foot set stands as a column', () => {
@@ -248,17 +257,16 @@ const load = async (id) => { const def = (await import(real(id).href)).default; 
 test('the real tileset tiles-forest: every cell of the ground gets a piece of its own, narrow pieces and fill versions included', { skip: !fs.existsSync(real('tiles-forest')) && 'sprites/tiles-forest.js is not there yet' }, async () => {
   const { def, set } = await load('tiles-forest');
   const index = tileIndex([set]);
-  const { level, tiles, plain, bare } = build('side', index);
+  const { level, tiles, plain } = build('side', index);
   assert.deepEqual(plain, []);
-  assert.equal(bare.size, 0, 'no cell of the ground is left to the plain drawing');
   for (const t of tiles) assert.ok(def.clips[t.clip], `${t.clip} is one of its clips`);
-  const map = levelMap(level, index);
-  const want = layoutTiles(map.rows, classifyTiles(def.clips), { view: 'side', legend: map.legend });
+  const map = levelMap(level);
+  const want = layoutTiles(map.rows, classifyTiles(def.clips), { view: 'side', legend: map.legend, decals: true });
   assert.deepEqual(tiles.map((t) => [t.clip, t.x / 32, t.y / 32]), want.tiles.map((t) => [t.clip, t.col, t.row]));
   assert.deepEqual(want.notes, []);
   const at = (c, r) => tileAt(tiles, c, r)[0], p = index.tiles.blocks[0].prefix;
-  assert.deepEqual([at(12, 5), at(12, 6), at(12, 7), at(23, 2), at(21, 2), at(22, 2)], [`${p}-left`, `${p}-side-l`, `${p}-inner-tl`, `${p}-bottom`, `${p}-inner-bl`, `${p}-inner-br`]);
-  if (index.tiles.blocks[0].pieces.single) assert.deepEqual([at(13, 2), at(14, 2), at(15, 2), at(3, 1), at(3, 2), at(3, 3), at(7, 3)], [`${p}-strip-l`, `${p}-strip-m`, `${p}-strip-r`, `${p}-col-t`, `${p}-col-m`, `${p}-col-b`, `${p}-single`]);
+  assert.deepEqual([at(12, 5), at(12, 6), at(12, 7), at(20, 2), at(21, 2), at(22, 2)], [`${p}-left`, `${p}-side-l`, `${p}-inner-tl`, `${p}-bottom`, `${p}-inner-bl`, `${p}-inner-br`]);
+  if (index.tiles.blocks[0].pieces.single) assert.deepEqual([at(12, 2), at(13, 2), at(14, 2), at(3, 1), at(3, 2), at(3, 3), at(7, 3)], [`${p}-strip-l`, `${p}-strip-m`, `${p}-strip-r`, `${p}-col-t`, `${p}-col-m`, `${p}-col-b`, `${p}-single`]);
   if (index.tiles.blocks[0].fills.length > 1) assert.ok(new Set(tiles.filter((t) => /-fill(-[bc])?$/.test(t.clip)).map((t) => t.clip)).size > 1, 'more than one version of the fill is used');
   const used = new Set(tiles.map((t) => t.clip));
   assert.deepEqual(Object.keys(def.clips).filter((c) => !used.has(c)), [], 'every clip of the tileset is in the scene');

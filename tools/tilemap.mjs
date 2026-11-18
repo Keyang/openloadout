@@ -10,6 +10,8 @@
 //   node tools/tilemap.mjs <id> --map my.txt    your own map, written as letters -> out/<id>-map-my.png
 //   node tools/tilemap.mjs <id> --crop 0,5,6,4  only the tiles from column 0, row 5, six wide and four high, at 6x
 //                                               -> out/<id>-map-crop.png: for looking closely at one join
+//   node tools/tilemap.mjs <id> --scatter       scatter the decals by the helper's rule (pickDecal), as a game or the
+//                                               playground would, instead of the fixed spots of the sample map
 //   node tools/tilemap.mjs --file path/to/sprite.js    a tileset that is not in sprites/
 //   --view side|top-down (default: the tileset's meta.view)   --scale 3   --bg '#8fd0f0'   --out <folder>
 //
@@ -122,9 +124,9 @@ function sampleMap() {
     if (grounds[1]) for (const [x, y] of [[6, 2], [7, 2], [8, 2], [6, 3], [7, 3], [8, 3]]) rows[y][x] = 'Q';
     tiles.extras.slice(0, 10).forEach((_, i) => { rows[9][3 + i] = String(i); });
   }
-  // every decal twice, where its `place` says
+  // every decal twice, where its `place` says (with --scatter the helper's own rule places them instead)
   const used = { above: 0, on: 0, below: 0 };
-  for (let round = 0; round < 2; round++) for (const d of tiles.decals) {
+  if (!args.includes('--scatter')) for (let round = 0; round < 2; round++) for (const d of tiles.decals) {
     const letter = pieceOf(d.clip).piece, list = SPOTS[view][d.place] ?? [];
     if (letter.length !== 1 || !/[a-z]/.test(letter) || !list.length) continue;
     for (let tries = 0; tries < list.length; tries++) {
@@ -144,7 +146,7 @@ if (mapFile) {
   const width = Math.max(...rows.map((r) => r.length));
   rows = rows.map((r) => r.padEnd(width, '.'));
 } else rows = sampleMap();
-const layout = layoutTiles(rows, tiles, { view });
+const layout = layoutTiles(rows, tiles, { view, decals: args.includes('--scatter') });
 
 // ---- the picture ---------------------------------------------------------------------------
 const COLS = layout.cols, ROWS = layout.rows;

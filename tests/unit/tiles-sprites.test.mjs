@@ -165,6 +165,8 @@ test('tools/tilemap.mjs --map draws a map written as letters, and says what it c
   fs.writeFileSync(map, '; a peak and a pillar\n....#...\n../\\.#..Z\n./##\\#...\n#########\n');
   const out = execFileSync(process.execPath, [path.join(root, 'tools/tilemap.mjs'), 'tiles-forest', '--map', map, '--out', dir], { encoding: 'utf8' });
   assert.match(out, /note: "Z"/);
+  const scattered = execFileSync(process.execPath, [path.join(root, 'tools/tilemap.mjs'), 'tiles-forest', '--scatter', '--out', dir], { encoding: 'utf8' });
+  assert.ok(!/note:/.test(scattered) && fs.existsSync(path.join(dir, 'tiles-forest-map.png')), scattered);
   const b = fs.readFileSync(path.join(dir, 'tiles-forest-map-hill.png'));
   assert.deepEqual([b.readUInt32BE(16), b.readUInt32BE(20)], [9 * 32 * 2, 4 * 32 * 2]);
   fs.rmSync(dir, { recursive: true, force: true });

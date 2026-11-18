@@ -87,23 +87,23 @@ export function createPainter({ sprites, colour, tiles: tileSets = null }) {
       const { sprite, params } = sprites[t.key], c = sprite.clips[t.clip];
       g.drawImage(frame(t.key, t.clip, c.frames > 1 ? Math.floor(time * clipFps(sprite, t.clip, params)) % c.frames : 0), t.x, t.y);
     };
-    // what the bag has no tiles for is drawn plainly: the cells the tile helper left bare, and only those
+    // what the bag has no tiles for at all is drawn plainly
     if (laid.plain.includes('floor')) plainFloor(g, level);
-    if (laid.plain.includes('ground')) plainGround(g, level, laid.bare);
+    if (laid.plain.includes('ground')) plainGround(g, level);
     if (laid.plain.includes('thin')) plainThin(g, level);
     for (const t of laid.tiles) if (!t.over) tile(t);
-    if (laid.plain.includes('wall')) plainWalls(g, level, laid.bare);
+    if (laid.plain.includes('wall')) plainWalls(g, level);
     for (const t of laid.tiles) if (t.over) tile(t);
     groundFor = beat; groundCanvas = cv;
     return cv;
   }
 
-  function plainGround(g, level, bare) {
+  function plainGround(g, level) {
     const T = level.tile;
     const at = (c, r) => (r < 0 ? CELL.EMPTY : r >= level.rows || c < 0 || c >= level.cols ? CELL.SOLID : level.cells[r * level.cols + c]);
     for (let r = 0; r < level.rows; r++) for (let c = 0; c < level.cols; c++) {
       const v = at(c, r), x = c * T, y = r * T;
-      if (v === CELL.EMPTY || !bare.has(`${c},${r}`)) continue;
+      if (v === CELL.EMPTY) continue;
       if (v !== CELL.SOLID) {
         // a slope: one column at a time
         for (let i = 0; i < T; i++) {
@@ -147,11 +147,11 @@ export function createPainter({ sprites, colour, tiles: tileSets = null }) {
   }
 
   /** Plain walls, seen from the south: a lit top, and a darker front face on the cells with floor below them. */
-  function plainWalls(g, level, bare) {
+  function plainWalls(g, level) {
     const T = level.tile;
     const wall = (c, r) => c < 0 || r < 0 || c >= level.cols || r >= level.rows || level.cells[r * level.cols + c] === CELL.WALL;
     for (let r = 0; r < level.rows; r++) for (let c = 0; c < level.cols; c++) {
-      if (level.cells[r * level.cols + c] !== CELL.WALL || !bare.has(`${c},${r}`)) continue;
+      if (level.cells[r * level.cols + c] !== CELL.WALL) continue;
       const x = c * T, y = r * T;
       g.fillStyle = C.wallTop; g.fillRect(x, y, T, T);
       if (!wall(c, r + 1)) {

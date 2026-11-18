@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import {
   TILE, BLOCK_PIECES, NARROW_PIECES, blockClips, thinClips, slopeClips, decoClips, pieceOf, blockJoins,
   blockKind, classifyTiles, pickPiece, pickClip, pickThin, pickStack, fillVariant, layoutTiles,
-  drawBlock, drawSlope, drawThin, textureTone, tileNoise,
+  drawBlock, drawSlope, drawThin, textureTone, tileNoise, nearestPiece, pickDecal, DECAL_CHANCE,
 } from '../../engine/tiles.js';
 import { Surface } from '../../engine/surface.js';
 import { col, ramp, INK } from '../../engine/color.js';
@@ -322,4 +322,106 @@ test('textureTone: the dark of a colour\'s ramp, or deeper, and never a tone tha
     assert.ok([ramp(c).dark, ramp(c).deep].includes(t) || t !== c, name);
     for (const look of THEME_PRESETS) { const to = applyColour(Uint32Array.from([col(c), col(t)]), look.theme.colour); assert.notEqual(to[0], to[1], `${name} ${c} under ${look.id}`); }
   }
+});
+
+// ---- what the playground had to work round: partial blocks, solidity, several tilesets, scattered decals ----------
+test('nearestPiece: a block that lacks a piece gets the closest one it has, in a stated order', () => {
+  assert.equal(nearestPiece('top', { top: 1 }), 'top');
+  // the piece that closes the most of the same sides without closing any other: top first, then the sides, then the bottom
+  assert.equal(nearestPiece('left', { top: 1, 'side-l': 1, fill: 1 }), 'top');
+  assert.equal(nearestPiece('left', { 'side-l': 1, fill: 1 }), 'side-l');
+  assert.equal(nearestPiece('bottom-r', { bottom: 1, 'side-r': 1, fill: 1 }), 'side-r');
+  assert.equal(nearestPiece('single', { top: 1, fill: 1 }), 'top');
+  assert.equal(nearestPiece('inner-tl', { fill: 1, top: 1, 'inner-br': 1 }), 'fill');
+  assert.equal(nearestPiece('side-l', { top: 1, fill: 1 }), 'fill', 'never a piece that closes a joined side while one that does not is there');
+  assert.equal(nearestPiece('fill', { top: 1, left: 1 }), 'top', 'with nothing better: the piece with the fewest wrongly closed sides');
+  assert.equal(nearestPiece('top', {}), null);
+  const all13 = Object.fromEntries(BLOCK_PIECES.map((p) => [p, `x-${p}`]));
+  assert.deepEqual(NARROW_PIECES.map((p) => nearestPiece(p, all13)), ['left', 'top', 'right', 'left', 'side-l', 'bottom-l', 'left'], 'the narrow pieces fall back as before');
+  for (const p of [...BLOCK_PIECES, ...NARROW_PIECES]) assert.equal(nearestPiece(p, { ...all13, [p]: 1 }), p);
+});
+test('pickClip and layoutTiles draw a partial block with what it has', () => {
+  const block = classifyTiles(['rock-fill', 'rock-top']).blocks[0];
+  const solid = (x, y) => x >= 1 && x <= 2 && y >= 1 && y <= 2;
+  assert.deepEqual([[1, 1], [2, 1], [1, 2], [2, 2]].map(([x, y]) => pickClip(block, solid, x, y)), ['rock-top', 'rock-top', 'rock-fill', 'rock-fill']);
+  const L = layoutTiles(['....', '.##.', '.##.', '....'], ['rock-fill', 'rock-top']);
+  assert.deepEqual(L.notes, []);
+  assert.deepEqual(L.tiles.map((t) => t.clip), ['rock-top', 'rock-top', 'rock-fill', 'rock-fill']);
+  assert.equal(pickPiece(solid, 1, 1, block.pieces), 'top');
+  assert.equal(pickPiece(solid, 1, 1), 'left', 'without `has` the exact piece is named');
+});
+test('layoutTiles: what is solid comes from the letters, whether or not the tileset has tiles for them', () => {
+  const side = layoutTiles(['..=.', '#/.|', 'I\\##'], {});
+  assert.deepEqual(side.tiles, []);
+  assert.ok(side.notes.length >= 4);
+  const k = (L, r, c) => [L.cells[r][c].kind, L.cells[r][c].solid];
+  assert.deepEqual([k(side, 1, 0), k(side, 1, 1), k(side, 2, 1), k(side, 2, 0), k(side, 0, 2), k(side, 1, 3), k(side, 0, 0)],
+    [['block', true], ['slope-up', true], ['slope-down', true], ['block', true], ['thin', false], ['stack', false], ['empty', false]]);
+  const top = layoutTiles(['W.O', 'P.Q'], {}, { view: 'top-down' });
+  assert.deepEqual([k(top, 0, 0), k(top, 0, 2), k(top, 1, 0), k(top, 1, 2), k(top, 0, 1)], [['block', true], ['block', true], ['block', false], ['block', false], ['empty', false]]);
+  // a letter of the caller's own: solid as the block it names would be
+  const own = layoutTiles(['XYZ'], {}, { view: 'top-down', legend: { X: 'block:lava', Y: 'block:carpet', Z: 'block:hedge' } });
+  assert.deepEqual([own.cells[0][0].solid, own.cells[0][1].solid, own.cells[0][2].solid], [true, false, true]);
+  assert.equal(layoutTiles(['X'], {}, { legend: { X: 'block:anything' } }).cells[0][0].solid, true, 'side view: every block is solid');
+  // with tiles the answer is the same
+  const withTiles = layoutTiles(['..=.', '#/.|', 'I\\##'], FOREST);
+  for (let r = 0; r < 3; r++) for (let c = 0; c < 4; c++) assert.deepEqual(k(withTiles, r, c), k(side, r, c), `${c},${r}`);
+});
+test('classifyTiles takes several tilesets and says which one each thing came from', () => {
+  const A = { ...blockClips('grass'), ...thinClips('grass') };
+  const B = { ...thinClips('plank'), 'ladder-cap': {}, 'ladder-mid': {}, ...blockClips('grass'), 'grass-deco-a': { place: 'above' }, ...blockClips('brick', { kind: 'wall' }) };
+  const t = classifyTiles([{ key: 'forest', clips: A }, { key: 'planks', clips: B }]);
+  assert.deepEqual(t.blocks.map((b) => [b.prefix, b.set, b.kind]), [['grass', 'forest', 'ground'], ['brick', 'planks', 'wall']], 'a prefix belongs to the first tileset that has it');
+  assert.deepEqual(t.thins.map((x) => [x.prefix, x.set]), [['grass', 'forest'], ['plank', 'planks']]);
+  assert.deepEqual(t.stacks.map((x) => [x.prefix, x.set]), [['ladder', 'planks']]);
+  assert.deepEqual(t.decals.map((d) => [d.clip, d.set]), [['grass-deco-a', 'planks']], 'a decal may come from another tileset than its block');
+  assert.deepEqual(t.blocks[0].decals.map((d) => d.clip), ['grass-deco-a']);
+  assert.equal(t.from['grass-top'], 'forest'); assert.equal(t.from['plank-thin-m'], 'planks'); assert.equal(t.from['brick-fill'], 'planks');
+  // names (file order) may be given beside the clip table
+  const viaNames = classifyTiles([{ key: 1, names: ['wall-top', 'wall-fill'], clips: { 'wall-top': { block: 'ground' }, 'wall-fill': {} } }]);
+  assert.deepEqual(viaNames.blocks.map((b) => [b.prefix, b.set, b.kind]), [['wall', 1, 'ground']]);
+  // every tile of a layout says which tileset draws it
+  const L = layoutTiles(['=-', '##'], t);
+  assert.deepEqual(L.tiles.map((x) => [x.clip, x.set]).sort(), [['grass-top', 'forest'], ['grass-top', 'forest'], ['grass-thin-l', 'forest'], ['plank-thin-l', 'planks']].sort());
+  // one tileset: nothing changes
+  const single = classifyTiles(A);
+  assert.equal(single.from, undefined); assert.equal('set' in single.blocks[0], false);
+});
+test('pickDecal: which decal, if any, stands in a cell, the same every time', () => {
+  const decals = [{ clip: 'g-deco-a', place: 'above' }, { clip: 'g-deco-b', place: 'above' }, { clip: 'g-deco-c', place: 'on' }];
+  const seen = new Map();
+  let n = 0;
+  for (let y = 0; y < 40; y++) for (let x = 0; x < 40; x++) {
+    const d = pickDecal(decals, 'above', x, y);
+    assert.equal(d, pickDecal(decals, 'above', x, y));
+    if (d) { n++; seen.set(d, (seen.get(d) ?? 0) + 1); }
+  }
+  assert.deepEqual([...seen.keys()].sort(), ['g-deco-a', 'g-deco-b'], 'only decals of that place');
+  assert.ok(Math.abs(n / 1600 - DECAL_CHANCE.above) < 0.06, `${n} of 1600`);
+  assert.ok(Math.min(...seen.values()) > n * 0.3, 'both are used');
+  assert.equal(pickDecal(decals, 'below', 3, 3), null);
+  assert.equal(pickDecal([], 'on', 3, 3), null);
+  let all = 0;
+  for (let x = 0; x < 200; x++) if (pickDecal(decals, 'on', x, 0, 1)) all++;
+  assert.equal(all, 200, 'a chance of 1 puts one in every cell');
+});
+test('layoutTiles scatters decals by that rule when asked: on fill, above a top, under a bottom, never elsewhere', () => {
+  const clips = { ...blockClips('grass', { fills: 2 }), ...decoClips('grass', ['above', 'on', 'below']) };
+  const rows = ['.'.repeat(30), '.'.repeat(30), '#'.repeat(30), '#'.repeat(30), '#'.repeat(30), '.'.repeat(30)];
+  const L = layoutTiles(rows, clips, { decals: true });
+  const at = (c, r) => L.tiles.filter((t) => t.col === c && t.row === r).map((t) => t.clip);
+  const placed = L.tiles.filter((t) => /-deco-/.test(t.clip));
+  for (const place of ['a', 'b', 'c']) assert.ok(placed.some((t) => t.clip === `grass-deco-${place}`), `some grass-deco-${place}`);
+  for (const t of placed) {
+    if (t.clip === 'grass-deco-a') { assert.equal(t.row, 1); assert.deepEqual(at(t.col, 2), ['grass-top']); }
+    if (t.clip === 'grass-deco-b') { assert.equal(t.row, 3); assert.ok(/^grass-fill/.test(at(t.col, 3)[0])); }
+    if (t.clip === 'grass-deco-c') { assert.equal(t.row, 5); assert.deepEqual(at(t.col, 4), ['grass-bottom']); }
+  }
+  assert.deepEqual(layoutTiles(rows, clips, { decals: true }).tiles, L.tiles);
+  assert.equal(layoutTiles(rows, clips).tiles.filter((t) => /-deco-/.test(t.clip)).length, 0, 'not unless asked');
+  assert.equal(layoutTiles(rows, clips, { decals: { above: 0, on: 0, below: 0 } }).tiles.filter((t) => /-deco-/.test(t.clip)).length, 0);
+  // a decal written in the map stays where it is; top-down, floor decals go on bare floor
+  const room = layoutTiles(['........', '........', '..WW....', '..WW....'], { 'floor-fill': {}, ...blockClips('wall', { kind: 'wall' }), ...decoClips('floor', ['on']) }, { view: 'top-down', decals: { floor: 1 } });
+  const crack = room.tiles.filter((t) => t.clip === 'floor-deco-a');
+  assert.equal(crack.length, 28, 'every bare floor cell, none on the wall');
 });
