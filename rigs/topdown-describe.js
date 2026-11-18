@@ -1,4 +1,4 @@
-// What the top-down character rig has (rigs/topdown.js and its side module rigs/topdown-riot.js), as plain data a
+// What the top-down character rig has (rigs/topdown.js and its side modules rigs/topdown-riot.js and rigs/topdown-sneak.js), as plain data a
 // program can read: its poses, carries and manners, body, hair, every part it can wear and every kind it can hold,
 // its attach points, each with the function that draws it and the options that function takes. First step of
 // Contract 13 (docs/architecture.md): a rig that lists itself. Nothing in the rig reads this file.
@@ -7,7 +7,7 @@
 //   node tools/rig.mjs topdown                             // the same as tables; --sheet draws every part and held kind
 //
 // Names are '<module>.<export>' with the module's name on window.loadout.framework (topdown = rigs/topdown.js,
-// topdownRiot = rigs/topdown-riot.js). Each thing is listed once, under the function that draws it; where the same
+// topdownRiot = rigs/topdown-riot.js, topdownSneak = rigs/topdown-sneak.js). Each thing is listed once, under the function that draws it; where the same
 // idea exists more than once it is under `duplicates`, with the calls a tidy-up would merge.
 // tests/unit/rig-describe-*.test.mjs prove every line: each thing listed is drawn through the function named, in the
 // directions given, at both ends of every range; and every export and every name list of the two modules is listed
@@ -44,7 +44,7 @@ export const RIG = {
   directions: ALL,
   directionList: { list: 'topdown.DIRECTIONS', choices: ALL, what: 'the drawn directions, in clip order; clips are named <pose>_<direction>, and a pose with no direction is drawn facing down' },
   directionClips: true,
-  modules: { topdown: 'rigs/topdown.js', topdownRiot: 'rigs/topdown-riot.js' },
+  modules: { topdown: 'rigs/topdown.js', topdownRiot: 'rigs/topdown-riot.js', topdownSneak: 'rigs/topdown-sneak.js' },
 
   frames: [
     { fn: 'topdown.frame', args: ['clip', 't', 'p', 'options'], what: 'One frame, posed and fitted once: F.draw(g, look, hooks), F.finish(g, { trail, flash, outline }), F.sockets(), F.hand(J). options: { item, rise, points, far, carry, tall, muzzle }.' },
@@ -140,6 +140,7 @@ export const RIG = {
     part('cape', 'topdown.cape', 'behind', 'back', ALL, { kind: pick(['plain', 'tattered']), length: num(0.3, 1.8, 1, '1 = to above the knee, 1.8 = to the floor'), colour: colour() }, 'A cape: behind the body facing down and sideways, over the back facing up.', { goesWith: ['mantle'] }),
     part('mantle', 'topdown.mantle', 'torso', 'back', FRONT, { colour: colour(), clasp: colour() }, 'The front of a cape: a mantle over the shoulders with a clasp at the neck.'),
     part('scarf', 'topdown.scarf', 'behind', 'back', ALL, { colour: colour('#c9423a'), length: num(4, 16, 10, 'pixels'), flow: num(0, 1, 0.3, '0 hanging to 1 streaming straight back'), wave: { data: 'a list of -1..1 from the neck to the tip; default [P.sway]' } }, 'The tail of a scarf, streaming back from the neck.', { goesWith: ['scarf wrap'] }),
+    part('scarf tail', 'topdownSneak.scarfTail', 'behind', 'back', ALL, { kind: { ...pick(['short', 'long'], 'long'), table: 'topdownSneak.SCARF_TAILS', what: '6 or 12 px at Length 1' }, length: num(0.65, 1.35, 1, 'a multiplier'), colour: colour('#c9423a'), action: { ...pick(['idle', 'walk', 'run', 'other'], 'idle', 'topdownSneak.SCARF_FLY'), what: "the frame's action: how far it streams, how many waves run down it and how hard it whips; `other` is every action not listed" }, t: { data: 'the clip phase, 0..1: what moves it' }, flow: { data: "0 hanging to 1 streaming straight back; replaces the action's own" }, beats: { data: "waves per loop; replaces the action's own" }, whip: { data: "how hard it swings; replaces the action's own" } }, 'The tail of a scarf as cloth: it narrows from the neck to a forked tip, hangs when the body rests, streams back when it moves, and a wave runs down it. Give it F.action and t.', { goesWith: ['scarf wrap'], line: 'topdownSneak.scarfLine' }),
     part('pack', 'topdown.pack', 'behind', 'back', ALL, { kind: pick(['tank', 'antenna', 'jet'], 'tank', 'topdown.PACK_KINDS'), size: GEAR, colour: colour(), glow: colour(), thrust: { ...num(0, 1, 0, "the flame of a jet (pass P.tuck); nothing on the other kinds"), except: ['tank', 'antenna'] } }, 'A pack on the back: a tank, a radio with a whip antenna, or a jet pack.', { ...rise('topdown.packRise', { option: 'kind' }, { option: 'size' }), far: 'topdown.packFar', goesWith: ['pack straps'] }),
     part('travel pack', 'topdown.travelPack', 'behind', 'back', ALL, { kind: pick(['backpack', 'crate', 'sack'], 'backpack', 'topdown.TRAVEL_PACK_KINDS'), size: GEAR, colour: colour(), wood: colour(), rug: colour('#7a4fc4', 'a rolled rug across its top, or none'), lantern: colour('#f2c230', 'a lantern hung from it, or none') }, "A traveller's pack over the shoulder of the weapon hand: a framed backpack, a crate or a tied sack.", { goesWith: ['pack straps'] }),
     // on the body
@@ -174,6 +175,8 @@ export const RIG = {
     part('hair bow', 'topdown.hairBow', 'head', 'head', ALL, { size: HAT, colour: colour() }, 'A ribbon bow on top of the head.', { ...rise('topdown.hairBowRise', { option: 'size' }) }),
     part('bandana', 'topdown.bandana', 'head', 'head', ALL, { colour: colour(), size: HAT }, 'A band of cloth over the brow, knotted at the back.'),
     part('mask', 'topdown.mask', 'head', 'head', ALL, { colour: colour(), size: HAT }, 'A cloth mask over the mouth and chin.'),
+    part('sized hood', 'topdownSneak.sizedHood', 'head', 'head', ALL, { colour: colour(), size: HAT }, 'The hood with a Size setting in place of a depth: small is pushed back off the face, big is pulled low over the brow.', { look: HATTED, ...rise('topdown.headgearRise', { value: 'hood' }) }),
+    part('head cloth', 'topdownSneak.headCloth', 'head', 'head', ALL, { kind: pick(['hood', 'bandana', 'mask'], 'hood', 'topdownSneak.HEAD_CLOTHS'), size: HAT, colour: colour() }, 'Cloth headgear by name with one Size setting: the sized hood, the bandana or the mask; any other name draws nothing. Set look.hatted for the hood; headRise() gives the rise.', { riseBy: 'topdownSneak.headRise' }),
     part('lens mask', 'topdownRiot.lensMask', 'head', 'head', ALL, { size: HAT, colour: colour(), lens: colour() }, 'A breathing mask with two lit lenses and a filter.'),
     part('beard', 'topdown.beard', 'head', 'head', FRONT, { kind: pick(['long', 'short']), length: num(0.65, 1.35, 1, 'a multiplier'), colour: colour() }, 'A beard: over the jaw and down the chest.'),
     part('spectacles', 'topdown.spectacles', 'head', 'head', FRONT, { frame: colour(), lens: colour() }, 'Round spectacles.'),
@@ -195,8 +198,10 @@ export const RIG = {
     }),
     held('wand', 'topdown.smallItem', 'topdown.smallItemSize', 'topdown.SMALL_ITEMS', { length: 9, back: 1.5, pad: 1.5 }, 'up', ['idle', 'walk', 'cast'], { wood: WOOD, orb: colour(), glow: { ...num(0, 1, 0), subtle: true } }, 'A wand with a lit tip.'),
     held('orb', 'topdown.smallItem', 'topdown.smallItemSize', 'topdown.SMALL_ITEMS', { length: 5, back: 0, pad: 3 }, 'up', ['idle', 'walk', 'cast'], { orb: colour(), glow: { ...num(0, 1, 0), subtle: true } }, 'A ball that floats over the hand.'),
-    held('dagger', 'topdown.smallItem', 'topdown.smallItemSize', 'topdown.SMALL_ITEMS', { length: 7, back: 1.5, pad: 1 }, 'low', ['idle', 'walk', 'run', 'attack'], { metal: METAL, hilt: colour() }, 'A dagger. A second one goes in the other hand at offGrip(J, P): the pair is wired in sprites/rogue-walker.js.', { pairAt: 'topdown.offGrip' }),
-    held('claws', 'topdown.smallItem', 'topdown.smallItemSize', 'topdown.SMALL_ITEMS', { length: 5, back: 0, pad: 2.5 }, 'low', ['idle', 'walk', 'run', 'attack'], { metal: METAL }, 'Claws on the fist; a pair with offGrip(J, P).', { pairAt: 'topdown.offGrip' }),
+    held('dagger', 'topdown.smallItem', 'topdown.smallItemSize', 'topdown.SMALL_ITEMS', { length: 7, back: 1.5, pad: 1 }, 'low', ['idle', 'walk', 'run', 'attack'], { metal: METAL, hilt: colour() }, 'A dagger. A second one goes in the other hand at offGrip(J, P): blade() of the sneak module draws the pair (held "daggers").', { pairAt: 'topdown.offGrip' }),
+    held('claws', 'topdown.smallItem', 'topdown.smallItemSize', 'topdown.SMALL_ITEMS', { length: 5, back: 0, pad: 2.5 }, 'low', ['idle', 'walk', 'run', 'attack'], { metal: METAL }, 'Claws on the fist; a pair with offGrip(J, P).', { pairAt: 'topdown.offGrip', also: [{ name: 'claws', fn: 'topdownSneak.blade', args: ['g', 'J', 'P', 'd', 'item'], size: 'topdownSneak.bladeSize', list: 'topdownSneak.BLADES', carry: 'low', what: "The same claws through the sneak module's blade(), which is called from the item hook (hand: 'main') and the offhand hook (hand: 'off') and so draws one on each fist." }] }),
+    held('daggers', 'topdownSneak.blade', 'topdownSneak.bladeSize', 'topdownSneak.BLADES', { length: 7, back: 1.5, pad: 1 }, 'low', ['idle', 'walk', 'run'], { metal: METAL, hilt: colour(), hand: { ...pick(['main', 'off'], 'main'), what: "which hand: 'main' from the item hook, 'off' from the offhand hook (the second one, a tone darker on the far side of a side clip)" } }, 'A dagger in each hand: the rig\'s dagger, drawn by blade() once from the item hook and once from the offhand hook.', { args: ['g', 'J', 'P', 'd', 'item'], sameAs: 'dagger', pairAt: 'topdown.offGrip' }),
+    held('short sword', 'topdownSneak.blade', 'topdownSneak.bladeSize', 'topdownSneak.BLADES', { length: 11 * 0.85, back: 1.5, pad: 1 }, 'low', ['idle', 'walk', 'run'], { metal: METAL, hilt: colour(), hand: { ...pick(['main', 'off'], 'main'), what: 'one sword: the off hand holds nothing' } }, "The rig's sword at 0.85 of its length, held in one hand.", { args: ['g', 'J', 'P', 'd', 'item'] }),
     held('halberd', 'topdown.townItem', 'topdown.townItemSize', ['topdown.TOWN_ITEM_KINDS', 'topdown.TOWN_ITEMS'], { length: 24, back: 11, pad: 3 }, 'upright', ['idle', 'walk', 'block'], { metal: METAL, wood: WOOD }, 'A halberd taller than its bearer; its shaft stands on the ground.'),
     held('pike', 'topdown.townItem', 'topdown.townItemSize', ['topdown.TOWN_ITEM_KINDS', 'topdown.TOWN_ITEMS'], { length: 23, back: 11, pad: 1.5 }, 'upright', ['idle', 'walk', 'block'], { metal: METAL, wood: WOOD }, 'A long spear, taller than its bearer.'),
     held('stick', 'topdown.townItem', 'topdown.townItemSize', ['topdown.TOWN_ITEM_KINDS', 'topdown.TOWN_ITEMS'], { length: 9, back: 1.5, pad: 1.5 }, 'up', ['idle', 'walk', 'run'], { wood: WOOD }, 'A stick.'),
@@ -236,6 +241,9 @@ export const RIG = {
     'topdown.waveHand': 'where a waving forearm and hand are',
     'topdown.ramp': 'passed on from engine/color.js', 'topdown.farRamp': 'passed on from engine/color.js', 'topdown.mix': 'passed on from engine/color.js', 'topdown.brightness': 'passed on from engine/color.js', 'topdown.INK': 'passed on from engine/color.js',
     'topdownRiot.shieldPlace': 'where a body shield is this frame',
+    'topdownSneak.scarfLine': 'the centre line of a scarf tail this frame: its root, tip, length, widths and the two strands of its fork',
+    'topdownSneak.headRise': "what frame() needs as `rise`: the headgear's rise when one is worn, otherwise the hair's (spiky hair stands 3 px up)",
+    'topdownSneak.bladeSize': "the size of a rogue's weapon for frame()'s `item`",
   },
   drawingHelpers: {
     'topdown.over': 'paints a shape with a rim where it covers what is drawn: a tool for parts, not a part',
@@ -295,11 +303,25 @@ export const RIG = {
       calls: ['topdown.muzzleFlash', 'topdown.muzzleFlare', 'topdown.over', 'topdown.drawOver'],
       merge: 'One muzzle light with a style option; over() and drawOver() are one helper.',
     },
+    {
+      what: 'Two scarf tails. scarf() is a ribbon of one width whose flow and wave the sprite works out; scarfTail() is the cloth one: it tapers to a forked tip, hangs at rest, and takes the action and the clip phase, with the flight of each action in SCARF_FLY (rigs/humanoid-figure.js has a table of the same kind for the side view).',
+      calls: ['topdown.scarf', 'topdownSneak.scarfTail', 'topdownSneak.SCARF_FLY', 'topdownSneak.SCARF_TAILS'],
+      merge: 'One scarf part: scarfTail(), with scarf() kept only as its plain ribbon for a sprite that passes a wave of its own.',
+    },
+    {
+      what: 'The hood is drawn by two functions with two settings (hood: depth 0 to 2; sizedHood: the Size every other headgear has), and headCloth() draws three of the fourteen pieces of headgear by name.',
+      calls: ['topdown.hood', 'topdownSneak.sizedHood', 'topdownSneak.headCloth', 'topdownSneak.HEAD_CLOTHS', 'topdownSneak.headRise'],
+      merge: 'The one registry of headgear named above: headCloth() and headRise() are its first three entries.',
+    },
+    {
+      what: 'blade() is a seventh function that draws held things: it names a rogue\'s weapons (daggers, short sword, claws) over smallItem() and heldItem(), and is the only one that draws the other hand\'s.',
+      calls: ['topdownSneak.blade', 'topdownSneak.bladeSize', 'topdownSneak.BLADES', 'topdown.smallItem', 'topdown.offGrip'],
+      merge: 'A `pair` flag on a held kind in the one registry of held kinds, and one draw function with a `hand` option.',
+    },
   ],
 
   inSprites: [
     { sprite: 'mage-walker', functions: ['starburst', 'sparkles', 'ring', 'particles', 'glow'], draws: 'The light of the cast and of the staff, wand or orb: five engine/fx.js calls placed at the muzzle socket, with their own timing.', belongs: 'An effect of the rig ("cast light") with the colour as its option.' },
-    { sprite: 'rogue-walker', functions: ['FLY', 'TAIL', 'HELD'], draws: 'Nothing itself, but it holds the arithmetic of how a scarf flies in each action (the same FLY table is inside rigs/humanoid-figure.js) and the wiring of a second blade in the other hand.', belongs: 'The scarf part (flow and wave per action) and a `pair` flag on held kinds.' },
     { sprite: 'village-elder', functions: ['elderFrame', 'SHORT_STEPS'], draws: 'Nothing itself; a manner written in the file raises the lantern hand and the talking hand (four changes to the pose).', belongs: 'Two named manners (hold out, talk with the hand).' },
     { sprite: 'merchant', functions: ['merchantFrame', 'TALL', 'NECK'], draws: 'Nothing itself; a manner in the file carries the head high, holds the goods out and keeps the waving hand clear of a brim; the wave clip entry and a taller body with longer arms are constants here.', belongs: 'A body kind (tall), a clip entry for wave in STANDARD, and a manner.' },
     { sprite: 'farm-kid', functions: ['TALL', 'SLIGHT'], draws: 'Nothing itself; the child body is two constants here.', belongs: 'A body kind (child) of the rig.' },
