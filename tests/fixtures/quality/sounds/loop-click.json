@@ -1,0 +1,46 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "q-loop-click",
+ "name": "Clicking loop",
+ "category": "ambience",
+ "description": "Breaks: the loop jumps where it wraps.",
+ "meta": {
+  "type": "ambience",
+  "role": "environment/ambience",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "platformer"
+  ],
+  "words": [
+   "blip",
+   "beep",
+   "tick",
+   "tone",
+   "click",
+   "note"
+  ],
+  "license": "draft"
+ },
+ "loop": true,
+ "normalize": false,
+ "duration": 0.5,
+ "params": [
+  {
+   "id": "pitch",
+   "label": "Pitch",
+   "min": 100,
+   "max": 400,
+   "default": 200
+  }
+ ],
+ "nodes": [
+  {
+   "id": "tone",
+   "type": "osc",
+   "freq": "pitch"
+  }
+ ],
+ "out": "0.3*tone + (t >= dur ? 0.6 : 0)"
+}

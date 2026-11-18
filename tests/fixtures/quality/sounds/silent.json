@@ -1,0 +1,80 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "q-silent",
+ "name": "Blip",
+ "category": "ui",
+ "description": "Breaks: the render is silent.",
+ "meta": {
+  "type": "sfx",
+  "role": "interface/click",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "platformer"
+  ],
+  "words": [
+   "blip",
+   "beep",
+   "tick",
+   "tone",
+   "click",
+   "note"
+  ],
+  "license": "draft"
+ },
+ "duration": "length + 0.02",
+ "params": [
+  {
+   "id": "pitch",
+   "label": "Pitch",
+   "min": 300,
+   "max": 2000,
+   "default": 800,
+   "scale": "log"
+  },
+  {
+   "id": "length",
+   "label": "Length",
+   "min": 0.05,
+   "max": 0.3,
+   "default": 0.12,
+   "scale": "log"
+  },
+  {
+   "id": "buzz",
+   "label": "Buzz",
+   "min": 0,
+   "max": 1,
+   "default": 0.3
+  }
+ ],
+ "nodes": [
+  {
+   "id": "amp",
+   "type": "ad",
+   "attack": 0.001,
+   "decay": "length",
+   "curve": 3
+  },
+  {
+   "id": "tone",
+   "type": "osc",
+   "wave": "sine",
+   "freq": "pitch"
+  },
+  {
+   "id": "edge",
+   "type": "osc",
+   "wave": "square",
+   "freq": "pitch"
+  }
+ ],
+ "out": "0*tone*amp",
+ "presets": {
+  "Soft": {
+   "pitch": 500,
+   "buzz": 0
+  }
+ }
+}

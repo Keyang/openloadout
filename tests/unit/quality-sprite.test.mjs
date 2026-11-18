@@ -1,0 +1,189 @@
+// The sprite quality bar (quality/sprite.js): one fixture per rule.
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { checkSprite, THRESHOLDS, whenHint } from '../../quality/sprite.js';
+import { choice, toggle } from '../../engine/sprite.js';
+
+const HINT_PARAMS = { hat: choice('Hat', 'cap', ['none', 'cap', 'spike']), cape: toggle('Cape', false) };
+import * as F from '../fixtures/quality/sprites.mjs';
+
+const TYPES = ['character', 'creature', 'tileset', 'prop', 'pickup', 'projectile', 'effect', 'background', 'ui', 'icon'];
+// stand-in for catalog/schema.js validateMeta(meta, kind) -> { ok, errors }
+const validateMeta = (meta, kind) => {
+  const errors = [];
+  if (kind !== 'sprite') errors.push(`kind should be sprite, got ${kind}`);
+  if (!TYPES.includes(meta.type)) errors.push(`type "${meta.type}" is not an allowed value`);
+  if (!meta.role) errors.push('role is missing');
+  return { ok: !errors.length, errors };
+};
+const opts = { soundIndex: F.SOUND_INDEX, validateMeta };
+const run = (fx, o = opts) => checkSprite(fx(), o);
+const has = (list, re) => list.some((m) => re.test(m));
+const count = (list, re) => list.filter((m) => re.test(m)).length;
+const show = (r) => `errors:\n  ${r.errors.join('\n  ')}\nwarnings:\n  ${r.warnings.join('\n  ')}`;
+
+function expectError(fx, re) {
+  const r = run(fx);
+  assert.ok(has(r.errors, re), `expected an error matching ${re}\n${show(r)}`);
+  return r;
+}
+function expectWarningOnly(fx, re) {
+  const r = run(fx);
+  assert.ok(has(r.warnings, re), `expected a warning matching ${re}\n${show(r)}`);
+  assert.ok(!has(r.errors, re), `expected no error matching ${re}\n${show(r)}`);
+  return r;
+}
+function expectClean(fx) {
+  const r = run(fx);
+  assert.deepEqual(r.errors, [], show(r));
+  return r;
+}
+
+test('a sprite that meets the bar passes with no errors and no warnings', () => {
+  const r = expectClean(F.good);
+  assert.deepEqual(r.warnings, [], show(r));
+});
+
+test('metrics report the time, the render count, the type, the fill and the strength threshold', () => {
+  const r = run(F.good);
+  assert.ok(r.metrics.ms > 0);
+  assert.ok(r.metrics.renders > 0);
+  assert.equal(r.metrics.type, 'creature');
+  assert.ok(r.metrics.smallestFill > 0.33 && r.metrics.smallestFill <= 1);
+  assert.equal(r.metrics.looks, r.metrics.bases + THRESHOLDS.randomLooks);
+  assert.equal(THRESHOLDS.randomLooks, 12);
+  assert.equal(Object.keys(r.metrics.controls).length, 9, 'per-control results');
+  assert.equal(r.metrics.controls.hat.kind, 'choice');
+  // N = clamp(round(opaque pixels of the default first frame / 100), 2, 8)
+  assert.ok(r.metrics.opaquePixels > 100);
+  assert.equal(r.metrics.strength, Math.min(8, Math.max(2, Math.round(r.metrics.opaquePixels / 100))));
+  assert.ok(r.metrics.controls.hatSize.maxChange > r.metrics.strength);
+});
+
+// ---- control strength -------------------------------------------------------------
+test('a slider that changes nothing is an error', () => expectError(F.deadSlider, /"wiggle" never changes the picture/));
+test('a colour that changes nothing is an error', () => expectError(F.deadColour, /"eyeColour" never changes the picture/));
+test('a slider that changes only a few pixels is an error', () => expectError(F.weakSlider, /"freckleSize" changes at most 2 pixels/));
+test('an on/off control that changes only a few pixels is a warning', () => expectWarningOnly(F.weakToggle, /"freckle" changes at most 2 pixels/));
+test('two choice options that look exactly the same are an error', () => expectError(F.sameChoice, /"mood": options "calm" and "grumpy" look the same/));
+test('two choice options a few pixels apart are a warning', () => expectWarningOnly(F.nearChoice, /"mood": options "sleepy" and "dozy" differ by at most 2 pixels/));
+
+// ---- dead controls, parts and `when` ------------------------------------------------------
+test('a control dead for some setting of another is an error that names the remedy', () => {
+  const r = expectError(F.deadForChoice, /"hatSize" does nothing when hat=none/);
+  assert.ok(has(r.errors, /"hatSize" .*declare `when: \{ hat: \['cap', 'spike'\] \}`/), show(r));
+  assert.ok(has(r.errors, /"hatColour" does nothing when hat=none/), show(r));
+});
+test('a part declaration excuses its controls when the part is off', () => expectClean(F.good));
+test('`when` excuses a control where it is not in effect', () => expectClean(F.whenDeclared));
+test('a control whose `when` needs two non-default settings is tested where it applies', () => {
+  expectClean(F.twoKeyWhenDrawn);
+  const r = expectError(F.twoKeyWhenNeverDrawn, /"trim" does nothing at the only setting where it applies \(hat=spike, cape=true\)/);
+  assert.ok(r.metrics.controls.trim.tested >= 1, 'tested at the built setting');
+});
+test('a control whose `when` can never hold is an error', () => expectError(F.cannotApply, /"hatColour" can never apply/));
+test('`when` as a list of alternatives ("any of these") is accepted', (t) => {
+  let def;
+  try { def = F.listWhenDrawn(); } catch (e) { if (/when must be an object/.test(e.message)) return t.skip('engine/sprite.js does not accept list-form when yet'); throw e; }
+  const r = checkSprite(def, opts);
+  assert.deepEqual(r.errors, [], show(r));
+});
+test('the `when` hint is one object when one other control explains it, a list when either of two does', () => {
+  // dead at the default, alive with hat=spike or with cape on: either is enough, so a list
+  assert.equal(whenHint({ deadIn: ['default', 'hat=cap', 'hat=none', 'cape=false'], aliveIn: ['hat=spike', 'cape=true'] }, HINT_PARAMS, { hat: 'cap', cape: false }), "when: [{ hat: ['spike'] }, { cape: [true] }]");
+  // alive at the default, dead with hat=none: one condition, one object
+  assert.equal(whenHint({ deadIn: ['hat=none'], aliveIn: ['default', 'hat=cap', 'hat=spike'] }, HINT_PARAMS, { hat: 'cap', cape: false }), "when: { hat: ['cap', 'spike'] }");
+  // alive at the default, dead with hat=none and with cape on: both must hold, one object
+  assert.equal(whenHint({ deadIn: ['hat=none', 'cape=true'], aliveIn: ['default', 'hat=cap', 'hat=spike'] }, HINT_PARAMS, { hat: 'cap', cape: false }), "when: { hat: ['cap', 'spike'], cape: [false] }");
+});
+test('a part whose selector is an on/off control is accepted', () => expectClean(F.togglePart));
+test('a part whose none is a list is accepted', () => expectClean(F.listNonePart));
+test('a control dead only at all sliders high is a warning (a deliberate clamp)', () => expectWarningOnly(F.deadAtExtreme, /"spot" does nothing when all sliders high/));
+test('parts: a part control changes the picture while the part is present', () => expectError(F.partControlDead, /part "hat": "hatColour" does nothing when .*hat=cap/));
+test('a sprite with a bad parts declaration cannot be defined (the engine throws)', () => {
+  assert.throws(F.partMissingKey, /"hatShape" is not one of the sprite's controls/);
+  assert.throws(F.partSelectorNotChoice, /must be a choice or an on\/off control/);
+});
+test('a part with more than 6 controls is a warning', () => {
+  const r = run(F.bigPart);
+  assert.ok(has(r.warnings, /part "hat" has 7 controls/), show(r));
+});
+test('the too-many-controls warning counts only controls outside parts', () => {
+  assert.ok(!has(run(F.manyWithPart).warnings, /too many/), show(run(F.manyWithPart)));
+  assert.ok(has(run(F.tooMany).warnings, /17 controls outside parts: too many/), show(run(F.tooMany)));
+});
+
+// ---- size, frame, motion ------------------------------------------------------------------
+test('the smallest look fills a reasonable share of the frame', () => {
+  const r = expectError(F.tinyLook, /smallest look .* fills \d+% of the frame/);
+  assert.ok(r.metrics.smallestFill < 0.25);
+  expectWarningOnly(F.smallLook, /smallest look .* fills \d+% of the frame/);
+});
+test('touching the frame edge is one error for the cause, with a count', () => {
+  const r = expectError(F.edgeTouch, /touches the frame edge/);
+  assert.equal(count(r.errors, /touches the frame edge/), 1, show(r));
+  assert.ok(has(r.errors, /touches the frame edge.*and \d+ more/), show(r));
+});
+test('icons and interface pieces may touch the frame edge', () => {
+  const r = run(F.iconFull);
+  assert.ok(!has(r.errors, /frame edge/), show(r));
+});
+test('same input gives the same pixels', () => expectError(F.nondeterministic, /two renders differ/));
+test('renders without error at every tested combination', () => expectError(F.throwsSometimes, /render threw/));
+test('a sprite that cannot draw gets one error, not a "never changes" for every control', () => {
+  const r = run(F.alwaysThrows);
+  assert.equal(count(r.errors, /render threw/), 1, show(r));
+  assert.ok(!has(r.errors, /never changes|does nothing/), show(r));
+});
+test('a creature moves in every clip', () => expectError(F.frozenClip, /idle: all frames are identical/));
+test('a frame with nothing drawn is an error', () => expectError(F.emptyFrame, /vanish frame 2.*nothing drawn/));
+test('an effect whose last frame is empty gets a warning', () => expectWarningOnly(F.emptyEffectEnd, /vanish.*last frame is empty/));
+test('a character has no one-frame clip', () => expectError(F.stillCharacter, /clip "pose" has one frame: a character must move in every clip/));
+test('a prop may have a one-frame clip', () => {
+  const r = run(F.stillProp);
+  assert.ok(!has(r.errors, /one frame/), show(r));
+  assert.equal(r.metrics.type, 'prop');
+});
+test('feet rest on the pivot line (a warning)', () => expectWarningOnly(F.floating, /lowest pixel is at y=\d+ but pivot y=28/));
+
+// ---- definition, metadata, sounds -----------------------------------------------------------
+test('every control has a label', () => expectError(F.noLabel, /"size" has no label/));
+test('a colour control has at least 3 swatches', () => expectError(F.twoSwatches, /color param "body" needs at least 3 swatches/));
+test('metadata: missing meta is an error when a validator is given', () => expectError(F.noMeta, /no meta/));
+test('metadata: meta must pass the validator', () => expectError(F.badMeta, /meta: type "spaceship" is not an allowed value/));
+test('metadata: skipped when no validator is given', () => {
+  const r = checkSprite(F.noMeta(), { soundIndex: F.SOUND_INDEX });
+  assert.ok(!has(r.errors, /meta/), show(r));
+  assert.equal(r.metrics.metaChecked, false);
+});
+test('sound ids exist, also on a cue with `when`', () => expectError(F.unknownSound, /sound "q-nope" on clip squash is not in sounds/));
+test('sound styles exist', () => expectError(F.unknownPreset, /no preset "Loud"/));
+test('sprites take sound effects, not music', () => expectError(F.musicOnSprite, /"q-song" on clip squash is a music track/));
+
+// ---- tilesets and backgrounds ---------------------------------------------------------------
+test('tileset: a good tileset passes; tiles may fill the frame and have one frame', () => {
+  const r = expectClean(F.tilesetGood);
+  assert.equal(r.metrics.type, 'tileset');
+  assert.ok(r.metrics.joins.length >= 3, 'fill repeats both ways, top repeats sideways, top sits on fill');
+});
+test('tileset: fill tiles are fully opaque', () => expectError(F.tilesetHole, /ground-fill: fill tile is not fully opaque/));
+test('tileset: fill tiles repeat without a seam', () => expectError(F.tilesetSeam, /seam: ground-fill right edge → ground-fill left edge/));
+test('tileset: top tiles repeat side by side without a seam', () => expectError(F.tilesetTopSeam, /seam: ground-top right edge → ground-top left edge/));
+test('tileset: the top tile sits on the fill tile without a seam', () => {
+  const r = expectError(F.tilesetUnderSeam, /seam: ground-top bottom edge → ground-fill top edge/);
+  assert.ok(!has(r.errors, /ground-top right edge/), show(r));
+});
+test('background: a good background passes', () => {
+  const r = expectClean(F.backgroundGood);
+  assert.equal(r.metrics.type, 'background');
+});
+test('background: left and right edges continue into each other', () => expectError(F.backgroundSeam, /near: left and right edges do not continue into each other/));
+test('background: every layer spans the full width, one error per layer', () => {
+  const r = expectError(F.backgroundGap, /near: layer does not span the full width/);
+  assert.equal(count(r.errors, /does not span/), 1, show(r));
+});
+
+test('checkSprite is fast (under 1 s for the fixture)', () => {
+  const r = run(F.good);
+  assert.ok(r.metrics.ms < 1000, `${r.metrics.ms} ms`);
+});

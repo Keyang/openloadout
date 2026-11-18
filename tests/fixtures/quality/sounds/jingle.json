@@ -1,0 +1,97 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "q-jingle",
+ "name": "Test jingle",
+ "category": "jingle",
+ "description": "Test sting: a one-shot musical jingle, judged as a jingle, not a track.",
+ "meta": {
+  "type": "jingle",
+  "role": "music/victory",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "platformer"
+  ],
+  "words": [
+   "blip",
+   "beep",
+   "tick",
+   "tone",
+   "click",
+   "note"
+  ],
+  "license": "draft"
+ },
+ "duration": "length*2 + 0.05",
+ "params": [
+  {
+   "id": "pitch",
+   "label": "Pitch",
+   "min": 300,
+   "max": 2000,
+   "default": 800,
+   "scale": "log"
+  },
+  {
+   "id": "length",
+   "label": "Length",
+   "min": 0.05,
+   "max": 0.3,
+   "default": 0.12,
+   "scale": "log"
+  },
+  {
+   "id": "buzz",
+   "label": "Buzz",
+   "min": 0,
+   "max": 1,
+   "default": 0.3
+  }
+ ],
+ "nodes": [
+  {
+   "id": "c",
+   "type": "clock",
+   "rate": "3/length",
+   "count": 3
+  },
+  {
+   "id": "notes",
+   "type": "seq",
+   "trig": "c",
+   "steps": [
+    0,
+    4,
+    7
+   ]
+  },
+  {
+   "id": "amp",
+   "type": "ad",
+   "attack": 0.002,
+   "decay": "length*1.2",
+   "curve": 3,
+   "trig": "c"
+  },
+  {
+   "id": "tone",
+   "type": "osc",
+   "wave": "sine",
+   "freq": "pitch*pow(2, notes/12)"
+  },
+  {
+   "id": "edge",
+   "type": "osc",
+   "wave": "square",
+   "freq": "pitch*pow(2, notes/12)"
+  }
+ ],
+ "out": "(tone*(1 - buzz) + edge*buzz*0.5)*amp",
+ "presets": {
+  "Soft": {
+   "pitch": 500,
+   "buzz": 0
+  }
+ }
+}

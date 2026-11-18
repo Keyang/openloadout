@@ -46,7 +46,7 @@ export default defineSprite({
     base: choice('Base', 'logs', ['logs', 'tipi', 'stones', 'none']),
     sparks: range('Sparks', 0.5, { lo: 'None', hi: 'Lots' }),
     colour: color('Flame colour', FIRE[0], FIRE),
-    wood: color('Wood', WOOD[0], WOOD),
+    wood: color('Wood', WOOD[0], WOOD, { when: { base: ['logs', 'tipi'] } }),
     flicker: range('Flicker', 0.5, { lo: 'Steady', hi: 'Wild', group: 'Motion' }),
     wind: range('Wind', 0.15, { lo: 'Still', hi: 'Windy', group: 'Motion' }),
     speed: range('Speed', 0.5, { lo: 'Slow', hi: 'Fast', group: 'Motion' }),

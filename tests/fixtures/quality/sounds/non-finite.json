@@ -1,0 +1,87 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "q-non-finite",
+ "name": "Blip",
+ "category": "ui",
+ "description": "Breaks: a slider at its lowest divides by zero, so the samples are not finite.",
+ "meta": {
+  "type": "sfx",
+  "role": "interface/click",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "platformer"
+  ],
+  "words": [
+   "blip",
+   "beep",
+   "tick",
+   "tone",
+   "click",
+   "note"
+  ],
+  "license": "draft"
+ },
+ "duration": "length + 0.02",
+ "params": [
+  {
+   "id": "pitch",
+   "label": "Pitch",
+   "min": 300,
+   "max": 2000,
+   "default": 800,
+   "scale": "log"
+  },
+  {
+   "id": "length",
+   "label": "Length",
+   "min": 0.05,
+   "max": 0.3,
+   "default": 0.12,
+   "scale": "log"
+  },
+  {
+   "id": "buzz",
+   "label": "Buzz",
+   "min": 0,
+   "max": 1,
+   "default": 0.3
+  },
+  {
+   "id": "level",
+   "label": "Level",
+   "min": 0,
+   "max": 1,
+   "default": 0.8
+  }
+ ],
+ "nodes": [
+  {
+   "id": "amp",
+   "type": "ad",
+   "attack": 0.001,
+   "decay": "length",
+   "curve": 3
+  },
+  {
+   "id": "tone",
+   "type": "osc",
+   "wave": "sine",
+   "freq": "pitch"
+  },
+  {
+   "id": "edge",
+   "type": "osc",
+   "wave": "square",
+   "freq": "pitch"
+  }
+ ],
+ "out": "(tone*(1 - buzz) + edge*buzz*0.5)*amp/level*0.8",
+ "presets": {
+  "Soft": {
+   "pitch": 500,
+   "buzz": 0
+  }
+ }
+}

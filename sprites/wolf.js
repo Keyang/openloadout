@@ -172,7 +172,7 @@ export default defineSprite({
     fluff: range('Fluffiness', 0.6, { lo: 'Sleek', hi: 'Fluffy' }),
     markings: choice('Markings', 'belly', ['plain', 'belly', 'socks', 'mask']),
     fur: color('Fur', FUR[0], FUR),
-    belly: color('Belly and markings', MARK[0], MARK),
+    belly: color('Belly and markings', MARK[0], MARK, { when: { markings: ['belly', 'socks', 'mask'] } }),
     eyes: color('Eyes', EYES[0], EYES),
     stride: range('Step size', 0.5, { lo: 'Small steps', hi: 'Big steps', group: 'Motion' }),
     bounce: range('Bounce', 0.5, { lo: 'Smooth', hi: 'Bouncy', group: 'Motion' }),

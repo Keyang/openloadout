@@ -2,7 +2,7 @@
 // sfx.mjs — command-line companion to the engine. Lets an agent validate,
 // render and "look at" a patch without a browser or ears.
 //
-//   node tools/sfx.mjs check  <patch.json> [more.json ...]   validate + render + measure + test every parameter
+//   node tools/sfx.mjs check  <patch.json> [more.json ...] [--json] [--no-cache]   the quality bar (quality/sound.js, cached in .cache/quality.json): validate, render, measure, test every parameter
 //   node tools/sfx.mjs render <patch.json> [-o out.wav] [--png out.png] [--set id=value ...] [--preset name] [--seed n]
 //   node tools/sfx.mjs nodes                                 print the node and expression reference
 //   node tools/sfx.mjs index  [sounds-dir]                   rebuild sounds/index.json for the website
@@ -11,8 +11,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import zlib from 'node:zlib';
 import { fileURLToPath } from 'node:url';
-import { validatePatch, renderPatch, createVoice, defaultParams, NODE_TYPES, EXPRESSION_FUNCTIONS, FORMAT } from '../sound/sfx-engine.js';
-import { analyze, critique, fingerprint, fingerprintDistance, spectrogram, pulse, seam } from '../sound/analyze.js';
+import { validatePatch, renderPatch, defaultParams, NODE_TYPES, EXPRESSION_FUNCTIONS, FORMAT } from '../sound/sfx-engine.js';
+import { analyze, spectrogram } from '../sound/analyze.js';
+import { runQuality } from './lib/quality-run.mjs';
 import { encodeWav } from '../sound/wav.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -27,72 +28,39 @@ function fail(msg) { console.error(msg); process.exit(1); }
 const pct = (x) => `${Math.round(x * 100)}%`;
 const hz = (x) => (x >= 1000 ? `${(x / 1000).toFixed(1)}k` : `${Math.round(x)}`);
 
-function checkOne(file) {
-  const patch = load(file);
-  const v = validatePatch(patch);
-  const lines = [];
-  let ok = v.ok;
+// Human-readable report of one quality/sound.js result (the same lines the checker always printed).
+function formatCheck(file, patch, r) {
+  const m = r.metrics, lines = [];
   lines.push(`${patch.id || path.basename(file)}  "${patch.name || '?'}"${patch.loop ? '  [loop]' : ''}`);
-  for (const e of v.errors) lines.push(`  ERROR: ${e}`);
-  for (const w of v.warnings) lines.push(`  WARN: ${w}`);
-  if (!v.ok) { lines.push('  RESULT: FAIL — fix the errors above.'); return { ok: false, text: lines.join('\n') }; }
-
-  const t0 = performance.now();
-  const base = renderPatch(patch, { seed: 1 });
-  const ms = performance.now() - t0;
-  const a = analyze(base.samples, base.sampleRate);
-  lines.push(`  render   ${a.seconds.toFixed(2)} s in ${ms.toFixed(0)} ms (${(a.seconds * 1000 / ms).toFixed(0)}x realtime) · raw peak ${base.rawPeak.toFixed(2)} · rms ${a.rmsDb.toFixed(1)} dBFS after normalise`);
+  if (!m.valid) {
+    for (const e of r.errors) lines.push(`  ERROR: ${e}`);
+    for (const w of r.warnings) lines.push(`  WARN: ${w}`);
+    lines.push('  RESULT: FAIL — fix the errors above.');
+    return lines.join('\n');
+  }
+  const a = m.analysis;
+  lines.push(`  render   ${a.seconds.toFixed(2)} s in ${m.renderMs} ms (${m.realtime.toFixed(0)}x realtime) · raw peak ${m.rawPeak.toFixed(2)} · rms ${a.rmsDb.toFixed(1)} dBFS after normalise`);
   lines.push(`  loudness ${a.contour}   (time →, 6 dB per step)`);
   lines.push(`  timing   attack ${a.attackMs.toFixed(0)} ms · sounding ${a.soundingSeconds.toFixed(2)} s · end level ${a.endLevelDb.toFixed(0)} dB`);
   lines.push(`  spectrum centroid ${hz(a.centroidHz.start)} → ${hz(a.centroidHz.middle)} → ${hz(a.centroidHz.end)} Hz · strongest ${hz(a.dominantHz.start)} → ${hz(a.dominantHz.middle)} → ${hz(a.dominantHz.end)} Hz (start → middle → end)`);
   lines.push(`  bands    ${Object.entries(a.bands).map(([k, x]) => `${k} ${pct(x)}`).join(' · ')}`);
-  {
-    // Peak level of every node at the defaults: shows which layer dominates the mix and which is dead.
-    const voice = createVoice(patch, { seed: 1 }), n = Math.round(Math.min(voice.duration, 30) * 44100);
-    const pk = new Float64Array(voice.nodeIds.length);
-    for (let i = 0; i < n; i++) { voice.tick(); for (let k = 0; k < pk.length; k++) { const x = Math.abs(voice.nodeValues[k]); if (x > pk[k]) pk[k] = x; } }
-    const fmt = (x) => (x >= 100 ? x.toFixed(0) : x >= 10 ? x.toFixed(1) : x.toFixed(2));
-    lines.push(`  nodes    peak |value|: ${voice.nodeIds.map((id, k) => `${id} ${fmt(pk[k])}`).join(' · ')}`);
+  const fmt = (x) => (x >= 100 ? x.toFixed(0) : x >= 10 ? x.toFixed(1) : x.toFixed(2));
+  lines.push(`  nodes    peak |value|: ${m.nodes.map((n) => `${n.id} ${fmt(n.peak)}`).join(' · ')}`);
+  if (m.loopSeam) {
+    const pl = m.pulse || [];
+    lines.push(`  loop     seam jump ${m.loopSeam.factor.toFixed(1)}x typical${m.loopSeam.factor > 8 ? ' (may click)' : ''} · ${m.stereo ? 'stereo' : 'mono'}${pl.length ? ` · pulse ${pl.map((p) => `${p.bpm} bpm (${p.strength})`).join(', ')}` : ' · no steady pulse'}`);
   }
-  const notes = critique(a, patch);
-  if (patch.loop) {
-    const sj = seam(base.samples), pl = pulse(base.samples, base.sampleRate);
-    lines.push(`  loop     seam jump ${sj.toFixed(1)}x typical${sj > 8 ? ' (may click)' : ''} · ${base.channels.length === 2 ? 'stereo' : 'mono'}${pl.length ? ` · pulse ${pl.map((p) => `${p.bpm} bpm (${p.strength})`).join(', ')}` : ' · no steady pulse'}`);
-    if (sj > 8 && Math.abs(base.samples[0] - base.samples[base.samples.length - 1]) > 0.05) notes.push('WARN: the loop point has a jump that may click.');
-  }
-  if (base.badSamples) notes.push(`ERROR: ${base.badSamples} non-finite samples in the render.`);
-
-  const params = patch.params || [];
-  if (!params.length) notes.push('WARN: no parameters — the sound cannot be remixed. Expose 3–7.');
-  if (params.length) lines.push('  params   change from min → max (average dB of spectral change; below 1.5 is barely audible)');
-  for (const p of params) {
-    const lo = renderPatch(patch, { seed: 1, params: { [p.id]: p.min } });
-    const hi = renderPatch(patch, { seed: 1, params: { [p.id]: p.max } });
-    const secs = Math.max(lo.duration, hi.duration);
-    const d = fingerprintDistance(fingerprint(lo.samples, lo.sampleRate, secs), fingerprint(hi.samples, hi.sampleRate, secs));
-    const flags = [];
-    for (const [label, r] of [['min', lo], ['max', hi]]) {
-      const ax = analyze(r.samples, r.sampleRate);
-      if (ax.peakDb < -40 || r.rawPeak < 1e-4) flags.push(`silent at ${label}`);
-      if (r.badSamples) flags.push(`non-finite samples at ${label}`);
-      if (!patch.loop && ax.endLevelDb > -12) flags.push(`cut off at ${label}`);
-    }
-    if (d < 1.5) flags.push('little audible effect — widen the range or wire it to something that matters');
-    lines.push(`    ${p.id.padEnd(12)} ${d.toFixed(1).padStart(5)} dB  (${p.min}..${p.max}, default ${p.default})${flags.length ? '  ← ' + flags.join('; ') : ''}`);
-    for (const f of flags) notes.push(`${f.startsWith('silent') || f.startsWith('non-finite') ? 'ERROR' : 'WARN'}: param '${p.id}': ${f}`);
-  }
-  const alt = renderPatch(patch, { seed: 2 });
-  const vd = fingerprintDistance(fingerprint(base.samples, base.sampleRate, base.duration), fingerprint(alt.samples, alt.sampleRate, base.duration));
-  lines.push(`  variation seed 1 vs seed 2: ${vd.toFixed(1)} dB${vd < 0.2 ? ' (identical every time — use rnd(lo, hi) or noise if repeats should differ)' : ''}`);
-  for (const [name, set] of Object.entries(patch.presets || {})) {
-    const r = renderPatch(patch, { seed: 1, params: set });
-    if (analyze(r.samples, r.sampleRate).peakDb < -40) notes.push(`ERROR: preset '${name}' is silent`);
-  }
-  if (patch.presets) lines.push(`  presets  ${Object.keys(patch.presets).join(', ')}`);
-  for (const n of notes) lines.push(`  ${n}`);
-  if (notes.some((n) => n.startsWith('ERROR'))) ok = false;
-  lines.push(ok ? `  RESULT: PASS${notes.length ? ' with notes' : ''}` : '  RESULT: FAIL');
-  return { ok, text: lines.join('\n') };
+  if (m.music) lines.push(`  music    tempo written ${m.music.writtenBpm ?? '?'} bpm, detected ${m.music.detectedBpm ?? 'none'} · length control ${m.music.lengthControl ?? 'none'} · melody instrument control ${m.music.instrumentControl ?? 'none'}`);
+  if (m.params.length) lines.push('  params   change from min → max (average dB of spectral change; below 1.5 is barely audible)');
+  for (const p of m.params) lines.push(`    ${p.id.padEnd(12)} ${p.distance.toFixed(1).padStart(5)} dB  (${p.min}..${p.max}, default ${p.default})${p.flags.length ? '  ← ' + p.flags.join('; ') : ''}`);
+  lines.push(`  variation seed 1 vs seed 2: ${m.variation.toFixed(1)} dB${m.variation < 0.2 ? ' (identical every time — use rnd(lo, hi) or noise if repeats should differ)' : ''}`);
+  if (m.presets.length) lines.push(`  presets  ${m.presets.join(', ')}`);
+  for (const e of r.errors) lines.push(`  ERROR: ${e}`);
+  for (const w of r.warnings) lines.push(`  WARN: ${w}`);
+  for (const n of r.notes) lines.push(`  NOTE: ${n}`);
+  const ok = !r.errors.length;
+  lines.push(ok ? `  RESULT: PASS${r.warnings.length || r.notes.length ? ' with notes' : ''}` : '  RESULT: FAIL');
+  return lines.join('\n');
 }
 
 // ---- PNG (waveform over log-frequency spectrogram), so a multimodal agent can view the sound.
@@ -132,10 +100,17 @@ function writePng(file, samples, sr) {
 }
 
 if (cmd === 'check') {
-  if (!args.length) fail('usage: sfx.mjs check <patch.json> [...]');
-  let allOk = true;
-  for (const f of args) { if (path.basename(f) === 'index.json') continue; const r = checkOne(f); console.log(r.text + '\n'); if (!r.ok) allOk = false; }
-  process.exit(allOk ? 0 : 1);
+  const json = args.includes('--json');
+  const ci = args.indexOf('--cache-file');
+  const cacheFile = ci >= 0 ? path.resolve(args[ci + 1]) : undefined;
+  const files = args.filter((a, i) => !a.startsWith('--') && !(ci >= 0 && i === ci + 1) && path.basename(a) !== 'index.json');
+  if (!files.length) fail('usage: sfx.mjs check <patch.json> [...] [--json] [--no-cache] [--cache-file <path>]');
+  for (const f of files) if (!fs.existsSync(f)) fail(`cannot read ${f}`);
+  const run = await runQuality({ sprites: [], sounds: files, cache: !args.includes('--no-cache'), cacheFile });
+  if (run.notice && !json) console.log(`note: ${run.notice}\n`);
+  if (json) console.log(JSON.stringify({ ok: run.results.every((r) => r.ok), metaChecked: run.metaChecked, notice: run.notice, sounds: run.results }, null, 2));
+  else for (const r of run.results) console.log(formatCheck(r.file, { id: r.id, name: r.name, loop: r.loop }, r) + (r.cached ? '\n  (from the cache: nothing it depends on has changed)' : '') + '\n');
+  process.exit(run.results.every((r) => r.ok) ? 0 : 1);
 } else if (cmd === 'render') {
   const file = args[0]; if (!file) fail('usage: sfx.mjs render <patch.json> [-o out.wav] [--png out.png] [--set id=value] [--preset name] [--seed n]');
   const patch = load(file);

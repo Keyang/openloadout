@@ -1,114 +1,61 @@
 #!/usr/bin/env node
-// Automatic checks for sprites. Run after every change:
+// Automatic checks for sprites: a thin command line over quality/sprite.js (every rule)
+// and tools/lib/quality-run.mjs (worker threads and a cache). docs/quality-bar.md says
+// what each rule means. Run after every change:
 //
-//   node tools/check.mjs            all sprites
-//   node tools/check.mjs <id>       one sprite
+//   node tools/check.mjs                 every sprite found in sprites/
+//   node tools/check.mjs <id|file> ...   one or more sprites, by id or by file path
+//   --json                               machine-readable: { ok, metaChecked, notice, sprites: [{ id, file, ok, errors, warnings, metrics, cached }] }
+//   --no-cache                           check again even when nothing changed
+//   --cache-file <path>                  use another cache file (default .cache/quality.json)
 //
-// Errors fail the run (exit 1); warnings are things to look at by eye.
+// Errors fail the run (exit 1); warnings are things to look at by eye. A sprite file
+// that cannot be loaded is reported as that sprite's error. Metadata is checked with
+// catalog/schema.js's validateMeta when that file exists.
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { sprites } from '../sprites/index.js';
-import { renderFrame, defaultParams, cleanParams, randomParams } from '../engine/sprite.js';
-import { brightness } from '../engine/color.js';
+import { pathToFileURL } from 'node:url';
+import { ROOT } from './lib/assets.mjs';
+import { runQuality, UnknownAsset } from './lib/quality-run.mjs';
 
-const only = process.argv[2];
-const dir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', 'sprites');
-let list = only ? sprites.filter((s) => s.id === only) : sprites;
-// a sprite does not have to be in the gallery list yet: sprites/<id>.js is loaded directly
-if (only && !list.length && fs.existsSync(path.join(dir, `${only}.js`))) {
-  list = [(await import(`../sprites/${only}.js`)).default];
-  console.log(`note: "${only}" is not in sprites/index.js yet, so it will not show in the gallery`);
+const args = process.argv.slice(2);
+const json = args.includes('--json');
+const ci = args.indexOf('--cache-file');
+const cacheFile = ci >= 0 ? path.resolve(args[ci + 1]) : undefined;
+const ids = args.filter((a, i) => !a.startsWith('--') && !(ci >= 0 && i === ci + 1));
+const say = json ? () => {} : (...m) => console.log(...m);
+
+let run;
+try {
+  run = await runQuality({ sprites: ids.length ? ids : undefined, sounds: [], cache: !args.includes('--no-cache'), cacheFile });
+} catch (e) {
+  if (e instanceof UnknownAsset) { console.error(e.message); process.exit(1); }
+  throw e;
 }
-if (!only) for (const f of fs.readdirSync(dir)) {
-  const fid = f.replace(/\.js$/, '');
-  if (f.endsWith('.js') && f !== 'index.js' && !f.startsWith('_') && !sprites.some((s) => s.id === fid)) console.log(`note: sprites/${f} is not listed in sprites/index.js`);
-}
-if (!list.length) { console.error(`Unknown sprite "${only}". Known: ${sprites.map((s) => s.id).join(', ')}`); process.exit(1); }
+if (run.notice) say(`note: ${run.notice}`);
 
-const soundsDir = path.resolve(dir, '..', 'sounds');
-const soundIndex = new Map();
-if (fs.existsSync(soundsDir)) for (const f of fs.readdirSync(soundsDir)) {
-  if (!f.endsWith('.json') || f === 'index.json') continue;
-  const patch = JSON.parse(fs.readFileSync(path.join(soundsDir, f), 'utf8'));
-  soundIndex.set(patch.id, patch);
+// the gallery still lists sprites by hand in sprites/index.js; say when one is missing there
+if (!json && !ids.length && fs.existsSync(path.join(ROOT, 'sprites', 'index.js'))) {
+  try {
+    const { sprites } = await import(pathToFileURL(path.join(ROOT, 'sprites', 'index.js')).href);
+    const listed = new Set((sprites ?? []).map((s) => s.id));
+    for (const r of run.results) if (r.metrics?.looks && !listed.has(r.id)) say(`note: ${r.file} is not listed in sprites/index.js, so it will not show in the gallery`);
+  } catch { /* the gallery list is not this tool's concern */ }
 }
 
-const diff = (a, b) => { let n = 0; for (let i = 0; i < a.data.length; i++) if (a.data[i] !== b.data[i]) n++; return n; };
-let failed = false;
-
-for (const sprite of list) {
-  const errors = new Set(), warns = new Set();
-  const [w, h] = sprite.size;
-  const lo = {}, hi = {};
-  for (const [k, d] of Object.entries(sprite.params)) {
-    if (!d || !d.kind) { errors.add(`param "${k}" is not built with range/choice/color/toggle`); continue; }
-    if (!d.label) errors.add(`param "${k}" has no label`);
-    if (d.kind === 'range') { lo[k] = d.min; hi[k] = d.max; }
-    if (d.kind === 'color' && !(d.swatches?.length >= 3)) errors.add(`color param "${k}" needs at least 3 swatches`);
-    if (d.kind === 'color') for (const c of d.swatches ?? []) if (brightness(c) < 0.14) warns.add(`color param "${k}": swatch ${c} is almost as dark as the outline, so shapes in it merge into a black blob`);
-  }
-  if (new Set(sprites.map((s) => s.id)).size !== sprites.length) errors.add('duplicate sprite ids in sprites/index.js');
-  for (const [cname, list] of Object.entries(sprite.sounds ?? {})) for (const c of list) {
-    const patch = soundIndex.get(c.sound);
-    if (!patch) { errors.add(`sound "${c.sound}" on clip ${cname} is not in sounds/ (known: ${[...soundIndex.keys()].join(', ')})`); continue; }
-    if (patch.category === 'music') errors.add(`"${c.sound}" on clip ${cname} is a music track; sprite animations take sound effects`);
-    if (c.preset && !(patch.presets && patch.presets[c.preset])) errors.add(`sound "${c.sound}" on clip ${cname}: no preset "${c.preset}" (it has: ${Object.keys(patch.presets ?? {}).join(', ') || 'none'})`);
-    if (patch.loop && !sprite.clips[cname].loop) warns.add(`looping sound "${c.sound}" on one-shot clip ${cname}: it only plays while that clip is on screen`);
-  }
-  const nParams = Object.keys(sprite.params).length;
-  if (nParams < 4) warns.add(`only ${nParams} parameters: give people more to play with`);
-  if (nParams > 16) warns.add(`${nParams} parameters: too many for a simple panel (aim for 8-15)`);
-
-  const looks = [['default', defaultParams(sprite)], ['all-low', cleanParams(sprite, lo)], ['all-high', cleanParams(sprite, hi)]];
-  for (let i = 0; i < 40; i++) looks.push([`random#${i}`, randomParams(sprite, 1000 + i * 7919)]);
-  // every choice option at least once with otherwise default values
-  for (const [k, d] of Object.entries(sprite.params)) if (d.kind === 'choice') for (const o of d.options) looks.push([`${k}=${o.value}`, { ...defaultParams(sprite), [k]: o.value }]);
-
-  for (const [lname, p] of looks) {
-    for (const [cname, clip] of Object.entries(sprite.clips)) {
-      let frames;
-      try {
-        frames = Array.from({ length: clip.frames }, (_, f) => renderFrame(sprite, cname, f, p));
-      } catch (e) {
-        errors.add(`${cname} / ${lname}: render threw ${e.message}`);
-        continue;
-      }
-      const colours = new Set();
-      let groundLow = -1;
-      frames.forEach((g, f) => {
-        const b = g.bounds();
-        if (!b) { errors.add(`${cname} frame ${f} / ${lname}: nothing drawn`); return; }
-        if (b.x0 === 0 || b.y0 === 0 || b.x1 === w - 1 || b.y1 === h - 1) errors.add(`${cname} / ${lname}: drawing touches the canvas edge (clipped) — frame ${f}, box ${b.x0},${b.y0}..${b.x1},${b.y1}`);
-        for (const v of g.data) if (v) colours.add(v);
-        groundLow = Math.max(groundLow, b.y1);
-        if (lname === 'default') {
-          const again = renderFrame(sprite, cname, f, p);
-          if (diff(g, again)) errors.add(`${cname} frame ${f}: two renders differ — do not use Math.random() or Date; use hash()/rng()`);
-        }
-      });
-      if (colours.size > 32) warns.add(`${cname} / ${lname}: ${colours.size} colours in one clip (pixel art reads best under ~24)`);
-      if (lname === 'default' && clip.frames > 1) {
-        const steps = [];
-        for (let f = 1; f < clip.frames; f++) steps.push(diff(frames[f - 1], frames[f]));
-        const avg = steps.reduce((a, b) => a + b, 0) / steps.length;
-        if (avg === 0) errors.add(`${cname}: all frames are identical`);
-        if (steps.filter((s) => s === 0).length > clip.frames / 2) warns.add(`${cname}: more than half the frames repeat the previous one`);
-        if (clip.loop) {
-          const wrap = diff(frames[clip.frames - 1], frames[0]);
-          if (wrap > avg * 2.5 + 8) warns.add(`${cname}: loop seam — last→first frame changes ${wrap}px vs ${avg.toFixed(0)}px between other frames`);
-          if (wrap === 0) warns.add(`${cname}: last frame equals first frame (a loop should not repeat its first pose)`);
-        }
-      }
-      if (lname === 'default' && sprite.grounded !== false && cname === Object.keys(sprite.clips)[0]) {
-        if (Math.abs(groundLow - sprite.pivot[1]) > 2) warns.add(`${cname}: lowest pixel is at y=${groundLow} but pivot y=${sprite.pivot[1]} — feet should rest on the pivot line (set grounded: false for flying things)`);
-      }
-    }
-  }
-  const status = errors.size ? 'FAIL' : warns.size ? 'ok (warnings)' : 'ok';
-  console.log(`${sprite.id.padEnd(14)} ${status}   ${looks.length} looks x ${Object.keys(sprite.clips).length} clips`);
-  for (const e of errors) console.log(`   ERROR  ${e}`);
-  for (const m of warns) console.log(`   warn   ${m}`);
-  if (errors.size) failed = true;
+for (const r of run.results) {
+  const status = !r.ok ? 'FAIL' : r.warnings.length ? 'ok (warnings)' : 'ok';
+  const size = r.metrics?.looks ? `${r.metrics.looks} looks x ${r.clips} clips   ${Math.round(r.metrics.ms)} ms` : '(not checked)';
+  say(`${String(r.id).padEnd(14)} ${status}   ${size}${r.cached ? ' (cached)' : ''}`);
+  for (const e of r.errors) say(`   ERROR  ${e}`);
+  for (const m of r.warnings) say(`   warn   ${m}`);
 }
-process.exit(failed ? 1 : 0);
+const allOk = run.results.every((r) => r.ok);
+if (json) {
+  console.log(JSON.stringify({ ok: allOk, metaChecked: run.metaChecked, notice: run.notice, sprites: run.results }, null, 2));
+} else if (run.results.length > 1) {
+  const fresh = run.results.filter((r) => !r.cached && r.metrics?.ms);
+  const ms = fresh.reduce((a, r) => a + r.metrics.ms, 0);
+  say(`\n${run.results.length} sprites: ${run.results.filter((r) => r.ok).length} pass, ${run.results.filter((r) => !r.ok).length} fail · ${run.results.length - fresh.length} from the cache${fresh.length ? ` · ${Math.round(ms / fresh.length)} ms per sprite checked` : ''}`);
+}
+process.exit(allOk ? 0 : 1);

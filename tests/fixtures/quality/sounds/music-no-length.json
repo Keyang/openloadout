@@ -1,0 +1,137 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "q-song-no-length",
+ "name": "Test song",
+ "category": "music",
+ "description": "Breaks: no length control.",
+ "meta": {
+  "type": "music",
+  "role": "music/battle",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "platformer"
+  ],
+  "words": [
+   "blip",
+   "beep",
+   "tick",
+   "tone",
+   "click",
+   "note"
+  ],
+  "license": "draft"
+ },
+ "loop": true,
+ "wrap": true,
+ "normalize": false,
+ "gain": 0.8,
+ "duration": "4*4*60/bpm",
+ "params": [
+  {
+   "id": "bpm",
+   "label": "Tempo",
+   "min": 100,
+   "max": 140,
+   "default": 120,
+   "unit": "bpm"
+  },
+  {
+   "id": "inst",
+   "label": "Melody instrument",
+   "min": 0,
+   "max": 1,
+   "default": 0,
+   "options": [
+    "Soft",
+    "Buzzy"
+   ]
+  }
+ ],
+ "nodes": [
+  {
+   "id": "c16",
+   "type": "clock",
+   "rate": "bpm/60*4"
+  },
+  {
+   "id": "kick",
+   "type": "pattern",
+   "trig": "c16",
+   "steps": "X...x...X...x..."
+  },
+  {
+   "id": "kenv",
+   "type": "ad",
+   "attack": 0.001,
+   "decay": 0.15,
+   "trig": "kick"
+  },
+  {
+   "id": "kosc",
+   "type": "osc",
+   "freq": "50 + 80*kenv"
+  },
+  {
+   "id": "hat",
+   "type": "pattern",
+   "trig": "c16",
+   "steps": "..x...x...x...x."
+  },
+  {
+   "id": "henv",
+   "type": "ad",
+   "attack": 0.001,
+   "decay": 0.03,
+   "trig": "hat"
+  },
+  {
+   "id": "hiss",
+   "type": "noise"
+  },
+  {
+   "id": "hhp",
+   "type": "filter",
+   "mode": "hp",
+   "in": "hiss",
+   "freq": 6000
+  },
+  {
+   "id": "gate",
+   "type": "pattern",
+   "trig": "c16",
+   "steps": "x.x.x...x.x.x..."
+  },
+  {
+   "id": "notes",
+   "type": "seq",
+   "trig": "c16",
+   "loop": true,
+   "steps": "0 _ 3 _ 7 _ _ _ 5 _ 3 _ 0 _ _ _"
+  },
+  {
+   "id": "menv",
+   "type": "ad",
+   "attack": 0.005,
+   "decay": 0.12,
+   "trig": "gate"
+  },
+  {
+   "id": "soft",
+   "type": "osc",
+   "wave": "tri",
+   "freq": "midi(69 + notes)"
+  },
+  {
+   "id": "buzzy",
+   "type": "osc",
+   "wave": "square",
+   "freq": "midi(69 + notes)"
+  }
+ ],
+ "out": [
+  "0.7*kosc*kenv + 0.15*hhp*henv + 0.25*menv*(inst < 0.5 ? soft : buzzy*0.6)",
+  "0.7*kosc*kenv + 0.12*hhp*henv + 0.25*menv*(inst < 0.5 ? soft : buzzy*0.6)"
+ ]
+}

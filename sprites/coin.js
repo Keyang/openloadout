@@ -119,7 +119,7 @@ export default defineSprite({
     rim: toggle('Raised rim', true),
     sparkle: toggle('Sparkle', true),
     metal: color('Metal', METALS[0], METALS),
-    inlay: color('Emblem colour', INLAYS[0], INLAYS),
+    inlay: color('Emblem colour', INLAYS[0], INLAYS, { when: { emblem: ['star', 'heart', 'gem'] } }),
     bob: range('Float', 0.5, { lo: 'Still', hi: 'Floaty', group: 'Motion' }),
     pop: range('Pop height', 0.5, { lo: 'Low', hi: 'High', group: 'Motion' }),
     speed: range('Speed', 0.5, { lo: 'Slow', hi: 'Fast', group: 'Motion' }),
