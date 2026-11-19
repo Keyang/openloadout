@@ -1,0 +1,47 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "menu-harp-error",
+  "name": "Harp error",
+  "category": "ui",
+  "description": "Not allowed: two neighbouring plucked strings that clash, stopped dead by the hand, then again softer, with a string rattling on the wood. The same every time. Change its pitch, speed, brightness and rattle.",
+  "meta": {
+    "type": "sfx",
+    "role": "interface/error",
+    "themes": ["neutral", "fantasy"],
+    "gameTypes": ["arcade", "card-game", "turn-based-rpg", "puzzle", "top-down-rpg"],
+    "words": ["harp", "plucked", "string", "error", "wrong", "denied", "locked", "invalid", "no", "sour", "thrum", "rattle", "menu"],
+    "license": "draft"
+  },
+  "duration": "1.8 / speed",
+  "params": [
+    { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 220, "max": 520, "default": 330, "scale": "log" },
+    { "id": "speed", "label": "Speed", "unit": "notes/s", "min": 4, "max": 9, "default": 6, "scale": "log" },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.4 },
+    { "id": "buzz", "label": "Rattle", "min": 0.2, "max": 1, "default": 0.5 }
+  ],
+  "nodes": [
+    { "id": "c2", "type": "clock", "rate": 1, "count": 1, "delay": "1.05 / speed" },
+    { "id": "fingerA", "type": "ad", "attack": 0.0004, "decay": 0.002, "curve": 2 },
+    { "id": "fingerB", "type": "ad", "attack": 0.0004, "decay": 0.002, "curve": 2, "trig": "c2" },
+    { "id": "tick", "type": "filter", "mode": "lp", "in": "fingerA + fingerB * 0.6", "freq": "1800 + bright * 4200", "q": 0.6 },
+    { "id": "ringing", "type": "expr", "expr": "(t < 0.36 / speed) || (t >= 1.05 / speed && t < 1.4 / speed)" },
+    { "id": "strHome", "type": "pluck", "freq": "pitch", "decay": "ringing ? 0.6 : 0.045", "damp": "(ringing ? 0.55 : 0.8) - bright * 0.2", "in": "tick", "trig": 0 },
+    { "id": "strUp", "type": "pluck", "freq": "pitch * semi(1)", "decay": "ringing ? 0.6 : 0.045", "damp": "(ringing ? 0.55 : 0.8) - bright * 0.2", "in": "tick", "trig": 0 },
+    { "id": "strings", "type": "expr", "expr": "strHome + strUp" },
+    { "id": "boxLow", "type": "filter", "mode": "bp", "in": "strings", "freq": 230, "q": 1.2 },
+    { "id": "boxHigh", "type": "filter", "mode": "bp", "in": "strings", "freq": 470, "q": 1.2 },
+    { "id": "shakeA", "type": "ad", "attack": 0.004, "decay": "0.4 / speed", "curve": 1.6 },
+    { "id": "shakeB", "type": "ad", "attack": 0.004, "decay": "0.3 / speed", "curve": 1.6, "trig": "c2" },
+    { "id": "rasp", "type": "osc", "wave": "pulse", "freq": "pitch", "width": 0.1 },
+    { "id": "rough", "type": "osc", "wave": "square", "freq": "pitch * 0.5" },
+    { "id": "rattle", "type": "filter", "mode": "bp", "in": "rasp * (0.6 + 0.4 * rough) * (shakeA + shakeB * 0.6)", "freq": "1500 + bright * 1500", "q": 0.9 },
+    { "id": "sum", "type": "expr", "expr": "strings + (boxLow + boxHigh) * 0.5 + rattle * buzz * 2.6" },
+    { "id": "tone", "type": "filter", "mode": "lp", "in": "sum", "freq": "2400 + bright * 6000", "q": 0.6 },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "tone", "freq": 80 }
+  ],
+  "out": "clean",
+  "presets": {
+    "Not allowed": { "pitch": 330, "speed": 7, "bright": 0.4, "buzz": 0.6 },
+    "Wrong answer": { "pitch": 294, "speed": 5, "bright": 0.5, "buzz": 0.35 }
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "fire-whoosh",
+  "name": "Flame whoosh",
+  "category": "magic",
+  "description": "A roaring whoosh of flame that flutters like fire in wind and ends in a few dry crackles: a fireball thrown or a torch swung. Change its size, length, brightness, flutter and crackle.",
+  "meta": { "type": "sfx", "role": "actions/cast", "themes": ["neutral", "fantasy", "dungeon"], "gameTypes": ["top-down-rpg", "turn-based-rpg", "platformer", "roguelike-action", "arcade"],
+    "words": ["fire", "flame", "fireball", "whoosh", "torch", "roar", "burn", "cast", "throw", "swing", "flamethrower", "blaze", "crackle", "hot"], "license": "draft" },
+  "duration": "length * (0.75 + 0.5 * size) + 0.03",
+  "params": [
+    { "id": "size", "label": "Size", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "length", "label": "Length", "unit": "s", "min": 0.3, "max": 1.0, "default": 0.5, "scale": "log" },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "flutter", "label": "Flutter", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "crackle", "label": "Crackle", "min": 0, "max": 1, "default": 0.4 }
+  ],
+  "nodes": [
+    { "id": "take", "type": "rand", "lo": 0.92, "hi": 1.08 },
+    { "id": "swell", "type": "env", "points": [[0, 0.45], ["length * (0.75 + 0.5 * size) * 0.36", 1, 1.4], ["length * (0.75 + 0.5 * size)", 0, 0.7]] },
+    { "id": "sweep", "type": "env", "points": [[0, "300 * 2^((0.5 - size) * 1.4)"], ["length * (0.75 + 0.5 * size) * 0.4", "1500 * 2^((0.5 - size) * 1.4)", "exp"], ["length * (0.75 + 0.5 * size)", "400 * 2^((0.5 - size) * 1.4)", "exp"]] },
+    { "id": "gust", "type": "clock", "rate": "25 + 15 * flutter", "jitter": 0.7 },
+    { "id": "lick", "type": "rand", "lo": 0, "hi": 1, "trig": "gust" },
+    { "id": "waver", "type": "lag", "in": "lick", "time": 0.007 },
+    { "id": "flame", "type": "expr", "expr": "1 - (0.1 + 0.85 * flutter) * (1 - waver)" },
+    { "id": "air", "type": "noise" },
+    { "id": "deep", "type": "noise", "color": "brown" },
+    { "id": "rush", "type": "filter", "mode": "bp", "in": "air", "freq": "sweep * take * (0.85 + 0.3 * waver * flutter)", "q": 1.1 },
+    { "id": "rumble", "type": "filter", "mode": "lp", "in": "deep", "freq": "sweep * 0.45" },
+    { "id": "hiss", "type": "filter", "mode": "hp", "in": "air", "freq": "2500 + 2500 * (1 - size)" },
+    { "id": "roar", "type": "shaper", "in": "rush * 1.6 + rumble * 1.1", "drive": 2.5 },
+    { "id": "tone", "type": "filter", "mode": "lp", "in": "roar * flame + hiss * flame * (0.04 + 0.35 * bright * bright)", "freq": "(900 + 9000 * bright * bright) * 2^((0.5 - size) * 0.8)" },
+    { "id": "sparks", "type": "dust", "density": "25 + 90 * crackle", "spread": 0.7 },
+    { "id": "snap", "type": "filter", "mode": "bp", "in": "sparks", "freq": "3200 * take", "q": 1.6 },
+    { "id": "tail", "type": "env", "points": [[0, 0], ["length * (0.75 + 0.5 * size) * 0.45", 0], ["length * (0.75 + 0.5 * size) * 0.7", 1], ["length * (0.75 + 0.5 * size) * 0.9", 0.8], ["length * (0.75 + 0.5 * size) + 0.02", 0]] },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "tone * swell + snap * tail * crackle * 6", "freq": 40 }
+  ],
+  "out": "clean",
+  "presets": {
+    "Fireball": { "size": 0.55, "length": 0.5, "bright": 0.5, "flutter": 0.5, "crackle": 0.5 },
+    "Torch swing": { "size": 0.15, "length": 0.32, "bright": 0.6, "flutter": 0.4, "crackle": 0.25 },
+    "Flame jet": { "size": 0.6, "length": 1.0, "bright": 0.55, "flutter": 0.9, "crackle": 0.4 }
+  }
+}

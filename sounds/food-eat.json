@@ -1,0 +1,57 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "food-eat",
+  "name": "Eating",
+  "category": "pickup",
+  "description": "Food eaten, cartoon style: one to three crisp, crunchy bites over a soft thump, then a tiny gulp. Change the bite size, speed, brightness, number of bites and how crunchy it is, from soft bread to a crisp apple. The same every time.",
+  "meta": {
+    "type": "sfx",
+    "role": "items/consume",
+    "themes": ["neutral", "fantasy"],
+    "gameTypes": ["arcade", "farming-sim", "top-down-rpg", "platformer", "turn-based-rpg"],
+    "words": ["eat", "food", "bite", "crunch", "munch", "chew", "gulp", "swallow", "snack", "apple", "bread", "consume", "heal", "nom"],
+    "license": "draft"
+  },
+  "duration": "bites/speed + 0.1",
+  "params": [
+    { "id": "size", "label": "Bite size", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "speed", "label": "Speed", "unit": "bites/s", "min": 4, "max": 9, "default": 6 },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "bites", "label": "Bites", "min": 1, "max": 3, "default": 2, "step": 1 },
+    { "id": "crunch", "label": "Crunch", "min": 0, "max": 1, "default": 0.6 }
+  ],
+  "nodes": [
+    { "id": "bClk", "type": "clock", "rate": "speed", "count": "bites" },
+    { "id": "bVar", "type": "seq", "steps": [1, 0.87, 1.09], "trig": "bClk" },
+    { "id": "bPh", "type": "env", "points": [[0, 0], ["1/speed", 1]], "trig": "bClk" },
+    { "id": "fill", "type": "expr", "expr": "mix(0.4, 0.8, size)" },
+    { "id": "u", "type": "expr", "expr": "min(bPh/fill, 1)" },
+    { "id": "on", "type": "expr", "expr": "bPh < fill ? 1 : 0" },
+    { "id": "tk", "type": "expr", "expr": "(u*(3 + round(crunch*2))) % 1" },
+    { "id": "tick", "type": "expr", "expr": "pow(1 - tk, mix(1.2, 4, crunch))*min(1, tk*mix(4, 40, crunch))" },
+    { "id": "bEnv", "type": "expr", "expr": "on*pow(1 - u, 0.8)*mix(1, tick, 0.45 + crunch*0.55)" },
+    { "id": "grain", "type": "noise", "seed": 11 },
+    { "id": "cFreq", "type": "expr", "expr": "mix(1150, 2600, crunch)*mix(1.4, 0.72, size)*mix(0.75, 1.5, bright)*bVar" },
+    { "id": "cLo", "type": "filter", "mode": "bp", "in": "grain", "freq": "cFreq", "q": "mix(0.9, 2.6, crunch)" },
+    { "id": "cHi", "type": "filter", "mode": "bp", "in": "grain", "freq": "cFreq*2.4", "q": 1.5 },
+    { "id": "crisp", "type": "expr", "expr": "(cLo + cHi*(0.3 + bright*0.6 + crunch*0.3))*bEnv" },
+    { "id": "tDrop", "type": "env", "points": [[0, 1.6], [0.04, 1, "exp"]], "trig": "bClk" },
+    { "id": "tAmp", "type": "ad", "attack": 0.003, "decay": "mix(0.05, 0.09, size)", "curve": 2, "trig": "bClk" },
+    { "id": "tOsc", "type": "osc", "wave": "sine", "freq": "mix(190, 115, size)*bVar*tDrop" },
+    { "id": "thump", "type": "expr", "expr": "tOsc*tAmp" },
+    { "id": "gClk", "type": "clock", "rate": 1, "count": 1, "delay": "bites/speed" },
+    { "id": "gBend", "type": "env", "points": [[0, 1], [0.04, 0.62, "exp"], [0.09, 1.2, "exp"]], "trig": "gClk" },
+    { "id": "gAmp", "type": "ad", "attack": 0.006, "hold": 0.03, "decay": 0.06, "curve": 2.2, "trig": "gClk" },
+    { "id": "gOsc", "type": "osc", "wave": "sine", "freq": "mix(480, 310, size)*gBend" },
+    { "id": "gTri", "type": "osc", "wave": "tri", "freq": "mix(480, 310, size)*gBend*2" },
+    { "id": "gulp", "type": "expr", "expr": "(gOsc + gTri*(0.1 + bright*0.3))*gAmp" },
+    { "id": "dry", "type": "expr", "expr": "crisp*1.6 + thump*mix(0.42, 0.3, crunch) + gulp*0.7" },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "dry", "freq": 60, "q": 0.7 }
+  ],
+  "out": "clean",
+  "presets": {
+    "Apple": { "crunch": 1, "bright": 0.65, "size": 0.4 },
+    "Bread": { "crunch": 0.1, "bright": 0.35 },
+    "Feast": { "bites": 3, "size": 0.9 }
+  }
+}

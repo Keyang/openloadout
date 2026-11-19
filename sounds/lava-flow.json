@@ -1,0 +1,768 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "lava-flow",
+ "name": "Lava",
+ "category": "ambience",
+ "description": "Molten rock: thick, slow, low bubbles that each swell and end in a soft pop, over a deep rumble and the dry crackle of cooling crust, with a jet of steam now and then. Change its size, how much it bubbles, the brightness, the crackle and the steam.",
+ "meta": {
+  "type": "ambience",
+  "role": "environment/ambience",
+  "themes": ["dungeon","fantasy"],
+  "gameTypes": [
+   "platformer",
+   "top-down-rpg",
+   "roguelike-action",
+   "turn-based-rpg",
+   "arcade"
+  ],
+  "words": [
+   "lava",
+   "magma",
+   "molten",
+   "volcano",
+   "bubbling",
+   "bubble",
+   "pop",
+   "glop",
+   "crackle",
+   "steam",
+   "hot",
+   "cave",
+   "hazard"
+  ],
+  "license": "draft"
+ },
+ "loop": true,
+ "duration": 8,
+ "params": [
+  {
+   "id": "size",
+   "label": "Size",
+   "min": 0,
+   "max": 1,
+   "default": 0.5,
+   "hint": "From a pool to a river: lower, slower bubbles and more rumble."
+  },
+  {
+   "id": "glop",
+   "label": "Bubbling",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  },
+  {
+   "id": "bright",
+   "label": "Brightness",
+   "min": 0,
+   "max": 1,
+   "default": 0.45
+  },
+  {
+   "id": "crackle",
+   "label": "Crackle",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  },
+  {
+   "id": "hiss",
+   "label": "Steam",
+   "min": 0,
+   "max": 1,
+   "default": 0.4
+  }
+ ],
+ "nodes": [
+  {
+   "id": "air",
+   "type": "noise"
+  },
+  {
+   "id": "grain",
+   "type": "filter",
+   "mode": "lp",
+   "in": "air",
+   "freq": 45
+  },
+  {
+   "id": "c1",
+   "type": "clock",
+   "rate": 0.1,
+   "count": 1,
+   "delay": "rnd(0.85, 1.5)"
+  },
+  {
+   "id": "u1",
+   "type": "env",
+   "trig": "c1",
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     "mix(0.2, 0.4, size) * rnd(0.76, 1)",
+     1
+    ]
+   ]
+  },
+  {
+   "id": "o1",
+   "type": "osc",
+   "wave": "saw",
+   "freq": "mix(130, 90, size) * rnd(1, 1.42) * 2 ^ (u1 * rnd(0.3, 0.47))"
+  },
+  {
+   "id": "b1",
+   "type": "expr",
+   "expr": "o1 * smooth(0, 0.3, u1) * (0.55 + 0.45 * u1) * (1 - smooth(0.9, 1, u1)) * rnd(0.5, 1)"
+  },
+  {
+   "id": "k1",
+   "type": "ad",
+   "trig": "u1 >= 0.999",
+   "attack": 0.004,
+   "decay": 0.04,
+   "curve": 1.6
+  },
+  {
+   "id": "p1",
+   "type": "filter",
+   "mode": "bp",
+   "in": "air * k1",
+   "freq": "rnd(420, 880)",
+   "q": 2.2
+  },
+  {
+   "id": "c2",
+   "type": "clock",
+   "rate": 0.1,
+   "count": 1,
+   "delay": "rnd(4.85, 5.5)"
+  },
+  {
+   "id": "u2",
+   "type": "env",
+   "trig": "c2",
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     "mix(0.2, 0.4, size) * rnd(0.76, 1)",
+     1
+    ]
+   ]
+  },
+  {
+   "id": "o2",
+   "type": "osc",
+   "wave": "saw",
+   "freq": "mix(130, 90, size) * rnd(1, 1.42) * 2 ^ (u2 * rnd(0.3, 0.47))"
+  },
+  {
+   "id": "b2",
+   "type": "expr",
+   "expr": "o2 * smooth(0, 0.3, u2) * (0.55 + 0.45 * u2) * (1 - smooth(0.9, 1, u2)) * rnd(0.5, 1)"
+  },
+  {
+   "id": "k2",
+   "type": "ad",
+   "trig": "u2 >= 0.999",
+   "attack": 0.004,
+   "decay": 0.04,
+   "curve": 1.6
+  },
+  {
+   "id": "p2",
+   "type": "filter",
+   "mode": "bp",
+   "in": "air * k2",
+   "freq": "rnd(420, 880)",
+   "q": 2.2
+  },
+  {
+   "id": "c3",
+   "type": "clock",
+   "rate": 0.1,
+   "count": 1,
+   "delay": "rnd(2.45, 3.1)"
+  },
+  {
+   "id": "u3",
+   "type": "env",
+   "trig": "c3",
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     "mix(0.2, 0.4, size) * rnd(0.76, 1)",
+     1
+    ]
+   ]
+  },
+  {
+   "id": "o3",
+   "type": "osc",
+   "wave": "saw",
+   "freq": "mix(130, 90, size) * rnd(1, 1.42) * 2 ^ (u3 * rnd(0.3, 0.47))"
+  },
+  {
+   "id": "b3",
+   "type": "expr",
+   "expr": "o3 * smooth(0, 0.3, u3) * (0.55 + 0.45 * u3) * (1 - smooth(0.9, 1, u3)) * rnd(0.5, 1)"
+  },
+  {
+   "id": "k3",
+   "type": "ad",
+   "trig": "u3 >= 0.999",
+   "attack": 0.004,
+   "decay": 0.04,
+   "curve": 1.6
+  },
+  {
+   "id": "p3",
+   "type": "filter",
+   "mode": "bp",
+   "in": "air * k3",
+   "freq": "rnd(420, 880)",
+   "q": 2.2
+  },
+  {
+   "id": "c4",
+   "type": "clock",
+   "rate": 0.1,
+   "count": 1,
+   "delay": "rnd(6.45, 7.05)"
+  },
+  {
+   "id": "u4",
+   "type": "env",
+   "trig": "c4",
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     "mix(0.2, 0.4, size) * rnd(0.76, 1)",
+     1
+    ]
+   ]
+  },
+  {
+   "id": "o4",
+   "type": "osc",
+   "wave": "saw",
+   "freq": "mix(130, 90, size) * rnd(1, 1.42) * 2 ^ (u4 * rnd(0.3, 0.47))"
+  },
+  {
+   "id": "b4",
+   "type": "expr",
+   "expr": "o4 * smooth(0, 0.3, u4) * (0.55 + 0.45 * u4) * (1 - smooth(0.9, 1, u4)) * rnd(0.5, 1)"
+  },
+  {
+   "id": "k4",
+   "type": "ad",
+   "trig": "u4 >= 0.999",
+   "attack": 0.004,
+   "decay": 0.04,
+   "curve": 1.6
+  },
+  {
+   "id": "p4",
+   "type": "filter",
+   "mode": "bp",
+   "in": "air * k4",
+   "freq": "rnd(420, 880)",
+   "q": 2.2
+  },
+  {
+   "id": "c5",
+   "type": "clock",
+   "rate": 0.1,
+   "count": 1,
+   "delay": "rnd(0.3, 0.75)"
+  },
+  {
+   "id": "u5",
+   "type": "env",
+   "trig": "c5",
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     "mix(0.2, 0.4, size) * rnd(0.76, 1)",
+     1
+    ]
+   ]
+  },
+  {
+   "id": "o5",
+   "type": "osc",
+   "wave": "saw",
+   "freq": "mix(130, 90, size) * rnd(1, 1.42) * 2 ^ (u5 * rnd(0.3, 0.47))"
+  },
+  {
+   "id": "b5",
+   "type": "expr",
+   "expr": "o5 * smooth(0, 0.3, u5) * (0.55 + 0.45 * u5) * (1 - smooth(0.9, 1, u5)) * rnd(0.5, 1) * clamp(0 + 6 * glop, 0, 1)"
+  },
+  {
+   "id": "k5",
+   "type": "ad",
+   "trig": "u5 >= 0.999",
+   "attack": 0.004,
+   "decay": 0.04,
+   "curve": 1.6
+  },
+  {
+   "id": "p5",
+   "type": "filter",
+   "mode": "bp",
+   "in": "air * k5",
+   "freq": "rnd(420, 880)",
+   "q": 2.2
+  },
+  {
+   "id": "c6",
+   "type": "clock",
+   "rate": 0.1,
+   "count": 1,
+   "delay": "rnd(4.05, 4.7)"
+  },
+  {
+   "id": "u6",
+   "type": "env",
+   "trig": "c6",
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     "mix(0.2, 0.4, size) * rnd(0.76, 1)",
+     1
+    ]
+   ]
+  },
+  {
+   "id": "o6",
+   "type": "osc",
+   "wave": "saw",
+   "freq": "mix(130, 90, size) * rnd(1, 1.42) * 2 ^ (u6 * rnd(0.3, 0.47))"
+  },
+  {
+   "id": "b6",
+   "type": "expr",
+   "expr": "o6 * smooth(0, 0.3, u6) * (0.55 + 0.45 * u6) * (1 - smooth(0.9, 1, u6)) * rnd(0.5, 1) * clamp(-1 + 6 * glop, 0, 1)"
+  },
+  {
+   "id": "k6",
+   "type": "ad",
+   "trig": "u6 >= 0.999",
+   "attack": 0.004,
+   "decay": 0.04,
+   "curve": 1.6
+  },
+  {
+   "id": "p6",
+   "type": "filter",
+   "mode": "bp",
+   "in": "air * k6",
+   "freq": "rnd(420, 880)",
+   "q": 2.2
+  },
+  {
+   "id": "c7",
+   "type": "clock",
+   "rate": 0.1,
+   "count": 1,
+   "delay": "rnd(7.2, 7.6)"
+  },
+  {
+   "id": "u7",
+   "type": "env",
+   "trig": "c7",
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     "mix(0.2, 0.4, size) * rnd(0.76, 1)",
+     1
+    ]
+   ]
+  },
+  {
+   "id": "o7",
+   "type": "osc",
+   "wave": "saw",
+   "freq": "mix(130, 90, size) * rnd(1, 1.42) * 2 ^ (u7 * rnd(0.3, 0.47))"
+  },
+  {
+   "id": "b7",
+   "type": "expr",
+   "expr": "o7 * smooth(0, 0.3, u7) * (0.55 + 0.45 * u7) * (1 - smooth(0.9, 1, u7)) * rnd(0.5, 1) * clamp(-2 + 6 * glop, 0, 1)"
+  },
+  {
+   "id": "k7",
+   "type": "ad",
+   "trig": "u7 >= 0.999",
+   "attack": 0.004,
+   "decay": 0.04,
+   "curve": 1.6
+  },
+  {
+   "id": "p7",
+   "type": "filter",
+   "mode": "bp",
+   "in": "air * k7",
+   "freq": "rnd(420, 880)",
+   "q": 2.2
+  },
+  {
+   "id": "c8",
+   "type": "clock",
+   "rate": 0.1,
+   "count": 1,
+   "delay": "rnd(1.65, 2.3)"
+  },
+  {
+   "id": "u8",
+   "type": "env",
+   "trig": "c8",
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     "mix(0.2, 0.4, size) * rnd(0.76, 1)",
+     1
+    ]
+   ]
+  },
+  {
+   "id": "o8",
+   "type": "osc",
+   "wave": "saw",
+   "freq": "mix(130, 90, size) * rnd(1, 1.42) * 2 ^ (u8 * rnd(0.3, 0.47))"
+  },
+  {
+   "id": "b8",
+   "type": "expr",
+   "expr": "o8 * smooth(0, 0.3, u8) * (0.55 + 0.45 * u8) * (1 - smooth(0.9, 1, u8)) * rnd(0.5, 1) * clamp(-3 + 6 * glop, 0, 1)"
+  },
+  {
+   "id": "k8",
+   "type": "ad",
+   "trig": "u8 >= 0.999",
+   "attack": 0.004,
+   "decay": 0.04,
+   "curve": 1.6
+  },
+  {
+   "id": "p8",
+   "type": "filter",
+   "mode": "bp",
+   "in": "air * k8",
+   "freq": "rnd(420, 880)",
+   "q": 2.2
+  },
+  {
+   "id": "c9",
+   "type": "clock",
+   "rate": 0.1,
+   "count": 1,
+   "delay": "rnd(5.65, 6.3)"
+  },
+  {
+   "id": "u9",
+   "type": "env",
+   "trig": "c9",
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     "mix(0.2, 0.4, size) * rnd(0.76, 1)",
+     1
+    ]
+   ]
+  },
+  {
+   "id": "o9",
+   "type": "osc",
+   "wave": "saw",
+   "freq": "mix(130, 90, size) * rnd(1, 1.42) * 2 ^ (u9 * rnd(0.3, 0.47))"
+  },
+  {
+   "id": "b9",
+   "type": "expr",
+   "expr": "o9 * smooth(0, 0.3, u9) * (0.55 + 0.45 * u9) * (1 - smooth(0.9, 1, u9)) * rnd(0.5, 1) * clamp(-4 + 6 * glop, 0, 1)"
+  },
+  {
+   "id": "k9",
+   "type": "ad",
+   "trig": "u9 >= 0.999",
+   "attack": 0.004,
+   "decay": 0.04,
+   "curve": 1.6
+  },
+  {
+   "id": "p9",
+   "type": "filter",
+   "mode": "bp",
+   "in": "air * k9",
+   "freq": "rnd(420, 880)",
+   "q": 2.2
+  },
+  {
+   "id": "c10",
+   "type": "clock",
+   "rate": 0.1,
+   "count": 1,
+   "delay": "rnd(3.25, 3.9)"
+  },
+  {
+   "id": "u10",
+   "type": "env",
+   "trig": "c10",
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     "mix(0.2, 0.4, size) * rnd(0.76, 1)",
+     1
+    ]
+   ]
+  },
+  {
+   "id": "o10",
+   "type": "osc",
+   "wave": "saw",
+   "freq": "mix(130, 90, size) * rnd(1, 1.42) * 2 ^ (u10 * rnd(0.3, 0.47))"
+  },
+  {
+   "id": "b10",
+   "type": "expr",
+   "expr": "o10 * smooth(0, 0.3, u10) * (0.55 + 0.45 * u10) * (1 - smooth(0.9, 1, u10)) * rnd(0.5, 1) * clamp(-5 + 6 * glop, 0, 1)"
+  },
+  {
+   "id": "k10",
+   "type": "ad",
+   "trig": "u10 >= 0.999",
+   "attack": 0.004,
+   "decay": 0.04,
+   "curve": 1.6
+  },
+  {
+   "id": "p10",
+   "type": "filter",
+   "mode": "bp",
+   "in": "air * k10",
+   "freq": "rnd(420, 880)",
+   "q": 2.2
+  },
+  {
+   "id": "bubL",
+   "type": "filter",
+   "mode": "lp",
+   "in": "(b1 * 0.76 + b2 * 0.51 + b3 * 0.65 + b4 * 0.82 + b5 * 0.58 + b6 * 0.44 + b7 * 0.72 + b8 * 0.61 + b9 * 0.86 + b10 * 0.55) * (1 + grain * 9)",
+   "freq": "380 + bright * 1100"
+  },
+  {
+   "id": "bubR",
+   "type": "filter",
+   "mode": "lp",
+   "in": "(b1 * 0.54 + b2 * 0.79 + b3 * 0.65 + b4 * 0.47 + b5 * 0.72 + b6 * 0.86 + b7 * 0.58 + b8 * 0.69 + b9 * 0.44 + b10 * 0.75) * (1 + grain * 9)",
+   "freq": "380 + bright * 1100"
+  },
+  {
+   "id": "popL",
+   "type": "expr",
+   "expr": "p1 * 0.65 * rnd(0.55, 1) + p2 * 0.30 * rnd(0.55, 1) + p3 * 0.50 * rnd(0.55, 1) + p4 * 0.75 * rnd(0.55, 1) + p5 * 0.40 * rnd(0.55, 1) * clamp(0 + 6 * glop, 0, 1) + p6 * 0.20 * rnd(0.55, 1) * clamp(-1 + 6 * glop, 0, 1) + p7 * 0.60 * rnd(0.55, 1) * clamp(-2 + 6 * glop, 0, 1) + p8 * 0.45 * rnd(0.55, 1) * clamp(-3 + 6 * glop, 0, 1) + p9 * 0.80 * rnd(0.55, 1) * clamp(-4 + 6 * glop, 0, 1) + p10 * 0.35 * rnd(0.55, 1) * clamp(-5 + 6 * glop, 0, 1)"
+  },
+  {
+   "id": "popR",
+   "type": "expr",
+   "expr": "p1 * 0.35 * rnd(0.55, 1) + p2 * 0.70 * rnd(0.55, 1) + p3 * 0.50 * rnd(0.55, 1) + p4 * 0.25 * rnd(0.55, 1) + p5 * 0.60 * rnd(0.55, 1) * clamp(0 + 6 * glop, 0, 1) + p6 * 0.80 * rnd(0.55, 1) * clamp(-1 + 6 * glop, 0, 1) + p7 * 0.40 * rnd(0.55, 1) * clamp(-2 + 6 * glop, 0, 1) + p8 * 0.55 * rnd(0.55, 1) * clamp(-3 + 6 * glop, 0, 1) + p9 * 0.20 * rnd(0.55, 1) * clamp(-4 + 6 * glop, 0, 1) + p10 * 0.65 * rnd(0.55, 1) * clamp(-5 + 6 * glop, 0, 1)"
+  },
+  {
+   "id": "deep",
+   "type": "noise",
+   "color": "brown"
+  },
+  {
+   "id": "rc",
+   "type": "clock",
+   "rate": 0.9,
+   "jitter": 0.6
+  },
+  {
+   "id": "rr",
+   "type": "rand",
+   "lo": 0.45,
+   "hi": 1,
+   "trig": "rc"
+  },
+  {
+   "id": "rl",
+   "type": "lag",
+   "in": "rr",
+   "time": 0.5
+  },
+  {
+   "id": "rumble",
+   "type": "filter",
+   "mode": "lp",
+   "in": "deep * rl",
+   "freq": "mix(150, 85, size)",
+   "q": 0.9
+  },
+  {
+   "id": "rumbleHp",
+   "type": "filter",
+   "mode": "hp",
+   "in": "rumble",
+   "freq": 38
+  },
+  {
+   "id": "dL",
+   "type": "dust",
+   "density": "10 + crackle * 50",
+   "spread": 0.6
+  },
+  {
+   "id": "fL",
+   "type": "rand",
+   "lo": 1500,
+   "hi": 4000,
+   "trig": "dL"
+  },
+  {
+   "id": "xL",
+   "type": "filter",
+   "mode": "bp",
+   "in": "dL",
+   "freq": "fL",
+   "q": 3
+  },
+  {
+   "id": "dR",
+   "type": "dust",
+   "density": "10 + crackle * 50",
+   "spread": 0.6
+  },
+  {
+   "id": "fR",
+   "type": "rand",
+   "lo": 1500,
+   "hi": 4000,
+   "trig": "dR"
+  },
+  {
+   "id": "xR",
+   "type": "filter",
+   "mode": "bp",
+   "in": "dR",
+   "freq": "fR",
+   "q": 3
+  },
+  {
+   "id": "s1",
+   "type": "clock",
+   "rate": 0.1,
+   "count": 1,
+   "delay": "rnd(0.5, 3)"
+  },
+  {
+   "id": "s2",
+   "type": "clock",
+   "rate": 0.1,
+   "count": 1,
+   "delay": "rnd(4.2, 7)"
+  },
+  {
+   "id": "j1",
+   "type": "ad",
+   "trig": "s1",
+   "attack": "rnd(0.12, 0.2)",
+   "hold": "rnd(0.1, 0.25)",
+   "decay": "rnd(0.18, 0.35)",
+   "curve": 1.5
+  },
+  {
+   "id": "j2",
+   "type": "ad",
+   "trig": "s2",
+   "attack": "rnd(0.12, 0.2)",
+   "hold": "rnd(0.1, 0.25)",
+   "decay": "rnd(0.18, 0.35)",
+   "curve": 1.5
+  },
+  {
+   "id": "h1",
+   "type": "filter",
+   "mode": "hp",
+   "in": "air * j1",
+   "freq": "rnd(3200, 5200)"
+  },
+  {
+   "id": "h2",
+   "type": "filter",
+   "mode": "hp",
+   "in": "air * j2 * step(0.35, rnd(0, 1))",
+   "freq": "rnd(3200, 5200)"
+  },
+  {
+   "id": "mL",
+   "type": "filter",
+   "mode": "lp",
+   "in": "bubL * 0.45 * (0.55 + 0.45 * glop) + popL * 2.6 * (0.55 + 0.45 * glop) * (0.75 + 0.5 * size) + rumbleHp * 0.26 * (0.5 + size) + tanh(xL * 3) * 1.3 * (0.3 + 0.7 * crackle) + (h1 * 0.9 * rnd(0.6, 1) + h2 * 0.35 * rnd(0.6, 1)) * 1.2 * hiss",
+   "freq": "3500 + bright * 10000"
+  },
+  {
+   "id": "mR",
+   "type": "filter",
+   "mode": "lp",
+   "in": "bubR * 0.45 * (0.55 + 0.45 * glop) + popR * 2.6 * (0.55 + 0.45 * glop) * (0.75 + 0.5 * size) + rumbleHp * 0.26 * (0.5 + size) + tanh(xR * 3) * 1.3 * (0.3 + 0.7 * crackle) + (h1 * 0.35 * rnd(0.6, 1) + h2 * 0.9 * rnd(0.6, 1)) * 1.2 * hiss",
+   "freq": "3500 + bright * 10000"
+  }
+ ],
+ "out": [
+  "mL",
+  "mR"
+ ],
+ "presets": {
+  "Lava pool": {
+   "size": 0.15,
+   "glop": 0.4,
+   "crackle": 0.4,
+   "hiss": 0.2
+  },
+  "Lava river": {
+   "size": 0.85,
+   "glop": 0.7,
+   "crackle": 0.6,
+   "hiss": 0.35
+  },
+  "Volcano vent": {
+   "size": 0.6,
+   "glop": 0.85,
+   "bright": 0.6,
+   "crackle": 0.55,
+   "hiss": 0.9
+  }
+ }
+}

@@ -1,0 +1,325 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "life-lost",
+ "name": "Life lost",
+ "category": "jingle",
+ "description": "One life gone, the game goes on: four brisk notes stepping down, the last settling onto its note with a small sag and a soft low thud. Change its pitch, speed, brightness, how far the last note droops and the instrument. The same every time.",
+ "meta": {
+  "type": "jingle",
+  "role": "music/gameover",
+  "themes": [
+   "neutral",
+   "fantasy",
+   "sci-fi"
+  ],
+  "gameTypes": [
+   "arcade",
+   "platformer",
+   "shooter",
+   "puzzle"
+  ],
+  "words": [
+   "life lost",
+   "lose a life",
+   "oops",
+   "miss",
+   "fail",
+   "died",
+   "hurt",
+   "retry",
+   "respawn",
+   "try again",
+   "falling",
+   "rueful",
+   "jingle",
+   "sting"
+  ],
+  "license": "draft"
+ },
+ "duration": "5/speed + 0.13",
+ "params": [
+  {
+   "id": "pitch",
+   "label": "Pitch",
+   "unit": "Hz",
+   "min": 196,
+   "max": 440,
+   "default": 294,
+   "scale": "log"
+  },
+  {
+   "id": "speed",
+   "label": "Speed",
+   "unit": "notes/s",
+   "min": 3.5,
+   "max": 6,
+   "default": 4.5
+  },
+  {
+   "id": "bright",
+   "label": "Brightness",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  },
+  {
+   "id": "droop",
+   "label": "Droop",
+   "unit": "semitones",
+   "min": 0,
+   "max": 2,
+   "default": 1
+  },
+  {
+   "id": "voice",
+   "label": "Instrument",
+   "min": 0,
+   "max": 2,
+   "default": 1,
+   "options": [
+    "Soft bell",
+    "Blip",
+    "Buzzy"
+   ]
+  }
+ ],
+ "nodes": [
+  {
+   "id": "wBell",
+   "type": "expr",
+   "expr": "voice < 0.5 ? 1 : 0"
+  },
+  {
+   "id": "wBlip",
+   "type": "expr",
+   "expr": "voice > 0.5 && voice < 1.5 ? 1 : 0"
+  },
+  {
+   "id": "wBuzz",
+   "type": "expr",
+   "expr": "voice > 1.5 ? 1 : 0"
+  },
+  {
+   "id": "clk",
+   "type": "clock",
+   "rate": "speed",
+   "count": 4
+  },
+  {
+   "id": "lastClk",
+   "type": "clock",
+   "rate": 1,
+   "count": 1,
+   "delay": "3/speed"
+  },
+  {
+   "id": "landClk",
+   "type": "clock",
+   "rate": 1,
+   "count": 1,
+   "delay": "3/speed + 0.667/speed"
+  },
+  {
+   "id": "note",
+   "type": "env",
+   "points": [
+    [
+     0,
+     "pitch*semi(7)"
+    ],
+    [
+     "1/speed",
+     "pitch*semi(6)",
+     "hold"
+    ],
+    [
+     "2/speed",
+     "pitch*semi(3)",
+     "hold"
+    ],
+    [
+     "3/speed",
+     "pitch*semi(droop)",
+     "hold"
+    ],
+    [
+     "3/speed + 0.667/speed",
+     "pitch",
+     "exp"
+    ]
+   ]
+  },
+  {
+   "id": "aShort",
+   "type": "ad",
+   "attack": "0.004 + 0.006*(voice < 0.5)",
+   "hold": "0.4/speed",
+   "decay": "0.62/speed",
+   "curve": 1.8,
+   "trig": "clk"
+  },
+  {
+   "id": "aLast",
+   "type": "ad",
+   "attack": "0.004 + 0.006*(voice < 0.5)",
+   "hold": "0.75/speed",
+   "decay": "1.25/speed",
+   "curve": 2,
+   "trig": "lastClk"
+  },
+  {
+   "id": "amp",
+   "type": "expr",
+   "expr": "t >= 3/speed - 0.0005 ? aLast : aShort"
+  },
+  {
+   "id": "vSin",
+   "type": "osc",
+   "wave": "sine",
+   "freq": "note"
+  },
+  {
+   "id": "vTri",
+   "type": "osc",
+   "wave": "tri",
+   "freq": "note*2"
+  },
+  {
+   "id": "vBell",
+   "type": "modal",
+   "in": "clk",
+   "freq": "note*2",
+   "ratios": [
+    1,
+    2.76,
+    5.4
+   ],
+   "gains": [
+    1,
+    0.4,
+    0.15
+   ],
+   "decay": "1.6/speed",
+   "tilt": 0.7
+  },
+  {
+   "id": "vSq",
+   "type": "osc",
+   "wave": "square",
+   "freq": "note"
+  },
+  {
+   "id": "vPl",
+   "type": "osc",
+   "wave": "pulse",
+   "width": 0.25,
+   "freq": "note*2"
+  },
+  {
+   "id": "vSaw",
+   "type": "osc",
+   "wave": "saw",
+   "freq": "note"
+  },
+  {
+   "id": "vSaw2",
+   "type": "osc",
+   "wave": "saw",
+   "freq": "note*1.006"
+  },
+  {
+   "id": "buzzRaw",
+   "type": "crush",
+   "in": "(vSaw*0.6 + vSaw2*0.4)*amp",
+   "bits": 4,
+   "rate": "5000 + bright*5000"
+  },
+  {
+   "id": "bellTone",
+   "type": "expr",
+   "expr": "(vSin*0.7 + vTri*(0.08 + 0.3*bright))*amp + vBell*(0.12 + 0.3*bright)*(t >= 3/speed - 0.0005 ? aLast : 1)"
+  },
+  {
+   "id": "blipTone",
+   "type": "expr",
+   "expr": "(vSq*0.34 + vPl*(0.05 + 0.16*bright))*amp"
+  },
+  {
+   "id": "tune",
+   "type": "expr",
+   "expr": "bellTone*wBell + blipTone*wBlip + buzzRaw*0.6*wBuzz"
+  },
+  {
+   "id": "tone",
+   "type": "filter",
+   "mode": "lp",
+   "in": "tune",
+   "freq": "900 + bright*bright*9000 + bright*1500",
+   "q": 0.6
+  },
+  {
+   "id": "thudFall",
+   "type": "env",
+   "points": [
+    [
+     0,
+     "pitch*0.62"
+    ],
+    [
+     0.05,
+     "pitch*0.27",
+     "exp"
+    ]
+   ],
+   "start": "pitch*0.62",
+   "trig": "landClk"
+  },
+  {
+   "id": "thudOsc",
+   "type": "osc",
+   "wave": "sine",
+   "freq": "thudFall"
+  },
+  {
+   "id": "thudGate",
+   "type": "ad",
+   "attack": 0.003,
+   "decay": 0.11,
+   "curve": 2.2,
+   "trig": "landClk"
+  },
+  {
+   "id": "thud",
+   "type": "expr",
+   "expr": "thudOsc*thudGate*(0.2 + 0.1*droop)"
+  },
+  {
+   "id": "clean",
+   "type": "filter",
+   "mode": "hp",
+   "in": "tone + thud",
+   "freq": 50
+  },
+  {
+   "id": "room",
+   "type": "reverb",
+   "in": "clean",
+   "size": 0.45,
+   "damp": 0.5,
+   "mix": "0.14*wBell"
+  }
+ ],
+ "out": "room*(1 - smooth(dur - 0.12, dur - 0.004, t))",
+ "presets": {
+  "Chiptune": {
+   "voice": 1
+  },
+  "Storybook": {
+   "voice": 0
+  },
+  "Gritty": {
+   "voice": 2,
+   "droop": 0.5
+  }
+ }
+}

@@ -1,0 +1,45 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "power-charge",
+  "name": "Power charge",
+  "category": "magic",
+  "description": "Power gathering before a big shot or spell: one steadily rising tone with a quickening tremble, a growing hiss and a bright glint when it is ready. Change its pitch, length, brightness, rise, grit and ready ping.",
+  "meta": { "type": "sfx", "role": "actions/cast", "themes": ["neutral", "sci-fi", "fantasy"], "gameTypes": ["shooter", "platformer", "arcade", "top-down-rpg", "turn-based-rpg"],
+    "words": ["charge", "charging", "power", "gather", "build up", "wind up", "charged shot", "spell", "energy", "tension", "ready", "hold", "swell", "rising"], "license": "draft" },
+  "duration": "length",
+  "params": [
+    { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 100, "max": 500, "default": 180, "scale": "log" },
+    { "id": "length", "label": "Length", "unit": "s", "min": 0.5, "max": 2.0, "default": 1.0, "scale": "log" },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "rise", "label": "Rise", "unit": "semitones", "min": 5, "max": 24, "default": 12 },
+    { "id": "grit", "label": "Grit", "min": 0, "max": 1, "default": 0.3 },
+    { "id": "ready", "label": "Ready ping", "min": 0, "max": 1, "default": 0.6 }
+  ],
+  "nodes": [
+    { "id": "sweep", "type": "env", "points": [[0, "pitch * rnd(0.97, 1.03)"], ["length - 0.12", "pitch * semi(rise)", "exp"]] },
+    { "id": "swell", "type": "env", "points": [[0, 0], [0.004, 0.2], ["length - 0.12", 1, 1.3], ["length - 0.085", 0.25], ["length - 0.04", 0]] },
+    { "id": "quick", "type": "env", "points": [[0, "8 * rnd(0.9, 1.1)"], ["length - 0.12", "30 * rnd(0.9, 1.1)", "exp"]] },
+    { "id": "tremor", "type": "osc", "wave": "sine", "freq": "quick", "phase": 0.25 },
+    { "id": "buzz", "type": "osc", "wave": "saw", "freq": "sweep" },
+    { "id": "hollow", "type": "osc", "wave": "pulse", "freq": "sweep * 2.005", "width": 0.3 },
+    { "id": "hiss", "type": "noise" },
+    { "id": "rough", "type": "shaper", "in": "buzz * 0.6 + hollow * 0.3 + hiss * grit * 0.15", "drive": "1 + grit * 7", "mode": "fold" },
+    { "id": "tone", "type": "filter", "mode": "lp", "in": "rough", "freq": "sweep * (2.5 + bright * 9) + grit * 600", "q": 1.2 },
+    { "id": "airGrow", "type": "env", "points": [[0, 0.03], ["length - 0.12", "rnd(0.85, 1.15)", 1.6], ["length - 0.05", 0]] },
+    { "id": "air", "type": "filter", "mode": "bp", "in": "hiss", "freq": "sweep * 6 + 1200 + bright * 3000", "q": 0.9 },
+    { "id": "tick", "type": "ad", "attack": 0.0005, "decay": 0.018, "curve": 3 },
+    { "id": "tickTone", "type": "filter", "mode": "lp", "in": "hiss", "freq": 2200 },
+    { "id": "glintAt", "type": "clock", "rate": 1, "count": 1, "delay": "length - 0.125" },
+    { "id": "glintEnv", "type": "ad", "attack": 0.003, "decay": 0.1, "curve": 2.2, "trig": "glintAt" },
+    { "id": "glintA", "type": "osc", "wave": "sine", "freq": "pitch * semi(rise) * 4" },
+    { "id": "glintB", "type": "osc", "wave": "sine", "freq": "pitch * semi(rise) * 6.02" },
+    { "id": "glint", "type": "expr", "expr": "(glintA * 0.6 + glintB * 0.4) * glintEnv" },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "tone * swell * (0.62 + 0.38 * tremor) + air * airGrow * (0.25 + grit * 0.35) + tickTone * tick * 0.25 + glint * ready * 1.4", "freq": 30 }
+  ],
+  "out": "clean",
+  "presets": {
+    "Charged shot": { "grit": 0.85 },
+    "Spell gathering": { "grit": 0, "length": 1.5, "bright": 0.3, "ready": 0.3 },
+    "Quick charge": { "length": 0.5 }
+  }
+}

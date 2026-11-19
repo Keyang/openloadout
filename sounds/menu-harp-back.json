@@ -1,0 +1,43 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "menu-harp-back",
+  "name": "Harp back",
+  "category": "ui",
+  "description": "Leaving a page: two warm plucked string notes stepping down, the second softer and stopped by the hand so it is shorter and duller, the same every time. Change its pitch, speed, brightness and how much of the hollow wooden soundbox you hear.",
+  "meta": {
+    "type": "sfx",
+    "role": "interface/click",
+    "themes": ["neutral", "fantasy"],
+    "gameTypes": ["arcade", "card-game", "turn-based-rpg", "farming-sim", "puzzle"],
+    "words": ["menu", "back", "cancel", "return", "exit", "previous", "harp", "plucked", "string", "lyre", "button", "no"],
+    "license": "draft"
+  },
+  "duration": "0.05 + 1.4 / speed",
+  "params": [
+    { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 220, "max": 520, "default": 330, "scale": "log" },
+    { "id": "speed", "label": "Speed", "unit": "notes/s", "min": 4, "max": 10, "default": 7, "scale": "log" },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.45 },
+    { "id": "body", "label": "Soundbox", "min": 0, "max": 1, "default": 0.5 }
+  ],
+  "nodes": [
+    { "id": "tickA", "type": "ad", "attack": 0.0003, "decay": 0.002, "curve": 1.5 },
+    { "id": "fingerA", "type": "filter", "mode": "lp", "in": "tickA", "freq": "1800 + bright * 6000", "q": 0.6 },
+    { "id": "stringA", "type": "pluck", "freq": "pitch", "decay": "0.1 + 1.6 / speed", "damp": "0.5 - bright * 0.25", "in": "fingerA", "trig": 0 },
+    { "id": "c2", "type": "clock", "rate": 1, "count": 1, "delay": "0.7 / speed" },
+    { "id": "tickB", "type": "ad", "attack": 0.0003, "decay": 0.002, "curve": 1.5, "trig": "c2" },
+    { "id": "fingerB", "type": "filter", "mode": "lp", "in": "tickB", "freq": "1000 + bright * 3200", "q": 0.6 },
+    { "id": "hand", "type": "env", "points": [[0, 0], ["1.15 / speed", 0, "hold"], ["1.15 / speed + 0.006", 1]] },
+    { "id": "stringB", "type": "pluck", "freq": "pitch * semi(-3)", "decay": "mix(0.05 + 1.2 / speed, 0.035, hand)", "damp": "mix(0.62 - bright * 0.18, 0.88, hand)", "in": "fingerB", "trig": 0 },
+    { "id": "strings", "type": "expr", "expr": "stringA + stringB * 0.45" },
+    { "id": "boxLow", "type": "filter", "mode": "bp", "in": "strings", "freq": 230, "q": 1.4 },
+    { "id": "boxHigh", "type": "filter", "mode": "bp", "in": "strings", "freq": 470, "q": 1.4 },
+    { "id": "sum", "type": "expr", "expr": "strings + (boxLow * 1.1 + boxHigh * 1.3) * body * 1.6" },
+    { "id": "tone", "type": "filter", "mode": "lp", "in": "sum", "freq": "2200 + bright * 8000", "q": 0.6 },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "tone", "freq": 90 }
+  ],
+  "out": "clean",
+  "presets": {
+    "Back": { "pitch": 330, "speed": 7, "bright": 0.45, "body": 0.5 },
+    "Cancel": { "pitch": 294, "speed": 5.5, "bright": 0.4, "body": 0.4 }
+  }
+}

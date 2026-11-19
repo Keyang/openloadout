@@ -1,0 +1,377 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "waterfall",
+ "name": "Waterfall",
+ "category": "ambience",
+ "description": "A wall of falling water: one steady heavy roar, the low thunder of the pool under it and a hiss of spray over it. Change its height, how far away it is, the brightness and the spray.",
+ "meta": {
+  "type": "ambience",
+  "role": "environment/ambience",
+  "themes": [
+   "forest",
+   "neutral",
+   "fantasy"
+  ],
+  "gameTypes": [
+   "top-down-rpg",
+   "platformer",
+   "turn-based-rpg",
+   "farming-sim"
+  ],
+  "words": [
+   "waterfall",
+   "falls",
+   "cascade",
+   "water",
+   "roar",
+   "falling water",
+   "spray",
+   "mist",
+   "river",
+   "rapids",
+   "rushing",
+   "torrent"
+  ],
+  "license": "draft"
+ },
+ "loop": true,
+ "duration": 6,
+ "params": [
+  {
+   "id": "size",
+   "label": "Height",
+   "min": 0,
+   "max": 1,
+   "default": 0.5,
+   "hint": "From a garden cascade on the left to great falls on the right: lower, heavier, with more thunder from the pool."
+  },
+  {
+   "id": "distance",
+   "label": "Distance",
+   "min": 0,
+   "max": 1,
+   "default": 0.3,
+   "hint": "Near is wide, with spray and splashing on rock; far is a narrow, soft, duller roar."
+  },
+  {
+   "id": "bright",
+   "label": "Brightness",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  },
+  {
+   "id": "spray",
+   "label": "Spray",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  }
+ ],
+ "nodes": [
+  {
+   "id": "nM",
+   "type": "noise",
+   "color": "pink"
+  },
+  {
+   "id": "roarLo",
+   "type": "expr",
+   "expr": "(430 - size * 230) * (1 + distance * 0.9)"
+  },
+  {
+   "id": "roarHi",
+   "type": "expr",
+   "expr": "(7600 - size * 3600) * (0.55 + bright * 0.9) * (1 - distance * 0.72)"
+  },
+  {
+   "id": "roarG",
+   "type": "expr",
+   "expr": "1"
+  },
+  {
+   "id": "bn",
+   "type": "noise",
+   "color": "brown"
+  },
+  {
+   "id": "pl",
+   "type": "filter",
+   "mode": "lp",
+   "in": "bn",
+   "freq": "150 - size * 55",
+   "q": 0.7
+  },
+  {
+   "id": "pool",
+   "type": "filter",
+   "mode": "lp",
+   "in": "pl",
+   "freq": "170 - size * 55",
+   "q": 0.7
+  },
+  {
+   "id": "fc",
+   "type": "clock",
+   "rate": "13 - size * 5",
+   "jitter": 0.85
+  },
+  {
+   "id": "fr",
+   "type": "rand",
+   "lo": 0,
+   "hi": 1,
+   "trig": "fc"
+  },
+  {
+   "id": "flut",
+   "type": "lag",
+   "in": "fr",
+   "time": 0.03
+  },
+  {
+   "id": "thunder",
+   "type": "expr",
+   "expr": "pool * (0.45 + flut * 1.1) * 1.8 * (0.2 + size * 0.9) * (1 - distance * 0.45)"
+  },
+  {
+   "id": "sprayG",
+   "type": "expr",
+   "expr": "0.6 * (0.08 + spray * 1.2) * (0.5 + bright * 0.9) * (0.06 + (1 - distance) * (1 - distance) * 1.6)"
+  },
+  {
+   "id": "splatF",
+   "type": "expr",
+   "expr": "(2100 - size * 800) * (0.8 + bright * 0.45)"
+  },
+  {
+   "id": "splatG",
+   "type": "expr",
+   "expr": "5 * (0.25 + spray * 0.9) * (1 - distance) * (1 - distance)"
+  },
+  {
+   "id": "nL",
+   "type": "noise",
+   "color": "pink"
+  },
+  {
+   "id": "wL",
+   "type": "noise",
+   "color": "white"
+  },
+  {
+   "id": "srcL",
+   "type": "expr",
+   "expr": "nM * sqrt(0.25 + distance * 0.7) + nL * sqrt(0.75 - distance * 0.7)"
+  },
+  {
+   "id": "rhL",
+   "type": "filter",
+   "mode": "hp",
+   "in": "srcL",
+   "freq": "roarLo",
+   "q": 0.6
+  },
+  {
+   "id": "roarL",
+   "type": "filter",
+   "mode": "lp",
+   "in": "rhL",
+   "freq": "roarHi",
+   "q": 0.6
+  },
+  {
+   "id": "shL",
+   "type": "filter",
+   "mode": "hp",
+   "in": "wL",
+   "freq": 5200,
+   "q": 0.8
+  },
+  {
+   "id": "sh1L",
+   "type": "filter",
+   "mode": "hp",
+   "in": "shL",
+   "freq": 4200,
+   "q": 0.7
+  },
+  {
+   "id": "sh2L",
+   "type": "filter",
+   "mode": "lp",
+   "in": "sh1L",
+   "freq": "8000 + bright * 5000",
+   "q": 0.6
+  },
+  {
+   "id": "scL",
+   "type": "clock",
+   "rate": 1.6,
+   "jitter": 0.8
+  },
+  {
+   "id": "srL",
+   "type": "rand",
+   "lo": 0,
+   "hi": 1,
+   "trig": "scL"
+  },
+  {
+   "id": "shimL",
+   "type": "lag",
+   "in": "srL",
+   "time": 0.5
+  },
+  {
+   "id": "dL",
+   "type": "dust",
+   "density": "300 + spray * 500",
+   "spread": 1
+  },
+  {
+   "id": "spL",
+   "type": "filter",
+   "mode": "bp",
+   "in": "dL",
+   "freq": "splatF",
+   "q": 0.8
+  },
+  {
+   "id": "mixL",
+   "type": "expr",
+   "expr": "roarL * roarG + thunder + sh2L * (0.55 + shimL * 0.9) * sprayG + spL * splatG"
+  },
+  {
+   "id": "outL",
+   "type": "filter",
+   "mode": "hp",
+   "in": "mixL",
+   "freq": 30
+  },
+  {
+   "id": "nR",
+   "type": "noise",
+   "color": "pink"
+  },
+  {
+   "id": "wR",
+   "type": "noise",
+   "color": "white"
+  },
+  {
+   "id": "srcR",
+   "type": "expr",
+   "expr": "nM * sqrt(0.25 + distance * 0.7) + nR * sqrt(0.75 - distance * 0.7)"
+  },
+  {
+   "id": "rhR",
+   "type": "filter",
+   "mode": "hp",
+   "in": "srcR",
+   "freq": "roarLo",
+   "q": 0.6
+  },
+  {
+   "id": "roarR",
+   "type": "filter",
+   "mode": "lp",
+   "in": "rhR",
+   "freq": "roarHi",
+   "q": 0.6
+  },
+  {
+   "id": "shR",
+   "type": "filter",
+   "mode": "hp",
+   "in": "wR",
+   "freq": 5200,
+   "q": 0.8
+  },
+  {
+   "id": "sh1R",
+   "type": "filter",
+   "mode": "hp",
+   "in": "shR",
+   "freq": 4200,
+   "q": 0.7
+  },
+  {
+   "id": "sh2R",
+   "type": "filter",
+   "mode": "lp",
+   "in": "sh1R",
+   "freq": "8000 + bright * 5000",
+   "q": 0.6
+  },
+  {
+   "id": "scR",
+   "type": "clock",
+   "rate": 1.6,
+   "jitter": 0.8
+  },
+  {
+   "id": "srR",
+   "type": "rand",
+   "lo": 0,
+   "hi": 1,
+   "trig": "scR"
+  },
+  {
+   "id": "shimR",
+   "type": "lag",
+   "in": "srR",
+   "time": 0.5
+  },
+  {
+   "id": "dR",
+   "type": "dust",
+   "density": "300 + spray * 500",
+   "spread": 1
+  },
+  {
+   "id": "spR",
+   "type": "filter",
+   "mode": "bp",
+   "in": "dR",
+   "freq": "splatF",
+   "q": 0.8
+  },
+  {
+   "id": "mixR",
+   "type": "expr",
+   "expr": "roarR * roarG + thunder + sh2R * (0.55 + shimR * 0.9) * sprayG + spR * splatG"
+  },
+  {
+   "id": "outR",
+   "type": "filter",
+   "mode": "hp",
+   "in": "mixR",
+   "freq": 30
+  }
+ ],
+ "out": [
+  "outL",
+  "outR"
+ ],
+ "presets": {
+  "Garden cascade": {
+   "size": 0.1,
+   "distance": 0.15,
+   "bright": 0.65,
+   "spray": 0.35
+  },
+  "Forest falls": {
+   "size": 0.5,
+   "distance": 0.35,
+   "bright": 0.5,
+   "spray": 0.55
+  },
+  "Great falls": {
+   "size": 0.95,
+   "distance": 0.35,
+   "bright": 0.4,
+   "spray": 0.8
+  }
+ }
+}

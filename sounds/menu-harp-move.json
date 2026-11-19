@@ -1,0 +1,42 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "menu-harp-move",
+  "name": "Harp move",
+  "category": "ui",
+  "description": "The cursor stepping to the next item: one soft fingertip pluck of a small harp string, stopped by the finger almost at once, the same every time. Change its pitch, length, brightness and how much of the hollow wooden soundbox you hear.",
+  "meta": {
+    "type": "sfx",
+    "role": "interface/hover",
+    "themes": ["neutral", "fantasy"],
+    "gameTypes": ["arcade", "card-game", "turn-based-rpg", "farming-sim", "puzzle"],
+    "words": ["menu", "cursor", "move", "hover", "highlight", "scroll", "navigate", "harp", "plucked", "string", "pluck", "soft", "warm"],
+    "license": "draft"
+  },
+  "duration": "length + 0.008",
+  "params": [
+    { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 220, "max": 520, "default": 330, "scale": "log" },
+    { "id": "length", "label": "Length", "unit": "s", "min": 0.07, "max": 0.22, "default": 0.12, "scale": "log" },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "body", "label": "Soundbox", "min": 0, "max": 1, "default": 0.4 }
+  ],
+  "nodes": [
+    { "id": "never", "type": "expr", "expr": "0" },
+    { "id": "flesh", "type": "noise", "color": "white", "seed": 11 },
+    { "id": "onePass", "type": "expr", "expr": "t * pitch < 1 ? 1 : 0" },
+    { "id": "tickEnv", "type": "ad", "attack": 0.0005, "decay": 0.002, "curve": 2 },
+    { "id": "finger", "type": "filter", "mode": "lp", "in": "flesh * onePass * 0.8 + tickEnv * 0.6", "freq": "1100 + bright * 3600", "q": 0.6 },
+    { "id": "stop", "type": "env", "points": [[0, 0], ["length * 0.7", 0], ["length * 0.82", 1]] },
+    { "id": "string", "type": "pluck", "trig": "never", "in": "finger", "freq": "pitch", "decay": "mix(0.5, 0.025, stop)", "damp": "0.58 - bright * 0.22 + stop * 0.3" },
+    { "id": "boxLow", "type": "filter", "mode": "bp", "in": "string", "freq": 230, "q": 1.6 },
+    { "id": "boxHigh", "type": "filter", "mode": "bp", "in": "string", "freq": 470, "q": 1.6 },
+    { "id": "sum", "type": "expr", "expr": "string * (1 - body * 0.45) + (boxLow * 0.8 + boxHigh) * body * 1.6" },
+    { "id": "fade", "type": "env", "points": [[0, 1], ["length * 0.93", 1], ["length", 0]] },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "sum * fade", "freq": 80 }
+  ],
+  "out": "clean",
+  "presets": {
+    "List": { "pitch": 330, "length": 0.12, "bright": 0.5, "body": 0.4 },
+    "Grid": { "pitch": 392, "length": 0.09, "bright": 0.6, "body": 0.3 },
+    "Tab": { "pitch": 277, "length": 0.17, "bright": 0.4, "body": 0.6 }
+  }
+}

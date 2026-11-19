@@ -1,0 +1,437 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "desert-wind",
+ "name": "Desert wind",
+ "category": "ambience",
+ "description": "Dry wind moaning low over dunes, with sheets of blown sand that hiss in after each gust and grains that patter on a tent or tick on a hull. Change the wind, the pitch of the moan, the brightness, the sand and what the grains hit.",
+ "meta": {
+  "type": "ambience",
+  "role": "environment/weather",
+  "themes": [
+   "neutral",
+   "fantasy",
+   "sci-fi"
+  ],
+  "gameTypes": [
+   "top-down-rpg",
+   "turn-based-rpg",
+   "platformer",
+   "roguelike-action",
+   "shooter"
+  ],
+  "words": [
+   "desert",
+   "wind",
+   "sand",
+   "dunes",
+   "sandstorm",
+   "dust",
+   "gust",
+   "moan",
+   "dry",
+   "wasteland",
+   "tent",
+   "wreck",
+   "weather",
+   "outdoor"
+  ],
+  "license": "draft"
+ },
+ "loop": true,
+ "duration": 8,
+ "normalize": false,
+ "params": [
+  {
+   "id": "amount",
+   "label": "Wind",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  },
+  {
+   "id": "pitch",
+   "label": "Pitch",
+   "unit": "Hz",
+   "min": 120,
+   "max": 480,
+   "default": 220,
+   "scale": "log"
+  },
+  {
+   "id": "bright",
+   "label": "Brightness",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  },
+  {
+   "id": "sand",
+   "label": "Sand",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  },
+  {
+   "id": "grain",
+   "label": "Sand hits",
+   "min": 0,
+   "max": 2,
+   "default": 0,
+   "options": [
+    "Dunes",
+    "Tent",
+    "Metal"
+   ]
+  }
+ ],
+ "nodes": [
+  {
+   "id": "isTent",
+   "type": "expr",
+   "expr": "grain >= 0.5 && grain < 1.5 ? 1 : 0"
+  },
+  {
+   "id": "isMetal",
+   "type": "expr",
+   "expr": "grain >= 1.5 ? 1 : 0"
+  },
+  {
+   "id": "gustClock",
+   "type": "clock",
+   "rate": "0.55 + 0.35*amount",
+   "jitter": 0.6
+  },
+  {
+   "id": "gustPick",
+   "type": "rand",
+   "trig": "gustClock"
+  },
+  {
+   "id": "gustA",
+   "type": "lag",
+   "in": "gustPick",
+   "time": 0.7
+  },
+  {
+   "id": "driftClock",
+   "type": "clock",
+   "rate": 0.27,
+   "jitter": 0.5
+  },
+  {
+   "id": "driftPick",
+   "type": "rand",
+   "trig": "driftClock"
+  },
+  {
+   "id": "gustB",
+   "type": "lag",
+   "in": "driftPick",
+   "time": 1.6
+  },
+  {
+   "id": "carryOver",
+   "type": "env",
+   "points": [
+    [
+     0,
+     "rnd(0.35, 0.6)"
+    ],
+    [
+     0.5,
+     "rnd(0.35, 0.6)"
+    ],
+    [
+     1.7,
+     0
+    ]
+   ]
+  },
+  {
+   "id": "gust",
+   "type": "expr",
+   "expr": "max(gustA*0.7 + gustB*0.3, carryOver)"
+  },
+  {
+   "id": "swell",
+   "type": "expr",
+   "expr": "0.3 + 0.2*(1 - amount) + gust*(0.9 + 0.5*amount)"
+  },
+  {
+   "id": "late",
+   "type": "delay",
+   "in": "gust",
+   "time": 0.45,
+   "mix": 1,
+   "max": 1
+  },
+  {
+   "id": "trail",
+   "type": "lag",
+   "in": "late",
+   "time": 0.55
+  },
+  {
+   "id": "sheet",
+   "type": "expr",
+   "expr": "clamp(max(trail, carryOver)*2.3 - 0.55, 0.1, 1.4)"
+  },
+  {
+   "id": "airL",
+   "type": "noise",
+   "color": "pink"
+  },
+  {
+   "id": "moanL",
+   "type": "filter",
+   "mode": "bp",
+   "in": "airL",
+   "freq": "pitch*(0.82 + 0.3*gust)*1",
+   "q": 2.4
+  },
+  {
+   "id": "breathL",
+   "type": "filter",
+   "mode": "bp",
+   "in": "airL",
+   "freq": "pitch*(2.2 + 1.2*bright)*(0.9 + 0.25*gust)",
+   "q": 0.8
+  },
+  {
+   "id": "grainsL",
+   "type": "dust",
+   "density": "2000 + 4000*sand",
+   "spread": 1
+  },
+  {
+   "id": "sandHiL",
+   "type": "filter",
+   "mode": "hp",
+   "in": "grainsL",
+   "freq": "3000 + 1400*bright",
+   "q": 0.7
+  },
+  {
+   "id": "sandTopL",
+   "type": "filter",
+   "mode": "hp",
+   "in": "sandHiL",
+   "freq": "3000 + 1400*bright",
+   "q": 0.7
+  },
+  {
+   "id": "sandSheetL",
+   "type": "filter",
+   "mode": "lp",
+   "in": "sandTopL",
+   "freq": "6000 + 5000*bright",
+   "q": 0.6
+  },
+  {
+   "id": "hitL",
+   "type": "dust",
+   "density": "(5 + 18*sand)*(0.25 + 1.1*sheet)",
+   "spread": 1
+  },
+  {
+   "id": "patL",
+   "type": "modal",
+   "in": "hitL",
+   "freq": "330*rnd(0.9, 1.1)",
+   "ratios": [
+    1,
+    1.71,
+    2.63
+   ],
+   "gains": [
+    1,
+    0.5,
+    0.2
+   ],
+   "decay": 0.05,
+   "tilt": 1.2
+  },
+  {
+   "id": "patSoftL",
+   "type": "filter",
+   "mode": "lp",
+   "in": "patL",
+   "freq": "700 + 500*bright",
+   "q": 0.6
+  },
+  {
+   "id": "tickL",
+   "type": "modal",
+   "in": "hitL",
+   "freq": "2900*rnd(0.93, 1.07)",
+   "ratios": [
+    1,
+    1.48,
+    2.31,
+    3.37
+   ],
+   "gains": [
+    1,
+    0.7,
+    "0.25 + 0.4*bright",
+    "0.1 + 0.3*bright"
+   ],
+   "decay": 0.03,
+   "tilt": 0.6
+  },
+  {
+   "id": "mixL",
+   "type": "expr",
+   "expr": "(moanL*0.36 + breathL*(0.1 + 0.25*bright))*swell + sandSheetL*sheet*(0.5 + 0.75*sand)*2.4 + (patSoftL*isTent*1.1 + tickL*isMetal*0.7)*(0.5 + 0.5*sand)"
+  },
+  {
+   "id": "outL",
+   "type": "filter",
+   "mode": "hp",
+   "in": "mixL*(0.22 + 0.78*amount)*0.44",
+   "freq": 40
+  },
+  {
+   "id": "airR",
+   "type": "noise",
+   "color": "pink"
+  },
+  {
+   "id": "moanR",
+   "type": "filter",
+   "mode": "bp",
+   "in": "airR",
+   "freq": "pitch*(0.82 + 0.3*gust)*1.04",
+   "q": 2.4
+  },
+  {
+   "id": "breathR",
+   "type": "filter",
+   "mode": "bp",
+   "in": "airR",
+   "freq": "pitch*(2.2 + 1.2*bright)*(0.9 + 0.25*gust)",
+   "q": 0.8
+  },
+  {
+   "id": "grainsR",
+   "type": "dust",
+   "density": "2000 + 4000*sand",
+   "spread": 1
+  },
+  {
+   "id": "sandHiR",
+   "type": "filter",
+   "mode": "hp",
+   "in": "grainsR",
+   "freq": "3000 + 1400*bright",
+   "q": 0.7
+  },
+  {
+   "id": "sandTopR",
+   "type": "filter",
+   "mode": "hp",
+   "in": "sandHiR",
+   "freq": "3000 + 1400*bright",
+   "q": 0.7
+  },
+  {
+   "id": "sandSheetR",
+   "type": "filter",
+   "mode": "lp",
+   "in": "sandTopR",
+   "freq": "6000 + 5000*bright",
+   "q": 0.6
+  },
+  {
+   "id": "hitR",
+   "type": "dust",
+   "density": "(5 + 18*sand)*(0.25 + 1.1*sheet)",
+   "spread": 1
+  },
+  {
+   "id": "patR",
+   "type": "modal",
+   "in": "hitR",
+   "freq": "410*rnd(0.9, 1.1)",
+   "ratios": [
+    1,
+    1.71,
+    2.63
+   ],
+   "gains": [
+    1,
+    0.5,
+    0.2
+   ],
+   "decay": 0.05,
+   "tilt": 1.2
+  },
+  {
+   "id": "patSoftR",
+   "type": "filter",
+   "mode": "lp",
+   "in": "patR",
+   "freq": "700 + 500*bright",
+   "q": 0.6
+  },
+  {
+   "id": "tickR",
+   "type": "modal",
+   "in": "hitR",
+   "freq": "3500*rnd(0.93, 1.07)",
+   "ratios": [
+    1,
+    1.48,
+    2.31,
+    3.37
+   ],
+   "gains": [
+    1,
+    0.7,
+    "0.25 + 0.4*bright",
+    "0.1 + 0.3*bright"
+   ],
+   "decay": 0.03,
+   "tilt": 0.6
+  },
+  {
+   "id": "mixR",
+   "type": "expr",
+   "expr": "(moanR*0.36 + breathR*(0.1 + 0.25*bright))*swell + sandSheetR*sheet*(0.5 + 0.75*sand)*2.4 + (patSoftR*isTent*1.1 + tickR*isMetal*0.7)*(0.5 + 0.5*sand)"
+  },
+  {
+   "id": "outR",
+   "type": "filter",
+   "mode": "hp",
+   "in": "mixR*(0.22 + 0.78*amount)*0.44",
+   "freq": 40
+  }
+ ],
+ "out": [
+  "outL",
+  "outR"
+ ],
+ "presets": {
+  "Camp at night": {
+   "amount": 0.35,
+   "pitch": 190,
+   "bright": 0.4,
+   "sand": 0.5,
+   "grain": 1
+  },
+  "Sandstorm": {
+   "amount": 0.95,
+   "pitch": 240,
+   "bright": 0.6,
+   "sand": 0.95,
+   "grain": 0
+  },
+  "Wrecked ship": {
+   "amount": 0.55,
+   "pitch": 160,
+   "bright": 0.55,
+   "sand": 0.55,
+   "grain": 2
+  }
+ }
+}

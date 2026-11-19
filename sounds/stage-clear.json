@@ -1,0 +1,78 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "stage-clear",
+ "name": "Stage clear",
+ "category": "jingle",
+ "description": "A level finished: a bouncy little ten-note tune that wiggles down twice and lands on a low held note with a soft chord and one high answering note; change the pitch, speed, brightness, room and instrument. The same every time.",
+ "meta": {
+  "type": "jingle",
+  "role": "music/victory",
+  "themes": ["neutral", "fantasy", "sci-fi"],
+  "gameTypes": ["arcade", "platformer", "puzzle", "shooter", "roguelike-action"],
+  "words": ["stage clear", "level complete", "level clear", "finish", "win", "victory", "cleared", "tune", "sting", "reward", "bouncy", "cheerful", "chiptune"],
+  "license": "draft"
+ },
+ "duration": "14/speed",
+ "params": [
+  { "id": "pitch", "label": "Pitch", "min": 262, "max": 523, "default": 349, "unit": "Hz", "scale": "log" },
+  { "id": "speed", "label": "Speed", "min": 5.5, "max": 9, "default": 7, "unit": "notes/s" },
+  { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.55 },
+  { "id": "space", "label": "Room", "min": 0, "max": 0.4, "default": 0.12 },
+  { "id": "voice", "label": "Instrument", "min": 0, "max": 2, "default": 1, "options": ["Soft bell", "Blip", "Buzzy"] }
+ ],
+ "nodes": [
+  { "id": "clk", "type": "clock", "rate": "speed", "count": 14 },
+  { "id": "hit", "type": "pattern", "trig": "clk", "steps": "XxxX. xxxX. X. X." },
+  { "id": "sHit", "type": "pattern", "trig": "clk", "steps": "XXX.. XXX.. .. .." },
+  { "id": "lHit", "type": "pattern", "trig": "clk", "steps": "...X. ...X. X. X." },
+  { "id": "note", "type": "seq", "steps": [7, 5, 9, 4, 5, 4, 7, 2, 4, 0], "trig": "hit" },
+  { "id": "hz", "type": "expr", "expr": "pitch*semi(note)" },
+  { "id": "endClk", "type": "clock", "rate": 1, "count": 1, "delay": "12/speed" },
+  { "id": "ansClk", "type": "clock", "rate": 1, "count": 1, "delay": "13/speed" },
+
+  { "id": "sAmp", "type": "ad", "attack": 0.003, "hold": "0.3/speed", "decay": "0.6/speed", "curve": 1.6, "trig": "sHit" },
+  { "id": "lAmp", "type": "ad", "attack": 0.003, "hold": "0.7/speed", "decay": "1.2/speed", "curve": 2.2, "trig": "lHit" },
+  { "id": "amp", "type": "expr", "expr": "sAmp + lAmp" },
+  { "id": "aAmp", "type": "ad", "attack": 0.003, "hold": "0.15/speed", "decay": "0.8/speed", "curve": 1.8, "trig": "ansClk" },
+  { "id": "cAmp", "type": "ad", "attack": 0.006, "hold": "0.5/speed", "decay": "1.4/speed", "curve": 2.2, "trig": "endClk" },
+
+  { "id": "pure", "type": "osc", "freq": "hz" },
+  { "id": "pure2", "type": "osc", "freq": "hz*2" },
+  { "id": "tick", "type": "ad", "attack": 0.0003, "decay": 0.002, "curve": 1.5, "trig": "hit" },
+  { "id": "tickA", "type": "ad", "attack": 0.0003, "decay": 0.002, "curve": 1.5, "trig": "ansClk" },
+  { "id": "ting", "type": "modal", "in": "tick", "freq": "hz*2", "ratios": [1, 2.76, 5.4], "gains": [1, "0.25 + bright*0.4", "0.08 + bright*0.25"], "decay": "1.5/speed", "tilt": 0.8 },
+  { "id": "tingA", "type": "modal", "in": "tickA", "freq": "pitch*4", "ratios": [1, 2.76, 5.4], "gains": [1, "0.25 + bright*0.4", "0.08 + bright*0.25"], "decay": "1.2/speed", "tilt": 0.8 },
+  { "id": "pureA", "type": "osc", "freq": "pitch*2" },
+  { "id": "bellV", "type": "expr", "expr": "(pure*0.8 + pure2*(0.08 + bright*0.2))*amp + ting*0.012 + pureA*aAmp*0.4 + tingA*0.01" },
+
+  { "id": "sq", "type": "osc", "wave": "pulse", "width": "0.5 - bright*0.18", "freq": "hz" },
+  { "id": "sqA", "type": "osc", "wave": "square", "freq": "pitch*2" },
+  { "id": "blipV", "type": "expr", "expr": "sq*amp*0.6 + sqA*aAmp*0.3" },
+
+  { "id": "saw", "type": "osc", "wave": "saw", "freq": "hz" },
+  { "id": "sawD", "type": "osc", "wave": "saw", "freq": "hz*1.007" },
+  { "id": "sawA", "type": "osc", "wave": "saw", "freq": "pitch*2" },
+  { "id": "rough", "type": "expr", "expr": "(saw + sawD*0.7)*amp*0.45 + sawA*aAmp*0.3" },
+
+  { "id": "c0", "type": "osc", "wave": "tri", "freq": "pitch*0.5" },
+  { "id": "c1", "type": "osc", "wave": "tri", "freq": "pitch*semi(-8)" },
+  { "id": "c2", "type": "osc", "wave": "tri", "freq": "pitch*semi(-5)" },
+  { "id": "p0", "type": "osc", "wave": "pulse", "width": 0.3, "freq": "pitch*0.5" },
+  { "id": "p1", "type": "osc", "wave": "pulse", "width": 0.3, "freq": "pitch*semi(-8)" },
+  { "id": "p2", "type": "osc", "wave": "pulse", "width": 0.3, "freq": "pitch*semi(-5)" },
+  { "id": "chord", "type": "expr", "expr": "(voice < 0.5 ? (c0 + c1 + c2)*0.22 : (p0 + p1 + p2)*0.09)*cAmp" },
+
+  { "id": "buzzIn", "type": "expr", "expr": "rough + chord" },
+  { "id": "buzzV", "type": "crush", "in": "buzzIn", "bits": 4, "rate": "3500 + bright*5000" },
+  { "id": "dry", "type": "expr", "expr": "voice < 0.5 ? bellV + chord : (voice < 1.5 ? blipV + chord : buzzV*0.8)" },
+  { "id": "tone", "type": "filter", "mode": "lp", "in": "dry", "freq": "1500 + bright*bright*9000", "q": 0.6 },
+  { "id": "hpf", "type": "filter", "mode": "hp", "in": "tone", "freq": 90 },
+  { "id": "verb", "type": "reverb", "in": "hpf", "size": 0.5, "damp": 0.45, "mix": "space + (voice < 0.5 ? 0.08 : 0)" }
+ ],
+ "out": "verb*(1 - smooth(dur - 0.08, dur - 0.005, t))",
+ "presets": {
+  "Chiptune": { "voice": 1, "space": 0.08 },
+  "Storybook": { "voice": 0, "space": 0.2, "bright": 0.5 },
+  "Gritty": { "voice": 2, "space": 0.04, "bright": 0.65 }
+ }
+}

@@ -1,0 +1,36 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "time-up",
+  "name": "Time up",
+  "category": "ui",
+  "description": "A flat, reedy horn blast that sags at its end, for when the time runs out or a round is over. Change its pitch, length, brightness, sag and number of blasts.",
+  "meta": { "type": "sfx", "role": "interface/error", "themes": ["neutral", "city"], "gameTypes": ["arcade", "racing", "puzzle", "shooter", "platformer"],
+    "words": ["time up", "timer", "horn", "buzzer", "round over", "match over", "time out", "countdown", "end", "final", "whistle", "klaxon", "blast"], "license": "draft" },
+  "duration": "length",
+  "params": [
+    { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 140, "max": 420, "default": 220, "scale": "log" },
+    { "id": "length", "label": "Length", "unit": "s", "min": 0.6, "max": 1.6, "default": 1.0, "scale": "log" },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "sag", "label": "Sag", "unit": "semitones", "min": 0, "max": 5, "default": 2 },
+    { "id": "blasts", "label": "Blasts", "min": 1, "max": 3, "default": 1, "step": 1 }
+  ],
+  "nodes": [
+    { "id": "clk", "type": "clock", "rate": "blasts / length", "count": "blasts" },
+    { "id": "droop", "type": "env", "points": [[0, "pitch"], ["length * 0.7", "pitch"], ["length", "pitch * semi(-sag)", "exp"]] },
+    { "id": "reedA", "type": "osc", "wave": "pulse", "width": 0.22, "freq": "droop" },
+    { "id": "reedB", "type": "osc", "wave": "saw", "freq": "droop * semi(1)" },
+    { "id": "reedC", "type": "osc", "wave": "pulse", "width": 0.3, "freq": "droop * 2 * semi(0.4)" },
+    { "id": "pair", "type": "expr", "expr": "reedA * 0.5 + reedB * 0.5 + reedC * 0.25" },
+    { "id": "rough", "type": "shaper", "in": "pair", "drive": 2.2, "mode": "tanh" },
+    { "id": "mouth", "type": "filter", "mode": "lp", "in": "rough", "freq": "(900 + bright * 3200) * pow(droop / pitch, 6)", "q": 1.6 },
+    { "id": "nose", "type": "filter", "mode": "bp", "in": "rough", "freq": "(1100 + bright * 900) * pow(droop / pitch, 2)", "q": 2.5 },
+    { "id": "horn", "type": "filter", "mode": "hp", "in": "mouth + nose * 0.8", "freq": 170, "q": 0.7 },
+    { "id": "amp", "type": "ad", "attack": 0.006, "hold": "length / blasts * (blasts > 1 ? 0.76 : 0.88)", "decay": "length / blasts * 0.1", "curve": 2, "trig": "clk" }
+  ],
+  "out": "horn * amp",
+  "presets": {
+    "Time up": { "blasts": 1 },
+    "Round over": { "blasts": 2 },
+    "Match over": { "blasts": 3, "pitch": 290, "length": 1.3 }
+  }
+}

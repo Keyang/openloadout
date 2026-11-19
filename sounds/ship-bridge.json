@@ -1,0 +1,96 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "ship-bridge",
+ "name": "Ship's bridge",
+ "category": "ambience",
+ "description": "The quiet control room of a starship or a base: a faint steady hum, the hush of the air system, a soft scanner gliding up and back, and far console sounds at uneven times. Change the hum's pitch, how busy the consoles are, the brightness, the kind of console sound and the scanner.",
+ "meta": {
+  "type": "ambience",
+  "role": "environment/ambience",
+  "themes": ["sci-fi", "space", "neutral"],
+  "gameTypes": ["roguelike-action", "shooter", "puzzle", "top-down-rpg", "platformer"],
+  "words": ["bridge", "starship", "spaceship", "control room", "cockpit", "console", "computer", "beeps", "scanner", "hum", "station", "base", "quiet", "interior"],
+  "license": "draft"
+ },
+ "loop": true,
+ "wrap": true,
+ "duration": 8,
+ "params": [
+  { "id": "pitch", "label": "Hum pitch", "unit": "Hz", "min": 60, "max": 180, "default": 110, "scale": "log" },
+  { "id": "activity", "label": "Activity", "min": 0, "max": 1, "default": 0.5 },
+  { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+  { "id": "console", "label": "Consoles", "min": 0, "max": 2, "default": 0, "options": ["Beeps", "Chirps", "Relays"] },
+  { "id": "scan", "label": "Scanner", "min": 0, "max": 1, "default": 0.4 }
+ ],
+ "nodes": [
+  { "id": "wB", "type": "expr", "expr": "max(0, 1 - abs(console))" },
+  { "id": "wC", "type": "expr", "expr": "max(0, 1 - abs(console - 1))" },
+  { "id": "wR", "type": "expr", "expr": "max(0, 1 - abs(console - 2))" },
+
+  { "id": "f1", "type": "expr", "expr": "round(pitch * 8) / 8" },
+  { "id": "f2", "type": "expr", "expr": "round(pitch * 1.5 * 8) / 8" },
+  { "id": "h1", "type": "osc", "wave": "sine", "freq": "f1", "phase": "rnd(0, 1)" },
+  { "id": "h1b", "type": "osc", "wave": "sine", "freq": "f1 * 2", "phase": "rnd(0, 1)" },
+  { "id": "h1c", "type": "osc", "wave": "sine", "freq": "f1 * 3", "phase": "rnd(0, 1)" },
+  { "id": "h2", "type": "osc", "wave": "sine", "freq": "f2", "phase": "rnd(0, 1)" },
+  { "id": "h2b", "type": "osc", "wave": "sine", "freq": "f2 * 2", "phase": "rnd(0, 1)" },
+  { "id": "humL", "type": "expr", "expr": "h1 + h2 * 0.55 + (h1b * 0.3 + h1c * 0.14 + h2b * 0.12) * (0.4 + bright * 0.9)" },
+  { "id": "humR", "type": "expr", "expr": "h1 * 0.85 + h2 * 0.75 + (h1b * 0.24 + h1c * 0.18 + h2b * 0.16) * (0.4 + bright * 0.9)" },
+
+  { "id": "nL", "type": "noise" },
+  { "id": "nR", "type": "noise" },
+  { "id": "airHpL", "type": "filter", "mode": "hp", "in": "nL", "freq": 500, "q": 0.6 },
+  { "id": "airHpR", "type": "filter", "mode": "hp", "in": "nR", "freq": 520, "q": 0.6 },
+  { "id": "airL", "type": "filter", "mode": "lp", "in": "airHpL", "freq": "1300 + bright * 1300", "q": 0.6 },
+  { "id": "airR", "type": "filter", "mode": "lp", "in": "airHpR", "freq": "1350 + bright * 1300", "q": 0.6 },
+
+  { "id": "scR", "type": "rand", "lo": 0, "hi": 1 },
+  { "id": "scT", "type": "rand", "lo": 0.9, "hi": 1.12 },
+  { "id": "sw", "type": "expr", "expr": "0.5 - 0.5 * cos(tau * (scR < 0.5 ? 1 : 2) * t / dur)" },
+  { "id": "scOsc", "type": "osc", "wave": "sine", "freq": "(520 + bright * 320) * scT * pow(2, sw)" },
+  { "id": "sc", "type": "expr", "expr": "scOsc * pow(sw, 1.6) * scan" },
+
+  { "id": "tl", "type": "expr", "expr": "t % dur" },
+  { "id": "clk", "type": "clock", "rate": "mix(0.7, 1.05, activity)", "jitter": 0.5, "delay": "rnd(0.1, 0.9)" },
+  { "id": "ev", "type": "expr", "expr": "clk * (tl > 0.12 && tl < 7.3 ? 1 : 0)" },
+  { "id": "r1", "type": "rand", "lo": 0, "hi": 1, "trig": "ev" },
+  { "id": "r2", "type": "rand", "lo": 0, "hi": 1, "trig": "ev" },
+  { "id": "r3", "type": "rand", "lo": 0, "hi": 1, "trig": "ev" },
+  { "id": "pan", "type": "rand", "lo": 0.15, "hi": 0.85, "trig": "ev" },
+  { "id": "lvl", "type": "rand", "lo": 0.55, "hi": 1, "trig": "ev" },
+  { "id": "ph", "type": "env", "trig": "ev", "points": [[0, 0], [0.4, 0.4]] },
+  { "id": "fEv", "type": "expr", "expr": "800 * pow(3, r1)" },
+
+  { "id": "bIdx", "type": "expr", "expr": "floor(ph / 0.1)" },
+  { "id": "bIn", "type": "expr", "expr": "(ph % 0.1) / 0.1" },
+  { "id": "bAmp", "type": "expr", "expr": "(bIdx < 2 ? 1 : 0) * smooth(0, 0.14, bIn) * (1 - smooth(0.4, 0.92, bIn))" },
+  { "id": "bF", "type": "expr", "expr": "clamp(fEv * (bIdx >= 1 ? semi(r2 < 0.25 ? -5 : r2 < 0.5 ? -2 : r2 < 0.75 ? 3 : 7) : 1), 800, 2400)" },
+
+  { "id": "cIdx", "type": "expr", "expr": "floor(ph / 0.036)" },
+  { "id": "cIn", "type": "expr", "expr": "(ph % 0.036) / 0.036" },
+  { "id": "cAmp", "type": "expr", "expr": "(cIdx < 3 + floor(r3 * 3) ? 1 : 0) * smooth(0, 0.18, cIn) * (1 - smooth(0.45, 0.95, cIn))" },
+  { "id": "cF", "type": "expr", "expr": "clamp(fEv * semi(cIdx * 2 - 4), 800, 2400)" },
+
+  { "id": "tone", "type": "osc", "wave": "sine", "freq": "wC > 0.5 ? cF : bF" },
+  { "id": "toneT", "type": "osc", "wave": "tri", "freq": "cF" },
+  { "id": "soft", "type": "expr", "expr": "(tone * bAmp * wB + (tone * 0.6 + toneT * 0.5) * cAmp * wC) * lvl" },
+  { "id": "softLp", "type": "filter", "mode": "lp", "in": "soft", "freq": "2200 + bright * 5000", "q": 0.6 },
+  { "id": "far", "type": "reverb", "in": "softLp", "size": 0.45, "damp": 0.5, "mix": 0.3 },
+
+  { "id": "nK", "type": "noise" },
+  { "id": "kAmp", "type": "expr", "expr": "ph >= 0.4 ? 0 : exp(-ph * 380) + (r3 < 0.5 && ph > 0.07 ? 0.7 * exp(-(ph - 0.07) * 380) : 0)" },
+  { "id": "zOsc", "type": "osc", "wave": "square", "freq": "fEv / 8" },
+  { "id": "zAmp", "type": "expr", "expr": "r3 >= 0.5 ? smooth(0.012, 0.02, ph) * (1 - smooth(0.05 + r2 * 0.1, 0.06 + r2 * 0.1, ph)) : 0" },
+  { "id": "relay", "type": "filter", "mode": "bp", "in": "(nK * kAmp * 1.6 + zOsc * zAmp * 0.5) * wR * lvl", "freq": "fEv * (0.8 + bright * 0.4)", "q": 2.5 },
+
+  { "id": "con", "type": "expr", "expr": "far * 0.2 + relay * 0.3" },
+  { "id": "mixL", "type": "expr", "expr": "humL * 0.022 + airL * 0.2 + sc * (1 - 0.5 * sw) * 0.2 + con * (1.3 - pan)" },
+  { "id": "mixR", "type": "expr", "expr": "humR * 0.022 + airR * 0.2 + sc * (0.5 + 0.5 * sw) * 0.2 + con * (0.3 + pan)" }
+ ],
+ "out": ["mixL", "mixR"],
+ "presets": {
+  "Calm bridge": { "console": 0, "activity": 0.3, "pitch": 110, "bright": 0.45, "scan": 0.35 },
+  "Science deck": { "console": 1, "activity": 0.9, "pitch": 132, "bright": 0.65, "scan": 0.7 },
+  "Old freighter": { "console": 2, "activity": 0.45, "pitch": 74, "bright": 0.35, "scan": 0.15 }
+ }
+}
