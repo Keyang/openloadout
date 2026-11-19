@@ -119,3 +119,4 @@ if (isMain(import.meta.url)) {
   const i = rest.indexOf('--node');
   console.log(report(JSON.parse(fs.readFileSync(file, 'utf8')), { ...(i >= 0 ? { node: rest[i + 1] } : {}), quick: !rest.includes('--full') }));
 }
+export * from '../../sound/bands.js';
