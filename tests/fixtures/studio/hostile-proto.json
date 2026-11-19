@@ -1,0 +1,29 @@
+{
+  "__proto__": { "polluted": "yes", "isAdmin": true },
+  "constructor": { "prototype": { "polluted": "yes" } },
+  "prototype": { "polluted": "yes" },
+  "format": "loadout-sprite",
+  "version": 1,
+  "id": "proto-blob",
+  "name": "Proto blob",
+  "meta": { "__proto__": { "polluted": "yes" }, "type": "creature", "role": "characters/enemy", "themes": ["neutral"], "gameTypes": ["arcade"], "view": "side", "words": ["blob", "slime", "goo", "jelly", "ooze", "creature"], "license": "draft" },
+  "body": { "rig": {
+    "__proto__": { "polluted": "yes" },
+    "format": "loadout-rig", "version": 1, "id": "blob", "name": "Blob", "view": "side", "size": [32, 32],
+    "colours": [ { "id": "goo", "label": "Goo", "default": "#6fbf4a", "__proto__": { "polluted": "yes" } } ],
+    "bones": [ { "id": "core", "parent": null, "at": [16, 24], "angle": 180, "length": 6, "constructor": "x" } ],
+    "shapes": [ { "id": "lump", "bone": "core", "kind": "ellipse", "at": [3, 0], "r": [6, 7], "paint": "goo", "z": 0 } ],
+    "ik": [], "points": [ { "id": "feet", "ground": true } ] } },
+  "size": [32, 32],
+  "pivot": [16, 28],
+  "colours": { "goo": "#6fbf4a", "__proto__": "#ff0000", "constructor": "#ff0000" },
+  "controls": [],
+  "parts": { "__proto__": { "label": "Bad", "shapes": ["lump"] } },
+  "clips": {
+    "__proto__": { "label": "Bad", "frames": 1, "fps": 1, "loop": true, "keys": [] },
+    "constructor": { "label": "Bad", "frames": 1, "fps": 1, "loop": true, "keys": [] },
+    "idle": { "label": "Idle", "frames": 8, "fps": 7, "loop": true,
+      "keys": [ { "t": 0, "root": [0, 0], "__proto__": { "polluted": "yes" } }, { "t": 0.5, "root": [0, -1], "stretch": { "core": 1.2, "__proto__": 9 } } ] }
+  },
+  "preview": "idle"
+}

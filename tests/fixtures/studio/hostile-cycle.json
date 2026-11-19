@@ -1,0 +1,7 @@
+{ "format": "loadout-rig", "version": 1, "id": "loop", "name": "Loop", "view": "none", "size": [32, 32],
+  "colours": [ { "id": "c", "label": "Colour", "default": "#888888" } ],
+  "bones": [ { "id": "a", "parent": "b", "angle": 0, "length": 4 },
+             { "id": "b", "parent": "a", "angle": 0, "length": 4 },
+             { "id": "self", "parent": "self", "angle": 0, "length": 4 } ],
+  "shapes": [ { "id": "s", "bone": "a", "kind": "limb", "width": 2, "paint": "c" } ],
+  "ik": [], "points": [] }

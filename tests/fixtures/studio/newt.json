@@ -1,0 +1,101 @@
+{
+  "format": "loadout-sprite",
+  "version": 1,
+  "id": "moss-newt",
+  "name": "Moss newt",
+  "blurb": "A small green newt that waddles along the forest floor and snaps at ankles.",
+  "meta": {
+    "type": "creature",
+    "role": "characters/enemy",
+    "themes": ["forest"],
+    "gameTypes": ["platformer"],
+    "view": "side",
+    "words": ["newt", "lizard", "salamander", "amphibian", "swamp", "creature", "bite"],
+    "license": "draft"
+  },
+  "body": {
+    "rig": {
+      "format": "loadout-rig", "version": 1, "id": "newt", "name": "Newt", "view": "side", "size": [48, 48],
+      "colours": [
+        { "id": "skin", "label": "Skin", "default": "#4f9d57", "material": "skin" },
+        { "id": "belly", "label": "Belly", "default": "#e6c545", "material": "skin" },
+        { "id": "eye", "label": "Eyes", "default": "#231b33", "detail": true }
+      ],
+      "bones": [
+        { "id": "body", "parent": null, "at": [20, 36], "angle": 90, "length": 12, "label": "Body" },
+        { "id": "head", "parent": "body", "angle": 0, "length": 7, "min": -30, "max": 30, "label": "Head" },
+        { "id": "tail1", "parent": "body", "from": 0, "angle": 180, "length": 7, "min": -45, "max": 45, "label": "Tail" },
+        { "id": "tail2", "parent": "tail1", "angle": 0, "length": 6, "min": -60, "max": 60, "label": "Tail tip" },
+        { "id": "thighF", "parent": "body", "from": 0.8, "angle": -90, "length": 4, "label": "Front leg" },
+        { "id": "shinF", "parent": "thighF", "angle": 20, "length": 3, "label": "Front foot" },
+        { "id": "thighB", "parent": "body", "from": 0.15, "angle": -90, "length": 4, "label": "Back leg" },
+        { "id": "shinB", "parent": "thighB", "angle": 20, "length": 3, "label": "Back foot" }
+      ],
+      "shapes": [
+        { "id": "torso", "bone": "body", "kind": "capsule", "from": 0, "to": 1, "r": [4, 3.5], "paint": "skin", "z": 10, "group": "body" },
+        { "id": "skull", "bone": "head", "kind": "ellipse", "at": [3.5, 0.5], "r": [4, 3], "paint": "skin", "z": 10, "group": "body" },
+        { "id": "tail", "bone": "tail1", "kind": "capsule", "from": 0, "to": 1, "r": [3, 1.8], "paint": "skin", "z": 10, "group": "body" },
+        { "id": "tailTip", "bone": "tail2", "kind": "capsule", "from": 0, "to": 1, "r": [1.8, 1], "paint": "skin", "z": 10, "group": "body" },
+        { "id": "belly", "bone": "body", "kind": "capsule", "from": 0.1, "to": 0.9, "offset": -2, "r": [2, 2], "paint": "belly", "z": 11 },
+        { "id": "legF1", "bone": "thighF", "kind": "limb", "width": 2, "paint": "skin", "z": 12 },
+        { "id": "legF2", "bone": "shinF", "kind": "limb", "width": 2, "paint": "skin", "z": 12 },
+        { "id": "legB1", "bone": "thighB", "kind": "limb", "width": 2, "paint": "skin", "z": 8, "far": true },
+        { "id": "legB2", "bone": "shinB", "kind": "limb", "width": 2, "paint": "skin", "z": 8, "far": true },
+        { "id": "frill", "bone": "head", "kind": "poly", "points": [[0, 2], [2, 5], [4, 3.5], [5, 2]], "paint": "belly", "z": 9, "part": "frill" },
+        { "id": "eye", "bone": "head", "kind": "dot", "at": [5, 1.5], "size": 1, "paint": "eye", "z": 20 },
+        { "id": "eyeShut", "bone": "head", "kind": "dot", "at": [5, 1.5], "size": 2, "paint": "eye", "z": 20, "hidden": true }
+      ],
+      "ik": [
+        { "id": "footF", "label": "Front foot", "bones": ["thighF", "shinF"], "bend": -1 },
+        { "id": "footB", "label": "Back foot", "bones": ["thighB", "shinB"], "bend": -1 }
+      ],
+      "points": [
+        { "id": "head", "bone": "head", "at": [7, 0] },
+        { "id": "back", "bone": "body", "at": [6, 4], "angle": 180 },
+        { "id": "feet", "ground": true }
+      ]
+    }
+  },
+  "size": [48, 48],
+  "pivot": [24, 42],
+  "grounded": true,
+  "colours": { "skin": "#4f9d57", "belly": "#e6c545", "eye": "#231b33" },
+  "controls": [
+    { "key": "speed", "standard": "speed" },
+    { "key": "tailLength", "label": "Tail", "lo": "Short", "hi": "Long", "min": 0.6, "max": 1.5, "default": 1, "scales": { "bones": ["tail1", "tail2"] } },
+    { "key": "chunk", "label": "Body", "lo": "Slim", "hi": "Chunky", "min": 0.8, "max": 1.3, "default": 1, "scales": { "shapes": ["torso", "belly"] } }
+  ],
+  "parts": { "frill": { "label": "Frill", "shapes": ["frill"], "default": true } },
+  "clips": {
+    "idle": { "label": "Idle", "frames": 8, "fps": 7, "loop": true,
+      "keys": [ { "t": 0, "root": [0, 0], "bones": { "tail1": 180 } },
+                { "t": 0.5, "root": [0, -1], "bones": { "tail1": 175 } },
+                { "t": 0.75, "hide": ["eye"], "show": ["eyeShut"] },
+                { "t": 0.875, "show": ["eye"], "hide": ["eyeShut"] } ] },
+    "walk": { "label": "Walk", "frames": 8, "fps": 10, "loop": true,
+      "keys": [ { "t": 0,    "root": [0, 0],  "ik": { "footF": [4, 0], "footB": [-4, 0] }, "bones": { "tail1": 170 } },
+                { "t": 0.25, "root": [0, -1], "ik": { "footF": [0, 0], "footB": [0, -2] }, "bones": { "tail1": 190 } },
+                { "t": 0.5,  "root": [0, 0],  "ik": { "footF": [-4, 0], "footB": [4, 0] }, "bones": { "tail1": 170 } },
+                { "t": 0.75, "root": [0, -1], "ik": { "footF": [0, -2], "footB": [0, 0] }, "bones": { "tail1": 190 } } ],
+      "sounds": [ { "sound": "footstep-grass", "frame": 0, "volume": 0.4 }, { "sound": "footstep-grass", "frame": 4, "volume": 0.4 } ] },
+    "attack": { "label": "Bite", "frames": 8, "fps": 13, "loop": false,
+      "keys": [ { "t": 0, "root": [0, 0], "bones": { "head": 0 } },
+                { "t": 0.2857, "ease": "in", "root": [-1, 0], "bones": { "head": -20 } },
+                { "t": 0.5714, "ease": "out", "root": [3, 0], "bones": { "head": 25 } },
+                { "t": 1, "root": [0, 0], "bones": { "head": 0 } } ],
+      "sounds": [ { "sound": "whoosh", "frame": 3, "preset": "Quick swipe", "volume": 0.5 } ] },
+    "hurt": { "label": "Hurt", "frames": 4, "fps": 9, "loop": false,
+      "keys": [ { "t": 0, "root": [-2, 0], "bones": { "head": -15 } }, { "t": 1, "root": [0, 0], "bones": { "head": 0 } } ],
+      "frameEdits": { "0": { "flash": true, "nudge": [-1, 0] } },
+      "sounds": [ { "sound": "punch", "frame": 0 } ] },
+    "die": { "label": "Die", "frames": 8, "fps": 10, "loop": false,
+      "keys": [ { "t": 0, "root": [-2, 0] },
+                { "t": 0.5714, "root": [0, 3], "bones": { "body": 100, "tail1": 175 } },
+                { "t": 0.7, "ease": "hold", "hide": ["eye"], "show": ["eyeShut"] },
+                { "t": 1, "root": [0, 4], "bones": { "body": 90, "tail1": 180, "head": 10 } } ],
+      "frameEdits": { "0": { "flash": true } },
+      "sounds": [ { "sound": "monster-fade", "frame": 0 } ] }
+  },
+  "preview": "walk",
+  "made": { "in": "studio", "from": "template:four-legs" }
+}

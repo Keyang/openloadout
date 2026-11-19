@@ -1,0 +1,57 @@
+{
+  "format": "loadout-sprite",
+  "version": 1,
+  "id": "waving-hero",
+  "name": "Waving hero",
+  "blurb": "The hero from the library, with a friendly wave added in the studio.",
+  "meta": {
+    "type": "character",
+    "role": "characters/player",
+    "themes": ["fantasy"],
+    "gameTypes": ["platformer", "roguelike-action"],
+    "view": "side",
+    "words": ["hero", "knight", "wave", "hello", "friendly", "adventurer"],
+    "license": "draft"
+  },
+  "body": {
+    "library": "humanoid",
+    "figure": {
+      "body": { "height": 0.5, "build": 0.5, "head": 0.5 },
+      "stance": "upright",
+      "motion": { "bounce": 0.5, "stride": 0.5 },
+      "moves": { "wave": "idle" },
+      "look": { "skin": "#e0b48a", "top": "#3a5fa8", "bottom": "#4a3a2a", "boots": "#2b2118", "bareArms": false },
+      "hair": { "style": "short", "colour": "#5a3a22" },
+      "held": { "kind": "sword", "length": 1, "angle": 0, "metal": "#c2c9d6", "hilt": "#7a4a2a" },
+      "headgear": { "kind": "none" },
+      "scarf": { "kind": "short", "length": 1, "colour": "#b03a2e" }
+    }
+  },
+  "size": [64, 64],
+  "pivot": [28, 58],
+  "grounded": true,
+  "colours": {},
+  "controls": [
+    { "key": "speed", "standard": "speed" },
+    { "key": "height", "label": "Height", "lo": "Short", "hi": "Tall", "min": 0, "max": 1, "default": 0.5, "sets": "height" }
+  ],
+  "parts": {
+    "held": { "label": "Sword", "default": true },
+    "scarf": { "label": "Scarf", "default": true }
+  },
+  "clips": {
+    "idle": { "label": "Idle", "frames": 8, "fps": 7, "loop": true, "from": "idle",
+      "keys": [ { "t": 0, "lift": 0, "armF": { "a": 9, "e": 14 }, "blink": false },
+                { "t": 0.5, "lift": -1, "armF": { "a": 9, "e": 14 } },
+                { "t": 0.75, "blink": true },
+                { "t": 0.875, "blink": false } ] },
+    "wave": { "label": "Wave", "frames": 8, "fps": 8, "loop": true, "from": "idle",
+      "keys": [ { "t": 0, "armF": { "a": 9, "e": 14 }, "lean": 0 },
+                { "t": 0.25, "armF": { "a": 160, "e": 30 }, "headTilt": -5 },
+                { "t": 0.5, "armF": { "a": 120, "e": 60 } },
+                { "t": 0.75, "armF": { "a": 160, "e": 30 }, "headTilt": 0 } ],
+      "frameEdits": { "2": { "nudge": [0, -1] } } }
+  },
+  "preview": "wave",
+  "made": { "in": "studio", "from": "library:knight", "by": "a tester" }
+}

@@ -1,0 +1,5 @@
+{ "format": "loadout-rig", "version": 1, "id": "markup", "name": "<img src=x onerror=alert(1)>", "view": "side", "size": [32, 32],
+  "colours": [ { "id": "c", "label": "<b>Colour</b>", "default": "#888888" } ],
+  "bones": [ { "id": "root", "parent": null, "at": [16, 16], "angle": 0, "length": 4, "label": "Bone\u0000\u001b[31m" } ],
+  "shapes": [ { "id": "s", "bone": "root", "kind": "limb", "width": 2, "paint": "c" } ],
+  "ik": [], "points": [] }

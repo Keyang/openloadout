@@ -445,6 +445,26 @@ Open, for Keyang:
 | R3 | Are the 14 rig sprites converted, or only new ones written this way? |
 | R4 | New animations as key poses in data (a list of joint settings the engine blends between): in scope, or later? |
 
+## Contract 14: the studio and data rigs (DRAFT)
+
+Decision from Keyang, 2026-11-19: "create studio page -- sprite: allowing create rig / animation / frame and sprites. we will add music & sound track editing in future." Status: **draft, designed in `docs/studio.md`, nothing built.** It amends Contract 13 (a rig may be data, not only code), Contract 11 (studio items are not held to the quality bar) and answers R4 (yes) and, for data sprites, R2.
+
+| Rule | What it says |
+|---|---|
+| 1. Two kinds of body | A **bone rig** is data (`loadout-rig`: bones with lengths and joint limits, shapes on bones with z-order and colour slots, two-bone IK chains, attach points). A **library body** is a code rig with a data layer; the first is the side-view person (`rigs/humanoid.js` through `rigs/humanoid-figure.js`). The code rigs stay; the studio starts from them as library bodies or as bone-rig templates shaped like them |
+| 2. A studio sprite is one JSON object | `loadout-sprite`: id, name, blurb, `meta` (Contract 1), body, size, pivot, grounded, colours, controls (which may only scale named bones or shapes), parts, clips, preview, `made`. No functions anywhere. Field lists: `docs/studio.md`, section 2 |
+| 3. Animation is key poses | A clip is frames, fps, loop, `keys` (each `{ t, ease, ... }` holding only the numbers it changes: bone angles, IK targets, root offset, stretch; for a library body the fields of its pose object), `frameEdits` (nudge, show, hide, flash on one frame) and `sounds`. One framework function blends them; `t` is the phase as `engine/sprite.js` computes it. A library body's formula poses are only where first keys come from ("bake") |
+| 4. One way in | `engine/data-sprite.js dataSprite(json)` validates and returns a normal `defineSprite` result whose `render` and `sockets` are framework code. Every page, the bag, the playground, the export, the looks (Contract 7) and the quality bar take it as they take any sprite |
+| 5. Pixels | A bone rig is drawn with the surface's shape calls (`limb`, capsule, turned ellipse, polygon), sampled at pixel centres; details (`dot`) are moved, never turned; same group and z paint as one `blob`; one `g.outline(INK)`, glow after it. No bitmap is ever rotated |
+| 6. Safety | A definition is data drawn by framework code, so it needs no worker. `catalog/studio-schema.js` validates every definition from the studio, storage, a link or a file before anything is drawn: JSON ≤ 64 KB, prototype keys dropped, unknown fields dropped, numbers clamped, every count capped (bones 48, shapes 160, clips 32, frames 64 a clip and 256 in all, frame at most 128 x 96), every reference resolved. Text is shown as text only. A link still asks first |
+| 7. Not held to the bar | A bag item with `definition: { data }` is added, played and exported without the quality bar (features.md: the bar applies to routes 1 and 2). The bar is shown in the studio as advice only. Everything else of Contract 11 holds |
+| 8. To the library | The studio downloads `sprites/<id>.js` of one fixed form: a comment, `import { dataSprite } from '../engine/data-sprite.js';` and `export default dataSprite(<the JSON>);`. The build reads the middle back as JSON and refuses a file that claims the form but is not exactly it. Dropped into `sprites/`, it is route 1: the quality bar applies |
+| 9. Where it is kept | Drafts: `localStorage` `loadout-studio-v1`, validated on every read, failed saves reported. Bag: `definition: { data }`, link entry `{ d }`, deflated when the link is made |
+| 10. On `window` | `loadout.studio.starts, create, list, get, set, validate, bake, render, advice, toBag, file, remove`, each an action in `generated/api.json` |
+| 11. Room for sound | The studio page is one stage, one timeline, one footer and a row of mode tabs (Body, Move, Frames, Look & name). Sound and music editing come later as more tabs on the same page; nothing is built for them now |
+
+Open for Keyang: `docs/studio.md`, section 9 (Q1 to Q5).
+
 ## Routes of the site (after wave 2)
 
 `#/` home (search first, bundles, start from a game type) · `#/browse?...` results with filters · `#/sprite/<id>` · `#/sound/<id>` · `#/music/<id>` · `#/bundle/<id>` · `#/bag` · `#/play`. Old links (`#/kit/...`, `#/sprites`) keep working.
