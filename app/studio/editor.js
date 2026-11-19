@@ -16,6 +16,8 @@ import { drawFrame, libraryFile, sheetOf } from './draw.js';
 import * as X from './edit.js';
 import { icon, menuButton } from './bits.js';
 import { bodyPane, movePane, framesPane, lookPane } from './panes.js';
+import { lightKeys, lightLabel } from './clip-tools.js';
+import { framesWithAdvice } from './more-panes.js';
 
 /** The four tabs: their address word (docs/studio.md), their key and their name. */
 export const MODES = Object.freeze([
@@ -157,13 +159,18 @@ export function editorPage(app, { id, entry, drafts, kept, query, studio = siteS
     const c = def.clips[S.clip];
     const keys = X.keyFrames(def, S.clip);
     const n = c.frames;
+    // item S10: keys between frames are thin ticks between two frames, never a frame's key; item S12: frames with a pixel warning are marked
+    const ticks = new Map();
+    for (const k of lightKeys(def, S.clip)) ticks.set(k.after, (ticks.get(k.after) ?? 0) + 1);
+    const adv = framesWithAdvice(def, S.clip);
     const box = el('div', { class: 'timeline', role: 'group', 'aria-label': `Frames of ${c.label}` }, Array.from({ length: n }, (_, f) => {
-      const b = el('button', { type: 'button', class: 'frame' + (keys.has(f) ? ' has-key' : ''), 'data-frame': f, 'aria-current': String(f === S.frame), 'aria-label': `Frame ${f + 1}${keys.has(f) ? ', has a key' : ''}`, tabindex: f === S.frame ? '0' : '-1',
+      const tick = ticks.has(f) ? el('span', { class: 'light-tick', 'data-after': f, title: `${lightLabel(def, S.clip)}: ${ticks.get(f)} key${ticks.get(f) === 1 ? '' : 's'} between frames ${f + 1} and ${(f + 1) % n + 1}`, 'aria-hidden': 'true' }) : null;
+      const b = el('button', { type: 'button', class: 'frame' + (keys.has(f) ? ' has-key' : '') + (adv.has(f) ? ' has-advice' : ''), 'data-frame': f, 'aria-current': String(f === S.frame), 'aria-label': `Frame ${f + 1}${keys.has(f) ? ', has a key' : ''}${adv.has(f) ? `. ${adv.get(f).join(' ')}` : ''}`, title: adv.has(f) ? adv.get(f).join('\n') : null, tabindex: f === S.frame ? '0' : '-1',
         onclick: () => setFrame(f),
         onkeydown: (e) => {
           if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); e.stopPropagation(); setFrame((S.frame + (e.key === 'ArrowRight' ? 1 : -1) + n) % n, true); }
         } }, thumbOf(def, S.clip, f), el('span', { class: 'frame-n', 'aria-hidden': 'true' }, String(f + 1)));
-      return b;
+      return [b, tick];
     }));
     const onion = el('label', { class: 'st-check', title: 'The frame before, faint, under this one' }, el('input', { type: 'checkbox', checked: S.onion, onchange: (e) => { S.onion = e.target.checked; stage.draw(); } }), 'Onion skin');
     under.replaceChildren(el('div', { class: 'st-timebar' }, playButton(), el('span', { class: 'st-clipname' }, c.label, el('span', { class: 'quiet num' }, ` · ${n} frames · ${c.fps} a second${c.loop === false ? ' · once' : ''}`)), S.mode === 'move' ? onion : null), box);
@@ -210,6 +217,8 @@ export function editorPage(app, { id, entry, drafts, kept, query, studio = siteS
       savedBox.className = 'saved' + (saver.pending() ? ' is-saving' : '');
       savedBox.replaceChildren(el('span', { class: 'dot', 'aria-hidden': 'true' }), el('span', { class: 'saved-text' }, saver.pending() ? 'Saving…' : 'Saved on this computer'),
         el('small', {}, S.bagKey && S.bagError ? 'Your bag has an older copy' : S.bagKey ? 'In your bag · updates as you work' : S.changes ? `${S.changes} change${S.changes === 1 ? '' : 's'} this visit` : 'Every change is kept as you go'));
+      // item S10 (Q1): a copy that stays as it is now, beside the bag item that follows the draft
+      if (S.bagKey && !S.bagError) savedBox.append(el('button', { type: 'button', class: 'link st-keep', 'data-act': 'keep-copy', onclick: () => keepCopy() }, 'Keep a copy in the bag'));
     }
     const takes = bagTakesStudio(S.def);
     toBagBtn.disabled = !takes || (!!S.bagKey && !S.bagError);
@@ -317,6 +326,26 @@ export function editorPage(app, { id, entry, drafts, kept, query, studio = siteS
   // ---- the moves the panes and the keyboard make ----
   const E = {
     S, ctx, say, select, setMode, setClip, positions: () => stage.positions(),
+    // item S10 and S12 (app/studio/more-panes.js): the pane drawn again when something it waited for arrives; an
+    // advice line selects what it is about (a frame of an animation, or a shape on its bone)
+    redraw: () => { drawPane(); drawUnder(); },
+    goFrame: (clip, frame, focus) => {
+      if (!X.hasClip(S.def, clip)) return;
+      setMode('frames');
+      if (S.clip !== clip) setClip(clip);
+      setFrame(Math.max(0, Math.min(S.def.clips[clip].frames - 1, frame | 0)));
+      (focus ? pane.querySelector(`[data-k="${CSS.escape(focus)}"]`) : under.querySelector(`.timeline [data-frame="${S.frame}"]`))?.focus();
+    },
+    goShape: (shape, bone) => {
+      if (!X.isRig(S.def)) return;
+      setMode('body');
+      S.bodyClip = null;
+      select({ bone, handle: `bone:${bone}` });
+      drawUnder();
+      const r = pane.querySelector(`.shape-row[data-shape="${CSS.escape(shape)}"]`);
+      r?.scrollIntoView?.({ block: 'nearest' });
+      r?.querySelector('select, button')?.focus({ preventScroll: true });
+    },
     commit: (def, note) => commit(def, note),
     rename: (name) => commit(X.setName(S.def, name, taken(name))),
     setFacing: (f) => { S.facing = f; S.sel = { ...S.sel, handle: null }; drawAll(); },
@@ -424,6 +453,15 @@ export function editorPage(app, { id, entry, drafts, kept, query, studio = siteS
     const warn = (r.warnings ?? [])[0];
     say(r.added === false ? 'Your bag has this version now.' : `In your bag. It updates as you work; Play tries it in the playground.${warn ? ` ${warn}` : ''}`);
     drawFoot();
+  }
+  /** Keep a frozen copy of the bag item beside it (app/bag.js keepCopy): the copy stays as the sprite is now; the item keeps following the draft. */
+  function keepCopy() {
+    if (!S.bagKey) return;
+    const f = saver.flush();
+    if ((f && !f.ok) || drafts.pending()) { say('No copy was made: your latest change is not saved yet. Download the file to keep it.'); return; }
+    let k = null;
+    try { k = typeof bagModule.bag.keepCopy === 'function' ? bagModule.bag.keepCopy(S.bagKey) : null; } catch (e) { say(`No copy was made: ${String(e?.message ?? e).slice(0, 160)}`); return; }
+    say(k ? 'A copy that stays as it is now is in your bag. The other one keeps following your changes.' : 'No copy was made: it is no longer in your bag. Put it in again first.');
   }
   async function downloadFile() {
     const f = await libraryFile(S.def, assetById(S.def.id) ? [S.def.id] : undefined);

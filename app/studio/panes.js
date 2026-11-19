@@ -8,6 +8,8 @@ import { CLOTH, SKIN, METAL, HAIR } from '../../engine/sprite.js';
 import { EASES } from '../../rigs/keypose.js';
 import * as X from './edit.js';
 import { row, head, btn, icon, stepper, toggle, select, text, menuButton, fieldId } from './bits.js';
+import { libraryBodyPane, mirrorButton, moveExtras, soundsSection, frameAdvice, fillNote, thinMark, adviceSection } from './more-panes.js';
+import { libraryChanged } from './library-body.js';
 
 const EASE_WORDS = { smooth: 'Smooth', linear: 'Steady', in: 'Speeds up', out: 'Slows down', hold: 'Holds still' };
 const ARROWS = [['←', 'left', -1, 0], ['↑', 'up', 0, -1], ['↓', 'down', 0, 1], ['→', 'right', 1, 0]];
@@ -46,7 +48,7 @@ export function bodyPane(E) {
   const startedFrom = X.startingBodies().find((s) => made === `template:${s.id}` || (s.id === 'hero' && made.startsWith('library:')));
   const out = [el('p', { class: 'pane-note' }, startedFrom ? `Started from ${startedFrom.label}. ` : '', el('a', { class: 'link', href: '#/studio' }, 'Start another'))];
   if (!X.isRig(def)) {
-    out.push(el('p', { class: 'pane-note' }, 'This body comes from the library. Its height, build and head are sliders under Look & name, and every animation can be posed under Move.'));
+    out.push(...libraryBodyPane(E));      // item S10: proportions, how it moves, attach points
     return out;
   }
   out.push(el('p', { class: 'st-phone' }, 'Easier on a bigger screen. Here, pick a bone and use the arrows.'));
@@ -79,7 +81,7 @@ export function bodyPane(E) {
     const slots = def.body.rig.colours.map((c) => ({ value: c.id, label: c.label || X.humanize(c.id) }));
     for (const s of shapes) {
       out.push(el('div', { class: 'shape-row', 'data-shape': s.id },
-        el('span', { class: 'shape-name' }, X.shapeLabel(s, def).split(',')[0]),
+        el('span', { class: 'shape-name' }, X.shapeLabel(s, def).split(',')[0], thinMark(def, s.id)),
         select({ id: fieldId('paint'), k: `paint-${s.id}`, label: `Colour of ${X.shapeLabel(s, def)}`, value: s.paint, options: slots, onchange: (v) => E.commit(X.setShape(def, s.id, { paint: v })) }),
         el('span', { class: 'shape-acts' },
           icon('−', 'Smaller', () => E.commit(X.resizeShape(def, s.id, -1)), { 'data-k': `smaller-${s.id}` }),
@@ -131,12 +133,14 @@ export function movePane(E) {
     key ? btn('Delete key', () => E.deleteKey(), { 'data-k': 'del-key' }) : btn('Add a key here', () => E.addKey(), { 'data-k': 'add-key', title: 'K' }),
     btn('Copy key', () => E.copyKey(), { disabled: !key, 'data-k': 'copy-key' }),
     btn('Paste key', () => E.pasteKey(), { disabled: !E.S.clipboard, 'data-k': 'paste-key' }),
+    ...mirrorButton(E),
   ];
   if (key) {
     const easeId = fieldId('ease');
     out.push(row('Leaves this key', select({ id: easeId, k: 'ease', label: 'How the motion leaves this key', value: key.ease ?? 'smooth', options: EASES.map((e) => ({ value: e, label: EASE_WORDS[e] })), onchange: (v) => E.commit(X.setKeyEase(def, clip, frame, v)) }), { forId: easeId }));
   }
   out.push(el('div', { class: 'st-actions' }, acts));
+  out.push(...moveExtras(E));      // item S10: keys between frames, start this clip over
   if (X.isRig(def)) {
     const keyed = new Set();
     if (key) {
@@ -147,7 +151,9 @@ export function movePane(E) {
     out.push(head('What you can move'), el('p', { class: 'pane-note' }, 'Drag on the picture, or pick one here and use the arrows. A dot marks what this frame\'s key changes.'));
     out.push(handleRows(E, X.handles(def, E.ctx()), keyed));
   } else {
-    out.push(head('What you can move'), el('p', { class: 'pane-note' }, 'Each arrow moves it a little on this frame. Dragging on the picture comes later for library bodies.'));
+    out.push(head('What you can move'), el('p', { class: 'pane-note' }, 'Drag on the picture, or pick one here and use the arrows. Move a hand and the arm follows. A dot marks what this frame\'s key changes.'));
+    out.push(handleRows(E, X.handles(def, E.ctx()), new Set(libraryChanged(def, clip, frame))));
+    out.push(head('The numbers'), el('p', { class: 'pane-note' }, 'The same pose as numbers, each a little at a time.'));
     out.push(el('div', { class: 'handle-list' }, X.libraryRows(def, clip, frame).map((r) => {
       const two = r.kind === 'point' || r.kind === 'arm';
       const value = r.kind === 'point' ? `${Math.round(r.value.x)}, ${Math.round(r.value.y)}` : r.kind === 'arm' ? `${Math.round(r.value.a)}°, ${Math.round(r.value.e)}°` : r.kind === 'angle' ? `${Math.round(r.value)}°` : `${Math.round(r.value)} px`;
@@ -186,6 +192,7 @@ export function framesPane(E) {
     const now = (e.show ?? []).includes(s.id) ? 'show' : (e.hide ?? []).includes(s.id) ? 'hide' : null;
     out.push(row(s.label, el('span', { class: 'seg', role: 'group', 'aria-label': s.label }, [[null, 'As the keys say'], ['show', 'Show'], ['hide', 'Hide']].map(([v, w]) => el('button', { type: 'button', 'aria-pressed': String(now === v), onclick: () => E.commit(X.setFrameShape(def, clip, frame, s.id, v)) }, w))), { changed: now !== null }));
   }
+  out.push(...frameAdvice(E), ...soundsSection(E));      // items S12 and S10: this frame's pixel warnings, its sounds
   out.push(head('Anchor', btn('Snap to the feet', () => E.commit(X.setPivot(def, X.feetPivot(def)), 'The anchor is under the feet.'), { 'data-k': 'snap-feet', disabled: !X.isRig(def) })));
   out.push(el('p', { class: 'pane-note' }, X.isRig(def) ? 'The point a game places: under the feet for anything that stands. Drag the cross on the picture or use the boxes.' : 'A library body always stands on the same point.'));
   const ax = fieldId('ax'), ay = fieldId('ay'), gid = fieldId('ground'), zid = fieldId('size');
@@ -194,6 +201,7 @@ export function framesPane(E) {
     out.push(row('Anchor down', stepper({ id: ay, k: 'anchor-y', label: 'Anchor down', value: def.pivot[1], min: 0, max: def.size[1] - 1, unit: 'px from the top', onchange: (n) => E.commit(X.setPivot(def, [def.pivot[0], n])) }), { forId: ay }));
     out.push(row('Stands', [toggle({ id: gid, label: 'Stands on the ground', checked: def.grounded !== false, onchange: (v) => E.commit(X.setGrounded(def, v)) }), el('span', { class: 'st-unit' }, def.grounded !== false ? 'On the ground' : 'In the air, as a flyer')], { forId: gid }));
     out.push(row('Frame size', select({ id: zid, k: 'frame-size', label: 'Frame size', value: def.size.join('x'), options: X.frameSizes(def).map(([w, h]) => ({ value: `${w}x${h}`, label: `${w} × ${h}` })), onchange: (v) => E.commit(X.setFrameSize(def, v.split('x').map(Number)), 'Frame size changed: the body moved with it.') }), { forId: zid, note: 'The sizes the library uses.' }));
+    out.push(fillNote(E));      // item S12: the fill band
     out.push(handleRows(E, X.handles(def, E.ctx())));
   }
   return out;
@@ -239,5 +247,6 @@ export function lookPane(E) {
   }
   out.push(row('Words to find it', text({ id: kid, value: (def.meta?.words ?? []).join(', '), max: 400, placeholder: 'newt, lizard, swamp', onchange: (v) => E.commit(X.setWords(def, v)) }), { forId: kid }));
   out.push(row('File name', el('code', { class: 'st-file' }, `${def.id}.js`), { note: 'What the download for the library is called. It follows the name.' }));
+  out.push(...adviceSection(E));      // item S12: what the library would ask, as advice
   return out;
 }
