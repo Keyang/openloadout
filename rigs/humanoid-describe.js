@@ -42,7 +42,7 @@ export const RIG = {
   ground: 58,
   directions: SIDE,
   directionClips: false,
-  modules: { humanoid: 'rigs/humanoid.js', humanoidFigure: 'rigs/humanoid-figure.js' },
+  modules: { humanoid: 'rigs/humanoid.js', humanoidFigure: 'rigs/humanoid-figure.js', humanoidStudio: 'rigs/humanoid-studio.js' },
 
   frames: [
     { fn: 'humanoidFigure.render', args: ['g', 'clip', 't', 'definition'], what: 'Paints one frame from a definition (data): body, stance, the pose the clip asks for, every part in its layer, the white flash, the outline, then the light. The nearest thing to the renderer of Contract 13; rogue-battler and road-bandit use it.' },
@@ -55,6 +55,8 @@ export const RIG = {
     { fn: 'humanoid.inFrame', what: 'Fits a body drawn on this rig into a frame of another size (the 48 x 48 imp).' },
     { fn: 'humanoid.clips', duplicateOf: 'humanoid.clipsFor', what: 'The clip table of the first characters: six fixed clips.' },
     { fn: 'humanoid.clipsFor', what: 'Standard clip entries for the named clips, in the order given.' },
+    { fn: 'humanoidStudio.frame', what: 'The studio\'s library body (S6): a figure definition with the Hero\'s parts too, posed as sprites/knight.js poses the Hero; a clip given as keys goes through the seam of humanoidFigure; keys made for another figure (keysFor) follow the formula to this one.' },
+    { fn: 'humanoidStudio.sockets', what: 'The attach points of one frame of the studio\'s library body.' },
   ],
 
   // the hooks of draw(), drawSkeleton() and drawImp(), in the order they are called
@@ -142,6 +144,12 @@ export const RIG = {
     // what a move of a figure shows in the far hand
     part('throwing knife', 'humanoidFigure.throwingKnife', 'front', 'offhand', { length: num(4, 7, 5, 'pixels'), metal: colour('#c2c9d6'), hilt: colour() }, 'A small knife: what the throw and toss moves show (a definition\'s `thrown`).', { args: ['g', 'at', 'options'] }),
     part('coin bag', 'humanoidFigure.coinBag', 'front', 'offhand', { colour: colour('#c9a06a'), tie: colour(), coin: colour(), size: GEAR }, 'A coin bag hanging from a hand: the prize of the steal move (a definition\'s `loot`).', { args: ['g', 'at', 'options'] }),
+    // the Hero's own, moved into the rig from sprites/knight.js with their pixels (rigs/humanoid-studio.js, S6)
+    part('cape', 'humanoidStudio.cape', 'behind', 'back', { kind: pick(['plain', 'tattered'], 'plain', 'humanoidStudio.CAPE_KINDS'), length: num(0.3, 1.8, 1, 'its Length setting: 1 hangs a little below the hip'), colour: colour('#c9423a', 'the cloth; painted a step darker') }, 'The Hero\'s cape: cloth from the shoulders that hangs behind and blows back with the sway; tattered has a torn hem.'),
+    part('cape on the ground', 'humanoidStudio.capeOnGround', 'front', 'back', { kind: pick(['plain', 'tattered'], 'plain', 'humanoidStudio.CAPE_KINDS'), length: num(0.3, 1.8, 1, 'as the cape\'s'), colour: colour('#c9423a') }, 'The edge of the Hero\'s cape along the ground under a body lying on its back (drawn once the pose\'s lie is over 0.9).', { shownWith: { pose: 'die', t: 1 } }),
+    part('hero headgear', 'humanoidStudio.heroHeadgear', 'head', 'head', { kind: pick(['plumed helmet', 'gold crown'], 'plumed helmet', 'humanoidStudio.HERO_HEADGEAR'), size: HAT, metal: colour('#c2c9d6', 'the helmet'), trim: colour('#c9423a', 'the plume and the crown\'s jewel') }, 'The Hero\'s helmet with a plume, or his gold crown with a jewel: other drawings than the rig\'s helmet and crown.', { rise: { fn: 'humanoidStudio.heroHeadgearRise', args: [{ option: 'kind' }, { option: 'size' }] } }),
+    part('hair under a helmet', 'humanoidStudio.napeHair', 'head', 'head', { style: { data: 'the hair style: only short and spiky show below a helmet', default: 'short' }, colour: colour('#5a3a22') }, 'Hair below the back of a helmet, so the hair colour still reads with it on.'),
+    part('hero belt', 'humanoidStudio.heroBelt', 'torso', null, { colour: colour('#c9423a', 'the strap, drawn in its shadow tone'), buckle: colour('#e8ecf2') }, 'The Hero\'s belt: one row across the hips with a buckle at the front, across the body when lying.'),
   ],
 
   held: [
@@ -188,8 +196,38 @@ export const RIG = {
     'humanoid.ramp': 'passed on from engine/color.js', 'humanoid.farRamp': 'passed on from engine/color.js', 'humanoid.mix': 'passed on from engine/color.js', 'humanoid.INK': 'passed on from engine/color.js',
     'humanoidFigure.clothRamp': 'the ramp a cloth of a colour is painted with (a derived colour rule)',
     'humanoidFigure.apart': 'a colour moved lighter or darker until it can be told from its neighbours (a derived colour rule)',
+    'humanoidStudio.bake': 'a clip\'s formula pose as studio keys (degrees) on every frame, and where its light looks back: "Start this clip over"',
+    'humanoidStudio.bakeClips': 'a table of clips, each baked, with the pose it was baked from',
+    'humanoidStudio.bakeClip': 'one clip baked: its keys, the pose they come from and the white flash as frame edits',
+    'humanoidStudio.MOST_FRAMES': 'the most frames bake() keys (the studio\'s frames per clip)',
+    'humanoidStudio.figureFor': 'a library-body studio sprite at settings: its stored figure with sliders, colour slots and parts applied, plus keys and keysFor',
+    'humanoidStudio.spriteSockets': 'the attach points of one frame of a library-body studio sprite, nudge applied',
+    'humanoidStudio.refigure': 'a studio sprite with a new stored figure, every clip\'s keys moved with it',
+    'humanoidStudio.toStudioKey': 'a pose of the rig as a studio key (radians to degrees)',
+    'humanoidStudio.fromStudioKey': 'a studio key in the rig\'s units (degrees to radians)',
+    'humanoidStudio.figureKeys': 'a studio sprite\'s clips as the keys a figure definition carries for the seam',
+    'humanoidStudio.heroFigure': 'the Hero of sprites/knight.js as a figure definition, for its settings',
+    'humanoidStudio.hero': 'the Hero as a studio sprite: the library body with his nine clips baked',
+    'humanoidStudio.HERO_SETTINGS': 'the Hero\'s settings at their defaults, by the names sprites/knight.js gives them',
   },
-  drawingHelpers: {},
+  drawingHelpers: {
+    'humanoidStudio.render': 'Paints one frame of the studio\'s library body: a figure definition with the Hero\'s parts as sprites/knight.js paints him, any other through humanoidFigure.render. Its parts are the cape, hero headgear, hair under a helmet and hero belt above.',
+    'humanoidStudio.drawSprite': 'Paints one frame of a library-body studio sprite (a loadout-sprite): figureFor at its settings, drawn by humanoidStudio.render, then the frame\'s nudge. What engine/data-sprite.js calls for every library body.',
+  },
+
+  // what a key of the studio may hold for this body (docs/studio.md 2.2): the fields of a pose, each with its kind and its
+  // range in the studio's units (degrees for angles; the rig works in radians), in humanoidStudio.POSE_FIELDS
+  poseFields: [
+    ...['rootX', 'lift', 'crouch'].map((name) => ({ name, list: 'humanoidStudio.POSE_FIELDS', kind: 'px', min: -64, max: 64, what: 'pixels' })),
+    ...['lean', 'headTilt', 'item', 'item2', 'headTurn'].map((name) => ({ name, list: 'humanoidStudio.POSE_FIELDS', kind: 'angle', min: -720, max: 720, what: 'degrees' })),
+    { name: 'sway', list: 'humanoidStudio.POSE_FIELDS', kind: 'signed', min: -1, max: 1, what: 'how hair, capes and scarves are thrown, -1..1' },
+    ...['glow', 'lie', 'pull', 'fling', 'air', 'out', 'level2', 'far'].map((name) => ({ name, list: 'humanoidStudio.POSE_FIELDS', kind: 'share', min: 0, max: 1, what: name === 'air' ? '0..1 through a toss; null when nothing is in the air' : '0..1' })),
+    { name: 'glint', list: 'humanoidStudio.POSE_FIELDS', kind: 'count', min: 0, max: 2, what: 'how bright the glint of loot is, 0..2' },
+    ...['footF', 'footB'].map((name) => ({ name, list: 'humanoidStudio.POSE_FIELDS', kind: 'point', min: -64, max: 64, what: '{ x, y } pixels from the ground under the hip; up: the knee bends up (lying)' })),
+    ...['armF', 'armB'].map((name) => ({ name, list: 'humanoidStudio.POSE_FIELDS', kind: 'arm', min: -720, max: 720, what: '{ a, e } degrees: the upper arm and the elbow' })),
+    ...['blink', 'flash', 'mouth', 'fire', 'prize'].map((name) => ({ name, list: 'humanoidStudio.POSE_FIELDS', kind: 'flag', what: 'true or false, stepped' })),
+    { name: 'knife', list: 'humanoidStudio.POSE_FIELDS', kind: 'word', what: 'where a thrown knife is: hand, air, or null' },
+  ],
 
   duplicates: [
     {

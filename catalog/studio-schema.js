@@ -23,6 +23,7 @@ import { MATERIAL_IDS } from '../engine/materials.js';
 import { POSES, HAIR_STYLES, ITEMS, PIVOT as HUMANOID_PIVOT } from '../rigs/humanoid.js';
 import { groundOf } from '../rigs/bones.js';
 import { STANCES, MOVES, HELD, HEADGEAR, PACKS } from '../rigs/humanoid-figure.js';
+import { POSE_FIELDS, CAPE_KINDS, HERO_HEADGEAR } from '../rigs/humanoid-studio.js';
 
 // ---- the tables ---------------------------------------------------------------------------------------------------
 
@@ -138,8 +139,8 @@ export function defaultPivot(size, grounded = true) {
 /** The default pivot (standing) of every frame size, keyed "WxH": what defaultPivot() gives. */
 export const STUDIO_PIVOTS = Object.freeze(Object.fromEntries(FRAME_SIZES.map(([w, h]) => [`${w}x${h}`, Object.freeze(defaultPivot([w, h]))])));
 
-/** The parts of a humanoid figure a sprite may let people switch off (rigs/humanoid-figure.js). */
-export const LIBRARY_PARTS = Object.freeze(['held', 'headgear', 'mask', 'scarf', 'belt', 'coat', 'pack']);
+/** The parts of a humanoid figure a sprite may let people switch off (rigs/humanoid-figure.js; the cape: rigs/humanoid-studio.js). */
+export const LIBRARY_PARTS = Object.freeze(['held', 'headgear', 'mask', 'scarf', 'belt', 'coat', 'pack', 'cape']);
 
 /** The fields of figure.body a library body's slider may set, each 0..1. */
 export const LIBRARY_BODY_FIELDS = Object.freeze(['height', 'build', 'head']);
@@ -155,6 +156,13 @@ export const HUMANOID_POSE_FIELDS = Object.freeze({
   footF: 'point', footB: 'point', armF: 'arm', armB: 'arm',
   blink: 'flag', flash: 'flag', mouth: 'flag', fire: 'flag',
 });
+
+/**
+ * What a key of a humanoid library body may hold besides HUMANOID_POSE_FIELDS: the fields the figure's own moves add
+ * (rigs/humanoid-figure.js throw, toss, steal; ranges, words and null from rigs/humanoid-studio.js POSE_FIELDS): far
+ * (share), glint (count: a whole number 0..2), prize (flag), knife (word: 'hand' or 'air', or null). air and knife may be null.
+ */
+export const HUMANOID_MOVE_FIELDS = Object.freeze({ far: 'share', glint: 'count', prize: 'flag', knife: 'word' });
 
 /** The pattern of a name inside a definition (bones, shapes, slots, parts, clips, keys of controls): a lowercase letter, then letters, digits and dashes, at most 40. */
 export const ID_PATTERN = /^[a-z][a-zA-Z0-9-]{0,39}$/;
@@ -709,11 +717,12 @@ const FIGURE_SPEC = {
   motion: { bounce: n(0, 1), stride: n(0, 1) },
   look: { skin: COLOUR, top: COLOUR, bottom: COLOUR, boots: COLOUR, bareArms: BOOL },
   hair: { style: oneOf(HAIR_STYLES), colour: COLOUR },
-  held: { kind: oneOf(HELD_KINDS), length: n(0.25, 3), angle: n(-180, 180), metal: COLOUR, wood: COLOUR, hilt: COLOUR, cord: COLOUR },
-  headgear: { kind: oneOf(['none', ...HEADGEAR]), size: n(0.25, 3), colour: COLOUR, band: COLOUR },
+  held: { kind: oneOf(HELD_KINDS), length: n(0.25, 3), angle: n(-180, 180), swing: n(0.5, 1.3), metal: COLOUR, wood: COLOUR, hilt: COLOUR, cord: COLOUR },
+  headgear: { kind: oneOf(['none', ...HEADGEAR, ...HERO_HEADGEAR]), size: n(0.25, 3), colour: COLOUR, band: COLOUR },
   mask: { colour: COLOUR, drape: n(0, 10) },
   scarf: { kind: oneOf(['none', 'short', 'long']), length: n(0.25, 3), colour: COLOUR },
-  belt: { colour: COLOUR, buckle: COLOUR },
+  belt: { style: oneOf(['plain', 'hero']), colour: COLOUR, buckle: COLOUR },
+  cape: { kind: oneOf(['none', ...CAPE_KINDS]), length: n(0.3, 1.8), colour: COLOUR },
   coat: { colour: COLOUR, belt: COLOUR, ragged: n(0, 1), length: n(0, 1.5) },
   pack: { kind: oneOf(['none', ...PACKS]), size: n(0.25, 3), colour: COLOUR, trim: COLOUR, leather: COLOUR, fletching: COLOUR, shaft: COLOUR },
   thrown: { metal: COLOUR, hilt: COLOUR },
@@ -771,7 +780,7 @@ const SPRITE_FIELDS = ['format', 'version', 'id', 'name', 'blurb', 'meta', 'body
 const CONTROL_FIELDS = ['key', 'label', 'lo', 'hi', 'min', 'max', 'default', 'scales', 'sets'];
 const CLIP_FIELDS = ['label', 'frames', 'fps', 'loop', 'keys', 'frameEdits', 'sounds', 'from'];
 const RIG_KEY_FIELDS = ['t', 'ease', 'root', 'bones', 'ik', 'stretch', 'show', 'hide'];
-const LIB_KEY_FIELDS = ['t', 'ease', ...Object.keys(HUMANOID_POSE_FIELDS)];
+const LIB_KEY_FIELDS = ['t', 'ease', ...Object.keys(HUMANOID_POSE_FIELDS), ...Object.keys(HUMANOID_MOVE_FIELDS)];
 const EDIT_FIELDS = ['nudge', 'show', 'hide', 'flash'];
 const SOUND_FIELDS = ['sound', 'frame', 'preset', 'volume'];
 
@@ -906,16 +915,26 @@ function checkKey(C, place, k, facts, lib, frame) {
     else o.ease = k.ease;
   }
   if (lib) {
-    for (const [f, kind] of Object.entries(HUMANOID_POSE_FIELDS)) {
+    for (const [f, kind] of Object.entries({ ...HUMANOID_POSE_FIELDS, ...HUMANOID_MOVE_FIELDS })) {
       const v = k[f];
       if (v === undefined) continue;
+      if (v === null && POSE_FIELDS[f]?.none) { o[f] = null; continue; }
       if (kind === 'flag') { const b = bool(C, place, f, v); if (b !== undefined) o[f] = b; continue; }
+      if (kind === 'word') {
+        if (!POSE_FIELDS[f].values.includes(v)) C.err(`${place}: ${f} must be one of ${listOf(POSE_FIELDS[f].values)}${POSE_FIELDS[f].none ? ' or null' : ''}; got ${say(v)}`);
+        else o[f] = v;
+        continue;
+      }
+      if (kind === 'count') { const x = num(C, place, f, typeof v === 'number' && Number.isFinite(v) ? whole(C, place, f, v) : v, POSE_FIELDS[f].min, POSE_FIELDS[f].max); if (x !== undefined) o[f] = x; continue; }
       if (kind === 'point' || kind === 'arm') {
         const [a, b] = kind === 'point' ? ['x', 'y'] : ['a', 'e'];
         const lim = kind === 'point' ? L.libraryPx : L.angle;
-        if (!isObj(v) || Object.keys(v).length !== 2 || v[a] === undefined || v[b] === undefined) { C.err(`${place}: ${f} must be { ${a}, ${b} }; got ${say(v)}`); continue; }
+        // a foot may also say `up`: its knee bends up (a leg lying on the ground, rigs/humanoid.js die)
+        const extra = kind === 'point' && isObj(v) && v.up !== undefined ? 1 : 0;
+        if (!isObj(v) || Object.keys(v).length !== 2 + extra || v[a] === undefined || v[b] === undefined) { C.err(`${place}: ${f} must be { ${a}, ${b} }${kind === 'point' ? ' (and up: true or false)' : ''}; got ${say(v)}`); continue; }
         const x = num(C, place, `${f}.${a}`, v[a], -lim, lim, { need: true }), y = num(C, place, `${f}.${b}`, v[b], -lim, lim, { need: true });
-        if (x !== undefined && y !== undefined) o[f] = { [a]: x, [b]: y };
+        const up = extra ? bool(C, place, `${f}.up`, v.up) : undefined;
+        if (x !== undefined && y !== undefined && (!extra || up !== undefined)) o[f] = extra ? { [a]: x, [b]: y, up } : { [a]: x, [b]: y };
         continue;
       }
       const [lo, hi] = kind === 'px' ? [-L.libraryPx, L.libraryPx] : kind === 'angle' ? [-L.angle, L.angle] : kind === 'signed' ? [-1, 1] : [0, 1];

@@ -40,6 +40,7 @@ import { ramp, tone, brightness, INK } from '../engine/color.js';
 import { capsuleIn, ellipseIn, polyIn } from '../engine/surface.js';
 import { twinkle } from '../engine/fx.js';
 import { bandTone } from '../engine/tones.js';
+import { blendKeys } from './keypose.js';
 import * as H from './humanoid.js';
 
 const [W, FRAME_H] = H.SIZE;
@@ -528,8 +529,24 @@ const LOOPS = ['idle', 'walk', 'run', 'victory', 'talk'];
 /** The poses whose first frame is already in the middle of the action (the recoil of a hit, the wind-up of a shot), not the idle pose. */
 const STARTS_MOVING = ['hurt', 'die', 'shoot', 'throw'];
 
+/**
+ * The pose of a clip the definition gives as key poses (the studio, docs/studio.md section 3): def.keys[clip] is a list
+ * of keys or { keys, loop }, in the rig's own units (radians, pixels; rigs/humanoid-studio.js converts the studio's
+ * degrees). Blended at phase t by rigs/keypose.js over the rest pose (idle at 0, in the stance); null when the clip has none.
+ */
+function keyedPose(F, t) {
+  const own = F.def.keys && Object.hasOwn(F.def.keys, F.clip) ? F.def.keys[F.clip] : null;
+  const list = Array.isArray(own) ? own : own?.keys;
+  if (!Array.isArray(list) || !list.length) return null;
+  const loop = typeof own.loop === 'boolean' ? own.loop : LOOPS.includes(F.name);
+  F.rest ??= poseAt({ ...F, clip: 'idle', name: 'idle', def: { ...F.def, keys: undefined } }, 0);
+  return blendKeys(list, t, { loop, base: F.rest });
+}
+
 /** The pose of a definition's clip at phase t, with its stance, the way its things are carried, and the frame keeping it in. */
 function poseAt(F, t) {
+  const keyed = keyedPose(F, t);
+  if (keyed) return fitPose(F, keyed);                                   // what a person keyed is what is drawn: no stance or carry laid over it
   const { d, m, held, stance, name } = F;
   const own = MOVES.includes(name);
   const P = own ? move(name, t, m, d) : H.pose(name, t, m, d);
@@ -568,6 +585,12 @@ function poseAt(F, t) {
   P.item2 = lerp(item2, PI / 2 - 0.06, P.lie || 0);
   // how far a sling is flung out: along the swing of an attack, a little at rest
   P.fling = held?.hangs ? lerp(0.2, 1, name === 'attack' ? keys(t, [[0, 0], [0.143, 0.6], [0.286, 1], [0.72, 1], [0.857, 0.4], [1, 0]]) : 0) * up : 0;
+  return fitPose(F, P);
+}
+
+/** A pose of a definition kept inside the frame: the held thing and the headgear (H.fit), changed in place and returned. */
+function fitPose(F, P) {
+  const { d, held, name } = F;
   const [rise, behind] = F.reach, top = d.headR + rise;
   H.fit(P, d, {
     item: held && name === 'die' ? { ...held, pad: held.pad + 1.5 } : held,
