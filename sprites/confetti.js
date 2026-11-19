@@ -60,9 +60,9 @@ export default defineSprite({
     pieces: range('Pieces', 12, { min: 6, max: 18, step: 1, lo: 'Few', hi: 'Many' }),
     spread: range('Spread', 0.5, { lo: 'Tight', hi: 'Wide' }),
     style: choice('Style', 'paper', ['paper', 'streamers', 'glitter']),
-    body: color('Colour 1', P.crimson, BODY),
-    accent: color('Colour 2', P.gold, ACCENT),
-    trim: color('Colour 3', P.hero, TRIM),
+    body: color('Main colour', P.crimson, BODY),
+    accent: color('Accent colour', P.gold, ACCENT),
+    trim: color('Trim colour', P.hero, TRIM),
     speed: range('Speed', 0.5, { lo: 'Slow', hi: 'Fast', group: 'Motion' }),
   },
   clips: {

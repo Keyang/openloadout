@@ -122,7 +122,8 @@
   {
    "id": "mOct",
    "type": "osc",
-   "freq": "glide*2"
+   "freq": "glide*2",
+   "phase": 0.25
   },
   {
    "id": "mTri",
@@ -141,7 +142,8 @@
    "type": "osc",
    "wave": "pulse",
    "width": 0.25,
-   "freq": "glide*2"
+   "freq": "glide*2",
+   "phase": 0.25
   },
   {
    "id": "mBell",
