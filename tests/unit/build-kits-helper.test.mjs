@@ -3,8 +3,8 @@
 // that is too small, a kit the catalogue does not list, and fewer than three kits.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { kitsOf, kitProblems, setProblems, sizeProblems, MIN_KITS } from '../helpers/kits.mjs';
-import { KIT_SIZE, loadPlans, ROOT } from '../../tools/lib/assets.mjs';
+import { kitsOf, kitProblems, setProblems, sizeProblems, isFullKit, MIN_KITS } from '../helpers/kits.mjs';
+import { KIT_SIZE, SMALL_KIT_SIZE, loadPlans, ROOT } from '../../tools/lib/assets.mjs';
 
 const many = (prefix, n) => Array.from({ length: n }, (_, i) => `${prefix}-${i}`);
 
@@ -36,21 +36,36 @@ test('a fourth kit is one more kit to check, not a failure', () => {
   assert.deepEqual(allProblems(s), []);
 });
 
-test('every kit is held to the size, the fourth one too', () => {
-  const s = site([...three, { id: 'kit-d', gameType: 'shooter', sprites: 5, sounds: 2, music: 1 }]);
+test('every kit is held to the size any kit may have, the fourth one too', () => {
+  const s = site([...three, { id: 'kit-d', gameType: 'shooter', sprites: 5, sounds: 2, music: 6 }]);
   const problems = allProblems(s);
   assert.equal(problems.length, 3, problems.join('\n'));
-  assert.match(problems[0], /kit-d holds 5 sprites; a kit holds 40 to 50/);
-  assert.match(problems[1], /kit-d holds 2 sounds; a kit holds 20/);
-  assert.match(problems[2], /kit-d holds 1 music tracks; a kit holds 2/);
-  for (const [field, [lo, hi]] of Object.entries(KIT_SIZE)) {
-    for (const n of [lo, hi]) assert.deepEqual(sizeProblems({ id: 'k', sprites: many('s', KIT_SIZE.sprites[0]), sounds: many('n', KIT_SIZE.sounds[0]), music: many('m', KIT_SIZE.music[0]), [field]: many('x', n) }), [], `${n} ${field} is inside`);
-    for (const n of [lo - 1, hi + 1]) assert.equal(sizeProblems({ id: 'k', sprites: many('s', KIT_SIZE.sprites[0]), sounds: many('n', KIT_SIZE.sounds[0]), music: many('m', KIT_SIZE.music[0]), [field]: many('x', n) }).length, 1, `${n} ${field} is outside`);
+  assert.match(problems[0], /kit-d holds 5 sprites; a kit holds 12 to 50/);
+  assert.match(problems[1], /kit-d holds 2 sounds; a kit holds 8 to 30/);
+  assert.match(problems[2], /kit-d holds 6 music tracks; a kit holds 1 to 4/);
+  const base = { id: 'k', sprites: many('s', SMALL_KIT_SIZE.sprites[0]), sounds: many('n', SMALL_KIT_SIZE.sounds[0]), music: many('m', SMALL_KIT_SIZE.music[0]) };
+  for (const [field, [lo, hi]] of Object.entries(SMALL_KIT_SIZE)) {
+    for (const n of [lo, hi]) assert.deepEqual(sizeProblems({ ...base, [field]: many('x', n) }), [], `${n} ${field} is inside`);
+    for (const n of [lo - 1, hi + 1]) assert.equal(sizeProblems({ ...base, [field]: many('x', n) }).length, 1, `${n} ${field} is outside`);
   }
 });
 
+test('a small kit is allowed beside three full kits, and does not count as one of them', () => {
+  const small = { id: 'kit-d', gameType: 'puzzle', sprites: 24, sounds: 24, music: 4 };
+  const s = site([...three, small]);
+  assert.deepEqual(allProblems(s), []);
+  assert.equal(isFullKit(s.catalog.bundles.find((b) => b.id === 'kit-d')), false);
+  for (const [field, [lo, hi]] of Object.entries(KIT_SIZE)) {
+    const full = { id: 'k', sprites: many('s', KIT_SIZE.sprites[0]), sounds: many('n', KIT_SIZE.sounds[0]), music: many('m', KIT_SIZE.music[0]) };
+    assert.equal(isFullKit({ ...full, [field]: many('x', hi) }), true);
+    assert.equal(isFullKit({ ...full, [field]: many('x', lo - 1) }), false);
+  }
+  const text = allProblems(site([...three.slice(0, 2), { ...small, id: 'kit-c' }])).join('\n');
+  assert.match(text, /there are 2 full kits \(kit-a, kit-b\); there must be at least 3/);
+});
+
 test('fewer than three kits, or fewer than three kinds of game, is said', () => {
-  assert.match(allProblems(site(three.slice(0, 2))).join('\n'), new RegExp(`there are 2 kits .*at least ${MIN_KITS}`));
+  assert.match(allProblems(site(three.slice(0, 2))).join('\n'), new RegExp(`there are 2 full kits .*at least ${MIN_KITS}`));
   const same = allProblems(site([{ id: 'kit-a', gameType: 'platformer' }, { id: 'kit-b', gameType: 'platformer' }, { id: 'kit-c', gameType: 'shooter' }]));
   assert.equal(same.length, 1);
   assert.match(same[0], /2 kinds of game \(platformer, shooter\)/);

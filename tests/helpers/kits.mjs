@@ -7,10 +7,12 @@
 // catalogue the site reads: what each kit holds, its game type, and whether its assets are there.
 //
 // The rules (the first acceptance criterion; goal G1 in docs/progress.md):
-//   - there are at least three kits, for at least three different game types;
-//   - every kit holds 40 to 50 sprites, 20 sounds and 2 music tracks (KIT_SIZE in tools/lib/assets.mjs);
+//   - there are at least three full kits (40 to 50 sprites, 20 sounds and 2 music tracks: KIT_SIZE in
+//     tools/lib/assets.mjs), for at least three different game types;
+//   - every kit, full or small, holds 12 to 50 sprites, 8 to 30 sounds and 1 to 4 music tracks (SMALL_KIT_SIZE:
+//     a kit may be smaller than a full one; Keyang, 2026-11-19);
 //   - every kit is in the catalogue, as its plan describes it, and every asset it lists is in the catalogue.
-import { KIT_SIZE } from '../../tools/lib/assets.mjs';
+import { KIT_SIZE, SMALL_KIT_SIZE } from '../../tools/lib/assets.mjs';
 
 export const MIN_KITS = 3;
 const idsOf = (list) => (list ?? []).map((x) => (typeof x === 'string' ? x : x.id));
@@ -22,10 +24,17 @@ export function kitsOf(catalog, plans) {
   return plans.map(({ id, plan }) => ({ id, plan, bundle: catalog.bundles.find((b) => b.id === id) ?? null }));
 }
 
-/** What is wrong with one kit's size: a list of sentences, empty when it is a full kit. */
+const inside = (bundle, size) => Object.entries(size).every(([field, [lo, hi]]) => bundle[field].length >= lo && bundle[field].length <= hi);
+
+/** Whether a kit's bundle has the size of a full kit (KIT_SIZE). */
+export function isFullKit(bundle) {
+  return inside(bundle, KIT_SIZE);
+}
+
+/** What is wrong with one kit's size: a list of sentences, empty when it is inside the size any kit may have (SMALL_KIT_SIZE). */
 export function sizeProblems(bundle) {
   const out = [];
-  for (const [field, [lo, hi]] of Object.entries(KIT_SIZE)) {
+  for (const [field, [lo, hi]] of Object.entries(SMALL_KIT_SIZE)) {
     const n = bundle[field].length;
     if (n < lo || n > hi) out.push(`${bundle.id} holds ${n} ${words[field]}; a kit holds ${lo === hi ? lo : `${lo} to ${hi}`}`);
   }
@@ -64,11 +73,15 @@ export function kitProblems({ id, plan, bundle }, catalog) {
   return out;
 }
 
-/** What is wrong with the kits as a set: too few of them, or too few kinds of game. A list of sentences. */
-export function setProblems(kits) {
+/**
+ * What is wrong with the kits as a set: too few full kits, or full kits for too few kinds of game. Small kits are
+ * allowed but do not count. A kit the catalogue does not list yet counts (kitProblems reports it). A list of sentences.
+ */
+export function setProblems(allKits) {
   const out = [];
-  if (kits.length < MIN_KITS) out.push(`there ${kits.length === 1 ? 'is' : 'are'} ${kits.length} kit${kits.length === 1 ? '' : 's'} (${kits.map((k) => k.id).join(', ') || 'none'}); there must be at least ${MIN_KITS}`);
+  const kits = allKits.filter((k) => !k.bundle || isFullKit(k.bundle));
+  if (kits.length < MIN_KITS) out.push(`there ${kits.length === 1 ? 'is' : 'are'} ${kits.length} full kit${kits.length === 1 ? '' : 's'} (${kits.map((k) => k.id).join(', ') || 'none'}); there must be at least ${MIN_KITS}`);
   const types = [...new Set(kits.filter((k) => k.bundle && k.bundle.gameType !== 'any').map((k) => k.bundle.gameType))];
-  if (types.length < MIN_KITS) out.push(`the kits are for ${types.length} kind${types.length === 1 ? '' : 's'} of game (${types.join(', ') || 'none'}); there must be kits for at least ${MIN_KITS} different kinds`);
+  if (types.length < MIN_KITS) out.push(`the full kits are for ${types.length} kind${types.length === 1 ? '' : 's'} of game (${types.join(', ') || 'none'}); there must be full kits for at least ${MIN_KITS} different kinds`);
   return out;
 }

@@ -62,9 +62,16 @@ export function loadBundles(root = ROOT) {
 /**
  * What a full game kit holds: [fewest, most] of each kind (the first acceptance criterion: 40 to 50 sprites,
  * 20 sounds and 2 music tracks). tools/bundles-from-plans.mjs says so when a plan is outside it, and
- * tests/e2e/three-bundles.spec.mjs holds every kit to it.
+ * tests/e2e/three-bundles.spec.mjs needs at least three kits of this size.
  */
 export const KIT_SIZE = Object.freeze({ sprites: Object.freeze([40, 50]), sounds: Object.freeze([20, 20]), music: Object.freeze([2, 2]) });
+
+/**
+ * What any kit may hold: [fewest, most] of each kind. A kit can be smaller than a full kit (a falling-block puzzle
+ * needs about 24 sprites, not 40; Keyang, 2026-11-19), so tests/e2e/three-bundles.spec.mjs holds every kit to this
+ * range and only the count of full kits to KIT_SIZE.
+ */
+export const SMALL_KIT_SIZE = Object.freeze({ sprites: Object.freeze([12, 50]), sounds: Object.freeze([8, 30]), music: Object.freeze([1, 4]) });
 
 /**
  * The kit plans: [{ id, file, plan }] from bundles/specs/<id>.plan.json, sorted by id. A plan is everything that

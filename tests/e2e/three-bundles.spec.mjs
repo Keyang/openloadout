@@ -6,8 +6,9 @@
 // change here. Everything else is read from the catalogue the site reads (tests/helpers/kits.mjs has the rules,
 // tests/unit/build-kits-helper.test.mjs proves them on made-up catalogues).
 //
-// Across the kits: there are at least three, for at least three different kinds of game. For each of them: 40 to 50
-// sprites, exactly 20 sounds and exactly 2 music tracks; it is in the catalogue as its plan describes it; every
+// Across the kits: there are at least three full kits (40 to 50 sprites, exactly 20 sounds and exactly 2 music
+// tracks), for at least three different kinds of game. Smaller kits are allowed (Keyang, 2026-11-19). For each kit,
+// full or small: 12 to 50 sprites, 8 to 30 sounds and 1 to 4 tracks; it is in the catalogue as its plan describes it; every
 // asset it lists is in the catalogue and opens on its own page without an error; and the kit opens in the
 // playground with a character the keyboard moves.
 //
@@ -40,13 +41,13 @@ test(`there are at least ${MIN_KITS} kits, for at least ${MIN_KITS} different ki
 });
 
 for (const { id } of PLANS) {
-  test(`${id}: the size of a full kit, every asset in it opens, and the playground has a character the keyboard moves`, async ({ page }) => {
+  test(`${id}: the size of a kit, every asset in it opens, and the playground has a character the keyboard moves`, async ({ page }) => {
     const catalog = readCatalogue(ROOT);
     const kit = kitNamed(catalog, id);
     // not in the catalogue, not the size of a kit, or not what its plan and the catalogue's assets say: stop here, saying which
     expect(kitProblems(kit, catalog), `${id}: against its plan and the catalogue`).toEqual([]);
     const { bundle } = kit;
-    expect(sizeProblems(bundle), `${id}: 40 to 50 sprites, 20 sounds and 2 music tracks`).toEqual([]);
+    expect(sizeProblems(bundle), `${id}: 12 to 50 sprites, 8 to 30 sounds and 1 to 4 music tracks`).toEqual([]);
     const { byId } = catalogueOf(catalog);
     test.setTimeout(180_000 + (bundle.sprites.length + bundle.sounds.length + bundle.music.length) * 8000);
     const listed = [...bundle.sprites.map((a) => ['sprite', a]), ...bundle.sounds.map((a) => ['sound', a]), ...bundle.music.map((a) => ['music', a])];

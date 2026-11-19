@@ -244,6 +244,7 @@ My recommendation, not a decision. As of 22:18 on 2026-11-18, steps 1 to 6 below
 | D17 | Out of this loop: MCP server, studio, physics, 3D, hosting, accounts | Keyang, 2026-11-18 | `docs/progress.md` |
 | D18 | The library plan's direction: reference games are checklists, original worlds, bundles in waves. No production authorised beyond the three kits (P6) | Keyang, 2026-11-18 | `docs/asset-plan.md` |
 | D19 | Local commits allowed, no pushing; folder and skill keep the old name | Keyang, 2026-11-18 | `docs/progress.md`, BASE-1 |
+| D20 | Kits may be smaller than a full kit (12 to 50 sprites, 8 to 30 sounds, 1 to 4 tracks); the acceptance test still needs three full kits (D16) | Keyang, 2026-11-19 | `SMALL_KIT_SIZE` in `tools/lib/assets.mjs`, `tests/helpers/kits.mjs` |
 
 ### Open, for Keyang
 

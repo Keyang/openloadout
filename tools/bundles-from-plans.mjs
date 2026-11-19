@@ -92,7 +92,7 @@ function sizeNote(bundle) {
   if (!off.length) return null;
   const tracks = (kind) => (kind === 'music' ? 'music tracks' : kind);
   return `a full kit holds ${Object.entries(KIT_SIZE).map(([kind, r]) => `${range(r)} ${tracks(kind)}`).join(', ')}; `
-    + `this plan lists ${off.map(([kind]) => `${bundle[kind].length} ${tracks(kind)}`).join(' and ')}. The site's acceptance test (tests/e2e/three-bundles.spec.mjs) holds every kit to that size.`;
+    + `this plan lists ${off.map(([kind]) => `${bundle[kind].length} ${tracks(kind)}`).join(' and ')}. A smaller kit is allowed (SMALL_KIT_SIZE in tools/lib/assets.mjs); the site's acceptance test (tests/e2e/three-bundles.spec.mjs) needs at least three full kits.`;
 }
 
 async function main(args) {
