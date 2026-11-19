@@ -16,7 +16,7 @@ import { restoreRuntime, madeItemState } from './api.js';      // W5-A, W5-B: wh
 import { packageFiles, defaultCues, activeTheme, kindMatches } from './bundle.js';
 import { zip } from './zip.js';
 import { themeControls } from './theme-controls.js';   // W2-D2
-import { spriteChanges, soundChanges, inWords } from './changes.js';   // what was changed, in plain words
+import { spriteChanges, soundChanges, inWords, packageWords } from './changes.js';   // what was changed, in plain words
 
 const INK = '#231b33', SHELF = '#f5f5f3', QUIET = '#b9b9b4';
 const KIND_LABEL = { sprite: 'Sprite', sound: 'Sound', music: 'Music' };
@@ -60,6 +60,7 @@ export function changeLink(item) {
     }
     if (item.kind === 'sound' && s.seed && s.seed !== 1) q.set('seed', String(s.seed));
   }
+  if (lookOf(s)) q.set('artlook', lookOf(s));      // its own look (the Look tab): the page opens wearing it
   q.set('bag', item.key);
   return `#/${item.kind}/${item.id}?${q}`;
 }
@@ -232,16 +233,18 @@ function describe(item, theme = null) {
     const used = sprite && theme ? spriteLook(sprite, s.params ?? {}, theme, { record: lookOf(s) ? undefined : s.lookParams }) : null;
     if (sprite) changes = spriteChanges(sprite, used ? used.params : s.params ?? {});
     const style = sprite ? artStyleOf(sprite, s.artStyle) : null;
-    parts = [changes.length ? inWords(changes) : 'Standard look', used && used.changed.length ? 'shapes changed by the bag\'s look' : null, style && style !== stylesOf(sprite)[0] ? `${styleById(style).label} style` : null, s.scale > 1 ? `pixel size ${s.scale}×` : null];
+    // (what it is as it comes is left unsaid: "look" means a colour look such as Night, and only a change is named)
+    parts = [changes.length ? inWords(changes) : null, used && used.changed.length ? 'shapes changed by the bag\'s look' : null, style && style !== stylesOf(sprite)[0] ? `${styleById(style).label} style` : null, s.scale > 1 ? `pixel size ${s.scale}×` : null];
   } else {
     const patch = soundById[item.id];
     if (patch) changes = soundChanges(patch, s.style, soundParams(patch, s.style, s.params));
-    parts = [s.style ? `${s.style} style` : 'Standard style', changes.length ? inWords(changes).toLowerCase() : null];
+    parts = [s.style ? `${s.style} version` : null, changes.length ? inWords(changes).toLowerCase() : null];
   }
   // an item that wears a look of its own, whatever the bag's look is, says which
   const own = lookOf(s);
-  if (own) { parts = parts.filter((x) => x !== 'Standard look' && x !== 'Standard style'); parts.push(own === 'original' ? 'keeps its own colours' : `${THEME_PRESETS.find((p) => p.id === own).name} look`); }      // its own look is its look: not "Standard look" as well
-  return { text: parts.filter(Boolean).join(', '), all: changes.length > 3 ? inWords(changes, changes.length) : null };
+  if (own) parts.push(own === 'original' ? 'keeps its own colours' : `${THEME_PRESETS.find((p) => p.id === own).name} look`);
+  const text = parts.filter(Boolean).join(', ');
+  return { text: text ? text[0].toUpperCase() + text.slice(1) : 'No changes yet', all: changes.length > 3 ? inWords(changes, changes.length) : null };
 }
 
 export function bagPage(app, query = {}, isCurrent = () => true) {
@@ -268,19 +271,26 @@ export function bagPage(app, query = {}, isCurrent = () => true) {
   // ==== end W2-G ====
   let pictures = [], raf = 0, confirming = false, busy = false;
   const status = el('p', { class: 'status', role: 'status' });
-  const say = (msg) => { status.textContent = msg; };
+  // What a status line says is about the bag as it was then ("Link copied", "Opened a shared bag", "Downloaded …"): once
+  // the bag holds something else, it no longer applies and goes (build() clears it).
+  // (what the look recorded of a sprite is filled in as its program arrives: that is not the bag changing)
+  const bagNow = () => JSON.stringify([bag.items().map((i) => { const { lookParams, ...rest } = i.settings ?? {}; return [i.key, rest]; }), bag.theme()]);
+  let statusFor = '', noteFor = '';
+  const say = (msg) => { status.textContent = msg; statusFor = bagNow(); };
   const linkNote = el('p', { class: 'bag-link-note', role: 'status' });
+  const noted = () => { noteFor = bagNow(); };
 
   // A shared bag arrived in the address.
   let offer = null;
   if (query.load) {
     const peek = bag.peekLink(query.load);
-    if (!peek) linkNote.textContent = 'That bag link is damaged, so nothing was added.';
+    if (!peek) { linkNote.textContent = 'That bag link is damaged, so nothing was added.'; noted(); }
     // W5-A: a sprite made on someone's visit is a small program. It is not run until the visitor says so.
     else if (peek.code) offer = { text: query.load, count: peek.count, code: peek.code, alone: !bag.count() };
     else if (!bag.count()) {
       const n = bag.fromLink(query.load);
       linkNote.textContent = `Opened a shared bag with ${n} item${n === 1 ? '' : 's'}.`;
+      noted();
     } else offer = { text: query.load, count: peek.count };
     history.replaceState(null, '', '#/bag');
   }
@@ -302,47 +312,78 @@ export function bagPage(app, query = {}, isCurrent = () => true) {
     const hide = on && covers.matches;
     for (const n of [list, app.querySelector('header.top')]) if (n) n.inert = hide;
   };
-  const onResize = () => behind(!!open);
+  const onResize = () => { behind(!!open); fitSide(); };
   covers.addEventListener('change', onResize);
-  function closePanel({ focus = false } = {}) {
+  // Beside the list the panel fills the window below whatever of the header is still in view, so its footer is never
+  // below the window's edge, whether the page is scrolled or not.
+  let fitting = 0;
+  function fitSide() {
+    if (!open || covers.matches) { side.style.height = ''; return; }
+    side.style.height = `${Math.round(window.innerHeight - Math.max(0, main.getBoundingClientRect().top))}px`;
+  }
+  const onScroll = () => { if (!fitting && open) fitting = requestAnimationFrame(() => { fitting = 0; fitSide(); }); };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onResize);
+  // An open panel is a step of its own for the browser's Back: Back closes it and stays on the bag, a second Back leaves.
+  // (The address stays #/bag; the step carries the item's key, so coming back to it opens the same panel.)
+  const ours = () => !!(history.state && history.state.bagPanel);
+  let popping = false;      // a Back asked for by closing the panel by hand, not yet arrived
+  function closePanel({ focus = false, pop = true } = {}) {
     if (!open) return;
     if (side.contains(document.activeElement)) focus = true;
     const key = open.key;
     open.editor.close();
     open = null;
+    if (pop && ours() && !popping) { popping = true; history.back(); }      // closed by hand: the step that opened it goes too
     side.hidden = true; side.replaceChildren();
     main.classList.remove('has-panel');
+    side.style.height = '';
     behind(false);
     for (const li of list.querySelectorAll('.bag-item[aria-current]')) li.removeAttribute('aria-current');
     if (focus) (list.querySelector(`.bag-item[data-key="${key}"] .bag-open`) ?? list.querySelector('.bag-open, a, button'))?.focus();
   }
-  function openPanel(key) {
+  function openPanel(key, { step = true } = {}) {
     if (open && open.key === key) return;
     const item = bag.get(key);
     if (!item) return;
     const asset = item.kind === 'sprite' ? spriteNow(item.id) : soundById[item.id];
     if (!asset || !kindMatches(item.kind, item.id) || remake(item)) return;
-    closePanel();
-    const editor = itemEditor(item, asset);
-    const playBtn = item.kind === 'sprite' ? null : el('button', { type: 'button', class: 'btn btn-sm btn-secondary bag-side-play', onclick: async () => { await editor.play(); syncPlay(); } });
-    const syncPlay = () => { if (!playBtn) return; const w = editor.playing() ? 'Stop' : 'Play'; playBtn.textContent = w; playBtn.setAttribute('aria-label', `${w} ${asset.name} as it is set here`); };
-    syncPlay();
-    const tick = playBtn ? setInterval(syncPlay, 300) : 0;
-    const shut = editor.close;
-    editor.close = () => { clearInterval(tick); shut(); };
+    // the row that was clicked stays where it was on screen, although the list beside the panel is narrower
+    const rowAt = (k) => list.querySelector(`.bag-item[data-key="${k}"]`)?.getBoundingClientRect().top ?? null;
+    const was = rowAt(key);
+    const wasOpen = !!open;
+    closePanel({ pop: false });
+    const pageLink = el('a', { class: 'btn btn-sm btn-secondary', href: changeLink(item), onclick: (e) => { editor.edit.flush(); e.currentTarget.setAttribute('href', changeLink(bag.get(key) ?? item)); } }, 'Open its page');
     const head = el('div', { class: 'bag-side-head' },
       el('div', { class: 'bag-side-title' }, el('h2', { class: 'h4', tabindex: '-1' }, asset.name), el('span', { class: 'quiet' }, KIND_LABEL[item.kind])),
-      playBtn,
-      el('a', { class: 'btn btn-sm btn-secondary', href: changeLink(item), onclick: (e) => { editor.edit.flush(); e.currentTarget.setAttribute('href', changeLink(bag.get(key) ?? item)); } }, 'Open its page'),
+      pageLink,
       el('button', { type: 'button', class: 'icon-btn bag-side-close', 'aria-label': 'Close the panel', onclick: () => closePanel({ focus: true }) }, '×'));
+    const editor = itemEditor(item, asset, { head, onCopyLink: copyBagLink });
+    // the way to its page carries the item as it is now (its look too)
+    const offLink = editor.edit.onChange(() => { const now = bag.get(key); if (now) pageLink.setAttribute('href', changeLink(now)); });
+    const shut = editor.close;
+    editor.close = () => { offLink(); shut(); };
     open = { key, editor, head };
-    side.replaceChildren(head, editor.node);
+    side.replaceChildren(editor.node);
     side.hidden = false;
     main.classList.add('has-panel');
     behind(true);
-    head.querySelector('h2').focus({ preventScroll: true });      // the keyboard goes into the panel; closing it gives it back to the row
+    // (while a Back asked for by a close is still on its way, the new step is added once it has arrived: see onPop)
+    if (step && !popping) { if (wasOpen && ours()) history.replaceState({ bagPanel: key }, ''); else history.pushState({ bagPanel: key }, ''); }
     for (const li of list.querySelectorAll('.bag-item')) { if (li.dataset.key === key) li.setAttribute('aria-current', 'true'); else li.removeAttribute('aria-current'); }
+    const now = rowAt(key);
+    if (was !== null && now !== null && Math.abs(now - was) > 1 && !covers.matches) window.scrollBy(0, now - was);
+    fitSide();
+    head.querySelector('h2').focus({ preventScroll: true });      // the keyboard goes into the panel; closing it gives it back to the row
   }
+  // Back (or Forward) to a step: the panel that step had open, or none
+  const onPop = () => {
+    if (popping) { popping = false; if (open) history.pushState({ bagPanel: open.key }, ''); return; }
+    const want = history.state && history.state.bagPanel;
+    if (want && bag.get(want)) { if (!open || open.key !== want) openPanel(want, { step: false }); }
+    else closePanel({ pop: false, focus: !!open });
+  };
+  window.addEventListener('popstate', onPop);
   const onKey = (e) => { if (e.key === 'Escape' && open && !e.defaultPrevented && !side.querySelector('.menu:not([hidden])')) closePanel({ focus: true }); };
   document.addEventListener('keydown', onKey);
 
@@ -361,6 +402,7 @@ export function bagPage(app, query = {}, isCurrent = () => true) {
       const alone = offer.alone;
       offer = null;
       linkNote.textContent = n === null ? 'That bag link is damaged, so nothing was added.' : alone ? `Opened a shared bag with ${n} item${n === 1 ? '' : 's'}.` : mode === 'add' ? `Added ${n} item${n === 1 ? '' : 's'} from the shared bag.` : `Your bag now holds the shared bag's ${n} item${n === 1 ? '' : 's'}.`;
+      noted();
       build();
     };
     const ignore = el('button', { type: 'button', class: 'btn btn-sm btn-secondary', onclick: () => { offer = null; build(); } }, 'Ignore the link');
@@ -380,13 +422,18 @@ export function bagPage(app, query = {}, isCurrent = () => true) {
     bag.remove(item.key);
   } }, 'Remove');
 
-  // the picture opens the panel too (the row's button is what the keyboard and a screen reader use)
-  function picBox(pic, key) {
+  // the whole row opens the panel (its picture, its words, the space between); the row's button is what the keyboard and
+  // a screen reader use. Its own buttons and links (Play, Open its page, Remove) do what they say instead.
+  function picBox(pic) {
     const box = pic.node.matches('canvas') ? el('div', { class: 'bag-pic' }, pic.node) : pic.node;
     box.classList.add('opens');
-    box.addEventListener('click', (e) => { if (!e.target.closest('button')) openPanel(key); });
     return box;
   }
+  const opensRow = (li, key) => {
+    li.classList.add('opens');
+    li.addEventListener('click', (e) => { if (!e.target.closest('a, button:not(.bag-open), input, label, summary, details') && !getSelection().toString()) openPanel(key); });
+    return li;
+  };
 
   function row(item, theme) {
     const sprite = item.kind === 'sprite' ? spriteNow(item.id) : null;
@@ -431,8 +478,8 @@ export function bagPage(app, query = {}, isCurrent = () => true) {
       // (an unchanged one says so once, in its words beside the name: "Standard look")
       n ? el('span', { class: 'bag-changes is-changed' }, el('span', { class: 'dot', 'aria-hidden': 'true' }), `${n} ${n === 1 ? 'change' : 'changes'}`) : null,
       sprite ? el('span', { class: 'bag-size num' }, `${sprite.size[0] * scale} × ${sprite.size[1] * scale}`, el('small', {}, ` pixel size ${scale}×`)) : null);
-    return el('li', { class: 'bag-item' + (gone ? ' is-gone' : ''), 'data-key': item.key, 'aria-current': open && open.key === item.key ? 'true' : null },
-      pic ? picBox(pic, item.key) : el('div', { class: 'bag-pic gone tile' }),
+    const li = el('li', { class: 'bag-item' + (gone ? ' is-gone' : ''), 'data-key': item.key, 'aria-current': open && open.key === item.key ? 'true' : null },
+      pic ? picBox(pic) : el('div', { class: 'bag-pic gone tile' }),
       gone ? el('div', { class: 'bag-text' }, words)
         : el('button', { type: 'button', class: 'bag-text bag-open', 'aria-label': `Change ${name}`, 'aria-haspopup': 'true', onclick: () => openPanel(item.key) }, words),
       facts,
@@ -447,6 +494,7 @@ export function bagPage(app, query = {}, isCurrent = () => true) {
           build();
         } }, 'Add another copy'),
         removeBtn(item, name)));
+    return gone ? li : opensRow(li, item.key);
   }
 
   // ---- export: one Download for everything
@@ -482,8 +530,7 @@ export function bagPage(app, query = {}, isCurrent = () => true) {
     try {
       const files = await packageFiles({ items, theme: bag.theme(), scale: 1, onProgress: say });
       saveBlob(zip(files), 'loadout-package.zip');
-      const n = (ext) => files.filter((f) => f.name.endsWith(ext)).length;
-      say(`Downloaded loadout-package.zip: ${n('.png')} sprite sheet${n('.png') === 1 ? '' : 's'}, ${n('.wav')} sound file${n('.wav') === 1 ? '' : 's'}, a list of everything and a guide.`);
+      say(`Downloaded loadout-package.zip: ${packageWords(files.map((f) => f.name))}.`);
     } catch (e) {
       console.warn(e);
       say(`The download did not start: ${e.message}. Try again, or use a different browser.`);
@@ -491,15 +538,24 @@ export function bagPage(app, query = {}, isCurrent = () => true) {
     busy = false; syncDownload();
   }
 
+  /** Copy the bag's link, for the panel's footer (when the browser will not keep the bag): what to say. */
+  async function copyBagLink() {
+    const url = `${location.origin}${location.pathname}${bag.toLink()}`;
+    if (bag.madeCount() && url.length > LINK_LIMIT) { await copyLink(); return 'This bag is too long for a link. Download it instead.'; }
+    try { await navigator.clipboard.writeText(url); return 'Link to your bag copied. Open it later to get these same things back.'; }
+    catch { await copyLink(); return 'Your browser did not allow copying. The link is under the bag\'s heading.'; }
+  }
   async function copyLink() {
     const url = `${location.origin}${location.pathname}${bag.toLink()}`;
     // W5-A: an item made on a visit travels with its whole source, which can make the link longer than a link can safely be
     if (bag.madeCount() && url.length > LINK_LIMIT) {
       linkNote.textContent = `This bag is too long for a link: it holds ${bag.madeCount() === 1 ? 'something' : 'things'} made on a visit, which travel${bag.madeCount() === 1 ? 's' : ''} with ${bag.madeCount() === 1 ? 'its' : 'their'} whole source, and the link would be ${url.length.toLocaleString('en')} characters long. Chat and mail apps cut links over ${LINK_LIMIT.toLocaleString('en')} characters short, so no link was made. Download the package instead: it holds everything, the source too.`;
+      noted();
       return;
     }
     try { await navigator.clipboard.writeText(url); linkNote.textContent = 'Link copied. Anyone who opens it gets a bag with these same items and settings.'; }
     catch { linkNote.textContent = 'Your browser did not allow copying. Select the link below and copy it.'; linkNote.append(el('input', { class: 'bag-link-text', readonly: true, value: url, 'aria-label': 'Link to this bag' })); }
+    noted();
   }
 
   function notKept(n) {
@@ -550,6 +606,10 @@ export function bagPage(app, query = {}, isCurrent = () => true) {
     fetchSprites(items);   // W2-G
     if (items.some(pendingMade)) restoreRuntime(true).then(() => { if (here() && !bag.items().some(pendingMade)) build(); });      // W5-B: drawn again once each is back, or known to need re-making
     if (!items.length) confirming = false;
+    // status lines about a bag that has changed since go (a copied link of a bag that is now emptied, an old download)
+    const sig = bagNow();
+    if (linkNote.textContent && sig !== noteFor) linkNote.replaceChildren();
+    if (status.textContent && sig !== statusFor && !busy) status.textContent = '';
     const counts = ['sprite', 'sound', 'music'].map((k) => [k, items.filter((i) => i.kind === k).length]).filter(([, c]) => c);
     list.replaceChildren(...[
       el('div', { class: 'bag-head' },
@@ -570,7 +630,7 @@ export function bagPage(app, query = {}, isCurrent = () => true) {
           el('ul', { class: 'bag-list' }, listRows(items, theme)),
           lookBox,   // W2-D2
         ]
-        : el('p', {}, el('a', { class: 'btn btn-primary', href: '#/browse' }, 'Browse the catalogue')),
+        : el('p', { class: 'bag-empty-go' }, el('a', { class: 'btn btn-primary', href: '#/browse' }, 'Browse the catalogue')),
     ].flat(Infinity).filter((k) => k != null && k !== false));
     for (const pic of pictures) {
       const cv = pic.node.matches('canvas.tile') ? pic.node : pic.node.querySelector('canvas.tile');
@@ -588,5 +648,8 @@ export function bagPage(app, query = {}, isCurrent = () => true) {
   build();
   const off = bag.onChange(build);
   const offMade = onCatalogChange(() => { if (here()) build(); });      // W5-A: an asset made on a visit has been brought back (or made again)
-  return () => { left = true; off(); offMade(); cancelAnimationFrame(raf); stopPictures(); document.removeEventListener('keydown', onKey); covers.removeEventListener('change', onResize); closePanel(); };
+  // coming back (Back, Forward, a reload) to a step that had a panel open opens it again
+  const back = history.state && history.state.bagPanel;
+  if (back && bag.get(back)) openPanel(back, { step: false });
+  return () => { left = true; off(); offMade(); cancelAnimationFrame(raf); stopPictures(); document.removeEventListener('keydown', onKey); window.removeEventListener('popstate', onPop); window.removeEventListener('scroll', onScroll); window.removeEventListener('resize', onResize); cancelAnimationFrame(fitting); covers.removeEventListener('change', onResize); closePanel({ pop: false }); };
 }

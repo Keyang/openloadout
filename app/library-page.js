@@ -1,6 +1,7 @@
 // The library, #/browse (docs/site-design.md, section 5; the picture to match is mocks/5-catalogue/library.html).
 // Top to bottom: the search box with "Smarter search"; the kind tabs with their numbers (All, Sprites, Sounds, Music,
-// Kits); one row of filters as small menus, where a chosen value becomes a black token with a ×; the number of results,
+// Kits); one row of filters as small menus, where a chosen value becomes a black token with a × (the chosen kind shows
+// as a token first in the row, and "Clear all", offered from the first choice, lets go of it too); the number of results,
 // the sort and the grid or list switch; then the results, as cards or as rows with more facts.
 //
 // Everything is drawn from the catalogue: no asset file is loaded to list it, and a card is only made when its place
@@ -168,6 +169,12 @@ export function libraryPage(app, query) {
     if (keys.some((k) => STYLE_KEYS.includes(k))) memory.remember(state);
     changed();
   }
+  /** Every filter and the kind go; the words typed stay. */
+  function clearAll() {
+    extras = { ...extras, kits: false };
+    clearFilters([...FILTER_KEYS, 'kind']);
+    tabs.querySelector('[data-kind="all"]')?.focus();       // the button pressed is gone: the focus waits on All
+  }
   function search(text) { input.value = text; state = { ...state, q: text }; changed(); }
   function setKind(kind) {
     openKey = null;
@@ -333,8 +340,15 @@ export function libraryPage(app, query) {
           : [parts[0].opts.map((o) => item(f.key, o)), remembered(f)]);
       nodes.push(el('div', { class: 'menu-wrap filter', role: 'group', 'aria-label': f.label, 'data-filter': f.key }, heads, menu));
     }
-    if (chosen.filter((c) => c.key !== 'kind').length > 1) {
-      nodes.push(el('button', { type: 'button', class: 'lib-clear', onclick: () => { openKey = null; clearFilters(FILTER_KEYS); } }, 'Clear all'));
+    // the kind chosen with the tabs is a choice too: it shows as a token first in the row, and Clear all lets go of it
+    const kindLabel = extras.kits ? 'Kits' : TABS.find(([k]) => k === state.kind)?.[1] ?? null;
+    if (kindLabel) {
+      nodes.unshift(el('span', { class: 'kind-token', 'data-kind-token': '' },
+        el('span', { class: 'what' }, el('small', {}, 'Kind'), kindLabel),
+        el('button', { type: 'button', class: 'x', 'aria-label': `Remove the filter Kind: ${kindLabel}`, onclick: () => { openKey = null; setKind('all'); tabs.querySelector('[data-kind="all"]')?.focus(); } }, icon(I.x))));
+    }
+    if (kindLabel || chosen.some((c) => c.key !== 'kind')) {
+      nodes.push(el('button', { type: 'button', class: 'lib-clear', onclick: () => { openKey = null; clearAll(); } }, 'Clear all'));
     }
     // what had the focus keeps it when the row is drawn again (results arriving while a menu is open)
     const at = document.activeElement, held = at instanceof HTMLElement && filters.contains(at) ? { ...at.dataset } : null;

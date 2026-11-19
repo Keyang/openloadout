@@ -21,9 +21,9 @@ const MUSIC = { kind: 'music', id: 'battle-theme', settings: {} };
 test('a row says how much was changed and the pixel size; nothing is open until a row is clicked', async ({ page }) => {
   await openBag(page, [HERO, AXE, SOUND]);
   await expect(side(page)).toBeHidden();
-  // an unchanged one says so once ("Standard look"), not twice
+  // an unchanged one says so once ("No changes yet"), not twice
   await expect(items(page).nth(0).locator('.bag-changes')).toHaveCount(0);
-  await expect(items(page).nth(0).locator('.bag-text .hint')).toHaveText('Standard look');
+  await expect(items(page).nth(0).locator('.bag-text .hint')).toHaveText('No changes yet');
   await expect(items(page).nth(0)).not.toContainText('As the original');
   await expect(items(page).nth(0).locator('.bag-size')).toContainText('64 × 64');
   await expect(items(page).nth(1).locator('.bag-changes')).toHaveText('2 changes');
@@ -46,7 +46,7 @@ test('clicking a row opens the panel beside the list; a change there is saved to
   await expect(side(page).locator('.rx-panel')).toHaveAttribute('aria-label', 'Change Hero');
   await expect(row).toHaveAttribute('aria-current', 'true');
   await expect(page).toHaveURL(/#\/bag$/);
-  await expect(savedState(page)).toContainText('Saved in your bag');
+  await expect(savedState(page)).toContainText(/In your bag[\s·]*0 changes/);      // an unchanged item is in the bag, not "Saved" (J4.2)
   // beside the list on a wide window
   const l = await page.locator('.bag-list').boundingBox(), p = await side(page).boundingBox();
   expect(p.x).toBeGreaterThanOrEqual(l.x + l.width);
@@ -54,6 +54,7 @@ test('clicking a row opens the panel beside the list; a change there is saved to
   await (await showControl(page, 'weapon')).getByRole('button', { name: 'Spear' }).click();
   await expect.poll(async () => (await bagItems(page)).find((i) => i.key === first.key).settings.params.weapon).toBe('spear');
   await expect(row.locator('.bag-changes')).toHaveText('1 change');
+  await expect(savedState(page)).toContainText('Saved in your bag');
   await expect(row.locator('.bag-text .hint')).toContainText(/spear/i);
   await expect.poll(async () => (await canvasStats(items(page).nth(0).locator('canvas.tile'))).hash, { message: 'the row shows the spear' }).not.toBe(plain);
   await setRange((await showControl(page, 'height')).locator('input[type=range]'), 'max');
@@ -152,9 +153,9 @@ test('an item with a look of its own is drawn, edited, shared and downloaded wit
   await openBag(page, [HERO, { kind: 'sprite', id: 'knight', settings: { look: 'frost' } }, { kind: 'sound', id: 'coin-pickup', settings: { look: 'frost' } }, SOUND]);
   const tile = (i) => items(page).nth(i).locator('canvas.tile');
   await expect.poll(async () => (await canvasStats(tile(0))).hash !== (await canvasStats(tile(1))).hash, { message: 'the Frost one is drawn in Frost' }).toBe(true);
-  await expect(items(page).nth(1).locator('.bag-text .hint')).toHaveText('Frost look');      // its own look only, not "Standard look" as well
+  await expect(items(page).nth(1).locator('.bag-text .hint')).toHaveText('Frost look');      // its own look only, not "No changes yet" as well
   await expect(items(page).nth(2).locator('.bag-text .hint')).toHaveText('Frost look');
-  await expect(items(page).nth(0).locator('.bag-text .hint')).toHaveText('Standard look');
+  await expect(items(page).nth(0).locator('.bag-text .hint')).toHaveText('No changes yet');
   await expect(items(page).nth(0).locator('.bag-text .hint')).not.toContainText('look,');
   const frost = (await canvasStats(tile(1))).hash;
 

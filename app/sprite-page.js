@@ -92,6 +92,9 @@ class StyleFrames {
   }
 }
 
+/** The visitor asked for less motion: pictures do not move by themselves. */
+const still = () => typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 export function spritePage(app, sprite, query) {
   document.title = `${sprite.name} · Loadout`;
   // what the preview stands on suits what the sprite is (app/stage.js): a scene with ground, a plain panel for an
@@ -135,7 +138,8 @@ export function spritePage(app, sprite, query) {
     p: cleanParams(sprite, s0.params),
     clip: clipNames.includes(query.clip) ? query.clip : sprite.preview,
     cues: s0.cues ?? spriteCues(sprite),
-    playing: true,
+    // (with reduced motion asked for, it stands still until Play is pressed: J13.2)
+    playing: !still(),
     // (the visitor's last choice; without one, a character or a creature stands in its scene and anything else is shown plain)
     stage: stageChoices.some((s) => s.id === keptStage(store.get(stageKey))) ? keptStage(store.get(stageKey)) : backdrop === 'ground' ? defaultStage(about) : stageChoices[0]?.id ?? null,
     look: lookOf(s0),      // its own look (the Look tab): one of the named whole-set looks, saved with it like any setting; null while it follows the bag
@@ -233,7 +237,8 @@ export function spritePage(app, sprite, query) {
   syncPlay();
 
   const setClip = (name) => {
-    st.clip = name; st.start = performance.now(); st.playing = true; st.lastFrame = -1; syncPlay();
+    // (another animation plays from its start; with reduced motion it shows its first frame until Play is pressed)
+    st.clip = name; st.start = performance.now(); st.playing = !still(); st.lastFrame = -1; st.frame = 0; syncPlay();
     for (const b of clipBar.children) b.setAttribute('aria-pressed', String(b.dataset.clip === name));
     buildStrip(); buildCues(); syncLoops(); saveUrl();
   };

@@ -14,10 +14,10 @@
 .rx-stage { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); grid-auto-rows: auto; gap: var(--s3); padding: var(--s5) var(--gutter); min-height: 0; min-width: 0; }
 .rx-head { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2px; min-width: 0; }
 .rx-head h1 { font-size: 28px; line-height: 1.1; letter-spacing: -0.035em; font-weight: 600; }
-.rx-head .blurb { font-size: 14px; color: var(--ink-2); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.rx-head .blurb { font-size: 14px; color: var(--ink-2); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
 .rx-head .made-here { font-size: 13px; padding: var(--s1) var(--s2); background: var(--shelf); border-radius: var(--r); justify-self: start; }
 .related { display: grid; grid-template-columns: minmax(0, 1fr); margin-top: 2px; }
-.rel { font-size: 13px; line-height: 1.5; color: var(--ink-2); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.rel { font-size: 13px; line-height: 1.5; color: var(--ink-2); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
 .rel-label::after { content: ':'; }
 .rel a { color: var(--ink); text-decoration: underline; text-decoration-color: var(--line-2); text-underline-offset: 3px; }
 .rel a:hover { text-decoration-color: var(--ink); }
@@ -108,7 +108,7 @@ canvas.stage { position: absolute; display: block; }
 /* a sound's and a track's looks: no picture, so each is a bordered button with its name and what is heard */
 .sound-looks { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px; }
 .sound-looks .vbtn { text-align: left; padding: 6px var(--s3); border: 1px solid var(--line-2); border-radius: var(--r); background: var(--paper); }
-.sound-looks .vbtn .name { padding: 0; color: var(--ink); font-size: 13px; white-space: nowrap; }
+.sound-looks .vbtn .name { padding: 0; color: var(--ink); font-size: 13px; white-space: normal; }
 .sound-looks .what { display: block; font-size: 12px; line-height: 1.3; color: var(--ink-2); }
 .sound-looks .vbtn:hover { border-color: var(--ink); }
 .sound-looks .vbtn[aria-pressed='true'] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
@@ -129,20 +129,29 @@ canvas.stage { position: absolute; display: block; }
 .vnav .icon-btn:disabled { opacity: 0.35; cursor: default; border-color: var(--line-2); }
 /* a tab longer than its room scrolls inside itself, and says so: a line and a fade at the edge there is more beyond */
 .pane { background: linear-gradient(var(--paper) 40%, transparent) top / 100% 28px no-repeat local, linear-gradient(transparent, var(--paper) 60%) bottom / 100% 28px no-repeat local, linear-gradient(var(--line-2), transparent) top / 100% 10px no-repeat scroll, linear-gradient(transparent, var(--line-2)) bottom / 100% 10px no-repeat scroll; }
-/* the browser is not keeping the bag: one short line (the whole of it is under the header) */
-.rx-foot .saved.is-warn { flex: 1 1 0; padding: 0; background: none; align-items: center; }
-.rx-foot:has(.saved.is-warn) { flex-wrap: nowrap; }
 .block-head .hint { display: inline; }
 .rx-panel .block-head h2 { margin-right: 0; }
 /* (no room for the version's name beside the arrows in a narrow panel: it goes, not half of it; the tile itself is marked) */
 @container (max-width: 560px) { .block-head:has(.vnav:not([hidden])) .hint { display: none; } .block-head:has(.vnav:not([hidden])) h2 { margin-right: auto; } }
-/* the footer fits its panel, whatever the panel's width: first the labels go, then the longer words */
+/* the footer fits its panel, whatever the panel's width (J3.2, J8.2): nothing it says goes. The saved state is two
+   short lines (what is kept, then how many changes) and the pixel size says what it is and how big the pictures will
+   be, also two lines beside its choice. On an asset page (main.rx); the bag's and the playground's panels keep theirs */
 .rx-foot { container-type: inline-size; }
 .rx-panel { container-type: inline-size; }
-@container (max-width: 860px) { .size .lbl { display: none; } }
-@container (max-width: 760px) { .size .num { display: none; } }
-@container (max-width: 690px) { .saved.is-idle { display: none; } .rx-foot .add-btn { margin-right: auto; } .block-head .hint-help { display: none; } }
-@container (max-width: 520px) { .saved .saved-rest, .saved small { display: none; } }
+@container (max-width: 690px) { .block-head .hint-help { display: none; } }
+/* (the saved state's two lines and the pixel size's are in base.css, for every panel) */
+/* changes that are not in the bag yet (a link's, the landing's): said plainly, with a grey dot; in a narrow panel on a
+   line of its own over Add to my bag and the rest (J9.2, J1.2) */
+.saved.is-unsaved .dot { background: var(--line-2); }
+/* (an asset that is not in the bag, with changes or none: Add to my bag takes the room its words would have, so in a
+   narrow panel they are one short line of their own over the buttons, never hidden: J3.2, J9.2) */
+@container (max-width: 690px) {
+  main.rx .rx-foot:has(.saved.is-unsaved, .saved.is-idle:not(.is-warn)):has(.size) { flex-wrap: wrap; row-gap: 6px; padding-top: var(--s2); }
+  main.rx .rx-foot:has(.size) .saved:is(.is-unsaved, .is-idle):not(.is-warn) { flex-basis: 100%; display: flex; align-items: baseline; gap: var(--s2); font-size: 13px; }
+  main.rx .rx-foot:has(.size) .saved:is(.is-unsaved, .is-idle):not(.is-warn) .dot { align-self: center; }
+  main.rx .rx-foot:has(.size) .saved:is(.is-unsaved, .is-idle):not(.is-warn) small { font-size: 13px; }
+  main.rx .rx-foot:has(.size) .saved:is(.is-unsaved, .is-idle):not(.is-warn) small::before { content: '· '; }
+}
 /* a short window: the version pictures stay large enough to read (the same size as in a tall window) and the one
    row scrolls sideways, in place of twelve small tiles squeezed into the panel's width. The names are in the tiles'
    tooltips, and the one on screen is named beside the heading */
@@ -152,11 +161,17 @@ canvas.stage { position: absolute; display: block; }
   .vstrip:not(.is-plain) .name { display: none; }
   .looks { gap: 6px; }
   .looks { --vmax: 72px; }
-  .looks .vbtn .name { white-space: nowrap; }
-  /* a sound's looks: names only, in a row of chips (what each does to the sound is in its tooltip) */
-  .sound-looks { display: flex; flex-wrap: wrap; }
-  .sound-looks .vbtn { height: 32px; padding: 0 var(--s3); display: inline-flex; align-items: center; }
-  .sound-looks .what { display: none; }
+  .looks .vbtn .name { font-size: 12px; line-height: 1.2; }
+  /* a sound's looks: compact, each still saying what it does to the sound (J7.3) */
+  .sound-looks { grid-template-columns: repeat(auto-fill, minmax(108px, 1fr)); gap: 4px; }
+  .sound-looks .vbtn { padding: 2px var(--s2); }
+  /* (a sound's versions: a little closer, so its looks fit under them) */
+  .vstrip.is-plain { gap: 4px; }
+  .vstrip.is-plain .vbtn { height: 28px; }
+  .sound-looks .vbtn .name { font-size: 12px; line-height: 1.3; }
+  .sound-looks .what { font-size: 11.5px; line-height: 1.2; }
+  .look-acts { margin-top: 6px; }
+  .look-tab .look-note { margin-bottom: 6px; }
   /* every tab fits its panel: rows a little closer */
   .rx-block, .rx-panel .tune { padding-top: var(--s3); }
   .block-head { margin-bottom: var(--s2); }
@@ -167,7 +182,7 @@ canvas.stage { position: absolute; display: block; }
   .part .ctl.is-main { min-height: 32px; }
   .part .chip { height: 26px; padding: 0 var(--s2); }
   .part + .part { margin-top: 2px; padding-top: 2px; }
-  .ctl .chips { gap: 4px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  main.rx .ctl .chips { gap: 4px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
   .pane-note { margin-bottom: var(--s2); }
 }
 
@@ -178,12 +193,10 @@ canvas.stage { position: absolute; display: block; }
   .rx-more > .icon-btn { right: var(--s5); }
   .cues-about { display: none; }
 }
-/* a short window: less air, and the line under the name is one line */
+/* a short window: less air (the line under the name and what it goes with keep two lines: nothing is cut off) */
 @media (min-width: 721px) and (max-height: 800px) {
   .rx-stage { padding-top: var(--s4); padding-bottom: var(--s4); gap: var(--s2); }
   .rx-head h1 { font-size: 24px; }
-  .rx-head .blurb { -webkit-line-clamp: 1; }
-  .rel { -webkit-line-clamp: 1; }
   .clips { max-height: 74px; }
   .play-big { width: 72px; height: 72px; }
 }

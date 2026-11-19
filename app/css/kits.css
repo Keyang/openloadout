@@ -27,13 +27,17 @@
 :is(.kits-page, .bundle-page) .kit-actions { margin-top: var(--s5); display: flex; gap: var(--s2); flex-wrap: wrap; }
 
 /* ---------- one kit, #/bundle/<id> ---------- */
-.bundle-actions { margin-top: var(--s5); display: flex; gap: var(--s2); flex-wrap: wrap; align-items: center; }
-.bundle-actions .status { flex: 0 0 100%; margin: var(--s1) 0 0; font-size: 13px; color: var(--ink-2); }
-.bundle-actions .status:empty { display: none; }
-.bundle-actions .go-bag { font-size: 14px; }
-.bundle-ask { flex: 0 0 100%; display: flex; flex-wrap: wrap; gap: var(--s2); align-items: center; padding: var(--s3); background: var(--shelf); border-radius: var(--r); }
-.bundle-ask p { flex: 0 0 100%; font-size: 14px; }
-.bundle-look { margin-top: var(--s7); }
+/* .bundle-actions holds the card and the line under it that says what a click did */
+.bundle-buttons { margin-top: var(--s5); display: flex; gap: var(--s2); flex-wrap: wrap; align-items: center; }
+.bundle-adds { margin: var(--s2) 0 0; font-size: 13px; color: var(--ink-2); }
+/* the message sits in the room between the card and the look (the same 48 px as before), so neither moves (J6.4) */
+.bundle-said { min-height: var(--s7); display: flex; align-items: center; flex-wrap: wrap; gap: var(--s1) var(--s4); padding: var(--s2) 0; font-size: 13px; }
+.bundle-said .status { margin: 0; color: var(--ink-2); flex: 0 1 auto; min-width: 0; text-wrap: pretty; }
+.bundle-said .status:empty { display: none; }
+.bundle-said .go-bag { font-size: 14px; white-space: nowrap; }
+.bundle-said .bundle-give-look { white-space: nowrap; }
+.bundle-look { margin-top: 0; }
+@media (max-width: 1180px) and (min-width: 721px) { .bundle-said { min-height: 72px; } }      /* room for the message on one line and its buttons on the next */
 .bundle-assets { margin-top: var(--s7); }
 .bundle-jump { display: grid; gap: var(--s2); margin-bottom: var(--s6); }
 .bundle-jump-row { display: grid; grid-template-columns: 72px minmax(0, 1fr); align-items: baseline; gap: var(--s3); }
@@ -99,3 +103,9 @@
   :is(.kits-page, .bundle-page) .facts { gap: var(--s5); }
   .look-head .hint { flex-basis: 100%; order: 3; }
 }
+
+/* a scene that fills its frame (app/kit-scene.js, fill): the frame's height comes from what is beside it, not from the
+   picture, which is laid over it from its top left corner and cut to it (by less than one of its pixels) */
+:is(.kits-page, .bundle-page) .kit-scene.is-fill { position: relative; display: block; }
+:is(.kits-page, .bundle-page) .kit-scene.is-fill canvas { position: absolute; left: 0; top: 0; }
+:is(.kits-page, .bundle-page) .kit-scene.is-fill.is-empty { display: grid; }

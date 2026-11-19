@@ -279,10 +279,15 @@ async function journey({ page, browser, context }, ui) {
   await expect(spriteRow.locator('.bag-text .hint')).not.toHaveText(/Standard look|your own/i);      // the row says what was changed, in plain words
   await expect(soundRow.locator('.bag-name')).toHaveText(sound.name);
   await expect(soundRow.locator('.bag-kind')).toHaveText('Sound');
-  await expect(soundRow.locator('.bag-text .hint')).toHaveText(/ style, .+/);      // the style, then what was changed
+  // the version if one was chosen, then what was changed (J4 words: no "Standard style" for the version it came with)
+  const esc = (t) => t.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  await expect(soundRow.locator('.bag-text .hint')).toHaveText(new RegExp(`^(.+ version, )?.*${esc(soundLabel)}`, 'i'));
+  await expect(soundRow.locator('.bag-text .hint')).not.toHaveText(/Standard|No changes yet/);
   await expect(trackRow.locator('.bag-name')).toHaveText(track.name);
   await expect(trackRow.locator('.bag-kind')).toHaveText('Music');
-  await expect(trackRow.locator('.bag-text .hint')).toHaveText(/ style, .+/);      // the style, then what was changed
+  await expect(trackRow.locator('.bag-text .hint')).toHaveText(new RegExp(`^(.+ version, )?.*${esc(instrumentName)}`, 'i'));
+  await expect(trackRow.locator('.bag-text .hint')).toHaveText(new RegExp(esc(pick.length.label), 'i'));
+  await expect(trackRow.locator('.bag-text .hint')).not.toHaveText(/Standard|No changes yet/);
   // "Open its page" leads back to each asset's page with exactly these settings
   await expect.poll(async () => (await rowFacts(page)).every((r) => r.change), { message: 'every row has its "Open its page" link' }).toBe(true);
   const facts = await rowFacts(page);

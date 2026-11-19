@@ -213,7 +213,13 @@ test('a bag link opens the same bag in another browser', async ({ page, browser 
   await other.goto(`${new URL(page.url()).origin}/index.html${link}`);
   await expect(other.locator('.bag-item')).toHaveCount(2);
   const got = await other.evaluate(async () => (await import('/app/bag.js')).bag.items().map((i) => [i.id, i.settings]));
-  expect(got).toEqual([[SOUND.id, { params: {}, style: 'Gem', seed: 3 }], [MUSIC.id, { params: { bpm: 140 }, style: null }]]);
+  // what the link leaves out is filled in from the item's version (J9.1), so the settings are the same ones, spelled out
+  expect(got.map(([id]) => id)).toEqual([SOUND.id, MUSIC.id]);
+  expect(got[0][1]).toMatchObject({ style: 'Gem', seed: 3 });
+  expect(got[1][1]).toMatchObject({ params: { bpm: 140 }, style: null });
+  // and the opened bag reads exactly as the one it came from: the same rows, words and counts
+  const rowsOf = (p) => p.locator('.bag-item').evaluateAll((els) => els.map((e) => e.innerText.replace(/\s+/g, ' ').trim()));
+  expect(await rowsOf(other)).toEqual(await rowsOf(page));
   await other.close();
 });
 
@@ -303,7 +309,7 @@ test('opening a sprite that is already in the bag shows it as it was changed, an
   await openRoute(page, '/sprite/knight?weapon=spear');
   await page.getByRole('tab', { name: 'Parts' }).click();
   await expect(page.getByRole('group', { name: 'Weapon' }).getByRole('button', { name: 'Spear' })).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.locator('.rx-panel .saved')).toContainText('Changes save by themselves');
+  await expect(page.locator('.rx-panel .saved')).toContainText('Not in your bag yet');      // its changes are not in the bag yet (J9.2)
   expect(await bagItems(page)).toHaveLength(1);
   await page.getByRole('group', { name: 'Cape' }).getByRole('button', { name: 'Tattered' }).click();
   await expect.poll(async () => (await bagItems(page)).length).toBe(2);

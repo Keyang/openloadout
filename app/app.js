@@ -23,10 +23,15 @@ function parseHash() {
 
 function notFound(what) {
   document.title = 'Not here · Loadout';       // not the title of the page they came from
-  app.replaceChildren(header(''), el('main', { class: 'v2 home notice' },
+  // one way on: the library. The header's link under the bar stays only when it is a way back (to results, the bag, a
+  // kit); with nowhere to go back to it would be a second link to the library in other words, so it goes.
+  const top = header('');
+  const back = top.querySelector('.back-link');
+  if (back && back.getAttribute('href') === '#/browse') back.remove();
+  app.replaceChildren(top, el('main', { class: 'v2 home notice' },
     el('h1', { class: 'h2' }, `That ${what} is not here`),
-    el('p', { class: 'lede' }, 'The link may be old or mistyped. Everything that exists is on the front page.'),
-    el('p', {}, el('a', { class: 'btn btn-primary', href: '#/' }, 'See everything'))));
+    el('p', { class: 'lede' }, 'The link may be old or mistyped. Everything Loadout has is in the library.'),
+    el('p', {}, el('a', { class: 'btn btn-primary', href: '#/browse' }, 'Browse the library'))));
   return () => {};
 }
 

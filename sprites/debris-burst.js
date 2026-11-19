@@ -19,7 +19,7 @@ export default defineSprite({
   id: 'debris-burst',
   name: 'Debris',
   kind: 'Effect',
-  blurb: 'What flies off a dead enemy: metal scrap that tumbles and comes to rest, or slime that splashes and flattens. Change its size, number of pieces, spread, kind of scrap, tumbling and colours.',
+  blurb: 'What flies off a dead enemy: metal scrap that tumbles and comes to rest, or bug goo that splashes and flattens. Change its size, number of pieces, spread, kind of scrap, tumbling and colours.',
   meta: { type: 'effect', role: 'effects/dust', themes: ['sci-fi', 'space'], gameTypes: ['roguelike-action', 'shooter'], view: 'top-down',
     words: ['debris', 'scrap', 'wreckage', 'shrapnel', 'metal', 'bolts', 'goo', 'slime', 'splat', 'gibs', 'break', 'destroy', 'death', 'remains'], license: 'draft' },
   size: [48, 48],

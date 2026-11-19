@@ -173,11 +173,12 @@ test('a bag row says in plain words what was changed, at most three things and h
   const note = (i) => rows(page).nth(i).locator('.bag-text .hint');
   await expect(note(0)).toHaveText('Height: taller, no weapon, blue cape and trim and 2 more, pixel size 2×');
   await expect(note(1)).toHaveText('Height: shorter');
-  await expect(note(2)).toHaveText('Standard look');
-  await expect(note(3)).toHaveText('Standard style, higher blade pitch');
-  await expect(note(4)).toHaveText('Heavy blade style, shorter swing time');
-  await expect(note(5)).toHaveText('Standard style, flute, length: longer');
-  await expect(note(6)).toHaveText('Standard style');
+  await expect(note(2)).toHaveText('No changes yet');
+  // (J4 words: the version it came with is not named; a chosen version is, as "<name> version")
+  await expect(note(3)).toHaveText('Higher blade pitch');
+  await expect(note(4)).toHaveText('Heavy blade version, shorter swing time');
+  await expect(note(5)).toHaveText('Flute, length: longer');
+  await expect(note(6)).toHaveText('No changes yet');
   // the old words that said nothing are gone
   await expect(page.locator('.bag-list')).not.toContainText(/your own (look|changes)/i);
   // the whole list of changes is there for anyone who wants it

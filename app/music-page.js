@@ -3,7 +3,10 @@
 // versions (its named styles first), its sliders and its choices (how long it is, which instrument leads) in tabs, and
 // a look of its own (Look), and the download. It plays live, so a slider is heard while it moves. Every change is saved to the bag as it is made.
 import { el, header, saveBlob } from './ui.js';
-import { soundParams, renderAsync, playRendered, playLive, wavBytes, isChoice, lengthOf } from './audio.js';
+import { soundParams, renderAsync, playRendered, wavBytes, isChoice, lengthOf } from './audio.js';
+import { createPlayer } from '../sound/player.js';
+import { createLimiter } from '../sound/limiter.js';
+import { typicalHz } from '../sound/theme.js';
 import { keepBag } from './add-to-bag.js';
 import { madeNote } from './catalog.js';      // W5-A: a track made on this visit says so, and a draft cannot go in the bag
 import { createEdit } from './editing.js';
@@ -12,8 +15,31 @@ import { soundModel } from './panel-model.js';
 import { assetShell, icon, ICON } from './asset-shell.js';
 import { lookOf } from './bag.js';
 import { applySound } from '../sound/theme.js';
-import { soundLookTab, heardIn } from './sound-look.js';      // the whole-set looks, on this one track
+import { soundLookTab, heardIn, liveBrightness, matchGain } from './sound-look.js';      // the whole-set looks, on this one track
 import { THEME_PRESETS } from '../engine/theme.js';
+
+// The track plays live through filters of its own, so a look is heard while it plays and its sliders still move it:
+// the live player -> the look's brightness (sound-look.js liveBrightness: the download's filters) -> the site's level
+// (0.8, as app/audio.js) -> the limiter. Made at the first Play, and kept for the visit.
+let rig = null;
+function liveRig() {
+  if (!rig) {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const post = ctx.createGain(); post.gain.value = 0.8; post.connect(createLimiter(ctx));
+    const pre = ctx.createGain(); pre.connect(post);
+    rig = { ctx, pre, post, filters: [], player: createPlayer({ context: ctx, destination: pre, volume: 1 }) };
+  }
+  if (rig.ctx.state === 'suspended') rig.ctx.resume();
+  return rig;
+}
+/** Put a look's brightness on the live output: filters (an empty list for none) and the gain that keeps it as loud. */
+function setLiveLook(r, coefs, gain = 1) {
+  r.pre.disconnect();
+  for (const f of r.filters) f.disconnect();
+  r.filters = coefs.map((c) => r.ctx.createIIRFilter(c.feedforward, c.feedback));
+  [r.pre, ...r.filters].reduce((a, b) => { a.connect(b); return b; }).connect(r.post);
+  r.post.gain.setTargetAtTime(0.8 * gain, r.ctx.currentTime, 0.02);
+}
 
 export function musicPage(app, patch, query) {
   document.title = `${patch.name} · Loadout`;
@@ -32,9 +58,8 @@ export function musicPage(app, patch, query) {
   const now = () => edit.settings();
   // what the track is heard with: its settings, in its own look when it has one (tempo, key, calm; brightness is a filter)
   const heard = () => heardIn(patch, now().params, lookOf(now()));
-  // a look that changes brightness cannot be played live: the loop is rendered first, then filtered (as in the bag)
   const filtered = (h) => !!(h.sound && h.sound.brightness);
-  const st = { voice: null, starting: false, gone: false, sent: { ...heard().params }, look: lookOf(now()) };
+  const st = { voice: null, starting: false, gone: false, sent: { ...heard().params }, look: lookOf(now()), typical: 0, measuring: 0, told: false };
 
   // How long the track is at some settings, in seconds (worked out once for each tempo and length).
   const lengths = new Map();
@@ -63,16 +88,33 @@ export function musicPage(app, patch, query) {
     playBtn.replaceChildren(icon(st.voice || st.starting ? ICON.stop : ICON.play, { fill: true }), el('span', { class: 'sr' }, word));
     playBtn.title = word;
   };
-  function stop() { st.starting = false; if (st.voice) st.voice.stop(); st.voice = null; syncPlay(); }
+  function stop() { st.starting = false; st.measuring++; if (st.voice) st.voice.stop(); st.voice = null; syncPlay(); }
+  /** The look's brightness on the live output: at once with what is known, then exactly once the loop's sound is measured. */
+  function liveLook() {
+    if (!rig || !st.voice || st.voice.rendered) return;
+    const h = heard(), b = filtered(h) ? h.sound.brightness : 0;
+    setLiveLook(rig, liveBrightness(b, rig.ctx.sampleRate, st.typical));
+    const id = ++st.measuring;
+    if (!b) return;
+    // (its typical frequency and the gain that keeps it as loud come from the rendered loop, as the download's do)
+    renderAsync(patch, { ...h.params }).then((raw) => {
+      if (id !== st.measuring || !st.voice || st.gone) return;
+      const chans = raw.channels?.length ? raw.channels : [raw.samples];
+      st.typical = typicalHz(chans, raw.sampleRate);
+      setLiveLook(rig, liveBrightness(b, rig.ctx.sampleRate, st.typical), matchGain(chans, liveBrightness(b, raw.sampleRate, st.typical)));
+    }).catch(() => {});
+  }
   async function play() {
     st.starting = true; syncPlay();
     const h = heard(), params = h.params;
     st.look = lookOf(now());
     try {
-      if (filtered(h)) throw new Error('rendered first');      // (caught below: the rendered loop, filtered)
-      const voice = await playLive(patch, { ...params });
+      const r = liveRig();
+      if (!r.ctx.audioWorklet) throw new Error('no live audio');
+      const voice = await r.player.live(patch, { ...params });
       if (st.gone || !st.starting) { voice.stop(); return; }
       st.voice = voice; st.sent = { ...params };
+      liveLook();
       push();      // whatever moved while it was starting
     } catch (e) {
       // no live audio in this browser: fall back to the rendered loop
@@ -81,16 +123,19 @@ export function musicPage(app, patch, query) {
         if (st.gone || !st.starting) return;
         const loop = playRendered(filtered(h) ? applySound(raw, h.sound) : raw, { force: true, loop: true });
         st.voice = { set() {}, stop: () => loop && loop.stop(), rendered: true };
-        if (!filtered(h)) say('This browser cannot change the music while it plays. Press Stop and Play again to hear a change.');
       } catch (e2) { say(`The music could not start: ${e2.message}.`); }
     }
     st.starting = false; syncPlay();
   }
-  /** Tell the playing track every setting that changed since it was last told. */
+  /** Tell the playing track every setting that changed since it was last told, and a new look at once. */
   function push() {
-    // a new look while it plays: it starts again in the new look (a filtered loop cannot change as it plays)
-    if ((st.voice || st.starting) && lookOf(now()) !== st.look) { stop(); play(); return; }
-    if (st.voice?.rendered && filtered(heard())) return;
+    if (st.voice?.rendered) {
+      // (a rendered loop cannot change as it plays: a new look starts it again; a slider is heard at the next Play)
+      if (lookOf(now()) !== st.look) { stop(); play(); return; }
+      if (!st.told) { st.told = true; say('This browser cannot change the music while it plays. Press Stop and Play again to hear a change.'); }
+      return;
+    }
+    if (st.voice && lookOf(now()) !== st.look) { st.look = lookOf(now()); liveLook(); }
     const p = heard().params;
     if (st.voice) for (const d of patch.params) if (p[d.id] !== st.sent[d.id]) st.voice.set(d.id, p[d.id]);
     st.sent = { ...p };
@@ -100,12 +145,11 @@ export function musicPage(app, patch, query) {
   let urlTimer = 0;
   function link() {
     const s = now(), q = new URLSearchParams(), own = soundParams(patch, s.style);
-    // a slider moved by hand: every setting travels. Otherwise the style's name, and the choices that are not the usual ones
+    // the style's name always (it is the version it started from); a slider moved by hand: every setting travels too.
+    // Otherwise the choices that are not the usual ones
+    if (s.style) q.set('style', s.style);
     if (patch.params.some((d) => !isChoice(d) && s.params[d.id] !== own[d.id])) for (const d of patch.params) q.set(d.id, String(s.params[d.id]));
-    else {
-      if (s.style) q.set('style', s.style);
-      for (const d of patch.params) if (isChoice(d) && s.params[d.id] !== d.default) q.set(d.id, String(s.params[d.id]));
-    }
+    else for (const d of patch.params) if (isChoice(d) && s.params[d.id] !== d.default) q.set(d.id, String(s.params[d.id]));
     if (lookOf(s)) q.set('artlook', lookOf(s));
     const qs = q.toString();
     return `#/music/${patch.id}${qs ? '?' + qs : ''}`;

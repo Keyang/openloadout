@@ -249,6 +249,19 @@ export function createBag(storage, { now = () => Date.now(), standard = null, ke
     return s;
   }
 
+  /**
+   * An item from a link made whole again: a link leaves out each control that equals the asset's standard settings
+   * (compact), and for a sound or a track those are its version's (its named style's), not the plain defaults. They are
+   * put back here, so the opened bag holds what the shared one held (J9.1, R3). Unknown assets are left as they came.
+   */
+  function expand(it) {
+    if (it.kind === 'sprite' || !standardOf) return it;
+    let base = null;
+    try { base = standardOf(it.kind, it.id, it.settings); } catch { base = null; }
+    if (!isObj(base) || !isObj(base.params)) return it;
+    return { ...it, settings: { ...it.settings, params: { ...clone(base.params), ...it.settings.params } } };
+  }
+
   /** The items and theme a link holds, or null when it is not a bag link. */
   function parseLink(text) {
     let data;
@@ -390,7 +403,8 @@ export function createBag(storage, { now = () => Date.now(), standard = null, ke
       // looks: records made under another look than the bag's own are left behind, and made again here
       const foreign = shapesOf(got.theme) !== shapesOf(state.theme);
       const t = now();
-      for (const it of list) {
+      for (const raw of list) {
+        const it = expand(raw);
         if (foreign && it.settings) delete it.settings.lookParams;
         put(it.definition ? { ...it, from: 'link' } : it, t);
       }

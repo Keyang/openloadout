@@ -8,18 +8,18 @@
 .bag-main { min-width: 0; padding: var(--s7) var(--gutter) var(--s9); }
 .bag-page:not(.has-panel) .bag-main { max-width: calc(var(--page) + 2 * var(--gutter)); width: 100%; margin: 0 auto; }
 .bag-page.has-panel { grid-template-columns: minmax(0, 5fr) minmax(420px, 6fr); max-width: none; }
-.bag-side { position: sticky; top: 0; height: calc(100vh - var(--top) - 1px); height: calc(100dvh - var(--top) - 1px); display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); border-left: 1px solid var(--line); background: var(--paper); min-width: 0; }
+.bag-side { position: sticky; top: 0; height: calc(100vh - var(--top) - 1px); height: calc(100dvh - var(--top) - 1px); display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); border-left: 1px solid var(--line); background: var(--paper); min-width: 0; }
 .bag-side > .rx-panel { --pad: var(--s5); }
-.bag-side-head { display: flex; align-items: center; gap: var(--s2); padding: var(--s4) var(--s5); border-bottom: 1px solid var(--line); }
+.bag-side-head { display: flex; align-items: center; gap: var(--s2); padding: var(--s4) var(--pad) 0 var(--s4); min-height: 36px; }
 .bag-side-title { margin-right: auto; min-width: 0; display: flex; align-items: baseline; gap: var(--s2); }
 .bag-side-title h2 { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.bag-side-title h2:focus { outline: 0; }
 .bag-side-title .quiet { font-size: 13px; }
 .bag-side-close { font-size: 20px; line-height: 1; }
 
 .bag-head { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--s4) var(--s6); flex-wrap: wrap; }
 .bag-head .lede { margin-top: var(--s2); font-size: 15px; }
 .bag-head + p { margin-top: var(--s5); }
+.bag-empty-go { margin-top: var(--s5); }
 .bag-tools { display: flex; align-items: center; gap: var(--s2); flex-wrap: wrap; }
 .bag-tools .label { font-size: 14px; }
 .bag-link-note { margin-top: var(--s3); font-size: 14px; color: var(--ink-2); }
@@ -52,7 +52,7 @@
 .bag-actions .play { height: 28px; min-width: 52px; padding: 0 10px; font-size: 13px; color: var(--ink); }
 .bag-pic.pending::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, var(--shelf-2), transparent); }
 .bag-text { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: baseline; gap: 0 var(--s2); text-align: left; min-width: 0; padding: var(--s2) 0; border-radius: var(--r); }
-.bag-open { cursor: pointer; }
+.bag-open, .bag-item.opens { cursor: pointer; }
 .bag-pic.opens { cursor: pointer; }
 .bag-open:hover .bag-name { text-decoration: underline; text-underline-offset: 3px; }
 .bag-name { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -77,12 +77,22 @@
 .bag-page.has-panel .bag-item { grid-template-columns: 80px minmax(0, 1fr); }
 .bag-page.has-panel .bag-facts { grid-column: 2; display: flex; gap: var(--s4); min-width: 0; }
 .bag-page.has-panel .bag-actions { grid-column: 2; }
+/* (stacked under the words: no empty line between them, whether the count is there or not) */
+.bag-page.has-panel .bag-item { row-gap: 4px; align-content: center; }
+.bag-page.has-panel .bag-item > :first-child { grid-row: 1 / span 3; align-self: center; }
+.bag-page.has-panel .bag-text { padding-bottom: 0; }
 .bag-page.has-panel .bag-export-words p { display: none; }
 
+@media (min-width: 721px) and (max-width: 1180px) {
+  .bag-side-title .quiet { display: none; }      /* beside the picture the name comes first; what kind it is shows in the list */
+}
 @media (max-width: 1000px) {
   .bag-item { grid-template-columns: 80px minmax(0, 1fr); }
   .bag-facts { grid-column: 2; display: flex; gap: var(--s4); min-width: 0; }
   .bag-actions { grid-column: 2; flex-wrap: wrap; }
+  .bag-item { row-gap: 4px; align-content: center; }
+  .bag-item > :first-child { grid-row: 1 / span 3; align-self: center; }
+  .bag-text { padding-bottom: 0; }
   /* no room for two columns: the panel covers the list, under the header, until it is closed */
   .bag-page.has-panel { grid-template-columns: minmax(0, 1fr); }
   .bag-side { position: fixed; inset: 0; z-index: 40; height: auto; border-left: 0; }
@@ -90,6 +100,8 @@
 @media (max-width: 720px) {
   .bag-main { padding-top: var(--s5); }
   .bag-side { overflow: auto; display: block; }
-  .bag-side-head { position: sticky; top: 0; z-index: 2; background: var(--paper); }
+  /* the name and Close stay at the top, the picture pinned under them, while the controls scroll under both */
+  .bag-side-head { position: sticky; top: 0; z-index: 3; background: var(--paper); height: 56px; min-height: 0; padding: 0 var(--pad); }
+  .bag-side .rx-panel.has-preview > .rx-preview { position: sticky; top: 56px; z-index: 2; border-bottom: 1px solid var(--line); }
   .bag-export .btn { flex: 1 1 auto; }
 }

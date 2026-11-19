@@ -359,6 +359,9 @@ for (const listed of LISTED) {
     await openRoute(page, `/bundle/${bundle.id}`);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(bundle.name);
     await expect(page.locator('main.bundle-page')).toHaveAttribute('data-look', 'original');
+    // the fine-tuning starts folded (journey J6.1): open it to reach its controls
+    await page.locator('.bundle-look summary').click();
+    await expect(control(page, 'Colour set')).toBeVisible();
     const first = await download();
     const assets = first.names.filter(isAsset);
     expect(first.json('manifest.json').theme).toEqual(PLAIN);

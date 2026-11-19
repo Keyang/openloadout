@@ -132,3 +132,32 @@ export function soundChanges(patch, style, params) {
   }
   return out;
 }
+
+// ---- what a download holds -----------------------------------------------------------------------
+
+const count = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+/**
+ * What a package holds, in the bag's words, from its file names (app/bundle.js packageFiles: sprites/<name>/ with the
+ * sheet and the sprite's own action sounds, sounds/<id>.wav, music/<id>.wav, a list and a read-me):
+ * "1 sprite sheet with its 7 action sounds, 1 sound, 1 music track, a list of everything and a guide".
+ */
+export function packageWords(names) {
+  const folders = new Set(), list = [...names];
+  let actions = 0;
+  for (const n of list) {
+    const m = /^sprites\/([^/]+)\//.exec(n);
+    if (!m) continue;
+    folders.add(m[1]);
+    if (n.endsWith('.wav')) actions++;
+  }
+  const sounds = list.filter((n) => /^sounds\/[^/]+\.wav$/.test(n)).length, music = list.filter((n) => /^music\/[^/]+\.wav$/.test(n)).length;
+  const sprites = folders.size;
+  const parts = [];
+  if (sprites) parts.push(count(sprites, 'sprite sheet') + (actions ? ` with ${sprites === 1 ? 'its' : 'their'} ${count(actions, 'action sound')}` : ''));
+  if (sounds) parts.push(count(sounds, 'sound'));
+  if (music) parts.push(count(music, 'music track'));
+  const extras = [list.includes('manifest.json') ? 'a list of everything' : null, list.some((n) => /read-?me/i.test(n)) ? 'a guide' : null].filter(Boolean);
+  const all = [...parts, ...extras];
+  if (!all.length) return 'nothing';
+  return all.length === 1 ? all[0] : `${all.slice(0, -1).join(', ')} and ${all.at(-1)}`;
+}

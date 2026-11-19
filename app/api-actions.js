@@ -234,5 +234,112 @@ export const ACTIONS = [
     description: 'Open a page of the site: "/" (home), "/browse?kind=sprite", "/sprite/<id>", "/sound/<id>", "/music/<id>", "/bundle/<id>", "/bundles", "/bag", "/play".',
     inputSchema: { type: 'object', properties: { route: { type: 'string', description: 'The part of the address after "#"' } }, required: ['route'], additionalProperties: false },
   },
+  ...studioActions(),
 ];
+
+// ---- the studio (docs/studio.md section 7, item S11; Contract 14 rule 10): app/api-studio.js -----------------------
+// The numbers in these descriptions are STUDIO_API_LIMITS of app/api-studio.js (not imported here: this list is loaded
+// by the build and by every first use of window.loadout, and the studio's modules only when a studio action is called);
+// tests/unit/api-studio.test.mjs fails when they drift apart.
+/** The studio's actions, in the order a person meets them. */
+function studioActions() {
+  const DRAFT = { type: 'string', pattern: '^[a-z][a-z0-9-]{0,39}$', description: 'A draft\'s name, as studio_create and studio_list give it, for example "moss-beast"' };
+  const DEFINITION = { oneOf: [{ type: 'object', additionalProperties: true }, { type: 'string' }], description: 'A studio sprite: the object { "format": "loadout-sprite", "version": 1, id, name, blurb, meta, body, colours, controls, parts, clips, preview, ... } (docs/studio.md section 2; studio_get shows a whole one), or its JSON text. At most 64 KB of JSON. Data only: no code anywhere' };
+  const EITHER = { oneOf: [DRAFT, { type: 'object', additionalProperties: true }], description: 'A draft\'s name, or a whole studio sprite definition (which is used, not kept)' };
+  const NONE = { type: 'object', properties: {}, additionalProperties: false };
+  return [
+    {
+      name: 'studio_starts', call: 'studio.starts', args: [],
+      description: 'What a new studio sprite can start from: bone-rig templates (Two legs, Four legs, Crawler, Flyer, Blob, Blank, and top-down ones) and library bodies with a preset (the Hero). Each has a "from" to give studio_create, its view, frame size and clips.',
+      inputSchema: NONE,
+    },
+    {
+      name: 'studio_create', call: 'studio.create', args: ['from', 'name'],
+      description: 'Make a new studio draft from a start (studio_starts lists them) and save it on this computer. The draft\'s name and the sprite\'s id come from the name ("Moss beast" -> "moss-beast"), never one the library or another draft uses. Returns { ok, draft, definition, saved, warnings }. The studio keeps at most 40 drafts and 2 MB; saved is false, with a warning, when this browser does not keep them.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          from: { type: 'string', description: 'What to start from, as studio_starts gives it: "template:four-legs", "template:blank", "library:knight" (a template\'s id alone also works)' },
+          name: { type: 'string', maxLength: 60, description: 'What the sprite is called, in everyday words ("Moss beast"); the start\'s own name when left out' },
+        },
+        required: ['from'], additionalProperties: false,
+      },
+    },
+    {
+      name: 'studio_list', call: 'studio.list', args: [],
+      description: 'The drafts kept on this computer, newest first: each one\'s name, id, sprite name, when it was saved, whether it is in the bag, and its state ("ready", or "damaged" with the reasons: what is saved no longer passes the checks, so it is not drawn). kept is false when this browser does not keep drafts after the tab closes.',
+      inputSchema: NONE,
+    },
+    {
+      name: 'studio_get', call: 'studio.get', args: ['draft'],
+      description: 'One draft\'s whole definition (the studio sprite as data), checked again as it is read. Change it and give it back with studio_set.',
+      inputSchema: { type: 'object', properties: { draft: DRAFT }, required: ['draft'], additionalProperties: false },
+    },
+    {
+      name: 'studio_set', call: 'studio.set', args: ['draft', 'definition'],
+      description: 'Replace a draft\'s definition. It is checked first (at most 64 KB of JSON; counts capped: 48 bones, 160 shapes, 32 clips, 64 frames a clip and 256 in all; unknown fields dropped; numbers clamped; every reference must resolve; the id may not be one the library uses; sounds must exist) and only the cleaned copy is kept. Returns { ok, errors, warnings, definition, saved }; a refused definition changes nothing. A draft that is in the bag updates its bag item too.',
+      inputSchema: { type: 'object', properties: { draft: DRAFT, definition: DEFINITION }, required: ['draft', 'definition'], additionalProperties: false },
+    },
+    {
+      name: 'studio_validate', call: 'studio.validate', args: ['definition'],
+      description: 'Check a studio sprite definition without keeping it: { ok, errors, warnings, value } where value is the cleaned copy that studio_set would keep. Errors stop it being drawn or kept; warnings are advice.',
+      inputSchema: { type: 'object', properties: { definition: DEFINITION }, required: ['definition'], additionalProperties: false },
+    },
+    {
+      name: 'studio_bake', call: 'studio.bake', args: ['draft', 'clip', 'from'],
+      description: 'For a library body (the Hero): turn one of the body\'s own poses into keys for a clip, one key on every frame ("Start this clip over"), replacing that clip\'s keys and keeping its frame count, speed, sounds and nudges; a clip the draft has not got yet is made, with the pose\'s own frame count. Then move or delete keys with studio_set. Bone rigs have no poses to bake from.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          draft: DRAFT,
+          clip: { type: 'string', description: 'The clip to bake into, an existing one or a new one ("walk", "wave")' },
+          from: { type: 'string', description: 'The pose to take: idle, walk, run, jump, attack, punch, thrust, shoot, cast, block, hurt, die, victory, talk, stab, throw, toss or steal. Left out: the pose the clip was baked from before' },
+        },
+        required: ['draft', 'clip'], additionalProperties: false,
+      },
+    },
+    {
+      name: 'studio_render', call: 'studio.render', args: ['draftOrDefinition', 'options'],
+      description: 'Draw a draft (or a definition given whole) and return a PNG data address: one frame, or a whole clip with every frame in one row when frame is left out, enlarged by scale (1 to 8), with its size, frame count, speed and how many pixels are drawn. bones: true draws the skeleton over a bone rig. At most 4,000,000 pixels in one picture.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          draftOrDefinition: EITHER,
+          options: {
+            type: 'object',
+            properties: {
+              clip: { type: 'string', description: 'Which animation (the sprite\'s preview clip unless given)' },
+              frame: { type: 'integer', minimum: 0, description: 'One frame, counted from 0. Leave out for every frame of the clip in one row' },
+              scale: { type: 'integer', minimum: 1, maximum: 8, description: 'Whole-number pixel size (1 unless given)' },
+              params: { type: 'object', additionalProperties: true, description: 'Settings for the sprite\'s controls by key: colour slots ("#rrggbb"), sliders, parts (true or false). Left-out controls stay at their defaults' },
+              bones: { type: 'boolean', description: 'true: draw the skeleton (a line per bone, a dot per joint) over the picture, as the studio does' },
+            },
+            additionalProperties: false,
+          },
+        },
+        required: ['draftOrDefinition'], additionalProperties: false,
+      },
+    },
+    {
+      name: 'studio_advice', call: 'studio.advice', args: ['draftOrDefinition'],
+      description: 'What the quality bar would say about a draft, as advice: { passes, problems (what the library would refuse), suggestions, metrics }. A studio sprite is not held to the bar: it goes in the bag and downloads whatever this says. The bar applies when the file is added to the library (sprites/<id>.js).',
+      inputSchema: { type: 'object', properties: { draftOrDefinition: EITHER }, required: ['draftOrDefinition'], additionalProperties: false },
+    },
+    {
+      name: 'studio_to_bag', call: 'studio.toBag', args: ['draft'],
+      description: 'Put a draft in the visitor\'s bag, linked to it: later studio_set calls update the bag item. Returns the item\'s key. Not ready yet: until the bag learns studio sprites (studio work item S8) this answers "not yet" and changes nothing; use studio_file meanwhile.',
+      inputSchema: { type: 'object', properties: { draft: DRAFT }, required: ['draft'], additionalProperties: false },
+    },
+    {
+      name: 'studio_file', call: 'studio.file', args: ['draftOrDefinition'],
+      description: 'The draft as a file for the library: { name: "<id>.js", text }, a fixed three-line wrapper around the definition as JSON (data, never code) to put in sprites/. library tells whether the library would take it as it is (its stricter checks: full metadata), with the reasons when not.',
+      inputSchema: { type: 'object', properties: { draftOrDefinition: EITHER }, required: ['draftOrDefinition'], additionalProperties: false },
+    },
+    {
+      name: 'studio_remove', call: 'studio.remove', args: ['draft'],
+      description: 'Delete a draft from this computer. This cannot be undone: download it first (studio_file) to keep it. A bag item made from it stays in the bag.',
+      inputSchema: { type: 'object', properties: { draft: DRAFT }, required: ['draft'], additionalProperties: false },
+    },
+  ];
+}
 
