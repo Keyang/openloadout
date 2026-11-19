@@ -1,0 +1,264 @@
+{
+ "id": "row",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "from": [
+     2,
+     0
+    ],
+    "to": [
+     26,
+     0
+    ],
+    "count": 7,
+    "place": {
+     "kind": "dot",
+     "paint": "metal.dark"
+    }
+   },
+   "primitives": [
+    {
+     "kind": "dot",
+     "paint": "metal.dark",
+     "at": [
+      2,
+      0
+     ]
+    },
+    {
+     "kind": "dot",
+     "paint": "metal.dark",
+     "at": [
+      6,
+      0
+     ]
+    },
+    {
+     "kind": "dot",
+     "paint": "metal.dark",
+     "at": [
+      10,
+      0
+     ]
+    },
+    {
+     "kind": "dot",
+     "paint": "metal.dark",
+     "at": [
+      14,
+      0
+     ]
+    },
+    {
+     "kind": "dot",
+     "paint": "metal.dark",
+     "at": [
+      18,
+      0
+     ]
+    },
+    {
+     "kind": "dot",
+     "paint": "metal.dark",
+     "at": [
+      22,
+      0
+     ]
+    },
+    {
+     "kind": "dot",
+     "paint": "metal.dark",
+     "at": [
+      26,
+      0
+     ]
+    }
+   ]
+  },
+  {
+   "args": {
+    "from": [
+     0,
+     0
+    ],
+    "to": [
+     10,
+     5
+    ],
+    "count": 3,
+    "place": {
+     "gen": "twinkle",
+     "v": 1,
+     "size": 1,
+     "paint": "gold",
+     "core": "shine"
+    }
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      -1,
+      -1
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".a.",
+      "aba",
+      ".a."
+     ],
+     "key": {
+      "a": "gold",
+      "b": "shine"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      4,
+      2
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".a.",
+      "aba",
+      ".a."
+     ],
+     "key": {
+      "a": "gold",
+      "b": "shine"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      9,
+      4
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".a.",
+      "aba",
+      ".a."
+     ],
+     "key": {
+      "a": "gold",
+      "b": "shine"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "from": [
+     4,
+     4
+    ],
+    "to": [
+     9,
+     4
+    ],
+    "count": 1,
+    "place": {
+     "kind": "stamp",
+     "rows": [
+      "ab"
+     ],
+     "key": {
+      "a": "metal",
+      "b": "metal.light"
+     }
+    }
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "rows": [
+      "ab"
+     ],
+     "key": {
+      "a": "metal",
+      "b": "metal.light"
+     },
+     "at": [
+      7,
+      4
+     ]
+    }
+   ]
+  },
+  {
+   "args": {
+    "from": [
+     1.25,
+     30
+    ],
+    "to": [
+     30.75,
+     30
+    ],
+    "count": 4,
+    "snap": false,
+    "place": {
+     "use": "stamp:clod",
+     "v": 1,
+     "paint": {
+      "a": "soil.dark"
+     }
+    }
+   },
+   "primitives": [
+    {
+     "kind": "use",
+     "use": "stamp:clod",
+     "v": 1,
+     "paint": {
+      "a": "soil.dark"
+     },
+     "at": [
+      1.25,
+      30
+     ]
+    },
+    {
+     "kind": "use",
+     "use": "stamp:clod",
+     "v": 1,
+     "paint": {
+      "a": "soil.dark"
+     },
+     "at": [
+      11.083333333333332,
+      30
+     ]
+    },
+    {
+     "kind": "use",
+     "use": "stamp:clod",
+     "v": 1,
+     "paint": {
+      "a": "soil.dark"
+     },
+     "at": [
+      20.916666666666664,
+      30
+     ]
+    },
+    {
+     "kind": "use",
+     "use": "stamp:clod",
+     "v": 1,
+     "paint": {
+      "a": "soil.dark"
+     },
+     "at": [
+      30.75,
+      30
+     ]
+    }
+   ]
+  }
+ ]
+}
