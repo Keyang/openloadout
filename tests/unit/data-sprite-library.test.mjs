@@ -32,7 +32,8 @@ test('data-sprite library: the Hero preset becomes a sprite (dataSprite and make
   assert.deepEqual(hero.pivot, [28, 58]);
   assert.equal(hero.grounded, true);
   assert.equal(hero.preview, 'walk');
-  assert.deepEqual(hero.made, { in: 'studio', from: 'library:knight' });
+  assert.deepEqual(hero.definition.made, { in: 'studio', from: 'library:knight' });
+  assert.equal(hero.made, undefined, 'sprite.made means a worker sprite (review F1, issue 1)');
   assert.equal(hero.definition.body.library, 'humanoid');
   assert.ok(Object.isFrozen(hero.definition) && Object.isFrozen(hero.definition.body.figure));
   const m = DS.makeDataSprite(heroDef);

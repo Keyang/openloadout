@@ -1,0 +1,275 @@
+{
+ "format": "loadout-sprite",
+ "version": 1,
+ "id": "test-rogue",
+ "name": "Rogue",
+ "blurb": "A rogue.",
+ "meta": {
+  "type": "character",
+  "role": "characters/player",
+  "themes": [
+   "fantasy"
+  ],
+  "gameTypes": [
+   "platformer"
+  ],
+  "view": "side",
+  "words": [
+   "rogue",
+   "thief",
+   "daggers",
+   "stab",
+   "sneaky",
+   "hood"
+  ],
+  "license": "draft"
+ },
+ "body": {
+  "library": "humanoid",
+  "figure": {
+   "body": {
+    "height": 0.45,
+    "build": 0.3,
+    "head": 0.5
+   },
+   "stance": "crouched",
+   "look": {
+    "skin": "#f6d3b0",
+    "top": "#2f8f9d",
+    "bottom": "#1d5964",
+    "boots": "#5a5f7a"
+   },
+   "held": {
+    "kind": "daggers",
+    "length": 1,
+    "angle": 0,
+    "metal": "#c2c9d6"
+   },
+   "headgear": {
+    "kind": "hood",
+    "size": 1,
+    "colour": "#2f8f9d"
+   },
+   "scarf": {
+    "kind": "long",
+    "length": 1,
+    "colour": "#5a5f7a"
+   }
+  },
+  "paint": {
+   "look.skin": "skin",
+   "look.top": "outfit",
+   "look.bottom": {
+    "rule": "tone",
+    "of": "outfit",
+    "by": -0.6
+   },
+   "look.boots": {
+    "rule": "apart",
+    "of": "trim",
+    "from": [
+     "outfit"
+    ],
+    "least": 0.05
+   },
+   "held.metal": "metal",
+   "headgear.colour": "outfit",
+   "scarf.colour": {
+    "rule": "choose",
+    "when": {
+     "weapon": [
+      "none"
+     ]
+    },
+    "then": "trim",
+    "else": {
+     "rule": "apart",
+     "of": "trim",
+     "from": [
+      [
+       "outfit",
+       0.05
+      ]
+     ]
+    }
+   }
+  }
+ },
+ "colours": {
+  "skin": "#f6d3b0",
+  "outfit": "#2f8f9d",
+  "trim": "#5a5f7a",
+  "metal": "#c2c9d6"
+ },
+ "controls": [
+  {
+   "key": "height",
+   "label": "Height",
+   "lo": "Short",
+   "hi": "Tall",
+   "min": 0,
+   "max": 1,
+   "default": 0.45,
+   "sets": "height"
+  },
+  {
+   "key": "weapon",
+   "kind": "choice",
+   "label": "Weapon",
+   "options": [
+    "daggers",
+    "short sword",
+    "claws",
+    "none"
+   ],
+   "default": "daggers",
+   "sets": "held.kind"
+  },
+  {
+   "key": "weaponLength",
+   "label": "Length",
+   "lo": "Short",
+   "hi": "Long",
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "default": 1,
+   "sets": "held.length"
+  },
+  {
+   "key": "headgear",
+   "kind": "choice",
+   "label": "Headgear",
+   "options": [
+    "hood",
+    "bandana",
+    {
+     "value": "none",
+     "label": "Bare head"
+    }
+   ],
+   "default": "hood",
+   "sets": "headgear.kind",
+   "was": {
+    "cowl": "hood"
+   }
+  },
+  {
+   "key": "skin",
+   "kind": "colour",
+   "label": "Skin",
+   "swatches": [
+    "#f6d3b0",
+    "#e8b088"
+   ]
+  },
+  {
+   "key": "metal",
+   "kind": "colour",
+   "label": "Metal",
+   "swatches": [
+    "#c2c9d6",
+    "#f2c230"
+   ],
+   "when": {
+    "weapon": [
+     "daggers",
+     "short sword",
+     "claws"
+    ]
+   }
+  },
+  {
+   "key": "bounce",
+   "label": "Bounce",
+   "lo": "Calm",
+   "hi": "Bouncy",
+   "min": 0,
+   "max": 1,
+   "default": 0.5,
+   "group": "Motion",
+   "sets": "motion.bounce"
+  },
+  {
+   "key": "speed",
+   "standard": "speed"
+  }
+ ],
+ "parts": {
+  "weapon": {
+   "label": "Weapon",
+   "params": [
+    "weapon",
+    "weaponLength",
+    "metal"
+   ],
+   "none": "none",
+   "socket": "hand"
+  },
+  "headgear": {
+   "label": "Headgear",
+   "params": [
+    "headgear"
+   ],
+   "none": [
+    "none"
+   ],
+   "socket": "head"
+  }
+ },
+ "clips": {
+  "idle": {
+   "label": "Idle",
+   "frames": 8,
+   "fps": 7,
+   "loop": true
+  },
+  "attack": {
+   "label": "Stab",
+   "frames": 8,
+   "fps": 13,
+   "loop": false,
+   "sounds": [
+    {
+     "sound": "sword-slash",
+     "frame": 3,
+     "volume": 0.7,
+     "when": {
+      "weapon": [
+       "daggers",
+       "short sword",
+       "claws"
+      ]
+     }
+    },
+    {
+     "sound": "whoosh",
+     "frame": 3,
+     "volume": 0.7,
+     "when": {
+      "weapon": [
+       "none"
+      ]
+     }
+    }
+   ]
+  }
+ },
+ "versions": [
+  {
+   "name": "Swordsman",
+   "params": {
+    "weapon": "short sword",
+    "weaponLength": 1.2
+   }
+  },
+  {
+   "name": "Bare hands",
+   "params": {
+    "weapon": "none",
+    "headgear": "cowl"
+   }
+  }
+ ],
+ "preview": "idle"
+}

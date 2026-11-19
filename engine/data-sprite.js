@@ -17,8 +17,10 @@
 //                 slider whose shapes all belong to one part is put in that part, so it hides with it
 //   clips         frames, loop, label; fps (a number, or a function of Speed); each clip's sounds -> sprite.sounds
 //   points        sockets(clip, t, p): the rig's attach points for that frame (Contract 3), absent when it has none
-//   the rest      id, name, blurb, meta, size, pivot, grounded, preview; kind from meta.type; `made` and the cleaned
-//                 `definition` (frozen plain JSON, for the bag, the studio and the library file to read back)
+//   the rest      id, name, blurb, meta, size, pivot, grounded, preview; kind from meta.type; the cleaned `definition`
+//                 (frozen plain JSON, for the bag, the studio and the library file to read back), `made` in it. The sprite
+//                 itself has no `made`: sprite.made means "made on this visit and drawn in a worker" (app/made.js) to
+//                 app/api-core.js render and engine/theme.js, and a data sprite is drawn here (review F1, issue 1)
 //
 // TOP-DOWN BONE RIGS (studio.md section 9, Q4: in version 1; Contract 2: one clip per direction). The data shape:
 //   - ONE rig with `view: "top-down"` and an optional `directions` object: an overlay per direction, any of
@@ -45,7 +47,7 @@
 //
 // Pure: no DOM, no Node, no clock, no randomness. Runs unchanged in the browser and in Node.
 
-import { defineSprite, range, color, toggle, SKIN, HAIR, CLOTH, METAL } from './sprite.js';
+import { defineSprite, range, choice, color, toggle, SKIN, HAIR, CLOTH, METAL } from './sprite.js';
 import { lerp } from './motion.js';
 import { validateStudioSprite, parseStudioJson, TOPDOWN_DIRECTIONS, directionOf, directionRig } from '../catalog/studio-schema.js';
 import { compileKeys, sampleKeys, framePhase, frameOfPhase } from '../rigs/keypose.js';
@@ -180,13 +182,26 @@ function partOwning(parts, shapeIds) {
 /** The speed slider of { standard: "speed" }: 0..1, default 0.5, in the Motion group. */
 const speedControl = (c) => range(c.label ?? 'Speed', 0.5, { lo: 'Slow', hi: 'Fast', group: 'Motion' });
 
-/** A slider of the definition's controls as a range() control. */
-const sliderControl = (c) => range(c.label, c.default, { min: c.min, max: c.max, ...(c.lo !== undefined ? { lo: c.lo } : {}), ...(c.hi !== undefined ? { hi: c.hi } : {}) });
+/** A slider of the definition's controls as a range() control (step, group and `when` when it gives them: studio item F1). */
+const sliderControl = (c) => range(c.label, c.default, { min: c.min, max: c.max, ...(c.lo !== undefined ? { lo: c.lo } : {}), ...(c.hi !== undefined ? { hi: c.hi } : {}), ...(c.step !== undefined ? { step: c.step } : {}), ...more(c) });
+
+/** group and `when` of a control, as engine/sprite.js takes them (copies: the definition is frozen). */
+const more = (c) => ({ ...(c.group !== undefined ? { group: c.group } : {}), ...(c.when !== undefined ? { when: JSON.parse(JSON.stringify(c.when)) } : {}) });
+
+/** A choice of the definition's controls (library bodies, studio item F1) as a choice() control: options as written (a word, or { value, label }), `was` for old values. */
+const choiceControl = (c) => choice(c.label, c.default, c.options.map((o) => (typeof o === 'string' ? o : { value: o.value, label: o.label })), { ...more(c), ...(c.was !== undefined ? { was: { ...c.was } } : {}) });
+
+/** A colour slot's control, with what a colour control of the definition says about it (label, swatches, material, group, when; studio item F1) over what the slot gives. */
+function colourControl(hex, fallback, own) {
+  const [label, material, swatches] = fallback;
+  if (!own) return color(label, hex, swatches, material ? { material } : {});
+  return color(own.label ?? label, hex, own.swatches ? [...own.swatches] : swatches, { ...more(own), ...(own.material !== undefined ? { material: own.material } : {}) });
+}
 
 /**
  * What every studio sprite has, bone rig or library body: id, name, blurb, kind, meta, size, pivot, grounded, the clips
- * (fps a function of the Speed slider when there is one: fps * lerp(0.65, 1.45, speed)), each clip's sounds, preview,
- * made and the frozen definition.
+ * (fps a function of the Speed slider when there is one: fps * lerp(0.65, 1.45, speed)), each clip's sounds, preview
+ * and the frozen definition (where it came from is definition.made; the sprite has no `made`, which means a worker sprite).
  */
 function baseOf(definition, speed) {
   const clips = {}, sounds = {};
@@ -207,7 +222,7 @@ function baseOf(definition, speed) {
     clips,
     sounds,
     preview: definition.preview,
-    made: definition.made,
+    ...(definition.versions ? { versions: definition.versions.map((v) => ({ name: v.name, params: { ...v.params } })) } : {}),
     definition,
   };
 }
@@ -218,21 +233,34 @@ const LIBRARY_SLOTS = { skin: ['Skin', 'skin', SKIN], hair: ['Hair', 'cloth', HA
 // the attach point each part of the side-view person hangs from (rigs/humanoid.js sockets), for Contract 3
 const LIBRARY_SOCKETS = { held: 'hand', headgear: 'head', mask: 'head', cape: 'back', pack: 'back' };
 
-/** Builds the sprite of a library body (the side-view person): drawn and given sockets only through rigs/humanoid-studio.js. */
+/**
+ * Builds the sprite of a library body (the side-view person): drawn and given sockets only through rigs/humanoid-studio.js.
+ * Controls in this order: the colour slots that have no colour control, then the definition's controls as listed (a
+ * colour control puts its slot's colour there), then one toggle per on/off part. A part with params (studio item F1) is
+ * a Contract 3 part as written (params, none, socket); an on/off part hangs from its usual socket.
+ */
 function buildLibrary(definition) {
   const params = {};
-  for (const [slot, hex] of Object.entries(definition.colours)) {
+  const own = new Map(definition.controls.filter((c) => c.kind === 'colour').map((c) => [c.key, c]));
+  const slotColour = (slot) => {
+    const hex = definition.colours[slot];
     const [label, material, list] = LIBRARY_SLOTS[slot] ?? [slot.charAt(0).toUpperCase() + slot.slice(1), 'cloth', CLOTH];
-    const swatches = [hex, ...list.filter((c) => c !== hex)].slice(0, 8);
-    params[slot] = color(label, hex, swatches, { material });
-  }
+    return colourControl(hex, [label, material, [hex, ...list.filter((c) => c !== hex)].slice(0, 8)], own.get(slot));
+  };
+  for (const slot of Object.keys(definition.colours)) if (!own.has(slot)) params[slot] = slotColour(slot);
   let speed = false;
   for (const c of definition.controls) {
     if (c.standard === 'speed') { speed = true; params.speed = speedControl(c); continue; }
-    params[c.key] = sliderControl(c);
+    if (c.kind === 'colour') params[c.key] = slotColour(c.key);
+    else if (c.kind === 'choice') params[c.key] = choiceControl(c);
+    else params[c.key] = sliderControl(c);
   }
   const parts = {};
   for (const [name, part] of Object.entries(definition.parts)) {
+    if (Array.isArray(part.params)) {
+      parts[name] = { label: part.label, params: [...part.params], ...(part.none !== undefined ? { none: Array.isArray(part.none) ? [...part.none] : part.none } : {}), ...(part.socket ? { socket: part.socket } : {}) };
+      continue;
+    }
     params[name] = toggle(part.label, part.default !== false);
     parts[name] = { label: part.label, params: [name], ...(LIBRARY_SOCKETS[name] ? { socket: LIBRARY_SOCKETS[name] } : {}) };
   }
@@ -262,15 +290,17 @@ function build(def) {
   const params = {};
   const partMembers = Object.fromEntries(Object.keys(definition.parts).map((n) => [n, []]));
   const join = (key, shapeIds) => { const part = partOwning(definition.parts, shapeIds); if (part) partMembers[part].push(key); };
+  const own = new Map(definition.controls.filter((c) => c.kind === 'colour').map((c) => [c.key, c]));
   for (const s of rig.colours) {
     if (s.detail) continue;
     const hex = definition.colours[s.id] ?? s.default;
-    params[s.id] = color(s.label, hex, swatchesFor(hex, s.material), s.material ? { material: s.material } : {});
+    params[s.id] = colourControl(hex, [s.label, s.material, swatchesFor(hex, s.material)], own.get(s.id));
     join(s.id, shapesOfControl(rig, 'paint', [s.id]));
   }
   let speed = false;
   for (const c of definition.controls) {
     if (c.standard === 'speed') { speed = true; params.speed = speedControl(c); continue; }
+    if (c.kind === 'colour') continue;          // its slot's control, above
     params[c.key] = sliderControl(c);
     const [what, ids] = Object.entries(c.scales)[0];
     join(c.key, shapesOfControl(rig, what, ids));

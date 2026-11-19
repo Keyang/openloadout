@@ -407,6 +407,20 @@ A name such as `topdown.cape` is `<module>.<export>`. An option is `{ min, max, 
 
 **When you add to one of these rigs, add to its description in the same change.** `tests/unit/rig-describe-data.test.mjs` fails for an export, a drawing function (first argument `g`), a name in an exported list, or a side module `rigs/<rig>-<name>.js` that the description does not list; `tests/unit/rig-describe-draw.test.mjs` draws every listed pose, part, held kind, hair style and effect through the function named, checks a part shows in exactly the directions given, and that both ends of every range stay inside the frame. A new part with a kind list needs the list exported (`PACK_KINDS`), or the tests cannot see a kind added later.
 
+## Studio definitions: what a library body may name and set
+
+A studio definition (`loadout-sprite`, `docs/studio.md` section 2.3; Contract 14) is data and never holds code. Where a library body (the side-view person) needs framework code, it names it from a fixed list, the same way it names a rig (Contract 14 rule 2, amended in studio item F1). The lists, each on `loadout.framework` under its module's name:
+
+| Export | Module | What it lists |
+|---|---|---|
+| `COLOUR_RULES` | `engine/data-rules.js` | The colour rules `body.paint` may name, with their arguments: `tone`, `mix`, `standOut` (engine/color.js `pick`), `apart`, `bandTone`, `ramp`, `choose`. `paintColour(expr, settings)` and `paintFigure(figure, paint, settings)` work one out; they never throw |
+| `FIGURE_SETTINGS` | `catalog/studio-schema.js` | The figure fields a slider or choice may `sets` (`"part.field"` and `stance`), each a number range or a list of words |
+| `FIGURE_COLOURS` | `catalog/studio-schema.js` | The figure's colour fields `body.paint` may paint |
+| `FIGURE_SOCKETS` | `catalog/studio-schema.js` | The attach points a Contract 3 part may hang from (`muzzle` too when the figure has `thrown`) |
+| `FIGURE_BLOCKS` | `engine/data-rules.js` | The blocks of a figure read with defaults when absent (`body`, `motion`, `look`, `hair`): a control may set a field of one the stored figure has not; any other part it sets must be in the figure |
+
+A new rule is a framework addition (Contract 11): an entry in `COLOUR_RULES`, its argument check in `catalog/studio-schema.js`, and a test in `tests/unit/data-rules.test.mjs` that it equals the function it names. A data sprite (`engine/data-sprite.js`) has no `sprite.made`: that field means a sprite made on this visit and drawn in a worker; where a data sprite came from is `sprite.definition.made`.
+
 ## Reference
 
 The full list (every action, every module, every export with its arguments and one-line description) is written by the build to `generated/api.md`, next to `generated/api.json`. It is not kept in git, because it changes with every function added to the framework. Run `node tools/lib/api.mjs` (a tenth of a second) and open it.
