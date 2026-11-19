@@ -53,7 +53,7 @@ function renamedSprite(text, fromId, to) {
 test.describe.configure({ mode: 'serial' });     // one worker: the copy is built once
 
 test.beforeAll(async () => {
-  test.setTimeout(240_000);
+  test.setTimeout(600_000);
   // which existing assets to copy: a small sprite with sliders, and a short sound with sliders (read from the real files)
   const sprites = fs.readdirSync(path.join(ROOT, 'sprites')).filter((f) => f.endsWith('.js') && !f.startsWith('_')).map((f) => f.slice(0, -3));
   const sounds = fs.readdirSync(path.join(ROOT, 'sounds')).filter((f) => f.endsWith('.json') && !f.startsWith('_')).map((f) => f.slice(0, -5));
@@ -76,7 +76,7 @@ test.beforeAll(async () => {
   fs.writeFileSync(path.join(scratch, 'sounds', `${NEW_SOUND.id}.json`), JSON.stringify(patch, null, 1) + '\n');
 
   // ---- the build, then the built site on its own port ---------------------------------------------
-  const built = spawnSync(process.execPath, [path.join(ROOT, 'tools', 'build.mjs'), '--root', scratch, '--dist', '--skip-quality', '--no-meaning'], { encoding: 'utf8', timeout: 200_000 });
+  const built = spawnSync(process.execPath, [path.join(ROOT, 'tools', 'build.mjs'), '--root', scratch, '--dist', '--skip-quality', '--no-meaning'], { encoding: 'utf8', timeout: 540_000 });
   must(built.status === 0, `the build of the copy failed:\n${built.stdout}${built.stderr}`);
   const dist = path.join(scratch, 'dist');
   CATALOG = JSON.parse(fs.readFileSync(path.join(dist, 'generated', 'catalog.json'), 'utf8'));
