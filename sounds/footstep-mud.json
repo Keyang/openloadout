@@ -1,0 +1,49 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "footstep-mud",
+ "name": "Footstep in mud",
+ "category": "movement",
+ "description": "A wet, sticky squelch of a step in mud with a low body and a short suck as the foot pulls out. Every take is a different step; change its weight, length, brightness and how wet the mud is.",
+ "meta": {
+  "type": "sfx",
+  "role": "characters/footstep",
+  "themes": ["neutral", "forest", "farm"],
+  "gameTypes": ["top-down-rpg", "farming-sim", "platformer", "turn-based-rpg"],
+  "words": ["footstep", "footsteps", "step", "walk", "run", "mud", "muddy", "swamp", "bog", "squelch", "wet", "sticky", "puddle"],
+  "license": "draft"
+ },
+ "duration": "length*(0.75 + 0.25*weight) + 0.03",
+ "params": [
+  { "id": "weight", "label": "Weight", "min": 0.5, "max": 2, "default": 1 },
+  { "id": "length", "label": "Length", "unit": "s", "min": 0.1, "max": 0.2, "default": 0.16, "scale": "log" },
+  { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+  { "id": "wet", "label": "Wetness", "min": 0, "max": 1, "default": 0.6 }
+ ],
+ "nodes": [
+  { "id": "thumpPitch", "type": "env", "points": [[0, "rnd(95, 115)/pow(weight, 0.7)"], [0.05, "55/pow(weight, 0.7)", "exp"]] },
+  { "id": "thump", "type": "osc", "freq": "thumpPitch" },
+  { "id": "thumpAmp", "type": "ad", "attack": 0.002, "decay": "0.035 + 0.03*weight", "curve": 2 },
+  { "id": "pn", "type": "noise", "color": "pink" },
+  { "id": "slapAmp", "type": "ad", "attack": 0.0008, "decay": "0.012 + 0.01*weight", "curve": 2.5 },
+  { "id": "slap", "type": "filter", "mode": "bp", "in": "pn", "freq": "rnd(0.9, 1.1)*(900 + bright*1200)/pow(weight, 0.4)", "q": 1 },
+  { "id": "sqFreq", "type": "env", "points": [[0, "rnd(0.9, 1.1)*(1000 + bright*900)/pow(weight, 0.4)"], ["length*(0.75 + 0.25*weight)*0.4", "330/pow(weight, 0.4)", "exp"]] },
+  { "id": "sqAmp", "type": "env", "points": [[0, 0], [0.004, 1], ["length*(0.75 + 0.25*weight)*0.45", 0, 1.8]] },
+  { "id": "squelch", "type": "filter", "mode": "bp", "in": "pn", "freq": "sqFreq", "q": "1.5 + 5*wet" },
+  { "id": "lift", "type": "clock", "rate": 1, "count": 1, "delay": "length*(0.75 + 0.25*weight)*rnd(0.48, 0.58)" },
+  { "id": "suckFreq", "type": "env", "trig": "lift", "points": [[0, "320/pow(weight, 0.4)"], ["length*(0.75 + 0.25*weight)*0.3", "rnd(0.9, 1.1)*(1000 + bright*900)/pow(weight, 0.4)", "exp"]] },
+  { "id": "suckAmp", "type": "env", "trig": "lift", "points": [[0, 0], ["length*(0.75 + 0.25*weight)*0.12", 1, 0.7], ["length*(0.75 + 0.25*weight)*0.36", 0, 1.6]] },
+  { "id": "suck", "type": "filter", "mode": "bp", "in": "pn", "freq": "suckFreq", "q": "2.5 + 6*wet" },
+  { "id": "pops", "type": "dust", "density": "20 + 140*wet", "spread": 1 },
+  { "id": "bubble", "type": "filter", "mode": "bp", "in": "pops*sqAmp", "freq": "rnd(0.8, 1.2)*(700 + bright*700)", "q": 12 },
+  { "id": "sum", "type": "expr", "expr": "thump*thumpAmp*0.7*pow(weight, 0.4) + slap*slapAmp*1.6 + squelch*sqAmp*(0.5 + 0.9*wet) + suck*suckAmp*(0.1 + 0.22*wet) + bubble*wet*0.6" },
+  { "id": "soft", "type": "shaper", "in": "sum*1.4", "drive": 1.2 },
+  { "id": "top", "type": "filter", "mode": "lp", "in": "soft", "freq": "(2500 + bright*5000)/pow(weight, 0.3)", "q": 0.7 },
+  { "id": "clean", "type": "filter", "mode": "hp", "in": "top", "freq": 35 }
+ ],
+ "out": "clean",
+ "presets": {
+  "Soft shoes": { "weight": 0.8, "length": 0.15, "bright": 0.45, "wet": 0.55 },
+  "Heavy boots": { "weight": 1.8, "length": 0.19, "bright": 0.4, "wet": 0.75 },
+  "Bare feet": { "weight": 0.7, "length": 0.12, "bright": 0.3, "wet": 0.4 }
+ }
+}

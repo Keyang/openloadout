@@ -1,0 +1,55 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "key-pickup",
+  "name": "Key pickup",
+  "category": "pickup",
+  "description": "A key collected: a short rising three-note tune over the small metallic jingle of a key ring. Change its pitch, speed, brightness and how much the keys rattle. The same every time.",
+  "meta": {
+    "type": "sfx",
+    "role": "items/pickup",
+    "themes": ["neutral", "fantasy", "dungeon"],
+    "gameTypes": ["arcade", "platformer", "top-down-rpg", "turn-based-rpg", "puzzle"],
+    "words": ["key", "keys", "key ring", "unlock", "pickup", "collect", "jingle", "rattle", "metal", "dungeon", "door", "found"],
+    "license": "draft"
+  },
+  "duration": "2/speed + 0.2 + 0.06*(1 - bright)^2",
+  "params": [
+    { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 440, "max": 1400, "default": 784, "scale": "log" },
+    { "id": "speed", "label": "Speed", "unit": "notes/s", "min": 9, "max": 20, "default": 13, "scale": "log" },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.45 },
+    { "id": "jingle", "label": "Jingle", "min": 0, "max": 1, "default": 0.5 }
+  ],
+  "nodes": [
+    { "id": "clk", "type": "clock", "rate": "speed", "count": 3 },
+    { "id": "note", "type": "seq", "steps": ["pitch", "pitch*semi(7)", "pitch*semi(10)"], "trig": "clk" },
+    { "id": "lastClk", "type": "clock", "rate": 1, "count": 1, "delay": "2/speed" },
+    { "id": "ampShort", "type": "ad", "attack": 0.002, "decay": "1.1/speed", "curve": 1.8, "trig": "clk" },
+    { "id": "ampLast", "type": "ad", "attack": 0.002, "decay": 0.17, "curve": 2.2, "trig": "lastClk" },
+    { "id": "isLast", "type": "expr", "expr": "t >= 2/speed - 0.0005 ? 1 : 0" },
+    { "id": "amp", "type": "expr", "expr": "isLast ? ampLast : ampShort" },
+    { "id": "sn", "type": "osc", "wave": "sine", "freq": "note" },
+    { "id": "tr", "type": "osc", "wave": "tri", "freq": "note" },
+    { "id": "sq", "type": "osc", "wave": "square", "freq": "note" },
+    { "id": "body", "type": "expr", "expr": "sn*clamp(1 - bright*1.4, 0, 1)*0.8 + tr*0.55 + sq*bright*0.4" },
+    { "id": "tone", "type": "filter", "mode": "lp", "in": "body", "freq": "note*(3 + bright*14)", "q": 0.7 },
+    { "id": "crushed", "type": "crush", "in": "tone", "bits": 5, "rate": 8000 },
+    { "id": "tune", "type": "expr", "expr": "mix(tone, crushed, smooth(0.7, 1, bright)*0.7)*amp" },
+    { "id": "hiss", "type": "noise", "seed": 7 },
+    { "id": "rkA", "type": "clock", "rate": 19, "count": "2 + round(jingle*3)" },
+    { "id": "rkB", "type": "clock", "rate": 15, "count": "1 + round(jingle*3)", "delay": 0.027 },
+    { "id": "hitA", "type": "ad", "attack": 0.0003, "decay": 0.003, "curve": 2, "trig": "rkA" },
+    { "id": "hitB", "type": "ad", "attack": 0.0003, "decay": 0.003, "curve": 2, "trig": "rkB" },
+    { "id": "keyA", "type": "modal", "in": "hiss*hitA", "freq": 2650, "ratios": [1, 1.93, 3.17, 4.41], "gains": [1, 0.7, 0.5, 0.35], "decay": 0.12, "tilt": 0.6 },
+    { "id": "keyB", "type": "modal", "in": "hiss*hitB", "freq": 3420, "ratios": [1, 1.71, 2.88, 4.07], "gains": [1, 0.6, 0.45, 0.3], "decay": 0.1, "tilt": 0.6 },
+    { "id": "ring", "type": "filter", "mode": "hp", "in": "keyA + keyB*0.8", "freq": "1800 - bright*600", "q": 0.7 },
+    { "id": "dry", "type": "expr", "expr": "tune + ring*jingle*0.13" },
+    { "id": "room", "type": "reverb", "in": "dry", "size": 0.3, "damp": 0.5, "mix": "0.14*(1 - bright)^2" },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "room", "freq": 200, "q": 0.7 }
+  ],
+  "out": "clean",
+  "presets": {
+    "Chiptune": { "pitch": 880, "speed": 15, "bright": 0.6, "jingle": 0.3 },
+    "Storybook": { "pitch": 698, "speed": 11, "bright": 0.1, "jingle": 0.7 },
+    "Gritty": { "pitch": 784, "speed": 18, "bright": 0.95, "jingle": 0.5 }
+  }
+}

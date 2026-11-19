@@ -1,0 +1,296 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "notify-ping",
+ "name": "Notification",
+ "category": "ui",
+ "description": "A message or quest update: a soft, friendly ping of two bell notes, the second well above the first, ringing on together. Change its pitch, length, brightness and ring. The same every time.",
+ "meta": {
+  "type": "sfx",
+  "role": "interface/reward",
+  "themes": [
+   "neutral",
+   "fantasy",
+   "sci-fi"
+  ],
+  "gameTypes": [
+   "arcade",
+   "turn-based-rpg",
+   "top-down-rpg",
+   "farming-sim",
+   "puzzle"
+  ],
+  "words": [
+   "notification",
+   "message",
+   "ping",
+   "alert",
+   "update",
+   "quest update",
+   "friend online",
+   "new mail",
+   "inbox",
+   "ding",
+   "chime",
+   "soft"
+  ],
+  "license": "draft"
+ },
+ "duration": "length + 0.01",
+ "params": [
+  {
+   "id": "pitch",
+   "label": "Pitch",
+   "min": 500,
+   "max": 1600,
+   "default": 880,
+   "unit": "Hz",
+   "scale": "log"
+  },
+  {
+   "id": "length",
+   "label": "Length",
+   "min": 0.2,
+   "max": 0.8,
+   "default": 0.4,
+   "unit": "s",
+   "scale": "log"
+  },
+  {
+   "id": "bright",
+   "label": "Brightness",
+   "min": 0,
+   "max": 1,
+   "default": 0.45
+  },
+  {
+   "id": "ring",
+   "label": "Ring",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  }
+ ],
+ "nodes": [
+  {
+   "id": "wSoft",
+   "type": "expr",
+   "expr": "1 - smooth(0.25, 0.8, bright)"
+  },
+  {
+   "id": "wGrit",
+   "type": "expr",
+   "expr": "smooth(0.65, 0.95, bright)"
+  },
+  {
+   "id": "wChip",
+   "type": "expr",
+   "expr": "clamp(1 - wSoft - wGrit, 0, 1)"
+  },
+  {
+   "id": "clk",
+   "type": "clock",
+   "rate": "1/(length*0.18)",
+   "count": 2
+  },
+  {
+   "id": "n2Clk",
+   "type": "clock",
+   "rate": 1,
+   "count": 1,
+   "delay": "length*0.18"
+  },
+  {
+   "id": "a1",
+   "type": "ad",
+   "attack": "0.003 + 0.01*(1 - smooth(0.25, 0.8, bright))",
+   "decay": "(length*0.95 - 0.01)*(1 - 0.35*smooth(0.65, 0.95, bright))",
+   "curve": "4.5 - ring*3.3"
+  },
+  {
+   "id": "a2",
+   "type": "ad",
+   "attack": "0.003 + 0.01*(1 - smooth(0.25, 0.8, bright))",
+   "decay": "(length*0.8 - 0.01)*(1 - 0.35*smooth(0.65, 0.95, bright))",
+   "curve": "4.5 - ring*3.3",
+   "trig": "n2Clk"
+  },
+  {
+   "id": "f1",
+   "type": "expr",
+   "expr": "pitch"
+  },
+  {
+   "id": "f2",
+   "type": "expr",
+   "expr": "pitch*semi(9)"
+  },
+  {
+   "id": "pSin",
+   "type": "osc",
+   "freq": "f1"
+  },
+  {
+   "id": "pTri",
+   "type": "osc",
+   "wave": "tri",
+   "freq": "f1*2"
+  },
+  {
+   "id": "pSq",
+   "type": "osc",
+   "wave": "square",
+   "freq": "f1"
+  },
+  {
+   "id": "pPl",
+   "type": "osc",
+   "wave": "pulse",
+   "width": 0.25,
+   "freq": "f1*2"
+  },
+  {
+   "id": "pBell",
+   "type": "modal",
+   "in": "clk*(t < length*0.1 ? 1 : 0)",
+   "freq": "f1*2",
+   "ratios": [
+    1,
+    2.76,
+    5.4
+   ],
+   "gains": [
+    1,
+    0.4,
+    0.15
+   ],
+   "decay": "length*(0.4 + ring*0.9)",
+   "tilt": 0.7
+  },
+  {
+   "id": "pFold",
+   "type": "shaper",
+   "in": "pSq*0.6 + pPl*0.3",
+   "drive": 3.5,
+   "mode": "fold"
+  },
+  {
+   "id": "pMix",
+   "type": "expr",
+   "expr": "(pSin*0.75 + pTri*0.12)*wSoft + (pSq*0.32 + pPl*0.12)*wChip + pFold*0.3*wGrit"
+  },
+  {
+   "id": "pBellMix",
+   "type": "expr",
+   "expr": "pBell*0.35*wSoft"
+  },
+  {
+   "id": "qSin",
+   "type": "osc",
+   "freq": "f2"
+  },
+  {
+   "id": "qTri",
+   "type": "osc",
+   "wave": "tri",
+   "freq": "f2*2"
+  },
+  {
+   "id": "qSq",
+   "type": "osc",
+   "wave": "square",
+   "freq": "f2"
+  },
+  {
+   "id": "qPl",
+   "type": "osc",
+   "wave": "pulse",
+   "width": 0.25,
+   "freq": "f2*2"
+  },
+  {
+   "id": "qBell",
+   "type": "modal",
+   "in": "n2Clk",
+   "freq": "f2*2",
+   "ratios": [
+    1,
+    2.76,
+    5.4
+   ],
+   "gains": [
+    1,
+    0.4,
+    0.15
+   ],
+   "decay": "length*(0.3 + ring*0.9)",
+   "tilt": 0.7
+  },
+  {
+   "id": "qFold",
+   "type": "shaper",
+   "in": "qSq*0.6 + qPl*0.3",
+   "drive": 3.5,
+   "mode": "fold"
+  },
+  {
+   "id": "qMix",
+   "type": "expr",
+   "expr": "(qSin*0.75 + qTri*0.12)*wSoft + (qSq*0.32 + qPl*0.12)*wChip + qFold*0.3*wGrit"
+  },
+  {
+   "id": "qBellMix",
+   "type": "expr",
+   "expr": "qBell*0.35*wSoft"
+  },
+  {
+   "id": "lead",
+   "type": "expr",
+   "expr": "pMix*a1*0.75 + pBellMix + qMix*a2*0.85 + qBellMix"
+  },
+  {
+   "id": "tone",
+   "type": "filter",
+   "mode": "lp",
+   "in": "lead",
+   "freq": "1200 + bright*8000",
+   "q": 0.6
+  },
+  {
+   "id": "crushed",
+   "type": "crush",
+   "in": "tone",
+   "bits": 6,
+   "rate": 12000
+  },
+  {
+   "id": "gritMix",
+   "type": "expr",
+   "expr": "tone*(1 - wGrit*0.7) + crushed*wGrit*0.7"
+  },
+  {
+   "id": "hpf",
+   "type": "filter",
+   "mode": "hp",
+   "in": "gritMix",
+   "freq": 60
+  }
+ ],
+ "out": "hpf*(1 - smooth(dur - 0.04, dur - 0.002, t))",
+ "presets": {
+  "Chiptune": {
+   "bright": 0.68,
+   "ring": 0.2,
+   "length": 0.3
+  },
+  "Storybook": {
+   "bright": 0.05,
+   "ring": 0.85,
+   "length": 0.55
+  },
+  "Gritty": {
+   "bright": 0.97,
+   "ring": 0.1,
+   "length": 0.28
+  }
+ }
+}

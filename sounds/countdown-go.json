@@ -1,0 +1,237 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "countdown-go",
+ "name": "Countdown go",
+ "category": "ui",
+ "description": "The \"go!\" after a 3-2-1 countdown: a high, bright, held beep that lifts up quickly as it starts. Change its pitch, length, brightness and lift. The same every time.",
+ "meta": {
+  "type": "sfx",
+  "role": "interface/confirm",
+  "themes": [
+   "neutral",
+   "sci-fi"
+  ],
+  "gameTypes": [
+   "arcade",
+   "racing",
+   "platformer",
+   "shooter",
+   "puzzle"
+  ],
+  "words": [
+   "go",
+   "start",
+   "countdown",
+   "race start",
+   "begin",
+   "beep",
+   "ready",
+   "launch",
+   "signal",
+   "round start"
+  ],
+  "license": "draft"
+ },
+ "duration": "length + 0.01",
+ "params": [
+  {
+   "id": "pitch",
+   "label": "Pitch",
+   "min": 2400,
+   "max": 5600,
+   "default": 4435,
+   "unit": "Hz",
+   "scale": "log"
+  },
+  {
+   "id": "length",
+   "label": "Length",
+   "min": 0.3,
+   "max": 0.9,
+   "default": 0.5,
+   "unit": "s",
+   "scale": "log"
+  },
+  {
+   "id": "bright",
+   "label": "Brightness",
+   "min": 0,
+   "max": 1,
+   "default": 0.45
+  },
+  {
+   "id": "lift",
+   "label": "Lift",
+   "min": 1,
+   "max": 12,
+   "default": 5,
+   "unit": "semitones"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "wSoft",
+   "type": "expr",
+   "expr": "1 - smooth(0.1, 0.75, bright)"
+  },
+  {
+   "id": "wGrit",
+   "type": "expr",
+   "expr": "smooth(0.65, 0.95, bright)"
+  },
+  {
+   "id": "wChip",
+   "type": "expr",
+   "expr": "clamp(1 - wSoft - wGrit, 0, 1)"
+  },
+  {
+   "id": "glide",
+   "type": "env",
+   "points": [
+    [
+     0,
+     "pitch*semi(-lift)"
+    ],
+    [
+     "0.04 + (lift - 1)*0.013",
+     "pitch",
+     "exp"
+    ]
+   ]
+  },
+  {
+   "id": "amp",
+   "type": "ad",
+   "attack": "0.002 + 0.006*(1 - smooth(0.1, 0.75, bright))",
+   "hold": "length*0.55*(1 - 0.35*smooth(0.65, 0.95, bright))",
+   "decay": "length*0.42",
+   "curve": 2.2
+  },
+  {
+   "id": "click",
+   "type": "ad",
+   "attack": 0.0005,
+   "decay": 0.012,
+   "curve": 3
+  },
+  {
+   "id": "mSin",
+   "type": "osc",
+   "freq": "glide"
+  },
+  {
+   "id": "mOct",
+   "type": "osc",
+   "freq": "glide*2"
+  },
+  {
+   "id": "mTri",
+   "type": "osc",
+   "wave": "tri",
+   "freq": "glide*3"
+  },
+  {
+   "id": "mSq",
+   "type": "osc",
+   "wave": "square",
+   "freq": "glide"
+  },
+  {
+   "id": "mPl",
+   "type": "osc",
+   "wave": "pulse",
+   "width": 0.25,
+   "freq": "glide*2"
+  },
+  {
+   "id": "mBell",
+   "type": "modal",
+   "in": "click",
+   "freq": "glide*2",
+   "ratios": [
+    1,
+    2.76,
+    5.4
+   ],
+   "gains": [
+    1,
+    0.4,
+    0.15
+   ],
+   "decay": "length*0.8",
+   "tilt": 0.7
+  },
+  {
+   "id": "mFold",
+   "type": "shaper",
+   "in": "mSq*0.6 + mPl*0.3",
+   "drive": 3.5,
+   "mode": "fold"
+  },
+  {
+   "id": "mMix",
+   "type": "expr",
+   "expr": "(mSin*0.42 + mOct*0.45 + mTri*0.35)*wSoft + (mSq*0.26 + mPl*0.38)*wChip + mFold*0.3*wGrit"
+  },
+  {
+   "id": "mBellMix",
+   "type": "expr",
+   "expr": "mBell*0.15*wSoft"
+  },
+  {
+   "id": "fifth",
+   "type": "osc",
+   "wave": "tri",
+   "freq": "glide*1.5"
+  },
+  {
+   "id": "lead",
+   "type": "expr",
+   "expr": "(mMix + fifth*0.12)*amp + mBellMix"
+  },
+  {
+   "id": "tone",
+   "type": "filter",
+   "mode": "lp",
+   "in": "lead",
+   "freq": "6000 + bright*9000",
+   "q": 0.6
+  },
+  {
+   "id": "crushed",
+   "type": "crush",
+   "in": "tone",
+   "bits": 6,
+   "rate": "pitch*5"
+  },
+  {
+   "id": "gritMix",
+   "type": "expr",
+   "expr": "tone*(1 - wGrit*0.7) + crushed*wGrit*0.7"
+  },
+  {
+   "id": "hpf",
+   "type": "filter",
+   "mode": "hp",
+   "in": "gritMix",
+   "freq": 60
+  }
+ ],
+ "out": "hpf*(1 - smooth(dur - 0.03, dur - 0.002, t))",
+ "presets": {
+  "Chiptune": {
+   "bright": 0.68,
+   "length": 0.42
+  },
+  "Storybook": {
+   "bright": 0.05,
+   "length": 0.65,
+   "lift": 3
+  },
+  "Gritty": {
+   "bright": 0.97,
+   "length": 0.38,
+   "lift": 8
+  }
+ }
+}

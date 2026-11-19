@@ -1,0 +1,174 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "swish-light",
+  "name": "Light swish",
+  "category": "weapon",
+  "description": "A thin, fast blade or stick through the air: a high, short whistling swish. Change its pitch, length, brightness and how much it whistles.",
+  "meta": {
+    "type": "sfx",
+    "role": "actions/swing",
+    "themes": [
+      "neutral",
+      "fantasy"
+    ],
+    "gameTypes": [
+      "turn-based-rpg",
+      "top-down-rpg",
+      "platformer",
+      "roguelike-action",
+      "arcade"
+    ],
+    "words": [
+      "swish",
+      "swing",
+      "dagger",
+      "rapier",
+      "stick",
+      "whip",
+      "fast",
+      "quick",
+      "slash",
+      "stab",
+      "attack",
+      "melee",
+      "whistle",
+      "air"
+    ],
+    "license": "draft"
+  },
+  "duration": "length + 0.02",
+  "params": [
+    {
+      "id": "pitch",
+      "label": "Pitch",
+      "unit": "Hz",
+      "min": 900,
+      "max": 4000,
+      "default": 1900,
+      "scale": "log"
+    },
+    {
+      "id": "length",
+      "label": "Length",
+      "unit": "s",
+      "min": 0.08,
+      "max": 0.3,
+      "default": 0.15,
+      "scale": "log"
+    },
+    {
+      "id": "bright",
+      "label": "Brightness",
+      "min": 0,
+      "max": 1,
+      "default": 0.5
+    },
+    {
+      "id": "whistle",
+      "label": "Whistle",
+      "min": 0,
+      "max": 1,
+      "default": 0.5
+    }
+  ],
+  "nodes": [
+    {
+      "id": "n",
+      "type": "noise"
+    },
+    {
+      "id": "amp",
+      "type": "env",
+      "points": [
+        [
+          0,
+          0.2
+        ],
+        [
+          "length * rnd(0.38, 0.48)",
+          1,
+          1.6
+        ],
+        [
+          "length",
+          0,
+          1.8
+        ]
+      ]
+    },
+    {
+      "id": "glide",
+      "type": "env",
+      "points": [
+        [
+          0,
+          "pitch * 0.7"
+        ],
+        [
+          "length * 0.45",
+          "pitch * rnd(1.08, 1.18)",
+          "exp"
+        ],
+        [
+          "length",
+          "pitch * 0.62",
+          "exp"
+        ]
+      ]
+    },
+    {
+      "id": "air",
+      "type": "filter",
+      "mode": "bp",
+      "in": "n",
+      "freq": "glide * (0.8 + bright * 0.4)",
+      "q": "1.2 + whistle * 5"
+    },
+    {
+      "id": "hiss",
+      "type": "filter",
+      "mode": "hp",
+      "in": "n",
+      "freq": "4000 + bright * 3000"
+    },
+    {
+      "id": "tone",
+      "type": "osc",
+      "wave": "sine",
+      "freq": "glide"
+    },
+    {
+      "id": "sum",
+      "type": "expr",
+      "expr": "(air * (1 + whistle * 1.2) + hiss * bright * 1.3 + tone * whistle * 0.35) * amp"
+    },
+    {
+      "id": "clean",
+      "type": "filter",
+      "mode": "hp",
+      "in": "sum",
+      "freq": 200
+    }
+  ],
+  "out": "clean",
+  "presets": {
+    "Dagger": {
+      "pitch": 2600,
+      "length": 0.1,
+      "bright": 0.6,
+      "whistle": 0.3
+    },
+    "Rapier": {
+      "pitch": 3200,
+      "length": 0.16,
+      "bright": 0.7,
+      "whistle": 0.85
+    },
+    "Stick": {
+      "pitch": 1100,
+      "length": 0.18,
+      "bright": 0.3,
+      "whistle": 0.15
+    }
+  }
+}

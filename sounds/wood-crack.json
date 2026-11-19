@@ -1,0 +1,45 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "wood-crack",
+ "name": "Wood crack",
+ "category": "impact",
+ "description": "A plank or branch snapping: a sharp splintering crack with the fibres tearing apart after it. Change its size, length, brightness and how much it splinters.",
+ "meta": {
+  "type": "sfx",
+  "role": "world/break",
+  "themes": ["neutral", "forest", "fantasy"],
+  "gameTypes": ["platformer", "top-down-rpg", "turn-based-rpg", "puzzle", "roguelike-action"],
+  "words": ["wood", "crack", "snap", "branch", "twig", "plank", "splinter", "break", "tear", "timber", "stick", "wooden"],
+  "license": "draft"
+ },
+ "duration": "length",
+ "params": [
+  { "id": "size", "label": "Size", "min": 0, "max": 1, "default": 0.5 },
+  { "id": "length", "label": "Length", "unit": "s", "min": 0.25, "max": 1.0, "default": 0.5, "scale": "log" },
+  { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+  { "id": "splinter", "label": "Splinter", "min": 0, "max": 1, "default": 0.5 }
+ ],
+ "nodes": [
+  { "id": "w", "type": "noise" },
+  { "id": "snapClk", "type": "clock", "rate": "rnd(28, 45)", "jitter": 0.6, "count": "1 + round(splinter*2)" },
+  { "id": "snapAmp", "type": "ad", "attack": 0.0003, "decay": "0.006 + 0.008*size", "curve": 2.5, "trig": "snapClk" },
+  { "id": "snapSrc", "type": "filter", "mode": "hp", "in": "w*snapAmp", "freq": "500 + 1500*bright - 300*size" },
+  { "id": "body", "type": "modal", "in": "snapSrc", "freq": "(480 - 260*size)*rnd(0.9, 1.1)", "ratios": [1, 2.57, 4.1, 6.3], "gains": [1, 0.7, 0.5, 0.3], "decay": "0.05 + 0.07*size", "tilt": 0.9 },
+  { "id": "tearEnv", "type": "env", "points": [[0, 0], ["0.015 + 0.02*size", 1], ["length*0.45", 0.5], ["length*0.92", 0, 1.8]] },
+  { "id": "fibres", "type": "dust", "density": "(250 + 1800*splinter)*tearEnv", "spread": 1 },
+  { "id": "fibreTone", "type": "modal", "in": "fibres", "freq": "(1500 - 500*size + 1200*bright)*rnd(0.9, 1.1)", "ratios": [1, 1.83, 2.9], "decay": 0.018, "tilt": 0.5 },
+  { "id": "strainSweep", "type": "env", "points": [[0, "(900 - 300*size)*rnd(0.9, 1.1)"], ["length*0.9", "(520 - 200*size)", "exp"]] },
+  { "id": "strain", "type": "filter", "mode": "bp", "in": "w", "freq": "strainSweep*(1 + 0.25*fibreTone)", "q": 5 },
+  { "id": "thudPitch", "type": "env", "points": [[0, "(170 - 70*size)"], [0.06, "(80 - 25*size)", "exp"]] },
+  { "id": "thud", "type": "osc", "freq": "thudPitch" },
+  { "id": "thudAmp", "type": "ad", "attack": 0.001, "decay": "0.04 + 0.08*size", "curve": 2 },
+  { "id": "dry", "type": "expr", "expr": "snapSrc*(0.9 + 0.8*bright) + body*0.3 + fibreTone*(0.03 + 0.09*splinter) + strain*tearEnv*(0.12 + 0.25*splinter) + thud*thudAmp*(0.3 + 0.5*size)" },
+  { "id": "clean", "type": "filter", "mode": "hp", "in": "dry", "freq": 40 }
+ ],
+ "out": "clean*(1 - smooth(dur - 0.05, dur - 0.003, t))",
+ "presets": {
+  "Twig": { "size": 0.05, "length": 0.3, "bright": 0.75, "splinter": 0.3 },
+  "Plank": { "size": 0.5, "length": 0.5, "bright": 0.5, "splinter": 0.6 },
+  "Tree branch": { "size": 0.9, "length": 0.9, "bright": 0.4, "splinter": 0.85 }
+ }
+}

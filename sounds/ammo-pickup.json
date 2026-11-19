@@ -1,0 +1,53 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "ammo-pickup",
+  "name": "Ammo pickup",
+  "category": "pickup",
+  "description": "Ammunition or arrows collected: a quick mechanical clack-clack of a magazine or a quiver with a short rising two-note blip. Change its pitch, speed, brightness and how hard the clacks are. The same every time.",
+  "meta": {
+    "type": "sfx",
+    "role": "items/pickup",
+    "themes": ["neutral", "sci-fi", "fantasy"],
+    "gameTypes": ["arcade", "shooter", "roguelike-action", "platformer", "top-down-rpg"],
+    "words": ["ammo", "ammunition", "bullets", "arrows", "quiver", "magazine", "clip", "reload", "refill", "pickup", "collect", "clack", "energy cell"],
+    "license": "draft"
+  },
+  "duration": "2.5/speed + 0.07",
+  "params": [
+    { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 400, "max": 1300, "default": 740, "scale": "log" },
+    { "id": "speed", "label": "Speed", "unit": "notes/s", "min": 10, "max": 20, "default": 14, "scale": "log" },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "clack", "label": "Clack", "min": 0, "max": 1, "default": 0.6 }
+  ],
+  "nodes": [
+    { "id": "hiss", "type": "noise", "seed": 11 },
+    { "id": "ckClk", "type": "clock", "rate": "speed/0.5", "count": 2 },
+    { "id": "ckHit", "type": "ad", "attack": 0.0003, "decay": "0.003 + clack*0.004", "curve": 2, "trig": "ckClk" },
+    { "id": "ckLevel", "type": "seq", "steps": [1, 0.8], "trig": "ckClk" },
+    { "id": "burst", "type": "expr", "expr": "hiss*ckHit*ckLevel" },
+    { "id": "wood", "type": "modal", "in": "burst", "freq": "520 + clack*120", "ratios": [1, 2.45, 3.9], "gains": [1, 0.6, 0.35], "decay": 0.05, "tilt": 0.7 },
+    { "id": "metal", "type": "modal", "in": "burst", "freq": "1250 + clack*250", "ratios": [1, 2.76, 5.4, 8.93], "gains": [1, 0.7, 0.45, 0.3], "decay": 0.07, "tilt": 0.6 },
+    { "id": "snapF", "type": "filter", "mode": "bp", "in": "burst", "freq": "2200 + bright*2500", "q": 1.2 },
+    { "id": "clacks", "type": "expr", "expr": "wood*0.2*(1 - smooth(0.2, 0.6, bright)) + metal*0.1*smooth(0.2, 0.6, bright) + snapF*0.8" },
+    { "id": "nClk", "type": "clock", "rate": "speed", "count": 2, "delay": "0.9/speed" },
+    { "id": "note", "type": "seq", "steps": ["pitch", "pitch*semi(3)"], "trig": "nClk" },
+    { "id": "nAmp", "type": "ad", "attack": 0.002, "hold": "0.3/speed", "decay": "0.07 + 0.3/speed", "curve": 2.5, "trig": "nClk" },
+    { "id": "sn", "type": "osc", "wave": "sine", "freq": "note" },
+    { "id": "tr", "type": "osc", "wave": "tri", "freq": "note" },
+    { "id": "sq", "type": "osc", "wave": "square", "freq": "note" },
+    { "id": "fmMod", "type": "osc", "wave": "sine", "freq": "note*2" },
+    { "id": "fmCar", "type": "osc", "wave": "sine", "freq": "note", "pm": "fmMod*smooth(0.6, 1, bright)*0.5" },
+    { "id": "body", "type": "expr", "expr": "tr*clamp(1 - bright*1.5, 0, 1)*0.6 + sn*0.3 + sq*bright*(1 - smooth(0.7, 1, bright)*0.6)*0.4 + fmCar*smooth(0.6, 1, bright)*0.6" },
+    { "id": "tone", "type": "filter", "mode": "lp", "in": "body", "freq": "note*(3 + bright*14)", "q": 0.7 },
+    { "id": "crushed", "type": "crush", "in": "tone", "bits": 5, "rate": 9000 },
+    { "id": "blip", "type": "expr", "expr": "mix(tone, crushed, smooth(0.7, 1, bright)*0.7)*nAmp" },
+    { "id": "dry", "type": "expr", "expr": "blip*0.8 + clacks*(0.25 + clack*0.9)" },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "dry", "freq": 200, "q": 0.7 }
+  ],
+  "out": "clean",
+  "presets": {
+    "Arrows": { "pitch": 587, "speed": 12, "bright": 0.1, "clack": 0.75 },
+    "Bullets": { "pitch": 740, "speed": 15, "bright": 0.5, "clack": 0.8 },
+    "Energy cells": { "pitch": 988, "speed": 18, "bright": 0.95, "clack": 0.5 }
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "wood-knock",
+  "name": "Wooden hit",
+  "category": "impact",
+  "tags": ["wood", "knock", "hit", "block"],
+  "description": "A blunt hit on something wooden: a dry, hollow knock with a short ringing body. Change its size, length, brightness and snap.",
+  "meta": {
+    "type": "sfx",
+    "role": "actions/hit",
+    "themes": ["neutral", "fantasy", "forest"],
+    "gameTypes": ["platformer", "turn-based-rpg", "top-down-rpg", "roguelike-action", "arcade"],
+    "words": ["wood", "wooden", "knock", "hit", "staff", "crate", "shield", "block", "bonk", "thwack", "strike", "bump", "hollow"],
+    "license": "draft"
+  },
+  "duration": "length",
+  "params": [
+    { "id": "size", "label": "Size", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "length", "label": "Length", "unit": "s", "min": 0.08, "max": 0.35, "default": 0.15, "scale": "log" },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "snap", "label": "Snap", "min": 0, "max": 1, "default": 0.5 }
+  ],
+  "nodes": [
+    { "id": "j", "type": "rand", "lo": 0.94, "hi": 1.06 },
+    { "id": "n", "type": "noise" },
+    { "id": "hitEnv", "type": "ad", "attack": 0.0003, "decay": "0.002 + (1 - snap)*0.006", "curve": 2 },
+    { "id": "exc", "type": "filter", "mode": "lp", "in": "n*hitEnv", "freq": "1200 + bright*8000 + snap*3000" },
+    { "id": "knock", "type": "modal", "in": "exc", "freq": "(640 - size*340)*j", "ratios": [1, 2.4, 3.95, 5.6], "decay": "length*0.55", "tilt": 0.6 },
+    { "id": "hollow", "type": "modal", "in": "exc", "freq": "(230 - size*100)*j", "ratios": [1, 1.62, 2.3], "decay": "length*0.8", "tilt": 0.35 },
+    { "id": "tf", "type": "env", "points": [[0, "(170 - size*70)*rnd(0.95, 1.05)"], [0.04, "90 - size*35", "exp"]] },
+    { "id": "th", "type": "osc", "wave": "sine", "freq": "tf" },
+    { "id": "ta", "type": "ad", "attack": 0.0008, "decay": "length*0.5", "curve": 2.5 },
+    { "id": "clickEnv", "type": "ad", "attack": 0.0002, "decay": 0.003, "curve": 2 },
+    { "id": "click", "type": "filter", "mode": "hp", "in": "n*clickEnv", "freq": 2500 },
+    { "id": "sum", "type": "expr", "expr": "knock*0.12 + hollow*0.08 + th*ta*0.22*(0.4 + size*0.6) + click*snap*(0.3 + bright)*1.2 + exc*0.15" },
+    { "id": "tone", "type": "filter", "mode": "lp", "in": "sum", "freq": "1200 + bright*12000" },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "tone", "freq": 40 }
+  ],
+  "out": "clean",
+  "presets": {
+    "Staff strike": { "size": 0.3, "length": 0.12, "bright": 0.65, "snap": 0.8 },
+    "Crate bump": { "size": 0.65, "length": 0.2, "bright": 0.4, "snap": 0.4 },
+    "Shield block": { "size": 0.85, "length": 0.28, "bright": 0.5, "snap": 0.7 }
+  }
+}

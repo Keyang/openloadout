@@ -1,0 +1,48 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "footstep-stone",
+ "name": "Footstep on stone",
+ "category": "movement",
+ "description": "A hard, short knock of a step on a stone floor with a dry click on top and a hint of a hall. Every take is a different step; change its weight, length, brightness and the scrape after it.",
+ "meta": {
+  "type": "sfx",
+  "role": "characters/footstep",
+  "themes": ["neutral", "dungeon", "fantasy"],
+  "gameTypes": ["top-down-rpg", "platformer", "turn-based-rpg", "roguelike-action"],
+  "words": ["footstep", "footsteps", "step", "walk", "run", "stone", "floor", "castle", "dungeon", "hall", "knock", "heel", "cobble", "tread"],
+  "license": "draft"
+ },
+ "duration": "length*(0.75 + 0.25*weight) + 0.03",
+ "params": [
+  { "id": "weight", "label": "Weight", "min": 0.5, "max": 2, "default": 1 },
+  { "id": "length", "label": "Length", "unit": "s", "min": 0.07, "max": 0.2, "default": 0.12, "scale": "log" },
+  { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+  { "id": "scuff", "label": "Scuff", "min": 0, "max": 1, "default": 0.25 }
+ ],
+ "nodes": [
+  { "id": "cn", "type": "noise" },
+  { "id": "cAmp", "type": "ad", "attack": 0.0003, "decay": "0.002 + 0.002*bright", "curve": 2 },
+  { "id": "click", "type": "filter", "mode": "hp", "in": "cn*cAmp", "freq": "2200 + bright*3500", "q": 0.8 },
+  { "id": "knock", "type": "modal", "in": "cn*cAmp", "freq": "rnd(0.9, 1.1)*560/pow(weight, 0.7)", "ratios": [1, 1.62, 2.27, 3.41], "gains": [1, 0.8, 0.6, 0.4], "decay": "0.025 + 0.025*weight", "tilt": 0.6 },
+  { "id": "pn", "type": "noise", "color": "pink" },
+  { "id": "body", "type": "filter", "mode": "bp", "in": "pn", "freq": "rnd(0.9, 1.1)*(650 + bright*800)/pow(weight, 0.5)", "q": 1.3 },
+  { "id": "bodyAmp", "type": "ad", "attack": 0.0005, "decay": "0.018 + 0.022*weight", "curve": 2.5 },
+  { "id": "heelPitch", "type": "env", "points": [[0, "120/weight"], [0.04, "60/weight", "exp"]] },
+  { "id": "heel", "type": "osc", "freq": "heelPitch" },
+  { "id": "heelAmp", "type": "ad", "attack": 0.001, "decay": "0.025*weight", "curve": 2 },
+  { "id": "c2", "type": "clock", "rate": 1, "count": 1, "delay": "length*(0.75 + 0.25*weight)*rnd(0.22, 0.32)" },
+  { "id": "scAmp", "type": "env", "trig": "c2", "points": [[0, 0], [0.008, 1], ["length*(0.75 + 0.25*weight)*0.5", 0, 2]] },
+  { "id": "grit", "type": "dust", "density": 2500, "spread": 1 },
+  { "id": "scrape", "type": "filter", "mode": "bp", "in": "cn*0.5 + grit", "freq": "rnd(0.85, 1.15)*(1800 + bright*2600)/pow(weight, 0.3)", "q": 0.9 },
+  { "id": "dry", "type": "expr", "expr": "click*(0.6 + bright) + knock*0.22 + body*bodyAmp*1.4 + heel*heelAmp*0.35*pow(weight, 0.5) + scrape*scAmp*scuff*1.6" },
+  { "id": "hall", "type": "reverb", "in": "dry", "size": 0.45, "damp": "0.7 - bright*0.3", "mix": 0.14 },
+  { "id": "fade", "type": "env", "points": [[0, 1], ["length*(0.75 + 0.25*weight)*0.75", 1], ["length*(0.75 + 0.25*weight) + 0.028", 0, 1.5]] },
+  { "id": "clean", "type": "filter", "mode": "hp", "in": "hall*fade", "freq": 35 }
+ ],
+ "out": "clean",
+ "presets": {
+  "Soft shoes": { "weight": 0.8, "length": 0.1, "bright": 0.3, "scuff": 0.15 },
+  "Heavy boots": { "weight": 1.8, "length": 0.17, "bright": 0.55, "scuff": 0.35 },
+  "Bare feet": { "weight": 0.7, "length": 0.08, "bright": 0.1, "scuff": 0 }
+ }
+}

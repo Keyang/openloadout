@@ -1,0 +1,149 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "warning-beep",
+ "name": "Warning beep",
+ "category": "ui",
+ "description": "A short urgent alert of quick identical beeps, for danger near, low fuel or an enemy spotting you. Change the pitch, the number of beeps, their speed and brightness.",
+ "meta": {
+  "type": "sfx",
+  "role": "interface/error",
+  "themes": [
+   "neutral",
+   "sci-fi"
+  ],
+  "gameTypes": [
+   "arcade",
+   "shooter",
+   "roguelike-action",
+   "racing",
+   "platformer"
+  ],
+  "words": [
+   "warning",
+   "beep",
+   "alert",
+   "danger",
+   "alarm",
+   "low fuel",
+   "spotted",
+   "detected",
+   "caution",
+   "notice",
+   "radar",
+   "beeping"
+  ],
+  "license": "draft"
+ },
+ "duration": "(beeps - 1) / speed + (beeps == 1 ? max(0.4 / speed, 0.17) : 0.4 / speed) + (beeps == 2 ? max(0.15 / speed, 0.055) : 0.15 / speed) + 0.022",
+ "params": [
+  {
+   "id": "pitch",
+   "label": "Pitch",
+   "unit": "Hz",
+   "min": 600,
+   "max": 2500,
+   "default": 1300,
+   "scale": "log"
+  },
+  {
+   "id": "beeps",
+   "label": "Beeps",
+   "min": 1,
+   "max": 4,
+   "default": 3,
+   "step": 1
+  },
+  {
+   "id": "speed",
+   "label": "Speed",
+   "unit": "notes per second",
+   "min": 4.7,
+   "max": 11,
+   "default": 6.5,
+   "scale": "log"
+  },
+  {
+   "id": "bright",
+   "label": "Brightness",
+   "min": 0,
+   "max": 1,
+   "default": 0.45
+  }
+ ],
+ "nodes": [
+  {
+   "id": "clk",
+   "type": "clock",
+   "rate": "speed",
+   "count": "beeps"
+  },
+  {
+   "id": "amp",
+   "type": "ad",
+   "attack": 0.002,
+   "hold": "(beeps == 1 ? max(0.4 / speed, 0.17) : 0.4 / speed)",
+   "decay": "(beeps == 2 ? max(0.15 / speed, 0.055) : 0.15 / speed)",
+   "curve": 1.6,
+   "trig": "clk"
+  },
+  {
+   "id": "pure",
+   "type": "osc",
+   "wave": "sine",
+   "freq": "pitch"
+  },
+  {
+   "id": "upper",
+   "type": "osc",
+   "wave": "sine",
+   "freq": "pitch * 2"
+  },
+  {
+   "id": "edge",
+   "type": "osc",
+   "wave": "square",
+   "freq": "pitch"
+  },
+  {
+   "id": "edgeTone",
+   "type": "filter",
+   "mode": "lp",
+   "in": "edge",
+   "freq": "pitch * (1.5 + bright * 5)",
+   "q": 0.7
+  },
+  {
+   "id": "mixd",
+   "type": "expr",
+   "expr": "pure * (1 - bright * 0.5) + upper * 0.15 + edgeTone * bright * 0.7"
+  },
+  {
+   "id": "clean",
+   "type": "filter",
+   "mode": "hp",
+   "in": "mixd * amp",
+   "freq": 60
+  }
+ ],
+ "out": "clean",
+ "presets": {
+  "Danger near": {
+   "pitch": 1300,
+   "beeps": 4,
+   "speed": 9,
+   "bright": 0.6
+  },
+  "Low fuel": {
+   "pitch": 800,
+   "beeps": 2,
+   "speed": 5,
+   "bright": 0.25
+  },
+  "Spotted": {
+   "pitch": 1900,
+   "beeps": 2,
+   "speed": 8,
+   "bright": 0.8
+  }
+ }
+}

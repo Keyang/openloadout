@@ -1,0 +1,56 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "heart-pickup",
+  "name": "Heart pickup",
+  "category": "pickup",
+  "description": "Health restored: three warm, round notes that rise gently and swell, with a soft shimmer after them. Change its pitch, speed, brightness and glow. The same every time.",
+  "meta": {
+    "type": "sfx",
+    "role": "items/pickup",
+    "themes": ["neutral", "fantasy"],
+    "gameTypes": ["arcade", "platformer", "turn-based-rpg", "top-down-rpg", "roguelike-action"],
+    "words": ["heart", "health", "life", "heal", "restore", "recover", "pickup", "collect", "hp", "refill", "warm", "glow"],
+    "license": "draft"
+  },
+  "duration": "2/speed + 0.19 + glow*0.12",
+  "params": [
+    { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 330, "max": 1100, "default": 587, "scale": "log" },
+    { "id": "speed", "label": "Speed", "unit": "notes/s", "min": 7, "max": 14, "default": 9, "scale": "log" },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.4 },
+    { "id": "glow", "label": "Glow", "min": 0, "max": 1, "default": 0.5 }
+  ],
+  "nodes": [
+    { "id": "clk", "type": "clock", "rate": "speed", "count": 3 },
+    { "id": "note", "type": "seq", "steps": ["pitch", "pitch*semi(2)", "pitch*semi(7)"], "trig": "clk" },
+    { "id": "glide", "type": "lag", "in": "note", "time": 0.006 },
+    { "id": "lastClk", "type": "clock", "rate": 1, "count": 1, "delay": "2/speed" },
+    { "id": "ampShort", "type": "ad", "attack": 0.004, "decay": "1.4/speed", "curve": 1.6, "trig": "clk" },
+    { "id": "ampLast", "type": "ad", "attack": 0.006, "hold": 0.03, "decay": 0.17, "curve": 1.8, "trig": "lastClk" },
+    { "id": "isLast", "type": "expr", "expr": "t >= 2/speed - 0.0005 ? 1 : 0" },
+    { "id": "swell", "type": "env", "points": [[0, 0.7], ["2/speed + 0.02", 1, 0.8]] },
+    { "id": "amp", "type": "expr", "expr": "(isLast ? ampLast : ampShort)*swell" },
+    { "id": "sn", "type": "osc", "wave": "sine", "freq": "glide" },
+    { "id": "oct", "type": "osc", "wave": "sine", "freq": "glide*2" },
+    { "id": "tr", "type": "osc", "wave": "tri", "freq": "glide" },
+    { "id": "sq", "type": "osc", "wave": "pulse", "width": 0.35, "freq": "glide" },
+    { "id": "body", "type": "expr", "expr": "sn*clamp(1 - bright*1.3, 0, 1)*0.9 + oct*0.18 + tr*0.5 + sq*bright*0.45" },
+    { "id": "soft", "type": "filter", "mode": "lp", "in": "body", "freq": "glide*(2.5 + bright*14)", "q": 0.7 },
+    { "id": "crushed", "type": "crush", "in": "soft", "bits": 5, "rate": 7000 },
+    { "id": "grit", "type": "expr", "expr": "mix(soft, crushed, smooth(0.7, 1, bright)*0.7)*amp" },
+    { "id": "glowClk", "type": "clock", "rate": 1, "count": 1, "delay": "2/speed + 0.03" },
+    { "id": "glowAmp", "type": "ad", "attack": 0.03, "decay": "0.12 + glow*0.1", "curve": 1.6, "trig": "glowClk" },
+    { "id": "sh1", "type": "osc", "wave": "sine", "freq": "pitch*semi(7)*3" },
+    { "id": "sh2", "type": "osc", "wave": "sine", "freq": "pitch*semi(7)*4.02" },
+    { "id": "trem", "type": "osc", "wave": "sine", "freq": 24 },
+    { "id": "shimmer", "type": "expr", "expr": "(sh1 + sh2*0.7)*(0.65 + 0.35*trem)*glowAmp*glow" },
+    { "id": "dry", "type": "expr", "expr": "grit + shimmer*0.35" },
+    { "id": "room", "type": "reverb", "in": "dry", "size": 0.35, "damp": 0.5, "mix": "0.16*(1 - bright)^2" },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "room", "freq": 150, "q": 0.7 }
+  ],
+  "out": "clean",
+  "presets": {
+    "Chiptune": { "pitch": 660, "speed": 11, "bright": 0.6, "glow": 0.2 },
+    "Storybook": { "pitch": 523, "speed": 8, "bright": 0.1, "glow": 0.9 },
+    "Gritty": { "pitch": 587, "speed": 13, "bright": 0.95, "glow": 0.1 }
+  }
+}

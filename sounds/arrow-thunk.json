@@ -1,0 +1,47 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "arrow-thunk",
+  "name": "Arrow hit",
+  "category": "impact",
+  "tags": ["arrow", "bolt", "thunk", "twang"],
+  "description": "An arrow or bolt striking a target: a sharp thunk and a short twang of the shaft shaking. Change its pitch, length, brightness and how much it quivers.",
+  "meta": {
+    "type": "sfx",
+    "role": "actions/hit",
+    "themes": ["neutral", "fantasy", "forest"],
+    "gameTypes": ["top-down-rpg", "platformer", "turn-based-rpg", "roguelike-action", "shooter"],
+    "words": ["arrow", "bolt", "hit", "thunk", "target", "bow", "crossbow", "stick", "quiver", "twang", "impact", "archery"],
+    "license": "draft"
+  },
+  "duration": "length",
+  "params": [
+    { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 120, "max": 500, "default": 220, "scale": "log" },
+    { "id": "length", "label": "Length", "unit": "s", "min": 0.12, "max": 0.5, "default": 0.25, "scale": "log" },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "quiver", "label": "Quiver", "min": 0, "max": 1, "default": 0.5 }
+  ],
+  "nodes": [
+    { "id": "j", "type": "rand", "lo": 0.95, "hi": 1.05 },
+    { "id": "j2", "type": "rand", "lo": 0.93, "hi": 1.07 },
+    { "id": "n", "type": "noise" },
+    { "id": "ce", "type": "ad", "attack": 0.0002, "decay": 0.003, "curve": 2 },
+    { "id": "click", "type": "filter", "mode": "hp", "in": "n*ce", "freq": "2500 + bright*3000" },
+    { "id": "exc", "type": "filter", "mode": "lp", "in": "n*ce", "freq": "2000 + bright*5000" },
+    { "id": "tf", "type": "env", "points": [[0, "pitch*1.4*rnd(0.95, 1.05)"], [0.03, "pitch*0.45", "exp"]] },
+    { "id": "th", "type": "osc", "wave": "sine", "freq": "tf" },
+    { "id": "ta", "type": "ad", "attack": 0.0005, "decay": "0.04 + length*0.12", "curve": 2.5 },
+    { "id": "target", "type": "modal", "in": "exc", "freq": "pitch*3.2*j", "ratios": [1, 2.4, 3.9], "decay": "0.04 + length*0.1", "tilt": 0.6 },
+    { "id": "wob", "type": "osc", "wave": "sine", "freq": "(16 + pitch*0.08)*j2" },
+    { "id": "shaft", "type": "pluck", "freq": "pitch*j2*(1 + 0.015*wob*quiver)", "decay": "length*1.6", "damp": "0.4 - bright*0.3" },
+    { "id": "twA", "type": "ad", "attack": 0.003, "decay": "length", "curve": 1.2 },
+    { "id": "sum", "type": "expr", "expr": "click*1.4 + th*ta*0.3 + target*0.15 + shaft*twA*(1 - quiver*0.7*(0.5 + 0.5*wob))*quiver*1.4" },
+    { "id": "tone", "type": "filter", "mode": "lp", "in": "sum", "freq": "2500 + bright*10000" },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "tone", "freq": 40 }
+  ],
+  "out": "clean",
+  "presets": {
+    "Into wood": { "pitch": 200, "length": 0.28, "bright": 0.5, "quiver": 0.6 },
+    "Into a target": { "pitch": 160, "length": 0.2, "bright": 0.3, "quiver": 0.35 },
+    "Glancing off": { "pitch": 380, "length": 0.18, "bright": 0.8, "quiver": 0.85 }
+  }
+}

@@ -1,0 +1,181 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "swing-heavy",
+  "name": "Heavy swing",
+  "category": "weapon",
+  "description": "A big slow weapon cutting the air: a deep, wide whoosh that swells and falls. Change its weight, length, brightness and how sudden the peak is.",
+  "meta": {
+    "type": "sfx",
+    "role": "actions/swing",
+    "themes": [
+      "neutral",
+      "fantasy"
+    ],
+    "gameTypes": [
+      "turn-based-rpg",
+      "top-down-rpg",
+      "platformer",
+      "roguelike-action"
+    ],
+    "words": [
+      "swing",
+      "heavy",
+      "hammer",
+      "axe",
+      "club",
+      "whoosh",
+      "swoosh",
+      "attack",
+      "melee",
+      "smash",
+      "cleave",
+      "slow",
+      "big"
+    ],
+    "license": "draft"
+  },
+  "duration": "clamp(length * (0.85 + weight * 0.3), 0.25, 0.8) + 0.02",
+  "params": [
+    {
+      "id": "weight",
+      "label": "Weight",
+      "min": 0,
+      "max": 1,
+      "default": 0.5
+    },
+    {
+      "id": "length",
+      "label": "Length",
+      "unit": "s",
+      "min": 0.25,
+      "max": 0.8,
+      "default": 0.45,
+      "scale": "log"
+    },
+    {
+      "id": "bright",
+      "label": "Brightness",
+      "min": 0,
+      "max": 1,
+      "default": 0.5
+    },
+    {
+      "id": "rush",
+      "label": "Rush",
+      "min": 0,
+      "max": 1,
+      "default": 0.5
+    }
+  ],
+  "nodes": [
+    {
+      "id": "n",
+      "type": "noise",
+      "color": "pink"
+    },
+    {
+      "id": "nw",
+      "type": "noise"
+    },
+    {
+      "id": "e",
+      "type": "env",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          "clamp(length * (0.85 + weight * 0.3), 0.25, 0.8) * (0.55 - rush * 0.2)",
+          1,
+          1.3
+        ],
+        [
+          "clamp(length * (0.85 + weight * 0.3), 0.25, 0.8)",
+          0,
+          1.4
+        ]
+      ]
+    },
+    {
+      "id": "st",
+      "type": "env",
+      "points": [
+        [
+          0,
+          0.18
+        ],
+        [
+          "clamp(length * (0.85 + weight * 0.3), 0.25, 0.8) * (0.55 - rush * 0.2)",
+          0
+        ]
+      ]
+    },
+    {
+      "id": "shape",
+      "type": "expr",
+      "expr": "pow(e, 1 + rush * 2.5) + st"
+    },
+    {
+      "id": "centre",
+      "type": "expr",
+      "expr": "(900 - weight * 450) * rnd(0.94, 1.06) * 2^(1.4 * (shape - 0.5))"
+    },
+    {
+      "id": "body",
+      "type": "filter",
+      "mode": "bp",
+      "in": "n",
+      "freq": "centre",
+      "q": "0.7 + rush * 1.2"
+    },
+    {
+      "id": "edge",
+      "type": "filter",
+      "mode": "bp",
+      "in": "nw",
+      "freq": "centre * (2.6 + bright * 2.4)",
+      "q": 1.4
+    },
+    {
+      "id": "low",
+      "type": "filter",
+      "mode": "lp",
+      "in": "n",
+      "freq": "220 - weight * 80"
+    },
+    {
+      "id": "sum",
+      "type": "expr",
+      "expr": "(body * 1.0 + edge * (0.06 + bright * 0.34) + low * (0.4 + weight * 0.6)) * shape"
+    },
+    {
+      "id": "clean",
+      "type": "filter",
+      "mode": "hp",
+      "in": "sum",
+      "freq": 45
+    }
+  ],
+  "out": "clean",
+  "presets": {
+    "War hammer": {
+      "weight": 0.9,
+      "length": 0.6,
+      "bright": 0.3,
+      "rush": 0.75
+    },
+    "Great axe": {
+      "weight": 0.6,
+      "length": 0.5,
+      "bright": 0.7,
+      "rush": 0.55
+    },
+    "Club": {
+      "weight": 0.35,
+      "length": 0.32,
+      "bright": 0.35,
+      "rush": 0.3
+    }
+  }
+}
