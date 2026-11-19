@@ -30,17 +30,27 @@
 //     it). The style guide's advice applies to the action. Direction names, `directions` and meta view "top-down" need
 //     a top-down body.
 //
+// LIBRARY BODIES (studio item F2; docs/studio.md 2.3, "Library bodies: one module each"). This file names no library
+// body. body.library is looked up in LIBRARY_REGISTRY (every body engine/library-bodies.js lists; opts.bodies, a
+// registry made by engine/library-body.js libraryBodies(), replaces it for tests and tools), and the body's descriptor
+// says what its figure may hold (a spec), what a control may set (settings, aliases), what body.paint may paint
+// (colours), its parts, sockets, key fields and poses, its frame sizes (a definition picks one with `size`; the first is
+// the default) and pivots, and its view (a "top-down" body may have direction clips). FIGURE_SETTINGS and the other
+// humanoid tables below are rigs/body-humanoid.js's, passed on under their old names. `made.in` is "studio" (made in
+// the studio) or "library" (a library sprite converted from its code file: from "code:<id>").
+//
 // Every function returns { ok, errors, warnings, value } and never throws. errors block drawing and the bag; warnings are
 // advice (or say what was cleaned). value is the cleaned copy (plain JSON) when ok, else null.
 // Pure JavaScript with no page, worker or Node in it: the site, the build and the tests all import this file.
 
 import { validateMeta, META_FIELDS, SPRITE_TYPES, SPRITE_ROLES, VIEWS, LICENSES, THEMES, GAME_TYPES } from './schema.js';
 import { MATERIAL_IDS } from '../engine/materials.js';
-import { POSES, HAIR_STYLES, ITEMS, PIVOT as HUMANOID_PIVOT } from '../rigs/humanoid.js';
 import { groundOf } from '../rigs/bones.js';
-import { STANCES, MOVES, HELD, HEADGEAR, PACKS } from '../rigs/humanoid-figure.js';
-import { POSE_FIELDS, CAPE_KINDS, HERO_HEADGEAR } from '../rigs/humanoid-studio.js';
-import { COLOUR_RULES, PAINT_DEPTH, FIGURE_BLOCKS } from '../engine/data-rules.js';
+import { COLOUR_RULES, PAINT_DEPTH } from '../engine/data-rules.js';
+// library bodies (studio item F2): each is one module listed in engine/library-bodies.js; this file never names one
+import { libraryBodies, isLibraryBodies } from '../engine/library-body.js';
+import * as LISTED_BODIES from '../engine/library-bodies.js';
+import { HUMANOID_BODY } from '../rigs/body-humanoid.js';
 
 // ---- the tables ---------------------------------------------------------------------------------------------------
 
@@ -176,14 +186,28 @@ export function directionRig(rig, direction) {
   return out;
 }
 
-/** The library bodies a definition may name; each has a renderer in the framework. */
-export const LIBRARY_BODIES = Object.freeze(['humanoid']);
+/** The registry of library bodies a definition may name (body.library): every body engine/library-bodies.js lists, each one module (studio item F2). */
+export const LIBRARY_REGISTRY = libraryBodies(LISTED_BODIES);
 
-/** The frame of every humanoid library body (rigs/humanoid.js SIZE). */
-export const LIBRARY_SIZE = Object.freeze([64, 64]);
+/** The library bodies a definition may name; each has a renderer in the framework (its module, listed in engine/library-bodies.js). */
+export const LIBRARY_BODIES = LIBRARY_REGISTRY.names;
 
-/** The anchor of every humanoid library body: rigs/humanoid.js PIVOT ([CX, GROUND], the style guide's [28, 58]). */
-export const LIBRARY_PIVOT = Object.freeze([...HUMANOID_PIVOT]);
+/**
+ * Returns a library body's descriptor by its name (engine/library-body.js), or null when there is none.
+ * Arguments: name (what body.library says), opts ({ bodies }: a registry made by libraryBodies(), used instead of LIBRARY_REGISTRY; for tests and tools that add a body).
+ */
+export function libraryBody(name, opts = {}) {
+  return registryOf(opts).get(name);
+}
+
+/** The registry a check uses: opts.bodies when it is one libraryBodies() made, else LIBRARY_REGISTRY. */
+const registryOf = (opts) => (isLibraryBodies(opts?.bodies) ? opts.bodies : LIBRARY_REGISTRY);
+
+/** The frame of the humanoid library body (rigs/humanoid.js SIZE); other bodies have their own sizes (their descriptor's `sizes`). */
+export const LIBRARY_SIZE = Object.freeze([...HUMANOID_BODY.sizes[0]]);
+
+/** The anchor of the humanoid library body: rigs/humanoid.js PIVOT ([CX, GROUND], the style guide's [28, 58]). */
+export const LIBRARY_PIVOT = Object.freeze([...HUMANOID_BODY.pivots['64x64']]);
 
 // The style guide's pivot x for a body that stands in a frame of each size (section 1, "Frame sizes": characters and
 // creatures first, since a studio body is one of them); a size it does not list stands in the middle.
@@ -203,30 +227,14 @@ export function defaultPivot(size, grounded = true) {
 /** The default pivot (standing) of every frame size, keyed "WxH": what defaultPivot() gives. */
 export const STUDIO_PIVOTS = Object.freeze(Object.fromEntries(FRAME_SIZES.map(([w, h]) => [`${w}x${h}`, Object.freeze(defaultPivot([w, h]))])));
 
-/** The parts of a humanoid figure a sprite may let people switch off (rigs/humanoid-figure.js; the cape: rigs/humanoid-studio.js). */
-export const LIBRARY_PARTS = Object.freeze(['held', 'headgear', 'mask', 'scarf', 'belt', 'coat', 'pack', 'cape']);
+/** The parts of a humanoid figure a sprite may let people switch off (rigs/body-humanoid.js; rigs/humanoid-figure.js; the cape: rigs/humanoid-studio.js). */
+export const LIBRARY_PARTS = HUMANOID_BODY.parts;
 
-/** The fields of figure.body a library body's slider may set, each 0..1. */
-export const LIBRARY_BODY_FIELDS = Object.freeze(['height', 'build', 'head']);
+/** The fields of figure.body a humanoid library body's slider may set by their short names (height, build, head), each 0..1. */
+export const LIBRARY_BODY_FIELDS = Object.freeze(Object.keys(HUMANOID_BODY.aliases));
 
-/**
- * What a key of a humanoid library body may hold: the fields of the pose rigs/humanoid.js pose() returns and
- * rigs/humanoid-figure.js adds, each with its kind: px (pixels), angle (degrees), share (0..1), signed (-1..1),
- * point ({ x, y } pixels), arm ({ a, e } degrees), flag (true or false, stepped).
- */
-export const HUMANOID_POSE_FIELDS = Object.freeze({
-  rootX: 'px', lift: 'px', crouch: 'px', lean: 'angle', headTilt: 'angle', item: 'angle', item2: 'angle',
-  sway: 'signed', glow: 'share', lie: 'share', headTurn: 'angle', pull: 'share', fling: 'share', air: 'share', out: 'share', level2: 'share',
-  footF: 'point', footB: 'point', armF: 'arm', armB: 'arm',
-  blink: 'flag', flash: 'flag', mouth: 'flag', fire: 'flag',
-});
-
-/**
- * What a key of a humanoid library body may hold besides HUMANOID_POSE_FIELDS: the fields the figure's own moves add
- * (rigs/humanoid-figure.js throw, toss, steal; ranges, words and null from rigs/humanoid-studio.js POSE_FIELDS): far
- * (share), glint (count: a whole number 0..2), prize (flag), knife (word: 'hand' or 'air', or null). air and knife may be null.
- */
-export const HUMANOID_MOVE_FIELDS = Object.freeze({ far: 'share', glint: 'count', prize: 'flag', knife: 'word' });
+// What a key of a humanoid library body may hold (moved to rigs/body-humanoid.js in studio item F2; passed on here).
+export { HUMANOID_POSE_FIELDS, HUMANOID_MOVE_FIELDS } from '../rigs/body-humanoid.js';
 
 /** The pattern of a name inside a definition (bones, shapes, slots, parts, clips, keys of controls): a lowercase letter, then letters, digits and dashes, at most 40. */
 export const ID_PATTERN = /^[a-z][a-zA-Z0-9-]{0,39}$/;
@@ -246,7 +254,9 @@ export const STUDIO_FORMATS = Object.freeze({ 'loadout-sprite': 1, 'loadout-rig'
 const PROTO_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
 const HEX_RE = /^#[0-9a-fA-F]{6}$/;
 const BAD_CHARS = /[\u0000-\u001f\u007f-\u009f\u200b-\u200f\u2028\u2029\u202a-\u202e\u2060\u2066-\u2069\ufeff]/;
-const MADE_FROM_RE = /^(?:new|template:[a-z][a-z0-9-]{0,39}|library:[a-z][a-z0-9-]{0,39})$/;
+// where a definition was made (studio item F2): in the studio (new, from a template, from a library sprite), or for the
+// library, by converting a sprite's code file to data (code:<id>) or written as data by hand (new)
+const MADE_IN = { studio: /^(?:new|template:[a-z][a-z0-9-]{0,39}|library:[a-z][a-z0-9-]{0,39})$/, library: /^(?:new|code:[a-z][a-z0-9-]{0,39})$/ };
 const SHINY = new Set(['metal', 'water', 'light', 'magic']);
 const isObj = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
 const q = (v) => (typeof v === 'string' ? `"${v.length > 40 ? v.slice(0, 40) + '...' : v}"` : say(v));
@@ -920,98 +930,79 @@ export function validateStudioRig(input, opts = {}) {
   }
 }
 
-// ---- the library body (a humanoid figure) --------------------------------------------------------------------------
+// ---- the library body's figure (its spec: the body's descriptor, engine/library-body.js) ---------------------------
 
-const COLOUR = 'colour', BOOL = 'bool';
-const n = (lo, hi) => ['num', lo, hi];
-const oneOf = (xs) => ['enum', xs];
-const HELD_KINDS = ['none', ...new Set([...Object.keys(ITEMS), ...Object.keys(HELD)])];
-const FIGURE_SPEC = {
-  body: { height: n(0, 1), build: n(0, 1), head: n(0, 1) },
-  motion: { bounce: n(0, 1), stride: n(0, 1) },
-  look: { skin: COLOUR, top: COLOUR, bottom: COLOUR, boots: COLOUR, bareArms: BOOL },
-  hair: { style: oneOf(HAIR_STYLES), colour: COLOUR },
-  held: { kind: oneOf(HELD_KINDS), length: n(0.25, 3), angle: n(-180, 180), swing: n(0.5, 1.3), metal: COLOUR, wood: COLOUR, hilt: COLOUR, cord: COLOUR },
-  headgear: { kind: oneOf(['none', ...HEADGEAR, ...HERO_HEADGEAR]), size: n(0.25, 3), colour: COLOUR, band: COLOUR },
-  mask: { colour: COLOUR, drape: n(0, 10) },
-  scarf: { kind: oneOf(['none', 'short', 'long']), length: n(0.25, 3), colour: COLOUR },
-  belt: { style: oneOf(['plain', 'hero']), colour: COLOUR, buckle: COLOUR },
-  cape: { kind: oneOf(['none', ...CAPE_KINDS]), length: n(0.3, 1.8), colour: COLOUR },
-  coat: { colour: COLOUR, belt: COLOUR, ragged: n(0, 1), length: n(0, 1.5) },
-  pack: { kind: oneOf(['none', ...PACKS]), size: n(0.25, 3), colour: COLOUR, trim: COLOUR, leather: COLOUR, fletching: COLOUR, shaft: COLOUR },
-  thrown: { metal: COLOUR, hilt: COLOUR },
-  loot: { colour: COLOUR, tie: COLOUR, glint: COLOUR },
-};
-const FIGURE_FIELDS = ['stance', 'moves', ...Object.keys(FIGURE_SPEC)];
-const POSE_NAMES = [...POSES, ...MOVES];
+/** One field of a figure against its kind (engine/library-body.js FIGURE_FIELD): the cleaned value, or undefined after an error or when absent. */
+function figureField(C, place, k, v, t) {
+  if (t === 'colour') return hex(C, place, k, v);
+  if (t === 'bool') return bool(C, place, k, v);
+  if (t[0] === 'num') return num(C, place, k, v, t[1], t[2]);
+  if (t[0] === 'enum') {
+    if (typeof v !== 'string' || !t[1].includes(v)) { C.err(`${place}: ${k} ${q(v)} is not known; use one of ${listOf(t[1])}`); return undefined; }
+    return v;
+  }
+  // map: { key: one of the values }, keys like clip names (the person's moves: clip name -> pose)
+  const [, keyWhat, valueWhat, values] = t;
+  if (!isObj(v)) { C.err(`${place}: ${k} must be an object of ${keyWhat}: ${valueWhat} name`); return undefined; }
+  const out = {};
+  for (const [key, x] of Object.entries(v)) {
+    if (!idOf(C, `${place}, ${k}`, key, { what: keyWhat })) continue;
+    if (typeof x !== 'string' || !values.includes(x)) { C.err(`${place}, ${k}: ${q(x)} for ${q(key)} is not a ${valueWhat} of the body; use one of ${listOf(values)}`); continue; }
+    out[key] = x;
+  }
+  return out;
+}
 
-function checkFigure(C, f, pre) {
+/** body.figure of a library body, checked against its body's figure spec (fields at the top and blocks of fields), then by the body's own checkFigure. */
+function checkFigure(C, f, pre, lib) {
   const where = `${pre}figure`;
   if (f === undefined) return {};
-  if (!isObj(f)) { C.err(`${where}: must be an object (rigs/humanoid-figure.js describes its fields); got ${say(f)}`); return null; }
-  knownOnly(C, where, f, FIGURE_FIELDS);
+  if (!isObj(f)) { C.err(`${where}: must be an object (${lib.figureHelp}); got ${say(f)}`); return null; }
+  knownOnly(C, where, f, Object.keys(lib.figure));
   const out = {};
-  if (f.stance !== undefined) {
-    if (!Object.hasOwn(STANCES, f.stance) || typeof f.stance !== 'string') C.err(`${where}: stance ${q(f.stance)} is not known; use one of ${listOf(Object.keys(STANCES))}`);
-    else out.stance = f.stance;
-  }
-  if (f.moves !== undefined) {
-    if (!isObj(f.moves)) C.err(`${where}: moves must be an object of clip name: pose name`);
-    else {
-      out.moves = {};
-      for (const [clip, pose] of Object.entries(f.moves)) {
-        if (!idOf(C, `${where}, moves`, clip, { what: 'clip name' })) continue;
-        if (!POSE_NAMES.includes(pose)) { C.err(`${where}, moves: ${q(pose)} for ${q(clip)} is not a pose of the body; use one of ${listOf(POSE_NAMES)}`); continue; }
-        out.moves[clip] = pose;
-      }
-    }
-  }
-  for (const [part, spec] of Object.entries(FIGURE_SPEC)) {
+  for (const [part, spec] of Object.entries(lib.figure)) {
     const v = f[part];
     if (v === undefined) continue;
+    if (!isObj(spec)) { const x = figureField(C, where, part, v, spec); if (x !== undefined) out[part] = x; continue; }
     const place = `${where}, ${part}`;
     if (!isObj(v)) { C.err(`${place}: must be an object with ${listOf(Object.keys(spec))}; got ${say(v)}`); continue; }
     knownOnly(C, place, v, Object.keys(spec));
     const o = {};
     for (const [k, t] of Object.entries(spec)) {
       if (v[k] === undefined) continue;
-      let x;
-      if (t === COLOUR) x = hex(C, place, k, v[k]);
-      else if (t === BOOL) x = bool(C, place, k, v[k]);
-      else if (t[0] === 'num') x = num(C, place, k, v[k], t[1], t[2]);
-      else if (!t[1].includes(v[k])) C.err(`${place}: ${k} ${q(v[k])} is not known; use one of ${listOf(t[1])}`);
-      else x = v[k];
+      const x = figureField(C, place, k, v[k], t);
       if (x !== undefined) o[k] = x;
     }
     out[part] = o;
+  }
+  if (lib.checkFigure) {
+    try { lib.checkFigure(out, { err: (m) => C.err(`${where}: ${String(m).slice(0, 300)}`), warn: (m) => C.warn(`${where}: ${String(m).slice(0, 300)}`) }); } catch (e) { C.err(`${where}: the body could not check it: ${String(e?.message ?? e).slice(0, 120)}`); }
   }
   return out;
 }
 
 // ---- what a library body's controls may set and paint (studio item F1) -------------------------------------------
 //
-// A control of a library body sets ONE field of the figure (`sets`: "part.field", a fixed vocabulary from FIGURE_SPEC,
-// never a free path): a slider a number field within that field's own range, a choice a word field with values the
-// field takes. The figure's colours are painted from the settings by `body.paint` ({ "part.field": expression }), whose
-// rules are the fixed registry of engine/data-rules.js (Contract 14 rule 2: a definition names framework functions,
-// it never holds code).
+// A control of a library body sets ONE field of the figure (`sets`: "part.field", a fixed vocabulary: the body's
+// `settings`, never a free path): a slider a number field within that field's own range, a choice a word field with
+// values the field takes. The figure's colours are painted from the settings by `body.paint` ({ "part.field":
+// expression }, the body's `colours`), whose rules are the fixed registry of engine/data-rules.js (Contract 14 rule 2: a
+// definition names framework functions, it never holds code). Each body's lists are its descriptor's (studio item F2).
 
-/** The fields of a figure a library body's control may set (`sets`), by "part.field" (and "stance"): { kind: number (min, max) | word (values) }. The older bare names height, build and head mean body.height, body.build and body.head. No arguments: a frozen object. */
-export const FIGURE_SETTINGS = Object.freeze(Object.fromEntries([
-  ['stance', Object.freeze({ kind: 'word', values: Object.freeze(Object.keys(STANCES)) })],
-  ...Object.entries(FIGURE_SPEC).flatMap(([part, spec]) => Object.entries(spec)
-    .filter(([, t]) => Array.isArray(t))
-    .map(([k, t]) => [`${part}.${k}`, Object.freeze(t[0] === 'num' ? { kind: 'number', min: t[1], max: t[2] } : { kind: 'word', values: Object.freeze([...t[1]]) })])),
-]));
+/** The fields of the side-view person's figure a library body's control may set (`sets`), by "part.field" (and "stance"): { kind: number (min, max) | word (values) }. The older bare names height, build and head mean body.height, body.build and body.head. No arguments: a frozen object (rigs/body-humanoid.js settings). */
+export const FIGURE_SETTINGS = HUMANOID_BODY.settings;
 
-/** The colour fields of a figure a library body may paint from its settings (`body.paint` keys), as "part.field". No arguments: a frozen list. */
-export const FIGURE_COLOURS = Object.freeze(Object.entries(FIGURE_SPEC).flatMap(([part, spec]) => Object.entries(spec).filter(([, t]) => t === COLOUR).map(([k]) => `${part}.${k}`)));
+/** The colour fields of the side-view person's figure a library body may paint from its settings (`body.paint` keys), as "part.field". No arguments: a frozen list (rigs/body-humanoid.js colours). */
+export const FIGURE_COLOURS = HUMANOID_BODY.colours;
 
 /** The attach points every frame of the side-view person has (rigs/humanoid-figure.js sockets); `muzzle` too when the figure has `thrown`. No arguments: a frozen list. */
-export const FIGURE_SOCKETS = Object.freeze(['hand', 'offhand', 'head', 'back', 'feet']);
+export const FIGURE_SOCKETS = Object.freeze(HUMANOID_BODY.socketNames({}));
 
-/** A `sets` as the "part.field" it names: the older bare body fields (height) are body.height. */
-const setsPath = (s) => (LIBRARY_BODY_FIELDS.includes(s) ? `body.${s}` : s);
+/** A `sets` as the "part.field" it names: a short name of the body (the person's height) is its alias (body.height). */
+const setsPath = (s, lib) => (lib && typeof s === 'string' && Object.hasOwn(lib.aliases, s) ? lib.aliases[s] : s);
+
+/** The fields of a body's settings of one kind ('number' or 'word'), for messages. */
+const settingsOfKind = (lib, kind) => Object.keys(lib.settings).filter((k) => lib.settings[k].kind === kind);
 
 /** True when a value is one a control of the key table (kind, values, min, max) can take. */
 function fits(d, v) {
@@ -1123,7 +1114,7 @@ function paintNodes(e, seen = 0) {
 }
 
 /** body.paint of a library body: { "part.field": expression }, each field a colour field of the figure. */
-function checkPaint(C, raw, figure, colourKeys, table) {
+function checkPaint(C, raw, figure, colourKeys, table, lib) {
   const place = 'Body: paint';
   if (!isObj(raw)) { C.err(`${place}: must be an object of "part.field": colour (engine/data-rules.js); got ${say(raw)}`); return undefined; }
   const keys = Object.keys(raw);
@@ -1132,8 +1123,8 @@ function checkPaint(C, raw, figure, colourKeys, table) {
   if (nodes > L.paintNodes) { C.err(`${place}: has ${nodes} rules and colours in all; the most is ${L.paintNodes}`); return undefined; }
   const out = {};
   for (const path of keys) {
-    if (!FIGURE_COLOURS.includes(path)) {
-      C.err(`${place}: ${q(path)} is not a colour field of the figure; a library body paints ${someOf(FIGURE_COLOURS, 12)}`);
+    if (!lib.colours.includes(path)) {
+      C.err(`${place}: ${q(path)} is not a colour field of the figure; this library body paints ${someOf(lib.colours, 12)}`);
       continue;
     }
     const part = path.split('.')[0];
@@ -1178,7 +1169,7 @@ const SPRITE_FIELDS = ['format', 'version', 'id', 'name', 'blurb', 'meta', 'body
 const CONTROL_FIELDS = ['key', 'label', 'lo', 'hi', 'min', 'max', 'default', 'scales', 'sets'];
 const CLIP_FIELDS = ['label', 'frames', 'fps', 'loop', 'keys', 'frameEdits', 'sounds', 'from'];
 const RIG_KEY_FIELDS = ['t', 'ease', 'root', 'bones', 'ik', 'stretch', 'show', 'hide'];
-const LIB_KEY_FIELDS = ['t', 'ease', ...Object.keys(HUMANOID_POSE_FIELDS), ...Object.keys(HUMANOID_MOVE_FIELDS)];
+// a library body's key fields are its descriptor's (keyFields): ['t', 'ease', ...Object.keys(lib.keyFields)]
 const EDIT_FIELDS = ['nudge', 'show', 'hide', 'flash'];
 const SOUND_FIELDS = ['sound', 'frame', 'preset', 'volume', 'when'];
 
@@ -1239,9 +1230,9 @@ function checkChoice(C, place, c, lib) {
   knownOnly(C, place, c, CHOICE_FIELDS);
   if (!lib) { C.err(`${place}: a choice is for library bodies (it sets a field of the figure); a bone rig's controls are sliders`); return null; }
   const o = { key: idOf(C, place, c.key, { what: 'key' }), kind: 'choice', label: text(C, place, 'label', c.label, L.nameChars, { need: true }) };
-  const target = FIGURE_SETTINGS[c.sets];
-  if (c.sets === undefined) C.err(`${place}: sets is missing; a choice sets a word field of the figure (${someOf(Object.keys(FIGURE_SETTINGS).filter((k) => FIGURE_SETTINGS[k].kind === 'word'))})`);
-  else if (!target || target.kind !== 'word') C.err(`${place}: sets ${q(c.sets)} is not a word field of the figure; a choice sets one of ${someOf(Object.keys(FIGURE_SETTINGS).filter((k) => FIGURE_SETTINGS[k].kind === 'word'), 12)}`);
+  const target = typeof c.sets === 'string' && Object.hasOwn(lib.settings, setsPath(c.sets, lib)) ? lib.settings[setsPath(c.sets, lib)] : undefined;
+  if (c.sets === undefined) C.err(`${place}: sets is missing; a choice sets a word field of the figure (${someOf(settingsOfKind(lib, 'word'))})`);
+  else if (!target || target.kind !== 'word') C.err(`${place}: sets ${q(c.sets)} is not a word field of the figure; a choice sets one of ${someOf(settingsOfKind(lib, 'word'), 12)}`);
   else o.sets = c.sets;
   const xs = list(C, place, c.options, L.options, { min: 2, what: 'options' });
   if (!xs) return o;
@@ -1347,7 +1338,7 @@ function checkControls(C, d, facts, lib, colourKeys = new Set()) {
     if (c.kind === 'slider') o.kind = 'slider';
     for (const f of ['lo', 'hi']) { const t = text(C, place, f, c[f], L.wordChars); if (t !== undefined) o[f] = t; }
     // a library slider sets one number field of the figure, within that field's range (the body fields: 0..1)
-    const target = lib ? FIGURE_SETTINGS[setsPath(c.sets)] : null;
+    const target = lib && typeof c.sets === 'string' && Object.hasOwn(lib.settings, setsPath(c.sets, lib)) ? lib.settings[setsPath(c.sets, lib)] : null;
     const [lo, hi] = lib ? (target?.kind === 'number' ? [target.min, target.max] : [0, 1]) : L.scale;
     o.min = num(C, place, 'min', c.min, lo, hi, { need: true });
     o.max = num(C, place, 'max', c.max, lo, hi, { need: true });
@@ -1361,11 +1352,12 @@ function checkControls(C, d, facts, lib, colourKeys = new Set()) {
       else o.default = num(C, place, 'default', c.default ?? Math.min(o.max, Math.max(o.min, lib ? 0.5 : 1)), o.min, o.max);
     }
     if (lib) {
-      if (c.scales !== undefined) C.err(`${place}: a library body's slider sets a field of the body (sets: ${listOf(LIBRARY_BODY_FIELDS)}, or a number field of the figure such as held.length), not scales`);
-      if (!target || target.kind !== 'number') C.err(`${place}: sets ${q(c.sets)} is not a number field of the figure; use one of ${listOf(LIBRARY_BODY_FIELDS)} or ${someOf(Object.keys(FIGURE_SETTINGS).filter((k) => FIGURE_SETTINGS[k].kind === 'number' && !k.startsWith('body.')), 12)}`);
+      const short = Object.keys(lib.aliases), long = settingsOfKind(lib, 'number').filter((k) => !Object.values(lib.aliases).includes(k));
+      if (c.scales !== undefined) C.err(`${place}: a library body's slider sets a field of the figure (sets: ${someOf([...short, ...long], 12)}), not scales`);
+      if (!target || target.kind !== 'number') C.err(`${place}: sets ${q(c.sets)} is not a number field of the figure; use one of ${someOf([...short, ...long], 12)}`);
       else {
         o.sets = c.sets;
-        const path = setsPath(c.sets);
+        const path = setsPath(c.sets, lib);
         if (setBy.has(path)) C.err(`${place}: ${path} is set twice (by ${q(setBy.get(path))} and ${q(o.key)}); a field is set by one control`);
         else setBy.set(path, o.key);
       }
@@ -1393,7 +1385,7 @@ function checkControls(C, d, facts, lib, colourKeys = new Set()) {
  * own controls], none, socket }. The selector is a choice; none is one of its options or a list of them; socket is an
  * attach point the body gives. A control is in one part at most.
  */
-function checkContractPart(C, place, name, p, ctl, owned, figure) {
+function checkContractPart(C, place, name, p, ctl, owned, figure, lib) {
   knownOnly(C, place, p, ['label', 'params', 'none', 'socket']);
   const o = { label: text(C, place, 'label', p.label, L.nameChars, { need: true }) };
   const xs = list(C, place, p.params, L.controls, { min: 1, what: 'params' });
@@ -1416,8 +1408,8 @@ function checkContractPart(C, place, name, p, ctl, owned, figure) {
     else o.none = Array.isArray(p.none) ? [...p.none] : p.none;
   }
   if (p.socket !== undefined) {
-    const sockets = [...FIGURE_SOCKETS, ...(isObj(figure?.thrown) ? ['muzzle'] : [])];
-    if (!sockets.includes(p.socket)) C.err(`${place}: socket ${say(p.socket)} is not an attach point of the body; it has ${listOf(sockets)}${sockets.includes('muzzle') ? '' : ' (and muzzle when the figure throws: thrown)'}`);
+    const sockets = lib.socketNames(figure ?? {});
+    if (!sockets.includes(p.socket)) C.err(`${place}: socket ${say(p.socket)} is not an attach point of the body; it has ${listOf(sockets)}${sockets.includes('muzzle') ? '' : lib.socketsNote}`);
     else o.socket = p.socket;
   }
   return o;
@@ -1434,8 +1426,8 @@ function checkParts(C, d, facts, lib, ctl = new Map(), figure = null) {
     const place = `Part ${q(name)}`;
     if (!idOf(C, place, name, { what: 'part name' })) continue;
     const p = d.parts[name];
-    if (lib && isObj(p) && p.params !== undefined) { out[name] = checkContractPart(C, place, name, p, ctl, owned, figure); continue; }
-    if (lib && !LIBRARY_PARTS.includes(name)) { C.err(`${place}: is not a part of the library body; use one of ${listOf(LIBRARY_PARTS)}, or list its controls (params, the choice that picks it first)`); continue; }
+    if (lib && isObj(p) && p.params !== undefined) { out[name] = checkContractPart(C, place, name, p, ctl, owned, figure, lib); continue; }
+    if (lib && !lib.parts.includes(name)) { C.err(`${place}: is not a part of the library body; use one of ${listOf(lib.parts)}, or list its controls (params, the choice that picks it first)`); continue; }
     if (!isObj(p)) { C.err(`${place}: must be an object with label${lib ? '' : ', shapes'} and default`); continue; }
     knownOnly(C, place, p, lib ? ['label', 'default'] : ['label', 'shapes', 'default']);
     const o = { label: text(C, place, 'label', p.label, L.nameChars, { need: true }) };
@@ -1457,27 +1449,27 @@ function checkParts(C, d, facts, lib, ctl = new Map(), figure = null) {
 
 function checkKey(C, place, k, facts, lib, frame) {
   if (!isObj(k)) { C.err(`${place}: must be an object with t and what the key changes`); return null; }
-  knownOnly(C, place, k, lib ? LIB_KEY_FIELDS : RIG_KEY_FIELDS);
+  knownOnly(C, place, k, lib ? ['t', 'ease', ...Object.keys(lib.keyFields)] : RIG_KEY_FIELDS);
   const o = { t: num(C, place, 't', k.t, 0, 1, { need: true }) };
   if (k.ease !== undefined) {
     if (!EASES.includes(k.ease)) C.err(`${place}: ease must be one of ${listOf(EASES)}; got ${say(k.ease)}`);
     else o.ease = k.ease;
   }
   if (lib) {
-    for (const [f, kind] of Object.entries({ ...HUMANOID_POSE_FIELDS, ...HUMANOID_MOVE_FIELDS })) {
-      const v = k[f];
+    for (const [f, spec] of Object.entries(lib.keyFields)) {
+      const v = k[f], kind = spec.kind;
       if (v === undefined) continue;
-      if (v === null && POSE_FIELDS[f]?.none) { o[f] = null; continue; }
+      if (v === null && spec.none) { o[f] = null; continue; }
       if (kind === 'flag') { const b = bool(C, place, f, v); if (b !== undefined) o[f] = b; continue; }
       if (kind === 'word') {
-        if (!POSE_FIELDS[f].values.includes(v)) C.err(`${place}: ${f} must be one of ${listOf(POSE_FIELDS[f].values)}${POSE_FIELDS[f].none ? ' or null' : ''}; got ${say(v)}`);
+        if (!spec.values.includes(v)) C.err(`${place}: ${f} must be one of ${listOf(spec.values)}${spec.none ? ' or null' : ''}; got ${say(v)}`);
         else o[f] = v;
         continue;
       }
-      if (kind === 'count') { const x = num(C, place, f, typeof v === 'number' && Number.isFinite(v) ? whole(C, place, f, v) : v, POSE_FIELDS[f].min, POSE_FIELDS[f].max); if (x !== undefined) o[f] = x; continue; }
+      if (kind === 'count') { const x = num(C, place, f, typeof v === 'number' && Number.isFinite(v) ? whole(C, place, f, v) : v, spec.min, spec.max); if (x !== undefined) o[f] = x; continue; }
       if (kind === 'point' || kind === 'arm') {
         const [a, b] = kind === 'point' ? ['x', 'y'] : ['a', 'e'];
-        const lim = kind === 'point' ? L.libraryPx : L.angle;
+        const lim = kind === 'point' ? Math.max(L.libraryPx, facts.W, facts.H) : L.angle;
         // a foot may also say `up`: its knee bends up (a leg lying on the ground, rigs/humanoid.js die)
         const extra = kind === 'point' && isObj(v) && v.up !== undefined ? 1 : 0;
         if (!isObj(v) || Object.keys(v).length !== 2 + extra || v[a] === undefined || v[b] === undefined) { C.err(`${place}: ${f} must be { ${a}, ${b} }${kind === 'point' ? ' (and up: true or false)' : ''}; got ${say(v)}`); continue; }
@@ -1486,7 +1478,8 @@ function checkKey(C, place, k, facts, lib, frame) {
         if (x !== undefined && y !== undefined && (!extra || up !== undefined)) o[f] = extra ? { [a]: x, [b]: y, up } : { [a]: x, [b]: y };
         continue;
       }
-      const [lo, hi] = kind === 'px' ? [-L.libraryPx, L.libraryPx] : kind === 'angle' ? [-L.angle, L.angle] : kind === 'signed' ? [-1, 1] : [0, 1];
+      const px = Math.max(L.libraryPx, facts.W, facts.H);   // a body bigger than 64 px may move further
+      const [lo, hi] = kind === 'px' ? [-px, px] : kind === 'angle' ? [-L.angle, L.angle] : kind === 'signed' ? [-1, 1] : [0, 1];
       const x = num(C, place, f, v, lo, hi);
       if (x !== undefined) o[f] = x;
     }
@@ -1599,7 +1592,7 @@ function checkClip(C, name, c, facts, lib) {
 
   if (c.from !== undefined) {
     if (!lib) C.warn(`${place}: from is for library bodies (the pose the keys were made from); dropped`);
-    else if (!POSE_NAMES.includes(c.from)) C.err(`${place}: from ${q(c.from)} is not a pose of the library body; use one of ${listOf(POSE_NAMES)}`);
+    else if (!lib.poses.includes(c.from)) C.err(`${place}: from ${q(c.from)} is not a pose of the library body; ${lib.poses.length ? `use one of ${listOf(lib.poses)}` : 'it has no formula poses, so leave from out'}`);
     else o.from = c.from;
   }
 
@@ -1681,14 +1674,19 @@ function checkSprite(C, d) {
     const r = checkRig(C, b.rig, 'Body: ');
     if (r) { out.body = { rig: r.rig }; facts = r.facts; }
   } else {
-    lib = true;
+    // a library body: its descriptor (engine/library-body.js) says what the figure, controls, parts, keys and poses
+    // may be, which frame sizes it draws at and where it stands; `lib` is that descriptor from here on (studio item F2)
     knownOnly(C, 'Body', b, ['library', 'figure', 'paint']);
-    if (!LIBRARY_BODIES.includes(b.library)) C.err(`Body: library ${q(b.library)} is not a library body; the library bodies are ${listOf(LIBRARY_BODIES)}`);
+    const reg = registryOf(C.opts);
+    if (!reg.has(b.library)) C.err(`Body: library ${q(b.library)} is not a library body; the library bodies are ${listOf(reg.names)}`);
     else {
-      const fig = checkFigure(C, b.figure, 'Body: ');
+      lib = reg.get(b.library);
+      const fig = checkFigure(C, b.figure, 'Body: ', lib);
       if (fig) out.body = { library: b.library, figure: fig };
       const none = new Map();
-      facts = { W: LIBRARY_SIZE[0], H: LIBRARY_SIZE[1], slots: none, bones: none, shapes: none, ik: none, chainOf: none, points: none, view: 'side' };
+      // the frame: the size the definition gives when the body draws at it, else the body's first
+      const [W0, H0] = lib.sizes.find(([w, h]) => Array.isArray(d.size) && d.size[0] === w && d.size[1] === h) ?? lib.sizes[0];
+      facts = { W: W0, H: H0, slots: none, bones: none, shapes: none, ik: none, chainOf: none, points: none, view: lib.view };
     }
   }
   out.meta = checkMeta(C, d.meta, facts?.view);
@@ -1698,9 +1696,9 @@ function checkSprite(C, d) {
 
   // size, pivot, grounded
   out.size = [W, H];
-  if (d.size !== undefined && !(Array.isArray(d.size) && d.size[0] === W && d.size[1] === H)) C.warn(`size comes from the body (${sizeName([W, H])}); the given size ${say(d.size)} was dropped`);
+  if (d.size !== undefined && !(Array.isArray(d.size) && d.size[0] === W && d.size[1] === H)) C.warn(`size comes from the body (${lib && lib.sizes.length > 1 ? `one of ${lib.sizes.map((s) => sizeName(s)).join(', ')}; kept ${sizeName([W, H])}` : sizeName([W, H])}); the given size ${say(d.size)} was dropped`);
   out.grounded = d.grounded === undefined ? true : bool(C, where, 'grounded', d.grounded);
-  if (d.pivot === undefined) out.pivot = lib ? [...LIBRARY_PIVOT] : defaultPivot([W, H], out.grounded !== false);
+  if (d.pivot === undefined) out.pivot = lib && Object.hasOwn(lib.pivots, `${W}x${H}`) ? [...lib.pivots[`${W}x${H}`]] : defaultPivot([W, H], out.grounded !== false);
   else {
     const p = pair(C, 'pivot', 'pivot', d.pivot, [0, W], [0, H], { wholePx: true });
     if (p) out.pivot = p;
@@ -1727,10 +1725,10 @@ function checkSprite(C, d) {
   const { controls, speed } = checkControls(C, d, facts, lib, colourKeys);
   out.controls = controls;
   // a control that sets a field of a part the stored figure has not changes nothing (rigs/humanoid-studio.js never adds a
-  // part, as body.paint never does); the blocks read with defaults (FIGURE_BLOCKS) are the exception (review F1, issue 4)
+  // part, as body.paint never does); the blocks read with defaults (the body's blocks) are the exception (review F1, issue 4)
   if (lib) for (const c of controls) {
-    const path = typeof c.sets === 'string' ? setsPath(c.sets) : '', part = path.includes('.') ? path.split('.')[0] : null;
-    if (part && !FIGURE_BLOCKS.includes(part) && !isObj(out.body?.figure?.[part])) C.warn(`Control ${q(c.key)}: sets ${q(path)}, but the figure has no ${part}, so it changes nothing; add ${part} to body.figure`);
+    const path = typeof c.sets === 'string' ? setsPath(c.sets, lib) : '', part = path.includes('.') ? path.split('.')[0] : null;
+    if (part && !lib.blocks.includes(part) && !isObj(out.body?.figure?.[part])) C.warn(`Control ${q(c.key)}: sets ${q(path)}, but the figure has no ${part}, so it changes nothing; add ${part} to body.figure`);
   }
   // every control by its key, as `when`, parts and versions read them: { kind: colour | range | choice | toggle, ... }
   const table = new Map([...colourKeys].map((k) => [k, { kind: 'colour' }]));
@@ -1761,7 +1759,7 @@ function checkSprite(C, d) {
     if (w === undefined) delete c.when; else c.when = w;
   }
   checkLoops(C, controls, out.parts);
-  if (lib && b.paint !== undefined) { const paint = checkPaint(C, b.paint, out.body?.figure, colourKeys, table); if (paint) out.body.paint = paint; }
+  if (lib && b.paint !== undefined) { const paint = checkPaint(C, b.paint, out.body?.figure, colourKeys, table, lib); if (paint) out.body.paint = paint; }
   if (d.versions !== undefined) { const v = checkVersions(C, d.versions, table); if (v) out.versions = v; }
 
   // clips, preview, made
@@ -1775,12 +1773,17 @@ function checkSprite(C, d) {
     else out.preview = d.preview;
   }
   if (d.made === undefined) out.made = { in: 'studio', from: 'new' };
-  else if (!isObj(d.made)) C.err(`made: must be { in: "studio", from, by }; got ${say(d.made)}`);
+  else if (!isObj(d.made)) C.err(`made: must be { in: "studio" | "library", from, by }; got ${say(d.made)}`);
   else {
     knownOnly(C, 'made', d.made, ['in', 'from', 'by']);
-    if (d.made.in !== 'studio') C.err(`made: in must be "studio"; got ${say(d.made.in)}`);
-    if (typeof d.made.from !== 'string' || !MADE_FROM_RE.test(d.made.from)) C.err(`made: from must be "new", "template:<id>" or "library:<id>"; got ${say(d.made.from)}`);
-    out.made = { in: 'studio', from: d.made.from };
+    const madeIn = typeof d.made.in === 'string' && Object.hasOwn(MADE_IN, d.made.in) ? d.made.in : null;
+    if (!madeIn) C.err(`made: in must be "studio" (made in the studio) or "library" (a library sprite converted from its code file to data); got ${say(d.made.in)}`);
+    else if (typeof d.made.from !== 'string' || !MADE_IN[madeIn].test(d.made.from)) {
+      C.err(madeIn === 'studio'
+        ? `made: from must be "new", "template:<id>" or "library:<id>" for a sprite made in the studio ("code:<id>" goes with in: "library"); got ${say(d.made.from)}`
+        : `made: from must be "code:<id>" (the code file it was converted from) or "new" for a library sprite written as data; got ${say(d.made.from)}`);
+    }
+    out.made = { in: madeIn ?? 'studio', from: d.made.from };
     const by = text(C, 'made', 'by', d.made.by, L.nameChars);
     if (by !== undefined) out.made.by = by;
   }

@@ -81,7 +81,7 @@ for (const id of IDS) {
     const now = (await import(`../../sprites/${id}.js`)).default;
     assert.ok(!now.made, 'sprite.made means "drawn in a worker" to app/api-core.js render and engine/theme.js; a data sprite is drawn here');
     assert.equal(typeof now.prepare, 'undefined');
-    assert.equal(now.definition.made.in, 'studio');
+    assert.deepEqual(now.definition.made, { in: 'library', from: `code:${id}` }, 'converted from its code file, not made in the studio (studio item F2)');
   });
 
   test(`F1 ${id}: looks (Contract 7) recolour it as they recoloured the original: the same materials, every frame within 2%`, async (t) => {

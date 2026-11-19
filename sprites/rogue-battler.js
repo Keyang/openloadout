@@ -1,4 +1,4 @@
-// Made in the Loadout studio. This file is data: open it in the studio (#/studio, "Open a file") to change it.
+// Converted from code to data for the Loadout library. This file is data, not code: the build refuses it with anything else in it.
 import { dataSprite } from '../engine/data-sprite.js';
 export default dataSprite({
   "format": "loadout-sprite",
@@ -333,5 +333,5 @@ export default dataSprite({
     "victory": {"label":"Victory","frames":8,"fps":8,"loop":true,"keys":[]}
   },
   "preview": "walk",
-  "made": {"in":"studio","from":"library:rogue-battler"}
+  "made": {"in":"library","from":"code:rogue-battler"}
 });

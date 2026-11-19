@@ -36,23 +36,25 @@
 //     validateDataSprite() is validateStudioSprite() with its messages capped at MAX_MESSAGES each, and the wall of
 //     Contract 14 rule 6 (plain data only, nothing run, 64 KB) is that file's, for the whole definition.
 //
-// LIBRARY BODIES ({ library: "humanoid", figure }: the side-view person; docs/studio.md 3, "Library bodies in
-// dataSprite") are drawn only through rigs/humanoid-studio.js: render() calls drawSprite(g, definition, { clip, frame,
-// t, p }) and sockets() calls spriteSockets(definition, { clip, t, p }), never rigs/humanoid-figure.js directly; only
-// they apply the Hero's parts, figureFor (sliders, colours, parts, keysFor) and the frame edits. Controls: one color()
-// per colour slot keyed by the slot id (label, material and swatches from LIBRARY_SLOTS, by the slot's name), one
-// range() per slider keyed by its key, one toggle() per part keyed by the part name (a Contract 3 part with the socket
-// it hangs from: held -> hand, headgear and mask -> head, cape and pack -> back), and the standard speed. Size 64 by
-// 64; sockets hand, offhand, head, back and feet on every frame.
+// LIBRARY BODIES ({ library: "<name>", figure }; docs/studio.md 2.3, "Library bodies: one module each"; studio item
+// F2) are drawn only through their body's descriptor (engine/library-body.js), found by name in the registry
+// (catalog/studio-schema.js LIBRARY_REGISTRY, every body engine/library-bodies.js lists; opts.bodies replaces it):
+// render() calls body.draw(g, definition, { clip, frame, t, p }) and sockets() calls body.socketsAt(definition, { clip,
+// t, p }). This file names no body. The side-view person (rigs/body-humanoid.js) draws through rigs/humanoid-studio.js
+// drawSprite and spriteSockets, which apply the Hero's parts, figureFor (sliders, colours, parts, keysFor) and the frame
+// edits. Controls: one color() per colour slot keyed by the slot id (label, material and swatches from the body's
+// `slots`, by the slot's name; any other slot is cloth), one range() per slider and one choice() per choice keyed by
+// its key, one toggle() per on/off part keyed by the part name (a Contract 3 part with the socket the body's
+// `partSockets` gives it: the person's held -> hand, headgear and mask -> head, cape and pack -> back), and the standard
+// speed. Size: the definition's (one of the body's sizes); sockets: whatever the body's socketsAt gives.
 //
 // Pure: no DOM, no Node, no clock, no randomness. Runs unchanged in the browser and in Node.
 
-import { defineSprite, range, choice, color, toggle, SKIN, HAIR, CLOTH, METAL } from './sprite.js';
+import { defineSprite, range, choice, color, toggle, SKIN, CLOTH, METAL } from './sprite.js';
 import { lerp } from './motion.js';
-import { validateStudioSprite, parseStudioJson, TOPDOWN_DIRECTIONS, directionOf, directionRig } from '../catalog/studio-schema.js';
+import { validateStudioSprite, parseStudioJson, libraryBody, TOPDOWN_DIRECTIONS, directionOf, directionRig } from '../catalog/studio-schema.js';
 import { compileKeys, sampleKeys, framePhase, frameOfPhase } from '../rigs/keypose.js';
 import { drawRig, solveRig, rigPoints } from '../rigs/bones.js';
-import { drawSprite, spriteSockets } from '../rigs/humanoid-studio.js';
 
 // The top-down helpers live with the format in catalog/studio-schema.js (since studio item S4b); passed on from here
 // because the studio's templates and pages reach them through this module.
@@ -227,24 +229,23 @@ function baseOf(definition, speed) {
   };
 }
 
-// A library body's colour slots are named, not described: the label, material (Contract 7) and swatches of the names
-// the Hero uses; any other slot is cloth, labelled from its name.
-const LIBRARY_SLOTS = { skin: ['Skin', 'skin', SKIN], hair: ['Hair', 'cloth', HAIR], metal: ['Metal', 'metal', METAL] };
-// the attach point each part of the side-view person hangs from (rigs/humanoid.js sockets), for Contract 3
-const LIBRARY_SOCKETS = { held: 'hand', headgear: 'head', mask: 'head', cape: 'back', pack: 'back' };
+// A library body's colour slots are named, not described: the label, material (Contract 7) and swatches its body's
+// `slots` give that name (the person's skin, hair and metal); any other slot is cloth, labelled from its name. Where an
+// on/off part hangs (Contract 3) is the body's `partSockets`.
 
 /**
- * Builds the sprite of a library body (the side-view person): drawn and given sockets only through rigs/humanoid-studio.js.
+ * Builds the sprite of a library body: drawn and given sockets only through its body's descriptor (draw, socketsAt).
  * Controls in this order: the colour slots that have no colour control, then the definition's controls as listed (a
  * colour control puts its slot's colour there), then one toggle per on/off part. A part with params (studio item F1) is
  * a Contract 3 part as written (params, none, socket); an on/off part hangs from its usual socket.
  */
-function buildLibrary(definition) {
+function buildLibrary(definition, body) {
   const params = {};
   const own = new Map(definition.controls.filter((c) => c.kind === 'colour').map((c) => [c.key, c]));
   const slotColour = (slot) => {
     const hex = definition.colours[slot];
-    const [label, material, list] = LIBRARY_SLOTS[slot] ?? [slot.charAt(0).toUpperCase() + slot.slice(1), 'cloth', CLOTH];
+    const named = Object.hasOwn(body.slots, slot) ? body.slots[slot] : null;
+    const [label, material, list] = named ? [named.label, named.material, named.swatches] : [slot.charAt(0).toUpperCase() + slot.slice(1), 'cloth', CLOTH];
     return colourControl(hex, [label, material, [hex, ...list.filter((c) => c !== hex)].slice(0, 8)], own.get(slot));
   };
   for (const slot of Object.keys(definition.colours)) if (!own.has(slot)) params[slot] = slotColour(slot);
@@ -262,25 +263,29 @@ function buildLibrary(definition) {
       continue;
     }
     params[name] = toggle(part.label, part.default !== false);
-    parts[name] = { label: part.label, params: [name], ...(LIBRARY_SOCKETS[name] ? { socket: LIBRARY_SOCKETS[name] } : {}) };
+    parts[name] = { label: part.label, params: [name], ...(Object.hasOwn(body.partSockets, name) ? { socket: body.partSockets[name] } : {}) };
   }
   return defineSprite({
     ...baseOf(definition, speed),
     params,
     parts,
     render(g, { clip, t, frame, p }) {
-      drawSprite(g, definition, { clip, frame, t, p });
+      body.draw(g, definition, { clip, frame, t, p });
     },
     sockets(clip, t, p) {
-      return spriteSockets(definition, { clip, t, p }) ?? {};
+      return body.socketsAt(definition, { clip, t, p }) ?? {};
     },
   });
 }
 
-/** Builds the defineSprite result from a cleaned definition (validateDataSprite's value): a bone rig, or a library body. */
-function build(def) {
+/** Builds the defineSprite result from a cleaned definition (validateDataSprite's value): a bone rig, or a library body (found in the registry; opts.bodies replaces it). */
+function build(def, opts = {}) {
   const definition = deepFreeze(JSON.parse(JSON.stringify(def)));
-  if (definition.body?.library !== undefined) return buildLibrary(definition);
+  if (definition.body?.library !== undefined) {
+    const body = libraryBody(definition.body.library, opts);
+    if (!body) throw new Error(`studio sprite ${definition.id}: there is no library body ${JSON.stringify(definition.body.library)}`);
+    return buildLibrary(definition, body);
+  }
   const rig = definition.body.rig;
   const topDown = rig.view === 'top-down';
   const views = topDown ? Object.fromEntries(TOPDOWN_DIRECTIONS.map((d) => [d, deepFreeze(directionRig(rig, d))])) : null;
@@ -341,14 +346,14 @@ function idHint(input) {
 
 /**
  * Turns a studio definition (`loadout-sprite`, an object or JSON text) into a sprite, as defineSprite does for a sprite
- * file: validated, then drawn by framework code (a bone rig by rigs/bones.js, a library body by rigs/humanoid-studio.js).
+ * file: validated, then drawn by framework code (a bone rig by rigs/bones.js, a library body by its body's module, engine/library-bodies.js).
  * Throws an Error naming what is wrong (the validator's errors) for a definition that does not pass. The default export of a library file.
  * Arguments: input (the definition), opts (as validateDataSprite takes them).
  */
 export function dataSprite(input, opts = {}) {
   const v = validateDataSprite(input, opts);
   if (!v.ok) throw new Error(`studio sprite ${idHint(input)}: ${v.errors.slice(0, 12).join('; ')}${v.errors.length > 12 ? `; and ${v.errors.length - 12} more` : ''}`);
-  return build(v.value);
+  return build(v.value, opts);
 }
 
 /**
@@ -360,7 +365,7 @@ export function makeDataSprite(input, opts = {}) {
   const v = validateDataSprite(input, opts);
   if (!v.ok) return { ok: false, errors: v.errors, warnings: v.warnings, sprite: null };
   try {
-    return { ok: true, errors: [], warnings: v.warnings, sprite: build(v.value) };
+    return { ok: true, errors: [], warnings: v.warnings, sprite: build(v.value, opts) };
   } catch (e) {
     return { ok: false, errors: [String(e?.message ?? e)], warnings: v.warnings, sprite: null };
   }
