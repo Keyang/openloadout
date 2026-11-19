@@ -1,0 +1,4 @@
+{
+  "about": "Released piece versions and the hash of their content. Added by node tools/lib/pieces-index.mjs --pin; never edit or remove a line: a changed look is a new version.",
+  "pins": {}
+}
