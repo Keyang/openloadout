@@ -1,0 +1,83 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "underwater",
+  "name": "Underwater",
+  "category": "ambience",
+  "description": "Heard with your head under water: a muffled hush that slowly swells, a few streams of bubbles rising far off, a faint fizz and now and then a low groan of deep water. Change the depth, the brightness, the swell and how many bubbles.",
+  "meta": {
+    "type": "ambience",
+    "role": "environment/ambience",
+    "themes": ["underwater", "fantasy"],
+    "gameTypes": ["platformer", "top-down-rpg", "puzzle", "roguelike-action", "turn-based-rpg"],
+    "words": ["underwater", "sea", "ocean", "deep", "dive", "swim", "submerged", "bubbles", "muffled", "reef", "lake", "abyss"],
+    "license": "draft"
+  },
+  "loop": true,
+  "normalize": false,
+  "duration": 8,
+  "params": [
+    { "id": "size", "label": "Depth", "min": 0, "max": 1, "default": 0.5, "hint": "Deeper is darker, lower and stiller." },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "swell", "label": "Swell", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "fizz", "label": "Bubbles", "min": 0, "max": 1, "default": 0.5 }
+  ],
+  "nodes": [
+    { "id": "wave", "type": "expr", "expr": "mix(sin(tau * 0.25 * t + 1.2), sin(tau * 0.125 * t + 2.1), size)" },
+    { "id": "press", "type": "expr", "expr": "1 + swell * (0.9 - size * 0.3) * wave" },
+
+    { "id": "nL", "type": "noise", "color": "brown" },
+    { "id": "nR", "type": "noise", "color": "brown" },
+    { "id": "pL", "type": "noise", "color": "pink" },
+    { "id": "pR", "type": "noise", "color": "pink" },
+    { "id": "murkCut", "type": "expr", "expr": "(420 - size * 220) * (0.75 + bright * 0.6) * (1 + swell * 0.25 * wave)" },
+    { "id": "lowL", "type": "filter", "mode": "lp", "in": "nL", "freq": "murkCut", "q": 0.9 },
+    { "id": "lowR", "type": "filter", "mode": "lp", "in": "nR", "freq": "murkCut * 1.06", "q": 0.9 },
+    { "id": "bodyL", "type": "filter", "mode": "bp", "in": "pL", "freq": "(620 - size * 230) * (0.85 + bright * 0.3)", "q": 1.6 },
+    { "id": "bodyR", "type": "filter", "mode": "bp", "in": "pR", "freq": "(560 - size * 200) * (0.85 + bright * 0.3)", "q": 1.6 },
+
+    { "id": "gate1c", "type": "clock", "rate": 0.6, "jitter": 0.8 },
+    { "id": "gate1r", "type": "rand", "trig": "gate1c" },
+    { "id": "gate1", "type": "lag", "in": "smooth(0.45, 0.8, gate1r)", "time": 0.35 },
+    { "id": "gate2c", "type": "clock", "rate": 0.45, "jitter": 0.8 },
+    { "id": "gate2r", "type": "rand", "trig": "gate2c" },
+    { "id": "gate2", "type": "lag", "in": "smooth(0.5, 0.85, gate2r)", "time": 0.4 },
+
+    { "id": "b1c", "type": "clock", "rate": "(9 - size * 4) * (0.6 + fizz * 0.6)", "jitter": 0.7 },
+    { "id": "b1p", "type": "rand", "lo": 0.8, "hi": 1.25, "trig": "b1c" },
+    { "id": "b1up", "type": "env", "trig": "b1c", "start": 1, "points": [[0, 1], [0.03, "semi(9)", "exp"]] },
+    { "id": "b1a", "type": "ad", "trig": "b1c", "attack": 0.003, "decay": 0.05, "curve": 2 },
+    { "id": "b1", "type": "osc", "freq": "(700 - size * 250) * rnd(0.9, 1.1) * b1p * b1up" },
+
+    { "id": "b2c", "type": "clock", "rate": "(7 - size * 3) * (0.6 + fizz * 0.6)", "jitter": 0.7 },
+    { "id": "b2p", "type": "rand", "lo": 0.75, "hi": 1.3, "trig": "b2c" },
+    { "id": "b2up", "type": "env", "trig": "b2c", "start": 1, "points": [[0, 1], [0.035, "semi(8)", "exp"]] },
+    { "id": "b2a", "type": "ad", "trig": "b2c", "attack": 0.003, "decay": 0.06, "curve": 2 },
+    { "id": "b2", "type": "osc", "freq": "(1050 - size * 380) * rnd(0.9, 1.1) * b2p * b2up" },
+
+    { "id": "bubL", "type": "filter", "mode": "lp", "in": "b1 * b1a * gate1 * 0.8 + b2 * b2a * gate2 * 0.4", "freq": "1400 + bright * 1800 - size * 500" },
+    { "id": "bubR", "type": "filter", "mode": "lp", "in": "b1 * b1a * gate1 * 0.4 + b2 * b2a * gate2 * 0.8", "freq": "1400 + bright * 1800 - size * 500" },
+
+    { "id": "fz", "type": "dust", "density": "(250 - size * 150) * (0.3 + fizz)", "spread": 1 },
+    { "id": "fzHi", "type": "filter", "mode": "bp", "in": "fz", "freq": "4600 + bright * 2400", "q": 1.4 },
+
+    { "id": "gc", "type": "clock", "rate": 0.125, "delay": "rnd(0.6, 4.5)" },
+    { "id": "ga", "type": "ad", "trig": "gc", "attack": 1.1, "decay": 2.2, "curve": 1.5 },
+    { "id": "gp", "type": "env", "trig": "gc", "start": 1, "points": [[0, 1], [3.3, "semi(rnd(-5, -2))", "exp"]] },
+    { "id": "groanF", "type": "expr", "expr": "(150 - size * 60) * rnd(0.85, 1.15) * gp" },
+    { "id": "groan1", "type": "filter", "mode": "bp", "in": "pL", "freq": "groanF", "q": 9 },
+    { "id": "groan2", "type": "filter", "mode": "bp", "in": "pR", "freq": "groanF * 2.01", "q": 9 },
+    { "id": "groan3", "type": "filter", "mode": "bp", "in": "pL + pR", "freq": "groanF * 3.02", "q": 9 },
+    { "id": "groan", "type": "expr", "expr": "(groan1 * 1.0 + groan2 * 0.8 + groan3 * 0.55) * ga * (0.5 + size * 0.5) * 0.15" },
+
+    { "id": "bedL", "type": "expr", "expr": "(lowL * 0.28 + bodyL * 0.5) * press + bubL * (0.03 + fizz * 0.75) + fzHi * (0.4 + fizz * 0.5) * (1 - size * 0.55) + groan * 0.9" },
+    { "id": "bedR", "type": "expr", "expr": "(lowR * 0.28 + bodyR * 0.5) * press + bubR * (0.03 + fizz * 0.75) + fzHi * (0.4 + fizz * 0.5) * (1 - size * 0.55) + groan * 0.9" },
+    { "id": "outL", "type": "filter", "mode": "hp", "in": "bedL", "freq": 30 },
+    { "id": "outR", "type": "filter", "mode": "hp", "in": "bedR", "freq": 30 }
+  ],
+  "out": ["tanh(outL * 0.74)", "tanh(outR * 0.74)"],
+  "presets": {
+    "Shallow pool": { "size": 0.1, "bright": 0.65, "swell": 0.3, "fizz": 0.7 },
+    "Open sea": { "size": 0.5, "bright": 0.5, "swell": 0.6, "fizz": 0.45 },
+    "Deep trench": { "size": 0.95, "bright": 0.3, "swell": 0.35, "fizz": 0.2 }
+  }
+}

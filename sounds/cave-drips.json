@@ -1,0 +1,83 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "cave-drips",
+  "name": "Cave",
+  "category": "ambience",
+  "description": "A quiet cave: a few clear water drips at uneven times, each echoing away, over the still low hum of the rock. Change the drips' pitch, the cave's size, the brightness and how often it drips.",
+  "meta": {
+    "type": "ambience",
+    "role": "environment/ambience",
+    "themes": ["dungeon", "fantasy"],
+    "gameTypes": ["platformer", "top-down-rpg", "turn-based-rpg", "roguelike-action", "puzzle"],
+    "words": ["cave", "cavern", "drip", "drips", "water", "echo", "underground", "grotto", "mine", "crypt", "damp", "dripping"],
+    "license": "draft"
+  },
+  "loop": true,
+  "wrap": true,
+  "normalize": false,
+  "duration": 8,
+  "params": [
+    { "id": "pitch", "label": "Pitch of the drips", "unit": "Hz", "min": 500, "max": 2000, "default": 1000, "scale": "log" },
+    { "id": "size", "label": "Cave size", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "drips", "label": "Drips", "min": 0, "max": 1, "default": 0.45, "hint": "How often a drip falls: one now and then, up to four in a loop, with faint far-off drips at the top." }
+  ],
+  "nodes": [
+    { "id": "c1", "type": "clock", "rate": 0.125, "delay": "rnd(0.02, 1.4)" },
+    { "id": "c2", "type": "clock", "rate": 0.125, "delay": "rnd(2.1, 3.6)" },
+    { "id": "c3", "type": "clock", "rate": 0.125, "delay": "rnd(4.2, 5.5)" },
+    { "id": "c4", "type": "clock", "rate": 0.125, "delay": "rnd(6.1, 7.4)" },
+
+    { "id": "g2", "type": "expr", "expr": "smooth(0.68, 0.78, drips)" },
+    { "id": "g3", "type": "expr", "expr": "smooth(0.25, 0.35, drips)" },
+    { "id": "g4", "type": "expr", "expr": "smooth(0.86, 0.96, drips)" },
+
+    { "id": "p1", "type": "env", "trig": "c1", "start": 1, "points": [[0, 1], [0.03, "semi(rnd(5, 9))", "exp"]] },
+    { "id": "p2", "type": "env", "trig": "c2", "start": 1, "points": [[0, 1], [0.025, "semi(rnd(4, 9))", "exp"]] },
+    { "id": "p3", "type": "env", "trig": "c3", "start": 1, "points": [[0, 1], [0.035, "semi(rnd(5, 10))", "exp"]] },
+    { "id": "p4", "type": "env", "trig": "c4", "start": 1, "points": [[0, 1], [0.028, "semi(rnd(4, 8))", "exp"]] },
+
+    { "id": "o1", "type": "osc", "freq": "pitch * rnd(0.8, 1.25) * p1" },
+    { "id": "o2", "type": "osc", "freq": "pitch * rnd(0.72, 1.3) * p2" },
+    { "id": "o3", "type": "osc", "freq": "pitch * rnd(0.8, 1.22) * p3" },
+    { "id": "o4", "type": "osc", "freq": "pitch * rnd(0.74, 1.32) * p4" },
+
+    { "id": "a1", "type": "ad", "trig": "c1", "attack": 0.001, "decay": "rnd(0.07, 0.1)", "curve": 2.2 },
+    { "id": "a2", "type": "ad", "trig": "c2", "attack": 0.001, "decay": "rnd(0.06, 0.09)", "curve": 2.2 },
+    { "id": "a3", "type": "ad", "trig": "c3", "attack": 0.001, "decay": "rnd(0.07, 0.1)", "curve": 2.2 },
+    { "id": "a4", "type": "ad", "trig": "c4", "attack": 0.001, "decay": "rnd(0.06, 0.09)", "curve": 2.2 },
+
+    { "id": "k", "type": "ad", "trig": "c1 + c2 * g2 + c3 * g3 + c4 * g4", "attack": 0.0003, "decay": 0.004, "curve": 2 },
+    { "id": "kn", "type": "noise", "seed": 7 },
+    { "id": "tick", "type": "filter", "mode": "bp", "in": "kn * k", "freq": "pitch * 3", "q": 1.5 },
+
+    { "id": "dry", "type": "expr", "expr": "o1 * a1 * rnd(0.8, 1) + o2 * a2 * g2 * rnd(0.7, 0.95) + o3 * a3 * g3 * rnd(0.75, 1) + o4 * a4 * g4 * rnd(0.7, 0.95) + tick * (0.08 + bright * 0.6)" },
+    { "id": "drop", "type": "filter", "mode": "lp", "in": "dry", "freq": "1800 + bright * 9000" },
+
+    { "id": "far", "type": "dust", "density": "smooth(0.5, 1, drips) * 5", "spread": 1 },
+    { "id": "farRing", "type": "filter", "mode": "bp", "in": "far", "freq": "pitch * 1.4", "q": 14 },
+
+    { "id": "echoL", "type": "delay", "in": "drop + farRing * 0.5", "time": "0.19 + size * 0.23", "feedback": "0.4 + size * 0.28", "mix": 1, "max": 0.5 },
+    { "id": "echoR", "type": "delay", "in": "drop + farRing * 0.5", "time": "0.26 + size * 0.21", "feedback": "0.4 + size * 0.28", "mix": 1, "max": 0.5 },
+    { "id": "wetL", "type": "filter", "mode": "lp", "in": "echoL", "freq": "700 + bright * 5500" },
+    { "id": "wetR", "type": "filter", "mode": "lp", "in": "echoR", "freq": "700 + bright * 5500" },
+    { "id": "roomL", "type": "reverb", "in": "drop * 0.6 + wetL * 0.4", "size": "0.5 + size * 0.45", "damp": "0.75 - bright * 0.4", "mix": 1 },
+    { "id": "roomR", "type": "reverb", "in": "drop * 0.6 + wetR * 0.4", "size": "0.52 + size * 0.45", "damp": "0.75 - bright * 0.4", "mix": 1 },
+
+    { "id": "rock", "type": "noise", "color": "brown" },
+    { "id": "hum1", "type": "filter", "mode": "lp", "in": "rock", "freq": "150 - size * 80", "q": 0.8 },
+    { "id": "hum", "type": "filter", "mode": "lp", "in": "hum1", "freq": "190 - size * 90" },
+    { "id": "air", "type": "noise", "color": "pink" },
+    { "id": "airBp", "type": "filter", "mode": "bp", "in": "air", "freq": "500 - size * 150", "q": 0.7 },
+    { "id": "bed", "type": "expr", "expr": "hum * 0.16 + airBp * 0.012" },
+
+    { "id": "sumL", "type": "filter", "mode": "hp", "in": "drop * 0.8 + wetL * 0.55 + roomL * (0.3 + size * 0.25) + bed", "freq": 30 },
+    { "id": "sumR", "type": "filter", "mode": "hp", "in": "drop * 0.8 + wetR * 0.55 + roomR * (0.3 + size * 0.25) + bed", "freq": 30 }
+  ],
+  "out": ["tanh(sumL * 0.8)", "tanh(sumR * 0.8)"],
+  "presets": {
+    "Damp cave": { "pitch": 1250, "size": 0.35, "bright": 0.55, "drips": 0.55 },
+    "Crypt": { "pitch": 800, "size": 0.15, "bright": 0.3, "drips": 0.2 },
+    "Huge cavern": { "pitch": 700, "size": 1, "bright": 0.45, "drips": 0.8 }
+  }
+}

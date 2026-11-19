@@ -1,0 +1,53 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "menu-wood-buy",
+  "name": "Wood buy",
+  "category": "ui",
+  "description": "Buying or equipping in a shop: wooden counting beads clack under three quick climbing notes on a little tuned wooden bar (two for equipping), the same every time. Change its pitch, speed, brightness, how many notes and how loud the beads are.",
+  "meta": {
+    "type": "sfx",
+    "role": "interface/confirm",
+    "themes": ["neutral", "fantasy"],
+    "gameTypes": ["arcade", "puzzle", "card-game", "turn-based-rpg", "top-down-rpg"],
+    "words": ["menu", "buy", "shop", "purchase", "equip", "trade", "store", "abacus", "beads", "wooden", "marimba", "button", "spend"],
+    "license": "draft"
+  },
+  "duration": "(notes - 1 + 1.3) / speed + 0.01",
+  "params": [
+    { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 440, "max": 1000, "default": 660, "scale": "log" },
+    { "id": "speed", "label": "Speed", "unit": "notes/s", "min": 7.4, "max": 16.5, "default": 11, "scale": "log" },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "notes", "label": "Notes", "min": 2, "max": 3, "default": 3, "step": 1 },
+    { "id": "clack", "label": "Clack", "min": 0, "max": 1, "default": 0.5 }
+  ],
+  "nodes": [
+    { "id": "hitA", "type": "ad", "attack": 0.0004, "decay": 0.0012, "curve": 2 },
+    { "id": "malletA", "type": "filter", "mode": "lp", "in": "hitA", "freq": "1200 + bright * 3000", "q": 0.6 },
+    { "id": "barA", "type": "modal", "in": "malletA", "freq": "pitch", "ratios": [1, 3.9, 9.2], "gains": [1, 1.5, 0.5], "decay": "1.0 / speed", "tilt": "1.3 - bright * 0.6" },
+    { "id": "c2", "type": "clock", "rate": 1, "count": 1, "delay": "1 / speed" },
+    { "id": "hitB", "type": "ad", "attack": 0.0004, "decay": 0.0012, "curve": 2, "trig": "c2" },
+    { "id": "malletB", "type": "filter", "mode": "lp", "in": "hitB", "freq": "1200 + bright * 3000", "q": 0.6 },
+    { "id": "barB", "type": "modal", "in": "malletB", "freq": "pitch * semi(2)", "ratios": [1, 3.9, 9.2], "gains": [1, 1.5, 0.5], "decay": "(notes > 2.5 ? 1.0 : 1.6) / speed", "tilt": "1.3 - bright * 0.6" },
+    { "id": "c3", "type": "clock", "rate": 1, "count": "notes > 2.5 ? 1 : 0", "delay": "2 / speed" },
+    { "id": "hitC", "type": "ad", "attack": 0.0004, "decay": 0.0012, "curve": 2, "trig": "c3" },
+    { "id": "malletC", "type": "filter", "mode": "lp", "in": "hitC", "freq": "1200 + bright * 3000", "q": 0.6 },
+    { "id": "barC", "type": "modal", "in": "malletC", "freq": "pitch * semi(9)", "ratios": [1, 3.9, 9.2], "gains": [1, 1.5, 0.5], "decay": "1.6 / speed", "tilt": "1.3 - bright * 0.6" },
+
+    { "id": "k1", "type": "clock", "rate": 1, "count": 1, "delay": 0 },
+    { "id": "k2", "type": "clock", "rate": 1, "count": 1, "delay": "0.5 / speed" },
+    { "id": "k3", "type": "clock", "rate": 1, "count": "notes > 2.5 ? 1 : 0", "delay": "1.5 / speed" },
+    { "id": "kHit", "type": "expr", "expr": "k1 + k2 * 0.8 + k3 * 0.9" },
+    { "id": "kClick", "type": "ad", "attack": 0.0002, "decay": 0.0006, "curve": 2, "trig": "kHit" },
+    { "id": "bead", "type": "modal", "in": "kClick", "freq": "pitch * 3.4", "ratios": [1, 2.2, 3.7], "gains": [1, 0.7, "0.2 + 0.5 * bright"], "decay": 0.009, "tilt": 1.1 },
+    { "id": "beadHi", "type": "filter", "mode": "hp", "in": "bead", "freq": 700 },
+
+    { "id": "sum", "type": "expr", "expr": "barA * 0.055 + barB * 0.06 + barC * 0.07 + beadHi * clack * 0.15" },
+    { "id": "tone", "type": "filter", "mode": "lp", "in": "sum", "freq": "2500 + bright * 9000", "q": 0.6 },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "tone", "freq": 80 }
+  ],
+  "out": "clean",
+  "presets": {
+    "Buy": { "pitch": 660, "speed": 11, "bright": 0.55, "notes": 3, "clack": 0.55 },
+    "Equip": { "pitch": 660, "speed": 10, "bright": 0.5, "notes": 2, "clack": 0.4 }
+  }
+}

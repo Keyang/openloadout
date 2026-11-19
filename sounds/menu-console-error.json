@@ -1,0 +1,227 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "menu-console-error",
+ "name": "Console error",
+ "category": "ui",
+ "description": "A soft \"not allowed\" on a warm console: two round electric-piano notes going down, the second sagging lower with a slow wobble, with a gentle echo. Change its pitch, speed, brightness, echo and wobble. The same every time.",
+ "meta": {
+  "type": "sfx",
+  "role": "interface/error",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "arcade",
+   "turn-based-rpg",
+   "puzzle",
+   "card-game"
+  ],
+  "words": [
+   "error",
+   "wrong",
+   "denied",
+   "invalid",
+   "no",
+   "fail",
+   "menu",
+   "retro",
+   "console",
+   "tine",
+   "echo",
+   "soft"
+  ],
+  "license": "draft"
+ },
+ "duration": "1/speed + 2.4/speed + 0.09 + 0.01",
+ "params": [
+  {
+   "id": "pitch",
+   "label": "Pitch",
+   "unit": "Hz",
+   "min": 260,
+   "max": 700,
+   "default": 440,
+   "scale": "log"
+  },
+  {
+   "id": "speed",
+   "label": "Speed",
+   "unit": "notes/s",
+   "min": 8,
+   "max": 20,
+   "default": 13
+  },
+  {
+   "id": "bright",
+   "label": "Brightness",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  },
+  {
+   "id": "echo",
+   "label": "Echo",
+   "min": 0.15,
+   "max": 0.6,
+   "default": 0.35
+  },
+  {
+   "id": "wobble",
+   "label": "Wobble",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  }
+ ],
+ "nodes": [
+  {
+   "id": "c1",
+   "type": "clock",
+   "rate": 1,
+   "count": 1
+  },
+  {
+   "id": "a1",
+   "type": "ad",
+   "attack": 0.002,
+   "decay": "1.05/speed",
+   "curve": 2.2,
+   "trig": "c1"
+  },
+  {
+   "id": "k1",
+   "type": "ad",
+   "attack": 0.0005,
+   "decay": 0.03,
+   "curve": 2,
+   "trig": "c1"
+  },
+  {
+   "id": "m1",
+   "type": "osc",
+   "freq": "pitch"
+  },
+  {
+   "id": "o1",
+   "type": "osc",
+   "freq": "pitch",
+   "pm": "m1*(0.04 + (0.08 + bright*0.12)*k1)"
+  },
+  {
+   "id": "c2",
+   "type": "clock",
+   "rate": 1,
+   "count": 1,
+   "delay": "1/speed"
+  },
+  {
+   "id": "sag",
+   "type": "env",
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     "2.2/speed",
+     1,
+     1.6
+    ]
+   ],
+   "trig": "c2"
+  },
+  {
+   "id": "vib",
+   "type": "osc",
+   "freq": 6.5
+  },
+  {
+   "id": "f2",
+   "type": "expr",
+   "expr": "pitch*semi(-6 - 1.6*sag + wobble*1.5*vib*(0.3 + 0.7*sag))"
+  },
+  {
+   "id": "a2",
+   "type": "ad",
+   "attack": 0.002,
+   "decay": "2.4/speed",
+   "curve": 1.8,
+   "trig": "c2"
+  },
+  {
+   "id": "k2",
+   "type": "ad",
+   "attack": 0.0005,
+   "decay": 0.03,
+   "curve": 2,
+   "trig": "c2"
+  },
+  {
+   "id": "m2",
+   "type": "osc",
+   "freq": "f2"
+  },
+  {
+   "id": "o2",
+   "type": "osc",
+   "freq": "f2",
+   "pm": "m2*(0.04 + (0.08 + bright*0.12)*k2)"
+  },
+  {
+   "id": "notes",
+   "type": "expr",
+   "expr": "o1*a1 + o2*a2*0.75"
+  },
+  {
+   "id": "grain",
+   "type": "crush",
+   "in": "notes",
+   "bits": 12,
+   "rate": 30000
+  },
+  {
+   "id": "tone",
+   "type": "filter",
+   "mode": "lp",
+   "in": "grain",
+   "freq": "2000 + bright*3000",
+   "q": 0.6
+  },
+  {
+   "id": "rep",
+   "type": "delay",
+   "in": "tone",
+   "time": 0.09,
+   "feedback": 0,
+   "mix": 1,
+   "max": 0.2
+  },
+  {
+   "id": "soft",
+   "type": "filter",
+   "mode": "lp",
+   "in": "rep",
+   "freq": "1500 + bright*1500",
+   "q": 0.6
+  },
+  {
+   "id": "clean",
+   "type": "filter",
+   "mode": "hp",
+   "in": "tone + soft*echo",
+   "freq": 120
+  }
+ ],
+ "out": "clean",
+ "presets": {
+  "Not allowed": {
+   "pitch": 440,
+   "speed": 13
+  },
+  "Wrong answer": {
+   "pitch": 392,
+   "speed": 10,
+   "wobble": 0.8
+  }
+ }
+}

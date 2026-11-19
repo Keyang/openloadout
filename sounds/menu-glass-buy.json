@@ -1,0 +1,48 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "menu-glass-buy",
+  "name": "Glass buy",
+  "category": "ui",
+  "description": "Buying or equipping: small crystal clinks tumbling quickly upward, like coins dropped into a glass jar, the last one left ringing. Change the pitch, speed, ring, brightness and how many clinks. The same every time.",
+  "meta": {
+    "type": "sfx",
+    "role": "interface/confirm",
+    "themes": ["neutral", "fantasy"],
+    "gameTypes": ["arcade", "puzzle", "card-game", "turn-based-rpg", "top-down-rpg"],
+    "words": ["buy", "purchase", "shop", "store", "equip", "coins", "jar", "glass", "crystal", "clink", "menu", "trade"],
+    "license": "draft"
+  },
+  "duration": "(notes > 2.5 ? 1.85 : 1)/speed + ring + 0.02",
+  "params": [
+    { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 1200, "max": 2800, "default": 1760, "scale": "log" },
+    { "id": "speed", "label": "Speed", "unit": "notes/s", "min": 10, "max": 20, "default": 14, "scale": "log" },
+    { "id": "ring", "label": "Ring", "unit": "s", "min": 0.28, "max": 0.58, "default": 0.39, "scale": "log" },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "notes", "label": "Notes", "min": 2, "max": 3, "default": 3, "step": 1 }
+  ],
+  "nodes": [
+    { "id": "hit1", "type": "clock", "rate": 1, "count": 1 },
+    { "id": "hit2", "type": "clock", "rate": 1, "count": 1, "delay": "1/speed" },
+    { "id": "hit3", "type": "clock", "rate": 1, "count": 1, "delay": "1.85/speed" },
+    { "id": "three", "type": "expr", "expr": "notes > 2.5 ? 1 : 0" },
+    { "id": "aRod0", "type": "ad", "attack": 0.0001, "decay": "0.0008 - (0.6)*0.0005", "curve": 3, "trig": "hit1" },
+    { "id": "aRod", "type": "expr", "expr": "(aRod0 + hit1*(4 + (0.6)*10))*(0.75)" },
+    { "id": "aGlass", "type": "modal", "in": "aRod", "freq": "pitch", "ratios": [1, 2.32, 4.25, 6.63], "gains": [1, "0.5 + bright*0.3", "0.3 + bright*0.3", "0.15 + bright*0.2"], "decay": "ring*0.6", "tilt": "1.2 - bright*0.7" },
+    { "id": "bRod0", "type": "ad", "attack": 0.0001, "decay": "0.0008 - (0.6)*0.0005", "curve": 3, "trig": "hit2" },
+    { "id": "bRod", "type": "expr", "expr": "(bRod0 + hit2*(4 + (0.6)*10))*(0.85)" },
+    { "id": "bGlass", "type": "modal", "in": "bRod", "freq": "pitch*semi(4)", "ratios": [1, 2.32, 4.25, 6.63], "gains": [1, "0.5 + bright*0.3", "0.3 + bright*0.3", "0.15 + bright*0.2"], "decay": "three ? ring*0.75 : ring*1.3", "tilt": "1.2 - bright*0.7" },
+    { "id": "cRod0", "type": "ad", "attack": 0.0001, "decay": "0.0008 - (0.6)*0.0005", "curve": 3, "trig": "hit3" },
+    { "id": "cRod", "type": "expr", "expr": "(cRod0 + hit3*(4 + (0.6)*10))*(1)*three" },
+    { "id": "cGlass", "type": "modal", "in": "cRod", "freq": "pitch*semi(11)", "ratios": [1, 2.32, 4.25, 6.63], "gains": [1, "0.5 + bright*0.3", "0.3 + bright*0.3", "0.15 + bright*0.2"], "decay": "ring*1.3", "tilt": "1.2 - bright*0.7" },
+    { "id": "tickHp", "type": "filter", "mode": "hp", "in": "aRod + bRod + cRod", "freq": 6000, "q": 0.7 },
+    { "id": "dry", "type": "expr", "expr": "aGlass + bGlass + cGlass*0.85 + tickHp*(0.05 + bright*0.1)" },
+    { "id": "tone", "type": "filter", "mode": "lp", "in": "dry", "freq": "pitch*1.8 + bright*14000", "q": 0.5 },
+    { "id": "room", "type": "reverb", "in": "tone", "size": 0.18, "damp": 0.25, "mix": 0.12 },
+    { "id": "hpf", "type": "filter", "mode": "hp", "in": "room", "freq": 120 }
+  ],
+  "out": "hpf*(1 - smooth(dur - 0.03, dur - 0.002, t))",
+  "presets": {
+    "Buy": { "notes": 3, "speed": 14, "ring": 0.39 },
+    "Equip": { "notes": 2, "speed": 12, "ring": 0.34 }
+  }
+}

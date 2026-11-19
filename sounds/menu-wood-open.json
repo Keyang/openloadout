@@ -1,0 +1,41 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "menu-wood-open",
+  "name": "Wood open",
+  "category": "ui",
+  "description": "A panel appearing: a sheet of paper unfolding with a rising swish that lands on a soft note of a little wooden bar, the same every time. Change its pitch, length, brightness and how much paper you hear.",
+  "meta": {
+    "type": "sfx",
+    "role": "interface/click",
+    "themes": ["neutral", "fantasy"],
+    "gameTypes": ["arcade", "puzzle", "card-game", "turn-based-rpg", "top-down-rpg"],
+    "words": ["menu", "open", "panel", "window", "popup", "inventory", "unfold", "paper", "swish", "wooden", "appear", "page"],
+    "license": "draft"
+  },
+  "duration": "length + 0.006",
+  "params": [
+    { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 440, "max": 1000, "default": 660, "scale": "log" },
+    { "id": "length", "label": "Length", "unit": "s", "min": 0.12, "max": 0.4, "default": 0.22, "scale": "log" },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "paper", "label": "Paper", "min": 0, "max": 1, "default": 0.6 }
+  ],
+  "nodes": [
+    { "id": "rustle", "type": "noise", "color": "pink", "seed": 3 },
+    { "id": "swishF", "type": "env", "points": [[0, 1500], ["length * 0.6", "4200 + bright * 800", "exp"]] },
+    { "id": "swishA", "type": "env", "points": [[0, 0.3], ["length * 0.5", 1], ["length * 0.68", 0]] },
+    { "id": "sheet", "type": "filter", "mode": "bp", "in": "rustle * swishA", "freq": "swishF", "q": 1.2 },
+    { "id": "c2", "type": "clock", "rate": 1, "count": 1, "delay": "length * 0.6" },
+    { "id": "hitB", "type": "ad", "attack": 0.0004, "decay": 0.0012, "curve": 2, "trig": "c2" },
+    { "id": "malletB", "type": "filter", "mode": "lp", "in": "hitB", "freq": "1200 + bright * 3000", "q": 0.6 },
+    { "id": "barB", "type": "modal", "in": "malletB", "freq": "pitch", "ratios": [1, 3.9, 9.2], "gains": [1, 1.5, 0.5], "decay": "length * 0.55", "tilt": "1.3 - bright * 0.6" },
+    { "id": "sum", "type": "expr", "expr": "sheet * (0.25 + paper * 0.75) * 2.2 + barB * 0.065" },
+    { "id": "tone", "type": "filter", "mode": "lp", "in": "sum", "freq": "3500 + bright * 9000", "q": 0.6 },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "tone", "freq": 80 }
+  ],
+  "out": "clean",
+  "presets": {
+    "Menu": { "pitch": 660, "length": 0.22, "bright": 0.5, "paper": 0.6 },
+    "Pop-up": { "pitch": 740, "length": 0.14, "bright": 0.65, "paper": 0.4 },
+    "Inventory": { "pitch": 587, "length": 0.32, "bright": 0.4, "paper": 0.85 }
+  }
+}

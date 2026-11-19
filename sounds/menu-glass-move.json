@@ -1,0 +1,167 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "menu-glass-move",
+ "name": "Glass move",
+ "category": "ui",
+ "description": "Moving the cursor to the next item: one tiny tap on a small glass with a short, clear ring. Change its pitch, ring, brightness and how hard the tap is. The same every time.",
+ "meta": {
+  "type": "sfx",
+  "role": "interface/hover",
+  "themes": [
+   "neutral",
+   "fantasy"
+  ],
+  "gameTypes": [
+   "arcade",
+   "puzzle",
+   "card-game",
+   "turn-based-rpg",
+   "top-down-rpg"
+  ],
+  "words": [
+   "hover",
+   "move",
+   "cursor",
+   "select",
+   "menu",
+   "glass",
+   "crystal",
+   "tap",
+   "ting",
+   "tink",
+   "highlight",
+   "navigate"
+  ],
+  "license": "draft"
+ },
+ "duration": "ring + 0.02",
+ "params": [
+  {
+   "id": "pitch",
+   "label": "Pitch",
+   "unit": "Hz",
+   "min": 1200,
+   "max": 2800,
+   "default": 1760,
+   "scale": "log"
+  },
+  {
+   "id": "ring",
+   "label": "Ring",
+   "unit": "s",
+   "min": 0.08,
+   "max": 0.3,
+   "default": 0.15,
+   "scale": "log"
+  },
+  {
+   "id": "bright",
+   "label": "Brightness",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  },
+  {
+   "id": "clink",
+   "label": "Clink",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  }
+ ],
+ "nodes": [
+  {
+   "id": "hit",
+   "type": "clock",
+   "rate": 1,
+   "count": 1
+  },
+  {
+   "id": "aRod0",
+   "type": "ad",
+   "attack": 0.0001,
+   "decay": "0.0008 - (clink)*0.0005",
+   "curve": 3,
+   "trig": "hit"
+  },
+  {
+   "id": "aRod",
+   "type": "expr",
+   "expr": "(aRod0 + hit*(4 + (clink)*10))*(0.5 + clink)"
+  },
+  {
+   "id": "aGlass",
+   "type": "modal",
+   "in": "aRod",
+   "freq": "pitch",
+   "ratios": [
+    1,
+    2.32,
+    4.25,
+    6.63
+   ],
+   "gains": [
+    1,
+    "0.5 + bright*0.3",
+    "0.3 + bright*0.3",
+    "0.15 + bright*0.2"
+   ],
+   "decay": "ring*1.5",
+   "tilt": "1.2 - bright*0.7"
+  },
+  {
+   "id": "tickHp",
+   "type": "filter",
+   "mode": "hp",
+   "in": "aRod*clink*clink*2",
+   "freq": 6000,
+   "q": 0.7
+  },
+  {
+   "id": "dry",
+   "type": "expr",
+   "expr": "aGlass + tickHp*(0.05 + bright*0.1)"
+  },
+  {
+   "id": "tone",
+   "type": "filter",
+   "mode": "lp",
+   "in": "dry",
+   "freq": "pitch*1.8 + bright*14000",
+   "q": 0.5
+  },
+  {
+   "id": "room",
+   "type": "reverb",
+   "in": "tone",
+   "size": 0.18,
+   "damp": 0.25,
+   "mix": 0.12
+  },
+  {
+   "id": "hpf",
+   "type": "filter",
+   "mode": "hp",
+   "in": "room",
+   "freq": 120
+  }
+ ],
+ "out": "hpf*(1 - smooth(dur - 0.03, dur - 0.002, t))",
+ "presets": {
+  "List": {
+   "ring": 0.15,
+   "clink": 0.5
+  },
+  "Grid": {
+   "ring": 0.1,
+   "clink": 0.65,
+   "bright": 0.6
+  },
+  "Tab": {
+   "pitch": 1400,
+   "ring": 0.22,
+   "clink": 0.4,
+   "bright": 0.45
+  }
+ }
+}

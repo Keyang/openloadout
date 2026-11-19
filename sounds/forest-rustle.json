@@ -1,0 +1,78 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "forest-rustle",
+ "name": "Forest",
+ "category": "ambience",
+ "description": "A quiet wood with no birds: leaves stirring in a slow breeze, rustling now in one tree and now in another, and once or twice a soft creak of a branch. Change the size of the trees, the breeze, the brightness, how much the leaves rustle and the creaks.",
+ "meta": {
+  "type": "ambience",
+  "role": "environment/ambience",
+  "themes": ["forest", "fantasy"],
+  "gameTypes": ["top-down-rpg", "turn-based-rpg", "platformer", "farming-sim", "puzzle"],
+  "words": ["forest", "woods", "trees", "leaves", "rustle", "breeze", "woodland", "grove", "nature", "outdoor", "calm", "branches", "creak", "foliage"],
+  "license": "draft"
+ },
+ "loop": true,
+ "duration": 8,
+ "normalize": false,
+ "params": [
+  { "id": "size", "label": "Trees", "min": 0, "max": 1, "default": 0.5 },
+  { "id": "breeze", "label": "Breeze", "min": 0, "max": 1, "default": 0.5 },
+  { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+  { "id": "leaves", "label": "Leaves", "min": 0, "max": 1, "default": 0.5 },
+  { "id": "creak", "label": "Creaks", "min": 0, "max": 1, "default": 0.4 }
+ ],
+ "nodes": [
+  { "id": "low", "type": "expr", "expr": "1.25 - 0.55*size" },
+
+  { "id": "airClk", "type": "clock", "rate": "0.42 - 0.2*size", "jitter": 0.6 },
+  { "id": "airRnd", "type": "rand", "trig": "airClk" },
+  { "id": "airLag", "type": "lag", "in": "airRnd", "time": "1.1 + 1.2*size" },
+  { "id": "air", "type": "expr", "expr": "0.45 + 0.9*airLag" },
+  { "id": "pinkL", "type": "noise", "color": "pink" },
+  { "id": "pinkR", "type": "noise", "color": "pink" },
+  { "id": "breezeL", "type": "filter", "mode": "bp", "in": "pinkL", "freq": "(700 + 900*bright)*low*(0.85 + 0.3*airLag)", "q": 0.6 },
+  { "id": "breezeR", "type": "filter", "mode": "bp", "in": "pinkR", "freq": "(760 + 900*bright)*low*(0.85 + 0.3*airLag)", "q": 0.6 },
+
+  { "id": "gateClkL", "type": "clock", "rate": "0.9 - 0.4*size", "jitter": 0.75 },
+  { "id": "gateClkR", "type": "clock", "rate": "0.8 - 0.35*size", "jitter": 0.75 },
+  { "id": "gateRndL", "type": "rand", "trig": "gateClkL" },
+  { "id": "gateRndR", "type": "rand", "trig": "gateClkR" },
+  { "id": "gateLagL", "type": "lag", "in": "gateRndL", "time": "0.3 + 0.4*size" },
+  { "id": "gateLagR", "type": "lag", "in": "gateRndR", "time": "0.3 + 0.4*size" },
+  { "id": "gateL", "type": "expr", "expr": "0.12 + smooth(0.25, 0.75, gateLagL)*(0.6 + 0.6*breeze)" },
+  { "id": "gateR", "type": "expr", "expr": "0.12 + smooth(0.25, 0.75, gateLagR)*(0.6 + 0.6*breeze)" },
+  { "id": "crinkleL", "type": "dust", "density": "(300 + 2600*leaves)*gateL", "spread": 1 },
+  { "id": "crinkleR", "type": "dust", "density": "(300 + 2600*leaves)*gateR", "spread": 1 },
+  { "id": "rustleL", "type": "filter", "mode": "bp", "in": "crinkleL", "freq": "(2600 + 2600*bright)*(1.1 - 0.3*size)", "q": 0.9 },
+  { "id": "rustleR", "type": "filter", "mode": "bp", "in": "crinkleR", "freq": "(2900 + 2600*bright)*(1.1 - 0.3*size)", "q": 0.9 },
+  { "id": "whiteL", "type": "noise" },
+  { "id": "whiteR", "type": "noise" },
+  { "id": "hissL", "type": "filter", "mode": "bp", "in": "whiteL", "freq": "(2400 + 2600*bright)*(1.1 - 0.3*size)", "q": 0.7 },
+  { "id": "hissR", "type": "filter", "mode": "bp", "in": "whiteR", "freq": "(2700 + 2600*bright)*(1.1 - 0.3*size)", "q": 0.7 },
+
+  { "id": "creak1", "type": "clock", "rate": 1, "count": 1, "delay": "rnd(0.7, 2.8)" },
+  { "id": "creak2", "type": "clock", "rate": 1, "count": 1, "delay": "rnd(4.2, 6.0)" },
+  { "id": "bend1", "type": "env", "points": [[0, 0], ["0.35 + 0.3*size", 1, 1.5], ["0.7 + 0.5*size", 0.2]], "trig": "creak1" },
+  { "id": "bend2", "type": "env", "points": [[0, 0], ["0.3 + 0.3*size", 1, 1.5], ["0.65 + 0.5*size", 0.3]], "trig": "creak2" },
+  { "id": "swell1", "type": "env", "points": [[0, 0], ["0.18 + 0.12*size", 1], ["0.5 + 0.35*size", 0.6], ["0.8 + 0.5*size", 0, 2]], "trig": "creak1" },
+  { "id": "swell2", "type": "env", "points": [[0, 0], ["0.12 + 0.12*size", 1], ["0.4 + 0.35*size", 0.5], ["0.7 + 0.5*size", 0, 2]], "trig": "creak2" },
+  { "id": "slip1", "type": "clock", "rate": "rnd(22, 34)*(1.15 - 0.4*size)*(1 + 0.45*bend1)", "jitter": 0.25 },
+  { "id": "slip2", "type": "clock", "rate": "rnd(30, 44)*(1.15 - 0.4*size)*(1 - 0.35*bend2)", "jitter": 0.25 },
+  { "id": "wood1", "type": "modal", "in": "slip1*swell1", "freq": "rnd(380, 560)*low", "ratios": [1, 2.3, 3.9], "gains": [1, 0.6, "0.2 + 0.4*bright"], "decay": 0.035, "tilt": 0.8 },
+  { "id": "wood2", "type": "modal", "in": "slip2*swell2", "freq": "rnd(430, 650)*low", "ratios": [1, 2.1, 3.6], "gains": [1, 0.6, "0.2 + 0.4*bright"], "decay": 0.03, "tilt": 0.8 },
+  { "id": "creaks", "type": "expr", "expr": "wood1*rnd(0.7, 1) + wood2*rnd(0.6, 1)" },
+
+  { "id": "breezeLvl", "type": "expr", "expr": "(0.1 + 0.9*breeze)*air" },
+  { "id": "mixL", "type": "expr", "expr": "breezeL*breezeLvl*0.3 + rustleL*(0.25 + 0.95*leaves)*(0.9 + 0.3*size) + hissL*gateL*leaves*0.06 + creaks*creak*0.34" },
+  { "id": "mixR", "type": "expr", "expr": "breezeR*breezeLvl*0.3 + rustleR*(0.25 + 0.95*leaves)*(0.9 + 0.3*size) + hissR*gateR*leaves*0.06 + creaks*creak*0.26" },
+  { "id": "outL", "type": "filter", "mode": "hp", "in": "mixL", "freq": 60 },
+  { "id": "outR", "type": "filter", "mode": "hp", "in": "mixR", "freq": 60 }
+ ],
+ "out": ["outL", "outR"],
+ "presets": {
+  "Calm wood": { "size": 0.4, "breeze": 0.2, "bright": 0.5, "leaves": 0.35, "creak": 0.25 },
+  "Breezy wood": { "size": 0.45, "breeze": 0.85, "bright": 0.6, "leaves": 0.8, "creak": 0.4 },
+  "Deep forest": { "size": 0.9, "breeze": 0.45, "bright": 0.3, "leaves": 0.5, "creak": 0.7 }
+ }
+}

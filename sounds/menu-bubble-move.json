@@ -1,0 +1,239 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "menu-bubble-move",
+ "name": "Bubble move",
+ "category": "ui",
+ "description": "The cursor stepping to the next item: one tiny water drop that bloops up to its note, with a wet pop and a soft wet tail. Change its pitch, length, brightness and how far it bloops.",
+ "meta": {
+  "type": "sfx",
+  "role": "interface/hover",
+  "themes": [
+   "neutral",
+   "underwater"
+  ],
+  "gameTypes": [
+   "arcade",
+   "puzzle",
+   "card-game",
+   "platformer"
+  ],
+  "words": [
+   "bubble",
+   "drop",
+   "bloop",
+   "hover",
+   "cursor",
+   "move",
+   "menu",
+   "select",
+   "scroll",
+   "water",
+   "wet",
+   "blip"
+  ],
+  "license": "draft"
+ },
+ "duration": "length + 0.025",
+ "params": [
+  {
+   "id": "pitch",
+   "label": "Pitch",
+   "unit": "Hz",
+   "min": 350,
+   "max": 900,
+   "default": 560,
+   "scale": "log"
+  },
+  {
+   "id": "length",
+   "label": "Length",
+   "unit": "s",
+   "min": 0.04,
+   "max": 0.14,
+   "default": 0.07,
+   "scale": "log"
+  },
+  {
+   "id": "bright",
+   "label": "Brightness",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  },
+  {
+   "id": "bloop",
+   "label": "Bloop",
+   "unit": "semitones",
+   "min": 0,
+   "max": 12,
+   "default": 6
+  }
+ ],
+ "nodes": [
+  {
+   "id": "t0",
+   "type": "clock",
+   "rate": 1,
+   "count": 1
+  },
+  {
+   "id": "j0",
+   "type": "env",
+   "trig": "t0",
+   "points": [
+    [
+     0,
+     "semi(-bloop)"
+    ],
+    [
+     "clamp(length * 0.4, 0.02, 0.05)",
+     1,
+     "exp"
+    ]
+   ]
+  },
+  {
+   "id": "a0",
+   "type": "ad",
+   "trig": "t0",
+   "attack": 0.0025,
+   "hold": "length * 0.25",
+   "decay": "length * 0.75",
+   "curve": 2
+  },
+  {
+   "id": "f0",
+   "type": "expr",
+   "expr": "pitch * j0"
+  },
+  {
+   "id": "o0",
+   "type": "osc",
+   "freq": "f0"
+  },
+  {
+   "id": "h0",
+   "type": "osc",
+   "freq": "f0 * 2"
+  },
+  {
+   "id": "n0",
+   "type": "expr",
+   "expr": "(o0 + h0 * (0.04 + bright * 0.3)) * a0 * 1"
+  },
+  {
+   "id": "pe0",
+   "type": "ad",
+   "trig": "t0",
+   "attack": 0.0003,
+   "decay": 0.007,
+   "curve": 3
+  },
+  {
+   "id": "pf0",
+   "type": "env",
+   "trig": "t0",
+   "points": [
+    [
+     0,
+     "pitch * 3"
+    ],
+    [
+     0.007,
+     "pitch * 6",
+     "exp"
+    ]
+   ]
+  },
+  {
+   "id": "po0",
+   "type": "osc",
+   "wave": "square",
+   "freq": "pf0"
+  },
+  {
+   "id": "p0",
+   "type": "expr",
+   "expr": "po0 * pe0 * 1"
+  },
+  {
+   "id": "body",
+   "type": "expr",
+   "expr": "n0"
+  },
+  {
+   "id": "popmix",
+   "type": "filter",
+   "mode": "bp",
+   "in": "p0",
+   "freq": "1800 + bright * 1800",
+   "q": 1.3
+  },
+  {
+   "id": "dry",
+   "type": "expr",
+   "expr": "body + popmix * (0.6 + bright * 0.9)"
+  },
+  {
+   "id": "wet",
+   "type": "reverb",
+   "in": "dry",
+   "size": 0.08,
+   "damp": 0.7,
+   "mix": 1
+  },
+  {
+   "id": "wetlp",
+   "type": "filter",
+   "mode": "lp",
+   "in": "wet",
+   "freq": 2500
+  },
+  {
+   "id": "tg",
+   "type": "env",
+   "points": [
+    [
+     0,
+     1
+    ],
+    [
+     "length * 0.6",
+     1
+    ],
+    [
+     "length + 0.025",
+     0
+    ]
+   ]
+  },
+  {
+   "id": "clean",
+   "type": "filter",
+   "mode": "hp",
+   "in": "dry + wetlp * 0.1 * tg",
+   "freq": 90
+  }
+ ],
+ "out": "clean",
+ "presets": {
+  "List": {
+   "pitch": 560,
+   "length": 0.07,
+   "bright": 0.5,
+   "bloop": 6
+  },
+  "Grid": {
+   "pitch": 680,
+   "length": 0.05,
+   "bright": 0.6,
+   "bloop": 5
+  },
+  "Tab": {
+   "pitch": 470,
+   "length": 0.1,
+   "bright": 0.4,
+   "bloop": 8
+  }
+ }
+}

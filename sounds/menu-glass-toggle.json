@@ -1,0 +1,42 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "menu-glass-toggle",
+  "name": "Glass toggle",
+  "category": "ui",
+  "description": "Flipping a switch or ticking a box: two tiny clinks on small glasses, stepping up when it switches on and down when it switches off. Change the pitch, ring, brightness and which way it goes. The same every time.",
+  "meta": {
+    "type": "sfx",
+    "role": "interface/click",
+    "themes": ["neutral", "fantasy"],
+    "gameTypes": ["arcade", "puzzle", "card-game", "turn-based-rpg", "top-down-rpg"],
+    "words": ["toggle", "switch", "checkbox", "tick", "on", "off", "option", "settings", "menu", "glass", "crystal", "clink"],
+    "license": "draft"
+  },
+  "duration": "ring + 0.02",
+  "params": [
+    { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 1200, "max": 2800, "default": 1760, "scale": "log" },
+    { "id": "ring", "label": "Ring", "unit": "s", "min": 0.12, "max": 0.35, "default": 0.2, "scale": "log" },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "dir", "label": "Switch", "min": 0, "max": 1, "default": 1, "options": ["Off", "On"], "hint": "On steps up to a higher glass; Off steps down to a lower one." }
+  ],
+  "nodes": [
+    { "id": "hit1", "type": "clock", "rate": 1, "count": 1 },
+    { "id": "hit2", "type": "clock", "rate": 1, "count": 1, "delay": "0.03 + ring * 0.15" },
+    { "id": "aRod0", "type": "ad", "attack": 0.0001, "decay": "0.0008 - (0.6)*0.0005", "curve": 3, "trig": "hit1" },
+    { "id": "aRod", "type": "expr", "expr": "(aRod0 + hit1*(4 + (0.6)*10))*(0.7)" },
+    { "id": "aGlass", "type": "modal", "in": "aRod", "freq": "pitch", "ratios": [1, 2.32, 4.25, 6.63], "gains": [1, "0.5 + bright*0.3", "0.3 + bright*0.3", "0.15 + bright*0.2"], "decay": "ring*0.7", "tilt": "1.2 - bright*0.7" },
+    { "id": "bRod0", "type": "ad", "attack": 0.0001, "decay": "0.0008 - (0.6)*0.0005", "curve": 3, "trig": "hit2" },
+    { "id": "bRod", "type": "expr", "expr": "(bRod0 + hit2*(4 + (0.6)*10))*(0.9)" },
+    { "id": "bGlass", "type": "modal", "in": "bRod", "freq": "pitch*semi(dir > 0.5 ? 5 : -5)", "ratios": [1, 2.32, 4.25, 6.63], "gains": [1, "0.5 + bright*0.3", "0.3 + bright*0.3", "0.15 + bright*0.2"], "decay": "ring*1.25", "tilt": "1.2 - bright*0.7" },
+    { "id": "tickHp", "type": "filter", "mode": "hp", "in": "aRod + bRod", "freq": 6000, "q": 0.7 },
+    { "id": "dry", "type": "expr", "expr": "aGlass + bGlass + tickHp*(0.05 + bright*0.1)" },
+    { "id": "tone", "type": "filter", "mode": "lp", "in": "dry", "freq": "pitch*1.8 + bright*14000", "q": 0.5 },
+    { "id": "room", "type": "reverb", "in": "tone", "size": 0.18, "damp": 0.25, "mix": 0.12 },
+    { "id": "hpf", "type": "filter", "mode": "hp", "in": "room", "freq": 120 }
+  ],
+  "out": "hpf*(1 - smooth(dur - 0.03, dur - 0.002, t))",
+  "presets": {
+    "Switch on": { "dir": 1, "ring": 0.2 },
+    "Switch off": { "dir": 0, "ring": 0.18 }
+  }
+}

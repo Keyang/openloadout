@@ -1,0 +1,222 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "menu-glass-confirm",
+ "name": "Glass confirm",
+ "category": "ui",
+ "description": "Choosing an item: two small glasses struck in quick turn, the second much higher and a touch out of tune, so they shimmer together as they ring. Change the pitch, speed, ring and brightness. The same every time.",
+ "meta": {
+  "type": "sfx",
+  "role": "interface/confirm",
+  "themes": [
+   "neutral",
+   "fantasy"
+  ],
+  "gameTypes": [
+   "arcade",
+   "puzzle",
+   "card-game",
+   "turn-based-rpg",
+   "top-down-rpg"
+  ],
+  "words": [
+   "confirm",
+   "select",
+   "accept",
+   "choose",
+   "ok",
+   "menu",
+   "glass",
+   "crystal",
+   "ting",
+   "chime",
+   "button",
+   "start"
+  ],
+  "license": "draft"
+ },
+ "duration": "1/speed + ring + 0.02",
+ "params": [
+  {
+   "id": "pitch",
+   "label": "Pitch",
+   "unit": "Hz",
+   "min": 1200,
+   "max": 2800,
+   "default": 1760,
+   "scale": "log"
+  },
+  {
+   "id": "speed",
+   "label": "Speed",
+   "unit": "notes/s",
+   "min": 8,
+   "max": 20,
+   "default": 12,
+   "scale": "log"
+  },
+  {
+   "id": "ring",
+   "label": "Ring",
+   "unit": "s",
+   "min": 0.25,
+   "max": 0.58,
+   "default": 0.36,
+   "scale": "log"
+  },
+  {
+   "id": "bright",
+   "label": "Brightness",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  }
+ ],
+ "nodes": [
+  {
+   "id": "hit1",
+   "type": "clock",
+   "rate": 1,
+   "count": 1
+  },
+  {
+   "id": "hit2",
+   "type": "clock",
+   "rate": 1,
+   "count": 1,
+   "delay": "1/speed"
+  },
+  {
+   "id": "aRod0",
+   "type": "ad",
+   "attack": 0.0001,
+   "decay": "0.0008 - (0.6)*0.0005",
+   "curve": 3,
+   "trig": "hit1"
+  },
+  {
+   "id": "aRod",
+   "type": "expr",
+   "expr": "(aRod0 + hit1*(4 + (0.6)*10))*(1)"
+  },
+  {
+   "id": "aGlass",
+   "type": "modal",
+   "in": "aRod",
+   "freq": "pitch",
+   "ratios": [
+    1,
+    2.32,
+    4.25,
+    6.63
+   ],
+   "gains": [
+    1,
+    "0.5 + bright*0.3",
+    "0.3 + bright*0.3",
+    "0.15 + bright*0.2"
+   ],
+   "decay": "ring*1.5 + 1/speed",
+   "tilt": "1.2 - bright*0.7"
+  },
+  {
+   "id": "aOct",
+   "type": "modal",
+   "in": "aRod",
+   "freq": "pitch",
+   "ratios": [
+    2
+   ],
+   "gains": [
+    0.9
+   ],
+   "decay": "ring*1.1 + 1/speed",
+   "tilt": 0
+  },
+  {
+   "id": "bRod0",
+   "type": "ad",
+   "attack": 0.0001,
+   "decay": "0.0008 - (0.6)*0.0005",
+   "curve": 3,
+   "trig": "hit2"
+  },
+  {
+   "id": "bRod",
+   "type": "expr",
+   "expr": "(bRod0 + hit2*(4 + (0.6)*10))*(0.75)"
+  },
+  {
+   "id": "bGlass",
+   "type": "modal",
+   "in": "bRod",
+   "freq": "pitch*2 + 7",
+   "ratios": [
+    1,
+    2.32,
+    4.25,
+    6.63
+   ],
+   "gains": [
+    1,
+    "0.5 + bright*0.3",
+    "0.3 + bright*0.3",
+    "0.15 + bright*0.2"
+   ],
+   "decay": "ring*1.1",
+   "tilt": "1.2 - bright*0.7"
+  },
+  {
+   "id": "tickHp",
+   "type": "filter",
+   "mode": "hp",
+   "in": "aRod + bRod",
+   "freq": 6000,
+   "q": 0.7
+  },
+  {
+   "id": "dry",
+   "type": "expr",
+   "expr": "aGlass + aOct + bGlass + tickHp*(0.05 + bright*0.1)"
+  },
+  {
+   "id": "tone",
+   "type": "filter",
+   "mode": "lp",
+   "in": "dry",
+   "freq": "pitch*1.8 + bright*14000",
+   "q": 0.5
+  },
+  {
+   "id": "room",
+   "type": "reverb",
+   "in": "tone",
+   "size": 0.18,
+   "damp": 0.25,
+   "mix": 0.12
+  },
+  {
+   "id": "hpf",
+   "type": "filter",
+   "mode": "hp",
+   "in": "room",
+   "freq": 120
+  }
+ ],
+ "out": "hpf*(1 - smooth(dur - 0.03, dur - 0.002, t))",
+ "presets": {
+  "Select": {
+   "speed": 15,
+   "ring": 0.28
+  },
+  "Accept": {
+   "speed": 12,
+   "ring": 0.36
+  },
+  "Start game": {
+   "pitch": 1480,
+   "speed": 10,
+   "ring": 0.52,
+   "bright": 0.65
+  }
+ }
+}
