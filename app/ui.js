@@ -126,11 +126,11 @@ if (typeof document !== 'undefined') {
 }
 
 // The library holds sprites, sounds and music: a page of any of them lights "Library" (kits are "bundles" in addresses and in the code).
-const NAV_KEY = { sprites: 'library', sounds: 'library', music: 'library', browse: 'library', library: 'library', kits: 'bundles', bundles: 'bundles', play: 'play' };
+const NAV_KEY = { sprites: 'library', sounds: 'library', music: 'library', browse: 'library', library: 'library', kits: 'bundles', bundles: 'bundles', play: 'play', studio: 'studio' };
 
 /**
- * The page header (docs/site-design.md, "Frame"): the wordmark, Library, Kits, Play, and the Bag button with its count.
- * On a phone the three links fold behind "Menu". `current`: home | library | sprites | sounds | music | bundles | kits | play | bag | ''.
+ * The page header (docs/site-design.md, "Frame"): the wordmark, Library, Kits, Play, Studio, and the Bag button with its count.
+ * On a phone the four links fold behind "Menu". `current`: home | library | sprites | sounds | music | bundles | kits | play | studio | bag | ''.
  * Under the row, when there is one: the way back to the list the visitor came from, and the warning that the bag is not kept.
  * index.html draws the same row before any script runs; change both together.
  */
@@ -145,7 +145,8 @@ export function header(current) {
     el('nav', { id: 'main-nav', class: 'top-nav', 'aria-label': 'Main' },
       link('#/browse', 'Library', 'library'),
       link('#/bundles', 'Kits', 'bundles'),
-      link('#/play', 'Play', 'play')),
+      link('#/play', 'Play', 'play'),
+      link('#/studio', 'Studio', 'studio')),
     menu,
     el('a', { class: 'bag-link', href: '#/bag', 'aria-current': current === 'bag' ? 'page' : null }, 'Bag ', el('span', { class: 'bag-count' }, String(bag.count()))),
     back ? el('a', { class: 'back-link', href: back.href }, el('span', { 'aria-hidden': 'true' }, '‹'), back.label) : null);
@@ -167,6 +168,7 @@ export function footer() {
       el('a', { href: '#/browse' }, 'Library'),
       el('a', { href: '#/bundles' }, 'Kits'),
       el('a', { href: '#/play' }, 'Play'),
+      el('a', { href: '#/studio' }, 'Studio'),
       el('a', { href: '#/bag' }, 'Bag')));
 }
 
