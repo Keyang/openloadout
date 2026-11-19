@@ -10,7 +10,7 @@
 import { solveRig, groundOf } from '../../rigs/bones.js';
 import { framePhase, frameOfPhase, snapKeys, clipPose } from '../../rigs/keypose.js';
 import { framePose, drawOptions, directionRig, directionOf, TOPDOWN_DIRECTIONS } from '../../engine/data-sprite.js';
-import { STANDARD_CLIPS, CLIP_SYNONYMS, FRAME_SIZES, STUDIO_LIMITS, SOCKET_NAMES } from '../../catalog/studio-schema.js';
+import { STANDARD_CLIPS, CLIP_SYNONYMS, FRAME_SIZES, STUDIO_LIMITS, SOCKET_NAMES, RESERVED_IDS } from '../../catalog/studio-schema.js';
 import { studioTemplate, studioTemplates } from '../../rigs/studio-templates.js';
 import { hero, figureFor, POSE_FIELDS } from '../../rigs/humanoid-studio.js';
 import { slugOf } from './drafts.js';
@@ -24,6 +24,7 @@ const half = (v) => Math.round(v * 2) / 2;
 const wrap180 = (d) => { let x = ((d + 180) % 360 + 360) % 360 - 180; if (x === -180) x = 180; return x; };
 const ID = /^[a-z][a-zA-Z0-9-]{0,39}$/;
 const HEX = /^#[0-9a-f]{6}$/i;
+const RESERVED = new Set(RESERVED_IDS);
 
 /** Words for an id people never typed: "tail1" -> "Tail 1", "eyeShut" -> "Eye shut". */
 export function humanize(id) {
@@ -297,7 +298,11 @@ export function removePoint(def, id) {
 
 // ---- keys ---------------------------------------------------------------------------------------------------------
 
-const clipOf = (def, clip) => (isObj(def?.clips?.[clip]) ? def.clips[clip] : null);
+// a clip is one of the definition's own: never a name every object has (constructor, __proto__, toString ...)
+const clipOf = (def, clip) => (isObj(def?.clips) && typeof clip === 'string' && Object.hasOwn(def.clips, clip) && isObj(def.clips[clip]) ? def.clips[clip] : null);
+
+/** Is `name` one of the definition's own animations (never a name every object already has)? */
+export const hasClip = (def, name) => clipOf(def, name) !== null;
 const keyTol = (c) => Math.min(0.002, 0.25 / Math.max(1, c.loop === false ? c.frames - 1 : c.frames));
 
 /** The index of the key that sits on a frame of a clip, or -1. A key between frames (a library body's light keys) is on none. */
@@ -326,7 +331,8 @@ export function keyedPose(def, clip, frame) {
 /** The key on a frame, made (holding nothing yet) when there is none; returns [copy of def, the key]. */
 function keyOn(def, clip, frame) {
   const d = cp(def);
-  const c = d.clips[clip];
+  const c = clipOf(d, clip);
+  if (!c) return [d, null];
   c.keys = c.keys ?? [];
   let i = keyIndexAt(d, clip, frame);
   if (i < 0) {
@@ -431,11 +437,11 @@ function solved(def, ctx) {
 /**
  * The handles of a frame, in frame pixels and in the order Tab moves through them: [{ id, kind, label, at: [x, y], from?: [x, y] }].
  * Body: the body's start ('root') and every bone's tip ('bone:<id>'). Move: the whole body ('root'), each two-bone
- * chain's end ('ik:<id>', a foot or a hand) and the tip of every other bone. Frames: the anchor ('pivot').
+ * chain's end ('ik:<id>', a foot or a hand) and the tip of every other bone. Frames: the anchor ('pivot'). A library body has none.
  * Arguments: def, ctx { mode ('body' | 'move' | 'frames'), clip, frame, facing (top-down Body only) }.
  */
 export function handles(def, ctx) {
-  if (ctx.mode === 'frames') return [{ id: 'pivot', kind: 'pivot', label: 'Anchor', at: [...def.pivot] }];
+  if (ctx.mode === 'frames') return isRig(def) ? [{ id: 'pivot', kind: 'pivot', label: 'Anchor', at: [...def.pivot] }] : [];
   if (!isRig(def)) return [];
   if (ctx.mode !== 'body' && !clipOf(def, ctx.clip)) return [];
   const { rig, J } = solved(def, ctx);
@@ -617,10 +623,23 @@ export function clipFromWords(def, words) {
   const w = String(words ?? '').trim();
   if (!/^[A-Za-z]{2,20}$/.test(w)) return null;
   const low = w.toLowerCase();
-  const name = CLIP_SYNONYMS[low] ?? low;
+  const name = Object.hasOwn(CLIP_SYNONYMS, low) ? CLIP_SYNONYMS[low] : low;
+  if (RESERVED.has(name)) return null;
   const have = new Set(Object.keys(def.clips ?? {}).map(actionOf));
   if (have.has(name)) return null;
   return { name, label: w[0].toUpperCase() + w.slice(1).toLowerCase() };
+}
+
+/** Why what a person typed cannot be a new animation, in everyday words (null when it can: clipFromWords gives it). */
+export function whyNotClip(def, words) {
+  const w = String(words ?? '').trim();
+  if (!w) return 'Type a name for the new animation.';
+  if (!/^[A-Za-z]{2,20}$/.test(w)) return 'Use one word for a new animation, letters only.';
+  const low = w.toLowerCase();
+  const name = Object.hasOwn(CLIP_SYNONYMS, low) ? CLIP_SYNONYMS[low] : low;
+  if (RESERVED.has(name)) return `"${w}" is a word the site keeps for itself. Pick another word.`;
+  if (new Set(Object.keys(def.clips ?? {}).map(actionOf)).has(name)) return `This sprite already has ${CLIP_WORDS[name] ?? humanize(name)}. Pick another word.`;
+  return null;
 }
 
 /** The clip a new animation's keys are copied from: the matching idle (a top-down direction's own), else none. */
@@ -637,7 +656,8 @@ function copySource(def, name) {
  */
 export function addClip(def, name, { label, copyFrom } = {}) {
   const d = cp(def);
-  if (!ID.test(name) || name.includes('_')) return { def: d, error: 'An animation\'s name is one word.' };
+  if (typeof name === 'string' && (RESERVED.has(name) || RESERVED.has(name.toLowerCase()))) return { def: d, error: `"${name}" is a word the site keeps for itself. Pick another word.` };
+  if (typeof name !== 'string' || !ID.test(name) || name.includes('_')) return { def: d, error: 'An animation\'s name is one word.' };
   const names = isTopDown(d) && !NO_DIRECTION.has(name) ? TOPDOWN_DIRECTIONS.map((x) => `${name}_${x}`) : [name];
   const std = STANDARD_CLIPS[name] ?? { frames: 8, fps: 10, loop: true };
   const clips = Object.keys(d.clips ?? {});
@@ -646,7 +666,7 @@ export function addClip(def, name, { label, copyFrom } = {}) {
   if (total + std.frames * names.length > STUDIO_LIMITS.frames) return { def: d, error: `A sprite can have at most ${STUDIO_LIMITS.frames} frames in all its animations together.` };
   const base = (label || CLIP_WORDS[name] || humanize(name)).slice(0, 50);
   for (const n of names) {
-    if (d.clips[n]) continue;
+    if (Object.hasOwn(d.clips, n)) continue;
     const src = clipOf(d, copyFrom) ? copyFrom : copySource(d, n);
     const shape = { frames: std.frames, loop: std.loop };
     const keys = src ? snapKeys(cp(d.clips[src].keys ?? []), shape).keys : [];
@@ -659,7 +679,7 @@ export function addClip(def, name, { label, copyFrom } = {}) {
 /** Remove an animation (not the last one); the preview moves to the first that is left. */
 export function removeClip(def, name) {
   const d = cp(def);
-  if (!d.clips[name] || Object.keys(d.clips).length <= 1) return d;
+  if (!clipOf(d, name) || Object.keys(d.clips).length <= 1) return d;
   delete d.clips[name];
   if (d.preview === name || !d.clips[d.preview]) d.preview = Object.keys(d.clips)[0];
   return d;
@@ -669,7 +689,7 @@ export function removeClip(def, name) {
 export function setClipLabel(def, name, label) {
   const d = cp(def);
   const l = String(label ?? '').trim().slice(0, 60);
-  if (d.clips[name] && l) d.clips[name].label = l;
+  if (clipOf(d, name) && l) d.clips[name].label = l;
   return d;
 }
 
@@ -691,7 +711,7 @@ function trimClip(c) {
  */
 export function setFrames(def, clip, frames) {
   const d = cp(def);
-  const c = d.clips[clip];
+  const c = clipOf(d, clip);
   if (!c) return { def: d, merged: [] };
   let n = clamp(Math.round(Number(frames) || 1), 1, STUDIO_LIMITS.framesPerClip);
   const others = Object.entries(d.clips).reduce((s, [k, x]) => s + (k === clip ? 0 : x.frames), 0);
@@ -707,14 +727,14 @@ export function setFrames(def, clip, frames) {
 /** Frames a second at the middle speed, 1..30. */
 export function setFps(def, clip, fps) {
   const d = cp(def);
-  if (d.clips[clip]) d.clips[clip].fps = clamp(Math.round(Number(fps) || 1), 1, STUDIO_LIMITS.fps);
+  if (clipOf(d, clip)) d.clips[clip].fps = clamp(Math.round(Number(fps) || 1), 1, STUDIO_LIMITS.fps);
   return d;
 }
 
 /** Loop or play once; the keys keep their place in the motion and snap to the frames: { def, merged }. */
 export function setLoop(def, clip, loop) {
   const d = cp(def);
-  const c = d.clips[clip];
+  const c = clipOf(d, clip);
   if (!c) return { def: d, merged: [] };
   c.loop = !!loop;
   const r = snapKeys(c.keys ?? [], { frames: c.frames, loop: c.loop });
@@ -768,7 +788,7 @@ export function setFrameSize(def, [w, h]) {
 /** Change one frame's adjustments: nudge ([dx, dy] whole px, or null to clear), flash (true / false). An empty edit goes. */
 export function setFrameEdit(def, clip, frame, patch) {
   const d = cp(def);
-  const c = d.clips[clip];
+  const c = clipOf(d, clip);
   if (!c || frame < 0 || frame >= c.frames) return d;
   const all = isObj(c.frameEdits) ? c.frameEdits : {};
   const e = isObj(all[String(frame)]) ? all[String(frame)] : {};
@@ -785,7 +805,7 @@ export function setFrameEdit(def, clip, frame, patch) {
 /** Show or hide one shape on one frame (state 'show', 'hide', or null to leave it to the keys). */
 export function setFrameShape(def, clip, frame, shape, state) {
   const d = cp(def);
-  const c = d.clips[clip];
+  const c = clipOf(d, clip);
   if (!c || frame < 0 || frame >= c.frames) return d;
   const all = isObj(c.frameEdits) ? c.frameEdits : {};
   const e = isObj(all[String(frame)]) ? all[String(frame)] : {};

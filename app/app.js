@@ -123,6 +123,7 @@ function route(moved) {
   else if (a === 'bag') lazyPage('./bag-page.js', (m, still) => m.bagPage(app, query, still), 'bag');
   else if (a === 'bundle') lazyPage('./bundle-page.js', (m, still) => m.bundlePage(app, b, query, still), 'bundle page');
   else if (a === 'play') lazyPage('./play-page.js', (m, still) => m.playPage(app, query, still), 'playground');
+  else if (a === 'studio') lazyPage('./studio-page.js', (m, still) => m.studioPage(app, b, query, still), 'studio');
   else if (kindOf(a) === 'sprite' && !b) openSprite(a, query);      // links from before sounds were added
   else teardown = notFound('page');
   arrived();          // back on the list they left: its place on the page is put back
