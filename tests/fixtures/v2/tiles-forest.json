@@ -1,0 +1,22 @@
+{ "format": "loadout-sprite", "version": 2, "id": "tiles-forest", "name": "Forest ground", "blurb": "Grassy ground that joins in every direction.", "size": [32, 32], "pivot": [16, 16],
+  "meta": { "type": "tileset", "role": "world/tile", "view": "side", "themes": ["forest"], "gameTypes": ["platformer"], "words": ["grass", "ground", "soil", "tiles", "earth", "terrain", "platform"], "license": "draft" },
+  "palette": [ { "id": "soil", "label": "Soil", "default": "#7a5236", "material": "earth" },
+               { "id": "grass", "label": "Grass", "default": "#5aa040", "material": "plant" } ],
+  "controls": [ { "key": "texture", "kind": "range", "label": "Clods", "lo": "Smooth", "hi": "Lumpy", "default": 0.5 },
+                { "key": "edge", "kind": "range", "label": "Grass depth", "lo": "Thin", "hi": "Deep", "min": 5, "max": 9, "default": 7 },
+                { "key": "bumps", "kind": "range", "label": "Bumps", "lo": "Flat", "hi": "Bumpy", "min": 0, "max": 3, "default": 1 } ],
+  "body": { "tiles": { "tile": 32,
+    "profiles": { "dips": [0,0,0,0.3,0.67,1,1,0.67,0.3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.3,0.67,1,1,0.67,0.3,0,0,0],
+                  "hang": [1,2,1,0,0,1,2,3,2,0,0,1,1,0,2,3,1,0,0,1,2,1,0,0,1,3,2,1,0,0,2,1] },
+    "groups": [ { "name": "grass", "kind": "block", "use": "ground", "pieces": ["block", "narrow", "thin", "slope"], "fills": 3,
+      "material": {
+        "fill": { "base": "soil", "versions": [ [ { "gen": "scatter", "v": 1, "seed": 41, "count": { "from": "texture", "map": [[0, 0], [1, 3]], "round": "px" }, "margin": 4, "gap": 10, "place": { "use": "stamp:clod", "v": 1, "paint": { "a": "soil.dark" } } } ] ] },
+        "edges": {
+          "top": { "depth": { "from": "edge", "map": [[5, 5], [9, 9]] }, "wrap": 4, "tuck": true,
+                   "inset": { "profile": "dips", "amount": { "from": "bumps", "map": [[0, 0], [3, 3]] } },
+                   "bands": [ { "rows": "last", "paint": "soil.dark" }, { "rows": [1, 1], "paint": "grass.light" }, { "rows": "last-1", "paint": "grass.dark" },
+                              { "rows": [2, 2], "where": { "profile": "hang", "in": [0] }, "paint": "grass.light" },
+                              { "rows": [3, 99], "where": { "profile": "hang", "in": [2, 3] }, "paint": "grass.dark" }, { "rows": [1, 99], "paint": "grass" } ] },
+          "left": { "depth": 1, "bands": [ { "rows": [1, 1], "paint": "soil.dark" } ] } } },
+      "decals": [ { "name": "a", "place": "above", "label": "Grass tuft", "outline": false, "draw": [ { "kind": "stamp", "at": [10, 23], "rows": ["...........b", "....b.b....."], "key": { "b": "grass.light" } } ] } ] } ] } },
+  "clips": { "grass-top": { "label": "Grass: top edge" } } }
