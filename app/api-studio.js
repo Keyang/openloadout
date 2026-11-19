@@ -17,12 +17,16 @@
 //     count capped, every reference resolved) before it is kept or drawn, and only the cleaned copy is kept. Options are
 //     read as own data fields only. Pictures are capped (scale 1..8, at most STUDIO_API_LIMITS.pixels pixels).
 //   - Drafts live in localStorage under `loadout-studio-v1`: { version: 1, drafts: { <draft>: { definition, savedAt,
-//     bagKey? } } }, at most 40 drafts and 2 MB. Everything read back is checked again before it is used; a draft that
-//     no longer passes is listed as "damaged", is neither drawn nor exported, and is kept as it was until it is set
-//     again or removed. A failed save is reported (saved: false and a warning), never swallowed; the change lives on
-//     in memory for this visit and is saved with the next change that succeeds. Without the browser's storage (a
-//     private window, blocked site data, Node) drafts live in memory and every change says "Not kept after this tab
-//     closes". The page (S9) saves 500 ms after a change; these calls save at once.
+//     bagKey? } } }, at most 40 drafts and 2 MB, read and written through app/studio-store.js (the one owner of that
+//     entry). Everything read back is checked again before it is used; a draft that no longer passes is listed as
+//     "damaged", is neither drawn nor exported, and is kept as it was until it is set again or removed. Entries the
+//     studio cannot use are carried through every save untouched, and a store it cannot read whole is never saved over:
+//     every change is refused, saying how to start afresh. Each save changes one draft against what storage holds at
+//     that moment, so the page and an agent do not undo each other. A failed save is reported (saved: false and a
+//     warning), never swallowed; the change waits in memory for this visit, over what storage holds, and is saved with
+//     the next change that succeeds. Without the browser's storage (a private window, blocked site data, Node) drafts
+//     live in memory and every change says "Not kept after this tab closes". The page (S9) saves 500 ms after a change;
+//     these calls save at once.
 //   - Studio sprites are not held to the quality bar (Contract 14 rule 7): advice() gives its findings as advice.
 //   - Nothing from a definition ever runs: it is data drawn by framework code, so no worker is needed.
 //
@@ -36,14 +40,15 @@ import { hero, bakeClips, bake as bakeKeys, drawSprite } from '../rigs/humanoid-
 import { POSES } from '../rigs/humanoid.js';
 import { MOVES } from '../rigs/humanoid-figure.js';
 import { solveRig, drawBoneLines } from '../rigs/bones.js';
+import { createDraftStore, unreadableMessage, StoreRefused, STORE_LIMITS, STUDIO_KEY as KEY } from './studio-store.js';
 
-/** The localStorage key the studio keeps its drafts under (docs/studio.md section 5, "Autosave"). */
-export const STUDIO_KEY = 'loadout-studio-v1';
+/** The localStorage key the studio keeps its drafts under (docs/studio.md section 5, "Autosave"; app/studio-store.js owns it). */
+export const STUDIO_KEY = KEY;
 
 /** The studio's own caps: drafts kept, characters of the whole store, picture scale and pixels in one picture; a definition is at most 64 KB of JSON (catalog/studio-schema.js). */
 export const STUDIO_API_LIMITS = Object.freeze({
-  drafts: 40,
-  storeChars: 2 * 1024 * 1024,
+  drafts: STORE_LIMITS.drafts,
+  storeChars: STORE_LIMITS.storeChars,
   scale: 8,
   pixels: 4_000_000,
   definitionBytes: STUDIO_LIMITS.jsonBytes,
@@ -55,14 +60,12 @@ export const NOT_KEPT = 'Not kept after this tab closes: this browser is not sav
 const DRAFT_RE = /^[a-z][a-z0-9-]{0,39}$/;
 const CLIP_RE = /^[a-z][a-zA-Z0-9_-]{0,39}$/;
 const BAG_KEY_RE = /^[A-Za-z0-9_-]{1,40}$/;
-const PROTO_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
 const POSE_NAMES = [...POSES, ...MOVES];
 const LIBRARY = { knight: { label: 'Hero', make: hero } };
 
 const isObj = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
 const messageOf = (e) => String((e && e.message) || e).slice(0, 300);
 const say = (v) => (v === null ? 'null' : v === undefined ? 'nothing' : Array.isArray(v) ? 'a list' : typeof v === 'string' ? JSON.stringify(v.length > 40 ? `${v.slice(0, 40)}…` : v) : typeof v === 'function' ? 'a function' : typeof v === 'object' ? 'an object' : `the ${typeof v} ${String(v)}`);
-const kb = (n) => (n >= 1024 * 1024 ? `${(n / (1024 * 1024)).toFixed(1)} MB` : `${Math.ceil(n / 1024)} KB`);
 const plain = (v) => (v === undefined ? null : JSON.parse(JSON.stringify(v, (k, x) => (typeof x === 'number' && !Number.isFinite(x) ? null : ArrayBuffer.isView(x) ? undefined : x))));
 const cap = (s) => s[0].toUpperCase() + s.slice(1);
 
@@ -205,39 +208,37 @@ export function createStudio(env = {}) {
   })());
   const fullOpts = async () => { const k = await known(); return { opts: { ...(k.catalogIds ? { catalogIds: k.catalogIds } : {}), ...(k.soundIds ? { soundIds: k.soundIds } : {}) }, problem: k.problem }; };
 
-  // ---- the store: read and checked on every call; `pending` is what a failed save left for this visit ----
-  let pending = null;
+  // ---- the store (app/studio-store.js): read again and checked on every call; one entry changed per save, against
+  // what storage holds at that moment; a store it cannot read whole is never saved over ----
+  const store = createDraftStore(storage, { limits: { drafts: limits.drafts, storeChars: limits.storeChars, readChars: Math.max(STORE_LIMITS.readChars, limits.storeChars) } });
+  /** { drafts (draft name -> { definition, savedAt, bagKey? }; an entry that is not an object has no definition, so it reads as damaged), problems, whole, count (every stored entry) }. */
   function read() {
-    if (pending) return { drafts: { ...pending }, problems: [] };
-    const problems = [], drafts = {};
-    let text;
-    try { text = storage.getItem(STUDIO_KEY); } catch (e) { return { drafts, problems: [`The saved drafts could not be read (${messageOf(e)}).`] }; }
-    if (text === null || text === undefined) return { drafts, problems };
-    if (typeof text !== 'string' || text.length > limits.storeChars) return { drafts, problems: [`The saved drafts are too big to read (${typeof text === 'string' ? kb(text.length) : 'not text'}; the studio keeps at most ${kb(limits.storeChars)}).`] };
-    let raw;
-    try { raw = JSON.parse(text, (k, v) => (PROTO_KEYS.has(k) ? undefined : v)); } catch { return { drafts, problems: ['The saved drafts are damaged (not JSON) and cannot be read.'] }; }
-    if (!isObj(raw) || !isObj(raw.drafts)) return { drafts, problems: raw === null ? [] : ['The saved drafts are damaged (no list of drafts) and cannot be read.'] };
-    for (const [k, e] of Object.entries(raw.drafts)) {
-      if (!DRAFT_RE.test(k)) { problems.push(`A saved entry ${say(k)} is not a draft name and was left out.`); continue; }
-      if (!isObj(e)) { problems.push(`The saved draft "${k}" is damaged and was left out.`); continue; }
-      if (Object.keys(drafts).length >= limits.drafts) { problems.push(`More than ${limits.drafts} drafts are saved; "${k}" and any after it were left out.`); break; }
-      drafts[k] = { definition: e.definition, savedAt: Number.isFinite(e.savedAt) ? e.savedAt : 0, ...(typeof e.bagKey === 'string' && BAG_KEY_RE.test(e.bagKey) ? { bagKey: e.bagKey } : {}) };
+    const r = store.read();
+    const problems = [...r.problems], drafts = {};
+    let odd = 0;
+    for (const [k, e] of Object.entries(r.entries)) {
+      if (!DRAFT_RE.test(k)) { if (++odd <= 5) problems.push(`A saved entry ${say(k)} is not a draft name: it is not listed, and is kept as it is.`); continue; }
+      drafts[k] = isObj(e) ? { definition: e.definition, savedAt: Number.isFinite(e.savedAt) ? e.savedAt : 0, ...(typeof e.bagKey === 'string' && BAG_KEY_RE.test(e.bagKey) ? { bagKey: e.bagKey } : {}) } : { definition: undefined, savedAt: 0 };
     }
-    return { drafts, problems };
+    if (odd > 5) problems.push(`${odd - 5} more saved entries are not draft names, and are kept as they are.`);
+    const count = Object.keys(r.entries).length;
+    if (count > limits.drafts) problems.push(`${count} drafts are saved, more than the ${limits.drafts} the studio keeps: every one is listed and kept, but no new draft can be made until some are removed (studio_remove).`);
+    return { drafts, problems, whole: r.whole, count };
   }
-  /** Saves the drafts; returns { saved, warnings }. A store over the size cap is refused before anything changes. */
-  function write(drafts) {
-    const text = JSON.stringify({ version: 1, drafts });
-    if (text.length > limits.storeChars) throw new Problem(`The studio keeps at most ${kb(limits.storeChars)} of drafts on this computer, and this change would make it ${kb(text.length)}: there is no room. Remove a draft you no longer need (studio_remove), after downloading it (studio_file) if you want to keep it.`);
-    try {
-      storage.setItem(STUDIO_KEY, text);
-      pending = null;
-    } catch (e) {
-      pending = { ...drafts };
-      return { saved: false, warnings: [`The draft could not be saved on this computer (${messageOf(e)}; the browser's storage for this site may be full). It is kept for this visit only: download the file (studio_file) so it is not lost.`] };
-    }
-    return kept ? { saved: true, warnings: [] } : { saved: false, warnings: [NOT_KEPT] };
+  /** read(), refusing a store that could not be read whole (using it, or saving over it, would lose the drafts in it). */
+  function readWhole() {
+    const r = read();
+    if (!r.whole) throw new Problem(unreadableMessage(r.problems));
+    return r;
   }
+  /** Changes one stored entry (change(entry now) -> the new entry, or undefined to remove it): { saved, warnings }. */
+  function commit(name, change) {
+    let w;
+    try { w = store.commit(name, change); } catch (e) { throw e instanceof StoreRefused ? new Problem(e.message) : e; }
+    if (!w.saved) return w;
+    return kept ? w : { saved: false, warnings: [NOT_KEPT] };
+  }
+  const tooMany = (count) => new Problem(`The studio keeps at most ${limits.drafts} drafts on this computer, and there are ${count}. Remove one you no longer need first (studio_remove), after downloading it (studio_file) if you want to keep it.`);
 
   /** The cleaned definition of a stored draft, or { errors } when it no longer passes (damaged). Checked without the library, which may have changed since. */
   const checkStored = (entry) => {
@@ -255,7 +256,7 @@ export function createStudio(env = {}) {
   /** A draft's entry and its cleaned definition; refuses a missing or damaged one. */
   function draftOf(draft) {
     const name = draftName(draft);
-    const { drafts } = read();
+    const { drafts } = readWhole();
     if (!Object.hasOwn(drafts, name)) throw noDraft(name, drafts);
     const c = checkStored(drafts[name]);
     if (!c.ok) throw new Problem([`The draft "${name}" is damaged: what is saved no longer passes the checks, so it is not used. Set it again (studio_set) or remove it (studio_remove).`, ...c.errors]);
@@ -286,8 +287,7 @@ export function createStudio(env = {}) {
     const m = await bagModule();
     if (!bagHolds(m, value) || typeof m.bag.updateDefinition !== 'function') return 'not updated';
     if (!inBag(m, key)) {
-      const { bagKey, ...rest } = drafts[name];
-      write({ ...drafts, [name]: rest });
+      commit(name, (e) => { if (!isObj(e)) return e; const { bagKey, ...rest } = e; return rest; });
       return 'not in the bag';
     }
     try { m.bag.updateDefinition(key, { data: value }); return 'updated'; } catch { return 'not updated'; }
@@ -298,11 +298,14 @@ export function createStudio(env = {}) {
     const { opts, problem } = await fullOpts();
     const v = validateDataSprite(input, opts);
     if (!v.ok) throw new Problem(v.errors, { warnings: v.warnings });
-    const { drafts } = read();
-    if (create && Object.keys(drafts).length >= limits.drafts) throw new Problem(`The studio keeps at most ${limits.drafts} drafts on this computer, and there are ${Object.keys(drafts).length}. Remove one you no longer need first (studio_remove), after downloading it (studio_file) if you want to keep it.`);
-    const was = drafts[name];
-    const entry = { definition: v.value, savedAt: now(), ...(was?.bagKey ? { bagKey: was.bagKey } : {}) };
-    const w = write({ ...drafts, [name]: entry });
+    const { count } = readWhole();
+    if (create && count >= limits.drafts) throw tooMany(count);
+    const savedAt = now();
+    // the entry's other fields (the bag link, anything a later version adds) stay as they are
+    const w = commit(name, (was) => {
+      if (create && was !== undefined) throw new Problem(`A draft "${name}" was saved elsewhere (the studio page or another tab) a moment ago; make yours again.`);
+      return { ...(isObj(was) ? was : {}), definition: v.value, savedAt };
+    });
     const out = { ok: true, draft: name, definition: v.value, warnings: [...v.warnings, ...(problem ? [problem] : []), ...w.warnings], saved: w.saved };
     const bag = create ? null : await follow(name, v.value);
     if (bag) out.bag = bag;
@@ -416,8 +419,8 @@ export function createStudio(env = {}) {
       if (name !== undefined && name !== null && typeof name !== 'string') throw new Problem(`name is what the sprite is called, as text of at most ${STUDIO_LIMITS.nameChars} characters ("Moss beast"). Got ${say(name)}.`);
       const label = typeof name === 'string' && name.trim() ? name.trim().replace(/\s+/g, ' ') : s.d.name;
       if (label.length > STUDIO_LIMITS.nameChars) throw new Problem(`The name is ${label.length} characters long; a name is at most ${STUDIO_LIMITS.nameChars}.`);
-      const { drafts } = read();
-      if (Object.keys(drafts).length >= limits.drafts) throw new Problem(`The studio keeps at most ${limits.drafts} drafts on this computer, and there are ${Object.keys(drafts).length}. Remove one you no longer need first (studio_remove), after downloading it (studio_file) if you want to keep it.`);
+      const { drafts, count } = readWhole();
+      if (count >= limits.drafts) throw tooMany(count);
       const id = await newId(label, drafts);
       const def = { ...s.d, id, name: label, made: { in: 'studio', from: s.from } };
       return keep(id, def, { create: true });
@@ -431,7 +434,7 @@ export function createStudio(env = {}) {
         if (!c.ok) row.errors = c.errors.slice(0, 5);
         return row;
       }).sort((a, b) => b.savedAt - a.savedAt || (a.draft < b.draft ? -1 : 1));
-      return { ok: true, drafts: out, kept, saved: !pending && kept, problems };
+      return { ok: true, drafts: out, kept, saved: !store.pending() && kept, problems };
     },
 
     get: async (draft) => {
@@ -441,7 +444,7 @@ export function createStudio(env = {}) {
 
     set: async (draft, definition) => {
       const name = draftName(draft);
-      const { drafts } = read();
+      const { drafts } = readWhole();
       if (!Object.hasOwn(drafts, name)) throw noDraft(name, drafts);
       return keep(name, definition);
     },
@@ -505,11 +508,11 @@ export function createStudio(env = {}) {
       if (!bagHolds(m, d.value)) throw new Problem(`Not yet: the bag cannot hold a sprite made in the studio until it learns to (studio work item S8). Meanwhile, studio_file gives the library file (sprites/${d.value.id}.js) and studio_render gives pictures.`);
       if (d.entry.bagKey && inBag(m, d.entry.bagKey)) {
         if (typeof m.bag.updateDefinition === 'function') m.bag.updateDefinition(d.entry.bagKey, { data: d.value });
-        return { ok: true, draft: d.name, key: d.entry.bagKey, added: false, saved: !pending && kept, warnings: [] };
+        return { ok: true, draft: d.name, key: d.entry.bagKey, added: false, saved: !store.pending() && kept, warnings: [] };
       }
       const key = m.bag.add({ kind: 'sprite', id: d.value.id, settings: {}, definition: { data: d.value } });
       if (typeof key !== 'string' || !BAG_KEY_RE.test(key)) throw new Problem('The bag did not take the sprite.');
-      const w = write({ ...d.drafts, [d.name]: { ...d.entry, bagKey: key } });
+      const w = commit(d.name, (e) => ({ ...(isObj(e) ? e : d.entry), bagKey: key }));
       return { ok: true, draft: d.name, key, added: true, saved: w.saved, warnings: w.warnings };
     },
 
@@ -526,10 +529,10 @@ export function createStudio(env = {}) {
 
     remove: async (draft) => {
       const name = draftName(draft);
-      const { drafts } = read();
+      const { drafts } = readWhole();
       if (!Object.hasOwn(drafts, name)) throw noDraft(name, drafts);
-      const { [name]: gone, ...rest } = drafts;
-      const w = write(rest);
+      const gone = drafts[name];
+      const w = commit(name, () => undefined);
       return { ok: true, draft: name, removed: true, saved: w.saved, warnings: [...w.warnings, ...(gone.bagKey ? ['Its bag item stays in the bag; take it out on the bag page or with bag_remove.'] : [])] };
     },
   };

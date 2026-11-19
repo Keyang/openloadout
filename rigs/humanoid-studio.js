@@ -501,7 +501,18 @@ export function figureFor(def, p = {}) {
     else delete fig[name];
   }
   for (const [name, c] of Object.entries(def.clips ?? {})) if (!(c?.keys?.length) && POSE_NAMES.includes(c?.from)) fig.moves = { ...fig.moves, [name]: c.from };
-  return { ...fig, keys: figureKeys(def.clips), keysFor: stored };
+  return { ...fig, keys: keysOfClips(def.clips), keysFor: stored };
+}
+
+// figureKeys of a frozen table of clips (engine/data-sprite.js freezes its definition), worked out once: it is most of
+// the cost of a frame. A table that can still change is worked out every time.
+const FROZEN_KEYS = new WeakMap();
+function keysOfClips(clips) {
+  const frozen = (v) => v === undefined || Object.isFrozen(v);
+  if (!clips || typeof clips !== 'object' || !Object.isFrozen(clips) || !Object.values(clips).every((c) => frozen(c) && frozen(c?.keys) && (c?.keys ?? []).every(frozen) && frozen(c?.frameEdits))) return figureKeys(clips);
+  let k = FROZEN_KEYS.get(clips);
+  if (!k) { k = figureKeys(clips); FROZEN_KEYS.set(clips, k); }
+  return k;
 }
 
 /** The clip, its frame and its phase for drawSprite and spriteSockets: frame wins when given; else the frame nearest t. Null for a clip the sprite has not. */

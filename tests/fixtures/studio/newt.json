@@ -22,10 +22,10 @@
         { "id": "eye", "label": "Eyes", "default": "#231b33", "detail": true }
       ],
       "bones": [
-        { "id": "body", "parent": null, "at": [20, 36], "angle": 90, "length": 12, "label": "Body" },
+        { "id": "body", "parent": null, "at": [22, 36], "angle": 90, "length": 12, "label": "Body" },
         { "id": "head", "parent": "body", "angle": 0, "length": 7, "min": -30, "max": 30, "label": "Head" },
-        { "id": "tail1", "parent": "body", "from": 0, "angle": 180, "length": 7, "min": -45, "max": 45, "label": "Tail" },
-        { "id": "tail2", "parent": "tail1", "angle": 0, "length": 6, "min": -60, "max": 60, "label": "Tail tip" },
+        { "id": "tail1", "parent": "body", "from": 0, "angle": 180, "length": 6, "min": -45, "max": 45, "label": "Tail" },
+        { "id": "tail2", "parent": "tail1", "angle": 0, "length": 5, "min": -60, "max": 60, "label": "Tail tip" },
         { "id": "thighF", "parent": "body", "from": 0.8, "angle": -90, "length": 4, "label": "Front leg" },
         { "id": "shinF", "parent": "thighF", "angle": 20, "length": 3, "label": "Front foot" },
         { "id": "thighB", "parent": "body", "from": 0.15, "angle": -90, "length": 4, "label": "Back leg" },
@@ -89,10 +89,10 @@
       "frameEdits": { "0": { "flash": true, "nudge": [-1, 0] } },
       "sounds": [ { "sound": "punch", "frame": 0 } ] },
     "die": { "label": "Die", "frames": 8, "fps": 10, "loop": false,
-      "keys": [ { "t": 0, "root": [-2, 0] },
-                { "t": 0.5714, "root": [0, 3], "bones": { "body": 100, "tail1": 175 } },
+      "keys": [ { "t": 0, "root": [-2, 0], "ik": { "footF": [0, 0], "footB": [0, 0] } },
+                { "t": 0.5714, "root": [0, 2], "ik": { "footF": [3, -1], "footB": [-3, -1] }, "bones": { "body": 100, "tail1": 175 } },
                 { "t": 0.7, "ease": "hold", "hide": ["eye"], "show": ["eyeShut"] },
-                { "t": 1, "root": [0, 4], "bones": { "body": 90, "tail1": 180, "head": 10 } } ],
+                { "t": 1, "root": [0, 3], "ik": { "footF": [4, -2], "footB": [-4, -2] }, "bones": { "body": 90, "tail1": 180, "head": 10 } } ],
       "frameEdits": { "0": { "flash": true } },
       "sounds": [ { "sound": "monster-fade", "frame": 0 } ] }
   },
