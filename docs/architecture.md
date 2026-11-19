@@ -438,6 +438,8 @@ What a rig does not have yet: a list, readable by a program, of its parts (name,
 
 Sprites with no rig stay as code files. The same split could later apply to other generators (tiles, stretchable boxes), which is a separate decision.
 
+**Superseded by Contract 15 (draft, 2026-11-19):** rigs that are code, "sprites with no rig stay as code files" and R2 to R3 above give way to every sprite as data on bone rigs, base pieces and named generators; only the separation of a rig from a sprite definition stands.
+
 Open, for Keyang:
 
 | Id | Question |
@@ -465,7 +467,27 @@ Decision from Keyang, 2026-11-19: "create studio page -- sprite: allowing create
 | 10. On `window` | `loadout.studio.starts, create, list, get, set, validate, bake, render, advice, toBag, file, remove`, each an action in `generated/api.json` |
 | 11. Room for sound | The studio page is one stage, one timeline, one footer and a row of mode tabs (Body, Move, Frames, Look & name). Sound and music editing come later as more tabs on the same page; nothing is built for them now |
 
+**Superseded in part by Contract 15 (draft, 2026-11-19):** rule 1's library bodies, rule 2's `body.library` and `FIGURE_*` tables, rule 3's library-body keys and (if DQ1 of `docs/data-sprites.md` is answered `.json`) rule 8's `.js` wrapper go; the bone rig, key poses (rule 3), `dataSprite` (rule 4), pixels (5), the validation wall (6), rules 7, 9, 10 and 11 stay and apply to every kind of asset.
+
 Open for Keyang: `docs/studio.md`, section 9 (Q1 to Q5).
+
+## Contract 15: every sprite is data (DRAFT)
+
+Decision from Keyang, 2026-11-19: "we will create thousands assets soon which will take much more effort to migrate in future. can we build B and completely get rid of A from everywhere?" Status: **draft, designed in `docs/data-sprites.md`, nothing built.** It supersedes Contract 13 (code rigs) and Contract 14 rules 1 to 3 (library bodies) and, if DQ1 is answered `.json`, rule 8 (the `.js` wrapper), amends Contracts 2, 3, 11 and 12, and keeps Contract 14's bone rig, key poses, validation wall, studio and `window.loadout.studio`.
+
+| Rule | What it says |
+|---|---|
+| 1. An asset is data | Every sprite, of every kind, is one `loadout-sprite` definition, version 2 (`docs/data-sprites.md` section 2): JSON, no function, expression or code text anywhere. `body` is one of `rig` (characters, creatures), `tiles`, `layers` (backgrounds), `panel` (interface pieces), `emitters` (effects), `pictures` (props, pickups, projectiles, icons). Version 1 definitions stay valid and draw the same |
+| 2. Only the framework draws | The framework keeps generic renderers (`engine/draw-list.js` per style, `rigs/bones.js`, `rigs/keypose.js`, `engine/data-sprite.js`) and named generators. No sprite drawing code exists anywhere else; the build refuses a file in `sprites/` that is not the data form |
+| 3. Computed variety is named | Hair from sliders, tile joins, derived colours, scatter, trims, scenery and particles are **named generators** from a fixed registry (`engine/gen/registry.js`): `{ "gen": "<id>", "v": <n>, ...args }`, each pure, deterministic, versioned, documented in `generated/generators.json`, unit-tested with golden output, with typed and capped arguments and a cost. A generator returns primitives and never touches a surface. A setting reaches a number only through a binding `{ "from": "<control>", "map": [[in, out], ...] }` or `{ "from", "pick" }`: a table, never a formula |
+| 4. Pixel detail is data | Primitives include `stamp` (a pixel block on a node, moved, swapped or mirrored, never turned, with variants per pose or frame), `dither`, `bands`, `text` (font pieces), `rect`, `line`, `arc`, `ring` and the operations `outline`, `tint`, `cut`, beside the bone format's `limb`, `capsule`, `ellipse`, `poly`, `dot` |
+| 5. Shared data are pieces | Bases (whole rigs with clips), parts (hair, headgear, held things), UI skins, tile materials, fonts and stamps are data files in `pieces/`, named `{ "use": "<id>", "v": <n> }`, owned and reviewed as framework. A changed look is a new version; a released version never changes |
+| 6. Safety | A definition is drawn on the page with no worker: the plain-data wall of Contract 14 rule 6 (JSON ≤ 128 KB), every name looked up in the registry, every argument typed and clamped, every count capped and the summed generator cost under a budget before anything draws. Definitions travel in bags, links and files. Made sprites from source text (Contract 11, `make.sprite(source)`) end: `make.sprite` takes a definition |
+| 7. The library and the bar | A library sprite changes only through its file, the quality bar (Contract 10) and an independent review. The studio and a sprite page's Advanced mode edit a copy (Contract 14 rule 7 holds for copies) |
+| 8. Adding to the framework | A missing capability is a new generator, a new version of one, or a new piece, added through the `/sprite-forge` skill, test first (Contract 11). An asset never brings one |
+| 9. Looks and styles | Every paint is a palette slot with a material, so Contract 7's material table is read from the data. The primitive list is Contract 12's seam: a style renders the primitives it supports, and a sprite may list any style that supports every primitive it uses |
+| 10. Ids and settings | Redraws keep ids, clips and control keys; renamed options use `was`, renamed controls a sprite-level `was: { controls }`; bag items record the definition's `rev` and re-record their look when it changes |
+| 11. Removal | The sandbox worker (`app/sandbox-worker.js`, `app/made.js`, `app/api-source.js`), the library bodies (`engine/library-body.js`, `engine/library-bodies.js`, `rigs/body-humanoid.js`, `rigs/humanoid-studio.js`, `app/studio/library-body.js`), every drawing rig in `rigs/` and every helper only assets called are deleted when their last caller is gone (`docs/data-sprites.md` section 5) |
 
 ## Routes of the site (after wave 2)
 

@@ -1,0 +1,173 @@
+{
+ "id": "mark",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "name": "skull",
+    "at": [
+     16,
+     12
+    ],
+    "size": 7,
+    "paint": "wood.dark"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      13,
+      9
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aaaaa.",
+      "aaaaaaa",
+      "a..a..a",
+      "a..a..a",
+      "aaa.aaa",
+      ".aaaaa.",
+      ".a.a.a."
+     ],
+     "key": {
+      "a": "wood.dark"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "name": "star",
+    "at": [
+     16,
+     15
+    ],
+    "size": 9,
+    "paint": "ink"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      12,
+      11
+     ],
+     "anchor": "tl",
+     "rows": [
+      "....a....",
+      "....a....",
+      "...aaa...",
+      "aaaaaaaaa",
+      ".aaaaaaa.",
+      "..aaaaa..",
+      "..aaaaa..",
+      ".aaa.aaa.",
+      ".aa...aa."
+     ],
+     "key": {
+      "a": "ink"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "name": "arrow",
+    "at": [
+     10.5,
+     10
+    ],
+    "size": 5,
+    "paint": "cream",
+    "flip": true
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      8,
+      8
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".....",
+      ".a...",
+      "aaaaa",
+      ".a...",
+      "....."
+     ],
+     "key": {
+      "a": "cream"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "name": "leaf",
+    "at": [
+     16,
+     16
+    ],
+    "size": 11,
+    "paint": "leaf",
+    "turn": 1
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      11,
+      11
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaa........",
+      "aaaaaa.....",
+      "aa.aaaaa...",
+      ".aa.aaaaa..",
+      ".aaa.aaaa..",
+      ".aaaa.aaaa.",
+      "..aaaa.aaa.",
+      "..aaaaa.aa.",
+      "...aaaaa.aa",
+      ".....aaaa.a",
+      "........aaa"
+     ],
+     "key": {
+      "a": "leaf"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "name": "question",
+    "at": [
+     8,
+     8
+    ],
+    "size": 3,
+    "paint": "ink"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      7,
+      7
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..a",
+      ".a.",
+      "..."
+     ],
+     "key": {
+      "a": "ink"
+     }
+    }
+   ]
+  }
+ ]
+}
