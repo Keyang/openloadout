@@ -1,5 +1,5 @@
 // Copies what the browser needs out of node_modules and the model cache into vendor/: the search files and the
-// site's two typefaces. The site never reads node_modules (docs/architecture.md, hard rule 3) and never asks
+// site's two typefaces (Geist for everything, Pixelify Sans for the wordmark: docs/site-design.md). The site never reads node_modules (docs/architecture.md, hard rule 3) and never asks
 // another site for anything (hard rule 1), so the fonts are served from here too.
 //
 //   await vendorAll()                          -> { dest, files: [{ to, bytes }], bytes, copied }   writes vendor/ in this project
@@ -12,7 +12,7 @@
 //   vendor/ort/ort-wasm-simd-threaded.{mjs,wasm}           the runtime that runs the model on the processor
 //   vendor/ort/ort-wasm-simd-threaded.asyncify.{mjs,wasm}  the same with WebGPU support; only with { webgpu: true }
 //   vendor/models/<model id>/...                           the embedding model: config, tokenizer, 8-bit weights
-//   vendor/fonts/<family>-latin-<weight>-normal.woff2      Figtree and Pixelify Sans, only the weights the site uses
+//   vendor/fonts/<family>-latin-<weight>-normal.woff2      Geist (all text) and Pixelify Sans (the wordmark), only the weights the site uses
 //   vendor/fonts/fonts.css                                 their @font-face rules; index.html links it
 //   vendor/manifest.json                                   what was copied, with sizes (fonts listed apart, under "fonts")
 //
@@ -56,10 +56,10 @@ export function vendorPlan({ model = DEFAULT_MODEL, meaning = true, webgpu = VEN
   };
 }
 
-/** The site's typefaces: only the weights app/style.css uses, only the Latin files. */
+/** The site's typefaces: only the weights app/css/base.css uses, only the Latin files. Geist is all text; Pixelify Sans is the wordmark alone. */
 export const FONTS = [
-  { family: 'Figtree', pkg: '@fontsource/figtree', name: 'figtree', weights: [400, 500, 600, 700] },
-  { family: 'Pixelify Sans', pkg: '@fontsource/pixelify-sans', name: 'pixelify-sans', weights: [500, 600, 700] },
+  { family: 'Geist', pkg: '@fontsource/geist', name: 'geist', weights: [400, 500, 600] },
+  { family: 'Pixelify Sans', pkg: '@fontsource/pixelify-sans', name: 'pixelify-sans', weights: [600] },
 ];
 
 /** The font files to copy and the stylesheet that names them: { files: [{ from, to }], css, versions }. */

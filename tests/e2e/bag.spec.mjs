@@ -248,40 +248,87 @@ test.describe('phone width', () => {
   });
 });
 
-test('add the Hero with a changed slider and part from its page; Change reopens it in update mode', async ({ page }) => {
+// Changes save themselves (docs/site-design.md, section 3): there is no "Add to my bag" step to forget on a sprite's page.
+test('changing the Hero on its page puts it in the bag as changed; Change reopens that item and goes on editing it', async ({ page }) => {
   test.setTimeout(90_000);
+  const saved = page.locator('.rx-panel .saved');
   await openRoute(page, '/sprite/knight');
+  // opening the page adds nothing
+  await expect(count(page)).toHaveText('0');
+  await expect(saved).toContainText('Changes save by themselves');
+  // the first change puts it in the bag; the next ones change that same item
   await setRange(page.locator('#c-height'), 'max');
+  await expect(count(page)).toHaveText('1');
+  await expect(saved).toContainText('Saved in your bag');
+  await page.getByRole('tab', { name: 'Parts' }).click();
   await page.getByRole('group', { name: 'Weapon' }).getByRole('button', { name: 'Axe' }).click();
   await setRange(page.locator('#c-weaponLength'), 'max');
   await page.getByRole('group', { name: 'Pixel size' }).getByRole('button', { name: '2×' }).click();
-  await page.getByRole('button', { name: 'Add to my bag' }).click();
+  await expect(saved).toContainText('3 changes');
+  await expect.poll(async () => (await bagItems(page))[0]?.settings.scale).toBe(2);
   await expect(count(page)).toHaveText('1');
   const [item] = await bagItems(page);
   expect(item).toMatchObject({ kind: 'sprite', id: 'knight', settings: { scale: 2, params: { height: 1, weapon: 'axe', weaponLength: 1.35 } } });
   expect(item.settings.cues.attack.find((c) => c.sound === 'sword-slash').when).toEqual({ weapon: ['sword', 'axe', 'spear'] });
+  // the address names the item, so a reload goes on with it
+  await expect(page).toHaveURL(/#\/sprite\/knight\?.*bag=/);
 
   await openRoute(page, '/bag');
   await expect(items(page).first()).toContainText('Height: taller, axe weapon, weapon length: longer, pixel size 2×');      // what was changed, in plain words
   await items(page).first().getByRole('link', { name: 'Change' }).click();
   await expect(page).toHaveURL(/#\/sprite\/knight\?.*bag=/);
-  await expect(bagButton(page)).toHaveText('Update');
+  await expect(saved).toContainText('Saved in your bag');
+  await expect(page.locator('.rx-panel .add-btn')).toBeHidden();
+  await page.getByRole('tab', { name: 'Parts' }).click();
   await expect(page.getByRole('group', { name: 'Weapon' }).getByRole('button', { name: 'Axe' })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('#c-height')).toHaveValue('1');
   await expect(page.locator('#c-weaponLength')).toHaveValue('1.35');
   await expect(page.getByRole('group', { name: 'Pixel size' }).getByRole('button', { name: '2×' })).toHaveAttribute('aria-pressed', 'true');
 
   await page.getByRole('group', { name: 'Weapon' }).getByRole('button', { name: 'Spear' }).click();
-  await reloadAfterEdit(page);
-  await expect(bagButton(page)).toHaveText('Update');
+  await expect.poll(async () => (await bagItems(page))[0].settings.params.weapon).toBe('spear');
+  await page.waitForTimeout(500); await page.reload(); await page.waitForSelector('.rx-panel .saved');
+  await expect(saved).toContainText('Saved in your bag');
+  await page.getByRole('tab', { name: 'Parts' }).click();
   await expect(page.getByRole('group', { name: 'Weapon' }).getByRole('button', { name: 'Spear' })).toHaveAttribute('aria-pressed', 'true');
-  await bagButton(page).click();
-  await expect(page.locator('.add-to-bag')).toContainText('Updated');
   await expect(count(page)).toHaveText('1');
   const [after] = await bagItems(page);
   expect(after.key).toBe(item.key);
   expect(after.settings.params.weapon).toBe('spear');
   expect(after.settings.scale).toBe(2);
+
+  // Start over keeps it in the bag, as the original; "Remove from bag" in the panel's menu takes it out
+  await page.getByRole('button', { name: 'Start over' }).click();
+  await expect(saved).toContainText('as the original');
+  await expect.poll(async () => (await bagItems(page))[0].settings.params.weapon).toBe('sword');
+  await expect(count(page)).toHaveText('1');
+  await page.getByRole('button', { name: 'More for Hero' }).click();
+  await page.getByRole('menuitem', { name: 'Remove from bag' }).click();
+  await expect(count(page)).toHaveText('0');
+  await expect(saved).toContainText('Changes save by themselves');
+});
+
+test('opening a sprite that is already in the bag shows it as it was changed, and edits that item', async ({ page }) => {
+  await openRoute(page, '/');
+  await addInPage(page, { kind: 'sprite', id: 'knight', settings: { params: { weapon: 'axe' }, cues: null, scale: 1 } });
+  await openRoute(page, '/sprite/knight');
+  await expect(page.locator('.rx-panel .saved')).toContainText('Saved in your bag');
+  await page.getByRole('tab', { name: 'Parts' }).click();
+  await expect(page.getByRole('group', { name: 'Weapon' }).getByRole('button', { name: 'Axe' })).toHaveAttribute('aria-pressed', 'true');
+  await page.getByRole('group', { name: 'Cape' }).getByRole('button', { name: 'None' }).click();
+  await expect.poll(async () => (await bagItems(page))[0].settings.params.cape).toBe('none');
+  expect(await bagItems(page)).toHaveLength(1);
+  // a link that carries its own settings is shown as it is, and its first change is kept as an item of its own
+  await openRoute(page, '/sprite/knight?weapon=spear');
+  await page.getByRole('tab', { name: 'Parts' }).click();
+  await expect(page.getByRole('group', { name: 'Weapon' }).getByRole('button', { name: 'Spear' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('.rx-panel .saved')).toContainText('Changes save by themselves');
+  expect(await bagItems(page)).toHaveLength(1);
+  await page.getByRole('group', { name: 'Cape' }).getByRole('button', { name: 'Tattered' }).click();
+  await expect.poll(async () => (await bagItems(page)).length).toBe(2);
+  const all = await bagItems(page);
+  expect(all[0].settings.params).toMatchObject({ weapon: 'axe', cape: 'none' });
+  expect(all[1].settings.params).toMatchObject({ weapon: 'spear', cape: 'tattered' });
 });
 
 test('sounds that need a weapon are left out of the package when the Hero has none', async ({ page }) => {

@@ -1,14 +1,16 @@
-// One sprite: preview, sliders, the sounds that play with each animation, download.
-import { defaultParams, cleanParams, randomParams, clipFps, partList, partRemoved, inEffect, cueInEffect, renderPixels } from '../engine/sprite.js';
+// One sprite: preview on the left; on the right the editing panel (app/panel.js) with its versions, its controls in tabs,
+// the sounds that play with each animation, and the download. Every change is saved to the bag as it is made (app/editing.js).
+import { defaultParams, cleanParams, clipFps, cueInEffect, renderPixels } from '../engine/sprite.js';
 import { stylesOf, styleById } from '../engine/styles.js';
-import { colorName } from '../engine/color.js';     // W6-A: a sprite may offer more than one style (Contract 12)
-import { bag } from './bag.js';
+import { bag, cleanSettings } from './bag.js';     // W6-A: a sprite may offer more than one style (Contract 12)
 import { drawStage, backdropFor, stagesFor } from './stage.js';
 import { zip } from './zip.js';
 import { el, header, Frames, travel, hover, shadow, saveBlob, store, cap } from './ui.js';
 import { sounds, soundById, soundParams, rendered, playRendered, soundState, setSoundOn, toUnit, toValue } from './audio.js';
 import { spriteFiles, defaultCues } from './bundle.js';
-import { addToBag, keepBag } from './add-to-bag.js';
+import { keepBag } from './add-to-bag.js';
+import { createEdit } from './editing.js';      // changes save themselves (docs/site-design.md, section 3)
+import { editPanel } from './panel.js';         // the right-hand column: versions, fine-tune tabs, the footer
 import { goesWith, moreLikeThis } from './related.js';
 import { madeNote, assetById } from './catalog.js';      // W5-A: a sprite made on this visit says so, and a draft cannot go in the bag
 
@@ -61,14 +63,8 @@ function unpackCues(sprite, text) {
 }
 
 const MAX_CUES = 8;   // sounds per animation; links keep at most this many
-
-/** A colour's everyday name with a capital, for the page: '#f2a030' -> 'Orange'. */
-const colourWord = (hex) => { const n = colorName(hex); return n ? n[0].toUpperCase() + n.slice(1) : 'Your own colour'; };
-/** The names a row of swatches is read out by: two that share a name are told apart by their place ('Red, choice 2'). */
-function swatchNames(list) {
-  const words = list.map(colourWord);
-  return words.map((w, i) => (words.filter((x) => x === w).length > 1 ? `${w}, choice ${i + 1}` : w));
-}
+/** A sprite's sounds as the bag keeps them: what tells two lists apart, without what the page adds while it is open. */
+const cueKey = (cues) => JSON.stringify(cleanSettings('sprite', { cues }).cues);
 
 /**
  * Frames of one sprite in one of its styles, drawn on demand and kept: what app/ui.js Frames is, for a sprite that
@@ -108,14 +104,31 @@ export function spritePage(app, sprite, query) {
   const held = choice && query.bag ? bag.get(query.bag) : null;
   // (the link's key is `artstyle`: `style` may be one of the sprite's own controls)
   const askedStyle = choice ? query.artstyle ?? (held && held.kind === 'sprite' && held.id === sprite.id ? held.settings.artStyle : undefined) : undefined;
+  // The edit session (app/editing.js): what the address carries is where it starts; a bag item of this sprite (the one
+  // the address names, or the visitor's own when the address carries no settings) is what it edits. From here on the
+  // session holds the settings, and every change to them is saved to the bag.
+  const made = madeNote(sprite.id);
+  const usual = { params: defaultParams(sprite), cues: spriteCues(sprite), scale: 1 };
+  let saveTimer = 0;
+  const edit = createEdit({
+    kind: 'sprite', id: sprite.id, defaults: usual, key: query.bag ?? null, canSave: !made?.draft,
+    start: {
+      params: cleanParams(sprite, query), cues: (query.sfx && unpackCues(sprite, query.sfx)) || spriteCues(sprite),
+      scale: [1, 2, 4].includes(Number(query.scale)) ? Number(query.scale) : 1,
+      ...(styles.includes(askedStyle) && askedStyle !== styles[0] ? { artStyle: askedStyle } : {}),      // only when it is not the sprite's first style
+    },
+    schedule: (fn) => { clearTimeout(saveTimer); saveTimer = setTimeout(fn, 150); },      // a slider being dragged is a few saves, not hundreds
+  });
+  const styleOf = (s) => (styles.includes(s.artStyle) ? s.artStyle : styles[0]);
+  const s0 = edit.settings();
   const st = {
-    style: styles.includes(askedStyle) ? askedStyle : styles[0],
-    p: cleanParams(sprite, query),
+    style: styleOf(s0),
+    p: cleanParams(sprite, s0.params),
     clip: clipNames.includes(query.clip) ? query.clip : sprite.preview,
-    cues: (query.sfx && unpackCues(sprite, query.sfx)) || spriteCues(sprite),
+    cues: s0.cues ?? spriteCues(sprite),
     playing: true,
     stage: stageChoices.some((s) => s.id === store.get(stageKey)) ? store.get(stageKey) : stageChoices[0]?.id ?? null,
-    scale: [1, 2, 4].includes(Number(query.scale)) ? Number(query.scale) : 1, start: performance.now(), frame: 0, lastFrame: -1, scroll: 0,
+    scale: s0.scale, start: performance.now(), frame: 0, lastFrame: -1, scroll: 0,
   };
   const frames = choice ? new StyleFrames(sprite, st.p, st.style) : new Frames(sprite, st.p);
   // W5-B: a sprite made on a visit is drawn in a worker of its own, and its frames for new settings arrive a moment later:
@@ -218,7 +231,7 @@ export function spritePage(app, sprite, query) {
 
   // ---- sounds for the current animation
   const cueBox = el('section', { class: 'cues' });
-  const cuesChanged = (rebuild) => { if (rebuild) buildCues(); buildStrip(); syncLoops(); saveUrl(); };
+  const cuesChanged = (rebuild) => { if (rebuild) buildCues(); buildStrip(); syncLoops(); edit.set({ cues: st.cues }); saveUrl(); };
 
   function cueRow(cue, list) {
     const patch = soundById[cue.sound];
@@ -285,132 +298,36 @@ export function spritePage(app, sprite, query) {
       list.length >= MAX_CUES ? el('span', { class: 'hint' }, ` An animation can have up to ${MAX_CUES} sounds. Remove one to add another.`) : '');
   }
 
-  // ---- look and motion controls, and one block per part (what the sprite holds or wears)
-  const panel = el('div', { class: 'panel' });
-  const controls = {};
-  const parts = partList(sprite);
-  const fields = {};          // control key -> its element in the panel
-  const sections = [];        // { box, keys, part }: the titled groups and part blocks
-  // A control that does nothing right now is hidden: a part's settings while the part is taken off, and any control
-  // whose `when` does not hold. A block with nothing left to show hides its title too.
-  const syncShown = () => {
-    for (const [key, node] of Object.entries(fields)) node.hidden = !inEffect(sprite, key, st.p);
-    for (const { box, keys, part } of sections) {
-      box.hidden = keys.every((k) => fields[k].hidden);
-      if (part) box.classList.toggle('off', partRemoved(sprite, part.name, st.p));
-    }
-  };
+  // ---- the settings changed (in the panel, or the bag item was changed elsewhere): draw what the session now holds
   const changed = () => {
-    syncShown(); frames.set(st.p); buildStrip(); saveUrl(); ahead();
+    frames.set(st.p); buildStrip(); ahead();
     // sounds that depend on the settings: refresh the list and anything looping when what applies has changed
     if (cueSig() !== shownSig) { buildCues(); syncLoops(); }
   };
-  const keep = (key, node) => { node.setAttribute('data-control', key); fields[key] = node; return node; };
-
-  // `title`: the control is the first one in a block that already carries its name, so the name is not shown twice
-  function control(key, d, title) { return keep(key, controlBody(key, d, title)); }
-  function controlBody(key, d, title) {
-    const id = `c-${key}`;
-    if (d.kind === 'range') {
-      const input = el('input', { id, type: 'range', min: d.min, max: d.max, step: d.step, value: st.p[key], oninput: (e) => { st.p[key] = Number(e.target.value); changed(); } });
-      controls[key] = () => { input.value = st.p[key]; };
-      return el('div', { class: 'field' }, el('label', { for: id }, d.label),
-        el('div', { class: 'slider' }, el('span', { class: 'end' }, d.lo), input, el('span', { class: 'end' }, d.hi)));
-    }
-    if (d.kind === 'choice') {
-      const row = el('div', { class: 'pills', role: 'group', 'aria-label': d.label },
-        d.options.map((o) => el('button', { type: 'button', class: 'pill', 'data-v': o.value, onclick: () => { st.p[key] = o.value; controls[key](); changed(); } }, o.label)));
-      controls[key] = () => { for (const b of row.children) b.setAttribute('aria-pressed', String(b.dataset.v === st.p[key])); };
-      controls[key]();
-      return el('div', { class: 'field' }, title ? null : el('span', { class: 'label' }, d.label), row);
-    }
-    if (d.kind === 'toggle') {
-      const input = el('input', { id, type: 'checkbox', 'aria-label': title ? d.label : null, onchange: (e) => { st.p[key] = e.target.checked; changed(); } });
-      input.checked = st.p[key];
-      controls[key] = () => { input.checked = st.p[key]; };
-      return el('div', { class: 'field toggle' }, el('label', { for: id }, title ? 'Show' : d.label), el('span', { class: 'switch' }, input, el('span', { class: 'knob', 'aria-hidden': 'true' })));
-    }
-    // each colour is named in words (engine/color.js colorName); its code is kept in the tooltip and, small, beside the name
-    const custom = el('input', { type: 'color', value: st.p[key], 'aria-label': `${d.label}: pick any colour`, oninput: (e) => { st.p[key] = e.target.value.toLowerCase(); controls[key](); changed(); } });
-    const names = swatchNames(d.swatches);
-    const row = el('div', { class: 'swatches', role: 'group', 'aria-label': d.label },
-      d.swatches.map((c, i) => el('button', { type: 'button', class: 'swatch', style: `--c:${c}`, 'data-v': c, 'aria-label': names[i], title: `${colourWord(c)} (colour code ${c})`, onclick: () => { st.p[key] = c; controls[key](); changed(); } })),
-      el('span', { class: 'swatch any', title: 'Pick any colour' }, custom));
-    const word = el('span', { class: 'colour-word' });
-    const code = el('span', { class: 'colour-code', title: 'The colour code, for drawing programs and game engines' });
-    controls[key] = () => {
-      let hit = false;
-      for (const b of row.querySelectorAll('button')) { const on = b.dataset.v === st.p[key]; hit = hit || on; b.setAttribute('aria-pressed', String(on)); }
-      custom.value = st.p[key];
-      custom.parentElement.classList.toggle('on', !hit);
-      custom.parentElement.style.setProperty('--c', st.p[key]);
-      word.textContent = colourWord(st.p[key]);
-      code.textContent = st.p[key];
-    };
-    controls[key]();
-    return el('div', { class: 'field' }, el('span', { class: 'label' }, d.label), row, el('p', { class: 'colour-now', 'aria-live': 'polite' }, word, ' ', code));
+  let syncStyle = () => {}, urlTimer = 0;
+  function pull() {
+    const s = edit.settings();
+    st.scale = s.scale;
+    if (styleOf(s) !== st.style) { st.style = styleOf(s); if (choice) frames.setStyle(st.style); ahead(); buildStrip(); syncStyle(); }
+    if (JSON.stringify(s.params) !== JSON.stringify(st.p)) { st.p = cleanParams(sprite, s.params); changed(); }
+    if (cueKey(s.cues) !== cueKey(st.cues)) { st.cues = s.cues ?? spriteCues(sprite); buildCues(); buildStrip(); syncLoops(); }
+    // the address follows; a save that is already on its way is left to land when it was due (it reads the item's key then)
+    if (!urlTimer) saveUrl();
   }
-  const syncControls = () => { for (const k of Object.keys(controls)) controls[k](); };
 
-  // the sprite's own controls, in their three groups; a control that belongs to a part is shown in that part's block
-  const inPart = new Set(parts.flatMap((part) => part.params));
-  const group = (gname) => {
-    const entries = Object.entries(sprite.params).filter(([key, d]) => d.group === gname && !inPart.has(key));
-    if (!entries.length) return null;
-    const box = el('section', { class: 'group' }, el('h2', {}, gname), entries.map(([key, d]) => control(key, d)));
-    sections.push({ box, keys: entries.map(([key]) => key) });
-    return box;
-  };
-  // one level below: a titled block per part, selector first, then the part's own settings
-  const partBlock = (part) => {
-    // the title is a button that folds the block shut, so a long panel can be tidied (handy on a phone)
-    const title = el('button', { type: 'button', class: 'fold', 'aria-expanded': 'true', onclick: () => {
-      title.setAttribute('aria-expanded', String(!box.classList.toggle('folded')));
-    } }, part.label, el('span', { class: 'fold-mark', 'aria-hidden': 'true' }));
-    const box = el('section', { class: 'group part', 'data-part': part.name },
-      el('h2', {}, title),
-      control(part.selector, sprite.params[part.selector], true),
-      part.controls.map((key) => control(key, sprite.params[key])));
-    sections.push({ box, keys: part.params, part });
-    return box;
-  };
-  // "Surprise me" changes only what can be seen: a control that ends up not in effect goes back to its usual value,
-  // so nothing hidden is left changed (in the picture or in the link)
-  const surprise = () => {
-    const p = randomParams(sprite, Math.floor(Math.random() * 1e9)), def = defaultParams(sprite);
-    for (let pass = 0, again = true; again && pass < 8; pass++) {
-      again = false;
-      for (const k of Object.keys(p)) if (p[k] !== def[k] && !inEffect(sprite, k, p)) { p[k] = def[k]; again = true; }
-    }
-    return p;
-  };
-
-  // the style choice, above every other control: only for a sprite that can be drawn in more than one style
-  let setStyle = () => {};
+  // the style choice (the panel's Look tab): only for a sprite that can be drawn in more than one style
   const styleBlock = () => {
-    const about = el('p', { class: 'hint style-about' }, styleById(st.style).about);
-    const row = el('div', { class: 'pills', role: 'group', 'aria-label': 'Style' },
-      styles.map((id) => el('button', { type: 'button', class: 'pill', 'data-style': id, 'aria-pressed': String(id === st.style), onclick: () => setStyle(id) }, styleById(id).label)));
-    setStyle = (id) => {
-      st.style = id;
-      frames.setStyle(id); ahead();
-      for (const b of row.children) b.setAttribute('aria-pressed', String(b.dataset.style === id));
-      about.textContent = styleById(id).about;
-      buildStrip(); saveUrl();
+    const about = el('p', { class: 'pane-note style-about' }, styleById(st.style).about);
+    const row = el('span', { class: 'chips', role: 'group', 'aria-label': 'Style' },
+      styles.map((id) => el('button', { type: 'button', class: 'chip', 'data-style': id, 'aria-pressed': String(id === st.style), onclick: () => edit.set({ artStyle: id === styles[0] ? undefined : id }) }, styleById(id).label)));
+    syncStyle = () => {
+      for (const b of row.children) b.setAttribute('aria-pressed', String(b.dataset.style === st.style));
+      about.textContent = styleById(st.style).about;
     };
-    return el('section', { class: 'group style-choice' }, el('h2', {}, 'Style'), el('div', { class: 'field' }, row), about);
+    return el('div', { class: 'style-choice' }, el('div', { class: 'ctl is-main', 'data-control-style': '' }, el('span', { class: 'ctl-label' }, 'Style'), row), about);
   };
-
-  panel.replaceChildren(
-    ...[choice ? styleBlock() : null,
-      el('div', { class: 'panel-actions' },
-        el('button', { type: 'button', class: 'btn', onclick: () => { st.p = surprise(); syncControls(); changed(); } }, 'Surprise me'),
-        el('button', { type: 'button', class: 'ghost', onclick: () => { st.p = defaultParams(sprite); st.cues = spriteCues(sprite); setStyle(styles[0]); syncControls(); changed(); cuesChanged(true); } }, 'Start over')),
-      group('Look'), ...parts.map(partBlock), group('Colors'), group('Motion')].filter(Boolean));
-  syncShown();
 
   // ---- link and download
-  let urlTimer = 0;
   function link() {
     const def = defaultParams(sprite), q = new URLSearchParams();
     for (const [k, v] of Object.entries(st.p)) if (v !== def[k]) q.set(k, typeof v === 'number' ? String(Math.round(v * 100) / 100) : String(v));
@@ -422,19 +339,8 @@ export function spritePage(app, sprite, query) {
     const qs = q.toString();
     return `#/sprite/${sprite.id}${qs ? '?' + qs : ''}`;
   }
-  function saveUrl() { clearTimeout(urlTimer); urlTimer = setTimeout(() => history.replaceState(null, '', keepBag(link(), query)), 200); }
-
-  const status = el('p', { class: 'status', role: 'status' });
-  const say = (msg) => { status.textContent = msg; };
-  const sizeText = () => `Each frame is ${sprite.size[0] * st.scale} × ${sprite.size[1] * st.scale} pixels.`;
-  const sizeNote = el('span', { class: 'hint' }, sizeText());
-  const sizeBar = el('div', { class: 'pills small', role: 'group', 'aria-label': 'Pixel size' },
-    [1, 2, 4].map((s) => el('button', { type: 'button', class: 'pill', 'aria-pressed': String(s === st.scale), onclick: (e) => {
-      st.scale = s;
-      for (const b of sizeBar.children) b.setAttribute('aria-pressed', String(b === e.currentTarget));
-      sizeNote.textContent = sizeText();
-      saveUrl();
-    } }, `${s}×`)));
+  // the address carries the settings, and the bag item they are saved to, so a reload goes on editing the same item
+  function saveUrl() { clearTimeout(urlTimer); urlTimer = setTimeout(() => { urlTimer = 0; history.replaceState(null, '', keepBag(link(), { bag: edit.key() })); }, 200); }
 
   async function download() {
     try {
@@ -447,41 +353,50 @@ export function spritePage(app, sprite, query) {
       const sheet = files.some((f) => f.name === `${sprite.id}.png`);
       const nPictures = files.filter((f) => !f.name.endsWith('.wav') && !f.name.endsWith('.json') && !f.name.endsWith('.txt')).length;
       const pictures = sheet ? 'the sprite sheet' : `${nPictures} picture${nPictures === 1 ? '' : 's'} in the "${styleById(st.style).label}" style`;
-      say(`Downloaded ${sprite.id}-sprite-and-sounds.zip: ${pictures}, ${nSounds} sound${nSounds === 1 ? '' : 's'}, the animation list, and a short guide.`);
+      return `Downloaded ${sprite.id}-sprite-and-sounds.zip: ${pictures}, ${nSounds} sound${nSounds === 1 ? '' : 's'}, the animation list, and a short guide.`;
     } catch (e) {
-      say(`The download did not start: ${e.message}. Try again, or use a different browser.`);
+      return `The download did not start: ${e.message}. Try again, or use a different browser.`;
     }
   }
   async function copyLink() {
-    clearTimeout(urlTimer);
+    clearTimeout(urlTimer); urlTimer = 0;
     const url = `${location.origin}${location.pathname}${link()}`;
-    try { await navigator.clipboard.writeText(url); say('Link copied. Anyone who opens it sees this exact sprite with these sounds.'); }
-    catch { say('Copy the address in your browser bar to share this exact sprite.'); }
+    try { await navigator.clipboard.writeText(url); return 'Link copied. Anyone who opens it sees this exact sprite with these sounds.'; }
+    catch { return 'Copy the address in your browser bar to share this exact sprite.'; }
   }
 
   buildStrip();
   buildCues();
 
-  const made = madeNote(sprite.id);
+  // ---- the editing panel: versions, the controls in tabs (with this page's sounds and style choice as two more), the footer
+  const more = moreLikeThis(sprite.id);
+  const panel = editPanel({
+    kind: 'sprite', asset: sprite, edit,
+    tabs: [
+      { id: 'sounds', label: 'Sounds', node: cueBox, changed: () => cueKey(st.cues) !== cueKey(usual.cues) },
+      ...(choice ? [{ id: 'look', label: 'Look', node: styleBlock(), changed: () => st.style !== styles[0] }] : []),
+    ],
+    sizeNote: (scale) => `${sprite.size[0] * scale} × ${sprite.size[1] * scale}`,
+    onDownload: download, onCopyLink: copyLink,
+    onMore: () => more.scrollIntoView({ block: 'start' }),
+  });
+  const offEdit = edit.onChange(pull);
+  const flush = () => edit.flush();
+  window.addEventListener('pagehide', flush);      // closing the tab mid-drag still saves the last change
+  if (edit.inBag()) saveUrl();
+
   app.replaceChildren(
     header('sprites'),
-    el('main', { class: 'editor' },
+    el('main', { class: 'editor with-panel' },
       el('div', { class: 'left' },
         el('div', { class: 'title-row' }, el('h1', {}, sprite.name), el('p', { class: 'blurb' }, sprite.blurb ?? '')),
         made ? el('p', { class: 'hint made-here' }, made.text) : null,
         el('div', { class: 'stage-card' }, stageWrap, el('div', { class: 'stage-tools' }, sceneBar, playBtn)),
         el('div', { class: 'under' }, el('span', { class: 'label' }, 'Animation'), clipBar),
         strip,
-        cueBox,
         goesWith(sprite.id)),     // the sounds it uses and the bundles it is in, from the catalogue
-      panel,
-      el('div', { class: 'get' },
-        made?.draft ? null : addToBag('sprite', sprite.id, () => ({ params: { ...st.p }, cues: st.cues, scale: st.scale, ...(st.style !== styles[0] ? { artStyle: st.style } : {}) }), query),
-        el('button', { type: 'button', class: 'btn big', onclick: download }, 'Download sprite and sounds'),
-        el('button', { type: 'button', class: 'ghost', onclick: copyLink }, 'Copy link'),
-        el('div', { class: 'size' }, el('span', { class: 'label' }, 'Pixel size'), sizeBar, sizeNote),
-        status),
-      moreLikeThis(sprite.id)));
+      panel.node,
+      more));
 
   // ---- animation loop
   const ctx = stage.getContext('2d');
@@ -544,6 +459,8 @@ export function spritePage(app, sprite, query) {
   syncLoops();
   return () => {
     cancelAnimationFrame(raf); ro.disconnect(); clearTimeout(urlTimer);
+    offEdit(); panel.close(); edit.close(); clearTimeout(saveTimer);      // leaving saves whatever was still waiting
+    window.removeEventListener('pagehide', flush);
     if (offFrames) offFrames();
     clearTimeout(aheadTimer);
     window.removeEventListener('sf-audio-ready', syncLoops);

@@ -1,5 +1,5 @@
-// Sprite page: preview, animation buttons, sliders, Surprise me / Start over, link, sounds, download, phone width.
-import { test, expect, openRoute, canvasStats, canvasGroupStats, setRange, downloadFrom, readZip, hasHorizontalScroll, waitForDrawn } from '../helpers/test.mjs';
+// Sprite page: preview, animation buttons, the editing panel's sliders, Surprise me / Start over, link, sounds, download, phone width.
+import { test, expect, openRoute, canvasStats, canvasGroupStats, setRange, downloadFrom, readZip, hasHorizontalScroll, waitForDrawn, openTab, downloadButton } from '../helpers/test.mjs';
 import { readCatalogue, catalogueOf } from '../helpers/catalog.mjs';
 
 // The sprites come from the catalogue (generated/catalog.json): there is no other list.
@@ -25,7 +25,8 @@ async function pause(page) {
   await expect(b).toHaveText('Play');
   await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
 }
-const lookSliders = (page) => page.locator('.panel section.group').filter({ has: page.locator('h2', { hasText: 'Look' }) }).locator('input[type=range]');
+// the sprite's own shape sliders (the panel's first tab)
+const lookSliders = (page) => page.locator('.rx-panel [data-pane="shape"] .ctl input[type=range]');
 const cueRows = (page) => page.locator('.cues li.cue');
 
 for (const id of SPRITES) {
@@ -56,7 +57,7 @@ for (const id of SPRITES) {
     });
 
     test('every slider changes something', async ({ page }) => {
-      const sliders = page.locator('.panel input[type=range]');
+      const sliders = page.locator('.rx-panel .ctl input[type=range]');      // every tab's, whichever is open
       const n = await sliders.count();
       expect(n).toBeGreaterThan(3);
       const clips = clipButtons(page);
@@ -69,14 +70,14 @@ for (const id of SPRITES) {
       };
       const base = await hashes();
       for (let i = 0; i < n; i++) {
-        const { key, group } = await sliders.nth(i).evaluate((el) => ({ key: el.id.replace(/^c-/, ''), group: el.closest('section.group').querySelector('h2').textContent }));
+        const { key, group } = await sliders.nth(i).evaluate((el) => ({ key: el.id.replace(/^c-/, ''), group: el.closest('[data-pane]').dataset.pane }));
         await setRange(sliders.nth(i), 'other');
         const after = await hashes();
         const pixels = after.some((h, k) => h !== base[k]);
         if (!pixels) {
           // Some Motion sliders (Speed) change timing, not pixels: what they change is the animation's frames per second,
           // which is saved in the address bar. A Look slider must always change the picture.
-          expect(group, `slider "${key}" changed no pixels in any animation`).toBe('Motion');
+          expect(group, `slider "${key}" changed no pixels in any animation`).toBe('motion');
         }
         await expect.poll(() => page.evaluate(() => location.hash), `slider "${key}" should be saved in the link`).toContain(`${key}=`);
         await page.getByRole('button', { name: 'Start over' }).click();
@@ -125,6 +126,7 @@ for (const id of SPRITES) {
 test.describe('sprite sounds', () => {
   test('the sounds section lists the default sounds of the animation, and adding and removing updates it', async ({ page }) => {
     await openRoute(page, '/sprite/knight');
+    await openTab(page, 'sounds');
     await expect(page.locator('.cues h2')).toHaveText('Sounds for Walk');
     const n0 = await cueRows(page).count();
     expect(n0).toBeGreaterThanOrEqual(1);                // footsteps
@@ -166,10 +168,10 @@ test.describe('sprite sounds', () => {
 
 test.describe('sprite download', () => {
   for (const id of EVERY_KIND) {
-    test(`${id}: Download sprite and sounds gives a zip with the PNG, JSON, a WAV and the guide`, async ({ page }) => {
+    test(`${id}: Download gives a zip with the PNG, JSON, a WAV and the guide`, async ({ page }) => {
       const sprite = await spriteProgram(id);
       await openRoute(page, `/sprite/${id}`);
-      const { name, bytes } = await downloadFrom(page, () => page.getByRole('button', { name: 'Download sprite and sounds' }).click());
+      const { name, bytes } = await downloadFrom(page, () => downloadButton(page).click());
       expect(name).toBe(`${id}-sprite-and-sounds.zip`);
       expect(bytes.subarray(0, 4).toString('latin1')).toBe('PK\x03\x04');
       const files = readZip(new Uint8Array(bytes));
@@ -198,6 +200,6 @@ test.describe('phone width', () => {
     await openRoute(page, '/sprite/knight');
     await page.waitForSelector('.strip .cell canvas');
     expect(await hasHorizontalScroll(page)).toBe(false);
-    await expect(page.getByRole('button', { name: 'Download sprite and sounds' })).toBeVisible();
+    await expect(downloadButton(page)).toBeVisible();
   });
 });

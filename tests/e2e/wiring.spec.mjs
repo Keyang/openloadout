@@ -126,8 +126,8 @@ test('a sprite in the bag is loaded only when the bag page needs it; leaving bef
   await expect(page.getByRole('button', { name: 'Download', exact: true })).toBeEnabled();
 
   // leave for another page, then let the file arrive
-  await page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: 'Music' }).click();
-  await expect.poll(() => hash(page)).toBe('#/browse?kind=music');
+  await page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: 'Library' }).click();
+  await expect.poll(() => hash(page)).toBe('#/browse');
   await expect(page.locator('ul.results > li').first()).toBeVisible();
   const arrived = page.waitForResponse((r) => new URL(r.url()).pathname === `/sprites/${SPRITE.id}.js`);
   release();

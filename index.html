@@ -18,27 +18,40 @@
   <!-- Asked for at once, not after the scripts that read it: the list of every asset. Low priority, so the page frame
        and the style sheet come first (tests/unit/site-first-paint.test.mjs). -->
   <link rel="preload" href="generated/catalog.json" as="fetch" crossorigin fetchpriority="low">
-  <!-- Just enough style for the page frame below, so it shows on a slow connection before the style sheet arrives.
-       The same values as app/style.css (:root, body, .top, .brand, .top nav a, .bag-link, .home, .lede); change both together.
-       Its letters are the system's: the site's own fonts come with the style sheet, so they do not hold up what matters first. -->
+  <!-- Just enough style for the page frame below, so it shows on a slow connection before the style sheets arrive.
+       The same values as app/css/base.css (:root, body, .top, .brand, .top-nav, .bag-link, .bag-count, .menu-btn, .home, .lede);
+       change both together. Its letters are the system's: the site's own fonts come with the style sheets, so they do not
+       hold up what matters first. -->
   <style>
-    body { margin: 0; background: #e8ecf6; color: #231b33; font: 500 16px/1.5 system-ui, -apple-system, 'Segoe UI', sans-serif; }
-    .top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 16px; max-width: 1160px; margin: 0 auto; padding: 20px 20px 0; box-sizing: border-box; }
-    .brand { font: 700 22px/1 system-ui, sans-serif; color: #231b33; text-decoration: none; }
-    .top-right { display: flex; align-items: baseline; gap: 6px 14px; flex-wrap: wrap; justify-content: flex-end; }
-    .top nav { display: flex; gap: 6px; flex-wrap: wrap; }
-    .top nav a { color: #231b33; font-weight: 600; text-decoration: none; padding: 4px 10px; border: 2px solid transparent; }
-    .bag-link { color: #231b33; font-weight: 700; text-decoration: none; padding: 4px 10px; border: 2px solid #231b33; background: #fff; }
-    .home { max-width: 1160px; margin: 0 auto; padding: 44px 20px 64px; box-sizing: border-box; }
-    .lede { font-size: 19px; line-height: 1.45; margin: 18px 0 28px; color: #5d5873; }
-    @media (max-width: 700px) { .top { align-items: center; } .top nav { display: none; } .home { padding-top: 28px; } }
+    body { margin: 0; background: #ffffff; color: #000000; font: 400 15px/1.5 system-ui, -apple-system, 'Segoe UI', sans-serif; }
+    .top { min-height: 56px; display: flex; flex-wrap: wrap; align-items: center; column-gap: 32px; padding: 0 32px; border-bottom: 1px solid #e5e5e2; box-sizing: border-box; }
+    .brand { height: 56px; display: inline-flex; align-items: center; font: 600 21px/1 system-ui, sans-serif; color: #000000; text-decoration: none; }
+    .top-nav { display: flex; gap: 24px; font-size: 14px; margin-right: auto; }
+    .top-nav a { color: #5c5c5c; text-decoration: none; padding: 6px 0; }
+    .bag-link { height: 32px; box-sizing: border-box; padding: 0 6px 0 12px; display: inline-flex; align-items: center; gap: 8px; border: 1px solid #cfcfcb; border-radius: 6px; font-size: 14px; font-weight: 500; color: #000000; text-decoration: none; }
+    .bag-count { min-width: 20px; height: 20px; box-sizing: border-box; padding: 0 6px; border-radius: 4px; background: #000000; color: #fff; font-size: 12px; line-height: 20px; text-align: center; }
+    .menu-btn { display: none; }
+    .home { max-width: 1184px; margin: 0 auto; padding: 48px 32px 96px; box-sizing: border-box; }
+    .lede { font-size: 18px; line-height: 1.5; margin: 0; color: #5c5c5c; }
+    @media (max-width: 860px) { .top { padding: 0 24px; } .home { padding-left: 24px; padding-right: 24px; } }
+    @media (max-width: 720px) { .top { padding: 0 16px; column-gap: 8px; } .brand { margin-right: auto; } .top-nav { display: none; } .home { padding-left: 16px; padding-right: 16px; } }
   </style>
 </head>
 <body>
   <!-- The page frame and a loading line, drawn before the style sheets below have arrived (they hold up only what comes
        after them) and before any script has run. app/app.js replaces it; the header matches app/ui.js header(). -->
-  <div id="app"><header class="top"><a class="brand" href="#/">Loadout</a><div class="top-right"><nav id="main-nav" aria-label="Main"><a href="#/browse?kind=sprite">Sprites</a> <a href="#/browse?kind=sound">Sounds</a> <a href="#/browse?kind=music">Music</a> <a href="#/bundles">Bundles</a> <a href="#/play">Play</a></nav><a class="bag-link" href="#/bag">Bag</a></div></header><main class="home"><p class="lede">Loading…</p></main></div>
+  <div id="app"><header class="top"><a class="brand" href="#/">Loadout</a><nav id="main-nav" class="top-nav" aria-label="Main"><a href="#/browse">Library</a> <a href="#/bundles">Kits</a> <a href="#/play">Play</a></nav><a class="bag-link" href="#/bag">Bag <span class="bag-count">0</span></a></header><main class="home"><p class="lede">Loading…</p></main></div>
   <link rel="stylesheet" href="vendor/fonts/fonts.css">
+  <!-- The shared look first (tokens, the frame, the components, the editing panel), then one sheet per page, each with
+       one owner. app/style.css holds the old pages' rules until each page builder has moved theirs out; it sits in a
+       layer, so nothing in it can win over app/css/. -->
+  <link rel="stylesheet" href="app/css/base.css">
+  <link rel="stylesheet" href="app/css/landing.css">
+  <link rel="stylesheet" href="app/css/library.css">
+  <link rel="stylesheet" href="app/css/asset.css">
+  <link rel="stylesheet" href="app/css/kits.css">
+  <link rel="stylesheet" href="app/css/bag.css">
+  <link rel="stylesheet" href="app/css/play.css">
   <link rel="stylesheet" href="app/style.css">
   <script type="module" src="app/app.js"></script>
 </body>

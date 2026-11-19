@@ -125,24 +125,29 @@ if (typeof document !== 'undefined') {
   document.addEventListener('click', (e) => { const on = e.target instanceof Element ? e.target.closest('.menu-btn') : null; closeMenus(on); });
 }
 
-/** The page header with the main navigation. `current`: home | sprites | sounds | music | bundles | play | bag | ''. */
+// The library holds sprites, sounds and music: a page of any of them lights "Library" (kits are "bundles" in addresses and in the code).
+const NAV_KEY = { sprites: 'library', sounds: 'library', music: 'library', browse: 'library', library: 'library', kits: 'bundles', bundles: 'bundles', play: 'play' };
+
+/**
+ * The page header (docs/site-design.md, "Frame"): the wordmark, Library, Kits, Play, and the Bag button with its count.
+ * On a phone the three links fold behind "Menu". `current`: home | library | sprites | sounds | music | bundles | kits | play | bag | ''.
+ * Under the row, when there is one: the way back to the list the visitor came from, and the warning that the bag is not kept.
+ * index.html draws the same row before any script runs; change both together.
+ */
 export function header(current) {
-  const on = current === 'kits' ? 'bundles' : current;      // kits are bundles now
+  const on = NAV_KEY[current] ?? '';
   const link = (href, label, key) => el('a', { href, 'data-key': key, 'aria-current': on === key ? 'page' : null }, label);
   const menu = el('button', { type: 'button', class: 'menu-btn', 'aria-expanded': 'false', 'aria-controls': 'main-nav' }, 'Menu');
   // an asset page says the way back to where the visitor came from (app/back.js)
   const back = wayBack();
   const top = el('header', { class: 'top' },
     el('a', { class: 'brand', href: '#/' }, 'Loadout'),
-    el('div', { class: 'top-right' },
-      menu,
-      el('nav', { id: 'main-nav', 'aria-label': 'Main' },
-        link('#/browse?kind=sprite', 'Sprites', 'sprites'),
-        link('#/browse?kind=sound', 'Sounds', 'sounds'),
-        link('#/browse?kind=music', 'Music', 'music'),
-        link('#/bundles', 'Bundles', 'bundles'),
-        link('#/play', 'Play', 'play')),      // W2-G: the playground
-      el('a', { class: 'bag-link', href: '#/bag', 'aria-current': current === 'bag' ? 'page' : null }, 'Bag ', el('span', { class: 'bag-count' }, String(bag.count())))),
+    el('nav', { id: 'main-nav', class: 'top-nav', 'aria-label': 'Main' },
+      link('#/browse', 'Library', 'library'),
+      link('#/bundles', 'Kits', 'bundles'),
+      link('#/play', 'Play', 'play')),
+    menu,
+    el('a', { class: 'bag-link', href: '#/bag', 'aria-current': current === 'bag' ? 'page' : null }, 'Bag ', el('span', { class: 'bag-count' }, String(bag.count()))),
     back ? el('a', { class: 'back-link', href: back.href }, el('span', { 'aria-hidden': 'true' }, '‹'), back.label) : null);
   top.dataset.page = current || '';
   syncNotKept(top);
@@ -154,9 +159,23 @@ export function header(current) {
   return top;
 }
 
+/** The footer (the landing page only): the wordmark's line and the ways into the site. */
+export function footer() {
+  return el('footer', { class: 'foot' },
+    el('span', {}, 'Loadout. Game art, sounds and music made by code, yours to change.'),
+    el('nav', { 'aria-label': 'Footer' },
+      el('a', { href: '#/browse' }, 'Library'),
+      el('a', { href: '#/bundles' }, 'Kits'),
+      el('a', { href: '#/play' }, 'Play'),
+      el('a', { href: '#/bag' }, 'Bag')));
+}
+
 /** Move the "you are here" mark in the header without redrawing it (the results view changes kind in place). */
 export function markNav(key) {
-  for (const a of document.querySelectorAll('header.top nav a')) {
-    if (a.dataset.key === key) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+  for (const top of document.querySelectorAll('header.top')) {
+    const on = NAV_KEY[key] ?? NAV_KEY[top.dataset.page] ?? '';      // nothing named: what the page itself is
+    for (const a of top.querySelectorAll('nav a')) {
+      if (a.dataset.key === on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+    }
   }
 }

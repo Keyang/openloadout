@@ -52,21 +52,26 @@ test('the two typefaces are served by the site itself and really load', async ({
   await page.evaluate(() => document.fonts.ready);
   expect(asked).toContain('/vendor/fonts/fonts.css');
   const fonts = asked.filter((p) => p.startsWith('/vendor/fonts/') && p.endsWith('.woff2'));
-  expect(fonts.some((p) => p.includes('figtree-latin'))).toBe(true);
+  expect(fonts.some((p) => p.includes('geist-latin'))).toBe(true);
   expect(fonts.some((p) => p.includes('pixelify-sans-latin'))).toBe(true);
   const used = await page.evaluate(() => ({
-    body: document.fonts.check('500 16px Figtree'),
-    display: document.fonts.check('700 22px "Pixelify Sans"'),
+    body: document.fonts.check('400 15px Geist'),
+    display: document.fonts.check('600 21px "Pixelify Sans"'),
+    text: getComputedStyle(document.body).fontFamily,
     heading: getComputedStyle(document.querySelector('h1')).fontFamily,
+    wordmark: getComputedStyle(document.querySelector('header .brand')).fontFamily,
   }));
   expect(used.body).toBe(true);
   expect(used.display).toBe(true);
-  expect(used.heading).toContain('Pixelify Sans');
-  // only the weights the site uses are shipped: four of Figtree, three of Pixelify Sans
+  // Geist for everything, headings too; Pixelify Sans only in the wordmark (docs/site-design.md)
+  expect(used.text).toContain('Geist');
+  expect(used.heading).toContain('Geist');
+  expect(used.heading).not.toContain('Pixelify');
+  expect(used.wordmark).toContain('Pixelify Sans');
+  // only the weights the site uses are shipped: three of Geist, one of Pixelify Sans
   const shipped = fs.readdirSync(new URL('vendor/fonts/', ROOT)).filter((f) => f.endsWith('.woff2')).sort();
   expect(shipped).toEqual([
-    'figtree-latin-400-normal.woff2', 'figtree-latin-500-normal.woff2', 'figtree-latin-600-normal.woff2', 'figtree-latin-700-normal.woff2',
-    'pixelify-sans-latin-500-normal.woff2', 'pixelify-sans-latin-600-normal.woff2', 'pixelify-sans-latin-700-normal.woff2',
+    'geist-latin-400-normal.woff2', 'geist-latin-500-normal.woff2', 'geist-latin-600-normal.woff2', 'pixelify-sans-latin-600-normal.woff2',
   ]);
   expect(new URL(baseURL).origin).toBeTruthy();
 });

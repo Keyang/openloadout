@@ -27,7 +27,7 @@ test('home loads and shows sprites, sounds, music and kits', async ({ page }) =>
     await expect(places(page, kind)).toHaveCount(count(kind));
   }
   await expect(kitCards(page)).toHaveCount(CATALOG().bundles.filter((b) => b.level === 'kit').length);
-  await expect(page.getByRole('navigation', { name: 'Main' }).getByRole('link')).toHaveText(['Sprites', 'Sounds', 'Music', 'Bundles', 'Play']);
+  await expect(page.getByRole('navigation', { name: 'Main' }).getByRole('link')).toHaveText(['Library', 'Kits', 'Play']);
   // a card is made when its place comes near the screen: the last of each kind is really there once scrolled to
   for (const [kind, cards] of [['sprite', spriteCards], ['sound', soundCards], ['music', musicCards]]) {
     const last = places(page, kind).last();

@@ -169,13 +169,14 @@ test('each opens on its own page, is changed, goes into the bag, is drawn there,
   await waitForDrawn(page);
   expect((await canvasStats(page.locator('canvas.stage'))).opaque).toBeGreaterThan(0);
   await expect(page.locator('.strip .cell canvas').first()).toBeVisible();
-  const spriteSlider = page.locator('.panel input[type=range]:visible').first();
+  const spriteSlider = page.locator('.rx-panel .ctl input[type=range]:visible').first();
   const spriteKey = (await spriteSlider.getAttribute('id')).replace(/^c-/, '');
   await setRange(spriteSlider, 'other');
   const spriteValue = Number(await spriteSlider.inputValue());
   await expect.poll(() => page.evaluate(() => location.hash)).toContain(`${spriteKey}=`);
-  await page.getByRole('button', { name: 'Add to my bag', exact: true }).click();
+  // the change saved itself to the bag (docs/site-design.md, section 3): there is nothing to press
   await expect(bagCount(page)).toHaveText('1');
+  await expect(page.locator('.rx-panel .saved')).toContainText('Saved in your bag');
 
   // ---- the sound: found, opened from its card, changed, played, added
   await page.locator('a.brand').click();

@@ -63,7 +63,7 @@ for (const { id } of PLANS) {
         await waitForDrawn(page);
         if (kind === 'music') await expect(page.locator('.stage-tools .tools-left button')).toHaveText('Play');
         else await expect.poll(async () => (await canvasStats(page.locator('canvas.stage'))).opaque, { message: `${a} is drawn`, timeout: 20_000 }).toBeGreaterThan(0);
-        await expect(page.locator('.add-to-bag button')).toHaveText(/^Add to (my )?bag$/);
+        await expect(page.locator(kind === 'sprite' ? '.rx-panel .add-btn' : '.add-to-bag button')).toHaveText(/^Add to (my )?bag$/);      // a sprite's page has it in the editing panel's footer
       } catch (e) { problems.push(String(e.message).split('\n')[0]); }
       problems.push(...watch.errors.splice(0));
       if (problems.length) broken.push(`${kind} ${a}: ${problems.join(' | ')}`);

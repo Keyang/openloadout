@@ -11,7 +11,7 @@
 //                         A sound on a still row (a button's state) is played when that row is shown, not on a frame;
 //                         a thin platform is stood on from above only and both engines get the step for it; the
 //                         states of an interface piece say when each is shown; a bar says how to cut its fill off
-//   one sprite alone      "Download sprite and sounds" on a sprite's own page gives the same text, for one sprite of
+//   one sprite alone      "Download" on a sprite's own page gives the same text, for one sprite of
 //                         every type the catalogue has (the first of each, so a new type is covered with no edit here)
 //   the top of the zip    read-me.txt opens with a contents list (name, what it is, where), licence.txt lists what
 //                         every asset records and invents no terms, manifest.json carries the same facts for tools
@@ -71,7 +71,7 @@ for (const type of TYPES) {
   const row = C.sprites.filter((a) => a.type === type).sort((a, b) => (a.id < b.id ? -1 : 1))[0];
   test(`a ${type} downloaded on its own (${row.id}): the text is right for what it is, and names its licence value`, async ({ page }) => {
     await openRoute(page, `/sprite/${row.id}`);
-    const { bytes } = await downloadFrom(page, () => page.getByRole('button', { name: 'Download sprite and sounds' }).click());
+    const { bytes } = await downloadFrom(page, () => page.locator('.rx-panel [data-act="download"]').click());
     const files = readZip(new Uint8Array(bytes));
     const text = (name) => new TextDecoder().decode(files.find((f) => f.name === name).data);
     const json = JSON.parse(text(`${row.id}.json`));

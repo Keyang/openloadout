@@ -1,28 +1,30 @@
-// Parts on the sprite page: each part is its own block of controls, one level below the sprite's own.
-import { test, expect, openRoute, canvasGroupStats, setRange, waitForDrawn } from '../helpers/test.mjs';
+// Parts on the sprite page: each part is its own block of controls in the editing panel's Parts tab (app/panel.js),
+// apart from the sprite's own controls (Shape, Colours, Motion).
+import { test, expect, openRoute, canvasGroupStats, setRange, waitForDrawn, openTab, partBlock, control, downloadButton } from '../helpers/test.mjs';
 
 const strip = (page) => page.locator('.strip .cell canvas');
 const stripHash = async (page) => (await canvasGroupStats(strip(page))).hash;
-const block = (page, title) => page.locator('.panel section.part').filter({ has: page.getByRole('heading', { name: title, exact: true }) });
+const block = partBlock;
 const slider = (scope, name) => scope.getByRole('slider', { name, exact: true });
 const hashNow = (page) => page.evaluate(() => location.hash);
 
 test.describe('Hero parts', () => {
-  test.beforeEach(async ({ page }) => { await openRoute(page, '/sprite/knight'); });
+  test.beforeEach(async ({ page }) => { await openRoute(page, '/sprite/knight'); await openTab(page, 'parts'); });
 
-  test('the Weapon block sits below Look and has its own settings in everyday words', async ({ page }) => {
+  test('the Weapon block is in the Parts tab, apart from Shape, and has its own settings in everyday words', async ({ page }) => {
     const weapon = block(page, 'Weapon');
     await expect(weapon).toBeVisible();
     // selector first, then the settings
     await expect(weapon.getByRole('group', { name: 'Weapon' }).getByRole('button', { name: 'Sword' })).toHaveAttribute('aria-pressed', 'true');
     for (const name of ['Length', 'Hold angle', 'Swing']) await expect(slider(weapon, name)).toBeVisible();
-    const order = await page.locator('.panel section.group h2').allTextContents();
-    expect(order.indexOf('Weapon')).toBeGreaterThan(order.indexOf('Look'));
-    expect(order).toEqual(expect.arrayContaining(['Look', 'Weapon', 'Headgear', 'Cape', 'Colors', 'Motion']));
-    // the weapon's controls are in its block, not in Look
-    const look = page.locator('.panel section.group').filter({ has: page.getByRole('heading', { name: 'Look', exact: true }) });
-    await expect(look.getByRole('group', { name: 'Weapon' })).toHaveCount(0);
-    await expect(page.locator('.panel')).not.toContainText(/param|socket/i);
+    const tabs = (await page.locator('.rx-panel [role="tab"]').allTextContents()).map((t) => t.trim());
+    expect(tabs).toEqual(['Shape', 'Parts', 'Colours', 'Motion', 'Sounds']);
+    const parts = (await page.locator('.rx-panel .part .ctl.is-main .ctl-label').allTextContents()).map((t) => t.trim());
+    expect(parts).toEqual(expect.arrayContaining(['Hair', 'Headgear', 'Weapon', 'Cape']));
+    // the weapon's controls are in its block, not among the sprite's own
+    await expect(page.locator('.rx-panel [data-pane="shape"]').getByRole('group', { name: 'Weapon' })).toHaveCount(0);
+    await expect(page.locator('.rx-panel [data-pane="shape"] [data-control="weaponLength"]')).toHaveCount(0);
+    await expect(page.locator('.rx-panel')).not.toContainText(/param|socket/i);
   });
 
   test('choosing None hides the weapon settings, and picking a weapon brings them back', async ({ page }) => {
@@ -71,12 +73,14 @@ test.describe('Hero parts', () => {
     await page.waitForSelector('.strip .cell canvas');
     expect(await hashNow(page)).toBe(hash);
     expect(await canvasGroupStats(strip(page))).toEqual(mine);
+    await openTab(page, 'parts');
     await expect(block(page, 'Weapon').getByRole('button', { name: 'Axe' })).toHaveAttribute('aria-pressed', 'true');
     expect(await slider(block(page, 'Weapon'), 'Hold angle').inputValue()).toBe(angle);
   });
 
   test('a link with the weapon set to none opens with the weapon settings hidden', async ({ page }) => {
     await openRoute(page, '/sprite/knight?weapon=none&clip=attack');
+    await openTab(page, 'parts');
     const weapon = block(page, 'Weapon');
     await expect(weapon.getByRole('button', { name: 'None' })).toHaveAttribute('aria-pressed', 'true');
     await expect(slider(weapon, 'Hold angle')).toBeHidden();
@@ -111,6 +115,7 @@ test.describe('Hero parts', () => {
 test.describe('Wizard parts', () => {
   test('the Wizard page shows Staff, Hat and Beard blocks, and the staff has Length and Hold angle', async ({ page }) => {
     await openRoute(page, '/sprite/wizard');
+    await openTab(page, 'parts');
     for (const title of ['Staff', 'Hat', 'Beard']) await expect(block(page, title)).toBeVisible();
     const staff = block(page, 'Staff');
     const before = await stripHash(page);
@@ -126,8 +131,9 @@ test.describe('Wizard parts', () => {
 test.describe('sprites without parts', () => {
   test('the coin page has no part blocks and still shows its controls', async ({ page }) => {
     await openRoute(page, '/sprite/coin');
-    await expect(page.locator('.panel section.part')).toHaveCount(0);
-    expect(await page.locator('.panel section.group').count()).toBeGreaterThanOrEqual(1);
+    await expect(page.locator('.rx-panel .part')).toHaveCount(0);
+    await expect(page.locator('.rx-panel [role="tab"][data-tab="parts"]')).toHaveCount(0);
+    expect(await page.locator('.rx-panel .ctl').count()).toBeGreaterThanOrEqual(1);
   });
 });
 
@@ -136,6 +142,7 @@ test.describe('phone width', () => {
   test('the Hero page with part blocks has no sideways scroll', async ({ page }) => {
     await openRoute(page, '/sprite/knight');
     await page.waitForSelector('.strip .cell canvas');
+    await openTab(page, 'parts');
     await expect(block(page, 'Weapon')).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1)).toBe(false);
   });
@@ -169,7 +176,10 @@ export default defineSprite({
     if (p.emblem === 'heart') g.rect(9, 11, 6, 2, p.inlay);
   },
 });`;
-const field = (page, key) => page.locator(`.panel [data-control="${key}"]`);
+const field = control;
+/** Is the control offered at all, whichever tab is open? (A control that is not in effect is `hidden`.) */
+const offered = (page, key, yes) => expect(field(page, key)).toHaveJSProperty('hidden', !yes);
+const coloursTab = (page) => page.getByRole('tab', { name: 'Colours' });
 
 test.describe('controls that only matter sometimes', () => {
   test.beforeEach(async ({ page }) => {
@@ -182,28 +192,33 @@ test.describe('controls that only matter sometimes', () => {
     await expect(field(page, 'emblem')).toBeVisible();
     await expect(field(page, 'inlay')).toBeHidden();
     await expect(field(page, 'glowSize')).toBeHidden();
-    // the Colors group has nothing to show yet, so its title is not shown either
-    await expect(page.getByRole('heading', { name: 'Colors', exact: true })).toBeHidden();
+    // the Colours tab has nothing to show yet, so it is not offered either
+    await expect(coloursTab(page)).toBeHidden();
 
     const before = await stripHash(page);
     await page.getByRole('group', { name: 'Emblem' }).getByRole('button', { name: 'Star' }).click();
-    await expect(field(page, 'inlay')).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Colors', exact: true })).toBeVisible();
+    await offered(page, 'inlay', true);
+    await expect(coloursTab(page)).toBeVisible();
     const star = await stripHash(page);
     expect(star).not.toBe(before);
-    await field(page, 'inlay').getByRole('button').nth(1).click();
+    await coloursTab(page).click();
+    await expect(field(page, 'inlay')).toBeVisible();
+    await field(page, 'inlay').locator('button.swatch').nth(1).click();
     expect(await stripHash(page)).not.toBe(star);
 
-    await page.getByRole('checkbox', { name: 'Glow' }).check({ force: true });
+    await openTab(page, 'shape');
+    await page.getByRole('checkbox', { name: 'Glow', exact: true }).check({ force: true });
     await expect(field(page, 'glowSize')).toBeVisible();
-    await expect(field(page, 'metal')).toBeVisible();
-    await page.getByRole('checkbox', { name: 'Glow' }).uncheck({ force: true });
+    await offered(page, 'metal', true);
+    await page.getByRole('checkbox', { name: 'Glow', exact: true }).uncheck({ force: true });
     await expect(field(page, 'glowSize')).toBeHidden();
+    await offered(page, 'metal', false);
 
     await page.getByRole('group', { name: 'Emblem' }).getByRole('button', { name: 'Plain' }).click();
-    await expect(field(page, 'inlay')).toBeHidden();
+    await offered(page, 'inlay', false);
+    await expect(coloursTab(page)).toBeHidden();
     await page.getByRole('button', { name: 'Start over' }).click();
-    await expect(field(page, 'inlay')).toBeHidden();
+    await offered(page, 'inlay', false);
     await expect.poll(() => stripHash(page)).toBe(before);
   });
 
@@ -215,10 +230,10 @@ test.describe('controls that only matter sometimes', () => {
       const glow = await page.locator('#c-glow').isChecked();
       await page.waitForTimeout(300);                       // the link is saved a moment after the change
       const hash = await hashNow(page);
-      if (plain) { await expect(field(page, 'inlay')).toBeHidden(); expect(hash).not.toContain('inlay='); seen.hidden++; }
-      else { await expect(field(page, 'inlay')).toBeVisible(); seen.shown++; }
-      if (glow) await expect(field(page, 'glowSize')).toBeVisible();
-      else { await expect(field(page, 'glowSize')).toBeHidden(); expect(hash).not.toContain('glowSize='); expect(hash).not.toContain('metal='); }
+      if (plain) { await offered(page, 'inlay', false); expect(hash).not.toContain('inlay='); seen.hidden++; }
+      else { await offered(page, 'inlay', true); seen.shown++; }
+      if (glow) await offered(page, 'glowSize', true);
+      else { await offered(page, 'glowSize', false); expect(hash).not.toContain('glowSize='); expect(hash).not.toContain('metal='); }
     }
     expect(seen.shown + seen.hidden).toBe(10);
   });
@@ -230,6 +245,7 @@ test.describe('sounds that only play sometimes', () => {
 
   test("the Hero's blade sound applies with a weapon and the unarmed sound without one", async ({ page }) => {
     await openRoute(page, '/sprite/knight?clip=attack');
+    await openTab(page, 'parts');
     await expect(page.locator('.cues h2')).toHaveText('Sounds for Attack');
     await expect(rows(page)).toHaveCount(2);
     const blade = rowFor(page, 'sword-slash'), bare = rows(page).filter({ hasNot: page.locator('select[aria-label="Sound"] option[value="sword-slash"]:checked') });
@@ -253,7 +269,7 @@ test.describe('sounds that only play sometimes', () => {
   test('the download leaves out a sound that does not play', async ({ page }) => {
     const { downloadFrom, readZip } = await import('../helpers/test.mjs');
     await openRoute(page, '/sprite/knight?weapon=none');
-    const { bytes } = await downloadFrom(page, () => page.getByRole('button', { name: 'Download sprite and sounds' }).click());
+    const { bytes } = await downloadFrom(page, () => downloadButton(page).click());
     const files = readZip(new Uint8Array(bytes));
     const meta = JSON.parse(new TextDecoder().decode(files.find((f) => f.name === 'knight.json').data));
     expect(meta.sounds.attack.map((c) => c.sound)).not.toContain('sword-slash');
@@ -265,6 +281,7 @@ test.describe('sounds that only play sometimes', () => {
 
   test('an edited sound list keeps its conditions across a reload', async ({ page }) => {
     await openRoute(page, '/sprite/knight?clip=attack');
+    await openTab(page, 'sounds');
     await rows(page).first().getByRole('button', { name: 'Duplicate' }).click();
     await expect(rows(page)).toHaveCount(3);
     await expect.poll(() => hashNow(page)).toContain('sfx=');
@@ -272,6 +289,7 @@ test.describe('sounds that only play sometimes', () => {
     await waitForDrawn(page);
     await expect(rows(page)).toHaveCount(3);
     await expect(page.locator('.cues li.cue.off')).toHaveCount(1);
+    await openTab(page, 'parts');
     await block(page, 'Weapon').getByRole('button', { name: 'None' }).click();
     await expect(page.locator('.cues li.cue.off')).toHaveCount(2);
   });
@@ -284,6 +302,7 @@ test.describe('a control that depends on a hidden control', () => {
     await page.route(/\/sprites\/coin\.js(\?.*)?$/, (r) => r.fulfill({ status: 200, contentType: 'text/javascript', body: WHEN_SPRITE }));
     await openRoute(page, '/sprite/coin');
     await expect(field(page, 'rim')).toBeHidden();
+    await expect(field(page, 'emblem')).toBeVisible();
     await page.getByRole('group', { name: 'Emblem' }).getByRole('button', { name: 'Star' }).click();
     await expect(field(page, 'rim')).toBeVisible();
     await expect(field(page, 'rimWidth')).toBeHidden();
@@ -301,30 +320,35 @@ test.describe('a control that depends on a hidden control', () => {
 test.describe('controls with either-or conditions on the shipped characters', () => {
   test('Hero: Metal is shown only while a weapon or the helmet is there to colour', async ({ page }) => {
     await openRoute(page, '/sprite/knight');
-    await expect(field(page, 'metal')).toBeVisible();
+    await openTab(page, 'parts');
+    await offered(page, 'metal', true);
     await block(page, 'Weapon').getByRole('button', { name: 'None' }).click();
-    await expect(field(page, 'metal')).toBeVisible();                       // the helmet is still metal
+    await offered(page, 'metal', true);                                     // the helmet is still metal
     await block(page, 'Headgear').getByRole('button', { name: 'Crown' }).click();
-    await expect(field(page, 'metal')).toBeHidden();
+    await offered(page, 'metal', false);
     await block(page, 'Weapon').getByRole('button', { name: 'Axe' }).click();
+    await offered(page, 'metal', true);
+    await openTab(page, 'colours');
     await expect(field(page, 'metal')).toBeVisible();
   });
 
   test('Wizard: Hair and beard colour goes when the hood hides the hair and there is no beard', async ({ page }) => {
     await openRoute(page, '/sprite/wizard');
-    await expect(field(page, 'beardColor')).toBeVisible();
+    await openTab(page, 'parts');
+    await offered(page, 'beardColor', true);
     await block(page, 'Hat').getByRole('button', { name: 'Hood' }).click();
-    await expect(field(page, 'beardColor')).toBeVisible();                  // the beard still shows
+    await offered(page, 'beardColor', true);                                // the beard still shows
     await block(page, 'Beard').getByRole('button', { name: 'None' }).click();
-    await expect(field(page, 'beardColor')).toBeHidden();
+    await offered(page, 'beardColor', false);
     await block(page, 'Hat').getByRole('button', { name: 'Wide' }).click();
-    await expect(field(page, 'beardColor')).toBeVisible();
+    await offered(page, 'beardColor', true);
   });
 });
 
 test.describe('links from before the cape had styles', () => {
   test('cape=false opens with no cape and the address is rewritten', async ({ page }) => {
     await openRoute(page, '/sprite/knight?cape=false&weapon=axe');
+    await openTab(page, 'parts');
     await expect(block(page, 'Cape').getByRole('button', { name: 'None' })).toHaveAttribute('aria-pressed', 'true');
     await expect(block(page, 'Cape').getByRole('slider')).toBeHidden();
     await expect.poll(() => hashNow(page)).toContain('cape=none');
@@ -338,32 +362,50 @@ test.describe('links from before the cape had styles', () => {
 
   test('cape=true opens with the plain cape and leaves no old value in the address', async ({ page }) => {
     await openRoute(page, '/sprite/knight?cape=true');
+    await openTab(page, 'parts');
     await expect(block(page, 'Cape').getByRole('button', { name: 'Plain' })).toHaveAttribute('aria-pressed', 'true');
     await expect.poll(() => hashNow(page)).not.toContain('cape=true');
   });
 });
 
-test.describe('folding a part block', () => {
-  test('the title folds the block shut and opens it again', async ({ page }) => {
+test.describe('the Fine-tune tabs', () => {
+  // (the old page folded a part's block shut to shorten one long column; the panel has tabs instead, each short enough to see whole)
+  test('one tab shows at a time, its controls are reachable, and changing tab changes nothing about the sprite', async ({ page }) => {
     await openRoute(page, '/sprite/knight');
-    const weapon = block(page, 'Weapon');
-    const title = weapon.getByRole('button', { name: 'Weapon', exact: true });
-    await expect(title).toHaveAttribute('aria-expanded', 'true');
-    await title.click();
-    await expect(title).toHaveAttribute('aria-expanded', 'false');
-    await expect(weapon.locator('#c-weaponLength')).toBeHidden();
-    await expect(weapon.getByRole('button', { name: 'Sword' })).toBeHidden();
-    await expect(block(page, 'Cape').getByRole('slider')).toBeVisible();     // other blocks stay open
-    // folding changes nothing about the sprite
+    const tab = (name) => page.getByRole('tab', { name, exact: true });
+    await expect(tab('Shape')).toHaveAttribute('aria-selected', 'true');
+    await expect(page.locator('#c-height')).toBeVisible();
+    await expect(page.locator('#c-weaponLength')).toBeHidden();
     const before = await stripHash(page);
-    await title.click();
-    await expect(slider(weapon, 'Length')).toBeVisible();
-    await expect(weapon.getByRole('button', { name: 'Sword' })).toBeVisible();
+    await tab('Parts').click();
+    await expect(tab('Parts')).toHaveAttribute('aria-selected', 'true');
+    await expect(tab('Shape')).toHaveAttribute('aria-selected', 'false');
+    await expect(page.locator('#c-weaponLength')).toBeVisible();
+    await expect(page.locator('#c-height')).toBeHidden();
+    await expect(block(page, 'Cape').getByRole('slider')).toBeVisible();
     expect(await stripHash(page)).toBe(before);
-    // a folded block stays folded when its part is changed elsewhere (Start over)
-    await title.click();
+    // the tab that is open stays open when the sprite is changed from elsewhere (Start over)
+    await block(page, 'Weapon').getByRole('button', { name: 'None' }).click();
+    await expect(tab('Parts').locator('.dot')).toBeVisible();      // the change dot: something in this tab is changed
+    await expect(block(page, 'Weapon').locator('.ctl.is-main')).toHaveClass(/is-changed/);
     await page.getByRole('button', { name: 'Start over' }).click();
-    await expect(weapon.locator('#c-weaponLength')).toBeHidden();
+    await expect(tab('Parts')).toHaveAttribute('aria-selected', 'true');
+    await expect(tab('Parts').locator('.dot')).toBeHidden();
+    await expect(page.locator('#c-weaponLength')).toBeVisible();
+  });
+
+  test('every changed control has its own Reset, which puts back that control alone', async ({ page }) => {
+    await openRoute(page, '/sprite/knight');
+    await openTab(page, 'parts');
+    const weapon = field(page, 'weapon'), cape = field(page, 'cape');
+    await expect(weapon.getByRole('button', { name: 'Put Weapon back' })).toBeHidden();
+    await weapon.getByRole('button', { name: 'Axe' }).click();
+    await cape.getByRole('button', { name: 'Tattered' }).click();
+    await weapon.getByRole('button', { name: 'Put Weapon back' }).click();
+    await expect(weapon.getByRole('button', { name: 'Sword' })).toHaveAttribute('aria-pressed', 'true');
+    await expect(weapon).not.toHaveClass(/is-changed/);
+    await expect(cape.getByRole('button', { name: 'Tattered' })).toHaveAttribute('aria-pressed', 'true');
+    await expect(cape).toHaveClass(/is-changed/);
   });
 });
 
@@ -372,6 +414,7 @@ test.describe('phone width: the preview stays in view', () => {
   test('scrolling down to the last controls keeps the preview on screen', async ({ page }) => {
     await openRoute(page, '/sprite/knight');
     await page.waitForSelector('.strip .cell canvas');
+    await openTab(page, 'motion');
     // bring the last control to the bottom of the screen (the page continues below it with related assets)
     await page.locator('#c-speed').evaluate((e) => e.scrollIntoView({ block: 'end' }));
     await expect(page.locator('#c-speed')).toBeInViewport();

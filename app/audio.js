@@ -1,5 +1,6 @@
 // Sound side of the site: loads the sound library, renders sounds with the
 // synthesis engine, plays them through Web Audio and draws their waveforms.
+import { isChoice, choicesOf, snap, toValue, toUnit } from './sound-params.js';
 import { renderPatch, defaultParams, createVoice } from '../sound/sfx-engine.js';
 import { encodeWav } from '../sound/wav.js';
 import { createPlayer } from '../sound/player.js';
@@ -60,13 +61,8 @@ export function removeSound(id) {
 
 // ---- parameters ------------------------------------------------------------
 
-/** A parameter that is a set of choices, not a slider: named options, or a few evenly spaced values. */
-export const isChoice = (d) => !!(d.options || d.step);
-export const choicesOf = (d) => (d.options ? d.options.map((name, i) => ({ value: i, label: name }))
-  : Array.from({ length: Math.round((d.max - d.min) / d.step) + 1 }, (_, i) => ({ value: d.min + i * d.step, label: `${d.min + i * d.step}${d.unit ? ' ' + d.unit : ''}` })));
-const snap = (d, v) => (d.options ? Math.round(v) : d.step ? d.min + Math.round((v - d.min) / d.step) * d.step : v);
-export const toValue = (d, u) => { const v = d.scale === 'log' ? d.min * Math.pow(d.max / d.min, u) : d.min + (d.max - d.min) * u; return snap(d, Number(v.toPrecision(4))); };
-export const toUnit = (d, v) => (d.scale === 'log' ? Math.log(v / d.min) / Math.log(d.max / d.min) : (v - d.min) / (d.max - d.min));
+// a control's value on a slider and back: app/sound-params.js (no page there, so the editing panel's model can use it too)
+export { isChoice, choicesOf, toValue, toUnit };
 
 /** Full parameter set: the sound's defaults, then a named style, then hand changes. */
 export function soundParams(patch, preset, overrides) {

@@ -29,7 +29,8 @@ test('the page frame and a loading line are in the HTML itself, before any scrip
   assert.match(app, /<header class="top"/, 'the header is drawn by the HTML');
   assert.match(app, /class="brand"[^>]*>Loadout</);
   assert.match(app, /<main[^>]*>[\s\S]*Loading/, 'a "Loading" line in main, the same words the app shows while it waits');
-  for (const word of ['Sprites', 'Sounds', 'Music', 'Bundles', 'Play', 'Bag']) assert.match(app, new RegExp(`>${word}\\b`), `the header names ${word}`);
+  for (const word of ['Library', 'Kits', 'Play', 'Bag']) assert.match(app, new RegExp(`>${word}\\b`), `the header names ${word}`);
+  assert.match(app, /class="bag-link"[^>]*>Bag <span class="bag-count">/, 'the bag button with its count, as app/ui.js header() draws it');
 });
 
 test('the catalogue is asked for at once, alongside the scripts, at low priority so the frame and style sheets come first', () => {
@@ -40,19 +41,20 @@ test('the frame needs no style sheet to show: its own small style is in the head
   const head = html.slice(0, html.indexOf('</head>'));
   assert.match(head, /<style>[\s\S]*\.top\s*\{[\s\S]*\.home\s*\{[\s\S]*<\/style>/, 'an inline style for the header and the loading line');
   assert.doesNotMatch(head, /rel="stylesheet"/, 'a style sheet in the head would hold up the frame');
-  const frameAt = html.indexOf('<div id="app"'), cssAt = html.indexOf('href="app/style.css"'), fontsAt = html.indexOf('href="vendor/fonts/fonts.css"'), scriptAt = html.indexOf('src="app/app.js"');
+  const frameAt = html.indexOf('<div id="app"'), cssAt = html.indexOf('href="app/css/base.css"'), fontsAt = html.indexOf('href="vendor/fonts/fonts.css"'), scriptAt = html.indexOf('src="app/app.js"');
   assert.ok(frameAt > 0 && frameAt < cssAt && frameAt < fontsAt, 'the frame comes before the style sheets');
   assert.ok(cssAt < scriptAt, 'the script comes after the style sheets, so the site never draws unstyled');
 });
 
 test('the frame letters are the system\'s, so no font is fetched before the style sheet', () => {
   const style = html.slice(html.indexOf('<style>'), html.indexOf('</style>'));
-  assert.doesNotMatch(style, /Figtree|Pixelify/);
+  assert.doesNotMatch(style, /Figtree|Geist|Pixelify/);
 });
 
-test('the inline frame style uses the site\'s own colours (kept in step with app/style.css)', () => {
-  const css = fs.readFileSync(new URL('app/style.css', ROOT), 'utf8');
-  const root = Object.fromEntries([...css.slice(0, css.indexOf('}')).matchAll(/--([a-z-]+):\s*(#[0-9a-f]{6})/gi)].map((m) => [m[1], m[2].toLowerCase()]));
+test('the inline frame style uses the site\'s own colours and header height (kept in step with app/css/base.css)', () => {
+  const css = fs.readFileSync(new URL('app/css/base.css', ROOT), 'utf8');
+  const rootAt = css.indexOf(':root {');
+  const root = Object.fromEntries([...css.slice(rootAt, css.indexOf('}', rootAt)).matchAll(/--([a-z0-9-]+):\s*(#[0-9a-f]{6}|\d+px)/gi)].map((m) => [m[1], m[2].toLowerCase()]));
   const style = html.slice(html.indexOf('<style>'), html.indexOf('</style>')).toLowerCase();
-  for (const name of ['ink', 'paper', 'soft']) assert.ok(style.includes(root[name]), `--${name} ${root[name]} is used in the frame`);
+  for (const name of ['ink', 'paper', 'ink-2', 'line', 'line-2', 'top']) { assert.ok(root[name], `base.css has --${name}`); assert.ok(style.includes(root[name]), `--${name} ${root[name]} is used in the frame`); }
 });

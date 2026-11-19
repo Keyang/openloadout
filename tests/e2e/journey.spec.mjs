@@ -135,18 +135,21 @@ async function journey({ page, browser, context }, ui) {
   };
 
   // a slider
-  const slider = page.locator('.panel input[type=range]:visible').first();
+  // (the editing panel, app/panel.js: the sprite's controls are in tabs, the first one open)
+  const tab = (name) => page.locator('.rx-panel').getByRole('tab', { name, exact: true });
+  const slider = page.locator('.rx-panel .ctl input[type=range]:visible').first();
   const sliderKey = (await slider.getAttribute('id')).replace(/^c-/, '');
-  const sliderLabel = (await page.locator(`.panel label[for="c-${sliderKey}"]`).textContent()).trim();
+  const sliderLabel = (await page.locator(`.rx-panel label[for="c-${sliderKey}"]`).textContent()).trim();
   await setRange(slider, 'other');
   const sliderValue = Number(await slider.inputValue());
   // the word at the end of the slider it was moved to ("Tall"): a row in the bag may say "Taller" rather than "Height"
-  const sliderEnd = await slider.evaluate((input) => { const ends = input.closest('.slider').querySelectorAll('.end'); return (Number(input.value) >= Number(input.max) ? ends[ends.length - 1] : ends[0])?.textContent ?? ''; });
+  const sliderEnd = await slider.evaluate((input) => { const row = input.closest('.slide'); return row.querySelector(Number(input.value) >= Number(input.max) ? '.hi' : '.lo')?.textContent ?? ''; });
   const sliderWord = sliderEnd.trim().split(/\s+/)[0].replace(/y$/, '');
   await previewChanged(`the "${sliderKey}" slider`);
 
   // a colour
-  const swatches = page.locator('.panel .swatches[role=group]:visible').first();
+  await ui.press(tab('Colours'));
+  const swatches = page.locator('.rx-panel .swatches[role=group]:visible').first();
   const colourKey = await swatches.evaluate((n) => n.closest('[data-control]').dataset.control);
   const colourValue = await swatches.locator('button.swatch[aria-pressed="false"]').last().getAttribute('data-v');
   const swatch = swatches.locator(`button.swatch[data-v="${colourValue}"]`);
@@ -159,14 +162,15 @@ async function journey({ page, browser, context }, ui) {
   const actionClip = sprite.tech.clips.find((c) => ACTION_CLIP.test(c.name));
   const clipPill = (label) => page.getByRole('group', { name: 'Animation' }).getByRole('button', { name: label, exact: true });
   let part = null, paused = true;
-  const blocks = page.locator('.panel section.group.part:visible');
+  await ui.press(tab('Parts'));
+  const blocks = page.locator('.rx-panel .part:visible');
   for (let b = 0; b < await blocks.count() && !part; b++) {
-    const block = blocks.nth(b), pills = block.locator('.pills[role=group]').first();
+    const block = blocks.nth(b), pills = block.locator('.chips[role=group]').first();
     if (!(await pills.count())) continue;                                        // an on/off part: no choice to make
-    const title = (await block.locator('h2').textContent()).trim();
-    const options = await pills.locator('button.pill[aria-pressed="false"]').evaluateAll((bs) => bs.map((x) => ({ value: x.dataset.v, label: x.textContent })));
+    const title = (await block.locator('.ctl.is-main .ctl-label').textContent()).trim();
+    const options = await pills.locator('button.chip[aria-pressed="false"]').evaluateAll((bs) => bs.map((x) => ({ value: x.dataset.v, label: x.textContent })));
     for (const o of options) {
-      await ui.press(pills.locator(`button.pill[data-v="${o.value}"]`));
+      await ui.press(pills.locator(`button.chip[data-v="${o.value}"]`));
       if (await block.evaluate((n) => n.classList.contains('off'))) continue;    // that choice takes the part off
       // the preview shows the choice (the still preview too, as long as it has not been started again)
       if (paused) await previewChanged(`the "${title}" choice ${o.label}`);
@@ -183,17 +187,17 @@ async function journey({ page, browser, context }, ui) {
     }
   }
   expect(part, `${sprite.id} has a part with another choice that keeps a sound on "${actionClip.label}"`).toBeTruthy();
-  await expect(page.locator(`.panel section.part[data-part="${part.name}"] button.pill[data-v="${part.value}"]`)).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator(`.rx-panel .part[data-part="${part.name}"] button.chip[data-v="${part.value}"]`)).toHaveAttribute('aria-pressed', 'true');
   const mine = await coloursOf(strip);
   const onlyMine = mine.filter((c) => !usual.has(c));              // colours the sprite has only because of what was changed
   expect(onlyMine.length, 'the changes brought new colours into the sprite').toBeGreaterThan(0);
   const shows = (tile) => expect.poll(async () => { const have = new Set(await coloursOf(tile)); return onlyMine.filter((c) => have.has(c)).length / onlyMine.length; },
     { message: 'the picture in the bag has the colours chosen on the sprite page', timeout: 15_000 }).toBeGreaterThanOrEqual(0.5);
 
-  wordings.push({ where: 'the sprite page', text: (await addButton(page).textContent()).trim() });
-  await ui.press(addButton(page));
+  // nothing to press: the changes saved themselves as they were made (docs/site-design.md, section 3), and the page says so
   await expect(bagCount(page)).toHaveText('1');
-  await expect(page.locator('.add-to-bag')).toContainText('Added to your bag');
+  await expect(page.locator('.rx-panel .saved')).toContainText('Saved in your bag');
+  await expect(page.locator('.rx-panel .add-btn')).toBeHidden();
   await fits('the sprite page after the changes');
 
   // ================================================================= a sound: found, heard, changed, heard again, added
@@ -366,6 +370,7 @@ async function journey({ page, browser, context }, ui) {
   await expect(bagRows(page)).toHaveCount(3);
   await ui.press(bagRows(page).nth(0).getByRole('link', { name: 'Change' }));
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(sprite.name);
+  await ui.press(page.locator('.rx-panel').getByRole('tab', { name: 'Sounds', exact: true }));      // the sprite's sounds, and the switch, are in the panel's Sounds tab
   await expect.soft(page.getByRole('checkbox', { name: 'Sound', exact: true }), 'after Mute in the playground, the "Sound" switch on the sprite page is still on').toBeChecked({ timeout: 5000 });
   await ui.press(page.locator('header a.bag-link'));
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Your bag');

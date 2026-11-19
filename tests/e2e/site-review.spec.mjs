@@ -33,8 +33,11 @@ blockedTest.describe('storage blocked', () => {
 
   test('adding on an asset page says the bag will not be kept, and what to do', async ({ page }) => {
     await openRoute(page, `/sprite/${firstSprite.id}`);
+    // (the editing panel's footer: where "Saved in your bag" would be, the warning stands instead)
+    const note = page.locator('.rx-panel .saved');
+    await expect(note).not.toContainText(/not keeping/i);      // nothing to lose yet
     await page.getByRole('button', { name: 'Add to my bag' }).click();
-    const note = page.locator('.add-to-bag');
+    await expect(note).not.toContainText(/^Saved/);
     await expect(note).toContainText(/not keeping/i);
     await expect(note).toContainText(/download/i);
     await expect(note).toContainText(/link/i);
@@ -67,7 +70,7 @@ blockedTest.describe('storage blocked', () => {
 test('with storage working, no "not kept" words appear anywhere', async ({ page }) => {
   await openRoute(page, `/sprite/${firstSprite.id}`);
   await page.getByRole('button', { name: 'Add to my bag' }).click();
-  await expect(page.locator('.add-to-bag')).toContainText('Added');
+  await expect(page.locator('.rx-panel .saved')).toContainText('Saved in your bag');
   await expect(page.locator('.not-kept')).toHaveCount(0);
   await expect(page.locator('body')).not.toContainText(/not keeping/i);
   await page.evaluate(() => { location.hash = '#/bag'; });
@@ -142,6 +145,7 @@ test('colour choices are named in words; the code is still there for whoever wan
   await openRoute(page, `/sprite/${a.id}`);
   const hexNamed = await page.locator('[aria-label^="#"]').count();
   expect(hexNamed, 'swatches are named by code').toBe(0);
+  await page.getByRole('tab', { name: 'Colours' }).click();
   const field = page.locator('.swatches').first().locator('xpath=..');
   const name = field.locator('.colour-word');
   await expect(name).toHaveText(/^[A-Z][a-z]+( [a-z]+)*$/);

@@ -179,7 +179,9 @@ test('a bag row says in plain words what was changed, at most three things and h
 
 // ---- 3. one wording for the bag button -------------------------------------------------------------------
 
-test('the bag button reads "Add to my bag" everywhere, and "In your bag" with "Update" once it is there', async ({ page }) => {
+// (A sprite's page saves by itself now, docs/site-design.md section 3: its panel offers "Add to my bag" until the sprite is
+// in the bag and says "Saved in your bag" from then on. The sound and music pages still have the button with "Update".)
+test('the bag button reads "Add to my bag" everywhere, and "In your bag" with "Update" (or "Saved in your bag") once it is there', async ({ page }) => {
   // on a card
   await openRoute(page, '/browse?kind=sound');
   const li = await place(page, SOUND.id);
@@ -196,7 +198,22 @@ test('the bag button reads "Add to my bag" everywhere, and "In your bag" with "U
   await expect(bagCount(page)).toHaveText('1');
 
   // on each kind of asset page
-  for (const asset of [SPRITE, SOUND, TRACK]) {
+  {
+    await openRoute(page, `/sprite/${SPRITE.id}`);
+    const add = page.locator('.rx-panel .add-btn'), saved = page.locator('.rx-panel .saved');
+    await expect(add).toHaveText('Add to my bag');
+    await expect(saved).toHaveText(/Changes save by themselves/);
+    const had = Number(await bagCount(page).textContent());
+    await add.click();
+    await expect(bagCount(page)).toHaveText(String(had + 1));
+    await expect(saved).toContainText('Saved in your bag');
+    await expect(add).toBeHidden();
+    // a change from here on changes that one, it does not add another
+    await page.getByRole('button', { name: 'Surprise me' }).click();
+    await expect(saved).toContainText(/Saved in your bag\s*\d+ changes?/);
+    await expect(bagCount(page)).toHaveText(String(had + 1));
+  }
+  for (const asset of [SOUND, TRACK]) {
     await openRoute(page, `/${asset.kind}/${asset.id}`);
     const area = page.locator('.add-to-bag');
     await expect(area.getByRole('button')).toHaveText('Add to my bag');
@@ -347,12 +364,12 @@ test.describe('on a phone (375 px)', () => {
     await menu.click();
     await expect(menu).toHaveAttribute('aria-expanded', 'true');
     await expect(nav).toBeVisible();
-    await expect(nav.getByRole('link')).toHaveText(['Sprites', 'Sounds', 'Music', 'Bundles', 'Play']);
+    await expect(nav.getByRole('link')).toHaveText(['Library', 'Kits', 'Play']);
     for (const a of await nav.getByRole('link').all()) expect((await a.boundingBox()).height).toBeGreaterThanOrEqual(36);      // big enough for a thumb
     expect(await hasHorizontalScroll(page)).toBe(false);
     // choosing a page goes there and the menu is closed again
-    await nav.getByRole('link', { name: 'Sounds' }).click();
-    await expect.poll(() => hash(page)).toBe('#/browse?kind=sound');
+    await nav.getByRole('link', { name: 'Library' }).click();
+    await expect.poll(() => hash(page)).toBe('#/browse');
     await expect(page.getByRole('navigation', { name: 'Main' })).toBeHidden();
     // Escape closes it too
     await page.getByRole('button', { name: 'Menu' }).click();
@@ -373,6 +390,6 @@ test.describe('on a phone (375 px)', () => {
 
 test('on a wide screen the header shows its links and no menu button', async ({ page }) => {
   await openRoute(page, '/');
-  await expect(page.getByRole('navigation', { name: 'Main' }).getByRole('link')).toHaveText(['Sprites', 'Sounds', 'Music', 'Bundles', 'Play']);
+  await expect(page.getByRole('navigation', { name: 'Main' }).getByRole('link')).toHaveText(['Library', 'Kits', 'Play']);
   await expect(page.locator('header .menu-btn')).toBeHidden();
 });

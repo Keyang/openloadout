@@ -116,8 +116,10 @@ test('an agent makes a pickup and its sound, and they go through the bag, a relo
   expect(before.opaque).toBeGreaterThan(0);
   await setRange(page.getByLabel('Size', { exact: true }), 1);
   await expect.poll(async () => (await canvasStats(stage)).hash).not.toBe(before.hash);
+  // (a change on the page is saved to the star's bag item as it is made: put the size back to what the agent added it with)
+  await setRange(page.getByLabel('Size', { exact: true }), 0.9);
   await expect(page.locator('.related')).toContainText('Wish chime');            // "Sounds it uses"
-  await expect(page.getByRole('button', { name: 'Add to my bag' })).toBeVisible();
+  await expect(page.locator('.rx-panel .saved')).toContainText('Saved in your bag');      // it can go in the bag: the change just made saved itself there
   expect((await page.evaluate((id) => window.loadout.go(`/sound/${id}`), CHIME_ID)).ok).toBe(true);
   await expect(page.getByRole('heading', { name: 'Wish chime', level: 1 })).toBeVisible();
   await expect(page.locator('.related')).toContainText('Wish star');             // "Used by"

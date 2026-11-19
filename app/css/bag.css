@@ -1,0 +1,4 @@
+/* Loadout: the bag, #/bag (app/bag-page.js: the list of your things with the editing panel beside it). Match: mocks/5-catalogue/NOTES.md, "The bag and the playground".
+   Owned by the builder of that page. Only that page's own layout goes here; tokens and the shared components (button,
+   chip, tab, segmented control, tile, card, token, change dot, menu, the editing panel) are in base.css and are used
+   as they are. Move what the page still needs out of app/style.css (the old rules) into this file. */

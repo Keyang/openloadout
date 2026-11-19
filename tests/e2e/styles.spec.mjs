@@ -9,7 +9,7 @@
 // Needs a built site. Run with: npx playwright test tests/e2e/styles.spec.mjs
 import fs from 'node:fs';
 import path from 'node:path';
-import { test, expect, openRoute, waitForDrawn, canvasGroupStats, downloadFrom, readZip } from '../helpers/test.mjs';
+import { test, expect, openRoute, waitForDrawn, canvasGroupStats, downloadFrom, readZip, showControl } from '../helpers/test.mjs';
 import { ROOT } from '../helpers/catalog.mjs';
 
 const fixture = (name) => fs.readFileSync(path.join(ROOT, 'tests/fixtures/styles', name), 'utf8')
@@ -24,7 +24,10 @@ async function makeFixtures(page) {
   for (const m of made) expect(m, JSON.stringify(m.errors)).toMatchObject({ ok: true, kept: true, errors: [] });
   return made;
 }
-const pressed = (page) => page.locator('.style-choice .pill[aria-pressed="true"]');
+// the Style choice is in the editing panel's Look tab (app/panel.js)
+const pressed = (page) => page.locator('.style-choice .chip[aria-pressed="true"]');
+const lookTab = (page) => page.getByRole('tab', { name: 'Look', exact: true });
+const inBag = (page) => expect(page.locator('.rx-panel .saved')).toContainText('Saved in your bag');
 const strip = (page) => canvasGroupStats(page.locator('.strip canvas'));
 /** How many different colours the frame strip shows. */
 const stripColours = (page) => page.locator('.strip canvas').evaluateAll((cvs) => {
@@ -85,8 +88,9 @@ test('existing sprites export exactly what the renderer made before the style se
 test('a sprite with one style shows nothing new: no Style choice, no style in its link, its bag item or its files', async ({ page }) => {
   await openRoute(page, '/sprite/coin');
   await expect(page.locator('.style-choice')).toHaveCount(0);
-  await expect(page.getByRole('heading', { name: 'Style', exact: true })).toHaveCount(0);
+  await expect(lookTab(page)).toHaveCount(0);
   await page.getByRole('button', { name: 'Add to my bag' }).click();
+  await inBag(page);
   const item = await page.evaluate(async () => (await window.loadout.bag.items()).items[0]);
   expect(Object.keys(item.settings)).toEqual(['params', 'cues', 'scale']);
   expect(page.url()).not.toContain('artstyle=');
@@ -97,7 +101,7 @@ test('a sprite with one style shows nothing new: no Style choice, no style in it
   expect(got[1].artStyle).toBe('pixel');
   expect(got[2]).toMatchObject({ ok: false });
   expect(got[2].errors[0]).toMatch(/"coin" cannot be drawn in the style "flat".*pixel/);
-  const file = await downloadFrom(page, () => page.getByRole('button', { name: 'Download sprite and sounds' }).click());
+  const file = await downloadFrom(page, () => page.locator('.rx-panel [data-act="download"]').click());
   const files = readZip(file.bytes);
   expect(files.map((f) => f.name)).toEqual(expect.arrayContaining(['coin.png', 'coin.json', 'how-to-use.txt']));
   expect('artStyle' in JSON.parse(text(files.find((f) => f.name === 'coin.json').data))).toBe(false);
@@ -117,18 +121,20 @@ test('the shipped site knows one style, and says so on window.loadout', async ({
   expect(got.coin).toEqual(['pixel']);
 });
 
-test('a sprite with three styles: the Style choice sits above the controls, in plain words, and the pictures follow it', async ({ page }) => {
+test('a sprite with three styles: the Style choice has a tab of its own, in plain words, and the pictures follow it', async ({ page }) => {
   await openRoute(page, '/');
   await makeFixtures(page);
   await page.evaluate(() => window.loadout.go('/sprite/style-blob'));
   await waitForDrawn(page);
   const choice = page.locator('.style-choice');
-  await expect(choice.getByRole('heading', { name: 'Style' })).toBeVisible();
-  await expect(choice.locator('.pill')).toHaveText(['Pixel art', 'Silhouette', 'Outlined shapes']);
+  // its own tab, the last one, with no change dot while the sprite is in its first style
+  await expect(page.locator('.rx-panel [role="tab"]').last()).toHaveText('Look');
+  await expect(lookTab(page).locator('.dot')).toBeHidden();
+  await lookTab(page).click();
+  await expect(choice.getByRole('group', { name: 'Style' })).toBeVisible();
+  await expect(choice.locator('.chip')).toHaveText(['Pixel art', 'Silhouette', 'Outlined shapes']);
   await expect(pressed(page)).toHaveText('Pixel art');
   await expect(choice.locator('.style-about')).toHaveText('Square pixels on a small grid, with a dark outline and three tones of shading.');
-  // above the other controls: it is the first thing in the panel
-  expect(await page.locator('.panel > *').first().getAttribute('class')).toContain('style-choice');
   expect(page.url()).not.toContain('artstyle=');
 
   const pixel = await strip(page);
@@ -151,7 +157,8 @@ test('a sprite with three styles: the Style choice sits above the controls, in p
   await expect.poll(() => page.url()).toContain('artstyle=outline-svg');
 
   // a control still redraws in the chosen style
-  await page.locator('[data-control="ears"]').getByRole('button', { name: 'Long' }).click();
+  await expect(lookTab(page).locator('.dot')).toBeVisible();      // another style than the first is a change
+  await (await showControl(page, 'ears')).getByRole('button', { name: 'Long' }).click();
   expect((await strip(page)).hash).not.toBe(shapes.hash);
 
   // "Start over" goes back to the sprite's first style
@@ -171,7 +178,7 @@ test('the style travels: in the link, in the bag item, through a reload and a sh
   const before = await strip(page);
 
   await page.getByRole('button', { name: 'Add to my bag' }).click();
-  await expect(page.locator('.add-note')).toContainText('Added to your bag');
+  await inBag(page);
   let item = await page.evaluate(async () => (await window.loadout.bag.items()).items[0]);
   expect(item.settings.artStyle).toBe('silhouette');
   expect(item.settings.params.tail).toBe(false);
@@ -185,18 +192,16 @@ test('the style travels: in the link, in the bag item, through a reload and a sh
   item = await page.evaluate(async () => (await window.loadout.bag.items()).items[0]);
   expect(item.settings.artStyle).toBe('silhouette');
 
-  // opened from the bag ("Change") the page takes the item's style, and "Update in bag" keeps the new one
+  // opened from the bag ("Change") the page takes the item's style, and a new choice is saved to that item as it is made
   await page.evaluate((key) => window.loadout.go(`/sprite/style-blob?bag=${key}`), item.key);
   await waitForDrawn(page);
   await expect(pressed(page)).toHaveText('Silhouette');
+  await lookTab(page).click();
   await page.locator('.style-choice').getByRole('button', { name: 'Outlined shapes' }).click();
-  await page.getByRole('button', { name: 'Update' }).click();
-  await expect(page.locator('.add-note')).toContainText('Updated in your bag');
-  item = await page.evaluate(async () => (await window.loadout.bag.items()).items[0]);
-  expect(item.settings.artStyle).toBe('outline-svg');
+  await expect.poll(async () => (await page.evaluate(async () => (await window.loadout.bag.items()).items[0])).settings.artStyle).toBe('outline-svg');
+  expect(await page.evaluate(async () => (await window.loadout.bag.items()).items.length)).toBe(1);
   // back to the first style: the item no longer names one
   await page.locator('.style-choice').getByRole('button', { name: 'Pixel art' }).click();
-  await page.getByRole('button', { name: 'Update' }).click();
   await expect.poll(async () => 'artStyle' in (await page.evaluate(async () => (await window.loadout.bag.items()).items[0])).settings).toBe(false);
 
   // the whole bag as a link, read back into an empty bag
@@ -216,7 +221,7 @@ test('the download follows the style: a marked PNG sheet for the finish-only sty
   await makeFixtures(page);
   await page.evaluate(() => window.loadout.go('/sprite/style-blob'));
   await waitForDrawn(page);
-  const get = async () => readZip((await downloadFrom(page, () => page.getByRole('button', { name: 'Download sprite and sounds' }).click())).bytes);
+  const get = async () => readZip((await downloadFrom(page, () => page.locator('.rx-panel [data-act="download"]').click())).bytes);
   const json = (files) => JSON.parse(text(files.find((f) => f.name === 'style-blob.json').data));
 
   const pixel = await get();
@@ -224,6 +229,7 @@ test('the download follows the style: a marked PNG sheet for the finish-only sty
   expect('artStyle' in json(pixel)).toBe(false);
   await expect(page.locator('.status')).toContainText('the sprite sheet');
 
+  await lookTab(page).click();
   await page.locator('.style-choice').getByRole('button', { name: 'Silhouette' }).click();
   const flat = await get();
   expect(flat.map((f) => f.name)).toEqual(['style-blob.png', 'style-blob.json', 'how-to-use.txt']);
@@ -310,7 +316,7 @@ test('a sprite of single pixels lists two styles: the shape style is never offer
   await makeFixtures(page);
   await page.evaluate(() => window.loadout.go('/sprite/style-sparkle'));
   await waitForDrawn(page);
-  await expect(page.locator('.style-choice .pill')).toHaveText(['Pixel art', 'Silhouette']);
+  await expect(page.locator('.style-choice .chip')).toHaveText(['Pixel art', 'Silhouette']);
   await expect(page.getByRole('button', { name: 'Outlined shapes' })).toHaveCount(0);
   // a link that names it opens in the sprite's first style instead
   await page.evaluate(() => window.loadout.go('/sprite/style-sparkle?artstyle=outline-svg'));
@@ -367,14 +373,14 @@ test('a sprite with a control called "style" and two art styles: both travel in 
   await page.evaluate(() => window.loadout.go('/sprite/style-sparkle?style=cross&artstyle=silhouette'));
   await waitForDrawn(page);
   await expect(pressed(page)).toHaveText('Silhouette');
-  await expect(page.locator('[data-control="style"] .pill[aria-pressed="true"]')).toHaveText('Cross');
+  await expect(page.locator('[data-control="style"] .chip[aria-pressed="true"]')).toHaveText('Cross');
   expect(await stripColours(page)).toBe(1);
   const cross = await strip(page);
-  await page.locator('[data-control="style"]').getByRole('button', { name: 'Spiral' }).click();
+  await (await showControl(page, 'style')).getByRole('button', { name: 'Spiral' }).click();
   expect((await strip(page)).hash).not.toBe(cross.hash);
   await expect.poll(() => page.url()).toContain('style=spiral');
   expect(page.url()).toContain('artstyle=silhouette');
-  await page.getByRole('button', { name: 'Add to my bag' }).click();
+  await inBag(page);      // the change saved itself
   const item = await page.evaluate(async () => (await window.loadout.bag.items()).items[0]);
   expect(item.settings.params.style).toBe('spiral');
   expect(item.settings.artStyle).toBe('silhouette');

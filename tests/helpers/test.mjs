@@ -12,4 +12,5 @@ export const test = base.extend({
 });
 export { expect };
 export * from './browser.mjs';
+export * from './panel.mjs';
 export { readZip } from './zip-read.mjs';

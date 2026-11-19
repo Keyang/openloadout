@@ -266,7 +266,7 @@ export function homePage(app, query) {
 export function browsePage(app, query) {
   document.title = 'Find · Loadout';
   const view = resultsView(query);
-  app.replaceChildren(header(''), el('main', { class: 'home browse' },
+  app.replaceChildren(header('library'), el('main', { class: 'home browse' },
     el('h1', { class: 'small' }, 'Find sprites, sounds and music'),
     view.box, view.node));
   return view.stop;

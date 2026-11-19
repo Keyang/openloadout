@@ -21,6 +21,7 @@ function makeCopy() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'loadout-plans-'));
   fs.cpSync(path.join(REAL, 'bundles'), path.join(dir, 'bundles'), { recursive: true });
   fs.cpSync(path.join(REAL, 'engine'), path.join(dir, 'engine'), { recursive: true });
+  fs.cpSync(path.join(REAL, 'sound'), path.join(dir, 'sound'), { recursive: true });   // engine/versions.js names sounds in everyday words (sound/words.js)
   fs.mkdirSync(path.join(dir, 'sprites'));
   fs.mkdirSync(path.join(dir, 'sounds'));
   // the tool only asks whether an asset's file is there
