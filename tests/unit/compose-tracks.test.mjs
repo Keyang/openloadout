@@ -23,12 +23,19 @@ const PINNED = {
   'hearthvale-battle': 'b95aa7dd53a8ebbe30753cf337c0f492975f6776',
   'derelict-run': '20a37c0f28fa108337315ffe3d5bf846f4b248ea',
   'derelict-boss': '50eef778098eb2d73e6f1a67d18347bf2d437de1',
+  // core music, part 1 (menu themes in six of the twelve bands, docs/music-styles.md)
+  'menu-darkambient': '0d7bb309d27f80541dfb9b27baa6399d26120674',
+  'menu-lofi': '51a0aa6858074bf19cf39afda3b530d4ca344ea5',
+  'menu-musicbox': 'bcdd3b002c931d09a938d4465a5baf50f3856f7f',
+  'menu-organ': '0697edc6162c7d86ed1255f508c0bdb7e25de164',
+  'menu-steelpan': '99978cee655e3b2b29f8341c3f7e00b643a092ff',
+  'menu-twang': 'a0caff30aa8f8a8e1bc2b9b5d942be7a77d4b401',
 };
 
 const generators = fs.readdirSync(path.join(ROOT, 'tools', 'compose')).filter((f) => f.endsWith('.mjs') && /\bexport (?:function|const) build\b/.test(fs.readFileSync(path.join(ROOT, 'tools', 'compose', f), 'utf8'))).sort();
 
-test('the five kit tracks have a generator each', () => {
-  assert.deepEqual(generators, ['derelict_boss.mjs', 'derelict_run.mjs', 'hearthvale_battle.mjs', 'hearthvale_village.mjs', 'thornwood_overworld.mjs']);
+test('every kit track has a generator (the five kit tracks and the six core menu themes)', () => {
+  assert.deepEqual(generators, ['derelict_boss.mjs', 'derelict_run.mjs', 'hearthvale_battle.mjs', 'hearthvale_village.mjs', 'menu_darkambient.mjs', 'menu_lofi.mjs', 'menu_musicbox.mjs', 'menu_organ.mjs', 'menu_steelpan.mjs', 'menu_twang.mjs', 'thornwood_overworld.mjs']);
 });
 
 for (const file of generators) {
