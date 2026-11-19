@@ -1,0 +1,52 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "potion-drink",
+  "name": "Potion drink",
+  "category": "pickup",
+  "description": "A potion swallowed: a few quick wet glugs, then a short bubbly shimmer that rises, or sinks for a dull, murky brew. Change its pitch, speed, brightness and the number of glugs. The same every time.",
+  "meta": {
+    "type": "sfx",
+    "role": "items/consume",
+    "themes": ["neutral", "fantasy"],
+    "gameTypes": ["arcade", "turn-based-rpg", "top-down-rpg", "platformer", "roguelike-action"],
+    "words": ["potion", "drink", "gulp", "glug", "swallow", "elixir", "flask", "heal", "mana", "poison", "consume", "bubbly", "brew"],
+    "license": "draft"
+  },
+  "duration": "glugs/speed + 0.17",
+  "params": [
+    { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 180, "max": 480, "default": 280, "scale": "log" },
+    { "id": "speed", "label": "Speed", "unit": "glugs/s", "min": 10, "max": 16, "default": 12, "scale": "log" },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.7 },
+    { "id": "glugs", "label": "Glugs", "min": 1, "max": 4, "default": 3, "step": 1 }
+  ],
+  "nodes": [
+    { "id": "gClk", "type": "clock", "rate": "speed", "count": "glugs" },
+    { "id": "gVar", "type": "seq", "steps": [1, 0.89, 1.07, 0.94], "trig": "gClk" },
+    { "id": "gSweep", "type": "env", "points": [[0, 1], [0.05, 1.9, "exp"]], "trig": "gClk" },
+    { "id": "gFreq", "type": "expr", "expr": "pitch*gVar*gSweep" },
+    { "id": "gAmp", "type": "ad", "attack": 0.004, "decay": "0.75/speed", "curve": 2, "trig": "gClk" },
+    { "id": "gSin", "type": "osc", "wave": "sine", "freq": "gFreq" },
+    { "id": "gTri", "type": "osc", "wave": "tri", "freq": "gFreq*2" },
+    { "id": "wet", "type": "noise", "seed": 3 },
+    { "id": "gWet", "type": "filter", "mode": "bp", "in": "wet", "freq": "gFreq*3", "q": 5 },
+    { "id": "glug", "type": "expr", "expr": "(gSin + gTri*0.35 + gWet*0.9)*gAmp" },
+    { "id": "shClk", "type": "clock", "rate": 42, "count": 7, "delay": "(glugs - 0.3)/speed" },
+    { "id": "shGlide", "type": "env", "points": [[0, 1], ["(glugs - 0.3)/speed", 1], ["(glugs - 0.3)/speed + 0.17", "semi(mix(-12, 14, bright))", "exp"]] },
+    { "id": "shStep", "type": "seq", "steps": [1, 1.12, 0.95, 1.08, 0.97, 1.1, 1.02], "trig": "shClk" },
+    { "id": "shAmp", "type": "ad", "attack": 0.002, "decay": 0.035, "curve": 2.2, "trig": "shClk" },
+    { "id": "shOsc", "type": "osc", "wave": "sine", "freq": "pitch*3.5*shGlide*shStep" },
+    { "id": "shPop", "type": "env", "points": [[0, 1], [0.025, 1.5, "exp"]], "trig": "shClk" },
+    { "id": "shOsc2", "type": "osc", "wave": "tri", "freq": "pitch*3.5*shGlide*shStep*shPop*2" },
+    { "id": "fizzAmp", "type": "env", "points": [[0, 0], ["(glugs - 0.3)/speed", 0], ["(glugs - 0.3)/speed + 0.03", 1], ["(glugs - 0.3)/speed + 0.19", 0, 1.6]] },
+    { "id": "fizz", "type": "filter", "mode": "bp", "in": "wet", "freq": "pitch*10*shGlide", "q": 2 },
+    { "id": "shimmer", "type": "expr", "expr": "(shOsc + shOsc2*(0.15 + bright*0.4))*shAmp + fizz*fizzAmp*(0.1 + bright*0.5)" },
+    { "id": "dry", "type": "expr", "expr": "glug*0.8 + shimmer*0.55" },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "dry", "freq": 120, "q": 0.7 }
+  ],
+  "out": "clean",
+  "presets": {
+    "Health": { "pitch": 280, "speed": 12, "bright": 0.7, "glugs": 3 },
+    "Magic": { "pitch": 340, "speed": 14, "bright": 1, "glugs": 2 },
+    "Poison": { "pitch": 220, "speed": 10, "bright": 0.08, "glugs": 3 }
+  }
+}

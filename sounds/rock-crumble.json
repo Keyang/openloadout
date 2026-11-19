@@ -1,0 +1,54 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "rock-crumble",
+ "name": "Rock crumble",
+ "category": "impact",
+ "description": "A wall or ledge breaking up: a low crack, then rocks tumbling down and settling. Change its size, length, brightness and how much rubble falls.",
+ "meta": {
+  "type": "sfx",
+  "role": "world/break",
+  "themes": ["neutral", "dungeon", "fantasy"],
+  "gameTypes": ["platformer", "top-down-rpg", "turn-based-rpg", "roguelike-action", "puzzle"],
+  "words": ["rock", "crumble", "rubble", "collapse", "cave-in", "break", "wall", "ledge", "stone", "landslide", "destroy", "debris", "falling"],
+  "license": "draft"
+ },
+ "duration": "length",
+ "params": [
+  { "id": "size", "label": "Size", "min": 0, "max": 1, "default": 0.5 },
+  { "id": "length", "label": "Length", "unit": "s", "min": 0.5, "max": 1.8, "default": 0.9, "scale": "log" },
+  { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+  { "id": "rubble", "label": "Rubble", "min": 0, "max": 1, "default": 0.5 }
+ ],
+ "nodes": [
+  { "id": "w", "type": "noise" },
+  { "id": "br", "type": "noise", "color": "brown" },
+  { "id": "crackAmp", "type": "ad", "attack": 0.0004, "decay": "0.012 + 0.02*size", "curve": 2 },
+  { "id": "crackSrc", "type": "filter", "mode": "lp", "in": "w*crackAmp", "freq": "2500 + 6000*bright" },
+  { "id": "crack", "type": "modal", "in": "crackSrc", "freq": "(330 - 170*size)*rnd(0.9, 1.1)", "ratios": [1, 1.61, 2.37, 3.3, 4.6], "decay": "0.08 + 0.12*size", "tilt": 0.8 },
+  { "id": "slap", "type": "filter", "mode": "bp", "in": "w*crackAmp", "freq": "(1100 + 1500*bright)*rnd(0.85, 1.15)", "q": 0.9 },
+  { "id": "thudPitch", "type": "env", "points": [[0, "(130 - 50*size)*rnd(0.9, 1.1)"], ["0.08 + 0.06*size", "(55 - 15*size)", "exp"]] },
+  { "id": "thud", "type": "osc", "freq": "thudPitch" },
+  { "id": "thudAmp", "type": "ad", "attack": 0.002, "decay": "0.12 + 0.15*size", "curve": 2 },
+  { "id": "fall", "type": "env", "points": [[0, 0], [0.04, 1], ["length*0.35", 0.55], ["length*0.92", 0, 1.6]] },
+  { "id": "stones", "type": "dust", "density": "(25 + 90*rubble)*fall*(1.3 - 0.5*size)", "spread": 1 },
+  { "id": "knock", "type": "modal", "in": "stones", "freq": "(700 - 300*size)*rnd(0.85, 1.15)", "ratios": [1, 1.53, 2.21, 3.07], "gains": [1, 0.8, 0.6, 0.4], "decay": 0.045, "tilt": 0.6 },
+  { "id": "knock2", "type": "modal", "in": "stones", "freq": "(1150 - 400*size)*rnd(0.85, 1.15)", "ratios": [1, 1.71, 2.6], "decay": 0.03, "tilt": 0.6 },
+  { "id": "grit", "type": "dust", "density": "(300 + 1400*rubble)*fall", "spread": 1 },
+  { "id": "gritTone", "type": "filter", "mode": "bp", "in": "grit", "freq": "(2200 + 3500*bright)*rnd(0.9, 1.1)", "q": 1 },
+  { "id": "boulderClk", "type": "clock", "rate": "round(1 + length*2.5*size + rubble*2)/(length*0.6)", "jitter": 0.7, "delay": "0.08 + 0.05*size", "count": "round(1 + length*2.5*size + rubble*2)" },
+  { "id": "boulderP", "type": "rand", "lo": 0.75, "hi": 1.3, "trig": "boulderClk" },
+  { "id": "boulderAmp", "type": "ad", "attack": 0.002, "decay": "0.06 + 0.05*size", "curve": 2, "trig": "boulderClk" },
+  { "id": "boulderSrc", "type": "filter", "mode": "bp", "in": "w*boulderAmp", "freq": "(500 - 150*size)*boulderP", "q": 1.4 },
+  { "id": "boulderLow", "type": "osc", "freq": "(110 - 30*size)*boulderP" },
+  { "id": "rumbleAmp", "type": "env", "points": [[0, 0], [0.02, 1], ["length*0.85", 0, 2]] },
+  { "id": "rumble", "type": "filter", "mode": "lp", "in": "br", "freq": "180 + 220*bright", "q": 0.8 },
+  { "id": "dry", "type": "expr", "expr": "crack*(0.03 + 0.02*bright) + slap*1.4 + thud*thudAmp*(0.2 + 0.2*size) + knock*(0.2 + 0.25*rubble) + knock2*(0.1 + 0.15*bright)*(0.4 + rubble) + gritTone*(0.8 + 1.2*bright)*(0.3 + rubble) + (boulderSrc*2 + boulderLow*boulderAmp*0.12)*(0.4 + size) + rumble*rumbleAmp*(0.15 + 0.3*size)" },
+  { "id": "clean", "type": "filter", "mode": "hp", "in": "dry", "freq": 35 }
+ ],
+ "out": "clean*(1 - smooth(dur - 0.06, dur - 0.003, t))",
+ "presets": {
+  "Cracked wall": { "size": 0.3, "length": 0.65, "bright": 0.6, "rubble": 0.3 },
+  "Falling ledge": { "size": 0.55, "length": 1.0, "bright": 0.5, "rubble": 0.65 },
+  "Cave-in": { "size": 0.95, "length": 1.6, "bright": 0.35, "rubble": 1 }
+ }
+}

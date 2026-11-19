@@ -1,0 +1,462 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "game-over",
+ "name": "Game over",
+ "category": "jingle",
+ "description": "The player lost: a slow, gentle, sad little tune that falls, sighs back up and sinks to rest on a soft low chord. Change its pitch, speed, brightness and room. The same every time.",
+ "meta": {
+  "type": "jingle",
+  "role": "music/gameover",
+  "themes": [
+   "neutral",
+   "fantasy",
+   "sci-fi"
+  ],
+  "gameTypes": [
+   "arcade",
+   "platformer",
+   "roguelike-action",
+   "shooter",
+   "puzzle"
+  ],
+  "words": [
+   "game over",
+   "lose",
+   "lost",
+   "defeat",
+   "death",
+   "fail",
+   "died",
+   "retry",
+   "sad",
+   "gloomy",
+   "jingle",
+   "sting"
+  ],
+  "license": "draft"
+ },
+ "duration": "4/speed + 0.2 + 1.28*0.85 + space*0.6 + 0.05",
+ "params": [
+  {
+   "id": "pitch",
+   "label": "Pitch",
+   "min": 294,
+   "max": 659,
+   "default": 440,
+   "unit": "Hz",
+   "scale": "log"
+  },
+  {
+   "id": "speed",
+   "label": "Speed",
+   "min": 4,
+   "max": 6,
+   "default": 5,
+   "unit": "notes/s"
+  },
+  {
+   "id": "bright",
+   "label": "Brightness",
+   "min": 0,
+   "max": 1,
+   "default": 0.45
+  },
+  {
+   "id": "space",
+   "label": "Room",
+   "min": 0,
+   "max": 0.4,
+   "default": 0.15
+  }
+ ],
+ "nodes": [
+  {
+   "id": "wSoft",
+   "type": "expr",
+   "expr": "1 - smooth(0.1, 0.75, bright)"
+  },
+  {
+   "id": "wGrit",
+   "type": "expr",
+   "expr": "smooth(0.65, 0.95, bright)"
+  },
+  {
+   "id": "wChip",
+   "type": "expr",
+   "expr": "clamp(1 - wSoft - wGrit, 0, 1)"
+  },
+  {
+   "id": "clk",
+   "type": "clock",
+   "rate": "speed",
+   "count": 5
+  },
+  {
+   "id": "hit",
+   "type": "pattern",
+   "trig": "clk",
+   "steps": "XXXXX"
+  },
+  {
+   "id": "note",
+   "type": "seq",
+   "steps": [
+    "pitch*semi(7)",
+    "pitch*semi(3)",
+    "pitch*semi(5)",
+    "pitch*semi(2)",
+    "pitch*semi(0)"
+   ],
+   "trig": "hit"
+  },
+  {
+   "id": "endClk",
+   "type": "clock",
+   "rate": 1,
+   "count": 1,
+   "delay": "4/speed"
+  },
+  {
+   "id": "aShort",
+   "type": "ad",
+   "attack": "0.003 + 0.01*(1 - smooth(0.1, 0.75, bright))",
+   "hold": "0.6/speed",
+   "decay": "(1 - 0.35*smooth(0.65, 0.95, bright))*1.4/speed",
+   "curve": 2,
+   "trig": "hit"
+  },
+  {
+   "id": "aLast",
+   "type": "ad",
+   "attack": "0.003 + 0.01*(1 - smooth(0.1, 0.75, bright))",
+   "hold": 0.2,
+   "decay": "(1 - 0.35*smooth(0.65, 0.95, bright))*1.28",
+   "curve": 2.2,
+   "trig": "endClk"
+  },
+  {
+   "id": "isLast",
+   "type": "expr",
+   "expr": "t >= 4/speed - 0.0005 ? 1 : 0"
+  },
+  {
+   "id": "amp",
+   "type": "expr",
+   "expr": "isLast ? aLast : aShort"
+  },
+  {
+   "id": "mSin",
+   "type": "osc",
+   "freq": "note"
+  },
+  {
+   "id": "mTri",
+   "type": "osc",
+   "wave": "tri",
+   "freq": "note*2"
+  },
+  {
+   "id": "mSq",
+   "type": "osc",
+   "wave": "square",
+   "freq": "note"
+  },
+  {
+   "id": "mPl",
+   "type": "osc",
+   "wave": "pulse",
+   "width": 0.25,
+   "freq": "note*2"
+  },
+  {
+   "id": "mBell",
+   "type": "modal",
+   "in": "hit",
+   "freq": "note*2",
+   "ratios": [
+    1,
+    2.76,
+    5.4
+   ],
+   "gains": [
+    1,
+    0.4,
+    0.15
+   ],
+   "decay": "0.5",
+   "tilt": 0.7
+  },
+  {
+   "id": "mFold",
+   "type": "shaper",
+   "in": "mSq*0.6 + mPl*0.3",
+   "drive": 3.5,
+   "mode": "fold"
+  },
+  {
+   "id": "mMix",
+   "type": "expr",
+   "expr": "(mSin*0.75 + mTri*0.12)*wSoft + (mSq*0.32 + mPl*0.12)*wChip + mFold*0.3*wGrit"
+  },
+  {
+   "id": "mBellMix",
+   "type": "expr",
+   "expr": "mBell*0.35*wSoft"
+  },
+  {
+   "id": "c0",
+   "type": "expr",
+   "expr": "pitch*semi(-12)"
+  },
+  {
+   "id": "c0Sin",
+   "type": "osc",
+   "freq": "c0"
+  },
+  {
+   "id": "c0Tri",
+   "type": "osc",
+   "wave": "tri",
+   "freq": "c0*2"
+  },
+  {
+   "id": "c0Sq",
+   "type": "osc",
+   "wave": "square",
+   "freq": "c0"
+  },
+  {
+   "id": "c0Pl",
+   "type": "osc",
+   "wave": "pulse",
+   "width": 0.25,
+   "freq": "c0*2"
+  },
+  {
+   "id": "c0Bell",
+   "type": "modal",
+   "in": "endClk",
+   "freq": "c0*2",
+   "ratios": [
+    1,
+    2.76,
+    5.4
+   ],
+   "gains": [
+    1,
+    0.4,
+    0.15
+   ],
+   "decay": "1.28*0.8",
+   "tilt": 0.7
+  },
+  {
+   "id": "c0Fold",
+   "type": "shaper",
+   "in": "c0Sq*0.6 + c0Pl*0.3",
+   "drive": 3.5,
+   "mode": "fold"
+  },
+  {
+   "id": "c0Mix",
+   "type": "expr",
+   "expr": "(c0Sin*0.75 + c0Tri*0.12)*wSoft + (c0Sq*0.32 + c0Pl*0.12)*wChip + c0Fold*0.3*wGrit"
+  },
+  {
+   "id": "c0BellMix",
+   "type": "expr",
+   "expr": "c0Bell*0.3*wSoft"
+  },
+  {
+   "id": "c1",
+   "type": "expr",
+   "expr": "pitch*semi(-9)"
+  },
+  {
+   "id": "c1Sin",
+   "type": "osc",
+   "freq": "c1"
+  },
+  {
+   "id": "c1Tri",
+   "type": "osc",
+   "wave": "tri",
+   "freq": "c1*2"
+  },
+  {
+   "id": "c1Sq",
+   "type": "osc",
+   "wave": "square",
+   "freq": "c1"
+  },
+  {
+   "id": "c1Pl",
+   "type": "osc",
+   "wave": "pulse",
+   "width": 0.25,
+   "freq": "c1*2"
+  },
+  {
+   "id": "c1Bell",
+   "type": "modal",
+   "in": "endClk",
+   "freq": "c1*2",
+   "ratios": [
+    1,
+    2.76,
+    5.4
+   ],
+   "gains": [
+    1,
+    0.4,
+    0.15
+   ],
+   "decay": "1.28*0.8",
+   "tilt": 0.7
+  },
+  {
+   "id": "c1Fold",
+   "type": "shaper",
+   "in": "c1Sq*0.6 + c1Pl*0.3",
+   "drive": 3.5,
+   "mode": "fold"
+  },
+  {
+   "id": "c1Mix",
+   "type": "expr",
+   "expr": "(c1Sin*0.75 + c1Tri*0.12)*wSoft + (c1Sq*0.32 + c1Pl*0.12)*wChip + c1Fold*0.3*wGrit"
+  },
+  {
+   "id": "c1BellMix",
+   "type": "expr",
+   "expr": "c1Bell*0.3*wSoft"
+  },
+  {
+   "id": "c2",
+   "type": "expr",
+   "expr": "pitch*semi(-5)"
+  },
+  {
+   "id": "c2Sin",
+   "type": "osc",
+   "freq": "c2"
+  },
+  {
+   "id": "c2Tri",
+   "type": "osc",
+   "wave": "tri",
+   "freq": "c2*2"
+  },
+  {
+   "id": "c2Sq",
+   "type": "osc",
+   "wave": "square",
+   "freq": "c2"
+  },
+  {
+   "id": "c2Pl",
+   "type": "osc",
+   "wave": "pulse",
+   "width": 0.25,
+   "freq": "c2*2"
+  },
+  {
+   "id": "c2Bell",
+   "type": "modal",
+   "in": "endClk",
+   "freq": "c2*2",
+   "ratios": [
+    1,
+    2.76,
+    5.4
+   ],
+   "gains": [
+    1,
+    0.4,
+    0.15
+   ],
+   "decay": "1.28*0.8",
+   "tilt": 0.7
+  },
+  {
+   "id": "c2Fold",
+   "type": "shaper",
+   "in": "c2Sq*0.6 + c2Pl*0.3",
+   "drive": 3.5,
+   "mode": "fold"
+  },
+  {
+   "id": "c2Mix",
+   "type": "expr",
+   "expr": "(c2Sin*0.75 + c2Tri*0.12)*wSoft + (c2Sq*0.32 + c2Pl*0.12)*wChip + c2Fold*0.3*wGrit"
+  },
+  {
+   "id": "c2BellMix",
+   "type": "expr",
+   "expr": "c2Bell*0.3*wSoft"
+  },
+  {
+   "id": "lead",
+   "type": "expr",
+   "expr": "(mMix*amp + mBellMix)*1"
+  },
+  {
+   "id": "chord",
+   "type": "expr",
+   "expr": "((c0Mix + c0BellMix)*0.3 + (c1Mix + c1BellMix)*0.24 + (c2Mix + c2BellMix)*0.22)*aLast"
+  },
+  {
+   "id": "tone",
+   "type": "filter",
+   "mode": "lp",
+   "in": "lead + chord",
+   "freq": "1400 + bright*9000",
+   "q": 0.6
+  },
+  {
+   "id": "crushed",
+   "type": "crush",
+   "in": "tone",
+   "bits": 6,
+   "rate": 12000
+  },
+  {
+   "id": "gritMix",
+   "type": "expr",
+   "expr": "tone*(1 - wGrit*0.7) + crushed*wGrit*0.7"
+  },
+  {
+   "id": "hpf",
+   "type": "filter",
+   "mode": "hp",
+   "in": "gritMix",
+   "freq": 60
+  },
+  {
+   "id": "room",
+   "type": "reverb",
+   "in": "hpf",
+   "size": 0.65,
+   "damp": 0.45,
+   "mix": "space"
+  }
+ ],
+ "out": "room*(1 - smooth(dur - 0.3, dur - 0.005, t))",
+ "presets": {
+  "Chiptune": {
+   "bright": 0.68,
+   "space": 0,
+   "speed": 5.5
+  },
+  "Storybook": {
+   "bright": 0.05,
+   "space": 0.25,
+   "speed": 4.4
+  },
+  "Gritty": {
+   "bright": 0.97,
+   "space": 0,
+   "speed": 5.5
+  }
+ }
+}

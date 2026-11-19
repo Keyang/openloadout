@@ -1,0 +1,200 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "cloth-flap",
+  "name": "Cloth flap",
+  "category": "movement",
+  "description": "A cape, flag or cloth wing snapping in a turn or a jump: one sharp snap, then a soft papery flutter. Change its size, length, brightness and how many flaps.",
+  "meta": {
+    "type": "sfx",
+    "role": "actions/dash",
+    "themes": [
+      "neutral",
+      "fantasy"
+    ],
+    "gameTypes": [
+      "platformer",
+      "top-down-rpg",
+      "turn-based-rpg",
+      "roguelike-action"
+    ],
+    "words": [
+      "cloth",
+      "cape",
+      "cloak",
+      "flag",
+      "flap",
+      "flutter",
+      "snap",
+      "wings",
+      "fabric",
+      "twirl",
+      "turn",
+      "jump",
+      "glide"
+    ],
+    "license": "draft"
+  },
+  "duration": "clamp(length * (0.85 + size * 0.3), 0.15, 0.6) + 0.005",
+  "params": [
+    {
+      "id": "size",
+      "label": "Size",
+      "min": 0,
+      "max": 1,
+      "default": 0.5
+    },
+    {
+      "id": "length",
+      "label": "Length",
+      "unit": "s",
+      "min": 0.15,
+      "max": 0.6,
+      "default": 0.3,
+      "scale": "log"
+    },
+    {
+      "id": "bright",
+      "label": "Brightness",
+      "min": 0,
+      "max": 1,
+      "default": 0.5
+    },
+    {
+      "id": "flutter",
+      "label": "Flutter",
+      "min": 1,
+      "max": 6,
+      "default": 3,
+      "step": 1
+    }
+  ],
+  "nodes": [
+    {
+      "id": "n",
+      "type": "noise"
+    },
+    {
+      "id": "np",
+      "type": "noise",
+      "color": "pink"
+    },
+    {
+      "id": "snapEnv",
+      "type": "ad",
+      "attack": 0.0008,
+      "decay": "0.025 + size * 0.02",
+      "curve": 3
+    },
+    {
+      "id": "snapBand",
+      "type": "filter",
+      "mode": "bp",
+      "in": "n",
+      "freq": "(2200 - size * 900) * (0.8 + bright * 0.5) * rnd(0.9, 1.1)",
+      "q": 1.1
+    },
+    {
+      "id": "whump",
+      "type": "filter",
+      "mode": "lp",
+      "in": "np",
+      "freq": "380 - size * 160"
+    },
+    {
+      "id": "whumpEnv",
+      "type": "ad",
+      "attack": 0.004,
+      "decay": "0.05 + size * 0.05",
+      "curve": 2
+    },
+    {
+      "id": "flaps",
+      "type": "clock",
+      "rate": "flutter / (clamp(length * (0.85 + size * 0.3), 0.15, 0.6) - (0.035 + size * 0.015))",
+      "jitter": 0.15,
+      "count": "flutter",
+      "delay": "0.035 + size * 0.015"
+    },
+    {
+      "id": "flapEnv",
+      "type": "ad",
+      "attack": 0.006,
+      "decay": "(clamp(length * (0.85 + size * 0.3), 0.15, 0.6) - (0.035 + size * 0.015)) / flutter * 1.3",
+      "curve": 2,
+      "trig": "flaps"
+    },
+    {
+      "id": "fade",
+      "type": "env",
+      "points": [
+        [
+          0,
+          1
+        ],
+        [
+          "clamp(length * (0.85 + size * 0.3), 0.15, 0.6)",
+          0.2,
+          1.3
+        ]
+      ]
+    },
+    {
+      "id": "flapGain",
+      "type": "sah",
+      "in": "np",
+      "trig": "flaps"
+    },
+    {
+      "id": "rustle",
+      "type": "dust",
+      "density": "900 + bright * 1500",
+      "spread": 1
+    },
+    {
+      "id": "paper",
+      "type": "filter",
+      "mode": "bp",
+      "in": "np * 0.6 + rustle * 0.8",
+      "freq": "(1300 - size * 600) * (0.7 + bright * 0.8)",
+      "q": 0.9
+    },
+    {
+      "id": "flutterMix",
+      "type": "expr",
+      "expr": "paper * flapEnv * fade * (0.45 + abs(flapGain) * 0.4)"
+    },
+    {
+      "id": "sum",
+      "type": "expr",
+      "expr": "snapBand * snapEnv * 1.6 + whump * whumpEnv * (0.4 + size * 0.5) + flutterMix * 2.4"
+    },
+    {
+      "id": "clean",
+      "type": "filter",
+      "mode": "hp",
+      "in": "sum",
+      "freq": 60
+    }
+  ],
+  "out": "clean",
+  "presets": {
+    "Cape twirl": {
+      "size": 0.55,
+      "length": 0.35,
+      "bright": 0.45,
+      "flutter": 3
+    },
+    "Flag snap": {
+      "size": 0.65,
+      "length": 0.25,
+      "bright": 0.7,
+      "flutter": 2
+    },
+    "Bird wings": {
+      "size": 0.25,
+      "length": 0.45,
+      "bright": 0.4,
+      "flutter": 5
+    }
+  }
+}

@@ -1,0 +1,253 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "footstep-ice",
+  "name": "Footstep on ice",
+  "category": "movement",
+  "description": "A step on ice: a hard, glassy tap with a faint high ring and a short skid after it. Every take is a different step; change its weight, length, brightness and how much it slides.",
+  "meta": {
+    "type": "sfx",
+    "role": "characters/footstep",
+    "themes": [
+      "neutral",
+      "dungeon",
+      "forest"
+    ],
+    "gameTypes": [
+      "platformer",
+      "top-down-rpg",
+      "turn-based-rpg",
+      "roguelike-action",
+      "puzzle"
+    ],
+    "words": [
+      "footstep",
+      "footsteps",
+      "step",
+      "walk",
+      "run",
+      "ice",
+      "frozen",
+      "lake",
+      "slip",
+      "skid",
+      "slide",
+      "winter",
+      "glassy",
+      "cold"
+    ],
+    "license": "draft"
+  },
+  "duration": "min(0.28, length*(0.8 + 0.2*weight) + 0.015)",
+  "params": [
+    {
+      "id": "weight",
+      "label": "Weight",
+      "min": 0.5,
+      "max": 2,
+      "default": 1
+    },
+    {
+      "id": "length",
+      "label": "Length",
+      "unit": "s",
+      "min": 0.08,
+      "max": 0.22,
+      "default": 0.14,
+      "scale": "log"
+    },
+    {
+      "id": "bright",
+      "label": "Brightness",
+      "min": 0,
+      "max": 1,
+      "default": 0.5
+    },
+    {
+      "id": "slide",
+      "label": "Slide",
+      "min": 0,
+      "max": 1,
+      "default": 0.4,
+      "hint": "A short skid after the step"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "wn",
+      "type": "noise"
+    },
+    {
+      "id": "tapAmp",
+      "type": "ad",
+      "attack": 0.0003,
+      "decay": 0.003,
+      "curve": 2
+    },
+    {
+      "id": "tick",
+      "type": "filter",
+      "mode": "hp",
+      "in": "wn*tapAmp",
+      "freq": "2200 + bright*2800",
+      "q": 0.7
+    },
+    {
+      "id": "ring",
+      "type": "modal",
+      "in": "wn*tapAmp",
+      "freq": "(2600 + bright*1400)/pow(weight, 0.3)*rnd(0.93, 1.07)",
+      "ratios": [
+        1,
+        2.61,
+        4.9,
+        7.3
+      ],
+      "decay": "length*(0.8 + 0.2*weight)*0.9",
+      "tilt": 0.55
+    },
+    {
+      "id": "sheet",
+      "type": "modal",
+      "in": "wn*tapAmp",
+      "freq": "(520 + bright*200)/pow(weight, 0.5)*rnd(0.94, 1.06)",
+      "ratios": [
+        1,
+        2.31,
+        3.9
+      ],
+      "decay": "0.035 + 0.02*weight",
+      "tilt": 0.4
+    },
+    {
+      "id": "thumpPitch",
+      "type": "env",
+      "points": [
+        [
+          0,
+          "rnd(115, 135)/pow(weight, 0.6)"
+        ],
+        [
+          0.04,
+          "60/pow(weight, 0.6)",
+          "exp"
+        ]
+      ]
+    },
+    {
+      "id": "thump",
+      "type": "osc",
+      "freq": "thumpPitch"
+    },
+    {
+      "id": "thumpAmp",
+      "type": "ad",
+      "attack": 0.0015,
+      "decay": "0.03 + 0.025*weight",
+      "curve": 2
+    },
+    {
+      "id": "skidAmp",
+      "type": "env",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          "0.012 + rnd(0, 0.008)",
+          0
+        ],
+        [
+          "0.025 + rnd(0, 0.008)",
+          1
+        ],
+        [
+          "0.03 + length*(0.8 + 0.2*weight)*0.35*(0.4 + 0.6*slide)",
+          0.6
+        ],
+        [
+          "length*(0.8 + 0.2*weight)*(0.55 + 0.4*slide)",
+          0,
+          "exp"
+        ]
+      ]
+    },
+    {
+      "id": "skidPitch",
+      "type": "env",
+      "points": [
+        [
+          0,
+          "(2600 + bright*2200)*rnd(0.9, 1.1)"
+        ],
+        [
+          "length*(0.8 + 0.2*weight)",
+          "(1500 + bright*1200)",
+          "exp"
+        ]
+      ]
+    },
+    {
+      "id": "skidTone",
+      "type": "filter",
+      "mode": "bp",
+      "in": "wn*skidAmp",
+      "freq": "skidPitch",
+      "q": 2.2
+    },
+    {
+      "id": "grains",
+      "type": "dust",
+      "density": 900,
+      "spread": 1
+    },
+    {
+      "id": "scrape",
+      "type": "filter",
+      "mode": "bp",
+      "in": "grains*skidAmp",
+      "freq": "skidPitch*1.4",
+      "q": 1.5
+    },
+    {
+      "id": "sumBus",
+      "type": "expr",
+      "expr": "tick*(0.8 + 1.2*bright) + ring*0.15 + sheet*0.3 + thump*thumpAmp*0.22 + (skidTone*0.75 + scrape*1.8)*slide"
+    },
+    {
+      "id": "sat",
+      "type": "shaper",
+      "in": "sumBus*1.6",
+      "drive": 1.2,
+      "mode": "tanh"
+    },
+    {
+      "id": "clean",
+      "type": "filter",
+      "mode": "hp",
+      "in": "sat",
+      "freq": 35
+    }
+  ],
+  "out": "clean",
+  "presets": {
+    "Soft shoes": {
+      "weight": 0.8,
+      "length": 0.13,
+      "bright": 0.45,
+      "slide": 0.4
+    },
+    "Heavy boots": {
+      "weight": 1.8,
+      "length": 0.18,
+      "bright": 0.4,
+      "slide": 0.6
+    },
+    "Bare feet": {
+      "weight": 0.7,
+      "length": 0.1,
+      "bright": 0.3,
+      "slide": 0.1
+    }
+  }
+}

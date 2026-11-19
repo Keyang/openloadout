@@ -1,0 +1,175 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "timer-tick",
+ "name": "Timer tick",
+ "category": "ui",
+ "description": "One dry tick of a countdown clock, made to play once a second. Change its pitch, length, brightness and how far it moves from a thin tick to a wooden tock.",
+ "meta": {
+  "type": "sfx",
+  "role": "interface/click",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "arcade",
+   "puzzle",
+   "racing",
+   "shooter",
+   "card-game"
+  ],
+  "words": [
+   "tick",
+   "tock",
+   "clock",
+   "timer",
+   "countdown",
+   "stopwatch",
+   "bomb",
+   "second",
+   "hurry",
+   "time",
+   "click"
+  ],
+  "license": "draft"
+ },
+ "duration": "length + 0.004",
+ "params": [
+  {
+   "id": "pitch",
+   "label": "Pitch",
+   "unit": "Hz",
+   "min": 1200,
+   "max": 5000,
+   "default": 2600,
+   "scale": "log"
+  },
+  {
+   "id": "length",
+   "label": "Length",
+   "unit": "s",
+   "min": 0.03,
+   "max": 0.12,
+   "default": 0.05,
+   "scale": "log"
+  },
+  {
+   "id": "bright",
+   "label": "Brightness",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  },
+  {
+   "id": "tock",
+   "label": "Tock",
+   "min": 0,
+   "max": 1,
+   "default": 0.3
+  }
+ ],
+ "nodes": [
+  {
+   "id": "hiss",
+   "type": "noise",
+   "seed": 11
+  },
+  {
+   "id": "hit",
+   "type": "ad",
+   "attack": 0.0002,
+   "decay": 0.0025,
+   "curve": 2
+  },
+  {
+   "id": "strike",
+   "type": "filter",
+   "mode": "hp",
+   "in": "hiss * hit",
+   "freq": "400 + bright * 2500"
+  },
+  {
+   "id": "metal",
+   "type": "modal",
+   "in": "strike",
+   "freq": "pitch",
+   "ratios": [
+    1,
+    1.73,
+    2.91
+   ],
+   "gains": [
+    1,
+    0.6,
+    0.35
+   ],
+   "decay": "length * 0.75",
+   "tilt": "1.4 - bright * 0.8"
+  },
+  {
+   "id": "wood",
+   "type": "modal",
+   "in": "strike",
+   "freq": "pitch * 0.32",
+   "ratios": [
+    1,
+    2.45,
+    4.1
+   ],
+   "gains": [
+    1,
+    0.45,
+    0.2
+   ],
+   "decay": "length * 0.8",
+   "tilt": 1.2
+  },
+  {
+   "id": "snap",
+   "type": "filter",
+   "mode": "hp",
+   "in": "hiss * hit",
+   "freq": 5000
+  },
+  {
+   "id": "sum",
+   "type": "expr",
+   "expr": "metal * (1 - tock) * 0.08 + wood * tock * 0.1 + snap * (0.15 + bright * 0.5)"
+  },
+  {
+   "id": "dull",
+   "type": "filter",
+   "mode": "lp",
+   "in": "sum",
+   "freq": "1500 + bright * bright * 14000",
+   "q": 0.6
+  },
+  {
+   "id": "clean",
+   "type": "filter",
+   "mode": "hp",
+   "in": "dull",
+   "freq": 80
+  }
+ ],
+ "out": "clean",
+ "presets": {
+  "Clock": {
+   "pitch": 2200,
+   "length": 0.06,
+   "bright": 0.4,
+   "tock": 0.6
+  },
+  "Bomb timer": {
+   "pitch": 3200,
+   "length": 0.045,
+   "bright": 0.75,
+   "tock": 0.05
+  },
+  "Stopwatch": {
+   "pitch": 4200,
+   "length": 0.032,
+   "bright": 0.6,
+   "tock": 0
+  }
+ }
+}

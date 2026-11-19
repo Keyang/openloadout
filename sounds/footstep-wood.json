@@ -1,0 +1,51 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "footstep-wood",
+ "name": "Footstep on wood",
+ "category": "movement",
+ "description": "A hollow knock of a step on floorboards with a short low boom of the board under it, and now and then a faint creak. Every take is a different step; change its weight, length, brightness and how often a board creaks.",
+ "meta": {
+  "type": "sfx",
+  "role": "characters/footstep",
+  "themes": ["neutral", "fantasy", "farm"],
+  "gameTypes": ["top-down-rpg", "turn-based-rpg", "platformer", "farming-sim"],
+  "words": ["footstep", "footsteps", "step", "walk", "run", "wood", "wooden", "floorboard", "floor", "plank", "deck", "tavern", "creak", "hollow"],
+  "license": "draft"
+ },
+ "duration": "length*(0.75 + 0.25*weight) + 0.03",
+ "params": [
+  { "id": "weight", "label": "Weight", "min": 0.5, "max": 2, "default": 1 },
+  { "id": "length", "label": "Length", "unit": "s", "min": 0.08, "max": 0.2, "default": 0.14, "scale": "log" },
+  { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+  { "id": "creak", "label": "Creak", "min": 0, "max": 1, "default": 0.35 }
+ ],
+ "nodes": [
+  { "id": "cn", "type": "noise" },
+  { "id": "cAmp", "type": "ad", "attack": 0.0003, "decay": "0.002 + 0.003*bright", "curve": 2 },
+  { "id": "click", "type": "filter", "mode": "bp", "in": "cn*cAmp", "freq": "1800 + bright*2500", "q": 0.8 },
+  { "id": "plank", "type": "modal", "in": "cn*cAmp", "freq": "rnd(0.92, 1.08)*420/pow(weight, 0.6)", "ratios": [1, 2.31, 3.72, 5.1], "gains": [1, 0.6, 0.4, 0.25], "decay": "0.035 + 0.02*weight", "tilt": 0.7 },
+  { "id": "hollow", "type": "modal", "in": "cn*cAmp", "freq": "rnd(0.93, 1.07)*175/pow(weight, 0.5)", "ratios": [1, 1.52], "gains": [1, 0.5], "decay": "length*(0.75 + 0.25*weight)*0.9", "tilt": 0.4 },
+  { "id": "pn", "type": "noise", "color": "pink" },
+  { "id": "body", "type": "filter", "mode": "bp", "in": "pn", "freq": "rnd(0.9, 1.1)*(500 + bright*700)/pow(weight, 0.4)", "q": 1.6 },
+  { "id": "bodyAmp", "type": "ad", "attack": 0.0006, "decay": "0.02 + 0.02*weight", "curve": 2.5 },
+  { "id": "heelPitch", "type": "env", "points": [[0, "110/weight"], [0.05, "58/weight", "exp"]] },
+  { "id": "heel", "type": "osc", "freq": "heelPitch" },
+  { "id": "heelAmp", "type": "ad", "attack": 0.001, "decay": "0.03*weight", "curve": 2 },
+  { "id": "r", "type": "rand", "lo": 0, "hi": 1 },
+  { "id": "c2", "type": "clock", "rate": 1, "count": 1, "delay": "length*(0.75 + 0.25*weight)*rnd(0.3, 0.42)" },
+  { "id": "crAmp", "type": "env", "trig": "c2", "points": [[0, 0], [0.012, 1], ["length*(0.75 + 0.25*weight)*0.32", 0.6], ["length*(0.75 + 0.25*weight)*0.5", 0, 1.5]] },
+  { "id": "crRate", "type": "env", "trig": "c2", "points": [[0, "rnd(80, 120)"], ["length*(0.75 + 0.25*weight)*0.5", "rnd(55, 75)", "exp"]] },
+  { "id": "stick", "type": "osc", "wave": "saw", "freq": "crRate" },
+  { "id": "creakTone", "type": "filter", "mode": "bp", "in": "stick", "freq": "rnd(0.85, 1.15)*(900 + bright*600)", "q": 5 },
+  { "id": "sum", "type": "expr", "expr": "click*(0.8 + bright*1.2) + plank*0.28 + hollow*0.075*pow(weight, 0.3) + body*bodyAmp*1.8 + heel*heelAmp*0.3 + creakTone*crAmp*step(r, creak)*(0.15 + 0.25*creak)" },
+  { "id": "fade", "type": "env", "points": [[0, 1], ["length*(0.75 + 0.25*weight)*0.75", 1], ["length*(0.75 + 0.25*weight) + 0.028", 0, 1.5]] },
+  { "id": "sat", "type": "shaper", "in": "sum*fade", "drive": 1.2 },
+  { "id": "clean", "type": "filter", "mode": "hp", "in": "sat", "freq": 35 }
+ ],
+ "out": "clean",
+ "presets": {
+  "Soft shoes": { "weight": 0.8, "length": 0.11, "bright": 0.35, "creak": 0.25 },
+  "Heavy boots": { "weight": 1.8, "length": 0.18, "bright": 0.5, "creak": 0.6 },
+  "Bare feet": { "weight": 0.7, "length": 0.09, "bright": 0.15, "creak": 0.1 }
+ }
+}

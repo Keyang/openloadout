@@ -1,0 +1,216 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "low-health",
+ "name": "Low health",
+ "category": "ui",
+ "description": "A calm low-health warning: a soft double heartbeat with a faint high tone over it, made to be played again and again. Change the pitch, speed, brightness and how loud the tone is.",
+ "meta": {
+  "type": "sfx",
+  "role": "interface/error",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "arcade",
+   "shooter",
+   "roguelike-action",
+   "platformer",
+   "top-down-rpg"
+  ],
+  "words": [
+   "low health",
+   "heartbeat",
+   "heart",
+   "pulse",
+   "danger",
+   "dying",
+   "warning",
+   "hurt",
+   "critical",
+   "health",
+   "thump",
+   "near death"
+  ],
+  "license": "draft"
+ },
+ "duration": "1 / speed",
+ "params": [
+  {
+   "id": "pitch",
+   "label": "Pitch",
+   "unit": "Hz",
+   "min": 55,
+   "max": 130,
+   "default": 80,
+   "scale": "log"
+  },
+  {
+   "id": "speed",
+   "label": "Speed",
+   "unit": "beats per second",
+   "min": 1,
+   "max": 2.5,
+   "default": 1.67,
+   "scale": "log"
+  },
+  {
+   "id": "bright",
+   "label": "Brightness",
+   "min": 0,
+   "max": 1,
+   "default": 0.45
+  },
+  {
+   "id": "tone",
+   "label": "Tone",
+   "min": 0,
+   "max": 1,
+   "default": 0.35
+  }
+ ],
+ "nodes": [
+  {
+   "id": "clk",
+   "type": "clock",
+   "rate": "speed / 0.3",
+   "count": 2
+  },
+  {
+   "id": "which",
+   "type": "seq",
+   "steps": [
+    1,
+    0.7
+   ],
+   "trig": "clk"
+  },
+  {
+   "id": "sweep",
+   "type": "env",
+   "points": [
+    [
+     0,
+     "pitch * 2.2"
+    ],
+    [
+     0.035,
+     "pitch",
+     "exp"
+    ]
+   ],
+   "trig": "clk"
+  },
+  {
+   "id": "thumpOsc",
+   "type": "osc",
+   "wave": "sine",
+   "freq": "sweep"
+  },
+  {
+   "id": "thumpAmp",
+   "type": "ad",
+   "attack": 0.004,
+   "decay": "0.16 / speed",
+   "curve": 2.5,
+   "trig": "clk"
+  },
+  {
+   "id": "thick",
+   "type": "shaper",
+   "in": "thumpOsc * thumpAmp",
+   "drive": "4 + bright * 4",
+   "mode": "tanh"
+  },
+  {
+   "id": "midBody",
+   "type": "filter",
+   "mode": "hp",
+   "in": "thick",
+   "freq": 280,
+   "q": 0.7
+  },
+  {
+   "id": "knockAmp",
+   "type": "ad",
+   "attack": 0.002,
+   "decay": 0.025,
+   "curve": 2,
+   "trig": "clk"
+  },
+  {
+   "id": "knockSrc",
+   "type": "osc",
+   "wave": "tri",
+   "freq": "pitch * 7"
+  },
+  {
+   "id": "knock",
+   "type": "filter",
+   "mode": "bp",
+   "in": "knockSrc * knockAmp",
+   "freq": "pitch * (6 + bright * 6)",
+   "q": 1.0
+  },
+  {
+   "id": "beat",
+   "type": "filter",
+   "mode": "lp",
+   "in": "thick * 0.5 + midBody * 1.4 + knock * (0.6 + bright * 0.8)",
+   "freq": "700 + bright * 3000",
+   "q": 0.7
+  },
+  {
+   "id": "toneOsc",
+   "type": "osc",
+   "wave": "sine",
+   "freq": "pitch * 16"
+  },
+  {
+   "id": "toneAmp",
+   "type": "env",
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     0.03,
+     1
+    ],
+    [
+     "0.9 / speed",
+     0,
+     2
+    ]
+   ]
+  },
+  {
+   "id": "clean",
+   "type": "filter",
+   "mode": "hp",
+   "in": "beat * which + toneOsc * toneAmp * tone * 0.35",
+   "freq": 30
+  }
+ ],
+ "out": "clean",
+ "presets": {
+  "Heartbeat": {
+   "pitch": 72,
+   "speed": 1.4,
+   "bright": 0.5,
+   "tone": 0.1
+  },
+  "Soft beep": {
+   "pitch": 75,
+   "speed": 1.67,
+   "bright": 0.3,
+   "tone": 0.9
+  },
+  "Danger pulse": {
+   "pitch": 85,
+   "speed": 2.2,
+   "bright": 0.7,
+   "tone": 0.5
+  }
+ }
+}

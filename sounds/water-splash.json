@@ -1,0 +1,267 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "water-splash",
+ "name": "Splash",
+ "category": "impact",
+ "description": "Something dropping into water: a deep plop, a spray of droplets and a short gurgle of bubbles. Change its size, length, brightness and how much spray flies up.",
+ "meta": {
+  "type": "sfx",
+  "role": "effects/impact",
+  "themes": [
+   "neutral",
+   "fantasy",
+   "underwater"
+  ],
+  "gameTypes": [
+   "platformer",
+   "top-down-rpg",
+   "turn-based-rpg",
+   "puzzle",
+   "arcade"
+  ],
+  "words": [
+   "splash",
+   "water",
+   "plop",
+   "drop",
+   "fall",
+   "dive",
+   "swim",
+   "lake",
+   "river",
+   "pond",
+   "sink",
+   "spray",
+   "wet"
+  ],
+  "license": "draft"
+ },
+ "duration": "length",
+ "params": [
+  {
+   "id": "size",
+   "label": "Size",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  },
+  {
+   "id": "length",
+   "label": "Length",
+   "unit": "s",
+   "min": 0.3,
+   "max": 1.2,
+   "default": 0.6,
+   "scale": "log"
+  },
+  {
+   "id": "bright",
+   "label": "Brightness",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  },
+  {
+   "id": "spray",
+   "label": "Spray",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  }
+ ],
+ "nodes": [
+  {
+   "id": "w",
+   "type": "noise"
+  },
+  {
+   "id": "br",
+   "type": "noise",
+   "color": "brown"
+  },
+  {
+   "id": "slapAmp",
+   "type": "ad",
+   "attack": 0.0005,
+   "decay": "0.02 + 0.03*size",
+   "curve": 2.2
+  },
+  {
+   "id": "slap",
+   "type": "filter",
+   "mode": "bp",
+   "in": "w*slapAmp",
+   "freq": "(900 + 1600*bright)*rnd(0.85, 1.15)/(0.7 + 0.6*size)",
+   "q": 0.8
+  },
+  {
+   "id": "plopPitch",
+   "type": "env",
+   "points": [
+    [
+     0,
+     "(380 - 230*size)*rnd(0.9, 1.1)"
+    ],
+    [
+     "0.05 + 0.07*size",
+     "(380 - 230*size)*rnd(1.7, 2.1)",
+     "exp"
+    ]
+   ]
+  },
+  {
+   "id": "plop",
+   "type": "osc",
+   "freq": "plopPitch"
+  },
+  {
+   "id": "plopAmp",
+   "type": "ad",
+   "attack": 0.003,
+   "decay": "0.08 + 0.14*size",
+   "curve": 2
+  },
+  {
+   "id": "bodyAmp",
+   "type": "ad",
+   "attack": 0.004,
+   "decay": "length*(0.25 + 0.3*size)",
+   "curve": 2
+  },
+  {
+   "id": "body",
+   "type": "filter",
+   "mode": "lp",
+   "in": "br",
+   "freq": "250 + 500*bright - 120*size",
+   "q": 0.9
+  },
+  {
+   "id": "drops",
+   "type": "dust",
+   "density": "700 + 2600*spray",
+   "spread": 1
+  },
+  {
+   "id": "sprayAmp",
+   "type": "ad",
+   "attack": 0.006,
+   "decay": "length*0.7",
+   "curve": 1.6
+  },
+  {
+   "id": "dropTone",
+   "type": "filter",
+   "mode": "bp",
+   "in": "drops",
+   "freq": "(2600 + 3500*bright)*rnd(0.9, 1.1)",
+   "q": 1.1
+  },
+  {
+   "id": "wash",
+   "type": "filter",
+   "mode": "bp",
+   "in": "w",
+   "freq": "(1200 + 1400*bright)/(0.8 + 0.4*size)",
+   "q": 0.7
+  },
+  {
+   "id": "fizz",
+   "type": "filter",
+   "mode": "hp",
+   "in": "w",
+   "freq": "3000 + 3000*bright"
+  },
+  {
+   "id": "gclk",
+   "type": "clock",
+   "rate": "max(2, round(length*9))/(length*0.95 - 0.1)",
+   "jitter": 0.6,
+   "delay": "0.07 + 0.05*size",
+   "count": "max(2, round(length*9))"
+  },
+  {
+   "id": "gp",
+   "type": "rand",
+   "lo": 0.7,
+   "hi": 1.6,
+   "trig": "gclk"
+  },
+  {
+   "id": "gup",
+   "type": "env",
+   "points": [
+    [
+     0,
+     1
+    ],
+    [
+     0.045,
+     1.9,
+     "exp"
+    ]
+   ],
+   "trig": "gclk"
+  },
+  {
+   "id": "gAmp",
+   "type": "ad",
+   "attack": 0.003,
+   "decay": "0.04 + 0.03*size",
+   "curve": 2,
+   "trig": "gclk"
+  },
+  {
+   "id": "gurgle",
+   "type": "osc",
+   "freq": "(560 - 260*size)*gp*gup"
+  },
+  {
+   "id": "gFade",
+   "type": "env",
+   "points": [
+    [
+     0,
+     1
+    ],
+    [
+     "length*0.9",
+     0.45
+    ]
+   ]
+  },
+  {
+   "id": "dry",
+   "type": "expr",
+   "expr": "slap*(1.4 + 0.8*bright + 0.8*size) + plop*plopAmp*(0.75 + 0.2*size) + body*bodyAmp*(0.5 + 0.7*size) + dropTone*sprayAmp*(0.3 + spray*6) + wash*sprayAmp*(0.2 + 0.8*spray) + fizz*sprayAmp*spray*(0.05 + 0.1*bright) + gurgle*gAmp*gFade*0.8"
+  },
+  {
+   "id": "clean",
+   "type": "filter",
+   "mode": "hp",
+   "in": "dry",
+   "freq": 40
+  }
+ ],
+ "out": "clean*(1 - smooth(dur - 0.06, dur - 0.003, t))",
+ "presets": {
+  "Pebble": {
+   "size": 0.1,
+   "length": 0.35,
+   "bright": 0.7,
+   "spray": 0.25
+  },
+  "Diver": {
+   "size": 0.55,
+   "length": 0.75,
+   "bright": 0.55,
+   "spray": 0.85
+  },
+  "Big crate": {
+   "size": 0.95,
+   "length": 1.1,
+   "bright": 0.35,
+   "spray": 0.6
+  }
+ }
+}

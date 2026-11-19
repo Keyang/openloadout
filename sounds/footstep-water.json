@@ -1,0 +1,248 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "footstep-water",
+  "name": "Footstep in water",
+  "category": "movement",
+  "description": "A step in shallow water: a low slap with a short bright spray of droplets and a little plip. Every take is a different step; change its weight, length, brightness and how deep the water is.",
+  "meta": {
+    "type": "sfx",
+    "role": "characters/footstep",
+    "themes": [
+      "neutral",
+      "forest",
+      "dungeon"
+    ],
+    "gameTypes": [
+      "platformer",
+      "top-down-rpg",
+      "turn-based-rpg",
+      "roguelike-action",
+      "farming-sim"
+    ],
+    "words": [
+      "footstep",
+      "footsteps",
+      "step",
+      "walk",
+      "run",
+      "water",
+      "puddle",
+      "splash",
+      "wade",
+      "shallow",
+      "stream",
+      "wet",
+      "rain"
+    ],
+    "license": "draft"
+  },
+  "duration": "min(0.28, length*(0.8 + 0.2*weight) + 0.015)",
+  "params": [
+    {
+      "id": "weight",
+      "label": "Weight",
+      "min": 0.5,
+      "max": 2,
+      "default": 1
+    },
+    {
+      "id": "length",
+      "label": "Length",
+      "unit": "s",
+      "min": 0.08,
+      "max": 0.22,
+      "default": 0.14,
+      "scale": "log"
+    },
+    {
+      "id": "bright",
+      "label": "Brightness",
+      "min": 0,
+      "max": 1,
+      "default": 0.5
+    },
+    {
+      "id": "depth",
+      "label": "Depth",
+      "min": 0,
+      "max": 1,
+      "default": 0.4,
+      "hint": "From a puddle to ankle-deep"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "pn",
+      "type": "noise",
+      "color": "pink"
+    },
+    {
+      "id": "slapAmp",
+      "type": "ad",
+      "attack": 0.001,
+      "decay": "0.025 + 0.025*weight + 0.03*depth",
+      "curve": 2.5
+    },
+    {
+      "id": "slap",
+      "type": "filter",
+      "mode": "bp",
+      "in": "pn",
+      "freq": "(520 + bright*450)/pow(weight, 0.4)*rnd(0.9, 1.1)",
+      "q": 0.9
+    },
+    {
+      "id": "bodyPitch",
+      "type": "env",
+      "points": [
+        [
+          0,
+          "rnd(105, 125)/pow(weight, 0.6)"
+        ],
+        [
+          0.05,
+          "55/pow(weight, 0.6)",
+          "exp"
+        ]
+      ]
+    },
+    {
+      "id": "body",
+      "type": "osc",
+      "freq": "bodyPitch"
+    },
+    {
+      "id": "bodyAmp",
+      "type": "ad",
+      "attack": 0.002,
+      "decay": "0.04 + 0.03*weight",
+      "curve": 2
+    },
+    {
+      "id": "wn",
+      "type": "noise"
+    },
+    {
+      "id": "sprayAmp",
+      "type": "env",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0.004,
+          1
+        ],
+        [
+          "length*(0.8 + 0.2*weight)*0.3",
+          0.3,
+          "exp"
+        ],
+        [
+          "length*(0.8 + 0.2*weight)*(0.7 + 0.3*depth)",
+          0,
+          "lin"
+        ]
+      ]
+    },
+    {
+      "id": "hiss",
+      "type": "filter",
+      "mode": "bp",
+      "in": "wn*sprayAmp",
+      "freq": "2200 + bright*2600",
+      "q": 0.8
+    },
+    {
+      "id": "drops",
+      "type": "dust",
+      "density": "500 + depth*1100",
+      "spread": 1
+    },
+    {
+      "id": "dropTone",
+      "type": "filter",
+      "mode": "bp",
+      "in": "drops*sprayAmp",
+      "freq": "2400 + bright*3000 + rnd(-400, 400)",
+      "q": 2.5
+    },
+    {
+      "id": "plipAt",
+      "type": "clock",
+      "rate": 1,
+      "count": 1,
+      "delay": "0.018 + 0.02*depth + rnd(0, 0.015)"
+    },
+    {
+      "id": "plipPitch",
+      "type": "env",
+      "trig": "plipAt",
+      "points": [
+        [
+          0,
+          "rnd(650, 900)/pow(weight, 0.3)"
+        ],
+        [
+          0.03,
+          "rnd(1300, 1700)/pow(weight, 0.3)",
+          "exp"
+        ]
+      ]
+    },
+    {
+      "id": "plip",
+      "type": "osc",
+      "freq": "plipPitch"
+    },
+    {
+      "id": "plipAmp",
+      "type": "ad",
+      "trig": "plipAt",
+      "attack": 0.002,
+      "decay": "0.025 + 0.015*depth",
+      "curve": 2
+    },
+    {
+      "id": "sumBus",
+      "type": "expr",
+      "expr": "slap*slapAmp*(2.2 + 1.6*depth) + body*bodyAmp*(0.15 + 0.35*depth) + hiss*(0.2 + 0.35*bright) + dropTone*(2.2 + 2*depth) + plip*plipAmp*(0.06 + 0.3*depth)"
+    },
+    {
+      "id": "soft",
+      "type": "shaper",
+      "in": "sumBus*1.8",
+      "drive": 1.2,
+      "mode": "tanh"
+    },
+    {
+      "id": "clean",
+      "type": "filter",
+      "mode": "hp",
+      "in": "soft",
+      "freq": 35
+    }
+  ],
+  "out": "clean",
+  "presets": {
+    "Soft shoes": {
+      "weight": 0.8,
+      "length": 0.13,
+      "bright": 0.45,
+      "depth": 0.35
+    },
+    "Heavy boots": {
+      "weight": 1.8,
+      "length": 0.18,
+      "bright": 0.35,
+      "depth": 0.65
+    },
+    "Bare feet": {
+      "weight": 0.7,
+      "length": 0.1,
+      "bright": 0.3,
+      "depth": 0.2
+    }
+  }
+}

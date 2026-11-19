@@ -1,0 +1,42 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "bush-rustle",
+ "name": "Bush rustle",
+ "category": "movement",
+ "description": "Something pushing through a bush or tall grass: a burst of leafy rustling that rises and falls, also for searching a bush. Change its size, length, brightness and how hard it shakes.",
+ "meta": {
+  "type": "sfx",
+  "role": "environment/ambience",
+  "themes": ["neutral", "forest", "farm"],
+  "gameTypes": ["top-down-rpg", "turn-based-rpg", "platformer", "farming-sim", "puzzle"],
+  "words": ["bush", "rustle", "leaves", "grass", "hedge", "shrub", "search", "hide", "sneak", "shake", "foliage", "plants", "rummage"],
+  "license": "draft"
+ },
+ "duration": "length",
+ "params": [
+  { "id": "size", "label": "Size", "min": 0, "max": 1, "default": 0.5 },
+  { "id": "length", "label": "Length", "unit": "s", "min": 0.25, "max": 1.0, "default": 0.5, "scale": "log" },
+  { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+  { "id": "shake", "label": "Shake", "min": 0, "max": 1, "default": 0.5 }
+ ],
+ "nodes": [
+  { "id": "w", "type": "noise" },
+  { "id": "pk", "type": "noise", "color": "pink" },
+  { "id": "swell", "type": "env", "points": [[0, 0.2], ["length*rnd(0.22, 0.32)", 1], ["length*0.6", 0.5], ["length*0.97", 0, 1.6]] },
+  { "id": "shakeClk", "type": "clock", "rate": "(2.5 + 7*shake)/length", "jitter": 0.6, "count": "round(2 + 7*shake)" },
+  { "id": "gust", "type": "ad", "attack": "0.004 + 0.006*size", "decay": "0.05 + 0.06*size", "curve": 1.6, "trig": "shakeClk" },
+  { "id": "flutter", "type": "expr", "expr": "swell*((1 - 0.7*shake) + gust*(0.4 + 1.1*shake))" },
+  { "id": "leaves", "type": "filter", "mode": "bp", "in": "w", "freq": "(2000 + 3000*bright - 800*size)*rnd(0.9, 1.1)", "q": 0.8 },
+  { "id": "crinkle", "type": "dust", "density": "(900 + 2500*shake)*flutter", "spread": 1 },
+  { "id": "crinkleTone", "type": "filter", "mode": "bp", "in": "crinkle", "freq": "(2600 + 3200*bright)*rnd(0.9, 1.1)", "q": 1.2 },
+  { "id": "twigs", "type": "filter", "mode": "bp", "in": "pk", "freq": "(900 - 400*size)*rnd(0.9, 1.1)", "q": 1.1 },
+  { "id": "dry", "type": "expr", "expr": "leaves*flutter*0.8 + crinkleTone*flutter*(0.8 + 1.2*shake) + twigs*flutter*(0.25 + 0.7*size)" },
+  { "id": "clean", "type": "filter", "mode": "hp", "in": "dry", "freq": 120 }
+ ],
+ "out": "clean*(1 - smooth(dur - 0.04, dur - 0.003, t))",
+ "presets": {
+  "Small bush": { "size": 0.3, "length": 0.4, "bright": 0.55, "shake": 0.5 },
+  "Tall grass": { "size": 0.1, "length": 0.6, "bright": 0.75, "shake": 0.3 },
+  "Big hedge": { "size": 0.9, "length": 0.85, "bright": 0.35, "shake": 0.75 }
+ }
+}

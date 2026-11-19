@@ -1,0 +1,46 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "footstep-leaves",
+  "name": "Footstep on leaves",
+  "category": "movement",
+  "description": "A step on dry fallen leaves: a crisp, broken-up crackle over a faint thump. Every take is a different step; change its weight, length, brightness and how crisp the leaves are.",
+  "meta": {
+    "type": "sfx",
+    "role": "characters/footstep",
+    "themes": ["neutral", "forest", "farm"],
+    "gameTypes": ["top-down-rpg", "platformer", "turn-based-rpg", "farming-sim", "roguelike-action"],
+    "words": ["footstep", "footsteps", "step", "walk", "run", "leaves", "autumn", "fall", "crackle", "crunch", "forest", "dry", "rustle"],
+    "license": "draft"
+  },
+  "duration": "min(0.28, length*(0.8 + 0.2*weight) + 0.015)",
+  "params": [
+    { "id": "weight", "label": "Weight", "min": 0.5, "max": 2, "default": 1 },
+    { "id": "length", "label": "Length", "unit": "s", "min": 0.08, "max": 0.22, "default": 0.15, "scale": "log" },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "crisp", "label": "Crispness", "min": 0, "max": 1, "default": 0.6 }
+  ],
+  "nodes": [
+    { "id": "thumpPitch", "type": "env", "points": [[0, "rnd(110, 135)/pow(weight, 0.6)"], [0.06, "65/pow(weight, 0.6)", "exp"]] },
+    { "id": "thump", "type": "osc", "freq": "thumpPitch" },
+    { "id": "thumpAmp", "type": "ad", "attack": 0.002, "decay": "0.04 + 0.03*weight", "curve": 2 },
+    { "id": "pn", "type": "noise", "color": "pink" },
+    { "id": "tap", "type": "filter", "mode": "bp", "in": "pn", "freq": "(700 + bright*400)/pow(weight, 0.3)", "q": 0.9 },
+    { "id": "leafAmp", "type": "env", "points": [[0, 0], [0.003, 1], ["length*(0.8 + 0.2*weight)*0.35", 0.55, "lin"], ["length*(0.8 + 0.2*weight)", 0, "exp"]] },
+    { "id": "breakClock", "type": "clock", "rate": "rnd(45, 70)", "jitter": 0.9 },
+    { "id": "burst", "type": "rand", "lo": 0, "hi": 1, "trig": "breakClock" },
+    { "id": "gate", "type": "expr", "expr": "mix(0.7, burst*burst*2.4, 0.3 + 0.7*crisp)" },
+    { "id": "grains", "type": "dust", "density": "900 + crisp*1700", "spread": 1 },
+    { "id": "crackle", "type": "filter", "mode": "bp", "in": "grains*leafAmp*gate", "freq": "(2200 + bright*3600 + crisp*900)*rnd(0.88, 1.12)", "q": 1.1 },
+    { "id": "snapHi", "type": "filter", "mode": "hp", "in": "grains*leafAmp*gate", "freq": "4500 + bright*2500", "q": 0.7 },
+    { "id": "rustle", "type": "filter", "mode": "bp", "in": "pn*leafAmp*gate", "freq": "1600 + bright*1800", "q": 0.8 },
+    { "id": "sumBus", "type": "expr", "expr": "thump*thumpAmp*0.2 + tap*thumpAmp*0.5 + crackle*(4 + 3*crisp) + snapHi*(0.6 + 2*crisp)*(0.3 + bright) + rustle*(0.5 - 0.3*crisp)" },
+    { "id": "soft", "type": "shaper", "in": "sumBus*2", "drive": 1.2, "mode": "tanh" },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "soft", "freq": 35 }
+  ],
+  "out": "clean",
+  "presets": {
+    "Soft shoes": { "weight": 0.8, "length": 0.14, "bright": 0.5, "crisp": 0.55 },
+    "Heavy boots": { "weight": 1.8, "length": 0.19, "bright": 0.4, "crisp": 0.8 },
+    "Bare feet": { "weight": 0.7, "length": 0.1, "bright": 0.3, "crisp": 0.15 }
+  }
+}

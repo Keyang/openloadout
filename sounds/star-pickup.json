@@ -1,0 +1,55 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "star-pickup",
+  "name": "Star pickup",
+  "category": "pickup",
+  "description": "A star or a big collectable: a quick bright run of three or four rising notes with a ping on each and a shower of twinkles on top. Change its pitch, speed, sparkle and the number of notes. The same every time.",
+  "meta": {
+    "type": "sfx",
+    "role": "items/pickup",
+    "themes": ["neutral", "fantasy", "space"],
+    "gameTypes": ["arcade", "platformer", "puzzle", "top-down-rpg", "roguelike-action"],
+    "words": ["star", "collectable", "big pickup", "bonus", "reward", "collect", "sparkle", "twinkle", "shine", "treasure", "special", "rare"],
+    "license": "draft"
+  },
+  "duration": "(notes - 1)/speed + 0.27",
+  "params": [
+    { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 500, "max": 1400, "default": 784, "scale": "log" },
+    { "id": "speed", "label": "Speed", "unit": "notes/s", "min": 12, "max": 24, "default": 16, "scale": "log" },
+    { "id": "sparkle", "label": "Sparkle", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "notes", "label": "Notes", "min": 3, "max": 4, "default": 4, "step": 1 }
+  ],
+  "nodes": [
+    { "id": "clk", "type": "clock", "rate": "speed", "count": "notes" },
+    { "id": "note", "type": "seq", "steps": ["pitch", "pitch*semi(notes > 3.5 ? 4 : 7)", "pitch*semi(notes > 3.5 ? 11 : 16)", "pitch*semi(16)"], "trig": "clk" },
+    { "id": "lastClk", "type": "clock", "rate": 1, "count": 1, "delay": "(notes - 1)/speed" },
+    { "id": "ampShort", "type": "ad", "attack": 0.0015, "decay": "1.2/speed", "curve": 1.7, "trig": "clk" },
+    { "id": "ampLast", "type": "ad", "attack": 0.0015, "hold": 0.02, "decay": 0.22, "curve": 2.2, "trig": "lastClk" },
+    { "id": "isLast", "type": "expr", "expr": "t >= (notes - 1)/speed - 0.0005 ? 1 : 0" },
+    { "id": "amp", "type": "expr", "expr": "isLast ? ampLast : ampShort" },
+    { "id": "sn", "type": "osc", "wave": "sine", "freq": "note" },
+    { "id": "tr", "type": "osc", "wave": "tri", "freq": "note" },
+    { "id": "sq", "type": "osc", "wave": "pulse", "width": 0.25, "freq": "note" },
+    { "id": "up", "type": "osc", "wave": "tri", "freq": "note*2.004" },
+    { "id": "body", "type": "expr", "expr": "sn*clamp(1 - sparkle*1.4, 0, 1)*0.7 + tr*0.5 + sq*sparkle*0.4 + up*(0.15 + sparkle*0.15)" },
+    { "id": "tone", "type": "filter", "mode": "lp", "in": "body", "freq": "note*(4 + sparkle*14)", "q": 0.7 },
+    { "id": "crushed", "type": "crush", "in": "tone", "bits": 5, "rate": 9000 },
+    { "id": "tune", "type": "expr", "expr": "mix(tone, crushed, smooth(0.75, 1, sparkle)*0.6)*amp" },
+    { "id": "ping", "type": "modal", "in": "clk", "freq": "note*2", "ratios": [1, 2.32, 4.25], "gains": [1, 0.5, 0.25], "decay": "isLast ? 0.3 : 0.08", "tilt": 0.6 },
+    { "id": "twClk", "type": "clock", "rate": 38, "count": 9, "delay": "0.6/speed" },
+    { "id": "twNote", "type": "seq", "steps": [4, 5.04, 6, 4.49, 6.73, 5.34, 8, 5.99, 7.13], "trig": "twClk" },
+    { "id": "twAmp", "type": "ad", "attack": 0.001, "decay": 0.035, "curve": 2.4, "trig": "twClk" },
+    { "id": "twFade", "type": "env", "points": [[0, 1], ["(notes - 1)/speed + 0.25", 0.2]] },
+    { "id": "tw", "type": "osc", "wave": "sine", "freq": "pitch*semi(4)*twNote" },
+    { "id": "twinkle", "type": "expr", "expr": "tw*twAmp*twFade" },
+    { "id": "dry", "type": "expr", "expr": "tune + ping*1*(0.3 + sparkle*0.5) + twinkle*(0.12 + sparkle*0.45)" },
+    { "id": "room", "type": "reverb", "in": "dry", "size": 0.3, "damp": 0.45, "mix": "0.14*(1 - sparkle)^2" },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "room", "freq": 200, "q": 0.7 }
+  ],
+  "out": "clean",
+  "presets": {
+    "Chiptune": { "pitch": 880, "speed": 20, "sparkle": 0.6, "notes": 4 },
+    "Storybook": { "pitch": 698, "speed": 14, "sparkle": 0.2, "notes": 4 },
+    "Gritty": { "pitch": 784, "speed": 22, "sparkle": 1, "notes": 3 }
+  }
+}
