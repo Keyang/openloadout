@@ -30,6 +30,7 @@
 import { PI } from '../engine/motion.js';
 import { ramp, farRamp, tone, INK } from '../engine/color.js';
 import { framePhase, frameOfPhase, blendKeys } from './keypose.js';
+import { paintFigure, FIGURE_BLOCKS } from '../engine/data-rules.js';
 import * as H from './humanoid.js';
 import * as F from './humanoid-figure.js';
 
@@ -478,6 +479,29 @@ function slotColour(v, slots, p) {
   return v;
 }
 
+// Any part other than engine/data-rules.js FIGURE_BLOCKS (held, headgear, cape ...) is drawn only when the stored figure
+// has it, so a control never adds one, as body.paint never does (review F1, issue 4; catalog/studio-schema.js warns).
+
+/** A control's value in the figure field it sets ("part.field", or "stance"): a number for a slider, a word for a choice (through its map, when it has one); nothing when the settings do not give one of those, or the part is one the figure has not. */
+function setField(fig, c, v) {
+  if (!(typeof v === 'string' || (typeof v === 'number' && Number.isFinite(v)))) return;
+  if (typeof v === 'string' && c.map && Object.hasOwn(c.map, v)) v = c.map[v];      // an option that stands for another value of the field
+  if (c.sets === 'stance') { if (typeof v === 'string') fig.stance = v; return; }
+  const dot = c.sets.indexOf('.'), part = c.sets.slice(0, dot), field = c.sets.slice(dot + 1);
+  if (dot < 1 || !field || part === '__proto__' || field === '__proto__') return;
+  if (!isPlain(fig[part]) && !FIGURE_BLOCKS.includes(part)) return;
+  fig[part] = { ...(isPlain(fig[part]) ? fig[part] : {}), [field]: v };
+}
+
+/** Every setting of a library-body sprite, its defaults under the ones p gives: colours, controls (speed 0.5) and on/off parts. */
+function settingsOf(def, q) {
+  const out = { ...(def.colours ?? {}) };
+  for (const c of def.controls ?? []) if (c?.key && c.kind !== 'colour') out[c.key] = c.standard ? 0.5 : c.default;
+  for (const [name, part] of Object.entries(def.parts ?? {})) if (!Array.isArray(part?.params)) out[name] = part?.default !== false;
+  for (const [k, v] of Object.entries(q ?? {})) if (v !== undefined && v !== null) out[k] = v;
+  return out;
+}
+
 /**
  * Returns the figure a library-body studio sprite is drawn with at settings p, plain data: its stored figure (body.figure)
  * with (1) each slider's value in the body field it sets (`sets`: height, build, head), (2) every colour of the figure
@@ -485,17 +509,32 @@ function slotColour(v, slots, p) {
  * (the first slot wins when two share a default), (3) each part switched off (p[part] false, or its default false when
  * p does not say) set to kind 'none' (held, headgear, scarf, pack, cape) or left out (belt, coat, mask), (4) a clip with
  * no keys but a `from` drawn by that pose, and (5) `keys` (figureKeys of the clips) and `keysFor` (the stored figure).
+ * Studio item F1: a slider or choice whose `sets` is "part.field" (or "stance") puts its value in that field; and when the
+ * definition has body.paint, (2) is replaced by it: only the fields paint names follow the settings, each through its
+ * rule (engine/data-rules.js paintFigure; missing settings are their defaults), and every other colour stays as stored.
+ * A Contract 3 part (with params) is taken off by its choice, not by (3).
  * Arguments: def (a cleaned loadout-sprite with body { library: 'humanoid', figure }), p (settings by slot, control key and part name; missing ones are their defaults).
  */
 export function figureFor(def, p = {}) {
-  const stored = def?.body?.figure ?? {}, fig = copyOf(stored), q = p ?? {};
-  for (const c of def.controls ?? []) if (BODY_FIELDS.includes(c?.sets) && typeof q[c.key] === 'number' && Number.isFinite(q[c.key])) fig.body = { ...fig.body, [c.sets]: q[c.key] };
-  const slots = Object.entries(def.colours ?? {});
-  if (slots.length) for (const part of Object.values(fig)) {
-    if (!isPlain(part)) continue;
-    for (const [k, v] of Object.entries(part)) if (typeof v === 'string' && HEX.test(v)) part[k] = slotColour(v, slots, q);
+  const stored = def?.body?.figure ?? {}, q = p ?? {};
+  let fig = copyOf(stored);
+  const all = settingsOf(def, q);
+  for (const c of def.controls ?? []) {
+    if (BODY_FIELDS.includes(c?.sets) && typeof q[c.key] === 'number' && Number.isFinite(q[c.key])) fig.body = { ...fig.body, [c.sets]: q[c.key] };
+    else if (typeof c?.sets === 'string' && !BODY_FIELDS.includes(c.sets)) setField(fig, c, all[c.key]);      // studio item F1: missing settings are the defaults
+  }
+  const paint = def?.body?.paint;
+  // body.paint (studio item F1): only the fields it names follow the settings, each through its rule (engine/data-rules.js)
+  if (isPlain(paint)) fig = paintFigure(fig, paint, all);
+  else {
+    const slots = Object.entries(def.colours ?? {});
+    if (slots.length) for (const part of Object.values(fig)) {
+      if (!isPlain(part)) continue;
+      for (const [k, v] of Object.entries(part)) if (typeof v === 'string' && HEX.test(v)) part[k] = slotColour(v, slots, q);
+    }
   }
   for (const [name, part] of Object.entries(def.parts ?? {})) {
+    if (Array.isArray(part?.params)) continue;       // a Contract 3 part is taken off by its choice (kind "none"), through `sets`
     if ((typeof q[name] === 'boolean' ? q[name] : part?.default !== false) || fig[name] === undefined) continue;
     if (KIND_PARTS.includes(name)) fig[name] = { ...fig[name], kind: 'none' };
     else delete fig[name];

@@ -283,9 +283,9 @@ test('a card for an asset with no built picture draws it live, and a draft has n
   expect(r).toBe(true);
   const card = (id) => page.locator(`#made-cards li[data-id="${id}"]`);
   await expect.poll(async () => (await canvasStats(card('route2-star').locator('canvas').first())).opaque).toBeGreaterThan(20);
-  // a sound's card draws its icon (cards show no waveform)
-  await expect(card('route2-chime').locator('.sound-pic svg path')).toHaveCount(1);
-  await expect.poll(() => card('route2-chime').locator('.sound-pic svg').evaluate((n) => { const r = n.getBoundingClientRect(); return r.width * r.height; })).toBeGreaterThan(0);
+  // a sound made on this visit has no built waveform: its card draws one from the sound itself
+  await expect(card('route2-chime').locator('.sound-pic canvas.wave')).toHaveCount(1);
+  await expect.poll(() => card('route2-chime').locator('.sound-pic canvas.wave').evaluate((c) => { const g = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let n = 0; for (let i = 3; i < g.length; i += 4) if (g[i] > 0) n++; return n; })).toBeGreaterThan(20);
   await expect(card('route2-star').locator('img')).toHaveCount(0);
   await expect(card('route2-star').getByRole('button', { name: /Add Wish star to my bag/ })).toBeVisible();
   await expect(card('route2-draft').locator('.card-add')).toHaveCount(0);

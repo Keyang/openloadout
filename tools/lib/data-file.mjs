@@ -9,6 +9,11 @@
 //     ...the cleaned definition as JSON: one bone, shape or key per line...
 //   });
 //
+// A library sprite converted from its code file to data (made: { in: "library", from: "code:<id>" }; studio item F2)
+// was not made in the studio, so its line 1 says so instead (LIBRARY_HEADER, "// Converted from code to data for the
+// Loadout library. ..."); the rest of the form, and every check, is the same. The writer picks line 1 from made.in
+// (headerFor) and the reader refuses a line 1 that says otherwise than made.in.
+//
 // writeDataFile() makes that text from a definition (validated first, written from the cleaned copy, read back before
 // it is returned). readDataFile() reads such a text back to its JSON WITHOUT RUNNING IT: the three lines must be exactly
 // these, what sits between `dataSprite(` and the final `);` must parse as JSON on its own (so there is no room for code:
@@ -30,8 +35,22 @@ import { STUDIO_LIMITS } from '../../catalog/studio-schema.js';
 /** The words that mark a sprite file as made in the studio: a file holding them anywhere claims the studio form. */
 export const STUDIO_MARK = 'Made in the Loadout studio';
 
-/** Line 1 of a studio library file, exactly. */
+/** Line 1 of a studio library file made in the studio (made.in "studio"), exactly. */
 export const STUDIO_HEADER = `// ${STUDIO_MARK}. This file is data: open it in the studio (#/studio, "Open a file") to change it.`;
+
+/** The words that mark a library sprite converted from its code file to data (made.in "library", studio item F2): a file holding them anywhere claims the same fixed form. */
+export const LIBRARY_MARK = 'Converted from code to data for the Loadout library';
+
+/** Line 1 of a library file converted from code (made.in "library"), exactly: it was not made in the studio, and is data all the same. */
+export const LIBRARY_HEADER = `// ${LIBRARY_MARK}. This file is data, not code: the build refuses it with anything else in it.`;
+
+/**
+ * Returns line 1 of the library file of a definition: LIBRARY_HEADER when its made.in is "library" (converted from code), else STUDIO_HEADER.
+ * Arguments: definition (a loadout-sprite, cleaned or not).
+ */
+export function headerFor(definition) {
+  return definition?.made?.in === 'library' ? LIBRARY_HEADER : STUDIO_HEADER;
+}
 
 /** Line 2 of a studio library file, exactly. */
 export const STUDIO_IMPORT = "import { dataSprite } from '../engine/data-sprite.js';";
@@ -45,7 +64,7 @@ export const FILE_CHARS = 512 * 1024;
 const PROTO_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
 const INLINE_DEPTH = 4;     // objects and lists this deep (a bone, a shape, a key) are written on one line
 const INLINE_CHARS = 72;    // and so is anything shorter than this as compact JSON (a size, a list of words)
-const FORM = `the comment "// ${STUDIO_MARK}...", one import of dataSprite, then export default dataSprite(<JSON>);`;
+const FORM = `the comment "// ${STUDIO_MARK}..." (or "// ${LIBRARY_MARK}..." for a sprite converted from code), one import of dataSprite, then export default dataSprite(<JSON>);`;
 
 const isObj = (x) => x !== null && typeof x === 'object' && !Array.isArray(x);
 const kb = (n) => `${Math.ceil(n / 1024)} KB`;
@@ -82,11 +101,11 @@ function idOfFile(file) {
 }
 
 /**
- * Whether a sprite file's text claims to be a studio library file: it holds the studio mark (STUDIO_MARK) anywhere.
+ * Whether a sprite file's text claims to be a studio library file: it holds the studio mark (STUDIO_MARK) or the converted library mark (LIBRARY_MARK) anywhere.
  * Arguments: text (the file's text).
  */
 export function claimsStudioForm(text) {
-  return typeof text === 'string' && text.includes(STUDIO_MARK);
+  return typeof text === 'string' && (text.includes(STUDIO_MARK) || text.includes(LIBRARY_MARK));
 }
 
 /**
@@ -106,7 +125,8 @@ export function readDataFile(text, opts = {}) {
     if (t.charCodeAt(0) === 0xfeff) t = t.slice(1);
     const nl1 = t.indexOf('\n');
     const nl2 = nl1 < 0 ? -1 : t.indexOf('\n', nl1 + 1);
-    if (nl1 < 0 || t.slice(0, nl1) !== STUDIO_HEADER) { errors.push(`Line 1 must be the studio comment, exactly: ${STUDIO_HEADER}`); return done(); }
+    const line1 = nl1 < 0 ? '' : t.slice(0, nl1);
+    if (line1 !== STUDIO_HEADER && line1 !== LIBRARY_HEADER) { errors.push(`Line 1 must be the studio comment, exactly: ${STUDIO_HEADER} (or, for a sprite converted from code: ${LIBRARY_HEADER})`); return done(); }
     if (nl2 < 0 || t.slice(nl1 + 1, nl2) !== STUDIO_IMPORT) { errors.push(`Line 2 must be exactly: ${STUDIO_IMPORT} (one import, nothing else)`); return done(); }
     let rest = t.slice(nl2 + 1);
     if (!rest.startsWith(STUDIO_CALL)) { errors.push(`Line 3 must start with ${STUDIO_CALL} (the definition follows as JSON)`); return done(); }
@@ -130,6 +150,7 @@ export function readDataFile(text, opts = {}) {
     const { file, ...vopts } = opts ?? {};
     const v = validateDataSprite(value, vopts);
     errors.push(...v.errors); warnings.push(...v.warnings);
+    if (v.ok && line1 !== headerFor(v.value)) errors.push(`Line 1 says ${line1 === LIBRARY_HEADER ? 'the sprite was converted from code' : 'the sprite was made in the studio'}, but its made.in is ${JSON.stringify(v.value.made?.in)}; line 1 must be: ${headerFor(v.value)}`);
     const want = idOfFile(file);
     if (want !== null && value.id !== want) errors.push(`The id inside is ${JSON.stringify(value.id)} but the file is named ${want}.js; a sprite file is named after its id`);
     return done(value);
@@ -152,7 +173,7 @@ export function writeDataFile(definition, opts = {}) {
     const v = validateDataSprite(definition, opts ?? {});
     if (!v.ok) return fail(v.errors, v.warnings);
     const name = `${v.value.id}.js`;
-    const text = `${STUDIO_HEADER}\n${STUDIO_IMPORT}\n${STUDIO_CALL}${formatJson(v.value)});\n`;
+    const text = `${headerFor(v.value)}\n${STUDIO_IMPORT}\n${STUDIO_CALL}${formatJson(v.value)});\n`;
     const back = readDataFile(text, { ...(opts ?? {}), file: `sprites/${name}` });
     if (!back.ok) return fail(back.errors, v.warnings);
     return { ok: true, errors: [], warnings: v.warnings, name, text };
@@ -172,5 +193,5 @@ export function checkDataFile(text, file, opts = {}) {
   const r = readDataFile(text, { strict: true, ...(opts ?? {}), file });
   if (r.ok) return r.value;
   const shown = r.errors.slice(0, 8).join('; ') + (r.errors.length > 8 ? `; and ${r.errors.length - 8} more` : '');
-  throw new Error(`${file}: this file says it was made in the Loadout studio, so it must be exactly the studio's form (${FORM}) holding a definition the library takes, and it is not. ${shown}. Make the file again from the studio (Download, "File for the library") instead of editing it by hand.`);
+  throw new Error(`${file}: this file says it is a Loadout sprite written as data, so it must be exactly the studio's form (${FORM}) holding a definition the library takes, and it is not. ${shown}. Make the file again from the studio (Download, "File for the library") instead of editing it by hand.`);
 }

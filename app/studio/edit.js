@@ -14,6 +14,7 @@ import { STANDARD_CLIPS, CLIP_SYNONYMS, FRAME_SIZES, STUDIO_LIMITS, SOCKET_NAMES
 import { studioTemplate, studioTemplates } from '../../rigs/studio-templates.js';
 import { hero, figureFor, POSE_FIELDS } from '../../rigs/humanoid-studio.js';
 import { slugOf } from './drafts.js';
+import { libraryHandles, dragLibrary, nudgeLibraryHandle } from './library-body.js';
 
 const RAD = Math.PI / 180;
 const cp = (v) => JSON.parse(JSON.stringify(v));
@@ -442,7 +443,8 @@ function solved(def, ctx) {
  */
 export function handles(def, ctx) {
   if (ctx.mode === 'frames') return isRig(def) ? [{ id: 'pivot', kind: 'pivot', label: 'Anchor', at: [...def.pivot] }] : [];
-  if (!isRig(def)) return [];
+  // a library body (the Hero): hips, hands, feet, head, upper body and the held thing on Move (app/studio/library-body.js, item S10)
+  if (!isRig(def)) return ctx.mode === 'move' ? libraryHandles(def, ctx.clip, ctx.frame ?? 0) : [];
   if (ctx.mode !== 'body' && !clipOf(def, ctx.clip)) return [];
   const { rig, J } = solved(def, ctx);
   const out = [];
@@ -483,6 +485,7 @@ export function dragHandle(def, ctx, id, point) {
   const [px, py] = point;
   if (!Number.isFinite(px) || !Number.isFinite(py)) return cp(def);
   if (id === 'pivot') return setPivot(def, [px, py]);
+  if (id.startsWith('lib:')) return ctx.mode === 'move' ? dragLibrary(def, ctx.clip, ctx.frame ?? 0, id, point) : cp(def);
   if (!isRig(def)) return cp(def);
   const { rig, pose, opt, J } = solved(def, ctx);
   const root = rig.bones.find((b) => b.parent == null);
@@ -534,6 +537,7 @@ function poseBone(def, ctx, b, cur, next) {
 
 /** Move a handle by whole pixels (the arrow keys, the arrow buttons): dragHandle to where it is plus [dx, dy]. */
 export function nudgeHandle(def, ctx, id, dx, dy) {
+  if (typeof id === 'string' && id.startsWith('lib:')) return ctx.mode === 'move' ? nudgeLibraryHandle(def, ctx.clip, ctx.frame ?? 0, id, dx, dy) : cp(def);
   const h = handles(def, ctx).find((x) => x.id === id);
   if (!h) return cp(def);
   if (id === 'pivot') return setPivot(def, [def.pivot[0] + dx, def.pivot[1] + dy]);
@@ -672,6 +676,8 @@ export function addClip(def, name, { label, copyFrom } = {}) {
     const keys = src ? snapKeys(cp(d.clips[src].keys ?? []), shape).keys : [];
     const dir = n.includes('_') ? n.split('_')[1] : null;
     d.clips[n] = { label: dir ? `${base} (${dir})` : base, frames: std.frames, fps: std.fps, loop: std.loop, keys };
+    // a library body's copy is made from the same pose as its source, so a change to the body moves it too (item S10)
+    if (src && !isRig(d) && typeof d.clips[src].from === 'string') d.clips[n].from = d.clips[src].from;
   }
   return { def: d, names };
 }

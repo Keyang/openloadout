@@ -407,6 +407,61 @@ A name such as `topdown.cape` is `<module>.<export>`. An option is `{ min, max, 
 
 **When you add to one of these rigs, add to its description in the same change.** `tests/unit/rig-describe-data.test.mjs` fails for an export, a drawing function (first argument `g`), a name in an exported list, or a side module `rigs/<rig>-<name>.js` that the description does not list; `tests/unit/rig-describe-draw.test.mjs` draws every listed pose, part, held kind, hair style and effect through the function named, checks a part shows in exactly the directions given, and that both ends of every range stay inside the frame. A new part with a kind list needs the list exported (`PACK_KINDS`), or the tests cannot see a kind added later.
 
+## Studio definitions: what a library body may name and set
+
+A studio definition (`loadout-sprite`, `docs/studio.md` section 2.3; Contract 14) is data and never holds code. Where a library body (the side-view person) needs framework code, it names it from a fixed list, the same way it names a rig (Contract 14 rule 2, amended in studio item F1). The lists, each on `loadout.framework` under its module's name:
+
+| Export | Module | What it lists |
+|---|---|---|
+| `COLOUR_RULES` | `engine/data-rules.js` | The colour rules `body.paint` may name, with their arguments: `tone`, `mix`, `standOut` (engine/color.js `pick`), `apart`, `bandTone`, `ramp`, `choose`. `paintColour(expr, settings)` and `paintFigure(figure, paint, settings)` work one out; they never throw |
+| `FIGURE_SETTINGS` | `catalog/studio-schema.js` | The figure fields a slider or choice may `sets` (`"part.field"` and `stance`), each a number range or a list of words |
+| `FIGURE_COLOURS` | `catalog/studio-schema.js` | The figure's colour fields `body.paint` may paint |
+| `FIGURE_SOCKETS` | `catalog/studio-schema.js` | The attach points a Contract 3 part may hang from (`muzzle` too when the figure has `thrown`) |
+| `FIGURE_BLOCKS` | `engine/data-rules.js` | The blocks of a figure read with defaults when absent (`body`, `motion`, `look`, `hair`): a control may set a field of one the stored figure has not; any other part it sets must be in the figure |
+
+A new rule is a framework addition (Contract 11): an entry in `COLOUR_RULES`, its argument check in `catalog/studio-schema.js`, and a test in `tests/unit/data-rules.test.mjs` that it equals the function it names. A data sprite (`engine/data-sprite.js`) has no `sprite.made`: that field means a sprite made on this visit and drawn in a worker; where a data sprite came from is `sprite.definition.made`.
+
+Since studio item F2 the `FIGURE_*` tables above, `LIBRARY_PARTS`, `HUMANOID_POSE_FIELDS` and `HUMANOID_MOVE_FIELDS` are the side-view person's descriptor (`rigs/body-humanoid.js`), passed on by `catalog/studio-schema.js` under their old names. Every other body has its own, below.
+
+### Library bodies: one module each
+
+A library body is a code rig with a data layer (`body: { library: "<name>", figure: {...} }`). `catalog/studio-schema.js` and `engine/data-sprite.js` name no body: they look `body.library` up in a registry and ask the body's **descriptor**. So a new body is **its own module plus one line**:
+
+1. Write `rigs/body-<name>.js`. It exports its descriptor, made by `defineLibraryBody()` from `engine/library-body.js`, under a name of its own (`TOPDOWN_BODY`), or a list of them for a family (`CREATURE_BODIES`, one per rig: `creature:hive-bug`, `creature:kiosk`, ...).
+2. Add one line to `engine/library-bodies.js`: `export * from '../rigs/body-<name>.js';`. Nothing else in that file.
+3. Tests: `tests/unit/<area>-*.test.mjs` for your body; `tests/unit/studio-bodies-registry.test.mjs` already checks every registered body (frame sizes of the style guide, a known view, the functions, the one-line form of the list). `tests/unit/studio-bodies-stub.test.mjs` with `tests/fixtures/studio-bodies/body-stub.js` is a worked example of a whole body in 60 lines.
+
+Name the module `rigs/body-<name>.js`, not `rigs/<rig>-studio.js`: a file `rigs/humanoid-*.js`, `rigs/topdown-*.js` or `rigs/kiosk-*.js` is a side module of that rig, and `tests/unit/rig-describe-data.test.mjs` then asks for it and each of its exports in the rig's description. Drawing code that belongs to the rig (a top-down figure renderer, a part moved out of a sprite) goes in the rig's own modules and its description as usual; the body module is the glue. A body module must not import `catalog/studio-schema.js` or `engine/data-sprite.js` (they import the list, which imports it): what it needs from the schema it is given.
+
+The descriptor (`engine/library-body.js` header has the full text; `*` = required):
+
+| Field | What it is |
+|---|---|
+| `id`* | The name `body.library` gives: `humanoid`, `topdown`, `creature:hive-bug` (`LIBRARY_BODY_NAME`: a word or family:word) |
+| `label`* | The everyday name |
+| `view`* | `side`, `front`, `top-down` or `none`. A `top-down` body may have direction clips (`walk_down`, ...; Contract 2) and meta view `top-down` |
+| `sizes`* | The frame sizes it draws at, `[[w, h], ...]`, each a style-guide size (`FRAME_SIZES`); the first is the default. A definition picks one with `size` (the thicket imp: `[48, 48]`); a size the body does not draw at is dropped with a warning |
+| `pivots` | `{ "WxH": [x, y] }`; a size without one gets `defaultPivot` |
+| `figure`* | The spec of `body.figure`, in `FIGURE_FIELD` kinds: `colour`, `flag`, `number(lo, hi)`, `word(values)`, `map(keyWhat, valueWhat, values)` (top level only), or a block `{ field: kind }` one level deep. The schema checks a figure against it, drops unknown fields with a warning; `checkFigure(figure, { err, warn })` adds what a spec cannot say |
+| `settings`, `aliases` | What a slider (number) or choice (word) may `sets`; default: every number and word field of the spec (`settingsOfSpec`). `aliases` are short names (`height` for `body.height`) |
+| `colours` | The `"part.field"` colours `body.paint` may paint (`COLOUR_RULES`); default: every colour in a block of the spec (`coloursOfSpec`) |
+| `blocks` | Blocks of the figure read with defaults when absent: a control may set a field of one the stored figure has not |
+| `parts`, `partSockets` | The parts people may switch off (a toggle each), and where each hangs (Contract 3). A Contract 3 part with `params` may have any name |
+| `sockets`, `socketsNote` | The attach points every frame has: a list, or `(figure) => list`. A part's `socket` must be one of them |
+| `keyFields` | What a key may hold: `{ field: kind }`, kind one of `KEY_KINDS` (`px`, `angle`, `share`, `signed`, `count {min, max}`, `point`, `arm`, `flag`, `word {values}`; `none: true` allows null). px may reach the frame's size |
+| `poses`, `bake` | The formula poses a clip's `from` may name, and `bake(def, clip, { frames, loop, from })` giving `{ from, keys, frameEdits? }` ("Start this clip over"); a body without formulas leaves both out |
+| `slots` | `{ slot: { label, material, swatches } }`: how a colour slot of that name is offered; any other slot is cloth |
+| `draw`* | `(g, def, { clip, frame, t, p })`: one frame of the cleaned definition at settings `p` on `g` (the definition's size). Frame edits (nudge, flash) are the body's job |
+| `socketsAt`* | `(def, { clip, frame, t, p })`: that frame's attach points, `{ name: { x, y, angle } }`, or null |
+
+Helpers in `engine/library-body.js` for a body's code: `libraryFrame(def, o)` (the clip, frame, phase, nudge and flash of one frame), `nudgeSurface(g, nudge)`, `applySettings(def, p, body)` (the figure at settings `p`: each control's value in the field it sets, parts switched off removed, `body.paint` worked out; for a body with no `figureFor` of its own), and `rigs/keypose.js blendKeys` for the keys. A test or a tool can hand the schema and `dataSprite` another registry: `libraryBodies(...)` makes one, and `opts.bodies` takes it (`validateStudioSprite`, `validateDataSprite`, `dataSprite`, `makeDataSprite`, `readDataFile`, `writeDataFile`).
+
+Not dispatched yet (other builders' files): the studio page and `window.loadout.studio` still call `rigs/humanoid-studio.js` directly for drawing, baking and starts (`app/studio/draw.js`, `app/studio/edit.js`, `app/studio/library-body.js`, `app/api-studio.js`); a definition with another body is validated, drawn as a sprite, put in the bag and written as a file, but the studio page cannot edit it until those go through `libraryBody(name).draw` / `.bake`. The studio's "Open a file" (`app/studio/home.js`) recognises a file by the words "Made in the Loadout studio" only; to open a converted file too it should ask `claimsStudioForm(text)` (`catalog/data-file.js`).
+
+### Where a data sprite came from
+
+`made: { in: "studio", from: "new" | "template:<id>" | "library:<id>" }` for a sprite made in the studio; its library file starts `// Made in the Loadout studio.` (`STUDIO_HEADER`). `made: { in: "library", from: "code:<id>" | "new" }` for a library sprite converted from its code file to data (or written as data by hand); its file starts `// Converted from code to data for the Loadout library.` (`LIBRARY_HEADER`). The writer picks the header from `made.in` (`headerFor`), the reader refuses a header that says otherwise, and both forms are otherwise the same: one comment, one import, `export default dataSprite(<JSON>);`, refused by the build with anything else in it (`catalog/data-file.js`, `tools/lib/data-file.mjs`, the same code). A converted file sets `made: { in: "library", from: "code:<its id>" }`.
+
 ## Reference
 
 The full list (every action, every module, every export with its arguments and one-line description) is written by the build to `generated/api.md`, next to `generated/api.json`. It is not kept in git, because it changes with every function added to the framework. Run `node tools/lib/api.mjs` (a tenth of a second) and open it.

@@ -698,15 +698,18 @@ test('a game type is kept the same way', async ({ page }) => {
 
 // ---- cards -------------------------------------------------------------------------------
 
-test('a sound card shows its icon and its length, and its play button plays it, loading just that sound', async ({ page }) => {
+test('a sound card shows its waveform and its length, and its play button plays it, loading just that sound', async ({ page }) => {
   const long = PICK.longSound;               // long enough to still be playing when the test looks
   await openRoute(page, `/browse?q=${encodeURIComponent(long.name)}&kind=sound`);
   const card = await place(page, long.id);
   const play = card.getByRole('button', { name: `Play ${long.name}`, exact: true });
   await expect(play).toBeVisible();
-  // an icon on the tile, never a waveform picture
-  await expect(card.locator('.card-tile .sound-pic svg')).toBeVisible();
-  await expect(card.locator('.card-tile img, .card-tile canvas')).toHaveCount(0);
+  // the waveform the build drew of it, on the tile; no icon
+  const wave = card.locator('.card-tile .sound-pic img.wave');
+  await expect(wave).toBeVisible();
+  await expect(wave).toHaveAttribute('src', long.thumb);
+  await expect.poll(() => wave.evaluate((img) => img.complete && img.naturalWidth)).toBe(64);
+  await expect(card.locator('.card-tile .sound-pic svg')).toHaveCount(0);
   await expect(card.locator('.card-tag')).toContainText(labelFor('type', long.type));
   await expect(card.locator('.card-tag .num')).toContainText(`${Math.round(long.tech.seconds) >= 10 ? Math.round(long.tech.seconds) : Number(long.tech.seconds.toFixed(2))} s`);
   const asked = [];

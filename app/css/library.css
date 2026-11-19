@@ -30,6 +30,9 @@
 .vdot:focus-visible { outline-offset: -4px; }
 /* a sound, a track: the icon of what it is for, the round play button, a line along the foot while it plays */
 .sound-pic { color: var(--ink); }
+/* a sound's waveform: 64×40, scaled up smoothly to most of the tile's width */
+.sound-pic .wave { width: 66%; height: auto; }
+.card.row .sound-pic .wave { width: 88%; }
 .card.sound.loading .tile-play { opacity: 0.5; }
 .tile-progress.on { width: 100%; }
 .tile-play svg { display: block; }

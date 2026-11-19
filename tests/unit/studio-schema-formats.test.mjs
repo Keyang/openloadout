@@ -14,7 +14,7 @@ test('exports the validator, the parser and the tables the studio builds from', 
   for (const k of ['STUDIO_LIMITS', 'FRAME_SIZES', 'STANDARD_CLIPS', 'CLIP_SYNONYMS', 'EASES', 'SHAPE_KINDS', 'SOCKET_NAMES', 'HUMANOID_POSE_FIELDS', 'LIBRARY_BODIES', 'LIBRARY_PARTS', 'ID_PATTERN', 'SPRITE_ID_PATTERN', 'RESERVED_IDS']) assert.ok(S[k] !== undefined, k);
   assert.deepEqual([...S.EASES], ['smooth', 'linear', 'in', 'out', 'hold']);
   assert.deepEqual([...S.SHAPE_KINDS], ['limb', 'capsule', 'ellipse', 'poly', 'dot']);
-  assert.deepEqual([...S.LIBRARY_BODIES], ['humanoid']);
+  assert.equal(S.LIBRARY_BODIES[0], 'humanoid', 'the side-view person is the first library body; others are added by their builders (studio item F2)');
 });
 
 test('the caps are the design\'s, and the shared ones equal LIMITS of app/api-source.js', () => {

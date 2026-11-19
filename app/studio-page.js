@@ -24,7 +24,7 @@ export function studioPage(app, draft, query = {}, still = () => true) {
   const entry = id === null ? null : drafts.get(id);
   if (!entry) {
     document.title = 'Not here · Studio · Loadout';
-    app.replaceChildren(header(''), el('main', { class: 'v2 home notice' },
+    app.replaceChildren(header('studio'), el('main', { class: 'v2 home notice' },
       el('h1', { class: 'h2' }, 'That draft is not here'),
       el('p', { class: 'lede' }, 'Drafts are kept in the browser they were made in. It may have been removed, or made on another computer.'),
       el('p', {}, el('a', { class: 'btn btn-primary', href: '#/studio' }, 'Go to the studio'))));

@@ -645,7 +645,7 @@ test('api-studio: toBag puts a draft in a bag that holds studio sprites, and lat
   const r = await s.toBag(draft);
   assert.equal(r.ok, true, JSON.stringify(r.errors));
   assert.equal(r.key, 'i1');
-  assert.deepEqual(items[0], { key: 'i1', kind: 'sprite', id: 'goo', settings: {}, definition: { data: definition } });
+  assert.deepEqual(items[0], { key: 'i1', kind: 'sprite', id: 'goo', settings: {}, definition: { data: definition }, draft: 'goo' });  // the bag item names its draft, so it follows edits (S8)
   assert.equal(stored(s.storage).drafts.goo.bagKey, 'i1');
   const changed = { ...definition, name: 'Green goo' };
   const set = await s.set(draft, changed);

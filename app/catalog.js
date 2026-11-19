@@ -6,12 +6,28 @@
 // From then until the page is left they answer assetById, loadSprite and loadSound like catalogue assets, so the
 // asset pages, the bag, the playground and the export need no code of their own for them. The built catalogue
 // itself (currentCatalog()) is never changed; allAssets() is the catalogue's rows followed by theirs.
+//
+// Studio sprites in the bag (docs/studio.md section 6; Contract 14 rule 4; studio item S8) are handed over the same way,
+// with the definition { data }: addStudioSprite(definition) checks it (engine/data-sprite.js, never strict), makes its
+// row (`studio: true`, `madeIn: 'studio'`) and registers it, and loadSprite(id) gives dataSprite(data). It is data drawn
+// by framework code, so it needs no worker. app/bag.js followStudio keeps them the ones the bag holds. The checker is
+// large and loaded on demand, so a registration takes a moment: loadCatalog() and loadSprite() wait for the ones under way.
 export const CATALOG_URL = 'generated/catalog.json';
 
 let catalog = null, loading = null;
-const sprites = new Map(), patches = new Map();
-const arrived = new Map();      // sprite programs that have finished loading, by id
-const made = new Map();         // assets made on this visit: id -> { row, definition }
+const studioBusy = new Set();     // studio registrations under way (promises)
+/** Resolves once no studio sprite is being registered (app/bag.js starts them when it loads and whenever the bag changes). */
+export function studioSettled() {
+  return studioBusy.size ? Promise.allSettled([...studioBusy]).then(() => studioSettled()) : Promise.resolve();
+}
+const sprites = new Map(), patches = new Map();      // the library's own files, loading or loaded, by id
+const arrived = new Map();      // library sprite programs that have finished loading, by id
+// assets made on this visit (and studio sprites): id -> { row, definition, program (a promise of the program or patch),
+// now (the program, once it is there) }. Kept apart from the library's: once the catalogue holds an id, the id is the
+// library's everywhere (assetById, loadSprite, spriteNow, loadSound), whatever was registered under it before.
+const made = new Map();
+/** The asset made on this visit that answers for id right now, or null (none, or the catalogue holds the id). */
+const madeNow = (id) => { const m = made.get(id); return m && assetById(id) === m.row ? m : null; };
 const watchers = new Set();
 
 /**
@@ -20,7 +36,8 @@ const watchers = new Set();
  * whatever they pass, get the same catalogue.
  */
 export function loadCatalog(url) {
-  if (catalog) return Promise.resolve(catalog);
+  // (studio sprites the bag holds are known by the time it resolves: it waits for registrations under way)
+  if (catalog) return studioSettled().then(() => catalog);
   if (!loading) {
     const from = url || CATALOG_URL;
     loading = fetch(from).then((r) => {
@@ -28,15 +45,23 @@ export function loadCatalog(url) {
       return r.json();
     }).then((c) => { catalog = c; return c; });
   }
-  return loading;
+  return loading.then((c) => studioSettled().then(() => c));
 }
 
 /** The loaded catalogue, or null before loadCatalog() has finished. */
 export const currentCatalog = () => catalog;
 /** An asset's row by id: the catalogue's, or that of an asset made on this visit. null when there is none. */
 export const assetById = (id) => (catalog ? catalog.assets.find((a) => a.id === id) : null) ?? made.get(id)?.row ?? null;
-/** Every asset there is right now: the catalogue's rows, then the ones made on this visit. */
-export const allAssets = () => [...(catalog ? catalog.assets : []), ...runtimeAssets()];
+/**
+ * Every asset of the library right now: the catalogue's rows, then the ones made on this visit. A studio sprite the bag
+ * holds (addStudioSprite) is left out: it is drawn by id (assetById) but is not part of the library, so code that checks
+ * an id against the library (window.loadout.studio, the studio page) never finds a draft's own bag row (studioAssets()).
+ */
+export const allAssets = () => [...(catalog ? catalog.assets : []), ...runtimeAssets().filter((row) => !row.studio)];
+/** The rows of the studio sprites the bag holds (addStudioSprite), in the order they came. */
+export const studioAssets = () => runtimeAssets().filter((row) => row.studio);
+/** Does the library hold this id: the catalogue, or an asset made on this visit (not a studio sprite from the bag)? False before the catalogue has loaded, for an id only it holds. */
+export const libraryHas = (id) => { const row = assetById(id); return !!row && !row.studio; };
 export const bundleById = (id) => (catalog ? catalog.bundles.find((b) => b.id === id) ?? null : null);
 export const assetsOfBundle = (bundle) => [...bundle.sprites, ...bundle.sounds, ...bundle.music].map(assetById).filter(Boolean);
 
@@ -56,7 +81,8 @@ export const runtimeAssets = () => [...made.values()].map((m) => m.row).filter((
 
 /**
  * Take in an asset made on this visit. row: its catalogue-shaped row ({ id, kind, name, ..., runtime: true });
- * definition: what its own file would hold, a sprite program (what defineSprite returned) or a sound patch.
+ * definition: what its own file would hold, a sprite program (what defineSprite returned) or a sound patch; or, for a
+ * sprite made in the studio, { data } (its studio definition, already checked; `sprite`: its dataSprite, when made).
  * The same id again replaces the earlier one. An id the catalogue uses is refused (it throws).
  */
 export function addRuntimeAsset(row, definition) {
@@ -65,16 +91,77 @@ export function addRuntimeAsset(row, definition) {
   if (!definition || typeof definition !== 'object') throw new Error(`addRuntimeAsset: "${row.id}" needs its definition (a sprite program or a patch)`);
   if (catalog && catalog.assets.some((a) => a.id === row.id)) throw new Error(`"${row.id}" is already an asset in the catalogue`);
   forget(row.id);
-  made.set(row.id, { row, definition });
-  if (row.kind === 'sprite') { sprites.set(row.id, Promise.resolve(definition)); arrived.set(row.id, definition); }
-  else patches.set(row.id, Promise.resolve(definition));
+  const data = row.kind === 'sprite' && isStudioData(definition);
+  const entry = { row, definition: data ? { data: definition.data } : definition, program: null, now: null };
+  if (data) { if (definition.sprite) { entry.program = Promise.resolve(definition.sprite); entry.now = definition.sprite; } }      // else made by loadSprite
+  else if (row.kind === 'sprite') { entry.program = Promise.resolve(definition); entry.now = definition; }
+  else entry.program = Promise.resolve(definition);
+  made.set(row.id, entry);
   tell({ added: row.id });
+}
+
+// ---- studio sprites (see the top) ----------------------------------------------------------------------------------
+
+/** Is this definition a studio sprite's ({ data }) rather than a sprite program? */
+const isStudioData = (d) => !!d && typeof d === 'object' && d.data !== undefined && typeof d.render !== 'function';
+const studioTurn = new Map();     // id -> the number of its latest registration or removal: an older one that ends later is dropped
+let studioCount = 0;
+const listOf = (v) => (Array.isArray(v) ? [...v] : []);
+
+/** A catalogue row for a studio sprite (Contract 4: derived from the sprite, as the build does for a file). */
+function studioRow(sprite, S, stylesOf) {
+  const p = S.defaultParams(sprite);
+  const soundIds = [...new Set(Object.values(sprite.sounds ?? {}).flat().map((c) => c.sound))].sort();
+  const clips = Object.entries(sprite.clips).map(([name, c]) => ({ name, label: c.label, frames: c.frames, loop: c.loop, fps: S.clipFps(sprite, name, p) }));
+  const preview = clips.find((c) => c.name === sprite.preview) ?? clips[0];
+  const m = sprite.meta && typeof sprite.meta === 'object' ? sprite.meta : {};
+  return {
+    id: sprite.id, kind: 'sprite', name: String(sprite.name), description: String(sprite.blurb ?? ''),
+    type: m.type ?? null, role: m.role ?? null, themes: listOf(m.themes), gameTypes: listOf(m.gameTypes), view: m.view ?? null, words: listOf(m.words), license: m.license ?? null,
+    styles: stylesOf(sprite), bundles: [], src: null,
+    tech: { frame: [sprite.size[0], sprite.size[1]], pivot: [sprite.pivot[0], sprite.pivot[1]], grounded: sprite.grounded !== false, clips, controls: Object.keys(sprite.params).length, parts: Object.keys(sprite.parts ?? {}), sounds: soundIds.length, soundIds },
+    thumb: null, strip: null, stripClip: preview?.name ?? null, stripFrames: preview?.frames ?? 0, stripFps: preview?.fps ?? 0,
+    runtime: true, ok: true, studio: true, madeIn: 'studio',
+  };
+}
+
+/**
+ * Take in a sprite made in the studio: check its definition (engine/data-sprite.js, never strict), make its row and
+ * register it (addRuntimeAsset). Resolves to { ok, id, errors, warnings }; never rejects. The same id again replaces it;
+ * a catalogue id is refused. Arguments: definition (a loadout-sprite, as the bag holds it).
+ */
+export function addStudioSprite(definition) {
+  const want = definition && typeof definition === 'object' && typeof definition.id === 'string' ? definition.id : null;
+  const turn = ++studioCount;
+  if (want) studioTurn.set(want, turn);
+  const job = (async () => {
+    try {
+      const [D, S, St] = await Promise.all([import('../engine/data-sprite.js'), import('../engine/sprite.js'), import('../engine/styles.js')]);
+      const r = D.makeDataSprite(definition);
+      if (!r.ok) return { ok: false, id: want, errors: r.errors, warnings: r.warnings };
+      if (want && studioTurn.get(want) !== turn) return { ok: true, id: want, errors: [], warnings: r.warnings, superseded: true };
+      const sprite = r.sprite;
+      addRuntimeAsset(studioRow(sprite, S, St.stylesOf), { data: JSON.parse(JSON.stringify(sprite.definition)), sprite });
+      return { ok: true, id: sprite.id, errors: [], warnings: r.warnings };
+    } catch (e) {
+      return { ok: false, id: want, errors: [String(e?.message ?? e)], warnings: [] };
+    }
+  })();
+  studioBusy.add(job);
+  job.finally(() => studioBusy.delete(job));
+  return job;
+}
+
+/** Forget a studio sprite (it left the bag). Returns false when there is none with that id; anything else is never removed. */
+export function removeStudioSprite(id) {
+  studioTurn.set(id, ++studioCount);      // a registration of it still under way is dropped
+  if (!made.get(id)?.row?.studio) return false;
+  return removeRuntimeAsset(id);
 }
 
 function forget(id) {
   if (!made.has(id)) return false;
-  made.delete(id);
-  sprites.delete(id); arrived.delete(id); patches.delete(id);
+  made.delete(id);      // (the library's own file of that id, if one was loaded, stays: it is kept apart)
   return true;
 }
 
@@ -92,6 +179,7 @@ export function removeRuntimeAsset(id) {
 export function madeNote(id) {
   const row = made.get(id)?.row;
   if (!row || assetById(id) !== row) return null;
+  if (row.studio) return { draft: false, text: 'Made in the studio and kept in your bag. It is drawn from its definition, which is data, not code.' };
   if (row.ok === false) return { draft: true, text: `Made on this visit. It does not pass the quality bar yet, so it cannot go in the bag. To fix: ${(row.errors ?? []).join(' ')}` };
   return { draft: false, text: 'Made on this visit. It is not part of the catalogue: put it in your bag to keep it.' };
 }
@@ -107,9 +195,19 @@ function tell(what) { for (const fn of [...watchers]) { try { fn(what); } catch 
  * Once the catalogue is in, an id it does not list as a sprite is refused without asking for a file.
  */
 export function loadSprite(id) {
+  // a studio sprite still being registered is waited for; once registered it is dataSprite(data), made here when not given
+  if (!made.has(id) && studioBusy.size && !(catalog && catalog.assets.some((a) => a.id === id))) return studioSettled().then(() => loadSprite(id));
+  const mine = madeNow(id);      // (null once the catalogue holds the id: then the library's file is loaded below)
+  if (mine && mine.row.kind === 'sprite' && isStudioData(mine.definition)) {
+    if (!mine.program) {
+      const p = import('../engine/data-sprite.js').then((m) => { const s = m.dataSprite(mine.definition.data); mine.now = s; return s; });
+      p.catch(() => { if (mine.program === p) mine.program = null; });
+      mine.program = p;
+    }
+    return mine.program;
+  }
   // a sprite made on this visit is drawn in a worker: each time it is asked for, what the bag will draw of it is brought first
-  const mine = made.get(id);
-  if (mine && mine.row.kind === 'sprite' && assetById(id) === mine.row) return Promise.resolve(typeof mine.definition.whenReady === 'function' ? mine.definition.whenReady() : null).then(() => mine.definition);
+  if (mine && mine.row.kind === 'sprite') return Promise.resolve(typeof mine.definition.whenReady === 'function' ? mine.definition.whenReady() : null).then(() => mine.definition);
   if (!sprites.has(id)) {
     if (catalog && assetById(id)?.kind !== 'sprite') return Promise.reject(new Error(`"${id}" is not a sprite on this site`));
     const p = import(`../sprites/${id}.js`).then((m) => { arrived.set(id, m.default); return m.default; });
@@ -120,7 +218,7 @@ export function loadSprite(id) {
 }
 
 /** A sprite's program if it has already been loaded, otherwise null. Never waits. */
-export const spriteNow = (id) => arrived.get(id) ?? null;
+export const spriteNow = (id) => { const m = madeNow(id); return m ? (m.row.kind === 'sprite' ? m.now : null) : arrived.get(id) ?? null; };
 
 /** Load several sprites. Resolves to { id: program } with the ones that loaded; one that cannot be loaded is left out. */
 export async function loadSprites(ids) {
@@ -133,6 +231,8 @@ export async function loadSprites(ids) {
 
 /** A sound's or music track's patch. Loaded on demand and kept. */
 export async function loadSound(id) {
+  const mine = madeNow(id);
+  if (mine && mine.row.kind !== 'sprite') return mine.program;
   if (!patches.has(id)) patches.set(id, fetch(`sounds/${id}.json`).then((r) => { if (!r.ok) throw new Error(`sounds/${id}.json: ${r.status}`); return r.json(); }));
   return patches.get(id);
 }

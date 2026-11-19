@@ -11,8 +11,22 @@
 // of it (`settings.lookParams`, from shapeRecord), so the bag draws and downloads the same pictures on every visit,
 // also after the rule behind "Also change shapes" changes. It is made when the item comes in or the shapes part of the
 // look changes (another number behind "Surprise me", shapes on or off), and kept when only colours change.
+//
+// Studio sprites (docs/studio.md 2.3, 5 journey d, 6; Contract 14 rules 6, 7, 9; studio item S8): a sprite made in the
+// studio is data, so its item is { kind: 'sprite', id, settings, definition: { data } } and it is drawn by framework
+// code (engine/data-sprite.js dataSprite), with no worker and without the quality bar. The data is checked by
+// validateDataSprite (never strict) when it goes in (add, updateDefinition, a link); that checker is large, so it is
+// loaded on demand (loadStudioCheck) and, until it has arrived, and for what is read back from storage, only the
+// plain-data wall applies here: the site checks the whole definition again before it draws or exports it (app/catalog.js
+// addStudioSprite, app/bundle.js). The item's id is its definition's id, never one another item or a library asset
+// holds. Such an item follows later edits of its studio draft (Keyang's Q1): window.loadout.studio calls
+// updateDefinition(key, { data }) when the draft is saved; `draft` names the draft, and keepCopy(key) keeps a frozen copy
+// that follows nothing. In a link it is the entry { d: data }, and a link that holds one is deflated (app/deflate.js),
+// unless it holds more than MAX_LINK_STUDIO; a link carries at most MAX_LINK_ITEMS items (see there).
 import { defaultTheme, normalizeTheme, shapeRecord, THEME_PRESETS } from '../engine/theme.js';
-import { spriteNow } from './catalog.js';
+import { spriteNow, libraryHas, loadCatalog, addStudioSprite, removeStudioSprite } from './catalog.js';
+import { deflateRaw, deflateRawAsync, inflateRaw } from './deflate.js';
+import { plainData } from '../catalog/plain-data.js';      // the plain-data wall of Contract 14 rule 6 (studio-schema's, without the rigs)
 
 export const BAG_KEY = 'loadout-bag-v1';
 export const KINDS = ['sprite', 'sound', 'music'];
@@ -24,6 +38,18 @@ export const MAX_SOURCE = 400_000;
  * and a cut link opens as "damaged". Over this the bag page says so and points at the download instead.
  */
 export const LINK_LIMIT = 8000;
+/**
+ * The most studio sprites one deflated link carries. Copies of one definition deflate to almost nothing, so without this a
+ * short link could bring hundreds of sprites into a bag and the site's storage; a deflated link with more is not opened
+ * (peekLink null). A bag with more writes its link plainly (toLink), as long as what it holds, so it still opens.
+ */
+export const MAX_LINK_STUDIO = 16;
+/**
+ * The most items one link carries, deflated or plain (the library holds about 360 assets). A short deflated link can
+ * hold hundreds of thousands of copies of one item, which would fill the browser's storage and freeze the bag page, so a
+ * link with more is not opened (peekLink null), and linkProblem says a bag that big makes no link.
+ */
+export const MAX_LINK_ITEMS = 1000;
 
 /** Storage that lives only as long as the page (used when the browser's storage is unavailable). */
 export function memoryStorage() {
@@ -113,37 +139,97 @@ function cleanRecord(r) {
   return entries.every(ok) ? Object.fromEntries(entries) : null;
 }
 
-/** The definition of an asset made on a visit, as plain data: sprite { source }, sound and music { patch }. null for anything else. */
-export function cleanDefinition(kind, definition) {
+// ---- studio sprites: data (see the top) ----------------------------------------------------------------------
+
+/** The most a studio definition may be as JSON text, in UTF-8 bytes (catalog/studio-schema.js STUDIO_LIMITS.jsonBytes). */
+export const STUDIO_JSON_BYTES = 64 * 1024;
+/** The most bytes a deflated link may inflate to: MAX_LINK_STUDIO studio sprites at their largest, and room for the rest. */
+export const LINK_INFLATE = MAX_LINK_STUDIO * STUDIO_JSON_BYTES + 512 * 1024;
+const STUDIO_FORMAT = 'loadout-sprite';
+const SPRITE_ID = /^[a-z][a-z0-9-]{0,39}$/;
+const DRAFT_ID = /^[a-z][a-z0-9-]{0,39}$/;
+
+let studioCheck = null, studioLoading = null;
+/** Loads the studio checker (engine/data-sprite.js validateDataSprite) for the bag; resolves to it. Safe to call again. */
+export function loadStudioCheck() {
+  studioLoading ??= import('../engine/data-sprite.js').then((m) => { studioCheck = m.validateDataSprite; return studioCheck; }, (e) => { studioLoading = null; throw e; });
+  return studioLoading;
+}
+/** Has the studio checker arrived? Until then the bag keeps studio data behind the plain-data wall only. */
+export const studioCheckLoaded = () => !!studioCheck;
+
+/**
+ * A studio definition as the bag keeps it: { ok, value } or { ok: false, error }. The plain-data wall (JSON only, at most
+ * 64 KB, format loadout-sprite, a sprite id), then, when `full` and the checker has arrived, validateDataSprite (never strict).
+ */
+function checkStudio(data, full) {
+  const wall = isObj(data) ? plainData(data) : null;
+  const copy = wall && !wall.errors.length ? wall.value : undefined;
+  if (!isObj(copy)) return { ok: false, error: wall?.errors[0] ? `it is not plain studio data (${wall.errors[0]})` : 'it is not plain studio data (a JSON object)' };
+  if (new TextEncoder().encode(JSON.stringify(copy)).length > STUDIO_JSON_BYTES) return { ok: false, error: `it is over ${STUDIO_JSON_BYTES / 1024} KB of JSON` };
+  if (copy.format !== STUDIO_FORMAT) return { ok: false, error: `its format is not "${STUDIO_FORMAT}"` };
+  if (typeof copy.id !== 'string' || !SPRITE_ID.test(copy.id)) return { ok: false, error: 'its id is not lowercase letters, digits and dashes' };
+  if (!full || !studioCheck) return { ok: true, value: copy };
+  let v;
+  try { v = studioCheck(copy); } catch (e) { return { ok: false, error: `it could not be checked (${e?.message ?? e})` }; }
+  return v && v.ok ? { ok: true, value: v.value } : { ok: false, error: (v?.errors ?? [])[0] ?? 'it does not pass the studio checks' };
+}
+
+/**
+ * The definition of an asset made on a visit, as plain data: sprite { source } or, made in the studio, { data };
+ * sound and music { patch }. null for anything else. A studio definition is checked as checkStudio says; opts.full: false
+ * keeps it to the plain-data wall (what is read back from storage: the site checks it all before drawing it).
+ */
+export function cleanDefinition(kind, definition, { full = true } = {}) {
   if (!isObj(definition)) return null;
+  if (kind === 'sprite' && definition.data !== undefined) { const c = checkStudio(definition.data, full); return c.ok ? { data: c.value } : null; }
   if (kind === 'sprite') return typeof definition.source === 'string' && definition.source.trim() && definition.source.length <= MAX_SOURCE ? { source: definition.source } : null;
   if (!isObj(definition.patch)) return null;
   try { return { patch: clone(definition.patch) }; } catch { return null; }
 }
 
-function cleanItem(raw) {
+/** Is this raw item a studio sprite (its definition is { data })? */
+const studioRaw = (raw) => isObj(raw) && raw.kind === 'sprite' && isObj(raw.definition) && raw.definition.data !== undefined;
+
+// full: check a studio definition with the checker when it has arrived (see cleanDefinition); false for storage
+function cleanItem(raw, full = false) {
   if (!isObj(raw) || !KINDS.includes(raw.kind) || typeof raw.id !== 'string' || !/^[a-z0-9][a-z0-9-]*$/.test(raw.id)) return null;
   const item = { kind: raw.kind, id: raw.id, settings: cleanSettings(raw.kind, raw.settings) };
-  const definition = cleanDefinition(raw.kind, raw.definition);
+  const definition = cleanDefinition(raw.kind, raw.definition, { full });
+  // a studio sprite whose data does not pass is left out: it never turns into a library item of the same id
+  if (studioRaw(raw) && !definition) return null;
   if (definition) item.definition = definition;
+  // a studio sprite: its id is its definition's; it follows its draft (`draft`), or is a copy that follows nothing (`frozen`)
+  if (definition?.data) {
+    item.id = definition.data.id;
+    if (raw.frozen === true) item.frozen = true;
+    else if (typeof raw.draft === 'string' && DRAFT_ID.test(raw.draft)) item.draft = raw.draft;
+  }
   // where a made item came from, kept so the bag page can say whom to ask when it turns out broken
   if (definition && raw.from === 'link') item.from = 'link';
   return item;
 }
 
 // ---- links: base64url of compact JSON ---------------------------------------------
+// A link that holds a studio sprite is 'z.' and the base64url of the JSON deflated (app/deflate.js).
 
-const toB64 = (text) => {
-  const bytes = new TextEncoder().encode(text);
+const bytesToB64 = (bytes) => {
   let bin = '';
-  for (const b of bytes) bin += String.fromCharCode(b);
+  for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
   return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 };
-const fromB64 = (text) => {
+const b64ToBytes = (text) => {
   const b64 = text.replace(/-/g, '+').replace(/_/g, '/');
   const bin = atob(b64 + '='.repeat((4 - (b64.length % 4)) % 4));
-  return new TextDecoder('utf-8', { fatal: true }).decode(Uint8Array.from(bin, (c) => c.charCodeAt(0)));
+  return Uint8Array.from(bin, (c) => c.charCodeAt(0));
 };
+const toB64 = (text) => bytesToB64(new TextEncoder().encode(text));
+const fromB64 = (text) => new TextDecoder('utf-8', { fatal: true }).decode(b64ToBytes(text));
+const DEFLATED = 'z.';
+/** The JSON text a link's value holds: plain base64url, or 'z.' and deflated base64url. Throws when it is neither. */
+const linkText = (p) => (p.startsWith(DEFLATED) ? new TextDecoder('utf-8', { fatal: true }).decode(inflateRaw(b64ToBytes(p.slice(DEFLATED.length)), LINK_INFLATE)) : fromB64(p));
+/** Is this link entry a studio sprite's (its fourth entry is { d: data })? */
+const studioEntry = (r) => Array.isArray(r) && isObj(r[3]) && r[3].d !== undefined;
 const LETTER = { sprite: 's', sound: 'a', music: 'm' };
 const KIND_OF = { s: 'sprite', a: 'sound', m: 'music' };
 const sameAs = (a, b) => JSON.stringify(a) === JSON.stringify(b);
@@ -154,7 +240,7 @@ function payloadOf(text) {
   const t = text.trim();
   const q = t.indexOf('?');
   if (q >= 0) return new URLSearchParams(t.slice(q + 1)).get('load');
-  return /^[A-Za-z0-9_-]+$/.test(t) && !t.startsWith('#') ? t : null;
+  return /^(z\.)?[A-Za-z0-9_-]+$/.test(t) && !t.startsWith('#') ? t : null;
 }
 
 /**
@@ -163,7 +249,8 @@ function payloadOf(text) {
  */
 // opts.kept: false when `storage` lives only as long as the page (memory standing in for storage the browser refused).
 // opts.spriteOf(id): a sprite's program if it is loaded, else null: the bag records what its look made of a sprite with it.
-export function createBag(storage, { now = () => Date.now(), standard = null, kept = true, spriteOf = null } = {}) {
+// opts.taken(id): true when an asset outside the bag (the library) holds that id: a studio sprite then gets another.
+export function createBag(storage, { now = () => Date.now(), standard = null, kept = true, spriteOf = null, taken = null } = {}) {
   let state = load();
   let standardOf = standard;
   let definitionOf = null;
@@ -222,9 +309,28 @@ export function createBag(storage, { now = () => Date.now(), standard = null, ke
   const newKey = () => 'i' + state.next++;
   const copy = (it) => clone(it);
 
+  /**
+   * An id for a studio sprite that no other bag item (but the one with selfKey) and no library asset holds: wanted, or
+   * its current id when that is wanted with a number (exactly as numbered() writes it), or wanted-2, wanted-3 ...
+   */
+  function freeId(wanted, selfKey = null, current = null) {
+    const used = (id) => state.items.some((x) => x.key !== selfKey && x.id === id) || (() => { try { return !!(taken && taken(id)); } catch { return false; } })();
+    if (!used(wanted)) return wanted;
+    const m = typeof current === 'string' ? /-(\d+)$/.exec(current) : null;
+    if (m && Number(m[1]) >= 2 && current === numbered(wanted, Number(m[1])) && !used(current)) return current;
+    for (let n = 2; ; n++) {
+      const id = numbered(wanted, n);
+      if (!used(id)) return id;
+    }
+  }
+  /** wanted with the number n, cut to fit 40 characters: wanted-n. */
+  const numbered = (wanted, n) => `${wanted.slice(0, 40 - `-${n}`.length).replace(/-+$/, '')}-${n}`;
+
   function put(raw, addedAt) {
-    const it = cleanItem(raw);
+    const it = cleanItem(raw, true);
+    if (!it && studioRaw(raw)) throw new Error(`a studio sprite goes in the bag only when it passes the studio checks, and this one does not: ${checkStudio(raw.definition.data, true).error}`);
     if (!it) throw new Error(`the bag holds sprites, sounds and music; got ${JSON.stringify(raw && { kind: raw.kind, id: raw.id })}`);
+    if (it.definition?.data) { it.id = freeId(it.id); it.definition.data.id = it.id; }      // studio: an id of its own
     // an asset made on this visit goes in with its definition, whoever adds it (a card, its page, a copy of a bag row)
     if (!it.definition && definitionOf) {
       let d = null;
@@ -262,17 +368,43 @@ export function createBag(storage, { now = () => Date.now(), standard = null, ke
     return { ...it, settings: { ...it.settings, params: { ...clone(base.params), ...it.settings.params } } };
   }
 
-  /** The items and theme a link holds, or null when it is not a bag link. */
-  function parseLink(text) {
-    let data;
+  /** What a link holds, as the JSON it is made of: the items with their definitions, and the bag's theme. */
+  function linkData() {
+    const def = (it) => (it.definition.data ? { d: it.definition.data } : it.kind === 'sprite' ? { s: it.definition.source } : { p: it.definition.patch });
+    const data = { v: 1, i: state.items.map((it) => (it.definition ? [LETTER[it.kind], it.id, compact(it), def(it)] : [LETTER[it.kind], it.id, compact(it)])) };
+    if (!sameAs(state.theme, defaultTheme())) data.t = state.theme;
+    return data;
+  }
+  // deflated: a bag that holds a studio sprite, and no more than a deflated link carries (a bigger one is written plainly)
+  const deflates = () => { const n = state.items.filter((i) => i.definition?.data).length; return n > 0 && n <= MAX_LINK_STUDIO; };
+  /** Load the studio checker first when a link holds a studio sprite (a checker that cannot load leaves the plain-data wall). */
+  async function checkerFor(text) {
+    const data = decodeLink(text);
+    if (data && data.i.some(studioEntry)) await loadStudioCheck().catch(() => {});
+  }
+
+  /** The JSON a link holds (plain or deflated), or null when it is not a bag link. */
+  function decodeLink(text) {
+    let data, deflated = false;
     try {
       const p = payloadOf(text);
       if (!p) return null;
-      data = JSON.parse(fromB64(p));
+      deflated = p.startsWith(DEFLATED);
+      data = JSON.parse(linkText(p));
     } catch { return null; }
-    if (!isObj(data) || !Array.isArray(data.i)) return null;
-    // a fourth entry is the definition of an asset made on a visit: { s: source } or { p: patch }
-    const list = data.i.map((r) => (Array.isArray(r) ? cleanItem({ kind: KIND_OF[r[0]], id: r[1], settings: r[2], definition: isObj(r[3]) ? { source: r[3].s, patch: r[3].p } : null }) : null)).filter(Boolean);
+    // a link carries at most MAX_LINK_ITEMS items; a deflated one holds a studio sprite (the site deflates no other) and
+    // at most MAX_LINK_STUDIO of them (see there). Any other is not a bag link this site opens.
+    if (!isObj(data) || !Array.isArray(data.i) || data.i.length > MAX_LINK_ITEMS) return null;
+    const studio = data.i.filter(studioEntry).length;
+    return deflated && (!studio || studio > MAX_LINK_STUDIO) ? null : data;
+  }
+  /** The items and theme a link holds, or null when it is not a bag link. */
+  function parseLink(text) {
+    const data = decodeLink(text);
+    if (!data) return null;
+    // a fourth entry is the definition of an asset made on a visit: { s: source } or { p: patch }, or made in the
+    // studio: { d: data }, which is checked again here (with the checker when it has arrived: fromLinkAsync waits for it)
+    const list = data.i.map((r) => (Array.isArray(r) ? cleanItem({ kind: KIND_OF[r[0]], id: r[1], settings: r[2], definition: isObj(r[3]) ? (r[3].d !== undefined ? { data: r[3].d } : { source: r[3].s, patch: r[3].p }) : null }, true) : null)).filter(Boolean);
     if (list.length !== data.i.length && !list.length) return null;
     return { list, theme: isObj(data.t) ? normalizeTheme(data.t) : defaultTheme() };
   }
@@ -344,8 +476,14 @@ export function createBag(storage, { now = () => Date.now(), standard = null, ke
       const got = parseLink(text);
       if (!got) return null;
       const made = got.list.filter((i) => i.definition).length;
-      return made ? { count: got.list.length, made, code: got.list.filter((i) => i.definition && i.kind === 'sprite').length } : { count: got.list.length };
+      // studio: how many are studio sprites, which are data (nothing of them runs); left out when there are none
+      const studio = got.list.filter((i) => i.definition?.data).length;
+      return made ? { count: got.list.length, made, code: got.list.filter((i) => i.definition && i.kind === 'sprite' && !i.definition.data).length, ...(studio ? { studio } : {}) } : { count: got.list.length };
     },
+    /** peekLink, once the studio checker has arrived when the link holds a studio sprite (so it counts only what passes). */
+    async peekLinkAsync(text) { await checkerFor(text); return api.peekLink(text); },
+    /** fromLink, once the studio checker has arrived when the link holds a studio sprite: each one is checked whole on the way in. */
+    async fromLinkAsync(text, opts) { await checkerFor(text); return api.fromLink(text, opts); },
     /**
      * Tell the bag each asset's standard settings, so links can leave them out:
      * fn(kind, id, settings) -> { params, cues?, artStyle? (a sprite's first art style) } or null when unknown.
@@ -360,7 +498,7 @@ export function createBag(storage, { now = () => Date.now(), standard = null, ke
     redefine(id, definition) {
       let n = 0;
       for (const it of state.items) {
-        if (it.id !== id) continue;
+        if (it.id !== id || it.definition?.data) continue;      // a studio sprite follows its draft instead (updateDefinition)
         const d = cleanDefinition(it.kind, definition);
         if (!d || sameAs(d, it.definition)) continue;
         it.definition = d;
@@ -384,11 +522,68 @@ export function createBag(storage, { now = () => Date.now(), standard = null, ke
     /** Read the storage again (another tab changed it). */
     reload() { state = load(); for (const fn of [...listeners]) { try { fn(api); } catch (e) { console.error('bag listener:', e); } } },
 
-    /** The whole bag as an address hash: '#/bag?load=...'. */
+    /**
+     * The whole bag as an address hash: '#/bag?load=...'. A bag that holds a studio sprite (at most MAX_LINK_STUDIO) makes
+     * a deflated link ('load=z....', written here by the plain-JS writer; toLinkAsync uses the browser's CompressionStream).
+     */
     toLink() {
-      const data = { v: 1, i: state.items.map((it) => (it.definition ? [LETTER[it.kind], it.id, compact(it), it.kind === 'sprite' ? { s: it.definition.source } : { p: it.definition.patch }] : [LETTER[it.kind], it.id, compact(it)])) };
-      if (!sameAs(state.theme, defaultTheme())) data.t = state.theme;
-      return '#/bag?load=' + toB64(JSON.stringify(data));
+      const text = JSON.stringify(linkData());
+      return '#/bag?load=' + (deflates() ? DEFLATED + bytesToB64(deflateRaw(new TextEncoder().encode(text))) : toB64(text));
+    },
+    /** toLink, deflated with the browser's CompressionStream when the bag holds a studio sprite (the same link as toLink otherwise). */
+    async toLinkAsync() {
+      if (!deflates()) return api.toLink();
+      return '#/bag?load=' + DEFLATED + bytesToB64(await deflateRawAsync(new TextEncoder().encode(JSON.stringify(linkData()))));
+    },
+
+    // ---- studio sprites (see the top) ----
+    /** How many items are studio sprites (their definition is { data }). */
+    studioCount: () => state.items.filter((i) => i.definition?.data).length,
+    /**
+     * A studio sprite's draft was saved: give its item the new definition (checked first), keeping its key and settings.
+     * Returns false when the key is not in the bag or is not a studio sprite that follows its draft (a frozen copy);
+     * throws when the definition does not pass the studio checks (the item is then unchanged). Arguments: key, definition ({ data }).
+     */
+    updateDefinition(key, definition) {
+      const it = state.items.find((i) => i.key === key);
+      if (!it || it.kind !== 'sprite' || !it.definition?.data || it.frozen) return false;
+      const c = checkStudio(isObj(definition) ? definition.data : undefined, true);
+      if (!c.ok) throw new Error(`a studio sprite goes in the bag only when it passes the studio checks, and this one does not: ${c.error}`);
+      const data = c.value;
+      data.id = freeId(data.id, it.key, it.id);
+      if (it.id === data.id && sameAs(it.definition.data, data)) return true;
+      it.id = data.id;
+      it.definition = { data };
+      delete it.settings.lookParams;      // looks: recorded again once the new program is loaded (fillLooks)
+      changed();
+      return true;
+    },
+    /**
+     * Give every studio sprite an id no library asset and no other item holds (taken() may only know the library once
+     * the catalogue has loaded: one that came in before then may hold a library id). Returns how many were renamed.
+     */
+    settleIds() {
+      let n = 0;
+      for (const it of state.items) {
+        if (!it.definition?.data) continue;
+        const id = freeId(it.id, it.key);
+        if (id === it.id) continue;
+        it.id = id;
+        it.definition.data.id = id;
+        delete it.settings.lookParams;      // looks: recorded again under the new id (fillLooks)
+        n++;
+      }
+      if (n) changed();
+      return n;
+    },
+    /** Keep a frozen copy of a studio sprite beside it: a new item, with an id of its own, that follows no draft. Returns its key, or null. */
+    keepCopy(key) {
+      const it = state.items.find((i) => i.key === key);
+      if (!it || !it.definition?.data) return null;
+      const { key: _k, addedAt: _a, draft: _d, ...rest } = clone(it);
+      const k = put({ ...rest, frozen: true }, now());
+      changed();
+      return k;
     },
     /**
      * Load a bag from a link made by toLink (a full address, the hash, or just its value).
@@ -433,9 +628,74 @@ export function pickStorage(win) {
 /** What the site says, wherever things are added and on the bag page, while the browser is not keeping the bag. */
 export const NOT_KEPT = 'This browser is not keeping your bag (a private window, or saving for sites is switched off), so it will be gone when you reload or close the page. Download it before you leave, or copy the link to your bag and open that later.';
 
+/**
+ * Keep the site's studio sprites (app/catalog.js addStudioSprite) the ones a bag holds, now and after every change: each
+ * one is checked whole and registered, a changed one again, one taken out is forgotten. Returns a function that stops it.
+ * Arguments: b (a bag from createBag).
+ */
+export function followStudio(b) {
+  const shown = new Map();        // id -> the JSON of the definition registered under it
+  const sync = () => {
+    const want = new Map();
+    for (const it of b.items()) if (it.kind === 'sprite' && it.definition?.data) want.set(it.id, JSON.stringify(it.definition.data));
+    for (const [id, text] of want) {
+      if (shown.get(id) === text) continue;
+      shown.set(id, text);
+      addStudioSprite(JSON.parse(text)).then((r) => { if (!r.ok) console.warn(`Loadout: the studio sprite "${id}" in the bag cannot be drawn: ${r.errors[0]}`); });
+    }
+    for (const id of [...shown.keys()]) if (!want.has(id)) { shown.delete(id); removeStudioSprite(id); }
+    if (want.size && !studioCheck) loadStudioCheck().catch(() => {});
+  };
+  sync();
+  return b.onChange(sync);
+}
+
+/**
+ * Words for why a bag makes no link, or null when its link is fine: over LINK_LIMIT characters, or more items than a link
+ * carries (MAX_LINK_ITEMS). They say what travels in the link: a studio sprite's definition (data), or the
+ * source of something made on a visit. Arguments: b (a bag), link (its link, or the link's length), opts.instead (the
+ * last sentence, what to do instead; the bag page's Download when left out).
+ */
+export function linkProblem(b, link, { instead = null } = {}) {
+  const length = typeof link === 'string' ? link.length : Number(link) || 0;
+  const studio = b.studioCount(), made = b.madeCount() - studio;
+  const n = (c, one, many) => `${c} ${c === 1 ? one : many}`;
+  const then = instead ?? `Download the package instead: it holds everything, ${studio && made ? 'the studio sprites\' files and the sources too' : studio ? `${studio === 1 ? 'the studio sprite\'s file' : 'each studio sprite\'s file'} too` : made ? 'the source too' : 'every file'}.`;
+  const count = b.count();
+  if (count > MAX_LINK_ITEMS) return `This bag is too big for a link: it holds ${count.toLocaleString('en')} things, and a link carries at most ${MAX_LINK_ITEMS.toLocaleString('en')}, so no link was made. ${then}`;
+  if (length <= LINK_LIMIT) return null;
+  const parts = [studio ? `${n(studio, 'sprite', 'sprites')} made in the studio` : '', made ? `${n(made, 'thing', 'things')} made on a visit` : ''].filter(Boolean);
+  const alone = studio + made === 1;
+  const what = parts.length ? `it holds ${parts.join(' and ')}, which travel${alone ? 's' : ''} with ${alone ? 'its' : 'their'} whole ${studio && made ? 'definition and source' : studio ? 'definition' : 'source'}, and ` : '';
+  return `This bag is too long for a link: ${what}the link would be ${length.toLocaleString('en')} characters long. Chat and mail apps cut links over ${LINK_LIMIT.toLocaleString('en')} characters short, so no link was made. ${then}`;
+}
+
+/**
+ * Keep the ids of a bag's studio sprites clear of the library's: once ready() has resolved (the catalogue is in, so the
+ * bag's taken() knows the library), and after every later change, settleIds. ready is called only when the bag holds a
+ * studio sprite, and again after a failure. Returns a function that stops it. Arguments: b (a bag), ready (() => promise).
+ */
+export function settleStudioIds(b, ready) {
+  let phase = 'waiting';      // 'waiting' -> 'asked' -> 'done'
+  const go = () => {
+    if (phase === 'done') { b.settleIds(); return; }
+    if (phase !== 'waiting' || !b.studioCount()) return;
+    phase = 'asked';
+    let p;
+    try { p = Promise.resolve(ready()); } catch (e) { p = Promise.reject(e); }
+    p.then(() => { phase = 'done'; b.settleIds(); }, () => { phase = 'waiting'; });
+  };
+  const stop = b.onChange(go);
+  go();
+  return stop;
+}
+
 /** The site's one shared bag. */
 const where = pickStorage(typeof window === 'undefined' ? undefined : window);
-export const bag = createBag(where.storage, { kept: where.kept, spriteOf: spriteNow });
+// a studio sprite never takes an id a library asset (or one made on a visit) holds: known once the catalogue is in, so
+// one that came in before then (a link, an early add, storage) is given another id when it arrives (settleStudioIds)
+export const bag = createBag(where.storage, { kept: where.kept, spriteOf: spriteNow, taken: libraryHas });
+if (typeof window !== 'undefined') { followStudio(bag); settleStudioIds(bag, () => loadCatalog()); }
 
 // Another tab changed the bag: pick it up here too.
 if (typeof window !== 'undefined') window.addEventListener('storage', (e) => { if (e.key === BAG_KEY) bag.reload(); });

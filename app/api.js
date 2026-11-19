@@ -75,7 +75,7 @@ export function restoreRuntime(sure = false) {
  * null for a catalogue item. Only a "ready" item is drawn or exported.
  */
 export function madeItemState(item) {
-  if (!item || !item.definition) return null;
+  if (!item || !item.definition || item.definition.data) return null;      // a studio sprite is data (Contract 14): nothing to check off the page
   return inner ? inner.state(item) : { state: 'checking' };
 }
 

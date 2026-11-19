@@ -63,7 +63,7 @@ export function drawRest(def, facing = 'side', p = {}) {
  */
 export async function libraryFile(def, catalogIds) {
   let F;
-  try { F = await import('../../tools/lib/data-file.mjs'); } catch {
+  try { F = await import('../../catalog/data-file.js'); } catch {
     return { ok: false, errors: ['the file writer could not be loaded on this site'], warnings: [], name: null, text: null };
   }
   return F.writeDataFile(def, catalogIds ? { catalogIds } : {});

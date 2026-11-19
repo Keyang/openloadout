@@ -40,8 +40,10 @@ test('data-sprite: the newt becomes a defineSprite result with the definition\'s
   assert.deepEqual(Object.keys(newt.clips), ['idle', 'walk', 'attack', 'hurt', 'die']);
 });
 
-test('data-sprite: the cleaned definition is kept on the sprite (made, definition), frozen, plain JSON', () => {
-  assert.deepEqual(newt.made, { in: 'studio', from: 'template:four-legs' });
+test('data-sprite: the cleaned definition is kept on the sprite (definition, with its made), frozen, plain JSON', () => {
+  // where it came from is the definition's: sprite.made means "made on this visit, drawn in a worker" (app/made.js; review F1, issue 1)
+  assert.deepEqual(newt.definition.made, { in: 'studio', from: 'template:four-legs' });
+  assert.equal(newt.made, undefined);
   assert.equal(newt.definition.format, 'loadout-sprite');
   assert.equal(newt.definition.id, 'moss-newt');
   assert.ok(Object.isFrozen(newt.definition) && Object.isFrozen(newt.definition.body.rig.bones[0]));

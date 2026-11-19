@@ -7,6 +7,7 @@
 // The pure helpers at the top (the look in the address bar, colour previews, fast
 // recolouring of a picture) have no DOM and run in Node for the unit tests; only
 // themeControls() touches `document`, and only when it is called.
+import { makeMagic } from './magic.js';
 import { defaultTheme, normalizeTheme, randomTheme, applyColour, namedMaterials, THEME_PRESETS, PALETTES } from '../engine/theme.js';
 
 const clone = (v) => JSON.parse(JSON.stringify(v));
@@ -244,7 +245,7 @@ export function themeControls({ theme, onChange = () => {}, original = defaultTh
   const shapes = h('input', { type: 'checkbox', role: 'switch', 'aria-describedby': shapesHint });
   shapes.addEventListener('change', () => { cur = { ...cur, shapes: shapes.checked }; emit(); });
   syncs.push(() => { shapes.checked = !!cur.shapes; });
-  const surprise = h('button', { type: 'button', class: 'btn btn-sm btn-secondary look-surprise' }, 'Surprise me');
+  const surprise = makeMagic(h('button', { type: 'button', class: 'btn btn-sm btn-secondary look-surprise' }, 'Surprise me'));
   surprise.addEventListener('click', () => {
     let seed = cur.seed, next;
     for (let i = 0; i < 20; i++) {   // a new look each press: skip the rare number that gives the same colours
