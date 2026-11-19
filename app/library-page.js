@@ -18,6 +18,7 @@ import {
   pickResults, resultLine, styleMemory, finder, smart, setSmartSearch, smartNote, onSearchChange, onSmartChange,
 } from './browse.js';
 import { SORTS, extrasFromQuery, libraryHash, sortRows, kitsMatching, tabCounts, createLayoutMemory } from './library-state.js';
+import { bagTray } from './tray.js';      // the bag at the right edge, filling up as things are added (app/tray.js)
 
 const EAGER = 12;        // cards made straight away; the rest are made when they scroll near the screen
 const NEAR = '500px';    // how near
@@ -399,8 +400,11 @@ export function libraryPage(app, query) {
   document.addEventListener('keydown', onDocKey);
 
   panel.setAttribute('aria-busy', 'true');
+  // the bag's tray beside the results (1024 px and wider: app/css/tray.css); it stays while the results scroll
+  const tray = bagTray({ size: 'full' });
   app.replaceChildren(header('library'), el('main', { class: 'v2 lib' },
-    el('h1', { class: 'sr' }, 'Library'), searchRow, skip, tabs, bar, panel));
+    el('h1', { class: 'sr' }, 'Library'), searchRow, skip, tabs, bar, panel), tray.node);
+  tray.placed();
   showLayout();
   drawTabs({ all: '', sprite: '', sound: '', music: '', kits: '' });
 
@@ -414,6 +418,7 @@ export function libraryPage(app, query) {
     document.removeEventListener('keydown', onDocKey);
     gallery.stop();
     for (const c of kitCards) c.stop();
+    tray.stop();
   };
 }
 

@@ -196,6 +196,160 @@ function topMap(f) {
   return { map, legend, stacks: [] };
 }
 
+// ---- one-screen levels (the playground, docs/playground-tray-workbench.md section 1) ---------------------------
+// f.screen = { cols, rows }: the level is made the size of the picture, so every thing in it is seen at once without
+// walking. The same pieces as the long level, fitted to the room there is: the ground two deep along the bottom, rows of
+// platforms two tiles apart above it (staggered, so each row can be jumped to from the one under it), and, where the
+// width allows, the mound, a hall with its back wall, ladders and posts, and the pool with its waterfall at the right.
+// The outermost column on each side may be cut by the picture's edge, so nothing is put there (level.inner).
+
+const SCREEN_MIN = { cols: 8, rows: 6 };
+const screenSize = (f) => ({ cols: Math.max(SCREEN_MIN.cols, Math.floor(f.screen.cols) || 0), rows: Math.max(SCREEN_MIN.rows, Math.floor(f.screen.rows) || 0) });
+const blankMap = (cols, rows) => Array.from({ length: rows }, () => Array(cols).fill('.'));
+
+/** Side view, one screen: the letters and the legend for what the bag has. */
+function sideScreen(f) {
+  const { cols, rows } = screenSize(f);
+  const map = blankMap(cols, rows), legend = {};
+  const set = (c0, c1, r0, r1, ch) => { for (let r = Math.max(0, r0); r <= Math.min(rows - 1, r1); r++) for (let c = Math.max(0, c0); c <= Math.min(cols - 1, c1); c++) map[r][c] = ch; };
+  const G = rows - 2, gp = f.ground ?? null, hi = cols - 2;
+  if (gp) { legend['#'] = `block:${gp}`; legend.I = `block:${f.second ?? gp}`; }
+  set(0, cols - 1, G, rows - 1, '#');
+  const busy = [];                        // column spans on the ground kept for one thing each: [c0, c1, top row]
+  // a platform at row `top` over these columns leaves a row of room above what stands on the ground there
+  const free = (c0, c1, top) => c0 >= 2 && c1 <= hi && !busy.some(([a, b, t]) => c0 <= b && c1 >= a && top >= t - 1);
+  let cursor = 3;
+  const poolEdge = (f.pool || f.fall) && cols >= 10 ? hi - 4 : hi + 1;      // where the pool's left bank begins
+  // the mound
+  if (f.slopes && cursor + 4 <= poolEdge - 1) {
+    const c = cursor;
+    set(c, c, G - 1, G - 1, '/'); set(c + 1, c + 2, G - 1, G - 1, '#'); set(c + 3, c + 3, G - 1, G - 1, '\\');
+    if (typeof f.slopes === 'string') { legend['/'] = `slope-up:${f.slopes}`; legend['\\'] = `slope-down:${f.slopes}`; }
+    busy.push([c, c + 3, G - 1]); cursor += 5;
+  }
+  // the pool in a dip near the right end, and a waterfall pouring into it from a ledge
+  let poolAt = null;
+  if ((f.pool || f.fall) && cols >= 10) {
+    const c0 = hi - 3;
+    if (f.pool) {
+      poolAt = c0;
+      legend['~'] = `liquid:${f.pool}`;
+      const bank = gp ? 'B' : '#';
+      if (gp) legend.B = [`back:${f.pool}`, `block:${gp}`];
+      set(c0, c0 + 2, G, G, '~');
+      set(c0 - 1, c0 - 1, G, G, bank); set(c0 + 3, c0 + 3, G, G, bank); set(c0, c0 + 2, G + 1, G + 1, bank);
+    }
+    if (f.fall && G - 4 >= 2) {
+      legend.V = `liquid:${f.fall}`;
+      set(c0, c0 + 2, G - 4, G - 4, '#');
+      set(c0 + 1, c0 + 1, G - 3, f.pool ? G : G - 1, 'V');
+      busy.push([c0 - 1, c0 + 3, G - 4]);
+    } else busy.push([c0 - 1, c0 + 3, G]);
+  }
+  // a hall with the first back wall in the bag behind it, under a roof
+  const it = (f.interiors ?? [])[0];
+  if (it && G - 3 >= 2 && cursor + 6 <= (poolAt ?? hi + 1) - 2) {
+    const L = HALL_LETTERS[0], x = cursor, R = it.block ? L.R : '#';
+    if (it.block) legend[L.R] = [`back:${it.floor}`, `block:${it.block}`];
+    legend[L.K] = `floor:${it.floor}`;
+    set(x, x + 5, G - 3, G - 3, R);                                  // the roof
+    set(x, x, G - 2, G - 2, R); set(x + 5, x + 5, G - 2, G - 2, R);   // its two sides; under them the way in and out
+    set(x + 1, x + 4, G - 2, G - 1, L.K); set(x, x, G - 1, G - 1, L.K); set(x + 5, x + 5, G - 1, G - 1, L.K);
+    if (it.window) { legend[L.N] = it.window; map[G - 2][x + 2] = L.N; }
+    if (it.battlement && G - 4 >= 1) { legend[L.M] = it.battlement; set(x, x + 5, G - 4, G - 4, L.M); }
+    busy.push([x, x + 5, G - 4]); cursor += 7;
+  }
+  // ladders, vines and posts, two tiles tall, on free ground in the gaps between the lowest platforms
+  const stacks = [];
+  const gaps = [];
+  for (let c = 6; c <= hi; c += 6) gaps.push(c, c + 1);
+  list(f.stacks ?? 0, 2).forEach((prefix, i) => {
+    const c = gaps.find((g) => free(g, g, G - 2) && !stacks.some((x) => Math.abs(x.c - g) < 2) && map[G - 1][g] === '.' && map[G][g] === '#');
+    if (c === undefined) return;
+    set(c, c, G - 2, G - 1, STACK_LETTERS[i]);
+    if (prefix) legend[STACK_LETTERS[i]] = `stack:${prefix}`;
+    stacks.push({ c, r0: G - 2, r1: G - 1 });
+    busy.push([c, c, G - 2]);
+  });
+  // rows of platforms two tiles apart, staggered; the second row's first one is the second block in the bag
+  const thins = f.strip ? [] : list(f.thins ?? 1, THIN_LETTERS.length);
+  const len = f.strip ? 3 : 4;
+  const tiersN = G - 2 >= 3 ? Math.floor((G - 5) / 2) + 1 : 0, islandTier = Math.min(1, tiersN - 1);
+  for (let k = 0, r = G - 2; r >= 3; k++, r -= 2) {
+    let first = true;
+    for (let c0 = 2 + (k % 2) * 3; c0 + 1 <= hi; c0 += 6) {
+      // the platform, cut short at the right edge and round whatever stands under it; a piece under two tiles is left out
+      const runs = [];
+      for (let c = c0; c <= Math.min(hi, c0 + len - 1); c++) {
+        if (!free(c, c, r)) continue;
+        if (runs.length && runs.at(-1)[1] === c - 1) runs.at(-1)[1] = c; else runs.push([c, c]);
+      }
+      for (const [a, b] of runs) {
+        if (b - a < 1) continue;
+        let ch = f.strip ? '#' : THIN_LETTERS[k % Math.max(1, thins.length)];
+        if (first && k === islandTier && (f.second || !gp)) ch = 'I';      // a floating block: the second ground, or the plain ground
+        first = false;
+        set(a, b, r, r, ch);
+        if (!f.strip && ch !== 'I' && thins[k % thins.length]) legend[ch] = `thin:${thins[k % thins.length]}`;
+      }
+    }
+  }
+  return { map, legend, stacks, halls: [], end: null };
+}
+
+/** Top-down, one screen: a walled room the size of the picture, with what the bag has laid in it where it fits. */
+function topScreen(f) {
+  const { cols, rows } = screenSize({ screen: { cols: f.screen.cols, rows: Math.max(7, f.screen.rows) } });
+  const map = blankMap(cols, rows), legend = {};
+  const set = (c0, c1, r0, r1, ch) => { for (let r = Math.max(0, r0); r <= Math.min(rows - 1, r1); r++) for (let c = Math.max(0, c0); c <= Math.min(cols - 1, c1); c++) map[r][c] = ch; };
+  const grounds = list(f.grounds ?? (f.path ? 1 : 0), 2), holes = list(f.holes ?? (f.hole ? 1 : 0), 2), floors = list(f.floors ?? 0, 2);
+  if (f.wall) legend.W = `block:${f.wall}`;
+  set(0, cols - 1, 0, 1, 'W'); set(0, cols - 1, rows - 1, rows - 1, 'W'); set(0, 0, 0, rows - 1, 'W'); set(cols - 1, cols - 1, 0, rows - 1, 'W');
+  const mid = Math.floor(rows / 2), wide = cols >= 14, tall = rows >= 10;
+  // a wall to walk round
+  if (wide && tall) set(Math.floor(cols / 2) - 1, Math.floor(cols / 2) + 1, 3, 4, 'W');
+  // a lane of the second ground across the room and up to the north wall; a square of the third
+  if (grounds.length) {
+    if (grounds[0]) legend.P = `block:${grounds[0]}`;
+    set(2, cols - 3, mid, mid, 'P'); set(4, 4, 2, mid, 'P');
+    if (grounds.length > 1 && wide) { if (grounds[1]) legend.Q = `block:${grounds[1]}`; set(cols - 6, cols - 4, mid + 1, Math.min(rows - 2, mid + 2), 'Q'); }
+  }
+  // a pond or a pit in the north-east, with a bridge where the tileset has one
+  const pond = holes.length ? 'O' : f.liquid ? '~' : null;
+  if (pond && cols >= 10) {
+    const what = holes.length ? (holes[0] ? `block:${holes[0]}` : null) : `liquid:${f.liquid}`;
+    if (what) legend[pond] = what;
+    const r1 = Math.min(mid - 1, tall ? 5 : 4);
+    set(cols - 5, cols - 2, 2, r1, pond);
+    if (f.bridge && what && r1 >= 3) { legend.H = [what, f.bridge]; set(cols - 5, cols - 2, 3, 3, 'H'); }
+  }
+  if (holes.length > 1 && tall) { if (holes[1]) legend.X = `block:${holes[1]}`; set(2, 3, rows - 3, rows - 2, holes[1] ? 'X' : 'O'); }
+  // another floor (the planks of a house), with a rail fence round it where the tileset has one
+  if ((floors[1] || f.fence) && wide && tall) {
+    const bx = 5, by = rows - 4;
+    if (floors[1]) { legend.L = `floor:${floors[1]}`; set(bx + 1, bx + 4, by + 1, by + 2, 'L'); }
+    if (f.fence) {
+      legend.T = f.fence.post; legend.Y = f.fence.h; legend.J = f.fence.v;
+      map[by][bx] = 'T'; set(bx + 1, bx + 4, by, by, 'Y'); set(bx, bx, by + 1, by + 2, 'J');
+      if (floors[1]) { legend.N = [`floor:${floors[1]}`, f.fence.v]; set(bx + 4, bx + 4, by + 1, by + 2, 'N'); } else set(bx + 4, bx + 4, by + 1, by + 2, 'J');
+    }
+  }
+  return { map, legend, stacks: [] };
+}
+
+/**
+ * The order things are put on a list of places: spread out, so the first few are far apart and the rest fill in
+ * between (the middle, then the quarters, then the eighths...).
+ */
+export function spreadOrder(n) {
+  const out = [], seen = new Set();
+  for (let step = 2 ** Math.ceil(Math.log2(Math.max(1, n))); step >= 1; step /= 2) {
+    for (let i = Math.floor(step / 2); i < n; i += step) if (!seen.has(i)) { seen.add(i); out.push(i); }
+  }
+  for (let i = 0; i < n; i++) if (!seen.has(i)) out.push(i);
+  return out;
+}
+
 /**
  * The level for a mode ('side' or 'top'), from what the bag's tiles have (levelFeatures gives these options):
  *   tiles: the helper's classification, used to read the map. ground, second: the prefixes of the first two blocks.
@@ -215,9 +369,12 @@ function topMap(f) {
  */
 export function makeLevel(mode, f = {}) {
   const T = TILE, top = mode === 'top';
-  const { map, legend, stacks, halls, end } = top ? topMap(f) : sideMap(f);
+  const screen = !!f.screen;
+  const { map, legend, stacks, halls, end } = top ? (screen ? topScreen(f) : topMap(f)) : (screen ? sideScreen(f) : sideMap(f));
   const rows = map.length, cols = map[0].length;
   const level = { mode: top ? 'top' : 'side', tile: T, cols, rows, width: cols * T, height: rows * T, map, legend };
+  // one screen: things are only put inside the outermost columns, which the picture's edge may cut
+  if (screen) { level.screen = true; level.inner = { x0: T, x1: (cols - 1) * T }; }
   // the helper says what each cell is: a block, a slope, a platform, a liquid; and, top-down, a wall, a hole or ground
   const cells = layoutTiles(map.map((r) => r.join('')), f.tiles ?? NO_TILES, { view: top ? 'top-down' : 'side', legend }).cells;
   level.wet = new Set();
@@ -246,14 +403,22 @@ export function makeLevel(mode, f = {}) {
       if (!cell.solid) return PATH;
       return (kindOf(block.prefix) ?? block.as) === 'hole' ? HOLE : WALL;
     }));
-    level.start = { x: Math.round(2.5 * T), y: Math.round(4.9 * T) };
-    const all = [];
+    level.start = screen ? { x: Math.round(2.5 * T), y: Math.round(2.9 * T) } : { x: Math.round(2.5 * T), y: Math.round(4.9 * T) };
+    const all = [], rest = [];
     for (let r = 2; r <= rows - 2; r++) for (let c = 1; c <= cols - 2; c++) {
-      if ((c + r) % 2 || isWall(level, c, r)) continue;
+      if (isWall(level, c, r)) continue;
       const s = { x: Math.round((c + 0.5) * T), y: Math.round((r + 0.9) * T) };
-      if (Math.hypot(s.x - level.start.x, s.y - level.start.y) > T * 1.4) all.push(s);
+      if (Math.hypot(s.x - level.start.x, s.y - level.start.y) <= T * 1.4) continue;
+      if ((c + r) % 2 === 0) all.push(s); else if (screen) rest.push(s);
     }
-    all.sort((a, b) => Math.hypot(a.x - level.start.x, a.y - level.start.y) - Math.hypot(b.x - level.start.x, b.y - level.start.y));
+    const near = (a, b) => Math.hypot(a.x - level.start.x, a.y - level.start.y) - Math.hypot(b.x - level.start.x, b.y - level.start.y);
+    all.sort(near);
+    if (screen) {
+      // every free cell of the room is a place, the ones a cell apart first; all sorts of thing share them
+      const shared = [...all, ...rest.sort(near)];
+      level.spots = { all: shared, pickup: shared, prop: shared, mover: shared };
+      return level;
+    }
     level.spots = { pickup: all.filter((_, i) => i % 3 === 0), prop: all.filter((_, i) => i % 3 === 1), mover: all.filter((_, i) => i % 3 === 2) };
     return level;
   }
@@ -273,9 +438,13 @@ export function makeLevel(mode, f = {}) {
     }
   });
   level.thins.sort((a, b) => THIN_LETTERS.indexOf(map[a.r][a.c0]) - THIN_LETTERS.indexOf(map[b.r][b.c0]));
-  level.groundY = 7 * T;
-  level.start = { x: 40, y: level.groundY };
+  level.groundY = screen ? (rows - 2) * T : 7 * T;
+  level.start = { x: screen ? Math.round(1.5 * T) : 40, y: level.groundY };
   const on = (x, from = 0) => ({ x, y: surfaceBelow(level, x, from).y });
+  if (screen) {
+    level.spots = screenSpots(level);
+    return level;
+  }
   const low = level.groundY - 40;                      // "on the ground": below the platforms
   level.spots = {
     pickup: [on(104, low), on(5.5 * T, 4.5 * T), on(9 * T, low), on(13.5 * T, 3.5 * T), on(17 * T), on(22.6 * T, low)],
@@ -334,6 +503,35 @@ export function levelFeatures(index, mode) {
       return { floor: x.prefix, block: block?.prefix ?? null, archL: mine('arch-l'), archR: mine('arch-r'), window: mine('window'), battlement: mine('battlement') };
     }),
   };
+}
+
+/**
+ * Side view, one screen: every place a thing can stand, one for each column of each surface (the ground, the tops of
+ * platforms, blocks and roofs), leaving out the outermost columns, liquids and the player's start. The surfaces are
+ * taken in turn (the ground first) and the places along each are spread out, so a few things are far apart and many
+ * fill every surface evenly; then the places half a tile along from those, for a crowded scene. Returns { all, full,
+ * pickup, prop, mover }: one shared list (world.js takes them in order); full: how many are a whole tile apart.
+ */
+function screenSpots(level) {
+  const T = level.tile, rows = [];
+  const thinAt = (c, r) => level.thins.some((p) => r === p.r && c >= p.c0 && c <= p.c1);
+  const standOn = (c, r) => cellAt(level, c, r) !== EMPTY || thinAt(c, r);
+  for (let r = 1; r < level.rows; r++) {
+    const row = [];
+    for (let c = 1; c <= level.cols - 2; c++) {
+      if (!standOn(c, r) || standOn(c, r - 1) || level.wet.has(`${c},${r}`) || level.wet.has(`${c},${r - 1}`)) continue;
+      const x = Math.round((c + 0.5) * T), y = surfaceBelow(level, x, (r - 1) * T + 1).y;
+      if (Math.abs(x - level.start.x) < T * 1.2 && Math.abs(y - level.start.y) < 1) continue;
+      row.push({ x, y });
+    }
+    if (row.length) rows.push(spreadOrder(row.length).map((i) => row[i]));
+  }
+  rows.reverse();                         // the ground first, then each row of platforms up from it
+  const all = [];
+  for (let i = 0; rows.some((r) => i < r.length); i++) for (const r of rows) if (i < r.length) all.push(r[i]);
+  // then, when there are more things than columns, half a tile along from each: closer together, still in view
+  const half = all.map((p) => ({ x: p.x + T / 2, y: p.y })).filter((p) => p.x < level.inner.x1 - 4 && Math.abs(surfaceBelow(level, p.x, p.y - 1).y - p.y) < 1);
+  return { all: [...all, ...half], full: all.length, pickup: all, prop: all, mover: all };
 }
 
 // ---- where things can stand ---------------------------------------------------------------------

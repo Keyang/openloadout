@@ -9,7 +9,7 @@ const ROOT = new URL('../../', import.meta.url);
 const read = (f) => fs.readFileSync(new URL(f, ROOT), 'utf8');
 const html = read('index.html');
 const base = read('app/css/base.css');
-const PAGES = ['landing', 'library', 'asset', 'kits', 'bag', 'play'];
+const PAGES = ['landing', 'library', 'asset', 'kits', 'bag', 'play', 'tray'];
 
 test('index.html links the fonts, base.css, then every page\'s sheet; the old sheet is gone', () => {
   const links = [...html.matchAll(/<link rel="stylesheet" href="([^"]+)">/g)].map((m) => m[1]);

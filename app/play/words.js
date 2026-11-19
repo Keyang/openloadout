@@ -44,6 +44,33 @@ export function roleNote(role, { player = true } = {}) {
   }
 }
 
+/** What a thing does in the scene in a few words, for its row in the list beside the scene. scene: { player }. */
+export function roleShort(role, { player = true } = {}) {
+  switch (role) {
+    case 'player': return 'You move this one';
+    case 'npc': return player ? 'Walks about, talks to you' : 'Walks about';
+    case 'creature': return player ? 'Moves by itself; you can hit it' : 'Moves by itself';
+    case 'pickup': return player ? 'Walk into it to collect it' : 'Waits to be collected';
+    case 'prop': return player ? 'Stands there; X uses it' : 'Stands there';
+    case 'effect': return 'Plays in the scene';
+    case 'projectile': return player ? 'Flies out when you attack' : 'Needs a character to fire it';
+    case 'tiles': return 'Makes the ground';
+    case 'background': return 'Behind the scene';
+    case 'display': return 'Over the top of the scene';
+    default: return '';
+  }
+}
+
+/** What the keys do, in one short line for the bar under the scene. scene: as keysLine. */
+export function keysShort({ mode, player, block = false, dodge = false }) {
+  if (!player) return '';
+  const out = [mode === 'top' ? 'Arrow keys to walk' : 'Arrow keys to walk, Space to jump', 'X to attack or use things'];
+  if (block) out.push('C to block');
+  if (dodge) out.push('V to dodge');
+  out.push('Shift to run');
+  return out.join(', ') + '.';
+}
+
 /** What the keys do. scene: { mode, player, block, dodge } (block, dodge: the player has those moves). */
 export function keysLine({ mode, player, block = false, dodge = false }) {
   if (!player) return 'Arrow keys move the view.';

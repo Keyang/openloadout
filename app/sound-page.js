@@ -9,6 +9,7 @@ import { madeNote } from './catalog.js';      // W5-A: a sound made on this visi
 import { createEdit } from './editing.js';
 import { editPanel } from './panel.js';
 import { assetShell, icon, ICON } from './asset-shell.js';
+import { bagTray } from './tray.js';      // the bag's slim tray at the right edge (1280 px and wider)
 import { lookOf } from './bag.js';
 import { applySound } from '../sound/theme.js';
 import { soundLookTab, heardIn, lookTheme } from './sound-look.js';      // the whole-set looks, on this one sound
@@ -128,12 +129,17 @@ export function soundPage(app, patch, query) {
     el('div', { class: 'stage-tools' }, el('div', { class: 'tools-left' }, playBtn, lengthNote)),
     progress);
   shell = assetShell({ kind: 'sound', id: patch.id, name: patch.name, line: patch.description ?? '', made, edit, stage: card, under: [el('div', { class: 'sound-under' }, variation, variationNote)], panel });
+  // the bag, slim, as the page's third column: this sound is marked in it while it is in the bag
+  const tray = bagTray({ size: 'slim', current: { kind: 'sound', id: patch.id, key: edit.key() } });
+  const offTray = edit.onChange(() => tray.setCurrent({ kind: 'sound', id: patch.id, key: edit.key() }));
+  shell.main.append(tray.node);
   app.replaceChildren(header('sounds'), shell.main);
+  tray.placed();
 
   return () => {
     cancelAnimationFrame(raf); clearTimeout(urlTimer); clearTimeout(soon);
     if (handle) handle.stop();
-    offEdit(); panel.close(); shell.close(); edit.close(); clearTimeout(saveTimer);      // leaving saves whatever was still waiting
+    offEdit(); offTray(); tray.stop(); panel.close(); shell.close(); edit.close(); clearTimeout(saveTimer);      // leaving saves whatever was still waiting
     window.removeEventListener('pagehide', flush);
   };
 }

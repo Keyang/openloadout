@@ -13,6 +13,7 @@ import { createEdit } from './editing.js';
 import { editPanel } from './panel.js';
 import { soundModel } from './panel-model.js';
 import { assetShell, icon, ICON } from './asset-shell.js';
+import { bagTray } from './tray.js';      // the bag's slim tray at the right edge (1280 px and wider)
 import { lookOf } from './bag.js';
 import { applySound } from '../sound/theme.js';
 import { soundLookTab, heardIn, liveBrightness, matchGain } from './sound-look.js';      // the whole-set looks, on this one track
@@ -197,11 +198,16 @@ export function musicPage(app, patch, query) {
     el('div', { class: 'stage-tools' }, el('div', { class: 'tools-left' }, playBtn, lengthNote)));
   const under = el('div', { class: 'sound-under' }, el('p', {}, 'Press Play, then move the sliders: the music changes while it plays, the way a game would change it during a fight.'));
   shell = assetShell({ kind: 'music', id: patch.id, name: patch.name, line: patch.description ?? '', made, edit, stage: card, under: [under], panel });
+  // the bag, slim, as the page's third column: this music is marked in it while it is in the bag
+  const tray = bagTray({ size: 'slim', current: { kind: 'music', id: patch.id, key: edit.key() } });
+  const offTray = edit.onChange(() => tray.setCurrent({ kind: 'music', id: patch.id, key: edit.key() }));
+  shell.main.append(tray.node);
   app.replaceChildren(header('music'), shell.main);
+  tray.placed();
 
   return () => {
     st.gone = true; clearTimeout(urlTimer); stop();
-    offEdit(); panel.close(); shell.close(); edit.close(); clearTimeout(saveTimer);      // leaving saves whatever was still waiting
+    offEdit(); offTray(); tray.stop(); panel.close(); shell.close(); edit.close(); clearTimeout(saveTimer);      // leaving saves whatever was still waiting
     window.removeEventListener('pagehide', flush);
   };
 }

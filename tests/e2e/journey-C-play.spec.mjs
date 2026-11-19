@@ -1,6 +1,8 @@
 // Journey J5 (docs/user-journeys.md, "Change an item from inside the playground"): the fixes for the testers'
 // "Playground and kits" defects in the playground's panel.
-//   J5.2  the panel never scrolls inside itself and no row of options is cut off, at 1440 x 900 and 1024 x 768
+//   J5.2  nothing inside the panel scrolls on its own (on one screen the right column scrolls as one: the playground on
+//         one screen, docs/playground-tray-workbench.md section 1) and no row of options is cut off, at 1440 x 900 and
+//         1024 x 768
 //   J5.4  the look of the whole bag is its own control, outside the chosen thing's panel, and says it is for the whole bag
 //   J5.2  a thing that wears a look of its own says so beside its colours ("Shown in the Night look")
 //   J5.2  a colour picked in the panel shows on the sprite in the scene within 1 s
@@ -34,7 +36,8 @@ async function tidyPanes(page) {
       const pane = s.querySelector('.pane:not([hidden])');
       const scrolls = (n) => n && n.scrollHeight > n.clientHeight + 1 && getComputedStyle(n).overflowY !== 'visible';
       const cut = [...pane.querySelectorAll('.chips, .swatches')].filter((c) => c.scrollWidth > c.clientWidth + 1).map((c) => c.getAttribute('aria-label'));
-      const inner = [s, ...s.querySelectorAll('*')].filter((n) => scrolls(n) && getComputedStyle(n).overflowY !== 'hidden').map((n) => n.className);
+      // the column itself (.play-edit-view) is what scrolls; nothing in it may scroll on its own
+      const inner = [s, ...s.querySelectorAll('*')].filter((n) => scrolls(n) && getComputedStyle(n).overflowY !== 'hidden' && !n.matches('.play-edit-view')).map((n) => n.className);
       return { tab: tabName, inner, cut };
     }, name));
   }
@@ -42,7 +45,7 @@ async function tidyPanes(page) {
 }
 
 for (const size of [{ width: 1440, height: 900 }, { width: 1024, height: 768 }]) {
-  test(`J5.2 ${size.width} x ${size.height}: the panel does not scroll inside itself and no chips are cut`, async ({ page }) => {
+  test(`J5.2 ${size.width} x ${size.height}: nothing in the panel scrolls on its own and no chips are cut`, async ({ page }) => {
     await page.setViewportSize(size);
     await openPlay(page, [{ kind: 'sprite', id: 'slime', settings: {} }]);
     for (const id of ['knight', 'slime', 'coin-pickup', 'battle-theme']) {
@@ -59,6 +62,7 @@ for (const size of [{ width: 1440, height: 900 }, { width: 1024, height: 768 }])
 test('J5.4: the look of the whole bag is its own control, outside the chosen thing\'s panel', async ({ page }) => {
   await openPlay(page);
   await page.getByRole('button', { name: 'Pause' }).click();
+  await choose(page, 'knight');
   // the chosen thing's own tabs do not hold it
   await expect(panel(page).getByRole('tab', { name: 'Everything' })).toHaveCount(0);
   const open = side(page).getByRole('button', { name: /whole bag/i });

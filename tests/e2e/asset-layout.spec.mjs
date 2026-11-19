@@ -131,10 +131,10 @@ for (const [w, h] of [[1440, 900], [1024, 768], [900, 700]]) {
   });
 }
 
-test('a tileset or a prop opens plain; a character opens in its scene', async ({ page }) => {
+test('a tileset or a prop opens plain; a character opens in your bag', async ({ page }) => {
   const pressed = () => page.locator('.stage-tools .seg button[aria-pressed="true"]');
   await openRoute(page, `/sprite/${HERO}`);
-  await expect(pressed()).toHaveText('In a scene');
+  await expect(pressed()).toHaveText('In your bag');
   for (const type of ['tileset', 'prop']) {
     const id = C.sprites.find((a) => a.type === type && !String(a.role).startsWith('interface/'))?.id;
     if (!id) continue;
