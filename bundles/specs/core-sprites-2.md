@@ -63,7 +63,7 @@ How to read a row: as in part 1. **Clips:** name, frame count, "loop" if it loop
 | 27 | `icons-system` | Settings icons | icon | interface/icon | none | 32x32 | K18 |
 | 28 | `icons-currency` | Currency icons | icon | interface/icon | none | 32x32 | K18 |
 | 29 | `icons-map` | Map marker icons | icon | interface/icon | none | 32x32 | K18 |
-| 30 | `rain` | Rain | effect | effects/weather | none | 64x64 | K19 |
+| 30 | `rainfall` | Rain | effect | effects/weather | none | 64x64 | K19 |
 | 31 | `snowfall` | Snowfall | effect | effects/weather | none | 64x64 | K19 |
 | 32 | `falling-leaves` | Falling leaves | effect | effects/weather | none | 64x64 | K19 |
 | 33 | `petal-fall` | Falling petals | effect | effects/weather | none | 64x64 | K20 |
@@ -197,10 +197,10 @@ What all 16 share. Read `sprites/ui-buttons-wood.js`, `sprites/ui-panel-wood.js`
 
 | Kind | Frame, pivot | Clips in file order | Stretching (`slice`) | Text |
 |---|---|---|---|---|
-| Buttons (`ui-buttons-*`) | 96x32, [48, 16] | `normal` 1 · `hover` 1 · `pressed` 1 · `disabled` 1 · `tab` 1 (label "Tab") · `tab-active` 1 (label "Open tab") | each clip the `slice` its helper returns, plus the frame's 1 px: `skinButton` 8 px each side (pressed: top 9, bottom 5, as `ui-buttons-wood`); `skinTab` 8 left, right and top, 1 at the open bottom | `textArea` on every clip: the helper's `text`, with `text: SKIN_TEXT[skin]` and `edge` one pixel of the band |
-| Panels (`ui-panel-*`) | 96x64, [48, 32] | `panel` 1 · `panel-title` 1 (label "With heading") · `inset` 1 (label "List well") · `tooltip` 1 | `panel`, `inset`: `slice9()`; `panel-title`: `slice9()` with `top` down to the strip's bottom line; `tooltip`: `slice9(rect)` of the rectangle it is drawn in (94x40 at the top of the frame), the tail inside the left 8 px | `textArea` on every clip: `inner` (and the `title` strip on `panel-title`, a list of two areas) |
+| Buttons (`ui-buttons-*`) | 96x32, [48, 16] | `normal` 1 · `hover` 1 · `pressed` 1 · `disabled` 1 · `tab` 1 (label "Tab, for a page that is not open") · `tab-active` 1 (label "Open tab, for the page on view"; a button's rows are all states, and the download guide needs each label to say when its state is shown) | each clip the `slice` its helper returns, plus the frame's 1 px: `skinButton` 8 px each side (pressed: top 9, bottom 5, as `ui-buttons-wood`); `skinTab` 8 left, right and top, 1 at the open bottom | `textArea` on every clip: the helper's `text`, with `text: SKIN_TEXT[skin]` and `edge` one pixel of the band |
+| Panels (`ui-panel-*`) | 96x64, [48, 32] | `panel` 1 · `panel-title` 1 (label "With heading") · `inset` 1 (label "List well") · `tooltip` 1 | `panel`, `inset`: `slice9()`; `panel-title`: `slice9()` with `top` down to the strip's bottom line; `tooltip`: `slice9(rect)` of the rectangle it is drawn in (94x40 at the top of the frame), the tail inside the left 8 px | `textArea` on every clip: `inner` (and the `title` strip on `panel-title`, a list of two areas), trimmed clear of any mark a style draws over it (the paper card's fold and pin, the candy icing and drips), because the contrast test checks every colour inside a text area |
 | Bars (`ui-bars-*`) | 64x16, [32, 8] | `frame` 1 · `fill` 1 · `fill-b` 1 · `fill-c` 1 · `flash` 4 · `slider` 1 (label "Slider track") · `knob` 1 (label "Slider knob") | housing and fills: `{ left: 8, top: 4, right: 8, bottom: 4, opening }` with `opening` from `skinBarOpening` (as `ui-bars-rpg`); `slider`: left and right 8; `knob`: its `rect` | none: bars have no `face` control and carry no text. **Rail and knob colours:** the `slider` rail is the housing's band in the `frame` colour round the same trough as `frame`; the `knob` is a slab whose body is a fixed palette colour per skin, edged in `frame`: paper `cream` (a paper knob ruled in the ink), candy `soil` (a toffee knob, glossy, in the sugar rim), flat `cavern` (a flat blue slab on the edge colour), gilded `cavern` (a stone knob in the gold, its gem in `accent` when `gems` is on). The fixed knob colours are each skin's default face, so `frame` already holds 3 to 1 against them |
-| Controls (`ui-controls-*`) | 32x32, [16, 16] | `check-on` 1 (label "Ticked box") · `check-off` 1 (label "Empty box") · `radio-on` 1 · `radio-off` 1 · `switch-on` 1 · `switch-off` 1 · `pointer` 8 loop · `selector` 8 loop | `selector`: `slice9()` (the brackets sit in the corners and stretch round any slot) | every clip `noText: true`. `pointer` exports a **`tip` socket** at its hot spot (`skinPointer`'s `tip`; angle PI/2, pointing right) |
+| Controls (`ui-controls-*`) | 32x32, [16, 16] | `check-on` 1 (label "Ticked box, while the option is on") · `check-off` 1 (label "Empty box, while the option is off") · `radio-on` 1 (label "Chosen dot, for the one option picked") · `radio-off` 1 (label "Empty dot, for each option not picked") · `switch-on` 1 (label "Switch, while the setting is on") · `switch-off` 1 (label "Switch, while the setting is off") · `pointer` 8 loop (label "Pointer, beside the item the player is on") · `selector` 8 loop (label "Selector, round the slot the player is on") (role `interface/cursor` makes every row a state, and the download guide needs each label to say when it is shown) | `selector`: `slice9()` (the brackets sit in the corners and stretch round any slot) | every clip `noText: true`. `pointer` exports a **`tip` socket** at its hot spot (`skinPointer`'s `tip`; angle PI/2, pointing right) |
 
 **Controls: a deliberate deviation from style guide section 8 (this page wins).** The controls sprites take role `interface/cursor` because they hold the menu pointer, but they are a sheet of small controls of which the pointer is one, so they have **no `idle` clip** and `check-on` comes first (the measured still). The pointer clip stays named `pointer`. Builders keep this order and name and say so in the report.
 
@@ -225,7 +225,7 @@ Text is dark (`INK`). Face candidates (pale papers): `cream`, `hearthvale.wheat`
 
 - **Meta:** type `ui`, role `interface/button`, view `none`, themes `neutral`; gameTypes `arcade`, `puzzle`, `card-game`, `farming-sim`. Batch **K11**.
 - **Frame:** 96x32, pivot [48, 16].
-- **Clips (6):** `normal` 1 · `hover` 1 · `pressed` 1 · `disabled` 1 · `tab` 1 ("Tab") · `tab-active` 1 ("Open tab").
+- **Clips (6):** `normal` 1 · `hover` 1 · `pressed` 1 · `disabled` 1 · `tab` 1 ("Tab, for a page that is not open") · `tab-active` 1 ("Open tab, for the page on view").
 - **Parts:** none.
 - **Controls (6):** `style` (choice: sheet | torn | card; default sheet), `corner` (Square / Round; default 0.5), `border` (Thin / Thick; default 0.5: the ruled line 1 to 2 px), `shadow` (toggle "Shadow", default true: a 2 px drop shadow down and to the left, inside the 8 px border; in every style), `face` ("Paper": default cream; swatches `skinSwatches('paper', ...)` of exactly `cream`, `hearthvale.wheat`, `skin`, `steel`, `goblin`: 5; declare `material: 'paint'`), `frame` ("Ink": default cavern; swatches exactly `cavern`, `soil`, `derelict.plate`, `hearthvale.bandit`: 4). The ink lines lie on the paper: the lists share no colour.
 - **Stretch and text:** as the table above; `text: INK`.
@@ -264,7 +264,7 @@ Text is dark (`INK`). Face candidates (pale papers): `cream`, `hearthvale.wheat`
 
 - **Meta:** type `ui`, role `interface/cursor`, view `none`, themes `neutral`; gameTypes `arcade`, `puzzle`, `card-game`, `farming-sim`. Batch **K11**.
 - **Frame:** 32x32, pivot [16, 16]. Socket `tip` on `pointer`.
-- **Clips (8):** `check-on` 1 ("Ticked box") · `check-off` 1 ("Empty box") · `radio-on` 1 · `radio-off` 1 · `switch-on` 1 · `switch-off` 1 · `pointer` 8 loop · `selector` 8 loop. All `noText: true`.
+- **Clips (8):** `check-on` 1 ("Ticked box, while the option is on") · `check-off` 1 ("Empty box, while the option is off") · `radio-on` 1 ("Chosen dot, for the one option picked") · `radio-off` 1 ("Empty dot, for each option not picked") · `switch-on` 1 ("Switch, while the setting is on") · `switch-off` 1 ("Switch, while the setting is off") · `pointer` 8 loop ("Pointer, beside the item the player is on") · `selector` 8 loop ("Selector, round the slot the player is on"). All `noText: true`.
 - **Parts:** none.
 - **Controls (7):** `style` (choice: sheet | torn | card; default sheet), `corner` (Square / Round; default 0.5), `border` (Thin / Thick; default 0.5), `face` ("Paper": as `ui-buttons-paper`: 5; `material: 'paint'`), `frame` ("Ink": as `ui-buttons-paper`: 4), `accent` ("Tick": the tick, the radio dot, the lit switch track, the pointer's nib; default crimson; swatches exactly `crimson`, `ember`, `gold`, `magic`, `moss`, `hero`: 6), `speed` (Slow / Fast; default 0.5). Tick, paper and ink all touch: the three lists share no colour.
 - **Sounds:** `check-on` frame 0 → `ui-click` style "Soft tap", volume 0.6 · `switch-on` frame 0 → `ui-click` style "Soft tap", volume 0.6.
@@ -280,7 +280,7 @@ Text is white. Face candidates (dark boiled sugar: toffee, blueberry, cherry win
 
 - **Meta:** type `ui`, role `interface/button`, view `none`, themes `neutral`, `candy`; gameTypes `arcade`, `puzzle`, `card-game`, `racing`. Batch **K12**.
 - **Frame:** 96x32, pivot [48, 16].
-- **Clips (6):** `normal` 1 · `hover` 1 · `pressed` 1 · `disabled` 1 · `tab` 1 ("Tab") · `tab-active` 1 ("Open tab").
+- **Clips (6):** `normal` 1 · `hover` 1 · `pressed` 1 · `disabled` 1 · `tab` 1 ("Tab, for a page that is not open") · `tab-active` 1 ("Open tab, for the page on view").
 - **Parts:** none.
 - **Controls (6):** `style` (choice: jelly | striped | frosted; default jelly), `corner` (Square / Round; default 0.75: candy is round), `border` (Thin / Thick; default 0.5), `shine` (toggle "Shine", default true: a glossy highlight bubble inside the top right of the border, at least 12 px; in every style, `jelly` included: no style draws a bubble of its own, so off means no bubble anywhere), `face` ("Candy": default soil; swatches `skinSwatches('candy', ...)` of exactly `soil`, `cavern`, `hearthvale.bandit`, `derelict.plate`: 4; declare `material: 'paint'`), `frame` ("Sugar": default cream; swatches exactly `cream`, `skin`, `sky`, `goblin`: 4; declare `material: 'paint'`). The rim touches the face: the lists share no colour.
 - **Stretch and text:** as the table; white text.
@@ -334,7 +334,7 @@ Text is white. Face candidates (solid flat colours): `cavern`, `soil`, `derelict
 
 - **Meta:** type `ui`, role `interface/button`, view `none`, themes `neutral`, `city`; gameTypes `arcade`, `puzzle`, `card-game`, `racing`. Batch **K13**.
 - **Frame:** 96x32, pivot [48, 16].
-- **Clips (6):** `normal` 1 · `hover` 1 · `pressed` 1 · `disabled` 1 · `tab` 1 ("Tab") · `tab-active` 1 ("Open tab").
+- **Clips (6):** `normal` 1 · `hover` 1 · `pressed` 1 · `disabled` 1 · `tab` 1 ("Tab, for a page that is not open") · `tab-active` 1 ("Open tab, for the page on view").
 - **Parts:** none.
 - **Controls (6):** `style` (choice: solid | outline | pill; default solid), `corner` (Square / Round; default 0.5; **when** `{ style: ['solid', 'outline'] }`: `pill` is always fully round), `border` (Thin / Thick; default 0.5: the band 1 to 2 px), `shadow` (toggle "Shadow", default false: a flat 2 px drop shadow down and to the left; in every style), `face` ("Face": default cavern; swatches `skinSwatches('flat', ...)` of exactly `cavern`, `soil`, `derelict.plate`, `hearthvale.bandit`: 4), `frame` ("Edge": default cream; swatches exactly `cream`, `sky`, `goblin`, `steel`, `skin`: 5). The band touches the face: the lists share no colour.
 - **Stretch and text:** as the table; white text. A `pill` button's ends are round: its slice is 8 px left and right as for the others.
@@ -388,7 +388,7 @@ Text is white. Face candidates (dark stone): `cavern`, `soil`, `derelict.plate`,
 
 - **Meta:** type `ui`, role `interface/button`, view `none`, themes `neutral`, `fantasy`, `dungeon`; gameTypes `arcade`, `turn-based-rpg`, `top-down-rpg`, `card-game`. Batch **K14**.
 - **Frame:** 96x32, pivot [48, 16].
-- **Clips (6):** `normal` 1 · `hover` 1 · `pressed` 1 · `disabled` 1 · `tab` 1 ("Tab") · `tab-active` 1 ("Open tab").
+- **Clips (6):** `normal` 1 · `hover` 1 · `pressed` 1 · `disabled` 1 · `tab` 1 ("Tab, for a page that is not open") · `tab-active` 1 ("Open tab, for the page on view").
 - **Parts:** none.
 - **Controls (7):** `style` (choice: temple | royal | ruin; default temple), `corner` (Square / Round; default 0.5; in `temple` and `ruin` it sets the size of the cut or chipped corner), `border` (Thin / Thick; default 0.5: the gold band 1 to 2 px), `gems` (toggle "Gems", default true: a 3x3 gem at each end of the band, at least 12 px in all; in every style), `face` ("Stone": default cavern; swatches `skinSwatches('gilded', ...)` of exactly `cavern`, `soil`, `derelict.plate`, `hearthvale.bandit`: 4), `frame` ("Gold": default cream; swatches exactly `cream`, `steel`, `skin`, `hearthvale.thunder`, `hearthvale.wheat`: 5; declare `material: 'metal'`), `accent` ("Gems": default magic; swatches exactly `magic`, `crimson`, `moss`, `hero`, `ember`: 5; **when** `{ gems: [true] }`). Gems sit in the gold band and the band touches the stone: the three lists share no colour.
 - **Stretch and text:** as the table, except `pressed` bottom **6**, not 5 (corrected 2026-11-19): pressed, the slab's bottom runs outline row 30, gold 29 and 28, ink line 27 and, in row 26, the temple fillet, the royal cushion and the key's inner step, with the 3x3 bottom gems in rows 26 to 28. Wood, candy and flat have no row inside the ink line, so their 5 holds; here 5 would put row 26 in the stretched middle (it differs from row 25 in every style but ruin and the thin band) and crop the bottom gems to 3x2 (measured). The helper's 5 plus the frame's 1 px gives 6; the text area (9, 8, 78x18) is unchanged. White text.
@@ -605,7 +605,9 @@ All icon sets: type `icon`, frame 32x32, pivot [16, 16] (`ICON_SIZE`, `ICON_PIVO
 
 All weather: type `effect`, role `effects/weather`, view `none`, frame 64x64, pivot [32, 32], `grounded: false`, one clip `loop` of 8 frames, fps 10 with `speed`, built on `fallField` (new, H1a). Pieces fill the inner 62x62 square and wrap round it; every blurb ends "Lay copies 62 px apart (each over its neighbours' empty border) to cover the screen." No ink: pieces are light, drawn as solid pixels, leaves and petals rimmed in a darker tone of their own colour (style guide section 2). 3 to 12 colours. **Layers:** where a row has a far layer, it is a second `fallField` with half the columns (rounded up), a smaller size, the same `rows`, `slant`, `turns` and shapes, **far laps** = `max(1, round(2/3 x laps))`, a whole number so the far loop closes too (rain: drizzle 1, rain 3, storm 3; snowfall: soft 1, blizzard 2, sleet 1), and `shift` [17, 23], drawn first, so near pieces cross over far ones. A far piece and a near piece can touch: their lists share no colour. **Count sliders set `cols`** (the number of columns); each style fixes `rows`, `laps`, `slant`, `sway`, `turns` (1 where not said) and its shape or `shapes` list as the row says. Read `sprites/fireflies.js` and `sprites/mist-drift.js` (part 1's area loops) first: this is their screen-wide partner.
 
-#### `rain` · Rain
+#### `rainfall` · Rain
+
+Renamed from `rain` on 2026-11-19: the id clashed with the sound `rain` (core-sounds-2), and the build refuses two assets with one id.
 
 - **Meta:** type `effect`, role `effects/weather`, view `none`, themes `neutral`, `forest`, `city`; gameTypes `platformer`, `top-down-rpg`, `farming-sim`, `shooter`. Batch **K19**.
 - **Frame:** 64x64, pivot [32, 32], `grounded: false`.
@@ -710,7 +712,7 @@ Each batch is one builder in one sitting, with review. **Helper batches come fir
 | **K16** | `input-face-buttons`, `input-dpad`, `input-stick`, `input-shoulder` | H1, K15 |
 | **K17** | `icons-food`, `icons-materials`, `icons-tools` (pathfinder for the new icon shapes) | H3 |
 | **K18** | `icons-system`, `icons-currency`, `icons-map` | H3, K17 |
-| **K19** | `rain`, `snowfall`, `falling-leaves` (pathfinder for screen-wide weather) | H1 |
+| **K19** | `rainfall`, `snowfall`, `falling-leaves` (pathfinder for screen-wide weather) | H1 |
 | **K20** | `petal-fall`, `ash-fall`, `dust-storm` | H1, K19 |
 
 In order: H1, H2 and H3 together; then K11, K15, K17 and K19 together; then K12, K13, K14, K16, K18 and K20. A builder who finds a helper short of an option adds it to that helper's module the way the skill says (tests first, additive only, fingerprint before and after) and lists it in the report; a builder who finds a helper missing altogether stops and reports it, because this page says none is.

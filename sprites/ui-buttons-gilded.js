@@ -101,8 +101,8 @@ export default defineSprite({
   },
   clips: {
     ...Object.fromEntries(BUTTON_STATES.map((s) => [s, { frames: 1, fps: 8, loop: true }])),
-    tab: { frames: 1, fps: 8, loop: true, label: 'Tab' },
-    'tab-active': { frames: 1, fps: 8, loop: true, label: 'Open tab' },
+    tab: { frames: 1, fps: 8, loop: true, label: 'Tab, for a page that is not open' },
+    'tab-active': { frames: 1, fps: 8, loop: true, label: 'Open tab, for the page on view' },
   },
   versions: [
     { name: 'Temple gold', params: {} },

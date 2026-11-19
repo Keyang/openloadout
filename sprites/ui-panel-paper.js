@@ -63,6 +63,35 @@ function piece(g, clip, p) {
   return out;
 }
 
+// A text area kept clear of marks drawn over its corner (a card's folded flap and the pin on it): while an edge row or column of the area holds a
+// colour other than the one at its middle, that row or column is left out: first the side that loses the fewest
+// pixels of that colour.
+function clearArea(g, a) {
+  let { x, y, w, h } = a;
+  const c = g.get(x + (w >> 1), y + (h >> 1));
+  // how many pixels of the middle colour a row or column holds, or -1 when it holds nothing else
+  const row = (py) => { let n = 0; for (let px = x; px < x + w; px++) if (g.get(px, py) === c) n++; return n === w ? -1 : n; };
+  const column = (px) => { let n = 0; for (let py = y; py < y + h; py++) if (g.get(px, py) === c) n++; return n === h ? -1 : n; };
+  while (w > 0 && h > 0) {
+    const cuts = [[row(y), () => { y++; h--; }], [row(y + h - 1), () => { h--; }], [column(x), () => { x++; w--; }], [column(x + w - 1), () => { w--; }]].filter(([n]) => n >= 0);
+    if (!cuts.length) break;
+    cuts.sort((m, n) => m[0] - n[0])[0][1]();
+  }
+  return { ...a, x, y, w, h };
+}
+// The band pixel to check the ink against: the helper's, or, where a torn edge has bitten it away, the nearest pixel
+// along the same row that the bites left as the untorn sheet drew it (with both its neighbours untouched too).
+function steadyEdge(g, clip, p, edge) {
+  if (g.get(edge.x, edge.y)) return edge;
+  const ref = new Surface(...SIZE);
+  piece(ref, clip, { ...p, style: 'sheet' });
+  const same = (x) => x >= 0 && x < SIZE[0] && g.get(x, edge.y) === ref.get(x, edge.y);
+  for (let d = 1; d < SIZE[0]; d++) for (const x of [edge.x - d, edge.x + d]) {
+    if (g.get(x, edge.y) && same(x - 1) && same(x) && same(x + 1)) return { x, y: edge.y };
+  }
+  return edge;
+}
+
 function slice(clip, p) {
   if (clip === 'tooltip') return slice9(TIP);
   if (clip === 'panel-title') return { ...slice9(), top: piece(new Surface(...SIZE), clip, p).inner.y };
@@ -106,11 +135,13 @@ export default defineSprite({
     { name: 'Old letter', params: { face: H.wheat, frame: P.soil } },
     { name: 'Mint memo', params: { face: P.goblin, accent: P.hero } },
   ],
-  // Where text goes (dark text), and one pixel of the ruled line (or the well's sunken line) to check against.
+  // Where text goes (dark text), and one pixel of the ruled line (or the well's sunken line) to check against. On a
+  // card the area stops short of the folded flap and the pin on it; on a torn sheet the line is checked beside a bite.
   textArea(clip, p) {
-    const out = piece(new Surface(...SIZE), clip, p), text = SKIN_TEXT.paper;
-    const main = { ...out.inner, text, edge: out.edge };
-    return out.title ? [main, { ...out.title, text, edge: out.edge }] : main;
+    const g = new Surface(...SIZE), out = piece(g, clip, p), text = SKIN_TEXT.paper;
+    const edge = steadyEdge(g, clip, p, out.edge), clear = (a) => (p.style === 'card' ? clearArea(g, a) : a);
+    const main = { ...clear(out.inner), text, edge };
+    return out.title ? [main, { ...clear(out.title), text, edge }] : main;
   },
 
   render(g, { clip, p }) {

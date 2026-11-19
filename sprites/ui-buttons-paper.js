@@ -70,6 +70,18 @@ function slice(clip, p) {
   if (clip === 'tab-active') return { ...s, top: 8 };
   return s;
 }
+// The band pixel to check the ink against: the helper's, or, where a torn edge has bitten it away, the nearest pixel
+// along the same row that the bites left as the untorn sheet drew it (with both its neighbours untouched too).
+function steadyEdge(g, clip, p, edge) {
+  if (g.get(edge.x, edge.y)) return edge;
+  const ref = new Surface(...SIZE);
+  piece(ref, clip, { ...p, style: 'sheet' });
+  const same = (x) => x >= 0 && x < SIZE[0] && g.get(x, edge.y) === ref.get(x, edge.y);
+  for (let d = 1; d < SIZE[0]; d++) for (const x of [edge.x - d, edge.x + d]) {
+    if (g.get(x, edge.y) && same(x - 1) && same(x) && same(x + 1)) return { x, y: edge.y };
+  }
+  return edge;
+}
 // The open tab's text area starts under its 8 px top slice; every other clip keeps the helper's.
 function textOf(clip, out) {
   if (clip !== 'tab-active') return out.text;
@@ -102,8 +114,8 @@ export default defineSprite({
   },
   clips: {
     ...Object.fromEntries(BUTTON_STATES.map((s) => [s, { frames: 1, fps: 8, loop: true }])),
-    tab: { frames: 1, fps: 8, loop: true, label: 'Tab' },
-    'tab-active': { frames: 1, fps: 8, loop: true, label: 'Open tab' },
+    tab: { frames: 1, fps: 8, loop: true, label: 'Tab, for a page that is not open' },
+    'tab-active': { frames: 1, fps: 8, loop: true, label: 'Open tab, for the page on view' },
   },
   versions: [
     { name: 'Notebook', params: {} },
@@ -112,10 +124,11 @@ export default defineSprite({
     { name: 'Blue print', params: { face: P.steel, frame: D.plate } },
     { name: 'Red ink note', params: { shadow: false, corner: 0, border: 1, frame: H.bandit } },
   ],
-  // Where the label goes in each clip, and one pixel of the ruled line to check the ink against the paper.
+  // Where the label goes in each clip, and one pixel of the ruled line to check the ink against the paper (beside a
+  // torn bite, never in one).
   textArea(clip, p) {
-    const out = piece(new Surface(...SIZE), clip, p);
-    return { ...textOf(clip, out), text: SKIN_TEXT.paper, edge: out.edge };
+    const g = new Surface(...SIZE), out = piece(g, clip, p);
+    return { ...textOf(clip, out), text: SKIN_TEXT.paper, edge: steadyEdge(g, clip, p, out.edge) };
   },
   sounds: {
     pressed: [{ sound: 'ui-click', preset: 'Soft tap', frame: 0, volume: 0.6 }],

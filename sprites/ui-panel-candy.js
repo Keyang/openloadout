@@ -53,6 +53,23 @@ function piece(g, clip, p) {
   return { ...out, body };
 }
 
+// A text area kept clear of marks drawn over its corner (the frosted rim's icing and drips): while an edge row or column of the area holds a
+// colour other than the one at its middle, that row or column is left out: first the side that loses the fewest
+// pixels of that colour.
+function clearArea(g, a) {
+  let { x, y, w, h } = a;
+  const c = g.get(x + (w >> 1), y + (h >> 1));
+  // how many pixels of the middle colour a row or column holds, or -1 when it holds nothing else
+  const row = (py) => { let n = 0; for (let px = x; px < x + w; px++) if (g.get(px, py) === c) n++; return n === w ? -1 : n; };
+  const column = (px) => { let n = 0; for (let py = y; py < y + h; py++) if (g.get(px, py) === c) n++; return n === h ? -1 : n; };
+  while (w > 0 && h > 0) {
+    const cuts = [[row(y), () => { y++; h--; }], [row(y + h - 1), () => { h--; }], [column(x), () => { x++; w--; }], [column(x + w - 1), () => { w--; }]].filter(([n]) => n >= 0);
+    if (!cuts.length) break;
+    cuts.sort((m, n) => m[0] - n[0])[0][1]();
+  }
+  return { ...a, x, y, w, h };
+}
+
 function slice(clip, p) {
   // slice9(TIP), with the bottom 5 px deeper: the tail's 5 rows lie under the slab's own 7 px bottom border
   if (clip === 'tooltip') return { ...slice9(TIP), bottom: slice9(TIP).bottom + 5 };
@@ -97,11 +114,13 @@ export default defineSprite({
     { name: 'Liquorice', params: { face: D.plate, accent: P.grass } },
     { name: 'Caramel', params: { frame: P.skin, accent: P.ember } },
   ],
-  // Where text goes (white text), and one pixel of the sugar rim to check against.
+  // Where text goes (white text), and one pixel of the sugar rim to check against. Frosted, the areas stop short of
+  // the icing and the drips that hang onto the face.
   textArea(clip, p) {
-    const out = piece(new Surface(...SIZE), clip, p), text = SKIN_TEXT.candy;
-    const main = { ...out.inner, text, edge: out.edge };
-    return out.title ? [main, { ...out.title, text, edge: out.edge }] : main;
+    const g = new Surface(...SIZE), out = piece(g, clip, p), text = SKIN_TEXT.candy;
+    const clear = (a) => (p.style === 'frosted' ? clearArea(g, a) : a);
+    const main = { ...clear(out.inner), text, edge: out.edge };
+    return out.title ? [main, { ...clear(out.title), text, edge: out.edge }] : main;
   },
 
   render(g, { clip, p }) {
