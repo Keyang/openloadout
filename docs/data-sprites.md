@@ -196,6 +196,7 @@ Example (`tiles-forest`, the grass cap only):
 | `id`, `gen`, `v` | A behaviour generator: `particles`, `sparkles`, `ring`, `shards`, `smoke`, `chunks`, `rays`, `streaks`, `flame`, `puffs`, `starburst`, `beam`, `leaves`, `embers`, `spark.ring`, `blast.ball`, `bolt`, `swirl`, `motes`, `fall.field` (weather), `trail.puffs`, `scorch` |
 | args | Typed per generator: `at`, `count`, `seed`, `arc`, `dist`, `life`, `size`, `rise`, `spin`, `paints` (hottest first), `loop`, `area` |
 | `keys` in clips | `emit: { <id>: { amount: 0..1, at: [x, y] } }`: blended like bone keys, so an emitter can start, swell and stop |
+| On or off (decided in B6, 2026-11-19) | An emitter that some clip's keys give an `amount` is off wherever no key gives it an amount above 0 (the coin's `burst`, keyed in `collect`, stays off in `spin`); an emitter no key gives an `amount` always draws (hit-spark's `sparks`, a projectile's trail), its `when` and `clip` deciding as for any item. The amount reaches the generator only as an `amount` argument it declares. Same rule for a `pictures` body's emitters (`engine/data-sprite.js`) and the `emitters` layout (B12) |
 | `glow` | Drawn after the outline, not inked (style guide 2) |
 
 ```json
@@ -297,7 +298,7 @@ The v1 kinds `limb`, `capsule`, `ellipse`, `poly`, `dot` stay. New kinds, all in
 | Family | Generators (each `@1`) | Replaces (today's module) |
 |---|---|---|
 | colour (rules) | `tone`, `mix`, `standOut`, `apart`, `bandTone`, `ramp`, `choose` (exist); `sky.look`, `texture.tone`, `lit.tone`, `haze`, `shade.of` | `data-rules.js`, `backdrop.skyLook/litTone/hazed`, `tiles.textureTone` |
-| layout | `rig` (bones), `tiles`, `layers`, `panel`, `emitters`, `pictures` | the six `body` kinds |
+| layout | `rig` (bones), `tiles`, `layers`, `panel`, `emitters`, `pictures` (each registered with family `layout` and the body kind as id; `run(input, ctx)` returns `{ list, palette, frames, offset, points, slice, textArea }`: the contract is in `engine/data-sprite.js`, LAYOUTS) | the six `body` kinds |
 | tile | `tile.clips`, `tile.block`, `tile.thin`, `tile.slope`, `tile.liquid`, `tile.decal`, `tile.courses`, `tile.pattern`, `edge.wave` (a profile), `paving.herringbone`, `paving.stones`, `fence`, `shore`, `plating.seams`, `plating.spots`, `bolt`, `grate` | `tiles`, `paving`, `fences`, `water`, `plating`, `dungeon`, `hive`, `ground` |
 | place | `scatter` (seeded, `stable`, margin, gap, rows), `row` (evenly along a line), `grid` | `tiles.scatter`, `backdrop.scatter` |
 | backdrop | `sky.bands`, `ridge`, `fill.below`, `fill.between`, `lit.edge`, `treeline`, `battlements`, `canopy`, `mist.band`, `cloud`, `stars`, `disc`, `round.tree`, `far.house`, `pillar`, `light.shaft`, `planet` | `backdrop`, `scenery`, `space`, `shafts` |
