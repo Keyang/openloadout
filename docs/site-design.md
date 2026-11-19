@@ -62,4 +62,6 @@ This is the behaviour change behind "the change will not persist" and "too many 
 
 ## 6. What must not change
 
+Behaviour added by the final fix wave (2026-11-19) that the new pages keep, restyled: grouped bundle lists; colour names beside swatches; the storage-blocked warning; the loading state; the view switch in the playground; the one-line explanation under "Also change shapes"; per-kind backdrops in previews.
+
 Everything behind the pages: the catalogue, search, the bag's data and links, downloads and their contents, the sandbox and content policy for made assets, `window.loadout`, the sound engine, the playground's game. The four goals' acceptance tests (`tests/e2e/journey.spec.mjs`, `whole-bundle.spec.mjs`, `three-bundles.spec.mjs`, `newasset.spec.mjs`) must pass after the rebuild; where they name old buttons, update the selectors and keep what they prove.
