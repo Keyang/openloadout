@@ -112,3 +112,73 @@ test('bones v2 caps: a point or shape naming a prototype key as its bone is left
     }
   }
 });
+
+// B56: a bone's parent, an IK chain's hip and an IK chain's id are looked up as the rig's own (Object.hasOwn), never
+// through Object.prototype: one named for a prototype member is unknown (left out), never thrown on.
+const PROTO_NAMES = ['constructor', '__proto__', 'toString', 'valueOf', 'hasOwnProperty'];
+const legRig = (extra = {}) => ({
+  size: [32, 32], colours: [{ id: 'skin', default: '#e0a878' }],
+  bones: [{ id: 'hip', parent: null, at: [16, 12], angle: 0, length: 0 },
+    { id: 'thigh', parent: 'hip', angle: 0, length: 7 }, { id: 'shin', parent: 'thigh', angle: 0, length: 7 }],
+  shapes: [{ id: 'leg', bone: 'thigh', kind: 'limb', width: 2, paint: 'skin' }, { id: 'calf', bone: 'shin', kind: 'limb', width: 2, paint: 'skin' }],
+  ik: [{ id: 'leg', bones: ['thigh', 'shin'] }],
+  ...extra,
+});
+
+test('B56 bones: a bone whose parent is named for a prototype member is left out, never thrown on (version 1 and 2)', () => {
+  for (const parent of PROTO_NAMES) {
+    for (const v2 of [false, true]) {
+      const base = legRig();
+      const rig = { ...base, ...(v2 ? { version: 2, nodes: [{ id: 'n', parent: 'hip', angle: 0 }] } : {}),
+        bones: [...base.bones, { id: 'stray', parent, angle: 30, length: 5 }],
+        shapes: [...base.shapes, { id: 'strayShape', bone: 'stray', kind: 'limb', width: 1, paint: 'skin' }] };
+      let J;
+      assert.doesNotThrow(() => { J = B.solveRig(rig); }, `${parent} v2=${v2}: solveRig`);
+      assert.equal(Object.hasOwn(J.bones, 'stray'), false, `${parent} v2=${v2}: the stray bone is left out`);
+      assert.ok(Object.hasOwn(J.bones, 'shin'), `${parent} v2=${v2}: the others are solved`);
+      assert.doesNotThrow(() => B.solveRig(rig, { ik: { leg: [2, 0] } }), `${parent} v2=${v2}: solveRig with IK`);
+      const g = new Surface(32, 32);
+      assert.doesNotThrow(() => B.drawRig(g, rig, { ik: { leg: [2, 0] } }), `${parent} v2=${v2}: drawRig`);
+      assert.ok(lit(g) > 0, `${parent} v2=${v2}: the leg is drawn`);
+      const r = B.rigList(rig, J);
+      assert.ok(r.skipped.some((s) => s.id === 'strayShape'), `${parent} v2=${v2}: the stray bone's shape is reported`);
+    }
+  }
+});
+
+test('B56 bones: an IK chain whose hip or id is named for a prototype member is unknown, never thrown on', () => {
+  const plain = legRig();
+  const rest = B.solveRig(plain);
+  for (const name of PROTO_NAMES) {
+    // the chain's first bone (its hip) names a prototype member: there is no such bone, so the chain does nothing
+    const hipless = legRig({ ik: [{ id: 'leg', bones: [name, 'shin'] }] });
+    let J;
+    assert.doesNotThrow(() => { J = B.solveRig(hipless, { ik: { leg: [3, -2] } }); }, `hip ${name}`);
+    assert.deepEqual(J.bones, rest.bones, `hip ${name}: drawn as at rest`);
+    assert.doesNotThrow(() => B.drawRig(new Surface(32, 32), hipless, { ik: { leg: [3, -2] } }), `hip ${name}: drawRig`);
+    // a chain id named for a prototype member that the pose gives no target: no IK, every number finite
+    const named = legRig({ ik: [{ id: name, bones: ['thigh', 'shin'] }] });
+    assert.doesNotThrow(() => { J = B.solveRig(named, { ik: { other: [3, -2] } }); }, `chain ${name}`);
+    assert.deepEqual(J.bones, rest.bones, `chain ${name}: no target, drawn as at rest`);
+    for (const b of Object.values(J.bones)) assert.ok([...b.start, ...b.end].every(Number.isFinite), `chain ${name}: finite`);
+  }
+});
+
+test('B56 bones: a bone named toString, valueOf or hasOwnProperty is an ordinary bone; constructor and __proto__ are left out', () => {
+  for (const id of PROTO_NAMES) {
+    const rig = { size: [32, 32], colours: [{ id: 'skin', default: '#e0a878' }],
+      bones: [{ id, parent: null, at: [16, 8], angle: 0, length: 6 }, { id: 'child', parent: id, angle: 20, length: 6 }],
+      shapes: [{ id: 'a', bone: id, kind: 'limb', width: 2, paint: 'skin' }, { id: 'b', bone: 'child', kind: 'limb', width: 2, paint: 'skin' }],
+      points: [{ id: 'tip', bone: 'child', at: [6, 0] }] };
+    let J;
+    assert.doesNotThrow(() => { J = B.solveRig(rig); }, id);
+    assert.equal(Object.getPrototypeOf(J.bones), Object.prototype, `${id}: J.bones keeps its prototype`);
+    const ordinary = !['constructor', '__proto__'].includes(id);
+    assert.equal(Object.hasOwn(J.bones, id), ordinary, `${id}: solved or left out`);
+    assert.equal(Object.hasOwn(J.bones, 'child'), ordinary, `${id}: its child too`);
+    assert.equal(Object.hasOwn(B.rigPoints(rig, J), 'tip'), ordinary, `${id}: the child's point`);
+    const g = new Surface(32, 32);
+    assert.doesNotThrow(() => B.drawRig(g, rig), id);
+    assert.equal(lit(g) > 0, ordinary, `${id}: drawn or not`);
+  }
+});

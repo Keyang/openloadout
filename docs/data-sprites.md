@@ -118,6 +118,19 @@ Worked example (a side-view knight; trimmed):
 
 A top-down character `extends` `base:person-topdown` (one rig, `directions` overlays for down, up, side, clips `<action>_<down|up|side>`), and overlays stamps per direction: `"directions": { "up": { "stamps": { "eye": { "hidden": true } } } }`.
 
+**The rig renderer (`rigs/bones.js`, build item B5).** `extends` never reaches it: the resolver (`engine/resolve.js`, B4) merges the base into the rig by id (and `drop`s), draws `use` pieces in and applies parts, so the renderer takes one plain rig. What it offers:
+
+| Export | What it is for |
+|---|---|
+| `solveRig(rig, pose, opt)` | Where every bone and node is for one pose: forward kinematics from data angles, two-bone IK. Bone parents, IK hips and chain ids are looked up as the rig's own ids (a parent named `toString` is unknown; a bone or chain whose id is `__proto__`, `constructor` or `prototype` is left out), never thrown on |
+| `rigList(rig, J, pose, opt)` | One solved frame as an `engine/draw-list.js` draw list in frame pixels: shapes the pose hides, parts that are off and failing `clip` / `direction` conditions left out; stamps given their variant; generator calls and `use` pieces expanded through `opt.expand` (the resolver's `expandFrame`); each primitive placed on its bone; the flash and the one outline added. Returns `{ list, palette, skipped, errors, sources }`. A bare rig counts as version 2 only when it says so or uses something of version 2 |
+| `rigFacing(rig, direction)` | A top-down rig seen from `down`, `up` or `side`: its `directions` overlay applied to bones, nodes, shapes and stamps |
+| `drawResolvedRig(g, resolved, pose, ctx)` | One frame of a resolved rig sprite (`resolveSprite`'s result) onto a Surface: the direction (`ctx.direction`, else the clip name's `_down` / `_up` / `_side`, else down) overlay, the sprite's size and attach points, and a version 2 sprite's rig always drawn by version 2 rules (every paint ref, the version 2 caps) even when it uses only version 1 kinds on `bone`. What `engine/data-sprite.js` `render` calls |
+| `resolvedRigList(resolved, pose, ctx)` | The same frame as `drawResolvedRig` draws, as `rigList`'s draw list (and `J`). What `engine/data-sprite.js` `dataFrameList` calls, so a frame's list is exactly what `render` paints (held by `data-sprite-v2-seams.test.mjs` for every v2 fixture and template) |
+| `resolvedRigPoints(resolved, pose, ctx)` | The frame's attach points as Contract 3 sockets (the rig's, a base's and the sprite's own `points`, which win by id). What `sockets` calls |
+| `pose.swap` | `{ stampId: variant \| null }` in a pose: which `variants` row set a stamp draws this frame. Keys step it, a frame edit sets it (the knight's `"3": { "swap": { "eye": "blink" } }`); `null`, or a name the stamp has not got, draws its own `rows`. It wins over a direction overlay's `variant` and the stamp's own |
+| `RIG_V2_LIMITS` | The most a version 2 rig is drawn with: `nodes` 64 (bones and nodes together), `shapes` (draw-list's primitive cap, the whole frame list after expansion; the rig's own primitives stop two short so the flash and outline always fit), `poly` points, `calls` 64 generator calls a frame, `radius` 320 px, `colours` 8. Version 1 rigs keep `BONE_LIMITS`. Anything past a cap is reported in `skipped`, never dropped in silence |
+
 ### 2.3 Tilesets
 
 `body.tiles`:
@@ -196,7 +209,7 @@ Example (`tiles-forest`, the grass cap only):
 | `id`, `gen`, `v` | A behaviour generator: `particles`, `sparkles`, `ring`, `shards`, `smoke`, `chunks`, `rays`, `streaks`, `flame`, `puffs`, `starburst`, `beam`, `leaves`, `embers`, `spark.ring`, `blast.ball`, `bolt`, `swirl`, `motes`, `fall.field` (weather), `trail.puffs`, `scorch` |
 | args | Typed per generator: `at`, `count`, `seed`, `arc`, `dist`, `life`, `size`, `rise`, `spin`, `paints` (hottest first), `loop`, `area` |
 | `keys` in clips | `emit: { <id>: { amount: 0..1, at: [x, y] } }`: blended like bone keys, so an emitter can start, swell and stop |
-| On or off (decided in B6, 2026-11-19) | An emitter that some clip's keys give an `amount` is off wherever no key gives it an amount above 0 (the coin's `burst`, keyed in `collect`, stays off in `spin`); an emitter no key gives an `amount` always draws (hit-spark's `sparks`, a projectile's trail), its `when` and `clip` deciding as for any item. The amount reaches the generator only as an `amount` argument it declares. Same rule for a `pictures` body's emitters (`engine/data-sprite.js`) and the `emitters` layout (B12) |
+| On or off (decided in B6, 2026-11-19) | An emitter that some clip's keys give an `amount` is off wherever no key gives it an amount above 0 (the coin's `burst`, keyed in `collect`, stays off in `spin`); an emitter no key gives an `amount` always draws (a projectile's trail; the `sparks` of the example below, whose keys give only `flash` an amount), its `when` and `clip` deciding as for any item. The amount reaches the generator only as an `amount` argument it declares. (The `hit-spark` fixture, `tests/fixtures/v2/hit-spark.json`, also keys `sparks`, `amount: 1` at t 0, so there `sparks` is on only where its blended amount is above 0. In both, `count: { "from": "amount" }` reads the sprite's **control** named `amount` (Sparks: Few to Many), not a key's emit amount; B12's redraw names that control `sparks` so the two do not read alike.) Same rule for a `pictures` body's emitters (`engine/data-sprite.js`) and the `emitters` layout (B12) |
 | `glow` | Drawn after the outline, not inked (style guide 2) |
 
 ```json
@@ -356,6 +369,21 @@ About 150 generators; each is a port of one existing function that **returns pri
 | Quality bar | definition text hash + `id@v` of every generator and piece it names + renderer version | A framework change re-checks **only** assets naming the changed generator; today any change under `engine/`, `rigs/` re-checks every importer (Contract 12) |
 | Generator goldens | `id@v` | A pinned version cannot change silently |
 
+### 4.3 Layouts: where each body plugs in, and who names its clips
+
+Step 4 for every body but a rig is a **layout**: a generator of family `layout` whose id is the body kind, found in the registry (the newest version). A later body plugs in by registering one, `defineGenerator({ id: "<kind>", v: 1, family: "layout", about, args: {}, cost: () => 0, run })`, in its own file; `engine/data-sprite.js` does not change. The contract of `run(input, ctx)` (what it is given, what it returns: `list`, `palette`, `frames`, `offset`, `points`, `slice`, `textArea`) is LAYOUTS in the header of `engine/data-sprite.js`. Until its layout is registered a body is refused, naming its build item (`NOT_BUILT_BODIES`).
+
+| Body | Laid out by | Registered from | Build item | Its clips are named by |
+|---|---|---|---|---|
+| `rig` | `rigs/bones.js` (`drawResolvedRig`, `resolvedRigList`, `resolvedRigPoints`; 2.2); never the registry | none | B5 | The definition's `clips` and its base's (`extends`) |
+| `pictures` | The built-in `picturesLayout` until `pictures` is registered | `engine/gen/pictures.js` | B8 | The definition's `clips`; an icon set's `pictures` are one-frame clips of their own (`engine/data-sprite.js`) |
+| `emitters` | Its registered layout | `engine/gen/fx.js` | B12 | The definition's `clips` |
+| `panel` | Its registered layout | `engine/gen/ui.js` | B13 | Its `states` (default `normal`, `hover`, `pressed`, `disabled`); a written clip must be one of them |
+| `layers` | Its registered layout | `engine/gen/backdrop.js` | B14 | Its layers' `name`s; a written clip must be one of them |
+| `tiles` | Its registered layout | `engine/gen/tiles.js` | B15 | **Not yet** (see below): today only the clips the definition writes |
+
+**A layout does not name clips.** A sprite's clip names are fixed before any frame is laid out: `engine/resolve.js` (`clipNames`) lists a panel's states, then a background's layer names, then a base's clips, then the definition's own (at most 64; prototype words dropped), and the validator (`catalog/sprite-schema.js`, `clipsOf` with `layoutClips`) checks the definition's `clips` against the same list. `run` sees one clip at a time and its result has no clip list. Tiles are the gap the B6 review found: the validator accepts any clip name for a `tiles` body (`layoutClips` is null, "the tile.clips generator names them") but `clipNames` has no tiles branch, so a tileset has only the clips its definition writes. **Decision for B15:** add a `tiles` branch to `engine/resolve.js` `clipNames` that names the clips with the `tile.clips` generator from the body's `groups` and `extra` (as `blockClips`, `thinClips`, `slopeClips`, `decoClips`, `liquidClips` name them today), and give the validator the same list as `layoutClips`, so tile clips are named in one place, as panel states and layers are.
+
 ## 5. What is removed, and when
 
 Phases are those of section 9: P0 framework, P1 pilot, P2 bases and pieces, P3 migration, P4 removal.
@@ -435,8 +463,9 @@ Every item: tests first, owned files only, additive until P4. Sizes: S ≤ 1 day
 | B2 | Generator registry and arg types | `engine/gen/registry.js`, `engine/gen/args.js`, `engine/gen/index.js` | `gen-registry-*.test.mjs`: types, versions, unknown refused, cost, goldens harness | — | M |
 | B3 | Primitive draw list and pixel renderer | `engine/draw-list.js` | `draw-list-*.test.mjs`: each primitive equals the `Surface` call it stands for; stamps unturned; groups as one blob; outline and glow order | — | M |
 | B4 | Resolver: bindings, colour rules, `when`, variants, parts, `extends`/`use`, `was` controls | `engine/resolve.js`, one addition to `engine/sprite.js cleanParams` | `resolve-*.test.mjs` | B1, B2 | M |
-| B5 | Rig v2: nodes, stamps and `use` on bones, direction stamp overlays, `extends` | `rigs/bones.js` (additive), `rigs/rig-extend.js` | `bones-v2-*.test.mjs`; every v1 template draws byte for byte | B3, B4 | M |
-| B6 | `dataSprite` v2 for every body; materials from slots; `slice`, `textArea`, sockets | `engine/data-sprite.js` | `data-sprite-v2-*.test.mjs`; v1 unchanged | B1 to B5 | M |
+| B5 | Rig v2: nodes, stamps and `use` on bones, direction stamp overlays; drawing a resolved sprite's rig (entry points in 2.2, "The rig renderer") | `rigs/bones.js` (additive). No `rigs/rig-extend.js`: `extends` is merged by the resolver (`engine/resolve.js`, B4) before the rig reaches `rigs/bones.js` | `bones-v2-*.test.mjs`; every v1 template draws byte for byte | B3, B4 | M |
+| B6 | `dataSprite` v2 for every body; materials from slots; `slice`, `textArea`, sockets; the layout contract (4.3) | `engine/data-sprite.js` | `data-sprite-v2-*.test.mjs`; v1 unchanged | B1 to B5 | M |
+| B56 | Seams the B5 and B6 reviews left: a rig frame's list through `resolvedRigList` (so `dataFrameList` is what `render` draws); prototype-named parents, IK hips and chains; own-property clip lookups; this document's rows | `engine/data-sprite.js`, `rigs/bones.js`, this file | `data-sprite-v2-seams.test.mjs`, `bones-v2-caps.test.mjs` | B5, B6 | S |
 | B7 | Pieces: folder, loader, index | `pieces/`, `engine/pieces.js`, `tools/lib/pieces-index.mjs` | `pieces-*.test.mjs`: index lists every file, versions pinned | B1 | S |
 | B8 | Pictures layout + first generators (`pickup.bob`, `pickup.spin`, `pickup.collect`, `glint`, `star`, `gem.cut`, `icon.fit`) | `engine/gen/pictures.js`, `engine/gen/shine.js`, `engine/gen/shape.js` | goldens | B2, B3 | M |
 | B9 | Build, tools and quality cache for data files | `tools/lib/assets.mjs`, `tools/lib/quality-run.mjs`, `tools/gen.mjs`, `tools/piece.mjs`; data checks in `quality/sprite.js` | `assets-data-*.test.mjs`; `newasset.spec.mjs` with a `.json` file | B6 | M |

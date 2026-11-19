@@ -74,7 +74,9 @@
 // meet air. Colours come from colour slots: ramp() for near shapes, farRamp() for `far`, flat for slots marked `detail`.
 //
 // Data is trusted only as far as this: the renderer never throws on a missing reference (a bone whose parent is
-// unknown or comes later, a shape on a missing bone or slot, a chain that is not parent and child is left out), caps
+// unknown or comes later, a shape on a missing bone or slot, a chain that is not parent and child is left out; every
+// id is looked up as the rig's own, so a parent, hip or chain named 'toString' or '__proto__' is unknown, and a bone or
+// chain whose own id is '__proto__', 'constructor' or 'prototype' is left out), caps
 // every count at the Contract 14 limits (version 2 rigs: RIG_V2_LIMITS) and ignores numbers that are not finite.
 // Validating and cleaning a definition is catalog/studio-schema.js's and catalog/sprite-schema.js's job. Pure: no
 // randomness, no clock, no DOM; runs the same in the browser and in Node.
@@ -195,7 +197,7 @@ function forward(rig, pose, opt, targets) {
   if (targets) {
     const byId = new Map(bones.filter(Boolean).map((b) => [b.id, b]));
     for (const c of list(rig.ik, CAP.ik)) {
-      const t = targets[c?.id];
+      const t = isObj(c) && typeof c.id === 'string' && Object.hasOwn(targets, c.id) ? targets[c.id] : null;
       if (!t || !Array.isArray(c.bones)) continue;
       const lower = byId.get(c.bones[1]);
       if (!byId.has(c.bones[0]) || !lower || lower.parent !== c.bones[0]) continue;
@@ -204,7 +206,7 @@ function forward(rig, pose, opt, targets) {
   }
   const forced = new Map();    // bone id -> absolute angle set by a solved chain
   for (const b of bones) {
-    if (!b || typeof b.id !== 'string' || out[b.id]) continue;
+    if (!b || typeof b.id !== 'string' || BAD_KEYS.has(b.id) || Object.hasOwn(out, b.id)) continue;
     const base = Math.max(0, num(b.length, 0));
     const k = clamp(num(scaleB[b.id], 1), 0.1, 4) * clamp(num(stretch[b.id], 1), 0.5, 1.5);
     const length = base * k;
@@ -217,7 +219,7 @@ function forward(rig, pose, opt, targets) {
       const at = pair(b.at);
       start = [at[0] + ox, at[1] + oy];
     } else {
-      const P = out[b.parent];
+      const P = Object.hasOwn(out, b.parent) ? out[b.parent] : undefined;   // the rig's own bone, never a prototype key
       if (!P || P.depth + 1 >= CAP.depth) continue;
       const f = clamp(num(b.from, 1), 0, 1);
       const { d } = axes(P.angle);
@@ -262,8 +264,8 @@ export function solveRig(rig, pose = {}, opt = {}) {
     targets = {};
     const shapeScale = opt.scale?.shapes ?? {};
     for (const c of list(rig.ik, CAP.ik)) {
-      if (!c || !Array.isArray(ik[c.id]) || !Array.isArray(c.bones)) continue;
-      const hip = rest[c.bones[0]];
+      if (!c || typeof c.id !== 'string' || BAD_KEYS.has(c.id) || !Object.hasOwn(ik, c.id) || !Array.isArray(ik[c.id]) || !Array.isArray(c.bones)) continue;
+      const hip = boneIn({ bones: rest }, c.bones[0]);
       if (!hip) continue;
       const [tx, ty] = pair(ik[c.id]);
       targets[c.id] = [hip.start[0] + root[0] + nudge[0] + tx, ground - footRise(rig, c.bones[1], shapeScale) + nudge[1] + ty];

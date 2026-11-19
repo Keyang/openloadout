@@ -57,8 +57,8 @@
 //                palette, pieces drawn in, a base merged, the clips
 //   3 pose       rigs/keypose.js: the clip's keys at the frame's phase, then its frame edits (nudge, flash, show, hide, swap)
 //   4-7 a rig    rigs/bones.js (build item B5) does the rest: drawResolvedRig(g, resolved, pose, ctx) for render (the
-//                direction's overlay, solveRig, rigList, drawList), resolvedRigPoints for sockets, rigList for
-//                dataFrameList; ctx.expand is engine/resolve.js expandFrame bound to the resolved sprite and the registry
+//                direction's overlay, solveRig, rigList, drawList), resolvedRigPoints for sockets, resolvedRigList for
+//                dataFrameList (the same rig, pose and context, so the list is what render draws); ctx.expand is engine/resolve.js expandFrame bound to the resolved sprite and the registry
 //   4 lay out    any other body: its LAYOUT (below) turns the resolved body and the pose into a draw list; the built-in
 //                `pictures` one lays out the node tree (each node's at, turn, scale, with the keys' `nodes` { turn, move,
 //                scale } and the motions added; parents first), the root key, nudge and whole-picture motions moving everything
@@ -110,7 +110,7 @@
 //   writes wins over the layout's for its clips.
 // EMITTERS (in a `pictures` body; recorded in docs/data-sprites.md 2.5c for B12). An emitter that some clip's keys give
 //   an `amount` is off wherever no key gives it an amount above 0 (the coin's collect burst stays off in spin); an
-//   emitter no key gives an amount always draws (a projectile's trail; hit-spark's sparks), its `when` and `clip`
+//   emitter no key gives an amount always draws (a projectile's trail; the 2.5c example's sparks), its `when` and `clip`
 //   deciding as for any item. Keys may move its `at` and set its keyable arguments; the amount reaches a generator
 //   that has an `amount` argument.
 //
@@ -120,7 +120,7 @@ import { defineSprite, range, choice, color, toggle, SKIN, CLOTH, METAL } from '
 import { lerp } from './motion.js';
 import { validateStudioSprite, parseStudioJson, libraryBody, TOPDOWN_DIRECTIONS, directionOf, directionRig } from '../catalog/studio-schema.js';
 import { compileKeys, sampleKeys, framePhase, frameOfPhase } from '../rigs/keypose.js';
-import { drawRig, solveRig, rigPoints, rigList, rigFacing, drawResolvedRig, resolvedRigPoints } from '../rigs/bones.js';
+import { drawRig, solveRig, rigPoints, drawResolvedRig, resolvedRigList, resolvedRigPoints } from '../rigs/bones.js';
 import { validateSprite, parseSpriteJson } from '../catalog/sprite-schema.js';
 import { resolveSprite, expandFrame, sceneItems, materialTable, paintHex, settingTable } from './resolve.js';
 import { drawList, placeOn, nodeFrame } from './draw-list.js';
@@ -170,9 +170,12 @@ const compiledOf = (clip) => {
   return c;
 };
 
+/** A definition's own clip by name (never an Object.prototype member such as 'toString' or '__proto__'), else null. */
+const clipOwn = (def, name) => (isObj(def?.clips) && typeof name === 'string' && Object.hasOwn(def.clips, name) && isObj(def.clips[name]) ? def.clips[name] : null);
+
 /** The pose at phase t with frame `frame`'s edits on it. */
 function poseAt(def, clipName, t, frame) {
-  const c = def?.clips?.[clipName];
+  const c = clipOwn(def, clipName);
   if (!isObj(c)) return {};
   const loop = c.loop !== false;
   const pose = sampleKeys(compiledOf(c), t, { loop });
@@ -197,7 +200,7 @@ function poseAt(def, clipName, t, frame) {
  * Arguments: def (a cleaned loadout-sprite, as validateDataSprite or sprite.definition gives it), clip (its name), frame (0..frames-1).
  */
 export function framePose(def, clip, frame) {
-  const c = def?.clips?.[clip];
+  const c = clipOwn(def, clip);
   if (!isObj(c)) return {};
   return poseAt(def, clip, framePhase(c, frame), frame);
 }
@@ -400,7 +403,7 @@ function build(def, opts = {}) {
   };
   if (hasPoints) {
     sprite.sockets = (clip, t, p) => {
-      const c = definition.clips[clip];
+      const c = clipOwn(definition, clip);
       if (!c) return {};
       const r = rigOf(clip);
       return rigPoints(r, solveRig(r, poseAt(definition, clip, t, frameOfPhase(c, t)), drawOptions(definition, p)));
@@ -532,7 +535,7 @@ function partsV2(definition, params, shapes) {
 function soundsV2(definition, clips) {
   const out = {};
   for (const [name, c] of Object.entries(clips)) {
-    const own = definition.clips?.[name]?.sounds;
+    const own = clipOwn(definition, name)?.sounds;
     const list = Array.isArray(own) ? own : c.sounds ?? [];
     const cues = list.filter((s) => isObj(s) && typeof s.sound === 'string' && s.frame < c.frames).map((s) => {
       const x = JSON.parse(JSON.stringify(s));
@@ -622,7 +625,7 @@ function expanded(R, list, ctx, gen, warn) {
   return x;
 }
 
-// -- the rig body: rigs/bones.js draws it (build item B5's entry points drawResolvedRig, resolvedRigPoints, rigList) --
+// -- the rig body: rigs/bones.js draws it (build item B5's entry points drawResolvedRig, resolvedRigPoints, resolvedRigList) --
 
 const num0 = (v, d) => (fin(v) ? v : d);
 
@@ -653,15 +656,13 @@ function drawRigFrame(g, R, c, clip, t, frame, gen) {
   return out;
 }
 
-/** One frame of a rig body as a draw list (rigs/bones.js rigFacing, solveRig, rigList: what drawResolvedRig draws). */
+/**
+ * One frame of a rig body as a draw list: rigs/bones.js resolvedRigList, the same rig (direction overlay, the sprite's
+ * size and points, a version 2 sprite's rig drawn as version 2), pose and context drawResolvedRig draws (build item B56).
+ */
 function rigFrame(R, c, clip, t, frame, gen, warn) {
-  const pose = poseV2(c, t, frame);
-  let rig = Array.isArray(R.body.rig.size) ? R.body.rig : { ...R.body.rig, size: [...R.size] };
-  const direction = rig.view === 'top-down' || (!rig.view && R.meta?.view === 'top-down') ? directionOf(clip) : null;
-  if (direction !== null && isObj(rig.directions)) rig = rigFacing(rig, direction);
-  const J = solveRig(rig, pose, { scale: R.scales });
-  const ctx = rigCtx(R, c, clip, t, frame, gen);
-  const r = rigList(rig, J, pose, { palette: R.palette, scale: R.scales, clip, direction, frame: { t, frame, frames: c.frames, loop: c.loop !== false, size: [...R.size] }, expand: ctx.expand });
+  const r = resolvedRigList(R, poseV2(c, t, frame), rigCtx(R, c, clip, t, frame, gen));
+  if (r.error) throw new Error(`sprite ${R.id}, clip ${clip} frame ${frame}: ${r.error}`);
   if (r.errors.length) throw new Error(`sprite ${R.id}, clip ${clip} frame ${frame}: ${r.errors.slice(0, 6).join('; ')}`);
   for (const s of r.skipped) warn(`"${s.id ?? s.kind}" was left out: ${s.why}`);
   return { list: r.list, palette: r.palette };
