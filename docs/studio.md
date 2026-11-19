@@ -304,6 +304,8 @@ Every item: tests first (`tests/unit/<area>-*.test.mjs`, `tests/e2e/<area>.spec.
 
 Order: S1, S2, S3 together → S4, S5 → S7, S8, S9 (★ ends here) → S6, S10, S11, S12 → S13. Biggest unknown: the redesign's shared stylesheet must exist before S9 looks like design 5; until then S9 builds on `mocks/5-catalogue/style.css` copied into `app/studio.css` and merges later.
 
+**Page conventions (from the redesign session, 2026-11-19).** The Catalogue redesign is committed (`b0dd99b`, `ab38294`; `app/style.css` is gone). The studio page puts class `v2` on its `<main>`, uses the tokens and components in `app/css/base.css` (`.btn`, `.chip`, `.tabs`/`.tab`, `.seg`, `.tile`, `.card`, the editing panel `.rx-panel`/`.rx-block`/`.vstrip`/`.vbtn`/`.pane`/`.ctl`/`.rx-foot`/`.saved`), and adds one sheet, `app/css/studio.css` (not `app/studio.css`), linked in `index.html` after the other page sheets, with `'studio'` added to `PAGES` in `tests/unit/site-css.test.mjs`. Two columns follow the remix layout in `app/css/asset.css`; the rules are in `docs/site-design.md`, "The look". Seam edits to `app/bag.js`, `app/bundle.js` and `app/app.js` wait until the redesign session says its journey-fix wave is committed; `app/catalog.js` and `app/api-actions.js` are free.
+
 ## 9. Open questions for Keyang
 
 | Id | Question | Recommendation |
