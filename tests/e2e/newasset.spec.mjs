@@ -102,9 +102,13 @@ const box = (page) => page.getByRole('searchbox', { name: 'Search' });
 const results = (page) => page.locator('ul.results > li');
 const resultIds = (page) => results(page).evaluateAll((lis) => lis.map((li) => li.dataset.id));
 const place = (page, id) => page.locator(`ul.results > li[data-id="${id}"]`);
-// a sprite's card shows the picture the build made of it; a sound's card draws its icon (it has no picture of its own)
+// a sprite's card shows the picture the build made of it; a sound's card shows its waveform (the build's picture, or
+// one drawn from the sound when it was made on this visit)
 const pictureLoaded = (card) => card.locator('img.thumb').evaluate((img) => img.complete && img.naturalWidth > 0);
-const iconDrawn = (card) => card.locator('.sound-pic svg').evaluate((svg) => { const r = svg.getBoundingClientRect(); return r.width > 0 && r.height > 0 && !!svg.querySelector('path')?.getAttribute('d'); });
+const waveShown = (card) => card.locator('.sound-pic .wave').evaluate((w) => {
+  if (w.tagName === 'IMG') return w.complete && w.naturalWidth > 0;
+  const g = w.getContext('2d').getImageData(0, 0, w.width, w.height).data; let n = 0; for (let i = 3; i < g.length; i += 4) if (g[i] > 0) n++; return n > 20;
+});
 /** The home page lists nothing itself: a search there opens the library. */
 async function search(page, words) {
   await box(page).fill(words);
@@ -136,7 +140,7 @@ test('both are counted on the home page and listed in the library, each with its
   await expect(page.locator('main')).toContainText(`${n('sprite')} sprites, ${n('sound')} sounds`);
   await open(page, '/browse');
   await expect(results(page)).toHaveCount(CATALOG.assets.length);
-  for (const [it, href, drawn] of [[NEW_SPRITE, `#/sprite/${NEW_SPRITE.id}`, pictureLoaded], [NEW_SOUND, `#/sound/${NEW_SOUND.id}`, iconDrawn]]) {
+  for (const [it, href, drawn] of [[NEW_SPRITE, `#/sprite/${NEW_SPRITE.id}`, pictureLoaded], [NEW_SOUND, `#/sound/${NEW_SOUND.id}`, waveShown]]) {
     const li = place(page, it.id);
     await expect(li).toHaveCount(1);
     await li.scrollIntoViewIfNeeded();

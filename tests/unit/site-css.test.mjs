@@ -51,7 +51,11 @@ test('base.css has every component, and the accent is spent only on the change d
   const uses = [...base.matchAll(/^.*var\(--mark\).*$/gm)].map((m) => m[0].trim());
   assert.equal(uses.length, 1, `--mark is used once, by the dot:\n${uses.join('\n')}`);
   assert.match(uses[0], /^\.dot \{/);
-  assert.doesNotMatch(base.replace(/\/\*[\s\S]*?\*\//g, ''), /#f26b1d(?![\s\S]*--mark)|box-shadow:\s*\d+px \d+px 0|(?<!mask-image:\s*)linear-gradient\((?!to right, var\(--ink\))/i, 'no second use of the accent, no hard shadows, no decorative gradients (a mask that fades a scrolling row at its edge is not decoration)');
+  // the one exception: "Surprise me" is the magic button, in colour on purpose (Keyang, 2026-11-19; app/magic.js). Its rules
+  // are all named .btn-magic / magic-*, and nothing else may borrow its gradient.
+  const magic = /^(\.btn-magic[^{]*|\.magic-burst[^{]*|@keyframes magic-[\w-]+\s*)\{(?:[^{}]|\{[^{}]*\})*\}\s*$/gm;
+  assert.ok([...base.matchAll(magic)].length >= 4, 'the magic button\'s rules are in base.css');
+  assert.doesNotMatch(base.replace(/\/\*[\s\S]*?\*\//g, '').replace(magic, ''), /#f26b1d(?![\s\S]*--mark)|box-shadow:\s*\d+px \d+px 0|(?<!mask-image:\s*)linear-gradient\((?!to right, var\(--ink\))/i, 'no second use of the accent, no hard shadows, no decorative gradients (a mask that fades a scrolling row at its edge is not decoration)');
   assert.match(base, /prefers-reduced-motion: reduce/);
   assert.match(base, /:focus-visible \{[^}]*outline/);
 });

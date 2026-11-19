@@ -377,6 +377,28 @@ input[type='range']:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 2px var(
 
 
 
+/* ---------- Surprise me: the one button that looks like magic (app/magic.js) ---------- */
+.btn-magic { position: relative; height: 36px; padding: 0 var(--s4); border: 0; color: #fff; font-weight: 600;
+  background: linear-gradient(110deg, #7c5cff 0%, #d14fff 30%, #ff5fa2 55%, #ffb020 80%, #7c5cff 100%); background-size: 250% 100%; background-position: 0% 50%;
+  box-shadow: 0 1px 0 rgba(255,255,255,.35) inset, 0 4px 14px -4px rgba(160, 70, 255, .6);
+  text-shadow: 0 1px 1px rgba(60, 0, 90, .35); animation: magic-drift 8s ease-in-out infinite alternate; transition: transform .15s ease, box-shadow .15s ease; }
+.btn-magic:hover { border: 0; background: linear-gradient(110deg, #7c5cff 0%, #d14fff 30%, #ff5fa2 55%, #ffb020 80%, #7c5cff 100%); background-size: 250% 100%;
+  transform: translateY(-1px); box-shadow: 0 1px 0 rgba(255,255,255,.35) inset, 0 8px 22px -6px rgba(200, 60, 255, .75); animation-duration: 2.5s; }
+.btn-magic:active { transform: translateY(0) scale(.97); background: linear-gradient(110deg, #7c5cff 0%, #d14fff 30%, #ff5fa2 55%, #ffb020 80%, #7c5cff 100%); background-size: 250% 100%; }
+.btn-magic:focus-visible { outline: 2px solid #7c5cff; outline-offset: 2px; }
+.btn-magic .magic-star { flex: none; filter: drop-shadow(0 0 3px rgba(255, 240, 160, .9)); animation: magic-twinkle 2.4s ease-in-out infinite; transform-origin: 42% 42%; }
+.btn-magic:hover .magic-star { animation-duration: .9s; }
+.btn-magic.is-casting { animation: magic-cast .45s ease-out; }
+.btn-magic.is-casting .magic-star { animation: magic-spin .5s ease-out; }
+@keyframes magic-drift { to { background-position: 100% 50%; } }
+@keyframes magic-twinkle { 0%, 100% { transform: scale(1) rotate(0); opacity: 1; } 50% { transform: scale(.8) rotate(12deg); opacity: .8; } }
+@keyframes magic-spin { from { transform: rotate(0) scale(1.4); } to { transform: rotate(180deg) scale(1); } }
+@keyframes magic-cast { 0% { transform: scale(.94); } 55% { transform: scale(1.06); } 100% { transform: scale(1); } }
+.magic-burst { position: fixed; width: 0; height: 0; pointer-events: none; z-index: 1000; }
+.magic-burst > span { position: absolute; left: calc(var(--sz) / -2); top: calc(var(--sz) / -2); width: var(--sz); height: var(--sz); background: var(--c);
+  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%); animation: magic-fly .75s cubic-bezier(.2, .7, .3, 1) forwards; }
+@keyframes magic-fly { 0% { transform: translate(0, 0) scale(.4) rotate(0); opacity: 1; } 70% { opacity: 1; } 100% { transform: translate(var(--dx), var(--dy)) scale(1.1) rotate(160deg); opacity: 0; } }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
 }

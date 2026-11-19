@@ -3,6 +3,7 @@
 // live by the engine (app/home-live.js), so the controls in step 2, "Surprise me" and the kits' looks really change them.
 import { labelFor } from '../catalog/schema.js';
 import { THEME_PRESETS } from '../engine/theme.js';
+import { makeMagic } from './magic.js';
 import { el, header, footer } from './ui.js';
 import { currentCatalog, loadSprite, loadSound } from './catalog.js';
 import { soundById, soundParams, renderAsync, playRendered, playLive } from './audio.js';
@@ -121,7 +122,7 @@ export function landingPage(app) {
     return a ? el('span', { class: `stand${out ? ` out-${out}` : ''}`, style: `--fw:${fw}` }, stand(a), b ? stand(b, above[1]) : null) : null;
   }));
   const back = el('button', { type: 'button', class: 'btn btn-sm btn-secondary', hidden: true, onclick: () => { for (const s of standing) s.reset(); back.hidden = true; surprise.focus(); } }, 'Back to the originals');
-  const surprise = el('button', { type: 'button', class: 'btn btn-sm btn-secondary', onclick: () => { for (const s of standing) s.surprise(); back.hidden = false; } }, 'Surprise me');
+  const surprise = makeMagic(el('button', { type: 'button', class: 'btn btn-sm btn-secondary', onclick: () => { for (const s of standing) s.surprise(); back.hidden = false; } }, 'Surprise me'));
   const lineup = el('section', { class: 'lineup tile', 'aria-label': 'Sprites from the three kits, drawn live' }, row,
     el('div', { class: 'lineup-cap' },
       el('span', {}, 'These are not fixed pictures. Each one is being drawn right now, so each one can change.'),

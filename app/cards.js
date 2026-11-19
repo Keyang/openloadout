@@ -4,7 +4,7 @@
 //   a sprite     its picture on the tile; on hover or keyboard focus its preview animation, played from the strip
 //                picture; three version dots that add a ready-made version straight to the bag (app/versions.js), and
 //                show that version on the tile while the pointer or the focus is on the dot
-//   a sound      its icon on the tile, its length, a play button
+//   a sound      its waveform on the tile (the icon of what it is for if it has none), its length, a play button
 //   a track      the same, with the music icon
 //   a kit        a few of its sprites on a wide tile, what it is for, what is in it
 //
@@ -18,7 +18,7 @@
 import { labelFor } from '../catalog/schema.js';
 import { el, reduceMotion } from './ui.js';
 import { assetById, bundlesOf, loadSound, loadSprite } from './catalog.js';
-import { soundById, soundParams, renderAsync, playRendered, playLive } from './audio.js';
+import { soundById, soundParams, renderAsync, playRendered, playLive, drawWave, whenRendered } from './audio.js';
 import { renderPixels, defaultParams, cleanParams } from '../engine/sprite.js';
 import { bag } from './bag.js';
 import { backdropFor } from './stage.js';
@@ -267,13 +267,13 @@ export function spriteCard(asset, { layout = 'card' } = {}) {
 // ---- a sound, a track ---------------------------------------------------------------------------------
 
 /** What a sound and a music card share: the icon on the tile, Play and Stop, one thing sounding at a time. */
-function audioCard(row, { tag, length, begin, loops }, { layout = 'card' } = {}) {
+function audioCard(row, { tag, length, begin, loops, pic = null }, { layout = 'card' } = {}) {
   const inRow = layout === 'row';
   const play = el('button', { class: 'tile-play', type: 'button', 'aria-label': `Play ${row.name}` }, icon(PLAY, { fill: true }));
   const progress = el('span', { class: 'tile-progress', 'aria-hidden': 'true' });
   const link = title(row);
   const add = draft(row) ? null : addButton(row);
-  const tile = el('div', { class: 'card-tile tile' }, el('span', { class: 'card-pic sound-pic' }, soundIcon(row, inRow ? 24 : 40)), inRow ? null : play, inRow ? null : add, progress);
+  const tile = el('div', { class: 'card-tile tile' }, el('span', { class: `card-pic sound-pic${pic ? ' has-wave' : ''}` }, pic ?? soundIcon(row, inRow ? 24 : 40)), inRow ? null : play, inRow ? null : add, progress);
   const node = inRow
     ? el('div', { class: 'card card-cell row sound', 'data-kind': row.kind }, tile, facts(row, link, tag), play, add ?? el('span', {}))
     : el('div', { class: 'card card-cell sound', 'data-kind': row.kind },
@@ -315,12 +315,25 @@ function audioCard(row, { tag, length, begin, loops }, { layout = 'card' } = {})
   return { node, stop: me.quiet, tick() {} };
 }
 
-/** A sound effect: its icon on the tile, its length. Pressing play loads that one sound and plays it. */
+/**
+ * A sound's waveform for its tile: the build's picture (generated/thumbs, drawn in row.thumbInk on a clear background,
+ * so it needs the light shelf tile), or, for a sound made on this visit, drawn from the sound itself when the page has
+ * a quiet moment. null when there is neither: the card shows the icon of what the sound is for.
+ */
+function wavePic(row) {
+  if (row.thumb) return el('img', { class: 'wave', src: row.thumb, alt: '', width: 64, height: 40, loading: 'lazy', decoding: 'async', draggable: 'false' });
+  if (row.runtime !== true || !soundById[row.id]) return null;
+  const wave = el('canvas', { class: 'wave', width: 64, height: 40, 'aria-hidden': 'true' });
+  whenRendered(soundById[row.id], (r) => drawWave(wave.getContext('2d'), r.samples, 0, 20, 64, 36, row.thumbInk ?? '#231b33'));
+  return wave;
+}
+
+/** A sound effect: its waveform on the tile, its length. Pressing play loads that one sound and plays it. */
 export function soundCard(asset, opts) {
   const row = rowOf(asset);
   const loops = !!row.tech?.loop;
   return audioCard(row, {
-    tag: tagOf(row), length: lengthWords(row.tech?.seconds, loops), loops,
+    tag: tagOf(row), length: lengthWords(row.tech?.seconds, loops), loops, pic: wavePic(row),
     begin: async (patch, ended) => playRendered(await renderAsync(patch, soundParams(patch)), { force: true, loop: false, onended: ended }),
   }, opts);
 }

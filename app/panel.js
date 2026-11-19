@@ -38,6 +38,7 @@
 import { renderPixels } from '../engine/sprite.js';
 import { colorName } from '../engine/color.js';
 import { el } from './ui.js';
+import { makeMagic } from './magic.js';
 import { spriteModel, soundModel, SPRITE_TABS } from './panel-model.js';
 import { versionsFor } from './versions.js';
 import { bag as siteBag, themeFor, lookOf } from './bag.js';
@@ -215,7 +216,7 @@ export function editPanel({
   const versionsBlock = el('div', { class: 'rx-block' },
     el('div', { class: 'block-head' },
       el('h2', {}, 'Start from a version'), hint, nav,
-      el('button', { type: 'button', class: 'btn btn-sm btn-secondary', 'data-act': 'surprise', onclick: () => act('surprise', model.surprise(edit.settings())) }, 'Surprise me'),
+      makeMagic(el('button', { type: 'button', class: 'btn btn-sm btn-secondary', 'data-act': 'surprise', onclick: () => act('surprise', model.surprise(edit.settings())) }, 'Surprise me')),
       el('button', { type: 'button', class: 'btn btn-sm btn-secondary', 'data-act': 'startover', onclick: () => { edit.startOver(); onAct('startover'); } }, 'Start over')),
     strip);
 
