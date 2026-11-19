@@ -1,0 +1,39 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "menu-wood-error",
+  "name": "Wood error",
+  "category": "ui",
+  "description": "Not allowed: two dull, muffled notes on a damped wooden bar, the second a little lower, the same every time. Change its pitch, speed, brightness and how dead and short the notes are.",
+  "meta": {
+    "type": "sfx",
+    "role": "interface/error",
+    "themes": ["neutral", "fantasy"],
+    "gameTypes": ["arcade", "puzzle", "card-game", "turn-based-rpg", "top-down-rpg"],
+    "words": ["menu", "error", "wrong", "denied", "locked", "invalid", "fail", "no", "wooden", "dull", "muffled", "button"],
+    "license": "draft"
+  },
+  "duration": "2.6 / speed",
+  "params": [
+    { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 440, "max": 1000, "default": 660, "scale": "log" },
+    { "id": "speed", "label": "Speed", "unit": "notes/s", "min": 6.5, "max": 14.4, "default": 10, "scale": "log" },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "dead", "label": "Deadness", "min": 0, "max": 1, "default": 0.5 }
+  ],
+  "nodes": [
+    { "id": "hitA", "type": "ad", "attack": 0.0005, "decay": 0.0016, "curve": 2 },
+    { "id": "malletA", "type": "filter", "mode": "lp", "in": "hitA", "freq": "700 + bright * 1600 - dead * 300", "q": 0.6 },
+    { "id": "barA", "type": "modal", "in": "malletA", "freq": "pitch", "ratios": [1, 3.9, 9.2], "gains": [1, 0.8, 0.2], "decay": "(0.15 - dead * 0.1) * 10 / speed", "tilt": "1.5 - bright * 0.6 + dead * 0.6" },
+    { "id": "c2", "type": "clock", "rate": 1, "count": 1, "delay": "1.3 / speed" },
+    { "id": "hitB", "type": "ad", "attack": 0.0005, "decay": 0.0016, "curve": 2, "trig": "c2" },
+    { "id": "malletB", "type": "filter", "mode": "lp", "in": "hitB", "freq": "700 + bright * 1600 - dead * 300", "q": 0.6 },
+    { "id": "barB", "type": "modal", "in": "malletB", "freq": "pitch * semi(-1)", "ratios": [1, 3.9, 9.2], "gains": [1, 0.8, 0.2], "decay": "(0.15 - dead * 0.1) * 10 / speed", "tilt": "1.5 - bright * 0.6 + dead * 0.6" },
+    { "id": "sum", "type": "expr", "expr": "barA * 0.065 + barB * 0.065" },
+    { "id": "tone", "type": "filter", "mode": "lp", "in": "sum", "freq": "1800 + bright * 5000 - dead * 600", "q": 0.6 },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "tone", "freq": 80 }
+  ],
+  "out": "clean",
+  "presets": {
+    "Not allowed": { "pitch": 660, "speed": 10, "bright": 0.45, "dead": 0.6 },
+    "Wrong answer": { "pitch": 587, "speed": 7.5, "bright": 0.5, "dead": 0.3 }
+  }
+}

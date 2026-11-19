@@ -1,0 +1,47 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "menu-console-buy",
+  "name": "Console buy",
+  "category": "ui",
+  "description": "Quick mellow electric-piano notes stepping up in wide leaps for buying or equipping in a shop menu, a soft high sparkle on the last note and a soft repeat after each. Change its pitch, speed, brightness, echo and how many notes play.",
+  "meta": {
+    "type": "sfx",
+    "role": "interface/confirm",
+    "themes": ["neutral"],
+    "gameTypes": ["arcade", "turn-based-rpg", "top-down-rpg", "card-game", "puzzle"],
+    "words": ["buy", "purchase", "shop", "store", "equip", "trade", "spend", "confirm", "menu", "retro", "console", "mellow", "sparkle"],
+    "license": "draft"
+  },
+  "duration": "(notes - 1) / speed + 1.6 / speed + 0.12",
+  "params": [
+    { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 260, "max": 700, "default": 440, "scale": "log" },
+    { "id": "speed", "label": "Speed", "unit": "notes/s", "min": 9, "max": 18, "default": 12, "scale": "log" },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "echo", "label": "Echo", "min": 0.15, "max": 0.6, "default": 0.35 },
+    { "id": "notes", "label": "Notes", "min": 2, "max": 3, "default": 3, "step": 1 }
+  ],
+  "nodes": [
+    { "id": "clk", "type": "clock", "rate": "speed", "count": "notes" },
+    { "id": "note", "type": "seq", "steps": ["pitch", "pitch * semi(7)", "pitch * semi(14)"], "trig": "clk" },
+    { "id": "barkAd", "type": "ad", "attack": 0.0005, "decay": 0.03, "curve": 2, "trig": "clk" },
+    { "id": "modOsc", "type": "osc", "wave": "sine", "freq": "note" },
+    { "id": "tine", "type": "osc", "wave": "sine", "freq": "note", "pm": "modOsc * (0.04 + (0.08 + bright * 0.12) * barkAd)" },
+    { "id": "amp", "type": "ad", "attack": 0.002, "decay": "1.6 / speed", "curve": 2.2, "trig": "clk" },
+    { "id": "grain", "type": "crush", "in": "tine * amp", "bits": 12, "rate": 30000 },
+    { "id": "tone", "type": "filter", "mode": "lp", "in": "grain", "freq": "2000 + bright * 3000", "q": 0.6 },
+    { "id": "lastClk", "type": "clock", "rate": 1, "count": 1, "delay": "(notes - 1) / speed" },
+    { "id": "lastNote", "type": "expr", "expr": "pitch * semi(7 * (notes - 1))" },
+    { "id": "spk1", "type": "osc", "wave": "sine", "freq": "lastNote * 3" },
+    { "id": "spk2", "type": "osc", "wave": "sine", "freq": "lastNote * 4.01" },
+    { "id": "spkAd", "type": "ad", "attack": 0.004, "decay": "1.3 / speed", "curve": 2.5, "trig": "lastClk" },
+    { "id": "sparkle", "type": "expr", "expr": "(spk1 * 0.6 + spk2 * 0.4) * spkAd * (0.12 + bright * 0.2)" },
+    { "id": "rep", "type": "delay", "in": "tone + sparkle", "time": 0.09, "feedback": 0, "mix": 1, "max": 0.2 },
+    { "id": "repSoft", "type": "filter", "mode": "lp", "in": "rep", "freq": "1500 + bright * 1500", "q": 0.6 },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "tone + sparkle + repSoft * echo", "freq": 120 }
+  ],
+  "out": "clean",
+  "presets": {
+    "Buy": { "notes": 3 },
+    "Equip": { "notes": 2 }
+  }
+}

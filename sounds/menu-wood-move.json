@@ -1,0 +1,39 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "menu-wood-move",
+  "name": "Wood move",
+  "category": "ui",
+  "description": "The cursor stepping to the next item: one soft tap on a little tuned wooden bar with a breath of paper under it, the same every time. Change its pitch, length, brightness and how much paper you hear.",
+  "meta": {
+    "type": "sfx",
+    "role": "interface/hover",
+    "themes": ["neutral", "fantasy"],
+    "gameTypes": ["arcade", "puzzle", "card-game", "turn-based-rpg", "top-down-rpg"],
+    "words": ["menu", "cursor", "move", "hover", "highlight", "scroll", "navigate", "wooden", "marimba", "paper", "tap", "soft"],
+    "license": "draft"
+  },
+  "duration": "length + 0.006",
+  "params": [
+    { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 440, "max": 1000, "default": 660, "scale": "log" },
+    { "id": "length", "label": "Length", "unit": "s", "min": 0.06, "max": 0.14, "default": 0.08, "scale": "log" },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "paper", "label": "Paper", "min": 0.15, "max": 1, "default": 0.4 }
+  ],
+  "nodes": [
+    { "id": "hitA", "type": "ad", "attack": 0.0004, "decay": 0.0012, "curve": 2 },
+    { "id": "malletA", "type": "filter", "mode": "lp", "in": "hitA", "freq": "1200 + bright * 3000", "q": 0.6 },
+    { "id": "barA", "type": "modal", "in": "malletA", "freq": "pitch", "ratios": [1, 3.9, 9.2], "gains": [1, 1.5, 0.5], "decay": "length * 1.6", "tilt": "1.3 - bright * 0.6" },
+    { "id": "rustle", "type": "noise", "color": "pink", "seed": 3 },
+    { "id": "breath", "type": "ad", "attack": 0.004, "decay": "length * 0.8", "curve": 2 },
+    { "id": "sheet", "type": "filter", "mode": "bp", "in": "rustle * breath", "freq": "2400 + bright * 1600", "q": 0.8 },
+    { "id": "sum", "type": "expr", "expr": "barA * 0.065 + sheet * paper * 8" },
+    { "id": "tone", "type": "filter", "mode": "lp", "in": "sum", "freq": "2500 + bright * 9000", "q": 0.6 },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "tone", "freq": 80 }
+  ],
+  "out": "clean",
+  "presets": {
+    "List": { "pitch": 660, "length": 0.08, "bright": 0.5, "paper": 0.35 },
+    "Grid": { "pitch": 784, "length": 0.065, "bright": 0.6, "paper": 0.25 },
+    "Tab": { "pitch": 554, "length": 0.11, "bright": 0.4, "paper": 0.6 }
+  }
+}

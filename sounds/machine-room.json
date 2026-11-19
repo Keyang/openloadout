@@ -1,0 +1,379 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "machine-room",
+ "name": "Machine room",
+ "category": "ambience",
+ "description": "Inside a room full of machines: a steady low motor drone with a second motor beating against it, a regular mechanical thump and clank, and a hiss of steam or fans. Change how big the machines are, how fast they beat, how bright it is and which machines fill the room.",
+ "meta": {
+  "type": "ambience",
+  "role": "environment/ambience",
+  "themes": [
+   "sci-fi",
+   "dungeon",
+   "city"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "shooter",
+   "platformer",
+   "puzzle",
+   "top-down-rpg"
+  ],
+  "words": [
+   "machine",
+   "factory",
+   "engine room",
+   "boiler",
+   "server",
+   "fans",
+   "press",
+   "piston",
+   "industrial",
+   "motor",
+   "drone",
+   "hum",
+   "steam",
+   "clank"
+  ],
+  "license": "draft"
+ },
+ "loop": true,
+ "wrap": true,
+ "duration": 4,
+ "params": [
+  {
+   "id": "size",
+   "label": "Size",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  },
+  {
+   "id": "speed",
+   "label": "Speed",
+   "unit": "beats per second",
+   "min": 1,
+   "max": 3,
+   "default": 2,
+   "step": 0.5
+  },
+  {
+   "id": "bright",
+   "label": "Brightness",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  },
+  {
+   "id": "machine",
+   "label": "Machine",
+   "min": 0,
+   "max": 2,
+   "default": 0,
+   "options": [
+    "Boiler",
+    "Fans",
+    "Presses"
+   ]
+  }
+ ],
+ "nodes": [
+  {
+   "id": "wB",
+   "type": "expr",
+   "expr": "max(0, 1 - abs(machine))"
+  },
+  {
+   "id": "wF",
+   "type": "expr",
+   "expr": "max(0, 1 - abs(machine - 1))"
+  },
+  {
+   "id": "wP",
+   "type": "expr",
+   "expr": "max(0, 1 - abs(machine - 2))"
+  },
+  {
+   "id": "f0",
+   "type": "expr",
+   "expr": "round(mix(66, 36, size) * 2) / 2"
+  },
+  {
+   "id": "m1",
+   "type": "osc",
+   "wave": "saw",
+   "freq": "f0",
+   "phase": "rnd(0, 1)"
+  },
+  {
+   "id": "m2",
+   "type": "osc",
+   "wave": "saw",
+   "freq": "f0 + 0.5",
+   "phase": "rnd(0, 1)"
+  },
+  {
+   "id": "sub",
+   "type": "osc",
+   "wave": "sine",
+   "freq": "f0 / 2",
+   "phase": "rnd(0, 1)"
+  },
+  {
+   "id": "droneLo",
+   "type": "filter",
+   "mode": "lp",
+   "in": "m1 + m2 * 0.8 + sub * 0.7",
+   "freq": "180 + bright * 300",
+   "q": 0.8
+  },
+  {
+   "id": "droneMid",
+   "type": "filter",
+   "mode": "bp",
+   "in": "m1 + m2",
+   "freq": "mix(900, 520, size) * (0.8 + bright * 0.5)",
+   "q": 1.6
+  },
+  {
+   "id": "drone",
+   "type": "shaper",
+   "in": "droneLo * 0.3 + droneMid * 1.2",
+   "drive": 1.6,
+   "mode": "tanh"
+  },
+  {
+   "id": "clk",
+   "type": "clock",
+   "rate": "speed"
+  },
+  {
+   "id": "acc",
+   "type": "pattern",
+   "trig": "clk",
+   "steps": "Xx"
+  },
+  {
+   "id": "tPitch",
+   "type": "env",
+   "trig": "clk",
+   "points": [
+    [
+     0,
+     "mix(120, 58, size) * 2.2"
+    ],
+    [
+     0.045,
+     "mix(120, 58, size)",
+     "exp"
+    ]
+   ]
+  },
+  {
+   "id": "tOsc",
+   "type": "osc",
+   "wave": "sine",
+   "freq": "tPitch"
+  },
+  {
+   "id": "tAmp",
+   "type": "ad",
+   "trig": "clk",
+   "attack": 0.002,
+   "decay": "mix(0.12, 0.26, size)",
+   "curve": 2.6
+  },
+  {
+   "id": "hit",
+   "type": "sah",
+   "in": "acc",
+   "trig": "clk"
+  },
+  {
+   "id": "nC",
+   "type": "noise"
+  },
+  {
+   "id": "cBurst",
+   "type": "ad",
+   "trig": "clk",
+   "attack": 0.0005,
+   "decay": 0.006,
+   "curve": 2
+  },
+  {
+   "id": "clank",
+   "type": "modal",
+   "in": "nC * cBurst",
+   "freq": "mix(820, 430, size) * rnd(0.96, 1.04)",
+   "ratios": [
+    1,
+    2.32,
+    3.87,
+    5.13,
+    7.41
+   ],
+   "decay": "mix(0.18, 0.32, size)",
+   "tilt": "0.6 - bright * 0.6"
+  },
+  {
+   "id": "crackAd",
+   "type": "ad",
+   "trig": "clk",
+   "attack": 0.0005,
+   "decay": "mix(0.02, 0.035, size)",
+   "curve": 2.5
+  },
+  {
+   "id": "crack",
+   "type": "filter",
+   "mode": "bp",
+   "in": "nC * crackAd",
+   "freq": "1300 + bright * 1500",
+   "q": 1.2
+  },
+  {
+   "id": "puffAd",
+   "type": "ad",
+   "trig": "clk",
+   "attack": 0.03,
+   "decay": "0.5 / speed",
+   "curve": 1.6
+  },
+  {
+   "id": "nL",
+   "type": "noise"
+  },
+  {
+   "id": "nR",
+   "type": "noise"
+  },
+  {
+   "id": "hissL",
+   "type": "filter",
+   "mode": "bp",
+   "in": "nL",
+   "freq": "3000 + bright * 3000",
+   "q": 0.7
+  },
+  {
+   "id": "hissR",
+   "type": "filter",
+   "mode": "bp",
+   "in": "nR",
+   "freq": "3200 + bright * 3000",
+   "q": 0.7
+  },
+  {
+   "id": "nb",
+   "type": "noise",
+   "color": "brown"
+  },
+  {
+   "id": "rumble",
+   "type": "filter",
+   "mode": "lp",
+   "in": "nb",
+   "freq": "mix(260, 140, size)",
+   "q": 0.7
+  },
+  {
+   "id": "fanF",
+   "type": "expr",
+   "expr": "round(mix(1300, 640, size) * 4) / 4"
+  },
+  {
+   "id": "fan1",
+   "type": "osc",
+   "wave": "tri",
+   "freq": "fanF",
+   "phase": "rnd(0, 1)"
+  },
+  {
+   "id": "fan2",
+   "type": "osc",
+   "wave": "sine",
+   "freq": "fanF * 2 + 0.75",
+   "phase": "rnd(0, 1)"
+  },
+  {
+   "id": "airL",
+   "type": "filter",
+   "mode": "bp",
+   "in": "nL",
+   "freq": "1400 + bright * 1200",
+   "q": 0.8
+  },
+  {
+   "id": "airR",
+   "type": "filter",
+   "mode": "bp",
+   "in": "nR",
+   "freq": "1500 + bright * 1200",
+   "q": 0.8
+  },
+  {
+   "id": "beat",
+   "type": "expr",
+   "expr": "(tOsc * tAmp * 0.5 + clank * 0.07 * (0.5 + 0.5 * wP) + crack * 0.9) * hit * (0.45 + 0.55 * wP)"
+  },
+  {
+   "id": "boilerC",
+   "type": "expr",
+   "expr": "rumble * 0.5 * wB + drone * (0.55 + 0.15 * wB)"
+  },
+  {
+   "id": "fanC",
+   "type": "expr",
+   "expr": "(fan1 * 0.22 + fan2 * 0.12) * (0.5 + bright * 0.5) * wF"
+  },
+  {
+   "id": "mixL",
+   "type": "expr",
+   "expr": "boilerC + fanC + beat + hissL * (wB * (0.08 + 0.7 * puffAd) + 0.1) + airL * 0.7 * wF"
+  },
+  {
+   "id": "mixR",
+   "type": "expr",
+   "expr": "boilerC + fanC * 0.8 + beat * 0.9 + hissR * (wB * (0.08 + 0.7 * puffAd) + 0.1) + airR * 0.7 * wF"
+  },
+  {
+   "id": "outL",
+   "type": "filter",
+   "mode": "hp",
+   "in": "mixL",
+   "freq": 30
+  },
+  {
+   "id": "outR",
+   "type": "filter",
+   "mode": "hp",
+   "in": "mixR",
+   "freq": 30
+  }
+ ],
+ "out": [
+  "outL",
+  "outR"
+ ],
+ "presets": {
+  "Boiler room": {
+   "machine": 0,
+   "size": 0.65,
+   "speed": 1,
+   "bright": 0.4
+  },
+  "Server room": {
+   "machine": 1,
+   "size": 0.25,
+   "speed": 2,
+   "bright": 0.65
+  },
+  "Factory floor": {
+   "machine": 2,
+   "size": 0.6,
+   "speed": 1.5,
+   "bright": 0.5
+  }
+ }
+}

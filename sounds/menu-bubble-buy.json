@@ -1,0 +1,81 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "menu-bubble-buy",
+ "name": "Bubble buy",
+ "category": "ui",
+ "description": "Buying or equipping an item: fizzy little water drops bloop upward one after another, then a bright pop like a cork. Change its pitch, speed, brightness, how far each drop bloops and how many drops play.",
+ "meta": {
+  "type": "sfx",
+  "role": "interface/confirm",
+  "themes": ["neutral", "underwater"],
+  "gameTypes": ["arcade", "puzzle", "card-game", "platformer"],
+  "words": ["bubble", "drop", "bloop", "buy", "purchase", "shop", "equip", "store", "fizz", "pop", "cork", "menu", "water"],
+  "license": "draft"
+ },
+ "duration": "(notes + 0.2) / speed + 0.085",
+ "params": [
+  { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 350, "max": 900, "default": 560, "scale": "log" },
+  { "id": "speed", "label": "Speed", "unit": "notes/s", "min": 8, "max": 16, "default": 12 },
+  { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+  { "id": "bloop", "label": "Bloop", "unit": "semitones", "min": 0, "max": 12, "default": 6 },
+  { "id": "notes", "label": "Notes", "min": 2, "max": 3, "default": 3, "step": 1 }
+ ],
+ "nodes": [
+  { "id": "t0", "type": "clock", "rate": 1, "count": 1 },
+  { "id": "j0", "type": "env", "trig": "t0", "points": [[0, "semi(-bloop)"], ["clamp(0.35 / speed, 0.02, 0.04)", 1, "exp"]] },
+  { "id": "a0", "type": "ad", "trig": "t0", "attack": 0.0025, "hold": "0.2 / speed", "decay": "0.75 / speed", "curve": 2 },
+  { "id": "f0", "type": "expr", "expr": "pitch * j0" },
+  { "id": "o0", "type": "osc", "freq": "f0" },
+  { "id": "h0", "type": "osc", "freq": "f0 * 2" },
+  { "id": "n0", "type": "expr", "expr": "(o0 + h0 * (0.04 + bright * 0.3)) * a0 * 0.75" },
+
+  { "id": "t1", "type": "clock", "rate": 1, "count": 1, "delay": "1 / speed" },
+  { "id": "j1", "type": "env", "trig": "t1", "points": [[0, "semi(-bloop)"], ["clamp(0.35 / speed, 0.02, 0.04)", 1, "exp"]] },
+  { "id": "a1", "type": "ad", "trig": "t1", "attack": 0.0025, "hold": "0.2 / speed", "decay": "(notes > 2.5 ? 0.75 : 1.1) / speed", "curve": 2 },
+  { "id": "f1", "type": "expr", "expr": "pitch * semi(4) * j1" },
+  { "id": "o1", "type": "osc", "freq": "f1" },
+  { "id": "h1", "type": "osc", "freq": "f1 * 2" },
+  { "id": "n1", "type": "expr", "expr": "(o1 + h1 * (0.04 + bright * 0.3)) * a1 * 0.85" },
+
+  { "id": "t2", "type": "clock", "rate": 1, "count": "notes > 2.5 ? 1 : 0", "delay": "2 / speed" },
+  { "id": "j2", "type": "env", "trig": "t2", "points": [[0, "semi(-bloop)"], ["clamp(0.35 / speed, 0.02, 0.04)", 1, "exp"]] },
+  { "id": "a2", "type": "ad", "trig": "t2", "attack": 0.0025, "hold": "0.2 / speed", "decay": "1.1 / speed", "curve": 2 },
+  { "id": "f2", "type": "expr", "expr": "pitch * semi(9) * j2" },
+  { "id": "o2", "type": "osc", "freq": "f2" },
+  { "id": "h2", "type": "osc", "freq": "f2 * 2" },
+  { "id": "n2", "type": "expr", "expr": "(o2 + h2 * (0.04 + bright * 0.3)) * a2 * 0.9" },
+
+  { "id": "pe0", "type": "ad", "trig": "t0", "attack": 0.0003, "decay": 0.007, "curve": 3 },
+  { "id": "pf0", "type": "env", "trig": "t0", "points": [[0, "pitch * 3"], [0.007, "pitch * 6", "exp"]] },
+  { "id": "po0", "type": "osc", "wave": "square", "freq": "pf0" },
+  { "id": "pe1", "type": "ad", "trig": "t1", "attack": 0.0003, "decay": 0.007, "curve": 3 },
+  { "id": "pf1", "type": "env", "trig": "t1", "points": [[0, "pitch * semi(4) * 3"], [0.007, "pitch * semi(4) * 6", "exp"]] },
+  { "id": "po1", "type": "osc", "wave": "square", "freq": "pf1" },
+  { "id": "pe2", "type": "ad", "trig": "t2", "attack": 0.0003, "decay": 0.007, "curve": 3 },
+  { "id": "pf2", "type": "env", "trig": "t2", "points": [[0, "pitch * semi(9) * 3"], [0.007, "pitch * semi(9) * 6", "exp"]] },
+  { "id": "po2", "type": "osc", "wave": "square", "freq": "pf2" },
+
+  { "id": "fz", "type": "noise", "color": "white", "seed": 7 },
+  { "id": "fzEnv", "type": "expr", "expr": "a0 * a0 + a1 * a1 + a2 * a2" },
+  { "id": "fizz", "type": "filter", "mode": "bp", "in": "fz * fzEnv", "freq": "2600 + bright * 1600", "q": 1.5 },
+
+  { "id": "tc", "type": "clock", "rate": 1, "count": 1, "delay": "(notes - 0.35) / speed" },
+  { "id": "ce", "type": "ad", "trig": "tc", "attack": 0.0004, "decay": 0.016, "curve": 3 },
+  { "id": "cf", "type": "env", "trig": "tc", "points": [[0, "pitch * semi(12)"], [0.012, "pitch * semi(19)", "exp"]] },
+  { "id": "co", "type": "osc", "freq": "cf" },
+  { "id": "cs", "type": "osc", "wave": "square", "freq": "cf * 2.5" },
+  { "id": "cork", "type": "expr", "expr": "(co + cs * (0.25 + bright * 0.35)) * ce" },
+
+  { "id": "body", "type": "expr", "expr": "n0 + n1 + n2 + fizz * (0.12 + bright * 0.12)" },
+  { "id": "popmix", "type": "filter", "mode": "bp", "in": "po0 * pe0 + po1 * pe1 + po2 * pe2 + cork * 1.6", "freq": "1800 + bright * 1800", "q": 1.3 },
+  { "id": "dry", "type": "expr", "expr": "body + popmix * (0.6 + bright * 0.9) + cork * 0.35" },
+  { "id": "wet", "type": "reverb", "in": "dry", "size": 0.08, "damp": 0.7, "mix": 1 },
+  { "id": "wetlp", "type": "filter", "mode": "lp", "in": "wet", "freq": 2500 },
+  { "id": "clean", "type": "filter", "mode": "hp", "in": "dry + wetlp * 0.25", "freq": 90 }
+ ],
+ "out": "clean",
+ "presets": {
+  "Buy": { "pitch": 560, "speed": 12, "bright": 0.6, "bloop": 6, "notes": 3 },
+  "Equip": { "pitch": 560, "speed": 12, "bright": 0.5, "bloop": 6, "notes": 2 }
+ }
+}

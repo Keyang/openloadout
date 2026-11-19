@@ -1,0 +1,196 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "menu-glass-close",
+ "name": "Glass close",
+ "category": "ui",
+ "description": "A panel closing: a clink on a lower glass, then its soft rubbed-rim tone fading quickly away. Change the pitch, length, brightness and how much rim tone follows. The same every time.",
+ "meta": {
+  "type": "sfx",
+  "role": "interface/click",
+  "themes": [
+   "neutral",
+   "fantasy"
+  ],
+  "gameTypes": [
+   "arcade",
+   "puzzle",
+   "card-game",
+   "turn-based-rpg",
+   "top-down-rpg"
+  ],
+  "words": [
+   "close",
+   "panel",
+   "window",
+   "popup",
+   "menu",
+   "inventory",
+   "dismiss",
+   "glass",
+   "crystal",
+   "rim",
+   "fade",
+   "hide"
+  ],
+  "license": "draft"
+ },
+ "duration": "length",
+ "params": [
+  {
+   "id": "pitch",
+   "label": "Pitch",
+   "unit": "Hz",
+   "min": 1200,
+   "max": 2800,
+   "default": 1760,
+   "scale": "log"
+  },
+  {
+   "id": "length",
+   "label": "Length",
+   "unit": "s",
+   "min": 0.2,
+   "max": 0.5,
+   "default": 0.3,
+   "scale": "log"
+  },
+  {
+   "id": "bright",
+   "label": "Brightness",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  },
+  {
+   "id": "swell",
+   "label": "Swell",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  }
+ ],
+ "nodes": [
+  {
+   "id": "hit",
+   "type": "clock",
+   "rate": 1,
+   "count": 1
+  },
+  {
+   "id": "f",
+   "type": "expr",
+   "expr": "pitch*semi(-5)"
+  },
+  {
+   "id": "rimEnv",
+   "type": "env",
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     0.012,
+     1
+    ],
+    [
+     "length*(0.5 + swell*0.47)",
+     0,
+     2.2
+    ]
+   ]
+  },
+  {
+   "id": "rim",
+   "type": "osc",
+   "freq": "f"
+  },
+  {
+   "id": "aRod0",
+   "type": "ad",
+   "attack": 0.0001,
+   "decay": "0.0008 - (0.6)*0.0005",
+   "curve": 3,
+   "trig": "hit"
+  },
+  {
+   "id": "aRod",
+   "type": "expr",
+   "expr": "(aRod0 + hit*(4 + (0.6)*10))*(1)"
+  },
+  {
+   "id": "aGlass",
+   "type": "modal",
+   "in": "aRod",
+   "freq": "f",
+   "ratios": [
+    1,
+    2.32,
+    4.25,
+    6.63
+   ],
+   "gains": [
+    1,
+    "0.5 + bright*0.3",
+    "0.3 + bright*0.3",
+    "0.15 + bright*0.2"
+   ],
+   "decay": "length*1.05",
+   "tilt": "1.2 - bright*0.7"
+  },
+  {
+   "id": "tickHp",
+   "type": "filter",
+   "mode": "hp",
+   "in": "aRod",
+   "freq": 6000,
+   "q": 0.7
+  },
+  {
+   "id": "dry",
+   "type": "expr",
+   "expr": "aGlass + rim*rimEnv*swell*8 + tickHp*(0.05 + bright*0.1)"
+  },
+  {
+   "id": "tone",
+   "type": "filter",
+   "mode": "lp",
+   "in": "dry",
+   "freq": "pitch*1.8 + bright*14000",
+   "q": 0.5
+  },
+  {
+   "id": "room",
+   "type": "reverb",
+   "in": "tone",
+   "size": 0.18,
+   "damp": 0.25,
+   "mix": 0.12
+  },
+  {
+   "id": "hpf",
+   "type": "filter",
+   "mode": "hp",
+   "in": "room",
+   "freq": 120
+  }
+ ],
+ "out": "hpf*(1 - smooth(dur - 0.03, dur - 0.002, t))",
+ "presets": {
+  "Menu": {
+   "length": 0.3,
+   "swell": 0.5
+  },
+  "Pop-up": {
+   "length": 0.22,
+   "swell": 0.3,
+   "bright": 0.6
+  },
+  "Inventory": {
+   "pitch": 1480,
+   "length": 0.42,
+   "swell": 0.7,
+   "bright": 0.45
+  }
+ }
+}

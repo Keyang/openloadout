@@ -1,0 +1,40 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "menu-console-toggle",
+  "name": "Console toggle",
+  "category": "ui",
+  "description": "A mellow electric-piano note for a switch or checkbox that flicks up into its pitch when switched on and down into it when switched off, with one soft repeat. Change its pitch, length, brightness, echo and which way it flicks.",
+  "meta": {
+    "type": "sfx",
+    "role": "interface/click",
+    "themes": ["neutral"],
+    "gameTypes": ["arcade", "turn-based-rpg", "puzzle", "card-game", "top-down-rpg"],
+    "words": ["toggle", "switch", "checkbox", "option", "setting", "on", "off", "flick", "menu", "retro", "console", "mellow", "echo"],
+    "license": "draft"
+  },
+  "duration": "length + 0.11",
+  "params": [
+    { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 260, "max": 700, "default": 440, "scale": "log" },
+    { "id": "length", "label": "Length", "unit": "s", "min": 0.08, "max": 0.22, "default": 0.14, "scale": "log" },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "echo", "label": "Echo", "min": 0.15, "max": 0.6, "default": 0.35 },
+    { "id": "dir", "label": "Switch", "min": 0, "max": 1, "default": 1, "step": 1, "options": ["Off", "On"] }
+  ],
+  "nodes": [
+    { "id": "glide", "type": "env", "points": [[0, "pitch * semi(7 - dir * 14)"], ["0.015 + length * 0.15", "pitch", "exp"]] },
+    { "id": "barkAd", "type": "ad", "attack": 0.0005, "decay": "0.02 + length * 0.12", "curve": 2 },
+    { "id": "modOsc", "type": "osc", "wave": "sine", "freq": "glide" },
+    { "id": "tine", "type": "osc", "wave": "sine", "freq": "glide", "pm": "modOsc * (0.04 + (0.08 + bright * 0.12) * barkAd)" },
+    { "id": "amp", "type": "ad", "attack": 0.002, "decay": "length", "curve": 2.2 },
+    { "id": "grain", "type": "crush", "in": "tine * amp", "bits": 12, "rate": 30000 },
+    { "id": "tone", "type": "filter", "mode": "lp", "in": "grain", "freq": "2000 + bright * 3000", "q": 0.6 },
+    { "id": "rep", "type": "delay", "in": "tone", "time": 0.09, "feedback": 0, "mix": 1, "max": 0.2 },
+    { "id": "repSoft", "type": "filter", "mode": "lp", "in": "rep", "freq": "1500 + bright * 1500", "q": 0.6 },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "tone + repSoft * echo", "freq": 120 }
+  ],
+  "out": "clean",
+  "presets": {
+    "Switch on": { "dir": 1 },
+    "Switch off": { "dir": 0 }
+  }
+}

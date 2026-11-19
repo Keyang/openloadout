@@ -1,0 +1,74 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "rain",
+ "name": "Rain",
+ "category": "ambience",
+ "description": "Steady rain outdoors: a soft wide wash over countless small drops, falling on leaves, on the ground or into puddles. Change how hard it rains, the size of the drops, the brightness and what the rain falls on.",
+ "meta": {
+  "type": "ambience",
+  "role": "environment/weather",
+  "themes": ["neutral", "forest", "farm"],
+  "gameTypes": ["top-down-rpg", "turn-based-rpg", "platformer", "farming-sim", "puzzle"],
+  "words": ["rain", "rainfall", "shower", "drizzle", "downpour", "storm", "weather", "wet", "drops", "puddles", "outdoor", "rainy", "patter"],
+  "license": "draft"
+ },
+ "loop": true,
+ "duration": 6,
+ "normalize": false,
+ "params": [
+  { "id": "amount", "label": "Rain", "min": 0, "max": 1, "default": 0.5 },
+  { "id": "size", "label": "Drop size", "min": 0, "max": 1, "default": 0.5 },
+  { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+  { "id": "surface", "label": "Falls on", "min": 0, "max": 2, "default": 1, "options": ["Leaves", "Ground", "Puddles"] }
+ ],
+ "nodes": [
+  { "id": "onLeaves", "type": "expr", "expr": "surface < 0.5 ? 1 : 0" },
+  { "id": "onGround", "type": "expr", "expr": "surface >= 0.5 && surface < 1.5 ? 1 : 0" },
+  { "id": "onPuddles", "type": "expr", "expr": "surface >= 1.5 ? 1 : 0" },
+  { "id": "dropF", "type": "expr", "expr": "1.3 - 0.6*size" },
+
+  { "id": "swellClk", "type": "clock", "rate": 0.45, "jitter": 0.6 },
+  { "id": "swellRnd", "type": "rand", "trig": "swellClk" },
+  { "id": "swellLag", "type": "lag", "in": "swellRnd", "time": 1.4 },
+  { "id": "swell", "type": "expr", "expr": "0.75 + 0.5*swellLag" },
+
+  { "id": "pinkL", "type": "noise", "color": "pink" },
+  { "id": "pinkR", "type": "noise", "color": "pink" },
+  { "id": "washHiL", "type": "filter", "mode": "hp", "in": "pinkL", "freq": 1000 },
+  { "id": "washHiR", "type": "filter", "mode": "hp", "in": "pinkR", "freq": 1000 },
+  { "id": "washL", "type": "filter", "mode": "lp", "in": "washHiL", "freq": "2600 + 3400*bright" },
+  { "id": "washR", "type": "filter", "mode": "lp", "in": "washHiR", "freq": "2600 + 3400*bright" },
+
+  { "id": "dropsL", "type": "dust", "density": "300 + 1700*amount", "spread": 1 },
+  { "id": "dropsR", "type": "dust", "density": "300 + 1700*amount", "spread": 1 },
+  { "id": "leafL", "type": "filter", "mode": "bp", "in": "dropsL", "freq": "(3000 + 3000*bright)*dropF", "q": 1.6 },
+  { "id": "leafR", "type": "filter", "mode": "bp", "in": "dropsR", "freq": "(3300 + 3000*bright)*dropF", "q": 1.6 },
+  { "id": "patL", "type": "filter", "mode": "bp", "in": "dropsL", "freq": "(650 + 700*bright)*dropF", "q": 0.9 },
+  { "id": "patR", "type": "filter", "mode": "bp", "in": "dropsR", "freq": "(700 + 700*bright)*dropF", "q": 0.9 },
+
+  { "id": "plinkA", "type": "dust", "density": "8 + 30*amount", "spread": 1 },
+  { "id": "plinkB", "type": "dust", "density": "8 + 30*amount", "spread": 1 },
+  { "id": "plinkC", "type": "dust", "density": "8 + 30*amount", "spread": 1 },
+  { "id": "ringA", "type": "modal", "in": "plinkA", "freq": "1500*dropF*rnd(0.92, 1.08)", "ratios": [1, 2.3], "gains": [1, 0.35], "decay": "0.05 + 0.04*size", "tilt": 0.8 },
+  { "id": "ringB", "type": "modal", "in": "plinkB", "freq": "2100*dropF*rnd(0.92, 1.08)", "ratios": [1, 2.3], "gains": [1, 0.35], "decay": "0.05 + 0.04*size", "tilt": 0.8 },
+  { "id": "ringC", "type": "modal", "in": "plinkC", "freq": "2900*dropF*rnd(0.92, 1.08)", "ratios": [1, 2.3], "gains": [1, 0.35], "decay": "0.04 + 0.03*size", "tilt": 0.8 },
+
+  { "id": "lowDust", "type": "dust", "density": "30 + 90*amount", "spread": 1 },
+  { "id": "patter", "type": "filter", "mode": "bp", "in": "lowDust", "freq": "(260 + 120*bright)*dropF", "q": 1.2 },
+
+  { "id": "washLvl", "type": "expr", "expr": "(0.12 + 0.88*amount)*swell*(1 - 0.35*onPuddles)" },
+  { "id": "tickLvl", "type": "expr", "expr": "onLeaves*0.6 + onGround*0.12 + onPuddles*0.25" },
+  { "id": "patLvl", "type": "expr", "expr": "onLeaves*0.2 + onGround*1.1 + onPuddles*0.5" },
+  { "id": "level", "type": "expr", "expr": "0.35 + 0.65*amount" },
+  { "id": "mixL", "type": "expr", "expr": "(washL*washLvl*0.55 + leafL*tickLvl + patL*patLvl*(0.8 + 0.6*size) + (ringA*0.8 + ringB*0.35)*onPuddles*0.22 + patter*(1.5 + 2.5*size)) * level" },
+  { "id": "mixR", "type": "expr", "expr": "(washR*washLvl*0.55 + leafR*tickLvl + patR*patLvl*(0.8 + 0.6*size) + (ringC*0.8 + ringB*0.35)*onPuddles*0.22 + patter*(1.5 + 2.5*size)) * level" },
+  { "id": "outL", "type": "filter", "mode": "hp", "in": "mixL", "freq": 40 },
+  { "id": "outR", "type": "filter", "mode": "hp", "in": "mixR", "freq": 40 }
+ ],
+ "out": ["outL", "outR"],
+ "presets": {
+  "Drizzle": { "amount": 0.12, "size": 0.25, "bright": 0.6, "surface": 0 },
+  "Steady rain": { "amount": 0.5, "size": 0.5, "bright": 0.5, "surface": 1 },
+  "Downpour": { "amount": 1, "size": 0.75, "bright": 0.45, "surface": 2 }
+ }
+}

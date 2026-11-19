@@ -1,0 +1,74 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "city-hum",
+  "name": "City street",
+  "category": "ambience",
+  "description": "A city heard from a side street: a low rumble of traffic, a few cars passing far off, the steady hum of building machines and a faint high hiss. Change the hum's pitch, how much traffic, how bright it is and how loud the hum is.",
+  "meta": {
+    "type": "ambience",
+    "role": "environment/ambience",
+    "themes": ["city", "neutral"],
+    "gameTypes": ["top-down-rpg", "shooter", "racing", "puzzle", "arcade"],
+    "words": ["city", "street", "town", "urban", "traffic", "cars", "downtown", "alley", "hum", "rumble", "night", "background", "outdoor"],
+    "license": "draft"
+  },
+  "loop": true,
+  "duration": 6,
+  "normalize": false,
+  "params": [
+    { "id": "pitch", "label": "Hum pitch", "unit": "Hz", "min": 60, "max": 240, "default": 110, "scale": "log" },
+    { "id": "traffic", "label": "Traffic", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "hum", "label": "Hum", "min": 0, "max": 1, "default": 0.5 }
+  ],
+  "nodes": [
+    { "id": "nb", "type": "noise", "color": "brown" },
+    { "id": "rumble", "type": "filter", "mode": "lp", "in": "nb", "freq": "110 + bright * 90", "q": 0.7 },
+    { "id": "npL", "type": "noise", "color": "pink" },
+    { "id": "npR", "type": "noise", "color": "pink" },
+    { "id": "washL", "type": "filter", "mode": "bp", "in": "npL", "freq": "420 + bright * 600", "q": 0.6 },
+    { "id": "washR", "type": "filter", "mode": "bp", "in": "npR", "freq": "450 + bright * 600", "q": 0.6 },
+
+    { "id": "c1", "type": "env", "points": [[0, 0], ["rnd(0.1, 0.6)", 0], ["rnd(1.4, 1.9)", 1, 1.6], ["rnd(3.0, 3.5)", 0, 1.6]] },
+    { "id": "p1", "type": "env", "points": [["rnd(0.1, 0.6)", "rnd(-0.9, -0.4)"], ["rnd(3.0, 3.5)", "rnd(0.4, 0.9)"]] },
+    { "id": "f1", "type": "expr", "expr": "c1 * c1" },
+    { "id": "car1", "type": "filter", "mode": "bp", "in": "npL + npR", "freq": "(220 + f1 * (500 + bright * 1300)) * rnd(0.85, 1.15)", "q": 1.4 },
+
+    { "id": "c2", "type": "env", "points": [[0, 0], ["rnd(1.9, 2.5)", 0], ["rnd(3.1, 3.6)", 1, 1.6], ["rnd(4.4, 5.0)", 0, 1.6]] },
+    { "id": "p2", "type": "env", "points": [["rnd(1.9, 2.5)", "rnd(0.4, 0.9)"], ["rnd(4.4, 5.0)", "rnd(-0.9, -0.4)"]] },
+    { "id": "f2", "type": "expr", "expr": "c2 * c2" },
+    { "id": "car2", "type": "filter", "mode": "bp", "in": "npL - npR", "freq": "(200 + f2 * (450 + bright * 1200)) * rnd(0.85, 1.15)", "q": 1.4 },
+
+    { "id": "c3", "type": "env", "points": [[0, 0], ["rnd(3.5, 3.9)", 0], ["rnd(4.4, 4.8)", 1, 1.6], ["rnd(5.4, 5.65)", 0, 1.6]] },
+    { "id": "p3", "type": "env", "points": [["rnd(3.5, 3.9)", "rnd(-0.8, -0.3)"], ["rnd(5.4, 5.65)", "rnd(0.3, 0.8)"]] },
+    { "id": "f3", "type": "expr", "expr": "c3 * c3" },
+    { "id": "car3", "type": "filter", "mode": "bp", "in": "npR", "freq": "(240 + f3 * (550 + bright * 1400)) * rnd(0.85, 1.15)", "q": 1.4 },
+
+    { "id": "carL", "type": "expr", "expr": "car1 * f1 * (1 - p1) + car2 * f2 * (1 - p2) * 0.8 + car3 * f3 * (1 - p3) * (0.3 + 0.7 * traffic) * 0.7" },
+    { "id": "carR", "type": "expr", "expr": "car1 * f1 * (1 + p1) + car2 * f2 * (1 + p2) * 0.8 + car3 * f3 * (1 + p3) * (0.3 + 0.7 * traffic) * 0.7" },
+
+    { "id": "nw", "type": "noise" },
+    { "id": "h1", "type": "filter", "mode": "bp", "in": "nw", "freq": "pitch", "q": 40 },
+    { "id": "h2", "type": "filter", "mode": "bp", "in": "nw", "freq": "pitch * 2", "q": 40 },
+    { "id": "h3", "type": "filter", "mode": "bp", "in": "nw", "freq": "pitch * 3", "q": 40 },
+    { "id": "h5", "type": "filter", "mode": "bp", "in": "nw", "freq": "pitch * 5", "q": 30 },
+    { "id": "humSum", "type": "expr", "expr": "(h1 * 0.8 + h2 * 0.8 + h3 * 0.5 + h5 * (0.2 + bright * 0.35)) * sqrt(110 / pitch)" },
+
+    { "id": "airL", "type": "noise" },
+    { "id": "airR", "type": "noise" },
+    { "id": "hissL", "type": "filter", "mode": "hp", "in": "airL", "freq": "5000 - bright * 1500", "q": 0.6 },
+    { "id": "hissR", "type": "filter", "mode": "hp", "in": "airR", "freq": "5000 - bright * 1500", "q": 0.6 },
+
+    { "id": "trafficLvl", "type": "expr", "expr": "0.1 + traffic * 0.9" },
+    { "id": "bedL", "type": "expr", "expr": "rumble * 0.8 * trafficLvl + washL * 0.9 * trafficLvl + carL * 0.9 * (0.35 + 0.65 * traffic) + humSum * hum * 0.45 + hissL * (0.006 + bright * 0.012)" },
+    { "id": "bedR", "type": "expr", "expr": "rumble * 0.8 * trafficLvl + washR * 0.9 * trafficLvl + carR * 0.9 * (0.35 + 0.65 * traffic) + humSum * hum * 0.45 + hissR * (0.006 + bright * 0.012)" },
+    { "id": "outL", "type": "filter", "mode": "hp", "in": "bedL", "freq": 35 },
+    { "id": "outR", "type": "filter", "mode": "hp", "in": "bedR", "freq": 35 }
+  ],
+  "out": ["outL * 0.35", "outR * 0.35"],
+  "presets": {
+    "Busy street": { "traffic": 0.95, "hum": 0.35, "bright": 0.6 },
+    "Quiet night": { "traffic": 0.15, "hum": 0.45, "bright": 0.35, "pitch": 120 },
+    "Back alley": { "traffic": 0.35, "hum": 0.85, "bright": 0.45, "pitch": 150 }
+  }
+}

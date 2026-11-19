@@ -1,0 +1,326 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "menu-bubble-open",
+ "name": "Bubble open",
+ "category": "ui",
+ "description": "A panel appearing: a bubble blown up, one long drop swelling and rising to its note, then a soft pop. Change its pitch, length, brightness, the quick bloop at its start and how loud the pop is.",
+ "meta": {
+  "type": "sfx",
+  "role": "interface/click",
+  "themes": [
+   "neutral",
+   "underwater"
+  ],
+  "gameTypes": [
+   "arcade",
+   "puzzle",
+   "card-game",
+   "platformer"
+  ],
+  "words": [
+   "bubble",
+   "blow",
+   "swell",
+   "open",
+   "panel",
+   "window",
+   "popup",
+   "menu",
+   "inventory",
+   "pop",
+   "water",
+   "appear"
+  ],
+  "license": "draft"
+ },
+ "duration": "length + 0.02",
+ "params": [
+  {
+   "id": "pitch",
+   "label": "Pitch",
+   "unit": "Hz",
+   "min": 350,
+   "max": 900,
+   "default": 560,
+   "scale": "log"
+  },
+  {
+   "id": "length",
+   "label": "Length",
+   "unit": "s",
+   "min": 0.16,
+   "max": 0.45,
+   "default": 0.28,
+   "scale": "log"
+  },
+  {
+   "id": "bright",
+   "label": "Brightness",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  },
+  {
+   "id": "bloop",
+   "label": "Bloop",
+   "unit": "semitones",
+   "min": 0,
+   "max": 12,
+   "default": 6
+  },
+  {
+   "id": "pop",
+   "label": "Pop",
+   "min": 0,
+   "max": 1,
+   "default": 0.6
+  }
+ ],
+ "nodes": [
+  {
+   "id": "t0",
+   "type": "clock",
+   "rate": 1,
+   "count": 1
+  },
+  {
+   "id": "j0",
+   "type": "env",
+   "trig": "t0",
+   "points": [
+    [
+     0,
+     "semi(-bloop)"
+    ],
+    [
+     0.05,
+     1,
+     "exp"
+    ]
+   ]
+  },
+  {
+   "id": "g0",
+   "type": "env",
+   "trig": "t0",
+   "points": [
+    [
+     0,
+     "semi(-12)"
+    ],
+    [
+     "length * 0.7",
+     1,
+     "exp"
+    ]
+   ]
+  },
+  {
+   "id": "a0",
+   "type": "env",
+   "trig": "t0",
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     0.004,
+     0.45
+    ],
+    [
+     "length * 0.45",
+     1
+    ],
+    [
+     "length * 0.65",
+     1
+    ],
+    [
+     "length",
+     0,
+     2
+    ]
+   ]
+  },
+  {
+   "id": "f0",
+   "type": "expr",
+   "expr": "pitch * j0 * g0"
+  },
+  {
+   "id": "o0",
+   "type": "osc",
+   "freq": "f0"
+  },
+  {
+   "id": "h0",
+   "type": "osc",
+   "freq": "f0 * 2"
+  },
+  {
+   "id": "n0",
+   "type": "expr",
+   "expr": "(o0 + h0 * (0.04 + bright * 0.3)) * a0 * 1"
+  },
+  {
+   "id": "tp",
+   "type": "clock",
+   "rate": 1,
+   "count": 1,
+   "delay": "length * 0.72"
+  },
+  {
+   "id": "pe0",
+   "type": "ad",
+   "trig": "t0",
+   "attack": 0.0003,
+   "decay": 0.007,
+   "curve": 3
+  },
+  {
+   "id": "pf0",
+   "type": "env",
+   "trig": "t0",
+   "points": [
+    [
+     0,
+     "pitch * semi(-12) * 3"
+    ],
+    [
+     0.007,
+     "pitch * semi(-12) * 6",
+     "exp"
+    ]
+   ]
+  },
+  {
+   "id": "po0",
+   "type": "osc",
+   "wave": "square",
+   "freq": "pf0"
+  },
+  {
+   "id": "p0",
+   "type": "expr",
+   "expr": "po0 * pe0 * 0.4"
+  },
+  {
+   "id": "pe1",
+   "type": "ad",
+   "trig": "tp",
+   "attack": 0.0003,
+   "decay": 0.016,
+   "curve": 3
+  },
+  {
+   "id": "pf1",
+   "type": "env",
+   "trig": "tp",
+   "points": [
+    [
+     0,
+     "pitch * 3"
+    ],
+    [
+     0.016,
+     "pitch * 6",
+     "exp"
+    ]
+   ]
+  },
+  {
+   "id": "po1",
+   "type": "osc",
+   "wave": "square",
+   "freq": "pf1"
+  },
+  {
+   "id": "p1",
+   "type": "expr",
+   "expr": "po1 * pe1 * pop * 1"
+  },
+  {
+   "id": "body",
+   "type": "expr",
+   "expr": "n0"
+  },
+  {
+   "id": "popmix",
+   "type": "filter",
+   "mode": "bp",
+   "in": "p0 + p1",
+   "freq": "1800 + bright * 1800",
+   "q": 1.3
+  },
+  {
+   "id": "dry",
+   "type": "expr",
+   "expr": "body + popmix * (0.6 + bright * 0.9)"
+  },
+  {
+   "id": "wet",
+   "type": "reverb",
+   "in": "dry",
+   "size": 0.08,
+   "damp": 0.7,
+   "mix": 1
+  },
+  {
+   "id": "wetlp",
+   "type": "filter",
+   "mode": "lp",
+   "in": "wet",
+   "freq": 2500
+  },
+  {
+   "id": "tg",
+   "type": "env",
+   "points": [
+    [
+     0,
+     1
+    ],
+    [
+     "length * 0.75",
+     1
+    ],
+    [
+     "length + 0.02",
+     0
+    ]
+   ]
+  },
+  {
+   "id": "clean",
+   "type": "filter",
+   "mode": "hp",
+   "in": "dry + wetlp * 0.1 * tg",
+   "freq": 90
+  }
+ ],
+ "out": "clean",
+ "presets": {
+  "Menu": {
+   "pitch": 560,
+   "length": 0.28,
+   "bright": 0.5,
+   "bloop": 6,
+   "pop": 0.6
+  },
+  "Pop-up": {
+   "pitch": 640,
+   "length": 0.2,
+   "bright": 0.65,
+   "bloop": 5,
+   "pop": 0.9
+  },
+  "Inventory": {
+   "pitch": 480,
+   "length": 0.38,
+   "bright": 0.4,
+   "bloop": 8,
+   "pop": 0.45
+  }
+ }
+}
