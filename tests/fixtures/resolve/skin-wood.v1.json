@@ -1,0 +1,5 @@
+{ "format": "loadout-piece", "version": 1, "id": "skin:wood", "v": 1, "name": "Test wood skin",
+  "about": "The look of wooden interface pieces, for the resolver's tests only (not art).",
+  "slots": [ { "id": "face" }, { "id": "frame" } ],
+  "body": { "lift": 1, "lip": 2, "face": { "paint": "face", "grain": "face.dark" }, "rim": { "paint": "frame", "light": "frame.light" },
+            "states": { "pressed": { "lip": 1 }, "disabled": { "tint": "frame.deep" } } } }

@@ -1,0 +1,9 @@
+{ "format": "loadout-piece", "version": 1, "id": "part:hair", "v": 1, "name": "Test hair",
+  "about": "Hair in three styles whose length is an arg, for the resolver's tests only (not art).",
+  "slots": [ { "id": "hair", "label": "Hair", "default": "#5a3a22", "material": "skin" } ],
+  "args": { "style": { "type": "word", "options": ["crop", "fall", "bun"], "default": "crop" },
+            "length": { "type": "px", "lo": 0, "hi": 12, "default": 3 } },
+  "body": { "draw": [
+    { "id": "cap", "kind": "ellipse", "at": [3, -1], "r": [4, 3], "paint": "hair", "z": 1, "group": "hair" },
+    { "id": "fall", "kind": "rect", "at": [-1, 0], "size": [2, { "from": "length", "map": [[0, 1], [12, 12]], "round": "px" }], "paint": "hair.dark", "when": { "style": ["fall"] } },
+    { "id": "bun", "kind": "stamp", "at": [0, -4], "rows": ["ab"], "key": { "a": "hair.light", "b": "hair" }, "when": { "style": ["bun"] } } ] } }

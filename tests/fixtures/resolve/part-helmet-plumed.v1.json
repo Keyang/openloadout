@@ -1,0 +1,6 @@
+{ "format": "loadout-piece", "version": 1, "id": "part:helmet-plumed", "v": 1, "name": "Test helmet",
+  "about": "A round helmet with a plume, for the resolver's tests only (not art).",
+  "slots": [ { "id": "metal" }, { "id": "plume", "default": "#c9423a", "material": "cloth" } ],
+  "body": { "draw": [
+    { "id": "bowl", "kind": "ellipse", "at": [3, -1], "r": [5, 4], "paint": "metal", "z": 2, "light": 1 },
+    { "id": "plume", "kind": "stamp", "at": [2, -6], "rows": ["aa", ".b"], "key": { "a": "plume", "b": "plume.dark" } } ] } }

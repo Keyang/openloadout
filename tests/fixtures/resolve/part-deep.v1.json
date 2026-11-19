@@ -1,0 +1,7 @@
+{ "format": "loadout-piece", "version": 1, "id": "part:deep", "v": 1, "name": "Test nesting",
+  "about": "A part that uses a part that uses a stamp, for the resolver's nesting tests only (not art).",
+  "slots": [ { "id": "hair", "default": "#3a6e2a", "material": "plant" } ],
+  "args": { "length": { "type": "px", "lo": 1, "hi": 4, "default": 2 } },
+  "body": { "draw": [
+    { "kind": "use", "use": "part:test-tuft", "v": 1, "at": [2, 0], "args": { "length": { "from": "length", "map": [[1, 1], [4, 4]] } } },
+    { "kind": "dot", "at": [0, 0], "paint": "hair.dark" } ] } }

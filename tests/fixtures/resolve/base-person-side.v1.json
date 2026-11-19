@@ -1,0 +1,31 @@
+{ "format": "loadout-piece", "version": 1, "id": "base:person-side", "v": 1, "name": "Test person",
+  "about": "A stick person seen from the side, for the resolver's tests only (not art).",
+  "slots": [ { "id": "skin" }, { "id": "outfit" }, { "id": "trousers" }, { "id": "metal" }, { "id": "eye" } ],
+  "body": {
+    "rig": {
+      "bones": [
+        { "id": "root", "parent": null, "at": [28, 44], "angle": 180, "length": 0 },
+        { "id": "hip", "parent": "root", "angle": 0, "length": 2 },
+        { "id": "spine", "parent": "hip", "angle": 0, "length": 10 },
+        { "id": "neck", "parent": "spine", "angle": 0, "length": 2 },
+        { "id": "head", "parent": "neck", "angle": 0, "length": 6 },
+        { "id": "thighF", "parent": "root", "from": 0, "angle": 170, "length": 7 },
+        { "id": "shinF", "parent": "thighF", "angle": 0, "length": 7 },
+        { "id": "thighB", "parent": "root", "from": 0, "angle": 190, "length": 7 },
+        { "id": "shinB", "parent": "thighB", "angle": 0, "length": 7 },
+        { "id": "armF", "parent": "spine", "from": 0.9, "angle": 160, "length": 6 },
+        { "id": "handF", "parent": "armF", "angle": 0, "length": 5 },
+        { "id": "armB", "parent": "spine", "from": 0.9, "angle": 200, "length": 6 },
+        { "id": "handB", "parent": "armB", "angle": 0, "length": 5 } ],
+      "shapes": [
+        { "id": "torso", "bone": "spine", "kind": "capsule", "from": 0, "to": 1, "r": [4, 3.5], "paint": "outfit", "z": 10, "group": "body" },
+        { "id": "skull", "bone": "head", "kind": "ellipse", "at": [3, 0], "r": [4, 4], "paint": "skin", "z": 12, "group": "body" },
+        { "id": "legF", "bone": "shinF", "kind": "limb", "width": 2, "paint": "trousers", "z": 8 },
+        { "id": "legB", "bone": "shinB", "kind": "limb", "width": 2, "paint": "trousers", "z": 4, "far": true } ],
+      "points": [ { "id": "hand", "bone": "handF", "at": [5, 0] } ] },
+    "clips": {
+      "idle": { "frames": 8, "fps": 6, "loop": true, "keys": [ { "t": 0, "root": [0, 0] }, { "t": 0.5, "root": [0, -1] } ] },
+      "walk": { "frames": 8, "fps": 10, "loop": true, "keys": [ { "t": 0, "bones": { "thighF": 150 } }, { "t": 0.5, "bones": { "thighF": 190 } } ],
+                "sounds": [ { "sound": "footstep-stone", "frame": 0 } ] },
+      "swing": { "frames": 8, "fps": 12, "loop": false, "keys": [ { "t": 0, "bones": { "armF": 200 } }, { "t": 0.6, "bones": { "armF": 90 } } ] },
+      "hurt": { "frames": 4, "fps": 10, "loop": false, "frameEdits": { "0": { "flash": true } } } } } }

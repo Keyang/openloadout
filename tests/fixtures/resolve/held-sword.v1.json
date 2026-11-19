@@ -1,0 +1,7 @@
+{ "format": "loadout-piece", "version": 1, "id": "held:sword", "v": 1, "name": "Test sword",
+  "about": "A sword whose blade length is an arg, for the resolver's tests only (not art).",
+  "slots": [ { "id": "blade" }, { "id": "grip", "default": "#5a3a22", "material": "wood" } ],
+  "args": { "length": { "type": "px", "lo": 4, "hi": 24, "default": 12 } },
+  "body": { "draw": [
+    { "id": "edge", "kind": "line", "from": [0, 0], "to": [{ "from": "length", "map": [[4, 4], [24, 24]] }, 0], "paint": "blade", "z": 3 },
+    { "id": "grip", "kind": "rect", "at": [-2, -1], "size": [2, 2], "paint": "grip" } ] } }

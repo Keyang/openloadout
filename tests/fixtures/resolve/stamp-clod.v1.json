@@ -1,0 +1,4 @@
+{ "format": "loadout-piece", "version": 1, "id": "stamp:clod", "v": 1, "name": "Test clod",
+  "about": "A clod of earth of three pixels, for the resolver's tests only (not art).",
+  "slots": [ { "id": "a", "default": "#5a3a22", "material": "earth" } ],
+  "body": { "rows": [".a", "aa"], "anchor": "bc" } }
