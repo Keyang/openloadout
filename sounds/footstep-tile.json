@@ -1,0 +1,211 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "footstep-tile",
+  "name": "Footstep on tiles",
+  "category": "movement",
+  "description": "A step on a smooth tiled floor: a sharp bright heel click with a short glassy edge over a small knock. Every take is a different step; change its weight, length, brightness and how hard the sole is.",
+  "meta": {
+    "type": "sfx",
+    "role": "characters/footstep",
+    "themes": [
+      "neutral",
+      "dungeon",
+      "sci-fi"
+    ],
+    "gameTypes": [
+      "top-down-rpg",
+      "turn-based-rpg",
+      "platformer",
+      "roguelike-action",
+      "puzzle"
+    ],
+    "words": [
+      "footstep",
+      "footsteps",
+      "step",
+      "walk",
+      "run",
+      "tile",
+      "tiles",
+      "floor",
+      "heel",
+      "click",
+      "indoor",
+      "marble",
+      "hall",
+      "palace"
+    ],
+    "license": "draft"
+  },
+  "duration": "min(0.28, length*(0.8 + 0.2*weight) + 0.015)",
+  "params": [
+    {
+      "id": "weight",
+      "label": "Weight",
+      "min": 0.5,
+      "max": 2,
+      "default": 1
+    },
+    {
+      "id": "length",
+      "label": "Length",
+      "unit": "s",
+      "min": 0.07,
+      "max": 0.22,
+      "default": 0.12,
+      "scale": "log"
+    },
+    {
+      "id": "bright",
+      "label": "Brightness",
+      "min": 0,
+      "max": 1,
+      "default": 0.5
+    },
+    {
+      "id": "hard",
+      "label": "Hardness",
+      "min": 0,
+      "max": 1,
+      "default": 0.65,
+      "hint": "From a rubber sole to a hard heel"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "wn",
+      "type": "noise"
+    },
+    {
+      "id": "clickAmp",
+      "type": "ad",
+      "attack": 0.0003,
+      "decay": "0.0015 + 0.004*hard",
+      "curve": 2
+    },
+    {
+      "id": "click",
+      "type": "filter",
+      "mode": "hp",
+      "in": "wn*clickAmp",
+      "freq": "1800 + bright*3000",
+      "q": 0.7
+    },
+    {
+      "id": "glass",
+      "type": "modal",
+      "in": "wn*clickAmp",
+      "freq": "(1900 + bright*1100)/pow(weight, 0.35)*rnd(0.94, 1.06)",
+      "ratios": [
+        1,
+        2.32,
+        4.25,
+        6.63
+      ],
+      "decay": "length*(0.8 + 0.2*weight)*(0.35 + 0.65*hard)",
+      "tilt": 0.5
+    },
+    {
+      "id": "pn",
+      "type": "noise",
+      "color": "pink"
+    },
+    {
+      "id": "knockAmp",
+      "type": "ad",
+      "attack": 0.0006,
+      "decay": "0.01 + 0.012*weight + 0.012*(1 - hard) + length*0.12",
+      "curve": 2.2
+    },
+    {
+      "id": "knock",
+      "type": "filter",
+      "mode": "bp",
+      "in": "pn",
+      "freq": "(950 + bright*700)/pow(weight, 0.3)*rnd(0.92, 1.08)",
+      "q": 1.3
+    },
+    {
+      "id": "thumpPitch",
+      "type": "env",
+      "points": [
+        [
+          0,
+          "rnd(120, 145)/pow(weight, 0.6)"
+        ],
+        [
+          0.04,
+          "62/pow(weight, 0.6)",
+          "exp"
+        ]
+      ]
+    },
+    {
+      "id": "thump",
+      "type": "osc",
+      "freq": "thumpPitch"
+    },
+    {
+      "id": "thumpAmp",
+      "type": "ad",
+      "attack": 0.0015,
+      "decay": "0.03 + 0.025*weight",
+      "curve": 2
+    },
+    {
+      "id": "padAmp",
+      "type": "ad",
+      "attack": 0.002,
+      "decay": "length*(0.8 + 0.2*weight)*0.5",
+      "curve": 2.5
+    },
+    {
+      "id": "pad",
+      "type": "filter",
+      "mode": "bp",
+      "in": "pn",
+      "freq": "(750 + bright*500)/pow(weight, 0.3)",
+      "q": 0.8
+    },
+    {
+      "id": "sumBus",
+      "type": "expr",
+      "expr": "click*(0.4 + 1.6*hard)*(0.5 + bright) + glass*(0.02 + 0.16*hard) + knock*knockAmp*(1.6 + 0.4*hard) + thump*thumpAmp*(0.12 + 0.2*(1 - hard)) + pad*padAmp*(1 - hard)*1.8"
+    },
+    {
+      "id": "sat",
+      "type": "shaper",
+      "in": "sumBus*1.6",
+      "drive": 1.3,
+      "mode": "tanh"
+    },
+    {
+      "id": "clean",
+      "type": "filter",
+      "mode": "hp",
+      "in": "sat",
+      "freq": 35
+    }
+  ],
+  "out": "clean",
+  "presets": {
+    "Soft shoes": {
+      "weight": 0.8,
+      "length": 0.1,
+      "bright": 0.4,
+      "hard": 0.2
+    },
+    "Heavy boots": {
+      "weight": 1.8,
+      "length": 0.17,
+      "bright": 0.45,
+      "hard": 0.8
+    },
+    "Bare feet": {
+      "weight": 0.7,
+      "length": 0.08,
+      "bright": 0.3,
+      "hard": 0
+    }
+  }
+}

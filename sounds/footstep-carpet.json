@@ -1,0 +1,211 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "footstep-carpet",
+  "name": "Footstep on carpet",
+  "category": "movement",
+  "description": "A step on carpet: a soft, dull, close pad with a faint brush of fibres and nothing sharp. Every take is a different step; change its weight, length, brightness and how thick the carpet is.",
+  "meta": {
+    "type": "sfx",
+    "role": "characters/footstep",
+    "themes": [
+      "neutral",
+      "farm",
+      "horror"
+    ],
+    "gameTypes": [
+      "top-down-rpg",
+      "turn-based-rpg",
+      "farming-sim",
+      "puzzle",
+      "platformer"
+    ],
+    "words": [
+      "footstep",
+      "footsteps",
+      "step",
+      "walk",
+      "run",
+      "carpet",
+      "rug",
+      "indoor",
+      "house",
+      "soft",
+      "quiet",
+      "sneak",
+      "muffled"
+    ],
+    "license": "draft"
+  },
+  "duration": "min(0.28, length*(0.8 + 0.2*weight) + 0.015)",
+  "params": [
+    {
+      "id": "weight",
+      "label": "Weight",
+      "min": 0.5,
+      "max": 2,
+      "default": 1
+    },
+    {
+      "id": "length",
+      "label": "Length",
+      "unit": "s",
+      "min": 0.08,
+      "max": 0.22,
+      "default": 0.13,
+      "scale": "log"
+    },
+    {
+      "id": "bright",
+      "label": "Brightness",
+      "min": 0,
+      "max": 1,
+      "default": 0.4
+    },
+    {
+      "id": "pile",
+      "label": "Thickness",
+      "min": 0,
+      "max": 1,
+      "default": 0.5,
+      "hint": "From a thin rug to deep carpet"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "pn",
+      "type": "noise",
+      "color": "pink"
+    },
+    {
+      "id": "padAmp",
+      "type": "env",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          "0.002 + 0.003*pile",
+          1
+        ],
+        [
+          "length*(0.8 + 0.2*weight)",
+          0,
+          "exp"
+        ]
+      ]
+    },
+    {
+      "id": "padTone",
+      "type": "filter",
+      "mode": "lp",
+      "in": "pn*padAmp",
+      "freq": "(1100 + bright*1100)*(1 - 0.55*pile)/pow(weight, 0.4)*rnd(0.9, 1.1)",
+      "q": 0.6
+    },
+    {
+      "id": "pad",
+      "type": "filter",
+      "mode": "hp",
+      "in": "padTone",
+      "freq": "280/pow(weight, 0.3)",
+      "q": 0.6
+    },
+    {
+      "id": "thumpPitch",
+      "type": "env",
+      "points": [
+        [
+          0,
+          "rnd(100, 120)/pow(weight, 0.6)"
+        ],
+        [
+          0.05,
+          "60/pow(weight, 0.6)",
+          "exp"
+        ]
+      ]
+    },
+    {
+      "id": "thump",
+      "type": "osc",
+      "freq": "thumpPitch"
+    },
+    {
+      "id": "thumpAmp",
+      "type": "ad",
+      "attack": 0.003,
+      "decay": "0.04 + 0.03*weight",
+      "curve": 2
+    },
+    {
+      "id": "tapAmp",
+      "type": "ad",
+      "attack": 0.0008,
+      "decay": "0.01 + 0.008*weight",
+      "curve": 2.2
+    },
+    {
+      "id": "tap",
+      "type": "filter",
+      "mode": "bp",
+      "in": "pn*tapAmp",
+      "freq": "(800 + bright*500)/pow(weight, 0.3)*rnd(0.92, 1.08)",
+      "q": 1.1
+    },
+    {
+      "id": "fibres",
+      "type": "dust",
+      "density": "500 + 600*pile",
+      "spread": 1
+    },
+    {
+      "id": "brush",
+      "type": "filter",
+      "mode": "bp",
+      "in": "fibres*padAmp",
+      "freq": "1300 + bright*1200",
+      "q": 0.8
+    },
+    {
+      "id": "sumBus",
+      "type": "expr",
+      "expr": "pad*(1.4 + 0.6*pile) + tap*(1.5 - 1.1*pile) + thump*thumpAmp*(0.18 + 0.1*pile) + brush*(0.6 + 1.2*bright)"
+    },
+    {
+      "id": "soft",
+      "type": "shaper",
+      "in": "sumBus*1.8",
+      "drive": 1.1,
+      "mode": "tanh"
+    },
+    {
+      "id": "clean",
+      "type": "filter",
+      "mode": "hp",
+      "in": "soft",
+      "freq": 35
+    }
+  ],
+  "out": "clean",
+  "presets": {
+    "Soft shoes": {
+      "weight": 0.8,
+      "length": 0.12,
+      "bright": 0.4,
+      "pile": 0.5
+    },
+    "Heavy boots": {
+      "weight": 1.8,
+      "length": 0.17,
+      "bright": 0.35,
+      "pile": 0.35
+    },
+    "Bare feet": {
+      "weight": 0.7,
+      "length": 0.1,
+      "bright": 0.3,
+      "pile": 0.7
+    }
+  }
+}

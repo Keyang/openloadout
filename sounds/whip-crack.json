@@ -1,0 +1,246 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "whip-crack",
+  "name": "Whip crack",
+  "category": "weapon",
+  "description": "A whip or lash: a rising swish that ends in a very sharp, dry crack. Change its pitch, length, brightness and how long the swish builds.",
+  "meta": {
+    "type": "sfx",
+    "role": "actions/swing",
+    "themes": [
+      "neutral",
+      "fantasy",
+      "sci-fi"
+    ],
+    "gameTypes": [
+      "platformer",
+      "top-down-rpg",
+      "roguelike-action",
+      "turn-based-rpg"
+    ],
+    "words": [
+      "whip",
+      "crack",
+      "lash",
+      "lasso",
+      "snap",
+      "rope",
+      "swish",
+      "attack",
+      "strike",
+      "flick",
+      "energy",
+      "tame"
+    ],
+    "license": "draft"
+  },
+  "duration": "length + 0.005",
+  "params": [
+    {
+      "id": "pitch",
+      "label": "Pitch",
+      "unit": "Hz",
+      "min": 900,
+      "max": 4500,
+      "default": 2000,
+      "scale": "log"
+    },
+    {
+      "id": "length",
+      "label": "Length",
+      "unit": "s",
+      "min": 0.15,
+      "max": 0.5,
+      "default": 0.3,
+      "scale": "log"
+    },
+    {
+      "id": "bright",
+      "label": "Brightness",
+      "min": 0,
+      "max": 1,
+      "default": 0.5
+    },
+    {
+      "id": "swish",
+      "label": "Swish",
+      "min": 0,
+      "max": 1,
+      "default": 0.5
+    }
+  ],
+  "nodes": [
+    {
+      "id": "n",
+      "type": "noise"
+    },
+    {
+      "id": "np",
+      "type": "noise",
+      "color": "pink"
+    },
+    {
+      "id": "flickEnv",
+      "type": "ad",
+      "attack": 0.0005,
+      "decay": 0.035,
+      "curve": 2
+    },
+    {
+      "id": "flick",
+      "type": "filter",
+      "mode": "bp",
+      "in": "n",
+      "freq": "pitch * 0.6",
+      "q": 1.2
+    },
+    {
+      "id": "swAmp",
+      "type": "env",
+      "points": [
+        [
+          0,
+          0.3
+        ],
+        [
+          "length * (0.3 + swish * 0.4) * rnd(0.93, 1.07)",
+          1,
+          1.6
+        ],
+        [
+          "length * (0.32 + swish * 0.4) + 0.01",
+          0,
+          1
+        ]
+      ]
+    },
+    {
+      "id": "swF",
+      "type": "env",
+      "points": [
+        [
+          0,
+          "pitch * 0.25"
+        ],
+        [
+          "length * (0.3 + swish * 0.4)",
+          "pitch * 1.1",
+          "exp"
+        ]
+      ]
+    },
+    {
+      "id": "air",
+      "type": "filter",
+      "mode": "bp",
+      "in": "np",
+      "freq": "swF",
+      "q": 1.6
+    },
+    {
+      "id": "hit",
+      "type": "clock",
+      "rate": 1,
+      "count": 1,
+      "delay": "length * (0.3 + swish * 0.4)"
+    },
+    {
+      "id": "crEnv",
+      "type": "ad",
+      "attack": 0.0002,
+      "decay": "0.006 + (1 - bright) * 0.006",
+      "curve": 3,
+      "trig": "hit"
+    },
+    {
+      "id": "crack",
+      "type": "filter",
+      "mode": "hp",
+      "in": "n",
+      "freq": "pitch * (0.6 + bright * 0.8)"
+    },
+    {
+      "id": "bodyEnv",
+      "type": "ad",
+      "attack": 0.0005,
+      "decay": "length * (0.7 - swish * 0.4) * 1.2",
+      "curve": 3,
+      "trig": "hit"
+    },
+    {
+      "id": "body",
+      "type": "filter",
+      "mode": "bp",
+      "in": "n",
+      "freq": "pitch * 0.75",
+      "q": 1.4
+    },
+    {
+      "id": "zapF",
+      "type": "env",
+      "trig": "hit",
+      "points": [
+        [
+          0,
+          "pitch * 0.5"
+        ],
+        [
+          0.06,
+          "pitch * 0.12",
+          "exp"
+        ]
+      ]
+    },
+    {
+      "id": "zap",
+      "type": "osc",
+      "wave": "saw",
+      "freq": "zapF"
+    },
+    {
+      "id": "zapGain",
+      "type": "expr",
+      "expr": "smooth(0.65, 1, bright)"
+    },
+    {
+      "id": "sum",
+      "type": "expr",
+      "expr": "air * swAmp * 0.32 + flick * flickEnv * 0.9 + crack * crEnv * 2.4 + body * bodyEnv * 0.7 + zap * bodyEnv * zapGain * 0.45"
+    },
+    {
+      "id": "dry",
+      "type": "shaper",
+      "in": "sum",
+      "drive": "1 + bright * 1.5",
+      "mode": "tanh"
+    },
+    {
+      "id": "clean",
+      "type": "filter",
+      "mode": "hp",
+      "in": "dry",
+      "freq": 150
+    }
+  ],
+  "out": "clean",
+  "presets": {
+    "Whip": {
+      "pitch": 2200,
+      "length": 0.28,
+      "bright": 0.55,
+      "swish": 0.45
+    },
+    "Lasso": {
+      "pitch": 1300,
+      "length": 0.45,
+      "bright": 0.3,
+      "swish": 0.85
+    },
+    "Energy lash": {
+      "pitch": 3000,
+      "length": 0.25,
+      "bright": 1,
+      "swish": 0.3
+    }
+  }
+}

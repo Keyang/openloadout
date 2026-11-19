@@ -1,0 +1,56 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "body-fall",
+  "name": "Body fall",
+  "category": "impact",
+  "tags": ["body", "fall", "thud", "death"],
+  "description": "A body dropping to the floor: a heavy soft thud, a smaller bump after it and a rustle of cloth. Change its weight, length, brightness and the second bump.",
+  "meta": {
+    "type": "sfx",
+    "role": "characters/death",
+    "themes": ["neutral", "fantasy", "dungeon"],
+    "gameTypes": ["top-down-rpg", "platformer", "turn-based-rpg", "roguelike-action", "shooter"],
+    "words": ["body", "fall", "drop", "thud", "collapse", "death", "die", "knockout", "defeat", "slump", "faint", "corpse"],
+    "license": "draft"
+  },
+  "duration": "length",
+  "params": [
+    { "id": "weight", "label": "Weight", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "length", "label": "Length", "unit": "s", "min": 0.2, "max": 0.7, "default": 0.35, "scale": "log" },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "bounce", "label": "Bounce", "min": 0, "max": 1, "default": 0.5 }
+  ],
+  "nodes": [
+    { "id": "j", "type": "rand", "lo": 0.92, "hi": 1.08 },
+    { "id": "n", "type": "noise" },
+    { "id": "tf", "type": "env", "points": [[0, "(150 - weight*70)*rnd(0.95, 1.05)"], [0.07, "60 - weight*25", "exp"]] },
+    { "id": "th", "type": "osc", "wave": "sine", "freq": "tf" },
+    { "id": "ta", "type": "ad", "attack": 0.001, "decay": "length*0.55", "curve": 2.4 },
+    { "id": "thSat", "type": "shaper", "in": "th*ta", "drive": 2 },
+    { "id": "slap", "type": "filter", "mode": "bp", "in": "n", "freq": "(340 + bright*420)*(1.2 - weight*0.4)*j", "q": 0.9 },
+    { "id": "slapA", "type": "ad", "attack": 0.0005, "decay": "0.03 + weight*0.03", "curve": 2.2 },
+    { "id": "flesh", "type": "filter", "mode": "bp", "in": "n", "freq": "(300 + bright*300)*(1.15 - weight*0.3)", "q": 0.8 },
+    { "id": "fleshA", "type": "ad", "attack": 0.001, "decay": "length*0.4", "curve": 2.2 },
+    { "id": "bClk", "type": "clock", "rate": 1, "count": 1, "delay": "length*0.3*rnd(0.88, 1.12)" },
+    { "id": "bf", "type": "env", "points": [[0, "(170 - weight*70)*rnd(0.93, 1.07)"], [0.05, "75 - weight*25", "exp"]], "trig": "bClk" },
+    { "id": "bth", "type": "osc", "wave": "sine", "freq": "bf" },
+    { "id": "bA", "type": "ad", "attack": 0.001, "decay": "length*0.45", "curve": 2.4, "trig": "bClk" },
+    { "id": "bSlapA", "type": "ad", "attack": 0.0005, "decay": "0.025 + weight*0.02", "curve": 2.2, "trig": "bClk" },
+    { "id": "cGate", "type": "ad", "attack": 0.004, "decay": "length*0.85", "curve": 1.8 },
+    { "id": "cd", "type": "dust", "density": 500, "spread": 1 },
+    { "id": "cloth", "type": "filter", "mode": "bp", "in": "cd + n*0.05", "freq": "2200 + bright*2500", "q": 0.6 },
+    { "id": "rClk", "type": "clock", "rate": 1, "count": 1, "delay": 0.003 },
+    { "id": "hits", "type": "expr", "expr": "rClk + bClk*bounce" },
+    { "id": "rKick", "type": "ad", "attack": 0.0005, "decay": 0.004, "curve": 1.5, "trig": "hits" },
+    { "id": "rattle", "type": "modal", "in": "n*rKick", "freq": "2600*j", "ratios": [1, 1.47, 2.09, 2.56], "decay": "length*0.6", "tilt": 0.6 },
+    { "id": "sum", "type": "expr", "expr": "thSat*0.3 + slap*slapA*3.2 + flesh*fleshA*1.8 + (bth*bA*0.3 + slap*bSlapA*2 + flesh*bA*1)*bounce + cloth*cGate*0.25 + rattle*smooth(0.65, 0.95, bright)*0.15" },
+    { "id": "tone", "type": "filter", "mode": "lp", "in": "sum", "freq": "1500 + bright*8000" },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "tone", "freq": 30 }
+  ],
+  "out": "clean",
+  "presets": {
+    "Small creature": { "weight": 0.1, "length": 0.24, "bright": 0.6, "bounce": 0.6 },
+    "Person": { "weight": 0.55, "length": 0.38, "bright": 0.45, "bounce": 0.5 },
+    "Armoured knight": { "weight": 0.95, "length": 0.6, "bright": 0.85, "bounce": 0.7 }
+  }
+}

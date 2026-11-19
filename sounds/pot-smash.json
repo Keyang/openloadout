@@ -1,0 +1,52 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "pot-smash",
+  "name": "Pot smash",
+  "category": "impact",
+  "tags": ["pot", "clay", "smash", "break"],
+  "description": "A clay pot breaking: a dull crack and a scatter of heavy pieces. Change its size, length, brightness and pieces.",
+  "meta": {
+    "type": "sfx",
+    "role": "world/break",
+    "themes": ["neutral", "fantasy", "dungeon"],
+    "gameTypes": ["top-down-rpg", "platformer", "turn-based-rpg", "roguelike-action", "arcade"],
+    "words": ["pot", "jar", "urn", "vase", "clay", "smash", "break", "shatter", "pottery", "loot", "destroy", "crash"],
+    "license": "draft"
+  },
+  "duration": "length",
+  "params": [
+    { "id": "size", "label": "Size", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "length", "label": "Length", "unit": "s", "min": 0.2, "max": 0.8, "default": 0.4, "scale": "log" },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "pieces", "label": "Pieces", "min": 0, "max": 1, "default": 0.5 }
+  ],
+  "nodes": [
+    { "id": "j", "type": "rand", "lo": 0.93, "hi": 1.07 },
+    { "id": "n", "type": "noise" },
+    { "id": "ce", "type": "ad", "attack": 0.0003, "decay": "0.004 + size*0.006", "curve": 2 },
+    { "id": "exc", "type": "filter", "mode": "lp", "in": "n*ce", "freq": "1500 + bright*5000" },
+    { "id": "shell", "type": "modal", "in": "exc", "freq": "(900 - size*450)*j", "ratios": [1, 1.52, 2.24, 3.1, 4.3], "decay": "0.05 + size*0.05", "tilt": 0.6 },
+    { "id": "belly", "type": "modal", "in": "exc", "freq": "(260 - size*130)*j", "ratios": [1, 1.5], "decay": "0.06 + size*0.08", "tilt": 0.3 },
+    { "id": "crack", "type": "filter", "mode": "bp", "in": "n*ce", "freq": "1800 + bright*2000", "q": 0.8 },
+    { "id": "tf", "type": "env", "points": [[0, "(150 - size*70)*rnd(0.95, 1.05)"], [0.06, "70 - size*30", "exp"]] },
+    { "id": "th", "type": "osc", "wave": "sine", "freq": "tf" },
+    { "id": "ta", "type": "ad", "attack": 0.001, "decay": "0.06 + size*0.08", "curve": 2.4 },
+    { "id": "pClk", "type": "clock", "rate": 1, "count": 1, "delay": "0.03 + size*0.02" },
+    { "id": "pGate", "type": "ad", "attack": 0.002, "decay": "length*0.95", "curve": 0.9, "trig": "pClk" },
+    { "id": "pc", "type": "clock", "rate": "(2 + pieces*6 + size*2)/(length*0.82)", "jitter": 0.8, "delay": "0.025 + size*0.015 + rnd(0, 0.01)", "count": "round(2 + pieces*6 + size*2)" },
+    { "id": "pick", "type": "rand", "lo": 0, "hi": 1, "trig": "pc" },
+    { "id": "lvl", "type": "rand", "lo": 0.3, "hi": 1, "trig": "pc" },
+    { "id": "pr", "type": "rand", "lo": 0.85, "hi": 1.18, "trig": "pc" },
+    { "id": "p1", "type": "modal", "in": "pc*lvl*pGate*(pick < 0.5 ? 1 : 0)", "freq": "(1500 - size*600)*j*pr", "ratios": [1, 1.6, 2.5], "decay": 0.035, "tilt": 0.5 },
+    { "id": "p2", "type": "modal", "in": "pc*lvl*pGate*(pick < 0.5 ? 0 : 1)", "freq": "(1000 - size*400)*j*pr", "ratios": [1, 1.7, 2.3], "decay": 0.045, "tilt": 0.5 },
+    { "id": "sum", "type": "expr", "expr": "shell*0.08 + belly*0.1 + crack*2 + th*ta*0.4*(0.3 + size) + (p1 + p2)*(0.2 + pieces)*0.5" },
+    { "id": "tone", "type": "filter", "mode": "lp", "in": "sum", "freq": "2000 + bright*9000" },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "tone", "freq": 35 }
+  ],
+  "out": "clean",
+  "presets": {
+    "Small jar": { "size": 0.15, "length": 0.28, "bright": 0.65, "pieces": 0.35 },
+    "Clay pot": { "size": 0.5, "length": 0.42, "bright": 0.5, "pieces": 0.55 },
+    "Big urn": { "size": 0.9, "length": 0.7, "bright": 0.4, "pieces": 0.8 }
+  }
+}

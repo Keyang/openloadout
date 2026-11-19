@@ -1,0 +1,45 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "footstep-snow",
+ "name": "Footstep on snow",
+ "category": "movement",
+ "description": "A muffled step into packed snow: a soft low thump and a short squeaky crunch. Every take is a different step; change its weight, length, brightness and how much it crunches.",
+ "meta": {
+  "type": "sfx",
+  "role": "characters/footstep",
+  "themes": ["neutral", "fantasy", "forest"],
+  "gameTypes": ["top-down-rpg", "platformer", "turn-based-rpg", "farming-sim"],
+  "words": ["footstep", "footsteps", "step", "walk", "run", "snow", "winter", "ice", "frost", "crunch", "squeak", "snowy", "cold"],
+  "license": "draft"
+ },
+ "duration": "length*(0.75 + 0.25*weight) + 0.03",
+ "params": [
+  { "id": "weight", "label": "Weight", "min": 0.5, "max": 2, "default": 1 },
+  { "id": "length", "label": "Length", "unit": "s", "min": 0.08, "max": 0.2, "default": 0.15, "scale": "log" },
+  { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+  { "id": "crunch", "label": "Crunch", "min": 0, "max": 1, "default": 0.6 }
+ ],
+ "nodes": [
+  { "id": "thumpPitch", "type": "env", "points": [[0, "rnd(105, 125)/pow(weight, 0.7)"], [0.06, "60/pow(weight, 0.7)", "exp"]] },
+  { "id": "thump", "type": "osc", "freq": "thumpPitch" },
+  { "id": "thumpAmp", "type": "ad", "attack": 0.003, "decay": "0.04 + 0.03*weight", "curve": 2 },
+  { "id": "pn", "type": "noise", "color": "pink" },
+  { "id": "pad", "type": "filter", "mode": "bp", "in": "pn", "freq": "rnd(0.9, 1.1)*(450 + bright*350)/pow(weight, 0.5)", "q": 1.1 },
+  { "id": "padAmp", "type": "ad", "attack": 0.002, "decay": "0.03 + 0.025*weight", "curve": 2.2 },
+  { "id": "crAmp", "type": "env", "points": [[0, 0], [0.005, 0.85], ["length*(0.75 + 0.25*weight)*rnd(0.15, 0.25)", 1], ["length*(0.75 + 0.25*weight)", 0, 2.4]] },
+  { "id": "squeakTick", "type": "clock", "rate": "rnd(260, 380)/pow(weight, 0.3)", "jitter": 0.55 },
+  { "id": "squeak", "type": "filter", "mode": "bp", "in": "squeakTick", "freq": "rnd(0.9, 1.1)*(1300 + bright*900)/pow(weight, 0.25)", "q": 7 },
+  { "id": "grains", "type": "dust", "density": "300 + crunch*1500", "spread": 1 },
+  { "id": "crumb", "type": "filter", "mode": "bp", "in": "grains", "freq": "rnd(0.9, 1.1)*(1800 + bright*1800)/pow(weight, 0.3)", "q": 2.5 },
+  { "id": "sum", "type": "expr", "expr": "thump*thumpAmp*0.3*pow(weight, 0.4) + pad*padAmp*1.8 + (squeak*(0.1 + 0.6*crunch) + crumb*(0.4 + 2.2*crunch))*crAmp" },
+  { "id": "muffle", "type": "filter", "mode": "lp", "in": "sum", "freq": "(2800 + bright*4500)/pow(weight, 0.3)", "q": 0.7 },
+  { "id": "soft", "type": "shaper", "in": "muffle*1.5", "drive": 1.1 },
+  { "id": "clean", "type": "filter", "mode": "hp", "in": "soft", "freq": 35 }
+ ],
+ "out": "clean",
+ "presets": {
+  "Soft shoes": { "weight": 0.8, "length": 0.13, "bright": 0.4, "crunch": 0.5 },
+  "Heavy boots": { "weight": 1.8, "length": 0.19, "bright": 0.45, "crunch": 0.85 },
+  "Bare feet": { "weight": 0.7, "length": 0.1, "bright": 0.25, "crunch": 0.2 }
+ }
+}

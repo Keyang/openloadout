@@ -1,0 +1,240 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "throw-toss",
+  "name": "Throw",
+  "category": "movement",
+  "description": "Something thrown by hand: a short arm whoosh with a small click as it leaves the hand, and a whirr if it spins. Change its weight, length, brightness and spin.",
+  "meta": {
+    "type": "sfx",
+    "role": "actions/shoot",
+    "themes": [
+      "neutral",
+      "fantasy"
+    ],
+    "gameTypes": [
+      "top-down-rpg",
+      "platformer",
+      "roguelike-action",
+      "turn-based-rpg",
+      "arcade"
+    ],
+    "words": [
+      "throw",
+      "toss",
+      "lob",
+      "hurl",
+      "grenade",
+      "rock",
+      "bottle",
+      "shuriken",
+      "star",
+      "spin",
+      "whoosh",
+      "release"
+    ],
+    "license": "draft"
+  },
+  "duration": "clamp(length * (0.85 + weight * 0.3), 0.15, 0.5) + 0.02",
+  "params": [
+    {
+      "id": "weight",
+      "label": "Weight",
+      "min": 0,
+      "max": 1,
+      "default": 0.5
+    },
+    {
+      "id": "length",
+      "label": "Length",
+      "unit": "s",
+      "min": 0.15,
+      "max": 0.5,
+      "default": 0.3,
+      "scale": "log"
+    },
+    {
+      "id": "bright",
+      "label": "Brightness",
+      "min": 0,
+      "max": 1,
+      "default": 0.5
+    },
+    {
+      "id": "spin",
+      "label": "Spin",
+      "min": 0,
+      "max": 1,
+      "default": 0.3
+    }
+  ],
+  "nodes": [
+    {
+      "id": "n",
+      "type": "noise"
+    },
+    {
+      "id": "np",
+      "type": "noise",
+      "color": "pink"
+    },
+    {
+      "id": "arm",
+      "type": "env",
+      "points": [
+        [
+          0,
+          0.45
+        ],
+        [
+          "length * 0.22",
+          1,
+          1.5
+        ],
+        [
+          "clamp(length * (0.85 + weight * 0.3), 0.15, 0.5)",
+          0,
+          1.8
+        ]
+      ]
+    },
+    {
+      "id": "sweep",
+      "type": "env",
+      "points": [
+        [
+          0,
+          "(700 - weight * 300)"
+        ],
+        [
+          "length * 0.22",
+          "(1700 - weight * 700) * rnd(0.9, 1.1)",
+          "exp"
+        ],
+        [
+          "clamp(length * (0.85 + weight * 0.3), 0.15, 0.5)",
+          "(600 - weight * 250)",
+          "exp"
+        ]
+      ]
+    },
+    {
+      "id": "air",
+      "type": "filter",
+      "mode": "bp",
+      "in": "np",
+      "freq": "sweep * (0.75 + bright * 0.5)",
+      "q": 1.3
+    },
+    {
+      "id": "hiss",
+      "type": "filter",
+      "mode": "hp",
+      "in": "n",
+      "freq": 5000
+    },
+    {
+      "id": "rel",
+      "type": "clock",
+      "rate": 1,
+      "count": 1,
+      "delay": "length * 0.2 * rnd(0.9, 1.1)"
+    },
+    {
+      "id": "clickEnv",
+      "type": "ad",
+      "attack": 0.0004,
+      "decay": 0.012,
+      "curve": 3,
+      "trig": "rel"
+    },
+    {
+      "id": "click",
+      "type": "filter",
+      "mode": "bp",
+      "in": "n",
+      "freq": "(3200 - weight * 1400) * (0.8 + bright * 0.4)",
+      "q": 2.5
+    },
+    {
+      "id": "spinRate",
+      "type": "env",
+      "points": [
+        [
+          0,
+          "(26 - weight * 10) * rnd(0.9, 1.1)"
+        ],
+        [
+          "length",
+          "(20 - weight * 8)"
+        ]
+      ]
+    },
+    {
+      "id": "wob",
+      "type": "osc",
+      "wave": "tri",
+      "freq": "spinRate"
+    },
+    {
+      "id": "whirr",
+      "type": "filter",
+      "mode": "bp",
+      "in": "n",
+      "freq": "(2400 - weight * 1100) * (0.8 + bright * 0.4)",
+      "q": 3
+    },
+    {
+      "id": "spinEnv",
+      "type": "env",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          "length * 0.22",
+          1,
+          1
+        ],
+        [
+          "clamp(length * (0.85 + weight * 0.3), 0.15, 0.5)",
+          0,
+          1.2
+        ]
+      ]
+    },
+    {
+      "id": "sum",
+      "type": "expr",
+      "expr": "air * arm * (1 - spin * 0.4) + hiss * arm * bright * 0.25 + click * clickEnv * 1.4 + whirr * spinEnv * spin * 1.8 * max(0, wob) "
+    },
+    {
+      "id": "clean",
+      "type": "filter",
+      "mode": "hp",
+      "in": "sum",
+      "freq": 60
+    }
+  ],
+  "out": "clean",
+  "presets": {
+    "Rock": {
+      "weight": 0.75,
+      "length": 0.3,
+      "bright": 0.35,
+      "spin": 0.1
+    },
+    "Bottle": {
+      "weight": 0.5,
+      "length": 0.38,
+      "bright": 0.45,
+      "spin": 0.5
+    },
+    "Throwing star": {
+      "weight": 0.1,
+      "length": 0.4,
+      "bright": 0.8,
+      "spin": 0.95
+    }
+  }
+}

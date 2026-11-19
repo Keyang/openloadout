@@ -1,0 +1,52 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "alarm-siren",
+ "name": "Alarm",
+ "category": "ambience",
+ "description": "A base or ship alarm that keeps sounding: a slow wailing siren, a two-note horn or fast harsh honks. Change its pitch, speed, brightness and grit.",
+ "meta": {
+  "type": "ambience",
+  "role": "world/machine",
+  "themes": ["neutral", "sci-fi", "space"],
+  "gameTypes": ["roguelike-action", "shooter", "arcade", "platformer"],
+  "words": ["alarm", "siren", "klaxon", "alert", "horn", "warning", "emergency", "evacuate", "lockdown", "danger", "intruder", "red alert"],
+  "license": "draft"
+ },
+ "loop": true,
+ "wrap": true,
+ "duration": 4,
+ "params": [
+  { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 300, "max": 1400, "default": 700, "scale": "log" },
+  { "id": "speed", "label": "Speed", "unit": "Hz", "min": 0.25, "max": 3, "default": 0.5, "scale": "log", "hint": "Slow: a long wailing rise and fall. Faster: two notes swapping. Fastest: short harsh honks." },
+  { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+  { "id": "grit", "label": "Grit", "min": 0, "max": 1, "default": 0.25 }
+ ],
+ "nodes": [
+  { "id": "rate", "type": "expr", "expr": "max(1, round(speed * dur)) / dur" },
+  { "id": "sq", "type": "expr", "expr": "smooth(0.3, 0.9, rate)" },
+  { "id": "kx", "type": "expr", "expr": "smooth(1.3, 2.2, rate)" },
+  { "id": "wave1", "type": "expr", "expr": "sin(tau * t * rate)" },
+  { "id": "shaped", "type": "expr", "expr": "tanh(wave1 * (1 + sq * 12)) / tanh(1 + sq * 12)" },
+  { "id": "frac", "type": "expr", "expr": "(t * rate) % 1" },
+  { "id": "honk", "type": "expr", "expr": "smooth(0, 0.05, frac) * (1 - smooth(0.55, 0.64, frac))" },
+  { "id": "scoop", "type": "expr", "expr": "-1 + 2 * smooth(0, 0.22, frac)" },
+  { "id": "contour", "type": "expr", "expr": "mix(shaped, scoop, kx)" },
+  { "id": "depth", "type": "expr", "expr": "mix(mix(9, 5, sq), 4, kx)" },
+  { "id": "fr", "type": "lag", "in": "pitch * semi(depth * (contour - 1) * 0.5)", "time": 0.006 },
+  { "id": "o1", "type": "osc", "wave": "saw", "freq": "fr" },
+  { "id": "o2", "type": "osc", "wave": "square", "freq": "fr * 1.004" },
+  { "id": "o3", "type": "osc", "wave": "sine", "freq": "fr" },
+  { "id": "body", "type": "expr", "expr": "o1 * (0.35 + kx * 0.25) + o2 * (0.25 + kx * 0.2) + o3 * (0.7 - kx * 0.3)" },
+  { "id": "tone", "type": "filter", "mode": "lp", "in": "body", "freq": "fr * (1.6 + bright * bright * 10)", "q": 0.9 },
+  { "id": "hard", "type": "shaper", "in": "tone", "drive": "1 + grit * 7", "mode": "clip" },
+  { "id": "lofi", "type": "crush", "in": "hard", "bits": "16 - grit * 10", "rate": "40000 - grit * 31000" },
+  { "id": "gate", "type": "expr", "expr": "mix(1, honk, kx)" },
+  { "id": "clean", "type": "filter", "mode": "hp", "in": "lofi * gate", "freq": 60 }
+ ],
+ "out": "clean",
+ "presets": {
+  "Siren": { "pitch": 650, "speed": 0.25, "bright": 0.45, "grit": 0.1 },
+  "Two-tone horn": { "pitch": 760, "speed": 1, "bright": 0.55, "grit": 0.2 },
+  "Klaxon": { "pitch": 520, "speed": 2.5, "bright": 0.75, "grit": 0.7 }
+ }
+}

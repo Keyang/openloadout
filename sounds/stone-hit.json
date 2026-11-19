@@ -1,0 +1,52 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "stone-hit",
+  "name": "Stone hit",
+  "category": "impact",
+  "tags": ["stone", "rock", "crack", "chips"],
+  "description": "A rock striking rock: a hard, dry crack with a few small chips falling after it. Change its size, length, brightness and chips.",
+  "meta": {
+    "type": "sfx",
+    "role": "effects/impact",
+    "themes": ["neutral", "fantasy", "dungeon"],
+    "gameTypes": ["platformer", "top-down-rpg", "turn-based-rpg", "roguelike-action", "puzzle"],
+    "words": ["stone", "rock", "hit", "crack", "clack", "pebble", "boulder", "impact", "smash", "chip", "throw", "strike"],
+    "license": "draft"
+  },
+  "duration": "length",
+  "params": [
+    { "id": "size", "label": "Size", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "length", "label": "Length", "unit": "s", "min": 0.1, "max": 0.5, "default": 0.2, "scale": "log" },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "chips", "label": "Chips", "min": 0, "max": 1, "default": 0.5 }
+  ],
+  "nodes": [
+    { "id": "j", "type": "rand", "lo": 0.93, "hi": 1.07 },
+    { "id": "n", "type": "noise" },
+    { "id": "ce", "type": "ad", "attack": 0.0002, "decay": "0.003 + size*0.006", "curve": 2.5 },
+    { "id": "crackHi", "type": "filter", "mode": "bp", "in": "n*ce", "freq": "(2500 + bright*4000)*(1.2 - size*0.5)", "q": 0.7 },
+    { "id": "crackM", "type": "modal", "in": "n*ce", "freq": "(1400 - size*800)*j", "ratios": [1, 1.73, 2.61, 3.47, 4.9], "decay": "0.03 + size*0.04", "tilt": 0.5 },
+    { "id": "tf", "type": "env", "points": [[0, "(160 - size*90)*rnd(0.95, 1.05)"], [0.05, "70 - size*35", "exp"]] },
+    { "id": "th", "type": "osc", "wave": "sine", "freq": "tf" },
+    { "id": "ta", "type": "ad", "attack": 0.001, "decay": "0.05 + size*0.12", "curve": 2.5 },
+    { "id": "body", "type": "filter", "mode": "bp", "in": "n", "freq": "(700 - size*350)*j", "q": 0.9 },
+    { "id": "bodyA", "type": "ad", "attack": 0.0005, "decay": "0.03 + size*0.05", "curve": 2.2 },
+    { "id": "cClk", "type": "clock", "rate": 1, "count": 1, "delay": "0.025 + size*0.02" },
+    { "id": "chipGate", "type": "ad", "attack": 0.002, "decay": "length*0.8", "curve": 1.5, "trig": "cClk" },
+    { "id": "cd", "type": "clock", "rate": "(2 + chips*6)/(length*0.7)", "jitter": 0.8, "delay": "0.03 + size*0.02 + rnd(0, 0.01)", "count": "round(1 + chips*5 + size*2)" },
+    { "id": "pick", "type": "rand", "lo": 0, "hi": 1, "trig": "cd" },
+    { "id": "lvl", "type": "rand", "lo": 0.25, "hi": 1, "trig": "cd" },
+    { "id": "pr", "type": "rand", "lo": 0.82, "hi": 1.2, "trig": "cd" },
+    { "id": "chipA", "type": "modal", "in": "cd*lvl*chipGate*(pick < 0.55 ? 1 : 0)", "freq": "(3200 - size*1300)*j*pr", "ratios": [1, 1.58, 2.37], "decay": 0.02, "tilt": 0.5 },
+    { "id": "chipB", "type": "modal", "in": "cd*lvl*chipGate*(pick < 0.55 ? 0 : 1)", "freq": "(2300 - size*900)*j*pr", "ratios": [1, 1.41, 2.2], "decay": 0.025, "tilt": 0.5 },
+    { "id": "sum", "type": "expr", "expr": "crackHi*3 + crackM*0.06 + th*ta*0.4*(0.3 + size) + body*bodyA*2 + (chipA + chipB)*(0.2 + chips)*0.6" },
+    { "id": "tone", "type": "filter", "mode": "lp", "in": "sum", "freq": "2500 + bright*12000" },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "tone", "freq": 35 }
+  ],
+  "out": "clean",
+  "presets": {
+    "Pebble": { "size": 0.1, "length": 0.13, "bright": 0.7, "chips": 0.3 },
+    "Rock": { "size": 0.5, "length": 0.22, "bright": 0.5, "chips": 0.55 },
+    "Boulder": { "size": 0.95, "length": 0.42, "bright": 0.4, "chips": 0.8 }
+  }
+}

@@ -1,0 +1,45 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "footstep-sand",
+ "name": "Footstep on sand",
+ "category": "movement",
+ "description": "A soft, dry, fine-grained hiss of a step in sand with hardly any thump. Every take is a different step; change its weight, length, brightness and how dry and loose the sand is.",
+ "meta": {
+  "type": "sfx",
+  "role": "characters/footstep",
+  "themes": ["neutral", "fantasy"],
+  "gameTypes": ["top-down-rpg", "platformer", "turn-based-rpg", "roguelike-action"],
+  "words": ["footstep", "footsteps", "step", "walk", "run", "sand", "beach", "desert", "dune", "shore", "hiss", "soft", "grainy"],
+  "license": "draft"
+ },
+ "duration": "length*(0.75 + 0.25*weight) + 0.03",
+ "params": [
+  { "id": "weight", "label": "Weight", "min": 0.5, "max": 2, "default": 1 },
+  { "id": "length", "label": "Length", "unit": "s", "min": 0.09, "max": 0.2, "default": 0.16, "scale": "log" },
+  { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+  { "id": "dry", "label": "Dryness", "min": 0, "max": 1, "default": 0.6 }
+ ],
+ "nodes": [
+  { "id": "grains", "type": "dust", "density": "2000 + dry*6000", "spread": 1 },
+  { "id": "grainAmp", "type": "env", "points": [[0, 0], [0.004, 1], ["length*(0.75 + 0.25*weight)*rnd(0.25, 0.35)", "0.22 + 0.25*dry"], ["length*(0.75 + 0.25*weight)", 0, 1.4]] },
+  { "id": "sandHiss", "type": "filter", "mode": "bp", "in": "grains*grainAmp", "freq": "rnd(0.9, 1.1)*(1400 + bright*2400 + dry*900)/pow(weight, 0.35)", "q": 0.7 },
+  { "id": "wn", "type": "noise" },
+  { "id": "fine", "type": "filter", "mode": "bp", "in": "wn*grainAmp", "freq": "(2500 + bright*3000)/pow(weight, 0.3)", "q": 0.6 },
+  { "id": "pn", "type": "noise", "color": "pink" },
+  { "id": "packAmp", "type": "ad", "attack": 0.002, "decay": "0.03 + 0.02*weight", "curve": 2.2 },
+  { "id": "pack", "type": "filter", "mode": "bp", "in": "pn", "freq": "rnd(0.9, 1.1)*(500 + bright*400)/pow(weight, 0.5)", "q": 1 },
+  { "id": "thumpPitch", "type": "env", "points": [[0, "100/weight"], [0.04, "55/weight", "exp"]] },
+  { "id": "thump", "type": "osc", "freq": "thumpPitch" },
+  { "id": "thumpAmp", "type": "ad", "attack": 0.002, "decay": "0.03*weight", "curve": 2 },
+  { "id": "sum", "type": "expr", "expr": "sandHiss*(2.2 + 1.2*dry) + fine*(0.02 + 0.06*dry) + pack*packAmp*(0.25 + 0.7*(1 - dry)) + thump*thumpAmp*0.08*pow(weight, 0.5)" },
+  { "id": "soft", "type": "shaper", "in": "sum*1.5", "drive": 1.1 },
+  { "id": "top", "type": "filter", "mode": "lp", "in": "soft", "freq": "(3500 + bright*6000)/pow(weight, 0.3)", "q": 0.6 },
+  { "id": "clean", "type": "filter", "mode": "hp", "in": "top", "freq": 35 }
+ ],
+ "out": "clean",
+ "presets": {
+  "Soft shoes": { "weight": 0.8, "length": 0.14, "bright": 0.4, "dry": 0.6 },
+  "Heavy boots": { "weight": 1.8, "length": 0.19, "bright": 0.45, "dry": 0.5 },
+  "Bare feet": { "weight": 0.7, "length": 0.11, "bright": 0.25, "dry": 0.3 }
+ }
+}

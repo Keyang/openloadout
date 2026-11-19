@@ -1,0 +1,52 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "glass-break",
+  "name": "Glass break",
+  "category": "impact",
+  "tags": ["glass", "shatter", "break", "shards"],
+  "description": "Glass shattering: a bright crack, then a shower of ringing shards that settle. Change its size, length, brightness and shards.",
+  "meta": {
+    "type": "sfx",
+    "role": "world/break",
+    "themes": ["neutral", "fantasy", "city"],
+    "gameTypes": ["top-down-rpg", "platformer", "turn-based-rpg", "roguelike-action", "puzzle"],
+    "words": ["glass", "break", "shatter", "smash", "window", "bottle", "crystal", "shards", "tinkle", "crash", "destroy", "jar"],
+    "license": "draft"
+  },
+  "duration": "length",
+  "params": [
+    { "id": "size", "label": "Size", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "length", "label": "Length", "unit": "s", "min": 0.3, "max": 1.2, "default": 0.6, "scale": "log" },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.6 },
+    { "id": "shards", "label": "Shards", "min": 0, "max": 1, "default": 0.6 }
+  ],
+  "nodes": [
+    { "id": "j", "type": "rand", "lo": 0.94, "hi": 1.06 },
+    { "id": "n", "type": "noise" },
+    { "id": "ce", "type": "ad", "attack": 0.0002, "decay": "0.004 + size*0.004", "curve": 2.2 },
+    { "id": "crack", "type": "filter", "mode": "hp", "in": "n*ce", "freq": "2000 + bright*2500" },
+    { "id": "pane", "type": "modal", "in": "n*ce", "freq": "(2400 - size*900)*j", "ratios": [1, 2.32, 4.25, 6.63], "decay": "0.2 + size*0.2", "tilt": 0.6 },
+    { "id": "tf", "type": "env", "points": [[0, "(260 - size*120)*rnd(0.95, 1.05)"], [0.03, "120 - size*50", "exp"]] },
+    { "id": "th", "type": "osc", "wave": "sine", "freq": "tf" },
+    { "id": "ta", "type": "ad", "attack": 0.0005, "decay": "0.04 + size*0.04", "curve": 2.5 },
+    { "id": "sClk", "type": "clock", "rate": 1, "count": 1, "delay": 0.012 },
+    { "id": "sGate", "type": "ad", "attack": 0.002, "decay": "length*0.95", "curve": 1.2, "trig": "sClk" },
+    { "id": "sDen", "type": "expr", "expr": "(25 + shards*300)*pow(max(0, 1 - t/(length*0.92)), 1)" },
+    { "id": "d1", "type": "dust", "density": "sDen*0.4", "spread": 1 },
+    { "id": "d2", "type": "dust", "density": "sDen*0.35", "spread": 1 },
+    { "id": "d3", "type": "dust", "density": "sDen*0.25", "spread": 1 },
+    { "id": "s1", "type": "modal", "in": "d1*sGate", "freq": "(4300 - size*1300)*j", "ratios": [1, 2.32, 4.25], "decay": "0.12 + size*0.1", "tilt": 0.5 },
+    { "id": "s2", "type": "modal", "in": "d2*sGate", "freq": "(3300 - size*1000)*j", "ratios": [1, 2.41, 4.4], "decay": "0.14 + size*0.1", "tilt": 0.5 },
+    { "id": "s3", "type": "modal", "in": "d3*sGate", "freq": "(5600 - size*1500)*j", "ratios": [1, 2.2, 3.9], "decay": "0.1 + size*0.08", "tilt": 0.5 },
+    { "id": "grit", "type": "filter", "mode": "bp", "in": "(d1 + d2)*sGate", "freq": "5000 + bright*3000", "q": 0.8 },
+    { "id": "sum", "type": "expr", "expr": "crack*(1.5 + size*1.2) + pane*0.08 + th*ta*0.25*(0.3 + size) + (s1 + s2 + s3)*(0.2 + shards)*0.3*(1.1 - size*0.6) + grit*0.15" },
+    { "id": "tone", "type": "filter", "mode": "lp", "in": "sum", "freq": "5000 + bright*14000" },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "tone", "freq": 60 }
+  ],
+  "out": "clean",
+  "presets": {
+    "Bottle": { "size": 0.3, "length": 0.45, "bright": 0.55, "shards": 0.4 },
+    "Window": { "size": 0.8, "length": 0.9, "bright": 0.65, "shards": 0.9 },
+    "Crystal": { "size": 0.15, "length": 1.0, "bright": 0.9, "shards": 0.7 }
+  }
+}
