@@ -1,7 +1,7 @@
 /* Loadout: the kits, #/bundles and #/bundle/<id> (app/kit-list.js, app/bundle-page.js, app/theme-controls.js). Match: the kit section of mocks/5-catalogue/landing.html.
    Owned by the builder of that page. Only that page's own layout goes here; tokens and the shared components (button,
    chip, tab, segmented control, tile, card, token, change dot, menu, the editing panel) are in base.css and are used
-   as they are. Move what the page still needs out of app/style.css (the old rules) into this file. */
+   as they are. */
 
 /* ---------- the list of kits, #/bundles ---------- */
 .kits-page, .bundle-page { max-width: calc(var(--page) + 2 * var(--gutter)); margin: 0 auto; padding: var(--s7) var(--gutter) var(--s9); }

@@ -23,17 +23,17 @@ function parseHash() {
 
 function notFound(what) {
   document.title = 'Not here · Loadout';       // not the title of the page they came from
-  app.replaceChildren(header(''), el('main', { class: 'home' },
-    el('h1', { class: 'small' }, `That ${what} is not here`),
+  app.replaceChildren(header(''), el('main', { class: 'v2 home notice' },
+    el('h1', { class: 'h2' }, `That ${what} is not here`),
     el('p', { class: 'lede' }, 'The link may be old or mistyped. Everything that exists is on the front page.'),
-    el('p', {}, el('a', { class: 'btn', href: '#/' }, 'See everything'))));
+    el('p', {}, el('a', { class: 'btn btn-primary', href: '#/' }, 'See everything'))));
   return () => {};
 }
 
 // the header stays while a page loads (the one index.html drew, or the last page's), so the frame never goes blank
 const waiting = () => {
   const top = app.querySelector('header.top');
-  app.replaceChildren(...(top ? [top] : []), el('main', { class: 'home' }, el('p', { class: 'lede' }, 'Loading…')));
+  app.replaceChildren(...(top ? [top] : []), el('main', { class: 'v2 home' }, el('p', { class: 'lede' }, 'Loading…')));
 };
 
 // Pages that are loaded only when visited. The page function returns its teardown, or a promise of it.
@@ -144,8 +144,8 @@ try {
 } catch (e) {
   // For whoever runs the site: the catalogue (generated/catalog.json) is written by "npm run build". A visitor cannot fix that, so the page does not ask them to.
   console.error('Loadout could not start: the catalogue did not load. If this is your copy of the site, run "npm run build" and publish the generated/ folder.', e);
-  app.replaceChildren(el('main', { class: 'home' },
-    el('h1', { class: 'small' }, 'Something went wrong'),
+  app.replaceChildren(el('main', { class: 'v2 home notice' },
+    el('h1', { class: 'h2' }, 'Something went wrong'),
     el('p', { class: 'lede' }, 'This page could not load its list of assets. Please try again later.'),
-    el('p', {}, el('button', { type: 'button', class: 'btn', onclick: () => location.reload() }, 'Try again'))));
+    el('p', {}, el('button', { type: 'button', class: 'btn btn-primary', onclick: () => location.reload() }, 'Try again'))));
 }

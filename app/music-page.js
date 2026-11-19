@@ -1,7 +1,7 @@
 // One music track (docs/site-design.md, section 5, "Sound, music"): the same two columns as a sprite (app/asset-shell.js).
 // Left: its name and line, a big play button and how long it is. Right: the editing panel (app/panel.js) with its
 // versions (its named styles first), its sliders and its choices (how long it is, which instrument leads) in tabs, and
-// the download. It plays live, so a slider is heard while it moves. Every change is saved to the bag as it is made.
+// a look of its own (Look), and the download. It plays live, so a slider is heard while it moves. Every change is saved to the bag as it is made.
 import { el, header, saveBlob } from './ui.js';
 import { soundParams, renderAsync, playRendered, playLive, wavBytes, isChoice, lengthOf } from './audio.js';
 import { keepBag } from './add-to-bag.js';
@@ -10,6 +10,10 @@ import { createEdit } from './editing.js';
 import { editPanel } from './panel.js';
 import { soundModel } from './panel-model.js';
 import { assetShell, icon, ICON } from './asset-shell.js';
+import { lookOf } from './bag.js';
+import { applySound } from '../sound/theme.js';
+import { soundLookTab, heardIn } from './sound-look.js';      // the whole-set looks, on this one track
+import { THEME_PRESETS } from '../engine/theme.js';
 
 export function musicPage(app, patch, query) {
   document.title = `${patch.name} · Loadout`;
@@ -22,11 +26,15 @@ export function musicPage(app, patch, query) {
   let saveTimer = 0;
   const edit = createEdit({
     kind: 'music', id: patch.id, defaults: { params: soundParams(patch, null), style: null }, key: query.bag ?? null, canSave: !made?.draft,
-    start: { params: soundParams(patch, style0, fromLink), style: style0 },
+    start: { params: soundParams(patch, style0, fromLink), style: style0, ...(lookOf({ look: query.artlook }) ? { look: query.artlook } : {}) },      // a look of its own, carried by the link as `artlook`
     schedule: (fn) => { clearTimeout(saveTimer); saveTimer = setTimeout(fn, 150); },
   });
   const now = () => edit.settings();
-  const st = { voice: null, starting: false, gone: false, sent: { ...now().params } };
+  // what the track is heard with: its settings, in its own look when it has one (tempo, key, calm; brightness is a filter)
+  const heard = () => heardIn(patch, now().params, lookOf(now()));
+  // a look that changes brightness cannot be played live: the loop is rendered first, then filtered (as in the bag)
+  const filtered = (h) => !!(h.sound && h.sound.brightness);
+  const st = { voice: null, starting: false, gone: false, sent: { ...heard().params }, look: lookOf(now()) };
 
   // How long the track is at some settings, in seconds (worked out once for each tempo and length).
   const lengths = new Map();
@@ -43,7 +51,7 @@ export function musicPage(app, patch, query) {
     ? { ...c, options: c.options.map((o) => ({ ...o, label: `${secondsAt({ ...s.params, [c.key]: o.value })} seconds` })) } : c));
 
   const lengthNote = el('span', { class: 'hint' });
-  const syncLength = () => { lengthNote.textContent = `${secondsAt(now().params)} seconds long, then it repeats.`; };
+  const syncLength = () => { lengthNote.textContent = `${secondsAt(heard().params)} seconds long, then it repeats.`; };
 
   let panel = null;
   const say = (text) => panel && panel.say(text);
@@ -58,8 +66,10 @@ export function musicPage(app, patch, query) {
   function stop() { st.starting = false; if (st.voice) st.voice.stop(); st.voice = null; syncPlay(); }
   async function play() {
     st.starting = true; syncPlay();
-    const params = now().params;
+    const h = heard(), params = h.params;
+    st.look = lookOf(now());
     try {
+      if (filtered(h)) throw new Error('rendered first');      // (caught below: the rendered loop, filtered)
       const voice = await playLive(patch, { ...params });
       if (st.gone || !st.starting) { voice.stop(); return; }
       st.voice = voice; st.sent = { ...params };
@@ -67,18 +77,21 @@ export function musicPage(app, patch, query) {
     } catch (e) {
       // no live audio in this browser: fall back to the rendered loop
       try {
-        const r = await renderAsync(patch, { ...params });
+        const raw = await renderAsync(patch, { ...params });
         if (st.gone || !st.starting) return;
-        const h = playRendered(r, { force: true, loop: true });
-        st.voice = { set() {}, stop: () => h && h.stop() };
-        say('This browser cannot change the music while it plays. Press Stop and Play again to hear a change.');
+        const loop = playRendered(filtered(h) ? applySound(raw, h.sound) : raw, { force: true, loop: true });
+        st.voice = { set() {}, stop: () => loop && loop.stop(), rendered: true };
+        if (!filtered(h)) say('This browser cannot change the music while it plays. Press Stop and Play again to hear a change.');
       } catch (e2) { say(`The music could not start: ${e2.message}.`); }
     }
     st.starting = false; syncPlay();
   }
   /** Tell the playing track every setting that changed since it was last told. */
   function push() {
-    const p = now().params;
+    // a new look while it plays: it starts again in the new look (a filtered loop cannot change as it plays)
+    if ((st.voice || st.starting) && lookOf(now()) !== st.look) { stop(); play(); return; }
+    if (st.voice?.rendered && filtered(heard())) return;
+    const p = heard().params;
     if (st.voice) for (const d of patch.params) if (p[d.id] !== st.sent[d.id]) st.voice.set(d.id, p[d.id]);
     st.sent = { ...p };
   }
@@ -93,6 +106,7 @@ export function musicPage(app, patch, query) {
       if (s.style) q.set('style', s.style);
       for (const d of patch.params) if (isChoice(d) && s.params[d.id] !== d.default) q.set(d.id, String(s.params[d.id]));
     }
+    if (lookOf(s)) q.set('artlook', lookOf(s));
     const qs = q.toString();
     return `#/music/${patch.id}${qs ? '?' + qs : ''}`;
   }
@@ -101,12 +115,14 @@ export function musicPage(app, patch, query) {
   async function download() {
     if (building) return '';
     building = true;
-    const params = now().params;
+    const h = heard(), params = h.params;
+    const look = THEME_PRESETS.find((p) => p.id === lookOf(now()) && p.id !== 'original');
     say(`Building the music file. This takes about ${Math.max(10, Math.round(lengthOf(patch, params) * 0.6 / 5) * 5)} seconds…`);
     try {
-      const r = await renderAsync(patch, { ...params });
+      const raw = await renderAsync(patch, { ...params });
+      const r = h.sound ? applySound(raw, h.sound) : raw;
       saveBlob(new Blob([wavBytes(r)], { type: 'audio/wav' }), `${patch.id}.wav`);
-      return `Downloaded ${patch.id}.wav: one loop, ${r.duration.toFixed(1)} seconds. Set it to repeat in your game.`;
+      return `Downloaded ${patch.id}.wav${look ? `, in the ${look.name} look` : ''}: one loop, ${r.duration.toFixed(1)} seconds. Set it to repeat in your game.`;
     } catch (e) { return `The download did not start: ${e.message}. Try again, or use a different browser.`; }
     finally { building = false; }
   }
@@ -116,13 +132,17 @@ export function musicPage(app, patch, query) {
     catch { return 'Copy the address in your browser bar to share this exact version.'; }
   }
 
+  // the looks (the panel's Look tab): a look of its own, saved with it like any setting
+  const look = soundLookTab({ patch, now: () => lookOf(now()), pick: (id) => edit.set({ look: id ?? null }), say });
+
   let shell = null;
   panel = editPanel({
     kind: 'music', asset: patch, edit, model,
+    tabs: [{ id: 'look', label: 'Look', node: look.node, changed: look.changed }],
     onDownload: download, onCopyLink: copyLink,
     onMore: () => shell && shell.openMore(),
   });
-  const offEdit = edit.onChange(() => { push(); syncLength(); if (!urlTimer) saveUrl(); });
+  const offEdit = edit.onChange(() => { look.sync(); push(); syncLength(); if (!urlTimer) saveUrl(); });
   const flush = () => edit.flush();
   window.addEventListener('pagehide', flush);
   syncPlay(); syncLength();

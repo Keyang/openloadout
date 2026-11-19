@@ -105,6 +105,13 @@ canvas.stage { position: absolute; display: block; }
 .looks .vpic { height: var(--vh, 88px); }
 .looks .vbtn .name { white-space: normal; line-height: 1.25; }
 .look-acts { margin-top: var(--s3); }
+/* a sound's and a track's looks: no picture, so each is a bordered button with its name and what is heard */
+.sound-looks { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px; }
+.sound-looks .vbtn { text-align: left; padding: 6px var(--s3); border: 1px solid var(--line-2); border-radius: var(--r); background: var(--paper); }
+.sound-looks .vbtn .name { padding: 0; color: var(--ink); font-size: 13px; white-space: nowrap; }
+.sound-looks .what { display: block; font-size: 12px; line-height: 1.3; color: var(--ink-2); }
+.sound-looks .vbtn:hover { border-color: var(--ink); }
+.sound-looks .vbtn[aria-pressed='true'] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
 
 /* ======================================================= THE EDITING PANEL, where its owner adds to base.css */
 /* versions with no picture (a sound, a track): a row of names, like chips */
@@ -146,6 +153,10 @@ canvas.stage { position: absolute; display: block; }
   .looks { gap: 6px; }
   .looks { --vmax: 72px; }
   .looks .vbtn .name { white-space: nowrap; }
+  /* a sound's looks: names only, in a row of chips (what each does to the sound is in its tooltip) */
+  .sound-looks { display: flex; flex-wrap: wrap; }
+  .sound-looks .vbtn { height: 32px; padding: 0 var(--s3); display: inline-flex; align-items: center; }
+  .sound-looks .what { display: none; }
   /* every tab fits its panel: rows a little closer */
   .rx-block, .rx-panel .tune { padding-top: var(--s3); }
   .block-head { margin-bottom: var(--s2); }

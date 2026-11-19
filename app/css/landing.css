@@ -1,7 +1,7 @@
 /* Loadout: the landing page, #/ (app/home.js homePage). Match: mocks/5-catalogue/landing.html.
    Owned by the builder of that page. Only that page's own layout goes here; tokens and the shared components (button,
    chip, tab, segmented control, tile, card, token, change dot, menu, the editing panel) are in base.css and are used
-   as they are. Move what the page still needs out of app/style.css (the old rules) into this file. */
+   as they are. */
 
 .landing { max-width: calc(var(--page) + 2 * var(--gutter)); margin: 0 auto; padding: 0 var(--gutter); }
 .landing .live { display: block; image-rendering: pixelated; flex: none; }

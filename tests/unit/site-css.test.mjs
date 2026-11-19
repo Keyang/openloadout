@@ -11,16 +11,19 @@ const html = read('index.html');
 const base = read('app/css/base.css');
 const PAGES = ['landing', 'library', 'asset', 'kits', 'bag', 'play'];
 
-test('index.html links the fonts, base.css, then every page\'s sheet; the old sheet, while it lasts, sits in a layer under them', () => {
+test('index.html links the fonts, base.css, then every page\'s sheet; the old sheet is gone', () => {
   const links = [...html.matchAll(/<link rel="stylesheet" href="([^"]+)">/g)].map((m) => m[1]);
-  const want = ['vendor/fonts/fonts.css', 'app/css/base.css', ...PAGES.map((p) => `app/css/${p}.css`)];
-  assert.deepEqual(links.filter((l) => l !== 'app/style.css'), want);
-  if (links.includes('app/style.css')) {
-    assert.ok(links.indexOf('app/style.css') > links.indexOf('app/css/base.css'), 'after base.css, which names the layers');
-    assert.match(read('app/style.css'), /@layer legacy \{/, 'its rules lose to every rule in app/css/');
-    assert.match(read('app/style.css'), /#app:not\(:has\(> main\.v2\)\) \{/, 'and they leave a rebuilt page (main.v2) alone');
-    assert.match(base, /@layer reset, legacy;/);
+  assert.deepEqual(links, ['vendor/fonts/fonts.css', 'app/css/base.css', ...PAGES.map((p) => `app/css/${p}.css`)]);
+  assert.ok(!fs.existsSync(new URL('app/style.css', ROOT)), 'app/style.css is deleted');
+  assert.doesNotMatch(base, /legacy/, 'no layer waits for the old rules');
+});
+
+test('every screen the app draws is a rebuilt one (main.v2), so nothing depends on the old rules', () => {
+  const files = fs.readdirSync(new URL('app/', ROOT), { recursive: true }).filter((f) => f.endsWith('.js'));
+  for (const f of files) {
+    for (const m of read(`app/${f}`).matchAll(/el\('main', \{ class: '([^']*)'/g)) assert.match(m[1], /(^| )v2( |$)/, `app/${f}: <main class="${m[1]}">`);
   }
+  assert.match(html, /<main class="v2 home">/, 'the loading line index.html draws');
 });
 
 test('every page sheet exists and says which page owns it', () => {
@@ -61,7 +64,7 @@ test('Geist is the site\'s typeface, served from the site; Pixelify Sans is the 
   const fonts = read('vendor/fonts/fonts.css');
   assert.equal(fonts, plan.css, 'vendor/fonts/fonts.css is what the vendor step writes now (run "node tools/lib/vendor.mjs")');
   for (const f of plan.files) assert.ok(fs.existsSync(new URL(`vendor/${f.to}`, ROOT)), `vendor/${f.to} is there`);
-  for (const f of ['index.html', 'app/css/base.css', 'app/style.css', ...PAGES.map((p) => `app/css/${p}.css`)]) assert.doesNotMatch(read(f), /Figtree/i, `${f} does not ask for Figtree`);
+  for (const f of ['index.html', 'app/css/base.css', ...PAGES.map((p) => `app/css/${p}.css`)]) assert.doesNotMatch(read(f), /Figtree/i, `${f} does not ask for Figtree`);
   assert.match(base, /--font:\s*'Geist'/);
   const pix = [...base.matchAll(/^.*Pixelify.*$/gm)].map((m) => m[0]);
   assert.equal(pix.length, 1, 'Pixelify Sans is named once, for the wordmark');

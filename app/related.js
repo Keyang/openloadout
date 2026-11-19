@@ -30,6 +30,6 @@ export function goesWith(id) {
 /** "More like this" for the foot of an asset page: one row of cards, filled in when the search is ready. */
 export function moreLikeThis(id) {
   const box = similarAssets(id, { count: 4 });
-  box.classList.replace('similar', 'more-like');      // the page's own section, laid out by the page (style.css)
+  box.classList.replace('similar', 'more-like');      // the page's own section, laid out by the page's own sheet (app/css/asset.css)
   return box;
 }
