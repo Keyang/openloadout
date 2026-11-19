@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loadout: game art, sound and music you can change</title>
+<link rel="stylesheet" href="../shared/fonts.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <a class="mark" href="landing.html">Loadout</a>
+  <nav class="top-nav" aria-label="Main">
+    <a href="library.html">Library</a>
+    <a href="library.html?kind=kits">Kits</a>
+    <a href="remix.html"><span class="wide">Change the </span>Hero</a>
+  </nav>
+  <button class="bag-btn" type="button" aria-haspopup="dialog" aria-expanded="false">Bag <span class="count" data-bag-count>0</span></button>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <h1>Game art, sound and music you can change.</h1>
+    <p class="lede">Pick a hero, a monster or a tune, change it with a few sliders and choices, and download it ready for your game.</p>
+    <div class="hero-actions">
+      <a class="btn btn-lg btn-primary" href="library.html">Browse everything</a>
+      <a class="btn btn-lg btn-secondary" href="remix.html">Change the Hero</a>
+    </div>
+    <form class="search" action="library.html" role="search">
+      <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg>
+      <input type="search" name="q" aria-label="Search the library" placeholder="Search 199 things, like slime, door or coin sound">
+    </form>
+  </section>
+
+  <section class="lineup tile" aria-label="Sprites from the three kits, drawn live">
+    <div class="lineup-row" id="lineup"></div>
+    <div class="lineup-cap">
+      <span>These are not fixed pictures. Each one is being drawn right now, so each one can change.</span>
+      <span class="btns">
+        <button class="btn btn-sm btn-secondary" type="button" id="lineup-reset" hidden>Back to the originals</button>
+        <button class="btn btn-sm btn-secondary" type="button" id="lineup-surprise">Surprise me</button>
+      </span>
+    </div>
+  </section>
+
+  <section class="section" id="how">
+    <div class="section-head"><div><h2>From the library to your game in three steps</h2></div></div>
+    <ol class="steps">
+      <li class="step">
+        <div class="step-tile tile"><div class="pick" id="pick"></div></div>
+        <h3><span class="n">1</span>Pick one</h3>
+        <p>137 sprites, 56 sounds and 6 music tracks. Search in plain words, or take a whole kit at once.</p>
+      </li>
+      <li class="step">
+        <div class="step-tile tile">
+          <div class="try">
+            <span class="hv"><lo-sprite id="try-hero" sprite="knight" clip="walk"></lo-sprite></span>
+            <div class="try-controls">
+              <div><span class="field-label" id="l-hair">Hair</span><div class="chips" id="try-hair" role="radiogroup" aria-labelledby="l-hair"></div></div>
+              <div><span class="field-label" id="l-outfit">Outfit</span><div class="swatches" id="try-outfit" role="radiogroup" aria-labelledby="l-outfit"></div></div>
+              <div><label class="field-label" for="try-height">Height</label><input id="try-height" type="range" min="0" max="1" step="0.01" value="0.5"></div>
+            </div>
+          </div>
+        </div>
+        <h3><span class="n">2</span>Change it</h3>
+        <p>These controls are real: try them. Changes are kept by themselves, and you can test them in a small playable scene.</p>
+      </li>
+      <li class="step">
+        <div class="step-tile tile">
+          <div class="sheet">
+            <div class="sheet-frames" id="sheet" aria-label="The Hero's walk as a sprite sheet"></div>
+            <div class="files"><span>hero-walk.png</span><span>hero.json</span><span>footstep.wav</span></div>
+          </div>
+        </div>
+        <h3><span class="n">3</span>Download it</h3>
+        <p>A zip of sprite sheets as PNG with a small data file, and sounds as WAV. Choose the pixel size: 1x, 2x or 4x.</p>
+      </li>
+    </ol>
+  </section>
+
+  <section class="section" id="kits">
+    <div class="section-head">
+      <div>
+        <h2>Three complete kits</h2>
+        <p>Characters, enemies, ground, objects, menus, sounds and music for one kind of game, made to belong together. Give a whole kit a new look in one go.</p>
+      </div>
+      <div class="chips" id="kit-looks" role="radiogroup" aria-label="Look for all three kits"></div>
+    </div>
+    <div class="kits" id="kit-list"></div>
+  </section>
+
+  <section class="section">
+    <div class="split">
+      <div class="split-text">
+        <h2 class="h2">One Hero, twelve ready‑made versions</h2>
+        <p>Start from one that is close. Then fine-tune the build, hair, headgear, weapon, cape and colours: the Hero has 20 controls and 9 animations.</p>
+        <a class="btn btn-secondary" href="remix.html">Change the Hero</a>
+      </div>
+      <div class="versions-grid" id="versions"></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <div><h2>A few favourites</h2></div>
+      <a class="link" href="library.html">See all 137 sprites</a>
+    </div>
+    <div class="grid-6" id="favourites"></div>
+  </section>
+
+  <section class="section">
+    <div class="split">
+      <div class="split-text">
+        <h2 class="h2">Sounds and music are part of it</h2>
+        <p>56 sound effects and 6 music tracks, made the same way as the art. Pick a style, set the length, choose the lead instrument.</p>
+        <a class="btn btn-secondary" href="library.html?kind=sound">Hear the sounds</a>
+      </div>
+      <ul class="srows" id="sounds"></ul>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="works">
+      <h2 class="h2">Where it works</h2>
+      <dl>
+        <div><dt>Unity</dt><dd>Drop the sprite sheets and sounds into your project. A Unity package is coming later.</dd></div>
+        <div><dt>Any other engine</dt><dd>If it reads PNG and WAV, it works.</dd></div>
+        <div><dt>What you download</dt><dd>One zip: sprite sheets as PNG with a small data file, sounds and music as WAV.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="section" aria-label="Loadout in numbers">
+    <div class="numbers">
+      <div><b>137</b><span>sprites</span></div>
+      <div><b>56</b><span>sounds</span></div>
+      <div><b>6</b><span>music tracks</span></div>
+      <div><b>3</b><span>complete kits</span></div>
+      <div><b>14</b><span>looks for a whole kit</span></div>
+    </div>
+  </section>
+
+  <section class="closing">
+    <h2 class="h2">Find the first thing for your game.</h2>
+    <div class="hero-actions">
+      <a class="btn btn-lg btn-primary" href="library.html">Browse everything</a>
+      <a class="btn btn-lg btn-secondary" href="remix.html">Change the Hero</a>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <span><span class="mark" style="font-size:16px;color:#000">Loadout</span>&ensp;Game art, sound and music you can change.</span>
+    <nav aria-label="Footer"><a href="library.html">Library</a><a href="library.html?kind=kits">Kits</a><a href="remix.html">Change the Hero</a></nav>
+  </footer>
+</main>
+
+<script type="module" src="landing.js"></script>
+<script type="module" src="../shared/mockbar.js"></script>
+</body>
+</html>

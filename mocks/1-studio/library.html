@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Library: Loadout</title>
+<link rel="stylesheet" href="../shared/fonts.css">
+<link rel="stylesheet" href="studio.css">
+<script type="module" src="../shared/kit.js"></script>
+</head>
+<body class="library">
+
+<header class="bar">
+  <a class="wordmark" href="landing.html">Loadout</a>
+  <nav aria-label="Main">
+    <a href="library.html" aria-current="page">Library</a>
+    <a href="library.html?kind=kits">Kits</a>
+    <a class="opt" href="remix.html">Editor</a>
+  </nav>
+  <span class="grow"></span>
+  <div class="pop-anchor">
+    <button class="btn quiet bag-btn" type="button" aria-expanded="false">Bag <span class="count">0</span></button>
+  </div>
+</header>
+
+<h1 class="sr">Library</h1>
+<div class="filters" role="search">
+  <div class="kinds" id="kinds" role="group" aria-label="What to show"></div>
+  <span class="pick" id="pGame"><select aria-label="Game type"></select></span>
+  <span class="pick" id="pTheme"><select aria-label="Theme"></select></span>
+  <span class="pick" id="pType"><select aria-label="Type"></select></span>
+  <div class="search">
+    <input id="q" type="search" placeholder="Search by plain words: sword, coin, door" aria-label="Search the library" autocomplete="off">
+    <button class="switch" id="smart" type="button" role="switch" aria-checked="false" title="Understands descriptions like &quot;something for when the player dies&quot;"><i></i>Smarter search</button>
+  </div>
+</div>
+
+<div class="lib" id="lib">
+  <main class="results">
+    <div class="results-head">
+      <span class="n" id="count" role="status"></span>
+      <span id="chips"></span>
+      <span class="hint" id="hint">Click a card to change it right here</span>
+    </div>
+    <div id="out"></div>
+  </main>
+  <aside class="quick" id="quick" hidden aria-label="Quick look"></aside>
+</div>
+
+<script type="module">
+import { h, ICON, TYPE, GAME, THEME, KITS, plain, seconds, bag, mountBag, controlEl, syncControl, sceneEl, rollEl, fit, loadCatalog, looks, url } from './studio.js';
+mountBag();
+document.querySelector('.search').insertAdjacentHTML('afterbegin', ICON.search);
+document.querySelectorAll('.pick').forEach((p) => p.insertAdjacentHTML('beforeend', ICON.chev));
+
+const { assets, bundles } = await loadCatalog();
+const byId = Object.fromEntries(assets.map((a) => [a.id, a]));
+const KINDS = [['sprite', 'Sprites', 'sprite'], ['sound', 'Sounds', 'sound'], ['music', 'Music', 'track'], ['kits', 'Kits', 'kit']];
+const qs = new URLSearchParams(location.search);
+const state = { kind: KINDS.some(([k]) => k === qs.get('kind')) ? qs.get('kind') : 'sprite', game: '', theme: '', type: '', q: qs.get('q') ?? '', smart: false, kit: '', open: qs.get('open') ?? '' };
+
+const $ = (id) => document.getElementById(id);
+const out = $('out'), quick = $('quick'), lib = $('lib');
+const sel = { game: $('pGame').firstElementChild, theme: $('pTheme').firstElementChild, type: $('pType').firstElementChild };
+$('q').value = state.q;
+
+/* ---------- search ---------- */
+const ORDER = Object.keys(TYPE);
+const STOP = new Set('a an the for of to when something some thing with and or that is in on my i it its who what'.split(' '));
+const stem = (w) => w.replace(/(ing|ed|s)$/, '');
+const ALSO = { die: ['death', 'dead', 'defeat'], win: ['victory', 'success', 'reward'], lose: ['fail', 'error'], hit: ['impact', 'hurt', 'damage'], shop: ['merchant', 'vendor'], money: ['coin', 'credit', 'gold'] };
+const hay = new Map(assets.map((a) => [a.id, [a.name, a.description, a.words.join(' '), TYPE[a.type], a.themes.join(' '), a.role].join(' ').toLowerCase()]));
+// Stand-in for the real smarter search: drop the filler words, allow a few near meanings, keep whatever matches the most ideas.
+let smartFor = null, smartBest = 0;
+const ideas = () => state.q.toLowerCase().split(/\s+/).filter((w) => w && !STOP.has(w)).map(stem).filter((w) => w.length > 1);
+const smartHits = (a) => ideas().filter((w) => [w, ...(ALSO[w] ?? [])].some((x) => hay.get(a.id).includes(x))).length;
+function score(a) {
+  const words = state.q.toLowerCase().split(/\s+/).filter(Boolean);
+  if (!words.length) return 1;
+  if (!state.smart) return words.every((w) => hay.get(a.id).includes(w)) ? 1 : 0;
+  if (smartFor !== state.q) { smartFor = state.q; smartBest = Math.max(0, ...assets.map(smartHits)); }
+  return smartBest > 0 && smartHits(a) === smartBest ? 1 : 0;
+}
+const passes = (a, kind) => a.kind === kind && (!state.game || a.gameTypes.includes(state.game)) && (!state.theme || a.themes.includes(state.theme))
+  && (!state.kit || a.bundles.includes(state.kit)) && (kind !== state.kind || !state.type || a.type === state.type);
+function found(kind) {
+  const rows = assets.filter((a) => passes(a, kind)).map((a) => [score(a), a]).filter(([s]) => s > 0);
+  rows.sort((x, y) => ORDER.indexOf(x[1].type) - ORDER.indexOf(y[1].type));   // characters first, then by kind of thing; names stay A to Z inside
+  return rows.map(([, a]) => a);
+}
+const foundKits = () => [...bundles].sort((x, y) => (KITS[x.id] ? Object.keys(KITS).indexOf(x.id) : 9) - (KITS[y.id] ? Object.keys(KITS).indexOf(y.id) : 9)).filter((b) => (!state.game || b.gameType === state.game) && (!state.q || [b.name, b.blurb, KITS[b.id]?.kind].join(' ').toLowerCase().includes(state.q.toLowerCase())));
+
+/* ---------- filter bar ---------- */
+function fillSelect(el, any, map, values) {
+  const was = el.value;
+  el.replaceChildren(h('option', { value: '' }, any), ...values.map((v) => h('option', { value: v }, map[v] ?? v)));
+  el.value = values.includes(was) ? was : '';
+}
+function paintBar() {
+  $('kinds').replaceChildren(...KINDS.map(([k, label]) => h('button', { type: 'button', 'aria-pressed': String(k === state.kind), onclick: () => { state.kind = k; state.type = ''; if (k === 'kits') state.kit = ''; closeQuick(); render(); } },
+    label, h('span', { class: 'n' }, k === 'kits' ? foundKits().length : found(k).length))));
+  const pool = state.kind === 'kits' ? [] : assets.filter((a) => a.kind === state.kind);
+  const uniq = (f) => [...new Set(pool.flatMap(f))];
+  const byCount = (f) => (x, y) => pool.filter((a) => f(a).includes(y)).length - pool.filter((a) => f(a).includes(x)).length;
+  fillSelect(sel.game, 'Any game type', GAME, state.kind === 'kits' ? ['platformer', 'turn-based-rpg', 'roguelike-action'] : uniq((a) => a.gameTypes).sort(byCount((a) => a.gameTypes)));
+  fillSelect(sel.theme, 'Any theme', THEME, uniq((a) => a.themes).sort(byCount((a) => a.themes)));
+  fillSelect(sel.type, 'Any type', TYPE, ORDER.filter((t) => pool.some((a) => a.type === t)));
+  sel.game.value = state.game; sel.theme.value = state.theme; sel.type.value = state.type;
+  state.game = sel.game.value; state.theme = sel.theme.value; state.type = sel.type.value;
+  $('pTheme').hidden = state.kind === 'kits';
+  $('pType').hidden = state.kind === 'kits' || state.kind === 'music';
+  for (const k of ['game', 'theme', 'type']) sel[k].parentElement.classList.toggle('on', !!state[k]);
+  $('q').placeholder = innerWidth < 760 ? (state.smart ? 'Describe it' : 'Search') : state.smart ? 'Describe it: something for when the player dies' : 'Search by plain words: sword, coin, door';
+}
+for (const k of ['game', 'theme', 'type']) sel[k].addEventListener('change', () => { state[k] = sel[k].value; render(); });
+$('q').addEventListener('input', () => { state.q = $('q').value.trim(); render(); });
+$('smart').addEventListener('click', () => { state.smart = !state.smart; $('smart').setAttribute('aria-checked', String(state.smart)); render(); });
+
+/* ---------- cards ---------- */
+// pictures are fetched as their card comes near the window, not all 199 at once
+const lazy = new IntersectionObserver((es) => es.forEach((e) => {
+  if (!e.isIntersecting) return;
+  lazy.unobserve(e.target);
+  if (e.target.dataset.live) return;   // the pointer is on it: the card is playing its animation
+  e.target.style.backgroundImage = `url(${e.target.dataset.src})`; lazy.unobserve(e.target);
+}), { rootMargin: '500px' });
+const later = (el, src) => { el.dataset.src = src; lazy.observe(el); return el; };
+let timer = 0;
+function spriteCard(a, box) {
+  const [w, hgt] = a.tech.frame;
+  const wide = w * 2 > box;
+  const room = wide ? box * 2 + 12 : box;
+  const s = Math.min(fit(w, hgt, room - 12, box - 12, 6), w <= 16 ? 5 : w <= 32 ? 4 : 3);
+  const pic = a.type === 'background' ? h('lo-sprite', { sprite: a.id, layers: true, scale: s })
+    : later(h('span', { class: 'pic', style: `width:${w * s}px;height:${hgt * s}px;background-size:${w * s}px ${hgt * s}px` }), url(a.thumb));
+  const card = h('div', { class: `card${wide ? ' wide' : ''}`, 'data-id': a.id },
+    h('button', { class: 'open', type: 'button', onclick: () => openQuick(a.id) },
+      h('span', { class: 'tile' }, pic), h('span', { class: 'meta' }, h('span', { class: 'name' }, a.name), h('span', { class: 'tag' }, TYPE[a.type]))),
+    addBtn(a.id, a.name));
+  if (a.type !== 'background' && a.strip && a.stripFrames > 1) {
+    card.addEventListener('pointerenter', () => {
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      let f = 0; clearInterval(timer); pic.dataset.live = '1';
+      pic.style.backgroundImage = `url(${url(a.strip)})`; pic.style.backgroundSize = `${w * s * a.stripFrames}px ${hgt * s}px`;
+      timer = setInterval(() => { f = (f + 1) % a.stripFrames; pic.style.backgroundPosition = `${-f * w * s}px 0`; }, 1000 / (a.stripFps || 8));
+    });
+    card.addEventListener('pointerleave', () => { clearInterval(timer); delete pic.dataset.live; pic.style.backgroundImage = `url(${url(a.thumb)})`; pic.style.backgroundSize = `${w * s}px ${hgt * s}px`; pic.style.backgroundPosition = '0 0'; });
+  }
+  return card;
+}
+function playBtn(a) {
+  const btn = h('button', { class: 'play', type: 'button', 'aria-pressed': 'false', 'aria-label': `Play ${a.name}`, html: ICON.play, onclick: () => {
+    const on = btn.getAttribute('aria-pressed') !== 'true';
+    btn.setAttribute('aria-pressed', String(on)); btn.innerHTML = on ? ICON.pause : ICON.play;
+    clearTimeout(btn.t); if (on) btn.t = setTimeout(() => { btn.setAttribute('aria-pressed', 'false'); btn.innerHTML = ICON.play; }, Math.min(4000, a.tech.seconds * 1000 + 300));
+  } });
+  return btn;
+}
+function soundCard(a, box) {
+  const music = a.kind === 'music';
+  const pic = music ? rollEl(a.id, 96, 40, box * 2 > 300 ? 3 : 2) : later(h('span', { class: 'snd' }), url(a.thumb));
+  return h('div', { class: `card${music ? ' wide' : ''}`, 'data-id': a.id },
+    h('button', { class: 'open', type: 'button', onclick: () => openQuick(a.id) },
+      h('span', { class: 'tile' }, pic, h('span', { class: 'len' }, `${seconds(a.tech.seconds)}${a.tech.loop ? ', loops' : ''}`)),
+      h('span', { class: 'meta' }, h('span', { class: 'name' }, a.name), h('span', { class: 'tag' }, music ? a.tech.styles.join(', ') : TYPE[a.type]))),
+    playBtn(a), addBtn(a.id, a.name));
+}
+function addBtn(id, name) {
+  const btn = h('button', { class: 'icon-btn ring add', type: 'button' });
+  const paint = () => { const on = bag.has(id); btn.setAttribute('aria-pressed', String(on)); btn.innerHTML = on ? ICON.check : ICON.plus; btn.setAttribute('aria-label', on ? `${name} is in your bag. Take it out` : `Add ${name} to your bag`); btn.title = on ? 'In your bag' : 'Add to bag'; };
+  btn.addEventListener('click', () => { bag.has(id) ? bag.remove(id) : bag.put(id); });
+  btn.paint = paint; paint();
+  return btn;
+}
+bag.onChange(() => { document.querySelectorAll('.add').forEach((b) => b.paint?.()); paintQuickFoot?.(); });
+
+/* ---------- results ---------- */
+function render() {
+  paintBar();
+  const chips = $('chips'); chips.replaceChildren();
+  const any = state.game || state.theme || state.type || state.q || state.kit;
+  if (state.kit) chips.append(h('span', { class: 'muted', style: 'margin-right:12px' }, `in ${KITS[state.kit]?.name ?? bundles.find((b) => b.id === state.kit).name}`));
+  if (any) chips.append(h('button', { class: 'link', type: 'button', style: 'border:0;background:none;padding:0', onclick: () => { Object.assign(state, { game: '', theme: '', type: '', q: '', kit: '' }); $('q').value = ''; render(); } }, 'Clear filters'));
+  $('hint').hidden = state.kind === 'kits';
+  const word = KINDS.find(([k]) => k === state.kind)[2];
+  if (state.kind === 'kits') return renderKits();
+  const rows = found(state.kind);
+  $('count').textContent = `${rows.length} ${word}${rows.length === 1 ? '' : 's'}`;
+  if (!rows.length) {
+    $('hint').hidden = true;
+    const other = KINDS.filter(([k]) => k !== state.kind && k !== 'kits').map(([k, label]) => [k, label, found(k).length]).filter((x) => x[2]);
+    out.replaceChildren(h('div', { class: 'empty' }, h('h2', {}, `No ${word}s match`),
+      h('p', {}, other.length ? `There ${other[0][2] === 1 ? 'is' : 'are'} ${other.map(([, l, n]) => `${n} in ${l}`).join(' and ')}. Or try fewer words, or turn on smarter search and describe what you need.` : 'Try fewer words, or turn on smarter search and describe what you need.'),
+      other.length ? h('button', { class: 'btn', type: 'button', onclick: () => { state.kind = other[0][0]; state.type = ''; render(); } }, `Show ${other[0][1].toLowerCase()}`) : null));
+    return;
+  }
+  const grid = h('div', { class: 'grid' });
+  out.replaceChildren(grid);
+  const cols = getComputedStyle(grid).gridTemplateColumns.split(' ');
+  const box = Math.floor(parseFloat(cols[0]));
+  grid.style.setProperty('--tile', `${Math.min(208, box)}px`);
+  grid.append(...rows.map((a) => (a.kind === 'sprite' ? spriteCard(a, Math.min(208, box)) : soundCard(a, box))));
+  markOpen();
+}
+function renderKits() {
+  const kits = foundKits(), full = kits.filter((b) => KITS[b.id]), small = kits.filter((b) => !KITS[b.id]);
+  $('count').textContent = `${kits.length} kit${kits.length === 1 ? '' : 's'}`;
+  const grid = h('div', { class: 'kit-grid' }, full.map((b) => h('div', { class: 'card kit-card', 'data-id': b.id },
+    h('button', { class: 'open', type: 'button', onclick: () => openQuick(b.id) }, sceneEl(b.id, 2),
+      h('span', { class: 'meta' }, h('span', { class: 'name' }, KITS[b.id].name), h('span', { class: 'tag' }, `${KITS[b.id].kind}. ${b.sprites.length} sprites, ${b.sounds.length} sounds, ${b.music.length} music tracks`))),
+    addBtn(b.id, KITS[b.id].name))));
+  out.replaceChildren(grid);
+  if (small.length) out.append(h('h2', { class: 'sets-title' }, 'Small starter sets'), h('ul', { class: 'sets' }, small.map((b) => h('li', {},
+    h('span', { class: 'name' }, b.name), h('span', { class: 'what' }, b.blurb),
+    h('button', { class: 'btn', type: 'button', onclick: () => openQuick(b.id) }, `Look inside: ${b.sprites.length + b.sounds.length + b.music.length} things`)))));
+  if (!kits.length) out.replaceChildren(h('div', { class: 'empty' }, h('h2', {}, 'No kits match'), h('p', {}, 'Try another game type, or clear the search.')));
+  markOpen();
+}
+const markOpen = () => document.querySelectorAll('.card').forEach((c) => c.classList.toggle('sel', c.dataset.id === state.open));
+const showOpen = () => document.querySelector('.card.sel')?.scrollIntoView({ block: 'nearest' });
+
+/* ---------- quick look: change an asset without leaving the library ---------- */
+let paintQuickFoot = null;
+function closeQuick() { state.open = ''; quick.hidden = true; quick.replaceChildren(); lib.classList.remove('open'); paintQuickFoot = null; markOpen(); }
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && state.open) { closeQuick(); render(); } });
+
+function shell(id, name, stageKid, bodyKids, { addLabel = 'Add to bag', second } = {}) {
+  const saved = h('span', { class: 'saved', role: 'status' });
+  const add = h('button', { class: 'btn primary', type: 'button' });
+  paintQuickFoot = () => {
+    const on = bag.has(id), it = bag.get(id);
+    const n = it?.params ? Object.keys(it.params).length : 0;
+    add.className = on ? 'btn' : 'btn primary';
+    add.innerHTML = on ? `${ICON.check}In your bag` : addLabel;
+    add.title = on ? 'Click to take it out of your bag' : '';
+    saved.classList.toggle('on', on);
+    saved.innerHTML = on ? (n || it?.look || it?.style ? `${ICON.check}Saved in your bag, with your changes` : 'Anything you change here is kept') : 'Change it and it is kept in your bag by itself';
+  };
+  add.addEventListener('click', () => (bag.has(id) ? bag.remove(id) : bag.put(id)));
+  quick.replaceChildren(
+    h('div', { class: 'stage' }, stageKid, h('button', { class: 'icon-btn ring close', type: 'button', 'aria-label': 'Close quick look', html: ICON.x, onclick: () => { closeQuick(); render(); } })),
+    h('div', { class: 'quick-body' }, bodyKids),
+    h('div', { class: 'quick-foot' }, saved, h('div', { class: 'row' }, add, second)));
+  quick.hidden = false; lib.classList.add('open');
+  quick.setAttribute('aria-label', `Quick look: ${name}`);
+  paintQuickFoot();
+}
+const inKits = (a) => a.bundles.filter((b) => KITS[b]).map((b) => KITS[b].name);
+const head = (name, tag, desc) => [h('div', {}, h('h2', {}, name), h('p', { class: 'tag' }, tag)), h('p', { class: 'desc' }, desc)];
+
+async function quickSprite(a) {
+  const [w, hgt] = a.tech.frame, bgd = a.type === 'background';
+  const el = h('lo-sprite', { sprite: a.id, scale: fit(w, hgt, 380, 224, 6), layers: bgd });
+  const ctlBox = h('div', { class: 'ctls' }), more = h('p', { class: 'muted', style: 'font-size:13px' });
+  const kits = inKits(a);
+  shell(a.id, a.name, el, [
+    ...head(a.name, `${TYPE[a.type]}${kits.length ? `, in ${kits.join(' and ')}` : ''}`, a.description),
+    h('div', { class: 'rule' }), ctlBox, more,
+  ], { second: h('a', { class: 'btn', href: 'remix.html', title: a.id === 'knight' ? '' : 'In this mock-up the full editor is shown with the Hero' }, 'Open the full editor') });
+  await el.ready;
+  if (state.open !== a.id) return;
+  const kept = bag.get(a.id);
+  if (kept?.params) el.setParams(kept.params);
+  const keep = () => { const p = {}; for (const k of el.changed()) p[k] = el.params[k]; bag.put(a.id, { params: p }); };
+  const set = (key, value) => { el.set(key, value); keep(); };
+  // the most useful few: what it wears or holds first, then colours, then sliders
+  const pick = () => {
+    const all = el.controls().flatMap((g) => g.items);
+    const rank = (i) => (i.isSelector ? 0 : i.kind === 'choice' ? 1 : i.kind === 'color' ? 2 : i.kind === 'toggle' ? 3 : 4);
+    const top = [...all].sort((x, y) => rank(x) - rank(y)).slice(0, 4);
+    return [all.filter((i) => top.includes(i)), all.length];
+  };
+  const clips = el.clips, over = h('div', { class: 'over' });
+  if (!bgd && clips.length > 1) {
+    const label = a.type === 'tileset' || a.type === 'ui' || a.type === 'icon' ? 'Piece' : 'Animation';
+    const pickClip = h('select', { 'aria-label': label, onchange: () => el.setClip(pickClip.value) }, clips.map((c) => h('option', { value: c.name, selected: c.name === el.clip }, c.label)));
+    over.append(h('span', { class: 'pick' }, pickClip, h('span', { html: ICON.chev, style: 'display:contents' })));
+  }
+  over.append(h('span', { style: 'flex:1' }), h('button', { class: 'btn', type: 'button', onclick: () => { el.surprise(); keep(); } }, 'Surprise me'));
+  el.after(over);
+  let shape = '';
+  const paint = () => {
+    const [list, total] = pick(), sig = list.map((i) => i.key).join();
+    if (sig !== shape) { shape = sig; ctlBox.replaceChildren(...list.map((i) => controlEl(i, set, { idPrefix: 'q' }))); }
+    else list.forEach((i) => syncControl(ctlBox, i));
+    more.textContent = total > list.length ? `${total - list.length} more controls in the full editor.` : '';
+  };
+  el.addEventListener('change', paint); paint();
+}
+
+async function quickSound(a) {
+  const music = a.kind === 'music';
+  const pic = music ? rollEl(a.id, 96, 40, 3) : h('span', { class: 'big-wave', style: `background-image:url(${url(a.thumb)})` });
+  const prog = h('div', { class: 'progress' }, h('i'));
+  const play = h('button', { class: 'play', type: 'button', 'aria-pressed': 'false', 'aria-label': `Play ${a.name}`, html: ICON.play, onclick: () => {
+    const on = play.getAttribute('aria-pressed') !== 'true', ms = Math.min(4000, a.tech.seconds * 1000 + 300);
+    play.setAttribute('aria-pressed', String(on)); play.innerHTML = on ? ICON.pause : ICON.play;
+    prog.classList.remove('go'); prog.style.setProperty('--dur', `${ms}ms`); void prog.offsetWidth; if (on) prog.classList.add('go');
+    clearTimeout(play.t); if (on) play.t = setTimeout(() => { play.setAttribute('aria-pressed', 'false'); play.innerHTML = ICON.play; prog.classList.remove('go'); }, ms);
+  } });
+  const ctlBox = h('div', { class: 'ctls' });
+  const kits = inKits(a);
+  shell(a.id, a.name, pic, [
+    ...head(a.name, `${TYPE[a.type]}${kits.length ? `, in ${kits.join(' and ')}` : ''}`, a.description),
+    h('div', { class: 'player' }, play, prog, h('span', { class: 'muted num' }, `${seconds(a.tech.seconds)}${a.tech.loop ? ', loops' : ''}`)),
+    h('div', { class: 'rule' }), ctlBox,
+    h('p', { class: 'muted', style: 'font-size:13px' }, 'No sound plays in this mock-up.'),
+  ], { second: h('span', { class: 'btn', 'aria-disabled': 'true', title: 'Only the Hero\'s editor is part of this mock-up' }, 'Open the full editor') });
+  // the real controls of the sound, read from its own file
+  const patch = await fetch(url(a.src)).then((r) => r.json()).catch(() => null);
+  if (state.open !== a.id || !patch) return;
+  const kept = bag.get(a.id) ?? {};
+  const styles = Object.keys(patch.presets ?? {});
+  const values = { ...Object.fromEntries(patch.params.map((p) => [p.id, p.default])), ...(patch.presets?.[kept.style ?? styles[0]] ?? {}), ...(kept.params ?? {}) };
+  let style = kept.style ?? styles[0];
+  const want = music ? ['bars', 'inst', 'intensity'] : patch.params.slice(0, 3).map((p) => p.id);
+  const paint = () => {
+    const items = [];
+    if (styles.length) items.push({ key: '__style', kind: 'choice', label: 'Style', value: style, options: styles.map((s) => ({ value: s, label: s })) });
+    for (const id of want) {
+      const p = patch.params.find((x) => x.id === id); if (!p) continue;
+      if (p.options) items.push({ key: p.id, kind: 'choice', label: p.label, value: String(Math.round(values[p.id])), options: p.options.map((o, i) => ({ value: String(i), label: o })) });
+      else items.push({ key: p.id, kind: 'range', label: p.id === 'bars' ? `Length: ${values[p.id]} bars` : p.label, value: values[p.id], min: p.min, max: p.max, step: p.step ?? (p.max - p.min) / 100, lo: p.id === 'bars' ? 'Short' : 'Less', hi: p.id === 'bars' ? 'Long' : 'More' });
+    }
+    ctlBox.replaceChildren(...items.map((i) => controlEl(i, (key, v) => {
+      if (key === '__style') { style = v; Object.assign(values, Object.fromEntries(patch.params.map((p) => [p.id, p.default])), patch.presets[v]); bag.put(a.id, { style, params: {} }); paint(); return; }
+      values[key] = Number(v);
+      bag.put(a.id, { style, params: { ...(bag.get(a.id)?.params ?? {}), [key]: Number(v) } });
+      const p = patch.params.find((x) => x.id === key);
+      if (p.options) paint(); else if (key === 'bars') ctlBox.querySelector(`[data-key="bars"] .ctl-label`).textContent = `Length: ${v} bars`;
+    }, { idPrefix: 'q' })));
+  };
+  paint();
+}
+
+function quickKit(b) {
+  const full = !!KITS[b.id], name = KITS[b.id]?.name ?? b.name;
+  const kept = bag.get(b.id) ?? {};
+  let stage, setLook = () => {};
+  if (full) { stage = sceneEl(b.id, 2); setLook = (l) => stage.setLook(l); if (kept.look) setLook(kept.look); }
+  else {
+    const els = b.sprites.slice(0, 4).map((id) => h('lo-sprite', { sprite: id, scale: fit(...byId[id].tech.frame, 88, 160, 3) }));
+    stage = h('div', { style: 'display:flex;gap:8px;align-items:end' }, els);
+    setLook = (l) => els.forEach((e) => (e.def ? e.setLook(l) : e.setAttribute('look', l)));
+  }
+  const lookSel = h('select', { id: 'qLook', onchange: () => { setLook(lookSel.value); bag.put(b.id, { look: lookSel.value }); } }, looks.map((l) => h('option', { value: l.id, selected: l.id === (kept.look ?? 'original') }, l.name)));
+  const types = {}; for (const id of b.sprites) types[byId[id].type] = (types[byId[id].type] ?? 0) + 1;
+  const WORD = { character: 'character', creature: 'creature', tileset: 'set of ground tiles', prop: 'object', pickup: 'pickup', projectile: 'projectile', effect: 'effect', background: 'background', ui: 'menu piece', icon: 'set of icons' };
+  const many = (t, n) => (n === 1 ? WORD[t] : WORD[t].replace(/^(\w+)/, '$1s'));
+  shell(b.id, name, stage, [
+    ...head(name, full ? KITS[b.id].kind : 'Small starter set', b.blurb),
+    h('p', { class: 'counts' }, h('span', {}, h('b', {}, b.sprites.length), ' sprites'), h('span', {}, h('b', {}, b.sounds.length), ' sounds'), h('span', {}, h('b', {}, b.music.length), ' music tracks')),
+    h('div', { class: 'rule' }),
+    h('div', { class: 'ctl' }, h('label', { class: 'ctl-label', for: 'qLook' }, 'Look for the whole kit (14)'), h('span', { class: 'pick block' }, lookSel, h('span', { html: ICON.chev, style: 'display:contents' })),
+      h('div', {}, h('button', { class: 'btn', type: 'button', style: 'margin-top:8px', onclick: () => { const l = looks[1 + Math.floor(Math.random() * (looks.length - 1))]; lookSel.value = l.id; setLook(l.id); bag.put(b.id, { look: l.id }); } }, 'Surprise me'))),
+    h('div', { class: 'rule' }),
+    h('p', { class: 'muted' }, `Inside: ${Object.entries(types).map(([t, n]) => `${n} ${many(t, n)}`).join(', ')}.`),
+  ], { addLabel: 'Add the whole kit', second: h('button', { class: 'btn', type: 'button', onclick: () => { Object.assign(state, { kind: 'sprite', kit: b.id, type: '', game: '', theme: '' }); closeQuick(); render(); } }, 'See its sprites') });
+}
+
+function openQuick(id) {
+  state.open = id; markOpen();
+  const b = bundles.find((x) => x.id === id), a = byId[id];
+  const was = lib.classList.contains('open');
+  if (b) quickKit(b); else if (a.kind === 'sprite') quickSprite(a); else quickSound(a);
+  if (!was && state.kind !== 'kits') { render(); state.open = id; markOpen(); showOpen(); }   // the grid is narrower now: fit the pictures again
+}
+
+const bar = document.querySelector('.filters');
+new ResizeObserver(() => document.documentElement.style.setProperty('--filters-h', `${bar.offsetHeight}px`)).observe(bar);
+let rz = 0, lastW = innerWidth;
+addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { if (innerWidth !== lastW) { lastW = innerWidth; render(); } }, 150); });
+render();
+if (state.open && (byId[state.open] || bundles.some((b) => b.id === state.open))) openQuick(state.open);
+</script>
+<script type="module" src="../shared/mockbar.js"></script>
+</body>
+</html>

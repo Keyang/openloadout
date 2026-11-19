@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hero: Loadout editor</title>
+<link rel="stylesheet" href="../shared/fonts.css">
+<link rel="stylesheet" href="studio.css">
+<script type="module" src="../shared/kit.js"></script>
+</head>
+<body class="remix">
+
+<header class="bar">
+  <a class="wordmark" href="landing.html">Loadout</a>
+  <span class="rule"></span>
+  <nav class="crumbs" aria-label="Where you are">
+    <a href="library.html">Library</a><span class="sep" aria-hidden="true">/</span><span aria-current="page">Hero</span>
+  </nav>
+  <span class="grow"></span>
+  <span class="saved" id="saved" role="status"></span>
+  <button class="btn quiet" type="button" id="surprise" aria-label="Surprise me"><span class="ico" data-i="dice"></span><span class="hide-s">Surprise me</span></button>
+  <button class="btn quiet" type="button" id="reset" aria-label="Start over"><span class="ico" data-i="undo"></span><span class="hide-s">Start over</span></button>
+  <div class="pop-anchor">
+    <button class="icon-btn" type="button" id="moreBtn" aria-label="More" aria-expanded="false"><span class="ico" data-i="more"></span></button>
+  </div>
+  <div class="pop-anchor">
+    <button class="btn primary" type="button" id="dlBtn" aria-expanded="false"><span class="ico" data-i="down"></span>Download</button>
+  </div>
+  <div class="pop-anchor hide-s">
+    <button class="btn quiet bag-btn" type="button" aria-expanded="false">Bag <span class="count">0</span></button>
+  </div>
+</header>
+
+<div class="editor">
+  <aside class="rail" aria-label="Animations and scene">
+    <div class="rail-head">
+      <h1>Hero</h1>
+      <p>A brave adventurer. Change the build, hair, gear and how they move.</p>
+    </div>
+    <div class="anims">
+      <div class="pane-title"><span>Animations</span><span class="num" id="animCount"></span></div>
+      <ul id="anims"></ul>
+    </div>
+    <div class="rail-scene">
+      <button class="switch" type="button" role="switch" aria-checked="false" id="scene"><i></i>Try it in a scene</button>
+      <small>Forest background, standing on grass</small>
+    </div>
+    <div class="rail-kits">
+      <h2>Part of</h2>
+      <ul>
+        <li><a class="link" href="library.html?kind=kits&open=kit-platformer-fantasy">Thornwood Keep</a></li>
+        <li><a class="link" href="library.html?kind=kits&open=kit-rpg-fantasy">Hearthvale</a></li>
+        <li><a class="link" href="library.html?kind=kits&open=dungeon-starter">Dungeon starter</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <section class="centre" aria-label="Preview">
+    <div class="pinned">
+      <div class="stage big-stage" id="stage">
+        <lo-sprite id="bg" sprite="bg-forest" layers hidden class="scene-bg"></lo-sprite>
+        <div class="ground" id="ground" hidden></div>
+        <div class="floor" id="floor"></div>
+        <span class="stage-name">Hero</span>
+        <lo-sprite id="hero" sprite="knight" clip="walk" paused frame="0" role="img" aria-label="The Hero, with your changes"></lo-sprite>
+      </div>
+    </div>
+    <div class="transport">
+      <button class="icon-btn ring" type="button" id="play" aria-label="Pause"></button>
+      <button class="icon-btn" type="button" id="prev" aria-label="Previous frame"><span class="ico" data-i="prev"></span></button>
+      <button class="icon-btn" type="button" id="next" aria-label="Next frame"><span class="ico" data-i="next"></span></button>
+      <span class="frame" id="frameLbl"></span>
+      <span class="grow"></span>
+      <span class="lbl">Speed</span>
+      <div class="seg" id="speed" role="group" aria-label="Playback speed"></div>
+    </div>
+    <div class="timeline">
+      <div class="lbl"><b>Sounds</b> <span id="tlClip"></span></div>
+      <div class="track-area">
+        <div class="cues" id="cues"></div>
+        <div class="ticks" id="ticks" role="group" aria-label="Frames"></div>
+      </div>
+    </div>
+    <div class="looks">
+      <div class="lbl">Look <b id="lookName">Original</b></div>
+      <ul id="looks"></ul>
+    </div>
+  </section>
+
+  <aside class="inspector" aria-label="Controls">
+    <div class="pane-title"><span>Controls</span><span class="num" id="ctlCount"></span></div>
+    <div id="groups"></div>
+  </aside>
+</div>
+
+<script type="module">
+import { clipFps, cueInEffect } from '../../engine/sprite.js';   // the shared kit keeps these to itself; read here for the transport and the timeline
+import { h, ICON, plain, bag, mountBag, controlEl, syncControl, tileURL, loadCatalog, looks } from './studio.js';
+mountBag();
+document.querySelectorAll('.ico').forEach((el) => { el.outerHTML = ICON[el.dataset.i]; });
+
+const $ = (id) => document.getElementById(id);
+const hero = $('hero'), bgEl = $('bg'), ground = $('ground'), stage = $('stage'), floor = $('floor');
+const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const state = { playing: !still, speed: 1, frame: 0, scene: false, px: 2, open: new Set(innerHeight >= 960 ? ['Body', 'Hair', 'Weapon'] : ['Hair', 'Weapon']) };
+
+await hero.ready;
+const { assets } = await loadCatalog();
+const soundName = (id) => assets.find((a) => a.id === id)?.name ?? id;
+const kept = bag.get('knight');
+if (kept) { hero.setParams(kept.params ?? {}); if (kept.look) hero.setLook(kept.look); }
+
+/* ---------- kept by itself ---------- */
+const keep = () => { const p = {}; for (const k of hero.changed()) p[k] = hero.params[k]; bag.put('knight', { params: p, look: hero.look }); };
+const paintSaved = () => {
+  const on = bag.has('knight');
+  $('saved').classList.toggle('on', on);
+  $('saved').innerHTML = on ? `${ICON.check}<span>Saved<span class="long"> in your bag</span></span>` : '<span class="long">Changes are kept in your bag</span>';
+};
+bag.onChange(paintSaved); paintSaved();
+
+/* ---------- stage: whole-number zoom, plain or in a scene ---------- */
+function layout() {
+  const W = stage.clientWidth, H = stage.clientHeight;
+  if (state.scene) {
+    const S = Math.max(2, Math.ceil(Math.max(W / 320, H / 180)));
+    bgEl.setAttribute('scale', S);
+    bgEl.style.left = `${Math.round((W - 320 * S) / 2)}px`; bgEl.style.bottom = '0';
+    ground.style.height = `${32 * S}px`; ground.style.backgroundSize = `${32 * S}px ${32 * S}px`;
+    ground.style.backgroundPosition = `${Math.round(W / 2)}px 0`;
+    hero.setAttribute('scale', S);
+    hero.style.left = `${Math.round(W / 2 - 28 * S)}px`; hero.style.top = `${H - (23 + 64) * S}px`;
+  } else {
+    const P = Math.max(2, Math.min(9, Math.floor(Math.min(W - 24, H - 24) / 64)));
+    hero.setAttribute('scale', P);
+    const top = Math.round((H - 64 * P) / 2);
+    hero.style.left = `${Math.round((W - 64 * P) / 2)}px`; hero.style.top = `${top}px`;
+    floor.style.top = `${top + 58 * P}px`;
+  }
+  bgEl.hidden = ground.hidden = !state.scene; floor.hidden = state.scene;
+}
+const paintGround = () => tileURL('tiles-forest', 'grass-top', hero.look).then((u) => (ground.style.backgroundImage = `url(${u})`));
+new ResizeObserver(layout).observe(stage);
+$('scene').addEventListener('click', () => {
+  state.scene = !state.scene; $('scene').setAttribute('aria-checked', String(state.scene));
+  if (state.scene) { bgEl.setLook?.(hero.look); paintGround(); }
+  layout();
+});
+
+/* ---------- transport: this page steps the frames itself, so it can pause, scrub and change speed ---------- */
+const clipDef = () => hero.def.clips[hero.clip];
+let t0 = performance.now();
+function show(f) {
+  state.frame = f;
+  hero.setAttribute('frame', f);
+  $('frameLbl').textContent = `Frame ${f + 1} of ${clipDef().frames}`;
+  $('ticks').querySelectorAll('button').forEach((b, i) => b.classList.toggle('at', i === f));
+  if (state.playing) $('cues').querySelectorAll('.cue').forEach((c) => { if (Number(c.dataset.frame) === f) flash(c); });
+}
+const flash = (c) => { c.classList.add('hit'); clearTimeout(c.t); c.t = setTimeout(() => c.classList.remove('hit'), 220); };
+function tick(now) {
+  if (state.playing) {
+    const c = clipDef(), fps = clipFps(hero.def, hero.clip, hero.params) * state.speed;
+    const n = Math.floor(((now - t0) / 1000) * fps);
+    const f = c.loop ? n % c.frames : Math.min(n % (c.frames + Math.ceil(fps * 0.7)), c.frames - 1);   // one-shot animations hold their last frame, then start again
+    if (f !== state.frame) show(f);
+  }
+  requestAnimationFrame(tick);
+}
+const paintPlay = () => { $('play').innerHTML = state.playing ? ICON.pause : ICON.play; $('play').setAttribute('aria-label', state.playing ? 'Pause' : 'Play'); };
+const setPlaying = (on) => { state.playing = on; if (on) t0 = performance.now() - (state.frame / (clipFps(hero.def, hero.clip, hero.params) * state.speed)) * 1000; paintPlay(); };
+$('play').addEventListener('click', () => setPlaying(!state.playing));
+const step = (d) => { setPlaying(false); const n = clipDef().frames; show((state.frame + d + n) % n); };
+$('prev').addEventListener('click', () => step(-1));
+$('next').addEventListener('click', () => step(1));
+for (const [v, label] of [[0.5, '0.5x'], [1, '1x'], [2, '2x']]) {
+  $('speed').append(h('button', { type: 'button', 'aria-pressed': String(v === 1), onclick: (e) => {
+    state.speed = v; t0 = performance.now(); $('speed').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b === e.currentTarget)));
+  } }, label));
+}
+
+/* ---------- animations ---------- */
+$('animCount').textContent = hero.clips.length;
+function paintAnims() {
+  $('anims').replaceChildren(...hero.clips.map((c) => h('li', {}, h('button', { type: 'button', 'aria-pressed': String(c.name === hero.clip), onclick: () => {
+    hero.setClip(c.name); t0 = performance.now(); paintAnims(); paintTimeline(); show(0);
+  } }, h('span', {}, c.label), h('small', {}, `${c.frames} frames${c.loop ? ', loops' : ''}`)))));
+}
+
+/* ---------- timeline: frames as ticks, sounds as markers on the frame they fire ---------- */
+function paintTimeline() {
+  const c = clipDef(), n = c.frames;
+  $('tlClip').textContent = `on ${hero.clips.find((x) => x.name === hero.clip).label.toLowerCase()}`;
+  $('ticks').replaceChildren(...Array.from({ length: n }, (_, i) => h('button', { type: 'button', class: i === state.frame ? 'at' : '', 'aria-label': `Go to frame ${i + 1}`, onclick: () => { setPlaying(false); show(i); } }, i + 1)));
+  const cues = (hero.def.sounds?.[hero.clip] ?? []).filter((q) => cueInEffect(hero.def, q, hero.params)).sort((a, b) => a.frame - b.frame);
+  if (!cues.length) return void $('cues').replaceChildren(h('span', { class: 'none' }, 'This animation has no sounds.'));
+  $('cues').replaceChildren(...cues.map((q, i) => {
+    const room = ((cues.find((x) => x.frame > q.frame)?.frame ?? n) - q.frame) / n * 100;
+    const b = h('button', { type: 'button', class: 'cue', 'data-frame': q.frame, style: `left:${(q.frame / n) * 100}%;--room:calc(${room}% - 6px)`,
+      title: `${soundName(q.sound)}, ${q.preset}: plays on frame ${q.frame + 1}. No sound plays in this mock-up.`, 'aria-label': `Play ${soundName(q.sound)}, ${q.preset}, on frame ${q.frame + 1}`, onclick: () => flash(b) },
+      h('span', { html: ICON.play, style: 'display:contents' }), h('span', {}, soundName(q.sound), ' ', h('em', {}, q.preset)));
+    return b;
+  }));
+}
+
+/* ---------- looks: each swatch is the Hero itself in that look ---------- */
+const lookEls = looks.map((l) => {
+  const mini = h('lo-sprite', { sprite: 'knight', clip: 'idle', paused: true, look: l.id === 'original' ? null : l.id });
+  const btn = h('button', { type: 'button', title: `${l.name}: ${l.blurb}`, 'aria-label': `${l.name} look`, 'aria-pressed': String(l.id === hero.look), onclick: () => { hero.setLook(l.id); keep(); } }, mini);
+  $('looks').append(h('li', {}, btn));
+  return [l, btn, mini];
+});
+let lookTimer = 0;
+const paintLooks = () => {
+  lookEls.forEach(([l, btn]) => btn.setAttribute('aria-pressed', String(l.id === hero.look)));
+  $('lookName').textContent = looks.find((l) => l.id === hero.look)?.name ?? 'Original';
+  clearTimeout(lookTimer); lookTimer = setTimeout(() => lookEls.forEach(([, , mini]) => mini.def && mini.setParams(hero.params)), 160);
+};
+
+/* ---------- inspector: every control of the Hero, in sections ---------- */
+const groupsEl = $('groups');
+const set = (key, value) => { hero.set(key, value); keep(); };
+let shape = '';
+function summary(g) {
+  const dflt = (i) => i.value === i.def;
+  const selector = g.items.find((i) => i.isSelector);
+  const out = [];
+  if (g.items.some((i) => !dflt(i))) out.push(h('i', { class: 'chg', title: 'Changed' }));
+  if (selector) out.push(selector.options.find((o) => o.value === selector.value)?.label ?? '');
+  else if (g.items.every((i) => i.kind === 'color')) out.push(...g.items.map((i) => h('i', { class: 'dot', style: `--c:${i.value}` })));
+  else { const n = g.items.filter((i) => !dflt(i)).length; out.push(n ? `${n} changed` : 'As it comes'); }
+  return out;
+}
+function paintGroups() {
+  const groups = hero.controls();
+  $('ctlCount').textContent = groups.reduce((n, g) => n + g.items.length, 0);
+  const sig = groups.map((g) => `${g.group}${state.open.has(plain(g.group)) ? '+' : '-'}:${g.items.map((i) => i.key).join()}`).join('|');
+  if (sig === shape) {
+    for (const g of groups) { g.items.forEach((i) => syncControl(groupsEl, i)); groupsEl.querySelector(`[data-group="${g.group}"] .sum`).replaceChildren(...summary(g)); }
+    return;
+  }
+  shape = sig;
+  groupsEl.replaceChildren(...groups.map((g) => {
+    const name = plain(g.group), open = state.open.has(name), id = `g-${g.group}`;
+    const body = h('div', { class: 'group-body', id, hidden: !open }, g.items.map((i) => {
+      const c = controlEl(i, set);
+      if (i.isSelector) c.querySelector('.ctl-label').classList.add('sr');
+      return c;
+    }));
+    return h('section', { class: 'group', 'data-group': g.group },
+      h('button', { type: 'button', 'aria-expanded': String(open), 'aria-controls': id, onclick: () => { state.open.has(name) ? state.open.delete(name) : state.open.add(name); paintGroups(); } },
+        h('span', { html: ICON.right, style: 'display:contents' }), h('span', {}, name), h('span', { class: 'sum' }, summary(g))),
+      body);
+  }));
+}
+
+hero.addEventListener('change', () => { paintGroups(); paintLooks(); paintTimeline(); if (state.scene) { bgEl.setLook(hero.look); paintGround(); } });
+$('surprise').addEventListener('click', () => { hero.surprise(); keep(); });
+$('reset').addEventListener('click', () => { hero.reset(); hero.setLook('original'); bag.remove('knight'); });
+
+/* ---------- download and the small menu ---------- */
+const pops = [];
+function popover(btn, build) {
+  let pop = null;
+  const close = () => { pop?.remove(); pop = null; btn.setAttribute('aria-expanded', 'false'); };
+  btn.addEventListener('click', (e) => { e.stopPropagation(); if (pop) return close(); pops.forEach((c) => c()); pop = build(close); pop.addEventListener('click', (ev) => ev.stopPropagation()); btn.parentElement.append(pop); btn.setAttribute('aria-expanded', 'true'); });
+  pops.push(close);
+}
+document.addEventListener('click', () => pops.forEach((c) => c()));
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') pops.forEach((c) => c()); });
+
+popover($('dlBtn'), () => {
+  const frames = hero.clips.reduce((n, c) => n + c.frames, 0), sounds = new Set(Object.values(hero.def.sounds ?? {}).flat().map((q) => q.sound)).size;
+  const note = h('p', { class: 'size-note' });
+  const seg = h('div', { class: 'seg', role: 'group', 'aria-label': 'Pixel size' });
+  const paint = () => { note.textContent = `Each frame is ${64 * state.px} by ${64 * state.px} pixels.`; seg.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(Number(b.dataset.px) === state.px))); };
+  for (const px of [1, 2, 4]) seg.append(h('button', { type: 'button', 'data-px': px, onclick: () => { state.px = px; paint(); } }, `${px}x`));
+  const go = h('button', { class: 'btn primary', type: 'button', onclick: () => { go.textContent = 'This mock-up does not make the zip'; setTimeout(() => (go.textContent = 'Download the zip'), 2200); } }, 'Download the zip');
+  const pop = h('div', { class: 'pop dl', role: 'dialog', 'aria-label': 'Download the Hero' },
+    h('h3', {}, 'Download the Hero, with your changes'),
+    h('div', { class: 'ctl' }, h('span', { class: 'ctl-label' }, 'Pixel size'), seg, note),
+    h('ul', {},
+      h('li', {}, h('span', {}, 'Sprite sheet, PNG'), h('span', {}, `${frames} frames in ${hero.clips.length} animations`)),
+      h('li', {}, h('span', {}, 'Data file'), h('span', {}, 'Frame positions and timing')),
+      h('li', {}, h('span', {}, 'Sounds, WAV'), h('span', {}, `${sounds} sounds`))),
+    go,
+    h('p', { class: 'note', style: 'margin:0' }, 'Works in Unity and any engine that reads PNG and WAV. A Unity package is coming later.'));
+  paint();
+  return pop;
+});
+popover($('moreBtn'), (close) => {
+  const inBag = bag.has('knight');
+  return h('div', { class: 'pop menu', role: 'menu' },
+    h('button', { type: 'button', role: 'menuitem', onclick: (e) => { e.currentTarget.textContent = 'Link copied (mock-up)'; setTimeout(close, 900); } }, 'Copy a link to this Hero'),
+    h('a', { role: 'menuitem', href: 'library.html?q=fighter' }, 'More like this'),
+    h('button', { type: 'button', role: 'menuitem', onclick: () => { inBag ? bag.remove('knight') : keep(); close(); } }, inBag ? 'Take out of your bag' : 'Put in your bag as it is'));
+});
+
+paintAnims(); paintTimeline(); paintGroups(); paintLooks(); paintPlay(); layout(); show(0);
+requestAnimationFrame(tick);
+</script>
+<script type="module" src="../shared/mockbar.js"></script>
+</body>
+</html>

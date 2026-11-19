@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Library: Loadout</title>
+<link rel="stylesheet" href="../shared/fonts.css">
+<link rel="stylesheet" href="site.css">
+<script type="module" src="../shared/kit.js"></script>
+<script type="module" src="library.js"></script>
+</head>
+<body>
+
+<header class="site-head">
+  <div class="wrap head-row">
+    <a class="wordmark" href="landing.html">Loadout</a>
+    <nav class="site-nav" aria-label="Main">
+      <a href="library.html" aria-current="page">Library</a>
+      <a href="remix.html">Make a hero</a>
+      <button type="button" title="The playground is not part of this mock-up">Playground</button>
+    </nav>
+    <button class="bag" type="button" title="The bag is not part of this mock-up">Bag <span class="bag-n">1</span></button>
+  </div>
+</header>
+
+<main class="wrap">
+  <h1 class="vh">Library</h1>
+
+  <div class="lib-top">
+    <div class="seg kind" id="kind" role="group" aria-label="What to show"></div>
+    <div class="search">
+      <svg viewBox="0 0 18 18" aria-hidden="true"><circle cx="7.5" cy="7.5" r="5.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 12l4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <input type="search" id="q" aria-label="Search" placeholder="Search sprites, sounds and music" autocomplete="off">
+      <label class="smart" title="Smarter search understands descriptions, like &quot;something for when the player dies&quot;. It downloads about 39 MB once. Not wired up in this mock-up.">
+        <input type="checkbox" id="smart"><i></i><span>Smarter search</span>
+      </label>
+    </div>
+  </div>
+
+  <div class="filters" id="filters">
+    <span class="pick-select"><select id="f-type" aria-label="Type"></select></span>
+    <span class="pick-select"><select id="f-kit" aria-label="Kit"></select></span>
+    <span class="pick-select"><select id="f-game" aria-label="Game type"></select></span>
+    <span class="pick-select"><select id="f-theme" aria-label="Theme"></select></span>
+    <button class="btn btn-ghost btn-sm" id="clear" type="button" hidden>Clear</button>
+    <p class="count" id="count" aria-live="polite"></p>
+  </div>
+
+  <div class="results" id="results"></div>
+</main>
+
+<script type="module" src="../shared/mockbar.js"></script>
+</body>
+</html>

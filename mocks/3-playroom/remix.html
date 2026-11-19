@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hero: Loadout</title>
+<link rel="stylesheet" href="../shared/fonts.css">
+<link rel="stylesheet" href="style.css">
+<script type="module" src="../shared/kit.js"></script>
+</head>
+<body class="remix">
+
+<header class="top">
+  <a class="brand" href="landing.html"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Loadout</a>
+  <nav class="top-nav" aria-label="Main">
+    <a href="library.html">Library</a>
+    <a href="library.html#kits">Kits</a>
+    <a class="wide" href="landing.html#how">How it works</a>
+  </nav>
+  <details class="bag" data-bag></details>
+</header>
+
+<main class="rx">
+  <div class="rx-bar">
+    <div class="rx-title">
+      <a class="round" href="library.html" aria-label="Back to the library"><svg class="ic" aria-hidden="true"><use href="#i-left"/></svg></a>
+      <div class="rx-name">
+        <h1 id="name">Hero</h1>
+        <p id="blurb">A brave adventurer. Change the build, hair, gear and how they move.</p>
+      </div>
+    </div>
+    <div class="rx-meta">
+      <details class="more" id="kits">
+        <summary class="chip" id="kits-say">In 3 kits</summary>
+        <div class="pop" id="kits-list"></div>
+      </details>
+      <div class="rx-size">
+        <span id="size-say">Pixel size</span>
+        <div class="seg" id="size" role="group" aria-label="Pixel size of the download">
+          <button type="button" data-size="1" aria-pressed="true">1×</button>
+          <button type="button" data-size="2" aria-pressed="false">2×</button>
+          <button type="button" data-size="4" aria-pressed="false">4×</button>
+        </div>
+      </div>
+    </div>
+    <div class="rx-go">
+      <button type="button" class="btn btn-primary" id="download"><svg class="ic" aria-hidden="true"><use href="#i-download"/></svg>Download</button>
+      <details class="more">
+        <summary class="round" aria-label="More"><svg class="ic" aria-hidden="true"><use href="#i-more"/></svg></summary>
+        <div class="pop">
+          <button type="button" id="copy"><svg class="ic" aria-hidden="true"><use href="#i-link"/></svg><span>Copy a link to this version</span></button>
+          <a id="alike" href="library.html"><svg class="ic" aria-hidden="true"><use href="#i-grid"/></svg>More like this</a>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <section class="stage" data-tone="sky" id="stage" aria-label="Picture">
+    <div class="stage-art" id="art">
+      <div class="floor" id="floor" hidden></div>
+      <lo-sprite id="backdrop" hidden></lo-sprite>
+      <div class="ground" id="ground" hidden></div>
+      <span class="podium" id="podium"></span>
+      <lo-sprite id="hero"></lo-sprite>
+    </div>
+    <div class="stage-tl"><button type="button" class="switch" role="switch" aria-checked="false" id="scene"><i></i>Show in a scene</button></div>
+    <div class="stage-tr">
+      <details class="more" id="look">
+        <summary class="btn btn-white"><span id="look-say">Look: Original</span><svg class="ic" aria-hidden="true"><use href="#i-down"/></svg></summary>
+        <div class="pop look-pop" id="look-list"></div>
+      </details>
+    </div>
+    <div class="stage-bl"><button type="button" class="round" id="playpause" aria-label="Pause the animation"><svg class="ic" aria-hidden="true"><use href="#i-pause"/></svg></button></div>
+    <div class="stage-br">
+      <button type="button" class="btn btn-white" id="surprise"><svg class="ic" aria-hidden="true"><use href="#i-dice"/></svg>Surprise me</button>
+      <button type="button" class="btn btn-white" id="reset"><svg class="ic" aria-hidden="true"><use href="#i-undo"/></svg>Start over</button>
+    </div>
+  </section>
+
+  <div class="clips" id="clips" role="group" aria-label="Animation"></div>
+
+  <aside class="dock" aria-label="Controls">
+    <div class="dock-tabs" id="tabs" role="tablist" aria-label="What to change"></div>
+    <div class="dock-panel" id="panel" role="tabpanel"></div>
+    <div class="dock-nav">
+      <button type="button" class="btn btn-sm" id="back"><svg class="ic" aria-hidden="true"><use href="#i-left"/></svg>Back</button>
+      <span class="saved" id="saved" role="status"></span>
+      <button type="button" class="btn btn-sm" id="next"><span>Next<span class="next-name" id="next-name"></span></span><svg class="ic" aria-hidden="true"><use href="#i-right"/></svg></button>
+    </div>
+  </aside>
+</main>
+
+<script type="module" src="remix.js"></script>
+<script type="module" src="../shared/mockbar.js"></script>
+</body>
+</html>

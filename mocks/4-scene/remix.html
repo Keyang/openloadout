@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Workbench: Loadout</title>
+<link rel="stylesheet" href="../shared/fonts.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="remix">
+<header class="top">
+  <a class="brand" href="landing.html">Loadout</a>
+  <nav aria-label="Main">
+    <a href="library.html">Library</a>
+    <a href="remix.html" aria-current="page">Workbench</a>
+  </nav>
+</header>
+<aside class="rail" id="rail" aria-label="Your game"></aside>
+
+<main class="bench">
+  <section class="work" aria-label="The picture">
+    <div class="what">
+      <h1 id="name"></h1>
+      <p id="blurb"></p>
+      <div class="kits">
+        <span id="kits"></span>
+        <details class="menu">
+          <summary aria-label="More" id="more"></summary>
+          <div>
+            <button type="button" id="copy">Copy link</button>
+            <a id="alike" href="library.html">More like this</a>
+          </div>
+        </details>
+      </div>
+    </div>
+    <div class="stage">
+      <div class="stage-bar">
+        <label><button class="switch" id="plain" type="button" role="switch" aria-checked="false" aria-label="Plain background"></button><span>Plain background</span></label>
+        <label><span><span class="wide-only">Look of the whole game</span><span class="narrow-only">Look</span></span><select class="pick-look" id="look" aria-label="Look of the whole game"></select></label>
+      </div>
+      <div id="scene"></div>
+    </div>
+    <div class="clips">
+      <button class="play" id="playpause" type="button" aria-label="Pause"></button>
+      <div class="chips" id="clips" role="group" aria-label="Animation"></div>
+    </div>
+    <div class="timeline" aria-label="Frames of this animation and the sounds on them">
+      <div class="tl-marks" id="marks"></div>
+      <div class="tl" id="tl"></div>
+    </div>
+  </section>
+
+  <aside class="insp" aria-label="Controls">
+    <div class="insp-status" id="status" role="status"></div>
+    <div class="insp-mid">
+      <div class="tabs" id="tabs" role="tablist" aria-label="What to change"></div>
+      <div class="panel" id="panel-controls" role="tabpanel"></div>
+      <div class="panel" id="panel-sounds" role="tabpanel" hidden></div>
+    </div>
+    <div class="insp-foot">
+      <div class="row">
+        <button class="btn sm" id="surprise" type="button">Surprise me</button>
+        <button class="btn sm" id="reset" type="button">Start over</button>
+      </div>
+      <div class="row">
+        <div class="seg" id="px" role="group" aria-label="Pixel size"></div>
+        <button class="btn primary" id="download" type="button">Download</button>
+      </div>
+      <p class="tag" id="size"></p>
+    </div>
+  </aside>
+</main>
+
+<script type="module">
+import { $, $$, h, store, byId, bundles, looks, ICON, TYPE, Scene, model, change, editor, mountRail, playButton, soundPic, say, fixLabel } from './app.js';
+const { clipFps } = await import('../../engine/sprite.js'); // the shared kit does not say how fast an animation runs; the engine does
+
+const asked = new URLSearchParams(location.search).get('id');
+const id = byId[asked]?.kind === 'sprite' ? asked : 'knight';
+const a = byId[id];
+const stands = ['character', 'creature', 'prop', 'pickup'].includes(a.type);
+const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const m = await model(id);
+const def = m.def;
+
+mountRail();
+$('#name').textContent = a.name;
+$('#blurb').textContent = a.description;
+document.title = `${a.name}: Loadout workbench`;
+const inKits = a.bundles.map((b) => bundles.find((x) => x.id === b)?.name.replace(/ (platformer|roguelite|turn-based RPG) kit$/, '')).filter(Boolean);
+$('#kits').textContent = inKits.length ? `In ${inKits.length > 1 ? inKits.slice(0, -1).join(', ') + ' and ' + inKits.at(-1) : inKits[0]}` : '';
+$('#more').innerHTML = ICON.dots;
+$('#copy').onclick = () => { $('.menu').open = false; say('This is a mock-up. It would copy a link to this exact Hero, changes included.'); };
+$('#alike').href = `library.html?q=${encodeURIComponent(TYPE[a.type].toLowerCase())}`;
+
+let clip = def.clips[a.stripClip] ? a.stripClip : Object.keys(def.clips)[0];
+let playing = !still, frame = 0, plain = !stands, px = 2, tab = null, t0 = performance.now();
+
+/* the stage: the thing, large, in your game */
+const host = $('#scene');
+const subject = () => $('.sc-item.focus lo-sprite', host);
+const applyPlay = () => {
+  const sp = subject(); if (!sp) return;
+  if (playing) sp.removeAttribute('paused'); else { sp.setAttribute('frame', frame); sp.setAttribute('paused', ''); }
+  t0 = performance.now();
+};
+const [fw, fh] = a.tech.frame;
+const scene = new Scene(host, {
+  focus: id, plain, clip: { [id]: clip }, onBuild: applyPlay,
+  scale: (w, hh) => Math.max(1, Math.min(6, Math.floor(hh / (plain ? fh + 12 : hh < 300 ? fh + 22 : Math.max(96, fh + 30))), Math.floor(w / (plain ? fw + 8 : Math.max(100, fw + 24))))),
+  onPick: (pid) => { if (pid !== id) location.href = `remix.html?id=${pid}`; },
+});
+$('#plain').setAttribute('aria-checked', String(plain));
+$('#plain').disabled = !stands;
+$('#plain').onclick = () => { plain = !plain; $('#plain').setAttribute('aria-checked', String(plain)); scene.o.plain = plain; scene.u = 0; scene.fit(); scene.build(); };
+const lookSel = $('#look');
+lookSel.append(...looks.map((l) => h('option', { value: l.id, text: l.name })));
+lookSel.value = store.state.look;
+lookSel.onchange = () => store.setLook(lookSel.value);
+
+/* animations and the frames under them */
+const clipsEl = $('#clips'), tl = $('#tl'), marks = $('#marks');
+const holds = (when, p) => !when || (Array.isArray(when) ? when.some((w) => holds(w, p)) : Object.entries(when).every(([k, v]) => v.includes(p[k])));
+const soundsNow = () => (def.sounds?.[clip] ?? []).filter((s) => holds(s.when, m.params) && byId[s.sound]);
+let cells = [];
+function drawClips() {
+  clipsEl.replaceChildren(...m.clips.map((c) => h('button.chip', { type: 'button', 'aria-pressed': String(c.name === clip), onclick: () => setClip(c.name) }, c.label)));
+  $('#playpause').innerHTML = playing ? ICON.pause : ICON.play;
+  $('#playpause').setAttribute('aria-label', playing ? 'Pause' : 'Play');
+}
+function drawTimeline() {
+  const n = def.clips[clip].frames;
+  tl.style.setProperty('--n', n); marks.style.setProperty('--n', n);
+  cells = Array.from({ length: n }, (_, i) => h('button.tl-cell', { type: 'button', 'aria-label': `Stop on frame ${i + 1}`, onclick: () => { playing = false; frame = i; applyPlay(); drawClips(); show(i); } }, String(i + 1)));
+  tl.replaceChildren(...cells);
+  const byFrame = new Map();
+  for (const s of soundsNow()) byFrame.set(s.frame, [...(byFrame.get(s.frame) ?? []), byId[s.sound].name]);
+  const at = [...byFrame.keys()].sort((x, y) => x - y);
+  marks.replaceChildren(...(at.length ? at.map((f0, i) => {
+    const end = at[i + 1] ?? n;
+    return h('button.tl-mark', { type: 'button', style: `grid-column:${f0 + 1} / ${end + 1};--span:${end - f0}`, title: 'See this sound', onclick: () => setTab('Sounds') }, h('i'), h('span', { text: byFrame.get(f0).join(' + ') }));
+  }) : [h('span.tl-none', { style: 'grid-column:1 / -1', text: `${m.clips.find((c) => c.name === clip).label} makes no sound.` })]));
+  show(playing ? 0 : frame);
+}
+const show = (f) => cells.forEach((c, i) => c.classList.toggle('now', i === f));
+function setClip(name) {
+  clip = name; frame = 0;
+  scene.o.clip = { [id]: clip };
+  subject()?.setAttribute('clip', clip);
+  t0 = performance.now();
+  drawClips(); drawTimeline(); drawSounds();
+}
+$('#playpause').onclick = () => { playing = !playing; applyPlay(); drawClips(); };
+(function tick(now) {
+  if (playing && cells.length) {
+    const c = def.clips[clip], fps = clipFps(def, clip, m.params), n = Math.floor(((now - t0) / 1000) * fps);
+    frame = c.loop ? n % c.frames : Math.min(n % (c.frames + Math.ceil(fps * 0.7)), c.frames - 1);
+    show(frame);
+  }
+  requestAnimationFrame(tick);
+})(performance.now());
+
+/* the inspector */
+const tabsEl = $('#tabs'), pControls = $('#panel-controls'), pSounds = $('#panel-sounds');
+const TAB = { Look: 'Body', Colors: 'Colours' };
+function drawTabs(groups) {
+  tab ??= groups[0]?.group ?? 'Sounds';
+  const names = [...groups.map((g) => g.group), 'Sounds'];
+  tabsEl.replaceChildren(...names.map((g) => {
+    const changed = groups.find((x) => x.group === g)?.items.some((it) => it.value !== it.def);
+    return h('button', { type: 'button', role: 'tab', 'aria-selected': String(g === tab), onclick: () => setTab(g) }, h('span', { text: fixLabel(TAB[g] ?? g) }), changed && h('i.dot', { title: 'Changed' }));
+  }));
+}
+const ed = editor(pControls, id, { group: '?', pictures: true, onRender: drawTabs });
+function setTab(g) {
+  tab = g;
+  pControls.hidden = g === 'Sounds'; pSounds.hidden = g !== 'Sounds';
+  if (g !== 'Sounds') ed.group = g; else drawTabs(m.controls());
+}
+function drawSounds() {
+  const list = soundsNow(), label = m.clips.find((c) => c.name === clip).label, groups = new Map();
+  for (const s of list) { const k = `${s.sound}|${s.preset ?? ''}`; groups.set(k, { ...s, frames: [...(groups.get(k)?.frames ?? []), s.frame + 1] }); }
+  const words = (fr) => (fr.length > 1 ? `frames ${fr.slice(0, -1).join(', ')} and ${fr.at(-1)}` : `frame ${fr[0]}`);
+  pSounds.replaceChildren(
+    h('p.panel-note', { text: list.length ? `${label} plays ${groups.size === 1 ? 'one sound' : `${groups.size} sounds`}. Pick another animation to see its sounds.` : `${label} makes no sound. Pick another animation to see its sounds.` }),
+    ...[...groups.values()].map((s) => { const snd = byId[s.sound]; return h('div.snd', {}, playButton(snd), soundPic(snd), h('div', {}, h('strong', { text: snd.name }), h('span', { text: `${s.preset ? `${s.preset} style, ` : ''}on ${words(s.frames)}` }))); }),
+    a.tech.soundIds?.length ? h('p.panel-note', { style: 'margin-top:16px', text: `${a.name} uses ${a.tech.soundIds.length} sounds across ${m.clips.length} animations. They come along when you download your game.` }) : null,
+  );
+}
+function drawStatus(pulse) {
+  const n = Object.keys(store.state.params[id] || {}).length;
+  $('#status').replaceChildren(...(store.has(id)
+    ? [h('span.kept', {}, h(`span.kept-i${pulse ? '.pulse' : ''}`, { html: ICON.check }), 'Saved in your game'), h('span.n', { text: n ? `${n} ${n === 1 ? 'change' : 'changes'}` : 'No changes yet' })]
+    : [h('span.n', { text: 'Not in your game yet' }), h('button.btn.sm.primary', { type: 'button', onclick: () => store.add(id) }, 'Add to your game')]));
+}
+$('#surprise').onclick = () => change(id, (x) => x.surprise());
+$('#reset').onclick = () => store.setParams(id, {});
+function drawSize() {
+  $('#px').replaceChildren(...[1, 2, 4].map((k) => h('button', { type: 'button', 'aria-pressed': String(px === k), onclick: () => { px = k; drawSize(); } }, `${k}x`)));
+  $('#size').textContent = `${fw * px} × ${fh * px} px a frame. A PNG sheet plus a data file.`;
+}
+$('#download').onclick = () => say(`This is a mock-up. It would download ${id}-${px}x.zip: the sprite sheet (PNG) and its data file, with your changes.`);
+
+store.on((s, ev) => {
+  if (ev.type === 'look' || ev.type === 'kit') lookSel.value = s.look;
+  if (ev.id && ev.id !== id) return;
+  t0 = performance.now(); // the picture starts its animation again after any change
+  if (ev.type === 'params' && !playing) applyPlay();
+  if (ev.type === 'params' && ev.meta?.kind !== 'range') { drawTimeline(); drawSounds(); }
+  if (ev.type !== 'settle') drawStatus(ev.type === 'params');
+});
+setTab(m.controls()[0]?.group ?? 'Sounds');
+drawClips(); drawTimeline(); drawSounds(); drawStatus(); drawSize();
+
+// on a phone the tabs stick right under the pinned picture
+const work = $('.work');
+new ResizeObserver(() => document.body.style.setProperty('--work-h', `${work.offsetHeight}px`)).observe(work);
+</script>
+<script type="module" src="../shared/mockbar.js"></script>
+</body>
+</html>

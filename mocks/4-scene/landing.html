@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loadout: game art you change by clicking on it</title>
+<link rel="stylesheet" href="../shared/fonts.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="land">
+<header class="top">
+  <a class="brand" href="landing.html">Loadout</a>
+  <nav aria-label="Main">
+    <a href="library.html">Library</a>
+    <a href="remix.html">Workbench</a>
+  </nav>
+</header>
+<aside class="rail" id="rail" aria-label="Your game"></aside>
+
+<main>
+  <section class="hero wrap">
+    <div class="hero-text">
+      <h1>Game art you change by clicking on it.</h1>
+      <div class="hero-side">
+        <p>Loadout is a box of characters, places, sounds and music for small games. None of it is a fixed picture. Click the hero, the slime or the sky and make them yours.</p>
+        <div class="hero-go">
+          <a class="btn primary lg" href="library.html">Build on this scene</a>
+          <a class="link" href="#how">How it works</a>
+        </div>
+      </div>
+    </div>
+    <div id="scene" aria-label="A game scene. Everything in it can be clicked and changed."></div>
+    <div class="stagebar">
+      <div class="stagebar-group"><span id="kit-l">Start from</span><div class="seg" id="kits" role="group" aria-labelledby="kit-l"></div></div>
+      <div class="stagebar-group"><span id="look-l">Look</span><div class="chips" id="looks" role="group" aria-labelledby="look-l"></div><button class="btn sm" id="surprise" type="button">Surprise me</button></div>
+    </div>
+  </section>
+
+  <section class="section" id="how">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>From nothing to a game you can see, in four steps</h2>
+        <p>You do not draw, record or write code. You choose, you nudge a few sliders, and what you chose stands in one scene the whole time, so nothing you change gets lost.</p>
+      </div>
+      <ol class="steps">
+        <li>
+          <div class="step-pic" id="step-pick"></div>
+          <h3>Pick</h3>
+          <p>Take a hero, enemies, a place, sounds and music from the library, or start from a whole kit.</p>
+        </li>
+        <li>
+          <div class="step-pic" id="step-change"></div>
+          <h3>Change</h3>
+          <p>Hair, weapon, height, colours, how it moves. The Hero alone has 20 things to change and 9 animations.</p>
+        </li>
+        <li>
+          <div class="step-pic" id="step-try"></div>
+          <h3>Try</h3>
+          <p>Everything you pick lands in your game scene next to the rest, so you see what fits before you build anything.</p>
+        </li>
+        <li>
+          <div class="step-pic">
+            <ul class="files">
+              <li><strong>Sprites</strong><span>PNG sheet plus a data file</span></li>
+              <li><strong>Sounds and music</strong><span>WAV</span></li>
+              <li><strong>Size</strong><span>1x, 2x or 4x</span></li>
+            </ul>
+          </div>
+          <h3>Download</h3>
+          <p>One zip with your changes in it, ready for a game engine.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="section" id="kits-section">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Three complete kits, each one a whole small game</h2>
+        <p>A kit is sprites, sounds and music made to belong together. Start from one and restyle all of it at once with a look, such as Sunset, Frost or Night.</p>
+      </div>
+      <div id="kitrows"></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Sounds and music come with it, already in step</h2>
+        <p>The Hero's footsteps land on the frames where the boots touch the ground. Every sound has styles too: a jump can be a tiny hop or a big leap, and each track has calmer and busier versions.</p>
+      </div>
+      <div class="sound-grid">
+        <figure class="walk">
+          <div class="walk-pic" id="walk-pic"></div>
+          <div class="tl-marks" id="walk-marks"></div>
+          <div class="tl" id="walk-tl"></div>
+          <figcaption>Walk, 8 frames. The footstep sound plays on frames 1 and 5.</figcaption>
+        </figure>
+        <ul class="soundlist" id="soundlist"></ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap works">
+      <h2>Works in Unity and in any engine that reads PNG and WAV</h2>
+      <dl>
+        <div><dt>Sprites</dt><dd>Sprite sheets as PNG, each with a data file, at 1x, 2x or 4x.</dd></div>
+        <div><dt>Sounds and music</dt><dd>Plain WAV files.</dd></div>
+        <div><dt>Unity package</dt><dd>Coming later. Until then the zip drops straight into a project.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <ul class="numbers">
+        <li><b>137</b><span>sprites</span></li>
+        <li><b>56</b><span>sounds</span></li>
+        <li><b>6</b><span>music tracks</span></li>
+        <li><b>3</b><span>complete kits</span></li>
+        <li><b>14</b><span>looks for a whole kit</span></li>
+      </ul>
+      <div class="closing">
+        <p>Your scene is still up there, with everything you changed.</p>
+        <a class="btn" href="library.html">Open the library</a>
+      </div>
+    </div>
+  </section>
+  <footer class="foot wrap">Loadout mock-up, design 4: Scene first.</footer>
+</main>
+
+<script type="module">
+import { $, h, whenSeen, store, KITS, Scene, openPop, mountRail, lookChips, kitCounts, looks, byId, ICON, playButton, soundPic, secs, TYPE } from './app.js';
+
+mountRail();
+
+// the hero: your game as a wide scene; click anything in it
+let hinted = false;
+const scene = new Scene($('#scene'), {
+  scale: (w) => (w >= 1080 ? 3 : 2),
+  height: (w, u) => (w >= 1080 ? 150 : w >= 600 ? 150 : 128),
+  max: innerWidth < 600 ? 4 : 8,
+  onPick: (id, anchor, sc, rect) => {
+    if (!hinted) { hinted = true; const el = sc.host.querySelector('.hint'); if (el) { el.classList.remove('hint'); el.querySelector('.sc-tag').textContent = byId[el.dataset.id].name; } }
+    openPop(id, anchor, { rect, onClose: () => sc.select(null) });
+  },
+  onBuild: (sc) => { if (!hinted) { const hero = sc.host.querySelector(`.sc-item[data-id="${KITS[store.state.kit].hero}"]`); if (hero) { hero.classList.add('hint'); hero.querySelector('.sc-tag').textContent = `${byId[hero.dataset.id].name}: click to change`; } } },
+});
+
+const kitsEl = $('#kits');
+const drawKits = () => kitsEl.replaceChildren(...Object.entries(KITS).map(([k, kit]) => h('button', { type: 'button', 'aria-pressed': String(store.state.kit === k), onclick: () => store.setKit(k) }, kit.name)));
+store.on((s, ev) => { if (ev.type === 'kit') drawKits(); });
+drawKits();
+lookChips($('#looks'), ['original', 'sunset', 'frost', 'night', 'candy', 'handheld']);
+$('#surprise').onclick = () => { const others = looks.filter((l) => l.id !== store.state.look); store.setLook(others[Math.floor(Math.random() * others.length)].id); };
+
+// step pictures
+const still = (id, attrs = {}) => h('lo-sprite', { sprite: id, scale: 1, hover: true, ...attrs });
+$('#step-pick').append(...['knight', 'slime', 'treasure-chest'].map((id, i) => h('span.mini', {}, still(id, { scale: id === 'treasure-chest' ? 2 : 1 }), i < 2 && h('b', { html: ICON.check }))));
+$('#step-change').append(...[{}, { hairStyle: 'spiky', headgear: 'none', weapon: 'axe', outfit: '#c9423a', trim: '#e6c545' }, { hairStyle: 'long', headgear: 'crown', weapon: 'spear', outfit: '#7a4fc4', cape: 'none', height: 0.8 }]
+  .map((p) => h('span.mini', {}, still('knight', { params: JSON.stringify(p), clip: 'idle' }))));
+whenSeen($('#step-try'), () => new Scene($('#step-try'), { scale: () => 1, source: () => ({ kit: 'thornwood', items: KITS.thornwood.starter }), max: 4 }));
+
+// the three kits
+$('#kitrows').append(...Object.entries(KITS).map(([k, kit]) => {
+  const { b, text } = kitCounts(k);
+  const pic = h('div');
+  const row = h('article.kitrow', {}, pic, h('div', {},
+    h('h3', { text: kit.name }), h('p.kind', { text: kit.kind }), h('p.blurb', { text: b.blurb }), h('p.has', { text: text }),
+    h('button.btn', { type: 'button', onclick: () => { store.setKit(k); scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); } }, `Start from ${kit.name}`)));
+  whenSeen(row, () => new Scene(pic, { scale: () => 2, height: () => 104, source: () => ({ kit: k, items: kit.starter }), max: innerWidth < 600 ? 4 : 8 }));
+  return row;
+}));
+
+// sounds
+const cells = Array.from({ length: 8 }, (_, i) => h('div.tl-cell', { style: 'display:grid;place-items:center' }, String(i + 1)));
+$('#walk-tl').append(...cells);
+$('#walk-marks').append(...[0, 4].map((f) => h('span.tl-mark', { style: `grid-column:${f + 1}` }, h('i'))));
+$('#soundlist').append(...['footstep-gravel', 'jump', 'sword-slash', 'coin-pickup', 'victory-fanfare', 'thornwood-overworld'].map((id) => {
+  const a = byId[id];
+  return h('li', {}, playButton(a), soundPic(a), h('div', {}, h('strong', { text: a.name }), h('span.styles', { text: `${TYPE[a.type]}. Styles: ${a.tech.styles.join(', ')}` })), h('span.len', { text: secs(a.tech.seconds) }));
+}));
+const walker = $('#walk-pic').appendChild(h('lo-sprite', { sprite: 'knight', clip: 'walk', scale: 3 }));
+await walker.ready;
+if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  let t0 = performance.now();
+  walker.addEventListener('pointerenter', () => (t0 = performance.now()));
+  const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) t0 = performance.now(); });
+  io.observe(walker);
+  const tick = (now) => { const f = Math.floor(((now - t0) / 1000) * 11) % 8; cells.forEach((c, i) => c.classList.toggle('now', i === f)); requestAnimationFrame(tick); };
+  requestAnimationFrame(tick);
+} else cells[0].classList.add('now');
+</script>
+<script type="module" src="../shared/mockbar.js"></script>
+</body>
+</html>

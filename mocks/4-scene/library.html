@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Library: Loadout</title>
+<link rel="stylesheet" href="../shared/fonts.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="lib">
+<header class="top">
+  <a class="brand" href="landing.html">Loadout</a>
+  <nav aria-label="Main">
+    <a href="library.html" aria-current="page">Library</a>
+    <a href="remix.html">Workbench</a>
+  </nav>
+</header>
+<aside class="rail open" id="rail" aria-label="Your game"></aside>
+
+<main class="lib-main">
+  <h1 class="vh">Library</h1>
+  <div class="lib-find">
+    <label class="search">
+      <span class="vh">Search sprites, sounds and music</span>
+      <input id="q" type="search" placeholder="Search by plain words: hero, coin, jump, forest" autocomplete="off">
+    </label>
+    <select class="pick-look" id="game" aria-label="Kind of game"></select>
+    <select class="pick-look" id="theme" aria-label="Theme"></select>
+  </div>
+  <div class="smart">
+    <button class="switch" id="smart" type="button" role="switch" aria-checked="false" aria-labelledby="smart-l"></button>
+    <span id="smart-l"><strong>Smarter search</strong> understands descriptions like "something for when the player dies"</span>
+  </div>
+  <div class="kindrow">
+    <div class="kinds" id="kinds" role="group" aria-label="What to show"></div>
+    <p class="count" id="count" role="status"></p>
+  </div>
+  <div class="filters">
+    <div class="chips" id="types" role="group" aria-label="Type"></div>
+  </div>
+  <div id="results"></div>
+</main>
+
+<script type="module">
+import { $, $$, h, store, assets, bundles, byId, TYPE, ICON, url, picture, openPop, mountRail, playButton, soundPic, live, secs } from './app.js';
+
+mountRail({ expanded: true });
+$('.search').prepend(h('span', { html: ICON.search }));
+
+const GAME = { platformer: 'Platformer', 'turn-based-rpg': 'Turn-based RPG', 'roguelike-action': 'Action roguelike', 'top-down-rpg': 'Top-down RPG', shooter: 'Shooter', arcade: 'Arcade', puzzle: 'Puzzle', 'card-game': 'Card game', 'farming-sim': 'Farming', racing: 'Racing' };
+const THEME = { fantasy: 'Fantasy', forest: 'Forest', dungeon: 'Dungeon', 'sci-fi': 'Sci-fi', space: 'Space', horror: 'Horror', farm: 'Farm', neutral: 'Fits anything' };
+const PLURAL = { character: 'Characters', creature: 'Creatures', tileset: 'Ground tiles', prop: 'Objects', pickup: 'Pickups', effect: 'Effects', projectile: 'Projectiles', background: 'Backgrounds', ui: 'Interface', icon: 'Icons', sfx: 'Sound effects', ambience: 'Background sounds', jingle: 'Jingles' };
+const KINDS = {
+  sprites: { label: 'Sprites', of: (a) => a.kind === 'sprite', types: ['character', 'creature', 'tileset', 'prop', 'pickup', 'effect', 'projectile', 'background', 'ui', 'icon'] },
+  sounds: { label: 'Sounds', of: (a) => a.kind === 'sound' && a.type !== 'music', types: ['sfx', 'ambience', 'jingle'] },
+  music: { label: 'Music', of: (a) => a.type === 'music', types: [] },
+  kits: { label: 'Kits', types: [] },
+};
+const KIT_ORDER = ['kit-platformer-fantasy', 'kit-rpg-fantasy', 'kit-roguelite-scifi', 'dungeon-starter', 'wizard-camp', 'menu-sounds'];
+const q0 = new URLSearchParams(location.search);
+const f = { kind: KINDS[q0.get('kind')] ? q0.get('kind') : 'sprites', type: '', game: '', theme: '', q: q0.get('q') ?? '' };
+$('#q').value = f.q;
+$('#game').append(h('option', { value: '', text: 'Any kind of game' }), ...Object.entries(GAME).map(([v, t]) => h('option', { value: v, text: t })));
+$('#theme').append(h('option', { value: '', text: 'Any theme' }), ...Object.entries(THEME).map(([v, t]) => h('option', { value: v, text: t })));
+
+const hay = new Map(assets.map((a) => [a.id, [a.name, a.description, TYPE[a.type], ...(a.words ?? []), ...(a.themes ?? []), ...(a.gameTypes ?? [])].join(' ').toLowerCase()]));
+const matches = (a) => (!f.game || a.gameTypes?.includes(f.game)) && (!f.theme || a.themes?.includes(f.theme)) && f.q.toLowerCase().split(/\s+/).filter(Boolean).every((w) => hay.get(a.id).includes(w));
+
+// pictures load only when their card comes near the window
+const seen = new IntersectionObserver((es) => { for (const e of es) if (e.isIntersecting) { seen.unobserve(e.target); picture(e.target.dataset.img).then((u) => e.target.style.setProperty('--img', `url("${u}")`)); } }, { rootMargin: '400px' });
+
+function card(a) {
+  const inGame = store.has(a.id);
+  const add = h('button.add', { type: 'button', 'aria-pressed': String(inGame), 'aria-label': inGame ? `Take ${a.name} out of your game` : `Add ${a.name} to your game`, title: inGame ? 'In your game. Press to take it out' : 'Add to your game', html: inGame ? ICON.check : ICON.plus, onclick: () => store.toggle(a.id) });
+  const el = h(`article.card${a.kind === 'sound' ? '.sound' : ''}${inGame ? '.in' : ''}`, { 'data-id': a.id });
+  const pic = h('button.card-pic', { type: 'button', 'aria-label': `Change ${a.name}`, onclick: () => openPop(a.id, el, { preview: a.kind === 'sprite' }) });
+  if (a.kind === 'sprite') {
+    const [w, hh] = a.tech.frame;
+    const k = Math.max(1, Math.min(3, Math.floor(128 / hh), Math.floor(168 / w)));
+    if (inGame) pic.append(live(a.id, { scale: k, hover: true, ...(a.type === 'background' ? { layers: true } : {}) })); // as it is in your game
+    else { const i = h(hh * k > 140 ? 'i.big' : 'i', { style: `--w:${w};--h:${hh};--k:${k};--n:${a.stripFrames};--fps:${a.stripFps}`, 'data-img': url(a.strip) }); seen.observe(i); pic.append(i); }
+  } else pic.append(soundPic(a, 2));
+  const top = h('div.card-top', {}, pic);
+  if (a.kind === 'sound') top.append(playButton(a), h('span.len', { text: secs(a.tech.seconds) }));
+  if (store.changed(a.id)) top.append(h('i.dot', { title: 'Changed' }));
+  el.append(top);
+  el.append(h('div.card-body', {}, h('div', {}, h('strong', { text: a.name }), h('span.tag', { text: TYPE[a.type] })), add));
+  return el;
+}
+function kitCard(b) {
+  const ids = [...b.sprites, ...b.sounds, ...b.music], all = ids.every((id) => store.has(id));
+  const parts = [`${b.sprites.length} ${b.sprites.length === 1 ? 'sprite' : 'sprites'}`, `${b.sounds.length} sounds`, b.music.length && `${b.music.length} ${b.music.length === 1 ? 'track' : 'tracks'}`].filter(Boolean).join(', ');
+  return h('article.kitcard', {},
+    h('div.kitcard-pics', {}, b.sprites.filter((id) => ['character', 'creature', 'pickup', 'prop'].includes(byId[id].type)).slice(0, 5).map((id) => { const a = byId[id], [w, hh] = a.tech.frame; const i = h('i.strip', { style: `--w:${w};--h:${hh};--k:1;--n:${a.stripFrames};--fps:${a.stripFps}`, 'data-img': url(a.strip) }); seen.observe(i); return i; })),
+    h('h3', { text: b.name.replace(/ (platformer|roguelite|turn-based RPG) kit$/, '') }), h('p', { text: b.blurb }), h('p.has', { text: parts }),
+    h('button.btn.sm', { type: 'button', disabled: all, onclick: () => store.addMany(ids) }, all ? 'All of it is in your game' : 'Add the whole kit'));
+}
+
+function draw() {
+  $('#kinds').replaceChildren(...Object.entries(KINDS).map(([k, d]) => h('button', { type: 'button', 'aria-pressed': String(f.kind === k), onclick: () => { f.kind = k; f.type = ''; draw(); } }, d.label, h('span', { text: k === 'kits' ? bundles.length : assets.filter(d.of).length }))));
+  const kind = KINDS[f.kind];
+  const pool = f.kind === 'kits' ? [] : assets.filter(kind.of).filter(matches);
+  $('#types').replaceChildren(...(kind.types.length ? ['', ...kind.types] : []).map((t) => h('button.chip', { type: 'button', 'aria-pressed': String(f.type === t), onclick: () => { f.type = t; draw(); } }, t ? PLURAL[t] : 'All')));
+  const list = pool.filter((a) => !f.type || a.type === f.type).sort((a, b) => kind.types.indexOf(a.type) - kind.types.indexOf(b.type) || a.name.localeCompare(b.name));
+  const res = $('#results');
+  if (f.kind === 'kits') {
+    const ks = bundles.filter((b) => !f.q || (b.name + ' ' + b.blurb).toLowerCase().includes(f.q.toLowerCase()));
+    $('#count').textContent = `${ks.length} kits`;
+    res.replaceChildren(h('div.kitcards', {}, ks.sort((a, b) => KIT_ORDER.indexOf(a.id) - KIT_ORDER.indexOf(b.id)).map(kitCard)));
+  } else {
+    const noun = f.kind === 'music' ? ['track', 'tracks'] : f.kind === 'sounds' ? ['sound', 'sounds'] : ['sprite', 'sprites'];
+    $('#count').textContent = `${list.length} ${list.length === 1 ? noun[0] : noun[1]}`;
+    res.replaceChildren(list.length ? h('div.grid', {}, list.map(card)) : h('p.empty', { text: 'Nothing matches. Try fewer words, or clear the filters.' }));
+  }
+}
+$('#q').addEventListener('input', (e) => { f.q = e.target.value; draw(); });
+$('#game').addEventListener('change', (e) => { f.game = e.target.value; draw(); });
+$('#theme').addEventListener('change', (e) => { f.theme = e.target.value; draw(); });
+$('#smart').addEventListener('click', (e) => e.currentTarget.setAttribute('aria-checked', String(e.currentTarget.getAttribute('aria-checked') !== 'true')));
+store.on((s, ev) => {
+  if (ev.type === 'kit') return draw();
+  if ((ev.type === 'items' || (ev.type === 'params' && ev.meta?.kind !== 'range')) && ev.id) { // only the card that changed
+    const old = $(`.card[data-id="${ev.id}"]`); if (old) old.replaceWith(card(byId[ev.id]));
+    if (f.kind === 'kits') draw();
+  } else if (ev.type === 'items') draw();
+});
+draw();
+</script>
+<script type="module" src="../shared/mockbar.js"></script>
+</body>
+</html>

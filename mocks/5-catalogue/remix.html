@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hero: Loadout</title>
+<link rel="stylesheet" href="../shared/fonts.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="remix">
+<header class="top">
+  <a class="mark" href="landing.html">Loadout</a>
+  <nav class="top-nav" aria-label="Main">
+    <a href="library.html">Library</a>
+    <a href="library.html?kind=kits">Kits</a>
+    <a href="remix.html" aria-current="page"><span class="wide">Change the </span>Hero</a>
+  </nav>
+  <button class="bag-btn" type="button" aria-haspopup="dialog" aria-expanded="false">Bag <span class="count" data-bag-count>0</span></button>
+</header>
+
+<main class="rx">
+  <section class="rx-stage" aria-label="The Hero, live">
+    <div class="rx-head">
+      <h1>Hero</h1>
+      <span class="more">
+        <a href="library.html?type=character">More like this</a>
+        <button type="button" id="copy">Copy link</button>
+      </span>
+      <span class="saved-mini"><span class="dot"></span>Saved in your bag</span>
+      <p>A brave adventurer. Change the build, hair, gear and how they move. Part of <a class="link" href="library.html?kit=kit-platformer-fantasy">Thornwood Keep</a>, <a class="link" href="library.html?kit=kit-rpg-fantasy">Hearthvale</a> and <a class="link" href="library.html?kit=dungeon-starter">Dungeon starter</a>.</p>
+    </div>
+
+    <div class="stage tile" id="stage" data-scene="plain">
+      <div class="stage-art" id="art">
+        <lo-sprite class="stage-bg" sprite="bg-forest" layers></lo-sprite>
+        <div class="stage-ground" id="ground"></div>
+        <div class="stage-shelf" id="shelf"></div>
+        <lo-sprite id="hero" sprite="knight" clip="walk"></lo-sprite>
+      </div>
+      <div class="stage-tools">
+        <span class="seg" role="group" aria-label="Where the Hero stands">
+          <button type="button" data-scene="plain" aria-pressed="true">Plain</button>
+          <button type="button" data-scene="forest" aria-pressed="false">In a scene</button>
+        </span>
+        <button type="button" class="icon-btn" id="playpause" aria-label="Pause the animation" aria-pressed="false"></button>
+      </div>
+    </div>
+
+    <div class="clips" id="clips" role="radiogroup" aria-label="Animation"></div>
+  </section>
+
+  <section class="rx-panel" aria-label="Change the Hero">
+    <div class="rx-block">
+      <div class="block-head">
+        <h2>Start from a version</h2>
+        <span class="hint">One click sets everything.</span>
+        <button type="button" class="btn btn-sm btn-secondary" id="surprise">Surprise me</button>
+        <button type="button" class="btn btn-sm btn-secondary" id="startover">Start over</button>
+      </div>
+      <div class="vstrip" id="versions"></div>
+    </div>
+
+    <div class="tune">
+      <div class="tune-head">
+        <h2>Fine-tune</h2>
+        <div class="tabs" role="tablist" aria-label="Fine-tune" id="tabs"></div>
+      </div>
+      <div class="pane" id="pane" role="tabpanel"></div>
+    </div>
+
+    <div class="rx-foot">
+      <span class="saved is-idle" id="saved" aria-live="polite"><span class="dot"></span><span id="saved-text">Changes save by themselves</span><small id="saved-n"></small></span>
+      <span class="size"><span class="lbl">Pixel size</span>
+        <span class="seg" role="group" aria-label="Pixel size" id="px">
+          <button type="button" data-px="1" aria-pressed="false">1x</button>
+          <button type="button" data-px="2" aria-pressed="true">2x</button>
+          <button type="button" data-px="4" aria-pressed="false">4x</button>
+        </span>
+        <span class="num lbl" id="px-out">128 × 128</span>
+      </span>
+      <button type="button" class="btn btn-primary" id="download">Download</button>
+    </div>
+  </section>
+</main>
+
+<script type="module" src="remix.js"></script>
+<script type="module" src="../shared/mockbar.js"></script>
+</body>
+</html>

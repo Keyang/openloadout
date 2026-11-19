@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hero: Loadout</title>
+<link rel="stylesheet" href="../shared/fonts.css">
+<link rel="stylesheet" href="site.css">
+<script type="module" src="../shared/kit.js"></script>
+<script type="module" src="remix.js"></script>
+</head>
+<body class="remix">
+
+<header class="bar">
+  <a class="wordmark" href="landing.html">Loadout</a>
+  <nav class="bar-nav" aria-label="Main"><a href="library.html">Library</a></nav>
+  <h1 class="bar-name">Hero</h1>
+  <p class="saved" id="saved" role="status">
+    <svg viewBox="0 0 14 14" aria-hidden="true"><path d="M2.5 7.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span id="saved-text">Saved in your bag</span>
+  </p>
+  <div class="bar-acts">
+    <button class="btn btn-ghost wide" id="surprise" type="button">Surprise me</button>
+    <button class="btn btn-ghost wide" id="reset" type="button">Start over</button>
+    <details class="more" id="more">
+      <summary aria-label="More"><svg viewBox="0 0 18 18" aria-hidden="true"><circle cx="3.5" cy="9" r="1.6" fill="currentColor"/><circle cx="9" cy="9" r="1.6" fill="currentColor"/><circle cx="14.5" cy="9" r="1.6" fill="currentColor"/></svg></summary>
+      <div class="more-menu">
+        <button type="button" id="copy">Copy link</button>
+        <a href="library.html?type=character">More like this</a>
+        <button type="button" id="remove">Take out of bag</button>
+      </div>
+    </details>
+    <div class="size-pick"><span>Pixel size</span>
+      <div class="seg" id="size" role="group" aria-label="Pixel size of the download">
+        <button type="button" aria-pressed="false">1x</button><button type="button" aria-pressed="true">2x</button><button type="button" aria-pressed="false">4x</button>
+      </div>
+    </div>
+    <button class="btn btn-primary" id="download" type="button">Download</button>
+  </div>
+</header>
+
+<main class="maker">
+  <section class="centre" aria-label="The Hero">
+    <div class="stage" id="stage">
+      <div class="stage-world" id="world">
+        <span class="shadow"></span>
+        <lo-sprite id="hero" sprite="knight" clip="walk"></lo-sprite>
+      </div>
+      <div class="stage-info">
+        <p id="blurb">A brave adventurer. Change the build, hair, gear and how they move.</p>
+        <p>In <a href="library.html?kit=kit-platformer-fantasy">Thornwood Keep</a> and <a href="library.html?kit=kit-rpg-fantasy">Hearthvale</a></p>
+      </div>
+      <div class="stage-tools">
+        <div class="seg" id="backdrop" role="group" aria-label="Where the Hero stands">
+          <button type="button" data-scene="" aria-pressed="true">Stage</button><button type="button" data-scene="forest" aria-pressed="false">In a forest</button>
+        </div>
+      </div>
+      <button class="playbtn stage-play" id="play" type="button" aria-pressed="true" aria-label="Pause or play the animation">
+        <svg class="i-play" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 1.5v11l9.5-5.5z" fill="currentColor"/></svg>
+        <svg class="i-stop" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 2h3v10H3zM8 2h3v10H8z" fill="currentColor"/></svg>
+      </button>
+      <div class="stage-quick">
+        <button class="btn btn-sm" type="button" data-do="surprise">Surprise me</button>
+        <button class="btn btn-sm" type="button" data-do="reset">Start over</button>
+      </div>
+    </div>
+    <div class="film" id="film" role="group" aria-label="Animation"></div>
+  </section>
+
+  <nav class="tabs" id="tabs" role="tablist" aria-label="What to change"></nav>
+
+  <section class="panel" id="panel" role="tabpanel" aria-labelledby="panel-title">
+    <div class="panel-head"><h2 id="panel-title"></h2><p id="panel-sub"></p></div>
+    <div class="panel-body" id="panel-body"></div>
+  </section>
+</main>
+
+<script type="module" src="../shared/mockbar.js"></script>
+</body>
+</html>

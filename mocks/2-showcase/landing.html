@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loadout: game art you can change</title>
+<link rel="stylesheet" href="../shared/fonts.css">
+<link rel="stylesheet" href="site.css">
+<script type="module" src="../shared/kit.js"></script>
+<script type="module" src="landing.js"></script>
+</head>
+<body>
+
+<header class="site-head">
+  <div class="wrap head-row">
+    <a class="wordmark" href="landing.html">Loadout</a>
+    <nav class="site-nav" aria-label="Main">
+      <a href="library.html">Library</a>
+      <a href="remix.html">Make a hero</a>
+      <button type="button" title="The playground is not part of this mock-up">Playground</button>
+    </nav>
+    <button class="bag" type="button" title="The bag is not part of this mock-up">Bag <span class="bag-n">1</span></button>
+  </div>
+</header>
+
+<main>
+  <section class="hero" aria-labelledby="top-title">
+    <div class="wrap hero-top">
+      <h1 class="h-display" id="top-title">Game art you can change</h1>
+      <div class="hero-side">
+        <p class="lede">Loadout is pixel art, sounds and music for your game. Nothing here is a fixed picture: move a slider, pick a look, and download it ready to use.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary btn-lg" href="library.html">Browse the library</a>
+          <a class="link" href="remix.html">Make your own Hero</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="scene" id="scene">
+      <div class="world" id="world" role="img" aria-label="A game scene made only of Loadout sprites, moving"></div>
+      <div class="scene-hud">
+        <div class="wrap">
+          <div class="hud-pill">
+            <div class="seg" id="kit-pick" role="group" aria-label="Which kit's world to show"></div>
+          </div>
+          <div class="hud-pill looks">
+            <span class="looks-name">Look: <b id="look-name">Original</b></span>
+            <div class="look-row" id="look-pick" role="group" aria-label="Look"></div>
+            <button class="btn btn-sm" id="look-surprise" type="button">Surprise me</button>
+          </div>
+        </div>
+      </div>
+      <div class="scene-note"><div class="wrap"><span id="scene-note" aria-live="polite"></span></div></div>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="hero-title">
+    <div class="wrap">
+      <div class="lineup-head">
+        <div class="band-head">
+          <h2 class="h-section" id="hero-title">One Hero, six ways</h2>
+          <p class="lede">These are all the same sprite. The Hero has 20 things to change, from height and hair to how far the sword swings, and 9 animations that follow along.</p>
+        </div>
+        <div class="hero-actions">
+          <button class="btn" id="lineup-surprise" type="button">Surprise me</button>
+          <a class="link" href="remix.html">Make your own</a>
+        </div>
+      </div>
+      <ul class="lineup" id="lineup"></ul>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="how-title" style="padding-top:0">
+    <div class="wrap">
+      <div class="band-head"><h2 class="h-section" id="how-title">From library to game in four steps</h2></div>
+      <ol class="steps">
+        <li><h3>Pick</h3><p>Search in plain words, or take a whole kit that already belongs together.</p></li>
+        <li><h3>Change</h3><p>Choose from pictures and move a few sliders. Every change is kept in your bag.</p></li>
+        <li><h3>Try</h3><p>Put what you picked into a small playable scene and watch it move.</p></li>
+        <li><h3>Download</h3><p>One zip of sprite sheets and sounds, ready for your game.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="kits-title" style="padding-top:0">
+    <div class="wrap">
+      <div class="band-head">
+        <h2 class="h-section" id="kits-title">Three complete kits</h2>
+        <p class="lede">Each one is a whole small game's worth: characters, enemies, ground, pickups, effects, menus, sounds and music made to go together.</p>
+      </div>
+      <div id="kit-shelves"></div>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="sound-title" style="padding-top:0">
+    <div class="wrap sound-grid">
+      <figure class="swing" id="swing">
+        <lo-sprite id="swing-hero" sprite="knight" clip="attack" scale="4" paused frame="0"></lo-sprite>
+        <div class="ruler" id="swing-ruler" aria-hidden="true"></div>
+        <figcaption class="swing-note" id="swing-note">The <b>sword slash</b> plays on the fourth frame of the swing.</figcaption>
+      </figure>
+      <div>
+        <div class="band-head" style="margin-bottom:0">
+          <h2 class="h-section" id="sound-title">Sounds and music come with it</h2>
+          <p class="lede">56 sounds and 6 music tracks, made the same way as the art. Pick a style, change the length or the lead instrument. Each animation already knows which sounds it plays, and when.</p>
+        </div>
+        <ul class="sound-list" id="sound-list"></ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="works-title" style="padding-top:0">
+    <div class="wrap works">
+      <div class="band-head" style="margin-bottom:0">
+        <h2 class="h-section" id="works-title">Works in Unity, and in any other engine</h2>
+        <p class="lede">A download is plain files: sprite sheets as PNG with a small data file beside each, and sounds and music as WAV. If your engine reads PNG and WAV, it reads Loadout. A Unity package is coming later.</p>
+      </div>
+      <div class="zip">
+        <p class="zip-name">What is in the zip</p>
+        <ul>
+          <li><span>Sprite sheets</span><span>PNG, at 1x, 2x or 4x pixel size</span></li>
+          <li><span>A data file per sheet</span><span>frame sizes and animation names</span></li>
+          <li><span>Sounds and music</span><span>WAV</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section aria-label="Loadout in numbers">
+    <div class="wrap">
+      <dl class="numbers">
+        <div><dt>137</dt><dd>sprites</dd></div>
+        <div><dt>56</dt><dd>sounds</dd></div>
+        <div><dt>6</dt><dd>music tracks</dd></div>
+        <div><dt>3</dt><dd>complete kits</dd></div>
+        <div><dt>14</dt><dd>looks for a whole kit</dd></div>
+      </dl>
+      <div class="closing">
+        <p class="lede">Everything is in the library, and everything in it can change.</p>
+        <a class="btn btn-primary btn-lg" href="library.html">Browse the library</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-foot"><div class="wrap">Loadout. Game-ready pixel art, sounds and music.</div></footer>
+
+<script type="module" src="../shared/mockbar.js"></script>
+</body>
+</html>

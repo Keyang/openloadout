@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loadout: five designs to choose from</title>
+<link rel="stylesheet" href="shared/fonts.css">
+<style>
+  :root { --ink: #16181d; --soft: #5b6270; --line: #e3e5ea; --page: #f6f7f9; --card: #fff; --pick: #2647d8; }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 16px/1.55 'Onest', system-ui, sans-serif; }
+  a { color: inherit; }
+  a:focus-visible { outline: 2px solid var(--pick); outline-offset: 3px; border-radius: 4px; }
+  .wrap { max-width: 1320px; margin: 0 auto; padding: 0 28px; }
+  header { padding: 56px 0 28px; }
+  h1 { font-size: clamp(28px, 4vw, 40px); line-height: 1.12; letter-spacing: -0.02em; margin: 0 0 12px; font-weight: 650; }
+  header p { margin: 0; max-width: 68ch; color: var(--soft); }
+  .jump { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+  .jump a { text-decoration: none; padding: 8px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); font-weight: 550; font-size: 14px; }
+  .jump a:hover { border-color: var(--ink); }
+
+  .design { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 28px; margin: 0 0 28px; scroll-margin-top: 16px; }
+  .head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 32px; align-items: start; margin-bottom: 22px; }
+  .head h2 { margin: 0; font-size: 24px; letter-spacing: -0.01em; font-weight: 650; }
+  .head h2 span { color: var(--soft); font-weight: 450; margin-right: 6px; }
+  .head p { margin: 6px 0 0; max-width: 72ch; color: var(--soft); }
+  .open { display: flex; gap: 8px; flex-wrap: wrap; }
+  .open a { text-decoration: none; padding: 9px 16px; border-radius: 8px; font-weight: 600; font-size: 14px; border: 1px solid var(--line); white-space: nowrap; }
+  .open a:first-child { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .open a:hover { border-color: var(--ink); }
+
+  .shots { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  figure { margin: 0; }
+  figure a { display: block; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--page); aspect-ratio: 16 / 10; }
+  figure a:hover { border-color: var(--ink); }
+  figure img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+  figcaption { font-size: 14px; color: var(--soft); margin-top: 8px; }
+  figcaption b { color: var(--ink); font-weight: 600; }
+
+  dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 20px 0 0; padding-top: 20px; border-top: 1px solid var(--line); }
+  dt { font-weight: 600; font-size: 14px; }
+  dd { margin: 4px 0 0; color: var(--soft); font-size: 14.5px; }
+
+  .compare { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 28px; margin: 0 0 28px; overflow-x: auto; }
+  .compare h2 { margin: 0 0 16px; font-size: 20px; font-weight: 650; }
+  table { border-collapse: collapse; width: 100%; min-width: 760px; font-size: 14.5px; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 14px 10px 0; border-bottom: 1px solid var(--line); }
+  th { font-weight: 600; white-space: nowrap; }
+  thead th { color: var(--soft); font-weight: 550; }
+  tr:last-child td, tr:last-child th { border-bottom: 0; }
+  footer { color: var(--soft); font-size: 14px; padding: 4px 0 64px; max-width: 80ch; }
+
+  @media (max-width: 860px) {
+    .wrap { padding: 0 16px; }
+    .design, .compare { padding: 18px; }
+    .head { grid-template-columns: 1fr; }
+    .shots, dl { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Five designs for Loadout</h1>
+    <p>Each design has three pages you can click through: the landing page, the library and the page for changing one asset (shown with the Hero). The art in every mock-up is real and live, so sliders and choices work. Everything else is a mock-up: nothing in the real site has changed.</p>
+    <nav class="jump" aria-label="Designs" id="jump"></nav>
+  </header>
+
+  <main id="designs"></main>
+
+  <section class="compare" aria-labelledby="cmp">
+    <h2 id="cmp">How each one answers your three complaints</h2>
+    <table>
+      <thead><tr><th>Design</th><th>Pages look messy</th><th>Scrolling back and forth to change an asset</th><th>Too many clicks, changes not kept</th></tr></thead>
+      <tbody id="cmp-rows"></tbody>
+    </table>
+  </section>
+
+  <footer>
+    <p>Tip: on any mock-up page, the small dark switcher at the bottom moves between the five designs on the same page, so you can compare like with like.</p>
+  </footer>
+</div>
+
+<script>
+const DESIGNS = [
+  {
+    slug: '1-studio', name: 'Studio',
+    idea: 'Loadout as a calm, precise creative tool. Light surfaces, hairlines, one blue accent.',
+    landing: 'The hero is a working miniature of the editor: the first thing a visitor does is change the Hero.',
+    library: 'A slim filter bar and a dense grid. Clicking a card opens a quick-look panel beside the grid, with live controls.',
+    remix: 'A three-pane editor that fills the window: animations on the left, the stage in the middle, an inspector on the right.',
+    messy: 'Hairlines instead of boxes, one accent, one type family.',
+    scroll: 'Three fixed panes; only the inspector scrolls, inside itself.',
+    clicks: 'Quick-look panel in the library; saved state in the editor bar.',
+  },
+  {
+    slug: '2-showcase', name: 'Showcase',
+    idea: 'Dark and cinematic, like a game storefront and a character-creation screen. The art glows; the interface steps back.',
+    landing: 'A full-width living scene. One press restyles everything with a look; another swaps the whole world to a different kit.',
+    library: 'Curated shelves per kit when browsing, a plain grid when searching or filtering.',
+    remix: 'A character creator: categories on the left, the Hero in the centre, and every choice shown as a picture of the Hero wearing it.',
+    messy: 'A dark stage with one warm accent; controls appear only where needed.',
+    scroll: 'One category on screen at a time; the Hero never moves.',
+    clicks: 'Choices are pictures, so one click shows and applies; saved state in the top bar.',
+  },
+  {
+    slug: '3-playroom', name: 'Playroom',
+    idea: 'Bright and friendly for a first-time creator, with large fields of colour taken from the kits and big, obvious controls.',
+    landing: 'One very large Hero with three chunky controls and a big Surprise me, then a wall of the same Hero in a dozen versions.',
+    library: 'A big search box, large tabs and pill filters. A card slides up a simple sheet with three controls.',
+    remix: 'A photo-editor layout: the picture stays put, a dock under it shows one category at a time, Next and Back step through.',
+    messy: 'Colour belongs to sections, not to every element; large type and space.',
+    scroll: 'Picture pinned; one category of large controls at a time, the same on a phone.',
+    clicks: 'Step-through dock; the sheet in the library covers the common changes.',
+  },
+  {
+    slug: '4-scene', name: 'Scene first',
+    idea: 'You never look at an asset alone: you always see it in your game. The scene is the workspace and the bag is always on screen.',
+    landing: 'A wide game scene where things can be clicked and changed in place.',
+    library: 'Results on the left, "your game" on the right with a live scene. Adding something drops it into the scene at once.',
+    remix: 'The Hero stands in a scene among the other things you picked, with an inspector in tabs beside it.',
+    messy: 'A workbench: neutral surfaces, crisp lines, the scene is the only large colour.',
+    scroll: 'Scene and tabbed inspector fill the window.',
+    clicks: 'Trying and changing are the same place; every change is kept in "your game" at once.',
+  },
+  {
+    slug: '5-catalogue', name: 'Catalogue',
+    idea: 'The closest to your reference: a white, minimal catalogue where restrained type and space let the art speak.',
+    landing: 'A centred column: headline, two buttons, a strip of live sprites, three steps, the kits, the numbers.',
+    library: 'Search, tabs with counts, filter tokens, grid or list. Cards offer ready-made versions to add directly.',
+    remix: 'Two columns: the Hero on the left; on the right, start from a ready-made version, then fine-tune in tabs.',
+    messy: 'White page, black type, almost no accent, no shadows.',
+    scroll: 'Two fixed columns; fine-tuning in tabs that fit the panel.',
+    clicks: 'Ready-made versions first: one click applies a whole look; saved state in the panel footer.',
+  },
+];
+const PAGES = [['landing', 'Landing'], ['library', 'Library'], ['remix', 'Changing an asset']];
+const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+document.getElementById('jump').innerHTML = DESIGNS.map((d, i) => `<a href="#${d.slug}">${i + 1}. ${esc(d.name)}</a>`).join('');
+document.getElementById('designs').innerHTML = DESIGNS.map((d, i) => `
+  <section class="design" id="${d.slug}" aria-labelledby="h-${d.slug}">
+    <div class="head">
+      <div><h2 id="h-${d.slug}"><span>${i + 1}</span>${esc(d.name)}</h2><p>${esc(d.idea)}</p></div>
+      <div class="open">${PAGES.map(([p, label]) => `<a href="${d.slug}/${p}.html">${p === 'landing' ? 'Open the landing page' : p === 'library' ? 'Library' : 'Changing an asset'}</a>`).join('')}</div>
+    </div>
+    <div class="shots">
+      ${PAGES.map(([p, label]) => `<figure><a href="${d.slug}/${p}.html"><img src="${d.slug}/shots/${p}.png" alt="${esc(d.name)}: ${label} page" loading="lazy"></a><figcaption><b>${label}.</b> ${esc(d[p])}</figcaption></figure>`).join('')}
+    </div>
+  </section>`).join('');
+document.getElementById('cmp-rows').innerHTML = DESIGNS.map((d, i) => `<tr><th><a href="#${d.slug}">${i + 1}. ${esc(d.name)}</a></th><td>${esc(d.messy)}</td><td>${esc(d.scroll)}</td><td>${esc(d.clicks)}</td></tr>`).join('');
+</script>
+</body>
+</html>

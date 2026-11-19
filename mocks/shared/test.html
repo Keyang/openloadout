@@ -1,0 +1,27 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>kit test</title>
+<style>body{font:14px system-ui;margin:20px;background:#f3f3f3} .row{display:flex;gap:16px;align-items:end;flex-wrap:wrap;margin:12px 0}</style>
+<script type="module" src="kit.js"></script>
+<div class="row">
+  <lo-sprite id="hero" sprite="knight" clip="walk" scale="4"></lo-sprite>
+  <lo-sprite sprite="knight" clip="attack" scale="3" look="night" params='{"hairStyle":"long","weapon":"axe"}'></lo-sprite>
+  <lo-sprite sprite="ember-wyrm" scale="2"></lo-sprite>
+  <lo-sprite sprite="void-ranger" scale="3" hover></lo-sprite>
+  <lo-sprite sprite="slime" scale="3" flip></lo-sprite>
+</div>
+<div class="row">
+  <lo-sprite sprite="bg-forest" layers scale="2"></lo-sprite>
+  <lo-sprite sprite="bg-starfield" layers style="width:320px"></lo-sprite>
+  <lo-sprite sprite="tiles-forest" scale="3" paused></lo-sprite>
+  <lo-sprite sprite="ui-dialogue" scale="2" paused></lo-sprite>
+</div>
+<pre id="out"></pre>
+<script type="module">
+  import { loadCatalog, looks } from './kit.js';
+  const hero = document.getElementById('hero');
+  await hero.ready;
+  hero.set('hairStyle', 'spiky'); hero.set('outfit', '#3f6fd1');
+  const cat = await loadCatalog();
+  out.textContent = JSON.stringify({ assets: cat.assets.length, looks: looks.length, groups: hero.controls().map(g => g.group + ':' + g.items.length), changed: hero.changed(), clips: hero.clips.map(c => c.name) }, null, 1);
+</script>

@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Library: Loadout</title>
+<link rel="stylesheet" href="../shared/fonts.css">
+<link rel="stylesheet" href="style.css">
+<script type="module" src="../shared/kit.js"></script>
+</head>
+<body>
+
+<header class="top">
+  <a class="brand" href="landing.html"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Loadout</a>
+  <nav class="top-nav" aria-label="Main">
+    <a href="library.html" aria-current="page">Library</a>
+    <a href="library.html#kits">Kits</a>
+    <a class="wide" href="landing.html#how">How it works</a>
+  </nav>
+  <details class="bag" data-bag></details>
+</header>
+
+<main class="wrap" id="main">
+  <h1 class="vh">Library</h1>
+  <div class="lib-head">
+    <label class="search">
+      <span class="vh">Search the library</span>
+      <svg class="ic" aria-hidden="true"><use href="#i-search"/></svg>
+      <input id="q" type="search" placeholder="Search for a dragon, a coin, a jump sound…" autocomplete="off">
+    </label>
+
+    <div class="kinds" role="tablist" aria-label="What to show" id="kinds"></div>
+
+    <div class="filters" id="filters"></div>
+  </div>
+
+  <div id="results" aria-live="polite"></div>
+</main>
+
+<div id="sheet-host" hidden>
+  <div class="scrim" data-close></div>
+  <section class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-name" id="sheet"></section>
+</div>
+
+<script type="module" src="library.js"></script>
+<script type="module" src="../shared/mockbar.js"></script>
+</body>
+</html>

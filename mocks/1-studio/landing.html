@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loadout: game art you can change</title>
+<link rel="stylesheet" href="../shared/fonts.css">
+<link rel="stylesheet" href="studio.css">
+<script type="module" src="../shared/kit.js"></script>
+</head>
+<body class="landing">
+
+<header class="bar">
+  <a class="wordmark" href="landing.html">Loadout</a>
+  <nav aria-label="Main">
+    <a href="library.html">Library</a>
+    <a href="library.html?kind=kits">Kits</a>
+    <a class="opt" href="remix.html">Editor</a>
+  </nav>
+  <span class="grow"></span>
+  <div class="pop-anchor">
+    <button class="btn quiet bag-btn" type="button" aria-expanded="false">Bag <span class="count">0</span></button>
+  </div>
+</header>
+
+<main>
+  <div class="hero">
+    <div class="wrap">
+      <div>
+        <h1>Game art you can change.</h1>
+        <p class="sub">Loadout is pixel art, sounds and music for your game. Pick something, move a few sliders until it is yours, then download it.</p>
+        <div class="acts">
+          <a class="btn primary big" href="library.html">Browse the library</a>
+          <a class="link" href="remix.html">Open the Hero in the full editor</a>
+        </div>
+        <p class="hint">Try it now. This editor is real.</p>
+      </div>
+
+      <div class="mini" id="mini" aria-label="A small version of the editor, with the Hero">
+        <div class="mini-top">
+          <strong>Hero</strong><span class="muted">A brave adventurer</span>
+          <span class="grow"></span>
+          <span class="saved" id="miniSaved" role="status"></span>
+        </div>
+        <div class="mini-body">
+          <div class="mini-stage">
+            <div class="stage"><lo-sprite id="hero" sprite="knight" clip="walk" scale="3"></lo-sprite></div>
+            <div class="mini-clips"><div class="seg" id="miniClips" role="group" aria-label="Animation"></div></div>
+          </div>
+          <div class="mini-ctls" id="miniCtls"></div>
+        </div>
+        <div class="mini-foot">
+          <button class="btn" type="button" id="miniSurprise">Surprise me</button>
+          <button class="btn quiet" type="button" id="miniReset">Start over</button>
+          <span class="grow"></span>
+          <span class="more">5 of its 20 controls.</span>
+          <a class="link" href="remix.html">See all of them</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="kits" id="kits">
+    <div class="wrap">
+      <div class="kits-head">
+        <div>
+          <h2>Three kits, each a whole game's worth</h2>
+          <p class="lede">Characters, enemies, ground, objects, menus, sounds and two music tracks that belong together. Change the look of all of it in one go.</p>
+        </div>
+      </div>
+      <div class="look-bar" role="group" aria-label="Look for all three kits">
+        <span class="lbl">Look</span>
+        <div class="seg" id="kitLooks"></div>
+        <button class="btn quiet" type="button" id="kitSurprise">Surprise me</button>
+      </div>
+      <div class="kit-row" id="kitRow"></div>
+    </div>
+  </section>
+
+  <section class="how">
+    <div class="wrap">
+      <h2>From the library to your game in four steps</h2>
+      <ol class="steps">
+        <li>
+          <div class="vig" aria-hidden="true">
+            <span class="thumb"><lo-sprite sprite="slime" scale="1" paused></lo-sprite></span>
+            <span class="thumb sel"><lo-sprite sprite="knight" scale="1" paused></lo-sprite></span>
+            <span class="thumb"><lo-sprite sprite="coin" scale="2" paused></lo-sprite></span>
+          </div>
+          <h3>Pick</h3>
+          <p>Search the library in plain words, or start from a whole kit.</p>
+        </li>
+        <li>
+          <div class="vig" aria-hidden="true">
+            <lo-sprite sprite="knight" clip="idle" scale="2" params='{"hairStyle":"spiky","hair":"#c9423a","headgear":"none","weapon":"axe","outfit":"#4f9d57"}'></lo-sprite>
+            <span class="vig-slider"><i style="--at:68%"></i><i style="--at:24%"></i><i style="--at:46%"></i></span>
+          </div>
+          <h3>Change</h3>
+          <p>Move sliders, pick colours. Every change is kept in your bag by itself.</p>
+        </li>
+        <li>
+          <div class="vig" id="vigTry" aria-hidden="true"></div>
+          <h3>Try</h3>
+          <p>Drop it into a small playable scene to see it move and hear it.</p>
+        </li>
+        <li>
+          <div class="vig" aria-hidden="true">
+            <span class="vig-files"><span data-i="file">hero.png</span><span data-i="file">hero.json</span><span data-i="note">footstep.wav</span></span>
+          </div>
+          <h3>Download</h3>
+          <p>Get a zip of sprite sheets and sounds, ready for your game.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="dozen">
+    <div class="wrap">
+      <div class="dozen-head">
+        <div>
+          <h2>One Hero, a dozen ways</h2>
+          <p class="lede">All twelve are the same Hero with different settings. Pick one to keep changing it.</p>
+        </div>
+        <button class="btn" type="button" id="shuffle">Shuffle all twelve</button>
+      </div>
+      <div class="dozen-grid" id="dozen"></div>
+    </div>
+  </section>
+
+  <section class="sound-sec">
+    <div class="wrap">
+      <div>
+        <h2>Sounds and music are included</h2>
+        <p class="lede">56 sounds and 6 music tracks, made the same way as the art, so they can change too.</p>
+        <ul class="points">
+          <li><b>Sounds have styles.</b> A sword slash can be a heavy blade or a quick dagger.</li>
+          <li><b>Music fits your level.</b> Make a track shorter or longer and choose its lead instrument.</li>
+          <li><b>Characters know their sounds.</b> The Hero's footsteps land on the right frame of the walk.</li>
+        </ul>
+      </div>
+      <ul class="tracks" id="tracks"></ul>
+    </div>
+  </section>
+
+  <section class="works">
+    <div class="wrap">
+      <div>
+        <h2>Works in Unity, and in any engine that reads PNG and WAV</h2>
+        <p class="lede">A download is a plain zip of pictures and sounds. There is nothing to install. A Unity package is coming later.</p>
+      </div>
+      <div>
+        <p class="files-cap">What is in the zip for the Hero</p>
+        <ul class="files">
+          <li><span>hero.png</span><span>Sprite sheet: every frame of all 9 animations, at 1x, 2x or 4x size</span></li>
+          <li><span>hero.json</span><span>Data file: where each frame is and how fast it plays</span></li>
+          <li><span>7 sounds as WAV</span><span>Footsteps, jump, landing, sword and hits</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="count" aria-label="Loadout in numbers">
+    <div class="wrap">
+      <dl class="numbers">
+        <div><dt>137</dt><dd>sprites</dd></div>
+        <div><dt>56</dt><dd>sounds</dd></div>
+        <div><dt>6</dt><dd>music tracks</dd></div>
+        <div><dt>3</dt><dd>complete kits</dd></div>
+        <div><dt>14</dt><dd>looks for a whole kit</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="end">
+    <div class="wrap">
+      <h2>Start with one sprite and make it yours</h2>
+      <a class="btn primary big" href="library.html">Browse the library</a>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <a class="wordmark" href="landing.html" style="font-size:16px">Loadout</a>
+    <span>Pixel art, sounds and music you can change.</span>
+  </div>
+</footer>
+
+<script type="module">
+import { h, ICON, KITS, bag, mountBag, controlEl, syncControl, sceneEl, rollEl, loadCatalog, looks, url, seconds } from './studio.js';
+mountBag();
+
+/* ---- the working miniature of the editor ---- */
+const hero = document.getElementById('hero');
+const ctls = document.getElementById('miniCtls'), saved = document.getElementById('miniSaved');
+const SHOW = ['hairStyle', 'weapon', 'outfit', 'cape', 'height'];
+const CLIPS = ['idle', 'walk', 'run', 'attack', 'victory'];
+await hero.ready;
+// whole-number zoom that fits the stage: 5x on a wide window, 3x in a narrow pane or on a phone
+const stageBox = hero.parentElement;
+new ResizeObserver(() => hero.setAttribute('scale', innerWidth <= 760 ? 3 : Math.max(2, Math.min(5, Math.floor((stageBox.clientWidth + 2) / 64))))).observe(stageBox);
+const kept = bag.get('knight');
+if (kept) { hero.setParams(kept.params ?? {}); if (kept.look) hero.setLook(kept.look); }
+
+const items = () => { const all = hero.controls().flatMap((g) => g.items); return SHOW.map((k) => all.find((i) => i.key === k)).filter(Boolean); };
+const paintSaved = () => {
+  const on = bag.has('knight');
+  saved.classList.toggle('on', on);
+  saved.innerHTML = on ? `${ICON.check}<span>Saved<span class="long"> in your bag</span></span>` : '<span class="long">Changes are kept by themselves</span>';
+};
+const keep = () => { const p = {}; for (const k of hero.changed()) p[k] = hero.params[k]; bag.put('knight', { params: p, look: hero.look }); };
+const set = (key, value) => { hero.set(key, value); keep(); };
+let shape = '';
+const paintCtls = () => {
+  const list = items(), sig = list.map((i) => i.key).join();
+  if (sig !== shape) { shape = sig; ctls.replaceChildren(...list.map((i) => controlEl(i, set, { idPrefix: 'mini' }))); }
+  else list.forEach((i) => syncControl(ctls, i));
+};
+hero.addEventListener('change', paintCtls);
+bag.onChange(paintSaved);
+paintCtls(); paintSaved();
+
+const clipBox = document.getElementById('miniClips');
+for (const c of hero.clips.filter((c) => CLIPS.includes(c.name))) {
+  clipBox.append(h('button', { type: 'button', 'aria-pressed': String(c.name === hero.clip), onclick: (e) => {
+    hero.setClip(c.name); clipBox.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b === e.currentTarget)));
+  } }, c.label));
+}
+document.getElementById('miniSurprise').onclick = () => { hero.surprise(); keep(); };
+document.getElementById('miniReset').onclick = () => { hero.reset(); hero.setLook('original'); bag.remove('knight'); };
+
+/* ---- the three kits ---- */
+const { assets, bundles } = await loadCatalog();
+const row = document.getElementById('kitRow'), scenes = [];
+for (const id of Object.keys(KITS)) {
+  const b = bundles.find((x) => x.id === id), scene = sceneEl(id, 2);
+  scenes.push(scene);
+  row.append(h('article', { class: 'kit' }, scene,
+    h('h3', {}, KITS[id].name), h('p', { class: 'kind' }, KITS[id].kind),
+    h('p', { class: 'has' }, h('span', {}, h('b', {}, b.sprites.length), ' sprites'), h('span', {}, h('b', {}, b.sounds.length), ' sounds'), h('span', {}, h('b', {}, b.music.length), ' music tracks'),
+      h('a', { class: 'link', href: `library.html?kind=kits&open=${id}`, style: 'margin-left:auto' }, 'See what is inside'))));
+}
+const lookBox = document.getElementById('kitLooks');
+const setLook = (id) => { scenes.forEach((s) => s.setLook(id)); lookBox.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.id === id))); lookName.textContent = ''; };
+const lookName = h('span', { class: 'muted', role: 'status' });
+for (const id of ['original', 'sunset', 'frost', 'night', 'candy', 'handheld']) {
+  const l = looks.find((x) => x.id === id);
+  lookBox.append(h('button', { type: 'button', 'data-id': id, 'aria-pressed': String(id === 'original'), onclick: () => setLook(id) }, l.name));
+}
+document.getElementById('kitSurprise').after(lookName);
+document.getElementById('kitSurprise').onclick = () => { const l = looks[1 + Math.floor(Math.random() * (looks.length - 1))]; setLook(l.id); lookName.textContent = `${l.name}, one of 14`; };
+
+/* ---- how it works: the "try" picture is a real small scene ---- */
+const tryScene = sceneEl('kit-platformer-fantasy', 1);
+tryScene.style.cssText += 'position:absolute;inset:0';
+document.getElementById('vigTry').append(tryScene);
+document.querySelectorAll('.vig-files [data-i]').forEach((el) => el.insertAdjacentHTML('afterbegin', ICON[el.dataset.i]));
+
+/* ---- one Hero, a dozen ways ---- */
+const DOZEN = [
+  { clip: 'walk' },
+  { clip: 'idle', params: { hairStyle: 'long', hair: '#e0b040', headgear: 'none', weapon: 'spear', outfit: '#4f9d57', trim: '#e6c545', cape: 'tattered' } },
+  { clip: 'victory', params: { headgear: 'crown', outfit: '#7a4fc4', trim: '#e6c545', metal: '#e6c545', height: 0.3, build: 0.8 } },
+  { clip: 'run', params: { hairStyle: 'spiky', hair: '#c9423a', headgear: 'none', weapon: 'axe', outfit: '#3a3350', trim: '#c9423a', cape: 'none', build: 0.9 } },
+  { clip: 'idle', params: { skin: '#9bd18a', hairStyle: 'bald', headgear: 'none', weapon: 'axe', outfit: '#6b7280', cape: 'tattered', trim: '#4f9d57', head: 0.85 } },
+  { clip: 'walk', params: { hairStyle: 'ponytail', hair: '#e670b0', headgear: 'none', weapon: 'spear', outfit: '#d65a9c', trim: '#f0ead8', height: 0.8, build: 0.2 } },
+  { clip: 'attack', look: 'night', params: { outfit: '#2f8f9d', weaponSwing: 1.3 } },
+  { clip: 'walk', params: { skin: '#6e4428', hair: '#2b2233', headgearSize: 1.4, metal: '#c98a4a', outfit: '#e08a2c', trim: '#3a3350', weapon: 'spear', weaponLength: 1.3 } },
+  { clip: 'idle', params: { skin: '#b9a7e0', hairStyle: 'long', hair: '#d8d8e0', headgear: 'crown', outfit: '#f0ead8', trim: '#7a4fc4', weapon: 'none', capeLength: 1.6 } },
+  { clip: 'run', look: 'handheld', params: { hairStyle: 'spiky', headgear: 'none' } },
+  { clip: 'victory', params: { hairStyle: 'spiky', hair: '#3f7fd1', headgear: 'none', outfit: '#e6c545', trim: '#3f6fd1', weaponLength: 1.35, height: 0.15, head: 0.9 } },
+  { clip: 'walk', look: 'sunset', params: { weapon: 'axe', metal: '#5d6475', outfit: '#c9423a', build: 1, height: 0.9 } },
+];
+const grid = document.getElementById('dozen');
+const many = DOZEN.map((d, i) => {
+  const el = h('lo-sprite', { sprite: 'knight', clip: d.clip, look: d.look ?? null, params: JSON.stringify(d.params ?? {}) });
+  grid.append(h('a', { href: 'remix.html', 'aria-label': `Open Hero number ${i + 1} in the editor`, onclick: () => {
+    const p = {}; for (const k of el.changed()) p[k] = el.params[k];
+    bag.put('knight', { params: p, look: el.look });
+  } }, el));
+  return el;
+});
+document.getElementById('shuffle').onclick = () => many.forEach((el) => el.def && el.surprise());
+
+/* ---- sounds and music ---- */
+const list = document.getElementById('tracks');
+for (const id of ['sword-slash', 'coin-pickup', 'wyrm-roar', 'wind', 'victory-fanfare', 'thornwood-overworld']) {
+  const a = assets.find((x) => x.id === id);
+  const pic = a.thumb ? h('span', { class: 'wave', style: `background-image:url(${url(a.thumb)})` }) : rollEl(id, 32, 20, 2);
+  const btn = h('button', { class: 'play', type: 'button', 'aria-pressed': 'false', 'aria-label': `Play ${a.name}`, html: ICON.play, onclick: () => {
+    const on = btn.getAttribute('aria-pressed') !== 'true';
+    btn.setAttribute('aria-pressed', String(on)); btn.innerHTML = on ? ICON.pause : ICON.play;
+    clearTimeout(btn.t); if (on) btn.t = setTimeout(() => { btn.setAttribute('aria-pressed', 'false'); btn.innerHTML = ICON.play; }, Math.min(4000, a.tech.seconds * 1000 + 300));
+  } });
+  list.append(h('li', { class: 'track' }, btn, pic,
+    h('span', {}, h('span', { class: 'name' }, a.name), h('span', { class: 'styles' }, `${a.type === 'music' ? 'Music' : a.type === 'sfx' ? 'Sound effect' : a.type === 'jingle' ? 'Jingle' : 'Background sound'}. Styles: ${a.tech.styles.join(', ')}`)),
+    h('span', { class: 'len' }, seconds(a.tech.seconds))));
+}
+</script>
+<script type="module" src="../shared/mockbar.js"></script>
+</body>
+</html>

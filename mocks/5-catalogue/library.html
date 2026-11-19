@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Library: Loadout</title>
+<link rel="stylesheet" href="../shared/fonts.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <a class="mark" href="landing.html">Loadout</a>
+  <nav class="top-nav" aria-label="Main">
+    <a href="library.html" aria-current="page">Library</a>
+    <a href="library.html?kind=kits">Kits</a>
+    <a href="remix.html"><span class="wide">Change the </span>Hero</a>
+  </nav>
+  <button class="bag-btn" type="button" aria-haspopup="dialog" aria-expanded="false">Bag <span class="count" data-bag-count>0</span></button>
+</header>
+
+<main class="lib">
+  <h1 class="sr">Library</h1>
+  <div class="lib-search">
+    <form class="search" role="search" id="search-form">
+      <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg>
+      <input id="q" type="search" aria-label="Search the library" placeholder="Search sprites, sounds and music" autocomplete="off">
+    </form>
+    <label class="smart" title="Understands descriptions like &quot;something for when the player dies&quot;">
+      <button class="switch" type="button" role="switch" aria-checked="false" id="smart" aria-label="Smarter search"></button>
+      <span>Smarter search</span>
+    </label>
+  </div>
+
+  <div class="tabs" role="tablist" aria-label="Kind" id="kinds"></div>
+
+  <div class="bar">
+    <div id="filters" style="display:contents"></div>
+    <span class="spacer"></span>
+    <span class="count" id="count" aria-live="polite"></span>
+    <span class="sort" id="sort-wrap"><label for="sort">Sort</label>
+      <select id="sort">
+        <option value="featured">Featured</option>
+        <option value="name">Name, A to Z</option>
+        <option value="controls">Most controls</option>
+        <option value="length">Longest first</option>
+      </select>
+    </span>
+    <span class="view" id="view-wrap">
+      <span class="seg" role="group" aria-label="Layout">
+        <button type="button" data-view="grid" aria-pressed="true" aria-label="Grid"><svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M2.5 2.5h4.5v4.5H2.5zM9 2.5h4.5v4.5H9zM2.5 9h4.5v4.5H2.5zM9 9h4.5v4.5H9z"/></svg></button>
+        <button type="button" data-view="list" aria-pressed="false" aria-label="List with more facts"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M2.5 4h11M2.5 8h11M2.5 12h11"/></svg></button>
+      </span>
+    </span>
+  </div>
+
+  <div id="results"></div>
+</main>
+
+<script type="module" src="library.js"></script>
+<script type="module" src="../shared/mockbar.js"></script>
+</body>
+</html>

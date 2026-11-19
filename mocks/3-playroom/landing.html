@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loadout: game art you can change</title>
+<link rel="stylesheet" href="../shared/fonts.css">
+<link rel="stylesheet" href="style.css">
+<script type="module" src="../shared/kit.js"></script>
+</head>
+<body>
+
+<header class="top">
+  <a class="brand" href="landing.html"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Loadout</a>
+  <nav class="top-nav" aria-label="Main">
+    <a href="library.html">Library</a>
+    <a href="library.html#kits">Kits</a>
+    <a class="wide" href="#how">How it works</a>
+  </nav>
+  <details class="bag" data-bag></details>
+</header>
+
+<main>
+  <div class="wrap">
+    <section class="hero field" data-tone="sky" aria-labelledby="h-hero">
+      <div class="hero-copy">
+        <h1 class="h-hero" id="h-hero">Game art you can change.</h1>
+        <p class="lead">Pick a hero, a monster or a tune. Change it until it is yours. Download it, ready for your game.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary btn-lg" href="library.html">Browse the library</a>
+          <a class="link" href="#kits">See the three kits</a>
+        </div>
+      </div>
+
+      <div class="hero-stage" aria-hidden="true">
+        <span class="podium"></span>
+        <lo-sprite id="hero" sprite="knight" clip="walk"></lo-sprite>
+      </div>
+
+      <div class="try" id="try" aria-label="Change the Hero">
+        <h2>Go on, change the Hero</h2>
+        <div id="try-ctls" style="display:grid;gap:16px"></div>
+        <div class="try-foot">
+          <button class="btn btn-ink btn-lg" id="surprise" type="button"><svg class="ic" aria-hidden="true"><use href="#i-dice"/></svg>Surprise me</button>
+          <a class="link small" id="keep" href="remix.html">Change everything about this Hero</a>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <section class="sec wrap" aria-labelledby="h-wall">
+    <div class="sec-head">
+      <h2 class="h-sec" id="h-wall">One hero, endless versions.</h2>
+      <p class="lead">Every picture here is the same Hero with different choices. All 137 sprites work this way: nothing is a fixed picture.</p>
+    </div>
+    <div class="wall" id="wall"></div>
+  </section>
+
+  <section class="sec wrap" id="kits" aria-labelledby="h-kits">
+    <div class="sec-head">
+      <h2 class="h-sec" id="h-kits">Three kits, each a whole game in a box.</h2>
+      <p class="lead">Characters, enemies, ground, pickups, menus, sounds and music that belong together. Change the look of a whole kit in one press.</p>
+      <div class="looks-row" id="looks" role="group" aria-label="Look for all three kits"></div>
+    </div>
+    <div class="kits" id="kit-bands"></div>
+  </section>
+
+  <section class="sec wrap" id="how" aria-labelledby="h-how">
+    <div class="sec-head">
+      <h2 class="h-sec" id="h-how">From library to game in four steps.</h2>
+    </div>
+    <ol class="steps">
+      <li class="step">
+        <div class="tile" data-tone="sun"><div style="display:flex;align-items:flex-end;gap:8px">
+          <lo-sprite sprite="slime" scale="2"></lo-sprite><lo-sprite sprite="wizard" clip="idle" scale="2"></lo-sprite><lo-sprite sprite="coin" scale="2"></lo-sprite>
+        </div></div>
+        <h3>Pick</h3>
+        <p>Find a hero, a monster, a sound or a whole kit. Search with everyday words.</p>
+      </li>
+      <li class="step">
+        <div class="tile" data-tone="dusk"><div style="display:flex;align-items:center;gap:0">
+          <lo-sprite sprite="knight" clip="idle" scale="2"></lo-sprite>
+          <svg class="ic" aria-hidden="true" style="width:28px;height:28px"><use href="#i-right"/></svg>
+          <lo-sprite sprite="knight" clip="idle" scale="2" params='{"hairStyle":"long","headgear":"crown","weapon":"axe","outfit":"#4f9d57","trim":"#e6c545","build":0.8}'></lo-sprite>
+        </div></div>
+        <h3>Change</h3>
+        <p>Move a few sliders and choose from pictures. No drawing, no recording.</p>
+      </li>
+      <li class="step">
+        <div class="tile" data-tone="sky"><div class="scene" id="step-scene" style="--s:2;position:absolute;left:-50px;bottom:0;border-radius:0"></div></div>
+        <h3>Try</h3>
+        <p>Drop it into a small playable scene and see it move before you take it.</p>
+      </li>
+      <li class="step">
+        <div class="tile" data-tone="leaf"><ul class="step-files">
+          <li><b>PNG</b>Pictures, frame by frame</li>
+          <li><b>WAV</b>Sounds and music</li>
+          <li><b>ZIP</b>All of it in one file</li>
+        </ul></div>
+        <h3>Download</h3>
+        <p>Get one zip with everything in your bag, changes included.</p>
+      </li>
+    </ol>
+  </section>
+
+  <div class="wrap">
+    <section class="audio field" data-tone="dusk" aria-labelledby="h-audio">
+      <div class="audio-copy">
+        <h2 class="h-sec" id="h-audio">Sounds and music are in the box.</h2>
+        <p class="lead">56 sounds and 6 music tracks, made to go with the art. You can change them too: a heavier sword, a longer tune, a different lead instrument.</p>
+        <div class="cue">
+          <p class="small"><strong>The Hero already knows when to make a noise.</strong> Walking plays a footstep on the first and fifth picture.</p>
+          <ol class="frames" id="cue-frames" aria-label="The eight pictures of the walk; a footstep plays on pictures 1 and 5"></ol>
+        </div>
+      </div>
+      <ul class="tracks" id="tracks"></ul>
+    </section>
+  </div>
+
+  <section class="sec wrap" aria-labelledby="h-works">
+    <div class="works">
+      <div class="works-copy">
+        <h2 class="h-sec" id="h-works">Works in Unity, and anywhere that reads PNG and WAV.</h2>
+        <p class="lead">You download ordinary files, so they open in Unity or any other engine you like. A ready-made Unity package is coming later.</p>
+      </div>
+      <ul class="gets">
+        <li><b>PNG</b><span>Every animation as a row of pictures, at 1, 2 or 4 times the size.</span>
+          <div class="sheet-px" id="sheet-px" role="img" aria-label="The Hero's walk as a row of eight pictures"></div></li>
+        <li><b>Data</b><span>A small file that tells your engine where each picture starts.</span></li>
+        <li><b>WAV</b><span>Every sound and every music track.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="sec wrap" aria-label="What is in the library today">
+    <ul class="numbers">
+      <li><b>137</b><span>sprites</span></li>
+      <li><b>56</b><span>sounds</span></li>
+      <li><b>6</b><span>music tracks</span></li>
+      <li><b>3</b><span>complete kits</span></li>
+      <li><b>14</b><span>looks for a whole kit</span></li>
+    </ul>
+  </section>
+
+  <div class="wrap">
+    <section class="closing field" data-tone="sun">
+      <h2 class="h-sec">Your game is missing a hero.</h2>
+      <a class="btn btn-primary btn-lg" href="library.html">Browse the library</a>
+    </section>
+    <footer class="foot">Loadout. Game-ready pixel art, sounds and music you can change.</footer>
+  </div>
+</main>
+
+<script type="module" src="landing.js"></script>
+<script type="module" src="../shared/mockbar.js"></script>
+</body>
+</html>
