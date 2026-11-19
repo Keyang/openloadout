@@ -6,25 +6,27 @@ It is for people who make small 2D games and do not draw, record or write code. 
 
 ## What is in it today
 
-Counts are of committed files as of 22:21 on 2026-11-18. The build loop was still running, so they can rise.
+Counts are of committed files as of 02:10 on 2026-11-19, when the build loop's four goals were checked.
 
 | Thing | Count |
 |---|---|
-| Sprites (`sprites/*.js`, committed) | 132 (5 more files are on disk and not yet committed) |
-| Sounds (`sounds/*.json`, committed) | 56 sound effects, ambience loops and jingles |
+| Sprites (`sprites/*.js`) | 137 |
+| Sounds (`sounds/*.json`) | 56 sound effects, ambience loops and jingles |
 | Music tracks (also in `sounds/`) | 6 |
-| Bundle files (`bundles/*.json`) | 4 |
-| Commits | 121 |
+| Bundle files (`bundles/*.json`) | 6: three kits and three small starter bundles |
+| Tests | 2,595 unit tests and 358 browser tests (8 skipped: Firefox and Safari are not installed) |
 
-A **bundle** is a list of sprites, sounds and tracks that belong together. A **kit** is a bundle for one kind of game. Three kits are planned, one for each of three game types picked from the top 100 2D games (`docs/game-types-research.md`):
+A **bundle** is a list of sprites, sounds and tracks that belong together. A **kit** is a bundle for one kind of game, with a plan in `bundles/specs/`. There is one kit for each of three game types picked from the top 100 2D games (`docs/game-types-research.md`):
 
-| Kit (id) | Game type | Sprites | Sounds | Tracks | Bundle file |
-|---|---|---|---|---|---|
-| Thornwood Keep platformer kit (`kit-platformer-fantasy`) | Platformer, side view, fantasy | 47 of 47 committed | 20 of 20 | 2 of 2 | Exists |
-| Hearthvale turn-based RPG kit (`kit-rpg-fantasy`) | Turn-based RPG, top-down map and side-view battles, fantasy | 47 of 49 committed | 20 of 20 | 2 of 2 | Not written yet |
-| Derelict Station roguelite kit (`kit-roguelite-scifi`) | Roguelike action, top-down, science fiction | 45 of 48 committed | 20 of 20 | 2 of 2 | Not written yet |
+| Kit (id) | Game type | Sprites | Sounds | Tracks |
+|---|---|---|---|---|
+| Thornwood Keep platformer kit (`kit-platformer-fantasy`) | Platformer, side view, fantasy | 47 | 20 | 2 |
+| Hearthvale turn-based RPG kit (`kit-rpg-fantasy`) | Turn-based RPG, top-down map and side-view battles, fantasy | 49 | 20 | 2 |
+| Derelict Station roguelite kit (`kit-roguelite-scifi`) | Roguelike action, top-down, science fiction | 48 | 20 | 2 |
 
-`tools/bundles-from-plans.mjs` writes a kit's bundle file once every asset it lists exists. At 22:21 `--check` reported all three plans complete on disk (some assets are not yet committed), so the two missing bundle files can now be written. The three small starter bundles are `dungeon-starter`, `wizard-camp` and `menu-sounds`.
+`tools/bundles-from-plans.mjs` writes a kit's bundle file once every asset its plan lists exists. The three small starter bundles are `dungeon-starter`, `wizard-camp` and `menu-sounds`.
+
+A full build with the quality bar took 25 minutes at 02:29 on 2026-11-19 (1,523 s; 199 assets checked, 0 errors, 9 warnings). The quality cache now re-checks only the assets whose own files or imported modules changed; a build without the quality bar (`--skip-quality`) takes about 5 seconds.
 
 ## How to run it
 
@@ -146,8 +148,8 @@ At 21:44 the last full unit run in `docs/progress.md` was 2,089 of 2,100. At 22:
 - **The MCP server is not built.** `window.loadout` and its description exist.
 - **A second art style is not built.** The framework seam exists and is tested with test-only styles (`docs/architecture.md`, Contract 12).
 - **Rigs as data are partly built** (Contract 13): the generic renderer is not.
-- **Licences:** every asset says `draft`.
 - **Open decisions for Keyang** are listed in `docs/features.md`: R2, R3 and R4 (Contract 13), whether the MCP server is next, the "flat Hero" style test, installing Firefox and Safari, a `footprint` field on sprites, and the search-by-meaning default.
-- The kit counts above and the committed file counts can still change: other agents were finishing assets.
+- **Engine steps in the download are untried.** The text for each kind of asset (tilesets, interface pieces, backgrounds) gives Unity and Godot steps written from knowledge of the engines; nothing has been imported into either.
+- **Licences:** every asset records `draft`, and the download's licence file says the terms are not set yet. Choosing terms is Keyang's decision.
 
 The sound engine in `sound/` began as a copy of `experiment/procedural-sfx/` and has since diverged, so do not re-copy it over; merge by hand.
