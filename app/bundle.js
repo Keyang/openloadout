@@ -9,6 +9,7 @@ import { defaultTheme, normalizeTheme, applyColour, spriteMaterials, spriteLook 
 import { applySound, themedSoundParams, soundSettingsFor } from '../sound/theme.js';
 import { soundById, soundParams, rendered, renderAsync, wavBytes, isMusic } from './audio.js';
 import { loadCatalog, assetById, loadSprite } from './catalog.js';
+import { themeFor, lookOf } from './bag.js';      // an item may wear a look of its own instead of the bag's
 import { restoreRuntime, madeItemState } from './api.js';      // W5-B: an item made on a visit is exported only once it has been checked again, and only as the bag stored it
 import { describeSheet } from '../engine/sheet-info.js';       // what kind of sheet it is, and what that kind needs (tile rules, layers, text areas), written into the JSON
 import { spriteGuide, packageGuide, licenceText, whatItIs, soundWhatItIs } from './guide.js';      // the words of a download, by kind of asset
@@ -162,6 +163,8 @@ function unique(taken, base, ext = '') {
  * (`whatItIs`, `license`). The words are in app/guide.js.
  * items: bag items { key, kind, id, settings }; theme: the bag's theme, applied to everything;
  * scale: pixel size for sprites whose settings do not choose one.
+ * An item whose settings carry a look of its own (`settings.look`, a named look: app/bag.js lookOf) is made with that
+ * look instead of the package's; its manifest entry then says `look` (the id) and `theme` (that look, complete).
  * Optional: catalog ({ id: { name, role, type } }), onProgress(text).
  * An item whose asset is not on the site, or whose own file cannot be loaded, is left out and named under "missing".
  * An item made on a visit (it carries `definition`, Contract 11) is packaged like any other; its source goes in next to it
@@ -180,6 +183,7 @@ export async function packageFiles({ items, theme = null, scale = 1, catalog = n
   const info = catalog ?? await catalogue();
   const files = [], assets = [], missing = [], unsupported = [], needsRemaking = [], refused = [];
   const folders = new Set(), soundNames = new Set(), musicNames = new Set();
+  const themeOf = new Map();      // each sprite's entry -> the look it was drawn with (null: none)
   let done = 0;
   if (items.some((i) => i.definition)) { onProgress('Checking what was made on a visit…'); await restoreRuntime(true); }
   for (const item of items) {
@@ -187,6 +191,8 @@ export async function packageFiles({ items, theme = null, scale = 1, catalog = n
     const made = madeItemState(item);
     if (made && made.state !== 'ready') { needsRemaking.push(item.id); continue; }
     const s = item.settings ?? {};
+    // the look this item is exported with: its own named look when it carries one, otherwise the package's
+    const own = lookOf(s), ti = own ? activeTheme(themeFor(s, theme)) : t;
     const about = info[item.id] ?? {};
     const entry = (name, meta) => ({ key: item.key, id: item.id, kind: item.kind, name: about.name ?? name, role: about.role ?? meta?.role ?? null, type: about.type ?? meta?.type ?? null, files: [], settings: s });
     // a sprite's own program is loaded here, when the package needs it
@@ -203,7 +209,7 @@ export async function packageFiles({ items, theme = null, scale = 1, catalog = n
       const cues = s.cues ?? defaultCues(sprite);
       let made;
       // W5-B: a sprite made on a visit whose frames at these settings fail the quality bar is left out, and named with why
-      try { const parts = await spriteParts(sprite, p, cues, s.scale ?? scale, t, style, s.lookParams); made = parts.files; a.whatItIs = whatItIs(parts.json); } catch (e) {
+      try { const parts = await spriteParts(sprite, p, cues, s.scale ?? scale, ti, style, own ? undefined : s.lookParams); made = parts.files; a.whatItIs = whatItIs(parts.json); } catch (e) {
         // (looks: below, once it is known to be in the package, the entry records the settings it was really drawn with)
         if (!e || !e.refused) throw e;
         folders.delete(folder);
@@ -219,6 +225,8 @@ export async function packageFiles({ items, theme = null, scale = 1, catalog = n
       if (a.files.includes(`sprites/${folder}/${sprite.id}.png`)) a.sheet = `sprites/${folder}/${sprite.id}.png`;
       a.animations = `sprites/${folder}/${sprite.id}.json`;
       if (style !== 'pixel') a.artStyle = style;
+      if (own) { a.look = own; a.theme = normalizeTheme(ti ?? {}); }
+      themeOf.set(a, ti);
       if (typeof item.definition?.source === 'string') {
         a.madeOnThisVisit = true;
         a.source = `sprites/${folder}/${sprite.id}.source.js`;
@@ -234,9 +242,9 @@ export async function packageFiles({ items, theme = null, scale = 1, catalog = n
       let r;
       if (music) {
         onProgress(`Building ${done} of ${items.length}: the music takes a few seconds…`);
-        r = await renderAsync(patch, t ? themedSoundParams(patch, base, t) : base);
-        if (t) r = applySound(r, soundSettingsFor(patch, t));
-      } else r = themedSound(patch, base, s.seed ?? 1, t);
+        r = await renderAsync(patch, ti ? themedSoundParams(patch, base, ti) : base);
+        if (ti) r = applySound(r, soundSettingsFor(patch, ti));
+      } else r = themedSound(patch, base, s.seed ?? 1, ti);
       const name = `${music ? 'music' : 'sounds'}/${unique(music ? musicNames : soundNames, item.id, '.wav')}`;
       files.push({ name, data: wavBytes(r) });
       a.files.push(name);
@@ -244,6 +252,7 @@ export async function packageFiles({ items, theme = null, scale = 1, catalog = n
       a.loop = !!(r.loop ?? patch.loop);
       a.license = about.license ?? patch.meta?.license ?? null;
       a.whatItIs = soundWhatItIs(a);
+      if (own) { a.look = own; a.theme = normalizeTheme(ti ?? {}); }
       if (item.definition?.patch) {
         a.madeOnThisVisit = true;
         a.source = name.replace(/\.wav$/, '.source.json');
@@ -255,23 +264,25 @@ export async function packageFiles({ items, theme = null, scale = 1, catalog = n
   }
   // looks (Contract 7): under a look, each sprite's entry records every setting it was really drawn with, the look's
   // shape changes included, so the same picture can be made again from this list alone. A package with no look is unchanged.
-  if (t) for (const a of assets) {
+  for (const a of assets) {
+    const at = themeOf.get(a);      // (an item with a look of its own is recorded under that look)
+    if (!at) continue;
     const sprite = a.kind === 'sprite' ? await loadSprite(a.id).catch(() => null) : null;
     if (!sprite) continue;
     // from the bag's record of what its look made of the sprite, when it has one (the same values the sheet was drawn with)
-    const used = spriteLook(sprite, a.settings?.params ?? {}, t, { record: a.settings?.lookParams });
+    const used = spriteLook(sprite, a.settings?.params ?? {}, at, { record: a.look ? undefined : a.settings?.lookParams });
     a.settings = { ...a.settings, params: used.params };
     delete a.settings.lookParams;
     a.changedByLook = used.changed;
   }
   const manifest = { app: 'Loadout', format: 'loadout-package', version: 1, theme: normalizeTheme(t ?? {}), assets };
-  if (t && assets.some((a) => a.kind === 'sprite')) manifest.settingsUsed = SETTINGS_USED;
+  if (assets.some((a) => a.kind === 'sprite' && themeOf.get(a))) manifest.settingsUsed = SETTINGS_USED;
   if (missing.length) manifest.missing = missing;
   if (unsupported.length) manifest.unsupported = unsupported;
   if (needsRemaking.length) manifest.needsRemaking = needsRemaking;
   if (refused.length) manifest.refused = refused;
   files.push({ name: 'manifest.json', data: enc.encode(JSON.stringify(manifest, null, 2)) });
-  files.push({ name: 'read-me.txt', data: enc.encode(packageGuide(manifest, !!t)) });      // opens with the contents list: name, what it is, where
+  files.push({ name: 'read-me.txt', data: enc.encode(packageGuide(manifest, !!t || assets.some((a) => a.look && a.look !== 'original'))) });      // opens with the contents list: name, what it is, where
   files.push({ name: 'licence.txt', data: enc.encode(licenceText(assets)) });               // what every asset records about its licence, and nothing more
   return files;
 }

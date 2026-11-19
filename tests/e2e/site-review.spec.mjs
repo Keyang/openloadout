@@ -206,7 +206,8 @@ test('the front page does not fetch the search index until a typed search needs 
   // a search uses the index; it answers from the catalogue at once and the index comes after (Contract 5)
   await page.locator('main input').first().fill('coin');
   await page.keyboard.press('Enter');
-  await expect(page.locator('main .finder .card').first()).toBeVisible();
+  // (the front page lists nothing itself: the search opens the library)
+  await expect(page.locator('ul.results > li .card').first()).toBeVisible();
   await expect.poll(() => asked.filter((u) => /search\.sqlite/.test(u)).length, { message: 'a typed search then fetches the index' }).toBe(1);
 });
 
@@ -259,10 +260,12 @@ test('a background fills the preview frame, with no ground under it', async ({ p
 test('interface pieces and backgrounds are off the grass on their cards too', async ({ page }) => {
   test.skip(!uiPiece, 'no interface piece in the catalogue');
   await openRoute(page, `/browse?q=${encodeURIComponent(uiPiece.name)}`);
-  const card = page.locator(`a.card[href="#/sprite/${uiPiece.id}"] .pic-tile`);
+  // every card's art sits on the plain shelf tile (docs/site-design.md, "Art"): no card has grass under it
+  const card = page.locator(`ul.results > li[data-id="${uiPiece.id}"] .card-tile`);
   await expect(card).toHaveCount(1);
   await expect(card).not.toHaveClass(/on-ground/);
-  await expect(card).toHaveClass(/on-panel/);
+  await expect(card).toHaveCSS('background-color', 'rgb(245, 245, 243)');
+  await expect(card.locator('canvas, img').first()).toBeAttached();
 });
 
 // ---- at phone width -----------------------------------------------------------------------------------------------

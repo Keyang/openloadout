@@ -18,7 +18,7 @@ test.describe('Hero parts', () => {
     await expect(weapon.getByRole('group', { name: 'Weapon' }).getByRole('button', { name: 'Sword' })).toHaveAttribute('aria-pressed', 'true');
     for (const name of ['Length', 'Hold angle', 'Swing']) await expect(slider(weapon, name)).toBeVisible();
     const tabs = (await page.locator('.rx-panel [role="tab"]').allTextContents()).map((t) => t.trim());
-    expect(tabs).toEqual(['Shape', 'Parts', 'Colours', 'Motion', 'Sounds']);
+    expect(tabs).toEqual(['Shape', 'Parts', 'Colours', 'Motion', 'Sounds', 'Look']);
     const parts = (await page.locator('.rx-panel .part .ctl.is-main .ctl-label').allTextContents()).map((t) => t.trim());
     expect(parts).toEqual(expect.arrayContaining(['Hair', 'Headgear', 'Weapon', 'Cape']));
     // the weapon's controls are in its block, not among the sprite's own
@@ -141,7 +141,7 @@ test.describe('phone width', () => {
   test.use({ viewport: { width: 375, height: 800 } });
   test('the Hero page with part blocks has no sideways scroll', async ({ page }) => {
     await openRoute(page, '/sprite/knight');
-    await page.waitForSelector('.strip .cell canvas');
+    await page.waitForSelector('canvas.stage');
     await openTab(page, 'parts');
     await expect(block(page, 'Weapon')).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1)).toBe(false);
@@ -413,7 +413,7 @@ test.describe('phone width: the preview stays in view', () => {
   test.use({ viewport: { width: 375, height: 800 } });
   test('scrolling down to the last controls keeps the preview on screen', async ({ page }) => {
     await openRoute(page, '/sprite/knight');
-    await page.waitForSelector('.strip .cell canvas');
+    await page.waitForSelector('canvas.stage');
     await openTab(page, 'motion');
     // bring the last control to the bottom of the screen (the page continues below it with related assets)
     await page.locator('#c-speed').evaluate((e) => e.scrollIntoView({ block: 'end' }));

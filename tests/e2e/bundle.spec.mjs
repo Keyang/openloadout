@@ -50,6 +50,8 @@ async function spriteStats(page) {
 }
 
 async function openBundle(page, query = '') {
+  // the kit's scene and its look come first on the page, so the window is made tall: every picture is then on screen and drawn
+  await page.setViewportSize({ width: page.viewportSize().width, height: Math.max(page.viewportSize().height, 5600) });
   await openRoute(page, `/bundle/${BUNDLE_ID}${query}`);
   await settled(page);
 }
@@ -60,7 +62,7 @@ test('the page shows the bundle, its controls, and every sprite, sound and track
   await openBundle(page);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(BUNDLE.name);
   await expect(page.locator('main')).toContainText(BUNDLE.blurb);
-  for (const name of ['Surprise me', 'Start over', 'Add the whole bundle to my bag', 'Download this bundle', 'Try it in the playground']) {
+  for (const name of ['Surprise me', 'Start over', 'Add the whole kit to my bag', 'Download this kit', 'Try it in the playground']) {
     await expect(page.getByRole('button', { name, exact: true })).toBeVisible();
   }
   for (const label of ['Colour shift', 'Colourfulness', 'Contrast', 'Pitch', 'Brightness', 'Speed', 'Intensity', 'Colour set']) {
@@ -221,6 +223,7 @@ test('bag page: with a brightness change, music plays the rendered, styled loop 
 
 test('every sprite is drawn whole, at the largest whole-number size that fits its tile, with or without shapes', async ({ page }) => {
   for (const id of [BUNDLE_ID, 'wizard-camp']) {
+    await page.setViewportSize({ width: 1280, height: 3200 });      // every picture on screen, so every one is drawn
     await openRoute(page, `/bundle/${id}`);
     await settled(page);
     for (const shapes of [false, true]) {
@@ -244,7 +247,7 @@ test('"Add the whole bundle to my bag" adds every asset once with this look, and
   await openBundle(page);
   await expect(count(page)).toHaveText('0');
   await page.getByRole('button', { name: 'Frost', exact: true }).click();
-  await page.getByRole('button', { name: 'Add the whole bundle to my bag' }).click();
+  await page.getByRole('button', { name: 'Add the whole kit to my bag' }).click();
   const n = allIds().length;
   await expect(count(page)).toHaveText(String(n));
   const items = await bagItems(page);
@@ -254,20 +257,43 @@ test('"Add the whole bundle to my bag" adds every asset once with this look, and
 
   // the bag is no longer empty: the page asks
   await page.getByRole('button', { name: 'Toxic', exact: true }).click();
-  await page.getByRole('button', { name: 'Add the whole bundle to my bag' }).click();
+  await page.getByRole('button', { name: 'Add the whole kit to my bag' }).click();
   await expect(page.locator('.bundle-ask')).toContainText('already');
   await page.getByRole('button', { name: 'Replace what is in my bag' }).click();
   await expect(count(page)).toHaveText(String(n));
   expect(await bagTheme(page)).toEqual(await presetTheme(page, 'toxic'));
-  await page.getByRole('button', { name: 'Add the whole bundle to my bag' }).click();
-  await page.getByRole('button', { name: 'Add to what is in my bag' }).click();
-  await expect(count(page)).toHaveText(String(2 * n));
+  // the kit is in the bag already, with this look: adding it again adds nothing and asks nothing
+  await page.getByRole('button', { name: 'Add the whole kit to my bag' }).click();
+  await expect(page.locator('.bundle-ask')).toBeHidden();
+  await expect(page.locator('.bundle-actions .status')).toContainText('already in your bag');
+  await expect(count(page)).toHaveText(String(n));
   await expect(page.getByRole('link', { name: 'Go to bag' })).toBeVisible();
+  // one thing taken out, another changed by the visitor: only the missing one is added, the changed one is left as it is
+  const [gone, kept] = await page.evaluate(async () => { const { bag } = await import('/app/bag.js'); const it = bag.items(); bag.remove(it[0].key); const s = it.find((i) => i.kind === 'sprite' && i.key !== it[0].key); bag.update(s.key, { ...s.settings, scale: 2 }); return [it[0].id, s.id]; });
+  await page.getByRole('button', { name: 'Add the whole kit to my bag' }).click();
+  await page.getByRole('button', { name: 'Add to what is in my bag' }).click();
+  const now = await bagItems(page);
+  expect(now.filter((i) => i.id === gone).length, 'the missing one is back, once').toBe(1);
+  expect(now.filter((i) => i.id === kept).map((i) => i.settings.scale).sort(), 'the changed one stays, and the kit\'s own is added beside it').toEqual([1, 2]);
+  expect(now.length).toBe(n + 1);
+});
+
+test('"Try it in the playground" with the kit already in the bag goes straight there and adds nothing', async ({ page }) => {
+  await openBundle(page);
+  const n = allIds().length;
+  await page.getByRole('button', { name: 'Add the whole kit to my bag' }).click();
+  await expect(count(page)).toHaveText(String(n));
+  await page.getByRole('button', { name: 'Night', exact: true }).click();      // another look on the page makes no difference to that
+  await page.getByRole('button', { name: 'Try it in the playground' }).click();
+  await expect(page).toHaveURL(/#\/play$/);
+  await page.waitForFunction(() => window.__loadoutPlay && window.__loadoutPlay.ready, null, { timeout: 60_000 });
+  await expect(count(page)).toHaveText(String(n));
+  expect((await bagItems(page)).length).toBe(n);
 });
 
 test('the bag page has the same controls, and its pictures follow the look', async ({ page }) => {
   await openBundle(page);
-  await page.getByRole('button', { name: 'Add the whole bundle to my bag' }).click();
+  await page.getByRole('button', { name: 'Add the whole kit to my bag' }).click();
   await openRoute(page, '/bag');
   const tile = page.locator('.bag-item').first().locator('canvas.tile');
   const before = await canvasStats(tile);
@@ -283,7 +309,7 @@ test('the bag page has the same controls, and its pictures follow the look', asy
 test('"Download this bundle" gives a zip with the look applied and every asset listed', async ({ page }) => {
   test.setTimeout(240_000);
   const dl = async () => {
-    const { name, bytes } = await downloadFrom(page, () => page.getByRole('button', { name: 'Download this bundle' }).click(), { timeout: 120_000 });
+    const { name, bytes } = await downloadFrom(page, () => page.getByRole('button', { name: 'Download this kit' }).click(), { timeout: 120_000 });
     return { name, files: readZip(new Uint8Array(bytes)) };
   };
   await openBundle(page);
@@ -319,7 +345,7 @@ test('phone width: no sideways scroll, controls and previews still there', async
 
 test('an unknown bundle says so', async ({ page }) => {
   await openRoute(page, '/bundle/no-such-bundle');
-  await expect(page.locator('main')).toContainText('That bundle is not here');
+  await expect(page.locator('main')).toContainText('That kit is not here');
 });
 
 test('50 sprites: a look change stays smooth', async ({ page }) => {

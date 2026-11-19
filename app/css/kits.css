@@ -1,4 +1,101 @@
-/* Loadout: the kits, #/bundles and #/bundle/<id> (app/home.js bundlesPage, app/bundle-page.js, app/theme-controls.js). Match: the kit section of mocks/5-catalogue/landing.html.
+/* Loadout: the kits, #/bundles and #/bundle/<id> (app/kit-list.js, app/bundle-page.js, app/theme-controls.js). Match: the kit section of mocks/5-catalogue/landing.html.
    Owned by the builder of that page. Only that page's own layout goes here; tokens and the shared components (button,
    chip, tab, segmented control, tile, card, token, change dot, menu, the editing panel) are in base.css and are used
    as they are. Move what the page still needs out of app/style.css (the old rules) into this file. */
+
+/* ---------- the list of kits, #/bundles ---------- */
+.kits-page, .bundle-page { max-width: calc(var(--page) + 2 * var(--gutter)); margin: 0 auto; padding: var(--s7) var(--gutter) var(--s9); }
+.kits-head { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--s5) var(--s7); flex-wrap: wrap; margin-bottom: var(--s6); }
+.kits-head .lede { margin-top: var(--s3); }
+.kits-group { margin: var(--s7) 0 var(--s4); }
+.kits-page .kits { display: grid; gap: var(--s6); }
+
+/* one kit: its scene on the shelf, its facts beside it (also the top of a kit's own page) */
+:is(.kits-page, .bundle-page) .kit, :is(.kits-page, .bundle-page) .kit-top { display: grid; grid-template-columns: minmax(0, 640px) minmax(0, 1fr); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+:is(.kits-page, .bundle-page) .kit-scene { display: grid; place-items: center; min-height: 180px; border-radius: 0; overflow: hidden; }
+:is(.kits-page, .bundle-page) .kit-scene canvas { display: block; flex: none; }
+:is(.kits-page, .bundle-page) .kit-lineup { display: flex; align-items: flex-end; justify-content: center; gap: var(--s2); padding: var(--s5); min-height: 180px; }
+:is(.kits-page, .bundle-page) .kit-lineup img { flex: none; image-rendering: pixelated; }
+:is(.kits-page, .bundle-page) .kit-body { padding: var(--s6) var(--s7); display: flex; flex-direction: column; min-width: 0; }
+:is(.kits-page, .bundle-page) .kit-kind { font-size: 14px; color: var(--ink-2); }
+:is(.kits-page, .bundle-page) .kit-body h1, :is(.kits-page, .bundle-page) .kit-body h3 { margin-top: var(--s1); }
+:is(.kits-page, .bundle-page) .kit-body h3 a.card { display: inline; border: 0; padding: 0; background: none; box-shadow: none; border-radius: 0; }
+:is(.kits-page, .bundle-page) .kit-body h3 a:hover { text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
+:is(.kits-page, .bundle-page) .kit-blurb { margin-top: var(--s4); color: var(--ink-2); text-wrap: pretty; max-width: 34em; }
+:is(.kits-page, .bundle-page) .facts { margin-top: auto; padding-top: var(--s5); display: flex; gap: var(--s6); font-size: 14px; color: var(--ink-2); }
+:is(.kits-page, .bundle-page) .facts b { display: block; font-size: 20px; line-height: 1.2; letter-spacing: -0.02em; font-weight: 600; color: var(--ink); }
+:is(.kits-page, .bundle-page) .kit-actions { margin-top: var(--s5); display: flex; gap: var(--s2); flex-wrap: wrap; }
+
+/* ---------- one kit, #/bundle/<id> ---------- */
+.bundle-actions { margin-top: var(--s5); display: flex; gap: var(--s2); flex-wrap: wrap; align-items: center; }
+.bundle-actions .status { flex: 0 0 100%; margin: var(--s1) 0 0; font-size: 13px; color: var(--ink-2); }
+.bundle-actions .status:empty { display: none; }
+.bundle-actions .go-bag { font-size: 14px; }
+.bundle-ask { flex: 0 0 100%; display: flex; flex-wrap: wrap; gap: var(--s2); align-items: center; padding: var(--s3); background: var(--shelf); border-radius: var(--r); }
+.bundle-ask p { flex: 0 0 100%; font-size: 14px; }
+.bundle-look { margin-top: var(--s7); }
+.bundle-assets { margin-top: var(--s7); }
+.bundle-jump { display: grid; gap: var(--s2); margin-bottom: var(--s6); }
+.bundle-jump-row { display: grid; grid-template-columns: 72px minmax(0, 1fr); align-items: baseline; gap: var(--s3); }
+.bundle-jump-row .label { font-size: 13px; color: var(--ink-2); }
+.bundle-jump-row ul { display: flex; flex-wrap: wrap; gap: 6px; }
+.bundle-jump .n, .bundle-shelf .n, .bundle-group-name .n { color: var(--ink-2); font-weight: 400; font-variant-numeric: tabular-nums; }
+.bundle-shelf { margin: var(--s7) 0 var(--s4); padding-top: var(--s5); border-top: 1px solid var(--line); scroll-margin-top: var(--s4); }
+.bundle-assets > section:first-of-type .bundle-shelf { margin-top: 0; }
+.bundle-shelf:focus, .bundle-group-name:focus { outline: 0; }
+.bundle-group-name { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; margin: var(--s5) 0 var(--s3); scroll-margin-top: var(--s4); }
+.bundle-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: var(--s5) var(--s4); }
+.bundle-pic { display: grid; place-items: center; }
+.bundle-sprite .bundle-pic { aspect-ratio: auto; height: 132px; }      /* a whole-number size of every sprite fits 128 (app/bundle-page.js PIC); a backdrop shows its middle */
+.bundle-pic canvas { flex: none; }
+.bundle-card.broken .bundle-pic::after { content: 'No picture'; font-size: 12px; color: var(--ink-2); }
+.bundle-pic.sound, .bundle-pic.music { aspect-ratio: 2 / 1; color: var(--ink-2); grid-auto-flow: column; gap: var(--s3); }
+.bundle-card.is-playing .bundle-pic { color: var(--ink); }
+.bundle-grid.sounds, .bundle-grid.music { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+.bundle-tempo { display: block; }
+.kit-none > * + * { margin-top: var(--s4); }
+
+/* ---------- the look for everything together (app/theme-controls.js): a kit's page, the bag, the playground ---------- */
+.look-controls { min-width: 0; }
+.look-head { display: flex; align-items: center; gap: var(--s3); flex-wrap: wrap; margin-bottom: var(--s3); }
+.look-title { font-size: 15px; line-height: 1.3; font-weight: 600; letter-spacing: -0.01em; }
+.look-head .hint { font-size: 13px; color: var(--ink-2); margin-right: auto; min-width: 0; }
+.look-presets { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: var(--s2); }
+.look-preset { display: grid; gap: 6px; padding: var(--s2); border: 1px solid var(--line-2); border-radius: var(--r); background: var(--paper); font-size: 13px; color: var(--ink-2); text-align: left; min-width: 0; }
+.look-preset:hover { border-color: var(--ink); color: var(--ink); }
+.look-preset[aria-pressed='true'] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); color: var(--ink); font-weight: 500; }
+.look-chips { display: flex; height: 20px; border-radius: 3px; overflow: hidden; }
+.look-chips i { flex: 1; }
+.look-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.look-row { display: flex; align-items: center; gap: var(--s4); flex-wrap: wrap; margin-top: var(--s4); }
+.look-toggle { display: inline-flex; align-items: center; gap: var(--s2); font-size: 14px; cursor: pointer; }
+.look-shapes-hint { font-size: 13px; color: var(--ink-2); margin-top: 6px; max-width: 60em; }
+.look-more { margin-top: var(--s4); border-top: 1px solid var(--line); }
+.look-more summary { padding: var(--s3) 0; font-size: 14px; font-weight: 500; cursor: pointer; width: fit-content; }
+.look-more[open] { padding-bottom: var(--s3); }
+.look-more[open] > summary { margin-bottom: var(--s2); }
+.look-more > .look-group { margin: 0 0 var(--s4); padding: 0; border: 0; min-width: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--s3) var(--s6); }
+.look-group legend { padding: 0; margin-bottom: var(--s2); font-size: 13px; font-weight: 600; }
+.look-field { min-width: 0; font-size: 13px; }
+.look-field > label, .look-label { display: block; margin-bottom: 4px; }
+.look-field select { height: 32px; width: 100%; padding: 0 10px; border: 1px solid var(--line-2); border-radius: var(--r); background: var(--paper); font-size: 13px; }
+.look-head-row, .look-field .look-head { display: flex; align-items: baseline; gap: var(--s2); margin-bottom: 0; flex-wrap: nowrap; }
+.look-field .look-head label { margin-right: auto; }
+.look-value { color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.look-asmade { font-size: 12px; color: var(--ink-2); text-decoration: underline; text-underline-offset: 3px; }
+.look-field .slider { display: grid; grid-template-columns: auto minmax(60px, 1fr) auto; align-items: center; gap: var(--s2); color: var(--ink-2); font-size: 12px; }
+.look-field .swatch.look-none { background: var(--paper); box-shadow: inset 0 0 0 1px var(--line-2); }
+.look-field .swatch.look-none::after { content: ''; position: absolute; left: 3px; right: 3px; top: 11px; height: 1.5px; background: var(--ink-2); transform: rotate(-45deg); }
+
+@media (max-width: 1000px) {
+  :is(.kits-page, .bundle-page) .kit, :is(.kits-page, .bundle-page) .kit-top { grid-template-columns: minmax(0, 1fr); }
+  :is(.kits-page, .bundle-page) .kit-body { padding: var(--s5); }
+}
+@media (max-width: 720px) {
+  .kits-page, .bundle-page { padding-top: var(--s5); }
+  .bundle-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .bundle-grid.sounds, .bundle-grid.music { grid-template-columns: minmax(0, 1fr); }
+  .bundle-jump-row { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  :is(.kits-page, .bundle-page) .facts { gap: var(--s5); }
+  .look-head .hint { flex-basis: 100%; order: 3; }
+}

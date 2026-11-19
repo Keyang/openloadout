@@ -88,7 +88,8 @@ test('existing sprites export exactly what the renderer made before the style se
 test('a sprite with one style shows nothing new: no Style choice, no style in its link, its bag item or its files', async ({ page }) => {
   await openRoute(page, '/sprite/coin');
   await expect(page.locator('.style-choice')).toHaveCount(0);
-  await expect(lookTab(page)).toHaveCount(0);
+  await expect(lookTab(page)).toHaveCount(1);      // the Look tab holds the whole-set looks; a sprite with one style has no Style choice in it
+  await expect(lookTab(page).locator('.dot')).toBeHidden();
   await page.getByRole('button', { name: 'Add to my bag' }).click();
   await inBag(page);
   const item = await page.evaluate(async () => (await window.loadout.bag.items()).items[0]);
@@ -386,7 +387,7 @@ test('a sprite with a control called "style" and two art styles: both travel in 
   expect(item.settings.artStyle).toBe('silhouette');
 });
 
-test('the bag page and the playground draw a bag item in its art style; its "Change" link carries it', async ({ page }) => {
+test('the bag page and the playground draw a bag item in its art style; its "Open its page" link carries it', async ({ page }) => {
   await openRoute(page, '/');
   await makeFixtures(page);
   const keys = await page.evaluate(async () => [(await window.loadout.bag.add('style-blob', { artStyle: 'silhouette' })).key, (await window.loadout.bag.add('style-blob')).key]);
@@ -402,8 +403,8 @@ test('the bag page and the playground draw a bag item in its art style; its "Cha
   await expect.poll(async () => (await colours(row(keys[1]).locator('canvas').first())) - (await colours(row(keys[0]).locator('canvas').first()))).toBeGreaterThan(2);
   await expect(row(keys[0])).toContainText('Silhouette');
   await expect(row(keys[1])).not.toContainText('Pixel art');
-  expect(await row(keys[0]).getByRole('link', { name: 'Change' }).getAttribute('href')).toContain('artstyle=silhouette');
-  expect(await row(keys[1]).getByRole('link', { name: 'Change' }).getAttribute('href')).not.toContain('artstyle=');
+  expect(await row(keys[0]).getByRole('link', { name: /^Open the page of/ }).getAttribute('href')).toContain('artstyle=silhouette');
+  expect(await row(keys[1]).getByRole('link', { name: /^Open the page of/ }).getAttribute('href')).not.toContain('artstyle=');
   // the playground paints each bag item in its own art style
   const painted = await page.evaluate(async () => {
     const [{ createPainter }, { loadSprite }, S] = await Promise.all([import('/app/play/draw.js'), import('/app/catalog.js'), import('/engine/sprite.js')]);

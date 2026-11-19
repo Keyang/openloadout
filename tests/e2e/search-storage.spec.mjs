@@ -48,7 +48,7 @@ test('with storage blocked the search page shows results and logs nothing', asyn
   const catalog = await (await page.request.get('/generated/catalog.json')).json();
   const name = catalog.assets.find((a) => a.kind === 'sprite').name;
   await page.goto(`/index.html#/browse?q=${encodeURIComponent(name)}`);
-  await expect(page.locator('main a.card', { hasText: name }).first()).toBeVisible({ timeout: 15_000 });
+  await expect(page.locator('main .card a.card-link', { hasText: name }).first()).toBeVisible({ timeout: 15_000 });
   await page.waitForTimeout(1500);                 // give the index file time to load (or to fail loudly)
   expect(seen).toEqual([]);
 });
@@ -58,7 +58,7 @@ test('typing "bad guy" in the search box shows only enemies and bosses', async (
   const hostile = (a) => a.kind === 'sprite' && /^characters\/(enemy|boss)(\/|$)/.test(a.role || '');
   test.skip(!catalog.assets.some(hostile), 'the catalogue has no enemies');
   const byId = new Map(catalog.assets.map((a) => [a.id, a]));
-  await page.goto('/index.html#/');
+  await page.goto('/index.html#/browse');
   const box = page.getByRole('searchbox', { name: 'Search' });
   await box.fill('bad guy');
   await page.waitForTimeout(1500);

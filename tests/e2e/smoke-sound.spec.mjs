@@ -1,5 +1,5 @@
 // Sound, music and kit pages. The sounds are picked from the catalogue (generated/catalog.json): there is no other list.
-import { test, expect, openRoute, setRange, downloadFrom, readZip, hasHorizontalScroll } from '../helpers/test.mjs';
+import { test, expect, openRoute, setRange, downloadFrom, readZip, hasHorizontalScroll, downloadButton, showControl } from '../helpers/test.mjs';
 import { readCatalogue, catalogueOf } from '../helpers/catalog.mjs';
 
 const C = catalogueOf(readCatalogue());
@@ -12,68 +12,75 @@ const looping = effects.find((a) => a.tech.loop);
 const TRACK = C.byId['battle-theme'] ?? C.music[0];
 
 const play = (page) => page.locator('.stage-tools .tools-left button');
+const sliders = (page) => page.locator('.rx-panel .ctl input[type=range]');      // every tab's, whichever is open
+const versions = (page) => page.locator('.rx-panel .vstrip .vbtn');
+const hashNow = (page) => page.evaluate(() => location.hash);
 
 test.describe('sound page', () => {
-  test('sliders and style buttons exist', async ({ page }) => {
+  test('two columns: a big play button and the length on the left, the panel with versions and sliders on the right; no waveform', async ({ page }) => {
     await openRoute(page, `/sound/${oneShot.id}`);
-    expect(await page.locator('.panel input[type=range]').count()).toBeGreaterThanOrEqual(2);
-    const styles = page.getByRole('group', { name: 'Style' }).getByRole('button');
-    expect(await styles.count()).toBeGreaterThanOrEqual(2);
-    await expect(styles.first()).toHaveText('Standard');
-    await expect(styles.first()).toHaveAttribute('aria-pressed', 'true');
-    await expect(page.locator('canvas.stage')).toBeVisible();
+    await expect(page.locator('main.v2.rx')).toBeVisible();
+    await expect(page.locator('h1')).toHaveText(oneShot.name);
+    await expect(play(page)).toHaveText('Play');
+    await expect(page.locator('.stage-tools .tools-left .hint')).toContainText('seconds long');
+    expect(await sliders(page).count()).toBeGreaterThanOrEqual(2);
+    // its named styles are its first versions
+    const names = await versions(page).locator('.name').allTextContents();
+    expect(names.slice(0, oneShot.tech.styles.length)).toEqual(oneShot.tech.styles);
+    for (const v of await versions(page).all()) await expect(v).toHaveAttribute('aria-pressed', 'false');
+    await expect(page.locator('main canvas'), 'no waveform picture').toHaveCount(0);
+    await expect(page.locator('.rx-panel .saved')).toContainText('Changes save by themselves');
   });
 
-  test('styles and sliders change the link; Start over goes back', async ({ page }) => {
+  test('a version and a slider change the link and save themselves; Start over goes back', async ({ page }) => {
     await openRoute(page, `/sound/${oneShot.id}`);
-    const styles = page.getByRole('group', { name: 'Style' }).getByRole('button');
-    await styles.nth(1).click();
-    await expect(styles.nth(1)).toHaveAttribute('aria-pressed', 'true');
-    await expect.poll(() => page.evaluate(() => location.hash)).toContain('style=');
-    await setRange(page.locator('.panel input[type=range]').first(), 'other');
-    await expect(styles.first()).toHaveAttribute('aria-pressed', 'false');
+    await versions(page).first().click();
+    await expect(versions(page).first()).toHaveAttribute('aria-pressed', 'true');
+    await expect.poll(() => hashNow(page)).toContain('style=');
+    await expect(page.locator('.rx-panel .saved')).toContainText('Saved in your bag');
+    await setRange(sliders(page).first(), 'other');
+    await expect(versions(page).first()).toHaveAttribute('aria-pressed', 'false');
+    const key = await sliders(page).first().evaluate((n) => n.dataset.key);
+    await expect.poll(() => hashNow(page)).toContain(`${key}=`);
+    // a reload goes on with the same sound, from the bag item it was saved to
+    const value = await sliders(page).first().inputValue();
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await expect(page.locator('.rx-panel .saved')).toContainText('Saved in your bag');
+    expect(Math.abs(Number(await sliders(page).first().inputValue()) - Number(value))).toBeLessThan(0.02);
     await page.getByRole('button', { name: 'Start over' }).click();
-    await expect(styles.first()).toHaveAttribute('aria-pressed', 'true');
+    await expect.poll(() => hashNow(page)).not.toContain(`${key}=`);
+    await expect(page.locator(`.rx-panel [data-control="${key}"]`)).not.toHaveClass(/is-changed/);
   });
 
   test('every slider and every style changes the sound', async ({ page }) => {
     await openRoute(page, `/sound/${oneShot.id}`);
-    const wav = async () => (await downloadFrom(page, () => page.getByRole('button', { name: 'Download sound' }).click(), { timeout: 8000, retries: 3 })).bytes;
+    const wav = async () => (await downloadFrom(page, () => downloadButton(page).click(), { timeout: 8000, retries: 3 })).bytes;
     const reset = () => page.getByRole('button', { name: 'Start over' }).click();
     const base = await wav();
-    const sliders = page.locator('.panel input[type=range]');
-    const n = await sliders.count();
+    const n = await sliders(page).count();
     for (let i = 0; i < n; i++) {
-      const label = await sliders.nth(i).evaluate((el) => document.querySelector(`label[for="${el.id}"]`).textContent);
-      await setRange(sliders.nth(i), 'other');
+      const label = await sliders(page).nth(i).evaluate((el) => document.querySelector(`label[for="${el.id}"]`).textContent);
+      await setRange(sliders(page).nth(i), 'other');
       expect((await wav()).equals(base), `slider "${label}" should change the sound`).toBe(false);
       await reset();
       expect((await wav()).equals(base), 'Start over should give back the first sound').toBe(true);
     }
-    const styles = page.getByRole('group', { name: 'Style' }).getByRole('button');
-    for (let i = 1; i < await styles.count(); i++) {
-      await styles.nth(i).click();
-      expect((await wav()).equals(base), `style "${await styles.nth(i).textContent()}" should change the sound`).toBe(false);
+    for (let i = 0; i < oneShot.tech.styles.length; i++) {
+      await versions(page).nth(i).click();
+      expect((await wav()).equals(base), `style "${oneShot.tech.styles[i]}" should change the sound`).toBe(false);
     }
-    // the waveform picture follows the sound too
-    await reset();
-    const hash = () => page.locator('canvas.stage').evaluate((cv) => cv.toDataURL());
-    await expect(play(page)).toHaveText('Play', { timeout: 8000 });
-    const h0 = await hash();
-    await setRange(sliders.first(), 'other');
-    await expect(play(page)).toHaveText('Play', { timeout: 8000 });
-    expect(await hash()).not.toBe(h0);
+    // the length on the left follows the sound
+    await expect(page.locator('.stage-tools .tools-left .hint')).toContainText('seconds long');
   });
 
   test('Play turns into Stop and back', async ({ page }) => {
     test.skip(!looping, 'no looping sound in the library');
     await openRoute(page, `/sound/${looping.id}`);
-    const play = page.locator('.stage-tools .tools-left button');
-    await expect(play).toHaveText('Play loop');
-    await play.click();
-    await expect(play).toHaveText('Stop');
-    await play.click();
-    await expect(play).toHaveText('Play loop');
+    await expect(play(page)).toHaveText('Play loop');
+    await play(page).click();
+    await expect(play(page)).toHaveText('Stop');
+    await play(page).click();
+    await expect(play(page)).toHaveText('Play loop');
   });
 
   test('Play on a one-shot sound shows Stop while it plays and returns to Play', async ({ page }) => {
@@ -85,12 +92,15 @@ test.describe('sound page', () => {
     await btn.click();
     await expect.poll(() => page.evaluate(() => window.__seen)).toContain('Stop');
     await expect(btn).toHaveText('Play', { timeout: 8000 });   // it ends by itself
+    // a variation is a change like any other: heard, saved, and in the link
     await page.getByRole('button', { name: 'Play a variation' }).click();
+    await expect.poll(() => hashNow(page)).toContain('seed=');
+    await expect(page.locator('.rx-panel .saved')).toContainText('Saved in your bag');
   });
 
-  test('Download sound gives a 16-bit PCM .wav', async ({ page }) => {
+  test('Download gives a 16-bit PCM .wav', async ({ page }) => {
     await openRoute(page, `/sound/${oneShot.id}`);
-    const { name, bytes } = await downloadFrom(page, () => page.getByRole('button', { name: 'Download sound' }).click());
+    const { name, bytes } = await downloadFrom(page, () => downloadButton(page).click());
     expect(name).toBe(`${oneShot.id}.wav`);
     expect(bytes.subarray(0, 4).toString('latin1')).toBe('RIFF');
     expect(bytes.subarray(8, 12).toString('latin1')).toBe('WAVE');
@@ -100,6 +110,7 @@ test.describe('sound page', () => {
     expect(bytes.readUInt32LE(40)).toBe(bytes.length - 44);
     expect(bytes.length).toBeGreaterThan(1000);
     expect(bytes.subarray(44).some((b) => b !== 0)).toBe(true);
+    await expect(page.locator('.rx-panel .status')).toContainText('Downloaded');
   });
 });
 
@@ -108,33 +119,42 @@ test.describe('music page', () => {
 
   test('has no waveform canvas, and Length and Melody instrument choices', async ({ page }) => {
     await openRoute(page, route);
-    await expect(page.locator('.stage-card')).toBeVisible();
-    await expect(page.locator('.stage-card canvas, canvas.stage')).toHaveCount(0);
+    await expect(page.locator('main.v2.rx .stage-card')).toBeVisible();
+    await expect(page.locator('main canvas')).toHaveCount(0);
+    await showControl(page, 'bars');
     const length = page.getByRole('group', { name: 'Length' }).getByRole('button');
     expect(await length.count()).toBeGreaterThanOrEqual(2);
     await expect(length.first()).toContainText('seconds');
+    await length.nth(1).click();
+    await expect(length.nth(1)).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('.stage-tools .tools-left .hint')).toContainText(`${parseInt(await length.nth(1).textContent(), 10)} seconds long`);
+    await showControl(page, 'inst');
     const inst = page.getByRole('group', { name: 'Melody instrument' }).getByRole('button');
     expect(await inst.count()).toBeGreaterThanOrEqual(2);
     await inst.nth(1).click();
     await expect(inst.nth(1)).toHaveAttribute('aria-pressed', 'true');
     await expect(inst.first()).toHaveAttribute('aria-pressed', 'false');
-    await length.nth(1).click();
-    await expect(length.nth(1)).toHaveAttribute('aria-pressed', 'true');
-    await expect.poll(() => page.evaluate(() => location.hash)).toContain('inst=1');
-    await expect.poll(() => page.evaluate(() => location.hash)).toContain('bars=16');
-    expect(await page.locator('.panel input[type=range]').count()).toBeGreaterThanOrEqual(3);
+    await expect.poll(() => hashNow(page)).toContain('inst=1');
+    await expect.poll(() => hashNow(page)).toContain('bars=16');
+    expect(await sliders(page).count()).toBeGreaterThanOrEqual(3);
+    // a style changes the sliders and keeps the length and the instrument chosen
+    await versions(page).first().click();
+    await expect(versions(page).first()).toHaveAttribute('aria-pressed', 'true');
+    await expect(inst.nth(1)).toHaveAttribute('aria-pressed', 'true');
+    await expect.poll(() => hashNow(page)).toContain('style=');
+    await expect.poll(() => hashNow(page)).toContain('bars=16');
+    await expect(page.locator('.rx-panel .saved')).toContainText('Saved in your bag');
   });
 
   test('Play starts and Stop stops', async ({ page }) => {
     await openRoute(page, route);
-    const play = page.locator('.stage-tools .tools-left button');
-    await expect(play).toHaveText('Play');
-    await play.click();
-    await expect(play).toHaveText('Stop', { timeout: 30_000 });
-    await setRange(page.locator('.panel input[type=range]').first(), 'other');   // change it while it plays
-    await expect(play).toHaveText('Stop');
-    await play.click();
-    await expect(play).toHaveText('Play');
+    await expect(play(page)).toHaveText('Play');
+    await play(page).click();
+    await expect(play(page)).toHaveText('Stop', { timeout: 30_000 });
+    await setRange(sliders(page).first(), 'other');   // change it while it plays
+    await expect(play(page)).toHaveText('Stop');
+    await play(page).click();
+    await expect(play(page)).toHaveText('Play');
   });
 });
 
@@ -159,7 +179,7 @@ test.describe('kit pages', () => {
       await expect(page.locator('.bundle-sprite a.bundle-name[href^="#/sprite/"]'), b.id).toHaveCount(b.sprites.length);
       await expect(page.locator('.bundle-sound a[href^="#/sound/"]'), b.id).toHaveCount(b.sounds.length);
       await expect(page.locator('.bundle-music a[href^="#/music/"]'), b.id).toHaveCount(b.music.length);
-      await expect(page.getByRole('button', { name: 'Download this bundle' })).toBeEnabled();
+      await expect(page.getByRole('button', { name: 'Download this kit' })).toBeEnabled();
     }
   });
 
@@ -179,7 +199,7 @@ test.describe('kit pages', () => {
     await expect(page.locator('main.bundle-page')).toBeVisible();
     const ids = await page.locator('.bundle-sprite a.bundle-name').evaluateAll((as) => as.map((a) => a.getAttribute('href').split('/').pop()));
     expect(ids.sort()).toEqual([...KIT.sprites].sort());
-    const { name, bytes } = await downloadFrom(page, () => page.getByRole('button', { name: 'Download this bundle' }).click(), { timeout: 120_000 });
+    const { name, bytes } = await downloadFrom(page, () => page.getByRole('button', { name: 'Download this kit' }).click(), { timeout: 120_000 });
     expect(name).toMatch(/\.zip$/);
     const names = readZip(new Uint8Array(bytes)).map((f) => f.name);
     for (const id of ids) expect(names, `sheet for ${id}`).toContain(`sprites/${id}/${id}.png`);

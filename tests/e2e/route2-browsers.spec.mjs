@@ -77,13 +77,14 @@ for (const [name, type] of Object.entries(BROWSERS)) {
 
     test('a made source that tries every way out finds none', async () => {
       skipUnlessInstalled();
+      const title = await page.evaluate(() => document.title);      // the home page's own title, which the made source must not change
       const made = await page.evaluate((src) => window.loadout.make.sprite(src), EVERY_WAY_OUT('rv-ways-everywhere'));
       expect(made, JSON.stringify(made.errors)).toMatchObject({ ok: true });
       const report = JSON.parse((await page.evaluate(() => window.loadout.assets.get('rv-ways-everywhere'))).asset.description);
       expect(report.has).toEqual([]);
       for (const [way, what] of Object.entries(report)) if (way !== 'has') expect(what, `${way} in ${name}`).toMatch(/^stopped: /);
       expect(reached).toEqual([]);
-      expect(await page.evaluate(() => document.title)).toBe('Loadout');
+      expect(await page.evaluate(() => document.title)).toBe(title);
     });
   });
 }

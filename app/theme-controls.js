@@ -214,9 +214,10 @@ const signed = (v, unit = '') => (v === 0 ? 'None' : `${v > 0 ? '+' : '−'}${Ma
  * theme: the look to show first. original: what "Start over" goes back to (default: the plain original).
  * live (default true): sliders report while they move; false reports when they are let go
  * (for pages that rebuild themselves on every change). open (default true): the fine-tuning starts unfolded.
+ * title: the heading over the looks (default 'Pick a look').
  * Returns { node, set(theme) (shows a look without calling onChange), get() }.
  */
-export function themeControls({ theme, onChange = () => {}, original = defaultTheme(), live = true, open = true } = {}) {
+export function themeControls({ theme, onChange = () => {}, original = defaultTheme(), live = true, open = true, title = 'Pick a look' } = {}) {
   let cur = normalizeTheme(theme);
   const start = normalizeTheme(original);
   const id = `look${++uid}`;
@@ -226,7 +227,7 @@ export function themeControls({ theme, onChange = () => {}, original = defaultTh
 
   // named looks
   const presetButtons = THEME_PRESETS.map((p) => {
-    const b = h('button', { type: 'button', class: 'look-preset', title: p.blurb, 'aria-pressed': 'false' },
+    const b = h('button', { type: 'button', class: 'look-preset', title: p.blurb, 'data-look': p.id, 'aria-pressed': 'false' },
       h('span', { class: 'look-chips', 'aria-hidden': 'true' }, previewSwatches(p.theme).map((c) => h('i', { style: `background:${c}` }))),
       h('span', { class: 'look-name' }, p.name));
     b.addEventListener('click', () => {
@@ -243,7 +244,7 @@ export function themeControls({ theme, onChange = () => {}, original = defaultTh
   const shapes = h('input', { type: 'checkbox', role: 'switch', 'aria-describedby': shapesHint });
   shapes.addEventListener('change', () => { cur = { ...cur, shapes: shapes.checked }; emit(); });
   syncs.push(() => { shapes.checked = !!cur.shapes; });
-  const surprise = h('button', { type: 'button', class: 'btn look-surprise' }, 'Surprise me');
+  const surprise = h('button', { type: 'button', class: 'btn btn-sm btn-secondary look-surprise' }, 'Surprise me');
   surprise.addEventListener('click', () => {
     let seed = cur.seed, next;
     for (let i = 0; i < 20; i++) {   // a new look each press: skip the rare number that gives the same colours
@@ -254,7 +255,7 @@ export function themeControls({ theme, onChange = () => {}, original = defaultTh
     cur = next;
     emit();
   });
-  const reset = h('button', { type: 'button', class: 'ghost look-reset' }, 'Start over');
+  const reset = h('button', { type: 'button', class: 'btn btn-sm btn-secondary look-reset' }, 'Start over');
   reset.addEventListener('click', () => { cur = clone(start); emit(); });
 
   // sliders
@@ -297,7 +298,7 @@ export function themeControls({ theme, onChange = () => {}, original = defaultTh
 
   const C = (k) => () => cur.colour[k];
   const setC = (k) => (v) => { cur.colour = { ...cur.colour, [k]: v }; };
-  const asMade = h('button', { type: 'button', class: 'ghost look-asmade' }, 'As made');
+  const asMade = h('button', { type: 'button', class: 'look-asmade' }, 'As made');
   asMade.addEventListener('click', () => { cur.music = { ...cur.music, intensity: null }; emit(); });
   syncs.push(() => { asMade.hidden = cur.music.intensity === null || cur.music.intensity === undefined; });
 
@@ -317,13 +318,14 @@ export function themeControls({ theme, onChange = () => {}, original = defaultTh
     slider({ label: 'Intensity', min: 0, max: 1, step: 0.05, lo: 'Calm', hi: 'Intense', get: () => cur.music.intensity, put: (v) => { cur.music = { ...cur.music, intensity: v }; }, show: (v) => (v === null || v === undefined ? 'As made' : pct(v)), extra: asMade }));
 
   const node = h('section', { class: 'look-controls', 'aria-label': 'The look of everything together' },
-    h('h2', { class: 'look-title' }, 'Pick a look'),
-    h('p', { class: 'hint look-hint' }, 'One choice restyles every sprite, sound and track together, so they still match.'),
+    h('div', { class: 'look-head' },
+      h('h2', { class: 'look-title' }, title),
+      h('p', { class: 'hint look-hint' }, 'One choice restyles every sprite, sound and track together, so they still match.'),
+      surprise, reset),
     h('div', { class: 'look-presets' }, presetButtons),
-    h('div', { class: 'look-row' }, surprise,
-      h('label', { class: 'look-toggle' }, h('span', {}, 'Also change shapes'), h('span', { class: 'switch' }, shapes, h('span', { class: 'knob', 'aria-hidden': 'true' }))),
-      reset),
-    h('p', { class: 'hint look-shapes-hint', id: shapesHint, style: 'margin:0 0 10px' }, SHAPES_HINT),
+    h('div', { class: 'look-row' },
+      h('label', { class: 'look-toggle' }, h('span', { class: 'switch' }, shapes, h('span', { class: 'knob', 'aria-hidden': 'true' })), h('span', {}, 'Also change shapes'))),
+    h('p', { class: 'hint look-shapes-hint', id: shapesHint }, SHAPES_HINT),
     h('details', { class: 'look-more', open: !!open }, h('summary', {}, 'Fine-tune colours, sound and music'), colourGroup, soundGroup, musicGroup));
   sync();
   return {

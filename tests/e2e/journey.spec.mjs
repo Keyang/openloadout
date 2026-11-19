@@ -38,10 +38,21 @@ const results = (page) => page.locator('ul.results > li');
 const resultIds = (page) => results(page).evaluateAll((lis) => lis.map((li) => li.dataset.id));
 const bagCount = (page) => page.locator('header .bag-count');
 const bagRows = (page) => page.locator('.bag-item');
-const addButton = (page) => page.locator('.add-to-bag').getByRole('button', { name: /^Add to (my )?bag$/ });
+// the editing panel's "Add to my bag": there only while the asset is not in the bag yet (a change saves it by itself)
+const addButton = (page) => page.locator('.rx-panel .add-btn');
+/** A control of the editing panel, by its key: its Fine-tune tab is opened first (only the open tab's controls are shown). */
+async function openControl(page, ui, key) {
+  const row = page.locator(`.rx-panel .ctl[data-control="${key}"]`);
+  const pane = await row.evaluate((n) => n.closest('[data-pane]')?.dataset.pane ?? null);
+  if (pane) { const tab = page.locator(`.rx-panel #tab-${pane}`); if ((await tab.getAttribute('aria-selected')) !== 'true') await ui.press(tab); }
+  await expect(row).toBeVisible();
+  return row;
+}
 const hashQuery = (page) => page.evaluate(() => new URLSearchParams(location.hash.split('?')[1] ?? '').toString());
 const queryOf = (text) => Object.fromEntries(new URLSearchParams(text));
 /** What a bag row tells the visitor: its name, what it is, how it was set up, and where "Change" leads (without the bag's own key). */
+/** The kind tabs of the library ("Sprites 120"). */
+const kindTab = (page, kind) => page.getByRole('tablist', { name: 'Kind', exact: true }).getByRole('tab', { name: new RegExp(`^${KIND_WORD[kind]} \\d+$`) });
 const rowFacts = (page) => bagRows(page).evaluateAll((rows) => rows.map((r) => ({
   name: r.querySelector('.bag-name')?.textContent, kind: r.querySelector('.bag-kind')?.textContent, note: r.querySelector('.bag-text .hint')?.textContent,
   change: (r.querySelector('.bag-actions a')?.getAttribute('href') ?? '').replace(/[?&]bag=[^&]*/, ''),
@@ -60,21 +71,22 @@ async function journey({ page, browser, context }, ui) {
   await recordPlayed(page);
 
   const wordings = [];                  // every "add to the bag" button met on the way: { where, text }
-  /** From the home page: type a word, narrow by kind, and open the asset from its card. `back`: also try the way back to the results. */
+  /** From the home page: type a word (the search goes to the library), narrow by kind, and open the asset from its card. `back`: also try the way back to the results. */
   async function find(asset, { back = false } = {}) {
     const { word, shared } = searchWord(asset, catalog);
     await ui.press(box(page));
     await box(page).fill(word);
+    await box(page).press('Enter');                                              // the home page lists nothing itself: the library shows what was found
+    await expect.poll(() => page.evaluate(() => location.hash), { message: 'the search opens the library' }).toMatch(/^#\/browse\?/);
     await expect.poll(() => resultIds(page), { message: `searching "${word}" finds ${asset.id}` }).toContain(asset.id);
     await expect(page.locator('.result-line')).toContainText(`for "${word}"`);
     const found = await resultIds(page);
     await fits(`the results for "${word}"`);
 
-    // a filter narrows what was found to one kind
-    const option = page.getByRole('group', { name: 'Kind', exact: true }).getByRole('button', { name: new RegExp(`^${KIND_WORD[asset.kind]} \\d+$`) });
-    if (!(await option.isVisible())) await ui.press(page.getByRole('button', { name: /^Narrow down/ }));      // on a phone the filters are folded away
+    // a kind tab narrows what was found to one kind
+    const option = kindTab(page, asset.kind);
     await ui.press(option);
-    await expect(page.locator('.chips .chip').filter({ hasText: KIND_WORD[asset.kind] })).toBeVisible();
+    await expect(option).toHaveAttribute('aria-selected', 'true');
     await expect.poll(() => results(page).evaluateAll((lis, kind) => lis.length > 0 && lis.every((li) => li.dataset.kind === kind), asset.kind)).toBe(true);
     const narrowed = await resultIds(page);
     expect(narrowed).toContain(asset.id);
@@ -99,7 +111,7 @@ async function journey({ page, browser, context }, ui) {
     if (!ways) return;
     await ui.press(way.first());
     await expect.soft(box(page), 'back at the results, the search is still there').toHaveValue(word);
-    await expect.soft(page.locator('.chips .chip').filter({ hasText: KIND_WORD[asset.kind] }), 'and so is the filter').toBeVisible();
+    await expect.soft(kindTab(page, asset.kind), 'and so is the kind chosen').toHaveAttribute('aria-selected', 'true');
     await expect.poll(() => resultIds(page), { message: `back at the results, ${asset.id} is still among them` }).toContain(asset.id);
     await li.scrollIntoViewIfNeeded();
     await open();
@@ -107,7 +119,6 @@ async function journey({ page, browser, context }, ui) {
   const goHome = async () => {
     await ui.press(page.locator('header a.brand'));
     await expect(box(page)).toBeVisible();
-    await expect(results(page).first()).toBeAttached();
   };
 
   // ================================================================= home
@@ -207,25 +218,30 @@ async function journey({ page, browser, context }, ui) {
   const playSound = page.locator('.stage-tools .tools-left button');
   const firstTake = await heardAfter(page, () => ui.press(playSound));
   await expect(playSound).toHaveText('Play', { timeout: 20_000 });               // it ends by itself
-  const soundSlider = page.locator('.panel input[type=range]').first();
-  const soundKey = (await soundSlider.getAttribute('id')).replace(/^s-/, '');
-  const soundLabel = (await page.locator(`.panel label[for="s-${soundKey}"]`).textContent()).trim();
-  const soundShown = page.locator('.panel .field').first().locator('.value');
+  // (the editing panel: the sound's sliders are in tabs, the first one open; each says its value in words at its end)
+  const soundSlider = page.locator('.rx-panel .ctl input[type=range]:visible').first();
+  const soundKey = (await soundSlider.getAttribute('id')).replace(/^c-/, '');
+  const soundLabel = (await page.locator(`.rx-panel label[for="c-${soundKey}"]`).textContent()).trim();
+  const soundShown = page.locator(`.rx-panel .ctl[data-control="${soundKey}"] .slide .hi`);
   const shownBefore = await soundShown.textContent();
+  wordings.push({ where: 'the sound page', text: (await addButton(page).textContent()).trim() });
   const changedTake = await heardAfter(page, () => setRange(soundSlider, 'other'));      // letting go of the slider plays the sound
   expect(changedTake, 'the changed sound is not the sound heard before').not.toBe(firstTake);
   await expect(soundShown).not.toHaveText(shownBefore);
   await expect.poll(async () => queryOf(await hashQuery(page))[soundKey], { message: 'the address carries the slider' }).toBeTruthy();
   const soundValue = Number(queryOf(await hashQuery(page))[soundKey]);
-  wordings.push({ where: 'the sound page', text: (await addButton(page).textContent()).trim() });
-  await ui.press(addButton(page));
+  // nothing to press: the change saved itself (docs/site-design.md, section 3)
   await expect(bagCount(page)).toHaveText('2');
+  await expect(page.locator('.rx-panel .saved')).toContainText('Saved in your bag');
+  await expect(addButton(page)).toBeHidden();
 
   // ================================================================= a music track: another length, another instrument, heard, added
   await goHome();
   await find(track);
   await fits('the music page');
-  const lengthPills = page.getByRole('group', { name: pick.length.label, exact: true });
+  wordings.push({ where: 'the music page', text: (await addButton(page).textContent()).trim() });
+  await openControl(page, ui, pick.length.id);
+  const lengthPills = page.locator('.rx-panel').getByRole('group', { name: pick.length.label, exact: true });
   const lengthNote = page.locator('.stage-tools .tools-left .hint');
   const usualLength = await lengthNote.textContent();
   // the shortest length on offer that is not the one it comes with (the buttons read "14 seconds")
@@ -235,7 +251,8 @@ async function journey({ page, browser, context }, ui) {
   await expect(lengthPills.locator(`button[data-v="${shorter.value}"]`)).toHaveAttribute('aria-pressed', 'true');
   await expect(lengthNote).not.toHaveText(usualLength);
   await expect(lengthNote).toHaveText(new RegExp(`^${shorter.seconds} seconds long`));
-  const instrumentPills = page.getByRole('group', { name: pick.instrument.label, exact: true });
+  await openControl(page, ui, pick.instrument.id);
+  const instrumentPills = page.locator('.rx-panel').getByRole('group', { name: pick.instrument.label, exact: true });
   const instrumentValue = await instrumentPills.locator('button[aria-pressed="false"]').last().getAttribute('data-v');
   const instrument = instrumentPills.locator(`button[data-v="${instrumentValue}"]`), instrumentName = await instrument.textContent();
   await ui.press(instrument);
@@ -247,12 +264,12 @@ async function journey({ page, browser, context }, ui) {
   await expect(playMusic).toHaveText('Play');
   await expect.poll(async () => queryOf(await hashQuery(page))[pick.instrument.id]).toBe(instrumentValue);
   expect(queryOf(await hashQuery(page))[pick.length.id]).toBe(shorter.value);
-  wordings.push({ where: 'the music page', text: (await addButton(page).textContent()).trim() });
-  await ui.press(addButton(page));
+  // the changes saved themselves
   await expect(bagCount(page)).toHaveText('3');
+  await expect(page.locator('.rx-panel .saved')).toContainText('Saved in your bag');
 
   // ================================================================= the bag: three things, as they were set up
-  await ui.press(page.locator('.add-to-bag').getByRole('link', { name: 'Go to bag' }));
+  await ui.press(page.locator('header a.bag-link'));
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Your bag');
   await expect(bagRows(page)).toHaveCount(3);
   await fits('the bag');
@@ -266,8 +283,8 @@ async function journey({ page, browser, context }, ui) {
   await expect(trackRow.locator('.bag-name')).toHaveText(track.name);
   await expect(trackRow.locator('.bag-kind')).toHaveText('Music');
   await expect(trackRow.locator('.bag-text .hint')).toHaveText(/ style, .+/);      // the style, then what was changed
-  // "Change" leads back to each asset's page with exactly these settings
-  await expect.poll(async () => (await rowFacts(page)).every((r) => r.change), { message: 'every row has its "Change" link' }).toBe(true);
+  // "Open its page" leads back to each asset's page with exactly these settings
+  await expect.poll(async () => (await rowFacts(page)).every((r) => r.change), { message: 'every row has its "Open its page" link' }).toBe(true);
   const facts = await rowFacts(page);
   const changeOf = (i) => queryOf(facts[i].change.split('?')[1] ?? '');
   expect(Number(changeOf(0)[sliderKey])).toBeCloseTo(sliderValue, 2);
@@ -368,7 +385,7 @@ async function journey({ page, browser, context }, ui) {
   expect((await playState(page)).muted).toBe(true);
   await ui.press(page.getByRole('link', { name: 'Back to your bag' }));
   await expect(bagRows(page)).toHaveCount(3);
-  await ui.press(bagRows(page).nth(0).getByRole('link', { name: 'Change' }));
+  await ui.press(bagRows(page).nth(0).getByRole('link', { name: /^Open the page of/ }));
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(sprite.name);
   await ui.press(page.locator('.rx-panel').getByRole('tab', { name: 'Sounds', exact: true }));      // the sprite's sounds, and the switch, are in the panel's Sounds tab
   await expect.soft(page.getByRole('checkbox', { name: 'Sound', exact: true }), 'after Mute in the playground, the "Sound" switch on the sprite page is still on').toBeChecked({ timeout: 5000 });
@@ -467,12 +484,12 @@ async function journey({ page, browser, context }, ui) {
   if (!(await toBundles.isVisible())) await ui.press(page.locator('header').getByRole('button', { name: 'Menu', exact: true }));      // on a phone the pages are behind "Menu"
   await ui.press(toBundles);
   await expect(page.locator('a.card.kit').first()).toBeVisible();
-  await fits('the list of bundles');
+  await fits('the list of kits');
   await ui.press(page.locator('a.card.kit').first());
-  const whole = page.getByRole('button', { name: /whole bundle/i });
+  const whole = page.getByRole('button', { name: /whole kit/i });
   await expect(whole).toBeVisible();
-  await fits('a bundle page');
-  wordings.push({ where: 'a bundle page', text: (await whole.textContent()).trim() });
+  await fits('a kit page');
+  wordings.push({ where: 'a kit page', text: (await whole.textContent()).trim() });
   const withMy = wordings.filter((w) => /\bmy bag\b/i.test(w.text)), without = wordings.filter((w) => !/\bmy bag\b/i.test(w.text));
   expect.soft(Math.min(withMy.length, without.length), `every button says "my bag" or every button says "bag": ${wordings.map((w) => `${w.where}: "${w.text}"`).join('; ')}`).toBe(0);
 }

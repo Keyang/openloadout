@@ -2,3 +2,173 @@
    Owned by the builder of that page. Only that page's own layout goes here; tokens and the shared components (button,
    chip, tab, segmented control, tile, card, token, change dot, menu, the editing panel) are in base.css and are used
    as they are. Move what the page still needs out of app/style.css (the old rules) into this file. */
+
+.landing { max-width: calc(var(--page) + 2 * var(--gutter)); margin: 0 auto; padding: 0 var(--gutter); }
+.landing .live { display: block; image-rendering: pixelated; flex: none; }
+
+/* ---------- the first screen ---------- */
+.landing .hero { text-align: center; padding: var(--s9) 0 var(--s7); }
+.landing .hero h1 { font-size: clamp(40px, 5.4vw, 72px); line-height: 1.02; letter-spacing: -0.04em; font-weight: 600; max-width: 13.5em; margin: 0 auto; text-wrap: balance; }
+.landing .hero .lede { margin: var(--s5) auto 0; max-width: 33em; }
+.landing .hero-actions { margin-top: var(--s6); display: flex; gap: var(--s3); justify-content: center; flex-wrap: wrap; }
+.landing .hero .search { max-width: 440px; margin: var(--s5) auto 0; }
+
+/* ---------- the line-up: sprites standing on one line, at twice their size ---------- */
+.landing .lineup { position: relative; height: 264px; overflow: hidden; }
+.landing .lineup-row { position: absolute; left: var(--s7); right: var(--s7); bottom: 48px; display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid var(--line-2); }
+.landing .stand { position: relative; width: calc(var(--fw) * 2px); height: 0; flex: none; }
+.landing .stand .live { position: absolute; left: calc(50% - var(--px) * 2px); bottom: calc(var(--pb) * -2px); }
+.landing .lineup-cap { position: absolute; left: var(--s4); right: var(--s4); bottom: var(--s2); min-height: 32px; display: flex; align-items: center; justify-content: space-between; gap: var(--s4); font-size: 13px; color: var(--ink-2); }
+.landing .lineup-cap .btns { display: flex; gap: var(--s2); margin-left: auto; }
+
+/* ---------- sections ---------- */
+.landing .section { padding-top: var(--s10); }
+.landing .section-head { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--s6); margin-bottom: var(--s7); }
+.landing .section-head h2, .landing .h2 { font-size: clamp(28px, 3.2vw, 40px); line-height: 1.08; letter-spacing: -0.035em; font-weight: 600; text-wrap: balance; }
+.landing .section-head p { margin-top: var(--s3); font-size: 18px; color: var(--ink-2); max-width: 36em; text-wrap: pretty; }
+.landing .section-head .link { font-size: 14px; white-space: nowrap; padding-bottom: 4px; }
+.landing .section-head .chips { flex: none; }
+
+/* a Hero cropped to its middle in a small tile (step 2, the sheet, the versions) */
+.landing .hv { --vs: 2; position: relative; overflow: hidden; display: block; width: 100%; height: calc(50px * var(--vs)); }
+.landing .hv .live { position: absolute; left: calc(50% - var(--cx) * var(--vs) * 1px); top: calc(50% - var(--cy) * var(--vs) * 1px); pointer-events: none; }
+
+/* ---------- three steps ---------- */
+.landing .steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s6); }
+.landing .step-tile { height: 264px; display: grid; place-items: center; padding: var(--s5); position: relative; overflow: hidden; }
+.landing .step h3 { margin-top: var(--s5); font-size: 18px; font-weight: 600; letter-spacing: -0.015em; display: flex; gap: var(--s3); align-items: baseline; }
+.landing .step h3 .n { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--ink); font-size: 12px; font-weight: 500; display: inline-grid; place-items: center; letter-spacing: 0; transform: translateY(-2px); flex: none; }
+.landing .step p { margin-top: var(--s2); color: var(--ink-2); max-width: 30em; }
+.landing .step p .link { color: var(--ink); white-space: nowrap; }
+.landing .pick { display: grid; grid-template-columns: repeat(3, 80px); gap: var(--s2); }
+.landing .pick a { width: 80px; height: 80px; border-radius: var(--r); background: var(--paper); position: relative; }
+.landing .pick i { position: absolute; inset: 0; overflow: hidden; border-radius: var(--r); }
+.landing .pick img { max-width: none; position: absolute; left: 50%; top: 50%; translate: calc(-50% + var(--dx, 0px)) calc(-50% + var(--dy, 0px)); }
+.landing .pick a:hover { box-shadow: 0 0 0 1px var(--line-2); }
+.landing .pick .on, .landing .pick .on:hover { box-shadow: 0 0 0 1.5px var(--ink); }
+.landing .pick .on::after { content: ''; position: absolute; right: -7px; top: -7px; width: 18px; height: 18px; border-radius: 50%; background: var(--ink) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23fff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 8.5l2.6 2.6L12 5.2'/%3E%3C/svg%3E") center / 12px no-repeat; }
+.landing .try { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: var(--s4); align-items: center; width: 100%; max-width: 312px; }
+.landing .try .hv { height: 176px; width: 120px; --vs: 3; }
+.landing .try-controls { display: grid; gap: var(--s3); background: var(--paper); border-radius: var(--r); padding: var(--s3); min-height: 176px; align-content: center; }
+.landing .field-label { font-size: 12px; color: var(--ink-2); margin-bottom: 6px; display: block; }
+.landing .try-controls .chip { height: 26px; padding: 0 8px; font-size: 12px; }
+.landing .try-controls .chips { gap: 4px; min-height: 26px; }
+.landing .try-controls .swatches { gap: 6px; min-height: 24px; }
+.landing .sheet { display: grid; gap: var(--s4); justify-items: center; }
+.landing .sheet-frames { display: grid; grid-template-columns: repeat(4, 56px); background: var(--paper); border-radius: var(--r); padding: var(--s2); }
+.landing .sheet-frames .hv { --vs: 1; width: 56px; height: 54px; }
+.landing .files { display: flex; gap: var(--s2); font-size: 12px; flex-wrap: wrap; justify-content: center; }
+.landing .files span { padding: 3px 8px; border-radius: 4px; background: var(--paper); }
+
+/* ---------- kits: a living scene (320 x 180 art pixels at a whole-number zoom) beside its facts ---------- */
+.landing .kits { display: grid; gap: var(--s6); }
+.landing .kit { display: grid; grid-template-columns: auto minmax(0, 1fr); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+.landing .kit-scene { background: var(--shelf); display: grid; place-items: center; }
+.landing .scene { --s: 2; position: relative; width: calc(320px * var(--s)); height: calc(180px * var(--s)); overflow: hidden; flex: none; }
+.landing .scene > * { position: absolute; }
+.landing .scene-bg { left: 0; top: 0; width: 100%; height: 100%; }
+.landing .scene-ground { left: 0; right: 0; top: calc(var(--top) * var(--s) * 1px); height: calc(var(--h) * var(--s) * 1px); background-size: calc(var(--tw) * var(--s) * 1px) auto; background-repeat: repeat; image-rendering: pixelated; }
+.landing .scene .actor { left: calc(var(--x) * var(--s) * 1px); top: calc(var(--y) * var(--s) * 1px); width: calc(var(--w) * var(--s) * 1px); height: auto; }
+.landing .kit-body { padding: var(--s5) var(--s6); display: flex; flex-direction: column; min-width: 0; }
+.landing .kit-kind { font-size: 14px; color: var(--ink-2); }
+.landing .kit h3 { font-size: 28px; line-height: 1.1; letter-spacing: -0.03em; font-weight: 600; margin-top: var(--s1); text-wrap: balance; }
+.landing .kit-blurb { margin-top: var(--s4); color: var(--ink-2); text-wrap: pretty; font-size: 15px; line-height: 1.5; display: block; -webkit-line-clamp: none; overflow: visible; max-width: 34em; }
+.landing .facts { margin-top: auto; padding-top: var(--s5); display: flex; gap: var(--s6); font-size: 14px; color: var(--ink-2); }
+.landing .facts b { display: block; font-size: 20px; line-height: 1.2; letter-spacing: -0.02em; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+.landing .kit-actions { margin-top: var(--s5); display: flex; gap: var(--s2); flex-wrap: wrap; }
+
+/* ---------- text beside a grid: the Hero's versions, the sounds ---------- */
+.landing .split { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: var(--s8); align-items: start; }
+.landing .split-text p { margin-top: var(--s4); font-size: 18px; color: var(--ink-2); text-wrap: pretty; }
+.landing .split-text .btn { margin-top: var(--s5); }
+.landing .versions-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s5) var(--s4); min-height: 132px; }
+.landing .version { display: block; text-align: left; font-size: 14px; }
+.landing .version .hv { height: 132px; }
+.landing .version .name { display: block; padding-top: var(--s2); font-weight: 500; }
+.landing .version:hover .tile { background: var(--shelf-2); }
+
+/* ---------- featured ---------- */
+.landing .grid-6 { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--s6) var(--s4); }
+
+/* ---------- sounds and music rows ---------- */
+.landing .srows { border-top: 1px solid var(--line); }
+.landing .srow { display: grid; grid-template-columns: 32px 40px minmax(0, 1fr) auto; align-items: center; gap: var(--s4); padding: 10px 0; border-bottom: 1px solid var(--line); position: relative; font-size: 14px; }
+.landing .row-play { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%; background: var(--ink); color: #fff; }
+.landing .row-play:hover { background: #2b2b2b; }
+.landing .srow .pic { width: 40px; height: 40px; display: grid; place-items: center; color: var(--ink); }
+.landing .srow-text { display: grid; min-width: 0; }
+.landing .srow .name { font-weight: 500; justify-self: start; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.landing .srow .name:hover { text-decoration: underline; text-underline-offset: 3px; }
+.landing .srow .what { color: var(--ink-2); font-size: 13px; }
+.landing .srow .tile-progress { bottom: -1px; }
+
+/* ---------- where it works, numbers, the way on ---------- */
+.landing .works { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: var(--s8); }
+.landing .works dl { border-top: 1px solid var(--line); }
+.landing .works dl div { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: var(--s5); padding: var(--s4) 0; border-bottom: 1px solid var(--line); }
+.landing .works dt { font-weight: 500; }
+.landing .works dd { color: var(--ink-2); }
+.landing .numbers { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); border-top: 1px solid var(--ink); }
+.landing .numbers div { padding: var(--s5) 0 0; }
+.landing .numbers b { display: block; font-size: clamp(36px, 4.4vw, 56px); line-height: 1; letter-spacing: -0.045em; font-weight: 600; font-variant-numeric: tabular-nums; }
+.landing .numbers span { display: block; margin-top: var(--s2); color: var(--ink-2); font-size: 14px; }
+.landing .closing { text-align: center; padding: var(--s10) 0; }
+
+/* ---------- smaller windows ---------- */
+@media (max-width: 1180px) {
+  /* the scene stays beside its words: the words set smaller so they fit its height */
+  .landing .kit-body { padding: var(--s5); }
+  .landing .kit h3 { font-size: 20px; line-height: 1.2; letter-spacing: -0.02em; }
+  .landing .kit-blurb { font-size: 13px; line-height: 1.45; margin-top: var(--s2); }
+  .landing .facts { padding-top: var(--s3); gap: var(--s5); }
+  .landing .kit-actions { margin-top: var(--s4); }
+  .landing .facts { margin-top: 0; }
+  .landing .grid-6 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .landing .split, .landing .works { grid-template-columns: minmax(0, 1fr); gap: var(--s6); }
+  .landing .stand.out-a { display: none; }
+}
+@media (max-width: 1003px) {
+  /* too narrow for the scene at twice its size: it sits at its own size on a shelf tile, centred */
+  .landing .scene { --s: 1; }
+  .landing .kit-scene { padding: var(--s5); }
+  .landing .kit h3 { font-size: 28px; line-height: 1.1; letter-spacing: -0.03em; }
+  .landing .kit-blurb { font-size: 15px; line-height: 1.5; margin-top: var(--s3); }
+}
+@media (max-width: 1040px) {
+  .landing .steps { grid-template-columns: minmax(0, 1fr); gap: var(--s5); }
+  .landing .step { display: grid; grid-template-columns: 352px minmax(0, 1fr); column-gap: var(--s6); align-content: center; }
+  .landing .step-tile { grid-row: 1 / span 2; }
+  .landing .step h3 { align-self: end; margin-top: 0; }
+  .landing .step p { align-self: start; }
+  .landing .section-head { flex-direction: column; align-items: flex-start; gap: var(--s4); }
+}
+@media (max-width: 860px) {
+  .landing { --gutter: 24px; }
+  .landing .section { padding-top: var(--s9); }
+}
+@media (max-width: 720px) {
+  .landing { --gutter: 16px; }
+  .landing .hero { padding: var(--s8) 0 var(--s6); }
+  .landing .hero .lede { font-size: 16px; }
+  .landing .lineup { height: 216px; }
+  .landing .lineup-row { left: var(--s5); right: var(--s5); bottom: 56px; }
+  .landing .lineup-cap { min-height: 40px; }
+  .landing .lineup-cap > span:first-child { display: none; }
+  .landing .stand.out-b { display: none; }
+  .landing .kit { grid-template-columns: minmax(0, 1fr); }
+  .landing .kit-scene { padding: 0; place-items: center; }
+  .landing .section-head { gap: var(--s3); margin-bottom: var(--s6); }
+  .landing .section-head .chips { flex: initial; }
+  .landing .steps { gap: var(--s7); }
+  .landing .step { display: block; }
+  .landing .step h3 { margin-top: var(--s5); }
+  .landing .kit-body { padding: var(--s5); }
+  .landing .facts { gap: var(--s5); }
+  .landing .versions-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s4) var(--s2); }
+  .landing .version .hv { height: 108px; }
+  .landing .grid-6 { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s5) var(--s3); }
+  .landing .numbers { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: var(--s5); }
+  .landing .works dl div { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .landing .srow { gap: var(--s3); }
+  .landing .closing { padding: var(--s9) 0; }
+}

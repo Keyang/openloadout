@@ -22,26 +22,16 @@ const bagButton = (page) => page.locator('.add-to-bag button');
 /** Wait until the page has rewritten its address after an edit, then reload. */
 const reloadAfterEdit = async (page) => { await page.waitForTimeout(500); await page.reload(); await page.waitForFunction(() => document.querySelector('.add-to-bag')); };
 
-test('add a changed sound and a music track from their pages; the bag lists them and keeps them', async ({ page }) => {
+test('a changed sound and a music track: the bag lists them and keeps them; clicking a row changes that item in the panel beside the list', async ({ page }) => {
   test.setTimeout(90_000);
-  await openRoute(page, `/sound/${SOUND.id}`);
+  await openRoute(page, '/');
   await expect(count(page)).toHaveText('0');
-  const slider = page.locator('.panel input[type=range]').first();
-  await setRange(slider, 'other');
-  const changedValue = Number(await slider.inputValue());
-  await page.getByRole('button', { name: 'Add to my bag' }).click();
-  await expect(count(page)).toHaveText('1');
-  await expect(page.locator('.add-to-bag')).toContainText('Added');
-  await expect(page.getByRole('link', { name: 'Go to bag' })).toHaveAttribute('href', '#/bag');
-
-  await openRoute(page, `/music/${MUSIC.id}`);
-  const musicSlider = page.locator('.panel input[type=range]').first();
-  await setRange(musicSlider, 'other');
-  const musicValue = Number(await musicSlider.inputValue());
-  await page.getByRole('button', { name: 'Add to my bag' }).click();
+  const soundKey = SOUND.params[0].id, musicKey = MUSIC.params.find((d) => !d.options && !d.choices)?.id ?? MUSIC.params[0].id;
+  await addInPage(page, { kind: 'sound', id: SOUND.id, settings: { params: { [soundKey]: SOUND.params[0].max }, style: null, seed: 1 } });
+  await addInPage(page, { kind: 'music', id: MUSIC.id, settings: { params: {}, style: null } });
   await expect(count(page)).toHaveText('2');
 
-  await page.getByRole('link', { name: 'Go to bag' }).click();
+  await openRoute(page, '/bag');
   await expect(items(page)).toHaveCount(2);
   await expect(items(page).nth(0)).toContainText(SOUND.name);
   await expect(items(page).nth(0)).toContainText('Sound');
@@ -53,43 +43,34 @@ test('add a changed sound and a music track from their pages; the bag lists them
   await expect(items(page)).toHaveCount(2);
   await expect(count(page)).toHaveText('2');
 
-  // Change opens the sound page in update mode, with the slider where it was left
+  // a click on the row opens the editing panel beside the list (no trip to the sound's page), with the slider where it was left
   const before = await bagItems(page);
-  await items(page).nth(0).getByRole('link', { name: 'Change' }).click();
-  await expect(page).toHaveURL(new RegExp(`#/sound/${SOUND.id}\\?.*bag=`));
-  await expect(bagButton(page)).toHaveText('Update');
-  await expect(page.getByRole('button', { name: 'Add to my bag' })).toHaveCount(0);
-  expect(Math.abs(Number(await page.locator('.panel input[type=range]').first().inputValue()) - changedValue)).toBeLessThan(0.02);
-  await setRange(page.locator('.panel input[type=range]').nth(1), 'other');
-  // the page rewrites its address as you edit; after a reload it must still update the same item
-  await reloadAfterEdit(page);
-  await expect(page).toHaveURL(/bag=/);
-  await expect(bagButton(page)).toHaveText('Update');
-  await setRange(page.locator('.panel input[type=range]').nth(1), 'other');
-  await page.getByRole('button', { name: 'Update' }).click();
-  await expect(page.locator('.add-to-bag')).toContainText('Updated');
+  await items(page).nth(0).getByRole('button', { name: `Change ${SOUND.name}` }).click();
+  await expect(page).toHaveURL(/#\/bag$/);
+  await expect(page.locator('.bag-side .rx-panel')).toHaveAttribute('aria-label', `Change ${SOUND.name}`);
+  await expect(page.locator('.rx-panel .saved')).toContainText('Saved in your bag');
+  await expect(page.getByRole('button', { name: 'Add to my bag' })).toBeHidden();
+  await expect(page.locator(`.rx-panel [data-control="${soundKey}"]`)).toHaveClass(/is-changed/);
+  await page.locator('.rx-panel').getByRole('button', { name: 'Surprise me' }).click();
+  await expect.poll(async () => JSON.stringify((await bagItems(page))[0].settings.params)).not.toBe(JSON.stringify(before[0].settings.params));
+  // after a reload it is still the same item, changed
+  await page.reload();
+  await expect(items(page)).toHaveCount(2);
   await expect(count(page)).toHaveText('2');
   const after = await bagItems(page);
   expect(after.length).toBe(2);
   expect(after[0].key).toBe(before[0].key);
   expect(after[0].settings.params).not.toEqual(before[0].settings.params);
 
-  // Change on the music item: its page opens in update mode with the slider where it was left
-  await openRoute(page, '/bag');
-  await items(page).nth(1).getByRole('link', { name: 'Change' }).click();
-  await expect(page).toHaveURL(new RegExp(`#/music/${MUSIC.id}\\?.*bag=`));
-  await expect(bagButton(page)).toHaveText('Update');
-  expect(Math.abs(Number(await page.locator('.panel input[type=range]').first().inputValue()) - musicValue)).toBeLessThan(0.02);
-  await setRange(page.locator('.panel input[type=range]').nth(1), 'other');
-  await reloadAfterEdit(page);
-  await expect(bagButton(page)).toHaveText('Update');
-  await setRange(page.locator('.panel input[type=range]').nth(1), 'other');
-  await bagButton(page).click();
-  await expect(page.locator('.add-to-bag')).toContainText('Updated');
+  // the music item, the same way
+  await items(page).nth(1).getByRole('button', { name: `Change ${MUSIC.name}` }).click();
+  await expect(page.locator('.bag-side .rx-panel')).toHaveAttribute('aria-label', `Change ${MUSIC.name}`);
+  await page.locator('.rx-panel').getByRole('button', { name: 'Surprise me' }).click();
+  await expect.poll(async () => JSON.stringify((await bagItems(page))[1].settings.params)).not.toBe(JSON.stringify(before[1].settings.params));
   await expect(count(page)).toHaveText('2');
-  const afterMusic = await bagItems(page);
-  expect(afterMusic[1].key).toBe(before[1].key);
-  expect(afterMusic[1].settings.params).not.toEqual(before[1].settings.params);
+  expect((await bagItems(page))[1].key).toBe(before[1].key);
+  // "Open its page" still leads to the track's own page, carrying the item
+  await expect(items(page).nth(1).getByRole('link', { name: /^Open the page of/ })).toHaveAttribute('href', new RegExp(`#/music/${MUSIC.id}\\?.*bag=`));
 
   // Add another copy, then Remove; each says what it did next to the row
   await openRoute(page, '/bag');
@@ -174,7 +155,7 @@ test('a sprite in the bag is drawn on the bag page and its sheet is in the zip',
   await expect(items(page).first()).toContainText('Coin');
   const pic = items(page).first().locator('canvas');
   await expect.poll(async () => (await canvasStats(pic)).opaque).toBeGreaterThan(0);
-  await expect(items(page).first().getByRole('link', { name: 'Change' })).toHaveAttribute('href', /#\/sprite\/coin\?.*bag=/);
+  await expect(items(page).first().getByRole('link', { name: /^Open the page of/ })).toHaveAttribute('href', /#\/sprite\/coin\?.*bag=/);
 
   const neutral = (await download(page)).files;
 
@@ -199,8 +180,8 @@ test('a sprite in the bag is drawn on the bag page and its sheet is in the zip',
 
 test('an empty bag explains how to fill it; Empty the bag asks first', async ({ page }) => {
   await openRoute(page, '/bag');
-  await expect(page.locator('main')).toContainText('Add to my bag');
-  await expect(page.getByRole('link', { name: 'Browse the catalogue' })).toHaveAttribute('href', '#/');
+  await expect(page.locator('main')).toContainText('every change is saved here by itself');
+  await expect(page.getByRole('link', { name: 'Browse the catalogue' })).toHaveAttribute('href', '#/browse');
   await expect(page.getByRole('button', { name: 'Download', exact: true })).toHaveCount(0);
 
   await addInPage(page, { kind: 'sound', id: SOUND.id, settings: { params: {}, style: null, seed: 1 } });
@@ -275,7 +256,7 @@ test('changing the Hero on its page puts it in the bag as changed; Change reopen
 
   await openRoute(page, '/bag');
   await expect(items(page).first()).toContainText('Height: taller, axe weapon, weapon length: longer, pixel size 2×');      // what was changed, in plain words
-  await items(page).first().getByRole('link', { name: 'Change' }).click();
+  await items(page).first().getByRole('link', { name: /^Open the page of/ }).click();
   await expect(page).toHaveURL(/#\/sprite\/knight\?.*bag=/);
   await expect(saved).toContainText('Saved in your bag');
   await expect(page.locator('.rx-panel .add-btn')).toBeHidden();
@@ -354,7 +335,7 @@ test('an item whose kind does not match its asset is treated as missing', async 
   await openRoute(page, '/bag');
   await expect(items(page)).toHaveCount(1);
   await expect(items(page).first()).toContainText('no longer on the site');
-  await expect(items(page).first().getByRole('link', { name: 'Change' })).toHaveCount(0);
+  await expect(items(page).first().getByRole('link', { name: /^Open the page of/ })).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Download', exact: true })).toBeDisabled();
   await expect(page.locator('.bag-export')).toContainText('Nothing in your bag can be downloaded');
 

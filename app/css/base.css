@@ -210,6 +210,7 @@ input[type='range']:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 2px var(
 .block-head { display: flex; align-items: center; gap: var(--s3); min-height: 32px; margin-bottom: var(--s3); }
 .block-head h2, .tune-head h2 { font-size: 15px; line-height: 1.3; font-weight: 600; letter-spacing: -0.01em; margin: 0; white-space: nowrap; }
 .block-head .hint { font-size: 13px; color: var(--ink-2); margin: 0 auto 0 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+@media (max-width: 480px) { .block-head { flex-wrap: wrap; row-gap: var(--s2); } .block-head h2 { margin-right: auto; } }   /* a narrow panel puts its buttons under the heading */
 .vstrip { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--s3) var(--s2); }
 .vstrip:empty { display: none; }
 .vbtn { display: block; text-align: center; font-size: 12px; color: var(--ink-2); min-width: 0; }
@@ -316,15 +317,7 @@ input[type='range']:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 2px var(
   .rx-foot .btn-primary { margin-left: auto; }
 }
 
-/* ---- for now: the old asset pages (main.editor) with the new panel in their second column. The asset-page builder
-   replaces this with the real two columns in asset.css and deletes it. ---- */
-.editor.with-panel { max-width: 1376px; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); grid-template-areas: 'left panel'; grid-template-rows: auto; }
-.editor.with-panel > .rx-panel { grid-area: panel; border-left: 1px solid var(--line); --pad: var(--s5); }
-.editor.with-panel > .more-like { grid-column: 1 / -1; }
-@media (max-width: 900px) {
-  .editor.with-panel { display: block; }
-  .editor.with-panel > .rx-panel { border-left: 0; --pad: 0px; margin-top: var(--s5); }
-}
+
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }

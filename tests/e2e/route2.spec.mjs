@@ -120,6 +120,37 @@ test('an agent makes a pickup and its sound, and they go through the bag, a relo
   await setRange(page.getByLabel('Size', { exact: true }), 0.9);
   await expect(page.locator('.related')).toContainText('Wish chime');            // "Sounds it uses"
   await expect(page.locator('.rx-panel .saved')).toContainText('Saved in your bag');      // it can go in the bag: the change just made saved itself there
+  // a look goes on a made sprite as on any other (its pictures come from its worker; the page recolours them)
+  await page.locator('.rx-panel [role="tab"][data-tab="look"]').click();
+  const plainLook = await canvasStats(stage);
+  await page.locator('.looks .vbtn[data-look="night"]').click();
+  await expect.poll(async () => (await canvasStats(stage)).hash).not.toBe(plainLook.hash);
+  await expect(page.locator('.looks .vbtn canvas')).toHaveCount(15);
+  await page.locator('.looks .vbtn[data-look=""]').click();
+  await expect.poll(async () => (await canvasStats(stage)).hash).toBe(plainLook.hash);
+  // once it is in the bag the page no longer asks for it to be put there
+  await expect(page.locator('.made-here')).toBeHidden();
+  // each version tile shows that version, not the picture that happened to be drawn last (a made sprite's frames
+  // come from its worker a moment after they are asked for): a tile's colours are the sprite's at that version's settings
+  const tiles = page.locator('.rx-panel .vstrip .vbtn');
+  await expect.poll(() => tiles.count()).toBeGreaterThanOrEqual(3);
+  const mismatched = () => page.evaluate(async (id) => {
+    const [{ spriteNow }, { versionsOf }, S] = await Promise.all([import('/app/catalog.js'), import('/engine/versions.js'), import('/engine/sprite.js')]);
+    const sprite = spriteNow(id), versions = versionsOf(sprite, 12), out = [];
+    const coloursOf = (data) => { const set = new Set(); for (let k = 0; k < data.length; k += 4) if (data[k + 3]) set.add((data[k] << 16) | (data[k + 1] << 8) | data[k + 2]); return [...set].sort().join(','); };
+    const tiles = [...document.querySelectorAll('.rx-panel .vstrip .vbtn')];
+    if (tiles.length !== versions.length) return [`${tiles.length} tiles for ${versions.length} versions`];
+    for (const [i, v] of versions.entries()) {
+      const params = S.cleanParams(sprite, { ...S.defaultParams(sprite), ...v.params });
+      await sprite.prepare(params, { clips: [sprite.preview] });
+      const clip = sprite.clips[sprite.preview], g = S.renderPixels(sprite, sprite.preview, clip.loop === false ? Math.floor(clip.frames / 2) : 0, params);
+      const cv = tiles[i].querySelector('canvas');
+      const shown = cv ? coloursOf(cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data) : 'no picture';
+      if (tiles[i].title !== v.name || shown !== coloursOf(g.bytes())) out.push(`${i} "${tiles[i].title}"`);
+    }
+    return out;
+  }, STAR_ID);
+  await expect.poll(mismatched, { message: 'version tiles whose picture is not their version' }).toEqual([]);
   expect((await page.evaluate((id) => window.loadout.go(`/sound/${id}`), CHIME_ID)).ok).toBe(true);
   await expect(page.getByRole('heading', { name: 'Wish chime', level: 1 })).toBeVisible();
   await expect(page.locator('.related')).toContainText('Wish star');             // "Used by"
@@ -252,7 +283,9 @@ test('a card for an asset with no built picture draws it live, and a draft has n
   expect(r).toBe(true);
   const card = (id) => page.locator(`#made-cards li[data-id="${id}"]`);
   await expect.poll(async () => (await canvasStats(card('route2-star').locator('canvas').first())).opaque).toBeGreaterThan(20);
-  await expect.poll(async () => (await canvasStats(card('route2-chime').locator('canvas').first())).opaque).toBeGreaterThan(5);
+  // a sound's card draws its icon (cards show no waveform)
+  await expect(card('route2-chime').locator('.sound-pic svg path')).toHaveCount(1);
+  await expect.poll(() => card('route2-chime').locator('.sound-pic svg').evaluate((n) => { const r = n.getBoundingClientRect(); return r.width * r.height; })).toBeGreaterThan(0);
   await expect(card('route2-star').locator('img')).toHaveCount(0);
   await expect(card('route2-star').getByRole('button', { name: /Add Wish star to my bag/ })).toBeVisible();
   await expect(card('route2-draft').locator('.card-add')).toHaveCount(0);

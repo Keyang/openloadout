@@ -34,8 +34,9 @@ test('window.loadout has the Contract 11 members, and the home page does not pay
   expect(shape.bag).toEqual(['add', 'clear', 'download', 'items', 'link', 'remove', 'setLook', 'update']);
 
   // nothing of the framework's own has been asked for yet
+  // (the rigs are not in this list: the home page draws a live line-up of the kits' sprites, whose programs use them)
   const before = await loaded(page);
-  for (const f of ['/app/api-core.js', '/app/api-actions.js', '/app/made.js', '/generated/framework.js', '/generated/api.json', '/quality/sprite.js', '/quality/sound.js', '/rigs/humanoid.js']) expect(before, `${f} should load on first use`).not.toContain(f);
+  for (const f of ['/app/api-core.js', '/app/api-actions.js', '/app/made.js', '/generated/framework.js', '/generated/api.json', '/quality/sprite.js', '/quality/sound.js']) expect(before, `${f} should load on first use`).not.toContain(f);
 
   // first use: the description, then the framework itself, built from the same list
   const got = await page.evaluate(async () => {

@@ -15,7 +15,7 @@ const clone = (v) => JSON.parse(JSON.stringify(v));
 
 /**
  * How many things are changed from the asset's own settings: one for each control, one for its sounds (a sprite),
- * its style and its variation (a sound). The pixel size is how it is exported, not a change to the asset.
+ * its style and its variation (a sound), a look of its own. The pixel size is how it is exported, not a change to the asset.
  */
 export function countChanges(kind, settings, defaults) {
   const p = settings.params ?? {}, d = defaults.params ?? {};
@@ -27,6 +27,7 @@ export function countChanges(kind, settings, defaults) {
     if ((settings.style ?? null) !== (defaults.style ?? null)) n++;
     if (kind === 'sound' && (settings.seed ?? 1) !== (defaults.seed ?? 1)) n++;
   }
+  if ((settings.look ?? null) !== (defaults.look ?? null)) n++;      // a look of its own (app/bag.js lookOf)
   return n;
 }
 

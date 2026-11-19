@@ -33,7 +33,7 @@ for (const bundle of CATALOG.bundles) {
     const big = bundle.sprites.length + bundle.sounds.length + 8 * bundle.music.length;
     test.setTimeout(240_000 + big * 8000);
     await openRoute(page, `/bundle/${bundle.id}`);
-    const zip = packageOf(await downloadFrom(page, () => page.getByRole('button', { name: 'Download this bundle' }).click(), { timeout: 180_000 + big * 6000 }));
+    const zip = packageOf(await downloadFrom(page, () => page.getByRole('button', { name: 'Download this kit' }).click(), { timeout: 180_000 + big * 6000 }));
     await expect(page.locator('.bundle-actions .status')).toContainText('Downloaded');
 
     const manifest = zip.json('manifest.json');

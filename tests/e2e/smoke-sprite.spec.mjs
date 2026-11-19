@@ -20,9 +20,9 @@ const strip = (page) => page.locator('.strip .cell canvas');
 const clipButtons = (page) => page.getByRole('group', { name: 'Animation' }).getByRole('button');
 /** Freeze the animation so the preview can be compared. */
 async function pause(page) {
-  const b = page.locator('.stage-tools button.ghost');
-  if ((await b.textContent()) === 'Pause') await b.click();
-  await expect(b).toHaveText('Play');
+  const b = page.locator('.stage-tools .icon-btn');
+  if ((await b.getAttribute('aria-label')) === 'Pause') await b.click();
+  await expect(b).toHaveAttribute('aria-label', 'Play');
   await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
 }
 // the sprite's own shape sliders (the panel's first tab)
@@ -198,7 +198,7 @@ test.describe('phone width', () => {
   });
   test('a sprite page has no sideways scroll', async ({ page }) => {
     await openRoute(page, '/sprite/knight');
-    await page.waitForSelector('.strip .cell canvas');
+    await page.waitForSelector('canvas.stage');
     expect(await hasHorizontalScroll(page)).toBe(false);
     await expect(downloadButton(page)).toBeVisible();
   });

@@ -1,4 +1,165 @@
-/* Loadout: the library, #/browse (app/browse.js, app/cards.js: search, kind tabs, filters, grid and list). Match: mocks/5-catalogue/library.html.
-   Owned by the builder of that page. Only that page's own layout goes here; tokens and the shared components (button,
-   chip, tab, segmented control, tile, card, token, change dot, menu, the editing panel) are in base.css and are used
-   as they are. Move what the page still needs out of app/style.css (the old rules) into this file. */
+/* Loadout: the library, #/browse (app/library-page.js), and the cards every page lists assets with (app/cards.js).
+   Match: mocks/5-catalogue/library.html. Owned by the builder of that page.
+   Tokens and the shared components (button, chip, tab, segmented control, tile, card, token, menu, search box, switch)
+   are in base.css and are used as they are. What this sheet adds:
+     1. the card's own parts (one link over the whole card, the picture's size, a sound's icon, a kit card, a list row)
+        and .card-grid, the grid any page lays cards out in: shared, used outside the library too;
+     2. the library page's layout (.lib-*). */
+
+/* ======================================================= CARDS (shared) */
+.card { position: relative; display: flex; flex-direction: column; }
+.card > .card-tile { order: -1; }      /* the tile shows first; in the page the name comes first, for the keyboard */
+/* the name is the card's one link, and it covers the whole card: the picture opens the page too, with one stop for the keyboard */
+.card-link::after { content: ''; position: absolute; inset: 0; z-index: 1; border-radius: var(--r); }
+.card-link:focus-visible { outline: 0; text-decoration: underline; text-underline-offset: 3px; }
+.card-link:focus-visible::after { outline: 2px solid var(--ink); outline-offset: 3px; }
+.card .tile-add, .card .tile-play, .card .card-dots { z-index: 2; }
+/* in the bag: the + becomes a tick on black, and leads to the bag */
+.tile-add.in-bag { background: var(--ink); border-color: var(--ink); color: #fff; }
+.tile-add.in-bag:hover { background: #2b2b2b; border-color: #2b2b2b; }
+.card-pic > * { max-width: none; flex: none; }
+.card-pic .thumb, .card-pic .anim { image-rendering: pixelated; }
+.card-tile.is-cover .card-pic { overflow: hidden; }
+/* on a background the dots sit on a small plate of paper, so they can be seen on any sky */
+.card-tile.is-cover .card-dots { background: var(--paper); box-shadow: 0 0 0 1px var(--line-2); }
+.card:hover > .card-tile { background: var(--shelf-2); }
+.card-tag .num { color: var(--ink-2); white-space: nowrap; }
+.card-tag > :first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+/* a version that is in the bag: its dot wears a ring */
+.vdot[aria-pressed='true']::before { box-shadow: 0 0 0 1.5px var(--paper), 0 0 0 3px var(--ink); }
+.vdot:focus-visible { outline-offset: -4px; }
+/* a sound, a track: the icon of what it is for, the round play button, a line along the foot while it plays */
+.sound-pic { color: var(--ink); }
+.card.sound.loading .tile-play { opacity: 0.5; }
+.tile-progress.on { width: 100%; }
+.tile-play svg { display: block; }
+
+/* the grid cards sit in, on any page */
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(176px, 1fr)); gap: var(--s6) var(--s4); margin: 0; padding: 0; list-style: none; }
+.card-grid > li { min-width: 0; }
+/* a place whose card is not made yet keeps a card's room, so the page does not jump */
+.card-grid > li:empty::before { content: ''; display: block; aspect-ratio: 1; }
+.card-grid > li:empty { padding-bottom: 49px; }
+/* ...and a made card is exactly that tall: the square tile and 49px of name and tag (the way back to a place in the list counts on it) */
+.card-grid > li > .card > .card-meta { height: 49px; overflow: hidden; }
+
+/* a kit: a wide tile with a few of its sprites standing on its foot */
+/* (the kit pages have a large ".kit" block of their own, app/css/kits.css: this card is not one, so it says so) */
+a.card.kit { display: block; grid-template-columns: none; border: 0; border-radius: 0; overflow: visible; color: inherit; }
+.kitcard-tile { display: block; aspect-ratio: auto; height: 176px; }
+.kitcard-pics { position: absolute; inset: 0; display: flex; align-items: flex-end; justify-content: center; padding-bottom: var(--s6); color: var(--ink); }
+.kitcard-pics svg { align-self: center; margin-top: var(--s6); }
+.kitcard-pics img { flex: none; image-rendering: pixelated; }
+.card.kit .card-meta { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2px; }
+.card.kit .card-title { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+.card.kit:hover .card-title { text-decoration: underline; text-underline-offset: 3px; }
+.kitcard-blurb { font-size: 13px; line-height: 1.45; color: var(--ink-2); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.card.kit .card-tag { margin-top: 2px; flex-wrap: wrap; gap: 0 var(--s3); }
+.kitcard-for { white-space: nowrap; }
+.lib-kits { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s6) var(--s5); margin: 0; padding: 0; list-style: none; }
+.lib-kits > li { min-width: 0; }
+
+/* a card as a list row, with more facts */
+.rows { border-top: 1px solid var(--line); margin: 0; padding: 0; list-style: none; }
+.rows-head, .card.row { display: grid; grid-template-columns: 64px minmax(0, 2.4fr) minmax(0, 1fr) minmax(0, 1.4fr) 80px 64px 56px 64px 28px; gap: var(--s4); align-items: center; }
+.rows-head { padding: var(--s2) 0; font-size: 12px; color: var(--ink-2); }
+.rows > li { border-bottom: 1px solid var(--line); }
+.rows > li:empty { height: 81px; }
+.card.row { padding: var(--s2) 0; font-size: 14px; }
+.card.row:hover { background: none; }
+.card.row .card-tile { width: 64px; height: 64px; }
+.card-pic.is-crop { display: block; overflow: hidden; }
+.card-pic.is-crop > * { position: absolute; left: var(--ox); top: var(--oy); }
+.card.row .card-dots, .card.row .tile-add, .card.row .tile-play { position: relative; inset: auto; }
+.card.row .card-dots { padding: 0; justify-self: start; margin-left: -4px; }
+.card.row:hover .card-dots { background: none; box-shadow: none; }
+.card.row .tile-play { justify-self: start; }
+.row-name { min-width: 0; display: grid; gap: 1px; }
+.card.row .desc { font-size: 13px; color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.card.row .cell { color: var(--ink-2); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.card.row .cell.num { color: var(--ink); }
+.rows-head .c-anim, .rows-head .c-ctl, .rows-head .c-len { white-space: nowrap; }
+
+/* "More like this" and any other short shelf of cards on another page (app/browse.js, similarAssets) */
+.similar > h2, .more-like > h2 { font-size: 15px; line-height: 1.3; font-weight: 600; letter-spacing: -0.01em; margin: 0 0 var(--s4); }
+
+/* ======================================================= THE LIBRARY PAGE */
+.lib { max-width: 1376px; margin: 0 auto; padding: var(--s6) var(--gutter) var(--s10); }
+.lib-search { display: grid; grid-template-columns: minmax(0, 640px) auto; gap: var(--s5); align-items: center; justify-content: space-between; }
+.smart { position: relative; display: flex; align-items: center; gap: 10px; justify-self: end; }
+.smart-text { min-width: 0; }
+.smart-name { font-size: 14px; line-height: 22px; color: var(--ink-2); cursor: pointer; white-space: nowrap; }
+.smart:hover .smart-name, .smart[data-state='ready'] .smart-name, .smart[data-state='loading'] .smart-name { color: var(--ink); }
+.smart-note { display: none; position: absolute; right: 0; top: calc(100% + 6px); z-index: 25; width: max-content; max-width: min(340px, calc(100vw - 2 * var(--gutter))); padding: 8px 10px; background: var(--paper); border: 1px solid var(--line-2); border-radius: var(--r); font-size: 13px; line-height: 1.4; color: var(--ink-2); text-wrap: pretty; }
+.smart:hover .smart-note, .smart:focus-within .smart-note, .smart[data-state='loading'] .smart-note, .smart[data-state='failed'] .smart-note { display: block; }
+.skip-link { position: absolute; left: var(--gutter); transform: translateY(-200vh); height: 32px; padding: 0 var(--s3); border-radius: var(--r); background: var(--ink); color: #fff; font-size: 13px; font-weight: 500; z-index: 40; }
+.skip-link:focus-visible { transform: none; outline-offset: 2px; }
+.lib-tabs { margin-top: var(--s4); }
+
+.lib-bar { display: flex; align-items: flex-start; gap: var(--s2) var(--s4); padding: var(--s4) 0 var(--s5); flex-wrap: wrap; }
+.lib-filters { display: flex; align-items: center; gap: var(--s2); flex-wrap: wrap; min-width: 0; }
+.lib-bar-end { margin-left: auto; display: flex; align-items: center; gap: var(--s3); min-width: 0; min-height: 32px; }
+.result-line { font-size: 13px; color: var(--ink-2); font-variant-numeric: tabular-nums; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.filter-btn { height: 32px; padding: 0 8px 0 12px; display: inline-flex; align-items: center; gap: 4px; border: 1px solid var(--line-2); border-radius: var(--r); font-size: 13px; background: var(--paper); white-space: nowrap; }
+.filter-btn:hover, .filter-btn[aria-expanded='true'] { border-color: var(--ink); }
+.filter-btn svg { color: var(--ink-2); }
+.lib-filters .token .what { font: inherit; font-size: 13px; font-weight: 500; white-space: nowrap; }
+.lib-filters .token .what small { font-weight: 400; }
+.lib-filters .token :focus-visible { outline-offset: 2px; }
+.lib-filters .menu { min-width: 220px; max-width: calc(100vw - 2 * var(--gutter)); }
+.lib-filters .menu .leaf { padding-left: 26px; }
+.lib-filters .menu button:not(.leaf):has(+ .leaf) { font-weight: 500; }
+.lib-filters .filter { display: inline-flex; gap: var(--s2); }
+.menu-head { padding: 8px 10px 4px; font-size: 12px; color: var(--ink-2); }
+.menu-part + .menu-part { margin-top: 4px; padding-top: 4px; border-top: 1px solid var(--line); }
+.menu-note { margin: 4px 0 0; padding: 8px 10px 6px; border-top: 1px solid var(--line); font-size: 12px; line-height: 1.4; color: var(--ink-2); max-width: 260px; }
+.lib-clear { font-size: 13px; color: var(--ink-2); padding: 0 var(--s2); height: 32px; }
+.lib-clear:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+.lib-sort { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink-2); white-space: nowrap; }
+.lib-sort select { height: 32px; padding: 0 28px 0 10px; border: 1px solid var(--line-2); border-radius: var(--r); background: var(--paper) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%235c5c5c' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E") right 8px center / 14px no-repeat; -webkit-appearance: none; appearance: none; font-size: 13px; color: var(--ink); cursor: pointer; }
+.lib-sort select:hover { border-color: var(--ink); }
+.lib-layout button { padding: 0 6px; }
+
+.lib-results { min-height: 40vh; }
+.lib .empty { padding: var(--s9) 0; text-align: center; color: var(--ink-2); font-size: 15px; display: grid; gap: var(--s2); justify-items: center; }
+.lib .empty p { max-width: 32em; overflow-wrap: anywhere; }
+.lib .empty-title { color: var(--ink); font-size: 18px; font-weight: 600; letter-spacing: -0.01em; }
+.lib .empty-do { display: flex; gap: var(--s2); flex-wrap: wrap; justify-content: center; margin-top: var(--s3); }
+.lib .empty-do:empty { display: none; }
+
+@media (max-width: 1180px) {
+  .lib-kits { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .rows-head, .card.row { grid-template-columns: 64px minmax(0, 2.4fr) minmax(0, 1fr) 80px 64px 56px 64px 28px; }
+  .rows-head .c-kit, .card.row .c-kit { display: none; }
+}
+@media (max-width: 860px) {
+  .rows-head { display: none; }
+  .card.row { grid-template-columns: 64px minmax(0, 1fr) auto 28px; gap: var(--s3); }
+  .card.row .cell { display: none; }
+  .lib-search { grid-template-columns: minmax(0, 1fr); gap: var(--s3); }
+  .smart { justify-self: start; }
+  .smart-note { right: auto; left: 0; }
+}
+@media (max-width: 720px) {
+  .lib { padding-top: var(--s5); }
+  .lib-tabs { overflow-x: auto; gap: var(--s4); scrollbar-width: none; }
+  .card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s5) var(--s3); }
+  .lib-kits { grid-template-columns: minmax(0, 1fr); }
+  .lib-bar-end { margin-left: 0; flex: 1 1 100%; }
+  .lib-bar-end .result-line { margin-right: auto; }
+  .lib-sort label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  /* one row of filters on a phone: a little tighter */
+  .lib-filters { gap: 6px; }
+  .lib-filters .filter { gap: 6px; }
+  .filter-btn { padding: 0 10px; }
+  .filter-btn svg { display: none; }
+  .lib-layout button { min-width: 36px; height: 30px; }
+}
+
+/* fingers: the small things on a tile keep their size and get more room to be pressed (44px where there is room) */
+@media (pointer: coarse), (max-width: 720px) {
+  .vdot { width: 24px; position: relative; }
+  .vdot::after, .card .tile-add::after, .card .tile-play::after { content: ''; position: absolute; inset: -8px; }
+  .vdot::after { inset: -8px 0; }
+  .card.row .card-dots { margin-left: -8px; }
+}

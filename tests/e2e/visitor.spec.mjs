@@ -23,6 +23,8 @@ async function reload(page) {
   await page.reload();
 }
 const box = (page) => page.getByRole('searchbox', { name: 'Search' });
+/** A kind tab of the library ("Sounds 41"). */
+const kindTab = (page, word) => page.getByRole('tablist', { name: 'Kind', exact: true }).getByRole('tab', { name: new RegExp(`^${word} \\d+$`) });
 const results = (page) => page.locator('ul.results > li');
 const hash = (page) => page.evaluate(() => location.hash);
 const back = (page) => page.locator('header a.back-link');
@@ -41,9 +43,12 @@ const topOf = (page, id) => page.locator(`ul.results > li[data-id="${id}"]`).eva
 // ---- 1. the way back -----------------------------------------------------------------------------
 
 test('an asset page opened from a search has "Back to results", which returns to the same text, filters and place in the list', async ({ page }) => {
+  // the front page's search opens the library with what was typed
   await openRoute(page, '/');
   await box(page).fill(word(SOUND));
-  await page.getByRole('group', { name: 'Kind', exact: true }).getByRole('button', { name: /^Sounds \d+$/ }).click();
+  await box(page).press('Enter');
+  await expect.poll(() => hash(page)).toBe(`#/browse?q=${word(SOUND)}`);
+  await kindTab(page, 'Sounds').click();
   await expect.poll(() => hash(page)).toBe(`#/browse?q=${word(SOUND)}&kind=sound`);
   const li = await place(page, SOUND.id);
   const before = { ids: await results(page).evaluateAll((lis) => lis.map((x) => x.dataset.id)), top: await topOf(page, SOUND.id) };
@@ -64,10 +69,9 @@ test('an asset page opened from a search has "Back to results", which returns to
   await expect.poll(() => hash(page)).toBe(`#/browse?q=${word(SOUND)}&kind=sound`);
   await waitForDrawn(page);
   await expect(box(page)).toHaveValue(word(SOUND));
-  await expect(page.getByRole('group', { name: 'Kind', exact: true }).getByRole('button', { name: /^Sounds \d+$/ })).toHaveAttribute('aria-pressed', 'true');
+  await expect(kindTab(page, 'Sounds')).toHaveAttribute('aria-selected', 'true');
   await expect.poll(() => results(page).evaluateAll((lis) => lis.map((x) => x.dataset.id))).toEqual(before.ids);
-  // the card they opened is on screen again: where it was, or as near as the page can scroll (the search began on the
-  // front page, whose top is taller than the results page they come back to; the next test checks the exact place)
+  // the card they opened is on screen again: where it was, or as near as the page can scroll (the next test checks the exact place)
   const card = page.locator(`ul.results > li[data-id="${SOUND.id}"] .card`).first();
   await expect(card).toBeVisible();
   await expect(card).toBeInViewport();
@@ -81,7 +85,7 @@ test('far down a long list: back puts the same card back under the visitor\'s ey
   const li = await place(page, SPRITE.id);                     // the last sprite: as far down as it gets
   const top = await topOf(page, SPRITE.id);
   const scrolled = await page.evaluate(() => window.scrollY);
-  await li.locator('a.card').click();
+  await li.locator(`a[href="#/sprite/${SPRITE.id}"]`).click();
   await expect(page.locator('h1')).toHaveText(SPRITE.name);
   await expect(page.evaluate(() => window.scrollY)).resolves.toBe(0);      // an asset page starts at its top
   await back(page).click();
@@ -90,7 +94,7 @@ test('far down a long list: back puts the same card back under the visitor\'s ey
   if (scrolled > 200) expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(100);
 
   // the same with the browser's Back button
-  await page.locator(`ul.results > li[data-id="${SPRITE.id}"] a.card`).click();
+  await page.locator(`ul.results > li[data-id="${SPRITE.id}"] a[href="#/sprite/${SPRITE.id}"]`).click();
   await expect(page.locator('h1')).toHaveText(SPRITE.name);
   await page.goBack();
   await expect.poll(() => hash(page)).toBe('#/browse?kind=sprite');
@@ -98,11 +102,14 @@ test('far down a long list: back puts the same card back under the visitor\'s ey
 });
 
 test('the way back follows where the visitor came from: the front page, the bag, a bundle, or nowhere', async ({ page }) => {
-  // from the front page with nothing typed
+  // from the front page with nothing typed (it lists no results of its own: a sprite it shows is opened)
   await openRoute(page, '/');
-  await (await place(page, SPRITE.id)).locator('a.card').click();
-  await expect(page.locator('h1')).toHaveText(SPRITE.name);
-  await expect(back(page)).toContainText('Back to results');
+  const shown = page.locator('main.landing a[href^="#/sprite/"]').first();
+  const name = await shown.evaluate((a) => a.getAttribute('href').split('/').pop());
+  await shown.scrollIntoViewIfNeeded();
+  await shown.click();
+  await expect(page.locator('h1')).toHaveText(CATALOG.assets.find((a) => a.id === name).name);
+  await expect(back(page)).toContainText('Back to');
   await expect(back(page)).toHaveAttribute('href', '#/');
   // from one asset to another (a link on the page): the way back still leads to the list
   const linked = page.locator('main a[href^="#/sound/"], main a[href^="#/music/"], main a[href^="#/sprite/"]').first();
@@ -113,12 +120,12 @@ test('the way back follows where the visitor came from: the front page, the bag,
   }
   await back(page).click();
   await expect.poll(() => hash(page)).toBe('#/');
-  await expect(page.getByRole('heading', { name: 'Start from a kind of game' })).toBeVisible();
+  await expect(page.locator('main.landing h1')).toBeVisible();
 
   // from the bag's "Change"
   await addToBag(page, { kind: 'sound', id: SOUND.id, settings: {} });
   await openRoute(page, '/bag');
-  await rows(page).first().getByRole('link', { name: 'Change' }).click();
+  await rows(page).first().getByRole('link', { name: /^Open the page of/ }).click();
   await expect(page.locator('h1')).toHaveText(SOUND.name);
   await expect(back(page)).toContainText('Back to your bag');
   await back(page).click();
@@ -179,9 +186,9 @@ test('a bag row says in plain words what was changed, at most three things and h
 
 // ---- 3. one wording for the bag button -------------------------------------------------------------------
 
-// (A sprite's page saves by itself now, docs/site-design.md section 3: its panel offers "Add to my bag" until the sprite is
-// in the bag and says "Saved in your bag" from then on. The sound and music pages still have the button with "Update".)
-test('the bag button reads "Add to my bag" everywhere, and "In your bag" with "Update" (or "Saved in your bag") once it is there', async ({ page }) => {
+// (Every asset page saves by itself now, docs/site-design.md section 3: its panel offers "Add to my bag" until the asset is
+// in the bag and says "Saved in your bag" from then on.)
+test('the bag button reads "Add to my bag" everywhere, and "In your bag" (or "Saved in your bag") once it is there', async ({ page }) => {
   // on a card
   await openRoute(page, '/browse?kind=sound');
   const li = await place(page, SOUND.id);
@@ -198,8 +205,8 @@ test('the bag button reads "Add to my bag" everywhere, and "In your bag" with "U
   await expect(bagCount(page)).toHaveText('1');
 
   // on each kind of asset page
-  {
-    await openRoute(page, `/sprite/${SPRITE.id}`);
+  for (const asset of [SPRITE, TRACK]) {
+    await openRoute(page, `/${asset.kind}/${asset.id}`);
     const add = page.locator('.rx-panel .add-btn'), saved = page.locator('.rx-panel .saved');
     await expect(add).toHaveText('Add to my bag');
     await expect(saved).toHaveText(/Changes save by themselves/);
@@ -213,25 +220,14 @@ test('the bag button reads "Add to my bag" everywhere, and "In your bag" with "U
     await expect(saved).toContainText(/Saved in your bag\s*\d+ changes?/);
     await expect(bagCount(page)).toHaveText(String(had + 1));
   }
-  for (const asset of [SOUND, TRACK]) {
-    await openRoute(page, `/${asset.kind}/${asset.id}`);
-    const area = page.locator('.add-to-bag');
-    await expect(area.getByRole('button')).toHaveText('Add to my bag');
-    const had = Number(await bagCount(page).textContent());
-    await area.getByRole('button').click();
-    await expect(bagCount(page)).toHaveText(String(had + 1));
-    await expect(area).toContainText('In your bag');
-    await expect(area.getByRole('button')).toHaveText('Update');
-    // Update changes that one, it does not add another
-    await area.getByRole('button').click();
-    await expect(area).toContainText('Updated');
-    await expect(bagCount(page)).toHaveText(String(had + 1));
-  }
-  // opened from the bag: the same two words
+  // the sound added from its card: its page knows it is in the bag already
+  await openRoute(page, `/sound/${SOUND.id}`);
+  await expect(page.locator('.rx-panel .add-btn')).toBeHidden();
+  // opened from the bag: the same words
   await openRoute(page, '/bag');
-  await rows(page).first().getByRole('link', { name: 'Change' }).click();
-  await expect(page.locator('.add-to-bag')).toContainText('In your bag');
-  await expect(page.locator('.add-to-bag').getByRole('button')).toHaveText('Update');
+  await rows(page).first().getByRole('link', { name: /^Open the page of/ }).click();
+  await expect(page.locator('.rx-panel .saved')).toContainText('Saved in your bag');
+  await expect(page.locator('.rx-panel .add-btn')).toBeHidden();
 
   // nowhere on the site says it another way
   for (const route of ['/', '/browse', '/bag', `/bundle/${BUNDLE.id}`, `/sprite/${SPRITE.id}`]) {
@@ -240,7 +236,7 @@ test('the bag button reads "Add to my bag" everywhere, and "In your bag" with "U
   }
   await page.evaluate(async () => (await import('/app/bag.js')).bag.clear());
   await openRoute(page, '/bag');
-  await expect(page.locator('main')).toContainText('Add to my bag');
+  await expect(page.locator('main')).not.toContainText(/Add to bag|Update in bag|Add to your bag/);
 });
 
 // ---- 4. Mute belongs to the playground ---------------------------------------------------------------------
@@ -392,4 +388,15 @@ test('on a wide screen the header shows its links and no menu button', async ({ 
   await openRoute(page, '/');
   await expect(page.getByRole('navigation', { name: 'Main' }).getByRole('link')).toHaveText(['Library', 'Kits', 'Play']);
   await expect(page.locator('header .menu-btn')).toBeHidden();
+});
+
+test('a sprite opened from the landing page says the way back is to the start, not to results', async ({ page }) => {
+  await openRoute(page, '/');
+  const link = page.locator('main a[href^="#/sprite/"]').first();
+  await link.scrollIntoViewIfNeeded();
+  await link.click();
+  await expect.poll(() => page.evaluate(() => location.hash)).toMatch(/^#\/sprite\//);
+  const way = page.locator('header a.back-link');
+  await expect(way).toHaveText(/Back to the start/);
+  await expect(way).toHaveAttribute('href', '#/');
 });

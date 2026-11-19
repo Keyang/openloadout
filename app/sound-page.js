@@ -1,144 +1,125 @@
-// One sound: hear it, change it with sliders, download it.
-import { el, header, saveBlob, SOUND_BG, cap } from './ui.js';
-import { soundParams, randomSoundParams, rendered, playRendered, wavBytes, toUnit, toValue, drawWave } from './audio.js';
-import { addToBag, keepBag } from './add-to-bag.js';
-import { shownValue } from '../sound/words.js';
-import { goesWith, moreLikeThis } from './related.js';
+// One sound (docs/site-design.md, section 5, "Sound, music"): the same two columns as a sprite (app/asset-shell.js).
+// Left: its name and line, a big play button and how long it is. Right: the editing panel (app/panel.js) with its
+// versions (its named styles first), its sliders in tabs, and the download. Every change is saved to the bag as it is
+// made (app/editing.js) and heard a moment after it. No waveform picture (a standing rule of the site).
+import { el, header, saveBlob, cap } from './ui.js';
+import { soundParams, rendered, playRendered, wavBytes } from './audio.js';
+import { keepBag } from './add-to-bag.js';
 import { madeNote } from './catalog.js';      // W5-A: a sound made on this visit says so, and a draft cannot go in the bag
-
-const INK = '#231b33';
-// A value in everyday words ("high", "fast", "a lot"), never "2200 Hz": a count with no unit (rockets, notes) is its number
-const fmt = shownValue;
+import { createEdit } from './editing.js';
+import { editPanel } from './panel.js';
+import { assetShell, icon, ICON } from './asset-shell.js';
 
 export function soundPage(app, patch, query) {
   document.title = `${patch.name} · Loadout`;
   const presets = Object.keys(patch.presets ?? {});
   const fromLink = {};
   for (const d of patch.params) if (query[d.id] !== undefined && Number.isFinite(Number(query[d.id]))) fromLink[d.id] = Number(query[d.id]);
-  const st = {
-    preset: presets.includes(query.style) ? query.style : null,
-    p: null, seed: 1, r: null, handle: null,
-  };
-  st.p = soundParams(patch, st.preset, fromLink);
-  st.custom = Object.keys(fromLink).length > 0;
+  const style0 = presets.includes(query.style) ? query.style : null;
+  const made = madeNote(patch.id);
 
-  // ---- wave display
-  const wave = el('canvas', { class: 'stage', role: 'img', 'aria-label': `${patch.name} waveform` });
-  const wrap = el('div', { class: 'stage-wrap wave-wrap' }, wave);
-  const g = wave.getContext('2d');
-  let W = 176, H = 72, zoom = 4;
-  const fit = () => {
-    const cw = wrap.clientWidth;
-    if (!cw) return;
-    zoom = Math.max(2, Math.min(5, Math.floor(cw / 104)));
-    W = Math.floor(cw / zoom);
-    wave.width = W; wave.height = H;
-    wave.style.width = W * zoom + 'px'; wave.style.height = H * zoom + 'px';
-    draw();
-  };
-  function draw() {
-    g.fillStyle = SOUND_BG[patch.category] ?? '#e6e9f2'; g.fillRect(0, 0, W, H);
-    g.fillStyle = 'rgba(35, 27, 51, 0.12)'; g.fillRect(6, H / 2 - 1, W - 12, 1);
-    if (!st.r) return;
-    const h = st.handle;
-    let played = -1;
-    if (h) { const u = (h.now() - h.startedAt) / h.duration; played = Math.floor((h.loop ? u % 1 : Math.min(1, u)) * (W - 12)); }
-    drawWave(g, st.r.samples, 6, H / 2, W - 12, H - 16, INK, played, '#5a48e0');
-  }
-
-  const playBtn = el('button', { type: 'button', class: 'btn', onclick: () => (st.handle ? stop() : play()) });
-  const lengthNote = el('span', { class: 'hint' });
-  const syncPlay = () => { playBtn.textContent = st.handle ? 'Stop' : patch.loop ? 'Play loop' : 'Play'; };
-  function stop() { if (st.handle) st.handle.stop(); st.handle = null; syncPlay(); draw(); }
-  function render() {
-    st.r = rendered(patch, st.p, st.seed);
-    lengthNote.textContent = patch.loop ? `Loops every ${st.r.duration.toFixed(1)} seconds` : `${st.r.duration.toFixed(2)} seconds long`;
-  }
-  function play() {
-    if (st.handle) st.handle.stop();
-    render();
-    st.handle = playRendered(st.r, { force: true, loop: !!patch.loop, onended: () => { st.handle = null; syncPlay(); draw(); } });
-    syncPlay();
-  }
-  /** Something changed: redraw, and play it if the person just acted. */
-  function changed(andPlay) {
-    render(); draw(); syncStyle(); saveUrl();
-    if (andPlay) play();
-  }
-
-  // ---- styles (named settings)
-  const styleBar = el('div', { class: 'pills', role: 'group', 'aria-label': 'Style' },
-    el('button', { type: 'button', class: 'pill', 'data-v': '', onclick: () => setStyle(null) }, 'Standard'),
-    presets.map((name) => el('button', { type: 'button', class: 'pill', 'data-v': name, onclick: () => setStyle(name) }, name)));
-  const syncStyle = () => { for (const b of styleBar.children) b.setAttribute('aria-pressed', String(!st.custom && b.dataset.v === (st.preset ?? ''))); };
-  function setStyle(name) { st.preset = name; st.custom = false; st.p = soundParams(patch, name); syncSliders(); changed(true); }
-
-  // ---- sliders
-  const sliders = {};
-  const fields = patch.params.map((d) => {
-    const out = el('span', { class: 'end value', style: 'min-width: 7.5em' }, fmt(d, st.p[d.id]));   // wide enough for "rises a little", so the slider does not jump as the word changes
-    const input = el('input', { id: `s-${d.id}`, type: 'range', min: 0, max: 1, step: 0.005, value: toUnit(d, st.p[d.id]), 'aria-valuetext': fmt(d, st.p[d.id]),
-      oninput: (e) => { st.p[d.id] = toValue(d, Number(e.target.value)); st.custom = true; out.textContent = fmt(d, st.p[d.id]); e.target.setAttribute('aria-valuetext', out.textContent); },
-      onchange: () => changed(true) });
-    sliders[d.id] = () => { input.value = toUnit(d, st.p[d.id]); out.textContent = fmt(d, st.p[d.id]); input.setAttribute('aria-valuetext', out.textContent); };
-    return el('div', { class: 'field' }, el('label', { for: `s-${d.id}` }, d.label), el('div', { class: 'slider two' }, input, out));
+  // The edit session: what the address carries is where it starts; a bag item of this sound (the one the address names,
+  // or the visitor's own when the address carries no settings) is what it edits. Every change is saved to the bag.
+  let saveTimer = 0;
+  const edit = createEdit({
+    kind: 'sound', id: patch.id, defaults: { params: soundParams(patch, null), style: null, seed: 1 }, key: query.bag ?? null, canSave: !made?.draft,
+    start: { params: soundParams(patch, style0, fromLink), style: style0, seed: Number(query.seed) >= 1 ? Math.round(Number(query.seed)) : 1 },      // (a seed: a variation opened from the bag)
+    schedule: (fn) => { clearTimeout(saveTimer); saveTimer = setTimeout(fn, 150); },      // a slider being dragged is a few saves, not hundreds
   });
-  const syncSliders = () => { for (const k of Object.keys(sliders)) sliders[k](); };
+  const now = () => edit.settings();
 
-  // ---- link and download
+  // ---- playing
+  let r = null, handle = null, raf = 0;
+  const lengthNote = el('span', { class: 'hint' });
+  const progress = el('span', { class: 'tile-progress', 'aria-hidden': 'true' });
+  const playBtn = el('button', { type: 'button', class: 'play-big', onclick: () => (handle ? stop() : play()) });
+  const syncPlay = () => {
+    const word = handle ? 'Stop' : patch.loop ? 'Play loop' : 'Play';
+    playBtn.replaceChildren(icon(handle ? ICON.stop : ICON.play, { fill: true }), el('span', { class: 'sr' }, word));
+    playBtn.title = word;
+  };
+  function render() {
+    const s = now();
+    r = rendered(patch, s.params, s.seed);
+    lengthNote.textContent = patch.loop ? `Loops every ${r.duration.toFixed(1)} seconds` : `${r.duration.toFixed(2)} seconds long`;
+    return r;
+  }
+  // the line along the bottom of the tile follows the sound while it plays
+  const follow = () => {
+    const h = handle;
+    if (!h) { progress.style.width = '0'; raf = 0; return; }
+    const u = (h.now() - h.startedAt) / h.duration;
+    progress.style.width = `${Math.max(0, Math.min(1, h.loop ? u % 1 : u)) * 100}%`;
+    raf = requestAnimationFrame(follow);
+  };
+  function stop() { if (handle) handle.stop(); handle = null; syncPlay(); }
+  function play() {
+    if (handle) handle.stop();
+    handle = playRendered(render(), { force: true, loop: !!patch.loop, onended: () => { handle = null; syncPlay(); } });
+    syncPlay();
+    if (handle && !raf) raf = requestAnimationFrame(follow);
+  }
+
+  // ---- the address and the files
   let urlTimer = 0;
   function link() {
-    const q = new URLSearchParams();
-    if (st.custom) for (const d of patch.params) q.set(d.id, String(st.p[d.id]));
-    else if (st.preset) q.set('style', st.preset);
+    const s = now(), q = new URLSearchParams();
+    // a style as it comes travels by its name; anything moved by hand travels as every slider's value
+    const own = soundParams(patch, s.style);
+    if (patch.params.some((d) => s.params[d.id] !== own[d.id])) for (const d of patch.params) q.set(d.id, String(s.params[d.id]));
+    else if (s.style) q.set('style', s.style);
+    if (s.seed !== 1) q.set('seed', String(s.seed));
     const qs = q.toString();
     return `#/sound/${patch.id}${qs ? '?' + qs : ''}`;
   }
-  function saveUrl() { clearTimeout(urlTimer); urlTimer = setTimeout(() => history.replaceState(null, '', keepBag(link(), query)), 200); }
-  const status = el('p', { class: 'status', role: 'status' });
-  const say = (msg) => { status.textContent = msg; };
+  // the address carries the settings, and the bag item they are saved to, so a reload goes on editing the same item
+  function saveUrl() { clearTimeout(urlTimer); urlTimer = setTimeout(() => { urlTimer = 0; history.replaceState(null, '', keepBag(link(), { bag: edit.key() })); }, 200); }
   function download() {
-    render();
-    saveBlob(new Blob([wavBytes(st.r)], { type: 'audio/wav' }), `${patch.id}.wav`);
-    say(`Downloaded ${patch.id}.wav. It works in Unity, Godot and any other game tool.`);
+    saveBlob(new Blob([wavBytes(render())], { type: 'audio/wav' }), `${patch.id}.wav`);
+    return `Downloaded ${patch.id}.wav. It works in Unity, Godot and any other game tool.`;
   }
   async function copyLink() {
-    clearTimeout(urlTimer);
-    try { await navigator.clipboard.writeText(`${location.origin}${location.pathname}${link()}`); say('Link copied. Anyone who opens it hears this exact sound.'); }
-    catch { say('Copy the address in your browser bar to share this exact sound.'); }
+    clearTimeout(urlTimer); urlTimer = 0;
+    try { await navigator.clipboard.writeText(`${location.origin}${location.pathname}${link()}`); return 'Link copied. Anyone who opens it hears this exact sound.'; }
+    catch { return 'Copy the address in your browser bar to share this exact sound.'; }
   }
 
-  if (Number(query.seed) >= 1) st.seed = Math.round(Number(query.seed));   // a variation opened from the bag
-  const made = madeNote(patch.id);
-  const bagBox = made?.draft ? null : addToBag('sound', patch.id, () => ({ params: { ...st.p }, style: st.preset, seed: st.seed }), query);
-  render(); syncPlay(); syncStyle();
-  app.replaceChildren(
-    header('sounds'),
-    el('main', { class: 'editor' },
-      el('div', { class: 'left' },
-        el('div', { class: 'title-row' }, el('h1', {}, patch.name), el('p', { class: 'blurb' }, patch.description ?? '')),
-        made ? el('p', { class: 'hint made-here' }, made.text) : null,
-        el('div', { class: 'stage-card' }, wrap, el('div', { class: 'stage-tools' }, el('div', { class: 'tools-left' }, playBtn, lengthNote),
-          el('button', { type: 'button', class: 'ghost', onclick: () => { st.seed = 1 + Math.floor(Math.random() * 9999); changed(true); } }, 'Play a variation'))),
-        el('div', { class: 'under' }, el('span', { class: 'label' }, 'Style'), styleBar),
-        goesWith(patch.id)),      // the sprites that use it and the bundles it is in, from the catalogue
-      el('div', { class: 'panel' },
-        el('div', { class: 'panel-actions' },
-          el('button', { type: 'button', class: 'btn', onclick: () => { st.p = soundParams(patch, null, randomSoundParams(patch)); st.custom = true; syncSliders(); changed(true); } }, 'Surprise me'),
-          el('button', { type: 'button', class: 'ghost', onclick: () => setStyle(null) }, 'Start over')),
-        el('section', { class: 'group' }, el('h2', {}, cap(patch.category) + ' sound'), fields)),
-      el('div', { class: 'get' },
-        bagBox,
-        el('button', { type: 'button', class: 'btn big', onclick: download }, 'Download sound'),
-        el('button', { type: 'button', class: 'ghost', onclick: copyLink }, 'Copy link'),
-        status),
-      moreLikeThis(patch.id)));
+  // ---- a change: drawn and saved in the address a moment after the last one, and played when the visitor made it here
+  let soon = 0, wantPlay = false;
+  const changed = () => {
+    clearTimeout(soon);
+    soon = setTimeout(() => { render(); syncVariation(); if (!urlTimer || wantPlay) saveUrl(); if (wantPlay) { wantPlay = false; play(); } }, 140);
+  };
+  const acted = () => { wantPlay = true; changed(); };
 
-  const ro = new ResizeObserver(fit);
-  ro.observe(wrap);
-  fit();
-  let raf = 0;
-  const loop = () => { if (st.handle) draw(); raf = requestAnimationFrame(loop); };
-  raf = requestAnimationFrame(loop);
-  return () => { cancelAnimationFrame(raf); ro.disconnect(); clearTimeout(urlTimer); if (st.handle) st.handle.stop(); };
+  const variationNote = el('p', {});
+  const syncVariation = () => { const n = now().seed; variationNote.textContent = n === 1 ? 'A variation is the same sound, a little different each time, the way a game varies it.' : `Variation ${n}. Start over goes back to the first.`; };
+  const variation = el('button', { type: 'button', class: 'btn btn-sm btn-secondary', onclick: () => { edit.set({ seed: 1 + Math.floor(Math.random() * 9999) }); acted(); } }, 'Play a variation');
+
+  let shell = null;
+  const panel = editPanel({
+    kind: 'sound', asset: patch, edit,
+    onDownload: download, onCopyLink: copyLink,
+    onMore: () => shell && shell.openMore(),
+    onAct: (what) => { if (what === 'version' || what === 'surprise' || what === 'control' || what === 'startover') acted(); },
+  });
+  const offEdit = edit.onChange(changed);
+  const flush = () => edit.flush();
+  window.addEventListener('pagehide', flush);      // closing the tab mid-drag still saves the last change
+  render(); syncPlay(); syncVariation();
+  if (edit.inBag()) saveUrl();
+
+  const card = el('div', { class: 'stage-card tile sound-card' },
+    el('span', { class: 'sound-icon' }, icon(ICON.speaker, { size: 18 }), `${cap(patch.category)} sound`),
+    el('div', { class: 'stage-tools' }, el('div', { class: 'tools-left' }, playBtn, lengthNote)),
+    progress);
+  shell = assetShell({ kind: 'sound', id: patch.id, name: patch.name, line: patch.description ?? '', made, edit, stage: card, under: [el('div', { class: 'sound-under' }, variation, variationNote)], panel });
+  app.replaceChildren(header('sounds'), shell.main);
+
+  return () => {
+    cancelAnimationFrame(raf); clearTimeout(urlTimer); clearTimeout(soon);
+    if (handle) handle.stop();
+    offEdit(); panel.close(); shell.close(); edit.close(); clearTimeout(saveTimer);      // leaving saves whatever was still waiting
+    window.removeEventListener('pagehide', flush);
+  };
 }

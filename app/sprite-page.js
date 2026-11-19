@@ -1,9 +1,12 @@
-// One sprite: preview on the left; on the right the editing panel (app/panel.js) with its versions, its controls in tabs,
-// the sounds that play with each animation, and the download. Every change is saved to the bag as it is made (app/editing.js).
+// One sprite (docs/site-design.md, section 5, "Asset"): two columns that fill the window (app/asset-shell.js). Left: its
+// name and line, its live picture on a shelf tile (plain, or in a scene that suits it), play and pause, its animations
+// as chips and the frames of the one playing. Right: the editing panel (app/panel.js) with its versions, its controls in
+// tabs, the sounds that play with each animation (Sounds), its looks (Look), and the download.
+// Every change is saved to the bag as it is made (app/editing.js).
 import { defaultParams, cleanParams, clipFps, cueInEffect, renderPixels } from '../engine/sprite.js';
 import { stylesOf, styleById } from '../engine/styles.js';
-import { bag, cleanSettings } from './bag.js';     // W6-A: a sprite may offer more than one style (Contract 12)
-import { drawStage, backdropFor, stagesFor } from './stage.js';
+import { bag, cleanSettings, lookOf } from './bag.js';     // W6-A: a sprite may offer more than one style (Contract 12)
+import { drawStage, backdropFor, stagesFor, sceneFor, defaultStage } from './stage.js';
 import { zip } from './zip.js';
 import { el, header, Frames, travel, hover, shadow, saveBlob, store, cap } from './ui.js';
 import { sounds, soundById, soundParams, rendered, playRendered, soundState, setSoundOn, toUnit, toValue } from './audio.js';
@@ -11,7 +14,8 @@ import { spriteFiles, defaultCues } from './bundle.js';
 import { keepBag } from './add-to-bag.js';
 import { createEdit } from './editing.js';      // changes save themselves (docs/site-design.md, section 3)
 import { editPanel } from './panel.js';         // the right-hand column: versions, fine-tune tabs, the footer
-import { goesWith, moreLikeThis } from './related.js';
+import { assetShell, icon, ICON, setIcon } from './asset-shell.js';
+import { lookTab, lookById, lookPainter } from './asset-look.js';      // the whole-set looks, on this one sprite
 import { madeNote, assetById } from './catalog.js';      // W5-A: a sprite made on this visit says so, and a draft cannot go in the bag
 
 /**
@@ -92,8 +96,12 @@ export function spritePage(app, sprite, query) {
   document.title = `${sprite.name} · Loadout`;
   // what the preview stands on suits what the sprite is (app/stage.js): a scene with ground, a plain panel for an
   // interface piece, or nothing at all for a background, which fills the frame itself
-  const backdrop = backdropFor(sprite.meta ?? assetById(sprite.id));
+  const about = sprite.meta ?? assetById(sprite.id);
+  const backdrop = backdropFor(about);
+  const scene = sceneFor(about);      // the scene "In a scene" means for this sprite: the meadow, or the cave
   const stageChoices = stagesFor(backdrop);
+  // (a choice kept from before the two scenes became one "In a scene")
+  const keptStage = (v) => (v === 'meadow' || v === 'cave' ? 'scene' : v);
   const stageKey = backdrop === 'panel' ? 'stage-panel' : 'stage';      // a chosen panel and a chosen scene are remembered apart
   const clipNames = Object.keys(sprite.clips);
   // The styles this sprite can be drawn in (Contract 12). With one, nothing on this page is different. With more, the
@@ -116,6 +124,7 @@ export function spritePage(app, sprite, query) {
       params: cleanParams(sprite, query), cues: (query.sfx && unpackCues(sprite, query.sfx)) || spriteCues(sprite),
       scale: [1, 2, 4].includes(Number(query.scale)) ? Number(query.scale) : 1,
       ...(styles.includes(askedStyle) && askedStyle !== styles[0] ? { artStyle: askedStyle } : {}),      // only when it is not the sprite's first style
+      ...(lookOf({ look: query.artlook }) ? { look: query.artlook } : {}),      // a look of its own (the Look tab), carried by the link as `artlook`
     },
     schedule: (fn) => { clearTimeout(saveTimer); saveTimer = setTimeout(fn, 150); },      // a slider being dragged is a few saves, not hundreds
   });
@@ -127,13 +136,31 @@ export function spritePage(app, sprite, query) {
     clip: clipNames.includes(query.clip) ? query.clip : sprite.preview,
     cues: s0.cues ?? spriteCues(sprite),
     playing: true,
-    stage: stageChoices.some((s) => s.id === store.get(stageKey)) ? store.get(stageKey) : stageChoices[0]?.id ?? null,
+    // (the visitor's last choice; without one, a character or a creature stands in its scene and anything else is shown plain)
+    stage: stageChoices.some((s) => s.id === keptStage(store.get(stageKey))) ? keptStage(store.get(stageKey)) : backdrop === 'ground' ? defaultStage(about) : stageChoices[0]?.id ?? null,
+    look: lookOf(s0),      // its own look (the Look tab): one of the named whole-set looks, saved with it like any setting; null while it follows the bag
     scale: s0.scale, start: performance.now(), frame: 0, lastFrame: -1, scroll: 0,
   };
   const frames = choice ? new StyleFrames(sprite, st.p, st.style) : new Frames(sprite, st.p);
   // W5-B: a sprite made on a visit is drawn in a worker of its own, and its frames for new settings arrive a moment later:
   // what was drawn meanwhile (the last look) is dropped then, and the stage and the strip draw again
-  const offFrames = typeof sprite.onFrames === 'function' ? sprite.onFrames((e) => { if (sprite.isFor(e, st.p, st.style)) { frames.set(st.p); buildStrip(); } }) : null;
+  const offFrames = typeof sprite.onFrames === 'function' ? sprite.onFrames((e) => { if (sprite.isFor(e, st.p, st.style)) { frames.set(st.p); repaint(); buildStrip(); } }) : null;
+  // a frame as it is shown: in the look chosen, when there is one (each drawn frame is recoloured once and kept)
+  let painter = null;
+  const painted = new Map();
+  function repaint() {
+    painted.clear();
+    const look = lookById(st.look);
+    try { painter = look ? lookPainter(sprite, st.p, st.style, look) : null; } catch (e) { console.error('look:', e); painter = null; }
+  }
+  const pic = (clip, f) => {
+    const cv = frames.get(clip, f);
+    if (!painter) return cv;
+    let out = painted.get(cv);
+    if (!out) { try { out = painter(cv); } catch (e) { console.error('look:', e); out = cv; } painted.set(cv, out); }
+    return out;
+  };
+  repaint();
   // and what one more click could ask for (each option, each switch, each other style) is brought ahead, so a click draws at once
   // (a click starts that at once; while a slider is being dragged it waits until the drag rests)
   let aheadTimer = 0, aheadAt = -1e9;
@@ -191,17 +218,18 @@ export function spritePage(app, sprite, query) {
   }
   window.addEventListener('sf-audio-ready', syncLoops);
 
-  // ---- stage
+  // ---- stage: the live picture on a shelf tile, with where it stands and play/pause on it
   const stage = el('canvas', { class: 'stage', role: 'img', 'aria-label': `${sprite.name} animation preview` });
-  const stageWrap = el('div', { class: 'stage-wrap' }, stage);
-  const strip = el('div', { class: 'strip' });
-  const clipBar = el('div', { class: 'pills', role: 'group', 'aria-label': 'Animation' });
-  const playBtn = el('button', { class: 'ghost', type: 'button', onclick: () => {
+  const shelf = el('span', { class: 'stage-shelf', 'aria-hidden': 'true' });      // the line a sprite stands on when it is shown plain
+  const stageWrap = el('div', { class: 'stage-wrap' }, stage, shelf);
+  const strip = el('div', { class: 'strip', role: 'group', 'aria-label': 'Frames' });
+  const clipBar = el('div', { class: 'clips chips', role: 'group', 'aria-label': 'Animation' });
+  const playBtn = el('button', { class: 'icon-btn', type: 'button', onclick: () => {
     st.playing = !st.playing;
     if (st.playing) { st.start = performance.now() - (st.frame / clipFps(sprite, st.clip, st.p)) * 1000; st.lastFrame = st.frame; }
     syncPlay(); syncLoops();
   } });
-  const syncPlay = () => { playBtn.textContent = st.playing ? 'Pause' : 'Play'; };
+  const syncPlay = () => { playBtn.setAttribute('aria-label', st.playing ? 'Pause' : 'Play'); playBtn.title = st.playing ? 'Pause the animation' : 'Play the animation'; setIcon(playBtn, st.playing ? 'pause' : 'play'); };
   syncPlay();
 
   const setClip = (name) => {
@@ -209,98 +237,131 @@ export function spritePage(app, sprite, query) {
     for (const b of clipBar.children) b.setAttribute('aria-pressed', String(b.dataset.clip === name));
     buildStrip(); buildCues(); syncLoops(); saveUrl();
   };
-  for (const name of clipNames) clipBar.append(el('button', { type: 'button', class: 'pill', 'data-clip': name, 'aria-pressed': String(name === st.clip), onclick: () => setClip(name) }, sprite.clips[name].label));
+  for (const name of clipNames) clipBar.append(el('button', { type: 'button', class: 'chip', 'data-clip': name, 'aria-pressed': String(name === st.clip), onclick: () => setClip(name) }, sprite.clips[name].label));
 
-  const sceneBar = stageChoices.length < 2 ? el('span', { class: 'scene-none' }) : el('div', { class: 'scene', role: 'group', 'aria-label': 'Backdrop' },
-    stageChoices.map((s) => el('button', { type: 'button', class: 'scene-btn scene-' + s.id, title: s.label, 'aria-label': `${s.label} backdrop`, 'aria-pressed': String(s.id === st.stage), onclick: (e) => {
+  // where it stands: plain or in a scene (a thing that stands on the ground), a light or a dark panel (an interface
+  // piece); a background is its own backdrop and has no choice
+  const stageWord = (s) => (backdrop === 'panel' ? s.label.replace(/ panel$/, '') : s.label);
+  const stageCard = el('div', { class: 'stage-card tile', 'data-backdrop': backdrop, 'data-stage': st.stage ?? '' });
+  const sceneBar = stageChoices.length < 2 ? el('span', { class: 'scene-none' }) : el('span', { class: 'seg', role: 'group', 'aria-label': 'Backdrop' },
+    (backdrop === 'ground' ? [...stageChoices].reverse() : stageChoices).map((s) => el('button', { type: 'button', 'data-stage': s.id, title: s.id === 'scene' ? `In a scene: the ${scene}` : null, 'aria-label': s.id === 'scene' ? null : `${s.label} backdrop`, 'aria-pressed': String(s.id === st.stage), onclick: () => {
       st.stage = s.id; store.set(stageKey, s.id);
-      for (const b of sceneBar.children) b.setAttribute('aria-pressed', String(b === e.currentTarget));
-    } })));
+      stageCard.dataset.stage = s.id;
+      for (const b of sceneBar.children) b.setAttribute('aria-pressed', String(b.dataset.stage === s.id));
+    } }, stageWord(s))));
+  stageCard.append(stageWrap, el('div', { class: 'stage-tools' }, sceneBar, playBtn));
 
+  let stripRoom = 0;
   function buildStrip() {
     const n = sprite.clips[st.clip].frames;
+    // every frame in one row inside the column: cells of 40px, smaller (down to 26) when the row would not fit; more
+    // frames than that wrap onto a second row
+    const room = strip.clientWidth - 4, cell = room > 0 ? Math.max(26, Math.min(40, Math.floor((room - 4 * (n - 1)) / n))) : 40;
+    strip.style.setProperty('--cell', `${cell}px`);
+    stripRoom = strip.clientWidth;
     const marked = new Set((st.cues[st.clip] ?? []).filter((c) => soundById[c.sound] && !soundById[c.sound].loop && applies(c)).map((c) => c.frame));
     strip.replaceChildren(...Array.from({ length: n }, (_, f) => {
       const c = el('canvas', { width: sprite.size[0], height: sprite.size[1] });
-      c.getContext('2d').drawImage(frames.get(st.clip, f), 0, 0);
+      c.getContext('2d').drawImage(pic(st.clip, f), 0, 0);
+      // in its cell at a whole-number size, or a whole-number fraction when the frame is larger than the cell
+      const z = (cell - 4) / Math.max(sprite.size[0], sprite.size[1]), k = z >= 1 ? Math.floor(z) : 1 / Math.ceil(1 / z);
+      c.style.width = `${sprite.size[0] * k}px`; c.style.height = `${sprite.size[1] * k}px`;
       return el('button', { type: 'button', class: 'cell' + (marked.has(f) ? ' has-sound' : ''), 'aria-label': `Frame ${f + 1}${marked.has(f) ? ', plays a sound' : ''}`, onclick: () => {
         st.playing = false; st.frame = f; st.lastFrame = f; syncPlay(); syncLoops(); fire(f, true);
       } }, c);
     }));
   }
 
-  // ---- sounds for the current animation
+  // ---- the Sounds tab: for the animation that is playing, which sound, on which frame, play it, change it
   const cueBox = el('section', { class: 'cues' });
   const cuesChanged = (rebuild) => { if (rebuild) buildCues(); buildStrip(); syncLoops(); edit.set({ cues: st.cues }); saveUrl(); };
+  const act = (label, onclick, more = {}) => el('button', { type: 'button', class: 'cue-act', onclick, ...more }, label);
 
   function cueRow(cue, list) {
     const patch = soundById[cue.sound];
     const n = sprite.clips[st.clip].frames;
     const soundSel = el('select', { 'aria-label': 'Sound', onchange: (e) => { cue.sound = e.target.value; cue.preset = null; cue.params = null; cuesChanged(true); playCue(cue, true); } },
       [...new Set(sounds.map((s) => s.category))].map((cat) => el('optgroup', { label: cap(cat) }, sounds.filter((s) => s.category === cat).map((s) => el('option', { value: s.id, selected: s.id === cue.sound }, s.name)))));
-    const when = patch.loop
-      ? el('span', { class: 'hint' }, 'plays for the whole animation')
-      : el('label', { class: 'inline' }, 'on frame ', el('select', { onchange: (e) => { cue.frame = Number(e.target.value); cuesChanged(false); } },
-        Array.from({ length: n }, (_, f) => el('option', { value: f, selected: f === cue.frame }, String(f + 1)))));
+    // the frame it starts on: one square per frame of the animation, the one it plays on filled
+    let when;
+    if (patch.loop) when = el('span', { class: 'cue-when' }, el('span', { class: 'ruler-word' }, 'Plays for the whole animation'));
+    else {
+      const word = el('span', { class: 'ruler-word' }, `Frame ${cue.frame + 1} of ${n}`);
+      const ruler = el('span', { class: 'ruler', role: 'group', 'aria-label': 'The frame it plays on' },
+        Array.from({ length: n }, (_, f) => el('button', { type: 'button', 'data-frame': f, 'aria-label': `Move to frame ${f + 1}`, 'aria-pressed': String(f === cue.frame), onclick: () => {
+          cue.frame = f;
+          for (const b of ruler.children) b.setAttribute('aria-pressed', String(Number(b.dataset.frame) === f));
+          word.textContent = `Frame ${f + 1} of ${n}`;
+          cuesChanged(false); playCue(cue, true);
+        } })));
+      when = el('span', { class: 'cue-when' }, ruler, word);
+    }
     const presets = Object.keys(patch.presets ?? {});
     const styleSel = el('select', { 'aria-label': 'Style', onchange: (e) => { cue.preset = e.target.value === '' || e.target.value === '*' ? null : e.target.value; if (e.target.value !== '*') cue.params = null; cuesChanged(true); playCue(cue, true); } },
       el('option', { value: '', selected: !cue.preset && !cue.params }, 'Standard'),
       presets.map((name) => el('option', { value: name, selected: cue.preset === name && !cue.params }, name)),
       cue.params ? el('option', { value: '*', selected: true }, 'Your own') : null);
     const head = el('div', { class: 'cue-head' },
-      el('button', { type: 'button', class: 'mini', 'aria-label': `Play ${patch.name}`, onclick: () => playCue(cue, true) }, 'Play'),
-      soundSel, when,
-      el('label', { class: 'inline' }, 'style ', styleSel),
-      el('button', { type: 'button', class: 'ghost', 'aria-expanded': String(!!cue.open), onclick: () => { cue.open = !cue.open; buildCues(); } }, cue.open ? 'Done' : 'Adjust'),
-      el('button', { type: 'button', class: 'ghost', disabled: list.length >= MAX_CUES, title: list.length >= MAX_CUES ? `An animation can have up to ${MAX_CUES} sounds` : null, onclick: () => {
-        // a copy with the same sound, style, changes and volume, on the next frame that has no sound yet
-        const copy = { sound: cue.sound, frame: cue.frame, preset: cue.preset, params: cue.params ? { ...cue.params } : null, volume: cue.volume, open: false };
-        if (cue.when) copy.when = cue.when;
-        if (!patch.loop) {
-          const taken = new Set(list.filter((c) => soundById[c.sound] && !soundById[c.sound].loop).map((c) => c.frame));
-          for (let i = 1; i < n; i++) { const f = (cue.frame + i) % n; if (!taken.has(f)) { copy.frame = f; break; } }
-        }
-        list.splice(list.indexOf(cue) + 1, 0, copy);
-        cuesChanged(true); playCue(copy, true);
-      } }, 'Duplicate'),
-      el('button', { type: 'button', class: 'ghost', onclick: () => { list.splice(list.indexOf(cue), 1); cuesChanged(true); } }, 'Remove'));
+      el('button', { type: 'button', class: 'icon-btn cue-play', 'aria-label': `Play ${patch.name}`, onclick: () => playCue(cue, true) }, icon(ICON.play, { fill: true })),
+      soundSel, when, styleSel,
+      el('span', { class: 'cue-acts' },
+        act(cue.open ? 'Done' : 'Adjust', () => { cue.open = !cue.open; buildCues(); }, { 'aria-expanded': String(!!cue.open) }),
+        act('Duplicate', () => {
+          // a copy with the same sound, style, changes and volume, on the next frame that has no sound yet
+          const copy = { sound: cue.sound, frame: cue.frame, preset: cue.preset, params: cue.params ? { ...cue.params } : null, volume: cue.volume, open: false };
+          if (cue.when) copy.when = cue.when;
+          if (!patch.loop) {
+            const taken = new Set(list.filter((c) => soundById[c.sound] && !soundById[c.sound].loop).map((c) => c.frame));
+            for (let i = 1; i < n; i++) { const f = (cue.frame + i) % n; if (!taken.has(f)) { copy.frame = f; break; } }
+          }
+          list.splice(list.indexOf(cue) + 1, 0, copy);
+          cuesChanged(true); playCue(copy, true);
+        }, { disabled: list.length >= MAX_CUES, title: list.length >= MAX_CUES ? `An animation can have up to ${MAX_CUES} sounds` : null }),
+        act('Remove', () => { list.splice(list.indexOf(cue), 1); cuesChanged(true); })));
     const on = applies(cue);
-    if (!on) head.append(el('span', { class: 'cue-note' }, 'Does not play with the current look.'));
-    if (!cue.open) return el('li', { class: on ? 'cue' : 'cue off' }, head);
+    const note = on ? null : el('p', { class: 'cue-note' }, 'Does not play with the current look.');
+    if (!cue.open) return el('li', { class: on ? 'cue' : 'cue off' }, head, note);
     const vals = soundParams(patch, cue.preset, cue.params);
+    const field = (label, input) => el('label', { class: 'cue-field' }, el('span', {}, label), input);
     const sliders = [
-      el('div', { class: 'field' }, el('label', {}, 'Volume'), el('input', { type: 'range', min: 0, max: 1, step: 0.05, value: cue.volume, 'aria-label': 'Volume', oninput: (e) => { cue.volume = Number(e.target.value); }, onchange: () => { cuesChanged(false); playCue(cue, true); } })),
-      ...patch.params.map((d) => el('div', { class: 'field' }, el('label', {}, d.label),
+      field('Volume', el('input', { type: 'range', min: 0, max: 1, step: 0.05, value: cue.volume, 'aria-label': 'Volume', oninput: (e) => { cue.volume = Number(e.target.value); fill(e.target); }, onchange: () => { cuesChanged(false); playCue(cue, true); } })),
+      ...patch.params.map((d) => field(d.label,
         el('input', { type: 'range', min: 0, max: 1, step: 0.005, value: toUnit(d, vals[d.id]), 'aria-label': d.label,
-          oninput: (e) => { cue.params = { ...soundParams(patch, cue.preset, cue.params), [d.id]: toValue(d, Number(e.target.value)) }; },
+          oninput: (e) => { cue.params = { ...soundParams(patch, cue.preset, cue.params), [d.id]: toValue(d, Number(e.target.value)) }; fill(e.target); },
           onchange: () => { cuesChanged(false); playCue(cue, true); if (styleSel.value !== '*') buildCues(); } }))),
     ];
-    return el('li', { class: on ? 'cue open' : 'cue open off' }, head, el('div', { class: 'cue-sliders' }, sliders));
+    for (const f of sliders) fill(f.querySelector('input'));
+    return el('li', { class: on ? 'cue open' : 'cue open off' }, head, note, el('div', { class: 'cue-sliders' }, sliders));
   }
+  // a slider's filled part follows its thumb (the track is drawn from --p, app/css/base.css)
+  function fill(input) { input.style.setProperty('--p', `${((Number(input.value) - Number(input.min)) / (Number(input.max) - Number(input.min) || 1)) * 100}%`); }
 
   function buildCues() {
     const list = st.cues[st.clip] ?? (st.cues[st.clip] = []);
     shownSig = cueSig();
     const soundSwitch = el('input', { id: 'sound-on', type: 'checkbox', onchange: (e) => { setSoundOn(e.target.checked); syncLoops(); } });
     soundSwitch.checked = soundState.on;
+    const full = list.length >= MAX_CUES;
     cueBox.replaceChildren(
       el('div', { class: 'cues-top' },
         el('h2', {}, `Sounds for ${sprite.clips[st.clip].label}`),
-        el('div', { class: 'field toggle' }, el('label', { for: 'sound-on' }, 'Sound'), el('span', { class: 'switch' }, soundSwitch, el('span', { class: 'knob', 'aria-hidden': 'true' })))),
+        el('span', { class: 'cues-about' }, 'They come along when you download.'),
+        el('span', { class: 'cues-switch' }, el('label', { for: 'sound-on' }, 'Sound'), el('span', { class: 'switch' }, soundSwitch, el('span', { class: 'knob', 'aria-hidden': 'true' })))),
       list.length ? el('ul', { class: 'cue-list' }, list.filter((c) => soundById[c.sound]).map((c) => cueRow(c, list)))
-        : el('p', { class: 'hint' }, 'This animation is silent. Add a sound and choose the frame it starts on.'),
-      el('button', { type: 'button', class: 'btn', disabled: list.length >= MAX_CUES, onclick: () => {
-        const used = new Set(list.map((c) => c.sound));
-        const pick = ['whoosh', 'punch', 'ui-click'].map((id) => soundById[id]).find((s) => s && !used.has(s.id)) ?? sounds.find((s) => !s.loop && !used.has(s.id)) ?? sounds[0];
-        const cue = { sound: pick.id, frame: st.playing ? 0 : st.frame, preset: null, params: null, volume: 1, open: false };
-        list.push(cue); cuesChanged(true); playCue(cue, true);
-      } }, 'Add a sound'),
-      list.length >= MAX_CUES ? el('span', { class: 'hint' }, ` An animation can have up to ${MAX_CUES} sounds. Remove one to add another.`) : '');
+        : el('p', { class: 'hint pane-note' }, 'This animation is silent. Add a sound and choose the frame it starts on.'),
+      el('p', { class: 'cues-add' },
+        el('button', { type: 'button', class: 'btn btn-sm btn-secondary', disabled: full, onclick: () => {
+          const used = new Set(list.map((c) => c.sound));
+          const pick = ['whoosh', 'punch', 'ui-click'].map((id) => soundById[id]).find((s) => s && !used.has(s.id)) ?? sounds.find((s) => !s.loop && !used.has(s.id)) ?? sounds[0];
+          const cue = { sound: pick.id, frame: st.playing ? 0 : st.frame, preset: null, params: null, volume: 1, open: false };
+          list.push(cue); cuesChanged(true); playCue(cue, true);
+        } }, 'Add a sound'),
+        full ? el('span', { class: 'hint' }, `An animation can have up to ${MAX_CUES} sounds. Remove one to add another.`) : null));
   }
 
   // ---- the settings changed (in the panel, or the bag item was changed elsewhere): draw what the session now holds
   const changed = () => {
-    frames.set(st.p); buildStrip(); ahead();
+    frames.set(st.p); repaint(); buildStrip(); ahead(); look.sync();
     // sounds that depend on the settings: refresh the list and anything looping when what applies has changed
     if (cueSig() !== shownSig) { buildCues(); syncLoops(); }
   };
@@ -308,8 +369,9 @@ export function spritePage(app, sprite, query) {
   function pull() {
     const s = edit.settings();
     st.scale = s.scale;
-    if (styleOf(s) !== st.style) { st.style = styleOf(s); if (choice) frames.setStyle(st.style); ahead(); buildStrip(); syncStyle(); }
+    if (styleOf(s) !== st.style) { st.style = styleOf(s); if (choice) frames.setStyle(st.style); repaint(); ahead(); buildStrip(); syncStyle(); look.sync(); }
     if (JSON.stringify(s.params) !== JSON.stringify(st.p)) { st.p = cleanParams(sprite, s.params); changed(); }
+    if (lookOf(s) !== st.look) { st.look = lookOf(s); repaint(); buildStrip(); look.sync(); }
     if (cueKey(s.cues) !== cueKey(st.cues)) { st.cues = s.cues ?? spriteCues(sprite); buildCues(); buildStrip(); syncLoops(); }
     // the address follows; a save that is already on its way is left to land when it was due (it reads the item's key then)
     if (!urlTimer) saveUrl();
@@ -327,6 +389,11 @@ export function spritePage(app, sprite, query) {
     return el('div', { class: 'style-choice' }, el('div', { class: 'ctl is-main', 'data-control-style': '' }, el('span', { class: 'ctl-label' }, 'Style'), row), about);
   };
 
+  // the looks (the panel's Look tab): a look of its own for this sprite, saved with it like any setting (app/asset-look.js)
+  let panel = null;
+  const setLook = (id) => edit.set({ look: id ?? null });
+  const look = lookTab({ sprite, now: () => ({ params: st.p, style: st.style, look: st.look }), pick: setLook, say: (text) => panel && panel.say(text), before: choice ? styleBlock() : null });
+
   // ---- link and download
   function link() {
     const def = defaultParams(sprite), q = new URLSearchParams();
@@ -334,6 +401,7 @@ export function spritePage(app, sprite, query) {
     if (st.clip !== sprite.preview) q.set('clip', st.clip);
     if (st.scale !== 1) q.set('scale', String(st.scale));
     if (st.style !== styles[0]) q.set('artstyle', st.style);     // like any other setting: only when it is not the usual one
+    if (st.look) q.set('artlook', st.look);
     const packed = packCues(sprite, st.cues);
     if (packed) q.set('sfx', packed);
     const qs = q.toString();
@@ -346,14 +414,15 @@ export function spritePage(app, sprite, query) {
     try {
       // only the sounds that play at these settings go in the package
       const playing = Object.fromEntries(Object.entries(st.cues).map(([clip, list]) => [clip, list.filter(applies)]));
-      const files = await spriteFiles(sprite, st.p, playing, st.scale, null, st.style);
+      const inLook = lookById(st.look);
+      const files = await spriteFiles(sprite, st.p, playing, st.scale, inLook ? inLook.theme : null, st.style);
       const nSounds = files.filter((f) => f.name.endsWith('.wav')).length;
       saveBlob(zip(files), `${sprite.id}-sprite-and-sounds.zip`);
       // what the pictures are depends on the style: a sheet for pixel art, perhaps one file per frame for another
       const sheet = files.some((f) => f.name === `${sprite.id}.png`);
       const nPictures = files.filter((f) => !f.name.endsWith('.wav') && !f.name.endsWith('.json') && !f.name.endsWith('.txt')).length;
       const pictures = sheet ? 'the sprite sheet' : `${nPictures} picture${nPictures === 1 ? '' : 's'} in the "${styleById(st.style).label}" style`;
-      return `Downloaded ${sprite.id}-sprite-and-sounds.zip: ${pictures}, ${nSounds} sound${nSounds === 1 ? '' : 's'}, the animation list, and a short guide.`;
+      return `Downloaded ${sprite.id}-sprite-and-sounds.zip${inLook ? `, in the ${inLook.name} look` : ''}: ${pictures}, ${nSounds} sound${nSounds === 1 ? '' : 's'}, the animation list, and a short guide.`;
     } catch (e) {
       return `The download did not start: ${e.message}. Try again, or use a different browser.`;
     }
@@ -368,58 +437,64 @@ export function spritePage(app, sprite, query) {
   buildStrip();
   buildCues();
 
-  // ---- the editing panel: versions, the controls in tabs (with this page's sounds and style choice as two more), the footer
-  const more = moreLikeThis(sprite.id);
-  const panel = editPanel({
+  // ---- the editing panel: versions, the controls in tabs (with this page's sounds and looks as two more), the footer
+  let shell = null;
+  panel = editPanel({
     kind: 'sprite', asset: sprite, edit,
     tabs: [
       { id: 'sounds', label: 'Sounds', node: cueBox, changed: () => cueKey(st.cues) !== cueKey(usual.cues) },
-      ...(choice ? [{ id: 'look', label: 'Look', node: styleBlock(), changed: () => st.style !== styles[0] }] : []),
+      { id: 'look', label: 'Look', node: look.node, changed: () => st.style !== styles[0] || !!lookOf(edit.settings()) },      // a look of its own is a change, saved like any other
     ],
     sizeNote: (scale) => `${sprite.size[0] * scale} × ${sprite.size[1] * scale}`,
     onDownload: download, onCopyLink: copyLink,
-    onMore: () => more.scrollIntoView({ block: 'start' }),
+    onMore: () => shell && shell.openMore(),
+    onTab: (id) => { if (id === 'look') look.show(); else look.hide(); },
   });
   const offEdit = edit.onChange(pull);
   const flush = () => edit.flush();
   window.addEventListener('pagehide', flush);      // closing the tab mid-drag still saves the last change
   if (edit.inBag()) saveUrl();
 
-  app.replaceChildren(
-    header('sprites'),
-    el('main', { class: 'editor with-panel' },
-      el('div', { class: 'left' },
-        el('div', { class: 'title-row' }, el('h1', {}, sprite.name), el('p', { class: 'blurb' }, sprite.blurb ?? '')),
-        made ? el('p', { class: 'hint made-here' }, made.text) : null,
-        el('div', { class: 'stage-card' }, stageWrap, el('div', { class: 'stage-tools' }, sceneBar, playBtn)),
-        el('div', { class: 'under' }, el('span', { class: 'label' }, 'Animation'), clipBar),
-        strip,
-        goesWith(sprite.id)),     // the sounds it uses and the bundles it is in, from the catalogue
-      panel.node,
-      more));
+  shell = assetShell({ kind: 'sprite', id: sprite.id, name: sprite.name, line: sprite.blurb ?? '', made, edit, stage: stageCard, under: [clipBar, strip], panel });
+  app.replaceChildren(header('sprites'), shell.main);
+  // (the animation the page opens on is in sight among its chips, also when a tileset has rows of them)
+  { const on = clipBar.querySelector('[aria-pressed="true"]'); const top = on ? on.offsetTop - clipBar.offsetTop : 0; if (on && top + on.offsetHeight > clipBar.clientHeight) clipBar.scrollTop = top - 4; }
 
   // ---- animation loop
   const ctx = stage.getContext('2d');
-  let W = 160, H = 104, zoom = 4, raf = 0, last = performance.now();
+  let W = 160, H = 104, gy = 80, raf = 0, last = performance.now();
+  // The picture fills its tile at a whole-number size: the canvas is as many sprite pixels as fit, the sprite in the
+  // middle of it. (A sprite larger than the tile is shown at a whole-number fraction instead.)
+  const place = (k) => {
+    const cw = stageWrap.clientWidth, ch = stageWrap.clientHeight;
+    const left = Math.floor((cw - W * k) / 2), top = Math.floor((ch - H * k) / 2);
+    stage.style.width = `${W * k}px`; stage.style.height = `${H * k}px`;
+    stage.style.left = `${left}px`; stage.style.top = `${top}px`;
+    return { left, top };
+  };
   const fit = () => {
-    const cw = stageWrap.clientWidth;
-    if (!cw) return;
+    const cw = stageWrap.clientWidth, ch = stageWrap.clientHeight;
+    if (!cw || !ch) return;
+    const [sw, sh] = sprite.size;
     if (backdrop === 'fill') {
-      // a background is the whole frame: the canvas is exactly the sprite, at the largest whole size that fits (or shrunk to fit)
+      // a background is the whole frame: the canvas is exactly the sprite, at the largest whole size that fits
       [W, H] = sprite.size;
-      zoom = Math.max(1, Math.min(5, Math.floor(cw / W)));
-      const k = W * zoom > cw ? cw / W : zoom;
+      const z = Math.min(cw / W, ch / H);
       stage.width = W; stage.height = H;
-      stage.style.width = Math.floor(W * k) + 'px'; stage.style.height = Math.floor(H * k) + 'px';
+      place(z >= 1 ? Math.min(6, Math.floor(z)) : 1 / Math.ceil(1 / z));
       return;
     }
-    zoom = Math.max(2, Math.min(5, Math.floor(cw / 104)));
-    W = Math.floor(cw / zoom);
-    H = Math.max(72, sprite.size[1] + 24);
+    const z = Math.min(cw / (sw + 24), ch / (sh + (backdrop === 'panel' ? 16 : 36)));
+    const k = z >= 1 ? Math.min(6, Math.floor(z)) : 1 / Math.ceil(1 / z);
+    W = Math.ceil(cw / k); H = Math.ceil(ch / k);
     stage.width = W; stage.height = H;
-    stage.style.width = W * zoom + 'px'; stage.style.height = H * zoom + 'px';
+    // the ground: under the middle of the tile, never so high that the sprite's top is cut, never off the bottom
+    const lift = hover(sprite);
+    gy = Math.min(H - 8, Math.max(sprite.pivot[1] + lift + 6, Math.round(H / 2 + (sprite.pivot[1] + lift) / 2 + 4)));
+    const at = place(k);
+    shelf.style.top = `${at.top + gy * k}px`;
   };
-  const ro = new ResizeObserver(fit);
+  const ro = new ResizeObserver(() => { fit(); if (strip.clientWidth !== stripRoom) buildStrip(); });
   ro.observe(stageWrap);
   fit();
 
@@ -435,7 +510,6 @@ export function spritePage(app, sprite, query) {
       if (pos !== st.lastFrame) { st.lastFrame = pos; if (pos < clip.frames) fire(pos, false); }
       st.scroll += travel(sprite, st.clip, st.p) * dt;
     }
-    const gy = H - 18;
     let px, py;
     if (backdrop === 'fill') {
       // behind a layer that is see-through in places: the light panel, so the gaps show as gaps, not as a scene
@@ -445,12 +519,12 @@ export function spritePage(app, sprite, query) {
       drawStage(ctx, W, H, H, st.stage, 0);         // nothing to stand on: the piece sits in the middle of the panel
       px = Math.round((W - sprite.size[0]) / 2); py = Math.round((H - sprite.size[1]) / 2);
     } else {
-      drawStage(ctx, W, H, gy, st.stage, st.scroll);
+      drawStage(ctx, W, H, gy, st.stage === 'scene' ? scene : st.stage, st.scroll);
       px = Math.round(W * 0.5 - sprite.size[0] / 2 + (sprite.size[0] / 2 - sprite.pivot[0]) * 0.5);
       py = gy - sprite.pivot[1] - hover(sprite);
       if (st.stage !== 'plain') shadow(ctx, px + sprite.pivot[0], gy, Math.round(sprite.size[0] * 0.17));
     }
-    ctx.drawImage(frames.get(st.clip, st.frame), px, py);
+    ctx.drawImage(pic(st.clip, st.frame), px, py);
     const cells = strip.children;
     for (let i = 0; i < cells.length; i++) cells[i].classList.toggle('on', i === st.frame);
     raf = requestAnimationFrame(tick);
@@ -459,7 +533,7 @@ export function spritePage(app, sprite, query) {
   syncLoops();
   return () => {
     cancelAnimationFrame(raf); ro.disconnect(); clearTimeout(urlTimer);
-    offEdit(); panel.close(); edit.close(); clearTimeout(saveTimer);      // leaving saves whatever was still waiting
+    offEdit(); panel.close(); look.close(); shell.close(); edit.close(); clearTimeout(saveTimer);      // leaving saves whatever was still waiting
     window.removeEventListener('pagehide', flush);
     if (offFrames) offFrames();
     clearTimeout(aheadTimer);

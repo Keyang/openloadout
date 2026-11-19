@@ -23,11 +23,12 @@ const PLAIN = {
 const PLAIN_OF = namedMaterials(PLAIN);       // looks: what each of these is of, by its name
 
 /**
- * sprites: { key: { sprite, params, artStyle? } } for every sprite entry that is drawn (artStyle: the bag item's art style, Contract 12).
+ * sprites: { key: { sprite, params, artStyle?, colour? } } (colour: that sprite's own colour settings, when it wears a look of its own)
  * colour: the bag look's colour settings (theme.colour).
  * tiles: what level.js tileIndex made of the bag's tilesets, or null with none.
  */
 export function createPainter({ sprites, colour, tiles: tileSets = null }) {
+  const bagColour = colour;
   const cache = new Map();
   const tinted = new Map();
   /** A plain colour with the bag's look applied. */
@@ -49,6 +50,7 @@ export function createPainter({ sprites, colour, tiles: tileSets = null }) {
     let cv = cache.get(id);
     if (!cv) {
       const { sprite, params, artStyle } = sprites[key];
+      const colour = sprites[key].colour ?? bagColour;      // a sprite that wears a look of its own has its own colour settings
       const style = artStyleOf(sprite, artStyle);
       let g;
       const of = () => spriteMaterials(sprite, params, { style });       // looks: what each colour of this sprite is of, found when a look first needs it
@@ -274,7 +276,46 @@ export function createPainter({ sprites, colour, tiles: tileSets = null }) {
     if (frontCanvas) g.drawImage(frontCanvas, -cx, -cy);
   }
 
-  return { frame, allFrames, draw, look };
+  /**
+   * One sprite's settings changed (sprites[key] now holds the new ones): what was drawn of it is dropped, and the
+   * ground too when it is laid from that sprite, so the next picture shows the change. Nothing else is touched.
+   */
+  function forget(key) {
+    for (const id of [...cache.keys()]) if (id.startsWith(key + '|')) cache.delete(id);
+    for (const id of [...clear.keys()]) if (id.startsWith(key + '|')) clear.delete(id);
+    if (laid && laid.tiles.some((t) => t.key === key)) { laid = null; groundFor = null; }
+  }
+
+  /** The bag item whose tile is laid at a point of the scene (the ground, a wall, a platform), or null. Known once the ground was drawn. */
+  function tileAt(x, y) {
+    if (!laid) return null;
+    for (let i = laid.tiles.length - 1; i >= 0; i--) {
+      const t = laid.tiles[i], [w, h] = sprites[t.key].sprite.size;
+      if (x >= t.x && x < t.x + w && y >= t.y && y < t.y + h) return t.key;
+    }
+    return null;
+  }
+
+  /** Mark the things of one kind as the chosen ones: a small corner at each corner of each, over the picture just drawn. */
+  function mark(g, { world, view, cam, key }) {
+    const k = world.kinds[key];
+    if (!k) return;
+    g.setTransform(view.zoom, 0, 0, view.zoom, 0, 0);
+    const cx = Math.round(cam.x), cy = Math.round(cam.y), n = 4;
+    for (const t of world.player ? [...world.things, world.player] : world.things) {
+      if (t.kind !== key || t.state === 'gone' || t.passing) continue;
+      const x0 = Math.round(t.x - k.pivot[0] - cx) - 2, y0 = Math.round(t.y - k.pivot[1] - t.lift - cy) - 2, x1 = x0 + k.size[0] + 3, y1 = y0 + k.size[1] + 3;
+      for (const [colour, d] of [['#ffffff', 1], ['#000000', 0]]) {
+        g.fillStyle = colour;
+        for (const [x, y, sx, sy] of [[x0, y0, 1, 1], [x1, y0, -1, 1], [x0, y1, 1, -1], [x1, y1, -1, -1]]) {
+          g.fillRect(sx > 0 ? x + d : x - d - n + 1, y + d * sy, n, 1);
+          g.fillRect(x + d * sx, sy > 0 ? y + d : y - d - n + 1, 1, n);
+        }
+      }
+    }
+  }
+
+  return { frame, allFrames, draw, look, forget, tileAt, mark };
 }
 
 /**

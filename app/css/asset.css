@@ -1,4 +1,210 @@
 /* Loadout: the asset pages, #/sprite/<id>, #/sound/<id>, #/music/<id> (app/sprite-page.js, app/sound-page.js, app/music-page.js: the two columns around the editing panel). Match: mocks/5-catalogue/remix.html.
    Owned by the builder of that page. Only that page's own layout goes here; tokens and the shared components (button,
    chip, tab, segmented control, tile, card, token, change dot, menu, the editing panel) are in base.css and are used
-   as they are. Move what the page still needs out of app/style.css (the old rules) into this file. */
+   as they are.
+   Also here, because the editing panel's owner is this page's builder: how the panel's version tiles sit in a short
+   window and how versions with no picture are shown (the last section). Those rules apply wherever the panel is shown. */
+
+/* ---------- the frame: the header, then two columns that fill the rest of the window. Nothing scrolls ---------- */
+#app:has(> main.rx) { height: 100vh; height: 100dvh; display: grid; grid-template-rows: auto minmax(0, 1fr); overflow: hidden; }
+.rx { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); min-height: 0; min-width: 0; }
+.rx > .rx-panel { border-left: 1px solid var(--line); }
+
+/* ---------- left: the name, the line, what it goes with; the picture; what is under it ---------- */
+.rx-stage { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); grid-auto-rows: auto; gap: var(--s3); padding: var(--s5) var(--gutter); min-height: 0; min-width: 0; }
+.rx-head { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2px; min-width: 0; }
+.rx-head h1 { font-size: 28px; line-height: 1.1; letter-spacing: -0.035em; font-weight: 600; }
+.rx-head .blurb { font-size: 14px; color: var(--ink-2); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.rx-head .made-here { font-size: 13px; padding: var(--s1) var(--s2); background: var(--shelf); border-radius: var(--r); justify-self: start; }
+.related { display: grid; grid-template-columns: minmax(0, 1fr); margin-top: 2px; }
+.rel { font-size: 13px; line-height: 1.5; color: var(--ink-2); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.rel-label::after { content: ':'; }
+.rel a { color: var(--ink); text-decoration: underline; text-decoration-color: var(--line-2); text-underline-offset: 3px; }
+.rel a:hover { text-decoration-color: var(--ink); }
+
+/* the picture: a shelf tile that takes the height that is left; the canvas is placed and sized by the page */
+.stage-card { position: relative; min-height: 0; min-width: 0; overflow: hidden; }
+.stage-wrap { position: absolute; inset: 0; overflow: hidden; border-radius: var(--r); }
+canvas.stage { position: absolute; display: block; }
+.stage-shelf { position: absolute; left: 22%; right: 22%; height: 1px; background: var(--line-2); display: none; }
+.stage-card[data-backdrop='ground'][data-stage='plain'] .stage-shelf { display: block; }
+.stage-tools { position: absolute; left: var(--s3); right: var(--s3); top: var(--s3); z-index: 2; display: flex; justify-content: space-between; align-items: center; gap: var(--s3); pointer-events: none; }
+.stage-tools > * { pointer-events: auto; }
+.stage-tools .scene-none { visibility: hidden; }
+
+/* the animations as chips, and the frames of the one that is playing */
+/* (a tileset has a chip for every tile: more than three rows of chips scroll inside their own box, so the picture keeps its room) */
+.clips { gap: 6px; max-height: 112px; overflow-y: auto; scrollbar-width: thin; padding: 2px; margin: -2px; align-content: flex-start; }
+.clips .chip { padding: 0 10px; }
+.strip { display: flex; flex-wrap: wrap; gap: var(--s1); min-width: 0; padding: 2px; margin: -2px; }
+.strip .cell { position: relative; flex: none; width: var(--cell, 40px); height: var(--cell, 40px); display: grid; place-items: center; overflow: hidden; background: var(--shelf); border-radius: var(--r); }
+.strip .cell:hover { background: var(--shelf-2); }
+.strip .cell.on { box-shadow: inset 0 0 0 1.5px var(--ink); }
+.strip .cell canvas { flex: none; }
+/* a frame a sound starts on: a small mark under the picture */
+.strip .cell.has-sound::after { content: ''; position: absolute; left: 50%; bottom: 3px; width: 8px; height: 2px; margin-left: -4px; border-radius: 1px; background: var(--ink); }
+
+/* a sound or a track on the left: its icon, a big play button, how long it is */
+.sound-card { display: grid; place-items: center; }
+.sound-card .sound-icon { position: absolute; left: var(--s4); top: var(--s4); color: var(--ink-2); display: inline-flex; align-items: center; gap: var(--s2); font-size: 13px; }
+.sound-card .stage-tools { position: static; display: block; pointer-events: auto; }
+.sound-card .tools-left { display: grid; justify-items: center; gap: var(--s4); text-align: center; }
+.play-big { width: 88px; height: 88px; border-radius: 50%; background: var(--ink); color: #fff; display: grid; place-items: center; }
+.play-big:hover { background: #2b2b2b; }
+.play-big:focus-visible { outline-offset: 4px; border-radius: 50%; }
+.play-big svg { width: 30px; height: 30px; }
+.sound-card .hint { font-size: 14px; color: var(--ink-2); }
+.sound-card .tile-progress { transition: none; }
+.sound-under { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2) var(--s4); font-size: 13px; color: var(--ink-2); min-height: 32px; }
+.sound-under p { margin: 0; }
+
+/* "More like this": a sheet over the left column, opened from the panel's menu */
+.rx-more { position: absolute; inset: 0; z-index: 12; background: var(--paper); padding: var(--s5) var(--gutter); overflow: auto; display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; gap: var(--s4); }
+.rx-more > .icon-btn { position: absolute; right: var(--gutter); top: var(--s5); }
+.rx-more .more-like h2 { font-size: 20px; line-height: 32px; letter-spacing: -0.02em; font-weight: 600; margin-bottom: var(--s4); }
+.rx-more .similar-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s5) var(--s4); }
+.rx-more-foot { font-size: 14px; }
+
+/* ---------- the Sounds tab: for the animation that is playing, which sound, on which frame, play it, change it ---------- */
+.cues { max-width: 720px; }
+.cues-top { display: flex; align-items: center; gap: var(--s3); margin-bottom: var(--s2); }
+.cues-top h2 { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; white-space: nowrap; }
+.cues-about { font-size: 13px; color: var(--ink-2); margin-right: auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.cues-switch { display: inline-flex; align-items: center; gap: var(--s2); font-size: 13px; margin-left: auto; }
+.cue + .cue { border-top: 1px solid var(--line); }
+.cue { padding: 6px 0; }
+.cue-head { display: grid; grid-template-columns: 32px minmax(0, 1.2fr) minmax(0, 1fr) auto; grid-template-areas: 'play sound style acts' '. when when when'; align-items: center; gap: 6px var(--s3); }
+.cue-play { grid-area: play; }
+.cue-head select[aria-label='Sound'] { grid-area: sound; }
+.cue-head select[aria-label='Style'] { grid-area: style; }
+.cue-when { grid-area: when; display: flex; align-items: center; gap: var(--s3); min-width: 0; }
+.cue-acts { grid-area: acts; display: flex; gap: var(--s3); }
+.cues select { height: 32px; min-width: 0; width: 100%; padding: 0 var(--s2); border: 1px solid var(--line-2); border-radius: var(--r); background: var(--paper); font-size: 13px; }
+.cues select:hover { border-color: var(--ink); }
+.cue-act { font-size: 13px; color: var(--ink-2); padding: 4px 0; }
+.cue-act:hover:not(:disabled) { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+.cue-act:disabled { opacity: 0.5; cursor: default; }
+.ruler { display: flex; flex-wrap: wrap; gap: 3px; }
+.ruler button { width: 16px; height: 16px; border-radius: 3px; background: var(--shelf); box-shadow: inset 0 0 0 1px var(--line-2); }
+.ruler button:hover { box-shadow: inset 0 0 0 1px var(--ink); }
+.ruler button[aria-pressed='true'] { background: var(--ink); box-shadow: none; }
+.ruler-word { font-size: 12px; color: var(--ink-2); white-space: nowrap; }
+.cue.off .cue-head { opacity: 0.55; }
+.cue-note { font-size: 12px; color: var(--ink-2); padding-left: 44px; }
+.cue-sliders { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--s1) var(--s5); padding: var(--s2) 0 var(--s1) 44px; }
+.cue-field { display: grid; font-size: 12px; color: var(--ink-2); }
+.cues-add { display: flex; align-items: center; gap: var(--s3); margin-top: var(--s2); }
+.cues-add .hint { font-size: 13px; color: var(--ink-2); }
+
+/* ---------- the Look tab: a sprite's art style (when it has a choice), then the whole-set looks on this one sprite ---------- */
+.look-tab { max-width: 760px; }
+.style-choice { margin-bottom: var(--s3); padding-bottom: var(--s2); border-bottom: 1px solid var(--line); }
+.style-choice .pane-note { margin: 0; }
+.looks { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: var(--s2); }
+.looks { --vmax: 104px; align-items: start; }
+.looks .vpic { height: var(--vh, 88px); }
+.looks .vbtn .name { white-space: normal; line-height: 1.25; }
+.look-acts { margin-top: var(--s3); }
+
+/* ======================================================= THE EDITING PANEL, where its owner adds to base.css */
+/* versions with no picture (a sound, a track): a row of names, like chips */
+.vstrip.is-plain { display: flex; flex-wrap: wrap; gap: 6px; }
+.vstrip.is-plain .vpic { display: none; }
+.vstrip.is-plain .vbtn { height: 32px; padding: 0 var(--s3); display: inline-flex; align-items: center; border: 1px solid var(--line-2); border-radius: var(--r); font-size: 13px; max-width: 100%; }
+.vstrip.is-plain .vbtn .name { padding: 0; }
+.vstrip.is-plain .vbtn:hover { border-color: var(--ink); }
+.vstrip.is-plain .vbtn[aria-pressed='true'] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+/* version pictures are cut to what is drawn (app/panel.js trimPictures), so a taller tile shows them at twice the size */
+.vstrip:not(.is-plain) { --vmax: 112px; }
+.vstrip:not(.is-plain) .vpic { height: var(--vh, 96px); }
+/* the arrows that move a row of versions wider than the panel */
+.vnav { display: inline-flex; gap: var(--s1); }
+.vnav .icon-btn:disabled { opacity: 0.35; cursor: default; border-color: var(--line-2); }
+/* a tab longer than its room scrolls inside itself, and says so: a line and a fade at the edge there is more beyond */
+.pane { background: linear-gradient(var(--paper) 40%, transparent) top / 100% 28px no-repeat local, linear-gradient(transparent, var(--paper) 60%) bottom / 100% 28px no-repeat local, linear-gradient(var(--line-2), transparent) top / 100% 10px no-repeat scroll, linear-gradient(transparent, var(--line-2)) bottom / 100% 10px no-repeat scroll; }
+/* the browser is not keeping the bag: one short line (the whole of it is under the header) */
+.rx-foot .saved.is-warn { flex: 1 1 0; padding: 0; background: none; align-items: center; }
+.rx-foot:has(.saved.is-warn) { flex-wrap: nowrap; }
+.block-head .hint { display: inline; }
+.rx-panel .block-head h2 { margin-right: 0; }
+/* (no room for the version's name beside the arrows in a narrow panel: it goes, not half of it; the tile itself is marked) */
+@container (max-width: 560px) { .block-head:has(.vnav:not([hidden])) .hint { display: none; } .block-head:has(.vnav:not([hidden])) h2 { margin-right: auto; } }
+/* the footer fits its panel, whatever the panel's width: first the labels go, then the longer words */
+.rx-foot { container-type: inline-size; }
+.rx-panel { container-type: inline-size; }
+@container (max-width: 860px) { .size .lbl { display: none; } }
+@container (max-width: 760px) { .size .num { display: none; } }
+@container (max-width: 690px) { .saved.is-idle { display: none; } .rx-foot .add-btn { margin-right: auto; } .block-head .hint-help { display: none; } }
+@container (max-width: 520px) { .saved .saved-rest, .saved small { display: none; } }
+/* a short window: the version pictures stay large enough to read (the same size as in a tall window) and the one
+   row scrolls sideways, in place of twelve small tiles squeezed into the panel's width. The names are in the tiles'
+   tooltips, and the one on screen is named beside the heading */
+@media (min-width: 721px) and (max-height: 800px) {
+  /* (five and a half tiles across, so the row is plainly cut at the panel's edge; its arrows are beside the heading) */
+  .vstrip:not(.is-plain) { --vmax: 88px; grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: max(68px, calc((100% - 30px) / 5.5)); gap: 6px; overflow-x: auto; scrollbar-width: none; }
+  .vstrip:not(.is-plain) .name { display: none; }
+  .looks { gap: 6px; }
+  .looks { --vmax: 72px; }
+  .looks .vbtn .name { white-space: nowrap; }
+  /* every tab fits its panel: rows a little closer */
+  .rx-block, .rx-panel .tune { padding-top: var(--s3); }
+  .block-head { margin-bottom: var(--s2); }
+  .pane { padding-top: var(--s2); padding-bottom: var(--s1); }
+  .ctl { min-height: 32px; }
+  .ctl-body { padding: 2px 0; }
+  .part .ctl { min-height: 26px; }
+  .part .ctl.is-main { min-height: 32px; }
+  .part .chip { height: 26px; padding: 0 var(--s2); }
+  .part + .part { margin-top: 2px; padding-top: 2px; }
+  .ctl .chips { gap: 4px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .pane-note { margin-bottom: var(--s2); }
+}
+
+@media (min-width: 721px) and (max-width: 1180px) {
+  .rx { grid-template-columns: minmax(0, 4fr) minmax(0, 6fr); }
+  .rx-stage { padding-left: var(--s5); padding-right: var(--s5); }
+  .rx-more { padding-left: var(--s5); padding-right: var(--s5); }
+  .rx-more > .icon-btn { right: var(--s5); }
+  .cues-about { display: none; }
+}
+/* a short window: less air, and the line under the name is one line */
+@media (min-width: 721px) and (max-height: 800px) {
+  .rx-stage { padding-top: var(--s4); padding-bottom: var(--s4); gap: var(--s2); }
+  .rx-head h1 { font-size: 24px; }
+  .rx-head .blurb { -webkit-line-clamp: 1; }
+  .rel { -webkit-line-clamp: 1; }
+  .clips { max-height: 74px; }
+  .play-big { width: 72px; height: 72px; }
+}
+
+/* ---------- a phone: the picture stays pinned at the top and the panel scrolls under it ---------- */
+@media (max-width: 720px) {
+  #app:has(> main.rx) { height: auto; display: block; overflow: visible; }
+  .rx { display: block; }
+  .rx > .rx-panel { border-left: 0; --pad: var(--gutter); }
+  .rx-stage { position: sticky; top: 0; z-index: 10; background: var(--paper); border-bottom: 1px solid var(--line); grid-template-rows: auto 200px; gap: var(--s2); padding: var(--s3) var(--gutter) var(--s2); }
+  .rx-head h1 { font-size: 20px; }
+  .rx-head .blurb, .rx-head .related { display: none; }
+  .clips { flex-wrap: nowrap; max-height: none; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; margin: 0 calc(-1 * var(--gutter)); padding: 2px var(--gutter); }
+  .rx-panel .block-head { flex-wrap: wrap; }
+  .rx-panel .block-head h2 { margin-right: auto; }
+  .rx-panel .block-head .hint { display: none; }
+  .clips .chip { height: 30px; flex: none; }
+  .strip { display: none; }
+  .rx-sound .rx-stage, .rx-music .rx-stage { grid-template-rows: auto 168px; }
+  .play-big { width: 64px; height: 64px; }
+  .sound-card .tools-left { gap: var(--s2); }
+  .sound-under p { display: none; }
+  .rx-music .sound-under { display: none; }
+  /* the footer, at the end of the panel: the saved state, then the pixel size and the bag, then the download */
+  .rx-foot .size { order: 1; }
+  .rx-foot .add-btn { order: 2; margin-left: auto; margin-right: 0; }
+  .rx-foot [data-act='download'] { order: 3; flex: 1 1 60%; }
+  .rx-foot .menu-wrap { order: 4; }
+  .rx-more { position: fixed; z-index: 40; padding: var(--s4) var(--gutter); }
+  .rx-more > .icon-btn { right: var(--gutter); top: var(--s4); }
+  .cue-head { grid-template-columns: 32px minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: 'play sound style' '. when when' '. acts acts'; }
+  .cue-sliders, .cue-note { padding-left: 0; }
+  .looks { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .cues-about { display: none; }
+}

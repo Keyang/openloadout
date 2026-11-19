@@ -4,7 +4,9 @@
 import { el, header } from './ui.js';
 import { loadCatalog, assetById, loadSprite } from './catalog.js';
 import { loadSounds, soundById, stopAll, isMusic } from './audio.js';
-import { homePage, browsePage, bundlesPage } from './home.js';
+import { homePage } from './home.js';
+import { bundlesPage } from './kit-list.js';         // the kits list (Catalogue redesign)
+import { browsePage } from './library-page.js';      // the library (Catalogue redesign)
 import { kitAddress } from './kit-page.js';
 import { leaving, arrived } from './back.js';
 import { standInCatalog, configureSearch } from './browse.js';

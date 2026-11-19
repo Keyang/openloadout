@@ -12,7 +12,7 @@ const line = (key, label, rows, href) => (rows.length
 /**
  * The "goes with" lines for one asset, each a list of links:
  *   a sprite   "Sounds it uses"      a sound or track   "Used by" (the sprites that play it)
- *   all        "In these bundles"
+ *   all        "In these kits"
  * Returns one element, or null when there is nothing to say.
  */
 export function goesWith(id) {
@@ -22,7 +22,7 @@ export function goesWith(id) {
     row.kind === 'sprite'
       ? line('sounds', 'Sounds it uses', soundsOf(id), (r) => `#/${r.kind}/${r.id}`)
       : line('sprites', 'Used by', spritesUsing(id), (r) => `#/sprite/${r.id}`),
-    line('bundles', 'In these bundles', bundlesOf(id), (b) => `#/bundle/${b.id}`),
+    line('bundles', 'In these kits', bundlesOf(id), (b) => `#/bundle/${b.id}`),
   ].filter(Boolean);
   return lines.length ? el('section', { class: 'related', 'aria-label': 'Goes with' }, lines) : null;
 }

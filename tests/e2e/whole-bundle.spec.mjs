@@ -227,7 +227,7 @@ for (const listed of LISTED) {
     for (const s of original.sprites) expect(s.opaque, `${s.id} is drawn`).toBeGreaterThan(0);
 
     // ---------------------------------------------------------------- the first original download
-    const first = packageOf(await downloadFrom(page, () => page.getByRole('button', { name: 'Download this bundle' }).click(), longDownload));
+    const first = packageOf(await downloadFrom(page, () => page.getByRole('button', { name: 'Download this kit' }).click(), longDownload));
     await expect(page.locator('.bundle-actions .status')).toContainText('Downloaded');
     const assetFiles = first.names.filter(isAsset);
     for (const id of bundle.sprites) expect(first.names, `${id}: its sheet`).toContain(`sprites/${id}/${id}.png`);
@@ -271,7 +271,7 @@ for (const listed of LISTED) {
     await lookButton(page, LOOK).click();
     await settled(page);
     await expect(bagCount(page)).toHaveText('0');
-    await page.getByRole('button', { name: 'Add the whole bundle to my bag' }).click();
+    await page.getByRole('button', { name: 'Add the whole kit to my bag' }).click();
     await expect(bagCount(page)).toHaveText(String(ids.length));
     await expect(page.locator('.bundle-actions .status')).toContainText('the whole bag has this look');
     await page.locator('.bundle-actions').getByRole('link', { name: 'Go to bag' }).click();
@@ -354,7 +354,7 @@ for (const listed of LISTED) {
     expect(bundle, `the bundle "${listed.id}" is still in generated/catalog.json`).toBeTruthy();
     expect(typeof LOOK?.theme.colour.palette, 'a named look with a colour set, to take the colour set from').toBe('string');
     const patches = readPatches();
-    const download = async () => packageOf(await downloadFrom(page, () => page.getByRole('button', { name: 'Download this bundle' }).click(), { timeout: 120_000 + big * 6000 }));
+    const download = async () => packageOf(await downloadFrom(page, () => page.getByRole('button', { name: 'Download this kit' }).click(), { timeout: 120_000 + big * 6000 }));
 
     await openRoute(page, `/bundle/${bundle.id}`);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(bundle.name);

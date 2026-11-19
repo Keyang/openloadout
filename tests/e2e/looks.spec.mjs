@@ -38,6 +38,8 @@ async function settled(page) {
   }, null, { timeout: 60_000 });
 }
 async function openBundle(page, id, query = '') {
+  // the kit's scene and its look come first on the page, so the window is made tall: every picture is then on screen and drawn
+  await page.setViewportSize({ width: page.viewportSize().width, height: Math.max(page.viewportSize().height, 5600) });
   await openRoute(page, `/bundle/${id}${query}`);
   await settled(page);
 }
@@ -53,7 +55,7 @@ test('"Also change shapes" says in one sentence, next to the switch, what it doe
     await openRoute(page, route);
     if (route === '/bag') {          // the bag shows its look controls once it holds something
       await openBundle(page, SMALL.id);
-      await page.getByRole('button', { name: 'Add the whole bundle to my bag' }).click();
+      await page.getByRole('button', { name: 'Add the whole kit to my bag' }).click();
       await openRoute(page, '/bag');
     }
     const toggle = page.getByRole('switch', { name: 'Also change shapes' });
@@ -124,7 +126,7 @@ test('a download under a look that changes shapes lists the settings each sprite
   const theme = themeFromQuery(query);
   await openBundle(page, SMALL.id, '?surprise=7&shapes=1');
   await expect(page.getByRole('switch', { name: 'Also change shapes' })).toBeChecked();
-  const zip = packageOf(await downloadFrom(page, () => page.getByRole('button', { name: 'Download this bundle' }).click(), { timeout: 180_000 }));
+  const zip = packageOf(await downloadFrom(page, () => page.getByRole('button', { name: 'Download this kit' }).click(), { timeout: 180_000 }));
   const record = zip.json('manifest.json');
   expect(record.theme.shapes).toBe(true);
   expect(typeof record.settingsUsed, 'the list says how to read the settings').toBe('string');
@@ -171,7 +173,7 @@ test('a download under a look that changes shapes lists the settings each sprite
   // with no look, the list is as it always was: only what the visitor set
   await page.locator('.bundle-look').getByRole('button', { name: 'Start over' }).click();
   await settled(page);
-  const plain = packageOf(await downloadFrom(page, () => page.getByRole('button', { name: 'Download this bundle' }).click(), { timeout: 180_000 })).json('manifest.json');
+  const plain = packageOf(await downloadFrom(page, () => page.getByRole('button', { name: 'Download this kit' }).click(), { timeout: 180_000 })).json('manifest.json');
   expect(plain.settingsUsed).toBeUndefined();
   for (const a of plain.assets.filter((x) => x.kind === 'sprite')) { expect(a.changedByLook).toBeUndefined(); expect(a.settings.params).toEqual({}); }
 });
@@ -181,13 +183,13 @@ test('adding a bundle to a bag that has a look of its own asks first, and can ke
   const n = new Set([...SMALL.sprites.map((id) => 's' + id), ...SMALL.sounds.map((id) => 'a' + id), ...SMALL.music.map((id) => 'm' + id)]).size;
   await openBundle(page, SMALL.id);
   await page.getByRole('button', { name: first.name, exact: true }).click();
-  await page.getByRole('button', { name: 'Add the whole bundle to my bag' }).click();
+  await page.getByRole('button', { name: 'Add the whole kit to my bag' }).click();
   await expect(bagCount(page)).toHaveText(String(n));
   expect(lookOf(await bagTheme(page)), 'an empty bag takes the look shown').toEqual(lookOf(first.theme));
 
   // another look on the page: the bag's own look is not lost without asking
   await page.getByRole('button', { name: second.name, exact: true }).click();
-  await page.getByRole('button', { name: 'Add the whole bundle to my bag' }).click();
+  await page.getByRole('button', { name: 'Add the whole kit to my bag' }).click();
   const ask = page.locator('.bundle-ask');
   await expect(ask).toContainText('a look of its own');
   expect(lookOf(await bagTheme(page)), 'nothing changes while the question is open').toEqual(lookOf(first.theme));
@@ -195,23 +197,24 @@ test('adding a bundle to a bag that has a look of its own asks first, and can ke
   await expect(bagCount(page)).toHaveText(String(n));
   expect(lookOf(await bagTheme(page)), 'Cancel leaves the bag as it was').toEqual(lookOf(first.theme));
 
-  await page.getByRole('button', { name: 'Add the whole bundle to my bag' }).click();
+  await page.getByRole('button', { name: 'Add the whole kit to my bag' }).click();
   await ask.getByRole('button', { name: /keep my bag's look/ }).click();
-  await expect(bagCount(page)).toHaveText(String(2 * n));
+  await expect(bagCount(page)).toHaveText(String(n));      // the kit is in the bag already: nothing is added twice
   expect(lookOf(await bagTheme(page)), 'the bag kept its look').toEqual(lookOf(first.theme));
   await expect(page.locator('.bundle-actions .status')).toContainText('the look your bag already has');
 
   // and the other choice gives everything the look shown
-  await page.getByRole('button', { name: 'Add the whole bundle to my bag' }).click();
+  await page.getByRole('button', { name: 'Add the whole kit to my bag' }).click();
   await ask.getByRole('button', { name: /give everything this look/ }).click();
-  await expect(bagCount(page)).toHaveText(String(3 * n));
+  await expect(bagCount(page)).toHaveText(String(n));
   expect(lookOf(await bagTheme(page))).toEqual(lookOf(second.theme));
   await expect(page.locator('.bundle-actions .status')).toContainText('the whole bag has this look');
 
-  // the page and the bag now agree: there is no look to lose, so the plain question is asked
-  await page.getByRole('button', { name: 'Add the whole bundle to my bag' }).click();
-  await expect(ask).not.toContainText('a look of its own');
-  await expect(ask.getByRole('button', { name: 'Add to what is in my bag' })).toBeVisible();
+  // the page and the bag now agree, and the kit is in the bag: there is nothing to ask
+  await page.getByRole('button', { name: 'Add the whole kit to my bag' }).click();
+  await expect(ask).toBeHidden();
+  await expect(page.locator('.bundle-actions .status')).toContainText('already in your bag');
+  await expect(bagCount(page)).toHaveText(String(n));
 });
 
 test('the bag says which sprites the look changed the shape of, and stops saying so when shapes are left alone', async ({ page }) => {
@@ -220,7 +223,7 @@ test('the bag says which sprites the look changed the shape of, and stops saying
   const changed = SMALL.sprites.filter((id) => spriteLook(SPRITES[id], {}, theme).changed.length);
   test.skip(!changed.length, 'this look changes no sprite of the bundle');
   await openBundle(page, SMALL.id, '?surprise=7&shapes=1');
-  await page.getByRole('button', { name: 'Add the whole bundle to my bag' }).click();
+  await page.getByRole('button', { name: 'Add the whole kit to my bag' }).click();
   await page.locator('.bundle-actions').getByRole('link', { name: 'Go to bag' }).click();
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Your bag');
   await expect(page.locator('.bag-item .bag-pic.pending')).toHaveCount(0, { timeout: 60_000 });
@@ -241,7 +244,7 @@ test('the bag keeps what its look made of each sprite, and draws and downloads t
     .map((x) => ({ ...x, key: Object.keys(x.rec).find((k) => SPRITES[x.id].params[k].kind === 'range') })).find((x) => x.key);
   test.skip(!pick, 'the look moves no slider of the bundle');
   await openBundle(page, SMALL.id, '?surprise=7&shapes=1');
-  await page.getByRole('button', { name: 'Add the whole bundle to my bag' }).click();
+  await page.getByRole('button', { name: 'Add the whole kit to my bag' }).click();
   // recorded when it went in: what the look made of every sprite
   const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('loadout-bag-v1')));
   for (const id of SMALL.sprites) {

@@ -12,9 +12,10 @@ const KEYS = {
 
 /**
  * pad: the element holding the on-screen buttons; each button says what it does in data-hold
- * (left | right | up | down | jump | action | block). Returns { state(mode), destroy() }.
+ * (left | right | up | down | jump | action | block). ignore: a selector; keys pressed inside a match are left alone
+ * (the editing panel beside the scene). Returns { state(mode), destroy() }.
  */
-export function createInput({ pad = null } = {}) {
+export function createInput({ pad = null, ignore = null } = {}) {
   const keys = new Set(), touch = new Set();
   const tapped = new Set();      // pressed since the scene last looked, so a tap shorter than one frame still counts
   const field = (el) => !!(el && el.closest && el.closest('input, select, textarea, [contenteditable=""], [contenteditable="true"]'));
@@ -23,6 +24,7 @@ export function createInput({ pad = null } = {}) {
   const down = (e) => {
     const name = KEYS[e.code];
     if (!name || e.metaKey || e.ctrlKey || e.altKey || field(e.target)) return;
+    if (ignore && e.target && e.target.closest && e.target.closest(ignore)) return;      // the keyboard is in the editing panel: its keys are the panel's
     if (e.code === 'Space' && control(e.target)) return;
     keys.add(name); tapped.add(name);
     if (name !== 'run') e.preventDefault();          // the arrow keys and Space would scroll the page

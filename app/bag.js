@@ -11,7 +11,7 @@
 // of it (`settings.lookParams`, from shapeRecord), so the bag draws and downloads the same pictures on every visit,
 // also after the rule behind "Also change shapes" changes. It is made when the item comes in or the shapes part of the
 // look changes (another number behind "Surprise me", shapes on or off), and kept when only colours change.
-import { defaultTheme, normalizeTheme, shapeRecord } from '../engine/theme.js';
+import { defaultTheme, normalizeTheme, shapeRecord, THEME_PRESETS } from '../engine/theme.js';
 import { spriteNow } from './catalog.js';
 
 export const BAG_KEY = 'loadout-bag-v1';
@@ -59,26 +59,49 @@ function cleanCues(cues) {
 
 /**
  * Settings by kind, as plain data:
- *   sprite { params, cues, scale, artStyle? }   sound { params, style, seed }   music { params, style }
+ *   sprite { params, cues, scale, artStyle?, look? }   sound { params, style, seed, look? }   music { params, style, look? }
+ * `look` is the id of a named look (engine/theme.js THEME_PRESETS) that this one item wears whatever the bag's look is.
+ * It is there only when one was chosen: an item without it follows the bag's look and is stored exactly as before.
  * A sprite's `artStyle` is the id of the art style it is drawn and exported in (Contract 12). It is there only when
  * one was chosen: the page leaves it out for the sprite's first style, so an item without it is stored exactly as before.
  * (`style` is something else: the name of one of a sound's named styles. A sprite item has none.)
  * Unknown fields are dropped, so whatever a page hands over cannot bloat the bag or its link.
  */
+const LOOK_ID = /^[a-z][a-z0-9-]{0,39}$/;
 export function cleanSettings(kind, settings) {
   const s = isObj(settings) ? settings : {};
   const params = isObj(s.params) ? clone(s.params) : {};
   const style = typeof s.style === 'string' && s.style ? s.style : null;
+  const look = typeof s.look === 'string' && LOOK_ID.test(s.look) ? s.look : null;      // the item's own look (see lookOf): only when one was chosen
   if (kind === 'sprite') {
     const scale = [1, 2, 3, 4, 6, 8].includes(Number(s.scale)) ? Number(s.scale) : 1;
     const out = { params, cues: cleanCues(s.cues), scale };
     if (typeof s.artStyle === 'string' && STYLE_ID.test(s.artStyle)) out.artStyle = s.artStyle;
     const record = cleanRecord(s.lookParams);      // looks: what the bag's look made of its shapes (see the top)
-    if (record) out.lookParams = record;
+    if (record && !look) out.lookParams = record;      // (an item with a look of its own does not follow the bag's)
+    if (look) out.look = look;
     return out;
   }
-  if (kind === 'sound') return { params, style, seed: Number.isFinite(Number(s.seed)) && Number(s.seed) >= 1 ? Math.round(Number(s.seed)) : 1 };
-  return { params, style };
+  if (kind === 'sound') return { params, style, seed: Number.isFinite(Number(s.seed)) && Number(s.seed) >= 1 ? Math.round(Number(s.seed)) : 1, ...(look ? { look } : {}) };
+  return { params, style, ...(look ? { look } : {}) };
+}
+
+/**
+ * An item's own look: the id of a named look (THEME_PRESETS) its settings carry, or null when they carry none or one
+ * this site does not know. null means the item follows the bag's look.
+ */
+export function lookOf(settings) {
+  const id = isObj(settings) && typeof settings.look === 'string' ? settings.look : null;
+  return id && THEME_PRESETS.some((p) => p.id === id) ? id : null;
+}
+/**
+ * The look one item is drawn, played and exported with (a complete theme): its own named look when it has one
+ * ("original" holds it as it was made, whatever the bag wears), otherwise the bag's look.
+ *   settings   the item's settings        bagTheme   the bag's theme (bag.theme()), or nothing for the plain look
+ */
+export function themeFor(settings, bagTheme) {
+  const id = lookOf(settings);
+  return normalizeTheme(id ? THEME_PRESETS.find((p) => p.id === id).theme : isObj(bagTheme) ? bagTheme : {});
 }
 
 /** A look's record of a sprite's shapes as plain data ({ control: number | text | true/false }), or null when it is anything else. */
@@ -173,7 +196,7 @@ export function createBag(storage, { now = () => Date.now(), standard = null, ke
   /** Record one item, if it is a sprite with no record and its program is loaded. Returns true when it changed. */
   function record(it) {
     if (it.kind !== 'sprite') return false;
-    if (!state.theme.shapes) { const had = 'lookParams' in it.settings; delete it.settings.lookParams; return had; }
+    if (!state.theme.shapes || it.settings.look) { const had = 'lookParams' in it.settings; delete it.settings.lookParams; return had; }
     if (it.settings.lookParams || !spriteOf) return false;
     let sprite = null;
     try { sprite = spriteOf(it.id); } catch { sprite = null; }

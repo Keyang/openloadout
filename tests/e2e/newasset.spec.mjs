@@ -1,8 +1,8 @@
 // The acceptance check for "adding an asset is one file" (W2-G).
 //
 // A scratch copy of the project gets ONE new sprite file and ONE new sound patch, and nothing else is edited.
-// After `node tools/build.mjs`, both must work everywhere on the site: listed on the home and browse pages
-// with their pictures, found by a word only they have, open on their own pages, can be changed and added to
+// After `node tools/build.mjs`, both must work everywhere on the site: counted on the home page and listed in the
+// library with their pictures, found by a word only they have, open on their own pages, can be changed and added to
 // the bag, drawn on the bag page, and inside the downloaded package with their settings in manifest.json.
 //
 // The copy is built with the build's own --root and --dist options and served on its own port, so this test
@@ -102,7 +102,15 @@ const box = (page) => page.getByRole('searchbox', { name: 'Search' });
 const results = (page) => page.locator('ul.results > li');
 const resultIds = (page) => results(page).evaluateAll((lis) => lis.map((li) => li.dataset.id));
 const place = (page, id) => page.locator(`ul.results > li[data-id="${id}"]`);
+// a sprite's card shows the picture the build made of it; a sound's card draws its icon (it has no picture of its own)
 const pictureLoaded = (card) => card.locator('img.thumb').evaluate((img) => img.complete && img.naturalWidth > 0);
+const iconDrawn = (card) => card.locator('.sound-pic svg').evaluate((svg) => { const r = svg.getBoundingClientRect(); return r.width > 0 && r.height > 0 && !!svg.querySelector('path')?.getAttribute('d'); });
+/** The home page lists nothing itself: a search there opens the library. */
+async function search(page, words) {
+  await box(page).fill(words);
+  await box(page).press('Enter');
+  await expect.poll(() => page.evaluate(() => location.hash)).toMatch(/^#\/browse\?/);
+}
 const bagCount = (page) => page.locator('header .bag-count');
 const bagItems = (page) => page.evaluate(async () => (await import('/app/bag.js')).bag.items());
 const json = (file) => JSON.parse(new TextDecoder().decode(file.data));
@@ -121,18 +129,20 @@ test('the build lists both new files in the catalogue, with pictures; the asset 
   for (const file of [s.thumb, s.strip, a.thumb]) expect(fs.statSync(path.join(scratch, 'dist', file)).size, file).toBeGreaterThan(60);
 });
 
-test('both are on the home page and the browse page, each with its picture', async ({ page }) => {
-  for (const route of ['/', '/browse']) {
-    await open(page, route);
-    await expect(results(page)).toHaveCount(CATALOG.assets.length);
-    for (const [it, href] of [[NEW_SPRITE, `#/sprite/${NEW_SPRITE.id}`], [NEW_SOUND, `#/sound/${NEW_SOUND.id}`]]) {
-      const li = place(page, it.id);
-      await expect(li).toHaveCount(1);
-      await li.scrollIntoViewIfNeeded();
-      await expect(li.locator(`a[href="${href}"]`)).toBeVisible();
-      await expect(li).toContainText(it.name);
-      await expect.poll(() => pictureLoaded(li)).toBe(true);
-    }
+test('both are counted on the home page and listed in the library, each with its picture', async ({ page }) => {
+  // the home page's numbers come from the catalogue, so they count the two new ones
+  const n = (kind) => CATALOG.assets.filter((x) => x.kind === kind).length;
+  await open(page, '/');
+  await expect(page.locator('main')).toContainText(`${n('sprite')} sprites, ${n('sound')} sounds`);
+  await open(page, '/browse');
+  await expect(results(page)).toHaveCount(CATALOG.assets.length);
+  for (const [it, href, drawn] of [[NEW_SPRITE, `#/sprite/${NEW_SPRITE.id}`, pictureLoaded], [NEW_SOUND, `#/sound/${NEW_SOUND.id}`, iconDrawn]]) {
+    const li = place(page, it.id);
+    await expect(li).toHaveCount(1);
+    await li.scrollIntoViewIfNeeded();
+    await expect(li.locator(`a[href="${href}"]`)).toBeVisible();
+    await expect(li).toContainText(it.name);
+    await expect.poll(() => drawn(li)).toBe(true);
   }
   // the filters count them too
   await open(page, '/browse?kind=sprite');
@@ -144,6 +154,7 @@ test('both are on the home page and the browse page, each with its picture', asy
 
 test('each is found by the word only it has', async ({ page }) => {
   await open(page, '/');
+  await search(page, NEW_SPRITE.word);      // from the home page, into the library; then the library's own box
   for (const it of [NEW_SPRITE, NEW_SOUND]) {
     await box(page).fill(it.word);
     await expect.poll(() => resultIds(page)).toEqual([it.id]);
@@ -163,7 +174,7 @@ test('each opens on its own page, is changed, goes into the bag, is drawn there,
 
   // ---- the sprite: found, opened from its card, changed, added
   await open(page, '/');
-  await box(page).fill(NEW_SPRITE.word);
+  await search(page, NEW_SPRITE.word);
   await place(page, NEW_SPRITE.id).locator(`a[href="#/sprite/${NEW_SPRITE.id}"]`).click();
   await expect(page.locator('h1')).toHaveText(NEW_SPRITE.name);
   await waitForDrawn(page);
@@ -181,18 +192,19 @@ test('each opens on its own page, is changed, goes into the bag, is drawn there,
   // ---- the sound: found, opened from its card, changed, played, added
   await page.locator('a.brand').click();
   await waitForDrawn(page);
-  await box(page).fill(NEW_SOUND.word);
+  await search(page, NEW_SOUND.word);
   await place(page, NEW_SOUND.id).locator(`a[href="#/sound/${NEW_SOUND.id}"]`).click();
   await expect(page.locator('h1')).toHaveText(NEW_SOUND.name);
   await waitForDrawn(page);
-  const soundSlider = page.locator('.panel input[type=range]').first();
-  const soundKey = (await soundSlider.getAttribute('id')).replace(/^s-/, '');
+  const soundSlider = page.locator('.rx-panel .ctl input[type=range]:visible').first();
+  const soundKey = (await soundSlider.getAttribute('id')).replace(/^c-/, '');
   await setRange(soundSlider, 'other');
   await expect.poll(() => page.evaluate(() => location.hash)).toContain(`${soundKey}=`);
   const playBtn = page.locator('.stage-tools .tools-left button');
   await expect(playBtn).toHaveText('Play', { timeout: 8000 });      // the change played it; it ends by itself
-  await page.getByRole('button', { name: 'Add to my bag', exact: true }).click();
+  // the change saved itself to the bag too
   await expect(bagCount(page)).toHaveText('2');
+  await expect(page.locator('.rx-panel .saved')).toContainText('Saved in your bag');
 
   // what went into the bag is what was set on the pages
   const inBag = await bagItems(page);
@@ -206,7 +218,7 @@ test('each opens on its own page, is changed, goes into the bag, is drawn there,
   expect(soundValue).not.toBe(control.default);
 
   // ---- the bag page: the sprite as it was set up, the sound's waveform
-  await page.getByRole('link', { name: 'Go to bag' }).click();
+  await page.locator('header a.bag-link').click();
   const items = page.locator('.bag-item');
   await expect(items).toHaveCount(2);
   await expect(items.nth(0)).toContainText(NEW_SPRITE.name);
@@ -241,8 +253,8 @@ test('each opens on its own page, is changed, goes into the bag, is drawn there,
   await expect.poll(async () => (await inked()).ink).toBeGreaterThan(64 * 2);
   expect((await inked()).heights).toBeGreaterThanOrEqual(3);
   await expect(items.nth(1).getByRole('button', { name: `Play ${NEW_SOUND.name}` })).toBeVisible();
-  // Change leads back to the asset's own page with these settings
-  await expect(items.nth(0).getByRole('link', { name: 'Change' })).toHaveAttribute('href', new RegExp(`^#/sprite/${NEW_SPRITE.id}\\?.*${spriteKey}=.*bag=`));
+  // "Open its page" leads back to the asset's own page with these settings
+  await expect(items.nth(0).getByRole('link', { name: /^Open the page of/ })).toHaveAttribute('href', new RegExp(`^#/sprite/${NEW_SPRITE.id}\\?.*${spriteKey}=.*bag=`));
 
   // ---- the package
   const { name, bytes } = await downloadFrom(page, () => page.getByRole('button', { name: 'Download', exact: true }).click(), { timeout: 120_000 });

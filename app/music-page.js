@@ -1,51 +1,73 @@
-// One music track: play it live, move its sliders while it plays, download it.
+// One music track (docs/site-design.md, section 5, "Sound, music"): the same two columns as a sprite (app/asset-shell.js).
+// Left: its name and line, a big play button and how long it is. Right: the editing panel (app/panel.js) with its
+// versions (its named styles first), its sliders and its choices (how long it is, which instrument leads) in tabs, and
+// the download. It plays live, so a slider is heard while it moves. Every change is saved to the bag as it is made.
 import { el, header, saveBlob } from './ui.js';
-import { soundParams, randomSoundParams, renderAsync, playRendered, playLive, wavBytes, toUnit, toValue, isChoice, choicesOf, lengthOf } from './audio.js';
-import { addToBag, keepBag } from './add-to-bag.js';
-import { shownValue } from '../sound/words.js';
-import { goesWith, moreLikeThis } from './related.js';
+import { soundParams, renderAsync, playRendered, playLive, wavBytes, isChoice, lengthOf } from './audio.js';
+import { keepBag } from './add-to-bag.js';
 import { madeNote } from './catalog.js';      // W5-A: a track made on this visit says so, and a draft cannot go in the bag
-
-// A value in everyday words ("high", "fast", "a lot"), never "2200 Hz": a count with no unit (rockets, notes) is its number
-const fmt = shownValue;
+import { createEdit } from './editing.js';
+import { editPanel } from './panel.js';
+import { soundModel } from './panel-model.js';
+import { assetShell, icon, ICON } from './asset-shell.js';
 
 export function musicPage(app, patch, query) {
   document.title = `${patch.name} · Loadout`;
   const presets = Object.keys(patch.presets ?? {});
   const fromLink = {};
   for (const d of patch.params) if (query[d.id] !== undefined && Number.isFinite(Number(query[d.id]))) fromLink[d.id] = Number(query[d.id]);
-  const st = {
-    preset: presets.includes(query.style) ? query.style : null,
-    custom: patch.params.some((d) => !isChoice(d) && fromLink[d.id] !== undefined),
-    p: null, voice: null, starting: false, gone: false,
-  };
-  st.p = soundParams(patch, st.preset, fromLink);
+  const style0 = presets.includes(query.style) ? query.style : null;
+  const made = madeNote(patch.id);
 
-  const status = el('p', { class: 'status', role: 'status' });
-  const say = (msg) => { status.textContent = msg; };
+  let saveTimer = 0;
+  const edit = createEdit({
+    kind: 'music', id: patch.id, defaults: { params: soundParams(patch, null), style: null }, key: query.bag ?? null, canSave: !made?.draft,
+    start: { params: soundParams(patch, style0, fromLink), style: style0 },
+    schedule: (fn) => { clearTimeout(saveTimer); saveTimer = setTimeout(fn, 150); },
+  });
+  const now = () => edit.settings();
+  const st = { voice: null, starting: false, gone: false, sent: { ...now().params } };
+
+  // How long the track is at some settings, in seconds (worked out once for each tempo and length).
+  const lengths = new Map();
+  const secondsAt = (params) => {
+    const key = patch.params.map((d) => params[d.id]).join(',');
+    if (!lengths.has(key)) { if (lengths.size > 400) lengths.clear(); lengths.set(key, Math.round(lengthOf(patch, params))); }
+    return lengths.get(key);
+  };
+  // The panel's model, with the length choices said in seconds at the current tempo, which is what a non-musician can judge.
+  const model = soundModel(patch);
+  const controlsOf = model.controls;
+  const byId = Object.fromEntries(patch.params.map((d) => [d.id, d]));
+  model.controls = (s) => controlsOf(s).map((c) => (c.kind === 'choice' && byId[c.key].unit === 'bars'
+    ? { ...c, options: c.options.map((o) => ({ ...o, label: `${secondsAt({ ...s.params, [c.key]: o.value })} seconds` })) } : c));
 
   const lengthNote = el('span', { class: 'hint' });
-  // Length choices are shown in seconds at the current tempo, which is what a non-musician can judge.
-  const lengthLabels = [];
-  const syncLength = () => {
-    lengthNote.textContent = `${Math.round(lengthOf(patch, st.p))} seconds long, then it repeats.`;
-    for (const [d, value, btn] of lengthLabels) btn.textContent = `${Math.round(lengthOf(patch, { ...st.p, [d.id]: value }))} seconds`;
-  };
+  const syncLength = () => { lengthNote.textContent = `${secondsAt(now().params)} seconds long, then it repeats.`; };
+
+  let panel = null;
+  const say = (text) => panel && panel.say(text);
 
   // ---- playing: live, so sliders are heard at once
-  const playBtn = el('button', { type: 'button', class: 'btn', onclick: () => (st.voice || st.starting ? stop() : play()) });
-  const syncPlay = () => { playBtn.textContent = st.starting ? 'Starting…' : st.voice ? 'Stop' : 'Play'; };
+  const playBtn = el('button', { type: 'button', class: 'play-big', onclick: () => (st.voice || st.starting ? stop() : play()) });
+  const syncPlay = () => {
+    const word = st.starting ? 'Starting…' : st.voice ? 'Stop' : 'Play';
+    playBtn.replaceChildren(icon(st.voice || st.starting ? ICON.stop : ICON.play, { fill: true }), el('span', { class: 'sr' }, word));
+    playBtn.title = word;
+  };
   function stop() { st.starting = false; if (st.voice) st.voice.stop(); st.voice = null; syncPlay(); }
   async function play() {
     st.starting = true; syncPlay();
+    const params = now().params;
     try {
-      const voice = await playLive(patch, { ...st.p });
+      const voice = await playLive(patch, { ...params });
       if (st.gone || !st.starting) { voice.stop(); return; }
-      st.voice = voice;
+      st.voice = voice; st.sent = { ...params };
+      push();      // whatever moved while it was starting
     } catch (e) {
       // no live audio in this browser: fall back to the rendered loop
       try {
-        const r = await renderAsync(patch, { ...st.p });
+        const r = await renderAsync(patch, { ...params });
         if (st.gone || !st.starting) return;
         const h = playRendered(r, { force: true, loop: true });
         st.voice = { set() {}, stop: () => h && h.stop() };
@@ -54,91 +76,68 @@ export function musicPage(app, patch, query) {
     }
     st.starting = false; syncPlay();
   }
-  const push = (id) => { if (st.voice) st.voice.set(id, st.p[id]); };
-  const pushAll = () => { for (const d of patch.params) push(d.id); };
+  /** Tell the playing track every setting that changed since it was last told. */
+  function push() {
+    const p = now().params;
+    if (st.voice) for (const d of patch.params) if (p[d.id] !== st.sent[d.id]) st.voice.set(d.id, p[d.id]);
+    st.sent = { ...p };
+  }
 
-  // ---- styles
-  const styleBar = el('div', { class: 'pills', role: 'group', 'aria-label': 'Style' },
-    el('button', { type: 'button', class: 'pill', 'data-v': '', onclick: () => setStyle(null) }, 'Standard'),
-    presets.map((name) => el('button', { type: 'button', class: 'pill', 'data-v': name, onclick: () => setStyle(name) }, name)));
-  const syncStyle = () => { for (const b of styleBar.children) b.setAttribute('aria-pressed', String(!st.custom && b.dataset.v === (st.preset ?? ''))); };
-  // a style changes the sliders but keeps the choices already made (length, instrument)
-  const choicesNow = () => Object.fromEntries(patch.params.filter(isChoice).map((d) => [d.id, st.p[d.id]]));
-  function setStyle(name, keep = true) { st.preset = name; st.custom = false; st.p = soundParams(patch, name, keep ? choicesNow() : null); syncSliders(); pushAll(); changed(); }
-  function changed() { syncStyle(); syncLength(); saveUrl(); }
-
-  // ---- sliders
-  const sliders = {};
-  const sliderField = (d) => {
-    const out = el('span', { class: 'end value', style: 'min-width: 7.5em' }, fmt(d, st.p[d.id]));   // wide enough for "rises a little", so the slider does not jump as the word changes
-    const input = el('input', { id: `m-${d.id}`, type: 'range', min: 0, max: 1, step: 0.005, value: toUnit(d, st.p[d.id]), 'aria-valuetext': fmt(d, st.p[d.id]),
-      oninput: (e) => { st.p[d.id] = toValue(d, Number(e.target.value)); st.custom = true; out.textContent = fmt(d, st.p[d.id]); e.target.setAttribute('aria-valuetext', out.textContent); push(d.id); },
-      onchange: () => changed() });
-    sliders[d.id] = () => { input.value = toUnit(d, st.p[d.id]); out.textContent = fmt(d, st.p[d.id]); input.setAttribute('aria-valuetext', out.textContent); };
-    return el('div', { class: 'field' }, el('label', { for: `m-${d.id}` }, d.label), el('div', { class: 'slider two' }, input, out));
-  };
-  const choiceField = (d) => {
-    const row = el('div', { class: 'pills', role: 'group', 'aria-label': d.label },
-      choicesOf(d).map((c) => {
-        const b = el('button', { type: 'button', class: 'pill', 'data-v': c.value, onclick: () => { st.p[d.id] = c.value; sliders[d.id](); push(d.id); changed(); } }, c.label);
-        if (d.unit === 'bars') lengthLabels.push([d, c.value, b]);
-        return b;
-      }));
-    sliders[d.id] = () => { for (const b of row.children) b.setAttribute('aria-pressed', String(Number(b.dataset.v) === st.p[d.id])); };
-    sliders[d.id]();
-    return el('div', { class: 'field' }, el('span', { class: 'label' }, d.label), row);
-  };
-  const choiceFields = patch.params.filter(isChoice).map(choiceField);
-  const fields = patch.params.filter((d) => !isChoice(d)).map(sliderField);
-  const syncSliders = () => { for (const k of Object.keys(sliders)) sliders[k](); };
-
-  // ---- link and download
+  // ---- the address and the file
   let urlTimer = 0;
   function link() {
-    const q = new URLSearchParams();
-    if (st.custom) for (const d of patch.params) q.set(d.id, String(st.p[d.id]));
+    const s = now(), q = new URLSearchParams(), own = soundParams(patch, s.style);
+    // a slider moved by hand: every setting travels. Otherwise the style's name, and the choices that are not the usual ones
+    if (patch.params.some((d) => !isChoice(d) && s.params[d.id] !== own[d.id])) for (const d of patch.params) q.set(d.id, String(s.params[d.id]));
     else {
-      if (st.preset) q.set('style', st.preset);
-      for (const d of patch.params) if (isChoice(d) && st.p[d.id] !== d.default) q.set(d.id, String(st.p[d.id]));
+      if (s.style) q.set('style', s.style);
+      for (const d of patch.params) if (isChoice(d) && s.params[d.id] !== d.default) q.set(d.id, String(s.params[d.id]));
     }
     const qs = q.toString();
     return `#/music/${patch.id}${qs ? '?' + qs : ''}`;
   }
-  function saveUrl() { clearTimeout(urlTimer); urlTimer = setTimeout(() => history.replaceState(null, '', keepBag(link(), query)), 200); }
-  const dlBtn = el('button', { type: 'button', class: 'btn big', onclick: async () => {
-    dlBtn.disabled = true; say(`Building the music file. This takes about ${Math.max(10, Math.round(lengthOf(patch, st.p) * 0.6 / 5) * 5)} seconds…`);
+  function saveUrl() { clearTimeout(urlTimer); urlTimer = setTimeout(() => { urlTimer = 0; history.replaceState(null, '', keepBag(link(), { bag: edit.key() })); }, 200); }
+  let building = false;
+  async function download() {
+    if (building) return '';
+    building = true;
+    const params = now().params;
+    say(`Building the music file. This takes about ${Math.max(10, Math.round(lengthOf(patch, params) * 0.6 / 5) * 5)} seconds…`);
     try {
-      const r = await renderAsync(patch, { ...st.p });
+      const r = await renderAsync(patch, { ...params });
       saveBlob(new Blob([wavBytes(r)], { type: 'audio/wav' }), `${patch.id}.wav`);
-      say(`Downloaded ${patch.id}.wav: one loop, ${r.duration.toFixed(1)} seconds. Set it to repeat in your game.`);
-    } catch (e) { say(`The download did not start: ${e.message}. Try again, or use a different browser.`); }
-    dlBtn.disabled = false;
-  } }, 'Download music');
+      return `Downloaded ${patch.id}.wav: one loop, ${r.duration.toFixed(1)} seconds. Set it to repeat in your game.`;
+    } catch (e) { return `The download did not start: ${e.message}. Try again, or use a different browser.`; }
+    finally { building = false; }
+  }
   async function copyLink() {
-    clearTimeout(urlTimer);
-    try { await navigator.clipboard.writeText(`${location.origin}${location.pathname}${link()}`); say('Link copied. Anyone who opens it hears this exact version.'); }
-    catch { say('Copy the address in your browser bar to share this exact version.'); }
+    clearTimeout(urlTimer); urlTimer = 0;
+    try { await navigator.clipboard.writeText(`${location.origin}${location.pathname}${link()}`); return 'Link copied. Anyone who opens it hears this exact version.'; }
+    catch { return 'Copy the address in your browser bar to share this exact version.'; }
   }
 
-  syncPlay(); syncStyle(); syncLength();
-  app.replaceChildren(
-    header('music'),
-    el('main', { class: 'editor' },
-      el('div', { class: 'left' },
-        el('div', { class: 'title-row' }, el('h1', {}, patch.name), el('p', { class: 'blurb' }, patch.description ?? '')),
-        madeNote(patch.id) ? el('p', { class: 'hint made-here' }, madeNote(patch.id).text) : null,
-        el('div', { class: 'stage-card' }, el('div', { class: 'stage-tools plain' }, el('div', { class: 'tools-left' }, playBtn, lengthNote))),
-        el('div', { class: 'under' }, el('span', { class: 'label' }, 'Style'), styleBar),
-        el('p', { class: 'used' }, 'Press Play, then move the sliders: the music changes while it plays, the way a game would change it during a fight.'),
-        goesWith(patch.id)),      // the bundles it is in, from the catalogue
-      el('div', { class: 'panel' },
-        el('div', { class: 'panel-actions' },
-          el('button', { type: 'button', class: 'btn', onclick: () => { const keep = Object.fromEntries(patch.params.filter((d) => d.step && !d.options).map((d) => [d.id, st.p[d.id]])); st.p = soundParams(patch, null, { ...randomSoundParams(patch), ...keep }); st.custom = true; syncSliders(); pushAll(); changed(); } }, 'Surprise me'),
-          el('button', { type: 'button', class: 'ghost', onclick: () => setStyle(null, false) }, 'Start over')),
-        choiceFields.length ? el('section', { class: 'group' }, el('h2', {}, 'Arrangement'), choiceFields) : null,
-        el('section', { class: 'group' }, el('h2', {}, 'Sound'), fields)),
-      el('div', { class: 'get' }, madeNote(patch.id)?.draft ? null : addToBag('music', patch.id, () => ({ params: { ...st.p }, style: st.preset }), query), dlBtn, el('button', { type: 'button', class: 'ghost', onclick: copyLink }, 'Copy link'), status),
-      moreLikeThis(patch.id)));
+  let shell = null;
+  panel = editPanel({
+    kind: 'music', asset: patch, edit, model,
+    onDownload: download, onCopyLink: copyLink,
+    onMore: () => shell && shell.openMore(),
+  });
+  const offEdit = edit.onChange(() => { push(); syncLength(); if (!urlTimer) saveUrl(); });
+  const flush = () => edit.flush();
+  window.addEventListener('pagehide', flush);
+  syncPlay(); syncLength();
+  if (edit.inBag()) saveUrl();
 
-  return () => { st.gone = true; clearTimeout(urlTimer); stop(); };
+  const card = el('div', { class: 'stage-card tile sound-card' },
+    el('span', { class: 'sound-icon' }, icon(ICON.note, { size: 18 }), 'Music'),
+    el('div', { class: 'stage-tools' }, el('div', { class: 'tools-left' }, playBtn, lengthNote)));
+  const under = el('div', { class: 'sound-under' }, el('p', {}, 'Press Play, then move the sliders: the music changes while it plays, the way a game would change it during a fight.'));
+  shell = assetShell({ kind: 'music', id: patch.id, name: patch.name, line: patch.description ?? '', made, edit, stage: card, under: [under], panel });
+  app.replaceChildren(header('music'), shell.main);
+
+  return () => {
+    st.gone = true; clearTimeout(urlTimer); stop();
+    offEdit(); panel.close(); shell.close(); edit.close(); clearTimeout(saveTimer);      // leaving saves whatever was still waiting
+    window.removeEventListener('pagehide', flush);
+  };
 }

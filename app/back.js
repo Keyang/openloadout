@@ -7,7 +7,7 @@ import { bundleById } from './catalog.js';
 
 const KEY = 'loadout-came-from';
 const ASSET = new Set(['sprite', 'sound', 'music']);
-const LIST = { '': 'results', browse: 'results', bag: 'bag', bundle: 'bundle', play: 'play', bundles: 'bundles' };
+const LIST = { '': 'home', browse: 'results', bag: 'bag', bundle: 'bundle', play: 'play', bundles: 'bundles' };
 
 const partsOf = (hash) => String(hash || '').replace(/^#\/?/, '').split('?')[0].split('/').filter(Boolean);
 const tidy = (hash) => (hash && hash !== '#' ? hash : '#/');
@@ -44,11 +44,16 @@ export function arrived(hash = location.hash) {
   if (!record || isAsset(hash)) return;
   write(null);
   if (tidy(hash) !== record.hash) return;
-  let tries = 0;
+  let tries = 0, held = 0;
   const put = () => {
     if (tidy(location.hash) !== record.hash) return;                // moved on meanwhile
     const place = record.id ? document.querySelector(`ul.results > li[data-id="${CSS.escape(record.id)}"]`) : null;
-    if (place) { window.scrollBy(0, place.getBoundingClientRect().top - record.top); return; }
+    if (place) {
+      window.scrollBy(0, place.getBoundingClientRect().top - record.top);
+      // the list above may still settle (cards being made, pictures arriving): hold the card where it was for a moment
+      if (++held < 20) requestAnimationFrame(put);
+      return;
+    }
     const room = document.documentElement.scrollHeight - window.innerHeight;
     if (!record.id && room >= record.y - 1) { window.scrollTo(0, record.y); return; }
     if (++tries < 180) requestAnimationFrame(put); else if (!record.id) window.scrollTo(0, record.y);
@@ -63,6 +68,6 @@ export function wayBack(hash = location.hash) {
   if (!record) return { href: '#/browse', label: 'Browse everything' };
   const bundle = record.kind === 'bundle' ? bundleById(partsOf(record.hash)[1]) : null;
   const label = record.kind === 'bag' ? 'Back to your bag' : record.kind === 'play' ? 'Back to the playground' : record.kind === 'bundles' ? 'Back to bundles'
-    : record.kind === 'bundle' ? `Back to ${bundle ? bundle.name : 'the bundle'}` : 'Back to results';
+    : record.kind === 'bundle' ? `Back to ${bundle ? bundle.name : 'the bundle'}` : record.kind === 'home' ? 'Back to the start' : 'Back to results';
   return { href: record.hash, label };
 }

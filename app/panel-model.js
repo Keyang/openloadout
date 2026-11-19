@@ -109,6 +109,11 @@ export function soundModel(patch) {
   });
   const byId = Object.fromEntries(defs.map((d) => [d.id, d]));
   const put = (settings, params, more = {}) => ({ ...settings, ...more, params });
+  // A track's choices (how long it is, which instrument leads) are the visitor's own arrangement: a style changes the
+  // sliders and keeps them, unless the version names one itself; Surprise me keeps the length. A sound has none of this.
+  const music = patch.category === 'music';
+  const kept = (settings, version) => (music ? Object.fromEntries(defs.filter((d) => isChoice(d) && !(version.params && d.id in version.params) && settings.params?.[d.id] !== undefined).map((d) => [d.id, settings.params[d.id]])) : {});
+  const lengths = (settings) => (music ? Object.fromEntries(defs.filter((d) => d.step && !d.options && settings.params?.[d.id] !== undefined).map((d) => [d.id, settings.params[d.id]])) : {});
   return {
     kind: patch.category === 'music' ? 'music' : 'sound', tabs: withTabs(SOUND_TABS, controls({ params: def })),
     controls,
@@ -119,11 +124,11 @@ export function soundModel(patch) {
     surprise(settings, seed) {
       let s = (seed ?? Math.floor(Math.random() * 1e9)) >>> 0;
       const r = () => { s = (Math.imul(s ^ (s >>> 15), 0x2c1b3c6d) + 0x9e3779b9) >>> 0; return ((s ^ (s >>> 13)) >>> 0) / 4294967296; };
-      return put(settings, Object.fromEntries(defs.map((d) => [d.id, toValue(d, r())])), { style: null });
+      return put(settings, { ...Object.fromEntries(defs.map((d) => [d.id, toValue(d, r())])), ...lengths(settings) }, { style: null });
     },
-    applyVersion: (settings, version) => put(settings, Object.fromEntries(Object.entries({ ...own(version.style ?? null), ...(version.params ?? {}) }).filter(([k]) => byId[k]).map(([k, v]) => [k, clamp(byId[k], v)])), { style: version.style ?? null }),
+    applyVersion: (settings, version) => put(settings, Object.fromEntries(Object.entries({ ...own(version.style ?? null), ...(version.params ?? {}), ...kept(settings, version) }).filter(([k]) => byId[k]).map(([k, v]) => [k, clamp(byId[k], v)])), { style: version.style ?? null }),
     isVersion(settings, version) {
-      const want = { ...own(version.style ?? null), ...(version.params ?? {}) };
+      const want = { ...own(version.style ?? null), ...(version.params ?? {}), ...kept(settings, version) };
       return defs.every((d) => sameValue(settings.params[d.id], clamp(d, want[d.id])));
     },
   };

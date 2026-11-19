@@ -14,27 +14,30 @@ const EFFECT = C.sounds.find(withUnit);
 const TRACK = C.music.find(withUnit);
 const UNITS = /\b(?:k?hz|bpm|rpm|oct|semitones?|db|ms)\b|\d\s*s\b/i;
 
-/** Every word on the page a visitor reads in the title, the description and the controls panel. */
+/** Every word on the page a visitor reads in the title, the description and the editing panel, every Fine-tune tab of it opened in turn. */
 async function shownText(page) {
-  return page.evaluate(() => [...document.querySelectorAll('main h1, main .blurb, main .panel, main [aria-label="Style"]')].map((n) => n.innerText).join('\n'));
+  const read = () => page.evaluate(() => [...document.querySelectorAll('main h1, main .blurb, main .rx-panel')].map((n) => n.innerText).join('\n'));
+  const texts = [await read()];
+  for (const tab of await page.locator('.rx-panel [role="tab"]:visible').all()) { await tab.click(); texts.push(await read()); }
+  return texts.join('\n');
 }
 
 for (const [kind, row] of [['sound', EFFECT], ['music', TRACK]]) {
   test(`the ${kind} page of "${row?.name}" shows no units or synthesizer words, and its sliders read as words`, async ({ page }) => {
     test.skip(!row, `no ${kind} with a unit control in the catalogue`);
     await openRoute(page, `/${kind}/${row.id}`);
-    await expect(page.locator('main .panel input[type=range]').first()).toBeVisible();
+    await expect(page.locator('main .rx-panel input[type=range]:visible').first()).toBeVisible();
     const text = await shownText(page);
     expect(text, 'a unit is shown').not.toMatch(UNITS);
     const found = TECHNICAL_WORDS.flatMap((w) => [...text.matchAll(new RegExp(w.re.source, 'gi'))].map((m) => m[0]));
     expect(found, 'technical words on the page').toEqual([]);
     expect(technicalWords(patchOf(row.id)), 'the patch itself').toEqual([]);
     // each slider's value and what a screen reader hears are words; moving it changes the word at the ends
-    const sliders = page.locator('main .panel input[type=range]');
+    const sliders = page.locator('main .rx-panel input[type=range]');      // every tab's
     const n = await sliders.count();
     for (let i = 0; i < n; i++) {
       const s = sliders.nth(i);
-      const value = s.locator('xpath=following-sibling::*[contains(@class,"value")]');
+      const value = s.locator('xpath=following-sibling::*[contains(@class,"hi")]');      // the slider's value, in words, at its end
       for (const end of ['0', '1']) {
         await s.evaluate((el, v) => { el.value = v; el.dispatchEvent(new Event('input', { bubbles: true })); }, end);
         const shown = (await value.textContent()).trim();
@@ -53,7 +56,7 @@ test('no sound or music page shows a unit or a synthesizer word', async ({ page 
   for (const [kind, rows] of [['sound', C.sounds], ['music', C.music]]) for (const row of rows) {
     await openRoute(page, `/${kind}/${row.id}`);
     await expect(page.locator('main h1')).toBeVisible();
-    await expect(page.locator('main .panel').first()).toBeVisible();
+    await expect(page.locator('main .rx-panel').first()).toBeVisible();
     const text = await shownText(page);
     const unit = text.match(UNITS);
     if (unit) bad.push(`${kind}/${row.id}: "${unit[0]}"`);

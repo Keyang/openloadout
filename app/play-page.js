@@ -3,8 +3,14 @@
 // is there. What each thing does comes from its metadata (app/play/roles.js); which clip plays comes
 // from clip names (app/play/clips.js); the ground comes from tile names (app/play/level.js); the
 // scene itself is app/play/world.js. This file only gathers the bag, builds the page and runs the loop.
-import { el, header } from './ui.js';
-import { bag } from './bag.js';
+//
+// The page is two columns (docs/site-design.md, section 5): the scene on the left, and on the right the editing panel
+// (app/panel.js) for whichever thing was clicked in the scene or picked from the list of what is in the bag. A change
+// made there is saved to the bag as it is made, and the scene takes it without starting again: the same character, in
+// the same place, drawn the new way. Anything else that changes the bag (a thing added or removed, a new look for
+// everything) builds the scene again.
+import { el, header, store } from './ui.js';
+import { bag, lookOf, themeFor } from './bag.js';
 import { loadCatalog, currentCatalog, assetById, loadSprite, loadSound } from './catalog.js';
 import { soundById, soundState, stopAll, toUnit, toValue, isChoice } from './audio.js';
 import { cleanParams, clipFps, clipStretch } from '../engine/sprite.js';
@@ -18,6 +24,8 @@ import { createPainter, cameraFor, VIEW_H } from './play/draw.js';
 import { createInput } from './play/input.js';
 import { createSounds } from './play/sound.js';
 import { displayPlan, fillSpan } from './play/display.js';
+import { itemEditor } from './bag-edit.js';
+import { themeControls } from './theme-controls.js';
 import { howTo, roleNote, keysLine, viewName, leftOutNote, viewReason } from './play/words.js';
 
 const HEARD_MAX = 60;
@@ -25,7 +33,10 @@ const BOSS_HP = 8;
 
 export async function playPage(app) {
   document.title = 'Playground · Loadout';
-  const main = el('main', { class: 'home play-page' }, el('p', { class: 'lede' }, 'Loading the playground…'));
+  // col: the scene and what is under it, made again with every build. side: the editing panel, which stays.
+  const col = el('div', { class: 'play-main' }, el('p', { class: 'lede' }, 'Loading the playground…'));
+  const side = el('aside', { class: 'play-side', hidden: true, 'aria-label': 'Change what is in the scene' });
+  const main = el('main', { class: 'v2 play-page' }, col, side);
   app.replaceChildren(header('play'), main);
 
   const guests = [];                 // assets handed over directly instead of through the bag (see addAssets)
@@ -36,6 +47,8 @@ export async function playPage(app) {
   const heard = [];                  // the last sounds that fired, for the browser tests
   let heardTotal = 0;
   let scene = null, gone = false, builds = 0;
+  let chosen = null;                 // the thing in the panel: { key, editor }
+  let pickedByHand = false;          // the visitor chose it (the scene's own first choice gives way to a new scene's)
   // Mute belongs to the playground: it is not remembered and nothing else on the site inherits it. The site's own
   // sound setting (the switch on a sprite page) is taken as found, and put back when the playground is left.
   const siteSound = soundState.on;
@@ -76,7 +89,75 @@ export async function playPage(app) {
     const resume = keep.music;         // music that was playing carries on after the page is rebuilt
     if (scene) scene.stop();
     scene = show(got.entries, got.missing, resume);
+    showSide(got.entries);
     api.ready = true;
+  }
+
+  // ---- the editing panel beside the scene ----------------------------------------------------------
+  // One bag item at a time (app/bag-edit.js). What it changes is saved to the bag, and the bag tells the scene (soft, below).
+
+  // the look of everything together: one more tab of the panel (and all there is to change when nothing can be picked)
+  const look = themeControls({ theme: bag.theme(), live: false, open: false, title: 'Give everything a look', onChange: (t) => bag.setTheme(t) });
+  const lookBox = el('div', { class: 'play-look' }, look.node);
+  const lookChanged = () => JSON.stringify(normalizeTheme(bag.theme())) !== JSON.stringify(normalizeTheme({}));
+  const pickBox = el('div', { class: 'play-side-head' });
+  let sideEntries = [], restored = false;
+
+  function closeChosen() {
+    if (!chosen) return;
+    chosen.editor.close();
+    chosen = null;
+  }
+  /** Put a bag item in the panel. byHand: the visitor asked for it (a click in the scene, the list, "Change"). */
+  function choose(key, byHand = false) {
+    const e = sideEntries.find((x) => x.key === key);
+    if (!e) return false;
+    if (byHand) { pickedByHand = true; store.set('play-chosen', key); }      // remembered, so a reload goes on with the same thing
+    if (chosen && chosen.key === key) { drawSide(); return true; }
+    const tab = chosen ? chosen.editor.panel.tab() : null;
+    closeChosen();
+    const item = bag.get(key);
+    if (!item) return false;
+    const editor = itemEditor(item, e.sprite ?? e.patch, {
+      versions: 6,
+      tabs: [{ id: 'everything', label: 'Everything', node: lookBox, changed: lookChanged }],
+    });
+    chosen = { key, editor };
+    if (tab === 'everything') editor.panel.showTab(tab);
+    drawSide();
+    return true;
+  }
+  function drawSide() {
+    const e = chosen ? sideEntries.find((x) => x.key === chosen.key) : null;
+    const select = el('select', { id: 'play-choose', onchange: (ev) => { choose(ev.target.value, true); } },
+      [['sprite', 'Sprites'], ['sound', 'Sounds'], ['music', 'Music']].map(([kind, label]) => {
+        const list = sideEntries.filter((x) => x.row.kind === kind);
+        return list.length ? el('optgroup', { label }, list.map((x) => el('option', { value: x.key, selected: !!chosen && x.key === chosen.key }, x.row.name))) : null;
+      }));
+    pickBox.replaceChildren(
+      el('label', { for: 'play-choose' }, 'Change'), select,
+      el('span', { class: 'quiet play-side-hint' }, 'or click it in the scene'),
+      e ? el('a', { class: 'link play-side-page', href: `#/${e.row.kind}/${e.row.id}?bag=${chosen.key}`, onclick: () => chosen && chosen.editor.edit.flush() }, 'Open its page') : null);
+    if (chosen) side.replaceChildren(pickBox, chosen.editor.node);
+    else side.replaceChildren(lookBox);
+    side.hidden = false;
+    for (const b of col.querySelectorAll('.play-edit')) b.setAttribute('aria-pressed', String(!!chosen && b.dataset.key === chosen.key));
+  }
+  /** After a build: the panel keeps the thing it had if that is still in the bag; else it takes the scene's main thing. */
+  function showSide(entries) {
+    sideEntries = entries.filter((e) => !String(e.key).startsWith('guest-') && bag.get(e.key));
+    look.set(bag.theme());
+    if (!entries.length) { closeChosen(); side.hidden = true; side.replaceChildren(); return; }
+    if (chosen && sideEntries.some((e) => e.key === chosen.key) && (pickedByHand || chosen.key === (scene.first?.() ?? chosen.key))) { chosen.editor.panel.sync(); drawSide(); return; }
+    closeChosen();
+    pickedByHand = false;
+    // after a reload: the thing that was being changed, if it is still in the bag
+    const before = !restored ? store.get('play-chosen') : null;
+    restored = true;
+    if (before && sideEntries.some((e) => e.key === before) && choose(before, true)) return;
+    const first = scene.first?.();
+    const key = sideEntries.some((e) => e.key === first) ? first : (sideEntries.find((e) => e.sprite) ?? sideEntries[0])?.key;
+    if (key === undefined || !choose(key)) drawSide();
   }
 
   // ---- the page for one state of the bag -----------------------------------------------------------
@@ -90,7 +171,9 @@ export async function playPage(app) {
     for (const e of entries) {
       if (!e.sprite) continue;
       // looks: from what the bag recorded its look made of the sprite, when it has a record (Contract 7, "The record")
-      drawn[e.key] = { sprite: e.sprite, params: spriteLook(e.sprite, e.settings.params ?? {}, theme, { record: e.settings.lookParams }).params, artStyle: e.settings.artStyle };
+      // (a sprite that wears a look of its own is drawn in that look, whatever the bag's is)
+      const own = lookOf(e.settings) ? themeFor(e.settings, theme) : null;
+      drawn[e.key] = { sprite: e.sprite, params: spriteLook(e.sprite, e.settings.params ?? {}, own ?? theme, { record: own ? undefined : e.settings.lookParams }).params, artStyle: e.settings.artStyle, colour: own ? own.colour : undefined };
       e.soundIds = soundIdsOf(e.sprite, e.settings.cues ?? null, drawn[e.key].params).filter((id) => patchOf(id));
     }
     const plan = planScene(entries, picks);
@@ -98,14 +181,14 @@ export async function playPage(app) {
     const stops = [];
 
     if (plan.empty) {
-      main.replaceChildren(...emptyView(missing));
-      return { stop() {}, state: () => blankState() };
+      col.replaceChildren(...emptyView(missing));
+      return { stop() {}, state: () => blankState(), soft: () => false };
     }
 
     const sounds = createSounds({ theme, patchOf });
     stops.push(() => sounds.destroy());
     const tracks = [], boards = [];
-    const muteBtn = el('button', { type: 'button', class: 'btn plain play-mute', onclick: () => setMuted(soundState.on) });
+    const muteBtn = el('button', { type: 'button', class: 'btn btn-sm btn-secondary play-mute', onclick: () => setMuted(soundState.on) });
     const syncMute = () => { muteBtn.textContent = soundState.on ? 'Mute' : 'Unmute'; muteBtn.setAttribute('aria-pressed', String(!soundState.on)); };
     function setMuted(muted) {
       if (muted) { for (const t of tracks) t.stop(); for (const b of boards) b.stop(); sounds.stopLoops(); }
@@ -116,19 +199,25 @@ export async function playPage(app) {
     syncMute();
 
     const blocks = [];
+    let card = null;
     let stateOf = () => blankState();
     let putPlayer = () => false;
+    // what a change made in the panel does to the running scene, by the key of the bag item it changed
+    const softSprite = {}, softSound = {};
+    let firstKey = plan.player ?? plan.scene[0] ?? null;
+    let spotOf = () => null;
 
     // ---- the scene
     if (!plan.soundsOnly) {
       const isLoop = (id) => !!patchOf(id)?.loop;
-      const kinds = entries.filter((e) => e.key === plan.player || e.key === plan.projectile || plan.scene.includes(e.key)).map((e) => {
+      const kindOf = (e) => {
         const role = plan.roles[e.key];
         const kind = buildKind({ key: e.key, sprite: e.sprite, row: e.row, settings: { params: drawn[e.key].params, cues: e.settings.cues ?? null } }, role,
           { isLoop, hostile: role === 'creature' && e.row.role !== 'characters/animal', hp: e.row.role === 'characters/boss' ? BOSS_HP : undefined });
         for (const clip of kind.clipNames) kind.cues[clip] = kind.cues[clip].filter((c) => patchOf(c.sound));
         return kind;
-      });
+      };
+      const kinds = entries.filter((e) => e.key === plan.player || e.key === plan.projectile || plan.scene.includes(e.key)).map(kindOf);
       // every tileset in the bag is read together: one may hold the floor, another the walls
       const tiles = tileIndex(plan.tilesets.map((key) => ({ key, names: Object.keys(drawn[key].sprite.clips), size: drawn[key].sprite.size[0], clips: drawn[key].sprite.clips })));
       const features = levelFeatures(tiles, plan.mode);
@@ -144,7 +233,7 @@ export async function playPage(app) {
       const painter = createPainter({ sprites: drawn, colour: theme.colour, tiles });
       sounds.warm(kinds.flatMap((k) => Object.values(k.cues).flat()));
 
-      const stage = el('canvas', { class: 'play-stage', role: 'img', 'aria-label': 'The playground scene' });
+      const stage = el('canvas', { class: 'play-stage', tabindex: '0', role: 'img', 'aria-label': 'The playground scene. Click a thing in it to change it.' });
       const wrap = el('div', { class: 'play-stage-wrap' }, stage);
       const ctx = stage.getContext('2d');
       const view = { w: 320, h: Math.min(VIEW_H, level.height), zoom: 2 };
@@ -166,7 +255,7 @@ export async function playPage(app) {
       const pad = el('div', { class: 'play-pad' },
         el('div', { class: 'play-pad-group' }, hold('left', 'Left', '◀'), top ? hold('up', 'Up', '▲') : null, top ? hold('down', 'Down', '▼') : null, hold('right', 'Right', '▶')),
         player ? el('div', { class: 'play-pad-group' }, top ? null : hold('jump', 'Jump'), has('block') ? hold('block', 'Block') : null, hold('action', 'Action')) : null);
-      const input = createInput({ pad });
+      const input = createInput({ pad, ignore: '.play-side' });      // keys pressed in the editing panel are the panel's: they never move the character
       stops.push(() => input.destroy());
 
       // score and health: what was collected (when there is something to collect) and the player's health,
@@ -182,7 +271,7 @@ export async function playPage(app) {
       // looked at together) and "Show one row" folds it away again; the button is there only when the row overflows,
       // and it comes before the row, so it stays in the same place, on the first line, when the row is folded open.
       const strip = pieces.length ? el('div', { class: 'play-pieces', role: 'group', tabindex: '0', 'aria-label': 'Interface pieces from your bag' }, pieces.map((p) => p.node)) : null;
-      const more = strip ? el('button', { type: 'button', class: 'mini play-pieces-more', hidden: true, onclick: () => { keep.allPieces = !keep.allPieces; syncPieces(); } }) : null;
+      const more = strip ? el('button', { type: 'button', class: 'btn btn-sm btn-secondary play-pieces-more', hidden: true, onclick: () => { keep.allPieces = !keep.allPieces; syncPieces(); } }) : null;
       const syncPieces = () => {
         if (!strip) return;
         strip.classList.toggle('open', keep.allPieces);
@@ -195,7 +284,7 @@ export async function playPage(app) {
         : null;
 
       // tools
-      const pauseBtn = el('button', { type: 'button', class: 'ghost', onclick: () => { keep.paused = !keep.paused; syncPause(); } });
+      const pauseBtn = el('button', { type: 'button', class: 'btn btn-sm btn-secondary', onclick: () => { keep.paused = !keep.paused; syncPause(); } });
       const syncPause = () => { pauseBtn.textContent = keep.paused ? 'Resume' : 'Pause'; };
       syncPause();
       let pendingClip = null;
@@ -208,15 +297,15 @@ export async function playPage(app) {
       const setView = (mode) => { if (mode === plan.mode) return; picks.mode = mode; build(); };
       const viewPick = el('span', { class: 'play-extras play-view' }, el('span', { class: 'label' }, 'View'),
         plan.modes.length > 1
-          ? el('span', { class: 'pills small', role: 'group', 'aria-label': 'View' }, MODES.filter((m) => plan.modes.includes(m)).map((m) => el('button', { type: 'button', class: 'pill', 'aria-pressed': String(m === plan.mode), onclick: () => setView(m) }, viewName(m))))
+          ? el('span', { class: 'seg', role: 'group', 'aria-label': 'View' }, MODES.filter((m) => plan.modes.includes(m)).map((m) => el('button', { type: 'button', 'aria-pressed': String(m === plan.mode), onclick: () => setView(m) }, viewName(m))))
           : el('span', { class: 'play-view-now' }, viewName(plan.mode)));
       const tools = el('div', { class: 'play-tools' },
         muteBtn, pauseBtn,
-        el('button', { type: 'button', class: 'ghost', onclick: () => { resetWorld(world); free.x = level.start.x; free.y = level.start.y; cam = null; syncCounts(); } }, 'Reset the scene'),
-        el('button', { type: 'button', class: 'ghost play-copy', onclick: copyLevel }, 'Copy this level'),
+        el('button', { type: 'button', class: 'btn btn-sm btn-secondary', onclick: () => { resetWorld(world); free.x = level.start.x; free.y = level.start.y; cam = null; syncCounts(); } }, 'Reset the scene'),
+        el('button', { type: 'button', class: 'btn btn-sm btn-secondary play-copy', onclick: copyLevel }, 'Copy this level'),
         viewPick,
         extras.length ? el('span', { class: 'play-extras' }, el('span', { class: 'label' }, 'Other moves'),
-          el('span', { class: 'pills small' }, extras.map((action) => el('button', { type: 'button', class: 'pill', onclick: () => { pendingClip = action; } }, labelOf(action))))) : null);
+          el('span', { class: 'chips' }, extras.map((action) => el('button', { type: 'button', class: 'chip', onclick: () => { pendingClip = action; } }, labelOf(action))))) : null);
 
       // "Copy this level": the map text on the clipboard; where the browser will not allow that, in a box to copy from
       const copyNote = el('p', { class: 'hint play-copied', role: 'status' });
@@ -241,26 +330,31 @@ export async function playPage(app) {
 
       // what is in the scene, with add one / remove one
       const counters = [];
+      const tags = {};
       const syncCounts = () => { for (const [key, node] of counters) node.textContent = String(countOf(world, key)); };
       // (what was drawn for the other view is not in the scene: it is listed on its own, under the scene)
       const rows = entries.filter((e) => e.sprite && !plan.leftOut.includes(e.key)).map((e) => {
         const role = plan.roles[e.key];
         // a sprite the visitor changed says so, so it is clear this is their version and not the one in the catalogue
-        const mine = isCustom(e.sprite, e.settings) ? el('span', { class: 'play-tag' }, 'your version') : null;
-        const row = el('li', {}, el('span', { class: 'play-name' }, e.row.name, mine), el('span', { class: 'hint' }, roleNote(role, { player: !!player })));
+        const tagBox = el('span', { class: 'play-tag-box' });
+        const tag = () => tagBox.replaceChildren(...(isCustom(e.sprite, e.settings) ? [el('span', { class: 'play-tag' }, el('span', { class: 'dot', 'aria-hidden': 'true' }), 'your version')] : []));
+        tag();
+        tags[e.key] = tag;
+        const row = el('li', {}, el('span', { class: 'play-name' }, e.row.name, tagBox), el('span', { class: 'hint' }, roleNote(role, { player: !!player })));
+        if (bag.get(e.key)) row.append(el('button', { type: 'button', class: 'play-edit', 'data-key': e.key, 'aria-pressed': 'false', 'aria-label': `Change ${e.row.name}`, onclick: () => choose(e.key, true) }, 'Change'));
         if (SCENE_ROLES.includes(role)) {
           const n = el('span', { class: 'play-n', 'aria-label': `${e.row.name} in the scene` });
           counters.push([e.key, n]);
           row.append(el('span', { class: 'play-more' },
-            el('button', { type: 'button', class: 'mini', 'aria-label': `Remove one ${e.row.name}`, onclick: () => { removeOne(world, e.key); syncCounts(); } }, 'Remove one'),
+            el('button', { type: 'button', class: 'play-step', 'aria-label': `Remove one ${e.row.name}`, title: 'Remove one', onclick: () => { removeOne(world, e.key); syncCounts(); } }, '−'),
             n,
-            el('button', { type: 'button', class: 'mini', 'aria-label': `Add one ${e.row.name}`, onclick: () => { spawn(world, e.key); syncCounts(); } }, 'Add one')));
+            el('button', { type: 'button', class: 'play-step', 'aria-label': `Add one ${e.row.name}`, title: 'Add one', onclick: () => { spawn(world, e.key); syncCounts(); } }, '+')));
         }
         return row;
       });
       syncCounts();
       const choice = (label, field, list) => (list.length < 2 ? null : el('div', { class: 'play-pick' }, el('span', { class: 'label' }, label),
-        el('span', { class: 'pills small', role: 'group', 'aria-label': label }, list.map((key) => el('button', { type: 'button', class: 'pill', 'aria-pressed': String(plan[field] === key), onclick: () => { picks[plan.mode][field] = key; build(); } }, byKey[key].row.name)))));
+        el('span', { class: 'chips', role: 'group', 'aria-label': label }, list.map((key) => el('button', { type: 'button', class: 'chip', 'aria-pressed': String(plan[field] === key), onclick: () => { picks[plan.mode][field] = key; build(); } }, byKey[key].row.name)))));
       const notes = [];
       const otherMode = MODES.find((m) => m !== plan.mode);
       // a character drawn for the other view is in the bag: say so, instead of sending the visitor off to find one
@@ -271,12 +365,13 @@ export async function playPage(app) {
       if (missing) notes.push(el('p', { class: 'hint' }, `${missing} thing${missing === 1 ? '' : 's'} in your bag could not be found, so ${missing === 1 ? 'it is' : 'they are'} not here.`));
 
       blocks.push(el('div', { class: 'play-card' }, hud, wrap, pad, tools, copyNote, howNote, keysNote));
+      card = blocks.at(-1);
       // Under the scene: what was left out of it because it was drawn for the other view, why, and the way to see it.
       if (plan.leftOut.length) {
         blocks.push(el('section', { class: 'play-left-out', 'aria-label': 'Left out of this scene' }, el('h2', {}, 'Left out of this scene'),
           el('p', {}, leftOutNote(plan.leftOut.map((key) => byKey[key].row.name), plan.mode)),
           el('p', { class: 'play-left-out-do' },
-            el('button', { type: 'button', class: 'btn plain', onclick: () => setView(otherMode) }, `Switch to ${viewName(otherMode)}`),
+            el('button', { type: 'button', class: 'btn btn-sm btn-secondary', onclick: () => setView(otherMode) }, `Switch to ${viewName(otherMode)}`),
             el('span', { class: 'hint' }, viewReason(plan.why, plan.mode)))));
       }
       blocks.push(el('section', { class: 'play-things' }, el('h2', {}, 'In the scene'),
@@ -314,6 +409,7 @@ export async function playPage(app) {
         const want = cameraFor(level, view, world.player ?? free);
         cam = cam && !keep.paused ? { x: want.x, y: Math.abs(want.y - cam.y) < 0.5 ? want.y : cam.y + (want.y - cam.y) * Math.min(1, dt * 7) } : want;
         painter.draw(ctx, { world, view, cam, plan });
+        if (pickedByHand && chosen && world.kinds[chosen.key]) painter.mark(ctx, { world, view, cam, key: chosen.key });      // what the visitor picked is marked in the scene
         if (world.collected !== shown) { shown = world.collected; countText.textContent = String(shown); }
         if (world.player && world.player.hp !== shownHp) { shownHp = world.player.hp; healthText.textContent = `${Math.max(0, shownHp)} of ${player.hp}`; }
         for (const p of pieces) p.tick(world.time);
@@ -328,12 +424,59 @@ export async function playPage(app) {
         map: mapText,
         plan: { mode: plan.mode, modes: plan.modes, why: plan.why, leftOut: plan.leftOut, player: plan.player, tilesets: plan.tilesets, background: plan.background, scene: plan.scene, display: plan.display, board: plan.board, music: plan.music },
       });
+      // ---- a thing in the scene is clicked: it goes in the panel. And the keyboard comes back to the scene.
+      const thingAt = (wx, wy) => {
+        let best = null;
+        for (const t of world.player ? [...world.things, world.player] : world.things) {
+          if (t.state === 'gone' || t.passing) continue;
+          const k = world.kinds[t.kind], x0 = t.x - k.pivot[0], y0 = t.y - k.pivot[1] - t.lift;
+          if (wx < x0 - 2 || wx > x0 + k.size[0] + 2 || wy < y0 - 2 || wy > y0 + k.size[1] + 2) continue;
+          const d = Math.hypot(wx - (x0 + k.size[0] / 2), wy - (y0 + k.size[1] / 2));
+          if (!best || d < best.d) best = { key: t.kind, d };
+        }
+        return best ? best.key : null;
+      };
+      stage.addEventListener('pointerdown', (ev) => {
+        stage.focus({ preventScroll: true });      // the keyboard comes to the scene
+        if (!cam) return;
+        const box = stage.getBoundingClientRect();
+        const wx = cam.x + (ev.clientX - box.left) / view.zoom, wy = cam.y + (ev.clientY - box.top) / view.zoom;
+        // a thing first; else the ground, wall or platform laid there; else what is behind the scene
+        const key = thingAt(wx, wy) ?? painter.tileAt(wx, wy) ?? plan.background ?? null;
+        if (key !== null && bag.get(key)) choose(key, true);
+      });
+      // where a kind of thing is on the page now (for the browser tests): the middle of its first one, in window pixels
+      spotOf = (key) => {
+        const t = world.player && world.player.kind === key ? world.player : world.things.find((x) => x.kind === key && x.state !== 'gone' && !x.passing);
+        if (!t || !cam) return null;
+        const k = world.kinds[t.kind], box = stage.getBoundingClientRect();
+        return { x: box.left + (t.x - k.pivot[0] + k.size[0] / 2 - cam.x) * view.zoom, y: box.top + (t.y - k.pivot[1] - t.lift + k.size[1] / 2 - cam.y) * view.zoom };
+      };
+
+      // ---- a sprite was changed in the panel: it is drawn the new way from the next picture on, where it stands
+      for (const e of entries) {
+        if (!e.sprite) continue;
+        softSprite[e.key] = () => {
+          const kind = world.kinds[e.key];
+          if (kind) {
+            const fresh = kindOf(e);
+            Object.assign(kind, fresh);
+            sounds.warm(Object.values(fresh.cues).flat());
+          }
+          painter.forget(e.key);
+          for (const p of pieces) p.again();
+          if (tags[e.key]) tags[e.key]();
+          for (const [clip, c] of Object.entries(e.sprite.clips)) for (let f = 0; f < c.frames; f++) jobs.push([e.key, clip, f]);
+        };
+      }
+
       putPlayer = (x, y) => { if (!world.player) return false; Object.assign(world.player, { x, y, vx: 0, vy: 0, onGround: plan.mode === 'top' }); cam = null; return true; };
       // start once the page is in place, so the scene knows how wide it can be
       queueMicrotask(() => { if (gone) return; ro.observe(wrap); if (strip) ro.observe(strip); fit(); syncPieces(); raf = requestAnimationFrame(tick); });
     } else {
       blocks.push(el('p', { class: 'lede' }, 'Your bag has sounds but nothing to draw yet, so here they are to listen to. Add a character or a creature to see a scene.'),
         el('div', { class: 'play-tools' }, muteBtn));
+      firstKey = null;
       stateOf = () => ({ ...blankState(), music: tracks.some((t) => t.playing() || t.starting()) });
     }
 
@@ -341,8 +484,9 @@ export async function playPage(app) {
     if (plan.board.length || plan.attached.length) {
       const buttons = plan.board.map((key) => {
         const e = byKey[key];
-        const btn = el('button', { type: 'button', class: 'btn plain play-sound', 'aria-pressed': 'false' }, e.row.name);
-        const b = sounds.boardSound(e.patch, e.settings, () => btn.setAttribute('aria-pressed', String(b.playing() && !!e.patch.loop)));
+        const btn = el('button', { type: 'button', class: 'chip play-sound', 'aria-pressed': 'false' }, e.row.name);
+        softSound[key] = () => {};      // the button reads the settings each time it is pressed
+        const b = sounds.boardSound(e.patch, () => e.settings, () => btn.setAttribute('aria-pressed', String(b.playing() && !!e.patch.loop)));
         boards.push(b);
         btn.addEventListener('click', () => {
           if (!soundState.on) setMuted(false);
@@ -364,7 +508,7 @@ export async function playPage(app) {
       const musicBox = el('section', { class: 'play-music' }, el('h2', {}, 'Music'), plan.music.map((key) => {
         const e = byKey[key], patch = e.patch, name = e.row.name;
         const note = el('p', { class: 'hint', role: 'status' });
-        const btn = el('button', { type: 'button', class: 'btn', onclick: () => {
+        const btn = el('button', { type: 'button', class: 'btn btn-sm btn-secondary', onclick: () => {
           if (t.playing() || t.starting()) { t.stop(); return; }
           if (!soundState.on) setMuted(false);
           for (const other of tracks) if (other !== t) other.stop();
@@ -379,14 +523,20 @@ export async function playPage(app) {
         const t = sounds.track(patch, e.settings, sync);
         tracks.push(t);
         sync();
+        const inputs = [];
+        // the track was changed in the panel: it is heard at once, and these sliders follow
+        softSound[key] = () => { t.retune(e.settings); for (const [d, input, fill] of inputs) { input.value = toUnit(d, t.params[d.id]); fill(); } };
         const sliders = patch.params.filter((d) => !isChoice(d) && d.id !== 'key');
         const lead = ['intensity', 'bpm'].map((id) => sliders.find((d) => d.id === id)).filter(Boolean);
         const mainOnes = [...lead, ...sliders.filter((d) => !lead.includes(d))].slice(0, 3);
         return el('div', { class: 'play-track' }, el('div', { class: 'play-track-top' }, el('span', { class: 'play-name' }, name), btn),
           mainOnes.map((d) => {
             const id = `play-${key}-${d.id}`;
-            return el('div', { class: 'field' }, el('label', { for: id }, d.label),
-              el('input', { id, type: 'range', min: 0, max: 1, step: 0.005, value: toUnit(d, t.params[d.id]), oninput: (ev) => t.set(d.id, toValue(d, Number(ev.target.value))) }));
+            const input = el('input', { id, type: 'range', min: 0, max: 1, step: 0.005, value: toUnit(d, t.params[d.id]), oninput: (ev) => { t.set(d.id, toValue(d, Number(ev.target.value))); fill(); } });
+            const fill = () => input.style.setProperty('--p', `${Number(input.value) * 100}%`);
+            fill();
+            inputs.push([d, input, fill]);
+            return el('div', { class: 'field' }, el('label', { for: id }, d.label), input);
           }), note);
       }), el('p', { class: 'hint' }, 'The music starts when you first press a key or tap the scene. Mute is under the scene.'));
       blocks.push(musicBox);
@@ -409,12 +559,45 @@ export async function playPage(app) {
     }
     stops.push(() => { for (const b of boards) b.stop(); });
 
-    main.replaceChildren(
-      el('div', { class: 'play-head' }, el('h1', { class: 'small' }, 'Playground'),
-        el('p', { class: 'lede' }, 'Try the things in your bag together before you download them. Each one does what its kind does: a character is yours to move, creatures wander, pickups can be collected, sounds play when they should.')),
+    col.replaceChildren(
+      el('div', { class: 'play-head' }, el('h1', { class: 'h3' }, 'Playground'),
+        el('p', { class: 'lede' }, 'Try the things in your bag together. Click one in the scene to change it: the change is saved in your bag and the scene takes it as you go.')),
       ...blocks,
-      el('p', { class: 'play-foot' }, el('a', { class: 'btn plain', href: '#/bag' }, 'Back to your bag'), el('span', { class: 'hint' }, 'The look you set for your bag is used here too: colours, sound and music.')));
-    return { stop() { for (const s of stops) s(); }, state: () => stateOf(), put: (x, y) => putPlayer(x, y) };
+      el('p', { class: 'play-foot' }, el('a', { class: 'btn btn-secondary', href: '#/bag' }, 'Back to your bag'), el('span', { class: 'hint' }, 'The look you set for your bag is used here too: colours, sound and music.')));
+    if (card) main.classList.add('has-scene'); else main.classList.remove('has-scene');
+
+    /**
+     * The bag changed. When all that changed is the settings of things already here (what the panel does), the scene
+     * takes them as it runs and this returns true. Anything else (a thing added or taken out, another look, a sprite
+     * whose sounds are now others) returns false, and the page builds the scene again.
+     */
+    const made = { items: entries.filter((e) => !String(e.key).startsWith('guest-')).map((e) => `${e.key}:${e.row.kind}:${e.row.id}`).join(), theme: JSON.stringify(theme), missing };
+    function soft() {
+      const items = bag.items();
+      const here = items.filter((i) => byKey[i.key]);
+      if (items.length - here.length !== made.missing || here.map((i) => `${i.key}:${i.kind}:${i.id}`).join() !== made.items) return false;
+      if (JSON.stringify(normalizeTheme(bag.theme())) !== made.theme) return false;
+      for (const item of here) {
+        const e = byKey[item.key], next = item.settings ?? {};
+        if (JSON.stringify(next) === JSON.stringify(e.settings)) continue;
+        if (e.sprite) {
+          if (!softSprite[e.key]) return false;
+          const own = lookOf(next) ? themeFor(next, theme) : null;
+          const params = spriteLook(e.sprite, next.params ?? {}, own ?? theme, { record: own ? undefined : next.lookParams }).params;
+          const ids = soundIdsOf(e.sprite, next.cues ?? null, params).filter((id) => patchOf(id));
+          if (ids.join() !== (e.soundIds ?? []).join() || (next.artStyle ?? null) !== (e.settings.artStyle ?? null)) return false;      // the sound board may differ now
+          e.settings = next;
+          drawn[e.key].params = params;
+          drawn[e.key].colour = own ? own.colour : undefined;
+          softSprite[e.key]();
+        } else {
+          e.settings = next;
+          if (softSound[e.key]) softSound[e.key]();
+        }
+      }
+      return true;
+    }
+    return { stop() { for (const s of stops) s(); }, state: () => stateOf(), put: (x, y) => putPlayer(x, y), soft, first: () => firstKey, spot: (key) => spotOf(key) };
   }
 
   function blankState() {
@@ -428,16 +611,16 @@ export async function playPage(app) {
     if (missing) {
       // the bag is not empty: what is in it is no longer on the site (an old link, a renamed asset)
       return [
-        el('h1', { class: 'small' }, 'Playground'),
+        el('h1', { class: 'h3' }, 'Playground'),
         el('p', { class: 'lede' }, `${missing === 1 ? 'The one thing' : `None of the ${missing} things`} in your bag could be found on the site any more, so there is nothing to try here. Take ${missing === 1 ? 'it' : 'them'} out of your bag and add something from the catalogue.`),
-        el('p', { class: 'play-foot' }, el('a', { class: 'btn', href: '#/bag' }, 'Open your bag'), el('a', { class: 'btn plain', href: '#/' }, 'Browse everything')),
+        el('p', { class: 'play-foot' }, el('a', { class: 'btn btn-primary', href: '#/bag' }, 'Open your bag'), el('a', { class: 'btn btn-secondary', href: '#/' }, 'Browse everything')),
       ];
     }
     return [
-      el('h1', { class: 'small' }, 'Playground'),
+      el('h1', { class: 'h3' }, 'Playground'),
       el('p', { class: 'lede' }, 'Your bag is empty, so there is nothing to try yet. Put a character, some creatures, things to collect, sounds or music in your bag, then come back here to see and hear them together before you download them.'),
-      el('p', { class: 'play-foot' }, el('a', { class: 'btn', href: '#/' }, 'Browse everything'),
-        bundle ? el('a', { class: 'btn plain', href: `#/bundle/${bundle.id}` }, `Start with the ${bundle.name} set`) : null),
+      el('p', { class: 'play-foot' }, el('a', { class: 'btn btn-primary', href: '#/' }, 'Browse everything'),
+        bundle ? el('a', { class: 'btn btn-secondary', href: `#/bundle/${bundle.id}` }, `Start with the ${bundle.name} set`) : null),
     ];
   }
 
@@ -446,7 +629,11 @@ export async function playPage(app) {
   const api = {
     ready: false,
     /** The scene as plain data: mode, player, things, collected, paused, muted, the sounds that fired. */
-    state: () => (scene ? scene.state() : blankState()),
+    state: () => ({ ...(scene ? scene.state() : blankState()), chosen: chosen ? chosen.key : null }),
+    /** Put a bag item (by its key) in the editing panel, as a click on it in the scene does. */
+    choose: (key) => choose(key, true),
+    /** Where a kind of thing (a bag item's key) is on the page now: { x, y } in window pixels, or null. */
+    spot: (key) => (scene && scene.spot ? scene.spot(key) : null),
     /** Put the player somewhere in the scene (for the browser tests and for taking pictures). Returns false with no player. */
     put: (x, y) => (scene && scene.put ? scene.put(x, y) : false),
     /** Try assets that are not in the catalogue: sprite definitions or sound patches. They are treated like bag items. */
@@ -459,9 +646,11 @@ export async function playPage(app) {
   main.addEventListener('click', unfocus);
 
   await build();
-  const off = bag.onChange(() => { build(); });
+  // the bag changed: a change of settings is taken by the running scene (what the panel does); anything else builds it again
+  const off = bag.onChange(() => { if (api.ready && scene && scene.soft && scene.soft()) { look.set(bag.theme()); return; } build(); });
   return () => {
     gone = true; off();
+    closeChosen();
     soundState.on = siteSound;
     main.removeEventListener('click', unfocus);
     if (scene) scene.stop();
@@ -518,7 +707,7 @@ function displayPiece(painter, key, name, sprite, params, health) {
       if (!changed(hp + '/' + max)) return;
       const span = fillSpan(opening, w, Math.max(0, hp) / Math.max(1, max));
       wipe(g); paint(g, plan.frame, 0); paint(g, plan.fill, 0, span.x, span.w);
-    } };
+    }, again() { shown = null; } };
   }
   if (plan.kind === 'glyphs') {
     const cells = Array.from({ length: health().max }, cell);
@@ -526,7 +715,7 @@ function displayPiece(painter, key, name, sprite, params, health) {
       const { hp } = health();
       if (!changed(hp)) return;
       cells.forEach((g, i) => { wipe(g); paint(g, i < hp ? plan.full : plan.empty, 0); });
-    } };
+    }, again() { shown = null; } };
   }
   if (plan.kind === 'button') {
     const g = cell();
@@ -540,7 +729,7 @@ function displayPiece(painter, key, name, sprite, params, health) {
       const f = frameOf(clip, time);
       if (!changed(clip + ':' + f)) return;
       wipe(g); paint(g, clip, f);
-    } };
+    }, again() { shown = null; } };
   }
   // a set: every clip (none left out), each on its own canvas; the ones that move, move
   const cells = plan.clips.map((clip) => ({ clip, g: cell(), f: -1 }));
@@ -551,5 +740,5 @@ function displayPiece(painter, key, name, sprite, params, health) {
       c.f = f;
       wipe(c.g); paint(c.g, c.clip, f);
     }
-  } };
+  }, again() { for (const c of cells) c.f = -1; } };
 }

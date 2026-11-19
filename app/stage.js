@@ -3,9 +3,10 @@
 // (backdropFor): a character stands on the ground, an interface piece sits on a panel, a background is the frame.
 import { hash } from '../engine/motion.js';
 
+// The asset page offers two (docs/site-design.md, section 5): the sprite alone on the page's shelf tile, or in a scene
+// that suits it (sceneFor). 'scene' is the first, so a character stands on the ground when its page opens.
 export const STAGES = [
-  { id: 'meadow', label: 'Meadow' },
-  { id: 'cave', label: 'Cave' },
+  { id: 'scene', label: 'In a scene' },
   { id: 'plain', label: 'Plain' },
 ];
 /** Backdrops for an interface piece: a plain panel, as a menu or a game screen would sit on. */
@@ -13,6 +14,20 @@ export const PANELS = [
   { id: 'panel-light', label: 'Light panel' },
   { id: 'panel-dark', label: 'Dark panel' },
 ];
+
+/**
+ * Where a thing that stands on the ground is shown when its page opens: a character or a creature in its scene,
+ * anything else (a tileset, a prop, a pickup, an effect) plain, where it is seen best. meta: { type }.
+ */
+export const defaultStage = (meta) => (['character', 'creature'].includes(String(meta?.type ?? '')) ? 'scene' : 'plain');
+
+/** Themes whose things live under a roof or under a dark sky: their scene is the cave. Everything else stands on the meadow. */
+const INDOORS = new Set(['dungeon', 'horror', 'sci-fi', 'space']);
+/** The scene that suits a sprite, from its catalogue row or its meta ({ themes }): 'meadow' or 'cave', by its first theme. */
+export function sceneFor(meta) {
+  const first = Array.isArray(meta?.themes) ? String(meta.themes[0] ?? '') : '';
+  return INDOORS.has(first) ? 'cave' : 'meadow';
+}
 
 /**
  * What a sprite is previewed on, from its catalogue row or its meta ({ type, role }):
@@ -37,23 +52,11 @@ const mod = (a, n) => ((a % n) + n) % n;
 export function drawStage(ctx, W, H, groundY, kind, scroll = 0) {
   const s = Math.floor(scroll);
   if (kind === 'panel-light' || kind === 'panel-dark') {
-    // a plain panel with a faint grid, nothing to stand on
-    const [face, line] = kind === 'panel-light' ? ['#eef0f7', '#e1e5f0'] : ['#2b2440', '#342c4d'];
-    ctx.fillStyle = face; ctx.fillRect(0, 0, W, H);
-    ctx.fillStyle = line;
-    for (let x = 0; x < W; x += 8) ctx.fillRect(x, 0, 1, H);
-    for (let y = 0; y < H; y += 8) ctx.fillRect(0, y, W, 1);
+    // a plain panel, nothing to stand on: the page's shelf colour, or the dark of a game screen
+    ctx.fillStyle = kind === 'panel-light' ? '#f5f5f3' : '#1f1f22'; ctx.fillRect(0, 0, W, H);
     return;
   }
-  if (kind === 'plain') {
-    for (let y = 0; y < H; y += 8) for (let x = 0; x < W; x += 8) {
-      ctx.fillStyle = ((x + y) / 8) % 2 ? '#e6e9f2' : '#f4f6fb';
-      ctx.fillRect(x, y, 8, 8);
-    }
-    ctx.fillStyle = '#c3c9dc';
-    for (let x = 0; x < W; x++) if (mod(x + s, 8) < 4) ctx.fillRect(x, groundY, 1, 1);
-    return;
-  }
+  if (kind === 'plain') { ctx.clearRect(0, 0, W, H); return; }      // nothing drawn: the page's shelf tile shows through
   if (kind === 'cave') {
     ctx.fillStyle = '#2d2646'; ctx.fillRect(0, 0, W, H);
     ctx.fillStyle = '#251f3b';

@@ -14,6 +14,12 @@ const TRACK = C.music.find((a) => a.bundles.length) ?? C.music[0];
 
 const related = (page) => page.locator('main .related');
 const more = (page) => page.locator('main section.more-like');
+/** "More like this" is in the editing panel's small menu (docs/site-design.md, section 5): open it. */
+async function openMore(page, name) {
+  await page.locator('.rx-panel').getByRole('button', { name: `More for ${name}`, exact: true }).click();
+  await page.getByRole('menuitem', { name: 'More like this' }).click();
+  await expect(page.getByRole('dialog', { name: 'More like this' })).toBeVisible();
+}
 const hash = (page) => page.evaluate(() => location.hash);
 
 test('the catalogue says which sounds each sprite uses', () => {
@@ -46,14 +52,17 @@ test('a sprite page lists the sounds it uses and its bundles, each a link, and m
   for (const s of want) await expect(sounds.locator(`a[href="#/${s.kind}/${s.id}"]`)).toHaveText(s.name);
   const bundles = related(page).locator('[data-rel="bundles"]');
   if (SPRITE.bundles.length) {
-    await expect(bundles).toContainText('In these bundles');
+    await expect(bundles).toContainText('In these kits');
     for (const id of SPRITE.bundles) await expect(bundles.locator(`a[href="#/bundle/${id}"]`)).toHaveText(C.bundle(id).name);
   } else await expect(bundles).toHaveCount(0);
 
   // more like this: cards of other assets, never itself
+  await openMore(page, SPRITE.name);
   await expect(more(page).getByRole('heading', { name: 'More like this' })).toBeVisible();
   await expect.poll(() => more(page).locator('.card').count()).toBeGreaterThanOrEqual(1);
   await expect(more(page).locator(`a[href="#/sprite/${SPRITE.id}"]`)).toHaveCount(0);
+
+  await page.getByRole('dialog', { name: 'More like this' }).getByRole('button', { name: 'Close' }).click();
 
   // a sound link opens that sound's page
   await sounds.getByRole('link').first().click();
@@ -76,14 +85,17 @@ test('a sound page says which sprites use it and which bundles it is in, and sho
   await expect(users.getByRole('link')).toHaveCount(want.length);
   for (const s of want) await expect(users.locator(`a[href="#/sprite/${s.id}"]`)).toHaveText(s.name);
   const bundles = related(page).locator('[data-rel="bundles"]');
-  await expect(bundles).toContainText('In these bundles');
+  await expect(bundles).toContainText('In these kits');
   await expect(bundles.getByRole('link')).toHaveCount(SOUND.bundles.length);
   for (const id of SOUND.bundles) await expect(bundles.locator(`a[href="#/bundle/${id}"]`)).toHaveText(C.bundle(id).name);
   await expect(page.locator('main a[href^="#/kit/"]'), 'no link to an old kit address').toHaveCount(0);
 
+  await openMore(page, SOUND.name);
   await expect(more(page).getByRole('heading', { name: 'More like this' })).toBeVisible();
   await expect.poll(() => more(page).locator('.card').count()).toBeGreaterThanOrEqual(1);
   await expect(more(page).locator(`a[href="#/sound/${SOUND.id}"]`)).toHaveCount(0);
+
+  await page.getByRole('dialog', { name: 'More like this' }).getByRole('button', { name: 'Close' }).click();
 
   // a bundle link opens the bundle
   const first = C.bundle(SOUND.bundles[0]);
@@ -97,17 +109,19 @@ test('a music page says which bundles the track is in, and shows more like it', 
   await expect(page.locator('h1')).toHaveText(TRACK.name);
   const bundles = related(page).locator('[data-rel="bundles"]');
   if (TRACK.bundles.length) {
-    await expect(bundles).toContainText('In these bundles');
+    await expect(bundles).toContainText('In these kits');
     for (const id of TRACK.bundles) await expect(bundles.locator(`a[href="#/bundle/${id}"]`)).toHaveText(C.bundle(id).name);
   } else await expect(bundles).toHaveCount(0);
   await expect(page.locator('main a[href^="#/kit/"]')).toHaveCount(0);
+  await openMore(page, TRACK.name);
   await expect(more(page).getByRole('heading', { name: 'More like this' })).toBeVisible();
   await expect.poll(() => more(page).locator('.card').count()).toBeGreaterThanOrEqual(1);
   await expect(more(page).locator(`a[href="#/music/${TRACK.id}"]`)).toHaveCount(0);
 });
 
 test('a sprite in the bag is loaded only when the bag page needs it; leaving before it arrives harms nothing', async ({ page }) => {
-  await openRoute(page, '/');
+  // (from the library, which shows the build's pictures: the front page draws the kits' sprites from their own files)
+  await openRoute(page, '/browse');
   await page.evaluate(async (id) => (await import('/app/bag.js')).bag.add({ kind: 'sprite', id, settings: {} }), SPRITE.id);
   // hold the sprite's own file back until the test lets it through
   let release;
@@ -122,7 +136,7 @@ test('a sprite in the bag is loaded only when the bag page needs it; leaving bef
   await expect(row).toContainText(SPRITE.name);
   await expect(row).not.toContainText('no longer on the site');
   await expect(row.locator('canvas.tile')).toHaveCount(0);
-  await expect(row.getByRole('link', { name: 'Change' })).toHaveCount(0);
+  await expect(row.getByRole('link', { name: /^Open the page of/ })).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Download', exact: true })).toBeEnabled();
 
   // leave for another page, then let the file arrive
@@ -142,14 +156,16 @@ test('a sprite in the bag is loaded only when the bag page needs it; leaving bef
   await expect(row.locator('canvas.tile')).toHaveCount(1);
   await waitForDrawn(page);
   expect((await canvasStats(row.locator('canvas.tile'))).opaque).toBeGreaterThan(0);
-  await expect(row.getByRole('link', { name: 'Change' })).toHaveAttribute('href', new RegExp(`^#/sprite/${SPRITE.id}\\?`));
+  await expect(row.getByRole('link', { name: /^Open the page of/ })).toHaveAttribute('href', new RegExp(`^#/sprite/${SPRITE.id}\\?`));
 });
 
 test.describe('phone width', () => {
   test.use({ viewport: { width: 375, height: 800 } });
   test('asset pages with their "goes with" lines and "More like this" have no sideways scroll', async ({ page }) => {
-    for (const route of [`/sprite/${SPRITE.id}`, `/sound/${SOUND.id}`, `/music/${TRACK.id}`]) {
+    for (const [route, name] of [[`/sprite/${SPRITE.id}`, SPRITE.name], [`/sound/${SOUND.id}`, SOUND.name], [`/music/${TRACK.id}`, TRACK.name]]) {
       await openRoute(page, route);
+      expect(await hasHorizontalScroll(page), route).toBe(false);
+      await openMore(page, name);
       await expect.poll(() => more(page).locator('.card').count()).toBeGreaterThanOrEqual(1);
       expect(await hasHorizontalScroll(page), route).toBe(false);
     }

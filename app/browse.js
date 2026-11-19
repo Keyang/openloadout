@@ -1,6 +1,6 @@
-// Finding things: what sits behind the results view (app/home.js) and anything else that lists assets.
+// Finding things: what sits behind the library (app/library-page.js) and anything else that lists assets.
 //
-//   the address bar     stateFromQuery, queryFromState, hashFromState, sameState
+//   the address bar     stateFromQuery, queryFromState, hashFromState, sameState   (the Kits tab and the sort: app/library-state.js)
 //   filters             FILTER_GROUPS, filtersFor, viewCounts, optionsFor, roleTree, activeFilters
 //   the style that stays  createStyleMemory, styleMemory   ("View" and "Game type" are remembered across visits)
 //   results             pickResults, resultLine, shelfTitle
@@ -429,10 +429,9 @@ export const finder = {
  */
 export function similarAssets(id, { count = 6, title = 'More like this' } = {}) {
   const heading = document.createElement('h2');
-  heading.className = 'shelf';
   heading.textContent = title;
   const list = document.createElement('ul');
-  list.className = 'gallery similar-list';
+  list.className = 'card-grid similar-list';          // the grid cards sit in on any page (app/css/library.css)
   const box = document.createElement('section');
   box.className = 'similar';
   box.hidden = true;

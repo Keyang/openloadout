@@ -17,7 +17,7 @@ test.beforeAll(() => {
 // a sprite from the catalogue as it is today (any will do; the last one, so nothing depends on what comes first)
 const aSprite = () => JSON.parse(fs.readFileSync(new URL('generated/catalog.json', ROOT), 'utf8')).assets.filter((a) => a.kind === 'sprite').at(-1).id;
 const PAGES = [
-  ['home', () => '/', 'ul.results > li'],
+  ['home', () => '/', 'main.landing h1'],
   ['results', () => '/browse?kind=sprite', 'ul.results > li'],
   ['a sprite page', () => `/sprite/${aSprite()}`, 'canvas.stage'],
   ['the playground', () => '/play', 'main'],
@@ -48,7 +48,7 @@ test('the two typefaces are served by the site itself and really load', async ({
   const asked = [];
   page.on('request', (r) => asked.push(new URL(r.url()).pathname));
   await page.goto('/index.html#/');
-  await page.locator('ul.results > li').first().waitFor();
+  await page.locator('main.landing h1').first().waitFor();
   await page.evaluate(() => document.fonts.ready);
   expect(asked).toContain('/vendor/fonts/fonts.css');
   const fonts = asked.filter((p) => p.startsWith('/vendor/fonts/') && p.endsWith('.woff2'));

@@ -5,6 +5,7 @@
 import { defaultTheme, normalizeTheme } from '../../engine/theme.js';
 import { applySound, themedSoundParams, soundSettingsFor } from '../../sound/theme.js';
 import { soundParams, rendered, renderAsync, playRendered, playLive } from '../audio.js';
+import { lookOf, themeFor } from '../bag.js';      // a bag item may wear a look of its own instead of the bag's
 
 /**
  * theme: the bag's look. patchOf(id): a sound's patch, or undefined when it is not known.
@@ -17,11 +18,15 @@ export function createSounds({ theme, patchOf }) {
   let gone = false;
 
   /** A sound effect rendered with its settings and the bag's look. Made once and kept. */
-  function themed(patch, params, seed) {
-    const key = patch.id + '|' + seed + '|' + patch.params.map((d) => params[d.id]).join(',');
+  // own: the id of the item's own look, when it has one (then that look is used, not the bag's)
+  const plain = JSON.stringify(defaultTheme());
+  const lookFor = (settings) => (lookOf(settings) ? themeFor(settings, t) : t);
+  function themed(patch, params, seed, own = null) {
+    const th = own ? themeFor({ look: own }, t) : t, asMade = own ? JSON.stringify(th) === plain : neutral;
+    const key = patch.id + '|' + seed + '|' + (own ?? '') + '|' + patch.params.map((d) => params[d.id]).join(',');
     let r = made.get(key);
     if (!r) {
-      r = neutral ? rendered(patch, params, seed) : applySound(rendered(patch, themedSoundParams(patch, params, t), seed), soundSettingsFor(patch, t));
+      r = asMade ? rendered(patch, params, seed) : applySound(rendered(patch, themedSoundParams(patch, params, th), seed), soundSettingsFor(patch, th));
       made.set(key, r);
     }
     return r;
@@ -75,14 +80,16 @@ export function createSounds({ theme, patchOf }) {
 
   /** A sound from the bag with its own settings. Returns { play() -> true while it is sounding, stop(), playing() }. */
   function boardSound(patch, settings, onChange = () => {}) {
-    const params = soundParams(patch, settings?.style, settings?.params);
+    // settings may be a function: asked each time the sound is played, so a change made while the scene runs is heard
+    const now = () => (typeof settings === 'function' ? settings() : settings);
     let handle = null;
     const api = {
       playing: () => !!handle,
       stop() { if (handle) { handle.stop(); handle = null; onChange(); } },
       play() {
         if (handle && patch.loop) { api.stop(); return false; }
-        const h = playRendered(themed(patch, params, settings?.seed ?? 1), { force: true, loop: !!patch.loop, onended: () => { if (handle === h) { handle = null; onChange(); } } });
+        const st = now();
+        const h = playRendered(themed(patch, soundParams(patch, st?.style, st?.params), st?.seed ?? 1, lookOf(st)), { force: true, loop: !!patch.loop, onended: () => { if (handle === h) { handle = null; onChange(); } } });
         handle = h;
         onChange();
         return !!h;
@@ -95,10 +102,17 @@ export function createSounds({ theme, patchOf }) {
 
   /** A music track from the bag. Returns { params, start() (a promise), stop(), set(id, value), playing(), starting() }. */
   function track(patch, settings, onChange = () => {}) {
-    const params = themedSoundParams(patch, soundParams(patch, settings?.style, settings?.params), t);
+    const params = themedSoundParams(patch, soundParams(patch, settings?.style, settings?.params), lookFor(settings));
     let voice = null, starting = false, note = '';
     const api = {
       params,
+      /** The track's settings changed in the bag: take them, heard at once while it plays. Returns the ids that changed. */
+      retune(next) {
+        const fresh = themedSoundParams(patch, soundParams(patch, next?.style, next?.params), lookFor(next));
+        const changed = Object.keys(fresh).filter((id) => fresh[id] !== params[id]);
+        for (const id of changed) api.set(id, fresh[id]);
+        return changed;
+      },
       playing: () => !!voice,
       starting: () => starting,
       note: () => note,
