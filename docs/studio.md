@@ -22,7 +22,8 @@ All three are JSON (no functions, no `undefined`, numbers finite). Angles are **
 |---|---|---|
 | `format`, `version` | `"loadout-rig"`, `1` | |
 | `id`, `name` | id, text ≤ 60 | "Newt" |
-| `view` | `side` \| `front` \| `none` | Side faces right, as every side-view sprite (style guide 1). Top-down direction rigs are not in version 1 (section 9, Q4) |
+| `view` | `side` \| `front` \| `top-down` \| `none` | Side faces right, as every side-view sprite (style guide 1). Top-down rigs are in version 1 (section 9, Q4): see `directions` |
+| `directions` | Top-down only, optional: `{ down?, up?, side? }` | A top-down rig (view "top-down") has an optional `directions` object with an overlay for any of down, up and side: `{ bones: { id: { angle, at (roots only), length, from (children only) } }, shapes: { id: { z, far, hidden, shade, light, plus the kind's geometry: width \| from, to, r, offset \| at, r \| points \| at, size } } }`. An overlay re-poses and re-proportions the same bones and shapes for that view; a direction without one draws the rig as written. Clips are named `<action>_<down\|up\|side>` (at most 40 characters), each with key poses in that direction's rig; a clip with no direction (hurt, die) faces down; side faces right. Numbers are clamped as the rig's own, and each direction as overlaid gets the rig's checks too. A rig that is not top-down has its `directions` dropped (a warning); direction clip names and meta view "top-down" need a top-down body (`catalog/studio-schema.js`) |
 | `size` | `[w, h]` | Frame size: one of the style guide's frame sizes (section 1, "Frame sizes") |
 | `colours` | list ≤ 8 of `{ id, label, default, material?, detail? }` | Colour slots. Shapes paint with a slot id, never a hex. `material` is an id of `engine/materials.js` (Contract 7). `detail: true` = eyes, teeth: no control, drawn flat |
 | `bones` | list ≤ 48 of bone | A tree. Order = parents before children |
@@ -56,10 +57,10 @@ Worked example (trimmed: the back legs mirror the front ones with `far: true`):
   "colours": [ { "id": "skin", "label": "Skin", "default": "#4f9d57", "material": "skin" },
                { "id": "belly", "label": "Belly", "default": "#e6c545", "material": "skin" },
                { "id": "eye", "label": "Eyes", "default": "#231b33", "detail": true } ],
-  "bones": [ { "id": "body", "parent": null, "at": [20, 36], "angle": 90, "length": 12 },
+  "bones": [ { "id": "body", "parent": null, "at": [22, 36], "angle": 90, "length": 12 },
              { "id": "head", "parent": "body", "angle": 0, "length": 7, "min": -30, "max": 30 },
-             { "id": "tail1", "parent": "body", "from": 0, "angle": 180, "length": 7, "min": -45, "max": 45 },
-             { "id": "tail2", "parent": "tail1", "angle": 0, "length": 6, "min": -60, "max": 60 },
+             { "id": "tail1", "parent": "body", "from": 0, "angle": 180, "length": 6, "min": -45, "max": 45 },
+             { "id": "tail2", "parent": "tail1", "angle": 0, "length": 5, "min": -60, "max": 60 },
              { "id": "thighF", "parent": "body", "from": 0.8, "angle": -90, "length": 4 },
              { "id": "shinF", "parent": "thighF", "angle": 20, "length": 3 } ],
   "shapes": [ { "id": "torso", "bone": "body", "kind": "capsule", "from": 0, "to": 1, "r": [4, 3.5], "paint": "skin", "z": 10, "group": "body" },
@@ -80,7 +81,7 @@ Worked example (trimmed: the back legs mirror the front ones with `far: true`):
 |---|---|
 | `label` | The everyday name shown ("Bite" for `attack`, style guide 4) |
 | `frames` | 1..64 (`LIMITS.framesPerClip` in `app/api-source.js`) |
-| `fps` | Frames per second at the middle speed, 1..30. The sprite's standard `speed` control scales it by `lerp(0.65, 1.45, speed)` as every catalogue clip does |
+| `fps` | 1..30. Frames per second at speed 0.5 is fps x 1.05; the standard `speed` control scales it by `lerp(0.65, 1.45, speed)`, as every catalogue clip does. Without a speed control the clip plays at fps (`engine/data-sprite.js`; bone rigs and library bodies alike) |
 | `loop` | true / false. Phase is `frame / frames` for a loop and `frame / (frames - 1)` for a one-shot, exactly as `engine/sprite.js` (`phase`) does |
 | `keys` | List ≤ 64 of key poses, sorted by `t` |
 | `frameEdits` | `{ "<frame>": { nudge: [dx, dy], show: [shape ids], hide: [...], flash: true } }`: adjustments to one frame after blending. `nudge` is whole pixels; `flash` tints white before the outline (style guide: `hurt` and `die` frame 0) |
@@ -296,7 +297,8 @@ Every item: tests first (`tests/unit/<area>-*.test.mjs`, `tests/e2e/<area>.spec.
 | S2 ★ | Key blender | `rigs/keypose.js` | `keypose-*.test.mjs`: per-track blending, five eases, loop closure, stepped flags, `t` at frame phases equals `engine/sprite.js` phase | — | S1, S3 |
 | S3 ★ | Bone renderer | `rigs/bones.js` | `bones-*.test.mjs`: FK, IK (equals `motion.ik2`), limits, every shape kind, groups as one blob, details unturned, outline and glow order, deterministic, a 360° turn stays clean (no pixel outside the shape's own ring), maximal definition under 50 ms a frame | — | S1, S2 |
 | S4 ★ | `dataSprite` | `engine/data-sprite.js` | `data-sprite-*.test.mjs`: newt → `defineSprite` result; `renderSheet` and `describeSheet` work; controls, parts, sounds, sockets map as in 2.3; `checkSprite` runs | S1–S3 | S5 |
-| S5 ★ | Templates | `rigs/studio-templates.js` (Two legs, Four legs, Crawler, Flyer, Blob, Blank, each with idle, walk, attack, hurt, die keyed) | `studio-templates.test.mjs`: each validates and renders every frame non-empty; contacts on 0 and 4 | S1, S3 | S4 |
+| S4b | Join the pieces | `engine/data-sprite.js` (library bodies drawn through `rigs/humanoid-studio.js drawSprite` / `spriteSockets`), `catalog/studio-schema.js` (absorbs the top-down format S4 introduced: view `top-down`, `directions`, clip names `<action>_<down\|up\|side>`; exports its plain-copy wall as `plainStudioData`, so `validateDataSprite` is `validateStudioSprite` with its messages capped), the newt fixture | `data-sprite-library.test.mjs` (the Hero preset as a sprite: controls, clips, every frame equals `drawSprite`, equals `knight.js` at the defaults, sockets, sheet), `data-sprite-bar.test.mjs` (newt, beetle, every template and the Hero pass `checkSprite` with no errors), `studio-schema-topdown.test.mjs` | S1, S4, S5, S6 | S7–S11 |
+| S5 ★ | Templates | `rigs/studio-templates.js` (Two legs, Four legs, Crawler, Flyer, Blob, Blank, each with idle, walk, attack, hurt, die keyed; and top-down templates, Top-down person and Top-down beast: one rig with down and up overlays plus idle_, walk_ and attack_ in each direction, modelled on `tests/fixtures/data-sprite/beetle-topdown.json`) | `studio-templates.test.mjs`: each validates and renders every frame non-empty; contacts on 0 and 4 | S1, S3 | S4 |
 | S6 | Hero and library bodies | `rigs/humanoid-studio.js` (Hero preset, cape and headgear moved in as new exports, `bake`), `poseFields` added to `rigs/humanoid-describe.js`, the seam in `rigs/humanoid-figure.js` | `humanoid-studio-*.test.mjs`: no `keys` = byte-identical for rogue-battler and road-bandit; baked clip = same frames; Hero preset ≤ 2% pixels off `knight.js`; describe tests still pass | S2 | S1–S5 (coordinate the two rig files with their owners) |
 | S7 ★ | Library file form | `tools/lib/data-file.mjs`, a check in the build | `data-file.test.mjs`: write → read back equal; a file with extra code is refused; e2e: a generated newt file dropped in `sprites/` is found and reaches the zip (as `newasset.spec.mjs`) | S4 | S8 |
 | S8 ★ | Bag, catalogue, export, playground | `app/bag.js`, `app/catalog.js`, `app/bundle.js` (small additions) | `bag-data-*.test.mjs` (clean, link round trip, deflate, over-limit message), `studio-bag.spec.mjs` (bag → play → zip with `<id>.js`, link opens on another profile) | S4 | S7, S9 |

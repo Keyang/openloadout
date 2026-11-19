@@ -302,12 +302,11 @@ test('data-sprite: makeDataSprite never throws: { ok, errors, warnings, sprite }
   }
 });
 
-test('data-sprite: a library body (the side-view person) errors clearly until studio item S6 lands', () => {
+test('data-sprite: a library body (the side-view person) is drawn since S4b (tests/unit/data-sprite-library.test.mjs)', () => {
   const hero = load('waving-hero');
   const v = DS.validateDataSprite(hero);
   assert.equal(v.ok, true, v.errors.join('\n'));
   const r = DS.makeDataSprite(hero);
-  assert.equal(r.ok, false);
-  assert.match(r.errors.join('\n'), /library body "humanoid".*not drawn yet/i);
-  assert.throws(() => DS.dataSprite(hero), /library body "humanoid".*not drawn yet/i);
+  assert.equal(r.ok, true, r.errors.join('\n'));
+  assert.equal(DS.dataSprite(hero).id, 'waving-hero');
 });

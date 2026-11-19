@@ -51,9 +51,9 @@ test('name: text of 1 to 60 characters', () => {
   assert.equal(passes({ ...newtRig(), name: '  Newt  ' }).value.name, 'Newt');
 });
 
-test('view: side, front or none; top-down is not in version 1', () => {
+test('view: side, front, top-down or none (top-down is in version 1 since S4b: studio.md section 9, Q4)', () => {
   for (const v of ['side', 'front', 'none']) passes({ ...newtRig(), view: v });
-  rejects({ ...newtRig(), view: 'top-down' }, 'top-down');
+  warns({ ...newtRig(), view: 'top-down' }, 'no directions');
   rejects({ ...newtRig(), view: 'back' }, 'view');
 });
 

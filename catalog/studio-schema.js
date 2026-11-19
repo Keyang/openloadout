@@ -14,6 +14,22 @@
 //   - text is returned as given (trimmed), never escaped or interpreted: the page shows it with textContent only.
 //     Control and invisible characters are refused.
 //
+// The wall alone (plain data, the caps, no getter ever run) is exported as plainStudioData() for code that reads a
+// definition before it checks it (the bag, links, window.loadout).
+//
+// TOP-DOWN BODIES (docs/studio.md 2.1; section 9, Q4: in version 1; Contract 2: one clip per direction). Moved here
+// from engine/data-sprite.js (studio item S4b), which now passes every definition straight to this file:
+//   - ONE rig with `view: "top-down"` and an optional `directions` object: an overlay per direction, any of "down",
+//     "up", "side", each { bones: { id: { angle, at (roots only), length, from (children only) } }, shapes: { id: { z,
+//     far, hidden, shade, light, and the shape's own geometry: width | from, to, r, offset | at, r | points | at,
+//     size } } }. An overlay re-poses and re-proportions the SAME bones and shapes for that view; a direction without
+//     one draws the rig as written. Each direction as overlaid also gets the rig's checks (only what the rig as
+//     written does not already say is reported, as "rig facing <direction>").
+//   - Clips are named `<action>_<down|up|side>` (walk_down, idle_side, ...), at most 40 characters, each with key
+//     poses in that direction's rig; a clip with no direction (hurt, die) faces down; side faces right (games mirror
+//     it). The style guide's advice applies to the action. Direction names, `directions` and meta view "top-down" need
+//     a top-down body.
+//
 // Every function returns { ok, errors, warnings, value } and never throws. errors block drawing and the bag; warnings are
 // advice (or say what was cleaned). value is the cleaned copy (plain JSON) when ok, else null.
 // Pure JavaScript with no page, worker or Node in it: the site, the build and the tests all import this file.
@@ -109,8 +125,49 @@ export const SHAPE_KINDS = Object.freeze(['limb', 'capsule', 'ellipse', 'poly', 
 /** Attach-point names of Contract 3, for a point that is one of them. */
 export const SOCKET_NAMES = Object.freeze(['hand', 'offhand', 'head', 'back', 'feet', 'muzzle', 'tip']);
 
-/** The views a studio body may have in version 1 (top-down is later: docs/studio.md, Q4). */
-export const STUDIO_VIEWS = Object.freeze(['side', 'front', 'none']);
+/** The views a studio body may have in version 1 (top-down since studio item S4b: docs/studio.md, Q4). */
+export const STUDIO_VIEWS = Object.freeze(['side', 'front', 'top-down', 'none']);
+
+/** The three drawn directions of a top-down body, in clip order (Contract 2; side faces right, games mirror it). */
+export const TOPDOWN_DIRECTIONS = Object.freeze(['down', 'up', 'side']);
+
+/** What a direction overlay may change on a bone, and on a shape of each kind (besides z, far, hidden, shade, light). */
+export const DIRECTION_FIELDS = Object.freeze({
+  bone: Object.freeze(['angle', 'at', 'length', 'from']),
+  shape: Object.freeze(['z', 'far', 'hidden', 'shade', 'light']),
+  kinds: Object.freeze({ limb: Object.freeze(['width']), capsule: Object.freeze(['from', 'to', 'r', 'offset']), ellipse: Object.freeze(['at', 'r']), poly: Object.freeze(['points']), dot: Object.freeze(['at', 'size']) }),
+});
+
+const DIR_CLIP_RE = /^(.+)_(down|up|side)$/;
+
+/** Which way a clip of a top-down sprite faces, from its name: 'down', 'up' or 'side'; a name with no direction ('hurt') is 'down'. Arguments: name (a clip name). */
+export function directionOf(name) {
+  const m = DIR_CLIP_RE.exec(String(name));
+  return m ? m[2] : 'down';
+}
+
+/**
+ * A top-down rig as seen from one direction: a copy of the rig with that direction's overlay applied (bones re-posed,
+ * shapes re-ordered, shown or hidden, re-proportioned) and no `directions` field. Any other rig, or a direction with
+ * no overlay, comes back as a plain copy. Arguments: rig (a loadout-rig, cleaned), direction ('down', 'up' or 'side').
+ */
+export function directionRig(rig, direction) {
+  const out = JSON.parse(JSON.stringify(rig ?? {}));
+  const over = isObj(out.directions) && TOPDOWN_DIRECTIONS.includes(direction) && Object.hasOwn(out.directions, direction) ? out.directions[direction] : null;
+  delete out.directions;
+  if (!isObj(over)) return out;
+  const patch = (items, changes, allowed) => {
+    if (!Array.isArray(items) || !isObj(changes)) return;
+    for (const item of items) {
+      const c = item && Object.hasOwn(changes, item.id) ? changes[item.id] : null;
+      if (!isObj(c)) continue;
+      for (const k of allowed(item)) if (Object.hasOwn(c, k)) item[k] = c[k];
+    }
+  };
+  patch(out.bones, over.bones, () => DIRECTION_FIELDS.bone);
+  patch(out.shapes, over.shapes, (s) => [...DIRECTION_FIELDS.shape, ...(DIRECTION_FIELDS.kinds[s.kind] ?? [])]);
+  return out;
+}
 
 /** The library bodies a definition may name; each has a renderer in the framework. */
 export const LIBRARY_BODIES = Object.freeze(['humanoid']);
@@ -192,6 +249,8 @@ function say(v) {
 }
 const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 const listOf = (xs) => xs.join(', ');
+// a list of names in a message: the first 8 and "and N more", so a definition full of junk cannot make a huge message
+const someOf = (names, n = 8) => (names.length > n ? `${names.slice(0, n).join(', ')} and ${names.length - n} more` : names.join(', '));
 const round = (n) => Math.round(n * 1e6) / 1e6;
 
 function context(opts = {}) {
@@ -212,7 +271,7 @@ const asSet = (v) => {
 /** Drops the fields of o that are not in `allowed`, with one warning naming them. */
 function knownOnly(C, place, o, allowed) {
   const extra = Object.keys(o).filter((k) => !allowed.includes(k));
-  if (extra.length) C.warn(`${place}: dropped what this format does not know: ${listOf(extra)}`);
+  if (extra.length) C.warn(`${place}: dropped what this format does not know: ${someOf(extra)}`);
 }
 
 /** A number in [lo, hi]: refused when not a number, clamped (with a warning) when outside. Returns undefined when refused or absent. */
@@ -352,15 +411,26 @@ export function parseStudioJson(textIn) {
   }
 }
 
-/** A plain-data copy of v: refuses code, getters, class instances, loops of objects, too deep or too big; drops prototype keys. */
+/**
+ * A plain-data copy of v, taken once, reading every field through its descriptor so no getter runs (and a Proxy's get
+ * trap never runs; its ownKeys, getPrototypeOf and getOwnPropertyDescriptor traps do, once, and nothing of it is kept).
+ * Refuses functions, getters, class instances (named without running code), loops of objects, holes and undefined in
+ * lists, nesting over 20, more than 40,000 values and more than 64 KB of text; drops prototype keys. Stops early once a
+ * cap is passed. (The walk engine/data-sprite.js had for the top-down overlay, moved here with it in studio item S4b.)
+ */
 function plainCopy(C, v) {
-  let nodes = 0, removed = 0, stopped = false;
+  let nodes = 0, chars = 0, removed = 0, stopped = false;
   const stack = new Set();
   const fail = (path, m) => { if (!stopped) C.err(`${path || 'The definition'}: ${m}`); };
   const walk = (x, path, depth) => {
     if (stopped) return undefined;
     if (++nodes > L.nodes) { fail('', `holds more than ${L.nodes.toLocaleString('en')} values; it cannot fit in 64 KB`); stopped = true; return undefined; }
-    if (x === null || typeof x === 'string' || typeof x === 'boolean') return x;
+    if (typeof x === 'string') {
+      chars += x.length;
+      if (chars > L.jsonBytes) { fail('', 'is more than 64 KB of text; the most is 64 KB'); stopped = true; return undefined; }
+      return x;
+    }
+    if (x === null || typeof x === 'boolean') return x;
     if (typeof x === 'number') { if (!Number.isFinite(x)) fail(path, `numbers must be finite; got ${String(x)}`); return x; }
     if (typeof x === 'function') { fail(path, 'is code (a function); a definition holds data only'); return undefined; }
     if (typeof x !== 'object') { fail(path, `is ${typeof x === 'undefined' ? 'missing (undefined)' : `a ${typeof x}`}, not plain data`); return undefined; }
@@ -369,26 +439,34 @@ function plainCopy(C, v) {
     stack.add(x);
     try {
       if (Array.isArray(x)) {
-        const n = x.length;
+        const d0 = Object.getOwnPropertyDescriptor(x, 'length');
+        const n = d0 && 'value' in d0 ? d0.value : 0;
         if (n > L.nodes) { fail(path, `is a list of ${n} entries; it cannot fit in 64 KB`); stopped = true; return undefined; }
         const out = new Array(n);
-        for (let i = 0; i < n; i++) {
+        for (let i = 0; i < n && !stopped; i++) {
           const d = Object.getOwnPropertyDescriptor(x, i);
-          if (!d || 'get' in d || 'set' in d) { fail(`${path}[${i}]`, d ? 'is worked out by code (a getter); a definition holds data only' : 'is missing (an empty place in a list)'); continue; }
+          if (!d || !('value' in d)) { fail(`${path}[${i}]`, d ? 'is worked out by code (a getter); a definition holds data only' : 'is missing (an empty place in a list)'); continue; }
           if (d.value === undefined) { fail(`${path}[${i}]`, 'is missing (undefined); a list holds data only'); continue; }
           out[i] = walk(d.value, `${path}[${i}]`, depth + 1);
         }
         return out;
       }
       const proto = Object.getPrototypeOf(x);
-      if (proto !== Object.prototype && proto !== null) { fail(path, `is a ${proto?.constructor?.name ?? 'special object'}, not plain data (an object of fields)`); return undefined; }
+      if (proto !== Object.prototype && proto !== null) {
+        let name = 'special object';
+        try { const d = proto && Object.getOwnPropertyDescriptor(proto, 'constructor'); const f = d && 'value' in d ? d.value : null; const nd = typeof f === 'function' ? Object.getOwnPropertyDescriptor(f, 'name') : null; if (nd && typeof nd.value === 'string') name = nd.value.slice(0, 40); } catch { /* keep the plain words */ }
+        fail(path, `is a ${name}, not plain data (an object of fields)`);
+        return undefined;
+      }
       const out = {};
       for (const k of Object.keys(x)) {
+        if (stopped) break;
         if (PROTO_KEYS.has(k)) { removed++; continue; }
         const d = Object.getOwnPropertyDescriptor(x, k);
         if (!d) continue;
-        if ('get' in d || 'set' in d) { fail(path ? `${path}.${k}` : k, 'is worked out by code (a getter); a definition holds data only'); continue; }
+        if (!('value' in d)) { fail(path ? `${path}.${k}` : k, 'is worked out by code (a getter); a definition holds data only'); continue; }
         if (d.value === undefined) continue;                     // as JSON would: an undefined field is absent
+        chars += k.length;
         out[k] = walk(d.value, path ? `${path}.${k}` : k, depth + 1);
       }
       return out;
@@ -419,6 +497,23 @@ function prepare(C, input) {
   return v;
 }
 
+/**
+ * The wall of Contract 14 rule 6 alone, for code that must read a definition before checking it: JSON text (read as
+ * parseStudioJson reads it) or an object in, a plain-data copy out, with every rule of plainCopy above and the 64 KB cap
+ * on the copy as JSON. Nothing in the input runs. Returns { ok, errors, warnings, value } (value: the copy, or null).
+ * Arguments: input (a definition, as an object or as JSON text).
+ */
+export function plainStudioData(input) {
+  const C = context();
+  try {
+    const v = prepare(C, input);
+    return result(C, C.errors.length ? null : v);
+  } catch (e) {
+    C.err(`The definition could not be read: ${String(e?.message ?? e).slice(0, 120)}`);
+    return result(C, null);
+  }
+}
+
 function header(C, place, d, format) {
   if (d.format !== format) {
     C.err(`${place}: format must be "${format}"${typeof d.format === 'string' ? `; got ${q(d.format)}` : ''}`);
@@ -432,7 +527,7 @@ function header(C, place, d, format) {
 
 // ---- the rig ------------------------------------------------------------------------------------------------------
 
-const RIG_FIELDS = ['format', 'version', 'id', 'name', 'view', 'size', 'colours', 'bones', 'shapes', 'ik', 'points'];
+const RIG_FIELDS = ['format', 'version', 'id', 'name', 'view', 'size', 'colours', 'bones', 'shapes', 'ik', 'points', 'directions'];
 const COLOUR_FIELDS = ['id', 'label', 'default', 'material', 'detail'];
 const BONE_FIELDS = ['id', 'parent', 'at', 'from', 'angle', 'length', 'min', 'max', 'label'];
 const SHAPE_FIELDS = ['id', 'bone', 'kind', 'paint', 'z', 'group', 'far', 'shade', 'light', 'glow', 'hidden', 'part'];
@@ -451,8 +546,8 @@ function checkRig(C, r, pre = '') {
   const out = { format: 'loadout-rig', version: 1 };
   out.id = idOf(C, where, r.id, { pattern: SPRITE_ID_PATTERN });
   out.name = text(C, where, 'name', r.name, L.nameChars, { need: true });
-  if (r.view === 'top-down') C.err(`${where}: view "top-down" is not in version 1 of the studio; use side, front or none`);
-  else if (!STUDIO_VIEWS.includes(r.view)) C.err(`${where}: view must be one of ${listOf(STUDIO_VIEWS)}; got ${say(r.view)}`);
+  const errorsBefore = C.errors.length;
+  if (!STUDIO_VIEWS.includes(r.view)) C.err(`${where}: view must be one of ${listOf(STUDIO_VIEWS)}; got ${say(r.view)}`);
   out.view = r.view;
   let W = L.frameWidth, H = L.frameHeight;
   if (!Array.isArray(r.size) || r.size.length !== 2) C.err(`${where}: size must be [width, height], one of the style guide's frame sizes: ${listOf(FRAME_SIZES.map(sizeName))}; got ${say(r.size)}`);
@@ -680,7 +775,119 @@ function checkRig(C, r, pre = '') {
     out.points.push(o);
   });
 
+  // a top-down body's direction overlays (its checks between fields too, once the rig as written is sound)
+  if (out.view === 'top-down') {
+    const dirs = checkDirections(C, where, r.directions, { W, H, bones, shapes });
+    if (dirs !== undefined) {
+      out.directions = dirs;
+      if (C.errors.length === errorsBefore) checkOverlaid(C, where, out);
+    }
+  } else if (r.directions !== undefined) {
+    C.warn(`${where}: directions are for a top-down body (view "top-down"); this one is seen from ${say(r.view)}, so they were dropped`);
+  }
+
   return { rig: out, facts: { W, H, slots, bones, shapes, ik, chainOf, points, view: out.view } };
+}
+
+/**
+ * Checks a top-down rig's `directions` (an overlay per direction: what changes on which bone and shape) against the
+ * cleaned rig (bones and shapes by id, frame W by H): numbers clamped as the rig's own, unknown fields dropped. Returns
+ * the cleaned overlays, or undefined when there are none (a warning) or they are not an object (an error).
+ */
+function checkDirections(C, where, raw, { W, H, bones, shapes }) {
+  const at = `${where} directions`, P = Math.max(W, H);
+  if (raw === undefined) { C.warn(`${at}: a top-down body has no directions, so down, up and side draw the same body; give down and up their own pose`); return undefined; }
+  if (!isObj(raw)) { C.err(`${at}: must be an object of direction: { bones, shapes }; got ${say(raw)}`); return undefined; }
+  const out = {};
+  for (const dir of Object.keys(raw)) {
+    if (!TOPDOWN_DIRECTIONS.includes(dir)) { C.err(`${at}: ${q(dir)} is not a direction; use down, up, side (a game mirrors side for left)`); continue; }
+    const o = raw[dir], place0 = `${at}, ${dir}`;
+    if (!isObj(o)) { C.err(`${place0}: must be an object with bones and shapes; got ${say(o)}`); continue; }
+    const extra = Object.keys(o).filter((k) => k !== 'bones' && k !== 'shapes');
+    if (extra.length) C.warn(`${place0}: dropped what a direction does not know: ${someOf(extra)}`);
+    const d = {};
+    if (o.bones !== undefined) {
+      if (!isObj(o.bones)) C.err(`${place0}: bones must be an object of bone id: changes; got ${say(o.bones)}`);
+      else for (const id of Object.keys(o.bones)) {
+        const place = `${place0}, bone ${q(id)}`;
+        const b = bones.get(id);
+        if (!b) { C.err(`${place0}: ${q(id)} is not a bone of this body`); continue; }
+        const v = o.bones[id];
+        if (!isObj(v)) { C.err(`${place}: must be an object with ${listOf(DIRECTION_FIELDS.bone)}; got ${say(v)}`); continue; }
+        const unknown = Object.keys(v).filter((k) => !DIRECTION_FIELDS.bone.includes(k));
+        if (unknown.length) C.warn(`${place}: dropped what a direction does not know: ${someOf(unknown)}`);
+        const x = {};
+        const a = num(C, place, 'angle', v.angle, -L.angle, L.angle);
+        if (a !== undefined) x.angle = a;
+        const l = num(C, place, 'length', v.length, 1, P);
+        if (l !== undefined) x.length = l;
+        if (v.at !== undefined) {
+          // a root's place, clamped per axis as the rig's own (x to [-W, 2W], y to [-H, 2H])
+          if (b.parent !== null) C.warn(`${place}: at is only for a bone with no parent (a root); dropped`);
+          else { const p = pair(C, place, 'at', v.at, [-W, 2 * W], [-H, 2 * H]); if (p) x.at = p; }
+        }
+        if (v.from !== undefined) {
+          if (b.parent === null) C.warn(`${place}: from is only for a bone that hangs from another; dropped`);
+          else { const f = num(C, place, 'from', v.from, 0, 1); if (f !== undefined) x.from = f; }
+        }
+        if (Object.keys(x).length) (d.bones ??= {})[id] = x;
+      }
+    }
+    if (o.shapes !== undefined) {
+      if (!isObj(o.shapes)) C.err(`${place0}: shapes must be an object of shape id: changes; got ${say(o.shapes)}`);
+      else for (const id of Object.keys(o.shapes)) {
+        const place = `${place0}, shape ${q(id)}`;
+        const s = shapes.get(id);
+        if (!s) { C.err(`${place0}: ${q(id)} is not a shape of this body`); continue; }
+        const v = o.shapes[id];
+        if (!isObj(v)) { C.err(`${place}: must be an object of what changes facing ${dir}; got ${say(v)}`); continue; }
+        const allowed = [...DIRECTION_FIELDS.shape, ...(DIRECTION_FIELDS.kinds[s.kind] ?? [])];
+        const unknown = Object.keys(v).filter((k) => !allowed.includes(k));
+        if (unknown.length) C.warn(`${place}: dropped what a direction cannot change on a ${s.kind}: ${someOf(unknown)}`);
+        const x = {};
+        for (const k of Object.keys(v)) {
+          if (!allowed.includes(k)) continue;
+          const val = v[k];
+          let c;
+          if (k === 'z') c = num(C, place, k, val, -L.z, L.z);
+          else if (k === 'far' || k === 'hidden') c = bool(C, place, k, val);
+          else if (k === 'shade') c = num(C, place, k, val, 0, 2);
+          else if (k === 'light') c = num(C, place, k, val, 0, 1);
+          else if (k === 'width') c = num(C, place, k, typeof val === 'number' && Number.isFinite(val) ? whole(C, place, k, val) : val, 1, L.limbWidth);
+          else if (k === 'from' || k === 'to') c = num(C, place, k, val, 0, 1);
+          else if (k === 'offset') c = num(C, place, k, val, -P, P);
+          else if (k === 'r') c = pair(C, place, k, val, [0, L.radius], [0, L.radius]);
+          else if (k === 'at') c = pair(C, place, k, val, [-P, P], [-P, P]);
+          else if (k === 'size') { if (val !== 1 && val !== 2) C.err(`${place}: a dot's size is 1 or 2 pixels; got ${say(val)}`); else c = val; }
+          else if (k === 'points') {
+            if (!Array.isArray(val) || val.length < 3 || val.length > L.polyPoints) C.err(`${place}: points must be 3 to ${L.polyPoints} points [u, v]; got ${say(val)}`);
+            else { const pts = val.map((p, i) => pair(C, place, `point ${i + 1}`, p, [-P, P], [-P, P])); if (pts.every(Boolean)) c = pts; }
+          }
+          if (c !== undefined) x[k] = c;
+        }
+        if (Object.keys(x).length) (d.shapes ??= {})[id] = x;
+      }
+    }
+    out[dir] = d;
+  }
+  return out;
+}
+
+/**
+ * Runs the rig's checks on each direction of a top-down rig as overlaid (directionRig), so the checks between fields
+ * (a limb 1 pixel thin, a shape too thin to draw) see the overlaid values too. Only what the rig as written does not
+ * already say is reported, as "<where> facing <direction>: ..."; its errors are errors.
+ */
+function checkOverlaid(C, where, rig) {
+  const asRig = (dir) => ({ ...directionRig(rig, dir), view: 'none' });
+  const base = validateStudioRig(asRig(null));
+  const known = new Set([...base.errors, ...base.warnings]);
+  for (const dir of TOPDOWN_DIRECTIONS) {
+    if (!Object.hasOwn(rig.directions, dir)) continue;
+    const v = validateStudioRig(asRig(dir));
+    for (const m of v.errors) if (!known.has(m)) C.err(`${where} facing ${dir}: ${m}`);
+    for (const m of v.warnings) if (!known.has(m)) C.warn(`${where} facing ${dir}: ${m}`);
+  }
 }
 
 function thickness(C, place, r) {
@@ -800,7 +1007,7 @@ function checkMeta(C, m, viewOfBody) {
     if (v === undefined) continue;
     if (typeof v !== 'string' || v.length > L.idChars) { C.err(`meta: ${k} must be a short word; got ${say(v)}`); continue; }
     if (BAD_CHARS.test(v)) { C.err(`meta: ${k} has control or invisible characters; remove them`); continue; }
-    if (k === 'view' && v === 'top-down') { C.err('meta: view "top-down" is not in version 1 of the studio; use side, front or none'); continue; }
+    if (k === 'view' && v === 'top-down' && viewOfBody && viewOfBody !== 'top-down') { C.err(`meta: view "top-down" needs a top-down body (rig view "top-down"); this body is seen from ${q(viewOfBody)}`); continue; }
     const allowed = META_VALUES[k];
     if (!allowed.includes(v)) { C.err(`meta: ${k} ${q(v)} is not one of ${k === 'role' ? 'the sprite roles (catalog/schema.js SPRITE_ROLES)' : listOf(allowed)}`); continue; }
     out[k] = v;
@@ -978,8 +1185,11 @@ function checkClip(C, name, c, facts, lib) {
   const place = `Clip ${q(name)}`;
   if (!isObj(c)) { C.err(`${place}: must be an object with ${listOf(CLIP_FIELDS)}; got ${say(c)}`); return null; }
   knownOnly(C, place, c, lib ? CLIP_FIELDS : CLIP_FIELDS.filter((f) => f !== 'from'));
-  const std = Object.hasOwn(STANDARD_CLIPS, name) ? STANDARD_CLIPS[name] : null;
-  const o = { label: text(C, place, 'label', c.label, L.nameChars) ?? cap(name) };
+  // a top-down body's direction clip (walk_down): the style guide's advice is for its action, its label says both
+  const m = facts.view === 'top-down' ? DIR_CLIP_RE.exec(name) : null;
+  const action = m ? m[1] : name, dir = m ? m[2] : null;
+  const std = Object.hasOwn(STANDARD_CLIPS, action) ? STANDARD_CLIPS[action] : null;
+  const o = { label: text(C, place, 'label', c.label, L.nameChars) ?? (dir ? `${cap(action)} (${dir})` : cap(name)) };
   let frames = 1;
   if (typeof c.frames !== 'number' || !Number.isFinite(c.frames)) C.err(`${place}: frames must be a whole number from 1 to ${L.framesPerClip}; got ${say(c.frames)}`);
   else if (!Number.isInteger(c.frames)) C.err(`${place}: frames must be a whole number; got ${say(c.frames)}`);
@@ -1050,13 +1260,13 @@ function checkClip(C, name, c, facts, lib) {
   }
 
   // advice from style guide 4
-  if (Object.hasOwn(CLIP_SYNONYMS, name)) C.warn(`${place}: the style guide calls this clip "${CLIP_SYNONYMS[name]}"; name it ${CLIP_SYNONYMS[name]} and keep the label ${q(o.label)}`);
+  if (Object.hasOwn(CLIP_SYNONYMS, action)) { const s = CLIP_SYNONYMS[action]; C.warn(`${place}: the style guide calls this clip "${s}"; name it ${dir ? `${s}_${dir}` : s} and keep the label ${q(o.label)}`); }
   if (std) {
-    if (frames !== std.frames) C.warn(`${place}: the style guide's ${name} has ${std.frames} frames; this one has ${frames}`);
-    if (o.loop !== std.loop) C.warn(`${place}: the style guide's ${name} ${std.loop ? 'loops' : 'plays once (no loop)'}`);
+    if (frames !== std.frames) C.warn(`${place}: the style guide's ${action} has ${std.frames} frames; this one has ${frames}`);
+    if (o.loop !== std.loop) C.warn(`${place}: the style guide's ${action} ${std.loop ? 'loops' : 'plays once (no loop)'}`);
   }
-  if ((name === 'hurt' || name === 'die') && !(o.frameEdits?.['0']?.flash || (lib && keys.some((k) => k.t === 0 && k.flash)))) {
-    C.warn(`${place}: the style guide starts ${name} on a white flash; turn on the white flash on frame 0`);
+  if ((action === 'hurt' || action === 'die') && !(o.frameEdits?.['0']?.flash || (lib && keys.some((k) => k.t === 0 && k.flash)))) {
+    C.warn(`${place}: the style guide starts ${action} on a white flash; turn on the white flash on frame 0`);
   }
   return o;
 }
@@ -1069,11 +1279,22 @@ function checkClips(C, d, facts, lib) {
   const out = {};
   let total = 0;
   for (const name of names) {
-    if (!idOf(C, `Clip ${q(name)}`, name, { what: 'clip name' })) continue;
+    const m = DIR_CLIP_RE.exec(name);
+    if (m) {
+      // <action>_<down|up|side>: a direction clip, only for a top-down body
+      if (facts.view !== 'top-down') { C.err(`Clip ${q(name)}: a name ending _down, _up or _side is a direction clip, for a top-down body; this body is seen from ${q(facts.view)}`); continue; }
+      if (!ID_PATTERN.test(m[1]) || name.length > L.idChars) { C.err(`Clip ${q(name)}: clip name ${q(name)} must be an action (a lowercase letter, then letters, digits and dashes) and _down, _up or _side, at most ${L.idChars} characters`); continue; }
+      const other = `${m[1]}-${m[2]}`;
+      if (names.includes(other)) C.err(`Clip ${q(name)}: there is also a clip ${q(other)}; a name may be written only one way (use ${q(name)})`);
+    } else if (!idOf(C, `Clip ${q(name)}`, name, { what: 'clip name' })) continue;
     const c = checkClip(C, name, d.clips[name], facts, lib);
     if (c) { out[name] = c; total += c.frames; }
   }
   if (total > L.frames) C.err(`Clips: have ${total} frames in all; the most is ${L.frames}`);
+  if (facts.view === 'top-down') {
+    const missing = ['walk_down', 'walk_up', 'walk_side'].filter((n) => !names.includes(n));
+    if (missing.length) C.warn(`Clips: a top-down sprite walks in three directions (Contract 2); add ${missing.join(', ')}`);
+  }
   return out;
 }
 
