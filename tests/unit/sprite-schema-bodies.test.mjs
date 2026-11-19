@@ -37,11 +37,10 @@ test('the examples pass without a piece list too (pieces are then checked by the
 
 test('without opts.generators the site\'s registry (engine/gen/index.js) is used', () => {
   const d = load('coin');
-  d.body.pictures.draw = [{ gen: 'twinkle', v: 1, on: 'coin', at: [0, 0], size: { from: 'size', map: [[0, 1], [1, 3]], round: 'px' }, paint: 'gold' }];
+  d.body.pictures.draw = [{ gen: 'twinkle', v: 1, on: 'coin', at: [0, 0], size: { from: 'size', map: [[0, 1], [1, 3]], round: 'px' }, paint: 'gold', core: 'light' }];  // twinkle@1 takes a core paint (B2)
   d.body.pictures.motion = []; d.body.pictures.emitters = [];
   d.controls = d.controls.filter((c) => c.key === 'size');
   delete d.clips.collect;
-  d.palette = d.palette.slice(0, 1);
   const r = validateSprite(d);
   assert.deepEqual(r.errors, []);
   assert.ok(r.uses.includes('twinkle@1'));
