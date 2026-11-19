@@ -1,0 +1,992 @@
+{
+ "format": "loadout-sprite",
+ "version": 1,
+ "id": "dung-beetle",
+ "name": "Dung beetle",
+ "blurb": "A round shiny beetle that trundles across the farm, seen from above in three directions.",
+ "meta": {
+  "type": "creature",
+  "role": "characters/animal",
+  "themes": [
+   "farm",
+   "forest"
+  ],
+  "gameTypes": [
+   "farming-sim",
+   "roguelike-action"
+  ],
+  "view": "top-down",
+  "words": [
+   "beetle",
+   "bug",
+   "insect",
+   "scarab",
+   "critter",
+   "crawl"
+  ],
+  "license": "draft"
+ },
+ "body": {
+  "rig": {
+   "format": "loadout-rig",
+   "version": 1,
+   "id": "beetle",
+   "name": "Beetle",
+   "view": "top-down",
+   "size": [
+    48,
+    48
+   ],
+   "colours": [
+    {
+     "id": "shell",
+     "label": "Shell",
+     "default": "#2f8f9d",
+     "material": "metal"
+    },
+    {
+     "id": "legs",
+     "label": "Legs and head",
+     "default": "#5d4a3a",
+     "material": "earth"
+    },
+    {
+     "id": "eye",
+     "label": "Eyes",
+     "default": "#f0ead8",
+     "detail": true
+    }
+   ],
+   "bones": [
+    {
+     "id": "body",
+     "parent": null,
+     "at": [
+      17,
+      37
+     ],
+     "angle": 90,
+     "length": 14,
+     "label": "Body"
+    },
+    {
+     "id": "head",
+     "parent": "body",
+     "angle": 0,
+     "length": 5,
+     "min": -25,
+     "max": 25,
+     "label": "Head"
+    },
+    {
+     "id": "legF",
+     "parent": "body",
+     "from": 0.8,
+     "angle": -52,
+     "length": 7,
+     "label": "Front leg"
+    },
+    {
+     "id": "legM",
+     "parent": "body",
+     "from": 0.5,
+     "angle": -90,
+     "length": 6,
+     "label": "Middle leg"
+    },
+    {
+     "id": "legB",
+     "parent": "body",
+     "from": 0.2,
+     "angle": -130,
+     "length": 7,
+     "label": "Back leg"
+    },
+    {
+     "id": "legF2",
+     "parent": "body",
+     "from": 0.75,
+     "angle": -62,
+     "length": 7,
+     "label": "Front leg (far)"
+    },
+    {
+     "id": "legM2",
+     "parent": "body",
+     "from": 0.45,
+     "angle": -92,
+     "length": 6,
+     "label": "Middle leg (far)"
+    },
+    {
+     "id": "legB2",
+     "parent": "body",
+     "from": 0.15,
+     "angle": -120,
+     "length": 7,
+     "label": "Back leg (far)"
+    },
+    {
+     "id": "horn",
+     "parent": "head",
+     "angle": 30,
+     "length": 4,
+     "label": "Horn"
+    }
+   ],
+   "shapes": [
+    {
+     "id": "l-legF",
+     "bone": "legF",
+     "kind": "limb",
+     "width": 2,
+     "paint": "legs",
+     "z": 9
+    },
+    {
+     "id": "l-legM",
+     "bone": "legM",
+     "kind": "limb",
+     "width": 2,
+     "paint": "legs",
+     "z": 9
+    },
+    {
+     "id": "l-legB",
+     "bone": "legB",
+     "kind": "limb",
+     "width": 2,
+     "paint": "legs",
+     "z": 9
+    },
+    {
+     "id": "l-legF2",
+     "bone": "legF2",
+     "kind": "limb",
+     "width": 2,
+     "paint": "legs",
+     "z": 4,
+     "far": true
+    },
+    {
+     "id": "l-legM2",
+     "bone": "legM2",
+     "kind": "limb",
+     "width": 2,
+     "paint": "legs",
+     "z": 4,
+     "far": true
+    },
+    {
+     "id": "l-legB2",
+     "bone": "legB2",
+     "kind": "limb",
+     "width": 2,
+     "paint": "legs",
+     "z": 4,
+     "far": true
+    },
+    {
+     "id": "belly",
+     "bone": "body",
+     "kind": "capsule",
+     "from": 0.15,
+     "to": 0.85,
+     "offset": -1.5,
+     "r": [
+      2.5,
+      2.5
+     ],
+     "paint": "legs",
+     "z": 8
+    },
+    {
+     "id": "shell",
+     "bone": "body",
+     "kind": "ellipse",
+     "at": [
+      7,
+      2.5
+     ],
+     "r": [
+      8,
+      5.5
+     ],
+     "paint": "shell",
+     "z": 10,
+     "light": 1
+    },
+    {
+     "id": "seam",
+     "bone": "body",
+     "kind": "poly",
+     "points": [
+      [
+       1,
+       2.5
+      ],
+      [
+       14,
+       3.5
+      ],
+      [
+       14,
+       2.5
+      ],
+      [
+       1,
+       1.5
+      ]
+     ],
+     "paint": "legs",
+     "z": 11,
+     "hidden": true
+    },
+    {
+     "id": "skull",
+     "bone": "head",
+     "kind": "ellipse",
+     "at": [
+      2,
+      0.5
+     ],
+     "r": [
+      3,
+      2.5
+     ],
+     "paint": "legs",
+     "z": 9
+    },
+    {
+     "id": "hornTip",
+     "bone": "horn",
+     "kind": "capsule",
+     "from": 0,
+     "to": 1,
+     "r": [
+      1.5,
+      1
+     ],
+     "paint": "shell",
+     "z": 9,
+     "part": "horn"
+    },
+    {
+     "id": "eye",
+     "bone": "head",
+     "kind": "dot",
+     "at": [
+      3,
+      1.5
+     ],
+     "size": 1,
+     "paint": "eye",
+     "z": 20
+    },
+    {
+     "id": "eye2",
+     "bone": "head",
+     "kind": "dot",
+     "at": [
+      3,
+      -1.5
+     ],
+     "size": 1,
+     "paint": "eye",
+     "z": 20,
+     "hidden": true
+    }
+   ],
+   "ik": [],
+   "points": [
+    {
+     "id": "head",
+     "bone": "head",
+     "at": [
+      5,
+      0
+     ]
+    },
+    {
+     "id": "back",
+     "bone": "body",
+     "at": [
+      7,
+      5
+     ],
+     "angle": 180
+    },
+    {
+     "id": "feet",
+     "ground": true
+    }
+   ],
+   "directions": {
+    "down": {
+     "bones": {
+      "body": {
+       "at": [
+        24,
+        24
+       ],
+       "angle": 0,
+       "length": 10
+      },
+      "head": {
+       "length": 4
+      },
+      "horn": {
+       "angle": 0,
+       "length": 2
+      },
+      "legF": {
+       "angle": -40,
+       "length": 10
+      },
+      "legM": {
+       "angle": -90,
+       "length": 10
+      },
+      "legB": {
+       "angle": -140,
+       "length": 10
+      },
+      "legF2": {
+       "angle": 40,
+       "length": 10
+      },
+      "legM2": {
+       "angle": 90,
+       "length": 10
+      },
+      "legB2": {
+       "angle": 140,
+       "length": 10
+      }
+     },
+     "shapes": {
+      "shell": {
+       "at": [
+        4.5,
+        0
+       ],
+       "r": [
+        7,
+        7.5
+       ],
+       "z": 10
+      },
+      "seam": {
+       "points": [
+        [
+         0,
+         0.5
+        ],
+        [
+         9,
+         0.5
+        ],
+        [
+         9,
+         -0.5
+        ],
+        [
+         0,
+         -0.5
+        ]
+       ],
+       "hidden": false
+      },
+      "skull": {
+       "at": [
+        1.5,
+        0
+       ],
+       "r": [
+        2.5,
+        3.5
+       ],
+       "z": 14
+      },
+      "hornTip": {
+       "z": 15
+      },
+      "eye": {
+       "at": [
+        2,
+        1.5
+       ],
+       "z": 20
+      },
+      "eye2": {
+       "at": [
+        2,
+        -1.5
+       ],
+       "hidden": false
+      },
+      "l-legF2": {
+       "far": false,
+       "z": 4
+      },
+      "l-legM2": {
+       "far": false,
+       "z": 4
+      },
+      "l-legB2": {
+       "far": false,
+       "z": 4
+      },
+      "l-legF": {
+       "z": 4
+      },
+      "l-legM": {
+       "z": 4
+      },
+      "l-legB": {
+       "z": 4
+      },
+      "belly": {
+       "hidden": true
+      }
+     }
+    },
+    "up": {
+     "bones": {
+      "body": {
+       "at": [
+        24,
+        36
+       ],
+       "angle": 180,
+       "length": 10
+      },
+      "head": {
+       "length": 4
+      },
+      "horn": {
+       "angle": 0,
+       "length": 3
+      },
+      "legF": {
+       "angle": -40,
+       "length": 10
+      },
+      "legM": {
+       "angle": -90,
+       "length": 10
+      },
+      "legB": {
+       "angle": -140,
+       "length": 10
+      },
+      "legF2": {
+       "angle": 40,
+       "length": 10
+      },
+      "legM2": {
+       "angle": 90,
+       "length": 10
+      },
+      "legB2": {
+       "angle": 140,
+       "length": 10
+      }
+     },
+     "shapes": {
+      "shell": {
+       "at": [
+        5.5,
+        0
+       ],
+       "r": [
+        7,
+        7.5
+       ],
+       "z": 10
+      },
+      "seam": {
+       "points": [
+        [
+         0,
+         0.5
+        ],
+        [
+         9,
+         0.5
+        ],
+        [
+         9,
+         -0.5
+        ],
+        [
+         0,
+         -0.5
+        ]
+       ],
+       "hidden": false
+      },
+      "skull": {
+       "at": [
+        1.5,
+        0
+       ],
+       "r": [
+        2.5,
+        3.5
+       ],
+       "z": 6
+      },
+      "hornTip": {
+       "z": 5
+      },
+      "eye": {
+       "hidden": true
+      },
+      "l-legF2": {
+       "far": false,
+       "z": 4
+      },
+      "l-legM2": {
+       "far": false,
+       "z": 4
+      },
+      "l-legB2": {
+       "far": false,
+       "z": 4
+      },
+      "l-legF": {
+       "z": 4
+      },
+      "l-legM": {
+       "z": 4
+      },
+      "l-legB": {
+       "z": 4
+      },
+      "belly": {
+       "hidden": true
+      }
+     }
+    }
+   }
+  }
+ },
+ "pivot": [
+  24,
+  42
+ ],
+ "grounded": true,
+ "colours": {
+  "shell": "#2f8f9d",
+  "legs": "#5d4a3a"
+ },
+ "controls": [
+  {
+   "key": "speed",
+   "standard": "speed"
+  },
+  {
+   "key": "legLength",
+   "label": "Legs",
+   "lo": "Stubby",
+   "hi": "Long",
+   "min": 0.7,
+   "max": 1.2,
+   "default": 1,
+   "scales": {
+    "bones": [
+     "legF",
+     "legM",
+     "legB",
+     "legF2",
+     "legM2",
+     "legB2"
+    ]
+   }
+  },
+  {
+   "key": "shellSize",
+   "label": "Shell",
+   "lo": "Small",
+   "hi": "Big",
+   "min": 0.8,
+   "max": 1.2,
+   "default": 1,
+   "scales": {
+    "shapes": [
+     "shell"
+    ]
+   }
+  }
+ ],
+ "parts": {
+  "horn": {
+   "label": "Horn",
+   "shapes": [
+    "hornTip"
+   ],
+   "default": true
+  }
+ },
+ "clips": {
+  "idle_down": {
+   "label": "Idle",
+   "frames": 8,
+   "fps": 7,
+   "loop": true,
+   "keys": [
+    {
+     "t": 0,
+     "root": [
+      0,
+      0
+     ],
+     "bones": {
+      "head": 0
+     }
+    },
+    {
+     "t": 0.5,
+     "root": [
+      0,
+      0
+     ],
+     "bones": {
+      "head": 8
+     }
+    }
+   ]
+  },
+  "walk_down": {
+   "label": "Walk",
+   "frames": 8,
+   "fps": 10,
+   "loop": true,
+   "keys": [
+    {
+     "t": 0,
+     "root": [
+      0,
+      0
+     ],
+     "bones": {
+      "legF": -28,
+      "legM": -102,
+      "legB": -128,
+      "legF2": 52,
+      "legM2": 78,
+      "legB2": 128
+     }
+    },
+    {
+     "t": 0.25,
+     "root": [
+      0,
+      -1
+     ],
+     "bones": {
+      "legF": -40,
+      "legM": -90,
+      "legB": -140,
+      "legF2": 40,
+      "legM2": 90,
+      "legB2": 140
+     }
+    },
+    {
+     "t": 0.5,
+     "root": [
+      0,
+      0
+     ],
+     "bones": {
+      "legF": -52,
+      "legM": -78,
+      "legB": -152,
+      "legF2": 28,
+      "legM2": 102,
+      "legB2": 152
+     }
+    },
+    {
+     "t": 0.75,
+     "root": [
+      0,
+      -1
+     ],
+     "bones": {
+      "legF": -40,
+      "legM": -90,
+      "legB": -140,
+      "legF2": 40,
+      "legM2": 90,
+      "legB2": 140
+     }
+    }
+   ],
+   "sounds": [
+    {
+     "sound": "footstep-leaves",
+     "frame": 0,
+     "volume": 0.3
+    },
+    {
+     "sound": "footstep-leaves",
+     "frame": 4,
+     "volume": 0.3
+    }
+   ]
+  },
+  "walk_up": {
+   "label": "Walk",
+   "frames": 8,
+   "fps": 10,
+   "loop": true,
+   "keys": [
+    {
+     "t": 0,
+     "root": [
+      0,
+      0
+     ],
+     "bones": {
+      "legF": -28,
+      "legM": -102,
+      "legB": -128,
+      "legF2": 52,
+      "legM2": 78,
+      "legB2": 128
+     }
+    },
+    {
+     "t": 0.25,
+     "root": [
+      0,
+      -1
+     ],
+     "bones": {
+      "legF": -40,
+      "legM": -90,
+      "legB": -140,
+      "legF2": 40,
+      "legM2": 90,
+      "legB2": 140
+     }
+    },
+    {
+     "t": 0.5,
+     "root": [
+      0,
+      0
+     ],
+     "bones": {
+      "legF": -52,
+      "legM": -78,
+      "legB": -152,
+      "legF2": 28,
+      "legM2": 102,
+      "legB2": 152
+     }
+    },
+    {
+     "t": 0.75,
+     "root": [
+      0,
+      -1
+     ],
+     "bones": {
+      "legF": -40,
+      "legM": -90,
+      "legB": -140,
+      "legF2": 40,
+      "legM2": 90,
+      "legB2": 140
+     }
+    }
+   ],
+   "sounds": [
+    {
+     "sound": "footstep-leaves",
+     "frame": 0,
+     "volume": 0.3
+    },
+    {
+     "sound": "footstep-leaves",
+     "frame": 4,
+     "volume": 0.3
+    }
+   ]
+  },
+  "walk_side": {
+   "label": "Walk",
+   "frames": 8,
+   "fps": 10,
+   "loop": true,
+   "keys": [
+    {
+     "t": 0,
+     "root": [
+      0,
+      0
+     ],
+     "bones": {
+      "legF": -44,
+      "legM": -98,
+      "legB": -122,
+      "legF2": -70,
+      "legM2": -84,
+      "legB2": -128
+     }
+    },
+    {
+     "t": 0.25,
+     "root": [
+      0,
+      -1
+     ],
+     "bones": {
+      "legF": -52,
+      "legM": -90,
+      "legB": -130,
+      "legF2": -62,
+      "legM2": -92,
+      "legB2": -120
+     }
+    },
+    {
+     "t": 0.5,
+     "root": [
+      0,
+      0
+     ],
+     "bones": {
+      "legF": -60,
+      "legM": -82,
+      "legB": -138,
+      "legF2": -54,
+      "legM2": -100,
+      "legB2": -112
+     }
+    },
+    {
+     "t": 0.75,
+     "root": [
+      0,
+      -1
+     ],
+     "bones": {
+      "legF": -52,
+      "legM": -90,
+      "legB": -130,
+      "legF2": -62,
+      "legM2": -92,
+      "legB2": -120
+     }
+    }
+   ],
+   "sounds": [
+    {
+     "sound": "footstep-leaves",
+     "frame": 0,
+     "volume": 0.3
+    },
+    {
+     "sound": "footstep-leaves",
+     "frame": 4,
+     "volume": 0.3
+    }
+   ]
+  },
+  "hurt": {
+   "label": "Hurt",
+   "frames": 4,
+   "fps": 9,
+   "loop": false,
+   "keys": [
+    {
+     "t": 0,
+     "root": [
+      0,
+      -2
+     ]
+    },
+    {
+     "t": 1,
+     "root": [
+      0,
+      0
+     ]
+    }
+   ],
+   "frameEdits": {
+    "0": {
+     "flash": true
+    }
+   },
+   "sounds": [
+    {
+     "sound": "bug-splat",
+     "frame": 0,
+     "volume": 0.6
+    }
+   ]
+  },
+  "die": {
+   "label": "Die",
+   "frames": 8,
+   "fps": 10,
+   "loop": false,
+   "keys": [
+    {
+     "t": 0,
+     "root": [
+      0,
+      0
+     ]
+    },
+    {
+     "t": 0.6,
+     "ease": "out",
+     "root": [
+      0,
+      1
+     ],
+     "bones": {
+      "legF": -20,
+      "legM": -90,
+      "legB": -160,
+      "legF2": 20,
+      "legM2": 90,
+      "legB2": 160
+     }
+    },
+    {
+     "t": 1,
+     "root": [
+      0,
+      1
+     ],
+     "bones": {
+      "legF": -10,
+      "legM": -90,
+      "legB": -170,
+      "legF2": 10,
+      "legM2": 90,
+      "legB2": 170
+     }
+    }
+   ],
+   "frameEdits": {
+    "0": {
+     "flash": true
+    }
+   }
+  }
+ },
+ "preview": "walk_down",
+ "made": {
+  "in": "studio",
+  "from": "template:four-legs"
+ }
+}
