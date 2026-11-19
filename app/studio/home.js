@@ -167,7 +167,7 @@ export function homePage(app, { drafts, kept, query }) {
       status),
     pick,
     listBox);
-  app.replaceChildren(header(''), main);
+  app.replaceChildren(header('studio'), main);
   drawTrouble();
   drawDrafts();
   return () => {};

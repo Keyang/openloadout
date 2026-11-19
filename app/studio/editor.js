@@ -545,7 +545,7 @@ export function editorPage(app, { id, entry, drafts, kept, query, studio = siteS
 
   // ---- the page ----
   const main = el('main', { class: 'v2 rx studio', 'data-draft': id }, stageCol, panel);
-  app.replaceChildren(header(''), main);
+  app.replaceChildren(header('studio'), main);
   const ro = new ResizeObserver(() => { drawStageTools(); stage.draw(); });
   ro.observe(stage.node);
   const flush = () => { saver.flush(); };
