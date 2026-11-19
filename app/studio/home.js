@@ -85,7 +85,7 @@ export function homePage(app, { drafts, kept, query }) {
     if (textIn.includes('Made in the Loadout studio')) {
       // the reader (tools/lib/data-file.mjs) is loaded only now: tools/ may not be served where the site is published
       let F;
-      try { F = await import('../../tools/lib/data-file.mjs'); } catch { say('Studio files cannot be opened on this copy of the site. Open the JSON instead.'); return; }
+      try { F = await import('../../catalog/data-file.js'); } catch { say('Studio files cannot be opened on this copy of the site. Open the JSON instead.'); return; }
       const r = F.readDataFile(textIn);
       if (!r.ok) { say(`That file could not be opened: ${r.errors[0]}`); return; }
       def = r.value;

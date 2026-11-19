@@ -510,7 +510,7 @@ export function createStudio(env = {}) {
         if (typeof m.bag.updateDefinition === 'function') m.bag.updateDefinition(d.entry.bagKey, { data: d.value });
         return { ok: true, draft: d.name, key: d.entry.bagKey, added: false, saved: !store.pending() && kept, warnings: [] };
       }
-      const key = m.bag.add({ kind: 'sprite', id: d.value.id, settings: {}, definition: { data: d.value } });
+      const key = m.bag.add({ kind: 'sprite', id: d.value.id, settings: {}, definition: { data: d.value }, draft: d.name });
       if (typeof key !== 'string' || !BAG_KEY_RE.test(key)) throw new Problem('The bag did not take the sprite.');
       const w = commit(d.name, (e) => ({ ...(isObj(e) ? e : d.entry), bagKey: key }));
       return { ok: true, draft: d.name, key, added: true, saved: w.saved, warnings: w.warnings };
@@ -520,7 +520,7 @@ export function createStudio(env = {}) {
       const { opts, problem } = await fullOpts();
       const { value } = await definitionOf(what, opts);
       let F;
-      try { F = await import('../tools/lib/data-file.mjs'); } catch (e) { throw new Problem(`The file writer (tools/lib/data-file.mjs) could not be loaded: ${messageOf(e)}`); }
+      try { F = await import('../catalog/data-file.js'); } catch (e) { throw new Problem(`The file writer (catalog/data-file.js) could not be loaded: ${messageOf(e)}`); }
       const w = F.writeDataFile(value, opts);
       if (!w.ok) throw new Problem(w.errors, { warnings: w.warnings });
       const strict = F.writeDataFile(value, { ...opts, strict: true });

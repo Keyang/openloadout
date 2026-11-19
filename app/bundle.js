@@ -8,7 +8,7 @@ import { exportSheet, styleById, stylesOf, supports } from '../engine/styles.js'
 import { defaultTheme, normalizeTheme, applyColour, spriteMaterials, spriteLook } from '../engine/theme.js';
 import { applySound, themedSoundParams, soundSettingsFor } from '../sound/theme.js';
 import { soundById, soundParams, rendered, renderAsync, wavBytes, isMusic } from './audio.js';
-import { loadCatalog, assetById, loadSprite } from './catalog.js';
+import { loadCatalog, assetById, loadSprite, libraryHas } from './catalog.js';
 import { themeFor, lookOf } from './bag.js';      // an item may wear a look of its own instead of the bag's
 import { restoreRuntime, madeItemState } from './api.js';      // W5-B: an item made on a visit is exported only once it has been checked again, and only as the bag stored it
 import { describeSheet } from '../engine/sheet-info.js';       // what kind of sheet it is, and what that kind needs (tile rules, layers, text areas), written into the JSON
@@ -137,6 +137,22 @@ async function spriteParts(sprite, p, cues, scale = 1, theme = null, style = und
 // ---- the bag as one package (Contract 8) -------------------------------------------
 
 /**
+ * A studio sprite's program and library file, made from its bag item's own definition ({ data }): { sprite, file:
+ * { name, text } }, or { sprite: null, errors } when the definition does not pass (checked again, never strict).
+ * Arguments: item (a bag item whose definition is { data }).
+ */
+export async function studioSprite(item) {
+  let D, F;
+  // (catalog/, not tools/: tools/ is not published. A module that cannot load costs this sprite, never the whole package.)
+  try { [D, F] = await Promise.all([import('../engine/data-sprite.js'), import('../catalog/data-file.js')]); } catch (e) { return { sprite: null, errors: [`the studio's file writer could not be loaded: ${String(e?.message ?? e)}`] }; }
+  const r = D.makeDataSprite(item.definition.data);
+  if (!r.ok || r.sprite.id !== item.id) return { sprite: null, errors: r.ok ? [`its definition is "${r.sprite.id}", not "${item.id}"`] : r.errors };
+  const file = F.writeDataFile(item.definition.data);
+  if (!file.ok) return { sprite: null, errors: file.errors };
+  return { sprite: r.sprite, file: { name: file.name, text: file.text } };
+}
+
+/**
  * What a package under a look says about the settings it records (manifest.settingsUsed). The colours are not the
  * look's colour settings applied alike to every pixel: each colour is held to what it is of (engine/theme.js,
  * spriteLook), so the note says how to get the very same picture again.
@@ -173,6 +189,10 @@ function unique(taken, base, ext = '') {
  * draws under its id. Otherwise nothing of it goes in, and it is named under "needsRemaking". A made sprite's frames
  * at the item's settings are then put through the quality bar before they are written; one that fails there is left
  * out and named under "refused" ([{ key, id, reason }]).
+ * A sprite made in the studio (its definition is { data }, Contract 14) is data: it is drawn here from the item's own
+ * definition by engine/data-sprite.js (checked again, never strict; no worker, no quality bar, rule 7), and its library
+ * file goes in next to its sheet (<id>.js, the fixed data form of catalog/data-file.js); the manifest marks it
+ * madeIn: "studio" and names that file as `source`. One whose definition no longer passes is named under "needsRemaking".
  * A sprite item whose settings name an art style (`artStyle`, Contract 12) is exported in that style, and its manifest
  * entry says `artStyle`; an entry without it is pixel. One that asks for a style its sprite does not list is left out
  * and named under "unsupported" (never quietly exported in another style).
@@ -184,11 +204,18 @@ export async function packageFiles({ items, theme = null, scale = 1, catalog = n
   const files = [], assets = [], missing = [], unsupported = [], needsRemaking = [], refused = [];
   const folders = new Set(), soundNames = new Set(), musicNames = new Set();
   const themeOf = new Map();      // each sprite's entry -> the look it was drawn with (null: none)
+  const programOf = new Map();    // each sprite's entry -> the program it was drawn with (a studio sprite's is made from its item)
   let done = 0;
-  if (items.some((i) => i.definition)) { onProgress('Checking what was made on a visit…'); await restoreRuntime(true); }
+  if (items.some((i) => i.definition && !i.definition.data)) { onProgress('Checking what was made on a visit…'); await restoreRuntime(true); }
   for (const item of items) {
     onProgress(`Building ${++done} of ${items.length}…`);
-    const made = madeItemState(item);
+    // a studio sprite never goes out under a library sprite's id: its file would take that sprite's place in sprites/
+    // (the bag gives it another id once the catalogue is in, app/bag.js settleStudioIds; this is the last guard)
+    if (item.kind === 'sprite' && item.definition?.data && libraryHas(item.id)) { refused.push({ key: item.key, id: item.id, reason: `"${item.id}" is the id of a sprite in the library, so its file would take that sprite's place; reload the page and the bag gives it an id of its own` }); continue; }
+    // a studio sprite is data: drawn from its own definition here, so it waits for no check in a worker
+    const studio = item.kind === 'sprite' && item.definition?.data ? await studioSprite(item) : null;
+    if (studio && !studio.sprite) { needsRemaking.push(item.id); continue; }
+    const made = studio ? null : madeItemState(item);
     if (made && made.state !== 'ready') { needsRemaking.push(item.id); continue; }
     const s = item.settings ?? {};
     // the look this item is exported with: its own named look when it carries one, otherwise the package's
@@ -196,7 +223,7 @@ export async function packageFiles({ items, theme = null, scale = 1, catalog = n
     const about = info[item.id] ?? {};
     const entry = (name, meta) => ({ key: item.key, id: item.id, kind: item.kind, name: about.name ?? name, role: about.role ?? meta?.role ?? null, type: about.type ?? meta?.type ?? null, files: [], settings: s });
     // a sprite's own program is loaded here, when the package needs it
-    const sprite = item.kind === 'sprite' && kindMatches(item.kind, item.id) ? await loadSprite(item.id).catch(() => null) : null;
+    const sprite = studio ? studio.sprite : item.kind === 'sprite' && kindMatches(item.kind, item.id) ? await loadSprite(item.id).catch(() => null) : null;
     if (item.kind === 'sprite' ? !sprite : !kindMatches(item.kind, item.id)) { missing.push(item.id); continue; }
     if (item.kind === 'sprite') {
       const style = typeof s.artStyle === 'string' && s.artStyle ? s.artStyle : stylesOf(sprite)[0];
@@ -227,6 +254,14 @@ export async function packageFiles({ items, theme = null, scale = 1, catalog = n
       if (style !== 'pixel') a.artStyle = style;
       if (own) { a.look = own; a.theme = normalizeTheme(ti ?? {}); }
       themeOf.set(a, ti);
+      programOf.set(a, sprite);
+      if (studio) {
+        // the library file of a studio sprite, beside its sheet: drop it into sprites/ to make it part of the library
+        a.madeIn = 'studio';
+        a.source = `sprites/${folder}/${studio.file.name}`;
+        files.push({ name: a.source, data: enc.encode(studio.file.text) });
+        a.files.push(a.source);
+      }
       if (typeof item.definition?.source === 'string') {
         a.madeOnThisVisit = true;
         a.source = `sprites/${folder}/${sprite.id}.source.js`;
@@ -267,7 +302,7 @@ export async function packageFiles({ items, theme = null, scale = 1, catalog = n
   for (const a of assets) {
     const at = themeOf.get(a);      // (an item with a look of its own is recorded under that look)
     if (!at) continue;
-    const sprite = a.kind === 'sprite' ? await loadSprite(a.id).catch(() => null) : null;
+    const sprite = a.kind === 'sprite' ? programOf.get(a) ?? await loadSprite(a.id).catch(() => null) : null;
     if (!sprite) continue;
     // from the bag's record of what its look made of the sprite, when it has one (the same values the sheet was drawn with)
     const used = spriteLook(sprite, a.settings?.params ?? {}, at, { record: a.look ? undefined : a.settings?.lookParams });

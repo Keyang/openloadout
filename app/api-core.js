@@ -658,7 +658,8 @@ export function createLoadout(env = {}) {
       const mod = await lib.bag(), { bag } = mod;
       if (!bag.count()) throw new Problem('The bag is empty, so there is nothing to link to. Add an asset first: loadout.bag.add("knight").');
       const link = `${win.location.origin}${win.location.pathname}${bag.toLink()}`;
-      if (bag.madeCount() && link.length > mod.LINK_LIMIT) throw new Problem(`This bag is too long for a link: it holds ${bag.madeCount()} thing${bag.madeCount() === 1 ? '' : 's'} made on a visit, which travel with their whole source, and the link would be ${link.length.toLocaleString('en')} characters long. The most a link may be is ${mod.LINK_LIMIT.toLocaleString('en')} characters, because chat and mail apps cut longer ones short. Share the download instead (loadout.bag.download()): it holds everything, the sources too.`);
+      const why = mod.linkProblem(bag, link, { instead: 'Share the download instead (loadout.bag.download()): it holds everything.' });
+      if (why) throw new Problem(why);
       return { ok: true, link, length: link.length, items: bag.count(), made: bag.madeCount() };
     },
 
@@ -766,7 +767,7 @@ export function createLoadout(env = {}) {
   let busy = 0, queue = Promise.resolve(), listening = false;
   /** Where a bag item made on a visit stands: { state: 'ready' | 'checking' | 'needs re-making', name?, reason? }; null for a catalogue item. */
   function stateOf(item) {
-    if (!item || !item.definition) return null;
+    if (!item || !item.definition || item.definition.data) return null;      // a studio sprite is data (Contract 14), checked by app/bag.js
     const entry = runtime.get(item.id);
     if (entry && sameDefinition(item, entry)) return entry.verdict.ok ? { state: 'ready', name: entry.row.name } : { state: 'needs re-making', name: entry.row.name, reason: entry.verdict.errors[0] ?? 'It does not pass the quality bar.' };
     const f = failed.get(defKey(item));
@@ -778,7 +779,7 @@ export function createLoadout(env = {}) {
     const [{ bag }, c] = await Promise.all([lib.bag(), lib.catalog()]);
     let settled = 0;
     // sounds first: a sprite's check looks up the sounds its clips play
-    const waiting = bag.items().filter((i) => i.definition);
+    const waiting = bag.items().filter((i) => i.definition && !i.definition.data);
     for (const item of [...waiting.filter((i) => i.kind !== 'sprite'), ...waiting.filter((i) => i.kind === 'sprite')]) {
       if (stateOf(item)?.state !== 'checking') continue;
       let name = item.id, sandbox = null, kept = false;

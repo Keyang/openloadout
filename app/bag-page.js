@@ -10,7 +10,7 @@ import { applySound, themedSoundParams, soundSettingsFor } from '../sound/theme.
 import { el, header, saveBlob, reduceMotion } from './ui.js';
 import { itemEditor, changesOf } from './bag-edit.js';
 import { soundById, soundParams, rendered, renderAsync, playRendered, playLive, drawWave } from './audio.js';
-import { bag, LINK_LIMIT, NOT_KEPT, lookOf, themeFor } from './bag.js';
+import { bag, LINK_LIMIT, NOT_KEPT, lookOf, themeFor, linkProblem } from './bag.js';
 import { THEME_PRESETS } from '../engine/theme.js';
 import { restoreRuntime, madeItemState } from './api.js';      // W5-A, W5-B: what the bag holds that was made on a visit is checked again, off the page, before it is shown
 import { packageFiles, defaultCues, activeTheme, kindMatches } from './bundle.js';
@@ -541,15 +541,17 @@ export function bagPage(app, query = {}, isCurrent = () => true) {
   /** Copy the bag's link, for the panel's footer (when the browser will not keep the bag): what to say. */
   async function copyBagLink() {
     const url = `${location.origin}${location.pathname}${bag.toLink()}`;
-    if (bag.madeCount() && url.length > LINK_LIMIT) { await copyLink(); return 'This bag is too long for a link. Download it instead.'; }
+    if (linkProblem(bag, url)) { await copyLink(); return 'This bag is too long for a link. Download it instead.'; }
     try { await navigator.clipboard.writeText(url); return 'Link to your bag copied. Open it later to get these same things back.'; }
     catch { await copyLink(); return 'Your browser did not allow copying. The link is under the bag\'s heading.'; }
   }
   async function copyLink() {
     const url = `${location.origin}${location.pathname}${bag.toLink()}`;
-    // W5-A: an item made on a visit travels with its whole source, which can make the link longer than a link can safely be
-    if (bag.madeCount() && url.length > LINK_LIMIT) {
-      linkNote.textContent = `This bag is too long for a link: it holds ${bag.madeCount() === 1 ? 'something' : 'things'} made on a visit, which travel${bag.madeCount() === 1 ? 's' : ''} with ${bag.madeCount() === 1 ? 'its' : 'their'} whole source, and the link would be ${url.length.toLocaleString('en')} characters long. Chat and mail apps cut links over ${LINK_LIMIT.toLocaleString('en')} characters short, so no link was made. Download the package instead: it holds everything, the source too.`;
+    // W5-A, S8: an item made on a visit travels with its whole source, a studio sprite with its definition, which can make
+    // the link longer than a link can safely be; and a link carries at most MAX_LINK_ITEMS items (app/bag.js linkProblem)
+    const why = linkProblem(bag, url);
+    if (why) {
+      linkNote.textContent = why;
       noted();
       return;
     }
