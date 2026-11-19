@@ -6,7 +6,8 @@
 import { defaultParams, cleanParams, clipFps, cueInEffect, renderPixels } from '../engine/sprite.js';
 import { stylesOf, styleById } from '../engine/styles.js';
 import { bag, cleanSettings, lookOf } from './bag.js';     // W6-A: a sprite may offer more than one style (Contract 12)
-import { drawStage, backdropFor, stagesFor, sceneFor, defaultStage } from './stage.js';
+import { drawStage, backdropFor, stagesFor, sceneFor, defaultStage, keptStage } from './stage.js';
+import { bagBackdrop } from './bag-scene.js';      // "In your bag": the creator's own scene behind the sprite (the workbench)
 import { zip } from './zip.js';
 import { el, header, Frames, travel, hover, shadow, saveBlob, store, cap } from './ui.js';
 import { sounds, soundById, soundParams, rendered, playRendered, soundState, setSoundOn, toUnit, toValue } from './audio.js';
@@ -15,6 +16,7 @@ import { keepBag } from './add-to-bag.js';
 import { createEdit } from './editing.js';      // changes save themselves (docs/site-design.md, section 3)
 import { editPanel } from './panel.js';         // the right-hand column: versions, fine-tune tabs, the footer
 import { assetShell, icon, ICON, setIcon } from './asset-shell.js';
+import { bagTray } from './tray.js';      // the bag's slim tray at the right edge (1280 px and wider)
 import { lookTab, lookById, lookPainter } from './asset-look.js';      // the whole-set looks, on this one sprite
 import { madeNote, assetById } from './catalog.js';      // W5-A: a sprite made on this visit says so, and a draft cannot go in the bag
 
@@ -103,8 +105,6 @@ export function spritePage(app, sprite, query) {
   const backdrop = backdropFor(about);
   const scene = sceneFor(about);      // the scene "In a scene" means for this sprite: the meadow, or the cave
   const stageChoices = stagesFor(backdrop);
-  // (a choice kept from before the two scenes became one "In a scene")
-  const keptStage = (v) => (v === 'meadow' || v === 'cave' ? 'scene' : v);
   const stageKey = backdrop === 'panel' ? 'stage-panel' : 'stage';      // a chosen panel and a chosen scene are remembered apart
   const clipNames = Object.keys(sprite.clips);
   // The styles this sprite can be drawn in (Contract 12). With one, nothing on this page is different. With more, the
@@ -249,32 +249,63 @@ export function spritePage(app, sprite, query) {
   const stageWord = (s) => (backdrop === 'panel' ? s.label.replace(/ panel$/, '') : s.label);
   const stageCard = el('div', { class: 'stage-card tile', 'data-backdrop': backdrop, 'data-stage': st.stage ?? '' });
   const sceneBar = stageChoices.length < 2 ? el('span', { class: 'scene-none' }) : el('span', { class: 'seg', role: 'group', 'aria-label': 'Backdrop' },
-    (backdrop === 'ground' ? [...stageChoices].reverse() : stageChoices).map((s) => el('button', { type: 'button', 'data-stage': s.id, title: s.id === 'scene' ? `In a scene: the ${scene}` : null, 'aria-label': s.id === 'scene' ? null : `${s.label} backdrop`, 'aria-pressed': String(s.id === st.stage), onclick: () => {
+    (backdrop === 'ground' ? [...stageChoices].reverse() : stageChoices).map((s) => el('button', { type: 'button', 'data-stage': s.id, title: s.id === 'bag' ? `${sprite.name} standing among the things in your bag` : null, 'aria-label': s.id === 'bag' ? null : `${s.label} backdrop`, 'aria-pressed': String(s.id === st.stage), onclick: () => {
       st.stage = s.id; store.set(stageKey, s.id);
       stageCard.dataset.stage = s.id;
+      fit();
       for (const b of sceneBar.children) b.setAttribute('aria-pressed', String(b.dataset.stage === s.id));
     } }, stageWord(s))));
   stageCard.append(stageWrap, el('div', { class: 'stage-tools' }, sceneBar, playBtn));
+  // "In your bag" (the workbench): the bag's background and ground, and up to six other things from the bag around the
+  // sprite, quieter; the sprite stands in front. It follows the bag, and works whether or not this sprite is in it.
+  const behind = backdrop === 'ground' ? bagBackdrop({ id: sprite.id, view: about?.view ?? null, onChange: (info) => {
+    stageCard.dataset.bagBackground = info.background;
+    stageCard.dataset.bagOthers = info.others.join(' ');
+  } }) : null;
+  if (behind) { stageCard.dataset.bagBackground = ''; stageCard.dataset.bagOthers = ''; }
 
-  let stripRoom = 0;
+  let stripRoom = 0, stripCells = [];
   function buildStrip() {
     const n = sprite.clips[st.clip].frames;
     // every frame in one row inside the column: cells of 40px, smaller (down to 26) when the row would not fit; more
-    // frames than that wrap onto a second row
+    // frames than that wrap onto more rows
     const room = strip.clientWidth - 4, cell = room > 0 ? Math.max(26, Math.min(40, Math.floor((room - 4 * (n - 1)) / n))) : 40;
+    const cols = room > 0 ? Math.max(1, Math.min(n, Math.floor((room + 4) / (cell + 4)))) : n;
     strip.style.setProperty('--cell', `${cell}px`);
+    strip.style.setProperty('--cols', String(cols));
     stripRoom = strip.clientWidth;
-    const marked = new Set((st.cues[st.clip] ?? []).filter((c) => soundById[c.sound] && !soundById[c.sound].loop && applies(c)).map((c) => c.frame));
-    strip.replaceChildren(...Array.from({ length: n }, (_, f) => {
+    // the sounds on this animation's frames, by frame: { frame: [names] } (a loop plays all along, so it has no frame)
+    const sounding = (st.cues[st.clip] ?? []).filter((c) => soundById[c.sound] && !soundById[c.sound].loop && applies(c));
+    const names = new Map();
+    for (const c of sounding) names.set(c.frame, [...new Set([...(names.get(c.frame) ?? []), soundById[c.sound].name])]);
+    const rowsWithMarks = new Set([...names.keys()].map((f) => Math.floor(f / cols)));
+    // each row of frames, with a line above it for the marks when one of its frames plays a sound (none when none does)
+    let line = 1;
+    const rowAt = [];
+    for (let r = 0; r * cols < n; r++) { rowAt[r] = { marks: rowsWithMarks.has(r) ? line++ : 0, cells: line++ }; }
+    strip.classList.toggle('has-marks', names.size > 0);
+    stripCells = Array.from({ length: n }, (_, f) => {
       const c = el('canvas', { width: sprite.size[0], height: sprite.size[1] });
       c.getContext('2d').drawImage(pic(st.clip, f), 0, 0);
       // in its cell at a whole-number size, or a whole-number fraction when the frame is larger than the cell
       const z = (cell - 4) / Math.max(sprite.size[0], sprite.size[1]), k = z >= 1 ? Math.floor(z) : 1 / Math.ceil(1 / z);
       c.style.width = `${sprite.size[0] * k}px`; c.style.height = `${sprite.size[1] * k}px`;
-      return el('button', { type: 'button', class: 'cell' + (marked.has(f) ? ' has-sound' : ''), 'aria-label': `Frame ${f + 1}${marked.has(f) ? ', plays a sound' : ''}`, onclick: () => {
+      const has = names.has(f);
+      return el('button', { type: 'button', class: 'cell' + (has ? ' has-sound' : ''), style: `grid-row:${rowAt[Math.floor(f / cols)].cells};grid-column:${(f % cols) + 1}`, 'aria-label': `Frame ${f + 1}${has ? `, plays ${names.get(f).join(' and ')}` : ''}`, onclick: () => {
         st.playing = false; st.frame = f; st.lastFrame = f; syncPlay(); syncLoops(); fire(f, true);
       } }, c);
-    }));
+    });
+    // a mark above each frame that plays a sound, with its name, reaching to the next mark or the end of the row: a
+    // click plays it (design 4's frame line)
+    const frames = [...names.keys()].sort((a, b) => a - b);
+    const marks = frames.map((f, i) => {
+      const r = Math.floor(f / cols), rowEnd = (r + 1) * cols, next = Math.min(frames[i + 1] ?? n, rowEnd, n);
+      const words = names.get(f).join(' + ');
+      return el('button', { type: 'button', class: 'strip-mark', 'data-frame': String(f), title: `${words}, on frame ${f + 1}. Play it`, 'aria-label': `Play ${words} (frame ${f + 1})`,
+        style: `grid-row:${rowAt[r].marks};grid-column:${(f % cols) + 1} / span ${Math.max(1, next - f)}`, onclick: () => fire(f, true) },
+      el('i', { 'aria-hidden': 'true' }), el('span', {}, words));
+    });
+    strip.replaceChildren(...marks, ...stripCells);
   }
 
   // ---- the Sounds tab: for the animation that is playing, which sound, on which frame, play it, change it
@@ -461,7 +492,12 @@ export function spritePage(app, sprite, query) {
   if (edit.inBag()) saveUrl();
 
   shell = assetShell({ kind: 'sprite', id: sprite.id, name: sprite.name, line: sprite.blurb ?? '', made, edit, stage: stageCard, under: [clipBar, strip], panel });
+  // the bag, slim, as the page's third column: this sprite is marked in it while it is in the bag
+  const tray = bagTray({ size: 'slim', current: { kind: 'sprite', id: sprite.id, key: edit.key() } });
+  const offTray = edit.onChange(() => tray.setCurrent({ kind: 'sprite', id: sprite.id, key: edit.key() }));
+  shell.main.append(tray.node);
   app.replaceChildren(header('sprites'), shell.main);
+  tray.placed();
   // (the animation the page opens on is in sight among its chips, also when a tileset has rows of them)
   { const on = clipBar.querySelector('[aria-pressed="true"]'); const top = on ? on.offsetTop - clipBar.offsetTop : 0; if (on && top + on.offsetHeight > clipBar.clientHeight) clipBar.scrollTop = top - 4; }
 
@@ -490,7 +526,9 @@ export function spritePage(app, sprite, query) {
       return;
     }
     const z = Math.min(cw / (sw + 24), ch / (sh + (backdrop === 'panel' ? 16 : 36)));
-    const k = z >= 1 ? Math.min(6, Math.floor(z)) : 1 / Math.ceil(1 / z);
+    let k = z >= 1 ? Math.min(6, Math.floor(z)) : 1 / Math.ceil(1 / z);
+    // in your bag: a smaller whole-number size, so the scene shows enough of the bag's world around the sprite
+    if (behind && st.stage === 'bag' && k >= 1) k = Math.min(k, Math.max(1, Math.floor(ch / 120)));
     W = Math.ceil(cw / k); H = Math.ceil(ch / k);
     stage.width = W; stage.height = H;
     // the ground: under the middle of the tile, never so high that the sprite's top is cut, never off the bottom
@@ -524,21 +562,22 @@ export function spritePage(app, sprite, query) {
       drawStage(ctx, W, H, H, st.stage, 0);         // nothing to stand on: the piece sits in the middle of the panel
       px = Math.round((W - sprite.size[0]) / 2); py = Math.round((H - sprite.size[1]) / 2);
     } else {
-      drawStage(ctx, W, H, gy, st.stage === 'scene' ? scene : st.stage, st.scroll);
+      let foot = gy;
+      if (st.stage === 'bag' && behind) foot = behind.draw(ctx, W, H, gy, now / 1000, () => drawStage(ctx, W, H, gy, scene, st.scroll)).gy;
+      else drawStage(ctx, W, H, gy, st.stage, st.scroll);
       px = Math.round(W * 0.5 - sprite.size[0] / 2 + (sprite.size[0] / 2 - sprite.pivot[0]) * 0.5);
-      py = gy - sprite.pivot[1] - hover(sprite);
-      if (st.stage !== 'plain') shadow(ctx, px + sprite.pivot[0], gy, Math.round(sprite.size[0] * 0.17));
+      py = foot - sprite.pivot[1] - hover(sprite);
+      if (st.stage !== 'plain') shadow(ctx, px + sprite.pivot[0], foot, Math.round(sprite.size[0] * 0.17));
     }
     ctx.drawImage(pic(st.clip, st.frame), px, py);
-    const cells = strip.children;
-    for (let i = 0; i < cells.length; i++) cells[i].classList.toggle('on', i === st.frame);
+    for (let i = 0; i < stripCells.length; i++) stripCells[i].classList.toggle('on', i === st.frame);
     raf = requestAnimationFrame(tick);
   };
   raf = requestAnimationFrame(tick);
   syncLoops();
   return () => {
     cancelAnimationFrame(raf); ro.disconnect(); clearTimeout(urlTimer);
-    offEdit(); panel.close(); look.close(); shell.close(); edit.close(); clearTimeout(saveTimer);      // leaving saves whatever was still waiting
+    offEdit(); offTray(); tray.stop(); if (behind) behind.stop(); panel.close(); look.close(); shell.close(); edit.close(); clearTimeout(saveTimer);      // leaving saves whatever was still waiting
     window.removeEventListener('pagehide', flush);
     if (offFrames) offFrames();
     clearTimeout(aheadTimer);

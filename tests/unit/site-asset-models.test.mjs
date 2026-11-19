@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { soundModel } from '../../app/panel-model.js';
-import { STAGES, sceneFor, stagesFor, defaultStage } from '../../app/stage.js';
+import { STAGES, sceneFor, stagesFor, defaultStage, keptStage } from '../../app/stage.js';
 import { countChanges } from '../../app/editing.js';
 
 const read = (id) => JSON.parse(fs.readFileSync(new URL(`../../sounds/${id}.json`, import.meta.url), 'utf8'));
@@ -38,9 +38,13 @@ test('Surprise me on a track keeps its length; on a sound it changes everything'
   assert.equal(out.seed, 4, 'a sound\'s variation is left alone by a version');
 });
 
-test('the asset page offers "In a scene" and "Plain"; the scene suits the sprite', () => {
-  assert.deepEqual(STAGES.map((s) => s.id), ['scene', 'plain']);
-  assert.equal(stagesFor('ground')[0].id, 'scene', 'a thing that stands on the ground opens in its scene');
+test('the asset page offers "In your bag" and "Plain"; with nothing of the bag\'s own, the scene suits the sprite', () => {
+  assert.deepEqual(STAGES.map((s) => s.id), ['bag', 'plain']);
+  assert.deepEqual(STAGES.map((s) => s.label), ['In your bag', 'Plain']);
+  assert.equal(stagesFor('ground')[0].id, 'bag', 'a thing that stands on the ground opens in your bag');
+  // a choice remembered from before (the two scenes, then "In a scene") is "In your bag" now
+  for (const old of ['meadow', 'cave', 'scene']) assert.equal(keptStage(old), 'bag', old);
+  assert.equal(keptStage('plain'), 'plain');
   assert.equal(sceneFor({ themes: ['fantasy', 'dungeon'] }), 'meadow');
   assert.equal(sceneFor({ themes: ['dungeon'] }), 'cave');
   assert.equal(sceneFor({ themes: ['sci-fi'] }), 'cave');
@@ -48,8 +52,8 @@ test('the asset page offers "In a scene" and "Plain"; the scene suits the sprite
   assert.equal(sceneFor(null), 'meadow');
 });
 
-test('a character or a creature opens in its scene; a tileset, a prop and anything else opens plain', () => {
-  for (const type of ['character', 'creature']) assert.equal(defaultStage({ type }), 'scene', type);
+test('a character or a creature opens in your bag; a tileset, a prop and anything else opens plain', () => {
+  for (const type of ['character', 'creature']) assert.equal(defaultStage({ type }), 'bag', type);
   for (const type of ['tileset', 'prop', 'pickup', 'effect', 'projectile', undefined]) assert.equal(defaultStage({ type }), 'plain', String(type));
   assert.equal(defaultStage(null), 'plain');
 });

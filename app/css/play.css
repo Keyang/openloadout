@@ -1,144 +1,187 @@
-/* Loadout: the playground, #/play (app/play-page.js: the scene with the editing panel beside it). Match: mocks/5-catalogue/NOTES.md, "The bag and the playground".
+/* Loadout: the playground, #/play (app/play-page.js). One screen (docs/playground-tray-workbench.md, section 1): the
+   scene on the left, the list of what is in the bag on the right, scrolling inside itself; the page does not scroll at
+   1440 x 900, 1024 x 768 or 900 x 700. At 720 px and under the scene is pinned at the top and the rest scrolls under it.
    Owned by the builder of that page. Only that page's own layout goes here; tokens and the shared components (button,
    chip, tab, segmented control, tile, card, token, change dot, menu, the editing panel) are in base.css and are used
    as they are. */
 
-/* two columns: the scene on the left, on the right the editing panel at its full height (it never scrolls inside
-   itself, R7). While the page scrolls down the panel, the scene stays in view beside it (sticky, in its own row of the
-   grid, so nothing under it can slide beneath it); what is under the scene follows once the panel ends. */
-.play-page { display: grid; grid-template-columns: minmax(0, 1fr) minmax(400px, 34%); grid-template-rows: auto minmax(0, 1fr); align-items: start; }
-.play-page:not(.has-scene) { grid-template-columns: minmax(0, 1fr); }
+.play-page { --play-side: clamp(300px, 28vw, 400px); }
+.play-page.has-scene { display: grid; grid-template-columns: minmax(0, 1fr) var(--play-side); height: calc(100dvh - var(--play-top, 57px)); overflow: hidden; }
 .play-page:not(.has-scene) .play-side { display: none; }
-.play-main { min-width: 0; padding: var(--s5) var(--gutter) var(--s9); display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s5); }
-@media (min-width: 1001px) {
-  .play-page.has-scene .play-main { display: contents; }
-  .play-page.has-scene .play-main > * { grid-column: 1; min-width: 0; margin: var(--s5) var(--gutter) 0; }
-  .play-page.has-scene .play-main > .play-head { grid-row: 1; }
-  .play-page.has-scene .play-main > .play-card { grid-row: 2; position: sticky; top: 0; z-index: 2; background: var(--paper); padding-bottom: var(--s3); }
-  .play-page.has-scene .play-main > .play-foot { margin-bottom: var(--s9); }
-}
-.play-page:not(.has-scene) .play-main { max-width: calc(var(--page) + 2 * var(--gutter)); width: 100%; margin: 0 auto; padding-top: var(--s7); }
-.play-head { display: flex; align-items: baseline; gap: var(--s2) var(--s5); flex-wrap: wrap; }
-.play-head .lede { font-size: 14px; max-width: none; flex: 1 1 320px; }
-.play-page:not(.has-scene) .play-head { display: grid; gap: var(--s3); }
-.play-page:not(.has-scene) .play-head .lede { font-size: 18px; max-width: 36em; }
+.play-page:not(.has-scene) .play-main { max-width: calc(var(--page) + 2 * var(--gutter)); width: 100%; margin: 0 auto; padding: var(--s7) var(--gutter) var(--s9); display: grid; gap: var(--s5); }
+.play-page:not(.has-scene) .play-main .lede { font-size: 18px; max-width: 36em; }
 
-.play-side { grid-column: 2; grid-row: 1 / span 12; align-self: stretch; display: block; border-left: 1px solid var(--line); background: var(--paper); min-width: 0; }
-.play-side > .rx-panel { --pad: var(--s5); grid-template-rows: auto auto auto auto; }
-.play-side .rx-panel.has-preview { grid-template-rows: auto auto auto auto; }
-.play-side .tune { grid-template-rows: auto auto; }
-.play-side .pane { overflow: visible; }
-.play-side .ctl .chips { flex-wrap: wrap; overflow: visible; }      /* every option of a row in view (asset.css lays them in one row on a short window) */
-.play-side > .play-look { padding: var(--s4) var(--s5) var(--s5); }
-.play-side-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--s2) var(--s3); padding: var(--s3) var(--s5); border-bottom: 1px solid var(--line); font-size: 14px; }
-.play-side-pick, .play-side-links { display: flex; align-items: center; flex-wrap: wrap; gap: var(--s1) var(--s2); min-width: 0; }
-.play-side-links { margin-left: auto; gap: var(--s1) var(--s4); }
-.play-side-head label { font-weight: 600; }
-.play-side-head select { height: 32px; min-width: 0; max-width: 200px; padding: 0 10px; border: 1px solid var(--line-2); border-radius: var(--r); background: var(--paper); font-size: 14px; }
-.play-side-head select:hover { border-color: var(--ink); }
-.play-side-hint { font-size: 13px; white-space: nowrap; }
-.play-side-page { font-size: 13px; white-space: nowrap; }
-.play-look-open { white-space: nowrap; }
-.play-look-open[aria-pressed='true'] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
-.play-look-back { margin-bottom: var(--s3); font-size: 14px; }
-.play-look-back[hidden] { display: none; }
-.play-look-close { color: var(--ink-2); }
-.play-look-close:hover { color: var(--ink); }
-.play-look-note { font-size: 13px; color: var(--ink-2); margin-top: var(--s3); }
-.play-look .look-presets { grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); }
-.play-look .look-head .hint { display: none; }
-.play-own-look { color: var(--ink); }
+/* the left column: a short head, the scene (all the room that is left), the moves of the picked thing, the bar */
+.play-page.has-scene .play-main { min-width: 0; min-height: 0; display: flex; flex-direction: column; gap: var(--s2); padding: var(--s3) var(--s5) var(--s3); }
+.play-head { display: flex; align-items: baseline; gap: var(--s1) var(--s4); flex-wrap: wrap; flex: none; }
+.play-head h1 { font-size: 20px; line-height: 1.2; }
+.play-head .lede { font-size: 14px; max-width: none; flex: 1 1 240px; }
+.play-stick { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; gap: var(--s2); }
+.play-scene { position: relative; flex: 1 1 auto; min-height: 160px; max-height: calc((100vw - var(--play-side) - 48px) * 0.8); }      /* a very tall window: the scene stays wider than it is tall */
+.play-stage-wrap { position: absolute; inset: 0; display: grid; place-items: center; overflow: hidden; border-radius: var(--r); background: var(--shelf); }
+.play-stage { display: block; cursor: pointer; border-radius: var(--r); }
+.play-stage:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; }
 
-/* the scene */
-.play-card { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s3); min-width: 0; }
-.play-stage-wrap { background: var(--shelf); border-radius: var(--r); overflow: hidden; display: grid; place-items: center; min-height: 180px; }
-.play-stage { display: block; cursor: pointer; }
-.play-stage:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; border-radius: var(--r); }
-.play-hud { display: flex; align-items: center; gap: var(--s3) var(--s4); flex-wrap: wrap; font-size: 14px; min-width: 0; }
+/* score, health and the bag's interface pieces lie over the top edge of the scene */
+.play-hud { position: absolute; left: var(--s2); right: var(--s2); top: var(--s2); z-index: 2; display: flex; align-items: flex-start; gap: var(--s2) var(--s3); flex-wrap: wrap; font-size: 13px; pointer-events: none; }
+.play-hud > * { pointer-events: auto; }
 .play-hud-title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-.play-count { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-2); white-space: nowrap; }
+.play-count { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 var(--s2); border-radius: var(--r); background: rgba(255, 255, 255, 0.88); color: var(--ink-2); white-space: nowrap; }
 .play-count strong { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
-.play-pic { display: block; flex: none; }
-.play-pieces { display: flex; align-items: center; gap: var(--s3); overflow-x: auto; min-width: 0; flex: 1 1 200px; padding: 2px; scrollbar-width: thin; }
-.play-pieces.open { flex-wrap: wrap; overflow: visible; flex-basis: 100%; }
+.play-pic { display: block; flex: none; image-rendering: pixelated; }
+.play-pieces { display: flex; align-items: center; gap: var(--s2); overflow-x: auto; min-width: 0; flex: 1 1 160px; padding: 2px; scrollbar-width: thin; }
+.play-pieces.open { flex-wrap: wrap; overflow: visible; flex-basis: 100%; padding: var(--s2); border-radius: var(--r); background: rgba(255, 255, 255, 0.88); }
 .play-piece { display: inline-flex; gap: 2px; flex: none; }
 .play-pieces.open .play-piece { flex-wrap: wrap; flex-shrink: 1; }
-.play-tools { display: flex; align-items: center; gap: var(--s2) var(--s2); flex-wrap: wrap; }
-.play-extras { display: inline-flex; align-items: center; gap: var(--s2); flex-wrap: wrap; font-size: 13px; }
-.play-extras .label, .play-pick .label { color: var(--ink-2); font-size: 13px; }
-.play-view { margin-left: var(--s3); }
+.play-pieces-more { height: 28px; }
+
+/* the moves of the picked thing: one line of chips under the scene, scrolling sideways when there are many */
+.play-anims { flex: none; height: 40px; display: flex; align-items: center; gap: var(--s3); overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; font-size: 13px; }
+.play-anims .chips { flex-wrap: nowrap; }
+.play-anims .chip { height: 30px; }
+.play-anims-name { font-weight: 600; white-space: nowrap; }
+.play-anims-hint { white-space: nowrap; }
+.play-anims-note, .play-howto-line { color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.play-anims-note strong, .play-howto { color: var(--ink); font-weight: 500; }
+
+/* the bar: Pause, Mute, Reset, the view; the keys; More */
+.play-bar { flex: none; display: flex; align-items: center; gap: var(--s2) var(--s3); padding-top: var(--s2); border-top: 1px solid var(--line); min-width: 0; }
+.play-tools { display: flex; align-items: center; gap: var(--s2); flex: none; }
+.play-view { display: inline-flex; align-items: center; gap: var(--s2); margin-left: var(--s2); font-size: 13px; }
+.play-view .label { color: var(--ink-2); }
 .play-view-now { font-weight: 500; }
-.play-extras .chip { height: 28px; }
-.play-keys, .play-howto, .play-copied { font-size: 13px; color: var(--ink-2); }
-.play-howto { color: var(--ink); }
+.play-keys { flex: 1 1 auto; min-width: 0; font-size: 13px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.play-more-wrap { flex: none; margin-left: auto; }
+.play-more-menu { min-width: 260px; max-width: min(420px, 80vw); }
+.play-copied { font-size: 13px; color: var(--ink-2); padding: 4px 10px 6px; margin: 0; }
 .play-copied:empty { display: none; }
 .play-map { display: block; width: 100%; margin-top: var(--s2); padding: var(--s2); border: 1px solid var(--line-2); border-radius: var(--r); font: 12px/1.2 ui-monospace, monospace; }
-.play-pad { display: none; justify-content: space-between; gap: var(--s3); }
+
+/* on-screen buttons, on a phone or a touch screen */
+.play-pad { display: none; justify-content: space-between; gap: var(--s3); flex: none; }
+.play-pad[hidden] { display: none !important; }
 .play-pad-group { display: flex; gap: 6px; }
 .play-key { min-width: 48px; height: 48px; padding: 0 var(--s3); border: 1px solid var(--line-2); border-radius: var(--r); background: var(--paper); font-size: 14px; font-weight: 500; touch-action: none; user-select: none; -webkit-user-select: none; }
 .play-key.held { background: var(--ink); border-color: var(--ink); color: #fff; }
 @media (pointer: coarse), (max-width: 720px) { .play-pad { display: flex; } }
 
-/* under the scene */
-.play-things h2, .play-board h2, .play-music h2, .play-left-out h2 { font-size: 15px; line-height: 1.3; font-weight: 600; letter-spacing: -0.01em; margin-bottom: var(--s2); }
-.play-things, .play-board, .play-music, .play-left-out { padding-top: var(--s4); border-top: 1px solid var(--line); min-width: 0; }
-.play-pick { display: flex; align-items: center; gap: var(--s2); flex-wrap: wrap; margin-bottom: var(--s2); }
-.play-pick .chip { height: 28px; }
-.play-things ul { border-top: 1px solid var(--line); margin-top: var(--s2); }
-.play-things li { display: grid; grid-template-columns: minmax(120px, 1fr) minmax(0, 2fr) auto auto; align-items: center; gap: var(--s1) var(--s4); padding: 6px 0; border-bottom: 1px solid var(--line); font-size: 14px; min-height: 40px; }
-.play-name { font-weight: 500; display: inline-flex; align-items: center; gap: var(--s2); flex-wrap: wrap; }
-.play-tag { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 400; color: var(--ink-2); white-space: nowrap; }
-.play-things .hint, .play-board .hint, .play-music .hint, .play-foot .hint, .play-left-out .hint { font-size: 13px; color: var(--ink-2); }
-.play-things > .hint { margin-top: var(--s3); }
-.play-things .hint a { text-decoration: underline; text-underline-offset: 3px; }
-.play-more { display: inline-flex; align-items: center; gap: 2px; grid-column: 3; }
-.play-step { width: 28px; height: 28px; border: 1px solid var(--line-2); border-radius: var(--r); font-size: 16px; line-height: 1; }
-.play-step:hover { border-color: var(--ink); }
-.play-n { min-width: 24px; text-align: center; font-variant-numeric: tabular-nums; }
-.play-edit { grid-column: 4; font-size: 13px; color: var(--ink-2); padding: 4px 0; }
-.play-edit:hover, .play-edit[aria-pressed='true'] { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
-.play-edit[aria-pressed='true'] { font-weight: 500; }
-.play-sounds { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: var(--s2); }
-.play-track { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--s2) var(--s5); align-items: end; padding: var(--s2) 0; }
-.play-track-top { display: flex; align-items: center; gap: var(--s3); }
-.play-track .field { font-size: 13px; color: var(--ink-2); min-width: 0; }
-.play-track .field label { display: block; }
-.play-track .hint { grid-column: 1 / -1; }
-.play-track .hint:empty { display: none; }
-.play-left-out p + p { margin-top: var(--s2); }
-.play-left-out-do { display: flex; align-items: center; gap: var(--s3); flex-wrap: wrap; }
-.play-foot { display: flex; align-items: center; gap: var(--s3); flex-wrap: wrap; }
+/* the right column: the head, then the list, the panel for one thing, or the look of the whole bag */
+.play-page.has-scene .play-side { min-width: 0; min-height: 0; display: flex; flex-direction: column; border-left: 1px solid var(--line); background: var(--paper); }
+.play-side-head { flex: none; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--s2) var(--s3); padding: var(--s3) var(--s4); border-bottom: 1px solid var(--line); }
+.play-side-title { font-size: 15px; line-height: 1.3; font-weight: 600; letter-spacing: -0.01em; white-space: nowrap; }
+.play-side-title .quiet { font-weight: 400; font-size: 13px; }
+.play-side-links { display: flex; align-items: center; flex-wrap: wrap; gap: var(--s1) var(--s3); font-size: 13px; }
+.play-look-open { white-space: nowrap; }
+.play-look-open[aria-pressed='true'] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.play-side-bag { white-space: nowrap; }
+.play-list, .play-edit-view, .play-side > .play-look { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+.play-list:focus { outline: 0; }
 
-@media (max-width: 1000px) {
-  /* one column: the scene, then the panel for what was clicked, then the rest */
-  .play-page, .play-page.has-scene { display: flex; flex-direction: column; align-items: stretch; }
-  .play-main { display: contents; }
-  .play-main > * { margin: var(--s4) var(--gutter) 0; order: 3; }
-  .play-main > .play-head { order: 0; }
-  .play-main > .play-card { order: 1; }
-  .play-main > .play-foot { margin-bottom: var(--s8); }
-  .play-side { order: 2; position: static; height: auto; display: block; border-left: 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin-top: var(--s5); }
-  .play-side > .rx-panel { display: block; }
-  .play-side .pane { overflow: visible; }
-  /* the scene is above, out of sight once the creator scrolls down to a lower control: the item's own picture stays
-     pinned at the top of the window while the controls scroll under it, so every change is seen where it is made (R1) */
-  .play-side .rx-panel.has-preview > .rx-preview { position: sticky; top: 0; z-index: 3; padding: var(--s3) var(--s5); background: var(--paper); border-bottom: 1px solid var(--line); }
-  .play-side .rx-preview-tile { width: 100%; height: 152px; flex-direction: row; }
-  .play-side .rx-preview-tile.is-sound { height: 96px; }
-  .play-page:not(.has-scene) .play-main { display: grid; }
-  .play-page:not(.has-scene) .play-main > * { margin: 0; }
+/* the list */
+.play-list section { padding: var(--s3) var(--s4) var(--s2); }
+.play-list section + section { border-top: 1px solid var(--line); }
+.play-list h3 { font-size: 13px; line-height: 1.3; font-weight: 600; color: var(--ink-2); margin: 0 0 var(--s1); }
+.play-list ul { margin: 0; padding: 0; list-style: none; }
+.play-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 0 var(--s2); padding: 4px 0; border-bottom: 1px solid var(--line); }
+.play-row:last-child { border-bottom: 0; }
+.play-row-pick, .play-row-main { display: flex; align-items: center; gap: var(--s3); min-width: 0; padding: 4px; margin-left: -4px; border-radius: var(--r); text-align: left; }
+.play-row-pick:hover:not(:disabled) { background: var(--shelf); }
+.play-row.is-picked .play-row-pick { background: var(--shelf-2); }
+.play-row.is-picked .play-name { text-decoration: underline; text-underline-offset: 3px; }
+.play-pic-tile { width: 44px; height: 44px; flex: none; display: grid; place-items: center; font-size: 18px; color: var(--ink-2); }
+.play-pic-live { display: block; width: 40px; height: 40px; image-rendering: pixelated; }
+.play-row-text { display: grid; min-width: 0; line-height: 1.3; }
+.play-name { font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: var(--s2); min-width: 0; }
+.play-does { font-size: 12px; color: var(--ink-2); }
+.play-tag { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 400; color: var(--ink-2); white-space: nowrap; }
+.play-more { display: inline-flex; align-items: center; gap: 2px; }
+.play-step { width: 28px; height: 28px; border: 1px solid var(--line-2); border-radius: var(--r); font-size: 16px; line-height: 1; background: var(--paper); }
+.play-step:hover { border-color: var(--ink); }
+.play-n { min-width: 22px; text-align: center; font-size: 13px; font-variant-numeric: tabular-nums; }
+.play-row-acts { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2); padding: 2px 0 var(--s2) 52px; }
+.play-row-acts[hidden] { display: none; }
+.play-row-acts .hint { font-size: 12px; color: var(--ink-2); }
+.play-row.is-out .play-row-pick { opacity: 0.5; cursor: default; }
+.play-track-note { grid-column: 1 / -1; font-size: 12px; color: var(--ink-2); padding-left: 52px; margin: 0; }
+.play-track-note:empty { display: none; }
+.play-left-out .hint, .play-notes .hint { font-size: 13px; color: var(--ink-2); }
+.play-left-out-do { display: flex; align-items: center; gap: var(--s2) var(--s3); flex-wrap: wrap; margin: var(--s2) 0; }
+.play-notes .hint + .hint { margin-top: var(--s2); }
+.play-notes a { text-decoration: underline; text-underline-offset: 3px; }
+
+/* the panel for one thing, in place of the list */
+.play-edit-top { display: flex; align-items: center; justify-content: space-between; gap: var(--s3); padding: var(--s2) var(--s4); border-bottom: 1px solid var(--line); font-size: 13px; }
+.play-back { color: var(--ink); font-weight: 500; }
+.play-side-page { white-space: nowrap; color: var(--ink-2); }
+.play-edit-view > .rx-panel { --pad: var(--s4); display: block; }
+.play-side .pane { overflow: visible; }
+.play-side .tune { grid-template-rows: auto auto; }
+.play-side .ctl .chips { flex-wrap: wrap; overflow: visible; }      /* every option of a row in view (asset.css lays them in one row on a short window) */
+/* a narrow column: a control's name and its Reset on one line, the control itself under them at the full width */
+.play-side { container-type: inline-size; }
+@container (max-width: 380px) {
+  .play-side .ctl { grid-template-columns: minmax(0, 1fr) auto; row-gap: 2px; }
+  .play-side .ctl > .ctl-label { grid-column: 1; grid-row: 1; }
+  .play-side .ctl > .reset { grid-column: 2; grid-row: 1; }
+  .play-side .ctl > :nth-child(2) { grid-column: 1 / -1; grid-row: 2; }
+  .play-side .ctl > .ctl-note { grid-column: 1 / -1; }
 }
-@media (max-width: 720px) {
-  .play-things li { grid-template-columns: minmax(0, 1fr) auto auto; }
-  .play-things li .hint { grid-column: 1 / -1; grid-row: 2; }
-  .play-more { grid-column: 2; }
-  .play-edit { grid-column: 3; }
-}
+.play-side .rx-panel.has-preview > .rx-preview { position: sticky; top: 0; z-index: 3; padding: var(--s2) var(--s4); background: var(--paper); border-bottom: 1px solid var(--line); }
+.play-side .rx-preview-tile { width: 100%; height: 120px; flex-direction: row; }
+.play-side .rx-preview-tile.is-sound { height: 80px; }
+.play-side > .play-look { padding: var(--s3) var(--s4) var(--s4); }
+.play-look-back { margin-bottom: var(--s3); font-size: 14px; }
+.play-look-close { color: var(--ink-2); }
+.play-look-close:hover { color: var(--ink); }
+.play-look-note { font-size: 13px; color: var(--ink-2); margin-top: var(--s3); }
+.play-look .look-presets { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); }
+.play-look .look-head .hint { display: none; }
+.play-own-look { color: var(--ink); }
 /* the panel in a narrow column: its heading row may fold (base.css keeps it on one line) */
 .play-side .block-head, .bag-side .block-head { flex-wrap: wrap; row-gap: var(--s2); }
 .play-side .block-head h2, .bag-side .block-head h2 { margin-right: auto; }
-/* the panel's tabs beside a scene or a list: every one is shown, on a second line when the column is narrow (base.css
-   scrolls the row sideways with no scrollbar, which hides the last ones) */
-.play-side .tune-head, .bag-side .tune-head { display: block; }      /* the heading on a line of its own, the tabs under it */
+/* the panel's tabs beside a scene or a list: every one is shown, on a second line when the column is narrow */
+.play-side .tune-head, .bag-side .tune-head { display: block; }
 .play-side .tune-head h2, .bag-side .tune-head h2 { padding-bottom: 0; }
 .play-side .tune-head .tabs, .bag-side .tune-head .tabs { flex-wrap: wrap; overflow: visible; gap: 0 var(--s4); }
+
+.play-foot { display: flex; align-items: center; gap: var(--s3); flex-wrap: wrap; }
+
+/* a short desktop window: the head gives its line to the scene */
+@media (min-width: 721px) and (max-height: 760px) {
+  .play-head .lede { display: none; }
+}
+@media (min-width: 721px) and (max-width: 1000px) {
+  .play-page.has-scene .play-main { padding: var(--s2) var(--s4); }
+  .play-head .lede { display: none; }
+  .play-keys { display: none; }
+  .play-view .label { display: none; }
+  .play-bar { flex-wrap: wrap; }
+  /* two lines of moves, always the same height, so the scene above keeps its size */
+  .play-anims { height: 72px; flex-wrap: wrap; align-content: center; row-gap: 4px; overflow: hidden auto; }
+  .play-anims .chips { flex-wrap: wrap; }
+}
+
+/* a phone: one column; the scene (and its buttons) pinned at the top, the rest scrolls under it */
+@media (max-width: 720px) {
+  .play-page.has-scene { display: block; height: auto; overflow: visible; }
+  .play-page.has-scene .play-main { display: contents; }      /* so the pinned scene stays pinned past the bar, down the whole list */
+  .play-head { padding: var(--s3) var(--s4) var(--s2); }
+  .play-head .lede { display: none; }
+  .play-stick { position: sticky; top: 0; z-index: 5; background: var(--paper); padding: var(--s2) var(--s4); border-bottom: 1px solid var(--line); }
+  .play-scene { height: min(46vh, 380px); flex: none; }
+  .play-anims, .play-bar { padding: var(--s2) var(--s4) 0; }
+  .play-anims { height: auto; min-height: 40px; flex-wrap: wrap; overflow: visible; }
+  .play-anims .chips { flex-wrap: wrap; }
+  .play-anims-note, .play-howto-line { white-space: normal; }
+  .play-bar { flex-wrap: wrap; border-top: 0; }
+  .play-tools { flex: 1 1 100%; flex-wrap: wrap; min-width: 0; }
+  .play-view { margin-left: 0; }
+  .play-view .label { display: none; }
+  .play-keys { white-space: normal; flex-basis: 100%; }
+  .play-more-wrap { margin-left: 0; }
+  .play-page.has-scene .play-side { display: block; border-left: 0; border-top: 1px solid var(--line); margin-top: var(--s3); }
+  .play-list, .play-edit-view, .play-side > .play-look { overflow: visible; }
+  .play-side .rx-panel.has-preview > .rx-preview { position: static; }
+  .play-side-links { width: 100%; justify-content: space-between; }
+}

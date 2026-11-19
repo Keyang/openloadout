@@ -201,24 +201,24 @@ test('an empty bag explains what to do', async ({ page }) => {
 test('a bag with only a sound shows the sound board and no scene', async ({ page }) => {
   await openPlay(page, [SOUND('coin-pickup')]);
   await expect(stage(page)).toHaveCount(0);
-  await expect(page.getByRole('heading', { name: 'Sound board' })).toBeVisible();
+  await expect(page.locator('.play-board').getByRole('heading', { name: 'Sounds' })).toBeVisible();
   const button = page.locator('.play-board').getByRole('button', { name: /Coin/ });
   await expect(button).toBeVisible();
   await button.click();
   await expect.poll(async () => (await state(page)).heard.map((h) => h.sound)).toContain('coin-pickup');
 });
 
-test('music in the bag can be started and stopped, with its main sliders', async ({ page }) => {
+test('music in the bag can be started and stopped from its row; its settings are one Change away', async ({ page }) => {
   test.setTimeout(90_000);
   await openPlay(page, [HERO, MUSIC('battle-theme')]);
   const box = page.locator('.play-music');
   await expect(box).toContainText('Battle');
-  const sliders = box.locator('input[type=range]');
-  expect(await sliders.count()).toBeGreaterThanOrEqual(1);
-  await expect(box.getByLabel(/Intensity/)).toBeVisible();
   await box.getByRole('button', { name: /Play music/ }).click();
   await expect(box.getByRole('button', { name: /Stop music/ })).toBeVisible({ timeout: 30_000 });
-  await setRange(sliders.first(), 'other');
+  await box.getByRole('button', { name: 'Change', exact: true }).click();
+  await expect(page.locator('.play-side .rx-panel')).toHaveAttribute('aria-label', 'Change Battle theme');
+  await setRange(page.locator('.play-side .rx-panel input[type=range]').first(), 'other');
+  await page.locator('.play-side').getByRole('button', { name: /All things in your bag/ }).click();
   await box.getByRole('button', { name: /Stop music/ }).click();
   await expect(box.getByRole('button', { name: /Play music/ })).toBeVisible();
 });
@@ -323,7 +323,7 @@ test('the first real tileset, background and bar build a side-view scene', async
   expect(s.plan.background).toBeTruthy();
   const { opaque, width, height } = await canvasStats(stage(page));
   expect(opaque).toBe(width * height);
-  await expect(page.locator('.play-things')).toContainText('Makes the ground.');
+  await expect(page.locator('.play-things')).toContainText('Makes the ground');
   // the player still stands on the ground, walks up the slope and is stopped by nothing on the way
   await page.keyboard.down('Shift');
   await page.keyboard.down('ArrowRight');
@@ -386,7 +386,7 @@ test('the page says only what can happen, and marks a sprite the visitor changed
   await expect(page.locator('.play-howto')).toHaveText('Jump onto the ledges, collect the coins, press X next to the slime.');
   await expect(page.locator('.play-keys')).toContainText('X to attack or use things');
   await expect(page.locator('.play-collected')).toHaveCount(1);
-  await expect(page.locator('.play-things li', { hasText: 'Slime' })).toContainText('hurts it');
+  await expect(page.locator('.play-things li', { hasText: 'Slime' })).toContainText('you can hit it');
   await expect(page.locator('.play-tag')).toHaveCount(0);
 
   // no pickups: no "Collected"; a changed Hero is marked as the visitor's version
@@ -419,8 +419,9 @@ test.describe('the level as text', () => {
     const map = (await state(page)).map;
     expect(map.startsWith('@ view = side\n')).toBe(true);
     expect(map).toContain('@ tilesets = play-tiles');
-    expect(map).toContain('########################');
-    await page.getByRole('button', { name: 'Copy this level' }).click();
+    expect(map).toContain('#'.repeat((await state(page)).level.cols));      // the ground, all the way across
+    await page.getByRole('button', { name: 'More' }).click();
+    await page.getByRole('menuitem', { name: 'Copy this level' }).click();
     await expect(page.locator('.play-copied')).toContainText('Copied');
     expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(map);
   });
@@ -439,16 +440,15 @@ test('the platformer assets together: every side-view tileset builds one scene, 
   expect(s.plan.tilesets.length).toBe(5);
   const cols = s.map.split('\n').filter((row) => row && !row.startsWith('@'))[0].length;
   expect(s.width).toBe(cols * 32);
-  expect(cols).toBe(24 + 2 * 8 + 10);                       // the ground, two halls (the cave's and the castle's), the post and the cliff
+  expect(cols, 'one screen: the level is as wide as the picture').toBe(s.level.cols);
+  expect(cols * 32 - s.view.w).toBeLessThan(32);
   expect(s.map).toContain('liquid:water');
   expect(s.map).toContain('liquid:fall');
-  expect(s.map).toContain('open:stone:arch-l');
-  expect(s.map).toContain('back:dark');
+  expect(s.map).toMatch(/back:/);                          // a hall with a back wall behind it
   const { opaque, width, height } = await canvasStats(stage(page));
   expect(opaque).toBe(width * height);
-  // the hero can run from the start into the first hall: over the mound, through the pool, past the step, under the arch
-  // (the whole way to the far end, with nothing but the hero in the scene, is walked in play-views.spec.mjs)
-  const far = 25 * 32;
+  // the hero can run from the start to the far side of the picture: over the mound, past the hall, through the pool
+  const far = (cols - 3) * 32;
   await page.keyboard.down('Shift');
   await page.keyboard.down('ArrowRight');
   let last = -1, stuck = 0;
@@ -468,7 +468,13 @@ test('side view: the hero wades in the pool, with the water drawn in front of it
   test.skip(!['tiles-forest', 'tiles-water'].every(exists), 'the forest and water tilesets are not both there yet');
   await openPlay(page, [HERO]);
   await addSprites(page, ['tiles-forest', 'tiles-water']);
-  expect((await state(page)).map).toContain('liquid:water');
+  const s0 = await state(page);
+  expect(s0.map).toContain('liquid:water');
+  // where the pool is: the '~' cells of the map, in the ground's top row
+  const rowsOfMap = s0.map.split('\n').filter((row) => row && !row.startsWith('@'));
+  const groundY = s0.level.groundY, poolRow = rowsOfMap[groundY / 32];
+  const poolCols = [...poolRow].map((ch, c) => (ch === '~' ? c : -1)).filter((c) => c >= 0);
+  expect(poolCols.length).toBeGreaterThan(1);
   await page.keyboard.down('Shift');
   await page.keyboard.down('ArrowRight');
   let stuck = 0, last = -1;
@@ -483,28 +489,29 @@ test('side view: the hero wades in the pool, with the water drawn in front of it
   await page.keyboard.up('Shift');
   await expect.poll(async () => { const p = (await state(page)).player; return p.wading && p.onGround; }).toBe(true);
   const p = (await state(page)).player;
-  expect(p.y).toBe(7 * 32 + 20);                           // legs under the surface, body above it
+  expect(p.y).toBe(groundY + 20);                          // legs under the surface, body above it
   expect(p.hp).toBe(3);                                    // water does no harm
   // The liquid is drawn in front of what stands in it: under the surface line the picture is the same with the hero
   // there as with the hero gone, and above it the hero shows. (Paused, so the water itself holds still.)
   await page.getByRole('button', { name: 'Pause' }).click();
   const region = (x0, y0, w, h) => stage(page).evaluate((cv, r) => {
     const s = window.__loadoutPlay.state(), z = s.zoom;
-    const camX = Math.max(0, Math.min(s.width - s.view.w, Math.round(s.player.x - s.view.w / 2)));
-    const camY = Math.max(0, Math.min(Math.min(s.height - s.view.h, 7 * 32 + 40 - s.view.h), Math.round(s.player.y - s.view.h * 0.62)));
-    const d = cv.getContext('2d').getImageData((r.x0 - camX) * z, (r.y0 - camY) * z, r.w * z, r.h * z).data;
+    const d = cv.getContext('2d').getImageData((r.x0 - s.cam.x) * z, (r.y0 - s.cam.y) * z, r.w * z, r.h * z).data;
     let h = 2166136261;
     for (let i = 0; i < d.length; i++) h = Math.imul(h ^ d[i], 16777619);
     return h >>> 0;
   }, { x0, y0, w, h });
-  await page.evaluate(() => window.__loadoutPlay.put(19.5 * 32, 7 * 32 + 20));       // the middle of the pool, clear of the banks
-  const x0 = Math.round(19.5 * 32) - 6;
+  // a cell of the pool clear of the waterfall (which is drawn in front of everything)
+  const clear = poolCols.find((c) => rowsOfMap[groundY / 32 - 1][c] !== 'V' && rowsOfMap[groundY / 32][c] === '~');
+  const mid = (clear + 0.5) * 32;
+  await page.evaluate(([x, y]) => window.__loadoutPlay.put(x, y), [mid, groundY + 20]);
+  const x0 = Math.round(mid) - 6;
   await page.waitForTimeout(200);
-  const legs = await region(x0, 7 * 32 + 9, 12, 10), head = await region(x0, 7 * 32 - 20, 12, 14);
-  await page.evaluate(() => window.__loadoutPlay.put(16.5 * 32, 7 * 32));
+  const legs = await region(x0, groundY + 9, 12, 10), head = await region(x0, groundY - 20, 12, 14);
+  await page.evaluate(([x, y]) => window.__loadoutPlay.put(x, y), [32 * 1.5, groundY]);
   await page.waitForTimeout(200);
-  expect(await region(x0, 7 * 32 + 9, 12, 10)).toBe(legs);
-  expect(await region(x0, 7 * 32 - 20, 12, 14)).not.toBe(head);
+  expect(await region(x0, groundY + 9, 12, 10)).toBe(legs);
+  expect(await region(x0, groundY - 20, 12, 14)).not.toBe(head);
 });
 
 test('top-down: trees and houses block the way at their base, and the hero walks behind them', async ({ page }) => {

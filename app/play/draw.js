@@ -193,7 +193,8 @@ export function createPainter({ sprites, colour, tiles: tileSets = null }) {
         const f = c.frames > 1 ? Math.floor(time * clipFps(sprite, clip, params)) % c.frames : 0;
         const img = frame(backgroundKey, clip, f);
         const speed = layerSpeed(clip, i, n);
-        const y = view.h - img.height + Math.round(rise * speed);
+        // a one-screen level does not move: every layer stands on the same line, a little under the ground's top
+        const y = level.screen ? level.groundY + 40 - cam.y - img.height : view.h - img.height + Math.round(rise * speed);
         for (let x = -layerShift(cam.x, speed, img.width); x < view.w; x += img.width) g.drawImage(img, x, y);
       });
       return;

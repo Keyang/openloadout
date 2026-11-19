@@ -1,0 +1,67 @@
+/* Loadout: the bag tray beside the library, #/browse, and the asset pages, #/sprite/<id>, #/sound/<id>, #/music/<id>
+   (app/tray.js, with its small live scene from app/bag-scene.js). docs/playground-tray-workbench.md, section 2.
+   Owned by the builder of that page. Tokens and the shared components (button, tile, change dot) are in base.css and
+   are used as they are; nothing here has a colour of its own.
+     full  the library, 1024 px and wider: a panel 320 px wide at the right edge, the full height under the header, that
+           stays while the results scroll
+     slim  an asset page, 1280 px and wider: a column 88 px wide, the third column of the page
+   Narrower than that the tray is not shown: the header's Bag button is the way to the bag. */
+
+.tray { display: none; }
+.tray-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'title dl' 'count dl'; align-items: center; column-gap: var(--s3); }
+.tray-title { grid-area: title; font-size: 15px; line-height: 1.3; font-weight: 600; letter-spacing: -0.01em; }
+.tray-count { grid-area: count; font-size: 13px; color: var(--ink-2); }
+.tray-count b { font-size: 15px; font-weight: 600; color: var(--ink); }
+.tray-dl { grid-area: dl; gap: 6px; }
+.tray-status { font-size: 12px; line-height: 1.4; color: var(--ink-2); }
+.tray-status:empty { display: none; }
+.tray-empty { font-size: 14px; line-height: 1.45; color: var(--ink-2); }
+.tray-list { margin: 0; padding: 0; list-style: none; min-height: 0; }
+.tray-pic { position: relative; display: grid; place-items: center; overflow: hidden; flex: none; color: var(--ink-2); }
+.tray-pic img, .tray-pic canvas { max-width: 100%; max-height: 100%; object-fit: contain; image-rendering: pixelated; }
+.tray-row:hover .tray-pic { background: var(--shelf-2); }
+.tray-more { font-size: 12px; color: var(--ink-2); text-align: center; }
+
+/* the small live scene of the bag: a picture the width of the panel, opening the playground */
+.tray-scene { display: block; position: relative; height: 132px; overflow: hidden; flex: none; }
+.tray-scene canvas { display: block; width: 100%; height: 132px; image-rendering: pixelated; }
+.tray-scene:hover { box-shadow: inset 0 0 0 1px var(--ink); }
+.tray-scene:hover canvas { opacity: 0.92; }
+.tray-scene:focus-visible { outline-offset: 2px; }
+
+/* ---------- full: the library ---------- */
+@media (min-width: 1024px) {
+  .tray-full { display: flex; flex-direction: column; gap: var(--s3); position: fixed; right: 0; top: var(--top); bottom: 0; width: 320px; z-index: 15; padding: var(--s4); background: var(--paper); border-left: 1px solid var(--line); }
+  #app:has(> .tray-full) > main.lib { margin: 0 320px 0 auto; }
+  .tray-full .tray-list { flex: 1 1 auto; overflow-y: auto; scrollbar-width: thin; margin: 0 calc(-1 * var(--s2)); padding: 0 var(--s2); }
+  .tray-full .tray-list > li { display: grid; grid-template-columns: minmax(0, 1fr) 28px; align-items: center; gap: var(--s1); border-bottom: 1px solid var(--line); }
+  .tray-full .tray-list > li:last-child { border-bottom: 0; }
+  .tray-full .tray-row { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; align-items: center; gap: var(--s3); padding: 6px 0; min-width: 0; }
+  .tray-full .tray-pic { width: 44px; height: 44px; }
+  .tray-full .tray-words { display: grid; min-width: 0; }
+  .tray-full .tray-name { font-size: 14px; font-weight: 500; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tray-full .tray-type { font-size: 12px; color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tray-full .tray-row:hover .tray-name { text-decoration: underline; text-underline-offset: 3px; }
+  .tray-full .tray-dot { display: inline-flex; padding-right: 2px; }
+  .tray-x { width: 28px; height: 28px; display: grid; place-items: center; border-radius: var(--r); color: var(--ink-2); }
+  .tray-x:hover { color: var(--ink); background: var(--shelf); }
+}
+
+/* ---------- slim: an asset page's third column ---------- */
+@media (min-width: 1280px) {
+  .rx:has(> .tray-slim) { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr) 88px; }
+  .tray-slim { display: flex; flex-direction: column; gap: var(--s2); min-height: 0; overflow: hidden; padding: var(--s4) var(--s2); border-left: 1px solid var(--line); }
+  .tray-slim .tray-head { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'count' 'dl'; row-gap: var(--s2); }
+  .tray-slim .tray-count { display: grid; line-height: 1.2; }
+  .tray-slim .tray-count b { font-size: 20px; letter-spacing: -0.02em; }
+  .tray-slim .tray-dl { width: 100%; padding: 0 4px; font-size: 12px; }
+  .tray-slim .tray-dl svg { display: none; }
+  .tray-slim .tray-status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .tray-slim .tray-list { display: grid; gap: 6px; align-content: start; overflow: hidden; }
+  .tray-slim .tray-row { display: block; }
+  .tray-slim .tray-pic { width: 100%; height: 56px; }
+  .tray-slim .tray-pic.is-sound { height: 40px; }
+  .tray-slim .tray-pic .dot { position: absolute; top: 4px; right: 4px; }
+  .tray-slim li[aria-current='true'] .tray-pic { box-shadow: inset 0 0 0 1.5px var(--ink); }
+  .tray-slim .tray-empty { font-size: 12px; text-align: center; }
+}

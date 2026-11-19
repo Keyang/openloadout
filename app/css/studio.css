@@ -1,0 +1,204 @@
+/* Loadout: the studio, #/studio and #/studio/<draft> (app/studio-page.js, app/studio/*). Match: docs/studio.md section 5 and
+   the remix page of design 5 (mocks/5-catalogue/remix.html).
+   Owned by the builder of that page. The editing page is the asset page's frame (main.rx in app/css/asset.css: two
+   columns filling the window, the picture pinned on a phone) with the editing panel's pieces from base.css (.tabs,
+   .pane, .ctl, .rx-foot, .saved, .seg, .chip, .btn, .swatch, .switch, .menu). Only the studio's own layout is here. */
+
+/* ======================================================= the first page: what to start from, the drafts */
+.studio-home { display: grid; gap: var(--s7); }
+.st-intro { display: grid; gap: var(--s4); max-width: 760px; }
+.st-intro-acts { display: flex; flex-wrap: wrap; gap: var(--s3); margin-top: var(--s2); }
+.st-intro .not-kept { margin: 0; }
+.st-trouble { margin: 0; }
+.st-trouble[hidden] { display: none; }
+.st-trouble-acts { display: flex; flex-wrap: wrap; gap: var(--s2); margin-top: var(--s2); }
+.studio-home .studio-say { min-height: 0; font-size: 14px; color: var(--ink); }
+.studio-home .studio-say:empty { display: none; }
+.studio-home .studio-say .link { font-size: 14px; }
+.st-row-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--s2) var(--s4); margin-bottom: var(--s4); }
+.st-starts { display: grid; grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: var(--s5) var(--s4); }
+.st-start { display: grid; gap: 2px; text-align: left; min-width: 0; }
+.st-start-pic { display: grid; place-items: center; aspect-ratio: 1; overflow: hidden; margin-bottom: 8px; }
+.st-start:hover .st-start-pic { background: var(--shelf-2); }
+.st-start:focus-visible { outline: 0; }
+.st-start:focus-visible .st-start-pic { box-shadow: inset 0 0 0 2px var(--ink); }
+.st-start-name { font-size: 14px; font-weight: 500; }
+.st-start-tag { font-size: 13px; color: var(--ink-2); }
+.st-list h2 { margin-bottom: var(--s4); }
+.st-drafts { display: grid; grid-template-columns: repeat(auto-fill, minmax(176px, 1fr)); gap: var(--s5) var(--s4); }
+.st-drafts > p { grid-column: 1 / -1; }
+.st-draft-pic { display: block; }
+.st-draft-acts { display: flex; gap: var(--s2); margin-top: var(--s2); }
+.st-broken { grid-column: 1 / -1; }
+
+/* ======================================================= the editing page */
+/* the left column: the name, the picture, its tools, and the timeline (or the animations) under it */
+.studio .rx-stage { grid-template-rows: auto minmax(0, 1fr) auto auto; gap: var(--s3); }
+.studio .rx-head { gap: 2px; }
+.studio .rx-head .blurb { -webkit-line-clamp: 1; }
+.st-back { font-size: 13px; color: var(--ink-2); justify-self: start; }
+.st-back:hover { color: var(--ink); }
+.studio-card { cursor: default; }
+.studio-canvas { position: absolute; inset: 0; display: block; touch-action: none; }
+.studio-canvas.is-dragging { cursor: grabbing !important; }
+.st-tools { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2) var(--s3); min-height: 32px; }
+.st-tools .seg[hidden] { display: none; }
+.st-gap { flex: 1 1 auto; }
+.st-zoombox { display: inline-flex; align-items: center; gap: 6px; }
+.st-zoom { min-width: 28px; text-align: center; font-size: 13px; color: var(--ink-2); }
+.st-icon { width: 32px; height: 32px; font-size: 15px; line-height: 1; color: var(--ink); }
+.st-icon:disabled { opacity: 0.4; cursor: default; border-color: var(--line-2); }
+.st-under { display: grid; gap: var(--s2); min-width: 0; }
+.st-under .clips { max-height: 74px; }
+.st-hint { font-size: 13px; color: var(--ink-2); }
+.st-timebar { display: flex; align-items: center; flex-wrap: wrap; gap: var(--s2) var(--s3); min-width: 0; }
+.st-timebar .clips { flex: 1 1 0; min-width: 0; }
+.st-play { min-width: 64px; }
+.st-clipname { font-size: 13px; font-weight: 500; margin-right: auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.st-check { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink-2); white-space: nowrap; cursor: pointer; }
+.st-check input { margin: 0; accent-color: var(--ink); width: 15px; height: 15px; }
+/* the timeline: every frame a small picture, a bar under the ones that have a key */
+.timeline { display: flex; gap: var(--s1); overflow-x: auto; scrollbar-width: thin; padding: 2px 2px 4px; margin: -2px; }
+.timeline .frame { position: relative; flex: none; width: 48px; height: 56px; display: grid; grid-template-rows: minmax(0, 1fr) 14px; place-items: center; padding: 3px 0 0; background: var(--shelf); border-radius: var(--r); overflow: hidden; }
+.timeline .frame canvas { max-width: 40px; max-height: 36px; image-rendering: pixelated; }
+.timeline .frame:hover { background: var(--shelf-2); }
+.timeline .frame[aria-current='true'] { box-shadow: inset 0 0 0 1.5px var(--ink); }
+.timeline .frame-n { font-size: 11px; line-height: 14px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.timeline .frame.has-key::after { content: ''; position: absolute; right: 4px; top: 4px; width: 6px; height: 6px; transform: rotate(45deg); border-radius: 1px; background: var(--ink); }
+.timeline .frame.has-key .frame-n { color: var(--ink); font-weight: 600; }
+
+/* the right column: the tabs, the pane (scrolls inside itself), what was just done, the footer */
+.studio .rx-panel { grid-template-rows: minmax(0, 1fr) auto auto; }
+.studio .tune { padding-top: var(--s4); }
+.studio .tune-head { gap: 0; }
+.studio .tune-head .tabs { gap: var(--s5); }
+.st-pane { padding-top: var(--s3); }
+.st-pane > * + * { margin-top: 2px; }
+.st-pane .ctl { max-width: 680px; }
+.st-pane .ctl-note { max-width: 680px; }
+.st-pane .pane-note { max-width: 620px; }
+.st-pane .pane-note + .pane-note { margin-top: -6px; }
+.st-head { display: flex; align-items: center; gap: var(--s3); min-height: 32px; margin: var(--s4) 0 var(--s2); max-width: 680px; }
+.st-head h3 { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; margin-right: auto; }
+.st-pane > .st-head:first-child { margin-top: 0; }
+.studio-say { margin: 0; padding: 0 var(--pad); font-size: 13px; line-height: 1.4; min-height: 0; }
+.studio-say:not(:empty) { padding-top: var(--s2); padding-bottom: var(--s2); border-top: 1px solid var(--line); }
+.st-phone { display: none; }
+/* fields */
+.st-num { width: 56px; height: 32px; padding: 0 6px; text-align: center; border: 1px solid var(--line-2); border-radius: var(--r); background: var(--paper); font-size: 13px; font-variant-numeric: tabular-nums; -moz-appearance: textfield; }
+.st-num::-webkit-inner-spin-button, .st-num::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.st-num:hover, .st-text:hover, .st-select:hover { border-color: #9a9a96; }
+.st-num:focus-visible, .st-text:focus-visible, .st-select:focus-visible { outline: 0; border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.st-step { display: inline-flex; align-items: center; gap: 4px; }
+.st-unit { font-size: 12px; color: var(--ink-2); white-space: nowrap; }
+.st-text { width: 100%; max-width: 420px; height: 32px; padding: 0 10px; border: 1px solid var(--line-2); border-radius: var(--r); background: var(--paper); font-size: 14px; }
+.st-area { height: auto; min-height: 56px; padding: 6px 10px; line-height: 1.4; resize: vertical; }
+.st-select { height: 32px; max-width: 100%; padding: 0 28px 0 10px; border: 1px solid var(--line-2); border-radius: var(--r); background: var(--paper); font-size: 13px; }
+.st-file { font: 500 13px/1 ui-monospace, 'SF Mono', Menlo, monospace; padding: 4px 8px; background: var(--shelf); border-radius: var(--r); }
+.st-actions { display: flex; flex-wrap: wrap; gap: var(--s2); margin: var(--s2) 0; }
+.st-inline { display: flex; align-items: center; flex-wrap: wrap; gap: var(--s2); }
+.st-inline .st-text { width: 180px; }
+.st-lbl { font-size: 13px; }
+.key-state { font-size: 14px; margin: var(--s3) 0 var(--s1); }
+.key-state strong { font-weight: 600; }
+.new-clip { display: grid; gap: var(--s2); padding: var(--s3); margin: var(--s2) 0; background: var(--shelf); border-radius: var(--r); max-width: 680px; }
+.new-clip .pane-note { margin: 0; }
+.new-clip .chip { height: 28px; }
+/* the bones as a tree */
+.bone-tree { display: flex; flex-wrap: wrap; gap: 4px 6px; max-width: 680px; }
+.bone-btn { height: 28px; padding: 0 10px; border: 1px solid var(--line-2); border-radius: var(--r); font-size: 13px; color: var(--ink-2); background: var(--paper); white-space: nowrap; }
+.bone-tree li { display: contents; }
+.bone-btn:hover { color: var(--ink); border-color: var(--ink); }
+.bone-btn[aria-pressed='true'] { color: var(--ink); border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); font-weight: 500; }
+/* a shape on the selected bone: what it is, its colour, then its buttons */
+.shape-row { display: grid; grid-template-columns: 72px minmax(0, 150px) auto; align-items: center; gap: var(--s2) var(--s3); padding: 6px 0; border-top: 1px solid var(--line); max-width: 680px; }
+.shape-row:last-of-type { border-bottom: 1px solid var(--line); }
+.shape-name { font-size: 14px; }
+.shape-row .st-select { width: 100%; max-width: 200px; }
+.shape-acts { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.shape-acts .st-check { margin: 0 6px; }
+.shape-row .st-icon, .handle-row .st-icon { width: 28px; height: 28px; font-size: 13px; }
+/* a handle as a row: its name (pick it, then the arrow keys), and arrow buttons */
+.handle-list { display: grid; max-width: 680px; }
+.handle-row { display: flex; align-items: center; gap: var(--s3); padding: 3px 0; border-top: 1px solid var(--line); }
+.handle-row:last-child { border-bottom: 1px solid var(--line); }
+.handle-name { position: relative; display: inline-flex; align-items: center; gap: 8px; flex: 1 1 auto; min-width: 0; min-height: 30px; padding: 0 6px; margin-left: -6px; border-radius: 4px; text-align: left; font-size: 14px; }
+.handle-name:hover { background: var(--shelf); }
+.handle-row.on .handle-name { font-weight: 600; }
+.handle-row.on { box-shadow: inset 2px 0 0 var(--ink); }
+.handle-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.handle-name .dot.off { visibility: hidden; }
+.handle-arrows { display: inline-flex; flex-wrap: wrap; gap: 4px; }
+.lib-row .handle-name { cursor: default; }
+.lib-row .handle-name:hover { background: none; }
+/* simple list rows: sliders, parts */
+.list-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto auto; align-items: center; gap: var(--s3); padding: 4px 0; border-top: 1px solid var(--line); max-width: 680px; font-size: 14px; }
+.list-row .quiet { font-size: 13px; }
+.list-row:has(> :nth-child(3):last-child) { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; }
+.st-point { gap: 4px; padding-right: 4px; color: var(--ink); }
+.st-point .quiet { font-size: 12px; }
+.st-x { width: 22px; height: 22px; border-radius: 4px; color: var(--ink-2); font-size: 15px; line-height: 1; }
+.st-x:hover { background: var(--shelf); color: var(--ink); }
+.st-pane .swatches { gap: 6px; }
+/* the footer: saved state, Play, Put in my bag, Download; why the bag buttons are off, on its own line */
+.st-foot { flex-wrap: wrap; row-gap: 6px; }
+.st-foot .saved { flex: 1 1 220px; }
+.st-foot .saved.is-warn { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; }
+.st-foot .saved.is-warn .btn { grid-column: 3; grid-row: 1 / span 2; margin-left: var(--s2); }
+.st-foot .saved.is-warn small { white-space: normal; }
+.st-foot .saved.is-saving .dot { background: var(--line-2); }
+.bag-note { flex: 0 0 100%; margin: 0; font-size: 12px; color: var(--ink-2); text-align: right; }
+.bag-note[hidden] { display: none; }
+
+/* a short window: less air */
+@media (min-width: 721px) and (max-height: 800px) {
+  .studio .rx-stage { gap: var(--s2); }
+  .studio .rx-head .blurb { display: none; }
+  .timeline .frame { width: 42px; height: 48px; grid-template-rows: minmax(0, 1fr) 12px; }
+  .timeline .frame canvas { max-width: 36px; max-height: 30px; }
+  .studio .tune { padding-top: var(--s3); }
+}
+@media (min-width: 721px) and (max-width: 1180px) {
+  .st-tools { flex-wrap: nowrap; gap: var(--s2); }
+  .st-tools .seg button { padding: 0 8px; }
+  .st-tools .btn-sm { padding: 0 10px; }
+  .studio .ctl { grid-template-columns: 120px minmax(0, 1fr) 40px; }
+  .shape-row { grid-template-columns: 64px minmax(0, 1fr); }
+  .shape-acts { grid-column: 1 / -1; }
+}
+
+/* ---------- a phone: the picture pinned at the top, the panel scrolls under it; handles are rows with arrows ---------- */
+@media (max-width: 720px) {
+  .studio .rx-stage { grid-template-rows: auto 208px auto auto; gap: 6px; padding-bottom: var(--s2); }
+  .studio .rx-head { grid-template-columns: auto minmax(0, 1fr); align-items: baseline; column-gap: var(--s3); }
+  .studio .rx-head h1 { font-size: 18px; grid-column: 2; grid-row: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .st-back { grid-column: 1; grid-row: 1; }
+  .st-tools { flex-wrap: nowrap; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+  .st-tools .btn-sm { padding: 0 10px; }
+  .st-zoombox { display: none; }
+  .studio .ctl-note { grid-column: 1 / -1; margin-top: 0; }
+  .timeline .frame { width: 34px; height: 34px; grid-template-rows: 1fr; padding: 0; }
+  .timeline .frame canvas { max-width: 28px; max-height: 28px; }
+  .timeline .frame-n { display: none; }
+  .timeline .frame.has-key::after { right: 3px; top: 3px; width: 5px; height: 5px; }
+  .st-timebar .st-clipname .quiet { display: none; }
+  .st-timebar { flex-wrap: nowrap; }
+  .st-timebar .clips { flex-wrap: nowrap; overflow-x: auto; }
+  .st-under .clips { margin: 0; padding: 2px 0; }
+  .studio .tune-head .tabs { gap: var(--s4); overflow-x: auto; }
+  .st-phone { display: block; font-size: 13px; color: var(--ink-2); padding: var(--s2) var(--s3); background: var(--shelf); border-radius: var(--r); margin: var(--s2) 0; }
+  .handle-row { flex-wrap: wrap; gap: 4px var(--s2); padding: 6px 0; }
+  .handle-name { flex: 1 1 100%; }
+  .handle-row .st-icon { width: 36px; height: 36px; font-size: 15px; }
+  .shape-row { grid-template-columns: 64px minmax(0, 1fr); }
+  .shape-acts { grid-column: 1 / -1; }
+  .list-row { grid-template-columns: minmax(0, 1fr) auto auto; }
+  .list-row .quiet { display: none; }
+  .st-foot .saved { flex-basis: 100%; }
+  .st-foot [data-act='play'] { order: 1; }
+  .st-foot .add-btn { order: 2; margin-left: auto; }
+  .st-foot .menu-wrap { order: 3; }
+  .bag-note { order: 4; text-align: left; }
+  .st-starts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .st-drafts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

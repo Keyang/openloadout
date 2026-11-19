@@ -1,13 +1,20 @@
-// The studio's drafts on this computer (docs/studio.md section 5, "Autosave"; Contract 14 rule 9; item S9).
-// One localStorage entry, `loadout-studio-v1`: { drafts: { <draft>: { definition, savedAt, bagKey? } } }, at most 40 drafts
-// and 2 MB. Everything read back is checked by the validator before it is drawn (Contract 11), and a broken draft is
-// left out and counted, never drawn. A save that fails (storage full, blocked) says so in plain words: it is never
-// swallowed. The same entry is what window.loadout.studio (app/api-studio.js) reads, so drafts made here are its drafts.
-// Pure: the storage is handed in (the page passes localStorage or memory), so it runs in the browser and in Node.
+// The studio's drafts on this computer (docs/studio.md section 5, "Autosave"; Contract 14 rule 9; item S9), in everyday
+// words for the studio page. Reading and writing the entry `loadout-studio-v1` ({ version: 1, drafts: { <draft>:
+// { definition, savedAt, bagKey? } } }) is app/studio-store.js's, the one owner that window.loadout.studio
+// (app/api-studio.js) uses too, so the page keeps its promises:
+//   - a store that cannot be read whole (damaged, not { drafts }, unreadable storage) is never saved over: problem() says
+//     so, every save is refused, and the page offers to download what is there and, only then, to start afresh;
+//   - one draft is changed per save, against what storage holds at that moment; whatever the page does not use (entries
+//     that are no draft, fields a later version adds) is carried through untouched;
+//   - a save that fails (storage full) is said in plain words, and the change waits in memory, shown on top, until the
+//     next save that works writes it.
+// Everything read back is checked by the validator before it is drawn (Contract 11); a broken draft is left out and
+// counted, never drawn. Pure: the storage is handed in (the page passes localStorage or memory), so it runs in Node too.
 import { validateDataSprite } from '../../engine/data-sprite.js';
+import { createDraftStore, StoreRefused, STUDIO_KEY as STORE_KEY } from '../studio-store.js';
 
 /** The localStorage key of the studio's drafts (docs/studio.md section 5). */
-export const STUDIO_KEY = 'loadout-studio-v1';
+export const STUDIO_KEY = STORE_KEY;
 
 /** The most drafts one browser keeps. */
 export const MAX_DRAFTS = 40;
@@ -41,30 +48,30 @@ export function draftIdFor(name, taken = []) {
 }
 
 /**
- * The drafts kept in a storage: { list, get, put, remove, ids, broken }. list() gives [{ id, name, savedAt, definition }],
- * newest first, valid ones only; get(id) gives { definition, savedAt, bagKey? } or null; put(id, definition, { bagKey })
- * and remove(id) give { ok, error? } with the error in plain words; broken() counts stored drafts that could not be read.
+ * The drafts kept in a storage: { list, get, put, remove, ids, broken, problem, pending, savedText, startAfresh }.
+ * list() gives [{ id, name, savedAt, definition, bagKey? }], newest first, valid ones only; get(id) gives { definition,
+ * savedAt, bagKey? } or null; put(id, definition, { bagKey }) (bagKey null forgets it) and remove(id) give { ok, error? }
+ * with the error in everyday words; broken() counts stored drafts that could not be read; problem() is null, or why the
+ * store cannot be used (then nothing is saved); pending() says a failed save waits; savedText() is what storage holds, to
+ * download; startAfresh() clears a store that cannot be read whole (and only such a store): { ok, error? }.
  * Arguments: storage ({ getItem, setItem, removeItem }), opts { now (the clock), check (a validator returning { ok, value }; default validateDataSprite) }.
  */
 export function createDrafts(storage, { now = () => Date.now(), check = (d) => validateDataSprite(d) } = {}) {
+  const store = createDraftStore(storage, { limits: { drafts: MAX_DRAFTS, storeChars: MAX_STORE_BYTES } });
   const cache = new Map();          // text of a definition -> its checked value, so a list is not validated twice
   let bad = 0;
 
+  /** What the store holds now: { entries, whole }. */
   function readAll() {
-    let text = null;
-    try { text = storage.getItem(STUDIO_KEY); } catch { return {}; }
-    if (typeof text !== 'string') return {};
-    let raw;
-    try { raw = JSON.parse(text, (k, v) => (k === '__proto__' || k === 'constructor' || k === 'prototype' ? undefined : v)); } catch { return {}; }
-    if (!isObj(raw) || !isObj(raw.drafts)) return {};
-    const out = {};
-    for (const [id, d] of Object.entries(raw.drafts)) out[id] = d;
-    return out;
+    let r;
+    try { r = store.read(); } catch { return { entries: {}, whole: false }; }
+    return { entries: r.entries, whole: r.whole };
   }
 
   function checked(id, d) {
     if (!DRAFT_ID.test(id) || !isObj(d) || !isObj(d.definition)) return null;
-    const key = JSON.stringify(d.definition);
+    let key;
+    try { key = JSON.stringify(d.definition); } catch { return null; }
     let value = cache.get(key);
     if (value === undefined) {
       let v;
@@ -76,58 +83,82 @@ export function createDrafts(storage, { now = () => Date.now(), check = (d) => v
     return { definition: JSON.parse(JSON.stringify(value)), savedAt: Number.isFinite(d.savedAt) ? d.savedAt : 0, ...(typeof d.bagKey === 'string' && d.bagKey.length <= BAG_KEY_CHARS ? { bagKey: d.bagKey } : {}) };
   }
 
-  function writeAll(all) {
-    const text = JSON.stringify({ drafts: all });
-    if (text.length > MAX_STORE_BYTES) return { ok: false, error: 'Your drafts could not be saved: together they would pass the 2 MB this browser keeps for the studio. Remove a draft you no longer need, or download this one as a file.' };
-    try { storage.setItem(STUDIO_KEY, text); } catch (e) {
-      const full = /quota|full/i.test(`${e?.name} ${e?.message}`);
-      return { ok: false, error: full ? 'Your draft could not be saved: this browser\'s storage is full. Download the file to keep it, or remove a draft you no longer need.' : 'Your draft could not be saved: this browser is not letting the site keep anything. Download the file to keep it.' };
+  /** Change one entry through the store: { ok, error? } in everyday words. */
+  function commit(id, change) {
+    let w;
+    try { w = store.commit(id, change); } catch (e) {
+      if (e instanceof Refused) return { ok: false, error: e.message };
+      if (!(e instanceof StoreRefused)) return { ok: false, error: `Your draft could not be saved: ${String(e?.message ?? e).slice(0, 200)}.` };
+      return { ok: false, error: readAll().whole ? TOO_BIG : UNREADABLE };
     }
+    if (!w.saved) return { ok: false, error: FULL };
     return { ok: true };
   }
 
   return {
-    /** Every draft that reads back as a valid definition, newest first: [{ id, name, savedAt, definition }]. */
+    /** Every draft that reads back as a valid definition, newest first: [{ id, name, savedAt, definition, bagKey? }]. */
     list() {
       bad = 0;
       const out = [];
-      for (const [id, d] of Object.entries(readAll())) {
+      for (const [id, d] of Object.entries(readAll().entries)) {
         const c = checked(id, d);
         if (c) out.push({ id, name: c.definition.name, savedAt: c.savedAt, definition: c.definition, ...(c.bagKey ? { bagKey: c.bagKey } : {}) });
-        else bad++;
+        else if (DRAFT_ID.test(id)) bad++;
       }
       return out.sort((a, b) => b.savedAt - a.savedAt || a.id.localeCompare(b.id));
     },
     /** One draft, checked: { definition, savedAt, bagKey? }, or null when there is none or it does not read back. */
     get(id) {
-      const all = readAll();
-      return Object.hasOwn(all, id) ? checked(id, all[id]) : null;
+      const { entries } = readAll();
+      return typeof id === 'string' && Object.hasOwn(entries, id) ? checked(id, entries[id]) : null;
     },
-    /** The ids of every stored draft, readable or not (for a new id that does not clash). */
-    ids: () => Object.keys(readAll()),
+    /** The ids of every stored entry, readable or not (for a new id that does not clash). */
+    ids: () => Object.keys(readAll().entries),
     /** How many stored drafts the last list() could not read. */
     broken: () => bad,
-    /** Save a draft: { ok, error? }. The definition is checked first; a bagKey given (or kept from before) stays with it. */
+    /** Null, or why the saved drafts cannot be used, in everyday words: then nothing is saved over them. */
+    problem: () => (readAll().whole ? null : UNREADABLE),
+    /** Whether a failed save waits in memory for the next save that works. */
+    pending: () => store.pending(),
+    /** What storage holds under the studio's key, as it is (for downloading before starting afresh); '' when nothing. */
+    savedText() {
+      try { const t = storage.getItem(STUDIO_KEY); return typeof t === 'string' ? t : ''; } catch { return ''; }
+    },
+    /** Clear saved drafts that cannot be read whole, so the studio can save again: { ok, error? }. A readable store is never cleared. */
+    startAfresh() {
+      if (readAll().whole) return { ok: false, error: 'Your saved drafts can be read, so they were left as they are.' };
+      try { storage.removeItem(STUDIO_KEY); } catch { return { ok: false, error: 'This browser did not let the saved drafts be cleared.' }; }
+      return { ok: true };
+    },
+    /** Save a draft: { ok, error? }. The definition is checked first; a bagKey given (or kept from before) stays with it; bagKey null forgets it. */
     put(id, definition, { bagKey } = {}) {
       if (!DRAFT_ID.test(String(id))) return { ok: false, error: 'That draft has no usable name.' };
       let v;
       try { v = check(definition); } catch { v = { ok: false, errors: ['it could not be read'] }; }
       if (!v?.ok) return { ok: false, error: `This draft could not be saved because it is not complete: ${(v?.errors ?? [])[0] ?? 'it could not be read'}.` };
-      const all = readAll();
-      if (!Object.hasOwn(all, id) && Object.keys(all).length >= MAX_DRAFTS) return { ok: false, error: `Your draft could not be saved: this browser keeps at most ${MAX_DRAFTS} drafts. Remove one you no longer need, or download this one as a file.` };
-      const keep = typeof bagKey === 'string' ? bagKey : isObj(all[id]) && typeof all[id].bagKey === 'string' ? all[id].bagKey : undefined;
-      all[id] = { definition: v.value, savedAt: now(), ...(keep && keep.length <= BAG_KEY_CHARS ? { bagKey: keep } : {}) };
-      return writeAll(all);
+      const savedAt = now();
+      return commit(id, (was) => {
+        if (was === undefined && Object.keys(readAll().entries).length >= MAX_DRAFTS) throw new Refused(`Your draft could not be saved: this browser keeps at most ${MAX_DRAFTS} drafts. Remove one you no longer need, or download this one as a file.`);
+        const entry = { ...(isObj(was) ? was : {}), definition: v.value, savedAt };
+        if (typeof bagKey === 'string' && bagKey.length <= BAG_KEY_CHARS) entry.bagKey = bagKey;
+        else if (bagKey === null) delete entry.bagKey;
+        return entry;
+      });
     },
     /** Remove a draft: { ok, error? }. */
     remove(id) {
-      const all = readAll();
-      if (!Object.hasOwn(all, id)) return { ok: true };
-      delete all[id];
-      return writeAll(all);
+      if (!readAll().whole) return { ok: false, error: UNREADABLE };
+      if (!Object.hasOwn(readAll().entries, id)) return { ok: true };
+      return commit(id, () => undefined);
     },
   };
 }
+
+/** A save the page itself refuses (too many drafts); its message is for a person. */
+class Refused extends Error {}
+const UNREADABLE = 'Your saved drafts could not be read whole (another tab or an older visit may have left them damaged), so the studio will not save over them: that would lose them. Download what is saved, then start afresh.';
+const TOO_BIG = 'Your drafts could not be saved: together they would pass the 2 MB this browser keeps for the studio. Remove a draft you no longer need, or download this one as a file.';
+const FULL = 'Your draft could not be saved: this browser\'s storage for the site is full. It is kept while this tab is open; download the file to keep it.';
 
 /**
  * Saves a little after the last change: schedule(def) (re)starts the wait, flush() saves what waits at once and returns

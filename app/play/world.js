@@ -24,13 +24,24 @@ const clamp = (v, lo, hi) => (v < lo ? lo : v > hi ? hi : v);
 const sign = (v) => (v < 0 ? -1 : 1);
 
 /**
+ * How many things a scene starts with (the player not counted): kinds as for createWorld; start: as createWorld's.
+ * The page uses it to choose a picture large enough to hold them all.
+ */
+export function startCount(kinds, player = null, start = null) {
+  const n = { ...START_COUNT, ...(start ?? {}) };
+  return kinds.filter((k) => k.key !== player).reduce((sum, k) => sum + (n[k.role] ?? 0), 0);
+}
+
+/**
  * A scene. kinds: what kinds.js built for each bag item, in bag order. player: the key of the kind
  * the visitor controls, or null. Things of every other kind are put on the level's spots.
  */
-export function createWorld({ mode, level, kinds, player = null, seed = 1 }) {
+export function createWorld({ mode, level, kinds, player = null, seed = 1, start = null }) {
   const byKey = Object.fromEntries(kinds.map((k) => [k.key, k]));
   const world = {
     mode, level, seed, kinds: byKey, order: kinds.map((k) => k.key),
+    start: { ...START_COUNT, ...(start ?? {}) },      // how many of each sort the scene starts with
+    show: {},                                          // { key: clip }: the things of that kind play that clip (showClip)
     playerKey: player && byKey[player] ? player : null,
     projectile: kinds.find((k) => k.role === 'projectile')?.key ?? null,
     burst: kinds.find((k) => k.role === 'effect' && k.clips.burst)?.key ?? null,     // plays where a hit lands
@@ -43,7 +54,7 @@ export function createWorld({ mode, level, kinds, player = null, seed = 1 }) {
 /** Put everything back where it started. */
 export function resetWorld(world) {
   world.things = []; world.collected = 0; world.collectedBy = {}; world.time = 0;
-  world.next = 1; world.used = { pickup: 0, prop: 0, mover: 0 };
+  world.next = 1; world.used = { pickup: 0, prop: 0, mover: 0, all: 0 };
   world.rand = rng(world.seed);
   world.prev = {};
   world.player = null;
@@ -53,8 +64,9 @@ export function resetWorld(world) {
     world.player = p;
     revive(world, p);
   }
-  const scene = world.order.map((key) => world.kinds[key]).filter((k) => k.key !== world.playerKey && START_COUNT[k.role]);
-  for (let i = 0; i < 3; i++) for (const k of scene) if (i < START_COUNT[k.role]) place(world, k);
+  const scene = world.order.map((key) => world.kinds[key]).filter((k) => k.key !== world.playerKey && (world.start ?? START_COUNT)[k.role]);
+  const start = world.start ?? START_COUNT;
+  for (let i = 0; i < 3; i++) for (const k of scene) if (i < (start[k.role] ?? 0)) place(world, k);
 }
 
 /** The player at the start, in full health. */
@@ -78,9 +90,10 @@ function makeThing(world, kind, x, y) {
 
 /** Put one more thing of a kind on the next free spot. */
 function place(world, kind, at = null) {
-  const cat = SPOT_OF[kind.role];
-  if (!cat) return null;
-  const { level } = world, list = level.spots[cat];
+  if (!SPOT_OF[kind.role]) return null;
+  // a one-screen level has one list of places that every sort of thing shares (level.js screenSpots)
+  const { level } = world, shared = !!level.spots.all, cat = shared ? 'all' : SPOT_OF[kind.role], list = level.spots[cat];
+  const inner = level.inner ?? { x0: 0, x1: level.width };
   let spot = at;
   if (!spot) {
     const i = world.used[cat]++, lap = Math.floor(i / list.length);
@@ -88,28 +101,35 @@ function place(world, kind, at = null) {
     if (lap) {
       // more things than spots: step sideways from a spot already used
       const x = spot.x + lap * 26;
-      if (level.mode === 'top' ? !hitsWall(level, x - 8, spot.y - 8, x + 8, spot.y) : Math.abs(surfaceBelow(level, x, spot.y - 4).y - spot.y) < 1) spot.x = x;
+      if (x + kind.box.r > inner.x1) { /* stays where it is: past the edge of the picture */ }
+      else if (level.mode === 'top' ? !hitsWall(level, x - 8, spot.y - 8, x + 8, spot.y) : Math.abs(surfaceBelow(level, x, spot.y - 4).y - spot.y) < 1) spot.x = x;
     }
     if (level.mode === 'top') {
       // big things (a house, a tree) take the first spot where they stand clear of the walls, of the player and of
       // what is already there
       const at = (s) => ({ x0: s.x - kind.box.l, x1: s.x + kind.box.r, y0: s.y - kind.lift - kind.box.t, y1: s.y - kind.lift + kind.box.b });
+      // (on a one-screen level the whole of it is also inside the picture, not only its feet)
       const fits = (s) => !hitsWall(level, s.x - kind.box.l, s.y - Math.min(kind.box.t, 16), s.x + kind.box.r, s.y)
+        && (!level.inner || (s.x - kind.box.l >= inner.x0 && s.x + kind.box.r <= inner.x1 && s.y - kind.lift - kind.box.t >= 0))
         && ![...world.things, ...(world.player ? [world.player] : [])].some((t) => overlap(grow(rectOf(world, t), 6), at(s)));
       for (let k = 0; k < list.length && !fits(spot); k++) spot = { ...list[(i + 1 + k) % list.length] };
+      // nowhere it fits whole: at least inside the picture
+      if (level.inner && !fits(spot) && inner.x0 + kind.box.l <= inner.x1 - kind.box.r) spot.x = clamp(spot.x, inner.x0 + kind.box.l, inner.x1 - kind.box.r);
     }
     if (level.mode === 'side') {
       // wide things (a boss, a house) move along until they stand clear of what is already there
       const span = supportAt(level, spot.x, spot.y);
-      const clash = (x) => world.things.some((t) => Math.abs(t.y - spot.y) < 1 && SPOT_OF[t.role] === cat && x - kind.box.l < t.x + world.kinds[t.kind].box.r + 4 && x + kind.box.r > t.x - world.kinds[t.kind].box.l - 4);
-      for (let n = 0; n < 40 && clash(spot.x) && spot.x + 8 + kind.box.r < span.x1; n++) spot.x += 8;
+      const clash = (x) => world.things.some((t) => Math.abs(t.y - spot.y) < 1 && (shared || SPOT_OF[t.role] === cat) && x - kind.box.l < t.x + world.kinds[t.kind].box.r + 4 && x + kind.box.r > t.x - world.kinds[t.kind].box.l - 4);
+      for (let n = 0; n < 40 && clash(spot.x) && spot.x + 8 + kind.box.r < Math.min(span.x1, inner.x1); n++) spot.x += 8;
+      // a wide thing stays inside the picture
+      if (level.inner && inner.x0 + kind.box.l <= inner.x1 - kind.box.r) spot.x = clamp(spot.x, inner.x0 + kind.box.l, inner.x1 - kind.box.r);
     }
   }
   const t = makeThing(world, kind, spot.x, spot.y);
   if (kind.role === 'creature' || kind.role === 'npc') {
     t.state = 'idle'; t.timer = 0.3 + world.rand() * 0.9;
     t.facing = world.rand() < 0.5 ? -1 : 1;
-    if (level.mode === 'side') { const s = supportAt(level, t.x, t.y - 4); t.span = { x0: s.x0, x1: s.x1 }; t.y = t.home.y = s.y; }
+    if (level.mode === 'side') { const s = supportAt(level, t.x, t.y - 4); t.span = { x0: Math.max(s.x0, inner.x0), x1: Math.min(s.x1, inner.x1) }; t.y = t.home.y = s.y; }
     setAnim(t, pickClip(kind.clipNames, 'idle', ctxOf(world, t, kind)));
   }
   world.things.push(t);
@@ -135,6 +155,34 @@ export function spawn(world, key) {
   }
   const x = clamp(Math.round(p.x + p.facing * (56 + (n % 3) * 24)), 16, level.width - 16);
   return place(world, kind, { x, y: surfaceBelow(level, x, Math.min(p.y, level.groundY) - 40).y });
+}
+
+/**
+ * Show one clip of a kind: every thing of that kind stops what it does and plays that clip, again and again, until it is
+ * shown something else; clip null gives the things back their own behaviour. Not for the player (input.play plays a
+ * clip on it once). Returns false for a kind that is not in the scene or has no such clip.
+ */
+export function showClip(world, key, clip) {
+  const kind = world.kinds[key];
+  if (!kind || (clip && !kind.clips[clip])) return false;
+  if (clip) world.show[key] = clip;
+  else {
+    delete world.show[key];
+    for (const t of world.things) if (t.kind === key && !t.passing && t.state !== 'gone') {
+      if (t.role === 'creature' || t.role === 'npc') { t.state = 'idle'; t.timer = 0.4; }
+      t.anim = createAnim(kind.rest, { flip: t.anim.flip });
+    }
+  }
+  return true;
+}
+
+/** A thing playing the clip it is shown: in place, from its first frame, again after a short pause when it ends. */
+function stepShown(world, t, clip, dt, ev) {
+  if (t.anim.clip !== clip) { t.anim = createAnim(clip, { flip: t.anim.flip }); t.showWait = 0.5; }
+  tick(world, t, dt, ev);
+  if (!t.anim.done) return;
+  t.showWait = (t.showWait ?? 0.5) - dt;
+  if (t.showWait <= 0) { t.anim = createAnim(clip, { flip: t.anim.flip }); t.showWait = 0.5; }
 }
 
 /** Take one away (the newest). False when there is none. */
@@ -215,7 +263,8 @@ const halfOf = (k) => Math.max(2, Math.min(7, k.box.l, k.box.r));
 
 /**
  * Move the scene on by dt seconds.
- * input: held keys { left, right, up, down, jump, action, run, block, dodge }, and clip: an extra move to play once (an action name).
+ * input: held keys { left, right, up, down, jump, action, run, block, dodge }, and clip: an extra move to play once (an action name),
+ * or play: one of the player's clips by its own name, to play once where it stands.
  * Returns events: { type: 'sound', sound, cue, kind, thing, clip } · { type: 'collect', kind, total } ·
  *   { type: 'hit', kind, thing } (the player hurt something) · { type: 'die', kind, thing } · { type: 'hurt' } (something hurt the player).
  */
@@ -228,6 +277,8 @@ export function step(world, input = {}, dt = 1 / 60) {
   if (world.player) stepPlayer(world, world.player, input, edge, dt, ev);
   for (const t of [...world.things]) {
     if (t.flash > 0) t.flash = Math.max(0, t.flash - dt);
+    const shown = world.show?.[t.kind];
+    if (shown && !t.passing && t.state !== 'gone' && t.state !== 'collected' && t.state !== 'dying') { stepShown(world, t, shown, dt, ev); continue; }
     if (t.passing === 'burst') { tick(world, t, dt, ev); if (played(world, t)) t.dead = true; }
     else if (t.role === 'creature' || t.role === 'npc') stepMover(world, t, dt, ev);
     else if (t.role === 'pickup') stepPickup(world, t, dt, ev);
@@ -288,6 +339,7 @@ function stepPlayer(world, p, input, edge, dt, ev) {
     else { p.busy = { type: 'action', timer: 0.3, hit: true }; strike(world, p, ev); }
   } else if (edge.block && !p.busy && pickClip(names, 'block', ctx)) begin('block', pickClip(names, 'block', ctx));
   else if (edge.dodge && !p.busy && pickClip(names, 'dodge', ctx)) begin('dodge', pickClip(names, 'dodge', ctx));
+  else if (input.play && !p.busy && k.clips[input.play]) begin('extra', { clip: input.play }, { passes: 1 });
   else if (input.clip && !p.busy) {
     const sel = lookupClip(names, input.clip, ctx);
     if (sel) begin('extra', sel, { passes: 2 });

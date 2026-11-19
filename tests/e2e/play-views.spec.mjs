@@ -36,6 +36,11 @@ const ready = (page) => page.waitForFunction(() => document.querySelector('main.
 const state = (page) => page.evaluate(() => window.__loadoutPlay.state());
 const viewSwitch = (page) => page.locator('.play-view');
 const leftOut = (page) => page.locator('.play-left-out');
+/** A character's row in the list, then its "Play as this". */
+async function playAs(page, id) {
+  await page.locator('.play-things').getByRole('button', { name: rowOf[id].name, exact: true }).click();
+  await page.locator('.play-things li.is-picked').getByRole('button', { name: 'Play as this' }).click();
+}
 /** Switch the view with the buttons under the scene, and wait for the scene to be rebuilt in it. */
 async function switchTo(page, mode) {
   await viewSwitch(page).getByRole('button', { name: NAME[mode], exact: true }).click();
@@ -66,8 +71,8 @@ async function checkScene(page, items, mode) {
     // and none of them has a row in the list of what is in the scene
     const rows = await page.locator('.play-things li .play-name').allTextContents();
     for (const id of out) expect(rows.map((r) => r.replace(/your version$/, '').trim())).not.toContain(rowOf[id].name);
-    // the scene sits above the list: "under the scene"
-    expect((await box.boundingBox()).y).toBeGreaterThan((await page.locator('canvas.play-stage').boundingBox()).y);
+    // in the list beside the scene, greyed
+    await expect(box.locator('li.play-row.is-out')).toHaveCount(out.length);
   } else await expect(leftOut(page)).toHaveCount(0);
   // every sprite in the bag is either in the page's list or in the left-out list: nothing vanishes without a word
   const listed = await page.locator('.play-things li .play-name').count();
@@ -137,10 +142,8 @@ test('a small mixed bag: the ground decides the view, the other view\'s things a
   await expect(leftOut(page)).toContainText('The ground tiles in your bag are drawn from above, so the scene opened top-down.');
   // something that fits both views is in both scenes
   expect(s.things.some((t) => t.id === anyPickup[0])).toBe(true);
-  // pick the second top-down character
-  const playAs = page.getByRole('group', { name: 'Play as' });
-  await expect(playAs.getByRole('button')).toHaveText(topPlayers.map((id) => rowOf[id].name));
-  await playAs.getByRole('button', { name: rowOf[topPlayers[1]].name, exact: true }).click();
+  // pick the second top-down character: its row in the list offers "Play as this"
+  await playAs(page, topPlayers[1]);
   await expect.poll(async () => (await state(page)).player.id).toBe(topPlayers[1]);
   // to side view: only side-view characters are offered; pick the second
   await switchTo(page, 'side');
@@ -148,8 +151,9 @@ test('a small mixed bag: the ground decides the view, the other view\'s things a
   expect(s.player.id).toBe(sidePlayers[0]);
   expect(s.things.some((t) => t.id === anyPickup[0])).toBe(true);
   await expect(leftOut(page)).toContainText('You switched to side view.');
-  await expect(page.getByRole('group', { name: 'Play as' }).getByRole('button')).toHaveText(sidePlayers.map((id) => rowOf[id].name));
-  await page.getByRole('group', { name: 'Play as' }).getByRole('button', { name: rowOf[sidePlayers[1]].name, exact: true }).click();
+  // the top-down characters are greyed in the list: they cannot be played as here
+  for (const id of topPlayers) await expect(leftOut(page).getByRole('button', { name: rowOf[id].name, exact: true })).toBeDisabled();
+  await playAs(page, sidePlayers[1]);
   await expect.poll(async () => (await state(page)).player.id).toBe(sidePlayers[1]);
   // back and forth: each view still has the character that was picked in it
   await switchTo(page, 'top');
@@ -207,7 +211,7 @@ test('side view with no ground tiles in the bag: nothing hangs under a floating 
   expect(s.mode).toBe('side');
   expect(s.map, 'the bag has no tiles, so the playground paints the ground itself').not.toContain('@ tilesets');
   const T = 32, rows = s.map.split('\n').filter((l) => l && !l.startsWith('@'));
-  const solid = (c, r) => r >= 0 && r < rows.length && rows[r][c] === '#';
+  const solid = (c, r) => r >= 0 && r < rows.length && (rows[r][c] === '#' || rows[r][c] === 'I');
   // every block with nothing above it and nothing under it, taken from the map of the level
   const floating = [];
   rows.forEach((row, r) => [...row].forEach((ch, c) => { if (solid(c, r) && !solid(c, r - 1) && !solid(c, r + 1) && r + 1 < rows.length) floating.push({ c, r }); }));
@@ -244,30 +248,24 @@ test('side view with no ground tiles in the bag: nothing hangs under a floating 
   expect(checked, 'every floating block was looked at').toBe(floating.length);
 });
 
-test('side view: the hero can run from the start to the cliff that ends the level, jumping what stands in the way', async ({ page }) => {
+test('side view: the hero can run from the start to the far side of the picture, jumping what stands in the way', async ({ page }) => {
   test.skip(!sidePlayers.length, 'no side-view character in the catalogue');
   await openPlay(page, [item(sidePlayers[0])]);
   const s = await state(page);
-  const rows = s.map.split('\n').filter((l) => l && !l.startsWith('@'));
-  // the cliff: the columns at the far end that are rock from the top of the scene's ground rows up to its highest block
-  const highest = rows.findIndex((row) => row.replace(/\./g, '') !== '');
-  let cliff = rows[0].length;
-  while (cliff > 0 && rows[highest][cliff - 1] !== '.') cliff--;
-  expect(cliff).toBeGreaterThan(rows[0].length / 2);
   await page.keyboard.down('Shift');
   await page.keyboard.down('ArrowRight');
-  let last = -1, stuck = 0, jumps = 0;
+  let last = -1, stuck = 0;
   for (let i = 0; i < 160 && stuck < 6; i++) {
     const p = (await state(page)).player;
-    if (Math.abs(p.x - last) < 1) { stuck++; jumps++; await page.keyboard.press('Space'); } else stuck = 0;
+    if (Math.abs(p.x - last) < 1) { stuck++; await page.keyboard.press('Space'); } else stuck = 0;
     last = p.x;
     await page.waitForTimeout(200);
   }
   await page.keyboard.up('ArrowRight');
   await page.keyboard.up('Shift');
   const end = (await state(page)).player;
-  expect(end.x, 'it reached the foot of the cliff').toBeGreaterThan((cliff - 1) * 32);
-  expect(end.x, 'and the cliff is the end').toBeLessThan(cliff * 32);
+  expect(end.x, 'it reached the far side').toBeGreaterThan((s.level.cols - 2) * 32);
+  expect(end.x, 'and the edge of the level is the end').toBeLessThanOrEqual(s.width);
   expect(end.hp).toBeGreaterThan(0);
 });
 

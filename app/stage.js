@@ -3,10 +3,12 @@
 // (backdropFor): a character stands on the ground, an interface piece sits on a panel, a background is the frame.
 import { hash } from '../engine/motion.js';
 
-// The asset page offers two (docs/site-design.md, section 5): the sprite alone on the page's shelf tile, or in a scene
-// that suits it (sceneFor). 'scene' is the first, so a character stands on the ground when its page opens.
+// The asset page offers two (docs/playground-tray-workbench.md, section 3): the sprite alone on the page's shelf tile,
+// or standing in the creator's own scene, "In your bag" (app/bag-scene.js: the bag's background and ground, other things
+// from the bag around it). With nothing of the bag's own to stand on, that is the scene that suits the sprite (sceneFor).
+// 'bag' is the first, so a character stands in the bag's scene when its page opens.
 export const STAGES = [
-  { id: 'scene', label: 'In a scene' },
+  { id: 'bag', label: 'In your bag' },
   { id: 'plain', label: 'Plain' },
 ];
 /** Backdrops for an interface piece: a plain panel, as a menu or a game screen would sit on. */
@@ -15,11 +17,14 @@ export const PANELS = [
   { id: 'panel-dark', label: 'Dark panel' },
 ];
 
+/** A choice remembered from before: the two scenes, and then "In a scene", are now "In your bag". */
+export const keptStage = (v) => (v === 'meadow' || v === 'cave' || v === 'scene' ? 'bag' : v);
+
 /**
- * Where a thing that stands on the ground is shown when its page opens: a character or a creature in its scene,
+ * Where a thing that stands on the ground is shown when its page opens: a character or a creature in your bag,
  * anything else (a tileset, a prop, a pickup, an effect) plain, where it is seen best. meta: { type }.
  */
-export const defaultStage = (meta) => (['character', 'creature'].includes(String(meta?.type ?? '')) ? 'scene' : 'plain');
+export const defaultStage = (meta) => (['character', 'creature'].includes(String(meta?.type ?? '')) ? 'bag' : 'plain');
 
 /** Themes whose things live under a roof or under a dark sky: their scene is the cave. Everything else stands on the meadow. */
 const INDOORS = new Set(['dungeon', 'horror', 'sci-fi', 'space']);
