@@ -24,6 +24,7 @@ import { THEME_PRESETS, applyColour, themedParams, spriteMaterials, lookColours,
 import { outsideMaterial, colourGap, materialById, unsaidMaterial, MATERIAL_IDS } from '../engine/materials.js';
 import { stylesOf, styleById, styleIds } from '../engine/styles.js';
 import { Surface } from '../engine/surface.js';
+import { cleanVersions } from '../engine/versions.js';
 
 const BLOCK_JOINS = blockJoins({ narrow: true, lanes: true });    // every pair of block pieces (the 13, the 7 narrow ones, the 9 lane ones) that can touch: [[a, axis, b], ...]
 
@@ -614,6 +615,8 @@ function checkStyle(def, { soundIndex, validateMeta } = {}, pass) {
   }
   const looks = [...bases];
   for (let i = 0; i < T.randomLooks; i++) looks.push([`random#${i}`, randomParams(def, 1000 + i * 7919)]);
+  // a sprite's own ready-made versions pass the bar like any other settings
+  if (def.versions !== undefined) for (const v of cleanVersions(def)) looks.push([`version:${v.name}`, v.params]);
   metrics.bases = bases.length;
   metrics.looks = looks.length;
 

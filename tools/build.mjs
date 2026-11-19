@@ -184,6 +184,9 @@ wrote = true;
 await step('framework', async () => (await import(pathToFileURL(path.join(ROOT, 'tools', 'lib', 'api.mjs')).href)).writeApi({ root }));
 // ==== end W5-A ====
 
+// ready-made versions of every asset (docs/site-design.md, section 4): generated/versions.json, read by the library and asset pages
+await step('versions', async () => (await import(pathToFileURL(path.join(ROOT, 'tools', 'lib', 'versions-build.mjs')).href)).writeVersions({ root }));
+
 // ---- thumbnails and strips -------------------------------------------------------------
 await step('thumbnails', async () => {
   const r = writeImages({ root, sprites: loaded.sprites, sounds: loaded.sounds, force: has('--force') });

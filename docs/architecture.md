@@ -57,6 +57,8 @@ meta: {
 
 `name` and one-sentence `blurb` / `description` stay where they are today. Facts that can be measured (frame size, clips, frame counts, length, tempo, number of controls, parts) are **not** written by hand: the build derives them.
 
+**Ready-made versions** (sprites, optional; `docs/site-design.md` section 4): `versions: [{ name, params }]` in `defineSprite`, named settings a person can start from. Names are everyday words of at most four, and `params` holds only settings that differ from the defaults; `engine/versions.js cleanVersions` checks them when the sprite is defined, and the quality bar (Contract 10) checks every version like any other settings. A sprite that lists none gets generated versions (`versionsOf`). The build writes every asset's versions, hand-made first, to `generated/versions.json`; the catalogue carries only `tech.versions`, the number of hand-made ones.
+
 Role tree (top level is shared by sprites and sounds so a chest and its creak sit together):
 
 | Top level | Sprites | Sounds |

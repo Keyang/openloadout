@@ -3,7 +3,8 @@
 
 import { rng } from './motion.js';
 import { styleFor, cleanStyles, pixelsOf } from './styles.js';   // styles.js imports this file too; neither uses the other until a call
-import { MATERIAL_IDS } from './materials.js';                     // what a colour can be of (Contract 7); it imports nothing
+import { MATERIAL_IDS } from './materials.js';
+import { cleanVersions } from './versions.js';                    // ready-made versions; versions.js imports this file too, neither uses the other until a call                     // what a colour can be of (Contract 7); it imports nothing
 
 // ---- parameter kinds -------------------------------------------------------
 // Each parameter is one control a non-technical person sees. `label`, `lo` and
@@ -113,6 +114,8 @@ export function defineSprite(def) {
   rejectLoops(def);
   // styles (Contract 12): which pipelines can draw and export it
   def.styles = cleanStyles(def.styles, `sprite ${def.id}`);
+  // ready-made versions (docs/site-design.md, section 4): named settings, checked like any settings
+  if (def.versions !== undefined) cleanVersions(def);
   return def;
 }
 

@@ -43,6 +43,7 @@ export function spriteTech(def) {
     parts: Object.keys(def.parts ?? {}),
     sounds: soundIds.size,   // distinct sound effects the sprite's animations play
     soundIds: [...soundIds].sort(),   // which ones, so a sound's page can say which sprites use it without loading them
+    versions: def.versions?.length ?? 0,   // hand-made ready-made versions it lists (the generated ones are in generated/versions.json)
   };
 }
 
