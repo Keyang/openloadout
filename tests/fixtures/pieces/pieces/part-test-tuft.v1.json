@@ -1,0 +1,19 @@
+{
+  "format": "loadout-piece",
+  "version": 1,
+  "id": "part:test-tuft",
+  "v": 1,
+  "name": "Test tuft",
+  "about": "A tuft of two lines on a clod, for the pieces loader's tests only (not art).",
+  "slots": [
+    { "id": "hair", "label": "Tuft", "default": "#3a6e2a", "material": "plant" }
+  ],
+  "args": { "length": { "type": "px", "lo": 1, "hi": 4, "default": 2 } },
+  "body": {
+    "draw": [
+      { "kind": "line", "from": [0, 0], "to": [0, -3], "paint": "hair" },
+      { "kind": "line", "from": [1, 0], "to": [2, -2], "paint": "hair.light" },
+      { "kind": "use", "use": "stamp:test-clod", "v": 1, "at": [0, 1], "paint": { "a": "hair.dark", "b": "hair" } }
+    ]
+  }
+}

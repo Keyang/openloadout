@@ -1,0 +1,13 @@
+{
+  "format": "loadout-piece",
+  "version": 1,
+  "id": "stamp:test-clod",
+  "v": 1,
+  "name": "Test clod",
+  "about": "A three-pixel lump of earth, for the pieces loader's tests only (not art).",
+  "slots": [
+    { "id": "a", "label": "Clod", "default": "#5a3a22", "material": "earth" },
+    { "id": "b", "label": "Clod top", "material": "earth" }
+  ],
+  "body": { "rows": ["b.", "aa"], "key": { "a": "a", "b": "b" }, "anchor": "bc" }
+}

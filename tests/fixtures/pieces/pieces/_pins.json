@@ -1,0 +1,7 @@
+{
+  "about": "Released piece versions and the hash of their content. Added by node tools/lib/pieces-index.mjs --pin; never edit or remove a line: a changed look is a new version.",
+  "pins": {
+    "part:test-tuft@1": "391d2064467e3ec0",
+    "stamp:test-clod@1": "dbc477ba7e54c293"
+  }
+}
