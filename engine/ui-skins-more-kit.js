@@ -18,8 +18,11 @@
 // moreSkinHeading  the flat panel's heading line is 2 px of its accent, which these skins do not use; a sprite draws
 //                the panel without a heading, makes the marks, then paints the strip and a rule of its own colours
 //                (neon: a 3 px tube line) over the face inside the rings.
+// dimDisabled    a disabled piece is its greys one step darker (tone -0.3), the ink kept: greyed out at the same
+//                lightness as the lit band, a pale band's grey and the band itself became one tone under the
+//                four-green Handheld look; one step darker keeps them two.
 
-import { col, INK } from './color.js';
+import { col, INK, tone, rgbToHex } from './color.js';
 import { desaturate } from './ui.js';
 import { moreSkinMarks } from './ui-skins-more.js';
 
@@ -90,4 +93,20 @@ export function moreSkinHeading(g, body, inner, rows, { strip, rule = [] } = {})
   rule.forEach((c, i) => paint(inner.y + rows + i, c));
   const used = rows + rule.length;
   return { title: { x: inner.x, y: inner.y, w: inner.w, h: rows }, inner: { ...inner, y: inner.y + used, h: inner.h - used } };
+}
+
+/**
+ * Darkens every pixel of a disabled piece already drawn by `amount` (default -0.3), the ink (and its grey) left as it is: returns the number of pixels changed.
+ * Arguments: g; opt { amount, ink (default INK) }.
+ */
+export function dimDisabled(g, { amount = -0.3, ink = INK } = {}) {
+  const inks = new Set([col(ink), col(desaturate(ink))]);
+  let n = 0;
+  for (let y = 0; y < g.h; y++) for (let x = 0; x < g.w; x++) {
+    const v = g.get(x, y);
+    if (!v || inks.has(v)) continue;
+    g.dot(x, y, tone(rgbToHex(v & 255, (v >>> 8) & 255, (v >>> 16) & 255), amount));
+    n++;
+  }
+  return n;
 }

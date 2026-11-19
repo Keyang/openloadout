@@ -17,6 +17,8 @@ import { twinkle } from '../engine/fx.js';
 const P = PALETTE.thornwood, D = PALETTE.derelict;
 const PIVOT = [24, 24];
 const NUMBERS = { p10: '+10', p50: '+50', p100: '+100', p500: '+500', p1000: '+1000', x2: 'x2', x5: 'x5' };
+// the choice's labels (and so the names of generated versions) say the number in words: a name holds no digits
+const SAID = { p10: 'Plus ten', p50: 'Plus fifty', p100: 'Plus hundred', p500: 'Plus five hundred', p1000: 'Plus thousand', x2: 'Times two', x5: 'Times five' };
 const RISE = [0, 2, 3, 4, 5, 6, 7, 8];         // px above rest, per frame of `rise`
 
 // The font's '+' is 3 rows tall at the small size (and in serif at the middle one): rimmed, it closes into a
@@ -74,7 +76,7 @@ export default defineSprite({
   pivot: PIVOT,
   grounded: false,
   params: {
-    number: choice('Number', 'p100', Object.entries(NUMBERS).map(([value, label]) => ({ value, label }))),
+    number: choice('Number', 'p100', Object.keys(NUMBERS).map((value) => ({ value, label: SAID[value] }))),
     style: choice('Style', 'chunky', [...FONT_STYLES]),
     size: range('Size', 0.5, { lo: 'Small', hi: 'Big' }),
     outline: choice('Outline', 'rimmed', ['ink', 'rimmed']),
@@ -89,11 +91,11 @@ export default defineSprite({
   },
   sounds: { rise: [{ sound: 'xp-blip', preset: 'XP shard', frame: 0, volume: 0.5 }] },
   versions: [
-    { name: '+100', params: {} },
-    { name: '+10, small', params: { number: 'p10', size: 0, body: P.cream } },
-    { name: '+1000', params: { number: 'p1000', size: 1, edge: P.crimson } },
+    { name: 'Plus hundred', params: {} },
+    { name: 'Plus ten, small', params: { number: 'p10', size: 0, body: P.cream } },
+    { name: 'Plus thousand', params: { number: 'p1000', size: 1, edge: P.crimson } },
     { name: 'Double', params: { number: 'x2', body: P.sky, edge: P.hero, style: 'rounded' } },
-    { name: '+50 serif', params: { number: 'p50', style: 'serif', body: P.goblin, outline: 'ink' } },
+    { name: 'Plus fifty serif', params: { number: 'p50', style: 'serif', body: P.goblin, outline: 'ink' } },
   ],
 
   render(g, { clip, frame, p }) {

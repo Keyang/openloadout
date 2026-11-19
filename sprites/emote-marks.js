@@ -35,7 +35,7 @@ export default defineSprite({
   grounded: false,
   params: {
     emote: choice('Emote', 'exclaim', [
-      { value: 'exclaim', label: '!' }, { value: 'question', label: '?' }, 'heart', 'anger', 'sweat', 'sleep', 'music',
+      { value: 'exclaim', label: 'Exclamation' }, { value: 'question', label: 'Question' }, 'heart', 'anger', 'sweat', 'sleep', 'music',
       { value: 'spark', label: 'Delight' }, { value: 'swirl', label: 'Dizzy' },
     ]),
     size: range('Size', 0.5, { lo: 'Small', hi: 'Big' }),

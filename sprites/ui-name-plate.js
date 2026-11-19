@@ -13,6 +13,7 @@
 // arrows). No words are drawn.
 import { defineSprite, range, choice, color, toggle } from '../engine/sprite.js';
 import { Surface } from '../engine/surface.js';
+import { worstContrast } from '../engine/ui.js';
 import { PALETTE } from '../engine/palettes.js';
 import { col, INK, tone, brightness } from '../engine/color.js';
 import { skinSwatches, SKIN_TEXT } from '../engine/ui-skins.js';
@@ -30,15 +31,27 @@ const SW = skinSwatches('flat', {
 });
 const PLATES = { plate: {}, 'plate-badge': { badge: true }, 'plate-lit': { lit: true } };
 
-// The targeted look, on the plate drawn with lit off: every band pixel turns the accent (a change that shows at 1x on
-// every band; an accent as bright as the band, within 0.1, goes darker first), and an arrow head of the accent grows from the inner edge of the band at each end, on the plate's
+// The targeted look, on the plate drawn with lit off: every band pixel turns the accent (lifted by litBand so it stands
+// off the plate and shows against every band), and an arrow head of the accent grows from the inner edge of the band at each end, on the plate's
 // middle row: columns 5, 5, 3 and 1 px tall on the face, its rim ink where it meets the face, so it stands off any face
 // (and the rim off any band swatch: ink is 9:1 or more against all five). Returns
 // the text area, narrowed if an arrow would reach it.
 const ARROW = [[0, -2], [0, -1], [0, 0], [0, 1], [0, 2], [1, -2], [1, -1], [1, 0], [1, 1], [1, 2], [2, -1], [2, 0], [2, 1], [3, 0]];
+// The lit band's colour: the accent, lifted (lighter, same hue) until it keeps 3 to 1 against the plate under every
+// look and sits 0.1 or more apart in brightness from the band it replaces, so the change shows at 1x (magic on sky,
+// moss on green). A darker accent cannot hold 3 to 1 against the dark plates under the Spooky and Mono looks.
+function litBand(p) {
+  let fallback = null;
+  for (let t = 0; t <= 2.4; t += 0.15) {
+    const c = tone(p.accent, t);
+    if (worstContrast(c, p.face) < 3) continue;
+    fallback ??= c;
+    if (Math.abs(brightness(c) - brightness(p.frame)) >= 0.1) return c;
+  }
+  return fallback ?? p.accent;
+}
 function litPlate(s, out, p) {
-  // an accent within 0.1 of the band's brightness (magic on sky) would hardly change it: the band takes it darker
-  const lit = Math.abs(brightness(p.accent) - brightness(p.frame)) < 0.1 ? tone(p.accent, -0.8) : p.accent;
+  const lit = litBand(p);
   const band = col(p.frame), face = col(p.face), acc = col(lit);
   for (let i = 0; i < s.data.length; i++) if (s.data[i] === band) s.data[i] = acc;
   const B = out.body, my = B.y + Math.floor((B.h - 1) / 2);

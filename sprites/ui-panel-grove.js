@@ -66,6 +66,21 @@ function piece(g, clip, p) {
     ({ title, inner } = moreSkinHeading(g, body, from, TITLE, { strip: T.faceDark, rule: [T.band, T.band] }));  }
   return { inner, title, slice: m.slice, edge: out.edge };
 }
+// A text area kept clear of marks drawn over its corners: while an edge row or column of the area holds a colour other
+// than the one at its middle, that row or column is left out, first the side that loses the fewest pixels of that colour.
+function clearArea(g, a) {
+  let { x, y, w, h } = a;
+  const c = g.get(x + (w >> 1), y + (h >> 1));
+  // how many pixels of the middle colour a row or column holds, or -1 when it holds nothing else
+  const row = (py) => { let n = 0; for (let px = x; px < x + w; px++) if (g.get(px, py) === c) n++; return n === w ? -1 : n; };
+  const column = (px) => { let n = 0; for (let py = y; py < y + h; py++) if (g.get(px, py) === c) n++; return n === h ? -1 : n; };
+  while (w > 0 && h > 0) {
+    const cuts = [[row(y), () => { y++; h--; }], [row(y + h - 1), () => { h--; }], [column(x), () => { x++; w--; }], [column(x + w - 1), () => { w--; }]].filter(([n]) => n >= 0);
+    if (!cuts.length) break;
+    cuts.sort((m, n) => m[0] - n[0])[0][1]();
+  }
+  return { ...a, x, y, w, h };
+}
 const plus1 = (s) => ({ left: s.left + 1, top: s.top + 1, right: s.right + 1, bottom: s.bottom + 1 });
 function slice(clip, p) {
   const out = piece(new Surface(...SIZE), clip, p), s = plus1(out.slice);
@@ -110,11 +125,12 @@ export default defineSprite({
     { name: 'Mint at night', params: { face: P.cavern, frame: H.heal, accent: P.hero } },
     { name: 'Bare', params: { leaves: false, corner: 0.25, face: D.plate } },
   ],
-  // Where text goes (white text), and one pixel of the vine to check it against.
+  // Where text goes (white text), and one pixel of the vine to check it against. The heading strip's area is kept clear
+  // of the leaves and flowers that reach into its top corners (clearArea, as ui-panel-paper's card).
   textArea(clip, p) {
-    const out = piece(new Surface(...SIZE), clip, p), text = SKIN_TEXT.flat;
+    const g = new Surface(...SIZE), out = piece(g, clip, p), text = SKIN_TEXT.flat;
     const main = { ...out.inner, text, edge: out.edge };
-    return out.title ? [main, { ...out.title, text, edge: out.edge }] : main;
+    return out.title ? [main, { ...clearArea(g, out.title), text, edge: out.edge }] : main;
   },
   render(g, { clip, p }) {
     piece(g, clip, p);

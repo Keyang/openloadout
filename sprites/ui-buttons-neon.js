@@ -27,7 +27,7 @@ import { skinButton, skinTab, skinSwatches, SKIN_TEXT } from '../engine/ui-skins
 import { roundSlab } from '../engine/ui-candy-slab.js';
 import { MORE_SKIN_STYLES, moreSkinBase, moreSkinCuts, moreSkinMarks } from '../engine/ui-skins-more.js';
 import { neonGapGlow } from '../engine/ui-neon-tube.js';
-import { thickenBand, moreSkinButtonMarks } from '../engine/ui-skins-more-kit.js';
+import { thickenBand, moreSkinButtonMarks, dimDisabled } from '../engine/ui-skins-more-kit.js';
 
 const P = PALETTE.thornwood, H = PALETTE.hearthvale, D = PALETTE.derelict;
 const SIZE = [96, 32], RECT = { x: 1, y: 1, w: SIZE[0] - 2, h: SIZE[1] - 2 };
@@ -124,5 +124,6 @@ export default defineSprite({
 
   render(g, { clip, p }) {
     piece(g, clip, p);
+    if (clip === 'disabled') dimDisabled(g);   // one step darker, so a pale band and its grey stay two tones under every look
   },
 });
