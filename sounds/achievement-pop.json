@@ -1,0 +1,394 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "achievement-pop",
+ "name": "Achievement",
+ "category": "ui",
+ "description": "An achievement or trophy banner sliding in: a soft low whump as the banner arrives, then three bright notes that go up, down and up again, the last with a small sparkle. Change its pitch, speed, brightness, how big the banner sounds and the instrument. The same every time.",
+ "meta": {
+  "type": "sfx",
+  "role": "interface/reward",
+  "themes": [
+   "neutral",
+   "fantasy",
+   "sci-fi"
+  ],
+  "gameTypes": [
+   "arcade",
+   "platformer",
+   "puzzle",
+   "top-down-rpg",
+   "shooter"
+  ],
+  "words": [
+   "achievement",
+   "trophy",
+   "unlock",
+   "unlocked",
+   "banner",
+   "badge",
+   "medal",
+   "award",
+   "reward",
+   "popup",
+   "toast",
+   "milestone",
+   "proud",
+   "sparkle"
+  ],
+  "license": "draft"
+ },
+ "duration": "6.3/speed",
+ "params": [
+  {
+   "id": "pitch",
+   "label": "Pitch",
+   "unit": "Hz",
+   "min": 330,
+   "max": 880,
+   "default": 523,
+   "scale": "log"
+  },
+  {
+   "id": "speed",
+   "label": "Speed",
+   "unit": "notes per second",
+   "min": 6,
+   "max": 14,
+   "default": 9
+  },
+  {
+   "id": "bright",
+   "label": "Brightness",
+   "min": 0,
+   "max": 1,
+   "default": 0.55
+  },
+  {
+   "id": "whump",
+   "label": "Banner",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  },
+  {
+   "id": "voice",
+   "label": "Instrument",
+   "min": 0,
+   "max": 2,
+   "default": 0,
+   "options": [
+    "Soft bell",
+    "Blip",
+    "Buzzy"
+   ]
+  }
+ ],
+ "nodes": [
+  {
+   "id": "isBell",
+   "type": "expr",
+   "expr": "voice < 0.5 ? 1 : 0"
+  },
+  {
+   "id": "isBlip",
+   "type": "expr",
+   "expr": "voice >= 0.5 && voice < 1.5 ? 1 : 0"
+  },
+  {
+   "id": "isBuzz",
+   "type": "expr",
+   "expr": "voice >= 1.5 ? 1 : 0"
+  },
+  {
+   "id": "thFall",
+   "type": "env",
+   "points": [
+    [
+     0,
+     170
+    ],
+    [
+     0.08,
+     62,
+     "exp"
+    ]
+   ]
+  },
+  {
+   "id": "thump",
+   "type": "osc",
+   "freq": "thFall"
+  },
+  {
+   "id": "thAmp",
+   "type": "ad",
+   "attack": 0.003,
+   "decay": "1.5/speed",
+   "curve": 2.2
+  },
+  {
+   "id": "air",
+   "type": "noise",
+   "seed": 32
+  },
+  {
+   "id": "airSweep",
+   "type": "env",
+   "points": [
+    [
+     0,
+     420
+    ],
+    [
+     "0.5/speed",
+     1500,
+     "exp"
+    ],
+    [
+     "1.6/speed",
+     600,
+     "exp"
+    ]
+   ]
+  },
+  {
+   "id": "breath",
+   "type": "filter",
+   "mode": "bp",
+   "in": "air",
+   "freq": "airSweep",
+   "q": 1.1
+  },
+  {
+   "id": "airAmp",
+   "type": "ad",
+   "attack": "0.4/speed",
+   "decay": "1.5/speed",
+   "curve": 1.8
+  },
+  {
+   "id": "banner",
+   "type": "expr",
+   "expr": "(thump*thAmp*0.9 + breath*airAmp*0.8)*(0.08 + whump*0.95)"
+  },
+  {
+   "id": "k1",
+   "type": "clock",
+   "rate": 1,
+   "count": 1,
+   "delay": "1.2/speed"
+  },
+  {
+   "id": "k2",
+   "type": "clock",
+   "rate": 1,
+   "count": 1,
+   "delay": "2.2/speed"
+  },
+  {
+   "id": "k3",
+   "type": "clock",
+   "rate": 1,
+   "count": 1,
+   "delay": "3.2/speed"
+  },
+  {
+   "id": "nf",
+   "type": "expr",
+   "expr": "t < 2.2/speed ? pitch*semi(7) : (t < 3.2/speed ? pitch*semi(4) : pitch*semi(12))"
+  },
+  {
+   "id": "aShort",
+   "type": "ad",
+   "attack": 0.004,
+   "decay": "1.15/speed",
+   "curve": 2.2,
+   "trig": "k1 + k2"
+  },
+  {
+   "id": "aLong",
+   "type": "ad",
+   "attack": 0.004,
+   "decay": "3.0/speed",
+   "curve": 2.4,
+   "trig": "k3"
+  },
+  {
+   "id": "amp",
+   "type": "expr",
+   "expr": "aShort + aLong"
+  },
+  {
+   "id": "sSin",
+   "type": "osc",
+   "freq": "nf"
+  },
+  {
+   "id": "sTri",
+   "type": "osc",
+   "wave": "tri",
+   "freq": "nf*2"
+  },
+  {
+   "id": "bSq",
+   "type": "osc",
+   "wave": "square",
+   "freq": "nf"
+  },
+  {
+   "id": "bPl",
+   "type": "osc",
+   "wave": "pulse",
+   "width": 0.25,
+   "freq": "nf*2"
+  },
+  {
+   "id": "zMod",
+   "type": "osc",
+   "freq": "nf*2"
+  },
+  {
+   "id": "zSaw",
+   "type": "osc",
+   "wave": "saw",
+   "freq": "nf",
+   "pm": "zMod*0.35"
+  },
+  {
+   "id": "bell1",
+   "type": "modal",
+   "in": "k1",
+   "freq": "pitch*semi(7)*2",
+   "ratios": [
+    1,
+    2.76,
+    5.4
+   ],
+   "gains": [
+    1,
+    0.4,
+    0.15
+   ],
+   "decay": "2.2/speed",
+   "tilt": 0.7
+  },
+  {
+   "id": "bell2",
+   "type": "modal",
+   "in": "k2",
+   "freq": "pitch*semi(4)*2",
+   "ratios": [
+    1,
+    2.76,
+    5.4
+   ],
+   "gains": [
+    1,
+    0.4,
+    0.15
+   ],
+   "decay": "2.2/speed",
+   "tilt": 0.7
+  },
+  {
+   "id": "bell3",
+   "type": "modal",
+   "in": "k3",
+   "freq": "pitch*semi(12)*2",
+   "ratios": [
+    1,
+    2.76,
+    5.4
+   ],
+   "gains": [
+    1,
+    0.4,
+    0.15
+   ],
+   "decay": "4.5/speed",
+   "tilt": 0.7
+  },
+  {
+   "id": "voiced",
+   "type": "expr",
+   "expr": "(sSin*0.75 + sTri*0.12)*isBell + (bSq*0.5 + bPl*0.2)*isBlip + zSaw*0.75*isBuzz"
+  },
+  {
+   "id": "lead",
+   "type": "expr",
+   "expr": "voiced*amp + (bell1 + bell2 + bell3*1.15)*0.35*isBell"
+  },
+  {
+   "id": "tone",
+   "type": "filter",
+   "mode": "lp",
+   "in": "lead",
+   "freq": "1400 + bright*8500",
+   "q": 0.6
+  },
+  {
+   "id": "crushed",
+   "type": "crush",
+   "in": "tone",
+   "bits": 5,
+   "rate": 11000
+  },
+  {
+   "id": "dressed",
+   "type": "expr",
+   "expr": "isBuzz ? tone*0.3 + crushed*0.7 : tone"
+  },
+  {
+   "id": "spClk",
+   "type": "clock",
+   "rate": "speed*3",
+   "count": 3,
+   "delay": "3.5/speed"
+  },
+  {
+   "id": "spTone",
+   "type": "osc",
+   "freq": "pitch*(t < 3.8/speed ? 4 : (t < 4.1/speed ? 6 : 8))"
+  },
+  {
+   "id": "spAmp",
+   "type": "ad",
+   "attack": 0.002,
+   "decay": "0.9/speed",
+   "curve": 3,
+   "trig": "spClk"
+  },
+  {
+   "id": "sparkle",
+   "type": "expr",
+   "expr": "spTone*spAmp*(0.1 + bright*0.22)"
+  },
+  {
+   "id": "room",
+   "type": "reverb",
+   "in": "dressed + sparkle",
+   "size": 0.45,
+   "damp": 0.4,
+   "mix": "isBell*0.16"
+  },
+  {
+   "id": "clean",
+   "type": "filter",
+   "mode": "hp",
+   "in": "room + banner",
+   "freq": 35
+  }
+ ],
+ "out": "clean*(1 - smooth(dur - 0.04, dur - 0.002, t))",
+ "presets": {
+  "Chiptune": {
+   "voice": 1
+  },
+  "Storybook": {
+   "voice": 0
+  },
+  "Gritty": {
+   "voice": 2
+  }
+ }
+}

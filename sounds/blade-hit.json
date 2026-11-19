@@ -1,0 +1,59 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "blade-hit",
+  "name": "Blade hit",
+  "category": "impact",
+  "description": "A blade landing on its target: a sharp slice and a soft thud at once, ending soft and wet on flesh, with a dull clank on armour or a dry knock on wood. Change its weight, length, brightness, how sharp the cut is and what it hits.",
+  "meta": {
+    "type": "sfx",
+    "role": "actions/hit",
+    "themes": ["neutral", "fantasy", "dungeon"],
+    "gameTypes": ["top-down-rpg", "platformer", "turn-based-rpg", "roguelike-action"],
+    "words": ["blade", "sword", "hit", "cut", "slice", "stab", "slash", "axe", "chop", "wound", "damage", "armour", "melee", "strike"],
+    "license": "draft"
+  },
+  "duration": "length",
+  "params": [
+    { "id": "weight", "label": "Weight", "min": 0.5, "max": 2, "default": 1, "scale": "log" },
+    { "id": "length", "label": "Length", "unit": "s", "min": 0.1, "max": 0.4, "default": 0.2, "scale": "log" },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "slice", "label": "Slice", "min": 0, "max": 1, "default": 0.6 },
+    { "id": "target", "label": "Hits", "min": 0, "max": 2, "default": 0, "options": ["Flesh", "Armour", "Wood"] }
+  ],
+  "nodes": [
+    { "id": "j", "type": "rand", "lo": 0.93, "hi": 1.07 },
+    { "id": "j2", "type": "rand", "lo": 0.9, "hi": 1.1 },
+    { "id": "isF", "type": "expr", "expr": "target < 0.5 ? 1 : 0" },
+    { "id": "isA", "type": "expr", "expr": "target >= 0.5 && target < 1.5 ? 1 : 0" },
+    { "id": "isW", "type": "expr", "expr": "target >= 1.5 ? 1 : 0" },
+    { "id": "n", "type": "noise" },
+    { "id": "sf", "type": "env", "points": [[0, "(4500 + bright*3000)*pow(weight, -0.4)*rnd(0.92, 1.08)"], [0.03, "(1500 + bright*1000)*pow(weight, -0.4)", "exp"]] },
+    { "id": "cutA", "type": "ad", "attack": 0.0004, "decay": "0.028 + 0.014*weight", "curve": 1.6 },
+    { "id": "cut", "type": "filter", "mode": "bp", "in": "n*cutA", "freq": "sf", "q": 2.2 },
+    { "id": "tf", "type": "env", "points": [[0, "210*pow(weight, -0.7)*rnd(0.94, 1.06)"], [0.045, "78*pow(weight, -0.7)", "exp"]] },
+    { "id": "th", "type": "osc", "wave": "sine", "freq": "tf" },
+    { "id": "ta", "type": "ad", "attack": 0.001, "decay": "length*(0.4 + 0.2*weight)", "curve": 2.2 },
+    { "id": "n2", "type": "noise" },
+    { "id": "drops", "type": "dust", "density": 700, "spread": 1 },
+    { "id": "wf", "type": "env", "points": [[0, "(520 + bright*300)*pow(weight, -0.5)"], [0.025, "(1300 + bright*700)*pow(weight, -0.5)*rnd(0.9, 1.1)"], ["length*0.6", "(500 + bright*250)*pow(weight, -0.5)", "exp"]] },
+    { "id": "wetA", "type": "ad", "attack": 0.004, "decay": "length*(0.55 + 0.2*weight)", "curve": 1.5 },
+    { "id": "wet", "type": "filter", "mode": "bp", "in": "(n2*0.6 + drops*4)*wetA*isF", "freq": "wf", "q": 1.6 },
+    { "id": "excA", "type": "ad", "attack": 0.0003, "decay": 0.004, "curve": 2 },
+    { "id": "exc", "type": "filter", "mode": "lp", "in": "n*excA", "freq": "1800 + bright*4500" },
+    { "id": "tap2", "type": "clock", "rate": 1, "count": 1, "delay": "rnd(0.009, 0.017)" },
+    { "id": "excB", "type": "ad", "attack": 0.0003, "decay": 0.004, "curve": 2, "trig": "tap2" },
+    { "id": "exc2", "type": "filter", "mode": "lp", "in": "n2*excB", "freq": "1500 + bright*3500" },
+    { "id": "plate", "type": "modal", "in": "exc*isA", "freq": "(420 + bright*140)*pow(weight, -0.5)*j", "ratios": [1, 1.58, 2.31, 3.17, 4.43], "decay": "0.08*(0.6 + 0.4*weight)*sqrt(length/0.2)", "tilt": 0.9 },
+    { "id": "plate2", "type": "modal", "in": "exc2*isA", "freq": "(590 + bright*180)*pow(weight, -0.5)*j2", "ratios": [1, 1.71, 2.63, 3.9], "decay": "0.065*(0.6 + 0.4*weight)*sqrt(length/0.2)", "tilt": 0.9 },
+    { "id": "wood", "type": "modal", "in": "exc*isW", "freq": "(330 + bright*90)*pow(weight, -0.5)*j", "ratios": [1, 2.25, 3.7], "gains": [1, 0.7, 0.3], "decay": "0.07*(0.6 + 0.4*weight)*sqrt(length/0.2)", "tilt": 1.2 },
+    { "id": "sum", "type": "expr", "expr": "cut*slice*2.2 + th*ta*(0.45 - 0.15*isW) + wet*1.3 + plate*0.25 + plate2*0.16 + wood*0.45 + exc*isW*0.6" },
+    { "id": "tone", "type": "filter", "mode": "lp", "in": "sum", "freq": "(3500 + bright*9000)*pow(weight, -0.6)" },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "tone", "freq": 40 }
+  ],
+  "out": "clean",
+  "presets": {
+    "Clean cut": { "target": 0, "weight": 0.9, "length": 0.18, "bright": 0.6, "slice": 0.8 },
+    "Armour bite": { "target": 1, "weight": 1.2, "length": 0.2, "bright": 0.55, "slice": 0.6 },
+    "Chopped wood": { "target": 2, "weight": 1.4, "length": 0.26, "bright": 0.45, "slice": 0.45 }
+  }
+}

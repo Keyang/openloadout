@@ -1,0 +1,41 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "menu-harp-toggle",
+  "name": "Harp toggle",
+  "category": "ui",
+  "description": "Flipping a switch or ticking a box: one plucked string whose note steps up a moment after the pluck when it turns on, and steps down and is stopped sooner when it turns off, the same every time. Change its pitch, length, brightness, how much wooden soundbox is heard and which way it switches.",
+  "meta": {
+    "type": "sfx",
+    "role": "interface/click",
+    "themes": ["neutral", "fantasy"],
+    "gameTypes": ["arcade", "puzzle", "card-game", "turn-based-rpg", "farming-sim"],
+    "words": ["harp", "plucked", "string", "toggle", "switch", "checkbox", "tick", "on", "off", "option", "setting", "menu", "pluck"],
+    "license": "draft"
+  },
+  "duration": "length * (0.86 + dir * 0.14) + 0.012",
+  "params": [
+    { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 220, "max": 520, "default": 330, "scale": "log" },
+    { "id": "length", "label": "Length", "unit": "s", "min": 0.1, "max": 0.26, "default": 0.16, "scale": "log" },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "body", "label": "Soundbox", "min": 0, "max": 1, "default": 0.4 },
+    { "id": "dir", "label": "Switch", "min": 0, "max": 1, "default": 1, "options": ["Off", "On"] }
+  ],
+  "nodes": [
+    { "id": "fingerHit", "type": "ad", "attack": 0.0004, "decay": 0.002, "curve": 2 },
+    { "id": "finger", "type": "filter", "mode": "lp", "in": "fingerHit", "freq": "1400 + bright * 3200", "q": 0.6 },
+    { "id": "note", "type": "env", "points": [[0, "pitch * semi(2 - dir * 2)"], [0.038, "pitch * semi(2 - dir * 2)"], [0.043, "pitch * semi(dir * 2)", "exp"]] },
+    { "id": "ringTime", "type": "env", "points": [[0, 0.5], ["length * (0.6 + dir * 0.18)", 0.5], ["length * (0.6 + dir * 0.18) + 0.004", "0.02 + length * 0.1"]] },
+    { "id": "mute", "type": "env", "points": [[0, 0], ["length * (0.6 + dir * 0.18)", 0], ["length * (0.6 + dir * 0.18) + 0.004", 0.3]] },
+    { "id": "string", "type": "pluck", "freq": "note", "decay": "ringTime", "damp": "0.58 - bright * 0.22 + mute", "in": "finger", "trig": 0 },
+    { "id": "boxLow", "type": "filter", "mode": "bp", "in": "string", "freq": 230, "q": 1.4 },
+    { "id": "boxHigh", "type": "filter", "mode": "bp", "in": "string", "freq": 470, "q": 1.4 },
+    { "id": "sum", "type": "expr", "expr": "string * (1 - body * 0.3) + (boxLow + boxHigh * 0.8) * body * 1.6" },
+    { "id": "tone", "type": "filter", "mode": "lp", "in": "sum", "freq": "2600 + bright * 8000", "q": 0.6 },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "tone", "freq": 80 }
+  ],
+  "out": "clean",
+  "presets": {
+    "Switch on": { "dir": 1 },
+    "Switch off": { "dir": 0 }
+  }
+}

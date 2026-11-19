@@ -1,0 +1,86 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "haunted-hall",
+  "name": "Haunted hall",
+  "category": "ambience",
+  "description": "An empty hall where something is wrong: thin draughts moaning through keyholes, a cold shimmer high up and a far knock now and then, all ringing in a big room. Change the moans' pitch, the hall's size, the brightness, the moaning and the knocks.",
+  "meta": {
+    "type": "ambience",
+    "role": "environment/ambience",
+    "themes": ["horror", "dungeon", "fantasy"],
+    "gameTypes": ["top-down-rpg", "roguelike-action", "platformer", "puzzle", "turn-based-rpg"],
+    "words": ["haunted", "ghost", "manor", "mansion", "hall", "spooky", "eerie", "draught", "moan", "knock", "crypt", "empty house", "creepy"],
+    "license": "draft"
+  },
+  "loop": true,
+  "wrap": true,
+  "duration": 8,
+  "params": [
+    { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 250, "max": 900, "default": 480, "scale": "log", "hint": "How high the draughts moan." },
+    { "id": "size", "label": "Hall size", "min": 0, "max": 1, "default": 0.6, "hint": "A bigger hall rings for longer and its knocks are lower." },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.4 },
+    { "id": "moan", "label": "Moaning", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "knocks", "label": "Knocks", "min": 0, "max": 1, "default": 0.3, "hint": "None at the bottom, one far knock in a loop, two at the top." }
+  ],
+  "nodes": [
+    { "id": "k", "type": "expr", "expr": "log(pitch / 250) / log(3.6)" },
+    { "id": "depth", "type": "expr", "expr": "1.2 + moan * 1.8" },
+
+    { "id": "g1", "type": "expr", "expr": "sin(tau * (t / 8 + rnd(0, 1)))" },
+    { "id": "g2", "type": "expr", "expr": "sin(tau * (2 * t / 8 + rnd(0, 1)))" },
+    { "id": "g3", "type": "expr", "expr": "sin(tau * (3 * t / 8 + rnd(0, 1)))" },
+    { "id": "s1", "type": "expr", "expr": "pow(0.5 + 0.5 * sin(tau * (2 * t / 8 + rnd(0, 1))), 1.5)" },
+    { "id": "s2", "type": "expr", "expr": "pow(0.5 + 0.5 * sin(tau * (3 * t / 8 + rnd(0, 1))), 1.5)" },
+    { "id": "s3", "type": "expr", "expr": "pow(0.5 + 0.5 * sin(tau * (t / 8 + rnd(0, 1))), 1.5)" },
+
+    { "id": "f1", "type": "expr", "expr": "clamp(pitch * mix(1.3, 0.6, k) * semi(g1 * depth), 300, 1200)" },
+    { "id": "f2", "type": "expr", "expr": "clamp(pitch * mix(1.7, 0.8, k) * semi(g2 * depth), 300, 1200)" },
+    { "id": "f3", "type": "expr", "expr": "clamp(pitch * mix(2.2, 1.05, k) * semi(g3 * depth), 300, 1200)" },
+
+    { "id": "n1", "type": "noise" },
+    { "id": "n2", "type": "noise" },
+    { "id": "n3", "type": "noise" },
+    { "id": "m1", "type": "filter", "mode": "bp", "in": "n1", "freq": "f1", "q": 24 },
+    { "id": "m2", "type": "filter", "mode": "bp", "in": "n2", "freq": "f2", "q": 32 },
+    { "id": "m3", "type": "filter", "mode": "bp", "in": "n3", "freq": "f3", "q": 38 },
+    { "id": "lvl", "type": "expr", "expr": "0.12 + moan * 1.1" },
+    { "id": "moanL", "type": "expr", "expr": "(m1 * s1 * 0.9 + m2 * s2 * 0.35 + m3 * s3 * 0.6) * lvl" },
+    { "id": "moanR", "type": "expr", "expr": "(m1 * s1 * 0.35 + m2 * s2 * 0.9 + m3 * s3 * 0.6) * lvl" },
+
+    { "id": "hn1", "type": "noise" },
+    { "id": "hn2", "type": "noise" },
+    { "id": "sw", "type": "expr", "expr": "pow(0.5 - 0.5 * cos(tau * (t / 8 + rnd(0, 1))), 2)" },
+    { "id": "sh1", "type": "filter", "mode": "bp", "in": "hn1", "freq": "rnd(4200, 5000)", "q": 7 },
+    { "id": "sh2", "type": "filter", "mode": "bp", "in": "hn2", "freq": "rnd(5800, 6900)", "q": 9 },
+    { "id": "shim", "type": "expr", "expr": "sw * (0.02 + bright * 0.1)" },
+
+    { "id": "c1", "type": "clock", "rate": 0.125, "delay": "rnd(0.5, 3.2)" },
+    { "id": "c2", "type": "clock", "rate": 0.125, "delay": "rnd(4.3, 7.2)" },
+    { "id": "on1", "type": "expr", "expr": "smooth(0.03, 0.2, knocks) * (0.6 + knocks * 0.4)" },
+    { "id": "on2", "type": "expr", "expr": "smooth(0.5, 0.7, knocks) * (0.5 + knocks * 0.4)" },
+    { "id": "kn", "type": "noise" },
+    { "id": "hit1", "type": "ad", "trig": "c1", "attack": 0.002, "decay": 0.014, "curve": 2 },
+    { "id": "hit2", "type": "ad", "trig": "c2", "attack": 0.002, "decay": 0.011, "curve": 2 },
+    { "id": "ex1", "type": "filter", "mode": "lp", "in": "kn * hit1", "freq": "500 + bright * 1400" },
+    { "id": "ex2", "type": "filter", "mode": "lp", "in": "kn * hit2", "freq": "450 + bright * 1200" },
+    { "id": "w1", "type": "modal", "in": "ex1", "freq": "(118 - size * 46) * rnd(0.82, 1.2)", "ratios": [1, 2.2, 3.7, 5.3], "gains": [1, 0.6, 0.3, 0.15], "decay": "0.22 + size * 0.25", "tilt": 1.1 },
+    { "id": "w2", "type": "modal", "in": "ex2", "freq": "(96 - size * 36) * rnd(0.8, 1.25)", "ratios": [1, 2.45, 3.4, 5.9], "gains": [1, 0.5, 0.3, 0.12], "decay": "0.2 + size * 0.22", "tilt": 1.1 },
+    { "id": "thump", "type": "expr", "expr": "w1 * on1 + w2 * on2" },
+
+    { "id": "an", "type": "noise", "color": "brown" },
+    { "id": "air", "type": "filter", "mode": "lp", "in": "an", "freq": "260 + bright * 500 - size * 80" },
+
+    { "id": "dryL", "type": "expr", "expr": "moanL + sh1 * shim + thump * 0.2 + air * 0.06" },
+    { "id": "dryR", "type": "expr", "expr": "moanR + sh2 * shim + thump * 0.2 + air * 0.06" },
+    { "id": "roomL", "type": "reverb", "in": "dryL", "size": "0.72 + size * 0.24", "damp": "0.7 - bright * 0.45", "mix": 1 },
+    { "id": "roomR", "type": "reverb", "in": "dryR", "size": "0.74 + size * 0.22", "damp": "0.7 - bright * 0.45", "mix": 1 },
+    { "id": "sumL", "type": "filter", "mode": "hp", "in": "dryL * 0.45 + roomL * (0.55 + size * 0.35)", "freq": 35 },
+    { "id": "sumR", "type": "filter", "mode": "hp", "in": "dryR * 0.45 + roomR * (0.55 + size * 0.35)", "freq": 35 }
+  ],
+  "out": ["sumL", "sumR"],
+  "presets": {
+    "Empty manor": { "pitch": 480, "size": 0.6, "bright": 0.4, "moan": 0.5, "knocks": 0.3 },
+    "Crypt wind": { "pitch": 310, "size": 0.85, "bright": 0.25, "moan": 0.6, "knocks": 0 },
+    "Something is here": { "pitch": 560, "size": 0.7, "bright": 0.5, "moan": 0.95, "knocks": 0.9 }
+  }
+}

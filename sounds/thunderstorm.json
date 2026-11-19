@@ -1,0 +1,87 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "thunderstorm",
+ "name": "Thunderstorm",
+ "category": "ambience",
+ "description": "A storm some way off: wind-blown rain arriving in sheets over a far rumble that never stops and swells into one soft roll of thunder, with no crack. Change the size of the storm, how far away it is, the brightness, the thunder and the rain.",
+ "meta": {
+  "type": "ambience",
+  "role": "environment/weather",
+  "themes": ["neutral", "forest", "horror"],
+  "gameTypes": ["top-down-rpg", "turn-based-rpg", "platformer", "farming-sim", "roguelike-action"],
+  "words": ["thunderstorm", "storm", "thunder", "rumble", "rain", "tempest", "weather", "distant", "rolling", "gloomy", "night", "squall", "downpour"],
+  "license": "draft"
+ },
+ "loop": true,
+ "duration": 8,
+ "normalize": false,
+ "params": [
+  { "id": "size", "label": "Storm size", "min": 0, "max": 1, "default": 0.5 },
+  { "id": "distance", "label": "Distance", "min": 0, "max": 1, "default": 0.5 },
+  { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+  { "id": "thunder", "label": "Thunder", "min": 0, "max": 1, "default": 0.5 },
+  { "id": "rain", "label": "Rain", "min": 0, "max": 1, "default": 0.5 }
+ ],
+ "nodes": [
+  { "id": "near", "type": "expr", "expr": "1 - distance" },
+
+  { "id": "farClk", "type": "clock", "rate": 0.5, "jitter": 0.6 },
+  { "id": "farRnd", "type": "rand", "trig": "farClk" },
+  { "id": "farLag", "type": "lag", "in": "farRnd", "time": 1.2 },
+  { "id": "farLvl", "type": "expr", "expr": "0.6 + 0.4*farLag" },
+  { "id": "farSrc", "type": "noise", "color": "brown" },
+  { "id": "farLow", "type": "filter", "mode": "lp", "in": "farSrc", "freq": "165 - 90*size" },
+  { "id": "farCut", "type": "filter", "mode": "hp", "in": "farLow", "freq": "66 - 22*size" },
+  { "id": "farRumble", "type": "expr", "expr": "farCut * farLvl" },
+
+  { "id": "rollClk", "type": "clock", "rate": 0.1, "count": 1, "delay": "rnd(0.5, 4.5)" },
+  { "id": "rollRamp", "type": "env", "trig": "rollClk", "points": [[0, 0], ["0.5 + 1.5*size*rnd(0.1, 0.45)", 1], ["1.5 + 1.5*size", 0]] },
+  { "id": "rollEnv", "type": "expr", "expr": "smooth(0, 1, rollRamp)" },
+  { "id": "rollDepth", "type": "rand", "lo": 0.7, "hi": 1 },
+  { "id": "bumpClk", "type": "clock", "rate": "3.4 - 1.4*size", "jitter": 0.8 },
+  { "id": "bumpRnd", "type": "rand", "trig": "bumpClk", "lo": 0.5, "hi": 1 },
+  { "id": "bump", "type": "lag", "in": "bumpRnd", "time": 0.11 },
+  { "id": "rollLvl", "type": "expr", "expr": "rollEnv * rollDepth * bump" },
+  { "id": "rollSrc", "type": "noise", "color": "brown" },
+  { "id": "rollLow", "type": "filter", "mode": "lp", "in": "rollSrc", "freq": "(80 + 220*rollEnv) * (1.25 - 0.5*size) * (1.1 - 0.2*distance)" },
+  { "id": "rollCut", "type": "filter", "mode": "hp", "in": "rollLow", "freq": "66 - 22*size" },
+  { "id": "roll", "type": "expr", "expr": "rollCut * rollLvl" },
+
+  { "id": "bodySrcL", "type": "noise", "color": "pink" },
+  { "id": "bodySrcR", "type": "noise", "color": "pink" },
+  { "id": "bodyL", "type": "filter", "mode": "bp", "in": "bodySrcL", "freq": "(430 + 180*bright) * (1.25 - 0.5*size)", "q": 0.8 },
+  { "id": "bodyR", "type": "filter", "mode": "bp", "in": "bodySrcR", "freq": "(470 + 180*bright) * (1.25 - 0.5*size)", "q": 0.8 },
+  { "id": "bodyLvl", "type": "expr", "expr": "(0.22*farLvl + rollLvl) * near * near" },
+
+  { "id": "sheetClkL", "type": "clock", "rate": 0.8, "jitter": 0.7 },
+  { "id": "sheetClkR", "type": "clock", "rate": 0.65, "jitter": 0.7 },
+  { "id": "sheetRndL", "type": "rand", "trig": "sheetClkL" },
+  { "id": "sheetRndR", "type": "rand", "trig": "sheetClkR" },
+  { "id": "sheetL", "type": "lag", "in": "sheetRndL", "time": 0.55 },
+  { "id": "sheetR", "type": "lag", "in": "sheetRndR", "time": 0.55 },
+  { "id": "gustClk", "type": "clock", "rate": 0.4, "jitter": 0.6 },
+  { "id": "gustRnd", "type": "rand", "trig": "gustClk" },
+  { "id": "gust", "type": "lag", "in": "gustRnd", "time": 0.9 },
+  { "id": "rainSrcL", "type": "noise", "color": "pink" },
+  { "id": "rainSrcR", "type": "noise", "color": "pink" },
+  { "id": "rainHiL", "type": "filter", "mode": "hp", "in": "rainSrcL", "freq": 800 },
+  { "id": "rainHiR", "type": "filter", "mode": "hp", "in": "rainSrcR", "freq": 800 },
+  { "id": "rainTop", "type": "expr", "expr": "(2000 + 2400*bright + 600*near) * (0.8 + 0.4*gust)" },
+  { "id": "rainL", "type": "filter", "mode": "lp", "in": "rainHiL", "freq": "rainTop" },
+  { "id": "rainR", "type": "filter", "mode": "lp", "in": "rainHiR", "freq": "rainTop" },
+  { "id": "rainLvl", "type": "expr", "expr": "(0.1 + 0.9*rain) * (0.8 + 0.4*near)" },
+
+  { "id": "thunderLvl", "type": "expr", "expr": "(0.15 + 0.85*thunder) * (0.75 + 0.5*near)" },
+  { "id": "low", "type": "expr", "expr": "(farRumble*0.7 + roll*(1.5 - 0.5*size)) * thunderLvl" },
+  { "id": "mixL", "type": "expr", "expr": "low + bodyL*bodyLvl*thunderLvl*2.0 + rainL*rainLvl*(0.3 + 0.7*sheetL)*1.0" },
+  { "id": "mixR", "type": "expr", "expr": "low + bodyR*bodyLvl*thunderLvl*2.0 + rainR*rainLvl*(0.3 + 0.7*sheetR)*1.0" },
+  { "id": "outL", "type": "filter", "mode": "hp", "in": "mixL*0.62", "freq": 35 },
+  { "id": "outR", "type": "filter", "mode": "hp", "in": "mixR*0.62", "freq": 35 }
+ ],
+ "out": ["outL", "outR"],
+ "presets": {
+  "Storm coming": { "distance": 0.85, "rain": 0.3, "thunder": 0.4, "size": 0.6 },
+  "Overhead": { "distance": 0.1, "thunder": 0.9, "rain": 0.9, "size": 0.7, "bright": 0.6 },
+  "Passing away": { "distance": 0.9, "thunder": 0.2, "rain": 0.45, "size": 0.4, "bright": 0.4 }
+ }
+}

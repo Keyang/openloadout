@@ -1,0 +1,49 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "spin-whirl",
+  "name": "Spin",
+  "category": "weapon",
+  "description": "A spinning attack or a spinning thing in flight: several quick whooshes in a row, crossing from side to side, each a little higher. Change its weight, length, brightness, number of turns and whistle.",
+  "meta": {
+    "type": "sfx",
+    "role": "actions/swing",
+    "themes": ["neutral", "fantasy"],
+    "gameTypes": ["roguelike-action", "top-down-rpg", "platformer", "turn-based-rpg"],
+    "words": ["spin", "whirl", "whirlwind", "spinning", "whoosh", "swoosh", "twirl", "cyclone", "attack", "boomerang", "blade", "rotate", "melee"],
+    "license": "draft"
+  },
+  "duration": "length + 0.02",
+  "params": [
+    { "id": "weight", "label": "Weight", "min": 0.5, "max": 2, "default": 1 },
+    { "id": "length", "label": "Length", "unit": "s", "min": 0.3, "max": 0.9, "default": 0.5, "scale": "log" },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "turns", "label": "Turns", "min": 2, "max": 5, "default": 3, "step": 1 },
+    { "id": "whistle", "label": "Whistle", "min": 0, "max": 1, "default": 0.3 }
+  ],
+  "nodes": [
+    { "id": "n", "type": "noise", "color": "pink" },
+    { "id": "nw", "type": "noise" },
+    { "id": "ph", "type": "expr", "expr": "min(t * turns / length, turns)" },
+    { "id": "idx", "type": "expr", "expr": "min(floor(ph), turns - 1)" },
+    { "id": "tick", "type": "clock", "rate": "turns / length" },
+    { "id": "jit", "type": "rand", "lo": -0.5, "hi": 0.5, "trig": "tick" },
+    { "id": "lvl", "type": "rand", "lo": 0.82, "hi": 1, "trig": "tick" },
+    { "id": "swell", "type": "expr", "expr": "pow(abs(sin(pi * ph)), 1.7)" },
+    { "id": "gate", "type": "env", "points": [[0, 0], [0.002, 1], ["length * 0.94", 1], ["length", 0]] },
+    { "id": "shape", "type": "expr", "expr": "(0.22 + 0.78 * swell * lvl) * gate" },
+    { "id": "centre", "type": "expr", "expr": "(1050 / weight ^ 0.8) * rnd(0.94, 1.06) * semi(idx * 2 + jit) * 2 ^ (1.3 * (swell - 0.5))" },
+    { "id": "body", "type": "filter", "mode": "bp", "in": "n", "freq": "centre", "q": 1.3 },
+    { "id": "edge", "type": "filter", "mode": "bp", "in": "nw", "freq": "centre * (2.4 + bright * 2.6)", "q": 1.4 },
+    { "id": "low", "type": "filter", "mode": "lp", "in": "n", "freq": "260 / weight" },
+    { "id": "thin", "type": "filter", "mode": "bp", "in": "nw", "freq": "centre * 2.7", "q": 18 },
+    { "id": "sum", "type": "expr", "expr": "(body + edge * (0.04 + bright * 0.7) + low * 0.3 * weight + thin * whistle * 0.2 * swell) * shape" },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "sum", "freq": 45 },
+    { "id": "side", "type": "expr", "expr": "0 - cos(pi * ph)" }
+  ],
+  "out": ["clean * (1 - 0.5 * side)", "clean * (1 + 0.5 * side)"],
+  "presets": {
+    "Spin attack": { "turns": 3 },
+    "Whirlwind": { "turns": 5, "length": 0.8 },
+    "Spinning blade": { "turns": 4, "weight": 0.6, "whistle": 0.85 }
+  }
+}

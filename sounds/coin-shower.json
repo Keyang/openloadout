@@ -1,0 +1,60 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "coin-shower",
+ "name": "Coin shower",
+ "category": "pickup",
+ "description": "A rush of small coins pouring out and clinking onto a pile, thick at first and thinning out, then one last coin spinning to rest. Change its pitch, length, brightness, how many coins fall and how long the last coin spins. A little different every time.",
+ "meta": {
+  "type": "sfx",
+  "role": "items/pickup",
+  "themes": ["neutral", "fantasy"],
+  "gameTypes": ["arcade", "turn-based-rpg", "top-down-rpg", "platformer", "roguelike-action"],
+  "words": ["coins", "money", "gold", "payout", "jackpot", "treasure", "chest", "loot", "spill", "sale", "reward", "clink", "jingle", "cash"],
+  "license": "draft"
+ },
+ "duration": "length",
+ "params": [
+  { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 1500, "max": 4500, "default": 2600, "scale": "log" },
+  { "id": "length", "label": "Length", "unit": "s", "min": 0.4, "max": 1.5, "default": 0.8, "scale": "log" },
+  { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+  { "id": "coins", "label": "Coins", "min": 0, "max": 1, "default": 0.5, "hint": "From a handful to a hoard" },
+  { "id": "settle", "label": "Spin", "min": 0, "max": 1, "default": 0.4, "hint": "The last coin spinning to rest" }
+ ],
+ "nodes": [
+  { "id": "rushT", "type": "expr", "expr": "length*(0.85 - settle*0.4)" },
+  { "id": "clk", "type": "clock", "rate": "(8 + coins*12)*1.9/rushT*max(0.2, 1 - t/rushT)", "jitter": 0.55, "count": "round(8 + coins*12)" },
+  { "id": "p1", "type": "pattern", "trig": "clk", "steps": "X..." },
+  { "id": "p2", "type": "pattern", "trig": "clk", "steps": ".X.." },
+  { "id": "p3", "type": "pattern", "trig": "clk", "steps": "..X." },
+  { "id": "p4", "type": "pattern", "trig": "clk", "steps": "...X" },
+  { "id": "q1", "type": "rand", "lo": -4, "hi": 3, "trig": "p1" },
+  { "id": "q2", "type": "rand", "lo": -3, "hi": 4, "trig": "p2" },
+  { "id": "q3", "type": "rand", "lo": -5, "hi": 2, "trig": "p3" },
+  { "id": "q4", "type": "rand", "lo": -2, "hi": 5, "trig": "p4" },
+  { "id": "l1", "type": "rand", "lo": 0.45, "hi": 1, "trig": "p1" },
+  { "id": "l2", "type": "rand", "lo": 0.45, "hi": 1, "trig": "p2" },
+  { "id": "l3", "type": "rand", "lo": 0.45, "hi": 1, "trig": "p3" },
+  { "id": "l4", "type": "rand", "lo": 0.45, "hi": 1, "trig": "p4" },
+  { "id": "c1", "type": "modal", "in": "p1*l1", "freq": "pitch*semi(q1)", "ratios": [1, 1.52, 2.47, 3.9], "gains": [1, 0.6, 0.4, 0.25], "decay": 0.11, "tilt": 0.6 },
+  { "id": "c2", "type": "modal", "in": "p2*l2", "freq": "pitch*semi(q2)", "ratios": [1, 1.58, 2.62, 4.1], "gains": [1, 0.55, 0.45, 0.2], "decay": 0.15, "tilt": 0.6 },
+  { "id": "c3", "type": "modal", "in": "p3*l3", "freq": "pitch*semi(q3)", "ratios": [1, 1.47, 2.38, 3.7], "gains": [1, 0.65, 0.35, 0.25], "decay": 0.19, "tilt": 0.6 },
+  { "id": "c4", "type": "modal", "in": "p4*l4", "freq": "pitch*semi(q4)", "ratios": [1, 1.55, 2.55, 4.3], "gains": [1, 0.5, 0.4, 0.2], "decay": 0.23, "tilt": 0.6 },
+  { "id": "n", "type": "noise" },
+  { "id": "tickAmp", "type": "ad", "attack": 0.0003, "decay": 0.006, "curve": 2, "trig": "clk" },
+  { "id": "tick", "type": "filter", "mode": "bp", "in": "n*tickAmp", "freq": "pitch*0.45", "q": 1.2 },
+  { "id": "spinRate", "type": "env", "start": 14, "points": [["length*(0.62 - settle*0.26)", 14], ["length - 0.07", 120, "exp"]] },
+  { "id": "spinClk", "type": "clock", "rate": "spinRate", "delay": "length*(0.62 - settle*0.26)" },
+  { "id": "spinAmp", "type": "env", "start": 0, "points": [["length*(0.62 - settle*0.26)", 0, "hold"], ["length*(0.62 - settle*0.26) + 0.002", 1], ["length - 0.07", 0.12, 1.5], ["length - 0.062", 0]] },
+  { "id": "spinTone", "type": "rand", "lo": 0.74, "hi": 0.86 },
+  { "id": "spin", "type": "modal", "in": "spinClk*spinAmp", "freq": "pitch*spinTone", "ratios": [1, 1.52, 2.47], "gains": [1, 0.5, 0.3], "decay": 0.07, "tilt": 0.6 },
+  { "id": "sum", "type": "expr", "expr": "(c1 + c2 + c3 + c4)*0.5 + tick*1.2 + spin*settle*0.5" },
+  { "id": "tone", "type": "filter", "mode": "lp", "in": "sum", "freq": "2600 + bright*bright*13000" },
+  { "id": "clean", "type": "filter", "mode": "hp", "in": "tone", "freq": 250 }
+ ],
+ "out": "clean",
+ "presets": {
+  "Handful": { "pitch": 3100, "length": 0.5, "bright": 0.55, "coins": 0.05, "settle": 0.3 },
+  "Chest spill": { "pitch": 2150, "length": 1.0, "bright": 0.4, "coins": 0.6, "settle": 0.5 },
+  "Jackpot": { "pitch": 2900, "length": 1.4, "bright": 0.75, "coins": 1, "settle": 0.7 }
+ }
+}

@@ -1,0 +1,944 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "tavern-room",
+ "name": "Tavern",
+ "category": "ambience",
+ "description": "The common room of an inn, heard from a table: mugs set down on wood, a plate or knife now and then, a bench creak, a few footsteps on the boards and a quiet murmur of people. Change the size of the room, how busy it is, the brightness, how many people are heard and what the cups are made of.",
+ "meta": {
+  "type": "ambience",
+  "role": "environment/ambience",
+  "themes": [
+   "neutral",
+   "fantasy"
+  ],
+  "gameTypes": [
+   "top-down-rpg",
+   "turn-based-rpg",
+   "card-game",
+   "farming-sim",
+   "platformer"
+  ],
+  "words": [
+   "tavern",
+   "inn",
+   "pub",
+   "bar",
+   "mugs",
+   "cups",
+   "clink",
+   "tableware",
+   "murmur",
+   "people",
+   "common room",
+   "rest",
+   "cosy",
+   "wooden"
+  ],
+  "license": "draft"
+ },
+ "loop": true,
+ "duration": 8,
+ "params": [
+  {
+   "id": "size",
+   "label": "Room size",
+   "min": 0,
+   "max": 1,
+   "default": 0.4,
+   "hint": "From a snug to a great hall: a longer room and lower knocks."
+  },
+  {
+   "id": "busy",
+   "label": "Busyness",
+   "min": 0,
+   "max": 1,
+   "default": 0.5,
+   "hint": "How many mugs, plates and steps."
+  },
+  {
+   "id": "bright",
+   "label": "Brightness",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  },
+  {
+   "id": "people",
+   "label": "People",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  },
+  {
+   "id": "ware",
+   "label": "Cups",
+   "min": 0,
+   "max": 2,
+   "default": 0,
+   "options": [
+    "Clay mugs",
+    "Pewter",
+    "Glasses"
+   ]
+  }
+ ],
+ "nodes": [
+  {
+   "id": "mc1",
+   "type": "clock",
+   "rate": 1,
+   "count": 1,
+   "delay": "rnd(0.45, 1.05)"
+  },
+  {
+   "id": "mc2",
+   "type": "clock",
+   "rate": 1,
+   "count": 1,
+   "delay": "rnd(1.6, 2.35)"
+  },
+  {
+   "id": "mc3",
+   "type": "clock",
+   "rate": 1,
+   "count": 1,
+   "delay": "rnd(2.9, 3.55)"
+  },
+  {
+   "id": "mc4",
+   "type": "clock",
+   "rate": 1,
+   "count": 1,
+   "delay": "rnd(4.1, 4.8)"
+  },
+  {
+   "id": "mc5",
+   "type": "clock",
+   "rate": 1,
+   "count": 1,
+   "delay": "rnd(5.3, 5.95)"
+  },
+  {
+   "id": "mc6",
+   "type": "clock",
+   "rate": 1,
+   "count": 1,
+   "delay": "rnd(6.5, 7.2)"
+  },
+  {
+   "id": "mugT",
+   "type": "expr",
+   "expr": "mc1 + mc2 * step(0.6, busy) + mc3 + mc4 * step(0.3, busy) + mc5 + mc6 * step(0.8, busy)"
+  },
+  {
+   "id": "mugLv",
+   "type": "rand",
+   "trig": "mugT",
+   "lo": 0.5,
+   "hi": 1
+  },
+  {
+   "id": "mugPt",
+   "type": "rand",
+   "trig": "mugT",
+   "lo": 0.78,
+   "hi": 1.28
+  },
+  {
+   "id": "mugPan",
+   "type": "rand",
+   "trig": "mugT",
+   "lo": 0.15,
+   "hi": 0.85
+  },
+  {
+   "id": "hitN",
+   "type": "noise"
+  },
+  {
+   "id": "mugA",
+   "type": "ad",
+   "trig": "mugT",
+   "attack": 0.0005,
+   "decay": 0.007,
+   "curve": 2
+  },
+  {
+   "id": "mugX",
+   "type": "filter",
+   "mode": "lp",
+   "in": "hitN * mugA * mugLv",
+   "freq": "2500 + bright * 6000"
+  },
+  {
+   "id": "knock",
+   "type": "modal",
+   "in": "mugX",
+   "freq": "(235 - size * 125) * mugPt",
+   "ratios": [
+    1,
+    2.42,
+    4.1
+   ],
+   "gains": [
+    1,
+    0.5,
+    0.25
+   ],
+   "decay": "0.06 + size * 0.07",
+   "tilt": 1.1
+  },
+  {
+   "id": "clay",
+   "type": "modal",
+   "in": "mugX * (ware == 0)",
+   "freq": "(900 - size * 220) * mugPt",
+   "ratios": [
+    1,
+    1.87,
+    3.3
+   ],
+   "gains": [
+    1,
+    0.6,
+    0.3
+   ],
+   "decay": 0.05,
+   "tilt": 1.2
+  },
+  {
+   "id": "pewter",
+   "type": "modal",
+   "in": "mugX * (ware == 1)",
+   "freq": "(2000 - size * 400) * mugPt",
+   "ratios": [
+    1,
+    2.76,
+    5.4,
+    8.93
+   ],
+   "gains": [
+    1,
+    0.7,
+    0.45,
+    0.2
+   ],
+   "decay": 0.32,
+   "tilt": 0.9
+  },
+  {
+   "id": "glass",
+   "type": "modal",
+   "in": "mugX * (ware == 2)",
+   "freq": "(3100 - size * 500) * mugPt",
+   "ratios": [
+    1,
+    2.32,
+    4.25,
+    6.63
+   ],
+   "gains": [
+    1,
+    0.55,
+    0.3,
+    0.15
+   ],
+   "decay": 0.6,
+   "tilt": 0.5
+  },
+  {
+   "id": "mug",
+   "type": "expr",
+   "expr": "knock * 0.13 * (ware == 2 ? 0.7 : 1) + (clay * 0.12 + pewter * 0.12 + glass * 0.13) * (0.6 + bright * 0.8)"
+  },
+  {
+   "id": "pc1",
+   "type": "clock",
+   "rate": 1,
+   "count": 1,
+   "delay": "rnd(3.65, 4)"
+  },
+  {
+   "id": "pc2",
+   "type": "clock",
+   "rate": 1,
+   "count": 1,
+   "delay": "rnd(1.15, 1.5)"
+  },
+  {
+   "id": "pc3",
+   "type": "clock",
+   "rate": 1,
+   "count": 1,
+   "delay": "rnd(6.05, 6.4)"
+  },
+  {
+   "id": "pc4",
+   "type": "clock",
+   "rate": 1,
+   "count": 1,
+   "delay": "rnd(4.9, 5.2)"
+  },
+  {
+   "id": "pingT",
+   "type": "expr",
+   "expr": "pc1 * step(0.12, busy) + pc2 * step(0.4, busy) + pc3 * step(0.62, busy) + pc4 * step(0.85, busy)"
+  },
+  {
+   "id": "pingLv",
+   "type": "rand",
+   "trig": "pingT",
+   "lo": 0.45,
+   "hi": 1
+  },
+  {
+   "id": "pingPt",
+   "type": "rand",
+   "trig": "pingT",
+   "lo": 3100,
+   "hi": 5200
+  },
+  {
+   "id": "pingPan",
+   "type": "rand",
+   "trig": "pingT",
+   "lo": 0.1,
+   "hi": 0.9
+  },
+  {
+   "id": "pingA",
+   "type": "ad",
+   "trig": "pingT",
+   "attack": 0.0003,
+   "decay": 0.004,
+   "curve": 2
+  },
+  {
+   "id": "ping",
+   "type": "modal",
+   "in": "hitN * pingA * pingLv",
+   "freq": "pingPt",
+   "ratios": [
+    1,
+    2.9,
+    5.1
+   ],
+   "gains": [
+    1,
+    0.5,
+    0.25
+   ],
+   "decay": 0.13,
+   "tilt": 0.8
+  },
+  {
+   "id": "crC",
+   "type": "clock",
+   "rate": 1,
+   "count": 1,
+   "delay": "rnd(2.4, 5.6)"
+  },
+  {
+   "id": "crT",
+   "type": "expr",
+   "expr": "crC * step(0.35, busy)"
+  },
+  {
+   "id": "crA",
+   "type": "ad",
+   "trig": "crT",
+   "attack": 0.09,
+   "hold": "rnd(0.06, 0.16)",
+   "decay": "rnd(0.16, 0.28)",
+   "curve": 1.6
+  },
+  {
+   "id": "crP",
+   "type": "env",
+   "trig": "crT",
+   "start": 1,
+   "points": [
+    [
+     0,
+     1
+    ],
+    [
+     "rnd(0.12, 0.2)",
+     "rnd(1.25, 1.6)"
+    ],
+    [
+     "rnd(0.32, 0.45)",
+     "rnd(0.85, 1.1)"
+    ]
+   ]
+  },
+  {
+   "id": "crJc",
+   "type": "clock",
+   "rate": 38,
+   "jitter": 0.8
+  },
+  {
+   "id": "crJr",
+   "type": "rand",
+   "trig": "crJc",
+   "lo": 0.75,
+   "hi": 1.25
+  },
+  {
+   "id": "crO",
+   "type": "osc",
+   "wave": "saw",
+   "freq": "rnd(52, 78) * crP * crJr * (1 - size * 0.2)"
+  },
+  {
+   "id": "crF1",
+   "type": "filter",
+   "mode": "bp",
+   "in": "crO * crA",
+   "freq": "rnd(520, 760) * crP",
+   "q": 7
+  },
+  {
+   "id": "crF2",
+   "type": "filter",
+   "mode": "bp",
+   "in": "crO * crA",
+   "freq": "rnd(1250, 1700) * crP",
+   "q": 9
+  },
+  {
+   "id": "creak",
+   "type": "expr",
+   "expr": "crF1 + crF2 * (0.3 + bright * 0.5)"
+  },
+  {
+   "id": "stC",
+   "type": "clock",
+   "rate": "rnd(1.7, 2.2)",
+   "jitter": 0.18,
+   "count": "2 + step(0.65, busy)",
+   "delay": "rnd(0.6, 5.8)"
+  },
+  {
+   "id": "stT",
+   "type": "expr",
+   "expr": "stC * step(0.22, busy)"
+  },
+  {
+   "id": "stLv",
+   "type": "rand",
+   "trig": "stT",
+   "lo": 0.55,
+   "hi": 1
+  },
+  {
+   "id": "stPt",
+   "type": "rand",
+   "trig": "stT",
+   "lo": 0.85,
+   "hi": 1.2
+  },
+  {
+   "id": "stA",
+   "type": "ad",
+   "trig": "stT",
+   "attack": 0.004,
+   "decay": 0.09,
+   "curve": 2.4
+  },
+  {
+   "id": "stP",
+   "type": "env",
+   "trig": "stT",
+   "start": 1,
+   "points": [
+    [
+     0,
+     1.5
+    ],
+    [
+     0.05,
+     1,
+     "exp"
+    ]
+   ]
+  },
+  {
+   "id": "stO",
+   "type": "osc",
+   "freq": "(104 - size * 40) * stPt * stP"
+  },
+  {
+   "id": "stN",
+   "type": "noise",
+   "color": "pink"
+  },
+  {
+   "id": "stB",
+   "type": "filter",
+   "mode": "bp",
+   "in": "stN * stA",
+   "freq": "(480 + bright * 300) * stPt",
+   "q": 1.4
+  },
+  {
+   "id": "stepS",
+   "type": "expr",
+   "expr": "(stO * stA * 0.5 + stB * 1.6) * stLv"
+  },
+  {
+   "id": "murNa",
+   "type": "noise",
+   "color": "pink"
+  },
+  {
+   "id": "murNb",
+   "type": "noise",
+   "color": "pink"
+  },
+  {
+   "id": "fc1",
+   "type": "clock",
+   "rate": "rnd(3, 6)",
+   "jitter": 0.7
+  },
+  {
+   "id": "fr1",
+   "type": "rand",
+   "trig": "fc1"
+  },
+  {
+   "id": "fl1",
+   "type": "lag",
+   "in": "fr1 * fr1",
+   "time": 0.055
+  },
+  {
+   "id": "sc1",
+   "type": "clock",
+   "rate": "rnd(0.6, 1.1)",
+   "jitter": 0.6
+  },
+  {
+   "id": "ra1",
+   "type": "rand",
+   "trig": "sc1"
+  },
+  {
+   "id": "rb1",
+   "type": "rand",
+   "trig": "sc1"
+  },
+  {
+   "id": "rl1",
+   "type": "rand",
+   "trig": "sc1"
+  },
+  {
+   "id": "da1",
+   "type": "lag",
+   "in": "ra1",
+   "time": 0.35
+  },
+  {
+   "id": "db1",
+   "type": "lag",
+   "in": "rb1",
+   "time": 0.35
+  },
+  {
+   "id": "dl1",
+   "type": "lag",
+   "in": "rl1",
+   "time": 0.6
+  },
+  {
+   "id": "bz1",
+   "type": "osc",
+   "wave": "pulse",
+   "width": 0.28,
+   "freq": "rnd(95, 205) * (0.86 + da1 * 0.3) * (1 - size * 0.15)"
+  },
+  {
+   "id": "va1",
+   "type": "filter",
+   "mode": "bp",
+   "in": "bz1 * 0.14 + murNa * 0.9",
+   "freq": "400 + da1 * 500",
+   "q": 2.6
+  },
+  {
+   "id": "vb1",
+   "type": "filter",
+   "mode": "bp",
+   "in": "bz1 * 0.14 + murNa * 0.9",
+   "freq": "1000 + db1 * 1400",
+   "q": 3.2
+  },
+  {
+   "id": "st1",
+   "type": "expr",
+   "expr": "(va1 + vb1 * (0.35 + bright * 0.4)) * fl1 * (0.25 + dl1 * 0.75)"
+  },
+  {
+   "id": "fc2",
+   "type": "clock",
+   "rate": "rnd(3, 6)",
+   "jitter": 0.7
+  },
+  {
+   "id": "fr2",
+   "type": "rand",
+   "trig": "fc2"
+  },
+  {
+   "id": "fl2",
+   "type": "lag",
+   "in": "fr2 * fr2",
+   "time": 0.055
+  },
+  {
+   "id": "sc2",
+   "type": "clock",
+   "rate": "rnd(0.6, 1.1)",
+   "jitter": 0.6
+  },
+  {
+   "id": "ra2",
+   "type": "rand",
+   "trig": "sc2"
+  },
+  {
+   "id": "rb2",
+   "type": "rand",
+   "trig": "sc2"
+  },
+  {
+   "id": "rl2",
+   "type": "rand",
+   "trig": "sc2"
+  },
+  {
+   "id": "da2",
+   "type": "lag",
+   "in": "ra2",
+   "time": 0.35
+  },
+  {
+   "id": "db2",
+   "type": "lag",
+   "in": "rb2",
+   "time": 0.35
+  },
+  {
+   "id": "dl2",
+   "type": "lag",
+   "in": "rl2",
+   "time": 0.6
+  },
+  {
+   "id": "bz2",
+   "type": "osc",
+   "wave": "pulse",
+   "width": 0.28,
+   "freq": "rnd(95, 205) * (0.86 + da2 * 0.3) * (1 - size * 0.15)"
+  },
+  {
+   "id": "va2",
+   "type": "filter",
+   "mode": "bp",
+   "in": "bz2 * 0.14 + murNb * 0.9",
+   "freq": "400 + da2 * 500",
+   "q": 2.6
+  },
+  {
+   "id": "vb2",
+   "type": "filter",
+   "mode": "bp",
+   "in": "bz2 * 0.14 + murNb * 0.9",
+   "freq": "1000 + db2 * 1400",
+   "q": 3.2
+  },
+  {
+   "id": "st2",
+   "type": "expr",
+   "expr": "(va2 + vb2 * (0.35 + bright * 0.4)) * fl2 * (0.25 + dl2 * 0.75)"
+  },
+  {
+   "id": "fc3",
+   "type": "clock",
+   "rate": "rnd(3, 6)",
+   "jitter": 0.7
+  },
+  {
+   "id": "fr3",
+   "type": "rand",
+   "trig": "fc3"
+  },
+  {
+   "id": "fl3",
+   "type": "lag",
+   "in": "fr3 * fr3",
+   "time": 0.055
+  },
+  {
+   "id": "sc3",
+   "type": "clock",
+   "rate": "rnd(0.6, 1.1)",
+   "jitter": 0.6
+  },
+  {
+   "id": "ra3",
+   "type": "rand",
+   "trig": "sc3"
+  },
+  {
+   "id": "rb3",
+   "type": "rand",
+   "trig": "sc3"
+  },
+  {
+   "id": "rl3",
+   "type": "rand",
+   "trig": "sc3"
+  },
+  {
+   "id": "da3",
+   "type": "lag",
+   "in": "ra3",
+   "time": 0.35
+  },
+  {
+   "id": "db3",
+   "type": "lag",
+   "in": "rb3",
+   "time": 0.35
+  },
+  {
+   "id": "dl3",
+   "type": "lag",
+   "in": "rl3",
+   "time": 0.6
+  },
+  {
+   "id": "bz3",
+   "type": "osc",
+   "wave": "pulse",
+   "width": 0.28,
+   "freq": "rnd(95, 205) * (0.86 + da3 * 0.3) * (1 - size * 0.15)"
+  },
+  {
+   "id": "va3",
+   "type": "filter",
+   "mode": "bp",
+   "in": "bz3 * 0.14 + murNa * 0.9",
+   "freq": "400 + da3 * 500",
+   "q": 2.6
+  },
+  {
+   "id": "vb3",
+   "type": "filter",
+   "mode": "bp",
+   "in": "bz3 * 0.14 + murNa * 0.9",
+   "freq": "1000 + db3 * 1400",
+   "q": 3.2
+  },
+  {
+   "id": "st3",
+   "type": "expr",
+   "expr": "(va3 + vb3 * (0.35 + bright * 0.4)) * fl3 * (0.25 + dl3 * 0.75)"
+  },
+  {
+   "id": "fc4",
+   "type": "clock",
+   "rate": "rnd(3, 6)",
+   "jitter": 0.7
+  },
+  {
+   "id": "fr4",
+   "type": "rand",
+   "trig": "fc4"
+  },
+  {
+   "id": "fl4",
+   "type": "lag",
+   "in": "fr4 * fr4",
+   "time": 0.055
+  },
+  {
+   "id": "sc4",
+   "type": "clock",
+   "rate": "rnd(0.6, 1.1)",
+   "jitter": 0.6
+  },
+  {
+   "id": "ra4",
+   "type": "rand",
+   "trig": "sc4"
+  },
+  {
+   "id": "rb4",
+   "type": "rand",
+   "trig": "sc4"
+  },
+  {
+   "id": "rl4",
+   "type": "rand",
+   "trig": "sc4"
+  },
+  {
+   "id": "da4",
+   "type": "lag",
+   "in": "ra4",
+   "time": 0.35
+  },
+  {
+   "id": "db4",
+   "type": "lag",
+   "in": "rb4",
+   "time": 0.35
+  },
+  {
+   "id": "dl4",
+   "type": "lag",
+   "in": "rl4",
+   "time": 0.6
+  },
+  {
+   "id": "bz4",
+   "type": "osc",
+   "wave": "pulse",
+   "width": 0.28,
+   "freq": "rnd(95, 205) * (0.86 + da4 * 0.3) * (1 - size * 0.15)"
+  },
+  {
+   "id": "va4",
+   "type": "filter",
+   "mode": "bp",
+   "in": "bz4 * 0.14 + murNb * 0.9",
+   "freq": "400 + da4 * 500",
+   "q": 2.6
+  },
+  {
+   "id": "vb4",
+   "type": "filter",
+   "mode": "bp",
+   "in": "bz4 * 0.14 + murNb * 0.9",
+   "freq": "1000 + db4 * 1400",
+   "q": 3.2
+  },
+  {
+   "id": "st4",
+   "type": "expr",
+   "expr": "(va4 + vb4 * (0.35 + bright * 0.4)) * fl4 * (0.25 + dl4 * 0.75)"
+  },
+  {
+   "id": "murL0",
+   "type": "expr",
+   "expr": "st1 * 0.80 + st2 * 0.25 + st3 * 0.60 + st4 * 0.10"
+  },
+  {
+   "id": "murR0",
+   "type": "expr",
+   "expr": "st1 * 0.20 + st2 * 0.75 + st3 * 0.40 + st4 * 0.90"
+  },
+  {
+   "id": "murL",
+   "type": "filter",
+   "mode": "lp",
+   "in": "murL0",
+   "freq": "(1500 + bright * 2600) * (1.25 - size * 0.6)"
+  },
+  {
+   "id": "murR",
+   "type": "filter",
+   "mode": "lp",
+   "in": "murR0",
+   "freq": "(1500 + bright * 2600) * (1.25 - size * 0.6)"
+  },
+  {
+   "id": "airN",
+   "type": "noise",
+   "color": "pink"
+  },
+  {
+   "id": "air",
+   "type": "filter",
+   "mode": "bp",
+   "in": "airN",
+   "freq": "640 - size * 380",
+   "q": 0.6
+  },
+  {
+   "id": "things",
+   "type": "expr",
+   "expr": "creak * 0.13 + stepS * 0.5"
+  },
+  {
+   "id": "dryL",
+   "type": "expr",
+   "expr": "mug * (1 - mugPan) + ping * 0.13 * (1 - pingPan) * (0.5 + bright) + things * 0.6 + murL * 0.85 * people + air * 0.06"
+  },
+  {
+   "id": "dryR",
+   "type": "expr",
+   "expr": "mug * mugPan + ping * 0.13 * pingPan * (0.5 + bright) + things * 0.4 + murR * 0.85 * people + air * 0.06"
+  },
+  {
+   "id": "roomL",
+   "type": "reverb",
+   "in": "dryL",
+   "size": "0.12 + size * 0.75",
+   "damp": "0.7 - bright * 0.35",
+   "mix": "0.02 + size * 0.13"
+  },
+  {
+   "id": "roomR",
+   "type": "reverb",
+   "in": "dryR",
+   "size": "0.15 + size * 0.75",
+   "damp": "0.7 - bright * 0.35",
+   "mix": "0.02 + size * 0.13"
+  },
+  {
+   "id": "sumL",
+   "type": "filter",
+   "mode": "hp",
+   "in": "roomL",
+   "freq": 40
+  },
+  {
+   "id": "sumR",
+   "type": "filter",
+   "mode": "hp",
+   "in": "roomR",
+   "freq": 40
+  }
+ ],
+ "out": [
+  "sumL",
+  "sumR"
+ ],
+ "presets": {
+  "Quiet inn": {
+   "ware": 0,
+   "busy": 0.15,
+   "people": 0.2,
+   "size": 0.3
+  },
+  "Busy tavern": {
+   "ware": 1,
+   "busy": 0.9,
+   "people": 0.9,
+   "size": 0.5
+  },
+  "Banquet hall": {
+   "ware": 2,
+   "size": 0.9,
+   "busy": 0.65,
+   "people": 0.6,
+   "bright": 0.6
+  }
+ }
+}

@@ -1,0 +1,66 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "lock-open",
+  "name": "Lock",
+  "category": "impact",
+  "description": "A key in a lock: tiny metal clicks, then the bolt slides back with a firm clunk, or it stays stuck on a dull knock. Change the pitch, length, brightness, rattle and whether it opens.",
+  "meta": { "type": "sfx", "role": "world/door", "themes": ["neutral", "fantasy", "dungeon"], "gameTypes": ["top-down-rpg", "platformer", "turn-based-rpg", "puzzle", "roguelike-action"],
+    "words": ["lock", "unlock", "key", "locked", "padlock", "bolt", "latch", "door", "open", "stuck", "click", "clunk", "metal", "chest"], "license": "draft" },
+  "duration": "length * (result > 0.5 ? 1 : 0.62)",
+  "params": [
+    { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 300, "max": 1200, "default": 600, "scale": "log" },
+    { "id": "length", "label": "Length", "unit": "s", "min": 0.2, "max": 0.6, "default": 0.35, "scale": "log" },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "rattle", "label": "Rattle", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "result", "label": "Lock", "min": 0, "max": 1, "default": 1, "options": ["Stuck", "Opens"] }
+  ],
+  "nodes": [
+    { "id": "c1", "type": "clock", "rate": 1, "count": 1 },
+    { "id": "c2", "type": "clock", "rate": 1, "count": 1, "delay": "length * 0.15 * rnd(0.88, 1.12)" },
+    { "id": "c3", "type": "clock", "rate": 1, "count": 1, "delay": "length * 0.3 * rnd(0.93, 1.07)" },
+    { "id": "cs", "type": "clock", "rate": 1, "count": 1, "delay": "length * 0.39" },
+    { "id": "cb", "type": "clock", "rate": 1, "count": 1, "delay": "length * 0.47" },
+    { "id": "n", "type": "noise" },
+
+    { "id": "pe1", "type": "ad", "attack": 0.0002, "decay": 0.003, "curve": 2, "trig": "c1" },
+    { "id": "pe2", "type": "ad", "attack": 0.0002, "decay": 0.003, "curve": 2, "trig": "c2" },
+    { "id": "pe3", "type": "ad", "attack": 0.0002, "decay": 0.003, "curve": 2, "trig": "c3" },
+    { "id": "pinr", "type": "rand", "lo": 0.86, "hi": 1.14, "trig": "c1 + c2 + c3" },
+    { "id": "pinx", "type": "filter", "mode": "lp", "in": "n * (pe1 + pe2 * 0.8 + pe3 * 0.9 * result)", "freq": "4000 + bright * 10000" },
+    { "id": "pins", "type": "modal", "in": "pinx", "freq": "pitch * 5 * pinr", "ratios": [1, 1.83, 2.9, 4.3], "decay": 0.03, "tilt": 0.5 },
+
+    { "id": "grains", "type": "dust", "density": 260, "spread": 1 },
+    { "id": "rgate", "type": "env", "points": [[0, 1], ["length * 0.3", 0.8], ["length * 0.37", 0]] },
+    { "id": "rat", "type": "filter", "mode": "bp", "in": "grains * rgate", "freq": "pitch * 7", "q": 4 },
+
+    { "id": "se", "type": "ad", "attack": "length * 0.06", "decay": 0.012, "curve": 1.5, "trig": "cs" },
+    { "id": "slide", "type": "filter", "mode": "bp", "in": "n * se", "freq": "pitch * (2.4 + bright * 1.6)", "q": 2.5 },
+
+    { "id": "bf", "type": "env", "points": [[0, "pitch * 0.36"], [0.05, "pitch * 0.17", "exp"]], "trig": "cb" },
+    { "id": "bo", "type": "osc", "wave": "sine", "freq": "bf" },
+    { "id": "ba", "type": "ad", "attack": 0.0008, "decay": "0.05 + length * 0.14", "curve": 2.2, "trig": "cb" },
+    { "id": "be", "type": "ad", "attack": 0.0003, "decay": 0.006, "curve": 2, "trig": "cb" },
+    { "id": "bx", "type": "filter", "mode": "lp", "in": "n * be", "freq": "3600 + bright * 8000" },
+    { "id": "ring", "type": "modal", "in": "bx", "freq": "pitch * 2.3 * rnd(0.97, 1.03)", "ratios": [1, 2.76, 5.4, 8.93], "decay": "length * 0.7", "tilt": 0.7 },
+
+    { "id": "kf", "type": "env", "points": [[0, "pitch * 0.32"], [0.03, "pitch * 0.2", "exp"]], "trig": "c3" },
+    { "id": "ko", "type": "osc", "wave": "tri", "freq": "kf" },
+    { "id": "ka", "type": "ad", "attack": 0.0005, "decay": "0.03 + length * 0.08", "curve": 3, "trig": "c3" },
+    { "id": "ke", "type": "ad", "attack": 0.0003, "decay": 0.012, "curve": 2, "trig": "c3" },
+    { "id": "kx", "type": "filter", "mode": "lp", "in": "n * ke", "freq": "600 + bright * 1200" },
+
+    { "id": "kn", "type": "modal", "in": "kx", "freq": "(pitch * 0.6 + 170) * rnd(0.96, 1.04)", "ratios": [1, 2.3, 3.9], "decay": 0.04, "tilt": 1 },
+
+    { "id": "pinmix", "type": "expr", "expr": "(pins * 0.16 + pinx * 0.5) * (0.3 + rattle) + rat * rattle * 1.2" },
+    { "id": "opens", "type": "expr", "expr": "bo * ba * 1.0 + bx * 0.9 + ring * 0.2 + slide * 0.35" },
+    { "id": "stuck", "type": "expr", "expr": "ko * ka * 0.6 + kx * 1.2 + kn * 0.35" },
+    { "id": "summ", "type": "expr", "expr": "pinmix + opens * result + stuck * (1 - result)" },
+    { "id": "hp", "type": "filter", "mode": "hp", "in": "summ", "freq": 40 }
+  ],
+  "out": "hp",
+  "presets": {
+    "Unlock door": { "result": 1 },
+    "Locked": { "result": 0 },
+    "Padlock": { "result": 1, "pitch": 950, "rattle": 0.9, "length": 0.28 }
+  }
+}
