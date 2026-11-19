@@ -5,6 +5,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { checkDataFile } from './data-file.mjs';
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 
@@ -23,6 +24,8 @@ export async function loadSprites(root = ROOT) {
   for (const f of fs.readdirSync(dir).filter((x) => isAsset(x, '.js')).sort()) {
     const file = path.join(dir, f);
     let def;
+    // a file made in the studio must be exactly its data form before it is run (docs/studio.md 2.4); throws naming the file
+    checkDataFile(fs.readFileSync(file, 'utf8'), `sprites/${f}`);
     try { def = (await import(pathToFileURL(file).href)).default; } catch (e) { throw new Error(`sprites/${f}: ${e.message}`); }
     const id = f.slice(0, -3);
     if (!def || def.id !== id) throw new Error(`sprites/${f}: the default export must be a sprite whose id is "${id}" (found ${def && def.id})`);
