@@ -75,6 +75,8 @@ canvas, .px, lo-sprite { image-rendering: pixelated; }
 .not-kept { flex: 0 0 100%; margin: 0 0 var(--s3); padding: var(--s2) var(--s3); background: var(--shelf); border-radius: var(--r); font-size: 14px; line-height: 1.45; }
 .not-kept strong { font-weight: 600; }
 .not-kept a { text-decoration: underline; text-underline-offset: 3px; white-space: nowrap; }
+/* (on an asset page the panel's footer says it from the start, beside Copy link: no banner pushing the page down while working) */
+#app:has(> main.rx) .top .not-kept { display: none; }
 
 /* ---------- frame: a page's first column and line (the loading line, "not here") and the footer ---------- */
 .home { max-width: calc(var(--page) + 2 * var(--gutter)); margin: 0 auto; padding: var(--s7) var(--gutter) var(--s9); }
@@ -242,6 +244,9 @@ input[type='range']:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 2px var(
 .ctl .reset { font-size: 12px; color: var(--ink-2); visibility: hidden; text-align: right; padding: 4px 0; }
 .ctl .reset:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
 .ctl.is-changed .reset { visibility: visible; }
+/* a line under a control, when something else decides it (a track's look that sets its intensity) */
+.ctl-note { grid-column: 2 / -1; margin-top: -6px; padding-bottom: 4px; font-size: 12px; line-height: 1.35; color: var(--ink-2); }
+.ctl-note[hidden] { display: none; }
 .ctl-body { display: flex; flex-wrap: wrap; align-items: center; gap: 6px var(--s3); min-width: 0; padding: 4px 0; }
 .slide { display: grid; grid-template-columns: 68px minmax(60px, 1fr) 68px; align-items: center; gap: 10px; font-size: 12px; color: var(--ink-2); width: 100%; }
 .slide .lo { text-align: right; }
@@ -263,14 +268,63 @@ input[type='range']:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 2px var(
 .saved { display: inline-flex; align-items: center; gap: var(--s2); font-size: 14px; margin: 0 auto 0 0; min-width: 0; }
 .saved .dot { width: 8px; height: 8px; }
 .saved small { font-size: 13px; color: var(--ink-2); white-space: nowrap; }
-.saved.is-saving .dot, .saved.is-idle .dot, .saved.is-off .dot { background: var(--line-2); }
-/* the browser is not keeping the bag: the whole warning, on a line of its own */
-.saved.is-warn { flex: 1 1 100%; align-items: flex-start; font-size: 13px; line-height: 1.45; padding: var(--s2) var(--s3); background: var(--shelf); border-radius: var(--r); }
-.saved.is-warn .dot { background: var(--ink); margin-top: 5px; }
-.rx-foot:has(.saved.is-warn) { flex-wrap: wrap; }
-.size { display: inline-flex; align-items: center; gap: var(--s2); font-size: 13px; color: var(--ink-2); white-space: nowrap; flex-basis: auto; flex-wrap: nowrap; }
+.saved.is-saving .dot, .saved.is-idle .dot, .saved.is-off .dot, .saved.is-plain .dot, .saved.is-unsaved .dot { background: var(--line-2); }
+/* the footer's saved state, in every panel: two short lines beside its dot (what is kept, then how many changes) */
+.rx-foot .saved { display: inline-grid; grid-template-columns: auto minmax(0, 1fr); justify-items: start; column-gap: var(--s2); align-items: center; line-height: 1.3; }
+.rx-foot .saved .dot { grid-row: 1 / span 2; }
+.rx-foot .saved .saved-text { grid-column: 2; }
+.rx-foot .saved small { display: block; grid-column: 2; font-size: 12px; }
+.rx-foot .saved small:empty { display: none; }
+/* the browser is not keeping the bag: the same two lines, on a shelf, the second allowed to wrap. Copy link sits beside
+   it; the footer wraps the rest under it rather than squeezing it */
+.rx-foot .saved.is-warn { flex: 1 1 260px; padding: 3px 10px; background: var(--shelf); border-radius: var(--r); font-size: 13px; line-height: 1.25; }
+.rx-foot .saved.is-warn .saved-text { font-weight: 500; }
+.rx-foot .saved.is-warn small { white-space: normal; }
+.rx-foot .saved.is-warn .dot { background: var(--ink); }
+.rx-foot .saved.is-warn.is-early .dot { background: var(--line-2); }
+.rx-foot:has(.saved.is-warn) { flex-wrap: wrap; row-gap: 6px; padding-top: var(--s2); padding-bottom: var(--s2); }
+.rx-foot:has(.saved.is-warn) .copy-btn { margin-right: auto; }
+/* the pixel size, in every panel: what it is and how big the pictures will be, two lines beside its choice */
+.size { display: inline-grid; grid-template-columns: auto auto; column-gap: var(--s2); align-items: center; line-height: 1.3; font-size: 12px; color: var(--ink-2); white-space: nowrap; }
+.size > .lbl { display: block; grid-column: 1; text-align: right; }
+.size > .num { grid-row: 2; color: var(--ink); }
+.size > .seg { grid-column: 2; grid-row: 1 / span 2; }
+.size > .num:empty { display: none; }
 .panel-status { margin: 0; padding: 0 var(--pad) var(--s3); font-size: 13px; color: var(--ink-2); min-height: 0; font-weight: 400; flex-basis: auto; }
 .panel-status:empty { display: none; }
+/* what was just done is said in the footer, in the place of the saved state, at most two lines: the buttons stay put */
+.rx-foot .panel-status { padding: 0; margin: 0 auto 0 0; flex: 1 1 0; min-width: 0; line-height: 1.4; color: var(--ink); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.rx-foot .panel-status:empty { display: none; }
+.rx-panel .rx-foot.has-say > .saved { display: none; }
+.rx-foot .copy-btn[hidden] { display: none; }
+
+/* the thing itself, as it is set (app/bag-edit.js), at the top left of a panel beside a list or a scene; the versions
+   beside it become one row of small tiles, so the picture and the control being changed are in view together */
+.rx-panel.has-preview { grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto auto minmax(0, 1fr) auto; grid-template-areas: 'pic head' 'pic vers' 'tune tune' 'foot foot'; }
+.rx-panel.has-preview > .rx-head { grid-area: head; min-width: 0; }
+.rx-panel.has-preview > .rx-preview { grid-area: pic; }
+.rx-panel.has-preview > .rx-block { grid-area: vers; min-width: 0; padding: var(--s3) var(--pad) 0 var(--s4); }
+.rx-panel.has-preview > .tune { grid-area: tune; padding-top: var(--s4); }
+.rx-panel.has-preview > .rx-foot { grid-area: foot; }
+.rx-preview { display: flex; flex-direction: column; gap: var(--s2); padding: var(--s4) 0 0 var(--pad); min-width: 0; }
+.rx-preview-tile { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--s3); width: 184px; height: 200px; background: var(--shelf); border-radius: var(--r); overflow: hidden; color: var(--ink); }
+.rx-preview-tile canvas { display: block; flex: none; image-rendering: pixelated; }
+.rx-preview-tile .play { min-width: 96px; }
+.rx-preview-tile .rx-preview-icon { flex: none; }
+.vstrip.is-row:not(.is-plain) { --vmax: 64px; grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 56px; gap: 6px; overflow-x: auto; scrollbar-width: none; padding: 2px 24px 2px 2px; margin: -2px; }
+.vstrip.is-row:not(.is-plain) .vpic { height: var(--vh, 64px); }
+.vstrip.is-row:not(.is-plain) .name { display: none; }
+.vstrip.is-row.is-plain { display: flex; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding: 2px 24px 2px 2px; margin: -2px; }
+/* (a row with more beyond its edge fades out there, besides its arrows, so a cut tile reads as "it goes on") */
+.vstrip.is-row.more-on { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent); }
+.vstrip.is-row.is-plain .vbtn { flex: none; }
+.rx-preview-tile.is-sound { height: 136px; }
+.rx-panel.has-preview .saved .saved-rest { display: inline; }
+.rx-panel.has-preview .hint-help { display: none; }
+.rx-panel.has-preview .block-head { flex-wrap: wrap; row-gap: var(--s2); }
+.rx-panel.has-preview .block-head .hint { display: inline; }
+.rx-head h2:focus { outline: 0; }
+.rx-head h2:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; border-radius: 2px; }
 
 /* a narrower panel (beside the bag's list, on a small window): tighter gutters, shorter names */
 @media (max-width: 1180px) {
@@ -279,7 +333,6 @@ input[type='range']:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 2px var(
   .tune-head h2 { display: none; }
   .block-head .hint { display: none; }
   .block-head h2 { margin-right: auto; }
-  .size .lbl, .saved small { display: none; }
 }
 /* a short window: the versions become one row of small tiles */
 @media (min-width: 721px) and (max-height: 800px) {
@@ -317,6 +370,9 @@ input[type='range']:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 2px var(
   .rx-foot { flex-wrap: wrap; }
   .saved { flex-basis: 100%; }
   .rx-foot .btn-primary { margin-left: auto; }
+  .rx-panel.has-preview > .rx-preview { padding: var(--s3) var(--pad); background: var(--paper); }
+  .rx-panel.has-preview > .rx-block { padding: var(--s4) var(--pad) 0; }
+  .rx-preview-tile { width: 100%; height: 176px; flex-direction: row; }
 }
 
 

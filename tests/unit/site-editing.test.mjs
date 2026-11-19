@@ -81,12 +81,13 @@ test('a link that carries settings shows those settings and does not overwrite t
   assert.equal(bag.get(edit.key()).settings.params.weapon, 'spear');
 });
 
-test('a link with settings and the key of a bag item edits that item (the page was reloaded while editing)', () => {
+test('a link with settings and the key of a bag item edits that item, as it is in the bag (the bag item wins over the address)', () => {
   const bag = createBag(memoryStorage());
   const key = bag.add({ kind: 'sprite', id: 'knight', settings: { params: { ...defaults().params, weapon: 'axe' }, cues: null, scale: 1 } });
   const edit = open(bag, { key, start: { ...defaults(), params: { ...defaults().params, weapon: 'spear' } } });
   assert.equal(edit.key(), key);
-  assert.equal(edit.settings().params.weapon, 'spear');
+  assert.equal(edit.settings().params.weapon, 'axe');
+  assert.equal(bag.count(), 1, 'no second item is made');
 });
 
 test('a key that is not in the bag, or belongs to another asset, is ignored', () => {
@@ -147,7 +148,9 @@ test('an item removed somewhere else (the bag page, another tab) is let go of', 
   edit.onChange((s) => seen.push(s.status));
   bag.remove(edit.key());
   assert.equal(edit.inBag(), false);
-  assert.equal(seen.at(-1), 'idle');
+  // the change is still on screen and no longer in the bag: "Not in your bag yet", with the way to add it (J9.2)
+  assert.equal(seen.at(-1), 'unsaved');
+  assert.equal(bag.count(), 0, 'letting go adds nothing back');
 });
 
 test('when the browser is not keeping the bag the state is the NOT_KEPT warning, not "Saved"', () => {

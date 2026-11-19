@@ -150,16 +150,20 @@ test('a track changed in the panel is saved, and its sliders under the scene fol
   expect((await state(page)).player.x).toBe(x);
 });
 
-test('the look of everything is one more tab of the panel: it restyles the scene and stays open', async ({ page }) => {
+test('the look of everything is one button away beside the panel: it restyles the scene and stays open', async ({ page }) => {
+  // J5.4: no longer an "Everything" tab of the thing's panel, but its own "Look of the whole bag" control
   await openPlay(page, [HERO, SLIME, COIN]);
   await page.getByRole('button', { name: 'Pause' }).click();
   const plain = (await canvasStats(stage(page))).hash;
-  await side(page).getByRole('tab', { name: 'Everything' }).click();
-  await side(page).getByRole('button', { name: 'Frost', exact: true }).click();
+  const open = side(page).getByRole('button', { name: 'Look of the whole bag' });
+  await open.click();
+  const look = side(page).locator('.play-look');
+  await look.getByRole('button', { name: 'Frost', exact: true }).click();
   await ready(page);
   await expect.poll(async () => (await canvasStats(stage(page))).hash).not.toBe(plain);
-  await expect(side(page).getByRole('button', { name: 'Frost', exact: true })).toHaveAttribute('aria-pressed', 'true');
-  await expect(side(page).getByRole('tab', { name: 'Everything' })).toHaveAttribute('aria-selected', 'true');
+  await expect(look.getByRole('button', { name: 'Frost', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  await expect(look).toBeVisible();
+  await expect(open).toHaveAttribute('aria-pressed', 'true');
   expect(await page.evaluate(async () => (await import('/app/bag.js')).bag.theme().colour.palette)).toBe('Frost');
 });
 
@@ -170,10 +174,16 @@ for (const size of [{ width: 1440, height: 900 }, { width: 1024, height: 768 }, 
     await expect(stage(page)).toBeVisible();
     await expect(side(page).locator('.rx-panel')).toBeVisible();
     expect(await hasHorizontalScroll(page)).toBe(false);
-    // every tab of the panel is whole and in view, "Everything" (the look of the whole bag) too; and nothing in its head is cut off
+    // every tab of the panel is whole and in view, and so is the way to the look of the whole bag (J5.4: its own
+    // button, no longer an "Everything" tab); and nothing in its head is cut off
     const panelBox = await side(page).boundingBox();
     const tabs = await side(page).getByRole('tab').all();
-    expect(await Promise.all(tabs.map((t) => t.textContent()))).toContain('Everything');
+    const whole = side(page).getByRole('button', { name: 'Look of the whole bag' });
+    await expect(whole).toBeVisible();
+    const wb = await whole.boundingBox();
+    expect(wb.x).toBeGreaterThanOrEqual(panelBox.x);
+    expect(wb.x + wb.width).toBeLessThanOrEqual(panelBox.x + panelBox.width);
+    expect(await whole.evaluate((n) => n.scrollWidth <= n.clientWidth + 1), 'the button\'s words are not cut off').toBe(true);
     for (const tab of tabs) {
       await expect(tab).toBeVisible();
       const b = await tab.boundingBox();
@@ -186,10 +196,14 @@ for (const size of [{ width: 1440, height: 900 }, { width: 1024, height: 768 }, 
     await expect(hint).toHaveText('or click it in the scene');
     expect(await hint.evaluate((n) => n.scrollWidth <= n.clientWidth + 1 && n.getBoundingClientRect().right <= document.documentElement.clientWidth), 'the hint is not cut off').toBe(true);
     if (size.width > 1000) {
-      // two columns: the panel is beside the scene and on the first screen
+      // two columns: the panel is beside the scene and starts on the first screen; it is shown at its full height
+      // (J5.2 R7: no scrolling inside it), and the scene stays in view while the page scrolls down the panel
       const s = await stage(page).boundingBox(), p = await side(page).boundingBox();
       expect(p.x).toBeGreaterThanOrEqual(s.x + s.width);
-      expect(p.y + p.height).toBeLessThanOrEqual(size.height + 1);
+      expect(p.y).toBeLessThan(size.height);
+      expect(await side(page).evaluate((n) => [n, ...n.querySelectorAll('*')].every((e) => !/(auto|scroll)/.test(getComputedStyle(e).overflowY) || e.scrollHeight <= e.clientHeight + 1)), 'nothing in the panel scrolls inside itself').toBe(true);
+      await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+      expect(await stage(page).evaluate((n) => { const r = n.getBoundingClientRect(); return r.bottom > 0 && r.top < innerHeight; }), 'the scene is still in view at the end of the panel').toBe(true);
     }
   });
 }

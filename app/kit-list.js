@@ -36,7 +36,7 @@ export function bundlesPage(app) {
   const hrefOf = (b) => `#/bundle/${b.id}${look && look.id !== 'original' ? `?look=${look.id}` : ''}`;
 
   function kitRow(b) {
-    const scene = kitScene(b, { fallback: () => lineUp(b) });
+    const scene = kitScene(b, { fallback: () => lineUp(b), fill: true });
     scenes.push(scene);
     const n = { sprites: (b.sprites ?? []).length, sounds: (b.sounds ?? []).length, music: (b.music ?? []).length };
     const fact = (c, one, many = one + 's') => (c ? el('span', {}, el('b', { class: 'num' }, String(c)), c === 1 ? one : many) : null);

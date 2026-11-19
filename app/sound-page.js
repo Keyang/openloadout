@@ -71,10 +71,11 @@ export function soundPage(app, patch, query) {
   let urlTimer = 0;
   function link() {
     const s = now(), q = new URLSearchParams();
-    // a style as it comes travels by its name; anything moved by hand travels as every slider's value
+    // the style travels by its name, and anything moved by hand after it as every slider's value: the style stays
+    // the version it started from (a reload shows the same version and the same count of changes)
     const own = soundParams(patch, s.style);
+    if (s.style) q.set('style', s.style);
     if (patch.params.some((d) => s.params[d.id] !== own[d.id])) for (const d of patch.params) q.set(d.id, String(s.params[d.id]));
-    else if (s.style) q.set('style', s.style);
     if (s.seed !== 1) q.set('seed', String(s.seed));
     if (lookOf(s)) q.set('artlook', lookOf(s));
     const qs = q.toString();

@@ -113,6 +113,13 @@ a.card.kit { display: block; grid-template-columns: none; border: 0; border-radi
 .menu-head { padding: 8px 10px 4px; font-size: 12px; color: var(--ink-2); }
 .menu-part + .menu-part { margin-top: 4px; padding-top: 4px; border-top: 1px solid var(--line); }
 .menu-note { margin: 4px 0 0; padding: 8px 10px 6px; border-top: 1px solid var(--line); font-size: 12px; line-height: 1.4; color: var(--ink-2); max-width: 260px; }
+/* the kind chosen with the tabs, as a token like the others (base.css .token), first in the row */
+.kind-token { height: 32px; display: inline-flex; align-items: stretch; border-radius: var(--r); background: var(--ink); color: #fff; font-size: 13px; font-weight: 500; white-space: nowrap; }
+.kind-token .what { padding: 0 4px 0 12px; display: inline-flex; align-items: center; gap: 6px; }
+.kind-token .what small { font-size: 13px; font-weight: 400; color: #c9c9c5; }
+.kind-token .x { width: 28px; display: grid; place-items: center; color: #fff; border-radius: 0 var(--r) var(--r) 0; }
+.kind-token .x:hover { background: #3a3a3a; }
+.kind-token :focus-visible { outline-color: var(--ink); outline-offset: 2px; }
 .lib-clear { font-size: 13px; color: var(--ink-2); padding: 0 var(--s2); height: 32px; }
 .lib-clear:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
 .lib-sort { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink-2); white-space: nowrap; }

@@ -31,11 +31,17 @@
 //   onAct           (what) => void, after the visitor acts here: 'version' | 'surprise' | 'startover' | 'control' | 'size' | 'add' | 'remove'
 //   onTab           (id) => void, when a Fine-tune tab is shown (also the first one, when the panel is made): a page's own
 //                   tab that is costly to draw (a row of pictures) waits for this
+//   preview         a node showing the thing itself as it is set (app/bag-edit.js: a live picture, or a Play button), for a
+//                   panel beside something else. It sits at the top left, beside the versions, which then shrink to one
+//                   row of small tiles, so the picture and the control being changed are in view together
+//   head            a node for the panel's title row (its name, a way to its page, Close), beside the preview
 import { renderPixels } from '../engine/sprite.js';
 import { colorName } from '../engine/color.js';
 import { el } from './ui.js';
 import { spriteModel, soundModel, SPRITE_TABS } from './panel-model.js';
 import { versionsFor } from './versions.js';
+import { bag as siteBag, themeFor, lookOf } from './bag.js';
+import { THEME_PRESETS } from '../engine/theme.js';
 
 /** A colour's everyday name with a capital, for the page: '#f2a030' -> 'Orange'. */
 export const colourWord = (hex) => { const n = colorName(hex); return n ? n[0].toUpperCase() + n.slice(1) : 'Your own colour'; };
@@ -104,6 +110,7 @@ export function editPanel({
   kind, asset, edit, name = asset.name, model = kind === 'sprite' ? spriteModel(asset) : soundModel(asset),
   tabs: extraTabs = [], versions: versionCount = 12, versionPicture = null, sizes = [1, 2, 4], sizeNote = null,
   onDownload = null, downloadLabel = 'Download', onCopyLink = null, moreHref = null, onMore = null, onAct = () => {}, onTab = null,
+  preview = null, head = null,
 }) {
   const act = (what, next) => { if (next) edit.set(next); onAct(what); };
   let settings = edit.settings();
@@ -112,7 +119,8 @@ export function editPanel({
   // (the name of the version on screen, then what a version does: a narrow panel keeps the name alone)
   const hintName = el('span', { class: 'hint-name' }), hintHelp = el('span', { class: 'hint-help' }, 'One click sets everything.');
   const hint = el('span', { class: 'hint' }, hintName, hintHelp);
-  const strip = el('div', { class: 'vstrip' + (kind === 'sprite' ? '' : ' is-plain') });
+  // (one tab stop: the arrow keys move between the versions, Enter picks one)
+  const strip = el('div', { class: 'vstrip' + (kind === 'sprite' ? '' : ' is-plain') + (preview ? ' is-row' : ''), role: 'group', 'aria-label': 'Versions' });
   let versionList = [], versionTiles = [];
   const pictureOf = versionPicture ?? (kind === 'sprite' ? (v, params) => spritePicture(asset, params, settings.artStyle) : () => null);
   // The pictures are one size (trimPictures): they are shown at the largest whole-number scale that fits the tile's
@@ -139,6 +147,7 @@ export function editPanel({
     nav.hidden = !over;
     navBack.disabled = strip.scrollLeft <= 0;
     navOn.disabled = strip.scrollLeft + strip.clientWidth >= strip.scrollWidth - 1;
+    strip.classList.toggle('more-on', over && !navOn.disabled);
   }
   strip.addEventListener('scroll', syncNav, { passive: true });
   // an ordinary mouse wheel moves the row sideways while there is more of it that way
@@ -164,6 +173,20 @@ export function editPanel({
     fitTiles();
     syncVersions();
   }
+  strip.addEventListener('keydown', (e) => {
+    const keys = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1, Home: -Infinity, End: Infinity };
+    if (!(e.key in keys) || !versionTiles.length) return;
+    const btns = versionTiles.map((t) => t.btn), i = Math.max(0, btns.indexOf(document.activeElement)), d = keys[e.key];
+    const to = d === -Infinity ? 0 : d === Infinity ? btns.length - 1 : (i + d + btns.length) % btns.length;
+    rove(btns[to]); btns[to].focus(); btns[to].scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    e.preventDefault();
+  });
+  /** The one version tile the Tab key reaches: the given one, else the one on screen, else the first. */
+  function rove(to = null) {
+    const btns = versionTiles.map((t) => t.btn);
+    const at = to ?? btns.find((b) => b === document.activeElement) ?? btns.find((b) => b.getAttribute('aria-pressed') === 'true') ?? btns[0];
+    for (const b of btns) b.tabIndex = b === at ? 0 : -1;
+  }
   // A sprite made on this visit is drawn in a worker: a picture asked for before its frames are here is the nearest
   // one there is, not the version's own. So its versions are brought first, and the tiles are drawn from them.
   let prepared = '';
@@ -179,8 +202,12 @@ export function editPanel({
   function syncVersions() {
     let on = null;
     for (const t of versionTiles) { const yes = model.isVersion(settings, t.v); t.btn.setAttribute('aria-pressed', String(yes)); if (yes && !on) on = t.v.name; }
+    if (!strip.contains(document.activeElement)) rove();
     hint.hidden = !versionTiles.length;
-    hintName.textContent = on ? `${on}. ` : edit.changes() ? 'Your own mix. ' : '';
+    // (the name alone, no full stop: a panel beside a list shows it without the help that follows)
+    const named = on ?? (edit.changes() ? 'Your own mix' : '');
+    hintName.textContent = named;
+    hintHelp.textContent = named ? ' · One click sets everything.' : 'One click sets everything.';
   }
   let gone = false;
   if (versionCount > 0) versionsFor(kind, asset, versionCount).then((list) => { if (gone) return; versionList = list; drawWhenReady(); });
@@ -229,14 +256,16 @@ export function editPanel({
       body = el('span', { class: 'ctl-body' }, el('span', { class: 'switch' }, input, el('span', { class: 'knob', 'aria-hidden': 'true' })));
       sync = (now) => { input.checked = !!now.value; };
     } else {
-      // each colour is named in words (engine/color.js colorName); its code is kept in the tooltip and, small, beside the name
+      // each colour is named in words (engine/color.js colorName); its code is kept in the tooltip only (no code words in view)
       const names = swatchNames(c.swatches);
       const custom = el('input', { type: 'color', value: c.value, 'aria-label': `${c.label}: pick any colour`, oninput: (e) => set(c.key, e.target.value.toLowerCase()) });
       const any = el('span', { class: 'swatch any', title: 'Pick any colour' }, custom);
       const group = el('span', { class: 'swatches', role: 'group', 'aria-label': c.label },
         c.swatches.map((hex, i) => el('button', { type: 'button', class: 'swatch', style: `--c:${hex}`, 'data-v': hex, 'aria-label': names[i], title: `${colourWord(hex)} (colour code ${hex})`, onclick: () => set(c.key, hex) })), any);
-      const word = el('span', { class: 'colour-word' }), code = el('span', { class: 'colour-code', title: 'The colour code, for drawing programs and game engines' });
-      body = el('span', { class: 'ctl-body' }, group, el('span', { class: 'colour-now', 'aria-live': 'polite' }, word, ' ', code));
+      // (the code stays in the page, out of view, for whoever copies it from the tooltip or the page's text)
+      const word = el('span', { class: 'colour-word' }), code = el('span', { class: 'colour-code', hidden: true });
+      const nowBox = el('span', { class: 'colour-now', 'aria-live': 'polite' }, word, code);
+      body = el('span', { class: 'ctl-body' }, group, nowBox);
       sync = (now) => {
         let hit = false;
         for (const b of group.querySelectorAll('button')) { const on = b.dataset.v === now.value; hit = hit || on; b.setAttribute('aria-pressed', String(on)); }
@@ -244,15 +273,24 @@ export function editPanel({
         any.classList.toggle('on', !hit);
         any.style.setProperty('--c', now.value);
         word.textContent = colourWord(now.value);
+        nowBox.title = `Colour code ${now.value}, for drawing programs and game engines`;
         code.textContent = now.value;
       };
     }
     const label = c.kind === 'range' || c.kind === 'toggle' ? el('label', { for: id }, c.label) : el('span', {}, c.label);
+    // a line under the control, when something else decides it (a track's look that sets its intensity)
+    const note = el('span', { class: 'ctl-note', id: `${id}-note`, hidden: true });
     const row = el('div', { class: 'ctl' + (c.main ? ' is-main' : ''), 'data-control': c.key },
       el('span', { class: 'ctl-label' }, label, el('span', { class: 'dot', title: 'Changed', 'aria-hidden': 'true' })),
       body,
-      el('button', { type: 'button', class: 'reset', 'aria-label': `Put ${c.label} back`, onclick: () => act('control', model.reset(edit.settings(), c.key)) }, 'Reset'));
-    return { row, sync };
+      el('button', { type: 'button', class: 'reset', 'aria-label': `Put ${c.label} back`, onclick: () => act('control', model.reset(edit.settings(), c.key)) }, 'Reset'),
+      note);
+    const say = (text) => {
+      note.textContent = text ?? ''; note.hidden = !text;
+      const input = row.querySelector('input');
+      if (input) { if (text) input.setAttribute('aria-describedby', note.id); else input.removeAttribute('aria-describedby'); }
+    };
+    return { row, sync, note: say };
   }
 
   const first = model.controls(settings);
@@ -310,11 +348,16 @@ export function editPanel({
   const sizeSeg = el('span', { class: 'seg', role: 'group', 'aria-label': 'Pixel size' },
     sizes.map((s) => el('button', { type: 'button', 'data-px': s, 'aria-pressed': 'false', onclick: () => act('size', { scale: s }) }, `${s}×`)));
   const sizeBox = kind === 'sprite' && sizes.length ? el('span', { class: 'size' }, el('span', { class: 'lbl' }, 'Pixel size'), sizeSeg, sizeOut) : null;
+  // What was just done ("Downloaded ..."): said in the footer in the place of the saved state, so the footer's buttons do
+  // not move; the saved state comes back with the next change.
   const status = el('p', { class: 'status panel-status', role: 'status' });
-  const say = (text) => { status.textContent = text ?? ''; };
+  let saidFor = '';
+  const say = (text) => { status.textContent = text ?? ''; saidFor = JSON.stringify(edit.settings()); foot.classList.toggle('has-say', !!status.textContent); };
   const run = (fn) => async () => { try { const text = await fn(); if (text) say(text); } catch (e) { say(`That did not work: ${e.message}.`); } };
   const download = onDownload ? el('button', { type: 'button', class: 'btn btn-primary', 'data-act': 'download', onclick: run(onDownload) }, downloadLabel) : null;
 
+  // the browser will not keep the bag: the way to keep the work is right beside the warning, not in the menu
+  const copyBtn = onCopyLink ? el('button', { type: 'button', class: 'btn btn-sm btn-secondary copy-btn', hidden: true, onclick: run(onCopyLink) }, 'Copy link') : null;
   const removeBtn = el('button', { type: 'button', role: 'menuitem', onclick: () => { closeMenu(); edit.remove(); say('Taken out of your bag.'); onAct('remove'); } }, 'Remove from bag');
   const menu = el('div', { class: 'menu up right', role: 'menu', hidden: true },
     onCopyLink ? el('button', { type: 'button', role: 'menuitem', onclick: () => { closeMenu(); run(onCopyLink)(); } }, 'Copy link') : null,
@@ -329,8 +372,10 @@ export function editPanel({
   document.addEventListener('click', outside);
   document.addEventListener('keydown', escape);
 
-  const foot = el('div', { class: 'rx-foot' }, saved, addBtn, sizeBox, download, menuWrap);
-  const node = el('section', { class: 'rx-panel', 'aria-label': `Change ${name}` }, versionsBlock, tune, foot, status);
+  const foot = el('div', { class: 'rx-foot' }, saved, status, copyBtn, addBtn, sizeBox, download, menuWrap);
+  if (head) head.classList.add('rx-head');
+  if (preview) preview.classList.add('rx-preview');
+  const node = el('section', { class: 'rx-panel' + (preview ? ' has-preview' : ''), 'aria-label': `Change ${name}` }, head, preview, versionsBlock, tune, foot);
 
   // ---- keeping it in step with the session ----
   let pictured = '';
@@ -360,19 +405,41 @@ export function editPanel({
     }
     if (tabNow && tabButtons.get(tabNow).hidden) showTab([...tabButtons].find(([, b]) => !b.hidden)?.[0] ?? tabNow);
     // version pictures follow the art style (a sprite that can be drawn in more than one)
+    // a track's look can set its intensity itself (sound/theme.js): the slider then does nothing, and says why
+    const intensity = kind === 'music' ? rows.get('intensity') : null;
+    if (intensity) {
+      const own = lookOf(settings), t = themeFor(settings, siteBag.theme());
+      const sets = t.music && t.music.intensity !== null && t.music.intensity !== undefined;
+      const lookName = own ? THEME_PRESETS.find((p) => p.id === own)?.name ?? 'This' : null;
+      intensity.note(!sets ? '' : own ? `The ${lookName} look sets this, so moving it changes nothing. Pick Original under Look to set it yourself.`
+        : 'Your bag\'s look sets this, so moving it changes nothing. Pick Original under Look to set it yourself.');
+    }
     if (kind === 'sprite' && (settings.artStyle ?? '') !== pictured && versionTiles.length) { pictured = settings.artStyle ?? ''; drawWhenReady(); } else syncVersions();
     for (const b of sizeSeg.children) b.setAttribute('aria-pressed', String(Number(b.dataset.px) === settings.scale));
     if (sizeNote) sizeOut.textContent = sizeNote(settings.scale ?? 1);
 
     const s = edit.state();
-    saved.className = `saved is-${s.status === 'not-kept' ? 'warn' : s.status}`;
-    // (the browser is not keeping the bag: one short line here; the whole of it is said once, under the header)
-    const text = s.status === 'not-kept' ? 'This browser is not keeping your bag. Download it or copy its link before you leave.' : s.text;
-    saved.title = s.status === 'not-kept' ? s.text : '';
+    if (status.textContent && JSON.stringify(settings) !== saidFor) say('');
+    // beside the bag's list or the playground's scene, an item with nothing changed is in the bag but nothing of it was
+    // saved: "Saved" would say it had been changed
+    // (and nothing changed is never the orange dot, which means "you changed this")
+    const plain = s.status === 'saved' && !s.changes;
+    // the browser keeps nothing: said from the start, in two short lines in the place of the saved state (the whole of it
+    // is in the tooltip and on the bag page). Before anything is in the bag it is a calm note, not a warning
+    const early = s.status === 'idle' && s.kept === false;
+    const warn = s.status === 'not-kept' || early;
+    saved.className = `saved is-${warn ? 'warn' : plain ? 'plain' : s.status}${early ? ' is-early' : ''}`;
+    // (not in the bag and nothing changed: that it is not in the bag comes first, then that changes save themselves)
+    const idle = s.status === 'idle' && !early;
+    const text = s.status === 'not-kept' ? 'This browser is not keeping your bag' : early ? 'For this visit only' : plain && preview ? 'In your bag' : idle ? s.detail : s.text;
+    saved.title = s.status === 'not-kept' ? s.text : early ? 'This browser does not keep things for the next visit (a private window, or saving for sites is switched off). Download what you make, or copy its link, before you leave.' : '';
     const cut = s.status === 'saved' ? text.indexOf(' ') : -1;
     savedLead.textContent = cut < 0 ? text : text.slice(0, cut);
     savedRest.textContent = cut < 0 ? '' : text.slice(cut);
-    savedMore.textContent = s.status === 'saved' || s.status === 'saving' ? s.detail : '';
+    savedMore.textContent = s.status === 'not-kept' ? 'Download it or copy its link before you leave'
+      : early ? 'This browser forgets your bag when you leave'
+      : plain && preview ? '0 changes' : idle ? s.text : s.detail;
+    if (copyBtn) copyBtn.hidden = s.status !== 'not-kept';
     addBtn.hidden = s.inBag || s.status === 'off' || s.status === 'saving';
     removeBtn.disabled = !s.inBag;
   }

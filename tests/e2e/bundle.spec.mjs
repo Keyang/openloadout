@@ -65,6 +65,8 @@ test('the page shows the bundle, its controls, and every sprite, sound and track
   for (const name of ['Surprise me', 'Start over', 'Add the whole kit to my bag', 'Download this kit', 'Try it in the playground']) {
     await expect(page.getByRole('button', { name, exact: true })).toBeVisible();
   }
+  // the fine-tuning starts folded (J6.1); its controls are one press away
+  await page.locator('.bundle-look summary').click();
   for (const label of ['Colour shift', 'Colourfulness', 'Contrast', 'Pitch', 'Brightness', 'Speed', 'Intensity', 'Colour set']) {
     await expect(page.getByLabel(label, { exact: true })).toBeVisible();
   }
@@ -243,7 +245,7 @@ test('every sprite is drawn whole, at the largest whole-number size that fits it
   }
 });
 
-test('"Add the whole bundle to my bag" adds every asset once with this look, and asks before mixing with what is there', async ({ page }) => {
+test('"Add the whole bundle to my bag" adds every asset once with this look, and later adds only what is missing, without a question', async ({ page }) => {
   await openBundle(page);
   await expect(count(page)).toHaveText('0');
   await page.getByRole('button', { name: 'Frost', exact: true }).click();
@@ -255,27 +257,28 @@ test('"Add the whole bundle to my bag" adds every asset once with this look, and
   expect(items.filter((i) => i.kind === 'sprite').map((i) => i.id)).toEqual(BUNDLE.sprites);
   expect(await bagTheme(page)).toEqual(await presetTheme(page, 'frost'));
 
-  // the bag is no longer empty: the page asks
+  // the kit is in the bag already: with another look on the page, adding it again adds nothing, asks nothing, and
+  // leaves the bag's look as it was (J6.4: one bag item per asset; the page's look goes on added items only)
   await page.getByRole('button', { name: 'Toxic', exact: true }).click();
   await page.getByRole('button', { name: 'Add the whole kit to my bag' }).click();
-  await expect(page.locator('.bundle-ask')).toContainText('already');
-  await page.getByRole('button', { name: 'Replace what is in my bag' }).click();
-  await expect(count(page)).toHaveText(String(n));
-  expect(await bagTheme(page)).toEqual(await presetTheme(page, 'toxic'));
-  // the kit is in the bag already, with this look: adding it again adds nothing and asks nothing
-  await page.getByRole('button', { name: 'Add the whole kit to my bag' }).click();
-  await expect(page.locator('.bundle-ask')).toBeHidden();
+  await expect(page.locator('.bundle-ask')).toHaveCount(0);
   await expect(page.locator('.bundle-actions .status')).toContainText('already in your bag');
   await expect(count(page)).toHaveText(String(n));
+  expect(await bagTheme(page)).toEqual(await presetTheme(page, 'frost'));
   await expect(page.getByRole('link', { name: 'Go to bag' })).toBeVisible();
-  // one thing taken out, another changed by the visitor: only the missing one is added, the changed one is left as it is
+  // one thing taken out, another changed by the visitor: only the missing one is added, in one click, wearing the
+  // page's look; the changed one is left as it is and not added twice
   const [gone, kept] = await page.evaluate(async () => { const { bag } = await import('/app/bag.js'); const it = bag.items(); bag.remove(it[0].key); const s = it.find((i) => i.kind === 'sprite' && i.key !== it[0].key); bag.update(s.key, { ...s.settings, scale: 2 }); return [it[0].id, s.id]; });
   await page.getByRole('button', { name: 'Add the whole kit to my bag' }).click();
-  await page.getByRole('button', { name: 'Add to what is in my bag' }).click();
+  await expect(page.locator('.bundle-ask')).toHaveCount(0);
+  await expect(page.locator('.bundle-actions .status')).toContainText('Added 1');
+  await expect(count(page)).toHaveText(String(n));
   const now = await bagItems(page);
   expect(now.filter((i) => i.id === gone).length, 'the missing one is back, once').toBe(1);
-  expect(now.filter((i) => i.id === kept).map((i) => i.settings.scale).sort(), 'the changed one stays, and the kit\'s own is added beside it').toEqual([1, 2]);
-  expect(now.length).toBe(n + 1);
+  expect(now.find((i) => i.id === gone).settings.look, 'the missing one wears the page\'s look').toBe('toxic');
+  expect(now.filter((i) => i.id === kept).map((i) => i.settings.scale), 'the changed one stays as it is, and is not added again').toEqual([2]);
+  expect(now.length).toBe(n);
+  expect(await bagTheme(page), 'the bag keeps its look').toEqual(await presetTheme(page, 'frost'));
 });
 
 test('"Try it in the playground" with the kit already in the bag goes straight there and adds nothing', async ({ page }) => {

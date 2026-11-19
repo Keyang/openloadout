@@ -110,13 +110,20 @@ for (const [w, h] of [[1440, 900], [1024, 768], [900, 700]]) {
       else expect(w).toBeLessThan(1000);
     });
 
-    test('the footer is one tidy row: nothing in it wraps or overlaps', async ({ page }) => {
+    test('the footer is tidy: nothing in it wraps, overlaps or is cut off', async ({ page }) => {
+      // (the status words may sit on a line of their own above the buttons in a narrow panel, so they can be read:
+      // journey J3.2 / J9.2; each piece is still one line, and no two pieces overlap)
       await openRoute(page, `/sprite/${HERO}`);
-      const rows = async () => page.locator('.rx-foot > *').evaluateAll((ns) => ns.filter((n) => n.getBoundingClientRect().width > 0).map((n) => { const r = n.getBoundingClientRect(); return { l: r.left, r: r.right, h: r.height }; }));
+      const rows = async () => page.locator('.rx-foot > *').evaluateAll((ns) => ns.filter((n) => n.getBoundingClientRect().width > 0).map((n) => { const r = n.getBoundingClientRect(); return { l: r.left, r: r.right, t: r.top, b: r.bottom, h: r.height, cut: n.scrollWidth > n.clientWidth + 1 }; }));
       for (const step of ['as it opens', 'after a change']) {
         const boxes = await rows();
-        for (let i = 1; i < boxes.length; i++) expect(boxes[i].l, `${step}: no overlap`).toBeGreaterThanOrEqual(boxes[i - 1].r - 0.5);
+        for (let i = 0; i < boxes.length; i++) for (let j = i + 1; j < boxes.length; j++) {
+          const a = boxes[i], b = boxes[j];
+          const apart = b.l >= a.r - 0.5 || a.l >= b.r - 0.5 || b.t >= a.b - 0.5 || a.t >= b.b - 0.5;
+          expect(apart, `${step}: no overlap`).toBe(true);
+        }
         for (const b of boxes) expect(b.h, `${step}: one line`).toBeLessThanOrEqual(44);
+        for (const b of boxes) expect(b.cut, `${step}: nothing cut off`).toBe(false);
         await page.getByRole('button', { name: 'Surprise me' }).click();
         await expect(page.locator('.rx-panel .saved')).toContainText('Saved in your bag');
       }

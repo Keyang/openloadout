@@ -21,6 +21,7 @@ export const CALLS = [
   'make.sprite', 'make.sound', 'check', 'render',
   'bag.add', 'bag.items', 'bag.remove', 'bag.update', 'bag.clear', 'bag.link', 'bag.setLook', 'bag.download',
   'go',
+  'studio.starts', 'studio.create', 'studio.list', 'studio.get', 'studio.set', 'studio.validate', 'studio.bake', 'studio.render', 'studio.advice', 'studio.toBag', 'studio.file', 'studio.remove',
 ];
 
 let loading = null, real = null, inner = null;
@@ -42,7 +43,7 @@ function install(win) {
   loadout.call = later('call');
   // Each is a promise of itself until it has arrived, so `await loadout.framework` is right at any time.
   for (const name of ['framework', 'api']) Object.defineProperty(loadout, name, { enumerable: true, get: () => (real ? real[name] : load().then((L) => L[name])) });
-  for (const group of ['assets', 'make', 'bag']) Object.freeze(loadout[group]);
+  for (const group of ['assets', 'make', 'bag', 'studio']) Object.freeze(loadout[group]);
   win.loadout = Object.freeze(loadout);
 }
 if (typeof window !== 'undefined' && typeof document !== 'undefined' && !window.loadout) install(window);

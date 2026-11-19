@@ -14,7 +14,7 @@ import { bag, lookOf, themeFor } from './bag.js';
 import { loadCatalog, currentCatalog, assetById, loadSprite, loadSound } from './catalog.js';
 import { soundById, soundState, stopAll, toUnit, toValue, isChoice } from './audio.js';
 import { cleanParams, clipFps, clipStretch } from '../engine/sprite.js';
-import { normalizeTheme, spriteLook } from '../engine/theme.js';
+import { normalizeTheme, spriteLook, THEME_PRESETS } from '../engine/theme.js';
 import { rowFromSprite, rowFromPatch, planScene, SCENE_ROLES, MODES } from './play/roles.js';
 import { buildKind, soundIdsOf, isCustom, harmfulLiquid } from './play/kinds.js';
 import { extraActions, lookupClip } from './play/clips.js';
@@ -96,15 +96,21 @@ export async function playPage(app) {
   // ---- the editing panel beside the scene ----------------------------------------------------------
   // One bag item at a time (app/bag-edit.js). What it changes is saved to the bag, and the bag tells the scene (soft, below).
 
-  // the look of everything together: one more tab of the panel (and all there is to change when nothing can be picked)
-  const look = themeControls({ theme: bag.theme(), live: false, open: false, title: 'Give everything a look', onChange: (t) => bag.setTheme(t) });
-  const lookBox = el('div', { class: 'play-look' }, look.node);
-  const lookChanged = () => JSON.stringify(normalizeTheme(bag.theme())) !== JSON.stringify(normalizeTheme({}));
+  // The look of the whole bag: its own control, apart from the chosen thing's panel (J5.4), so it is never mistaken for
+  // a setting of that one thing. "Look of the whole bag" in the head of the column shows it in place of the thing's
+  // panel; "Back to <thing>" (or picking a thing) goes back. With nothing to pick it is all the column shows.
+  const look = themeControls({ theme: bag.theme(), live: false, open: false, title: 'The look of your whole bag', onChange: (t) => bag.setTheme(t) });
+  const lookBack = el('p', { class: 'play-look-back' });
+  const lookBox = el('div', { class: 'play-look', role: 'region', 'aria-label': 'The look of your whole bag' },
+    lookBack, look.node,
+    el('p', { class: 'hint play-look-note' }, 'Everything in your bag takes this look, here, in your bag and in the download. A thing with a look of its own keeps it.'));
+  let lookOpen = false;
   const pickBox = el('div', { class: 'play-side-head' });
   let sideEntries = [], restored = false;
 
   function closeChosen() {
     if (!chosen) return;
+    chosen.off();
     chosen.editor.close();
     chosen = null;
   }
@@ -112,20 +118,33 @@ export async function playPage(app) {
   function choose(key, byHand = false) {
     const e = sideEntries.find((x) => x.key === key);
     if (!e) return false;
-    if (byHand) { pickedByHand = true; store.set('play-chosen', key); }      // remembered, so a reload goes on with the same thing
+    if (byHand) { pickedByHand = true; lookOpen = false; store.set('play-chosen', key); }      // remembered, so a reload goes on with the same thing
     if (chosen && chosen.key === key) { drawSide(); return true; }
-    const tab = chosen ? chosen.editor.panel.tab() : null;
     closeChosen();
     const item = bag.get(key);
     if (!item) return false;
-    const editor = itemEditor(item, e.sprite ?? e.patch, {
-      versions: 6,
-      tabs: [{ id: 'everything', label: 'Everything', node: lookBox, changed: lookChanged }],
-    });
-    chosen = { key, editor };
-    if (tab === 'everything') editor.panel.showTab(tab);
+    const editor = itemEditor(item, e.sprite ?? e.patch, { versions: 6 });
+    chosen = { key, editor, off: ownLookNote(editor) };
     drawSide();
     return true;
+  }
+  /**
+   * A thing that wears a look of its own is drawn in it: a colour picked for it is changed by that look. Its Colours tab
+   * says so, so a picked green that shows as blue is explained (J5.2). Returns the function that stops following it.
+   */
+  function ownLookNote(editor) {
+    const pane = editor.node.querySelector('[data-pane="colours"]');
+    if (!pane) return () => {};
+    const note = el('p', { class: 'pane-note play-own-look', hidden: true });
+    pane.prepend(note);
+    const sync = () => {
+      const id = lookOf(editor.edit.settings());
+      const name = id ? THEME_PRESETS.find((p) => p.id === id)?.name : null;
+      note.hidden = !name || id === 'original';
+      note.textContent = name ? `Shown in the ${name} look (its own, in the Look tab), so the colours you pick come out changed by it.` : '';
+    };
+    sync();
+    return editor.edit.onChange(sync);
   }
   function drawSide() {
     const e = chosen ? sideEntries.find((x) => x.key === chosen.key) : null;
@@ -134,12 +153,19 @@ export async function playPage(app) {
         const list = sideEntries.filter((x) => x.row.kind === kind);
         return list.length ? el('optgroup', { label }, list.map((x) => el('option', { value: x.key, selected: !!chosen && x.key === chosen.key }, x.row.name))) : null;
       }));
+    const showLook = lookOpen || !chosen;
     pickBox.replaceChildren(
-      el('label', { for: 'play-choose' }, 'Change'), select,
-      el('span', { class: 'quiet play-side-hint' }, 'or click it in the scene'),
-      e ? el('a', { class: 'link play-side-page', href: `#/${e.row.kind}/${e.row.id}?bag=${chosen.key}`, onclick: () => chosen && chosen.editor.edit.flush() }, 'Open its page') : null);
-    if (chosen) side.replaceChildren(pickBox, chosen.editor.node);
-    else side.replaceChildren(lookBox);
+      el('div', { class: 'play-side-pick' },
+        el('label', { for: 'play-choose' }, 'Change'), select,
+        el('span', { class: 'quiet play-side-hint' }, 'or click it in the scene')),
+      el('div', { class: 'play-side-links' },
+        e && !showLook ? el('a', { class: 'link play-side-page', href: `#/${e.row.kind}/${e.row.id}?bag=${chosen.key}`, onclick: () => chosen && chosen.editor.edit.flush() }, 'Open its page') : null,
+        chosen ? el('button', { type: 'button', class: 'btn btn-sm btn-secondary play-look-open', 'aria-pressed': String(showLook), 'aria-expanded': String(showLook), onclick: () => { lookOpen = !lookOpen; drawSide(); (lookOpen ? lookBox.querySelector('.look-title') : chosen?.editor.node.querySelector('h2'))?.focus?.({ preventScroll: true }); } }, 'Look of the whole bag') : null));
+    lookBack.replaceChildren(chosen && e ? el('button', { type: 'button', class: 'link play-look-close', onclick: () => { lookOpen = false; drawSide(); } }, el('span', { 'aria-hidden': 'true' }, '‹ '), `Back to ${e.row.name}`) : '');
+    lookBack.hidden = !(chosen && e);
+    if (!sideEntries.length && !chosen) side.replaceChildren(lookBox);
+    else side.replaceChildren(pickBox, showLook ? lookBox : chosen.editor.node);
+    side.dataset.showing = showLook ? 'look' : 'item';
     side.hidden = false;
     for (const b of col.querySelectorAll('.play-edit')) b.setAttribute('aria-pressed', String(!!chosen && b.dataset.key === chosen.key));
   }

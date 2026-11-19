@@ -843,6 +843,10 @@ export function createLoadout(env = {}) {
     }
   };
 
+  // window.loadout.studio (app/api-studio.js): loaded the first time a studio action is called
+  const studio = once(async () => (await import('./api-studio.js')).createStudio({ window: win }));
+  for (const a of ACTIONS) if (a.call.startsWith('studio.')) actions[a.call] = async (...args) => (await studio())[a.call.slice('studio.'.length)](...args);
+
   const loadout = {};
   for (const a of ACTIONS) {
     const [group, member] = a.call.split('.');
@@ -859,7 +863,7 @@ export function createLoadout(env = {}) {
   });
   Object.defineProperty(loadout, 'framework', { get: framework, enumerable: true });
   Object.defineProperty(loadout, 'api', { get: api, enumerable: true });
-  for (const group of ['assets', 'make', 'bag']) Object.freeze(loadout[group]);      // not Object.values(loadout): reading framework or api starts their download
+  for (const group of ['assets', 'make', 'bag', 'studio']) Object.freeze(loadout[group]);      // not Object.values(loadout): reading framework or api starts their download
   Object.freeze(loadout);
   internals.set(loadout, {
     /** Go through what the bag holds from a link or an earlier visit; resolves when all of it is settled. Never rejects. */

@@ -178,7 +178,8 @@ test('a download under a look that changes shapes lists the settings each sprite
   for (const a of plain.assets.filter((x) => x.kind === 'sprite')) { expect(a.changedByLook).toBeUndefined(); expect(a.settings.params).toEqual({}); }
 });
 
-test('adding a bundle to a bag that has a look of its own asks first, and can keep the bag\'s look', async ({ page }) => {
+test('adding a bundle to a bag that has a look of its own never changes the bag\'s look unasked, and offers the look shown', async ({ page }) => {
+  // J6.4: no Add/Replace question any more. The bag keeps its look; a look made on the page is offered to the whole bag.
   const [first, second] = NAMED;
   const n = new Set([...SMALL.sprites.map((id) => 's' + id), ...SMALL.sounds.map((id) => 'a' + id), ...SMALL.music.map((id) => 'm' + id)]).size;
   await openBundle(page, SMALL.id);
@@ -187,33 +188,32 @@ test('adding a bundle to a bag that has a look of its own asks first, and can ke
   await expect(bagCount(page)).toHaveText(String(n));
   expect(lookOf(await bagTheme(page)), 'an empty bag takes the look shown').toEqual(lookOf(first.theme));
 
-  // another look on the page: the bag's own look is not lost without asking
+  // another named look on the page: the bag's own look is not lost, and nothing is asked or added twice
+  const status = page.locator('.bundle-actions .status');
+  const offer = page.getByRole('button', { name: 'Give my whole bag this look' });
   await page.getByRole('button', { name: second.name, exact: true }).click();
   await page.getByRole('button', { name: 'Add the whole kit to my bag' }).click();
-  const ask = page.locator('.bundle-ask');
-  await expect(ask).toContainText('a look of its own');
-  expect(lookOf(await bagTheme(page)), 'nothing changes while the question is open').toEqual(lookOf(first.theme));
-  await ask.getByRole('button', { name: 'Cancel' }).click();
-  await expect(bagCount(page)).toHaveText(String(n));
-  expect(lookOf(await bagTheme(page)), 'Cancel leaves the bag as it was').toEqual(lookOf(first.theme));
-
-  await page.getByRole('button', { name: 'Add the whole kit to my bag' }).click();
-  await ask.getByRole('button', { name: /keep my bag's look/ }).click();
+  await expect(page.locator('.bundle-ask')).toHaveCount(0);
+  await expect(status).toContainText('already in your bag');
   await expect(bagCount(page)).toHaveText(String(n));      // the kit is in the bag already: nothing is added twice
   expect(lookOf(await bagTheme(page)), 'the bag kept its look').toEqual(lookOf(first.theme));
-  await expect(page.locator('.bundle-actions .status')).toContainText('the look your bag already has');
 
-  // and the other choice gives everything the look shown
+  // a look made on the page: the bag keeps its look, and the page offers to give the whole bag the look shown
+  await page.locator('.bundle-look .look-surprise').click();
   await page.getByRole('button', { name: 'Add the whole kit to my bag' }).click();
-  await ask.getByRole('button', { name: /give everything this look/ }).click();
+  await expect(status).toContainText('the look your bag already has');
   await expect(bagCount(page)).toHaveText(String(n));
-  expect(lookOf(await bagTheme(page))).toEqual(lookOf(second.theme));
-  await expect(page.locator('.bundle-actions .status')).toContainText('the whole bag has this look');
+  expect(lookOf(await bagTheme(page)), 'nothing changes the bag\'s look by itself').toEqual(lookOf(first.theme));
+  await expect(offer).toBeVisible();
+  await offer.click();
+  await expect(status).toContainText('Your whole bag now has this look');
+  await expect(bagCount(page)).toHaveText(String(n));
+  expect(lookOf(await bagTheme(page)), 'the offer gives the bag the look shown').not.toEqual(lookOf(first.theme));
 
-  // the page and the bag now agree, and the kit is in the bag: there is nothing to ask
+  // the page and the bag now agree, and the kit is in the bag: there is nothing to offer
   await page.getByRole('button', { name: 'Add the whole kit to my bag' }).click();
-  await expect(ask).toBeHidden();
-  await expect(page.locator('.bundle-actions .status')).toContainText('already in your bag');
+  await expect(offer).toBeHidden();
+  await expect(status).toContainText('already in your bag');
   await expect(bagCount(page)).toHaveText(String(n));
 });
 

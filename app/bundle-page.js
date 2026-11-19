@@ -10,7 +10,7 @@
 // short list of colours instead of drawing it again. With "Also change shapes" the
 // sprite's own program draws the frames it needs.
 import { loadCatalog, bundleById, assetsOfBundle, loadSprite, loadSound } from './catalog.js';
-import { normalizeTheme, renderThemedFrame, spriteMaterials } from '../engine/theme.js';
+import { normalizeTheme, renderThemedFrame, spriteMaterials, THEME_PRESETS } from '../engine/theme.js';
 import { applySound, themedSoundParams, soundSettingsFor } from '../sound/theme.js';
 import { el, header, saveBlob, reduceMotion, cap } from './ui.js';
 import { kitScene } from './kit-scene.js';
@@ -20,7 +20,7 @@ import { packageFiles, activeTheme } from './bundle.js';
 import { zip } from './zip.js';
 import { shelvesOf } from './shelves.js';
 import { labelFor } from '../catalog/schema.js';
-import { themeControls, themeFromQuery, lookSearch, queryHasLook, indexPixels, recolourIndexed } from './theme-controls.js';
+import { themeControls, themeFromQuery, lookSearch, queryHasLook, indexPixels, recolourIndexed, matchPreset } from './theme-controls.js';
 
 const PIC = 128;                 // the room for a sprite picture in its tile, in screen pixels (css/kits.css .bundle-pic: 132 high)
 const MAX_ZOOM = 8;
@@ -28,9 +28,15 @@ const plural = (n, one, many = one + 's') => `${n} ${n === 1 ? one : many}`;
 const GAME_WORDS = { any: 'any game', platformer: 'platformer games', 'turn-based-rpg': 'turn-based role-playing games', 'roguelike-action': 'roguelike action games' };
 const linkTo = (row) => `#/${row.kind}/${row.id}`;
 
+// A kit that is not there: one way on, to the list of kits, in words that say where it goes (like the other pages that
+// are not there, app/app.js notFound). When the visitor came from somewhere else (results, the bag, the playground,
+// the start), the way back stays under the header, as it does on a kit's own page.
 function notHere(app, title, text) {
   document.title = 'Not here · Loadout';
-  app.replaceChildren(header('bundles'), el('main', { class: 'v2 home kit-none' },
+  const top = header('bundles');
+  const back = wayBackToKit();
+  if (back.href !== '#/bundles') top.append(el('a', { class: 'back-link', href: back.href }, el('span', { 'aria-hidden': 'true' }, '‹'), back.label));
+  app.replaceChildren(top, el('main', { class: 'v2 home kit-none' },
     el('h1', { class: 'h3' }, title),
     el('p', { class: 'lede' }, text),
     el('p', {}, el('a', { class: 'btn btn-primary', href: '#/bundles' }, 'See every kit'))));
@@ -262,6 +268,33 @@ function musicTile(row, patch) {
   };
 }
 
+// ---- the way back ----------------------------------------------------------------------------
+
+/**
+ * The link at the top of a kit's page, like an asset page's (app/back.js): back to the page the visitor came from (the
+ * start, the list of kits, search results, the bag, the playground), read from the tab's own history where the
+ * browser tells it; otherwise to the list of kits. { href, label }.
+ */
+export function wayBackToKit(prevUrl = previousUrl()) {
+  let hash = '';
+  try { hash = prevUrl ? new URL(prevUrl).hash : null; } catch { hash = null; }
+  if (hash === null) return { href: '#/bundles', label: 'All kits' };
+  const [path] = hash.replace(/^#\/?/, '').split('?');
+  const first = path.split('/')[0] ?? '';
+  if (first === '') return { href: '#/', label: 'Back to the start' };
+  if (first === 'bundles' || first === 'kits') return { href: '#/bundles', label: 'Back to all kits' };
+  if (first === 'browse' || first === 'library') return { href: hash, label: 'Back to results' };
+  if (first === 'bag') return { href: '#/bag', label: 'Back to your bag' };
+  if (first === 'play') return { href: '#/play', label: 'Back to the playground' };
+  return { href: '#/bundles', label: 'All kits' };
+}
+function previousUrl() {
+  try {
+    const nav = window.navigation, i = nav?.currentEntry?.index;
+    return Number.isInteger(i) && i > 0 ? nav.entries()[i - 1]?.url ?? null : null;
+  } catch { return null; }
+}
+
 // ---- the page --------------------------------------------------------------------------------
 
 // still(): handed over by the router (lazyPage in app.js); false once the visitor has gone elsewhere.
@@ -273,7 +306,7 @@ export async function bundlePage(app, id, query = {}, still = () => true) {
   }
   if (!still()) return null;
   const bundle = bundleById(id);
-  if (!bundle) return notHere(app, 'That kit is not here', 'The link may be old or mistyped. Everything that exists is on the front page.');
+  if (!bundle) return notHere(app, 'That kit is not here', 'The link may be old or mistyped. Every kit Loadout has is on the kits page.');
   document.title = `${bundle.name} · Loadout`;
 
   const rows = assetsOfBundle(bundle);
@@ -296,7 +329,7 @@ export async function bundlePage(app, id, query = {}, still = () => true) {
   }
 
   const main = el('main', { class: 'v2 bundle-page' });
-  const scene = kitScene(bundle, { theme });
+  const scene = kitScene(bundle, { theme, fill: true });
 
   function setLook(t, { address = true } = {}) {
     theme = normalizeTheme(t);
@@ -307,75 +340,80 @@ export async function bundlePage(app, id, query = {}, still = () => true) {
     for (const tile of tiles) tile.restyle(theme, key, now);
     scene.setLook(theme);
     main.dataset.lookMs = (performance.now() - t0).toFixed(2);
+    // each thing's own page opens wearing a named look picked here (a look of its own there, `artlook`)
+    const named = namedLook();
+    for (const a of main.querySelectorAll('.bundle-card a[href]')) {
+      const base = a.getAttribute('href').split('?')[0];
+      a.setAttribute('href', named && named !== 'original' ? `${base}?artlook=${named}` : base);
+    }
     if (address) {
       const search = key === 'original' ? '' : key;
       history.replaceState(null, '', `#/bundle/${bundle.id}${search ? '?' + search : ''}`);
     }
   }
 
-  const controls = themeControls({ theme, original, open: window.matchMedia('(min-width: 901px)').matches, title: 'Give the whole kit a look', onChange: (t) => setLook(t) });      // on a phone the fine-tuning starts folded, so the grid is near
+  const controls = themeControls({ theme, original, open: false, title: 'Give the whole kit a look', onChange: (t) => setLook(t) });      // the fine-tuning starts folded, so what is in the kit is near
 
   // ---- actions
   const status = el('p', { class: 'status', role: 'status' });
-  const say = (text) => { status.textContent = text; };
-  const ask = el('div', { class: 'bundle-ask', hidden: true });
+  const say = (text) => { status.textContent = text; offer.hidden = true; };
   const goBag = el('a', { class: 'link go-bag', href: '#/bag', hidden: true }, 'Go to bag');
+  // offered, never done unasked: the look made on this page for everything already in the bag too
+  const offer = el('button', { type: 'button', class: 'btn btn-sm btn-secondary bundle-give-look', hidden: true, onclick: () => { bag.setTheme(theme); say(`Your whole bag now has this look. It holds ${plural(bag.count(), 'thing')}.`); } }, 'Give my whole bag this look');
   const n = rows.length;
   const items = () => rows.map((r, i) => ({ key: `b${i + 1}`, kind: r.kind, id: r.id, settings: cleanSettings(r.kind, {}) }));
 
-  // what of the kit is not in the bag yet: an asset that is there as the kit would add it (its standard settings) is not added again
-  const plainSettings = (s) => { const c = cleanSettings('sprite', s); delete c.lookParams; return JSON.stringify(c.params) === '{}' && !c.cues && c.scale === 1 && !c.artStyle && !c.look; };
-  const plainSound = (s) => JSON.stringify(s?.params ?? {}) === '{}' && !s?.style && (s?.seed ?? 1) === 1 && !s?.look;
-  const inBag = (it, held) => held.some((h) => h.kind === it.kind && h.id === it.id && (it.kind === 'sprite' ? plainSettings(h.settings) : plainSound(h.settings)));
+  // One bag item per asset: what of the kit is not in the bag yet, whatever the settings of what is there
+  // (a Hero the visitor changed is their Hero: the kit's plain one is not put beside it).
   function fresh() {
-    const held = bag.items(), seen = new Set();
-    return items().filter((it) => { const k = it.kind + ':' + it.id; if (seen.has(k) || inBag(it, held)) return false; seen.add(k); return true; });
+    const held = new Set(bag.items().map((h) => h.kind + ':' + h.id)), seen = new Set();
+    return items().filter((it) => { const k = it.kind + ':' + it.id; if (seen.has(k) || held.has(k)) return false; seen.add(k); return true; });
   }
   const notKeptNote = () => (bag.kept() ? '' : ' This browser is not keeping your bag: it will be gone when you reload or close the page. Download it or copy its link from your bag before you leave.');
-  function put(mode, then, keepLook = false) {     // looks: keepLook leaves the bag the look it already has
-    ask.hidden = true;
-    if (mode === 'replace') bag.clear();
+  // the same look: the same colours, sound and music, and the same shapes (the number behind "Surprise me" only matters with shapes)
+  const lookKey = (t) => { const x = normalizeTheme(t); return JSON.stringify([x.colour, x.sound, x.music, x.shapes, x.shapes ? x.seed : 0]); };
+  const sameTheme = (a, b) => lookKey(a) === lookKey(b);
+  /** The named look the page shows (a THEME_PRESETS id), or null for a look made here (fine-tuned, a surprise, shapes). */
+  const namedLook = () => (theme.shapes ? null : matchPreset(theme));      // (the number behind Surprise me only matters with shapes)
+  const lookName = (id) => THEME_PRESETS.find((p) => p.id === id)?.name ?? id;
+  /**
+   * Add what of the kit is missing, in one go. An empty bag takes the kit's look as its own. A bag that has things in
+   * it keeps its look and theirs: the added things wear the kit's look as a look of their own (a named look), or, for a
+   * look made on this page, the page offers to give the whole bag that look (never done without asking).
+   */
+  function addAll(then) {
+    const wasEmpty = !bag.count();
     const add = fresh();
-    for (const it of add) bag.add({ kind: it.kind, id: it.id, settings: it.settings });
-    if (!keepLook) bag.setTheme(theme);
-    const what = mode === 'replace' ? `Your bag now holds ${plural(add.length, 'thing')} from ${bundle.name}`
-      : add.length ? `Added ${plural(add.length, 'thing')} from ${bundle.name} to your bag` : `Everything from ${bundle.name} was already in your bag`;
-    const lookSaid = keepLook ? (add.length ? '. They take the look your bag already has' : '. It keeps the look your bag already has') : ', and the whole bag has this look';
-    say(`${what}${lookSaid}. It holds ${plural(bag.count(), 'thing')}.` + notKeptNote());
+    const there = new Set(items().map((it) => it.kind + ':' + it.id)).size - add.length;
+    const bagLook = bag.theme();
+    const named = namedLook();
+    const own = !wasEmpty && !sameTheme(bagLook, theme) && named ? named : null;      // the added things wear this look of their own
+    for (const it of add) bag.add({ kind: it.kind, id: it.id, settings: own ? { ...it.settings, look: own } : it.settings });
+    if (wasEmpty && add.length) bag.setTheme(theme);
+    const added = add.length ? `Added ${plural(add.length, 'thing')} to your bag.` : `Everything from ${bundle.name} is already in your bag.`;
+    const were = add.length && there ? ` ${there} ${there === 1 ? 'was' : 'were'} already in your bag.` : '';
+    let lookSaid = '', offerIt = false;
+    if (wasEmpty && add.length) lookSaid = ' Now the whole bag has this look.';
+    else if (own) lookSaid = ` They wear the ${lookName(own)} look; what was in your bag keeps its own.`;
+    else if (!sameTheme(bagLook, theme)) {
+      lookSaid = add.length ? ' They take the look your bag already has.' : ' It keeps the look your bag already has.';
+      offerIt = true;
+    }
+    say(`${added}${were}${lookSaid} It holds ${plural(bag.count(), 'thing')}.` + notKeptNote());
+    offer.hidden = !offerIt;
     goBag.hidden = false;
     if (then) then();
   }
-  function addAll(then) {
-    if (!bag.count()) { put('add', then); return; }
-    const m = bag.count();
-    // the whole kit is in the bag already: there is nothing to add, so nothing is asked on the way to the playground,
-    // and nothing at all when the bag wears this look too
-    const sameLook = JSON.stringify(normalizeTheme(bag.theme())) === JSON.stringify(normalizeTheme(theme));
-    if (!fresh().length && (then || sameLook)) {
-      ask.hidden = true;
-      say(`Everything from ${bundle.name} is already in your bag. It holds ${plural(m, 'thing')}.` + notKeptNote());
-      goBag.hidden = false;
-      if (then) then();
-      return;
-    }
-    // the same look: the same colours, sound and music, and the same shapes (the number behind "Surprise me" only matters with shapes)
-    const lookOf = (t) => { const x = normalizeTheme(t); return JSON.stringify([x.colour, x.sound, x.music, x.shapes, x.shapes ? x.seed : 0]); };
-    const ownLook = lookOf(bag.theme()) !== lookOf({}) && lookOf(bag.theme()) !== lookOf(theme);
-    ask.replaceChildren(
-      // looks: a bag that has a look of its own, different from the one shown here, never loses it without being asked
-      ...(ownLook ? [
-        el('p', {}, `Your bag already has ${plural(m, 'thing')} in it, with a look of its own. Add this kit and keep your bag's look, add it and give everything this look, or replace what is in your bag (the bag then takes this look)?`),
-        el('button', { type: 'button', class: 'btn btn-sm btn-primary', onclick: () => put('add', then, true) }, 'Add, and keep my bag\'s look'),
-        el('button', { type: 'button', class: 'btn btn-sm btn-secondary', onclick: () => put('add', then) }, 'Add, and give everything this look'),
-      ] : [
-        el('p', {}, `Your bag already has ${plural(m, 'thing')} in it. Add this kit to them, or replace them? Either way, the whole bag takes this look.`),
-        el('button', { type: 'button', class: 'btn btn-sm btn-primary', onclick: () => put('add', then) }, 'Add to what is in my bag'),
-      ]),
-      el('button', { type: 'button', class: 'btn btn-sm btn-secondary', onclick: () => put('replace', then) }, 'Replace what is in my bag'),
-      el('button', { type: 'button', class: 'btn btn-sm btn-secondary', onclick: () => { ask.hidden = true; say(''); } }, 'Cancel'));
-    ask.hidden = false;
-    ask.querySelector('button').focus();
-  }
+  // before any click: how many things adding (or trying) the kit puts in the bag, kept up to date as the bag changes
+  const addsId = `bundle-adds-${bundle.id}`;
+  const adds = el('p', { class: 'bundle-adds', id: addsId });
+  const syncAdds = () => {
+    const k = fresh().length;
+    // short enough for one line at every size, so the card keeps its height when it changes
+    adds.textContent = k === 0 ? 'All of it is in your bag already.' : `Adding it puts ${plural(k, 'thing')} in your bag.`;
+  };
+  syncAdds();
+  const offAdds = bag.onChange(syncAdds);
   let busy = false;
   const dlBtn = el('button', { type: 'button', class: 'btn btn-secondary' }, 'Download this kit');
   dlBtn.addEventListener('click', async () => {
@@ -385,8 +423,12 @@ export async function bundlePage(app, id, query = {}, still = () => true) {
     try {
       const files = await packageFiles({ items: items(), theme, scale: 1, onProgress: say });
       saveBlob(zip(files), `${bundle.id}.zip`);
-      const count = (ext) => files.filter((f) => f.name.endsWith(ext)).length;
-      say(`Downloaded ${bundle.id}.zip: ${plural(count('.png'), 'sprite sheet')}, ${plural(count('.wav'), 'sound file')}, a list of everything and a guide, all with this look.`);
+      // in the words the page uses: its sprites, sounds and music (a sprite's own sounds go in its folder: they are not counted again)
+      const of = (k) => rows.filter((r) => r.kind === k).length;
+      const what = [of('sprite') ? plural(of('sprite'), 'sprite sheet') + (rows.some((r) => r.kind === 'sprite' && r.tech?.sounds) ? ' with the sounds they make' : '') : null,
+        of('sound') ? plural(of('sound'), 'sound') : null, of('music') ? plural(of('music'), 'music track') : null].filter(Boolean);
+      const listed = what.length > 1 ? `${what.slice(0, -1).join(', ')} and ${what.at(-1)}` : what[0] ?? 'nothing';
+      say(`Downloaded ${bundle.id}.zip: ${listed}, with a list of everything and a guide, all in this look.`);
     } catch (e) {
       console.warn(e);
       say(`The download did not start: ${e.message}. Try again, or use a different browser.`);
@@ -421,23 +463,30 @@ export async function bundlePage(app, id, query = {}, still = () => true) {
 
   const fact = (k, word, many = word + 's') => { const c = rows.filter((r) => r.kind === k).length; return c ? el('span', {}, el('b', { class: 'num' }, String(c)), c === 1 ? word : many) : null; };
   main.append(
-    el('section', { class: 'kit-top' },
-      scene.node,
-      el('div', { class: 'kit-body' },
-        el('p', { class: 'kit-kind bundle-kicker' }, `Kit for ${GAME_WORDS[bundle.gameType] ?? bundle.gameType.replace(/-/g, ' ') + ' games'}`),
-        el('h1', { class: 'h3' }, bundle.name),
-        el('p', { class: 'kit-blurb' }, bundle.blurb),
-        el('div', { class: 'facts', 'aria-label': counts.join(', ') }, fact('sprite', 'sprite'), fact('sound', 'sound'), fact('music', 'music track')),
-        el('div', { class: 'bundle-actions' },
-          el('button', { type: 'button', class: 'btn btn-primary', onclick: () => addAll() }, 'Add the whole kit to my bag'),
-          el('button', { type: 'button', class: 'btn btn-secondary', onclick: () => addAll(() => { location.hash = '#/play'; }) }, 'Try it in the playground'),
-          dlBtn, ask, status, goBag))),
+    el('div', { class: 'bundle-actions' },
+      el('section', { class: 'kit-top' },
+        scene.node,
+        el('div', { class: 'kit-body' },
+          el('p', { class: 'kit-kind bundle-kicker' }, `Kit for ${GAME_WORDS[bundle.gameType] ?? bundle.gameType.replace(/-/g, ' ') + ' games'}`),
+          el('h1', { class: 'h3' }, bundle.name),
+          el('p', { class: 'kit-blurb' }, bundle.blurb),
+          el('div', { class: 'facts', 'aria-label': counts.join(', ') }, fact('sprite', 'sprite'), fact('sound', 'sound'), fact('music', 'music track')),
+          el('div', { class: 'bundle-buttons' },
+            el('button', { type: 'button', class: 'btn btn-primary', 'aria-describedby': addsId, onclick: () => addAll() }, 'Add the whole kit to my bag'),
+            el('button', { type: 'button', class: 'btn btn-secondary', 'aria-describedby': addsId, onclick: () => addAll(() => { location.hash = '#/play'; }) }, 'Try it in the playground'),
+            dlBtn),
+          adds)),
+      // what a click did is said under the card, in the room between it and the look, so the card never grows (J6.4)
+      el('div', { class: 'bundle-said' }, status, goBag, offer)),
     el('aside', { class: 'bundle-look' }, controls.node),
     el('div', { class: 'bundle-assets' },
       jumpNav,
       shelves,
       n ? null : el('p', { class: 'quiet' }, 'This kit is empty.')));
-  app.replaceChildren(header('bundles'), main);
+  const top = header('bundles');
+  const back = wayBackToKit();
+  top.append(el('a', { class: 'back-link', href: back.href }, el('span', { 'aria-hidden': 'true' }, '‹'), back.label));
+  app.replaceChildren(top, main);
 
   // ---- only what is on screen is drawn
   const watched = new Map(tiles.map((t) => [t.watch, t]));
@@ -451,6 +500,7 @@ export async function bundlePage(app, id, query = {}, still = () => true) {
 
   return () => {
     cancelAnimationFrame(raf);
+    offAdds();
     io.disconnect();
     scene.stop();
     for (const t of tiles) if (t.stop) t.stop();

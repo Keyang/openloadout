@@ -30,9 +30,11 @@ export function sceneRows(rows) {
  * fallback(): what to show instead when the kit has nothing to stand in a scene (a kit of sounds).
  * Returns { node, setLook(theme), stop(), ready (a promise: true when there is a scene, false when the kit has nothing to stand in one) }.
  */
-export function kitScene(bundle, { theme = null, label = `A scene made only from ${bundle.name}`, fallback = null } = {}) {
+// fill: the scene fills its frame however tall the frame is made by what is beside it (a kit's page, the list of kits):
+// it shows more of the level instead of leaving bands of shelf above and below. The frame is at least one scene tall.
+export function kitScene(bundle, { theme = null, label = `A scene made only from ${bundle.name}`, fallback = null, fill = false } = {}) {
   const canvas = el('canvas', { class: 'kit-scene-pic', role: 'img', 'aria-label': label, width: 320, height: 180 });
-  const node = el('div', { class: 'kit-scene tile', 'data-kit': bundle.id }, canvas);
+  const node = el('div', { class: 'kit-scene tile' + (fill ? ' is-fill' : ''), 'data-kit': bundle.id }, canvas);
   const ctx = canvas.getContext('2d');
   const view = { w: 320, h: VIEW_H, zoom: 1 };
   let look = normalizeTheme(theme ?? {}), made = null, raf = 0, gone = false, visible = false, last = 0, drawnOnce = false;
@@ -42,9 +44,20 @@ export function kitScene(bundle, { theme = null, label = `A scene made only from
     if (!cw || !made) return;
     view.h = Math.min(VIEW_H, made.level.height);
     view.zoom = Math.max(1, Math.min(3, Math.floor(cw / 300)));
-    view.w = Math.max(96, Math.min(made.level.width, Math.floor(cw / view.zoom)));
-    canvas.width = view.w * view.zoom; canvas.height = view.h * view.zoom;
-    canvas.style.width = canvas.width + 'px'; canvas.style.height = canvas.height + 'px';
+    if (fill) {
+      // the frame is one scene tall at least; when what is beside it makes it taller, the picture grows to fill it:
+      // a larger whole-number size when the level is not tall enough, and more of the level above and below
+      const least = view.h * view.zoom;
+      if (node.style.minHeight !== least + 'px') node.style.minHeight = least + 'px';
+      const ch = Math.max(least, node.clientHeight);
+      while (view.zoom < 6 && made.level.height * view.zoom < ch && cw / (view.zoom + 1) >= 96) view.zoom++;
+      view.h = Math.min(made.level.height, Math.ceil(ch / view.zoom));
+    }
+    view.w = Math.max(96, Math.min(made.level.width, Math.ceil(cw / view.zoom)));
+    const w = view.w * view.zoom, h = view.h * view.zoom;
+    if (canvas.width === w && canvas.height === h) return;
+    canvas.width = w; canvas.height = h;
+    canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
     drawnOnce = false;
   };
   const paint = () => {

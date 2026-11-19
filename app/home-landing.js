@@ -22,7 +22,9 @@ const LINEUP = [
 // Step 1: a few things to pick from, the first one picked. [id, nudge right, nudge down] so each sits in the middle of its square.
 const PICK = [['knight', 4, -14], ['slime', 4, -8], ['campfire', 0, -8], ['treasure-chest', 0, 0], ['bat', 0, 0], ['coin', 0, 0]];
 // Step 2: the Hero's controls offered here (the Hero's own page has them all).
-const TRY = { hair: 'hairStyle', outfit: 'outfit', height: 'height', start: { headgear: 'none' } };
+// It starts as the Hero looks everywhere else (his own settings, helmet on), so the picture here and on his page agree.
+// The hair styles offered are the three that show under the helmet (spiky and bald hide under it).
+const TRY = { hair: 'hairStyle', hairs: ['short', 'long', 'ponytail'], outfit: 'outfit', height: 'height', start: {} };
 const TRY_OUTFITS = ['#3f6fd1', '#c9423a', '#4f9d57', '#e6c545', '#7a4fc4'];
 const KIT_LOOKS = ['original', 'sunset', 'frost', 'night', 'candy', 'handheld'];
 const FEATURED = ['ember-wyrm', 'wizard', 'moss-golem', 'void-ranger', 'hive-mother', 'campfire', 'cottage', 'treasure-chest', 'fx-fire-spell', 'warp-pad', 'bg-castle', 'tiles-castle'];
@@ -100,6 +102,8 @@ export function landingPage(app) {
   const first = el('section', { class: 'hero' },
     el('h1', {}, 'Game art, sound and music you can change.'),
     el('p', { class: 'lede' }, 'Pick a hero, a monster or a tune, change it with a few sliders and choices, and download it ready for your game.'),
+    // true today: nothing costs anything; what a released game may do with it is not decided (every asset records "draft", README "Licences")
+    el('p', { class: 'terms' }, 'Free to try and to download. The terms for using it in a game you release are not set yet.'),
     actions(), search);
 
   // ---------------------------------------------------------------- the line-up
@@ -168,7 +172,7 @@ export function landingPage(app) {
     mine.ready.then((def) => {
       if (!def || !alive) return;
       const h = def.params[TRY.hair], o = def.params[TRY.outfit], t = def.params[TRY.height];
-      hair.replaceChildren(...(h?.options ?? []).slice(0, 3).map((x) => el('button', { type: 'button', class: 'chip', role: 'radio', 'data-v': x.value, onclick: () => set({ [TRY.hair]: x.value }) }, x.label)));
+      hair.replaceChildren(...(h?.options ?? []).filter((x) => TRY.hairs.includes(x.value)).map((x) => el('button', { type: 'button', class: 'chip', role: 'radio', 'data-v': x.value, onclick: () => set({ [TRY.hair]: x.value }) }, x.label)));
       outfit.replaceChildren(...TRY_OUTFITS.filter((c) => (o?.swatches ?? []).includes(c)).map((c) => el('button', { type: 'button', class: 'swatch', role: 'radio', 'data-v': c, style: `--c:${c}`, 'aria-label': colourWord(c), title: colourWord(c), onclick: () => set({ [TRY.outfit]: c }) })));
       if (t) { height.min = String(t.min); height.max = String(t.max); height.step = String(t.step); }
       Promise.all(cells.map((c) => c.ready)).then(() => { if (alive) paint(); });
