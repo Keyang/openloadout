@@ -8,7 +8,7 @@
   "blaster",
   "zap"
  ],
- "description": "Pitch-dropping blaster zap with a noisy muzzle click.",
+ "description": "A blaster zap that falls in pitch, with a crackly click at the muzzle.",
  "meta": {
   "type": "sfx",
   "role": "actions/shoot",

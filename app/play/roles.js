@@ -5,9 +5,8 @@
 //   kind music, or type music                              -> music: plays, with its main sliders
 //   kind sound                                             -> a button on the sound board, unless a sprite in the bag plays it
 //   role characters/player                                 -> the player (one is picked; the others walk around)
-//   type tileset, or role world/tile                       -> the ground: every tileset made for the scene's view is used,
-//                                                             together (view side in a side-view scene, top-down in a
-//                                                             top-down one, any other view in both; see level.js)
+//   type tileset, or role world/tile                       -> the ground: every tileset that fits the scene's view is used,
+//                                                             together (see level.js)
 //   type background, or a role under environment/          -> layers behind the scene (far, mid, near)
 //   type ui or icon, a role under interface/, items/icon   -> the on-screen display (never the player, whatever it shows)
 //   role characters/enemy, boss or animal, or type creature -> moves by itself; the action hurts it. An animal never
@@ -17,7 +16,10 @@
 //   type projectile, or role effects/projectile            -> fired by the player's action
 //   type effect, or a role under effects/                  -> plays in the scene; its burst plays where a hit lands
 //   everything else (world/prop, world/door, ...)          -> a prop: the action next to it steps it through its clips
-//   view top-down on the player                            -> a top-down scene; any other view: side view
+//   view (side, top-down)                                  -> which scene it can be in. The scene opens in the view of the
+//                                                             bag's ground tiles, else of most of its things (chooseMode);
+//                                                             a thing drawn for the other view is left out and listed, never
+//                                                             placed; every other view (front, none) fits both scenes
 //   tech.pivot, tech.grounded (catalogue row)              -> where it stands: a grounded sprite on the ground, others hover
 //   stripClip (catalogue row)                              -> the clip a thing with no idle rests on
 // The clip names are in clips.js, the tile names in level.js.
@@ -88,17 +90,64 @@ export function rowFromPatch(patch) {
 
 const pick = (list, wanted) => (list.includes(wanted) ? wanted : list[0] ?? null);
 
+/** The two views a scene can have, in the order the page offers them. */
+export const MODES = ['side', 'top'];
+// the view (meta.view) a scene of each sort is drawn in, and the roles that are never part of the picture of the scene
+const DRAWN_FOR = { side: 'side', top: 'top-down' };
+const NOT_PLACED = ['display', 'sound', 'music'];
+
+/**
+ * True when a thing drawn for `view` (a sprite's meta.view) can be put in a scene of this mode ('side' or 'top').
+ * Only the other scene's own view is turned away: a side-view sprite in a top-down scene, a top-down sprite in a
+ * side-view scene. Every other view ('front', 'none', none given) fits both: a coin, a burst, a field of stars.
+ */
+export function fitsMode(view, mode) {
+  return view !== DRAWN_FOR[mode === 'top' ? 'side' : 'top'];
+}
+
+/**
+ * Which view a bag's scene opens in, the way a person looking at the bag would say it.
+ * things: [{ view, role }] in bag order, one for each sprite that would be part of the scene (role: its playground role).
+ * wanted: the view the visitor switched to ('side', 'top'), if any.
+ * Returns { mode, modes, why }.
+ *   modes  the views the bag has something drawn for, in MODES order; with nothing drawn for either, side view only
+ *   why    'only'    the bag has things for one view, so there is nothing to choose
+ *          'chosen'  the visitor switched to it
+ *          'tiles'   every ground tileset that says a view says this one
+ *          'most'    more of the bag's things were drawn for this view than for the other
+ *          'player'  as many of each: the first character to play as was drawn for this view
+ *          'even'    as many of each and no such character: side view
+ */
+export function chooseMode(things, wanted = null) {
+  const drawnFor = (mode) => things.filter((t) => t.view === DRAWN_FOR[mode]);
+  const modes = MODES.filter((mode) => drawnFor(mode).length);
+  if (modes.length < 2) return { mode: modes[0] ?? MODES[0], modes: modes.length ? modes : [MODES[0]], why: 'only' };
+  if (modes.includes(wanted)) return { mode: wanted, modes, why: 'chosen' };
+  const ground = MODES.filter((mode) => drawnFor(mode).some((t) => t.role === 'tiles'));
+  if (ground.length === 1) return { mode: ground[0], modes, why: 'tiles' };
+  const [side, top] = MODES.map((mode) => drawnFor(mode).length);
+  if (side !== top) return { mode: side > top ? 'side' : 'top', modes, why: 'most' };
+  const first = things.find((t) => t.role === 'player' && MODES.some((mode) => t.view === DRAWN_FOR[mode]));
+  if (first) return { mode: MODES.find((mode) => first.view === DRAWN_FOR[mode]), modes, why: 'player' };
+  return { mode: MODES[0], modes, why: 'even' };
+}
+
 /**
  * Sort a bag into a scene.
  * entries: [{ key, row, soundIds }] in bag order; soundIds = the sounds that sprite plays on its clips.
- * picks: { player, background } keys the visitor chose (each falls back to the first of its kind).
+ * picks: what the visitor chose: { mode, side: { player, background }, top: { player, background } }. Each view keeps
+ * its own picks, so switching the view and back changes nothing else; a pick that is not there (or not in this
+ * view) falls back to the first of its kind.
  * Returns {
- *   mode: 'side' | 'top',            // from the player's view; with no player, from the other sprites
- *   player, players,                  // the key in use and every playable character
+ *   mode: 'side' | 'top',            // chooseMode: from the bag's ground tiles, else from what most of it was drawn for
+ *   modes, why,                       // the views the bag has things for (two: the page offers a switch); why this one
+ *   player, players,                  // the key in use and every playable character drawn for this view
  *   tilesets, otherTiles,             // the tilesets made for this scene's view (used together); those made for the other view
- *   background, backgrounds,
+ *   background, backgrounds,          // those that fit this view
  *   scene,                            // keys of the things that stand or move in the scene, in bag order
  *   projectile,                       // the key the player's action fires, or null
+ *   leftOut,                          // keys of every sprite drawn for the other view, in bag order: none of them is
+ *                                     // in player, players, scene, projectile, tilesets or backgrounds
  *   display, music,                   // on-screen display pieces; music tracks
  *   board, attached,                  // sounds with a button of their own; sounds a sprite in the bag already plays
  *   roles: { key: role },             // a playable character that was not picked is an 'npc'
@@ -107,32 +156,28 @@ const pick = (list, wanted) => (list.includes(wanted) ? wanted : list[0] ?? null
  */
 export function planScene(entries, picks = {}) {
   const roles = {};
-  const by = (role) => entries.filter((e) => roles[e.key] === role).map((e) => e.key);
   for (const e of entries) roles[e.key] = roleOf(e.row);
+  const placed = entries.filter((e) => e.row.kind === 'sprite' && !NOT_PLACED.includes(roles[e.key]));
+  const { mode, modes, why } = chooseMode(placed.map((e) => ({ view: e.row.view, role: roles[e.key] })), picks.mode ?? null);
+  // a thing drawn for the other view would look wrong here: side-view grass is not a top-down floor, and a hero
+  // seen from above cannot walk along a side-view ledge
+  const out = new Set(placed.filter((e) => !fitsMode(e.row.view, mode)).map((e) => e.key));
+  const by = (role) => entries.filter((e) => roles[e.key] === role && !out.has(e.key)).map((e) => e.key);
+  const mine = picks[mode] ?? {};
   const players = by('player'), backgrounds = by('background');
-  const player = pick(players, picks.player);
+  const player = pick(players, mine.player);
   for (const k of players) if (k !== player) roles[k] = 'npc';
-
-  const viewOf = (key) => entries.find((e) => e.key === key)?.row.view;
-  let mode = 'side';
-  if (player) mode = viewOf(player) === 'top-down' ? 'top' : 'side';
-  else {
-    const views = entries.filter((e) => SCENE_ROLES.includes(roles[e.key]) || roles[e.key] === 'tiles').map((e) => e.row.view);
-    if (views.includes('top-down') && !views.includes('side')) mode = 'top';
-  }
-  // a tileset drawn for the other view would lay the wrong ground: side-view grass is not a top-down floor
-  const wrong = mode === 'top' ? 'side' : 'top-down';
-  const fits = (key) => viewOf(key) !== wrong;
 
   const used = new Set(entries.filter((e) => e.row.kind === 'sprite').flatMap((e) => e.soundIds ?? []));
   const sounds = entries.filter((e) => roles[e.key] === 'sound');
   const sprites = entries.filter((e) => e.row.kind === 'sprite');
   return {
-    mode, player, players,
-    tilesets: by('tiles').filter(fits), otherTiles: by('tiles').filter((k) => !fits(k)),
-    background: pick(backgrounds, picks.background), backgrounds,
-    scene: entries.filter((e) => SCENE_ROLES.includes(roles[e.key])).map((e) => e.key),
+    mode, modes, why, player, players,
+    tilesets: by('tiles'), otherTiles: entries.filter((e) => roles[e.key] === 'tiles' && out.has(e.key)).map((e) => e.key),
+    background: pick(backgrounds, mine.background), backgrounds,
+    scene: entries.filter((e) => SCENE_ROLES.includes(roles[e.key]) && !out.has(e.key)).map((e) => e.key),
     projectile: by('projectile')[0] ?? null,
+    leftOut: entries.filter((e) => out.has(e.key)).map((e) => e.key),
     display: by('display'),
     music: by('music'),
     board: sounds.filter((e) => !used.has(e.row.id)).map((e) => e.key),

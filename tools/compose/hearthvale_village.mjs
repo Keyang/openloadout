@@ -122,7 +122,7 @@ export function build(gains = GAINS) {
     id: 'hearthvale-village',
     name: 'Village and fields theme',
     tags: ['music', 'village', 'storybook', 'adaptive', 'loop'],
-    description: 'Warm, gentle village music in F major, 8 to 32 bars long: plucked strings roll under a tune in long notes, Intensity brings in the bass and the tune, then a shaker and hand drum, then a chime, and you can change the tempo, key, lilt and the instrument that plays the tune.',
+    description: 'Warm, gentle, happy village music in short or long versions: plucked strings roll under a tune in long notes, Intensity brings in the bass and the tune, then a shaker and hand drum, then a chime, and you can change the speed, pitch, lilt and the instrument that plays the tune.',
     meta: {
       type: 'music', role: 'music/exploration', themes: ['fantasy', 'farm'], gameTypes: ['turn-based-rpg', 'top-down-rpg', 'farming-sim'],
       words: ['village', 'town', 'fields', 'home', 'map', 'walk', 'wander', 'explore', 'shop', 'peaceful', 'gentle', 'cozy', 'pastoral', 'flute'],

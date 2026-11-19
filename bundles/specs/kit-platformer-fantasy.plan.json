@@ -2,6 +2,7 @@
   "id": "kit-platformer-fantasy",
   "name": "Thornwood Keep platformer kit",
   "gameType": "platformer",
+  "blurb": "Everything for a side-view fantasy platformer: a hero, enemies and a boss, forest, cave, water and castle ground, platforms, traps, pickups, effects, backgrounds, a wooden interface, sounds and two tracks.",
   "theme": "fantasy",
   "view": "side",
   "palette": {

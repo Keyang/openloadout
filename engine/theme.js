@@ -3,12 +3,22 @@
 // matching. Colour settings are applied AFTER a frame is rendered, so they work
 // on any sprite with no per-sprite work; `shapes` additionally varies each
 // sprite's own controls from the theme's seed.
+//
+// A look may move hue, warmth and tone, but a thing must stay what it is. Three rules keep it so:
+//   1. Every colour a sprite draws has a material (engine/materials.js: sky, water, skin, warning ...), found by
+//      spriteMaterials() from the sprite's colour controls, and a look may only pull a colour as far as its material
+//      allows (applyColour with a third argument; spriteLook and renderThemedFrame do it for you).
+//   2. Two tones of a sprite that were clearly different stay clearly different (the same call).
+//   3. "Also change shapes" (themedParams) moves sliders inside the safe middle of their range and picks among
+//      options a sprite marks as variants; it never takes a part off, never swaps one for another kind, never
+//      flips a switch and never touches a colour.
 // Pure JavaScript: runs the same in the browser and in Node. No DOM, no files.
 
 import { rgbToHsl, hslToRgb, hexToRgb, col, INK } from './color.js';
 import { rng } from './motion.js';
-import { renderFrame, cleanParams } from './sprite.js';
+import { renderFrame, renderPixels, cleanParams, inEffect, partList } from './sprite.js';
 import { styleFor } from './styles.js';
+import { controlMaterial, restMaterial, holdColour, limitsOf, materialById, oklab as labOf, oklch, fromOklch, hueTurn } from './materials.js';
 
 // ---- the theme -------------------------------------------------------------
 
@@ -135,19 +145,32 @@ function colourTransform(colour) {
  * Recolour pixels in place and return them.
  * pixels: a Uint32Array in the Surface's byte order (color.js `pack`: r in the
  * low byte, alpha in the high byte), or RGBA bytes (Uint8ClampedArray / Uint8Array).
+ * colour: the colour settings of a theme (Contract 7).
+ * materials (optional): what each colour of the picture is of, from spriteMaterials(sprite, settings) or
+ * namedMaterials(colours), or a function that returns one (it is only called when the look changes a colour, so
+ * nothing is drawn to find out for a look that leaves colours alone). With it a colour moves only as far as its
+ * material allows and tones that were clearly apart stay apart; a sprite's pictures are always recoloured this
+ * way (spriteLook, renderThemedFrame). Without it this is the plain colour maths, the same for every colour.
  * Pixels with alpha 0 are left untouched; alpha is never changed.
  * Each distinct colour is worked out once, so the number of distinct colours never rises.
  */
-export function applyColour(pixels, colour) {
+export function applyColour(pixels, colour, materials) {
+  let map;
   const fn = colourTransform(colour);
   if (!fn) return pixels;
-  const memo = new Map();
-  const map = (r, g, b) => {
-    const key = (r << 16) | (g << 8) | b;
-    let v = memo.get(key);
-    if (v === undefined) { v = fn(r, g, b); memo.set(key, v); }
-    return v;
-  };
+  if (materials) {
+    const look = lookColours(typeof materials === 'function' ? materials() : materials, colour);
+    if (!look) return pixels;
+    map = look.of;
+  } else {
+    const memo = new Map();
+    map = (r, g, b) => {
+      const key = (r << 16) | (g << 8) | b;
+      let v = memo.get(key);
+      if (v === undefined) { v = fn(r, g, b); memo.set(key, v); }
+      return v;
+    };
+  }
   if (pixels instanceof Uint32Array) {
     let lastIn = -1, lastOut = 0;
     for (let i = 0; i < pixels.length; i++) {
@@ -166,6 +189,462 @@ export function applyColour(pixels, colour) {
     pixels[i] = r; pixels[i + 1] = g; pixels[i + 2] = b;
   }
   return pixels;
+}
+
+// ---- what each colour of a sprite is of --------------------------------------------------------------------------
+
+/**
+ * True when a look leaves one colour only: shades of grey, a colour set whose colours all share one hue (the green
+ * screen), no colourfulness, or a tint at nearly full strength. Under such a look hue cannot say what a thing is,
+ * so only tone is held, and the colours that carry a meaning (signal, warning) keep theirs.
+ * colour: the colour settings of a theme.
+ */
+export function isOneColourLook(colour) {
+  const c = { ...defaultTheme().colour, ...(colour || {}) };
+  if (Number.isFinite(Number(c.saturation)) && Number(c.saturation) <= 0.2) return true;
+  if (typeof c.tint === 'string' && Number(c.tintAmount) >= 0.8) return true;
+  const list = !c.palette ? null : Array.isArray(c.palette) ? c.palette : paletteByName(c.palette)?.colours;
+  if (!list || !list.length) return false;
+  const hues = list.map((hex) => oklch(...hexToRgb(hex))).filter((k) => k.C >= 0.04).map((k) => k.h).sort((a, b) => a - b);
+  if (!hues.length) return true;
+  let gap = 360 - hues[hues.length - 1] + hues[0];
+  for (let i = 1; i < hues.length; i++) gap = Math.max(gap, hues[i] - hues[i - 1]);
+  return 360 - gap <= ONE_HUE_SPAN;
+}
+/** A colour set whose hues all lie within this many degrees is one colour (isOneColourLook). */
+export const ONE_HUE_SPAN = 45;
+
+const TABLES = new WeakMap();       // sprite -> Map(settings -> table)
+const TABLES_KEPT = 24;             // per sprite; "Surprise me" with shapes asks for a new one each press
+const LOOKS_KEPT = 12;              // per table
+// Two colours no sprite is made in: a control is set to the one further from its own colour to see what it paints.
+const PROBES = [[255, 0, 255], [0, 224, 0]];
+const rgbGap = (a, b) => Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]) + Math.abs(a[2] - b[2]);
+const hex2 = (v) => v.toString(16).padStart(2, '0');
+
+/** The frames of a clip that are looked at to learn a sprite's colours: one a third of the way in, and the first of the clip shown on cards. */
+function sampleFrames(sprite, clip) {
+  const n = sprite.clips[clip].frames;
+  const at = [Math.floor(n / 3)];
+  if (clip === sprite.preview && !at.includes(0)) at.unshift(0);
+  return at;
+}
+
+/**
+ * What each colour in a sprite's pictures is of, at these settings: the table a look needs to recolour the sprite
+ * without turning its sky brown or its skin green.
+ * It is found by drawing: a sample of frames of every clip, once as set and once more per colour control with that
+ * control set to a colour no sprite uses. The pixels that change are the ones that control paints; each colour of
+ * the picture takes the material of the control that paints most of it (controlMaterial in engine/materials.js),
+ * and a colour that no control paints takes the sprite's rest material.
+ * sprite: a sprite; params: its settings (as drawn: after a look's shape changes); style: the art style (its first when left out).
+ * Returns { rest, total, colours: Map(0xRRGGBB -> { n (pixels seen), material, control (the key, or null) }) }.
+ * Kept per sprite and settings, so asking again costs nothing. A sprite made on a visit is drawn elsewhere and
+ * cannot be asked here: its table has no colours, and every colour of it takes the rest material.
+ */
+export function spriteMaterials(sprite, params, { style } = {}) {
+  const st = styleFor(sprite, style);
+  const p = cleanParams(sprite, params || {});
+  const key = st.id + JSON.stringify(Object.keys(sprite.params).map((k) => p[k]));
+  let per = TABLES.get(sprite);
+  if (!per) TABLES.set(sprite, per = new Map());
+  let table = per.get(key);
+  if (table) return table;
+  table = buildTable(sprite, p, st.id);
+  if (per.size >= TABLES_KEPT) per.delete(per.keys().next().value);
+  per.set(key, table);
+  return table;
+}
+
+function buildTable(sprite, p, style) {
+  const table = { rest: restMaterial(sprite), total: 0, colours: new Map(), looks: new Map() };
+  if (sprite.made || typeof sprite.prepare === 'function') return table;
+  const keys = Object.keys(sprite.params).filter((k) => sprite.params[k].kind === 'color' && inEffect(sprite, k, p));
+  const probes = keys.map((k) => {
+    const own = hexToRgb(p[k]);
+    const to = rgbGap(own, PROBES[0]) >= rgbGap(own, PROBES[1]) ? PROBES[0] : PROBES[1];
+    return { hex: `#${hex2(to[0])}${hex2(to[1])}${hex2(to[2])}`, reach: Math.max(1, rgbGap(own, to)) };
+  });
+  const draw = (clip, f, q) => { try { return renderPixels(sprite, clip, f, q, { style }).data; } catch { return null; } };
+  // Sliders move shapes far more often than they bring in a colour. So when sliders are away from where the sprite
+  // was made ("Also change shapes" moves them on every press), the sprite with its sliders back at rest is asked
+  // first (its table is kept, and is the one every look without shapes uses): if nothing here is drawn in a colour
+  // that table does not know, each colour is of what it is of there, and only the frames as set are drawn.
+  const atRest = { ...p };
+  let moved = false;
+  for (const [k, d] of Object.entries(sprite.params)) if (d.kind === 'range' && p[k] !== d.def) { atRest[k] = d.def; moved = true; }
+  if (moved) {
+    const known = spriteMaterials(sprite, atRest, { style }).colours;
+    const counts = new Map();
+    let all = known.size > 0;
+    look: for (const clip of Object.keys(sprite.clips)) for (const f of sampleFrames(sprite, clip)) {
+      const base = draw(clip, f, p);
+      if (!base) continue;
+      let lastV = -1, key = 0;
+      for (let i = 0; i < base.length; i++) {
+        const v = base[i];
+        if (!(v >>> 24)) continue;
+        if (v !== lastV) { lastV = v; key = ((v & 255) << 16) | (v & 0xff00) | ((v >>> 16) & 255); if (!known.has(key)) { all = false; break look; } }
+        counts.set(key, (counts.get(key) ?? 0) + 1);
+      }
+    }
+    if (all && counts.size) {
+      for (const [key, n] of counts) { const e = known.get(key); table.colours.set(key, { n, material: e.material, control: e.control }); table.total += n; }
+      return table;
+    }
+  }
+  const seen = new Map();             // colour -> { n, by: pixels each control paints most }
+  let asking = true;
+  for (const clip of Object.keys(sprite.clips)) for (const f of sampleFrames(sprite, clip)) {
+    const base = draw(clip, f, p);
+    if (!base || !base.some((v) => v >>> 24)) continue;
+    // A control's picture with nothing in it, where the sprite as set draws something, means this sprite is drawn
+    // elsewhere and only has the frames it was handed (the quality bar's stand-in for a sprite made on a visit):
+    // it cannot be asked, so nothing more is asked of it, and its colours take the rest material.
+    const alts = [];
+    for (let j = 0; j < keys.length && asking; j++) {
+      const a = draw(clip, f, { ...p, [keys[j]]: probes[j].hex });
+      if (a && a.length === base.length && a.some((v) => v >>> 24)) alts.push(a);
+      else { asking = false; alts.length = 0; for (const e of seen.values()) e.by.fill(0); }
+    }
+    let lastV = -1, e = null;
+    for (let i = 0; i < base.length; i++) {
+      const v = base[i];
+      if (!(v >>> 24)) continue;
+      if (v !== lastV) {
+        lastV = v;
+        e = seen.get(v & 0xffffff);
+        if (!e) seen.set(v & 0xffffff, e = { n: 0, by: new Array(keys.length).fill(0) });
+      }
+      e.n++;
+      let best = -1, most = 0;
+      for (let j = 0; j < alts.length; j++) {
+        const a = alts[j];
+        if (!a || a[i] === v) continue;
+        const w = a[i];
+        // how much of this pixel's colour the control decides: the change here, against the change made to the control
+        const share = (w >>> 24 ? Math.abs((w & 255) - (v & 255)) + Math.abs(((w >>> 8) & 255) - ((v >>> 8) & 255)) + Math.abs(((w >>> 16) & 255) - ((v >>> 16) & 255)) : 765) / probes[j].reach;
+        if (share > most) { most = share; best = j; }
+      }
+      if (best >= 0) e.by[best]++;
+    }
+  }
+  const materials = keys.map((k) => controlMaterial(k, sprite.params[k], sprite));
+  for (const [v, e] of seen) {
+    let main = -1;
+    for (let j = 0; j < keys.length; j++) if (e.by[j] > (main < 0 ? 0 : e.by[main])) main = j;
+    const painted = main >= 0 && e.by[main] * 2 >= e.n;
+    // kept as 0xRRGGBB (the Surface holds red in the low byte)
+    table.colours.set(((v & 255) << 16) | (v & 0xff00) | ((v >>> 16) & 255), { n: e.n, material: painted ? materials[main] : table.rest, control: painted ? keys[main] : null });
+    table.total += e.n;
+  }
+  return table;
+}
+
+/**
+ * The materials table of a picture that is not a sprite: a short list of named colours, such as a scene's own sky,
+ * grass and dirt. Each colour takes the material its name says (controlMaterial in engine/materials.js: "sky",
+ * "grassEdge", "wallTop"), or `rest` when the name says nothing.
+ * colours: { name: '#rrggbb' }; rest: the material of every other colour ('paint' when left out).
+ * Returns a table as spriteMaterials does, for applyColour's third argument.
+ */
+export function namedMaterials(colours, { rest = 'paint' } = {}) {
+  const table = { rest, total: 0, colours: new Map(), looks: new Map() };
+  for (const [name, hex] of Object.entries(colours || {})) {
+    const [r, g, b] = hexToRgb(hex);
+    const said = controlMaterial(name, { label: name }, null);
+    table.colours.set((r << 16) | (g << 8) | b, { n: 2, material: said === 'paint' ? rest : said, control: name });
+    table.total += 2;
+  }
+  return table;
+}
+
+/**
+ * One materials table for a picture made of several sprites (a scene put together from tiles and props): every
+ * colour of every table, and where two tables disagree about a colour, what the one that draws more of it says.
+ * tables: a list of tables from spriteMaterials or namedMaterials; rest: the material of every other colour.
+ */
+export function mergeMaterials(tables, { rest = 'paint' } = {}) {
+  const out = { rest, total: 0, colours: new Map(), looks: new Map() };
+  for (const t of tables) for (const [v, e] of t.colours) {
+    const had = out.colours.get(v);
+    if (!had) out.colours.set(v, { ...e });
+    else out.colours.set(v, { n: had.n + e.n, material: e.n > had.n ? e.material : had.material, control: e.n > had.n ? e.control : had.control });
+    out.total += e.n;
+  }
+  return out;
+}
+
+// ---- a look on a sprite: every colour held by its material, and tones kept apart ---------------------------------------
+
+/**
+ * Two tones of one sprite stay apart under a look. Made colours at least APART different (colourGap in
+ * engine/materials.js: 0 the same, 1 black against white) count as clearly different; after a look they must still be
+ * at least half as different as they were, and no closer than HELD (toneNeed). MOST is how many of a sprite's colours,
+ * most used first, are kept apart, of those that cover at least SHARE of its pixels (a few flower pixels must not push
+ * the soil they lie on; the quality bar counts the same colours, THRESHOLDS.toneShare).
+ */
+export const TONES = { APART: 0.07, HELD: 0.09, MOST: 96, STEP: 0.04, SHARE: 0.004 };
+/** How different two tones must still be after a look, when they were `before` different (colourGap). 0 when they were not clearly different to begin with. */
+export const toneNeed = (before) => (before < TONES.APART ? 0 : Math.min(TONES.HELD, before * 0.5));
+/**
+ * Also two tones a step apart (at least TONES.STEP: the bands of a sky, the steps of a shading) are kept half their gap
+ * apart where there is room, so a gradient does not become one colour where the look's set has one colour for it.
+ */
+const stepNeed = (before) => toneNeed(before) || (before < TONES.STEP ? 0 : before * 0.5);
+
+const gap3 = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
+const fromLab = (lab) => fromOklch(lab[0], Math.hypot(lab[1], lab[2]), (Math.atan2(lab[2], lab[1]) * 180) / Math.PI);
+
+/**
+ * A look worked out for one sprite: null when the look changes no colour, otherwise { one, of(r, g, b) -> [r, g, b] }.
+ * table: from spriteMaterials; colour: the colour settings of a theme. Kept on the table, so it is worked out once.
+ * Every colour of the table becomes what the look wishes, pulled back inside its material's limits (holdColour);
+ * then, most used first, a colour that has come too close to one already placed (toneNeed) takes another colour of
+ * the colour set that its material allows, or else is moved away from it the way it differed when made (under a
+ * one-colour look: lighter or darker). A colour that is not in the table takes the material of the table colour it
+ * is a shade of, or the rest material, and is held the same way.
+ */
+export function lookColours(table, colour) {
+  const c = { ...defaultTheme().colour, ...(colour || {}) };
+  const key = JSON.stringify([c.hue, c.saturation, c.contrast, c.tint, c.tintAmount, c.palette, c.outline]);
+  if (table.looks.has(key)) return table.looks.get(key);
+  const fn = colourTransform(c);
+  let look = null;
+  if (fn) {
+    const one = isOneColourLook(c);
+    const ink = hexToRgb(INK);
+    const swapsInk = typeof c.outline === 'string' && /^#[0-9a-f]{6}$/i.test(c.outline);
+    const isInk = (rgb) => swapsInk && rgb[0] === ink[0] && rgb[1] === ink[1] && rgb[2] === ink[2];
+    // A colour set first: where the set's nearest colour is outside what the material allows, the nearest colour of
+    // the set that is inside, and the same kind of colour, is taken (a grey-blue stone takes the set's grey, not its
+    // brick red turned as far as stone may turn); only when the set has none is the colour held between the two, off
+    // the set. Held off the set it keeps the lightness the look gives it before the set (under a set alone: its own),
+    // so the steps of a shading the set has nothing for stay steps (the bands of a night sky under Forest).
+    const list = c.palette ? (Array.isArray(c.palette) ? c.palette : paletteByName(c.palette)?.colours) : null;
+    const set = list && list.length ? list.map((hex) => { const rgb = hexToRgb(hex); return { rgb, lab: labOf(...rgb), lch: oklch(...rgb) }; }) : null;
+    const before = set ? colourTransform({ ...c, palette: null }) : null;        // what the look does before its colour set
+    const held = (material, from) => {
+      const wish = fn(...from);
+      if (isInk(from)) return wish;
+      const to = holdColour(material, from, wish, { oneColour: one });
+      if (to === wish || !set) return to;
+      const at = labOf(...(before ? before(...from) : from));
+      // the same kind of colour as the look would make it, or (for a material that holds its hue) as it was made: a grey
+      // stone may take the set's grey even where the look would give it a cast
+      const kinds = one ? null : [oklch(...to), ...(materialById(material)?.hue == null ? [] : [oklch(...from)])];
+      let best = null, near = Infinity;
+      for (const x of set) {
+        const d = gap3(x.lab, at);
+        if (d < near && (!kinds || kinds.some((k) => sameKind(k, x.lch))) && holdColour(material, from, x.rgb, { oneColour: one }) === x.rgb) { near = d; best = x.rgb; }
+      }
+      if (best) return best;
+      if (one) return to;
+      const t = oklch(...to);
+      return holdColour(material, from, fromOklch(oklch(...(before ? before(...from) : from)).L, t.C, t.h), { oneColour: one });
+    };
+    const entries = [...table.colours].map(([v, e]) => {
+      const from = [v >>> 16, (v >>> 8) & 255, v & 255];
+      const to = held(e.material, from);
+      return { v, n: e.n, material: e.material, from, fromLab: labOf(...from), to, toLab: labOf(...to), fixed: isInk(from) };
+    }).sort((a, b) => b.n - a.n || a.v - b.v);
+    keepTonesApart(entries.filter((e) => e.n >= Math.max(2, table.total * TONES.SHARE)).slice(0, TONES.MOST), c, one);
+    const map = new Map(entries.map((e) => [e.v, e.to]));
+    const shadeOf = (from) => {                       // the table colour this one is a shade of, if any
+      const lab = labOf(...from);
+      let best = null, near = 0.05;
+      for (const e of entries) { const d = gap3(lab, e.fromLab); if (d < near) { near = d; best = e; } }
+      return best;
+    };
+    look = {
+      one,
+      of(r, g, b) {
+        const v = (r << 16) | (g << 8) | b;
+        let to = map.get(v);
+        if (to === undefined) {
+          const from = [r, g, b];
+          to = held(shadeOf(from)?.material ?? table.rest, from);
+          map.set(v, to);
+        }
+        return to;
+      },
+    };
+  }
+  if (table.looks.size >= LOOKS_KEPT) table.looks.delete(table.looks.keys().next().value);
+  table.looks.set(key, look);
+  return look;
+}
+
+/**
+ * What "the same kind of colour" means when a look moves a colour to keep it apart from another, or to keep it inside
+ * its material's limits: a step may make a colour lighter, darker, a little warmer or cooler, never another colour.
+ * A colour with a hue stays within `hue` degrees of it and keeps at least `keep` of its strength; a nearly grey one
+ * (weaker than `grey`) stays nearly grey. (The faults behind it, 2026-11-19: under Forest one plank of a wooden door
+ * jumped to the set's green to stay apart from the plank beside it.)
+ */
+export const KIND = { hue: 15, keep: 0.5, grey: 0.03 };
+/** True when colour `c` is the same kind of colour as `w` (KIND). Both are { L, C, h } (oklch in engine/materials.js). */
+export function sameKind(w, c) {
+  if (w.C < KIND.grey) return c.C < Math.max(2 * KIND.grey, w.C * 2);
+  return c.C >= w.C * KIND.keep && Math.abs(hueTurn(w.h, c.h)) <= KIND.hue;
+}
+
+/**
+ * Moves entries (most used first) so that none has come too close to one placed before it. Changes each entry's `to`
+ * and `toLab`. Under a look of many colours a colour that clashes tries, in this order: other colours of the colour
+ * set that its material allows and that are the same kind of colour (sameKind); then steps away from the colour it
+ * clashes with, the way it differed from it when made. It takes the place that leaves it furthest clear of
+ * everything placed before it. Under a one-colour look only lightness is left to tell most tones apart, so all of
+ * them are spread out in lightness together instead (spreadLightness); the colours that keep their hue (signal,
+ * warning) keep it there and count it as part of their difference. In a crowded picture under a look of few
+ * tones a pair may still end closer than toneNeed asks: the quality bar reports what is left nearly the same.
+ */
+function keepTonesApart(entries, colour, one) {
+  const list = colour.palette ? (Array.isArray(colour.palette) ? colour.palette : paletteByName(colour.palette)?.colours) : null;
+  const set = list ? list.map((hex) => { const rgb = hexToRgb(hex); return { rgb, lab: labOf(...rgb), lch: oklch(...rgb) }; }) : [];
+  if (one) spreadLightness(entries.filter((e) => !e.fixed), entries.filter((e) => e.fixed));
+  else placeApart(entries, set);
+}
+
+/** The greedy placing keepTonesApart describes for a look of many colours: most used first, each clear of the ones placed before it. */
+function placeApart(entries, set) {
+  const placed = [];
+  // how clear of everything placed a colour is at `lab`: the least (gap / gap needed) over the placed colours it was
+  // clearly different from; 1 or more is clear of all, 0 is the very same colour. hit: the placed colour it is least clear of.
+  const clearance = (e, lab) => {
+    let least = Infinity, hit = null;
+    for (const a of placed) {
+      const need = stepNeed(gap3(a.fromLab, e.fromLab));
+      if (!need) continue;
+      const m = gap3(a.toLab, lab) / need;
+      if (m < least) { least = m; hit = a; }
+    }
+    return { least, hit };
+  };
+  for (const e of entries) {
+    const now = e.fixed ? { least: 1, hit: null } : clearance(e, e.toLab);
+    if (now.least < 1) {
+      const { hit } = now;
+      let best = { least: now.least, to: e.to, lab: e.toLab };
+      const tryAt = (to) => {
+        const lab = labOf(...to), c = clearance(e, lab).least;
+        if (c > best.least + 1e-9) best = { least: c, to, lab };
+        return c >= 1;
+      };
+      let done = false;
+      const kind = oklch(...e.to);
+      // another colour of the colour set, nearest first, that the material allows and that is the same kind of colour
+      for (const x of set.map((y) => ({ ...y, d: gap3(y.lab, e.toLab) })).filter((y) => y.d > 1e-6).sort((p, q) => p.d - q.d).slice(0, 6)) {
+        if (!sameKind(kind, x.lch) || holdColour(e.material, e.from, x.rgb) !== x.rgb) continue;
+        if ((done = tryAt(x.rgb))) break;
+      }
+      if (!done) {
+        // a step away from the colour it clashes with: the way it differed from it when made, or its own colour made
+        // lighter or darker than that one (the lighter of the two when made first); never into another kind of colour
+        const d = [e.fromLab[0] - hit.fromLab[0], e.fromLab[1] - hit.fromLab[1], e.fromLab[2] - hit.fromLab[2]];
+        const len = Math.hypot(d[0], d[1], d[2]) || 1;
+        const need = stepNeed(gap3(hit.fromLab, e.fromLab));
+        const up = Math.abs(d[0]) >= 0.02 ? Math.sign(d[0]) : (d[2] >= 0 ? 1 : -1);
+        const ways = [(k) => [hit.toLab[0] + (d[0] * k) / len, hit.toLab[1] + (d[1] * k) / len, hit.toLab[2] + (d[2] * k) / len],
+          (k) => [hit.toLab[0] + up * k, e.toLab[1], e.toLab[2]], (k) => [hit.toLab[0] - up * k, e.toLab[1], e.toLab[2]]];
+        search: for (const part of [1.08, 0.75, 0.5, 1.5]) for (const way of ways) {
+          const lab = way(need * part);
+          lab[0] = Math.min(1, Math.max(0.03, lab[0]));         // no lighter than white
+          const to = holdColour(e.material, e.from, fromLab(lab));
+          if (sameKind(kind, oklch(...to)) && tryAt(to)) break search;
+        }
+      }
+      e.to = best.to; e.toLab = best.lab;
+    }
+    placed.push(e);
+  }
+}
+
+/** The lightest and darkest a colour may be made to keep tones apart under a one-colour look (OKLab lightness). */
+const L_RANGE = [0.04, 0.985];
+/** The most spreadLightness moves a tone from the lightness the look gave it: past this the look would no longer be itself. */
+const L_PUSH = 0.15;
+
+/**
+ * Under a one-colour look: moves the lightness of `movers` so that every two tones that were clearly different
+ * (toneNeed), or a step apart (stepNeed), end apart, with `fixed` entries (the outline, where the look swaps it) staying where they are. Each mover
+ * stays inside its material's lightness limits, no further than L_PUSH from the lightness the look gave it, and
+ * keeps the strength and hue the look gave it (the look's own cast;
+ * a signal or warning colour its own hue), which counts toward its difference from the others.
+ * How: all of them are put in order of the lightness the look gave them (two the look made just as light go in the
+ * order they had when made: the lighter stays lighter, of two equally light the warmer). In that order each pair
+ * that must be apart gets the gap it needs, but no more than a cap that is as large as the room allows (found by
+ * halving): in a crowded picture every pair still gets as much as it can, and the small gaps that were asked for in
+ * full. Each tone is then put as near the lightness the look gave it as those gaps let it be: first the mean of the
+ * placing pushed up and the placing pushed down (so no side takes all the moving), then each in turn as near its own
+ * as its neighbours allow.
+ */
+function spreadLightness(movers, fixed) {
+  if (!movers.length) return;
+  const all = [...movers, ...fixed].map((e, i) => ({ e, moves: i < movers.length, wish: e.toLab[0] }));
+  for (const a of all) {
+    if (!a.moves) { a.lo = a.hi = a.wish; continue; }
+    const lim = limitsOf(a.e.material, a.e.from, { oneColour: true }).light;
+    a.lo = Math.min(a.wish, Math.max(L_RANGE[0], a.wish - L_PUSH, lim ? lim[0] : 0));
+    a.hi = Math.max(a.wish, Math.min(L_RANGE[1], a.wish + L_PUSH, lim ? lim[1] : 1));
+  }
+  const madeOrder = (p, q) => { const dl = p.e.fromLab[0] - q.e.fromLab[0]; return Math.abs(dl) >= 0.02 ? dl : p.e.fromLab[2] - q.e.fromLab[2]; };
+  all.sort((p, q) => (Math.abs(p.wish - q.wish) > 1e-6 ? p.wish - q.wish : madeOrder(p, q)));
+  const n = all.length;
+  // r[i][j], i < j in that order: the lightness gap the pair needs (the part hue and strength do not already give)
+  const r = all.map(() => new Float64Array(n));
+  let most = 0;
+  for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) {
+    const need = stepNeed(gap3(all[i].e.fromLab, all[j].e.fromLab));
+    if (!need || (!all[i].moves && !all[j].moves)) continue;
+    const ab = Math.hypot(all[i].e.toLab[1] - all[j].e.toLab[1], all[i].e.toLab[2] - all[j].e.toLab[2]);
+    r[i][j] = Math.sqrt(Math.max(0, need * need - ab * ab)) * 1.02;
+    most = Math.max(most, r[i][j]);
+  }
+  if (!most) return;
+  // the earliest (up) and latest (down) each may be, with every gap capped at `cap`; null when that does not fit
+  const envelopes = (cap) => {
+    const up = new Float64Array(n), down = new Float64Array(n);
+    for (let k = 0; k < n; k++) { let v = all[k].lo; for (let j = 0; j < k; j++) if (r[j][k]) v = Math.max(v, up[j] + Math.min(r[j][k], cap)); up[k] = v; }
+    for (let k = n - 1; k >= 0; k--) { let v = all[k].hi; for (let j = k + 1; j < n; j++) if (r[k][j]) v = Math.min(v, down[j] - Math.min(r[k][j], cap)); down[k] = v; }
+    for (let k = 0; k < n; k++) if (up[k] > down[k] + 1e-9) return null;
+    return { up, down };
+  };
+  let cap = most, env = envelopes(cap);
+  if (!env) {
+    let lo = 0, hi = most;
+    env = envelopes(0);
+    if (!env) return;                                   // the fixed ones alone do not fit: leave the look as it is
+    for (let i = 0; i < 14; i++) { const mid = (lo + hi) / 2; const got = envelopes(mid); if (got) { lo = mid; env = got; } else hi = mid; }
+    cap = lo;
+  }
+  const { up, down } = env;
+  const g = (j, k) => Math.min(r[j][k], cap);
+  const pushedUp = new Float64Array(n), pushedDown = new Float64Array(n);
+  for (let k = 0; k < n; k++) { let v = Math.max(up[k], all[k].wish); for (let j = 0; j < k; j++) if (r[j][k]) v = Math.max(v, pushedUp[j] + g(j, k)); pushedUp[k] = Math.min(down[k], v); }
+  for (let k = n - 1; k >= 0; k--) { let v = Math.min(down[k], all[k].wish); for (let j = k + 1; j < n; j++) if (r[k][j]) v = Math.min(v, pushedDown[j] - g(k, j)); pushedDown[k] = Math.max(up[k], v); }
+  // from there, each in turn goes as near the lightness the look gave it as its neighbours' gaps let it, until none can
+  const x = all.map((_, k) => (pushedUp[k] + pushedDown[k]) / 2);
+  for (let sweep = 0; sweep < 40; sweep++) {
+    let moved = 0;
+    for (let k = 0; k < n; k++) {
+      if (!all[k].moves) continue;
+      let lo = up[k], hi = down[k];
+      for (let j = 0; j < k; j++) if (r[j][k]) lo = Math.max(lo, x[j] + g(j, k));
+      for (let j = k + 1; j < n; j++) if (r[k][j]) hi = Math.min(hi, x[j] - g(k, j));
+      const v = Math.min(hi, Math.max(lo, all[k].wish));
+      if (lo <= hi + 1e-9 && Math.abs(v - x[k]) > 1e-6) { moved = Math.max(moved, Math.abs(v - x[k])); x[k] = v; }
+    }
+    if (moved < 1e-4) break;
+  }
+  for (let k = 0; k < n; k++) {
+    const a = all[k];
+    if (!a.moves) continue;
+    if (Math.abs(x[k] - a.e.toLab[0]) < 1e-4) continue;
+    const c = oklch(...a.e.to);
+    a.e.to = fromOklch(x[k], c.C, c.h);
+    a.e.toLab = labOf(...a.e.to);
+  }
 }
 
 // ---- presets -----------------------------------------------------------------
@@ -207,38 +686,62 @@ export function assetSeed(seed, id) {
   return (h ^ (h >>> 13)) >>> 0;
 }
 
-// How far `shapes` moves each kind of control from where the bundle has it.
-const RANGE_SPREAD = 0.4;    // a slider moves up to 40% of its travel either way
-const CHOICE_CHANCE = 0.5;   // a list control switches to another option half the time
-const COLOUR_CHANCE = 0.6;   // a colour control picks another of its swatches
-const TOGGLE_CHANCE = 0.25;  // an on/off control flips
+// What "Also change shapes" may do (Contract 7). A look must never remove or swap what makes a sprite recognisable:
+//   a slider     moves by at most `spread` of its travel, and never out of the safe middle of its range (the range
+//                without `edge` of its travel at each end), where a sprite is itself at any setting. A slider that
+//                is already outside the middle never moves further out. A slider marked look: 'keep' does not move.
+//   a choice     is left alone, unless the sprite marks it look: 'vary' (its options are variants of one thing).
+//                Then it takes another option `vary` of the time, but never one that takes a part off, never an
+//                option called "none" or "off", and never when it is at such an option now.
+//   an on/off    is left alone, unless marked look: 'vary'; then it flips `flip` of the time. A switch that puts a
+//                part on or off (the first control of a part) never flips.
+//   a part       what a sprite holds or wears (Contract 3) is never taken off, put on or swapped for another kind:
+//                its first control is left alone unless marked look: 'vary'.
+//   a colour     is never changed here: colours are the look's own job, held by their material (applyColour).
+/** The limits of "Also change shapes": { spread, edge, vary, flip } (see themedParams). */
+export const SHAPES = { spread: 0.25, edge: 0.2, vary: 0.5, flip: 0.25 };
+
+const OFF_VALUES = new Set(['none', 'off']);
 
 /**
  * The controls to render `sprite` with under `theme`.
  * theme.shapes false: `baseParams` itself, unchanged.
- * theme.shapes true: each control nudged from `baseParams` using theme.seed and
- * the sprite's id, so one seed always gives one look and sprites in the same
- * bundle vary differently. Always valid values (cleanParams).
+ * theme.shapes true: sliders nudged from `baseParams` inside the safe middle of their range, and the choices and
+ * switches the sprite marks look: 'vary' varied (SHAPES), using theme.seed and the sprite's id, so one seed always
+ * gives one look and sprites in the same bundle vary differently. Nothing is taken off or swapped for another kind
+ * of thing, and no colour is touched. Always valid values (cleanParams).
  */
 export function themedParams(sprite, baseParams, theme) {
   if (!theme || !theme.shapes) return baseParams;
   const base = cleanParams(sprite, baseParams || {});
   const r = rng(assetSeed(theme.seed ?? 0, sprite.id));
   const p = { ...base };
+  const parts = partList(sprite);
   for (const [k, d] of Object.entries(sprite.params)) {
     // Draw the same number of random values for every control, so adding one
     // control to a sprite does not reshuffle the others.
     const a = r(), b = r();
+    if (d.look === 'keep') continue;
+    const part = parts.find((x) => x.selector === k);
     if (d.kind === 'range') {
-      let v = base[k] + (a * 2 - 1) * RANGE_SPREAD * (d.max - d.min);
-      if (d.step) v = d.min + Math.round((v - d.min) / d.step) * d.step;
+      const span = d.max - d.min;
+      const lo = Math.min(base[k], d.min + SHAPES.edge * span), hi = Math.max(base[k], d.max - SHAPES.edge * span);
+      let v = Math.min(hi, Math.max(lo, base[k] + (a * 2 - 1) * SHAPES.spread * span));
+      if (d.step) {
+        v = d.min + Math.round((v - d.min) / d.step) * d.step;
+        if (v < lo - 1e-9) v += d.step;
+        if (v > hi + 1e-9) v -= d.step;
+        if (v < lo - 1e-9 || v > hi + 1e-9) v = base[k];
+      }
       p[k] = Number(v.toFixed(6));
     } else if (d.kind === 'choice') {
-      if (a < CHOICE_CHANCE) p[k] = d.options[Math.floor(b * d.options.length)].value;
-    } else if (d.kind === 'color') {
-      if (a < COLOUR_CHANCE && d.swatches?.length) p[k] = d.swatches[Math.floor(b * d.swatches.length)];
+      if (d.look !== 'vary' || a >= SHAPES.vary) continue;
+      const off = new Set([...OFF_VALUES, ...(part && part.none !== undefined ? (Array.isArray(part.none) ? part.none : [part.none]) : [])]);
+      if (off.has(base[k])) continue;
+      const options = d.options.map((o) => o.value).filter((v) => !off.has(v));
+      if (options.length) p[k] = options[Math.floor(b * options.length)];
     } else if (d.kind === 'toggle') {
-      if (a < TOGGLE_CHANCE) p[k] = !base[k];
+      if (d.look === 'vary' && !part && a < SHAPES.flip) p[k] = !base[k];
     }
   }
   return cleanParams(sprite, p);
@@ -290,15 +793,56 @@ export function randomTheme(seed = 0, { shapes = false } = {}) {
 }
 
 /**
- * Render one frame with the theme's controls and colours. Returns what renderFrame returns: a Surface in the pixel style.
- * style: the style to draw in (one the sprite lists; its first when left out).
+ * The record of what "Also change shapes" made of one sprite: { key: value } for each control whose value the look
+ * changed ({} when it changed none, or the look leaves shapes alone). The sprite's own settings with this on top are
+ * exactly what the look draws it with. A bag keeps it per sprite (Contract 6, `lookParams`) and hands it back as
+ * spriteLook's `record`, so what the bag drew once it keeps drawing, even after the rule behind shapes changes.
  */
-export function renderThemedFrame(sprite, clip, frame, baseParams, theme, { style } = {}) {
+export function shapeRecord(sprite, baseParams, theme) {
   const t = normalizeTheme(theme);
+  if (!t.shapes) return {};
+  const base = cleanParams(sprite, baseParams || {});
+  const p = themedParams(sprite, base, t);
+  return Object.fromEntries(Object.keys(sprite.params).filter((k) => p[k] !== base[k]).map((k) => [k, p[k]]));
+}
+
+const isRecord = (r) => r !== null && typeof r === 'object' && !Array.isArray(r);
+
+/**
+ * Everything one sprite needs under a look, and the record of what was made (Contract 7): the settings it is
+ * actually drawn with, which of them the look changed, and how its pixels are recoloured.
+ * sprite: a sprite; baseParams: the settings it has without the look; theme: the look; style: the art style (its first when left out).
+ * record (optional): what the look made of the sprite's shapes before (shapeRecord, as a bag keeps it). Under a look
+ * with shapes it is used instead of working the shapes out again; under a look without shapes it is ignored.
+ * Returns { params, changed, recolour(pixels) }:
+ *   params    every control's value as drawn (themedParams): drawing the sprite with these, with no look, and then
+ *             calling recolour, gives the same picture again;
+ *   changed   the keys of the controls whose value the look changed ([] unless the look changes shapes);
+ *   recolour  recolours pixels in place and returns them (applyColour with the sprite's materials at these
+ *             settings, spriteMaterials: not the plain colour maths, which would give another picture).
+ */
+export function spriteLook(sprite, baseParams, theme, { style, record } = {}) {
+  const t = normalizeTheme(theme);
+  const base = cleanParams(sprite, baseParams || {});
+  const params = t.shapes && isRecord(record) ? cleanParams(sprite, { ...base, ...record }) : themedParams(sprite, base, t);
+  const changed = Object.keys(sprite.params).filter((k) => params[k] !== base[k]);
+  const plain = !colourTransform(t.colour);
+  // what each colour is of is found by drawing, so it is only found when a pixel is first recoloured
+  let table = null;
+  const recolour = plain ? (pixels) => pixels : (pixels) => applyColour(pixels, t.colour, table ??= spriteMaterials(sprite, params, { style }));
+  return { params, changed, recolour };
+}
+
+/**
+ * Render one frame with the theme's controls and colours. Returns what renderFrame returns: a Surface in the pixel style.
+ * style: the style to draw in (one the sprite lists; its first when left out). record: as spriteLook.
+ */
+export function renderThemedFrame(sprite, clip, frame, baseParams, theme, { style, record } = {}) {
   const st = styleFor(sprite, style);
-  const g = renderFrame(sprite, clip, frame, themedParams(sprite, cleanParams(sprite, baseParams || {}), t), { style: st.id });
+  const look = spriteLook(sprite, baseParams, theme, { style: st.id, record });
+  const g = renderFrame(sprite, clip, frame, look.params, { style: st.id });
   // a surface that is not a pixel grid says how a look recolours it (engine/styles.js, defineStyle)
-  if (st.recolour) st.recolour(g, (pixels) => applyColour(pixels, t.colour));
-  else applyColour(g.data, t.colour);
+  if (st.recolour) st.recolour(g, look.recolour);
+  else look.recolour(g.data);
   return g;
 }

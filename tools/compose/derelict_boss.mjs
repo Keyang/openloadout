@@ -99,7 +99,7 @@ export function build(gains = GAINS) {
     id: 'derelict-boss',
     name: 'Station boss theme',
     tags: ['music', 'boss', 'electronic', 'adaptive', 'loop'],
-    description: 'Relentless, distorted boss music in C minor with an alarm in it, 8 to 32 bars long: Intensity brings in a half-time kick and snare and the alarm, then a kick on every 8th note with gated chords, then pushes the melody forward over crushed drums, and you can change the tempo, key, grit and the instrument that plays the tune.',
+    description: 'Relentless, dark, distorted boss music with an alarm in it, in short or long versions: Intensity brings in a heavy, slow beat and the alarm, then a fast pounding beat with choppy chords, then pushes the tune forward over crushed drums, and you can change the speed, pitch, grit and the instrument that plays the tune.',
     meta: {
       type: 'music', role: 'music/boss', themes: ['sci-fi', 'space'], gameTypes: ['roguelike-action', 'shooter', 'arcade'],
       words: ['boss', 'fight', 'battle', 'showdown', 'danger', 'alarm', 'siren', 'enraged', 'relentless', 'distorted', 'electronic', 'synth', 'industrial', 'heavy'],

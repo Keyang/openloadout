@@ -4,11 +4,14 @@
 // ground and sky the playground draws when the bag has no tiles or background.
 import { renderFrame, clipFps } from '../../engine/sprite.js';
 import { artStyleOf, pixelsOf, recolourFrame } from '../../engine/styles.js';
-import { applyColour } from '../../engine/theme.js';
+import { applyColour, spriteMaterials, namedMaterials } from '../../engine/theme.js';
 import { hexToRgb, rgbToHex, pack } from '../../engine/color.js';
 import { hash } from '../../engine/motion.js';
 import { levelTiles, surfaceBelow, CELL } from './level.js';
 import { layerSpeed, layerShift, drawOrder } from './layers.js';
+
+/** The scene is this many sprite pixels high: one background layer (320 x 180) fills it. */
+export const VIEW_H = 180;
 
 const mod = (a, n) => ((a % n) + n) % n;
 const PLAIN = {
@@ -17,6 +20,7 @@ const PLAIN = {
   floor: '#d9dfc0', floorSpeck: '#c6cea9', wallTop: '#8a7fa8', wallFace: '#5d557f', wallEdge: '#231b33', outside: '#2d2646',
   shade: '#231b33',
 };
+const PLAIN_OF = namedMaterials(PLAIN);       // looks: what each of these is of, by its name
 
 /**
  * sprites: { key: { sprite, params, artStyle? } } for every sprite entry that is drawn (artStyle: the bag item's art style, Contract 12).
@@ -31,7 +35,7 @@ export function createPainter({ sprites, colour, tiles: tileSets = null }) {
     let v = tinted.get(hex);
     if (!v) {
       const px = new Uint32Array([pack(...hexToRgb(hex))]);
-      applyColour(px, colour);
+      applyColour(px, colour, PLAIN_OF);       // looks: the scene's own sky stays sky, its grass stays grass (Contract 7)
       v = rgbToHex(px[0] & 255, (px[0] >>> 8) & 255, (px[0] >>> 16) & 255);
       tinted.set(hex, v);
     }
@@ -47,8 +51,9 @@ export function createPainter({ sprites, colour, tiles: tileSets = null }) {
       const { sprite, params, artStyle } = sprites[key];
       const style = artStyleOf(sprite, artStyle);
       let g;
-      if (style === 'pixel') { g = renderFrame(sprite, clip, f, params); applyColour(g.data, colour); }
-      else g = pixelsOf(recolourFrame(renderFrame(sprite, clip, f, params, { style }), style, (pixels) => applyColour(pixels, colour)), style);
+      const of = () => spriteMaterials(sprite, params, { style });       // looks: what each colour of this sprite is of, found when a look first needs it
+      if (style === 'pixel') { g = renderFrame(sprite, clip, f, params); applyColour(g.data, colour, of); }
+      else g = pixelsOf(recolourFrame(renderFrame(sprite, clip, f, params, { style }), style, (pixels) => applyColour(pixels, colour, of)), style);
       cv = document.createElement('canvas');
       cv.width = g.w; cv.height = g.h;
       cv.getContext('2d').putImageData(new ImageData(g.bytes(), g.w, g.h), 0, 0);
@@ -102,7 +107,7 @@ export function createPainter({ sprites, colour, tiles: tileSets = null }) {
     };
     // what the bag has no tiles for at all is drawn plainly
     if (laid.plain.includes('floor')) plainFloor(g, level, laid.open);
-    if (laid.plain.includes('ground')) plainGround(g, level);
+    if (laid.plain.includes('ground')) plainGround(g, level, C);
     if (laid.plain.includes('thin')) plainThin(g, level);
     for (const t of laid.tiles) if (!t.over) tile(t);
     if (laid.plain.includes('wall')) plainWalls(g, level);
@@ -121,37 +126,6 @@ export function createPainter({ sprites, colour, tiles: tileSets = null }) {
     return cv;
   }
   let frontCanvas = null;
-
-  function plainGround(g, level) {
-    const T = level.tile;
-    const at = (c, r) => (r < 0 ? CELL.EMPTY : r >= level.rows || c < 0 || c >= level.cols ? CELL.SOLID : level.cells[r * level.cols + c]);
-    for (let r = 0; r < level.rows; r++) for (let c = 0; c < level.cols; c++) {
-      const v = at(c, r), x = c * T, y = r * T;
-      if (v === CELL.EMPTY) continue;
-      if (v !== CELL.SOLID) {
-        // a slope: one column at a time
-        for (let i = 0; i < T; i++) {
-          const top = v === CELL.UP ? T - 1 - i : i;
-          g.fillStyle = C.dirt; g.fillRect(x + i, y + top, 1, T - top);
-          g.fillStyle = C.grass; g.fillRect(x + i, y + top, 1, Math.min(5, T - top));
-          g.fillStyle = C.grassEdge; if (T - top > 5) g.fillRect(x + i, y + top + 5, 1, 1);
-        }
-        continue;
-      }
-      g.fillStyle = C.dirt; g.fillRect(x, y, T, T);
-      g.fillStyle = C.dirtSpeck;
-      for (let i = 0; i < 3; i++) g.fillRect(x + 3 + Math.floor(hash(c * 5 + i, r) * (T - 8)), y + 8 + Math.floor(hash(c, r * 5 + i) * (T - 12)), 2, 1);
-      if (at(c, r - 1) === CELL.EMPTY) {
-        g.fillStyle = C.grass; g.fillRect(x, y, T, 5);
-        g.fillStyle = C.grassEdge; g.fillRect(x, y + 5, T, 1);
-        for (let i = 0; i < T; i++) if (hash(x + i, 1) < 0.09) g.fillRect(x + i, y - 2, 1, 2);
-      }
-      g.fillStyle = C.dirtSpeck;
-      if (at(c - 1, r) === CELL.EMPTY) g.fillRect(x, y + (at(c, r - 1) === CELL.EMPTY ? 6 : 0), 1, T);
-      if (at(c + 1, r) === CELL.EMPTY) g.fillRect(x + T - 1, y + (at(c, r - 1) === CELL.EMPTY ? 6 : 0), 1, T);
-      if (at(c, r + 1) === CELL.EMPTY) g.fillRect(x, y + T - 2, T, 2);
-    }
-  }
 
   function plainThin(g, level) {
     for (const p of level.thins) {
@@ -241,8 +215,8 @@ export function createPainter({ sprites, colour, tiles: tileSets = null }) {
 
   // ---- things
 
-  // With a palette every pixel on screen should be one of its colours, so the shadow is a
-  // checker of one solid colour there, and a soft see-through shadow otherwise.
+  // With a colour set nothing see-through is drawn, so no blend adds colours of its own to the picture: the
+  // shadow is a checker of one solid colour there, and a soft see-through shadow otherwise.
   const strict = !!(colour && colour.palette);
   function shadow(g, x, y, w) {
     if (strict) {
@@ -301,6 +275,46 @@ export function createPainter({ sprites, colour, tiles: tileSets = null }) {
   }
 
   return { frame, allFrames, draw, look };
+}
+
+/**
+ * The ground of a side-view level with no tileset in the bag, painted plainly: dirt with a grass top, a darker line
+ * down each open side and along each open underside. Nothing is painted outside the cells that hold ground, except
+ * the blades of grass that stand two pixels above a top.
+ * g: a 2D drawing context (only fillStyle and fillRect are used); C: the colours { dirt, dirtSpeck, grass, grassEdge }.
+ */
+export function plainGround(g, level, C) {
+  const T = level.tile;
+  const at = (c, r) => (r < 0 ? CELL.EMPTY : r >= level.rows || c < 0 || c >= level.cols ? CELL.SOLID : level.cells[r * level.cols + c]);
+  for (let r = 0; r < level.rows; r++) for (let c = 0; c < level.cols; c++) {
+    const v = at(c, r), x = c * T, y = r * T;
+    if (v === CELL.EMPTY) continue;
+    if (v !== CELL.SOLID) {
+      // a slope: one column at a time
+      for (let i = 0; i < T; i++) {
+        const top = v === CELL.UP ? T - 1 - i : i;
+        g.fillStyle = C.dirt; g.fillRect(x + i, y + top, 1, T - top);
+        g.fillStyle = C.grass; g.fillRect(x + i, y + top, 1, Math.min(5, T - top));
+        g.fillStyle = C.grassEdge; if (T - top > 5) g.fillRect(x + i, y + top + 5, 1, 1);
+      }
+      continue;
+    }
+    g.fillStyle = C.dirt; g.fillRect(x, y, T, T);
+    g.fillStyle = C.dirtSpeck;
+    for (let i = 0; i < 3; i++) g.fillRect(x + 3 + Math.floor(hash(c * 5 + i, r) * (T - 8)), y + 8 + Math.floor(hash(c, r * 5 + i) * (T - 12)), 2, 1);
+    if (at(c, r - 1) === CELL.EMPTY) {
+      g.fillStyle = C.grass; g.fillRect(x, y, T, 5);
+      g.fillStyle = C.grassEdge; g.fillRect(x, y + 5, T, 1);
+      for (let i = 0; i < T; i++) if (hash(x + i, 1) < 0.09) g.fillRect(x + i, y - 2, 1, 2);
+    }
+    g.fillStyle = C.dirtSpeck;
+    // the line down an open side starts under the grass of an open top, and ends at the bottom of the block: drawn
+    // any longer it hangs under a floating block like a leg
+    const from = at(c, r - 1) === CELL.EMPTY ? 6 : 0;
+    if (at(c - 1, r) === CELL.EMPTY) g.fillRect(x, y + from, 1, T - from);
+    if (at(c + 1, r) === CELL.EMPTY) g.fillRect(x + T - 1, y + from, 1, T - from);
+    if (at(c, r + 1) === CELL.EMPTY) g.fillRect(x, y + T - 2, T, 2);
+  }
 }
 
 /** Side view: the lowest the view goes. It rests showing the top row of the ground and a little of what is under it. */

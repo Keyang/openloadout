@@ -252,7 +252,7 @@ export function homePage(app, query) {
     el('span', { class: 'hint' }, 'Try'),
     EXAMPLES.map((text) => {
       const btn = el('button', { type: 'button', class: 'pill', onclick: () => view.search(text) }, text);
-      finder.direct(text).then((ids) => { if (!ids.length) btn.remove(); }).catch(() => {});      // only examples that find something
+      finder.direct(text, { index: false }).then((ids) => { if (!ids.length) btn.remove(); }).catch(() => {});      // only examples that find something (from the catalogue: no index fetched for this)
       return btn;
     }));
   app.replaceChildren(header('home'), el('main', { class: 'home front' },

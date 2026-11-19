@@ -9,7 +9,7 @@
   "potion",
   "loop"
  ],
- "description": "Stream of chirping sine blobs with random pitch. A loop you can run live.",
+ "description": "A stream of chirping bubbles, each at its own pitch. A loop that keeps playing while you move the sliders.",
  "meta": {
   "type": "ambience",
   "role": "environment/ambience",
@@ -43,7 +43,7 @@
  "params": [
   {
    "id": "rate",
-   "label": "Rate",
+   "label": "Speed",
    "min": 1,
    "max": 25,
    "default": 7,
@@ -52,7 +52,7 @@
   },
   {
    "id": "pitch",
-   "label": "Size",
+   "label": "Pitch",
    "min": 200,
    "max": 2000,
    "default": 600,

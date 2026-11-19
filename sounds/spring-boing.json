@@ -4,7 +4,7 @@
   "name": "Spring",
   "category": "movement",
   "tags": ["spring", "bounce", "boing", "cartoon"],
-  "description": "A cartoon spring: the pitch leaps up an octave, then wobbles and settles, over a short metallic twang. Pitch, wobble, length, brightness and metal can be changed.",
+  "description": "A cartoon spring: the pitch leaps up high, then wobbles and settles, over a short metal twang. Pitch, wobble, length, brightness and metal can be changed.",
   "meta": {
     "type": "sfx",
     "role": "world/machine",

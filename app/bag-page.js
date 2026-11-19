@@ -3,11 +3,11 @@
 import { assetById, spriteNow, loadSprites, onCatalogChange } from './catalog.js';   // W2-G: which sprites exist comes from the catalogue; their programs are loaded when the bag needs them
 import { defaultParams, cleanParams, clipFps } from '../engine/sprite.js';
 import { artStyleOf, stylesOf, styleById, pixelsOf } from '../engine/styles.js';   // W6-A: an item is shown in its art style (Contract 12)
-import { renderThemedFrame } from '../engine/theme.js';
+import { renderThemedFrame, spriteLook } from '../engine/theme.js';
 import { applySound, themedSoundParams, soundSettingsFor } from '../sound/theme.js';
 import { el, header, saveBlob, SPRITE_BG, SOUND_BG, TILE_BG, drawSpriteOnTile, reduceMotion } from './ui.js';
 import { soundById, soundParams, rendered, renderAsync, playRendered, playLive, drawWave } from './audio.js';
-import { bag, LINK_LIMIT } from './bag.js';
+import { bag, LINK_LIMIT, NOT_KEPT } from './bag.js';
 import { restoreRuntime, madeItemState } from './api.js';      // W5-A, W5-B: what the bag holds that was made on a visit is checked again, off the page, before it is shown
 import { packageFiles, defaultCues, activeTheme, kindMatches } from './bundle.js';
 import { zip } from './zip.js';
@@ -73,7 +73,8 @@ function spritePicture(sprite, settings, theme) {
   const frame = (f) => {
     let cv = frames.get(f);
     if (!cv) {
-      const g = style === first && style === 'pixel' ? renderThemedFrame(sprite, clip, f, p, theme) : pixelsOf(renderThemedFrame(sprite, clip, f, p, theme, { style }), style);
+      // looks: drawn from what the bag recorded its look made of the sprite (Contract 7, "The record")
+      const g = style === first && style === 'pixel' ? renderThemedFrame(sprite, clip, f, p, theme, { record: settings.lookParams }) : pixelsOf(renderThemedFrame(sprite, clip, f, p, theme, { style, record: settings.lookParams }), style);
       cv = document.createElement('canvas');
       cv.width = g.w; cv.height = g.h;
       cv.getContext('2d').putImageData(new ImageData(g.bytes(), g.w, g.h), 0, 0);
@@ -204,14 +205,16 @@ function musicPicture(patch, settings, theme) {
  * What a row says about its item, in plain words: what was changed (at most three things, then how many more),
  * built from each control's own words (app/changes.js). Returns { text, all }: `all` lists every change, for the row's tooltip.
  */
-function describe(item) {
+function describe(item, theme = null) {
   const s = item.settings ?? {};
   let changes = [], parts;
   if (item.kind === 'sprite') {
     const sprite = spriteNow(item.id);
-    if (sprite) changes = spriteChanges(sprite, s.params ?? {});
+    // looks: under a look that also changes shapes, the row says what the sprite is really drawn with (Contract 7)
+    const used = sprite && theme ? spriteLook(sprite, s.params ?? {}, theme, { record: s.lookParams }) : null;
+    if (sprite) changes = spriteChanges(sprite, used ? used.params : s.params ?? {});
     const style = sprite ? artStyleOf(sprite, s.artStyle) : null;
-    parts = [changes.length ? inWords(changes) : 'Standard look', style && style !== stylesOf(sprite)[0] ? `${styleById(style).label} style` : null, s.scale > 1 ? `pixel size ${s.scale}×` : null];
+    parts = [changes.length ? inWords(changes) : 'Standard look', used && used.changed.length ? 'shapes changed by the bag\'s look' : null, style && style !== stylesOf(sprite)[0] ? `${styleById(style).label} style` : null, s.scale > 1 ? `pixel size ${s.scale}×` : null];
   } else {
     const patch = soundById[item.id];
     if (patch) changes = soundChanges(patch, s.style, soundParams(patch, s.style, s.params));
@@ -325,7 +328,7 @@ export function bagPage(app, query = {}, isCurrent = () => true) {
     else if (!gone) pic = item.kind === 'music' ? musicPicture(patch, item.settings, theme) : soundPicture(patch, item.settings, theme);
     if (pic) pictures.push(pic);
     const name = sprite?.name ?? patch?.name ?? item.id;
-    const said = gone ? null : describe(item);
+    const said = gone ? null : describe(item, theme);
     return el('li', { class: 'bag-item', 'data-key': item.key },
       pic ? pic.node : el('div', { class: 'bag-pic gone' }),
       el('div', { class: 'bag-text' },
@@ -372,6 +375,7 @@ export function bagPage(app, query = {}, isCurrent = () => true) {
   async function download() {
     if (busy) return;
     busy = true; dlBtn.disabled = true;
+    bag.fillLooks();      // looks: the package holds what the bag shows
     const items = bag.items();
     say(items.some((i) => i.kind === 'music') ? 'Putting your package together. Music takes a few seconds…' : 'Putting your package together…');
     try {
@@ -395,6 +399,17 @@ export function bagPage(app, query = {}, isCurrent = () => true) {
     }
     try { await navigator.clipboard.writeText(url); linkNote.textContent = 'Link copied. Anyone who opens it gets a bag with these same items and settings.'; }
     catch { linkNote.textContent = 'Your browser did not allow copying. Select the link below and copy it.'; linkNote.append(el('input', { class: 'bag-link-text', readonly: true, value: url, 'aria-label': 'Link to this bag' })); }
+  }
+
+  function notKept(n) {
+    if (bag.kept()) return null;
+    const why = bag.saved() ? NOT_KEPT
+      : 'Your bag could not be saved: this browser\'s storage for the site is full. What is in it now will be gone when you reload or close the page. Download it now, copy its link, or take things out until this message goes away.';
+    return el('div', { class: 'bag-unsaved', role: 'alert' },
+      el('p', {}, el('strong', {}, n ? 'This bag is for this visit only. ' : 'Anything you add is for this visit only. '), why),
+      n ? el('div', { class: 'bag-unsaved-do' },
+        el('button', { type: 'button', class: 'btn', onclick: () => { exportBox.scrollIntoView({ block: 'nearest' }); download(); } }, 'Download it now'),
+        el('button', { type: 'button', class: 'ghost', onclick: copyLink }, 'Copy the link to this bag')) : null);
   }
 
   function tools(n) {
@@ -425,6 +440,7 @@ export function bagPage(app, query = {}, isCurrent = () => true) {
     const shown = new Map();
     for (const li of main.querySelectorAll('.bag-item[data-key]')) { const cv = li.querySelector('canvas.tile'); if (cv) shown.set(li.dataset.key, cv); }
     stopPictures();
+    bag.fillLooks();      // looks: sprites whose programs have come in since get their record now, and are drawn from it
     const items = bag.items(), theme = bag.theme();
     fetchSprites(items);   // W2-G
     if (items.some(pendingMade)) restoreRuntime(true).then(() => { if (here() && !bag.items().some(pendingMade)) build(); });      // W5-B: drawn again once each is back, or known to need re-making
@@ -432,8 +448,9 @@ export function bagPage(app, query = {}, isCurrent = () => true) {
     const counts = ['sprite', 'sound', 'music'].map((k) => [k, items.filter((i) => i.kind === k).length]).filter(([, c]) => c);
     main.replaceChildren(...[
       el('h1', { class: 'small' }, 'Your bag'),
-      // W5-B: a save the browser refused is said, not swallowed
-      bag.saved() ? null : el('p', { class: 'status bag-unsaved', role: 'alert' }, 'Your bag could not be saved: this browser\'s storage for the site is full. What is in it now will be gone when you reload or close the page. Download it now, or take things out until this message goes away.'),
+      // W5-B: a save the browser refused is said, not swallowed; and a browser that keeps nothing (a private window,
+      // blocked site data) is said too, with the two ways to keep the bag right there
+      notKept(items.length),
       offerBox(),
       items.length
         ? [

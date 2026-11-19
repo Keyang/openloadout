@@ -20,6 +20,7 @@ function parseHash() {
 }
 
 function notFound(what) {
+  document.title = 'Not here · Loadout';       // not the title of the page they came from
   app.replaceChildren(header(''), el('main', { class: 'home' },
     el('h1', { class: 'small' }, `That ${what} is not here`),
     el('p', { class: 'lede' }, 'The link may be old or mistyped. Everything that exists is on the front page.'),
@@ -27,7 +28,11 @@ function notFound(what) {
   return () => {};
 }
 
-const waiting = () => app.replaceChildren(el('main', { class: 'home' }, el('p', { class: 'lede' }, 'Loading…')));
+// the header stays while a page loads (the one index.html drew, or the last page's), so the frame never goes blank
+const waiting = () => {
+  const top = app.querySelector('header.top');
+  app.replaceChildren(...(top ? [top] : []), el('main', { class: 'home' }, el('p', { class: 'lede' }, 'Loading…')));
+};
 
 // Pages that are loaded only when visited. The page function returns its teardown, or a promise of it.
 // open(module, still): still() is false once the visitor has moved on; a page that waits for something checks it before drawing.
@@ -52,6 +57,21 @@ function sounds() {
   soundsWanted ??= loadSounds().catch((e) => { console.error(e); }).then(() => { soundsIn = true; });   // sprites still work without sounds
   return soundsWanted;
 }
+/** Does this address open a page that waits for the sound library? */
+const needsSounds = ({ parts: [a, b] }) => !LISTS.has(a ?? '') && !(a === 'music' && !b);
+/** A slow or metered connection (where the browser says so): nothing is fetched ahead of need. */
+const slowLink = () => { const c = navigator.connection; return !!c && (c.saveData === true || /(^|-)(2g|3g)$/.test(c.effectiveType ?? '')); };
+
+/**
+ * While the sound library is on its way, the page's own code (and a sprite's program, with the rig it is drawn on)
+ * is fetched alongside it instead of after it. Nothing runs yet: the page opens as usual once the sounds are in.
+ */
+const PAGE_FILES = { sprite: './sprite-page.js', sound: './sound-page.js', music: './music-page.js', bag: './bag-page.js', bundle: './bundle-page.js', play: './play-page.js' };
+function warmUp(a, b) {
+  const file = a === 'sound' && soundById[b] && isMusic(soundById[b]) ? PAGE_FILES.music : PAGE_FILES[a];
+  if (file) import(file).catch(() => {});                    // a failure shows when the page itself opens
+  if (a === 'sprite' && kindOf(b) === 'sprite') loadSprite(b).catch(() => {});
+}
 
 /** Go to another address without leaving the old one in the Back history. */
 function moveTo(hash) { location.replace(hash); }
@@ -74,8 +94,9 @@ function route(moved) {
   const here = location.hash;
   // W5-A: something made on an earlier visit that the bag holds is checked again off the page, after the page has drawn; its own page waits for that
   if (b && madePending(b)) { waiting(); restoreRuntime(true).then(() => { if (location.hash === here) route(); }); return; }
-  if (!LISTS.has(a ?? '') && !(a === 'music' && !b) && !soundsIn) {
+  if (needsSounds({ parts }) && !soundsIn) {
     waiting();
+    warmUp(a, b);
     sounds().then(() => { if (location.hash === here) route(); });
     return;
   }
@@ -101,6 +122,8 @@ function route(moved) {
 }
 
 waiting();
+// a first page that needs the sound library asks for it now, alongside the catalogue, not after it
+if (needsSounds(parseHash())) sounds();
 // ==== W2-G: the catalogue's address ====
 // Test-only: on a developer's machine "?catalog=<file>.json" swaps in a stand-in catalogue (standInCatalog: localhost only).
 const standIn = standInCatalog();
@@ -113,8 +136,9 @@ try {
   window.addEventListener('hashchange', route);
   route();
   setTimeout(() => restoreRuntime(), 0);      // W5-A: after the first page is up, what the bag holds from an earlier visit is checked again (in workers, never here)
-  // fetch the sound library in a quiet moment, so the first asset page opens at once
-  if (window.requestIdleCallback) window.requestIdleCallback(() => sounds()); else setTimeout(sounds, 400);
+  // fetch the sound library in a quiet moment, so the first asset page opens at once; not on a slow or metered
+  // connection, where it would hold up the pictures on screen (an asset page then fetches it when it opens)
+  if (!slowLink()) { if (window.requestIdleCallback) window.requestIdleCallback(() => sounds()); else setTimeout(sounds, 400); }
 } catch (e) {
   // For whoever runs the site: the catalogue (generated/catalog.json) is written by "npm run build". A visitor cannot fix that, so the page does not ask them to.
   console.error('Loadout could not start: the catalogue did not load. If this is your copy of the site, run "npm run build" and publish the generated/ folder.', e);

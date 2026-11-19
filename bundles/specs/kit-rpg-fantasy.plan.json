@@ -2,6 +2,7 @@
   "id": "kit-rpg-fantasy",
   "name": "Hearthvale turn-based RPG kit",
   "gameType": "turn-based-rpg",
+  "blurb": "Everything for a turn-based fantasy role-playing game: a party seen on the map and in battle, villagers, enemies and a dragon, meadow, village, shore and dungeon ground, buildings, portraits, spell effects, battle backgrounds, menus, sounds and two tracks.",
   "theme": "fantasy",
   "view": "top-down",
   "palette": {

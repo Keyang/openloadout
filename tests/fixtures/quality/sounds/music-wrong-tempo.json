@@ -3,7 +3,7 @@
  "id": "q-song-tempo",
  "name": "Test song",
  "category": "music",
- "description": "Breaks: plays at 100 bpm while the written tempo is 120.",
+ "description": "Breaks: plays at 100 beats a minute while the written tempo is 120.",
  "meta": {
   "type": "music",
   "role": "music/battle",
@@ -31,7 +31,7 @@
  "params": [
   {
    "id": "bpm",
-   "label": "Tempo",
+   "label": "Speed",
    "min": 100,
    "max": 140,
    "default": 120,

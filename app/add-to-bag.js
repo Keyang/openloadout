@@ -53,6 +53,8 @@ export function addToBag(kind, id, getSettings, query) {
       key = bag.add({ kind, id, settings });
       note.textContent = `Added to your bag. It now holds ${bag.count()} item${bag.count() === 1 ? '' : 's'}.`;
     }
+    // a browser that keeps nothing (private window, blocked site data) is said where the adding happens
+    if (!bag.kept()) note.textContent += ' This browser is not keeping your bag: it will be gone when you reload or close the page. Download it or copy its link from your bag before you leave.';
     go.hidden = false;
     sync();
   });

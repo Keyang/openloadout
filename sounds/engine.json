@@ -9,7 +9,7 @@
   "kart",
   "loop"
  ],
- "description": "Four-stroke style engine. Run it live and drive the RPM and throttle sliders.",
+ "description": "A car or kart engine. Play it and move the Engine speed and Throttle sliders while it runs.",
  "meta": {
   "type": "sfx",
   "role": "world/machine",
@@ -42,11 +42,11 @@
  "wrap": true,
  "duration": 3,
  "normalize": false,
- "gain": 0.47,
+ "gain": 0.42,
  "params": [
   {
    "id": "rpm",
-   "label": "RPM",
+   "label": "Engine speed",
    "min": 700,
    "max": 8000,
    "default": 1500,

@@ -103,7 +103,7 @@ export default defineSprite({
     width: range('Width', 0.6, { lo: 'Narrow', hi: 'Wide' }),
     style: choice('Style', 'pylon', [{ value: 'pylon', label: 'Pylon' }, { value: 'orb', label: 'Orb' }, { value: 'wall mount', label: 'Wall mount' }]),
     beams: choice('Beams', 'two', [{ value: 'one', label: 'One' }, { value: 'two', label: 'Two' }, { value: 'three', label: 'Three' }]),
-    body: color('Posts', D.hull, BODIES),
+    body: color('Posts', D.hull, BODIES, { material: 'metal' }),
     accent: color('Warning paint', D.amber, swatches('derelict', 'accent', { lead: 'amber' })),
     glow: color('Beam', D.red, swatches('derelict', 'glow', { lead: 'red' })),
     flicker: range('Flicker', 0.5, { lo: 'Steady', hi: 'Wild', group: 'Motion' }),

@@ -4,7 +4,7 @@
  "name": "Menu confirm",
  "category": "ui",
  "tags": ["menu", "confirm", "select", "bell"],
- "description": "Choosing a command: two soft bell notes a fifth apart, the second higher, with a short glassy shimmer. Warm, round and the same every time.",
+ "description": "Choosing a command: two soft bell notes, the second higher, with a short glassy shimmer. Warm, round and the same every time.",
  "meta": {
   "type": "sfx",
   "role": "interface/confirm",
@@ -16,7 +16,7 @@
  "duration": "1/speed + ring*0.85 + 0.015",
  "params": [
   { "id": "pitch", "label": "Pitch", "min": 300, "max": 1200, "default": 520, "unit": "Hz", "scale": "log" },
-  { "id": "spread", "label": "Interval", "min": 2, "max": 12, "default": 7, "unit": "semitones" },
+  { "id": "spread", "label": "Jump between notes", "min": 2, "max": 12, "default": 7, "unit": "semitones" },
   { "id": "speed", "label": "Speed", "min": 7, "max": 22, "default": 12, "unit": "notes/s" },
   { "id": "ring", "label": "Ring", "min": 0.06, "max": 0.2, "default": 0.12, "unit": "s" },
   { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.45 }

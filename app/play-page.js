@@ -8,19 +8,18 @@ import { bag } from './bag.js';
 import { loadCatalog, currentCatalog, assetById, loadSprite, loadSound } from './catalog.js';
 import { soundById, soundState, stopAll, toUnit, toValue, isChoice } from './audio.js';
 import { cleanParams, clipFps, clipStretch } from '../engine/sprite.js';
-import { normalizeTheme, themedParams } from '../engine/theme.js';
-import { rowFromSprite, rowFromPatch, planScene, SCENE_ROLES } from './play/roles.js';
+import { normalizeTheme, spriteLook } from '../engine/theme.js';
+import { rowFromSprite, rowFromPatch, planScene, SCENE_ROLES, MODES } from './play/roles.js';
 import { buildKind, soundIdsOf, isCustom, harmfulLiquid } from './play/kinds.js';
 import { extraActions, lookupClip } from './play/clips.js';
 import { makeLevel, levelFeatures, tileIndex, levelText } from './play/level.js';
 import { createWorld, resetWorld, step, spawn, removeOne, countOf, snapshot, activeLoops } from './play/world.js';
-import { createPainter, cameraFor } from './play/draw.js';
+import { createPainter, cameraFor, VIEW_H } from './play/draw.js';
 import { createInput } from './play/input.js';
 import { createSounds } from './play/sound.js';
 import { displayPlan, fillSpan } from './play/display.js';
-import { howTo, roleNote, keysLine } from './play/words.js';
+import { howTo, roleNote, keysLine, viewName, leftOutNote, viewReason } from './play/words.js';
 
-const VIEW_H = 180;      // the scene is this many sprite pixels high: one background layer (320 x 180) fills it
 const HEARD_MAX = 60;
 const BOSS_HP = 8;
 
@@ -30,8 +29,10 @@ export async function playPage(app) {
   app.replaceChildren(header('play'), main);
 
   const guests = [];                 // assets handed over directly instead of through the bag (see addAssets)
-  const picks = {};                  // the visitor's choice of player and background
-  const keep = { paused: false, music: false, started: false };    // survives a rebuild
+  // The visitor's choices: the view, and for each view its own player and background, so that switching the view
+  // and back brings back exactly what was there (a pick made in one view is never used in the other).
+  const picks = { mode: null, side: {}, top: {} };
+  const keep = { paused: false, music: false, started: false, allPieces: false };    // survives a rebuild
   const heard = [];                  // the last sounds that fired, for the browser tests
   let heardTotal = 0;
   let scene = null, gone = false, builds = 0;
@@ -88,7 +89,8 @@ export async function playPage(app) {
     const drawn = {};
     for (const e of entries) {
       if (!e.sprite) continue;
-      drawn[e.key] = { sprite: e.sprite, params: themedParams(e.sprite, cleanParams(e.sprite, e.settings.params ?? {}), theme), artStyle: e.settings.artStyle };
+      // looks: from what the bag recorded its look made of the sprite, when it has a record (Contract 7, "The record")
+      drawn[e.key] = { sprite: e.sprite, params: spriteLook(e.sprite, e.settings.params ?? {}, theme, { record: e.settings.lookParams }).params, artStyle: e.settings.artStyle };
       e.soundIds = soundIdsOf(e.sprite, e.settings.cues ?? null, drawn[e.key].params).filter((id) => patchOf(id));
     }
     const plan = planScene(entries, picks);
@@ -175,8 +177,21 @@ export async function playPage(app) {
       const health = player ? el('span', { class: 'play-count play-health' }, 'Health: ', healthText) : null;
       const healthNow = () => (world.player ? { hp: world.player.hp, max: player.hp } : { hp: 3, max: 3 });
       const pieces = plan.display.map((key) => displayPiece(painter, key, byKey[key].row.name, drawn[key].sprite, drawn[key].params, healthNow));
+      // The bag's interface pieces are ONE ROW that scrolls sideways inside itself, however many there are, so a
+      // large bag does not push the scene down the page. "Show all" folds the row open (the pieces wrap, to be
+      // looked at together) and "Show one row" folds it away again; the button is there only when the row overflows,
+      // and it comes before the row, so it stays in the same place, on the first line, when the row is folded open.
+      const strip = pieces.length ? el('div', { class: 'play-pieces', role: 'group', tabindex: '0', 'aria-label': 'Interface pieces from your bag' }, pieces.map((p) => p.node)) : null;
+      const more = strip ? el('button', { type: 'button', class: 'mini play-pieces-more', hidden: true, onclick: () => { keep.allPieces = !keep.allPieces; syncPieces(); } }) : null;
+      const syncPieces = () => {
+        if (!strip) return;
+        strip.classList.toggle('open', keep.allPieces);
+        more.setAttribute('aria-expanded', String(keep.allPieces));
+        more.textContent = keep.allPieces ? 'Show one row' : `Show all ${pieces.length}`;
+        more.hidden = !keep.allPieces && strip.scrollWidth <= strip.clientWidth + 1;
+      };
       const hud = count || health || pieces.length
-        ? el('div', { class: 'play-hud', 'aria-label': 'Score and health' }, el('span', { class: 'play-hud-title' }, 'Score and health'), count, health, pieces.map((p) => p.node))
+        ? el('div', { class: 'play-hud', 'aria-label': 'Score and health' }, el('span', { class: 'play-hud-title' }, 'Score and health'), count, health, more, strip)
         : null;
 
       // tools
@@ -189,10 +204,17 @@ export async function playPage(app) {
         const sel = lookupClip(player.clipNames, action, { mode: plan.mode, view: player.view });
         return (sel ? player.clips[sel.clip].label : action).replace(/\s*\(.*\)$/, '');
       };
+      // The view: which one the scene is in, and, when the bag has things for both, the way to the other one.
+      const setView = (mode) => { if (mode === plan.mode) return; picks.mode = mode; build(); };
+      const viewPick = el('span', { class: 'play-extras play-view' }, el('span', { class: 'label' }, 'View'),
+        plan.modes.length > 1
+          ? el('span', { class: 'pills small', role: 'group', 'aria-label': 'View' }, MODES.filter((m) => plan.modes.includes(m)).map((m) => el('button', { type: 'button', class: 'pill', 'aria-pressed': String(m === plan.mode), onclick: () => setView(m) }, viewName(m))))
+          : el('span', { class: 'play-view-now' }, viewName(plan.mode)));
       const tools = el('div', { class: 'play-tools' },
         muteBtn, pauseBtn,
         el('button', { type: 'button', class: 'ghost', onclick: () => { resetWorld(world); free.x = level.start.x; free.y = level.start.y; cam = null; syncCounts(); } }, 'Reset the scene'),
         el('button', { type: 'button', class: 'ghost play-copy', onclick: copyLevel }, 'Copy this level'),
+        viewPick,
         extras.length ? el('span', { class: 'play-extras' }, el('span', { class: 'label' }, 'Other moves'),
           el('span', { class: 'pills small' }, extras.map((action) => el('button', { type: 'button', class: 'pill', onclick: () => { pendingClip = action; } }, labelOf(action))))) : null);
 
@@ -220,12 +242,12 @@ export async function playPage(app) {
       // what is in the scene, with add one / remove one
       const counters = [];
       const syncCounts = () => { for (const [key, node] of counters) node.textContent = String(countOf(world, key)); };
-      const rows = entries.filter((e) => e.sprite).map((e) => {
+      // (what was drawn for the other view is not in the scene: it is listed on its own, under the scene)
+      const rows = entries.filter((e) => e.sprite && !plan.leftOut.includes(e.key)).map((e) => {
         const role = plan.roles[e.key];
         // a sprite the visitor changed says so, so it is clear this is their version and not the one in the catalogue
         const mine = isCustom(e.sprite, e.settings) ? el('span', { class: 'play-tag' }, 'your version') : null;
-        const unused = plan.otherTiles.includes(e.key) ? `Made for ${top ? 'side view' : 'top-down'}, so it is not used in this scene.` : null;
-        const row = el('li', {}, el('span', { class: 'play-name' }, e.row.name, mine), el('span', { class: 'hint' }, unused ?? roleNote(role, { player: !!player })));
+        const row = el('li', {}, el('span', { class: 'play-name' }, e.row.name, mine), el('span', { class: 'hint' }, roleNote(role, { player: !!player })));
         if (SCENE_ROLES.includes(role)) {
           const n = el('span', { class: 'play-n', 'aria-label': `${e.row.name} in the scene` });
           counters.push([e.key, n]);
@@ -238,13 +260,25 @@ export async function playPage(app) {
       });
       syncCounts();
       const choice = (label, field, list) => (list.length < 2 ? null : el('div', { class: 'play-pick' }, el('span', { class: 'label' }, label),
-        el('span', { class: 'pills small', role: 'group', 'aria-label': label }, list.map((key) => el('button', { type: 'button', class: 'pill', 'aria-pressed': String(plan[field] === key), onclick: () => { picks[field] = key; build(); } }, byKey[key].row.name)))));
+        el('span', { class: 'pills small', role: 'group', 'aria-label': label }, list.map((key) => el('button', { type: 'button', class: 'pill', 'aria-pressed': String(plan[field] === key), onclick: () => { picks[plan.mode][field] = key; build(); } }, byKey[key].row.name)))));
       const notes = [];
-      if (!player) notes.push(el('p', { class: 'hint' }, 'There is no character to play as in your bag, so the arrow keys only move the view. ', el('a', { href: '#/browse?kind=sprite' }, 'Find a character')));
+      const otherMode = MODES.find((m) => m !== plan.mode);
+      // a character drawn for the other view is in the bag: say so, instead of sending the visitor off to find one
+      const playerElsewhere = plan.leftOut.some((key) => byKey[key].row.role === 'characters/player');
+      if (!player && playerElsewhere) notes.push(el('p', { class: 'hint' }, `There is no character drawn for this view to play as, so the arrow keys only move the view. Switch to ${viewName(otherMode)} to play as the one in your bag.`));
+      else if (!player) notes.push(el('p', { class: 'hint' }, 'There is no character to play as in your bag, so the arrow keys only move the view. ', el('a', { href: '#/browse?kind=sprite' }, 'Find a character')));
       if (top && plan.backgrounds.length) notes.push(el('p', { class: 'hint' }, 'Seen from above, the background lies under the room: it only shows through a pit you can see into.'));
       if (missing) notes.push(el('p', { class: 'hint' }, `${missing} thing${missing === 1 ? '' : 's'} in your bag could not be found, so ${missing === 1 ? 'it is' : 'they are'} not here.`));
 
       blocks.push(el('div', { class: 'play-card' }, hud, wrap, pad, tools, copyNote, howNote, keysNote));
+      // Under the scene: what was left out of it because it was drawn for the other view, why, and the way to see it.
+      if (plan.leftOut.length) {
+        blocks.push(el('section', { class: 'play-left-out', 'aria-label': 'Left out of this scene' }, el('h2', {}, 'Left out of this scene'),
+          el('p', {}, leftOutNote(plan.leftOut.map((key) => byKey[key].row.name), plan.mode)),
+          el('p', { class: 'play-left-out-do' },
+            el('button', { type: 'button', class: 'btn plain', onclick: () => setView(otherMode) }, `Switch to ${viewName(otherMode)}`),
+            el('span', { class: 'hint' }, viewReason(plan.why, plan.mode)))));
+      }
       blocks.push(el('section', { class: 'play-things' }, el('h2', {}, 'In the scene'),
         choice('Play as', 'player', plan.players), choice('Background', 'background', plan.backgrounds),
         el('ul', {}, rows), notes));
@@ -285,17 +319,18 @@ export async function playPage(app) {
         for (const p of pieces) p.tick(world.time);
         raf = requestAnimationFrame(tick);
       };
-      const ro = new ResizeObserver(fit);
+      const ro = new ResizeObserver(() => { fit(); syncPieces(); });
       stops.push(() => { cancelAnimationFrame(raf); ro.disconnect(); });
       stateOf = () => ({
         ...snapshot(world), paused: keep.paused, muted: !soundState.on, zoom: view.zoom, view: { w: view.w, h: view.h },
+        cam: cam ? { x: Math.round(cam.x), y: Math.round(cam.y) } : null,        // the corner of the scene the picture shows, as it was last drawn
         heard: [...heard], heardTotal, music: tracks.some((t) => t.playing() || t.starting()),
         map: mapText,
-        plan: { mode: plan.mode, player: plan.player, tilesets: plan.tilesets, background: plan.background, scene: plan.scene, display: plan.display, board: plan.board, music: plan.music },
+        plan: { mode: plan.mode, modes: plan.modes, why: plan.why, leftOut: plan.leftOut, player: plan.player, tilesets: plan.tilesets, background: plan.background, scene: plan.scene, display: plan.display, board: plan.board, music: plan.music },
       });
       putPlayer = (x, y) => { if (!world.player) return false; Object.assign(world.player, { x, y, vx: 0, vy: 0, onGround: plan.mode === 'top' }); cam = null; return true; };
       // start once the page is in place, so the scene knows how wide it can be
-      queueMicrotask(() => { if (gone) return; ro.observe(wrap); fit(); raf = requestAnimationFrame(tick); });
+      queueMicrotask(() => { if (gone) return; ro.observe(wrap); if (strip) ro.observe(strip); fit(); syncPieces(); raf = requestAnimationFrame(tick); });
     } else {
       blocks.push(el('p', { class: 'lede' }, 'Your bag has sounds but nothing to draw yet, so here they are to listen to. Add a character or a creature to see a scene.'),
         el('div', { class: 'play-tools' }, muteBtn));
@@ -451,8 +486,9 @@ const pieceScale = (sprite) => (Math.max(sprite.size[0], sprite.size[1]) <= 32 ?
 /**
  * An interface piece or icon in the "Score and health" strip. What it shows comes from its clip names
  * (app/play/display.js): a bar filled to the player's health inside its opening, glyphs for each point of
- * health, a button with its states, or a set: every clip side by side. Each clip is its own small canvas,
- * so a long set wraps onto the next line instead of pushing the page wider than the screen.
+ * health, a button with its states, or a set: every clip side by side. Each clip is its own small canvas: in the
+ * strip's one row they stay side by side (the row scrolls), and when the row is folded open ("Show all") a long
+ * set wraps onto the next line instead of pushing the page wider than the screen.
  * health(): { hp, max } now.
  */
 function displayPiece(painter, key, name, sprite, params, health) {

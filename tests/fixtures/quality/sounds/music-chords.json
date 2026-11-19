@@ -3,7 +3,7 @@
  "id": "q-chords",
  "name": "Chord song",
  "category": "music",
- "description": "Test track in C major: C, F, G, C, with a bass, a pad and a tune written to those chords.",
+ "description": "Test track: chords C, F, G, C, with a bass, a pad and a tune written to those chords.",
  "meta": {
   "type": "music",
   "role": "music/battle",
@@ -31,7 +31,7 @@
  "params": [
   {
    "id": "bpm",
-   "label": "Tempo",
+   "label": "Speed",
    "min": 100,
    "max": 140,
    "default": 120,

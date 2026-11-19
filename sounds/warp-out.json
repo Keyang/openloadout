@@ -4,7 +4,7 @@
   "name": "Warp",
   "category": "vehicle",
   "tags": ["sci-fi", "teleport", "warp", "machine"],
-  "description": "Teleporting away: a stack of sines gliding up with a slow chorus and noise swelling under them, cut off suddenly by a sub thump. A negative rise runs it the other way: it starts with the thump and glides down. Length, pitch, rise, shimmer and thump can be changed.",
+  "description": "Teleporting away: a stack of pure tones gliding up with a slow shimmer and a hiss swelling under them, cut off suddenly by a deep thump. Set Glide below the middle to run it the other way: it starts with the thump and glides down. Length, pitch, glide, shimmer and thump can be changed.",
   "meta": {
     "type": "sfx",
     "role": "world/machine",
@@ -17,7 +17,7 @@
   "params": [
     { "id": "length", "label": "Length", "min": 0.55, "max": 1.4, "default": 1.1, "unit": "s", "scale": "log" },
     { "id": "pitch", "label": "Pitch", "min": 150, "max": 700, "default": 300, "unit": "Hz", "scale": "log" },
-    { "id": "rise", "label": "Rise", "min": -24, "max": 24, "default": 24, "unit": "semitones" },
+    { "id": "rise", "label": "Glide", "min": -24, "max": 24, "default": 24, "unit": "semitones" },
     { "id": "shimmer", "label": "Shimmer", "min": 0, "max": 1, "default": 0.6 },
     { "id": "thump", "label": "Thump", "min": 0, "max": 1, "default": 0.7 }
   ],

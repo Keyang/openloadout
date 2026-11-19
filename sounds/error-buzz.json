@@ -9,7 +9,7 @@
   "denied",
   "buzzer"
  ],
- "description": "Two short falling dissonant buzzes: wrong answer / action not allowed.",
+ "description": "Two short falling buzzes that clash: a wrong answer, or something that is not allowed.",
  "meta": {
   "type": "sfx",
   "role": "interface/error",
@@ -74,7 +74,7 @@
   },
   {
    "id": "bite",
-   "label": "Bite",
+   "label": "Brightness",
    "unit": "Hz",
    "min": 600,
    "max": 3000,
@@ -83,7 +83,7 @@
   },
   {
    "id": "clash",
-   "label": "Dissonance",
+   "label": "Clash",
    "unit": "semitones",
    "min": 0.3,
    "max": 1.5,

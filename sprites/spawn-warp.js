@@ -72,7 +72,7 @@ export default defineSprite({
     rings: choice('Rings', 'two', ['one', 'two', 'three']),
     pieces: range('Ticks', 8, { min: 4, max: 12, step: 1, lo: 'Few', hi: 'Many' }),
     core: color('Core', D.cream, CORE),
-    edge: color('Edge', D.red, EDGE),
+    edge: color('Edge', D.red, EDGE, { material: 'warning' }),   // a spawn warning: a look must leave it as loud as it is
     flicker: range('Flicker', 0.5, { lo: 'Steady', hi: 'Wild', group: 'Motion' }),
     speed: range('Speed', 0.5, { lo: 'Slow', hi: 'Fast', group: 'Motion' }),
   },

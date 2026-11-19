@@ -55,8 +55,8 @@ export default defineSprite({
     style: choice('Style', 'ball', ['ball', 'comet', 'skull']),
     length: range('Length', 0.5, { lo: 'Short', hi: 'Long' }),
     sparks: toggle('Sparks', true),
-    core: color('Core', P.cream, CORE),
-    glow: color('Glow', P.ember, GLOW),
+    core: color('Core', P.cream, CORE, { material: 'fire' }),   // flame: a look keeps it a fire colour
+    glow: color('Glow', P.ember, GLOW, { material: 'fire' }),
     flicker: range('Flicker', 0.5, { lo: 'Steady', hi: 'Wild', group: 'Motion' }),
     speed: range('Speed', 0.5, { lo: 'Slow', hi: 'Fast', group: 'Motion' }),
   },

@@ -37,7 +37,7 @@
 //   meaningTimeoutMs       how long a search waits for the model to read the query before answering with keywords only. Default 1200
 //   meaningLoadTimeoutMs   how long the model may take to download and start before it is given up on. Default 180000
 import {
-  createKeywordIndex, countFacets, similarByMeta, matchesFilters, keywordSql, mergeRankings, vectorNorms, topKVectors,
+  createKeywordIndex, countFacets, similarByMeta, matchesFilters, keywordSql, mergeKeywordRankings, mergeMeaningRanking, vectorNorms, topKVectors,
   normalize, hasRealWords, MAX_QUERY_CHARS,
 } from './core.js';
 
@@ -92,6 +92,10 @@ export async function createSearch({
       fetch(dbHref).then((r) => { if (!r.ok) throw new Error(`${dbHref}: ${r.status}`); return r.arrayBuffer(); }),
     ]);
     if (closed) return;
+    // The index file is opened in memory and never stored. SQLite's browser build would otherwise set up a way to
+    // keep databases in the browser's storage as it starts, and that throws (and logs errors) when the browser
+    // blocks storage, as a private window can. SQLite reads this setting once, while it starts, and then removes it.
+    globalThis.sqlite3ApiConfig = { ...(globalThis.sqlite3ApiConfig || {}), disable: { vfs: { kvvfs: true } } };
     const sqlite3 = await mod.default({ print: () => {}, printErr: () => {} });
     if (closed) return;
     const data = new Uint8Array(bytes);
@@ -235,7 +239,7 @@ export async function createSearch({
     try {
       const { sql, params } = keywordSql(query, { filters, limit: Math.max(limit, POOL), expand: basic.correct });
       const fromIndex = known(db.selectObjects(sql, params));
-      return mergeRankings([fromCatalogue, fromIndex]);
+      return mergeKeywordRankings(query, fromCatalogue, fromIndex);
     } catch (err) {
       console.warn('Loadout search: the index file could not answer, using the catalogue.', err);
       return fromCatalogue;
@@ -257,7 +261,7 @@ export async function createSearch({
       if (h.score < minScore) break;                    // not similar enough to be a result
       byMeaning.push({ id: rowIds[h.index], score: h.score });
     }
-    return mergeRankings([keywords, byMeaning], { limit });
+    return mergeMeaningRanking(q, keywords, byMeaning, { limit });
   }
 
   async function similar(id, n = 6) {

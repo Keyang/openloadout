@@ -732,6 +732,49 @@ metal: color('Metal', P.steel, swatches('hearthvale', 'metal'), { when: [{ weapo
 - Labels and end words are everyday words. No "amplitude", "params", "offset".
 - Group order in `params`: Look sliders and choices, then each part's settings together, then colours, then Motion.
 
+### Whole-bundle looks: what you must tell the engine
+
+A visitor can restyle a whole bundle with one look (`docs/architecture.md`, Contract 7). A look may move hue, warmth and tone, but your sprite must stay what it is: its sky a sky, its skin skin, its warning a warning, and with "Also change shapes" still the same thing with the same parts. The engine does this for every sprite, from what your controls say. Three things are yours.
+
+**1. Name colour controls for what they are of.** The engine reads a colour's material from the control's label, then its key (`engine/materials.js`, `controlMaterial`):
+
+| Say | For | A look then |
+|---|---|---|
+| Sky, Space, Clouds, Mist | sky | keeps it a sky colour, lighter and cooler than the ground |
+| Water, Foam, Ice | water | keeps it blue-green, apart from the land |
+| Grass, Leaves, Moss, Flowers, Fruit | plant | keeps a meadow green, not olive |
+| Soil, Path, Hills, Bank, Roof, Thatch | earth | |
+| Wood, Rope, Leather | wood | |
+| Stone, Rock, Walls, Floor, Plating, Bone, Skull | stone | may give it a cast, never a strong colour |
+| Metal, Steel, Gold, Blade, Armour | metal | keeps gold golden |
+| Skin, Fur, Hide, Feathers, Belly, Scales | skin | keeps that skin tone; a red dragon stays red |
+| Fire, Flame, Lava, Torch | fire | |
+| Glow, Light, Eyes, Screen, Beam | light | |
+| Magic, Crystal, Gem, Jewel, Seal | magic | |
+| Outfit, Robe, Cape, Trim, Apron, Banners, Hair | cloth | any colour, about as light or dark as made |
+| Warning, Hazard, Danger | warning | keeps it as loud as made, under every look |
+| Heart (on any sprite); Health, Shield, Mana, Experience (in an interface piece or an icon) | signal | keeps the colour that carries the meaning, under every look |
+
+Anything else ("Body", "Accent", "Colour") is `paint` on most sprites: a look may do what it likes with it. That is right for a slime's body and wrong for a spawn warning, a health potion's red or a wooden door. **Where the label cannot say it, declare it.** A label that names a thing which can be made of different stuff ("Door": wood or metal; "Liquid"; "Card"; "Shard"; "Block"; "Barrel"; "Crate": `UNSAID_WORDS` in `engine/materials.js`) must always be declared, and the checker warns until it is:
+
+```js
+edge: color('Edge', P.red, EDGE, { material: 'warning' }),      // spawn-warp: the ring is a warning
+edge: color('Edge', P.heal, EDGE, { material: 'signal' }),      // fx-heal: the green means healing
+glow: color('Glow', P.ember, GLOW, { material: 'fire' }),       // wall-torch: the glow is a flame
+```
+
+Declared so far: `spawn-warp` (warning), `fx-heal` (signal), the flames of `fx-fire-spell`, `explosion-small`, `explosion-large`, `fireball` and `wall-torch` (fire); what a pickup gives: `potion` liquid, `xp-shard` shard, `keycard` stripe (signal); hazards: `acid-pool` body, `blast-door` stripes (warning); what a thing is made of: `dungeon-door` door (wood), `blast-door` door and `laser-gate` posts (metal), `crumble-block` (stone), `spore-hopper` pod and ruff (plant), `bat` fur and wings (skin), `market-stall` stripes and `arrow` fletching (cloth). A free colour can be declared too, so the checker stops asking: `keycard` card (paint). A colour that no control paints takes the sprite's rest material: `signal` in an interface piece (its fixed colours are colour codes), `light` in an effect or a projectile, otherwise `paint`. If your sprite's fixed colours are all one thing, say so on the sprite: `materials: { rest: 'stone' }`. Better still, give a sky or a body of water its own colour control: a fixed blue is `paint`, and a look will repaint it.
+
+**2. Keep tones apart by lightness (rule 8 of section 3).** The engine keeps clearly different tones apart under every look: under a look of many colours by moving one of them to another colour of the same kind (never a brown plank to green), under shades of grey by spreading every tone out in lightness. In a very crowded picture it may still fall short; the checker then warns "two tones ... become nearly the same" with the pair and the look. Make them differ in lightness, or declare the one that carries a meaning.
+
+**3. Mark what "Also change shapes" may and may not touch.** The rule (`themedParams`): a slider moves at most a quarter of its travel and stays in the middle of its range; a choice, an on/off control and what a sprite holds or wears are never changed; colours are never changed. So:
+
+- **Every sprite must still be itself with every slider anywhere in the middle three fifths of its range.** If one slider can lose what the sprite is even there (a saw whose teeth vanish at "few"), mark it `{ look: 'keep' }`.
+- **A choice is only varied when you mark it `{ look: 'vary' }`**, and you may only do that after looking at every option on the contact sheet and finding each one plainly the same thing: eye shapes that all read as eyes, a stripe pattern. Not a weapon, not a liquid, not a time of day, not a style where one option drops the feature (the slime's "dots" eyes are one pixel each: not marked). No choice in the three kits is marked yet.
+- An option called `none` or `off` is never picked, and a part is never taken off, even when marked.
+
+The checker runs all of this by itself ("held under every look", and the frame-edge check at 12 shape seeds). To look: `node tools/render.mjs <id>` and the bundle page with `?look=forest`, `?look=mono` and `?surprise=7&shapes=1`.
+
 ---
 
 ## 11. Sound

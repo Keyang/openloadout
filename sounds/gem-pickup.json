@@ -9,7 +9,7 @@
   "gem",
   "arcade"
  ],
- "description": "Three rising chime notes of a major chord with a glassy ping on each; the last one rings. Interval steps between chord voicings (open fifths, close triad, triad to octave, wide) and at the far end becomes a two-note key jingle (the note, then a fifth above).",
+ "description": "Three rising chime notes of a happy chord with a glassy ping on each; the last one rings. Note spread moves the notes from close together to far apart, and at its far end it becomes a two-note key jingle.",
  "meta": {
   "type": "sfx",
   "role": "items/pickup",
@@ -54,14 +54,14 @@
   },
   {
    "id": "spread",
-   "label": "Interval",
+   "label": "Note spread",
    "min": 0.4,
    "max": 1.75,
    "default": 1
   },
   {
    "id": "speed",
-   "label": "Speed",
+   "label": "Time between notes",
    "unit": "s",
    "min": 0.05,
    "max": 0.09,

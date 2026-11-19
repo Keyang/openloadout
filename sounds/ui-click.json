@@ -8,7 +8,7 @@
   "tick",
   "tap"
  ],
- "description": "Short, dry button tick: a pitched blip with a noisy snap and an optional woody knock.",
+ "description": "A short, dry button tick: a pitched blip with a sharp snap and a woody knock you can add.",
  "meta": {
   "type": "sfx",
   "role": "interface/click",
@@ -47,7 +47,7 @@
  "params": [
   {
    "id": "tone",
-   "label": "Tone",
+   "label": "Pitch",
    "min": 500,
    "max": 6000,
    "default": 1800,

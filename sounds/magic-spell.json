@@ -9,7 +9,7 @@
   "fantasy",
   "heal"
  ],
- "description": "Gliding FM pad with random harmonic sparkles and a reverb tail.",
+ "description": "A gliding, bell-like swell with random sparkles and a long echoing tail.",
  "meta": {
   "type": "sfx",
   "role": "actions/cast",
@@ -66,7 +66,7 @@
   },
   {
    "id": "sparkle",
-   "label": "Sparkle rate",
+   "label": "Sparkles",
    "min": 5,
    "max": 60,
    "default": 28,

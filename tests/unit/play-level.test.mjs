@@ -6,7 +6,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { makeLevel, levelFeatures, tileIndex, levelMap, levelText, levelTiles, isWall, solidAt, surfaceBelow, supportAt, wetAt, CELL } from '../../app/play/level.js';
-import { cameraFloor } from '../../app/play/draw.js';
+import { cameraFloor, VIEW_H } from '../../app/play/draw.js';
+import { JUMP_V, GRAVITY } from '../../app/play/world.js';
 import { FENCE } from '../../engine/fences.js';
 import { readMap } from '../../engine/maptext.js';
 import { classifyTiles, layoutTiles, pickPiece, nearestPiece, blockKind, BLOCK_PIECES, NARROW_PIECES, LANE_PIECES } from '../../engine/tiles.js';
@@ -21,7 +22,7 @@ const build = (mode, index) => { const level = makeLevel(mode, levelFeatures(ind
 const tileAt = (tiles, c, r) => tiles.filter((t) => t.x === c * 32 && t.y === r * 32).map((t) => t.clip);
 const cell = (level, c, r) => level.cells[r * level.cols + c];
 
-test('side view: a ground, a step, an island, a platform, a strip, a pillar, a single block and places to put things', () => {
+test('side view: a ground, a step, an island, a platform, a ledge, a block two tall, a single block, a post, the cliff at the end and places to put things', () => {
   const level = makeLevel('side');
   assert.equal(level.mode, 'side');
   assert.equal(level.tile, 32);
@@ -42,11 +43,97 @@ test('side view: a ground, a step, an island, a platform, a strip, a pillar, a s
   const step = supportAt(level, 13.5 * 32, 3.5 * 32);
   assert.equal(step.y, level.groundY - 64, 'the step is two tiles high');
   assert.deepEqual([step.x0, step.x1], [12 * 32, 15 * 32]);
-  // ground one tile thick: a strip three wide, a pillar three tall, a block on its own
-  assert.deepEqual([12, 13, 14].map((c) => cell(level, c, 2)), [CELL.SOLID, CELL.SOLID, CELL.SOLID]);
-  assert.deepEqual([cell(level, 13, 1), cell(level, 13, 3)], [CELL.EMPTY, CELL.EMPTY]);
-  assert.deepEqual([cell(level, 3, 1), cell(level, 3, 2), cell(level, 3, 3), cell(level, 3, 0), cell(level, 3, 4), cell(level, 2, 2), cell(level, 4, 2)], [CELL.SOLID, CELL.SOLID, CELL.SOLID, CELL.EMPTY, CELL.EMPTY, CELL.EMPTY, CELL.EMPTY]);
+  // ground one tile thick: a ledge three wide, a block two tall, a block on its own
+  assert.deepEqual([18, 19, 20, 21, 22].map((c) => cell(level, c, 3)), [CELL.EMPTY, CELL.SOLID, CELL.SOLID, CELL.SOLID, CELL.EMPTY]);
+  assert.deepEqual([cell(level, 20, 2), cell(level, 20, 4)], [CELL.EMPTY, CELL.EMPTY]);
+  assert.deepEqual([cell(level, 3, 3), cell(level, 3, 4), cell(level, 3, 2), cell(level, 3, 5), cell(level, 2, 3), cell(level, 4, 3)], [CELL.SOLID, CELL.SOLID, CELL.EMPTY, CELL.EMPTY, CELL.EMPTY, CELL.EMPTY]);
+  // the far end: a post two tall standing on the ground, then the cliff that ends the level, four tall, with a
+  // window through it
+  const post = level.post.c, cliff = level.cliff.c0;
+  assert.deepEqual([cell(level, post, 4), cell(level, post, 5), cell(level, post, 6), cell(level, post - 1, 6), cell(level, post + 1, 6)], [CELL.EMPTY, CELL.SOLID, CELL.SOLID, CELL.EMPTY, CELL.EMPTY]);
+  assert.ok(post < cliff - 1 && cliff < level.cols - 3);
+  for (let c = cliff; c < level.cols; c++) assert.deepEqual([2, 3, 4, 6].map((r) => cell(level, c, r)), [CELL.EMPTY, CELL.SOLID, CELL.SOLID, CELL.SOLID], `the cliff at column ${c}`);
+  assert.deepEqual([cliff, cliff + 1, cliff + 2, cliff + 3, cliff + 4].map((c) => cell(level, c, 5)), [CELL.SOLID, CELL.SOLID, CELL.EMPTY, CELL.EMPTY, CELL.SOLID], 'the window');
+  for (const list of Object.values(level.spots)) for (const s of list) assert.ok(s.x < cliff * 32, 'nothing is put in or past the cliff');
   assert.deepEqual([cell(level, 7, 3), cell(level, 6, 3), cell(level, 8, 3), cell(level, 7, 2), cell(level, 7, 4)], [CELL.SOLID, CELL.EMPTY, CELL.EMPTY, CELL.EMPTY, CELL.EMPTY]);
+});
+
+// ---- nothing hangs where nothing should be -----------------------------------------------------------------------
+// The scene shows 180 sprite pixels of a level that is taller than that, so whatever crosses the top edge of the
+// view looks as if it hangs from the top of the picture (a pillar high up once showed as a stub of dirt there).
+
+const realSets = async (...ids) => { const out = []; for (const id of ids) out.push(fromDef(id, (await import(`../../sprites/${id}.js`)).default)); return out; };
+const spriteFiles = fs.readdirSync(new URL('../../sprites/', import.meta.url)).filter((f) => f.endsWith('.js'));
+/** Every tileset on disk drawn for a view, found by reading the sprites folder (no list of names). */
+async function tilesetsFor(view) {
+  const out = [];
+  for (const f of spriteFiles) {
+    if (!/^tiles-/.test(f)) continue;
+    const def = (await import(`../../sprites/${f}`)).default;
+    if (def.meta?.type === 'tileset' && def.meta.view === view) out.push(fromDef(def.id, def));
+  }
+  return out;
+}
+/** The side-view levels to check: no tiles, the fixture, each real tileset alone, and all of them together. */
+async function sideLevels() {
+  const real = await tilesetsFor('side');
+  const indexes = [['no tiles', null], ['the fixture', sideIndex], ...real.map((s) => [s.key, tileIndex([s])])];
+  if (real.length > 1) indexes.push(['every side-view tileset', tileIndex(real)]);
+  return indexes.map(([name, index]) => ({ name, index, level: makeLevel('side', levelFeatures(index, 'side')) }));
+}
+
+test('side view: nothing is cut by the top of the view, so nothing hangs from the top of the picture', async () => {
+  for (const { name, index, level } of await sideLevels()) {
+    const rest = cameraFloor(level, { w: 320, h: VIEW_H });          // the top of what the view shows while the player is on the ground
+    const firstWhole = Math.ceil(rest / level.tile);
+    assert.ok(firstWhole >= 1 && firstWhole < level.groundY / level.tile, 'the view rests below the top of the level');
+    level.map.forEach((row, r) => { if (r < firstWhole) assert.equal(row.join('').replace(/\./g, ''), '', `${name}: row ${r} is above the view or cut by its top edge, and must be empty`); });
+    for (let r = 0; r < firstWhole; r++) for (let c = 0; c < level.cols; c++) assert.equal(cell(level, c, r), CELL.EMPTY);
+    assert.ok(level.thins.every((t) => t.y >= rest) && level.stacks.every((s) => s.r0 >= firstWhole));
+    // and the tiles themselves: only a decal that grows on top of a block (a flower, a tuft) may stand above the first whole row
+    const { tiles } = levelTiles(level, index);
+    for (const t of tiles) assert.ok(t.y >= firstWhole * level.tile || (t.layer === 6 && t.y >= (firstWhole - 1) * level.tile), `${name}: ${t.clip} at row ${t.y / level.tile}`);
+  }
+});
+
+test('side view: whatever floats is a whole thing with room to walk under it, and nothing on the way is too high to jump', async () => {
+  const jump = (JUMP_V * JUMP_V) / (2 * GRAVITY);                   // how high the player's feet rise
+  for (const { name, index, level } of await sideLevels()) {
+    const T = level.tile, ground = level.groundY / T;
+    const inside = (c, r) => c >= 0 && c < level.cols && r >= 0 && r < level.rows;
+    const solid = (c, r) => inside(c, r) && cell(level, c, r) !== CELL.EMPTY;
+    // a cell is built on when it is solid or holds a wall of a building (a back wall, an archway to walk through)
+    const map = levelMap(level), laid = layoutTiles(map.rows, index?.tiles ?? classifyTiles({}), { view: map.view, legend: map.legend }).cells;
+    const built = (c, r) => inside(c, r) && (solid(c, r) || laid[r][c].things.some((t) => ['back', 'floor', 'part'].includes(t.kind)));
+    // sort the built cells into things: cells that touch
+    const seen = new Set(), things = [];
+    for (let r = 0; r < level.rows; r++) for (let c = 0; c < level.cols; c++) {
+      if (!built(c, r) || seen.has(`${c},${r}`)) continue;
+      const cells = [], todo = [[c, r]];
+      seen.add(`${c},${r}`);
+      while (todo.length) {
+        const [x, y] = todo.pop();
+        cells.push([x, y]);
+        for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) if (built(x + dx, y + dy) && !seen.has(`${x + dx},${y + dy}`)) { seen.add(`${x + dx},${y + dy}`); todo.push([x + dx, y + dy]); }
+      }
+      things.push(cells);
+    }
+    const floating = things.filter((cells) => !cells.some(([, y]) => y >= ground));
+    assert.equal(things.length - floating.length, 1, `${name}: everything that is not floating is one piece of ground`);
+    for (const cells of floating) {
+      const low = Math.max(...cells.map(([, y]) => y));
+      assert.ok(ground - 1 - low >= 2, `${name}: a floating block at row ${low} leaves two tiles to walk under`);
+    }
+    // along the ground, up to the cliff that ends the level: a step, a mound or a post is never higher than a jump
+    assert.ok(level.cliff.c0 > level.post.c && level.cliff.c0 < level.cols);
+    for (let c = 0; c < level.cliff.c0; c++) {
+      let top = ground;
+      while (top > 0 && solid(c, top - 1)) top--;
+      assert.ok((ground - top) * T <= jump, `${name}: column ${c} stands ${(ground - top) * T} px high, and a jump is ${jump} px`);
+    }
+    // the cliff is the end: it runs to the edge of the level, so nothing behind it is cut off from the rest
+    for (let c = level.cliff.c0; c < level.cols; c++) assert.ok(solid(c, ground - 1) && solid(c, ground - 4), `${name}: the cliff is whole at column ${c}`);
+  }
 });
 
 test('with no tileset the level is the same, nothing is tiled and everything is drawn plainly', () => {
@@ -95,14 +182,20 @@ test('side view tiles: every piece of the block, the narrow pieces, fill version
   assert.deepEqual([at(12, 6), at(14, 6)], ['stone-side-l', 'stone-side-r']);
   assert.match(at(13, 6), /^stone-fill/);
   assert.deepEqual([at(12, 7), at(14, 7), at(15, 7)], ['stone-inner-tl', 'stone-inner-tr', 'stone-top']);
-  // the small floating island, and the mass high up with a part hanging under it: undersides and bottom inner corners
+  // the small floating island: corners and undersides
   assert.deepEqual([at(16, 3), at(17, 3), at(16, 4), at(17, 4)], ['stone-left', 'stone-right', 'stone-bottom-l', 'stone-bottom-r']);
-  assert.deepEqual([at(19, 1), at(20, 1), at(19, 2), at(20, 2), at(21, 2), at(22, 2), at(23, 2)], ['stone-left', 'stone-top', 'stone-bottom-l', 'stone-bottom', 'stone-inner-bl', 'stone-inner-br', 'stone-bottom']);
-  assert.deepEqual([at(21, 3), at(22, 3)], ['stone-bottom-l', 'stone-bottom-r']);
-  // ground one tile thick uses the narrow pieces
-  assert.deepEqual([at(12, 2), at(13, 2), at(14, 2)], ['stone-strip-l', 'stone-strip-m', 'stone-strip-r']);
-  assert.deepEqual([at(3, 1), at(3, 2), at(3, 3)], ['stone-col-t', 'stone-col-m', 'stone-col-b']);
+  // the cliff at the far end: its face and top, and round its window an underside with inner corners
+  const cliff = level.cliff.c0, post = level.post.c;
+  assert.deepEqual([at(cliff, 3), at(cliff + 2, 3), at(cliff, 4), at(cliff, 6)], ['stone-left', 'stone-top', 'stone-side-l', 'stone-side-l']);
+  assert.deepEqual([at(cliff + 1, 4), at(cliff + 2, 4), at(cliff + 3, 4), at(cliff + 4, 4)], ['stone-inner-br', 'stone-bottom', 'stone-bottom', 'stone-inner-bl']);
+  assert.deepEqual([at(cliff + 1, 5), at(cliff + 4, 5), at(cliff + 2, 6), at(cliff + 3, 6)], ['stone-side-r', 'stone-side-l', 'stone-top', 'stone-top']);
+  // ground one tile thick uses the narrow pieces: the ledge, the block two tall, the post, the block on its own
+  assert.deepEqual([at(19, 3), at(20, 3), at(21, 3)], ['stone-strip-l', 'stone-strip-m', 'stone-strip-r']);
+  assert.deepEqual([at(3, 3), at(3, 4)], ['stone-col-t', 'stone-col-b']);
+  assert.deepEqual([at(post, 5), at(post, 6)], ['stone-col-t', 'stone-col-m']);
   assert.equal(at(7, 3), 'stone-single');
+  // between them the level uses every piece a block can have
+  for (const piece of [...BLOCK_PIECES, ...NARROW_PIECES]) assert.ok(tiles.some((t) => t.clip === `stone-${piece}`), `stone-${piece} is in the level`);
   // fill versions are mixed by position
   assert.ok(tiles.some((t) => t.clip === 'stone-fill') && tiles.some((t) => t.clip === 'stone-fill-b'));
   // the thin platform and the mound
@@ -113,7 +206,7 @@ test('side view tiles: every piece of the block, the narrow pieces, fill version
   assert.equal(surfaceBelow(level, 9 * 32, 5 * 32).y, level.groundY - 32);
   // each piece is the one the helper picks for that cell
   const solid = (x, y) => { const cx = Math.max(0, Math.min(level.cols - 1, x)), cy = Math.max(0, Math.min(level.rows - 1, y)); return cell(level, cx, cy) !== CELL.EMPTY; };
-  for (const [c, r] of [[12, 5], [12, 7], [21, 2], [13, 2], [3, 2], [7, 3]]) assert.equal(at(c, r), 'stone-' + pickPiece(solid, c, r, T.blocks[0].pieces));
+  for (const [c, r] of [[12, 5], [12, 7], [cliff + 1, 4], [cliff + 4, 4], [20, 3], [3, 4], [post, 6], [7, 3]]) assert.equal(at(c, r), 'stone-' + pickPiece(solid, c, r, T.blocks[0].pieces));
   assert.ok(tiles.some((t) => t.clip === 'stone-deco-a'), 'decals lie over cells of their block');
   assert.ok(tiles.every((t) => t.key === 's'));
 });
@@ -129,7 +222,7 @@ test('a tileset with only some pieces: every cell gets the nearest piece it has,
   assert.equal(at(1, 8), 'grass-fill');
   assert.equal(at(12, 5), 'grass-' + nearestPiece('left', has), 'a corner it does not have: the nearest piece it has');
   assert.equal(at(12, 6), 'grass-' + nearestPiece('side-l', has));
-  assert.equal(at(20, 2), 'grass-' + nearestPiece('bottom', has));
+  assert.equal(at(level.cliff.c0 + 2, 4), 'grass-' + nearestPiece('bottom', has));
   for (let r = 0; r < level.rows; r++) for (let c = 0; c < level.cols; c++) if (cell(level, c, r) === CELL.SOLID) assert.ok(at(c, r), `cell ${c},${r} has a tile`);
   // no thin pieces: the platform is a strip of the block, one tile thick
   assert.deepEqual(level.thins, []);
@@ -276,9 +369,10 @@ test('side view: a liquid lies as a pool in a dip, with its fill behind the bank
   // the banks and the bottom: the ground, with the water behind it so no sky shows in the dents of its edge
   for (const [c, r] of [[18, 7], [22, 7], [19, 8], [20, 8], [21, 8]]) { assert.match(at(c, r)[0], /^water-/, `water behind ${c},${r}`); assert.match(at(c, r)[1], /^grass-/); }
   assert.deepEqual(levelMap(level).legend.B, ['back:water', 'block:grass']);
-  // the waterfall: its top under the mass above, its body, and its foot in the pool's own top row
-  assert.deepEqual([3, 4, 5, 6, 7].map((r) => at(20, r).at(-1)), ['fall-top', 'fall-fill', 'fall-fill', 'fall-fill', 'fall-foot']);
-  assert.deepEqual([3, 4, 5, 6].map((r) => cell(level, 20, r)), [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY, CELL.EMPTY], 'falling water is not solid');
+  // the waterfall: its top under the ledge above, its body, and its foot in the pool's own top row
+  assert.equal(at(20, 3).at(-1), 'grass-strip-m', 'the ledge the water pours from');
+  assert.deepEqual([4, 5, 6, 7].map((r) => at(20, r).at(-1)), ['fall-top', 'fall-fill', 'fall-fill', 'fall-foot']);
+  assert.deepEqual([4, 5, 6].map((r) => cell(level, 20, r)), [CELL.EMPTY, CELL.EMPTY, CELL.EMPTY], 'falling water is not solid');
   for (const list of Object.values(level.spots)) for (const s of list) assert.ok(s.x < 19 * 32 || s.x > 22 * 32, 'nothing is put in the pool');
   // whoever stands in the pool is in the liquid: the page draws the liquid in front of them, and they wade
   assert.equal(wetAt(level, 19.5 * 32, 7 * 32 + 20), true);
@@ -301,7 +395,7 @@ test('side view: a back wall gets a tower and a hall of its own tileset, with an
   const f = levelFeatures(index, 'side');
   assert.deepEqual(f.interiors, [{ floor: 'brick', block: 'stone', archL: 'arch-l', archR: 'arch-r', window: 'window', battlement: 'battlement' }]);
   const { level, tiles } = build('side', index);
-  assert.equal(level.cols, 32, 'the level is one hall wider');
+  assert.equal(level.cols, makeLevel('side').cols + 8, 'the level is one hall wider');
   const at = (c, r) => tileAt(tiles, c, r);
   assert.equal(at(1, 7)[0], 'grass-top', 'the ground is still the first block');
   assert.match(at(25, 4)[0], /^stone-/, 'the hall is built of the block that came with the back wall');
@@ -317,9 +411,9 @@ test('side view: a back wall gets a tower and a hall of its own tileset, with an
   assert.match(at(28, 4)[1], /^stone-/);
   assert.deepEqual(at(27, 3), ['battlement']);
   // its top is inside the view when the player stands on the ground: nothing of it is cut off
-  const top = Math.min(...tiles.filter((t) => t.x >= 24 * 32).map((t) => t.y));
+  const top = Math.min(...tiles.filter((t) => t.x >= 24 * 32 && t.x < 32 * 32).map((t) => t.y));
   assert.equal(top, 3 * 32);
-  assert.ok(cameraFloor(level, { w: 360, h: 180 }) <= top, `the resting view starts at ${cameraFloor(level, { w: 360, h: 180 })}`);
+  assert.ok(cameraFloor(level, { w: 360, h: VIEW_H }) <= top, `the resting view starts at ${cameraFloor(level, { w: 360, h: VIEW_H })}`);
   // walk in under the arch, through the hall and out the far side: nothing is in the way at ground level
   for (let c = 24; c <= 31; c++) assert.equal(cell(level, c, 6), CELL.EMPTY, `cell ${c},6`);
   assert.ok(level.spots.pickup.some((s) => s.x > 27 * 32 && s.x < 30 * 32 && s.y === level.groundY), 'something to collect inside');
@@ -328,12 +422,13 @@ test('side view: a back wall gets a tower and a hall of its own tileset, with an
   // a cave: its dark wall behind a hall of its own rock, and no archway; two back walls make two halls
   const cave = setOf('k', [...full('rock'), 'dark-fill']);
   const both = build('side', tileIndex([cave, castle]));
-  assert.equal(both.level.cols, 40);
+  assert.equal(both.level.cols, makeLevel('side').cols + 16);
   assert.deepEqual([tileAt(both.tiles, 25, 6), tileAt(both.tiles, 28, 6)], [['dark-fill'], ['dark-fill']]);
   assert.match(tileAt(both.tiles, 25, 5)[0], /^rock-/);
   assert.deepEqual(tileAt(both.tiles, 33, 6), ['brick-fill', 'arch-l']);
   assert.match(tileAt(both.tiles, 33, 5)[0], /^stone-/);
-  assert.equal(makeLevel('side').cols, 24, 'with no back wall there is no hall');
+  assert.equal(makeLevel('side').cols, level.cols - 8, 'with no back wall there is no hall');
+  assert.equal(makeLevel('side').cliff.c0, level.cliff.c0 - 8, 'and the cliff at the far end comes straight after the ground');
 });
 
 test('top-down: the second ground is a lane with a crossing and a bend, leading to a square', () => {
@@ -456,7 +551,7 @@ test('the level is map text: a tool or a game reads it back and lays out the ver
     assert.deepEqual(again.tiles.map((t) => [t.clip, t.col, t.row]), tiles.map((t) => [t.clip, t.x / 32, t.y / 32]));
     assert.ok(text.split('\n').filter((l) => l && !l.startsWith('@')).every((row) => [...row].length === level.cols));
   }
-  assert.match(levelText(makeLevel('side')), /^@ view = side\n\n\.{24}\n/, 'with no tiles it is still a level');
+  assert.match(levelText(makeLevel('side')), new RegExp(`^@ view = side\n\n\\.{${makeLevel('side').cols}}\n`), 'with no tiles it is still a level');
 });
 
 // The real tilesets, when they are there (they are made alongside the playground).
@@ -473,8 +568,9 @@ test('the real tileset tiles-forest: every cell of the ground gets a piece of it
   for (const t of tiles) assert.ok(def.clips[t.clip], `${t.clip} is one of its clips`);
   assert.deepEqual(lay(level, index).notes, []);
   const at = (c, r) => tileAt(tiles, c, r)[0], p = index.tiles.blocks[0].prefix;
-  assert.deepEqual([at(12, 5), at(12, 6), at(12, 7), at(20, 2), at(21, 2), at(22, 2)], [`${p}-left`, `${p}-side-l`, `${p}-inner-tl`, `${p}-bottom`, `${p}-inner-bl`, `${p}-inner-br`]);
-  if (index.tiles.blocks[0].pieces.single) assert.deepEqual([at(12, 2), at(13, 2), at(14, 2), at(3, 1), at(3, 2), at(3, 3), at(7, 3)], [`${p}-strip-l`, `${p}-strip-m`, `${p}-strip-r`, `${p}-col-t`, `${p}-col-m`, `${p}-col-b`, `${p}-single`]);
+  const cliff = level.cliff.c0;
+  assert.deepEqual([at(12, 5), at(12, 6), at(12, 7), at(cliff + 2, 4), at(cliff + 4, 4), at(cliff + 1, 4)], [`${p}-left`, `${p}-side-l`, `${p}-inner-tl`, `${p}-bottom`, `${p}-inner-bl`, `${p}-inner-br`]);
+  if (index.tiles.blocks[0].pieces.single) assert.deepEqual([at(19, 3), at(20, 3), at(21, 3), at(3, 3), at(level.post.c, 6), at(3, 4), at(7, 3)], [`${p}-strip-l`, `${p}-strip-m`, `${p}-strip-r`, `${p}-col-t`, `${p}-col-m`, `${p}-col-b`, `${p}-single`]);
   if (index.tiles.blocks[0].fills.length > 1) assert.ok(new Set(tiles.filter((t) => /-fill(-[bc])?$/.test(t.clip)).map((t) => t.clip)).size > 1, 'more than one version of the fill is used');
   const used = new Set(tiles.map((t) => t.clip));
   assert.deepEqual(Object.keys(def.clips).filter((c) => !used.has(c) && !LANE_PIECES.some((l) => c.endsWith('-' + l))), [], 'every clip of the tileset is in the scene');
@@ -492,7 +588,7 @@ test('the real side-view tilesets together: every platform, column, pool, waterf
   for (const clip of ['brick-fill', 'arch-l', 'arch-r', 'window', 'battlement', 'stone-top', 'stone-side-l']) assert.ok(used('tiles-castle').has(clip), `${clip} of tiles-castle is placed`);
   for (const clip of ['dark-fill', 'rock-top']) assert.ok(used('tiles-cave').has(clip), `${clip} of tiles-cave is placed`);
   assert.equal(tileAt(tiles, 1, 7)[0], 'grass-top', 'the forest, first in the bag, is the ground');
-  assert.equal(level.cols, 40);
+  assert.equal(level.cols, makeLevel('side').cols + 16, 'two halls wider');
   assert.deepEqual(readMap(levelText(level, ids)).rows, level.map.map((r) => r.join('')));
 });
 

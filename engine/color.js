@@ -131,3 +131,42 @@ export function pick(against, ...candidates) {
 }
 
 export const INK = '#231b33'; // default outline colour
+
+/**
+ * An everyday name for a colour, for people who do not read colour codes: colorName('#f2a030') -> 'orange',
+ * colorName('#1f2f6f') -> 'dark blue'. hex: '#rrggbb' or '#rgb'. Returns '' for anything that is not a colour code.
+ * Lower-case words only (a page capitalises it); the same code always gives the same name.
+ */
+export function colorName(hex) {
+  if (typeof hex !== 'string' || !/^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.test(hex.trim())) return '';
+  const [h, s, l] = rgbToHsl(...hexToRgb(hex.trim()));
+  const chroma = (1 - Math.abs(2 * l - 1)) * s;
+  if (l >= 0.94 && chroma < 0.2) return 'white';
+  if (l <= 0.07) return 'black';
+  if (chroma < 0.08 || s < 0.1) return l >= 0.75 ? 'light grey' : l <= 0.22 ? 'near black' : l <= 0.38 ? 'dark grey' : 'grey';
+  let base;
+  if (h < 12 || h >= 345) base = 'red';
+  else if (h < 42) base = 'orange';
+  else if (h < 66) base = 'yellow';
+  else if (h < 85) base = 'lime green';
+  else if (h < 160) base = 'green';
+  else if (h < 185) base = 'teal';
+  else if (h < 200) base = l > 0.5 ? 'sky blue' : 'teal';
+  else if (h < 258) base = 'blue';            // pure blue is hue 240 and navy too: blue runs on to blue-violet
+  else if (h < 300) base = 'purple';
+  else base = 'pink';
+  // warm colours change name with lightness and strength: dull dark orange is brown, dull mid orange is tan,
+  // pale orange is cream, dark red stays red, light red is pink, dark pink reads as purple
+  if (base === 'orange' && s < 0.55 && l < 0.5) return l < 0.2 ? 'dark brown' : 'brown';
+  if ((base === 'orange' || (base === 'yellow' && s < 0.6)) && l < 0.42) return l < 0.2 ? 'dark brown' : 'brown';
+  if (base === 'yellow' && l < 0.32) return 'olive';
+  if (base === 'lime green' && l < 0.36) return 'olive green';      // dark yellow-green reads as olive, not lime
+  if ((base === 'orange' || base === 'yellow') && l > 0.8 && s < 0.9) return 'cream';
+  if (base === 'orange' && s < 0.55 && l <= 0.8) return 'tan';
+  if (base === 'red' && l > 0.72) return 'pink';
+  if (base === 'red' && l < 0.42) return 'dark red';
+  if (base === 'pink' && l < 0.36) return l < 0.3 ? 'dark purple' : 'purple';   // dark magenta and plum read as purple
+  const shade = l < 0.3 ? 'dark ' : l > 0.72 ? 'light ' : '';
+  const dull = !shade && s < 0.3 ? 'greyish ' : '';
+  return shade + dull + base;
+}

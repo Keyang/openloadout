@@ -9,7 +9,7 @@
   "melee",
   "thud"
  ],
- "description": "Body thud with a pitch drop, a mid slap and saturated noise.",
+ "description": "A body thud that drops in pitch, a slap and a crunchy hiss.",
  "meta": {
   "type": "sfx",
   "role": "actions/hit",

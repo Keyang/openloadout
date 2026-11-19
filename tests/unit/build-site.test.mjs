@@ -225,3 +225,121 @@ test('the quality step runs quality/sprite.js and quality/sound.js when they exi
   fs.rmSync(path.join(root, 'quality'), { recursive: true });
   assert.equal(skipped.code, 0, skipped.out);
 });
+
+// ---- a failed build never changes what the site shows; messages say what to do -----------------------------
+
+/** Every file under generated/ with its content, so "nothing changed" can be checked byte for byte. */
+function snapshot(dir) {
+  const out = {};
+  const walk = (d) => { for (const e of fs.readdirSync(d, { withFileTypes: true })) { const f = path.join(d, e.name); if (e.isDirectory()) walk(f); else out[path.relative(dir, f)] = fs.readFileSync(f).toString('base64'); } };
+  walk(dir);
+  return out;
+}
+/** A stand-in quality bar for the copy: fails the sprites whose ids are listed, passes everything else. */
+function stubQuality(root, failing = []) {
+  fs.mkdirSync(path.join(root, 'quality'), { recursive: true });
+  fs.writeFileSync(path.join(root, 'quality', 'sprite.js'),
+    `const FAIL = ${JSON.stringify(failing)};\nexport function checkSprite(def) { return { errors: FAIL.includes(def.id) ? ['shine frame 0 / default: nothing drawn (and 3 more)'] : [], warnings: [], metrics: {} }; }\n`);
+  fs.writeFileSync(path.join(root, 'quality', 'sound.js'), 'export function checkSound() { return { errors: [], warnings: [], notes: [], metrics: {} }; }\n');
+}
+const fullBuild = (root, ...args) => {
+  const r = spawnSync(process.execPath, [BUILD, '--root', root, ...args], { encoding: 'utf8', timeout: 180000 });
+  return { code: r.status, out: r.stdout + r.stderr };
+};
+const addNewAssets = (root) => {
+  fs.copyFileSync(path.join(FIX, 'test-gem.js'), path.join(root, 'sprites', 'test-gem.js'));
+  fs.copyFileSync(path.join(FIX, 'test-pop.json'), path.join(root, 'sounds', 'test-pop.json'));
+};
+const removeNewAssets = (root) => { fs.rmSync(path.join(root, 'sprites', 'test-gem.js'), { force: true }); fs.rmSync(path.join(root, 'sounds', 'test-pop.json'), { force: true }); };
+
+test('a new asset that fails the quality bar stops the build and leaves generated/ exactly as it was', () => {
+  stubQuality(root, []);
+  assert.equal(fullBuild(root).code, 0, 'a good build to start from');
+  const before = snapshot(path.join(root, 'generated'));
+  addNewAssets(root);
+  stubQuality(root, ['test-gem']);
+  const r = fullBuild(root);
+  assert.equal(r.code, 1, r.out);
+  const after = snapshot(path.join(root, 'generated'));
+  assert.deepEqual(Object.keys(after).sort(), Object.keys(before).sort(), 'no file was added to or taken from generated/');
+  assert.deepEqual(Object.keys(after).filter((f) => after[f] !== before[f]), [], 'no file in generated/ was changed');
+  const cat = readCatalog(root);
+  assert.equal(cat.assets.some((a) => a.id === 'test-gem'), false, 'the failing sprite is not in the catalogue the site reads');
+  assert.equal(JSON.parse(fs.readFileSync(path.join(root, 'generated', 'sounds.json'), 'utf8')).patches.some((p) => p.id === 'test-pop'), false, 'nor is the sound that came with it');
+  // the message: which file, what is wrong, what to do, and that the site was not changed
+  assert.match(r.out, /sprites\/test-gem\.js/);
+  assert.match(r.out, /Test gem/);
+  assert.match(r.out, /What is wrong:\s+shine frame 0 \/ default: nothing drawn/);
+  assert.match(r.out, /What to do:/);
+  assert.ok(r.out.includes('node tools/check.mjs test-gem'), r.out);
+  assert.match(r.out, /site (still shows|was not changed|is unchanged)|nothing .* was changed/i, r.out);
+  assert.doesNotMatch(r.out, /\n\s+at /, 'no stack trace');
+
+  // once it passes, the same build takes it in, and says nothing about skipping
+  stubQuality(root, []);
+  const good = fullBuild(root);
+  assert.equal(good.code, 0, good.out);
+  assert.equal(readCatalog(root).assets.some((a) => a.id === 'test-gem'), true);
+  assert.doesNotMatch(good.out, /NOT CHECKED:|left out the quality bar/, good.out);
+  removeNewAssets(root);
+  assert.equal(fullBuild(root).code, 0);
+});
+
+test('--skip-quality still builds, and the last thing it says is that nothing was checked', () => {
+  stubQuality(root, ['slime']);            // would fail if it ran
+  const r = build(root);                   // --skip-quality
+  assert.equal(r.code, 0, r.out);
+  const end = r.out.slice(r.out.lastIndexOf('Done in'));
+  assert.match(end, /NOT CHECKED:/, r.out);
+  assert.match(end, /left out the quality bar/, r.out);
+  assert.match(end, /--skip-quality/, 'it names the option that did it');
+  assert.match(end, /without --skip-quality|node tools\/build\.mjs/i, 'and says how to get a checked build');
+});
+
+test('when the site already lists an asset that now fails, the build says so', () => {
+  addNewAssets(root);
+  stubQuality(root, ['test-gem']);
+  assert.equal(build(root).code, 0, 'a build that skips the bar takes the asset in');
+  assert.equal(readCatalog(root).assets.some((a) => a.id === 'test-gem'), true);
+  const r = fullBuild(root);
+  assert.equal(r.code, 1, r.out);
+  assert.match(r.out, /still (lists|shows)[^\n]*Test gem/i, r.out);
+  assert.match(r.out, /--skip-quality|earlier build/i, r.out);
+  removeNewAssets(root);
+  fs.rmSync(path.join(root, 'quality'), { recursive: true });
+  assert.equal(build(root).code, 0);
+});
+
+test('a build step that breaks part-way leaves the catalogue alone and prints no stack trace', () => {
+  const before = fs.readFileSync(path.join(root, 'generated', 'catalog.json'), 'utf8');
+  addNewAssets(root);
+  fs.mkdirSync(path.join(root, 'tools', 'lib'), { recursive: true });
+  fs.writeFileSync(path.join(root, 'tools', 'lib', 'search-index.mjs'), "export async function buildSearchIndex() { throw new Error('the disk is full'); }\n");
+  const r = build(root);
+  fs.rmSync(path.join(root, 'tools'), { recursive: true });
+  removeNewAssets(root);
+  assert.equal(r.code, 1, r.out);
+  assert.match(r.out, /search/i, 'it names the step');
+  assert.match(r.out, /the disk is full/);
+  assert.doesNotMatch(r.out, /\n\s+at /, 'no stack trace');
+  assert.equal(fs.readFileSync(path.join(root, 'generated', 'catalog.json'), 'utf8'), before, 'the catalogue is as the last good build left it');
+  assert.deepEqual(fs.readdirSync(path.join(root, 'generated')).filter((f) => /tmp|\.next/.test(f)), [], 'no half-written file is left behind');
+  assert.equal(build(root).code, 0);
+});
+
+test('two assets with one id: one message that names both files, and nothing misleading after it', () => {
+  // a sprite named like a sound that a bundle lists (taken from the real bundles, whichever they are today)
+  const soundId = real.bundles.flatMap((b) => b.sounds)[0];
+  assert.ok(soundId, 'a bundle lists a sound');
+  const f = path.join(root, 'sprites', `${soundId}.js`);
+  fs.writeFileSync(f, fs.readFileSync(path.join(FIX, 'test-gem.js'), 'utf8').replace("id: 'test-gem'", `id: '${soundId}'`).replace("sounds: { shine: [{ sound: 'test-pop', frame: 0 }] },", ''));
+  const r = build(root);
+  fs.rmSync(f);
+  assert.equal(r.code, 1, r.out);
+  assert.match(r.out, /1 problem to fix/, r.out);
+  assert.ok(r.out.includes(`sprites/${soundId}.js`) && r.out.includes(`sounds/${soundId}.json`), 'both files are named');
+  assert.match(r.out, /rename/i, 'it says what to do');
+  assert.doesNotMatch(r.out, /bundles\//, 'no bundle is blamed for it');
+  assert.doesNotMatch(r.out, /move it to/, r.out);
+  assert.equal(build(root).code, 0);
+});

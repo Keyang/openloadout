@@ -90,8 +90,27 @@ export const store = {
   set(k, v) { try { localStorage.setItem('sf-' + k, v); } catch { /* private window */ } },
 };
 
+// While the browser is not keeping the bag (a private window, blocked site data: bag.kept() is false) and the bag holds
+// something, every page's header says so, with the way to the bag, where it can be downloaded or its link copied.
+// Not on the bag page itself, which says it in full (app/bag-page.js).
+function notKeptNote() {
+  return el('p', { class: 'not-kept', role: 'status' },
+    el('strong', {}, 'Your bag is for this visit only. '),
+    'This browser will forget it when you reload or close the page, so download it or copy its link before you leave. ',
+    el('a', { href: '#/bag' }, 'Go to your bag'));
+}
+function syncNotKept(top) {
+  const want = !bag.kept() && bag.count() > 0 && top.dataset.page !== 'bag';
+  const has = top.querySelector('.not-kept');
+  if (want && !has) top.append(notKeptNote());
+  else if (!want && has) has.remove();
+}
+
 // The header's bag count follows the bag on every page.
-bag.onChange(() => { for (const n of document.querySelectorAll('header .bag-count')) n.textContent = String(bag.count()); });
+bag.onChange(() => {
+  for (const n of document.querySelectorAll('header .bag-count')) n.textContent = String(bag.count());
+  for (const top of document.querySelectorAll('header.top')) syncNotKept(top);
+});
 
 // On a narrow screen the links sit behind one "Menu" button, so the header stays one row. Escape or a press elsewhere closes it.
 function closeMenus(except) {
@@ -125,6 +144,8 @@ export function header(current) {
         link('#/play', 'Play', 'play')),      // W2-G: the playground
       el('a', { class: 'bag-link', href: '#/bag', 'aria-current': current === 'bag' ? 'page' : null }, 'Bag ', el('span', { class: 'bag-count' }, String(bag.count())))),
     back ? el('a', { class: 'back-link', href: back.href }, el('span', { 'aria-hidden': 'true' }, '‹'), back.label) : null);
+  top.dataset.page = current || '';
+  syncNotKept(top);
   menu.addEventListener('click', () => {
     const open = menu.getAttribute('aria-expanded') !== 'true';
     menu.setAttribute('aria-expanded', String(open));

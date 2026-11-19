@@ -4,7 +4,7 @@
   "name": "Hive shriek",
   "category": "impact",
   "tags": ["sci-fi", "alien", "scream", "boss"],
-  "description": "A stylised alien scream: two detuned pulse waves rising with a fast vibrato through a filter that opens like a mouth, rasping noise on top, ending in a dry clicking rattle. Pitch, length, rasp, vibrato and brightness can be changed.",
+  "description": "A made-up alien scream: two buzzing voices rising with a fast wobble through a mouth that opens, a raspy hiss on top, ending in a dry clicking rattle. Pitch, length, rasp, wobble and brightness can be changed.",
   "meta": {
     "type": "sfx",
     "role": "characters/voice",
@@ -18,7 +18,7 @@
     { "id": "pitch", "label": "Pitch", "min": 300, "max": 1000, "default": 500, "unit": "Hz", "scale": "log" },
     { "id": "length", "label": "Length", "min": 0.85, "max": 1.5, "default": 1.1, "unit": "s", "scale": "log" },
     { "id": "grit", "label": "Rasp", "min": 0, "max": 1, "default": 0.5 },
-    { "id": "wobble", "label": "Vibrato", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "wobble", "label": "Wobble", "min": 0, "max": 1, "default": 0.5 },
     { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 }
   ],
   "nodes": [

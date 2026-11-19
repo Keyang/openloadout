@@ -93,7 +93,7 @@ export function build(gains = GAINS) {
     id: 'hearthvale-battle',
     name: 'Party battle theme',
     tags: ['music', 'battle', 'rpg', 'adaptive', 'loop'],
-    description: 'Heroic, galloping battle music in A minor with a Dorian lift, 8 to 32 bars long: Intensity brings in the drums, the tune, the brass stabs, then an octave doubling and tom fills, and you can change the tempo, key, grit and the instrument that plays the tune.',
+    description: 'Heroic, galloping battle music, serious but hopeful, in short or long versions: Intensity brings in the drums, the tune and short brass hits, then the tune played high as well and drum rolls, and you can change the speed, pitch, grit and the instrument that plays the tune.',
     meta: {
       type: 'music', role: 'music/battle', themes: ['fantasy'], gameTypes: ['turn-based-rpg', 'top-down-rpg'],
       words: ['battle', 'fight', 'combat', 'encounter', 'enemy', 'monster', 'party', 'heroic', 'gallop', 'urgent', 'brass', 'strings', 'wyrm', 'boss'],

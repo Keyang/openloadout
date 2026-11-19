@@ -1,6 +1,7 @@
 // Finds every asset in the source tree. There is no list to maintain:
 // a file in sprites/ is a sprite, a file in sounds/ is a sound or a music track,
-// a file in bundles/ is a bundle. Used by the build, the checkers and the tests.
+// a file in bundles/ is a bundle, a file bundles/specs/<id>.plan.json is the plan of a kit.
+// Used by the build, the checkers and the tests.
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -52,6 +53,31 @@ export function loadBundles(root = ROOT) {
     const id = f.slice(0, -5);
     if (b.id !== id) throw new Error(`bundles/${f}: "id" must be "${id}" (found ${b.id})`);
     return { ...b, file: `bundles/${f}` };
+  });
+}
+
+/**
+ * What a full game kit holds: [fewest, most] of each kind (the first acceptance criterion: 40 to 50 sprites,
+ * 20 sounds and 2 music tracks). tools/bundles-from-plans.mjs says so when a plan is outside it, and
+ * tests/e2e/three-bundles.spec.mjs holds every kit to it.
+ */
+export const KIT_SIZE = Object.freeze({ sprites: Object.freeze([40, 50]), sounds: Object.freeze([20, 20]), music: Object.freeze([2, 2]) });
+
+/**
+ * The kit plans: [{ id, file, plan }] from bundles/specs/<id>.plan.json, sorted by id. A plan is everything that
+ * is about one kit (its name, game type, the sentence shown on its page, its palette, and the sprites, sounds and
+ * music it holds), so a new kit is a new plan file and its assets. tools/bundles-from-plans.mjs turns a finished
+ * plan into bundles/<id>.json. A bundle that has a plan is a full game kit; the small starter bundles have none.
+ */
+export function loadPlans(root = ROOT) {
+  const dir = path.join(root, 'bundles', 'specs');
+  if (!fs.existsSync(dir)) return [];
+  return fs.readdirSync(dir).filter((f) => f.endsWith('.plan.json')).sort().map((f) => {
+    const file = `bundles/specs/${f}`;
+    const plan = readJSON(path.join(dir, f), file);
+    const id = f.slice(0, -'.plan.json'.length);
+    if (plan.id !== id) throw new Error(`${file}: "id" must be "${id}" (found ${plan.id}); a plan's file is named after its kit`);
+    return { id, file, plan };
   });
 }
 

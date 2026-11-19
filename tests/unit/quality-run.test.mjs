@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { runQuality, dependencyHash, cacheable, soundsHash } from '../../tools/lib/quality-run.mjs';
+import { runQuality, assetFiles, cacheable, soundsHash } from '../../tools/lib/quality-run.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const FX = path.join(ROOT, 'tests', 'fixtures', 'quality');
@@ -50,10 +50,13 @@ test('a sprite file that cannot be loaded is reported as that sprite\'s error, a
   assert.ok(!good.errors.some((e) => /cannot be loaded/.test(e)));
 });
 
-test('the dependency hash covers the engine, rigs, sound engine, quality code and schema', () => {
-  const h = dependencyHash(ROOT);
-  assert.match(h, /^[0-9a-f]{40}$/);
-  assert.equal(dependencyHash(ROOT), h, 'stable');
+test('a result is keyed on the asset, the checker and the metadata rules (the detail is in build-quality-cache.test.mjs)', () => {
+  const file = path.join(FX, 'sprite-files', 'q-good.js');
+  const { files, open } = assetFiles(ROOT, 'sprite', file);
+  const rel = files.map((f) => path.relative(ROOT, f).split(path.sep).join('/'));
+  for (const need of ['tests/fixtures/quality/sprite-files/q-good.js', 'engine/sprite.js', 'quality/sprite.js', 'catalog/schema.js']) assert.ok(rel.includes(need), need);
+  assert.equal(open, false);
+  assert.deepEqual(assetFiles(ROOT, 'sprite', file).files, files, 'stable');
 });
 
 test('a result that says the checker crashed is not cached', () => {
@@ -74,4 +77,20 @@ test('a sprite\'s cache key covers only the sounds it uses', () => {
   put('step', 2);
   assert.notEqual(soundsHash(root, ['step']), h, 'a sound it uses changed: new key');
   assert.notEqual(soundsHash(root, ['missing']), soundsHash(root, []), 'a missing sound is part of the key');
+});
+
+test('works when called from a one-line script (node -e): the workers do not run that script again', async () => {
+  // A worker thread starts with the options Node itself was started with. Started as `node -e "<script>"`, each
+  // worker would run <script> again, which starts workers, which run it again, without end.
+  const { spawnSync } = await import('node:child_process');
+  const { pathToFileURL } = await import('node:url');
+  const dir = tmp();
+  const script = `
+    import { runQuality } from ${JSON.stringify(pathToFileURL(path.join(ROOT, 'tools', 'lib', 'quality-run.mjs')).href)};
+    const r = await runQuality({ sprites: [], sounds: [${JSON.stringify(path.join(FX, 'sounds', 'good-blip.json'))}], cacheFile: ${JSON.stringify(path.join(dir, 'quality.json'))} });
+    console.log('RESULT ' + r.results.map((x) => x.id + ':' + x.ok).join(','));`;
+  const r = spawnSync(process.execPath, ['--input-type=module', '-e', script], { encoding: 'utf8', timeout: 60000 });
+  assert.equal(r.status, 0, `finished (signal ${r.signal})\n${r.stdout}${r.stderr}`);
+  assert.equal(r.stdout.match(/RESULT/g)?.length, 1, 'the script ran once');
+  assert.match(r.stdout, /RESULT q-blip:true/);
 });

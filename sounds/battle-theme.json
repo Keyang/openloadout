@@ -10,7 +10,7 @@
   "adaptive",
   "loop"
  ],
- "description": "Fast D-minor battle music, 8 to 32 bars long. Intensity brings in the snare, the brass stabs, then the melody and double-time kick, so a game can drive it live. Longer versions build up section by section, and the melody can be played by five instruments.",
+ "description": "Fast, dark battle music in short or long versions. Intensity brings in the snare drum, short brass hits, then the tune and a faster kick drum, so a game can raise it as a fight heats up. Longer versions build up part by part, and five instruments can play the tune.",
  "meta": {
   "type": "music",
   "role": "music/battle",
@@ -56,7 +56,7 @@
   },
   {
    "id": "bpm",
-   "label": "Tempo",
+   "label": "Speed",
    "min": 130,
    "max": 190,
    "default": 160,
@@ -64,7 +64,7 @@
   },
   {
    "id": "key",
-   "label": "Key",
+   "label": "Pitch",
    "min": -5,
    "max": 6,
    "default": 0,

@@ -10,6 +10,7 @@ import { assetById, loadSound, loadSprite } from './catalog.js';
 import { soundById, soundParams, renderAsync, playRendered, playLive, whenRendered, drawWave } from './audio.js';
 import { renderPixels, defaultParams } from '../engine/sprite.js';
 import { bag } from './bag.js';
+import { backdropFor } from './stage.js';
 
 // Pixel art is always shown at a whole-number scale: 3x on a wide screen, 2x on a phone, less when a frame is big.
 const fit = (fw, fh, w, h, most) => { const f = Math.min(w / fw, h / fh); return f >= 1 ? Math.min(most, Math.floor(f)) : 1 / Math.ceil(1 / f); };
@@ -61,7 +62,10 @@ export function spriteCard(asset) {
   const [sky, ground, edge] = TILE_BG[row.type] ?? TILE_BG.character;
   const thumb = row.thumb ? el('img', { class: 'thumb pic', src: row.thumb, alt: '', width: fw, height: fh, decoding: 'async', draggable: 'false' }) : null;
   const canvas = el('canvas', { class: 'anim pic', width: fw, height: fh, hidden: true, 'aria-hidden': 'true' });
-  const tile = el('span', { class: 'pic-tile on-ground', style: `${sizes(fw, fh)};--sky:${sky};--ground:${ground};--edge:${edge}` }, thumb, canvas);
+  // what the picture sits on suits what it is (app/stage.js): ground for things that stand, a plain panel for interface pieces,
+  // nothing for a background, which fills the tile
+  const sits = { ground: 'on-ground', panel: 'on-panel', fill: 'fills' }[backdropFor(row)];
+  const tile = el('span', { class: `pic-tile ${sits}`, style: `${sizes(fw, fh)};--sky:${sky};--ground:${ground};--edge:${edge}` }, thumb, canvas);
   const card = el('a', { class: 'card', href: `#/sprite/${row.id}` }, tile, el('span', { class: 'card-text' }, text(row, labelFor('type', row.type))));
 
   const frames = row.stripFrames || 1, fps = row.stripFps || 10;

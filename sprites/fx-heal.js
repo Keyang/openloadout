@@ -36,7 +36,7 @@ export default defineSprite({
     style: choice('Style', 'plus', ['plus', 'leaf', 'star', 'heart']),
     rings: toggle('Ring', true),
     core: color('Core', P.cream, CORE),
-    edge: color('Edge', P.heal, EDGE),
+    edge: color('Edge', P.heal, EDGE, { material: 'signal' }),   // the colour says "healing": a look keeps it
     speed: range('Speed', 0.5, { lo: 'Slow', hi: 'Fast', group: 'Motion' }),
   },
   clips: {

@@ -4,7 +4,7 @@
  "name": "Text blip",
  "category": "ui",
  "tags": ["dialogue", "text", "voice", "blip"],
- "description": "One letter of dialogue appearing: a short soft triangle note whose pitch lands somewhere new each time, so a line of text murmurs like a voice.",
+ "description": "One letter of dialogue appearing: a short soft note whose pitch lands somewhere new each time, so a line of text murmurs like a voice.",
  "meta": {
   "type": "sfx",
   "role": "interface/click",

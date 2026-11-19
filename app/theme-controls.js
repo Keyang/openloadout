@@ -7,7 +7,7 @@
 // The pure helpers at the top (the look in the address bar, colour previews, fast
 // recolouring of a picture) have no DOM and run in Node for the unit tests; only
 // themeControls() touches `document`, and only when it is called.
-import { defaultTheme, normalizeTheme, randomTheme, applyColour, THEME_PRESETS, PALETTES } from '../engine/theme.js';
+import { defaultTheme, normalizeTheme, randomTheme, applyColour, namedMaterials, THEME_PRESETS, PALETTES } from '../engine/theme.js';
 
 const clone = (v) => JSON.parse(JSON.stringify(v));
 const clampTo = (v, lo, hi) => (v < lo ? lo : v > hi ? hi : v);
@@ -137,15 +137,18 @@ export function newSeed(previous = 0) {
 // ---- colour previews -------------------------------------------------------------------------
 
 // Colours most sprites have (skin, red cloth, blue cloth, leaves, gold), so a look's
-// preview shows what it does to a typical character.
-const SAMPLE = ['#e8b796', '#c9423a', '#4f7fe0', '#6cc06a', '#ffcf3f'];
+// preview shows what it does to a typical character. Each is named for what it is of, so the preview is held
+// the way a sprite's own colours are (skin stays a skin tone, leaves stay leaves).
+const SAMPLE_NAMED = { skin: '#e8b796', outfit: '#c9423a', cape: '#4f7fe0', leaves: '#6cc06a', gold: '#ffcf3f' };
+const SAMPLE = Object.values(SAMPLE_NAMED);
+const SAMPLE_OF = namedMaterials(SAMPLE_NAMED);
 
 /** Five '#rrggbb' colours: the sample colours under this theme. */
 export function previewSwatches(theme) {
   const t = normalizeTheme(theme);
   const bytes = new Uint8ClampedArray(SAMPLE.length * 4);
   SAMPLE.forEach((h, i) => { for (let c = 0; c < 3; c++) bytes[i * 4 + c] = parseInt(h.slice(1 + c * 2, 3 + c * 2), 16); bytes[i * 4 + 3] = 255; });
-  applyColour(bytes, t.colour);
+  applyColour(bytes, t.colour, SAMPLE_OF);
   return SAMPLE.map((_, i) => '#' + [0, 1, 2].map((c) => bytes[i * 4 + c].toString(16).padStart(2, '0')).join(''));
 }
 
@@ -168,9 +171,13 @@ export function indexPixels(bytes) {
   return { idx: list.length <= 65536 ? Uint16Array.from(idx) : idx, colours: Uint32Array.from(list) };
 }
 
-/** New RGBA bytes: the indexed picture under these colour settings (Contract 7 `colour`). */
-export function recolourIndexed(indexed, colour) {
-  const themed = applyColour(indexed.colours.slice(), colour);
+/**
+ * New RGBA bytes: the indexed picture under these colour settings (Contract 7 `colour`).
+ * materials (optional): what each colour of the picture is of, from spriteMaterials(sprite, settings) in
+ * engine/theme.js. A sprite's picture is always given with it, so its sky stays sky and its skin stays skin.
+ */
+export function recolourIndexed(indexed, colour, materials) {
+  const themed = applyColour(indexed.colours.slice(), colour, materials);
   const out = new Uint32Array(indexed.idx.length);
   for (let i = 0; i < out.length; i++) out[i] = themed[indexed.idx[i]];
   return new Uint8ClampedArray(out.buffer);
@@ -180,6 +187,9 @@ export function recolourIndexed(indexed, colour) {
 
 const TINTS = [['#ffb040', 'Amber'], ['#ff7a5a', 'Coral'], ['#ffc040', 'Gold'], ['#e8d8b0', 'Old photo'], ['#7ae0c0', 'Mint'], ['#5aa8ff', 'Sky'], ['#6a4ac0', 'Purple'], ['#ff8ac8', 'Pink']];
 const OUTLINES = [['#000000', 'Black'], ['#1a1020', 'Plum'], ['#2a1a10', 'Brown'], ['#0e1a2a', 'Navy'], ['#2a0e1a', 'Wine'], ['#102014', 'Pine'], ['#0a0612', 'Night']];
+
+/** What "Also change shapes" does, in one sentence, shown next to the switch (engine/theme.js, themedParams, has the rule). */
+export const SHAPES_HINT = 'Also change shapes makes each thing a little bigger, smaller or livelier and lets a sound take another of its own styles; nothing is taken away or swapped for something else.';
 
 let uid = 0;
 
@@ -229,7 +239,8 @@ export function themeControls({ theme, onChange = () => {}, original = defaultTh
   });
 
   // Surprise me, shapes, Start over
-  const shapes = h('input', { type: 'checkbox', role: 'switch' });
+  const shapesHint = `${id}-shapes-hint`;
+  const shapes = h('input', { type: 'checkbox', role: 'switch', 'aria-describedby': shapesHint });
   shapes.addEventListener('change', () => { cur = { ...cur, shapes: shapes.checked }; emit(); });
   syncs.push(() => { shapes.checked = !!cur.shapes; });
   const surprise = h('button', { type: 'button', class: 'btn look-surprise' }, 'Surprise me');
@@ -312,6 +323,7 @@ export function themeControls({ theme, onChange = () => {}, original = defaultTh
     h('div', { class: 'look-row' }, surprise,
       h('label', { class: 'look-toggle' }, h('span', {}, 'Also change shapes'), h('span', { class: 'switch' }, shapes, h('span', { class: 'knob', 'aria-hidden': 'true' }))),
       reset),
+    h('p', { class: 'hint look-shapes-hint', id: shapesHint, style: 'margin:0 0 10px' }, SHAPES_HINT),
     h('details', { class: 'look-more', open: !!open }, h('summary', {}, 'Fine-tune colours, sound and music'), colourGroup, soundGroup, musicGroup));
   sync();
   return {

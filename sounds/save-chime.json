@@ -4,7 +4,7 @@
  "name": "Save chime",
  "category": "jingle",
  "tags": ["save", "checkpoint", "reward", "bell", "jingle"],
- "description": "The game is saved: a few rising glassy bell notes of a major chord with an added ninth, the last one held in a long shimmering room. A small tune, the same every time.",
+ "description": "The game is saved: a few rising glassy bell notes of a happy chord, the last one held in a long shimmering room. A small tune, the same every time.",
  "meta": {
   "type": "jingle",
   "role": "interface/reward",

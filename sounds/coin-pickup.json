@@ -8,7 +8,7 @@
   "reward",
   "arcade"
  ],
- "description": "A quick three-note chiptune tune for a collected coin: a low grace note, then a leap of a major sixth that is struck twice, a triangle with a thin pulse edge and a short bell on top, the last note ringing. Change its pitch, interval, speed, ring and shine. Identical every time.",
+ "description": "A quick three-note retro game tune for a collected coin: a short low note, then a jump up that is struck twice, a soft hollow tone with a thin bright edge and a short bell on top, the last note ringing. Change its pitch, the jump between notes, the time between notes, the ring and the shine. The same every time.",
  "meta": {
   "type": "sfx",
   "role": "items/pickup",
@@ -51,7 +51,7 @@
   },
   {
    "id": "interval",
-   "label": "Interval",
+   "label": "Jump between notes",
    "min": 2,
    "max": 12,
    "default": 9,
@@ -59,7 +59,7 @@
   },
   {
    "id": "speed",
-   "label": "Speed",
+   "label": "Time between notes",
    "min": 0.035,
    "max": 0.11,
    "default": 0.055,

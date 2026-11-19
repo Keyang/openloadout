@@ -321,20 +321,33 @@ async function fetchCounted(files, still) {
   }));
 }
 
+// Final review (fault 5): the search index file (generated/search.sqlite, about half a megabyte, and its reader) is
+// fetched only when something needs it: words typed into a search, "More like this", or smarter search. Until then
+// the catalogue answers (Contract 5: every level answers), so a page that only lists things never waits for it.
+let indexed = null;
 function start() {
   if (!starting) {
     starting = (async () => {
       catalog = await loadCatalog();
       let wanted = false;
       try { wanted = browserStorage().getItem(SMART_KEY) === 'on'; } catch { /* off */ }
-      full = await createSearch({ catalog, dbUrl: setup.dbUrl, vendorBase: setup.vendorBase, meaning: 'off' });
-      full.onLevel(tell);
+      full = await createSearch({ catalog, dbUrl: null, meaning: 'off' });
       sizeUp();
       // chosen on an earlier visit: the browser has the files already, so there is nothing to count
-      if (wanted) switchSmart(true, { save: false, count: false });
+      if (wanted) wantIndex().then(() => switchSmart(true, { save: false, count: false }));
     })();
   }
   return starting;
+}
+/** The search with the index file, made the first time something needs it; it then answers everything. */
+function wantIndex() {
+  indexed ??= start().then(async () => {
+    const s = await createSearch({ catalog, dbUrl: setup.dbUrl, vendorBase: setup.vendorBase, meaning: 'off' });
+    full = s;
+    s.onLevel(tell);
+    return s;
+  });
+  return indexed;
 }
 
 const remember = (on) => { try { browserStorage().setItem(SMART_KEY, on ? 'on' : 'off'); } catch { /* this visit only */ } };
@@ -379,7 +392,7 @@ async function switchSmart(on, { save = true, count = true } = {}) {
 }
 
 /** Switch "Smarter search" on or off, and remember the choice. Resolves when it is ready, or has failed. */
-export async function setSmartSearch(on) { await start(); return switchSmart(!!on); }
+export async function setSmartSearch(on) { await wantIndex(); return switchSmart(!!on); }
 
 const ids = (rows) => rows.map((r) => r.id);
 const everything = () => catalog.assets.length + 1;
@@ -387,9 +400,13 @@ const everything = () => catalog.assets.length + 1;
 /** The site's search. Every call waits only for the catalogue. */
 export const finder = {
   ready: () => start(),
-  /** Ids whose words match, best first, at once. With nothing typed: every asset, in catalogue order. */
-  async direct(q) {
+  /**
+   * Ids whose words match, best first, at once. With nothing typed: every asset, in catalogue order.
+   * index: false answers from the catalogue alone and does not fetch the index (a check that is not a search).
+   */
+  async direct(q, { index = true } = {}) {
     await start();
+    if (index && String(q ?? '').trim()) await wantIndex();
     if (full.level !== 'meaning') return ids(await full.search(q, { limit: everything() }));
     wordsOnly ??= await createSearch({ catalog, dbUrl: null, meaning: 'off' });
     return ids(await wordsOnly.search(q, { limit: everything() }));
@@ -400,7 +417,7 @@ export const finder = {
   async ranked(q) { await start(); return ids(await full.search(q, { limit: everything() })); },
   /** How many assets each filter value would give, among `among` (ids) or everything. */
   async counts(filters, among = null) { await start(); return full.counts(filters, { ids: among }); },
-  async similar(id, n = 6) { await start(); return full.similar(id, n); },
+  async similar(id, n = 6) { await wantIndex(); return full.similar(id, n); },
 };
 
 // ---- for other pages --------------------------------------------------------------------------

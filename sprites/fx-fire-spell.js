@@ -40,8 +40,8 @@ export default defineSprite({
     pieces: range('Tongues', 5, { min: 3, max: 7, step: 1, lo: 'Few', hi: 'Many' }),
     style: choice('Style', 'pillar', ['pillar', 'ball', 'ring']),
     sparks: toggle('Embers', true),
-    core: color('Core', P.thunder, CORE),
-    edge: color('Edge', P.fire, EDGE),
+    core: color('Core', P.thunder, CORE, { material: 'fire' }),   // flame: a look keeps it a fire colour
+    edge: color('Edge', P.fire, EDGE, { material: 'fire' }),
     flicker: range('Flicker', 0.5, { lo: 'Steady', hi: 'Wild', group: 'Motion' }),
     speed: range('Speed', 0.5, { lo: 'Slow', hi: 'Fast', group: 'Motion' }),
   },

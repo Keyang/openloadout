@@ -1,5 +1,6 @@
 // The little scene behind the sprite in the preview. Drawn in sprite pixels so
-// the backdrop and the sprite share one pixel grid.
+// the backdrop and the sprite share one pixel grid. Which backdrops suit a sprite depends on what it is
+// (backdropFor): a character stands on the ground, an interface piece sits on a panel, a background is the frame.
 import { hash } from '../engine/motion.js';
 
 export const STAGES = [
@@ -7,11 +8,43 @@ export const STAGES = [
   { id: 'cave', label: 'Cave' },
   { id: 'plain', label: 'Plain' },
 ];
+/** Backdrops for an interface piece: a plain panel, as a menu or a game screen would sit on. */
+export const PANELS = [
+  { id: 'panel-light', label: 'Light panel' },
+  { id: 'panel-dark', label: 'Dark panel' },
+];
+
+/**
+ * What a sprite is previewed on, from its catalogue row or its meta ({ type, role }):
+ *   'panel'  an interface piece (role under interface/, or type ui or icon): a plain panel, no ground, centred
+ *   'fill'   a background (role environment/background, or type background): the picture fills the frame
+ *   'ground' everything else stands on the ground of a scene (meadow, cave, plain)
+ */
+export function backdropFor(meta) {
+  const role = String(meta?.role ?? ''), type = String(meta?.type ?? '');
+  if (role.startsWith('interface/')) return 'panel';
+  if (role === 'environment/background') return 'fill';
+  if (type === 'ui' || type === 'icon') return 'panel';
+  if (type === 'background') return 'fill';
+  return 'ground';
+}
+
+/** The backdrop choices that suit a kind from backdropFor: scenes, panels, or none (a background is its own backdrop). */
+export const stagesFor = (backdrop) => (backdrop === 'panel' ? PANELS : backdrop === 'fill' ? [] : STAGES);
 
 const mod = (a, n) => ((a % n) + n) % n;
 
 export function drawStage(ctx, W, H, groundY, kind, scroll = 0) {
   const s = Math.floor(scroll);
+  if (kind === 'panel-light' || kind === 'panel-dark') {
+    // a plain panel with a faint grid, nothing to stand on
+    const [face, line] = kind === 'panel-light' ? ['#eef0f7', '#e1e5f0'] : ['#2b2440', '#342c4d'];
+    ctx.fillStyle = face; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = line;
+    for (let x = 0; x < W; x += 8) ctx.fillRect(x, 0, 1, H);
+    for (let y = 0; y < H; y += 8) ctx.fillRect(0, y, W, 1);
+    return;
+  }
   if (kind === 'plain') {
     for (let y = 0; y < H; y += 8) for (let x = 0; x < W; x += 8) {
       ctx.fillStyle = ((x + y) / 8) % 2 ? '#e6e9f2' : '#f4f6fb';

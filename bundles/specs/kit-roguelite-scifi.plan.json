@@ -2,6 +2,7 @@
   "id": "kit-roguelite-scifi",
   "name": "Derelict Station roguelite kit",
   "gameType": "roguelike-action",
+  "blurb": "Everything for a top-down sci-fi action roguelike: a ranger, troopers, bugs, robots and two bosses, station and hive ground, doors and props, pickups, projectiles, effects, a starfield, a tech interface, sounds and two tracks.",
   "theme": "sci-fi",
   "view": "top-down",
   "palette": {

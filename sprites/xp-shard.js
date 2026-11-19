@@ -51,8 +51,8 @@ export default defineSprite({
     size: range('Size', 0.5, { lo: 'Small', hi: 'Big' }),
     shape: choice('Shape', 'shard', ['shard', 'orb', 'star', 'cube']),
     sparkle: toggle('Sparkle', true),
-    body: color('Shard', P.xp, swatches('derelict', 'gem')),
-    glow: color('Heart', P.cream, [P.cream, P.suit, P.skin, P.steel]),      // pale colours only: it is the bright heart of the shard
+    body: color('Shard', P.xp, swatches('derelict', 'gem'), { material: 'signal' }),
+    glow: color('Heart', P.cream, [P.cream, P.suit, P.skin, P.steel], { material: 'light' }),      // pale colours only: it is the bright heart of the shard
     bob: range('Float', 0.5, { lo: 'Still', hi: 'Floaty', group: 'Motion' }),
     speed: range('Speed', 0.5, { lo: 'Slow', hi: 'Fast', group: 'Motion' }),
   },

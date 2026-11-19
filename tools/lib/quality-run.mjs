@@ -1,9 +1,18 @@
 // Runs the quality bar (quality/sprite.js, quality/sound.js) over many assets at once:
-// across worker threads, with each result cached in .cache/quality.json. A cached result
-// is used when nothing it depends on has changed: the asset file, the engine, rigs, sound
-// engine, quality code and catalog/schema.js (and, for sprites, the sounds their cues name
-// (only those) and any shared helper file sprites/_*.js). A crashed check is never cached. Used by tools/check.mjs, tools/sfx.mjs and
-// tools/build.mjs.
+// across worker threads, with each result cached in .cache/quality.json.
+//
+// What a cached result is keyed on: the files that asset really loads, and nothing else.
+//   - the asset's own file;
+//   - for a sprite, every module it imports, followed through their imports (its rig, the engine modules
+//     the rig uses, a shared helper sprites/_*.js), read from the source text by tools/lib/imports.mjs;
+//   - the checker's code: quality/sprite.js or quality/sound.js with everything it imports, catalog/schema.js,
+//     and the worker that calls them (tools/lib/quality-worker.mjs);
+//   - for a sprite, the sounds its cues name (only those).
+// So an edit to one rig re-checks the sprites on that rig, an edit to the sound engine re-checks the sounds,
+// and an edit to a file nothing loads re-checks nothing. If any module behind an asset holds an import that
+// cannot be followed by reading it (import(someVariable)), that asset is keyed on the whole of engine/, rigs/,
+// sound/ and quality/ instead, so a stale pass is never served. A crashed check is never cached.
+// assetFiles() returns the list for one asset. Used by tools/check.mjs, tools/sfx.mjs and tools/build.mjs.
 //
 //   const { results, metaChecked, notice } = await runQuality({
 //     root,        // project folder (default: this project)
@@ -15,6 +24,8 @@
 //     onResult,    // (result) => void, called as each asset finishes
 //   });
 //   results: [{ kind, id, file, ok, errors, warnings, notes, metrics, cached, ... }] in the order asked
+//
+//   failureReport(results) -> lines of text for the assets that failed: which file, what is wrong, what to do.
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -22,11 +33,16 @@ import crypto from 'node:crypto';
 import { Worker } from 'node:worker_threads';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { ROOT } from './assets.mjs';
+import { importGraph } from './imports.mjs';
 
 const WORKER = path.join(path.dirname(fileURLToPath(import.meta.url)), 'quality-worker.mjs');
 const DEP_DIRS = ['engine', 'rigs', 'sound', 'quality'];
 const DEP_FILES = ['catalog/schema.js'];
-const VERSION = 1;
+const VERSION = 2;       // 2: each asset is keyed on the files it loads (1 keyed every asset on whole folders)
+// A worker starts with the options Node was started with. Under `node -e "<script>"` those options hold the script
+// itself, so each worker would run it again (and start workers of its own, without end): then start it with none.
+const FROM_ONE_LINER = process.execArgv.some((a) => /^(-e|--eval|-p|--print|-pe)$/.test(a) || /^--(eval|print)=/.test(a));
+const WORKER_OPTIONS = FROM_ONE_LINER ? { execArgv: [] } : {};
 const isAsset = (f, ext) => f.endsWith(ext) && !f.startsWith('_') && f !== 'index.js' && f !== 'index.json';
 
 function walk(dir, out = []) {
@@ -37,21 +53,39 @@ function walk(dir, out = []) {
   }
   return out;
 }
-function hashFiles(root, files) {
-  const h = crypto.createHash('sha1');
-  for (const f of files) { h.update(path.relative(root, f)); h.update('\0'); h.update(fs.readFileSync(f)); h.update('\0'); }
-  return h.digest('hex');
+/**
+ * The files a cached result for one asset depends on (see the top of this file).
+ * kind: 'sprite' or 'sound'; file: the asset's file; graph: an importGraph() to share between many calls.
+ * Returns { files, missing, open }: absolute paths, sorted; `missing` are files that are named but not on disk
+ * (creating one changes the key); `open` is true when an import could not be followed, in which case `files`
+ * holds the whole framework.
+ */
+export function assetFiles(root = ROOT, kind, file, graph) {
+  root = path.resolve(root);
+  graph ??= importGraph({ root });
+  const starts = [path.resolve(file), path.join(root, 'quality', kind === 'sprite' ? 'sprite.js' : 'sound.js'), ...DEP_FILES.map((f) => path.join(root, f))];
+  const c = graph.closure(starts);
+  // the worker loads the checker by a path it works out while running (the lines above name those files), so it is
+  // listed as one file and not read for imports
+  const all = new Set([...c.files, WORKER]);
+  if (c.unknown.length) for (const f of DEP_DIRS.flatMap((d) => walk(path.join(root, d)))) all.add(f);
+  return { files: [...all].sort(), missing: c.missing, open: c.unknown.length > 0 };
 }
 
-/** Hash of everything every check depends on besides the asset itself. */
-export function dependencyHash(root = ROOT) {
-  const files = [...DEP_DIRS.flatMap((d) => walk(path.join(root, d))), ...DEP_FILES.map((f) => path.join(root, f)).filter((f) => fs.existsSync(f))];
-  return hashFiles(root, files);
-}
-/** Shared sprite helpers (sprites/_*.js): every sprite may import them. */
-function spriteHelpersHash(root) {
-  const sprites = path.join(root, 'sprites');
-  return hashFiles(root, fs.existsSync(sprites) ? fs.readdirSync(sprites).filter((f) => f.startsWith('_')).sort().map((f) => path.join(sprites, f)) : []);
+/** Makes the cache key of one asset: (kind, file) => 40 hex characters. Reads each file once however many assets share it. */
+function keyMaker(root) {
+  const graph = importGraph({ root }), digests = new Map();
+  const digest = (f) => {
+    if (!digests.has(f)) { let d = '(missing)'; try { d = crypto.createHash('sha1').update(fs.readFileSync(f)).digest('hex'); } catch { /* gone since it was listed */ } digests.set(f, d); }
+    return digests.get(f);
+  };
+  return (kind, file) => {
+    const { files, missing } = assetFiles(root, kind, file, graph);
+    const h = crypto.createHash('sha1').update(`v${VERSION}\0${kind}\0`);
+    for (const f of files) { h.update(path.relative(root, f)); h.update('\0'); h.update(digest(f)); h.update('\0'); }
+    for (const f of missing) { h.update(path.relative(root, f)); h.update('\0(missing)\0'); }
+    return h.digest('hex');
+  };
 }
 
 /** Hash of the sounds a sprite's cues name (sounds/<id>.json), so editing another sound keeps its cached result. */
@@ -122,17 +156,15 @@ export async function runQuality({ root = ROOT, sprites, sounds, cache = true, c
     ...soundFiles(root, sounds).map((file) => ({ kind: 'sound', file })),
   ];
   const { metaChecked, notice } = await metaStatus(root);
-  const dep = dependencyHash(root), extras = tasks.some((t) => t.kind === 'sprite') ? spriteHelpersHash(root) : '';
+  const keyOf = keyMaker(root);
   const stored = readCache(cacheFile).entries;
   const results = new Array(tasks.length), todo = [], updates = {};
   tasks.forEach((t, i) => {
     t.i = i;
     t.rel = path.relative(root, t.file).startsWith('..') ? t.file : path.relative(root, t.file);
     t.key = `${t.kind}:${t.rel}`;
-    let content = '';
-    try { content = fs.readFileSync(t.file); } catch { /* the worker reports it */ }
-    t.hash = crypto.createHash('sha1').update(dep).update(t.kind === 'sprite' ? extras : '').update(content).digest('hex');
-    if (t.kind === 'sound') { try { t.music = JSON.parse(content).category === 'music'; } catch { t.music = false; } }
+    t.hash = keyOf(t.kind, t.file);
+    if (t.kind === 'sound') { try { t.music = JSON.parse(fs.readFileSync(t.file, 'utf8')).category === 'music'; } catch { t.music = false; } }
     const entry = stored[t.key];
     const fresh = entry && entry.hash === t.hash && (!entry.uses || soundsHash(root, entry.uses) === entry.usesHash);
     const hit = cache && fresh ? entry.result : null;
@@ -154,7 +186,7 @@ export async function runQuality({ root = ROOT, sprites, sounds, cache = true, c
       onResult?.(results[t.i]);
     };
     for (let w = 0; w < n; w++) {
-      const worker = new Worker(WORKER, { workerData: { root } });
+      const worker = new Worker(WORKER, { workerData: { root }, ...WORKER_OPTIONS });
       running++;
       let current = null;
       const feed = () => {
@@ -188,4 +220,63 @@ export async function runQuality({ root = ROOT, sprites, sounds, cache = true, c
   });
   if (Object.keys(updates).length) writeCache(cacheFile, updates);
   return { results, metaChecked, notice };
+}
+
+// ---- saying what failed ------------------------------------------------------------------
+// One wording for every tool that stops on the quality bar (the build today): for each asset that failed,
+// which file, what is wrong, and what to do about it.
+
+const isCrash = (e) => /^checker (crashed|stopped)/.test(e);
+/** The id to hand to tools/check.mjs: the file's own name when it is in sprites/, otherwise the path. */
+const spriteArg = (file) => (/^sprites\/[^/]+\.m?js$/.test(file) ? path.basename(file).replace(/\.m?js$/, '') : file);
+
+function whatToDo(r) {
+  const errors = r.errors ?? [];
+  if (errors.length && errors.every(isCrash)) {
+    return ['This is not a finding about the asset: the checking code itself broke while looking at it.',
+      'Build again. If the same message comes back, pass it on exactly as it is.'];
+  }
+  if (r.kind === 'sprite') {
+    const arg = spriteArg(r.file);
+    const first = errors.some((e) => e.startsWith('cannot be loaded'))
+      ? `The file stops with a mistake before anything can be drawn; the words after "cannot be loaded:" say what it is. Correct it in ${r.file}.`
+      : `Open ${r.file} and correct what is listed.`;
+    return [first, `Check only this sprite:  node tools/check.mjs ${arg}`, `Look at what it draws:   node tools/render.mjs ${arg}   (pictures go to out/)`];
+  }
+  const first = errors.some((e) => e.startsWith('cannot be read'))
+    ? `The file is not written correctly, often a missing or extra comma, quote or bracket; the words after "cannot be read:" say where. Correct it in ${r.file}.`
+    : `Open ${r.file} and correct what is listed.`;
+  return [first, `Check only this sound, with what was measured:  node tools/sfx.mjs check ${r.file}`];
+}
+
+/**
+ * The assets that failed, as lines of text: for each, the file (and its name), "What is wrong" with every
+ * finding word for word, and "What to do" with the commands that check and show just that asset. Ends with
+ * how to read the short forms findings use, and where every check is explained. No failures: no lines.
+ * results: as runQuality() returns them.
+ */
+export function failureReport(results) {
+  const failed = results.filter((r) => !r.ok || (r.errors ?? []).length);
+  if (!failed.length) return [];
+  const lines = [];
+  for (const r of failed) {
+    const errors = (r.errors ?? []).length ? r.errors : ['it did not pass, and the checker gave no reason'];
+    lines.push(`${r.file}${r.name ? `  ("${r.name}")` : ''}`);
+    if (errors.length === 1) lines.push(`  What is wrong:  ${errors[0]}`);
+    else { lines.push(`  What is wrong (${errors.length} things):`); errors.forEach((e, i) => lines.push(`    ${i + 1}. ${e}`)); }
+    const todo = whatToDo(r);
+    lines.push(`  What to do:     ${todo[0]}`);
+    for (const t of todo.slice(1)) lines.push(`                  ${t}`);
+    lines.push('');
+  }
+  const all = failed.flatMap((r) => r.errors ?? []);
+  const place = all.map((e) => /^(\S+) frame (\d+) \/ ([^:]+):/.exec(e)).find(Boolean);
+  const more = all.map((e) => /\(and (\d+) more\)/.exec(e)).find(Boolean);
+  if (place || more) {
+    lines.push('How to read a finding:');
+    if (place) lines.push(`  "${place[1]} frame ${place[2]} / ${place[3]}" is the animation called "${place[1]}", picture ${place[2]} of it (pictures are counted from 0), drawn with the settings named after the slash.`);
+    if (more) lines.push(`  "(and ${more[1]} more)" means the same fault was seen in ${more[1]} more ${more[1] === '1' ? 'place' : 'places'}; correcting the cause clears them all.`);
+  }
+  lines.push('What each check looks for is explained in docs/quality-bar.md.');
+  return lines;
 }

@@ -10,7 +10,7 @@
   "adaptive",
   "loop"
  ],
- "description": "Warm, gentle village music in F major, 8 to 32 bars long: plucked strings roll under a tune in long notes, Intensity brings in the bass and the tune, then a shaker and hand drum, then a chime, and you can change the tempo, key, lilt and the instrument that plays the tune.",
+ "description": "Warm, gentle, happy village music in short or long versions: plucked strings roll under a tune in long notes, Intensity brings in the bass and the tune, then a shaker and hand drum, then a chime, and you can change the speed, pitch, lilt and the instrument that plays the tune.",
  "meta": {
   "type": "music",
   "role": "music/exploration",
@@ -56,7 +56,7 @@
   },
   {
    "id": "bpm",
-   "label": "Tempo",
+   "label": "Speed",
    "min": 80,
    "max": 108,
    "default": 92,
@@ -64,7 +64,7 @@
   },
   {
    "id": "key",
-   "label": "Key",
+   "label": "Pitch",
    "min": -5,
    "max": 6,
    "default": 0,

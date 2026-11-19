@@ -4,7 +4,7 @@
   "name": "Robot shutdown",
   "category": "impact",
   "tags": ["sci-fi", "gritty", "robot", "death"],
-  "description": "A machine dying: a crushed pulse tone gliding down, chopped by a stutter that slows, ending in a crackle of sparks. Pitch, length, stutter, sparks and grit can be changed.",
+  "description": "A machine dying: a crushed buzzing tone gliding down, chopped by a stutter that slows, ending in a crackle of sparks. Pitch, length, stutter, sparks and grit can be changed.",
   "meta": {
     "type": "sfx",
     "role": "characters/death",

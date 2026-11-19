@@ -16,6 +16,7 @@
 import { test, expect as baseExpect, openRoute, waitForDrawn, canvasStats, setRange, downloadFrom } from '../helpers/test.mjs';
 import { readCatalogue, readPatches, catalogueOf, recordPlayed, heardAfter, playReady, playState, packageOf, sameBytes } from '../helpers/acceptance.mjs';
 import { THEME_PRESETS, PALETTES, normalizeTheme, defaultTheme } from '../../engine/theme.js';
+import { shelvesOf } from '../../app/shelves.js';
 
 // Many builders share this machine: anything the page is waited for gets 20 seconds, not the usual 5.
 const expect = baseExpect.configure({ timeout: 20_000 });
@@ -36,6 +37,10 @@ const LOOK = NAMED.find((p) => hasPalette(p) && p.theme.sound.pitch !== 0 && p.t
 /** Another look, to change the whole bag to and back. */
 const OTHER = LOOK && (NAMED.find((p) => p.id !== LOOK.id && p.id !== 'original' && hasPalette(p)) ?? NAMED.find((p) => p.id !== LOOK.id && differs(p.theme.colour, PLAIN.colour)));
 const ORIGINAL = NAMED.find((p) => !differs(p.theme.colour, PLAIN.colour) && !differs(p.theme.sound, PLAIN.sound) && !differs(p.theme.music, PLAIN.music));
+// Under the look, at least this much of the playground scene is in the look's own colours (measured 2026-11-19: 0.09 to
+// 0.31 over the bundles, the rest being the sky and the ground, held as what they are), and at least this much of it
+// is another colour than without the look (measured: 0.99 to 1).
+const PLAY_SHARE = 0.05, PLAY_CHANGED = 0.6;
 const paletteOf = (look) => new Set((PALETTES.find((p) => p.name === look.theme.colour.palette)?.colours ?? []).map((c) => parseInt(c.slice(1), 16)));
 
 const lookButton = (scope, look) => scope.getByRole('button', { name: look.name, exact: true });
@@ -111,8 +116,8 @@ const hashes = (list) => list.map((p) => p.hash);
 
 /**
  * Open the playground from the bag, hold its scene still at its start, and read it:
- * { hash, share } where share is how much of the scene is painted in colours of `palette` (a Set of 0xRRGGBB), or null
- * when the bag has nothing to draw.
+ * { hash, share, sample } where share is how much of the scene is painted in colours of `palette` (a Set of 0xRRGGBB),
+ * and sample is every 7th pixel's colour (0xRRGGBB), to compare two scenes by; or null when the bag has nothing to draw.
  */
 async function playgroundScene(page, palette) {
   await page.getByRole('link', { name: 'Try these in the playground' }).click();
@@ -124,16 +129,21 @@ async function playgroundScene(page, palette) {
   await page.getByRole('button', { name: 'Reset the scene' }).click();
   let last = null;
   await expect.poll(async () => { const now = (await canvasStats(stage)).hash, same = now === last; last = now; return same; }, { message: 'the paused scene holds still', timeout: 20_000 }).toBe(true);
-  const share = await stage.evaluate((cv, colours) => {
+  const { share, sample } = await stage.evaluate((cv, colours) => {
     const set = new Set(colours);
     const { data } = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height);
     let hit = 0;
-    for (let i = 0; i < data.length; i += 4) if (set.has((data[i] << 16) | (data[i + 1] << 8) | data[i + 2])) hit++;
-    return hit / (data.length / 4);
+    const sample = [];
+    for (let i = 0, n = 0; i < data.length; i += 4, n++) {
+      const v = (data[i] << 16) | (data[i + 1] << 8) | data[i + 2];
+      if (set.has(v)) hit++;
+      if (n % 7 === 0) sample.push(v);
+    }
+    return { share: hit / (data.length / 4), sample };
   }, [...palette]);
   const state = await playState(page);
   await page.getByRole('button', { name: 'Unmute', exact: true }).click();
-  return { hash: last, share, muted: state.muted };
+  return { hash: last, share, sample, muted: state.muted };
 }
 
 // ---- the packages ---------------------------------------------------------------------------------------------
@@ -211,7 +221,9 @@ for (const listed of LISTED) {
     await expect(page.locator('.bundle-music')).toHaveCount(bundle.music.length);
 
     const original = { sprites: await spritePictures(page), sounds: await soundsHeard(page, bundle, rows), tracks: await trackLines(page) };
-    expect(original.sprites.map((s) => s.id)).toEqual(bundle.sprites);
+    // the page shows every sprite of the bundle once, grouped under its headings (app/shelves.js), so in shelf order
+    expect(original.sprites.map((s) => s.id)).toEqual(shelvesOf(bundle.sprites.map((id) => rows[id])).flatMap((g) => g.rows.map((r) => r.id)));
+    expect(original.sprites.map((s) => s.id).sort()).toEqual(bundle.sprites.slice().sort());
     for (const s of original.sprites) expect(s.opaque, `${s.id} is drawn`).toBeGreaterThan(0);
 
     // ---------------------------------------------------------------- the first original download
@@ -228,7 +240,8 @@ for (const listed of LISTED) {
     await expect(lookButton(page, LOOK)).toHaveAttribute('aria-pressed', 'true');
     expect((await lookInAddress(page)).look).toBe(LOOK.id);
     const styled = { sprites: await spritePictures(page), sounds: await soundsHeard(page, bundle, rows), tracks: await trackLines(page) };
-    styled.sprites.forEach((s, i) => expect(s.hash, `the picture of ${s.id} changed under ${LOOK.name}`).not.toBe(original.sprites[i].hash));
+    const originalHash = Object.fromEntries(original.sprites.map((s) => [s.id, s.hash]));
+    styled.sprites.forEach((s) => expect(s.hash, `the picture of ${s.id} changed under ${LOOK.name}`).not.toBe(originalHash[s.id]));
     for (const id of bundle.sounds) expect(styled.sounds[id], `${id} sounds different under ${LOOK.name}`).not.toBe(original.sounds[id]);
     for (const id of bundle.music) expect(styled.tracks[id], `${id} plays differently under ${LOOK.name}`).not.toBe(original.tracks[id]);
 
@@ -286,8 +299,11 @@ for (const listed of LISTED) {
     const playedStyled = await playgroundScene(page, palette);
     if (bundle.sprites.length) {
       expect(playedStyled, 'the playground draws a scene').toBeTruthy();
-      // a look with a colour set leaves nothing on screen in any other colour: sky, ground and every sprite
-      if (palette.size) expect(playedStyled.share, `how much of the playground scene is in the ${LOOK.name} colours (1 is all of it)`).toBe(1);
+      // A look with a colour set paints the scene in that set, except what must stay what it is: a sky stays a sky, grass
+      // stays grass, skin stays skin (Contract 7; tests/e2e/looks.spec.mjs and tests/unit/looks-materials.test.mjs hold
+      // that side). So a good part of the scene is in the set's colours, not all of it (the sky and the ground are most
+      // of it); further down, without the look none of it is, and most of the scene's pixels are another colour.
+      if (palette.size) expect(playedStyled.share, `how much of the playground scene is in the ${LOOK.name} colours`).toBeGreaterThanOrEqual(PLAY_SHARE);
     }
     await page.getByRole('link', { name: 'Back to your bag' }).click();
     await expect(page.locator('.bag-item')).toHaveCount(ids.length);
@@ -322,6 +338,9 @@ for (const listed of LISTED) {
     const playedPlain = await playgroundScene(page, palette);
     if (playedStyled && playedPlain) {
       expect(playedPlain.hash, 'the playground scene looks different without the look').not.toBe(playedStyled.hash);
+      // a look that silently left the playground alone would change none of it
+      const changed = playedStyled.sample.filter((v, i) => v !== playedPlain.sample[i]).length / playedStyled.sample.length;
+      expect(changed, `how much of the playground scene the ${LOOK.name} look recoloured`).toBeGreaterThanOrEqual(PLAY_CHANGED);
       if (palette.size) expect(playedPlain.share, `without the look the scene is not in the ${LOOK.name} colours`).toBeLessThan(playedStyled.share);
     }
   });

@@ -2,14 +2,13 @@
 import { el, header, saveBlob, SOUND_BG, cap } from './ui.js';
 import { soundParams, randomSoundParams, rendered, playRendered, wavBytes, toUnit, toValue, drawWave } from './audio.js';
 import { addToBag, keepBag } from './add-to-bag.js';
+import { shownValue } from '../sound/words.js';
 import { goesWith, moreLikeThis } from './related.js';
 import { madeNote } from './catalog.js';      // W5-A: a sound made on this visit says so, and a draft cannot go in the bag
 
 const INK = '#231b33';
-const fmt = (d, v) => {
-  const n = Math.abs(v) >= 100 ? Math.round(v) : Math.abs(v) >= 10 ? Math.round(v * 10) / 10 : Math.round(v * 100) / 100;
-  return d.unit ? `${n} ${d.unit}` : String(n);
-};
+// A value in everyday words ("high", "fast", "a lot"), never "2200 Hz": a count with no unit (rockets, notes) is its number
+const fmt = shownValue;
 
 export function soundPage(app, patch, query) {
   document.title = `${patch.name} · Loadout`;
@@ -77,11 +76,11 @@ export function soundPage(app, patch, query) {
   // ---- sliders
   const sliders = {};
   const fields = patch.params.map((d) => {
-    const out = el('span', { class: 'end value' }, fmt(d, st.p[d.id]));
-    const input = el('input', { id: `s-${d.id}`, type: 'range', min: 0, max: 1, step: 0.005, value: toUnit(d, st.p[d.id]),
-      oninput: (e) => { st.p[d.id] = toValue(d, Number(e.target.value)); st.custom = true; out.textContent = fmt(d, st.p[d.id]); },
+    const out = el('span', { class: 'end value', style: 'min-width: 7.5em' }, fmt(d, st.p[d.id]));   // wide enough for "rises a little", so the slider does not jump as the word changes
+    const input = el('input', { id: `s-${d.id}`, type: 'range', min: 0, max: 1, step: 0.005, value: toUnit(d, st.p[d.id]), 'aria-valuetext': fmt(d, st.p[d.id]),
+      oninput: (e) => { st.p[d.id] = toValue(d, Number(e.target.value)); st.custom = true; out.textContent = fmt(d, st.p[d.id]); e.target.setAttribute('aria-valuetext', out.textContent); },
       onchange: () => changed(true) });
-    sliders[d.id] = () => { input.value = toUnit(d, st.p[d.id]); out.textContent = fmt(d, st.p[d.id]); };
+    sliders[d.id] = () => { input.value = toUnit(d, st.p[d.id]); out.textContent = fmt(d, st.p[d.id]); input.setAttribute('aria-valuetext', out.textContent); };
     return el('div', { class: 'field' }, el('label', { for: `s-${d.id}` }, d.label), el('div', { class: 'slider two' }, input, out));
   });
   const syncSliders = () => { for (const k of Object.keys(sliders)) sliders[k](); };

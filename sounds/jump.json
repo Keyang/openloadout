@@ -8,7 +8,7 @@
   "hop",
   "retro"
  ],
- "description": "Rising pulse-wave chirp.",
+ "description": "A rising, buzzy chirp.",
  "meta": {
   "type": "sfx",
   "role": "actions/jump",
@@ -63,7 +63,7 @@
   },
   {
    "id": "duty",
-   "label": "Pulse width",
+   "label": "Fullness",
    "min": 0.08,
    "max": 0.5,
    "default": 0.25

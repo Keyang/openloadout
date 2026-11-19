@@ -62,7 +62,7 @@ export default defineSprite({
     shape: choice('Shape', 'round', ['round', 'splat', 'long']),
     pieces: range('Bubbles', 0.5, { lo: 'Few', hi: 'Many' }),
     crust: toggle('Dark rim', true),
-    body: color('Body', P.acid, BODY),
+    body: color('Body', P.acid, BODY, { material: 'warning' }),
     glow: color('Shine', P.cream, SHINE),
     wobble: range('Wobble', 0.5, { lo: 'Firm', hi: 'Wobbly', group: 'Motion' }),
     speed: range('Speed', 0.5, { lo: 'Slow', hi: 'Fast', group: 'Motion' }),

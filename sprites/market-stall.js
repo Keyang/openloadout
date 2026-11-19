@@ -48,7 +48,7 @@ export default defineSprite({
     width: range('Width', 0.5, { lo: 'Narrow', hi: 'Wide' }),
     // the cloth is dark and the accent light, so stripes and edging show whatever is picked, under every look
     cloth: color('Cloth', P.roof, swatchesBetween('hearthvale', ['outfit'], { lead: 'roof', max: 0.5 })),
-    accent: color('Stripes and edging', P.cream, swatchesBetween('hearthvale', ['accent', 'core', 'sky'], { lead: 'cream', min: 0.7 })),
+    accent: color('Stripes and edging', P.cream, swatchesBetween('hearthvale', ['accent', 'core', 'sky'], { lead: 'cream', min: 0.7 }), { material: 'cloth' }),
     wood: color('Wood', P.wood, swatches('hearthvale', 'wood')),
     sway: range('Sway', 0.5, { lo: 'Still', hi: 'Swaying', group: 'Motion' }),
     speed: range('Speed', 0.5, { lo: 'Slow', hi: 'Fast', group: 'Motion' }),

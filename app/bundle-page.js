@@ -9,13 +9,14 @@
 // short list of colours instead of drawing it again. With "Also change shapes" the
 // sprite's own program draws the frames it needs.
 import { loadCatalog, bundleById, assetsOfBundle, loadSprite, loadSound } from './catalog.js';
-import { normalizeTheme, renderThemedFrame } from '../engine/theme.js';
+import { normalizeTheme, renderThemedFrame, spriteMaterials } from '../engine/theme.js';
 import { applySound, themedSoundParams, soundSettingsFor } from '../sound/theme.js';
 import { el, header, saveBlob, reduceMotion, SOUND_BG, cap } from './ui.js';
 import { soundById, soundParams, rendered, renderAsync, playRendered, playLive, drawWave } from './audio.js';
 import { bag, cleanSettings } from './bag.js';
 import { packageFiles, activeTheme } from './bundle.js';
 import { zip } from './zip.js';
+import { shelvesOf } from './shelves.js';
 import { themeControls, themeFromQuery, lookSearch, queryHasLook, indexPixels, recolourIndexed } from './theme-controls.js';
 
 const INK = '#231b33';
@@ -26,6 +27,7 @@ const GAME_WORDS = { any: 'any game', platformer: 'platformer games', 'turn-base
 const linkTo = (row) => `#/${row.kind}/${row.id}`;
 
 function notHere(app, title, text) {
+  document.title = 'Not here · Loadout';
   app.replaceChildren(header(''), el('main', { class: 'home' },
     el('h1', { class: 'small' }, title),
     el('p', { class: 'lede' }, text),
@@ -106,7 +108,7 @@ function spriteTile(row, page) {
   function paint(now) {
     if (!visible || !indexed || !look || painted === lookKey) return;
     shaped.clear();
-    if (!look.shapes || !sprite) sg.putImageData(new ImageData(recolourIndexed(indexed, look.colour), fw * frames, fh), 0, 0);
+    if (!look.shapes || !sprite) sg.putImageData(new ImageData(recolourIndexed(indexed, look.colour, sprite ? () => spriteMaterials(sprite, {}) : null), fw * frames, fh), 0, 0);   // looks: with what each colour is of (Contract 7)
     painted = lookKey;
     draw(frameAt(now));
   }
@@ -119,6 +121,9 @@ function spriteTile(row, page) {
       if (!bytes) throw new Error(`${row.id}: no picture`);
       indexed = indexPixels(bytes);
       paint(performance.now());
+      // looks: what each colour of this sprite is of is found by drawing it a few times; do that now, between other
+      // work, so the first look that is picked does not have to wait for it
+      if (sprite) setTimeout(() => { try { spriteMaterials(sprite, {}); } catch { /* found again when a look needs it */ } }, 0);
     })().catch((e) => { console.warn(e); node.classList.add('broken'); });
     return loading;
   }
@@ -290,6 +295,7 @@ export async function bundlePage(app, id, query = {}, still = () => true) {
   const page = { start: performance.now() };
   const queue = idleQueue();
   const tiles = [];
+  const tileOf = new Map();       // catalogue row -> its tile
   for (const row of rows) {
     if (row.kind === 'sprite') tiles.push(spriteTile(row, page));
     else {
@@ -298,8 +304,8 @@ export async function bundlePage(app, id, query = {}, still = () => true) {
       if (!patch) continue;
       tiles.push(row.kind === 'music' ? musicTile(row, patch) : soundTile(row, patch, queue));
     }
+    tileOf.set(row, tiles.at(-1));
   }
-  const byKind = (k) => tiles.filter((t) => t.node.classList.contains(`bundle-${k}`));
 
   const main = el('main', { class: 'home bundle-page' });
 
@@ -328,7 +334,7 @@ export async function bundlePage(app, id, query = {}, still = () => true) {
   const n = rows.length;
   const items = () => rows.map((r, i) => ({ key: `b${i + 1}`, kind: r.kind, id: r.id, settings: cleanSettings(r.kind, {}) }));
 
-  function put(mode, then) {
+  function put(mode, then, keepLook = false) {     // looks: keepLook leaves the bag the look it already has
     ask.hidden = true;
     if (mode === 'replace') bag.clear();
     const seen = new Set();
@@ -337,17 +343,28 @@ export async function bundlePage(app, id, query = {}, still = () => true) {
       seen.add(it.kind + ':' + it.id);
       bag.add({ kind: it.kind, id: it.id, settings: it.settings });
     }
-    bag.setTheme(theme);
-    say(`${mode === 'replace' ? 'Your bag now holds' : 'Added'} ${plural(seen.size, 'thing')} from ${bundle.name}${mode === 'replace' ? '' : ' to your bag'}, and the whole bag has this look. It holds ${plural(bag.count(), 'thing')}.`);
+    if (!keepLook) bag.setTheme(theme);
+    say(`${mode === 'replace' ? 'Your bag now holds' : 'Added'} ${plural(seen.size, 'thing')} from ${bundle.name}${mode === 'replace' ? '' : ' to your bag'}${keepLook ? '. They take the look your bag already has' : ', and the whole bag has this look'}. It holds ${plural(bag.count(), 'thing')}.`
+      + (bag.kept() ? '' : ' This browser is not keeping your bag: it will be gone when you reload or close the page. Download it or copy its link from your bag before you leave.'));
     goBag.hidden = false;
     if (then) then();
   }
   function addAll(then) {
     if (!bag.count()) { put('add', then); return; }
     const m = bag.count();
+    // the same look: the same colours, sound and music, and the same shapes (the number behind "Surprise me" only matters with shapes)
+    const lookOf = (t) => { const x = normalizeTheme(t); return JSON.stringify([x.colour, x.sound, x.music, x.shapes, x.shapes ? x.seed : 0]); };
+    const ownLook = lookOf(bag.theme()) !== lookOf({}) && lookOf(bag.theme()) !== lookOf(theme);
     ask.replaceChildren(
-      el('p', {}, `Your bag already has ${plural(m, 'thing')} in it. Add this bundle to them, or replace them? Either way, the whole bag takes this look.`),
-      el('button', { type: 'button', class: 'btn', onclick: () => put('add', then) }, 'Add to what is in my bag'),
+      // looks: a bag that has a look of its own, different from the one shown here, never loses it without being asked
+      ...(ownLook ? [
+        el('p', {}, `Your bag already has ${plural(m, 'thing')} in it, with a look of its own. Add this bundle and keep your bag's look, add it and give everything this look, or replace what is in your bag (the bag then takes this look)?`),
+        el('button', { type: 'button', class: 'btn', onclick: () => put('add', then, true) }, 'Add, and keep my bag\'s look'),
+        el('button', { type: 'button', class: 'ghost', onclick: () => put('add', then) }, 'Add, and give everything this look'),
+      ] : [
+        el('p', {}, `Your bag already has ${plural(m, 'thing')} in it. Add this bundle to them, or replace them? Either way, the whole bag takes this look.`),
+        el('button', { type: 'button', class: 'btn', onclick: () => put('add', then) }, 'Add to what is in my bag'),
+      ]),
       el('button', { type: 'button', class: 'ghost', onclick: () => put('replace', then) }, 'Replace what is in my bag'),
       el('button', { type: 'button', class: 'ghost', onclick: () => { ask.hidden = true; say(''); } }, 'Cancel'));
     ask.hidden = false;
@@ -373,7 +390,28 @@ export async function bundlePage(app, id, query = {}, still = () => true) {
 
   const counts = [['sprite', 'sprite'], ['sound', 'sound'], ['music', 'music track']]
     .map(([k, word]) => [rows.filter((r) => r.kind === k).length, word]).filter(([c]) => c).map(([c, w]) => plural(c, w));
-  const shelf = (title, kind, list) => (list.length ? [el('h2', { class: 'bundle-shelf' }, title), el('ul', { class: `bundle-grid ${kind}` }, list.map((t) => t.node))] : null);
+  // Sprites, sounds and music, each split into groups under everyday headings with counts (app/shelves.js: from each
+  // asset's type and role, so any bundle is grouped the same way). A list of the groups at the top moves to each one.
+  const jumps = [];
+  const counted = (label, count) => [label, ' ', el('span', { class: 'n' }, String(count))];
+  const goTo = (heading) => () => { heading.focus({ preventScroll: true }); heading.scrollIntoView({ block: 'start', behavior: reduceMotion.matches ? 'auto' : 'smooth' }); };
+  function kindSection(title, kind, word) {
+    const groups = shelvesOf(rows.filter((r) => r.kind === kind && tileOf.has(r)));
+    if (!groups.length) return null;
+    const total = groups.reduce((sum, g) => sum + g.rows.length, 0);
+    const h2 = el('h2', { class: 'bundle-shelf', tabindex: '-1' }, counted(title, total));
+    const list = [];
+    const sections = groups.map((g) => {
+      const h3 = groups.length > 1 ? el('h3', { class: 'bundle-group-name', tabindex: '-1' }, counted(g.label, g.rows.length)) : null;
+      if (h3) list.push(el('li', {}, el('button', { type: 'button', class: 'pill', onclick: goTo(h3), 'aria-label': `${g.label}: ${plural(g.rows.length, word)}` }, counted(g.label, g.rows.length))));
+      return el('section', { class: 'bundle-group', 'data-group': g.key }, h3, el('ul', { class: `bundle-grid ${kind === 'music' ? kind : kind + 's'}` }, g.rows.map((r) => tileOf.get(r).node)));
+    });
+    if (!list.length) list.push(el('li', {}, el('button', { type: 'button', class: 'pill', onclick: goTo(h2), 'aria-label': `${title}: ${plural(total, word)}` }, counted(title, total))));
+    jumps.push(el('div', { class: 'bundle-jump-row' }, el('span', { class: 'label' }, title), el('ul', {}, list)));
+    return el('section', { class: `bundle-kind-${kind}` }, h2, sections);
+  }
+  const shelves = [kindSection('Sprites', 'sprite', 'sprite'), kindSection('Sounds', 'sound', 'sound'), kindSection('Music', 'music', 'track')];
+  const jumpNav = jumps.length && tiles.length > 12 ? el('nav', { class: 'bundle-jump', 'aria-label': 'What is in this bundle' }, jumps) : null;
 
   main.append(
     el('p', { class: 'bundle-kicker' }, `Bundle for ${GAME_WORDS[bundle.gameType] ?? bundle.gameType.replace(/-/g, ' ') + ' games'} · ${counts.join(', ')}`),
@@ -386,9 +424,8 @@ export async function bundlePage(app, id, query = {}, still = () => true) {
     el('div', { class: 'bundle-layout' },
       el('aside', { class: 'bundle-look' }, controls.node),
       el('div', { class: 'bundle-assets' },
-        shelf('Sprites', 'sprites', byKind('sprite')),
-        shelf('Sounds', 'sounds', byKind('sound')),
-        shelf('Music', 'music', byKind('music')),
+        jumpNav,
+        shelves,
         n ? null : el('p', { class: 'empty' }, 'This bundle is empty.'))));
   app.replaceChildren(header(''), main);
 

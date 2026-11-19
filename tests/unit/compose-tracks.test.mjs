@@ -17,12 +17,12 @@ import { validateMeta } from '../../catalog/schema.js';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const sha = (file) => crypto.createHash('sha1').update(fs.readFileSync(file)).digest('hex');
 const PINNED = {
-  'battle-theme': 'a353ac60bc1be8dd6f76ae0e8373f20d233b44aa',
-  'thornwood-overworld': '8a99726791ae4e5c99ae60ef986d4b49675660ab',
-  'hearthvale-village': 'be35b19ac042917f6115c994c5adf5200fbe26a2',
-  'hearthvale-battle': '56dea8532f7f8c2b009311ef835a87f70bbb57d1',
-  'derelict-run': '8fe3e05577082947ca7ba8666e8fa4fee1b3d19f',
-  'derelict-boss': '0c91d4035d1e075b59cd72b690ba3997f9fead97',
+  'battle-theme': '36802491ffbadb1210706224429277c408204563',
+  'thornwood-overworld': '260bca1dec6a4df9d041eb5b8ca2cec0a76aebe5',
+  'hearthvale-village': 'd363f1e661b697661e7d9f5f0888f2da4f9ab7d2',
+  'hearthvale-battle': 'b95aa7dd53a8ebbe30753cf337c0f492975f6776',
+  'derelict-run': '20a37c0f28fa108337315ffe3d5bf846f4b248ea',
+  'derelict-boss': '50eef778098eb2d73e6f1a67d18347bf2d437de1',
 };
 
 const generators = fs.readdirSync(path.join(ROOT, 'tools', 'compose')).filter((f) => f.endsWith('.mjs') && /\bexport (?:function|const) build\b/.test(fs.readFileSync(path.join(ROOT, 'tools', 'compose', f), 'utf8'))).sort();

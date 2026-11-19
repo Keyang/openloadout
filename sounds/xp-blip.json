@@ -4,7 +4,7 @@
   "name": "XP blip",
   "category": "pickup",
   "tags": ["sci-fi", "collect", "experience", "chain"],
-  "description": "One experience shard collected: a tiny sine and triangle blip that chirps upward. Made to be chained, so a game can raise the pitch a step for each shard in a streak. Identical every time.",
+  "description": "One experience shard collected: a tiny pure blip that chirps upward. Made to be chained, so a game can raise the pitch a step for each shard in a streak. The same every time.",
   "meta": {
     "type": "sfx",
     "role": "items/pickup",

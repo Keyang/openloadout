@@ -3,7 +3,7 @@
  "id": "q-low-thud",
  "name": "Low thud",
  "category": "impact",
- "description": "Breaks: a thud with almost nothing above 300 Hz.",
+ "description": "Breaks: a thud with almost nothing high in it.",
  "meta": {
   "type": "sfx",
   "role": "actions/land",

@@ -237,6 +237,9 @@ test('the search box takes exactly as much as is searched: 120 characters, typed
   const typedQ = () => page.evaluate(() => new URLSearchParams(location.hash.split('?')[1] || '').get('q'));
   await expect.poll(typedQ).toBe(long.slice(0, 120));     // the address holds the same 120 characters
   expect((await resultIds(page))).toContain(PICK.sound.id);
+  // The order may still change once when the search file arrives (ties are settled by it), so compare that final order.
+  await page.waitForLoadState('networkidle');
+  await page.waitForTimeout(300);
   const before = await resultIds(page);
 
   // a reload shows the same text and the same results: nothing was dropped out of sight

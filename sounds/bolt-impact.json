@@ -9,7 +9,7 @@
   "impact",
   "ping"
  ],
- "description": "A shot landing: a sharp falling blip, a short metal ping and a noise tick, dry enough to play many times a second.",
+ "description": "A shot landing: a sharp falling blip, a short metal ping and a tiny tick, dry enough to play many times a second.",
  "meta": {
   "type": "sfx",
   "role": "actions/hit",

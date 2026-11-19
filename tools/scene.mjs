@@ -56,7 +56,7 @@ import { encodePNG } from './png.mjs';
 import { renderFrame, defaultParams, cleanParams } from '../engine/sprite.js';
 import { TILE, classifyTiles, layoutTiles } from '../engine/tiles.js';
 import { readMap } from '../engine/maptext.js';
-import { THEME_PRESETS, applyColour } from '../engine/theme.js';
+import { THEME_PRESETS, applyColour, spriteMaterials, mergeMaterials } from '../engine/theme.js';
 import { col } from '../engine/color.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -129,7 +129,9 @@ export async function composeScene(scene, opts = {}) {
   const W = layout.cols * TILE, H = layout.rows * TILE;
   const pixels = new Uint32Array(W * H).fill(col(opts.bg ?? '#2b2b3a'));
   const cache = new Map();
+  const drawn = new Map();        // looks: every sprite in the scene with its settings, so a look knows what each colour is of (Contract 7)
   const frameOf = (s, clip, f, p, key) => {
+    if (!drawn.has(key)) drawn.set(key, [s, p]);
     const k = `${key}/${clip}/${f}`;
     if (!cache.has(k)) cache.set(k, renderFrame(s, clip, f, p));
     return cache.get(k);
@@ -160,7 +162,7 @@ export async function composeScene(scene, opts = {}) {
   things.sort((a, b) => a.y - b.y || a.i - b.i);
   for (const q of things) paste(frameOf(q.s, q.clip, q.frame, q.p, `${q.s.id}/${JSON.stringify(q.p)}`), Math.round(q.x - q.s.pivot[0]), Math.round(q.y - q.s.pivot[1]));
 
-  return { width: W, height: H, cols: layout.cols, rows: layout.rows, pixels, notes, layout, placed: things.map((q) => ({ id: q.s.id, clip: q.clip, frame: q.frame, x: q.x, y: q.y })) };
+  return { width: W, height: H, cols: layout.cols, rows: layout.rows, pixels, notes, layout, materials: () => mergeMaterials([...drawn.values()].map(([s, p]) => spriteMaterials(s, p))), placed: things.map((q) => ({ id: q.s.id, clip: q.clip, frame: q.frame, x: q.x, y: q.y })) };
 }
 
 /**
@@ -179,7 +181,7 @@ export function sceneLooks(picture, looks = ['original'], opts = {}) {
   looks.forEach((id, li) => {
     const look = THEME_PRESETS.find((l) => l.id === id);
     if (!look) throw new Error(`scene: no look "${id}". Looks: ${lookIds().join(', ')}`);
-    const data = applyColour(Uint32Array.from(picture.pixels), look.theme.colour) ?? picture.pixels;
+    const data = applyColour(Uint32Array.from(picture.pixels), look.theme.colour, picture.materials) ?? picture.pixels;      // as the site recolours: each colour held by what it is of
     const bytes = new Uint8ClampedArray(data.buffer, data.byteOffset, data.byteLength);
     for (let y = 0; y < H * scale; y++) for (let x = 0; x < OW; x++) {
       const i = ((r0 * TILE + Math.floor(y / scale)) * picture.width + c0 * TILE + Math.floor(x / scale)) * 4, o = ((li * (H * scale + gap) + y) * OW + x) * 4;

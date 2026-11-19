@@ -108,6 +108,21 @@ export default defineSprite({
   size: H.SIZE,
   pivot: H.PIVOT,
   preview: 'walk',
+  // ready-made versions to start from (docs/site-design.md, section 4): the settings that differ from the defaults
+  versions: [
+    { name: 'Classic', params: {} },
+    { name: 'Ranger', params: { hairStyle: 'long', hair: '#a8612a', headgear: 'none', weapon: 'spear', cape: 'tattered', outfit: '#4f9d57', trim: '#3a3350', skin: '#e8b088', build: 0.25, height: 0.75 } },
+    { name: 'Royal', params: { headgear: 'crown', hairStyle: 'long', hair: '#e0b040', capeLength: 1.6, outfit: '#7a4fc4', trim: '#e6c545', metal: '#e6c545' } },
+    { name: 'Raider', params: { build: 1, hairStyle: 'ponytail', hair: '#c9423a', headgear: 'none', weapon: 'axe', weaponLength: 1.3, cape: 'none', outfit: '#6b7280', trim: '#e08a2c', metal: '#8f97a8' } },
+    { name: 'Shadow', params: { hairStyle: 'spiky', hair: '#2b2233', headgear: 'none', weaponLength: 0.7, cape: 'tattered', outfit: '#3a3350', trim: '#3a3350', metal: '#5d6475', skin: '#c98a5c', build: 0.2 } },
+    { name: 'Swamp guard', params: { skin: '#9bd18a', hairStyle: 'bald', headgearSize: 1.4, weapon: 'spear', outfit: '#e08a2c', trim: '#4f9d57', cape: 'none', height: 0.2, metal: '#c98a4a' } },
+    { name: 'Brawler', params: { hairStyle: 'bald', headgear: 'none', weapon: 'none', cape: 'none', outfit: '#e08a2c', skin: '#9a6240', build: 0.9, bounce: 0.9 } },
+    { name: 'Frost guard', params: { outfit: '#2f8f9d', trim: '#f0ead8', hairStyle: 'long', hair: '#d8d8e0', capeLength: 1.5, weapon: 'spear', weaponLength: 1.2 } },
+    { name: 'Gold knight', params: { headgearSize: 1.3, metal: '#e6c545', outfit: '#f0ead8', trim: '#e6c545', weaponLength: 1.3 } },
+    { name: 'Squire', params: { height: 0, head: 1, hairStyle: 'spiky', hair: '#e0b040', headgear: 'none', weaponLength: 0.65, cape: 'none', outfit: '#c9423a', bounce: 1 } },
+    { name: 'Spirit', params: { skin: '#b9a7e0', hairStyle: 'long', hair: '#d8d8e0', headgear: 'none', cape: 'tattered', capeLength: 1.8, outfit: '#f0ead8', trim: '#7a4fc4', weapon: 'none' } },
+    { name: 'Rose captain', params: { hairStyle: 'ponytail', hair: '#e670b0', headgear: 'crown', outfit: '#d65a9c', trim: '#f0ead8', weapon: 'axe', metal: '#e6c545', skin: '#6e4428' } },
+  ],
   // sounds that play with each animation: frame is counted from 0; preset is one of the sound's named styles;
   // `when` limits a sound to some settings (the blade is heard only when a weapon is held; a bare fist swishes instead;
   // a blocked blow rings on a weapon and thuds on bare arms)

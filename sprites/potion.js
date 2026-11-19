@@ -27,7 +27,7 @@ export default defineSprite({
     shape: choice('Shape', 'round', ['round', 'tall', 'flask', 'vial']),
     level: range('Fill', 0.7, { lo: 'Low', hi: 'Full' }),
     bubbles: toggle('Bubbles', true),
-    body: color('Liquid', P.crimson, swatches('thornwood', 'edge', { lead: 'crimson' })),
+    body: color('Liquid', P.crimson, swatches('thornwood', 'edge', { lead: 'crimson' }), { material: 'signal' }),
     accent: color('Glass', P.cream, [P.cream, P.sky, P.steel, P.goblin, P.haze]),      // pale colours only: the liquid must show through
     bob: range('Float', 0.5, { lo: 'Still', hi: 'Floaty', group: 'Motion' }),
     pop: range('Pop height', 0.5, { lo: 'Low', hi: 'High', group: 'Motion' }),

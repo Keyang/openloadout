@@ -6,7 +6,7 @@
  "tags": [
   "pop"
  ],
- "description": "A short sine blip used by the build tests.",
+ "description": "A short pure blip used by the build tests.",
  "meta": {
   "type": "sfx",
   "role": "items/pickup",

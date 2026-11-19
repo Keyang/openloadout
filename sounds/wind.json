@@ -8,7 +8,7 @@
   "outdoor",
   "loop"
  ],
- "description": "Gusting filtered noise with an optional whistle.",
+ "description": "Gusting wind, with a whistle you can add.",
  "meta": {
   "type": "ambience",
   "role": "environment/weather",

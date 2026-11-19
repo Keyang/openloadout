@@ -20,7 +20,8 @@
 import { renderFrame, defaultParams, cleanParams, randomParams, clipFps, inEffect, partList } from '../engine/sprite.js';
 import { brightness, hexToRgb, rgbToHsl } from '../engine/color.js';
 import { blockJoins, classifyTiles } from '../engine/tiles.js';
-import { THEME_PRESETS, applyColour, themedParams } from '../engine/theme.js';
+import { THEME_PRESETS, applyColour, themedParams, spriteMaterials, lookColours, randomTheme, toneNeed } from '../engine/theme.js';
+import { outsideMaterial, colourGap, materialById, unsaidMaterial, MATERIAL_IDS } from '../engine/materials.js';
 import { stylesOf, styleById, styleIds } from '../engine/styles.js';
 import { Surface } from '../engine/surface.js';
 
@@ -58,6 +59,18 @@ export const THRESHOLDS = {
   // Counting colours kept instead does not separate them (the bat keeps 47% of its colours and reads; the bad far
   // layer kept 63%), and counting only the edges inside the outline fails layers that keep a clear silhouette.
   lookEdgesWarn: 0.65,
+  // Held under every look (S-held-under-looks): what the site really draws under a look (lookColours in
+  // engine/theme.js: every colour held by its material, tones kept apart) is measured for each named look and for
+  // lookSurprises "Surprise me" looks (seeds 1 to lookSurprises). Two faults are looked for:
+  //   a colour that left its material's limits (outsideMaterial in engine/materials.js): the sky went brown;
+  //   two tones that were clearly different (toneNeed in engine/theme.js) and are now less than toneSame apart
+  //   (colourGap: 0.02 is about the least difference an eye picks up between two flat areas): two colour-coded
+  //   cells became one grey. Only tones that each cover toneShare of the sprite's drawn pixels count, and at most
+  //   the toneMost most used.
+  lookSurprises: 6,
+  toneSame: 0.02,
+  toneShare: 0.004,
+  toneMost: 48,
   // Inside the frame under a look that varies shapes (S-inside-frame-shapes): seeds 0 to shapeSeeds - 1 of
   // themedParams (engine/theme.js) are drawn. The two faults that led to this check (2026-11-18: void-ranger `die`
   // frame 5 and muzzle-flash `burst` frame 3, found by the 50-seed sweep in tests/unit/theme-colour.test.mjs) showed
@@ -288,6 +301,56 @@ export function whenHint(res, params, dflt) {
 }
 const settingName = (bn) => (bn === 'default' ? 'everything else is at its default' : bn === 'all-low' ? 'all sliders low' : bn === 'all-high' ? 'all sliders high' : bn);
 
+/** The looks a sprite is measured under: every named look that changes a colour, then THRESHOLDS.lookSurprises "Surprise me" looks. [{ id, name, colour }] */
+export function checkedLooks() {
+  const plain = JSON.stringify(THEME_PRESETS.find((p) => p.id === 'original')?.theme.colour ?? {});
+  return [
+    ...THEME_PRESETS.filter((p) => JSON.stringify(p.theme.colour) !== plain).map((p) => ({ id: p.id, name: p.name, colour: p.theme.colour })),
+    ...Array.from({ length: THRESHOLDS.lookSurprises }, (_, i) => ({ id: `surprise-${i + 1}`, name: `Surprise me (number ${i + 1})`, colour: randomTheme(i + 1).colour })),
+  ];
+}
+
+/**
+ * What goes wrong with one sprite's colours under looks: the measure behind "held under every look".
+ * table: what each colour of the sprite is of, from spriteMaterials (engine/theme.js);
+ * looks: [{ id, name, colour }] (checkedLooks() when left out);
+ * recolour(table, colour): the look worked out for the sprite, { one, of(r, g, b) } or null when it changes nothing.
+ *   Left out, it is the engine's own (lookColours): what the site draws. A test hands in another to show a fault.
+ * Returns { tested, left, merged }:
+ *   left    a colour outside its material's limits: [{ look, from, to, material, control, why }] ('#rrggbb' colours);
+ *   merged  two tones, clearly different as made, now nearly the same: [{ look, a, b, before, after }].
+ */
+export function lookFaults(table, looks = checkedLooks(), recolour = lookColours) {
+  const T = THRESHOLDS;
+  const hex = (rgb) => `#${rgb.map((c) => c.toString(16).padStart(2, '0')).join('')}`;
+  const all = [...table.colours].map(([v, e]) => ({ ...e, rgb: [v >>> 16, (v >>> 8) & 255, v & 255] })).sort((a, b) => b.n - a.n);
+  const tones = all.filter((c) => c.n >= Math.max(2, table.total * T.toneShare)).slice(0, T.toneMost);
+  const pairs = [];
+  for (let i = 0; i < tones.length; i++) for (let j = i + 1; j < tones.length; j++) {
+    const before = colourGap(tones[i].rgb, tones[j].rgb);
+    if (toneNeed(before)) pairs.push([i, j, before]);
+  }
+  const out = { tested: 0, left: [], merged: [] };
+  for (const look of looks) {
+    const made = recolour(table, look.colour);
+    if (!made) continue;
+    out.tested++;
+    const swapsInk = typeof look.colour.outline === 'string';
+    for (const c of all) {
+      if (c.n < 2 || (swapsInk && hex(c.rgb) === '#231b33')) continue;      // the outline colour is swapped for the look's own, whatever it is of
+      const to = made.of(...c.rgb);
+      const why = outsideMaterial(c.material, c.rgb, to, { oneColour: !!made.one });
+      if (why) out.left.push({ look, from: hex(c.rgb), to: hex(to), material: c.material, control: c.control, why });
+    }
+    const to = tones.map((c) => made.of(...c.rgb));
+    for (const [i, j, before] of pairs) {
+      const after = colourGap(to[i], to[j]);
+      if (after < T.toneSame) out.merged.push({ look, a: hex(tones[i].rgb), b: hex(tones[j].rgb), before, after, into: hex(to[i]) });
+    }
+  }
+  return out;
+}
+
 /**
  * Run the sprite quality bar on a definition. Returns { errors, warnings, metrics }; no errors means it passes.
  * soundIndex: Map or object of sound id -> patch (left out: sound cues are not checked);
@@ -492,6 +555,10 @@ function checkStyle(def, { soundIndex, validateMeta } = {}, pass) {
     if (!d.label) error(`param "${k}" has no label`);
     if (d.kind === 'color' && !(d.swatches?.length >= 3)) error(`color param "${k}" needs at least 3 swatches`);
     if (d.kind === 'color') for (const c of d.swatches ?? []) if (brightness(c) < 0.14) warn(`color param "${k}": swatch ${c} is almost as dark as the outline, so shapes in it merge into a black blob`);
+    // a colour named after a thing that can be made of different stuff (a door: wood or metal) says nothing a
+    // whole-bundle look can use (engine/materials.js, UNSAID_WORDS): the sprite has to say what it is of
+    const unsaid = d.kind === 'color' ? unsaidMaterial(k, d, def) : null;
+    if (unsaid) warn(`the "${d.label}" colour is named after a ${unsaid}, which can be made of different things, so a whole-bundle look cannot tell what it is and may turn it into anything: say what it is of on the control, for example color('${d.label}', ..., { material: 'wood' }) (one of ${MATERIAL_IDS.join(', ')})`, `unsaid:${k}`);
     if (d.kind === 'choice' && !(d.options?.length >= 2)) error(`choice "${k}" needs at least 2 options`);
   }
   const inParts = new Set(parts.flatMap((p) => p.params));
@@ -1153,6 +1220,45 @@ function checkStyle(def, { soundIndex, validateMeta } = {}, pass) {
         `looks:${worst.look.id}:${a}:${b}`);
     }
     metrics.themes = { tested, lowest: Math.round(lowest.share * 1000) / 1000, clip: lowest.clip, look: lowest.look, ms: Math.round((now() - t1) * 10) / 10 };
+  }
+
+  // ---- held under every look ------------------------------------------------------------------------
+  // The check above uses the plain colour maths, which treats every colour alike: it says how much a sprite's own
+  // tones depend on hue alone. This one measures what the site really draws: a look recolours a sprite knowing what
+  // each colour is of (spriteMaterials: found by drawing the sprite once more per colour control), holds each colour
+  // inside its material's limits and keeps clearly different tones apart (lookColours). A colour outside its limits
+  // is an error: the sky went brown, skin stopped being skin. Two tones made nearly the same is a warning with the
+  // pair named: in a crowded picture under a look of few tones the engine cannot always keep every pair apart.
+  {
+    const t1 = now();
+    const held = { tested: 0, colours: 0, left: 0, merged: 0, materials: {}, ms: 0 };
+    metrics.held = held;
+    let table = null;
+    try { table = spriteMaterials(def, dflt, { style: pass.style.id }); } catch { table = null; }
+    if (table && table.colours.size) {
+      for (const e of table.colours.values()) held.materials[e.material] = (held.materials[e.material] ?? 0) + e.n;
+      held.colours = table.colours.size;
+      const faults = lookFaults(table);
+      held.tested = faults.tested; held.left = faults.left.length; held.merged = faults.merged.length;
+      const label = (key) => (key && params[key] ? `the "${params[key].label}" colour` : 'a colour no control paints');
+      const names = (list) => [...new Set(list.map((f) => f.look.name))];
+      const also = (list, first) => { const rest = names(list).filter((n) => n !== first); return rest.length ? ` Also under ${rest.slice(0, 4).join(', ')}${rest.length > 4 ? ` and ${rest.length - 4} more` : ''}.` : ''; };
+      const byColour = new Map();
+      for (const f of faults.left) { const k = `${f.material}:${f.from}`; if (!byColour.has(k)) byColour.set(k, []); byColour.get(k).push(f); }
+      for (const [k, list] of byColour) {
+        const f = list[0];
+        error(`under the "${f.look.name}" look ${label(f.control)} ${f.from}, which is ${materialById(f.material).name.toLowerCase()}, became ${f.to}: ${f.why}.${also(list, f.look.name)} A look must leave a thing what it is (the limits are in engine/materials.js; lookColours in engine/theme.js holds them)`, `held:${k}`);
+      }
+      const byPair = new Map();
+      for (const f of faults.merged) { const k = `${f.a}:${f.b}`; if (!byPair.has(k)) byPair.set(k, []); byPair.get(k).push(f); }
+      const worstFirst = [...byPair].sort((x, y) => y[1].length - x[1].length || y[1][0].before - x[1][0].before);
+      for (const [k, list] of worstFirst.slice(0, 3)) {
+        const f = list[0];
+        warn(`two tones that are clearly different become nearly the same under the "${f.look.name}" look: ${f.a} and ${f.b} both come out close to ${f.into} (${f.before.toFixed(2)} apart as made, ${f.after.toFixed(2)} after; under ${T.toneSame} they read as one).${also(list, f.look.name)} Make them differ in lightness as well as in hue, or, where a colour carries a meaning, say so on its control (material: 'signal' or 'warning') so every look keeps it`, `tones:${k}`);
+      }
+      if (worstFirst.length > 3) warn(`${worstFirst.length - 3} more pairs of tones become nearly the same under some look (metrics.held.merged counts every case)`, 'tones:more');
+    }
+    held.ms = Math.round((now() - t1) * 10) / 10;
   }
 
   return finish();

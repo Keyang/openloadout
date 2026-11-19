@@ -4,7 +4,7 @@
  "name": "Menu move",
  "category": "ui",
  "tags": ["menu", "cursor", "tick", "hover"],
- "description": "The cursor stepping to the next row: a tiny dry sine tick over a short wooden knock. Quiet, and the same every time.",
+ "description": "The cursor stepping to the next row: a tiny dry tick over a short wooden knock. Quiet, and the same every time.",
  "meta": {
   "type": "sfx",
   "role": "interface/hover",

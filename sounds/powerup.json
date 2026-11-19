@@ -8,7 +8,7 @@
   "arcade",
   "rise"
  ],
- "description": "Looping arpeggio that glides upward, with a short echo.",
+ "description": "A looping run of notes that glides upward, with a short echo.",
  "meta": {
   "type": "sfx",
   "role": "items/consume",
@@ -49,7 +49,7 @@
   },
   {
    "id": "speed",
-   "label": "Arp speed",
+   "label": "Speed",
    "min": 8,
    "max": 40,
    "default": 20,
@@ -73,7 +73,7 @@
   },
   {
    "id": "duty",
-   "label": "Pulse width",
+   "label": "Fullness",
    "min": 0.1,
    "max": 0.5,
    "default": 0.3

@@ -17,10 +17,15 @@ const top = (q, opts) => ids(index.search(q, { limit: 5, ...opts }));
 
 test('core uses no Node or browser APIs', () => {
   const src = fs.readFileSync(new URL('../../search/core.js', import.meta.url), 'utf8');
-  assert.doesNotMatch(src, /\bimport\b[^;]*\bfrom\b/, 'core.js imports nothing');
+  const imports = [...src.matchAll(/\bimport\b[^;]*\bfrom\s*'([^']+)'/g)].map((m) => m[1]);
+  assert.deepEqual(imports, ['./everyday-words.js'], 'core.js imports only its table of everyday words');
+  const data = fs.readFileSync(new URL('../../search/everyday-words.js', import.meta.url), 'utf8');
+  assert.doesNotMatch(data, /\bimport\b/, 'the table imports nothing');
   for (const banned of ['window', 'document', 'process.', 'require(', 'fetch(', 'navigator']) {
     assert.ok(!src.includes(banned), `core.js must not use ${banned}`);
   }
+  // the table holds everyday words such as "window", so it is checked for code that uses them, not for the words
+  assert.doesNotMatch(data, /\b(window|document|navigator|process)\.|\b(require|fetch)\(/, 'the table is data, not code');
 });
 
 test('normalize lowercases, strips accents and punctuation', () => {

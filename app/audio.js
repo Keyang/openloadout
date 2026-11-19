@@ -3,6 +3,7 @@
 import { renderPatch, defaultParams, createVoice } from '../sound/sfx-engine.js';
 import { encodeWav } from '../sound/wav.js';
 import { createPlayer } from '../sound/player.js';
+import { createLimiter } from '../sound/limiter.js';   // sounds that overlap add up: keep the sum under full scale
 import { store } from './ui.js';
 
 export const sounds = [];      // sound effects
@@ -131,7 +132,7 @@ export function setSoundOn(on) { soundState.on = on; store.set('sound', on ? 'on
 function context() {
   if (!ctx) {
     ctx = new (window.AudioContext || window.webkitAudioContext)();
-    master = ctx.createGain(); master.gain.value = 0.8; master.connect(ctx.destination);
+    master = ctx.createGain(); master.gain.value = 0.8; master.connect(createLimiter(ctx));
   }
   if (ctx.state === 'suspended') ctx.resume();
   return ctx;

@@ -139,7 +139,7 @@ nodes = [
 patch = {
     "format": "sfxpatch/0.1", "id": "battle-theme", "name": "Battle theme", "category": "music",
     "tags": ["music", "boss", "combat", "adaptive", "loop"],
-    "description": "Fast D-minor battle music, 8 to 32 bars long. Intensity brings in the snare, the brass stabs, then the melody and double-time kick, so a game can drive it live. Longer versions build up section by section, and the melody can be played by five instruments.",
+    "description": "Fast, dark battle music in short or long versions. Intensity brings in the snare drum, short brass hits, then the tune and a faster kick drum, so a game can raise it as a fight heats up. Longer versions build up part by part, and five instruments can play the tune.",
     # the catalogue rejects an asset with no metadata, so the generator writes it: running this is always safe
     "meta": {
         "type": "music", "role": "music/battle", "themes": ["fantasy", "neutral"],
@@ -151,8 +151,8 @@ patch = {
     "duration": "round(bars/8)*8*4*60/bpm",
     "params": [
         P("intensity", "Intensity", 0, 1, 0.9),
-        P("bpm", "Tempo", 130, 190, 160, "bpm"),
-        P("key", "Key", -5, 6, 0, "semitones"),
+        P("bpm", "Speed", 130, 190, 160, "bpm"),
+        P("key", "Pitch", -5, 6, 0, "semitones"),
         P("bright", "Brightness", 0, 1, 0.6),
         P("grit", "Grit", 0, 1, 0.4),
         P("lead", "Melody", 0, 1, 0.8),

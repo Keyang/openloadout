@@ -45,8 +45,8 @@ export default defineSprite({
     lobes: range('Bulges', 6, { min: 4, max: 9, step: 1, lo: 'Few', hi: 'Many' }),
     style: choice('Style', 'fire', ['fire', 'plasma', { value: 'shock-ring', label: 'Shock ring' }]),
     soot: toggle('Soot', true),
-    core: color('Core', P.cream, CORE),
-    edge: color('Edge', P.amber, EDGE),
+    core: color('Core', P.cream, CORE, { material: 'fire' }),   // flame: a look keeps it a fire colour
+    edge: color('Edge', P.amber, EDGE, { material: 'fire' }),
     speed: range('Speed', 0.5, { lo: 'Slow', hi: 'Fast', group: 'Motion' }),
   },
   clips: {

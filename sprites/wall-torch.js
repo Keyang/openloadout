@@ -104,7 +104,7 @@ export default defineSprite({
     height: range('Height', 0.5, { lo: 'Short', hi: 'Tall' }),
     halo: toggle('Halo', true),
     sparks: toggle('Sparks', true),
-    glow: color('Glow', P.ember, swatches('thornwood', 'glow', { lead: 'ember' })),
+    glow: color('Glow', P.ember, swatches('thornwood', 'glow', { lead: 'ember' }), { material: 'fire' }),   // flame: a look keeps it a fire colour
     metal: color('Metal', P.steel, swatches('thornwood', 'metal')),
     flicker: range('Flicker', 0.5, { lo: 'Steady', hi: 'Wild', group: 'Motion' }),
     speed: range('Speed', 0.5, { lo: 'Slow', hi: 'Fast', group: 'Motion' }),

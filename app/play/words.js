@@ -53,3 +53,48 @@ export function keysLine({ mode, player, block = false, dodge = false }) {
   out.push('Hold Shift to run. On a phone, use the buttons under the scene.');
   return out.join(' ');
 }
+
+// ---- the two views of the scene -------------------------------------------------------------------------
+
+const VIEW = {
+  side: { name: 'Side view', scene: 'side-view scene', drawn: 'from the side', opened: 'in side view', switched: 'side view' },
+  top: { name: 'Top-down', scene: 'top-down scene', drawn: 'from above', opened: 'top-down', switched: 'top-down' },
+};
+const other = (mode) => (mode === 'top' ? 'side' : 'top');
+
+/** The name of a view on a button: 'Side view' or 'Top-down'. mode: 'side' | 'top'. */
+export function viewName(mode) {
+  return VIEW[mode === 'top' ? 'top' : 'side'].name;
+}
+
+/** Names as they are said in a sentence: "A", "A and B", "A, B and C". */
+export function listNames(names) {
+  if (names.length <= 1) return names[0] ?? '';
+  return `${names.slice(0, -1).join(', ')} and ${names.at(-1)}`;
+}
+
+/**
+ * The line under the scene for the things that were left out of it because they were drawn for the other view:
+ * who, why, and how to see them. names: their names; mode: the view of the scene they are left out of. '' with none.
+ */
+export function leftOutNote(names, mode) {
+  if (!names.length) return '';
+  const here = VIEW[mode === 'top' ? 'top' : 'side'], there = VIEW[other(mode)], one = names.length === 1;
+  return `${listNames(names)} ${one ? 'is' : 'are'} drawn to be seen ${there.drawn}, so ${one ? 'it is' : 'they are'} left out of this ${here.scene}. Switch to ${there.name} to see ${one ? 'it' : 'them'}.`;
+}
+
+/**
+ * Why the scene opened in this view, as a sentence. why: what roles.js chooseMode said ('tiles', 'most', 'player',
+ * 'even', 'chosen', 'only'); mode: the view. '' when the bag has things for one view only: there was nothing to choose.
+ */
+export function viewReason(why, mode) {
+  const v = VIEW[mode === 'top' ? 'top' : 'side'];
+  switch (why) {
+    case 'tiles': return `The ground tiles in your bag are drawn ${v.drawn}, so the scene opened ${v.opened}.`;
+    case 'most': return `Most things in your bag are drawn ${v.drawn}, so the scene opened ${v.opened}.`;
+    case 'player': return `Your bag has as many things drawn from the side as from above, so the scene opened ${v.opened}, the way the first character in your bag is drawn.`;
+    case 'even': return `Your bag has as many things drawn from the side as from above, so the scene opened ${v.opened}.`;
+    case 'chosen': return `You switched to ${v.switched}.`;
+    default: return '';
+  }
+}

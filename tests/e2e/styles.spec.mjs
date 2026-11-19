@@ -41,7 +41,7 @@ const stripColours = (page) => page.locator('.strip canvas').evaluateAll((cvs) =
 test('existing sprites export exactly what the renderer made before the style seam: the same PNG bytes and the same JSON', async ({ page }) => {
   await openRoute(page, '/');
   const got = await page.evaluate(async () => {
-    const [bundle, catalog, audio, S, T, old] = await Promise.all([import('/app/bundle.js'), import('/app/catalog.js'), import('/app/audio.js'), import('/engine/sprite.js'), import('/engine/theme.js'), import('/tests/fixtures/styles/legacy-render.mjs')]);
+    const [bundle, catalog, audio, S, T, old, info] = await Promise.all([import('/app/bundle.js'), import('/app/catalog.js'), import('/app/audio.js'), import('/engine/sprite.js'), import('/engine/theme.js'), import('/tests/fixtures/styles/legacy-render.mjs'), import('/engine/sheet-info.js')]);
     const cat = await catalog.loadCatalog();
     await audio.loadSounds();
     const dec = new TextDecoder();
@@ -63,12 +63,14 @@ test('existing sprites export exactly what the renderer made before the style se
       for (const [name, p, scale, theme] of [['defaults', S.defaultParams(sprite), 1, null], ['random, 2x, Frost look', S.randomParams(sprite, 4242), 2, look]]) {
         let before;
         try { before = old.legacyRenderSheet(sprite, p, { scale }); } catch { continue; }    // it fails with or without the seam
-        if (theme) T.applyColour(before.data, theme.colour);
+        if (theme) T.applyColour(before.data, theme.colour, T.spriteMaterials(sprite, p));      // a look recolours a sprite knowing what each colour is of (Contract 7)
         const files = await bundle.spriteFiles(sprite, p, bundle.defaultCues(sprite), scale, theme);
         const meta = JSON.parse(dec.decode(files.find((f) => f.name === `${id}.json`).data));
         delete meta.sounds;
         if (!same(files.find((f) => f.name === `${id}.png`).data, await png(before))) differ.push(`${id} (${name}): PNG`);
-        if (JSON.stringify(meta, null, 2) !== JSON.stringify(before.meta, null, 2)) differ.push(`${id} (${name}): JSON`);
+        // the download says what kind of sheet it is on top of what the renderer wrote (engine/sheet-info.js, added after
+        // the seam): the old renderer's JSON gets the same description, so everything the renderer wrote is still compared
+        if (JSON.stringify(meta, null, 2) !== JSON.stringify(info.describeSheet(sprite, before.meta, p), null, 2)) differ.push(`${id} (${name}): JSON`);
         if (files.some((f) => /\.svg$/.test(f.name)) || files[0].name !== `${id}.png` || files[1].name !== `${id}.json`) differ.push(`${id} (${name}): file list`);
       }
       compared.push(id);

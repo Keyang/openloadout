@@ -6,7 +6,13 @@
 // An asset made on a visit (window.loadout.make, Contract 11) is not in the catalogue, so its bag item carries
 // its whole definition: { source } (a sprite's module text) or { patch } (a sound or a track). That is what
 // brings it back after a reload, and what a shared link has to hold. Catalogue items have no definition.
-import { defaultTheme, normalizeTheme } from '../engine/theme.js';
+//
+// looks (Contract 7, "The record"): while the bag's look changes shapes, each sprite item keeps what that look made
+// of it (`settings.lookParams`, from shapeRecord), so the bag draws and downloads the same pictures on every visit,
+// also after the rule behind "Also change shapes" changes. It is made when the item comes in or the shapes part of the
+// look changes (another number behind "Surprise me", shapes on or off), and kept when only colours change.
+import { defaultTheme, normalizeTheme, shapeRecord } from '../engine/theme.js';
+import { spriteNow } from './catalog.js';
 
 export const BAG_KEY = 'loadout-bag-v1';
 export const KINDS = ['sprite', 'sound', 'music'];
@@ -67,10 +73,21 @@ export function cleanSettings(kind, settings) {
     const scale = [1, 2, 3, 4, 6, 8].includes(Number(s.scale)) ? Number(s.scale) : 1;
     const out = { params, cues: cleanCues(s.cues), scale };
     if (typeof s.artStyle === 'string' && STYLE_ID.test(s.artStyle)) out.artStyle = s.artStyle;
+    const record = cleanRecord(s.lookParams);      // looks: what the bag's look made of its shapes (see the top)
+    if (record) out.lookParams = record;
     return out;
   }
   if (kind === 'sound') return { params, style, seed: Number.isFinite(Number(s.seed)) && Number(s.seed) >= 1 ? Math.round(Number(s.seed)) : 1 };
   return { params, style };
+}
+
+/** A look's record of a sprite's shapes as plain data ({ control: number | text | true/false }), or null when it is anything else. */
+function cleanRecord(r) {
+  if (!isObj(r)) return null;
+  const entries = Object.entries(r);
+  if (entries.length > 200) return null;
+  const ok = ([k, v]) => /^[A-Za-z_$][A-Za-z0-9_$]{0,63}$/.test(k) && ((typeof v === 'number' && Number.isFinite(v)) || typeof v === 'boolean' || (typeof v === 'string' && v.length <= 200));
+  return entries.every(ok) ? Object.fromEntries(entries) : null;
 }
 
 /** The definition of an asset made on a visit, as plain data: sprite { source }, sound and music { patch }. null for anything else. */
@@ -121,7 +138,9 @@ function payloadOf(text) {
  * A bag kept in `storage` (anything with getItem / setItem).
  * opts.now: the clock for addedAt (tests pass a fixed one).
  */
-export function createBag(storage, { now = () => Date.now(), standard = null } = {}) {
+// opts.kept: false when `storage` lives only as long as the page (memory standing in for storage the browser refused).
+// opts.spriteOf(id): a sprite's program if it is loaded, else null: the bag records what its look made of a sprite with it.
+export function createBag(storage, { now = () => Date.now(), standard = null, kept = true, spriteOf = null } = {}) {
   let state = load();
   let standardOf = standard;
   let definitionOf = null;
@@ -144,7 +163,22 @@ export function createBag(storage, { now = () => Date.now(), standard = null } =
       if (key[0] === 'i' && Number.isInteger(n) && n >= next) next = n + 1;
       items.push({ key, ...it, addedAt: Number.isFinite(r.addedAt) ? r.addedAt : 0 });
     }
-    return { items, theme: isObj(raw.theme) ? normalizeTheme(raw.theme) : defaultTheme(), next };
+    const theme = isObj(raw.theme) ? normalizeTheme(raw.theme) : defaultTheme();
+    if (!theme.shapes) for (const it of items) if (it.kind === 'sprite') delete it.settings.lookParams;   // looks: a record only lives with shapes
+    return { items, theme, next };
+  }
+
+  // ---- looks: the record of what the bag's look made of each sprite (see the top) ----
+  const shapesOf = (t) => (t.shapes ? `seed ${t.seed}` : '');
+  /** Record one item, if it is a sprite with no record and its program is loaded. Returns true when it changed. */
+  function record(it) {
+    if (it.kind !== 'sprite') return false;
+    if (!state.theme.shapes) { const had = 'lookParams' in it.settings; delete it.settings.lookParams; return had; }
+    if (it.settings.lookParams || !spriteOf) return false;
+    let sprite = null;
+    try { sprite = spriteOf(it.id); } catch { sprite = null; }
+    if (!sprite || !sprite.params) return false;
+    try { it.settings.lookParams = shapeRecord(sprite, it.settings.params, state.theme); return true; } catch { return false; }
   }
 
   // saved: did the last change reach the storage? When the browser refuses (its storage for the site is full) the bag
@@ -174,6 +208,7 @@ export function createBag(storage, { now = () => Date.now(), standard = null } =
       try { d = cleanDefinition(it.kind, definitionOf(it.kind, it.id)); } catch { d = null; }
       if (d) it.definition = d;
     }
+    record(it);      // looks
     const item = { key: newKey(), ...it, addedAt };
     state.items.push(item);
     return item.key;
@@ -221,7 +256,14 @@ export function createBag(storage, { now = () => Date.now(), standard = null } =
     update(key, settings) {
       const it = state.items.find((i) => i.key === key);
       if (!it) return false;
+      const old = it.settings;
       it.settings = cleanSettings(it.kind, settings);
+      // looks: the record stays while the item's own settings stay; other settings are recorded again
+      if (it.kind === 'sprite') {
+        if (!sameAs(old.params, it.settings.params)) delete it.settings.lookParams;
+        else if (old.lookParams) it.settings.lookParams = old.lookParams;
+        record(it);
+      }
       changed();
       return true;
     },
@@ -240,8 +282,22 @@ export function createBag(storage, { now = () => Date.now(), standard = null } =
     /** The bag-wide theme (Contract 7), always complete. */
     theme: () => clone(state.theme),
     setTheme(theme) {
+      const before = shapesOf(state.theme);
       state.theme = normalizeTheme(isObj(theme) ? theme : {});
+      // looks: another shapes part of the look is recorded again; a change of colours keeps what was recorded
+      if (shapesOf(state.theme) !== before) for (const it of state.items) if (it.kind === 'sprite') delete it.settings.lookParams;
+      for (const it of state.items) record(it);
       changed();
+    },
+    /**
+     * Record what the look made of every sprite that has no record yet (its program was not loaded when it came in).
+     * Saves, without telling the listeners: what is drawn does not change. Returns how many were recorded.
+     */
+    fillLooks() {
+      let n = 0;
+      for (const it of state.items) if (record(it)) n++;
+      if (n) save();
+      return n;
     },
     /** Call fn(bag) after every change. Returns a function that stops it. */
     onChange(fn) { listeners.add(fn); return () => listeners.delete(fn); },
@@ -279,6 +335,12 @@ export function createBag(storage, { now = () => Date.now(), standard = null } =
     },
     /** false when the last change could not be written to the browser's storage: the bag then holds it for this visit only. */
     saved: () => saved,
+    /**
+     * Does the browser keep this bag for the next visit? false when its storage is refused (a private window, site data
+     * blocked: the bag then lives in memory, and every save "works" but nothing lasts) or the last save failed.
+     * Pages that add to the bag or show it say so in plain words (NOT_KEPT) while it is false.
+     */
+    kept: () => kept && saved,
     /** Tell every listener to look again, though nothing in the bag changed (what is known about its items did). */
     touch() { for (const fn of [...listeners]) { try { fn(api); } catch (e) { console.error('bag listener:', e); } } },
     /** How many items were made on a visit (they carry their definition). */
@@ -302,8 +364,13 @@ export function createBag(storage, { now = () => Date.now(), standard = null } =
       if (!got) return null;
       const { list } = got;
       if (mode !== 'add') { state.items = []; state.theme = got.theme; }
+      // looks: records made under another look than the bag's own are left behind, and made again here
+      const foreign = shapesOf(got.theme) !== shapesOf(state.theme);
       const t = now();
-      for (const it of list) put(it.definition ? { ...it, from: 'link' } : it, t);
+      for (const it of list) {
+        if (foreign && it.settings) delete it.settings.lookParams;
+        put(it.definition ? { ...it, from: 'link' } : it, t);
+      }
       changed();
       return list.length;
     },
@@ -311,19 +378,27 @@ export function createBag(storage, { now = () => Date.now(), standard = null } =
   return api;
 }
 
-/** The browser's storage when it works, otherwise memory (private windows, blocked storage, Node). */
-function siteStorage() {
+/**
+ * Where the bag lives: { storage, kept }. The browser's storage when it can be read (kept: true), otherwise memory that
+ * lasts as long as the page (kept: false: private windows, blocked site data, Node). win: the window, or undefined.
+ */
+export function pickStorage(win) {
   // Usable means readable. Writing is not tried here: when the browser's storage for the site is full a write fails,
   // but the bag already stored is still there to read, and each failed save is reported (saved()).
   try {
-    if (typeof window === 'undefined' || !window.localStorage) return memoryStorage();
-    window.localStorage.getItem(BAG_KEY);
-    return window.localStorage;
-  } catch { return memoryStorage(); }
+    const store = win && win.localStorage;
+    if (!store) return { storage: memoryStorage(), kept: false };
+    store.getItem(BAG_KEY);
+    return { storage: store, kept: true };
+  } catch { return { storage: memoryStorage(), kept: false }; }
 }
 
+/** What the site says, wherever things are added and on the bag page, while the browser is not keeping the bag. */
+export const NOT_KEPT = 'This browser is not keeping your bag (a private window, or saving for sites is switched off), so it will be gone when you reload or close the page. Download it before you leave, or copy the link to your bag and open that later.';
+
 /** The site's one shared bag. */
-export const bag = createBag(siteStorage());
+const where = pickStorage(typeof window === 'undefined' ? undefined : window);
+export const bag = createBag(where.storage, { kept: where.kept, spriteOf: spriteNow });
 
 // Another tab changed the bag: pick it up here too.
 if (typeof window !== 'undefined') window.addEventListener('storage', (e) => { if (e.key === BAG_KEY) bag.reload(); });

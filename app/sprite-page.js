@@ -1,15 +1,16 @@
 // One sprite: preview, sliders, the sounds that play with each animation, download.
 import { defaultParams, cleanParams, randomParams, clipFps, partList, partRemoved, inEffect, cueInEffect, renderPixels } from '../engine/sprite.js';
-import { stylesOf, styleById } from '../engine/styles.js';     // W6-A: a sprite may offer more than one style (Contract 12)
+import { stylesOf, styleById } from '../engine/styles.js';
+import { colorName } from '../engine/color.js';     // W6-A: a sprite may offer more than one style (Contract 12)
 import { bag } from './bag.js';
-import { drawStage, STAGES } from './stage.js';
+import { drawStage, backdropFor, stagesFor } from './stage.js';
 import { zip } from './zip.js';
 import { el, header, Frames, travel, hover, shadow, saveBlob, store, cap } from './ui.js';
 import { sounds, soundById, soundParams, rendered, playRendered, soundState, setSoundOn, toUnit, toValue } from './audio.js';
 import { spriteFiles, defaultCues } from './bundle.js';
 import { addToBag, keepBag } from './add-to-bag.js';
 import { goesWith, moreLikeThis } from './related.js';
-import { madeNote } from './catalog.js';      // W5-A: a sprite made on this visit says so, and a draft cannot go in the bag
+import { madeNote, assetById } from './catalog.js';      // W5-A: a sprite made on this visit says so, and a draft cannot go in the bag
 
 /**
  * The sprite's own sounds, as defaultCues gives them, each keeping its `when` (the settings it plays at):
@@ -61,6 +62,14 @@ function unpackCues(sprite, text) {
 
 const MAX_CUES = 8;   // sounds per animation; links keep at most this many
 
+/** A colour's everyday name with a capital, for the page: '#f2a030' -> 'Orange'. */
+const colourWord = (hex) => { const n = colorName(hex); return n ? n[0].toUpperCase() + n.slice(1) : 'Your own colour'; };
+/** The names a row of swatches is read out by: two that share a name are told apart by their place ('Red, choice 2'). */
+function swatchNames(list) {
+  const words = list.map(colourWord);
+  return words.map((w, i) => (words.filter((x) => x === w).length > 1 ? `${w}, choice ${i + 1}` : w));
+}
+
 /**
  * Frames of one sprite in one of its styles, drawn on demand and kept: what app/ui.js Frames is, for a sprite that
  * offers a choice of style. A style that does not draw on the pixel grid is shown by its pixel picture.
@@ -85,6 +94,11 @@ class StyleFrames {
 
 export function spritePage(app, sprite, query) {
   document.title = `${sprite.name} · Loadout`;
+  // what the preview stands on suits what the sprite is (app/stage.js): a scene with ground, a plain panel for an
+  // interface piece, or nothing at all for a background, which fills the frame itself
+  const backdrop = backdropFor(sprite.meta ?? assetById(sprite.id));
+  const stageChoices = stagesFor(backdrop);
+  const stageKey = backdrop === 'panel' ? 'stage-panel' : 'stage';      // a chosen panel and a chosen scene are remembered apart
   const clipNames = Object.keys(sprite.clips);
   // The styles this sprite can be drawn in (Contract 12). With one, nothing on this page is different. With more, the
   // page opens in the style its link names; opened from the bag ("Change"), in the item's style; otherwise the first.
@@ -100,7 +114,7 @@ export function spritePage(app, sprite, query) {
     clip: clipNames.includes(query.clip) ? query.clip : sprite.preview,
     cues: (query.sfx && unpackCues(sprite, query.sfx)) || spriteCues(sprite),
     playing: true,
-    stage: STAGES.some((s) => s.id === store.get('stage')) ? store.get('stage') : 'meadow',
+    stage: stageChoices.some((s) => s.id === store.get(stageKey)) ? store.get(stageKey) : stageChoices[0]?.id ?? null,
     scale: [1, 2, 4].includes(Number(query.scale)) ? Number(query.scale) : 1, start: performance.now(), frame: 0, lastFrame: -1, scroll: 0,
   };
   const frames = choice ? new StyleFrames(sprite, st.p, st.style) : new Frames(sprite, st.p);
@@ -184,9 +198,9 @@ export function spritePage(app, sprite, query) {
   };
   for (const name of clipNames) clipBar.append(el('button', { type: 'button', class: 'pill', 'data-clip': name, 'aria-pressed': String(name === st.clip), onclick: () => setClip(name) }, sprite.clips[name].label));
 
-  const sceneBar = el('div', { class: 'scene', role: 'group', 'aria-label': 'Backdrop' },
-    STAGES.map((s) => el('button', { type: 'button', class: 'scene-btn scene-' + s.id, title: s.label, 'aria-label': `${s.label} backdrop`, 'aria-pressed': String(s.id === st.stage), onclick: (e) => {
-      st.stage = s.id; store.set('stage', s.id);
+  const sceneBar = stageChoices.length < 2 ? el('span', { class: 'scene-none' }) : el('div', { class: 'scene', role: 'group', 'aria-label': 'Backdrop' },
+    stageChoices.map((s) => el('button', { type: 'button', class: 'scene-btn scene-' + s.id, title: s.label, 'aria-label': `${s.label} backdrop`, 'aria-pressed': String(s.id === st.stage), onclick: (e) => {
+      st.stage = s.id; store.set(stageKey, s.id);
       for (const b of sceneBar.children) b.setAttribute('aria-pressed', String(b === e.currentTarget));
     } })));
 
@@ -316,19 +330,25 @@ export function spritePage(app, sprite, query) {
       controls[key] = () => { input.checked = st.p[key]; };
       return el('div', { class: 'field toggle' }, el('label', { for: id }, title ? 'Show' : d.label), el('span', { class: 'switch' }, input, el('span', { class: 'knob', 'aria-hidden': 'true' })));
     }
+    // each colour is named in words (engine/color.js colorName); its code is kept in the tooltip and, small, beside the name
     const custom = el('input', { type: 'color', value: st.p[key], 'aria-label': `${d.label}: pick any colour`, oninput: (e) => { st.p[key] = e.target.value.toLowerCase(); controls[key](); changed(); } });
+    const names = swatchNames(d.swatches);
     const row = el('div', { class: 'swatches', role: 'group', 'aria-label': d.label },
-      d.swatches.map((c) => el('button', { type: 'button', class: 'swatch', style: `--c:${c}`, 'data-v': c, 'aria-label': c, onclick: () => { st.p[key] = c; controls[key](); changed(); } })),
+      d.swatches.map((c, i) => el('button', { type: 'button', class: 'swatch', style: `--c:${c}`, 'data-v': c, 'aria-label': names[i], title: `${colourWord(c)} (colour code ${c})`, onclick: () => { st.p[key] = c; controls[key](); changed(); } })),
       el('span', { class: 'swatch any', title: 'Pick any colour' }, custom));
+    const word = el('span', { class: 'colour-word' });
+    const code = el('span', { class: 'colour-code', title: 'The colour code, for drawing programs and game engines' });
     controls[key] = () => {
       let hit = false;
       for (const b of row.querySelectorAll('button')) { const on = b.dataset.v === st.p[key]; hit = hit || on; b.setAttribute('aria-pressed', String(on)); }
       custom.value = st.p[key];
       custom.parentElement.classList.toggle('on', !hit);
       custom.parentElement.style.setProperty('--c', st.p[key]);
+      word.textContent = colourWord(st.p[key]);
+      code.textContent = st.p[key];
     };
     controls[key]();
-    return el('div', { class: 'field' }, el('span', { class: 'label' }, d.label), row);
+    return el('div', { class: 'field' }, el('span', { class: 'label' }, d.label), row, el('p', { class: 'colour-now', 'aria-live': 'polite' }, word, ' ', code));
   }
   const syncControls = () => { for (const k of Object.keys(controls)) controls[k](); };
 
@@ -469,6 +489,15 @@ export function spritePage(app, sprite, query) {
   const fit = () => {
     const cw = stageWrap.clientWidth;
     if (!cw) return;
+    if (backdrop === 'fill') {
+      // a background is the whole frame: the canvas is exactly the sprite, at the largest whole size that fits (or shrunk to fit)
+      [W, H] = sprite.size;
+      zoom = Math.max(1, Math.min(5, Math.floor(cw / W)));
+      const k = W * zoom > cw ? cw / W : zoom;
+      stage.width = W; stage.height = H;
+      stage.style.width = Math.floor(W * k) + 'px'; stage.style.height = Math.floor(H * k) + 'px';
+      return;
+    }
     zoom = Math.max(2, Math.min(5, Math.floor(cw / 104)));
     W = Math.floor(cw / zoom);
     H = Math.max(72, sprite.size[1] + 24);
@@ -492,10 +521,20 @@ export function spritePage(app, sprite, query) {
       st.scroll += travel(sprite, st.clip, st.p) * dt;
     }
     const gy = H - 18;
-    drawStage(ctx, W, H, gy, st.stage, st.scroll);
-    const px = Math.round(W * 0.5 - sprite.size[0] / 2 + (sprite.size[0] / 2 - sprite.pivot[0]) * 0.5);
-    const py = gy - sprite.pivot[1] - hover(sprite);
-    if (st.stage !== 'plain') shadow(ctx, px + sprite.pivot[0], gy, Math.round(sprite.size[0] * 0.17));
+    let px, py;
+    if (backdrop === 'fill') {
+      // behind a layer that is see-through in places: the light panel, so the gaps show as gaps, not as a scene
+      drawStage(ctx, W, H, H, 'panel-light', 0);
+      px = 0; py = 0;
+    } else if (backdrop === 'panel') {
+      drawStage(ctx, W, H, H, st.stage, 0);         // nothing to stand on: the piece sits in the middle of the panel
+      px = Math.round((W - sprite.size[0]) / 2); py = Math.round((H - sprite.size[1]) / 2);
+    } else {
+      drawStage(ctx, W, H, gy, st.stage, st.scroll);
+      px = Math.round(W * 0.5 - sprite.size[0] / 2 + (sprite.size[0] / 2 - sprite.pivot[0]) * 0.5);
+      py = gy - sprite.pivot[1] - hover(sprite);
+      if (st.stage !== 'plain') shadow(ctx, px + sprite.pivot[0], gy, Math.round(sprite.size[0] * 0.17));
+    }
     ctx.drawImage(frames.get(st.clip, st.frame), px, py);
     const cells = strip.children;
     for (let i = 0; i < cells.length; i++) cells[i].classList.toggle('on', i === st.frame);

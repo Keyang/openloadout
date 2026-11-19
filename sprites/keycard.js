@@ -65,8 +65,8 @@ export default defineSprite({
     shape: choice('Shape', 'card', ['card', 'chip', 'fob']),
     stripes: choice('Stripes', 'one', ['one', 'two', 'chevron']),
     sparkle: toggle('Sparkle', true),
-    body: color('Card', P.panel, swatchesBetween('derelict', 'metal', { lead: 'panel', min: 0.45 })),      // no dark card: it would merge with the outline
-    accent: color('Stripe', P.red, swatches('derelict', 'accent', { lead: 'red' })),
+    body: color('Card', P.panel, swatchesBetween('derelict', 'metal', { lead: 'panel', min: 0.45 }), { material: 'paint' }),      // no dark card: it would merge with the outline
+    accent: color('Stripe', P.red, swatches('derelict', 'accent', { lead: 'red' }), { material: 'signal' }),
     glow: color('Light', P.cyan, swatches('derelict', 'glow')),
     bob: range('Float', 0.5, { lo: 'Still', hi: 'Floaty', group: 'Motion' }),
     pop: range('Pop height', 0.5, { lo: 'Low', hi: 'High', group: 'Motion' }),

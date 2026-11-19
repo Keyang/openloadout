@@ -167,8 +167,8 @@ export function standardParams({ tempo, defaults = {} }) {
   if (!LENGTHS.includes(d.bars)) fail(`defaults.bars: ${d.bars} is not one of the lengths (${LENGTHS.join(', ')} bars)`);
   return [
     param('intensity', 'Intensity', 0, 1, d.intensity),
-    param('bpm', 'Tempo', tempo[0], tempo[1], tempo[2], { unit: 'bpm' }),
-    param('key', 'Key', KEY_RANGE[0], KEY_RANGE[1], d.key, { unit: 'semitones' }),
+    param('bpm', 'Speed', tempo[0], tempo[1], tempo[2], { unit: 'bpm' }),           // labels in everyday words (quality/sound.js A-words): "Speed", not "Tempo"
+    param('key', 'Pitch', KEY_RANGE[0], KEY_RANGE[1], d.key, { unit: 'semitones' }),  // and "Pitch", not "Key"
     param('bars', 'Length', LENGTHS[0], LENGTHS[LENGTHS.length - 1], d.bars, { unit: 'bars', step: SECTION_BARS }),
     param('inst', 'Melody instrument', 0, INSTRUMENTS.length - 1, inst, { options: [...INSTRUMENTS] }),
     param('bright', 'Brightness', 0, 1, d.bright),

@@ -52,7 +52,7 @@ export default defineSprite({
     trail: toggle('Trail', true),
     wood: color('Wood', P.wood, WOOD),
     metal: color('Metal', P.steel, METAL),
-    accent: color('Feathers', P.crimson, ACCENT),
+    accent: color('Feathers', P.crimson, ACCENT, { material: 'cloth' }),      // fletching: dyed, any colour
     wobble: range('Wobble', 0.5, { lo: 'Firm', hi: 'Wobbly', group: 'Motion' }),
     speed: range('Speed', 0.5, { lo: 'Slow', hi: 'Fast', group: 'Motion' }),
   },

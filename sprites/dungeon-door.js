@@ -136,7 +136,7 @@ export default defineSprite({
     bars: toggle('Barred window', false),
     // the leaf keeps to darker colours and its fittings to light ones, so no pair of swatches merges them (a slab,
     // four parts Stone to one part Door, stays under the darkest Metal too)
-    body: color('Door', HV.wood, swatchesBetween('hearthvale', ['wood', 'outfit'], { lead: 'wood', max: 0.52 })),
+    body: color('Door', HV.wood, swatchesBetween('hearthvale', ['wood', 'outfit'], { lead: 'wood', max: 0.52 }), { material: 'wood' }),
     metal: color('Metal', HV.steel, swatchesBetween('hearthvale', 'metal', { min: 0.6 })),
     stone: color('Stone', HV.slate, swatchesBetween('hearthvale', 'stone', { lead: 'slate', max: 0.6 })),
     glow: color('Seal', HV.mage, swatches('hearthvale', 'glow', { lead: 'mage' })),

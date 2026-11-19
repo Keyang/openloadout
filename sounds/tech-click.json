@@ -9,7 +9,7 @@
   "click",
   "blip"
  ],
- "description": "A clean interface blip: a short sine with a little FM on its first few milliseconds and a tiny high tick. Identical every time.",
+ "description": "A clean interface blip: a short pure tone with a quick metallic edge at its very start and a tiny high tick. The same every time.",
  "meta": {
   "type": "sfx",
   "role": "interface/click",

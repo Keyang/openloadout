@@ -9,7 +9,7 @@
   "level-up",
   "bell"
  ],
- "description": "Four-note major arpeggio on a soft FM bell, with room.",
+ "description": "Four rising bell notes of a happy chord, with a little echo.",
  "meta": {
   "type": "jingle",
   "role": "interface/reward",
@@ -50,7 +50,7 @@
  "params": [
   {
    "id": "root",
-   "label": "Root note",
+   "label": "Pitch",
    "min": 300,
    "max": 1200,
    "default": 660,

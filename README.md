@@ -38,12 +38,12 @@ npm run serve          # static server on http://localhost:5178
 
 `npm run serve` also takes a port (`npm run serve -- --port 5200`, or the `PORT` environment variable) and a folder (`-- --root dist` serves the built site). The browser tests use a second server on port 5199, which Playwright starts itself.
 
-`npm run build` runs `node tools/build.mjs`. It checks every asset, writes the catalogue and thumbnails, runs the quality checks, builds the search index and copies the browser files it needs into `vendor/`. It stops with the list of problems if an asset or a bundle is wrong. Options:
+`npm run build` runs `node tools/build.mjs`. It checks every asset and runs the quality checks first, then writes the thumbnails, the search index and the catalogue, and copies the browser files it needs into `vendor/`. It stops with the list of problems if an asset or a bundle is wrong; for an asset that fails the quality checks it says which file, what is wrong and what to do. Nothing the site reads is written until every asset has passed, so a build that stops leaves the site as the last finished build wrote it. Options:
 
 | Option | What it does |
 |---|---|
 | `--dist` | Also writes the publishable site to `dist/` |
-| `--skip-quality` | Skips the quality checks. Use it only to get a quick look; the site then shows assets nobody has checked |
+| `--skip-quality` | Skips the quality checks. Use it only to get a quick look; the site then shows assets nobody has checked, and the build ends by saying so ("NOT CHECKED") |
 | `--no-meaning` | Builds the search index with keywords only and copies no search model. The site then offers no "Smarter search" switch, and the vendor folder is 1.5 MB instead of about 40 MB. Without this option the first build downloads the search model (about 24 MB) from Hugging Face into `.cache/models/` |
 | `--no-cache` | Runs the quality checks again on assets that have not changed |
 | `--force` | Redraws every thumbnail |
@@ -91,7 +91,7 @@ Both checkers run the quality bar (`docs/quality-bar.md`). Errors fail an asset;
 | `tools/tilemap.mjs` | Renders a map from a tileset so the joins between tiles can be looked at |
 | `tools/scene.mjs` | Renders a scene from several tilesets, with props, looks and frames, from a JSON file |
 | `tools/rig.mjs` | Lists what a body rig has (poses, parts, held things, sockets) as tables and contact sheets |
-| `tools/bundles-from-plans.mjs` | Writes `bundles/<id>.json` for each kit plan whose assets all exist; `--check` writes nothing |
+| `tools/bundles-from-plans.mjs` | Writes `bundles/<id>.json` for each kit plan whose assets all exist; `--check` writes nothing. A new kit is new files only: its plan `bundles/specs/<id>.plan.json` (name, game type, the sentence for its page, palette, asset lists) and its assets. The top of the tool says how, including the one code step when a kit brings a new palette |
 | `tools/compose/` | The music kit's command line (`kit.mjs`) and one generator per track that writes its patch (`thornwood_overworld.mjs`, `hearthvale_village.mjs`, `hearthvale_battle.mjs`, `derelict_run.mjs`, `derelict_boss.mjs`, `battle_theme.py`); `verify_music.mjs` lists the notes sounding in each bar; `render_ramp.mjs` renders a loop while one slider climbs |
 | `tools/search-eval.mjs` | Measures search on the test set in `tests/fixtures/search/` and writes `docs/search-eval.md` |
 
@@ -113,7 +113,7 @@ npx playwright test tests/e2e/journey.spec.mjs   # one file
 
 - `journey.spec.mjs`: search, customise, add to the bag, play and download a sprite, a sound and a track, at desktop and phone width.
 - `whole-bundle.spec.mjs`: one look restyles every asset of every bundle in previews, the bag, the playground and the download, and "Start over" restores it.
-- `three-bundles.spec.mjs`: each kit has 40 to 50 sprites, 20 sounds and 2 tracks, every asset opens, and the playground has a character the keyboard moves. It passes only for kits whose bundle file exists.
+- `three-bundles.spec.mjs`: there are at least three kits for at least three kinds of game; every kit (every bundle that has a plan in `bundles/specs/`, however many there are) has 40 to 50 sprites, 20 sounds and 2 tracks, every asset opens, and the playground has a character the keyboard moves. It passes only for kits whose bundle file exists.
 - `newasset.spec.mjs`: a new asset file is found by search and reaches the zip with no other edit.
 - `route2.spec.mjs`, `route2-safety.spec.mjs`: a sprite is made, checked, bagged and exported using `window.loadout` only, and hostile sources fail.
 

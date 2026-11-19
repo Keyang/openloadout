@@ -15,11 +15,31 @@
   -->
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' blob: 'wasm-unsafe-eval'; worker-src 'self' blob:; connect-src 'self'; img-src 'self' data: blob:; media-src 'self' data: blob:; font-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; frame-src 'none'; base-uri 'self'; form-action 'none'">
   <title>Loadout</title>
-  <link rel="stylesheet" href="vendor/fonts/fonts.css">
-  <link rel="stylesheet" href="app/style.css">
+  <!-- Asked for at once, not after the scripts that read it: the list of every asset. Low priority, so the page frame
+       and the style sheet come first (tests/unit/site-first-paint.test.mjs). -->
+  <link rel="preload" href="generated/catalog.json" as="fetch" crossorigin fetchpriority="low">
+  <!-- Just enough style for the page frame below, so it shows on a slow connection before the style sheet arrives.
+       The same values as app/style.css (:root, body, .top, .brand, .top nav a, .bag-link, .home, .lede); change both together.
+       Its letters are the system's: the site's own fonts come with the style sheet, so they do not hold up what matters first. -->
+  <style>
+    body { margin: 0; background: #e8ecf6; color: #231b33; font: 500 16px/1.5 system-ui, -apple-system, 'Segoe UI', sans-serif; }
+    .top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 16px; max-width: 1160px; margin: 0 auto; padding: 20px 20px 0; box-sizing: border-box; }
+    .brand { font: 700 22px/1 system-ui, sans-serif; color: #231b33; text-decoration: none; }
+    .top-right { display: flex; align-items: baseline; gap: 6px 14px; flex-wrap: wrap; justify-content: flex-end; }
+    .top nav { display: flex; gap: 6px; flex-wrap: wrap; }
+    .top nav a { color: #231b33; font-weight: 600; text-decoration: none; padding: 4px 10px; border: 2px solid transparent; }
+    .bag-link { color: #231b33; font-weight: 700; text-decoration: none; padding: 4px 10px; border: 2px solid #231b33; background: #fff; }
+    .home { max-width: 1160px; margin: 0 auto; padding: 44px 20px 64px; box-sizing: border-box; }
+    .lede { font-size: 19px; line-height: 1.45; margin: 18px 0 28px; color: #5d5873; }
+    @media (max-width: 700px) { .top { align-items: center; } .top nav { display: none; } .home { padding-top: 28px; } }
+  </style>
 </head>
 <body>
-  <div id="app"></div>
+  <!-- The page frame and a loading line, drawn before the style sheets below have arrived (they hold up only what comes
+       after them) and before any script has run. app/app.js replaces it; the header matches app/ui.js header(). -->
+  <div id="app"><header class="top"><a class="brand" href="#/">Loadout</a><div class="top-right"><nav id="main-nav" aria-label="Main"><a href="#/browse?kind=sprite">Sprites</a> <a href="#/browse?kind=sound">Sounds</a> <a href="#/browse?kind=music">Music</a> <a href="#/bundles">Bundles</a> <a href="#/play">Play</a></nav><a class="bag-link" href="#/bag">Bag</a></div></header><main class="home"><p class="lede">Loading…</p></main></div>
+  <link rel="stylesheet" href="vendor/fonts/fonts.css">
+  <link rel="stylesheet" href="app/style.css">
   <script type="module" src="app/app.js"></script>
 </body>
 </html>

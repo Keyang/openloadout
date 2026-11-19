@@ -116,7 +116,7 @@ hair:  color('Hair', '#5a3a22', HAIR, { when: { headgear: ['none', 'crown'] } })
 
 ## Contract 4: the catalogue file
 
-`npm run build` writes `generated/catalog.json`. The site lists and filters from this file and loads an asset's own file only when it needs to draw or play it.
+`npm run build` writes `generated/catalog.json`, and only after every asset has passed validation and the quality bar (Contract 10): a build that stops leaves the last finished catalogue in place, so a failed build never adds an asset to the site. (A build run with `--skip-quality` leaves the bar out and ends by saying the site is not checked.) The site lists and filters from this file and loads an asset's own file only when it needs to draw or play it.
 
 ```js
 {
@@ -183,17 +183,87 @@ theme = {
   colour: { hue: 0, saturation: 1, contrast: 1, tint: null, tintAmount: 0, palette: null, outline: null },
   sound:  { pitch: 0, brightness: 0 },        // semitones; -1..1
   music:  { tempo: 1, intensity: null },      // multiplier; 0..1 or null to leave alone
-  shapes: false,              // true: also vary each asset's own controls from the seed
+  shapes: false,              // true: also vary each asset's own controls from the seed, within the rule below
 }
 ```
 
-- `engine/theme.js` (built in W2-D1): `defaultTheme()`, `normalizeTheme(theme)`, `applyColour(pixels, theme.colour)` (changes a Surface's `Uint32Array` or an RGBA byte array in place), `themedParams(sprite, baseParams, theme)` (returns `baseParams` unless `theme.shapes` is true), `renderThemedFrame(sprite, clip, frame, baseParams, theme)`, `randomTheme(seed, { shapes })`, `PALETTES` (11 named palettes), `THEME_PRESETS` (14 named whole-bundle looks: `{ id, name, blurb, theme }`).
-- `sound/theme.js`: `applySound(rendered, theme.sound)` (pitch by resampling, so length changes; brightness by filter), `themedSoundParams(patch, baseParams, theme)` (music: tempo, intensity and key go through the track's own controls), `shouldResample(patch)` (false for music), `soundSettingsFor(patch, theme)`.
+- `engine/theme.js` (built in W2-D1): `defaultTheme()`, `normalizeTheme(theme)`, `applyColour(pixels, theme.colour, materials)` (changes a Surface's `Uint32Array` or an RGBA byte array in place), `themedParams(sprite, baseParams, theme)` (returns `baseParams` unless `theme.shapes` is true), `spriteLook(sprite, baseParams, theme)`, `renderThemedFrame(sprite, clip, frame, baseParams, theme)`, `randomTheme(seed, { shapes })`, `PALETTES` (11 named palettes), `THEME_PRESETS` (14 named whole-bundle looks: `{ id, name, blurb, theme }`).
+- `sound/theme.js`: `applySound(rendered, theme.sound)` (pitch by resampling, so length changes; brightness by filter), `themedSoundParams(patch, baseParams, theme)` (music: tempo, intensity and key go through the track's own controls; with `shapes` a sound effect takes another of its own named styles), `shouldResample(patch)` (false for music), `soundSettingsFor(patch, theme)`.
 - `outline` replaces the standard outline colour everywhere it is used, which includes eyes and pupils.
+
+**A look may move hue, warmth and tone, but a thing must stay what it is** (decided after the final review of 2026-11-18: under the Forest look a sky turned brown, under Mono a row of colour-coded cells became one grey, and "Also change shapes" took the teeth off a saw). Three rules, all in the framework, none per asset:
+
+**1. Every colour has a material, and a material has limits.** `engine/materials.js` lists the materials: sky, water, plant, earth, wood, stone, metal, skin, cloth, fire, light, magic, interface, signal, warning, and `paint` for anything else. Each says how far a look may pull a colour from the colour it was made in: how many degrees its hue may turn, how much of its strength it keeps, how much lighter or darker it may get. The limits are measured from the made colour, so a green-skinned goblin stays green and a dusk sky stays dusk.
+
+| Material | Hue may turn | Keeps at least | Lightness may change | Note |
+|---|---|---|---|---|
+| skin (also fur, hide, feathers) | 12° | 60% of its strength | 0.08 | |
+| plant | 12° | 75% | 0.10 | A meadow stays green, not olive |
+| warning, signal | 10° | 85% | 0.07, 0.08 | Keep their colour under every look, one-colour looks included: a red heart stays red, not rust |
+| metal | 14° | 40% | 0.10 | Gold stays golden |
+| fire | 20° | 70% | 0.10 | |
+| water, wood, sky | 24° to 28° | 45% to 55% | 0.10 to 0.12 | |
+| earth, light | 30°, 35° | 45%, 55% | 0.12, 0.10 | Earth includes roofs of clay, thatch or slate |
+| magic, stone | 50°, 60° | 60%, none | 0.12 | A stone (or a bone) may lose its colour, never gain much |
+| cloth, interface | any | any | 0.22, 0.14 | |
+| paint | any | any | any | The plain colour maths, as before |
+
+(Lightness is on a 0 to 1 scale. The numbers live in `MATERIALS`; this table is a reading aid.) A look turns a colour's hue toward what it wishes only as far as the wish lies in that direction: a wish up to 60° away turns it as far as the material allows, one more than 150° away (the look has nothing of this kind: a brown for a sky) not at all, and in between less and less (`FAR`), so two shades of one thing whose wishes differ a little turn alike.
+
+A colour control's material is, in order: what it declares (`color('Edge', ..., { material: 'warning' })`), what its label says ("Sky", "Grass", "Skin"), what its key says, and last the default for the sprite's type (`controlMaterial`). Words that name a thing which can be made of different stuff (a door: wood or metal; a liquid; a card; a shard: `UNSAID_WORDS`) say nothing a look can use: a control called by one of them must declare its material, and the quality bar warns when it does not (`unsaidMaterial`). Which colours of a picture a control paints is found by drawing: `spriteMaterials(sprite, settings)` draws a sample of frames once as set and once more per colour control with that control set to a colour no sprite uses; the pixels that change are that control's. A colour that no control paints takes the sprite's rest material (`signal` in an interface piece, `light` in an effect, else `paint`; a sprite may say `materials: { rest: 'stone' }`). The table is kept per sprite and settings. A sprite made on a visit is drawn in a worker and is not asked: all its colours take the rest material.
+
+`applyColour` with that table (its third argument) gives each colour what the look wishes, pulled back inside its limits (`holdColour`). With a colour set, a colour whose nearest set colour is outside its limits takes the nearest set colour that is inside and is the same kind of colour (`sameKind`); only when the set has none is it held between the two, off the set, and then it keeps the lightness the look gives it before its colour set (so the bands of a night sky stay bands where the set has no colour for them). **So a look with a colour set no longer paints everything in that set**: a sky under Forest is a duller, greener blue that the Forest set does not hold. Without the third argument `applyColour` is the plain colour maths it always was; the engine's helpers that pick colours to survive every look (`engine/tiles.js`, `paving.js`, `ui.js`, `backdrop.js`) still use that, so no sprite's own pixels changed.
+
+A look that leaves one colour only (shades of grey, the green screen, no colourfulness: `isOneColourLook`) cannot keep hues: there only lightness is held, except for `signal` and `warning`, which keep their hue and nine tenths of the strength they would otherwise keep (`KEEPS_SHARE`). Mono is therefore grey with its warnings, health bars and health pickups still in colour.
+
+**2. Two tones that were clearly different stay clearly different, and each stays the kind of colour it was.** "Clearly different" is 0.07 in OKLab distance; afterwards they should be at least half as far apart as they were, up to 0.09 (`TONES`, `toneNeed`). In the same call:
+- Under a look of many colours, most used colour first, a colour that has come too close to one already placed takes another colour of the set that its material allows **and that is the same kind of colour** (`sameKind`, limits in `KIND`: within 15° of the hue the look gave it and at least half its strength; a nearly grey one stays nearly grey), or else steps away from it the way it differed when made, or is made lighter or darker, again only into the same kind of colour. (Review of 2026-11-19: under Forest one plank of a wooden door jumped to the set's green to stay apart from the plank beside it.)
+- Under a one-colour look only lightness tells tones apart, so all of them are spread out in lightness together (`spreadLightness`): in the order of lightness the look gave them, each pair gets the gap it needs, capped as low as the room in the picture forces, every tone stays inside its material's lightness limits and within 0.15 of the lightness the look gave it. Colours that keep their hue under such a look (signal, warning) keep it and count it as part of their difference.
+- Under both, two tones a step apart (0.04 to 0.07: the bands of a night sky, `TONES.STEP`) are kept half their gap apart too where there is room, so a gradient does not become one colour where the look's set has one colour for it; only colours covering at least 0.4% of the picture are kept apart (`TONES.SHARE`, the same share the quality bar counts), so a few flower pixels never push the soil they lie on.
+In a crowded picture this remains best effort: the quality bar names any pair left nearly the same.
+
+**3. "Also change shapes" never removes or swaps what makes a sprite recognisable** (`themedParams`, limits in `SHAPES`):
+
+| Control | What a look may do |
+|---|---|
+| Slider | Move by at most a quarter of its travel, and never outside the middle of its range (the range without a fifth at each end). One already outside the middle never moves further out. Marked `look: 'keep'`, it does not move |
+| Choice | Nothing, unless the sprite marks it `look: 'vary'` (its options are variants of one thing). Then another option half the time, never "none" or "off", never one that takes a part off |
+| On/off | Nothing, unless marked `look: 'vary'`; then it flips a quarter of the time |
+| Part (Contract 3) | Never taken off, put on or swapped for another kind: its first control is left alone unless marked `look: 'vary'`, and even then never to or from its `none` value |
+| Colour | Nothing. Colours are the look's own job |
+
+**The record.** `spriteLook(sprite, baseParams, theme, { record })` returns `{ params, changed, recolour }`: every control's value as drawn, the keys the look changed, and the function that recolours the sprite's pixels (with the sprite's materials). Under a look, each sprite's entry in a download's `manifest.json` has `settings.params` set to those values and `changedByLook` to those keys, and the manifest says so in `settingsUsed` (`SETTINGS_USED` in `app/bundle.js`); the sheet's own JSON has the same `params`. The same picture can be made again from the record: draw with the recorded values, then recolour the way the site does, each colour held to what it is of: `renderThemedFrame(sprite, clip, frame, settings.params, theme)` with `theme.shapes` false does both. Applying `theme.colour` alike to every pixel (`applyColour` without materials) gives a different picture.
+
+**The bag keeps what its look drew.** While the bag's look changes shapes, each sprite item keeps `settings.lookParams`: the controls the look changed and the values it gave them (`shapeRecord`). It is recorded when the item comes in (from a card, a page, a bundle or a link), when the item's own settings change, and when the shapes part of the look changes (another number behind "Surprise me", shapes switched on); a change of colours keeps it, and switching shapes off drops it. A sprite whose program is not loaded yet is recorded the first time the bag page draws it (`bag.fillLooks()`). The bag page, the playground and the download all draw from it (`record` in `spriteLook` and `renderThemedFrame`), so a bag shows and downloads the same pictures on every visit, also after the rule behind shapes changes. A bag link carries the records; added to a bag with another look, they are left behind and made again. (A bag saved before 2026-11-19 has no record: it gets one, under the rule of the day, the first time it is opened.) A package with no look is byte for byte what it was.
+
+**On the site.** The switch has one sentence under it saying what it does. Adding a bundle to a bag that already has a different look of its own asks first, and can keep the bag's look. Every place that draws a sprite under a look passes its materials (`app/bundle-page.js`, `bag-page.js`, `play/draw.js`, `bundle.js`); the playground's own sky and ground are named colours (`namedMaterials`). `tools/scene.mjs` recolours a whole scene with one table merged from the sprites in it (`mergeMaterials`), which holds every material but keeps tones apart across the scene, not per sprite, so its look rows can differ a little from the site's.
+
+**The quality bar** (`quality/sprite.js`, "held under every look") measures what the site draws under every named look and six "Surprise me" looks: a colour outside its material's limits is an error; two clearly different tones that end up nearly the same (under 0.02 apart) is a warning that names the pair and the look (`lookFaults`, `metrics.held`); a colour control named after a thing that can be made of different stuff, with no material declared, is a warning. `tests/unit/looks-kinds.test.mjs` holds the whole catalogue to no tones merged, no shades of one control split into two kinds of colour, and no pickup colour that carries a meaning lost.
 
 ## Contract 8: export
 
 `app/bundle.js` builds every download in the browser: `packageFiles({ items, theme, scale })` returns the files for a zip with `sprites/<id>/` (sheet, JSON, the sprite's sounds), `sounds/`, `music/`, one `manifest.json` describing every asset with its role, and a guide. The export choice shows "Zip package" and "Unity package (coming later)", the second disabled.
+
+**What a download says about each asset.** Everything visual is a sprite (Contract 2), so the rows of a sheet mean different things. `renderSheet` lays them all out the same way and its JSON is unchanged; `describeSheet(sprite, sheet, p)` (`engine/sheet-info.js`) adds what kind of sheet it is and what that kind needs, and `app/bundle.js` writes the result as `<id>.json`. `app/guide.js` writes every text of a download from that JSON alone, so text and JSON cannot disagree: `how-to-use.txt` next to each sheet is written for the kind (a figure, a figure with a row per direction, an object, a pickup, a projectile, an effect, a tileset, a background, an interface piece, a set of pictures, one still picture), with steps for Unity and Godot that are stated as not tried in the engines. Rows and frames are counted from 0 everywhere. `tests/helpers/download-check.mjs` is the one checker the unit tests (every file in `sprites/`) and the browser tests (a real download of every bundle) hold these to.
+
+| Where | Field | Meaning |
+|---|---|---|
+| Sheet JSON | `kind` | `character`, `creature`, `object`, `pickup`, `projectile`, `effect`, `tileset`, `background`, `interface`, `pictures` or `animation` (`sheetKind`: from `meta.type`, then `meta.role`, then whether anything moves) |
+| | `view` | The sprite's `meta.view`, when it has one |
+| | `counting` | One sentence: rows and frames are counted from 0 |
+| | `grounded` | `true` when the pivot is the point that stands on the ground, `false` when it is only the thing's anchor |
+| | `facing` | Kept (`right`) only for a side-view character, creature or projectile and a top-down projectile. Removed where it would be false or is not recorded: tilesets, backgrounds, interface pieces, pictures, objects, pickups, a figure with a row per direction, and every effect (some show a direction, some do not, and nothing records which) |
+| | `animations[name].label` | The row's everyday name |
+| | `animations[name].direction` | Only on a sheet with a row per direction: `down`, `up`, `right` (a name ending `_side`) or `any` |
+| | `animations[name].state` | An interface piece: `true` on the rows that are states of one piece and not pieces of their own (`stateRows`: every row of a button or a cursor, the standard state names anywhere else) |
+| | `animations[name].textArea` | An interface piece: where text goes, `{ x, y, w, h, colour }` in sheet pixels from the frame's top left corner (a list when there are several), from the sprite's `textArea` |
+| | `tiles` | A tileset: `tileSize`, `how` (how to read it), `groups`, `tiles` (`{ group, piece, family }` for each tile name) and `other` (tiles placed by hand), from `tileRules` in `engine/tile-rules.js` |
+| | `tiles.groups[]` | `{ name, kind, use, solid, oneWay, tiles, versions, rules, patterns, decorations }`. `kind` is `block` (`use`: `ground`, `wall` or `hole`), `floor`, `liquid`, `platform`, `slope` or `stack`. `solid` groups block the way; a `platform` is not solid and carries `oneWay: true` instead (stood on from above only), and no other kind has `oneWay`. `rules` is an ordered list `[{ tile, needs }]`, first match wins, a neighbour not named may be either (a Rule Tile in Unity). `patterns` is `[{ tile, around }]`: one complete arrangement of all eight neighbours for each tile the rules pick, the fullest it is used for, a corner counted only with both its sides (a terrain in Godot, which matches cell by cell and has no ordered rules). Both are made by asking the picker in `engine/tiles.js` about every arrangement, never written by hand |
+| | `layers`, `layersHow` | A background: `[{ name, row, scroll }]` from the back to the front; `scroll` is the share of the camera's movement the layer slides by (`layerScroll`) |
+| `manifest.json` entry | `whatItIs` | A few everyday words for the asset ("tileset for a top-down game", "sound effect") |
+| | `license` | The licence value the asset records, as recorded, or `null` |
+| Package | `read-me.txt` | Opens with the contents list: each asset's name, what it is and where it is (folders are named after ids) |
+| | `licence.txt` | The licence value every asset records and what each value means. `draft` is said to be undecided; no terms are stated that nobody has set. A single-sprite download says the same inside `how-to-use.txt` |
 
 **Stretchable pieces.** A sprite may declare `slice`: one entry per clip a game may stretch (an object, or a function of the settings), or one function `(clip, p)`. `renderSheet` (`engine/sprite.js`, `clipStretch`) then writes these fields into the sheet JSON, on the clip's entry in `animations` and on each of its frames, in sheet pixels (they scale with the sheet). A sprite with no `slice` gets none of them and its sheet is unchanged.
 
@@ -208,7 +278,7 @@ A cursor's hot spot is a socket named `tip` on each frame (`sockets`, Contract 3
 
 ## Contract 9: the playground
 
-`#/play`. A sandbox where the visitor tries what is in their bag. It has two modes chosen from the player sprite's `meta.view`: side view (walk, jump, gravity, ground tiles) and top-down (walk in four directions over floor tiles, using the direction clips of Contract 2). It is not three fixed games: it works with whatever is there. A sprite's role decides what it does: a player sprite is moved with the keyboard (its clips are picked by name: idle, walk, run, jump, attack...; its sounds fire on their frames); enemies and creatures move by themselves; pickups can be collected (their collect clip and sound play); tiles make the ground; background layers scroll; a music track plays with its controls; sound effects get buttons. The bag's theme applies to everything.
+`#/play`. A sandbox where the visitor tries what is in their bag. It has two modes: side view (walk, jump, gravity, ground tiles) and top-down (walk in four directions over floor tiles, using the direction clips of Contract 2). The mode is chosen from what the bag holds (`app/play/roles.js`, `chooseMode`): the `meta.view` of its ground tiles when they all say the same view, else the view most of its things were drawn for; when the bag has things for both, the page offers "Side view" and "Top-down" and each view keeps its own picks. A sprite drawn for one view (`meta.view` `side` or `top-down`) is never placed in the other view's scene: it is listed under the scene with the reason and the way to see it. Every other view (`front`, `none`) fits both. It is not three fixed games: it works with whatever is there. A sprite's role decides what it does: a player sprite is moved with the keyboard (its clips are picked by name: idle, walk, run, jump, attack...; its sounds fire on their frames); enemies and creatures move by themselves; pickups can be collected (their collect clip and sound play); tiles make the ground; background layers scroll; a music track plays with its controls; sound effects get buttons. The bag's theme applies to everything.
 
 ## Contract 10: the quality bar
 

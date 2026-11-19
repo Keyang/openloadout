@@ -78,12 +78,13 @@ test('a sound with enough high end gets no phone warning', () => {
 // ---- item 3: styles ------------------------------------------------------------------------------------
 test('every style gets the one-shot checks, and each message names the style', () => {
   const r = checkSound(load('styles'));
-  assert.deepEqual(r.errors, [], show(r));
+  // too loud is an error since 2026-11-18 (A-peak): the "Hot" style, and the top of the level control it turns up
+  assert.ok(r.errors.some((m) => m.includes('"Hot"') && /too loud/.test(m)), `expected an error naming "Hot"\n${show(r)}`);
+  assert.deepEqual(r.errors.filter((m) => !/too loud/.test(m)), [], show(r));
   const style = (name, re) => assert.ok(r.warnings.some((m) => m.includes(`"${name}"`) && re.test(m)), `expected a warning naming "${name}" matching ${re}\n${show(r)}`);
   style('Cut short', /cut off/);
   style('Too long', /lasts 3\.02 s/);
   style('Boomy', /above 300 Hz/);
-  style('Hot', /peak/);
   assert.ok(!r.warnings.some((m) => m.includes('"Fine"')), `the style that breaks nothing is not named\n${show(r)}`);
   const s = Object.fromEntries(r.metrics.styles.map((x) => [x.name, x]));
   assert.deepEqual(Object.keys(s), ['Fine', 'Cut short', 'Too long', 'Boomy', 'Hot']);

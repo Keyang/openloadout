@@ -1,10 +1,15 @@
 // Playground: the ground of the scene. A level is a small map of letters, one letter for each 32 px cell,
 // written to show whatever tiles the bag holds:
-//   side view   ground two deep, a step, a floating island, platforms (one for each kind in the bag), a strip, a
-//               pillar and a single block, a mass high up with a part hanging under it; with slopes a mound; with a
-//               liquid a pool in a dip (water behind its banks) and, with a waterfall, a fall into it; for each
-//               back wall in the bag a tower and a hall with that wall behind (an archway at the tower's foot, a
-//               window and battlements where the tileset has those clips)
+//   side view   ground two deep, a step, a floating island, platforms (one for each kind in the bag), a ledge one
+//               tile thick, a block two tall and a single block; with slopes a mound; with a liquid a pool in a dip
+//               (water behind its banks) and, with a waterfall, a fall into it from under the ledge; for each back
+//               wall in the bag a tower and a hall with that wall behind (an archway at the tower's foot, a window
+//               and battlements where the tileset has those clips); at the far end a post and the cliff that ends
+//               the level, with a window through it. Between them these use every piece a block can have.
+//               NOTHING STANDS ABOVE THE VIEW'S RESTING TOP EDGE. The view shows 180 px of a 288 px level, resting
+//               with its top a little above row 3 (draw.js cameraFloor). Whatever lay in rows 0 to 2 was cut by that
+//               edge and looked as if it hung from the top of the picture, so those rows are empty: they are the sky
+//               the view climbs into when the player jumps. Whatever floats has two tiles of room under it.
 //   top-down    a walled room on the first floor in the bag: walls with faces, a wall one tile thick, a lane of
 //               second ground with a crossing and a bend that leads to a square, a pond or pit that cannot be walked
 //               into (a bridge over it where the tileset has one), a second pit, a patch of any other floor, and a
@@ -35,16 +40,33 @@ const NO_TILES = classifyTiles({});                // a map can be read for what
 // '~' a liquid, '=' '-' thin platforms, '|' ':' '!' things that stack; top-down 'W' the wall, 'O' the hole,
 // 'P' 'Q' ground laid over the floor; '.' nothing. Every other letter is named in the level's legend.
 const SIDE_MAP = [
+  '........................',     // rows 0 to 2 are sky: see the note at the top of this file
   '........................',
-  '...#...............#####',     // a pillar one tile wide (col-t, col-m, col-b); a mass high up with a part hanging
-  '...#........###....#####',     // under it (bottom pieces, inner-bl, inner-br); a strip one tile high (strip-l/m/r)
-  '...#...#........II...##.',     // a block on its own (single); the top of a small floating island
-  '................II......',
+  '........................',
+  '...#...#........II.###..',     // a block two tall (col-t, col-b); a block on its own (single); a small floating
+  '...#............II......',     // island; a ledge one tile thick (strip-l/m/r), which a waterfall pours from
   '............###.........',     // a step up, two tiles high
   '............###.........',
   '########################',     // the ground, two deep
   '########################',
 ];
+// The far end of every side-view level, after the halls: a post two tiles tall (col-t, col-m), low enough to jump,
+// and the cliff that ends the level, with a window through the rock (round the window: bottom, inner-bl, inner-br).
+// The cliff is the end: nothing lies beyond it, so it is in nobody's way. (A rock with room to walk under an
+// underside like that would need five rows above the ground, and the view shows four.)
+// POST: the post's column. CLIFF: the cliff's first column.
+const SIDE_END = [
+  '..........',
+  '..........',
+  '..........',
+  '....######',
+  '....######',
+  '.#..##..##',
+  '.#..######',
+  '##########',
+  '##########',
+];
+const POST = 1, CLIFF = 4;
 const TOP_MAP = [
   'WWWWWWWWWWWWWWWWWWWWWWWW',     // the north wall is two deep, so its front face shows
   'WWWWWWWWWWWWWWWWWWWWWWWW',
@@ -63,7 +85,7 @@ const TOP_MAP = [
 ];
 const THIN_SPOTS = [[4, 6, 5], [9, 11, 3], [21, 23, 5]];   // floating platforms: first column, last column, row
 const THIN_LETTERS = ['=', '-', '_'];
-const STACK_COLS = [2, 11, 15, 18];                        // where ladders, vines and posts stand, three tiles tall
+const STACK_COLS = [0, 11, 15, 18];                        // where ladders, vines and posts stand, three tiles tall
 const STACK_LETTERS = ['|', ':', '!', '%'];
 const POOL = { c0: 19, c1: 21, row: 7, fall: 20 };          // the dip the pool lies in, and the column a waterfall comes down
 // the letters of one tower and hall: block, block with the back wall behind it, back wall, window, battlement, arch halves
@@ -106,14 +128,16 @@ function sideMap(f) {
     set(POOL.c0 - 1, POOL.c0 - 1, POOL.row, POOL.row, bank); set(POOL.c1 + 1, POOL.c1 + 1, POOL.row, POOL.row, bank);
     set(POOL.c0, POOL.c1, POOL.row + 1, POOL.row + 1, bank);
   }
-  // a waterfall from under the mass above, down to the pool's surface (its foot takes the place of the surface there)
+  // a waterfall from under the ledge above, down to the pool's surface (its foot takes the place of the surface there)
   if (f.fall) {
     legend.V = `liquid:${f.fall}`;
-    set(POOL.fall, POOL.fall, 3, f.pool ? POOL.row : POOL.row - 1, 'V');
+    set(POOL.fall, POOL.fall, 4, f.pool ? POOL.row : POOL.row - 1, 'V');
   }
   // for each back wall in the bag: a tower with an archway at its foot, and a hall under a roof with that wall behind
+  const halls = [];
   (f.interiors ?? []).slice(0, HALL_LETTERS.length).forEach((it, i) => {
     const L = HALL_LETTERS[i], x = map[0].length;
+    halls.push(x);
     map.forEach((row, r) => row.push(...(r >= 7 ? '#' : '.').repeat(HALL_WIDTH)));
     const S = it.block ? L.S : '#', R = it.block ? L.R : '#';
     if (it.block) { legend[L.S] = `block:${it.block}`; legend[L.R] = [`back:${it.floor}`, `block:${it.block}`]; }
@@ -131,7 +155,10 @@ function sideMap(f) {
     if (it.window) { legend[L.N] = it.window; map[5][x + 4] = L.N; }
     if (it.battlement) { legend[L.M] = it.battlement; set(x + 1, x + 6, 3, 3, L.M); }
   });
-  return { map, legend, stacks };
+  // the far end: the post and the cliff
+  const end = map[0].length;
+  map.forEach((row, r) => row.push(...SIDE_END[r]));
+  return { map, legend, stacks, halls, end };
 }
 
 /** Top-down: the letters and the legend for what the bag has. */
@@ -182,12 +209,13 @@ function topMap(f) {
  * which cannot be walked through), harmful (set by the page: the pool's liquid hurts).
  * What is solid, a slope or a platform is read from layoutTiles' cells for the map, not worked out here.
  * Returns { mode, tile, cols, rows, width, height, map (the letters), legend, cells, start, spots } and, side view,
- * { groundY, slopes, thins: [{ c0, c1, r, x0, x1, y }], stacks: [{ c, r0, r1 }] }.
+ * { groundY, slopes, thins: [{ c0, c1, r, x0, x1, y }], stacks: [{ c, r0, r1 }], post: { c } (the column of the post
+ * at the far end), cliff: { c0 } (the first column of the cliff that ends the level) }.
  * spots: { pickup, prop, mover }: where the first things of each sort are put ({ x, y } of their ground point).
  */
 export function makeLevel(mode, f = {}) {
   const T = TILE, top = mode === 'top';
-  const { map, legend, stacks } = top ? topMap(f) : sideMap(f);
+  const { map, legend, stacks, halls, end } = top ? topMap(f) : sideMap(f);
   const rows = map.length, cols = map[0].length;
   const level = { mode: top ? 'top' : 'side', tile: T, cols, rows, width: cols * T, height: rows * T, map, legend };
   // the helper says what each cell is: a block, a slope, a platform, a liquid; and, top-down, a wall, a hole or ground
@@ -255,11 +283,14 @@ export function makeLevel(mode, f = {}) {
     mover: [on(190, low), on(13.5 * T, 3.5 * T), on(23 * T, low), on(120, low)],
   };
   // inside each hall: something to collect, something standing, something moving
-  for (let x = SIDE_MAP[0].length; x < cols; x += HALL_WIDTH) {
+  for (const x of halls) {
     level.spots.pickup.splice(2, 0, on((x + 4.5) * T, low));
     level.spots.prop.splice(2, 0, on((x + 3.5) * T, low));
     level.spots.mover.splice(1, 0, on((x + 5.2) * T, low));
   }
+  // the far end: where the post stands and where the cliff begins
+  level.post = { c: end + POST };
+  level.cliff = { c0: end + CLIFF };
   return level;
 }
 

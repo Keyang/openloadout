@@ -5,6 +5,7 @@
 //   node tools/search-eval.mjs --write         also put the tables into docs/search-eval.md
 //   node tools/search-eval.mjs --models Snowflake/snowflake-arctic-embed-xs
 //   node tools/search-eval.mjs --misses        list the searches each method got wrong
+//   node tools/search-eval.mjs --everyday      everyday searches ("bad guy", "money") on the real catalogue; see evaluateEveryday
 //
 // For every search it asks: is one of the right assets in the top 5? It asks that of
 //   basic      keyword search from the catalogue alone (search/core.js)
@@ -18,7 +19,7 @@ import zlib from 'node:zlib';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { DatabaseSync } from 'node:sqlite';
 import {
-  createKeywordIndex, matchesFilters, keywordSql, mergeRankings, quantize, vectorNorms, topKVectors, searchText, hasRealWords,
+  createKeywordIndex, matchesFilters, keywordSql, mergeRankings, mergeKeywordRankings, mergeMeaningRanking, quantize, vectorNorms, topKVectors, searchText, hasRealWords,
 } from '../search/core.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -147,7 +148,7 @@ async function evalModel(id, { assets, queries, blind, basic, keyword, bits = 32
     const kw = keyword(q, { filters, limit: 50 });
     if (!hasRealWords(q)) return kw.slice(0, limit);
     const byMeaning = vector(basic.respell(q, e.isWord), { filters, limit: 50 }).filter((r) => r.score >= floor);
-    return mergeRankings([kw, byMeaning], { limit, weights });
+    return mergeMeaningRanking(q, kw, byMeaning, { limit, weights });
   };
   // how much is lost by storing 8 bits a number instead of 32
   const full = (q, { filters, limit }) => {
@@ -194,7 +195,7 @@ export async function evaluate({ models, weights = FUSION, log = () => {} } = {}
   const ftsNoFix = ftsSearcher(plain, { correct: () => [] });
   const ftsNoFixRows = runQueries(queries, ftsNoFix);
   // the keyword ranking the site uses once the index file has loaded: both keyword searches merged
-  const keyword = (q, { filters, limit }) => (q ? mergeRankings([basic.search(q, { filters, limit: 50 }), fts(q, { filters, limit: 50 })], { limit }) : basic.search(q, { filters, limit }));
+  const keyword = (q, { filters, limit }) => (q ? mergeKeywordRankings(q, basic.search(q, { filters, limit: 50 }), fts(q, { filters, limit: 50 }), { limit }) : basic.search(q, { filters, limit }));
   const keywordRows = runQueries(queries, keyword);
   const blindRows = { basic: runQueries(blind, (q, o) => basic.search(q, o)), fts: runQueries(blind, fts), keyword: runQueries(blind, keyword) };
 
@@ -301,11 +302,116 @@ export function misses(r) {
   return out.join('\n');
 }
 
+// ---------------------------------------------------------------- everyday searches
+// tests/fixtures/search/queries-everyday.json: what a non-artist would type ("bad guy", "money", "floor"), with the
+// right results stated by kind, type and role rather than by id, so the same set scores any catalogue.
+//
+//   node tools/search-eval.mjs --everyday                       the real catalogue (generated/catalog.json)
+//   node tools/search-eval.mjs --everyday --catalog <file>      another one (the stand-in: tests/fixtures/search/catalog.json)
+//   add --no-model to leave out smarter search, --misses to list what each level got wrong
+
+const asList = (v) => (Array.isArray(v) ? v : v == null ? [] : [v]);
+const roleUnder = (role, want) => role === want || String(role || '').startsWith(want + '/');
+
+/** Is this asset a right answer for an expectation ({ kind, type, role, named } or a list of them, any one)? */
+export function matchesExpectation(asset, expect) {
+  return asList(expect).some((e) => {
+    if (e.kind && !asList(e.kind).includes(asset.kind)) return false;
+    if (e.type && !asList(e.type).includes(asset.type)) return false;
+    if (e.role && !asList(e.role).some((r) => roleUnder(asset.role, r))) return false;
+    if (e.named) {
+      const words = new Set(`${asset.name || ''} ${asList(asset.words).join(' ')}`.toLowerCase().split(/[^a-z0-9]+/));
+      if (!asList(e.named).some((w) => words.has(w))) return false;
+    }
+    return true;
+  });
+}
+
+export function loadEveryday() {
+  return JSON.parse(fs.readFileSync(path.join(FIX, 'queries-everyday.json'), 'utf8')).queries;
+}
+
+/** Run each everyday search: { q, got, first, found, clean } where clean is how many of the top 5 are right (0 to 1). */
+export function runEveryday(queries, search, assets, { limit = 5 } = {}) {
+  const byId = new Map(assets.map((a) => [a.id, a]));
+  const possible = (e) => assets.some((a) => matchesExpectation(a, e));
+  return queries.filter((x) => possible(x.expect)).map((x) => {
+    const got = search(x.q, { limit }).slice(0, limit).map((r) => r.id);
+    const right = got.map((id) => byId.has(id) && matchesExpectation(byId.get(id), x.expect));
+    return { q: x.q, got: got.map((id) => (byId.get(id) || { name: id }).name), right, first: !!right[0], found: right.some(Boolean), clean: got.length ? right.filter(Boolean).length / Math.min(limit, got.length) : 0 };
+  });
+}
+
+export function summarizeEveryday(rows) {
+  const n = rows.length || 1;
+  return { n: rows.length, first: rows.filter((r) => r.first).length / n, found: rows.filter((r) => r.found).length / n, clean: rows.reduce((s, r) => s + r.clean, 0) / n };
+}
+
+/** Plain search (catalogue only, then with the index file) and smarter search on the everyday set. */
+export async function evaluateEveryday({ catalogFile = path.join(ROOT, 'generated', 'catalog.json'), model = true, log = () => {} } = {}) {
+  const { buildSearchIndex } = await import('./lib/search-index.mjs');
+  const assets = JSON.parse(fs.readFileSync(catalogFile, 'utf8')).assets;
+  const queries = loadEveryday();
+  fs.mkdirSync(WORK, { recursive: true });
+  const basic = createKeywordIndex(assets);
+  const plainFile = path.join(WORK, 'everyday-keywords.sqlite');
+  await buildSearchIndex({ assets, outFile: plainFile });
+  const fts = ftsSearcher(plainFile, basic);
+  // what the site does once the index file has loaded: both keyword searches merged
+  const keyword = (q, { limit }) => mergeKeywordRankings(q, basic.search(q, { limit: 50 }), fts(q, { limit: 50 }), { limit });
+  const out = { catalog: path.relative(ROOT, catalogFile), assets: assets.length, queries: queries.length, levels: {} };
+  out.levels.basic = runEveryday(queries, (q, o) => basic.search(q, o), assets);
+  out.levels.keywords = runEveryday(queries, keyword, assets);
+  if (model) {
+    const { createEmbedder, DEFAULT_MODEL } = await import('./lib/embed.mjs');
+    log(`embedding ${assets.length} assets with ${DEFAULT_MODEL} ...`);
+    const e = await createEmbedder(DEFAULT_MODEL);
+    const dim = e.spec.dim;
+    const passages = await e.embedPassages(assets.map(searchText));
+    const matrix = new Int8Array(assets.length * dim);
+    passages.forEach((v, i) => matrix.set(quantize(v), i * dim));
+    const norms = vectorNorms(matrix, dim);
+    const floor = e.spec.minScore || 0;
+    const qvec = new Map();
+    for (const x of queries) { const t = basic.respell(x.q, e.isWord); if (!qvec.has(t)) qvec.set(t, await e.embedQuery(t)); }
+    // as search/client.js does: keywords merged with what the model finds above the similarity floor
+    const smarter = (q, { limit }) => {
+      const kw = keyword(q, { limit: 50 });
+      if (!hasRealWords(q)) return kw.slice(0, limit);
+      const byMeaning = topKVectors(qvec.get(basic.respell(q, e.isWord)), matrix, dim, 50, { norms })
+        .filter((h) => h.score >= floor).map((h) => ({ id: assets[h.index].id, score: h.score }));
+      return mergeMeaningRanking(q, kw, byMeaning, { limit, weights: FUSION });
+    };
+    out.levels.smarter = runEveryday(queries, smarter, assets);
+  }
+  fts.close();
+  return out;
+}
+
+export function reportEveryday(r, { misses: showMisses = false } = {}) {
+  const names = { basic: 'Plain search, catalogue only', keywords: 'Plain search with the index file', smarter: 'Smarter search' };
+  const lines = [`Everyday searches: ${r.levels.basic.length} of ${r.queries} apply to ${r.catalog} (${r.assets} assets).`, ''];
+  lines.push(table(['Level', 'First result right', 'A right result in the top 5', 'Share of the top 5 that is right'],
+    Object.entries(r.levels).map(([k, rows]) => { const s = summarizeEveryday(rows); return [names[k], pct(s.first), pct(s.found), pct(s.clean)]; })));
+  if (showMisses) {
+    for (const [k, rows] of Object.entries(r.levels)) {
+      lines.push('', `${names[k]}: searches with a wrong result in the top 5`);
+      for (const x of rows.filter((y) => y.clean < 1)) lines.push(`  "${x.q}" -> ${x.got.map((g, i) => (x.right[i] ? g : `[${g}]`)).join(', ') || '(nothing)'}`);
+    }
+  }
+  return lines.join('\n');
+}
+
 const START = '<!-- measured:start (written by tools/search-eval.mjs --write) -->', END = '<!-- measured:end -->';
 
 async function main() {
   const args = process.argv.slice(2);
   const opt = (n) => { const i = args.indexOf('--' + n); return i < 0 ? null : args[i + 1]; };
+  if (args.includes('--everyday')) {
+    const e = await evaluateEveryday({ catalogFile: opt('catalog') ? path.resolve(opt('catalog')) : undefined, model: !args.includes('--no-model'), log: (m) => console.error(m) });
+    console.log(reportEveryday(e, { misses: args.includes('--misses') }));
+    return;
+  }
   const r = await evaluate({ models: opt('models') ? opt('models').split(',') : null, weights: opt('weights') ? opt('weights').split(',').map(Number) : FUSION, log: (m) => console.error(m) });
   const text = report(r);
   console.log(text);

@@ -3,7 +3,7 @@
  "id": "q-slow-hit",
  "name": "Slow hit",
  "category": "impact",
- "description": "Breaks: a hit that fades in over 300 ms.",
+ "description": "Breaks: a hit that fades in slowly, over a third of a second.",
  "meta": {
   "type": "sfx",
   "role": "actions/hit",

@@ -37,8 +37,8 @@ export default defineSprite({
     spread: range('Spread', 0.5, { lo: 'Tight', hi: 'Wide' }),
     style: choice('Style', 'round', ['round', 'star', 'ring']),
     smoke: toggle('Smoke', true),
-    core: color('Core', P.cream, CORE),
-    edge: color('Edge', P.ember, EDGE),
+    core: color('Core', P.cream, CORE, { material: 'fire' }),   // flame: a look keeps it a fire colour
+    edge: color('Edge', P.ember, EDGE, { material: 'fire' }),
     speed: range('Speed', 0.5, { lo: 'Slow', hi: 'Fast', group: 'Motion' }),
   },
   clips: {

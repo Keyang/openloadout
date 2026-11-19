@@ -14,7 +14,7 @@ node tools/check.mjs [<id> ...] [--json] [--no-cache]                 sprites (n
 node tools/sfx.mjs check sounds/<id>.json ... [--json] [--no-cache]   sound effects, ambience, jingles, music
 ```
 
-Both run on worker threads and keep each result in `.cache/quality.json`, keyed by a hash of the asset file and of `engine/`, `rigs/`, `sound/`, `quality/` and `catalog/schema.js` (sprites also hash `sounds/` and `sprites/_*.js`). An unchanged asset costs nothing; `--no-cache` checks it again. The build (`node tools/build.mjs`) uses the same runner and fails on any error.
+Both run on worker threads and keep each result in `.cache/quality.json`, keyed on the files that asset really loads: its own file, every module it imports followed through their imports (its rig, the engine modules the rig uses, a shared `sprites/_*.js` helper), the checker's own code (`quality/sprite.js` or `quality/sound.js` with what it imports, and `catalog/schema.js`), and for a sprite the sounds its cues name. So an edit to one rig checks only the sprites on that rig again, an edit to the sound engine checks only the sounds, and an edit to a file nothing loads checks nothing (`tools/lib/quality-run.mjs`; the import lists come from `tools/lib/imports.mjs`). An unchanged asset costs nothing; `--no-cache` checks it again. The build (`node tools/build.mjs`) uses the same runner, runs it before it writes anything the site reads, and stops on any error saying which file, what is wrong and what to do.
 
 Every threshold below is a named constant in `THRESHOLDS` in the library file. Change the constant and this document together.
 
@@ -123,7 +123,8 @@ The checker renders the patch at its defaults, at the lowest and highest value o
 | A-starts | A one-shot starts at once | more than 30 ms of silence first | warning |
 | A-onset | A hit, click, shot, step or pickup has started within 10 ms. Measured as **onset**: the first sample within 20 dB of the peak, not the time to the loudest moment. Checked at the default and in every style | onset above 10 ms (`onsetDb`, `onsetMaxMs`) | warning |
 | A-length | A one-shot's length suits its type, at the default and in every style | sound effect outside 0.03 to 2 s; jingle outside 1 to 6 s (`lengthRange`) | warning |
-| A-peak | A patch that is not normalised (`"normalize": false`) stays under full scale, at the default and in every style | level above 1 before the limiter (`clipPeak`) | warning |
+| A-peak | The level heard (`heardPeak`: the raw peak of a patch that says `"normalize": false`, 0.89 for a normalised one) stays a little under full scale at the default, in every style and at both ends of every control (since 2026-11-18; it was a warning on the default and styles only) | above 0.95 (`peakMax`; full scale is `clipPeak`, 1) | error |
+| A-words | What a visitor reads (name, description, control labels, choices, style names) has no units, synthesizer terms or music theory (`TECHNICAL_WORDS`, `technicalWords`; the list and why each word is on it are in `quality/sound.js`). Text only, no render | any word on the list | error |
 | A-tail | A one-shot is not padded with silence | last 150 ms and 25% of the length silent | warning |
 | A-cut-off | A one-shot has died away by its end | last 1/32 louder than -18 dB re. the loudest | warning |
 | A-dc | No DC offset | mean above 0.05 | warning |

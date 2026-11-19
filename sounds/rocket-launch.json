@@ -9,7 +9,7 @@
   "missile",
   "launch"
  ],
- "description": "A small rocket leaving: an ignition pop, then a rush of noise that climbs as it flies away over a low burning tone. One control makes it a volley of up to four.",
+ "description": "A small rocket leaving: an ignition pop, then a rushing hiss that climbs as it flies away over a low burning tone. One control makes it a volley of up to four.",
  "meta": {
   "type": "sfx",
   "role": "actions/shoot",

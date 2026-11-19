@@ -10,7 +10,7 @@
   "pipe",
   "modal"
  ],
- "description": "Modal resonator struck by a noise burst. Slide Inharmonic from tuned bell to clangy pipe.",
+ "description": "Ringing metal struck once. Turn up Clang to go from a tuned bell to a clanging pipe.",
  "meta": {
   "type": "sfx",
   "role": "effects/impact",
@@ -68,7 +68,7 @@
   },
   {
    "id": "inharm",
-   "label": "Inharmonic",
+   "label": "Clang",
    "min": 0,
    "max": 1,
    "default": 0.7

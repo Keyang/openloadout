@@ -3,6 +3,7 @@
 
 import { rng } from './motion.js';
 import { styleFor, cleanStyles, pixelsOf } from './styles.js';   // styles.js imports this file too; neither uses the other until a call
+import { MATERIAL_IDS } from './materials.js';                     // what a colour can be of (Contract 7); it imports nothing
 
 // ---- parameter kinds -------------------------------------------------------
 // Each parameter is one control a non-technical person sees. `label`, `lo` and
@@ -12,21 +13,28 @@ import { styleFor, cleanStyles, pixelsOf } from './styles.js';   // styles.js im
 // `when` may also be a list of such objects: any one of them is enough.
 // A choice whose options were renamed lists the old names: `was: { false: 'none', true: 'plain' }`,
 // so links made before the change still open with the right option.
+// Two options tell a whole-bundle look (engine/theme.js, Contract 7) what a control is, where it cannot tell by itself:
+//   material: 'sky'   on a colour: what the colour is of (an id from engine/materials.js), when its label does not say.
+//   look: 'keep'      on a slider: this is what makes the sprite what it is, so "Also change shapes" leaves it alone.
+//   look: 'vary'      on a choice or an on/off control: its options are variants of one thing (eye shapes, a pattern),
+//                     so "Also change shapes" may pick another. Left out, a choice or an on/off control is never changed.
 
 const only = (o) => {
   const extra = {};
   if (o.when !== undefined) extra.when = o.when;
   if (o.was !== undefined) extra.was = o.was;
+  if (o.material !== undefined) extra.material = o.material;
+  if (o.look !== undefined) extra.look = o.look;
   return extra;
 };
 
-/** A slider control. def: its default; o: { min = 0, max = 1, step = 0.01, lo, hi (the words shown at each end), group, when }. */
+/** A slider control. def: its default; o: { min = 0, max = 1, step = 0.01, lo, hi (the words shown at each end), group, when, look ('keep': a whole-bundle look never moves it) }. */
 export const range = (label, def, o = {}) => ({ kind: 'range', label, def, min: o.min ?? 0, max: o.max ?? 1, step: o.step ?? 0.01, lo: o.lo ?? '', hi: o.hi ?? '', group: o.group ?? 'Look', ...only(o) });
-/** A pick-one control. options: values, or { value, label } pairs; def: the default value; o: { group, when, was }. */
+/** A pick-one control. options: values, or { value, label } pairs; def: the default value; o: { group, when, was, look ('vary': its options are variants a whole-bundle look may pick among) }. */
 export const choice = (label, def, options, o = {}) => ({ kind: 'choice', label, def, options: options.map((x) => (typeof x === 'string' ? { value: x, label: x[0].toUpperCase() + x.slice(1) } : x)), group: o.group ?? 'Look', ...only(o) });
-/** A colour control. def: the default '#rrggbb'; swatches: the colours offered (see swatches() in palettes.js); o: { group, when }. */
+/** A colour control. def: the default '#rrggbb'; swatches: the colours offered (see swatches() in palettes.js); o: { group, when, material (what the colour is of, an id from engine/materials.js, when the label does not say) }. */
 export const color = (label, def, swatches, o = {}) => ({ kind: 'color', label, def, swatches, group: o.group ?? 'Colors', ...only(o) });
-/** An on/off control. def: true or false; o: { group, when }. */
+/** An on/off control. def: true or false; o: { group, when, look ('vary': a whole-bundle look may flip it) }. */
 export const toggle = (label, def, o = {}) => ({ kind: 'toggle', label, def, group: o.group ?? 'Look', ...only(o) });
 
 export const SKIN = ['#f6d3b0', '#e8b088', '#c98a5c', '#9a6240', '#6e4428', '#9bd18a', '#b9a7e0'];
@@ -94,12 +102,33 @@ export function defineSprite(def) {
       if (d.kind !== 'choice' || d.was === null || typeof d.was !== 'object' || Array.isArray(d.was)) throw new Error(`${where}: was must be an object on a choice: { oldValue: newValue }`);
       for (const [old, now] of Object.entries(d.was)) if (!d.options.some((o) => o.value === now)) throw new Error(`${where}: was maps "${old}" to "${now}", which is not one of its options`);
     }
+    cleanLookMarks(def, k, d);
+  }
+  if (def.materials !== undefined) {
+    const m = def.materials;
+    if (m === null || typeof m !== 'object' || Array.isArray(m) || Object.keys(m).some((key) => key !== 'rest')) throw new Error(`sprite ${def.id}: "materials" takes one field, rest: the material of every colour that no control paints`);
+    if (m.rest !== undefined && !MATERIAL_IDS.includes(m.rest)) throw new Error(`sprite ${def.id}: materials.rest is ${JSON.stringify(m.rest)}, which is not a material; use one of ${MATERIAL_IDS.join(', ')}`);
   }
   defineParts(def);
   rejectLoops(def);
   // styles (Contract 12): which pipelines can draw and export it
   def.styles = cleanStyles(def.styles, `sprite ${def.id}`);
   return def;
+}
+
+// ---- what a whole-bundle look may do with a control (Contract 7) -----------------
+
+/** Checks one control's `material` and `look` marks: a material only on a colour, and one that exists; look only 'keep' or 'vary', where it means something. */
+function cleanLookMarks(def, k, d) {
+  const where = `sprite ${def.id}: control "${k}"`;
+  if (d.material !== undefined) {
+    if (d.kind !== 'color') throw new Error(`${where}: material is for colour controls (it says what the colour is of); this one is a ${d.kind}`);
+    if (!MATERIAL_IDS.includes(d.material)) throw new Error(`${where}: material is ${JSON.stringify(d.material)}, which is not a material; use one of ${MATERIAL_IDS.join(', ')}`);
+  }
+  if (d.look !== undefined) {
+    if (d.look !== 'keep' && d.look !== 'vary') throw new Error(`${where}: look is ${JSON.stringify(d.look)}; use 'keep' (a whole-bundle look never changes it) or 'vary' (a look may pick another of its options)`);
+    if (d.kind === 'color' && d.look === 'vary') throw new Error(`${where}: look: 'vary' is for shapes; a look recolours every colour by itself, within what its material allows`);
+  }
 }
 
 // ---- `when`: a control or a sound that only applies at some settings ----------

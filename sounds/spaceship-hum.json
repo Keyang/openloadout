@@ -10,7 +10,7 @@
   "loop",
   "live"
  ],
- "description": "Continuous engine loop; pitch, brightness and loudness all follow the thrust parameter (drive it live).",
+ "description": "An engine hum that keeps playing: its pitch, brightness and loudness all follow Thrust, which you can move while it plays.",
  "meta": {
   "type": "sfx",
   "role": "world/machine",

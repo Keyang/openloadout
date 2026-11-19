@@ -6,9 +6,12 @@
 //               keywordFields, FTS_COLUMNS, FTS_WEIGHTS, ftsQuery, keywordSql  <- the same search inside the index file
 //   filters     matchesFilters, filterAssets, countFacets, filterSql
 //   meaning     quantize, cosineInt8, vectorNorms, topKVectors, mergeRankings
-//   other       similarByMeta, applyCorrections, MAX_QUERY_CHARS, MAX_QUERY_WORDS
+//   everyday    everydayWords: what people call an asset ("bad guy", "money"), from search/everyday-words.js
+//   other       similarByMeta, applyCorrections, mergeKeywordRankings, mergeMeaningRanking, MAX_QUERY_CHARS, MAX_QUERY_WORDS
 //
 // An asset is one entry of generated/catalog.json (docs/architecture.md, Contract 4).
+// The only import is a table of plain data next to this file, so this stays free of Node and browser APIs.
+import { EVERYDAY_WORDS } from './everyday-words.js';
 
 // ---------------------------------------------------------------- text
 
@@ -115,6 +118,36 @@ const TYPE_LABEL = {
 const list = (v) => (Array.isArray(v) ? v : v == null || v === '' ? [] : [v]);
 const roleWords = (role) => String(role || '').replace(/[/-]/g, ' ');
 
+// ---------------------------------------------------------------- everyday words
+
+function fits(asset, when) {
+  if (when.kind && !list(when.kind).includes(asset.kind)) return false;
+  if (when.type && !list(when.type).includes(asset.type)) return false;
+  if (when.role && !list(when.role).some((r) => roleMatches(asset.role, r))) return false;
+  if (when.named) {
+    const own = new Set(rawTokens(`${asset.name || ''} ${list(asset.words).join(' ')}`));
+    if (!list(when.named).some((w) => own.has(w))) return false;
+  }
+  return true;
+}
+const EVERYDAY = new WeakMap();
+
+/**
+ * The everyday words people use for this asset ("bad guy", "baddie" for an enemy; "money" for a coin), from the
+ * table in search/everyday-words.js, matched on the asset's kind, type, role and own words. Every index applies
+ * them when it is built, so a new asset is found by them with nothing added to its file. `table` is for tests.
+ */
+export function everydayWords(asset, table = EVERYDAY_WORDS) {
+  const cached = table === EVERYDAY_WORDS && asset && typeof asset === 'object' ? EVERYDAY.get(asset) : null;
+  if (cached) return cached;
+  const out = [];
+  for (const entry of table) if (fits(asset, entry.when || {})) for (const w of entry.words) if (!out.includes(w)) out.push(w);
+  if (table === EVERYDAY_WORDS && asset && typeof asset === 'object') EVERYDAY.set(asset, out);
+  return out;
+}
+/** Everyday words as keyword-index text: a phrase is kept as one word ("bad guy" -> "badguy"), so its parts match only together. */
+const everydayText = (asset) => everydayWords(asset).map((w) => rawTokens(w).join('')).filter(Boolean).join(' ');
+
 /** The text that stands for an asset when it is turned into a vector. One or two sentences in plain words. */
 export function searchText(asset) {
   const a = asset;
@@ -123,6 +156,8 @@ export function searchText(asset) {
   parts.push(`${what} for ${roleWords(a.role)}.`.replace(/\s+/g, ' '));
   const words = list(a.words);
   if (words.length) parts.push(`Also: ${words.join(', ')}.`);
+  const everyday = everydayWords(a).filter((w) => !words.includes(w));
+  if (everyday.length) parts.push(`People call it: ${everyday.join(', ')}.`);
   const themes = list(a.themes).filter((t) => t !== 'neutral');
   if (themes.length) parts.push(`Theme: ${themes.join(', ')}.`);
   return parts.filter(Boolean).join(' ');
@@ -197,11 +232,20 @@ export function filterSql(filters) {
 
 // ---------------------------------------------------------------- keyword search (the basic level)
 
-const FIELD_WEIGHT = { name: 4, words: 3, id: 1.5, role: 1.5, type: 1.5, tags: 1, description: 1 };
+/**
+ * Searches of two to this many words (filler words left out) list only the assets that have the most of them.
+ * Longer ones are descriptions ("beeping when you are about to die"), where a good result rarely has every word
+ * and the asset that happens to have them all can be the wrong one (a dice roll: "die").
+ */
+export const AND_WORDS = 2;
+/** Endings that make another form of the same word ("sell" -> "seller"), for matching a finished word to a longer one. */
+const WORD_ENDINGS = new Set(['s', 'es', 'er', 'ers', 'or', 'ors', 'ed', 'ing', 'y', 'ie', 'ies', 'ly', 'ion', 'ions', 'ment', 'ness', 'able', 'ful', 'ish']);
+const FIELD_WEIGHT = { name: 4, words: 3, id: 1.5, role: 1.5, type: 1.5, everyday: 1.5, tags: 1, description: 1 };
 
 /**
  * The text of an asset split into the columns keyword search looks at. The index file's FTS5 table
  * has these columns in this order (FTS_COLUMNS), so the two keyword searches read the same text.
+ * `everyday` (everydayWords, phrases joined into one word) is also written into the index file's role column.
  */
 export function keywordFields(asset) {
   const pair = (text) => { const raw = rawTokens(text); const out = raw.slice(); for (let i = 0; i + 1 < raw.length; i++) out.push(raw[i] + raw[i + 1]); return out.join(' '); };
@@ -209,9 +253,10 @@ export function keywordFields(asset) {
     name: `${asset.name || ''} ${pair(asset.name)}`.trim(),
     words: list(asset.words).map((w) => { const r = rawTokens(w); return r.length > 1 ? `${r.join(' ')} ${r.join('')}` : r.join(''); }).join(' '),
     description: asset.description || '',
-    role: `${roleWords(asset.role)} ${rawTokens(asset.id).join(' ')}`.trim(),
+    role: `${roleWords(asset.role)} ${rawTokens(asset.id).join(' ')} ${everydayText(asset)}`.trim(),
     type: `${asset.type || ''} ${asset.kind || ''} ${TYPE_WORDS[asset.type] || ''}`.trim(),
     tags: `${list(asset.themes).join(' ')} ${list(asset.gameTypes).join(' ')}`.trim(),
+    everyday: everydayText(asset),
   };
 }
 export const FTS_COLUMNS = ['name', 'words', 'description', 'role', 'type', 'tags'];
@@ -222,7 +267,7 @@ function fieldTokens(asset) {
   const f = keywordFields(asset);
   return {
     name: rawTokens(f.name), words: rawTokens(f.words), id: rawTokens(asset.id), role: rawTokens(asset.role),
-    type: rawTokens(f.type), tags: rawTokens(f.tags), description: rawTokens(f.description),
+    type: rawTokens(f.type), tags: rawTokens(f.tags), description: rawTokens(f.description), everyday: rawTokens(f.everyday),
   };
 }
 
@@ -275,19 +320,25 @@ export function createKeywordIndex(assets) {
   }
 
   // Which catalogue words a typed word may stand for, each with how much to trust the match.
+  // `exact` is the set of those that are the word itself (not its start, not a near spelling).
   function candidates(raw, isLast) {
     const s = stem(raw);
     const out = new Map();
     const put = (term, w) => { if (postings.has(term) && (out.get(term) || 0) < w) out.set(term, w); };
     put(s, 1); put(raw, 1);
-    const exact = out.size > 0;
-    if (raw.length >= 2 && (isLast || !exact)) {
+    const exact = new Set(out.keys());
+    if (raw.length >= 2 && (isLast || !exact.size)) {
       for (const term of stems) {
-        if (term.length > raw.length && term.startsWith(raw)) put(term, (exact ? 0.35 : 0.55) + 0.3 * (raw.length / term.length));
+        if (term.length <= raw.length || !term.startsWith(raw)) continue;
+        const share = raw.length / term.length;
+        // A word with another typed after it is finished: "bad" in "bad guy" is not the start of "badge", but "sell"
+        // may be "seller". Only the last word may still be half typed.
+        if (!isLast && !WORD_ENDINGS.has(term.slice(raw.length))) continue;
+        put(term, (exact.size ? 0.35 : 0.55) + 0.3 * share);
       }
     }
-    if (!exact) for (const f of fuzzy(raw)) put(f.stem, f.d === 1 ? 0.6 : 0.4);
-    return out;
+    if (!exact.size) for (const f of fuzzy(raw)) put(f.stem, f.d === 1 ? 0.6 : 0.4);
+    return { terms: out, exact };
   }
 
   function search(query, { filters, limit = 30 } = {}) {
@@ -300,26 +351,49 @@ export function createKeywordIndex(assets) {
       for (let doc = 0; doc < N && rows.length < limit; doc++) if (!pass || pass(doc)) rows.push({ id: assets[doc].id, score: 0 });
       return rows;
     }
-    const score = new Float64Array(N), hits = new Uint8Array(N);
+    // matched: one bit per query word found in the asset. firm: the same, leaving out a word found only as the start of
+    // a longer one when the word itself is in the catalogue ("sound" in "soundtrack")
+    const score = new Float64Array(N), matched = new Uint32Array(N), firm = new Uint32Array(N);
     raw.forEach((r, i) => {
-      const best = new Map();
-      for (const [term, trust] of candidates(r, i === raw.length - 1)) {
+      const best = new Map(), byWord = new Set();
+      const { terms, exact } = candidates(r, i === raw.length - 1);
+      for (const [term, trust] of terms) {
         const weight = trust * idf(term);
-        for (const [doc, w] of postings.get(term)) { const v = weight * w; if ((best.get(doc) || 0) < v) best.set(doc, v); }
+        for (const [doc, w] of postings.get(term)) {
+          const v = weight * w;
+          if ((best.get(doc) || 0) < v) best.set(doc, v);
+          if (exact.has(term)) byWord.add(doc);
+        }
       }
-      for (const [doc, v] of best) { score[doc] += v; hits[doc]++; }
+      // When the word itself is in the catalogue, what merely starts with it ("bad" -> "badge") ranks below everything that has the word
+      if (byWord.size) {
+        let low = Infinity;
+        for (const doc of byWord) low = Math.min(low, best.get(doc));
+        for (const [doc, v] of best) if (!byWord.has(doc)) best.set(doc, Math.min(v, 0.5 * low));
+      }
+      for (const [doc, v] of best) { score[doc] += v; matched[doc] |= 1 << i; if (!byWord.size || byWord.has(doc)) firm[doc] |= 1 << i; }
     });
-    // two words typed apart that the catalogue writes as one ("level up" and "levelup"): a bonus, never a requirement
+    // two words typed apart that the catalogue writes as one ("level up" and "levelup", "bad guy" and the everyday
+    // word "badguy"): the asset has both words
     for (let i = 0; i + 1 < raw.length; i++) {
       const joined = raw[i] + raw[i + 1];
-      const p = postings.get(stem(joined)) || postings.get(joined);
-      if (p) { const w = idf(postings.has(stem(joined)) ? stem(joined) : joined) * 0.5; for (const [doc, v] of p) score[doc] += w * v; }
+      const term = postings.has(stem(joined)) ? stem(joined) : postings.has(joined) ? joined : null;
+      if (!term) continue;
+      const w = idf(term) * 0.5;
+      for (const [doc, v] of postings.get(term)) { score[doc] += w * v; matched[doc] |= 3 << i; firm[doc] |= 3 << i; }
     }
+    const bits = (m) => { let n = 0; for (; m; m &= m - 1) n++; return n; };
+    // In a search of a few words, what has the most of them is the result: "bad guy" does not list every "guy",
+    // nor "fight music" every piece of music. Only when no asset has two of the words does any one of them do.
+    let most = 0;
+    if (raw.length >= 2 && raw.length <= AND_WORDS) for (let doc = 0; doc < N; doc++) if (firm[doc] && (!pass || pass(doc))) most = Math.max(most, bits(firm[doc]));
+    const needed = most >= 2 ? most : 0;
     const phrase = normalize(clip(query));
     const rows = [];
     for (let doc = 0; doc < N; doc++) {
-      if (!hits[doc] || (pass && !pass(doc))) continue;
-      let s = score[doc] * (0.4 + 0.6 * (hits[doc] / raw.length));
+      if (!matched[doc] || (pass && !pass(doc))) continue;
+      if (bits(firm[doc]) < needed) continue;
+      let s = score[doc] * (0.4 + 0.6 * (bits(matched[doc]) / raw.length));
       if (names[doc] === phrase) s *= 1.6;
       else if (phrase.length >= 3 && (' ' + names[doc] + ' ').includes(' ' + phrase + ' ')) s *= 1.2;
       rows.push({ id: assets[doc].id, score: s });
@@ -407,6 +481,21 @@ export function keywordSql(query, { filters = null, limit = 30, expand = null } 
 // ---------------------------------------------------------------- merging rankings
 
 /**
+ * The keyword ranking once the index file has loaded: the catalogue search (createKeywordIndex) merged with the
+ * index file's (keywordSql) for the same query. The index file matches any one word and any start of the last one,
+ * so for a short search (up to AND_WORDS words) it only reorders what the catalogue search found, and adds results
+ * of its own only when that found nothing: otherwise "bad guy" would bring back every "guy", and "bad" every
+ * "badge", that the catalogue search left out or put last. A longer search (a description) takes both.
+ * Both lists are best first; returns [{ id, score }].
+ */
+export function mergeKeywordRankings(query, fromCatalogue, fromIndex, { limit = Infinity } = {}) {
+  const found = new Set((fromCatalogue || []).map((r) => r.id));
+  const short = queryWords(query).length <= AND_WORDS;
+  const extra = short && found.size ? (fromIndex || []).filter((r) => found.has(r.id)) : fromIndex || [];
+  return mergeRankings([fromCatalogue || [], extra], { limit });
+}
+
+/**
  * Merge several best-first lists of { id } into one (reciprocal rank fusion): an item scores
  * weight / (k + position) in each list it appears in. No list's own scores are compared, only positions.
  */
@@ -419,6 +508,19 @@ export function mergeRankings(lists, { k = 60, weights = null, limit = Infinity 
   const out = [...score].map(([id, s]) => ({ id, score: s }));
   out.sort((x, y) => y.score - x.score);
   return out.length > limit ? out.slice(0, limit) : out;
+}
+
+/**
+ * The smarter-search ranking: the keyword ranking merged with what the embedding model found (each best first).
+ * For a short search (up to AND_WORDS words) that the words already answer, the model only reorders those results:
+ * measured on the everyday searches, what the model added there was nearly always unrelated ("Thicket imp" for
+ * "mouse pointer"). It adds its own when the words found nothing ("kitty"), and always for a longer description.
+ */
+export function mergeMeaningRanking(query, keywords, byMeaning, { limit = Infinity, weights = null } = {}) {
+  const found = new Set((keywords || []).map((r) => r.id));
+  const short = queryWords(query).length <= AND_WORDS;
+  const extra = short && found.size ? (byMeaning || []).filter((r) => found.has(r.id)) : byMeaning || [];
+  return mergeRankings([keywords || [], extra], { limit, weights });
 }
 
 // ---------------------------------------------------------------- 8-bit vectors

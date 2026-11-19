@@ -83,7 +83,7 @@ export function build(gains = GAINS) {
     id: 'thornwood-overworld',
     name: 'Forest trail theme',
     tags: ['music', 'overworld', 'chiptune', 'adaptive', 'loop'],
-    description: 'Bright, bouncy chiptune level music in G major, 8 to 32 bars long: Intensity brings in the drums, then the tune, then the harmony and an echo, and you can change the tempo, key, bounce and the instrument that plays the tune.',
+    description: 'Bright, bouncy, happy chiptune level music in short or long versions: Intensity brings in the drums, then the tune, then a second tune under it and an echo, and you can change the speed, pitch, bounce and the instrument that plays the tune.',
     meta: {
       type: 'music', role: 'music/exploration', themes: ['fantasy', 'forest'], gameTypes: ['platformer', 'arcade'],
       words: ['overworld', 'level', 'stage', 'trail', 'explore', 'walk', 'adventure', 'journey', 'happy', 'cheerful', 'bouncy', 'chiptune', '8-bit', 'retro'],

@@ -4,7 +4,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { displayPlan, fillSpan } from '../../app/play/display.js';
 import { layerSpeed, layerShift, drawOrder } from '../../app/play/layers.js';
-import { howTo, plural, roleNote, keysLine } from '../../app/play/words.js';
+import { howTo, plural, roleNote, keysLine, viewName, listNames, leftOutNote, viewReason } from '../../app/play/words.js';
 import { isCustom } from '../../app/play/kinds.js';
 import { defineSprite, range, choice } from '../../engine/sprite.js';
 
@@ -95,4 +95,34 @@ test('a sprite the visitor changed is told apart from one as it was made', () =>
   assert.equal(isCustom(s, { params: {}, cues: { idle: [{ sound: 'hum', frame: 0, preset: null, params: null, volume: 1 }] } }), false, 'its own sounds, written out');
   assert.equal(isCustom(s, { params: {}, cues: { idle: [] } }), true, 'a sound taken off');
   assert.equal(isCustom(s, { params: {}, cues: { idle: [{ sound: 'hum', frame: 0, volume: 0.4 }] } }), true);
+});
+
+test('the two views have everyday names, and a list of names reads as a sentence', () => {
+  assert.deepEqual([viewName('side'), viewName('top')], ['Side view', 'Top-down']);
+  assert.equal(listNames(['Knight']), 'Knight');
+  assert.equal(listNames(['Knight', 'Wizard']), 'Knight and Wizard');
+  assert.equal(listNames(['Knight', 'Wizard', 'Slime']), 'Knight, Wizard and Slime');
+});
+
+test('what is left out of the scene is said with the reason and the way to see it', () => {
+  // a top-down scene: the things left out were drawn from the side
+  assert.equal(leftOutNote(['Knight'], 'top'), 'Knight is drawn to be seen from the side, so it is left out of this top-down scene. Switch to Side view to see it.');
+  assert.equal(leftOutNote(['Knight', 'Wizard', 'Slime'], 'top'), 'Knight, Wizard and Slime are drawn to be seen from the side, so they are left out of this top-down scene. Switch to Side view to see them.');
+  // a side-view scene: the things left out were drawn from above
+  assert.equal(leftOutNote(['Meadow and paths'], 'side'), 'Meadow and paths is drawn to be seen from above, so it is left out of this side-view scene. Switch to Top-down to see it.');
+  assert.equal(leftOutNote(['Cottage', 'Inn'], 'side'), 'Cottage and Inn are drawn to be seen from above, so they are left out of this side-view scene. Switch to Top-down to see them.');
+  assert.equal(leftOutNote([], 'side'), '');
+  for (const mode of ['side', 'top']) assert.doesNotMatch(leftOutNote(['A', 'B'], mode), /top-down\b.*\btop-down scene|mode|sprite|asset|meta/i, 'everyday words only');
+});
+
+test('why the scene opened in this view is said in a sentence, or not at all when there was nothing to choose', () => {
+  assert.equal(viewReason('tiles', 'top'), 'The ground tiles in your bag are drawn from above, so the scene opened top-down.');
+  assert.equal(viewReason('tiles', 'side'), 'The ground tiles in your bag are drawn from the side, so the scene opened in side view.');
+  assert.equal(viewReason('most', 'top'), 'Most things in your bag are drawn from above, so the scene opened top-down.');
+  assert.equal(viewReason('most', 'side'), 'Most things in your bag are drawn from the side, so the scene opened in side view.');
+  assert.match(viewReason('player', 'top'), /first character/);
+  assert.match(viewReason('even', 'side'), /side view/);
+  assert.equal(viewReason('chosen', 'top'), 'You switched to top-down.');
+  assert.equal(viewReason('chosen', 'side'), 'You switched to side view.');
+  assert.equal(viewReason('only', 'side'), '');
 });

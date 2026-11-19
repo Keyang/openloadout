@@ -31,7 +31,7 @@
  "params": [
   {
    "id": "bpm",
-   "label": "Tempo",
+   "label": "Speed",
    "min": 100,
    "max": 140,
    "default": 120,

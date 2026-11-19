@@ -34,6 +34,8 @@ export const THRESHOLDS = {
   styleCutOffDb: -18,       // a style whose last 1/32 is louder than this (re. loudest) is cut off: the same line as A-cut-off for the default. Loudest style ending in sounds/: -21.5 dB (dodge-dash "Thruster dash")
   lengthRange: { sfx: [0.03, 2], jingle: [1, 6] },   // seconds, one-shots only (quality bar section 3; 0.03 s is the shortest interface sound of style guide 11). Effects run 0.035 to 2.8 s (4 styles over 2 s); jingles 0.59 to 2.85 s (1 style under 1 s)
   clipPeak: 1,              // a patch that says "normalize": false is soft-clipped by the engine above this level (full scale). The two tracks peak at 0.71 to 0.85 over their 9 looks; normalised patches are exempt (their raw peaks run 0.17 to 9.3 and are scaled to 0.89)
+  // ---- added 2026-11-18 (final review). Data: the 8 patches that say "normalize": false, at their defaults, every style and both ends of every control ----
+  peakMax: 0.95,            // A-peak, an error: the level heard (heardPeak) at the defaults, in any style or at either end of any control stays at or under this, 0.4 dB under full scale, so a little rounding in a game's mixer does not reach it. The six tracks peak at 0.72 to 0.85 (battle-theme "Final phase" and grit at its highest, 0.847); normalised patches are 0.89 by construction
   randomSeeds: 5,           // a control under audibleChangeDb with seed 1 is rendered with this many seeds at both ends. Seeds 1 to 5 give a first rnd(-1, 1) of 0.03, -0.11, 0.23, -0.55, -0.29: seed 1 alone is nearly the centre of any random pick, which is why a "spread" scored under 1.5 dB
   onsetShiftMs: 10,         // a control under audibleChangeDb whose note starts move this far between its ends is audible as timing. thornwood-overworld "swing": 0.36 dB spectral, note starts move 38 ms (half of them by 10 ms or more); a control that changes nothing reads 0 ms. Only run under audibleChangeDb: a control that reshapes the sound also moves detected note starts (up to 54 ms among the library's controls under 2 dB)
   chordTop: 3, chordInTop: 2,   // a bar sounds its written chord when at least 2 of its 3 strongest notes (pitch classes) belong to it
@@ -115,6 +117,89 @@ export function writtenChords(patch) {
   return { tonic: pc(tonic), tonicFrom, bars };
 }
 
+/**
+ * The level a listener gets from a render: the peak after the engine's own scaling. A normalised patch is scaled to
+ * 0.89 whatever its raw level; one that says "normalize": false is played at its raw level.
+ * r: what renderPatch returns ({ rawPeak, appliedGain }).
+ */
+export function heardPeak(r) {
+  return r.rawPeak * (r.appliedGain ?? 1);
+}
+
+/**
+ * Words a visitor would have to look up, in the text a sound or music page shows: the name, the description, each
+ * control's label, the names of a control's choices and the style names. The people who use the site make games
+ * but do not program synthesizers, so a page says "deep" not "80 Hz", "ringing metal" not "modal resonator".
+ * Each entry: re (case-insensitive, whole words), instead (what to write). Why each group is here:
+ * - units (Hz, kHz, dB, ms, bpm, rpm, octaves, semitones): a number with a unit means nothing to someone who has not
+ *   studied sound; say how high, how fast, how long. Seconds are everyday and are allowed.
+ * - wave shapes (sine, saw, sawtooth, square wave, pulse wave, pulse width, duty, "triangle note"): names of
+ *   oscillator shapes; say what it sounds like (soft, buzzy, hollow, bright). "Sawed-off" or a triangle as an
+ *   instrument is not caught.
+ * - synthesis (FM, LFO, ADSR, oscillator, resonator, modal, inharmonic, harmonic, overtone, partial, filter,
+ *   low-pass, high-pass, band-pass, cutoff, resonance, envelope, decay, sustain, detune, dissonant, vibrato, tremolo,
+ *   reverb, saturated, transient, timbre, formant, "sub" as in sub bass, and "noise" as a sound source): the
+ *   synthesizer's parts, not what is heard. "Noise" is here because in a sound's own text it always names the
+ *   source (white noise), which tells a listener nothing; write hiss, rush, crackle. "Attack" is not here: in a
+ *   game it is a word everyone uses.
+ * - music theory (key names like "D minor", modes, intervals, triads, voicings, arpeggios, counted bars, "8th note",
+ *   half-time, double-time, grace note): say happy, dark, rising, a run of notes, short or long.
+ * - mixing and code words ("mids", "low end", "parameter", "every seed"): say deep or high sounds, control, take.
+ * - key and tempo in the musician's sense: a control named "Key" (or "Musical key"), "change the key", "a key change",
+ *   "in the key of", and "tempo" anywhere; say Pitch (lower to higher) and Speed (slower to faster). Key is also an
+ *   everyday thing (a style called "Key", "a key jingle", "Key click"), so only the musical phrasings are listed, and
+ *   the bare word only as a whole control name. An entry with `in: 'control'` reads control names only.
+ * "Synth" and "chiptune" are allowed: they name instruments and a style of game music that players know.
+ */
+export const TECHNICAL_WORDS = [
+  { re: /\bk?hz\b/i, instead: 'say how high or low it sounds: deep, low, high, shrill' },
+  { re: /\bdb\b|\bdecibels?\b/i, instead: 'say louder or quieter' },
+  { re: /\bms\b|\bmilliseconds?\b/i, instead: 'say at once, quick or slow, or give seconds' },
+  { re: /\bbpm\b/i, instead: 'say speed, slower or faster (or "beats a minute")' },
+  { re: /\brpm\b/i, instead: 'say engine speed' },
+  { re: /\boct\b|\boctaves?\b/i, instead: 'say higher or lower, or much higher' },
+  { re: /\bsemitones?\b/i, instead: 'say a little higher or lower' },
+  { re: /\bsines?\b|\bsaws?\b|\bsawtooth\b|\bsquare[- ]waves?\b|\bpulse[- ]?(?:waves?|width)\b|(?<![\w-])duty\b|\btriangle (?:waves?|notes?|blips?|tones?|with)\b/i, instead: 'say what it sounds like: soft, pure, buzzy, hollow, bright' },
+  { re: /\b(?:fm|lfo|adsr)\b/i, instead: 'say what it sounds like: bell-like, wobbling, ringing' },
+  { re: /\boscillators?\b|\bresonators?\b|\bmodal\b|\binharmonic\b|\bharmonics?\b|\bovertones?\b|\bpartials?\b/i, instead: 'say what is heard: ringing metal, a bell, a clang, a richer tone' },
+  { re: /\bfilter(?:s|ed|ing)?\b|\b(?:low|high|band)[- ]?pass(?:ed)?\b|\bcutoff\b|\bresonance\b/i, instead: 'say brighter or duller, muffled, thin' },
+  { re: /\benvelopes?\b|\bdecay\b|\bsustain\b|\btransients?\b/i, instead: 'say how quickly it starts and how long it rings' },
+  { re: /\bdetuned?\b|\bdissonan(?:t|ce)\b|\bvibrato\b|\btremolo\b|\breverb\b|\bsaturat(?:ed|ion)\b|\btimbre\b|\bformants?\b/i, instead: 'say what is heard: wobbly, harsh, sour, echoing, crunchy, the sound of it' },
+  { re: /\bsub(?![\w-])|\bsub-?bass\b/i, instead: 'say deep or low' },
+  { re: /\bnoise\b/i, instead: 'say what it sounds like: hiss, rush, crackle, static' },
+  { re: /\b[a-g](?:#|♯|b|♭)?-(?:major|minor)\b|\bin [a-g](?:#|♯|b|♭)? (?:major|minor)\b|\bdorian\b|\bmixolydian\b|\blydian\b|\bphrygian\b|\baeolian\b/i, instead: 'say happy, bright, sad or dark' },
+  { re: /\bintervals?\b|\btriads?\b|\bvoicings?\b|\barpeggi(?:o|os|ated)\b|\barp\b|\b(?:major|minor|perfect) (?:second|third|fourth|fifth|sixth|seventh)s?\b|\ba (?:fourth|fifth|sixth|ninth) (?:apart|above|below)\b|\badded ninth\b|\bgrace note\b/i, instead: 'say a jump between notes, a chord, a run of notes, a small or big step' },
+  { re: /\b\d+(?:st|nd|rd|th) notes?\b|\b\d+ (?:to \d+ )?bars?\b|\bhalf-time\b|\bdouble-time\b/i, instead: 'say short or long, slower or faster, every beat' },
+  { re: /\bmids\b|\bmid-?range\b|\blow end\b|\bhigh end\b/i, instead: 'say deep, middle or high sounds' },
+  { re: /\bparam(?:eter)?s?\b|\b(?:every|each|another|a different|random|new) seeds?\b/i, instead: 'say control or slider; say every take or every time it plays' },
+  { re: /^(?:musical )?key$/i, in: 'control', instead: 'call it Pitch: lower to higher' },
+  { re: /\b(?:change|changes|changing|shift|shifts|raise|raises|lower|lowers|set|sets) (?:the|its) key\b|\bkey changes?\b|\bin the key of\b|\btempo\b/i, instead: 'say pitch (lower or higher) and speed (slower or faster)' },
+];
+
+/**
+ * The technical words in what a visitor reads of a patch (see TECHNICAL_WORDS). Reads text only: no render.
+ * patch: a sound patch. Returns [{ word (as written), where ('the name', 'the description', 'control "<label>"',
+ * 'a choice of "<label>"', 'style "<name>"'), instead }], in reading order.
+ */
+export function technicalWords(patch) {
+  const texts = [['the name', patch?.name], ['the description', patch?.description]];
+  for (const d of Array.isArray(patch?.params) ? patch.params : []) {
+    texts.push([`control "${d.label}"`, d.label]);
+    for (const o of Array.isArray(d.options) ? d.options : []) texts.push([`a choice of "${d.label}"`, o]);
+  }
+  for (const name of Object.keys(patch?.presets ?? {})) texts.push([`style "${name}"`, name]);
+  const out = [];
+  for (const [where, text] of texts) {
+    if (typeof text !== 'string') continue;
+    for (const w of TECHNICAL_WORDS) {
+      if (w.in === 'control' && !where.startsWith('control ')) continue;
+      const all = new RegExp(w.re.source, 'gi');
+      for (const m of text.matchAll(all)) out.push({ word: m[0], where, instead: w.instead });
+    }
+  }
+  return out;
+}
+
 const pct = (x) => `${Math.round(x * 100)}%`;
 const quoted = (names) => (names.length > 1 ? `styles ${names.slice(0, -1).map((n) => `"${n}"`).join(', ')} and "${names[names.length - 1]}"` : `style "${names[0]}"`);
 const both = (values) => (values.length > 1 ? `${values.slice(0, -1).join(', ')} and ${values[values.length - 1]}` : values[0]);
@@ -160,6 +245,16 @@ export function checkSound(patch, { validateMeta } = {}) {
     if (patch?.category && patch.category !== 'jingle') warnings.push(`a jingle's patch should say "category": "jingle" (it says "${patch.category}"), so the site does not list it as a music track`);
   }
   if (type === 'ambience' && patch && !patch.loop) errors.push('an ambience must loop ("loop": true): it plays under a scene for minutes');
+  // A-words: what a visitor reads is in everyday words (text only, so it runs even on a patch that does not build)
+  {
+    const found = technicalWords(patch);
+    metrics.technicalWords = found;
+    if (found.length) {
+      const seen = new Set(), list = [];
+      for (const x of found) { const key = `${x.word.toLowerCase()}|${x.where}`; if (!seen.has(key)) { seen.add(key); list.push(`"${x.word}" in ${x.where} (${x.instead})`); } }
+      errors.push(`words: a visitor would have to look up ${list.join('; ')}. The people who use the site make games but do not program synthesizers: write what is heard, in everyday words (skills/sprite-forge/SOUND.md, "Words a visitor reads").`);
+    }
+  }
   if (!v.ok) return finish();
 
   // ---- the default render --------------------------------------------------------------
@@ -176,12 +271,14 @@ export function checkSound(patch, { validateMeta } = {}) {
 
   // ---- shape of a look (the default here; every style further down) -------------------------------
   const lengthRule = !patch.loop && T.lengthRange[type] ? { range: T.lengthRange[type], what: type === 'jingle' ? 'a jingle' : 'a sound effect' } : null;
-  const clips = (r) => patch.normalize === false && r.rawPeak > T.clipPeak;
+  const clips = (r) => heardPeak(r) > T.peakMax;      // A-peak: heard above the margin under full scale (an error)
+  const loudText = (level) => `the level reaches ${level.toFixed(2)}, above ${T.peakMax} (full scale is ${T.clipPeak}, where it distorts; this patch is not normalised, so it is heard as made)`;
   const tooLong = (ax) => lengthRule && (ax.seconds < lengthRule.range[0] || ax.seconds > lengthRule.range[1]);
   const lengthText = lengthRule ? `${lengthRule.what} lasts ${lengthRule.range[0]} to ${lengthRule.range[1]} s` : '';
   if (kind && a.onsetMs > T.onsetMaxMs) warnings.push(`slow start: this ${kind} reaches a tenth of its loudest level ${a.onsetMs.toFixed(0)} ms after it begins (the first sample within ${-T.onsetDb} dB of the peak); a hit, click, shot, step or pickup should get there within ${T.onsetMaxMs} ms. Shorten the attack of its first layer, or add a short click at the very start (an "ad" envelope with attack 0.001 on a tone or on noise).`);
   if (tooLong(a)) warnings.push(`length: lasts ${a.seconds.toFixed(2)} s; ${lengthText}. Change "duration" or the default of the control that sets it; if the brief asks for this length, tell the reviewer so.`);
-  if (clips(base)) warnings.push(`peak: the level reaches ${base.rawPeak.toFixed(2)} before the limiter, where full scale is ${T.clipPeak}; this patch is not normalised, so the engine soft-clips it and it distorts. Lower "gain" or the levels mixed in "out".`);
+  metrics.heardPeak = heardPeak(base);
+  if (clips(base)) errors.push(`too loud: at its standard settings ${loudText(heardPeak(base))}. Lower "gain" or the levels mixed in "out".`);
 
   // peak level of every node at the defaults: shows which layer dominates and which is dead
   {
@@ -235,8 +332,10 @@ export function checkSound(patch, { validateMeta } = {}) {
       }
       extraMs += now() - x0;
     }
+    more.peakMin = heardPeak(lo); more.peakMax = heardPeak(hi);
     for (const [label, r] of [['min', lo], ['max', hi]]) {
       const ax = analyze(r.samples, r.sampleRate);
+      if (clips(r)) flags.push(`too loud at ${label}`);
       if (ax.peakDb < T.silentDb || r.rawPeak < 1e-4) flags.push(`silent at ${label}`);
       if (r.badSamples) flags.push(`non-finite samples at ${label}`);
       if (!patch.loop && ax.endLevelDb > T.cutOffDb) flags.push(`cut off at ${label}`);
@@ -245,7 +344,10 @@ export function checkSound(patch, { validateMeta } = {}) {
     else if (d < T.deadControlDb) flags.push('changes nothing — wire it to something or remove it');
     else if (d < T.audibleChangeDb) flags.push('little audible effect — widen the range or wire it to something that matters');
     metrics.params.push({ id: p.id, min: p.min, max: p.max, default: p.default, distance: d, flags, ...more });
-    for (const f of flags) (/^(silent|non-finite|changes nothing)/.test(f) ? errors : warnings).push(`param '${p.id}': ${f}`);
+    for (const f of flags) {
+      if (/^too loud at (min|max)$/.test(f)) { const atMax = f.endsWith('max'); errors.push(`param '${p.id}': too loud at its ${atMax ? 'highest' : 'lowest'} setting (${atMax ? p.max : p.min}): ${loudText(atMax ? more.peakMax : more.peakMin)}. Lower the level this control adds at that end, narrow its range, or lower the levels mixed in "out".`); continue; }
+      (/^(silent|non-finite|changes nothing)/.test(f) ? errors : warnings).push(`param '${p.id}': ${f}`);
+    }
   }
 
   // ---- takes and presets ----------------------------------------------------------------------
@@ -268,13 +370,13 @@ export function checkSound(patch, { validateMeta } = {}) {
       if (!rumble && !isMusic && ax.above300 < T.phoneShareMin) flags.push('phone');
       if (kind && ax.onsetMs > T.onsetMaxMs) flags.push('slow start');
     }
-    metrics.styles.push({ name, seconds: ax.seconds, rawPeak: r.rawPeak, endLevelDb: ax.endLevelDb, above300: ax.above300, onsetMs: ax.onsetMs, crestDb: ax.crestDb, flags });
+    metrics.styles.push({ name, seconds: ax.seconds, rawPeak: r.rawPeak, heardPeak: heardPeak(r), endLevelDb: ax.endLevelDb, above300: ax.above300, onsetMs: ax.onsetMs, crestDb: ax.crestDb, flags });
   }
   const flagged = (flag) => metrics.styles.filter((x) => x.flags.includes(flag));
   const styleWarning = (flag, text) => { const list = flagged(flag); if (list.length) warnings.push(`${quoted(list.map((x) => x.name))}: ${text(list)}`); };
   styleWarning('non-finite', () => 'some samples are not finite numbers with these settings (a division by zero or runaway feedback). Narrow the settings the style uses, or guard the expression.');
   styleWarning('cut off', (l) => `cut off: the last moment is still at ${both(l.map((x) => `${x.endLevelDb.toFixed(0)} dB`))} of the loudest, and should be below ${T.styleCutOffDb} dB. Make "duration" longer or the decay shorter at the style's settings.`);
-  styleWarning('peak', (l) => `peak: the level reaches ${both(l.map((x) => x.rawPeak.toFixed(2)))} before the limiter, where full scale is ${T.clipPeak}; this patch is not normalised, so the engine soft-clips it and it distorts. Lower the settings that add level in the style, or the levels mixed in "out".`);
+  { const l = flagged('peak'); if (l.length) errors.push(`${quoted(l.map((x) => x.name))}: too loud: the level reaches ${both(l.map((x) => x.heardPeak.toFixed(2)))}, above ${T.peakMax} (full scale is ${T.clipPeak}, where it distorts; this patch is not normalised, so it is heard as made). Lower the settings that add level in the style, or the levels mixed in "out".`); }
   styleWarning('length', (l) => `${l.length > 1 ? 'last' : 'lasts'} ${both(l.map((x) => `${x.seconds.toFixed(2)} s`))}; ${lengthText}. Change the style's length setting; if the brief asks for this length, tell the reviewer so.`);
   styleWarning('slow start', (l) => `slow start: ${both(l.map((x) => `${x.onsetMs.toFixed(0)} ms`))} to reach a tenth of the loudest level; a ${kind} should get there within ${T.onsetMaxMs} ms. Shorten the attack at the style's settings.`);
   // phone speakers: the default and its styles in one message

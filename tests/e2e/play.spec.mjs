@@ -134,7 +134,16 @@ test('the look of the bag changes the pixels of the scene', async ({ page }) => 
   const a = await canvasStats(stage(page));
   await page.waitForTimeout(200);
   expect((await canvasStats(stage(page))).hash).toBe(a.hash);          // paused: the picture holds still
-  await page.evaluate(async () => { const { bag } = await import('/app/bag.js'); bag.setTheme({ colour: { palette: 'Frost' } }); });
+  // a colour set of the site, and how much of the picture is painted in its colours
+  const set = await page.evaluate(async () => { const { PALETTES } = await import('/engine/theme.js'); const p = PALETTES.find((x) => x.name === 'Frost') ?? PALETTES[0]; return { name: p.name, colours: p.colours.map((c) => parseInt(c.slice(1), 16)) }; });
+  const picture = () => stage(page).evaluate((cv, colours) => {
+    const d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data, inSet = new Set(colours), seen = new Set();
+    let hit = 0;
+    for (let i = 0; i < d.length; i += 4) { const v = (d[i] << 16) | (d[i + 1] << 8) | d[i + 2]; seen.add(v); if (inSet.has(v)) hit++; }
+    return { share: hit / (d.length / 4), colours: [...seen] };
+  }, set.colours);
+  const plain = await picture();
+  await page.evaluate(async (name) => { const { bag } = await import('/app/bag.js'); bag.setTheme({ colour: { palette: name } }); }, set.name);
   await expect.poll(async () => (await canvasStats(stage(page))).hash, { timeout: 15_000 }).not.toBe(a.hash);
   await ready(page);
   await page.waitForTimeout(300);
@@ -143,9 +152,17 @@ test('the look of the bag changes the pixels of the scene', async ({ page }) => 
   expect((await canvasStats(stage(page))).hash).toBe(b.hash);
   expect(b.hash).not.toBe(a.hash);
   expect((await state(page)).paused).toBe(true);
-  // the colours on screen all come from the palette now: far fewer of them than before
-  const colours = () => stage(page).evaluate((cv) => { const d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data, s = new Set(); for (let i = 0; i < d.length; i += 4) s.add((d[i] << 16) | (d[i + 1] << 8) | d[i + 2]); return s.size; });
-  expect(await colours()).toBeLessThanOrEqual(16);
+  // The look reached the whole picture: the sky and ground the playground paints itself, and every sprite.
+  // A colour set pulls each colour towards the set but a thing stays what it is (architecture.md, Contract 7: grass
+  // stays green, skin stays skin), so not every colour on screen is one of the set: a good part of the picture is,
+  // where next to none of it was before; hardly a colour of the plain picture is left; and there are no more
+  // colours than before.
+  const looked = await picture();
+  expect(plain.share, `how much of the plain picture is in the ${set.name} colours`).toBeLessThan(0.05);
+  expect(looked.share, `how much of the picture is in the ${set.name} colours with the look on`).toBeGreaterThan(plain.share + 0.1);
+  const kept = looked.colours.filter((v) => plain.colours.includes(v));
+  expect(kept.length, 'colours of the plain picture still on screen').toBeLessThan(plain.colours.length / 4);
+  expect(looked.colours.length, 'colours on screen with the look on').toBeLessThanOrEqual(plain.colours.length);
 });
 
 test('add one, remove one, reset and mute', async ({ page }) => {
@@ -420,27 +437,31 @@ test('the platformer assets together: every side-view tileset builds one scene, 
   expect(s.mode).toBe('side');
   expect(s.player.id).toBe('knight');
   expect(s.plan.tilesets.length).toBe(5);
-  expect(s.width).toBe(40 * 32);                            // two halls: the cave's and the castle's
+  const cols = s.map.split('\n').filter((row) => row && !row.startsWith('@'))[0].length;
+  expect(s.width).toBe(cols * 32);
+  expect(cols).toBe(24 + 2 * 8 + 10);                       // the ground, two halls (the cave's and the castle's), the post and the cliff
   expect(s.map).toContain('liquid:water');
   expect(s.map).toContain('liquid:fall');
   expect(s.map).toContain('open:stone:arch-l');
   expect(s.map).toContain('back:dark');
   const { opaque, width, height } = await canvasStats(stage(page));
   expect(opaque).toBe(width * height);
-  // the hero can run from one end to the other: over the mound, through the pool, past the step, under the arches
+  // the hero can run from the start into the first hall: over the mound, through the pool, past the step, under the arch
+  // (the whole way to the far end, with nothing but the hero in the scene, is walked in play-views.spec.mjs)
+  const far = 25 * 32;
   await page.keyboard.down('Shift');
   await page.keyboard.down('ArrowRight');
   let last = -1, stuck = 0;
   for (let i = 0; i < 120 && stuck < 6; i++) {
     const p = (await state(page)).player;
-    if (p.x > 25 * 32) break;
+    if (p.x > far) break;
     if (Math.abs(p.x - last) < 1) { stuck++; await page.keyboard.press('Space'); } else stuck = 0;
     last = p.x;
     await page.waitForTimeout(250);
   }
   await page.keyboard.up('ArrowRight');
   await page.keyboard.up('Shift');
-  expect((await state(page)).player.x).toBeGreaterThan(25 * 32);
+  expect((await state(page)).player.x).toBeGreaterThan(far);
 });
 
 test('side view: the hero wades in the pool, with the water drawn in front of its legs', async ({ page }) => {
@@ -554,13 +575,20 @@ test.describe('on a phone', () => {
     expect(await hasHorizontalScroll(page)).toBe(false);
   });
 
-  test('a long icon or glyph set wraps instead of making the page scroll sideways', async ({ page }) => {
+  test('a long icon or glyph set stays in its one row, and wraps when the row is folded open; the page never scrolls sideways', async ({ page }) => {
     await openPlay(page, [HERO, COIN]);
     await addFixtures(page, 'display');
     if (exists('ui-damage-digits')) await addSprites(page, ['ui-damage-digits']);
     await expect(page.locator('.play-hud').getByRole('img', { name: 'Test icons' }).locator('canvas')).toHaveCount(10);
     expect(await hasHorizontalScroll(page)).toBe(false);
+    // the row itself is no wider than the screen: what does not fit is reached by scrolling inside it
+    const row = await page.locator('.play-pieces').evaluate((n) => ({ right: n.getBoundingClientRect().right, inner: n.scrollWidth, shown: n.clientWidth }));
+    expect(row.right).toBeLessThanOrEqual(375);
+    expect(row.inner).toBeGreaterThan(row.shown);
+    // folded open, every piece is on the screen: a long set wraps onto the next line
+    await page.locator('.play-pieces-more').click();
     const widest = await page.evaluate(() => Math.max(...[...document.querySelectorAll('.play-hud *')].map((n) => n.getBoundingClientRect().right)));
     expect(widest).toBeLessThanOrEqual(375);
+    expect(await hasHorizontalScroll(page)).toBe(false);
   });
 });

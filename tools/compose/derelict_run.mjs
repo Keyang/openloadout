@@ -95,7 +95,7 @@ export function build(gains = GAINS) {
     id: 'derelict-run',
     name: 'Station run theme',
     tags: ['music', 'synthwave', 'electronic', 'adaptive', 'loop'],
-    description: 'Dark, driving synthwave in E minor for moving through a dead space station, 8 to 32 bars long: Intensity opens the bass, then brings in the drums, the arpeggio and the melody with its echo, and you can change the tempo, key, grit and the instrument that plays the tune.',
+    description: 'Dark, driving electronic music for moving through a dead space station, in short or long versions: Intensity opens up the bass, then brings in the drums, a fast run of notes and the tune with its echo, and you can change the speed, pitch, grit and the instrument that plays the tune.',
     meta: {
       type: 'music', role: 'music/exploration', themes: ['sci-fi', 'space'], gameTypes: ['roguelike-action', 'shooter'],
       words: ['station', 'run', 'level', 'floor', 'explore', 'corridor', 'synthwave', 'electronic', 'synth', 'dark', 'driving', 'tense', 'retro', 'arpeggio'],

@@ -5,11 +5,13 @@
 // file asks that style's exporter, and adds the sounds, the JSON and the guide around what it returns.
 import { cleanParams, cueInEffect } from '../engine/sprite.js';
 import { exportSheet, styleById, stylesOf, supports } from '../engine/styles.js';
-import { defaultTheme, normalizeTheme, applyColour, themedParams } from '../engine/theme.js';
+import { defaultTheme, normalizeTheme, applyColour, spriteMaterials, spriteLook } from '../engine/theme.js';
 import { applySound, themedSoundParams, soundSettingsFor } from '../sound/theme.js';
 import { soundById, soundParams, rendered, renderAsync, wavBytes, isMusic } from './audio.js';
 import { loadCatalog, assetById, loadSprite } from './catalog.js';
 import { restoreRuntime, madeItemState } from './api.js';      // W5-B: an item made on a visit is exported only once it has been checked again, and only as the bag stored it
+import { describeSheet } from '../engine/sheet-info.js';       // what kind of sheet it is, and what that kind needs (tile rules, layers, text areas), written into the JSON
+import { spriteGuide, packageGuide, licenceText, whatItIs, soundWhatItIs } from './guide.js';      // the words of a download, by kind of asset
 
 const enc = new TextEncoder();
 
@@ -68,10 +70,19 @@ function themedSound(patch, params, seed, t) {
  * theme (optional, Contract 7): recolours the pictures and the sounds, and with `shapes` varies the sprite's own controls.
  * style (optional, Contract 12): the style to export in, one the sprite lists (its first when left out). It rejects,
  * naming the sprite's styles, for one it does not list. The JSON says `artStyle` only when it is not pixel.
+ * The JSON also says what kind of sheet it is and what that kind needs (engine/sheet-info.js: `kind`, how rows are
+ * counted, a tileset's `tiles`, a background's `layers`, an interface piece's `textArea`), and how-to-use.txt is
+ * written for that kind (app/guide.js), with the licence value the sprite records.
  */
 export async function spriteFiles(sprite, p, cues, scale = 1, theme = null, style = undefined) {
+  return (await spriteParts(sprite, p, cues, scale, theme, style)).files;
+}
+
+/** spriteFiles, and the sheet's JSON as an object beside the files: { files, json }. For the package, which lists what each sprite is. */
+// record (optional): what a bag recorded its look made of the sprite's shapes (Contract 7, "The record"); drawn from it when given
+async function spriteParts(sprite, p, cues, scale = 1, theme = null, style = undefined, record = undefined) {
   const t = activeTheme(theme);
-  const drawn = t ? themedParams(sprite, cleanParams(sprite, p), t) : p;
+  const drawn = t ? spriteLook(sprite, p, t, { record }).params : p;
   // W5-B: a sprite made on a visit is drawn in a worker of its own; its frames at these settings are brought first (a catalogue sprite has no prepare)
   if (typeof sprite.prepare === 'function') await sprite.prepare(drawn, { style: style ?? undefined });
   // W5-B: and what is about to be written of it is looked at first: the quality bar is run on exactly these frames
@@ -81,8 +92,8 @@ export async function spriteFiles(sprite, p, cues, scale = 1, theme = null, styl
     const look = await sprite.judgeLook(drawn, { style: style ?? undefined });
     if (!look.ok) throw Object.assign(new Error(`${sprite.name} does not pass the quality bar as it is set up here, so it was not made into files: ${look.errors[0]}`), { refused: true, reason: look.errors[0] });
   }
-  const made = await exportSheet(sprite, drawn, { style: style ?? undefined, scale, recolour: t ? (pixels) => applyColour(pixels, t.colour) : null, encodePng: pngBytes });
-  const sheet = { meta: made.data };
+  const made = await exportSheet(sprite, drawn, { style: style ?? undefined, scale, recolour: t ? (pixels) => applyColour(pixels, t.colour, () => spriteMaterials(sprite, drawn, { style: style ?? undefined })) : null, encodePng: pngBytes });
+  const sheet = { meta: describeSheet(sprite, made.data, drawn) };
   const files = [], wavs = new Map();
   sheet.meta.sounds = {};
   for (const [clip, all] of Object.entries(cues)) {
@@ -113,76 +124,26 @@ export async function spriteFiles(sprite, p, cues, scale = 1, theme = null, styl
   for (const f of made.files) files.push({ name: f.name, data: f.bytes });
   files.push({ name: `${sprite.id}.json`, data: enc.encode(JSON.stringify(sheet.meta, null, 2)) });
   for (const w of wavs.values()) files.push({ name: `sounds/${w.name}`, data: w.data });
-  // the guide below is about a PNG sheet; a style that makes other files gets a short one that lists them
-  files.push({ name: 'how-to-use.txt', data: enc.encode(sheet.meta.image ? howTo(sprite, sheet.meta) : howToOther(sprite, sheet.meta, made)) });
-  return files;
-}
-
-/** The guide for a style that does not make a PNG sheet: what the files are, and where the animation list is. */
-function howToOther(sprite, meta, made) {
-  const style = styleById(made.style);
-  const rows = Object.entries(meta.animations).map(([name, a]) => `  ${name}: ${a.frames} frames, ${a.fps} frames per second, ${a.loop ? 'loops' : 'plays once'}`).join('\n');
-  const shown = made.files.slice(0, 6).map((f) => `  ${f.name}`).join('\n');
-  return `${sprite.name} — made with Loadout, in the "${style.label}" style
-
-${style.about}
-
-What is in this folder
-${shown}${made.files.length > 6 ? `\n  ... ${made.files.length} picture files in all` : ''}
-  ${sprite.id}.json  the animation list: every frame, its file, how long it shows, and the settings used${Object.keys(meta.sounds).length ? '\n  sounds/        one WAV file per sound; the JSON lists them under "sounds" with the frame each starts on' : ''}
-
-Animations
-${rows}
-  The sprite faces right. Flip it in your game to face left.
-  The point that touches the ground is ${meta.pivot.x}, ${meta.pivot.y} inside each frame.
-`;
-}
-
-function howTo(sprite, meta) {
-  const rows = Object.entries(meta.animations).map(([name, a]) => `  row ${a.row + 1}: ${name} — ${a.frames} frames, ${a.fps} frames per second, ${a.loop ? 'loops' : 'plays once'}`).join('\n');
-  const soundRows = Object.entries(meta.sounds).flatMap(([clip, list]) => list.map((c) => `  ${clip}: ${c.file} — ${c.loop ? 'loops for as long as the animation plays' : `starts on frame ${c.frame + 1} (${c.timeMs} ms in)`}${c.volume !== 1 ? `, volume ${Math.round(c.volume * 100)}%` : ''}`));
-  const soundPart = soundRows.length ? `
-Sounds
-  Play each sound when its animation reaches the frame listed here. The same list is in ${sprite.id}.json under "sounds".
-${soundRows.join('\n')}
-  Unity: add an Animation Event on that frame that calls AudioSource.PlayOneShot with the clip.
-  Godot: add a sound track to the AnimationPlayer, or call play() on an AudioStreamPlayer when the frame changes.
-  Web: play the file when your animation code switches to that frame.
-` : '';
-  return `${sprite.name} — made with Loadout
-
-What is in this folder
-  ${sprite.id}.png   the sprite sheet: every animation frame in one picture
-  ${sprite.id}.json  the same information as below, for tools that read it${soundRows.length ? '\n  sounds/        one WAV file per sound' : ''}
-
-The sheet
-  Each frame is ${meta.frameWidth} x ${meta.frameHeight} pixels. Each row is one animation, read left to right.
-${rows}
-  The sprite faces right. Flip it in your game to face left.
-  The point that touches the ground is ${meta.pivot.x}, ${meta.pivot.y} inside each frame.
-${soundPart}
-Unity
-  Drag the PNG into your project. In the Inspector set Sprite Mode: Multiple, Filter Mode: Point (no filter),
-  Compression: None. Open the Sprite Editor, choose Slice > Grid By Cell Size > ${meta.frameWidth} x ${meta.frameHeight}.
-  Select the frames of one row and drag them into the scene to create an animation.
-
-Godot
-  Add an AnimatedSprite2D, create SpriteFrames, choose "Add frames from sprite sheet", set the grid to
-  ${Math.max(...Object.values(meta.animations).map((a) => a.frames))} columns and ${Object.keys(meta.animations).length} rows. Set the texture filter to Nearest.
-
-Phaser and other web engines
-  Load it as a sprite sheet with frameWidth ${meta.frameWidth} and frameHeight ${meta.frameHeight}.
-
-Keep pixel art sharp: always turn smoothing or filtering off, and scale by whole numbers (2x, 3x, 4x).
-`;
+  // the guide is written for the kind of asset this is; a style that makes other files than one sheet gets them listed
+  const drawnIn = made.style === 'pixel' ? null : styleById(made.style);
+  files.push({ name: 'how-to-use.txt', data: enc.encode(spriteGuide({
+    json: sheet.meta, description: typeof sprite.blurb === 'string' ? sprite.blurb : '', licence: sprite.meta?.license,
+    pictures: sheet.meta.image ? null : made.files.map((f) => f.name), style: drawnIn ? { label: drawnIn.label, about: drawnIn.about } : null,
+  })) });
+  return { files, json: sheet.meta };
 }
 
 // ---- the bag as one package (Contract 8) -------------------------------------------
 
+/**
+ * What a package under a look says about the settings it records (manifest.settingsUsed). The colours are not the
+ * look's colour settings applied alike to every pixel: each colour is held to what it is of (engine/theme.js,
+ * spriteLook), so the note says how to get the very same picture again.
+ */
+export const SETTINGS_USED = 'Each sprite\'s settings.params are the values it was drawn with, this look\'s changes to its shapes included (changedByLook names the ones the look moved). To make the same picture again: draw the sprite with these values, then recolour it the way Loadout does, which keeps each colour what it is (a sky stays a sky, skin stays skin). With Loadout\'s engine that is renderThemedFrame(sprite, clip, frame, settings.params, theme) in engine/theme.js, with theme.shapes set to false (the shapes are already in these values). Applying theme.colour to every pixel alike gives a different picture.';
+
 /** Name, role and type of every catalogue asset, by id. Empty when the catalogue file is not there. */
 const catalogue = () => loadCatalog().then((c) => Object.fromEntries((c.assets ?? []).map((a) => [a.id, a]))).catch(() => ({}));
-
-const KIND_WORD = { sprite: 'sprite', sound: 'sound effect', music: 'music track' };
 
 /** A name not yet in `taken`: base, base-2, base-3 ... */
 function unique(taken, base, ext = '') {
@@ -195,7 +156,10 @@ function unique(taken, base, ext = '') {
 /**
  * Every file of the bag's package:
  *   sprites/<id>/   sheet (PNG), animation list (JSON), the sprite's sounds, how-to-use.txt
- *   sounds/<id>.wav    music/<id>.wav    manifest.json    read-me.txt
+ *   sounds/<id>.wav    music/<id>.wav    manifest.json    read-me.txt    licence.txt
+ * read-me.txt opens with the contents list (each asset's name, what kind of thing it is, where it is: folders are
+ * named after ids); licence.txt lists the licence value every asset records; each manifest entry carries both
+ * (`whatItIs`, `license`). The words are in app/guide.js.
  * items: bag items { key, kind, id, settings }; theme: the bag's theme, applied to everything;
  * scale: pixel size for sprites whose settings do not choose one.
  * Optional: catalog ({ id: { name, role, type } }), onProgress(text).
@@ -233,12 +197,14 @@ export async function packageFiles({ items, theme = null, scale = 1, catalog = n
       if (!supports(sprite, style) || !styleById(style)) { unsupported.push({ id: item.id, artStyle: style }); continue; }
       const folder = unique(folders, item.id);
       const a = entry(sprite.name, sprite.meta);
+      a.license = about.license ?? sprite.meta?.license ?? null;      // what the asset records, as recorded (licence.txt lists it)
       a.folder = `sprites/${folder}/`;
       const p = cleanParams(sprite, s.params ?? {});
       const cues = s.cues ?? defaultCues(sprite);
       let made;
       // W5-B: a sprite made on a visit whose frames at these settings fail the quality bar is left out, and named with why
-      try { made = await spriteFiles(sprite, p, cues, s.scale ?? scale, t, style); } catch (e) {
+      try { const parts = await spriteParts(sprite, p, cues, s.scale ?? scale, t, style, s.lookParams); made = parts.files; a.whatItIs = whatItIs(parts.json); } catch (e) {
+        // (looks: below, once it is known to be in the package, the entry records the settings it was really drawn with)
         if (!e || !e.refused) throw e;
         folders.delete(folder);
         refused.push({ key: item.key, id: item.id, reason: e.reason });
@@ -276,6 +242,8 @@ export async function packageFiles({ items, theme = null, scale = 1, catalog = n
       a.files.push(name);
       a.seconds = Math.round(r.duration * 100) / 100;
       a.loop = !!(r.loop ?? patch.loop);
+      a.license = about.license ?? patch.meta?.license ?? null;
+      a.whatItIs = soundWhatItIs(a);
       if (item.definition?.patch) {
         a.madeOnThisVisit = true;
         a.source = name.replace(/\.wav$/, '.source.json');
@@ -285,37 +253,25 @@ export async function packageFiles({ items, theme = null, scale = 1, catalog = n
       assets.push(a);
     }
   }
+  // looks (Contract 7): under a look, each sprite's entry records every setting it was really drawn with, the look's
+  // shape changes included, so the same picture can be made again from this list alone. A package with no look is unchanged.
+  if (t) for (const a of assets) {
+    const sprite = a.kind === 'sprite' ? await loadSprite(a.id).catch(() => null) : null;
+    if (!sprite) continue;
+    // from the bag's record of what its look made of the sprite, when it has one (the same values the sheet was drawn with)
+    const used = spriteLook(sprite, a.settings?.params ?? {}, t, { record: a.settings?.lookParams });
+    a.settings = { ...a.settings, params: used.params };
+    delete a.settings.lookParams;
+    a.changedByLook = used.changed;
+  }
   const manifest = { app: 'Loadout', format: 'loadout-package', version: 1, theme: normalizeTheme(t ?? {}), assets };
+  if (t && assets.some((a) => a.kind === 'sprite')) manifest.settingsUsed = SETTINGS_USED;
   if (missing.length) manifest.missing = missing;
   if (unsupported.length) manifest.unsupported = unsupported;
   if (needsRemaking.length) manifest.needsRemaking = needsRemaking;
   if (refused.length) manifest.refused = refused;
   files.push({ name: 'manifest.json', data: enc.encode(JSON.stringify(manifest, null, 2)) });
-  files.push({ name: 'read-me.txt', data: enc.encode(packageGuide(manifest, !!t)) });
+  files.push({ name: 'read-me.txt', data: enc.encode(packageGuide(manifest, !!t)) });      // opens with the contents list: name, what it is, where
+  files.push({ name: 'licence.txt', data: enc.encode(licenceText(assets)) });               // what every asset records about its licence, and nothing more
   return files;
-}
-
-function packageGuide(manifest, themed) {
-  const list = manifest.assets.map((a) => `  ${a.name} (${KIND_WORD[a.kind]})${a.role ? `, for ${a.role.replace('/', ': ')}` : ''}\n    ${a.folder ?? a.files[0]}`).join('\n');
-  const has = (k) => manifest.assets.some((a) => a.kind === k);
-  return `Your Loadout package
-
-This package holds ${manifest.assets.length} asset${manifest.assets.length === 1 ? '' : 's'}, each exactly as you set it up in your bag${themed ? ', with the bag\'s look applied to all of them so they match' : ''}.
-${manifest.missing ? `\nNot included (no longer on the site): ${manifest.missing.join(', ')}\n` : ''}${manifest.refused ? `\nNot included (made on a visit, and not passing the quality bar as set up in the bag): ${manifest.refused.map((r) => r.id).join(', ')}\n` : ''}${manifest.needsRemaking ? `\nNot included (made on a visit, and in need of re-making): ${manifest.needsRemaking.join(', ')}\n` : ''}${manifest.unsupported ? `\nNot included (asked for in a style it cannot be drawn in): ${manifest.unsupported.map((u) => `${u.id} (${u.artStyle})`).join(', ')}\n` : ''}
-What is in it
-${list}
-
-Folders
-${has('sprite') ? '  sprites/    one folder per sprite: the sprite sheet (PNG), its animation list (JSON), the sounds that go\n              with its animations, and how-to-use.txt with the steps for Unity, Godot and web engines\n' : ''}${has('sound') ? '  sounds/     one WAV file per sound effect\n' : ''}${has('music') ? '  music/      one WAV file per music track. Each is one loop: set it to repeat in your game\n' : ''}  manifest.json   a list of every asset: its name, what it is for, its files and the settings it was made with.
-                  Tools and scripts can read it to set the assets up for you
-
-Using it in Unity
-  Drag the whole folder into your project's Assets folder.
-  Sprites: select each PNG, set Sprite Mode: Multiple, Filter Mode: Point (no filter), Compression: None,
-  then slice it in the Sprite Editor by the frame size in its how-to-use.txt.
-  Sounds and music: they import as Audio Clips. Tick Loop on the music and on any sound listed as a loop.
-
-Keep pixel art sharp: turn smoothing or filtering off, and scale by whole numbers (2x, 3x, 4x).
-${manifest.assets.some((a) => a.madeOnThisVisit) ? `\nMade on your visit: ${manifest.assets.filter((a) => a.madeOnThisVisit).map((a) => a.name).join(', ')}.\n  These are not in Loadout's catalogue. Each comes with its source (the .source file next to it), which is what\n  Loadout needs to make it again: keep it if you want to change the asset later.\n` : ''}Made with Loadout.
-`;
 }
