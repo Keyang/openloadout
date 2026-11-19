@@ -56,7 +56,7 @@ function nearStreaks(g, { t, cols, rows, laps, slant, mark, long, short, body, d
 }
 
 export default defineSprite({
-  id: 'rain',
+  id: 'rainfall',
   name: 'Rain',
   kind: 'Effect',
   blurb: 'Rain falling over the whole screen, near streaks long and bright over far ones short and dim, as drizzle, rain or a slanting storm. Change how many drops, how long, the style, the far rain, the colours and the speed. Lay copies 62 px apart (each over its neighbours\' empty border) to cover the screen.',
