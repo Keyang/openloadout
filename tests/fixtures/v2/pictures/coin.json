@@ -1,0 +1,515 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "coin",
+ "name": "Coin",
+ "blurb": "A spinning pickup. Make it a gold coin, a shop token or a gem medal.",
+ "meta": {
+  "type": "pickup",
+  "role": "items/pickup",
+  "themes": [
+   "fantasy",
+   "neutral"
+  ],
+  "gameTypes": [
+   "platformer",
+   "turn-based-rpg",
+   "arcade",
+   "puzzle"
+  ],
+  "view": "front",
+  "words": [
+   "coin",
+   "gold",
+   "money",
+   "cash",
+   "currency",
+   "treasure",
+   "loot",
+   "token",
+   "gem",
+   "medal",
+   "collect",
+   "pickup",
+   "spin",
+   "score"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  30
+ ],
+ "grounded": false,
+ "preview": "spin",
+ "styles": [
+  "pixel"
+ ],
+ "palette": [
+  {
+   "id": "metal",
+   "label": "Metal",
+   "default": "#f2c230",
+   "material": "metal",
+   "swatches": [
+    "#f2c230",
+    "#c9ced9",
+    "#cf8a4a",
+    "#6f7a94",
+    "#5fc4a0",
+    "#e8dca8"
+   ]
+  },
+  {
+   "id": "inlay",
+   "label": "Emblem colour",
+   "default": "#c76a16",
+   "material": "paint",
+   "swatches": [
+    "#c76a16",
+    "#fff0a0",
+    "#e2473f",
+    "#3f86e0",
+    "#3fbf6b",
+    "#a45ee0",
+    "#3a3350"
+   ]
+  },
+  {
+   "id": "field",
+   "material": "metal",
+   "derive": {
+    "rule": "choose",
+    "when": {
+     "rim": [
+      true
+     ]
+    },
+    "then": {
+     "rule": "tone",
+     "of": "metal",
+     "by": -0.25
+    },
+    "else": "metal"
+   }
+  },
+  {
+   "id": "gleam",
+   "material": "metal",
+   "derive": {
+    "rule": "mix",
+    "of": {
+     "rule": "ramp",
+     "of": "metal",
+     "tone": "light"
+    },
+    "with": "shine",
+    "amount": 0.6
+   }
+  },
+  {
+   "id": "inlay-ink",
+   "material": "paint",
+   "derive": {
+    "rule": "apart",
+    "of": "inlay",
+    "from": [
+     [
+      "field",
+      0.2
+     ]
+    ],
+    "least": 0.2
+   }
+  },
+  {
+   "id": "shine",
+   "default": "#ffffff",
+   "material": "light",
+   "detail": true
+  }
+ ],
+ "controls": [
+  {
+   "key": "size",
+   "kind": "range",
+   "label": "Size",
+   "lo": "Small",
+   "hi": "Big",
+   "default": 0.5
+  },
+  {
+   "key": "thickness",
+   "kind": "range",
+   "label": "Thickness",
+   "lo": "Thin",
+   "hi": "Chunky",
+   "default": 0.4
+  },
+  {
+   "key": "shape",
+   "kind": "choice",
+   "label": "Shape",
+   "options": [
+    "round",
+    "octagon",
+    "square"
+   ],
+   "default": "round"
+  },
+  {
+   "key": "emblem",
+   "kind": "choice",
+   "label": "Emblem",
+   "options": [
+    "star",
+    "heart",
+    "plain",
+    "hole",
+    "gem"
+   ],
+   "default": "star"
+  },
+  {
+   "key": "rim",
+   "kind": "toggle",
+   "label": "Raised rim",
+   "default": true
+  },
+  {
+   "key": "sparkle",
+   "kind": "toggle",
+   "label": "Sparkle",
+   "default": true
+  },
+  {
+   "key": "inlay",
+   "kind": "colour",
+   "label": "Emblem colour",
+   "when": {
+    "emblem": [
+     "star",
+     "heart",
+     "gem"
+    ]
+   }
+  },
+  {
+   "key": "bob",
+   "kind": "range",
+   "label": "Float",
+   "lo": "Still",
+   "hi": "Floaty",
+   "default": 0.5,
+   "group": "Motion"
+  },
+  {
+   "key": "pop",
+   "kind": "range",
+   "label": "Pop height",
+   "lo": "Low",
+   "hi": "High",
+   "default": 0.5,
+   "group": "Motion"
+  },
+  {
+   "key": "speed",
+   "standard": "speed"
+  }
+ ],
+ "body": {
+  "pictures": {
+   "nodes": [
+    {
+     "id": "coin",
+     "parent": null,
+     "at": [
+      16,
+      16
+     ]
+    }
+   ],
+   "draw": [
+    {
+     "id": "face",
+     "gen": "token",
+     "v": 1,
+     "on": "coin",
+     "at": [
+      0,
+      0.5
+     ],
+     "size": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        10
+       ],
+       [
+        1,
+        19
+       ]
+      ],
+      "round": "px"
+     },
+     "thick": {
+      "from": "thickness",
+      "map": [
+       [
+        0,
+        2
+       ],
+       [
+        1,
+        5
+       ]
+      ],
+      "round": "px"
+     },
+     "shape": {
+      "from": "shape",
+      "pick": {
+       "round": "round",
+       "octagon": "octagon",
+       "square": "square"
+      }
+     },
+     "emblem": {
+      "from": "emblem",
+      "pick": {
+       "star": "star",
+       "heart": "heart",
+       "plain": "plain",
+       "hole": "hole",
+       "gem": "gem"
+      }
+     },
+     "rim": {
+      "from": "rim",
+      "pick": {
+       "true": true,
+       "false": false
+      }
+     },
+     "metal": "metal",
+     "field": "field",
+     "gleam": "gleam",
+     "inlay": "inlay-ink",
+     "shine": "shine"
+    },
+    {
+     "kind": "outline",
+     "paint": "ink"
+    },
+    {
+     "id": "sparkle",
+     "gen": "gleam",
+     "v": 1,
+     "on": "coin",
+     "clip": [
+      "spin"
+     ],
+     "when": {
+      "sparkle": [
+       true
+      ]
+     },
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         3.25
+        ],
+        [
+         0.7222,
+         6.5
+        ],
+        [
+         1,
+         6.9
+        ]
+       ],
+       "round": "px"
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -3.25
+        ],
+        [
+         0.7222,
+         -6.5
+        ],
+        [
+         1,
+         -6.9
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "paint": "metal.light",
+     "core": "shine"
+    }
+   ],
+   "motion": [
+    {
+     "gen": "pickup.bob",
+     "v": 1,
+     "clip": [
+      "spin"
+     ],
+     "height": {
+      "from": "bob",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    },
+    {
+     "gen": "pickup.spin",
+     "v": 1,
+     "node": "coin",
+     "clip": [
+      "spin"
+     ]
+    },
+    {
+     "gen": "pickup.collect",
+     "v": 1,
+     "node": "coin",
+     "clip": [
+      "collect"
+     ],
+     "pop": {
+      "from": "pop",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "room": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        7.9
+       ],
+       [
+        1,
+        2.9
+       ]
+      ]
+     }
+    }
+   ],
+   "emitters": [
+    {
+     "id": "burst",
+     "gen": "pickup.burst",
+     "v": 1,
+     "on": "coin",
+     "at": [
+      0.25,
+      0.5
+     ],
+     "reach": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        8.1
+       ],
+       [
+        1,
+        12.6
+       ]
+      ]
+     },
+     "sparkle": {
+      "from": "sparkle",
+      "pick": {
+       "true": true,
+       "false": false
+      }
+     },
+     "paint": "metal",
+     "bright": "metal.light",
+     "core": "shine"
+    }
+   ]
+  }
+ },
+ "clips": {
+  "spin": {
+   "frames": 8,
+   "fps": 10
+  },
+  "collect": {
+   "frames": 8,
+   "fps": 14,
+   "loop": false,
+   "frameEdits": {
+    "4": {
+     "flash": true
+    }
+   },
+   "keys": [
+    {
+     "t": 0,
+     "ease": "hold",
+     "emit": {
+      "burst": {
+       "amount": 0
+      }
+     }
+    },
+    {
+     "t": 0.6,
+     "ease": "linear",
+     "emit": {
+      "burst": {
+       "amount": 0.1111
+      }
+     }
+    },
+    {
+     "t": 1,
+     "emit": {
+      "burst": {
+       "amount": 1
+      }
+     }
+    }
+   ],
+   "sounds": [
+    {
+     "sound": "coin-pickup",
+     "frame": 1
+    }
+   ]
+  }
+ }
+}

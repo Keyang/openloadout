@@ -1,0 +1,102 @@
+{
+ "id": "icon.glint",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     3.2,
+     -6.4
+    ],
+    "paint": "shine"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      18,
+      9
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".a",
+      ".a",
+      "..",
+      "a."
+     ],
+     "key": {
+      "a": "shine"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     1,
+     -3.6
+    ],
+    "len": 1,
+    "dot": false,
+    "paint": "shine",
+    "turn": -26.57
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      15,
+      12
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a"
+     ],
+     "key": {
+      "a": "shine"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     3.5,
+     -2.5
+    ],
+    "corner": true,
+    "paint": "shine",
+    "zoom": 1.3,
+    "scale": 0.9
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      20,
+      13
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aa",
+      "a."
+     ],
+     "key": {
+      "a": "shine"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     3.5,
+     -2.5
+    ],
+    "paint": "shine",
+    "shiny": false
+   },
+   "primitives": []
+  }
+ ]
+}

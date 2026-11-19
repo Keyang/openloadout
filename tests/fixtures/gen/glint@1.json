@@ -1,0 +1,154 @@
+{
+ "id": "glint",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "r": 9,
+    "phase": 0,
+    "within": [
+     {
+      "kind": "ellipse",
+      "at": [
+       16,
+       16
+      ],
+      "r": [
+       9,
+       7
+      ]
+     }
+    ],
+    "paint": "shine"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      12,
+      9
+     ],
+     "anchor": "tl",
+     "rows": [
+      "......a.",
+      ".....aaa",
+      ".....aaa",
+      "....aaa.",
+      "....aaa.",
+      "...aaa..",
+      "...aaa..",
+      "..aaa...",
+      "..aaa...",
+      ".aaa....",
+      ".aaa....",
+      "aaa.....",
+      "aaa.....",
+      ".a......"
+     ],
+     "key": {
+      "a": "shine"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "r": 9,
+    "phase": -0.8,
+    "slant": 0,
+    "width": 0.3,
+    "within": [
+     {
+      "kind": "rect",
+      "at": [
+       8,
+       8
+      ],
+      "size": [
+       16,
+       16
+      ]
+     }
+    ],
+    "paint": "shine"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      8,
+      8
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaa",
+      "aaa",
+      "aaa",
+      "aaa",
+      "aaa",
+      "aaa",
+      "aaa",
+      "aaa",
+      "aaa",
+      "aaa",
+      "aaa",
+      "aaa",
+      "aaa",
+      "aaa",
+      "aaa",
+      "aaa"
+     ],
+     "key": {
+      "a": "shine"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     12,
+     20
+    ],
+    "r": 5,
+    "phase": 1.2,
+    "slant": 1,
+    "width": 0.1,
+    "paint": "metal.light"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      10,
+      18
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".........a",
+      "........a.",
+      ".......a..",
+      "......a...",
+      ".....a....",
+      "....a.....",
+      "...a......",
+      "..a.......",
+      ".a........",
+      "a........."
+     ],
+     "key": {
+      "a": "metal.light"
+     }
+    }
+   ]
+  }
+ ]
+}

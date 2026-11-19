@@ -1,0 +1,242 @@
+{
+ "id": "icon.fit",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "draw": [
+     {
+      "gen": "icon.paint",
+      "v": 1,
+      "shapes": [
+       {
+        "kind": "ellipse",
+        "at": [
+         -2.5,
+         0.5
+        ],
+        "r": [
+         6,
+         7
+        ]
+       },
+       {
+        "kind": "ellipse",
+        "at": [
+         2.5,
+         0.5
+        ],
+        "r": [
+         6,
+         7
+        ]
+       }
+      ],
+      "paint": "body",
+      "dark": 2,
+      "soft": 0,
+      "lit": 1,
+      "zoom": 1.3
+     }
+    ],
+    "turn": 13.28
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      5,
+      6
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".......aaa...........",
+      "....aabbbaaa.........",
+      "...cbbbbbbbaaaaaaa...",
+      "..cbbbbbbbbbbbbbbaa..",
+      "..cbbbbbbbbbbbbbbbaa.",
+      ".ccbbbbbbbbbbbbbbbba.",
+      ".cbbbbbbbbbbbbbbbbbaa",
+      ".cbbbbbbbbbbbbbbbbbba",
+      "ccbbbbbbbbbbbbbbbbbba",
+      "cccbbbbbbbbbbbbbbbbba",
+      "cccbbbbbbbbbbbbbbbbba",
+      ".ccbbbbbbbbbbbbbbbbba",
+      ".cccbbbbbbbbbbbbbbbba",
+      ".ccccbbbbbbbbbbbbbbba",
+      "..ccccbbbbbbbbbbbbbb.",
+      "...ccccccbcbbbbbbbba.",
+      "....cccccccccbbbbbc..",
+      ".........ccccccccc...",
+      "...........ccccc....."
+     ],
+     "key": {
+      "a": "body.light",
+      "b": "body",
+      "c": "body.dark"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "draw": [
+     {
+      "gen": "icon.paint",
+      "v": 1,
+      "shapes": [
+       {
+        "kind": "ellipse",
+        "at": [
+         1.5,
+         0
+        ],
+        "r": [
+         9.6,
+         5.4
+        ]
+       }
+      ],
+      "paint": "water",
+      "soft": 1
+     },
+     {
+      "gen": "icon.line",
+      "v": 1,
+      "path": [
+       4.4,
+       -3.6,
+       3.6,
+       0,
+       4.4,
+       3.4
+      ],
+      "paint": "water.dark",
+      "over": true
+     },
+     {
+      "gen": "icon.glint",
+      "v": 1,
+      "at": [
+       1,
+       -3.6
+      ],
+      "len": 1,
+      "dot": false,
+      "paint": "shine"
+     }
+    ],
+    "size": 1,
+    "turn": -26.57
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      4,
+      7
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..............aaaaaa....",
+      "...........aabbbbbbaaa..",
+      "........aabbbcbbbbbbbaa.",
+      ".......bbbbbbcbbbbbbbbaa",
+      ".....abbbdbbbcbbbbbbbbba",
+      "....bbbbbbbbbbcbbbbbbbba",
+      "...bbbbbbbbbbbcbbbbbbbba",
+      "..ebbbbbbbbbbbcbbbbbbbba",
+      ".cbbbbbbbbbbbbbcbbbbbbb.",
+      ".ebbbbbbbbbbbbbbcbbbbba.",
+      "cebbbbbbbbbbbbbbcbbbbb..",
+      "cebbbbbbbbbbbbbbbcbbb...",
+      "cebbbbbbbbbbbbbbbbbe....",
+      "cebbbbbbbbbbbbbbbbc.....",
+      "ceebbbbbbbbbbbbee.......",
+      "cceeebbbbbbbeecc........",
+      ".ccceeeeeeecc...........",
+      "...ccccccc.............."
+     ],
+     "key": {
+      "a": "water.light",
+      "b": "water",
+      "c": "water.dark",
+      "d": "shine",
+      "e": {
+       "rule": "mix",
+       "of": "water",
+       "with": {
+        "rule": "ramp",
+        "of": "water",
+        "tone": "dark"
+       },
+       "amount": 0.5
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "draw": [
+     {
+      "gen": "icon.paint",
+      "v": 1,
+      "shapes": [
+       {
+        "kind": "rect",
+        "at": [
+         -3.4,
+         -1
+        ],
+        "size": [
+         6.8,
+         10.6
+        ]
+       }
+      ],
+      "paint": "cream",
+      "soft": 0
+     }
+    ],
+    "size": 0,
+    "tilt": false,
+    "soften": false,
+    "shiny": false,
+    "fill": 0.88
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      11,
+      8
+     ],
+     "anchor": "tl",
+     "rows": [
+      "abbbbbbbbb",
+      "abbbbbbbbb",
+      "abbbbbbbbb",
+      "abbbbbbbbb",
+      "abbbbbbbbb",
+      "abbbbbbbbb",
+      "abbbbbbbbb",
+      "abbbbbbbbb",
+      "abbbbbbbbb",
+      "abbbbbbbbb",
+      "abbbbbbbbb",
+      "abbbbbbbbb",
+      "abbbbbbbbb",
+      "abbbbbbbbb",
+      "abbbbbbbbb",
+      "aaaaaaaaaa"
+     ],
+     "key": {
+      "a": "cream.dark",
+      "b": "cream"
+     }
+    }
+   ]
+  }
+ ]
+}

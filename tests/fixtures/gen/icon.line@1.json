@@ -1,0 +1,108 @@
+{
+ "id": "icon.line",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "path": [
+     4.4,
+     -3.6,
+     3.6,
+     0,
+     4.4,
+     3.4
+    ],
+    "paint": "body.dark"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      19,
+      12
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".a",
+      ".a",
+      "a.",
+      "a.",
+      "a.",
+      "a.",
+      ".a",
+      ".a"
+     ],
+     "key": {
+      "a": "body.dark"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "path": [
+     -3.2,
+     -0.6,
+     -0.2,
+     0
+    ],
+    "paint": "root.dark",
+    "turn": 26.57,
+    "scale": 1.2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      12,
+      13
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a...",
+      ".aa.",
+      "...a"
+     ],
+     "key": {
+      "a": "root.dark"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "path": [
+     -4.9,
+     -0.4,
+     -7,
+     1
+    ],
+    "paint": "stem.deep",
+    "over": true,
+    "centre": [
+     15,
+     17
+    ],
+    "zoom": 1.2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      6,
+      16
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...a",
+      ".aa.",
+      "a..."
+     ],
+     "key": {
+      "a": "stem.deep"
+     }
+    }
+   ]
+  }
+ ]
+}

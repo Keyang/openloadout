@@ -1,0 +1,104 @@
+{
+ "id": "taper",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "from": [
+     0,
+     -4.6
+    ],
+    "to": [
+     -4.6,
+     -12
+    ],
+    "r0": 1.6,
+    "r1": 0.8,
+    "paint": "accent"
+   },
+   "primitives": [
+    {
+     "kind": "capsule",
+     "from": [
+      0,
+      -4.6
+     ],
+     "to": [
+      -4.6,
+      -12
+     ],
+     "r": [
+      1.6,
+      0.8
+     ],
+     "paint": "accent"
+    }
+   ]
+  },
+  {
+   "args": {
+    "from": [
+     1.5,
+     1.5
+    ],
+    "to": [
+     7,
+     7
+    ],
+    "r0": 1.5,
+    "paint": "cream"
+   },
+   "primitives": [
+    {
+     "kind": "capsule",
+     "from": [
+      1.5,
+      1.5
+     ],
+     "to": [
+      7,
+      7
+     ],
+     "r": [
+      1.5,
+      1.5
+     ],
+     "paint": "cream"
+    }
+   ]
+  },
+  {
+   "args": {
+    "from": [
+     10,
+     20
+    ],
+    "to": [
+     22,
+     6
+    ],
+    "r0": 0.6,
+    "r1": 3,
+    "paint": "leaf.dark"
+   },
+   "primitives": [
+    {
+     "kind": "capsule",
+     "from": [
+      10,
+      20
+     ],
+     "to": [
+      22,
+      6
+     ],
+     "r": [
+      0.6,
+      3
+     ],
+     "paint": "leaf.dark"
+    }
+   ]
+  }
+ ]
+}

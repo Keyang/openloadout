@@ -1,0 +1,1668 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "icons-food",
+ "name": "Food icons",
+ "blurb": "Eight food icons: apple, roast leg, cheese, fish, egg, carrot, mushroom and a bowl of soup; change their size, tilt, shading, shine and the colours of the fruit, the greens and the bowl.",
+ "meta": {
+  "type": "icon",
+  "role": "items/icon",
+  "themes": [
+   "neutral",
+   "farm",
+   "fantasy"
+  ],
+  "gameTypes": [
+   "farming-sim",
+   "top-down-rpg",
+   "turn-based-rpg",
+   "arcade"
+  ],
+  "view": "none",
+  "words": [
+   "food",
+   "apple",
+   "meat",
+   "cheese",
+   "fish",
+   "egg",
+   "carrot",
+   "mushroom",
+   "soup",
+   "cooking",
+   "ingredient",
+   "eat",
+   "harvest",
+   "inventory"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "apple",
+ "styles": [
+  "pixel"
+ ],
+ "palette": [
+  {
+   "id": "body",
+   "label": "Fruit",
+   "default": "#c9423a",
+   "material": "plant",
+   "swatches": [
+    "#c9423a",
+    "#f2c230",
+    "#a4c44a",
+    "#7a4fc4",
+    "#e08a2c"
+   ]
+  },
+  {
+   "id": "accent",
+   "label": "Greens",
+   "default": "#3f8a4f",
+   "material": "plant",
+   "swatches": [
+    "#3f8a4f",
+    "#6aa83e",
+    "#4f9d57",
+    "#357a4c"
+   ]
+  },
+  {
+   "id": "bowl",
+   "label": "Bowl",
+   "default": "#a06a3c",
+   "material": "paint",
+   "swatches": [
+    "#a06a3c",
+    "#7a4f33",
+    "#f0ead8",
+    "#c2c9d6",
+    "#a8612a",
+    "#c98a4a"
+   ]
+  },
+  {
+   "id": "soil",
+   "default": "#7a4f33",
+   "material": "wood",
+   "detail": true
+  },
+  {
+   "id": "cream",
+   "default": "#f0ead8",
+   "material": "paint",
+   "detail": true
+  },
+  {
+   "id": "wood",
+   "default": "#a06a3c",
+   "material": "paint",
+   "detail": true
+  },
+  {
+   "id": "gold",
+   "default": "#f2c230",
+   "material": "paint",
+   "detail": true
+  },
+  {
+   "id": "water",
+   "default": "#3f9fd1",
+   "material": "paint",
+   "detail": true
+  },
+  {
+   "id": "ember",
+   "default": "#e08a2c",
+   "material": "paint",
+   "detail": true
+  },
+  {
+   "id": "white",
+   "default": "#ffffff",
+   "material": "light",
+   "detail": true
+  }
+ ],
+ "controls": [
+  {
+   "key": "size",
+   "kind": "range",
+   "label": "Size",
+   "lo": "Small",
+   "hi": "Big",
+   "default": 0.5
+  },
+  {
+   "key": "tilt",
+   "kind": "toggle",
+   "label": "Tilt",
+   "default": true
+  },
+  {
+   "key": "shade",
+   "kind": "toggle",
+   "label": "Extra shading",
+   "default": true
+  },
+  {
+   "key": "shine",
+   "kind": "toggle",
+   "label": "Shine",
+   "default": true
+  }
+ ],
+ "versions": [
+  {
+   "name": "Pantry",
+   "params": {}
+  },
+  {
+   "name": "Upright",
+   "params": {
+    "tilt": false,
+    "body": "#e08a2c",
+    "accent": "#357a4c"
+   }
+  },
+  {
+   "name": "Green apple",
+   "params": {
+    "body": "#a4c44a",
+    "accent": "#6aa83e"
+   }
+  },
+  {
+   "name": "Plain and big",
+   "params": {
+    "size": 1,
+    "shade": false,
+    "shine": false
+   }
+  },
+  {
+   "name": "Dark bowl",
+   "params": {
+    "bowl": "#7a4f33",
+    "body": "#f2c230"
+   }
+  }
+ ],
+ "body": {
+  "pictures": {
+   "draw": [
+    {
+     "kind": "outline",
+     "paint": "ink"
+    }
+   ],
+   "fit": {
+    "gen": "icon.fit",
+    "v": 1,
+    "size": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       0
+      ],
+      [
+       1,
+       1
+      ]
+     ]
+    },
+    "tilt": {
+     "from": "tilt",
+     "pick": {
+      "true": true,
+      "false": false
+     }
+    },
+    "soften": {
+     "from": "shade",
+     "pick": {
+      "true": true,
+      "false": false
+     }
+    },
+    "shiny": {
+     "from": "shine",
+     "pick": {
+      "true": true,
+      "false": false
+     }
+    }
+   },
+   "pictures": {
+    "apple": {
+     "label": "Apple",
+     "angle": 13.282525588538995,
+     "draw": [
+      {
+       "gen": "icon.paint",
+       "v": 1,
+       "shapes": [
+        {
+         "gen": "taper",
+         "v": 1,
+         "from": [
+          0,
+          -4
+         ],
+         "to": [
+          0.6,
+          -9.8
+         ],
+         "r0": 1,
+         "paint": "soil"
+        }
+       ],
+       "paint": "soil",
+       "flat": true,
+       "zoom": 1.3
+      },
+      {
+       "gen": "icon.paint",
+       "v": 1,
+       "shapes": [
+        {
+         "kind": "ellipse",
+         "at": [
+          -2.5,
+          0.5
+         ],
+         "r": [
+          6,
+          7
+         ],
+         "paint": "body"
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          2.5,
+          0.5
+         ],
+         "r": [
+          6,
+          7
+         ],
+         "paint": "body"
+        }
+       ],
+       "paint": "body",
+       "minus": [
+        {
+         "kind": "ellipse",
+         "at": [
+          0,
+          -6.9
+         ],
+         "r": [
+          1.6,
+          1.3
+         ],
+         "paint": "body"
+        }
+       ],
+       "dark": 2,
+       "soft": 0,
+       "lit": 1,
+       "zoom": 1.3
+      },
+      {
+       "gen": "icon.paint",
+       "v": 1,
+       "shapes": [
+        {
+         "kind": "ellipse",
+         "at": [
+          0,
+          -6.9
+         ],
+         "r": [
+          2.6,
+          2.2
+         ],
+         "paint": "body"
+        }
+       ],
+       "paint": "body.dark",
+       "within": [
+        {
+         "kind": "ellipse",
+         "at": [
+          -2.5,
+          0.5
+         ],
+         "r": [
+          6,
+          7
+         ],
+         "paint": "body"
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          2.5,
+          0.5
+         ],
+         "r": [
+          6,
+          7
+         ],
+         "paint": "body"
+        }
+       ],
+       "edge": [
+        0,
+        1
+       ],
+       "flat": true,
+       "zoom": 1.3
+      },
+      {
+       "gen": "icon.paint",
+       "v": 1,
+       "shapes": [
+        {
+         "gen": "leaf",
+         "v": 1,
+         "from": [
+          0.5,
+          -7.64
+         ],
+         "to": [
+          7.1,
+          -9.64
+         ],
+         "width": 4.4,
+         "belly": 0.45,
+         "blunt": 0.25,
+         "paint": "accent"
+        }
+       ],
+       "paint": "accent",
+       "dark": 1,
+       "soft": 0,
+       "lit": 0,
+       "zoom": 1.3
+      },
+      {
+       "gen": "icon.glint",
+       "v": 1,
+       "at": [
+        3.5,
+        -2.5
+       ],
+       "paint": "white",
+       "corner": true,
+       "over": false,
+       "zoom": 1.3
+      }
+     ]
+    },
+    "drumstick": {
+     "label": "Roast leg",
+     "angle": 13.282525588538995,
+     "draw": [
+      {
+       "gen": "icon.paint",
+       "v": 1,
+       "shapes": [
+        {
+         "gen": "taper",
+         "v": 1,
+         "from": [
+          1.5,
+          1.5
+         ],
+         "to": [
+          7,
+          7
+         ],
+         "r0": 1.5,
+         "paint": "cream"
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          9,
+          6.6
+         ],
+         "r": [
+          1.9,
+          1.9
+         ],
+         "paint": "cream"
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          6.6,
+          9
+         ],
+         "r": [
+          1.9,
+          1.9
+         ],
+         "paint": "cream"
+        }
+       ],
+       "paint": "cream",
+       "dark": 1,
+       "soft": 0,
+       "lit": 0,
+       "zoom": 1.2
+      },
+      {
+       "gen": "icon.paint",
+       "v": 1,
+       "shapes": [
+        {
+         "kind": "ellipse",
+         "at": [
+          -3,
+          -1.5
+         ],
+         "r": [
+          7,
+          6
+         ],
+         "paint": "wood"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -4,
+           3.5
+          ],
+          [
+           1,
+           -5
+          ],
+          [
+           5.5,
+           2.5
+          ],
+          [
+           3.6,
+           4.6
+          ]
+         ],
+         "paint": "wood"
+        }
+       ],
+       "paint": "wood",
+       "dark": 2,
+       "soft": 0,
+       "lit": 1,
+       "zoom": 1.2
+      },
+      {
+       "gen": "icon.paint",
+       "v": 1,
+       "shapes": [
+        {
+         "gen": "taper",
+         "v": 1,
+         "from": [
+          -6.5,
+          -3.6
+         ],
+         "to": [
+          -2,
+          -5.4
+         ],
+         "r0": 0.6,
+         "paint": "wood"
+        }
+       ],
+       "paint": "wood.light",
+       "flat": true,
+       "within": [
+        {
+         "kind": "ellipse",
+         "at": [
+          -3,
+          -1.5
+         ],
+         "r": [
+          7,
+          6
+         ],
+         "paint": "wood"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -4,
+           3.5
+          ],
+          [
+           1,
+           -5
+          ],
+          [
+           5.5,
+           2.5
+          ],
+          [
+           3.6,
+           4.6
+          ]
+         ],
+         "paint": "wood"
+        }
+       ],
+       "zoom": 1.2
+      }
+     ]
+    },
+    "cheese": {
+     "label": "Cheese",
+     "angle": -13.282525588538995,
+     "draw": [
+      {
+       "gen": "icon.paint",
+       "v": 1,
+       "shapes": [
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -9,
+           5.6
+          ],
+          [
+           8.4,
+           5.6
+          ],
+          [
+           8.4,
+           -3.6
+          ]
+         ],
+         "paint": "gold"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -9,
+           5.6
+          ],
+          [
+           8.4,
+           -3.6
+          ],
+          [
+           9.6,
+           -7.6
+          ],
+          [
+           -7.8,
+           1.5999999999999996
+          ]
+         ],
+         "paint": "gold"
+        }
+       ],
+       "paint": "gold",
+       "dark": 1,
+       "soft": 0,
+       "lit": 0,
+       "zoom": 1.2
+      },
+      {
+       "gen": "icon.paint",
+       "v": 1,
+       "shapes": [
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -9,
+           5.6
+          ],
+          [
+           8.4,
+           -3.6
+          ],
+          [
+           9.6,
+           -7.6
+          ],
+          [
+           -7.8,
+           1.5999999999999996
+          ]
+         ],
+         "paint": "gold"
+        }
+       ],
+       "paint": "gold.light",
+       "flat": true,
+       "within": [
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -9,
+           5.6
+          ],
+          [
+           8.4,
+           5.6
+          ],
+          [
+           8.4,
+           -3.6
+          ]
+         ],
+         "paint": "gold"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -9,
+           5.6
+          ],
+          [
+           8.4,
+           -3.6
+          ],
+          [
+           9.6,
+           -7.6
+          ],
+          [
+           -7.8,
+           1.5999999999999996
+          ]
+         ],
+         "paint": "gold"
+        }
+       ],
+       "zoom": 1.2
+      },
+      {
+       "gen": "icon.paint",
+       "v": 1,
+       "shapes": [
+        {
+         "kind": "rect",
+         "at": [
+          7,
+          -4
+         ],
+         "size": [
+          3,
+          10
+         ],
+         "paint": "gold"
+        }
+       ],
+       "paint": {
+        "rule": "mix",
+        "of": "gold",
+        "with": {
+         "rule": "ramp",
+         "of": "gold",
+         "tone": "dark"
+        },
+        "amount": 0.5
+       },
+       "flat": true,
+       "within": [
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -9,
+           5.6
+          ],
+          [
+           8.4,
+           5.6
+          ],
+          [
+           8.4,
+           -3.6
+          ]
+         ],
+         "paint": "gold"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -9,
+           5.6
+          ],
+          [
+           8.4,
+           -3.6
+          ],
+          [
+           9.6,
+           -7.6
+          ],
+          [
+           -7.8,
+           1.5999999999999996
+          ]
+         ],
+         "paint": "gold"
+        }
+       ],
+       "zoom": 1.2
+      },
+      {
+       "gen": "icon.paint",
+       "v": 1,
+       "shapes": [
+        {
+         "kind": "ellipse",
+         "at": [
+          4.2,
+          2.6
+         ],
+         "r": [
+          1.6,
+          1.6
+         ],
+         "paint": "gold"
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          5,
+          -0.6
+         ],
+         "r": [
+          1,
+          1
+         ],
+         "paint": "gold"
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          -1.4,
+          3.4
+         ],
+         "r": [
+          1.1,
+          1.1
+         ],
+         "paint": "gold"
+        }
+       ],
+       "paint": "gold.deep",
+       "flat": true,
+       "within": [
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -9,
+           5.6
+          ],
+          [
+           8.4,
+           5.6
+          ],
+          [
+           8.4,
+           -3.6
+          ]
+         ],
+         "paint": "gold"
+        }
+       ],
+       "zoom": 1.2
+      }
+     ]
+    },
+    "fish": {
+     "label": "Fish",
+     "angle": -26.56505117707799,
+     "draw": [
+      {
+       "gen": "icon.paint",
+       "v": 1,
+       "shapes": [
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -6,
+           0
+          ],
+          [
+           -11.5,
+           -6
+          ],
+          [
+           -9.4,
+           0
+          ],
+          [
+           -11.5,
+           6
+          ]
+         ],
+         "paint": "water"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -3.6,
+           -3.8
+          ],
+          [
+           3,
+           -4.6
+          ],
+          [
+           -4.6,
+           -8.2
+          ]
+         ],
+         "paint": "water"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -1,
+           4
+          ],
+          [
+           3,
+           4.4
+          ],
+          [
+           -1.6,
+           7.4
+          ]
+         ],
+         "paint": "water"
+        }
+       ],
+       "paint": "water",
+       "soft": 0
+      },
+      {
+       "gen": "icon.paint",
+       "v": 1,
+       "shapes": [
+        {
+         "kind": "ellipse",
+         "at": [
+          1.5,
+          0
+         ],
+         "r": [
+          9.6,
+          5.4
+         ],
+         "paint": "water"
+        }
+       ],
+       "paint": "water",
+       "soft": 1
+      },
+      {
+       "gen": "icon.paint",
+       "v": 1,
+       "shapes": [
+        {
+         "kind": "ellipse",
+         "at": [
+          1.5,
+          0
+         ],
+         "r": [
+          9.6,
+          5.4
+         ],
+         "paint": "water"
+        }
+       ],
+       "paint": "cream",
+       "soft": 0,
+       "lit": 0,
+       "within": [
+        {
+         "kind": "rect",
+         "at": [
+          -6,
+          1.4
+         ],
+         "size": [
+          20,
+          10
+         ],
+         "paint": "cream"
+        }
+       ]
+      },
+      {
+       "gen": "icon.line",
+       "v": 1,
+       "path": [
+        4.4,
+        -3.6,
+        3.6,
+        0,
+        4.4,
+        3.4
+       ],
+       "paint": "water.dark",
+       "over": true
+      },
+      {
+       "gen": "icon.paint",
+       "v": 1,
+       "shapes": [
+        {
+         "kind": "ellipse",
+         "at": [
+          7.4,
+          -1.4
+         ],
+         "r": [
+          1.15,
+          1.15
+         ],
+         "paint": "ink"
+        }
+       ],
+       "paint": "ink",
+       "flat": true
+      },
+      {
+       "gen": "icon.glint",
+       "v": 1,
+       "at": [
+        1,
+        -3.6
+       ],
+       "paint": "white",
+       "len": 1,
+       "dot": false
+      }
+     ]
+    },
+    "egg": {
+     "label": "Egg",
+     "draw": [
+      {
+       "gen": "icon.fit",
+       "v": 1,
+       "size": {
+        "from": "size",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "tilt": {
+        "from": "tilt",
+        "pick": {
+         "true": true,
+         "false": false
+        }
+       },
+       "soften": {
+        "from": "shade",
+        "pick": {
+         "true": true,
+         "false": false
+        }
+       },
+       "shiny": {
+        "from": "shine",
+        "pick": {
+         "true": true,
+         "false": false
+        }
+       },
+       "fill": 0.88,
+       "turn": 26.56505117707799,
+       "draw": [
+        {
+         "gen": "icon.paint",
+         "v": 1,
+         "shapes": [
+          {
+           "kind": "poly",
+           "points": [
+            [
+             0,
+             -11.5
+            ],
+            [
+             1.8591,
+             -11.1081
+            ],
+            [
+             3.6544,
+             -9.9593
+            ],
+            [
+             5.3097,
+             -8.1317
+            ],
+            [
+             6.729,
+             -5.75
+            ],
+            [
+             7.7988,
+             -2.9764
+            ],
+            [
+             8.4,
+             0
+            ],
+            [
+             8.4288,
+             2.9764
+            ],
+            [
+             7.8202,
+             5.75
+            ],
+            [
+             6.5697,
+             8.1317
+            ],
+            [
+             4.7456,
+             9.9593
+            ],
+            [
+             2.4891,
+             11.1081
+            ],
+            [
+             0,
+             11.5
+            ],
+            [
+             -2.4891,
+             11.1081
+            ],
+            [
+             -4.7456,
+             9.9593
+            ],
+            [
+             -6.5697,
+             8.1317
+            ],
+            [
+             -7.8202,
+             5.75
+            ],
+            [
+             -8.4288,
+             2.9764
+            ],
+            [
+             -8.4,
+             0
+            ],
+            [
+             -7.7988,
+             -2.9764
+            ],
+            [
+             -6.729,
+             -5.75
+            ],
+            [
+             -5.3097,
+             -8.1317
+            ],
+            [
+             -3.6544,
+             -9.9593
+            ],
+            [
+             -1.8591,
+             -11.1081
+            ]
+           ],
+           "paint": "cream"
+          }
+         ],
+         "paint": "cream",
+         "soft": 3
+        },
+        {
+         "gen": "icon.glint",
+         "v": 1,
+         "at": [
+          3.2,
+          -6.4
+         ],
+         "paint": "white"
+        }
+       ]
+      }
+     ]
+    },
+    "carrot": {
+     "label": "Carrot",
+     "angle": 26.56505117707799,
+     "draw": [
+      {
+       "gen": "icon.paint",
+       "v": 1,
+       "shapes": [
+        {
+         "gen": "taper",
+         "v": 1,
+         "from": [
+          0,
+          -4.6
+         ],
+         "to": [
+          -4.6,
+          -12
+         ],
+         "r0": 1.6,
+         "r1": 0.8,
+         "paint": "accent"
+        },
+        {
+         "gen": "taper",
+         "v": 1,
+         "from": [
+          0,
+          -4.6
+         ],
+         "to": [
+          0.6,
+          -13
+         ],
+         "r0": 1.7,
+         "r1": 0.9,
+         "paint": "accent"
+        },
+        {
+         "gen": "taper",
+         "v": 1,
+         "from": [
+          0,
+          -4.6
+         ],
+         "to": [
+          5,
+          -11.4
+         ],
+         "r0": 1.6,
+         "r1": 0.8,
+         "paint": "accent"
+        }
+       ],
+       "paint": "accent",
+       "soft": 0
+      },
+      {
+       "gen": "icon.paint",
+       "v": 1,
+       "shapes": [
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -4.6,
+           -4.4
+          ],
+          [
+           4.6,
+           -4.4
+          ],
+          [
+           0.7,
+           11.5
+          ],
+          [
+           -0.7,
+           11.5
+          ]
+         ],
+         "paint": "ember"
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          0,
+          -4.4
+         ],
+         "r": [
+          4.6,
+          1.6
+         ],
+         "paint": "ember"
+        }
+       ],
+       "paint": "ember",
+       "soft": 1
+      },
+      {
+       "gen": "icon.line",
+       "v": 1,
+       "path": [
+        -3.2,
+        -0.6,
+        -0.2,
+        0
+       ],
+       "paint": "ember.dark",
+       "over": true
+      },
+      {
+       "gen": "icon.line",
+       "v": 1,
+       "path": [
+        -2.6,
+        3.4,
+        -0.2,
+        4
+       ],
+       "paint": "ember.dark",
+       "over": true
+      },
+      {
+       "gen": "icon.line",
+       "v": 1,
+       "path": [
+        -2,
+        7.2,
+        -0.2,
+        7.8
+       ],
+       "paint": "ember.dark",
+       "over": true
+      }
+     ]
+    },
+    "mushroom": {
+     "label": "Mushroom",
+     "angle": 13.282525588538995,
+     "draw": [
+      {
+       "gen": "icon.paint",
+       "v": 1,
+       "shapes": [
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -3.4,
+           -1
+          ],
+          [
+           3.4,
+           -1
+          ],
+          [
+           3.4,
+           9.6
+          ],
+          [
+           -3.4,
+           9.6
+          ]
+         ],
+         "paint": "cream"
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          0,
+          9.4
+         ],
+         "r": [
+          4.4,
+          2.2
+         ],
+         "paint": "cream"
+        }
+       ],
+       "paint": "cream",
+       "soft": 0
+      },
+      {
+       "gen": "icon.paint",
+       "v": 1,
+       "shapes": [
+        {
+         "kind": "ellipse",
+         "at": [
+          0,
+          -0.6
+         ],
+         "r": [
+          10.2,
+          2.6
+         ],
+         "paint": "cream"
+        }
+       ],
+       "paint": "cream.dark",
+       "flat": true,
+       "within": [
+        {
+         "kind": "rect",
+         "at": [
+          -12,
+          -1.2
+         ],
+         "size": [
+          24,
+          20
+         ],
+         "paint": "cream"
+        }
+       ]
+      },
+      {
+       "gen": "icon.line",
+       "v": 1,
+       "path": [
+        -4.9,
+        -0.4,
+        -7,
+        1
+       ],
+       "paint": "cream.deep",
+       "over": true
+      },
+      {
+       "gen": "icon.line",
+       "v": 1,
+       "path": [
+        -2.8,
+        -0.4,
+        -4,
+        1
+       ],
+       "paint": "cream.deep",
+       "over": true
+      },
+      {
+       "gen": "icon.line",
+       "v": 1,
+       "path": [
+        2.8,
+        -0.4,
+        4,
+        1
+       ],
+       "paint": "cream.deep",
+       "over": true
+      },
+      {
+       "gen": "icon.line",
+       "v": 1,
+       "path": [
+        4.9,
+        -0.4,
+        7,
+        1
+       ],
+       "paint": "cream.deep",
+       "over": true
+      },
+      {
+       "gen": "icon.paint",
+       "v": 1,
+       "shapes": [
+        {
+         "kind": "ellipse",
+         "at": [
+          0,
+          -1.2
+         ],
+         "r": [
+          11.5,
+          9.4
+         ],
+         "paint": "soil"
+        }
+       ],
+       "paint": "soil",
+       "soft": 2,
+       "minus": [
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -12,
+           -1.2
+          ],
+          [
+           12,
+           -1.2
+          ],
+          [
+           12,
+           10
+          ],
+          [
+           -12,
+           10
+          ]
+         ],
+         "paint": "soil"
+        }
+       ]
+      },
+      {
+       "gen": "icon.glint",
+       "v": 1,
+       "at": [
+        4,
+        -7.2
+       ],
+       "paint": "white",
+       "len": 1
+      }
+     ]
+    },
+    "soup": {
+     "label": "Soup",
+     "draw": [
+      {
+       "gen": "icon.paint",
+       "v": 1,
+       "shapes": [
+        {
+         "kind": "ellipse",
+         "at": [
+          0,
+          -1
+         ],
+         "r": [
+          11.5,
+          9.4
+         ],
+         "paint": "bowl"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -4.4,
+           7
+          ],
+          [
+           4.4,
+           7
+          ],
+          [
+           4.4,
+           9.8
+          ],
+          [
+           -4.4,
+           9.8
+          ]
+         ],
+         "paint": "bowl"
+        }
+       ],
+       "paint": "bowl",
+       "soft": 2,
+       "minus": [
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -12,
+           -12
+          ],
+          [
+           12,
+           -12
+          ],
+          [
+           12,
+           -1
+          ],
+          [
+           -12,
+           -1
+          ]
+         ],
+         "paint": "bowl"
+        }
+       ]
+      },
+      {
+       "gen": "icon.paint",
+       "v": 1,
+       "shapes": [
+        {
+         "kind": "ellipse",
+         "at": [
+          0,
+          -1
+         ],
+         "r": [
+          11.5,
+          3.6
+         ],
+         "paint": "bowl"
+        }
+       ],
+       "paint": "bowl.light",
+       "flat": true
+      },
+      {
+       "gen": "icon.paint",
+       "v": 1,
+       "shapes": [
+        {
+         "kind": "ellipse",
+         "at": [
+          0,
+          -0.8
+         ],
+         "r": [
+          9.6,
+          2.5
+         ],
+         "paint": "ember"
+        }
+       ],
+       "paint": "ember",
+       "soft": 0,
+       "lit": 0
+      },
+      {
+       "gen": "icon.paint",
+       "v": 1,
+       "shapes": [
+        {
+         "gen": "taper",
+         "v": 1,
+         "from": [
+          -4.6,
+          -0.4
+         ],
+         "to": [
+          -0.6,
+          -1.6
+         ],
+         "r0": 0.6,
+         "r1": 1.5,
+         "paint": "accent"
+        },
+        {
+         "gen": "taper",
+         "v": 1,
+         "from": [
+          -0.6,
+          -1.6
+         ],
+         "to": [
+          2,
+          -0.6
+         ],
+         "r0": 1.5,
+         "r1": 0.6,
+         "paint": "accent"
+        },
+        {
+         "gen": "taper",
+         "v": 1,
+         "from": [
+          1.4,
+          0.2
+         ],
+         "to": [
+          4.4,
+          -0.4
+         ],
+         "r0": 1.1,
+         "r1": 0.5,
+         "paint": "accent"
+        }
+       ],
+       "paint": "accent",
+       "flat": true
+      }
+     ]
+    }
+   }
+  }
+ }
+}

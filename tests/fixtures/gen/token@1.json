@@ -1,0 +1,179 @@
+{
+ "id": "token",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     0,
+     0.5
+    ],
+    "size": 15,
+    "thick": 3,
+    "metal": "metal",
+    "field": "field",
+    "gleam": "gleam",
+    "inlay": "emblem",
+    "shine": "shine",
+    "emblem": "star"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      -7,
+      -7
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".....aaaaa.....",
+      "...abbbbbccc...",
+      "..bbbddedacaa..",
+      ".dbbfffeaaabaa.",
+      ".bbffffeaaddba.",
+      "dbffffeeeafddaa",
+      "dbfeeeeeeeeedba",
+      "dbffeeeeeeefdba",
+      "dbfffeeeeeffdba",
+      "ddfffeeeeeffdba",
+      ".dbffeefeeffbb.",
+      ".ddbeeaffeebba.",
+      "..ddcaffffbbb..",
+      "...cccbbbbbd...",
+      ".....ddddd....."
+     ],
+     "key": {
+      "a": "metal.light",
+      "b": "metal",
+      "c": "gleam",
+      "d": "metal.dark",
+      "e": "emblem",
+      "f": "field"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     0,
+     0.5
+    ],
+    "size": 10,
+    "thick": 2,
+    "shape": "octagon",
+    "emblem": "hole",
+    "spin": 60,
+    "sheen": 0.4,
+    "metal": "metal",
+    "field": "field",
+    "gleam": "gleam",
+    "inlay": "emblem",
+    "shine": "shine"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      -3,
+      -4
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aabb.",
+      "cddabb",
+      "cdaddb",
+      "cdaddd",
+      "cdddde",
+      "cdddde",
+      "cdddbe",
+      "cddfbb",
+      "ccdeeb",
+      ".cced."
+     ],
+     "key": {
+      "a": "metal",
+      "b": "metal.light",
+      "c": "metal.deep",
+      "d": "metal.dark",
+      "e": "gleam",
+      "f": "field"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "size": 19,
+    "thick": 5,
+    "shape": "square",
+    "emblem": "gem",
+    "rim": false,
+    "spin": 150,
+    "squash": 0.2,
+    "scale": 0.8,
+    "metal": "metal",
+    "field": "metal",
+    "gleam": "gleam",
+    "inlay": "emblem",
+    "shine": "shine"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      8,
+      11
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".abbbbbbbccbbbdd.",
+      ".ddddddecccddbad.",
+      "adddddfeecdddbbdd",
+      "addddfffgeddddbad",
+      "adddfffffeedddbad",
+      "addhhfffffeeddbad",
+      "adddhhfffffdddbad",
+      "addddhhfffddddbad",
+      "aadddchhfdddddbad",
+      ".addccchddddddaa.",
+      ".aaaccaaaaaaaaii."
+     ],
+     "key": {
+      "a": "metal.dark",
+      "b": "metal.light",
+      "c": "gleam",
+      "d": "metal",
+      "e": "emblem.light",
+      "f": "emblem",
+      "g": "shine",
+      "h": "emblem.dark",
+      "i": "metal.deep"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "size": 12,
+    "thick": 2,
+    "emblem": "heart",
+    "scale": 0.1,
+    "metal": "metal",
+    "field": "field",
+    "gleam": "gleam",
+    "inlay": "emblem",
+    "shine": "shine"
+   },
+   "primitives": []
+  }
+ ]
+}

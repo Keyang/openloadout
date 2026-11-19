@@ -33,12 +33,16 @@ const CASES = {
   ],
 };
 
+// Motions (node moves) and layouts (a whole frame) do not return primitives: tests/unit/gen-motion-layout-contract.test.mjs
+// holds every registered one to its own goldens, fuzz and determinism (build item B8).
+const shapeListGenerators = () => registry.generators().filter((g) => g.family !== 'motion' && g.family !== 'layout');
+
 test('every registered generator has a golden file with at least three cases', () => {
-  const missing = registry.generators().filter((g) => !readGolden(g.key) && !CASES[g.key]);
+  const missing = shapeListGenerators().filter((g) => !readGolden(g.key) && !CASES[g.key]);
   assert.deepEqual(missing.map((g) => g.key), [], 'generators with no goldens');
 });
 
-for (const g of registry.generators()) {
+for (const g of shapeListGenerators()) {
   test(`${g.key} passes the goldens harness`, () => checkGeneratorContract(registry, g, { cases: CASES[g.key] }));
 }
 

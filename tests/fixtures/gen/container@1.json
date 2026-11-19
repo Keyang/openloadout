@@ -1,0 +1,212 @@
+{
+ "id": "container",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "style": "crate",
+    "size": 19,
+    "wood": "wood",
+    "metal": "metal",
+    "markPaint": "stamp"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      6,
+      11
+     ],
+     "anchor": "tl",
+     "rows": [
+      "abbbbbbbbbbbbbbbbbb",
+      "acacccacccacccacccb",
+      "aaaaaaaaaaaaaaaaaaa",
+      "ddefddddddddddeeeeg",
+      "ddefdddddddddeeeeeg",
+      "ddefddddddddeeedeeg",
+      "ddefdddddddeeeddeeg",
+      "ddefffffffeeefffeeg",
+      "ddefdddddeeeddddeeg",
+      "ddefddddeeedddddeeg",
+      "ddefdddeeeddddddeeg",
+      "ddefddeeedddddddeeg",
+      "ddeffeeeffffffffeeg",
+      "ddefeeedddddddddeeg",
+      "ddedeeddddddddddeeg",
+      "ddeddfffffffffffeeg",
+      "abbbbbbbbbbbbbbbbbb",
+      "acacccacccacccacccb",
+      "aaaaaaaaaaaaaaaaaaa"
+     ],
+     "key": {
+      "a": "metal.dark",
+      "b": "metal.light",
+      "c": "metal",
+      "d": "wood.dark",
+      "e": "wood",
+      "f": "wood.deep",
+      "g": "wood.light"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "style": "barrel",
+    "size": 15,
+    "bands": false,
+    "mark": "skull",
+    "wood": "wood",
+    "metal": "metal",
+    "markPaint": "stamp",
+    "lean": 8.6
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      10,
+      14
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...abbbbb.....",
+      "...acacccbbbb.",
+      "..aaaaaaaaccb.",
+      "..aacacccaaaaa",
+      ".aaacacccacccb",
+      ".aacacccaacccb",
+      ".aacacdddcccb.",
+      ".aacaddddcccb.",
+      ".aacadcdadccb.",
+      ".aacadddddccb.",
+      ".aacacdcddccb.",
+      "aaaaaaaaacccb.",
+      ".aaacccacaaaa.",
+      ".aaaaaaaaccb..",
+      "..aaaaaaaaa...",
+      ".........aa..."
+     ],
+     "key": {
+      "a": "wood.dark",
+      "b": "wood.light",
+      "c": "wood",
+      "d": "stamp"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "style": "pot",
+    "size": 23,
+    "mark": "star",
+    "wood": "wood",
+    "metal": "metal",
+    "markPaint": "stamp",
+    "grow": 1
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      4,
+      5
+     ],
+     "anchor": "tl",
+     "rows": [
+      "....abbbbbbbbbbbbbbb....",
+      "....aaaacccccccccccb....",
+      "......aaaaaaaaaaac......",
+      "......deeeeeeeeeee......",
+      "......dddddddddddd......",
+      "......aacccccccccb......",
+      "......cccccccccccb......",
+      "......cccccccccccb......",
+      "....bccccccccccccbbb....",
+      "...ccccccccccccccccbb...",
+      "..acccccccccfcccccccbb..",
+      ".aacccccccccfccccccccbb.",
+      ".acccccccccfffccccccccb.",
+      ".accccccfffffffffcccccb.",
+      "aaaccccccfffffffccccccbb",
+      "aaacccccccfffffccccccccb",
+      ".aacccccccfffffcccccccc.",
+      ".aaacccccfffcfffccccccb.",
+      ".aaaaccccffcccffccccccb.",
+      "..aaaacccccccccccccccc..",
+      "...ddeeeeeeeeeeeeeeee...",
+      "....dddddddddddddddd....",
+      "......aacccccccccc......",
+      "......aaaaaaaaaaaa......",
+      "......aaaaaaaaaaaa......"
+     ],
+     "key": {
+      "a": "wood.dark",
+      "b": "wood.light",
+      "c": "wood",
+      "d": "metal.dark",
+      "e": "metal.light",
+      "f": "stamp"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "style": "crate",
+    "size": 21,
+    "mark": "leaf",
+    "wood": "wood",
+    "metal": "metal",
+    "markPaint": "stamp",
+    "split": true
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      3,
+      8
+     ],
+     "anchor": "tl",
+     "rows": [
+      "......aaaaa....aaa.......",
+      "baaaaabcccb....cccaaaaaaa",
+      "bcbcccbbbbb....bbbbcccbca",
+      "bbbbbbddddd....dddbbbbbbb",
+      "ddefddddddd....dddddddeeg",
+      "ddefddddddd....dddddddeeg",
+      "ddefddddddd....dhhddddeeg",
+      "ddefdddddhh....hhdhdddeeg",
+      "ddefddfffhhh..hfhhhdddeeg",
+      ".ddeffddhhhh..dhhdfffeeg.",
+      ".ddefdddhhhd..hhhddddeeg.",
+      ".ddefdddhhdh..hhhddddeeg.",
+      ".ddefddhhdhh..hhdddddeeg.",
+      ".ddefdfhhhhh..hfffdddeeg.",
+      ".ddeffdhhhdd..ddddfffeeg.",
+      ".ddefddddddd..dddddddeeg.",
+      ".ddefddddddd..dddddddeeg.",
+      ".ddefdffffffffffffdddeeg.",
+      "..ddefaaaaaaaaaaaaffeeg..",
+      "..baaaccbcccbcccbcaaaaa..",
+      "..bcbcbbbbbbbbbbbbccbca..",
+      "..bbbb............bbbbb.."
+     ],
+     "key": {
+      "a": "metal.light",
+      "b": "metal.dark",
+      "c": "metal",
+      "d": "wood.dark",
+      "e": "wood",
+      "f": "wood.deep",
+      "g": "wood.light",
+      "h": "stamp"
+     }
+    }
+   ]
+  }
+ ]
+}

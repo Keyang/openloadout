@@ -1,0 +1,225 @@
+{
+ "id": "gem.cut",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "r": [
+     7,
+     8
+    ],
+    "paint": "stone",
+    "shine": "shine"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      9,
+      8
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...abbbbbbc...",
+      "...abbbbbbc...",
+      "..aabbbbbbcc..",
+      ".aaabbbbbbccc.",
+      ".aaabbbbbbccc.",
+      "aaaabbbbbbcccc",
+      ".ddddaaaabbbb.",
+      ".ddddaaaabbbb.",
+      "..dddaaaabbb..",
+      "...ddaaaabb...",
+      "...dddaabbb...",
+      "....ddaabb....",
+      ".....daab.....",
+      ".....daab.....",
+      "......db......"
+     ],
+     "key": {
+      "a": "stone",
+      "b": "stone.light",
+      "c": {
+       "rule": "mix",
+       "of": {
+        "rule": "ramp",
+        "of": "stone",
+        "tone": "light"
+       },
+       "with": "shine",
+       "amount": 0.55
+      },
+      "d": "stone.dark"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     15.5,
+     16
+    ],
+    "r": [
+     4,
+     5
+    ],
+    "cut": "emerald",
+    "facets": false,
+    "paint": "stone",
+    "shine": "shine"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      11,
+      11
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..aaaaa.",
+      ".bbbaaaa",
+      "cbbbadda",
+      "cbbbadda",
+      "cbbbaaaa",
+      "cbbbaaaa",
+      "cbbbbbba",
+      "ccbbbbba",
+      ".ccbbbba",
+      "..ccccc."
+     ],
+     "key": {
+      "a": "stone.light",
+      "b": "stone",
+      "c": "stone.dark",
+      "d": "shine"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     15
+    ],
+    "r": [
+     10,
+     12
+    ],
+    "cut": "heart",
+    "paint": "ruby",
+    "shine": "shine"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      6,
+      3
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..aaaaa......bbbbb..",
+      "..aaaaa......bbbbb..",
+      ".aaaaaaa....bbbbbbb.",
+      ".aaaaaaaa..bbbbbbbb.",
+      "aaaaaaaaa..bbbbbbbbb",
+      "aaaaaaaaaabbbbbbbbbb",
+      "aaaaaaaaaabbbbbbbbba",
+      "aaaaaaaaaccbbbbbbaaa",
+      "aaaaaaaaccccbbbbaaaa",
+      "aaaaaaaccccccbbaaaaa",
+      "aaaaaaccccccccaaaaaa",
+      ".dddddccccccccaaaaa.",
+      ".ddddddccccccaaaaaa.",
+      "..dddddccccccaaaaa..",
+      "...ddddccccccaaaa...",
+      "....dddccccccaaa....",
+      "....ddddccccaaaa....",
+      ".....dddccccaaa.....",
+      "......ddccccaa......",
+      ".......ddccaa.......",
+      ".......ddccaa.......",
+      "........dcca........",
+      ".........da........."
+     ],
+     "key": {
+      "a": "ruby.light",
+      "b": {
+       "rule": "mix",
+       "of": {
+        "rule": "ramp",
+        "of": "ruby",
+        "tone": "light"
+       },
+       "with": "shine",
+       "amount": 0.55
+      },
+      "c": "ruby",
+      "d": "ruby.dark"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "r": [
+     6,
+     6
+    ],
+    "cut": "round",
+    "paint": "stone",
+    "shine": "shine"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      10,
+      10
+     ],
+     "anchor": "tl",
+     "rows": [
+      "....aaaa....",
+      "..baaaaaac..",
+      ".bbbaaaaccc.",
+      ".dbbbbbbcca.",
+      "dddbbbbbbaaa",
+      "dddbbbbbbaaa",
+      "dddbbbbbbaaa",
+      "dddbbbbbbaaa",
+      ".dddbbbbbba.",
+      ".dddddddbbb.",
+      "..dddddddb..",
+      "....dddd...."
+     ],
+     "key": {
+      "a": "stone.light",
+      "b": "stone",
+      "c": {
+       "rule": "mix",
+       "of": {
+        "rule": "ramp",
+        "of": "stone",
+        "tone": "light"
+       },
+       "with": "shine",
+       "amount": 0.55
+      },
+      "d": "stone.dark"
+     }
+    }
+   ]
+  }
+ ]
+}

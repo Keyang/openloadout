@@ -1,0 +1,227 @@
+{
+ "id": "pickup.burst",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     16,
+     11
+    ],
+    "amount": 0.365,
+    "reach": 10.6,
+    "paint": "metal",
+    "bright": "metal.light",
+    "core": "shine"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      20,
+      12
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".a.",
+      "aba",
+      ".a."
+     ],
+     "key": {
+      "a": "metal",
+      "b": "shine"
+     }
+    },
+    {
+     "kind": "dot",
+     "at": [
+      16,
+      16
+     ],
+     "paint": "metal.light"
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      9,
+      12
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".a.",
+      "aba",
+      ".a."
+     ],
+     "key": {
+      "a": "metal",
+      "b": "shine"
+     }
+    },
+    {
+     "kind": "dot",
+     "at": [
+      10,
+      8
+     ],
+     "paint": "metal.light"
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      14,
+      4
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".a.",
+      "aba",
+      ".a."
+     ],
+     "key": {
+      "a": "metal",
+      "b": "shine"
+     }
+    },
+    {
+     "kind": "dot",
+     "at": [
+      21,
+      8
+     ],
+     "paint": "metal.light"
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      14,
+      9
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..a..",
+      "..a..",
+      "aabaa",
+      "..a..",
+      "..a.."
+     ],
+     "key": {
+      "a": "metal.light",
+      "b": "shine"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     11
+    ],
+    "amount": 0.9,
+    "reach": 10.6,
+    "paint": "metal",
+    "bright": "metal.light",
+    "core": "shine"
+   },
+   "primitives": [
+    {
+     "kind": "dot",
+     "at": [
+      22,
+      14
+     ],
+     "paint": "metal.light"
+    },
+    {
+     "kind": "dot",
+     "at": [
+      9,
+      14
+     ],
+     "paint": "metal.light"
+    },
+    {
+     "kind": "dot",
+     "at": [
+      15,
+      3
+     ],
+     "paint": "metal.light"
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16.5,
+     9
+    ],
+    "amount": 0.1,
+    "reach": 8,
+    "sparkle": false,
+    "paint": "gold",
+    "bright": "gold.light",
+    "core": "shine"
+   },
+   "primitives": [
+    {
+     "kind": "dot",
+     "at": [
+      19,
+      10
+     ],
+     "paint": "gold.light"
+    },
+    {
+     "kind": "dot",
+     "at": [
+      13,
+      10
+     ],
+     "paint": "gold.light"
+    },
+    {
+     "kind": "dot",
+     "at": [
+      16,
+      5
+     ],
+     "paint": "gold.light"
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      14,
+      7
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..a..",
+      "..a..",
+      "aabaa",
+      "..a..",
+      "..a.."
+     ],
+     "key": {
+      "a": "gold.light",
+      "b": "shine"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "amount": 0,
+    "reach": 8,
+    "paint": "gold",
+    "bright": "gold.light",
+    "core": "shine"
+   },
+   "primitives": []
+  }
+ ]
+}

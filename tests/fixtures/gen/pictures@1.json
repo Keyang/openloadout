@@ -1,0 +1,33 @@
+{
+ "id": "pictures",
+ "v": 1,
+ "family": "layout",
+ "fixtures": [
+  "pictures/coin.json",
+  "pictures/crate.json",
+  "pictures/icons-food.json"
+ ],
+ "frames": {
+  "pictures/coin.json spin 0": "547241fd",
+  "pictures/coin.json spin 4": "9dd76f30",
+  "pictures/coin.json spin 7": "2f808b26",
+  "pictures/coin.json collect 0": "57c07445",
+  "pictures/coin.json collect 4": "22f28cc6",
+  "pictures/coin.json collect 7": "8ca00317",
+  "pictures/crate.json idle 0": "d01bb015",
+  "pictures/crate.json hurt 0": "7ad72b9c",
+  "pictures/crate.json hurt 2": "a1b5d154",
+  "pictures/crate.json hurt 3": "d01bb015",
+  "pictures/crate.json break 0": "77948f27",
+  "pictures/crate.json break 4": "70b352a3",
+  "pictures/crate.json break 7": "d99f7b37",
+  "pictures/icons-food.json apple 0": "838f8400",
+  "pictures/icons-food.json drumstick 0": "2721a5fe",
+  "pictures/icons-food.json cheese 0": "ba1c6ab6",
+  "pictures/icons-food.json fish 0": "a9ecbada",
+  "pictures/icons-food.json egg 0": "ead4ac44",
+  "pictures/icons-food.json carrot 0": "ccd8c37b",
+  "pictures/icons-food.json mushroom 0": "e8ad5a88",
+  "pictures/icons-food.json soup 0": "5badb9c4"
+ }
+}

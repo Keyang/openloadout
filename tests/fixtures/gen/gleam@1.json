@@ -1,0 +1,126 @@
+{
+ "id": "gleam",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     22,
+     10
+    ],
+    "paint": "metal.light",
+    "core": "shine"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      20,
+      8
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..a..",
+      "..a..",
+      "aabaa",
+      "..a..",
+      "..a.."
+     ],
+     "key": {
+      "a": "metal.light",
+      "b": "shine"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     22,
+     10
+    ],
+    "paint": "metal.light",
+    "core": "shine"
+   },
+   "ctx": {
+    "t": 0.125,
+    "loop": true,
+    "frames": 8,
+    "frame": 1
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      21,
+      9
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".a.",
+      "aba",
+      ".a."
+     ],
+     "key": {
+      "a": "metal.light",
+      "b": "shine"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     5.5,
+     6.2
+    ],
+    "paint": "gold",
+    "core": "shine",
+    "peak": 0.5,
+    "big": 1
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": true,
+    "frames": 8,
+    "frame": 4
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      4,
+      5
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".a.",
+      "aba",
+      ".a."
+     ],
+     "key": {
+      "a": "gold",
+      "b": "shine"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     22,
+     10
+    ],
+    "paint": "metal.light",
+    "core": "shine"
+   },
+   "ctx": {
+    "t": 0.375,
+    "loop": true,
+    "frames": 8,
+    "frame": 3
+   },
+   "primitives": []
+  }
+ ]
+}
