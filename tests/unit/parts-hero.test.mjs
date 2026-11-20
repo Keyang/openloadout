@@ -5,8 +5,9 @@ import { defaultParams, cleanParams, renderFrame, renderSheet, partList, partOf,
 import { col, ramp } from '../../engine/color.js';
 import { Surface } from '../../engine/surface.js';
 import * as H from '../../rigs/humanoid.js';
-import knight, { weaponReach } from '../../sprites/knight.js';
-import wizard from '../../sprites/wizard.js';
+import { codeSprite, codeSpriteModule } from '../helpers/library.mjs';   // the code, frozen first (tests/helpers/library.mjs): its parts and weaponReach are code
+const { default: knight, weaponReach } = await codeSpriteModule('knight');
+const wizard = await codeSprite('wizard');
 
 const frames = (s, clip) => Array.from({ length: s.clips[clip].frames }, (_, f) => f);
 const everyFrame = (s) => Object.keys(s.clips).flatMap((clip) => frames(s, clip).map((f) => [clip, f]));

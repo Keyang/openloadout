@@ -13,6 +13,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { renderFrame, frameSockets, defaultParams, cleanParams, randomParams } from '../../engine/sprite.js';
 import { readDataFile, checkDataFile } from '../../tools/lib/data-file.mjs';
 import { renderThemedFrame, randomTheme, spriteMaterials } from '../../engine/theme.js';
+import { codeSprite, codeSpriteSource } from '../helpers/library.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const IDS = ['rogue-battler', 'road-bandit'];
@@ -49,7 +50,7 @@ const differ = (a, b) => { let c = 0; for (let i = 0; i < a.data.length; i++) if
 
 for (const id of IDS) {
   test(`F1 ${id}: the file in sprites/ is a studio library file (the fixed form, strict) and no longer code`, () => {
-    const text = fs.readFileSync(path.join(ROOT, 'sprites', `${id}.js`), 'utf8');
+    const text = codeSpriteSource(id);      // the converted file, frozen first (tests/helpers/library.mjs): the migration redraws it as version 2
     const r = readDataFile(text, { file: `sprites/${id}.js`, strict: true });
     assert.equal(r.ok, true, r.errors.join('\n'));
     assert.equal(r.value.body.library, 'humanoid');
@@ -58,7 +59,7 @@ for (const id of IDS) {
   });
 
   test(`F1 ${id}: two colours on one colour, and colours off the swatches, draw as the original (pixels within 2%, sockets within 1 px)`, async (t) => {
-    const was = await original(id), now = (await import(`../../sprites/${id}.js`)).default;
+    const was = await original(id), now = await codeSprite(id);
     let worst = { share: 0, at: 'nothing differs' };
     const over = [];
     for (const { name, p } of colourSettings(was)) {
@@ -78,14 +79,14 @@ for (const id of IDS) {
 
 for (const id of IDS) {
   test(`F1 ${id}: a data sprite is not one made on this visit (no truthy made, no prepare); where it came from stays on its definition`, async () => {
-    const now = (await import(`../../sprites/${id}.js`)).default;
+    const now = await codeSprite(id);
     assert.ok(!now.made, 'sprite.made means "drawn in a worker" to app/api-core.js render and engine/theme.js; a data sprite is drawn here');
     assert.equal(typeof now.prepare, 'undefined');
     assert.deepEqual(now.definition.made, { in: 'library', from: `code:${id}` }, 'converted from its code file, not made in the studio (studio item F2)');
   });
 
   test(`F1 ${id}: looks (Contract 7) recolour it as they recoloured the original: the same materials, every frame within 2%`, async (t) => {
-    const was = await original(id), now = (await import(`../../sprites/${id}.js`)).default;
+    const was = await original(id), now = await codeSprite(id);
     const P = defaultParams(was);
     const mw = spriteMaterials(was, P), mn = spriteMaterials(now, cleanParams(now, P));
     assert.ok(mw.total > 0, 'the original has a material table');

@@ -1,0 +1,1853 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "tiles-cave",
+ "name": "Cave rock tiles",
+ "blurb": "Rough faceted rock for caves, with a thin ledge, a dark back wall, stalactites, stalagmites and glowing crystals; change the colours, the lit rim, how jagged, cracked and wet it is.",
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "rock-top",
+ "styles": [
+  "pixel"
+ ],
+ "meta": {
+  "type": "tileset",
+  "role": "world/tile",
+  "themes": [
+   "fantasy",
+   "dungeon"
+  ],
+  "gameTypes": [
+   "platformer"
+  ],
+  "view": "side",
+  "words": [
+   "cave",
+   "rock",
+   "stone",
+   "cavern",
+   "underground",
+   "mine",
+   "stalactite",
+   "stalagmite",
+   "crystal",
+   "ground",
+   "wall",
+   "ledge",
+   "walk",
+   "dark"
+  ],
+  "license": "draft"
+ },
+ "palette": [
+  {
+   "id": "rock",
+   "label": "Rock",
+   "default": "#5d6475",
+   "material": "stone",
+   "swatches": [
+    "#5d6475",
+    "#8f97a8",
+    "#6b7280",
+    "#a06a3c"
+   ]
+  },
+  {
+   "id": "shade",
+   "label": "Back wall",
+   "default": "#3f5068",
+   "material": "stone",
+   "swatches": [
+    "#3f5068",
+    "#7a4f33",
+    "#5a3a22",
+    "#3a3350"
+   ]
+  },
+  {
+   "id": "crystal",
+   "label": "Crystal",
+   "default": "#4fd8ee",
+   "material": "magic",
+   "swatches": [
+    "#4fd8ee",
+    "#c9423a",
+    "#a4c44a",
+    "#7a4fc4",
+    "#f2c230"
+   ]
+  },
+  {
+   "id": "shine",
+   "default": "#ffffff",
+   "material": "light",
+   "detail": true
+  },
+  {
+   "id": "water",
+   "default": "#3f9fd1",
+   "material": "water",
+   "detail": true
+  },
+  {
+   "id": "hi",
+   "material": "stone",
+   "derive": {
+    "rule": "tone",
+    "of": "rock",
+    "by": 1.4
+   }
+  },
+  {
+   "id": "lit",
+   "material": "stone",
+   "derive": {
+    "rule": "mix",
+    "of": "rock",
+    "with": {
+     "rule": "ramp",
+     "of": "rock",
+     "tone": "light"
+    },
+    "amount": 0.5
+   }
+  },
+  {
+   "id": "dim",
+   "material": "stone",
+   "derive": {
+    "rule": "mix",
+    "of": "rock",
+    "with": {
+     "rule": "ramp",
+     "of": "rock",
+     "tone": "dark"
+    },
+    "amount": 0.55
+   }
+  },
+  {
+   "id": "wet",
+   "material": "water",
+   "derive": {
+    "rule": "mix",
+    "of": {
+     "rule": "ramp",
+     "of": "rock",
+     "tone": "light"
+    },
+    "with": "shine",
+    "amount": 0.7
+   }
+  }
+ ],
+ "controls": [
+  {
+   "key": "edge",
+   "kind": "range",
+   "label": "Edge",
+   "lo": "Thin",
+   "hi": "Deep",
+   "min": 3,
+   "max": 6,
+   "step": 1,
+   "default": 3
+  },
+  {
+   "key": "jagged",
+   "kind": "range",
+   "label": "Edges",
+   "lo": "Smooth",
+   "hi": "Jagged",
+   "default": 0.5
+  },
+  {
+   "key": "texture",
+   "kind": "range",
+   "label": "Texture",
+   "lo": "Plain",
+   "hi": "Busy",
+   "default": 0.5
+  },
+  {
+   "key": "wear",
+   "kind": "range",
+   "label": "Wear",
+   "lo": "New",
+   "hi": "Worn",
+   "default": 0.3
+  },
+  {
+   "key": "damp",
+   "kind": "toggle",
+   "label": "Damp",
+   "default": false
+  },
+  {
+   "key": "rock",
+   "kind": "colour",
+   "label": "Rock"
+  },
+  {
+   "key": "shade",
+   "kind": "colour",
+   "label": "Back wall"
+  },
+  {
+   "key": "crystal",
+   "kind": "colour",
+   "label": "Crystal"
+  }
+ ],
+ "body": {
+  "tiles": {
+   "tile": 32,
+   "profiles": {
+    "top": [
+     0,
+     0,
+     1.5,
+     1.5,
+     3,
+     3,
+     1.5,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     1.5,
+     1.5,
+     1.5,
+     3,
+     3,
+     1.5,
+     0,
+     0
+    ],
+    "under": [
+     0,
+     0.99,
+     2.01,
+     3,
+     3,
+     3,
+     2.01,
+     0.99,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0.99,
+     2.01,
+     3,
+     3,
+     2.01,
+     0,
+     1.5,
+     3,
+     2.01,
+     0
+    ],
+    "west": [
+     0,
+     0,
+     0,
+     0,
+     1,
+     2,
+     2,
+     1,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     2,
+     2,
+     2,
+     1,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     2,
+     2,
+     1,
+     0,
+     0,
+     0
+    ],
+    "east": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     2,
+     2,
+     1,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     2,
+     2,
+     1,
+     0,
+     0,
+     2,
+     2,
+     1,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "broken": [
+     0,
+     1,
+     2,
+     2,
+     1,
+     0,
+     0,
+     1,
+     0,
+     0,
+     1,
+     2,
+     1,
+     0,
+     0,
+     0,
+     1,
+     1,
+     0,
+     2,
+     2,
+     1,
+     0,
+     0,
+     1,
+     0,
+     0,
+     1,
+     2,
+     1,
+     0,
+     1
+    ],
+    "wet": [
+     0,
+     0,
+     0,
+     0,
+     1,
+     1,
+     0,
+     0,
+     0,
+     0,
+     1,
+     1,
+     1,
+     1,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     1,
+     0,
+     0,
+     0,
+     0,
+     1,
+     1,
+     1,
+     0,
+     0,
+     0
+    ],
+    "lip": [
+     0,
+     1,
+     1,
+     1,
+     1,
+     1,
+     1,
+     1,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     1,
+     1,
+     1,
+     1,
+     0,
+     1,
+     1,
+     1,
+     0
+    ]
+   },
+   "groups": [
+    {
+     "name": "rock",
+     "kind": "block",
+     "use": "ground",
+     "pieces": [
+      "block",
+      "narrow",
+      "thin"
+     ],
+     "fills": 3,
+     "thickness": 12,
+     "under": {
+      "depth": 1,
+      "inset": {
+       "profile": "lip",
+       "amount": {
+        "from": "jagged",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          0.5,
+          1
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       }
+      },
+      "bands": [
+       {
+        "rows": [
+         1,
+         99
+        ],
+        "paint": "dim"
+       }
+      ]
+     },
+     "material": {
+      "round": {
+       "from": "jagged",
+       "map": [
+        [
+         0,
+         1
+        ],
+        [
+         0.6,
+         1
+        ],
+        [
+         0.61,
+         2
+        ],
+        [
+         1,
+         2
+        ]
+       ],
+       "round": "px"
+      },
+      "behind": true,
+      "fill": {
+       "base": "rock",
+       "versions": [
+        [
+         {
+          "kind": "poly",
+          "points": [
+           [
+            26,
+            14
+           ],
+           [
+            29,
+            18
+           ],
+           [
+            20,
+            27
+           ],
+           [
+            17,
+            24
+           ],
+           [
+            22,
+            17
+           ]
+          ],
+          "paint": "lit.base"
+         },
+         {
+          "kind": "line",
+          "from": [
+           0,
+           10
+          ],
+          "to": [
+           1,
+           10
+          ],
+          "paint": "rock.dark"
+         },
+         {
+          "kind": "line",
+          "from": [
+           1,
+           10
+          ],
+          "to": [
+           7,
+           13
+          ],
+          "paint": "rock.dark"
+         },
+         {
+          "kind": "line",
+          "from": [
+           7,
+           13
+          ],
+          "to": [
+           19,
+           1
+          ],
+          "paint": "rock.dark"
+         },
+         {
+          "kind": "line",
+          "from": [
+           19,
+           1
+          ],
+          "to": [
+           19,
+           0
+          ],
+          "paint": "rock.dark"
+         },
+         {
+          "kind": "line",
+          "from": [
+           31,
+           10
+          ],
+          "to": [
+           30,
+           10
+          ],
+          "paint": "rock.dark"
+         },
+         {
+          "kind": "line",
+          "from": [
+           30,
+           10
+          ],
+          "to": [
+           26,
+           14
+          ],
+          "paint": "rock.dark"
+         },
+         {
+          "kind": "line",
+          "from": [
+           26,
+           14
+          ],
+          "to": [
+           28,
+           18
+          ],
+          "paint": "rock.dark"
+         },
+         {
+          "kind": "line",
+          "from": [
+           28,
+           18
+          ],
+          "to": [
+           19,
+           27
+          ],
+          "paint": "rock.dark"
+         },
+         {
+          "kind": "line",
+          "from": [
+           19,
+           27
+          ],
+          "to": [
+           19,
+           31
+          ],
+          "paint": "rock.dark"
+         },
+         {
+          "gen": "scatter",
+          "v": 1,
+          "seed": 11,
+          "count": {
+           "from": "texture",
+           "map": [
+            [
+             0,
+             0
+            ],
+            [
+             1,
+             4
+            ]
+           ],
+           "round": "px"
+          },
+          "margin": 6,
+          "gap": 8,
+          "place": {
+           "kind": "stamp",
+           "rows": [
+            "aab",
+            ".ab"
+           ],
+           "key": {
+            "a": "lit.base",
+            "b": "rock.light"
+           }
+          }
+         },
+         {
+          "gen": "scatter",
+          "v": 1,
+          "seed": 31,
+          "count": {
+           "from": "wear",
+           "map": [
+            [
+             0,
+             0
+            ],
+            [
+             1,
+             3
+            ]
+           ],
+           "round": "px"
+          },
+          "margin": 6,
+          "gap": 10,
+          "place": {
+           "kind": "stamp",
+           "rows": [
+            "a.",
+            "a.",
+            ".a",
+            "a."
+           ],
+           "key": {
+            "a": "rock.dark"
+           }
+          }
+         },
+         {
+          "kind": "stamp",
+          "at": [
+           21,
+           18
+          ],
+          "rows": [
+           "aab"
+          ],
+          "key": {
+           "a": "rock.light",
+           "b": "wet"
+          },
+          "when": {
+           "damp": [
+            true
+           ]
+          }
+         }
+        ],
+        [
+         {
+          "kind": "poly",
+          "points": [
+           [
+            7,
+            7
+           ],
+           [
+            28,
+            18
+           ],
+           [
+            19,
+            27
+           ],
+           [
+            18,
+            28
+           ],
+           [
+            3,
+            20
+           ],
+           [
+            3,
+            15
+           ]
+          ],
+          "paint": "lit.base"
+         },
+         {
+          "kind": "line",
+          "from": [
+           0,
+           10
+          ],
+          "to": [
+           1,
+           10
+          ],
+          "paint": "rock.dark"
+         },
+         {
+          "kind": "line",
+          "from": [
+           1,
+           10
+          ],
+          "to": [
+           5,
+           6
+          ],
+          "paint": "rock.dark"
+         },
+         {
+          "kind": "line",
+          "from": [
+           5,
+           6
+          ],
+          "to": [
+           27,
+           17
+          ],
+          "paint": "rock.dark"
+         },
+         {
+          "kind": "line",
+          "from": [
+           27,
+           17
+          ],
+          "to": [
+           19,
+           25
+          ],
+          "paint": "rock.dark"
+         },
+         {
+          "kind": "line",
+          "from": [
+           19,
+           25
+          ],
+          "to": [
+           19,
+           31
+          ],
+          "paint": "rock.dark"
+         },
+         {
+          "kind": "line",
+          "from": [
+           19,
+           0
+          ],
+          "to": [
+           19,
+           1
+          ],
+          "paint": "rock.dark"
+         },
+         {
+          "kind": "line",
+          "from": [
+           19,
+           1
+          ],
+          "to": [
+           26,
+           8
+          ],
+          "paint": "rock.dark"
+         },
+         {
+          "kind": "line",
+          "from": [
+           26,
+           8
+          ],
+          "to": [
+           30,
+           10
+          ],
+          "paint": "rock.dark"
+         },
+         {
+          "kind": "line",
+          "from": [
+           30,
+           10
+          ],
+          "to": [
+           31,
+           10
+          ],
+          "paint": "rock.dark"
+         },
+         {
+          "gen": "scatter",
+          "v": 1,
+          "seed": 18,
+          "count": {
+           "from": "texture",
+           "map": [
+            [
+             0,
+             0
+            ],
+            [
+             1,
+             4
+            ]
+           ],
+           "round": "px"
+          },
+          "margin": 6,
+          "gap": 8,
+          "place": {
+           "kind": "stamp",
+           "rows": [
+            "aab",
+            ".ab"
+           ],
+           "key": {
+            "a": "lit.base",
+            "b": "rock.light"
+           }
+          }
+         },
+         {
+          "gen": "scatter",
+          "v": 1,
+          "seed": 36,
+          "count": {
+           "from": "wear",
+           "map": [
+            [
+             0,
+             0
+            ],
+            [
+             1,
+             3
+            ]
+           ],
+           "round": "px"
+          },
+          "margin": 6,
+          "gap": 10,
+          "place": {
+           "kind": "stamp",
+           "rows": [
+            "a.",
+            "a.",
+            ".a",
+            "a."
+           ],
+           "key": {
+            "a": "rock.dark"
+           }
+          }
+         },
+         {
+          "kind": "stamp",
+          "at": [
+           11,
+           13
+          ],
+          "rows": [
+           "aab"
+          ],
+          "key": {
+           "a": "rock.light",
+           "b": "wet"
+          },
+          "when": {
+           "damp": [
+            true
+           ]
+          }
+         },
+         {
+          "kind": "stamp",
+          "at": [
+           22,
+           10
+          ],
+          "rows": [
+           "aab"
+          ],
+          "key": {
+           "a": "rock.light",
+           "b": "wet"
+          },
+          "when": {
+           "damp": [
+            true
+           ]
+          }
+         }
+        ],
+        [
+         {
+          "kind": "poly",
+          "points": [
+           [
+            18,
+            3
+           ],
+           [
+            23,
+            3
+           ],
+           [
+            29,
+            9
+           ],
+           [
+            20,
+            18
+           ],
+           [
+            9,
+            12
+           ]
+          ],
+          "paint": "lit.base"
+         },
+         {
+          "kind": "line",
+          "from": [
+           19,
+           0
+          ],
+          "to": [
+           19,
+           1
+          ],
+          "paint": "rock.dark"
+         },
+         {
+          "kind": "line",
+          "from": [
+           19,
+           1
+          ],
+          "to": [
+           23,
+           3
+          ],
+          "paint": "rock.dark"
+         },
+         {
+          "kind": "line",
+          "from": [
+           23,
+           3
+          ],
+          "to": [
+           30,
+           10
+          ],
+          "paint": "rock.dark"
+         },
+         {
+          "kind": "line",
+          "from": [
+           30,
+           10
+          ],
+          "to": [
+           31,
+           10
+          ],
+          "paint": "rock.dark"
+         },
+         {
+          "kind": "line",
+          "from": [
+           0,
+           10
+          ],
+          "to": [
+           1,
+           10
+          ],
+          "paint": "rock.dark"
+         },
+         {
+          "kind": "line",
+          "from": [
+           1,
+           10
+          ],
+          "to": [
+           6,
+           15
+          ],
+          "paint": "rock.dark"
+         },
+         {
+          "kind": "line",
+          "from": [
+           6,
+           15
+          ],
+          "to": [
+           14,
+           19
+          ],
+          "paint": "rock.dark"
+         },
+         {
+          "kind": "line",
+          "from": [
+           14,
+           19
+          ],
+          "to": [
+           18,
+           27
+          ],
+          "paint": "rock.dark"
+         },
+         {
+          "kind": "line",
+          "from": [
+           18,
+           27
+          ],
+          "to": [
+           19,
+           28
+          ],
+          "paint": "rock.dark"
+         },
+         {
+          "kind": "line",
+          "from": [
+           19,
+           28
+          ],
+          "to": [
+           19,
+           31
+          ],
+          "paint": "rock.dark"
+         },
+         {
+          "gen": "scatter",
+          "v": 1,
+          "seed": 25,
+          "count": {
+           "from": "texture",
+           "map": [
+            [
+             0,
+             0
+            ],
+            [
+             1,
+             4
+            ]
+           ],
+           "round": "px"
+          },
+          "margin": 6,
+          "gap": 8,
+          "place": {
+           "kind": "stamp",
+           "rows": [
+            "aab",
+            ".ab"
+           ],
+           "key": {
+            "a": "lit.base",
+            "b": "rock.light"
+           }
+          }
+         },
+         {
+          "gen": "scatter",
+          "v": 1,
+          "seed": 41,
+          "count": {
+           "from": "wear",
+           "map": [
+            [
+             0,
+             0
+            ],
+            [
+             1,
+             3
+            ]
+           ],
+           "round": "px"
+          },
+          "margin": 6,
+          "gap": 10,
+          "place": {
+           "kind": "stamp",
+           "rows": [
+            "a.",
+            "a.",
+            ".a",
+            "a."
+           ],
+           "key": {
+            "a": "rock.dark"
+           }
+          }
+         },
+         {
+          "kind": "stamp",
+          "at": [
+           18,
+           7
+          ],
+          "rows": [
+           "aab"
+          ],
+          "key": {
+           "a": "rock.light",
+           "b": "wet"
+          },
+          "when": {
+           "damp": [
+            true
+           ]
+          }
+         },
+         {
+          "kind": "stamp",
+          "at": [
+           8,
+           21
+          ],
+          "rows": [
+           "aab"
+          ],
+          "key": {
+           "a": "rock.light",
+           "b": "wet"
+          },
+          "when": {
+           "damp": [
+            true
+           ]
+          }
+         }
+        ]
+       ]
+      },
+      "edges": {
+       "top": {
+        "depth": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ],
+         "round": "px"
+        },
+        "inset": {
+         "profile": "top",
+         "amount": {
+          "from": "jagged",
+          "map": [
+           [
+            0,
+            0
+           ],
+           [
+            1,
+            1
+           ]
+          ]
+         }
+        },
+        "ragged": {
+         "profile": "broken",
+         "amount": {
+          "from": "jagged",
+          "map": [
+           [
+            0,
+            0
+           ],
+           [
+            0.6667,
+            1
+           ],
+           [
+            1,
+            1
+           ]
+          ]
+         }
+        },
+        "bands": [
+         {
+          "rows": [
+           1,
+           1
+          ],
+          "where": {
+           "profile": "wet",
+           "in": [
+            1
+           ]
+          },
+          "paint": {
+           "rule": "choose",
+           "when": {
+            "damp": [
+             true
+            ]
+           },
+           "then": "wet",
+           "else": "hi"
+          }
+         },
+         {
+          "rows": [
+           1,
+           1
+          ],
+          "paint": "hi"
+         },
+         {
+          "rows": [
+           2,
+           99
+          ],
+          "paint": "rock.light"
+         }
+        ]
+       },
+       "right": {
+        "depth": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           1
+          ],
+          [
+           6,
+           4
+          ]
+         ],
+         "round": "px"
+        },
+        "inset": {
+         "profile": "east",
+         "amount": {
+          "from": "jagged",
+          "map": [
+           [
+            0,
+            0
+           ],
+           [
+            1,
+            1
+           ]
+          ]
+         }
+        },
+        "bands": [
+         {
+          "rows": [
+           1,
+           99
+          ],
+          "paint": "rock.light"
+         }
+        ]
+       },
+       "left": {
+        "depth": 1,
+        "inset": {
+         "profile": "west",
+         "amount": {
+          "from": "jagged",
+          "map": [
+           [
+            0,
+            0
+           ],
+           [
+            1,
+            1
+           ]
+          ]
+         }
+        },
+        "bands": [
+         {
+          "rows": [
+           1,
+           1
+          ],
+          "paint": "dim"
+         }
+        ]
+       },
+       "bottom": {
+        "depth": 2,
+        "inset": {
+         "profile": "under",
+         "amount": {
+          "from": "jagged",
+          "map": [
+           [
+            0,
+            0
+           ],
+           [
+            1,
+            1
+           ]
+          ]
+         }
+        },
+        "bands": [
+         {
+          "rows": [
+           1,
+           99
+          ],
+          "paint": "dim"
+         }
+        ]
+       }
+      },
+      "outside": [
+       {
+        "x": [
+         25,
+         25
+        ],
+        "y": [
+         31,
+         31
+        ],
+        "paint": "water.light",
+        "when": {
+         "damp": [
+          true
+         ]
+        }
+       },
+       {
+        "x": [
+         25,
+         25
+        ],
+        "y": [
+         16,
+         31
+        ],
+        "paint": "water",
+        "when": {
+         "damp": [
+          true
+         ]
+        }
+       }
+      ]
+     },
+     "decals": [
+      {
+       "name": "a",
+       "place": "below",
+       "label": "Stalactites",
+       "outline": true,
+       "draw": [
+        {
+         "kind": "stamp",
+         "at": [
+          10,
+          0
+         ],
+         "rows": [
+          "aabcaaaaabb",
+          "aabcaaaaabb",
+          "aabcaaaaabb",
+          ".ab.caaaabb",
+          ".ab.cadaab.",
+          ".a..cadaab.",
+          ".a...cdaab.",
+          ".a...cdaab.",
+          ".....cdab..",
+          ".....cadb..",
+          ".....caab..",
+          "......aab..",
+          "......aab..",
+          "......aab..",
+          "......ab...",
+          "......ab...",
+          "......ab...",
+          "......ab...",
+          ".......a...",
+          ".......a...",
+          ".......a..."
+         ],
+         "key": {
+          "a": "rock",
+          "b": "rock.light",
+          "c": "dim",
+          "d": "rock.dark"
+         }
+        },
+        {
+         "kind": "stamp",
+         "at": [
+          17,
+          22
+         ],
+         "rows": [
+          "a",
+          "b"
+         ],
+         "key": {
+          "a": "wet",
+          "b": "shine"
+         },
+         "glow": true,
+         "when": {
+          "damp": [
+           true
+          ]
+         }
+        }
+       ]
+      },
+      {
+       "name": "b",
+       "place": "above",
+       "label": "Stalagmites",
+       "outline": true,
+       "draw": [
+        {
+         "kind": "stamp",
+         "at": [
+          10,
+          15
+         ],
+         "rows": [
+          "....a.......",
+          "....a.......",
+          "....ab......",
+          "....ab......",
+          "...aab......",
+          "...aab......",
+          "...caab.....",
+          "...caab.....",
+          "..cadab.....",
+          "..cdaaab....",
+          "..cdaaab....",
+          ".cadaabb..a.",
+          ".cadaabb..a.",
+          ".cadaaabbab.",
+          "caaaaaabbaab",
+          "caaaaaabbaab",
+          "caaaaaabbaab"
+         ],
+         "key": {
+          "a": "rock",
+          "b": "rock.light",
+          "c": "dim",
+          "d": "rock.dark"
+         }
+        },
+        {
+         "kind": "stamp",
+         "at": [
+          14,
+          16
+         ],
+         "rows": [
+          "a"
+         ],
+         "key": {
+          "a": "wet"
+         },
+         "when": {
+          "damp": [
+           true
+          ]
+         }
+        }
+       ]
+      },
+      {
+       "name": "c",
+       "place": "above",
+       "label": "Glowing crystals",
+       "outline": true,
+       "draw": [
+        {
+         "kind": "stamp",
+         "at": [
+          10,
+          11
+         ],
+         "rows": [
+          ".....a......",
+          ".....b......",
+          "....abb.....",
+          "....abb.....",
+          "....cbd.....",
+          "...acbdb....",
+          "...acbcb....",
+          "...acbcb....",
+          "...acbcb....",
+          "...acbcb..a.",
+          ".a.acbcb..d.",
+          ".d.acbcb.abb",
+          "abbacbcb.ccb",
+          "acbacbcbaccb",
+          "acbacbcbaccb",
+          "acbacbcbaccb",
+          "acbacccbaccb",
+          "acbacccbaccb",
+          "efffeeeffffe",
+          "eeeeeeeeeeee",
+          "eeeeeeeeeeee"
+         ],
+         "key": {
+          "a": "crystal.dark",
+          "b": "crystal.light",
+          "c": "crystal",
+          "d": "shine",
+          "e": "rock",
+          "f": "rock.light"
+         }
+        },
+        {
+         "kind": "stamp",
+         "at": [
+          8,
+          7
+         ],
+         "rows": [
+          "........a...............",
+          ".......aba..............",
+          "........a...............",
+          "........................",
+          "........................",
+          "........................",
+          "........................",
+          "........................",
+          "........................",
+          "...............a........",
+          "........................",
+          "a......................."
+         ],
+         "key": {
+          "a": "crystal.light",
+          "b": "shine"
+         },
+         "glow": true
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "dark",
+     "kind": "floor",
+     "fills": 3,
+     "label": "Back wall",
+     "material": {
+      "ink": "none",
+      "fill": {
+       "base": "shade",
+       "versions": [
+        [
+         {
+          "kind": "line",
+          "from": [
+           7,
+           11
+          ],
+          "to": [
+           10,
+           8
+          ],
+          "paint": "shade.dark"
+         },
+         {
+          "kind": "line",
+          "from": [
+           10,
+           8
+          ],
+          "to": [
+           12,
+           9
+          ],
+          "paint": "shade.dark"
+         },
+         {
+          "kind": "line",
+          "from": [
+           20,
+           21
+          ],
+          "to": [
+           23,
+           24
+          ],
+          "paint": "shade.dark"
+         },
+         {
+          "kind": "line",
+          "from": [
+           13,
+           21
+          ],
+          "to": [
+           14,
+           21
+          ],
+          "paint": "shade.dark"
+         }
+        ],
+        [
+         {
+          "kind": "line",
+          "from": [
+           19,
+           6
+          ],
+          "to": [
+           22,
+           9
+          ],
+          "paint": "shade.dark"
+         },
+         {
+          "kind": "line",
+          "from": [
+           6,
+           22
+          ],
+          "to": [
+           9,
+           19
+          ],
+          "paint": "shade.dark"
+         },
+         {
+          "kind": "line",
+          "from": [
+           9,
+           19
+          ],
+          "to": [
+           11,
+           20
+          ],
+          "paint": "shade.dark"
+         },
+         {
+          "kind": "line",
+          "from": [
+           25,
+           18
+          ],
+          "to": [
+           26,
+           18
+          ],
+          "paint": "shade.dark"
+         }
+        ],
+        [
+         {
+          "kind": "line",
+          "from": [
+           11,
+           17
+          ],
+          "to": [
+           15,
+           14
+          ],
+          "paint": "shade.dark"
+         },
+         {
+          "kind": "line",
+          "from": [
+           22,
+           24
+          ],
+          "to": [
+           24,
+           26
+          ],
+          "paint": "shade.dark"
+         },
+         {
+          "kind": "line",
+          "from": [
+           24,
+           26
+          ],
+          "to": [
+           27,
+           25
+          ],
+          "paint": "shade.dark"
+         },
+         {
+          "kind": "line",
+          "from": [
+           5,
+           6
+          ],
+          "to": [
+           6,
+           6
+          ],
+          "paint": "shade.dark"
+         }
+        ]
+       ]
+      }
+     }
+    }
+   ]
+  }
+ },
+ "clips": {
+  "rock-thin-l": {
+   "label": "Rock ledge: left end"
+  },
+  "rock-thin-m": {
+   "label": "Rock ledge: middle"
+  },
+  "rock-thin-r": {
+   "label": "Rock ledge: right end"
+  },
+  "dark-fill": {
+   "label": "Back wall"
+  },
+  "dark-fill-b": {
+   "label": "Back wall, version B"
+  },
+  "dark-fill-c": {
+   "label": "Back wall, version C"
+  }
+ },
+ "made": {
+  "in": "library",
+  "from": "code:tiles-cave",
+  "by": "B15 redraw (test fixture)"
+ }
+}

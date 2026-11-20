@@ -5,10 +5,7 @@
 // what an asset is (its type, its view, what its JSON carries).
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import fs from 'node:fs';
-import path from 'node:path';
-import { pathToFileURL } from 'node:url';
-import { ROOT } from '../../tools/lib/assets.mjs';
+import { librarySprites, libraryCoverage } from '../helpers/library.mjs';
 import { defineSprite, renderSheet, defaultParams, range } from '../../engine/sprite.js';
 import { describeSheet, sheetKind, sheetFacing, clipDirection, layerScroll, stateRows, SHEET_KINDS, COUNTING } from '../../engine/sheet-info.js';
 import { SCROLL } from '../../engine/backdrop.js';
@@ -16,13 +13,8 @@ import { spriteGuide, packageGuide, licenceText, licenceWords, whatItIs, soundWh
 import { rowFromSprite } from '../../app/play/roles.js';
 import { guideFaults, packageFaults, rowLine, sectionOf, needsSaid, cellsSaid } from '../helpers/download-check.mjs';
 
-const sprites = [];
-for (const f of fs.readdirSync(path.join(ROOT, 'sprites')).filter((x) => x.endsWith('.js') && !x.startsWith('_')).sort()) {
-  try {
-    const def = (await import(pathToFileURL(path.join(ROOT, 'sprites', f)).href)).default;
-    if (def && typeof def.render === 'function') sprites.push(def);
-  } catch { /* a file another builder has half-written: not counted */ }
-}
+// every sprite in sprites/, a code file or a data file (tests/helpers/library.mjs); one another builder has half-written is not counted
+const sprites = (await librarySprites()).sprites.map((s) => s.def).filter((def) => def && typeof def.render === 'function');
 
 /** A catalogue-shaped row of a sprite, with the licence value it records. */
 const rowOf = (def) => ({ ...rowFromSprite(def), license: def.meta?.license });
@@ -434,3 +426,5 @@ test('a package: read-me.txt opens with the contents list, licence.txt lists wha
   assert.match(partial, new RegExp(`Made on your visit: ${assets[0].name}\\.`));
   assert.match(partial, /with the bag's look applied to all of them/);
 });
+
+test('the scan covers every sprite file, code and data alike, and names any that did not load', async (t) => t.diagnostic(await libraryCoverage()));

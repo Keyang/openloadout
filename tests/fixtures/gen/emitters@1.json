@@ -1,0 +1,28 @@
+{
+ "id": "emitters",
+ "v": 1,
+ "family": "layout",
+ "fixtures": [
+  "hit-spark.json",
+  "emitters/blaster-bolt.json",
+  "emitters/plasma-burst.json",
+  "emitters/hit-spark.json"
+ ],
+ "frames": {
+  "hit-spark.json hit 0": "8970d7c1",
+  "hit-spark.json hit 2": "8ca4965b",
+  "hit-spark.json hit 4": "42478f26",
+  "emitters/blaster-bolt.json fly 0": "42467dee",
+  "emitters/blaster-bolt.json fly 2": "8ecab2ca",
+  "emitters/blaster-bolt.json fly 3": "52605b52",
+  "emitters/blaster-bolt.json hit 0": "7c74fe18",
+  "emitters/blaster-bolt.json hit 2": "0d0c46f1",
+  "emitters/blaster-bolt.json hit 4": "9c81e714",
+  "emitters/plasma-burst.json burst 0": "98b385b6",
+  "emitters/plasma-burst.json burst 4": "f0c03d6a",
+  "emitters/plasma-burst.json burst 7": "54b22652",
+  "emitters/hit-spark.json burst 0": "44fccabf",
+  "emitters/hit-spark.json burst 2": "98ae69c4",
+  "emitters/hit-spark.json burst 4": "f2891037"
+ }
+}

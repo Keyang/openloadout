@@ -1,6 +1,7 @@
 // Sprite page: preview, animation buttons, the editing panel's sliders, Surprise me / Start over, link, sounds, download, phone width.
 import { test, expect, openRoute, canvasStats, canvasGroupStats, setRange, downloadFrom, readZip, hasHorizontalScroll, waitForDrawn, openTab, downloadButton } from '../helpers/test.mjs';
 import { readCatalogue, catalogueOf } from '../helpers/catalog.mjs';
+import { librarySprite } from '../helpers/library.mjs';
 
 // The sprites come from the catalogue (generated/catalog.json): there is no other list.
 const C = catalogueOf(readCatalogue());
@@ -13,7 +14,7 @@ const SPRITES = FIRST.length ? FIRST : C.sprites.filter((a) => ['character', 'cr
 const ONE_OF_EACH = [...new Set(C.sprites.map((a) => a.type))].map((type) => C.sprites.find((a) => a.type === type).id);
 const EVERY_KIND = [...new Set([...SPRITES, ...ONE_OF_EACH])];
 /** A sprite's own program, loaded from its file. */
-const spriteProgram = async (id) => { const A = await import('../../tools/lib/assets.mjs'), f = A.findSpriteFile(A.ROOT, id); return f?.endsWith('.json') ? A.loadDataSprite(A.ROOT, f) : (await import(`../../sprites/${id}.js`)).default; };   // a data sprite (sprites/<id>.json, P1) or a code file
+const spriteProgram = (id) => librarySprite(id);   // a data sprite (sprites/<id>.json) or a code file (tests/helpers/library.mjs)
 
 const stage = (page) => page.locator('canvas.stage');
 const strip = (page) => page.locator('.strip .cell canvas');

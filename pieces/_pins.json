@@ -1,6 +1,17 @@
 {
   "about": "Released piece versions and the hash of their content. Added by node tools/lib/pieces-index.mjs --pin; never edit or remove a line: a changed look is a new version.",
   "pins": {
+    "base:person-topdown-walker@1": "14710a8a558e1389",
+    "base:person-topdown@1": "b291674a0dde4aa8",
+    "held:topdown-cane@1": "54e3dd4fd815fb45",
+    "held:topdown-lantern@1": "94360ffea77bbc65",
+    "part:topdown-beard@1": "2a3e18e110df901c",
+    "part:topdown-belt@1": "254f5af01e13872e",
+    "part:topdown-cap-peaked@1": "d04496fe851f3cc5",
+    "part:topdown-circlet@1": "9504ecf08db4bc35",
+    "part:topdown-hair-ring@1": "887ee4d6bf0d2a8f",
+    "part:topdown-hunch@1": "6cbe26b672cf2d29",
+    "part:topdown-robe@1": "4a1d60160a5be35d",
     "skin:flat@1": "570bd7b8f1133860",
     "skin:plain@1": "e2c41af5bea880b3",
     "skin:wood@1": "5722fd91dd449b34"

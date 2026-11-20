@@ -9,6 +9,7 @@ import { validateStudio } from '../../catalog/studio-schema.js';
 import { studioTemplate, STUDIO_TEMPLATE_IDS } from '../../rigs/studio-templates.js';
 import { readDataFile } from '../../catalog/data-file.js';
 import { stubRegistry } from '../fixtures/v2/registry.mjs';
+import { codeSpriteSource } from '../helpers/library.mjs';
 
 const read = (p) => JSON.parse(fs.readFileSync(new URL(`../fixtures/${p}`, import.meta.url), 'utf8'));
 const V1 = {
@@ -20,8 +21,10 @@ const V1 = {
   'data-sprite/beetle-topdown': read('data-sprite/beetle-topdown.json'),
   ...Object.fromEntries(STUDIO_TEMPLATE_IDS.map((id) => [`template/${id}`, studioTemplate(id)])),
 };
+// the two converted library files (version 1), from their frozen copies (tests/helpers/library.mjs): the migration redraws
+// the library's as version 2 data files (docs/data-sprites.md section 7), and this test is about version 1
 for (const id of ['rogue-battler', 'road-bandit']) {
-  const text = fs.readFileSync(new URL(`../../sprites/${id}.js`, import.meta.url), 'utf8');
+  const text = codeSpriteSource(id);
   V1[`library/${id}`] = readDataFile(text).value;
 }
 const opts = { generators: stubRegistry() };

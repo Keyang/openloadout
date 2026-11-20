@@ -22,6 +22,7 @@ import { TECH_STYLES, cutPx, cutRectIn, techPanel, scanLines, techBarHousing, te
 import { spunIn, allIn, notIn, reachOf, ringIn, hexIn } from '../../engine/shapes.js';
 import { MARKS, LABEL_MARKS, SIGN_MARKS, markIn, drawMark } from '../../engine/marks.js';
 
+import { codeSprite, codeSpriteSource } from '../helpers/library.mjs';   // the code, frozen first (tests/helpers/library.mjs): a test about the framework it uses
 const P = PALETTE.derelict;
 const lit = (g) => g.data.reduce((n, v) => n + (v ? 1 : 0), 0);
 const count = (g, hex) => { const c = col(hex); return g.data.reduce((n, v) => n + (v === c ? 1 : 0), 0); };
@@ -316,8 +317,8 @@ test('S20 techPanel: corner lights in the glow colour stay out of the flat middl
 
 const { renderFrame, renderSheet, defaultParams, cleanParams } = await import('../../engine/sprite.js');
 const { validateMeta } = await import('../../catalog/schema.js');
-const hudS = (await import('../../sprites/ui-hud-roguelite.js')).default, barsS = (await import('../../sprites/ui-bars-tech.js')).default;
-const cardS = (await import('../../sprites/ui-upgrade-card.js')).default, crossS = (await import('../../sprites/ui-crosshair.js')).default;
+const hudS = (await codeSprite('ui-hud-roguelite')), barsS = (await codeSprite('ui-bars-tech'));
+const cardS = (await codeSprite('ui-upgrade-card')), crossS = (await codeSprite('ui-crosshair'));
 const drawS = (s, clip, over = {}, f = 0) => renderFrame(s, clip, f, cleanParams(s, { ...defaultParams(s), ...over }));
 const clipList = (s) => Object.entries(s.clips).map(([n, c]) => `${n} ${c.frames}${c.frames > 1 ? (c.loop ? ' loop' : ' once') : ''}`);
 const LOOKS = [['as made', null], ...THEME_PRESETS.map((t) => [t.name, normalizeTheme(t.theme).colour])];
@@ -520,7 +521,7 @@ const apart = (A, B, w) => { let m = 99; for (const a of A) for (const b of B) m
 
 test('S20 HUD, fix round 1: pips are built with the shared combinators, the unknown room shows the framework question mark, the credit has one closed ring', async () => {
   const { readFileSync } = await import('node:fs');
-  const src = readFileSync(new URL('../../sprites/ui-hud-roguelite.js', import.meta.url), 'utf8');
+  const src = codeSpriteSource('ui-hud-roguelite');
   assert.ok(!/glyphGrid|QUERY|\.forEach\(\(row/.test(src) && !/'[.#]{3,}'/.test(src), 'no bitmap and no grid loop in the sprite');
   assert.ok(!/=>\s*\(px, py\)\s*=>\s*a\(px, py\)\s*&&/.test(src) && /allIn\(/.test(src) && /notIn\(/.test(src), 'no shape combinators of its own');
   // the question mark: every pixel of the 7 px mark, in the light tone of the Empty colour, and nothing else in that tone

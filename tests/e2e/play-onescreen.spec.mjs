@@ -146,7 +146,8 @@ test('a row picked in the list shows its animations as chips; a chip plays that 
   await list(page).getByRole('button', { name: 'Slime', exact: true }).click();
   expect((await state(page)).chosen).toBe(slime);
   await expect(chips).toContainText('Slime');
-  const names = await page.evaluate(async () => Object.keys((await import('/sprites/slime.js')).default.clips));
+  // the slime as the site loads it, a code file or a data file (app/catalog.js)
+  const names = await page.evaluate(async () => { const C = await import('/app/catalog.js'); await C.loadCatalog(); return Object.keys((await C.loadSprite('slime')).clips); });
   await expect(chips.locator('button[data-clip]')).toHaveCount(names.length);
   // pick one that is not what it does by itself, and it plays that, and keeps playing it
   const pick = names.find((n) => /hurt|die|attack|jump/.test(n)) ?? names.at(-1);

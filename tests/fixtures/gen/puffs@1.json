@@ -1,0 +1,159 @@
+{
+ "id": "puffs",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     23.5,
+     24.5
+    ],
+    "count": 5,
+    "seed": 3,
+    "stagger": 0.3,
+    "angle": 180,
+    "arc": 360,
+    "dist": 9,
+    "rise": 3,
+    "size": 3.1,
+    "lobes": 2,
+    "paints": [
+     "s0",
+     "s1",
+     "s2"
+    ]
+   },
+   "ctx": {
+    "t": 0.4,
+    "loop": false
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      18,
+      16
+     ],
+     "anchor": "tl",
+     "rows": [
+      "....aaa......",
+      "...abbba.....",
+      "..abbbbba....",
+      ".acbbbbba....",
+      ".acbbbbba....",
+      ".abbbbbbba...",
+      "acbbbbbbba...",
+      "acbbbbbbbba..",
+      "acbbbbbbbbba.",
+      "accbbbbbbbbba",
+      ".acccccccbbba",
+      "..acbbbbbbbba",
+      "..acbbbbbbba.",
+      "..acccccccba.",
+      "...aaccacca.."
+     ],
+     "key": {
+      "a": "s2",
+      "b": "s0",
+      "c": "s1"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     20
+    ],
+    "count": 4,
+    "seed": 1,
+    "loop": true,
+    "dist": 6,
+    "rise": 5,
+    "size": 3,
+    "shape": "chunky",
+    "paints": [
+     "s0",
+     "s1",
+     "s2"
+    ]
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": true
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      16,
+      15
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..aaaa..",
+      ".abccca.",
+      ".abcccca",
+      "acccccca",
+      "accccbca",
+      "accccbba",
+      "accccaa.",
+      ".aaaa..."
+     ],
+     "key": {
+      "a": "s2",
+      "b": "s1",
+      "c": "s0"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     24
+    ],
+    "count": 3,
+    "seed": 6,
+    "dist": 8,
+    "size": 2.5,
+    "shape": "wispy",
+    "floor": 27,
+    "lobes": 3,
+    "paints": [
+     "s0",
+     "s1",
+     "s2"
+    ]
+   },
+   "ctx": {
+    "t": 0.7,
+    "loop": false
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      16,
+      21
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".....aaaa...",
+      "..aaabbbbaa.",
+      ".abbbbbbbbba",
+      "abbbbbbbbba.",
+      ".aabbbabba..",
+      "...aaa.aa..."
+     ],
+     "key": {
+      "a": "s2",
+      "b": "s0"
+     }
+    }
+   ]
+  }
+ ]
+}

@@ -23,8 +23,9 @@ import { THEME_PRESETS, PALETTES, applyColour } from '../../engine/theme.js';
 import { checkSprite, seamCheck } from '../../quality/sprite.js';
 import { validateMeta } from '../../catalog/schema.js';
 import { BATTLE, standApart, standOutLighter, roundTree, farHouse, railFence, tufts, groundMarks, arcade, pillar, wallTorch, wallRing, lightPatch, pavedFloor, moon, cloudBank } from '../../engine/scenery.js';
-import field from '../../sprites/bg-battle-field.js';
-import dungeon from '../../sprites/bg-battle-dungeon.js';
+import { codeSprite } from '../helpers/library.mjs';   // the code, frozen first (tests/helpers/library.mjs): a test about the framework it uses
+const field = await codeSprite('bg-battle-field');
+const dungeon = await codeSprite('bg-battle-dungeon');
 
 const [W, H] = LAYER;
 const HV = PALETTE.hearthvale;

@@ -10,6 +10,7 @@ import { Surface } from '../../engine/surface.js';
 import { col, INK } from '../../engine/color.js';
 import { renderFrame, defaultParams, cleanParams } from '../../engine/sprite.js';
 import { HAIR_STYLES } from '../../rigs/topdown.js';
+import { librarySprite } from '../helpers/library.mjs';
 import {
   PORTRAIT_SIZE, PORTRAIT_PIVOT, PORTRAIT_FRAMES, TALK_FRAMES, TALK_FPS, FACE_MOODS, FACE_AGES, FACE_HAIR, FACE_HEADGEAR, FACE_BEARDS, FACE_COLLARS, FACE_CARRIED,
   faceClips, parseFaceClip, talkStep, faceBust, portraitFrame, portrait,
@@ -147,8 +148,9 @@ test('faceBust draws on the surface it is given, without a frame, and leaves wha
 
 // ---- the two portrait sets -----------------------------------------------------------------------
 
-const party = (await import('../../sprites/portraits-party.js')).default;
-const village = (await import('../../sprites/portraits-village.js')).default;
+// the library's two sets and map sprites, a code file or a data file (tests/helpers/library.mjs): these tests are about the assets
+const party = await librarySprite('portraits-party');
+const village = await librarySprite('portraits-village');
 const face = (sprite, clip, set = {}, frame = 0) => renderFrame(sprite, clip, frame, cleanParams(sprite, { ...defaultParams(sprite), ...set }));
 
 test('the two sets have the clips, the controls and the role of their specification', () => {
@@ -182,7 +184,7 @@ test('each portrait wears the default colours of that person\'s map sprite', asy
     [village, 'kid', 'farm-kid', ['skin', 'hair', 'outfit', 'accent']],
   ];
   for (const [set, who, id, keys] of same) {
-    const sprite = (await import(`../../sprites/${id}.js`)).default, g = face(set, `${who}-neutral`);
+    const sprite = await librarySprite(id), g = face(set, `${who}-neutral`);
     for (const key of keys) assert.ok(count(g, sprite.params[key].def) >= 6, `${who}: the ${key} colour of ${id} (${sprite.params[key].def}) shows in the portrait`);
   }
 });

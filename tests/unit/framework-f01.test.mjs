@@ -9,6 +9,7 @@ import { col, ramp, tone } from '../../engine/color.js';
 import * as T from '../../rigs/topdown.js';
 import * as S from '../../rigs/topdown-sneak.js';
 
+import { codeSprite, codeSpriteSource } from '../helpers/library.mjs';   // the code, frozen first (tests/helpers/library.mjs): a test about the framework it uses
 const LOOK = { skin: '#f6d3b0', top: '#3f6fd1', bottom: '#2c4a8a', boots: '#9a6a3e', hair: '#5a3a22', hairStyle: 'short' };
 const [W, H] = T.SIZE;
 const CLOTH = '#c9423a';                                  // a colour nothing else on the test body uses
@@ -279,14 +280,14 @@ test('blade: no weapon draws nothing in either hand', () => {
 // ---- the sprite that uses them --------------------------------------------------------------------------
 
 test('rogue-walker holds no drawing or pose arithmetic of its own (Contract 13)', () => {
-  const src = fs.readFileSync(new URL('../../sprites/rogue-walker.js', import.meta.url), 'utf8').split('\n').filter((l) => !l.trim().startsWith('//')).join('\n');
+  const src = codeSpriteSource('rogue-walker').split('\n').filter((l) => !l.trim().startsWith('//')).join('\n');
   for (const word of ['Math.', 'lerp', 'clamp', 'TAU', 'g.rect', 'g.fill', 'g.dot', 'g.line', 'g.capsule', 'g.ellipse', 'g.poly', 'g.blob']) assert.ok(!src.includes(word), `sprites/rogue-walker.js still has ${word}`);
   assert.ok(src.includes('S.scarfTail') && src.includes('S.headCloth') && src.includes('S.blade') && src.includes('S.headRise'), 'it asks the rig for its scarf, headgear, blades and rise by name');
 });
 
 test('rogue-walker draws through the rig: its default frame is the rig\'s parts and nothing else', async () => {
   const { renderFrame, defaultParams } = await import('../../engine/sprite.js');
-  const sprite = (await import('../../sprites/rogue-walker.js')).default, p = defaultParams(sprite);
+  const sprite = (await codeSprite('rogue-walker')), p = defaultParams(sprite);
   for (const clip of ['idle_down', 'walk_up', 'run_side']) for (const frame of [0, 3]) {
     const got = renderFrame(sprite, clip, frame, p), t = frame / 8, HV = { steel: '#c2c9d6', gold: '#f2c230' };
     const F = T.frameWith(clip, t, p, { item: S.bladeSize(p.weapon, p.weaponLength), carry: 'low', rise: S.headRise({ headgear: p.headgear, size: p.headgearSize, hairStyle: p.hairStyle }), manner: T.dashManner });

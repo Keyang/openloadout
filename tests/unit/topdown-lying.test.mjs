@@ -3,12 +3,16 @@
 // goes down with the body in one path, without jumping from one side to the other.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import fs from 'node:fs';
 import { Surface } from '../../engine/surface.js';
 import { INK } from '../../engine/color.js';
 import { defaultParams, renderFrame } from '../../engine/sprite.js';
 import { themedParams, defaultTheme } from '../../engine/theme.js';
 import * as T from '../../rigs/topdown.js';
+import { codeSprite, codeSpritesWhere } from '../helpers/library.mjs';
+
+// The sprites built on the rig: code that imports rigs/topdown*.js, the frozen copies first (tests/helpers/library.mjs),
+// so the rig keeps its test sprites when the library's are redrawn as data (docs/data-sprites.md section 7).
+const onTheRig = () => codeSpritesWhere(/rigs\/topdown(-[\w-]+)?\.js/).map((s) => s.id);
 
 const [W, H] = T.SIZE;
 const LOOK = { skin: '#f6d3b0', top: '#3f6fd1', bottom: '#2c4a8a', boots: '#9a6a3e', hair: '#5a3a22', hairStyle: 'short' };
@@ -66,11 +70,10 @@ test('topdown rig: in die the held thing goes down with the body in one path: no
 });
 
 test('every sprite on the top-down rig: die stays inside the frame for 50 whole-bundle "shapes" looks', async () => {
-  const dir = new URL('../../sprites/', import.meta.url);
-  const onRig = fs.readdirSync(dir).filter((f) => f.endsWith('.js') && /rigs\/topdown(-[\w-]+)?\.js/.test(fs.readFileSync(new URL(f, dir), 'utf8')));
-  assert.ok(onRig.includes('hero-walker.js'));
-  for (const file of onRig) {
-    const s = (await import(new URL(file, dir).href)).default;
+  const onRig = onTheRig();
+  assert.ok(onRig.includes('hero-walker'));
+  for (const id of onRig) {
+    const s = await codeSprite(id);
     if (!s.clips.die) continue;
     for (let seed = 0; seed < 50; seed++) {
       const p = themedParams(s, defaultParams(s), { ...defaultTheme(), seed, shapes: true });
@@ -84,12 +87,11 @@ test('every sprite on the top-down rig: die stays inside the frame for 50 whole-
 
 test('every sprite on the top-down rig, 50 "shapes" looks: exported sockets do not depend on drawing first, and in die the hand socket is on the held thing', async () => {
   const { frameSockets, partList, partRemoved } = await import('../../engine/sprite.js');
-  const dir = new URL('../../sprites/', import.meta.url);
-  const onRig = fs.readdirSync(dir).filter((f) => f.endsWith('.js') && /rigs\/topdown(-[\w-]+)?\.js/.test(fs.readFileSync(new URL(f, dir), 'utf8')));
+  const onRig = onTheRig();
   assert.ok(onRig.length >= 9, `${onRig.length} sprites on the rig`);
   let held = 0;
-  for (const file of onRig) {
-    const s = (await import(new URL(file, dir).href)).default;
+  for (const id of onRig) {
+    const s = await codeSprite(id);
     const hand = partList(s).find((part) => part.socket === 'hand');
     for (let seed = 0; seed < 50; seed++) {
       const p = themedParams(s, defaultParams(s), { ...defaultTheme(), seed, shapes: true });

@@ -18,6 +18,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { RIG_IDS, ROOT, loadRig, resolve, mentioned, entriesOf, namesIn } from '../../tools/rig.mjs';
+import { codeSpriteSource } from '../helpers/library.mjs';
 
 const isList = (v) => (Array.isArray(v) ? v.length > 0 && v.every((x) => typeof x === 'string')
   : v !== null && typeof v === 'object' && Object.keys(v).length > 0 && Object.values(v).every((x) => typeof x === 'function' || (x !== null && typeof x === 'object' && !Array.isArray(x))));
@@ -161,12 +162,15 @@ for (const id of RIG_IDS) {
     for (const dup of rig.duplicates) {
       assert.ok(dup.what && dup.merge && dup.calls.length >= 2, `${id}: duplicate "${dup.what}" names what overlaps, at least two calls, and what to merge into`);
       for (const c of dup.calls) {
-        if (c.includes('#')) { const [file, name] = c.split('#'); assert.match(fs.readFileSync(path.join(ROOT, file), 'utf8'), new RegExp(`\\b${name}\\b`), `${c} is not there any more`); }
+        // a sprite's code is read from its frozen copy first (tests/helpers/library.mjs), as inSprites below
+        if (c.includes('#')) { const [file, name] = c.split('#'), sprite = /^sprites\/([a-z0-9-]+)\.js$/.exec(file); assert.match((sprite && codeSpriteSource(sprite[1])) ?? fs.readFileSync(path.join(ROOT, file), 'utf8'), new RegExp(`\\b${name}\\b`), `${c} is not there any more`); }
         else assert.notEqual(resolve(L, c), undefined, `${id}: duplicate "${dup.what}" names ${c}, which is not exported`);
       }
     }
     for (const s of rig.inSprites) {
-      const text = fs.readFileSync(path.join(ROOT, 'sprites', `${s.sprite}.js`), 'utf8');
+      // the sprite's code, frozen first (tests/helpers/library.mjs): the migration redraws the library's as data files
+      const text = codeSpriteSource(s.sprite);
+      assert.ok(text !== null, `sprites/${s.sprite}.js is gone and has no frozen copy in tests/fixtures/code-sprites/: freeze it, or take it out of inSprites in rigs/${id}-describe.js`);
       for (const name of s.functions) assert.match(text, new RegExp(`\\b${name}\\b`), `sprites/${s.sprite}.js no longer has ${name}: update inSprites in rigs/${id}-describe.js`);
       assert.ok(s.draws && s.belongs, `${s.sprite}: says what it draws and where that belongs`);
     }

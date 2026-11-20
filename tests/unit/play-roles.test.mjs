@@ -6,6 +6,7 @@ import { roleOf, rowFromSprite, rowFromPatch, planScene, fitsMode } from '../../
 import { validateMeta } from '../../catalog/schema.js';
 import { renderFrame, defaultParams } from '../../engine/sprite.js';
 import { all as fixtures, walker, tilesSide, tilesTop, backdrop } from '../fixtures/play/index.js';
+import { librarySprite, hasLibrarySprite } from '../helpers/library.mjs';
 
 const sprite = (id, type, role, view = 'side') => ({ id, kind: 'sprite', name: id, type, role, view });
 const sound = (id, role = 'actions/hit', type = 'sfx') => ({ id, kind: 'sound', name: id, type, role, view: null });
@@ -13,7 +14,7 @@ const entry = (row, soundIds = []) => ({ key: 'k-' + row.id, row, soundIds });
 // every kit on disk (bundles/kit-*.json): the tests below are about whatever kits there are, not about named ones
 const bundleDir = new URL('../../bundles/', import.meta.url);
 const kits = fs.readdirSync(bundleDir).filter((f) => /^kit-.*\.json$/.test(f)).map((f) => JSON.parse(fs.readFileSync(new URL(f, bundleDir), 'utf8')))
-  .filter((kit) => kit.sprites.every((id) => fs.existsSync(new URL(`../../sprites/${id}.js`, import.meta.url))));
+  .filter((kit) => kit.sprites.every(hasLibrarySprite));      // a code file or a data file (tests/helpers/library.mjs)
 
 test('a role comes from type, role and kind', () => {
   assert.equal(roleOf(sprite('a', 'character', 'characters/player')), 'player');
@@ -289,7 +290,7 @@ test('the switch is offered only when the bag has things for both views, and eac
 test('every kit, added whole: its ground decides the view, and no thing is in the wrong scene', { skip: !kits.length && 'no kit bundle is there yet' }, async () => {
   for (const kit of kits) {
     const entries = [];
-    for (const id of kit.sprites) entries.push(entry(rowFromSprite((await import(`../../sprites/${id}.js`)).default)));
+    for (const id of kit.sprites) entries.push(entry(rowFromSprite(await librarySprite(id))));
     const viewOf = Object.fromEntries(entries.map((e) => [e.key, e.row.view]));
     const tileViews = new Set(entries.filter((e) => roleOf(e.row) === 'tiles').map((e) => e.row.view).filter((v) => v === 'side' || v === 'top-down'));
     const plan = planScene(entries);

@@ -10,6 +10,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { codeSpriteAsFile } from './library.mjs';
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 /** The framework folders a scratch project copies: what a data sprite is loaded, drawn and checked with. */
@@ -81,7 +82,7 @@ export const asFile = (def) => `${JSON.stringify(def, null, 2)}\n`;
 /**
  * A scratch project: copies of the framework folders, sprites/ sounds/ bundles/ pieces/ (empty unless given), and:
  *   data     { '<id>': definition | text } written as sprites/<id>.json
- *   code     ids of the real project's code sprites to copy (sprites/<id>.js)
+ *   code     ids of code sprites to copy as sprites/<id>.js: the frozen copy (tests/fixtures/code-sprites/) first, else the real project's file
  *   sounds   ids of the real project's sounds to copy, or { '<id>': patch }
  *   pieces   true: the two test pieces of tests/fixtures/pieces/pieces (with their pins)
  *   files    { '<relative path>': text } anything else
@@ -92,12 +93,8 @@ export function dataProject({ data = {}, code = [], sounds = [], pieces = false,
   for (const d of FRAMEWORK) fs.cpSync(path.join(ROOT, d), path.join(root, d), { recursive: true });
   for (const d of ['sprites', 'sounds', 'bundles', 'pieces']) fs.mkdirSync(path.join(root, d), { recursive: true });
   for (const [id, def] of Object.entries(data)) fs.writeFileSync(path.join(root, 'sprites', `${id}.json`), typeof def === 'string' ? def : asFile(def));
-  for (const id of code) {
-    // a code sprite since redrawn as data (P1: coin, crate, icons-food) comes from its frozen copy, imports put back
-    const frozen = path.join(ROOT, 'tests', 'fixtures', 'code-sprites', `${id}.js`);
-    if (!fs.existsSync(path.join(ROOT, 'sprites', `${id}.js`)) && fs.existsSync(frozen)) fs.writeFileSync(path.join(root, 'sprites', `${id}.js`), fs.readFileSync(frozen, 'utf8').replaceAll("from '../../../engine/", "from '../engine/"));
-    else fs.copyFileSync(path.join(ROOT, 'sprites', `${id}.js`), path.join(root, 'sprites', `${id}.js`));
-  }
+  // a code sprite, frozen copy first as codeSprite reads it (tests/helpers/library.mjs), imports put back for sprites/
+  for (const id of code) fs.writeFileSync(path.join(root, 'sprites', `${id}.js`), codeSpriteAsFile(id));
   if (Array.isArray(sounds)) for (const id of sounds) fs.copyFileSync(path.join(ROOT, 'sounds', `${id}.json`), path.join(root, 'sounds', `${id}.json`));
   else for (const [id, patch] of Object.entries(sounds)) fs.writeFileSync(path.join(root, 'sounds', `${id}.json`), JSON.stringify(patch));
   if (pieces) for (const f of fs.readdirSync(path.join(ROOT, 'tests', 'fixtures', 'pieces', 'pieces'))) fs.copyFileSync(path.join(ROOT, 'tests', 'fixtures', 'pieces', 'pieces', f), path.join(root, 'pieces', f));

@@ -10,8 +10,9 @@ import { col, INK, brightness } from '../../engine/color.js';
 import { PALETTE } from '../../engine/palettes.js';
 import { validateMeta } from '../../catalog/schema.js';
 import * as T from '../../rigs/topdown.js';
-import hero from '../../sprites/hero-walker.js';
-import knight from '../../sprites/knight.js';
+import { codeSprite } from '../helpers/library.mjs';   // the code, frozen first (tests/helpers/library.mjs): a test about the framework it uses
+const hero = await codeSprite('hero-walker');
+const knight = await codeSprite('knight');
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const HV = PALETTE.hearthvale;

@@ -13,7 +13,8 @@ import { Surface } from '../../engine/surface.js';
 import { framePhase } from '../../rigs/keypose.js';
 import * as S from '../../rigs/humanoid-studio.js';
 import * as DS from '../../engine/data-sprite.js';
-import knight from '../../sprites/knight.js';
+import { codeSprite } from '../helpers/library.mjs';   // the code, frozen first (tests/helpers/library.mjs): a test about the framework it uses
+const knight = await codeSprite('knight');
 
 const heroDef = S.hero();
 const hero = DS.dataSprite(heroDef);

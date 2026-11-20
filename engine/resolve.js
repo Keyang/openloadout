@@ -38,7 +38,8 @@
 //     lost        the ids of the palette's lost slots (engine/data-sprite.js makes a frame painting one an error),
 //     materials   { rest, slots: { slot: material } } (Contract 7 read from the data; materialTable gives theme.js's form),
 //     scales      { bones: { id: factor }, shapes: { id: factor } },
-//     body        { kind, <kind>: the body resolved } (kind: rig, tiles, layers, panel, emitters, pictures), base (the
+//     body        { kind, <kind>: the body resolved } (kind: rig, tiles, layers, panel, emitters, pictures; an emitters
+//                 body also carries its `nodes` and `draw` beside them, resolved alike), base (the
 //                 base piece "id@v" a rig extends, or null), pieces (every piece drawn, "id@v", sorted),
 //     clips       { name: { label, frames, fps, fpsBase, loop, keys, frameEdits, sounds, from? } },
 //     points, slice, textArea }
@@ -57,8 +58,9 @@ import { lerp } from './motion.js';
 import { lostPaints } from './draw-list.js';
 import { restMaterial } from './materials.js';
 import { parsePieceRef, pieceRegistry } from './pieces.js';
-import { validateSprite, plainSpriteData } from '../catalog/sprite-schema.js';
+import { validateSprite, plainSpriteData, checkMaterialPiece } from '../catalog/sprite-schema.js';   // checkMaterialPiece: build item B15 review
 import * as SITE from './gen/index.js';
+import { tileClips, tileClipNames } from './gen/tiles-clips.js';
 
 /** The caps of one resolve: setting keys read, text of a setting, notes kept, values walked, nesting, items in a list, pieces drawn, pieces inside pieces, slots pieces may add, points of a table. */
 export const RESOLVE_LIMITS = Object.freeze({ settings: 256, text: 64, notes: 64, values: 60000, depth: 24, list: 4000, uses: 256, pieceDepth: 4, slots: 64, mapPoints: 32 });
@@ -792,6 +794,7 @@ function joinWhen(a, b) {
 function pieceObject(S, env, x, depth) {
   if (++S.uses > L.uses) throw new Stop(`more than ${L.uses} pieces to draw; at most ${L.uses}`);
   const { piece, ref, kind } = getPiece(S, x.use, x.v);
+  if (kind === 'material') { const bad = checkMaterialPiece(piece).errors; if (bad.length) throw new Stop(`${ref}: ${bad.slice(0, 3).join('; ')}`); }   // build item B15 review: a shared material is held to the material rules
   const args = pieceArgs(S, piece, ref, x.args);
   const map = slotMapOf(S, env, piece, ref, x.paint);
   const body = renameBody(S, piece.body, map);
@@ -909,10 +912,10 @@ function rigOf(S, env, rig, depth) {
   return { rig: out, base: ref, baseClips: clips, baseEnv: benv };
 }
 
-/** The clip names of a body: a panel's states, a background's layers, then a base's clips, then the definition's own. */
+/** The clip names of a body: a panel's states, a background's layers, a tileset's tiles (tile.clips, engine/gen/tiles-clips.js), then a base's clips, then the definition's own. */
 function clipNames(def, kind, body, baseClips) {
   const layout = kind === 'panel' ? (Array.isArray(body?.states) ? body.states : ['normal', 'hover', 'pressed', 'disabled'])
-    : kind === 'layers' ? (Array.isArray(body) ? body.map((l) => l?.name) : []) : [];
+    : kind === 'layers' ? (Array.isArray(body) ? body.map((l) => l?.name) : []) : kind === 'tiles' ? tileClipNames(body) : [];
   return [...new Set([...layout, ...Object.keys(baseClips ?? {}), ...Object.keys(isObj(def.clips) ? def.clips : {})])].filter((n) => typeof n === 'string' && !BAD_KEYS.has(n)).slice(0, 64);
 }
 
@@ -930,7 +933,7 @@ function cuesOf(S, env, list) {
 }
 
 /** The clips at these settings: inherited from the base where they say `from` (or are the base's own), fps at the Speed setting, cues whose `when` fails left out. */
-function clipsOf(S, def, names, baseClips, baseEnv, speed) {
+function clipsOf(S, def, names, baseClips, baseEnv, speed, laid = null) {
   const out = {};
   const own = isObj(def.clips) ? def.clips : {};
   const k = speed === null ? 1 : lerp(SPEED_FPS[0], SPEED_FPS[1], speed);
@@ -938,17 +941,21 @@ function clipsOf(S, def, names, baseClips, baseEnv, speed) {
     const c = isObj(own[name]) ? own[name] : null;
     const fromName = c && typeof c.from === 'string' ? c.from : c ? null : name;
     const b = fromName && isObj(baseClips) && isObj(baseClips[fromName]) ? baseClips[fromName] : null;
-    const pickOf = (f) => (c && c[f] !== undefined ? c[f] : b && b[f] !== undefined ? b[f] : undefined);
+    // what the layout says of the clip (a tileset's tile: label, frames, fps, block kind, decal place), under the definition's own
+    const lay = isObj(laid) && Object.hasOwn(laid, name) && isObj(laid[name]) ? laid[name] : null;
+    const pickOf = (f) => (c && c[f] !== undefined ? c[f] : b && b[f] !== undefined ? b[f] : lay && lay[f] !== undefined ? lay[f] : undefined);
     const frames = Number.isInteger(pickOf('frames')) && pickOf('frames') >= 1 ? pickOf('frames') : 1;
     const fpsBase = fin(pickOf('fps')) && pickOf('fps') > 0 ? pickOf('fps') : 10;
     const r = {
-      label: typeof c?.label === 'string' ? c.label : typeof b?.label === 'string' ? b.label : cap(name),
+      label: typeof c?.label === 'string' ? c.label : typeof b?.label === 'string' ? b.label : typeof lay?.label === 'string' ? lay.label : cap(name),
       frames, fps: fpsBase * k, fpsBase, loop: typeof pickOf('loop') === 'boolean' ? pickOf('loop') : true,
       keys: clone(Array.isArray(pickOf('keys')) ? pickOf('keys') : []),
       frameEdits: { ...clone(isObj(b?.frameEdits) ? b.frameEdits : {}), ...clone(isObj(c?.frameEdits) ? c.frameEdits : {}) },
       sounds: c && c.sounds !== undefined ? cuesOf(S, S.env, c.sounds) : b ? cuesOf(S, baseEnv ?? S.env, b.sounds) : [],
     };
     if (c && typeof c.from === 'string') r.from = c.from;
+    if (lay && typeof lay.block === 'string') r.block = lay.block;
+    if (lay && typeof lay.place === 'string') r.place = lay.place;
     out[name] = r;
   }
   return out;
@@ -1021,9 +1028,11 @@ export function resolveSprite(def, settings = {}, opts = {}) {
     let body, base = null, baseClips = null, baseEnv = null;
     if (kind === 'rig') ({ rig: body, base, baseClips, baseEnv } = rigOf(S, env, d.body.rig, 1));
     else body = settle(S, env, d.body[kind], 1);
+    // an emitters body's node tree and draw list sit beside its emitters (docs/data-sprites.md 2.5c; build item B12b)
+    const beside = kind === 'emitters' ? Object.fromEntries(['nodes', 'draw'].filter((f) => d.body[f] !== undefined).map((f) => [f, settle(S, env, d.body[f], 1)]).filter(([, v]) => v !== DROP)) : null;
     if (body === DROP) body = null;
     const speed = T.get('speed')?.speed ? valueOf(T, params, 'speed') : null;
-    const clips = clipsOf(S, d, clipNames(d, kind, kind === 'panel' ? d.body.panel : kind === 'layers' ? d.body.layers : null, baseClips), baseClips, baseEnv, speed);
+    const clips = clipsOf(S, d, clipNames(d, kind, kind === 'panel' ? d.body.panel : kind === 'layers' ? d.body.layers : kind === 'tiles' ? d.body.tiles : null, baseClips), baseClips, baseEnv, speed, kind === 'tiles' ? tileClips(d.body.tiles) : null);
     const extra = (f) => (d[f] === undefined ? null : (() => { const v = settle(S, env, d[f], 1); return v === DROP ? null : v; })());
     const rest = restMaterial({ meta: d.meta, materials: d.materials });
     const materials = { rest, slots: Object.fromEntries(Object.entries(palette).map(([id, s]) => [id, s.material ?? rest])) };
@@ -1034,7 +1043,7 @@ export function resolveSprite(def, settings = {}, opts = {}) {
       rev: d.rev ?? null, made: clone(d.made) ?? null,
       params, notes, active: activeSettings(d, params), partsOff: [...off],
       palette, lost: Object.keys(palette).filter((k) => palette[k].lost === true), materials, scales: scalesOf(T, params),
-      body: { kind, [kind]: body }, base, pieces: [...S.used].sort(),
+      body: { kind, [kind]: body, ...beside }, base, pieces: [...S.used].sort(),
       clips, points: extra('points'), slice: extra('slice'), textArea: extra('textArea'),
     };
     deepFreeze(out);

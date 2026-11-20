@@ -7,10 +7,10 @@
 // itself is contrastFaults() in the helper; the first half of this file tests that on made-up sprites.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import fs from 'node:fs';
 import { defineSprite, range, choice, color } from '../../engine/sprite.js';
 import { contrastFaults, panel9 } from '../../engine/ui.js';
 import { Surface } from '../../engine/surface.js';
+import { librarySprites, libraryCoverage } from '../helpers/library.mjs';
 
 const made = (over = {}) => defineSprite({
   id: 'fixture-panel', name: 'Fixture', size: [48, 32], pivot: [24, 16],
@@ -102,12 +102,9 @@ test('a clip may have several text areas, and an area may be meant for dark text
 
 // ---- every interface sprite in sprites/ ------------------------------------------------------
 
-const dir = new URL('../../sprites/', import.meta.url);
-const files = fs.readdirSync(dir).filter((f) => f.endsWith('.js') && f !== 'index.js' && !f.startsWith('_')).sort();
+// a code file or a data file (tests/helpers/library.mjs); a file that cannot be loaded is the checker's to report
 let found = 0;
-for (const f of files) {
-  let sprite;
-  try { sprite = (await import(new URL(f, dir).href)).default; } catch { continue; }   // a file that cannot be loaded is the checker's to report
+for (const { def: sprite } of (await librarySprites()).sprites) {
   if (sprite?.meta?.type !== 'ui') continue;
   found++;
   test(`${sprite.id}: text and frame keep their contrast under every whole-bundle look`, () => {
@@ -116,3 +113,5 @@ for (const f of files) {
   });
 }
 test('the sweep found the interface sprites by itself', () => { assert.ok(found >= 4, `${found} sprites of type ui`); });
+
+test('the scan covers every sprite file, code and data alike, and names any that did not load', async (t) => t.diagnostic(await libraryCoverage()));

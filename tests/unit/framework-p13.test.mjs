@@ -19,12 +19,13 @@ import { SPARK_STYLES, sparkMark, sparkRing, sparkOrbit, blastBall, driftUp, spa
 import { socketTones, levelIn, slotFill } from '../../engine/slots.js';
 import { heartIn, insetIn } from '../../engine/shapes.js';
 import { WOOD_STYLES, woodTones, woodPanel, woodButton } from '../../engine/ui-wood.js';
-import sparkle from '../../sprites/pickup-sparkle.js';
-import poof from '../../sprites/enemy-poof.js';
-import boom from '../../sprites/explosion-small.js';
-import hud from '../../sprites/ui-hud-platformer.js';
-import buttons from '../../sprites/ui-buttons-wood.js';
-import panels from '../../sprites/ui-panel-wood.js';
+import { codeSprite } from '../helpers/library.mjs';   // the code, frozen first (tests/helpers/library.mjs): a test about the framework it uses
+const sparkle = await codeSprite('pickup-sparkle');
+const poof = await codeSprite('enemy-poof');
+const boom = await codeSprite('explosion-small');
+const hud = await codeSprite('ui-hud-platformer');
+const buttons = await codeSprite('ui-buttons-wood');
+const panels = await codeSprite('ui-panel-wood');
 
 const P = PALETTE.thornwood;
 const lit = (g) => g.data.reduce((n, v) => n + (v ? 1 : 0), 0);

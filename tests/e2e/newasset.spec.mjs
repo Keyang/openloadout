@@ -17,12 +17,12 @@ import { test, expect, waitForDrawn, canvasStats, setRange, downloadFrom, readZi
 import { ROOT } from '../helpers/catalog.mjs';
 
 // What the site needs to build and run. `tools` is linked, not copied: the build reads its search and vendor steps from the root it builds.
-const COPY = ['index.html', 'app', 'engine', 'rigs', 'sound', 'sprites', 'sounds', 'bundles', 'catalog', 'search', 'quality'];
+const COPY = ['index.html', 'app', 'engine', 'rigs', 'sound', 'sprites', 'sounds', 'bundles', 'catalog', 'search', 'quality', 'pieces'];
 // Words no real asset has, so a search for one can only find the new asset.
 const NEW_SPRITE = { id: 'zz-newasset-sprite', name: 'Quibblefrost token', word: 'quibblefrost' };
 const NEW_SOUND = { id: 'zz-newasset-sound', name: 'Zanderwhistle blip', word: 'zanderwhistle' };
 
-let scratch = null, server = null, BASE = null, CATALOG = null, FROM = null;
+let scratch = null, server = null, BASE = null, CATALOG = null, FROM = null, NEW_FILE = null;
 const row = (id) => CATALOG.assets.find((a) => a.id === id);
 
 function must(ok, message) { if (!ok) throw new Error(`newasset: ${message}`); }
@@ -32,8 +32,17 @@ const freePort = () => new Promise((resolve, reject) => {
   s.listen(0, '127.0.0.1', () => { const { port } = s.address(); s.close(() => resolve(port)); });
 });
 
-/** The text of a sprite file with a new id and name, and one of its words swapped for a new one. */
-function renamedSprite(text, fromId, to) {
+/** The text of a sprite file with a new id and name, and one of its words swapped for a new one: a data file (sprites/<id>.json) or a code file. */
+function renamedSprite(text, fromId, to, ext = '.js') {
+  if (ext === '.json') {
+    const def = JSON.parse(text);
+    must(def.id === fromId && typeof def.name === 'string', `sprites/${fromId}.json has no id "${fromId}" and name to rename`);
+    must(Array.isArray(def.meta?.words) && def.meta.words.length, `sprites/${fromId}.json has no meta words list`);
+    def.id = to.id;
+    def.name = to.name;
+    def.meta.words = [...def.meta.words.slice(0, -1), to.word];
+    return `${JSON.stringify(def, null, 2)}\n`;
+  }
   const id = new RegExp(`\\bid:\\s*(['"])${fromId}\\1`);
   must(id.test(text), `sprites/${fromId}.js has no id: '${fromId}' to rename`);
   let out = text.replace(id, `id: '${to.id}'`);
@@ -55,9 +64,20 @@ test.describe.configure({ mode: 'serial' });     // one worker: the copy is buil
 test.beforeAll(async () => {
   test.setTimeout(600_000);
   // which existing assets to copy: a small sprite with sliders, and a short sound with sliders (read from the real files)
-  const sprites = fs.readdirSync(path.join(ROOT, 'sprites')).filter((f) => f.endsWith('.js') && !f.startsWith('_')).map((f) => f.slice(0, -3));
+  // a sprite is a code file or a data file (docs/data-sprites.md, DQ1): a code file while there is one of these types (this
+  // is the code sprite's acceptance check; newasset-data.spec.mjs is the data file's), else a data file, as the migration
+  // redraws every code sprite as data (section 7)
+  const files = fs.readdirSync(path.join(ROOT, 'sprites')).filter((f) => /\.(js|json)$/.test(f) && !f.startsWith('_') && f !== 'index.js');
   const sounds = fs.readdirSync(path.join(ROOT, 'sounds')).filter((f) => f.endsWith('.json') && !f.startsWith('_')).map((f) => f.slice(0, -5));
-  const spriteId = ['coin', ...sprites].find((id) => sprites.includes(id) && /\bmeta:\s*\{[^}]*\btype:\s*'(pickup|prop|character|creature)'/.test(fs.readFileSync(path.join(ROOT, 'sprites', `${id}.js`), 'utf8')));
+  const typeOf = (f) => {
+    const text = fs.readFileSync(path.join(ROOT, 'sprites', f), 'utf8');
+    if (f.endsWith('.js')) return /\bmeta:\s*\{[^}]*\btype:\s*'([a-z]+)'/.exec(text)?.[1];
+    try { return JSON.parse(text).meta?.type; } catch { return null; }
+  };
+  const order = (ext) => [`coin${ext}`, ...files.filter((f) => f.endsWith(ext))].filter((f) => files.includes(f));
+  const spriteFile = [...order('.js'), ...order('.json')].find((f) => ['pickup', 'prop', 'character', 'creature'].includes(typeOf(f)));
+  const ext = spriteFile && spriteFile.slice(spriteFile.lastIndexOf('.'));
+  const spriteId = spriteFile && spriteFile.slice(0, -ext.length);
   const patchOf = (id) => JSON.parse(fs.readFileSync(path.join(ROOT, 'sounds', `${id}.json`), 'utf8'));
   const soundId = ['coin-pickup', ...sounds].find((id) => { if (!sounds.includes(id)) return false; const p = patchOf(id); return p.category !== 'music' && !p.loop && (p.params ?? []).length >= 1; });
   must(spriteId && soundId, 'the project has no sprite or sound to copy');
@@ -68,7 +88,8 @@ test.beforeAll(async () => {
   fs.symlinkSync(path.join(ROOT, 'tools'), path.join(scratch, 'tools'), 'dir');
 
   // ---- the only two edits: one new sprite file, one new sound file --------------------------------
-  fs.writeFileSync(path.join(scratch, 'sprites', `${NEW_SPRITE.id}.js`), renamedSprite(fs.readFileSync(path.join(ROOT, 'sprites', `${spriteId}.js`), 'utf8'), spriteId, NEW_SPRITE));
+  NEW_FILE = `sprites/${NEW_SPRITE.id}${ext}`;
+  fs.writeFileSync(path.join(scratch, NEW_FILE), renamedSprite(fs.readFileSync(path.join(ROOT, 'sprites', spriteFile), 'utf8'), spriteId, NEW_SPRITE, ext));
   const patch = patchOf(soundId);
   patch.id = NEW_SOUND.id;
   patch.name = NEW_SOUND.name;
@@ -125,7 +146,7 @@ test('the build lists both new files in the catalogue, with pictures; the asset 
   const files = (dir, ext) => fs.readdirSync(path.join(scratch, dir)).filter((f) => f.endsWith(ext) && !f.startsWith('_'));
   expect(CATALOG.assets.map((x) => x.id).sort()).toEqual([...files('sprites', '.js').map((f) => f.slice(0, -3)), ...files('sprites', '.json').map((f) => f.slice(0, -5)), ...files('sounds', '.json').map((f) => f.slice(0, -5))].sort());      // a sprite is a code file or a data file
   const s = row(NEW_SPRITE.id), a = row(NEW_SOUND.id), from = row(FROM.sprite);
-  expect(s).toMatchObject({ kind: 'sprite', name: NEW_SPRITE.name, src: `sprites/${NEW_SPRITE.id}.js`, type: from.type, role: from.role });
+  expect(s).toMatchObject({ kind: 'sprite', name: NEW_SPRITE.name, src: NEW_FILE, type: from.type, role: from.role });
   expect(s.words).toContain(NEW_SPRITE.word);
   expect(s.tech.frame).toEqual(from.tech.frame);
   expect(a).toMatchObject({ kind: 'sound', name: NEW_SOUND.name, src: `sounds/${NEW_SOUND.id}.json` });
@@ -234,7 +255,10 @@ test('each opens on its own page, is changed, goes into the bag, is drawn there,
   const tile = items.nth(0).locator('canvas.tile');
   await expect(tile).toHaveCount(1);
   const picture = () => tile.evaluate(async (cv, { id, params }) => {
-    const [{ default: sprite }, { renderFrame, cleanParams }] = await Promise.all([import(`/sprites/${id}.js`), import('/engine/sprite.js')]);
+    // its own program as the site loads it: a code file imported, a data file fetched and drawn (app/catalog.js)
+    const [C, { renderFrame, cleanParams }] = await Promise.all([import('/app/catalog.js'), import('/engine/sprite.js')]);
+    await C.loadCatalog();
+    const sprite = await C.loadSprite(id);
     const colours = (bytes) => { const set = new Set(); for (let i = 0; i < bytes.length; i += 4) if (bytes[i + 3] === 255) set.add((bytes[i] << 16) | (bytes[i + 1] << 8) | bytes[i + 2]); return set; };
     const want = colours(renderFrame(sprite, sprite.preview, 0, cleanParams(sprite, params)).bytes());
     const have = colours(cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data);

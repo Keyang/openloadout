@@ -138,7 +138,9 @@ const FIX = new URL('../fixtures/v2/', import.meta.url);
 const LAYOUT_FIXTURES = {
   'pictures@1': ['pictures/coin.json', 'pictures/crate.json', 'pictures/icons-food.json'],
   'panel@1': ['panel/bare-panel.json'],
+  'emitters@1': ['hit-spark.json', 'emitters/blaster-bolt.json', 'emitters/plasma-burst.json', 'emitters/hit-spark.json'],
   'layers@1': ['bg-forest.json', 'layers/bg-starfield.json', 'layers/bg-forest-wide.json'],
+  'tiles@1': ['tiles/tiles-cave.json', 'tiles/tiles-dungeon.json'],   // build item B15 (tiles-forest.json needs the test pieces)
 };
 const layouts = () => registry.generators().filter((g) => g.family === 'layout');
 const load = (p) => dataSprite(JSON.parse(fs.readFileSync(new URL(p, FIX), 'utf8')));

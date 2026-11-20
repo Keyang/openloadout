@@ -7,8 +7,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import forest from '../../sprites/tiles-forest.js';
-import platforms from '../../sprites/tiles-platforms.js';
+const forest = await librarySprite('tiles-forest');
+const platforms = await librarySprite('tiles-platforms');
 import { renderFrame, defaultParams, cleanParams } from '../../engine/sprite.js';
 import { PALETTE } from '../../engine/palettes.js';
 import { col, INK } from '../../engine/color.js';
@@ -16,6 +16,7 @@ import { blockJoins } from '../../engine/tiles.js';
 import { checkSprite } from '../../quality/sprite.js';
 import { validateMeta } from '../../catalog/schema.js';
 
+import { librarySprite } from '../helpers/library.mjs';   // the library asset, a code file or a data file (tests/helpers/library.mjs)
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const P = PALETTE.thornwood;
 const BLOCK = ['left', 'top', 'right', 'side-l', 'fill', 'side-r', 'bottom-l', 'bottom', 'bottom-r', 'inner-tl', 'inner-tr', 'inner-bl', 'inner-br'];

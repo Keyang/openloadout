@@ -7,6 +7,7 @@ import { Surface } from '../../engine/surface.js';
 import { col, ramp, INK } from '../../engine/color.js';
 import * as T from '../../rigs/topdown.js';
 
+import { codeSprite } from '../helpers/library.mjs';   // the code, frozen first (tests/helpers/library.mjs): a test about the framework it uses
 const LOOK = { skin: '#f6d3b0', top: '#3f6fd1', bottom: '#2c4a8a', boots: '#9a6a3e', hair: '#5a3a22', hairStyle: 'short' };
 const [W, H] = T.SIZE;
 const CLOTH = '#c9423a';                                  // a colour nothing else on the test body uses
@@ -206,8 +207,8 @@ test('walkingStickManner: a staff carried upright is lifted on one step of the w
 
 // ---- the two sprites of the batch, against their specification rows (bundles/specs/kit-rpg-fantasy.md) ----
 
-const { default: mage } = await import('../../sprites/mage-walker.js');
-const { default: rogue } = await import('../../sprites/rogue-walker.js');
+const mage = await codeSprite('mage-walker');
+const rogue = await codeSprite('rogue-walker');
 const { defaultParams, cleanParams, renderFrame } = await import('../../engine/sprite.js');
 const ends = (s, i) => cleanParams(s, Object.fromEntries(Object.entries(s.params).map(([k, d]) => [k, d.kind === 'range' ? [d.min, d.max][i] : d.def])));
 

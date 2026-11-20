@@ -7,10 +7,11 @@ import { PALETTE } from '../../engine/palettes.js';
 import { barOpening, contrast, digitSize, digitBody, panelSwatches } from '../../engine/ui.js';
 import { THEME_PRESETS, normalizeTheme, applyColour } from '../../engine/theme.js';
 import { validateMeta } from '../../catalog/schema.js';
-import dialogue from '../../sprites/ui-dialogue.js';
-import menu from '../../sprites/ui-battle-menu.js';
-import bars from '../../sprites/ui-bars-rpg.js';
-import digits from '../../sprites/ui-damage-digits.js';
+import { librarySprite } from '../helpers/library.mjs';   // the library asset, a code file or a data file (tests/helpers/library.mjs)
+const dialogue = await librarySprite('ui-dialogue');
+const menu = await librarySprite('ui-battle-menu');
+const bars = await librarySprite('ui-bars-rpg');
+const digits = await librarySprite('ui-damage-digits');
 
 const P = PALETTE.hearthvale;
 const ALL = [dialogue, menu, bars, digits];

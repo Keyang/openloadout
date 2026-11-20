@@ -49,7 +49,7 @@ test('sprite rows: src, description from blurb, derived tech, thumb and strip', 
   assert.equal(k.name, 'Hero');
   assert.equal(k.description, def.blurb);
   assert.equal(k.view, 'side');
-  assert.equal(k.src, 'sprites/knight.js');
+  assert.equal(k.src, loaded.sprites.find((s) => s.id === 'knight').file);      // sprites/knight.js, or sprites/knight.json once redrawn as data
   assert.deepEqual(k.tech.frame, def.size);
   assert.deepEqual(k.tech.clips.map((c) => c.name), Object.keys(def.clips));
   for (const c of k.tech.clips) {
@@ -71,7 +71,7 @@ test('sprite rows: src, description from blurb, derived tech, thumb and strip', 
 test('sprite parts are listed when declared', () => {
   const def = { ...loaded.sprites.find((s) => s.id === 'knight').def };
   def.parts = { weapon: { label: 'Weapon', params: ['weapon'], none: 'none' } };
-  const c = buildCatalog({ sprites: [{ id: 'knight', file: 'sprites/knight.js', def }], sounds: [], bundles: [] });
+  const c = buildCatalog({ sprites: [{ id: 'knight', file: loaded.sprites.find((s) => s.id === 'knight').file, def }], sounds: [], bundles: [] });
   assert.deepEqual(c.assets[0].tech.parts, ['weapon']);
 });
 

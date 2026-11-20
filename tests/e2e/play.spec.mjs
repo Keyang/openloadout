@@ -1,14 +1,15 @@
 // The playground (#/play; feature BAG-3; architecture.md Contract 9): try what is in the bag before downloading it.
-import fs from 'node:fs';
 import { test, expect, openRoute, canvasStats, setRange, hasHorizontalScroll } from '../helpers/test.mjs';
+import { hasLibrarySprite, librarySpriteFile } from '../helpers/library.mjs';
 
-const exists = (id) => fs.existsSync(new URL(`../../sprites/${id}.js`, import.meta.url));
-/** Hand the playground real sprites straight from sprites/ (they may not be in the built catalogue yet). */
+// a library sprite is a code file or a data file (tests/helpers/library.mjs): either is there, either is handed over
+const exists = hasLibrarySprite;
+/** Hand the playground real sprites straight from sprites/ (they may not be in the built catalogue yet): a code file imported, a data file read as the site reads one. */
 const addSprites = (page, ids) => page.evaluate(async (list) => {
   const defs = [];
-  for (const id of list) defs.push((await import(`/sprites/${id}.js`)).default);
+  for (const src of list) defs.push(src.endsWith('.json') ? await (await import('/app/catalog.js')).loadDataFile(`/${src}`) : (await import(`/${src}`)).default);
   await window.__loadoutPlay.addAssets(defs);
-}, ids);
+}, ids.map((id) => librarySpriteFile(id) ?? `sprites/${id}.js`));
 
 const SPRITE = (id) => ({ kind: 'sprite', id, settings: { params: {}, cues: null, scale: 1 } });
 const SOUND = (id) => ({ kind: 'sound', id, settings: { params: {}, style: null, seed: 1 } });
@@ -314,7 +315,7 @@ test('fixture tiles and background layers replace the plain ground and sky', asy
 });
 
 test('the first real tileset, background and bar build a side-view scene', async ({ page }) => {
-  test.skip(!exists('tiles-forest') || !exists('bg-forest'), 'sprites/tiles-forest.js or bg-forest.js is not there yet');
+  test.skip(!exists('tiles-forest') || !exists('bg-forest'), 'sprites/tiles-forest or bg-forest is not there yet');
   await openPlay(page, [HERO, SLIME, COIN]);
   await addSprites(page, ['tiles-forest', 'bg-forest', ...(exists('ui-bars-rpg') ? ['ui-bars-rpg'] : [])]);
   const s = await state(page);
@@ -334,7 +335,7 @@ test('the first real tileset, background and bar build a side-view scene', async
 });
 
 test('the real top-down hero walks its direction clips', async ({ page }) => {
-  test.skip(!exists('hero-walker'), 'sprites/hero-walker.js is not there yet');
+  test.skip(!exists('hero-walker'), 'sprites/hero-walker is not there yet');
   await openPlay(page, []);
   await addSprites(page, ['hero-walker']);
   await addFixtures(page, 'topDown');

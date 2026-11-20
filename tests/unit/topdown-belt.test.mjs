@@ -10,6 +10,7 @@ import { bandTone } from '../../engine/tones.js';
 import * as T from '../../rigs/topdown.js';
 import * as H from '../../rigs/humanoid.js';
 import * as Fig from '../../rigs/humanoid-figure.js';
+import { codeSprite } from '../helpers/library.mjs';
 
 const mixed = (a, b) => '#' + [1, 3, 5].map((i) => Math.round((parseInt(a.slice(i, i + 2), 16) + parseInt(b.slice(i, i + 2), 16)) / 2).toString(16).padStart(2, '0')).join('');
 const lum = (v) => (0.299 * (v & 255) + 0.587 * ((v >> 8) & 255) + 0.114 * ((v >> 16) & 255)) / 255;
@@ -88,7 +89,8 @@ test('the Rogue, on the map and in battle: the belt is clear of the tunic at the
   // the colour each sprite hands to belt(): the map Rogue a paler tone of its trim, the battle Rogue its trim kept apart from the tunic
   const beltColour = { 'rogue-walker': (p) => tone(p.trim, 0.85), 'rogue-battler': (p) => Fig.apart(p.trim, p.outfit, 0.05) };
   for (const [id, clip] of [['rogue-walker', 'idle_down'], ['rogue-walker', 'idle_up'], ['rogue-walker', 'idle_side'], ['rogue-battler', 'idle']]) {
-    const s = (await import(`../../sprites/${id}.js`)).default, p = defaultParams(s), g = renderFrame(s, clip, 0, p);
+    // the code these belts are drawn by, frozen (tests/helpers/library.mjs): the test is about the rigs' belt, not the library asset
+    const s = await codeSprite(id), p = defaultParams(s), g = renderFrame(s, clip, 0, p);
     const cloth = col(p.outfit), found = { belt: col(bandTone(beltColour[id](p), p.outfit)) };
     let n = 0;
     for (const v of g.data) if (v === found.belt) n++;

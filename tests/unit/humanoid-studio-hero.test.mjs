@@ -11,7 +11,8 @@ import { framePhase } from '../../rigs/keypose.js';
 import * as H from '../../rigs/humanoid.js';
 import * as S from '../../rigs/humanoid-studio.js';
 import { validateStudio } from '../../catalog/studio-schema.js';
-import knight from '../../sprites/knight.js';
+import { codeSprite } from '../helpers/library.mjs';   // the code, frozen first (tests/helpers/library.mjs): a test about the framework it uses
+const knight = await codeSprite('knight');
 
 const draw = (clip, t, def) => { const g = new Surface(...H.SIZE); S.render(g, clip, t, def); return g; };
 const count = (g) => { let n = 0; for (const v of g.data) if (v) n++; return n; };

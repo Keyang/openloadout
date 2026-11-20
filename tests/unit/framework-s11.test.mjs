@@ -18,6 +18,7 @@ import { stripesIn } from '../../engine/solids.js';
 import { rectIn } from '../../engine/surface.js';
 import { shadeTo, BULKHEAD_STYLES, drawBulkhead, DOOR_STYLES, doorLeaves, SCREEN_PICTURES, screenIn, laserBeam, machineTones, drawCasing, hazardBand } from '../../engine/bulkhead.js';
 
+import { codeSprite } from '../helpers/library.mjs';   // the code, frozen first (tests/helpers/library.mjs): a test about the framework it uses
 const TONES = { base: '#6b7896', lit: '#9db2c5', soft: '#7f8fa9', seam: '#424672', skirt: '#575f84', dark: '#2f3059' };
 const GLOW = '#2fb3a8', OFF = '#101020';
 const at = (g, x, y) => g.data[y * g.w + x];
@@ -310,7 +311,7 @@ test("layoutTiles: a 'face' decal written in a map is drawn on a face cell and l
 });
 
 test("the station walls: every fixture is a 'face' decal, and a room built from letters puts them on face cells only", async () => {
-  const walls = (await import('../../sprites/tiles-station-walls.js')).default, floor = (await import('../../sprites/tiles-station-floor.js')).default;
+  const walls = (await codeSprite('tiles-station-walls')), floor = (await codeSprite('tiles-station-floor'));
   for (const k of ['a', 'b', 'c', 'd']) assert.equal(walls.clips[`wall-deco-${k}`].place, 'face');
   const T = classifyTiles([{ key: 'walls', clips: walls.clips }, { key: 'floor', clips: floor.clips }]);
   const L = layoutTiles(ROOM, T, { view: 'top-down', decals: true });

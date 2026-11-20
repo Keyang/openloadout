@@ -3,20 +3,12 @@
 // The tilesets are found by scanning sprites/, so a new one is covered with no edit here.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import fs from 'node:fs';
-import path from 'node:path';
-import { pathToFileURL } from 'node:url';
-import { ROOT } from '../../tools/lib/assets.mjs';
+import { librarySprites, libraryCoverage } from '../helpers/library.mjs';
 import { classifyTiles, pickClip, pickThin, pickStack, blockClips, thinClips, slopeClips, decoClips, liquidClips, BLOCK_PIECES, NARROW_PIECES, LANE_PIECES } from '../../engine/tiles.js';
 import { AROUND, TILE_FAMILIES, LIQUID_FAMILY, tileFamily, rulesFrom, applyRules, tileRules, patternsFrom, meetable } from '../../engine/tile-rules.js';
 
-const tilesets = [];
-for (const f of fs.readdirSync(path.join(ROOT, 'sprites')).filter((x) => x.endsWith('.js') && !x.startsWith('_')).sort()) {
-  try {
-    const def = (await import(pathToFileURL(path.join(ROOT, 'sprites', f)).href)).default;
-    if (def?.meta?.type === 'tileset') tilesets.push(def);
-  } catch { /* a file another builder has half-written: not counted */ }
-}
+// every sprite in sprites/, a code file or a data file (tests/helpers/library.mjs); one another builder has half-written is not counted
+const tilesets = (await librarySprites()).sprites.map((s) => s.def).filter((def) => def?.meta?.type === 'tileset');
 const every = (keys) => Array.from({ length: 1 << keys.length }, (_, m) => Object.fromEntries(keys.map((k, i) => [k, !!(m & (1 << i))])));
 const KEYS = AROUND.map(([k]) => k);
 const solidOf = (a) => (x, y) => (x === 0 && y === 0) || !!a[AROUND.find(([, dx, dy]) => dx === x && dy === y)?.[0]];
@@ -196,3 +188,5 @@ test('the naming scheme: every piece name the tile helper knows belongs to a fam
   assert.equal(tileFamily('x-left').id, 'corner', '"left" is a top corner, not a side');
   assert.equal(tileFamily('x-side-l').id, 'edge');
 });
+
+test('the scan covers every sprite file, code and data alike, and names any that did not load', async (t) => t.diagnostic(await libraryCoverage()));

@@ -10,6 +10,7 @@ import fs from 'node:fs';
 import * as DF from '../../catalog/data-file.js';
 import * as TF from '../../tools/lib/data-file.mjs';
 import { validateStudioSprite } from '../../catalog/studio-schema.js';
+import { codeSpriteSource } from '../helpers/library.mjs';
 
 const newt = () => JSON.parse(fs.readFileSync(new URL('../fixtures/studio/newt.json', import.meta.url), 'utf8'));
 const conv = () => ({ ...newt(), made: { in: 'library', from: 'code:moss-newt' } });
@@ -67,7 +68,7 @@ test('F2 made: the build\'s reader is the same code, and has the same headers', 
 
 test('F2 made: the two converted rig sprites say they were converted, not made in the studio', () => {
   for (const id of ['rogue-battler', 'road-bandit']) {
-    const text = fs.readFileSync(new URL(`../../sprites/${id}.js`, import.meta.url), 'utf8');
+    const text = codeSpriteSource(id);      // the converted file, frozen (tests/helpers/library.mjs): the migration redraws it as version 2
     assert.equal(text.split('\n')[0], DF.LIBRARY_HEADER, id);
     const r = DF.readDataFile(text, { file: `sprites/${id}.js` });
     assert.equal(r.ok, true, r.errors.join('\n'));

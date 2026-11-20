@@ -4,12 +4,13 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { defineSprite, renderSheet, renderFrame, defaultParams, cleanParams, range, clipStretch } from '../../engine/sprite.js';
 import { col, INK } from '../../engine/color.js';
+import { librarySprite } from '../helpers/library.mjs';   // the library asset, a code file or a data file (tests/helpers/library.mjs)
 import coin from '../fixtures/code-sprites/coin.js';   // the code file as it was before P1 (a code sprite to export)
-import slime from '../../sprites/slime.js';
-import dialogue from '../../sprites/ui-dialogue.js';
-import menu from '../../sprites/ui-battle-menu.js';
-import bars from '../../sprites/ui-bars-rpg.js';
-import digits from '../../sprites/ui-damage-digits.js';
+const slime = await librarySprite('slime');
+const dialogue = await librarySprite('ui-dialogue');
+const menu = await librarySprite('ui-battle-menu');
+const bars = await librarySprite('ui-bars-rpg');
+const digits = await librarySprite('ui-damage-digits');
 
 const NEW = ['border', 'rect', 'opening', 'tile'];
 const params = (s, over = {}) => cleanParams(s, { ...defaultParams(s), ...over });

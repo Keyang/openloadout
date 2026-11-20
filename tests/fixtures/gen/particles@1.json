@@ -1,0 +1,441 @@
+{
+ "id": "particles",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "count": 8,
+    "seed": 2,
+    "loop": false,
+    "arc": 360,
+    "dist": 10,
+    "size": 2,
+    "paints": [
+     "p0",
+     "p1",
+     "p2"
+    ]
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": false,
+    "frames": 5,
+    "frame": 1
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      15,
+      15
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aa",
+      "aa"
+     ],
+     "key": {
+      "a": "p0"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      17,
+      13
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aa",
+      "aa"
+     ],
+     "key": {
+      "a": "p0"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      12,
+      14
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aa",
+      "aa"
+     ],
+     "key": {
+      "a": "p0"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      17,
+      15
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aa",
+      "aa"
+     ],
+     "key": {
+      "a": "p0"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      15,
+      15
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aa",
+      "aa"
+     ],
+     "key": {
+      "a": "p0"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      15,
+      15
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aa",
+      "aa"
+     ],
+     "key": {
+      "a": "p0"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      15,
+      15
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aa",
+      "aa"
+     ],
+     "key": {
+      "a": "p0"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      18,
+      12
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aa",
+      "aa"
+     ],
+     "key": {
+      "a": "p0"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     24,
+     40
+    ],
+    "count": 10,
+    "seed": 3,
+    "angle": 180,
+    "arc": 60,
+    "dist": 14,
+    "gravity": -4,
+    "size": 3,
+    "spread": 2,
+    "wobble": 1.5,
+    "lifespan": 0.7,
+    "paints": [
+     "p0",
+     "p1",
+     "p2",
+     "p3",
+     "p4"
+    ]
+   },
+   "ctx": {
+    "t": 0.375,
+    "loop": true,
+    "frames": 8,
+    "frame": 3
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      21,
+      26
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a"
+     ],
+     "key": {
+      "a": "p3"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      26,
+      26
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a"
+     ],
+     "key": {
+      "a": "p3"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     23.5,
+     23.5
+    ],
+    "count": 6,
+    "seed": 5,
+    "loop": false,
+    "stagger": 0.15,
+    "arc": 360,
+    "dist": 18,
+    "size": 3.6,
+    "paints": [
+     "p1",
+     "p2",
+     "p3",
+     "p3",
+     "p4"
+    ]
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": false,
+    "frames": 8,
+    "frame": 4
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      29,
+      30
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aa"
+     ],
+     "key": {
+      "a": "p3"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      28,
+      12
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aa",
+      "aa"
+     ],
+     "key": {
+      "a": "p3"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      16,
+      19
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aa",
+      "aa"
+     ],
+     "key": {
+      "a": "p3"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      12,
+      22
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aa",
+      "aa"
+     ],
+     "key": {
+      "a": "p3"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      25,
+      30
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aa"
+     ],
+     "key": {
+      "a": "p3"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      25,
+      30
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aa"
+     ],
+     "key": {
+      "a": "p3"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "count": 4,
+    "seed": 9,
+    "loop": false,
+    "arc": 360,
+    "dist": 8,
+    "size": 6,
+    "begin": 0.2,
+    "end": 0.8,
+    "paints": [
+     "p0",
+     "p1",
+     "p2",
+     "p3",
+     "p4"
+    ]
+   },
+   "ctx": {
+    "t": 0.4,
+    "loop": false,
+    "frames": 6,
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      13,
+      13
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aaaa.",
+      "aabbaa",
+      "abbbba",
+      "abbbba",
+      "aabbaa",
+      ".aaaa."
+     ],
+     "key": {
+      "a": "p4",
+      "b": "p0"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      15,
+      14
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaa.",
+      "abbba",
+      "abbba",
+      "abba.",
+      ".aa.."
+     ],
+     "key": {
+      "a": "p4",
+      "b": "p1"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      13,
+      13
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aaaa.",
+      "aabbaa",
+      "abbbba",
+      "abbbba",
+      "aabbaa",
+      ".aaaa."
+     ],
+     "key": {
+      "a": "p4",
+      "b": "p0"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      13,
+      13
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aaaa.",
+      "aabbaa",
+      "abbbba",
+      "abbbba",
+      "aabbaa",
+      ".aaaa."
+     ],
+     "key": {
+      "a": "p4",
+      "b": "p0"
+     }
+    }
+   ]
+  }
+ ]
+}

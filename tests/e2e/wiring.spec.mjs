@@ -123,10 +123,10 @@ test('a sprite in the bag is loaded only when the bag page needs it; leaving bef
   // (from the library, which shows the build's pictures: the front page draws the kits' sprites from their own files)
   await openRoute(page, '/browse');
   await page.evaluate(async (id) => (await import('/app/bag.js')).bag.add({ kind: 'sprite', id, settings: {} }), SPRITE.id);
-  // hold the sprite's own file back until the test lets it through
+  // hold the sprite's own file back until the test lets it through (its src: sprites/<id>.js, or sprites/<id>.json for a data sprite)
   let release;
   const gate = new Promise((r) => { release = r; });
-  const file = `**/sprites/${SPRITE.id}.js`;
+  const file = `**/${SPRITE.src}`;
   await page.route(file, async (route) => { await gate; await route.continue(); });
 
   await page.locator('header a.bag-link').click();
@@ -143,7 +143,7 @@ test('a sprite in the bag is loaded only when the bag page needs it; leaving bef
   await page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: 'Library' }).click();
   await expect.poll(() => hash(page)).toBe('#/browse');
   await expect(page.locator('ul.results > li').first()).toBeVisible();
-  const arrived = page.waitForResponse((r) => new URL(r.url()).pathname === `/sprites/${SPRITE.id}.js`);
+  const arrived = page.waitForResponse((r) => new URL(r.url()).pathname === `/${SPRITE.src}`);
   release();
   await arrived;
   await page.waitForTimeout(300);

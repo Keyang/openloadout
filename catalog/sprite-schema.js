@@ -50,6 +50,7 @@ import { swatches as paletteSwatches } from '../engine/palettes.js';
 import { styleIds } from '../engine/styles.js';
 import { PRIMITIVE_KINDS as GEN_PRIMITIVE_KINDS, TONES, FIXED_PAINTS as GEN_FIXED_PAINTS, STAMP_ANCHORS as GEN_STAMP_ANCHORS, PLACEABLE_KINDS as GEN_PLACEABLE_KINDS } from '../engine/gen/args.js';
 import * as SITE_GENERATORS from '../engine/gen/index.js';
+import { tileClipNames, groupDrawsMiddles } from '../engine/gen/tiles-clips.js';
 
 // ---- the tables ---------------------------------------------------------------------------------------------------
 
@@ -117,7 +118,7 @@ export const BAND_EDGES = Object.freeze(['hard', 'dither']);
 /** The kinds of a tileset group (docs/data-sprites.md 2.3) and the piece sets a group may ask for. */
 export const TILE_GROUP_KINDS = Object.freeze(['block', 'floor', 'liquid', 'platform', 'slope', 'stack']);
 /** The piece sets a tile group may ask the tile.clips generator for. */
-export const TILE_PIECES = Object.freeze(['block', 'narrow', 'thin', 'slope', 'inner']);
+export const TILE_PIECES = Object.freeze(['block', 'narrow', 'thin', 'slope', 'inner', 'lanes', 'cap', 'mid', 'foot']);   // lanes, cap, mid, foot: build item B15 (a stack's pieces; a liquid's foot)
 /** Where a tile decal goes (engine/tiles.js decoClips). */
 export const DECAL_PLACES = Object.freeze(['on', 'above', 'below', 'face', 'rim']);
 /** The edges of a tile material. */
@@ -496,6 +497,13 @@ function binding(C, place, field, b, t) {
   return undefined;
 }
 
+/** The largest number a cleaned binding can give (for the cost): a map's largest output after its rounding, a pick's largest, or the slider's max for the control itself. */
+function boundWorst(C, b) {
+  const r = (x) => (b.round === 'px' ? Math.round(x) : b.round === 'half' ? Math.round(x * 2) / 2 : x);
+  const outs = Array.isArray(b.map) ? b.map.map((m) => r(m[1])) : isObj(b.pick) ? Object.values(b.pick).filter(fin) : [C.table.get(b.from)?.max].filter(fin);
+  return outs.length ? Math.max(...outs) : 0;
+}
+
 /** A number or a binding to one: { value, worst } or undefined. clamp: v1 geometry clamps with a warning; new fields refuse. */
 function numOrBind(C, place, field, v, lo, hi, { need = false, clamp = false, whole = false } = {}) {
   if (isBindingLike(v)) return binding(C, place, field, v, { kind: 'number', lo, hi, whole });
@@ -699,6 +707,7 @@ function genCall(C, place, g, { role = 'draw', nested = false, depth = 0 } = {})
     } catch { cost = NaN; }
     if (!fin(cost) || cost < 0) { C.err(`${place}: the cost of ${key} could not be worked out (the framework's generator gave ${say(cost)}); it cannot be drawn`); return undefined; }
     C.cost.expanded += cost;
+    if (role === 'emitter') C.emitterPrice = { worst: { ...r.worst }, cost };
   }
   return out;
 }
@@ -770,8 +779,7 @@ function argValue(C, place, name, v, info, { depth = 0, key = '' } = {}) {
   if (t === 'point') {
     const p = pairOf(C, place, name, v, [info.lo, info.hi], [info.lo, info.hi]);
     if (!p) return undefined;
-    const w = p.map((c) => (isBindingLike(c) ? (Array.isArray(c.map) ? Math.max(...c.map.map((m) => m[1])) : 0) : c));
-    return { value: p, worst: w };
+    return { value: p, worst: p.map((c) => (isBindingLike(c) ? boundWorst(C, c) : c)) };
   }
   if (t === 'profile') {
     const x = profileRef(C, place, name, v);
@@ -1457,11 +1465,102 @@ function emittersOf(C, where, raw) {
     if (g.on !== undefined) onRef(C, place, g.on, {});
     if (C.shapeIds.has(g.id)) { C.err(`${place}: the id ${q(g.id)} is used twice; each emitter needs its own id`); return; }
     const { entry } = lookupGenerator(C, g.gen, g.v);
-    C.emitters.set(g.id, { entry, key: `${g.gen}@${g.v}` });
+    C.emitters.set(g.id, { entry, key: `${g.gen}@${g.v}`, worst: C.emitterPrice?.worst ?? {}, cost: C.emitterPrice?.cost ?? 0, when: g.when, clip: g.clip });
+    C.emitterPrice = undefined;
     C.shapeIds.set(g.id, { kind: 'emitter' });
     out.push(g);
   });
   return out;
+}
+
+/**
+ * The stamp pixels of the emitters (3.4 rule 2, Contract 15 rule 6; build item B12b), worked out once with no key read:
+ * each emitter's bound (engine/gen/index.js STAMP_BOUNDS) at the values it sets (bindings at their largest) and amount
+ * 1, in this sprite's frame, since keys may lower its size arguments but never raise them (checkKey) and an amount is
+ * held to 0..1 when it draws. An emitter whose generator has no bound is refused, so is one over a frame's cap, and so
+ * are emitters that can draw together and are over it in all: every emitter counts as on in every frame, apart from
+ * those its `when` (a control's settings: the values the `when`s list and one more none lists) or its `clip` keep
+ * apart. Conditions it does not read count as holding, so the sum is never less than a frame can hold; the work is at
+ * most 4,096 sums of at most 16 emitters (L.emitters), whatever the clips and keys.
+ */
+function boundEmitters(C) {
+  const ems = [];
+  for (const [id, e] of C.emitters ?? []) {
+    if (!e.entry) continue;
+    const bound = stampBoundOf(C, e);
+    if (!bound && !boundsKnown(C, e)) continue;   // a test's or a tool's own registry with no table of bounds
+    if (!bound) { C.err(`Emitter ${q(id)}: ${e.key} has no stamp bound (engine/gen/index.js STAMP_BOUNDS), so this site cannot tell how many stamp pixels it paints; it cannot be an emitter`); continue; }
+    let p;
+    try { p = bound(Object.freeze({ ...e.worst }), [C.W, C.H]); } catch { p = NaN; }
+    if (!fin(p) || p < 0) { C.err(`Emitter ${q(id)}: the stamp pixels of ${e.key} could not be worked out; it cannot be drawn`); continue; }
+    if (p > L.stampPixels) { C.err(`Emitter ${q(id)}: ${e.key} can paint up to ${grand(Math.round(p))} stamp pixels in this ${C.W} x ${C.H} frame at its largest, over the budget of ${grand(L.stampPixels)} stamp pixels a frame may hold: make it smaller`); continue; }
+    if (p > 0) ems.push({ id, pixels: p, when: e.when, clip: Array.isArray(e.clip) ? e.clip : null });
+  }
+  if (!ems.length || C.errors.length) return;
+  // the clips the emitters name, and null for any other clip (where only those with no `clip` draw)
+  const clipNames = [...new Set(ems.flatMap((e) => e.clip ?? [])), null];
+  // the control settings that decide which emitters' whens hold: each key the whens name, its listed values and one more
+  const alts = (w) => (Array.isArray(w) ? w : isObj(w) ? [w] : []).filter(isObj);
+  const domains = new Map();
+  for (const e of ems) for (const alt of alts(e.when)) for (const [k, vs] of Object.entries(alt)) {
+    if (SCENE_KEYS.has(k) || !Array.isArray(vs)) continue;
+    const d = domains.get(k) ?? domains.set(k, new Set()).get(k);
+    for (const v of vs) d.add(v);
+  }
+  const OTHER = Symbol('other');
+  let settings = [{}];
+  for (const [k, d] of domains) {
+    if (settings.length * (d.size + 1) * clipNames.length > 4096) { settings = [null]; break; }
+    settings = settings.flatMap((set) => [...d, OTHER].map((v) => ({ ...set, [k]: v })));
+  }
+  const holds = (w, set) => {
+    if (w === undefined || set === null) return true;
+    const list = alts(w);
+    return !list.length || list.some((alt) => Object.entries(alt).every(([k, vs]) => !Array.isArray(vs) || !Object.hasOwn(set, k) || vs.includes(set[k])));
+  };
+  let worst = 0, where = null;
+  for (const set of settings) {
+    const on = ems.filter((e) => holds(e.when, set));
+    for (const c of clipNames) {
+      let sum = 0;
+      for (const e of on) if (!e.clip || (c !== null && e.clip.includes(c))) sum += e.pixels;
+      if (sum <= worst) continue;
+      worst = sum;
+      const which = set ? Object.entries(set).filter(([, v]) => v !== OTHER).map(([k, v]) => `${k} ${say(v)}`) : [];
+      where = [c === null ? null : `in clip ${q(c)}`, which.length ? `with ${which.join(', ')}` : null].filter(Boolean).join(' ');
+    }
+  }
+  if (worst > L.stampPixels) C.err(`The emitters can paint up to ${grand(Math.round(worst))} stamp pixels in one frame (${[where, 'those that can draw together; amounts are not read'].filter(Boolean).join(', ')}); a frame may hold ${grand(L.stampPixels)}: make them smaller, or keep them apart with when or clip`);
+}
+
+/** Whether an emitter's generator must have a stamp bound: the site's own generators must, and so must one from a registry that brings a STAMP_BOUNDS table. */
+function boundsKnown(C, e) {
+  if (isObj(C.reg?.STAMP_BOUNDS)) return true;
+  return !!e.entry && e.entry === SITE_GENERATORS.generator(e.entry.id, e.entry.v);
+}
+
+/** The keyable arguments of an emitter's generator its price reads (engine/gen/index.js SIZE_KEYS): the registry's own, or the site's for the site's entry; every keyable argument when it has none. */
+function sizeKeysOf(C, e) {
+  const own = C.reg?.SIZE_KEYS?.[e.key];
+  if (Array.isArray(own)) return own;
+  const site = SITE_GENERATORS.SIZE_KEYS?.[e.key];
+  if (Array.isArray(site) && e.entry && e.entry === SITE_GENERATORS.generator(e.entry.id, e.entry.v)) return site;
+  return Array.isArray(e.entry?.keyable) ? e.entry.keyable : [];
+}
+
+/** Whether a keyed value v is not above w, the value an emitter sets: numbers (and points, each coordinate) compared; anything else must be equal. */
+function notAbove(v, w) {
+  if (fin(v) && fin(w)) return v <= w;
+  if (Array.isArray(v) && Array.isArray(w) && v.length === w.length) return v.every((x, i) => notAbove(x, w[i]));
+  return v === w || JSON.stringify(v) === JSON.stringify(w);
+}
+
+/** The stamp-pixel bound of an emitter's generator (engine/gen/index.js STAMP_BOUNDS): the registry's own, or the site's when the registry holds the site's entry; null when none. */
+function stampBoundOf(C, e) {
+  const own = C.reg?.STAMP_BOUNDS?.[e.key];
+  if (typeof own === 'function') return own;
+  const site = SITE_GENERATORS.STAMP_BOUNDS?.[e.key];
+  return typeof site === 'function' && e.entry === SITE_GENERATORS.generator(e.entry.id, e.entry.v) ? site : null;
 }
 
 const PICTURES_FIELDS = ['nodes', 'draw', 'per', 'motion', 'emitters', 'fit', 'pictures'];
@@ -1656,7 +1755,7 @@ function layersBody(C, raw) {
 }
 
 const TILES_FIELDS = ['tile', 'profiles', 'groups', 'material', 'extra'];
-const GROUP_FIELDS = ['name', 'kind', 'use', 'pieces', 'fills', 'material', 'decals'];
+const GROUP_FIELDS = ['name', 'kind', 'use', 'pieces', 'fills', 'material', 'decals', 'label', 'frames', 'fps', 'thickness', 'under', 'pictures', 'outline'];   // label ... outline: build item B15
 
 /** body.tiles (2.3): a tile size, named profiles, groups with piece sets and a material as data (or a material piece), decals, extra tiles. */
 function tilesBody(C, b) {
@@ -1666,6 +1765,7 @@ function tilesBody(C, b) {
   const out = {};
   if (b.tile !== 16 && b.tile !== 32) C.err(`${where}: tile must be 16 or 32 (pixels a side); got ${say(b.tile)}`);
   else out.tile = b.tile;
+  if (b.tile === 16) C.err(`${where}: 16 px tiles are not drawn yet: engine/tiles.js draws 32 px tiles (make the tileset 32 px)`);   // build item B15: the layout's own reason
   const T = out.tile ?? 32;
   C.profiles = new Map();
   if (b.profiles !== undefined) {
@@ -1701,7 +1801,7 @@ function tilesBody(C, b) {
     }
     const f = num(C, place, 'fills', g.fills ?? 1, 1, L.fillVersions, { clamp: false, whole: true }); if (f !== undefined) o.fills = f;
     if (g.material !== undefined) o.material = materialOf(C, `${place} material`, g.material, T);
-    else if (b.material === undefined) C.err(`${place}: has no material; give the group a material, or the tileset one for every group`);
+    else if (b.material === undefined && !isObj(g.pictures)) C.err(`${place}: has no material; give the group a material, or the tileset one for every group (a group drawn by hand gives pictures instead)`);
     if (g.decals !== undefined) {
       const ds = list(C, place, g.decals, L.decals, { what: 'decals' }) ?? [];
       o.decals = [];
@@ -1709,9 +1809,10 @@ function tilesBody(C, b) {
       ds.forEach((d, k) => {
         const dp = `${place}, decal ${typeof d?.name === 'string' ? q(d.name) : k + 1}`;
         if (!isObj(d)) { C.err(`${dp}: must be { name, place, label, draw, outline }; got ${say(d)}`); return; }
-        knownOnly(C, dp, d, ['name', 'place', 'label', 'draw', 'outline']);
+        knownOnly(C, dp, d, ['name', 'place', 'label', 'draw', 'outline', 'frames']);
         const x = {};
-        const dname = idOf(C, dp, d.name, { pattern: SPRITE_ID_PATTERN, what: 'decal name' });
+        const dname = idOf(C, dp, d.name, { pattern: /^[a-z0-9]{1,8}$/, what: 'decal name (letters or digits: its clip is <group>-deco-<name>)' });
+        const fr = num(C, dp, 'frames', d.frames, 1, 64, { clamp: false, whole: true }); if (fr !== undefined) x.frames = fr;
         if (dname && dn.has(dname)) { C.err(`${dp}: is listed twice`); return; }
         if (dname) { x.name = dname; dn.add(dname); }
         if (d.place !== undefined && !DECAL_PLACES.includes(d.place)) C.err(`${dp}: place must be one of ${listOf(DECAL_PLACES)}; got ${say(d.place)}`); else x.place = d.place ?? 'on';
@@ -1721,6 +1822,7 @@ function tilesBody(C, b) {
         o.decals.push(x);
       });
     }
+    tileGroupMore(C, place, g, o, T);
     out.groups.push(o);
   });
   C.tileGroups = names;
@@ -1739,7 +1841,9 @@ function tilesBody(C, b) {
       out.extra.push(x);
     });
   }
-  C.layoutClips = null;                 // the tile.clips generator names the clips (engine/tiles.js), not this file
+  for (const g of out.groups) tileFillCount(C, `Group ${q(g.name ?? '?')}`, g, out.material);   // build item B15 review: N fills, N versions
+  C.layoutClips = tileClipNames(out);   // build item B15: tile.clips names the clips (engine/gen/tiles-clips.js), as engine/resolve.js does
+  C.closedClips = true;
   return out;
 }
 
@@ -1747,8 +1851,9 @@ function tilesBody(C, b) {
 function materialOf(C, place, m, T) {
   if (!isObj(m)) { C.err(`${place}: must be a material { fill, edges } or a material piece { "use": "material:<name>", "v": 1 }; got ${say(m)}`); return undefined; }
   if (Object.hasOwn(m, 'use')) { knownOnly(C, place, m, ['use', 'v', 'paint', 'args']); return pieceUse(C, place, m, { kind: 'material' }); }
-  knownOnly(C, place, m, ['fill', 'edges']);
+  knownOnly(C, place, m, ['fill', 'edges', 'ink', 'round', 'soft', 'behind', 'face', 'liquid', 'outside']);
   const out = {};
+  tileMaterialMore(C, place, m, out, T);
   if (m.fill !== undefined) {
     const f = m.fill, fp = `${place} fill`;
     if (!isObj(f)) C.err(`${fp}: must be { base, versions }; got ${say(f)}`);
@@ -1776,7 +1881,7 @@ function materialOf(C, place, m, T) {
         const o = {};
         if (e.depth !== undefined) { const d = numOrBind(C, ep, 'depth', e.depth, 0, T); if (d) o.depth = d.value; }
         if (e.wrap !== undefined) { const w = numOrBind(C, ep, 'wrap', e.wrap, 0, T); if (w) o.wrap = w.value; }
-        const tk = bool(C, ep, 'tuck', e.tuck); if (tk !== undefined) o.tuck = tk;
+        if (fin(e.tuck)) { const tk = num(C, ep, 'tuck', e.tuck, 0, T, { clamp: false, whole: true }); if (tk !== undefined) o.tuck = tk; } else { const tk = bool(C, ep, 'tuck', e.tuck); if (tk !== undefined) o.tuck = tk; }
         for (const f of ['inset', 'ragged']) {
           if (e[f] === undefined) continue;
           const x = e[f];
@@ -1792,11 +1897,17 @@ function materialOf(C, place, m, T) {
           bs.forEach((r, i) => {
             const rp = `${ep}, band rule ${i + 1}`;
             if (!isObj(r)) { C.err(`${rp}: must be { rows, where, paint }; got ${say(r)}`); return; }
-            knownOnly(C, rp, r, ['rows', 'where', 'paint']);
+            knownOnly(C, rp, r, ['rows', 'where', 'paint', 'when']);   // when: build item B15 review 2
             const x = {};
             if (r.rows === 'last' || r.rows === 'last-1') x.rows = r.rows;
+            else if (isObj(r.rows) && Object.hasOwn(r.rows, 'profile')) {   // { profile }: rows 1 to the profile's value at each column (a run hanging from the edge)
+              knownOnly(C, `${rp}, rows`, r.rows, ['profile']);
+              const pr = profileRef(C, `${rp}, rows`, 'profile', r.rows.profile);
+              if (pr === undefined) return;
+              x.rows = { profile: pr };
+            }
             else if (Array.isArray(r.rows) && r.rows.length === 2 && r.rows.every((n) => Number.isInteger(n) && n >= 1 && n <= 99) && r.rows[0] <= r.rows[1]) x.rows = [...r.rows];
-            else { C.err(`${rp}: rows must be [from, to] (whole numbers 1 to 99 counted from the edge, from no more than to), "last" or "last-1"; got ${say(r.rows)}`); return; }
+            else { C.err(`${rp}: rows must be [from, to] (whole numbers 1 to 99 counted from the edge, from no more than to), "last", "last-1" or { profile } (rows 1 to the profile's value at each column); got ${say(r.rows)}`); return; }
             if (r.where !== undefined) {
               const w = r.where;
               if (!isObj(w)) C.err(`${rp}: where must be { profile, in: [values] }; got ${say(w)}`);
@@ -1810,6 +1921,7 @@ function materialOf(C, place, m, T) {
             }
             const p = paintRef(C, `${rp}, paint`, r.paint);
             if (p !== undefined) x.paint = p;
+            if (r.when !== undefined) { const w = checkWhen(C, rp, r.when); if (w === undefined) return; x.when = w; }
             o.bands.push(x);
           });
         }
@@ -1818,6 +1930,166 @@ function materialOf(C, place, m, T) {
     }
   }
   return out;
+}
+
+// ---- build item B15: what a tile group and a tile material may say besides the fields above ------------------------
+// (engine/gen/tiles.js reads them; docs/data-sprites.md 2.3 lists the first fields, these follow the code tilesets)
+
+/** A group's label (the word before each piece), frames and fps (an animated tileset), a thin platform's thickness and underside, pictures drawn by hand for its pieces, and whether those are outlined. */
+function tileGroupMore(C, place, g, o, T) {
+  const lab = text(C, place, 'label', g.label, L.nameChars); if (lab !== undefined) o.label = lab;
+  const fr = num(C, place, 'frames', g.frames, 1, 64, { clamp: false, whole: true }); if (fr !== undefined) o.frames = fr;
+  const fps = num(C, place, 'fps', g.fps, 1, 60, { clamp: false }); if (fps !== undefined) o.fps = fps;
+  const th = num(C, place, 'thickness', g.thickness, 4, T, { clamp: false, whole: true }); if (th !== undefined) o.thickness = th;
+  if (g.under !== undefined) { const u = materialOf(C, `${place} under`, { edges: { bottom: g.under } }, T)?.edges?.bottom; if (u) o.under = u; }
+  if (g.pictures !== undefined) {
+    const names = mapNames(C, `${place} pictures`, g.pictures, 32, 'piece: [primitives]');
+    if (names) {
+      o.pictures = {};
+      for (const n of names) {
+        if (!/^[a-z][a-z0-9-]{0,15}$/.test(n)) { C.err(`${place} pictures: ${q(n)} is not a piece name (cap, mid, foot, thin-l, top ...)`); continue; }
+        o.pictures[n] = drawList(C, `${place} picture ${q(n)}`, g.pictures[n], `${place} picture ${q(n)}:`);
+      }
+    }
+  }
+  const ol = bool(C, place, 'outline', g.outline); if (ol !== undefined) o.outline = ol;
+}
+
+/** A material's ink ("none" for no line), corner round, soft ground, fill versions behind edge pieces, a top-down wall's face and a liquid's surface. */
+function tileMaterialMore(C, place, m, out, T) {
+  if (m.ink !== undefined) { if (m.ink === 'none') out.ink = 'none'; else { const p = paintRef(C, `${place}, ink`, m.ink); if (p !== undefined) out.ink = p; } }
+  if (m.round !== undefined) { const r = numOrBind(C, place, 'round', m.round, 0, 14); if (r) out.round = r.value; }
+  for (const f of ['soft', 'behind']) { const b = bool(C, place, f, m[f]); if (b !== undefined) out[f] = b; }
+  if (m.face !== undefined) {
+    const fp = `${place} face`;
+    if (!isObj(m.face)) C.err(`${fp}: must be { draw, top, base, shadow }; got ${say(m.face)}`);
+    else {
+      knownOnly(C, fp, m.face, ['draw', 'top', 'base', 'shadow']);
+      out.face = { draw: drawList(C, `${fp} draw`, m.face.draw ?? [], `${fp}:`) };
+      for (const f of ['top', 'base', 'shadow']) {
+        if (m.face[f] === undefined) continue;
+        if (f === 'shadow' && m.face[f] === 'none') { out.face[f] = 'none'; continue; }
+        const p = paintRef(C, `${fp}, ${f}`, m.face[f]); if (p !== undefined) out.face[f] = p;
+      }
+    }
+  }
+  if (m.liquid !== undefined) {
+    const lp = `${place} liquid`;
+    if (!isObj(m.liquid)) C.err(`${lp}: must be { level, rise, surface }; got ${say(m.liquid)}`);
+    else {
+      knownOnly(C, lp, m.liquid, ['level', 'rise', 'surface']);
+      out.liquid = {};
+      const lv = numOrBind(C, lp, 'level', m.liquid.level ?? 6, 0, T - 1); if (lv) out.liquid.level = lv.value;
+      if (m.liquid.rise !== undefined) {
+        const r = m.liquid.rise;
+        if (!isObj(r)) C.err(`${lp}: rise must be { profile, amount, travel }; got ${say(r)}`);
+        else {
+          knownOnly(C, `${lp}, rise`, r, ['profile', 'amount', 'travel']);
+          const pr = profileRef(C, `${lp}, rise`, 'profile', r.profile);
+          const am = numOrBind(C, `${lp}, rise`, 'amount', r.amount ?? 1, 0, T);
+          const tr = num(C, `${lp}, rise`, 'travel', r.travel ?? 0, -4, 4, { clamp: false, whole: true });
+          if (pr !== undefined && am && tr !== undefined) out.liquid.rise = { profile: pr, amount: am.value, travel: tr };
+        }
+      }
+      if (m.liquid.surface !== undefined) { const s = materialOf(C, `${lp} surface`, { edges: { top: { bands: m.liquid.surface } } }, T)?.edges?.top?.bands; if (s) out.liquid.surface = s; }
+    }
+  }
+  if (m.outside !== undefined) tileOutside(C, place, m.outside, out, T);
+}
+
+/** A material's `outside`: rules for the pixels beyond its outline ({ x, y, out, paint, when }: tile columns and rows [from, to], px beyond the line on soft ground [from, to]; first match wins, no match leaves them see-through). */
+function tileOutside(C, place, raw, out, T) {
+  const rs = list(C, `${place} outside`, raw, L.bandRules, { what: 'outside rules' }) ?? [];
+  out.outside = [];
+  rs.forEach((r, i) => {
+    const rp = `${place}, outside rule ${i + 1}`;
+    if (!isObj(r)) { C.err(`${rp}: must be { x, y, out, paint, when }; got ${say(r)}`); return; }
+    knownOnly(C, rp, r, ['x', 'y', 'out', 'paint', 'when']);
+    const x = {};
+    for (const [f, lo, hi] of [['x', 0, T - 1], ['y', 0, T - 1], ['out', 1, T]]) {
+      const v = r[f];
+      if (v === undefined) continue;
+      if (!Array.isArray(v) || v.length !== 2 || !v.every(Number.isInteger) || v[0] < lo || v[1] > hi || v[0] > v[1]) { C.err(`${rp}: ${f} must be [from, to], whole numbers from ${lo} to ${hi} (from no more than to); got ${say(v)}`); return; }
+      x[f] = [...v];
+    }
+    if (r.when !== undefined) { const w = checkWhen(C, rp, r.when); if (w === undefined) return; x.when = w; }
+    const p = paintRef(C, `${rp}, paint`, r.paint);
+    if (p === undefined) return;
+    x.paint = p;
+    out.outside.push(x);
+  });
+}
+
+/** Fills against fill versions: a group asking for N fills draws N different middles, so its material (its own, or the tileset's, written in place) gives N versions; more is a warning. A material piece is held to it where it is drawn (engine/gen/tiles.js). */
+function tileFillCount(C, place, g, shared) {
+  if (!groupDrawsMiddles(g)) {   // build item B15 review 2: platform, slope, stack and a block of thin or slope pieces only draw no middles
+    if ((g.fills ?? 1) > 1) C.err(`${place}: fills ${g.fills} asks for ${g.fills} different middles, but a ${g.kind ?? '?'} group${g.kind === 'block' ? ` of ${listOf(g.pieces ?? [])} pieces` : ''} draws no middle tiles; leave fills out (it is for blocks of block, narrow or lanes pieces, floors and liquids)`);
+    return;
+  }
+  const m = g.material ?? shared;
+  if (!isObj(m) || Object.hasOwn(m, 'use')) return;
+  const n = g.fills ?? 1, v = Array.isArray(m.fill?.versions) ? m.fill.versions.length : 0;
+  const has = v ? `${v} fill version${v === 1 ? '' : 's'}` : 'no fill versions';
+  if (n > 1 && v < n) C.err(`${place}: fills ${n} asks for ${n} different middles, but its material has ${has}; give fill.versions ${n} draw lists (the first may be [])`);
+  else if (v > n && g.material) C.warn(`${place}: its material has ${has}; fills ${n} draws only the first ${n === 1 ? 'one' : n}`);
+}
+
+const MATERIAL_CHECKS = new WeakMap();   // a loaded piece (frozen, shared) -> its check
+
+// A piece's args as the controls its body's bindings and `when`s may name, read as engine/resolve.js argTable reads
+// them (a number type a range over lo..hi, its type's own range else 0..1; a word a choice of its options; a flag on/off).
+const ARG_NUMBER_TYPES = new Set(['px', 'share', 'count', 'angle', 'seed']);
+const ARG_TYPE_RANGE = { share: [0, 1], angle: [-720, 720], seed: [0, 9999] };
+function pieceArgTable(C, args) {
+  if (!isObj(args)) return;
+  for (const [name, t] of Object.entries(args).slice(0, 16)) {
+    if (!isObj(t) || !ID_PATTERN.test(name) || RESERVED.has(name)) continue;
+    if (ARG_NUMBER_TYPES.has(t.type)) { const [lo, hi] = ARG_TYPE_RANGE[t.type] ?? [0, 1]; C.table.set(name, { kind: 'range', min: fin(t.lo) ? t.lo : lo, max: fin(t.hi) ? t.hi : hi, scales: false }); }
+    else if (t.type === 'word') { const values = (Array.isArray(t.options) ? t.options : Array.isArray(t.values) ? t.values : []).filter((x) => typeof x === 'string'); C.table.set(name, { kind: 'choice', values }); }
+    else if (t.type === 'flag') C.table.set(name, { kind: 'toggle' });
+  }
+}
+
+/**
+ * The body check of a material piece (pieces/material-<name>.v<v>.json; docs/data-sprites.md 3.3): the rules a tileset's
+ * own material is held to (catalog/sprite-schema.js materialOf), with its paints naming the piece's own slots (a face's
+ * top with a tone, as only those are renamed by a use) and its profile names its own `profiles` (body.profiles), so a
+ * shared material draws the same in every tileset. Pieces of other kinds pass. It is the `check` hook engine/pieces.js
+ * validatePiece takes; engine/resolve.js runs it wherever a tileset uses one. Returns { errors, warnings }.
+ */
+export function checkMaterialPiece(piece, opts = {}) {
+  if (!isObj(piece) || typeof piece.id !== 'string' || !piece.id.startsWith('material:')) return { errors: [], warnings: [] };
+  if (MATERIAL_CHECKS.has(piece)) return MATERIAL_CHECKS.get(piece);
+  const C = context(opts);
+  C.cost = { written: 0, expanded: 0, budget: L.expanded, stampPixels: 0, generators: 0, nodes: 0, pieces: 0, frames: 0 };
+  const where = `The material ${piece.id}`;
+  try {
+    setup(C);
+    C.version = 2; C.W = 32; C.H = 32;
+    for (const s of Array.isArray(piece.slots) ? piece.slots : []) if (isObj(s) && typeof s.id === 'string') C.slots.set(s.id, { material: s.material, detail: false, derived: false, control: false });
+    pieceArgTable(C, piece.args);   // build item B15 review 2: inside a piece's body a binding or a `when` names the piece's args
+    const b = isObj(piece.body) ? piece.body : {};
+    const { profiles, ...m } = isObj(b.material) ? { ...b.material, profiles: b.profiles } : b;
+    C.profiles = new Map();
+    if (profiles !== undefined) {
+      const names = mapNames(C, `${where} profiles`, profiles, L.profiles, 'name: [numbers]') ?? [];
+      for (const n of names) {
+        if (!idOf(C, `${where} profiles`, n, { what: 'profile name' })) continue;
+        const v = profiles[n];
+        if (!Array.isArray(v) || !v.length || v.length > L.profileLength || v.some((x) => !fin(x) || Math.abs(x) > 64)) { C.err(`${where}: the profile ${q(n)} must be a list of 1 to ${L.profileLength} numbers from -64 to 64; got ${Array.isArray(v) ? `${v.length} entries` : say(v)}`); continue; }
+        C.profiles.set(n, v.length);
+      }
+    }
+    if (Object.hasOwn(m, 'use')) C.err(`${where}: a material piece is a material itself { fill, edges, ... }; it cannot use another piece`);
+    else materialOf(C, where, m, 32);
+    const top = isObj(m.face) ? m.face.top : undefined;
+    if (typeof top === 'string' && C.slots.has(top)) C.err(`${where} face: top names ${q(top)} without a tone; in a material piece write it with one ("${top}.base", "${top}.light") so a use can colour it`);
+  } catch (e) {
+    C.err(`${where}: could not be checked: ${String(e?.message ?? e).slice(0, 120)}`);
+  }
+  const res = finish(C);
+  MATERIAL_CHECKS.set(piece, res);
+  return res;
 }
 
 // ---- the sprite: palette, controls, parts, clips ------------------------------------------------------------------
@@ -2200,7 +2472,12 @@ function checkKey(C, place, k) {
       const t = targetOf(info);
       if (!t) { C.err(`${place}: emit ${q(id)}: ${q(f)} cannot be keyed`); continue; }
       const v = targetValue(C, place, `emit ${q(id)} ${f}`, val, t);
-      if (v !== undefined) n[f] = v;
+      if (v === undefined) continue;
+      // a size argument (engine/gen/index.js SIZE_KEYS) may be keyed down from what the emitter sets, never up: the
+      // emitter is priced once at what it sets, so no key can raise its cost or its stamps (3.4 rule 2; B12b)
+      const sized = sizeKeysOf(C, e);
+      if (sized.includes(f) && !notAbove(v, e.worst?.[f])) { C.err(`${place}: emit ${q(id)}: a key sets ${f} to ${say(v)}, above the ${say(e.worst?.[f])} the emitter sets; ${e.key} is priced at what the emitter sets, so keys may lower ${listOf(sized)} but never raise ${sized.length === 1 ? 'it' : 'them'}: set ${f} at its largest on the emitter and key it down`); continue; }
+      n[f] = v;
     }
     return n;
   });
@@ -2321,7 +2598,7 @@ function clipsOf(C, raw) {
     const m = DIR_CLIP_RE.exec(name);
     if (m && names.includes(`${m[1]}-${m[2]}`)) C.err(`Clip ${q(name)}: there is also a clip ${q(`${m[1]}-${m[2]}`)}; a name may be written only one way`);
     const isWritten = written === null ? true : written.includes(name);
-    if (C.closedClips && !isWritten) { C.err(`Clip ${q(name)}: ${q(name)} is not one of the ${C.bodyKind === 'panel' ? 'states' : 'layers'} (${someOf(written)}); this body's clips are its ${C.bodyKind === 'panel' ? 'states' : 'layers'}`); continue; }
+    if (C.closedClips && !isWritten) { const are = C.bodyKind === 'panel' ? 'states' : C.bodyKind === 'tiles' ? 'tiles' : 'layers'; C.err(`Clip ${q(name)}: ${q(name)} is not one of the ${are} (${someOf(written)}); this body's clips are its ${are}${C.bodyKind === 'tiles' ? ' (named <group>-<piece> by its groups, decals and extra tiles)' : ''}`); continue; }
     if (written === null && C.tileGroups && ![...C.tileGroups].some((g) => name.startsWith(`${g}-`)) && !C.tileExtras.has(name)) C.warn(`Clip ${q(name)}: does not start with a group's name (${someOf([...C.tileGroups])}); the tiles are named <group>-<piece>`);
     const r = checkClip(C, name, raw[name], isWritten && written !== null ? true : written === null);
     if (r) { out[name] = r.clip; total += r.frames; }
@@ -2722,6 +2999,7 @@ function finalChecks(C, controls = []) {
     if (s.control && !C.anyPiece) C.err(`Colour ${q(id)}: nothing paints it, so its control would do nothing; paint a shape with it or remove it`);
     else if (!C.anyPiece) C.warn(`Colour ${q(id)}: nothing paints it`);
   }
+  boundEmitters(C);
   // the caps on what was counted (docs/data-sprites.md 2.7)
   const k = C.cost;
   if (k.written > L.primitives) C.err(`The sprite has ${grand(k.written)} primitives and generator calls written; the most is ${L.primitives}`);

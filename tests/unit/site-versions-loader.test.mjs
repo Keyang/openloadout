@@ -4,7 +4,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { loadVersions, versionsFor, forgetVersions } from '../../app/versions.js';
-import knight from '../../sprites/knight.js';
+import { librarySprite } from '../helpers/library.mjs';   // the library asset, a code file or a data file (tests/helpers/library.mjs)
+const knight = await librarySprite('knight');
 
 const file = JSON.parse(fs.readFileSync(new URL('../../generated/versions.json', import.meta.url), 'utf8'));
 const fetchFile = async () => ({ ok: true, json: async () => file });

@@ -11,6 +11,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import * as DF from '../../tools/lib/data-file.mjs';
 import { dataSprite, validateDataSprite } from '../../engine/data-sprite.js';
 import { renderFrame, defaultParams } from '../../engine/sprite.js';
+import { codeSpriteAsFile } from '../helpers/library.mjs';
 
 const REAL = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const load = (rel) => JSON.parse(fs.readFileSync(path.join(REAL, 'tests', 'fixtures', rel), 'utf8'));
@@ -159,7 +160,7 @@ test('data-file: the id inside must match the file name', () => {
 });
 
 test('data-file: a file without the studio comment is not a studio file and is left to the ordinary sprite checks', () => {
-  const ordinary = fs.readFileSync(path.join(REAL, 'sprites', fs.readdirSync(path.join(REAL, 'sprites')).find((f) => f.endsWith('.js'))), 'utf8');
+  const ordinary = codeSpriteAsFile('coin');      // an ordinary code sprite: the old code coin, frozen (tests/helpers/library.mjs)
   assert.equal(DF.claimsStudioForm(ordinary), false);
   assert.equal(DF.checkDataFile(ordinary, 'sprites/whatever.js'), null);
   assert.equal(DF.claimsStudioForm(TEXT), true);

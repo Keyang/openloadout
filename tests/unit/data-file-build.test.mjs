@@ -10,6 +10,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadSprites } from '../../tools/lib/assets.mjs';
 import { writeDataFile } from '../../tools/lib/data-file.mjs';
+import { codeSpriteAsFile } from '../helpers/library.mjs';
 
 const REAL = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const newt = JSON.parse(fs.readFileSync(path.join(REAL, 'tests', 'fixtures', 'studio', 'newt.json'), 'utf8'));
@@ -75,8 +76,8 @@ test('data-file build: a studio file under another file name is refused, naming 
 });
 
 test('data-file build: ordinary sprite files are not affected', async () => {
-  const name = fs.readdirSync(path.join(REAL, 'sprites')).find((f) => f === 'coin.js') ?? fs.readdirSync(path.join(REAL, 'sprites')).find((f) => f.endsWith('.js'));
-  const root = make({ [name]: fs.readFileSync(path.join(REAL, 'sprites', name), 'utf8'), [newtFile.name]: newtFile.text });
+  // an ordinary code sprite: the old code coin, frozen (tests/helpers/library.mjs), as the library's own are redrawn as data
+  const root = make({ 'coin.js': codeSpriteAsFile('coin'), [newtFile.name]: newtFile.text });
   const got = await loadSprites(root);
   assert.equal(got.length, 2);
 });

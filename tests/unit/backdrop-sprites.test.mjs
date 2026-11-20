@@ -9,8 +9,9 @@ import { LAYER, PIVOT, TIMES, skyLook } from '../../engine/backdrop.js';
 import { THEME_PRESETS, applyColour } from '../../engine/theme.js';
 import { checkSprite, seamCheck } from '../../quality/sprite.js';
 import { validateMeta } from '../../catalog/schema.js';
-import forest from '../../sprites/bg-forest.js';
-import castle from '../../sprites/bg-castle.js';
+import { librarySprite } from '../helpers/library.mjs';   // the library asset, a code file or a data file (tests/helpers/library.mjs)
+const forest = await librarySprite('bg-forest');
+const castle = await librarySprite('bg-castle');
 
 const P = PALETTE.thornwood;
 const [W, H] = LAYER;

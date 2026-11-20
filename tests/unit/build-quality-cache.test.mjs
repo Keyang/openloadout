@@ -10,6 +10,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { runQuality, assetFiles } from '../../tools/lib/quality-run.mjs';
+import { isSpriteFile } from '../../tools/lib/assets.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 
@@ -156,7 +157,8 @@ test('assetFiles lists what a key covers', () => {
 
 test('on the real project: a key covers the asset and the checker, and is narrower than the whole framework', () => {
   const rel = (f) => path.relative(ROOT, f).split(path.sep).join('/');
-  const spriteFiles = fs.readdirSync(path.join(ROOT, 'sprites')).filter((f) => f.endsWith('.js') && !f.startsWith('_')).sort();
+  // a code file or a data file (docs/data-sprites.md, DQ1): a data file's key is its definition, the pieces and generators it names and the code that draws it
+  const spriteFiles = fs.readdirSync(path.join(ROOT, 'sprites')).filter(isSpriteFile).sort();
   const framework = ['engine', 'rigs'].flatMap((d) => fs.readdirSync(path.join(ROOT, d)).filter((f) => f.endsWith('.js')).map((f) => `${d}/${f}`));
   const usedBy = Object.fromEntries(framework.map((f) => [f, 0]));
   for (const f of spriteFiles) {

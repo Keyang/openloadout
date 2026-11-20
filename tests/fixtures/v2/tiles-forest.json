@@ -10,7 +10,10 @@
                   "hang": [1,2,1,0,0,1,2,3,2,0,0,1,1,0,2,3,1,0,0,1,2,1,0,0,1,3,2,1,0,0,2,1] },
     "groups": [ { "name": "grass", "kind": "block", "use": "ground", "pieces": ["block", "narrow", "thin", "slope"], "fills": 3,
       "material": {
-        "fill": { "base": "soil", "versions": [ [ { "gen": "scatter", "v": 1, "seed": 41, "count": { "from": "texture", "map": [[0, 0], [1, 3]], "round": "px" }, "margin": 4, "gap": 10, "place": { "use": "stamp:clod", "v": 1, "paint": { "a": "soil.dark" } } } ] ] },
+        "fill": { "base": "soil", "versions": [
+          [ { "gen": "scatter", "v": 1, "seed": 41, "count": { "from": "texture", "map": [[0, 0], [1, 3]], "round": "px" }, "margin": 4, "gap": 10, "place": { "use": "stamp:clod", "v": 1, "paint": { "a": "soil.dark" } } } ],
+          [ { "gen": "scatter", "v": 1, "seed": 7, "count": { "from": "texture", "map": [[0, 0], [1, 2]], "round": "px" }, "margin": 4, "gap": 10, "place": { "use": "stamp:clod", "v": 1, "paint": { "a": "soil.dark" } } } ],
+          [ { "gen": "scatter", "v": 1, "seed": 23, "count": { "from": "texture", "map": [[0, 0], [1, 3]], "round": "px" }, "margin": 4, "gap": 10, "place": { "use": "stamp:clod", "v": 1, "paint": { "a": "soil.dark" } } } ] ] },
         "edges": {
           "top": { "depth": { "from": "edge", "map": [[5, 5], [9, 9]] }, "wrap": 4, "tuck": true,
                    "inset": { "profile": "dips", "amount": { "from": "bumps", "map": [[0, 0], [3, 3]] } },
@@ -18,5 +21,5 @@
                               { "rows": [2, 2], "where": { "profile": "hang", "in": [0] }, "paint": "grass.light" },
                               { "rows": [3, 99], "where": { "profile": "hang", "in": [2, 3] }, "paint": "grass.dark" }, { "rows": [1, 99], "paint": "grass" } ] },
           "left": { "depth": 1, "bands": [ { "rows": [1, 1], "paint": "soil.dark" } ] } } },
-      "decals": [ { "name": "a", "place": "above", "label": "Grass tuft", "outline": false, "draw": [ { "kind": "stamp", "at": [10, 23], "rows": ["...........b", "....b.b....."], "key": { "b": "grass.light" } } ] } ] } ] } },
+      "decals": [ { "name": "a", "place": "above", "label": "Grass tuft", "outline": false, "draw": [ { "kind": "stamp", "at": [10, 30], "rows": ["...........b", "....b.b....."], "key": { "b": "grass.light" } } ] } ] } ] } },
   "clips": { "grass-top": { "label": "Grass: top edge" } } }

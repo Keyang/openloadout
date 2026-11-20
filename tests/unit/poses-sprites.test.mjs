@@ -6,11 +6,12 @@ import fs from 'node:fs';
 import { defaultParams, cleanParams, renderFrame, renderSheet, frameSockets, clipFps, partList, cueInEffect } from '../../engine/sprite.js';
 import { col, ramp, farRamp } from '../../engine/color.js';
 import * as H from '../../rigs/humanoid.js';
-import knight from '../../sprites/knight.js';
-import wizard from '../../sprites/wizard.js';
-import slime from '../../sprites/slime.js';
-import bat from '../../sprites/bat.js';
-import wolf from '../../sprites/wolf.js';
+import { librarySprite, codeSprite } from '../helpers/library.mjs';   // the library asset, a code file or a data file (tests/helpers/library.mjs)
+const knight = await librarySprite('knight');
+const wizard = await librarySprite('wizard');
+const slime = await librarySprite('slime');
+const bat = await librarySprite('bat');
+const wolf = await librarySprite('wolf');
 
 const SPRITES = { knight, wizard, slime, bat, wolf };
 const look = (s, over = {}) => cleanParams(s, { ...defaultParams(s), ...over });
@@ -47,6 +48,11 @@ function clipHashes(s, p, clips) {
 }
 
 // ---- what was there before is untouched -------------------------------------------------------
+// History tests of the P00 change: the code files' old clips drew the same pixels after it as before. They are about
+// that code, so they read the frozen copies (tests/fixtures/code-sprites/, codeSprite), not the library asset: a data
+// redraw of these five may differ by a few pixels and is held to docs/data-sprites.md's tolerance by its own batch.
+// Every other test in this file is an acceptance check on the library asset, whatever its file kind.
+const CODE = { knight: await codeSprite('knight'), wizard: await codeSprite('wizard'), slime: await codeSprite('slime'), bat: await codeSprite('bat'), wolf: await codeSprite('wolf') };
 
 // Recorded on 2026-11-18 from the sprites as they were before this change (one hash per clip over all its frames).
 const LOOKS = {
@@ -77,12 +83,12 @@ const BEFORE = {
 };
 
 test("the Hero's default idle, walk and run frames are pixel-identical to before", () => {
-  const got = clipHashes(knight, defaultParams(knight), ['idle', 'walk', 'run']);
+  const got = clipHashes(CODE.knight, defaultParams(CODE.knight), ['idle', 'walk', 'run']);
   assert.deepEqual(got, { idle: '64393393', walk: 'f7129018', run: '573fc90f' });
 });
 
 test('every clip the five sprites had before draws exactly what it drew before, in several looks', () => {
-  for (const [id, s] of Object.entries(SPRITES)) for (const [name, over] of Object.entries(LOOKS[id])) {
+  for (const [id, s] of Object.entries(CODE)) for (const [name, over] of Object.entries(LOOKS[id])) {
     const want = BEFORE[`${id} ${name}`];
     assert.deepEqual(clipHashes(s, look(s, over), Object.keys(want)), want, `${id}, ${name} look`);
   }

@@ -12,8 +12,10 @@ import { loadAssets } from '../../tools/lib/assets.mjs';
 const REAL = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const BUILD = path.join(REAL, 'tools', 'build.mjs');
 const FIX = path.join(REAL, 'tests', 'fixtures', 'catalog');
-// what a project copy needs to build: the assets and the code they import, plus the site for --dist
-const COPY = ['engine', 'rigs', 'sound', 'sprites', 'sounds', 'bundles', 'app', 'index.html'];
+// what a project copy needs to build: the assets and the code they import, plus the site for --dist (catalog/: a studio
+// library file in sprites/ is checked by catalog/studio-schema.js when it is loaded; studio item F1 made two of them;
+// pieces/: what a data sprite, sprites/<id>.json, may use, as the migration redraws the library as data)
+const COPY = ['engine', 'rigs', 'sound', 'sprites', 'sounds', 'bundles', 'app', 'catalog', 'pieces', 'index.html'];
 
 function makeCopy() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'loadout-build-'));
@@ -191,7 +193,8 @@ test('--dist copies the publishable site and nothing else', () => {
   const r = build(root, '--dist');
   assert.equal(r.code, 0, r.out);
   const dist = path.join(root, 'dist');
-  for (const p of ['index.html', 'app', 'engine', 'sprites/knight.js', 'sounds/coin-pickup.json', 'bundles/dungeon-starter.json', 'generated/catalog.json', 'generated/thumbs/knight.png']) {
+  // the knight's file is sprites/knight.js, or sprites/knight.json once redrawn as data
+  for (const p of ['index.html', 'app', 'engine', real.sprites.find((s) => s.id === 'knight').file, 'sounds/coin-pickup.json', 'bundles/dungeon-starter.json', 'generated/catalog.json', 'generated/thumbs/knight.png']) {
     assert.ok(fs.existsSync(path.join(dist, p)), `dist/${p}`);
   }
   for (const p of ['.cache', 'tools', 'tests', 'node_modules', 'dist']) assert.ok(!fs.existsSync(path.join(dist, p)), `dist/${p} should not be copied`);

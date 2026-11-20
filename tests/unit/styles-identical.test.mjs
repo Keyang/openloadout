@@ -5,11 +5,8 @@
 // today's rigs and helpers, so a helper that is changed on purpose changes both and the test still holds.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import fs from 'node:fs';
-import path from 'node:path';
 import crypto from 'node:crypto';
-import { pathToFileURL } from 'node:url';
-import { ROOT } from '../../tools/lib/assets.mjs';
+import { librarySprites, libraryCoverage } from '../helpers/library.mjs';
 import { encodePNG } from '../../tools/png.mjs';
 import { renderFrame, renderSheet, defaultParams, randomParams } from '../../engine/sprite.js';
 import { exportSheet, stylesOf } from '../../engine/styles.js';
@@ -20,16 +17,9 @@ const sha = (b) => crypto.createHash('sha1').update(b).digest('hex');
 const png = (s) => encodePNG(s.w, s.h, new Uint8Array(s.data.buffer, s.data.byteOffset, s.data.byteLength));
 const encodePng = (w, h, rgba) => encodePNG(w, h, rgba);
 
-// every sprite in sprites/ that loads (one that another builder has half-written is named, not counted)
-const sprites = [], unloadable = [];
-for (const f of fs.readdirSync(path.join(ROOT, 'sprites')).filter((x) => x.endsWith('.js') && !x.startsWith('_') && x !== 'index.js').sort()) {
-  const file = path.join(ROOT, 'sprites', f);
-  try {
-    const def = (await import(pathToFileURL(file).href)).default;
-    if (!def || typeof def.render !== 'function') throw new Error('no sprite exported');
-    sprites.push({ id: def.id, file, def });
-  } catch (e) { unloadable.push(`${f}: ${String(e.message).split('\n')[0]}`); }
-}
+// every sprite in sprites/ that loads, a code file or a data file (tests/helpers/library.mjs; one that another builder
+// has half-written is named, not counted)
+const { sprites, unloadable } = await librarySprites();
 
 /** What one sprite makes: a hash over every frame, and the sheet's PNG and JSON, at 1x defaults and 2x random settings. */
 function made(def, frame, sheet) {
@@ -73,6 +63,8 @@ test('the pixel exporter hands back exactly the old sheet: the same PNG bytes, t
 
 test('every existing sprite offers one style, pixel, and its catalogue row says so', () => {
   for (const { id, def } of sprites) assert.deepEqual(stylesOf(def), ['pixel'], id);
-  const cat = buildCatalog({ sprites: sprites.slice(0, 6).map(({ id, def }) => ({ id, file: `sprites/${id}.js`, def })) });
+  const cat = buildCatalog({ sprites: sprites.slice(0, 6).map(({ id, file, def }) => ({ id, file, def })) });
   for (const row of cat.assets) assert.deepEqual(row.styles, ['pixel'], row.id);
 });
+
+test('the scan covers every sprite file, code and data alike, and names any that did not load', async (t) => t.diagnostic(await libraryCoverage()));

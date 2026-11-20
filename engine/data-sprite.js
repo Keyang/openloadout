@@ -953,6 +953,8 @@ function buildV2(value, opts = {}) {
   for (const name of names) {
     const c = clipInfo(first, name), fps = c.fpsBase ?? c.fps;
     clips[name] = { frames: c.frames, loop: c.loop, label: c.label, fps: speed ? (p) => fps * lerp(0.65, 1.45, fin(p?.speed) ? p.speed : 0.5) : fps };
+    // a tile's block kind and a decal's place, as engine/tiles.js blockClips and decoClips leave them (build item B15)
+    for (const f of ['block', 'place']) if (typeof c[f] === 'string') clips[name][f] = c[f];
   }
   const noClip = (clip) => new Error(`sprite ${id}: no clip "${String(clip).slice(0, 40)}"`);
   const frameOf = (clip, t, frame, p) => {

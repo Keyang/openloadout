@@ -10,16 +10,17 @@ import { ROOT } from '../../tools/lib/assets.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 
+import { librarySprite, codeSpriteFile } from '../helpers/library.mjs';   // the library asset, a code file or a data file (tests/helpers/library.mjs)
 const ONLY = ['knight', 'slime', 'coin-pickup', 'battle-theme'];
 
 test('buildVersions gives each asset its versions: hand ones first, params only as they differ, styles by name', async () => {
   const out = await buildVersions({ only: ONLY });
   assert.deepEqual(Object.keys(out), [...ONLY].sort());
-  const knight = (await import('../../sprites/knight.js')).default;
+  const knight = (await librarySprite('knight'));
   assert.equal(out.knight.length, 12);
   assert.deepEqual(out.knight[0], { name: 'Classic', made: 'hand', params: {} });
   assert.deepEqual(out.knight.map((v) => cleanParams(knight, v.params)), versionsOf(knight, VERSIONS_PER_ASSET).map((v) => v.params));
-  const slime = (await import('../../sprites/slime.js')).default;
+  const slime = (await librarySprite('slime'));
   assert.deepEqual(out.slime.map((v) => v.name), versionsOf(slime, VERSIONS_PER_ASSET).map((v) => v.name));
   const coin = JSON.parse(fs.readFileSync(path.join(ROOT, 'sounds', 'coin-pickup.json'), 'utf8'));
   assert.deepEqual(out['coin-pickup'][0], { name: 'Gem', made: 'hand', style: 'Gem' });
@@ -42,9 +43,11 @@ test('the same input gives the same file, and a cache hit gives exactly what mak
 
 test('the cache key covers the asset file and everything it and engine/versions.js load', () => {
   const graph = importGraph({ root: ROOT });
-  const file = path.join(ROOT, 'sprites', 'knight.js');
+  // a code sprite's key (the code knight and wizard, frozen first: tests/helpers/library.mjs), whose imports are followed
+  const file = codeSpriteFile('knight');
   const { files } = graph.closure([file, path.join(ROOT, 'engine', 'versions.js')]);
-  for (const f of ['sprites/knight.js', 'engine/versions.js', 'engine/sprite.js', 'rigs/humanoid.js', 'engine/materials.js']) assert.ok(files.includes(path.join(ROOT, f)), f);
+  assert.ok(files.includes(file), path.relative(ROOT, file));
+  for (const f of ['engine/versions.js', 'engine/sprite.js', 'rigs/humanoid.js', 'engine/materials.js']) assert.ok(files.includes(path.join(ROOT, f)), f);
   assert.equal(versionsKey(graph, file, ROOT), versionsKey(graph, file, ROOT));
-  assert.notEqual(versionsKey(graph, file, ROOT), versionsKey(graph, path.join(ROOT, 'sprites', 'slime.js'), ROOT));
+  assert.notEqual(versionsKey(graph, file, ROOT), versionsKey(graph, codeSpriteFile('wizard'), ROOT));
 });

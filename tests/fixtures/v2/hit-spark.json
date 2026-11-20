@@ -1,11 +1,12 @@
 { "format": "loadout-sprite", "version": 2, "id": "hit-spark", "name": "Hit spark", "blurb": "A burst of sparks where a blow lands.", "size": [32, 32], "pivot": [16, 16], "grounded": false,
   "meta": { "type": "effect", "role": "effects/spark", "view": "none", "themes": ["neutral"], "gameTypes": ["platformer"], "words": ["hit", "spark", "impact", "flash", "sparks", "burst", "strike"], "license": "draft" },
   "palette": [ { "id": "spark", "label": "Sparks", "default": "#ffd060", "material": "fire" } ],
-  "controls": [ { "key": "amount", "kind": "range", "label": "Sparks", "lo": "Few", "hi": "Many", "default": 0.5 },
+  "was": { "controls": { "amount": "sparks" } },
+  "controls": [ { "key": "sparks", "kind": "range", "label": "Sparks", "lo": "Few", "hi": "Many", "default": 0.5 },
                 { "key": "size", "kind": "range", "label": "Spread", "lo": "Tight", "hi": "Wide", "default": 0.5 } ],
   "body": { "emitters": [
-    { "id": "sparks", "gen": "particles", "v": 1, "at": [16, 16], "count": { "from": "amount", "map": [[0, 4], [1, 12]], "round": "px" }, "seed": 2, "loop": false, "arc": 360,
+    { "id": "sparks", "gen": "particles", "v": 1, "at": [16, 16], "count": { "from": "sparks", "map": [[0, 4], [1, 12]], "round": "px" }, "seed": 2, "loop": false, "arc": 360,
       "dist": { "from": "size", "map": [[0, 8], [1, 13]] }, "size": 2, "paints": ["spark.light", "spark", "spark.dark"], "glow": true },
     { "id": "flash", "gen": "starburst", "v": 1, "at": [16, 16], "points": 4, "r": [3, 9], "paints": ["spark.light"], "glow": true } ] },
   "clips": { "hit": { "frames": 5, "fps": 18, "loop": false,
-    "keys": [ { "t": 0, "emit": { "flash": { "amount": 1 }, "sparks": { "amount": 1, "dist": 4 } } }, { "t": 0.5, "emit": { "flash": { "amount": 0 } } } ] } } }
+    "keys": [ { "t": 0, "emit": { "flash": { "amount": 1 }, "sparks": { "amount": 1 } } }, { "t": 0.5, "emit": { "flash": { "amount": 0 } } } ] } } }

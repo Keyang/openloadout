@@ -14,6 +14,7 @@ import { membraneWing } from '../../engine/creature.js';
 import { leaves } from '../../engine/fx.js';
 import * as H from '../../rigs/humanoid.js';
 
+import { codeSprite } from '../helpers/library.mjs';   // the code, frozen first (tests/helpers/library.mjs): a test about the framework it uses
 const PI = Math.PI;
 const pixels = (g) => { let n = 0; for (const c of g.data) if (c) n++; return n; };
 const differ = (a, b) => { let n = 0; for (let i = 0; i < a.data.length; i++) if (a.data[i] !== b.data[i]) n++; return n; };
@@ -273,7 +274,7 @@ test('leaves: thrown up and out, they tumble down, stay in the box and are all t
 test('the rig\'s first body is untouched: draw() still paints the Hero as it did', async () => {
   // the sprite tests pin every pixel of the existing characters; this is the short version for this file's additions
   const { renderFrame, defaultParams } = await import('../../engine/sprite.js');
-  const knight = (await import('../../sprites/knight.js')).default;
+  const knight = (await codeSprite('knight'));
   const a = renderFrame(knight, 'idle', 0, defaultParams(knight)), b = renderFrame(knight, 'idle', 0, defaultParams(knight));
   assert.equal(differ(a, b), 0);
   assert.ok(pixels(a) > 400);

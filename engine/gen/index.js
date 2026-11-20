@@ -11,12 +11,16 @@ import './shape.js';
 import './icon.js';
 import './shine.js';
 import './fx-items.js';
+import './fx-burst.js';
+import './emitters.js';
 import './motion.js';
 import './pictures.js';
 import './ui-pieces.js';
 import './ui.js';
 import './backdrop.js';
+import './tiles.js';         // build item B15: tiles@1, the layout of a tileset, its material as data (engine/gen/tiles.js)
 import { BACKDROP_FRAME_GENERATORS } from './backdrop-frame.js';
+import { FX_STAMP_BOUNDS, FX_SIZE_KEYS } from './fx-burst.js';   // not from backdrop.js: it imports resolve.js, which imports this module
 
 /** Declares and registers a generator version in the site's registry; returns its frozen entry (engine/gen/registry.js). */
 export { defineGenerator } from './registry.js';
@@ -52,10 +56,47 @@ export { CTX_FIELDS } from './registry.js';
  */
 export const ORIGIN_FIXED = Object.freeze({ 'gem.cut@1': 2, 'glint@1': 2, 'icon.paint@1': 2, 'icon.line@1': 2, 'icon.glint@1': 2 });
 
+/**
+ * The most stamp pixels a call can return in a frame of size [W, H]: "<id>@<v>" -> (args with defaults filled, size) ->
+ * pixels, for every behaviour (family fx). catalog/sprite-schema.js prices each emitter once by it, at its declared
+ * values, alone and summed over the emitters that can draw together, and refuses an emitter whose generator has none,
+ * before anything draws (build items B12, B12b: the effect behaviours, engine/gen/fx-burst.js).
+ */
+export const STAMP_BOUNDS = Object.freeze({
+  ...FX_STAMP_BOUNDS,
+  // engine/gen/fx.js and fx-items.js (B2, B8): a twinkle is one stamp of at most 9 x 9; a pickup burst at most three
+  // twinkles of size 1 and one of size 2 (its dots are not stamps); chunks are polygons and dots
+  'twinkle@1': () => 81,
+  'pickup.burst@1': () => 3 * 9 + 25,
+  'chunks@1': () => 0,
+});
+
+/**
+ * The keyable arguments of each behaviour that its cost or its stamp bound reads: "<id>@<v>" -> names. A clip key may
+ * set one of these below what the emitter sets, never above (catalog/sprite-schema.js), so keys never raise what an
+ * emitter was priced at; a behaviour with no entry has every keyable argument treated so (build item B12b).
+ */
+export const SIZE_KEYS = Object.freeze({
+  ...FX_SIZE_KEYS,
+  'twinkle@1': Object.freeze([]),          // its cost (1) and its bound (81) read no argument
+  'pickup.burst@1': Object.freeze([]),
+  'chunks@1': Object.freeze([]),
+});
+
 /** Generators that work in frame pixels by design, never on a node's own coordinates, each with why: "<id>@<v>" -> reason. */
 export const FRAME_GENERATORS = Object.freeze({
   ...BACKDROP_FRAME_GENERATORS,      // build item B14: backdrops wrap across the layer's width (engine/gen/backdrop.js)
   'pickup.burst@1': 'an effect that keeps its sparkles 3 px inside the frame: name it as an emitter (the pictures layout puts an emitter on its node\'s frame first), not in a draw list on a node',
   'chunks@1': 'an effect whose floor row and box are frame rows and columns: name it as an emitter, not in a draw list on a node',
   'icon.fit@1': 'lays out a whole icon centred in the frame: an icon set\'s fit, never drawn on a node',
+  // build item B12: the effect behaviours keep to the frame's 1 px border as engine/fx.js did (engine/gen/fx-burst.js)
+  'particles@1': 'an effect whose one-shot particles stop at the frame\'s border: name it as an emitter, not in a draw list on a node',
+  'starburst@1': 'an effect clipped to the frame\'s 1 px border: name it as an emitter, not in a draw list on a node',
+  'glow@1': 'an effect clipped to the frame\'s 1 px border: name it as an emitter, not in a draw list on a node',
+  'ring@1': 'an effect that stops growing at the frame\'s border: name it as an emitter, not in a draw list on a node',
+  'streaks@1': 'an effect clipped to the frame\'s 1 px border: name it as an emitter, not in a draw list on a node',
+  'puffs@1': 'an effect whose one-shot puffs stop at the frame\'s border: name it as an emitter, not in a draw list on a node',
+  'shot.bar@1': 'a bar of light whose nose and tail keep 3 px inside the frame: name it as an emitter, not in a draw list on a node',
+  // build item B15: a tile's pattern wraps round the tile's 32 px (engine/gen/tiles.js)
+  'tile.courses@1': 'stone courses that wrap round the tile\'s 32 px: name it in a tile\'s fill version or face picture, not on a node',
 });

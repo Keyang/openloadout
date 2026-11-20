@@ -4,7 +4,6 @@
 // checker use. With no tileset in the bag there is still a ground to stand on.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import fs from 'node:fs';
 import { makeLevel, levelFeatures, tileIndex, levelMap, levelText, levelTiles, isWall, solidAt, surfaceBelow, supportAt, wetAt, CELL } from '../../app/play/level.js';
 import { cameraFloor, VIEW_H } from '../../app/play/draw.js';
 import { JUMP_V, GRAVITY } from '../../app/play/world.js';
@@ -12,6 +11,7 @@ import { FENCE } from '../../engine/fences.js';
 import { readMap } from '../../engine/maptext.js';
 import { classifyTiles, layoutTiles, pickPiece, nearestPiece, blockKind, BLOCK_PIECES, NARROW_PIECES, LANE_PIECES } from '../../engine/tiles.js';
 import { tilesSide, tilesTop } from '../fixtures/play/index.js';
+import { librarySprite, librarySprites, libraryCoverage, hasLibrarySprite } from '../helpers/library.mjs';
 
 const block = (p) => BLOCK_PIECES.map((s) => `${p}-${s}`);
 const setOf = (key, names, clips) => ({ key, names, size: 32, clips });
@@ -62,14 +62,13 @@ test('side view: a ground, a step, an island, a platform, a ledge, a block two t
 // The scene shows 180 sprite pixels of a level that is taller than that, so whatever crosses the top edge of the
 // view looks as if it hangs from the top of the picture (a pillar high up once showed as a stub of dirt there).
 
-const realSets = async (...ids) => { const out = []; for (const id of ids) out.push(fromDef(id, (await import(`../../sprites/${id}.js`)).default)); return out; };
-const spriteFiles = fs.readdirSync(new URL('../../sprites/', import.meta.url)).filter((f) => f.endsWith('.js'));
+// library sprites by id or all of them, a code file or a data file alike (tests/helpers/library.mjs)
+const realSets = async (...ids) => { const out = []; for (const id of ids) out.push(fromDef(id, await librarySprite(id))); return out; };
 /** Every tileset on disk drawn for a view, found by reading the sprites folder (no list of names). */
 async function tilesetsFor(view) {
   const out = [];
-  for (const f of spriteFiles) {
-    if (!/^tiles-/.test(f)) continue;
-    const def = (await import(`../../sprites/${f}`)).default;
+  for (const { id, def } of (await librarySprites()).sprites) {
+    if (!/^tiles-/.test(id)) continue;
     if (def.meta?.type === 'tileset' && def.meta.view === view) out.push(fromDef(def.id, def));
   }
   return out;
@@ -555,12 +554,11 @@ test('the level is map text: a tool or a game reads it back and lays out the ver
 });
 
 // The real tilesets, when they are there (they are made alongside the playground).
-const real = (id) => new URL(`../../sprites/${id}.js`, import.meta.url);
-const have = (...ids) => ids.every((id) => fs.existsSync(real(id)));
-const load = async (id) => { const def = (await import(real(id).href)).default; return { def, set: fromDef(id, def) }; };
+const have = (...ids) => ids.every(hasLibrarySprite);
+const load = async (id) => { const def = await librarySprite(id); return { def, set: fromDef(id, def) }; };
 const loadAll = async (ids) => { const all = await Promise.all(ids.map(load)); return { index: tileIndex(all.map((x) => x.set)), defs: Object.fromEntries(all.map((x, i) => [ids[i], x.def])) }; };
 
-test('the real tileset tiles-forest: every cell of the ground gets a piece of its own, narrow pieces and fill versions included', { skip: !have('tiles-forest') && 'sprites/tiles-forest.js is not there yet' }, async () => {
+test('the real tileset tiles-forest: every cell of the ground gets a piece of its own, narrow pieces and fill versions included', { skip: !have('tiles-forest') && 'sprites/tiles-forest is not there yet' }, async () => {
   const { def, set } = await load('tiles-forest');
   const index = tileIndex([set]);
   const { level, tiles, plain } = build('side', index);
@@ -608,3 +606,5 @@ test('the real top-down tilesets together: the meadow under everything, a lane, 
   assert.equal(isWall(level, 17, 8), false);
   assert.match(at(7, 10)[1], /^plank-fill/, 'the village planks are a patch on the meadow');
 });
+
+test('the scan covers every sprite file, code and data alike, and names any that did not load', async (t) => t.diagnostic(await libraryCoverage()));

@@ -1,0 +1,1648 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "hit-spark",
+ "name": "Hit spark",
+ "blurb": "The flash where a hit lands: a white star whose rays fly outward and fade. Change its size, rays, style, turn and colours.",
+ "meta": {
+  "type": "effect",
+  "role": "effects/spark",
+  "themes": [
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "platformer",
+   "turn-based-rpg",
+   "roguelike-action",
+   "arcade"
+  ],
+  "view": "none",
+  "words": [
+   "hit",
+   "spark",
+   "impact",
+   "flash",
+   "star",
+   "slash",
+   "strike",
+   "clash",
+   "damage",
+   "burst",
+   "attack",
+   "sharp"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "burst",
+ "palette": [
+  {
+   "id": "core",
+   "label": "Core",
+   "default": "#f0ead8",
+   "material": "fire",
+   "swatches": [
+    "#f0ead8",
+    "#f6d3b0",
+    "#8fd0f0",
+    "#9bd18a",
+    "#c2c9d6"
+   ]
+  },
+  {
+   "id": "edge",
+   "label": "Edge",
+   "default": "#f2c230",
+   "material": "fire",
+   "swatches": [
+    "#f2c230",
+    "#e08a2c",
+    "#c9423a",
+    "#4fd8ee",
+    "#7a4fc4",
+    "#a4c44a",
+    "#3f6fd1"
+   ]
+  },
+  {
+   "id": "mid",
+   "material": "fire",
+   "derive": {
+    "rule": "mix",
+    "of": "core",
+    "with": "edge",
+    "amount": 0.5
+   }
+  },
+  {
+   "id": "rim",
+   "material": "fire",
+   "derive": {
+    "rule": "tone",
+    "of": "edge",
+    "by": -1
+   }
+  },
+  {
+   "id": "shine",
+   "default": "#ffffff",
+   "material": "light",
+   "detail": true
+  }
+ ],
+ "controls": [
+  {
+   "key": "size",
+   "kind": "range",
+   "label": "Size",
+   "lo": "Small",
+   "hi": "Big",
+   "default": 0.5
+  },
+  {
+   "key": "pieces",
+   "kind": "range",
+   "label": "Pieces",
+   "lo": "Few",
+   "hi": "Many",
+   "min": 4,
+   "max": 8,
+   "step": 1,
+   "default": 6
+  },
+  {
+   "key": "style",
+   "kind": "choice",
+   "label": "Style",
+   "options": [
+    "star",
+    "slash",
+    "ring"
+   ],
+   "default": "star"
+  },
+  {
+   "key": "twist",
+   "kind": "range",
+   "label": "Twist",
+   "lo": "Straight",
+   "hi": "Turned",
+   "default": 0
+  },
+  {
+   "key": "core",
+   "kind": "colour",
+   "label": "Core"
+  },
+  {
+   "key": "edge",
+   "kind": "colour",
+   "label": "Edge"
+  },
+  {
+   "key": "speed",
+   "standard": "speed"
+  }
+ ],
+ "body": {
+  "emitters": [
+   {
+    "id": "star0",
+    "gen": "starburst",
+    "v": 1,
+    "when": {
+     "style": [
+      "star"
+     ]
+    },
+    "at": [
+     15.5,
+     15.5
+    ],
+    "points": {
+     "from": "pieces",
+     "map": [
+      [
+       4,
+       4
+      ],
+      [
+       8,
+       8
+      ]
+     ],
+     "round": "px"
+    },
+    "turn": 180,
+    "twist": {
+     "from": "twist",
+     "map": [
+      [
+       0,
+       0
+      ],
+      [
+       1,
+       1
+      ]
+     ]
+    },
+    "r": [
+     0,
+     {
+      "from": "size",
+      "map": [
+       [
+        0,
+        7
+       ],
+       [
+        1,
+        11.5
+       ]
+      ]
+     }
+    ],
+    "width": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       3.92
+      ],
+      [
+       1,
+       6.44
+      ]
+     ]
+    },
+    "paints": [
+     "core",
+     "edge"
+    ]
+   },
+   {
+    "id": "star0-white",
+    "gen": "starburst",
+    "v": 1,
+    "when": {
+     "style": [
+      "star"
+     ]
+    },
+    "at": [
+     15.5,
+     15.5
+    ],
+    "points": {
+     "from": "pieces",
+     "map": [
+      [
+       4,
+       4
+      ],
+      [
+       8,
+       8
+      ]
+     ],
+     "round": "px"
+    },
+    "turn": 180,
+    "twist": {
+     "from": "twist",
+     "map": [
+      [
+       0,
+       0
+      ],
+      [
+       1,
+       1
+      ]
+     ]
+    },
+    "r": [
+     0,
+     {
+      "from": "size",
+      "map": [
+       [
+        0,
+        5.4
+       ],
+       [
+        1,
+        9.9
+       ]
+      ]
+     }
+    ],
+    "width": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       1.92
+      ],
+      [
+       1,
+       4.44
+      ]
+     ]
+    },
+    "paints": [
+     "shine"
+    ]
+   },
+   {
+    "id": "star1",
+    "gen": "starburst",
+    "v": 1,
+    "when": {
+     "style": [
+      "star"
+     ]
+    },
+    "at": [
+     15.5,
+     15.5
+    ],
+    "points": {
+     "from": "pieces",
+     "map": [
+      [
+       4,
+       4
+      ],
+      [
+       8,
+       8
+      ]
+     ],
+     "round": "px"
+    },
+    "turn": 180,
+    "twist": {
+     "from": "twist",
+     "map": [
+      [
+       0,
+       0
+      ],
+      [
+       1,
+       1
+      ]
+     ]
+    },
+    "r": [
+     {
+      "from": "size",
+      "map": [
+       [
+        0,
+        2.1
+       ],
+       [
+        1,
+        3.45
+       ]
+      ]
+     },
+     {
+      "from": "size",
+      "map": [
+       [
+        0,
+        8.575
+       ],
+       [
+        0.518519,
+        11.433333
+       ],
+       [
+        1,
+        12.625
+       ]
+      ]
+     }
+    ],
+    "width": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       2.1
+      ],
+      [
+       1,
+       3.45
+      ]
+     ]
+    },
+    "paints": [
+     "core",
+     "edge"
+    ]
+   },
+   {
+    "id": "star1-white",
+    "gen": "starburst",
+    "v": 1,
+    "when": {
+     "style": [
+      "star"
+     ]
+    },
+    "at": [
+     15.5,
+     15.5
+    ],
+    "points": {
+     "from": "pieces",
+     "map": [
+      [
+       4,
+       4
+      ],
+      [
+       8,
+       8
+      ]
+     ],
+     "round": "px"
+    },
+    "turn": 180,
+    "twist": {
+     "from": "twist",
+     "map": [
+      [
+       0,
+       0
+      ],
+      [
+       1,
+       1
+      ]
+     ]
+    },
+    "r": [
+     {
+      "from": "size",
+      "map": [
+       [
+        0,
+        3.85
+       ],
+       [
+        1,
+        6.325
+       ]
+      ]
+     },
+     {
+      "from": "size",
+      "map": [
+       [
+        0,
+        6.575
+       ],
+       [
+        0.518519,
+        9.433333
+       ],
+       [
+        1,
+        10.625
+       ]
+      ]
+     }
+    ],
+    "width": 0.4,
+    "paints": [
+     "shine"
+    ]
+   },
+   {
+    "id": "star2",
+    "gen": "starburst",
+    "v": 1,
+    "when": {
+     "style": [
+      "star"
+     ]
+    },
+    "at": [
+     15.5,
+     15.5
+    ],
+    "points": {
+     "from": "pieces",
+     "map": [
+      [
+       4,
+       4
+      ],
+      [
+       8,
+       8
+      ]
+     ],
+     "round": "px"
+    },
+    "turn": 180,
+    "twist": {
+     "from": "twist",
+     "map": [
+      [
+       0,
+       0
+      ],
+      [
+       1,
+       1
+      ]
+     ]
+    },
+    "r": [
+     {
+      "from": "size",
+      "map": [
+       [
+        0,
+        5.04
+       ],
+       [
+        1,
+        8.28
+       ]
+      ]
+     },
+     {
+      "from": "size",
+      "map": [
+       [
+        0,
+        9.8
+       ],
+       [
+        0.518519,
+        13.066667
+       ],
+       [
+        1,
+        13.5
+       ]
+      ]
+     }
+    ],
+    "width": 1.5,
+    "paints": [
+     "mid",
+     "rim"
+    ]
+   },
+   {
+    "id": "star2-tips",
+    "gen": "starburst",
+    "v": 1,
+    "when": {
+     "style": [
+      "star"
+     ]
+    },
+    "at": [
+     15.5,
+     15.5
+    ],
+    "points": {
+     "from": "pieces",
+     "map": [
+      [
+       4,
+       4
+      ],
+      [
+       8,
+       8
+      ]
+     ],
+     "round": "px"
+    },
+    "turn": 180,
+    "twist": {
+     "from": "twist",
+     "map": [
+      [
+       0,
+       0
+      ],
+      [
+       1,
+       1
+      ]
+     ]
+    },
+    "r": [
+     {
+      "from": "size",
+      "map": [
+       [
+        0,
+        7.8
+       ],
+       [
+        0.518519,
+        11.066667
+       ],
+       [
+        1,
+        11.5
+       ]
+      ]
+     },
+     {
+      "from": "size",
+      "map": [
+       [
+        0,
+        9.8
+       ],
+       [
+        0.518519,
+        13.066667
+       ],
+       [
+        1,
+        13.5
+       ]
+      ]
+     }
+    ],
+    "width": 0.4,
+    "paints": [
+     "core"
+    ]
+   },
+   {
+    "id": "star-tips",
+    "gen": "starburst",
+    "v": 1,
+    "when": {
+     "style": [
+      "star"
+     ]
+    },
+    "at": [
+     15.5,
+     15.5
+    ],
+    "points": {
+     "from": "pieces",
+     "map": [
+      [
+       4,
+       4
+      ],
+      [
+       8,
+       8
+      ]
+     ],
+     "round": "px"
+    },
+    "turn": 180,
+    "twist": {
+     "from": "twist",
+     "map": [
+      [
+       0,
+       0
+      ],
+      [
+       1,
+       1
+      ]
+     ]
+    },
+    "r": [
+     {
+      "from": "size",
+      "map": [
+       [
+        0,
+        8.1
+       ],
+       [
+        0.518519,
+        11.6
+       ],
+       [
+        1,
+        11.6
+       ]
+      ]
+     },
+     {
+      "from": "size",
+      "map": [
+       [
+        0,
+        10.9
+       ],
+       [
+        0.518519,
+        14.4
+       ],
+       [
+        1,
+        14.4
+       ]
+      ]
+     }
+    ],
+    "width": 0.4,
+    "paints": [
+     "edge",
+     "rim"
+    ],
+    "rim": 2
+   },
+   {
+    "id": "ring",
+    "gen": "ring",
+    "v": 1,
+    "when": {
+     "style": [
+      "ring"
+     ]
+    },
+    "at": [
+     15.5,
+     15.5
+    ],
+    "r0": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       5.25
+      ],
+      [
+       1,
+       8.625
+      ]
+     ]
+    },
+    "r1": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       7.5
+      ],
+      [
+       0.518519,
+       11
+      ],
+      [
+       1,
+       11
+      ]
+     ]
+    },
+    "thick": 3,
+    "seed": 3,
+    "paints": [
+     "shine",
+     "core",
+     "mid",
+     "edge",
+     "rim"
+    ]
+   },
+   {
+    "id": "ring0-star",
+    "gen": "starburst",
+    "v": 1,
+    "when": {
+     "style": [
+      "ring"
+     ]
+    },
+    "at": [
+     15.5,
+     15.5
+    ],
+    "points": {
+     "from": "pieces",
+     "map": [
+      [
+       4,
+       4
+      ],
+      [
+       8,
+       8
+      ]
+     ],
+     "round": "px"
+    },
+    "turn": 180,
+    "twist": {
+     "from": "twist",
+     "map": [
+      [
+       0,
+       0
+      ],
+      [
+       1,
+       1
+      ]
+     ]
+    },
+    "r": [
+     0,
+     {
+      "from": "size",
+      "map": [
+       [
+        0,
+        7
+       ],
+       [
+        1,
+        11.5
+       ]
+      ]
+     }
+    ],
+    "width": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       2.1
+      ],
+      [
+       1,
+       3.45
+      ]
+     ]
+    },
+    "paints": [
+     "core",
+     "edge"
+    ]
+   },
+   {
+    "id": "ring-glow",
+    "gen": "glow",
+    "v": 1,
+    "when": {
+     "style": [
+      "ring"
+     ]
+    },
+    "at": [
+     15.5,
+     15.5
+    ],
+    "r": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       4.34
+      ],
+      [
+       1,
+       7.13
+      ]
+     ]
+    },
+    "paints": [
+     "shine",
+     "shine",
+     "core",
+     "edge"
+    ]
+   },
+   {
+    "id": "ring-tips",
+    "gen": "starburst",
+    "v": 1,
+    "when": {
+     "style": [
+      "ring"
+     ]
+    },
+    "at": [
+     15.5,
+     15.5
+    ],
+    "points": {
+     "from": "pieces",
+     "map": [
+      [
+       4,
+       4
+      ],
+      [
+       8,
+       8
+      ]
+     ],
+     "round": "px"
+    },
+    "turn": 180,
+    "twist": {
+     "from": "twist",
+     "map": [
+      [
+       0,
+       0
+      ],
+      [
+       1,
+       1
+      ]
+     ]
+    },
+    "r": [
+     {
+      "from": "size",
+      "map": [
+       [
+        0,
+        8.0
+       ],
+       [
+        0.518519,
+        11.5
+       ],
+       [
+        1,
+        11.5
+       ]
+      ]
+     },
+     {
+      "from": "size",
+      "map": [
+       [
+        0,
+        10.5
+       ],
+       [
+        0.518519,
+        14
+       ],
+       [
+        1,
+        14
+       ]
+      ]
+     }
+    ],
+    "width": 0.4,
+    "paints": [
+     "edge",
+     "rim"
+    ],
+    "rim": 2
+   },
+   {
+    "id": "slash-across",
+    "gen": "starburst",
+    "v": 1,
+    "when": {
+     "style": [
+      "slash"
+     ]
+    },
+    "at": [
+     15.5,
+     15.5
+    ],
+    "points": {
+     "from": "pieces",
+     "map": [
+      [
+       4,
+       4
+      ],
+      [
+       8,
+       8
+      ]
+     ],
+     "round": "px"
+    },
+    "turn": {
+     "from": "twist",
+     "map": [
+      [
+       0,
+       135
+      ],
+      [
+       1,
+       225
+      ]
+     ]
+    },
+    "twist": 1,
+    "r": [
+     0,
+     {
+      "from": "size",
+      "map": [
+       [
+        0,
+        4.34
+       ],
+       [
+        0.5,
+        5.735
+       ],
+       [
+        1,
+        7.13
+       ]
+      ]
+     }
+    ],
+    "width": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       2.1
+      ],
+      [
+       0.5,
+       2.775
+      ],
+      [
+       1,
+       3.45
+      ]
+     ]
+    },
+    "paints": [
+     "core",
+     "edge"
+    ]
+   },
+   {
+    "id": "slash-cuts",
+    "gen": "starburst",
+    "v": 1,
+    "when": {
+     "style": [
+      "slash"
+     ]
+    },
+    "at": [
+     15.5,
+     15.5
+    ],
+    "points": {
+     "from": "pieces",
+     "map": [
+      [
+       4,
+       4
+      ],
+      [
+       8,
+       8
+      ]
+     ],
+     "round": "px"
+    },
+    "turn": {
+     "from": "twist",
+     "map": [
+      [
+       0,
+       135
+      ],
+      [
+       1,
+       225
+      ]
+     ]
+    },
+    "twist": 1,
+    "r": [
+     {
+      "from": "size",
+      "map": [
+       [
+        0,
+        0.7625
+       ],
+       [
+        0.5,
+        3.2375
+       ],
+       [
+        1,
+        5.7125
+       ]
+      ]
+     },
+     {
+      "from": "size",
+      "map": [
+       [
+        0,
+        6.3125
+       ],
+       [
+        0.5,
+        8.7875
+       ],
+       [
+        1,
+        11.2625
+       ]
+      ]
+     }
+    ],
+    "width": 1.6,
+    "push": 3.3125,
+    "paints": [
+     "core",
+     "mid",
+     "edge",
+     "rim"
+    ],
+    "rim": 2
+   },
+   {
+    "id": "slash-blade",
+    "gen": "starburst",
+    "v": 1,
+    "when": {
+     "style": [
+      "slash"
+     ]
+    },
+    "at": [
+     15.5,
+     15.5
+    ],
+    "points": 2,
+    "turn": {
+     "from": "twist",
+     "map": [
+      [
+       0,
+       135
+      ],
+      [
+       1,
+       225
+      ]
+     ]
+    },
+    "r": [
+     0,
+     {
+      "from": "size",
+      "map": [
+       [
+        0,
+        9.1
+       ],
+       [
+        0.5,
+        12.025
+       ],
+       [
+        0.837607,
+        14
+       ],
+       [
+        1,
+        14
+       ]
+      ]
+     }
+    ],
+    "width": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       4.34
+      ],
+      [
+       0.5,
+       5.735
+      ],
+      [
+       1,
+       7.13
+      ]
+     ]
+    },
+    "paints": [
+     "core",
+     "edge"
+    ]
+   },
+   {
+    "id": "slash-trail",
+    "gen": "starburst",
+    "v": 1,
+    "when": {
+     "style": [
+      "slash"
+     ]
+    },
+    "at": [
+     15.5,
+     15.5
+    ],
+    "points": 2,
+    "turn": {
+     "from": "twist",
+     "map": [
+      [
+       0,
+       135
+      ],
+      [
+       1,
+       225
+      ]
+     ]
+    },
+    "r": [
+     0,
+     14
+    ],
+    "width": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       2.38
+      ],
+      [
+       0.5,
+       3.145
+      ],
+      [
+       1,
+       3.91
+      ]
+     ]
+    },
+    "paints": [
+     "core",
+     "mid",
+     "edge",
+     "rim"
+    ],
+    "rim": 2
+   },
+   {
+    "id": "slash-light",
+    "gen": "starburst",
+    "v": 1,
+    "when": {
+     "style": [
+      "slash"
+     ]
+    },
+    "at": [
+     15.5,
+     15.5
+    ],
+    "points": 2,
+    "turn": {
+     "from": "twist",
+     "map": [
+      [
+       0,
+       135
+      ],
+      [
+       1,
+       225
+      ]
+     ]
+    },
+    "r": [
+     0,
+     {
+      "from": "size",
+      "map": [
+       [
+        0,
+        8.075
+       ],
+       [
+        0.5,
+        11.0
+       ],
+       [
+        0.837607,
+        12.975
+       ],
+       [
+        1,
+        12.975
+       ]
+      ]
+     }
+    ],
+    "width": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       2.14
+      ],
+      [
+       0.5,
+       3.535
+      ],
+      [
+       1,
+       4.93
+      ]
+     ]
+    },
+    "paints": [
+     "shine"
+    ]
+   }
+  ]
+ },
+ "clips": {
+  "burst": {
+   "frames": 5,
+   "fps": 16,
+   "loop": false,
+   "keys": [
+    {
+     "t": 0.0,
+     "emit": {
+      "star0": {
+       "amount": 1
+      },
+      "star0-white": {
+       "amount": 1
+      },
+      "star1": {
+       "amount": 0
+      },
+      "star1-white": {
+       "amount": 0
+      },
+      "star2": {
+       "amount": 0
+      },
+      "star2-tips": {
+       "amount": 0
+      },
+      "star-tips": {
+       "amount": 0
+      },
+      "ring0-star": {
+       "amount": 1
+      },
+      "ring-glow": {
+       "amount": 1,
+       "scale": 1,
+       "cool": 0
+      },
+      "ring-tips": {
+       "amount": 0
+      },
+      "slash-across": {
+       "amount": 1
+      },
+      "slash-cuts": {
+       "amount": 0
+      },
+      "slash-blade": {
+       "amount": 1
+      },
+      "slash-trail": {
+       "amount": 0
+      },
+      "slash-light": {
+       "amount": 1,
+       "short": 0.975,
+       "width": 3.535
+      }
+     }
+    },
+    {
+     "t": 0.25,
+     "emit": {
+      "star0": {
+       "amount": 0
+      },
+      "star0-white": {
+       "amount": 0
+      },
+      "star1": {
+       "amount": 1
+      },
+      "star1-white": {
+       "amount": 1
+      },
+      "star2": {
+       "amount": 0
+      },
+      "star2-tips": {
+       "amount": 0
+      },
+      "star-tips": {
+       "amount": 0
+      },
+      "ring0-star": {
+       "amount": 0
+      },
+      "ring-glow": {
+       "amount": 1,
+       "scale": 0.6451612903225807,
+       "cool": 1
+      },
+      "ring-tips": {
+       "amount": 0
+      },
+      "slash-across": {
+       "amount": 0
+      },
+      "slash-cuts": {
+       "amount": 1,
+       "push": 0,
+       "cut": 0.0,
+       "short": 0.0,
+       "width": 1.6,
+       "cool": 0
+      },
+      "slash-blade": {
+       "amount": 0
+      },
+      "slash-trail": {
+       "amount": 1,
+       "cut": 0,
+       "width": 3.145,
+       "cool": 0
+      },
+      "slash-light": {
+       "amount": 1,
+       "short": 0,
+       "width": 0.4
+      }
+     }
+    },
+    {
+     "t": 0.5,
+     "emit": {
+      "star0": {
+       "amount": 0
+      },
+      "star0-white": {
+       "amount": 0
+      },
+      "star1": {
+       "amount": 0
+      },
+      "star1-white": {
+       "amount": 0
+      },
+      "star2": {
+       "amount": 1
+      },
+      "star2-tips": {
+       "amount": 1
+      },
+      "star-tips": {
+       "amount": 0
+      },
+      "ring0-star": {
+       "amount": 0
+      },
+      "ring-glow": {
+       "amount": 0
+      },
+      "ring-tips": {
+       "amount": 1,
+       "cut": 0,
+       "cool": 0
+      },
+      "slash-across": {
+       "amount": 0
+      },
+      "slash-cuts": {
+       "amount": 1,
+       "push": 1.85,
+       "cut": 1.85,
+       "short": 0.0,
+       "width": 0.4,
+       "cool": 2
+      },
+      "slash-blade": {
+       "amount": 0
+      },
+      "slash-trail": {
+       "amount": 1,
+       "cut": 4.1625,
+       "width": 1.7,
+       "cool": 0
+      },
+      "slash-light": {
+       "amount": 0
+      }
+     }
+    },
+    {
+     "t": 0.75,
+     "emit": {
+      "star0": {
+       "amount": 0
+      },
+      "star0-white": {
+       "amount": 0
+      },
+      "star1": {
+       "amount": 0
+      },
+      "star1-white": {
+       "amount": 0
+      },
+      "star2": {
+       "amount": 0
+      },
+      "star2-tips": {
+       "amount": 0
+      },
+      "star-tips": {
+       "amount": 1,
+       "cut": 0,
+       "short": 0.4,
+       "cool": 0
+      },
+      "ring0-star": {
+       "amount": 0
+      },
+      "ring-glow": {
+       "amount": 0
+      },
+      "ring-tips": {
+       "amount": 1,
+       "cut": 1.5,
+       "cool": 1
+      },
+      "slash-across": {
+       "amount": 0
+      },
+      "slash-cuts": {
+       "amount": 1,
+       "push": 2.525,
+       "cut": 3.95,
+       "short": 0.0,
+       "width": 0.4,
+       "cool": 2
+      },
+      "slash-blade": {
+       "amount": 0
+      },
+      "slash-trail": {
+       "amount": 1,
+       "cut": 10,
+       "width": 0.4,
+       "cool": 2
+      },
+      "slash-light": {
+       "amount": 0
+      }
+     }
+    },
+    {
+     "t": 1.0,
+     "emit": {
+      "star0": {
+       "amount": 0
+      },
+      "star0-white": {
+       "amount": 0
+      },
+      "star1": {
+       "amount": 0
+      },
+      "star1-white": {
+       "amount": 0
+      },
+      "star2": {
+       "amount": 0
+      },
+      "star2-tips": {
+       "amount": 0
+      },
+      "star-tips": {
+       "amount": 1,
+       "cut": 1.5,
+       "short": 0,
+       "cool": 1
+      },
+      "ring0-star": {
+       "amount": 0
+      },
+      "ring-glow": {
+       "amount": 0
+      },
+      "ring-tips": {
+       "amount": 0
+      },
+      "slash-across": {
+       "amount": 0
+      },
+      "slash-cuts": {
+       "amount": 1,
+       "push": 3.3125,
+       "cut": 4.55,
+       "short": 0.0,
+       "width": 0.4,
+       "cool": 3
+      },
+      "slash-blade": {
+       "amount": 0
+      },
+      "slash-trail": {
+       "amount": 1,
+       "cut": 12.5,
+       "width": 0.4,
+       "cool": 3
+      },
+      "slash-light": {
+       "amount": 0
+      }
+     }
+    }
+   ]
+  }
+ }
+}

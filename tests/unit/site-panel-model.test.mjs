@@ -5,7 +5,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { spriteModel, soundModel, SPRITE_TABS } from '../../app/panel-model.js';
 import { defaultParams, inEffect } from '../../engine/sprite.js';
-import knight from '../../sprites/knight.js';
+import { librarySprite, librarySprites } from '../helpers/library.mjs';   // the library asset, a code file or a data file (tests/helpers/library.mjs)
+const knight = await librarySprite('knight');
 
 const start = (sprite) => ({ params: defaultParams(sprite), cues: {}, scale: 1 });
 
@@ -24,11 +25,11 @@ test('the Hero: build in Shape, what it holds and wears in Parts, colours in Col
 });
 
 test('every control of every sprite lands in exactly one tab, and tabs with nothing in them are left out', async () => {
-  const dir = new URL('../../sprites/', import.meta.url);
-  const files = fs.readdirSync(dir).filter((f) => f.endsWith('.js'));
-  assert.ok(files.length > 50);
-  for (const f of files) {
-    const sprite = (await import(new URL(f, dir))).default;
+  // every library sprite, a code file or a data file (tests/helpers/library.mjs)
+  const { sprites, unloadable } = await librarySprites();
+  assert.deepEqual(unloadable, []);
+  assert.ok(sprites.length > 50);
+  for (const { def: sprite } of sprites) {
     const m = spriteModel(sprite);
     const list = m.controls(start(sprite));
     assert.deepEqual(list.map((c) => c.key).sort(), Object.keys(sprite.params).sort(), `${sprite.id}: every control once`);

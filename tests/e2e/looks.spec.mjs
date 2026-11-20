@@ -12,13 +12,14 @@ import { test, expect as baseExpect, openRoute, waitForDrawn, downloadFrom } fro
 import { readCatalogue, packageOf } from '../helpers/acceptance.mjs';
 import { THEME_PRESETS, normalizeTheme, defaultTheme, spriteMaterials, spriteLook, shapeRecord, isOneColourLook } from '../../engine/theme.js';
 import { themeFromQuery } from '../../app/theme-controls.js';
-import { loadSprites } from '../../tools/lib/assets.mjs';
+import { librarySprites } from '../helpers/library.mjs';
 
 const expect = baseExpect.configure({ timeout: 20_000 });
 test.use({ reducedMotion: 'reduce', actionTimeout: 30_000 });
 
 const CATALOGUE = readCatalogue();
-const SPRITES = Object.fromEntries((await loadSprites()).map((s) => [s.def.id, s.def]));
+// every library sprite that loads, a code file or a data file (one another builder has half-written is left out, not thrown)
+const SPRITES = Object.fromEntries((await librarySprites()).sprites.map((s) => [s.def.id, s.def]));
 const size = (b) => b.sprites.length + b.sounds.length + b.music.length;
 /** The quickest bundle to download that has a sprite: no music if there is one without, then the fewest things. */
 const SMALL = CATALOGUE.bundles.filter((b) => b.sprites.length && b.sprites.every((id) => SPRITES[id])).sort((a, b) => a.music.length - b.music.length || size(a) - size(b))[0];

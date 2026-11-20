@@ -1,0 +1,1836 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "tiles-dungeon",
+ "name": "Dungeon tiles",
+ "blurb": "Flagstone floors, dark walls with a brick face, pits and stairs for top-down dungeon rooms and corridors; change the stone, floor and slime colours, the paving, the kerb, how worn and how damp it is.",
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "wall-bottom",
+ "styles": [
+  "pixel"
+ ],
+ "meta": {
+  "type": "tileset",
+  "role": "world/tile",
+  "themes": [
+   "fantasy",
+   "dungeon"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "top-down-rpg"
+  ],
+  "view": "top-down",
+  "words": [
+   "dungeon",
+   "floor",
+   "flagstones",
+   "wall",
+   "bricks",
+   "pit",
+   "hole",
+   "stairs",
+   "corridor",
+   "room",
+   "crypt",
+   "cellar",
+   "explore",
+   "underground"
+  ],
+  "license": "draft"
+ },
+ "palette": [
+  {
+   "id": "stone",
+   "label": "Stone",
+   "default": "#5a5f7a",
+   "material": "stone",
+   "swatches": [
+    "#5a5f7a",
+    "#8e3a4a",
+    "#357a4c",
+    "#7a4fc4"
+   ]
+  },
+  {
+   "id": "floor",
+   "label": "Floor",
+   "default": "#7e84a0",
+   "material": "stone",
+   "swatches": [
+    "#7e84a0",
+    "#a8a4a0",
+    "#c9a06a",
+    "#e6c96a"
+   ]
+  },
+  {
+   "id": "growth",
+   "label": "Slime and moss",
+   "default": "#4f9d57",
+   "material": "plant",
+   "swatches": [
+    "#4f9d57",
+    "#7fbf5a",
+    "#357a4c",
+    "#e6c96a",
+    "#c8553a"
+   ]
+  },
+  {
+   "id": "course",
+   "material": "stone",
+   "derive": {
+    "rule": "mix",
+    "of": "stone",
+    "with": {
+     "rule": "ramp",
+     "of": "stone",
+     "tone": "light"
+    },
+    "amount": 0.45
+   }
+  },
+  {
+   "id": "bone",
+   "default": "#f0ead8",
+   "material": "stone",
+   "detail": true
+  },
+  {
+   "id": "iron",
+   "default": "#c2c9d6",
+   "material": "metal",
+   "detail": true
+  },
+  {
+   "id": "water",
+   "default": "#4fa8d8",
+   "material": "water",
+   "detail": true
+  },
+  {
+   "id": "puddle",
+   "material": "water",
+   "derive": {
+    "rule": "mix",
+    "of": "floor",
+    "with": "water",
+    "amount": 0.6
+   }
+  },
+  {
+   "id": "drip",
+   "material": "stone",
+   "derive": {
+    "rule": "mix",
+    "of": "stone",
+    "with": {
+     "rule": "ramp",
+     "of": "stone",
+     "tone": "light"
+    },
+    "amount": 0.7
+   }
+  },
+  {
+   "id": "ooze",
+   "material": "plant",
+   "derive": {
+    "rule": "mix",
+    "of": {
+     "rule": "ramp",
+     "of": "growth",
+     "tone": "deep"
+    },
+    "with": "ink",
+    "amount": 0.5
+   }
+  },
+  {
+   "id": "wet",
+   "material": "stone",
+   "derive": {
+    "rule": "tone",
+    "of": {
+     "rule": "ramp",
+     "of": "floor",
+     "tone": "light"
+    },
+    "by": 0.5
+   }
+  }
+ ],
+ "controls": [
+  {
+   "key": "style",
+   "kind": "choice",
+   "label": "Style",
+   "options": [
+    {
+     "value": "slabs",
+     "label": "Slabs"
+    },
+    {
+     "value": "bricks",
+     "label": "Bricks"
+    },
+    {
+     "value": "cobbles",
+     "label": "Cobbles"
+    }
+   ],
+   "default": "slabs"
+  },
+  {
+   "key": "edge",
+   "kind": "range",
+   "label": "Edge",
+   "lo": "Thin",
+   "hi": "Deep",
+   "min": 3,
+   "max": 9,
+   "step": 1,
+   "default": 5
+  },
+  {
+   "key": "texture",
+   "kind": "range",
+   "label": "Texture",
+   "lo": "Plain",
+   "hi": "Busy",
+   "default": 0.5
+  },
+  {
+   "key": "wear",
+   "kind": "range",
+   "label": "Wear",
+   "lo": "New",
+   "hi": "Worn",
+   "default": 0.35
+  },
+  {
+   "key": "damp",
+   "kind": "toggle",
+   "label": "Damp",
+   "default": false
+  },
+  {
+   "key": "stone",
+   "kind": "colour",
+   "label": "Stone"
+  },
+  {
+   "key": "floor",
+   "kind": "colour",
+   "label": "Floor"
+  },
+  {
+   "key": "growth",
+   "kind": "colour",
+   "label": "Slime and moss"
+  }
+ ],
+ "body": {
+  "tiles": {
+   "tile": 32,
+   "profiles": {
+    "nicks": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     1,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "pj0": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0,
+     0,
+     0,
+     0
+    ],
+    "pj1": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "pj2": [
+     0,
+     0,
+     0,
+     1,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "slime": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     3,
+     5,
+     2,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     2,
+     4,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     3,
+     2,
+     0,
+     0,
+     0
+    ],
+    "ooze": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     2,
+     4,
+     1,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     3,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     2,
+     1,
+     0,
+     0,
+     0
+    ]
+   },
+   "groups": [
+    {
+     "name": "floor",
+     "kind": "floor",
+     "fills": 3,
+     "label": "Floor",
+     "material": {
+      "ink": "none",
+      "fill": {
+       "base": "floor",
+       "versions": [
+        [
+         {
+          "gen": "tile.courses",
+          "v": 1,
+          "heights": [
+           17,
+           15
+          ],
+          "joints": [
+           10,
+           29,
+           4,
+           20
+          ],
+          "counts": [
+           2,
+           2
+          ],
+          "shift": 3,
+          "round": false,
+          "paint": "floor.dark",
+          "when": {
+           "style": [
+            "slabs"
+           ]
+          }
+         },
+         {
+          "gen": "tile.courses",
+          "v": 1,
+          "heights": [
+           8,
+           8,
+           8,
+           8
+          ],
+          "joints": [
+           13,
+           29,
+           5,
+           21,
+           13,
+           29,
+           5,
+           21
+          ],
+          "counts": [
+           2,
+           2,
+           2,
+           2
+          ],
+          "shift": 3,
+          "round": false,
+          "paint": "floor.dark",
+          "when": {
+           "style": [
+            "bricks"
+           ]
+          }
+         },
+         {
+          "gen": "tile.courses",
+          "v": 1,
+          "heights": [
+           8,
+           8,
+           8,
+           8
+          ],
+          "joints": [
+           3,
+           11,
+           20,
+           28,
+           7,
+           15,
+           23,
+           30,
+           2,
+           10,
+           18,
+           26,
+           6,
+           13,
+           22,
+           29
+          ],
+          "counts": [
+           4,
+           4,
+           4,
+           4
+          ],
+          "shift": 3,
+          "round": true,
+          "paint": "floor.dark",
+          "when": {
+           "style": [
+            "cobbles"
+           ]
+          }
+         }
+        ],
+        [
+         {
+          "gen": "tile.courses",
+          "v": 1,
+          "heights": [
+           17,
+           15
+          ],
+          "joints": [
+           10,
+           29,
+           4,
+           20
+          ],
+          "counts": [
+           2,
+           2
+          ],
+          "shift": 3,
+          "round": false,
+          "paint": "floor.dark",
+          "when": {
+           "style": [
+            "slabs"
+           ]
+          }
+         },
+         {
+          "gen": "tile.courses",
+          "v": 1,
+          "heights": [
+           8,
+           8,
+           8,
+           8
+          ],
+          "joints": [
+           13,
+           29,
+           5,
+           21,
+           13,
+           29,
+           5,
+           21
+          ],
+          "counts": [
+           2,
+           2,
+           2,
+           2
+          ],
+          "shift": 3,
+          "round": false,
+          "paint": "floor.dark",
+          "when": {
+           "style": [
+            "bricks"
+           ]
+          }
+         },
+         {
+          "gen": "tile.courses",
+          "v": 1,
+          "heights": [
+           8,
+           8,
+           8,
+           8
+          ],
+          "joints": [
+           3,
+           11,
+           20,
+           28,
+           7,
+           15,
+           23,
+           30,
+           2,
+           10,
+           18,
+           26,
+           6,
+           13,
+           22,
+           29
+          ],
+          "counts": [
+           4,
+           4,
+           4,
+           4
+          ],
+          "shift": 3,
+          "round": true,
+          "paint": "floor.dark",
+          "when": {
+           "style": [
+            "cobbles"
+           ]
+          }
+         },
+         {
+          "gen": "scatter",
+          "v": 1,
+          "seed": 21,
+          "count": {
+           "from": "wear",
+           "map": [
+            [
+             0,
+             0
+            ],
+            [
+             1,
+             3
+            ]
+           ],
+           "round": "px"
+          },
+          "margin": 6,
+          "gap": 9,
+          "place": {
+           "kind": "stamp",
+           "rows": [
+            "aa"
+           ],
+           "key": {
+            "a": "floor.dark"
+           }
+          }
+         },
+         {
+          "gen": "scatter",
+          "v": 1,
+          "seed": 33,
+          "count": {
+           "from": "wear",
+           "map": [
+            [
+             0,
+             0
+            ],
+            [
+             0.29,
+             0
+            ],
+            [
+             0.3,
+             1
+            ],
+            [
+             1,
+             1
+            ]
+           ],
+           "round": "px"
+          },
+          "margin": 6,
+          "gap": 9,
+          "place": {
+           "kind": "stamp",
+           "rows": [
+            ".ab.",
+            "abba"
+           ],
+           "key": {
+            "a": "growth.dark",
+            "b": "growth"
+           }
+          }
+         },
+         {
+          "gen": "scatter",
+          "v": 1,
+          "seed": 5,
+          "count": {
+           "from": "texture",
+           "map": [
+            [
+             0,
+             0
+            ],
+            [
+             0.4,
+             0
+            ],
+            [
+             1,
+             3
+            ]
+           ],
+           "round": "px"
+          },
+          "margin": 6,
+          "gap": 9,
+          "place": {
+           "kind": "stamp",
+           "rows": [
+            "aaa"
+           ],
+           "key": {
+            "a": "floor.light"
+           }
+          }
+         },
+         {
+          "kind": "stamp",
+          "at": [
+           6,
+           22
+          ],
+          "rows": [
+           "aaaa",
+           ".aa."
+          ],
+          "key": {
+           "a": "wet"
+          },
+          "when": {
+           "damp": [
+            true
+           ]
+          }
+         },
+         {
+          "kind": "stamp",
+          "at": [
+           19,
+           12
+          ],
+          "rows": [
+           "aaa"
+          ],
+          "key": {
+           "a": "wet"
+          },
+          "when": {
+           "damp": [
+            true
+           ]
+          }
+         }
+        ],
+        [
+         {
+          "gen": "tile.courses",
+          "v": 1,
+          "heights": [
+           17,
+           15
+          ],
+          "joints": [
+           10,
+           29,
+           4,
+           20
+          ],
+          "counts": [
+           2,
+           2
+          ],
+          "shift": 3,
+          "round": false,
+          "paint": "floor.dark",
+          "when": {
+           "style": [
+            "slabs"
+           ]
+          }
+         },
+         {
+          "gen": "tile.courses",
+          "v": 1,
+          "heights": [
+           8,
+           8,
+           8,
+           8
+          ],
+          "joints": [
+           13,
+           29,
+           5,
+           21,
+           13,
+           29,
+           5,
+           21
+          ],
+          "counts": [
+           2,
+           2,
+           2,
+           2
+          ],
+          "shift": 3,
+          "round": false,
+          "paint": "floor.dark",
+          "when": {
+           "style": [
+            "bricks"
+           ]
+          }
+         },
+         {
+          "gen": "tile.courses",
+          "v": 1,
+          "heights": [
+           8,
+           8,
+           8,
+           8
+          ],
+          "joints": [
+           3,
+           11,
+           20,
+           28,
+           7,
+           15,
+           23,
+           30,
+           2,
+           10,
+           18,
+           26,
+           6,
+           13,
+           22,
+           29
+          ],
+          "counts": [
+           4,
+           4,
+           4,
+           4
+          ],
+          "shift": 3,
+          "round": true,
+          "paint": "floor.dark",
+          "when": {
+           "style": [
+            "cobbles"
+           ]
+          }
+         },
+         {
+          "gen": "scatter",
+          "v": 1,
+          "seed": 47,
+          "count": {
+           "from": "wear",
+           "map": [
+            [
+             0,
+             0
+            ],
+            [
+             1,
+             3
+            ]
+           ],
+           "round": "px"
+          },
+          "margin": 6,
+          "gap": 9,
+          "place": {
+           "kind": "stamp",
+           "rows": [
+            "aa"
+           ],
+           "key": {
+            "a": "floor.dark"
+           }
+          }
+         },
+         {
+          "gen": "scatter",
+          "v": 1,
+          "seed": 12,
+          "count": {
+           "from": "wear",
+           "map": [
+            [
+             0,
+             0
+            ],
+            [
+             0.24,
+             0
+            ],
+            [
+             0.25,
+             1
+            ],
+            [
+             1,
+             1
+            ]
+           ],
+           "round": "px"
+          },
+          "margin": 6,
+          "gap": 9,
+          "place": {
+           "kind": "stamp",
+           "rows": [
+            "aa..",
+            "..a.",
+            "..a.",
+            "...a"
+           ],
+           "key": {
+            "a": "floor.dark"
+           }
+          }
+         },
+         {
+          "gen": "scatter",
+          "v": 1,
+          "seed": 29,
+          "count": {
+           "from": "wear",
+           "map": [
+            [
+             0,
+             0
+            ],
+            [
+             0.74,
+             0
+            ],
+            [
+             0.75,
+             1
+            ],
+            [
+             1,
+             1
+            ]
+           ],
+           "round": "px"
+          },
+          "margin": 6,
+          "gap": 9,
+          "place": {
+           "kind": "stamp",
+           "rows": [
+            ".ab.",
+            "abba"
+           ],
+           "key": {
+            "a": "growth.dark",
+            "b": "growth"
+           }
+          }
+         },
+         {
+          "gen": "scatter",
+          "v": 1,
+          "seed": 13,
+          "count": {
+           "from": "texture",
+           "map": [
+            [
+             0,
+             0
+            ],
+            [
+             0.4,
+             0
+            ],
+            [
+             1,
+             3
+            ]
+           ],
+           "round": "px"
+          },
+          "margin": 6,
+          "gap": 9,
+          "place": {
+           "kind": "stamp",
+           "rows": [
+            "aaa"
+           ],
+           "key": {
+            "a": "floor.light"
+           }
+          }
+         },
+         {
+          "kind": "stamp",
+          "at": [
+           21,
+           8
+          ],
+          "rows": [
+           "aaaa",
+           ".aa."
+          ],
+          "key": {
+           "a": "wet"
+          },
+          "when": {
+           "damp": [
+            true
+           ]
+          }
+         },
+         {
+          "kind": "stamp",
+          "at": [
+           9,
+           25
+          ],
+          "rows": [
+           "aaa"
+          ],
+          "key": {
+           "a": "wet"
+          },
+          "when": {
+           "damp": [
+            true
+           ]
+          }
+         }
+        ]
+       ]
+      }
+     },
+     "decals": [
+      {
+       "name": "a",
+       "place": "on",
+       "label": "Cracks",
+       "outline": false,
+       "draw": [
+        {
+         "kind": "stamp",
+         "at": [
+          5,
+          12
+         ],
+         "rows": [
+          "..aaaaaaa............",
+          ".abbbbbbbaa...aaaa...",
+          "abbbbbbbbb....ccccaa.",
+          "abbbbbbbb.bb.bbcccbba",
+          ".abbbbbbbbbb.bbbbbbba",
+          "..aabbbbbbbb.bbbbbbba",
+          "....aaabbbbb..bbbbaa.",
+          "...ccccbbbbbbbbbaa...",
+          ".......abbbbbbba.....",
+          "........aaaaaaa......"
+         ],
+         "key": {
+          "a": "floor.dark",
+          "b": "puddle",
+          "c": "puddle.light"
+         },
+         "when": {
+          "damp": [
+           true
+          ]
+         }
+        },
+        {
+         "kind": "stamp",
+         "at": [
+          8,
+          5
+         ],
+         "rows": [
+          "...........aa",
+          "..........a..",
+          "..........a..",
+          ".........a...",
+          "aa.aaaaaaa...",
+          "..a...aaaa...",
+          ".......a.....",
+          ".......a.....",
+          "........aa...",
+          ".......aaaa..",
+          "......a..a...",
+          ".........a...",
+          ".........a...",
+          ".........aa.."
+         ],
+         "key": {
+          "a": "floor.dark"
+         }
+        }
+       ]
+      },
+      {
+       "name": "b",
+       "place": "on",
+       "label": "Bones",
+       "outline": false,
+       "draw": [
+        {
+         "kind": "stamp",
+         "at": [
+          4,
+          7
+         ],
+         "rows": [
+          ".....aaaaa..............",
+          "....aaaaaaa.............",
+          "...bacaaacaa............",
+          "...bcccaccca............",
+          "....bcaaaca.............",
+          ".....bacaa..............",
+          ".....babab..............",
+          ".....b.b.b..............",
+          ".....b.b.b.a........a...",
+          "....dddddddda..aaaaa....",
+          "..........aaa.b.ddddd...",
+          ".........aabaa..........",
+          ".a....aaabdbba..........",
+          "baa.aabbdd.dbd..........",
+          "bbaaaddd....da..........",
+          "dbaad.......baa.......a.",
+          ".bba........baaa.....aaa",
+          ".dbd........aaabbbbbaaad",
+          "..d........bbadddddbbaa.",
+          "...........dbd.....dbba.",
+          "............d.......dbd.",
+          ".....................d.."
+         ],
+         "key": {
+          "a": "bone",
+          "b": "bone.dark",
+          "c": "iron.deep",
+          "d": "floor.dark"
+         }
+        }
+       ]
+      },
+      {
+       "name": "c",
+       "place": "on",
+       "label": "Iron grate",
+       "outline": false,
+       "draw": [
+        {
+         "kind": "stamp",
+         "at": [
+          7,
+          8
+         ],
+         "rows": [
+          "aaaaaaaaaaaaaaaaaa",
+          "abaacbaacbaacbaaca",
+          "abaacbaacbaacbaaca",
+          "abaacbaacbaacbaaca",
+          "abaacbaacbaacbaaca",
+          "abaacbaacbaacbaaca",
+          "abaacbaacbaacbaaca",
+          "abaacbaacbaacbaaca",
+          "abaacbaacbaacbaaca",
+          "abaacbaacbaacbaaca",
+          "abaacbaacbaacbaaca",
+          "abaacbaacbaacbaaca",
+          "abaacbaacbaacbaaca",
+          "abaacbaacbaacbaaca",
+          "abaacbaacbaacbaaca",
+          "aaaaaaaaaaaaaaaaaa",
+          "dddddddddddddddddd"
+         ],
+         "key": {
+          "a": "iron.deep",
+          "b": "iron.dark",
+          "c": "ink",
+          "d": "floor.dark"
+         }
+        },
+        {
+         "kind": "stamp",
+         "at": [
+          12,
+          9
+         ],
+         "rows": [
+          "aa.....a",
+          "aa.....a",
+          "aa......"
+         ],
+         "key": {
+          "a": "growth"
+         },
+         "when": {
+          "damp": [
+           true
+          ]
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "wall",
+     "kind": "block",
+     "use": "wall",
+     "label": "Wall",
+     "pieces": [
+      "block",
+      "narrow"
+     ],
+     "material": {
+      "ink": "ink",
+      "round": 1,
+      "fill": {
+       "base": "stone.dark"
+      },
+      "edges": {
+       "top": {
+        "depth": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           1
+          ],
+          [
+           9,
+           4
+          ]
+         ],
+         "round": "px"
+        },
+        "inset": {
+         "profile": "nicks",
+         "amount": {
+          "from": "wear",
+          "map": [
+           [
+            0,
+            0
+           ],
+           [
+            0.49,
+            0
+           ],
+           [
+            0.5,
+            1
+           ],
+           [
+            1,
+            1
+           ]
+          ],
+          "round": "px"
+         }
+        },
+        "bands": [
+         {
+          "rows": [
+           1,
+           1
+          ],
+          "paint": "stone.light"
+         },
+         {
+          "rows": [
+           2,
+           99
+          ],
+          "paint": "stone"
+         }
+        ]
+       },
+       "right": {
+        "depth": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           1
+          ],
+          [
+           9,
+           4
+          ]
+         ],
+         "round": "px"
+        },
+        "bands": [
+         {
+          "rows": [
+           1,
+           1
+          ],
+          "paint": "stone.light"
+         },
+         {
+          "rows": [
+           2,
+           99
+          ],
+          "paint": "stone"
+         }
+        ]
+       },
+       "left": {
+        "depth": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           1
+          ],
+          [
+           9,
+           4
+          ]
+         ],
+         "round": "px"
+        },
+        "bands": [
+         {
+          "rows": [
+           1,
+           99
+          ],
+          "paint": "stone"
+         }
+        ]
+       }
+      },
+      "face": {
+       "draw": [
+        {
+         "kind": "stamp",
+         "at": [
+          0,
+          0
+         ],
+         "rows": [
+          "aaaaaabaaaaaaaaaaaaaaabaaaaaaaaa",
+          "ccccccbcccccccccccccccbccccccccc",
+          "ccccccbcccccccccccccccbccccccccc",
+          "ccccccbcccccccccccccccbccccccccc",
+          "ccccccbcccccccccccccccbccccccccc",
+          "ccccccbcccccccccccccccbccccccccc",
+          "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "aaaaaaaaaaaaaabaaaaaaaaaaaaaaaba",
+          "ccccccccccccccbcccccccccccccccbc",
+          "ccccccccccccccbcccccccccccccccbc",
+          "ccccccccccccccbcccccccccccccccbc",
+          "ccccccccccccccbcccccccccccccccbc",
+          "ccccccccccccccbcccccccccccccccbc",
+          "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "aaaaaabaaaaaaaaaaaaaaabaaaaaaaaa",
+          "ccccccbcccccccccccccccbccccccccc",
+          "ccccccbcccccccccccccccbccccccccc",
+          "ccccccbcccccccccccccccbccccccccc",
+          "ccccccbcccccccccccccccbccccccccc",
+          "ccccccbcccccccccccccccbccccccccc",
+          "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "aaaaaaaaaaaaaabaaaaaaaaaaaaaaaba",
+          "ccccccccccccccbcccccccccccccccbc",
+          "ccccccccccccccbcccccccccccccccbc",
+          "ccccccccccccccbcccccccccccccccbc",
+          "ccccccccccccccbcccccccccccccccbc",
+          "ccccccccccccccbcccccccccccccccbc",
+          "ccccccccccccccbccccccddcccccccbc",
+          "ccccccccccccccbccccceeeeccccccbc"
+         ],
+         "key": {
+          "a": "course",
+          "b": "stone.dark",
+          "c": "stone",
+          "d": "growth",
+          "e": "growth.dark"
+         }
+        },
+        {
+         "kind": "stamp",
+         "at": [
+          9,
+          10
+         ],
+         "rows": [
+          "a",
+          "a",
+          "a",
+          "a",
+          "a"
+         ],
+         "key": {
+          "a": "drip"
+         },
+         "when": {
+          "damp": [
+           true
+          ]
+         }
+        },
+        {
+         "kind": "stamp",
+         "at": [
+          21,
+          16
+         ],
+         "rows": [
+          "a",
+          "a",
+          "a",
+          "a"
+         ],
+         "key": {
+          "a": "drip"
+         },
+         "when": {
+          "damp": [
+           true
+          ]
+         }
+        },
+        {
+         "kind": "stamp",
+         "at": [
+          27,
+          9
+         ],
+         "rows": [
+          "a",
+          "a",
+          "a",
+          "a"
+         ],
+         "key": {
+          "a": "drip"
+         },
+         "when": {
+          "damp": [
+           true
+          ]
+         }
+        }
+       ],
+       "top": "stone.light",
+       "shadow": "floor.dark"
+      }
+     }
+    },
+    {
+     "name": "pit",
+     "kind": "block",
+     "use": "hole",
+     "label": "Pit",
+     "pieces": [
+      "block",
+      "narrow"
+     ],
+     "material": {
+      "ink": "ink",
+      "fill": {
+       "base": "ink"
+      },
+      "edges": {
+       "top": {
+        "depth": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           8
+          ],
+          [
+           9,
+           14
+          ]
+         ],
+         "round": "px"
+        },
+        "bands": [
+         {
+          "rows": {
+           "profile": "ooze"
+          },
+          "paint": "ooze",
+          "when": {
+           "damp": [
+            true
+           ]
+          }
+         },
+         {
+          "rows": {
+           "profile": "slime"
+          },
+          "paint": "growth",
+          "when": {
+           "damp": [
+            true
+           ]
+          }
+         },
+         {
+          "rows": [
+           1,
+           1
+          ],
+          "paint": "stone.light"
+         },
+         {
+          "rows": "last",
+          "paint": "stone.dark"
+         },
+         {
+          "rows": "last-1",
+          "paint": "stone.dark"
+         },
+         {
+          "rows": [
+           4,
+           4
+          ],
+          "paint": "stone.dark"
+         },
+         {
+          "rows": [
+           8,
+           8
+          ],
+          "paint": "stone.dark"
+         },
+         {
+          "rows": [
+           12,
+           12
+          ],
+          "paint": "stone.dark"
+         },
+         {
+          "rows": [
+           2,
+           3
+          ],
+          "where": {
+           "profile": "pj0",
+           "in": [
+            1
+           ]
+          },
+          "paint": "stone.dark"
+         },
+         {
+          "rows": [
+           5,
+           7
+          ],
+          "where": {
+           "profile": "pj1",
+           "in": [
+            1
+           ]
+          },
+          "paint": "stone.dark"
+         },
+         {
+          "rows": [
+           9,
+           11
+          ],
+          "where": {
+           "profile": "pj2",
+           "in": [
+            1
+           ]
+          },
+          "paint": "stone.dark"
+         },
+         {
+          "rows": [
+           1,
+           99
+          ],
+          "paint": "stone"
+         }
+        ]
+       },
+       "left": {
+        "depth": 1,
+        "bands": [
+         {
+          "rows": [
+           1,
+           1
+          ],
+          "paint": "stone"
+         }
+        ]
+       },
+       "right": {
+        "depth": 1,
+        "bands": [
+         {
+          "rows": [
+           1,
+           1
+          ],
+          "paint": "stone.dark"
+         }
+        ]
+       },
+       "bottom": {
+        "depth": 1,
+        "bands": [
+         {
+          "rows": [
+           1,
+           1
+          ],
+          "paint": "stone.dark"
+         }
+        ]
+       }
+      }
+     }
+    }
+   ],
+   "extra": [
+    {
+     "name": "stairs-down",
+     "label": "Stairs going down",
+     "draw": [
+      {
+       "kind": "stamp",
+       "at": [
+        0,
+        0
+       ],
+       "rows": [
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "abbaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "abbaccccccccccccccccccccccccaaaa",
+        "abbaccccccccccccccccccccccccaaaa",
+        "abbaccccccccccccccccccccccccaaaa",
+        "abbaccccccccccccccccccccccccaaaa",
+        "addbbbbbbbbbbbbbbbbbbbbbbbbbbbba",
+        "addbeeeeeeeeeeeeeeeeeeeeeeeebbba",
+        "addbeeeeeeeeeeeeeeeeeeeeeeeebbba",
+        "addbeeeeeeeeeeeeeeeeeeeeeeeebbba",
+        "addbeeeeeeeeeeeeeeeeeeeeeeeebbba",
+        "affbccccccccccccccccccccccccbbba",
+        "affbggggggggggggggggggggggggbbba",
+        "affbggggggggggggggggggggggggbbba",
+        "affbggggggggggggggggggggggggbbba",
+        "affbggggggggggggggggggggggggbbba",
+        "affbggggggggggggggggggggggggbbba",
+        "aeedeeeeeeeeeeeeeeeeeeeeeeeeddda",
+        "aeedhhhhhhhhhhhhhhhhhhhhhhhhddda",
+        "aeedhhhhhhhhhhhhhhhhhhhhhhhhddda",
+        "aeedhhhhhhhhhhhhhhhhhhhhhhhhddda",
+        "aeedhhhhhhhhhhhhhhhhhhhhhhhhddda",
+        "aeedhhhhhhhhhhhhhhhhhhhhhhhhddda",
+        "aiifggggggggggggggggggggggggfffa",
+        "aiifjjjjjjjjjjjjjjjjjjjjjjjjfffa",
+        "aiifkkkkkkkkkkkkkkkkkkkkkkkkfffa",
+        "aiifkkkkkkkkkkkkkkkkkkkkkkkkfffa",
+        "aiifkkkkkkkkkkkkkkkkkkkkkkkkfffa",
+        "aiifkkkkkkkkkkkkkkkkkkkkkkkkfffa"
+       ],
+       "key": {
+        "a": "ink",
+        "b": "stone.deep",
+        "c": "floor.deep",
+        "d": "course.deep",
+        "e": "course.dark",
+        "f": "stone.dark",
+        "g": "floor.dark",
+        "h": "course",
+        "i": "stone",
+        "j": "floor.light",
+        "k": "floor"
+       }
+      }
+     ]
+    },
+    {
+     "name": "stairs-up",
+     "label": "Stairs going up",
+     "draw": [
+      {
+       "kind": "stamp",
+       "at": [
+        0,
+        0
+       ],
+       "rows": [
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "abccddddddddddddddddddddddddeffa",
+        "abccddddddddddddddddddddddddeffa",
+        "abccddddddddddddddddddddddddeffa",
+        "abccddddddddddddddddddddddddeffa",
+        "abccggggggggggggggggggggggggeffa",
+        "abccggggggggggggggggggggggggeffa",
+        "abccbbbbbbbbbbbbbbbbbbbbbbbbeffa",
+        "abccbbbbbbbbbbbbbbbbbbbbbbbbeffa",
+        "abccbbbbbbbbbbbbbbbbbbbbbbbbeffa",
+        "abccbbbbbbbbbbbbbbbbbbbbbbbbeffa",
+        "abcchhhhhhhhhhhhhhhhhhhhhhhheffa",
+        "abcchhhhhhhhhhhhhhhhhhhhhhhheffa",
+        "abccggggggggggggggggggggggggeffa",
+        "abccggggggggggggggggggggggggeffa",
+        "abccggggggggggggggggggggggggeffa",
+        "abccggggggggggggggggggggggggeffa",
+        "abcciiiiiiiiiiiiiiiiiiiiiiiieffa",
+        "abcciiiiiiiiiiiiiiiiiiiiiiiieffa",
+        "abcchhhhhhhhhhhhhhhhhhhhhhhheffa",
+        "abcchhhhhhhhhhhhhhhhhhhhhhhheffa",
+        "abcchhhhhhhhhhhhhhhhhhhhhhhheffa",
+        "abcchhhhhhhhhhhhhhhhhhhhhhhheffa",
+        "abccjjjjjjjjjjjjjjjjjjjjjjjjeffa",
+        "abccjjjjjjjjjjjjjjjjjjjjjjjjeffa",
+        "abcciiiiiiiiiiiiiiiiiiiiiiiieffa",
+        "abcciiiiiiiiiiiiiiiiiiiiiiiieffa",
+        "abcciiiiiiiiiiiiiiiiiiiiiiiieffa",
+        "abcciiiiiiiiiiiiiiiiiiiiiiiieffa",
+        "abcckkkkkkkkkkkkkkkkkkkkkkkkeffa",
+        "abcckkkkkkkkkkkkkkkkkkkkkkkkeffa",
+        "abcckkkkkkkkkkkkkkkkkkkkkkkkeffa"
+       ],
+       "key": {
+        "a": "ink",
+        "b": "stone.light",
+        "c": "stone",
+        "d": "floor.light",
+        "e": "stone.deep",
+        "f": "stone.dark",
+        "g": "floor",
+        "h": "course",
+        "i": "floor.dark",
+        "j": "course.dark",
+        "k": "floor.deep"
+       }
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "clips": {
+  "floor-fill": {
+   "label": "Floor"
+  },
+  "floor-fill-b": {
+   "label": "Floor, version B"
+  },
+  "floor-fill-c": {
+   "label": "Floor, version C"
+  }
+ },
+ "made": {
+  "in": "library",
+  "from": "code:tiles-dungeon",
+  "by": "B15 redraw (test fixture)"
+ }
+}

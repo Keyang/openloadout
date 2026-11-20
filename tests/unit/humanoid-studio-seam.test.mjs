@@ -8,6 +8,7 @@ import { Surface } from '../../engine/surface.js';
 import { blendKeys } from '../../rigs/keypose.js';
 import * as H from '../../rigs/humanoid.js';
 import * as F from '../../rigs/humanoid-figure.js';
+import { codeSprite } from '../helpers/library.mjs';
 
 const fnv = (h, x) => Math.imul(h ^ x, 16777619) >>> 0;
 
@@ -40,7 +41,7 @@ const BEFORE = {
 
 for (const id of ['rogue-battler', 'road-bandit']) {
   test(`${id}: with no keys every frame and attach point is byte for byte as before the seam`, async () => {
-    const s = (await import(`../../sprites/${id}.js`)).default;
+    const s = await codeSprite(id);      // the converted file as the hashes were taken from, frozen (tests/helpers/library.mjs)
     const want = BEFORE[id];
     const got = {};
     for (const [name, p] of settings(s)) if (name in want) got[name] = hashAll(s, p);
