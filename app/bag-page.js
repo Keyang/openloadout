@@ -451,7 +451,7 @@ export function bagPage(app, query = {}, isCurrent = () => true) {
         el('span', { class: 'bag-kind' }, KIND_LABEL[item.kind]),
         el('span', { class: 'hint' },
           el('strong', {}, 'Needs re-making. '),
-          item.from === 'link' ? 'This came broken from the link. Ask the sender for a new one.' : 'This was kept from an earlier visit and is broken now. Make it again, or remove it.',
+          again.say ?? (item.from === 'link' ? 'This came broken from the link. Ask the sender for a new one.' : 'This was kept from an earlier visit and is broken now. Make it again, or remove it.'),
           ' It is not shown and will be left out of the download.'),
         // what the check found is for whoever can re-make it, so it stays folded away
         again.reason ? el('details', { class: 'hint remake-why' }, el('summary', {}, 'Details'), again.reason) : null),

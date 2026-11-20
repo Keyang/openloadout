@@ -727,6 +727,6 @@ Using it in Godot
   Copy the whole folder into your project folder.
 ${has('sprite') ? '  Sprites: follow the how-to-use.txt in each sprite\'s folder.\n' : ''}${has('sound') || has('music') ? '  Sounds and music: play a WAV file with an AudioStreamPlayer. For music or a sound that repeats, select the\n  file, open the Import tab, set Loop Mode to Forward and press Reimport.\n' : ''}
 Keep pixel art sharp: turn smoothing or filtering off, and scale by whole numbers (2x, 3x, 4x).
-${made.length ? `\nMade on your visit: ${made.map((a) => a.name).join(', ')}.\n  These are not in Loadout's catalogue. Each comes with its source (the .source file next to it), which is what\n  Loadout needs to make it again: keep it if you want to change the asset later.\n` : ''}Made with Loadout.
+${made.length ? `\nMade on your visit: ${made.map((a) => a.name).join(', ')}.\n  These are not in Loadout's catalogue. Each comes with its definition (the .sprite.json file next to it),\n  which is what Loadout needs to make it again: keep it if you want to change the asset later.\n` : ''}Made with Loadout.
 `;
 }

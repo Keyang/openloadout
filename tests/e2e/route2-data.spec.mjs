@@ -95,7 +95,7 @@ test('an old bag item made from source text is never run: it is listed as made w
   await other.goto(`/index.html${link}`);
   await expect(other.locator('.bag-offer')).toHaveCount(0);
   await expect(other.locator('.bag-item.remake')).toHaveCount(1);
-  await expect(other.locator('.bag-item.remake')).toContainText('Ask the sender for a new one');
+  await expect(other.locator('.bag-item.remake')).toContainText('made with an older version of Loadout; ask for a new link');   // Keyang's DQ2 wording on the page itself
   await expect(other.locator('.bag-item.remake details')).toContainText(/older version of Loadout/);
   expect(await other.evaluate(() => window.__ran ?? null)).toBe(null);
   expect([...reached, ...otherReached]).toEqual([]);
