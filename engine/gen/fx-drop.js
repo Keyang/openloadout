@@ -3,14 +3,14 @@
 // specification's lightColumn of "engine/fx-columns.js" and chips of "engine/fx.js" drew; those helpers were never
 // carried over, so these are written from the specification and the reviewed renders).
 //   light.columns@1  upright lines of light standing on a row, hottest at the foot, that shorten from the top and thin
-//   motes@1          square motes on a row, half to each side, that slide apart, lift and cool
+//   drop.motes@1     square motes on a row, half to each side, that slide apart, lift and cool
 // Both read the clip phase ctx.t (fract(t) in a looping clip, so a loop closes) and return whole-pixel rects only, never
 // cut to the frame: they draw the same on a node at its origin as in frame pixels, as an emitter or in a draw list.
 // `paints` is hottest first (engine/gen/fx-burst.js COLOURS: white, core, middle, edge, rim).
 // Pure: no randomness but `seed` through engine/motion.js hash, no clock, no DOM; runs the same in the browser and Node.
 //
 //   { "gen": "light.columns", "v": 1, "at": [32, 62], "count": 3, "span": 38, "height": 48, "style": "lines", "paints": ["shine", "core", "mid", "edge", "rim"] }
-//   { "gen": "motes", "v": 1, "at": [32, 62], "count": 3, "reach": 8, "paints": ["shine", "core", "mid", "edge", "rim"] }
+//   { "gen": "drop.motes", "v": 1, "at": [32, 62], "count": 3, "reach": 8, "paints": ["shine", "core", "mid", "edge", "rim"] }
 import { defineGenerator } from './registry.js';
 import { point, px, count, seed, word, paints } from './args.js';
 import { hash, fract, clamp, lerp, keys, easeOut } from '../motion.js';
@@ -98,14 +98,14 @@ export const lightColumns = defineGenerator({
 });
 
 /**
- * motes@1: square motes on the row `at`[1], `count` to each side of `at`[0], 3 x 3 and 2 x 2 by turns and `gap` apart.
+ * drop.motes@1: square motes on the row `at`[1], `count` to each side of `at`[0], 3 x 3 and 2 x 2 by turns and `gap` apart.
  * Over the clip (ctx.t) each slides away from the middle (the outer ones farther, up to `reach`, so no two cross),
  * lifts `rise` pixels and cools through `paints`; a 3 x 3 one has the last paint down its shaded left and bottom. From half
  * way all are 2 x 2. The inner `keep` a side last to the end; the rest are quicker and gone after 0.7 of the clip. Written from the
  * Gridline specification (see the header).
  */
-export const motes = defineGenerator({
-  id: 'motes', v: 1, family: 'fx',
+export const dropMotes = defineGenerator({
+  id: 'drop.motes', v: 1, family: 'fx',
   about: 'Square motes on a row, half to each side, that slide apart, lift and cool, a few 2 x 2 ones left at the end: the dust of a landing.',
   args: {
     at: point({ about: 'The middle of the row they lie on: their lowest pixels start on this row' }),

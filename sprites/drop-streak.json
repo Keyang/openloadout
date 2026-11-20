@@ -29,7 +29,7 @@
       "height": { "from": "height", "map": [[0, 40], [1, 56]], "round": "px" },
       "style": { "from": "style", "pick": { "lines": "lines", "dashes": "dashes", "blocks": "blocks" } },
       "paints": ["shine", "core", "mid", "edge", "rim"] },
-    { "id": "dust", "gen": "motes", "v": 1, "clip": ["dust"], "at": [32, 62],
+    { "id": "dust", "gen": "drop.motes", "v": 1, "clip": ["dust"], "at": [32, 62],
       "count": { "from": "pieces", "map": [[2, 2], [5, 5]], "round": "px" },
       "reach": { "from": "width", "map": [[0, 5], [1, 10]] },
       "rise": 2, "keep": 2,

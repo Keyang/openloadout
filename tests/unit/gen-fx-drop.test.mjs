@@ -1,5 +1,5 @@
 // The landing effects of a dropped piece (engine/gen/fx-drop.js, family "fx"): light.columns@1, upright lines of light
-// standing on a row that shorten from the top, and motes@1, square motes sliding apart along a row. They are the look
+// standing on a row that shorten from the top, and drop.motes@1, square motes sliding apart along a row. They are the look
 // the Gridline kit's drop-streak drew in code (bundles/specs/kit-puzzle-gridline.md, `drop-streak`), now generators.
 // Both are pinned by the goldens harness (tests/helpers/gen-harness.mjs); the tests after it hold what the
 // specification asks. To pin: GEN_GOLDEN_WRITE=1 node --test tests/unit/gen-fx-drop.test.mjs
@@ -17,7 +17,7 @@ const CASES = {
     { args: { at: [0, 0], count: 2, span: 16, height: 40, style: 'dashes', seed: 7, paints: ['core', 'edge.light', 'edge'] }, ctx: { t: 0.8, loop: false, frames: 6, frame: 4 } },
     { args: { at: [10.5, 30], count: 1, height: 12, thick: 2, paints: ['core'] }, ctx: { t: 1, loop: false, frames: 6, frame: 5 } },
   ],
-  'motes@1': [
+  'drop.motes@1': [
     { args: { at: [32, 62], paints: FIVE } },
     { args: { at: [32, 62], count: 5, reach: 10, paints: FIVE }, ctx: { t: 0.6, loop: false, frames: 6, frame: 3 } },
     { args: { at: [0, 0], count: 1, reach: 4, rise: 0, keep: 0, paints: ['core', 'edge'] }, ctx: { t: 0.2, loop: false, frames: 6, frame: 1 } },
@@ -55,7 +55,7 @@ const columnsOf = (px) => new Set([...px.keys()].map((k) => Number(k.split(',')[
 /** How many separate runs of neighbouring columns are lit. */
 const runs = (px) => { const xs = [...columnsOf(px)].sort((a, b) => a - b); return xs.filter((x, i) => i === 0 || x !== xs[i - 1] + 1).length; };
 const cols = (more = {}, t = 0) => pixels({ gen: 'light.columns', v: 1, at: [32, 62], paints: FIVE, ...more }, t);
-const dust = (more = {}, t = 0) => pixels({ gen: 'motes', v: 1, at: [32, 62], paints: FIVE, ...more }, t);
+const dust = (more = {}, t = 0) => pixels({ gen: 'drop.motes', v: 1, at: [32, 62], paints: FIVE, ...more }, t);
 
 test('the column styles are the specification\'s', () => {
   assert.deepEqual([...COLUMN_STYLES], ['lines', 'dashes', 'blocks']);
@@ -103,7 +103,7 @@ test('dashes are 3 px with gaps, blocks are squares as wide as the streak; lines
   assert.ok(lit(column('blocks')).startsWith('111100111100'), 'blocks: 4 lit, 2 dark');
 });
 
-test('motes: a row of 2x2 and 3x3 squares on the row, half each side, sliding apart and rising; four 2x2 are left', () => {
+test('drop.motes: a row of 2x2 and 3x3 squares on the row, half each side, sliding apart and rising; four 2x2 are left', () => {
   for (const count of [2, 3, 5]) {
     const start = dust({ count, reach: 10 });
     assert.equal(box(start).y1, 62, 'on the row');
@@ -124,7 +124,7 @@ test('motes: a row of 2x2 and 3x3 squares on the row, half each side, sliding ap
 });
 
 test('both draw the same on a node at its origin as in frame pixels (rects only, nothing cut at 0)', () => {
-  for (const gen of ['light.columns', 'motes']) {
+  for (const gen of ['light.columns', 'drop.motes']) {
     const a = pixels({ gen, v: 1, at: [32, 62], paints: FIVE }, 0.4), b = pixels({ gen, v: 1, at: [0, 0], paints: FIVE }, 0.4);
     assert.equal(a.size, b.size);
     for (const [k, paint] of b) { const [x, y] = k.split(',').map(Number); assert.equal(a.get(`${x + 32},${y + 62}`), paint); }

@@ -21,7 +21,7 @@ import './backdrop.js';
 import './tiles.js';         // build item B15: tiles@1, the layout of a tileset, its material as data (engine/gen/tiles.js)
 import './block.js';         // the Gridline kit: block.cell@1 and block.ghost@1, a puzzle cell and its landing preview (engine/gen/block.js)
 import './grid.js';          // the Gridline kit's backdrop: grid.lines, grid.lights, grid.towers, grid.shapes, grid.band, grid.runner (engine/gen/grid.js)
-import './fx-drop.js';       // the Gridline kit: light.columns@1 and motes@1, the streaks above a dropped piece and its landing dust (engine/gen/fx-drop.js)
+import './fx-drop.js';       // the Gridline kit: light.columns@1 and drop.motes@1, the streaks above a dropped piece and its landing dust (engine/gen/fx-drop.js)
 import './fx-chips.js';      // the Gridline kit: chip.burst@1 and checker.fade@1, a cleared cell breaking into chips or blinking out (engine/gen/fx-chips.js)
 import './ui-grid.js';       // the Gridline kit: ui.gridbox@1, the dark window of its boxes and panels (engine/gen/ui-grid.js)
 import './counter.js';       // the Gridline kit: ui.counter@1, ui.counter.digits@1 and ui.counter.mark@1, a stat counter's case, digits and picture (engine/gen/counter.js)
@@ -87,7 +87,7 @@ export const STAMP_BOUNDS = Object.freeze({
   ...CHIPS_STAMP_BOUNDS,                   // engine/gen/fx-chips.js: whole-pixel rects only, no stamps
   // engine/gen/fx-drop.js: whole-pixel rects only, no stamps
   'light.columns@1': () => 0,
-  'motes@1': () => 0,
+  'drop.motes@1': () => 0,
   ...SPIN_STAMP_BOUNDS,                    // engine/gen/fx-spin.js: whole-pixel rects only, no stamps
   ...QUAD_STAMP_BOUNDS,                    // engine/gen/fx-quad.js: the square ring's four corner cells; the rays are rects
 });
@@ -104,7 +104,7 @@ export const SIZE_KEYS = Object.freeze({
   'chunks@1': Object.freeze([]),
   ...CHIPS_SIZE_KEYS,                      // engine/gen/fx-chips.js: their keyable arguments price nothing
   'light.columns@1': Object.freeze([]),    // nothing keyable: it plays over the clip phase
-  'motes@1': Object.freeze([]),
+  'drop.motes@1': Object.freeze([]),
   ...SPIN_SIZE_KEYS,                       // engine/gen/fx-spin.js: nothing keyable
   ...QUAD_SIZE_KEYS,                       // engine/gen/fx-quad.js: their keyable arguments price nothing
 });
