@@ -10,7 +10,7 @@
 //     next save that works writes it.
 // Everything read back is checked by the validator before it is drawn (Contract 11); a broken draft is left out and
 // counted, never drawn. Pure: the storage is handed in (the page passes localStorage or memory), so it runs in Node too.
-import { validateDataSprite } from '../../engine/data-sprite.js';
+import { checkDraft } from './v2-check.js';
 import { createDraftStore, StoreRefused, STUDIO_KEY as STORE_KEY } from '../studio-store.js';
 
 /** The localStorage key of the studio's drafts (docs/studio.md section 5). */
@@ -54,9 +54,10 @@ export function draftIdFor(name, taken = []) {
  * with the error in everyday words; broken() counts stored drafts that could not be read; problem() is null, or why the
  * store cannot be used (then nothing is saved); pending() says a failed save waits; savedText() is what storage holds, to
  * download; startAfresh() clears a store that cannot be read whole (and only such a store): { ok, error? }.
- * Arguments: storage ({ getItem, setItem, removeItem }), opts { now (the clock), check (a validator returning { ok, value }; default validateDataSprite) }.
+ * Arguments: storage ({ getItem, setItem, removeItem }), opts { now (the clock), check (a validator returning { ok, value }; default
+ * app/studio/v2-check.js checkDraft: validateDataSprite for version 1, the plain-data wall for version 2, build item B17) }.
  */
-export function createDrafts(storage, { now = () => Date.now(), check = (d) => validateDataSprite(d) } = {}) {
+export function createDrafts(storage, { now = () => Date.now(), check = (d) => checkDraft(d) } = {}) {
   const store = createDraftStore(storage, { limits: { drafts: MAX_DRAFTS, storeChars: MAX_STORE_BYTES } });
   const cache = new Map();          // text of a definition -> its checked value, so a list is not validated twice
   let bad = 0;

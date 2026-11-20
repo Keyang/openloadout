@@ -9,6 +9,8 @@ import { assetById } from '../catalog.js';
 import { draftIdFor, slugOf } from './drafts.js';
 import { startingBodies, startFrom, setName, hasClip } from './edit.js';
 import { drawFrame } from './draw.js';
+import { checkDraft } from './v2-check.js';
+import { v2Picture, v2StartsSection } from './v2-starts.js';
 
 const FILE_CHARS = 512 * 1024;
 
@@ -26,6 +28,7 @@ function ago(t, now = Date.now()) {
 
 /** A frame of a definition as a canvas shown at a whole-number size that fits `room` pixels. */
 function picture(def, room) {
+  if (def?.version === 2) return v2Picture(def, room);       // build item B17: every body, drawn once its pieces are loaded
   const clip = hasClip(def, def.preview) ? def.preview : Object.keys(def.clips)[0];
   const g = drawFrame(def, clip, 0);
   const c = el('canvas', { width: g.w, height: g.h, 'aria-hidden': 'true' });
@@ -46,7 +49,7 @@ export function homePage(app, { drafts, kept, query }) {
   const say = (...t) => status.replaceChildren(...t);
 
   function create(def, how) {
-    const v = validateDataSprite(def);
+    const v = checkDraft(def);       // version 1 as validateDataSprite; a version 2 file kept with its mistakes shown (B17)
     if (!v.ok) { say(`That could not be opened: ${v.errors[0]}`); return; }
     const id = draftIdFor(v.value.name, drafts.ids());
     const r = drafts.put(id, v.value);
@@ -72,6 +75,7 @@ export function homePage(app, { drafts, kept, query }) {
         el('span', { class: 'st-start-name' }, s.label),
         el('span', { class: 'st-start-tag' }, s.kind === 'library' ? 'From the library' : VIEW_WORD[s.view] ?? 'Side view')));
     }
+    pick.append(v2StartsSection({ drafts, say }));
   }
 
   // ---- opening a file ----

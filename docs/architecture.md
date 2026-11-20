@@ -524,7 +524,8 @@ What is built, as of 2026-11-20 05:00, commit `6773968` ("committed" = in git):
 | `make.sprite` takes data; sandbox deleted; the `made` token | Committed (B11, B11b; Contract 11) | `app/api-core.js`, `app/bag.js` |
 | The `/sprite-forge` skill and maker agent write data sprites | Done (B10, B10b), outside this folder | `skills/sprite-forge/` |
 | Tests ready for redraws (library tests load either file kind; frozen code copies) | Committed (T1, `87a4e2c`): 46 frozen copies pinned by `SHA256SUMS` | `tests/helpers/library.mjs`, `tests/fixtures/code-sprites/` |
-| Not built | 11 more bases (B16), the studio for every body (B17), Advanced mode (B18), the other editors (B19), migration M1 to M40, removals R1 to R4 (only the sandbox is gone), the build refusing code sprites, a bag item recording its definition's `rev` | |
+| Advanced mode on a sprite page (B18) | Built 2026-11-20, review round 1 fixed, not committed: a library data sprite's page opens the version 2 editor inline on a copy (a version 2 studio draft, `made.from: "library:<id>"`); address `#/sprite/<id>?…&edit=advanced&copy=<draft>&pane=<tab>&aclip=<clip>` (docs/data-sprites.md section 6) | `app/sprite-advanced.js`, `app/sprite-advanced-model.js` |
+| Not built | 11 more bases (B16), the studio for every body (B17), the other editors (B19), migration M1 to M40, removals R1 to R4 (only the sandbox is gone), the build refusing code sprites, a bag item recording its definition's `rev` | |
 
 | Rule | What it says |
 |---|---|

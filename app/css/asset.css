@@ -238,3 +238,30 @@ canvas.stage { position: absolute; display: block; }
   .looks { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .cues-about { display: none; }
 }
+
+/* ---------- Advanced editing on a sprite's page (build item B18: app/sprite-advanced.js). The studio's version 2 editor
+   is moved onto the page: its picture, tools and frames under the page's heading, its panel in place of the simple
+   controls (their rules are app/css/studio.css's, as main gets .studio .studio-v2 while it is open) ---------- */
+.tune-head .adv-open { flex: none; margin-left: auto; margin-bottom: 6px; }
+.adv-note { font-size: 13px; line-height: 1.4; color: var(--ink-2); padding: var(--s2) var(--pad) 0; }
+.rx-head .adv-open { justify-self: start; margin-top: var(--s2); }
+.rx-head .adv-note { padding: 0; }
+main.is-advanced .rx-head { grid-template-columns: minmax(0, 1fr); }
+main.is-advanced .rx-head h1 { grid-column: auto; grid-row: auto; }
+.adv-bar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2) var(--s3); margin-top: var(--s2); padding: var(--s2) var(--s3); background: var(--shelf); border-radius: var(--r); font-size: 13px; line-height: 1.4; }
+.adv-what { flex: 1 1 260px; min-width: 0; margin: 0; color: var(--ink-2); }
+.adv-title { color: var(--ink); font-weight: 600; }
+.adv-copyname { color: var(--ink); font-weight: 500; overflow-wrap: anywhere; }
+.adv-acts { display: inline-flex; flex-wrap: wrap; align-items: center; gap: var(--s2) var(--s3); }
+.adv-studio { font-size: 13px; white-space: nowrap; }
+.adv-short { display: none; }
+@media (max-width: 720px) {
+  .adv-bar .adv-long, .adv-bar .adv-studio { display: none; }
+  .adv-bar .adv-short { display: inline; }
+  .tune-head .adv-open { margin-bottom: 4px; }
+  main.is-advanced .rx-head .blurb, main.is-advanced .rx-head .related { display: none; }
+  main.is-advanced .rx-head h1 { font-size: 18px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .adv-bar { margin-top: 2px; padding: 6px var(--s2); gap: 6px var(--s2); }
+  .adv-what { flex: 1 1 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .adv-bar .btn-sm { height: 30px; }
+}

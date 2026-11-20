@@ -19,6 +19,7 @@ import { assetShell, icon, ICON, setIcon } from './asset-shell.js';
 import { bagTray } from './tray.js';      // the bag's slim tray at the right edge (1280 px and wider)
 import { lookTab, lookById, lookPainter } from './asset-look.js';      // the whole-set looks, on this one sprite
 import { madeNote, assetById } from './catalog.js';      // W5-A: a sprite made on this visit says so, and a draft cannot go in the bag
+import { advancedMode } from './sprite-advanced.js';      // B18: Advanced editing, the studio's editor on a copy of this sprite
 
 /**
  * The sprite's own sounds, as defaultCues gives them, each keeping its `when` (the settings it plays at):
@@ -498,6 +499,9 @@ export function spritePage(app, sprite, query) {
   shell.main.append(tray.node);
   app.replaceChildren(header('sprites'), shell.main);
   tray.placed();
+  // Advanced (a library data sprite only): the studio's editor on a copy, in place of the picture and the simple controls
+  const advanced = advancedMode({ sprite, main: shell.main, query, params: () => st.p, pause: () => { if (st.playing) { st.playing = false; syncPlay(); syncLoops(); } },
+    resume: () => { if (!raf) { last = performance.now(); raf = requestAnimationFrame(tick); } } });      // (the picture is not drawn while Advanced is open: see tick)
   // (the animation the page opens on is in sight among its chips, also when a tileset has rows of them)
   { const on = clipBar.querySelector('[aria-pressed="true"]'); const top = on ? on.offsetTop - clipBar.offsetTop : 0; if (on && top + on.offsetHeight > clipBar.clientHeight) clipBar.scrollTop = top - 4; }
 
@@ -542,6 +546,7 @@ export function spritePage(app, sprite, query) {
   fit();
 
   const tick = (now) => {
+    if (advanced.isOpen()) { raf = 0; return; }      // Advanced shows the editor's picture instead; leaving starts this again
     const dt = Math.min(0.1, (now - last) / 1000); last = now;
     const clip = sprite.clips[st.clip];
     const fps = clipFps(sprite, st.clip, st.p);
@@ -577,7 +582,7 @@ export function spritePage(app, sprite, query) {
   syncLoops();
   return () => {
     cancelAnimationFrame(raf); ro.disconnect(); clearTimeout(urlTimer);
-    offEdit(); offTray(); tray.stop(); if (behind) behind.stop(); panel.close(); look.close(); shell.close(); edit.close(); clearTimeout(saveTimer);      // leaving saves whatever was still waiting
+    advanced.close(); offEdit(); offTray(); tray.stop(); if (behind) behind.stop(); panel.close(); look.close(); shell.close(); edit.close(); clearTimeout(saveTimer);      // leaving saves whatever was still waiting
     window.removeEventListener('pagehide', flush);
     if (offFrames) offFrames();
     clearTimeout(aheadTimer);

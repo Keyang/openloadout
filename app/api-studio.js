@@ -31,7 +31,10 @@
 //   - Nothing from a definition ever runs: it is data drawn by framework code, so no worker is needed.
 //
 // Runs unchanged in the browser and in Node (the unit tests hand in storage, the library's ids, the sounds and the bag).
-import { makeDataSprite, validateDataSprite, framePose, drawOptions, directionRig, directionOf } from '../engine/data-sprite.js';
+import { makeDataSprite, framePose, drawOptions, directionRig, directionOf } from '../engine/data-sprite.js';
+// build item B17: version 2 drafts and definitions (every body) beside version 1 (app/studio/v2-api.js)
+import { checkFull as validateDataSprite } from './studio/v2-check.js';
+import { v2StartList, v2StartFrom, libraryStart, preloadPieces, renderV2, fileV2 } from './studio/v2-api.js';
 import { renderFrame, cleanParams, clipFps } from '../engine/sprite.js';
 import { Surface } from '../engine/surface.js';
 import { STUDIO_LIMITS } from '../catalog/studio-schema.js';
@@ -320,13 +323,15 @@ export function createStudio(env = {}) {
       const d = L.make();
       return { from: `library:${id}`, label: L.label, blurb: d.blurb, body: 'library body', view: d.meta.view, size: [...d.size], clips: Object.keys(d.clips) };
     });
-    return [...studioTemplates().map((t) => ({ from: `template:${t.id}`, label: t.label, blurb: t.blurb, body: 'bone rig', view: t.view, size: [...t.size], clips: [...t.clips] })), ...libraryStarts.map((s) => ({ ...s, size: [...s.size], clips: [...s.clips] }))];
+    return [...studioTemplates().map((t) => ({ from: `template:${t.id}`, label: t.label, blurb: t.blurb, body: 'bone rig', view: t.view, size: [...t.size], clips: [...t.clips] })), ...libraryStarts.map((s) => ({ ...s, size: [...s.size], clips: [...s.clips] })), ...v2StartList()];
   };
   /** The definition to start from, and its canonical name. */
   function startFrom(from) {
     const all = () => starts().map((s) => s.from).join(', ');
     if (typeof from !== 'string' || !from) throw new Problem(`from names what to start from: one of ${all()} (studio_starts lists them).`);
     const t = from.startsWith('template:') ? from.slice(9) : from.startsWith('library:') ? null : from;
+    const v2 = v2StartFrom(from.startsWith('v2-') ? `template:${from}` : from);
+    if (v2) return v2;
     if (t !== null) {
       const d = studioTemplate(t);
       if (d) return { d, from: `template:${t}` };
@@ -351,12 +356,13 @@ export function createStudio(env = {}) {
   function draw(value, o) {
     const warnings = [];
     const clip = o.clip ?? value.preview;
-    if (typeof clip !== 'string' || !Object.hasOwn(value.clips, clip)) throw new Problem(`There is no clip ${say(o.clip)}. The clips are: ${Object.keys(value.clips).join(', ')}.`);
-    const count = value.clips[clip].frames;
+    if (value.version !== 2 && (typeof clip !== 'string' || !Object.hasOwn(value.clips, clip))) throw new Problem(`There is no clip ${say(o.clip)}. The clips are: ${Object.keys(value.clips).join(', ')}.`);
+    const count = value.version === 2 ? 1 : value.clips[clip].frames;
     const one = o.frame !== undefined && o.frame !== null;
-    if (one && !(Number.isInteger(o.frame) && o.frame >= 0 && o.frame < count)) throw new Problem(`frame must be a whole number from 0 to ${count - 1} (the clip "${clip}" has ${count} frame${count === 1 ? '' : 's'}); leave it out for the whole clip in one row. Got ${say(o.frame)}.`);
+    if (value.version !== 2 && one && !(Number.isInteger(o.frame) && o.frame >= 0 && o.frame < count)) throw new Problem(`frame must be a whole number from 0 to ${count - 1} (the clip "${clip}" has ${count} frame${count === 1 ? '' : 's'}); leave it out for the whole clip in one row. Got ${say(o.frame)}.`);
     const scale = o.scale ?? 1;
     if (!(Number.isInteger(scale) && scale >= 1 && scale <= limits.scale)) throw new Problem(`scale must be a whole number from 1 to ${limits.scale}. Got ${say(o.scale)}.`);
+    if (value.version === 2) { const r2 = renderV2(value, o, limits); if (!r2.ok) throw new Problem(r2.errors); return r2; }
     if (o.params !== undefined && o.params !== null && !isObj(o.params)) throw new Problem(`params must be an object of settings by control key, for example { "${Object.keys(value.colours ?? {})[0] ?? 'speed'}": "#4f9d57" }. Got ${say(o.params)}.`);
     if (o.bones !== undefined && o.bones !== null && typeof o.bones !== 'boolean') throw new Problem(`bones must be true (draw the skeleton over the picture) or false. Got ${say(o.bones)}.`);
     const frames = one ? [o.frame] : Array.from({ length: count }, (_, f) => f);
@@ -415,14 +421,17 @@ export function createStudio(env = {}) {
     create: async (fromOrOptions, nameIn) => {
       const opts = isObj(fromOrOptions) ? fromOrOptions : { from: fromOrOptions, name: nameIn };
       const from = own(opts, 'from'), name = own(opts, 'name');
-      const s = startFrom(from);
+      // a library data sprite starts as a copy (DQ5); the Hero preset (LIBRARY) and pages with no site to read from are as before
+      const lib = typeof from === 'string' && !Object.hasOwn(LIBRARY, from.slice(8)) && (env.libraryText || win) ? await libraryStart(from, { read: env.libraryText, taken: [...Object.keys(read().drafts), ...((await known()).catalogIds ?? [])] }) : null;
+      if (lib?.error) throw new Problem(lib.error);
+      const s = lib ?? startFrom(from);
       if (name !== undefined && name !== null && typeof name !== 'string') throw new Problem(`name is what the sprite is called, as text of at most ${STUDIO_LIMITS.nameChars} characters ("Moss beast"). Got ${say(name)}.`);
       const label = typeof name === 'string' && name.trim() ? name.trim().replace(/\s+/g, ' ') : s.d.name;
       if (label.length > STUDIO_LIMITS.nameChars) throw new Problem(`The name is ${label.length} characters long; a name is at most ${STUDIO_LIMITS.nameChars}.`);
       const { drafts, count } = readWhole();
       if (count >= limits.drafts) throw tooMany(count);
       const id = await newId(label, drafts);
-      const def = { ...s.d, id, name: label, made: { in: 'studio', from: s.from } };
+      const def = { ...s.d, id: lib && !(typeof name === 'string' && name.trim()) ? s.d.id : id, name: label, made: { in: 'studio', from: s.from } };
       return keep(id, def, { create: true });
     },
 
@@ -519,6 +528,7 @@ export function createStudio(env = {}) {
     file: async (what) => {
       const { opts, problem } = await fullOpts();
       const { value } = await definitionOf(what, opts);
+      if (value.version === 2) { const f2 = fileV2(value, opts); return { ...f2, warnings: [...f2.warnings, ...(problem ? [problem] : [])] }; }
       let F;
       try { F = await import('../catalog/data-file.js'); } catch (e) { throw new Problem(`The file writer (catalog/data-file.js) could not be loaded: ${messageOf(e)}`); }
       const w = F.writeDataFile(value, opts);
@@ -539,7 +549,7 @@ export function createStudio(env = {}) {
 
   // every member never throws: a Problem is the caller's message, anything else is said plainly
   const safe = (fn) => async (...args) => {
-    try { return plain(await fn(...args)); } catch (e) {
+    try { await preloadPieces(storage, STUDIO_KEY, args); return plain(await fn(...args)); } catch (e) {
       if (e instanceof Problem) return { ok: false, errors: e.errors.map(String), ...(e.extra?.warnings?.length ? { warnings: e.extra.warnings } : {}) };
       return { ok: false, errors: [`The studio could not finish this: ${messageOf(e)}`] };
     }

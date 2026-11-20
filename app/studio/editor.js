@@ -18,6 +18,7 @@ import { icon, menuButton } from './bits.js';
 import { bodyPane, movePane, framesPane, lookPane } from './panes.js';
 import { lightKeys, lightLabel } from './clip-tools.js';
 import { framesWithAdvice } from './more-panes.js';
+import { v2EditorPage } from './v2-editor.js';
 
 /** The four tabs: their address word (docs/studio.md), their key and their name. */
 export const MODES = Object.freeze([
@@ -43,6 +44,8 @@ function inBag(key) {
  * studio ({ ready, toBag }: what 'Put in my bag' calls, on the same drafts; default window.loadout.studio) }.
  */
 export function editorPage(app, { id, entry, drafts, kept, query, studio = siteStudio }) {
+  // build item B17: a version 2 draft (every body) has its own editor; version 1 drafts open here as before
+  if (entry.definition?.version === 2) return v2EditorPage(app, { id, entry, drafts, kept, query, studio });
   /** Does the bag take studio sprites (item S8)? The same test toBag makes, and toBag is there. */
   const bagTakesStudio = (def) => studio.ready() && bagTakes(bagModule, def);
   const startMode = MODES.find((m) => m.id === query.mode)?.mode ?? 'body';
