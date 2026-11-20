@@ -1,0 +1,1531 @@
+{
+ "id": "chip.burst",
+ "v": 2,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     48,
+     48
+    ],
+    "paints": [
+     "shine",
+     "core",
+     "mid",
+     "edge",
+     "edge",
+     "rim"
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      42,
+      42
+     ],
+     "size": [
+      12,
+      12
+     ],
+     "paint": "mid",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      43,
+      43
+     ],
+     "size": [
+      10,
+      10
+     ],
+     "paint": "core",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      44,
+      44
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "shine",
+     "shade": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     48,
+     48
+    ],
+    "block": "chips",
+    "count": 12,
+    "size": 5,
+    "dist": 26,
+    "begin": 0.3,
+    "room": 47,
+    "paints": [
+     "shine",
+     "core",
+     "mid",
+     "edge",
+     "edge",
+     "rim"
+    ]
+   },
+   "ctx": {
+    "t": 0.09090909090909091,
+    "loop": false,
+    "frames": 12,
+    "frame": 1,
+    "size": [
+     96,
+     96
+    ],
+    "clip": "burst"
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      37,
+      40
+     ],
+     "size": [
+      5,
+      5
+     ],
+     "paint": "shine",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      43,
+      40
+     ],
+     "size": [
+      5,
+      5
+     ],
+     "paint": "shine",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      49,
+      40
+     ],
+     "size": [
+      5,
+      5
+     ],
+     "paint": "shine",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      55,
+      40
+     ],
+     "size": [
+      5,
+      5
+     ],
+     "paint": "shine",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      37,
+      46
+     ],
+     "size": [
+      5,
+      5
+     ],
+     "paint": "shine",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      43,
+      46
+     ],
+     "size": [
+      5,
+      5
+     ],
+     "paint": "shine",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      49,
+      46
+     ],
+     "size": [
+      5,
+      5
+     ],
+     "paint": "shine",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      55,
+      46
+     ],
+     "size": [
+      5,
+      5
+     ],
+     "paint": "shine",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      37,
+      52
+     ],
+     "size": [
+      5,
+      5
+     ],
+     "paint": "shine",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      43,
+      52
+     ],
+     "size": [
+      5,
+      5
+     ],
+     "paint": "shine",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      49,
+      52
+     ],
+     "size": [
+      5,
+      5
+     ],
+     "paint": "shine",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      55,
+      52
+     ],
+     "size": [
+      5,
+      5
+     ],
+     "paint": "shine",
+     "shade": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     48,
+     48
+    ],
+    "block": "chips",
+    "count": 16,
+    "size": 5,
+    "dist": 26,
+    "begin": 0.3,
+    "room": 47,
+    "paints": [
+     "shine",
+     "core",
+     "mid",
+     "edge",
+     "edge",
+     "rim"
+    ]
+   },
+   "ctx": {
+    "t": 0.2727272727272727,
+    "loop": false,
+    "frames": 12,
+    "frame": 3,
+    "size": [
+     96,
+     96
+    ],
+    "clip": "burst"
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      37,
+      37
+     ],
+     "size": [
+      5,
+      5
+     ],
+     "paint": "rim",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      38,
+      37
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "core",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      43,
+      37
+     ],
+     "size": [
+      5,
+      5
+     ],
+     "paint": "rim",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      44,
+      37
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "core",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      49,
+      37
+     ],
+     "size": [
+      5,
+      5
+     ],
+     "paint": "rim",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      50,
+      37
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "core",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      55,
+      37
+     ],
+     "size": [
+      5,
+      5
+     ],
+     "paint": "rim",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      56,
+      37
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "core",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      37,
+      43
+     ],
+     "size": [
+      5,
+      5
+     ],
+     "paint": "rim",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      38,
+      43
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "core",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      43,
+      43
+     ],
+     "size": [
+      5,
+      5
+     ],
+     "paint": "rim",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      44,
+      43
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "core",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      49,
+      43
+     ],
+     "size": [
+      5,
+      5
+     ],
+     "paint": "rim",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      50,
+      43
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "core",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      55,
+      43
+     ],
+     "size": [
+      5,
+      5
+     ],
+     "paint": "rim",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      56,
+      43
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "core",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      37,
+      49
+     ],
+     "size": [
+      5,
+      5
+     ],
+     "paint": "rim",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      38,
+      49
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "core",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      43,
+      49
+     ],
+     "size": [
+      5,
+      5
+     ],
+     "paint": "rim",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      44,
+      49
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "core",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      49,
+      49
+     ],
+     "size": [
+      5,
+      5
+     ],
+     "paint": "rim",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      50,
+      49
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "core",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      55,
+      49
+     ],
+     "size": [
+      5,
+      5
+     ],
+     "paint": "rim",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      56,
+      49
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "core",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      37,
+      55
+     ],
+     "size": [
+      5,
+      5
+     ],
+     "paint": "rim",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      38,
+      55
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "core",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      43,
+      55
+     ],
+     "size": [
+      5,
+      5
+     ],
+     "paint": "rim",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      44,
+      55
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "core",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      49,
+      55
+     ],
+     "size": [
+      5,
+      5
+     ],
+     "paint": "rim",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      50,
+      55
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "core",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      55,
+      55
+     ],
+     "size": [
+      5,
+      5
+     ],
+     "paint": "rim",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      56,
+      55
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "core",
+     "shade": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     48,
+     48
+    ],
+    "block": "chips",
+    "count": 8,
+    "size": 4,
+    "dist": 26,
+    "square": 1,
+    "keep": 1,
+    "begin": 0.3,
+    "room": 47,
+    "paints": [
+     "shine",
+     "core",
+     "mid",
+     "edge",
+     "edge",
+     "rim"
+    ]
+   },
+   "ctx": {
+    "t": 0.5454545454545454,
+    "loop": false,
+    "frames": 12,
+    "frame": 6,
+    "size": [
+     96,
+     96
+    ],
+    "clip": "burst"
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      28,
+      28
+     ],
+     "size": [
+      3,
+      3
+     ],
+     "paint": "rim",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      29,
+      28
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "core",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      47,
+      28
+     ],
+     "size": [
+      3,
+      3
+     ],
+     "paint": "rim",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      48,
+      28
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "core",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      64,
+      29
+     ],
+     "size": [
+      3,
+      3
+     ],
+     "paint": "rim",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      65,
+      29
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "core",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      30,
+      47
+     ],
+     "size": [
+      3,
+      3
+     ],
+     "paint": "rim",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      31,
+      47
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "core",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      64,
+      47
+     ],
+     "size": [
+      3,
+      3
+     ],
+     "paint": "rim",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      65,
+      47
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "core",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      29,
+      64
+     ],
+     "size": [
+      3,
+      3
+     ],
+     "paint": "rim",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      30,
+      64
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "core",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      47,
+      64
+     ],
+     "size": [
+      3,
+      3
+     ],
+     "paint": "rim",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      48,
+      64
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "core",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      65,
+      65
+     ],
+     "size": [
+      3,
+      3
+     ],
+     "paint": "rim",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      66,
+      65
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "core",
+     "shade": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     0,
+     0
+    ],
+    "block": "chips",
+    "count": 12,
+    "size": 6,
+    "dist": 30,
+    "square": 1,
+    "keep": 1,
+    "gravity": 2,
+    "begin": 0.3,
+    "room": 47,
+    "paints": [
+     "shine",
+     "core",
+     "mid",
+     "edge",
+     "edge",
+     "rim"
+    ]
+   },
+   "ctx": {
+    "t": 1,
+    "loop": false,
+    "frames": 12,
+    "frame": 11,
+    "size": [
+     96,
+     96
+    ],
+    "clip": "burst"
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      -34,
+      -32
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      -34,
+      -31
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": "rim",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      -10,
+      -31
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      -10,
+      -30
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": "rim",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      7,
+      -29
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      7,
+      -28
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": "rim",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      31,
+      -31
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      31,
+      -30
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": "rim",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      -32,
+      9
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      -32,
+      10
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": "rim",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      -31,
+      -7
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      -31,
+      -6
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": "rim",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      30,
+      -7
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      30,
+      -6
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": "rim",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      32,
+      10
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      32,
+      11
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": "rim",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      -33,
+      33
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      -33,
+      34
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": "rim",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      -10,
+      34
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      -10,
+      35
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": "rim",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      8,
+      33
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      8,
+      34
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": "rim",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      31,
+      33
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      31,
+      34
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": "rim",
+     "shade": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "side": 12,
+    "count": 5,
+    "size": 5,
+    "mark": "spark",
+    "dist": 11,
+    "square": 0.5,
+    "begin": 0.1428,
+    "paints": [
+     "shine",
+     "core",
+     "mid",
+     "edge",
+     "edge",
+     "rim"
+    ]
+   },
+   "ctx": {
+    "t": 0.36363636363636365,
+    "loop": false,
+    "frames": 12,
+    "frame": 4,
+    "size": [
+     96,
+     96
+    ],
+    "clip": "burst"
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      5,
+      13
+     ],
+     "size": [
+      5,
+      1
+     ],
+     "paint": "core",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      7,
+      11
+     ],
+     "size": [
+      1,
+      5
+     ],
+     "paint": "core",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      7,
+      13
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": "shine",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      14,
+      9
+     ],
+     "size": [
+      5,
+      1
+     ],
+     "paint": "core",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      16,
+      7
+     ],
+     "size": [
+      1,
+      5
+     ],
+     "paint": "core",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      16,
+      9
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": "shine",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      22,
+      13
+     ],
+     "size": [
+      5,
+      1
+     ],
+     "paint": "core",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      24,
+      11
+     ],
+     "size": [
+      1,
+      5
+     ],
+     "paint": "core",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      24,
+      13
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": "shine",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      9,
+      22
+     ],
+     "size": [
+      5,
+      1
+     ],
+     "paint": "core",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      11,
+      20
+     ],
+     "size": [
+      1,
+      5
+     ],
+     "paint": "core",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      11,
+      22
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": "shine",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      19,
+      22
+     ],
+     "size": [
+      5,
+      1
+     ],
+     "paint": "core",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      21,
+      20
+     ],
+     "size": [
+      1,
+      5
+     ],
+     "paint": "core",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      21,
+      22
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": "shine",
+     "shade": 0
+    }
+   ]
+  }
+ ]
+}

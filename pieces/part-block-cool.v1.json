@@ -1,0 +1,970 @@
+{
+ "format": "loadout-piece",
+ "version": 1,
+ "id": "part:block-cool",
+ "v": 1,
+ "name": "Ocean and Greys blocks",
+ "about": "One Gridline puzzle cell in colour 1 to 7 of the Ocean scheme (blues and teals) or the Greys scheme (told apart by lightness alone), drawn by block.cell@1 from its top-left corner.",
+ "slots": [
+  {
+   "id": "block-hero",
+   "label": "Hero",
+   "default": "#3f6fd1",
+   "material": "paint"
+  },
+  {
+   "id": "block-sky",
+   "label": "Sky",
+   "default": "#56c4f2",
+   "material": "paint"
+  },
+  {
+   "id": "block-teal",
+   "label": "Teal",
+   "default": "#2a9a9a",
+   "material": "paint"
+  },
+  {
+   "id": "block-cyan",
+   "label": "Cyan",
+   "default": "#5fe0f0",
+   "material": "paint"
+  },
+  {
+   "id": "block-slate",
+   "label": "Slate",
+   "default": "#4f5894",
+   "material": "paint"
+  },
+  {
+   "id": "block-deep",
+   "label": "Deep",
+   "default": "#1e4658",
+   "material": "paint"
+  },
+  {
+   "id": "block-pearl",
+   "label": "Pearl",
+   "default": "#e6e8f6",
+   "material": "paint"
+  },
+  {
+   "id": "block-well",
+   "label": "Well",
+   "default": "#2a3058",
+   "material": "paint"
+  },
+  {
+   "id": "block-line",
+   "label": "Line",
+   "default": "#3a4278",
+   "material": "paint"
+  },
+  {
+   "id": "block-dusk",
+   "label": "Dusk",
+   "default": "#6e78b4",
+   "material": "paint"
+  },
+  {
+   "id": "block-mist",
+   "label": "Mist",
+   "default": "#a3abd8",
+   "material": "paint"
+  },
+  {
+   "id": "block-steel",
+   "label": "Steel",
+   "default": "#c2c9d6",
+   "material": "paint"
+  }
+ ],
+ "args": {
+  "scheme": {
+   "type": "word",
+   "options": [
+    "ocean",
+    "mono"
+   ],
+   "default": "ocean"
+  },
+  "slot": {
+   "type": "word",
+   "options": [
+    "c1",
+    "c2",
+    "c3",
+    "c4",
+    "c5",
+    "c6",
+    "c7"
+   ],
+   "default": "c1"
+  },
+  "size": {
+   "type": "count",
+   "lo": 6,
+   "hi": 32,
+   "default": 16
+  },
+  "style": {
+   "type": "word",
+   "options": [
+    "bevel",
+    "gem",
+    "glass",
+    "pillow",
+    "frame"
+   ],
+   "default": "bevel"
+  },
+  "edge": {
+   "type": "count",
+   "lo": 1,
+   "hi": 3,
+   "default": 2
+  },
+  "mark": {
+   "type": "flag",
+   "default": false
+  },
+  "shine": {
+   "type": "flag",
+   "default": false
+  }
+ },
+ "made": {
+  "by": "the sprite-forge skill",
+  "from": "bundles/specs/kit-puzzle-gridline.md (BLOCK_SCHEMES)"
+ },
+ "body": {
+  "draw": [
+   {
+    "id": "ocean-1",
+    "gen": "block.cell",
+    "v": 1,
+    "at": [0, 0],
+    "size": {
+     "from": "size",
+     "map": [
+      [6, 6],
+      [32, 32]
+     ],
+     "round": "px"
+    },
+    "style": {
+     "from": "style",
+     "pick": {
+      "bevel": "bevel",
+      "gem": "gem",
+      "glass": "glass",
+      "pillow": "pillow",
+      "frame": "frame"
+     }
+    },
+    "edge": {
+     "from": "edge",
+     "map": [
+      [1, 1],
+      [3, 3]
+     ],
+     "round": "px"
+    },
+    "symbol": {
+     "from": "mark",
+     "pick": {
+      "true": "disc",
+      "false": "none"
+     }
+    },
+    "paint": "block-hero",
+    "shine": {
+     "from": "shine",
+     "pick": {
+      "true": {
+       "rule": "tone",
+       "of": "block-hero",
+       "by": 3
+      },
+      "false": "clear"
+     }
+    },
+    "when": {
+     "scheme": [
+      "ocean"
+     ],
+     "slot": [
+      "c1"
+     ]
+    }
+   },
+   {
+    "id": "ocean-2",
+    "gen": "block.cell",
+    "v": 1,
+    "at": [0, 0],
+    "size": {
+     "from": "size",
+     "map": [
+      [6, 6],
+      [32, 32]
+     ],
+     "round": "px"
+    },
+    "style": {
+     "from": "style",
+     "pick": {
+      "bevel": "bevel",
+      "gem": "gem",
+      "glass": "glass",
+      "pillow": "pillow",
+      "frame": "frame"
+     }
+    },
+    "edge": {
+     "from": "edge",
+     "map": [
+      [1, 1],
+      [3, 3]
+     ],
+     "round": "px"
+    },
+    "symbol": {
+     "from": "mark",
+     "pick": {
+      "true": "ring",
+      "false": "none"
+     }
+    },
+    "paint": "block-sky",
+    "shine": {
+     "from": "shine",
+     "pick": {
+      "true": {
+       "rule": "tone",
+       "of": "block-sky",
+       "by": 3
+      },
+      "false": "clear"
+     }
+    },
+    "when": {
+     "scheme": [
+      "ocean"
+     ],
+     "slot": [
+      "c2"
+     ]
+    }
+   },
+   {
+    "id": "ocean-3",
+    "gen": "block.cell",
+    "v": 1,
+    "at": [0, 0],
+    "size": {
+     "from": "size",
+     "map": [
+      [6, 6],
+      [32, 32]
+     ],
+     "round": "px"
+    },
+    "style": {
+     "from": "style",
+     "pick": {
+      "bevel": "bevel",
+      "gem": "gem",
+      "glass": "glass",
+      "pillow": "pillow",
+      "frame": "frame"
+     }
+    },
+    "edge": {
+     "from": "edge",
+     "map": [
+      [1, 1],
+      [3, 3]
+     ],
+     "round": "px"
+    },
+    "symbol": {
+     "from": "mark",
+     "pick": {
+      "true": "plus",
+      "false": "none"
+     }
+    },
+    "paint": "block-teal",
+    "shine": {
+     "from": "shine",
+     "pick": {
+      "true": {
+       "rule": "tone",
+       "of": "block-teal",
+       "by": 3
+      },
+      "false": "clear"
+     }
+    },
+    "when": {
+     "scheme": [
+      "ocean"
+     ],
+     "slot": [
+      "c3"
+     ]
+    }
+   },
+   {
+    "id": "ocean-4",
+    "gen": "block.cell",
+    "v": 1,
+    "at": [0, 0],
+    "size": {
+     "from": "size",
+     "map": [
+      [6, 6],
+      [32, 32]
+     ],
+     "round": "px"
+    },
+    "style": {
+     "from": "style",
+     "pick": {
+      "bevel": "bevel",
+      "gem": "gem",
+      "glass": "glass",
+      "pillow": "pillow",
+      "frame": "frame"
+     }
+    },
+    "edge": {
+     "from": "edge",
+     "map": [
+      [1, 1],
+      [3, 3]
+     ],
+     "round": "px"
+    },
+    "symbol": {
+     "from": "mark",
+     "pick": {
+      "true": "diamond",
+      "false": "none"
+     }
+    },
+    "paint": "block-cyan",
+    "shine": {
+     "from": "shine",
+     "pick": {
+      "true": {
+       "rule": "tone",
+       "of": "block-cyan",
+       "by": 3
+      },
+      "false": "clear"
+     }
+    },
+    "when": {
+     "scheme": [
+      "ocean"
+     ],
+     "slot": [
+      "c4"
+     ]
+    }
+   },
+   {
+    "id": "ocean-5",
+    "gen": "block.cell",
+    "v": 1,
+    "at": [0, 0],
+    "size": {
+     "from": "size",
+     "map": [
+      [6, 6],
+      [32, 32]
+     ],
+     "round": "px"
+    },
+    "style": {
+     "from": "style",
+     "pick": {
+      "bevel": "bevel",
+      "gem": "gem",
+      "glass": "glass",
+      "pillow": "pillow",
+      "frame": "frame"
+     }
+    },
+    "edge": {
+     "from": "edge",
+     "map": [
+      [1, 1],
+      [3, 3]
+     ],
+     "round": "px"
+    },
+    "symbol": {
+     "from": "mark",
+     "pick": {
+      "true": "bar",
+      "false": "none"
+     }
+    },
+    "paint": "block-slate",
+    "shine": {
+     "from": "shine",
+     "pick": {
+      "true": {
+       "rule": "tone",
+       "of": "block-slate",
+       "by": 3
+      },
+      "false": "clear"
+     }
+    },
+    "when": {
+     "scheme": [
+      "ocean"
+     ],
+     "slot": [
+      "c5"
+     ]
+    }
+   },
+   {
+    "id": "ocean-6",
+    "gen": "block.cell",
+    "v": 1,
+    "at": [0, 0],
+    "size": {
+     "from": "size",
+     "map": [
+      [6, 6],
+      [32, 32]
+     ],
+     "round": "px"
+    },
+    "style": {
+     "from": "style",
+     "pick": {
+      "bevel": "bevel",
+      "gem": "gem",
+      "glass": "glass",
+      "pillow": "pillow",
+      "frame": "frame"
+     }
+    },
+    "edge": {
+     "from": "edge",
+     "map": [
+      [1, 1],
+      [3, 3]
+     ],
+     "round": "px"
+    },
+    "symbol": {
+     "from": "mark",
+     "pick": {
+      "true": "triangle",
+      "false": "none"
+     }
+    },
+    "paint": "block-deep",
+    "shine": {
+     "from": "shine",
+     "pick": {
+      "true": {
+       "rule": "tone",
+       "of": "block-deep",
+       "by": 3
+      },
+      "false": "clear"
+     }
+    },
+    "when": {
+     "scheme": [
+      "ocean"
+     ],
+     "slot": [
+      "c6"
+     ]
+    }
+   },
+   {
+    "id": "ocean-7",
+    "gen": "block.cell",
+    "v": 1,
+    "at": [0, 0],
+    "size": {
+     "from": "size",
+     "map": [
+      [6, 6],
+      [32, 32]
+     ],
+     "round": "px"
+    },
+    "style": {
+     "from": "style",
+     "pick": {
+      "bevel": "bevel",
+      "gem": "gem",
+      "glass": "glass",
+      "pillow": "pillow",
+      "frame": "frame"
+     }
+    },
+    "edge": {
+     "from": "edge",
+     "map": [
+      [1, 1],
+      [3, 3]
+     ],
+     "round": "px"
+    },
+    "symbol": {
+     "from": "mark",
+     "pick": {
+      "true": "square",
+      "false": "none"
+     }
+    },
+    "paint": "block-pearl",
+    "shine": {
+     "from": "shine",
+     "pick": {
+      "true": {
+       "rule": "tone",
+       "of": "block-pearl",
+       "by": 3
+      },
+      "false": "clear"
+     }
+    },
+    "when": {
+     "scheme": [
+      "ocean"
+     ],
+     "slot": [
+      "c7"
+     ]
+    }
+   },
+   {
+    "id": "mono-1",
+    "gen": "block.cell",
+    "v": 1,
+    "at": [0, 0],
+    "size": {
+     "from": "size",
+     "map": [
+      [6, 6],
+      [32, 32]
+     ],
+     "round": "px"
+    },
+    "style": {
+     "from": "style",
+     "pick": {
+      "bevel": "bevel",
+      "gem": "gem",
+      "glass": "glass",
+      "pillow": "pillow",
+      "frame": "frame"
+     }
+    },
+    "edge": {
+     "from": "edge",
+     "map": [
+      [1, 1],
+      [3, 3]
+     ],
+     "round": "px"
+    },
+    "symbol": {
+     "from": "mark",
+     "pick": {
+      "true": "disc",
+      "false": "none"
+     }
+    },
+    "paint": "block-well",
+    "shine": {
+     "from": "shine",
+     "pick": {
+      "true": {
+       "rule": "tone",
+       "of": "block-well",
+       "by": 3
+      },
+      "false": "clear"
+     }
+    },
+    "when": {
+     "scheme": [
+      "mono"
+     ],
+     "slot": [
+      "c1"
+     ]
+    }
+   },
+   {
+    "id": "mono-2",
+    "gen": "block.cell",
+    "v": 1,
+    "at": [0, 0],
+    "size": {
+     "from": "size",
+     "map": [
+      [6, 6],
+      [32, 32]
+     ],
+     "round": "px"
+    },
+    "style": {
+     "from": "style",
+     "pick": {
+      "bevel": "bevel",
+      "gem": "gem",
+      "glass": "glass",
+      "pillow": "pillow",
+      "frame": "frame"
+     }
+    },
+    "edge": {
+     "from": "edge",
+     "map": [
+      [1, 1],
+      [3, 3]
+     ],
+     "round": "px"
+    },
+    "symbol": {
+     "from": "mark",
+     "pick": {
+      "true": "ring",
+      "false": "none"
+     }
+    },
+    "paint": "block-line",
+    "shine": {
+     "from": "shine",
+     "pick": {
+      "true": {
+       "rule": "tone",
+       "of": "block-line",
+       "by": 3
+      },
+      "false": "clear"
+     }
+    },
+    "when": {
+     "scheme": [
+      "mono"
+     ],
+     "slot": [
+      "c2"
+     ]
+    }
+   },
+   {
+    "id": "mono-3",
+    "gen": "block.cell",
+    "v": 1,
+    "at": [0, 0],
+    "size": {
+     "from": "size",
+     "map": [
+      [6, 6],
+      [32, 32]
+     ],
+     "round": "px"
+    },
+    "style": {
+     "from": "style",
+     "pick": {
+      "bevel": "bevel",
+      "gem": "gem",
+      "glass": "glass",
+      "pillow": "pillow",
+      "frame": "frame"
+     }
+    },
+    "edge": {
+     "from": "edge",
+     "map": [
+      [1, 1],
+      [3, 3]
+     ],
+     "round": "px"
+    },
+    "symbol": {
+     "from": "mark",
+     "pick": {
+      "true": "plus",
+      "false": "none"
+     }
+    },
+    "paint": "block-slate",
+    "shine": {
+     "from": "shine",
+     "pick": {
+      "true": {
+       "rule": "tone",
+       "of": "block-slate",
+       "by": 3
+      },
+      "false": "clear"
+     }
+    },
+    "when": {
+     "scheme": [
+      "mono"
+     ],
+     "slot": [
+      "c3"
+     ]
+    }
+   },
+   {
+    "id": "mono-4",
+    "gen": "block.cell",
+    "v": 1,
+    "at": [0, 0],
+    "size": {
+     "from": "size",
+     "map": [
+      [6, 6],
+      [32, 32]
+     ],
+     "round": "px"
+    },
+    "style": {
+     "from": "style",
+     "pick": {
+      "bevel": "bevel",
+      "gem": "gem",
+      "glass": "glass",
+      "pillow": "pillow",
+      "frame": "frame"
+     }
+    },
+    "edge": {
+     "from": "edge",
+     "map": [
+      [1, 1],
+      [3, 3]
+     ],
+     "round": "px"
+    },
+    "symbol": {
+     "from": "mark",
+     "pick": {
+      "true": "diamond",
+      "false": "none"
+     }
+    },
+    "paint": "block-dusk",
+    "shine": {
+     "from": "shine",
+     "pick": {
+      "true": {
+       "rule": "tone",
+       "of": "block-dusk",
+       "by": 3
+      },
+      "false": "clear"
+     }
+    },
+    "when": {
+     "scheme": [
+      "mono"
+     ],
+     "slot": [
+      "c4"
+     ]
+    }
+   },
+   {
+    "id": "mono-5",
+    "gen": "block.cell",
+    "v": 1,
+    "at": [0, 0],
+    "size": {
+     "from": "size",
+     "map": [
+      [6, 6],
+      [32, 32]
+     ],
+     "round": "px"
+    },
+    "style": {
+     "from": "style",
+     "pick": {
+      "bevel": "bevel",
+      "gem": "gem",
+      "glass": "glass",
+      "pillow": "pillow",
+      "frame": "frame"
+     }
+    },
+    "edge": {
+     "from": "edge",
+     "map": [
+      [1, 1],
+      [3, 3]
+     ],
+     "round": "px"
+    },
+    "symbol": {
+     "from": "mark",
+     "pick": {
+      "true": "bar",
+      "false": "none"
+     }
+    },
+    "paint": "block-mist",
+    "shine": {
+     "from": "shine",
+     "pick": {
+      "true": {
+       "rule": "tone",
+       "of": "block-mist",
+       "by": 3
+      },
+      "false": "clear"
+     }
+    },
+    "when": {
+     "scheme": [
+      "mono"
+     ],
+     "slot": [
+      "c5"
+     ]
+    }
+   },
+   {
+    "id": "mono-6",
+    "gen": "block.cell",
+    "v": 1,
+    "at": [0, 0],
+    "size": {
+     "from": "size",
+     "map": [
+      [6, 6],
+      [32, 32]
+     ],
+     "round": "px"
+    },
+    "style": {
+     "from": "style",
+     "pick": {
+      "bevel": "bevel",
+      "gem": "gem",
+      "glass": "glass",
+      "pillow": "pillow",
+      "frame": "frame"
+     }
+    },
+    "edge": {
+     "from": "edge",
+     "map": [
+      [1, 1],
+      [3, 3]
+     ],
+     "round": "px"
+    },
+    "symbol": {
+     "from": "mark",
+     "pick": {
+      "true": "triangle",
+      "false": "none"
+     }
+    },
+    "paint": "block-steel",
+    "shine": {
+     "from": "shine",
+     "pick": {
+      "true": {
+       "rule": "tone",
+       "of": "block-steel",
+       "by": 3
+      },
+      "false": "clear"
+     }
+    },
+    "when": {
+     "scheme": [
+      "mono"
+     ],
+     "slot": [
+      "c6"
+     ]
+    }
+   },
+   {
+    "id": "mono-7",
+    "gen": "block.cell",
+    "v": 1,
+    "at": [0, 0],
+    "size": {
+     "from": "size",
+     "map": [
+      [6, 6],
+      [32, 32]
+     ],
+     "round": "px"
+    },
+    "style": {
+     "from": "style",
+     "pick": {
+      "bevel": "bevel",
+      "gem": "gem",
+      "glass": "glass",
+      "pillow": "pillow",
+      "frame": "frame"
+     }
+    },
+    "edge": {
+     "from": "edge",
+     "map": [
+      [1, 1],
+      [3, 3]
+     ],
+     "round": "px"
+    },
+    "symbol": {
+     "from": "mark",
+     "pick": {
+      "true": "square",
+      "false": "none"
+     }
+    },
+    "paint": "block-pearl",
+    "shine": {
+     "from": "shine",
+     "pick": {
+      "true": {
+       "rule": "tone",
+       "of": "block-pearl",
+       "by": 3
+      },
+      "false": "clear"
+     }
+    },
+    "when": {
+     "scheme": [
+      "mono"
+     ],
+     "slot": [
+      "c7"
+     ]
+    }
+   }
+  ]
+ }
+}

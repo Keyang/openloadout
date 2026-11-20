@@ -1,0 +1,958 @@
+{
+ "format": "loadout-piece",
+ "version": 1,
+ "id": "part:block-warm",
+ "v": 1,
+ "name": "Prism and Ember blocks",
+ "about": "One Gridline puzzle cell in colour 1 to 7 of the Prism scheme (pinks, yellows, teal, violet, pearl) or the Ember scheme (warm), drawn by block.cell@1 from its top-left corner.",
+ "slots": [
+  {
+   "id": "block-rose",
+   "label": "Rose",
+   "default": "#f2609e",
+   "material": "paint"
+  },
+  {
+   "id": "block-coral",
+   "label": "Coral",
+   "default": "#f5875a",
+   "material": "paint"
+  },
+  {
+   "id": "block-lemon",
+   "label": "Lemon",
+   "default": "#f2dc4c",
+   "material": "paint"
+  },
+  {
+   "id": "block-lime",
+   "label": "Lime",
+   "default": "#a6dc46",
+   "material": "paint"
+  },
+  {
+   "id": "block-teal",
+   "label": "Teal",
+   "default": "#2a9a9a",
+   "material": "paint"
+  },
+  {
+   "id": "block-violet",
+   "label": "Violet",
+   "default": "#7d52e6",
+   "material": "paint"
+  },
+  {
+   "id": "block-pearl",
+   "label": "Pearl",
+   "default": "#e6e8f6",
+   "material": "paint"
+  },
+  {
+   "id": "block-gold",
+   "label": "Gold",
+   "default": "#f2c230",
+   "material": "paint"
+  },
+  {
+   "id": "block-plum",
+   "label": "Plum",
+   "default": "#6a3a8e",
+   "material": "paint"
+  },
+  {
+   "id": "block-cream",
+   "label": "Cream",
+   "default": "#f0ead8",
+   "material": "paint"
+  }
+ ],
+ "args": {
+  "scheme": {
+   "type": "word",
+   "options": [
+    "prism",
+    "ember"
+   ],
+   "default": "prism"
+  },
+  "slot": {
+   "type": "word",
+   "options": [
+    "c1",
+    "c2",
+    "c3",
+    "c4",
+    "c5",
+    "c6",
+    "c7"
+   ],
+   "default": "c1"
+  },
+  "size": {
+   "type": "count",
+   "lo": 6,
+   "hi": 32,
+   "default": 16
+  },
+  "style": {
+   "type": "word",
+   "options": [
+    "bevel",
+    "gem",
+    "glass",
+    "pillow",
+    "frame"
+   ],
+   "default": "bevel"
+  },
+  "edge": {
+   "type": "count",
+   "lo": 1,
+   "hi": 3,
+   "default": 2
+  },
+  "mark": {
+   "type": "flag",
+   "default": false
+  },
+  "shine": {
+   "type": "flag",
+   "default": false
+  }
+ },
+ "made": {
+  "by": "the sprite-forge skill",
+  "from": "bundles/specs/kit-puzzle-gridline.md (BLOCK_SCHEMES)"
+ },
+ "body": {
+  "draw": [
+   {
+    "id": "prism-1",
+    "gen": "block.cell",
+    "v": 1,
+    "at": [0, 0],
+    "size": {
+     "from": "size",
+     "map": [
+      [6, 6],
+      [32, 32]
+     ],
+     "round": "px"
+    },
+    "style": {
+     "from": "style",
+     "pick": {
+      "bevel": "bevel",
+      "gem": "gem",
+      "glass": "glass",
+      "pillow": "pillow",
+      "frame": "frame"
+     }
+    },
+    "edge": {
+     "from": "edge",
+     "map": [
+      [1, 1],
+      [3, 3]
+     ],
+     "round": "px"
+    },
+    "symbol": {
+     "from": "mark",
+     "pick": {
+      "true": "disc",
+      "false": "none"
+     }
+    },
+    "paint": "block-rose",
+    "shine": {
+     "from": "shine",
+     "pick": {
+      "true": {
+       "rule": "tone",
+       "of": "block-rose",
+       "by": 3
+      },
+      "false": "clear"
+     }
+    },
+    "when": {
+     "scheme": [
+      "prism"
+     ],
+     "slot": [
+      "c1"
+     ]
+    }
+   },
+   {
+    "id": "prism-2",
+    "gen": "block.cell",
+    "v": 1,
+    "at": [0, 0],
+    "size": {
+     "from": "size",
+     "map": [
+      [6, 6],
+      [32, 32]
+     ],
+     "round": "px"
+    },
+    "style": {
+     "from": "style",
+     "pick": {
+      "bevel": "bevel",
+      "gem": "gem",
+      "glass": "glass",
+      "pillow": "pillow",
+      "frame": "frame"
+     }
+    },
+    "edge": {
+     "from": "edge",
+     "map": [
+      [1, 1],
+      [3, 3]
+     ],
+     "round": "px"
+    },
+    "symbol": {
+     "from": "mark",
+     "pick": {
+      "true": "ring",
+      "false": "none"
+     }
+    },
+    "paint": "block-coral",
+    "shine": {
+     "from": "shine",
+     "pick": {
+      "true": {
+       "rule": "tone",
+       "of": "block-coral",
+       "by": 3
+      },
+      "false": "clear"
+     }
+    },
+    "when": {
+     "scheme": [
+      "prism"
+     ],
+     "slot": [
+      "c2"
+     ]
+    }
+   },
+   {
+    "id": "prism-3",
+    "gen": "block.cell",
+    "v": 1,
+    "at": [0, 0],
+    "size": {
+     "from": "size",
+     "map": [
+      [6, 6],
+      [32, 32]
+     ],
+     "round": "px"
+    },
+    "style": {
+     "from": "style",
+     "pick": {
+      "bevel": "bevel",
+      "gem": "gem",
+      "glass": "glass",
+      "pillow": "pillow",
+      "frame": "frame"
+     }
+    },
+    "edge": {
+     "from": "edge",
+     "map": [
+      [1, 1],
+      [3, 3]
+     ],
+     "round": "px"
+    },
+    "symbol": {
+     "from": "mark",
+     "pick": {
+      "true": "plus",
+      "false": "none"
+     }
+    },
+    "paint": "block-lemon",
+    "shine": {
+     "from": "shine",
+     "pick": {
+      "true": {
+       "rule": "tone",
+       "of": "block-lemon",
+       "by": 3
+      },
+      "false": "clear"
+     }
+    },
+    "when": {
+     "scheme": [
+      "prism"
+     ],
+     "slot": [
+      "c3"
+     ]
+    }
+   },
+   {
+    "id": "prism-4",
+    "gen": "block.cell",
+    "v": 1,
+    "at": [0, 0],
+    "size": {
+     "from": "size",
+     "map": [
+      [6, 6],
+      [32, 32]
+     ],
+     "round": "px"
+    },
+    "style": {
+     "from": "style",
+     "pick": {
+      "bevel": "bevel",
+      "gem": "gem",
+      "glass": "glass",
+      "pillow": "pillow",
+      "frame": "frame"
+     }
+    },
+    "edge": {
+     "from": "edge",
+     "map": [
+      [1, 1],
+      [3, 3]
+     ],
+     "round": "px"
+    },
+    "symbol": {
+     "from": "mark",
+     "pick": {
+      "true": "diamond",
+      "false": "none"
+     }
+    },
+    "paint": "block-lime",
+    "shine": {
+     "from": "shine",
+     "pick": {
+      "true": {
+       "rule": "tone",
+       "of": "block-lime",
+       "by": 3
+      },
+      "false": "clear"
+     }
+    },
+    "when": {
+     "scheme": [
+      "prism"
+     ],
+     "slot": [
+      "c4"
+     ]
+    }
+   },
+   {
+    "id": "prism-5",
+    "gen": "block.cell",
+    "v": 1,
+    "at": [0, 0],
+    "size": {
+     "from": "size",
+     "map": [
+      [6, 6],
+      [32, 32]
+     ],
+     "round": "px"
+    },
+    "style": {
+     "from": "style",
+     "pick": {
+      "bevel": "bevel",
+      "gem": "gem",
+      "glass": "glass",
+      "pillow": "pillow",
+      "frame": "frame"
+     }
+    },
+    "edge": {
+     "from": "edge",
+     "map": [
+      [1, 1],
+      [3, 3]
+     ],
+     "round": "px"
+    },
+    "symbol": {
+     "from": "mark",
+     "pick": {
+      "true": "bar",
+      "false": "none"
+     }
+    },
+    "paint": "block-teal",
+    "shine": {
+     "from": "shine",
+     "pick": {
+      "true": {
+       "rule": "tone",
+       "of": "block-teal",
+       "by": 3
+      },
+      "false": "clear"
+     }
+    },
+    "when": {
+     "scheme": [
+      "prism"
+     ],
+     "slot": [
+      "c5"
+     ]
+    }
+   },
+   {
+    "id": "prism-6",
+    "gen": "block.cell",
+    "v": 1,
+    "at": [0, 0],
+    "size": {
+     "from": "size",
+     "map": [
+      [6, 6],
+      [32, 32]
+     ],
+     "round": "px"
+    },
+    "style": {
+     "from": "style",
+     "pick": {
+      "bevel": "bevel",
+      "gem": "gem",
+      "glass": "glass",
+      "pillow": "pillow",
+      "frame": "frame"
+     }
+    },
+    "edge": {
+     "from": "edge",
+     "map": [
+      [1, 1],
+      [3, 3]
+     ],
+     "round": "px"
+    },
+    "symbol": {
+     "from": "mark",
+     "pick": {
+      "true": "triangle",
+      "false": "none"
+     }
+    },
+    "paint": "block-violet",
+    "shine": {
+     "from": "shine",
+     "pick": {
+      "true": {
+       "rule": "tone",
+       "of": "block-violet",
+       "by": 3
+      },
+      "false": "clear"
+     }
+    },
+    "when": {
+     "scheme": [
+      "prism"
+     ],
+     "slot": [
+      "c6"
+     ]
+    }
+   },
+   {
+    "id": "prism-7",
+    "gen": "block.cell",
+    "v": 1,
+    "at": [0, 0],
+    "size": {
+     "from": "size",
+     "map": [
+      [6, 6],
+      [32, 32]
+     ],
+     "round": "px"
+    },
+    "style": {
+     "from": "style",
+     "pick": {
+      "bevel": "bevel",
+      "gem": "gem",
+      "glass": "glass",
+      "pillow": "pillow",
+      "frame": "frame"
+     }
+    },
+    "edge": {
+     "from": "edge",
+     "map": [
+      [1, 1],
+      [3, 3]
+     ],
+     "round": "px"
+    },
+    "symbol": {
+     "from": "mark",
+     "pick": {
+      "true": "square",
+      "false": "none"
+     }
+    },
+    "paint": "block-pearl",
+    "shine": {
+     "from": "shine",
+     "pick": {
+      "true": {
+       "rule": "tone",
+       "of": "block-pearl",
+       "by": 3
+      },
+      "false": "clear"
+     }
+    },
+    "when": {
+     "scheme": [
+      "prism"
+     ],
+     "slot": [
+      "c7"
+     ]
+    }
+   },
+   {
+    "id": "ember-1",
+    "gen": "block.cell",
+    "v": 1,
+    "at": [0, 0],
+    "size": {
+     "from": "size",
+     "map": [
+      [6, 6],
+      [32, 32]
+     ],
+     "round": "px"
+    },
+    "style": {
+     "from": "style",
+     "pick": {
+      "bevel": "bevel",
+      "gem": "gem",
+      "glass": "glass",
+      "pillow": "pillow",
+      "frame": "frame"
+     }
+    },
+    "edge": {
+     "from": "edge",
+     "map": [
+      [1, 1],
+      [3, 3]
+     ],
+     "round": "px"
+    },
+    "symbol": {
+     "from": "mark",
+     "pick": {
+      "true": "disc",
+      "false": "none"
+     }
+    },
+    "paint": "block-coral",
+    "shine": {
+     "from": "shine",
+     "pick": {
+      "true": {
+       "rule": "tone",
+       "of": "block-coral",
+       "by": 3
+      },
+      "false": "clear"
+     }
+    },
+    "when": {
+     "scheme": [
+      "ember"
+     ],
+     "slot": [
+      "c1"
+     ]
+    }
+   },
+   {
+    "id": "ember-2",
+    "gen": "block.cell",
+    "v": 1,
+    "at": [0, 0],
+    "size": {
+     "from": "size",
+     "map": [
+      [6, 6],
+      [32, 32]
+     ],
+     "round": "px"
+    },
+    "style": {
+     "from": "style",
+     "pick": {
+      "bevel": "bevel",
+      "gem": "gem",
+      "glass": "glass",
+      "pillow": "pillow",
+      "frame": "frame"
+     }
+    },
+    "edge": {
+     "from": "edge",
+     "map": [
+      [1, 1],
+      [3, 3]
+     ],
+     "round": "px"
+    },
+    "symbol": {
+     "from": "mark",
+     "pick": {
+      "true": "ring",
+      "false": "none"
+     }
+    },
+    "paint": "block-lemon",
+    "shine": {
+     "from": "shine",
+     "pick": {
+      "true": {
+       "rule": "tone",
+       "of": "block-lemon",
+       "by": 3
+      },
+      "false": "clear"
+     }
+    },
+    "when": {
+     "scheme": [
+      "ember"
+     ],
+     "slot": [
+      "c2"
+     ]
+    }
+   },
+   {
+    "id": "ember-3",
+    "gen": "block.cell",
+    "v": 1,
+    "at": [0, 0],
+    "size": {
+     "from": "size",
+     "map": [
+      [6, 6],
+      [32, 32]
+     ],
+     "round": "px"
+    },
+    "style": {
+     "from": "style",
+     "pick": {
+      "bevel": "bevel",
+      "gem": "gem",
+      "glass": "glass",
+      "pillow": "pillow",
+      "frame": "frame"
+     }
+    },
+    "edge": {
+     "from": "edge",
+     "map": [
+      [1, 1],
+      [3, 3]
+     ],
+     "round": "px"
+    },
+    "symbol": {
+     "from": "mark",
+     "pick": {
+      "true": "plus",
+      "false": "none"
+     }
+    },
+    "paint": "block-gold",
+    "shine": {
+     "from": "shine",
+     "pick": {
+      "true": {
+       "rule": "tone",
+       "of": "block-gold",
+       "by": 3
+      },
+      "false": "clear"
+     }
+    },
+    "when": {
+     "scheme": [
+      "ember"
+     ],
+     "slot": [
+      "c3"
+     ]
+    }
+   },
+   {
+    "id": "ember-4",
+    "gen": "block.cell",
+    "v": 1,
+    "at": [0, 0],
+    "size": {
+     "from": "size",
+     "map": [
+      [6, 6],
+      [32, 32]
+     ],
+     "round": "px"
+    },
+    "style": {
+     "from": "style",
+     "pick": {
+      "bevel": "bevel",
+      "gem": "gem",
+      "glass": "glass",
+      "pillow": "pillow",
+      "frame": "frame"
+     }
+    },
+    "edge": {
+     "from": "edge",
+     "map": [
+      [1, 1],
+      [3, 3]
+     ],
+     "round": "px"
+    },
+    "symbol": {
+     "from": "mark",
+     "pick": {
+      "true": "diamond",
+      "false": "none"
+     }
+    },
+    "paint": "block-rose",
+    "shine": {
+     "from": "shine",
+     "pick": {
+      "true": {
+       "rule": "tone",
+       "of": "block-rose",
+       "by": 3
+      },
+      "false": "clear"
+     }
+    },
+    "when": {
+     "scheme": [
+      "ember"
+     ],
+     "slot": [
+      "c4"
+     ]
+    }
+   },
+   {
+    "id": "ember-5",
+    "gen": "block.cell",
+    "v": 1,
+    "at": [0, 0],
+    "size": {
+     "from": "size",
+     "map": [
+      [6, 6],
+      [32, 32]
+     ],
+     "round": "px"
+    },
+    "style": {
+     "from": "style",
+     "pick": {
+      "bevel": "bevel",
+      "gem": "gem",
+      "glass": "glass",
+      "pillow": "pillow",
+      "frame": "frame"
+     }
+    },
+    "edge": {
+     "from": "edge",
+     "map": [
+      [1, 1],
+      [3, 3]
+     ],
+     "round": "px"
+    },
+    "symbol": {
+     "from": "mark",
+     "pick": {
+      "true": "bar",
+      "false": "none"
+     }
+    },
+    "paint": "block-plum",
+    "shine": {
+     "from": "shine",
+     "pick": {
+      "true": {
+       "rule": "tone",
+       "of": "block-plum",
+       "by": 3
+      },
+      "false": "clear"
+     }
+    },
+    "when": {
+     "scheme": [
+      "ember"
+     ],
+     "slot": [
+      "c5"
+     ]
+    }
+   },
+   {
+    "id": "ember-6",
+    "gen": "block.cell",
+    "v": 1,
+    "at": [0, 0],
+    "size": {
+     "from": "size",
+     "map": [
+      [6, 6],
+      [32, 32]
+     ],
+     "round": "px"
+    },
+    "style": {
+     "from": "style",
+     "pick": {
+      "bevel": "bevel",
+      "gem": "gem",
+      "glass": "glass",
+      "pillow": "pillow",
+      "frame": "frame"
+     }
+    },
+    "edge": {
+     "from": "edge",
+     "map": [
+      [1, 1],
+      [3, 3]
+     ],
+     "round": "px"
+    },
+    "symbol": {
+     "from": "mark",
+     "pick": {
+      "true": "triangle",
+      "false": "none"
+     }
+    },
+    "paint": "block-violet",
+    "shine": {
+     "from": "shine",
+     "pick": {
+      "true": {
+       "rule": "tone",
+       "of": "block-violet",
+       "by": 3
+      },
+      "false": "clear"
+     }
+    },
+    "when": {
+     "scheme": [
+      "ember"
+     ],
+     "slot": [
+      "c6"
+     ]
+    }
+   },
+   {
+    "id": "ember-7",
+    "gen": "block.cell",
+    "v": 1,
+    "at": [0, 0],
+    "size": {
+     "from": "size",
+     "map": [
+      [6, 6],
+      [32, 32]
+     ],
+     "round": "px"
+    },
+    "style": {
+     "from": "style",
+     "pick": {
+      "bevel": "bevel",
+      "gem": "gem",
+      "glass": "glass",
+      "pillow": "pillow",
+      "frame": "frame"
+     }
+    },
+    "edge": {
+     "from": "edge",
+     "map": [
+      [1, 1],
+      [3, 3]
+     ],
+     "round": "px"
+    },
+    "symbol": {
+     "from": "mark",
+     "pick": {
+      "true": "square",
+      "false": "none"
+     }
+    },
+    "paint": "block-cream",
+    "shine": {
+     "from": "shine",
+     "pick": {
+      "true": {
+       "rule": "tone",
+       "of": "block-cream",
+       "by": 3
+      },
+      "false": "clear"
+     }
+    },
+    "when": {
+     "scheme": [
+      "ember"
+     ],
+     "slot": [
+      "c7"
+     ]
+    }
+   }
+  ]
+ }
+}

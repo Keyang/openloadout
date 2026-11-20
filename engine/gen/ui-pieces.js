@@ -32,8 +32,12 @@ import { hash, wave } from '../motion.js';
 import {
   UI_SLICE, UI_EDGE, UI_SHADOW, UI_STATES, UI_STYLES, roundRows, cutRows, spanAt, rowsArea, areaCount, spansArea, rectArea, marksToStamps, toneOf, mixOf, shadeOf,
 } from './ui-shapes.js';
+import { measureGridbox, measureGridbox2 } from './ui-grid.js';   // the Gridline kit's window, ui.gridbox@1: its measure is listed in UI_MEASURES below
+import { measureGauge } from './ui-gauge.js';   // registers ui.gauge@1 (its own module) and gives its measure
 
 const fin = (v) => typeof v === 'number' && Number.isFinite(v);
+import { measureCounter } from './counter.js';   // the Gridline kit's counter case, ui.counter@1: its measure (the digit windows as text areas) is listed in UI_MEASURES below
+import { measureScreen } from './ui-screen.js';   // the Gridline kit's screens, ui.screen@1 (pause, results, game over, new best): its measure is listed in UI_MEASURES below
 const clampI = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.round(fin(v) ? v : lo)));
 const clamp01 = (v) => Math.max(0, Math.min(1, fin(v) ? v : 0));
 const flat = (p) => ({ paint: p, shade: 0 });
@@ -692,6 +696,11 @@ export const UI_PIECES = Object.freeze(['ui.panel@1', 'ui.button@1', 'ui.bar@1',
 export const UI_MEASURES = Object.freeze({
   'ui.panel@1': measurePanel, 'ui.button@1': measureButton, 'ui.bar@1': measureBar, 'ui.slider@1': measureSlider,
   'ui.knob@1': measureKnob, 'ui.highlight@1': measureHighlight, 'ui.arrow@1': () => ({}),
+  'ui.gridbox@1': measureGridbox,   // engine/gen/ui-grid.js
+  'ui.gauge@1': measureGauge,           // engine/gen/ui-gauge.js: the standing gauge of the Gridline kit
+  'ui.counter@1': measureCounter,   // engine/gen/counter.js
+  'ui.screen@1': measureScreen,   // engine/gen/ui-screen.js
+  'ui.gridbox@2': measureGridbox2,   // engine/gen/ui-grid.js: the window with the kit's own tube and corners
 });
 
 /**

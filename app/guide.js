@@ -359,6 +359,7 @@ function tileLayers(T, view, gname) {
 
 function groupHeading(g, view) {
   const blocks = g.solid ? 'It blocks the way.' : 'It does not block the way.';
+  if (g.kind === 'floor' && view === 'none') return `Group "${g.name}": the empty cells of a board. Lay it behind whatever is put on the board, wherever a cell is to show empty. ${blocks}`;
   if (g.kind === 'floor' && view !== 'top-down') return `Group "${g.name}": a wall behind the action. Lay it behind the other tiles, wherever you want one. ${blocks}`;
   if (g.kind === 'floor') return `Group "${g.name}": the base ground. Lay it in every cell, under everything else. ${blocks}`;
   if (g.kind === 'liquid') return `Group "${g.name}": a liquid. Its sides and its bed are whatever holds it. ${blocks}`;
@@ -375,8 +376,11 @@ function tilesetGuide(json) {
   const rows = rowsOf(json), wN = padName(rows), wR = padRow(rows);
   const row = Object.fromEntries(rows.map((r) => [r.name, r]));
   const tw = json.frameWidth, th = json.frameHeight;
-  const moving = rows.filter((r) => r.frames > 1);
-  const moves = (r) => (r.frames > 1 ? ` (moves: ${r.frames} frames, ${r.fps} per second)` : '');
+  const once = rows.filter((r) => r.frames > 1 && r.loop === false);      // a row played through one time (a flash over a cell, a tile that goes)
+  const moving = rows.filter((r) => r.frames > 1 && r.loop !== false);
+  const moves = (r) => (r.frames > 1 ? ` (${r.loop === false ? 'plays once' : 'moves'}: ${r.frames} frames, ${r.fps} per second)` : '');
+  const placed = T.groups.length === 0;                                    // no group at all: every tile is put in its cell by the game (the cells of a puzzle), no rule picks one
+  const onceNames = list(once.map((r) => `"${r.name}"`));
   const what = (r) => { const l = r.label ?? ''; const i = l.indexOf(': '); return (i >= 0 ? l.slice(i + 2) : l) || r.name; };
   const wW = Math.min(34, Math.max(...rows.map((r) => what(r).length)) + 2);
   const line = (name, tail) => `    ${rowAt(row[name], wR, wN)}${what(row[name]).padEnd(wW)}${tail}${moves(row[name])}`.trimEnd();
@@ -398,7 +402,7 @@ function tilesetGuide(json) {
   const grouped = new Set(T.groups.flatMap((g) => [...g.tiles, ...g.decorations.map((d) => d.tile)]));
   const loose = rows.filter((r) => !grouped.has(r.name) && !T.other.includes(r.name));
   if (loose.length) parts.push(['  Decorations with no group of their own: put them where they look right.', ...loose.map((r) => line(r.name, ''))].join('\n'));
-  if (T.other.length) parts.push(['  Tiles to place by hand (no rule picks them):', ...T.other.filter((n) => row[n]).map((n) => line(n, ''))].join('\n'));
+  if (T.other.length) parts.push([placed ? '  Tiles your game places, one in a cell (no rule picks them):' : '  Tiles to place by hand (no rule picks them):', ...T.other.filter((n) => row[n]).map((n) => line(n, ''))].join('\n'));
 
   const families = new Set(Object.values(T.tiles).map((t) => t.family).filter(Boolean));
   const meanings = [...TILE_FAMILIES, LIQUID_FAMILY].filter((f) => families.has(f.id));
@@ -409,6 +413,7 @@ function tilesetGuide(json) {
   const gname = (g) => `"${g.name}"${shared(g) ? ` (${KIND_WORDS[g.kind] ?? g.use ?? 'ground'})` : ''}`;
   const blocking = T.groups.filter((g) => g.solid).map(gname), ruled = T.groups.filter((g) => g.rules.length > 1);
   const platforms = T.groups.filter((g) => g.oneWay).map(gname);      // stood on from above only: neither a wall nor nothing
+  const lone = !placed && ruled.length === 0;                          // groups, but each is one tile: no rule chooses between tiles, so there is no rule tile or terrain to set up, and the rest is placed by the game
 
   // one complete arrangement for each tile, for a tool that matches cell by cell (the JSON's "patterns")
   const SECTION = 'The eight cells round each tile';
@@ -443,6 +448,8 @@ ${meanings.map((f) => wrap(f.words, `  ${''.padEnd(wF)}`, `  ${f.names.padEnd(wF
     ...(T.groups.some((g) => g.versions.length > 1) ? ['Where a group has several versions of its middle tile, set that rule\'s Output to Random and add them all.'] : []),
     ...(moving.length ? ['A tile that moves: in a Rule Tile set that rule\'s Output to Animation and add the tile\'s frames in order; for a tile used on its own create an Animated Tile (also in "2D Tilemap Extras"). Set the speed to the tile\'s "per second" number.'] : []),
     ...(blocking.length ? [`Blocking the way: paint ${list(blocking)} on a Tilemap of ${blocking.length > 1 ? 'their' : 'its'} own, apart from anything that does not block, and add a Tilemap Collider 2D to it.`] : []),
+    ...(once.length ? [`A row that plays once (${onceNames}): do not make an Animated Tile for it, which would repeat. Make a Tile for each of its frames and show them in turn from a script, each for 1 divided by the row's "per second" number of a second; put them on a Tilemap of their own, above the others, when the row is shown over other tiles.`] : []),
+    ...(placed || lone ? ['Placing tiles from your game: keep a reference to each Tile and call SetTile(cell, tile) on the Tilemap to put one in a cell; calling it for that cell with no tile takes it out again.'] : []),
     ...(platforms.length ? [`Platforms to stand on: paint ${list(platforms)} on a Tilemap of ${platforms.length > 1 ? 'their' : 'its'} own. Add a Tilemap Collider 2D to it and tick Used By Effector on that collider, then add a Platform Effector 2D and leave its Use One Way ticked: a body then lands on a platform from above and passes up through it from below. The collider should cover only the strip drawn in the top part of each tile, not the whole square: a tile made by dragging a picture into the palette takes its shape from the picture (Collider Type: Sprite on the Tile).`] : []),
   ];
   const godot = [
@@ -452,18 +459,20 @@ ${meanings.map((f) => wrap(f.words, `  ${''.padEnd(wF)}`, `  ${f.names.padEnd(wF
     ...(ruled.length ? [`To have Godot choose the right tile by itself, add a Terrain Set to the TileSet (in the Inspector, under Terrain Sets) with Mode: Match Corners and Sides, and in it one terrain for each of these groups: ${list(ruled.map(gname))}. In the TileSet panel choose Paint and, as the property to paint, Terrains; pick the terrain and paint on each tile of the group. Each tile is shown in nine parts: the middle one gives the tile its terrain, and the eight squares round it stand for the eight cells round the tile. Paint the middle square of every tile of the group, and of the outer squares exactly the ones listed for that tile under "${SECTION}" above, no others. (Do not go by the rule list for this: a rule names only part of what a tile needs.)${anyVersions ? ' Give another version of a middle tile the same squares as the middle tile: Godot then mixes them.' : ''} Then open the Terrains tab of the TileMap panel and paint with the terrain.`] : []),
     ...(moving.length ? ['A tile that moves: its frames lie side by side in its row. Remove the tiles Godot made for the frames after the first, select the first and, under Animation, add the other frames and set each frame\'s duration to 1 divided by its "per second" number.'] : []),
     ...(blocking.length ? [`Blocking the way: add a Physics Layer to the TileSet and paint a collision shape on the tiles of ${list(blocking)}: the whole square${T.groups.some((g) => g.kind === 'slope') ? ', or for a slope the part under its line' : ''}.`] : []),
+    ...(once.length ? [`A row that plays once (${onceNames}): do not give it an Animation in the TileSet, which would repeat. Keep the tiles Godot made for its frames and show them in turn from a script, each for 1 divided by the row's "per second" number of a second; put them on a TileMapLayer of their own, after the others in the Scene panel, when the row is shown over other tiles.`] : []),
+    ...(placed || lone ? ['Placing tiles from your game: call set_cell(cell, source id, place in the atlas) on the TileMapLayer to put a tile in a cell, where the place in the atlas is Vector2i(frame, row) as above and the source id is the one the TileSet panel shows for the picture (0 for the first); erase_cell(cell) takes it out again.'] : []),
     ...(platforms.length ? [`Platforms to stand on: ${blocking.length ? 'on the same Physics Layer' : 'add a Physics Layer to the TileSet and'} paint a collision shape on the tiles of ${list(platforms)} that covers only the strip drawn in the top part of the tile, not the whole square. Then choose Select, pick those tiles and, under Physics in the tile's properties, tick One Way on that polygon: a body then lands on the platform from above and passes up through it from below.`] : []),
     GODOT_SHARP,
   ];
 
   return `The tiles
-${wrap(`Each tile is ${tw} x ${th} pixels. Each row of the picture is one tile, not an animation.${moving.length ? ' A tile whose row has more than one frame moves (water, a glow): show its frames from left to right, over and over, at the speed listed.' : ''}`)}
+${wrap(`Each tile is ${tw} x ${th} pixels. Each row of the picture is one tile, not an animation.${moving.length ? ' A tile whose row has more than one frame moves (water, a glow): show its frames from left to right, over and over, at the speed listed.' : ''}${once.length ? ` A row marked "plays once" (${onceNames}) is a short change shown one time: show its frames from left to right at the speed listed, then stop.` : ''}`)}
 
 ${parts.join('\n\n')}
 ${names}
 Which tile goes where
-${wrap(`The lines above say what each tile needs in the cells next to it.${eg ? ` "needs ${eg.name}: left" means the cell to the left must hold the same group; "no ${eg.name}: above" means the cell above must not. A cell that is not named may hold anything.` : ''} ${id}.json has the same under "tiles": for every group a list of "rules" to go down, using the first tile whose "needs" all hold. The order of that list matters: where two tiles could fit a cell, the one that comes first in it is used.`)}
-${layers.length ? `${wrap(`Layers: some of these tiles lie over others, so build the map in layers, from the bottom up: ${numbered}.${byHand}`)}\n` : ''}${wrap(`${blocking.length ? `Groups that block the way: ${list(blocking)}.` : platforms.length ? 'No group here blocks the way on every side.' : 'None of these groups blocks the way.'}${platforms.length ? ` Platforms, stood on from above only: ${list(platforms)}.` : ''}`)}
+${placed ? wrap(`No rule picks any of these tiles, and none needs a particular tile next to it: your game puts each one in its cell (the cells of a puzzle, a marker, a light shown over a cell). ${id}.json lists them under "tiles" as "other".`) : `${lone ? wrap(`No rule chooses between these tiles, and none needs a particular tile next to it. A group here is one tile: put it in every cell that holds the group.${T.other.length ? ' Every other tile is put in its cell by you or by your game.' : ''} There is nothing for a tool to work out from the neighbours, so there is no rule list to set up in an engine: paint the tiles, or place them from your game as the steps below say. ${id}.json lists the groups${T.other.length ? ' and, as "other", the tiles placed by hand' : ''} under "tiles".`) : wrap(`The lines above say what each tile needs in the cells next to it.${eg ? ` "needs ${eg.name}: left" means the cell to the left must hold the same group; "no ${eg.name}: above" means the cell above must not. A cell that is not named may hold anything.` : ''} ${id}.json has the same under "tiles": for every group a list of "rules" to go down, using the first tile whose "needs" all hold. The order of that list matters: where two tiles could fit a cell, the one that comes first in it is used.`)}
+${layers.length ? `${wrap(`Layers: some of these tiles lie over others, so build the map in layers, from the bottom up: ${numbered}.${byHand}`)}\n` : ''}${wrap(`${blocking.length ? `Groups that block the way: ${list(blocking)}.` : platforms.length ? 'No group here blocks the way on every side.' : 'None of these groups blocks the way.'}${platforms.length ? ` Platforms, stood on from above only: ${list(platforms)}.` : ''}`)}`}
 ${cells}${soundSection(json)}
 Unity
 ${steps(unity)}

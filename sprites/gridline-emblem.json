@@ -1,0 +1,40 @@
+{ "format": "loadout-sprite", "version": 2, "id": "gridline-emblem", "name": "Title emblem",
+  "blurb": "A badge of bright block cells for a title screen that builds itself and shines; change its shape, set of colours, block style, cell size, outline and bounce.",
+  "meta": {"type":"ui","role":"interface/icon","themes":["neutral","sci-fi"],"gameTypes":["puzzle","arcade"],"view":"none","words":["title","emblem","badge","logo","menu","blocks","start","splash","mark","stack"],"license":"draft"},
+  "size": [96,64], "pivot": [48,32], "grounded": false, "preview": "idle", "styles": ["pixel"],
+  "stylesWhy": "The kit is pixel only until the flat style has been looked at (specification, decision P5); each cell's finish is laid pixel by pixel by block.cell@2.",
+  "palette": [
+    {"id":"glow","label":"Shine","default":"#e6e8f6","material":"light","swatches":["#e6e8f6","#5fe0f0","#f2dc4c","#f2c230"]},
+    {"id":"shine","default":"#ffffff","material":"light","detail":true} ],
+  "controls": [
+    {"key":"shape","kind":"choice","label":"Shape","options":[{"value":"diamond","label":"Diamond"},{"value":"arrow","label":"Arrow"},{"value":"stairs","label":"Stairs"},{"value":"ring","label":"Ring"}],"default":"diamond"},
+    {"key":"scheme","kind":"choice","label":"Colours","options":[{"value":"prism","label":"Prism"},{"value":"ember","label":"Ember"},{"value":"ocean","label":"Ocean"},{"value":"mono","label":"Greys"}],"default":"prism"},
+    {"key":"style","kind":"choice","label":"Block style","options":[{"value":"bevel","label":"Bevel"},{"value":"gem","label":"Gem"},{"value":"glass","label":"Glass"},{"value":"pillow","label":"Pillow"},{"value":"frame","label":"Frame"}],"default":"bevel"},
+    {"key":"cell","kind":"range","label":"Cell size","lo":"Small","hi":"Big","min":6,"max":10,"step":2,"default":8},
+    {"key":"outline","kind":"toggle","label":"Outline","default":true},
+    {"key":"glow","kind":"colour","label":"Shine"},
+    {"key":"bounce","kind":"range","label":"Bounce","lo":"Calm","hi":"Bouncy","default":0.5,"group":"Motion"},
+    {"key":"speed","standard":"speed"} ],
+  "versions": [
+    {"name":"Prism diamond","params":{}},
+    {"name":"Ember arrow","params":{"shape":"arrow","scheme":"ember"}},
+    {"name":"Ocean stairs","params":{"shape":"stairs","scheme":"ocean","style":"gem"}},
+    {"name":"Mono ring","params":{"shape":"ring","scheme":"mono","glow":"#5fe0f0"}},
+    {"name":"Big glass","params":{"cell":10,"style":"glass","outline":false}} ],
+  "body": { "pictures": {
+    "nodes": [{"id":"badge","parent":null,"at":[48,32]}],
+    "draw": [
+      {"id":"cells-rest-warm","kind":"use","use":"part:badge-warm","v":1,"on":"badge","at":[0,0],"when":{"scheme":["prism","ember"],"clip":["idle"]},"args":{"scheme":{"from":"scheme","pick":{"prism":"prism","ember":"ember","ocean":"prism","mono":"prism"}},"shape":{"from":"shape","pick":{"diamond":"diamond","arrow":"arrow","stairs":"stairs","ring":"ring"}},"cell":{"from":"cell","map":[[6,6],[10,10]],"round":"px"},"style":{"from":"style","pick":{"bevel":"bevel","gem":"gem","glass":"glass","pillow":"pillow","frame":"frame"}},"edge":2,"play":"rest","room":{"from":"cell","map":[[6,16],[8,11],[10,6]],"round":"px"}}},
+      {"id":"cells-rest-cool","kind":"use","use":"part:badge-cool","v":1,"on":"badge","at":[0,0],"when":{"scheme":["ocean","mono"],"clip":["idle"]},"args":{"scheme":{"from":"scheme","pick":{"prism":"ocean","ember":"ocean","ocean":"ocean","mono":"mono"}},"shape":{"from":"shape","pick":{"diamond":"diamond","arrow":"arrow","stairs":"stairs","ring":"ring"}},"cell":{"from":"cell","map":[[6,6],[10,10]],"round":"px"},"style":{"from":"style","pick":{"bevel":"bevel","gem":"gem","glass":"glass","pillow":"pillow","frame":"frame"}},"edge":2,"play":"rest","room":{"from":"cell","map":[[6,16],[8,11],[10,6]],"round":"px"}}},
+      {"id":"cells-build-warm","kind":"use","use":"part:badge-warm","v":1,"on":"badge","at":[0,0],"when":{"scheme":["prism","ember"],"clip":["build"]},"args":{"scheme":{"from":"scheme","pick":{"prism":"prism","ember":"ember","ocean":"prism","mono":"prism"}},"shape":{"from":"shape","pick":{"diamond":"diamond","arrow":"arrow","stairs":"stairs","ring":"ring"}},"cell":{"from":"cell","map":[[6,6],[10,10]],"round":"px"},"style":{"from":"style","pick":{"bevel":"bevel","gem":"gem","glass":"glass","pillow":"pillow","frame":"frame"}},"edge":2,"play":"build","room":{"from":"cell","map":[[6,16],[8,11],[10,6]],"round":"px"}}},
+      {"id":"cells-build-cool","kind":"use","use":"part:badge-cool","v":1,"on":"badge","at":[0,0],"when":{"scheme":["ocean","mono"],"clip":["build"]},"args":{"scheme":{"from":"scheme","pick":{"prism":"ocean","ember":"ocean","ocean":"ocean","mono":"mono"}},"shape":{"from":"shape","pick":{"diamond":"diamond","arrow":"arrow","stairs":"stairs","ring":"ring"}},"cell":{"from":"cell","map":[[6,6],[10,10]],"round":"px"},"style":{"from":"style","pick":{"bevel":"bevel","gem":"gem","glass":"glass","pillow":"pillow","frame":"frame"}},"edge":2,"play":"build","room":{"from":"cell","map":[[6,16],[8,11],[10,6]],"round":"px"}}},
+      {"id":"cells-shine-warm","kind":"use","use":"part:badge-warm","v":1,"on":"badge","at":[0,0],"when":{"scheme":["prism","ember"],"clip":["shine"]},"args":{"scheme":{"from":"scheme","pick":{"prism":"prism","ember":"ember","ocean":"prism","mono":"prism"}},"shape":{"from":"shape","pick":{"diamond":"diamond","arrow":"arrow","stairs":"stairs","ring":"ring"}},"cell":{"from":"cell","map":[[6,6],[10,10]],"round":"px"},"style":{"from":"style","pick":{"bevel":"bevel","gem":"gem","glass":"glass","pillow":"pillow","frame":"frame"}},"edge":2,"play":"shine","room":{"from":"cell","map":[[6,16],[8,11],[10,6]],"round":"px"}}},
+      {"id":"cells-shine-cool","kind":"use","use":"part:badge-cool","v":1,"on":"badge","at":[0,0],"when":{"scheme":["ocean","mono"],"clip":["shine"]},"args":{"scheme":{"from":"scheme","pick":{"prism":"ocean","ember":"ocean","ocean":"ocean","mono":"mono"}},"shape":{"from":"shape","pick":{"diamond":"diamond","arrow":"arrow","stairs":"stairs","ring":"ring"}},"cell":{"from":"cell","map":[[6,6],[10,10]],"round":"px"},"style":{"from":"style","pick":{"bevel":"bevel","gem":"gem","glass":"glass","pillow":"pillow","frame":"frame"}},"edge":2,"play":"shine","room":{"from":"cell","map":[[6,16],[8,11],[10,6]],"round":"px"}}},
+      {"id":"rim-idle","gen":"block.badgeRim","v":1,"on":"badge","at":[0,0],"clip":["idle"],"shape":{"from":"shape","pick":{"diamond":"diamond","arrow":"arrow","stairs":"stairs","ring":"ring"}},"cell":{"from":"cell","map":[[6,6],[10,10]],"round":"px"},"outline":{"from":"outline","pick":{"true":true,"false":false}},"paint":"glow","shine":"shine","play":"round"},
+      {"id":"rim-build","gen":"block.badgeRim","v":1,"on":"badge","at":[0,0],"clip":["build"],"shape":{"from":"shape","pick":{"diamond":"diamond","arrow":"arrow","stairs":"stairs","ring":"ring"}},"cell":{"from":"cell","map":[[6,6],[10,10]],"round":"px"},"outline":{"from":"outline","pick":{"true":true,"false":false}},"paint":"glow","shine":"shine","play":"build"},
+      {"id":"rim-shine","gen":"block.badgeRim","v":1,"on":"badge","at":[0,0],"clip":["shine"],"shape":{"from":"shape","pick":{"diamond":"diamond","arrow":"arrow","stairs":"stairs","ring":"ring"}},"cell":{"from":"cell","map":[[6,6],[10,10]],"round":"px"},"outline":{"from":"outline","pick":{"true":true,"false":false}},"paint":"glow","shine":"shine","play":"rest"} ],
+    "motion": [{"gen":"pickup.bob","v":1,"clip":["idle"],"height":{"from":"bounce","map":[[0,0],[1,1.4]]}}] } },
+  "clips": {
+    "idle": {"frames":8,"fps":8,"loop":true,"label":"Showing"},
+    "build": {"frames":12,"fps":12,"loop":false,"label":"Building","sounds":[{"sound":"block-lock","preset":"Click in","frame":3,"volume":0.6},{"sound":"block-lock","preset":"Click in","frame":7,"volume":0.6},{"sound":"line-clear","preset":"Single","frame":11,"volume":0.7}]},
+    "shine": {"frames":8,"fps":12,"loop":false,"label":"Shine","sounds":[{"sound":"spin-bonus","preset":"Mini spin","frame":0,"volume":0.5}]} } }

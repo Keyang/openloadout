@@ -1,0 +1,123 @@
+{
+ "id": "block.ghost",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     0,
+     0
+    ],
+    "paint": "glow"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      0,
+      0
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaaaaaaaaaaa",
+      "abbbbbbbbbbbbbba",
+      "ab............ba",
+      "ab............ba",
+      "ab............ba",
+      "ab............ba",
+      "ab............ba",
+      "ab............ba",
+      "ab............ba",
+      "ab............ba",
+      "ab............ba",
+      "ab............ba",
+      "ab............ba",
+      "ab............ba",
+      "abbbbbbbbbbbbbba",
+      "aaaaaaaaaaaaaaaa"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "glow"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     -8,
+     -8
+    ],
+    "size": 16,
+    "style": "dash",
+    "paint": "glow"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      -8,
+      -8
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaaaaaaaaaaa",
+      "abb..bb..bb..bba",
+      "ab............ba",
+      "a..............a",
+      "a..............a",
+      "ab............ba",
+      "ab............ba",
+      "a..............a",
+      "a..............a",
+      "ab............ba",
+      "ab............ba",
+      "a..............a",
+      "a..............a",
+      "ab............ba",
+      "abb..bb..bb..bba",
+      "aaaaaaaaaaaaaaaa"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "glow"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     4,
+     2
+    ],
+    "size": 9,
+    "paint": "glow.light",
+    "ink": "clear"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      5,
+      3
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaa",
+      "a.....a",
+      "a.....a",
+      "a.....a",
+      "a.....a",
+      "a.....a",
+      "aaaaaaa"
+     ],
+     "key": {
+      "a": "glow.light"
+     }
+    }
+   ]
+  }
+ ]
+}

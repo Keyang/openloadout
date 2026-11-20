@@ -1,0 +1,811 @@
+{
+ "id": "grid.lines",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "paint": "haze"
+   },
+   "ctx": {
+    "size": [
+     320,
+     180
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      0
+     ],
+     "size": [
+      1,
+      180
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      20,
+      0
+     ],
+     "size": [
+      1,
+      180
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      40,
+      0
+     ],
+     "size": [
+      1,
+      180
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      60,
+      0
+     ],
+     "size": [
+      1,
+      180
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      80,
+      0
+     ],
+     "size": [
+      1,
+      180
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      100,
+      0
+     ],
+     "size": [
+      1,
+      180
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      120,
+      0
+     ],
+     "size": [
+      1,
+      180
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      140,
+      0
+     ],
+     "size": [
+      1,
+      180
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      160,
+      0
+     ],
+     "size": [
+      1,
+      180
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      180,
+      0
+     ],
+     "size": [
+      1,
+      180
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      200,
+      0
+     ],
+     "size": [
+      1,
+      180
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      220,
+      0
+     ],
+     "size": [
+      1,
+      180
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      240,
+      0
+     ],
+     "size": [
+      1,
+      180
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      260,
+      0
+     ],
+     "size": [
+      1,
+      180
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      280,
+      0
+     ],
+     "size": [
+      1,
+      180
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      300,
+      0
+     ],
+     "size": [
+      1,
+      180
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      0
+     ],
+     "size": [
+      320,
+      1
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      20
+     ],
+     "size": [
+      320,
+      1
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      40
+     ],
+     "size": [
+      320,
+      1
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      60
+     ],
+     "size": [
+      320,
+      1
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      80
+     ],
+     "size": [
+      320,
+      1
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      100
+     ],
+     "size": [
+      320,
+      1
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      120
+     ],
+     "size": [
+      320,
+      1
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      140
+     ],
+     "size": [
+      320,
+      1
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      160
+     ],
+     "size": [
+      320,
+      1
+     ],
+     "paint": "haze",
+     "shade": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "pitch": 20,
+    "paint": "haze",
+    "accent": "haze.light",
+    "accentEvery": [
+     4,
+     3
+    ]
+   },
+   "ctx": {
+    "size": [
+     320,
+     180
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      20,
+      0
+     ],
+     "size": [
+      1,
+      180
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      40,
+      0
+     ],
+     "size": [
+      1,
+      180
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      60,
+      0
+     ],
+     "size": [
+      1,
+      180
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      100,
+      0
+     ],
+     "size": [
+      1,
+      180
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      120,
+      0
+     ],
+     "size": [
+      1,
+      180
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      140,
+      0
+     ],
+     "size": [
+      1,
+      180
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      180,
+      0
+     ],
+     "size": [
+      1,
+      180
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      200,
+      0
+     ],
+     "size": [
+      1,
+      180
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      220,
+      0
+     ],
+     "size": [
+      1,
+      180
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      260,
+      0
+     ],
+     "size": [
+      1,
+      180
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      280,
+      0
+     ],
+     "size": [
+      1,
+      180
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      300,
+      0
+     ],
+     "size": [
+      1,
+      180
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      20
+     ],
+     "size": [
+      320,
+      1
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      40
+     ],
+     "size": [
+      320,
+      1
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      80
+     ],
+     "size": [
+      320,
+      1
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      100
+     ],
+     "size": [
+      320,
+      1
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      140
+     ],
+     "size": [
+      320,
+      1
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      160
+     ],
+     "size": [
+      320,
+      1
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      0
+     ],
+     "size": [
+      1,
+      180
+     ],
+     "paint": "haze.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      80,
+      0
+     ],
+     "size": [
+      1,
+      180
+     ],
+     "paint": "haze.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      160,
+      0
+     ],
+     "size": [
+      1,
+      180
+     ],
+     "paint": "haze.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      240,
+      0
+     ],
+     "size": [
+      1,
+      180
+     ],
+     "paint": "haze.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      0
+     ],
+     "size": [
+      320,
+      1
+     ],
+     "paint": "haze.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      60
+     ],
+     "size": [
+      320,
+      1
+     ],
+     "paint": "haze.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      120
+     ],
+     "size": [
+      320,
+      1
+     ],
+     "paint": "haze.light",
+     "shade": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "pitch": 16,
+    "paint": "haze",
+    "accent": "glow",
+    "accentEvery": [
+     0,
+     2
+    ]
+   },
+   "ctx": {
+    "size": [
+     64,
+     64
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      0
+     ],
+     "size": [
+      1,
+      64
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      16,
+      0
+     ],
+     "size": [
+      1,
+      64
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      32,
+      0
+     ],
+     "size": [
+      1,
+      64
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      48,
+      0
+     ],
+     "size": [
+      1,
+      64
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      16
+     ],
+     "size": [
+      64,
+      1
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      48
+     ],
+     "size": [
+      64,
+      1
+     ],
+     "paint": "haze",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      0
+     ],
+     "size": [
+      64,
+      1
+     ],
+     "paint": "glow",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      32
+     ],
+     "size": [
+      64,
+      1
+     ],
+     "paint": "glow",
+     "shade": 0
+    }
+   ]
+  }
+ ]
+}

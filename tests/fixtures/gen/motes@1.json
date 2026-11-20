@@ -1,0 +1,489 @@
+{
+ "id": "motes",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     32,
+     62
+    ],
+    "paints": [
+     "shine",
+     "core",
+     "mid",
+     "edge",
+     "rim"
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      28,
+      60
+     ],
+     "size": [
+      3,
+      3
+     ],
+     "paint": "rim",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      29,
+      60
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      25,
+      61
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      20,
+      60
+     ],
+     "size": [
+      3,
+      3
+     ],
+     "paint": "rim",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      21,
+      60
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      33,
+      60
+     ],
+     "size": [
+      3,
+      3
+     ],
+     "paint": "rim",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      34,
+      60
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      38,
+      61
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      41,
+      60
+     ],
+     "size": [
+      3,
+      3
+     ],
+     "paint": "rim",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      42,
+      60
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     32,
+     62
+    ],
+    "count": 5,
+    "reach": 10,
+    "paints": [
+     "shine",
+     "core",
+     "mid",
+     "edge",
+     "rim"
+    ]
+   },
+   "ctx": {
+    "t": 0.6,
+    "loop": false,
+    "frames": 6,
+    "frame": 3
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      23,
+      60
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      19,
+      60
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      13,
+      59
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      8,
+      59
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      3,
+      59
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      39,
+      60
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      43,
+      60
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      50,
+      59
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      55,
+      59
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      60,
+      59
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     0,
+     0
+    ],
+    "count": 1,
+    "reach": 4,
+    "rise": 0,
+    "keep": 0,
+    "paints": [
+     "core",
+     "edge"
+    ]
+   },
+   "ctx": {
+    "t": 0.2,
+    "loop": false,
+    "frames": 6,
+    "frame": 1
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      -6,
+      -2
+     ],
+     "size": [
+      3,
+      3
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      -5,
+      -2
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      3,
+      -2
+     ],
+     "size": [
+      3,
+      3
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      4,
+      -2
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     20,
+     20
+    ],
+    "count": 3,
+    "keep": 2,
+    "paints": [
+     "shine",
+     "core",
+     "mid",
+     "edge",
+     "rim"
+    ]
+   },
+   "ctx": {
+    "t": 1,
+    "loop": false,
+    "frames": 6,
+    "frame": 5
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      11,
+      17
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      6,
+      17
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      27,
+      17
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      32,
+      17
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    }
+   ]
+  }
+ ]
+}

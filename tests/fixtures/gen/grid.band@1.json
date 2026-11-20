@@ -1,0 +1,471 @@
+{
+ "id": "grid.band",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "paint": "land"
+   },
+   "ctx": {
+    "size": [
+     320,
+     180
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      158
+     ],
+     "size": [
+      320,
+      22
+     ],
+     "paint": "land",
+     "shade": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "height": 28,
+    "seed": 3,
+    "paint": "land",
+    "alt": "land.dark",
+    "lip": 3,
+    "lipPaint": "land.light"
+   },
+   "ctx": {
+    "size": [
+     320,
+     180
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      152
+     ],
+     "size": [
+      320,
+      28
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      152
+     ],
+     "size": [
+      16,
+      16
+     ],
+     "paint": "land.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      32,
+      152
+     ],
+     "size": [
+      16,
+      16
+     ],
+     "paint": "land.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      32,
+      168
+     ],
+     "size": [
+      16,
+      12
+     ],
+     "paint": "land.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      48,
+      168
+     ],
+     "size": [
+      16,
+      12
+     ],
+     "paint": "land.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      64,
+      168
+     ],
+     "size": [
+      16,
+      12
+     ],
+     "paint": "land.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      80,
+      168
+     ],
+     "size": [
+      16,
+      12
+     ],
+     "paint": "land.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      96,
+      152
+     ],
+     "size": [
+      16,
+      16
+     ],
+     "paint": "land.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      96,
+      168
+     ],
+     "size": [
+      16,
+      12
+     ],
+     "paint": "land.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      128,
+      168
+     ],
+     "size": [
+      16,
+      12
+     ],
+     "paint": "land.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      144,
+      168
+     ],
+     "size": [
+      16,
+      12
+     ],
+     "paint": "land.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      160,
+      152
+     ],
+     "size": [
+      16,
+      16
+     ],
+     "paint": "land.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      160,
+      168
+     ],
+     "size": [
+      16,
+      12
+     ],
+     "paint": "land.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      176,
+      152
+     ],
+     "size": [
+      16,
+      16
+     ],
+     "paint": "land.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      176,
+      168
+     ],
+     "size": [
+      16,
+      12
+     ],
+     "paint": "land.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      192,
+      152
+     ],
+     "size": [
+      16,
+      16
+     ],
+     "paint": "land.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      192,
+      168
+     ],
+     "size": [
+      16,
+      12
+     ],
+     "paint": "land.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      224,
+      168
+     ],
+     "size": [
+      16,
+      12
+     ],
+     "paint": "land.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      240,
+      168
+     ],
+     "size": [
+      16,
+      12
+     ],
+     "paint": "land.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      256,
+      168
+     ],
+     "size": [
+      16,
+      12
+     ],
+     "paint": "land.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      272,
+      168
+     ],
+     "size": [
+      16,
+      12
+     ],
+     "paint": "land.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      152
+     ],
+     "size": [
+      320,
+      3
+     ],
+     "paint": "land.light",
+     "shade": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "height": 12,
+    "cell": 8,
+    "base": 64,
+    "share": 0.6,
+    "paint": "land",
+    "alt": "land.dark"
+   },
+   "ctx": {
+    "size": [
+     64,
+     64
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      52
+     ],
+     "size": [
+      64,
+      12
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      52
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      8,
+      60
+     ],
+     "size": [
+      8,
+      4
+     ],
+     "paint": "land.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      16,
+      60
+     ],
+     "size": [
+      8,
+      4
+     ],
+     "paint": "land.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      24,
+      52
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      24,
+      60
+     ],
+     "size": [
+      8,
+      4
+     ],
+     "paint": "land.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      40,
+      60
+     ],
+     "size": [
+      8,
+      4
+     ],
+     "paint": "land.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      56,
+      52
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      56,
+      60
+     ],
+     "size": [
+      8,
+      4
+     ],
+     "paint": "land.dark",
+     "shade": 0
+    }
+   ]
+  }
+ ]
+}

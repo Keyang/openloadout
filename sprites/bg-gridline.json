@@ -1,0 +1,43 @@
+{ "format": "loadout-sprite", "version": 2, "id": "bg-gridline", "name": "Grid backdrop",
+  "blurb": "A dark grid, towers of lit cells and floating shapes that pulse, in three layers that repeat sideways: scroll far at 0.1, mid at 0.4, near at 0.7 of the camera's speed, or lay far two by two behind a still screen. Change the colours, the stacks' height and the floating shapes.",
+  "meta": {"type": "background", "role": "environment/background", "themes": ["neutral", "sci-fi"], "gameTypes": ["puzzle", "arcade", "shooter"], "view": "none", "words": ["grid", "backdrop", "void", "neon", "shapes", "night", "abstract", "space", "lines", "glow"], "license": "draft"},
+  "size": [320, 180], "pivot": [160, 180], "grounded": false, "preview": "far", "styles": ["pixel"],
+  "stylesWhy": "The kit is pixel only until the flat style has been looked at (specification, decision P5). Detail layer: the 2x2 lights and the lit cells.",
+  "palette": [
+    {"id": "sky", "label": "Space", "default": "#2a3058", "material": "sky", "swatches": ["#2a3058", "#3a4278", "#1e4658", "#6a3a8e"]},
+    {"id": "land", "label": "Stacks", "default": "#7d52e6", "material": "stone", "swatches": ["#7d52e6", "#2a9a9a", "#3f6fd1", "#6e78b4"]},
+    {"id": "haze", "label": "Grid lines", "default": "#4f5894", "material": "interface", "swatches": ["#4f5894", "#a3abd8", "#f5875a", "#46d8a8"]},
+    {"id": "glow", "label": "Lights", "default": "#5fe0f0", "material": "light", "swatches": ["#5fe0f0", "#f2dc4c", "#f2609e", "#e6e8f6"]},
+    {"id": "void", "default": "#12152b", "material": "sky", "detail": true},
+    {"id": "air", "material": "sky", "derive": {"rule": "mix", "of": "sky", "with": "void", "amount": 0.62}},
+    {"id": "band-top", "material": "sky", "derive": {"rule": "mix", "of": "sky", "with": "void", "amount": 0.7}},
+    {"id": "band-mid", "material": "sky", "derive": {"rule": "mix", "of": "sky", "with": "void", "amount": 0.55}},
+    {"id": "band-low", "material": "sky", "derive": {"rule": "mix", "of": "sky", "with": "void", "amount": 0.4}} ],
+  "controls": [
+    {"key": "sky", "kind": "colour", "label": "Space", "group": "Colors"},
+    {"key": "land", "kind": "colour", "label": "Stacks", "group": "Colors"},
+    {"key": "haze", "kind": "colour", "label": "Grid lines", "group": "Colors"},
+    {"key": "glow", "kind": "colour", "label": "Lights", "group": "Colors"},
+    {"key": "height", "kind": "range", "label": "Height", "lo": "Short", "hi": "Tall", "default": 0.5},
+    {"key": "density", "kind": "range", "label": "Floating shapes", "lo": "Few", "hi": "Many", "min": 4, "max": 12, "step": 1, "default": 8},
+    {"key": "style", "kind": "choice", "label": "Shape kind", "options": ["squares", "rings", "pieces", "mixed"], "default": "mixed"},
+    {"key": "speed", "standard": "speed"} ],
+  "versions": [
+    {"name": "Night grid", "params": {}},
+    {"name": "Plum haze", "params": {"sky": "#6a3a8e", "haze": "#f5875a"}},
+    {"name": "Deep sea", "params": {"sky": "#1e4658", "haze": "#46d8a8", "land": "#2a9a9a"}},
+    {"name": "Bright lines", "params": {"sky": "#3a4278", "haze": "#a3abd8", "glow": "#f2dc4c", "density": 12}} ],
+  "body": { "layers": [
+    { "name": "far", "scroll": 0.1, "draw": [
+      {"kind": "rect", "at": [0,0], "size": [320,60], "paint": "band-top", "shade": 0},
+      {"kind": "rect", "at": [0,60], "size": [320,60], "paint": "band-mid", "shade": 0},
+      {"kind": "rect", "at": [0,120], "size": [320,60], "paint": "band-low", "shade": 0},
+      {"gen": "grid.lines", "v": 1, "pitch": 20, "paint": {"rule": "clear.of", "v": 1, "of": {"rule": "haze", "v": 1, "of": "haze", "air": "air", "depth": 0.62}, "behind": ["band-top", "band-mid", "band-low"], "step": 0.05, "way": "lighter"}, "accent": {"rule": "tone", "of": {"rule": "clear.of", "v": 1, "of": {"rule": "haze", "v": 1, "of": "haze", "air": "air", "depth": 0.62}, "behind": ["band-top", "band-mid", "band-low"], "step": 0.05, "way": "lighter"}, "by": 0.55}, "accentEvery": [4,3]},
+      {"gen": "grid.lights", "v": 1, "count": 14, "seed": 3, "pitch": 20, "paint": {"rule": "haze", "v": 1, "of": "glow", "air": "air", "depth": 0.45}} ] },
+    { "name": "mid", "scroll": 0.4, "draw": [
+      {"gen": "grid.shapes", "v": 1, "seed": 5, "count": {"from": "density", "map": [[4,4],[12,12]], "round": "px"}, "kind": {"from": "style", "pick": {"squares": "squares", "rings": "rings", "pieces": "pieces", "mixed": "mixed"}}, "top": 16, "floor": {"from": "height", "map": [[0,136],[0.5,112],[1,96]], "round": "px"}, "paints": [{"rule": "mix", "of": {"rule": "haze", "v": 1, "of": "land", "air": "air", "depth": 0.2}, "with": {"rule": "clear.of", "v": 1, "of": {"rule": "haze", "v": 1, "of": "land", "air": "air", "depth": 0.6}, "behind": ["band-low"], "also": ["band-mid"], "way": "lighter"}, "amount": 0.25},{"rule": "tone", "of": {"rule": "haze", "v": 1, "of": "land", "air": "air", "depth": 0.2}, "by": 0.3},{"rule": "tone", "of": {"rule": "haze", "v": 1, "of": "land", "air": "air", "depth": 0.2}, "by": 0.8}]},
+      {"gen": "grid.towers", "v": 1, "seed": 0, "cell": 8, "slots": 8, "tall": {"from": "height", "map": [[0,3],[0.5,6],[1,8]], "round": "px"}, "paint": {"rule": "clear.of", "v": 1, "of": {"rule": "haze", "v": 1, "of": "land", "air": "air", "depth": 0.6}, "behind": ["band-low"], "also": ["band-mid"], "way": "lighter"}, "alt": {"rule": "tone", "of": {"rule": "clear.of", "v": 1, "of": {"rule": "haze", "v": 1, "of": "land", "air": "air", "depth": 0.6}, "behind": ["band-low"], "also": ["band-mid"], "way": "lighter"}, "by": 0.6}, "lit": {"rule": "haze", "v": 1, "of": "glow", "air": "air", "depth": 0}, "unlit": {"rule": "tone", "of": {"rule": "clear.of", "v": 1, "of": {"rule": "haze", "v": 1, "of": "land", "air": "air", "depth": 0.6}, "behind": ["band-low"], "also": ["band-mid"], "way": "lighter"}, "by": -0.7}} ] },
+    { "name": "near", "scroll": 0.7, "draw": [
+      {"gen": "grid.band", "v": 1, "seed": 0, "cell": 16, "height": {"from": "height", "map": [[0,16],[1,28]], "round": "px"}, "paint": {"rule": "clear.of", "v": 1, "of": {"rule": "haze", "v": 1, "of": "land", "air": "air", "depth": 0.3}, "behind": ["band-low"], "also": [{"rule": "clear.of", "v": 1, "of": {"rule": "haze", "v": 1, "of": "land", "air": "air", "depth": 0.6}, "behind": ["band-low"], "also": ["band-mid"], "way": "lighter"}, "band-top", "band-mid"], "step": 0.06, "way": "lighter"}, "alt": {"rule": "tone", "of": {"rule": "clear.of", "v": 1, "of": {"rule": "haze", "v": 1, "of": "land", "air": "air", "depth": 0.3}, "behind": ["band-low"], "also": [{"rule": "clear.of", "v": 1, "of": {"rule": "haze", "v": 1, "of": "land", "air": "air", "depth": 0.6}, "behind": ["band-low"], "also": ["band-mid"], "way": "lighter"}, "band-top", "band-mid"], "step": 0.06, "way": "lighter"}, "by": -0.8}, "lip": 4, "lipPaint": {"rule": "tone", "of": {"rule": "clear.of", "v": 1, "of": {"rule": "haze", "v": 1, "of": "land", "air": "air", "depth": 0.3}, "behind": ["band-low"], "also": [{"rule": "clear.of", "v": 1, "of": {"rule": "haze", "v": 1, "of": "land", "air": "air", "depth": 0.6}, "behind": ["band-low"], "also": ["band-mid"], "way": "lighter"}, "band-top", "band-mid"], "step": 0.06, "way": "lighter"}, "by": 0.5}},
+      {"gen": "grid.runner", "v": 1, "row": {"from": "height", "map": [[0,164],[1,152]], "round": "px"}, "length": 48, "paint": {"rule": "haze", "v": 1, "of": "glow", "air": "air", "depth": 0}, "dim": {"rule": "haze", "v": 1, "of": "glow", "air": "air", "depth": 0.75}} ] } ] },
+  "clips": {"far": {"frames": 1, "fps": 4}, "mid": {"frames": 8, "fps": 4}, "near": {"frames": 8, "fps": 4}} }

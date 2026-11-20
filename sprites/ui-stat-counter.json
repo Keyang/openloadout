@@ -1,0 +1,49 @@
+{
+  "format": "loadout-sprite",
+  "version": 2,
+  "id": "ui-stat-counter",
+  "name": "Level and lines counter",
+  "blurb": "A small counter for the side of a block puzzle: a picture for level, lines, speed or combo beside a row of digit windows, a digit that rolls up by one and a flash on level up, plus the empty case for the game's own digits; change the style, number of digits, size, picture and colours.",
+  "meta": {"type":"ui","role":"interface/panel","themes":["neutral","sci-fi"],"gameTypes":["puzzle","arcade"],"view":"none","words":["level","lines","counter","stage","speed","combo","digits","hud","number","count"],"license":"draft"},
+  "size": [64,24],
+  "pivot": [32,12],
+  "grounded": false,
+  "preview": "idle",
+  "styles": ["pixel"],
+  "stylesWhy": "The kit is pixel only until the flat style has been looked at (specification, decision P5); the case, the digits and the picture are laid pixel by pixel by the ui.counter generators.",
+  "palette": [
+    {"id":"face","label":"Windows","default":"#2a3058","material":"interface","swatches":["#2a3058","#3a4278","#1e4658","#6a3a8e"]},
+    {"id":"frame","label":"Case","default":"#c2c9d6","material":"paint","swatches":["#c2c9d6","#5fe0f0","#f2dc4c","#e6e8f6"]},
+    {"id":"glow","label":"Digits","default":"#f2dc4c","material":"light","swatches":["#f2dc4c","#5fe0f0","#f0ead8","#e6e8f6"]},
+    {"id":"shine","default":"#ffffff","material":"light","detail":true}],
+  "controls": [
+    {"key":"style","kind":"choice","label":"Style","options":["plate","strip","drum"],"default":"strip"},
+    {"key":"digits","kind":"range","label":"Digits","lo":"Few","hi":"Many","min":2,"max":4,"step":1,"default":3},
+    {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+    {"key":"icon","kind":"choice","label":"Picture","options":["level","lines","speed","combo"],"default":"level"},
+    {"key":"face","kind":"colour","label":"Windows"},
+    {"key":"frame","kind":"colour","label":"Case"},
+    {"key":"glow","kind":"colour","label":"Digits"},
+    {"key":"speed","standard":"speed"}],
+  "versions": [
+    {"name":"Level","params":{}},
+    {"name":"Lines","params":{"icon":"lines","glow":"#5fe0f0"}},
+    {"name":"Speed drum","params":{"icon":"speed","style":"drum","glow":"#f0ead8"}},
+    {"name":"Combo, two big digits","params":{"icon":"combo","digits":2,"size":1,"glow":"#e6e8f6"}},
+    {"name":"Plate on plum","params":{"style":"plate","face":"#6a3a8e","frame":"#e6e8f6"}}],
+  "body": {"panel":{
+    "piece":{"gen":"ui.counter","v":1,"clip":["frame"],"at":[1,1],"width":62,"height":22,"picture":13,"count":{"from":"digits","map":[[2,2],[4,4]],"round":"px"},"big":{"from":"size","map":[[0,0],[1,1]]},"style":{"from":"style","pick":{"plate":"plate","strip":"strip","drum":"drum"}},"face":"face","frame":"frame","text":"shine"},
+    "states":["idle","roll","bump","frame"],
+    "draw":[
+    {"id":"case","gen":"ui.counter","v":1,"clip":["idle","roll","bump"],"at":[1,1],"width":62,"height":22,"picture":13,"count":{"from":"digits","map":[[2,2],[4,4]],"round":"px"},"big":{"from":"size","map":[[0,0],[1,1]]},"style":{"from":"style","pick":{"plate":"plate","strip":"strip","drum":"drum"}},"face":"face","frame":"frame"},
+    {"id":"picture","gen":"ui.counter.mark","v":1,"clip":["idle","roll","frame"],"at":[4,5],"name":{"from":"icon","pick":{"level":"level","lines":"lines","speed":"speed","combo":"combo"}},"paint":"glow"},
+    {"id":"picture-bump","gen":"ui.counter.mark","v":1,"clip":["bump"],"at":[4,5],"name":{"from":"icon","pick":{"level":"level","lines":"lines","speed":"speed","combo":"combo"}},"play":"bump","paint":"glow","flash":"shine"},
+    {"id":"number","gen":"ui.counter.digits","v":1,"clip":["idle"],"at":[1,1],"width":62,"height":22,"picture":13,"count":{"from":"digits","map":[[2,2],[4,4]],"round":"px"},"big":{"from":"size","map":[[0,0],[1,1]]},"style":{"from":"style","pick":{"plate":"plate","strip":"strip","drum":"drum"}},"value":12,"paint":"glow"},
+    {"id":"number-roll","gen":"ui.counter.digits","v":1,"clip":["roll"],"at":[1,1],"width":62,"height":22,"picture":13,"count":{"from":"digits","map":[[2,2],[4,4]],"round":"px"},"big":{"from":"size","map":[[0,0],[1,1]]},"style":{"from":"style","pick":{"plate":"plate","strip":"strip","drum":"drum"}},"value":12,"play":"roll","paint":"glow"},
+    {"id":"number-bump","gen":"ui.counter.digits","v":1,"clip":["bump"],"at":[1,1],"width":62,"height":22,"picture":13,"count":{"from":"digits","map":[[2,2],[4,4]],"round":"px"},"big":{"from":"size","map":[[0,0],[1,1]]},"style":{"from":"style","pick":{"plate":"plate","strip":"strip","drum":"drum"}},"value":12,"play":"bump","paint":"glow","flash":"shine"}]}},
+  "clips": {
+    "idle":{"frames":1,"fps":8,"loop":true,"label":"Showing a number"},
+    "roll":{"frames":6,"fps":12,"loop":false,"label":"Count up by one","sounds":[{"sound":"block-shift","preset":"Soft shift","frame":1,"volume":0.4}]},
+    "bump":{"frames":4,"fps":10,"loop":false,"label":"Level up flash","sounds":[{"sound":"combo-chime","preset":"Combo 4","frame":0,"volume":0.6}]},
+    "frame":{"frames":1,"fps":8,"loop":true,"label":"Empty, for the game's own digits"}}
+}

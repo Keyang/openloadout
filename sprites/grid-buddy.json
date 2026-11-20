@@ -1,0 +1,39 @@
+{ "format": "loadout-sprite", "version": 2, "id": "grid-buddy", "name": "Block buddy",
+  "blurb": "A small living puzzle piece that cheers at a clear, worries when the stack is high and slumps when the round is lost; change its body shape, size, eyes, feet and colours.",
+  "meta": { "type": "creature", "role": "characters/npc", "themes": ["neutral", "sci-fi"], "gameTypes": ["puzzle", "arcade"], "view": "front", "words": ["mascot", "buddy", "block", "cube", "cheer", "worry", "cute", "helper", "reaction", "face"], "license": "draft" },
+  "size": [48, 48], "pivot": [24, 42], "grounded": true, "preview": "idle", "styles": ["pixel"],
+  "stylesWhy": "The kit is pixel only until the flat style has been looked at (specification, decision P5); the body, eyes, cheeks and sweat drop are laid pixel by pixel by block.buddy@1.",
+  "palette": [
+    { "id": "body", "label": "Body", "default": "#3f6fd1", "material": "paint", "swatches": ["#3f6fd1", "#f2609e", "#2a9a9a", "#7d52e6", "#f5875a"] },
+    { "id": "accent", "label": "Feet and cheeks", "default": "#f2dc4c", "material": "light", "swatches": ["#f2dc4c", "#e6e8f6", "#46d8a8", "#a6dc46"] },
+    { "id": "drop", "default": "#56c4f2", "material": "water", "detail": true },
+    { "id": "spark", "default": "#f2dc4c", "material": "light", "detail": true },
+    { "id": "shine", "default": "#ffffff", "material": "light", "detail": true } ],
+  "controls": [
+    { "key": "size", "kind": "range", "label": "Size", "lo": "Small", "hi": "Big", "default": 0.5 },
+    { "key": "build", "kind": "range", "label": "Build", "lo": "Slim", "hi": "Stocky", "default": 0.5 },
+    { "key": "shape", "kind": "choice", "label": "Body", "options": ["square", "line", "zig", "ell"], "default": "square" },
+    { "key": "eyes", "kind": "choice", "label": "Eyes", "options": ["dots", "round", "visor"], "default": "round" },
+    { "key": "feet", "kind": "toggle", "label": "Feet", "default": true },
+    { "key": "body", "kind": "colour", "label": "Body" },
+    { "key": "accent", "kind": "colour", "label": "Feet and cheeks" },
+    { "key": "bounce", "kind": "range", "label": "Bounce", "lo": "Calm", "hi": "Bouncy", "default": 0.5, "group": "Motion" },
+    { "key": "speed", "standard": "speed" } ],
+  "versions": [
+    { "name": "Blue square", "params": { } },
+    { "name": "Rose line", "params": { "shape": "line", "body": "#f2609e" } },
+    { "name": "Teal zig", "params": { "shape": "zig", "body": "#2a9a9a", "eyes": "dots" } },
+    { "name": "Violet ell, visor", "params": { "shape": "ell", "body": "#7d52e6", "eyes": "visor", "accent": "#46d8a8" } },
+    { "name": "Small coral", "params": { "size": 0, "build": 1, "body": "#f5875a", "feet": false } } ],
+  "body": { "pictures": {
+    "nodes": [{ "id": "buddy", "parent": null, "at": [24, 42] }],
+    "draw": [
+      { "id": "idle", "gen": "block.buddy", "v": 1, "on": "buddy", "at": [0, 0], "clip": ["idle"], "act": "idle", "shape": { "from": "shape", "pick": { "square": "square", "line": "line", "zig": "zig", "ell": "ell" } }, "size": { "from": "size", "map": [[0, 0], [1, 1]] }, "build": { "from": "build", "map": [[0, 0], [1, 1]] }, "eyes": { "from": "eyes", "pick": { "dots": "dots", "round": "round", "visor": "visor" } }, "feet": { "from": "feet", "pick": { "true": true, "false": false } }, "bounce": { "from": "bounce", "map": [[0, 0], [1, 1]] }, "paint": "body", "accent": "accent", "shine": "shine", "drop": "drop", "spark": "spark" },
+      { "id": "cheer", "gen": "block.buddy", "v": 1, "on": "buddy", "at": [0, 0], "clip": ["cheer"], "act": "cheer", "shape": { "from": "shape", "pick": { "square": "square", "line": "line", "zig": "zig", "ell": "ell" } }, "size": { "from": "size", "map": [[0, 0], [1, 1]] }, "build": { "from": "build", "map": [[0, 0], [1, 1]] }, "eyes": { "from": "eyes", "pick": { "dots": "dots", "round": "round", "visor": "visor" } }, "feet": { "from": "feet", "pick": { "true": true, "false": false } }, "bounce": { "from": "bounce", "map": [[0, 0], [1, 1]] }, "paint": "body", "accent": "accent", "shine": "shine", "drop": "drop", "spark": "spark" },
+      { "id": "worry", "gen": "block.buddy", "v": 1, "on": "buddy", "at": [0, 0], "clip": ["worry"], "act": "worry", "shape": { "from": "shape", "pick": { "square": "square", "line": "line", "zig": "zig", "ell": "ell" } }, "size": { "from": "size", "map": [[0, 0], [1, 1]] }, "build": { "from": "build", "map": [[0, 0], [1, 1]] }, "eyes": { "from": "eyes", "pick": { "dots": "dots", "round": "round", "visor": "visor" } }, "feet": { "from": "feet", "pick": { "true": true, "false": false } }, "bounce": { "from": "bounce", "map": [[0, 0], [1, 1]] }, "paint": "body", "accent": "accent", "shine": "shine", "drop": "drop", "spark": "spark" },
+      { "id": "slump", "gen": "block.buddy", "v": 1, "on": "buddy", "at": [0, 0], "clip": ["slump"], "act": "slump", "shape": { "from": "shape", "pick": { "square": "square", "line": "line", "zig": "zig", "ell": "ell" } }, "size": { "from": "size", "map": [[0, 0], [1, 1]] }, "build": { "from": "build", "map": [[0, 0], [1, 1]] }, "eyes": { "from": "eyes", "pick": { "dots": "dots", "round": "round", "visor": "visor" } }, "feet": { "from": "feet", "pick": { "true": true, "false": false } }, "bounce": { "from": "bounce", "map": [[0, 0], [1, 1]] }, "paint": "body", "accent": "accent", "shine": "shine", "drop": "drop", "spark": "spark" } ] } },
+  "clips": {
+    "idle": { "frames": 8, "fps": 7 },
+    "cheer": { "frames": 8, "fps": 11, "loop": false, "label": "Cheer", "sounds": [{ "sound": "combo-chime", "frame": 1, "preset": "Combo 4", "volume": 0.5 }] },
+    "worry": { "frames": 8, "fps": 10, "label": "Worry", "sounds": [{ "sound": "danger-pulse", "frame": 0, "preset": "Calm warning", "volume": 0.35 }] },
+    "slump": { "frames": 8, "fps": 9, "loop": false, "label": "Slump", "sounds": [{ "sound": "top-out", "frame": 0, "preset": "Small collapse", "volume": 0.6 }] } } }
