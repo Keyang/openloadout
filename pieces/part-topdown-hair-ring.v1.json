@@ -1,0 +1,42 @@
+{
+ "format": "loadout-piece",
+ "version": 1,
+ "id": "part:topdown-hair-ring",
+ "v": 1,
+ "name": "Ring of hair",
+ "about": "A bald crown ringed with hair at the temples and round the back, on the head of base:person-topdown.",
+ "slots": [
+  {
+   "id": "hair",
+   "label": "Hair",
+   "default": "#e8e0c8",
+   "material": "plant" } ],
+ "made": {
+  "by": "tools/bake-topdown.mjs",
+  "from": "rigs/topdown.js" },
+ "body": {
+  "draw": [
+   {
+    "id": "ring-down",
+    "kind": "stamp",
+    "at": [-3,-7.5],
+    "rows": [".aa.........ca.","caa.........caa","caa.........caa","cca.........cca",".cc.........cc."],
+    "key": {"a":"hair","c":"hair.dark"},
+    "z": 4,
+    "when": {"direction":["down"]} },
+   {
+    "id": "ring-up",
+    "kind": "stamp",
+    "at": [-3,-7.5],
+    "rows": [".a...........a.","caaaaaaaaaaacaa","caaaaaaaaaaacaa","ccaaaaaaaaaacca",".caaaaaaaaaaac.",".ccccccccccccc."],
+    "key": {"a":"hair","c":"hair.dark"},
+    "z": 4,
+    "when": {"direction":["up"]} },
+   {
+    "id": "ring-side",
+    "kind": "stamp",
+    "at": [-2,-7.5],
+    "rows": [".aaaa","caaaa","caaaa","ccaaa",".cccc"],
+    "key": {"a":"hair","c":"hair.dark"},
+    "z": 4,
+    "when": {"direction":["side"]} } ] } }

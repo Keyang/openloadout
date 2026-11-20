@@ -1,0 +1,93 @@
+{
+ "format": "loadout-piece",
+ "version": 1,
+ "id": "part:topdown-circlet",
+ "v": 1,
+ "name": "Circlet",
+ "about": "A thin band of metal round the brow with a stone at the front, hair or skin showing above it.",
+ "slots": [
+  {
+   "id": "metal",
+   "label": "Metal",
+   "default": "#e0b040",
+   "material": "metal" },
+  {
+   "id": "gem",
+   "label": "Stone",
+   "default": "#9a3a2e",
+   "material": "magic" } ],
+ "args": {
+  "size": {
+   "type": "px",
+   "lo": 0.5,
+   "hi": 1.8,
+   "default": 1 } },
+ "made": {
+  "by": "tools/bake-topdown.mjs",
+  "from": "rigs/topdown.js" },
+ "body": {
+  "draw": [
+   {
+    "id": "band-down",
+    "kind": "stamp",
+    "at": [{"from":"size","map":[[0.5,-3],[1.2475,-3],[1.25,-4],[1.8,-4]]},-6.5],
+    "rows": ["aaaaaaaabbbbb"],
+    "key": {"a":"metal","b":"metal.light"},
+    "z": 5,
+    "when": {"direction":["down"]} },
+   {
+    "id": "under-down",
+    "kind": "stamp",
+    "at": [-3,-8.5],
+    "rows": ["..ccccccccccccc..."],
+    "key": {"c":"metal.dark"},
+    "z": 4,
+    "when": {"direction":["down"]} },
+   {
+    "id": "stone-down",
+    "kind": "rect",
+    "at": [{"from":"size","map":[[0.5,-3],[0.7975,-3],[0.8,-4],[1.2475,-4],[1.25,-5],[1.8,-5]]},{"from":"size","map":[[0.5,-0.5],[1.4975,-0.5],[1.5,-1.5],[1.8,-1.5]]}],
+    "size": [{"from":"size","map":[[0.5,1],[0.7975,1],[0.8,2],[1.4975,2],[1.5,3],[1.8,3]]},{"from":"size","map":[[0.5,1],[0.7975,1],[0.8,2],[1.2475,2],[1.25,3],[1.8,3]]}],
+    "paint": "gem.base",
+    "z": 6,
+    "when": {"direction":["down"]} },
+   {
+    "id": "band-up",
+    "kind": "stamp",
+    "at": [{"from":"size","map":[[0.5,-3],[1.2475,-3],[1.25,-4],[1.8,-4]]},-6.5],
+    "rows": ["aaaaaaaabbbbb"],
+    "key": {"a":"metal","b":"metal.light"},
+    "z": 5,
+    "when": {"direction":["up"]} },
+   {
+    "id": "under-up",
+    "kind": "stamp",
+    "at": [-3,-8.5],
+    "rows": ["..ccccccccccccc..."],
+    "key": {"c":"metal.dark"},
+    "z": 4,
+    "when": {"direction":["up"]} },
+   {
+    "id": "band-side",
+    "kind": "stamp",
+    "at": [{"from":"size","map":[[0.5,-3],[1.2475,-3],[1.25,-4],[1.8,-4]]},-6.5],
+    "rows": ["aaaaaaaabbbbb"],
+    "key": {"a":"metal","b":"metal.light"},
+    "z": 5,
+    "when": {"direction":["side"]} },
+   {
+    "id": "under-side",
+    "kind": "stamp",
+    "at": [-3,-8.5],
+    "rows": ["..ccccccccccccc..."],
+    "key": {"c":"metal.dark"},
+    "z": 4,
+    "when": {"direction":["side"]} },
+   {
+    "id": "stone-side",
+    "kind": "rect",
+    "at": [{"from":"size","map":[[0.5,-3],[0.7975,-3],[0.8,-4],[1.2475,-4],[1.25,-5],[1.8,-5]]},{"from":"size","map":[[0.5,5.5],[0.7975,5.5],[0.8,4.5],[1.4975,4.5],[1.5,3.5],[1.8,3.5]]}],
+    "size": [{"from":"size","map":[[0.5,1],[0.7975,1],[0.8,2],[1.4975,2],[1.5,3],[1.8,3]]},{"from":"size","map":[[0.5,1],[0.7975,1],[0.8,2],[1.2475,2],[1.25,3],[1.8,3]]}],
+    "paint": "gem.base",
+    "z": 6,
+    "when": {"direction":["side"]} } ] } }

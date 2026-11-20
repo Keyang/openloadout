@@ -1,0 +1,220 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "village-elder",
+ "name": "Village elder",
+ "blurb": "An old villager bent over a walking stick, who walks slowly and talks. Change the stoop, beard, cap, what is held and the colours.",
+ "meta": {
+  "type": "character",
+  "role": "characters/npc",
+  "themes": ["fantasy","farm"],
+  "gameTypes": ["turn-based-rpg","top-down-rpg"],
+  "view": "top-down",
+  "words": ["elder","old man","villager","grandfather","sage","quest giver","beard","cane","walk","talk","village","wise"],
+  "license": "draft" },
+ "size": [48,48],
+ "pivot": [24,42],
+ "preview": "walk_down",
+ "palette": [
+  {
+   "id": "skin",
+   "label": "Skin",
+   "default": "#f6d3b0",
+   "material": "skin",
+   "swatches": ["#f6d3b0","#e8b088","#c98a5c","#9a6240","#6e4428","#9bd18a","#b9a7e0"] },
+  {
+   "id": "hair",
+   "label": "Hair",
+   "default": "#f0ead8",
+   "material": "plant",
+   "swatches": ["#f0ead8","#9a6a3e","#e6c96a","#c9423a","#5a3a22","#a8612a","#e0b040","#d8d8e0"] },
+  {
+   "id": "outfit",
+   "label": "Robe",
+   "default": "#a8a4a0",
+   "material": "cloth",
+   "swatches": ["#a8a4a0","#3f6fd1","#7a4fc4","#2f8f9d","#c9423a","#8e3a4a","#4f9d57","#e08a2c"] },
+  {
+   "id": "trim",
+   "label": "Trim",
+   "default": "#c8553a",
+   "material": "cloth",
+   "swatches": ["#c8553a","#c9423a","#f2c230","#2f8f9d","#7a4fc4","#f0ead8","#e08a2c","#e6c545"] },
+  {
+   "id": "bottom",
+   "derive": {
+    "rule": "tone",
+    "of": "outfit",
+    "by": -0.6 },
+   "material": "cloth" },
+  {
+   "id": "wood",
+   "default": "#9a6a3e",
+   "material": "wood",
+   "detail": true },
+  {
+   "id": "gold",
+   "default": "#f2c230",
+   "material": "metal",
+   "detail": true },
+  {
+   "id": "rust",
+   "default": "#a8806a",
+   "material": "metal",
+   "detail": true },
+  {
+   "id": "glow",
+   "default": "#f4e06a",
+   "material": "light",
+   "detail": true } ],
+ "body": {
+  "rig": {
+   "extends": {
+    "use": "base:person-topdown-walker",
+    "v": 1,
+    "paint": {"top":"outfit","bottom":"bottom","boots":"wood","topFar":"outfit.dark","bottomFar":"bottom.dark"} },
+   "shapes": [
+    {"id":"cuffB-down","kind":"stamp","on":"fistB","at":[-1,0],"rows":["ccc"],"key":{"c":"trim"},"z":60.5,"when":{"direction":["down"]}},
+    {"id":"cuffF-down","kind":"stamp","on":"fistF","at":[-1,0],"rows":["ccc"],"key":{"c":"trim"},"z":62.5,"when":{"direction":["down"]}},
+    {"id":"cuffB-up","kind":"stamp","on":"fistB","at":[-1,0],"rows":["ccc"],"key":{"c":"trim"},"z":32.5,"when":{"direction":["up"]}},
+    {"id":"cuffF-up","kind":"stamp","on":"fistF","at":[-1,0],"rows":["ccc"],"key":{"c":"trim"},"z":35.5,"when":{"direction":["up"]}},
+    {"id":"cuffB-side","kind":"stamp","on":"fistB","at":[-1,0],"rows":["ccc"],"key":{"c":"trim.dark"},"z":6.5,"when":{"direction":["side"]}},
+    {"id":"cuffF-side","kind":"stamp","on":"fistF","at":[-1,0],"rows":["ccc"],"key":{"c":"trim"},"z":72.5,"when":{"direction":["side"]}},
+    {"id":"robe","kind":"use","use":"part:topdown-robe","v":1,"on":"hip","z":40,"paint":{"cloth":"outfit","trim":"trim"},"args":{"width":{"from":"build","map":[[0,3.5],[1,5.45]]}}},
+    {"id":"belt","kind":"use","use":"part:topdown-belt","v":1,"on":"waist","z":40,"paint":{"belt":"trim"}},
+    {"id":"hunch","kind":"use","use":"part:topdown-hunch","v":1,"on":"chest","z":40,"paint":{"cloth":"outfit"},"args":{"amount":{"from":"stoop","map":[[0,0],[1,1]]}}},
+    {"id":"hair","kind":"use","use":"part:topdown-hair-ring","v":1,"on":"head","z":50,"paint":{"hair":"hair"}},
+    {"id":"beard","kind":"use","use":"part:topdown-beard","v":1,"on":"head","z":54,"paint":{"hair":"hair"},"args":{"kind":{"from":"beard","pick":{"long":"long","short":"short","none":"long"}},"length":{"from":"beardLength","map":[[0.65,0.65],[1.35,1.35]]}},"when":{"beard":["long","short"]}},
+    {"id":"cap","kind":"use","use":"part:topdown-cap-peaked","v":1,"on":"head","z":50,"paint":{"cloth":"trim"},"args":{"size":{"from":"headgearSize","map":[[0.5,0.5],[1.8,1.8]]}},"when":{"headgear":["cap"]}},
+    {"id":"circlet","kind":"use","use":"part:topdown-circlet","v":1,"on":"head","z":50,"paint":{"metal":"gold","gem":"trim"},"args":{"size":{"from":"headgearSize","map":[[0.5,0.5],[1.8,1.8]]}},"when":{"headgear":["circlet"]}},
+    {"id":"cane","kind":"use","use":"held:topdown-cane","v":1,"on":"root","z":60,"paint":{"wood":"wood"},"args":{"length":{"from":"heldSize","map":[[0.65,7.15],[1.35,14.85]]}},"when":{"held":["cane"]}},
+    {"id":"lantern","kind":"use","use":"held:topdown-lantern","v":1,"on":"cuffF","z":60,"paint":{"metal":"rust","glow":"glow"},"args":{"length":{"from":"heldSize","map":[[0.65,6.5],[1.35,11.5]]}},"when":{"held":["lantern"]}} ] } },
+ "controls": [
+  {
+   "key": "height",
+   "kind": "range",
+   "label": "Height",
+   "lo": "Short",
+   "hi": "Tall",
+   "default": 0.5,
+   "scales": {
+    "bones": ["hip","spine","thiF","thiB","shnF","shnB","legF","legB","legIF","legIB"],
+    "by": [0.82,1.18] } },
+  {
+   "key": "build",
+   "kind": "range",
+   "label": "Build",
+   "lo": "Slim",
+   "hi": "Stocky",
+   "default": 0.5,
+   "scales": {
+    "bones": ["shoulderF","shoulderB"],
+    "by": [0.6,1.3] } },
+  {
+   "key": "stoop",
+   "kind": "range",
+   "label": "Stoop",
+   "lo": "Upright",
+   "hi": "Bent",
+   "default": 0.55,
+   "scales": {
+    "bones": ["hip","thiF","thiB","shnF","shnB","legF","legB","legIF","legIB","neck","nape"],
+    "by": [1,0.65] } },
+  {
+   "key": "held",
+   "kind": "choice",
+   "label": "Held",
+   "options": ["cane","lantern","none"],
+   "default": "cane" },
+  {
+   "key": "heldSize",
+   "kind": "range",
+   "label": "Size",
+   "lo": "Small",
+   "hi": "Big",
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "default": 1 },
+  {
+   "key": "beard",
+   "kind": "choice",
+   "label": "Beard",
+   "options": ["long","short","none"],
+   "default": "long" },
+  {
+   "key": "beardLength",
+   "kind": "range",
+   "label": "Length",
+   "lo": "Short",
+   "hi": "Long",
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "default": 1 },
+  {
+   "key": "headgear",
+   "kind": "choice",
+   "label": "Headgear",
+   "options": ["none","cap","circlet"],
+   "default": "none" },
+  {
+   "key": "headgearSize",
+   "kind": "range",
+   "label": "Size",
+   "lo": "Small",
+   "hi": "Big",
+   "min": 0.5,
+   "max": 1.8,
+   "step": 0.05,
+   "default": 1 },
+  {
+   "key": "speed",
+   "standard": "speed" } ],
+ "parts": {
+  "held": {
+   "label": "Held",
+   "params": ["held","heldSize"],
+   "none": "none",
+   "socket": "hand",
+   "shapes": ["cane","lantern"] },
+  "beard": {
+   "label": "Beard",
+   "params": ["beard","beardLength"],
+   "none": "none",
+   "socket": "head",
+   "shapes": ["beard"] },
+  "headgear": {
+   "label": "Headgear",
+   "params": ["headgear","headgearSize"],
+   "none": "none",
+   "socket": "head",
+   "shapes": ["cap","circlet"] } },
+ "clips": {
+  "idle_down": {
+   "from": "idle_down" },
+  "idle_up": {
+   "from": "idle_up" },
+  "idle_side": {
+   "from": "idle_side" },
+  "walk_down": {
+   "from": "walk_down",
+   "sounds": [
+    {"sound":"footstep-grass","frame":0,"preset":"Dirt path","volume":0.45},
+    {"sound":"footstep-grass","frame":4,"preset":"Dirt path","volume":0.45} ] },
+  "walk_up": {
+   "from": "walk_up",
+   "sounds": [
+    {"sound":"footstep-grass","frame":0,"preset":"Dirt path","volume":0.45},
+    {"sound":"footstep-grass","frame":4,"preset":"Dirt path","volume":0.45} ] },
+  "walk_side": {
+   "from": "walk_side",
+   "sounds": [
+    {"sound":"footstep-grass","frame":0,"preset":"Dirt path","volume":0.45},
+    {"sound":"footstep-grass","frame":4,"preset":"Dirt path","volume":0.45} ] },
+  "talk": {
+   "from": "talk" } },
+ "made": {
+  "in": "library",
+  "from": "code:village-elder",
+  "by": "tools/bake-topdown.mjs (B16b)" } }

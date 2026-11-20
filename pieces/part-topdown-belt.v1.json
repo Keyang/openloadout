@@ -1,0 +1,42 @@
+{
+ "format": "loadout-piece",
+ "version": 1,
+ "id": "part:topdown-belt",
+ "v": 1,
+ "name": "Belt",
+ "about": "A belt round the waist in the shadow tone of its colour, on the waist node; worn over a robe or a tunic.",
+ "slots": [
+  {
+   "id": "belt",
+   "label": "Belt",
+   "default": "#9a3a2e",
+   "material": "cloth" } ],
+ "made": {
+  "by": "tools/bake-topdown.mjs",
+  "from": "rigs/topdown.js" },
+ "body": {
+  "draw": [
+   {
+    "id": "belt-down",
+    "kind": "stamp",
+    "at": [-3,-4.5],
+    "rows": ["ccccccccc"],
+    "key": {"c":"belt.dark"},
+    "z": 1,
+    "when": {"direction":["down"]} },
+   {
+    "id": "belt-up",
+    "kind": "stamp",
+    "at": [-3,-4.5],
+    "rows": ["ccccccccc"],
+    "key": {"c":"belt.dark"},
+    "z": 1,
+    "when": {"direction":["up"]} },
+   {
+    "id": "belt-side",
+    "kind": "stamp",
+    "at": [-3,-3.5],
+    "rows": ["cccccccc"],
+    "key": {"c":"belt.dark"},
+    "z": 1,
+    "when": {"direction":["side"]} } ] } }

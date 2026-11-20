@@ -1,0 +1,46 @@
+{
+ "format": "loadout-piece",
+ "version": 1,
+ "id": "part:topdown-hunch",
+ "v": 1,
+ "name": "Stooped back",
+ "about": "The rounded back of a stooped body: a hump behind the neck from the side, shoulders up over the head from behind; on the chest node.",
+ "slots": [
+  {
+   "id": "cloth",
+   "label": "Back",
+   "default": "#8a8f99",
+   "material": "cloth" } ],
+ "args": {
+  "amount": {
+   "type": "share",
+   "lo": 0,
+   "hi": 1,
+   "default": 0.5 } },
+ "made": {
+  "by": "tools/bake-topdown.mjs",
+  "from": "rigs/topdown.js" },
+ "body": {
+  "draw": [
+   {
+    "id": "hump-side",
+    "kind": "ellipse",
+    "at": [2.6,-3.4],
+    "r": [{"from":"amount","map":[[0,2.2],[1,3.6]]},{"from":"amount","map":[[0,1.2],[1,2.8]]}],
+    "paint": "cloth",
+    "z": 2,
+    "when": {"direction":["side"]} },
+   {
+    "id": "shoulders-up",
+    "kind": "poly",
+    "points": [[{"from":"amount","map":[[0,2],[1,2]]},-6.875],[{"from":"amount","map":[[0,2],[0.1481,2],[0.15,1.4332],[1,0.8612]]},-6.6407],[{"from":"amount","map":[[0,2],[0.1481,2],[0.15,0.905],[1,-0.2]]},-5.9539],[{"from":"amount","map":[[0,2],[0.1481,2],[0.15,0.4514],[1,-1.1113]]},-4.8614],[{"from":"amount","map":[[0,2],[0.1481,2],[0.15,0.1034],[1,-1.8105]]},-3.4375],[{"from":"amount","map":[[0,2],[0.1481,2],[0.15,-0.1154],[1,-2.2501]]},-1.7794],[{"from":"amount","map":[[0,2],[0.1481,2],[0.15,-0.19],[1,-2.4]]},0],[{"from":"amount","map":[[0,2],[0.1481,2],[0.15,-0.1154],[1,-2.2501]]},1.7794],[{"from":"amount","map":[[0,2],[0.1481,2],[0.15,0.1034],[1,-1.8105]]},3.4375],[{"from":"amount","map":[[0,2],[0.1481,2],[0.15,0.4514],[1,-1.1113]]},4.8614],[{"from":"amount","map":[[0,2],[0.1481,2],[0.15,0.905],[1,-0.2]]},5.9539],[{"from":"amount","map":[[0,2],[0.1481,2],[0.15,1.4332],[1,0.8612]]},6.6407],[{"from":"amount","map":[[0,2],[1,2]]},6.875]],
+    "paint": "cloth.base",
+    "z": 30,
+    "when": {"direction":["up"]} },
+   {
+    "id": "back-up",
+    "kind": "poly",
+    "points": [[2,-7],[2,7],[{"from":"amount","map":[[0,2],[0.1654,2],[0.1673,3],[0.4981,3],[0.5,4],[0.8327,4],[0.8346,5],[1,5]]},7],[{"from":"amount","map":[[0,2],[0.1654,2],[0.1673,3],[0.4981,3],[0.5,4],[0.8327,4],[0.8346,5],[1,5]]},-7]],
+    "paint": "cloth.base",
+    "z": 30,
+    "when": {"direction":["up"]} } ] } }

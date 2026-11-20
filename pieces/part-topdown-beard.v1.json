@@ -1,0 +1,74 @@
+{
+ "format": "loadout-piece",
+ "version": 1,
+ "id": "part:topdown-beard",
+ "v": 1,
+ "name": "Beard",
+ "about": "A beard over the jaw, long down the chest or short round the chin, facing down and sideways (nothing shows from behind).",
+ "slots": [
+  {
+   "id": "hair",
+   "label": "Beard",
+   "default": "#e8e0c8",
+   "material": "plant" } ],
+ "args": {
+  "kind": {
+   "type": "word",
+   "options": ["long","short"],
+   "default": "long" },
+  "length": {
+   "type": "px",
+   "lo": 0.65,
+   "hi": 1.35,
+   "default": 1 } },
+ "made": {
+  "by": "tools/bake-topdown.mjs",
+  "from": "rigs/topdown.js" },
+ "body": {
+  "draw": [
+   {
+    "id": "jaw-down",
+    "kind": "stamp",
+    "at": [2,-7.5],
+    "rows": [".cc.........aa..","..cccccccccca...","...caaaaaaaa...."],
+    "key": {"a":"hair","c":"hair.dark"},
+    "z": 2,
+    "when": {"direction":["down"]} },
+   {
+    "id": "tail-down",
+    "kind": "poly",
+    "paint": "hair",
+    "z": 1,
+    "when": [{"direction":["down"],"kind":["long"]}],
+    "points": [[5,-5],[5,5],[{"from":"length","map":[[0.65,10],[0.7496,10],[0.751,11],[0.9165,11],[0.9179,12],[1.0821,12],[1.0835,13],[1.249,13],[1.2504,14],[1.35,14]]},1],[{"from":"length","map":[[0.65,10],[0.7496,10],[0.751,11],[0.9165,11],[0.9179,12],[1.0821,12],[1.0835,13],[1.249,13],[1.2504,14],[1.35,14]]},-1]] },
+   {
+    "id": "tuft-down",
+    "kind": "ellipse",
+    "paint": "hair",
+    "z": 1,
+    "when": [{"direction":["down"],"kind":["short"]}],
+    "at": [5.5,0],
+    "r": [{"from":"length","map":[[0.65,1.5],[0.7496,1.5],[0.751,2.5],[1.249,2.5],[1.2504,3.5],[1.35,3.5]]},5] },
+   {
+    "id": "jaw-side",
+    "kind": "stamp",
+    "at": [2,-7.5],
+    "rows": ["................","......ccccccc...","......caaaaa...."],
+    "key": {"a":"hair","c":"hair.dark"},
+    "z": 2,
+    "when": {"direction":["side"]} },
+   {
+    "id": "tail-side",
+    "kind": "poly",
+    "paint": "hair",
+    "z": 1,
+    "when": [{"direction":["side"],"kind":["long"]}],
+    "points": [[5,-1.5],[4.5,6.1],[{"from":"length","map":[[0.65,10],[0.7496,10],[0.751,11],[0.9165,11],[0.9179,12],[1.0821,12],[1.0835,13],[1.249,13],[1.2504,14],[1.35,14]]},3.925],[{"from":"length","map":[[0.65,10],[0.7496,10],[0.751,11],[0.9165,11],[0.9179,12],[1.0821,12],[1.0835,13],[1.249,13],[1.2504,14],[1.35,14]]},1.925]] },
+   {
+    "id": "tuft-side",
+    "kind": "ellipse",
+    "paint": "hair",
+    "z": 1,
+    "when": [{"direction":["side"],"kind":["short"]}],
+    "at": [5.5,2.275],
+    "r": [{"from":"length","map":[[0.65,1.5],[0.7496,1.5],[0.751,2.5],[1.249,2.5],[1.2504,3.5],[1.35,3.5]]},3.9] } ] } }
