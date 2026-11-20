@@ -1,0 +1,96 @@
+{
+ "id": "haze",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "of": "land",
+    "air": "sky.light"
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      0
+     ],
+     "size": [
+      32,
+      32
+     ],
+     "paint": {
+      "rule": "haze",
+      "v": 1,
+      "of": "land",
+      "air": "sky.light",
+      "depth": 0.5
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "of": "land",
+    "air": "sky.light",
+    "depth": 1
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      0
+     ],
+     "size": [
+      32,
+      32
+     ],
+     "paint": {
+      "rule": "haze",
+      "v": 1,
+      "of": "land",
+      "air": "sky.light",
+      "depth": 1
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "of": "leaf.dark",
+    "air": {
+     "rule": "sky.look",
+     "v": 1,
+     "of": "sky",
+     "what": "air"
+    },
+    "depth": 0.4
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      0
+     ],
+     "size": [
+      32,
+      32
+     ],
+     "paint": {
+      "rule": "haze",
+      "v": 1,
+      "of": "leaf.dark",
+      "air": {
+       "rule": "sky.look",
+       "v": 1,
+       "of": "sky",
+       "what": "air"
+      },
+      "depth": 0.4
+     }
+    }
+   ]
+  }
+ ]
+}

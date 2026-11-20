@@ -8,6 +8,7 @@
 //   nodeFrame({ at, turn, mirror, scale })     the frame of a picture node (x right, y down, turned clockwise)
 //   boneFrame(start, angle)                    the frame of a solved bone, exactly as rigs/bones.js places its shapes
 //   paintOf(ref, palette)                      what a paint ref paints: '#rrggbb' (flat), a ramp (three tones) or CLEAR
+//   lostPaints(list, palette)                  the primitives painting a slot flagged `lost` (not drawn): [{ index, slot }]
 //   costOf(prim, w, h), workBudget(w, h)       the work one primitive asks of a frame alone, and a frame's budget
 //   listCost(list, w, h, { palette, shadow })  the work drawList spends on a whole list, exactly (over workBudget: cut)
 //
@@ -47,7 +48,8 @@
 // when the slot is `detail`), '<slot>.light' / '.base' / '.dark' / '.deep' (one tone, flat), '<slot>.far' (farRamp), or
 // a ramp object { base, light, dark }. `palette` maps slot ids to '#rrggbb' or { hex, detail }. Colour rules
 // ({ rule }) are resolved before drawing (engine/resolve.js), not here. One-pixel kinds (dot, line, stamp, text, dither,
-// bands) paint flat: a slot gives its base.
+// bands) paint flat: a slot gives its base. A slot flagged { lost: true } (engine/resolve.js could not work its colour
+// out) names no colour: what it paints is left out and reported, never drawn in whatever hex it holds.
 //
 // HOW IT STAYS PIXEL ART (style guide 1 and 2; docs/studio.md section 4). Shapes are shape tests sampled at pixel
 // centres with hard edges (Surface.fill); nothing is a turned bitmap. A slot ramp gives three tones: a 1 px shadow band
@@ -170,6 +172,7 @@ function slotOf(palette, id) {
   const s = palette[id];
   if (typeof s === 'string') return HEX.test(s) ? { hex: s, detail: false } : null;
   if (isObj(s)) {
+    if (s.lost === true) return null;   // engine/resolve.js could not work its colour out (its flag, never its colour)
     const hex = typeof s.hex === 'string' ? s.hex : s.default;
     return typeof hex === 'string' && HEX.test(hex) ? { hex, detail: s.detail === true } : null;
   }
@@ -205,8 +208,37 @@ export function paintOf(ref, palette = {}, { far = false } = {}) {
 const flat = (p) => (typeof p === 'string' || p === CLEAR ? p : p.base);
 function needPaint(ref, palette, opt) {
   const p = paintOf(ref, palette, opt);
+  if (p === null && lostSlot(ref, palette)) no(`paint ${show(ref)}: its colour could not be worked out (engine/resolve.js flags the slot lost), so it is not drawn`);
   if (p === null) no(ref === undefined ? 'it has no paint' : `paint ${show(ref)} names no colour (a slot of the palette, a slot tone, '#rrggbb', 'ink' or 'clear'; colour rules are resolved before drawing)`);
   return p;
+}
+
+/** The slot a paint ref names ('slot' or 'slot.tone') when the palette flags it `lost` (engine/resolve.js could not work its colour out), else null. */
+function lostSlot(ref, palette) {
+  if (typeof ref !== 'string' || HEX.test(ref)) return null;
+  const id = ref.indexOf('.') < 0 ? ref : ref.slice(0, ref.indexOf('.'));
+  return own(palette, id) && isObj(palette[id]) && palette[id].lost === true ? id : null;
+}
+
+/**
+ * The primitives of a list that paint with a slot whose colour could not be worked out (the palette flags it `lost`;
+ * drawList leaves them out): [{ index, slot }], one per primitive, in list order. Reads paint, a stamp's key, band stops,
+ * a text's outline, and a dither's or a cut's area and shape. For engine/data-sprite.js and the layouts, which make such
+ * a frame an error naming the slot. Arguments: list, palette ({ slot: '#rrggbb' | { hex, lost? } }).
+ */
+export function lostPaints(list, palette = {}) {
+  const out = [];
+  if (!Array.isArray(list) || !isObj(palette)) return out;
+  const find = (p, depth = 0) => {
+    if (!isObj(p) || depth > 6) return null;
+    for (const v of [p.paint, p.kind === 'text' ? p.outline : undefined, ...(isObj(p.key) ? Object.values(p.key) : []), ...(Array.isArray(p.stops) ? p.stops : [])]) {
+      const s = lostSlot(v, palette);
+      if (s) return s;
+    }
+    return find(p.area, depth + 1) ?? find(p.shape, depth + 1);
+  };
+  for (let i = 0; i < list.length && out.length < 200; i++) { const slot = find(list[i]); if (slot) out.push({ index: i, slot }); }
+  return out;
 }
 
 // ---- frames: placing a primitive written in a node's own frame -------------------------------------------------------

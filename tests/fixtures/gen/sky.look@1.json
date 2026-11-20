@@ -1,0 +1,93 @@
+{
+ "id": "sky.look",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "of": "sky"
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      0
+     ],
+     "size": [
+      32,
+      32
+     ],
+     "paint": {
+      "rule": "sky.look",
+      "v": 1,
+      "of": "sky",
+      "time": 0.5,
+      "dark": 0,
+      "what": "band",
+      "at": 0
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "of": "sky",
+    "time": 0,
+    "what": "air"
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      0
+     ],
+     "size": [
+      32,
+      32
+     ],
+     "paint": {
+      "rule": "sky.look",
+      "v": 1,
+      "of": "sky",
+      "time": 0,
+      "dark": 0,
+      "what": "air",
+      "at": 0
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "of": "sky",
+    "time": 1,
+    "dark": 0.5,
+    "what": "band",
+    "at": 0.7
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      0
+     ],
+     "size": [
+      32,
+      32
+     ],
+     "paint": {
+      "rule": "sky.look",
+      "v": 1,
+      "of": "sky",
+      "time": 1,
+      "dark": 0.5,
+      "what": "band",
+      "at": 0.7
+     }
+    }
+   ]
+  }
+ ]
+}

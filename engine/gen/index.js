@@ -15,6 +15,8 @@ import './motion.js';
 import './pictures.js';
 import './ui-pieces.js';
 import './ui.js';
+import './backdrop.js';
+import { BACKDROP_FRAME_GENERATORS } from './backdrop-frame.js';
 
 /** Declares and registers a generator version in the site's registry; returns its frozen entry (engine/gen/registry.js). */
 export { defineGenerator } from './registry.js';
@@ -52,6 +54,7 @@ export const ORIGIN_FIXED = Object.freeze({ 'gem.cut@1': 2, 'glint@1': 2, 'icon.
 
 /** Generators that work in frame pixels by design, never on a node's own coordinates, each with why: "<id>@<v>" -> reason. */
 export const FRAME_GENERATORS = Object.freeze({
+  ...BACKDROP_FRAME_GENERATORS,      // build item B14: backdrops wrap across the layer's width (engine/gen/backdrop.js)
   'pickup.burst@1': 'an effect that keeps its sparkles 3 px inside the frame: name it as an emitter (the pictures layout puts an emitter on its node\'s frame first), not in a draw list on a node',
   'chunks@1': 'an effect whose floor row and box are frame rows and columns: name it as an emitter, not in a draw list on a node',
   'icon.fit@1': 'lays out a whole icon centred in the frame: an icon set\'s fit, never drawn on a node',

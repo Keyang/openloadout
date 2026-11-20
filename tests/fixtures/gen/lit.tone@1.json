@@ -1,0 +1,86 @@
+{
+ "id": "lit.tone",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "of": "rock",
+    "air": "sky.light"
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      0
+     ],
+     "size": [
+      32,
+      32
+     ],
+     "paint": {
+      "rule": "lit.tone",
+      "v": 1,
+      "of": "rock",
+      "air": "sky.light",
+      "amount": 0.4
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "of": "rock",
+    "air": "sky.light",
+    "amount": 0.55
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      0
+     ],
+     "size": [
+      32,
+      32
+     ],
+     "paint": {
+      "rule": "lit.tone",
+      "v": 1,
+      "of": "rock",
+      "air": "sky.light",
+      "amount": 0.55
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "of": "star",
+    "air": "void",
+    "amount": 0.3
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      0
+     ],
+     "size": [
+      32,
+      32
+     ],
+     "paint": {
+      "rule": "lit.tone",
+      "v": 1,
+      "of": "star",
+      "air": "void",
+      "amount": 0.3
+     }
+    }
+   ]
+  }
+ ]
+}

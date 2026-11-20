@@ -32,7 +32,7 @@ import { sheetCell, cellFrames, sheetPng, SHEET_COLOURS } from './lib/data-sheet
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 /** Families whose generators are not drawn as a call in a draw list. */
-export const NOT_DRAWN = Object.freeze({ layout: 'lays out a whole body', motion: 'moves nodes over a clip' });
+export const NOT_DRAWN = Object.freeze({ layout: 'lays out a whole body', motion: 'moves nodes over a clip', colour: 'is a colour rule, worked out where a paint names it (B14)' });
 const PHASES = 4;
 
 /** The entry of "<id>" (newest version) or "<id>@<v>": { entry } or { error } naming what is known. */

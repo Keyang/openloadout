@@ -1,0 +1,113 @@
+{
+ "id": "disc",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     70,
+     12
+    ],
+    "r": 6,
+    "paint": "sun"
+   },
+   "ctx": {
+    "size": [
+     96,
+     48
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "ellipse",
+     "at": [
+      70,
+      12
+     ],
+     "r": [
+      6,
+      6
+     ],
+     "paint": "sun",
+     "shade": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     94,
+     20
+    ],
+    "r": 5,
+    "paint": "moon"
+   },
+   "ctx": {
+    "size": [
+     96,
+     48
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "ellipse",
+     "at": [
+      94,
+      20
+     ],
+     "r": [
+      5,
+      5
+     ],
+     "paint": "moon",
+     "shade": 0
+    },
+    {
+     "kind": "ellipse",
+     "at": [
+      -2,
+      20
+     ],
+     "r": [
+      5,
+      5
+     ],
+     "paint": "moon",
+     "shade": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     1,
+     20
+    ],
+    "r": 4,
+    "wrap": false,
+    "paint": "moon"
+   },
+   "ctx": {
+    "size": [
+     96,
+     48
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "ellipse",
+     "at": [
+      1,
+      20
+     ],
+     "r": [
+      4,
+      4
+     ],
+     "paint": "moon",
+     "shade": 0
+    }
+   ]
+  }
+ ]
+}

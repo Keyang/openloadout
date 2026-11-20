@@ -1,0 +1,245 @@
+{
+ "id": "sky.bands",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "paint": {
+     "rule": "sky.look",
+     "v": 1,
+     "of": "sky",
+     "time": 0.5
+    },
+    "bands": 4,
+    "horizon": 30
+   },
+   "ctx": {
+    "size": [
+     96,
+     48
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      0
+     ],
+     "size": [
+      96,
+      10
+     ],
+     "paint": {
+      "rule": "sky.look",
+      "v": 1,
+      "of": "sky",
+      "time": 0.5,
+      "at": 0
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      10
+     ],
+     "size": [
+      96,
+      10
+     ],
+     "paint": {
+      "rule": "sky.look",
+      "v": 1,
+      "of": "sky",
+      "time": 0.5,
+      "at": 0.3333333333333333
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      20
+     ],
+     "size": [
+      96,
+      10
+     ],
+     "paint": {
+      "rule": "sky.look",
+      "v": 1,
+      "of": "sky",
+      "time": 0.5,
+      "at": 0.6666666666666666
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      30
+     ],
+     "size": [
+      96,
+      18
+     ],
+     "paint": {
+      "rule": "sky.look",
+      "v": 1,
+      "of": "sky",
+      "time": 0.5,
+      "at": 1
+     },
+     "shade": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "paint": "sky",
+    "bands": 3,
+    "horizon": 28
+   },
+   "ctx": {
+    "size": [
+     96,
+     48
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      0
+     ],
+     "size": [
+      96,
+      14
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": "sky",
+      "by": -0.6
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      14
+     ],
+     "size": [
+      96,
+      14
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": "sky",
+      "by": -0.1
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      28
+     ],
+     "size": [
+      96,
+      20
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": "sky",
+      "by": 0.4
+     },
+     "shade": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "paint": {
+     "rule": "space.look",
+     "v": 1,
+     "of": "sky",
+     "deep": "void"
+    },
+    "bands": 3,
+    "horizon": 32
+   },
+   "ctx": {
+    "size": [
+     96,
+     48
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      0
+     ],
+     "size": [
+      96,
+      16
+     ],
+     "paint": {
+      "rule": "space.look",
+      "v": 1,
+      "of": "sky",
+      "deep": "void",
+      "at": 0
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      16
+     ],
+     "size": [
+      96,
+      16
+     ],
+     "paint": {
+      "rule": "space.look",
+      "v": 1,
+      "of": "sky",
+      "deep": "void",
+      "at": 0.5
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      32
+     ],
+     "size": [
+      96,
+      16
+     ],
+     "paint": {
+      "rule": "space.look",
+      "v": 1,
+      "of": "sky",
+      "deep": "void",
+      "at": 1
+     },
+     "shade": 0
+    }
+   ]
+  }
+ ]
+}

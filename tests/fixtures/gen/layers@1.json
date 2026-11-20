@@ -1,0 +1,22 @@
+{
+ "id": "layers",
+ "v": 1,
+ "family": "layout",
+ "fixtures": [
+  "bg-forest.json",
+  "layers/bg-starfield.json",
+  "layers/bg-forest-wide.json"
+ ],
+ "frames": {
+  "bg-forest.json far 0": "1a313c6b",
+  "bg-forest.json mid 0": "9b20e6fb",
+  "layers/bg-starfield.json far 0": "12de3258",
+  "layers/bg-starfield.json mid 0": "aee1e549",
+  "layers/bg-starfield.json mid 4": "92e347d3",
+  "layers/bg-starfield.json mid 7": "e3bc9223",
+  "layers/bg-starfield.json near 0": "8371e008",
+  "layers/bg-forest-wide.json far 0": "062889cb",
+  "layers/bg-forest-wide.json mid 0": "4e5ad431",
+  "layers/bg-forest-wide.json near 0": "f22b7362"
+ }
+}

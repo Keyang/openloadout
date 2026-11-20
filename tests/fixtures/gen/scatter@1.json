@@ -1,0 +1,355 @@
+{
+ "id": "scatter",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "count": 4,
+    "seed": 12,
+    "stable": true,
+    "rows": [
+     8,
+     30
+    ],
+    "wrap": true,
+    "place": {
+     "kind": "rect",
+     "size": [
+      3,
+      2
+     ],
+     "paint": "cloud"
+    }
+   },
+   "ctx": {
+    "size": [
+     96,
+     48
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "size": [
+      3,
+      2
+     ],
+     "paint": "cloud",
+     "at": [
+      13,
+      30
+     ]
+    },
+    {
+     "kind": "rect",
+     "size": [
+      3,
+      2
+     ],
+     "paint": "cloud",
+     "at": [
+      36,
+      14
+     ]
+    },
+    {
+     "kind": "rect",
+     "size": [
+      3,
+      2
+     ],
+     "paint": "cloud",
+     "at": [
+      50,
+      13
+     ]
+    },
+    {
+     "kind": "rect",
+     "size": [
+      3,
+      2
+     ],
+     "paint": "cloud",
+     "at": [
+      72,
+      18
+     ]
+    }
+   ]
+  },
+  {
+   "args": {
+    "count": 3,
+    "seed": 5,
+    "rows": [
+     10,
+     20
+    ],
+    "place": {
+     "gen": "disc",
+     "v": 1,
+     "r": 3,
+     "paint": "sun"
+    }
+   },
+   "ctx": {
+    "size": [
+     96,
+     48
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "ellipse",
+     "at": [
+      13,
+      14
+     ],
+     "r": [
+      3,
+      3
+     ],
+     "paint": "sun",
+     "shade": 0
+    },
+    {
+     "kind": "ellipse",
+     "at": [
+      42,
+      12
+     ],
+     "r": [
+      3,
+      3
+     ],
+     "paint": "sun",
+     "shade": 0
+    },
+    {
+     "kind": "ellipse",
+     "at": [
+      82,
+      17
+     ],
+     "r": [
+      3,
+      3
+     ],
+     "paint": "sun",
+     "shade": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "count": 6,
+    "seed": 13,
+    "jitter": 0.8,
+    "rows": [
+     40,
+     43
+    ],
+    "drift": 8,
+    "show": 0.75,
+    "wrap": true,
+    "place": {
+     "kind": "rect",
+     "size": [
+      3,
+      2
+     ],
+     "paint": "dust"
+    }
+   },
+   "ctx": {
+    "size": [
+     96,
+     48
+    ],
+    "t": 0.25
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "size": [
+      3,
+      2
+     ],
+     "paint": "dust",
+     "at": [
+      27,
+      42
+     ]
+    },
+    {
+     "kind": "rect",
+     "size": [
+      3,
+      2
+     ],
+     "paint": "dust",
+     "at": [
+      45,
+      41
+     ]
+    },
+    {
+     "kind": "rect",
+     "size": [
+      3,
+      2
+     ],
+     "paint": "dust",
+     "at": [
+      57,
+      41
+     ]
+    },
+    {
+     "kind": "rect",
+     "size": [
+      3,
+      2
+     ],
+     "paint": "dust",
+     "at": [
+      82,
+      41
+     ]
+    }
+   ]
+  },
+  {
+   "args": {
+    "count": 5,
+    "seed": 2,
+    "margin": 4,
+    "gap": 10,
+    "wrap": false,
+    "rows": [
+     4,
+     28
+    ],
+    "place": {
+     "kind": "dot",
+     "size": 2,
+     "paint": "soil.dark"
+    }
+   },
+   "ctx": {
+    "size": [
+     32,
+     32
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "dot",
+     "size": 2,
+     "paint": "soil.dark",
+     "at": [
+      6,
+      13
+     ]
+    },
+    {
+     "kind": "dot",
+     "size": 2,
+     "paint": "soil.dark",
+     "at": [
+      11,
+      24
+     ]
+    },
+    {
+     "kind": "dot",
+     "size": 2,
+     "paint": "soil.dark",
+     "at": [
+      14,
+      5
+     ]
+    },
+    {
+     "kind": "dot",
+     "size": 2,
+     "paint": "soil.dark",
+     "at": [
+      21,
+      25
+     ]
+    },
+    {
+     "kind": "dot",
+     "size": 2,
+     "paint": "soil.dark",
+     "at": [
+      26,
+      13
+     ]
+    }
+   ]
+  },
+  {
+   "args": {
+    "count": 3,
+    "seed": 41,
+    "margin": 4,
+    "gap": 10,
+    "place": {
+     "kind": "rect",
+     "size": [
+      2,
+      2
+     ],
+     "paint": "soil.dark"
+    }
+   },
+   "ctx": {
+    "size": [
+     32,
+     32
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "size": [
+      2,
+      2
+     ],
+     "paint": "soil.dark",
+     "at": [
+      7,
+      7
+     ]
+    },
+    {
+     "kind": "rect",
+     "size": [
+      2,
+      2
+     ],
+     "paint": "soil.dark",
+     "at": [
+      16,
+      27
+     ]
+    },
+    {
+     "kind": "rect",
+     "size": [
+      2,
+      2
+     ],
+     "paint": "soil.dark",
+     "at": [
+      23,
+      13
+     ]
+    }
+   ]
+  }
+ ]
+}

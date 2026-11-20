@@ -305,6 +305,7 @@ export function defaultParams(sprite) {
 /** Fill in missing keys and clamp out-of-range values. */
 export function cleanParams(sprite, input = {}) {
   const p = defaultParams(sprite);
+  input = renamedParams(sprite, input);
   for (const [k, d] of Object.entries(sprite.params)) {
     const v = input[k];
     if (v === undefined || v === null) continue;
@@ -318,6 +319,20 @@ export function cleanParams(sprite, input = {}) {
     else if (d.kind === 'color') { if (/^#[0-9a-f]{6}$/i.test(v)) p[k] = v.toLowerCase(); }
   }
   return p;
+}
+
+// Settings saved under a control's old key, read under its new one: a sprite-level `was: { controls: { oldKey: newKey } }`
+// (docs/data-sprites.md section 7, build item B4). The new key wins when both are given; anything else passes as it was.
+function renamedParams(sprite, input) {
+  const map = sprite?.was?.controls;
+  if (!map || typeof map !== 'object' || Array.isArray(map) || !input || typeof input !== 'object') return input;
+  const out = { ...input };
+  for (const [old, now] of Object.entries(map)) {
+    if (typeof now !== 'string' || !Object.hasOwn(sprite.params, now) || Object.hasOwn(sprite.params, old) || !Object.hasOwn(out, old)) continue;
+    if (out[now] === undefined || out[now] === null) out[now] = out[old];
+    delete out[old];
+  }
+  return out;
 }
 
 /** A random but good-looking parameter set: colours come from the curated swatches. */

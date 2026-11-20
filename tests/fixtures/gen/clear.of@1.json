@@ -1,0 +1,116 @@
+{
+ "id": "clear.of",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "of": "rock",
+    "behind": [
+     "sky"
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      0
+     ],
+     "size": [
+      32,
+      32
+     ],
+     "paint": {
+      "rule": "clear.of",
+      "v": 1,
+      "of": "rock",
+      "behind": [
+       "sky"
+      ],
+      "also": [
+       "clear"
+      ],
+      "step": 0.08,
+      "way": "auto",
+      "floor": 0
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "of": "land",
+    "behind": [
+     "void",
+     "sky"
+    ],
+    "way": "lighter",
+    "step": 0.06
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      0
+     ],
+     "size": [
+      32,
+      32
+     ],
+     "paint": {
+      "rule": "clear.of",
+      "v": 1,
+      "of": "land",
+      "behind": [
+       "void",
+       "sky"
+      ],
+      "also": [
+       "clear"
+      ],
+      "step": 0.06,
+      "way": "lighter",
+      "floor": 0
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "of": "land.dark",
+    "behind": [
+     "land"
+    ],
+    "floor": 0.19
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      0
+     ],
+     "size": [
+      32,
+      32
+     ],
+     "paint": {
+      "rule": "clear.of",
+      "v": 1,
+      "of": "land.dark",
+      "behind": [
+       "land"
+      ],
+      "also": [
+       "clear"
+      ],
+      "step": 0.08,
+      "way": "auto",
+      "floor": 0.19
+     }
+    }
+   ]
+  }
+ ]
+}

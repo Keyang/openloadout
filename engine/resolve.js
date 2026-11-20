@@ -31,9 +31,11 @@
 //   { ok, errors, warnings, version, id, name, meta, size, pivot, grounded, styles, preview, rev, made,
 //     params      every setting as used (cleanSettings), notes (what cleaning did), active (controls in effect),
 //     partsOff    names of the parts that are off,
-//     palette     { slot: { hex, detail, material, derived?, piece?, slot? } }: the sprite's slots and the slots a piece's
-//                 colour needed (a tone or a rule mapped to a piece slot, or a piece slot's default), each a slot of
-//                 its own so its tones work; engine/draw-list.js takes it as its palette,
+//     palette     { slot: { hex, detail, material, derived?, piece?, slot?, lost? } }: the sprite's slots and the slots a
+//                 piece's colour needed (a tone or a rule mapped to a piece slot, or a piece slot's default), each a slot
+//                 of its own so its tones work; engine/draw-list.js takes it as its palette. lost: true marks a slot
+//                 whose colour could not be worked out (its hex is FALLBACK only as a stand-in; never test the colour),
+//     lost        the ids of the palette's lost slots (engine/data-sprite.js makes a frame painting one an error),
 //     materials   { rest, slots: { slot: material } } (Contract 7 read from the data; materialTable gives theme.js's form),
 //     scales      { bones: { id: factor }, shapes: { id: factor } },
 //     body        { kind, <kind>: the body resolved } (kind: rig, tiles, layers, panel, emitters, pictures), base (the
@@ -49,9 +51,10 @@
 // pieces, slots added), and a cap reached is an error, never a hang. Every function returns plain data and never throws.
 // Deterministic: no clock, no randomness; the same definition and settings give the same result.
 // Pure JavaScript with no page, worker or Node in it: the site, the build and the tests all import this file.
-import { paintColour, COLOUR_RULES, FALLBACK } from './data-rules.js';
+import { paintColour, COLOUR_RULES, FALLBACK, whenMatches } from './data-rules.js';
 import { ramp, farRamp, INK, hexToRgb } from './color.js';
 import { lerp } from './motion.js';
+import { lostPaints } from './draw-list.js';
 import { restMaterial } from './materials.js';
 import { parsePieceRef, pieceRegistry } from './pieces.js';
 import { validateSprite, plainSpriteData } from '../catalog/sprite-schema.js';
@@ -394,26 +397,37 @@ export function bindingValue(binding, params = {}, table = {}) {
 
 // ---- colours ---------------------------------------------------------------------------------------------------
 
-/** One palette entry's colour: { hex } from a palette entry, a '#rrggbb' string, or null. */
+/** One palette entry's colour: { hex } from a palette entry, a '#rrggbb' string, or null (also for an entry flagged lost: its colour was never worked out). */
 const slotHex = (palette, id) => {
   if (!isObj(palette) || !Object.hasOwn(palette, id) || BAD_KEYS.has(id)) return null;
   const s = palette[id];
+  if (isObj(s) && s.lost === true) return null;
   return lower(typeof s === 'string' ? s : isObj(s) ? s.hex : null);
 };
 
-/** A colour rule with every colour argument a '#rrggbb' (paint refs and nested rules worked out) and every bound number a number, ready for engine/data-rules.js paintColour. */
+/**
+ * A colour rule with every colour argument a '#rrggbb' (paint refs and nested rules worked out) and every bound number a
+ * number, ready for engine/data-rules.js paintColour; null when a colour it reads cannot be worked out here (a framework
+ * colour rule inside it, a slot the palette has not got, clear, a colour or a list of colours missing), so it is never
+ * worked out with engine/data-rules.js's magenta standing in for that colour.
+ */
 function ruleWithColours(rule, palette, params, T, depth) {
   const spec = COLOUR_RULES[rule.rule].args;
   const out = { rule: rule.rule };
+  let lost = false;
+  const hex = (x) => { const h = hexOf(x, palette, params, T, depth + 1); if (!h) lost = true; return h; };
   for (const [name, a] of Object.entries(spec)) {
     const v = rule[name];
-    if (v === undefined) continue;
-    if (a.kind === 'colour') out[name] = hexOf(v, palette, params, T, depth + 1) ?? FALLBACK;
-    else if (a.kind === 'colours') out[name] = Array.isArray(v) ? v.slice(0, 8).map((x) => (Array.isArray(x) ? [hexOf(x[0], palette, params, T, depth + 1) ?? FALLBACK, fin(x[1]) ? x[1] : 0.15] : hexOf(x, palette, params, T, depth + 1) ?? FALLBACK)) : v;
-    else if (a.kind === 'number') out[name] = isBindingIn(v, T) ? bindingValue(v, params, T) : v;
+    if (v === undefined) { if (a.kind === 'colour' || a.kind === 'colours') lost = true; continue; }
+    if (a.kind === 'colour') out[name] = hex(v);
+    else if (a.kind === 'colours') {
+      if (!Array.isArray(v) || !v.length) lost = true;
+      else out[name] = v.slice(0, 8).map((x) => (Array.isArray(x) ? [hex(x[0]), fin(x[1]) ? x[1] : 0.15] : hex(x)));
+    } else if (a.kind === 'number') out[name] = isBindingIn(v, T) ? bindingValue(v, params, T) : v;
     else out[name] = clone(v);
+    if (lost) return null;
   }
-  return out;
+  return lost ? null : out;
 }
 
 function hexOf(ref, palette, params, T, depth = 0) {
@@ -435,7 +449,10 @@ function hexOf(ref, palette, params, T, depth = 0) {
   if (isObj(ref) && T && isBindingIn(ref, T)) return hexOf(bindingValue(ref, params, T), palette, params, T, depth + 1);
   if (isObj(ref) && typeof ref.rule === 'string') {
     if (!Object.hasOwn(COLOUR_RULES, ref.rule)) return null;
-    return lower(paintColour(ruleWithColours(ref, palette, params, T, depth), params)) ?? null;
+    // choose reads only the branch the settings take (as engine/data-rules.js does), so the other may be anything
+    if (ref.rule === 'choose') return hexOf(whenMatches(isObj(ref.when) || Array.isArray(ref.when) ? ref.when : { '': [] }, isObj(params) ? params : {}) ? ref.then : ref.else, palette, params, T, depth + 1);
+    const r = ruleWithColours(ref, palette, params, T, depth);
+    return r ? lower(paintColour(r, params)) ?? null : null;
   }
   return null;
 }
@@ -444,7 +461,8 @@ function hexOf(ref, palette, params, T, depth = 0) {
  * The colour a paint gives at these settings, '#rrggbb' (lowercase): a palette slot, a tone of one ("gold.dark",
  * light, base, dark, deep, far as engine/draw-list.js gives them), ink, a colour written out, or a colour rule of
  * engine/data-rules.js (choose reads the settings). null for clear, a slot the palette has not, or a rule this module
- * cannot work out (a registry colour rule). Arguments: ref, palette ({ slot: { hex } | '#rrggbb' }), params.
+ * cannot work out: a registry colour rule, or a data-rules rule holding a colour it cannot work out anywhere inside
+ * (never a colour worked out with magenta standing in). Arguments: ref, palette ({ slot: { hex } | '#rrggbb' }), params.
  */
 export function paintHex(ref, palette = {}, params = {}) {
   try { return hexOf(ref, palette, params, null, 0); } catch { return null; }
@@ -464,9 +482,11 @@ function ruleRefs(rule, out = [], depth = 0) {
 }
 
 /**
- * The palette at these settings: { slot: { hex, detail, material, derived?, label? } }. A slot with a colour setting
+ * The palette at these settings: { slot: { hex, detail, material, derived?, label?, lost? } }. A slot with a colour setting
  * takes the person's colour, a detail slot its default, a derived slot its colour rule (engine/data-rules.js, in the
- * order the rules need each other) and, when it names none, the material of the first slot its rule reads.
+ * order the rules need each other) and, when it names none, the material of the first slot its rule reads. A slot
+ * whose colour cannot be worked out (a rule it cannot work out, a loop, no default) is flagged lost: true, with the
+ * hex FALLBACK only so old readers still get a colour: a lost colour is told by the flag, never by its colour.
  * Never throws. Arguments: def, params (settings; those left out take their defaults).
  */
 export function resolvePalette(def, params = {}) {
@@ -483,6 +503,7 @@ export function resolvePalette(def, params = {}) {
       if (s.derive !== undefined) { e.derived = true; out[s.id] = e; pending.push(s); continue; }
       const own = T.get(s.id)?.kind === 'colour' ? lower(p[s.id]) : null;
       e.hex = own ?? lower(s.default) ?? FALLBACK;
+      if (!own && !lower(s.default)) e.lost = true;
       out[s.id] = e;
     }
     const done = new Set(Object.keys(out).filter((k) => !out[k].derived));
@@ -491,13 +512,15 @@ export function resolvePalette(def, params = {}) {
         const s = pending[i];
         const needs = ruleRefs(s.derive).filter((r) => Object.hasOwn(out, r));
         if (!needs.every((r) => done.has(r))) continue;
-        out[s.id].hex = hexOf(s.derive, out, p, T, 0) ?? FALLBACK;
+        const hex = hexOf(s.derive, out, p, T, 0);
+        out[s.id].hex = hex ?? FALLBACK;
+        if (!hex) out[s.id].lost = true;
         if (!out[s.id].material) out[s.id].material = needs.map((r) => out[r].material).find(Boolean) ?? null;
         done.add(s.id);
         pending.splice(i--, 1);
       }
     }
-    for (const s of pending) out[s.id].hex = FALLBACK;
+    for (const s of pending) { out[s.id].hex = FALLBACK; out[s.id].lost = true; }
   } catch { /* what was worked out stands */ }
   return out;
 }
@@ -626,7 +649,7 @@ function bareRef(S, target, { ref, slot, material }) {
   if (S.synth.has(key)) return S.synth.get(key);
   if (S.synth.size >= L.slots) throw new Stop(`pieces need more than ${L.slots} colours of their own; at most ${L.slots}`);
   const id = freshSlot(S, slot);
-  S.palette[id] = { hex: hex ?? FALLBACK, detail: false, material: mat, derived: true, piece: ref, slot };
+  S.palette[id] = { hex: hex ?? FALLBACK, detail: false, material: mat, derived: true, piece: ref, slot, ...(hex ? {} : { lost: true }) };
   S.synth.set(key, id);
   return id;
 }
@@ -1010,7 +1033,7 @@ export function resolveSprite(def, settings = {}, opts = {}) {
       preview: typeof d.preview === 'string' && Object.hasOwn(clips, d.preview) ? d.preview : Object.keys(clips)[0] ?? null,
       rev: d.rev ?? null, made: clone(d.made) ?? null,
       params, notes, active: activeSettings(d, params), partsOff: [...off],
-      palette, materials, scales: scalesOf(T, params),
+      palette, lost: Object.keys(palette).filter((k) => palette[k].lost === true), materials, scales: scalesOf(T, params),
       body: { kind, [kind]: body }, base, pieces: [...S.used].sort(),
       clips, points: extra('points'), slice: extra('slice'), textArea: extra('textArea'),
     };
@@ -1068,7 +1091,8 @@ const CTX_KEYS = ['t', 'frame', 'frames', 'loop', 'size', 'clip', 'direction'];
 /**
  * Every paint of a primitive that is a colour rule worked out to a palette slot of its own (ruleSlot: shaded with its
  * ramp, its source's material): paint, a stamp's key, band stops, a text's outline, areas and shapes inside. A rule this
- * module cannot work out is left as it is (frame false: the frame may) or drawn magenta with a warning (frame true).
+ * module cannot work out is left as it is (frame false: the frame may) or, in a frame, painted FALLBACK with a warning
+ * and listed in S.lost ({ rule }), so the frame reports it by that list, never by the colour.
  */
 function finishPaints(S, p, depth = 0, frame = true) {
   if (!isObj(p) || depth > 6) return p;
@@ -1078,6 +1102,7 @@ function finishPaints(S, p, depth = 0, frame = true) {
     if (h) return ruleSlot(S, v, h);
     if (!frame) return v;
     S.warn(`the colour rule "${String(v.rule).slice(0, 40)}" cannot be worked out here; it is drawn magenta`);
+    if (Array.isArray(S.lost) && !S.lost.some((x) => x.index === S.at && x.rule === String(v.rule).slice(0, 40))) S.lost.push({ index: S.at, rule: String(v.rule).slice(0, 40) });
     return FALLBACK;
   };
   const out = { ...p };
@@ -1095,13 +1120,14 @@ function finishPaints(S, p, depth = 0, frame = true) {
  * expandList: checked, budgeted, its node and z carried), every piece a generator placed drawn in, every colour rule
  * left in a paint worked out to '#rrggbb'. The result is what engine/draw-list.js draws (with `palette`). Never
  * throws. Returns { ok, primitives, errors, warnings, cost, palette (the resolved palette plus any slot a placed piece
- * needed) }. Arguments: resolved (resolveSprite's result), list, ctx ({ t, frame, frames, loop, size, clip, direction },
+ * needed), lost ([{ index, rule } | { index, slot }]: each primitive painting a colour that could not be worked out, a
+ * colour rule this module cannot work out or a slot the palette flags lost; empty when every colour was) }. Arguments: resolved (resolveSprite's result), list, ctx ({ t, frame, frames, loop, size, clip, direction },
  * all optional; size defaults to the sprite's), opts { generators (default: resolveSprite's when it can run, else the
  * site's), pieces (default: resolveSprite's), budget }.
  */
 export function expandFrame(resolved, list, ctx = {}, opts = {}) {
   const warnings = [];
-  const fail = (errors) => ({ ok: false, primitives: [], errors: errors.slice(0, 50), warnings, cost: 0, palette: resolved?.palette ?? {} });
+  const fail = (errors) => ({ ok: false, primitives: [], errors: errors.slice(0, 50), warnings, cost: 0, palette: resolved?.palette ?? {}, lost: [] });
   try {
     if (!isObj(resolved) || resolved.ok !== true) return fail(['nothing to expand: the sprite was not resolved']);
     if (!Array.isArray(list)) return fail(['a draw list is a list of primitives and generator calls']);
@@ -1140,8 +1166,11 @@ export function expandFrame(resolved, list, ctx = {}, opts = {}) {
     if (todo) return fail([`pieces and generators nest more than ${L.pieceDepth} deep`]);
     if (done.length > L.list) return fail([`the frame holds more than ${L.list} primitives; at most ${L.list}`]);
     for (const [id, s] of Object.entries(palette)) if (s && s.rule && lower(s.hex)) S.synth.set(`rule|${lower(s.hex)}|${s.material ?? null}`, id);   // the rule slots resolveSprite made
-    const primitives = done.map((p) => finishPaints(S, p, 0, true));
-    return { ok: true, primitives, errors: [], warnings, cost, palette };
+    S.lost = [];
+    const primitives = done.map((p, i) => { S.at = i; return finishPaints(S, p, 0, true); });
+    // what could not be worked out, by flag: rules (above) and slots the palette flags lost that a primitive paints
+    const lost = [...S.lost, ...lostPaints(primitives, palette)].sort((a, b) => a.index - b.index).slice(0, 50);
+    return { ok: true, primitives, errors: [], warnings, cost, palette, lost };
   } catch (e) {
     return fail([e instanceof Stop ? msg(e) : `the frame could not be expanded: ${msg(e)}`]);
   }

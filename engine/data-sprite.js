@@ -123,7 +123,7 @@ import { compileKeys, sampleKeys, framePhase, frameOfPhase } from '../rigs/keypo
 import { drawRig, solveRig, rigPoints, drawResolvedRig, resolvedRigList, resolvedRigPoints } from '../rigs/bones.js';
 import { validateSprite, parseSpriteJson } from '../catalog/sprite-schema.js';
 import { resolveSprite, expandFrame, sceneItems, materialTable, paintHex, settingTable } from './resolve.js';
-import { drawList, placeOn, nodeFrame } from './draw-list.js';
+import { drawList, placeOn, nodeFrame, lostPaints } from './draw-list.js';
 import { pieceRegistry, sitePieces } from './pieces.js';
 import { swatches as paletteSwatches } from './palettes.js';
 import { MATERIAL_IDS } from './materials.js';
@@ -621,8 +621,16 @@ function expanded(R, list, ctx, gen, warn) {
   if (!list.length) return { primitives: [], palette: R.palette };
   const x = expandFrame(R, list, ctx, { generators: gen });
   if (!x.ok) throw new Error(`sprite ${R.id}, clip ${ctx.clip} frame ${ctx.frame}: ${x.errors.slice(0, 6).join('; ')}`);
+  if (x.lost?.length) throw new Error(`sprite ${R.id}, clip ${ctx.clip} frame ${ctx.frame}: ${lostText(x.lost)}`);
   for (const w of x.warnings) warn(w);
   return x;
+}
+
+/** Why a frame is refused: the colours engine/resolve.js could not work out ([{ rule } | { slot }], its `lost` flags, never told by colour). */
+function lostText(lost) {
+  const one = (x) => (x.rule ? `the colour rule "${String(x.rule).slice(0, 40)}"` : `colour "${String(x.slot).slice(0, 40)}"`);
+  const names = [...new Set(lost.slice(0, 4).map(one))].join(', ');
+  return `${names} cannot be worked out (a framework colour rule inside a rule on a shape outside a layers body, a slot it names that is missing, or a colour derived from one); it would be drawn magenta, so the frame is refused`;
 }
 
 // -- the rig body: rigs/bones.js draws it (build item B5's entry points drawResolvedRig, resolvedRigPoints, resolvedRigList) --
@@ -646,7 +654,7 @@ function bonesOf(rig) {
 /** What rigs/bones.js drawResolvedRig and resolvedRigPoints take besides the pose: the frame's scene, what a generator sees, and the expand hook (engine/resolve.js expandFrame bound to the resolved sprite). */
 const rigCtx = (R, c, clip, t, frame, gen) => ({
   clip, t, frame, frames: c.frames, loop: c.loop !== false,
-  expand: (list, ctx) => expandFrame(R, list, ctx, { generators: gen }),
+  expand: (list, ctx) => { const x = expandFrame(R, list, ctx, { generators: gen }); return x.ok && x.lost?.length ? { ...x, ok: false, errors: [lostText(x.lost)] } : x; },
 });
 
 /** Draws one frame of a rig body onto g through rigs/bones.js drawResolvedRig; throws when a generator or piece could not be drawn. */
@@ -664,6 +672,8 @@ function rigFrame(R, c, clip, t, frame, gen, warn) {
   const r = resolvedRigList(R, poseV2(c, t, frame), rigCtx(R, c, clip, t, frame, gen));
   if (r.error) throw new Error(`sprite ${R.id}, clip ${clip} frame ${frame}: ${r.error}`);
   if (r.errors.length) throw new Error(`sprite ${R.id}, clip ${clip} frame ${frame}: ${r.errors.slice(0, 6).join('; ')}`);
+  const lost = lostPaints(r.list, R.palette);
+  if (lost.length) throw new Error(`sprite ${R.id}, clip ${clip} frame ${frame}: ${lostText(lost)}`);
   for (const s of r.skipped) warn(`"${s.id ?? s.kind}" was left out: ${s.why}`);
   return { list: r.list, palette: r.palette };
 }
@@ -877,6 +887,8 @@ function layoutFrame(L, R, c, clip, t, frame, gen, warn) {
     throw new FrameError(`${where}: the ${L.kind} layout failed: ${String(e?.message ?? e).slice(0, 300)}`);
   }
   if (!isObj(out) || !Array.isArray(out.list)) throw new FrameError(`${where}: the ${L.kind} layout gave no draw list`);
+  const lost = lostPaints(out.list, isObj(out.palette) ? out.palette : R.palette);
+  if (lost.length) throw new FrameError(`${where}: ${lostText(lost)}`);
   return {
     list: withFlash(out.list, pose.flash), palette: isObj(out.palette) ? out.palette : R.palette,
     frames: out.frames instanceof Map ? out.frames : new Map(), offset: pairOr0(out.offset),

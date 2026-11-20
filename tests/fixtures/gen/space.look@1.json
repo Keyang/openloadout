@@ -1,0 +1,89 @@
+{
+ "id": "space.look",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "of": "sky",
+    "deep": "void"
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      0
+     ],
+     "size": [
+      32,
+      32
+     ],
+     "paint": {
+      "rule": "space.look",
+      "v": 1,
+      "of": "sky",
+      "deep": "void",
+      "what": "band",
+      "at": 0
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "of": "sky",
+    "deep": "void",
+    "at": 1
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      0
+     ],
+     "size": [
+      32,
+      32
+     ],
+     "paint": {
+      "rule": "space.look",
+      "v": 1,
+      "of": "sky",
+      "deep": "void",
+      "what": "band",
+      "at": 1
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "of": "sky",
+    "deep": "void",
+    "what": "air"
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      0
+     ],
+     "size": [
+      32,
+      32
+     ],
+     "paint": {
+      "rule": "space.look",
+      "v": 1,
+      "of": "sky",
+      "deep": "void",
+      "what": "air",
+      "at": 0
+     }
+    }
+   ]
+  }
+ ]
+}

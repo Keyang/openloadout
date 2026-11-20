@@ -1,0 +1,396 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "bg-forest-wide",
+ "name": "Wide forest backdrop",
+ "blurb": "Mountains, hills and woods in three layers 640 px wide that repeat sideways: scroll far at 0.1, mid at 0.4 and near at 0.7 of the camera's speed.",
+ "size": [
+  640,
+  180
+ ],
+ "pivot": [
+  320,
+  180
+ ],
+ "meta": {
+  "type": "background",
+  "role": "environment/background",
+  "view": "side",
+  "themes": [
+   "forest"
+  ],
+  "gameTypes": [
+   "platformer"
+  ],
+  "words": [
+   "forest",
+   "mountains",
+   "sky",
+   "backdrop",
+   "trees",
+   "hills",
+   "parallax"
+  ],
+  "license": "draft"
+ },
+ "palette": [
+  {
+   "id": "sky",
+   "label": "Sky",
+   "default": "#7fb8e0",
+   "material": "sky"
+  },
+  {
+   "id": "cloud",
+   "label": "Clouds",
+   "default": "#f0f4f8",
+   "material": "sky"
+  },
+  {
+   "id": "rock",
+   "label": "Mountains",
+   "default": "#6a7280",
+   "material": "stone"
+  },
+  {
+   "id": "air",
+   "label": "Haze",
+   "default": "#c8d8e8",
+   "material": "sky"
+  },
+  {
+   "id": "back",
+   "label": "Hills",
+   "default": "#4a7a4a",
+   "material": "plant"
+  },
+  {
+   "id": "leaf",
+   "label": "Trees",
+   "default": "#2f5a32",
+   "material": "plant"
+  }
+ ],
+ "controls": [
+  {
+   "key": "time",
+   "kind": "range",
+   "label": "Time of day",
+   "lo": "Dawn",
+   "hi": "Dusk",
+   "default": 0.5
+  },
+  {
+   "key": "clouds",
+   "kind": "range",
+   "label": "Clouds",
+   "lo": "Few",
+   "hi": "Many",
+   "default": 0.5
+  },
+  {
+   "key": "height",
+   "kind": "range",
+   "label": "Mountains",
+   "lo": "Low",
+   "hi": "High",
+   "default": 0.5
+  },
+  {
+   "key": "haze",
+   "kind": "range",
+   "label": "Haze",
+   "lo": "Clear",
+   "hi": "Misty",
+   "default": 0.3
+  },
+  {
+   "key": "density",
+   "kind": "range",
+   "label": "Trees",
+   "lo": "Sparse",
+   "hi": "Dense",
+   "default": 0.5
+  }
+ ],
+ "body": {
+  "layers": [
+   {
+    "name": "far",
+    "scroll": 0.1,
+    "draw": [
+     {
+      "gen": "sky.bands",
+      "v": 1,
+      "paint": {
+       "rule": "sky.look",
+       "v": 1,
+       "of": "sky",
+       "time": {
+        "from": "time"
+       }
+      },
+      "bands": 6
+     },
+     {
+      "gen": "disc",
+      "v": 1,
+      "at": [
+       472,
+       26
+      ],
+      "r": 10,
+      "paint": {
+       "rule": "sky.look",
+       "v": 1,
+       "of": "sky",
+       "time": {
+        "from": "time"
+       },
+       "what": "glow"
+      }
+     },
+     {
+      "gen": "scatter",
+      "v": 1,
+      "seed": 12,
+      "stable": true,
+      "count": {
+       "from": "clouds",
+       "map": [
+        [
+         0,
+         2
+        ],
+        [
+         1,
+         8
+        ]
+       ],
+       "round": "px"
+      },
+      "place": {
+       "gen": "cloud",
+       "v": 1,
+       "paint": "cloud"
+      },
+      "rows": [
+       14,
+       59
+      ]
+     },
+     {
+      "gen": "ridge",
+      "v": 1,
+      "base": 156,
+      "height": {
+       "from": "height",
+       "map": [
+        [
+         0,
+         44
+        ],
+        [
+         1,
+         84
+        ]
+       ]
+      },
+      "seed": 3,
+      "peaks": 4,
+      "shape": "jagged",
+      "rough": 0.55,
+      "paint": "rock",
+      "litEdge": {
+       "depth": 0.75,
+       "paint": "rock.light"
+      }
+     },
+     {
+      "gen": "mist.band",
+      "v": 1,
+      "at": 158,
+      "height": {
+       "from": "haze",
+       "map": [
+        [
+         0,
+         0
+        ],
+        [
+         0.34,
+         0
+        ],
+        [
+         0.35,
+         13
+        ],
+        [
+         1,
+         17
+        ]
+       ],
+       "round": "px"
+      },
+      "paint": "air"
+     }
+    ]
+   },
+   {
+    "name": "mid",
+    "scroll": 0.4,
+    "draw": [
+     {
+      "gen": "ridge",
+      "v": 1,
+      "id": "hill",
+      "base": 150,
+      "seed": 7,
+      "peaks": 3,
+      "paint": "back"
+     },
+     {
+      "gen": "treeline",
+      "v": 1,
+      "on": "hill",
+      "clumps": {
+       "from": "density",
+       "map": [
+        [
+         0,
+         4
+        ],
+        [
+         1,
+         11
+        ]
+       ],
+       "round": "px"
+      },
+      "tall": 12,
+      "seed": 4,
+      "paint": "leaf"
+     }
+    ]
+   },
+   {
+    "name": "near",
+    "scroll": 0.7,
+    "draw": [
+     {
+      "gen": "scatter",
+      "v": 1,
+      "count": {
+       "from": "density",
+       "map": [
+        [
+         0,
+         4
+        ],
+        [
+         1,
+         10
+        ]
+       ],
+       "round": "px"
+      },
+      "seed": 31,
+      "stable": true,
+      "rows": [
+       160,
+       170
+      ],
+      "place": {
+       "gen": "canopy",
+       "v": 1,
+       "r": 22,
+       "paint": {
+        "rule": "haze",
+        "v": 1,
+        "of": "leaf",
+        "air": {
+         "rule": "sky.look",
+         "v": 1,
+         "of": "sky",
+         "time": {
+          "from": "time"
+         },
+         "what": "air"
+        },
+        "depth": 0.1
+       },
+       "lit": {
+        "rule": "lit.tone",
+        "v": 1,
+        "of": {
+         "rule": "haze",
+         "v": 1,
+         "of": "leaf",
+         "air": {
+          "rule": "sky.look",
+          "v": 1,
+          "of": "sky",
+          "time": {
+           "from": "time"
+          },
+          "what": "air"
+         },
+         "depth": 0.1
+        },
+        "air": {
+         "rule": "sky.look",
+         "v": 1,
+         "of": "sky",
+         "time": {
+          "from": "time"
+         },
+         "what": "air"
+        },
+        "amount": 0.3
+       },
+       "dark": {
+        "rule": "haze",
+        "v": 1,
+        "of": "leaf.dark",
+        "air": {
+         "rule": "sky.look",
+         "v": 1,
+         "of": "sky",
+         "time": {
+          "from": "time"
+         },
+         "what": "air"
+        },
+        "depth": 0.1
+       }
+      }
+     },
+     {
+      "gen": "ridge",
+      "v": 1,
+      "base": 176,
+      "height": 8,
+      "seed": 23,
+      "peaks": 12,
+      "rough": 0.4,
+      "paint": {
+       "rule": "haze",
+       "v": 1,
+       "of": "leaf.dark",
+       "air": {
+        "rule": "sky.look",
+        "v": 1,
+        "of": "sky",
+        "time": {
+         "from": "time"
+        },
+        "what": "air"
+       },
+       "depth": 0.1
+      }
+     }
+    ]
+   }
+  ]
+ }
+}

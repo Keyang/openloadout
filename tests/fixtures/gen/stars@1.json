@@ -1,0 +1,467 @@
+{
+ "id": "stars",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "count": 12,
+    "seed": 4,
+    "top": 2,
+    "bottom": 46,
+    "paint": "star",
+    "plus": 0.3,
+    "big": 0.1
+   },
+   "ctx": {
+    "size": [
+     96,
+     48
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      2,
+      11
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "star",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      5,
+      8
+     ],
+     "size": [
+      5,
+      1
+     ],
+     "paint": "star",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      7,
+      6
+     ],
+     "size": [
+      1,
+      5
+     ],
+     "paint": "star",
+     "shade": 0
+    },
+    {
+     "kind": "dot",
+     "at": [
+      7,
+      8
+     ],
+     "paint": "star"
+    },
+    {
+     "kind": "rect",
+     "at": [
+      16,
+      27
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "star",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      30,
+      36
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "star",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      38,
+      17
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "star",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      42,
+      6
+     ],
+     "size": [
+      5,
+      1
+     ],
+     "paint": "star",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      44,
+      4
+     ],
+     "size": [
+      1,
+      5
+     ],
+     "paint": "star",
+     "shade": 0
+    },
+    {
+     "kind": "dot",
+     "at": [
+      44,
+      6
+     ],
+     "paint": "star"
+    },
+    {
+     "kind": "rect",
+     "at": [
+      52,
+      14
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "star",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      60,
+      11
+     ],
+     "size": [
+      3,
+      1
+     ],
+     "paint": "star",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      61,
+      10
+     ],
+     "size": [
+      1,
+      3
+     ],
+     "paint": "star",
+     "shade": 0
+    },
+    {
+     "kind": "dot",
+     "at": [
+      61,
+      11
+     ],
+     "paint": "star"
+    },
+    {
+     "kind": "rect",
+     "at": [
+      66,
+      17
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "star",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      75,
+      31
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "star",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      80,
+      40
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "star",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      88,
+      36
+     ],
+     "size": [
+      3,
+      1
+     ],
+     "paint": "star",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      89,
+      35
+     ],
+     "size": [
+      1,
+      3
+     ],
+     "paint": "star",
+     "shade": 0
+    },
+    {
+     "kind": "dot",
+     "at": [
+      89,
+      36
+     ],
+     "paint": "star"
+    }
+   ]
+  },
+  {
+   "args": {
+    "count": 8,
+    "seed": 9,
+    "paint": "star",
+    "dim": "star.dark",
+    "heart": "shine",
+    "plus": 0.45,
+    "big": 0.16,
+    "twinkle": 0.7
+   },
+   "ctx": {
+    "size": [
+     96,
+     48
+    ],
+    "t": 0.125
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      2,
+      43
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "star.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      10,
+      4
+     ],
+     "size": [
+      3,
+      1
+     ],
+     "paint": "star",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      11,
+      3
+     ],
+     "size": [
+      1,
+      3
+     ],
+     "paint": "star",
+     "shade": 0
+    },
+    {
+     "kind": "dot",
+     "at": [
+      11,
+      4
+     ],
+     "paint": "shine"
+    },
+    {
+     "kind": "rect",
+     "at": [
+      23,
+      27
+     ],
+     "size": [
+      5,
+      1
+     ],
+     "paint": "star",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      25,
+      25
+     ],
+     "size": [
+      1,
+      5
+     ],
+     "paint": "star",
+     "shade": 0
+    },
+    {
+     "kind": "dot",
+     "at": [
+      25,
+      27
+     ],
+     "paint": "shine"
+    },
+    {
+     "kind": "rect",
+     "at": [
+      39,
+      37
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "star",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      46,
+      30
+     ],
+     "size": [
+      5,
+      1
+     ],
+     "paint": "star",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      48,
+      28
+     ],
+     "size": [
+      1,
+      5
+     ],
+     "paint": "star",
+     "shade": 0
+    },
+    {
+     "kind": "dot",
+     "at": [
+      48,
+      30
+     ],
+     "paint": "shine"
+    },
+    {
+     "kind": "rect",
+     "at": [
+      62,
+      29
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "star",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      70,
+      24
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "star",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      84,
+      8
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "star",
+     "shade": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "count": 0,
+    "seed": 1,
+    "paint": "star"
+   },
+   "ctx": {
+    "size": [
+     96,
+     48
+    ]
+   },
+   "primitives": []
+  }
+ ]
+}
