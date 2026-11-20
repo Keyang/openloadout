@@ -48,12 +48,16 @@ const PINNED = {
   'credits-folk': '70e423303ffbdd840f462270e7e691e8a2ba5237',
   'credits-rock': '0dcd577a96fbb4469b102b4bd03ff9e7ad1b3ef1',
   'credits-marimba': '9e21c1f94fcb9f1c669309bd68203ca52cc29a17',
+  'gridline-title': '7282480335d1616898d1de16c813840dbbb176da',
+  'gridline-calm': '8e189350acb7b1c6946ffea5f8170ed04eaa1068',
+  'gridline-rush': '65fe4b36813704738168f72de8da5b67473f482f',
+  'gridline-results': '12a395876e4561df1bc412838b7cfbb98b569035',
 };
 
 const generators = fs.readdirSync(path.join(ROOT, 'tools', 'compose')).filter((f) => f.endsWith('.mjs') && /\bexport (?:function|const) build\b/.test(fs.readFileSync(path.join(ROOT, 'tools', 'compose', f), 'utf8'))).sort();
 
 test('every kit track has a generator (the five kit tracks and the core music themes)', () => {
-  assert.deepEqual(generators, ['credits_chip.mjs', 'credits_darkambient.mjs', 'credits_folk.mjs', 'credits_lofi.mjs', 'credits_marimba.mjs', 'credits_musicbox.mjs', 'credits_orchestra.mjs', 'credits_organ.mjs', 'credits_rock.mjs', 'credits_steelpan.mjs', 'credits_synthwave.mjs', 'credits_twang.mjs', 'derelict_boss.mjs', 'derelict_run.mjs', 'hearthvale_battle.mjs', 'hearthvale_village.mjs', 'menu_chip.mjs', 'menu_darkambient.mjs', 'menu_folk.mjs', 'menu_lofi.mjs', 'menu_marimba.mjs', 'menu_musicbox.mjs', 'menu_orchestra.mjs', 'menu_organ.mjs', 'menu_rock.mjs', 'menu_steelpan.mjs', 'menu_synthwave.mjs', 'menu_twang.mjs', 'thornwood_overworld.mjs']);
+  assert.deepEqual(generators, ['credits_chip.mjs', 'credits_darkambient.mjs', 'credits_folk.mjs', 'credits_lofi.mjs', 'credits_marimba.mjs', 'credits_musicbox.mjs', 'credits_orchestra.mjs', 'credits_organ.mjs', 'credits_rock.mjs', 'credits_steelpan.mjs', 'credits_synthwave.mjs', 'credits_twang.mjs', 'derelict_boss.mjs', 'derelict_run.mjs', 'gridline_calm.mjs', 'gridline_results.mjs', 'gridline_rush.mjs', 'gridline_title.mjs', 'hearthvale_battle.mjs', 'hearthvale_village.mjs', 'menu_chip.mjs', 'menu_darkambient.mjs', 'menu_folk.mjs', 'menu_lofi.mjs', 'menu_marimba.mjs', 'menu_musicbox.mjs', 'menu_orchestra.mjs', 'menu_organ.mjs', 'menu_rock.mjs', 'menu_steelpan.mjs', 'menu_synthwave.mjs', 'menu_twang.mjs', 'thornwood_overworld.mjs']);
 });
 
 for (const file of generators) {

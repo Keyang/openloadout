@@ -1,0 +1,1727 @@
+{
+  "id": "kit-puzzle-gridline",
+  "name": "Gridline falling-block puzzle kit",
+  "gameType": "puzzle",
+  "blurb": "Everything for a falling-block puzzle: block skins in four colour sets, a playing field, next and hold boxes, line-clear bursts, counters, pause, results and game-over panels, a title emblem, a block buddy, a grid backdrop, 24 sounds and four tracks.",
+  "theme": "neutral",
+  "view": "none",
+  "size": {
+    "sprites": [
+      20,
+      30
+    ],
+    "sounds": [
+      20,
+      26
+    ],
+    "music": [
+      2,
+      4
+    ]
+  },
+  "palette": {
+    "name": "Gridline",
+    "colours": {
+      "ink": "#231b33",
+      "void": "#12152b",
+      "well": "#2a3058",
+      "line": "#3a4278",
+      "deep": "#1e4658",
+      "plum": "#6a3a8e",
+      "slate": "#4f5894",
+      "dusk": "#6e78b4",
+      "mist": "#a3abd8",
+      "pearl": "#e6e8f6",
+      "cream": "#f0ead8",
+      "rose": "#f2609e",
+      "coral": "#f5875a",
+      "lemon": "#f2dc4c",
+      "lime": "#a6dc46",
+      "mint": "#46d8a8",
+      "sky": "#56c4f2",
+      "teal": "#2a9a9a",
+      "violet": "#7d52e6",
+      "hero": "#3f6fd1",
+      "cyan": "#5fe0f0",
+      "red": "#e2473f",
+      "gold": "#f2c230",
+      "steel": "#c2c9d6",
+      "skin": "#f6d3b0"
+    }
+  },
+  "sprites": [
+    {
+      "id": "gridline-blocks",
+      "name": "Block skins",
+      "type": "tileset",
+      "role": "world/tile",
+      "view": "none",
+      "frame": [
+        16,
+        16
+      ],
+      "pivot": [
+        8,
+        8
+      ],
+      "clips": [
+        {
+          "name": "cell-1",
+          "frames": 1,
+          "loop": true,
+          "label": "Colour 1"
+        },
+        {
+          "name": "cell-2",
+          "frames": 1,
+          "loop": true,
+          "label": "Colour 2"
+        },
+        {
+          "name": "cell-3",
+          "frames": 1,
+          "loop": true,
+          "label": "Colour 3"
+        },
+        {
+          "name": "cell-4",
+          "frames": 1,
+          "loop": true,
+          "label": "Colour 4"
+        },
+        {
+          "name": "cell-5",
+          "frames": 1,
+          "loop": true,
+          "label": "Colour 5"
+        },
+        {
+          "name": "cell-6",
+          "frames": 1,
+          "loop": true,
+          "label": "Colour 6"
+        },
+        {
+          "name": "cell-7",
+          "frames": 1,
+          "loop": true,
+          "label": "Colour 7"
+        },
+        {
+          "name": "junk",
+          "frames": 1,
+          "loop": true,
+          "label": "Junk block"
+        },
+        {
+          "name": "ghost",
+          "frames": 1,
+          "loop": true,
+          "label": "Landing preview"
+        },
+        {
+          "name": "lock",
+          "frames": 6,
+          "loop": false,
+          "label": "Lock in"
+        },
+        {
+          "name": "clear",
+          "frames": 6,
+          "loop": false,
+          "label": "Clear"
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "G1"
+    },
+    {
+      "id": "gridline-well",
+      "name": "Playing field",
+      "type": "tileset",
+      "role": "world/tile",
+      "view": "none",
+      "frame": [
+        16,
+        16
+      ],
+      "pivot": [
+        8,
+        8
+      ],
+      "clips": [
+        {
+          "name": "field-fill",
+          "frames": 1,
+          "loop": true,
+          "label": "Empty cell"
+        },
+        {
+          "name": "field-alt",
+          "frames": 1,
+          "loop": true,
+          "label": "Empty cell, other shade"
+        },
+        {
+          "name": "rim-l",
+          "frames": 1,
+          "loop": true,
+          "label": "Left wall"
+        },
+        {
+          "name": "rim-r",
+          "frames": 1,
+          "loop": true,
+          "label": "Right wall"
+        },
+        {
+          "name": "rim-floor",
+          "frames": 1,
+          "loop": true,
+          "label": "Floor under the field"
+        },
+        {
+          "name": "rim-floor-l",
+          "frames": 1,
+          "loop": true,
+          "label": "Bottom-left corner"
+        },
+        {
+          "name": "rim-floor-r",
+          "frames": 1,
+          "loop": true,
+          "label": "Bottom-right corner"
+        },
+        {
+          "name": "rim-cap-l",
+          "frames": 1,
+          "loop": true,
+          "label": "Top of the left wall"
+        },
+        {
+          "name": "rim-cap-r",
+          "frames": 1,
+          "loop": true,
+          "label": "Top of the right wall"
+        },
+        {
+          "name": "spawn",
+          "frames": 8,
+          "loop": true,
+          "label": "Entry cell, where new pieces appear"
+        },
+        {
+          "name": "danger",
+          "frames": 8,
+          "loop": true,
+          "label": "Danger cell, in the top rows while the stack is high"
+        },
+        {
+          "name": "target",
+          "frames": 1,
+          "loop": true,
+          "label": "Goal line cell, for rounds that clear down to a line"
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "G1"
+    },
+    {
+      "id": "bg-gridline",
+      "name": "Grid backdrop",
+      "type": "background",
+      "role": "environment/background",
+      "view": "none",
+      "frame": [
+        320,
+        180
+      ],
+      "pivot": [
+        160,
+        180
+      ],
+      "clips": [
+        {
+          "name": "far",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "mid",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "near",
+          "frames": 8,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "G1"
+    },
+    {
+      "id": "ui-piece-box",
+      "name": "Next and hold boxes",
+      "type": "ui",
+      "role": "interface/panel",
+      "view": "none",
+      "frame": [
+        96,
+        64
+      ],
+      "pivot": [
+        48,
+        32
+      ],
+      "clips": [
+        {
+          "name": "hold",
+          "frames": 1,
+          "loop": true,
+          "label": "Hold box, keeping a piece for later"
+        },
+        {
+          "name": "next",
+          "frames": 1,
+          "loop": true,
+          "label": "Next box, showing the piece to come"
+        },
+        {
+          "name": "queue",
+          "frames": 1,
+          "loop": true,
+          "label": "Queue slot, for the pieces after the next one"
+        },
+        {
+          "name": "hold-used",
+          "frames": 1,
+          "loop": true,
+          "label": "Hold box after a swap, until the piece lands"
+        },
+        {
+          "name": "swap",
+          "frames": 4,
+          "loop": false,
+          "label": "Swap flash, the moment a piece goes into hold"
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "G2"
+    },
+    {
+      "id": "ui-gridline-panels",
+      "name": "Round panels",
+      "type": "ui",
+      "role": "interface/panel",
+      "view": "none",
+      "frame": [
+        96,
+        64
+      ],
+      "pivot": [
+        48,
+        32
+      ],
+      "clips": [
+        {
+          "name": "pause",
+          "frames": 1,
+          "loop": true,
+          "label": "Pause panel, while the game is stopped"
+        },
+        {
+          "name": "results",
+          "frames": 1,
+          "loop": true,
+          "label": "Results panel, when a round ends with its numbers"
+        },
+        {
+          "name": "game-over",
+          "frames": 1,
+          "loop": true,
+          "label": "Game over panel, after the stack reaches the top"
+        },
+        {
+          "name": "record",
+          "frames": 8,
+          "loop": true,
+          "label": "New best panel, while a record score is shown"
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "G2"
+    },
+    {
+      "id": "ui-stat-counter",
+      "name": "Level and lines counter",
+      "type": "ui",
+      "role": "interface/panel",
+      "view": "none",
+      "frame": [
+        64,
+        24
+      ],
+      "pivot": [
+        32,
+        12
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 1,
+          "loop": true,
+          "label": "Showing a number"
+        },
+        {
+          "name": "roll",
+          "frames": 6,
+          "loop": false,
+          "label": "Count up by one"
+        },
+        {
+          "name": "bump",
+          "frames": 4,
+          "loop": false,
+          "label": "Level up flash"
+        },
+        {
+          "name": "frame",
+          "frames": 1,
+          "loop": true,
+          "label": "Empty, for the game's own digits"
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "G2"
+    },
+    {
+      "id": "ui-junk-gauge",
+      "name": "Junk gauge",
+      "type": "ui",
+      "role": "interface/bar",
+      "view": "none",
+      "frame": [
+        16,
+        64
+      ],
+      "pivot": [
+        8,
+        32
+      ],
+      "clips": [
+        {
+          "name": "frame",
+          "frames": 1,
+          "loop": true,
+          "label": "Empty gauge housing"
+        },
+        {
+          "name": "fill",
+          "frames": 1,
+          "loop": true,
+          "label": "Junk rows on their way"
+        },
+        {
+          "name": "fill-b",
+          "frames": 1,
+          "loop": true,
+          "label": "Junk about to land, the last moment to clear it"
+        },
+        {
+          "name": "flash",
+          "frames": 4,
+          "loop": false,
+          "label": "Gauge flash, when junk is sent or arrives"
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "G2"
+    },
+    {
+      "id": "cell-burst",
+      "name": "Cell burst",
+      "type": "effect",
+      "role": "effects/spark",
+      "view": "none",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        16
+      ],
+      "clips": [
+        {
+          "name": "burst",
+          "frames": 8,
+          "loop": false
+        },
+        {
+          "name": "dissolve",
+          "frames": 6,
+          "loop": false,
+          "label": "Dissolve"
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "G3"
+    },
+    {
+      "id": "drop-streak",
+      "name": "Drop streaks",
+      "type": "effect",
+      "role": "effects/dust",
+      "view": "none",
+      "frame": [
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        62
+      ],
+      "clips": [
+        {
+          "name": "burst",
+          "frames": 6,
+          "loop": false
+        },
+        {
+          "name": "dust",
+          "frames": 6,
+          "loop": false,
+          "label": "Landing puffs"
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "G3"
+    },
+    {
+      "id": "spin-sparkle",
+      "name": "Spin sparkle",
+      "type": "effect",
+      "role": "effects/magic",
+      "view": "none",
+      "frame": [
+        48,
+        48
+      ],
+      "pivot": [
+        24,
+        24
+      ],
+      "clips": [
+        {
+          "name": "burst",
+          "frames": 10,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "G3"
+    },
+    {
+      "id": "quad-burst",
+      "name": "Big clear burst",
+      "type": "effect",
+      "role": "effects/explosion",
+      "view": "none",
+      "frame": [
+        96,
+        96
+      ],
+      "pivot": [
+        48,
+        48
+      ],
+      "clips": [
+        {
+          "name": "burst",
+          "frames": 12,
+          "loop": false
+        },
+        {
+          "name": "flash",
+          "frames": 8,
+          "loop": false,
+          "label": "Board clear"
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "G3"
+    },
+    {
+      "id": "gridline-emblem",
+      "name": "Title emblem",
+      "type": "ui",
+      "role": "interface/icon",
+      "view": "none",
+      "frame": [
+        96,
+        64
+      ],
+      "pivot": [
+        48,
+        32
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true,
+          "label": "Showing"
+        },
+        {
+          "name": "build",
+          "frames": 12,
+          "loop": false,
+          "label": "Building"
+        },
+        {
+          "name": "shine",
+          "frames": 8,
+          "loop": false,
+          "label": "Shine"
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "G4"
+    },
+    {
+      "id": "grid-buddy",
+      "name": "Block buddy",
+      "type": "creature",
+      "role": "characters/npc",
+      "view": "front",
+      "frame": [
+        48,
+        48
+      ],
+      "pivot": [
+        24,
+        42
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "cheer",
+          "frames": 8,
+          "loop": false,
+          "label": "Cheer"
+        },
+        {
+          "name": "worry",
+          "frames": 8,
+          "loop": true,
+          "label": "Worry"
+        },
+        {
+          "name": "slump",
+          "frames": 8,
+          "loop": false,
+          "label": "Slump"
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "G4"
+    },
+    {
+      "id": "icons-gridline-modes",
+      "name": "Mode icons",
+      "type": "icon",
+      "role": "interface/icon",
+      "view": "none",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        16
+      ],
+      "clips": [
+        {
+          "name": "endless",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "sprint",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "timed",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "versus",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "calm",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "daily",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "puzzle",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "practice",
+          "frames": 1,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "G4"
+    },
+    {
+      "id": "ui-buttons-neon",
+      "name": "Neon buttons",
+      "type": "ui",
+      "role": "interface/button",
+      "view": "none",
+      "frame": [
+        96,
+        32
+      ],
+      "pivot": [
+        48,
+        16
+      ],
+      "clips": [
+        {
+          "name": "normal",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "hover",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "pressed",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "disabled",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "tab",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "tab-active",
+          "frames": 1,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "ui-panel-neon",
+      "name": "Neon panels",
+      "type": "ui",
+      "role": "interface/panel",
+      "view": "none",
+      "frame": [
+        96,
+        64
+      ],
+      "pivot": [
+        48,
+        32
+      ],
+      "clips": [
+        {
+          "name": "panel",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "panel-title",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "inset",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "tooltip",
+          "frames": 1,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "ui-bars-neon",
+      "name": "Neon bars and slider",
+      "type": "ui",
+      "role": "interface/bar",
+      "view": "none",
+      "frame": [
+        64,
+        16
+      ],
+      "pivot": [
+        32,
+        8
+      ],
+      "clips": [
+        {
+          "name": "frame",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "fill",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "fill-b",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "fill-c",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "flash",
+          "frames": 4,
+          "loop": false
+        },
+        {
+          "name": "slider",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "knob",
+          "frames": 1,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "ui-controls-neon",
+      "name": "Neon checkboxes and cursor",
+      "type": "ui",
+      "role": "interface/cursor",
+      "view": "none",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        16
+      ],
+      "clips": [
+        {
+          "name": "check-on",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "check-off",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "radio-on",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "radio-off",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "switch-on",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "switch-off",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "pointer",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "selector",
+          "frames": 8,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "font-chunky",
+      "name": "Chunky pixel letters",
+      "type": "ui",
+      "role": "interface/icon",
+      "view": "none",
+      "frame": [
+        16,
+        20
+      ],
+      "pivot": [
+        4,
+        13
+      ],
+      "clips": [
+        {
+          "name": "upper",
+          "frames": 26,
+          "loop": true
+        },
+        {
+          "name": "lower",
+          "frames": 26,
+          "loop": true
+        },
+        {
+          "name": "digits",
+          "frames": 10,
+          "loop": true
+        },
+        {
+          "name": "marks",
+          "frames": 18,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "ui-score-counter",
+      "name": "Score counter",
+      "type": "ui",
+      "role": "interface/panel",
+      "view": "none",
+      "frame": [
+        96,
+        24
+      ],
+      "pivot": [
+        48,
+        12
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "roll",
+          "frames": 6,
+          "loop": false
+        },
+        {
+          "name": "bump",
+          "frames": 4,
+          "loop": false
+        },
+        {
+          "name": "frame",
+          "frames": 1,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "ui-timer",
+      "name": "Timer",
+      "type": "ui",
+      "role": "interface/panel",
+      "view": "none",
+      "frame": [
+        64,
+        24
+      ],
+      "pivot": [
+        32,
+        12
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "tick",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "warn",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "frame",
+          "frames": 1,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "ui-score-pop",
+      "name": "Score pop",
+      "type": "ui",
+      "role": "interface/icon",
+      "view": "none",
+      "frame": [
+        48,
+        32
+      ],
+      "pivot": [
+        24,
+        24
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "rise",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "ui-word-pop",
+      "name": "Word pop",
+      "type": "ui",
+      "role": "interface/icon",
+      "view": "none",
+      "frame": [
+        96,
+        32
+      ],
+      "pivot": [
+        48,
+        16
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "pop",
+          "frames": 8,
+          "loop": false
+        },
+        {
+          "name": "leave",
+          "frames": 6,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "confetti",
+      "name": "Confetti",
+      "type": "effect",
+      "role": "effects/spark",
+      "view": "none",
+      "frame": [
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        32
+      ],
+      "clips": [
+        {
+          "name": "burst",
+          "frames": 12,
+          "loop": false
+        }
+      ],
+      "parts": [],
+      "reuse": true,
+      "batch": null
+    }
+  ],
+  "sounds": [
+    {
+      "id": "menu-console-move",
+      "name": "Console move",
+      "type": "sfx",
+      "role": "interface/hover",
+      "styles": [
+        "List",
+        "Grid",
+        "Tab"
+      ],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "menu-console-confirm",
+      "name": "Console confirm",
+      "type": "sfx",
+      "role": "interface/confirm",
+      "styles": [
+        "Select",
+        "Accept",
+        "Start game"
+      ],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "menu-console-back",
+      "name": "Console back",
+      "type": "sfx",
+      "role": "interface/click",
+      "styles": [
+        "Back",
+        "Cancel"
+      ],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "menu-console-open",
+      "name": "Console open",
+      "type": "sfx",
+      "role": "interface/click",
+      "styles": [
+        "Menu",
+        "Pop-up",
+        "Inventory"
+      ],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "menu-console-toggle",
+      "name": "Console toggle",
+      "type": "sfx",
+      "role": "interface/click",
+      "styles": [
+        "Switch on",
+        "Switch off"
+      ],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "countdown-go",
+      "name": "Countdown go",
+      "type": "sfx",
+      "role": "interface/confirm",
+      "styles": [
+        "Chiptune",
+        "Storybook",
+        "Gritty"
+      ],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "level-up",
+      "name": "Level up",
+      "type": "jingle",
+      "role": "interface/reward",
+      "styles": [
+        "Chiptune",
+        "Storybook",
+        "Gritty"
+      ],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "game-over",
+      "name": "Game over",
+      "type": "jingle",
+      "role": "music/gameover",
+      "styles": [
+        "Chiptune",
+        "Storybook",
+        "Gritty"
+      ],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "block-shift",
+      "name": "Block shift",
+      "type": "sfx",
+      "role": "interface/click",
+      "styles": [
+        "Shift",
+        "Soft shift",
+        "Step down"
+      ],
+      "reuse": false,
+      "batch": "GS1"
+    },
+    {
+      "id": "block-turn",
+      "name": "Block turn",
+      "type": "sfx",
+      "role": "interface/click",
+      "styles": [
+        "Turn right",
+        "Turn left",
+        "Heavy turn"
+      ],
+      "reuse": false,
+      "batch": "GS1"
+    },
+    {
+      "id": "block-slam",
+      "name": "Hard drop",
+      "type": "sfx",
+      "role": "actions/land",
+      "styles": [
+        "Hard drop",
+        "Heavy slam",
+        "Small piece"
+      ],
+      "reuse": false,
+      "batch": "GS1"
+    },
+    {
+      "id": "block-lock",
+      "name": "Lock in",
+      "type": "sfx",
+      "role": "actions/land",
+      "styles": [
+        "Click in",
+        "Soft lock",
+        "Glass lock"
+      ],
+      "reuse": false,
+      "batch": "GS1"
+    },
+    {
+      "id": "block-hold",
+      "name": "Hold swap",
+      "type": "sfx",
+      "role": "items/equip",
+      "styles": [
+        "Swap",
+        "Hold empty",
+        "Swap back"
+      ],
+      "reuse": false,
+      "batch": "GS1"
+    },
+    {
+      "id": "block-bump",
+      "name": "Blocked move",
+      "type": "sfx",
+      "role": "interface/error",
+      "styles": [
+        "Wall tap",
+        "Can't turn",
+        "Soft no"
+      ],
+      "reuse": false,
+      "batch": "GS1"
+    },
+    {
+      "id": "line-clear",
+      "name": "Line clear",
+      "type": "sfx",
+      "role": "interface/reward",
+      "styles": [
+        "Single",
+        "Double",
+        "Triple"
+      ],
+      "reuse": false,
+      "batch": "GS2"
+    },
+    {
+      "id": "quad-clear",
+      "name": "Four-line clear",
+      "type": "sfx",
+      "role": "interface/reward",
+      "styles": [
+        "Four lines",
+        "Spin four",
+        "Streak of fours"
+      ],
+      "reuse": false,
+      "batch": "GS2"
+    },
+    {
+      "id": "combo-chime",
+      "name": "Combo chime",
+      "type": "sfx",
+      "role": "interface/reward",
+      "styles": [
+        "Combo 1",
+        "Combo 4",
+        "Combo max"
+      ],
+      "reuse": false,
+      "batch": "GS2"
+    },
+    {
+      "id": "spin-bonus",
+      "name": "Spin bonus",
+      "type": "sfx",
+      "role": "interface/reward",
+      "styles": [
+        "Spin",
+        "Mini spin",
+        "Big spin"
+      ],
+      "reuse": false,
+      "batch": "GS2"
+    },
+    {
+      "id": "junk-send",
+      "name": "Send junk",
+      "type": "sfx",
+      "role": "actions/shoot",
+      "styles": [
+        "Send one",
+        "Send four",
+        "Counter"
+      ],
+      "reuse": false,
+      "batch": "GS2"
+    },
+    {
+      "id": "board-clear",
+      "name": "Board clear",
+      "type": "jingle",
+      "role": "interface/reward",
+      "styles": [
+        "All clear",
+        "Small clear",
+        "Perfect round"
+      ],
+      "reuse": false,
+      "batch": "GS3"
+    },
+    {
+      "id": "new-record",
+      "name": "New best",
+      "type": "jingle",
+      "role": "interface/reward",
+      "styles": [
+        "New best",
+        "Close call",
+        "Big record"
+      ],
+      "reuse": false,
+      "batch": "GS3"
+    },
+    {
+      "id": "junk-rise",
+      "name": "Junk rows rise",
+      "type": "sfx",
+      "role": "world/machine",
+      "styles": [
+        "One row",
+        "Big push",
+        "Slow rumble"
+      ],
+      "reuse": false,
+      "batch": "GS3"
+    },
+    {
+      "id": "danger-pulse",
+      "name": "Danger pulse",
+      "type": "ambience",
+      "role": "environment/ambience",
+      "styles": [
+        "Stack high",
+        "Almost full",
+        "Calm warning"
+      ],
+      "reuse": false,
+      "batch": "GS3"
+    },
+    {
+      "id": "top-out",
+      "name": "Stack overflow",
+      "type": "sfx",
+      "role": "world/break",
+      "styles": [
+        "Top out",
+        "Collapse",
+        "Small collapse"
+      ],
+      "reuse": false,
+      "batch": "GS3"
+    }
+  ],
+  "music": [
+    {
+      "id": "gridline-title",
+      "name": "Title theme",
+      "role": "music/menu",
+      "band": "chip",
+      "bpm": 132,
+      "tempo": [
+        120,
+        150
+      ],
+      "key": "F major",
+      "chords": "F Bb C Dm Bb Gm Am C",
+      "chordOrder": "0M 5M 7M 9m 5M 2m 4m 7M",
+      "inst": "Chiptune",
+      "reuse": false,
+      "batch": "GM1"
+    },
+    {
+      "id": "gridline-calm",
+      "name": "Calm play",
+      "role": "music/exploration",
+      "band": "synthwave",
+      "bpm": 100,
+      "tempo": [
+        88,
+        112
+      ],
+      "key": "D minor",
+      "chords": "Dm Bb Gm C Dm Bb F A",
+      "chordOrder": "0m 8M 5m 10M 0m 8M 3M 7M",
+      "inst": "Bell",
+      "reuse": false,
+      "batch": "GM2"
+    },
+    {
+      "id": "gridline-rush",
+      "name": "Fast play",
+      "role": "music/battle",
+      "band": "chip",
+      "bpm": 156,
+      "tempo": [
+        144,
+        160
+      ],
+      "key": "A major (the C major chord in bar 6 is borrowed from the minor)",
+      "chords": "A E F#m D A C D E",
+      "chordOrder": "0M 7M 9m 5M 0M 3M 5M 7M",
+      "inst": "Synth lead",
+      "reuse": false,
+      "batch": "GM3"
+    },
+    {
+      "id": "gridline-results",
+      "name": "Results",
+      "role": "music/victory",
+      "band": "synthwave",
+      "bpm": 92,
+      "tempo": [
+        84,
+        104
+      ],
+      "key": "E-flat major",
+      "chords": "Eb Cm Gm Ab Eb Cm Ab Bb",
+      "chordOrder": "0M 9m 4m 5M 0M 9m 5M 7M",
+      "inst": "Plucked string",
+      "reuse": false,
+      "batch": "GM4"
+    }
+  ],
+  "batches": [
+    {
+      "id": "GH0",
+      "kind": "helper",
+      "assets": [
+        "tools/lib/assets.mjs: kitSize(plan) (a plan's own size, puzzle plans only, else KIT_SIZE, which stays unchanged); loadPlans checks a plan's size",
+        "tests/helpers/kits.mjs: sizeProblems(bundle, plan) against kitSize(plan); kitProblems passes its plan",
+        "tools/bundles-from-plans.mjs: the size note uses kitSize(plan)",
+        "tests/unit/build-kit-plans.test.mjs: 'the bundle files on disk are what the plans say' compares only plans whose bundle is written (fails today for this plan: no bundles/kit-puzzle-gridline.json)",
+        "tests/e2e/three-bundles.spec.mjs: size from the plan; a view-none puzzle kit with no characters/player sprite skips the player and arrow-key checks but must paint the whole playground scene with no errors",
+        "app/play-page.js: the playground paints a kit's scene with no player sprite (playState().player null), if it does not already"
+      ],
+      "needs": [
+        "the Loadout owner's yes to the kit-size rule change, recorded under goal G1 in docs/progress.md"
+      ],
+      "after": [],
+      "order": 1
+    },
+    {
+      "id": "GH1",
+      "kind": "helper",
+      "assets": [
+        "tests/unit/palettes-core.test.mjs: add gridline to the palette list of 'bundle ids and short names reach the same palette' (first; today 18 tests, 17 pass, 1 fail; after it 18 pass)",
+        "engine/blocks.js: BLOCK_STYLES, BLOCK_SCHEMES, BLOCK_SYMBOLS, blockScheme, blockCell, blockSymbolIn, ghostCell, fieldCell, wellRim, cornerBlocks, gaugeColumn, gaugeFill, pieceCells, statMarkIn, blockEyes"
+      ],
+      "needs": [
+        "palettes"
+      ],
+      "after": [
+        "GH0"
+      ],
+      "order": 2
+    },
+    {
+      "id": "GH2",
+      "kind": "helper",
+      "assets": [
+        "engine/fx.js: chips",
+        "engine/backdrop.js: gridLines"
+      ],
+      "needs": [],
+      "after": [],
+      "order": 1
+    },
+    {
+      "id": "GS1",
+      "kind": "sounds",
+      "assets": [
+        "block-shift",
+        "block-turn",
+        "block-slam",
+        "block-lock",
+        "block-hold",
+        "block-bump"
+      ],
+      "needs": [],
+      "after": [],
+      "order": 1
+    },
+    {
+      "id": "GS2",
+      "kind": "sounds",
+      "assets": [
+        "line-clear",
+        "quad-clear",
+        "combo-chime",
+        "spin-bonus",
+        "junk-send"
+      ],
+      "needs": [],
+      "after": [],
+      "order": 1
+    },
+    {
+      "id": "GS3",
+      "kind": "sounds",
+      "assets": [
+        "board-clear",
+        "new-record",
+        "junk-rise",
+        "danger-pulse",
+        "top-out"
+      ],
+      "needs": [],
+      "after": [],
+      "order": 1
+    },
+    {
+      "id": "G1",
+      "kind": "tilesets and background",
+      "assets": [
+        "gridline-blocks",
+        "gridline-well",
+        "bg-gridline"
+      ],
+      "needs": [
+        "palettes"
+      ],
+      "after": [
+        "GH1",
+        "GH2"
+      ],
+      "order": 3,
+      "pathfinder": true
+    },
+    {
+      "id": "G2",
+      "kind": "interface",
+      "assets": [
+        "ui-piece-box",
+        "ui-gridline-panels",
+        "ui-stat-counter",
+        "ui-junk-gauge"
+      ],
+      "needs": [
+        "palettes"
+      ],
+      "after": [
+        "GH1",
+        "GS1",
+        "GS2",
+        "G1"
+      ],
+      "order": 4
+    },
+    {
+      "id": "G3",
+      "kind": "effects",
+      "assets": [
+        "cell-burst",
+        "drop-streak",
+        "spin-sparkle",
+        "quad-burst"
+      ],
+      "needs": [
+        "palettes"
+      ],
+      "after": [
+        "GH1",
+        "GH2",
+        "G1"
+      ],
+      "order": 4
+    },
+    {
+      "id": "G4",
+      "kind": "title and cast",
+      "assets": [
+        "gridline-emblem",
+        "grid-buddy",
+        "icons-gridline-modes"
+      ],
+      "needs": [
+        "palettes"
+      ],
+      "after": [
+        "GH1",
+        "GS1",
+        "GS2",
+        "GS3",
+        "G1"
+      ],
+      "order": 4
+    },
+    {
+      "id": "GM1",
+      "kind": "music",
+      "assets": [
+        "gridline-title"
+      ],
+      "needs": [
+        "compose-kit",
+        "band chip heard by a person"
+      ],
+      "after": [],
+      "order": 1
+    },
+    {
+      "id": "GM2",
+      "kind": "music",
+      "assets": [
+        "gridline-calm"
+      ],
+      "needs": [
+        "compose-kit",
+        "band synthwave heard by a person"
+      ],
+      "after": [],
+      "order": 1
+    },
+    {
+      "id": "GM3",
+      "kind": "music",
+      "assets": [
+        "gridline-rush"
+      ],
+      "needs": [
+        "compose-kit",
+        "band chip heard by a person"
+      ],
+      "after": [
+        "GM1"
+      ],
+      "order": 2
+    },
+    {
+      "id": "GM4",
+      "kind": "music",
+      "assets": [
+        "gridline-results"
+      ],
+      "needs": [
+        "compose-kit",
+        "band synthwave heard by a person"
+      ],
+      "after": [
+        "GM2"
+      ],
+      "order": 2
+    }
+  ],
+  "reusedChanges": []
+}

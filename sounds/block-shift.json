@@ -1,0 +1,37 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "block-shift",
+  "name": "Block shift",
+  "category": "ui",
+  "description": "A tiny dry tick for a puzzle piece moving one step: a short, clean, hollow beep with a small click on top. Change its pitch, length, brightness and how hard the click snaps. The same every time.",
+  "meta": {
+    "type": "sfx",
+    "role": "interface/click",
+    "themes": ["neutral"],
+    "gameTypes": ["puzzle", "arcade"],
+    "words": ["tick", "move", "shift", "step", "slide", "block", "piece", "click", "blip", "nudge", "cursor", "chiptune", "soft drop"],
+    "license": "draft"
+  },
+  "duration": "length",
+  "params": [
+    { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 300, "max": 1600, "default": 880, "scale": "log" },
+    { "id": "length", "label": "Length", "unit": "s", "min": 0.03, "max": 0.08, "default": 0.045, "scale": "log" },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "snap", "label": "Snap", "min": 0, "max": 1, "default": 0.5 }
+  ],
+  "nodes": [
+    { "id": "body", "type": "osc", "wave": "square", "freq": "pitch" },
+    { "id": "tone", "type": "filter", "mode": "lp", "in": "body", "freq": "pitch * (1.6 + bright * bright * 9)", "q": 0.6 },
+    { "id": "amp", "type": "ad", "attack": "0.004 - snap * 0.0037", "decay": "length * 0.9", "curve": 3 },
+    { "id": "hiss", "type": "noise", "seed": 7 },
+    { "id": "edge", "type": "filter", "mode": "hp", "in": "hiss", "freq": "2500 + bright * 2500", "q": 0.7 },
+    { "id": "click", "type": "ad", "attack": 0.0002, "decay": 0.003, "curve": 1.5 },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "tone * amp + edge * click * snap * 1.4", "freq": 120 }
+  ],
+  "out": "clean",
+  "presets": {
+    "Shift": {},
+    "Soft shift": { "pitch": 660, "snap": 0.15, "bright": 0.3 },
+    "Step down": { "pitch": 523, "length": 0.035 }
+  }
+}

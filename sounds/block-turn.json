@@ -1,0 +1,35 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "block-turn",
+  "name": "Block turn",
+  "category": "ui",
+  "description": "A quick tuned flick for turning a puzzle piece: a short blip that slides a few notes up or down with a breath of air behind it. Change its pitch, which way and how far it slides, its length, brightness and swish.",
+  "meta": { "type": "sfx", "role": "interface/click", "themes": ["neutral"], "gameTypes": ["puzzle", "arcade"],
+    "words": ["turn", "rotate", "spin", "flick", "twist", "blip", "piece", "block", "flip", "swish", "tick", "move"], "license": "draft" },
+  "duration": "length + 0.008",
+  "params": [
+    { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 400, "max": 1600, "default": 659, "scale": "log" },
+    { "id": "rise", "label": "Turn", "unit": "semitones", "min": -7, "max": 7, "default": 5, "step": 1, "hint": "Above the middle the slide goes up; below it the slide goes down, for turning the other way." },
+    { "id": "length", "label": "Length", "unit": "s", "min": 0.05, "max": 0.16, "default": 0.09, "scale": "log" },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "swish", "label": "Swish", "min": 0, "max": 1, "default": 0.4 }
+  ],
+  "nodes": [
+    { "id": "glide", "type": "env", "points": [[0, "pitch"], ["length * 0.55", "pitch * semi(rise)", "exp"]] },
+    { "id": "body", "type": "osc", "wave": "pulse", "width": 0.3, "freq": "glide" },
+    { "id": "soft", "type": "osc", "wave": "tri", "freq": "glide" },
+    { "id": "tone", "type": "filter", "mode": "lp", "in": "body * 0.7 + soft * 0.5", "freq": "1400 + bright * 7000" },
+    { "id": "amp", "type": "ad", "attack": 0.002, "decay": "length", "curve": 1.7 },
+    { "id": "air", "type": "noise", "seed": 4107 },
+    { "id": "band", "type": "filter", "mode": "bp", "in": "air", "freq": "glide * (3 + bright * 2)", "q": 5 },
+    { "id": "airAmp", "type": "ad", "attack": "length * 0.25", "decay": "length * 0.7", "curve": 1.5 },
+    { "id": "sum", "type": "expr", "expr": "tone * amp + band * airAmp * swish * 1.6" },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "sum", "freq": 40 }
+  ],
+  "out": "clean",
+  "presets": {
+    "Turn right": { "pitch": 659, "rise": 5, "length": 0.09, "bright": 0.5, "swish": 0.4 },
+    "Turn left": { "rise": -4 },
+    "Heavy turn": { "pitch": 440, "length": 0.14, "swish": 0.7 }
+  }
+}

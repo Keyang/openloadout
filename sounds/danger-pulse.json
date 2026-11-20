@@ -1,0 +1,55 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "danger-pulse",
+ "name": "Danger pulse",
+ "category": "ambience",
+ "description": "A soft, low double thump like a slow heartbeat with a two-note warning beep, for when the stack is nearly at the top. Change the beep's pitch, the speed, the brightness and how loud the beep is.",
+ "meta": {
+  "type": "ambience",
+  "role": "environment/ambience",
+  "themes": ["neutral"],
+  "gameTypes": ["puzzle", "arcade"],
+  "words": ["danger", "warning", "heartbeat", "pulse", "thump", "beep", "alert", "tension", "stack", "almost full", "nervous", "low health", "throb"],
+  "license": "draft"
+ },
+ "loop": true,
+ "wrap": true,
+ "duration": 4,
+ "params": [
+  { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 400, "max": 1200, "default": 659.26, "scale": "log", "hint": "The first note of the warning beep. The second note is always a little lower." },
+  { "id": "speed", "label": "Speed", "min": 0, "max": 2, "default": 1, "options": ["Slow", "Medium", "Fast"] },
+  { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.4 },
+  { "id": "beep", "label": "Beep", "min": 0, "max": 1, "default": 0.4, "hint": "How loud the warning beep is. All the way down: only the heartbeat." }
+ ],
+ "nodes": [
+  { "id": "beat", "type": "clock", "rate": "(4 + 2 * speed) / 4" },
+  { "id": "beat2", "type": "clock", "rate": "(4 + 2 * speed) / 4", "delay": "0.2 - 0.035 * speed" },
+  { "id": "fall1", "type": "env", "trig": "beat", "start": 70, "points": [[0, 70], [0.13, 50, "exp"]] },
+  { "id": "fall2", "type": "env", "trig": "beat2", "start": 70, "points": [[0, 70], [0.13, 50, "exp"]] },
+  { "id": "lub", "type": "osc", "wave": "sine", "freq": "fall1" },
+  { "id": "dub", "type": "osc", "wave": "sine", "freq": "fall2" },
+  { "id": "amp1", "type": "ad", "trig": "beat", "attack": 0.004, "hold": 0.015, "decay": 0.1, "curve": 2.2 },
+  { "id": "amp2", "type": "ad", "trig": "beat2", "attack": 0.004, "hold": 0.015, "decay": 0.12, "curve": 2.2 },
+  { "id": "hiss", "type": "noise", "seed": 23 },
+  { "id": "tap1", "type": "ad", "trig": "beat", "attack": 0.004, "hold": 0.025, "decay": 0.09, "curve": 1.2 },
+  { "id": "tap2", "type": "ad", "trig": "beat2", "attack": 0.004, "hold": 0.025, "decay": 0.09, "curve": 1.2 },
+  { "id": "click", "type": "filter", "mode": "bp", "in": "hiss * (tap1 + tap2 * 0.75)", "freq": "420 + bright * 380", "q": 2.5 },
+  { "id": "edge", "type": "filter", "mode": "hp", "in": "click", "freq": 300, "q": 0.7 },
+  { "id": "thump", "type": "expr", "expr": "lub * amp1 + dub * amp2 * 0.8 + edge * (2.9 + bright * 0.7)" },
+  { "id": "warn1", "type": "clock", "rate": 0.5 },
+  { "id": "warn2", "type": "clock", "rate": 0.5, "delay": 0.17 },
+  { "id": "note1", "type": "osc", "wave": "square", "freq": "pitch" },
+  { "id": "note2", "type": "osc", "wave": "square", "freq": "pitch * semi(-4)" },
+  { "id": "hold1", "type": "ad", "trig": "warn1", "attack": 0.008, "hold": 0.09, "decay": 0.07, "curve": 1.6 },
+  { "id": "hold2", "type": "ad", "trig": "warn2", "attack": 0.008, "hold": 0.11, "decay": 0.12, "curve": 1.6 },
+  { "id": "tone", "type": "filter", "mode": "lp", "in": "note1 * hold1 + note2 * hold2", "freq": "pitch * (1.3 + bright * 5)", "q": 0.8 },
+  { "id": "sum", "type": "expr", "expr": "thump + tone * beep * 1.3" },
+  { "id": "clean", "type": "filter", "mode": "hp", "in": "sum", "freq": 30 }
+ ],
+ "out": "clean",
+ "presets": {
+  "Stack high": { "speed": 1 },
+  "Almost full": { "speed": 2, "beep": 0.8 },
+  "Calm warning": { "speed": 0, "beep": 0 }
+ }
+}

@@ -1,0 +1,57 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "new-record",
+  "name": "New best",
+  "category": "jingle",
+  "description": "A record score: a proud buzzy tune over ringing bells that climbs, jumps up high in the middle, steps back down and lands on a held note with a quick flutter. Change its pitch, the time between notes, the brightness and the room. The same every time.",
+  "meta": {
+    "type": "jingle",
+    "role": "interface/reward",
+    "themes": ["neutral"],
+    "gameTypes": ["puzzle", "arcade"],
+    "words": ["record", "new best", "high score", "best score", "top score", "personal best", "beat", "champion", "tune", "bells", "reward", "celebrate", "results", "proud"],
+    "license": "draft"
+  },
+  "duration": "speed * 9 + 0.9 + space * 0.8",
+  "params": [
+    { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 260, "max": 700, "default": 440, "scale": "log" },
+    { "id": "speed", "label": "Time between notes", "unit": "s", "min": 0.08, "max": 0.16, "default": 0.12 },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.6 },
+    { "id": "space", "label": "Room", "min": 0, "max": 0.25, "default": 0.12 }
+  ],
+  "nodes": [
+    { "id": "beat", "type": "clock", "rate": "1 / speed", "count": 8 },
+    { "id": "land", "type": "clock", "rate": 1, "count": 1, "delay": "speed * 7" },
+    { "id": "isLast", "type": "expr", "expr": "t >= speed * 7 - 0.0005 ? 1 : 0" },
+
+    { "id": "note", "type": "seq", "steps": [-12, -7, -5, 0, 12, 7, 5, 0], "trig": "beat" },
+    { "id": "flutter", "type": "env", "points": [[0, 0], ["speed * 7.5", 5, "hold"], ["speed * 8", 0, "hold"], ["speed * 8.5", 5, "hold"], ["speed * 9", 0, "hold"]] },
+    { "id": "hz", "type": "expr", "expr": "pitch * semi(note + flutter)" },
+    { "id": "lead", "type": "osc", "wave": "pulse", "freq": "hz", "width": "0.42 - bright * 0.2" },
+    { "id": "leadSoft", "type": "filter", "mode": "lp", "in": "lead", "freq": "900 + bright * 4200", "q": 0.6 },
+    { "id": "stepAmp", "type": "ad", "attack": 0.004, "hold": "speed * 0.45", "decay": "speed * 0.8", "curve": 1.8, "trig": "beat" },
+    { "id": "lastAmp", "type": "ad", "attack": 0.004, "hold": "speed * 2 + 0.08", "decay": 0.62, "curve": 2, "trig": "land" },
+    { "id": "leadAmp", "type": "expr", "expr": "isLast ? lastAmp : stepAmp" },
+
+    { "id": "bellNote", "type": "seq", "steps": [0, 7, 12, 7, 12, 19, 24, 12], "trig": "beat" },
+    { "id": "bellHz", "type": "expr", "expr": "pitch * semi(bellNote)" },
+    { "id": "glint", "type": "ad", "attack": 0.001, "decay": "speed * 1.1 + 0.04", "curve": 2, "trig": "beat" },
+    { "id": "partial", "type": "osc", "wave": "sine", "freq": "bellHz * 3" },
+    { "id": "bell", "type": "osc", "wave": "sine", "freq": "bellHz", "pm": "partial * glint * (0.05 + bright * 0.35)" },
+    { "id": "bellStep", "type": "ad", "attack": 0.002, "decay": "speed * 2 + 0.1", "curve": 2.4, "trig": "beat" },
+    { "id": "bellLast", "type": "ad", "attack": 0.002, "decay": 0.75, "curve": 2.4, "trig": "land" },
+    { "id": "bellAmp", "type": "expr", "expr": "isLast ? bellLast : bellStep" },
+    { "id": "fifth", "type": "osc", "wave": "sine", "freq": "pitch * semi(7)" },
+
+    { "id": "sum", "type": "expr", "expr": "leadSoft * leadAmp * 0.42 + bell * bellAmp * 0.5 + fifth * bellLast * 0.16" },
+    { "id": "tone", "type": "filter", "mode": "lp", "in": "sum", "freq": "2000 + bright * 11000", "q": 0.6 },
+    { "id": "room", "type": "reverb", "in": "tone", "size": 0.6, "damp": 0.35, "mix": "space * 2" },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "room", "freq": 40 }
+  ],
+  "out": "clean * (1 - smooth(dur - 0.25, dur - 0.005, t))",
+  "presets": {
+    "New best": {},
+    "Close call": { "speed": 0.09, "pitch": 392 },
+    "Big record": { "space": 0.25, "bright": 0.9 }
+  }
+}

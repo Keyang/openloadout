@@ -1,0 +1,239 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "junk-rise",
+ "name": "Junk rows rise",
+ "category": "impact",
+ "description": "A grinding push from below: a low buzz that climbs one note for each row, with a crunchy click on every step, over a rumble that swells and stops. Change its weight, the number of rows, the time per row and the grit.",
+ "meta": {
+  "type": "sfx",
+  "role": "world/machine",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "puzzle",
+   "arcade"
+  ],
+  "words": [
+   "junk",
+   "garbage",
+   "rows",
+   "rise",
+   "push",
+   "grind",
+   "rumble",
+   "crunch",
+   "stack",
+   "shove",
+   "attack",
+   "versus",
+   "buzzy"
+  ],
+  "license": "draft"
+ },
+ "duration": "max(0.3, rows * speed + 0.1)",
+ "params": [
+  {
+   "id": "weight",
+   "label": "Weight",
+   "min": 0,
+   "max": 1,
+   "default": 0.5
+  },
+  {
+   "id": "rows",
+   "label": "Rows",
+   "min": 1,
+   "max": 4,
+   "default": 2,
+   "step": 1
+  },
+  {
+   "id": "speed",
+   "label": "Time per row",
+   "unit": "s",
+   "min": 0.08,
+   "max": 0.2,
+   "default": 0.12,
+   "scale": "log"
+  },
+  {
+   "id": "grit",
+   "label": "Grit",
+   "min": 0,
+   "max": 1,
+   "default": 0.4
+  }
+ ],
+ "nodes": [
+  {
+   "id": "tick",
+   "type": "clock",
+   "rate": "1 / speed",
+   "count": "rows"
+  },
+  {
+   "id": "row",
+   "type": "expr",
+   "expr": "min(floor(t / speed + 0.0001), rows - 1) + (weight > 0.66 ? 0 : (weight >= 0.34 ? 1 : 3))"
+  },
+  {
+   "id": "note",
+   "type": "expr",
+   "expr": "row < 1 ? 110 : (row < 2 ? 130.81 : (row < 3 ? 146.83 : (row < 4 ? 164.81 : (row < 5 ? 196 : (row < 6 ? 220 : 261.63)))))"
+  },
+  {
+   "id": "buzz",
+   "type": "osc",
+   "wave": "square",
+   "freq": "note"
+  },
+  {
+   "id": "edge",
+   "type": "osc",
+   "wave": "pulse",
+   "freq": "note",
+   "width": 0.22
+  },
+  {
+   "id": "shove",
+   "type": "ad",
+   "trig": "tick",
+   "attack": 0.003,
+   "hold": "speed * 0.45",
+   "decay": "speed * 0.55",
+   "curve": 1.4
+  },
+  {
+   "id": "gate",
+   "type": "env",
+   "start": 1,
+   "points": [
+    [
+     0,
+     1
+    ],
+    [
+     "rows * speed",
+     1,
+     "hold"
+    ],
+    [
+     "rows * speed + 0.035",
+     0
+    ]
+   ]
+  },
+  {
+   "id": "tone",
+   "type": "filter",
+   "mode": "lp",
+   "in": "buzz * 0.55 + edge * 0.6",
+   "freq": "700 + grit * 3600 - weight * 250",
+   "q": 0.9
+  },
+  {
+   "id": "mid",
+   "type": "filter",
+   "mode": "hp",
+   "in": "tone",
+   "freq": 260,
+   "q": 0.7
+  },
+  {
+   "id": "hiss",
+   "type": "noise"
+  },
+  {
+   "id": "knock",
+   "type": "ad",
+   "trig": "tick",
+   "attack": 0.0005,
+   "decay": "0.03 + grit * 0.03",
+   "curve": 2.6
+  },
+  {
+   "id": "hard",
+   "type": "rand",
+   "trig": "tick",
+   "lo": 0.7,
+   "hi": 1
+  },
+  {
+   "id": "chip",
+   "type": "filter",
+   "mode": "bp",
+   "in": "hiss",
+   "freq": "(1500 + grit * 1700) * rnd(0.9, 1.1)",
+   "q": 1.1
+  },
+  {
+   "id": "crunch",
+   "type": "crush",
+   "in": "(tone * 0.95 + mid * 0.6) * (0.55 + 0.45 * shove) * gate + chip * knock * hard * (0.5 + grit * 1.4)",
+   "bits": "7.5 - grit * 4.5",
+   "rate": "11000 - grit * 6500"
+  },
+  {
+   "id": "deep",
+   "type": "noise",
+   "color": "brown"
+  },
+  {
+   "id": "swell",
+   "type": "env",
+   "start": 0.25,
+   "points": [
+    [
+     0,
+     0.25
+    ],
+    [
+     "rows * speed * 0.85",
+     1,
+     1.6
+    ],
+    [
+     "rows * speed + 0.06",
+     0,
+     2
+    ]
+   ]
+  },
+  {
+   "id": "rumble",
+   "type": "filter",
+   "mode": "lp",
+   "in": "deep",
+   "freq": "260 - weight * 120",
+   "q": 1.2
+  },
+  {
+   "id": "sum",
+   "type": "expr",
+   "expr": "crunch + rumble * swell * (0.5 + weight * 0.9)"
+  },
+  {
+   "id": "clean",
+   "type": "filter",
+   "mode": "hp",
+   "in": "sum",
+   "freq": 30
+  }
+ ],
+ "out": "clean",
+ "presets": {
+  "One row": {
+   "rows": 1
+  },
+  "Big push": {
+   "rows": 4,
+   "weight": 0.8
+  },
+  "Slow rumble": {
+   "rows": 2,
+   "speed": 0.2,
+   "grit": 0.15
+  }
+ }
+}

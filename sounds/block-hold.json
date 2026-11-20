@@ -1,0 +1,49 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "block-hold",
+  "name": "Hold swap",
+  "category": "ui",
+  "description": "Two quick glassy blips, one dipping down and one coming back up, over a soft swish, for tucking a piece away and bringing another out. Change its pitch, the time between notes, brightness, swish and whether the second blip plays.",
+  "meta": {
+    "type": "sfx",
+    "role": "items/equip",
+    "themes": ["neutral"],
+    "gameTypes": ["puzzle", "arcade"],
+    "words": ["hold", "swap", "switch", "store", "stash", "exchange", "reserve", "piece", "blip", "swish", "tidy", "glassy"],
+    "license": "draft"
+  },
+  "duration": "speed * notes + 0.04",
+  "params": [
+    { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 400, "max": 1400, "default": 659, "scale": "log" },
+    { "id": "speed", "label": "Time between notes", "unit": "s", "min": 0.04, "max": 0.12, "default": 0.07 },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "swish", "label": "Swish", "min": 0, "max": 1, "default": 0.4 },
+    { "id": "notes", "label": "Notes", "min": 1, "max": 2, "default": 2, "step": 1 }
+  ],
+  "nodes": [
+    { "id": "second", "type": "clock", "rate": 1, "count": 1, "delay": "speed" },
+    { "id": "fall", "type": "env", "points": [[0, "pitch"], ["speed * 0.6", "pitch * semi(-7)", "exp"]] },
+    { "id": "climb", "type": "env", "start": "pitch * semi(-7)", "trig": "second", "points": [[0, "pitch * semi(-7)"], ["speed * 0.6", "pitch", "exp"]] },
+    { "id": "ampA", "type": "ad", "attack": 0.002, "decay": "speed * 0.95", "curve": 2 },
+    { "id": "ampB", "type": "ad", "attack": 0.002, "decay": "speed + 0.03", "curve": 2.2, "trig": "second" },
+    { "id": "barkA", "type": "ad", "attack": 0.0005, "decay": "speed * 0.5", "curve": 2 },
+    { "id": "barkB", "type": "ad", "attack": 0.0005, "decay": "speed * 0.5", "curve": 2, "trig": "second" },
+    { "id": "modA", "type": "osc", "wave": "sine", "freq": "fall * 2" },
+    { "id": "blipA", "type": "osc", "wave": "sine", "freq": "fall", "pm": "modA * (0.05 + bright * 0.12 + (0.1 + bright * 0.5) * barkA)" },
+    { "id": "modB", "type": "osc", "wave": "sine", "freq": "climb * 2" },
+    { "id": "blipB", "type": "osc", "wave": "sine", "freq": "climb", "pm": "modB * (0.05 + bright * 0.12 + (0.1 + bright * 0.5) * barkB)" },
+    { "id": "back", "type": "expr", "expr": "step(1.5, notes)" },
+    { "id": "air", "type": "noise", "color": "white", "seed": 13 },
+    { "id": "sweep", "type": "env", "points": [[0, 5200], ["speed", 1500, "exp"], ["speed * 2", 5200, "exp"]] },
+    { "id": "band", "type": "filter", "mode": "bp", "in": "air", "freq": "sweep * (0.7 + bright * 0.6)", "q": 2.5 },
+    { "id": "airAmp", "type": "env", "points": [[0, 0], [0.004, 1], ["speed * 0.9", 0.25, 2], ["speed", "0.25 + step(1.5, notes) * 0.55"], ["speed * notes + 0.03", 0, 2]] },
+    { "id": "tone", "type": "filter", "mode": "lp", "in": "blipA * ampA + blipB * ampB * back", "freq": "2500 + bright * 6500", "q": 0.6 },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "tone + band * airAmp * swish * 0.9", "freq": 120 }
+  ],
+  "out": "clean",
+  "presets": {
+    "Swap": {},
+    "Hold empty": { "notes": 1 },
+    "Swap back": { "pitch": 587 }
+  }
+}

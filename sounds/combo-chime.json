@@ -1,0 +1,41 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "combo-chime",
+  "name": "Combo chime",
+  "category": "ui",
+  "description": "One clean bell note with a tiny echo, for each clear in a combo: raise Combo and the note climbs, step by step. Change its first note, the combo count, how long it rings and its brightness. The same every time.",
+  "meta": {
+    "type": "sfx",
+    "role": "interface/reward",
+    "themes": ["neutral"],
+    "gameTypes": ["puzzle", "arcade"],
+    "words": ["combo", "chain", "streak", "chime", "bell", "ding", "climb", "rising", "reward", "score", "multiplier", "bonus", "clean"],
+    "license": "draft"
+  },
+  "duration": "0.03 + ring * 0.92",
+  "params": [
+    { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 260, "max": 1050, "default": 523, "scale": "log" },
+    { "id": "combo", "label": "Combo", "min": 0, "max": 7, "default": 0, "step": 1 },
+    { "id": "ring", "label": "Ring", "unit": "s", "min": 0.1, "max": 0.4, "default": 0.2 },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 }
+  ],
+  "nodes": [
+    { "id": "rung", "type": "expr", "expr": "combo % 5" },
+    { "id": "note", "type": "expr", "expr": "12 * floor(combo / 5) + (rung < 3 ? rung * 2 : rung * 2 + 1)" },
+    { "id": "hz", "type": "expr", "expr": "pitch * semi(note)" },
+    { "id": "glint", "type": "ad", "attack": 0.001, "decay": "ring * 0.35", "curve": 2 },
+    { "id": "partial", "type": "osc", "wave": "sine", "freq": "hz * 3" },
+    { "id": "bell", "type": "osc", "wave": "sine", "freq": "hz", "pm": "partial * glint * (0.03 + bright * 0.27)" },
+    { "id": "amp", "type": "ad", "attack": 0.002, "decay": "ring * 0.8", "curve": 2.6 },
+    { "id": "again", "type": "clock", "rate": 1, "count": 1, "delay": "0.025 + ring * 0.2" },
+    { "id": "echoAmp", "type": "ad", "attack": 0.002, "decay": "ring * 0.6", "curve": 2.6, "trig": "again" },
+    { "id": "fade", "type": "env", "points": [[0, 1], ["0.02 + ring * 0.88", 1], ["0.03 + ring * 0.92", 0]] },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "bell * (amp + echoAmp * 0.3) * fade", "freq": 80 }
+  ],
+  "out": "clean",
+  "presets": {
+    "Combo 1": { "combo": 0 },
+    "Combo 4": { "combo": 3 },
+    "Combo max": { "combo": 7, "ring": 0.35 }
+  }
+}
