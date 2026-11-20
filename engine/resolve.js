@@ -41,7 +41,7 @@
 //     body        { kind, <kind>: the body resolved } (kind: rig, tiles, layers, panel, emitters, pictures; an emitters
 //                 body also carries its `nodes` and `draw` beside them, resolved alike), base (the
 //                 base piece "id@v" a rig extends, or null), pieces (every piece drawn, "id@v", sorted),
-//     clips       { name: { label, frames, fps, fpsBase, loop, keys, frameEdits, sounds, from? } },
+//     clips       { name: { label, frames, fps, fpsBase, loop, keys, frameEdits, sounds, from?, noText? } },
 //     points, slice, textArea }
 // A piece drawn in takes the id of its use (so show, hide and frame edits act on the whole piece), the use's `on`, its
 // z added to each item's, and its group, glow, hidden, far, part, shade and light where an item sets none; a use with
@@ -954,6 +954,7 @@ function clipsOf(S, def, names, baseClips, baseEnv, speed, laid = null) {
       sounds: c && c.sounds !== undefined ? cuesOf(S, S.env, c.sounds) : b ? cuesOf(S, baseEnv ?? S.env, b.sounds) : [],
     };
     if (c && typeof c.from === 'string') r.from = c.from;
+    if (c && c.noText === true) r.noText = true;
     if (lay && typeof lay.block === 'string') r.block = lay.block;
     if (lay && typeof lay.place === 'string') r.place = lay.place;
     out[name] = r;

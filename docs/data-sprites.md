@@ -64,7 +64,7 @@ Method: `meta.type` and the `engine/` and `rigs/` modules each file imports (exc
 | `parts` | Contract 3 parts (2.6) | extended |
 | `versions` | ≤ 24 `{ name, params }` (Contract 1) | yes |
 | `body` | Exactly one of `rig` (2.2), `tiles` (2.3), `layers` (2.4), `panel` (2.5b), `emitters` (2.5c), `pictures` (2.5d) | v1: `rig`, `library` (library goes) |
-| `clips` | `{ name: clip }`: `label`, `frames`, `fps`, `loop`, `keys`, `frameEdits`, `sounds` (each cue may carry `when`), `from` (a base's clip it inherits). A layout may write the clips for you (`tiles`, `layers`, `panel` state lists) | extended |
+| `clips` | `{ name: clip }`: `label`, `frames`, `fps`, `loop`, `keys`, `frameEdits`, `sounds` (each cue may carry `when`), `from` (a base's clip it inherits), `noText: true` (an interface clip that never carries the game's text, such as a counter row showing its own sample digits: `contrastFaults` skips it and the sheet gives it no text area). A layout may write the clips for you (`tiles`, `layers`, `panel` state lists) | extended |
 | `points` | Attach points (Contract 3 sockets) on nodes: `{ id, on, at, angle? }` | v1 rig `points` |
 | `slice`, `textArea` | Contract 8, as data per clip (`{ left, top, right, bottom }`, `{ x, y, w, h, colour }`); a layout may compute them (a `panel` does) | new |
 | `materials` | `{ rest }`: Contract 7 material for colours no slot paints | new |

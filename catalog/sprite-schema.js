@@ -2393,7 +2393,7 @@ function partsOf(C, raw) {
   return out;
 }
 
-const CLIP_FIELDS = ['label', 'frames', 'fps', 'loop', 'keys', 'frameEdits', 'sounds', 'from'];
+const CLIP_FIELDS = ['label', 'frames', 'fps', 'loop', 'keys', 'frameEdits', 'sounds', 'from', 'noText'];
 const EDIT_FIELDS = ['nudge', 'show', 'hide', 'flash', 'swap'];
 const SOUND_FIELDS = ['sound', 'frame', 'preset', 'volume', 'when'];
 
@@ -2568,6 +2568,8 @@ function checkClip(C, name, c, written) {
       o.sounds.push(x);
     });
   }
+  // noText: the clip never carries the game's text (engine/ui.js, CONTRAST); only a true one is kept
+  if (bool(C, place, 'noText', c.noText) === true) o.noText = true;
   // advice from style guide 4, for bodies that act
   if (C.bodyKind === 'rig') {
     if (Object.hasOwn(CLIP_SYNONYMS, action)) { const s = CLIP_SYNONYMS[action]; C.warn(`${place}: the style guide calls this clip "${s}"; name it ${dir ? `${s}_${dir}` : s} and keep the label ${q(o.label)}`); }
