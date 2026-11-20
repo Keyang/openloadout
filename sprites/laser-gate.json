@@ -1,0 +1,138 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "laser-gate",
+ "name": "Laser gate",
+ "blurb": "Two posts with beams of light between them that bar a corridor, power down, stand dark or warn before they switch on. Change the gap, the posts, the number of beams, the flicker and the colours.",
+ "meta": {
+  "type": "prop",
+  "role": "world/hazard",
+  "themes": ["sci-fi","space"],
+  "gameTypes": ["roguelike-action","shooter"],
+  "view": "top-down",
+  "words": ["laser","gate","beam","barrier","fence","trap","hazard","security","switch off","warn","block","corridor","energy"],
+  "license": "draft"
+ },
+ "size": [64,48],
+ "pivot": [32,46],
+ "preview": "idle",
+ "styles": ["pixel"],
+ "palette": [
+  {
+   "id": "body",
+   "label": "Posts",
+   "default": "#6b7896",
+   "material": "metal",
+   "swatches": ["#6b7896","#9aa6c0","#c2c9d6","#566182","#6660b6","#a87894"]
+  },
+  {
+   "id": "accent",
+   "label": "Warning paint",
+   "default": "#f2a030",
+   "material": "warning",
+   "swatches": ["#f2a030","#2fb3a8","#e2473f","#3f6fd1","#5fe0f0","#9fe040"]
+  },
+  {
+   "id": "glow",
+   "label": "Beam",
+   "default": "#e2473f",
+   "material": "light",
+   "swatches": ["#e2473f","#5fe0f0","#9fe040","#f2a030","#b48af8","#4f9ff0","#5fd47a"]
+  }
+ ],
+ "controls": [
+  {"key":"width","kind":"range","label":"Width","lo":"Narrow","hi":"Wide","default":0.6},
+  {
+   "key": "style",
+   "kind": "choice",
+   "label": "Style",
+   "options": [{"value":"pylon","label":"Pylon"},{"value":"orb","label":"Orb"},{"value":"wall mount","label":"Wall mount"}],
+   "default": "pylon"
+  },
+  {
+   "key": "beams",
+   "kind": "choice",
+   "label": "Beams",
+   "options": [{"value":"one","label":"One"},{"value":"two","label":"Two"},{"value":"three","label":"Three"}],
+   "default": "two"
+  },
+  {"key":"body","kind":"colour","label":"Posts"},
+  {"key":"accent","kind":"colour","label":"Warning paint"},
+  {"key":"glow","kind":"colour","label":"Beam"},
+  {"key":"flicker","kind":"range","label":"Flicker","lo":"Steady","hi":"Wild","default":0.5,"group":"Motion"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": {
+  "pictures": {
+   "nodes": [],
+   "draw": [
+    {
+     "id": "idle",
+     "gen": "laser.gate",
+     "v": 1,
+     "at": [32,46],
+     "clip": ["idle"],
+     "picture": "idle",
+     "width": {"from":"width","map":[[0,0],[1,1]],"round":"none"},
+     "style": {"from":"style","pick":{"pylon":"pylon","orb":"orb","wall mount":"wall-mount"}},
+     "beams": {"from":"beams","pick":{"one":"one","two":"two","three":"three"}},
+     "body": "body",
+     "accent": "accent",
+     "glowing": "glow",
+     "flicker": {"from":"flicker","map":[[0,0],[1,1]],"round":"none"}
+    },
+    {
+     "id": "open",
+     "gen": "laser.gate",
+     "v": 1,
+     "at": [32,46],
+     "clip": ["open"],
+     "picture": "open",
+     "width": {"from":"width","map":[[0,0],[1,1]],"round":"none"},
+     "style": {"from":"style","pick":{"pylon":"pylon","orb":"orb","wall mount":"wall-mount"}},
+     "beams": {"from":"beams","pick":{"one":"one","two":"two","three":"three"}},
+     "body": "body",
+     "accent": "accent",
+     "glowing": "glow",
+     "flicker": {"from":"flicker","map":[[0,0],[1,1]],"round":"none"}
+    },
+    {
+     "id": "off",
+     "gen": "laser.gate",
+     "v": 1,
+     "at": [32,46],
+     "clip": ["off"],
+     "picture": "off",
+     "width": {"from":"width","map":[[0,0],[1,1]],"round":"none"},
+     "style": {"from":"style","pick":{"pylon":"pylon","orb":"orb","wall mount":"wall-mount"}},
+     "beams": {"from":"beams","pick":{"one":"one","two":"two","three":"three"}},
+     "body": "body",
+     "accent": "accent",
+     "glowing": "glow",
+     "flicker": {"from":"flicker","map":[[0,0],[1,1]],"round":"none"}
+    },
+    {
+     "id": "warn",
+     "gen": "laser.gate",
+     "v": 1,
+     "at": [32,46],
+     "clip": ["warn"],
+     "picture": "warn",
+     "width": {"from":"width","map":[[0,0],[1,1]],"round":"none"},
+     "style": {"from":"style","pick":{"pylon":"pylon","orb":"orb","wall mount":"wall-mount"}},
+     "beams": {"from":"beams","pick":{"one":"one","two":"two","three":"three"}},
+     "body": "body",
+     "accent": "accent",
+     "glowing": "glow",
+     "flicker": {"from":"flicker","map":[[0,0],[1,1]],"round":"none"}
+    }
+   ]
+  }
+ },
+ "clips": {
+  "idle": {"frames":8,"fps":10,"label":"On","sounds":[{"sound":"spaceship-hum","preset":"Idle","frame":0,"volume":0.35}]},
+  "open": {"frames":6,"fps":12,"loop":false,"label":"Power down","sounds":[{"sound":"tech-click","preset":"Confirm","frame":0,"volume":0.6}]},
+  "off": {"frames":1,"fps":8},
+  "warn": {"frames":6,"fps":8}
+ }
+}

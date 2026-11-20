@@ -1,0 +1,409 @@
+{
+ "id": "platform.moving",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     32,
+     8
+    ],
+    "wood": "wood",
+    "metal": "metal"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      8,
+      1
+     ],
+     "anchor": "tl",
+     "rows": [
+      "....a...........................",
+      "...aba..........................",
+      "..abaca.........................",
+      "..abaca.........................",
+      "...aba..........................",
+      "...ada..........................",
+      "...aba..........................",
+      ".aadddaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "accceeeeeefeeeeeeefeeeeeeefeeeee",
+      "abbbggggggfgggggggfgggggggfggggg",
+      "abdbggggggfgggggggfgggggggfggggg",
+      "adddffffffffffffffffffffffffffff",
+      ".aaaahhhhhhhhhhhhhhhhhhhhhhhhhhh",
+      "....ahhhhhhhhfffffhhhhhhhhfffffh",
+      "....ahhhhhhhhhhhhhhhhhhhhhhhhhhh",
+      "....afffffffffffffffffffffffffff",
+      ".....aaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "................adbbbdiiiidbba..",
+      "................adddbdiiiidbbaa.",
+      ".................aadbdiiiidbbbba",
+      "..................abbdiiiidbbdda",
+      ".................abbbbddddbbaada",
+      "................addbbddbbbbba.a.",
+      ".................addaadbbddbba..",
+      "..................aa.abbaaddba..",
+      "....................addda.ada...",
+      ".....................aaa...a...."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "metal",
+      "c": "metal.light",
+      "d": "metal.dark",
+      "e": "wood.light",
+      "f": "wood.dark",
+      "g": "wood",
+      "h": {
+       "rule": "mix",
+       "of": "wood",
+       "with": {
+        "rule": "ramp",
+        "of": "wood",
+        "tone": "dark"
+       },
+       "amount": 0.5
+      },
+      "i": {
+       "rule": "tone",
+       "of": "metal",
+       "by": -1.6
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      40,
+      1
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...........a....",
+      "..........aba...",
+      ".........abaca..",
+      ".........abaca..",
+      "..........aba...",
+      "..........ada...",
+      "..........aba...",
+      "aaaaaaaaaadddaa.",
+      "eefeeeeeeeeeccca",
+      "ggfgggggggggbbba",
+      "ggfgggggggggbdba",
+      "ffffffffffffddda",
+      "hhhhhhhhhhhaaaa.",
+      "hhhhhhhhhhha....",
+      "hhhhhhhhhhha....",
+      "fffffffffffa....",
+      "aaaaaaaaaaa.....",
+      "................",
+      "................",
+      "................",
+      "................",
+      "................",
+      "................",
+      "................",
+      "................",
+      "................",
+      "................"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "metal",
+      "c": "metal.light",
+      "d": "metal.dark",
+      "e": "wood.light",
+      "f": "wood.dark",
+      "g": "wood",
+      "h": {
+       "rule": "mix",
+       "of": "wood",
+       "with": {
+        "rule": "ramp",
+        "of": "wood",
+        "tone": "dark"
+       },
+       "amount": 0.5
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     32,
+     8
+    ],
+    "wood": "wood",
+    "metal": "metal",
+    "picture": "move"
+   },
+   "ctx": {
+    "t": 0.4,
+    "loop": false,
+    "frames": 6,
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      8,
+      1
+     ],
+     "anchor": "tl",
+     "rows": [
+      "....a...........................",
+      "..aaba..........................",
+      ".abaca..........................",
+      ".abaca..........................",
+      "..aba...........................",
+      "..ada...........................",
+      "...aba..........................",
+      ".aadddaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "accceeeeeefeeeeeeefeeeeeeefeeeee",
+      "abbbggggggfgggggggfgggggggfggggg",
+      "abdbggggggfgggggggfgggggggfggggg",
+      "adddffffffffffffffffffffffffffff",
+      ".aaaahhhhhhhhhhhhhhhhhhhhhhhhhhh",
+      "....ahhhhhhhhfffffhhhhhhhhfffffh",
+      "....ahhhhhhhhhhhhhhhhhhhhhhhhhhh",
+      "....afffffffffffffffffffffffffff",
+      ".....aaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      ".................aabbdiiiidbbaa.",
+      "................adbbbdiiiidbbbba",
+      "................adddbdiiiidbbbda",
+      ".................aadddiiiidbbaa.",
+      "...................abbddddbba...",
+      "..................abbbdbbbbdba..",
+      ".................addbaddbbaddba.",
+      "..................ada.adba.ada..",
+      "...................a..adda..a...",
+      ".......................aa......."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "metal",
+      "c": "metal.light",
+      "d": "metal.dark",
+      "e": "wood.light",
+      "f": "wood.dark",
+      "g": "wood",
+      "h": {
+       "rule": "mix",
+       "of": "wood",
+       "with": {
+        "rule": "ramp",
+        "of": "wood",
+        "tone": "dark"
+       },
+       "amount": 0.5
+      },
+      "i": {
+       "rule": "tone",
+       "of": "metal",
+       "by": -1.6
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      40,
+      1
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...........a....",
+      ".........aaba...",
+      "........abaca...",
+      "........abaca...",
+      ".........aba....",
+      ".........ada....",
+      "..........aba...",
+      "aaaaaaaaaadddaa.",
+      "eefeeeeeeeeeccca",
+      "ggfgggggggggbbba",
+      "ggfgggggggggbdba",
+      "ffffffffffffddda",
+      "hhhhhhhhhhhaaaa.",
+      "hhhhhhhhhhha....",
+      "hhhhhhhhhhha....",
+      "fffffffffffa....",
+      "aaaaaaaaaaa.....",
+      "................",
+      "................",
+      "................",
+      "................",
+      "................",
+      "................",
+      "................",
+      "................",
+      "................",
+      "................"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "metal",
+      "c": "metal.light",
+      "d": "metal.dark",
+      "e": "wood.light",
+      "f": "wood.dark",
+      "g": "wood",
+      "h": {
+       "rule": "mix",
+       "of": "wood",
+       "with": {
+        "rule": "ramp",
+        "of": "wood",
+        "tone": "dark"
+       },
+       "amount": 0.5
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     32,
+     8
+    ],
+    "wood": "wood",
+    "metal": "metal",
+    "picture": "move"
+   },
+   "ctx": {
+    "t": 0.375,
+    "loop": true,
+    "frames": 8,
+    "frame": 3
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      8,
+      1
+     ],
+     "anchor": "tl",
+     "rows": [
+      "....a...........................",
+      "...aba..........................",
+      "..abaca.........................",
+      ".abaca..........................",
+      "..aba...........................",
+      "..ada...........................",
+      "...aba..........................",
+      "...aba..........................",
+      ".aadddaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "accceeeeeefeeeeeeefeeeeeeefeeeee",
+      "abbbggggggfgggggggfgggggggfggggg",
+      "abdbggggggfgggggggfgggggggfggggg",
+      "adddffffffffffffffffffffffffffff",
+      ".aaaahhhhhhhhhhhhhhhhhhhhhhhhhhh",
+      "....ahhhhhhhhfffffhhhhhhhhfffffh",
+      "....ahhhhhhhhhhhhhhhhhhhhhhhhhhh",
+      "....afffffffffffffffffffffffffff",
+      ".....aaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "................adddbdiiiidbbaa.",
+      ".................aadbdiiiidbba..",
+      "..................adbdiiiidbbaa.",
+      ".................aabbdiiiidbbdba",
+      "................adbbbbddddbbadda",
+      "................addbdddbbbbbaaa.",
+      ".................adaaabbdddba...",
+      "..................a.adbaaadbba..",
+      "....................adda.adda...",
+      ".....................aa...aa...."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "metal",
+      "c": "metal.light",
+      "d": "metal.dark",
+      "e": "wood.light",
+      "f": "wood.dark",
+      "g": "wood",
+      "h": {
+       "rule": "mix",
+       "of": "wood",
+       "with": {
+        "rule": "ramp",
+        "of": "wood",
+        "tone": "dark"
+       },
+       "amount": 0.5
+      },
+      "i": {
+       "rule": "tone",
+       "of": "metal",
+       "by": -1.6
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      40,
+      1
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...........a....",
+      "..........aba...",
+      ".........abaca..",
+      "........abaca...",
+      ".........aba....",
+      ".........ada....",
+      "..........aba...",
+      "..........aba...",
+      "aaaaaaaaaadddaa.",
+      "eefeeeeeeeeeccca",
+      "ggfgggggggggbbba",
+      "ggfgggggggggbdba",
+      "ffffffffffffddda",
+      "hhhhhhhhhhhaaaa.",
+      "hhhhhhhhhhha....",
+      "hhhhhhhhhhha....",
+      "fffffffffffa....",
+      "aaaaaaaaaaa.....",
+      "................",
+      "................",
+      "................",
+      "................",
+      "................",
+      "................",
+      "................",
+      "................",
+      "................",
+      "................"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "metal",
+      "c": "metal.light",
+      "d": "metal.dark",
+      "e": "wood.light",
+      "f": "wood.dark",
+      "g": "wood",
+      "h": {
+       "rule": "mix",
+       "of": "wood",
+       "with": {
+        "rule": "ramp",
+        "of": "wood",
+        "tone": "dark"
+       },
+       "amount": 0.5
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

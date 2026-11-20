@@ -1,0 +1,212 @@
+{
+ "id": "inn",
+ "frozen": "2026-11-20",
+ "source": "sprites/inn.js",
+ "sha256": "f5f5b2b4fd2d127639a5035a942aa32860cff59fcfcba99adddb0a165194a911",
+ "name": "Inn",
+ "blurb": "A two-storey village inn with a double door that opens, windows that light up at night and a hanging picture sign. Change its width, roof, chimney, sign and colours.",
+ "meta": {
+  "type": "prop",
+  "role": "world/building",
+  "themes": [
+   "fantasy",
+   "farm"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "top-down-rpg"
+  ],
+  "view": "top-down",
+  "words": [
+   "inn",
+   "tavern",
+   "pub",
+   "hotel",
+   "house",
+   "village",
+   "sign",
+   "door",
+   "open",
+   "enter",
+   "rest",
+   "sleep",
+   "night",
+   "timber"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  128,
+  96
+ ],
+ "pivot": [
+  64,
+  92
+ ],
+ "grounded": true,
+ "preview": "closed",
+ "params": {
+  "width": {
+   "kind": "range",
+   "label": "Width",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Narrow",
+   "hi": "Wide",
+   "group": "Look"
+  },
+  "roof": {
+   "kind": "choice",
+   "label": "Roof",
+   "def": "tile",
+   "options": [
+    "thatch",
+    "tile",
+    "slate"
+   ],
+   "group": "Look"
+  },
+  "chimney": {
+   "kind": "toggle",
+   "label": "Chimney",
+   "def": true,
+   "group": "Look"
+  },
+  "sign": {
+   "kind": "choice",
+   "label": "Sign",
+   "def": "mug",
+   "options": [
+    "mug",
+    "bed",
+    "moon",
+    "none"
+   ],
+   "group": "Look"
+  },
+  "signColour": {
+   "kind": "color",
+   "label": "Colour",
+   "def": "#f2c230",
+   "swatches": [
+    "#f2c230",
+    "#c9423a",
+    "#f0ead8",
+    "#7fe0a0",
+    "#4fd8ee",
+    "#c8553a"
+   ],
+   "group": "Colors"
+  },
+  "wall": {
+   "kind": "color",
+   "label": "Walls",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#a8a4a0",
+    "#c9a06a",
+    "#a8c8d8",
+    "#9fd8f4"
+   ],
+   "group": "Colors"
+  },
+  "roofColour": {
+   "kind": "color",
+   "label": "Roof colour",
+   "def": "#c8553a",
+   "swatches": [
+    "#c8553a",
+    "#5a5f7a",
+    "#e6c96a",
+    "#9a6a3e",
+    "#2f8f9d"
+   ],
+   "group": "Colors"
+  },
+  "wood": {
+   "kind": "color",
+   "label": "Beams and door",
+   "def": "#9a6a3e",
+   "swatches": [
+    "#9a6a3e",
+    "#a8612a",
+    "#5a3a22",
+    "#c8553a",
+    "#5a5f7a",
+    "#2f8f9d"
+   ],
+   "group": "Colors"
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Window light",
+   "def": "#f4e06a",
+   "swatches": [
+    "#f4e06a",
+    "#4fd8ee",
+    "#e8662c",
+    "#7aa0f4",
+    "#7fe0a0",
+    "#7a4fc4"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "closed": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "open": {
+   "frames": 6,
+   "loop": false,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  },
+  "lit": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    8,
+    12
+   ]
+  }
+ },
+ "sounds": {
+  "open": [
+   {
+    "sound": "door-creak",
+    "frame": 0,
+    "preset": "Wooden door",
+    "volume": 0.8
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-rpg-fantasy"
+ ]
+}

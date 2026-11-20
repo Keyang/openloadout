@@ -1,0 +1,487 @@
+{
+ "id": "security-bot",
+ "frozen": "2026-11-20",
+ "source": "sprites/security-bot.js",
+ "sha256": "1069de3ead3763f17922f96cfd907c88081110a2bfb42e2357b9faf07e93462a",
+ "name": "Security bot",
+ "blurb": "A heavy robot guard on treads or legs that patrols, charges, shoots and shuts down in a slump. Change its size, bulk, drive, head, weapon, back pack and colours.",
+ "meta": {
+  "type": "creature",
+  "role": "characters/enemy",
+  "themes": [
+   "sci-fi",
+   "space"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "shooter"
+  ],
+  "view": "top-down",
+  "words": [
+   "robot",
+   "guard",
+   "security",
+   "sentry",
+   "machine",
+   "tank",
+   "treads",
+   "patrol",
+   "charge",
+   "ram",
+   "shoot",
+   "shutdown",
+   "enemy",
+   "hazard stripes"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  48,
+  48
+ ],
+ "pivot": [
+  24,
+  42
+ ],
+ "grounded": false,
+ "preview": "walk_down",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "bulk": {
+   "kind": "range",
+   "label": "Bulk",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Light",
+   "hi": "Heavy",
+   "group": "Look"
+  },
+  "legs": {
+   "kind": "choice",
+   "label": "Legs",
+   "def": "treads",
+   "options": [
+    {
+     "value": "treads",
+     "label": "Treads"
+    },
+    {
+     "value": "legs",
+     "label": "Legs"
+    }
+   ],
+   "group": "Look"
+  },
+  "shape": {
+   "kind": "choice",
+   "label": "Shape",
+   "def": "block",
+   "options": [
+    {
+     "value": "dome",
+     "label": "Dome"
+    },
+    {
+     "value": "block",
+     "label": "Block"
+    },
+    {
+     "value": "sensor",
+     "label": "Sensor"
+    }
+   ],
+   "group": "Look"
+  },
+  "weapon": {
+   "kind": "choice",
+   "label": "Weapon",
+   "def": "cannon",
+   "options": [
+    {
+     "value": "cannon",
+     "label": "Cannon"
+    },
+    {
+     "value": "saw",
+     "label": "Saw"
+    },
+    {
+     "value": "claw",
+     "label": "Claw"
+    },
+    {
+     "value": "none",
+     "label": "None"
+    }
+   ],
+   "group": "Look"
+  },
+  "weaponLength": {
+   "kind": "range",
+   "label": "Length",
+   "def": 1,
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "lo": "Short",
+   "hi": "Long",
+   "group": "Look"
+  },
+  "pack": {
+   "kind": "choice",
+   "label": "Pack",
+   "def": "none",
+   "options": [
+    {
+     "value": "none",
+     "label": "None"
+    },
+    {
+     "value": "siren",
+     "label": "Siren"
+    },
+    {
+     "value": "exhaust",
+     "label": "Exhaust"
+    }
+   ],
+   "group": "Look"
+  },
+  "packSize": {
+   "kind": "range",
+   "label": "Size",
+   "def": 1,
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Body",
+   "def": "#6b7896",
+   "swatches": [
+    "#6b7896",
+    "#9aa6c0",
+    "#a87894",
+    "#c98a4a"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Hazard stripes",
+   "def": "#f2a030",
+   "swatches": [
+    "#f2a030",
+    "#f2c230",
+    "#2fb3a8",
+    "#f0ead8"
+   ],
+   "group": "Colors"
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Lights",
+   "def": "#e2473f",
+   "swatches": [
+    "#e2473f",
+    "#9fe040",
+    "#b48af8",
+    "#b04a8a"
+   ],
+   "group": "Colors"
+  },
+  "bounce": {
+   "kind": "range",
+   "label": "Bounce",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Calm",
+   "hi": "Bouncy",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle_down": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    7,
+    10
+   ]
+  },
+  "walk_down": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "walk_up": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "walk_side": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "attack_down": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    8,
+    14,
+    19
+   ]
+  },
+  "attack_up": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    8,
+    14,
+    19
+   ]
+  },
+  "attack_side": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    8,
+    14,
+    19
+   ]
+  },
+  "shoot_down": {
+   "frames": 6,
+   "loop": false,
+   "fps": [
+    9,
+    15,
+    20
+   ]
+  },
+  "shoot_up": {
+   "frames": 6,
+   "loop": false,
+   "fps": [
+    9,
+    15,
+    20
+   ]
+  },
+  "shoot_side": {
+   "frames": 6,
+   "loop": false,
+   "fps": [
+    9,
+    15,
+    20
+   ]
+  },
+  "hurt": {
+   "frames": 4,
+   "loop": false,
+   "fps": [
+    6,
+    9,
+    13
+   ]
+  },
+  "die": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  }
+ },
+ "sounds": {
+  "walk_down": [
+   {
+    "sound": "footstep-metal",
+    "preset": "Heavy mech",
+    "volume": 0.45,
+    "frame": 0
+   },
+   {
+    "sound": "footstep-metal",
+    "preset": "Heavy mech",
+    "volume": 0.45,
+    "frame": 4
+   }
+  ],
+  "walk_up": [
+   {
+    "sound": "footstep-metal",
+    "preset": "Heavy mech",
+    "volume": 0.45,
+    "frame": 0
+   },
+   {
+    "sound": "footstep-metal",
+    "preset": "Heavy mech",
+    "volume": 0.45,
+    "frame": 4
+   }
+  ],
+  "walk_side": [
+   {
+    "sound": "footstep-metal",
+    "preset": "Heavy mech",
+    "volume": 0.45,
+    "frame": 0
+   },
+   {
+    "sound": "footstep-metal",
+    "preset": "Heavy mech",
+    "volume": 0.45,
+    "frame": 4
+   }
+  ],
+  "attack_down": [
+   {
+    "sound": "dodge-dash",
+    "frame": 3,
+    "preset": "Thruster dash",
+    "volume": 0.7
+   },
+   {
+    "sound": "bolt-impact",
+    "frame": 5,
+    "preset": "On metal",
+    "volume": 0.85
+   }
+  ],
+  "attack_up": [
+   {
+    "sound": "dodge-dash",
+    "frame": 3,
+    "preset": "Thruster dash",
+    "volume": 0.7
+   },
+   {
+    "sound": "bolt-impact",
+    "frame": 5,
+    "preset": "On metal",
+    "volume": 0.85
+   }
+  ],
+  "attack_side": [
+   {
+    "sound": "dodge-dash",
+    "frame": 3,
+    "preset": "Thruster dash",
+    "volume": 0.7
+   },
+   {
+    "sound": "bolt-impact",
+    "frame": 5,
+    "preset": "On metal",
+    "volume": 0.85
+   }
+  ],
+  "shoot_down": [
+   {
+    "sound": "scatter-blast",
+    "frame": 1,
+    "preset": "Heavy slug",
+    "volume": 0.85,
+    "when": {
+     "weapon": [
+      "cannon"
+     ]
+    }
+   }
+  ],
+  "shoot_up": [
+   {
+    "sound": "scatter-blast",
+    "frame": 1,
+    "preset": "Heavy slug",
+    "volume": 0.85,
+    "when": {
+     "weapon": [
+      "cannon"
+     ]
+    }
+   }
+  ],
+  "shoot_side": [
+   {
+    "sound": "scatter-blast",
+    "frame": 1,
+    "preset": "Heavy slug",
+    "volume": 0.85,
+    "when": {
+     "weapon": [
+      "cannon"
+     ]
+    }
+   }
+  ],
+  "hurt": [
+   {
+    "sound": "bolt-impact",
+    "frame": 0,
+    "preset": "On metal",
+    "volume": 0.9
+   }
+  ],
+  "die": [
+   {
+    "sound": "bot-shutdown",
+    "frame": 0,
+    "preset": "Bot shutdown",
+    "volume": 1
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-roguelite-scifi"
+ ]
+}

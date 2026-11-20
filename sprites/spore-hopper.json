@@ -1,0 +1,50 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "spore-hopper",
+ "name": "Spore hopper",
+ "blurb": "A seed pod that hops about on a coiled root and puffs spores. Change its size and plumpness, its eyes, its leafy ruff and its colours.",
+ "meta": {"type":"creature","role":"characters/enemy","themes":["fantasy","forest"],"gameTypes":["platformer"],"view":"side","words":["pod","seed","bulb","plant","sprout","onion","spores","hop","bounce","spring","puff","enemy","monster","poison"],"license":"draft"},
+ "size": [48,48],
+ "pivot": [24,42],
+ "grounded": true,
+ "preview": "hop",
+ "styles": ["pixel"],
+ "palette": [
+  {"id":"ruffColour","label":"Colour","default":"#3f8a4f","material":"plant","swatches":["#3f8a4f","#6aa83e","#e08a2c","#f0ead8"]},
+  {"id":"body","label":"Pod","default":"#a4c44a","material":"plant","swatches":["#a4c44a","#9bd18a","#c9423a","#f2c230","#3f9fd1"]},
+  {"id":"glow","label":"Spores","default":"#7a4fc4","material":"light","swatches":["#7a4fc4","#4fd8ee","#e08a2c","#f0ead8"]}
+ ],
+ "controls": [
+  {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+  {"key":"bulk","kind":"range","label":"Pod","lo":"Slim","hi":"Plump","default":0.5},
+  {"key":"eyes","kind":"choice","label":"Eyes","options":["round","sleepy","angry"],"default":"round"},
+  {"key":"ribs","kind":"toggle","label":"Ribs","default":true},
+  {"key":"ruff","kind":"choice","label":"Ruff","options":["leaves","petals","thorns","none"],"default":"leaves"},
+  {"key":"ruffSize","kind":"range","label":"Size","lo":"Small","hi":"Big","default":1,"min":0.65,"max":1.35,"step":0.05},
+  {"key":"ruffColour","kind":"colour","label":"Colour","when":{"ruff":["leaves","petals","thorns"]}},
+  {"key":"body","kind":"colour","label":"Pod"},
+  {"key":"glow","kind":"colour","label":"Spores"},
+  {"key":"hop","kind":"range","label":"Hop height","lo":"Low","hi":"High","default":0.5,"group":"Motion"},
+  {"key":"wobble","kind":"range","label":"Wobble","lo":"Firm","hi":"Wobbly","default":0.5,"group":"Motion"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "parts": {"ruff":{"label":"Ruff","params":["ruff","ruffSize"],"none":"none","socket":"head"}},
+ "points": [{"id":"head","on":"head","at":[0,0]},{"id":"muzzle","on":"muzzle","at":[0,0]}],
+ "body": { "pictures": {
+  "nodes": [{"id":"body","parent":null,"at":[24,42]},{"id":"head","parent":null,"at":[0,0]},{"id":"muzzle","parent":null,"at":[0,0]}],
+  "draw": [
+   {"id":"creature","gen":"creature.spore-hopper","v":1,"on":"body","at":[0,0],"picture":"clip","size":{"from":"size"},"bulk":{"from":"bulk"},"hop":{"from":"hop"},"wobble":{"from":"wobble"},"eyes":{"from":"eyes"},"ribs":{"from":"ribs"},"ruff":{"from":"ruff"},"ruffSize":{"from":"ruffSize"},"ruffColour":"ruffColour","body":"body","spores":"glow"}
+  ],
+  "motion": [
+   {"gen":"creature.spore-hopper.points","v":1,"at":[24,42],"size":{"from":"size"},"bulk":{"from":"bulk"},"hop":{"from":"hop"},"wobble":{"from":"wobble"}}
+  ]
+ } },
+ "clips": {
+  "idle": {"frames":8,"fps":7},
+  "hop": {"frames":8,"fps":11,"sounds":[{"sound":"jump","frame":1,"preset":"Tiny hop","volume":0.5},{"sound":"footstep-gravel","frame":6,"preset":"Sneaking","volume":0.5}]},
+  "attack": {"label":"Spore puff","frames":8,"fps":13,"loop":false,"sounds":[{"sound":"whoosh","frame":4,"preset":"Quick swipe","volume":0.7}]},
+  "hurt": {"frames":4,"fps":9,"loop":false,"sounds":[{"sound":"punch","frame":0,"preset":"Light jab","volume":0.9}]},
+  "die": {"frames":8,"fps":10,"loop":false,"sounds":[{"sound":"enemy-squish","frame":0,"preset":"Pop","volume":1}]}
+ }
+}

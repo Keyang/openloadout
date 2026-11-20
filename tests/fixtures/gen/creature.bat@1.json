@@ -1,0 +1,330 @@
+{
+ "id": "creature.bat",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     25,
+     25
+    ],
+    "picture": "fly",
+    "body": "body",
+    "membrane": "membrane",
+    "eye": "eye"
+   },
+   "ctx": {
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      9,
+      12
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".....a........................",
+      "....aba.......................",
+      "....acbaa...............a.....",
+      "....accbba.a...........ada....",
+      "....accccbaaa........aadeea...",
+      ".aaaccccccafaa.....aaadeeea...",
+      "agggggggggafaa....adahaeeeaaa.",
+      ".accccccggaffaa...aahhaiiiiiia",
+      "..accgggccaffaaaaaaahbaeeeeea.",
+      ".aaggcccccafbfjjjjjhbhaiieeea.",
+      "aggcccccccafkfffffjjjhaeeiiea.",
+      ".aaaccccccafkfffffffjhaeeeeiia",
+      "....aaaaccakffffffffjjaeaaaaa.",
+      "........aackfffllfflljaa......",
+      ".........akkfflmnllmnlja......",
+      ".........akkkflmmllmmlja......",
+      ".........akkkffllffllfja......",
+      "..........akkkffolloffa.......",
+      "..........akkkffokkofja.......",
+      "...........akkkkfffffa........",
+      "...........akkkkkkkkka........",
+      "............aakkkkkaa.........",
+      ".............agaaaga..........",
+      ".............aga.aga..........",
+      "..............a...a..........."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "membrane.light",
+      "c": "membrane",
+      "d": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": {
+         "rule": "tone",
+         "of": "membrane",
+         "by": -0.75
+        },
+        "with": {
+         "rule": "mix",
+         "of": "#241a3a",
+         "with": "#241a3a",
+         "amount": 0
+        },
+        "amount": 0.12
+       },
+       "tone": "light"
+      },
+      "e": {
+       "rule": "mix",
+       "of": {
+        "rule": "tone",
+        "of": "membrane",
+        "by": -0.75
+       },
+       "with": {
+        "rule": "mix",
+        "of": "#241a3a",
+        "with": "#241a3a",
+        "amount": 0
+       },
+       "amount": 0.12
+      },
+      "f": "body",
+      "g": "membrane.dark",
+      "h": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.6
+      },
+      "i": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": {
+         "rule": "tone",
+         "of": "membrane",
+         "by": -0.75
+        },
+        "with": {
+         "rule": "mix",
+         "of": "#241a3a",
+         "with": "#241a3a",
+         "amount": 0
+        },
+        "amount": 0.12
+       },
+       "tone": "dark"
+      },
+      "j": "body.light",
+      "k": "body.dark",
+      "l": "body.deep",
+      "m": "eye",
+      "n": {
+       "rule": "tone",
+       "of": "eye",
+       "by": 0.9
+      },
+      "o": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     25,
+     25
+    ],
+    "picture": "attack",
+    "size": 1,
+    "span": 0,
+    "wing": "round",
+    "ears": 1,
+    "eyes": "cute",
+    "fangs": false,
+    "body": "body",
+    "membrane": "membrane",
+    "eye": "eye",
+    "flap": 1,
+    "bob": 0
+   },
+   "ctx": {
+    "frame": 4
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      15,
+      13
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".......a....................",
+      "......aaa............a......",
+      ".....aabaa..........aaa.....",
+      ".....aabaa.........aacaa....",
+      ".....aabbaa.......aaccaa....",
+      ".....aabbaa.......aaccaa....",
+      ".....aabdbaa.....aacccaa....",
+      ".....aabdbaa.aaa.aacdcaa....",
+      ".....aabddbaaeeeaaccdcaa....",
+      ".....aabddeebbbeeeeddcaa....",
+      "....aaabbbbbbbbbbbeedcaa....",
+      "...adaabfbbbbbbbbbbeecaa....",
+      "...addafbbbbbbbbbbbbeeaa....",
+      ".aaghhgfbbbbbbbbbbbbbeija...",
+      "aggghhffbbbbbbaabbaabeejja..",
+      "aggghgffbbbbbklakkamkbejjnn.",
+      "agghggffbbbbbkllkkllkbejna..",
+      "agghggfffbbbbbkkbbkkbbejja..",
+      "agghggfffbbbbbboooobbbejjnnn",
+      ".aghgggfffbbbbboooobbbjja...",
+      "..aggggffffbbbboppobbeaan...",
+      "...aaagaffffbbbbbbbbba...nn.",
+      "......a.affffffbbbffa.......",
+      ".........afffffffffa........",
+      "..........aahfffhaa.........",
+      "...........ahaaaha..........",
+      "............a...a..........."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body",
+      "c": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.6
+      },
+      "d": "membrane.light",
+      "e": "body.light",
+      "f": "body.dark",
+      "g": "membrane",
+      "h": "membrane.dark",
+      "i": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": {
+         "rule": "tone",
+         "of": "membrane",
+         "by": -0.75
+        },
+        "with": {
+         "rule": "mix",
+         "of": "#241a3a",
+         "with": "#241a3a",
+         "amount": 0
+        },
+        "amount": 0.12
+       },
+       "tone": "dark"
+      },
+      "j": {
+       "rule": "mix",
+       "of": {
+        "rule": "tone",
+        "of": "membrane",
+        "by": -0.75
+       },
+       "with": {
+        "rule": "mix",
+        "of": "#241a3a",
+        "with": "#241a3a",
+        "amount": 0
+       },
+       "amount": 0.12
+      },
+      "k": "body.deep",
+      "l": "eye",
+      "m": {
+       "rule": "tone",
+       "of": "eye",
+       "by": 0.9
+      },
+      "n": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      },
+      "o": {
+       "rule": "mix",
+       "of": "#5a1626",
+       "with": "#5a1626",
+       "amount": 0
+      },
+      "p": {
+       "rule": "mix",
+       "of": "#e0607a",
+       "with": "#e0607a",
+       "amount": 0
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     30,
+     20
+    ],
+    "picture": "die",
+    "size": 0,
+    "span": 1,
+    "wing": "sharp",
+    "eyes": "one",
+    "body": "body",
+    "membrane": "membrane",
+    "eye": "eye"
+   },
+   "ctx": {
+    "frame": 6
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      15,
+      18
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..............aa.......",
+      ".............abba......",
+      "......aaa....abbba.....",
+      ".....accca....aba......",
+      "......aca......a.......",
+      "..a....a...............",
+      ".aba...................",
+      "abbba...............aa.",
+      "abba...............acca",
+      ".aa................acca",
+      "....................aa.",
+      ".......................",
+      "...................aaa.",
+      ".aa...............abbba",
+      "abba..............abbba",
+      "abba...............aaa.",
+      ".aa...aaa......a.......",
+      ".....accca....aba......",
+      "......aca....abba......",
+      ".......a......aba......",
+      "...............a......."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body",
+      "c": "membrane"
+     }
+    }
+   ]
+  }
+ ]
+}

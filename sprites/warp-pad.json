@@ -1,0 +1,122 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "warp-pad",
+ "name": "Warp pad",
+ "blurb": "A teleporter platform on the floor: its lights chase round, rings of light rise as it charges, and a column of light fires when it warps. Change its size, shape, rings, colours and flicker.",
+ "meta": {
+  "type": "prop",
+  "role": "world/prop",
+  "themes": ["sci-fi","space"],
+  "gameTypes": ["roguelike-action","shooter"],
+  "view": "top-down",
+  "words": ["warp","teleporter","pad","portal","exit","platform","beam","charge","activate","next level","transporter","glowing"],
+  "license": "draft"
+ },
+ "size": [64,48],
+ "pivot": [32,40],
+ "preview": "idle",
+ "styles": ["pixel"],
+ "palette": [
+  {
+   "id": "body",
+   "label": "Body",
+   "default": "#6b7896",
+   "material": "metal",
+   "swatches": ["#6b7896","#566182","#434d6d","#3f6fd1","#2fb3a8","#4f9ff0"]
+  },
+  {
+   "id": "accent",
+   "label": "Rim lights",
+   "default": "#2fb3a8",
+   "material": "signal",
+   "swatches": ["#2fb3a8","#f2a030","#e2473f","#3f6fd1","#5fe0f0","#9fe040"]
+  },
+  {
+   "id": "glow",
+   "label": "Glow",
+   "default": "#5fe0f0",
+   "material": "light",
+   "swatches": ["#5fe0f0","#e2473f","#9fe040","#f2a030","#b48af8","#4f9ff0","#5fd47a"]
+  }
+ ],
+ "controls": [
+  {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+  {
+   "key": "style",
+   "kind": "choice",
+   "label": "Style",
+   "options": [{"value":"round","label":"Round"},{"value":"hex","label":"Hex"},{"value":"pylons","label":"Pylons"}],
+   "default": "round"
+  },
+  {
+   "key": "rings",
+   "kind": "choice",
+   "label": "Rings",
+   "options": [{"value":"one","label":"One"},{"value":"two","label":"Two"},{"value":"three","label":"Three"}],
+   "default": "two"
+  },
+  {"key":"body","kind":"colour","label":"Body"},
+  {"key":"accent","kind":"colour","label":"Rim lights"},
+  {"key":"glow","kind":"colour","label":"Glow"},
+  {"key":"flicker","kind":"range","label":"Flicker","lo":"Steady","hi":"Wild","default":0.5,"group":"Motion"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": {
+  "pictures": {
+   "nodes": [],
+   "draw": [
+    {
+     "id": "idle",
+     "gen": "warp.pad",
+     "v": 1,
+     "at": [32,40],
+     "clip": ["idle"],
+     "picture": "idle",
+     "size": {"from":"size","map":[[0,0],[1,1]],"round":"none"},
+     "style": {"from":"style","pick":{"round":"round","hex":"hex","pylons":"pylons"}},
+     "rings": {"from":"rings","pick":{"one":"one","two":"two","three":"three"}},
+     "body": "body",
+     "accent": "accent",
+     "glowing": "glow",
+     "flicker": {"from":"flicker","map":[[0,0],[1,1]],"round":"none"}
+    },
+    {
+     "id": "charge",
+     "gen": "warp.pad",
+     "v": 1,
+     "at": [32,40],
+     "clip": ["charge"],
+     "picture": "charge",
+     "size": {"from":"size","map":[[0,0],[1,1]],"round":"none"},
+     "style": {"from":"style","pick":{"round":"round","hex":"hex","pylons":"pylons"}},
+     "rings": {"from":"rings","pick":{"one":"one","two":"two","three":"three"}},
+     "body": "body",
+     "accent": "accent",
+     "glowing": "glow",
+     "flicker": {"from":"flicker","map":[[0,0],[1,1]],"round":"none"}
+    },
+    {
+     "id": "activate",
+     "gen": "warp.pad",
+     "v": 1,
+     "at": [32,40],
+     "clip": ["activate"],
+     "picture": "activate",
+     "size": {"from":"size","map":[[0,0],[1,1]],"round":"none"},
+     "style": {"from":"style","pick":{"round":"round","hex":"hex","pylons":"pylons"}},
+     "rings": {"from":"rings","pick":{"one":"one","two":"two","three":"three"}},
+     "body": "body",
+     "accent": "accent",
+     "glowing": "glow",
+     "flicker": {"from":"flicker","map":[[0,0],[1,1]],"round":"none"}
+    }
+   ]
+  }
+ },
+ "clips": {
+  "idle": {"frames":8,"fps":8},
+  "charge": {"frames":8,"fps":10,"sounds":[{"sound":"spaceship-hum","preset":"Cruise","frame":0,"volume":0.35}]},
+  "activate": {"frames":10,"fps":12,"loop":false,"label":"Warp","sounds":[{"sound":"warp-out","preset":"Warp out","frame":2,"volume":0.8}]}
+ }
+}

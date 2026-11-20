@@ -1,0 +1,203 @@
+{
+ "id": "blast-door",
+ "frozen": "2026-11-20",
+ "source": "sprites/blast-door.js",
+ "sha256": "ba2a1fbf3b9b1c044e216217b9f224e3b5a7e26cbbbd9c2b5fb4a58c45cb3d32",
+ "name": "Blast door",
+ "blurb": "A heavy station door two tiles wide whose leaves draw back into the frame with a hiss, or stay clamped shut with red lights blinking. Make it split, iris or shutter, and change its seams, warning stripes, lights and colours.",
+ "meta": {
+  "type": "prop",
+  "role": "world/door",
+  "themes": [
+   "sci-fi",
+   "space"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "shooter"
+  ],
+  "view": "top-down",
+  "words": [
+   "door",
+   "gate",
+   "airlock",
+   "bulkhead",
+   "hatch",
+   "entrance",
+   "exit",
+   "open",
+   "locked",
+   "slide",
+   "room cleared",
+   "metal",
+   "heavy"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  64,
+  48
+ ],
+ "pivot": [
+  32,
+  46
+ ],
+ "grounded": true,
+ "preview": "closed",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "split",
+   "options": [
+    {
+     "value": "split",
+     "label": "Split"
+    },
+    {
+     "value": "iris",
+     "label": "Iris"
+    },
+    {
+     "value": "shutter",
+     "label": "Shutter"
+    }
+   ],
+   "group": "Look"
+  },
+  "pieces": {
+   "kind": "range",
+   "label": "Panels",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "stripes": {
+   "kind": "toggle",
+   "label": "Hazard stripes",
+   "def": true,
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Door",
+   "def": "#6b7896",
+   "swatches": [
+    "#6b7896",
+    "#9aa6c0",
+    "#c2c9d6",
+    "#566182",
+    "#6660b6",
+    "#a87894"
+   ],
+   "material": "metal",
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Stripes",
+   "def": "#f2a030",
+   "swatches": [
+    "#f2a030",
+    "#2fb3a8",
+    "#e2473f",
+    "#3f6fd1",
+    "#5fe0f0",
+    "#9fe040"
+   ],
+   "material": "warning",
+   "group": "Colors",
+   "when": {
+    "stripes": [
+     true
+    ]
+   }
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Light",
+   "def": "#2fb3a8",
+   "swatches": [
+    "#2fb3a8",
+    "#5fe0f0",
+    "#9fe040",
+    "#f2a030",
+    "#b48af8",
+    "#4f9ff0",
+    "#5fd47a"
+   ],
+   "group": "Colors"
+  },
+  "hull": {
+   "kind": "color",
+   "label": "Frame",
+   "def": "#434d6d",
+   "swatches": [
+    "#434d6d",
+    "#566182",
+    "#6b7896",
+    "#6660b6",
+    "#a87894"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "closed": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "open": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  },
+  "locked": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    8,
+    12
+   ]
+  }
+ },
+ "sounds": {
+  "open": [
+   {
+    "sound": "door-hiss",
+    "preset": "Blast door",
+    "frame": 0,
+    "volume": 0.8
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-roguelite-scifi"
+ ]
+}

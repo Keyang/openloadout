@@ -1,0 +1,35 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "market-stall",
+ "name": "Market stall",
+ "blurb": "A wooden counter under a cloth awning on four poles, with goods laid out and room for a merchant behind it. Change the awning, the goods, the width and the colours.",
+ "meta": {"type":"prop","role":"world/building","themes":["fantasy","farm"],"gameTypes":["turn-based-rpg","top-down-rpg"],"view":"top-down","words":["stall","market","shop","stand","booth","awning","counter","goods","buy","sell","trade","flap","village","fair"],"license":"draft"},
+ "size": [64,64],
+ "pivot": [32,60],
+ "preview": "flap",
+ "styles": ["pixel"],
+ "palette": [
+  {"id":"cloth","label":"Cloth","default":"#c8553a","material":"cloth","swatches":["#c8553a","#3f6fd1","#7a4fc4","#2f8f9d","#c9423a","#8e3a4a","#4f9d57"]},
+  {"id":"accent","label":"Stripes and edging","default":"#f0ead8","material":"cloth","swatches":["#f0ead8","#f2c230","#7fe0a0","#f4e06a","#9fd8f4","#a8c8d8","#e6c96a"]},
+  {"id":"wood","label":"Wood","default":"#9a6a3e","material":"wood","swatches":["#9a6a3e","#c9a06a","#e6c96a","#a8612a","#5a3a22","#c98a4a"]}
+ ],
+ "controls": [
+  {"key":"style","kind":"choice","label":"Style","options":["striped","plain","scalloped"],"default":"striped"},
+  {"key":"shape","kind":"choice","label":"Goods","options":["fruit","potions","weapons","bread"],"default":"fruit"},
+  {"key":"width","kind":"range","label":"Width","lo":"Narrow","hi":"Wide","default":0.5},
+  {"key":"cloth","kind":"colour","label":"Cloth"},
+  {"key":"accent","kind":"colour","label":"Stripes and edging"},
+  {"key":"wood","kind":"colour","label":"Wood"},
+  {"key":"sway","kind":"range","label":"Sway","lo":"Still","hi":"Swaying","default":0.5,"group":"Motion"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": { "pictures": { "nodes": [], "draw": [
+  {"id":"idle","gen":"stall.market","v":1,"clip":["idle"],"picture":"idle","at":[32,60],"style":{"from":"style","pick":{"striped":"striped","plain":"plain","scalloped":"scalloped"}},"shape":{"from":"shape","pick":{"fruit":"fruit","potions":"potions","weapons":"weapons","bread":"bread"}},"width":{"from":"width","map":[[0,0],[1,1]],"round":"none"},"cloth":"cloth","accent":"accent","wood":"wood","sway":{"from":"sway","map":[[0,0],[1,1]],"round":"none"}},
+  {"id":"flap","gen":"stall.market","v":1,"clip":["flap"],"picture":"flap","at":[32,60],"style":{"from":"style","pick":{"striped":"striped","plain":"plain","scalloped":"scalloped"}},"shape":{"from":"shape","pick":{"fruit":"fruit","potions":"potions","weapons":"weapons","bread":"bread"}},"width":{"from":"width","map":[[0,0],[1,1]],"round":"none"},"cloth":"cloth","accent":"accent","wood":"wood","sway":{"from":"sway","map":[[0,0],[1,1]],"round":"none"}}
+ ] } },
+ "clips": {
+  "idle": {"frames":1,"fps":8},
+  "flap": {"frames":8,"fps":10}
+ }
+}

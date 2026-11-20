@@ -1,0 +1,2417 @@
+{
+ "id": "creature.spore-hopper.points",
+ "v": 1,
+ "family": "motion",
+ "cases": [
+  {
+   "args": {},
+   "ctx": {
+    "t": 0,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      21.97
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      16
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 0.25,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      23.908810817194144
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      18.21348724610298
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 0.5,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      21.97
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      16
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 0.75,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      19.9434160913436
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      13.664605682421666
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 1,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      21.97
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      16
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 0,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      21.97
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      16
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 0.25,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      23.908810817194144
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      18.21348724610298
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 0.5,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      21.97
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      16
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 0.75,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      19.9434160913436
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      13.664605682421666
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 1,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      21.97
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      16
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 0
+   },
+   "ctx": {
+    "t": 0,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      25.776
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      20.799999999999997
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 0
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      27.36104865375532
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      22.604789796882383
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 0
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      25.776
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      20.799999999999997
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 0
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      24.120732873074886
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      18.897684545937338
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 0
+   },
+   "ctx": {
+    "t": 1,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      25.776
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      20.799999999999997
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 0
+   },
+   "ctx": {
+    "t": 0,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      25.776
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      20.799999999999997
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 0
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      27.36104865375532
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      22.604789796882383
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 0
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      25.776
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      20.799999999999997
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 0
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      24.120732873074886
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      18.897684545937338
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 0
+   },
+   "ctx": {
+    "t": 1,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      25.776
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      20.799999999999997
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 1
+   },
+   "ctx": {
+    "t": 0,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      18.164
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      11.2
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 1
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      20.45657298063297
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      13.822184695323571
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 1
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      18.164
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      11.2
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 1
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      15.766099309612322
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      8.431526818906
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 1
+   },
+   "ctx": {
+    "t": 1,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      18.164
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      11.2
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 1
+   },
+   "ctx": {
+    "t": 0,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      18.164
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      11.2
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 1
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      20.45657298063297
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      13.822184695323571
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 1
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      18.164
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      11.2
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 1
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      15.766099309612322
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      8.431526818906
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 1
+   },
+   "ctx": {
+    "t": 1,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      18.164
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      11.2
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "bulk": 0
+   },
+   "ctx": {
+    "t": 0,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      21.43
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      15.25
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "bulk": 0
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      23.398654936230514
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      17.50493741143127
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "bulk": 0
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      21.43
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      15.25
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "bulk": 0
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      19.369863250132767
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      12.868004514073284
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "bulk": 0
+   },
+   "ctx": {
+    "t": 1,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      21.43
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      15.25
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "bulk": 0
+   },
+   "ctx": {
+    "t": 0,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      21.43
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      15.25
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "bulk": 0
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      23.398654936230514
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      17.50493741143127
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "bulk": 0
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      21.43
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      15.25
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "bulk": 0
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      19.369863250132767
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      12.868004514073284
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "bulk": 0
+   },
+   "ctx": {
+    "t": 1,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      21.43
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      15.25
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "bulk": 1
+   },
+   "ctx": {
+    "t": 0,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      22.509999999999998
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      16.75
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "bulk": 1
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      24.418966698157774
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      18.922037080774682
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "bulk": 1
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      22.509999999999998
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      16.75
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "bulk": 1
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      20.516968932554434
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      14.461206850770047
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "bulk": 1
+   },
+   "ctx": {
+    "t": 1,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      22.509999999999998
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      16.75
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "bulk": 1
+   },
+   "ctx": {
+    "t": 0,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      22.509999999999998
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      16.75
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "bulk": 1
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      24.418966698157774
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      18.922037080774682
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "bulk": 1
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      22.509999999999998
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      16.75
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "bulk": 1
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      20.516968932554434
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      14.461206850770047
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "bulk": 1
+   },
+   "ctx": {
+    "t": 1,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      22.509999999999998
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      16.75
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "hop": 0
+   },
+   "ctx": {
+    "t": 0,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      21.97
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      16
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "hop": 0
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      23.908810817194144
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      18.21348724610298
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "hop": 0
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      21.97
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      16
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "hop": 0
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      19.9434160913436
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      13.664605682421666
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "hop": 0
+   },
+   "ctx": {
+    "t": 1,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      21.97
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      16
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "hop": 0
+   },
+   "ctx": {
+    "t": 0,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      21.97
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      16
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "hop": 0
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      23.908810817194144
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      18.21348724610298
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "hop": 0
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      21.97
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      16
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "hop": 0
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      19.9434160913436
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      13.664605682421666
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "hop": 0
+   },
+   "ctx": {
+    "t": 1,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      21.97
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      16
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "hop": 1
+   },
+   "ctx": {
+    "t": 0,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      21.97
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      16
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "hop": 1
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      23.908810817194144
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      18.21348724610298
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "hop": 1
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      21.97
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      16
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "hop": 1
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      19.9434160913436
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      13.664605682421666
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "hop": 1
+   },
+   "ctx": {
+    "t": 1,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      21.97
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      16
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "hop": 1
+   },
+   "ctx": {
+    "t": 0,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      21.97
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      16
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "hop": 1
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      23.908810817194144
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      18.21348724610298
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "hop": 1
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      21.97
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      16
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "hop": 1
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      19.9434160913436
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      13.664605682421666
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "hop": 1
+   },
+   "ctx": {
+    "t": 1,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      21.97
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      16
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "wobble": 0
+   },
+   "ctx": {
+    "t": 0,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      21.97
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      16
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "wobble": 0
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      23.538488315481988
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      17.699150438169426
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "wobble": 0
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      21.97
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      16
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "wobble": 0
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      20.38286485097636
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      14.27495118191161
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "wobble": 0
+   },
+   "ctx": {
+    "t": 1,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      21.97
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      16
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "wobble": 0
+   },
+   "ctx": {
+    "t": 0,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      21.97
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      16
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "wobble": 0
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      23.538488315481988
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      17.699150438169426
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "wobble": 0
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      21.97
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      16
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "wobble": 0
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      20.38286485097636
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      14.27495118191161
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "wobble": 0
+   },
+   "ctx": {
+    "t": 1,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      21.97
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      16
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "wobble": 1
+   },
+   "ctx": {
+    "t": 0,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      21.97
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      16
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "wobble": 1
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      24.25772935779817
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      18.69809633027523
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "wobble": 1
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      21.97
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      16
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "wobble": 1
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      19.473543956043954
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      13.012005494505495
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "wobble": 1
+   },
+   "ctx": {
+    "t": 1,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      21.97
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      16
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "wobble": 1
+   },
+   "ctx": {
+    "t": 0,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      21.97
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      16
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "wobble": 1
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      24.25772935779817
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      18.69809633027523
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "wobble": 1
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      21.97
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      16
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "wobble": 1
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      19.473543956043954
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      13.012005494505495
+     ],
+     "turn": -144
+    }
+   ]
+  },
+  {
+   "args": {
+    "wobble": 1
+   },
+   "ctx": {
+    "t": 1,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24,
+      21.97
+     ],
+     "turn": -180
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      16
+     ],
+     "turn": -144
+    }
+   ]
+  }
+ ]
+}

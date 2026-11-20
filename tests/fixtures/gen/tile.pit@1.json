@@ -1,0 +1,280 @@
+{
+ "id": "tile.pit",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "picture": "pit-left",
+    "land": "land",
+    "hull": "hull",
+    "lights": "glow"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      0,
+      0
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "baaaaaccccaaaaccccaaaaccccaaaaaa",
+      "badddddddddddddddddddddddddddddd",
+      "baeeeeeeeeeeeeedeeeeeeeeeeeeeeed",
+      "baeeeeeeeeeeeeedeeeeeeeeeeeeeeed",
+      "baeeeeeeeeeeeeedeeeeeeeeeeeeeeed",
+      "bcdddddddddddddfdddddddddddddddf",
+      "bcdddddddddddddfdddddddddddddddf",
+      "bcdddddddddddddfdddddddddddddddf",
+      "bcffffffffffffffffffffffffffffff",
+      "baffffffffffffffffffffffffffffff",
+      "baffffffffffffffffffffffffffffff",
+      "bagggggggggggggggggggggggggggggg",
+      "bagggggggggggggggggggggggggggggg",
+      "bcgggggggggggggggggggggggggggggg",
+      "bcgggggggggggggggggggggggggggggg",
+      "bcgggggggggggggggggggggggggggggg",
+      "bcggggggggggggggggghgggggggggggg",
+      "bagggggggggggggggghihggggggggggg",
+      "baggggggjjggggggggghgggggggggggg",
+      "baggggggjjgggggggggggggggggggggg",
+      "bagggggggggggggggggggggggggggggg",
+      "bcgggggggggggggggggggggggggggggg",
+      "bcgggggggggggggggggggggggggggggg",
+      "bcgggggggggggggggggggggggggggggg",
+      "bcgggggggggjjggggggggggggggggggg",
+      "bagggggggggjjggggggggggggggggggg",
+      "bagggggggggggggggggggggggggggggg",
+      "bagggggggggggggggggggggggggggggg",
+      "bagggggggggggggggggggggggggggggg",
+      "bggggggggggggggggggggggggggggggg",
+      "bggggggggggggggggggggggggggggggg"
+     ],
+     "key": {
+      "a": {
+       "rule": "textureTone",
+       "of": "land"
+      },
+      "b": {
+       "rule": "textureLight",
+       "of": "land",
+       "from": 0.4
+      },
+      "c": "glow",
+      "d": "hull.dark",
+      "e": "hull",
+      "f": "hull.deep",
+      "g": {
+       "rule": "mix",
+       "of": "#141a33",
+       "with": "#141a33",
+       "amount": 0
+      },
+      "h": {
+       "rule": "mix",
+       "of": "#c2c9d6",
+       "with": "#c2c9d6",
+       "amount": 0
+      },
+      "i": {
+       "rule": "mix",
+       "of": "#e8ecf2",
+       "with": "#e8ecf2",
+       "amount": 0
+      },
+      "j": {
+       "rule": "textureLight",
+       "of": {
+        "rule": "mix",
+        "of": "#141a33",
+        "with": "#141a33",
+        "amount": 0
+       },
+       "from": 0.4
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     10,
+     20
+    ],
+    "picture": "pit-inner-br",
+    "land": "land",
+    "hull": "hull",
+    "lights": "glow",
+    "below": "reactor",
+    "height": 14,
+    "pieces": 1
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": true,
+    "frames": 8,
+    "frame": 4
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      -6,
+      4
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaabbaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaabbaaaaabbaaa",
+      "aaaaaaaaaaaaacccccccaaaaaaabbaaa",
+      "aaaaaaaaaaacccccccccccaaaaaaaaaa",
+      "aaaaaaaaaaaaccccccccaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaad"
+     ],
+     "key": {
+      "a": {
+       "rule": "mix",
+       "of": {
+        "rule": "mix",
+        "of": "#141a33",
+        "with": "#141a33",
+        "amount": 0
+       },
+       "with": {
+        "rule": "mix",
+        "of": "#e2473f",
+        "with": "#e2473f",
+        "amount": 0
+       },
+       "amount": 0.3
+      },
+      "b": {
+       "rule": "mix",
+       "of": "#f2a030",
+       "with": "#f2a030",
+       "amount": 0
+      },
+      "c": {
+       "rule": "mix",
+       "of": {
+        "rule": "mix",
+        "of": "#141a33",
+        "with": "#141a33",
+        "amount": 0
+       },
+       "with": {
+        "rule": "mix",
+        "of": "#e2473f",
+        "with": "#e2473f",
+        "amount": 0
+       },
+       "amount": 0.62
+      },
+      "d": {
+       "rule": "textureLight",
+       "of": "land",
+       "from": 0.4
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "picture": "pit-deco-b",
+    "land": "land",
+    "hull": "hull",
+    "lights": "glow",
+    "below": "space",
+    "height": 14,
+    "pieces": 1
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true,
+    "frames": 8,
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      9,
+      2
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a......a.......a.",
+      "a......a.......a.",
+      "a......a.......a.",
+      "a......a.......a.",
+      "a......a.......a.",
+      "a......a.......a.",
+      "a......a.......a.",
+      ".a.....a......a..",
+      ".a.....a......bb.",
+      ".a.....a.....bccb",
+      ".a....a......bccb",
+      ".a....a.......bb.",
+      ".a....a..........",
+      "..a...a..........",
+      "..bc..a..........",
+      "..bb..a..........",
+      "......a..........",
+      "......a..........",
+      ".....a...........",
+      ".....a...........",
+      ".....bc..........",
+      ".....bb.........."
+     ],
+     "key": {
+      "a": "hull.light",
+      "b": "glow",
+      "c": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

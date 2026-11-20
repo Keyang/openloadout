@@ -1,0 +1,473 @@
+{
+ "id": "terminal.wall",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     16,
+     46
+    ],
+    "body": "body",
+    "accent": "accent",
+    "glowing": "glow"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      3,
+      9
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aaaaaaaaaaaaaaaaaaaaaaaa.",
+      "abbbbbbbbbbbbbbbbbbbbbbbba",
+      "acccccccccccccccccccccccca",
+      "adeeeeeeeeeeeeeeeeeeeeeeca",
+      "adeeeeeeeeeeeeeeeeeeeeeeca",
+      "adeeffffffffffffffffffeeca",
+      "adeeffgggggggfggggggffeeca",
+      "adeehhhhhhhhhhhhhhhhhheeca",
+      "adeeffgggfgggggfffffffeeca",
+      "adeeffffffffffffffffffeeca",
+      "adeeffgggggfggggggffffeeca",
+      "adeeffffffffffffffffffeeca",
+      "adeeffggfgggffffffffffeeca",
+      "adeefffffiifffffffffffeeca",
+      "adeefgggfiifffffffffffeeca",
+      "adeeffffffffffffffffffeeca",
+      "adeeeeeeeeeeeeeeeeeeeeeeca",
+      "adjjjjjjjjjjjjjjjjjjjjjjca",
+      "adkllkkmmmmmmmmmmmmkkllkca",
+      "adkllkkmmmmmmmmmmmmkkllkca",
+      "adkkkkkkkkkkkkkkkkkkkkkkca",
+      "abbbbbbbbbbbbbbbbbbbbbbbba",
+      "acceeceeceeceeceeceeceecca",
+      "acccccccccccccccccccccccca",
+      "akkkkkkkkkkkkkkkkkkkkkkkka",
+      "adddddddddddddddddddddddda",
+      ".aaaadkkdeeeeeeeedkkcaaaa.",
+      "....adkkdccccccccdkkca....",
+      "....adkkdeeeeeeeedkkca....",
+      "....adkkdccccccccdkkca....",
+      "....adkkdeeeeeeeedkkca....",
+      "...aadkkddddddddddkkcaa..."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "textureLight",
+       "of": "body"
+      },
+      "c": {
+       "rule": "textureLight",
+       "of": "body",
+       "against": "body",
+       "from": 0.4
+      },
+      "d": {
+       "rule": "textureTone",
+       "of": "body"
+      },
+      "e": {
+       "rule": "shadeTo",
+       "of": "body",
+       "drop": 0.2,
+       "floor": 0.17
+      },
+      "f": {
+       "rule": "mix",
+       "of": "#202742",
+       "with": "#202742",
+       "amount": 0
+      },
+      "g": "glow",
+      "h": {
+       "rule": "mix",
+       "of": {
+        "rule": "mix",
+        "of": "#202742",
+        "with": "#202742",
+        "amount": 0
+       },
+       "with": "glow",
+       "amount": 0.3
+      },
+      "i": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      },
+      "j": {
+       "rule": "textureLight",
+       "of": {
+        "rule": "shadeTo",
+        "of": "body",
+        "drop": 0.2,
+        "floor": 0.17
+       },
+       "against": {
+        "rule": "shadeTo",
+        "of": "body",
+        "drop": 0.2,
+        "floor": 0.17
+       },
+       "from": 0.4
+      },
+      "k": "body",
+      "l": {
+       "rule": "tone",
+       "of": "accent",
+       "by": -0.9
+      },
+      "m": "accent"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      3,
+      41
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..abbbbbbbbbbbbbbbbbbbba..",
+      "..acddddddddddddddddddea..",
+      "..acddddddddddddddddddea..",
+      "..acddddddddddddddddddea..",
+      "..acddddddddddddddddddea..",
+      "...aaaaaaaaaaaaaaaaaaaa..."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "textureLight",
+       "of": "body"
+      },
+      "c": {
+       "rule": "textureTone",
+       "of": "body"
+      },
+      "d": "body",
+      "e": {
+       "rule": "textureLight",
+       "of": "body",
+       "against": "body",
+       "from": 0.4
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     46
+    ],
+    "body": "body",
+    "accent": "accent",
+    "glowing": "glow",
+    "picture": "activate"
+   },
+   "ctx": {
+    "t": 0.4,
+    "loop": false,
+    "frames": 6,
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      3,
+      9
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aaaaaaaaaaaaaaaaaaaaaaaa.",
+      "abbbbbbbbbbbbbbbbbbbbbbbba",
+      "acccccccccccccccccccccccca",
+      "adeeeeeeeeeeeeeeeeeeeeeeca",
+      "adeeeeeeeeeeeeeeeeeeeeeeca",
+      "adeeffffffffffffffffffeeca",
+      "adeefffffffffffffgffffeeca",
+      "adeeffffffffffffggffffeeca",
+      "adeefffffffffffggfffffeeca",
+      "adeeffffffffffggffffffeeca",
+      "adeefffgfffffggfffffffeeca",
+      "adeefffggfffggffffffffeeca",
+      "adeeffffggfggfffffffffeeca",
+      "adeefffffgggffffffffffeeca",
+      "adeeffffffgfffffffffffeeca",
+      "adeeffffffffffffffffffeeca",
+      "adeeeeeeeeeeeeeeeeeeeeeeca",
+      "adhiihhhhhhhhhhhhhhhhiihca",
+      "adiggijiiiiiiiiiiiijiggica",
+      "adiggijiiiiiiiiiiiijiggica",
+      "adjiijjjjjjjjjjjjjjjjiijca",
+      "abbbbbbbbbbbbbbbbbbbbbbbba",
+      "acceeceeceeceeceeceeceecca",
+      "acccccccccccccccccccccccca",
+      "ajjjjjjjjjjjjjjjjjjjjjjjja",
+      "adddddddddddddddddddddddda",
+      ".aaaadjjdeeeeeeeedjjcaaaa.",
+      "....adjjdccccccccdjjca....",
+      "....adjjdeeeeeeeedjjca....",
+      "....adjjdccccccccdjjca....",
+      "....adjjdeeeeeeeedjjca....",
+      "...aadjjddddddddddjjcaa..."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "textureLight",
+       "of": "body"
+      },
+      "c": {
+       "rule": "textureLight",
+       "of": "body",
+       "against": "body",
+       "from": 0.4
+      },
+      "d": {
+       "rule": "textureTone",
+       "of": "body"
+      },
+      "e": {
+       "rule": "shadeTo",
+       "of": "body",
+       "drop": 0.2,
+       "floor": 0.17
+      },
+      "f": "glow",
+      "g": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      },
+      "h": {
+       "rule": "textureLight",
+       "of": {
+        "rule": "shadeTo",
+        "of": "body",
+        "drop": 0.2,
+        "floor": 0.17
+       },
+       "against": {
+        "rule": "shadeTo",
+        "of": "body",
+        "drop": 0.2,
+        "floor": 0.17
+       },
+       "from": 0.4
+      },
+      "i": "accent",
+      "j": "body"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      3,
+      41
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..abbbbbbbbbbbbbbbbbbbba..",
+      "..acddddddddddddddddddea..",
+      "..acddddddddddddddddddea..",
+      "..acddddddddddddddddddea..",
+      "..acddddddddddddddddddea..",
+      "...aaaaaaaaaaaaaaaaaaaa..."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "textureLight",
+       "of": "body"
+      },
+      "c": {
+       "rule": "textureTone",
+       "of": "body"
+      },
+      "d": "body",
+      "e": {
+       "rule": "textureLight",
+       "of": "body",
+       "against": "body",
+       "from": 0.4
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     46
+    ],
+    "body": "body",
+    "accent": "accent",
+    "glowing": "glow",
+    "picture": "off"
+   },
+   "ctx": {
+    "t": 0.375,
+    "loop": true,
+    "frames": 8,
+    "frame": 3
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      3,
+      9
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aaaaaaaaaaaaaaaaaaaaaaaa.",
+      "abbbbbbbbbbbbbbbbbbbbbbbba",
+      "acccccccccccccccccccccccca",
+      "adeeeeeeeeeeeeeeeeeeeeeeca",
+      "adeeeeeeeeeeeeeeeeeeeeeeca",
+      "adeeffffffffffffffffffeeca",
+      "adeefffffffffffffffggfeeca",
+      "adeeffffffffffffffggffeeca",
+      "adeefffffffffffffggfffeeca",
+      "adeeffffffffffffggffffeeca",
+      "adeeffffffffffffffffffeeca",
+      "adeeffffffffffffffffffeeca",
+      "adeeffffffffffffffffffeeca",
+      "adeeffffffffffffffffffeeca",
+      "adeeffffffffffffffffffeeca",
+      "adeeffffffffffffffffffeeca",
+      "adeeeeeeeeeeeeeeeeeeeeeeca",
+      "adhhhhhhhhhhhhhhhhhhhhhhca",
+      "adijjiikkkkkkkkkkkkiijjica",
+      "adijjiikkkkkkkkkkkkiijjica",
+      "adiiiiiiiiiiiiiiiiiiiiiica",
+      "abbbbbbbbbbbbbbbbbbbbbbbba",
+      "acceeceeceeceeceeceeceecca",
+      "acccccccccccccccccccccccca",
+      "aiiiiiiiiiiiiiiiiiiiiiiiia",
+      "adddddddddddddddddddddddda",
+      ".aaaadiideeeeeeeediicaaaa.",
+      "....adiidccccccccdiica....",
+      "....adiideeeeeeeediica....",
+      "....adiidccccccccdiica....",
+      "....adiideeeeeeeediica....",
+      "...aadiiddddddddddiicaa..."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "textureLight",
+       "of": "body"
+      },
+      "c": {
+       "rule": "textureLight",
+       "of": "body",
+       "against": "body",
+       "from": 0.4
+      },
+      "d": {
+       "rule": "textureTone",
+       "of": "body"
+      },
+      "e": {
+       "rule": "shadeTo",
+       "of": "body",
+       "drop": 0.2,
+       "floor": 0.17
+      },
+      "f": {
+       "rule": "mix",
+       "of": "#202742",
+       "with": "#202742",
+       "amount": 0
+      },
+      "g": {
+       "rule": "mix",
+       "of": {
+        "rule": "mix",
+        "of": "#202742",
+        "with": "#202742",
+        "amount": 0
+       },
+       "with": {
+        "rule": "textureLight",
+        "of": "body",
+        "against": "body",
+        "from": 0.4
+       },
+       "amount": 0.3
+      },
+      "h": {
+       "rule": "textureLight",
+       "of": {
+        "rule": "shadeTo",
+        "of": "body",
+        "drop": 0.2,
+        "floor": 0.17
+       },
+       "against": {
+        "rule": "shadeTo",
+        "of": "body",
+        "drop": 0.2,
+        "floor": 0.17
+       },
+       "from": 0.4
+      },
+      "i": "body",
+      "j": {
+       "rule": "tone",
+       "of": "accent",
+       "by": -1.9
+      },
+      "k": "accent"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      3,
+      41
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..abbbbbbbbbbbbbbbbbbbba..",
+      "..acddddddddddddddddddea..",
+      "..acddddddddddddddddddea..",
+      "..acddddddddddddddddddea..",
+      "..acddddddddddddddddddea..",
+      "...aaaaaaaaaaaaaaaaaaaa..."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "textureLight",
+       "of": "body"
+      },
+      "c": {
+       "rule": "textureTone",
+       "of": "body"
+      },
+      "d": "body",
+      "e": {
+       "rule": "textureLight",
+       "of": "body",
+       "against": "body",
+       "from": 0.4
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

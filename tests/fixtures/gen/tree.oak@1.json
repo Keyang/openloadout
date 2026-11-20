@@ -1,0 +1,614 @@
+{
+ "id": "tree.oak",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     32,
+     76
+    ],
+    "fruitColour": "fruitColour",
+    "leaf": "leaf",
+    "wood": "wood"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      3,
+      18
+     ],
+     "anchor": "tl",
+     "rows": [
+      "............................aaaa",
+      "...........................abbbc",
+      "................aaaa..aaaaabbbbb",
+      "..............aaccccaaccccddddcc",
+      ".............abbbbbccccccddddddc",
+      ".............abbbbccccccccccbbbb",
+      "............adbbbdccccbbbccbbbbb",
+      "............addccccccbbbbbbbbbbb",
+      "............adddcccccbbbbbbbbbbb",
+      "............adddccccccbbbbbbbbbb",
+      ".............acccccccccbbbccbbbb",
+      "......aaaaaaaacdddcccccccccccbbb",
+      ".....accccccddddddddddccccbbbbbb",
+      "....adbbbcccdcccddddddddcbbbbbcb",
+      "...adbbbdccccccbbbbbdddddcbbbbcc",
+      "...addbcccccbbbbbbbbbbddddbbbccc",
+      "..adddcccccbbbbbbbbbbbbddddccccc",
+      "...adddccccbbbbbbbbbbbbbdddccccc",
+      "...adccccccccbbbbbbbbbbccdddcccc",
+      "...aaccccccccbbbbbbbbbbbcddddddd",
+      "..adcccccccccccccbbbbbdddddddddd",
+      ".addcccccccccccbbbbbbddccccccccb",
+      "addcccccccccccbbbbbdcccbbbcccbbb",
+      "addccccccccccccbbbdcccbbbbbccbbb",
+      "addcccccccccccccbcccccbbbbbccbbb",
+      "adddcccccccccccccccccccbbbbcbbbb",
+      "adddddccccccccccccccccccbbcccccb",
+      ".addddcccccccccccccccccccccbbccb",
+      "..aaddccccccccccccccccccccbbbbcc",
+      "...adbccccccccccccccccccccbbbbcc",
+      "...adddcccccccccccccccccccbbbbcc",
+      "...addddcccccccccccccccccccbbccc"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "leaf.light",
+      "c": "leaf",
+      "d": "leaf.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      35,
+      18
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".........................",
+      "a........................",
+      "ba.......................",
+      "bbaa.....................",
+      "bbbbaa...................",
+      "ccbbbba..................",
+      "ccccbbba.................",
+      "ccccbbbba...aaaaa........",
+      "ccccbbbbbaaacccbba.......",
+      "cccbbbbbbbbcccccbba......",
+      "ccccdddbbbdddddccbba.....",
+      "ccddddbbbdddddddcbba.....",
+      "cdbbcccbbccccddddbbaa....",
+      "bbbcccccccccccdddcbbba...",
+      "bbccccccccccccccdccbcca..",
+      "bbcccccccccccccccddbcca..",
+      "bbbbccccccccccccccddbca..",
+      "bbbbbccccccccccccbddba...",
+      "bbbbbcccbbccccccccbdbba..",
+      "dddbbbcccbbcccccccbbbba..",
+      "ddddddccccbcccccccbbbba..",
+      "cddddddcccbbbcccccbbbba..",
+      "ccccdddddbbbbbcccbbbbbca.",
+      "cccccdddddbbbbccbbbbbbcca",
+      "cccccccddddbbbbbbbbbdbcca",
+      "cccccccbddddbbbbbbbbdccba",
+      "ccccccccbdddbbbbbbbbdbdda",
+      "ccccccccbbdddbbbbbbdddda.",
+      "cccccccccbdddbbbbbbdaaa..",
+      "bbbccccccbbddbbbbbba.....",
+      "bbbbccccbbbddbbbbbba.....",
+      "bbbbbccbbbbddbbbbcba....."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "leaf",
+      "c": "leaf.light",
+      "d": "leaf.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      3,
+      50
+     ],
+     "anchor": "tl",
+     "rows": [
+      "....abbbbbbbbbcccccccccccccccccc",
+      ".....abbbbbbbbbbbbcccccccccccccc",
+      "......aaaaaabbbbbbcccccccccccccc",
+      "............aaaabbbccccccccccccc",
+      "...............abbbccccccccccccc",
+      "................abbbbccbcccccccc",
+      "................abbbbbbbbbcccccc",
+      ".................aabbabbbbbbbbbb",
+      "...................aa.aabbbbbbbb",
+      ".......................aaaaaaabb",
+      ".......................addddddab",
+      ".......................addddddda",
+      ".......................addeeeeee",
+      ".......................addeeeeee",
+      ".......................addeeeeed",
+      ".......................addeeeeed",
+      ".......................addeeeeed",
+      ".......................addeeeeed",
+      ".......................addedeeed",
+      ".......................addedeeee",
+      ".......................adeedeeee",
+      ".......................aeeedeeee",
+      "......................aeeeeeeeee",
+      ".....................aeeeeeeeeee",
+      "....................addddddddddd",
+      "...................adddddddddddd",
+      "....................aaaaaaaaaaaa"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "leaf.dark",
+      "c": "leaf",
+      "d": "wood.dark",
+      "e": "wood"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      35,
+      50
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaaaaaabbaaaccad.....",
+      "aaaaaaaaaaabaaaaaaad.....",
+      "aaaaaaaaaaabbbabbbd......",
+      "aaaaaaaaaabbbbabbd.......",
+      "aaaaaaaaaabbbdddd........",
+      "aaaaaaaabbbbbd...........",
+      "aaaaaabbddddd............",
+      "aaaaaadd.................",
+      "baaadd...................",
+      "bbbbd....................",
+      "bbbd.....................",
+      "ddd......................",
+      "eed......................",
+      "eed......................",
+      "eed......................",
+      "eed......................",
+      "eed......................",
+      "eed......................",
+      "eed......................",
+      "eed......................",
+      "eed......................",
+      "eed......................",
+      "eeed.....................",
+      "eeeed....................",
+      "fffffd...................",
+      "ffffffd..................",
+      "dddddd..................."
+     ],
+     "key": {
+      "a": "leaf",
+      "b": "leaf.dark",
+      "c": "leaf.light",
+      "d": "ink",
+      "e": "wood",
+      "f": "wood.dark"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     32,
+     76
+    ],
+    "fruitColour": "fruitColour",
+    "leaf": "leaf",
+    "wood": "wood",
+    "picture": "sway"
+   },
+   "ctx": {
+    "t": 0.4,
+    "loop": false,
+    "frames": 6,
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      4,
+      18
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".............................aaa",
+      "............................abbb",
+      ".................aaaa..aaaaabbbb",
+      "...............aaccccaaccccddddc",
+      "..............abbbbbccccccdddddd",
+      "..............abbbbccccccccccbbb",
+      ".............adbbbdccccbbbccbbbb",
+      ".............addccccccbbbbbbbbbb",
+      ".............adddcccccbbbbbbbbbb",
+      ".............acccccccccbbbbbbbbb",
+      "......aaaaaaaaadddccccccbbbccbbb",
+      ".....accccccddddddddddccccccccbb",
+      "....adbbbcccccccddddddddcccbbbbc",
+      "...adbbbdccccccbbbbbdddddcbbbbcc",
+      "...addbcccccbbbbbbbbbbddddcbbbcc",
+      "..adddcccccbbbbbbbbbbbbddddbbccc",
+      "...adddccccbbbbbbbbbbbbbdddccccc",
+      "...adccccccccbbbbbbbbbbccdddcccc",
+      "...aaccccccccbbbbbbbbbbddddddddd",
+      "..adcccccccccccccbbbdddddddddddd",
+      ".addcccccccccccbbbbddccccccccbbd",
+      "addcccccccccccbbbdcccbbbcccbbbbb",
+      "addccccccccccccbdcccbbbbbccbbbbb",
+      "addcccccccccccccccccbbbbbccbbbbb",
+      "adddcccccccccccccccccbbbbcbbbbbb",
+      "adddddccccccccccccccccbbcccccbbb",
+      ".addddcccccccccccccccccccbbccbbb",
+      "..aaddccccccccccccccccccbbbbccbb",
+      "...adbccccccccccccccccccbbbbcccc",
+      "...adddcccccccccccccccccbbbbcccc",
+      "...addddcccccccccccccccccbbccccc",
+      "....adddddddddcccccccccccccccccc"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "leaf.light",
+      "c": "leaf",
+      "d": "leaf.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      36,
+      18
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a.......................",
+      "ba......................",
+      "cba.....................",
+      "bbbaa...................",
+      "bbbbbaa.................",
+      "cccbbbba................",
+      "cccccbbba..aaaaa........",
+      "cccccbbbbaacccbba.......",
+      "cccccbbbbbcccccbba......",
+      "cccddddbbdddddccbba.....",
+      "cddddbbbdddddddcbba.....",
+      "dbbcccbbccccddddbbaa....",
+      "bbcccccccccccdddcbbba...",
+      "bccccccccccccccdccbcca..",
+      "bcccccccccccccccddbcca..",
+      "bbbccccccccccccccddbca..",
+      "bbbbccccccccccccbddba...",
+      "bbbbcccbbccccccccbdbba..",
+      "dbbbbcccbbcccccccbbbba..",
+      "ddddcccccbcccccccbbbba..",
+      "dddddccccbbbcccccbbbba..",
+      "ccdddddcbbbbbcccbbbbbca.",
+      "cccdddddbbbbbccbbbbbbcca",
+      "cccccddddbbbbbbbbbbdbcca",
+      "cccccbddddbbbbbbbbbdccba",
+      "ccccccbdddbbbbbbbbbdbdda",
+      "ccccccbbdddbbbbbbbdddda.",
+      "cccccccbdddbbbbbbbdaaa..",
+      "bccccccbbddbbbbbbba.....",
+      "bbccccbbbddbbbbbbba.....",
+      "bbbccbbbbddbbbbbcba.....",
+      "bbbbbbbbbddbbbbccba....."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "leaf",
+      "c": "leaf.light",
+      "d": "leaf.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      4,
+      50
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".....abbbbbbbbbbcccccccccccccccc",
+      "......aaaaaabbbbcccccccccccccccc",
+      "............aabbbccccccccccccccc",
+      ".............abbbccccccccccccccc",
+      "..............abbbbccbcccccccccc",
+      "..............abbbbbbbbbcccccccc",
+      "...............aabbabbbbbbbbbbcc",
+      ".................aa.aabbbbbbbbbc",
+      "......................aaaaaabbbb",
+      "......................adddddabbb",
+      "......................addddddaaa",
+      "......................addddddddd",
+      "......................addeeeeeee",
+      "......................addeeeeeee",
+      "......................addeeeeede",
+      "......................addeeeeede",
+      "......................addeeeeede",
+      "......................addeeeeede",
+      "......................addedeeede",
+      "......................addedeeeee",
+      "......................adeedeeeee",
+      "......................aeeedeeeee",
+      ".....................aeeeeeeeeee",
+      "....................aeeeeeeeeeee",
+      "...................adddddddddddd",
+      "..................addddddddddddd",
+      "...................aaaaaaaaaaaaa"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "leaf.dark",
+      "c": "leaf",
+      "d": "wood.dark",
+      "e": "wood"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      36,
+      50
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaaaabaaaaaaaac.....",
+      "aaaaaaaaabbbabbbbc......",
+      "aaaaaaaabbbbabbbc.......",
+      "aaaaaaaabbbccccc........",
+      "aaaaaabbbbbc............",
+      "aaaabbccccc.............",
+      "aaaacc..................",
+      "aacc....................",
+      "bbc.....................",
+      "bc......................",
+      "cc......................",
+      "dc......................",
+      "ec......................",
+      "ec......................",
+      "ec......................",
+      "ec......................",
+      "ec......................",
+      "ec......................",
+      "ec......................",
+      "ec......................",
+      "ec......................",
+      "ec......................",
+      "eec.....................",
+      "eeec....................",
+      "ddddc...................",
+      "dddddc..................",
+      "ccccc..................."
+     ],
+     "key": {
+      "a": "leaf",
+      "b": "leaf.dark",
+      "c": "ink",
+      "d": "wood.dark",
+      "e": "wood"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     32,
+     76
+    ],
+    "fruitColour": "fruitColour",
+    "leaf": "leaf",
+    "wood": "wood",
+    "picture": "shake"
+   },
+   "ctx": {
+    "t": 0.375,
+    "loop": true,
+    "frames": 8,
+    "frame": 3
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      3,
+      18
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...........................aaaa.",
+      "..........................abbbca",
+      "...............aaaa..aaaaabbbbbc",
+      ".............aaccccaaccccddddccc",
+      "............abbbbbccccccddddddcc",
+      "............abbbbccccccccccbbbbb",
+      "...........adbbbdccccbbbccbbbbbb",
+      "...........addccccccbbbbbbbbbbbb",
+      "...........adddcccccbbbbbbbbbbbb",
+      "...........adddccccccbbbbbbbbbbb",
+      "............acccccccccbbbccbbbbb",
+      "......aaaaaaaccdddccccccccccbbbb",
+      ".....acccccdddddddddddcccbbbbbbb",
+      "....adbbbccddcccddddddddbbbbbcbb",
+      "...adbbbdccccccbbbbbdddddbbbbccc",
+      "...addbcccccbbbbbbbbbbddddbbcccc",
+      "..adddcccccbbbbbbbbbbbbddddccccc",
+      "...adddccccbbbbbbbbbbbbbdddccccc",
+      "...adccccccccbbbbbbbbbbccdddcccc",
+      "...aaccccccccbbbbbbbbbbbcddddddd",
+      "..adcccccccccccccbbbbbdddddddddd",
+      ".addcccccccccccbbbbbbddccccccccb",
+      "addcccccccccccbbbbbdcccbbbcccbbb",
+      "addccccccccccccbbbdcccbbbbbccbbb",
+      "addcccccccccccccbcccccbbbbbccbbb",
+      "adddcccccccccccccccccccbbbbcbbbb",
+      "adddddccccccccccccccccccbbcccccb",
+      ".addddcccccccccccccccccccccbbccb",
+      "..aaddccccccccccccccccccccbbbbcc",
+      "...adbccccccccccccccccccccbbbbcc",
+      "...adddcccccccccccccccccccbbbbcc",
+      "...addddcccccccccccccccccccbbccc"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "leaf.light",
+      "c": "leaf",
+      "d": "leaf.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      35,
+      18
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".........................",
+      ".........................",
+      "a........................",
+      "baa......................",
+      "bbbaa....................",
+      "cbbbba...................",
+      "cccbbba..................",
+      "cccbbbba....aaaaa........",
+      "cccbbbbbaaaacccbba.......",
+      "ccbbbbbbbbbcccccbba......",
+      "ccccddbbbbdddddccbba.....",
+      "ccddddbbbdddddddcbba.....",
+      "cdbbcccbbccccddddbbaa....",
+      "bbbcccccccccccdddcbbba...",
+      "bbccccccccccccccdccbcca..",
+      "bbcccccccccccccccddbcca..",
+      "bbbbccccccccccccccddbca..",
+      "bbbbbccccccccccccbddba...",
+      "bbbbbcccbbccccccccbdbba..",
+      "dddbbbcccbbcccccccbbbba..",
+      "ddddddccccbcccccccbbbba..",
+      "cddddddcccbbbcccccbbbba..",
+      "ccccdddddbbbbbcccbbbbbca.",
+      "cccccdddddbbbbccbbbbbbcca",
+      "cccccccddddbbbbbbbbbdbcca",
+      "cccccccbddddbbbbbbbbdccba",
+      "ccccccccbdddbbbbbbbbdbdda",
+      "ccccccccbbdddbbbbbbdddda.",
+      "cccccccccbdddbbbbbbdaaa..",
+      "bbbccccccbbddbbbbbba.....",
+      "bbbbccccbbbddbbbbbba.....",
+      "bbbbbccbbbbddbbbbcba....."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "leaf",
+      "c": "leaf.light",
+      "d": "leaf.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      3,
+      50
+     ],
+     "anchor": "tl",
+     "rows": [
+      "....abbbbbbbbbcccccccccccccccccc",
+      ".....abbbbbbbbbbbbcccccccccccccc",
+      "......aaaaaabbbbbbcccccccccccccc",
+      "............aaaabbbccccccccccccc",
+      "...............abbbccccccccccccc",
+      "................abbbbccbcccccccc",
+      "................abbbbbbbbbcccccc",
+      ".................aabbabbbbbbbbbb",
+      "...................aa.aabbbbbbbb",
+      ".......................aaaaaaabb",
+      ".......................addddddab",
+      ".......................addddddda",
+      ".......................addeeeeee",
+      "............f..........addeeeeee",
+      "...........f...........addeeeeed",
+      "..........f............addeeeeed",
+      ".......................addeeeeed",
+      ".......................addeeeeed",
+      ".......................addedeeed",
+      ".......................addedeeee",
+      ".......................adeedeeee",
+      "............fff........aeeedeeee",
+      "......................aeeeeeeeee",
+      ".....................aeeeeeeeeee",
+      "....................addddddddddd",
+      "...................adddddddddddd",
+      "....................aaaaaaaaaaaa"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "leaf.dark",
+      "c": "leaf",
+      "d": "wood.dark",
+      "e": "wood",
+      "f": "leaf.light"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      35,
+      50
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaaaaaabbaaaccad.....",
+      "aaaaaaaaaaabaaaaaaad.....",
+      "aaaaaaaaaaabbbabbbd......",
+      "aaaaaaaaaabbbbabbd.......",
+      "aaaaaaaaaabbbdddd........",
+      "aaaaaaaabbbbbd...........",
+      "aaaaaabbddddd............",
+      "aaaaaadd.................",
+      "baaadd...................",
+      "bbbbd....................",
+      "bbbd.....................",
+      "ddd.......aaa............",
+      "eed......................",
+      "eed......................",
+      "eed......................",
+      "eed......................",
+      "eed......................",
+      "eed......................",
+      "eed......................",
+      "eed........aaa...........",
+      "eed......................",
+      "eed......................",
+      "eeed.....................",
+      "eeeed....................",
+      "fffffd...................",
+      "ffffffd..................",
+      "dddddd..................."
+     ],
+     "key": {
+      "a": "leaf",
+      "b": "leaf.dark",
+      "c": "leaf.light",
+      "d": "ink",
+      "e": "wood",
+      "f": "wood.dark"
+     }
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,37 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "acid-pool",
+ "name": "Acid pool",
+ "blurb": "A boiling puddle of acid on the floor, seen from above: bubbles swell and burst and its edge wobbles; it can dry to a dark stain and spread again. Change its size, shape, bubbles, rim and colours.",
+ "meta": {"type":"prop","role":"world/hazard","themes":["sci-fi","space","horror"],"gameTypes":["roguelike-action","shooter"],"view":"top-down","words":["acid","pool","puddle","goo","slime","hazard","bubble","boil","spread","fade","stain","damage","toxic","floor"],"license":"draft"},
+ "size": [48,32],
+ "pivot": [24,16],
+ "grounded": false,
+ "preview": "idle",
+ "styles": ["pixel"],
+ "palette": [
+  {"id":"body","label":"Body","default":"#9fe040","material":"warning","swatches":["#9fe040","#2fb3a8","#4f9ff0","#5fe0f0","#b04a8a"]},
+  {"id":"glow","label":"Shine","default":"#f0ead8","material":"light","swatches":["#f0ead8","#e8ecf2","#f6d3b0","#c2c9d6"]}
+ ],
+ "controls": [
+  {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+  {"key":"shape","kind":"choice","label":"Shape","options":["round","splat","long"],"default":"round"},
+  {"key":"pieces","kind":"range","label":"Bubbles","lo":"Few","hi":"Many","default":0.5},
+  {"key":"crust","kind":"toggle","label":"Dark rim","default":true},
+  {"key":"body","kind":"colour","label":"Body"},
+  {"key":"glow","kind":"colour","label":"Shine"},
+  {"key":"wobble","kind":"range","label":"Wobble","lo":"Firm","hi":"Wobbly","default":0.5,"group":"Motion"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": { "pictures": { "nodes": [], "draw": [
+  {"id":"idle","gen":"pool.acid","v":1,"clip":["idle"],"picture":"idle","at":[24,16],"size":{"from":"size","map":[[0,0],[1,1]],"round":"none"},"shape":{"from":"shape","pick":{"round":"round","splat":"splat","long":"long"}},"pieces":{"from":"pieces","map":[[0,0],[1,1]],"round":"none"},"crust":{"from":"crust","pick":{"true":true,"false":false}},"body":"body","glowColour":"glow","wobble":{"from":"wobble","map":[[0,0],[1,1]],"round":"none"}},
+  {"id":"fade","gen":"pool.acid","v":1,"clip":["fade"],"picture":"fade","at":[24,16],"size":{"from":"size","map":[[0,0],[1,1]],"round":"none"},"shape":{"from":"shape","pick":{"round":"round","splat":"splat","long":"long"}},"pieces":{"from":"pieces","map":[[0,0],[1,1]],"round":"none"},"crust":{"from":"crust","pick":{"true":true,"false":false}},"body":"body","glowColour":"glow","wobble":{"from":"wobble","map":[[0,0],[1,1]],"round":"none"}},
+  {"id":"spawn","gen":"pool.acid","v":1,"clip":["spawn"],"picture":"spawn","at":[24,16],"size":{"from":"size","map":[[0,0],[1,1]],"round":"none"},"shape":{"from":"shape","pick":{"round":"round","splat":"splat","long":"long"}},"pieces":{"from":"pieces","map":[[0,0],[1,1]],"round":"none"},"crust":{"from":"crust","pick":{"true":true,"false":false}},"body":"body","glowColour":"glow","wobble":{"from":"wobble","map":[[0,0],[1,1]],"round":"none"}}
+ ] } },
+ "clips": {
+  "idle": {"frames":8,"fps":8,"label":"Bubbling","sounds":[{"sound":"bubbles","preset":"Boiling","frame":0,"volume":0.35}]},
+  "fade": {"frames":8,"fps":12,"loop":false,"label":"Dry up"},
+  "spawn": {"frames":8,"fps":12,"loop":false,"label":"Spread"}
+ }
+}

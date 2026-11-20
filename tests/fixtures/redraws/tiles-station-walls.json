@@ -1,0 +1,411 @@
+{
+ "id": "tiles-station-walls",
+ "frozen": "2026-11-20",
+ "source": "sprites/tiles-station-walls.js",
+ "sha256": "5354599173a286d2166c2f630cd55af28b4b41581f2d119bb35b2576e73a365f",
+ "name": "Station walls",
+ "blurb": "Metal bulkheads for a top-down space station: dark wall tops with a lit rim, a panelled face with a light strip and a pipe, a window, a pipe junction, a warning sign, a flickering lamp and the posts of a doorway; change the colours, the build of the panels, the rim and how worn it is.",
+ "meta": {
+  "type": "tileset",
+  "role": "world/tile",
+  "themes": [
+   "sci-fi",
+   "space"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "shooter"
+  ],
+  "view": "top-down",
+  "words": [
+   "wall",
+   "bulkhead",
+   "hull",
+   "panel",
+   "pipe",
+   "window",
+   "porthole",
+   "doorway",
+   "corridor",
+   "room",
+   "station",
+   "spaceship",
+   "metal",
+   "block"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "wall-single",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "panels",
+   "options": [
+    {
+     "value": "panels",
+     "label": "Panels"
+    },
+    {
+     "value": "ribbed",
+     "label": "Ribbed"
+    },
+    {
+     "value": "plated",
+     "label": "Plated"
+    }
+   ],
+   "group": "Look"
+  },
+  "edge": {
+   "kind": "range",
+   "label": "Edge",
+   "def": 4,
+   "min": 3,
+   "max": 6,
+   "step": 1,
+   "lo": "Thin",
+   "hi": "Deep",
+   "group": "Look"
+  },
+  "texture": {
+   "kind": "range",
+   "label": "Texture",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Plain",
+   "hi": "Busy",
+   "group": "Look"
+  },
+  "wear": {
+   "kind": "range",
+   "label": "Wear",
+   "def": 0.4,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "New",
+   "hi": "Worn",
+   "group": "Look"
+  },
+  "hull": {
+   "kind": "color",
+   "label": "Wall",
+   "def": "#6b7896",
+   "swatches": [
+    "#6b7896",
+    "#9aa6c0",
+    "#566182",
+    "#6660b6",
+    "#a87894"
+   ],
+   "group": "Colors"
+  },
+  "plate": {
+   "kind": "color",
+   "label": "Wall top",
+   "def": "#434d6d",
+   "swatches": [
+    "#434d6d",
+    "#566182",
+    "#6b7896",
+    "#6660b6",
+    "#a87894"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Warning paint",
+   "def": "#f2a030",
+   "swatches": [
+    "#f2a030",
+    "#2fb3a8",
+    "#e2473f",
+    "#3f6fd1",
+    "#5fe0f0",
+    "#9fe040"
+   ],
+   "group": "Colors"
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Wall lights",
+   "def": "#2fb3a8",
+   "swatches": [
+    "#2fb3a8",
+    "#5fe0f0",
+    "#e2473f",
+    "#9fe040",
+    "#f2a030",
+    "#b48af8",
+    "#4f9ff0",
+    "#5fd47a"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "wall-left": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-top": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-right": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-side-l": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-fill": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-side-r": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-bottom-l": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-bottom": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-bottom-r": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-inner-tl": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-inner-tr": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-inner-bl": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-inner-br": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-strip-l": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-strip-m": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-strip-r": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-col-t": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-col-m": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-col-b": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-single": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-deco-a": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-deco-b": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-deco-c": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-deco-d": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    4,
+    6,
+    9
+   ]
+  },
+  "doorway-l": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "doorway-r": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [],
+ "bundles": [
+  "kit-roguelite-scifi"
+ ]
+}

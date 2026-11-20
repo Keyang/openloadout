@@ -1,0 +1,85 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "saw-blade",
+ "name": "Saw blade",
+ "blurb": "A spinning circular saw blade that hurts on touch; change its size, the cut of its teeth, how many it has, the hub plate, the metal and how much it wobbles.",
+ "meta": {
+  "type": "prop",
+  "role": "world/hazard",
+  "themes": ["fantasy","forest"],
+  "gameTypes": ["platformer"],
+  "view": "side",
+  "words": ["saw","blade","sawblade","buzzsaw","hazard","trap","spin","grind","cut","danger","obstacle","metal","sharp"],
+  "license": "draft"
+ },
+ "size": [48,48],
+ "pivot": [24,24],
+ "grounded": false,
+ "preview": "idle",
+ "styles": ["pixel"],
+ "palette": [
+  {
+   "id": "metal",
+   "label": "Metal",
+   "default": "#c2c9d6",
+   "material": "metal",
+   "swatches": ["#c2c9d6","#f2c230","#8f97a8","#5d6475","#e6c545","#c98a4a"]
+  },
+  {"id":"accent","label":"Hub plate","default":"#c9423a","material":"paint","swatches":["#c9423a","#7a4fc4","#f0ead8","#4fd8ee","#a4c44a"]}
+ ],
+ "controls": [
+  {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.55},
+  {
+   "key": "style",
+   "kind": "choice",
+   "label": "Style",
+   "options": [{"value":"classic","label":"Classic"},{"value":"jagged","label":"Jagged"},{"value":"ring","label":"Ring"}],
+   "default": "classic"
+  },
+  {"key":"teeth","kind":"range","label":"Teeth","lo":"Few","hi":"Many","default":8,"min":6,"max":12,"step":1},
+  {"key":"hub","kind":"toggle","label":"Hub plate","default":true},
+  {"key":"metal","kind":"colour","label":"Metal"},
+  {"key":"accent","kind":"colour","label":"Hub plate","when":{"hub":[true]}},
+  {"key":"wobble","kind":"range","label":"Wobble","lo":"Firm","hi":"Wobbly","default":0.35,"group":"Motion"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": {
+  "pictures": {
+   "nodes": [],
+   "draw": [
+    {
+     "id": "idle",
+     "gen": "saw.blade",
+     "v": 1,
+     "at": [24,24],
+     "clip": ["idle"],
+     "picture": "idle",
+     "size": {"from":"size","map":[[0,0],[1,1]],"round":"none"},
+     "style": {"from":"style","pick":{"classic":"classic","jagged":"jagged","ring":"ring"}},
+     "teeth": {"from":"teeth","map":[[6,6],[12,12]],"round":"px"},
+     "hub": {"from":"hub","pick":{"true":true,"false":false}},
+     "metal": "metal",
+     "accent": "accent",
+     "wobble": {"from":"wobble","map":[[0,0],[1,1]],"round":"none"}
+    },
+    {
+     "id": "grind",
+     "gen": "saw.blade",
+     "v": 1,
+     "at": [24,24],
+     "clip": ["grind"],
+     "picture": "grind",
+     "size": {"from":"size","map":[[0,0],[1,1]],"round":"none"},
+     "style": {"from":"style","pick":{"classic":"classic","jagged":"jagged","ring":"ring"}},
+     "teeth": {"from":"teeth","map":[[6,6],[12,12]],"round":"px"},
+     "hub": {"from":"hub","pick":{"true":true,"false":false}},
+     "metal": "metal",
+     "accent": "accent",
+     "wobble": {"from":"wobble","map":[[0,0],[1,1]],"round":"none"}
+    }
+   ]
+  }
+ },
+ "clips": {"idle":{"frames":8,"fps":12,"label":"Spin"},"grind":{"frames":8,"fps":12}}
+}

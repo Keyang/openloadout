@@ -1,0 +1,390 @@
+{
+ "id": "tiles-hive",
+ "frozen": "2026-11-20",
+ "source": "sprites/tiles-hive.js",
+ "sha256": "dbb27e85c85afc8d04bc4b3fb6dbd959cedcbd7eaae15a89eebf760b8c677363",
+ "name": "Hive growth",
+ "blurb": "The infested part of a space station seen from above: a soft membrane floor with veins, walls of bulging mass with a ribbed, dripping face, eggs, a pulsing vein knot, a husk and creep; change the colours, the veins, the rim, the texture and the wet shine.",
+ "meta": {
+  "type": "tileset",
+  "role": "world/tile",
+  "themes": [
+   "sci-fi",
+   "space",
+   "horror"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "shooter"
+  ],
+  "view": "top-down",
+  "words": [
+   "hive",
+   "alien",
+   "growth",
+   "flesh",
+   "membrane",
+   "organic",
+   "nest",
+   "eggs",
+   "veins",
+   "creep",
+   "infested",
+   "wall",
+   "floor",
+   "slimy"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "wall-single",
+ "params": {
+  "veins": {
+   "kind": "range",
+   "label": "Veins",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "edge": {
+   "kind": "range",
+   "label": "Edge",
+   "def": 4,
+   "min": 3,
+   "max": 5,
+   "step": 1,
+   "lo": "Thin",
+   "hi": "Deep",
+   "group": "Look"
+  },
+  "texture": {
+   "kind": "range",
+   "label": "Texture",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Plain",
+   "hi": "Busy",
+   "group": "Look"
+  },
+  "wet": {
+   "kind": "toggle",
+   "label": "Wet",
+   "def": true,
+   "group": "Look"
+  },
+  "flesh": {
+   "kind": "color",
+   "label": "Floor",
+   "def": "#a87894",
+   "swatches": [
+    "#a87894",
+    "#6b7896",
+    "#2fb3a8",
+    "#6660b6"
+   ],
+   "group": "Colors"
+  },
+  "growth": {
+   "kind": "color",
+   "label": "Walls",
+   "def": "#b04a8a",
+   "swatches": [
+    "#b04a8a",
+    "#6660b6",
+    "#e2473f",
+    "#6b7896"
+   ],
+   "group": "Colors"
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Glow",
+   "def": "#9fe040",
+   "swatches": [
+    "#9fe040",
+    "#5fe0f0",
+    "#e2473f",
+    "#f2a030",
+    "#b48af8",
+    "#4f9ff0",
+    "#5fd47a"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "hive-fill": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "hive-fill-b": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "hive-fill-c": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "wall-left": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-top": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-right": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-side-l": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-fill": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-side-r": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-bottom-l": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-bottom": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-bottom-r": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-inner-tl": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-inner-tr": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-inner-bl": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-inner-br": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-strip-l": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-strip-m": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-strip-r": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-col-t": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-col-m": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-col-b": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-single": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "hive-deco-a": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "hive-deco-b": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    4,
+    6,
+    9
+   ]
+  },
+  "hive-deco-c": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "hive-deco-d": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [],
+ "bundles": [
+  "kit-roguelite-scifi"
+ ]
+}

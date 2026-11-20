@@ -1,0 +1,4577 @@
+{
+ "id": "robot.vendor-bot.points",
+ "v": 1,
+ "family": "motion",
+ "cases": [
+  {
+   "args": {},
+   "ctx": {
+    "t": 0,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      11
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      34.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      34.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      33
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 0.25,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      9
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      32.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      32.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      31
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 0.5,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      11
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      34.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      34.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      33
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 0.75,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      13
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      36.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      36.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      35
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 1,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      11
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      34.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      34.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      33
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 0,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      11
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      34.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      34.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      33
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 0.25,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      9
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      32.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      32.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      31
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 0.5,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      11
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      34.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      34.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      33
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 0.75,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      13
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      36.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      36.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      35
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 1,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      11
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      34.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      34.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      33
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 0
+   },
+   "ctx": {
+    "t": 0,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      15
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      34.5,
+      34.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      14.5,
+      34.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      34
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 0
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      13
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      34.5,
+      32.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      14.5,
+      32.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      32
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 0
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      15
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      34.5,
+      34.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      14.5,
+      34.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      34
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 0
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      17
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      34.5,
+      36.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      14.5,
+      36.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      36
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 0
+   },
+   "ctx": {
+    "t": 1,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      15
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      34.5,
+      34.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      14.5,
+      34.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      34
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 0
+   },
+   "ctx": {
+    "t": 0,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      15
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      34.5,
+      34.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      14.5,
+      34.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      34
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 0
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      13
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      34.5,
+      32.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      14.5,
+      32.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      32
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 0
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      15
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      34.5,
+      34.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      14.5,
+      34.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      34
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 0
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      17
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      34.5,
+      36.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      14.5,
+      36.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      36
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 0
+   },
+   "ctx": {
+    "t": 1,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      15
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      34.5,
+      34.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      14.5,
+      34.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      34
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 1
+   },
+   "ctx": {
+    "t": 0,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      9
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      38.5,
+      33.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      10.5,
+      33.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22.5,
+      32
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 1
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      7
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      38.5,
+      31.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      10.5,
+      31.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22.5,
+      30
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 1
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      9
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      38.5,
+      33.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      10.5,
+      33.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22.5,
+      32
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 1
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      11
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      38.5,
+      35.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      10.5,
+      35.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22.5,
+      34
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 1
+   },
+   "ctx": {
+    "t": 1,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      9
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      38.5,
+      33.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      10.5,
+      33.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22.5,
+      32
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 1
+   },
+   "ctx": {
+    "t": 0,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      9
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      38.5,
+      33.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      10.5,
+      33.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22.5,
+      32
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 1
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      7
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      38.5,
+      31.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      10.5,
+      31.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22.5,
+      30
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 1
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      9
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      38.5,
+      33.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      10.5,
+      33.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22.5,
+      32
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 1
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      11
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      38.5,
+      35.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      10.5,
+      35.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22.5,
+      34
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 1
+   },
+   "ctx": {
+    "t": 1,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      9
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      38.5,
+      33.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      10.5,
+      33.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22.5,
+      32
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "headgearSize": 0.65
+   },
+   "ctx": {
+    "t": 0,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      11
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      34.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      34.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      33
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "headgearSize": 0.65
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      9
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      32.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      32.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      31
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "headgearSize": 0.65
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      11
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      34.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      34.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      33
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "headgearSize": 0.65
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      13
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      36.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      36.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      35
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "headgearSize": 0.65
+   },
+   "ctx": {
+    "t": 1,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      11
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      34.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      34.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      33
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "headgearSize": 0.65
+   },
+   "ctx": {
+    "t": 0,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      11
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      34.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      34.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      33
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "headgearSize": 0.65
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      9
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      32.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      32.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      31
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "headgearSize": 0.65
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      11
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      34.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      34.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      33
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "headgearSize": 0.65
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      13
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      36.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      36.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      35
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "headgearSize": 0.65
+   },
+   "ctx": {
+    "t": 1,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      11
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      34.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      34.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      33
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "headgearSize": 1.35
+   },
+   "ctx": {
+    "t": 0,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      11
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      34.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      34.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      33
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "headgearSize": 1.35
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      9
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      32.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      32.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      31
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "headgearSize": 1.35
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      11
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      34.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      34.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      33
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "headgearSize": 1.35
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      13
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      36.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      36.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      35
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "headgearSize": 1.35
+   },
+   "ctx": {
+    "t": 1,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      11
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      34.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      34.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      33
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "headgearSize": 1.35
+   },
+   "ctx": {
+    "t": 0,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      11
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      34.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      34.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      33
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "headgearSize": 1.35
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      9
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      32.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      32.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      31
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "headgearSize": 1.35
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      11
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      34.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      34.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      33
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "headgearSize": 1.35
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      13
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      36.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      36.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      35
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "headgearSize": 1.35
+   },
+   "ctx": {
+    "t": 1,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      11
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      34.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      34.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      33
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "heldSize": 0.65
+   },
+   "ctx": {
+    "t": 0,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      11
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      34.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      34.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      33
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "heldSize": 0.65
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      9
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      32.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      32.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      31
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "heldSize": 0.65
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      11
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      34.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      34.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      33
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "heldSize": 0.65
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      13
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      36.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      36.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      35
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "heldSize": 0.65
+   },
+   "ctx": {
+    "t": 1,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      11
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      34.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      34.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      33
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "heldSize": 0.65
+   },
+   "ctx": {
+    "t": 0,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      11
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      34.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      34.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      33
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "heldSize": 0.65
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      9
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      32.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      32.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      31
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "heldSize": 0.65
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      11
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      34.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      34.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      33
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "heldSize": 0.65
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      13
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      36.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      36.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      35
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "heldSize": 0.65
+   },
+   "ctx": {
+    "t": 1,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      11
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      34.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      34.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      33
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "heldSize": 1.35
+   },
+   "ctx": {
+    "t": 0,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      11
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      34.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      34.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      33
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "heldSize": 1.35
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      9
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      32.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      32.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      31
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "heldSize": 1.35
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      11
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      34.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      34.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      33
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "heldSize": 1.35
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      13
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      36.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      36.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      35
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "heldSize": 1.35
+   },
+   "ctx": {
+    "t": 1,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      11
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      34.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      34.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      33
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "heldSize": 1.35
+   },
+   "ctx": {
+    "t": 0,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      11
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      34.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      34.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      33
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "heldSize": 1.35
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      9
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      32.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      32.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      31
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "heldSize": 1.35
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      11
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      34.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      34.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      33
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "heldSize": 1.35
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      13
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      36.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      36.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      35
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "heldSize": 1.35
+   },
+   "ctx": {
+    "t": 1,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      11
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      34.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      34.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      33
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "bob": 0
+   },
+   "ctx": {
+    "t": 0,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      11
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      34.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      34.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      33
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "bob": 0
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      10
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      33.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      33.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      32
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "bob": 0
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      11
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      34.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      34.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      33
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "bob": 0
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      12
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      35.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      35.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      34
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "bob": 0
+   },
+   "ctx": {
+    "t": 1,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      11
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      34.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      34.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      33
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "bob": 0
+   },
+   "ctx": {
+    "t": 0,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      11
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      34.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      34.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      33
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "bob": 0
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      10
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      33.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      33.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      32
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "bob": 0
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      11
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      34.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      34.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      33
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "bob": 0
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      12
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      35.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      35.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      34
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "bob": 0
+   },
+   "ctx": {
+    "t": 1,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      11
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      34.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      34.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      33
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "bob": 1
+   },
+   "ctx": {
+    "t": 0,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      11
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      35.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      33.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      33
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "bob": 1
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      8
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      31.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      31.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      30
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "bob": 1
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      11
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      33.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      35.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      33
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "bob": 1
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      14
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      37.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      37.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      36
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "bob": 1
+   },
+   "ctx": {
+    "t": 1,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      11
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      35.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      33.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      33
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "bob": 1
+   },
+   "ctx": {
+    "t": 0,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      11
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      35.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      33.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      33
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "bob": 1
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      8
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      31.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      31.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      30
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "bob": 1
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      11
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      33.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      35.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      33
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "bob": 1
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      14
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      37.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      37.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      36
+     ],
+     "turn": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "bob": 1
+   },
+   "ctx": {
+    "t": 1,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "head",
+     "move": [
+      24.5,
+      11
+     ],
+     "turn": -180
+    },
+    {
+     "node": "hand",
+     "move": [
+      36.5,
+      35.5
+     ],
+     "turn": -180
+    },
+    {
+     "node": "offhand",
+     "move": [
+      12.5,
+      33.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "feet",
+     "move": [
+      24.5,
+      42
+     ],
+     "turn": 0
+    },
+    {
+     "node": "hatch",
+     "move": [
+      22,
+      33
+     ],
+     "turn": 0
+    }
+   ]
+  }
+ ]
+}

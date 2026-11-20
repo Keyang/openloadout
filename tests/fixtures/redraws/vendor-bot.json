@@ -1,0 +1,291 @@
+{
+ "id": "vendor-bot",
+ "frozen": "2026-11-20",
+ "source": "sprites/vendor-bot.js",
+ "sha256": "98917777e6682bde390ba415dfe8201f593a822fb1d004228c3eca9d09264379",
+ "name": "Vendor bot",
+ "blurb": "A friendly shop robot that hovers in place, chats and serves from its hatch. Change its body, screen face, arms, what it wears and holds, and its colours.",
+ "meta": {
+  "type": "character",
+  "role": "characters/npc",
+  "themes": [
+   "sci-fi",
+   "space"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "shooter"
+  ],
+  "view": "top-down",
+  "words": [
+   "vendor",
+   "shop",
+   "shopkeeper",
+   "merchant",
+   "robot",
+   "kiosk",
+   "vending machine",
+   "store",
+   "talk",
+   "sell",
+   "buy",
+   "hover",
+   "friendly"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  48,
+  48
+ ],
+ "pivot": [
+  24,
+  42
+ ],
+ "grounded": false,
+ "preview": "idle",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "shape": {
+   "kind": "choice",
+   "label": "Shape",
+   "def": "boxy",
+   "options": [
+    {
+     "value": "boxy",
+     "label": "Boxy"
+    },
+    {
+     "value": "round",
+     "label": "Round"
+    },
+    {
+     "value": "capsule",
+     "label": "Capsule"
+    }
+   ],
+   "group": "Look"
+  },
+  "eyes": {
+   "kind": "choice",
+   "label": "Eyes",
+   "def": "smile",
+   "options": [
+    {
+     "value": "smile",
+     "label": "Smile"
+    },
+    {
+     "value": "dots",
+     "label": "Dots"
+    },
+    {
+     "value": "visor",
+     "label": "Visor"
+    },
+    {
+     "value": "one eye",
+     "label": "One eye"
+    }
+   ],
+   "group": "Look"
+  },
+  "arms": {
+   "kind": "toggle",
+   "label": "Arms",
+   "def": true,
+   "group": "Look"
+  },
+  "headgear": {
+   "kind": "choice",
+   "label": "Headgear",
+   "def": "antenna",
+   "options": [
+    {
+     "value": "antenna",
+     "label": "Antenna"
+    },
+    {
+     "value": "dish",
+     "label": "Dish"
+    },
+    {
+     "value": "cap",
+     "label": "Cap"
+    },
+    {
+     "value": "none",
+     "label": "None"
+    }
+   ],
+   "group": "Look"
+  },
+  "headgearSize": {
+   "kind": "range",
+   "label": "Size",
+   "def": 1,
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "held": {
+   "kind": "choice",
+   "label": "Held",
+   "def": "none",
+   "options": [
+    {
+     "value": "none",
+     "label": "None"
+    },
+    {
+     "value": "sign",
+     "label": "Sign"
+    },
+    {
+     "value": "tray",
+     "label": "Tray"
+    }
+   ],
+   "group": "Look"
+  },
+  "heldSize": {
+   "kind": "range",
+   "label": "Size",
+   "def": 1,
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Body",
+   "def": "#9aa6c0",
+   "swatches": [
+    "#9aa6c0",
+    "#c2c9d6",
+    "#6b7896",
+    "#e8ecf2"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Trim",
+   "def": "#2fb3a8",
+   "swatches": [
+    "#2fb3a8",
+    "#3f6fd1",
+    "#9fe040"
+   ],
+   "group": "Colors"
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Screen",
+   "def": "#5fe0f0",
+   "swatches": [
+    "#5fe0f0",
+    "#f2a030",
+    "#b48af8",
+    "#4f9ff0",
+    "#5fd47a"
+   ],
+   "group": "Colors"
+  },
+  "bob": {
+   "kind": "range",
+   "label": "Float",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Still",
+   "hi": "Floaty",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    7,
+    10
+   ]
+  },
+  "talk": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    7,
+    10
+   ]
+  },
+  "sell": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  }
+ },
+ "sounds": {
+  "talk": [
+   {
+    "sound": "tech-click",
+    "frame": 0,
+    "preset": "Hover",
+    "volume": 0.6
+   },
+   {
+    "sound": "tech-click",
+    "frame": 4,
+    "preset": "Hover",
+    "volume": 0.6
+   }
+  ],
+  "sell": [
+   {
+    "sound": "credit-pickup",
+    "frame": 3,
+    "preset": "Credit chip",
+    "volume": 0.7
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-roguelite-scifi"
+ ]
+}

@@ -1,0 +1,37 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "wall-torch",
+ "name": "Wall torch",
+ "blurb": "A torch burning in a wall bracket, which can be put out and lit again. Change the bracket, the flame, its halo and sparks, and the colours.",
+ "meta": {"type":"prop","role":"world/prop","themes":["fantasy","dungeon"],"gameTypes":["platformer"],"view":"side","words":["torch","flame","fire","light","sconce","lamp","burn","ignite","castle","cave","wall","flicker"],"license":"draft"},
+ "size": [32,48],
+ "pivot": [16,34],
+ "grounded": false,
+ "preview": "idle",
+ "styles": ["pixel"],
+ "palette": [
+  {"id":"glow","label":"Glow","default":"#e08a2c","material":"fire","swatches":["#e08a2c","#4fd8ee","#f2c230","#a4c44a","#c9423a","#7a4fc4"]},
+  {"id":"metal","label":"Metal","default":"#c2c9d6","material":"metal","swatches":["#c2c9d6","#f2c230","#8f97a8","#5d6475","#e6c545","#c98a4a"]}
+ ],
+ "controls": [
+  {"key":"style","kind":"choice","label":"Style","options":[{"value":"iron","label":"Iron ring"},{"value":"wood","label":"Wooden block"},{"value":"sconce","label":"Sconce"}],"default":"iron"},
+  {"key":"height","kind":"range","label":"Height","lo":"Short","hi":"Tall","default":0.5},
+  {"key":"halo","kind":"toggle","label":"Halo","default":true},
+  {"key":"sparks","kind":"toggle","label":"Sparks","default":true},
+  {"key":"glow","kind":"colour","label":"Glow"},
+  {"key":"metal","kind":"colour","label":"Metal"},
+  {"key":"flicker","kind":"range","label":"Flicker","lo":"Steady","hi":"Wild","default":0.5,"group":"Motion"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": { "pictures": { "nodes": [], "draw": [
+  {"id":"idle","gen":"torch.wall","v":1,"clip":["idle"],"picture":"idle","at":[16,34],"style":{"from":"style","pick":{"iron":"iron","wood":"wood","sconce":"sconce"}},"height":{"from":"height","map":[[0,0],[1,1]],"round":"none"},"halo":{"from":"halo","pick":{"true":true,"false":false}},"sparks":{"from":"sparks","pick":{"true":true,"false":false}},"glowColour":"glow","metal":"metal","flicker":{"from":"flicker","map":[[0,0],[1,1]],"round":"none"}},
+  {"id":"out","gen":"torch.wall","v":1,"clip":["out"],"picture":"out","at":[16,34],"style":{"from":"style","pick":{"iron":"iron","wood":"wood","sconce":"sconce"}},"height":{"from":"height","map":[[0,0],[1,1]],"round":"none"},"halo":{"from":"halo","pick":{"true":true,"false":false}},"sparks":{"from":"sparks","pick":{"true":true,"false":false}},"glowColour":"glow","metal":"metal","flicker":{"from":"flicker","map":[[0,0],[1,1]],"round":"none"}},
+  {"id":"ignite","gen":"torch.wall","v":1,"clip":["ignite"],"picture":"ignite","at":[16,34],"style":{"from":"style","pick":{"iron":"iron","wood":"wood","sconce":"sconce"}},"height":{"from":"height","map":[[0,0],[1,1]],"round":"none"},"halo":{"from":"halo","pick":{"true":true,"false":false}},"sparks":{"from":"sparks","pick":{"true":true,"false":false}},"glowColour":"glow","metal":"metal","flicker":{"from":"flicker","map":[[0,0],[1,1]],"round":"none"}}
+ ] } },
+ "clips": {
+  "idle": {"frames":8,"fps":8,"label":"Burn","sounds":[{"sound":"fire","preset":"Torch","frame":0,"volume":0.35}]},
+  "out": {"frames":1,"fps":8,"label":"Unlit"},
+  "ignite": {"frames":6,"fps":12,"loop":false,"sounds":[{"sound":"whoosh","preset":"Quick swipe","frame":1,"volume":0.7}]}
+ }
+}

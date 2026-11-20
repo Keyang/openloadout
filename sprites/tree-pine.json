@@ -1,0 +1,36 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "tree-pine",
+ "name": "Pine tree",
+ "blurb": "A pointed fir tree for a top-down map, in tiers that sway from the tip; change its size, height, width, snow and colours.",
+ "meta": {"type":"prop","role":"world/prop","themes":["fantasy","forest"],"gameTypes":["turn-based-rpg","top-down-rpg"],"view":"top-down","words":["tree","pine","fir","evergreen","conifer","forest","woods","snow","winter","sway","shake","needles"],"license":"draft"},
+ "size": [48,80],
+ "pivot": [24,76],
+ "preview": "sway",
+ "styles": ["pixel"],
+ "palette": [
+  {"id":"leaf","label":"Needles","default":"#357a4c","material":"plant","swatches":["#357a4c","#4f9d57","#7fbf5a"]},
+  {"id":"wood","label":"Wood","default":"#9a6a3e","material":"wood","swatches":["#9a6a3e","#c9a06a","#a8612a","#5a3a22","#c98a4a"]}
+ ],
+ "controls": [
+  {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.6},
+  {"key":"shape","kind":"choice","label":"Shape","options":["short","medium","tall"],"default":"medium"},
+  {"key":"width","kind":"range","label":"Width","lo":"Narrow","hi":"Wide","default":0.5},
+  {"key":"snowy","kind":"toggle","label":"Snowy","default":false},
+  {"key":"leaf","kind":"colour","label":"Needles"},
+  {"key":"wood","kind":"colour","label":"Wood"},
+  {"key":"sway","kind":"range","label":"Sway","lo":"Still","hi":"Swaying","default":0.5,"group":"Motion"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": { "pictures": { "nodes": [], "draw": [
+  {"id":"idle","gen":"tree.pine","v":1,"clip":["idle"],"picture":"idle","at":[24,76],"size":{"from":"size","map":[[0,0],[1,1]],"round":"none"},"shape":{"from":"shape","pick":{"short":"short","medium":"medium","tall":"tall"}},"width":{"from":"width","map":[[0,0],[1,1]],"round":"none"},"snowy":{"from":"snowy","pick":{"true":true,"false":false}},"leaf":"leaf","wood":"wood","sway":{"from":"sway","map":[[0,0],[1,1]],"round":"none"}},
+  {"id":"sway","gen":"tree.pine","v":1,"clip":["sway"],"picture":"sway","at":[24,76],"size":{"from":"size","map":[[0,0],[1,1]],"round":"none"},"shape":{"from":"shape","pick":{"short":"short","medium":"medium","tall":"tall"}},"width":{"from":"width","map":[[0,0],[1,1]],"round":"none"},"snowy":{"from":"snowy","pick":{"true":true,"false":false}},"leaf":"leaf","wood":"wood","sway":{"from":"sway","map":[[0,0],[1,1]],"round":"none"}},
+  {"id":"shake","gen":"tree.pine","v":1,"clip":["shake"],"picture":"shake","at":[24,76],"size":{"from":"size","map":[[0,0],[1,1]],"round":"none"},"shape":{"from":"shape","pick":{"short":"short","medium":"medium","tall":"tall"}},"width":{"from":"width","map":[[0,0],[1,1]],"round":"none"},"snowy":{"from":"snowy","pick":{"true":true,"false":false}},"leaf":"leaf","wood":"wood","sway":{"from":"sway","map":[[0,0],[1,1]],"round":"none"}}
+ ] } },
+ "clips": {
+  "idle": {"frames":1,"fps":8},
+  "sway": {"frames":8,"fps":8},
+  "shake": {"frames":6,"fps":12,"loop":false,"sounds":[{"sound":"footstep-grass","frame":0,"preset":"Tall grass","volume":0.6}]}
+ }
+}

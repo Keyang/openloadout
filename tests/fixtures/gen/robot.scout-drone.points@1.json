@@ -1,0 +1,3137 @@
+{
+ "id": "robot.scout-drone.points",
+ "v": 1,
+ "family": "motion",
+ "cases": [
+  {
+   "args": {},
+   "ctx": {
+    "t": 0,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      32.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      15
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 0.25,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      30.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      13
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 0.5,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      32.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      15
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 0.75,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      29
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      34.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      17
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 1,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      32.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      15
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 0,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      32.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      15
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 0.25,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      30.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      13
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 0.5,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      32.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      15
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 0.75,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      29
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      34.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      17
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 1,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      32.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      15
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 0
+   },
+   "ctx": {
+    "t": 0,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      31.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      16
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 0
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      29.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      14
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 0
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      31.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      16
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 0
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      29
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      33.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      18
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 0
+   },
+   "ctx": {
+    "t": 1,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      31.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      16
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 0
+   },
+   "ctx": {
+    "t": 0,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      31.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      16
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 0
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      29.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      14
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 0
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      31.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      16
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 0
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      29
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      33.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      18
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 0
+   },
+   "ctx": {
+    "t": 1,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      31.5
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      16
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 1
+   },
+   "ctx": {
+    "t": 0,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      29
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      35
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      14
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 1
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      33
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      12
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 1
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      29
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      35
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      14
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 1
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      31
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      37
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      16
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 1
+   },
+   "ctx": {
+    "t": 1,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      29
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      35
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      14
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 1
+   },
+   "ctx": {
+    "t": 0,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      29
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      35
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      14
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 1
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      33
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      12
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 1
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      29
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      35
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      14
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 1
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      31
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      37
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      16
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "size": 1
+   },
+   "ctx": {
+    "t": 1,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      29
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      35
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      14
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "weaponLength": 0.65
+   },
+   "ctx": {
+    "t": 0,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      30.4125
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      15
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "weaponLength": 0.65
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      28.4125
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      13
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "weaponLength": 0.65
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      30.4125
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      15
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "weaponLength": 0.65
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      29
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      32.4125
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      17
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "weaponLength": 0.65
+   },
+   "ctx": {
+    "t": 1,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      30.4125
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      15
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "weaponLength": 0.65
+   },
+   "ctx": {
+    "t": 0,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      30.4125
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      15
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "weaponLength": 0.65
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      28.4125
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      13
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "weaponLength": 0.65
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      30.4125
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      15
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "weaponLength": 0.65
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      29
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      32.4125
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      17
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "weaponLength": 0.65
+   },
+   "ctx": {
+    "t": 1,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      30.4125
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      15
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "weaponLength": 1.35
+   },
+   "ctx": {
+    "t": 0,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      34.0875
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      15
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "weaponLength": 1.35
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      32.0875
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      13
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "weaponLength": 1.35
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      34.0875
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      15
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "weaponLength": 1.35
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      29
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      36.0875
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      17
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "weaponLength": 1.35
+   },
+   "ctx": {
+    "t": 1,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      34.0875
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      15
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "weaponLength": 1.35
+   },
+   "ctx": {
+    "t": 0,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      34.0875
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      15
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "weaponLength": 1.35
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      32.0875
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      13
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "weaponLength": 1.35
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      34.0875
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      15
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "weaponLength": 1.35
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      29
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      36.0875
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      17
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "weaponLength": 1.35
+   },
+   "ctx": {
+    "t": 1,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      34.0875
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      15
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "wingSpan": 0.65
+   },
+   "ctx": {
+    "t": 0,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      32.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      15
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "wingSpan": 0.65
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      30.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      13
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "wingSpan": 0.65
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      32.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      15
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "wingSpan": 0.65
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      29
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      34.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      17
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "wingSpan": 0.65
+   },
+   "ctx": {
+    "t": 1,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      32.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      15
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "wingSpan": 0.65
+   },
+   "ctx": {
+    "t": 0,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      32.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      15
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "wingSpan": 0.65
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      30.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      13
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "wingSpan": 0.65
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      32.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      15
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "wingSpan": 0.65
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      29
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      34.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      17
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "wingSpan": 0.65
+   },
+   "ctx": {
+    "t": 1,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      32.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      15
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "wingSpan": 1.35
+   },
+   "ctx": {
+    "t": 0,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      32.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      15
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "wingSpan": 1.35
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      30.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      13
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "wingSpan": 1.35
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      32.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      15
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "wingSpan": 1.35
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      29
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      34.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      17
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "wingSpan": 1.35
+   },
+   "ctx": {
+    "t": 1,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      32.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      15
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "wingSpan": 1.35
+   },
+   "ctx": {
+    "t": 0,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      32.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      15
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "wingSpan": 1.35
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      30.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      13
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "wingSpan": 1.35
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      32.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      15
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "wingSpan": 1.35
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      29
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      34.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      17
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "wingSpan": 1.35
+   },
+   "ctx": {
+    "t": 1,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      32.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      15
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "bob": 0
+   },
+   "ctx": {
+    "t": 0,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      32.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      15
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "bob": 0
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      26
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      31.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      14
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "bob": 0
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      32.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      15
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "bob": 0
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      28
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      33.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      16
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "bob": 0
+   },
+   "ctx": {
+    "t": 1,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      32.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      15
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "bob": 0
+   },
+   "ctx": {
+    "t": 0,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      32.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      15
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "bob": 0
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      26
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      31.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      14
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "bob": 0
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      32.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      15
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "bob": 0
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      28
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      33.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      16
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "bob": 0
+   },
+   "ctx": {
+    "t": 1,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      32.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      15
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "bob": 1
+   },
+   "ctx": {
+    "t": 0,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      23,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      23,
+      32.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      23,
+      15
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "bob": 1
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      24
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      29.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      12
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "bob": 1
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      25,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      25,
+      32.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      25,
+      15
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "bob": 1
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      30
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      35.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      18
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "bob": 1
+   },
+   "ctx": {
+    "t": 1,
+    "loop": true
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      23,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      23,
+      32.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      23,
+      15
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "bob": 1
+   },
+   "ctx": {
+    "t": 0,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      23,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      23,
+      32.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      23,
+      15
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "bob": 1
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      24
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      29.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      12
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "bob": 1
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      25,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      25,
+      32.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      25,
+      15
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "bob": 1
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      24,
+      30
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      24,
+      35.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      24,
+      18
+     ],
+     "turn": -180
+    }
+   ]
+  },
+  {
+   "args": {
+    "bob": 1
+   },
+   "ctx": {
+    "t": 1,
+    "loop": false
+   },
+   "moves": [
+    {
+     "node": "hand",
+     "move": [
+      23,
+      27
+     ],
+     "turn": 0
+    },
+    {
+     "node": "muzzle",
+     "move": [
+      23,
+      32.25
+     ],
+     "turn": 0
+    },
+    {
+     "node": "back",
+     "move": [
+      23,
+      15
+     ],
+     "turn": -180
+    }
+   ]
+  }
+ ]
+}

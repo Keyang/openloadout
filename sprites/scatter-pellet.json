@@ -755,27 +755,763 @@
           "when": {"shape":["shard"],"size":[{"atLeast":0.75}],"flicker":[{"atLeast":0.8}],"clip":["fly"]}
         },
         {"kind":"outline","paint":"rim.base"},
+        {
+          "id": "spark3restR7",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,5],[0.15,5],[0.15025,4],[0.4,4],[0.40025,3],[0.49975,3],[0.5,4],[0.65,4],[0.65025,3],[0.9,3],[0.90025,2],[0.99975,2],[1,3]]},7],
+          "size": [{"from":"length","map":[[0,1],[0.15,1],[0.15025,2],[0.275,2],[0.27525,1],[0.4,1],[0.40025,2],[0.65,2],[0.65025,3],[0.775,3],[0.77525,2],[0.9,2],[0.90025,3],[1,3]],"round":"px"},1],
+          "paint": "rim.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"below":0.25}],"clip":["fly"]}
+        },
+        {
+          "id": "spark3restG7",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,6],[0.275,6],[0.27525,5],[0.49975,5],[0.5,6],[0.775,6],[0.77525,5],[0.99975,5],[1,6]]},7],
+          "size": [{"from":"length","map":[[0,4],[0.275,4],[0.27525,5],[0.775,5],[0.77525,6],[1,6]],"round":"px"},1],
+          "paint": "glow.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"below":0.25}],"clip":["fly"]}
+        },
+        {
+          "id": "spark3restStar",
+          "kind": "stamp",
+          "at": [{"from":"length","map":[[0,5],[0.49975,5],[0.5,6],[0.99975,6],[1,7]]},3],
+          "rows": ["....g....","...gcg...","...gcg...",".gggcggg.","gcccccccg",".gggcggg.","...gcg...","...gcg...","....g...."],
+          "key": {"c":"core.base","g":"glow.base"},
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"below":0.25}],"clip":["fly"]}
+        },
+        {
+          "id": "spark3out1R7",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,4],[0.15,4],[0.15025,3],[0.4,3],[0.40025,2],[0.49975,2],[0.5,3],[0.65,3],[0.65025,2],[0.9,2],[0.90025,1],[0.99975,1],[1,2]]},7],
+          "size": [{"from":"length","map":[[0,2],[0.025,2],[0.02525,1],[0.15,1],[0.15025,2],[0.4,2],[0.40025,3],[0.525,3],[0.52525,2],[0.65,2],[0.65025,3],[0.9,3],[0.90025,4],[1,4]],"round":"px"},1],
+          "paint": "rim.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"below":0.25}],"flicker":[{"below":0.35715}],"clip":["fly"]}
+        },
+        {
+          "id": "spark3out1G7",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,6],[0.025,6],[0.02525,5],[0.49975,5],[0.5,6],[0.525,6],[0.52525,5],[0.99975,5],[1,6]]},7],
+          "size": [{"from":"length","map":[[0,4],[0.025,4],[0.02525,5],[0.525,5],[0.52525,6],[1,6]],"round":"px"},1],
+          "paint": "glow.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"below":0.25}],"flicker":[{"below":0.35715}],"clip":["fly"]}
+        },
+        {
+          "id": "spark3out1Star",
+          "kind": "stamp",
+          "at": [{"from":"length","map":[[0,5],[0.49975,5],[0.5,6],[0.99975,6],[1,7]]},3],
+          "rows": ["....g....","...gcg...","...gcg...",".gggcggg.","gcccccccg",".gggcggg.","...gcg...","...gcg...","....g...."],
+          "key": {"c":"core.base","g":"glow.base"},
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"below":0.25}],"flicker":[{"below":0.35715}],"clip":["fly"]}
+        },
+        {
+          "id": "spark3out2R7",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,3],[0.15,3],[0.15025,2],[0.4,2],[0.40025,1],[0.49975,1],[0.5,2],[0.65,2],[0.65025,1],[1,1]]},7],
+          "size": [{"from":"length","map":[[0,2],[0.15,2],[0.15025,3],[0.275,3],[0.27525,2],[0.4,2],[0.40025,3],[0.65,3],[0.65025,4],[1,4]],"round":"px"},1],
+          "paint": "rim.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"below":0.25}],"flicker":[{"atLeast":0.35715,"below":0.4}],"clip":["fly"]}
+        },
+        {
+          "id": "spark3out2G7",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,5],[0.275,5],[0.27525,4],[0.49975,4],[0.5,5],[1,5]]},7],
+          "size": [{"from":"length","map":[[0,5],[0.275,5],[0.27525,6],[0.99975,6],[1,7]],"round":"px"},1],
+          "paint": "glow.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"below":0.25}],"flicker":[{"atLeast":0.35715,"below":0.4}],"clip":["fly"]}
+        },
+        {
+          "id": "spark3out2Star",
+          "kind": "stamp",
+          "at": [{"from":"length","map":[[0,5],[0.49975,5],[0.5,6],[0.99975,6],[1,7]]},3],
+          "rows": ["....g....","...gcg...","...gcg...",".gggcggg.","gcccccccg",".gggcggg.","...gcg...","...gcg...","....g...."],
+          "key": {"c":"core.base","g":"glow.base"},
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"below":0.25}],"flicker":[{"atLeast":0.35715,"below":0.4}],"clip":["fly"]}
+        },
+        {
+          "id": "spark3outFR7",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,3],[0.15,3],[0.15025,2],[0.4,2],[0.40025,1],[0.49975,1],[0.5,2],[0.65,2],[0.65025,1],[1,1]]},7],
+          "size": [{"from":"length","map":[[0,2],[0.15,2],[0.15025,3],[0.275,3],[0.27525,2],[0.4,2],[0.40025,3],[0.65,3],[0.65025,4],[1,4]],"round":"px"},1],
+          "paint": "rim.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"below":0.25}],"flicker":[{"atLeast":0.4}],"clip":["fly"]}
+        },
+        {
+          "id": "spark3outFG7",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,5],[0.275,5],[0.27525,4],[0.49975,4],[0.5,5],[1,5]]},7],
+          "size": [{"from":"length","map":[[0,5],[0.275,5],[0.27525,6],[0.99975,6],[1,7]],"round":"px"},1],
+          "paint": "glow.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"below":0.25}],"flicker":[{"atLeast":0.4}],"clip":["fly"]}
+        },
+        {
+          "id": "spark3outFStar",
+          "kind": "stamp",
+          "at": [{"from":"length","map":[[0,4],[0.49975,4],[0.5,5],[0.99975,5],[1,6]]},2],
+          "rows": [".....g.....","....gcg....","....gcg....","....gcg....",".ggggcgggg.","gcccccccccg",".ggggcgggg.","....gcg....","....gcg....","....gcg....",".....g....."],
+          "key": {"c":"core.base","g":"glow.base"},
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"below":0.25}],"flicker":[{"atLeast":0.4}],"clip":["fly"]}
+        },
+        {
+          "id": "spark3in1R7",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,6],[0.025,6],[0.02525,9],[0.15,9],[0.15025,5],[0.4,5],[0.40025,4],[0.49975,4],[0.5,5],[0.65,5],[0.65025,4],[0.9,4],[0.90025,3],[0.99975,3],[1,4]]},7],
+          "size": [{"from":"length","map":[[0,1],[0.4,1],[0.40025,2],[0.525,2],[0.52525,1],[0.65,1],[0.65025,2],[0.9,2],[0.90025,3],[1,3]],"round":"px"},1],
+          "paint": "rim.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"below":0.25}],"flicker":[{"below":0.35715}],"clip":["fly"]}
+        },
+        {
+          "id": "spark3in1G7",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,7],[0.025,7],[0.02525,6],[0.49975,6],[0.5,7],[0.525,7],[0.52525,6],[0.99975,6],[1,7]]},7],
+          "size": [{"from":"length","map":[[0,3],[0.025,3],[0.02525,4],[0.525,4],[0.52525,5],[1,5]],"round":"px"},1],
+          "paint": "glow.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"below":0.25}],"flicker":[{"below":0.35715}],"clip":["fly"]}
+        },
+        {
+          "id": "spark3in1Star",
+          "kind": "stamp",
+          "at": [{"from":"length","map":[[0,5],[0.49975,5],[0.5,6],[0.99975,6],[1,7]]},3],
+          "rows": ["....g....","...gcg...","...gcg...",".gggcggg.","gcccccccg",".gggcggg.","...gcg...","...gcg...","....g...."],
+          "key": {"c":"core.base","g":"glow.base"},
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"below":0.25}],"flicker":[{"below":0.35715}],"clip":["fly"]}
+        },
+        {
+          "id": "spark3in2R7",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,9],[0.15,9],[0.15025,6],[0.275,6],[0.27525,9],[0.4,9],[0.40025,5],[0.49975,5],[0.5,6],[0.65,6],[0.65025,5],[0.9,5],[0.90025,4],[0.99975,4],[1,5]]},7],
+          "size": [{"from":"length","map":[[0,1],[0.65,1],[0.65025,2],[0.775,2],[0.77525,1],[0.9,1],[0.90025,2],[1,2]],"round":"px"},1],
+          "paint": "rim.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"below":0.25}],"flicker":[{"atLeast":0.35715,"below":0.8}],"clip":["fly"]}
+        },
+        {
+          "id": "spark3in2G7",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,7],[0.275,7],[0.27525,6],[0.49975,6],[0.5,7],[0.775,7],[0.77525,6],[0.99975,6],[1,7]]},7],
+          "size": [{"from":"length","map":[[0,3],[0.275,3],[0.27525,4],[0.775,4],[0.77525,5],[1,5]],"round":"px"},1],
+          "paint": "glow.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"below":0.25}],"flicker":[{"atLeast":0.35715,"below":0.8}],"clip":["fly"]}
+        },
+        {
+          "id": "spark3in2Star",
+          "kind": "stamp",
+          "at": [{"from":"length","map":[[0,5],[0.49975,5],[0.5,6],[0.99975,6],[1,7]]},3],
+          "rows": ["....g....","...gcg...","...gcg...",".gggcggg.","gcccccccg",".gggcggg.","...gcg...","...gcg...","....g...."],
+          "key": {"c":"core.base","g":"glow.base"},
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"below":0.25}],"flicker":[{"atLeast":0.35715,"below":0.8}],"clip":["fly"]}
+        },
+        {
+          "id": "spark3inFR7",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,9],[0.15,9],[0.15025,6],[0.275,6],[0.27525,9],[0.4,9],[0.40025,5],[0.49975,5],[0.5,6],[0.65,6],[0.65025,5],[0.9,5],[0.90025,4],[0.99975,4],[1,5]]},7],
+          "size": [{"from":"length","map":[[0,1],[0.65,1],[0.65025,2],[0.775,2],[0.77525,1],[0.9,1],[0.90025,2],[1,2]],"round":"px"},1],
+          "paint": "rim.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"below":0.25}],"flicker":[{"atLeast":0.8}],"clip":["fly"]}
+        },
+        {
+          "id": "spark3inFG7",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,7],[0.275,7],[0.27525,6],[0.49975,6],[0.5,7],[0.775,7],[0.77525,6],[0.99975,6],[1,7]]},7],
+          "size": [{"from":"length","map":[[0,3],[0.275,3],[0.27525,4],[0.775,4],[0.77525,5],[1,5]],"round":"px"},1],
+          "paint": "glow.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"below":0.25}],"flicker":[{"atLeast":0.8}],"clip":["fly"]}
+        },
+        {
+          "id": "spark3inFStar",
+          "kind": "stamp",
+          "at": [{"from":"length","map":[[0,4],[0.49975,4],[0.5,5],[0.99975,5],[1,6]]},2],
+          "rows": [".....g.....","....gcg....","....gcg....","....gcg....",".ggggcgggg.","gcccccccccg",".ggggcgggg.","....gcg....","....gcg....","....gcg....",".....g....."],
+          "key": {"c":"core.base","g":"glow.base"},
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"below":0.25}],"flicker":[{"atLeast":0.8}],"clip":["fly"]}
+        },
+        {
+          "id": "spark4restR7",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,4],[0.12475,4],[0.125,5],[0.12525,9],[0.15,9],[0.15025,4],[0.4,4],[0.40025,3],[0.62475,3],[0.625,4],[0.65,4],[0.65025,3],[0.9,3],[0.90025,2],[1,2]]},7],
+          "size": [{"from":"length","map":[[0,1],[0.4,1],[0.40025,2],[0.625,2],[0.62525,1],[0.65,1],[0.65025,2],[0.9,2],[0.90025,3],[1,3]],"round":"px"},1],
+          "paint": "rim.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.25,"below":0.75}],"clip":["fly"]}
+        },
+        {
+          "id": "spark4restG7",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,5],[0.12475,5],[0.125,6],[0.12525,5],[0.62475,5],[0.625,6],[0.62525,5],[1,5]]},7],
+          "size": [{"from":"length","map":[[0,4],[0.125,4],[0.12525,5],[0.625,5],[0.62525,6],[1,6]],"round":"px"},1],
+          "paint": "glow.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.25,"below":0.75}],"clip":["fly"]}
+        },
+        {
+          "id": "spark4restStar",
+          "kind": "stamp",
+          "at": [{"from":"length","map":[[0,4],[0.12475,4],[0.125,5],[0.62475,5],[0.625,6],[1,6]]},3],
+          "rows": ["....g....","...gcg...","...gcg...",".ggcccgg.","gcccccccg",".ggcccgg.","...gcg...","...gcg...","....g...."],
+          "key": {"c":"core.base","g":"glow.base"},
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.25,"below":0.75}],"clip":["fly"]}
+        },
+        {
+          "id": "spark4out1R7",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,3],[0.12475,3],[0.125,4],[0.15,4],[0.15025,3],[0.4,3],[0.40025,2],[0.62475,2],[0.625,3],[0.65,3],[0.65025,2],[0.9,2],[0.90025,1],[1,1]]},7],
+          "size": [{"from":"length","map":[[0,1],[0.15,1],[0.15025,2],[0.375,2],[0.37525,1],[0.4,1],[0.40025,2],[0.65,2],[0.65025,3],[0.875,3],[0.87525,2],[0.9,2],[0.90025,3],[1,3]],"round":"px"},1],
+          "paint": "rim.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.25,"below":0.75}],"flicker":[{"below":0.35715}],"clip":["fly"]}
+        },
+        {
+          "id": "spark4out1G7",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,4],[0.12475,4],[0.125,5],[0.375,5],[0.37525,4],[0.62475,4],[0.625,5],[0.875,5],[0.87525,4],[1,4]]},7],
+          "size": [{"from":"length","map":[[0,5],[0.375,5],[0.37525,6],[0.875,6],[0.87525,7],[1,7]],"round":"px"},1],
+          "paint": "glow.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.25,"below":0.75}],"flicker":[{"below":0.35715}],"clip":["fly"]}
+        },
+        {
+          "id": "spark4out1Star",
+          "kind": "stamp",
+          "at": [{"from":"length","map":[[0,4],[0.12475,4],[0.125,5],[0.62475,5],[0.625,6],[1,6]]},3],
+          "rows": ["....g....","...gcg...","...gcg...",".ggcccgg.","gcccccccg",".ggcccgg.","...gcg...","...gcg...","....g...."],
+          "key": {"c":"core.base","g":"glow.base"},
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.25,"below":0.75}],"flicker":[{"below":0.35715}],"clip":["fly"]}
+        },
+        {
+          "id": "spark4out2R7",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,2],[0.12475,2],[0.125,3],[0.15,3],[0.15025,2],[0.4,2],[0.40025,1],[0.62475,1],[0.625,2],[0.65,2],[0.65025,1],[1,1]]},7],
+          "size": [{"from":"length","map":[[0,2],[0.125,2],[0.12525,1],[0.15,1],[0.15025,2],[0.4,2],[0.40025,3],[0.625,3],[0.62525,2],[0.65,2],[0.65025,3],[1,3]],"round":"px"},1],
+          "paint": "rim.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.25,"below":0.75}],"flicker":[{"atLeast":0.35715,"below":0.4}],"clip":["fly"]}
+        },
+        {
+          "id": "spark4out2G7",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,4],[0.12475,4],[0.125,5],[0.12525,4],[0.62475,4],[0.625,5],[0.62525,4],[1,4]]},7],
+          "size": [{"from":"length","map":[[0,5],[0.125,5],[0.12525,6],[0.625,6],[0.62525,7],[1,7]],"round":"px"},1],
+          "paint": "glow.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.25,"below":0.75}],"flicker":[{"atLeast":0.35715,"below":0.4}],"clip":["fly"]}
+        },
+        {
+          "id": "spark4out2Star",
+          "kind": "stamp",
+          "at": [{"from":"length","map":[[0,4],[0.12475,4],[0.125,5],[0.62475,5],[0.625,6],[1,6]]},3],
+          "rows": ["....g....","...gcg...","...gcg...",".ggcccgg.","gcccccccg",".ggcccgg.","...gcg...","...gcg...","....g...."],
+          "key": {"c":"core.base","g":"glow.base"},
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.25,"below":0.75}],"flicker":[{"atLeast":0.35715,"below":0.4}],"clip":["fly"]}
+        },
+        {
+          "id": "spark4outFR7",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,2],[0.12475,2],[0.125,3],[0.15,3],[0.15025,2],[0.4,2],[0.40025,1],[0.62475,1],[0.625,2],[0.65,2],[0.65025,1],[1,1]]},7],
+          "size": [{"from":"length","map":[[0,2],[0.125,2],[0.12525,1],[0.15,1],[0.15025,2],[0.4,2],[0.40025,3],[0.625,3],[0.62525,2],[0.65,2],[0.65025,3],[1,3]],"round":"px"},1],
+          "paint": "rim.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.25,"below":0.75}],"flicker":[{"atLeast":0.4}],"clip":["fly"]}
+        },
+        {
+          "id": "spark4outFG7",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,4],[0.12475,4],[0.125,5],[0.12525,4],[0.62475,4],[0.625,5],[0.62525,4],[1,4]]},7],
+          "size": [{"from":"length","map":[[0,5],[0.125,5],[0.12525,6],[0.625,6],[0.62525,7],[1,7]],"round":"px"},1],
+          "paint": "glow.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.25,"below":0.75}],"flicker":[{"atLeast":0.4}],"clip":["fly"]}
+        },
+        {
+          "id": "spark4outFStar",
+          "kind": "stamp",
+          "at": [{"from":"length","map":[[0,3],[0.12475,3],[0.125,4],[0.62475,4],[0.625,5],[1,5]]},2],
+          "rows": [".....g.....","....gcg....","....gcg....","....gcg....",".gggcccggg.","gcccccccccg",".gggcccggg.","....gcg....","....gcg....","....gcg....",".....g....."],
+          "key": {"c":"core.base","g":"glow.base"},
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.25,"below":0.75}],"flicker":[{"atLeast":0.4}],"clip":["fly"]}
+        },
+        {
+          "id": "spark4in1R7",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,8],[0.12475,8],[0.125,9],[0.15,9],[0.15025,5],[0.375,5],[0.37525,9],[0.4,9],[0.40025,4],[0.62475,4],[0.625,5],[0.65,5],[0.65025,4],[0.9,4],[0.90025,3],[1,3]]},7],
+          "size": [{"from":"length","map":[[0,1],[0.65,1],[0.65025,2],[0.875,2],[0.87525,1],[0.9,1],[0.90025,2],[1,2]],"round":"px"},1],
+          "paint": "rim.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.25,"below":0.75}],"flicker":[{"below":0.35715}],"clip":["fly"]}
+        },
+        {
+          "id": "spark4in1G7",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,5],[0.12475,5],[0.125,6],[0.375,6],[0.37525,5],[0.62475,5],[0.625,6],[0.875,6],[0.87525,5],[1,5]]},7],
+          "size": [{"from":"length","map":[[0,4],[0.375,4],[0.37525,5],[0.875,5],[0.87525,6],[1,6]],"round":"px"},1],
+          "paint": "glow.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.25,"below":0.75}],"flicker":[{"below":0.35715}],"clip":["fly"]}
+        },
+        {
+          "id": "spark4in1Star",
+          "kind": "stamp",
+          "at": [{"from":"length","map":[[0,4],[0.12475,4],[0.125,5],[0.62475,5],[0.625,6],[1,6]]},3],
+          "rows": ["....g....","...gcg...","...gcg...",".ggcccgg.","gcccccccg",".ggcccgg.","...gcg...","...gcg...","....g...."],
+          "key": {"c":"core.base","g":"glow.base"},
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.25,"below":0.75}],"flicker":[{"below":0.35715}],"clip":["fly"]}
+        },
+        {
+          "id": "spark4in2R7",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,8],[0.12475,8],[0.125,9],[0.4,9],[0.40025,5],[0.62475,5],[0.625,6],[0.62525,10],[0.65,10],[0.65025,5],[0.9,5],[0.90025,4],[1,4]]},7],
+          "size": [{"from":"length","map":[[0,1],[0.9,1],[0.90025,2],[1,2]],"round":"px"},1],
+          "paint": "rim.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.25,"below":0.75}],"flicker":[{"atLeast":0.35715,"below":0.8}],"clip":["fly"]}
+        },
+        {
+          "id": "spark4in2G7",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,6],[0.12475,6],[0.125,7],[0.15,7],[0.15025,6],[0.62475,6],[0.625,7],[0.62525,6],[1,6]]},7],
+          "size": [{"from":"length","map":[[0,3],[0.15,3],[0.15025,4],[0.625,4],[0.62525,5],[1,5]],"round":"px"},1],
+          "paint": "glow.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.25,"below":0.75}],"flicker":[{"atLeast":0.35715,"below":0.8}],"clip":["fly"]}
+        },
+        {
+          "id": "spark4in2Star",
+          "kind": "stamp",
+          "at": [{"from":"length","map":[[0,4],[0.12475,4],[0.125,5],[0.62475,5],[0.625,6],[1,6]]},3],
+          "rows": ["....g....","...gcg...","...gcg...",".ggcccgg.","gcccccccg",".ggcccgg.","...gcg...","...gcg...","....g...."],
+          "key": {"c":"core.base","g":"glow.base"},
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.25,"below":0.75}],"flicker":[{"atLeast":0.35715,"below":0.8}],"clip":["fly"]}
+        },
+        {
+          "id": "spark4inFR7",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,8],[0.12475,8],[0.125,9],[0.4,9],[0.40025,5],[0.62475,5],[0.625,6],[0.62525,10],[0.65,10],[0.65025,5],[0.9,5],[0.90025,4],[1,4]]},7],
+          "size": [{"from":"length","map":[[0,1],[0.9,1],[0.90025,2],[1,2]],"round":"px"},1],
+          "paint": "rim.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.25,"below":0.75}],"flicker":[{"atLeast":0.8}],"clip":["fly"]}
+        },
+        {
+          "id": "spark4inFG7",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,6],[0.12475,6],[0.125,7],[0.15,7],[0.15025,6],[0.62475,6],[0.625,7],[0.62525,6],[1,6]]},7],
+          "size": [{"from":"length","map":[[0,3],[0.15,3],[0.15025,4],[0.625,4],[0.62525,5],[1,5]],"round":"px"},1],
+          "paint": "glow.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.25,"below":0.75}],"flicker":[{"atLeast":0.8}],"clip":["fly"]}
+        },
+        {
+          "id": "spark4inFStar",
+          "kind": "stamp",
+          "at": [{"from":"length","map":[[0,3],[0.12475,3],[0.125,4],[0.62475,4],[0.625,5],[1,5]]},2],
+          "rows": [".....g.....","....gcg....","....gcg....","....gcg....",".gggcccggg.","gcccccccccg",".gggcccggg.","....gcg....","....gcg....","....gcg....",".....g....."],
+          "key": {"c":"core.base","g":"glow.base"},
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.25,"below":0.75}],"flicker":[{"atLeast":0.8}],"clip":["fly"]}
+        },
+        {
+          "id": "spark5restG6",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,7],[0.24975,7],[0.25,8],[0.25025,7],[0.74975,7],[0.75,8],[0.875,8],[0.87525,7],[1,7]]},6],
+          "size": [{"from":"length","map":[[0,2],[0.25,2],[0.25025,3],[0.875,3],[0.87525,4],[1,4]],"round":"px"},1],
+          "paint": "glow.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.75}],"clip":["fly"]}
+        },
+        {
+          "id": "spark5restR7",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,4],[0.025,4],[0.02525,8],[0.15,8],[0.15025,3],[0.24975,3],[0.25,4],[0.4,4],[0.40025,3],[0.65,3],[0.65025,2],[0.74975,2],[0.75,3],[0.9,3],[0.90025,2],[1,2]]},7],
+          "size": [{"from":"length","map":[[0,1],[0.4,1],[0.40025,2],[0.525,2],[0.52525,1],[0.65,1],[0.65025,2],[0.9,2],[0.90025,3],[1,3]],"round":"px"},1],
+          "paint": "rim.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.75}],"clip":["fly"]}
+        },
+        {
+          "id": "spark5restG7",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,5],[0.025,5],[0.02525,4],[0.24975,4],[0.25,5],[0.525,5],[0.52525,4],[0.74975,4],[0.75,5],[1,5]]},7],
+          "size": [{"from":"length","map":[[0,5],[0.025,5],[0.02525,6],[0.525,6],[0.52525,7],[1,7]],"round":"px"},1],
+          "paint": "glow.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.75}],"clip":["fly"]}
+        },
+        {
+          "id": "spark5restG8",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,7],[0.24975,7],[0.25,8],[0.25025,7],[0.74975,7],[0.75,8],[0.875,8],[0.87525,7],[1,7]]},8],
+          "size": [{"from":"length","map":[[0,2],[0.25,2],[0.25025,3],[0.875,3],[0.87525,4],[1,4]],"round":"px"},1],
+          "paint": "glow.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.75}],"clip":["fly"]}
+        },
+        {
+          "id": "spark5restStar",
+          "kind": "stamp",
+          "at": [{"from":"length","map":[[0,3],[0.24975,3],[0.25,4],[0.74975,4],[0.75,5],[1,5]]},2],
+          "rows": [".....g.....","....gcg....","....gcg....","....gcg....",".gggcccggg.","gcccccccccg",".gggcccggg.","....gcg....","....gcg....","....gcg....",".....g....."],
+          "key": {"c":"core.base","g":"glow.base"},
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.75}],"clip":["fly"]}
+        },
+        {
+          "id": "spark5out1G6",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,7],[0.00025,6],[0.24975,6],[0.25,7],[0.625,7],[0.62525,6],[0.74975,6],[0.75,7],[1,7]]},6],
+          "size": [{"from":"length","map":[[0,2],[0.00025,3],[0.625,3],[0.62525,4],[1,4]],"round":"px"},1],
+          "paint": "glow.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.75}],"flicker":[{"below":0.35715}],"clip":["fly"]}
+        },
+        {
+          "id": "spark5out1R7",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,3],[0.15,3],[0.15025,2],[0.24975,2],[0.25,3],[0.4,3],[0.40025,2],[0.65,2],[0.65025,1],[0.74975,1],[0.75,2],[0.9,2],[0.90025,1],[1,1]]},7],
+          "size": [{"from":"length","map":[[0,1],[0.15,1],[0.15025,2],[0.275,2],[0.27525,1],[0.4,1],[0.40025,2],[0.65,2],[0.65025,3],[0.775,3],[0.77525,2],[0.9,2],[0.90025,3],[1,3]],"round":"px"},1],
+          "paint": "rim.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.75}],"flicker":[{"below":0.35715}],"clip":["fly"]}
+        },
+        {
+          "id": "spark5out1G7",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,4],[0.24975,4],[0.25,5],[0.275,5],[0.27525,4],[0.74975,4],[0.75,5],[0.775,5],[0.77525,4],[1,4]]},7],
+          "size": [{"from":"length","map":[[0,6],[0.275,6],[0.27525,7],[0.775,7],[0.77525,8],[1,8]],"round":"px"},1],
+          "paint": "glow.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.75}],"flicker":[{"below":0.35715}],"clip":["fly"]}
+        },
+        {
+          "id": "spark5out1G8",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,7],[0.00025,6],[0.24975,6],[0.25,7],[0.625,7],[0.62525,6],[0.74975,6],[0.75,7],[1,7]]},8],
+          "size": [{"from":"length","map":[[0,2],[0.00025,3],[0.625,3],[0.62525,4],[1,4]],"round":"px"},1],
+          "paint": "glow.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.75}],"flicker":[{"below":0.35715}],"clip":["fly"]}
+        },
+        {
+          "id": "spark5out1Star",
+          "kind": "stamp",
+          "at": [{"from":"length","map":[[0,3],[0.24975,3],[0.25,4],[0.74975,4],[0.75,5],[1,5]]},2],
+          "rows": [".....g.....","....gcg....","....gcg....","....gcg....",".gggcccggg.","gcccccccccg",".gggcccggg.","....gcg....","....gcg....","....gcg....",".....g....."],
+          "key": {"c":"core.base","g":"glow.base"},
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.75}],"flicker":[{"below":0.35715}],"clip":["fly"]}
+        },
+        {
+          "id": "spark5out2G6",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,6],[0.24975,6],[0.25,7],[0.375,7],[0.37525,6],[0.74975,6],[0.75,7],[1,7]]},6],
+          "size": [{"from":"length","map":[[0,3],[0.375,3],[0.37525,4],[1,4]],"round":"px"},1],
+          "paint": "glow.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.75}],"flicker":[{"atLeast":0.35715,"below":0.4}],"clip":["fly"]}
+        },
+        {
+          "id": "spark5out2R7",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,2],[0.15,2],[0.15025,1],[0.24975,1],[0.25,2],[0.4,2],[0.40025,1],[1,1]]},7],
+          "size": [{"from":"length","map":[[0,2],[0.025,2],[0.02525,1],[0.15,1],[0.15025,2],[0.4,2],[0.40025,3],[1,3]],"round":"px"},1],
+          "paint": "rim.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.75}],"flicker":[{"atLeast":0.35715,"below":0.4}],"clip":["fly"]}
+        },
+        {
+          "id": "spark5out2G7",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,4],[0.025,4],[0.02525,3],[0.24975,3],[0.25,4],[1,4]]},7],
+          "size": [{"from":"length","map":[[0,6],[0.025,6],[0.02525,7],[0.74975,7],[0.75,8],[1,8]],"round":"px"},1],
+          "paint": "glow.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.75}],"flicker":[{"atLeast":0.35715,"below":0.4}],"clip":["fly"]}
+        },
+        {
+          "id": "spark5out2G8",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,6],[0.24975,6],[0.25,7],[0.375,7],[0.37525,6],[0.74975,6],[0.75,7],[1,7]]},8],
+          "size": [{"from":"length","map":[[0,3],[0.375,3],[0.37525,4],[1,4]],"round":"px"},1],
+          "paint": "glow.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.75}],"flicker":[{"atLeast":0.35715,"below":0.4}],"clip":["fly"]}
+        },
+        {
+          "id": "spark5out2Star",
+          "kind": "stamp",
+          "at": [{"from":"length","map":[[0,3],[0.24975,3],[0.25,4],[0.74975,4],[0.75,5],[1,5]]},2],
+          "rows": [".....g.....","....gcg....","....gcg....","....gcg....",".gggcccggg.","gcccccccccg",".gggcccggg.","....gcg....","....gcg....","....gcg....",".....g....."],
+          "key": {"c":"core.base","g":"glow.base"},
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.75}],"flicker":[{"atLeast":0.35715,"below":0.4}],"clip":["fly"]}
+        },
+        {
+          "id": "spark5outFG6",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,6],[0.24975,6],[0.25,7],[0.375,7],[0.37525,6],[0.74975,6],[0.75,7],[1,7]]},6],
+          "size": [{"from":"length","map":[[0,3],[0.375,3],[0.37525,4],[1,4]],"round":"px"},1],
+          "paint": "glow.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.75}],"flicker":[{"atLeast":0.4}],"clip":["fly"]}
+        },
+        {
+          "id": "spark5outFR7",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,2],[0.15,2],[0.15025,1],[0.24975,1],[0.25,2],[0.4,2],[0.40025,1],[1,1]]},7],
+          "size": [{"from":"length","map":[[0,2],[0.025,2],[0.02525,1],[0.15,1],[0.15025,2],[0.4,2],[0.40025,3],[1,3]],"round":"px"},1],
+          "paint": "rim.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.75}],"flicker":[{"atLeast":0.4}],"clip":["fly"]}
+        },
+        {
+          "id": "spark5outFG7",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,4],[0.025,4],[0.02525,3],[0.24975,3],[0.25,4],[1,4]]},7],
+          "size": [{"from":"length","map":[[0,6],[0.025,6],[0.02525,7],[0.74975,7],[0.75,8],[1,8]],"round":"px"},1],
+          "paint": "glow.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.75}],"flicker":[{"atLeast":0.4}],"clip":["fly"]}
+        },
+        {
+          "id": "spark5outFG8",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,6],[0.24975,6],[0.25,7],[0.375,7],[0.37525,6],[0.74975,6],[0.75,7],[1,7]]},8],
+          "size": [{"from":"length","map":[[0,3],[0.375,3],[0.37525,4],[1,4]],"round":"px"},1],
+          "paint": "glow.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.75}],"flicker":[{"atLeast":0.4}],"clip":["fly"]}
+        },
+        {
+          "id": "spark5outFStar",
+          "kind": "stamp",
+          "at": [{"from":"length","map":[[0,2],[0.24975,2],[0.25,3],[0.74975,3],[0.75,4],[1,4]]},1],
+          "rows": ["......g......",".....gcg.....",".....gcg.....",".....gcg.....",".....gcg.....",".ggggcccgggg.","gcccccccccccg",".ggggcccgggg.",".....gcg.....",".....gcg.....",".....gcg.....",".....gcg.....","......g......"],
+          "key": {"c":"core.base","g":"glow.base"},
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.75}],"flicker":[{"atLeast":0.4}],"clip":["fly"]}
+        },
+        {
+          "id": "spark5in1G6",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,7],[0.24975,7],[0.25,8],[0.5,8],[0.50025,7],[0.74975,7],[0.75,8],[1,8]]},6],
+          "size": [{"from":"length","map":[[0,2],[0.5,2],[0.50025,3],[1,3]],"round":"px"},1],
+          "paint": "glow.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.75}],"flicker":[{"below":0.35715}],"clip":["fly"]}
+        },
+        {
+          "id": "spark5in1R7",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,8],[0.15,8],[0.15025,4],[0.24975,4],[0.25,5],[0.275,5],[0.27525,9],[0.4,9],[0.40025,4],[0.65,4],[0.65025,3],[0.74975,3],[0.75,4],[0.9,4],[0.90025,3],[1,3]]},7],
+          "size": [{"from":"length","map":[[0,1],[0.65,1],[0.65025,2],[0.775,2],[0.77525,1],[0.9,1],[0.90025,2],[1,2]],"round":"px"},1],
+          "paint": "rim.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.75}],"flicker":[{"below":0.35715}],"clip":["fly"]}
+        },
+        {
+          "id": "spark5in1G7",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,5],[0.24975,5],[0.25,6],[0.275,6],[0.27525,5],[0.74975,5],[0.75,6],[0.775,6],[0.77525,5],[1,5]]},7],
+          "size": [{"from":"length","map":[[0,5],[0.275,5],[0.27525,6],[0.775,6],[0.77525,7],[1,7]],"round":"px"},1],
+          "paint": "glow.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.75}],"flicker":[{"below":0.35715}],"clip":["fly"]}
+        },
+        {
+          "id": "spark5in1G8",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,7],[0.24975,7],[0.25,8],[0.5,8],[0.50025,7],[0.74975,7],[0.75,8],[1,8]]},8],
+          "size": [{"from":"length","map":[[0,2],[0.5,2],[0.50025,3],[1,3]],"round":"px"},1],
+          "paint": "glow.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.75}],"flicker":[{"below":0.35715}],"clip":["fly"]}
+        },
+        {
+          "id": "spark5in1Star",
+          "kind": "stamp",
+          "at": [{"from":"length","map":[[0,3],[0.24975,3],[0.25,4],[0.74975,4],[0.75,5],[1,5]]},2],
+          "rows": [".....g.....","....gcg....","....gcg....","....gcg....",".gggcccggg.","gcccccccccg",".gggcccggg.","....gcg....","....gcg....","....gcg....",".....g....."],
+          "key": {"c":"core.base","g":"glow.base"},
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.75}],"flicker":[{"below":0.35715}],"clip":["fly"]}
+        },
+        {
+          "id": "spark5in2G6",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,8],[0.125,8],[0.12525,7],[0.24975,7],[0.25,8],[0.74975,8],[0.75,9],[0.75025,8],[1,8]]},6],
+          "size": [{"from":"length","map":[[0,1],[0.125,1],[0.12525,2],[0.75,2],[0.75025,3],[1,3]],"round":"px"},1],
+          "paint": "glow.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.75}],"flicker":[{"atLeast":0.35715,"below":0.8}],"clip":["fly"]}
+        },
+        {
+          "id": "spark5in2R7",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,8],[0.24975,8],[0.25,9],[0.4,9],[0.40025,5],[0.525,5],[0.52525,9],[0.65,9],[0.65025,4],[0.74975,4],[0.75,5],[0.9,5],[0.90025,4],[1,4]]},7],
+          "size": [{"from":"length","map":[[0,1],[0.9,1],[0.90025,2],[1,2]],"round":"px"},1],
+          "paint": "rim.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.75}],"flicker":[{"atLeast":0.35715,"below":0.8}],"clip":["fly"]}
+        },
+        {
+          "id": "spark5in2G7",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,6],[0.15,6],[0.15025,5],[0.24975,5],[0.25,6],[0.525,6],[0.52525,5],[0.74975,5],[0.75,6],[1,6]]},7],
+          "size": [{"from":"length","map":[[0,4],[0.15,4],[0.15025,5],[0.525,5],[0.52525,6],[1,6]],"round":"px"},1],
+          "paint": "glow.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.75}],"flicker":[{"atLeast":0.35715,"below":0.8}],"clip":["fly"]}
+        },
+        {
+          "id": "spark5in2G8",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,8],[0.125,8],[0.12525,7],[0.24975,7],[0.25,8],[0.74975,8],[0.75,9],[0.75025,8],[1,8]]},8],
+          "size": [{"from":"length","map":[[0,1],[0.125,1],[0.12525,2],[0.75,2],[0.75025,3],[1,3]],"round":"px"},1],
+          "paint": "glow.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.75}],"flicker":[{"atLeast":0.35715,"below":0.8}],"clip":["fly"]}
+        },
+        {
+          "id": "spark5in2Star",
+          "kind": "stamp",
+          "at": [{"from":"length","map":[[0,3],[0.24975,3],[0.25,4],[0.74975,4],[0.75,5],[1,5]]},2],
+          "rows": [".....g.....","....gcg....","....gcg....","....gcg....",".gggcccggg.","gcccccccccg",".gggcccggg.","....gcg....","....gcg....","....gcg....",".....g....."],
+          "key": {"c":"core.base","g":"glow.base"},
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.75}],"flicker":[{"atLeast":0.35715,"below":0.8}],"clip":["fly"]}
+        },
+        {
+          "id": "spark5inFG6",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,8],[0.125,8],[0.12525,7],[0.24975,7],[0.25,8],[0.74975,8],[0.75,9],[0.75025,8],[1,8]]},6],
+          "size": [{"from":"length","map":[[0,1],[0.125,1],[0.12525,2],[0.75,2],[0.75025,3],[1,3]],"round":"px"},1],
+          "paint": "glow.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.75}],"flicker":[{"atLeast":0.8}],"clip":["fly"]}
+        },
+        {
+          "id": "spark5inFR7",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,8],[0.24975,8],[0.25,9],[0.4,9],[0.40025,5],[0.525,5],[0.52525,9],[0.65,9],[0.65025,4],[0.74975,4],[0.75,5],[0.9,5],[0.90025,4],[1,4]]},7],
+          "size": [{"from":"length","map":[[0,1],[0.9,1],[0.90025,2],[1,2]],"round":"px"},1],
+          "paint": "rim.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.75}],"flicker":[{"atLeast":0.8}],"clip":["fly"]}
+        },
+        {
+          "id": "spark5inFG7",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,6],[0.15,6],[0.15025,5],[0.24975,5],[0.25,6],[0.525,6],[0.52525,5],[0.74975,5],[0.75,6],[1,6]]},7],
+          "size": [{"from":"length","map":[[0,4],[0.15,4],[0.15025,5],[0.525,5],[0.52525,6],[1,6]],"round":"px"},1],
+          "paint": "glow.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.75}],"flicker":[{"atLeast":0.8}],"clip":["fly"]}
+        },
+        {
+          "id": "spark5inFG8",
+          "kind": "rect",
+          "at": [{"from":"length","map":[[0,8],[0.125,8],[0.12525,7],[0.24975,7],[0.25,8],[0.74975,8],[0.75,9],[0.75025,8],[1,8]]},8],
+          "size": [{"from":"length","map":[[0,1],[0.125,1],[0.12525,2],[0.75,2],[0.75025,3],[1,3]],"round":"px"},1],
+          "paint": "glow.base",
+          "shade": 0,
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.75}],"flicker":[{"atLeast":0.8}],"clip":["fly"]}
+        },
+        {
+          "id": "spark5inFStar",
+          "kind": "stamp",
+          "at": [{"from":"length","map":[[0,2],[0.24975,2],[0.25,3],[0.74975,3],[0.75,4],[1,4]]},1],
+          "rows": ["......g......",".....gcg.....",".....gcg.....",".....gcg.....",".....gcg.....",".ggggcccgggg.","gcccccccccccg",".ggggcccgggg.",".....gcg.....",".....gcg.....",".....gcg.....",".....gcg.....","......g......"],
+          "key": {"c":"core.base","g":"glow.base"},
+          "hidden": true,
+          "when": {"shape":["spark"],"size":[{"atLeast":0.75}],"flicker":[{"atLeast":0.8}],"clip":["fly"]}
+        },
         {"kind":"cut","shape":{"kind":"rect","at":[0,0],"size":[1,16]}},
         {"kind":"cut","shape":{"kind":"rect","at":[15,0],"size":[1,16]}}
       ],
       "emitters": [
-        {"id":"tail","gen":"shot.bar","v":1,"clip":["fly"],"when":{"shape":["round","spark"]},"at":[6,8],"length":{"from":"length","map":[[0,4.5],[1,8.5]]},"thick":1,"style":"bolt","lead":0,"flicker":{"from":"flicker","map":[[0,0],[1,3]],"round":"px"},"paints":["rim"]},
-        {"id":"warm","gen":"shot.bar","v":1,"clip":["fly"],"when":{"shape":["round","spark"]},"at":[6,8],"length":{"from":"length","map":[[0,2.5],[1,4.5]]},"thick":1,"style":"bolt","lead":{"from":"length","map":[[0,1],[1,2]],"round":"px"},"paints":["glow"]},
+        {"id":"tail","gen":"shot.bar","v":1,"clip":["fly"],"when":{"shape":["round"]},"at":[6,8],"length":{"from":"length","map":[[0,4.5],[1,8.5]]},"thick":1,"style":"bolt","lead":0,"flicker":{"from":"flicker","map":[[0,0],[1,3]],"round":"px"},"paints":["rim"]},
+        {"id":"warm","gen":"shot.bar","v":1,"clip":["fly"],"when":{"shape":["round"]},"at":[6,8],"length":{"from":"length","map":[[0,2.5],[1,4.5]]},"thick":1,"style":"bolt","lead":{"from":"length","map":[[0,1],[1,2]],"round":"px"},"paints":["glow"]},
         {"id":"ball","gen":"glow","v":1,"clip":["fly"],"when":{"shape":["round"]},"at":[{"from":"length","map":[[0,9.5],[0.249,9.5],[0.25,10.5],[0.749,10.5],[0.75,11.5],[1,11.5]]},7.5],"r":{"from":"size","map":[[0,2.3],[0.5,3.2],[1,3.4]]},"paints":["core","glow","rim"]},
         {"id":"hot","gen":"glow","v":1,"clip":["fly"],"when":{"shape":["round"]},"at":[{"from":"length","map":[[0,9.5],[0.249,9.5],[0.25,10.5],[0.749,10.5],[0.75,11.5],[1,11.5]]},7.5],"r":{"from":"size","map":[[0,1.1],[0.5,1.5],[1,1.6]]},"paints":["core"]},
-        {
-          "id": "star",
-          "gen": "starburst",
-          "v": 1,
-          "clip": ["fly"],
-          "when": {"shape":["spark"]},
-          "at": [{"from":"length","map":[[0,9.5],[0.249,9.5],[0.25,10.5],[0.749,10.5],[0.75,11.5],[1,11.5]]},7.5],
-          "points": 4,
-          "r": [0,{"from":"size","map":[[0,3.5],[1,4.5]]}],
-          "width": {"from":"size","map":[[0,1.4],[1,2]]},
-          "turn": 0,
-          "paints": ["core","glow"]
-        },
         {"id":"pop","gen":"glow","v":1,"clip":["hit"],"at":[7.5,7.5],"r":{"from":"size","map":[[0,3.1],[1,4.1]]},"paints":["shine","shine","core","glow"]},
         {"id":"spark1","gen":"starburst","v":1,"clip":["hit"],"at":[7.5,7.5],"points":4,"turn":45,"r":[0,{"from":"size","map":[[0,3.6],[1,5.12]]}],"width":0.9,"paints":["core","glow"]},
         {"id":"spark2","gen":"starburst","v":1,"clip":["hit"],"at":[7.5,7.5],"points":4,"turn":45,"r":[{"from":"size","map":[[0,2.025],[1,2.88]]},{"from":"size","map":[[0,4.5],[1,6.4]]}],"width":0.4,"paints":["mid"]},
@@ -791,37 +1527,57 @@
         {
           "t": 0,
           "emit": {"tail":{"beat":0}},
-          "show": ["dart3rest","dart3restCore","dart4rest","dart4restCore","dart5rest","dart5restCore"],
+          "show": ["dart3rest","dart3restCore","dart4rest","dart4restCore","dart5rest","dart5restCore","spark3restR7","spark3restG7","spark3restStar","spark4restR7","spark4restG7","spark4restStar","spark5restG6","spark5restR7","spark5restG7","spark5restG8","spark5restStar"],
           "hide": [
             "dart3out1", "dart3out1Core", "dart3out2", "dart3out2Core", "dart3outF", "dart3outFCore", "dart3in1", "dart3in1Core", "dart3in2", "dart3in2Core", "dart3inF", "dart3inFCore", "dart4out1", "dart4out1Core", "dart4out2", "dart4out2Core", "dart4outF", "dart4outFCore", "dart4in1", "dart4in1Core", "dart4in2",
-            "dart4in2Core", "dart4inF", "dart4inFCore", "dart5out1", "dart5out1Core", "dart5out2", "dart5out2Core", "dart5outF", "dart5outFCore", "dart5in1", "dart5in1Core", "dart5in2", "dart5in2Core", "dart5inF", "dart5inFCore"
+            "dart4in2Core", "dart4inF", "dart4inFCore", "dart5out1", "dart5out1Core", "dart5out2", "dart5out2Core", "dart5outF", "dart5outFCore", "dart5in1", "dart5in1Core", "dart5in2", "dart5in2Core", "dart5inF", "dart5inFCore", "spark3out1R7", "spark3out1G7", "spark3out1Star", "spark3out2R7", "spark3out2G7",
+            "spark3out2Star", "spark3outFR7", "spark3outFG7", "spark3outFStar", "spark3in1R7", "spark3in1G7", "spark3in1Star", "spark3in2R7", "spark3in2G7", "spark3in2Star", "spark3inFR7", "spark3inFG7", "spark3inFStar", "spark4out1R7", "spark4out1G7", "spark4out1Star", "spark4out2R7", "spark4out2G7", "spark4out2Star",
+            "spark4outFR7", "spark4outFG7", "spark4outFStar", "spark4in1R7", "spark4in1G7", "spark4in1Star", "spark4in2R7", "spark4in2G7", "spark4in2Star", "spark4inFR7", "spark4inFG7", "spark4inFStar", "spark5out1G6", "spark5out1R7", "spark5out1G7", "spark5out1G8", "spark5out1Star", "spark5out2G6", "spark5out2R7",
+            "spark5out2G7", "spark5out2G8", "spark5out2Star", "spark5outFG6", "spark5outFR7", "spark5outFG7", "spark5outFG8", "spark5outFStar", "spark5in1G6", "spark5in1R7", "spark5in1G7", "spark5in1G8", "spark5in1Star", "spark5in2G6", "spark5in2R7", "spark5in2G7", "spark5in2G8", "spark5in2Star", "spark5inFG6",
+            "spark5inFR7", "spark5inFG7", "spark5inFG8", "spark5inFStar"
           ]
         },
         {
           "t": 0.25,
           "emit": {"tail":{"beat":1}},
-          "show": ["dart3out1","dart3out1Core","dart3out2","dart3out2Core","dart3outF","dart3outFCore","dart4out1","dart4out1Core","dart4out2","dart4out2Core","dart4outF","dart4outFCore","dart5out1","dart5out1Core","dart5out2","dart5out2Core","dart5outF","dart5outFCore"],
+          "show": [
+            "dart3out1", "dart3out1Core", "dart3out2", "dart3out2Core", "dart3outF", "dart3outFCore", "dart4out1", "dart4out1Core", "dart4out2", "dart4out2Core", "dart4outF", "dart4outFCore", "dart5out1", "dart5out1Core", "dart5out2", "dart5out2Core", "dart5outF", "dart5outFCore", "spark3out1R7", "spark3out1G7",
+            "spark3out1Star", "spark3out2R7", "spark3out2G7", "spark3out2Star", "spark3outFR7", "spark3outFG7", "spark3outFStar", "spark4out1R7", "spark4out1G7", "spark4out1Star", "spark4out2R7", "spark4out2G7", "spark4out2Star", "spark4outFR7", "spark4outFG7", "spark4outFStar", "spark5out1G6", "spark5out1R7",
+            "spark5out1G7", "spark5out1G8", "spark5out1Star", "spark5out2G6", "spark5out2R7", "spark5out2G7", "spark5out2G8", "spark5out2Star", "spark5outFG6", "spark5outFR7", "spark5outFG7", "spark5outFG8", "spark5outFStar"
+          ],
           "hide": [
             "dart3rest", "dart3restCore", "dart3in1", "dart3in1Core", "dart3in2", "dart3in2Core", "dart3inF", "dart3inFCore", "dart4rest", "dart4restCore", "dart4in1", "dart4in1Core", "dart4in2", "dart4in2Core", "dart4inF", "dart4inFCore", "dart5rest", "dart5restCore", "dart5in1", "dart5in1Core", "dart5in2",
-            "dart5in2Core", "dart5inF", "dart5inFCore"
+            "dart5in2Core", "dart5inF", "dart5inFCore", "spark3restR7", "spark3restG7", "spark3restStar", "spark3in1R7", "spark3in1G7", "spark3in1Star", "spark3in2R7", "spark3in2G7", "spark3in2Star", "spark3inFR7", "spark3inFG7", "spark3inFStar", "spark4restR7", "spark4restG7", "spark4restStar", "spark4in1R7",
+            "spark4in1G7", "spark4in1Star", "spark4in2R7", "spark4in2G7", "spark4in2Star", "spark4inFR7", "spark4inFG7", "spark4inFStar", "spark5restG6", "spark5restR7", "spark5restG7", "spark5restG8", "spark5restStar", "spark5in1G6", "spark5in1R7", "spark5in1G7", "spark5in1G8", "spark5in1Star", "spark5in2G6",
+            "spark5in2R7", "spark5in2G7", "spark5in2G8", "spark5in2Star", "spark5inFG6", "spark5inFR7", "spark5inFG7", "spark5inFG8", "spark5inFStar"
           ]
         },
         {
           "t": 0.5,
           "emit": {"tail":{"beat":0}},
-          "show": ["dart3rest","dart3restCore","dart4rest","dart4restCore","dart5rest","dart5restCore"],
+          "show": ["dart3rest","dart3restCore","dart4rest","dart4restCore","dart5rest","dart5restCore","spark3restR7","spark3restG7","spark3restStar","spark4restR7","spark4restG7","spark4restStar","spark5restG6","spark5restR7","spark5restG7","spark5restG8","spark5restStar"],
           "hide": [
             "dart3out1", "dart3out1Core", "dart3out2", "dart3out2Core", "dart3outF", "dart3outFCore", "dart3in1", "dart3in1Core", "dart3in2", "dart3in2Core", "dart3inF", "dart3inFCore", "dart4out1", "dart4out1Core", "dart4out2", "dart4out2Core", "dart4outF", "dart4outFCore", "dart4in1", "dart4in1Core", "dart4in2",
-            "dart4in2Core", "dart4inF", "dart4inFCore", "dart5out1", "dart5out1Core", "dart5out2", "dart5out2Core", "dart5outF", "dart5outFCore", "dart5in1", "dart5in1Core", "dart5in2", "dart5in2Core", "dart5inF", "dart5inFCore"
+            "dart4in2Core", "dart4inF", "dart4inFCore", "dart5out1", "dart5out1Core", "dart5out2", "dart5out2Core", "dart5outF", "dart5outFCore", "dart5in1", "dart5in1Core", "dart5in2", "dart5in2Core", "dart5inF", "dart5inFCore", "spark3out1R7", "spark3out1G7", "spark3out1Star", "spark3out2R7", "spark3out2G7",
+            "spark3out2Star", "spark3outFR7", "spark3outFG7", "spark3outFStar", "spark3in1R7", "spark3in1G7", "spark3in1Star", "spark3in2R7", "spark3in2G7", "spark3in2Star", "spark3inFR7", "spark3inFG7", "spark3inFStar", "spark4out1R7", "spark4out1G7", "spark4out1Star", "spark4out2R7", "spark4out2G7", "spark4out2Star",
+            "spark4outFR7", "spark4outFG7", "spark4outFStar", "spark4in1R7", "spark4in1G7", "spark4in1Star", "spark4in2R7", "spark4in2G7", "spark4in2Star", "spark4inFR7", "spark4inFG7", "spark4inFStar", "spark5out1G6", "spark5out1R7", "spark5out1G7", "spark5out1G8", "spark5out1Star", "spark5out2G6", "spark5out2R7",
+            "spark5out2G7", "spark5out2G8", "spark5out2Star", "spark5outFG6", "spark5outFR7", "spark5outFG7", "spark5outFG8", "spark5outFStar", "spark5in1G6", "spark5in1R7", "spark5in1G7", "spark5in1G8", "spark5in1Star", "spark5in2G6", "spark5in2R7", "spark5in2G7", "spark5in2G8", "spark5in2Star", "spark5inFG6",
+            "spark5inFR7", "spark5inFG7", "spark5inFG8", "spark5inFStar"
           ]
         },
         {
           "t": 0.75,
           "emit": {"tail":{"beat":-1}},
-          "show": ["dart3in1","dart3in1Core","dart3in2","dart3in2Core","dart3inF","dart3inFCore","dart4in1","dart4in1Core","dart4in2","dart4in2Core","dart4inF","dart4inFCore","dart5in1","dart5in1Core","dart5in2","dart5in2Core","dart5inF","dart5inFCore"],
+          "show": [
+            "dart3in1", "dart3in1Core", "dart3in2", "dart3in2Core", "dart3inF", "dart3inFCore", "dart4in1", "dart4in1Core", "dart4in2", "dart4in2Core", "dart4inF", "dart4inFCore", "dart5in1", "dart5in1Core", "dart5in2", "dart5in2Core", "dart5inF", "dart5inFCore", "spark3in1R7", "spark3in1G7", "spark3in1Star",
+            "spark3in2R7", "spark3in2G7", "spark3in2Star", "spark3inFR7", "spark3inFG7", "spark3inFStar", "spark4in1R7", "spark4in1G7", "spark4in1Star", "spark4in2R7", "spark4in2G7", "spark4in2Star", "spark4inFR7", "spark4inFG7", "spark4inFStar", "spark5in1G6", "spark5in1R7", "spark5in1G7", "spark5in1G8",
+            "spark5in1Star", "spark5in2G6", "spark5in2R7", "spark5in2G7", "spark5in2G8", "spark5in2Star", "spark5inFG6", "spark5inFR7", "spark5inFG7", "spark5inFG8", "spark5inFStar"
+          ],
           "hide": [
             "dart3rest", "dart3restCore", "dart3out1", "dart3out1Core", "dart3out2", "dart3out2Core", "dart3outF", "dart3outFCore", "dart4rest", "dart4restCore", "dart4out1", "dart4out1Core", "dart4out2", "dart4out2Core", "dart4outF", "dart4outFCore", "dart5rest", "dart5restCore", "dart5out1", "dart5out1Core",
-            "dart5out2", "dart5out2Core", "dart5outF", "dart5outFCore"
+            "dart5out2", "dart5out2Core", "dart5outF", "dart5outFCore", "spark3restR7", "spark3restG7", "spark3restStar", "spark3out1R7", "spark3out1G7", "spark3out1Star", "spark3out2R7", "spark3out2G7", "spark3out2Star", "spark3outFR7", "spark3outFG7", "spark3outFStar", "spark4restR7", "spark4restG7", "spark4restStar",
+            "spark4out1R7", "spark4out1G7", "spark4out1Star", "spark4out2R7", "spark4out2G7", "spark4out2Star", "spark4outFR7", "spark4outFG7", "spark4outFStar", "spark5restG6", "spark5restR7", "spark5restG7", "spark5restG8", "spark5restStar", "spark5out1G6", "spark5out1R7", "spark5out1G7", "spark5out1G8",
+            "spark5out1Star", "spark5out2G6", "spark5out2R7", "spark5out2G7", "spark5out2G8", "spark5out2Star", "spark5outFG6", "spark5outFR7", "spark5outFG7", "spark5outFG8", "spark5outFStar"
           ]
         }
       ]

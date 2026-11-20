@@ -1,0 +1,175 @@
+{
+ "id": "market-stall",
+ "frozen": "2026-11-20",
+ "source": "sprites/market-stall.js",
+ "sha256": "2263916aff2a65a2af600cb49c3e9fd83da1848042ea71b9b2a74cf87b1ec771",
+ "name": "Market stall",
+ "blurb": "A wooden counter under a cloth awning on four poles, with goods laid out and room for a merchant behind it. Change the awning, the goods, the width and the colours.",
+ "meta": {
+  "type": "prop",
+  "role": "world/building",
+  "themes": [
+   "fantasy",
+   "farm"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "top-down-rpg"
+  ],
+  "view": "top-down",
+  "words": [
+   "stall",
+   "market",
+   "shop",
+   "stand",
+   "booth",
+   "awning",
+   "counter",
+   "goods",
+   "buy",
+   "sell",
+   "trade",
+   "flap",
+   "village",
+   "fair"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  64,
+  64
+ ],
+ "pivot": [
+  32,
+  60
+ ],
+ "grounded": true,
+ "preview": "flap",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "striped",
+   "options": [
+    "striped",
+    "plain",
+    "scalloped"
+   ],
+   "group": "Look"
+  },
+  "shape": {
+   "kind": "choice",
+   "label": "Goods",
+   "def": "fruit",
+   "options": [
+    "fruit",
+    "potions",
+    "weapons",
+    "bread"
+   ],
+   "group": "Look"
+  },
+  "width": {
+   "kind": "range",
+   "label": "Width",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Narrow",
+   "hi": "Wide",
+   "group": "Look"
+  },
+  "cloth": {
+   "kind": "color",
+   "label": "Cloth",
+   "def": "#c8553a",
+   "swatches": [
+    "#c8553a",
+    "#3f6fd1",
+    "#7a4fc4",
+    "#2f8f9d",
+    "#c9423a",
+    "#8e3a4a",
+    "#4f9d57"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Stripes and edging",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#f2c230",
+    "#7fe0a0",
+    "#f4e06a",
+    "#9fd8f4",
+    "#a8c8d8",
+    "#e6c96a"
+   ],
+   "group": "Colors"
+  },
+  "wood": {
+   "kind": "color",
+   "label": "Wood",
+   "def": "#9a6a3e",
+   "swatches": [
+    "#9a6a3e",
+    "#c9a06a",
+    "#e6c96a",
+    "#a8612a",
+    "#5a3a22",
+    "#c98a4a"
+   ],
+   "group": "Colors"
+  },
+  "sway": {
+   "kind": "range",
+   "label": "Sway",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Still",
+   "hi": "Swaying",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "flap": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [],
+ "bundles": [
+  "kit-rpg-fantasy"
+ ]
+}

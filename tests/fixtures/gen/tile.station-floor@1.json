@@ -1,0 +1,244 @@
+{
+ "id": "tile.station-floor",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "picture": "floor-fill",
+    "floor": "floor",
+    "plate": "plate",
+    "accent": "accent",
+    "lights": "glow"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      0,
+      0
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbba",
+      "ccccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccccba"
+     ],
+     "key": {
+      "a": {
+       "rule": "textureTone",
+       "of": "floor"
+      },
+      "b": {
+       "rule": "textureLight",
+       "of": "floor",
+       "from": 0.4
+      },
+      "c": "floor"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     10,
+     20
+    ],
+    "picture": "plate-inner-br",
+    "floor": "floor",
+    "plate": "plate",
+    "accent": "accent",
+    "lights": "glow",
+    "style": "hex",
+    "edge": 6,
+    "texture": 1,
+    "wear": 1
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": true,
+    "frames": 1,
+    "frame": 0
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      -6,
+      4
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaaaabbbbbbbbbbbbbbbbbbbbbbc",
+      "bccccccccabbbbbbbbbbbbbbbbbbbbba",
+      "bbbbbbbbbcabbbbbbbbbbbbbbbbbbbab",
+      "bbbbbbbbbbcabbbbbbbbbbbbbbbbbabb",
+      "bbbbbbbbbbbcabbbbbbbbbbbbbbbabbb",
+      "bbbbbbbbbbbbcabbbbbbbbbbbbbabbbb",
+      "bbbbbbbbbbbbbcabbbbbbbbbbbabbbbb",
+      "bbbbbbbbbbbbbbcabbbbbbbbbabbbbbb",
+      "bbbbbbbbbbbbbbbcaaaaaaaaabbbbbbb",
+      "bbbbbbbbbbbbbbbabccccccccabbbbbb",
+      "bbbbbbbbbbbbbbabbbbbbbbbbcabbbbb",
+      "bbbbbbbbbbbbbabbbbbbbbbbbbcabbbb",
+      "bbbbbbbbbbbbabbbbbbbbbbbbbbcabbb",
+      "bbbbbbbbbbbabbbbbbbbbbbbbbbbcabb",
+      "bbbbbbbbbbabbbbbbbbbbbbbbbbbbcab",
+      "bbbbbbbbbabbbbbbbbbbbbbbbbbbbbca",
+      "aaaaaaaaabbbbbbbbbbbbbbbbbbbbbbc",
+      "bccccccccabbbbbbbbbbbbbbbbbbbbba",
+      "bbbbbbbbbcabbbbbbbbbbbbbbbbbbbab",
+      "bbbbbbbbbbcabbbbbbbbbbbbbbbbbabb",
+      "bbbbbbbbbbbcabbbbbbbbbbbbbbbabbb",
+      "bbbbbbbbbbbbcabbbbbbbbbbbbbabbbb",
+      "bbbbbbbbbbbbbcabbbbbbbbbbbabbbbb",
+      "bbbbbbbbbbbbbbcabbbbbbbbbabbbbbb",
+      "bbbbbbbbbbbbbbbcaaaaaaaaabbbbbbb",
+      "bbbbbbbbbbbbbbbabccccccccabbbbbb",
+      "bbbbbbbbbbbbbbabbbbbbbbbbcabbbbb",
+      "bbbbbbbbbbbbbabbbbbbbbbbbbcabbbb",
+      "bbbbbbbbbbbbabbbbbbbbbbbbbbcabbb",
+      "bbbbbbbbbbbabbbbbbbbbbbbbbbbcabb",
+      "bbbbbbbbbbabbbbbbbbbbbbbbbbbbcab",
+      "bbbbbbbbbabbbbbbbbbbbbbbbbbbbbcd"
+     ],
+     "key": {
+      "a": {
+       "rule": "textureTone",
+       "of": {
+        "rule": "sunkTone",
+        "of": "plate",
+        "under": "floor",
+        "drop": 0.08,
+        "floor": 0.2
+       }
+      },
+      "b": {
+       "rule": "sunkTone",
+       "of": "plate",
+       "under": "floor",
+       "drop": 0.08,
+       "floor": 0.2
+      },
+      "c": {
+       "rule": "textureLight",
+       "of": {
+        "rule": "sunkTone",
+        "of": "plate",
+        "under": "floor",
+        "drop": 0.08,
+        "floor": 0.2
+       },
+       "from": 0.4
+      },
+      "d": {
+       "rule": "textureTone",
+       "of": "floor"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "picture": "floor-deco-f",
+    "floor": "floor",
+    "plate": "plate",
+    "accent": "accent",
+    "lights": "glow",
+    "style": "panels",
+    "edge": 6,
+    "texture": 1,
+    "wear": 1
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true,
+    "frames": 8,
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      6,
+      12
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aaaaaaaaaaaaaaaaaa",
+      "baccddddddddddddcca",
+      "bacdeeeeeeeeeeeedca",
+      "bacdeeeeeeeeeeeedca",
+      "bacdeeeeeeeeeeeedca",
+      "baccddddddddddddcca",
+      "baaaaaaaaaaaaaaaaaa",
+      "bbbbbbbbbbbbbbbbbbb"
+     ],
+     "key": {
+      "a": {
+       "rule": "textureTone",
+       "of": "floor"
+      },
+      "b": {
+       "rule": "textureLight",
+       "of": "floor",
+       "from": 0.4
+      },
+      "c": {
+       "rule": "sunkTone",
+       "of": "plate",
+       "under": "floor",
+       "drop": 0.08,
+       "floor": 0.2
+      },
+      "d": "glow",
+      "e": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

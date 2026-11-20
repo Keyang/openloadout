@@ -1,0 +1,1930 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "tiles-station-walls",
+ "name": "Station walls",
+ "blurb": "Metal bulkheads for a top-down space station: dark wall tops with a lit rim, a panelled face with a light strip and a pipe, a window, a pipe junction, a warning sign, a flickering lamp and the posts of a doorway; change the colours, the build of the panels, the rim and how worn it is.",
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "wall-single",
+ "styles": [
+  "pixel"
+ ],
+ "meta": {
+  "type": "tileset",
+  "role": "world/tile",
+  "themes": [
+   "sci-fi",
+   "space"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "shooter"
+  ],
+  "view": "top-down",
+  "words": [
+   "wall",
+   "bulkhead",
+   "hull",
+   "panel",
+   "pipe",
+   "window",
+   "porthole",
+   "doorway",
+   "corridor",
+   "room",
+   "station",
+   "spaceship",
+   "metal",
+   "block"
+  ],
+  "license": "draft"
+ },
+ "palette": [
+  {
+   "id": "hull",
+   "label": "Wall",
+   "default": "#6b7896",
+   "material": "metal",
+   "swatches": [
+    "#6b7896",
+    "#9aa6c0",
+    "#566182",
+    "#6660b6",
+    "#a87894"
+   ]
+  },
+  {
+   "id": "plate",
+   "label": "Wall top",
+   "default": "#434d6d",
+   "material": "metal",
+   "swatches": [
+    "#434d6d",
+    "#566182",
+    "#6b7896",
+    "#6660b6",
+    "#a87894"
+   ]
+  },
+  {
+   "id": "accent",
+   "label": "Warning paint",
+   "default": "#f2a030",
+   "material": "warning",
+   "swatches": [
+    "#f2a030",
+    "#2fb3a8",
+    "#e2473f",
+    "#3f6fd1",
+    "#5fe0f0",
+    "#9fe040"
+   ]
+  },
+  {
+   "id": "glow",
+   "label": "Wall lights",
+   "default": "#2fb3a8",
+   "material": "light",
+   "swatches": [
+    "#2fb3a8",
+    "#5fe0f0",
+    "#e2473f",
+    "#9fe040",
+    "#f2a030",
+    "#b48af8",
+    "#4f9ff0",
+    "#5fd47a"
+   ]
+  }
+ ],
+ "controls": [
+  {
+   "key": "style",
+   "kind": "choice",
+   "label": "Style",
+   "options": [
+    {
+     "value": "panels",
+     "label": "Panels"
+    },
+    {
+     "value": "ribbed",
+     "label": "Ribbed"
+    },
+    {
+     "value": "plated",
+     "label": "Plated"
+    }
+   ],
+   "default": "panels"
+  },
+  {
+   "key": "edge",
+   "kind": "range",
+   "label": "Edge",
+   "lo": "Thin",
+   "hi": "Deep",
+   "min": 3,
+   "max": 6,
+   "step": 1,
+   "default": 4
+  },
+  {
+   "key": "texture",
+   "kind": "range",
+   "label": "Texture",
+   "lo": "Plain",
+   "hi": "Busy",
+   "default": 0.5
+  },
+  {
+   "key": "wear",
+   "kind": "range",
+   "label": "Wear",
+   "lo": "New",
+   "hi": "Worn",
+   "default": 0.4
+  },
+  {
+   "key": "hull",
+   "kind": "colour",
+   "label": "Wall"
+  },
+  {
+   "key": "plate",
+   "kind": "colour",
+   "label": "Wall top"
+  },
+  {
+   "key": "accent",
+   "kind": "colour",
+   "label": "Warning paint"
+  },
+  {
+   "key": "glow",
+   "kind": "colour",
+   "label": "Wall lights"
+  },
+  {
+   "key": "speed",
+   "standard": "speed"
+  }
+ ],
+ "body": {
+  "tiles": {
+   "tile": 32,
+   "groups": [
+    {
+     "name": "wall",
+     "kind": "block",
+     "use": "wall",
+     "pieces": [
+      "block",
+      "narrow"
+     ],
+     "fps": 6,
+     "outline": false,
+     "pictures": {
+      "left": [
+       {
+        "gen": "tile.station-walls",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "wall-left",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "ribbed": "ribbed",
+          "plated": "plated"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "hull": "hull",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ],
+      "top": [
+       {
+        "gen": "tile.station-walls",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "wall-top",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "ribbed": "ribbed",
+          "plated": "plated"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "hull": "hull",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ],
+      "right": [
+       {
+        "gen": "tile.station-walls",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "wall-right",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "ribbed": "ribbed",
+          "plated": "plated"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "hull": "hull",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ],
+      "side-l": [
+       {
+        "gen": "tile.station-walls",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "wall-side-l",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "ribbed": "ribbed",
+          "plated": "plated"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "hull": "hull",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ],
+      "fill": [
+       {
+        "gen": "tile.station-walls",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "wall-fill",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "ribbed": "ribbed",
+          "plated": "plated"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "hull": "hull",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ],
+      "side-r": [
+       {
+        "gen": "tile.station-walls",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "wall-side-r",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "ribbed": "ribbed",
+          "plated": "plated"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "hull": "hull",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ],
+      "bottom-l": [
+       {
+        "gen": "tile.station-walls",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "wall-bottom-l",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "ribbed": "ribbed",
+          "plated": "plated"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "hull": "hull",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ],
+      "bottom": [
+       {
+        "gen": "tile.station-walls",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "wall-bottom",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "ribbed": "ribbed",
+          "plated": "plated"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "hull": "hull",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ],
+      "bottom-r": [
+       {
+        "gen": "tile.station-walls",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "wall-bottom-r",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "ribbed": "ribbed",
+          "plated": "plated"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "hull": "hull",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ],
+      "inner-tl": [
+       {
+        "gen": "tile.station-walls",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "wall-inner-tl",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "ribbed": "ribbed",
+          "plated": "plated"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "hull": "hull",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ],
+      "inner-tr": [
+       {
+        "gen": "tile.station-walls",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "wall-inner-tr",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "ribbed": "ribbed",
+          "plated": "plated"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "hull": "hull",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ],
+      "inner-bl": [
+       {
+        "gen": "tile.station-walls",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "wall-inner-bl",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "ribbed": "ribbed",
+          "plated": "plated"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "hull": "hull",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ],
+      "inner-br": [
+       {
+        "gen": "tile.station-walls",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "wall-inner-br",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "ribbed": "ribbed",
+          "plated": "plated"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "hull": "hull",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ],
+      "strip-l": [
+       {
+        "gen": "tile.station-walls",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "wall-strip-l",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "ribbed": "ribbed",
+          "plated": "plated"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "hull": "hull",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ],
+      "strip-m": [
+       {
+        "gen": "tile.station-walls",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "wall-strip-m",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "ribbed": "ribbed",
+          "plated": "plated"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "hull": "hull",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ],
+      "strip-r": [
+       {
+        "gen": "tile.station-walls",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "wall-strip-r",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "ribbed": "ribbed",
+          "plated": "plated"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "hull": "hull",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ],
+      "col-t": [
+       {
+        "gen": "tile.station-walls",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "wall-col-t",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "ribbed": "ribbed",
+          "plated": "plated"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "hull": "hull",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ],
+      "col-m": [
+       {
+        "gen": "tile.station-walls",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "wall-col-m",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "ribbed": "ribbed",
+          "plated": "plated"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "hull": "hull",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ],
+      "col-b": [
+       {
+        "gen": "tile.station-walls",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "wall-col-b",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "ribbed": "ribbed",
+          "plated": "plated"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "hull": "hull",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ],
+      "single": [
+       {
+        "gen": "tile.station-walls",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "wall-single",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "ribbed": "ribbed",
+          "plated": "plated"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "hull": "hull",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ]
+     },
+     "decals": [
+      {
+       "name": "a",
+       "place": "face",
+       "label": "Window",
+       "outline": false,
+       "draw": [
+        {
+         "gen": "tile.station-walls",
+         "v": 1,
+         "at": [
+          16,
+          16
+         ],
+         "picture": "wall-deco-a",
+         "style": {
+          "from": "style",
+          "pick": {
+           "panels": "panels",
+           "ribbed": "ribbed",
+           "plated": "plated"
+          }
+         },
+         "edge": {
+          "from": "edge",
+          "map": [
+           [
+            3,
+            3
+           ],
+           [
+            6,
+            6
+           ]
+          ]
+         },
+         "texture": {
+          "from": "texture",
+          "map": [
+           [
+            0,
+            0
+           ],
+           [
+            1,
+            1
+           ]
+          ]
+         },
+         "wear": {
+          "from": "wear",
+          "map": [
+           [
+            0,
+            0
+           ],
+           [
+            1,
+            1
+           ]
+          ]
+         },
+         "hull": "hull",
+         "plate": "plate",
+         "accent": "accent",
+         "lights": "glow"
+        }
+       ]
+      },
+      {
+       "name": "b",
+       "place": "face",
+       "label": "Pipe junction",
+       "outline": false,
+       "draw": [
+        {
+         "gen": "tile.station-walls",
+         "v": 1,
+         "at": [
+          16,
+          16
+         ],
+         "picture": "wall-deco-b",
+         "style": {
+          "from": "style",
+          "pick": {
+           "panels": "panels",
+           "ribbed": "ribbed",
+           "plated": "plated"
+          }
+         },
+         "edge": {
+          "from": "edge",
+          "map": [
+           [
+            3,
+            3
+           ],
+           [
+            6,
+            6
+           ]
+          ]
+         },
+         "texture": {
+          "from": "texture",
+          "map": [
+           [
+            0,
+            0
+           ],
+           [
+            1,
+            1
+           ]
+          ]
+         },
+         "wear": {
+          "from": "wear",
+          "map": [
+           [
+            0,
+            0
+           ],
+           [
+            1,
+            1
+           ]
+          ]
+         },
+         "hull": "hull",
+         "plate": "plate",
+         "accent": "accent",
+         "lights": "glow"
+        }
+       ]
+      },
+      {
+       "name": "c",
+       "place": "face",
+       "label": "Warning sign",
+       "outline": false,
+       "draw": [
+        {
+         "gen": "tile.station-walls",
+         "v": 1,
+         "at": [
+          16,
+          16
+         ],
+         "picture": "wall-deco-c",
+         "style": {
+          "from": "style",
+          "pick": {
+           "panels": "panels",
+           "ribbed": "ribbed",
+           "plated": "plated"
+          }
+         },
+         "edge": {
+          "from": "edge",
+          "map": [
+           [
+            3,
+            3
+           ],
+           [
+            6,
+            6
+           ]
+          ]
+         },
+         "texture": {
+          "from": "texture",
+          "map": [
+           [
+            0,
+            0
+           ],
+           [
+            1,
+            1
+           ]
+          ]
+         },
+         "wear": {
+          "from": "wear",
+          "map": [
+           [
+            0,
+            0
+           ],
+           [
+            1,
+            1
+           ]
+          ]
+         },
+         "hull": "hull",
+         "plate": "plate",
+         "accent": "accent",
+         "lights": "glow"
+        }
+       ]
+      },
+      {
+       "name": "d",
+       "place": "face",
+       "label": "Wall light",
+       "frames": 8,
+       "outline": false,
+       "draw": [
+        {
+         "gen": "tile.station-walls",
+         "v": 1,
+         "at": [
+          16,
+          16
+         ],
+         "picture": "wall-deco-d",
+         "style": {
+          "from": "style",
+          "pick": {
+           "panels": "panels",
+           "ribbed": "ribbed",
+           "plated": "plated"
+          }
+         },
+         "edge": {
+          "from": "edge",
+          "map": [
+           [
+            3,
+            3
+           ],
+           [
+            6,
+            6
+           ]
+          ]
+         },
+         "texture": {
+          "from": "texture",
+          "map": [
+           [
+            0,
+            0
+           ],
+           [
+            1,
+            1
+           ]
+          ]
+         },
+         "wear": {
+          "from": "wear",
+          "map": [
+           [
+            0,
+            0
+           ],
+           [
+            1,
+            1
+           ]
+          ]
+         },
+         "hull": "hull",
+         "plate": "plate",
+         "accent": "accent",
+         "lights": "glow"
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "extra": [
+    {
+     "name": "doorway-l",
+     "label": "Doorway: left post and sill",
+     "draw": [
+      {
+       "gen": "tile.station-walls",
+       "v": 1,
+       "at": [
+        16,
+        16
+       ],
+       "picture": "doorway-l",
+       "style": {
+        "from": "style",
+        "pick": {
+         "panels": "panels",
+         "ribbed": "ribbed",
+         "plated": "plated"
+        }
+       },
+       "edge": {
+        "from": "edge",
+        "map": [
+         [
+          3,
+          3
+         ],
+         [
+          6,
+          6
+         ]
+        ]
+       },
+       "texture": {
+        "from": "texture",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "wear": {
+        "from": "wear",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "hull": "hull",
+       "plate": "plate",
+       "accent": "accent",
+       "lights": "glow"
+      }
+     ]
+    },
+    {
+     "name": "doorway-r",
+     "label": "Doorway: right post and sill",
+     "draw": [
+      {
+       "gen": "tile.station-walls",
+       "v": 1,
+       "at": [
+        16,
+        16
+       ],
+       "picture": "doorway-r",
+       "style": {
+        "from": "style",
+        "pick": {
+         "panels": "panels",
+         "ribbed": "ribbed",
+         "plated": "plated"
+        }
+       },
+       "edge": {
+        "from": "edge",
+        "map": [
+         [
+          3,
+          3
+         ],
+         [
+          6,
+          6
+         ]
+        ]
+       },
+       "texture": {
+        "from": "texture",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "wear": {
+        "from": "wear",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "hull": "hull",
+       "plate": "plate",
+       "accent": "accent",
+       "lights": "glow"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "clips": {
+  "wall-left": {
+   "label": "Wall: top left corner"
+  },
+  "wall-top": {
+   "label": "Wall: top"
+  },
+  "wall-right": {
+   "label": "Wall: top right corner"
+  },
+  "wall-side-l": {
+   "label": "Wall: left side"
+  },
+  "wall-fill": {
+   "label": "Wall: middle"
+  },
+  "wall-side-r": {
+   "label": "Wall: right side"
+  },
+  "wall-bottom-l": {
+   "label": "Wall: bottom left corner"
+  },
+  "wall-bottom": {
+   "label": "Wall: bottom"
+  },
+  "wall-bottom-r": {
+   "label": "Wall: bottom right corner"
+  },
+  "wall-inner-tl": {
+   "label": "Wall: inside corner, top left"
+  },
+  "wall-inner-tr": {
+   "label": "Wall: inside corner, top right"
+  },
+  "wall-inner-bl": {
+   "label": "Wall: inside corner, bottom left"
+  },
+  "wall-inner-br": {
+   "label": "Wall: inside corner, bottom right"
+  },
+  "wall-strip-l": {
+   "label": "Wall: strip, left end"
+  },
+  "wall-strip-m": {
+   "label": "Wall: strip, middle"
+  },
+  "wall-strip-r": {
+   "label": "Wall: strip, right end"
+  },
+  "wall-col-t": {
+   "label": "Wall: column, top"
+  },
+  "wall-col-m": {
+   "label": "Wall: column, middle"
+  },
+  "wall-col-b": {
+   "label": "Wall: column, bottom"
+  },
+  "wall-single": {
+   "label": "Wall: single tile"
+  },
+  "wall-deco-a": {
+   "label": "Window"
+  },
+  "wall-deco-b": {
+   "label": "Pipe junction"
+  },
+  "wall-deco-c": {
+   "label": "Warning sign"
+  },
+  "wall-deco-d": {
+   "label": "Wall light"
+  },
+  "doorway-l": {
+   "label": "Doorway: left post and sill"
+  },
+  "doorway-r": {
+   "label": "Doorway: right post and sill"
+  }
+ }
+}

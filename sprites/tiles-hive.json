@@ -1,0 +1,1905 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "tiles-hive",
+ "name": "Hive growth",
+ "blurb": "The infested part of a space station seen from above: a soft membrane floor with veins, walls of bulging mass with a ribbed, dripping face, eggs, a pulsing vein knot, a husk and creep; change the colours, the veins, the rim, the texture and the wet shine.",
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "wall-single",
+ "styles": [
+  "pixel"
+ ],
+ "meta": {
+  "type": "tileset",
+  "role": "world/tile",
+  "themes": [
+   "sci-fi",
+   "space",
+   "horror"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "shooter"
+  ],
+  "view": "top-down",
+  "words": [
+   "hive",
+   "alien",
+   "growth",
+   "flesh",
+   "membrane",
+   "organic",
+   "nest",
+   "eggs",
+   "veins",
+   "creep",
+   "infested",
+   "wall",
+   "floor",
+   "slimy"
+  ],
+  "license": "draft"
+ },
+ "palette": [
+  {
+   "id": "flesh",
+   "label": "Floor",
+   "default": "#a87894",
+   "material": "skin",
+   "swatches": [
+    "#a87894",
+    "#6b7896",
+    "#2fb3a8",
+    "#6660b6"
+   ]
+  },
+  {
+   "id": "growth",
+   "label": "Walls",
+   "default": "#b04a8a",
+   "material": "skin",
+   "swatches": [
+    "#b04a8a",
+    "#6660b6",
+    "#e2473f",
+    "#6b7896"
+   ]
+  },
+  {
+   "id": "glow",
+   "label": "Glow",
+   "default": "#9fe040",
+   "material": "light",
+   "swatches": [
+    "#9fe040",
+    "#5fe0f0",
+    "#e2473f",
+    "#f2a030",
+    "#b48af8",
+    "#4f9ff0",
+    "#5fd47a"
+   ]
+  }
+ ],
+ "controls": [
+  {
+   "key": "veins",
+   "kind": "range",
+   "label": "Veins",
+   "lo": "Few",
+   "hi": "Many",
+   "default": 0.5
+  },
+  {
+   "key": "edge",
+   "kind": "range",
+   "label": "Edge",
+   "lo": "Thin",
+   "hi": "Deep",
+   "min": 3,
+   "max": 5,
+   "step": 1,
+   "default": 4
+  },
+  {
+   "key": "texture",
+   "kind": "range",
+   "label": "Texture",
+   "lo": "Plain",
+   "hi": "Busy",
+   "default": 0.5
+  },
+  {
+   "key": "wet",
+   "kind": "toggle",
+   "label": "Wet",
+   "default": true
+  },
+  {
+   "key": "flesh",
+   "kind": "colour",
+   "label": "Floor"
+  },
+  {
+   "key": "growth",
+   "kind": "colour",
+   "label": "Walls"
+  },
+  {
+   "key": "glow",
+   "kind": "colour",
+   "label": "Glow"
+  },
+  {
+   "key": "speed",
+   "standard": "speed"
+  }
+ ],
+ "body": {
+  "tiles": {
+   "tile": 32,
+   "decalOrder": "last",
+   "groups": [
+    {
+     "name": "hive",
+     "kind": "floor",
+     "fills": 3,
+     "fps": 6,
+     "outline": false,
+     "pictures": {
+      "fill": [
+       {
+        "gen": "tile.hive",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "hive-fill",
+        "veins": {
+         "from": "veins",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           5,
+           5
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wet": {
+         "from": "wet",
+         "pick": {
+          "true": true,
+          "false": false
+         }
+        },
+        "flesh": "flesh",
+        "growth": "growth",
+        "lights": "glow"
+       }
+      ],
+      "fill-b": [
+       {
+        "gen": "tile.hive",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "hive-fill-b",
+        "veins": {
+         "from": "veins",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           5,
+           5
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wet": {
+         "from": "wet",
+         "pick": {
+          "true": true,
+          "false": false
+         }
+        },
+        "flesh": "flesh",
+        "growth": "growth",
+        "lights": "glow"
+       }
+      ],
+      "fill-c": [
+       {
+        "gen": "tile.hive",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "hive-fill-c",
+        "veins": {
+         "from": "veins",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           5,
+           5
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wet": {
+         "from": "wet",
+         "pick": {
+          "true": true,
+          "false": false
+         }
+        },
+        "flesh": "flesh",
+        "growth": "growth",
+        "lights": "glow"
+       }
+      ]
+     },
+     "decals": [
+      {
+       "name": "a",
+       "place": "on",
+       "label": "Eggs",
+       "outline": false,
+       "draw": [
+        {
+         "gen": "tile.hive",
+         "v": 1,
+         "at": [
+          16,
+          16
+         ],
+         "picture": "hive-deco-a",
+         "veins": {
+          "from": "veins",
+          "map": [
+           [
+            0,
+            0
+           ],
+           [
+            1,
+            1
+           ]
+          ]
+         },
+         "edge": {
+          "from": "edge",
+          "map": [
+           [
+            3,
+            3
+           ],
+           [
+            5,
+            5
+           ]
+          ]
+         },
+         "texture": {
+          "from": "texture",
+          "map": [
+           [
+            0,
+            0
+           ],
+           [
+            1,
+            1
+           ]
+          ]
+         },
+         "wet": {
+          "from": "wet",
+          "pick": {
+           "true": true,
+           "false": false
+          }
+         },
+         "flesh": "flesh",
+         "growth": "growth",
+         "lights": "glow"
+        }
+       ]
+      },
+      {
+       "name": "b",
+       "place": "on",
+       "label": "Vein knot",
+       "frames": 8,
+       "outline": false,
+       "draw": [
+        {
+         "gen": "tile.hive",
+         "v": 1,
+         "at": [
+          16,
+          16
+         ],
+         "picture": "hive-deco-b",
+         "veins": {
+          "from": "veins",
+          "map": [
+           [
+            0,
+            0
+           ],
+           [
+            1,
+            1
+           ]
+          ]
+         },
+         "edge": {
+          "from": "edge",
+          "map": [
+           [
+            3,
+            3
+           ],
+           [
+            5,
+            5
+           ]
+          ]
+         },
+         "texture": {
+          "from": "texture",
+          "map": [
+           [
+            0,
+            0
+           ],
+           [
+            1,
+            1
+           ]
+          ]
+         },
+         "wet": {
+          "from": "wet",
+          "pick": {
+           "true": true,
+           "false": false
+          }
+         },
+         "flesh": "flesh",
+         "growth": "growth",
+         "lights": "glow"
+        }
+       ]
+      },
+      {
+       "name": "c",
+       "place": "on",
+       "label": "Empty husk",
+       "outline": false,
+       "draw": [
+        {
+         "gen": "tile.hive",
+         "v": 1,
+         "at": [
+          16,
+          16
+         ],
+         "picture": "hive-deco-c",
+         "veins": {
+          "from": "veins",
+          "map": [
+           [
+            0,
+            0
+           ],
+           [
+            1,
+            1
+           ]
+          ]
+         },
+         "edge": {
+          "from": "edge",
+          "map": [
+           [
+            3,
+            3
+           ],
+           [
+            5,
+            5
+           ]
+          ]
+         },
+         "texture": {
+          "from": "texture",
+          "map": [
+           [
+            0,
+            0
+           ],
+           [
+            1,
+            1
+           ]
+          ]
+         },
+         "wet": {
+          "from": "wet",
+          "pick": {
+           "true": true,
+           "false": false
+          }
+         },
+         "flesh": "flesh",
+         "growth": "growth",
+         "lights": "glow"
+        }
+       ]
+      },
+      {
+       "name": "d",
+       "place": "on",
+       "label": "Creep patch",
+       "outline": false,
+       "draw": [
+        {
+         "gen": "tile.hive",
+         "v": 1,
+         "at": [
+          16,
+          16
+         ],
+         "picture": "hive-deco-d",
+         "veins": {
+          "from": "veins",
+          "map": [
+           [
+            0,
+            0
+           ],
+           [
+            1,
+            1
+           ]
+          ]
+         },
+         "edge": {
+          "from": "edge",
+          "map": [
+           [
+            3,
+            3
+           ],
+           [
+            5,
+            5
+           ]
+          ]
+         },
+         "texture": {
+          "from": "texture",
+          "map": [
+           [
+            0,
+            0
+           ],
+           [
+            1,
+            1
+           ]
+          ]
+         },
+         "wet": {
+          "from": "wet",
+          "pick": {
+           "true": true,
+           "false": false
+          }
+         },
+         "flesh": "flesh",
+         "growth": "growth",
+         "lights": "glow"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "wall",
+     "kind": "block",
+     "use": "wall",
+     "pieces": [
+      "block",
+      "narrow"
+     ],
+     "outline": false,
+     "pictures": {
+      "left": [
+       {
+        "gen": "tile.hive",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "wall-left",
+        "veins": {
+         "from": "veins",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           5,
+           5
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wet": {
+         "from": "wet",
+         "pick": {
+          "true": true,
+          "false": false
+         }
+        },
+        "flesh": "flesh",
+        "growth": "growth",
+        "lights": "glow"
+       }
+      ],
+      "top": [
+       {
+        "gen": "tile.hive",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "wall-top",
+        "veins": {
+         "from": "veins",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           5,
+           5
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wet": {
+         "from": "wet",
+         "pick": {
+          "true": true,
+          "false": false
+         }
+        },
+        "flesh": "flesh",
+        "growth": "growth",
+        "lights": "glow"
+       }
+      ],
+      "right": [
+       {
+        "gen": "tile.hive",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "wall-right",
+        "veins": {
+         "from": "veins",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           5,
+           5
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wet": {
+         "from": "wet",
+         "pick": {
+          "true": true,
+          "false": false
+         }
+        },
+        "flesh": "flesh",
+        "growth": "growth",
+        "lights": "glow"
+       }
+      ],
+      "side-l": [
+       {
+        "gen": "tile.hive",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "wall-side-l",
+        "veins": {
+         "from": "veins",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           5,
+           5
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wet": {
+         "from": "wet",
+         "pick": {
+          "true": true,
+          "false": false
+         }
+        },
+        "flesh": "flesh",
+        "growth": "growth",
+        "lights": "glow"
+       }
+      ],
+      "fill": [
+       {
+        "gen": "tile.hive",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "wall-fill",
+        "veins": {
+         "from": "veins",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           5,
+           5
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wet": {
+         "from": "wet",
+         "pick": {
+          "true": true,
+          "false": false
+         }
+        },
+        "flesh": "flesh",
+        "growth": "growth",
+        "lights": "glow"
+       }
+      ],
+      "side-r": [
+       {
+        "gen": "tile.hive",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "wall-side-r",
+        "veins": {
+         "from": "veins",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           5,
+           5
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wet": {
+         "from": "wet",
+         "pick": {
+          "true": true,
+          "false": false
+         }
+        },
+        "flesh": "flesh",
+        "growth": "growth",
+        "lights": "glow"
+       }
+      ],
+      "bottom-l": [
+       {
+        "gen": "tile.hive",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "wall-bottom-l",
+        "veins": {
+         "from": "veins",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           5,
+           5
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wet": {
+         "from": "wet",
+         "pick": {
+          "true": true,
+          "false": false
+         }
+        },
+        "flesh": "flesh",
+        "growth": "growth",
+        "lights": "glow"
+       }
+      ],
+      "bottom": [
+       {
+        "gen": "tile.hive",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "wall-bottom",
+        "veins": {
+         "from": "veins",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           5,
+           5
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wet": {
+         "from": "wet",
+         "pick": {
+          "true": true,
+          "false": false
+         }
+        },
+        "flesh": "flesh",
+        "growth": "growth",
+        "lights": "glow"
+       }
+      ],
+      "bottom-r": [
+       {
+        "gen": "tile.hive",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "wall-bottom-r",
+        "veins": {
+         "from": "veins",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           5,
+           5
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wet": {
+         "from": "wet",
+         "pick": {
+          "true": true,
+          "false": false
+         }
+        },
+        "flesh": "flesh",
+        "growth": "growth",
+        "lights": "glow"
+       }
+      ],
+      "inner-tl": [
+       {
+        "gen": "tile.hive",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "wall-inner-tl",
+        "veins": {
+         "from": "veins",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           5,
+           5
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wet": {
+         "from": "wet",
+         "pick": {
+          "true": true,
+          "false": false
+         }
+        },
+        "flesh": "flesh",
+        "growth": "growth",
+        "lights": "glow"
+       }
+      ],
+      "inner-tr": [
+       {
+        "gen": "tile.hive",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "wall-inner-tr",
+        "veins": {
+         "from": "veins",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           5,
+           5
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wet": {
+         "from": "wet",
+         "pick": {
+          "true": true,
+          "false": false
+         }
+        },
+        "flesh": "flesh",
+        "growth": "growth",
+        "lights": "glow"
+       }
+      ],
+      "inner-bl": [
+       {
+        "gen": "tile.hive",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "wall-inner-bl",
+        "veins": {
+         "from": "veins",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           5,
+           5
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wet": {
+         "from": "wet",
+         "pick": {
+          "true": true,
+          "false": false
+         }
+        },
+        "flesh": "flesh",
+        "growth": "growth",
+        "lights": "glow"
+       }
+      ],
+      "inner-br": [
+       {
+        "gen": "tile.hive",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "wall-inner-br",
+        "veins": {
+         "from": "veins",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           5,
+           5
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wet": {
+         "from": "wet",
+         "pick": {
+          "true": true,
+          "false": false
+         }
+        },
+        "flesh": "flesh",
+        "growth": "growth",
+        "lights": "glow"
+       }
+      ],
+      "strip-l": [
+       {
+        "gen": "tile.hive",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "wall-strip-l",
+        "veins": {
+         "from": "veins",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           5,
+           5
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wet": {
+         "from": "wet",
+         "pick": {
+          "true": true,
+          "false": false
+         }
+        },
+        "flesh": "flesh",
+        "growth": "growth",
+        "lights": "glow"
+       }
+      ],
+      "strip-m": [
+       {
+        "gen": "tile.hive",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "wall-strip-m",
+        "veins": {
+         "from": "veins",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           5,
+           5
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wet": {
+         "from": "wet",
+         "pick": {
+          "true": true,
+          "false": false
+         }
+        },
+        "flesh": "flesh",
+        "growth": "growth",
+        "lights": "glow"
+       }
+      ],
+      "strip-r": [
+       {
+        "gen": "tile.hive",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "wall-strip-r",
+        "veins": {
+         "from": "veins",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           5,
+           5
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wet": {
+         "from": "wet",
+         "pick": {
+          "true": true,
+          "false": false
+         }
+        },
+        "flesh": "flesh",
+        "growth": "growth",
+        "lights": "glow"
+       }
+      ],
+      "col-t": [
+       {
+        "gen": "tile.hive",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "wall-col-t",
+        "veins": {
+         "from": "veins",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           5,
+           5
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wet": {
+         "from": "wet",
+         "pick": {
+          "true": true,
+          "false": false
+         }
+        },
+        "flesh": "flesh",
+        "growth": "growth",
+        "lights": "glow"
+       }
+      ],
+      "col-m": [
+       {
+        "gen": "tile.hive",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "wall-col-m",
+        "veins": {
+         "from": "veins",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           5,
+           5
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wet": {
+         "from": "wet",
+         "pick": {
+          "true": true,
+          "false": false
+         }
+        },
+        "flesh": "flesh",
+        "growth": "growth",
+        "lights": "glow"
+       }
+      ],
+      "col-b": [
+       {
+        "gen": "tile.hive",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "wall-col-b",
+        "veins": {
+         "from": "veins",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           5,
+           5
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wet": {
+         "from": "wet",
+         "pick": {
+          "true": true,
+          "false": false
+         }
+        },
+        "flesh": "flesh",
+        "growth": "growth",
+        "lights": "glow"
+       }
+      ],
+      "single": [
+       {
+        "gen": "tile.hive",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "wall-single",
+        "veins": {
+         "from": "veins",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           5,
+           5
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wet": {
+         "from": "wet",
+         "pick": {
+          "true": true,
+          "false": false
+         }
+        },
+        "flesh": "flesh",
+        "growth": "growth",
+        "lights": "glow"
+       }
+      ]
+     }
+    }
+   ]
+  }
+ },
+ "clips": {
+  "hive-fill": {
+   "label": "Membrane"
+  },
+  "hive-fill-b": {
+   "label": "Membrane, version B"
+  },
+  "hive-fill-c": {
+   "label": "Membrane, version C"
+  },
+  "wall-left": {
+   "label": "Wall: top left corner"
+  },
+  "wall-top": {
+   "label": "Wall: top"
+  },
+  "wall-right": {
+   "label": "Wall: top right corner"
+  },
+  "wall-side-l": {
+   "label": "Wall: left side"
+  },
+  "wall-fill": {
+   "label": "Wall: middle"
+  },
+  "wall-side-r": {
+   "label": "Wall: right side"
+  },
+  "wall-bottom-l": {
+   "label": "Wall: bottom left corner"
+  },
+  "wall-bottom": {
+   "label": "Wall: bottom"
+  },
+  "wall-bottom-r": {
+   "label": "Wall: bottom right corner"
+  },
+  "wall-inner-tl": {
+   "label": "Wall: inside corner, top left"
+  },
+  "wall-inner-tr": {
+   "label": "Wall: inside corner, top right"
+  },
+  "wall-inner-bl": {
+   "label": "Wall: inside corner, bottom left"
+  },
+  "wall-inner-br": {
+   "label": "Wall: inside corner, bottom right"
+  },
+  "wall-strip-l": {
+   "label": "Wall: strip, left end"
+  },
+  "wall-strip-m": {
+   "label": "Wall: strip, middle"
+  },
+  "wall-strip-r": {
+   "label": "Wall: strip, right end"
+  },
+  "wall-col-t": {
+   "label": "Wall: column, top"
+  },
+  "wall-col-m": {
+   "label": "Wall: column, middle"
+  },
+  "wall-col-b": {
+   "label": "Wall: column, bottom"
+  },
+  "wall-single": {
+   "label": "Wall: single tile"
+  },
+  "hive-deco-a": {
+   "label": "Eggs"
+  },
+  "hive-deco-b": {
+   "label": "Vein knot"
+  },
+  "hive-deco-c": {
+   "label": "Empty husk"
+  },
+  "hive-deco-d": {
+   "label": "Creep patch"
+  }
+ }
+}

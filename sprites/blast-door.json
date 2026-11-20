@@ -1,0 +1,117 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "blast-door",
+ "name": "Blast door",
+ "blurb": "A heavy station door two tiles wide whose leaves draw back into the frame with a hiss, or stay clamped shut with red lights blinking. Make it split, iris or shutter, and change its seams, warning stripes, lights and colours.",
+ "meta": {
+  "type": "prop",
+  "role": "world/door",
+  "themes": ["sci-fi","space"],
+  "gameTypes": ["roguelike-action","shooter"],
+  "view": "top-down",
+  "words": ["door","gate","airlock","bulkhead","hatch","entrance","exit","open","locked","slide","room cleared","metal","heavy"],
+  "license": "draft"
+ },
+ "size": [64,48],
+ "pivot": [32,46],
+ "preview": "closed",
+ "styles": ["pixel"],
+ "palette": [
+  {
+   "id": "body",
+   "label": "Door",
+   "default": "#6b7896",
+   "material": "metal",
+   "swatches": ["#6b7896","#9aa6c0","#c2c9d6","#566182","#6660b6","#a87894"]
+  },
+  {
+   "id": "accent",
+   "label": "Stripes",
+   "default": "#f2a030",
+   "material": "warning",
+   "swatches": ["#f2a030","#2fb3a8","#e2473f","#3f6fd1","#5fe0f0","#9fe040"]
+  },
+  {
+   "id": "glow",
+   "label": "Light",
+   "default": "#2fb3a8",
+   "material": "signal",
+   "swatches": ["#2fb3a8","#5fe0f0","#9fe040","#f2a030","#b48af8","#4f9ff0","#5fd47a"]
+  },
+  {"id":"hull","label":"Frame","default":"#434d6d","material":"metal","swatches":["#434d6d","#566182","#6b7896","#6660b6","#a87894"]}
+ ],
+ "controls": [
+  {
+   "key": "style",
+   "kind": "choice",
+   "label": "Style",
+   "options": [{"value":"split","label":"Split"},{"value":"iris","label":"Iris"},{"value":"shutter","label":"Shutter"}],
+   "default": "split"
+  },
+  {"key":"pieces","kind":"range","label":"Panels","lo":"Few","hi":"Many","default":0.5},
+  {"key":"stripes","kind":"toggle","label":"Hazard stripes","default":true},
+  {"key":"body","kind":"colour","label":"Door"},
+  {"key":"accent","kind":"colour","label":"Stripes","when":{"stripes":[true]}},
+  {"key":"glow","kind":"colour","label":"Light"},
+  {"key":"hull","kind":"colour","label":"Frame"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": {
+  "pictures": {
+   "nodes": [],
+   "draw": [
+    {
+     "id": "closed",
+     "gen": "door.blast",
+     "v": 1,
+     "at": [32,46],
+     "clip": ["closed"],
+     "picture": "closed",
+     "style": {"from":"style","pick":{"split":"split","iris":"iris","shutter":"shutter"}},
+     "pieces": {"from":"pieces","map":[[0,0],[1,1]],"round":"none"},
+     "stripes": {"from":"stripes","pick":{"true":true,"false":false}},
+     "body": "body",
+     "accent": "accent",
+     "glowing": "glow",
+     "hull": "hull"
+    },
+    {
+     "id": "open",
+     "gen": "door.blast",
+     "v": 1,
+     "at": [32,46],
+     "clip": ["open"],
+     "picture": "open",
+     "style": {"from":"style","pick":{"split":"split","iris":"iris","shutter":"shutter"}},
+     "pieces": {"from":"pieces","map":[[0,0],[1,1]],"round":"none"},
+     "stripes": {"from":"stripes","pick":{"true":true,"false":false}},
+     "body": "body",
+     "accent": "accent",
+     "glowing": "glow",
+     "hull": "hull"
+    },
+    {
+     "id": "locked",
+     "gen": "door.blast",
+     "v": 1,
+     "at": [32,46],
+     "clip": ["locked"],
+     "picture": "locked",
+     "style": {"from":"style","pick":{"split":"split","iris":"iris","shutter":"shutter"}},
+     "pieces": {"from":"pieces","map":[[0,0],[1,1]],"round":"none"},
+     "stripes": {"from":"stripes","pick":{"true":true,"false":false}},
+     "body": "body",
+     "accent": "accent",
+     "glowing": "glow",
+     "hull": "hull"
+    }
+   ]
+  }
+ },
+ "clips": {
+  "closed": {"frames":1,"fps":8},
+  "open": {"frames":8,"fps":12,"loop":false,"sounds":[{"sound":"door-hiss","preset":"Blast door","frame":0,"volume":0.8}]},
+  "locked": {"frames":8,"fps":8}
+ }
+}

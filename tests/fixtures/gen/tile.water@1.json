@@ -1,0 +1,216 @@
+{
+ "id": "tile.water",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "piece": "water-top",
+    "water": "water",
+    "foam": "foam",
+    "lit": "lit",
+    "murk": "murk",
+    "froth": "froth",
+    "leaf": "leaf",
+    "cream": "cream",
+    "crimson": "crimson"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      0,
+      4
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aaaaaa..........aaaaaa.........",
+      "aaaaaaaaa......aaaaaaaaaaaaaaaaa",
+      "bbbbbbbbbaaaaaabbbbbbbbbbbbbbbbb",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "cccccccccccccccccccccccccccccccc",
+      "cccccccccccccccccccccccccccccccc",
+      "cccccccccccccccccccccccccccccccc",
+      "ccccccccccccccccdddddccccccccccc",
+      "cccccccccccccccccccccccccccccccc",
+      "ccccccbbbbbbbbcccccccccccccccccc",
+      "cccccccccccccccccccccccccccccccc",
+      "cccccccccccccccccccccccccccccccc",
+      "cccccccccccccccccccccccccccccccc",
+      "cccccccccccccccccccccccccccccccc",
+      "cccccccccccccccccccccccccccccccc",
+      "cccccccccccccccccccccccccccccccc",
+      "cccccccccccccccccccccccccccccccc",
+      "cccccccccccccccccccccccccccccccc",
+      "cccccccccccccccccccccccccccccccc",
+      "ccccccccccddddddcccccccccccccccc",
+      "cccccccccccccccccccccccccccccccc",
+      "cccccccccccccccccccccccccccccccc",
+      "cccccccccccccccccccccccccccccccc",
+      "ccccccccccccccccbbbbcccccccccccc",
+      "cccccccccccccccccccccccccccccccc",
+      "cccccccccccccccccccccccccccccccc",
+      "cccccccccccccccccccccccccccccccc",
+      "cccccccccccccccccccccccccccccccc"
+     ],
+     "key": {
+      "a": "foam",
+      "b": "lit",
+      "c": "water",
+      "d": "murk"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "piece": "water-fill-c",
+    "water": "water",
+    "foam": "foam",
+    "lit": "lit",
+    "murk": "murk",
+    "froth": "froth",
+    "leaf": "leaf",
+    "cream": "cream",
+    "crimson": "crimson"
+   },
+   "ctx": {
+    "t": 0.375,
+    "frame": 3,
+    "frames": 8,
+    "loop": true
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      0,
+      0
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaabbbbbaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaccccccccaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaccccaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaabbbbbaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaadaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaacccccaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+     ],
+     "key": {
+      "a": "water",
+      "b": "murk",
+      "c": "lit",
+      "d": "foam"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     40,
+     20
+    ],
+    "piece": "fall-foot",
+    "water": "water",
+    "foam": "foam",
+    "lit": "lit",
+    "murk": "murk",
+    "froth": "froth",
+    "leaf": "leaf",
+    "cream": "cream",
+    "crimson": "crimson"
+   },
+   "ctx": {
+    "t": 0.5,
+    "frame": 4,
+    "frames": 8,
+    "loop": true
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      24,
+      4
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaabbbaaccccaaaaaaabbbaaaaaaaaaa",
+      "aaabbbaaccccbbaaaaabbbaaaabbaaaa",
+      "aaabbbbaccccaaaaaaaaaaaaaaaaaaaa",
+      "aabbbbbaccbbbbbbbaaaaaaaaaaaaaaa",
+      "bbbbbbbbbbbbbbbbbbbbbbbbaabbbbba",
+      "bbdbbbbbbbdbbbbbbbbbbbbbbbbbbbbb",
+      "dddbbbbbbddbbbbbbddbbbbbbbdbbbbb",
+      "dddbbbbbbddbbbbbdddbbbbbbddbbbbb",
+      "dddddddddddddddddddddddddddddddd",
+      "ddaaaaadddddddddddaaaaaddddddddd",
+      "aaaaaaaaaadddddaaaaaaaaaaaddddda",
+      "aaaaaaaaaaaaaaaaaaaaeeeeeaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaacbccccaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaacaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaacaaa",
+      "aaaaaaaaaaaaaacaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaabaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaeeeeeeaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaccccccaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+     ],
+     "key": {
+      "a": "water",
+      "b": "foam",
+      "c": "lit",
+      "d": "froth",
+      "e": "murk"
+     }
+    }
+   ]
+  }
+ ]
+}

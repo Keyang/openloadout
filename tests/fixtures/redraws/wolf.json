@@ -1,0 +1,373 @@
+{
+ "id": "wolf",
+ "frozen": "2026-11-20",
+ "source": "sprites/wolf.js",
+ "sha256": "dc18de7cc7e72ef1f924803edb5ea7f26d8bbc2f31af1b98cfe2354c02560206",
+ "name": "Wolf",
+ "blurb": "A four-legged hunter. Reshape it into a wolf, a fox or a husky.",
+ "meta": {
+  "type": "creature",
+  "role": "characters/enemy",
+  "themes": [
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "platformer",
+   "turn-based-rpg"
+  ],
+  "view": "side",
+  "words": [
+   "wolf",
+   "fox",
+   "husky",
+   "dog",
+   "beast",
+   "animal",
+   "enemy",
+   "monster",
+   "hunter",
+   "predator",
+   "run",
+   "bite",
+   "pounce"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  64,
+  48
+ ],
+ "pivot": [
+  27,
+  43
+ ],
+ "grounded": true,
+ "preview": "run",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Body size",
+   "def": 0.55,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "legs": {
+   "kind": "range",
+   "label": "Leg length",
+   "def": 0.55,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Short",
+   "hi": "Long",
+   "group": "Look"
+  },
+  "snout": {
+   "kind": "range",
+   "label": "Snout",
+   "def": 0.55,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Short",
+   "hi": "Long",
+   "group": "Look"
+  },
+  "ears": {
+   "kind": "choice",
+   "label": "Ears",
+   "def": "pointy",
+   "options": [
+    {
+     "value": "pointy",
+     "label": "Pointy"
+    },
+    {
+     "value": "tall",
+     "label": "Tall"
+    },
+    {
+     "value": "floppy",
+     "label": "Floppy"
+    }
+   ],
+   "group": "Look"
+  },
+  "tail": {
+   "kind": "choice",
+   "label": "Tail",
+   "def": "hanging",
+   "options": [
+    {
+     "value": "hanging",
+     "label": "Hanging"
+    },
+    {
+     "value": "brush",
+     "label": "Brush"
+    },
+    {
+     "value": "curled",
+     "label": "Curled"
+    }
+   ],
+   "group": "Look"
+  },
+  "fluff": {
+   "kind": "range",
+   "label": "Fluffiness",
+   "def": 0.6,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Sleek",
+   "hi": "Fluffy",
+   "group": "Look"
+  },
+  "markings": {
+   "kind": "choice",
+   "label": "Markings",
+   "def": "belly",
+   "options": [
+    {
+     "value": "plain",
+     "label": "Plain"
+    },
+    {
+     "value": "belly",
+     "label": "Belly"
+    },
+    {
+     "value": "socks",
+     "label": "Socks"
+    },
+    {
+     "value": "mask",
+     "label": "Mask"
+    }
+   ],
+   "group": "Look"
+  },
+  "fur": {
+   "kind": "color",
+   "label": "Fur",
+   "def": "#8a93a6",
+   "swatches": [
+    "#8a93a6",
+    "#5b6272",
+    "#d9772b",
+    "#a8502a",
+    "#8a5a3a",
+    "#c9a26b",
+    "#e8e6e0",
+    "#3a3644"
+   ],
+   "group": "Colors"
+  },
+  "belly": {
+   "kind": "color",
+   "label": "Belly and markings",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#ffffff",
+    "#c9ccd6",
+    "#e6c796",
+    "#3a3350",
+    "#6b4a3a"
+   ],
+   "group": "Colors",
+   "when": {
+    "markings": [
+     "belly",
+     "socks",
+     "mask"
+    ]
+   }
+  },
+  "eyes": {
+   "kind": "color",
+   "label": "Eyes",
+   "def": "#f2c230",
+   "swatches": [
+    "#f2c230",
+    "#e08a2c",
+    "#7fd0f0",
+    "#8fd16a",
+    "#e2574c",
+    "#f0ead8"
+   ],
+   "group": "Colors"
+  },
+  "stride": {
+   "kind": "range",
+   "label": "Step size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small steps",
+   "hi": "Big steps",
+   "group": "Motion"
+  },
+  "bounce": {
+   "kind": "range",
+   "label": "Bounce",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Smooth",
+   "hi": "Bouncy",
+   "group": "Motion"
+  },
+  "wag": {
+   "kind": "range",
+   "label": "Tail wag",
+   "def": 0.4,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Still",
+   "hi": "Waggy",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    4,
+    6,
+    9
+   ]
+  },
+  "walk": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    6,
+    9,
+    13
+   ]
+  },
+  "run": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    9,
+    15,
+    20
+   ]
+  },
+  "attack": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  },
+  "hurt": {
+   "frames": 4,
+   "loop": false,
+   "fps": [
+    6,
+    9,
+    13
+   ]
+  },
+  "die": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  }
+ },
+ "sounds": {
+  "walk": [
+   {
+    "sound": "footstep-gravel",
+    "frame": 0,
+    "preset": "Sneaking"
+   },
+   {
+    "sound": "footstep-gravel",
+    "frame": 4,
+    "preset": "Sneaking"
+   }
+  ],
+  "run": [
+   {
+    "sound": "footstep-gravel",
+    "frame": 1,
+    "preset": "Boots"
+   },
+   {
+    "sound": "footstep-gravel",
+    "frame": 5,
+    "preset": "Boots"
+   }
+  ],
+  "attack": [
+   {
+    "sound": "whoosh",
+    "frame": 2,
+    "preset": "Quick swipe"
+   },
+   {
+    "sound": "punch",
+    "frame": 4,
+    "preset": "Light jab"
+   }
+  ],
+  "hurt": [
+   {
+    "sound": "punch",
+    "frame": 0,
+    "preset": "Light jab"
+   }
+  ],
+  "die": [
+   {
+    "sound": "punch",
+    "frame": 0,
+    "preset": "Heavy body blow",
+    "volume": 1
+   },
+   {
+    "sound": "land-thud",
+    "frame": 5,
+    "preset": "Heavy landing",
+    "volume": 1
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-platformer-fantasy",
+  "kit-rpg-fantasy",
+  "wizard-camp"
+ ]
+}

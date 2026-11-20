@@ -1,8 +1,7 @@
 // E3 round 2: acid-glob as a pictures body. The drips and droplets are solid goo, so they are shapes on keyed nodes
 // drawn before the ink outline (the code drew trailPuffs and particles before g.outline); the splat is the code's own
 // splatIn outline (engine/plating.js) as a polygon with its satellite drops, on a node Size scales and the keys grow.
-import { head, clip, build, B, lin } from './lib.mjs';
-import { hash, fract, keys as keysAt, easeOut, clamp } from '../../engine/motion.js';
+import { head, clip, build, B, lin, hash, fract, keys as keysAt, easeOut, clamp } from './lib.mjs';
 const h = head('acid-glob', { body: 'water', glow: 'light' });
 const TAU = Math.PI * 2, RM = 6;                             // R at the middle size: lerp(4.5, 7.5, 0.5)
 const r1 = (v) => Math.round(v * 10) / 10, r2 = (v) => Math.round(v * 100) / 100, q4 = (v) => Math.round(v * 1e4) / 1e4;

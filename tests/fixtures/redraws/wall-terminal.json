@@ -1,0 +1,207 @@
+{
+ "id": "wall-terminal",
+ "frozen": "2026-11-20",
+ "source": "sprites/wall-terminal.js",
+ "sha256": "b0286f0f2b4e3b126491686d2eefd81d0c5f095675af5023ed5ad0b4e48c1196",
+ "name": "Terminal",
+ "blurb": "A station computer to walk up to and use: its screen scrolls, flashes and shows a tick when it is used, or stands dark. Make it a console, a kiosk or a wall panel, choose what the screen shows, and change the keyboard, lights and colours.",
+ "meta": {
+  "type": "prop",
+  "role": "world/prop",
+  "themes": [
+   "sci-fi",
+   "space"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "shooter"
+  ],
+  "view": "top-down",
+  "words": [
+   "terminal",
+   "computer",
+   "console",
+   "screen",
+   "monitor",
+   "kiosk",
+   "keyboard",
+   "hack",
+   "activate",
+   "use",
+   "interact",
+   "switch",
+   "data"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  48
+ ],
+ "pivot": [
+  16,
+  46
+ ],
+ "grounded": true,
+ "preview": "idle",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "console",
+   "options": [
+    {
+     "value": "console",
+     "label": "Console"
+    },
+    {
+     "value": "kiosk",
+     "label": "Kiosk"
+    },
+    {
+     "value": "wall panel",
+     "label": "Wall panel"
+    }
+   ],
+   "group": "Look"
+  },
+  "shape": {
+   "kind": "choice",
+   "label": "Screen shows",
+   "def": "text",
+   "options": [
+    {
+     "value": "text",
+     "label": "Text"
+    },
+    {
+     "value": "graph",
+     "label": "Graph"
+    },
+    {
+     "value": "map",
+     "label": "Map"
+    },
+    {
+     "value": "skull",
+     "label": "Skull"
+    }
+   ],
+   "group": "Look"
+  },
+  "keys": {
+   "kind": "toggle",
+   "label": "Keyboard",
+   "def": true,
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Body",
+   "def": "#6b7896",
+   "swatches": [
+    "#6b7896",
+    "#9aa6c0",
+    "#c2c9d6",
+    "#566182",
+    "#6660b6",
+    "#a87894"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Trim",
+   "def": "#2fb3a8",
+   "swatches": [
+    "#2fb3a8",
+    "#f2a030",
+    "#e2473f",
+    "#3f6fd1",
+    "#5fe0f0",
+    "#9fe040"
+   ],
+   "group": "Colors"
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Screen",
+   "def": "#5fe0f0",
+   "swatches": [
+    "#5fe0f0",
+    "#e2473f",
+    "#9fe040",
+    "#f2a030",
+    "#b48af8",
+    "#4f9ff0",
+    "#5fd47a"
+   ],
+   "group": "Colors"
+  },
+  "flicker": {
+   "kind": "range",
+   "label": "Flicker",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Steady",
+   "hi": "Wild",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    8,
+    12
+   ]
+  },
+  "activate": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  },
+  "off": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  }
+ },
+ "sounds": {
+  "activate": [
+   {
+    "sound": "tech-click",
+    "preset": "Confirm",
+    "frame": 1,
+    "volume": 0.6
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-roguelite-scifi"
+ ]
+}

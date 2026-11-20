@@ -1,0 +1,388 @@
+{
+ "id": "bug.crawler",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "body": "body",
+    "accent": "accent",
+    "lit": "glow",
+    "at": [
+     24,
+     40
+    ]
+   },
+   "ctx": {
+    "clip": "idle_down",
+    "frame": 0
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      12,
+      20
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..........aaaaa..........",
+      "........aabbbbbaa........",
+      ".......abcccccbbba.......",
+      ".....aadccccccccbbaa.....",
+      "....aeadccdddddccbaea....",
+      "....aeedddbbbbbddbeea....",
+      "...aeaedbcccccbbbdeaea...",
+      "...aeaadccccccccbbaaea...",
+      "..aeeaadcccccccccbaaeea..",
+      "..aeeeedddddddddcbeeeea..",
+      "..aeaaaedbbbbbbbdeaaaea..",
+      ".aeeaeeedccccccbbeeeaeea.",
+      ".aeaaeaedddddddddeaeaaea.",
+      "aeeaeeaaffghhhffgaaeeaeea",
+      "aiaaea.ajffhhhffja.aeaaia",
+      ".a.aeaajjjkkkkkljjaaea.a.",
+      "...aeajjjlaaaaallljaea...",
+      "..aeelljaa.....aajjjeea..",
+      "..aeaalllaa...aajjlaaea..",
+      "..aia.aallla.alllaa.aia..",
+      "...a....aaa...aaa....a..."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body.light",
+      "c": "body",
+      "d": "body.dark",
+      "e": "accent",
+      "f": "glow",
+      "g": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      },
+      "h": {
+       "rule": "mix",
+       "of": {
+        "rule": "tone",
+        "of": "accent",
+        "by": -0.75
+       },
+       "with": {
+        "rule": "mix",
+        "of": "#241a3a",
+        "with": "#241a3a",
+        "amount": 0
+       },
+       "amount": 0.12
+      },
+      "i": "accent.dark",
+      "j": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      },
+      "k": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": {
+         "rule": "tone",
+         "of": "accent",
+         "by": -0.75
+        },
+        "with": {
+         "rule": "mix",
+         "of": "#241a3a",
+         "with": "#241a3a",
+         "amount": 0
+        },
+        "amount": 0.12
+       },
+       "tone": "dark"
+      },
+      "l": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "tone": "dark"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "body": "body",
+    "accent": "accent",
+    "lit": "glow",
+    "at": [
+     24,
+     40
+    ],
+    "size": 1,
+    "legs": 0,
+    "length": "long",
+    "spikes": true,
+    "horns": "tusks",
+    "hornLength": 1.35,
+    "tail": "stinger",
+    "tailLength": 0.65,
+    "bounce": 1,
+    "stride": 0
+   },
+   "ctx": {
+    "clip": "walk_side",
+    "frame": 3
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      7,
+      21
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".....a..........................",
+      "..aaaba......a.....a............",
+      ".acbbbbaa...aca...aca...........",
+      ".abbcbbaca..acba..aca...........",
+      "accbbcaccba.acbba.acba..........",
+      "acbbaaaacbaaacbcaaacbca.........",
+      "accbbaddcceefcfddefcfddaaaaaa...",
+      ".acbbeffffefffffeeffffdeddddda..",
+      ".acccefffeefffffeeffffeeffffdga.",
+      "..aacefffeefffffeeffffeffhffdgba",
+      "....aefffeefffffeefffeeefffhigbb",
+      "....aeeeeeeeeeeeeeeeeeeefffhhgcc",
+      ".....ajjggejjgggkjjgggeeefdbbgaa",
+      "......ajjkjajjggkejjggkeeecbbba.",
+      ".......aakkaajjjkkajjjkaaacccbba",
+      ".......akka..aaaalaaaakka.aaccbb",
+      ".......aka.......a....aka...accc",
+      ".......ala............ala....aac",
+      "........a..............a.......a",
+      "................................",
+      "................................"
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      },
+      "c": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "tone": "dark"
+      },
+      "d": "body.light",
+      "e": "body.dark",
+      "f": "body",
+      "g": {
+       "rule": "mix",
+       "of": {
+        "rule": "tone",
+        "of": "accent",
+        "by": -0.75
+       },
+       "with": {
+        "rule": "mix",
+        "of": "#241a3a",
+        "with": "#241a3a",
+        "amount": 0
+       },
+       "amount": 0.12
+      },
+      "h": "glow",
+      "i": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      },
+      "j": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": {
+         "rule": "tone",
+         "of": "accent",
+         "by": -0.75
+        },
+        "with": {
+         "rule": "mix",
+         "of": "#241a3a",
+         "with": "#241a3a",
+         "amount": 0
+        },
+        "amount": 0.12
+       },
+       "tone": "dark"
+      },
+      "k": "accent",
+      "l": "accent.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      39,
+      21
+     ],
+     "anchor": "tl",
+     "rows": [
+      "....",
+      "....",
+      "....",
+      "....",
+      "....",
+      "....",
+      "....",
+      "....",
+      "....",
+      "aa..",
+      "bba.",
+      "ccca",
+      "aaa.",
+      "....",
+      "....",
+      "a...",
+      "ba..",
+      "cba.",
+      "ccca",
+      "aaca",
+      "..a."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      },
+      "c": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "tone": "dark"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "body": "body",
+    "accent": "accent",
+    "lit": "glow",
+    "at": [
+     10,
+     12
+    ],
+    "picture": "attack-up",
+    "length": "short",
+    "horns": "none",
+    "tail": "club"
+   },
+   "ctx": {
+    "frame": 4
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      -2,
+      -12
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..........aaaaa..........",
+      ".........abbbbba.........",
+      "........accccccca........",
+      ".......acbbbbbbbca.......",
+      ".....a.adddddddbba.a.....",
+      "....aeacdddcddddbbaea....",
+      "....aeecddcfcccccbeea....",
+      "...aeaacddcfgggggcaaea...",
+      "...aeeacddcfgggggcaeea...",
+      "..aeeeeccdcffgggcbeeeea..",
+      "..aeaaaeccccfgggceaaaea..",
+      "..aeaaaeeahcffffgeaaaea..",
+      ".aeeaeeaa.aaaaaffaeeaeea.",
+      ".aeaaea........aa.aeaaea.",
+      ".aeaaea...........aeaaea.",
+      "aeaaea.............aeaaea",
+      "aiaaea.............aeaaia",
+      ".a.aea.............aea.a.",
+      "...aea.............aea...",
+      "..aea...............aea..",
+      "..aea...............aea..",
+      "..aia...............aia..",
+      "...a.................a..."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body.light",
+      "c": "body.dark",
+      "d": "body",
+      "e": "accent",
+      "f": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "tone": "dark"
+      },
+      "g": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      },
+      "h": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": {
+         "rule": "tone",
+         "of": "accent",
+         "by": -0.75
+        },
+        "with": {
+         "rule": "mix",
+         "of": "#241a3a",
+         "with": "#241a3a",
+         "amount": 0
+        },
+        "amount": 0.12
+       },
+       "tone": "dark"
+      },
+      "i": "accent.dark"
+     }
+    }
+   ]
+  }
+ ]
+}

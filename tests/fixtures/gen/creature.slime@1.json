@@ -1,0 +1,247 @@
+{
+ "id": "creature.slime",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     22,
+     42
+    ],
+    "picture": "hop",
+    "body": "body"
+   },
+   "ctx": {
+    "frame": 3
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      14,
+      18
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".....aaaaaa.....",
+      "....abbbbbba....",
+      "...acbbbbbbba...",
+      "..acbbbbbbbbba..",
+      "..acbbbbbdbbba..",
+      ".accbbbbbbbddba.",
+      ".acbbbbbbbbbdba.",
+      ".acbbbbbbbbbbba.",
+      "accbbbbbbbbbbbba",
+      "accbbbbaebbaebba",
+      "accbbbbaabbaabba",
+      "acccbbbaabbaabba",
+      "acccbbbbbbfbbbba",
+      ".accbbbbbbbbbba.",
+      ".accbbbbbbbbbba.",
+      ".acccbbbbbbbbba.",
+      ".acccccccccccca.",
+      "..acccccccccca..",
+      "...aaaaaaaaaa..."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body",
+      "c": "body.dark",
+      "d": "body.light",
+      "e": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      },
+      "f": {
+       "rule": "tone",
+       "of": "body",
+       "by": -1.6
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     22,
+     42
+    ],
+    "picture": "attack",
+    "size": 1,
+    "shape": 1,
+    "eyes": "one",
+    "topping": "crown",
+    "shine": false,
+    "body": "body",
+    "wobble": 1,
+    "hop": 0
+   },
+   "ctx": {
+    "frame": 4
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      24,
+      8
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".............a..a.a....",
+      "............abaababa...",
+      "............acddddda...",
+      "............acccccca...",
+      ".............aaaeeea...",
+      "............aaeeeeeea..",
+      "...........aeeeeeeeeea.",
+      "..........aeeeeeeeeeea.",
+      ".........aeeeeeeeeeeeea",
+      "........afeeeeeeeeeeeea",
+      ".......afeeeeeeeeeeeeea",
+      ".......aeeeeeeeeeeeeeea",
+      "......afeeeeeeeeeeeeeea",
+      ".....afeeeeeeeeeeeeeeea",
+      ".....afeeeeeeeeeeeeeea.",
+      "....afeeeeeeeeeeeeeeea.",
+      "....afeeeeeeeeeeeeeeea.",
+      "...afeeeeeeaaeeaaeeeea.",
+      "...afeeeeeeeaeeeaeeea..",
+      "..affeeeeeeaaeeaaeeea..",
+      "..afeeeeeeeaaeeaaeeea..",
+      "..afeeeeeeeeeeeeeeea...",
+      ".affeeeeeeeeeeeeeeea...",
+      ".affeeeeeeeeeeeeeea....",
+      ".afeeeeeeeeeeeeeeea....",
+      ".afeeeeeeeeeeeeeeea....",
+      "affeeeeeeeeeeeeeea.....",
+      "affeeeeeeeeeeeeea......",
+      "affeeeeeeeeeeeeea......",
+      "affeeeeeeeeeeeea.......",
+      "afffffffffffffa........",
+      "affffffffffffa........."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#e6c545",
+        "with": "#e6c545",
+        "amount": 0
+       },
+       "tone": "light"
+      },
+      "c": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#e6c545",
+        "with": "#e6c545",
+        "amount": 0
+       },
+       "tone": "dark"
+      },
+      "d": {
+       "rule": "mix",
+       "of": "#e6c545",
+       "with": "#e6c545",
+       "amount": 0
+      },
+      "e": "body",
+      "f": "body.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      24,
+      40
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aaaaaaaaaaaa.........."
+     ],
+     "key": {
+      "a": "ink"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     20,
+     40
+    ],
+    "picture": "die",
+    "size": 0,
+    "shape": 0,
+    "eyes": "sleepy",
+    "topping": "bow",
+    "body": "body"
+   },
+   "ctx": {
+    "frame": 5
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      5,
+      21
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..........aa....a..........",
+      ".........abca..aca.........",
+      ".........acca..abca.a......",
+      ".....aa...aa...aca.aca.....",
+      "....abca........a.acbca....",
+      "....acca..........accca....",
+      ".aaa.aa............aca.....",
+      "acbca...............a....a.",
+      "accca...................aba",
+      "acca...................acca",
+      ".aa.....................aa.",
+      "...........................",
+      "...........................",
+      ".........a......a..........",
+      "........ada....aea.........",
+      "........adea.aaeea.........",
+      ".....aaaadeeadddeaaaa......",
+      "...aaffffddffffddfbbfaa....",
+      "..affffffffffffffffffffa...",
+      "...aaaaaaaaaaaaaaaaaaaa...."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body.light",
+      "c": "body",
+      "d": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#e0609a",
+        "with": "#e0609a",
+        "amount": 0
+       },
+       "tone": "dark"
+      },
+      "e": {
+       "rule": "mix",
+       "of": "#e0609a",
+       "with": "#e0609a",
+       "amount": 0
+      },
+      "f": "body.dark"
+     }
+    }
+   ]
+  }
+ ]
+}

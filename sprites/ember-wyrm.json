@@ -1,0 +1,66 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "ember-wyrm",
+ "name": "Ember wyrm",
+ "blurb": "A boss: a long-necked dragon crouched on four legs that bites, breathes fire and beats its wings. Change its size, neck, bulk, spines, wings, horns, tail and colours.",
+ "meta": {"type":"creature","role":"characters/boss","themes":["fantasy","dungeon"],"gameTypes":["turn-based-rpg","platformer"],"view":"side","words":["dragon","wyrm","drake","wyvern","monster","wings","horns","bite","fire breath","burn","buffet","roar","boss fight","scaly"],"license":"draft"},
+ "size": [128,96],
+ "pivot": [56,90],
+ "grounded": false,
+ "preview": "idle",
+ "styles": ["pixel"],
+ "palette": [
+  {"id":"body","label":"Hide","default":"#c9423a","material":"skin","swatches":["#c9423a","#4f9d57","#7a4fc4","#8e3a4a","#2f8f9d","#3f6fd1"]},
+  {"id":"accent","label":"Belly and wings","default":"#e6c96a","material":"skin","swatches":["#e6c96a","#d8d8e0","#c9a06a","#a8a4a0","#f2c230"]},
+  {"id":"glow","label":"Fire","default":"#e8662c","material":"fire","swatches":["#e8662c","#4fd8ee","#7aa0f4","#f4e06a","#7fe0a0"]}
+ ],
+ "controls": [
+  {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+  {"key":"length","kind":"range","label":"Neck","lo":"Short","hi":"Long","default":0.5},
+  {"key":"bulk","kind":"range","label":"Bulk","lo":"Lean","hi":"Heavy","default":0.5},
+  {"key":"spines","kind":"choice","label":"Spines","options":["none","ridge","sails"],"default":"ridge"},
+  {"key":"wings","kind":"choice","label":"Wings","options":["large","small","tattered","none"],"default":"large"},
+  {"key":"wingSpan","kind":"range","label":"Span","lo":"Small","hi":"Wide","min":0.65,"max":1.35,"step":0.05,"default":1},
+  {"key":"horns","kind":"choice","label":"Horns","options":["swept","ram","crown","none"],"default":"swept"},
+  {"key":"hornLength","kind":"range","label":"Length","lo":"Short","hi":"Long","min":0.65,"max":1.35,"step":0.05,"default":1},
+  {"key":"tail","kind":"choice","label":"Tail","options":["spade","club","flame"],"default":"spade"},
+  {"key":"tailLength","kind":"range","label":"Length","lo":"Short","hi":"Long","min":0.65,"max":1.35,"step":0.05,"default":1},
+  {"key":"body","kind":"colour","label":"Hide"},
+  {"key":"accent","kind":"colour","label":"Belly and wings"},
+  {"key":"glow","kind":"colour","label":"Fire"},
+  {"key":"bounce","kind":"range","label":"Bounce","lo":"Calm","hi":"Bouncy","default":0.5,"group":"Motion"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "parts": {"wings":{"label":"Wings","params":["wings","wingSpan"],"none":"none","socket":"back"},"horns":{"label":"Horns","params":["horns","hornLength"],"none":"none","socket":"head"},"tail":{"label":"Tail","params":["tail","tailLength"],"socket":"tail"}},
+ "points": [
+  {"id":"head","on":"head","at":[0,0]},
+  {"id":"back","on":"back","at":[0,0]},
+  {"id":"tail","on":"tail","at":[0,0]},
+  {"id":"feet","on":"feet","at":[0,0]},
+  {"id":"muzzle","on":"muzzle","at":[0,0]}
+ ],
+ "body": { "pictures": {
+  "nodes": [
+   {"id":"body","parent":null,"at":[56,90]},
+   {"id":"head","parent":null,"at":[0,0]},
+   {"id":"back","parent":null,"at":[0,0]},
+   {"id":"tail","parent":null,"at":[0,0]},
+   {"id":"feet","parent":null,"at":[0,0]},
+   {"id":"muzzle","parent":null,"at":[0,0]}
+  ],
+  "draw": [
+   {"id":"creature","gen":"beast.quadruped","v":1,"on":"body","at":[0,0],"size":{"from":"size","map":[[0,0],[1,1]]},"length":{"from":"length","map":[[0,0],[1,1]]},"bulk":{"from":"bulk","map":[[0,0],[1,1]]},"spines":{"from":"spines","pick":{"none":"none","ridge":"ridge","sails":"sails"}},"wings":{"from":"wings","pick":{"large":"large","small":"small","tattered":"tattered","none":"none"}},"wingSpan":{"from":"wingSpan","map":[[0.65,0.65],[1.35,1.35]]},"horns":{"from":"horns","pick":{"swept":"swept","ram":"ram","crown":"crown","none":"none"}},"hornLength":{"from":"hornLength","map":[[0.65,0.65],[1.35,1.35]]},"tail":{"from":"tail","pick":{"spade":"spade","club":"club","flame":"flame"}},"tailLength":{"from":"tailLength","map":[[0.65,0.65],[1.35,1.35]]},"body":"body","accent":"accent","lit":"glow","bounce":{"from":"bounce","map":[[0,0],[1,1]]}}
+  ],
+  "motion": [
+   {"gen":"beast.quadruped.points","v":1,"at":[56,90],"size":{"from":"size","map":[[0,0],[1,1]]},"length":{"from":"length","map":[[0,0],[1,1]]},"bulk":{"from":"bulk","map":[[0,0],[1,1]]},"spines":{"from":"spines","pick":{"none":"none","ridge":"ridge","sails":"sails"}},"wings":{"from":"wings","pick":{"large":"large","small":"small","tattered":"tattered","none":"none"}},"wingSpan":{"from":"wingSpan","map":[[0.65,0.65],[1.35,1.35]]},"horns":{"from":"horns","pick":{"swept":"swept","ram":"ram","crown":"crown","none":"none"}},"hornLength":{"from":"hornLength","map":[[0.65,0.65],[1.35,1.35]]},"tail":{"from":"tail","pick":{"spade":"spade","club":"club","flame":"flame"}},"tailLength":{"from":"tailLength","map":[[0.65,0.65],[1.35,1.35]]},"bounce":{"from":"bounce","map":[[0,0],[1,1]]}}
+  ] } },
+ "clips": {
+  "idle": {"frames":8,"fps":7,"label":"Idle"},
+  "attack": {"frames":12,"fps":11,"loop":false,"label":"Bite","sounds":[{"sound":"punch","preset":"Heavy body blow","frame":7,"volume":1}]},
+  "breath": {"frames":12,"fps":11,"loop":false,"label":"Fire breath","sounds":[{"sound":"wyrm-roar","preset":"Fire breath","frame":1,"volume":1}]},
+  "buffet": {"frames":10,"fps":11,"loop":false,"label":"Wing buffet","sounds":[{"sound":"whoosh","preset":"Heavy swing","frame":4,"volume":1}]},
+  "hurt": {"frames":4,"fps":9,"loop":false,"label":"Hurt","sounds":[{"sound":"punch","preset":"Heavy body blow","frame":0,"volume":0.9}]},
+  "die": {"frames":12,"fps":10,"loop":false,"label":"Die","sounds":[{"sound":"wyrm-roar","preset":"Distant growl","frame":0,"volume":1},{"sound":"monster-fade","preset":"Big beast falls","frame":8,"volume":1}]}
+ }
+}

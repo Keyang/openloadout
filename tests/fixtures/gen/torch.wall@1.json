@@ -1,0 +1,465 @@
+{
+ "id": "torch.wall",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     16,
+     34
+    ],
+    "glowColour": "glow",
+    "metal": "metal"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      5,
+      5
+     ],
+     "anchor": "tl",
+     "rows": [
+      "........a......a........",
+      "........b......b........",
+      "........b......b.b......",
+      "........................",
+      "...........b.bb.........",
+      "..a..........cb......a..",
+      "...b........cac.....b...",
+      "..........ccaac.........",
+      "........dcaaaac.........",
+      "........caaaaac.........",
+      ".......caabbaac.........",
+      ".......caabbbaac........",
+      ".bb.....cabbbaac.....bb.",
+      "aa......cabbbbac......aa",
+      ".......caabbdbbac.......",
+      ".......cabbdddbaac......",
+      ".......caabbbbbac.......",
+      "........ccaaaaac........",
+      ".....b..efccccce..b.....",
+      "....ab..efggggge..ba....",
+      "........eeeeeeee........",
+      ".......eehiiiiie........",
+      "......ejehhhhhhe........",
+      "......ejheeeeeee........",
+      "......ejheklleme........",
+      "......ejheklleme........",
+      "......eeeeeeeeee........",
+      ".....ehiiiiiiiiie.......",
+      ".....ehmmhhhhhmie.......",
+      ".....ehhhhhhhhhhe.......",
+      "......eeeeeeeeee........",
+      "......ejekllehme........"
+     ],
+     "key": {
+      "a": "glow",
+      "b": {
+       "rule": "mix",
+       "of": {
+        "rule": "tone",
+        "of": "glow",
+        "by": 1.6
+       },
+       "with": "glow",
+       "amount": 0.5
+      },
+      "c": {
+       "rule": "tone",
+       "of": "glow",
+       "by": -1
+      },
+      "d": {
+       "rule": "tone",
+       "of": "glow",
+       "by": 1.6
+      },
+      "e": "ink",
+      "f": {
+       "rule": "mix",
+       "of": {
+        "rule": "mix",
+        "of": "#7a4f33",
+        "with": "#7a4f33",
+        "amount": 0
+       },
+       "with": "ink",
+       "amount": 0.6
+      },
+      "g": {
+       "rule": "mix",
+       "of": "glow",
+       "with": {
+        "rule": "mix",
+        "of": {
+         "rule": "mix",
+         "of": "#7a4f33",
+         "with": "#7a4f33",
+         "amount": 0
+        },
+        "with": "ink",
+        "amount": 0.6
+       },
+       "amount": 0.45
+      },
+      "h": "metal.dark",
+      "i": "metal.light",
+      "j": {
+       "rule": "tone",
+       "of": "metal",
+       "by": -1.8
+      },
+      "k": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#a06a3c",
+        "with": "#a06a3c",
+        "amount": 0
+       },
+       "tone": "dark"
+      },
+      "l": {
+       "rule": "mix",
+       "of": "#a06a3c",
+       "with": "#a06a3c",
+       "amount": 0
+      },
+      "m": "metal"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      5,
+      37
+     ],
+     "anchor": "tl",
+     "rows": [
+      "......abacddaefa........",
+      "......abacddaefa........",
+      "......abacddaefa........",
+      "......abacddaefa........",
+      "......abacddaefa........",
+      ".......aacddaba.........",
+      "........acccaa..........",
+      ".........aaa............"
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "tone",
+       "of": "metal",
+       "by": -1.8
+      },
+      "c": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#a06a3c",
+        "with": "#a06a3c",
+        "amount": 0
+       },
+       "tone": "dark"
+      },
+      "d": {
+       "rule": "mix",
+       "of": "#a06a3c",
+       "with": "#a06a3c",
+       "amount": 0
+      },
+      "e": "metal.dark",
+      "f": "metal"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     34
+    ],
+    "glowColour": "glow",
+    "metal": "metal",
+    "picture": "out"
+   },
+   "ctx": {
+    "t": 0.4,
+    "loop": false,
+    "frames": 6,
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      10,
+      19
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".....aaaa...",
+      "....abbbba..",
+      "...acbbbbba.",
+      "...acbbbbba.",
+      "...acbbbbba.",
+      "...acbbbbba.",
+      "...aaaaaaaa.",
+      "..aadeeeeea.",
+      ".afadddddda.",
+      ".afdaaaaaaa.",
+      ".afdaghhaia.",
+      ".afdaghhaia.",
+      ".aaaaaaaaaa.",
+      "adeeeeeeeeea",
+      "adiidddddiea",
+      "adddddddddda",
+      ".aaaaaaaaaa.",
+      ".afaghhadia.",
+      ".afaghhadia.",
+      ".afaghhadia.",
+      ".afaghhadia.",
+      ".afaghhadia.",
+      ".afaghhadia.",
+      "..aaghhafa..",
+      "...agggaa...",
+      "....aaa....."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "mix",
+       "of": {
+        "rule": "mix",
+        "of": "#7a4f33",
+        "with": "#7a4f33",
+        "amount": 0
+       },
+       "with": "ink",
+       "amount": 0.6
+      },
+      "c": {
+       "rule": "tone",
+       "of": {
+        "rule": "mix",
+        "of": {
+         "rule": "mix",
+         "of": "#7a4f33",
+         "with": "#7a4f33",
+         "amount": 0
+        },
+        "with": "ink",
+        "amount": 0.6
+       },
+       "by": -0.6
+      },
+      "d": "metal.dark",
+      "e": "metal.light",
+      "f": {
+       "rule": "tone",
+       "of": "metal",
+       "by": -1.8
+      },
+      "g": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#a06a3c",
+        "with": "#a06a3c",
+        "amount": 0
+       },
+       "tone": "dark"
+      },
+      "h": {
+       "rule": "mix",
+       "of": "#a06a3c",
+       "with": "#a06a3c",
+       "amount": 0
+      },
+      "i": "metal"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     34
+    ],
+    "glowColour": "glow",
+    "metal": "metal",
+    "picture": "ignite"
+   },
+   "ctx": {
+    "t": 0.375,
+    "loop": true,
+    "frames": 8,
+    "frame": 3
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      8,
+      7
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a.............",
+      ".......bb.....",
+      "......bccb....",
+      "......bccb....",
+      "......accbaa..",
+      "......bcccbb..",
+      "......bccaccba",
+      "......bccacccb",
+      ".....bccaaaccb",
+      ".....bccaaacab",
+      ".....bcaaaaccb",
+      ".a..bcaaddacb.",
+      "....bcaaddacb.",
+      "....bcadddaccb",
+      "....bccaaaaacb",
+      ".....bbcccccb.",
+      ".....efbbbbbe.",
+      ".....efggggge.",
+      ".....eeeeeeee.",
+      "....eehiiiiie.",
+      "...ejehhhhhhe.",
+      "...ejheeeeeee.",
+      "...ejheklleme.",
+      "...ejheklleme.",
+      "...eeeeeeeeee.",
+      "..ehiiiiiiiiie",
+      "..ehmmhhhhhmie",
+      "..ehhhhhhhhhhe",
+      "...eeeeeeeeee.",
+      "...ejekllehme.",
+      "...ejekllehme.",
+      "...ejekllehme."
+     ],
+     "key": {
+      "a": {
+       "rule": "mix",
+       "of": {
+        "rule": "tone",
+        "of": "glow",
+        "by": 1.6
+       },
+       "with": "glow",
+       "amount": 0.5
+      },
+      "b": {
+       "rule": "tone",
+       "of": "glow",
+       "by": -1
+      },
+      "c": "glow",
+      "d": {
+       "rule": "tone",
+       "of": "glow",
+       "by": 1.6
+      },
+      "e": "ink",
+      "f": {
+       "rule": "mix",
+       "of": {
+        "rule": "mix",
+        "of": "#7a4f33",
+        "with": "#7a4f33",
+        "amount": 0
+       },
+       "with": "ink",
+       "amount": 0.6
+      },
+      "g": {
+       "rule": "mix",
+       "of": "glow",
+       "with": {
+        "rule": "mix",
+        "of": {
+         "rule": "mix",
+         "of": "#7a4f33",
+         "with": "#7a4f33",
+         "amount": 0
+        },
+        "with": "ink",
+        "amount": 0.6
+       },
+       "amount": 0.45
+      },
+      "h": "metal.dark",
+      "i": "metal.light",
+      "j": {
+       "rule": "tone",
+       "of": "metal",
+       "by": -1.8
+      },
+      "k": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#a06a3c",
+        "with": "#a06a3c",
+        "amount": 0
+       },
+       "tone": "dark"
+      },
+      "l": {
+       "rule": "mix",
+       "of": "#a06a3c",
+       "with": "#a06a3c",
+       "amount": 0
+      },
+      "m": "metal"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      8,
+      39
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...abacddaefa.",
+      "...abacddaefa.",
+      "...abacddaefa.",
+      "....aacddaba..",
+      ".....acccaa...",
+      "......aaa....."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "tone",
+       "of": "metal",
+       "by": -1.8
+      },
+      "c": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#a06a3c",
+        "with": "#a06a3c",
+        "amount": 0
+       },
+       "tone": "dark"
+      },
+      "d": {
+       "rule": "mix",
+       "of": "#a06a3c",
+       "with": "#a06a3c",
+       "amount": 0
+      },
+      "e": "metal.dark",
+      "f": "metal"
+     }
+    }
+   ]
+  }
+ ]
+}

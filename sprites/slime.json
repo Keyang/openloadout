@@ -1,0 +1,40 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "slime",
+ "name": "Slime",
+ "blurb": "A bouncy blob. Pick a colour, a face and something to wear.",
+ "meta": {"type":"creature","role":"characters/enemy","themes":["fantasy","dungeon","candy"],"gameTypes":["platformer","turn-based-rpg"],"view":"side","words":["slime","blob","goo","jelly","ooze","gel","enemy","monster","bounce","hop","squish","jump"],"license":"draft"},
+ "size": [48,48],
+ "pivot": [22,42],
+ "grounded": true,
+ "preview": "hop",
+ "styles": ["pixel"],
+ "palette": [
+  {"id":"body","label":"Colour","default":"#5fc46b","material":"paint","swatches":["#5fc46b","#3fb3c9","#4f7fe0","#9a62d6","#e0609a","#e2574c","#e89a35","#e6cf4a","#8a93a6"]}
+ ],
+ "controls": [
+  {"key":"size","kind":"range","label":"Size","lo":"Tiny","hi":"Huge","default":0.5},
+  {"key":"shape","kind":"range","label":"Shape","lo":"Flat","hi":"Tall","default":0.5},
+  {"key":"eyes","kind":"choice","label":"Eyes","options":["cute","dots","angry","sleepy","one"],"default":"cute"},
+  {"key":"topping","kind":"choice","label":"On top","options":["none","crown","sprout","horns","bow"],"default":"none"},
+  {"key":"shine","kind":"toggle","label":"Shine","default":true},
+  {"key":"body","kind":"colour","label":"Colour"},
+  {"key":"wobble","kind":"range","label":"Wobble","lo":"Firm","hi":"Jelly","default":0.5,"group":"Motion"},
+  {"key":"hop","kind":"range","label":"Hop height","lo":"Low","hi":"High","default":0.5,"group":"Motion"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": { "pictures": {
+  "nodes": [{"id":"body","parent":null,"at":[22,42]}],
+  "draw": [
+   {"id":"creature","gen":"creature.slime","v":1,"on":"body","at":[0,0],"picture":"clip","size":{"from":"size"},"shape":{"from":"shape"},"eyes":{"from":"eyes"},"topping":{"from":"topping"},"shine":{"from":"shine"},"body":"body","wobble":{"from":"wobble"},"hop":{"from":"hop"}}
+  ]
+ } },
+ "clips": {
+  "idle": {"frames":8,"fps":8},
+  "hop": {"frames":8,"fps":11,"sounds":[{"sound":"jump","frame":1,"preset":"Tiny hop"},{"sound":"footstep-gravel","frame":6,"preset":"Sneaking"}]},
+  "attack": {"frames":8,"fps":13,"loop":false,"sounds":[{"sound":"whoosh","frame":3,"preset":"Quick swipe"}]},
+  "hurt": {"frames":4,"fps":9,"loop":false,"sounds":[{"sound":"punch","frame":0,"preset":"Light jab"}]},
+  "die": {"frames":8,"fps":10,"loop":false,"sounds":[{"sound":"enemy-squish","frame":0,"preset":"Squish","volume":1}]}
+ }
+}

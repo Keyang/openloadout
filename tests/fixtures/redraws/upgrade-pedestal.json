@@ -1,0 +1,211 @@
+{
+ "id": "upgrade-pedestal",
+ "frozen": "2026-11-20",
+ "source": "sprites/upgrade-pedestal.js",
+ "sha256": "acdc7c53bcfa398189037d4328f58673e21425742f21540e035047d70b60a5ee",
+ "name": "Upgrade pedestal",
+ "blurb": "A stand that offers an upgrade as a turning hologram, which streaks away when it is taken. Change the stand, the hologram, its size, float and colours.",
+ "meta": {
+  "type": "prop",
+  "role": "world/prop",
+  "themes": [
+   "sci-fi",
+   "space"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "shooter"
+  ],
+  "view": "top-down",
+  "words": [
+   "pedestal",
+   "upgrade",
+   "hologram",
+   "altar",
+   "stand",
+   "shop",
+   "powerup",
+   "reward",
+   "choose",
+   "activate",
+   "take",
+   "projector",
+   "glowing"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  48
+ ],
+ "pivot": [
+  16,
+  46
+ ],
+ "grounded": true,
+ "preview": "idle",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "pillar",
+   "options": [
+    {
+     "value": "pillar",
+     "label": "Pillar"
+    },
+    {
+     "value": "ring",
+     "label": "Ring"
+    },
+    {
+     "value": "claw",
+     "label": "Claw"
+    }
+   ],
+   "group": "Look"
+  },
+  "shape": {
+   "kind": "choice",
+   "label": "Hologram",
+   "def": "cube",
+   "options": [
+    {
+     "value": "cube",
+     "label": "Cube"
+    },
+    {
+     "value": "orb",
+     "label": "Orb"
+    },
+    {
+     "value": "arrow",
+     "label": "Arrow"
+    },
+    {
+     "value": "star",
+     "label": "Star"
+    }
+   ],
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Body",
+   "def": "#6b7896",
+   "swatches": [
+    "#6b7896",
+    "#566182",
+    "#434d6d",
+    "#3f6fd1",
+    "#2fb3a8",
+    "#4f9ff0"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Lights",
+   "def": "#2fb3a8",
+   "swatches": [
+    "#2fb3a8",
+    "#f2a030",
+    "#e2473f",
+    "#3f6fd1",
+    "#5fe0f0",
+    "#9fe040"
+   ],
+   "group": "Colors"
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Hologram colour",
+   "def": "#b48af8",
+   "swatches": [
+    "#b48af8",
+    "#5fe0f0",
+    "#e2473f",
+    "#9fe040",
+    "#f2a030",
+    "#4f9ff0",
+    "#5fd47a"
+   ],
+   "group": "Colors"
+  },
+  "bob": {
+   "kind": "range",
+   "label": "Float",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Still",
+   "hi": "Floaty",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    8,
+    12
+   ]
+  },
+  "activate": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  },
+  "taken": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  }
+ },
+ "sounds": {
+  "activate": [
+   {
+    "sound": "upgrade-get",
+    "preset": "Upgrade",
+    "frame": 1
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-roguelite-scifi"
+ ]
+}

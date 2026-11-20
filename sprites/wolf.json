@@ -1,0 +1,48 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "wolf",
+ "name": "Wolf",
+ "blurb": "A four-legged hunter. Reshape it into a wolf, a fox or a husky.",
+ "meta": {"type":"creature","role":"characters/enemy","themes":["fantasy","forest"],"gameTypes":["platformer","turn-based-rpg"],"view":"side","words":["wolf","fox","husky","dog","beast","animal","enemy","monster","hunter","predator","run","bite","pounce"],"license":"draft"},
+ "size": [64,48],
+ "pivot": [27,43],
+ "grounded": true,
+ "preview": "run",
+ "styles": ["pixel"],
+ "palette": [
+  {"id":"fur","label":"Fur","default":"#8a93a6","material":"skin","swatches":["#8a93a6","#5b6272","#d9772b","#a8502a","#8a5a3a","#c9a26b","#e8e6e0","#3a3644"]},
+  {"id":"belly","label":"Belly and markings","default":"#f0ead8","material":"skin","swatches":["#f0ead8","#ffffff","#c9ccd6","#e6c796","#3a3350","#6b4a3a"]},
+  {"id":"eyes","label":"Eyes","default":"#f2c230","material":"light","swatches":["#f2c230","#e08a2c","#7fd0f0","#8fd16a","#e2574c","#f0ead8"]}
+ ],
+ "controls": [
+  {"key":"size","kind":"range","label":"Body size","lo":"Small","hi":"Big","default":0.55},
+  {"key":"legs","kind":"range","label":"Leg length","lo":"Short","hi":"Long","default":0.55},
+  {"key":"snout","kind":"range","label":"Snout","lo":"Short","hi":"Long","default":0.55},
+  {"key":"ears","kind":"choice","label":"Ears","options":["pointy","tall","floppy"],"default":"pointy"},
+  {"key":"tail","kind":"choice","label":"Tail","options":["hanging","brush","curled"],"default":"hanging"},
+  {"key":"fluff","kind":"range","label":"Fluffiness","lo":"Sleek","hi":"Fluffy","default":0.6},
+  {"key":"markings","kind":"choice","label":"Markings","options":["plain","belly","socks","mask"],"default":"belly"},
+  {"key":"fur","kind":"colour","label":"Fur"},
+  {"key":"belly","kind":"colour","label":"Belly and markings","when":{"markings":["belly","socks","mask"]}},
+  {"key":"eyes","kind":"colour","label":"Eyes"},
+  {"key":"stride","kind":"range","label":"Step size","lo":"Small steps","hi":"Big steps","default":0.5,"group":"Motion"},
+  {"key":"bounce","kind":"range","label":"Bounce","lo":"Smooth","hi":"Bouncy","default":0.5,"group":"Motion"},
+  {"key":"wag","kind":"range","label":"Tail wag","lo":"Still","hi":"Waggy","default":0.4,"group":"Motion"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": { "pictures": {
+  "nodes": [{"id":"body","parent":null,"at":[27,43]}],
+  "draw": [
+   {"id":"creature","gen":"creature.wolf","v":1,"on":"body","at":[0,0],"picture":"clip","size":{"from":"size"},"legs":{"from":"legs"},"snout":{"from":"snout"},"ears":{"from":"ears"},"tail":{"from":"tail"},"fluff":{"from":"fluff"},"markings":{"from":"markings"},"fur":"fur","belly":"belly","eyes":"eyes","stride":{"from":"stride"},"bounce":{"from":"bounce"},"wag":{"from":"wag"}}
+  ]
+ } },
+ "clips": {
+  "idle": {"frames":8,"fps":6},
+  "walk": {"frames":8,"fps":9,"sounds":[{"sound":"footstep-gravel","frame":0,"preset":"Sneaking"},{"sound":"footstep-gravel","frame":4,"preset":"Sneaking"}]},
+  "run": {"frames":8,"fps":14,"sounds":[{"sound":"footstep-gravel","frame":1,"preset":"Boots"},{"sound":"footstep-gravel","frame":5,"preset":"Boots"}]},
+  "attack": {"frames":8,"fps":12,"loop":false,"sounds":[{"sound":"whoosh","frame":2,"preset":"Quick swipe"},{"sound":"punch","frame":4,"preset":"Light jab"}]},
+  "hurt": {"frames":4,"fps":9,"loop":false,"sounds":[{"sound":"punch","frame":0,"preset":"Light jab"}]},
+  "die": {"frames":8,"fps":10,"loop":false,"sounds":[{"sound":"punch","frame":0,"preset":"Heavy body blow","volume":1},{"sound":"land-thud","frame":5,"preset":"Heavy landing","volume":1}]}
+ }
+}

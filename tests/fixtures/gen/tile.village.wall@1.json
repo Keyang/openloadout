@@ -1,0 +1,227 @@
+{
+ "id": "tile.village.wall",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "piece": "wall-left",
+    "stone": "stone",
+    "growth": "growth",
+    "cap": "cap",
+    "capJoint": "capJoint",
+    "capLit": "capLit",
+    "capGlint": "capGlint",
+    "faceBody": "faceBody",
+    "mossFoot": "mossFoot"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      0,
+      0
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "acbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "accbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "acccdddddcdddddddddddddddcdddddd",
+      "acccdddddcdddddddddddddddcdddddd",
+      "acccdddddcdddddddddddddddcdddddd",
+      "acccdddddcdddddddddddddddcdddddd",
+      "acccdddddcdddddddddddddddcdddddd",
+      "acccdddddcdddddddddddddddcdddddd",
+      "acccdddddcdddddddddddddddcdddddd",
+      "acccdddddcdddddddddddddddcdddddd",
+      "acccdddddcdddddddddddddddcdddddd",
+      "acccdddddcdddddddddddddddcdddddd",
+      "acccdddddcdddddddddddddddcdddddd",
+      "acccdddddcdddddddddddddddcdddddd",
+      "acccdddddcdddddddddddddddcdddddd",
+      "accccccccccccccccccccccccccccccc",
+      "acccddddddddddeeecdddddddddeeecd",
+      "acccddddddddddddecdddddddddddecd",
+      "acccdddddddddddddcddddddddddddcd",
+      "acccdddddddddddddcddddddddddddcd",
+      "acccdddddddddddddcddddddddddddcd",
+      "acccdddddddddddddcddddddddddddcd",
+      "acccdddddddddddddcddddddddddddcd",
+      "acccdddddddddddddcddddddddddddcd",
+      "acccdddddddddddddcddddddddddddcd",
+      "acccdddddddddddddcddddddddddddcd",
+      "acccdddddddddddddcddddddddddddcd",
+      "acccdddddddddddddcddddddddddddcd",
+      "acccdddddddddddddcddddddddddddcd",
+      "acccdddddddddddddcddddddddddddcd"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "capLit",
+      "c": "capJoint",
+      "d": "cap",
+      "e": "capGlint"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "piece": "wall-inner-tr",
+    "stone": "stone",
+    "growth": "growth",
+    "cap": "cap",
+    "capJoint": "capJoint",
+    "capLit": "capLit",
+    "capGlint": "capGlint",
+    "faceBody": "faceBody",
+    "mossFoot": "mossFoot"
+   },
+   "ctx": {
+    "t": 0.375,
+    "frame": 3,
+    "frames": 8,
+    "loop": true
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      0,
+      0
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaaaaaaaaaaaabaaaaaaaaaaaccd",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbccc",
+      "aaaaaaeeebaaaaaaaaaaaaeeebaaaccc",
+      "aaaaaaaaebaaaaaaaaaaaaaaebaacccc",
+      "aaaaaaaaabaaaaaaaaaaaaaaabaaaaaa",
+      "aaaaaaaaabaaaaaaaaaaaaaaabaaaaaa",
+      "aaaaaaaaabaaaaaaaaaaaaaaabaaaaaa",
+      "aaaaaaaaabaaaaaaaaaaaaaaabaaaaaa",
+      "aaaaaaaaabaaaaaaaaaaaaaaabaaaaaa",
+      "aaaaaaaaabaaaaaaaaaaaaaaabaaaaaa",
+      "aaaaaaaaabaaaaaaaaaaaaaaabaaaaaa",
+      "aaaaaaaaabaaaaaaaaaaaaaaabaaaaaa",
+      "aaaaaaaaabaaaaaaaaaaaaaaabaaaaaa",
+      "aaaaaaaaabaaaaaaaaaaaaaaabaaaaaa",
+      "aaaaaaaaabaaaaaaaaaaaaaaabaaaaaa",
+      "aaaaaaaaabaaaaaaaaaaaaaaabaaaaaa",
+      "aaaaaaaaabaaaaaaaaaaaaaaabaaaaaa",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "aaaaaaaaaaaaaaeeebaaaaaaaaaeeeba",
+      "aaaaaaaaaaaaaaaaebaaaaaaaaaaaeba",
+      "aaaaaaaaaaaaaaaaabaaaaaaaaaaaaba",
+      "aaaaaaaaaaaaaaaaabaaaaaaaaaaaaba",
+      "aaaaaaaaaaaaaaaaabaaaaaaaaaaaaba",
+      "aaaaaaaaaaaaaaaaabaaaaaaaaaaaaba",
+      "aaaaaaaaaaaaaaaaabaaaaaaaaaaaaba",
+      "aaaaaaaaaaaaaaaaabaaaaaaaaaaaaba",
+      "aaaaaaaaaaaaaaaaabaaaaaaaaaaaaba",
+      "aaaaaaaaaaaaaaaaabaaaaaaaaaaaaba",
+      "aaaaaaaaaaaaaaaaabaaaaaaaaaaaaba",
+      "aaaaaaaaaaaaaaaaabaaaaaaaaaaaaba",
+      "aaaaaaaaaaaaaaaaabaaaaaaaaaaaaba",
+      "aaaaaaaaaaaaaaaaabaaaaaaaaaaaaba"
+     ],
+     "key": {
+      "a": "cap",
+      "b": "capJoint",
+      "c": "capLit",
+      "d": "ink",
+      "e": "capGlint"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     40,
+     20
+    ],
+    "piece": "wall-single",
+    "stone": "stone",
+    "growth": "growth",
+    "cap": "cap",
+    "capJoint": "capJoint",
+    "capLit": "capLit",
+    "capGlint": "capGlint",
+    "faceBody": "faceBody",
+    "mossFoot": "mossFoot"
+   },
+   "ctx": {
+    "t": 0.5,
+    "frame": 4,
+    "frames": 8,
+    "loop": true
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      24,
+      4
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.",
+      "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbba",
+      "acbbbbbbbbbbbbbbbbbbbbbbbbbbbbba",
+      "accbbbbbbbbbbbbbbbbbbbbbbbbbbbba",
+      "acccdddddcdddddddddddddddcdddbba",
+      "acccdddddcdddddddddddddddcdddbba",
+      "acccdddddcdddddddddddddddcdddbba",
+      "acccdddddcdddddddddddddddcdddbba",
+      "aeeefeeeeeeeeeefeeeeeeeeeefeeeea",
+      "agggfggggggggggfggggggggggfgggga",
+      "agggfggggggggggfggggggggggfgggga",
+      "agggfggggggggggfggggggggggfgggga",
+      "agggfggggggggggfggggggggggfgggga",
+      "agggfggggggggggfggggggggggfgggga",
+      "affffffffffffffffffffffffffffffa",
+      "aeeeeeeeefeeeeeeeeeefeeeeeeeeefa",
+      "aggggggggfggggggggggfgggggggggfa",
+      "aggggggggfggggggggggfgggggggggfa",
+      "aggggggggfggggggggggfgggggggggfa",
+      "aggggggggfggggggggggfgggggggggfa",
+      "aggggggggfggggggggggfgggggggggfa",
+      "affffffffffffffffffffffffffffffa",
+      "aeefeeeeeeeeefeeeeeeeeeefeeeeeea",
+      "aggfgggggggggfggggggggggfgggggga",
+      "aggfgggggggggfggggggggggfgggggga",
+      "aggfgggggggggfggggggggggfgggggga",
+      "aggfgggggggggfgggggghgggfgggggga",
+      "agghhggggggggfggggghihhgfgggggga",
+      "agiiiigggggiifggggiiiiiifgggiiga",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj",
+      "jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "capLit",
+      "c": "capJoint",
+      "d": "cap",
+      "e": "stone",
+      "f": "stone.dark",
+      "g": "faceBody",
+      "h": "growth",
+      "i": "mossFoot",
+      "j": "stone.deep"
+     }
+    }
+   ]
+  }
+ ]
+}

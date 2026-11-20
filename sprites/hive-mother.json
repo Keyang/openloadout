@@ -1,0 +1,69 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "hive-mother",
+ "name": "Hive mother",
+ "blurb": "A boss: a bloated alien queen with a small armoured head, scythe legs and a huge pale abdomen studded with glowing egg sacs. Change her size, abdomen, legs, egg sacs, horns, wings and colours.",
+ "meta": {"type":"creature","role":"characters/boss","themes":["sci-fi","space","horror"],"gameTypes":["roguelike-action","shooter"],"view":"top-down","words":["queen","mother","hive","alien","bug","insect","brood","egg sac","stab","acid spray","spawn","enrage","boss fight","bloated"],"license":"draft"},
+ "size": [96,96],
+ "pivot": [48,88],
+ "grounded": false,
+ "preview": "idle",
+ "styles": ["pixel"],
+ "palette": [
+  {"id":"body","label":"Shell","default":"#ca9eda","material":"paint","swatches":["#ca9eda","#9aa6c0","#e8ecf2","#c2c9d6","#f2c230"]},
+  {"id":"accent","label":"Sacs","default":"#b04a8a","material":"paint","swatches":["#b04a8a","#e2473f","#3f6fd1","#6b7896"]},
+  {"id":"glow","label":"Acid","default":"#9fe040","material":"light","swatches":["#9fe040","#5fe0f0","#f2a030","#b48af8","#5fd47a","#f0ead8"]}
+ ],
+ "controls": [
+  {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+  {"key":"bulk","kind":"range","label":"Abdomen","lo":"Lean","hi":"Bloated","default":0.5},
+  {"key":"legs","kind":"choice","label":"Legs","options":["four","six","eight"],"default":"six"},
+  {"key":"pieces","kind":"range","label":"Egg sacs","lo":"Few","hi":"Many","default":0.5},
+  {"key":"horns","kind":"choice","label":"Horns","options":["crown","antlers","none"],"default":"crown"},
+  {"key":"hornLength","kind":"range","label":"Length","lo":"Short","hi":"Long","min":0.65,"max":1.35,"step":0.05,"default":1},
+  {"key":"wings","kind":"choice","label":"Wings","options":["none","stubs","veil"],"default":"none"},
+  {"key":"wingSpan","kind":"range","label":"Span","lo":"Small","hi":"Wide","min":0.65,"max":1.35,"step":0.05,"default":1},
+  {"key":"body","kind":"colour","label":"Shell"},
+  {"key":"accent","kind":"colour","label":"Sacs"},
+  {"key":"glow","kind":"colour","label":"Acid"},
+  {"key":"bounce","kind":"range","label":"Bounce","lo":"Calm","hi":"Bouncy","default":0.5,"group":"Motion"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "parts": {"horns":{"label":"Horns","params":["horns","hornLength"],"none":"none","socket":"head"},"wings":{"label":"Wings","params":["wings","wingSpan"],"none":"none","socket":"back"}},
+ "points": [
+  {"id":"head","on":"head","at":[0,0]},
+  {"id":"back","on":"back","at":[0,0]},
+  {"id":"feet","on":"feet","at":[0,0]},
+  {"id":"muzzle","on":"muzzle","at":[0,0]},
+  {"id":"spawn1","on":"spawn1","at":[0,0]},
+  {"id":"spawn2","on":"spawn2","at":[0,0]},
+  {"id":"spawn3","on":"spawn3","at":[0,0]}
+ ],
+ "body": { "pictures": {
+  "nodes": [
+   {"id":"body","parent":null,"at":[48,88]},
+   {"id":"head","parent":null,"at":[0,0]},
+   {"id":"back","parent":null,"at":[0,0]},
+   {"id":"feet","parent":null,"at":[0,0]},
+   {"id":"muzzle","parent":null,"at":[0,0]},
+   {"id":"spawn1","parent":null,"at":[0,0]},
+   {"id":"spawn2","parent":null,"at":[0,0]},
+   {"id":"spawn3","parent":null,"at":[0,0]}
+  ],
+  "draw": [
+   {"id":"creature","gen":"bug.queen","v":1,"on":"body","at":[0,0],"size":{"from":"size","map":[[0,0],[1,1]]},"bulk":{"from":"bulk","map":[[0,0],[1,1]]},"legs":{"from":"legs","pick":{"four":"four","six":"six","eight":"eight"}},"pieces":{"from":"pieces","map":[[0,0],[1,1]]},"horns":{"from":"horns","pick":{"crown":"crown","antlers":"antlers","none":"none"}},"hornLength":{"from":"hornLength","map":[[0.65,0.65],[1.35,1.35]]},"wings":{"from":"wings","pick":{"none":"none","stubs":"stubs","veil":"veil"}},"wingSpan":{"from":"wingSpan","map":[[0.65,0.65],[1.35,1.35]]},"body":"body","accent":"accent","lit":"glow","bounce":{"from":"bounce","map":[[0,0],[1,1]]}}
+  ],
+  "motion": [
+   {"gen":"bug.queen.points","v":1,"at":[48,88],"size":{"from":"size","map":[[0,0],[1,1]]},"bulk":{"from":"bulk","map":[[0,0],[1,1]]},"legs":{"from":"legs","pick":{"four":"four","six":"six","eight":"eight"}},"pieces":{"from":"pieces","map":[[0,0],[1,1]]},"horns":{"from":"horns","pick":{"crown":"crown","antlers":"antlers","none":"none"}},"hornLength":{"from":"hornLength","map":[[0.65,0.65],[1.35,1.35]]},"wings":{"from":"wings","pick":{"none":"none","stubs":"stubs","veil":"veil"}},"wingSpan":{"from":"wingSpan","map":[[0.65,0.65],[1.35,1.35]]},"bounce":{"from":"bounce","map":[[0,0],[1,1]]}}
+  ] } },
+ "clips": {
+  "idle": {"frames":8,"fps":7,"label":"Idle"},
+  "attack": {"frames":10,"fps":11,"loop":false,"label":"Stab","sounds":[{"sound":"bolt-impact","frame":6,"preset":"On flesh","volume":1}]},
+  "shoot": {"frames":12,"fps":11,"loop":false,"label":"Acid spray","sounds":[{"sound":"laser-shot","frame":5,"preset":"Alien ray","volume":1}]},
+  "spawn": {"frames":10,"fps":10,"loop":false,"label":"Spawn","sounds":[{"sound":"bug-splat","frame":4,"preset":"Mite pop","volume":1}]},
+  "enrage": {"frames":10,"fps":10,"loop":false,"label":"Enrage","sounds":[{"sound":"hive-shriek","frame":2,"preset":"Enraged","volume":1}]},
+  "hurt": {"frames":4,"fps":9,"loop":false,"label":"Hurt","sounds":[{"sound":"bolt-impact","frame":0,"preset":"On flesh","volume":0.9}]},
+  "die": {"frames":12,"fps":10,"loop":false,"label":"Die","sounds":[{"sound":"hive-shriek","frame":0,"preset":"Hive mother","volume":1},{"sound":"bug-splat","frame":7,"preset":"Big burst","volume":1}]}
+ }
+}

@@ -1,12 +1,11 @@
-// Writes sprites/scatter-pellet.json (migration batch E3). Round and spark are behaviours (shot.bar tails, glow,
-// starburst); the shard is the code's dart drawn as it drew it (engine/shots.js lightShape on a four-point kite): the
-// kite in the glow, its core (the kite less one pixel above and below, which is what lightShape's bands leave on a
+// Writes sprites/scatter-pellet.json (migration batch E3). Round is behaviours (shot.bar tails, glow); the spark
+// (build item E3b) and the shard are pictures drawn as the code drew them, pixel for pixel. The shard is the code's
+// dart drawn as it drew it (engine/shots.js lightShape on a four-point kite): the kite in the glow, its core (the kite less one pixel above and below, which is what lightShape's bands leave on a
 // dart three to five rows tall) over it, then a rim round both. shot.bar kept its ends 3 px inside the frame, so a long
 // or flickering dart could not reach where the code drew it (review of E3 round 2, issue 2). Every number of a point is
 // a table on Length, worked out from the code's own sums for each of its three dart widths (Size), each tail beat
 // (frames 0 and 2 at rest, 1 out, 3 in) and each flicker step (Flicker 1 or 2 px, and the paler flare of a wild dart).
-import { head, clip, build, B, pick, lin, oneEach } from './lib.mjs';
-import { polyIn } from '../../engine/surface.js';
+import { head, clip, build, B, pick, lin, oneEach, polyIn, capsuleIn, ellipseIn, starIn } from './lib.mjs';
 const h = head('scatter-pellet');
 h.palette.push(
   { id: 'mid', material: 'light', derive: { rule: 'mix', of: 'core', with: 'glow', amount: 0.5 } },
@@ -19,12 +18,10 @@ const tailBars = (when) => [
   { id: 'tail', gen: 'shot.bar', v: 1, clip: ['fly'], when, at: [6, 8], length: L, thick: 1, style: 'bolt', lead: 0, flicker: B('flicker', 0, 3, 'px'), paints: ['rim'] },
   { id: 'warm', gen: 'shot.bar', v: 1, clip: ['fly'], when, at: [6, 8], length: B('length', 2.5, 4.5), thick: 1, style: 'bolt', lead: B('length', 1, 2, 'px'), paints: ['glow'] } ];
 const emitters = [
-  ...tailBars({ shape: ['round', 'spark'] }),
+  ...tailBars({ shape: ['round'] }),
   // round: a ball of light, rim to core
   { id: 'ball', gen: 'glow', v: 1, clip: ['fly'], when: { shape: ['round'] }, at: [HX, 7.5], r: B('size', [[0, 2.3], [0.5, 3.2], [1, 3.4]]), paints: ['core', 'glow', 'rim'] },
   { id: 'hot', gen: 'glow', v: 1, clip: ['fly'], when: { shape: ['round'] }, at: [HX, 7.5], r: B('size', [[0, 1.1], [0.5, 1.5], [1, 1.6]]), paints: ['core'] },
-  // spark: a four-pointed star of the core, rimmed in the glow
-  { id: 'star', gen: 'starburst', v: 1, clip: ['fly'], when: { shape: ['spark'] }, at: [HX, 7.5], points: 4, r: [0, B('size', 3.5, 4.5)], width: B('size', 1.4, 2), turn: 0, paints: ['core', 'glow'] },
   // hit: a white pop, then four sparks that fly out, thin and cool
   { id: 'pop', gen: 'glow', v: 1, clip: ['hit'], at: [7.5, 7.5], r: B('size', 3.1, 4.1), paints: ['shine', 'shine', 'core', 'glow'] },
   { id: 'spark1', gen: 'starburst', v: 1, clip: ['hit'], at: [7.5, 7.5], points: 4, turn: 45, r: [0, lin('size', 4.5, 6.4, 0.8)], width: 0.9, paints: ['core', 'glow'] },
@@ -80,12 +77,66 @@ for (const { d, when: sz } of SIZES) for (const [name, beat, flick, edge] of VAR
   dartItems.push({ id: `dart${d}${name}`, kind: 'poly', points: pts('kite'), paint: `${edge}.base`, shade: 0, hidden: true, when },
     { id: `dart${d}${name}Core`, kind: 'poly', points: pts('core'), paint: 'core.base', shade: 0, hidden: true, when });
 }
-const shownOn = (f) => dartItems.filter((it) => VARIANTS.find((v) => it.id.slice(5).replace(/Core$/, '') === v[0])[1] === FRAME_BEAT[f]).map((it) => it.id);
-// the rim round the dart, then x 0 and x 15 cleared: lightShape drew inside the frame less its 1 px border
-const body = { pictures: { draw: [...dartItems, { kind: 'outline', paint: 'rim.base' }, { kind: 'cut', shape: { kind: 'rect', at: [0, 0], size: [1, 16] } }, { kind: 'cut', shape: { kind: 'rect', at: [15, 0], size: [1, 16] } }], emitters } };
+
+// ---- the spark (build item E3b; review of E3 round 3, issue 6) -----------------------------------------------------
+// The code's star drawn as it drew it, so no stray tail pixel and the star grows on a flaring beat: its tail (a capsule
+// of the rim colour, the glow from `split` on) and over it the star (engine/shapes.js starIn, four points, 2 px past the
+// head's radius or 3 on a flare, its inner corners 0.36 of that or 0.3, joined with a small disc) in the core with a
+// 1 px rim of the glow. The star is the same pixels wherever it sits, so it is a stamp moved along Length; the tail is
+// one run of pixels a row in each colour, each a rect whose ends are tables on Length (as the shard's points are).
+const SPARK_R = { 3: 1.4, 4: 2, 5: 2.4 };                    // the code's layersOf radius of a head d px across
+/** The code's spark at one Length, beat and flicker, in frame pixels: { cx, tail: { y: { rim: [a, b] | null, glow } } }. */
+function sparkAt(len, d, beat, amp) {
+  const base = lerp(4.5, 8.5, len), cx = 7.5 + Math.round((base - d / 2) / 2), cy = 7.5, r = SPARK_R[d];
+  const tail = Math.min(cx - 1, base + beat * amp), split = Math.round(cx - r - 1 - (tail - r - 1) * 0.5);
+  const streak = capsuleIn(cx - tail + 0.5, cy, cx, cy, 0.4, d === 5 ? 1.4 : 0.4);
+  const rows = {};
+  for (let y = 5; y <= 9; y++) for (const part of ['rim', 'glow']) {
+    const xs = [];
+    for (let x = 1; x < 15; x++) if (streak(x + 0.5, y + 0.5) && (part === 'rim' ? x + 0.5 < split : x + 0.5 >= split)) xs.push(x);
+    (rows[y] ??= {})[part] = xs.length ? [xs[0], xs.at(-1)] : null;
+  }
+  return { cx, rows };
+}
+/** The star of a head d px across (flaring or not) as stamp rows round a middle at (7.5, 7.5), 'c' core and 'g' glow. */
+function starRows(d, flare) {
+  const r = SPARK_R[d], star = starIn(7.5, 7.5, r + (flare ? 3 : 2), 4, flare ? 0.3 : 0.36), disc = ellipseIn(7.5, 7.5, r * 0.6, r * 0.6);
+  const on = (x, y) => star(x + 0.5, y + 0.5) || disc(x + 0.5, y + 0.5);
+  const rows = [];
+  for (let y = 0; y < 16; y++) {
+    let row = '';
+    for (let x = 0; x < 16; x++) row += on(x, y) ? 'c' : on(x - 1, y) || on(x + 1, y) || on(x, y - 1) || on(x, y + 1) ? 'g' : '.';
+    rows.push(row);
+  }
+  return rows;
+}
+const px = (v) => (typeof v === 'number' ? v : { ...v, round: 'px' });   // a whole number of pixels
+const sparkItems = [], sparkVariant = new Map();
+for (const { d, when: sz } of SIZES) for (const [name, beat, flick, edge] of VARIANTS) {
+  const amp = flick && flick[0].below !== undefined && flick[0].below <= AMP1 ? 1 : 2, flare = edge === 'mid';
+  const when = { shape: ['spark'], size: sz, ...(flick ? { flicker: flick } : {}), clip: ['fly'] };
+  const add = (it) => { sparkItems.push({ ...it, hidden: true, when }); sparkVariant.set(it.id, beat); };
+  const at = (len) => sparkAt(len, d, beat, amp);
+  for (let y = 5; y <= 9; y++) for (const part of ['rim', 'glow']) {
+    const runs = Array.from({ length: 41 }, (_, k) => at(k / 40).rows[y][part]);
+    if (runs.every((r) => !r)) continue;
+    // where the run is empty, a pixel the star always covers (its middle) stands in for it
+    const run = (len) => { const s = at(len); return s.rows[y][part] ?? [s.cx - 0.5, s.cx - 0.5]; };
+    add({ id: `spark${d}${name}${part === 'rim' ? 'R' : 'G'}${y}`, kind: 'rect', at: [onLength((len) => run(len)[0]), y], size: [px(onLength((len) => run(len)[1] - run(len)[0] + 1)), 1], paint: `${part}.base`, shade: 0 });
+  }
+  const rows = starRows(d, flare), top = rows.findIndex((r) => /[cg]/.test(r)), bottom = rows.findLastIndex((r) => /[cg]/.test(r));
+  const left = Math.min(...rows.map((r) => r.search(/[cg]/)).filter((i) => i >= 0)), right = Math.max(...rows.map((r) => r.length - 1 - [...r].reverse().join('').search(/[cg]/)).filter((i) => i < 16));
+  add({ id: `spark${d}${name}Star`, kind: 'stamp', at: [onLength((len) => at(len).cx - 7.5 + left), top], rows: rows.slice(top, bottom + 1).map((r) => r.slice(left, right + 1)), key: { c: 'core.base', g: 'glow.base' } });
+}
+const shownOn = (f) => [...dartItems.filter((it) => VARIANTS.find((v) => it.id.slice(5).replace(/Core$/, '') === v[0])[1] === FRAME_BEAT[f]).map((it) => it.id),
+  ...sparkItems.filter((it) => sparkVariant.get(it.id) === FRAME_BEAT[f]).map((it) => it.id)];
+const allShown = [...dartItems, ...sparkItems].map((it) => it.id);
+// the rim round the dart, then the spark (no rim of its own but the star's), then x 0 and x 15 cleared: lightShape drew
+// inside the frame less its 1 px border
+const body = { pictures: { draw: [...dartItems, { kind: 'outline', paint: 'rim.base' }, ...sparkItems, { kind: 'cut', shape: { kind: 'rect', at: [0, 0], size: [1, 16] } }, { kind: 'cut', shape: { kind: 'rect', at: [15, 0], size: [1, 16] } }], emitters } };
 const beat = (b) => ({ tail: { beat: b } });
 const clips = {
-  fly: clip(h, 'fly', 12, { keys: [0, 1, 0, -1].map((b, f) => ({ t: f / 4, emit: beat(b), show: shownOn(f), hide: dartItems.map((it) => it.id).filter((id) => !shownOn(f).includes(id)) })) }),
+  fly: clip(h, 'fly', 12, { keys: [0, 1, 0, -1].map((b, f) => ({ t: f / 4, emit: beat(b), show: shownOn(f), hide: allShown.filter((id) => !shownOn(f).includes(id)) })) }),
   hit: clip(h, 'hit', 16, { keys: oneEach(4, ['pop', 'spark1', 'spark2', 'spark3']) }),
 };
 /** The definition this writer gives (tools/projectiles/write.mjs writes it as sprites/scatter-pellet.json). */

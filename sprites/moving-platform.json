@@ -1,0 +1,82 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "moving-platform",
+ "name": "Moving platform",
+ "blurb": "A floating platform to ride, with a gear turning underneath; change its width, what it is made of, the chains it hangs from, the colours and how much it bobs.",
+ "meta": {
+  "type": "prop",
+  "role": "world/platform",
+  "themes": ["fantasy","forest"],
+  "gameTypes": ["platformer"],
+  "view": "side",
+  "words": ["platform","moving","lift","elevator","floating","ride","gear","chains","ledge","move","travel","wooden","stone"],
+  "license": "draft"
+ },
+ "size": [64,32],
+ "pivot": [32,8],
+ "grounded": false,
+ "preview": "idle",
+ "styles": ["pixel"],
+ "palette": [
+  {
+   "id": "wood",
+   "label": "Deck",
+   "default": "#a06a3c",
+   "material": "wood",
+   "swatches": ["#a06a3c","#7a4f33","#f0ead8","#a8612a","#8f97a8","#a4c44a"]
+  },
+  {"id":"metal","label":"Metal","default":"#c2c9d6","material":"metal","swatches":["#c2c9d6","#f2c230","#5d6475","#e6c545","#c98a4a"]}
+ ],
+ "controls": [
+  {"key":"width","kind":"range","label":"Width","lo":"Narrow","hi":"Wide","default":48,"min":40,"max":62,"step":2},
+  {
+   "key": "style",
+   "kind": "choice",
+   "label": "Style",
+   "options": [{"value":"wood","label":"Wood"},{"value":"stone","label":"Stone"},{"value":"metal","label":"Metal"}],
+   "default": "wood"
+  },
+  {"key":"chains","kind":"toggle","label":"Chains","default":true},
+  {"key":"wood","kind":"colour","label":"Deck"},
+  {"key":"metal","kind":"colour","label":"Metal"},
+  {"key":"bob","kind":"range","label":"Float","lo":"Still","hi":"Floaty","default":0.5,"group":"Motion"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": {
+  "pictures": {
+   "nodes": [],
+   "draw": [
+    {
+     "id": "idle",
+     "gen": "platform.moving",
+     "v": 1,
+     "at": [32,8],
+     "clip": ["idle"],
+     "picture": "idle",
+     "width": {"from":"width","map":[[40,40],[62,62]],"round":"none"},
+     "style": {"from":"style","pick":{"wood":"wood","stone":"stone","metal":"metal"}},
+     "chains": {"from":"chains","pick":{"true":true,"false":false}},
+     "wood": "wood",
+     "metal": "metal",
+     "bob": {"from":"bob","map":[[0,0],[1,1]],"round":"none"}
+    },
+    {
+     "id": "move",
+     "gen": "platform.moving",
+     "v": 1,
+     "at": [32,8],
+     "clip": ["move"],
+     "picture": "move",
+     "width": {"from":"width","map":[[40,40],[62,62]],"round":"none"},
+     "style": {"from":"style","pick":{"wood":"wood","stone":"stone","metal":"metal"}},
+     "chains": {"from":"chains","pick":{"true":true,"false":false}},
+     "wood": "wood",
+     "metal": "metal",
+     "bob": {"from":"bob","map":[[0,0],[1,1]],"round":"none"}
+    }
+   ]
+  }
+ },
+ "clips": {"idle":{"frames":8,"fps":8},"move":{"frames":8,"fps":12}}
+}

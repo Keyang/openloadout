@@ -1,0 +1,621 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "tiles-shore",
+ "name": "Water and shore",
+ "blurb": "Ponds, rivers and coast for a top-down map, with sandy banks, lapping foam, plank bridges, lily pads and a rock; change the colours, the width of the bank, how choppy the water is, the sparkle and the speed.",
+ "size": [32,32],
+ "pivot": [16,16],
+ "grounded": false,
+ "preview": "water-single",
+ "styles": ["pixel"],
+ "meta": {
+  "type": "tileset",
+  "role": "world/tile",
+  "themes": ["fantasy","forest"],
+  "gameTypes": ["turn-based-rpg","top-down-rpg"],
+  "view": "top-down",
+  "words": ["water","pond","lake","river","stream","shore","coast","bank","beach","bridge","lily pad","foam","swim","overworld"],
+  "license": "draft"
+ },
+ "palette": [
+  {
+   "id": "water",
+   "label": "Water",
+   "default": "#4fa8d8",
+   "material": "water",
+   "swatches": ["#4fa8d8","#7aa0f4","#2f8f9d","#4fd8ee"]
+  },
+  {
+   "id": "foam",
+   "label": "Foam",
+   "default": "#f0ead8",
+   "material": "water",
+   "swatches": ["#f0ead8","#9fd8f4","#c2c9d6","#f4e06a"]
+  },
+  {
+   "id": "land",
+   "label": "Bank",
+   "default": "#c9a06a",
+   "material": "earth",
+   "swatches": ["#c9a06a","#e6c96a","#a8a4a0","#f0ead8"]
+  },
+  {
+   "id": "wood",
+   "label": "Bridge",
+   "default": "#9a6a3e",
+   "material": "wood",
+   "swatches": ["#9a6a3e","#e6c96a","#a8612a","#c98a4a"]
+  },
+  {"id":"body","material":"water","derive":{"rule":"tone","of":"water","by":-0.7}},
+  {"id":"swell","material":"water","derive":{"rule":"textureLight","of":"body","against":"body","from":0.5}},
+  {"id":"sand","material":"earth","derive":{"rule":"raisedGround","of":"land"}},
+  {"id":"crest","material":"water","derive":{"rule":"mix","of":"foam","with":"white","amount":0.7}},
+  {"id":"leaf","default":"#4f9d57","material":"plant","detail":true},
+  {"id":"cream","default":"#f0ead8","material":"plant","detail":true},
+  {"id":"gold","default":"#f2c230","material":"plant","detail":true},
+  {"id":"cobble","default":"#a8a4a0","material":"stone","detail":true}
+ ],
+ "controls": [
+  {"key":"edge","kind":"range","label":"Edge","lo":"Thin","hi":"Deep","min":6,"max":10,"step":1,"default":8},
+  {"key":"waves","kind":"range","label":"Waves","lo":"Calm","hi":"Choppy","default":0.5},
+  {"key":"sparkle","kind":"toggle","label":"Sparkle","default":true},
+  {"key":"water","kind":"colour","label":"Water"},
+  {"key":"foam","kind":"colour","label":"Foam"},
+  {"key":"land","kind":"colour","label":"Bank"},
+  {"key":"wood","kind":"colour","label":"Bridge"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": {
+  "tiles": {
+   "tile": 32,
+   "decalOrder": "last",
+   "groups": [
+    {
+     "name": "water",
+     "kind": "block",
+     "use": "hole",
+     "pieces": ["block","narrow"],
+     "fills": 6,
+     "frames": 8,
+     "fps": 6,
+     "outline": false,
+     "pictures": {
+      "left": [
+       {
+        "gen": "tile.shore",
+        "v": 1,
+        "at": [16,16],
+        "piece": "water-left",
+        "edge": {"from":"edge","map":[[6,6],[10,10]],"round":"px"},
+        "waves": {"from":"waves"},
+        "sparkle": {"from":"sparkle"},
+        "water": "water",
+        "foam": "foam",
+        "body": "body",
+        "streak": {"rule":"choose","when":{"sparkle":[true]},"then":{"rule":"textureLight","of":"body"},"else":"swell"},
+        "froth": {"rule":"mix","of":"foam","with":"water","amount":0.5},
+        "crest": "crest",
+        "sand": "sand"
+       }
+      ],
+      "top": [
+       {
+        "gen": "tile.shore",
+        "v": 1,
+        "at": [16,16],
+        "piece": "water-top",
+        "edge": {"from":"edge","map":[[6,6],[10,10]],"round":"px"},
+        "waves": {"from":"waves"},
+        "sparkle": {"from":"sparkle"},
+        "water": "water",
+        "foam": "foam",
+        "body": "body",
+        "streak": {"rule":"choose","when":{"sparkle":[true]},"then":{"rule":"textureLight","of":"body"},"else":"swell"},
+        "froth": {"rule":"mix","of":"foam","with":"water","amount":0.5},
+        "crest": "crest",
+        "sand": "sand"
+       }
+      ],
+      "right": [
+       {
+        "gen": "tile.shore",
+        "v": 1,
+        "at": [16,16],
+        "piece": "water-right",
+        "edge": {"from":"edge","map":[[6,6],[10,10]],"round":"px"},
+        "waves": {"from":"waves"},
+        "sparkle": {"from":"sparkle"},
+        "water": "water",
+        "foam": "foam",
+        "body": "body",
+        "streak": {"rule":"choose","when":{"sparkle":[true]},"then":{"rule":"textureLight","of":"body"},"else":"swell"},
+        "froth": {"rule":"mix","of":"foam","with":"water","amount":0.5},
+        "crest": "crest",
+        "sand": "sand"
+       }
+      ],
+      "side-l": [
+       {
+        "gen": "tile.shore",
+        "v": 1,
+        "at": [16,16],
+        "piece": "water-side-l",
+        "edge": {"from":"edge","map":[[6,6],[10,10]],"round":"px"},
+        "waves": {"from":"waves"},
+        "sparkle": {"from":"sparkle"},
+        "water": "water",
+        "foam": "foam",
+        "body": "body",
+        "streak": {"rule":"choose","when":{"sparkle":[true]},"then":{"rule":"textureLight","of":"body"},"else":"swell"},
+        "froth": {"rule":"mix","of":"foam","with":"water","amount":0.5},
+        "crest": "crest",
+        "sand": "sand"
+       }
+      ],
+      "fill": [
+       {
+        "gen": "tile.shore",
+        "v": 1,
+        "at": [16,16],
+        "piece": "water-fill",
+        "edge": {"from":"edge","map":[[6,6],[10,10]],"round":"px"},
+        "waves": {"from":"waves"},
+        "sparkle": {"from":"sparkle"},
+        "water": "water",
+        "foam": "foam",
+        "body": "body",
+        "streak": {"rule":"choose","when":{"sparkle":[true]},"then":{"rule":"textureLight","of":"body"},"else":"swell"},
+        "froth": {"rule":"mix","of":"foam","with":"water","amount":0.5},
+        "crest": "crest",
+        "sand": "sand"
+       }
+      ],
+      "fill-b": [
+       {
+        "gen": "tile.shore",
+        "v": 1,
+        "at": [16,16],
+        "piece": "water-fill-b",
+        "edge": {"from":"edge","map":[[6,6],[10,10]],"round":"px"},
+        "waves": {"from":"waves"},
+        "sparkle": {"from":"sparkle"},
+        "water": "water",
+        "foam": "foam",
+        "body": "body",
+        "streak": {"rule":"choose","when":{"sparkle":[true]},"then":{"rule":"textureLight","of":"body"},"else":"swell"},
+        "froth": {"rule":"mix","of":"foam","with":"water","amount":0.5},
+        "crest": "crest",
+        "sand": "sand"
+       }
+      ],
+      "fill-c": [
+       {
+        "gen": "tile.shore",
+        "v": 1,
+        "at": [16,16],
+        "piece": "water-fill-c",
+        "edge": {"from":"edge","map":[[6,6],[10,10]],"round":"px"},
+        "waves": {"from":"waves"},
+        "sparkle": {"from":"sparkle"},
+        "water": "water",
+        "foam": "foam",
+        "body": "body",
+        "streak": {"rule":"choose","when":{"sparkle":[true]},"then":{"rule":"textureLight","of":"body"},"else":"swell"},
+        "froth": {"rule":"mix","of":"foam","with":"water","amount":0.5},
+        "crest": "crest",
+        "sand": "sand"
+       }
+      ],
+      "fill-d": [
+       {
+        "gen": "tile.shore",
+        "v": 1,
+        "at": [16,16],
+        "piece": "water-fill-d",
+        "edge": {"from":"edge","map":[[6,6],[10,10]],"round":"px"},
+        "waves": {"from":"waves"},
+        "sparkle": {"from":"sparkle"},
+        "water": "water",
+        "foam": "foam",
+        "body": "body",
+        "streak": {"rule":"choose","when":{"sparkle":[true]},"then":{"rule":"textureLight","of":"body"},"else":"swell"},
+        "froth": {"rule":"mix","of":"foam","with":"water","amount":0.5},
+        "crest": "crest",
+        "sand": "sand"
+       }
+      ],
+      "fill-e": [
+       {
+        "gen": "tile.shore",
+        "v": 1,
+        "at": [16,16],
+        "piece": "water-fill-e",
+        "edge": {"from":"edge","map":[[6,6],[10,10]],"round":"px"},
+        "waves": {"from":"waves"},
+        "sparkle": {"from":"sparkle"},
+        "water": "water",
+        "foam": "foam",
+        "body": "body",
+        "streak": {"rule":"choose","when":{"sparkle":[true]},"then":{"rule":"textureLight","of":"body"},"else":"swell"},
+        "froth": {"rule":"mix","of":"foam","with":"water","amount":0.5},
+        "crest": "crest",
+        "sand": "sand"
+       }
+      ],
+      "fill-f": [
+       {
+        "gen": "tile.shore",
+        "v": 1,
+        "at": [16,16],
+        "piece": "water-fill-f",
+        "edge": {"from":"edge","map":[[6,6],[10,10]],"round":"px"},
+        "waves": {"from":"waves"},
+        "sparkle": {"from":"sparkle"},
+        "water": "water",
+        "foam": "foam",
+        "body": "body",
+        "streak": {"rule":"choose","when":{"sparkle":[true]},"then":{"rule":"textureLight","of":"body"},"else":"swell"},
+        "froth": {"rule":"mix","of":"foam","with":"water","amount":0.5},
+        "crest": "crest",
+        "sand": "sand"
+       }
+      ],
+      "side-r": [
+       {
+        "gen": "tile.shore",
+        "v": 1,
+        "at": [16,16],
+        "piece": "water-side-r",
+        "edge": {"from":"edge","map":[[6,6],[10,10]],"round":"px"},
+        "waves": {"from":"waves"},
+        "sparkle": {"from":"sparkle"},
+        "water": "water",
+        "foam": "foam",
+        "body": "body",
+        "streak": {"rule":"choose","when":{"sparkle":[true]},"then":{"rule":"textureLight","of":"body"},"else":"swell"},
+        "froth": {"rule":"mix","of":"foam","with":"water","amount":0.5},
+        "crest": "crest",
+        "sand": "sand"
+       }
+      ],
+      "bottom-l": [
+       {
+        "gen": "tile.shore",
+        "v": 1,
+        "at": [16,16],
+        "piece": "water-bottom-l",
+        "edge": {"from":"edge","map":[[6,6],[10,10]],"round":"px"},
+        "waves": {"from":"waves"},
+        "sparkle": {"from":"sparkle"},
+        "water": "water",
+        "foam": "foam",
+        "body": "body",
+        "streak": {"rule":"choose","when":{"sparkle":[true]},"then":{"rule":"textureLight","of":"body"},"else":"swell"},
+        "froth": {"rule":"mix","of":"foam","with":"water","amount":0.5},
+        "crest": "crest",
+        "sand": "sand"
+       }
+      ],
+      "bottom": [
+       {
+        "gen": "tile.shore",
+        "v": 1,
+        "at": [16,16],
+        "piece": "water-bottom",
+        "edge": {"from":"edge","map":[[6,6],[10,10]],"round":"px"},
+        "waves": {"from":"waves"},
+        "sparkle": {"from":"sparkle"},
+        "water": "water",
+        "foam": "foam",
+        "body": "body",
+        "streak": {"rule":"choose","when":{"sparkle":[true]},"then":{"rule":"textureLight","of":"body"},"else":"swell"},
+        "froth": {"rule":"mix","of":"foam","with":"water","amount":0.5},
+        "crest": "crest",
+        "sand": "sand"
+       }
+      ],
+      "bottom-r": [
+       {
+        "gen": "tile.shore",
+        "v": 1,
+        "at": [16,16],
+        "piece": "water-bottom-r",
+        "edge": {"from":"edge","map":[[6,6],[10,10]],"round":"px"},
+        "waves": {"from":"waves"},
+        "sparkle": {"from":"sparkle"},
+        "water": "water",
+        "foam": "foam",
+        "body": "body",
+        "streak": {"rule":"choose","when":{"sparkle":[true]},"then":{"rule":"textureLight","of":"body"},"else":"swell"},
+        "froth": {"rule":"mix","of":"foam","with":"water","amount":0.5},
+        "crest": "crest",
+        "sand": "sand"
+       }
+      ],
+      "inner-tl": [
+       {
+        "gen": "tile.shore",
+        "v": 1,
+        "at": [16,16],
+        "piece": "water-inner-tl",
+        "edge": {"from":"edge","map":[[6,6],[10,10]],"round":"px"},
+        "waves": {"from":"waves"},
+        "sparkle": {"from":"sparkle"},
+        "water": "water",
+        "foam": "foam",
+        "body": "body",
+        "streak": {"rule":"choose","when":{"sparkle":[true]},"then":{"rule":"textureLight","of":"body"},"else":"swell"},
+        "froth": {"rule":"mix","of":"foam","with":"water","amount":0.5},
+        "crest": "crest",
+        "sand": "sand"
+       }
+      ],
+      "inner-tr": [
+       {
+        "gen": "tile.shore",
+        "v": 1,
+        "at": [16,16],
+        "piece": "water-inner-tr",
+        "edge": {"from":"edge","map":[[6,6],[10,10]],"round":"px"},
+        "waves": {"from":"waves"},
+        "sparkle": {"from":"sparkle"},
+        "water": "water",
+        "foam": "foam",
+        "body": "body",
+        "streak": {"rule":"choose","when":{"sparkle":[true]},"then":{"rule":"textureLight","of":"body"},"else":"swell"},
+        "froth": {"rule":"mix","of":"foam","with":"water","amount":0.5},
+        "crest": "crest",
+        "sand": "sand"
+       }
+      ],
+      "inner-bl": [
+       {
+        "gen": "tile.shore",
+        "v": 1,
+        "at": [16,16],
+        "piece": "water-inner-bl",
+        "edge": {"from":"edge","map":[[6,6],[10,10]],"round":"px"},
+        "waves": {"from":"waves"},
+        "sparkle": {"from":"sparkle"},
+        "water": "water",
+        "foam": "foam",
+        "body": "body",
+        "streak": {"rule":"choose","when":{"sparkle":[true]},"then":{"rule":"textureLight","of":"body"},"else":"swell"},
+        "froth": {"rule":"mix","of":"foam","with":"water","amount":0.5},
+        "crest": "crest",
+        "sand": "sand"
+       }
+      ],
+      "inner-br": [
+       {
+        "gen": "tile.shore",
+        "v": 1,
+        "at": [16,16],
+        "piece": "water-inner-br",
+        "edge": {"from":"edge","map":[[6,6],[10,10]],"round":"px"},
+        "waves": {"from":"waves"},
+        "sparkle": {"from":"sparkle"},
+        "water": "water",
+        "foam": "foam",
+        "body": "body",
+        "streak": {"rule":"choose","when":{"sparkle":[true]},"then":{"rule":"textureLight","of":"body"},"else":"swell"},
+        "froth": {"rule":"mix","of":"foam","with":"water","amount":0.5},
+        "crest": "crest",
+        "sand": "sand"
+       }
+      ],
+      "strip-l": [
+       {
+        "gen": "tile.shore",
+        "v": 1,
+        "at": [16,16],
+        "piece": "water-strip-l",
+        "edge": {"from":"edge","map":[[6,6],[10,10]],"round":"px"},
+        "waves": {"from":"waves"},
+        "sparkle": {"from":"sparkle"},
+        "water": "water",
+        "foam": "foam",
+        "body": "body",
+        "streak": {"rule":"choose","when":{"sparkle":[true]},"then":{"rule":"textureLight","of":"body"},"else":"swell"},
+        "froth": {"rule":"mix","of":"foam","with":"water","amount":0.5},
+        "crest": "crest",
+        "sand": "sand"
+       }
+      ],
+      "strip-m": [
+       {
+        "gen": "tile.shore",
+        "v": 1,
+        "at": [16,16],
+        "piece": "water-strip-m",
+        "edge": {"from":"edge","map":[[6,6],[10,10]],"round":"px"},
+        "waves": {"from":"waves"},
+        "sparkle": {"from":"sparkle"},
+        "water": "water",
+        "foam": "foam",
+        "body": "body",
+        "streak": {"rule":"choose","when":{"sparkle":[true]},"then":{"rule":"textureLight","of":"body"},"else":"swell"},
+        "froth": {"rule":"mix","of":"foam","with":"water","amount":0.5},
+        "crest": "crest",
+        "sand": "sand"
+       }
+      ],
+      "strip-r": [
+       {
+        "gen": "tile.shore",
+        "v": 1,
+        "at": [16,16],
+        "piece": "water-strip-r",
+        "edge": {"from":"edge","map":[[6,6],[10,10]],"round":"px"},
+        "waves": {"from":"waves"},
+        "sparkle": {"from":"sparkle"},
+        "water": "water",
+        "foam": "foam",
+        "body": "body",
+        "streak": {"rule":"choose","when":{"sparkle":[true]},"then":{"rule":"textureLight","of":"body"},"else":"swell"},
+        "froth": {"rule":"mix","of":"foam","with":"water","amount":0.5},
+        "crest": "crest",
+        "sand": "sand"
+       }
+      ],
+      "col-t": [
+       {
+        "gen": "tile.shore",
+        "v": 1,
+        "at": [16,16],
+        "piece": "water-col-t",
+        "edge": {"from":"edge","map":[[6,6],[10,10]],"round":"px"},
+        "waves": {"from":"waves"},
+        "sparkle": {"from":"sparkle"},
+        "water": "water",
+        "foam": "foam",
+        "body": "body",
+        "streak": {"rule":"choose","when":{"sparkle":[true]},"then":{"rule":"textureLight","of":"body"},"else":"swell"},
+        "froth": {"rule":"mix","of":"foam","with":"water","amount":0.5},
+        "crest": "crest",
+        "sand": "sand"
+       }
+      ],
+      "col-m": [
+       {
+        "gen": "tile.shore",
+        "v": 1,
+        "at": [16,16],
+        "piece": "water-col-m",
+        "edge": {"from":"edge","map":[[6,6],[10,10]],"round":"px"},
+        "waves": {"from":"waves"},
+        "sparkle": {"from":"sparkle"},
+        "water": "water",
+        "foam": "foam",
+        "body": "body",
+        "streak": {"rule":"choose","when":{"sparkle":[true]},"then":{"rule":"textureLight","of":"body"},"else":"swell"},
+        "froth": {"rule":"mix","of":"foam","with":"water","amount":0.5},
+        "crest": "crest",
+        "sand": "sand"
+       }
+      ],
+      "col-b": [
+       {
+        "gen": "tile.shore",
+        "v": 1,
+        "at": [16,16],
+        "piece": "water-col-b",
+        "edge": {"from":"edge","map":[[6,6],[10,10]],"round":"px"},
+        "waves": {"from":"waves"},
+        "sparkle": {"from":"sparkle"},
+        "water": "water",
+        "foam": "foam",
+        "body": "body",
+        "streak": {"rule":"choose","when":{"sparkle":[true]},"then":{"rule":"textureLight","of":"body"},"else":"swell"},
+        "froth": {"rule":"mix","of":"foam","with":"water","amount":0.5},
+        "crest": "crest",
+        "sand": "sand"
+       }
+      ],
+      "single": [
+       {
+        "gen": "tile.shore",
+        "v": 1,
+        "at": [16,16],
+        "piece": "water-single",
+        "edge": {"from":"edge","map":[[6,6],[10,10]],"round":"px"},
+        "waves": {"from":"waves"},
+        "sparkle": {"from":"sparkle"},
+        "water": "water",
+        "foam": "foam",
+        "body": "body",
+        "streak": {"rule":"choose","when":{"sparkle":[true]},"then":{"rule":"textureLight","of":"body"},"else":"swell"},
+        "froth": {"rule":"mix","of":"foam","with":"water","amount":0.5},
+        "crest": "crest",
+        "sand": "sand"
+       }
+      ]
+     },
+     "decals": [
+      {
+       "name": "a",
+       "place": "on",
+       "label": "Lily pads",
+       "frames": 8,
+       "draw": [
+        {
+         "gen": "tile.shore",
+         "v": 1,
+         "at": [16,16],
+         "piece": "water-deco-a",
+         "edge": {"from":"edge","map":[[6,6],[10,10]],"round":"px"},
+         "waves": {"from":"waves"},
+         "sparkle": {"from":"sparkle"},
+         "water": "water",
+         "foam": "foam",
+         "body": "body",
+         "streak": {"rule":"textureLight","of":"body"},
+         "leaf": "leaf",
+         "cream": "cream",
+         "gold": "gold"
+        }
+       ]
+      },
+      {
+       "name": "b",
+       "place": "on",
+       "label": "Rock",
+       "frames": 1,
+       "draw": [
+        {
+         "gen": "tile.shore",
+         "v": 1,
+         "at": [16,16],
+         "piece": "water-deco-b",
+         "edge": {"from":"edge","map":[[6,6],[10,10]],"round":"px"},
+         "waves": {"from":"waves"},
+         "sparkle": {"from":"sparkle"},
+         "water": "water",
+         "foam": "foam",
+         "body": "body",
+         "cobble": "cobble"
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "extra": [
+    {
+     "name": "bridge-h",
+     "label": "Bridge, left to right",
+     "draw": [
+      {
+       "gen": "tile.shore",
+       "v": 1,
+       "at": [16,16],
+       "piece": "bridge-h",
+       "edge": {"from":"edge","map":[[6,6],[10,10]],"round":"px"},
+       "waves": {"from":"waves"},
+       "sparkle": {"from":"sparkle"},
+       "wood": "wood"
+      }
+     ]
+    },
+    {
+     "name": "bridge-v",
+     "label": "Bridge, up and down",
+     "draw": [
+      {
+       "gen": "tile.shore",
+       "v": 1,
+       "at": [16,16],
+       "piece": "bridge-v",
+       "edge": {"from":"edge","map":[[6,6],[10,10]],"round":"px"},
+       "waves": {"from":"waves"},
+       "sparkle": {"from":"sparkle"},
+       "wood": "wood"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "clips": {"water-fill":{"label":"Water: middle, still water"}}
+}

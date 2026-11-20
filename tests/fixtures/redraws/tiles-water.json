@@ -1,0 +1,184 @@
+{
+ "id": "tiles-water",
+ "frozen": "2026-11-20",
+ "source": "sprites/tiles-water.js",
+ "sha256": "60cbde0b4fb5d09e027bf4ed179b7dffca30262dc4e1a389c1359d8613fd953d",
+ "name": "Water and waterfalls",
+ "blurb": "An animated pool and a waterfall for a side-view level; make it water, lava or a swamp, and change its colour, its foam, how choppy it is, the sparkle and the speed.",
+ "meta": {
+  "type": "tileset",
+  "role": "world/tile",
+  "themes": [
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "platformer"
+  ],
+  "view": "side",
+  "words": [
+   "water",
+   "waterfall",
+   "river",
+   "pool",
+   "lake",
+   "pond",
+   "lava",
+   "swamp",
+   "liquid",
+   "swim",
+   "splash",
+   "wave",
+   "foam",
+   "hazard"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "water-top",
+ "params": {
+  "liquid": {
+   "kind": "choice",
+   "label": "Liquid",
+   "def": "water",
+   "options": [
+    "water",
+    "lava",
+    "swamp"
+   ],
+   "group": "Look"
+  },
+  "waves": {
+   "kind": "range",
+   "label": "Waves",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Calm",
+   "hi": "Choppy",
+   "group": "Look"
+  },
+  "sparkle": {
+   "kind": "toggle",
+   "label": "Sparkle",
+   "def": true,
+   "group": "Look"
+  },
+  "water": {
+   "kind": "color",
+   "label": "Colour",
+   "def": "#3f9fd1",
+   "swatches": [
+    "#3f9fd1",
+    "#3f6fd1",
+    "#7fb0b8",
+    "#e08a2c",
+    "#a4c44a"
+   ],
+   "group": "Colors"
+  },
+  "foam": {
+   "kind": "color",
+   "label": "Foam",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#f2c230",
+    "#c2c9d6",
+    "#e6c545",
+    "#8fd0f0"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "water-top": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    4,
+    6,
+    9
+   ]
+  },
+  "water-fill": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    4,
+    6,
+    9
+   ]
+  },
+  "water-fill-b": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    4,
+    6,
+    9
+   ]
+  },
+  "water-fill-c": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    4,
+    6,
+    9
+   ]
+  },
+  "fall-top": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    4,
+    6,
+    9
+   ]
+  },
+  "fall-fill": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    4,
+    6,
+    9
+   ]
+  },
+  "fall-foot": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    4,
+    6,
+    9
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [],
+ "bundles": [
+  "kit-platformer-fantasy"
+ ]
+}

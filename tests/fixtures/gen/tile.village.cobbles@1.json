@@ -1,0 +1,221 @@
+{
+ "id": "tile.village.cobbles",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "piece": "cobble-left",
+    "stone": "stone",
+    "growth": "growth",
+    "body": "body",
+    "deepJoint": "deepJoint",
+    "joint": "joint",
+    "darker": "darker",
+    "glint": "glint",
+    "mossOn": "mossOn"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      0,
+      0
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".....aaaaaa.aaaaaaa.aaaaaa.aaaaa",
+      "..aaabbcbbbabbbbbbbaccbbbbabbcbb",
+      ".dcceccccccebbbbbbbecccccceccccc",
+      ".dcceccccccebbbbbbbecccccceccccc",
+      "dccceeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      ".deeeeccccceccccccceecccccececcc",
+      "dbbbeccccccecccccccceccccccceccc",
+      "dbbbeccccccecccccccceccccccceccc",
+      "dbbbeccccccecccccccceccccccceccc",
+      "dbbbeccccceeecccccceeeccccceeecc",
+      "dbbbeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "dbbbeceeeccccceeeccccceeecccceee",
+      ".deeeececcccccceccccccceccccccec",
+      "dcccecceccccccceccccccceccccccec",
+      "dcccecceccccccceccccccceccccccec",
+      "dcccecceccccccceccccccceccccccec",
+      ".dcccececcccccceccccccceccccccec",
+      "dccceceeeccccceeeccccceeecccceee",
+      "dccceeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "dcccecccceeeccccceeeccccceeecccc",
+      ".deeeecccceccccccceccccccceccccc",
+      "dccceccccceccccccceccccccceccccc",
+      "dccceccccceccccccceccccccceccccc",
+      "dccceccccceccccccceccccccceccccc",
+      "dccceccccceccccccceccccccceccccc",
+      "dcccecccceeeccccceeeccccceeecccc",
+      "dccceeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      ".deeeeeecccceeecccccceeecccceeec",
+      "dcccececcccccecccccccceccccccecc",
+      "dcccececcccccecccccccceccccccecc",
+      "dcccececcccccecccccccceccccccecc",
+      "dcccececcccccecccccccceccccccecc"
+     ],
+     "key": {
+      "a": "stone.deep",
+      "b": "darker",
+      "c": "body",
+      "d": "stone.dark",
+      "e": "joint"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "piece": "cobble-inner-tl",
+    "stone": "stone",
+    "growth": "growth",
+    "body": "body",
+    "deepJoint": "deepJoint",
+    "joint": "joint",
+    "darker": "darker",
+    "glint": "glint",
+    "mossOn": "mossOn"
+   },
+   "ctx": {
+    "t": 0.375,
+    "frame": 3,
+    "frames": 8,
+    "loop": true
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      0,
+      0
+     ],
+     "anchor": "tl",
+     "rows": [
+      "abbbcbcbbbbbbcbbbbbbbbcbbbbbbcbb",
+      "ddbbccccbbbbcccbbbbbbcccbbbbcccb",
+      "bbbccccccccccccccccccccccccccccc",
+      "bbcccbbbbbcccbbbbbbcccbbbbbcccbb",
+      "ccccbbbbbbbcbbbbbbbbcbbbbbbbcbbb",
+      "bbbcbbbbbbbcbbbbbbbbcbbbbbbbcbbb",
+      "bbbcbbbbbbbcbbbbbbbbcbbbbbbbcbbb",
+      "bbbcbbbbbbbcbbbbbbbbcbbbbbbbcbbb",
+      "bbbcbbbbbbbcbbbbbbbbcbbbbbbbcbbb",
+      "bbcccbbbbbcccbbbbbbcccbbbbbcccbb",
+      "cccccccccccccccccccccccccccccccc",
+      "bbbbbbcccbbbbbcccbbbbbcccbbbbccc",
+      "bbbbbbbcbbbbbbbcbbbbbbbcbbbbbbcb",
+      "bbbbbbbcbbbbbbbcbbbbbbbcbbbbbbcb",
+      "bbbbbbbcbbbbbbbcbbbbbbbcbbbbbbcb",
+      "bbbbbbbcbbbbbbbcbbbbbbbcbbbbbbcb",
+      "bbbbbbbcbbbbbbbcbbbbbbbcbbbbbbcb",
+      "bbbbbbcccbbbbbcccbbbbbcccbbbbccc",
+      "cccccccccccccccccccccccccccccccc",
+      "bcccbbbbbcccbbbbbcccbbbbbcccbbbb",
+      "bbcbbbbbbbcbbbbbbbcbbbbbbbcbbbbb",
+      "bbcbbbbbbbcbbbbbbbcbbbbbbbcbbbbb",
+      "bbcbbbbbbbcbbbbbbbcbbbbbbbcbbbbb",
+      "bbcbbbbbbbcbbbbbbbcbbbbbbbcbbbbb",
+      "bbcbbbbbbbcbbbbbbbcbbbbbbbcbbbbb",
+      "bcccbbbbbcccbbbbbcccbbbbbcccbbbb",
+      "cccccccccccccccccccccccccccccccc",
+      "bbbbbcccbbbbcccbbbbbbcccbbbbcccb",
+      "bbbbbbcbbbbbbcbbbbbbbbcbbbbbbcbb",
+      "bbbbbbcbbbbbbcbbbbbbbbcbbbbbbcbb",
+      "bbbbbbcbbbbbbcbbbbbbbbcbbbbbbcbb",
+      "bbbbbbcbbbbbbcbbbbbbbbcbbbbbbcbb"
+     ],
+     "key": {
+      "a": "stone.deep",
+      "b": "body",
+      "c": "joint",
+      "d": "darker"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     40,
+     20
+    ],
+    "piece": "cobble-single",
+    "stone": "stone",
+    "growth": "growth",
+    "body": "body",
+    "deepJoint": "deepJoint",
+    "joint": "joint",
+    "darker": "darker",
+    "glint": "glint",
+    "mossOn": "mossOn"
+   },
+   "ctx": {
+    "t": 0.5,
+    "frame": 4,
+    "frames": 8,
+    "loop": true
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      24,
+      4
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".....aaaaaa.aaaaaaa.aaaaaa.a....",
+      "..aaabbcbbbabbbbbbbaccbbbbabaa..",
+      ".dcceccccccebbbbbbbeccccccecbca.",
+      ".dcceccccccebbbbbbbecccccceccca.",
+      "dccceeeeeeeeeeeeeeeeeeeeeeeeeea.",
+      ".deeeeccccceccccccceeccccceeccba",
+      "dbbbecccccceccccccccecccccceccba",
+      "dbbbecccccceccccccccecccccceccca",
+      "dbbbecccccceccccccccecccccceccba",
+      "dbbbeccccceeecccccceeeccccceccba",
+      "dbbbeeeeeeeeeeeeeeeeeeeeeeeeccba",
+      "dbbbeceeeccccceeeccccceeecceccba",
+      ".deeeececccccccecccccccecceeeea.",
+      "dcccecceccccccceccccccceccceccca",
+      "dcccecceccccccceccccccceccceccba",
+      "dcccecceccccccceccccccceccceccba",
+      ".dcccececcccccceccccccceccceccca",
+      "dccceceeeccccceeeccccceeecceccba",
+      "dccceeeeeeeeeeeeeeeeeeeeeeeeccba",
+      "dcccecccceeeccccceeeccccceeeeea.",
+      ".deeeecccceccccccceccccccceebbba",
+      "dccceccccceccccccceccccccceebbba",
+      "dccceccccceccccccceccccccceebbba",
+      "dcccecccccecccccccecccccccebbba.",
+      "dcccecccceeccccccceccccccceebbba",
+      "dccceccccceeccccceeeccceceeebbba",
+      "dccceeeeecceeeeeeeeeeeebeeeeeea.",
+      ".deeeeeeecceeeeeeeeeeeebeeeeccba",
+      ".dcccecccdccceccccccebbbbbbecba.",
+      ".dccceccc.dcceccccccebbdbbbecca.",
+      "..ddcdccc..ccdccccccdbb.bbbddd..",
+      "....d.ddd..dd.dddddd.dd.ddd....."
+     ],
+     "key": {
+      "a": "stone.deep",
+      "b": "darker",
+      "c": "body",
+      "d": "stone.dark",
+      "e": "joint"
+     }
+    }
+   ]
+  }
+ ]
+}

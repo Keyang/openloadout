@@ -1,0 +1,610 @@
+{
+ "id": "creature.wolf",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     27,
+     43
+    ],
+    "picture": "run",
+    "fur": "fur",
+    "belly": "belly",
+    "eyes": "eyes"
+   },
+   "ctx": {
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      6,
+      14
+     ],
+     "anchor": "tl",
+     "rows": [
+      "............................a...",
+      "...........................abaaa",
+      "...........................abcdd",
+      "............................abcc",
+      "..........................aaaabc",
+      ".........................aeeeddb",
+      "........................addddddd",
+      ".....................aaadddddddd",
+      ".................aaaaeeddddddddd",
+      "............aaaaaeeeddddddddddbd",
+      "......aaaaaaeeeeddddddddddddddbd",
+      "....aadddddbddddddddddddddddffbf",
+      "...addddddbbddddddddddddddddffff",
+      "..adddddddbbddddddddddbddddddfff",
+      ".abdddddbabbdddddddddgffffddddff",
+      ".adddbbaaabfdddddfffaggggffdddfh",
+      "abbbaaa..afddddddffa.aaaggggdddh",
+      ".aaa....agddddddfga.....aaaaaddd",
+      "........adddddggha..........addd",
+      ".......adddddhhhha..........abdd",
+      "......abdddaahhha...........addh",
+      "......abdda.aihha..........addhh",
+      "......abda..aiha..........adddha",
+      "......adda..aiiha.........adddha",
+      ".....abdda...aiha..........aaaa.",
+      ".....abda....aiha...............",
+      ".....abda....aiiha..............",
+      ".....addda....ahhha.............",
+      ".....addda....ahhha.............",
+      "......aaa......aaa.............."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "fur.dark",
+      "c": {
+       "rule": "tone",
+       "of": "fur",
+       "by": -0.75
+      },
+      "d": "fur",
+      "e": "fur.light",
+      "f": "belly",
+      "g": "belly.dark",
+      "h": {
+       "rule": "mix",
+       "of": {
+        "rule": "tone",
+        "of": "fur",
+        "by": -0.75
+       },
+       "with": {
+        "rule": "mix",
+        "of": "#241a3a",
+        "with": "#241a3a",
+        "amount": 0
+       },
+       "amount": 0.12
+      },
+      "i": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": {
+         "rule": "tone",
+         "of": "fur",
+         "by": -0.75
+        },
+        "with": {
+         "rule": "mix",
+         "of": "#241a3a",
+         "with": "#241a3a",
+         "amount": 0
+        },
+        "amount": 0.12
+       },
+       "tone": "dark"
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      38,
+      14
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aa............",
+      "bbaaaa........",
+      "cbbddda.......",
+      "caccdda.......",
+      "cccccca.......",
+      "ccccccca......",
+      "cccceeccaaaa..",
+      "ccccfacccccca.",
+      "cccccccccccgga",
+      "cchhhhhhhccgga",
+      "eehhhhiiiiiia.",
+      "heiiiaahhhaa..",
+      "hiaaa..aaa....",
+      "aa............",
+      "a.............",
+      "a.............",
+      "da............",
+      "da............",
+      "dda...........",
+      "dda...........",
+      "da............",
+      "a.............",
+      "..............",
+      "..............",
+      "..............",
+      "..............",
+      "..............",
+      "..............",
+      "..............",
+      ".............."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": {
+         "rule": "tone",
+         "of": "fur",
+         "by": -0.75
+        },
+        "with": {
+         "rule": "mix",
+         "of": "#241a3a",
+         "with": "#241a3a",
+         "amount": 0
+        },
+        "amount": 0.12
+       },
+       "tone": "dark"
+      },
+      "c": "fur",
+      "d": {
+       "rule": "mix",
+       "of": {
+        "rule": "tone",
+        "of": "fur",
+        "by": -0.75
+       },
+       "with": {
+        "rule": "mix",
+        "of": "#241a3a",
+        "with": "#241a3a",
+        "amount": 0
+       },
+       "amount": 0.12
+      },
+      "e": "fur.dark",
+      "f": "eyes",
+      "g": {
+       "rule": "mix",
+       "of": "#2a2030",
+       "with": "#2a2030",
+       "amount": 0
+      },
+      "h": "belly",
+      "i": "belly.dark"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     27,
+     43
+    ],
+    "picture": "attack",
+    "size": 1,
+    "legs": 1,
+    "snout": 0,
+    "ears": "floppy",
+    "tail": "curled",
+    "fluff": 0,
+    "markings": "mask",
+    "fur": "fur",
+    "belly": "belly",
+    "eyes": "eyes",
+    "stride": 1,
+    "bounce": 0,
+    "wag": 1
+   },
+   "ctx": {
+    "frame": 3
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      13,
+      15
+     ],
+     "anchor": "tl",
+     "rows": [
+      "......aaaaa.....................",
+      ".....abbbbba..................aa",
+      "....acbbbdda.............aaaaaee",
+      "....afffaaa.............aeeeeffc",
+      "...acffaaaaaaaaaaaaaaaaaffffffcg",
+      "...accfaeeeeeeeeeeeeeeeffffffcgg",
+      "....acffffffffffffffffffffffchgg",
+      "....accfffffffffffffffffffffchhh",
+      "....acccfffffffffffffffffffffccc",
+      "....accfffffffffffffffffffffbbbb",
+      "....accfffffffffffffffffffffbbbb",
+      "....acfffffffffffcccccfffffffbbb",
+      "....adfffffffbbbdddddbbbbffffbbb",
+      "....afffffffbbbaaaaadddbbffffbbi",
+      "...afffffffddda.....aaddbbffffbi",
+      "..affffffiiiaa........adddffffii",
+      ".affffffiiia...........aaaafffii",
+      "adbbfffiiaa...............affffi",
+      "adbbfjjia.................affffj",
+      "adbbkjja...................abbbj",
+      "adbbkjja..................abbbbj",
+      "adbbkjja.................abbbbbj",
+      "adbbkkjja...............abbbbbja",
+      "adbbakjja..............adbbbbja.",
+      "adbbakjja..............abbbbjja.",
+      "adbbakjja..............abbbbaa..",
+      "abbbbjjjja..............aaaa....",
+      "abbbbjjjja......................",
+      ".aaaaaaaa......................."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "belly",
+      "c": "fur.dark",
+      "d": "belly.dark",
+      "e": "fur.light",
+      "f": "fur",
+      "g": {
+       "rule": "tone",
+       "of": "fur",
+       "by": -0.6
+      },
+      "h": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "fur",
+        "by": -0.6
+       },
+       "tone": "dark"
+      },
+      "i": {
+       "rule": "mix",
+       "of": {
+        "rule": "tone",
+        "of": "fur",
+        "by": -0.75
+       },
+       "with": {
+        "rule": "mix",
+        "of": "#241a3a",
+        "with": "#241a3a",
+        "amount": 0
+       },
+       "amount": 0.12
+      },
+      "j": {
+       "rule": "mix",
+       "of": {
+        "rule": "tone",
+        "of": "belly",
+        "by": -0.75
+       },
+       "with": {
+        "rule": "mix",
+        "of": "#241a3a",
+        "with": "#241a3a",
+        "amount": 0
+       },
+       "amount": 0.12
+      },
+      "k": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": {
+         "rule": "tone",
+         "of": "belly",
+         "by": -0.75
+        },
+        "with": {
+         "rule": "mix",
+         "of": "#241a3a",
+         "with": "#241a3a",
+         "amount": 0
+        },
+        "amount": 0.12
+       },
+       "tone": "dark"
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      45,
+      15
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aaa..........",
+      "abbbaaaa......",
+      "bcccbdddaa....",
+      "cccccbdeddaa..",
+      "ccccfbdbbddda.",
+      "cccbbddgaddhha",
+      "cfbddddddeeeha",
+      "bbeeeeeeeeeeia",
+      "dieeeeeeeejaa.",
+      "eiiieeejeka...",
+      "eeiiiiiieea...",
+      "eaaaaaaaeea...",
+      "a.......aa....",
+      "a.............",
+      "a.............",
+      "a.............",
+      "la............",
+      "la............",
+      "mma...........",
+      "mma...........",
+      "mna...........",
+      "aa............",
+      "..............",
+      "..............",
+      "..............",
+      "..............",
+      "..............",
+      "..............",
+      ".............."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "fur.dark",
+      "c": {
+       "rule": "tone",
+       "of": "fur",
+       "by": -0.6
+      },
+      "d": "fur",
+      "e": "belly",
+      "f": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "fur",
+        "by": -0.6
+       },
+       "tone": "dark"
+      },
+      "g": "eyes",
+      "h": {
+       "rule": "mix",
+       "of": "#2a2030",
+       "with": "#2a2030",
+       "amount": 0
+      },
+      "i": "belly.dark",
+      "j": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      },
+      "k": {
+       "rule": "mix",
+       "of": "#8a2638",
+       "with": "#8a2638",
+       "amount": 0
+      },
+      "l": {
+       "rule": "mix",
+       "of": {
+        "rule": "tone",
+        "of": "fur",
+        "by": -0.75
+       },
+       "with": {
+        "rule": "mix",
+        "of": "#241a3a",
+        "with": "#241a3a",
+        "amount": 0
+       },
+       "amount": 0.12
+      },
+      "m": {
+       "rule": "mix",
+       "of": {
+        "rule": "tone",
+        "of": "belly",
+        "by": -0.75
+       },
+       "with": {
+        "rule": "mix",
+        "of": "#241a3a",
+        "with": "#241a3a",
+        "amount": 0
+       },
+       "amount": 0.12
+      },
+      "n": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": {
+         "rule": "tone",
+         "of": "belly",
+         "by": -0.75
+        },
+        "with": {
+         "rule": "mix",
+         "of": "#241a3a",
+         "with": "#241a3a",
+         "amount": 0
+        },
+        "amount": 0.12
+       },
+       "tone": "dark"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     30,
+     40
+    ],
+    "picture": "die",
+    "size": 0,
+    "legs": 0,
+    "snout": 1,
+    "ears": "tall",
+    "tail": "brush",
+    "markings": "plain",
+    "fur": "fur",
+    "belly": "belly",
+    "eyes": "eyes"
+   },
+   "ctx": {
+    "frame": 7
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      10,
+      25
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".......................aa..aa...",
+      "......................abbaaccaa.",
+      ".......................abbaaccda",
+      "......................aaebffacdd",
+      "....aaa..............aeffbggffcd",
+      "..aafffaaa...aaa..aaafffffbgffff",
+      ".affffffffaaaeeeaaeeffffffbbffff",
+      "abfffffffffbfffeefffffffffffffff",
+      "abbbffffffbbffffffffffffffffffff",
+      ".aabbbbbbbbbffffffffffffffffffff",
+      "...aaaaaaabffffffbfbbbbfffffffff",
+      ".........abffffffbfbbbbfffbbbbbb",
+      "........abbbffffbbfccbbbbbbfbbff",
+      ".........aaaaaaaafffdddaaaaaabbf",
+      "................afffddda.....aaf",
+      ".................aaaaaa........a"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "fur.dark",
+      "c": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": {
+         "rule": "tone",
+         "of": "fur",
+         "by": -0.75
+        },
+        "with": {
+         "rule": "mix",
+         "of": "#241a3a",
+         "with": "#241a3a",
+         "amount": 0
+        },
+        "amount": 0.12
+       },
+       "tone": "dark"
+      },
+      "d": {
+       "rule": "mix",
+       "of": {
+        "rule": "tone",
+        "of": "fur",
+        "by": -0.75
+       },
+       "with": {
+        "rule": "mix",
+        "of": "#241a3a",
+        "with": "#241a3a",
+        "amount": 0
+       },
+       "amount": 0.12
+      },
+      "e": "fur.light",
+      "f": "fur",
+      "g": {
+       "rule": "tone",
+       "of": "fur",
+       "by": -0.75
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      42,
+      25
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...........",
+      "...........",
+      "...........",
+      "aa.........",
+      "bba........",
+      "ca.........",
+      "ccaa.......",
+      "ccccaaaaaa.",
+      "ddcccccceea",
+      "cccccccceea",
+      "ccccffffffa",
+      "fffcccccaa.",
+      "bbaaaaaa...",
+      "ccbba......",
+      "ccbba......",
+      "aaaa......."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "mix",
+       "of": {
+        "rule": "tone",
+        "of": "fur",
+        "by": -0.75
+       },
+       "with": {
+        "rule": "mix",
+        "of": "#241a3a",
+        "with": "#241a3a",
+        "amount": 0
+       },
+       "amount": 0.12
+      },
+      "c": "fur",
+      "d": "fur.deep",
+      "e": {
+       "rule": "mix",
+       "of": "#2a2030",
+       "with": "#2a2030",
+       "amount": 0
+      },
+      "f": "fur.dark"
+     }
+    }
+   ]
+  }
+ ]
+}

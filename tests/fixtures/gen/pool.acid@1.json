@@ -1,0 +1,194 @@
+{
+ "id": "pool.acid",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     24,
+     16
+    ],
+    "body": "body",
+    "glowColour": "glow"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      9,
+      6
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".........aaaaaaaaaaaa..........",
+      ".......aabbbbbbbbbbbbaa........",
+      ".....aabbbbbbbbbbbbbbbbaa......",
+      "....abbbbccccccccccccbbbba.....",
+      "...abbbcccccccdcdcdbbbcbbba....",
+      "...abbcccccccccbccbbedbccbba...",
+      "..abbcccccccccdcdcbeeebbbbbba..",
+      "..abbcccccccccccccbbebbbedbbba.",
+      "..abbccccccccccccccbbbbeeebcbba",
+      "..abbcccccccccccccccccbbebbcbba",
+      ".abbcccccccccccccbeccccbbbccbba",
+      ".abbcccccccccbbbccbcccccccccbba",
+      "abbcccccccccbbedbcccccccccccbba",
+      "abbcccccffffbeeebccccccccbbbba.",
+      "abbcccccccccbbebbcccccbbbbbba..",
+      "abbccccccccccbbbccbbbbbbbaaa...",
+      ".abbcccccccccccbbbbbbbaaa......",
+      "..abbbbbbbbbbbbbbbaaaa.........",
+      "...abbbbbbbbbbbaaa.............",
+      "....aaaaaaaaaaa................"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body.dark",
+      "c": "body",
+      "d": "glow",
+      "e": "body.light",
+      "f": {
+       "rule": "mix",
+       "of": "body",
+       "with": {
+        "rule": "ramp",
+        "of": "body",
+        "tone": "dark"
+       },
+       "amount": 0.7
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     24,
+     16
+    ],
+    "body": "body",
+    "glowColour": "glow",
+    "picture": "fade"
+   },
+   "ctx": {
+    "t": 0.4,
+    "loop": false,
+    "frames": 6,
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      11,
+      7
+     ],
+     "anchor": "tl",
+     "rows": [
+      "........aaaaaaaaaa.........",
+      ".....aaabbbbbbbbbbaa.......",
+      "....abbbbbbbbbbbbbbbaa.....",
+      "...abbbbccccccccccbbbba....",
+      "..abbcccccccccccddccbbba...",
+      "..abbccccccccccccdddccbba..",
+      ".abbcccccccccccceeedddcbba.",
+      ".abbcccccccccccbbbcccddcbba",
+      ".abbccccccccccbbfdbcccccbba",
+      ".abbccbfccccccbfffbcccccbba",
+      "abbccccbccccccbbfbbcccccbba",
+      "abbcccceeeeecccbbbcccccbbba",
+      "abbcccccccccccccccccbbbbba.",
+      "abbcccccccccccccbbbbbbbaa..",
+      "abbbcccccccccbbbbbbbaaa....",
+      ".abbbbbbbbbbbbbbaaaa.......",
+      "..aabbbbbbbbbaaa...........",
+      "....aaaaaaaaa.............."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body.dark",
+      "c": "body",
+      "d": "glow",
+      "e": {
+       "rule": "mix",
+       "of": "body",
+       "with": {
+        "rule": "ramp",
+        "of": "body",
+        "tone": "dark"
+       },
+       "amount": 0.7
+      },
+      "f": "body.light"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     24,
+     16
+    ],
+    "body": "body",
+    "glowColour": "glow",
+    "picture": "spawn"
+   },
+   "ctx": {
+    "t": 0.375,
+    "loop": true,
+    "frames": 8,
+    "frame": 3
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      10,
+      6
+     ],
+     "anchor": "tl",
+     "rows": [
+      "............aaaa.............",
+      "........aaaabbbbaaaa.........",
+      "......aabbbbbbbbbbbbaa.......",
+      ".....abbbbbbccccbbbbbbaa.....",
+      "....abbbccccccccccccbbbba....",
+      "...abbcccccccccccdddccbbba...",
+      "...abbcccccccccccccdddccbba..",
+      "...abbccccccccccceeeedddcbba.",
+      "..abbccccccccccccccccccdcbba.",
+      "..abbcccccccccccccccccccccbba",
+      ".abbccccccccccccccccccccccbba",
+      ".abbccccccccccccccccccccccbba",
+      "abbccccceeeeeccccccccccccbba.",
+      "abbccccccccccccccccccbbbbba..",
+      "abbccccccccccccccbbbbbbbba...",
+      "abbcccccccccccbbbbbbbaaaa....",
+      ".abbbbbcccbbbbbbbaaaa........",
+      "..abbbbbbbbbbbaaa............",
+      "...aaaabbbaaaa...............",
+      ".......aaa..................."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body.dark",
+      "c": "body",
+      "d": "glow",
+      "e": {
+       "rule": "mix",
+       "of": "body",
+       "with": {
+        "rule": "ramp",
+        "of": "body",
+        "tone": "dark"
+       },
+       "amount": 0.7
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

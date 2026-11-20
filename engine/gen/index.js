@@ -33,6 +33,7 @@ import './icon-modes.js';    // the Gridline kit: icon.mode@1, the eight signs o
 import './icon-sets.js';     // batch M4: icon.fitted, icon.body, icon.rim, icon.flame, icon.plate and oval: what the library icon sets drew in code
 import './prize-items.js';   // migration batch M2: the ten pickups' shape generators (timepiece@1 ...), ports of their code
 import './world-props.js';   // migration batch M3: the library props' shape generators (spring.pad@1 ...), ports of their code
+import './props-p5.js';      // migration batch P5: eight interactive props' port generators (door.blast@1, warp.pad@1 ...), the code's drawing on paint refs
 import './motion-sheen.js';  // migration batch M1: pickup.sheen@1, the glint sweep of a floating pickup (engine/gen/motion-sheen.js)
 import './chip.js';          // migration batch M1: chip@1 and chip.turn@1, the credit chip's turning face (engine/gen/chip.js)
 import './faces.js';         // migration batch M4b: portrait@1, the portrait sets' faces, a port of engine/faces.js (engine/gen/faces.js)
@@ -44,6 +45,8 @@ import './ui-inputs.js';     // migration batch M9: key.cap, key.wide, pad.dpad,
 import './ui-hud.js';        // migration batch M9: damage.digits, status.icons, crosshair ...: the HUD pictures' ports (engine/gen/ui-hud.js)
 import './ui-bubbles.js';    // migration batch M9: emote.marks, the bubbles and the name plate: their ports (engine/gen/ui-bubbles.js)
 import './scenery.js';      // migration batch M10: the backdrops' scenery generators (tall.trees@1, pillars@1 ...), ports of their code
+import './robots.js';       // migration batch C3: robot.security-bot, robot.vendor-bot, robot.warden-mech, robot.scout-drone: the four robots' ports (engine/gen/robots.js)
+import './creatures.js';    // migration batch C2: bug.crawler, bug.mite, bug.spitter, bug.beetle, bug.queen, beast.quadruped: the six bugs and beasts' ports (engine/gen/creatures.js)
 import { SCENERY_FRAME_GENERATORS } from './scenery-frame.js';
 import { BACKDROP_FRAME_GENERATORS } from './backdrop-frame.js';
 import { CHIPS_STAMP_BOUNDS, CHIPS_SIZE_KEYS } from './fx-chips.js';
@@ -55,6 +58,10 @@ import { B12C_STAMP_BOUNDS, B12C_SIZE_KEYS, B12C_FRAME_GENERATORS } from './fx-b
 import { E2_STAMP_BOUNDS, E2_SIZE_KEYS, E2_FRAME_GENERATORS } from './fx-e2.js';   // migration batch E2: the effect behaviours its redraws needed (engine/gen/fx-e2.js)
 import { E1_STAMP_BOUNDS, E1_SIZE_KEYS, E1_FRAME_GENERATORS } from './fx-e1.js';   // build item E1: the behaviours the hit, blast and spell redraws add (engine/gen/fx-e1.js)
 import { E1_EFFECT_STAMP_BOUNDS, E1_EFFECT_SIZE_KEYS } from './fx-e1-effects.js';   // build item E1: ten library effects ported whole (engine/gen/fx-e1-effects.js)
+import './creature-c1.js';   // creature batch C1: six library creatures ported whole and the points motions of three (engine/gen/creature-c1.js)
+import './world-p4.js';      // migration batch P4: the buildings, trees, stall, fires, flag and acid pool ported whole (engine/gen/world-p4.js)
+import './tile-ports.js';    // build item T2: tile.castle, tile.village.cobbles, .wood, .wall, tile.meadow, tile.water, tile.shore: five tilesets' tiles ported whole (engine/gen/tile-ports.js)
+import './tiles-t3.js';      // build item T3: tile.hive, tile.pit, tile.station-floor, tile.station-walls, four station tilesets' tiles ported whole (engine/gen/tiles-t3.js)
 
 /** Declares and registers a generator version in the site's registry; returns its frozen entry (engine/gen/registry.js). */
 export { defineGenerator } from './registry.js';

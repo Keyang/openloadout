@@ -1,0 +1,1230 @@
+{
+ "id": "door.blast",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     32,
+     46
+    ],
+    "body": "body",
+    "accent": "accent",
+    "glowing": "glow",
+    "hull": "hull"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      1,
+      2
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "accccccccccccccccccccccccccccccc",
+      "accccccccccccccccccccccccccccccc",
+      "accccccccccccccccccccccccccccccc",
+      "accccccccccccccccccccccccccccccc",
+      "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "adddddcddddddddddddddddddddddddd",
+      "addcbdcdddddddddddddddddddeeeeee",
+      "addecdcdddddddddddddddddddeeffff",
+      "adddddcdddddddddddddddddddeeeeee",
+      "adddddceeeeeeeeeeeeeeeeeeeeeeeee",
+      "adddddcggggggggggggggggggggggggg",
+      "adddddcggggggggggggggggggggggggg",
+      "adddddcggggggggggggggggggggggggg",
+      "adddddcggggggggggggggggggggggggg",
+      "adddddcggggggggggggggggggggggggg",
+      "adddddcggggggggggggggggggggggggg",
+      "addfhdcggggggggggggggggggggggggg",
+      "addffdciiiiiiiiiiiiiiiiiiiiiiaaa",
+      "adddddcjjjjjjjjjjjjjjjjjjjjjkakk",
+      "adddddcgggggggggggggggggggggkagg",
+      "adddddcgggggggggggggggjiigggkagg",
+      "adddddcgggggggggggggggjiigggkagg",
+      "adddddcgggggggggggggggjiigggkagg",
+      "adddddcgggggggggggggggjiigggkagg",
+      "adddddcgggggggggggggggjiigggkagg",
+      "adddddciiiiiiiiiiiiiiiiiiiiikaaa",
+      "adddddcjjjjjjjjjjjjjjjjjjjjjjkkk",
+      "adddddcggggggggggggggggggggggggg",
+      "adddddcggggggggggggggggggggggggg",
+      "adddddcggggggggggggggggggggggggg"
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "textureLight",
+       "of": {
+        "rule": "shadeTo",
+        "of": "hull",
+        "under": "body",
+        "drop": 0.15,
+        "floor": 0.16
+       }
+      },
+      "c": {
+       "rule": "textureLight",
+       "of": {
+        "rule": "shadeTo",
+        "of": "hull",
+        "under": "body",
+        "drop": 0.15,
+        "floor": 0.16
+       },
+       "against": {
+        "rule": "shadeTo",
+        "of": "hull",
+        "under": "body",
+        "drop": 0.15,
+        "floor": 0.16
+       },
+       "from": 0.4
+      },
+      "d": {
+       "rule": "shadeTo",
+       "of": "hull",
+       "under": "body",
+       "drop": 0.15,
+       "floor": 0.16
+      },
+      "e": {
+       "rule": "textureTone",
+       "of": {
+        "rule": "shadeTo",
+        "of": "hull",
+        "under": "body",
+        "drop": 0.15,
+        "floor": 0.16
+       }
+      },
+      "f": "glow",
+      "g": "body",
+      "h": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      },
+      "i": {
+       "rule": "textureTone",
+       "of": "body"
+      },
+      "j": {
+       "rule": "textureLight",
+       "of": "body",
+       "against": "body",
+       "from": 0.4
+      },
+      "k": {
+       "rule": "textureLight",
+       "of": "body"
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      33,
+      2
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaa.",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbba",
+      "ccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccba",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbba",
+      "ddddddddddddddddddddddddddddca",
+      "eeeedddddddddddddddddddddcbdca",
+      "fgeedddddddddddddddddddddecdca",
+      "eeeeddddddddddddddddddddddddca",
+      "eeeeeeeeeeeeeeeeeeeeeeedddddca",
+      "haiiiiiiiiiiiiiiiiiiiiidddddca",
+      "haiiiiiiiiiiiiiiiiiiiiidddddca",
+      "haiiiiiiiiiiiiiiiiiiiiidddddca",
+      "haiiiiiiiiiiiiiiiiiiiiidddddca",
+      "haiiiiiiiiiiiiiiiiiiiiidddddca",
+      "haiiiiiiiiiiiiiiiiiiiiidddddca",
+      "haiiiiiiiiiiiiiiiiiiiiiddfgdca",
+      "aajjjjjjjjjjjjjjjjjjjjjddffdca",
+      "hkkkkkkkkkkkkkkkkkkkkkkdddddca",
+      "iiiiiiiiiiiiiiiiiiiiiiidddddca",
+      "iiiikjjiiiiiiiiiiiiiiiidddddca",
+      "iiiikjjiiiiiiiiiiiiiiiidddddca",
+      "iiiikjjiiiiiiiiiiiiiiiidddddca",
+      "iiiikjjiiiiiiiiiiiiiiiidddddca",
+      "iiiikjjiiiiiiiiiiiiiiiidddddca",
+      "ajjjjjjjjjjjjjjjjjjjjjjdddddca",
+      "hakkkkkkkkkkkkkkkkkkkkkdddddca",
+      "haiiiiiiiiiiiiiiiiiiiiidddddca",
+      "haiiiiiiiiiiiiiiiiiiiiidddddca",
+      "haiiiiiiiiiiiiiiiiiiiiidddddca"
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "textureLight",
+       "of": {
+        "rule": "shadeTo",
+        "of": "hull",
+        "under": "body",
+        "drop": 0.15,
+        "floor": 0.16
+       }
+      },
+      "c": {
+       "rule": "textureLight",
+       "of": {
+        "rule": "shadeTo",
+        "of": "hull",
+        "under": "body",
+        "drop": 0.15,
+        "floor": 0.16
+       },
+       "against": {
+        "rule": "shadeTo",
+        "of": "hull",
+        "under": "body",
+        "drop": 0.15,
+        "floor": 0.16
+       },
+       "from": 0.4
+      },
+      "d": {
+       "rule": "shadeTo",
+       "of": "hull",
+       "under": "body",
+       "drop": 0.15,
+       "floor": 0.16
+      },
+      "e": {
+       "rule": "textureTone",
+       "of": {
+        "rule": "shadeTo",
+        "of": "hull",
+        "under": "body",
+        "drop": 0.15,
+        "floor": 0.16
+       }
+      },
+      "f": "glow",
+      "g": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      },
+      "h": {
+       "rule": "textureLight",
+       "of": "body"
+      },
+      "i": "body",
+      "j": {
+       "rule": "textureTone",
+       "of": "body"
+      },
+      "k": {
+       "rule": "textureLight",
+       "of": "body",
+       "against": "body",
+       "from": 0.4
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      1,
+      34
+     ],
+     "anchor": "tl",
+     "rows": [
+      "abbbbbcddddddddddddddddddddddddd",
+      "abbbbbcddddddddddddddddddddddddd",
+      "abbbbbcddddddddddddddddddddddddd",
+      "abbbbbceeeeeeeeeeeeeeeeeeeeeeaaa",
+      "abbbbbcfffffffffffffffffffffgagg",
+      "abbbbbchiiiihhhhiiiihhhhiiiigahh",
+      "abbbbbciiiihhhhiiiihhhhiiiihgahi",
+      "abbbbbciiihhhhiiiihhhhiiiihhgaii",
+      "abbbbbciihhhhiiiihhhhiiiihhhgaii",
+      "abbbbbcihhhhiiiihhhhiiiihhhhgaii",
+      "abcccccdddddddddddddddddddddgadd",
+      "abbbbbcdddddddddddddddddddddgadd",
+      ".aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "shadeTo",
+       "of": "hull",
+       "under": "body",
+       "drop": 0.15,
+       "floor": 0.16
+      },
+      "c": {
+       "rule": "textureLight",
+       "of": {
+        "rule": "shadeTo",
+        "of": "hull",
+        "under": "body",
+        "drop": 0.15,
+        "floor": 0.16
+       },
+       "against": {
+        "rule": "shadeTo",
+        "of": "hull",
+        "under": "body",
+        "drop": 0.15,
+        "floor": 0.16
+       },
+       "from": 0.4
+      },
+      "d": "body",
+      "e": {
+       "rule": "textureTone",
+       "of": "body"
+      },
+      "f": {
+       "rule": "textureLight",
+       "of": "body",
+       "against": "body",
+       "from": 0.4
+      },
+      "g": {
+       "rule": "textureLight",
+       "of": "body"
+      },
+      "h": {
+       "rule": "textureTone",
+       "of": {
+        "rule": "shadeTo",
+        "of": "hull",
+        "under": "body",
+        "drop": 0.15,
+        "floor": 0.16
+       }
+      },
+      "i": "accent"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      33,
+      34
+     ],
+     "anchor": "tl",
+     "rows": [
+      "abcccccccccccccccccccccdddddeb",
+      "abcccccccccccccccccccccdddddeb",
+      "abcccccccccccccccccccccdddddeb",
+      "bbfffffffffffffffffffffdddddeb",
+      "aggggggggggggggggggggggdddddeb",
+      "hhhhiiiihhhhiiiihhhhiiidddddeb",
+      "hhhiiiihhhhiiiihhhhiiiidddddeb",
+      "hhiiiihhhhiiiihhhhiiiihdddddeb",
+      "hiiiihhhhiiiihhhhiiiihhdddddeb",
+      "iiiihhhhiiiihhhhiiiihhhdddddeb",
+      "cccccccccccccccccccccccdeeeeeb",
+      "cccccccccccccccccccccccdddddeb",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbb."
+     ],
+     "key": {
+      "a": {
+       "rule": "textureLight",
+       "of": "body"
+      },
+      "b": "ink",
+      "c": "body",
+      "d": {
+       "rule": "shadeTo",
+       "of": "hull",
+       "under": "body",
+       "drop": 0.15,
+       "floor": 0.16
+      },
+      "e": {
+       "rule": "textureLight",
+       "of": {
+        "rule": "shadeTo",
+        "of": "hull",
+        "under": "body",
+        "drop": 0.15,
+        "floor": 0.16
+       },
+       "against": {
+        "rule": "shadeTo",
+        "of": "hull",
+        "under": "body",
+        "drop": 0.15,
+        "floor": 0.16
+       },
+       "from": 0.4
+      },
+      "f": {
+       "rule": "textureTone",
+       "of": "body"
+      },
+      "g": {
+       "rule": "textureLight",
+       "of": "body",
+       "against": "body",
+       "from": 0.4
+      },
+      "h": "accent",
+      "i": {
+       "rule": "textureTone",
+       "of": {
+        "rule": "shadeTo",
+        "of": "hull",
+        "under": "body",
+        "drop": 0.15,
+        "floor": 0.16
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     32,
+     46
+    ],
+    "body": "body",
+    "accent": "accent",
+    "glowing": "glow",
+    "hull": "hull",
+    "picture": "open"
+   },
+   "ctx": {
+    "t": 0.4,
+    "loop": false,
+    "frames": 6,
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      1,
+      2
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "accccccccccccccccccccccccccccccc",
+      "accccccccccccccccccccccccccccccc",
+      "accccccccccccccccccccccccccccccc",
+      "accccccccccccccccccccccccccccccc",
+      "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "adddddcddddddddddddddddddddddddd",
+      "addcbdcdddddddddddddddddddeeffff",
+      "addecdcdddddddddddddddddddefgggg",
+      "adddddcdddddddddddddddddddeeffff",
+      "adddddceeeeeeeeeeeeeeeeeeeeeeeee",
+      "adddddchhhhhhhhhhhhhhhhhhhhhhhhi",
+      "adddddchhhhhhhhhhhhhhhhhhhhhhhhi",
+      "adddddchhhhhhhhhhhhhhhhhhhhhhhhi",
+      "adddddchhhhhhhhhhhhhhhhhhhhhhhhi",
+      "adddddchhhhhhhhhhhhhhhhhhhhhhhhi",
+      "addffdchhhhhhhhhhhhhhhhhhhhhhhhi",
+      "adfggfchhhhhhhhhhhhhhhhhhhhhhhhi",
+      "adfggfcjjjjjjjjjjjjjjjjjjjjjaaaa",
+      "addffdckkkkkkkkkkkkkkkkkkkkiaaai",
+      "adddddchhhhhhhhhhhhhhhhhhhhiaaah",
+      "adddddchhhhhhhhhhhhhhkjjhhhiaaah",
+      "adddddchhhhhhhhhhhhhhkjjhhhiaaah",
+      "adddddchhhhhhhhhhhhhhkjjhhhiaaah",
+      "adddddchhhhhhhhhhhhhhkjjhhhiaaah",
+      "adddddchhhhhhhhhhhhhhkjjhhhiaaah",
+      "adddddcjjjjjjjjjjjjjjjjjjjjiaaaa",
+      "adddddckkkkkkkkkkkkkkkkkkkkkiiii",
+      "adddddchhhhhhhhhhhhhhhhhhhhhhhhi",
+      "adddddchhhhhhhhhhhhhhhhhhhhhhhhi",
+      "adddddchhhhhhhhhhhhhhhhhhhhhhhhi"
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "textureLight",
+       "of": {
+        "rule": "shadeTo",
+        "of": "hull",
+        "under": "body",
+        "drop": 0.15,
+        "floor": 0.16
+       }
+      },
+      "c": {
+       "rule": "textureLight",
+       "of": {
+        "rule": "shadeTo",
+        "of": "hull",
+        "under": "body",
+        "drop": 0.15,
+        "floor": 0.16
+       },
+       "against": {
+        "rule": "shadeTo",
+        "of": "hull",
+        "under": "body",
+        "drop": 0.15,
+        "floor": 0.16
+       },
+       "from": 0.4
+      },
+      "d": {
+       "rule": "shadeTo",
+       "of": "hull",
+       "under": "body",
+       "drop": 0.15,
+       "floor": 0.16
+      },
+      "e": {
+       "rule": "textureTone",
+       "of": {
+        "rule": "shadeTo",
+        "of": "hull",
+        "under": "body",
+        "drop": 0.15,
+        "floor": 0.16
+       }
+      },
+      "f": "glow",
+      "g": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      },
+      "h": "body",
+      "i": {
+       "rule": "textureLight",
+       "of": "body"
+      },
+      "j": {
+       "rule": "textureTone",
+       "of": "body"
+      },
+      "k": {
+       "rule": "textureLight",
+       "of": "body",
+       "against": "body",
+       "from": 0.4
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      33,
+      2
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaa.",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbba",
+      "ccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccba",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbba",
+      "ddddddddddddddddddddddddddddca",
+      "eeffdddddddddddddddddddddcbdca",
+      "ggefdddddddddddddddddddddfcdca",
+      "eeffddddddddddddddddddddddddca",
+      "fffffffffffffffffffffffdddddca",
+      "aaahhhhhhhhhhhhhhhhhhhhdddddca",
+      "aaahhhhhhhhhhhhhhhhhhhhdddddca",
+      "aaahhhhhhhhhhhhhhhhhhhhdddddca",
+      "aaahhhhhhhhhhhhhhhhhhhhdddddca",
+      "aaahhhhhhhhhhhhhhhhhhhhdddddca",
+      "aaahhhhhhhhhhhhhhhhhhhhddeedca",
+      "aaahhhhhhhhhhhhhhhhhhhhdeggeca",
+      "aaaiiiiiiiiiiiiiiiiiiiideggeca",
+      "jjkkkkkkkkkkkkkkkkkkkkkddeedca",
+      "hhhhhhhhhhhhhhhhhhhhhhhdddddca",
+      "hhhhhkiihhhhhhhhhhhhhhhdddddca",
+      "hhhhhkiihhhhhhhhhhhhhhhdddddca",
+      "hhhhhkiihhhhhhhhhhhhhhhdddddca",
+      "hhhhhkiihhhhhhhhhhhhhhhdddddca",
+      "hhhhhkiihhhhhhhhhhhhhhhdddddca",
+      "aaiiiiiiiiiiiiiiiiiiiiidddddca",
+      "aaakkkkkkkkkkkkkkkkkkkkdddddca",
+      "aaahhhhhhhhhhhhhhhhhhhhdddddca",
+      "aaahhhhhhhhhhhhhhhhhhhhdddddca",
+      "aaahhhhhhhhhhhhhhhhhhhhdddddca"
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "textureLight",
+       "of": {
+        "rule": "shadeTo",
+        "of": "hull",
+        "under": "body",
+        "drop": 0.15,
+        "floor": 0.16
+       }
+      },
+      "c": {
+       "rule": "textureLight",
+       "of": {
+        "rule": "shadeTo",
+        "of": "hull",
+        "under": "body",
+        "drop": 0.15,
+        "floor": 0.16
+       },
+       "against": {
+        "rule": "shadeTo",
+        "of": "hull",
+        "under": "body",
+        "drop": 0.15,
+        "floor": 0.16
+       },
+       "from": 0.4
+      },
+      "d": {
+       "rule": "shadeTo",
+       "of": "hull",
+       "under": "body",
+       "drop": 0.15,
+       "floor": 0.16
+      },
+      "e": "glow",
+      "f": {
+       "rule": "textureTone",
+       "of": {
+        "rule": "shadeTo",
+        "of": "hull",
+        "under": "body",
+        "drop": 0.15,
+        "floor": 0.16
+       }
+      },
+      "g": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      },
+      "h": "body",
+      "i": {
+       "rule": "textureTone",
+       "of": "body"
+      },
+      "j": {
+       "rule": "textureLight",
+       "of": "body"
+      },
+      "k": {
+       "rule": "textureLight",
+       "of": "body",
+       "against": "body",
+       "from": 0.4
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      1,
+      34
+     ],
+     "anchor": "tl",
+     "rows": [
+      "abbbbbcdddddddddddddddddddddddde",
+      "abbbbbcdddddddddddddddddddddddde",
+      "abbbbbcdddddddddddddddddddddddde",
+      "abbbbbcfffffffffffffffffffffaaaa",
+      "abbbbbcggggggggggggggggggggeaaae",
+      "abbbbbchhhhiiiihhhhiiiihhhheaaai",
+      "abbbbbchjjjjiihhhhiiiihhhhieaaai",
+      "abbbbbcjkkkkjhhhhiiiihhhhiieaaah",
+      "abbbbbcjkkkkkjhhiiiihhhhiiieaaah",
+      "abbbbbckkkkkkjhiiiihhhhiiiieaaah",
+      "abcccccjkkkkkjdddddddddddddeaaad",
+      "abbbbbcdjjjjjddddddddddddddeaaad",
+      ".aaaaaaaaaaaaaaaaaaaaaaaaaaa..aa"
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "shadeTo",
+       "of": "hull",
+       "under": "body",
+       "drop": 0.15,
+       "floor": 0.16
+      },
+      "c": {
+       "rule": "textureLight",
+       "of": {
+        "rule": "shadeTo",
+        "of": "hull",
+        "under": "body",
+        "drop": 0.15,
+        "floor": 0.16
+       },
+       "against": {
+        "rule": "shadeTo",
+        "of": "hull",
+        "under": "body",
+        "drop": 0.15,
+        "floor": 0.16
+       },
+       "from": 0.4
+      },
+      "d": "body",
+      "e": {
+       "rule": "textureLight",
+       "of": "body"
+      },
+      "f": {
+       "rule": "textureTone",
+       "of": "body"
+      },
+      "g": {
+       "rule": "textureLight",
+       "of": "body",
+       "against": "body",
+       "from": 0.4
+      },
+      "h": "accent",
+      "i": {
+       "rule": "textureTone",
+       "of": {
+        "rule": "shadeTo",
+        "of": "hull",
+        "under": "body",
+        "drop": 0.15,
+        "floor": 0.16
+       }
+      },
+      "j": {
+       "rule": "mix",
+       "of": "#9aa6c0",
+       "with": "#9aa6c0",
+       "amount": 0
+      },
+      "k": {
+       "rule": "mix",
+       "of": "#e8ecf2",
+       "with": "#e8ecf2",
+       "amount": 0
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      33,
+      34
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaabbbbbbbbbbbbbbbbbbbbcccccda",
+      "aaabbbbbbbbbbbbbbbbbbbbcccccda",
+      "aaabbbbbbbbbbbbbbbbbbbbcccccda",
+      "aaaeeeeeeeeeeeeeeeeeeeecccccda",
+      "ffgggggggggggggggggggggcccccda",
+      "hiiiihhhhiiiihhhhiiiihhcccccda",
+      "iiiihhhhiiiihhhhijjjjhhcccccda",
+      "iiihhhhiiiihhhhijkkkkjhcccccda",
+      "iihhhhiiiihhhhijkkkkkjicccccda",
+      "ihhhhiiiihhhhiijkkkkkkjcccccda",
+      "bbbbbbbbbbbbbbbjkkkkkjbcddddda",
+      "bbbbbbbbbbbbbbbbjjjjjbbcccccda",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaa."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body",
+      "c": {
+       "rule": "shadeTo",
+       "of": "hull",
+       "under": "body",
+       "drop": 0.15,
+       "floor": 0.16
+      },
+      "d": {
+       "rule": "textureLight",
+       "of": {
+        "rule": "shadeTo",
+        "of": "hull",
+        "under": "body",
+        "drop": 0.15,
+        "floor": 0.16
+       },
+       "against": {
+        "rule": "shadeTo",
+        "of": "hull",
+        "under": "body",
+        "drop": 0.15,
+        "floor": 0.16
+       },
+       "from": 0.4
+      },
+      "e": {
+       "rule": "textureTone",
+       "of": "body"
+      },
+      "f": {
+       "rule": "textureLight",
+       "of": "body"
+      },
+      "g": {
+       "rule": "textureLight",
+       "of": "body",
+       "against": "body",
+       "from": 0.4
+      },
+      "h": {
+       "rule": "textureTone",
+       "of": {
+        "rule": "shadeTo",
+        "of": "hull",
+        "under": "body",
+        "drop": 0.15,
+        "floor": 0.16
+       }
+      },
+      "i": "accent",
+      "j": {
+       "rule": "mix",
+       "of": "#9aa6c0",
+       "with": "#9aa6c0",
+       "amount": 0
+      },
+      "k": {
+       "rule": "mix",
+       "of": "#e8ecf2",
+       "with": "#e8ecf2",
+       "amount": 0
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     32,
+     46
+    ],
+    "body": "body",
+    "accent": "accent",
+    "glowing": "glow",
+    "hull": "hull",
+    "picture": "locked"
+   },
+   "ctx": {
+    "t": 0.375,
+    "loop": true,
+    "frames": 8,
+    "frame": 3
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      1,
+      2
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "accccccccccccccccccccccccccccccc",
+      "accccccccccccccccccccccccccccccc",
+      "accccccccccccccccccccccccccccccc",
+      "accccccccccccccccccccccccccccccc",
+      "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "adddddcddddddddddddddddddddddddd",
+      "addcbdcdddddddddddddddddddeeeeee",
+      "addecdcdddddddddddddddddddeeffff",
+      "adddddcdddddddddddddddddddeeeeee",
+      "adddddceeeeeeeeeeeeeeeeeeeeeeeee",
+      "adddddcggggggggggggggggggggggggg",
+      "adddddcggggggggggggggggggggggggg",
+      "adddddcggggggggggggggggggggggggg",
+      "adddddcggggggggggggggggggggggggg",
+      "adddddcggggggggggggggggggggggggg",
+      "adddddcggggggggggggggggggggggggg",
+      "addfhdcggggggggggggggggggggggggg",
+      "addffdciiiiiiiiiiiiiiiiiiiiiiaaa",
+      "adddddcjjjjjjjjjjjjjjjjjjjjjkakk",
+      "adddddcgggggggggggggggggbbbbbbbb",
+      "adddddcgggggggggggggggjidddddddd",
+      "adddddcgggggggggggggggjidcbdeeee",
+      "adddddcgggggggggggggggjidecdefff",
+      "adddddcgggggggggggggggjiddddeeee",
+      "adddddcgggggggggggggggjidddddddd",
+      "adddddciiiiiiiiiiiiiiiiieeeeeeee",
+      "adddddcjjjjjjjjjjjjjjjjjjjjjjkkk",
+      "adddddcggggggggggggggggggggggggg",
+      "adddddcggggggggggggggggggggggggg",
+      "adddddcggggggggggggggggggggggggg"
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "textureLight",
+       "of": {
+        "rule": "shadeTo",
+        "of": "hull",
+        "under": "body",
+        "drop": 0.15,
+        "floor": 0.16
+       }
+      },
+      "c": {
+       "rule": "textureLight",
+       "of": {
+        "rule": "shadeTo",
+        "of": "hull",
+        "under": "body",
+        "drop": 0.15,
+        "floor": 0.16
+       },
+       "against": {
+        "rule": "shadeTo",
+        "of": "hull",
+        "under": "body",
+        "drop": 0.15,
+        "floor": 0.16
+       },
+       "from": 0.4
+      },
+      "d": {
+       "rule": "shadeTo",
+       "of": "hull",
+       "under": "body",
+       "drop": 0.15,
+       "floor": 0.16
+      },
+      "e": {
+       "rule": "textureTone",
+       "of": {
+        "rule": "shadeTo",
+        "of": "hull",
+        "under": "body",
+        "drop": 0.15,
+        "floor": 0.16
+       }
+      },
+      "f": {
+       "rule": "mix",
+       "of": "#e2473f",
+       "with": "#e2473f",
+       "amount": 0
+      },
+      "g": "body",
+      "h": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      },
+      "i": {
+       "rule": "textureTone",
+       "of": "body"
+      },
+      "j": {
+       "rule": "textureLight",
+       "of": "body",
+       "against": "body",
+       "from": 0.4
+      },
+      "k": {
+       "rule": "textureLight",
+       "of": "body"
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      33,
+      2
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaa.",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbba",
+      "ccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccba",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbba",
+      "ddddddddddddddddddddddddddddca",
+      "eeeedddddddddddddddddddddcbdca",
+      "fgeedddddddddddddddddddddecdca",
+      "eeeeddddddddddddddddddddddddca",
+      "eeeeeeeeeeeeeeeeeeeeeeedddddca",
+      "haiiiiiiiiiiiiiiiiiiiiidddddca",
+      "haiiiiiiiiiiiiiiiiiiiiidddddca",
+      "haiiiiiiiiiiiiiiiiiiiiidddddca",
+      "haiiiiiiiiiiiiiiiiiiiiidddddca",
+      "haiiiiiiiiiiiiiiiiiiiiidddddca",
+      "haiiiiiiiiiiiiiiiiiiiiidddddca",
+      "haiiiiiiiiiiiiiiiiiiiiiddfgdca",
+      "aajjjjjjjjjjjjjjjjjjjjjddffdca",
+      "hkkkkkkkkkkkkkkkkkkkkkkdddddca",
+      "bbbbbciiiiiiiiiiiiiiiiidddddca",
+      "dddddcjiiiiiiiiiiiiiiiidddddca",
+      "eedcbcjiiiiiiiiiiiiiiiidddddca",
+      "gedeccjiiiiiiiiiiiiiiiidddddca",
+      "eedddcjiiiiiiiiiiiiiiiidddddca",
+      "dddddcjiiiiiiiiiiiiiiiidddddca",
+      "eeeeeejjjjjjjjjjjjjjjjjdddddca",
+      "hakkkkkkkkkkkkkkkkkkkkkdddddca",
+      "haiiiiiiiiiiiiiiiiiiiiidddddca",
+      "haiiiiiiiiiiiiiiiiiiiiidddddca",
+      "haiiiiiiiiiiiiiiiiiiiiidddddca"
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "textureLight",
+       "of": {
+        "rule": "shadeTo",
+        "of": "hull",
+        "under": "body",
+        "drop": 0.15,
+        "floor": 0.16
+       }
+      },
+      "c": {
+       "rule": "textureLight",
+       "of": {
+        "rule": "shadeTo",
+        "of": "hull",
+        "under": "body",
+        "drop": 0.15,
+        "floor": 0.16
+       },
+       "against": {
+        "rule": "shadeTo",
+        "of": "hull",
+        "under": "body",
+        "drop": 0.15,
+        "floor": 0.16
+       },
+       "from": 0.4
+      },
+      "d": {
+       "rule": "shadeTo",
+       "of": "hull",
+       "under": "body",
+       "drop": 0.15,
+       "floor": 0.16
+      },
+      "e": {
+       "rule": "textureTone",
+       "of": {
+        "rule": "shadeTo",
+        "of": "hull",
+        "under": "body",
+        "drop": 0.15,
+        "floor": 0.16
+       }
+      },
+      "f": {
+       "rule": "mix",
+       "of": "#e2473f",
+       "with": "#e2473f",
+       "amount": 0
+      },
+      "g": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      },
+      "h": {
+       "rule": "textureLight",
+       "of": "body"
+      },
+      "i": "body",
+      "j": {
+       "rule": "textureTone",
+       "of": "body"
+      },
+      "k": {
+       "rule": "textureLight",
+       "of": "body",
+       "against": "body",
+       "from": 0.4
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      1,
+      34
+     ],
+     "anchor": "tl",
+     "rows": [
+      "abbbbbcddddddddddddddddddddddddd",
+      "abbbbbcddddddddddddddddddddddddd",
+      "abbbbbcddddddddddddddddddddddddd",
+      "abbbbbceeeeeeeeeeeeeeeeeeeeeeaaa",
+      "abbbbbcfffffffffffffffffffffgagg",
+      "abbbbbchiiiihhhhiiiihhhhiiiigahh",
+      "abbbbbciiiihhhhiiiihhhhiiiihgahi",
+      "abbbbbciiihhhhiiiihhhhiiiihhgaii",
+      "abbbbbciihhhhiiiihhhhiiiihhhgaii",
+      "abbbbbcihhhhiiiihhhhiiiihhhhgaii",
+      "abcccccdddddddddddddddddddddgadd",
+      "abbbbbcdddddddddddddddddddddgadd",
+      ".aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "shadeTo",
+       "of": "hull",
+       "under": "body",
+       "drop": 0.15,
+       "floor": 0.16
+      },
+      "c": {
+       "rule": "textureLight",
+       "of": {
+        "rule": "shadeTo",
+        "of": "hull",
+        "under": "body",
+        "drop": 0.15,
+        "floor": 0.16
+       },
+       "against": {
+        "rule": "shadeTo",
+        "of": "hull",
+        "under": "body",
+        "drop": 0.15,
+        "floor": 0.16
+       },
+       "from": 0.4
+      },
+      "d": "body",
+      "e": {
+       "rule": "textureTone",
+       "of": "body"
+      },
+      "f": {
+       "rule": "textureLight",
+       "of": "body",
+       "against": "body",
+       "from": 0.4
+      },
+      "g": {
+       "rule": "textureLight",
+       "of": "body"
+      },
+      "h": {
+       "rule": "textureTone",
+       "of": {
+        "rule": "shadeTo",
+        "of": "hull",
+        "under": "body",
+        "drop": 0.15,
+        "floor": 0.16
+       }
+      },
+      "i": "accent"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      33,
+      34
+     ],
+     "anchor": "tl",
+     "rows": [
+      "abcccccccccccccccccccccdddddeb",
+      "abcccccccccccccccccccccdddddeb",
+      "abcccccccccccccccccccccdddddeb",
+      "bbfffffffffffffffffffffdddddeb",
+      "aggggggggggggggggggggggdddddeb",
+      "hhhhiiiihhhhiiiihhhhiiidddddeb",
+      "hhhiiiihhhhiiiihhhhiiiidddddeb",
+      "hhiiiihhhhiiiihhhhiiiihdddddeb",
+      "hiiiihhhhiiiihhhhiiiihhdddddeb",
+      "iiiihhhhiiiihhhhiiiihhhdddddeb",
+      "cccccccccccccccccccccccdeeeeeb",
+      "cccccccccccccccccccccccdddddeb",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbb."
+     ],
+     "key": {
+      "a": {
+       "rule": "textureLight",
+       "of": "body"
+      },
+      "b": "ink",
+      "c": "body",
+      "d": {
+       "rule": "shadeTo",
+       "of": "hull",
+       "under": "body",
+       "drop": 0.15,
+       "floor": 0.16
+      },
+      "e": {
+       "rule": "textureLight",
+       "of": {
+        "rule": "shadeTo",
+        "of": "hull",
+        "under": "body",
+        "drop": 0.15,
+        "floor": 0.16
+       },
+       "against": {
+        "rule": "shadeTo",
+        "of": "hull",
+        "under": "body",
+        "drop": 0.15,
+        "floor": 0.16
+       },
+       "from": 0.4
+      },
+      "f": {
+       "rule": "textureTone",
+       "of": "body"
+      },
+      "g": {
+       "rule": "textureLight",
+       "of": "body",
+       "against": "body",
+       "from": 0.4
+      },
+      "h": "accent",
+      "i": {
+       "rule": "textureTone",
+       "of": {
+        "rule": "shadeTo",
+        "of": "hull",
+        "under": "body",
+        "drop": 0.15,
+        "floor": 0.16
+       }
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

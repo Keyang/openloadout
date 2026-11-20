@@ -1,0 +1,45 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "bat",
+ "name": "Bat",
+ "blurb": "A flapping cave bat. Change the wings, ears and colours to make imps, moths and other flyers.",
+ "meta": {"type":"creature","role":"characters/enemy","themes":["fantasy","dungeon","horror"],"gameTypes":["platformer","turn-based-rpg"],"view":"side","words":["bat","vampire","imp","moth","flyer","flying","fly","flap","wings","cave","enemy","monster","swoop"],"license":"draft"},
+ "size": [48,48],
+ "pivot": [25,25],
+ "grounded": false,
+ "preview": "fly",
+ "styles": ["pixel"],
+ "palette": [
+  {"id":"body","label":"Body","default":"#5b4a78","material":"skin","swatches":["#5b4a78","#3a3350","#6b4a3a","#8a93a6","#c9423a","#3f7a5e","#e9e2d0","#3f5fa8"]},
+  {"id":"membrane","label":"Wings","default":"#8a4a6e","material":"skin","swatches":["#8a4a6e","#4a3a6a","#a8553a","#5d6475","#7a2f3a","#3f8f7a","#d9a8b0","#d8d2c4"]},
+  {"id":"eye","label":"Eyes","default":"#ffd84a","material":"light","swatches":["#ffd84a","#ff5a4a","#7ae0ff","#9aff6a","#ffffff","#ff8ad8"]}
+ ],
+ "controls": [
+  {"key":"size","kind":"range","label":"Body size","lo":"Small","hi":"Chubby","default":0.5},
+  {"key":"span","kind":"range","label":"Wing span","lo":"Stubby","hi":"Wide","default":0.5},
+  {"key":"wing","kind":"choice","label":"Wing shape","options":["classic","sharp","round"],"default":"classic"},
+  {"key":"ears","kind":"range","label":"Ear size","lo":"Tiny","hi":"Huge","default":0.5},
+  {"key":"eyes","kind":"choice","label":"Eyes","options":["glow","cute","angry","one"],"default":"glow"},
+  {"key":"fangs","kind":"toggle","label":"Fangs","default":true},
+  {"key":"body","kind":"colour","label":"Body"},
+  {"key":"membrane","kind":"colour","label":"Wings"},
+  {"key":"eye","kind":"colour","label":"Eyes"},
+  {"key":"flap","kind":"range","label":"Flap size","lo":"Flutter","hi":"Big beats","default":0.5,"group":"Motion"},
+  {"key":"bob","kind":"range","label":"Bob","lo":"Steady","hi":"Bouncy","default":0.5,"group":"Motion"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": { "pictures": {
+  "nodes": [{"id":"body","parent":null,"at":[25,25]}],
+  "draw": [
+   {"id":"creature","gen":"creature.bat","v":1,"on":"body","at":[0,0],"picture":"clip","size":{"from":"size"},"span":{"from":"span"},"wing":{"from":"wing"},"ears":{"from":"ears"},"eyes":{"from":"eyes"},"fangs":{"from":"fangs"},"body":"body","membrane":"membrane","eye":"eye","flap":{"from":"flap"},"bob":{"from":"bob"}}
+  ]
+ } },
+ "clips": {
+  "idle": {"label":"Glide","frames":8,"fps":8},
+  "fly": {"frames":8,"fps":14,"sounds":[{"sound":"whoosh","frame":1,"preset":"Quick swipe","volume":0.5}]},
+  "attack": {"frames":8,"fps":12,"loop":false,"sounds":[{"sound":"whoosh","frame":2,"preset":"Heavy swing"}]},
+  "hurt": {"frames":4,"fps":9,"loop":false,"sounds":[{"sound":"punch","frame":0,"preset":"Light jab"}]},
+  "die": {"frames":8,"fps":10,"loop":false,"sounds":[{"sound":"enemy-squish","frame":0,"preset":"Pop","volume":1}]}
+ }
+}

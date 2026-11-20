@@ -1,0 +1,2590 @@
+{
+ "id": "robot.warden-mech",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     48,
+     48
+    ],
+    "picture": "idle",
+    "size": 0.5,
+    "bulk": 0.5,
+    "legs": 0.5,
+    "shape": "cockpit",
+    "weapon": "cannon-arms",
+    "weaponLength": 1,
+    "pack": "missile-pods",
+    "packSize": 1,
+    "bounce": 0.5,
+    "body": "body",
+    "accent": "accent",
+    "lights": "glow"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      15,
+      19
+     ],
+     "anchor": "tl",
+     "rows": [
+      "............aaaaaaaaaaaa........",
+      "...........abbbbbbbbbbbba.......",
+      "...........abbbbbbbbbbbba.......",
+      "..........abbbbbbbbbbbbbba......",
+      "..........acddddddddddddba......",
+      "..........acdeeeeddeeeedba......",
+      "..........acdefgeddefgedba......",
+      "..........acdeffeddeffedba......",
+      "..........acdeeeeddeeeedba..aaaa",
+      "..........acddddddddddddba.ahhhh",
+      "..........acdeeeeddeeeedbaahhhhh",
+      "...aaaaaaaaiiefgeddefgedbajkkkkk",
+      "..ahhhhhhhhhhiffeddeffedbajkllll",
+      ".ahhhhhhhhhhhhiiiiiiiiiiiajklmmm",
+      ".ahhhhhhhhhhhhihhhhhhhhhhijklfff",
+      "ahhhhhhhhhhhhhhihhhhhhhhhijklfff",
+      "ajkkkkkkkkkkkkhihhhhhhhhhijkklff",
+      "ajkkkkkkkkkkkkhihhhhhhhhhijkklff",
+      "alllnnnlllnnnllihhhhhhhhhijkklll",
+      "anlllnnnlllnnnlikkkkkkkkkijkkkkk",
+      "annlllnnnlllnnnikkkkkkkkkijjjjjj",
+      "annnlllnnnlllnnikkkkkkkkkkiiiiii",
+      ".annnlllnnnlllnikkkkkkkkkkllefff",
+      "..ajjkkkkkkkkkhikkkkkkkkklleffmm",
+      "...ajjjjjjjjjjjikkkkkkkkkleefmmm",
+      "...aiiiiiiaaaiikkkkkkkkkklllllll",
+      "..alllllla..ajjjkkkkkkkkkleffmmg",
+      "..allllloa..ajjjjjjjjjjjkleffmmg",
+      "..aiiiiiia...ajjjjkkkkkkkleffmmg",
+      ".ahhhhhhhha...ajjjjkkkkkklllllll",
+      "ahhhhhhhhhha...ajjjllllkklleffmm",
+      "ajkkkkkkkkha....ajjjjkkkkkllefff"
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": {
+         "rule": "tone",
+         "of": "body",
+         "by": -0.75
+        },
+        "with": {
+         "rule": "mix",
+         "of": "#241a3a",
+         "with": "#241a3a",
+         "amount": 0
+        },
+        "amount": 0.12
+       },
+       "tone": "light"
+      },
+      "c": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": {
+         "rule": "tone",
+         "of": "body",
+         "by": -0.75
+        },
+        "with": {
+         "rule": "mix",
+         "of": "#241a3a",
+         "with": "#241a3a",
+         "amount": 0
+        },
+        "amount": 0.12
+       },
+       "tone": "dark"
+      },
+      "d": {
+       "rule": "mix",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.75
+       },
+       "with": {
+        "rule": "mix",
+        "of": "#241a3a",
+        "with": "#241a3a",
+        "amount": 0
+       },
+       "amount": 0.12
+      },
+      "e": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#434d6d",
+        "with": "#434d6d",
+        "amount": 0
+       },
+       "tone": "dark"
+      },
+      "f": "glow",
+      "g": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      },
+      "h": "body.light",
+      "i": "body.deep",
+      "j": "body.dark",
+      "k": "body",
+      "l": {
+       "rule": "mix",
+       "of": "#434d6d",
+       "with": "#434d6d",
+       "amount": 0
+      },
+      "m": {
+       "rule": "mix",
+       "of": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "with": "glow",
+       "amount": 0.5
+      },
+      "n": "accent",
+      "o": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#434d6d",
+        "with": "#434d6d",
+        "amount": 0
+       },
+       "tone": "light"
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      47,
+      19
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..........aaaaaaaaaaaa..........",
+      ".........abbbbbbbbbbbba.........",
+      ".........abbbbbbbbbbbba.........",
+      "........abbbbbbbbbbbbbba........",
+      "........acddddddddddddba........",
+      "........acdeeeeddeeeedba........",
+      "........acdefgeddefgedba........",
+      "........acdeffeddeffedba........",
+      "aaaaaa..acdeeeeddeeeedba........",
+      "hhhhhha.acddddddddddddba........",
+      "hhhhhhhaacdeeeeddeeeedba........",
+      "iiiiiihhacdefgeddefgejjaaaaaaaa.",
+      "kkkkkkihacdeffeddeffjhhhhhhhhhha",
+      "kkllmkihajjjjjjjjjjjhhhhhhhhhhhh",
+      "kkfffkihjhhhhhhhhhhjhhhhhhhhhhhh",
+      "kkffkiihjhhhhhhhhhjhhhhhhhhhhhhh",
+      "kkffkiihjhhhhhhhhhjniiiiiiiiiiii",
+      "kkffkiihjhhhhhhhhhjniiiiiiiiiiii",
+      "kkkkkiihjhhhhhhhhhjoookkkoookkko",
+      "iiiiiiihjiiiiiiiiijookkkoookkkoo",
+      "nnnnnnnnjiiiiiiiiijokkkoookkkooo",
+      "jjjjjjjjiiiiiiiiiijkkkoookkkoook",
+      "fffffeppiiiiiiiiiijkkoookkkoookk",
+      "mmmmffeppiiiiiiiiijniiiiiiiiiiia",
+      "mmmmmfeepiiiiiiiiijnnnnnnnnnnna.",
+      "kkkkkkkkpiiiiiiiiiijjaaajjjjjja.",
+      "gggmmffepiiiiiiiiiiiha..akkkkppa",
+      "gggmmffepinnnnnnnnnnna..akkkkkpa",
+      "gggmmffepiiiiiiiiiiia...ajjjjjja",
+      "kkkkkkkkpiiiiiiiiiia...ahhhhhhhh",
+      "mmmmffekpiikkkkiiia...ahhhhhhhhh",
+      "fffffekkiiiiiiiiia....aniiiiiiii"
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": {
+         "rule": "tone",
+         "of": "body",
+         "by": -0.75
+        },
+        "with": {
+         "rule": "mix",
+         "of": "#241a3a",
+         "with": "#241a3a",
+         "amount": 0
+        },
+        "amount": 0.12
+       },
+       "tone": "light"
+      },
+      "c": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": {
+         "rule": "tone",
+         "of": "body",
+         "by": -0.75
+        },
+        "with": {
+         "rule": "mix",
+         "of": "#241a3a",
+         "with": "#241a3a",
+         "amount": 0
+        },
+        "amount": 0.12
+       },
+       "tone": "dark"
+      },
+      "d": {
+       "rule": "mix",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.75
+       },
+       "with": {
+        "rule": "mix",
+        "of": "#241a3a",
+        "with": "#241a3a",
+        "amount": 0
+       },
+       "amount": 0.12
+      },
+      "e": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#434d6d",
+        "with": "#434d6d",
+        "amount": 0
+       },
+       "tone": "dark"
+      },
+      "f": "glow",
+      "g": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      },
+      "h": "body.light",
+      "i": "body",
+      "j": "body.deep",
+      "k": {
+       "rule": "mix",
+       "of": "#434d6d",
+       "with": "#434d6d",
+       "amount": 0
+      },
+      "l": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      },
+      "m": {
+       "rule": "mix",
+       "of": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "with": "glow",
+       "amount": 0.5
+      },
+      "n": "body.dark",
+      "o": "accent",
+      "p": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#434d6d",
+        "with": "#434d6d",
+        "amount": 0
+       },
+       "tone": "light"
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      79,
+      19
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..",
+      "..",
+      "..",
+      "..",
+      "..",
+      "..",
+      "..",
+      "..",
+      "..",
+      "..",
+      "..",
+      "..",
+      "..",
+      "a.",
+      "a.",
+      "ba",
+      "ba",
+      "ba",
+      "ca",
+      "ca",
+      "da",
+      "da",
+      "a.",
+      "..",
+      "..",
+      "..",
+      "..",
+      "..",
+      "..",
+      "a.",
+      "ba",
+      "ba"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body.light",
+      "c": "accent",
+      "d": {
+       "rule": "mix",
+       "of": "#434d6d",
+       "with": "#434d6d",
+       "amount": 0
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      15,
+      51
+     ],
+     "anchor": "tl",
+     "rows": [
+      "abcccddcccea.....abbdddccccddffg",
+      "abcccddcccea......abbbbcccccddff",
+      "abbcccccccea.......abbbbbbbbbddd",
+      ".abbbbbbbba.......abhbbbbbbbbbbb",
+      ".ahhhhhhhha.......acchhhhhhhhhhh",
+      ".aijjjjjjja......accchddddddbccc",
+      ".aijjjjjjja.....abccchddkkddbccc",
+      ".alkkkkkkma.....acccchddkkddbccc",
+      ".alkkkkkkma....abccccchdddddbccc",
+      ".almmmmmmma....accccccchddddbbcc",
+      ".ammffffmma...accccccccchddddbbc",
+      "ammffffffmma.abcccccccccbhaaaabb",
+      ".ammffffmma..acccccccccbcca...ab",
+      "..ammmmmma.aahhhhhhhhhhcca.....a",
+      "...aaaaaa.annnnnnnnnnnnha.......",
+      ".........aijjjjjjjjjjjjja.......",
+      ".........aijjjjjddjjjjjja.......",
+      ".........aijjjjjddjjjjjja.......",
+      ".........aiijjjjjjjjjjjja.......",
+      "..........aiiiiiiiiiiiia........",
+      "...........ahhhhhhhhhha.........",
+      "..........abccccbbcccea.........",
+      "..........abccccbbcccea.........",
+      "..........abccccbbcccea.........",
+      "..........abccccbbcccea.........",
+      "..........abccccbbcccea.........",
+      "..........abccccbbcccea.........",
+      "..........acccccbbcccea.........",
+      ".........abcccccbbcccea.........",
+      ".........ahhhhhhhhhhhha.........",
+      ".........aeeeeeeeeeeeea.........",
+      "........aeeeeeeeeeeeeeea........"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body.dark",
+      "c": "body",
+      "d": {
+       "rule": "mix",
+       "of": "#434d6d",
+       "with": "#434d6d",
+       "amount": 0
+      },
+      "e": "body.light",
+      "f": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#434d6d",
+        "with": "#434d6d",
+        "amount": 0
+       },
+       "tone": "dark"
+      },
+      "g": "glow",
+      "h": "body.deep",
+      "i": "accent.dark",
+      "j": "accent",
+      "k": {
+       "rule": "standOut",
+       "against": "body",
+       "from": [
+        {
+         "rule": "mix",
+         "of": "#c2c9d6",
+         "with": "#c2c9d6",
+         "amount": 0
+        },
+        {
+         "rule": "mix",
+         "of": "#6b7896",
+         "with": "#6b7896",
+         "amount": 0
+        }
+       ]
+      },
+      "l": {
+       "rule": "ramp",
+       "of": {
+        "rule": "standOut",
+        "against": "body",
+        "from": [
+         {
+          "rule": "mix",
+          "of": "#c2c9d6",
+          "with": "#c2c9d6",
+          "amount": 0
+         },
+         {
+          "rule": "mix",
+          "of": "#6b7896",
+          "with": "#6b7896",
+          "amount": 0
+         }
+        ]
+       },
+       "tone": "dark"
+      },
+      "m": {
+       "rule": "ramp",
+       "of": {
+        "rule": "standOut",
+        "against": "body",
+        "from": [
+         {
+          "rule": "mix",
+          "of": "#c2c9d6",
+          "with": "#c2c9d6",
+          "amount": 0
+         },
+         {
+          "rule": "mix",
+          "of": "#6b7896",
+          "with": "#6b7896",
+          "amount": 0
+         }
+        ]
+       },
+       "tone": "light"
+      },
+      "n": "accent.light"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      47,
+      51
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaabbccddddcccdde.....efdddccddd",
+      "bbbbccddddddddde......efdddccddd",
+      "cccccfffffffffe.......effddddddd",
+      "fffffffffffffgde.......effffffff",
+      "gggggggggggggdde.......egggggggg",
+      "ddddddccccchgddde......eijjjjjjj",
+      "ddddddcckkchgdddde.....eijjjjjjj",
+      "ddddddcckkchgdddde.....elkkkkkkm",
+      "ddddddcccccgdddddde....elkkkkkkm",
+      "ddddddccccgddddddde....elmmmmmmm",
+      "dddddccccgddddddddde...emmbbbbmm",
+      "ddddeeeegdfddddddddde.emmbbbbbbm",
+      "fdde...effdfdddddddde..emmbbbbmm",
+      "ffe.....effggggggggggee.emmmmmme",
+      "ee.......egnnnnnnnnnnnne.eeeeee.",
+      ".........eijjjjjjjjjjjjje.......",
+      ".........eijjjjjccjjjjjje.......",
+      ".........eijjjjjccjjjjjje.......",
+      ".........eiijjjjjjjjjjjje.......",
+      "..........eiiiiiiiiiiiie........",
+      "...........egggggggggge.........",
+      "...........efddddffddooe........",
+      "...........efddddffdddoe........",
+      "...........efddddffdddoe........",
+      "...........efddddffdddoe........",
+      "...........efddddffdddoe........",
+      "...........efddddffdddoe........",
+      "...........efddddffdddoe........",
+      "...........efddddffdddooe.......",
+      "...........egggggggggggge.......",
+      "...........eooooooooooooe.......",
+      "..........eooooooooooooooe......"
+     ],
+     "key": {
+      "a": "glow",
+      "b": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#434d6d",
+        "with": "#434d6d",
+        "amount": 0
+       },
+       "tone": "dark"
+      },
+      "c": {
+       "rule": "mix",
+       "of": "#434d6d",
+       "with": "#434d6d",
+       "amount": 0
+      },
+      "d": "body",
+      "e": "ink",
+      "f": "body.dark",
+      "g": "body.deep",
+      "h": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#434d6d",
+        "with": "#434d6d",
+        "amount": 0
+       },
+       "tone": "light"
+      },
+      "i": "accent.dark",
+      "j": "accent",
+      "k": {
+       "rule": "standOut",
+       "against": "body",
+       "from": [
+        {
+         "rule": "mix",
+         "of": "#c2c9d6",
+         "with": "#c2c9d6",
+         "amount": 0
+        },
+        {
+         "rule": "mix",
+         "of": "#6b7896",
+         "with": "#6b7896",
+         "amount": 0
+        }
+       ]
+      },
+      "l": {
+       "rule": "ramp",
+       "of": {
+        "rule": "standOut",
+        "against": "body",
+        "from": [
+         {
+          "rule": "mix",
+          "of": "#c2c9d6",
+          "with": "#c2c9d6",
+          "amount": 0
+         },
+         {
+          "rule": "mix",
+          "of": "#6b7896",
+          "with": "#6b7896",
+          "amount": 0
+         }
+        ]
+       },
+       "tone": "dark"
+      },
+      "m": {
+       "rule": "ramp",
+       "of": {
+        "rule": "standOut",
+        "against": "body",
+        "from": [
+         {
+          "rule": "mix",
+          "of": "#c2c9d6",
+          "with": "#c2c9d6",
+          "amount": 0
+         },
+         {
+          "rule": "mix",
+          "of": "#6b7896",
+          "with": "#6b7896",
+          "amount": 0
+         }
+        ]
+       },
+       "tone": "light"
+      },
+      "n": "accent.light",
+      "o": "body.light"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      79,
+      51
+     ],
+     "anchor": "tl",
+     "rows": [
+      "ab",
+      "ab",
+      "ab",
+      "b.",
+      "b.",
+      "b.",
+      "b.",
+      "b.",
+      "b.",
+      "b.",
+      "b.",
+      "cb",
+      "b.",
+      "..",
+      "..",
+      "..",
+      "..",
+      "..",
+      "..",
+      "..",
+      "..",
+      "..",
+      "..",
+      "..",
+      "..",
+      "..",
+      "..",
+      "..",
+      "..",
+      "..",
+      "..",
+      ".."
+     ],
+     "key": {
+      "a": "body.light",
+      "b": "ink",
+      "c": {
+       "rule": "ramp",
+       "of": {
+        "rule": "standOut",
+        "against": "body",
+        "from": [
+         {
+          "rule": "mix",
+          "of": "#c2c9d6",
+          "with": "#c2c9d6",
+          "amount": 0
+         },
+         {
+          "rule": "mix",
+          "of": "#6b7896",
+          "with": "#6b7896",
+          "amount": 0
+         }
+        ]
+       },
+       "tone": "light"
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      15,
+      83
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".......abbbbbbbbbbbbbbbba.......",
+      ".......acddddddddddddddba.......",
+      ".......acddddddccddddddba.......",
+      ".......accdddddccddddddba.......",
+      "........acccccccccccccca........",
+      ".........aaaaaaaaaaaaaa........."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body.light",
+      "c": "body.dark",
+      "d": "body"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      47,
+      83
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".........abbbbbbbbbbbbbbbba.....",
+      ".........acddddddddddddddba.....",
+      ".........acddddddccddddddba.....",
+      ".........accdddddccddddddba.....",
+      "..........acccccccccccccca......",
+      "...........aaaaaaaaaaaaaa......."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body.light",
+      "c": "body.dark",
+      "d": "body"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     48,
+     48
+    ],
+    "picture": "beam",
+    "size": 1,
+    "bulk": 0.5,
+    "legs": 0.5,
+    "shape": "cockpit",
+    "weapon": "cannon-arms",
+    "weaponLength": 1,
+    "pack": "missile-pods",
+    "packSize": 1,
+    "bounce": 0.5,
+    "body": "body",
+    "accent": "accent",
+    "lights": "glow"
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": false,
+    "frames": 12,
+    "frame": 6
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      4,
+      10
+     ],
+     "anchor": "tl",
+     "rows": [
+      "....................aaaaaaaaaaaa",
+      "...................abbbbbbbbbbbb",
+      "...................abbbbbbbbbbbb",
+      "..................abbbbbbbbbbbbb",
+      "..................acdddddddddddd",
+      "..................acdeeeeddeeeed",
+      "..................acdefgeddefged",
+      "..................acdeffeddeffed",
+      "..................acdeeeeddeeeed",
+      "..................acdddddddddddd",
+      "..........aaaaaaaaahdeeeeddeeeed",
+      ".........aiiiiiiiiiihefgeddefged",
+      "........aiiiiiiiiiiiihffeddeffed",
+      "........aiiiiiiiiiiiiheeeddeeeed",
+      ".......aiiiiiiiiiiiiiihhhhhhhhhh",
+      ".......ajkkkkkkkkkkkkihiiiiiiiii",
+      ".......ajkkkkkkkkkkkkihiiiiiiiii",
+      ".......allmmmlllmmmlllhiiiiiiiii",
+      ".......alllmmmlllmmmllhiiiiiiiii",
+      ".......amlllmmmlllmmmlhiiiiiiiii",
+      ".......ammlllmmmlllmmmhiiiiiiiii",
+      ".......ammmlllmmmlllmmhkkkkkkkkk",
+      ".......ahjjkkkkkkkkkkihkkkkkkkkk",
+      ".....aammhjjkkkkkkkkkihkkkkkkkkk",
+      "....anmmmmhjjjjjjjjjjjhkkkkkkkkk",
+      "..aahhhhhhhhhhaaaaaahhkkkkkkkkkk",
+      ".aiiiiiiiiiiha.....ajjkkkkkkkkkk",
+      "aiiiiiiiiiiiia.....ajjkkkkkkkkko",
+      "ajkkkkkkkkkkia.....ajjkkkkkkkkko",
+      "ajkkkkmmkkkkia.....ajjjkkkkkkkko",
+      "ajkkkkmmkkkkia.....ajjjjjjjjjjjo",
+      "ajkkkkkkkkkkia......ajjjjkkkkkko"
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": {
+         "rule": "tone",
+         "of": "body",
+         "by": -0.75
+        },
+        "with": {
+         "rule": "mix",
+         "of": "#241a3a",
+         "with": "#241a3a",
+         "amount": 0
+        },
+        "amount": 0.12
+       },
+       "tone": "light"
+      },
+      "c": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": {
+         "rule": "tone",
+         "of": "body",
+         "by": -0.75
+        },
+        "with": {
+         "rule": "mix",
+         "of": "#241a3a",
+         "with": "#241a3a",
+         "amount": 0
+        },
+        "amount": 0.12
+       },
+       "tone": "dark"
+      },
+      "d": {
+       "rule": "mix",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.75
+       },
+       "with": {
+        "rule": "mix",
+        "of": "#241a3a",
+        "with": "#241a3a",
+        "amount": 0
+       },
+       "amount": 0.12
+      },
+      "e": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#434d6d",
+        "with": "#434d6d",
+        "amount": 0
+       },
+       "tone": "dark"
+      },
+      "f": "glow",
+      "g": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      },
+      "h": "body.deep",
+      "i": "body.light",
+      "j": "body.dark",
+      "k": "body",
+      "l": "accent",
+      "m": {
+       "rule": "mix",
+       "of": "#434d6d",
+       "with": "#434d6d",
+       "amount": 0
+      },
+      "n": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#434d6d",
+        "with": "#434d6d",
+        "amount": 0
+       },
+       "tone": "light"
+      },
+      "o": {
+       "rule": "tone",
+       "of": "glow",
+       "by": -1
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      36,
+      10
+     ],
+     "anchor": "tl",
+     "rows": [
+      "....................aaaaaaaaaaaa",
+      "a..................abbbbbbbbbbbb",
+      "a..................abbbbbbbbbbbb",
+      "ba................abbbbbbbbbbbbb",
+      "ba................acdddddddddddd",
+      "ba................acdeeeeddeeeed",
+      "ba................acdefgeddefged",
+      "ba................acdeffeddeffed",
+      "ba..aaaaaaaaaaaa..acdeeeeddeeeed",
+      "ba.ahhhhhhhhhhhha.acdddddddddddd",
+      "baahhhhhhhhhhhhhhaacdeeeeddeeeed",
+      "baijjjjjjjjjjjjjhhacdefgeddefgek",
+      "baijlllllllllllljhacdeffeddeffkh",
+      "baijlggggllgmmgljhacdeeeeddeeekh",
+      "kaijlffffllffffljhakkkkkkkkkkkhh",
+      "hkijlfnffllfffnljhkhhhhhhhhhhkij",
+      "hkijjnmnfllffnmnjhkhhhhhhhhhhkij",
+      "hkijjlnffllfffnjjhkhhhhhhhhhhkol",
+      "hkijjlfffllfffljjhkhhhhhhhhhhkll",
+      "hkijjllpppppplljjhkhhhhhhhhhhkll",
+      "hkijpppffffffpppjhkhhhhhhhhhhklo",
+      "jkippffffffffffppikjjjjjjjjjjkoo",
+      "jjpffffffffffffffpjjjjjjjjjjjkij",
+      "jpffffnnnnnnnnffffpjjjjjjjjjjkij",
+      "ppfffnnnnnnnnnnfffppjjjjjjjjjkii",
+      "pfffnnnnggggnnnnfffpjjjjjjjjjjkk",
+      "pffnnnggggggggnnnffpjjjjjjjjjjjh",
+      "fffnnnggggggggnnnfffpjjjjjjjjjjh",
+      "fffnngggmmmmgggnnfffpjjjjjjjjjjh",
+      "fffnngggmmmmgggnnfffpjjjjjjjjjjh",
+      "fffnngggmmmmgggnnfffpiiiiiiiiiii",
+      "fffnngggmmmmgggnnfffpjjjjjjjjjja"
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": {
+         "rule": "tone",
+         "of": "body",
+         "by": -0.75
+        },
+        "with": {
+         "rule": "mix",
+         "of": "#241a3a",
+         "with": "#241a3a",
+         "amount": 0
+        },
+        "amount": 0.12
+       },
+       "tone": "light"
+      },
+      "c": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": {
+         "rule": "tone",
+         "of": "body",
+         "by": -0.75
+        },
+        "with": {
+         "rule": "mix",
+         "of": "#241a3a",
+         "with": "#241a3a",
+         "amount": 0
+        },
+        "amount": 0.12
+       },
+       "tone": "dark"
+      },
+      "d": {
+       "rule": "mix",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.75
+       },
+       "with": {
+        "rule": "mix",
+        "of": "#241a3a",
+        "with": "#241a3a",
+        "amount": 0
+       },
+       "amount": 0.12
+      },
+      "e": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#434d6d",
+        "with": "#434d6d",
+        "amount": 0
+       },
+       "tone": "dark"
+      },
+      "f": "glow",
+      "g": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      },
+      "h": "body.light",
+      "i": "body.dark",
+      "j": "body",
+      "k": "body.deep",
+      "l": {
+       "rule": "mix",
+       "of": "#434d6d",
+       "with": "#434d6d",
+       "amount": 0
+      },
+      "m": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      },
+      "n": {
+       "rule": "mix",
+       "of": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "with": "glow",
+       "amount": 0.5
+      },
+      "o": "accent",
+      "p": {
+       "rule": "tone",
+       "of": "glow",
+       "by": -1
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      68,
+      10
+     ],
+     "anchor": "tl",
+     "rows": [
+      "....................",
+      "a...................",
+      "a...................",
+      "ba..................",
+      "ba..................",
+      "ba..................",
+      "ba..................",
+      "ba..................",
+      "ba..................",
+      "ba..................",
+      "caaaaaaaaa..........",
+      "dddddddddda.........",
+      "ddddddddddda........",
+      "ddddddddddda........",
+      "dddddddddddda.......",
+      "eeeeeeeeeeeda.......",
+      "eeeeeeeeeeeda.......",
+      "ffgggfffgggfa.......",
+      "fgggfffgggffa.......",
+      "gggfffgggfffa.......",
+      "ggfffgggfffga.......",
+      "gfffgggfffgga.......",
+      "eeeeeeeeeeeca.......",
+      "eeeeeeeeeechhaa.....",
+      "iiiiiiiiicffhhha....",
+      "aaaaaaccccccccccaa..",
+      "a.....acdddddddddda.",
+      "a.....adddddddddddda",
+      "a.....aieeeeeeeeeeda",
+      "a.....aieeeeffeeeeda",
+      "a.....aieeeeffeeeeda",
+      "......aieeeeeeeeeeda"
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": {
+         "rule": "tone",
+         "of": "body",
+         "by": -0.75
+        },
+        "with": {
+         "rule": "mix",
+         "of": "#241a3a",
+         "with": "#241a3a",
+         "amount": 0
+        },
+        "amount": 0.12
+       },
+       "tone": "light"
+      },
+      "c": "body.deep",
+      "d": "body.light",
+      "e": "body",
+      "f": {
+       "rule": "mix",
+       "of": "#434d6d",
+       "with": "#434d6d",
+       "amount": 0
+      },
+      "g": "accent",
+      "h": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#434d6d",
+        "with": "#434d6d",
+        "amount": 0
+       },
+       "tone": "light"
+      },
+      "i": "body.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      4,
+      42
+     ],
+     "anchor": "tl",
+     "rows": [
+      "abbcccccccccda.......abbbbccccce",
+      ".abbbbbbbbbba.........abbbbcffff",
+      ".agggggggggga..........abbbbcccc",
+      ".ahiiiiiiiiia...........abbbffff",
+      ".ahiiiiiiiiia............abbbbcc",
+      ".ajkkkkkkkkla.............abbbbc",
+      ".ajkkkkkkkkla..............abbbb",
+      ".ajkkkkkkkkla..............agbbb",
+      ".ajkllllllkla..............acgge",
+      ".allmmmmmmlla.............abccge",
+      "allmmmmmmmmlla............acccge",
+      ".allmmmmmmlla............abcccen",
+      "..aallllllaa.............abcccen",
+      "....aaaaaa...............accccen",
+      "........................abccccen",
+      "........................abccceno",
+      "........................acccceno",
+      ".......................abcccceno",
+      ".......................accccenop",
+      ".....................aagggggenop",
+      "....................aqqqqqqqenop",
+      "...................ahiiiiiienopr",
+      "...................ahiiiiiienopr",
+      "...................ahiiiiifenopr",
+      "...................ahiiiiienoprr",
+      "...................ahiiiiienoprr",
+      "...................ahhiiiienoprr",
+      "....................ahhhhhenoprr",
+      "....................aggggenoprrr",
+      "....................abcccenoprrr",
+      "....................abcccenoprrr",
+      "....................abccenoprrrr"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body.dark",
+      "c": "body",
+      "d": "body.light",
+      "e": {
+       "rule": "tone",
+       "of": "glow",
+       "by": -1
+      },
+      "f": {
+       "rule": "mix",
+       "of": "#434d6d",
+       "with": "#434d6d",
+       "amount": 0
+      },
+      "g": "body.deep",
+      "h": "accent.dark",
+      "i": "accent",
+      "j": {
+       "rule": "ramp",
+       "of": {
+        "rule": "standOut",
+        "against": "body",
+        "from": [
+         {
+          "rule": "mix",
+          "of": "#c2c9d6",
+          "with": "#c2c9d6",
+          "amount": 0
+         },
+         {
+          "rule": "mix",
+          "of": "#6b7896",
+          "with": "#6b7896",
+          "amount": 0
+         }
+        ]
+       },
+       "tone": "dark"
+      },
+      "k": {
+       "rule": "standOut",
+       "against": "body",
+       "from": [
+        {
+         "rule": "mix",
+         "of": "#c2c9d6",
+         "with": "#c2c9d6",
+         "amount": 0
+        },
+        {
+         "rule": "mix",
+         "of": "#6b7896",
+         "with": "#6b7896",
+         "amount": 0
+        }
+       ]
+      },
+      "l": {
+       "rule": "ramp",
+       "of": {
+        "rule": "standOut",
+        "against": "body",
+        "from": [
+         {
+          "rule": "mix",
+          "of": "#c2c9d6",
+          "with": "#c2c9d6",
+          "amount": 0
+         },
+         {
+          "rule": "mix",
+          "of": "#6b7896",
+          "with": "#6b7896",
+          "amount": 0
+         }
+        ]
+       },
+       "tone": "light"
+      },
+      "m": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#434d6d",
+        "with": "#434d6d",
+        "amount": 0
+       },
+       "tone": "dark"
+      },
+      "n": "glow",
+      "o": {
+       "rule": "mix",
+       "of": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "with": "glow",
+       "amount": 0.5
+      },
+      "p": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      },
+      "q": "accent.light",
+      "r": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      36,
+      42
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaabbbccccccccbbbaaadeeeeeeeeef.",
+      "daabbbccccccccbbbaadggggeeeeef..",
+      "daaabbbbccccbbbbaaadeeeeeeeef...",
+      "ddaaabbbbbbbbbbaaaddggggeeef....",
+      "edaaaabbbbbbbbaaaadeeeeeeef.....",
+      "dadaaaaaaaaaaaaaadeeeeeeef......",
+      "dabddaaaaaaaaaaddhhhhhhhff......",
+      "dabcdddaaaaaadddhhhhhhhieef.....",
+      "abcjjjjddddddadiiiiiiiiieef.....",
+      "abcjjjjjjjcbadeeggggggkieeef....",
+      "abcjjjjjjjcbadeegggllgkieeef....",
+      "bcjjjjjjjjcbadeegggllgkieeeef...",
+      "bcjjjjjjjcbadeeeggggggieeeeef...",
+      "bcjjjjjjjcbadeeegggggieeeeeeef..",
+      "bcjjjjjjjcbadeegggggieeeeeeeeef.",
+      "cjjjjjjjjcbadefffffieheeeeeeeef.",
+      "cjjjjjjjcbadef....fhhheeeeeeeeef",
+      "cjjjjjjjcbadf......fheheeeeeeeef",
+      "jjjjjjjjcbad.......fhheheeeeeeee",
+      "jjjjjjjjcbad........fheiiiiiiiii",
+      "jjjjjjjcbad.........fhimmmmmmmmm",
+      "jjjjjjjcbad..........fnooooooooo",
+      "jjjjjjjcbad..........fnooooooooo",
+      "jjjjjjjcbad..........fnoooooggoo",
+      "jjjjjjcbad...........fnoooooggoo",
+      "jjjjjjcbad...........fnooooooooo",
+      "jjjjjjcbad...........fnnoooooooo",
+      "jjjjjjcbad............fnnnnnnnnn",
+      "jjjjjcbad..............fiiiiiiii",
+      "jjjjjcbad..............fheeeehhe",
+      "jjjjjcbad..............fheeeehhe",
+      "jjjjjcbad..............fheeeehhe"
+     ],
+     "key": {
+      "a": "glow",
+      "b": {
+       "rule": "mix",
+       "of": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "with": "glow",
+       "amount": 0.5
+      },
+      "c": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      },
+      "d": {
+       "rule": "tone",
+       "of": "glow",
+       "by": -1
+      },
+      "e": "body",
+      "f": "ink",
+      "g": {
+       "rule": "mix",
+       "of": "#434d6d",
+       "with": "#434d6d",
+       "amount": 0
+      },
+      "h": "body.dark",
+      "i": "body.deep",
+      "j": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      },
+      "k": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#434d6d",
+        "with": "#434d6d",
+        "amount": 0
+       },
+       "tone": "light"
+      },
+      "l": {
+       "rule": "standOut",
+       "against": "body",
+       "from": [
+        {
+         "rule": "mix",
+         "of": "#c2c9d6",
+         "with": "#c2c9d6",
+         "amount": 0
+        },
+        {
+         "rule": "mix",
+         "of": "#6b7896",
+         "with": "#6b7896",
+         "amount": 0
+        }
+       ]
+      },
+      "m": "accent.light",
+      "n": "accent.dark",
+      "o": "accent"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      68,
+      42
+     ],
+     "anchor": "tl",
+     "rows": [
+      "......abbcccccccccda",
+      ".......abbbbbbbbbba.",
+      ".......aeeeeeeeeeea.",
+      ".......afggggggggga.",
+      ".......afggggggggga.",
+      ".......ahiiiiiiiija.",
+      ".......ahiiiiiiiija.",
+      ".......ahiiiiiiiija.",
+      ".......ahijjjjjjija.",
+      ".......ajjkkkkkkjja.",
+      "......ajjkkkkkkkkjja",
+      ".......ajjkkkkkkjja.",
+      "........aajjjjjjaa..",
+      "..........aaaaaa....",
+      "....................",
+      "....................",
+      "....................",
+      "....................",
+      "a...................",
+      "aaa.................",
+      "llla................",
+      "gggga...............",
+      "gggga...............",
+      "gggga...............",
+      "gggga...............",
+      "gggga...............",
+      "gggga...............",
+      "fffa................",
+      "eeea................",
+      "ccda................",
+      "ccda................",
+      "ccda................"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body.dark",
+      "c": "body",
+      "d": "body.light",
+      "e": "body.deep",
+      "f": "accent.dark",
+      "g": "accent",
+      "h": {
+       "rule": "ramp",
+       "of": {
+        "rule": "standOut",
+        "against": "body",
+        "from": [
+         {
+          "rule": "mix",
+          "of": "#c2c9d6",
+          "with": "#c2c9d6",
+          "amount": 0
+         },
+         {
+          "rule": "mix",
+          "of": "#6b7896",
+          "with": "#6b7896",
+          "amount": 0
+         }
+        ]
+       },
+       "tone": "dark"
+      },
+      "i": {
+       "rule": "standOut",
+       "against": "body",
+       "from": [
+        {
+         "rule": "mix",
+         "of": "#c2c9d6",
+         "with": "#c2c9d6",
+         "amount": 0
+        },
+        {
+         "rule": "mix",
+         "of": "#6b7896",
+         "with": "#6b7896",
+         "amount": 0
+        }
+       ]
+      },
+      "j": {
+       "rule": "ramp",
+       "of": {
+        "rule": "standOut",
+        "against": "body",
+        "from": [
+         {
+          "rule": "mix",
+          "of": "#c2c9d6",
+          "with": "#c2c9d6",
+          "amount": 0
+         },
+         {
+          "rule": "mix",
+          "of": "#6b7896",
+          "with": "#6b7896",
+          "amount": 0
+         }
+        ]
+       },
+       "tone": "light"
+      },
+      "k": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#434d6d",
+        "with": "#434d6d",
+        "amount": 0
+       },
+       "tone": "dark"
+      },
+      "l": "accent.light"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      4,
+      74
+     ],
+     "anchor": "tl",
+     "rows": [
+      "....................abccdefghhhh",
+      "....................abccdefghhhh",
+      "....................accdefghhhhh",
+      "...................abccdefghhhhh",
+      "...................abccdefghhhhh",
+      "...................aiidefghhhhhh",
+      "...................ajjdefghhhhhh",
+      "..................ajjjdefghhhhhh",
+      ".................ajjjjdefghhhhhh",
+      ".................abccdefghhhhhhh",
+      ".................abccdefghhhhhhh",
+      ".................abccdefghhhhhhh",
+      ".................abbdefghhhhhhhh",
+      "..................abdefghhhhhhhh",
+      "...................adefghhhhhhhh",
+      "...................defghhhhhhhhh",
+      "...................defghhhhhhhhh",
+      "...................defghhhhhhhhh",
+      "..................defggggggggggg"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body.dark",
+      "c": "body",
+      "d": {
+       "rule": "tone",
+       "of": "glow",
+       "by": -1
+      },
+      "e": "glow",
+      "f": {
+       "rule": "mix",
+       "of": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "with": "glow",
+       "amount": 0.5
+      },
+      "g": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      },
+      "h": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      },
+      "i": "body.deep",
+      "j": "body.light"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      36,
+      74
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaabcde...............fghhhhggh",
+      "aaaabcde...............fghhhhggh",
+      "aaaabcde...............fghhhhggh",
+      "aaaabcde...............fghhhhggh",
+      "aaabcde................fghhhhggh",
+      "aaabcde................fiiiiiiii",
+      "aaabcde................fjjjjjjjj",
+      "aaabcde...............fjjjjjjjjj",
+      "aabcde...............fjjjjjjjjjj",
+      "aabcde...............fghhhhhhhhh",
+      "aabcde...............fghhhhhhggh",
+      "abcde................fghhhhhhggh",
+      "abcde................fgghhhhhggh",
+      "abcde.................fggggggggg",
+      "abcde..................fffffffff",
+      "bcde............................",
+      "bcde............................",
+      "bcde............................",
+      "bcde............................"
+     ],
+     "key": {
+      "a": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      },
+      "b": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      },
+      "c": {
+       "rule": "mix",
+       "of": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "with": "glow",
+       "amount": 0.5
+      },
+      "d": "glow",
+      "e": {
+       "rule": "tone",
+       "of": "glow",
+       "by": -1
+      },
+      "f": "ink",
+      "g": "body.dark",
+      "h": "body",
+      "i": "body.deep",
+      "j": "body.light"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      68,
+      74
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aabc................",
+      "aabc................",
+      "aabc................",
+      "aabbc...............",
+      "aaabc...............",
+      "ddddc...............",
+      "bbbbc...............",
+      "bbbbbc..............",
+      "bbbbbbc.............",
+      "aaaaabc.............",
+      "aaaaabc.............",
+      "aaaaabc.............",
+      "aaaaabc.............",
+      "eeeeec..............",
+      "ccccc...............",
+      "....................",
+      "....................",
+      "....................",
+      "...................."
+     ],
+     "key": {
+      "a": "body",
+      "b": "body.light",
+      "c": "ink",
+      "d": "body.deep",
+      "e": "body.dark"
+     }
+    },
+    {
+     "kind": "rect",
+     "at": [
+      22,
+      93
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": "glow",
+      "by": -1
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      23,
+      93
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": "glow",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      24,
+      93
+     ],
+     "size": [
+      13,
+      1
+     ],
+     "paint": {
+      "rule": "mix",
+      "of": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      },
+      "with": "glow",
+      "amount": 0.5
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      37,
+      93
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": "glow",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      38,
+      93
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": "glow",
+      "by": -1
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      22,
+      94
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": "glow",
+      "by": -1
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      23,
+      94
+     ],
+     "size": [
+      15,
+      1
+     ],
+     "paint": "glow",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      38,
+      94
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": "glow",
+      "by": -1
+     },
+     "shade": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     51,
+     46
+    ],
+    "picture": "die",
+    "size": 0,
+    "bulk": 0.5,
+    "legs": 0.5,
+    "shape": "cockpit",
+    "weapon": "cannon-arms",
+    "weaponLength": 1,
+    "pack": "missile-pods",
+    "packSize": 1,
+    "bounce": 0.5,
+    "body": "body",
+    "accent": "accent",
+    "lights": "glow"
+   },
+   "ctx": {
+    "t": 0.6,
+    "loop": false,
+    "frames": 12,
+    "frame": 3
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      20,
+      22
+     ],
+     "anchor": "tl",
+     "rows": [
+      "............aaaaaaaaaaaa........",
+      "...........abbbbbbbbbbbba.......",
+      "...........abbbbbbbbbbbba.......",
+      "..........abbbbbbbbbbbbbba......",
+      "..........acddddddddddddba......",
+      "..........acdeeeeddeeeedba......",
+      "..........acdefgeddefgedba......",
+      "..........acdeffeddeffedba......",
+      "..........acdeeeeddeeeedba......",
+      "..........acddddddddddddba..aaaa",
+      ".....hhhh.acdeeeeddeeeedba.aiiii",
+      "....hjjjjhahhkfgeddefgedbaaiiiih",
+      "....hjhhhihjjhkfeddeffedbalmmmhj",
+      "....hhiiiihjjjhkkkkkkkkkkalmnnhj",
+      "..hhjhiiiihjjjhkiiiiiiiiiklmnooh",
+      ".hjjhiiiiiihjhiikiiiiiiiiklmnooh",
+      "hjjhlmmmmmmmhmmikiiiiiiiiklmmnhj",
+      "hjhalmmmmmmmmmmikiiiiiiiiklmmnhj",
+      ".h.anpppnnnpppnnkiiiiiiiiklmmnnh",
+      "..hannpppnnnphpnkmmmmmmmmklmmmmm",
+      ".hjhnnnpppnnhjhpkmmmmmmmmkllllll",
+      ".hjhannnppphjjhpkmmmmmmmmmkkkkkk",
+      "..h.aklhhmmhjhmikmmmmmmmmnnegggq",
+      "....anhjjhllhlllkmmmmmmmmnnegqqq",
+      "....anhjjjhaaakklmmmmmmmmnnnnnnn",
+      "....annhhhra.allllmmmmmmmnegqqqq",
+      "...akkkkkkka..alllllllllmnegqqgg",
+      "..aiiiiiiiia...allllmmmmmneggqqq",
+      ".aiiiiiiiiiia...allllmmmmnnnnnnn",
+      ".almmmmmmmmia....allnnnmmnnegggq",
+      ".almmmnnmmmia.....allllmmmnneegg",
+      ".allmmnnmmmia......allnlmmmnnnee"
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": {
+         "rule": "tone",
+         "of": "body",
+         "by": -0.75
+        },
+        "with": {
+         "rule": "mix",
+         "of": "#241a3a",
+         "with": "#241a3a",
+         "amount": 0
+        },
+        "amount": 0.12
+       },
+       "tone": "light"
+      },
+      "c": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": {
+         "rule": "tone",
+         "of": "body",
+         "by": -0.75
+        },
+        "with": {
+         "rule": "mix",
+         "of": "#241a3a",
+         "with": "#241a3a",
+         "amount": 0
+        },
+        "amount": 0.12
+       },
+       "tone": "dark"
+      },
+      "d": {
+       "rule": "mix",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.75
+       },
+       "with": {
+        "rule": "mix",
+        "of": "#241a3a",
+        "with": "#241a3a",
+        "amount": 0
+       },
+       "amount": 0.12
+      },
+      "e": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#434d6d",
+        "with": "#434d6d",
+        "amount": 0
+       },
+       "tone": "dark"
+      },
+      "f": "glow",
+      "g": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      },
+      "h": {
+       "rule": "tone",
+       "of": {
+        "rule": "mix",
+        "of": "#f2a030",
+        "with": "#f2a030",
+        "amount": 0
+       },
+       "by": -1
+      },
+      "i": "body.light",
+      "j": {
+       "rule": "mix",
+       "of": "#f2a030",
+       "with": "#f2a030",
+       "amount": 0
+      },
+      "k": "body.deep",
+      "l": "body.dark",
+      "m": "body",
+      "n": {
+       "rule": "mix",
+       "of": "#434d6d",
+       "with": "#434d6d",
+       "amount": 0
+      },
+      "o": {
+       "rule": "tone",
+       "of": "glow",
+       "by": -1
+      },
+      "p": "accent",
+      "q": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      },
+      "r": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#434d6d",
+        "with": "#434d6d",
+        "amount": 0
+       },
+       "tone": "light"
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      52,
+      22
+     ],
+     "anchor": "tl",
+     "rows": [
+      "........aaaaaaaaaaaa............",
+      ".......abbbbbbbbbbbba...........",
+      ".......abbbbbbbbbbbba...........",
+      "......abbbbbbbbbbbbbba..........",
+      "......acddddddddddddba..........",
+      "......acdeeeeddeeeedba..........",
+      "......acdefgeddefgedba..........",
+      "......acdeffeddeffedba..........",
+      "......acdeeeeddeeeedba..........",
+      "aaaa..acddddddddddddba..........",
+      "hiiha.acdeeeeddeeeedba..........",
+      "ijjiiaacdefgeddefgkkkaaaaa......",
+      "jlljjiicdeffeddefkhhhhhhhha.....",
+      "jlglljjikkkkkkkkkhhhhhhhhhha....",
+      "jlmmgljihhhhhhhhkhhhhhhhhhha....",
+      "jlmmljihhhhhhhhkhhhhhhhhhhhha...",
+      "jlgllljihhhhhhhknooooooooooha...",
+      "jlljjjjihhhhhhhknooooooooooha...",
+      "ijjiiiihhhhhhhhkpppqqqpppqqqa...",
+      "oijiohkooooooookppqqqpppqqqpa...",
+      "nninnnkooooooookpqqqpppqqqppa...",
+      "kkkkkkoooooooookqqqpppqqqppa....",
+      "mgggerrooooooooknoooooooooka....",
+      "mmmgeqrooooooooknnnnnnnnnkra....",
+      "gqqqqqroooooooookkaaakkkkqra....",
+      "gmmmgerooooooooooha.aqiiiqra....",
+      "mggmgeronnnnnnnnna..aijjjiika...",
+      "gmmggeroooooooooa...ijjllljiha..",
+      "gqqqqqrooooooooa...ijjlljjjjiii.",
+      "mgggeqrooqqqooa....ijlljiljljjji",
+      "ggeeqqoooooooa.....ijljiqiijlljj",
+      "eeqqqooooqooa......ijjjiqqijjlji"
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": {
+         "rule": "tone",
+         "of": "body",
+         "by": -0.75
+        },
+        "with": {
+         "rule": "mix",
+         "of": "#241a3a",
+         "with": "#241a3a",
+         "amount": 0
+        },
+        "amount": 0.12
+       },
+       "tone": "light"
+      },
+      "c": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": {
+         "rule": "tone",
+         "of": "body",
+         "by": -0.75
+        },
+        "with": {
+         "rule": "mix",
+         "of": "#241a3a",
+         "with": "#241a3a",
+         "amount": 0
+        },
+        "amount": 0.12
+       },
+       "tone": "dark"
+      },
+      "d": {
+       "rule": "mix",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.75
+       },
+       "with": {
+        "rule": "mix",
+        "of": "#241a3a",
+        "with": "#241a3a",
+        "amount": 0
+       },
+       "amount": 0.12
+      },
+      "e": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#434d6d",
+        "with": "#434d6d",
+        "amount": 0
+       },
+       "tone": "dark"
+      },
+      "f": "glow",
+      "g": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      },
+      "h": "body.light",
+      "i": {
+       "rule": "tone",
+       "of": {
+        "rule": "mix",
+        "of": "#f2a030",
+        "with": "#f2a030",
+        "amount": 0
+       },
+       "by": -1
+      },
+      "j": {
+       "rule": "mix",
+       "of": "#f2a030",
+       "with": "#f2a030",
+       "amount": 0
+      },
+      "k": "body.deep",
+      "l": {
+       "rule": "mix",
+       "of": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "with": {
+        "rule": "mix",
+        "of": "#f2a030",
+        "with": "#f2a030",
+        "amount": 0
+       },
+       "amount": 0.5
+      },
+      "m": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      },
+      "n": "body.dark",
+      "o": "body",
+      "p": "accent",
+      "q": {
+       "rule": "mix",
+       "of": "#434d6d",
+       "with": "#434d6d",
+       "amount": 0
+      },
+      "r": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#434d6d",
+        "with": "#434d6d",
+        "amount": 0
+       },
+       "tone": "light"
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      84,
+      22
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      "a",
+      "."
+     ],
+     "key": {
+      "a": {
+       "rule": "tone",
+       "of": {
+        "rule": "mix",
+        "of": "#f2a030",
+        "with": "#f2a030",
+        "amount": 0
+       },
+       "by": -1
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      20,
+      54
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..abbbbbbbba........abbbbbbbcccc",
+      "..adddddddda........adbbbbbbbbbb",
+      "..aefffffffa.......agddddddddddd",
+      "..aefffffffa......abgdccccccbggg",
+      "..ahiiiiiija......aggdcciiccbggg",
+      "..ahjjjjjjja.....aggggdciiccbggg",
+      "..ajjkkkkjja....abgggggdccccbbgg",
+      ".ajjkkkkkkjja...agggggggdccccbbg",
+      "..ajjkkkkjja...agggggggggdaaaabb",
+      "...ajjjjjja...abggggggggba....ab",
+      "....aaaaaa..aaadddddddbba......a",
+      "...........allllllllllda........",
+      "..........aefffffffffffa........",
+      "..........aeffffccfffffa........",
+      "..........aeffffccfffffa........",
+      "..........aeeffffffffffa........",
+      "...........aeeeeeeeeeea.........",
+      "...........addddddddda..........",
+      "...........abgggbbggma..........",
+      "...........abgggbbggma..........",
+      "...........abgggbbggma..........",
+      "...........abgggbbggma..........",
+      "...........abgggbbggma..........",
+      "...........aggggbbggma..........",
+      "..........abggggbbggma..........",
+      "..........adddddddddda..........",
+      "..........ammmmmmmmmma..........",
+      ".........ammmmmmmmmmmma.........",
+      "........abgggggggggggmma........",
+      "........abgggggbbgggggma........",
+      "........abbggggbbgggggma........",
+      ".........abbbbbbbbbbbba........."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body.dark",
+      "c": {
+       "rule": "mix",
+       "of": "#434d6d",
+       "with": "#434d6d",
+       "amount": 0
+      },
+      "d": "body.deep",
+      "e": "accent.dark",
+      "f": "accent",
+      "g": "body",
+      "h": {
+       "rule": "ramp",
+       "of": {
+        "rule": "standOut",
+        "against": "body",
+        "from": [
+         {
+          "rule": "mix",
+          "of": "#c2c9d6",
+          "with": "#c2c9d6",
+          "amount": 0
+         },
+         {
+          "rule": "mix",
+          "of": "#6b7896",
+          "with": "#6b7896",
+          "amount": 0
+         }
+        ]
+       },
+       "tone": "dark"
+      },
+      "i": {
+       "rule": "standOut",
+       "against": "body",
+       "from": [
+        {
+         "rule": "mix",
+         "of": "#c2c9d6",
+         "with": "#c2c9d6",
+         "amount": 0
+        },
+        {
+         "rule": "mix",
+         "of": "#6b7896",
+         "with": "#6b7896",
+         "amount": 0
+        }
+       ]
+      },
+      "j": {
+       "rule": "ramp",
+       "of": {
+        "rule": "standOut",
+        "against": "body",
+        "from": [
+         {
+          "rule": "mix",
+          "of": "#c2c9d6",
+          "with": "#c2c9d6",
+          "amount": 0
+         },
+         {
+          "rule": "mix",
+          "of": "#6b7896",
+          "with": "#6b7896",
+          "amount": 0
+         }
+        ]
+       },
+       "tone": "light"
+      },
+      "k": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#434d6d",
+        "with": "#434d6d",
+        "amount": 0
+       },
+       "tone": "dark"
+      },
+      "l": "accent.light",
+      "m": "body.light"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      52,
+      54
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaabbbbbbbc.......deedbbbbdeed.",
+      "bbbbbbbbbbfc.......deeedffdeeed.",
+      "fffffffffffgc......deheeddeehhed",
+      "ggggaaaaaifggc.....dehheeeeeeeed",
+      "ggggaajjaifggc.....deehhhhedddd.",
+      "ggggaajjafggggc.....ddeeeedkkc..",
+      "ggggaaaafgggggc.....ckdeedlkkc..",
+      "gggaaaafggggggc....ckklddlllkkc.",
+      "ggccccfbgggggggc....ckkllllkkc..",
+      "bc....cbbggggggc.....ckkkkkkc...",
+      "c.....cbffffffffcc....cccccc....",
+      ".......cmmmmmmmmmmc.............",
+      "......cnoooooooooooc............",
+      "......cnooooaaoooooc............",
+      "......cnooooaaoooooc............",
+      "......cnnooooooooooc............",
+      ".......cnnnnnnnnnnc.............",
+      "........cfffffffffc.............",
+      "........cbgggbbggpc.............",
+      "........cbgggbbggpc.............",
+      "........cbgggbbggpc.............",
+      "........cbgggbbggpc.............",
+      "........cbgggbbggpc.............",
+      "........cbgggbbggpc.............",
+      "........cbgggbbggppc............",
+      "........cffffffffffc............",
+      "........cppppppppppc............",
+      ".......cppppppppppppc...........",
+      "......cbgggggggggggppc..........",
+      "......cbgggggbbgggggpc..........",
+      "......cbbggggbbgggggpc..........",
+      ".......cbbbbbbbbbbbbc..........."
+     ],
+     "key": {
+      "a": {
+       "rule": "mix",
+       "of": "#434d6d",
+       "with": "#434d6d",
+       "amount": 0
+      },
+      "b": "body.dark",
+      "c": "ink",
+      "d": {
+       "rule": "tone",
+       "of": {
+        "rule": "mix",
+        "of": "#f2a030",
+        "with": "#f2a030",
+        "amount": 0
+       },
+       "by": -1
+      },
+      "e": {
+       "rule": "mix",
+       "of": "#f2a030",
+       "with": "#f2a030",
+       "amount": 0
+      },
+      "f": "body.deep",
+      "g": "body",
+      "h": {
+       "rule": "mix",
+       "of": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "with": {
+        "rule": "mix",
+        "of": "#f2a030",
+        "with": "#f2a030",
+        "amount": 0
+       },
+       "amount": 0.5
+      },
+      "i": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#434d6d",
+        "with": "#434d6d",
+        "amount": 0
+       },
+       "tone": "light"
+      },
+      "j": {
+       "rule": "standOut",
+       "against": "body",
+       "from": [
+        {
+         "rule": "mix",
+         "of": "#c2c9d6",
+         "with": "#c2c9d6",
+         "amount": 0
+        },
+        {
+         "rule": "mix",
+         "of": "#6b7896",
+         "with": "#6b7896",
+         "amount": 0
+        }
+       ]
+      },
+      "k": {
+       "rule": "ramp",
+       "of": {
+        "rule": "standOut",
+        "against": "body",
+        "from": [
+         {
+          "rule": "mix",
+          "of": "#c2c9d6",
+          "with": "#c2c9d6",
+          "amount": 0
+         },
+         {
+          "rule": "mix",
+          "of": "#6b7896",
+          "with": "#6b7896",
+          "amount": 0
+         }
+        ]
+       },
+       "tone": "light"
+      },
+      "l": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#434d6d",
+        "with": "#434d6d",
+        "amount": 0
+       },
+       "tone": "dark"
+      },
+      "m": "accent.light",
+      "n": "accent.dark",
+      "o": "accent",
+      "p": "body.light"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      20,
+      86
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..........aaaaaaaaaaaa.........."
+     ],
+     "key": {
+      "a": "ink"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      52,
+      86
+     ],
+     "anchor": "tl",
+     "rows": [
+      "........aaaaaaaaaaaa............"
+     ],
+     "key": {
+      "a": "ink"
+     }
+    }
+   ]
+  }
+ ]
+}

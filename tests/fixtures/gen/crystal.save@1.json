@@ -1,0 +1,499 @@
+{
+ "id": "crystal.save",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     16,
+     46
+    ],
+    "pedestalColour": "pedestalColour",
+    "body": "body",
+    "glowing": "glow"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      3,
+      9
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...........aaaa..........",
+      "..........aabbaa.........",
+      "..........abcdba.........",
+      ".........aabcdbaa........",
+      ".........abccddba........",
+      "........aabccddbaa.......",
+      "........abcccdddba.......",
+      ".......aabcccdddbaa......",
+      ".c.....abccccddddba......",
+      "cec...aabcccccdddbaa.....",
+      ".c..cccbcccccecdddbccc...",
+      "..ccaaabccccccddddbaa.ca.",
+      "..aa.abccccccddddddba.aea",
+      "....aaaaaacccdddaaaaaa.a.",
+      ".....aabffaaaaaaccbaa....",
+      "......aabffffccccbaa.....",
+      ".......aabfffcccbaa......",
+      "........abfffcccba.......",
+      "........aabffccbaa.......",
+      ".........aabfcbaa........",
+      "..........aabbaa.........",
+      "...........aaaa..........",
+      ".........................",
+      ".........................",
+      ".........................",
+      "..........bbbbbb.........",
+      "........bbggggggbb.......",
+      "......bbgghiiiihggbb.....",
+      "....bbgghhiiiiiihhggbb...",
+      "...bgghigghiiiihggjhggb..",
+      "..bghhhiiiggggggjjjhhhgb.",
+      "..bghhhhiiikkkkkjihhhhgb."
+     ],
+     "key": {
+      "a": "glow",
+      "b": "ink",
+      "c": "body",
+      "d": {
+       "rule": "mix",
+       "of": {
+        "rule": "ramp",
+        "of": "body",
+        "tone": "light"
+       },
+       "with": {
+        "rule": "mix",
+        "of": "#ffffff",
+        "with": "#ffffff",
+        "amount": 0
+       },
+       "amount": 0.55
+      },
+      "e": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      },
+      "f": "body.dark",
+      "g": {
+       "rule": "faceTone",
+       "of": "pedestalColour",
+       "face": "top",
+       "tone": "light"
+      },
+      "h": {
+       "rule": "faceTone",
+       "of": "pedestalColour",
+       "face": "top",
+       "tone": "base"
+      },
+      "i": {
+       "rule": "faceTone",
+       "of": "pedestalColour",
+       "face": "wall",
+       "tone": "dark"
+      },
+      "j": {
+       "rule": "faceTone",
+       "of": "pedestalColour",
+       "face": "wall",
+       "tone": "light"
+      },
+      "k": {
+       "rule": "faceTone",
+       "of": "pedestalColour",
+       "face": "wall",
+       "tone": "base"
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      3,
+      41
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..abccddddbbbbbbddddccea.",
+      "..abbbcccccccccccccceeea.",
+      "..abbbbbffffffffffeeeeba.",
+      "...abbbbbbbbbbbbbbbbbba..",
+      "....aabbbbbbbbbbbbbbaa...",
+      "......aaaaaaaaaaaaaa....."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "faceTone",
+       "of": "pedestalColour",
+       "face": "wall",
+       "tone": "dark"
+      },
+      "c": {
+       "rule": "faceTone",
+       "of": "pedestalColour",
+       "face": "top",
+       "tone": "light"
+      },
+      "d": {
+       "rule": "faceTone",
+       "of": "pedestalColour",
+       "face": "top",
+       "tone": "base"
+      },
+      "e": {
+       "rule": "faceTone",
+       "of": "pedestalColour",
+       "face": "wall",
+       "tone": "light"
+      },
+      "f": {
+       "rule": "faceTone",
+       "of": "pedestalColour",
+       "face": "wall",
+       "tone": "base"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     46
+    ],
+    "pedestalColour": "pedestalColour",
+    "body": "body",
+    "glowing": "glow",
+    "picture": "activate"
+   },
+   "ctx": {
+    "t": 0.4,
+    "loop": false,
+    "frames": 6,
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      2,
+      4
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..........aaaaaaaa..........",
+      "........aabbbbbbbbaa........",
+      "......aabbbbccccbbbbaa......",
+      ".....abbbbbcddddcbbbbba.....",
+      "....abbbbbcddeeddcbbbbba....",
+      "...abbbbbbcdebfedcbbbbbba...",
+      "..abbbbbbcddebfeddcbbbbbba..",
+      "..abbbbbbcdebbffedcbbbbbba..",
+      ".abbbbbbcddebbffeddcbbbbbba.",
+      ".abbbbbbcdebbbfffedcbbbbbba.",
+      "abbbbbbcddebbbfffeddcbbbbbba",
+      "abbbbbbcdebbbbbfffedcbbbbbba",
+      "abbbbbcddebbbbbfffeddcbbbbba",
+      "abbbbbbbebbbbbbffffebbbbbbba",
+      "abbbbcddebbbbbbffffeddcbbbba",
+      "abbddcdebbbbbbbfffffedcddbba",
+      "abbbbdddddddbbbffddddddbbbba",
+      "abbbbcddegdhdddddbbeddcbbbba",
+      ".abbbbcddegdgggbbbeddcbbbba.",
+      ".abbbbbcddeggggbbeddcbbbbba.",
+      "..abbbbbcdegggbbbedcbbbbba..",
+      "..abbbbbcaaeggbbeaacbbbbba..",
+      "...abaaaahhhegbehhhaaaaba...",
+      "...aahhhbbcddeeddcbbhhhaa...",
+      "..ah.abbbbbcddddcbbbbba.ha..",
+      "..ah..aabbbbccccbbbbaa..ha..",
+      "...aahhhaabbbbbbbbaahhhaa...",
+      ".....aaaahhhhhhhhhhaaaa.....",
+      ".........aaaaaaaaaa.........",
+      "............................",
+      "...........eeeeee...........",
+      ".........eeiiiiiiee........."
+     ],
+     "key": {
+      "a": {
+       "rule": "tone",
+       "of": "body",
+       "by": -1
+      },
+      "b": "body",
+      "c": {
+       "rule": "mix",
+       "of": "glow",
+       "with": "body",
+       "amount": 0.5
+      },
+      "d": "glow",
+      "e": "ink",
+      "f": {
+       "rule": "mix",
+       "of": {
+        "rule": "ramp",
+        "of": "body",
+        "tone": "light"
+       },
+       "with": {
+        "rule": "mix",
+        "of": "#ffffff",
+        "with": "#ffffff",
+        "amount": 0
+       },
+       "amount": 0.55
+      },
+      "g": "body.dark",
+      "h": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      },
+      "i": {
+       "rule": "faceTone",
+       "of": "pedestalColour",
+       "face": "top",
+       "tone": "light"
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      2,
+      36
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".......aabbcddddcbbaa.......",
+      ".....aabbccddddddccbbaa.....",
+      "....abbcdbbcddddcbbecbba....",
+      "...abcccdddbbbbbbeeecccba...",
+      "...abccccdddfffffedccccba...",
+      "...adbbccccddddddccccbbea...",
+      "...adddbbbbbbbbbbbbbbeeea...",
+      "...adddddffffffffffeeeeda...",
+      "....adddddddddddddddddda....",
+      ".....aaddddddddddddddaa.....",
+      ".......aaaaaaaaaaaaaa......."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "faceTone",
+       "of": "pedestalColour",
+       "face": "top",
+       "tone": "light"
+      },
+      "c": {
+       "rule": "faceTone",
+       "of": "pedestalColour",
+       "face": "top",
+       "tone": "base"
+      },
+      "d": {
+       "rule": "faceTone",
+       "of": "pedestalColour",
+       "face": "wall",
+       "tone": "dark"
+      },
+      "e": {
+       "rule": "faceTone",
+       "of": "pedestalColour",
+       "face": "wall",
+       "tone": "light"
+      },
+      "f": {
+       "rule": "faceTone",
+       "of": "pedestalColour",
+       "face": "wall",
+       "tone": "base"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     46
+    ],
+    "pedestalColour": "pedestalColour",
+    "body": "body",
+    "glowing": "glow",
+    "picture": "activate"
+   },
+   "ctx": {
+    "t": 0.375,
+    "loop": true,
+    "frames": 8,
+    "frame": 3
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      4,
+      5
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..........aaaa..........",
+      ".........abbbba.........",
+      "........abbccbba........",
+      "........abcdecba........",
+      "........abcddcbba.......",
+      ".......abbcddecba.......",
+      ".......abcdddecba.......",
+      "......abbcdddecbba......",
+      "......abcdddddecba......",
+      "......abcdddddecbba.....",
+      ".....abbcdddddeecba.....",
+      "...ddddcddddddeecdddd...",
+      ".db.abbcdddddddeecba.dd.",
+      ".bfbggcddddddddeecgggbb.",
+      ".gbbbbbbbddddddbbbbbbgg.",
+      "gb..abchhbbbbbbicbba..bg",
+      "gb..abbchhhhhhicbba...bg",
+      ".ggbbbbbchhhhhicbabbbgg.",
+      "...ggggbbbbbbbbbbgggg...",
+      ".......gggggggggg.......",
+      "...ggggfffchhcfffgggg...",
+      ".ggfff..abbccbba..fffgg.",
+      "gf.......abbbba.......fg",
+      "gf........aaaa........fg",
+      ".ggfff............fffgg.",
+      "...ggggffffffffffgggg...",
+      ".......gggggggggg.......",
+      "........................",
+      "........................",
+      ".........cccccc.........",
+      ".......ccjjjjjjcc.......",
+      ".....ccjjkllllkjjcc....."
+     ],
+     "key": {
+      "a": {
+       "rule": "mix",
+       "of": "glow",
+       "with": "body",
+       "amount": 0.5
+      },
+      "b": "glow",
+      "c": "ink",
+      "d": "body",
+      "e": {
+       "rule": "mix",
+       "of": {
+        "rule": "ramp",
+        "of": "body",
+        "tone": "light"
+       },
+       "with": {
+        "rule": "mix",
+        "of": "#ffffff",
+        "with": "#ffffff",
+        "amount": 0
+       },
+       "amount": 0.55
+      },
+      "f": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      },
+      "g": {
+       "rule": "tone",
+       "of": "body",
+       "by": -1
+      },
+      "h": "body.dark",
+      "i": "body.light",
+      "j": {
+       "rule": "faceTone",
+       "of": "pedestalColour",
+       "face": "top",
+       "tone": "light"
+      },
+      "k": {
+       "rule": "faceTone",
+       "of": "pedestalColour",
+       "face": "top",
+       "tone": "base"
+      },
+      "l": {
+       "rule": "faceTone",
+       "of": "pedestalColour",
+       "face": "wall",
+       "tone": "dark"
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      4,
+      37
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...aabbccddddddccbbaa...",
+      "..abbcdbbcddddcbbecbba..",
+      ".abcccdddbbbbbbeeecccba.",
+      ".abccccdddfffffedccccba.",
+      ".adbbccccddddddccccbbea.",
+      ".adddbbbbbbbbbbbbbbeeea.",
+      ".adddddffffffffffeeeeda.",
+      "..adddddddddddddddddda..",
+      "...aaddddddddddddddaa...",
+      ".....aaaaaaaaaaaaaa....."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "faceTone",
+       "of": "pedestalColour",
+       "face": "top",
+       "tone": "light"
+      },
+      "c": {
+       "rule": "faceTone",
+       "of": "pedestalColour",
+       "face": "top",
+       "tone": "base"
+      },
+      "d": {
+       "rule": "faceTone",
+       "of": "pedestalColour",
+       "face": "wall",
+       "tone": "dark"
+      },
+      "e": {
+       "rule": "faceTone",
+       "of": "pedestalColour",
+       "face": "wall",
+       "tone": "light"
+      },
+      "f": {
+       "rule": "faceTone",
+       "of": "pedestalColour",
+       "face": "wall",
+       "tone": "base"
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

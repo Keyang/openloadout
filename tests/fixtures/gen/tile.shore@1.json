@@ -1,0 +1,228 @@
+{
+ "id": "tile.shore",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "piece": "water-left",
+    "water": "water",
+    "foam": "foam",
+    "wood": "wood",
+    "body": "body",
+    "streak": "streak",
+    "froth": "froth",
+    "crest": "crest",
+    "sand": "sand",
+    "leaf": "leaf",
+    "cream": "cream",
+    "gold": "gold",
+    "cobble": "cobble"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      0,
+      0
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...........aaaaa.......aaaaaaaaa",
+      ".........aaaaaaaaaa..aaaaaaaaaaa",
+      ".........aabbbbbaaaaaaabbbbbbbbb",
+      ".....a.aabbbbbbbbbbaabbbbbbbbbbb",
+      "...aaaaaabbbbbbbbbbbbbbbbbbbbbbb",
+      "...aababbbbbbbbbbbbbbbbbbbbbbbbb",
+      "...aabbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "..aabbbbbbbcccccbbbbbbbccccccccc",
+      ".aabbbbbbccdddddcccbbccddddddddd",
+      "aabbbbbbbddeeeeedddccddeeffffeee",
+      "aabbbcbccdeeeffeeeeddeeeeeeeeeee",
+      "aacccdcddeeegeefeeeeeeeegggggeee",
+      ".aaddedefeehhhheffeeeeeegggggggg",
+      ".aadeeeeeeggggggggiiiegggggggggg",
+      "..aadjffgggggggggggggggggggggggg",
+      "..aadjgggggggggggggggggggggggggg",
+      ".aadeegggggggggggggggggggggggggg",
+      ".aadjggggggggggggggggggggggggggg",
+      "abdjeegggggggggggggggggggggggggg",
+      "abdeeggggggggggggggggggggggggggg",
+      "cbdeeggggggggggggghhgggggggggggg",
+      "acdegggggggggggggggggggggggggggg",
+      "aadjejgggggggggggggggggggggggggg",
+      ".aadejhhhhhggggggggggggggggggggg",
+      ".aadejgggggggggggggggggggggggggg",
+      ".aadejgggggggggggggggggggggggggg",
+      "aadjejgggggggggggggggggggggggggg",
+      "aadejggggggggggggggggggggggggggg",
+      "aadjeggggggggggggggggggggggggggg",
+      "adjjgggggggggggggggggggggggggggg",
+      "bdeggggggggggggggggggggggggggggg",
+      "bdeggggggggggggggggggggggggggggg"
+     ],
+     "key": {
+      "a": "sand",
+      "b": "sand.dark",
+      "c": "sand.deep",
+      "d": "ink",
+      "e": "water",
+      "f": "crest",
+      "g": "body",
+      "h": "streak",
+      "i": "foam",
+      "j": "froth"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "piece": "water-inner-tl",
+    "water": "water",
+    "foam": "foam",
+    "wood": "wood",
+    "body": "body",
+    "streak": "streak",
+    "froth": "froth",
+    "crest": "crest",
+    "sand": "sand",
+    "leaf": "leaf",
+    "cream": "cream",
+    "gold": "gold",
+    "cobble": "cobble"
+   },
+   "ctx": {
+    "t": 0.375,
+    "frame": 3,
+    "frames": 8,
+    "loop": true
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      0,
+      0
+     ],
+     "anchor": "tl",
+     "rows": [
+      "abcddddddddddddddddddddddddddddd",
+      "abcddddddddddddddddddddddddddddd",
+      "ebccdddddddddddddddddddddddddddd",
+      "ebcfdddddddddddddddddddddddddddd",
+      "ebcfdddddddddddddddddddddddddddd",
+      "ebcfddddddddddddddddddggggggdddd",
+      "ebfddddddddddddddddddddddddddddd",
+      "hbfddddddddddddddddddddddddddddd",
+      "bccddddddddddddddddddddddddddddd",
+      "cccddddddddddddddddddddddddddddd",
+      "ccdddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddggggddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddgggggdddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddggggggddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd",
+      "dddddddddddddddddddddddddddddddd"
+     ],
+     "key": {
+      "a": "sand",
+      "b": "ink",
+      "c": "water",
+      "d": "body",
+      "e": "sand.dark",
+      "f": "froth",
+      "g": "streak",
+      "h": "sand.deep"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     40,
+     20
+    ],
+    "piece": "water-deco-b",
+    "water": "water",
+    "foam": "foam",
+    "wood": "wood",
+    "body": "body",
+    "streak": "streak",
+    "froth": "froth",
+    "crest": "crest",
+    "sand": "sand",
+    "leaf": "leaf",
+    "cream": "cream",
+    "gold": "gold",
+    "cobble": "cobble"
+   },
+   "ctx": {
+    "t": 0.5,
+    "frame": 4,
+    "frames": 8,
+    "loop": true
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      29,
+      13
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".........aaaaa.........",
+      "......aaabbbbbaa.......",
+      ".....abbcbddddbbaa.....",
+      "....acbbccddddddbba....",
+      "...accbbbdcddddddba....",
+      "...accbbbddcddddbbba...",
+      "...accbbbdddddddbba....",
+      "..eacccbbbdddddbbbae...",
+      "ee.accccbbbcbbbbba..ee.",
+      "e...accccbbbccbbca...e.",
+      "e....acccccccccca....e.",
+      "e..f..acccccccaa..f..ee",
+      "e..f...aaaaaaa...ff..e.",
+      "ee.............ff...ee.",
+      "..eee..................",
+      "....eeeeeee............",
+      "...........e..........."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "cobble",
+      "c": "cobble.dark",
+      "d": "cobble.light",
+      "e": "water",
+      "f": "foam"
+     }
+    }
+   ]
+  }
+ ]
+}

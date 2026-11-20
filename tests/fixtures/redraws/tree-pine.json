@@ -1,0 +1,176 @@
+{
+ "id": "tree-pine",
+ "frozen": "2026-11-20",
+ "source": "sprites/tree-pine.js",
+ "sha256": "f112d082f8d4555429aa5150706e6415a35fca95425d17c896e5c1c385a77e5f",
+ "name": "Pine tree",
+ "blurb": "A pointed fir tree for a top-down map, in tiers that sway from the tip; change its size, height, width, snow and colours.",
+ "meta": {
+  "type": "prop",
+  "role": "world/prop",
+  "themes": [
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "top-down-rpg"
+  ],
+  "view": "top-down",
+  "words": [
+   "tree",
+   "pine",
+   "fir",
+   "evergreen",
+   "conifer",
+   "forest",
+   "woods",
+   "snow",
+   "winter",
+   "sway",
+   "shake",
+   "needles"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  48,
+  80
+ ],
+ "pivot": [
+  24,
+  76
+ ],
+ "grounded": true,
+ "preview": "sway",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.6,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "shape": {
+   "kind": "choice",
+   "label": "Shape",
+   "def": "medium",
+   "options": [
+    "short",
+    "medium",
+    "tall"
+   ],
+   "group": "Look"
+  },
+  "width": {
+   "kind": "range",
+   "label": "Width",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Narrow",
+   "hi": "Wide",
+   "group": "Look"
+  },
+  "snowy": {
+   "kind": "toggle",
+   "label": "Snowy",
+   "def": false,
+   "group": "Look"
+  },
+  "leaf": {
+   "kind": "color",
+   "label": "Needles",
+   "def": "#357a4c",
+   "swatches": [
+    "#357a4c",
+    "#4f9d57",
+    "#7fbf5a"
+   ],
+   "group": "Colors"
+  },
+  "wood": {
+   "kind": "color",
+   "label": "Wood",
+   "def": "#9a6a3e",
+   "swatches": [
+    "#9a6a3e",
+    "#c9a06a",
+    "#a8612a",
+    "#5a3a22",
+    "#c98a4a"
+   ],
+   "group": "Colors"
+  },
+  "sway": {
+   "kind": "range",
+   "label": "Sway",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Still",
+   "hi": "Swaying",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "sway": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    8,
+    12
+   ]
+  },
+  "shake": {
+   "frames": 6,
+   "loop": false,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  }
+ },
+ "sounds": {
+  "shake": [
+   {
+    "sound": "footstep-grass",
+    "frame": 0,
+    "preset": "Tall grass",
+    "volume": 0.6
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-rpg-fantasy"
+ ]
+}

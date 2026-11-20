@@ -1,0 +1,175 @@
+{
+ "id": "saw-blade",
+ "frozen": "2026-11-20",
+ "source": "sprites/saw-blade.js",
+ "sha256": "630ee2fc05ea1163ca447bf8f9785c6f8fe5f1283155b48d68e2f40e10b2aac8",
+ "name": "Saw blade",
+ "blurb": "A spinning circular saw blade that hurts on touch; change its size, the cut of its teeth, how many it has, the hub plate, the metal and how much it wobbles.",
+ "meta": {
+  "type": "prop",
+  "role": "world/hazard",
+  "themes": [
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "platformer"
+  ],
+  "view": "side",
+  "words": [
+   "saw",
+   "blade",
+   "sawblade",
+   "buzzsaw",
+   "hazard",
+   "trap",
+   "spin",
+   "grind",
+   "cut",
+   "danger",
+   "obstacle",
+   "metal",
+   "sharp"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  48,
+  48
+ ],
+ "pivot": [
+  24,
+  24
+ ],
+ "grounded": false,
+ "preview": "idle",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.55,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "classic",
+   "options": [
+    {
+     "value": "classic",
+     "label": "Classic"
+    },
+    {
+     "value": "jagged",
+     "label": "Jagged"
+    },
+    {
+     "value": "ring",
+     "label": "Ring"
+    }
+   ],
+   "group": "Look"
+  },
+  "teeth": {
+   "kind": "range",
+   "label": "Teeth",
+   "def": 8,
+   "min": 6,
+   "max": 12,
+   "step": 1,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "hub": {
+   "kind": "toggle",
+   "label": "Hub plate",
+   "def": true,
+   "group": "Look"
+  },
+  "metal": {
+   "kind": "color",
+   "label": "Metal",
+   "def": "#c2c9d6",
+   "swatches": [
+    "#c2c9d6",
+    "#f2c230",
+    "#8f97a8",
+    "#5d6475",
+    "#e6c545",
+    "#c98a4a"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Hub plate",
+   "def": "#c9423a",
+   "swatches": [
+    "#c9423a",
+    "#7a4fc4",
+    "#f0ead8",
+    "#4fd8ee",
+    "#a4c44a"
+   ],
+   "group": "Colors",
+   "when": {
+    "hub": [
+     true
+    ]
+   }
+  },
+  "wobble": {
+   "kind": "range",
+   "label": "Wobble",
+   "def": 0.35,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Firm",
+   "hi": "Wobbly",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  },
+  "grind": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [],
+ "bundles": [
+  "kit-platformer-fantasy"
+ ]
+}

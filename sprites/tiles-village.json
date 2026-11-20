@@ -1,0 +1,1070 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "tiles-village",
+ "name": "Village ground and walls",
+ "blurb": "A cobbled square to lay over grass, a wooden floor, low stone walls and rail fences for a top-down village; change the stone, wood and moss colours, the cobble pattern, the border and how worn it all is.",
+ "size": [32,32],
+ "pivot": [16,16],
+ "grounded": false,
+ "preview": "cobble-right",
+ "styles": ["pixel"],
+ "meta": {
+  "type": "tileset",
+  "role": "world/tile",
+  "themes": ["fantasy","farm"],
+  "gameTypes": ["turn-based-rpg","top-down-rpg"],
+  "view": "top-down",
+  "words": [
+   "cobbles",
+   "cobblestone",
+   "paving",
+   "square",
+   "street",
+   "floorboards",
+   "planks",
+   "wall",
+   "fence",
+   "village",
+   "town",
+   "garden",
+   "walk",
+   "build"
+  ],
+  "license": "draft"
+ },
+ "palette": [
+  {
+   "id": "stone",
+   "label": "Stone",
+   "default": "#a8a4a0",
+   "material": "stone",
+   "swatches": ["#a8a4a0","#5a5f7a","#7e84a0","#f0ead8","#c9a06a","#6b7280","#8f97a8"]
+  },
+  {
+   "id": "wood",
+   "label": "Wood",
+   "default": "#9a6a3e",
+   "material": "wood",
+   "swatches": ["#9a6a3e","#c9a06a","#e6c96a","#a8612a","#5a3a22","#c98a4a"]
+  },
+  {
+   "id": "growth",
+   "label": "Moss",
+   "default": "#4f9d57",
+   "material": "plant",
+   "swatches": ["#4f9d57","#7fbf5a","#357a4c","#e6c96a","#c8553a"]
+  },
+  {"id":"body","material":"stone","derive":{"rule":"pavingTone","of":"stone"}},
+  {"id":"deepjoint","material":"stone","derive":{"rule":"textureTone","of":"body"}},
+  {"id":"joint","material":"stone","derive":{"rule":"stoneShade","of":"body","with":"deepjoint","start":0.55}},
+  {"id":"cap","material":"stone","derive":{"rule":"mix","of":"stone","with":"stone.light","amount":0.6}},
+  {"id":"caplit","material":"stone","derive":{"rule":"textureLight","of":"cap"}},
+  {"id":"capjoint","material":"stone","derive":{"rule":"textureTone","of":"cap"}},
+  {"id":"face","material":"stone","derive":{"rule":"mix","of":"stone","with":"stone.dark","amount":0.3}},
+  {"id":"seam","material":"wood","derive":{"rule":"textureTone","of":"wood"}},
+  {"id":"sheen","material":"wood","derive":{"rule":"textureLight","of":"wood","against":"wood","from":0.5}}
+ ],
+ "controls": [
+  {
+   "key": "style",
+   "kind": "choice",
+   "label": "Style",
+   "options": [
+    {"value":"round","label":"Round cobbles"},
+    {"value":"square","label":"Square flags"},
+    {"value":"herringbone","label":"Herringbone"}
+   ],
+   "default": "round"
+  },
+  {"key":"edge","kind":"range","label":"Edge","lo":"Thin","hi":"Deep","min":3,"max":7,"step":1,"default":5},
+  {"key":"texture","kind":"range","label":"Texture","lo":"Plain","hi":"Busy","default":0.5},
+  {"key":"wear","kind":"range","label":"Wear","lo":"New","hi":"Worn","default":0.35},
+  {"key":"stone","kind":"colour","label":"Stone"},
+  {"key":"wood","kind":"colour","label":"Wood"},
+  {"key":"growth","kind":"colour","label":"Moss"}
+ ],
+ "body": {
+  "tiles": {
+   "tile": 32,
+   "groups": [
+    {
+     "name": "cobble",
+     "kind": "block",
+     "use": "ground",
+     "pieces": ["block","narrow"],
+     "fills": 3,
+     "label": "Cobbles",
+     "outline": false,
+     "pictures": {
+      "left": [
+       {
+        "gen": "tile.village.cobbles",
+        "v": 1,
+        "at": [16,16],
+        "piece": "cobble-left",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stone": "stone",
+        "growth": "growth",
+        "body": "body",
+        "deepJoint": "deepjoint",
+        "joint": "joint",
+        "darker": {"rule":"mix","of":"body","with":"deepjoint","amount":0.8},
+        "glint": {"rule":"textureLight","of":"body"},
+        "mossOn": {"rule":"textureTone","of":"growth","against":"body"}
+       }
+      ],
+      "top": [
+       {
+        "gen": "tile.village.cobbles",
+        "v": 1,
+        "at": [16,16],
+        "piece": "cobble-top",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stone": "stone",
+        "growth": "growth",
+        "body": "body",
+        "deepJoint": "deepjoint",
+        "joint": "joint",
+        "darker": {"rule":"mix","of":"body","with":"deepjoint","amount":0.8},
+        "glint": {"rule":"textureLight","of":"body"},
+        "mossOn": {"rule":"textureTone","of":"growth","against":"body"}
+       }
+      ],
+      "right": [
+       {
+        "gen": "tile.village.cobbles",
+        "v": 1,
+        "at": [16,16],
+        "piece": "cobble-right",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stone": "stone",
+        "growth": "growth",
+        "body": "body",
+        "deepJoint": "deepjoint",
+        "joint": "joint",
+        "darker": {"rule":"mix","of":"body","with":"deepjoint","amount":0.8},
+        "glint": {"rule":"textureLight","of":"body"},
+        "mossOn": {"rule":"textureTone","of":"growth","against":"body"}
+       }
+      ],
+      "side-l": [
+       {
+        "gen": "tile.village.cobbles",
+        "v": 1,
+        "at": [16,16],
+        "piece": "cobble-side-l",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stone": "stone",
+        "growth": "growth",
+        "body": "body",
+        "deepJoint": "deepjoint",
+        "joint": "joint",
+        "darker": {"rule":"mix","of":"body","with":"deepjoint","amount":0.8},
+        "glint": {"rule":"textureLight","of":"body"},
+        "mossOn": {"rule":"textureTone","of":"growth","against":"body"}
+       }
+      ],
+      "fill": [
+       {
+        "gen": "tile.village.cobbles",
+        "v": 1,
+        "at": [16,16],
+        "piece": "cobble-fill",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stone": "stone",
+        "growth": "growth",
+        "body": "body",
+        "deepJoint": "deepjoint",
+        "joint": "joint",
+        "darker": {"rule":"mix","of":"body","with":"deepjoint","amount":0.8},
+        "glint": {"rule":"textureLight","of":"body"},
+        "mossOn": {"rule":"textureTone","of":"growth","against":"body"}
+       }
+      ],
+      "fill-b": [
+       {
+        "gen": "tile.village.cobbles",
+        "v": 1,
+        "at": [16,16],
+        "piece": "cobble-fill-b",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stone": "stone",
+        "growth": "growth",
+        "body": "body",
+        "deepJoint": "deepjoint",
+        "joint": "joint",
+        "darker": {"rule":"mix","of":"body","with":"deepjoint","amount":0.8},
+        "glint": {"rule":"textureLight","of":"body"},
+        "mossOn": {"rule":"textureTone","of":"growth","against":"body"}
+       }
+      ],
+      "fill-c": [
+       {
+        "gen": "tile.village.cobbles",
+        "v": 1,
+        "at": [16,16],
+        "piece": "cobble-fill-c",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stone": "stone",
+        "growth": "growth",
+        "body": "body",
+        "deepJoint": "deepjoint",
+        "joint": "joint",
+        "darker": {"rule":"mix","of":"body","with":"deepjoint","amount":0.8},
+        "glint": {"rule":"textureLight","of":"body"},
+        "mossOn": {"rule":"textureTone","of":"growth","against":"body"}
+       }
+      ],
+      "side-r": [
+       {
+        "gen": "tile.village.cobbles",
+        "v": 1,
+        "at": [16,16],
+        "piece": "cobble-side-r",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stone": "stone",
+        "growth": "growth",
+        "body": "body",
+        "deepJoint": "deepjoint",
+        "joint": "joint",
+        "darker": {"rule":"mix","of":"body","with":"deepjoint","amount":0.8},
+        "glint": {"rule":"textureLight","of":"body"},
+        "mossOn": {"rule":"textureTone","of":"growth","against":"body"}
+       }
+      ],
+      "bottom-l": [
+       {
+        "gen": "tile.village.cobbles",
+        "v": 1,
+        "at": [16,16],
+        "piece": "cobble-bottom-l",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stone": "stone",
+        "growth": "growth",
+        "body": "body",
+        "deepJoint": "deepjoint",
+        "joint": "joint",
+        "darker": {"rule":"mix","of":"body","with":"deepjoint","amount":0.8},
+        "glint": {"rule":"textureLight","of":"body"},
+        "mossOn": {"rule":"textureTone","of":"growth","against":"body"}
+       }
+      ],
+      "bottom": [
+       {
+        "gen": "tile.village.cobbles",
+        "v": 1,
+        "at": [16,16],
+        "piece": "cobble-bottom",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stone": "stone",
+        "growth": "growth",
+        "body": "body",
+        "deepJoint": "deepjoint",
+        "joint": "joint",
+        "darker": {"rule":"mix","of":"body","with":"deepjoint","amount":0.8},
+        "glint": {"rule":"textureLight","of":"body"},
+        "mossOn": {"rule":"textureTone","of":"growth","against":"body"}
+       }
+      ],
+      "bottom-r": [
+       {
+        "gen": "tile.village.cobbles",
+        "v": 1,
+        "at": [16,16],
+        "piece": "cobble-bottom-r",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stone": "stone",
+        "growth": "growth",
+        "body": "body",
+        "deepJoint": "deepjoint",
+        "joint": "joint",
+        "darker": {"rule":"mix","of":"body","with":"deepjoint","amount":0.8},
+        "glint": {"rule":"textureLight","of":"body"},
+        "mossOn": {"rule":"textureTone","of":"growth","against":"body"}
+       }
+      ],
+      "inner-tl": [
+       {
+        "gen": "tile.village.cobbles",
+        "v": 1,
+        "at": [16,16],
+        "piece": "cobble-inner-tl",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stone": "stone",
+        "growth": "growth",
+        "body": "body",
+        "deepJoint": "deepjoint",
+        "joint": "joint",
+        "darker": {"rule":"mix","of":"body","with":"deepjoint","amount":0.8},
+        "glint": {"rule":"textureLight","of":"body"},
+        "mossOn": {"rule":"textureTone","of":"growth","against":"body"}
+       }
+      ],
+      "inner-tr": [
+       {
+        "gen": "tile.village.cobbles",
+        "v": 1,
+        "at": [16,16],
+        "piece": "cobble-inner-tr",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stone": "stone",
+        "growth": "growth",
+        "body": "body",
+        "deepJoint": "deepjoint",
+        "joint": "joint",
+        "darker": {"rule":"mix","of":"body","with":"deepjoint","amount":0.8},
+        "glint": {"rule":"textureLight","of":"body"},
+        "mossOn": {"rule":"textureTone","of":"growth","against":"body"}
+       }
+      ],
+      "inner-bl": [
+       {
+        "gen": "tile.village.cobbles",
+        "v": 1,
+        "at": [16,16],
+        "piece": "cobble-inner-bl",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stone": "stone",
+        "growth": "growth",
+        "body": "body",
+        "deepJoint": "deepjoint",
+        "joint": "joint",
+        "darker": {"rule":"mix","of":"body","with":"deepjoint","amount":0.8},
+        "glint": {"rule":"textureLight","of":"body"},
+        "mossOn": {"rule":"textureTone","of":"growth","against":"body"}
+       }
+      ],
+      "inner-br": [
+       {
+        "gen": "tile.village.cobbles",
+        "v": 1,
+        "at": [16,16],
+        "piece": "cobble-inner-br",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stone": "stone",
+        "growth": "growth",
+        "body": "body",
+        "deepJoint": "deepjoint",
+        "joint": "joint",
+        "darker": {"rule":"mix","of":"body","with":"deepjoint","amount":0.8},
+        "glint": {"rule":"textureLight","of":"body"},
+        "mossOn": {"rule":"textureTone","of":"growth","against":"body"}
+       }
+      ],
+      "strip-l": [
+       {
+        "gen": "tile.village.cobbles",
+        "v": 1,
+        "at": [16,16],
+        "piece": "cobble-strip-l",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stone": "stone",
+        "growth": "growth",
+        "body": "body",
+        "deepJoint": "deepjoint",
+        "joint": "joint",
+        "darker": {"rule":"mix","of":"body","with":"deepjoint","amount":0.8},
+        "glint": {"rule":"textureLight","of":"body"},
+        "mossOn": {"rule":"textureTone","of":"growth","against":"body"}
+       }
+      ],
+      "strip-m": [
+       {
+        "gen": "tile.village.cobbles",
+        "v": 1,
+        "at": [16,16],
+        "piece": "cobble-strip-m",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stone": "stone",
+        "growth": "growth",
+        "body": "body",
+        "deepJoint": "deepjoint",
+        "joint": "joint",
+        "darker": {"rule":"mix","of":"body","with":"deepjoint","amount":0.8},
+        "glint": {"rule":"textureLight","of":"body"},
+        "mossOn": {"rule":"textureTone","of":"growth","against":"body"}
+       }
+      ],
+      "strip-r": [
+       {
+        "gen": "tile.village.cobbles",
+        "v": 1,
+        "at": [16,16],
+        "piece": "cobble-strip-r",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stone": "stone",
+        "growth": "growth",
+        "body": "body",
+        "deepJoint": "deepjoint",
+        "joint": "joint",
+        "darker": {"rule":"mix","of":"body","with":"deepjoint","amount":0.8},
+        "glint": {"rule":"textureLight","of":"body"},
+        "mossOn": {"rule":"textureTone","of":"growth","against":"body"}
+       }
+      ],
+      "col-t": [
+       {
+        "gen": "tile.village.cobbles",
+        "v": 1,
+        "at": [16,16],
+        "piece": "cobble-col-t",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stone": "stone",
+        "growth": "growth",
+        "body": "body",
+        "deepJoint": "deepjoint",
+        "joint": "joint",
+        "darker": {"rule":"mix","of":"body","with":"deepjoint","amount":0.8},
+        "glint": {"rule":"textureLight","of":"body"},
+        "mossOn": {"rule":"textureTone","of":"growth","against":"body"}
+       }
+      ],
+      "col-m": [
+       {
+        "gen": "tile.village.cobbles",
+        "v": 1,
+        "at": [16,16],
+        "piece": "cobble-col-m",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stone": "stone",
+        "growth": "growth",
+        "body": "body",
+        "deepJoint": "deepjoint",
+        "joint": "joint",
+        "darker": {"rule":"mix","of":"body","with":"deepjoint","amount":0.8},
+        "glint": {"rule":"textureLight","of":"body"},
+        "mossOn": {"rule":"textureTone","of":"growth","against":"body"}
+       }
+      ],
+      "col-b": [
+       {
+        "gen": "tile.village.cobbles",
+        "v": 1,
+        "at": [16,16],
+        "piece": "cobble-col-b",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stone": "stone",
+        "growth": "growth",
+        "body": "body",
+        "deepJoint": "deepjoint",
+        "joint": "joint",
+        "darker": {"rule":"mix","of":"body","with":"deepjoint","amount":0.8},
+        "glint": {"rule":"textureLight","of":"body"},
+        "mossOn": {"rule":"textureTone","of":"growth","against":"body"}
+       }
+      ],
+      "single": [
+       {
+        "gen": "tile.village.cobbles",
+        "v": 1,
+        "at": [16,16],
+        "piece": "cobble-single",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stone": "stone",
+        "growth": "growth",
+        "body": "body",
+        "deepJoint": "deepjoint",
+        "joint": "joint",
+        "darker": {"rule":"mix","of":"body","with":"deepjoint","amount":0.8},
+        "glint": {"rule":"textureLight","of":"body"},
+        "mossOn": {"rule":"textureTone","of":"growth","against":"body"}
+       }
+      ]
+     }
+    },
+    {
+     "name": "plank",
+     "kind": "floor",
+     "fills": 3,
+     "label": "Wooden floor",
+     "outline": false,
+     "pictures": {
+      "fill": [
+       {
+        "gen": "tile.village.wood",
+        "v": 1,
+        "at": [16,16],
+        "piece": "plank-fill",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "wood": "wood",
+        "seam": "seam",
+        "fibre": {"rule":"stoneShade","of":"wood","with":"seam","start":0.55},
+        "sheen": "sheen"
+       }
+      ],
+      "fill-b": [
+       {
+        "gen": "tile.village.wood",
+        "v": 1,
+        "at": [16,16],
+        "piece": "plank-fill-b",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "wood": "wood",
+        "seam": "seam",
+        "fibre": {"rule":"stoneShade","of":"wood","with":"seam","start":0.55},
+        "sheen": "sheen"
+       }
+      ],
+      "fill-c": [
+       {
+        "gen": "tile.village.wood",
+        "v": 1,
+        "at": [16,16],
+        "piece": "plank-fill-c",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "wood": "wood",
+        "seam": "seam",
+        "fibre": {"rule":"stoneShade","of":"wood","with":"seam","start":0.55},
+        "sheen": "sheen"
+       }
+      ]
+     }
+    },
+    {
+     "name": "wall",
+     "kind": "block",
+     "use": "wall",
+     "pieces": ["block","narrow"],
+     "label": "Wall",
+     "outline": false,
+     "pictures": {
+      "left": [
+       {
+        "gen": "tile.village.wall",
+        "v": 1,
+        "at": [16,16],
+        "piece": "wall-left",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stone": "stone",
+        "growth": "growth",
+        "cap": "cap",
+        "capJoint": "capjoint",
+        "capLit": "caplit",
+        "capGlint": {"rule":"ifLight","of":"cap","above":0.85,"then":"cap","else":"caplit"},
+        "faceBody": "face",
+        "mossFoot": {"rule":"textureTone","of":"growth","against":"face"}
+       }
+      ],
+      "top": [
+       {
+        "gen": "tile.village.wall",
+        "v": 1,
+        "at": [16,16],
+        "piece": "wall-top",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stone": "stone",
+        "growth": "growth",
+        "cap": "cap",
+        "capJoint": "capjoint",
+        "capLit": "caplit",
+        "capGlint": {"rule":"ifLight","of":"cap","above":0.85,"then":"cap","else":"caplit"},
+        "faceBody": "face",
+        "mossFoot": {"rule":"textureTone","of":"growth","against":"face"}
+       }
+      ],
+      "right": [
+       {
+        "gen": "tile.village.wall",
+        "v": 1,
+        "at": [16,16],
+        "piece": "wall-right",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stone": "stone",
+        "growth": "growth",
+        "cap": "cap",
+        "capJoint": "capjoint",
+        "capLit": "caplit",
+        "capGlint": {"rule":"ifLight","of":"cap","above":0.85,"then":"cap","else":"caplit"},
+        "faceBody": "face",
+        "mossFoot": {"rule":"textureTone","of":"growth","against":"face"}
+       }
+      ],
+      "side-l": [
+       {
+        "gen": "tile.village.wall",
+        "v": 1,
+        "at": [16,16],
+        "piece": "wall-side-l",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stone": "stone",
+        "growth": "growth",
+        "cap": "cap",
+        "capJoint": "capjoint",
+        "capLit": "caplit",
+        "capGlint": {"rule":"ifLight","of":"cap","above":0.85,"then":"cap","else":"caplit"},
+        "faceBody": "face",
+        "mossFoot": {"rule":"textureTone","of":"growth","against":"face"}
+       }
+      ],
+      "fill": [
+       {
+        "gen": "tile.village.wall",
+        "v": 1,
+        "at": [16,16],
+        "piece": "wall-fill",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stone": "stone",
+        "growth": "growth",
+        "cap": "cap",
+        "capJoint": "capjoint",
+        "capLit": "caplit",
+        "capGlint": {"rule":"ifLight","of":"cap","above":0.85,"then":"cap","else":"caplit"},
+        "faceBody": "face",
+        "mossFoot": {"rule":"textureTone","of":"growth","against":"face"}
+       }
+      ],
+      "side-r": [
+       {
+        "gen": "tile.village.wall",
+        "v": 1,
+        "at": [16,16],
+        "piece": "wall-side-r",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stone": "stone",
+        "growth": "growth",
+        "cap": "cap",
+        "capJoint": "capjoint",
+        "capLit": "caplit",
+        "capGlint": {"rule":"ifLight","of":"cap","above":0.85,"then":"cap","else":"caplit"},
+        "faceBody": "face",
+        "mossFoot": {"rule":"textureTone","of":"growth","against":"face"}
+       }
+      ],
+      "bottom-l": [
+       {
+        "gen": "tile.village.wall",
+        "v": 1,
+        "at": [16,16],
+        "piece": "wall-bottom-l",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stone": "stone",
+        "growth": "growth",
+        "cap": "cap",
+        "capJoint": "capjoint",
+        "capLit": "caplit",
+        "capGlint": {"rule":"ifLight","of":"cap","above":0.85,"then":"cap","else":"caplit"},
+        "faceBody": "face",
+        "mossFoot": {"rule":"textureTone","of":"growth","against":"face"}
+       }
+      ],
+      "bottom": [
+       {
+        "gen": "tile.village.wall",
+        "v": 1,
+        "at": [16,16],
+        "piece": "wall-bottom",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stone": "stone",
+        "growth": "growth",
+        "cap": "cap",
+        "capJoint": "capjoint",
+        "capLit": "caplit",
+        "capGlint": {"rule":"ifLight","of":"cap","above":0.85,"then":"cap","else":"caplit"},
+        "faceBody": "face",
+        "mossFoot": {"rule":"textureTone","of":"growth","against":"face"}
+       }
+      ],
+      "bottom-r": [
+       {
+        "gen": "tile.village.wall",
+        "v": 1,
+        "at": [16,16],
+        "piece": "wall-bottom-r",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stone": "stone",
+        "growth": "growth",
+        "cap": "cap",
+        "capJoint": "capjoint",
+        "capLit": "caplit",
+        "capGlint": {"rule":"ifLight","of":"cap","above":0.85,"then":"cap","else":"caplit"},
+        "faceBody": "face",
+        "mossFoot": {"rule":"textureTone","of":"growth","against":"face"}
+       }
+      ],
+      "inner-tl": [
+       {
+        "gen": "tile.village.wall",
+        "v": 1,
+        "at": [16,16],
+        "piece": "wall-inner-tl",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stone": "stone",
+        "growth": "growth",
+        "cap": "cap",
+        "capJoint": "capjoint",
+        "capLit": "caplit",
+        "capGlint": {"rule":"ifLight","of":"cap","above":0.85,"then":"cap","else":"caplit"},
+        "faceBody": "face",
+        "mossFoot": {"rule":"textureTone","of":"growth","against":"face"}
+       }
+      ],
+      "inner-tr": [
+       {
+        "gen": "tile.village.wall",
+        "v": 1,
+        "at": [16,16],
+        "piece": "wall-inner-tr",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stone": "stone",
+        "growth": "growth",
+        "cap": "cap",
+        "capJoint": "capjoint",
+        "capLit": "caplit",
+        "capGlint": {"rule":"ifLight","of":"cap","above":0.85,"then":"cap","else":"caplit"},
+        "faceBody": "face",
+        "mossFoot": {"rule":"textureTone","of":"growth","against":"face"}
+       }
+      ],
+      "inner-bl": [
+       {
+        "gen": "tile.village.wall",
+        "v": 1,
+        "at": [16,16],
+        "piece": "wall-inner-bl",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stone": "stone",
+        "growth": "growth",
+        "cap": "cap",
+        "capJoint": "capjoint",
+        "capLit": "caplit",
+        "capGlint": {"rule":"ifLight","of":"cap","above":0.85,"then":"cap","else":"caplit"},
+        "faceBody": "face",
+        "mossFoot": {"rule":"textureTone","of":"growth","against":"face"}
+       }
+      ],
+      "inner-br": [
+       {
+        "gen": "tile.village.wall",
+        "v": 1,
+        "at": [16,16],
+        "piece": "wall-inner-br",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stone": "stone",
+        "growth": "growth",
+        "cap": "cap",
+        "capJoint": "capjoint",
+        "capLit": "caplit",
+        "capGlint": {"rule":"ifLight","of":"cap","above":0.85,"then":"cap","else":"caplit"},
+        "faceBody": "face",
+        "mossFoot": {"rule":"textureTone","of":"growth","against":"face"}
+       }
+      ],
+      "strip-l": [
+       {
+        "gen": "tile.village.wall",
+        "v": 1,
+        "at": [16,16],
+        "piece": "wall-strip-l",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stone": "stone",
+        "growth": "growth",
+        "cap": "cap",
+        "capJoint": "capjoint",
+        "capLit": "caplit",
+        "capGlint": {"rule":"ifLight","of":"cap","above":0.85,"then":"cap","else":"caplit"},
+        "faceBody": "face",
+        "mossFoot": {"rule":"textureTone","of":"growth","against":"face"}
+       }
+      ],
+      "strip-m": [
+       {
+        "gen": "tile.village.wall",
+        "v": 1,
+        "at": [16,16],
+        "piece": "wall-strip-m",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stone": "stone",
+        "growth": "growth",
+        "cap": "cap",
+        "capJoint": "capjoint",
+        "capLit": "caplit",
+        "capGlint": {"rule":"ifLight","of":"cap","above":0.85,"then":"cap","else":"caplit"},
+        "faceBody": "face",
+        "mossFoot": {"rule":"textureTone","of":"growth","against":"face"}
+       }
+      ],
+      "strip-r": [
+       {
+        "gen": "tile.village.wall",
+        "v": 1,
+        "at": [16,16],
+        "piece": "wall-strip-r",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stone": "stone",
+        "growth": "growth",
+        "cap": "cap",
+        "capJoint": "capjoint",
+        "capLit": "caplit",
+        "capGlint": {"rule":"ifLight","of":"cap","above":0.85,"then":"cap","else":"caplit"},
+        "faceBody": "face",
+        "mossFoot": {"rule":"textureTone","of":"growth","against":"face"}
+       }
+      ],
+      "col-t": [
+       {
+        "gen": "tile.village.wall",
+        "v": 1,
+        "at": [16,16],
+        "piece": "wall-col-t",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stone": "stone",
+        "growth": "growth",
+        "cap": "cap",
+        "capJoint": "capjoint",
+        "capLit": "caplit",
+        "capGlint": {"rule":"ifLight","of":"cap","above":0.85,"then":"cap","else":"caplit"},
+        "faceBody": "face",
+        "mossFoot": {"rule":"textureTone","of":"growth","against":"face"}
+       }
+      ],
+      "col-m": [
+       {
+        "gen": "tile.village.wall",
+        "v": 1,
+        "at": [16,16],
+        "piece": "wall-col-m",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stone": "stone",
+        "growth": "growth",
+        "cap": "cap",
+        "capJoint": "capjoint",
+        "capLit": "caplit",
+        "capGlint": {"rule":"ifLight","of":"cap","above":0.85,"then":"cap","else":"caplit"},
+        "faceBody": "face",
+        "mossFoot": {"rule":"textureTone","of":"growth","against":"face"}
+       }
+      ],
+      "col-b": [
+       {
+        "gen": "tile.village.wall",
+        "v": 1,
+        "at": [16,16],
+        "piece": "wall-col-b",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stone": "stone",
+        "growth": "growth",
+        "cap": "cap",
+        "capJoint": "capjoint",
+        "capLit": "caplit",
+        "capGlint": {"rule":"ifLight","of":"cap","above":0.85,"then":"cap","else":"caplit"},
+        "faceBody": "face",
+        "mossFoot": {"rule":"textureTone","of":"growth","against":"face"}
+       }
+      ],
+      "single": [
+       {
+        "gen": "tile.village.wall",
+        "v": 1,
+        "at": [16,16],
+        "piece": "wall-single",
+        "style": {"from":"style"},
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stone": "stone",
+        "growth": "growth",
+        "cap": "cap",
+        "capJoint": "capjoint",
+        "capLit": "caplit",
+        "capGlint": {"rule":"ifLight","of":"cap","above":0.85,"then":"cap","else":"caplit"},
+        "faceBody": "face",
+        "mossFoot": {"rule":"textureTone","of":"growth","against":"face"}
+       }
+      ]
+     }
+    }
+   ],
+   "extra": [
+    {
+     "name": "fence-h",
+     "label": "Fence: rails and post (repeats sideways)",
+     "draw": [
+      {
+       "gen": "tile.village.wood",
+       "v": 1,
+       "at": [16,16],
+       "piece": "fence-h",
+       "style": {"from":"style"},
+       "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+       "texture": {"from":"texture"},
+       "wear": {"from":"wear"},
+       "wood": "wood"
+      }
+     ]
+    },
+    {
+     "name": "fence-v",
+     "label": "Fence: going up the map (repeats up and down)",
+     "draw": [
+      {
+       "gen": "tile.village.wood",
+       "v": 1,
+       "at": [16,16],
+       "piece": "fence-v",
+       "style": {"from":"style"},
+       "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+       "texture": {"from":"texture"},
+       "wear": {"from":"wear"},
+       "wood": "wood"
+      }
+     ]
+    },
+    {
+     "name": "fence-post",
+     "label": "Fence: post for corners and ends",
+     "draw": [
+      {
+       "gen": "tile.village.wood",
+       "v": 1,
+       "at": [16,16],
+       "piece": "fence-post",
+       "style": {"from":"style"},
+       "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+       "texture": {"from":"texture"},
+       "wear": {"from":"wear"},
+       "wood": "wood"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "clips": {
+  "plank-fill": {"label":"Wooden floor"},
+  "plank-fill-b": {"label":"Wooden floor, version B"},
+  "plank-fill-c": {"label":"Wooden floor, version C"}
+ }
+}

@@ -1,0 +1,211 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "tiles-water",
+ "name": "Water and waterfalls",
+ "blurb": "An animated pool and a waterfall for a side-view level; make it water, lava or a swamp, and change its colour, its foam, how choppy it is, the sparkle and the speed.",
+ "size": [32,32],
+ "pivot": [16,16],
+ "grounded": false,
+ "preview": "water-top",
+ "styles": ["pixel"],
+ "meta": {
+  "type": "tileset",
+  "role": "world/tile",
+  "themes": ["fantasy","forest"],
+  "gameTypes": ["platformer"],
+  "view": "side",
+  "words": ["water","waterfall","river","pool","lake","pond","lava","swamp","liquid","swim","splash","wave","foam","hazard"],
+  "license": "draft"
+ },
+ "palette": [
+  {
+   "id": "water",
+   "label": "Colour",
+   "default": "#3f9fd1",
+   "material": "water",
+   "swatches": ["#3f9fd1","#3f6fd1","#7fb0b8","#e08a2c","#a4c44a"]
+  },
+  {
+   "id": "foam",
+   "label": "Foam",
+   "default": "#f0ead8",
+   "material": "water",
+   "swatches": ["#f0ead8","#f2c230","#c2c9d6","#e6c545","#8fd0f0"]
+  },
+  {"id":"lit","material":"water","derive":{"rule":"textureLight","of":"water"}},
+  {"id":"murk","material":"water","derive":{"rule":"textureTone","of":"water"}},
+  {"id":"froth","material":"water","derive":{"rule":"mix","of":"foam","with":"water","amount":0.4}},
+  {"id":"leaf","default":"#3f8a4f","material":"plant","detail":true},
+  {"id":"cream","default":"#f0ead8","material":"plant","detail":true},
+  {"id":"crimson","default":"#c9423a","material":"plant","detail":true}
+ ],
+ "controls": [
+  {
+   "key": "liquid",
+   "kind": "choice",
+   "label": "Liquid",
+   "options": [{"value":"water","label":"Water"},{"value":"lava","label":"Lava"},{"value":"swamp","label":"Swamp"}],
+   "default": "water"
+  },
+  {"key":"waves","kind":"range","label":"Waves","lo":"Calm","hi":"Choppy","default":0.5},
+  {"key":"sparkle","kind":"toggle","label":"Sparkle","default":true},
+  {"key":"water","kind":"colour","label":"Colour"},
+  {"key":"foam","kind":"colour","label":"Foam"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": {
+  "tiles": {
+   "tile": 32,
+   "groups": [
+    {
+     "name": "water",
+     "kind": "liquid",
+     "fills": 3,
+     "label": "Pool",
+     "frames": 8,
+     "fps": 6,
+     "outline": false,
+     "pictures": {
+      "top": [
+       {
+        "gen": "tile.water",
+        "v": 1,
+        "at": [16,16],
+        "piece": "water-top",
+        "liquid": {"from":"liquid"},
+        "waves": {"from":"waves"},
+        "sparkle": {"from":"sparkle"},
+        "water": "water",
+        "foam": "foam",
+        "lit": "lit",
+        "murk": "murk",
+        "froth": "froth",
+        "leaf": "leaf",
+        "cream": "cream",
+        "crimson": "crimson"
+       }
+      ],
+      "fill": [
+       {
+        "gen": "tile.water",
+        "v": 1,
+        "at": [16,16],
+        "piece": "water-fill",
+        "liquid": {"from":"liquid"},
+        "waves": {"from":"waves"},
+        "sparkle": {"from":"sparkle"},
+        "water": "water",
+        "foam": "foam",
+        "lit": "lit",
+        "murk": "murk",
+        "froth": "froth",
+        "leaf": "leaf",
+        "cream": "cream",
+        "crimson": "crimson"
+       }
+      ],
+      "fill-b": [
+       {
+        "gen": "tile.water",
+        "v": 1,
+        "at": [16,16],
+        "piece": "water-fill-b",
+        "liquid": {"from":"liquid"},
+        "waves": {"from":"waves"},
+        "sparkle": {"from":"sparkle"},
+        "water": "water",
+        "foam": "foam",
+        "lit": "lit",
+        "murk": "murk",
+        "froth": "froth",
+        "leaf": "leaf",
+        "cream": "cream",
+        "crimson": "crimson"
+       }
+      ],
+      "fill-c": [
+       {
+        "gen": "tile.water",
+        "v": 1,
+        "at": [16,16],
+        "piece": "water-fill-c",
+        "liquid": {"from":"liquid"},
+        "waves": {"from":"waves"},
+        "sparkle": {"from":"sparkle"},
+        "water": "water",
+        "foam": "foam",
+        "lit": "lit",
+        "murk": "murk",
+        "froth": "froth",
+        "leaf": "leaf",
+        "cream": "cream",
+        "crimson": "crimson"
+       }
+      ]
+     }
+    },
+    {
+     "name": "fall",
+     "kind": "liquid",
+     "pieces": ["foot"],
+     "label": "Waterfall",
+     "frames": 8,
+     "fps": 6,
+     "outline": false,
+     "pictures": {
+      "top": [
+       {
+        "gen": "tile.water",
+        "v": 1,
+        "at": [16,16],
+        "piece": "fall-top",
+        "liquid": {"from":"liquid"},
+        "waves": {"from":"waves"},
+        "sparkle": {"from":"sparkle"},
+        "water": "water",
+        "foam": "foam",
+        "lit": "lit",
+        "murk": "murk",
+        "froth": "froth"
+       }
+      ],
+      "fill": [
+       {
+        "gen": "tile.water",
+        "v": 1,
+        "at": [16,16],
+        "piece": "fall-fill",
+        "liquid": {"from":"liquid"},
+        "waves": {"from":"waves"},
+        "sparkle": {"from":"sparkle"},
+        "water": "water",
+        "foam": "foam",
+        "lit": "lit",
+        "murk": "murk",
+        "froth": "froth"
+       }
+      ],
+      "foot": [
+       {
+        "gen": "tile.water",
+        "v": 1,
+        "at": [16,16],
+        "piece": "fall-foot",
+        "liquid": {"from":"liquid"},
+        "waves": {"from":"waves"},
+        "sparkle": {"from":"sparkle"},
+        "water": "water",
+        "foam": "foam",
+        "lit": "lit",
+        "murk": "murk",
+        "froth": "froth"
+       }
+      ]
+     }
+    }
+   ]
+  }
+ },
+ "clips": {"fall-top":{"label":"Waterfall: top"},"fall-fill":{"label":"Waterfall: falling water"}}
+}

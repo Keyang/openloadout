@@ -77,7 +77,7 @@ export const SPRITE_LIMITS = Object.freeze({
   boneDepth: 16, ik: 8, points: 16, polyPoints: 24,
   variants: 16,            // variants of one stamp
   layers: 8, emitters: 16, motion: 16, states: 12, pictures: 64,
-  tileGroups: 8, decals: 26, extraTiles: 16, profiles: 16, profileLength: 64, bandRules: 16, fillVersions: 4,
+  tileGroups: 8, decals: 26, extraTiles: 16, profiles: 16, profileLength: 64, bandRules: 16, fillVersions: 6,
   text: 40,                // characters of a text primitive
   angle: 720, z: 100, fps: 30,
   scale: Object.freeze([0.25, 4]),

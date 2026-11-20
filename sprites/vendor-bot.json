@@ -1,0 +1,1348 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "vendor-bot",
+ "name": "Vendor bot",
+ "blurb": "A friendly shop robot that hovers in place, chats and serves from its hatch. Change its body, screen face, arms, what it wears and holds, and its colours.",
+ "meta": {
+  "type": "character",
+  "role": "characters/npc",
+  "themes": [
+   "sci-fi",
+   "space"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "shooter"
+  ],
+  "view": "top-down",
+  "words": [
+   "vendor",
+   "shop",
+   "shopkeeper",
+   "merchant",
+   "robot",
+   "kiosk",
+   "vending machine",
+   "store",
+   "talk",
+   "sell",
+   "buy",
+   "hover",
+   "friendly"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  48,
+  48
+ ],
+ "pivot": [
+  24,
+  42
+ ],
+ "grounded": false,
+ "preview": "idle",
+ "styles": [
+  "pixel"
+ ],
+ "palette": [
+  {
+   "id": "body",
+   "label": "Body",
+   "default": "#9aa6c0",
+   "material": "metal",
+   "swatches": [
+    "#c2c9d6",
+    "#6b7896",
+    "#e8ecf2"
+   ]
+  },
+  {
+   "id": "accent",
+   "label": "Trim",
+   "default": "#2fb3a8",
+   "material": "paint",
+   "swatches": [
+    "#3f6fd1",
+    "#9fe040"
+   ]
+  },
+  {
+   "id": "glow",
+   "label": "Screen",
+   "default": "#5fe0f0",
+   "material": "light",
+   "swatches": [
+    "#f2a030",
+    "#b48af8",
+    "#4f9ff0",
+    "#5fd47a"
+   ]
+  }
+ ],
+ "controls": [
+  {
+   "key": "size",
+   "kind": "range",
+   "label": "Size",
+   "lo": "Small",
+   "hi": "Big",
+   "default": 0.5
+  },
+  {
+   "key": "shape",
+   "kind": "choice",
+   "label": "Shape",
+   "options": [
+    "boxy",
+    "round",
+    "capsule"
+   ],
+   "default": "boxy"
+  },
+  {
+   "key": "eyes",
+   "kind": "choice",
+   "label": "Eyes",
+   "options": [
+    "smile",
+    "dots",
+    "visor",
+    "one eye"
+   ],
+   "default": "smile"
+  },
+  {
+   "key": "arms",
+   "kind": "toggle",
+   "label": "Arms",
+   "default": true
+  },
+  {
+   "key": "headgear",
+   "kind": "choice",
+   "label": "Headgear",
+   "options": [
+    "antenna",
+    "dish",
+    "cap",
+    "none"
+   ],
+   "default": "antenna"
+  },
+  {
+   "key": "headgearSize",
+   "kind": "range",
+   "label": "Size",
+   "lo": "Small",
+   "hi": "Big",
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "default": 1
+  },
+  {
+   "key": "held",
+   "kind": "choice",
+   "label": "Held",
+   "options": [
+    "none",
+    "sign",
+    "tray"
+   ],
+   "default": "none"
+  },
+  {
+   "key": "heldSize",
+   "kind": "range",
+   "label": "Size",
+   "lo": "Small",
+   "hi": "Big",
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "default": 1
+  },
+  {
+   "key": "body",
+   "kind": "colour",
+   "label": "Body"
+  },
+  {
+   "key": "accent",
+   "kind": "colour",
+   "label": "Trim"
+  },
+  {
+   "key": "glow",
+   "kind": "colour",
+   "label": "Screen"
+  },
+  {
+   "key": "bob",
+   "kind": "range",
+   "label": "Float",
+   "lo": "Still",
+   "hi": "Floaty",
+   "default": 0.5,
+   "group": "Motion"
+  },
+  {
+   "key": "speed",
+   "standard": "speed"
+  }
+ ],
+ "parts": {
+  "headgear": {
+   "label": "Headgear",
+   "params": [
+    "headgear",
+    "headgearSize"
+   ],
+   "none": "none",
+   "socket": "head"
+  },
+  "held": {
+   "label": "Held",
+   "params": [
+    "held",
+    "heldSize"
+   ],
+   "none": "none",
+   "socket": "hand"
+  }
+ },
+ "points": [
+  {
+   "id": "head",
+   "on": "head",
+   "at": [
+    0,
+    0
+   ],
+   "angle": 0
+  },
+  {
+   "id": "hand",
+   "on": "hand",
+   "at": [
+    0,
+    0
+   ],
+   "angle": 0
+  },
+  {
+   "id": "offhand",
+   "on": "offhand",
+   "at": [
+    0,
+    0
+   ],
+   "angle": 0
+  },
+  {
+   "id": "feet",
+   "on": "feet",
+   "at": [
+    0,
+    0
+   ],
+   "angle": 0
+  },
+  {
+   "id": "hatch",
+   "on": "hatch",
+   "at": [
+    0,
+    0
+   ],
+   "angle": 0
+  }
+ ],
+ "body": {
+  "pictures": {
+   "nodes": [
+    {
+     "id": "robot",
+     "parent": null,
+     "at": [
+      24,
+      24
+     ]
+    },
+    {
+     "id": "head",
+     "parent": null,
+     "at": [
+      0,
+      0
+     ]
+    },
+    {
+     "id": "hand",
+     "parent": null,
+     "at": [
+      0,
+      0
+     ]
+    },
+    {
+     "id": "offhand",
+     "parent": null,
+     "at": [
+      0,
+      0
+     ]
+    },
+    {
+     "id": "feet",
+     "parent": null,
+     "at": [
+      0,
+      0
+     ]
+    },
+    {
+     "id": "hatch",
+     "parent": null,
+     "at": [
+      0,
+      0
+     ]
+    }
+   ],
+   "draw": [
+    {
+     "gen": "robot.vendor-bot",
+     "v": 1,
+     "on": "robot",
+     "at": [
+      0,
+      0
+     ],
+     "clip": [
+      "idle"
+     ],
+     "picture": "idle",
+     "size": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ],
+      "round": "none"
+     },
+     "shape": {
+      "from": "shape",
+      "pick": {
+       "boxy": "boxy",
+       "round": "round",
+       "capsule": "capsule"
+      }
+     },
+     "eyes": {
+      "from": "eyes",
+      "pick": {
+       "smile": "smile",
+       "dots": "dots",
+       "visor": "visor",
+       "one eye": "one-eye"
+      }
+     },
+     "arms": {
+      "from": "arms",
+      "pick": {
+       "true": true,
+       "false": false
+      }
+     },
+     "headgear": {
+      "from": "headgear",
+      "pick": {
+       "antenna": "antenna",
+       "dish": "dish",
+       "cap": "cap",
+       "none": "none"
+      }
+     },
+     "headgearSize": {
+      "from": "headgearSize",
+      "map": [
+       [
+        0.65,
+        0.65
+       ],
+       [
+        0.7,
+        0.7
+       ],
+       [
+        0.7000000000000001,
+        0.7000000000000001
+       ],
+       [
+        0.75,
+        0.75
+       ],
+       [
+        0.8,
+        0.8
+       ],
+       [
+        0.85,
+        0.85
+       ],
+       [
+        0.8500000000000001,
+        0.8500000000000001
+       ],
+       [
+        0.9,
+        0.9
+       ],
+       [
+        0.95,
+        0.95
+       ],
+       [
+        0.9500000000000001,
+        0.9500000000000001
+       ],
+       [
+        1.0,
+        1.0
+       ],
+       [
+        1.05,
+        1.05
+       ],
+       [
+        1.1,
+        1.1
+       ],
+       [
+        1.15,
+        1.15
+       ],
+       [
+        1.2,
+        1.2
+       ],
+       [
+        1.2000000000000002,
+        1.2000000000000002
+       ],
+       [
+        1.25,
+        1.25
+       ],
+       [
+        1.3,
+        1.3
+       ],
+       [
+        1.35,
+        1.35
+       ]
+      ],
+      "round": "none"
+     },
+     "held": {
+      "from": "held",
+      "pick": {
+       "none": "none",
+       "sign": "sign",
+       "tray": "tray"
+      }
+     },
+     "heldSize": {
+      "from": "heldSize",
+      "map": [
+       [
+        0.65,
+        0.65
+       ],
+       [
+        0.7,
+        0.7
+       ],
+       [
+        0.7000000000000001,
+        0.7000000000000001
+       ],
+       [
+        0.75,
+        0.75
+       ],
+       [
+        0.8,
+        0.8
+       ],
+       [
+        0.85,
+        0.85
+       ],
+       [
+        0.8500000000000001,
+        0.8500000000000001
+       ],
+       [
+        0.9,
+        0.9
+       ],
+       [
+        0.95,
+        0.95
+       ],
+       [
+        0.9500000000000001,
+        0.9500000000000001
+       ],
+       [
+        1.0,
+        1.0
+       ],
+       [
+        1.05,
+        1.05
+       ],
+       [
+        1.1,
+        1.1
+       ],
+       [
+        1.15,
+        1.15
+       ],
+       [
+        1.2,
+        1.2
+       ],
+       [
+        1.2000000000000002,
+        1.2000000000000002
+       ],
+       [
+        1.25,
+        1.25
+       ],
+       [
+        1.3,
+        1.3
+       ],
+       [
+        1.35,
+        1.35
+       ]
+      ],
+      "round": "none"
+     },
+     "bob": {
+      "from": "bob",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ],
+      "round": "none"
+     },
+     "body": "body",
+     "accent": "accent",
+     "lights": "glow"
+    },
+    {
+     "gen": "robot.vendor-bot",
+     "v": 1,
+     "on": "robot",
+     "at": [
+      0,
+      0
+     ],
+     "clip": [
+      "talk"
+     ],
+     "picture": "talk",
+     "size": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ],
+      "round": "none"
+     },
+     "shape": {
+      "from": "shape",
+      "pick": {
+       "boxy": "boxy",
+       "round": "round",
+       "capsule": "capsule"
+      }
+     },
+     "eyes": {
+      "from": "eyes",
+      "pick": {
+       "smile": "smile",
+       "dots": "dots",
+       "visor": "visor",
+       "one eye": "one-eye"
+      }
+     },
+     "arms": {
+      "from": "arms",
+      "pick": {
+       "true": true,
+       "false": false
+      }
+     },
+     "headgear": {
+      "from": "headgear",
+      "pick": {
+       "antenna": "antenna",
+       "dish": "dish",
+       "cap": "cap",
+       "none": "none"
+      }
+     },
+     "headgearSize": {
+      "from": "headgearSize",
+      "map": [
+       [
+        0.65,
+        0.65
+       ],
+       [
+        0.7,
+        0.7
+       ],
+       [
+        0.7000000000000001,
+        0.7000000000000001
+       ],
+       [
+        0.75,
+        0.75
+       ],
+       [
+        0.8,
+        0.8
+       ],
+       [
+        0.85,
+        0.85
+       ],
+       [
+        0.8500000000000001,
+        0.8500000000000001
+       ],
+       [
+        0.9,
+        0.9
+       ],
+       [
+        0.95,
+        0.95
+       ],
+       [
+        0.9500000000000001,
+        0.9500000000000001
+       ],
+       [
+        1.0,
+        1.0
+       ],
+       [
+        1.05,
+        1.05
+       ],
+       [
+        1.1,
+        1.1
+       ],
+       [
+        1.15,
+        1.15
+       ],
+       [
+        1.2,
+        1.2
+       ],
+       [
+        1.2000000000000002,
+        1.2000000000000002
+       ],
+       [
+        1.25,
+        1.25
+       ],
+       [
+        1.3,
+        1.3
+       ],
+       [
+        1.35,
+        1.35
+       ]
+      ],
+      "round": "none"
+     },
+     "held": {
+      "from": "held",
+      "pick": {
+       "none": "none",
+       "sign": "sign",
+       "tray": "tray"
+      }
+     },
+     "heldSize": {
+      "from": "heldSize",
+      "map": [
+       [
+        0.65,
+        0.65
+       ],
+       [
+        0.7,
+        0.7
+       ],
+       [
+        0.7000000000000001,
+        0.7000000000000001
+       ],
+       [
+        0.75,
+        0.75
+       ],
+       [
+        0.8,
+        0.8
+       ],
+       [
+        0.85,
+        0.85
+       ],
+       [
+        0.8500000000000001,
+        0.8500000000000001
+       ],
+       [
+        0.9,
+        0.9
+       ],
+       [
+        0.95,
+        0.95
+       ],
+       [
+        0.9500000000000001,
+        0.9500000000000001
+       ],
+       [
+        1.0,
+        1.0
+       ],
+       [
+        1.05,
+        1.05
+       ],
+       [
+        1.1,
+        1.1
+       ],
+       [
+        1.15,
+        1.15
+       ],
+       [
+        1.2,
+        1.2
+       ],
+       [
+        1.2000000000000002,
+        1.2000000000000002
+       ],
+       [
+        1.25,
+        1.25
+       ],
+       [
+        1.3,
+        1.3
+       ],
+       [
+        1.35,
+        1.35
+       ]
+      ],
+      "round": "none"
+     },
+     "bob": {
+      "from": "bob",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ],
+      "round": "none"
+     },
+     "body": "body",
+     "accent": "accent",
+     "lights": "glow"
+    },
+    {
+     "gen": "robot.vendor-bot",
+     "v": 1,
+     "on": "robot",
+     "at": [
+      0,
+      0
+     ],
+     "clip": [
+      "sell"
+     ],
+     "picture": "sell",
+     "size": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ],
+      "round": "none"
+     },
+     "shape": {
+      "from": "shape",
+      "pick": {
+       "boxy": "boxy",
+       "round": "round",
+       "capsule": "capsule"
+      }
+     },
+     "eyes": {
+      "from": "eyes",
+      "pick": {
+       "smile": "smile",
+       "dots": "dots",
+       "visor": "visor",
+       "one eye": "one-eye"
+      }
+     },
+     "arms": {
+      "from": "arms",
+      "pick": {
+       "true": true,
+       "false": false
+      }
+     },
+     "headgear": {
+      "from": "headgear",
+      "pick": {
+       "antenna": "antenna",
+       "dish": "dish",
+       "cap": "cap",
+       "none": "none"
+      }
+     },
+     "headgearSize": {
+      "from": "headgearSize",
+      "map": [
+       [
+        0.65,
+        0.65
+       ],
+       [
+        0.7,
+        0.7
+       ],
+       [
+        0.7000000000000001,
+        0.7000000000000001
+       ],
+       [
+        0.75,
+        0.75
+       ],
+       [
+        0.8,
+        0.8
+       ],
+       [
+        0.85,
+        0.85
+       ],
+       [
+        0.8500000000000001,
+        0.8500000000000001
+       ],
+       [
+        0.9,
+        0.9
+       ],
+       [
+        0.95,
+        0.95
+       ],
+       [
+        0.9500000000000001,
+        0.9500000000000001
+       ],
+       [
+        1.0,
+        1.0
+       ],
+       [
+        1.05,
+        1.05
+       ],
+       [
+        1.1,
+        1.1
+       ],
+       [
+        1.15,
+        1.15
+       ],
+       [
+        1.2,
+        1.2
+       ],
+       [
+        1.2000000000000002,
+        1.2000000000000002
+       ],
+       [
+        1.25,
+        1.25
+       ],
+       [
+        1.3,
+        1.3
+       ],
+       [
+        1.35,
+        1.35
+       ]
+      ],
+      "round": "none"
+     },
+     "held": {
+      "from": "held",
+      "pick": {
+       "none": "none",
+       "sign": "sign",
+       "tray": "tray"
+      }
+     },
+     "heldSize": {
+      "from": "heldSize",
+      "map": [
+       [
+        0.65,
+        0.65
+       ],
+       [
+        0.7,
+        0.7
+       ],
+       [
+        0.7000000000000001,
+        0.7000000000000001
+       ],
+       [
+        0.75,
+        0.75
+       ],
+       [
+        0.8,
+        0.8
+       ],
+       [
+        0.85,
+        0.85
+       ],
+       [
+        0.8500000000000001,
+        0.8500000000000001
+       ],
+       [
+        0.9,
+        0.9
+       ],
+       [
+        0.95,
+        0.95
+       ],
+       [
+        0.9500000000000001,
+        0.9500000000000001
+       ],
+       [
+        1.0,
+        1.0
+       ],
+       [
+        1.05,
+        1.05
+       ],
+       [
+        1.1,
+        1.1
+       ],
+       [
+        1.15,
+        1.15
+       ],
+       [
+        1.2,
+        1.2
+       ],
+       [
+        1.2000000000000002,
+        1.2000000000000002
+       ],
+       [
+        1.25,
+        1.25
+       ],
+       [
+        1.3,
+        1.3
+       ],
+       [
+        1.35,
+        1.35
+       ]
+      ],
+      "round": "none"
+     },
+     "bob": {
+      "from": "bob",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ],
+      "round": "none"
+     },
+     "body": "body",
+     "accent": "accent",
+     "lights": "glow"
+    }
+   ],
+   "motion": [
+    {
+     "gen": "robot.vendor-bot.points",
+     "v": 1,
+     "at": [
+      24,
+      24
+     ],
+     "size": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ],
+      "round": "none"
+     },
+     "shape": {
+      "from": "shape",
+      "pick": {
+       "boxy": "boxy",
+       "round": "round",
+       "capsule": "capsule"
+      }
+     },
+     "eyes": {
+      "from": "eyes",
+      "pick": {
+       "smile": "smile",
+       "dots": "dots",
+       "visor": "visor",
+       "one eye": "one-eye"
+      }
+     },
+     "arms": {
+      "from": "arms",
+      "pick": {
+       "true": true,
+       "false": false
+      }
+     },
+     "headgear": {
+      "from": "headgear",
+      "pick": {
+       "antenna": "antenna",
+       "dish": "dish",
+       "cap": "cap",
+       "none": "none"
+      }
+     },
+     "headgearSize": {
+      "from": "headgearSize",
+      "map": [
+       [
+        0.65,
+        0.65
+       ],
+       [
+        0.7,
+        0.7
+       ],
+       [
+        0.7000000000000001,
+        0.7000000000000001
+       ],
+       [
+        0.75,
+        0.75
+       ],
+       [
+        0.8,
+        0.8
+       ],
+       [
+        0.85,
+        0.85
+       ],
+       [
+        0.8500000000000001,
+        0.8500000000000001
+       ],
+       [
+        0.9,
+        0.9
+       ],
+       [
+        0.95,
+        0.95
+       ],
+       [
+        0.9500000000000001,
+        0.9500000000000001
+       ],
+       [
+        1.0,
+        1.0
+       ],
+       [
+        1.05,
+        1.05
+       ],
+       [
+        1.1,
+        1.1
+       ],
+       [
+        1.15,
+        1.15
+       ],
+       [
+        1.2,
+        1.2
+       ],
+       [
+        1.2000000000000002,
+        1.2000000000000002
+       ],
+       [
+        1.25,
+        1.25
+       ],
+       [
+        1.3,
+        1.3
+       ],
+       [
+        1.35,
+        1.35
+       ]
+      ],
+      "round": "none"
+     },
+     "held": {
+      "from": "held",
+      "pick": {
+       "none": "none",
+       "sign": "sign",
+       "tray": "tray"
+      }
+     },
+     "heldSize": {
+      "from": "heldSize",
+      "map": [
+       [
+        0.65,
+        0.65
+       ],
+       [
+        0.7,
+        0.7
+       ],
+       [
+        0.7000000000000001,
+        0.7000000000000001
+       ],
+       [
+        0.75,
+        0.75
+       ],
+       [
+        0.8,
+        0.8
+       ],
+       [
+        0.85,
+        0.85
+       ],
+       [
+        0.8500000000000001,
+        0.8500000000000001
+       ],
+       [
+        0.9,
+        0.9
+       ],
+       [
+        0.95,
+        0.95
+       ],
+       [
+        0.9500000000000001,
+        0.9500000000000001
+       ],
+       [
+        1.0,
+        1.0
+       ],
+       [
+        1.05,
+        1.05
+       ],
+       [
+        1.1,
+        1.1
+       ],
+       [
+        1.15,
+        1.15
+       ],
+       [
+        1.2,
+        1.2
+       ],
+       [
+        1.2000000000000002,
+        1.2000000000000002
+       ],
+       [
+        1.25,
+        1.25
+       ],
+       [
+        1.3,
+        1.3
+       ],
+       [
+        1.35,
+        1.35
+       ]
+      ],
+      "round": "none"
+     },
+     "bob": {
+      "from": "bob",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ],
+      "round": "none"
+     }
+    }
+   ]
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "fps": 7,
+   "loop": true
+  },
+  "talk": {
+   "frames": 8,
+   "fps": 7,
+   "loop": true,
+   "sounds": [
+    {
+     "sound": "tech-click",
+     "frame": 0,
+     "preset": "Hover",
+     "volume": 0.6
+    },
+    {
+     "sound": "tech-click",
+     "frame": 4,
+     "preset": "Hover",
+     "volume": 0.6
+    }
+   ]
+  },
+  "sell": {
+   "frames": 8,
+   "fps": 10,
+   "loop": false,
+   "sounds": [
+    {
+     "sound": "credit-pickup",
+     "frame": 3,
+     "preset": "Credit chip",
+     "volume": 0.7
+    }
+   ]
+  }
+ }
+}

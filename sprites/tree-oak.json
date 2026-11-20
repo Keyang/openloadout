@@ -1,0 +1,39 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "tree-oak",
+ "name": "Oak tree",
+ "blurb": "A broad leafy tree for a top-down map that sways in the wind and drops leaves when shaken; change its size, crown, trunk, fruit and colours.",
+ "meta": {"type":"prop","role":"world/prop","themes":["fantasy","forest"],"gameTypes":["turn-based-rpg","top-down-rpg"],"view":"top-down","words":["tree","oak","apple tree","forest","woods","leaves","trunk","orchard","sway","shake","shade","nature"],"license":"draft"},
+ "size": [64,80],
+ "pivot": [32,76],
+ "preview": "sway",
+ "styles": ["pixel"],
+ "palette": [
+  {"id":"fruitColour","label":"Colour","default":"#c8553a","material":"plant","swatches":["#c8553a","#f2c230","#c9423a","#f0ead8","#7fe0a0","#4fd8ee"]},
+  {"id":"leaf","label":"Leaves","default":"#4f9d57","material":"plant","swatches":["#4f9d57","#7fbf5a","#357a4c","#e6c96a"]},
+  {"id":"wood","label":"Wood","default":"#9a6a3e","material":"wood","swatches":["#9a6a3e","#c9a06a","#a8612a","#5a3a22","#c98a4a"]}
+ ],
+ "controls": [
+  {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.8},
+  {"key":"shape","kind":"choice","label":"Shape","options":["round","wide","layered"],"default":"round"},
+  {"key":"thickness","kind":"range","label":"Thickness","lo":"Thin","hi":"Chunky","default":0.5},
+  {"key":"fruit","kind":"choice","label":"Fruit","options":["none","apples","blossom"],"default":"none"},
+  {"key":"fruitColour","kind":"colour","label":"Colour","when":{"fruit":["apples","blossom"]}},
+  {"key":"leaf","kind":"colour","label":"Leaves"},
+  {"key":"wood","kind":"colour","label":"Wood"},
+  {"key":"sway","kind":"range","label":"Sway","lo":"Still","hi":"Swaying","default":0.5,"group":"Motion"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "parts": {"fruit":{"label":"Fruit","params":["fruit"],"none":"none"}},
+ "body": { "pictures": { "nodes": [], "draw": [
+  {"id":"idle","gen":"tree.oak","v":1,"clip":["idle"],"picture":"idle","at":[32,76],"size":{"from":"size","map":[[0,0],[1,1]],"round":"none"},"shape":{"from":"shape","pick":{"round":"round","wide":"wide","layered":"layered"}},"thickness":{"from":"thickness","map":[[0,0],[1,1]],"round":"none"},"fruit":{"from":"fruit","pick":{"none":"none","apples":"apples","blossom":"blossom"}},"fruitColour":"fruitColour","leaf":"leaf","wood":"wood","sway":{"from":"sway","map":[[0,0],[1,1]],"round":"none"}},
+  {"id":"sway","gen":"tree.oak","v":1,"clip":["sway"],"picture":"sway","at":[32,76],"size":{"from":"size","map":[[0,0],[1,1]],"round":"none"},"shape":{"from":"shape","pick":{"round":"round","wide":"wide","layered":"layered"}},"thickness":{"from":"thickness","map":[[0,0],[1,1]],"round":"none"},"fruit":{"from":"fruit","pick":{"none":"none","apples":"apples","blossom":"blossom"}},"fruitColour":"fruitColour","leaf":"leaf","wood":"wood","sway":{"from":"sway","map":[[0,0],[1,1]],"round":"none"}},
+  {"id":"shake","gen":"tree.oak","v":1,"clip":["shake"],"picture":"shake","at":[32,76],"size":{"from":"size","map":[[0,0],[1,1]],"round":"none"},"shape":{"from":"shape","pick":{"round":"round","wide":"wide","layered":"layered"}},"thickness":{"from":"thickness","map":[[0,0],[1,1]],"round":"none"},"fruit":{"from":"fruit","pick":{"none":"none","apples":"apples","blossom":"blossom"}},"fruitColour":"fruitColour","leaf":"leaf","wood":"wood","sway":{"from":"sway","map":[[0,0],[1,1]],"round":"none"}}
+ ] } },
+ "clips": {
+  "idle": {"frames":1,"fps":8},
+  "sway": {"frames":8,"fps":8},
+  "shake": {"frames":6,"fps":12,"loop":false,"sounds":[{"sound":"footstep-grass","frame":0,"preset":"Tall grass","volume":0.6}]}
+ }
+}

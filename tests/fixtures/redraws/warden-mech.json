@@ -1,0 +1,354 @@
+{
+ "id": "warden-mech",
+ "frozen": "2026-11-20",
+ "source": "sprites/warden-mech.js",
+ "sha256": "0078b5f18813f08fd6c9275c971d07bf99fa5721158b0f2b2bed7b05f6868cf5",
+ "name": "Warden mech",
+ "blurb": "A boss: a walking security machine with a glowing reactor in its chest that stomps, fires a missile volley and a sweeping beam, overheats and blows apart. Change its size, bulk, legs, head, weapon arms, back pack and colours.",
+ "meta": {
+  "type": "creature",
+  "role": "characters/boss",
+  "themes": [
+   "sci-fi",
+   "space"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "shooter"
+  ],
+  "view": "top-down",
+  "words": [
+   "mech",
+   "robot",
+   "machine",
+   "walker",
+   "guardian",
+   "warden",
+   "security",
+   "missile",
+   "beam",
+   "stomp",
+   "overheat",
+   "reactor",
+   "weak point",
+   "boss fight"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  96,
+  96
+ ],
+ "pivot": [
+  48,
+  88
+ ],
+ "grounded": false,
+ "preview": "walk",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "bulk": {
+   "kind": "range",
+   "label": "Bulk",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Light",
+   "hi": "Heavy",
+   "group": "Look"
+  },
+  "legs": {
+   "kind": "range",
+   "label": "Legs",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Short",
+   "hi": "Long",
+   "group": "Look"
+  },
+  "shape": {
+   "kind": "choice",
+   "label": "Head",
+   "def": "cockpit",
+   "options": [
+    {
+     "value": "cockpit",
+     "label": "Cockpit"
+    },
+    {
+     "value": "sensor",
+     "label": "Sensor"
+    },
+    {
+     "value": "skull plate",
+     "label": "Skull plate"
+    }
+   ],
+   "group": "Look"
+  },
+  "weapon": {
+   "kind": "choice",
+   "label": "Weapon",
+   "def": "cannon arms",
+   "options": [
+    {
+     "value": "cannon arms",
+     "label": "Cannon arms"
+    },
+    {
+     "value": "claws",
+     "label": "Claws"
+    },
+    {
+     "value": "drills",
+     "label": "Drills"
+    }
+   ],
+   "group": "Look"
+  },
+  "weaponLength": {
+   "kind": "range",
+   "label": "Length",
+   "def": 1,
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "lo": "Short",
+   "hi": "Long",
+   "group": "Look"
+  },
+  "pack": {
+   "kind": "choice",
+   "label": "Pack",
+   "def": "missile pods",
+   "options": [
+    {
+     "value": "missile pods",
+     "label": "Missile pods"
+    },
+    {
+     "value": "radiators",
+     "label": "Radiators"
+    },
+    {
+     "value": "none",
+     "label": "None"
+    }
+   ],
+   "group": "Look"
+  },
+  "packSize": {
+   "kind": "range",
+   "label": "Size",
+   "def": 1,
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Body",
+   "def": "#6b7896",
+   "swatches": [
+    "#6b7896",
+    "#9aa6c0",
+    "#c2c9d6",
+    "#a87894"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Hazard paint",
+   "def": "#f2a030",
+   "swatches": [
+    "#f2a030",
+    "#f2c230",
+    "#2fb3a8",
+    "#f0ead8"
+   ],
+   "group": "Colors"
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Reactor and eyes",
+   "def": "#e2473f",
+   "swatches": [
+    "#e2473f",
+    "#9fe040",
+    "#b48af8",
+    "#b04a8a"
+   ],
+   "group": "Colors"
+  },
+  "bounce": {
+   "kind": "range",
+   "label": "Bounce",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Calm",
+   "hi": "Bouncy",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    7,
+    10
+   ]
+  },
+  "walk": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "shoot": {
+   "frames": 12,
+   "loop": false,
+   "fps": [
+    7,
+    12,
+    16
+   ]
+  },
+  "beam": {
+   "frames": 12,
+   "loop": false,
+   "fps": [
+    7,
+    12,
+    16
+   ]
+  },
+  "overheat": {
+   "frames": 10,
+   "loop": false,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "hurt": {
+   "frames": 4,
+   "loop": false,
+   "fps": [
+    6,
+    9,
+    13
+   ]
+  },
+  "die": {
+   "frames": 12,
+   "loop": false,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  }
+ },
+ "sounds": {
+  "walk": [
+   {
+    "sound": "footstep-metal",
+    "frame": 0,
+    "preset": "Heavy mech",
+    "volume": 0.8
+   },
+   {
+    "sound": "footstep-metal",
+    "frame": 4,
+    "preset": "Heavy mech",
+    "volume": 0.8
+   }
+  ],
+  "shoot": [
+   {
+    "sound": "rocket-launch",
+    "frame": 4,
+    "preset": "Missile volley",
+    "volume": 1
+   }
+  ],
+  "beam": [
+   {
+    "sound": "laser-shot",
+    "frame": 6,
+    "preset": "Heavy cannon",
+    "volume": 1
+   }
+  ],
+  "overheat": [
+   {
+    "sound": "door-hiss",
+    "frame": 0,
+    "preset": "Airlock",
+    "volume": 1
+   }
+  ],
+  "hurt": [
+   {
+    "sound": "bolt-impact",
+    "frame": 0,
+    "preset": "On metal",
+    "volume": 0.9
+   }
+  ],
+  "die": [
+   {
+    "sound": "bot-shutdown",
+    "frame": 0,
+    "preset": "Mech collapse",
+    "volume": 1
+   },
+   {
+    "sound": "explosion",
+    "frame": 8,
+    "preset": "Grenade",
+    "volume": 1
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-roguelite-scifi"
+ ]
+}

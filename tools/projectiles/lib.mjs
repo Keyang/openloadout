@@ -63,6 +63,76 @@ export function clipWhen(list) {
   });
 }
 
+// ---- engine helpers, frozen (build item E3b; review of E3 round 3, issue 4) -----------------------------------------
+// The writers work their geometry out with these, copied from engine/motion.js, engine/surface.js and engine/shapes.js
+// as they were on 2026-11-20 (word for word, but starIn, which takes its `inner` share as an argument), so a later
+// change to the engine's (polyIn's edge rule, say, or hash) cannot change what a writer gives: a file that still draws
+// right never turns into one that "differs from its writer", and running write.mjs never quietly re-derives a
+// projectile from a new engine. Never change them; a writer that needs another
+// rule gets its own helper here.
+/** engine/motion.js lerp, frozen: the value t of the way from a to b. */
+export const lerp = (a, b, t) => a + (b - a) * t;
+/** engine/motion.js clamp, frozen: v kept between lo and hi (0 and 1 unless given). */
+export const clamp = (v, lo = 0, hi = 1) => (v < lo ? lo : v > hi ? hi : v);
+/** engine/motion.js smooth, frozen: ease in and out (smoothstep), t clamped. */
+export const smooth = (t) => { t = clamp(t); return t * t * (3 - 2 * t); };
+/** engine/motion.js easeOut, frozen: 0..1 -> 0..1, fast then slow, t clamped. */
+export const easeOut = (t) => 1 - (1 - clamp(t)) ** 2;
+/** engine/motion.js fract, frozen: the part of t after the decimal point, 0 up to 1. */
+export const fract = (t) => t - Math.floor(t);
+/** engine/motion.js keys, frozen: the value at t of keyframes [[t, v], ...], eased between them. */
+export function keys(t, ks, ease = smooth) {
+  if (t <= ks[0][0]) return ks[0][1];
+  for (let i = 1; i < ks.length; i++) {
+    if (t <= ks[i][0]) {
+      const [t0, v0] = ks[i - 1], [t1, v1] = ks[i];
+      return lerp(v0, v1, ease((t - t0) / (t1 - t0 || 1e-6)));
+    }
+  }
+  return ks[ks.length - 1][1];
+}
+/** engine/motion.js hash, frozen: a steady random number 0 up to 1 from two integers. */
+export function hash(a, b = 0) {
+  let h = (Math.imul(a | 0, 374761393) + Math.imul(b | 0, 668265263)) >>> 0;
+  h = Math.imul(h ^ (h >>> 13), 1274126177) >>> 0;
+  return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
+}
+/** engine/surface.js polyIn, frozen: the shape test (even-odd) of a polygon given as [[x, y], ...]. */
+export function polyIn(pts) {
+  const n = pts.length;
+  return (px, py) => {
+    let hit = false;
+    for (let i = 0, j = n - 1; i < n; j = i++) {
+      const [xi, yi] = pts[i], [xj, yj] = pts[j];
+      if ((yi > py) !== (yj > py) && px < ((xj - xi) * (py - yi)) / (yj - yi) + xi) hit = !hit;
+    }
+    return hit;
+  };
+}
+
+/** engine/surface.js capsuleIn, frozen: the shape test of a thick line with round ends, its radius r0 to r1. */
+export function capsuleIn(x0, y0, x1, y1, r0, r1 = r0) {
+  const dx = x1 - x0, dy = y1 - y0, len2 = dx * dx + dy * dy || 1e-6;
+  return (px, py) => {
+    let t = ((px - x0) * dx + (py - y0) * dy) / len2;
+    t = t < 0 ? 0 : t > 1 ? 1 : t;
+    const ex = px - (x0 + dx * t), ey = py - (y0 + dy * t);
+    const r = r0 + (r1 - r0) * t;
+    return ex * ex + ey * ey <= r * r;
+  };
+}
+/** engine/surface.js ellipseIn, frozen: the shape test of an ellipse. */
+export const ellipseIn = (cx, cy, rx, ry) => (px, py) => ((px - cx) / rx) ** 2 + ((py - cy) / ry) ** 2 <= 1;
+/** engine/shapes.js starIn with an `inner` given, frozen: the shape test of a star, its first point up. */
+export function starIn(cx, cy, r, points, inner) {
+  const pts = [];
+  for (let i = 0; i < points * 2; i++) {
+    const a = -Math.PI / 2 + (i * Math.PI) / points, d = i % 2 ? r * inner : r;
+    pts.push([cx + Math.cos(a) * d, cy + Math.sin(a) * d]);
+  }
+  return polyIn(pts);
+}
+
 /** JSON laid out for review: anything that fits in `width` characters on one line, the rest spread out by two spaces. */
 export function fmt(v, ind = '', width = 118) {
   const one = JSON.stringify(v);

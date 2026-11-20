@@ -1,0 +1,295 @@
+{
+ "id": "spore-hopper",
+ "frozen": "2026-11-20",
+ "source": "sprites/spore-hopper.js",
+ "sha256": "99790219e35ba3570a19d01833b0d95b262a8d328840aae02562bedbd2176aaf",
+ "name": "Spore hopper",
+ "blurb": "A seed pod that hops about on a coiled root and puffs spores. Change its size and plumpness, its eyes, its leafy ruff and its colours.",
+ "meta": {
+  "type": "creature",
+  "role": "characters/enemy",
+  "themes": [
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "platformer"
+  ],
+  "view": "side",
+  "words": [
+   "pod",
+   "seed",
+   "bulb",
+   "plant",
+   "sprout",
+   "onion",
+   "spores",
+   "hop",
+   "bounce",
+   "spring",
+   "puff",
+   "enemy",
+   "monster",
+   "poison"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  48,
+  48
+ ],
+ "pivot": [
+  24,
+  42
+ ],
+ "grounded": true,
+ "preview": "hop",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "bulk": {
+   "kind": "range",
+   "label": "Pod",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slim",
+   "hi": "Plump",
+   "group": "Look"
+  },
+  "eyes": {
+   "kind": "choice",
+   "label": "Eyes",
+   "def": "round",
+   "options": [
+    {
+     "value": "round",
+     "label": "Round"
+    },
+    {
+     "value": "sleepy",
+     "label": "Sleepy"
+    },
+    {
+     "value": "angry",
+     "label": "Angry"
+    }
+   ],
+   "group": "Look"
+  },
+  "ribs": {
+   "kind": "toggle",
+   "label": "Ribs",
+   "def": true,
+   "group": "Look"
+  },
+  "ruff": {
+   "kind": "choice",
+   "label": "Ruff",
+   "def": "leaves",
+   "options": [
+    {
+     "value": "leaves",
+     "label": "Leaves"
+    },
+    {
+     "value": "petals",
+     "label": "Petals"
+    },
+    {
+     "value": "thorns",
+     "label": "Thorns"
+    },
+    {
+     "value": "none",
+     "label": "None"
+    }
+   ],
+   "group": "Look"
+  },
+  "ruffSize": {
+   "kind": "range",
+   "label": "Size",
+   "def": 1,
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "ruffColour": {
+   "kind": "color",
+   "label": "Colour",
+   "def": "#3f8a4f",
+   "swatches": [
+    "#3f8a4f",
+    "#6aa83e",
+    "#e08a2c",
+    "#f0ead8"
+   ],
+   "group": "Colors",
+   "material": "plant"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Pod",
+   "def": "#a4c44a",
+   "swatches": [
+    "#a4c44a",
+    "#9bd18a",
+    "#c9423a",
+    "#f2c230",
+    "#3f9fd1"
+   ],
+   "group": "Colors",
+   "material": "plant"
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Spores",
+   "def": "#7a4fc4",
+   "swatches": [
+    "#7a4fc4",
+    "#4fd8ee",
+    "#e08a2c",
+    "#f0ead8"
+   ],
+   "group": "Colors"
+  },
+  "hop": {
+   "kind": "range",
+   "label": "Hop height",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Low",
+   "hi": "High",
+   "group": "Motion"
+  },
+  "wobble": {
+   "kind": "range",
+   "label": "Wobble",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Firm",
+   "hi": "Wobbly",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    7,
+    10
+   ]
+  },
+  "hop": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    12,
+    16
+   ]
+  },
+  "attack": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    8,
+    14,
+    19
+   ]
+  },
+  "hurt": {
+   "frames": 4,
+   "loop": false,
+   "fps": [
+    6,
+    9,
+    13
+   ]
+  },
+  "die": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  }
+ },
+ "sounds": {
+  "hop": [
+   {
+    "sound": "jump",
+    "frame": 1,
+    "preset": "Tiny hop",
+    "volume": 0.5
+   },
+   {
+    "sound": "footstep-gravel",
+    "frame": 6,
+    "preset": "Sneaking",
+    "volume": 0.5
+   }
+  ],
+  "attack": [
+   {
+    "sound": "whoosh",
+    "frame": 4,
+    "preset": "Quick swipe",
+    "volume": 0.7
+   }
+  ],
+  "hurt": [
+   {
+    "sound": "punch",
+    "frame": 0,
+    "preset": "Light jab",
+    "volume": 0.9
+   }
+  ],
+  "die": [
+   {
+    "sound": "enemy-squish",
+    "frame": 0,
+    "preset": "Pop",
+    "volume": 1
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-platformer-fantasy"
+ ]
+}

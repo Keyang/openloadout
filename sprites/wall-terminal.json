@@ -1,0 +1,122 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "wall-terminal",
+ "name": "Terminal",
+ "blurb": "A station computer to walk up to and use: its screen scrolls, flashes and shows a tick when it is used, or stands dark. Make it a console, a kiosk or a wall panel, choose what the screen shows, and change the keyboard, lights and colours.",
+ "meta": {
+  "type": "prop",
+  "role": "world/prop",
+  "themes": ["sci-fi","space"],
+  "gameTypes": ["roguelike-action","shooter"],
+  "view": "top-down",
+  "words": ["terminal","computer","console","screen","monitor","kiosk","keyboard","hack","activate","use","interact","switch","data"],
+  "license": "draft"
+ },
+ "size": [32,48],
+ "pivot": [16,46],
+ "preview": "idle",
+ "styles": ["pixel"],
+ "palette": [
+  {
+   "id": "body",
+   "label": "Body",
+   "default": "#6b7896",
+   "material": "metal",
+   "swatches": ["#6b7896","#9aa6c0","#c2c9d6","#566182","#6660b6","#a87894"]
+  },
+  {
+   "id": "accent",
+   "label": "Trim",
+   "default": "#2fb3a8",
+   "material": "signal",
+   "swatches": ["#2fb3a8","#f2a030","#e2473f","#3f6fd1","#5fe0f0","#9fe040"]
+  },
+  {
+   "id": "glow",
+   "label": "Screen",
+   "default": "#5fe0f0",
+   "material": "interface",
+   "swatches": ["#5fe0f0","#e2473f","#9fe040","#f2a030","#b48af8","#4f9ff0","#5fd47a"]
+  }
+ ],
+ "controls": [
+  {
+   "key": "style",
+   "kind": "choice",
+   "label": "Style",
+   "options": [{"value":"console","label":"Console"},{"value":"kiosk","label":"Kiosk"},{"value":"wall panel","label":"Wall panel"}],
+   "default": "console"
+  },
+  {
+   "key": "shape",
+   "kind": "choice",
+   "label": "Screen shows",
+   "options": [{"value":"text","label":"Text"},{"value":"graph","label":"Graph"},{"value":"map","label":"Map"},{"value":"skull","label":"Skull"}],
+   "default": "text"
+  },
+  {"key":"keys","kind":"toggle","label":"Keyboard","default":true},
+  {"key":"body","kind":"colour","label":"Body"},
+  {"key":"accent","kind":"colour","label":"Trim"},
+  {"key":"glow","kind":"colour","label":"Screen"},
+  {"key":"flicker","kind":"range","label":"Flicker","lo":"Steady","hi":"Wild","default":0.5,"group":"Motion"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": {
+  "pictures": {
+   "nodes": [],
+   "draw": [
+    {
+     "id": "idle",
+     "gen": "terminal.wall",
+     "v": 1,
+     "at": [16,46],
+     "clip": ["idle"],
+     "picture": "idle",
+     "style": {"from":"style","pick":{"console":"console","kiosk":"kiosk","wall panel":"wall-panel"}},
+     "shape": {"from":"shape","pick":{"text":"text","graph":"graph","map":"map","skull":"skull"}},
+     "keys": {"from":"keys","pick":{"true":true,"false":false}},
+     "body": "body",
+     "accent": "accent",
+     "glowing": "glow",
+     "flicker": {"from":"flicker","map":[[0,0],[1,1]],"round":"none"}
+    },
+    {
+     "id": "activate",
+     "gen": "terminal.wall",
+     "v": 1,
+     "at": [16,46],
+     "clip": ["activate"],
+     "picture": "activate",
+     "style": {"from":"style","pick":{"console":"console","kiosk":"kiosk","wall panel":"wall-panel"}},
+     "shape": {"from":"shape","pick":{"text":"text","graph":"graph","map":"map","skull":"skull"}},
+     "keys": {"from":"keys","pick":{"true":true,"false":false}},
+     "body": "body",
+     "accent": "accent",
+     "glowing": "glow",
+     "flicker": {"from":"flicker","map":[[0,0],[1,1]],"round":"none"}
+    },
+    {
+     "id": "off",
+     "gen": "terminal.wall",
+     "v": 1,
+     "at": [16,46],
+     "clip": ["off"],
+     "picture": "off",
+     "style": {"from":"style","pick":{"console":"console","kiosk":"kiosk","wall panel":"wall-panel"}},
+     "shape": {"from":"shape","pick":{"text":"text","graph":"graph","map":"map","skull":"skull"}},
+     "keys": {"from":"keys","pick":{"true":true,"false":false}},
+     "body": "body",
+     "accent": "accent",
+     "glowing": "glow",
+     "flicker": {"from":"flicker","map":[[0,0],[1,1]],"round":"none"}
+    }
+   ]
+  }
+ },
+ "clips": {
+  "idle": {"frames":8,"fps":8},
+  "activate": {"frames":8,"fps":12,"loop":false,"sounds":[{"sound":"tech-click","preset":"Confirm","frame":1,"volume":0.6}]},
+  "off": {"frames":1,"fps":8}
+ }
+}

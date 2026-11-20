@@ -1,0 +1,392 @@
+{
+ "id": "robot.scout-drone",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     24,
+     24
+    ],
+    "picture": "idle",
+    "size": 0.5,
+    "shape": "round",
+    "eyes": "single",
+    "weapon": "blaster",
+    "weaponLength": 1,
+    "wings": "rotors",
+    "wingSpan": 1,
+    "bob": 0.5,
+    "body": "body",
+    "accent": "accent",
+    "lights": "glow"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      8,
+      12
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..aaaaa.................aaaaa..",
+      ".abbbbbaa..............abcccca.",
+      "abbbbbbbba..aaaaaaaa...acbbccca",
+      "abccdcccbaaaeeeeeeeeaa.acccdbca",
+      ".abbbbbaaaeeeeeeeeeeeeaaaccccba",
+      "..aaaffffeeeeeeeeeeeeeeffffaaa.",
+      ".....aafddfffdeeeefdddfffaa....",
+      "......addfffdddfffdddfffda.....",
+      "......agggfdddhhhhddffggga.....",
+      "......agiiggghhjjhhgggiiia.....",
+      "......agiiiihhjjkjhhiiiiia.....",
+      "......aggiiihjjjjkjhiiiiia.....",
+      ".......aggiihjjjjjjhiiiia......",
+      "........aggihhjjjjhhiiia.......",
+      ".........aggghhjjhhiiga........",
+      "..........aagghhhhggaa.........",
+      "............aahfffaa...........",
+      ".............acccca............",
+      ".............acjjca............",
+      ".............acccca............",
+      "..............aaaa............."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#c2c9d6",
+        "with": "#c2c9d6",
+        "amount": 0
+       },
+       "tone": "light"
+      },
+      "c": {
+       "rule": "mix",
+       "of": "#c2c9d6",
+       "with": "#c2c9d6",
+       "amount": 0
+      },
+      "d": "accent",
+      "e": "body.light",
+      "f": {
+       "rule": "mix",
+       "of": "#434d6d",
+       "with": "#434d6d",
+       "amount": 0
+      },
+      "g": "body.dark",
+      "h": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#434d6d",
+        "with": "#434d6d",
+        "amount": 0
+       },
+       "tone": "dark"
+      },
+      "i": "body",
+      "j": "glow",
+      "k": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     24,
+     24
+    ],
+    "picture": "shoot",
+    "size": 1,
+    "shape": "round",
+    "eyes": "single",
+    "weapon": "blaster",
+    "weaponLength": 1,
+    "wings": "rotors",
+    "wingSpan": 1,
+    "bob": 0.5,
+    "body": "body",
+    "accent": "accent",
+    "lights": "glow"
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": false,
+    "frames": 6,
+    "frame": 3
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      7,
+      10
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aaaaaa....................aaaaa",
+      "abccccca..................abbbbb",
+      "acbbcccca....aaaaaaaa....abbbbbb",
+      "acccdbcca..aaeeeeeeeeaa..acccdcc",
+      "acccccba.aaeeeeeeeeeeeeaa.abbbbb",
+      ".aaafffaaeeeeeeeeeeeeeeeeaafffaa",
+      "....afffdddfffeeeeeedddffffffa..",
+      ".....afdddfffdddfffdddfffddfa...",
+      "......addfffdddfffdddfffddda....",
+      ".....aggggfdddffhhddfffdgggga...",
+      ".....agiiigggghhhhhhggggiiiia...",
+      ".....aggiiiiihhjjjjhhiiiiiiia...",
+      "......agiiiiihjjjkjjhiiiiiia....",
+      "......aggiiihhjjjjkjhhiiiiia....",
+      ".......aggiihhjjjjjjhhiiiia.....",
+      "........agggihjjjjjjhiiiga......",
+      ".........aagghhjjjjhhigaa.......",
+      "...........aaghhhhhhgaa.........",
+      ".............ahfhhffa...........",
+      ".............ahfffffa...........",
+      ".............acccccca...........",
+      ".............acjjjjca...........",
+      ".............acccccca...........",
+      "..............aaaaaa............"
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#c2c9d6",
+        "with": "#c2c9d6",
+        "amount": 0
+       },
+       "tone": "light"
+      },
+      "c": {
+       "rule": "mix",
+       "of": "#c2c9d6",
+       "with": "#c2c9d6",
+       "amount": 0
+      },
+      "d": "accent",
+      "e": "body.light",
+      "f": {
+       "rule": "mix",
+       "of": "#434d6d",
+       "with": "#434d6d",
+       "amount": 0
+      },
+      "g": "body.dark",
+      "h": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#434d6d",
+        "with": "#434d6d",
+        "amount": 0
+       },
+       "tone": "dark"
+      },
+      "i": "body",
+      "j": "glow",
+      "k": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      39,
+      10
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a..",
+      "ba.",
+      "bba",
+      "cba",
+      "ba.",
+      "a..",
+      "...",
+      "...",
+      "...",
+      "...",
+      "...",
+      "...",
+      "...",
+      "...",
+      "...",
+      "...",
+      "...",
+      "...",
+      "...",
+      "...",
+      "...",
+      "...",
+      "...",
+      "..."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#c2c9d6",
+        "with": "#c2c9d6",
+        "amount": 0
+       },
+       "tone": "light"
+      },
+      "c": {
+       "rule": "mix",
+       "of": "#c2c9d6",
+       "with": "#c2c9d6",
+       "amount": 0
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     27,
+     22
+    ],
+    "picture": "die",
+    "size": 0,
+    "shape": "round",
+    "eyes": "single",
+    "weapon": "blaster",
+    "weaponLength": 1,
+    "wings": "rotors",
+    "wingSpan": 1,
+    "bob": 0.5,
+    "body": "body",
+    "accent": "accent",
+    "lights": "glow"
+   },
+   "ctx": {
+    "t": 0.6,
+    "loop": false,
+    "frames": 8,
+    "frame": 3
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      17,
+      15
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".............aa.....",
+      "............abbaaa..",
+      "...........abccbbba.",
+      "...........abbbdcca.",
+      "............aeebbbba",
+      "....aaaa.aaaeeeaaaa.",
+      "...adddeafffeea.....",
+      "..aggdaaehhhfffa....",
+      ".agiaabchhhhheeaa...",
+      ".agiicbhhhhhjeeeda..",
+      "aggiiachhhkhhelddda.",
+      ".agiiiaabhhiglllgga.",
+      ".aggiiiiaaiiimmiiiga",
+      "..aggiiiiiiiimmiiia.",
+      "...aaggiiiiimmiiiia.",
+      "....agggiiiimmiiia..",
+      ".....aleggglllgia...",
+      ".....acceeaalaaa....",
+      ".....acmcca.a.......",
+      "....acccmca.........",
+      ".....aaaca..........",
+      "........a..........."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#c2c9d6",
+        "with": "#c2c9d6",
+        "amount": 0
+       },
+       "tone": "light"
+      },
+      "c": {
+       "rule": "mix",
+       "of": "#c2c9d6",
+       "with": "#c2c9d6",
+       "amount": 0
+      },
+      "d": "accent",
+      "e": {
+       "rule": "mix",
+       "of": "#434d6d",
+       "with": "#434d6d",
+       "amount": 0
+      },
+      "f": "body.light",
+      "g": "body.dark",
+      "h": {
+       "rule": "tone",
+       "of": {
+        "rule": "mix",
+        "of": "#f2a030",
+        "with": "#f2a030",
+        "amount": 0
+       },
+       "by": -1
+      },
+      "i": "body",
+      "j": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      },
+      "k": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      },
+      "l": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#434d6d",
+        "with": "#434d6d",
+        "amount": 0
+       },
+       "tone": "dark"
+      },
+      "m": {
+       "rule": "tone",
+       "of": "glow",
+       "by": -1.2
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,862 @@
+{
+ "id": "laser.gate",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     32,
+     46
+    ],
+    "body": "body",
+    "accent": "accent",
+    "glowing": "glow"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      4,
+      8
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..aaaaaaaa......................",
+      ".abbbbbbbba.....................",
+      ".acccccccca.....................",
+      ".adeeeeeeca.....................",
+      ".adeefgeeca.....................",
+      ".adeeffeeca.....................",
+      ".adeeeeeeca.....................",
+      ".adeeeeeeca.....................",
+      "..adeeeeca......................",
+      "..adeeeecaaahhhh................",
+      "..adeeeeciijjjjjhhhhhhhhhhhhhhhh",
+      "..adeeeeckjglllljjjjjjjjjjjjjjjj",
+      "..adeeeeckjggggggggggggggggggggg",
+      "..adeeeeckjglllljjjjjjjjjjjjjjjj",
+      "..adeeeeckkjjjjjhhhhhhhhhhhhhhhh",
+      "..adeeeecaaahhhh................",
+      "..adeeeeca......................",
+      "..adeeeeca......................",
+      "..adeeeeca......................",
+      "..adeeeeca......................",
+      "..adeeeeca......................",
+      "..adeeeecaaa................hhhh",
+      "..adeeeeciijhhhhhhhhhhhhhhhhjjjj",
+      "..adeeeeckjgjjjjjjjjjjjjjjjjllll",
+      "..adeeeeckjggggggggggggggggggggg",
+      "..adeeeeckjgjjjjjjjjjjjjjjjjllll",
+      "..adeeeeckkjhhhhhhhhhhhhhhhhjjjj",
+      "..adeeeecaaa................hhhh",
+      "..adeeeeca......................",
+      "..adeeeeca......................",
+      ".aadeeeecaa.....................",
+      "abbbbbbbbbba...................."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "textureLight",
+       "of": "body"
+      },
+      "c": {
+       "rule": "textureLight",
+       "of": "body",
+       "against": "body",
+       "from": 0.4
+      },
+      "d": {
+       "rule": "textureTone",
+       "of": "body"
+      },
+      "e": "body",
+      "f": "accent",
+      "g": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      },
+      "h": {
+       "rule": "tone",
+       "of": "glow",
+       "by": -1
+      },
+      "i": {
+       "rule": "textureLight",
+       "of": {
+        "rule": "shadeTo",
+        "of": "body",
+        "drop": 0.2,
+        "floor": 0.17
+       },
+       "against": {
+        "rule": "shadeTo",
+        "of": "body",
+        "drop": 0.2,
+        "floor": 0.17
+       },
+       "from": 0.4
+      },
+      "j": "glow",
+      "k": {
+       "rule": "shadeTo",
+       "of": "body",
+       "drop": 0.2,
+       "floor": 0.17
+      },
+      "l": {
+       "rule": "tone",
+       "of": "glow",
+       "by": 1.6
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      36,
+      8
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..............aaaaaaaa..",
+      ".............abbbbbbbba.",
+      ".............acccccccca.",
+      ".............adeeeeeeca.",
+      ".............adeefgeeca.",
+      ".............adeeffeeca.",
+      ".............adeeeeeeca.",
+      ".............adeeeeeeca.",
+      "..............adeeeeca..",
+      "............aaadeeeeca..",
+      "hhhhhhhhhhhhijjdeeeeca..",
+      "iiiiiiiiiiiigikdeeeeca..",
+      "gggggggggggggikdeeeeca..",
+      "iiiiiiiiiiiigikdeeeeca..",
+      "hhhhhhhhhhhhikkdeeeeca..",
+      "............aaadeeeeca..",
+      "..............adeeeeca..",
+      "..............adeeeeca..",
+      "..............adeeeeca..",
+      "..............adeeeeca..",
+      "..............adeeeeca..",
+      "............aaadeeeeca..",
+      "hhhhhhhhhhhhijjdeeeeca..",
+      "iiiiiiiiiiiigikdeeeeca..",
+      "gggggggggggggikdeeeeca..",
+      "iiiiiiiiiiiigikdeeeeca..",
+      "hhhhhhhhhhhhikkdeeeeca..",
+      "............aaadeeeeca..",
+      "..............adeeeeca..",
+      "..............adeeeeca..",
+      ".............aadeeeecaa.",
+      "............abbbbbbbbbba"
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "textureLight",
+       "of": "body"
+      },
+      "c": {
+       "rule": "textureLight",
+       "of": "body",
+       "against": "body",
+       "from": 0.4
+      },
+      "d": {
+       "rule": "textureTone",
+       "of": "body"
+      },
+      "e": "body",
+      "f": "accent",
+      "g": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      },
+      "h": {
+       "rule": "tone",
+       "of": "glow",
+       "by": -1
+      },
+      "i": "glow",
+      "j": {
+       "rule": "textureLight",
+       "of": {
+        "rule": "shadeTo",
+        "of": "body",
+        "drop": 0.2,
+        "floor": 0.17
+       },
+       "against": {
+        "rule": "shadeTo",
+        "of": "body",
+        "drop": 0.2,
+        "floor": 0.17
+       },
+       "from": 0.4
+      },
+      "k": {
+       "rule": "shadeTo",
+       "of": "body",
+       "drop": 0.2,
+       "floor": 0.17
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      4,
+      40
+     ],
+     "anchor": "tl",
+     "rows": [
+      "abbbbbbbbbba....................",
+      "acddddddddba....................",
+      "aceeffeeffba....................",
+      "aceffeeffeba....................",
+      "acffeeffeeba....................",
+      "acddddddddba....................",
+      ".aaaaaaaaaa....................."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "textureLight",
+       "of": "body",
+       "against": "body",
+       "from": 0.4
+      },
+      "c": {
+       "rule": "textureTone",
+       "of": "body"
+      },
+      "d": "body",
+      "e": "accent",
+      "f": {
+       "rule": "shadeTo",
+       "of": "body",
+       "drop": 0.2,
+       "floor": 0.17
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      36,
+      40
+     ],
+     "anchor": "tl",
+     "rows": [
+      "............abbbbbbbbbba",
+      "............acddddddddba",
+      "............aceeffeeffba",
+      "............aceffeeffeba",
+      "............acffeeffeeba",
+      "............acddddddddba",
+      ".............aaaaaaaaaa."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "textureLight",
+       "of": "body",
+       "against": "body",
+       "from": 0.4
+      },
+      "c": {
+       "rule": "textureTone",
+       "of": "body"
+      },
+      "d": "body",
+      "e": "accent",
+      "f": {
+       "rule": "shadeTo",
+       "of": "body",
+       "drop": 0.2,
+       "floor": 0.17
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     32,
+     46
+    ],
+    "body": "body",
+    "accent": "accent",
+    "glowing": "glow",
+    "picture": "open"
+   },
+   "ctx": {
+    "t": 0.4,
+    "loop": false,
+    "frames": 6,
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      4,
+      8
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..aaaaaaaa......................",
+      ".abbbbbbbba.....................",
+      ".acccccccca.....................",
+      ".adeeeeeeca.....................",
+      ".adeefgeeca.....................",
+      ".adeeffeeca.....................",
+      ".adeeeeeeca.....................",
+      ".adeeeeeeca.....................",
+      "..adeeeeca......................",
+      "..adeeeecaaa....................",
+      "..adeeeechhha...................",
+      "..adeeeeciiga...................",
+      "..adeeeeciijkkkkkkkkkk....kkkkkk",
+      "..adeeeeciija...................",
+      "..adeeeeciiia...................",
+      "..adeeeecaaa....................",
+      "..adeeeeca......................",
+      "..adeeeeca......................",
+      "..adeeeeca......................",
+      "..adeeeeca......................",
+      "..adeeeeca......................",
+      "..adeeeecaaa....................",
+      "..adeeeechhha...................",
+      "..adeeeeciiga...................",
+      "..adeeeeciijkkkkkk....kkkkkkkk..",
+      "..adeeeeciija...................",
+      "..adeeeeciiia...................",
+      "..adeeeecaaa....................",
+      "..adeeeeca......................",
+      "..adeeeeca......................",
+      ".aadeeeecaa.....................",
+      "abbbbbbbbbba...................."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "textureLight",
+       "of": "body"
+      },
+      "c": {
+       "rule": "textureLight",
+       "of": "body",
+       "against": "body",
+       "from": 0.4
+      },
+      "d": {
+       "rule": "textureTone",
+       "of": "body"
+      },
+      "e": "body",
+      "f": "accent",
+      "g": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      },
+      "h": {
+       "rule": "textureLight",
+       "of": {
+        "rule": "shadeTo",
+        "of": "body",
+        "drop": 0.2,
+        "floor": 0.17
+       },
+       "against": {
+        "rule": "shadeTo",
+        "of": "body",
+        "drop": 0.2,
+        "floor": 0.17
+       },
+       "from": 0.4
+      },
+      "i": {
+       "rule": "shadeTo",
+       "of": "body",
+       "drop": 0.2,
+       "floor": 0.17
+      },
+      "j": "glow",
+      "k": {
+       "rule": "tone",
+       "of": "glow",
+       "by": 1.6
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      36,
+      8
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..............aaaaaaaa..",
+      ".............abbbbbbbba.",
+      ".............acccccccca.",
+      ".............adeeeeeeca.",
+      ".............adeefgeeca.",
+      ".............adeeffeeca.",
+      ".............adeeeeeeca.",
+      ".............adeeeeeeca.",
+      "..............adeeeeca..",
+      "............aaadeeeeca..",
+      "...........ahhhdeeeeca..",
+      "...........agiideeeeca..",
+      "jjjjjjjjjjjjkiideeeeca..",
+      "...........akiideeeeca..",
+      "...........aiiideeeeca..",
+      "............aaadeeeeca..",
+      "..............adeeeeca..",
+      "..............adeeeeca..",
+      "..............adeeeeca..",
+      "..............adeeeeca..",
+      "..............adeeeeca..",
+      "............aaadeeeeca..",
+      "...........ahhhdeeeeca..",
+      "...........agiideeeeca..",
+      "..jjjjjjjjjjkiideeeeca..",
+      "...........akiideeeeca..",
+      "...........aiiideeeeca..",
+      "............aaadeeeeca..",
+      "..............adeeeeca..",
+      "..............adeeeeca..",
+      ".............aadeeeecaa.",
+      "............abbbbbbbbbba"
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "textureLight",
+       "of": "body"
+      },
+      "c": {
+       "rule": "textureLight",
+       "of": "body",
+       "against": "body",
+       "from": 0.4
+      },
+      "d": {
+       "rule": "textureTone",
+       "of": "body"
+      },
+      "e": "body",
+      "f": "accent",
+      "g": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      },
+      "h": {
+       "rule": "textureLight",
+       "of": {
+        "rule": "shadeTo",
+        "of": "body",
+        "drop": 0.2,
+        "floor": 0.17
+       },
+       "against": {
+        "rule": "shadeTo",
+        "of": "body",
+        "drop": 0.2,
+        "floor": 0.17
+       },
+       "from": 0.4
+      },
+      "i": {
+       "rule": "shadeTo",
+       "of": "body",
+       "drop": 0.2,
+       "floor": 0.17
+      },
+      "j": {
+       "rule": "tone",
+       "of": "glow",
+       "by": 1.6
+      },
+      "k": "glow"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      4,
+      40
+     ],
+     "anchor": "tl",
+     "rows": [
+      "abbbbbbbbbba....................",
+      "acddddddddba....................",
+      "aceeffeeffba....................",
+      "aceffeeffeba....................",
+      "acffeeffeeba....................",
+      "acddddddddba....................",
+      ".aaaaaaaaaa....................."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "textureLight",
+       "of": "body",
+       "against": "body",
+       "from": 0.4
+      },
+      "c": {
+       "rule": "textureTone",
+       "of": "body"
+      },
+      "d": "body",
+      "e": "accent",
+      "f": {
+       "rule": "shadeTo",
+       "of": "body",
+       "drop": 0.2,
+       "floor": 0.17
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      36,
+      40
+     ],
+     "anchor": "tl",
+     "rows": [
+      "............abbbbbbbbbba",
+      "............acddddddddba",
+      "............aceeffeeffba",
+      "............aceffeeffeba",
+      "............acffeeffeeba",
+      "............acddddddddba",
+      ".............aaaaaaaaaa."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "textureLight",
+       "of": "body",
+       "against": "body",
+       "from": 0.4
+      },
+      "c": {
+       "rule": "textureTone",
+       "of": "body"
+      },
+      "d": "body",
+      "e": "accent",
+      "f": {
+       "rule": "shadeTo",
+       "of": "body",
+       "drop": 0.2,
+       "floor": 0.17
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     32,
+     46
+    ],
+    "body": "body",
+    "accent": "accent",
+    "glowing": "glow",
+    "picture": "warn"
+   },
+   "ctx": {
+    "t": 0.375,
+    "loop": true,
+    "frames": 8,
+    "frame": 3
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      4,
+      8
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..aaaaaaaa......................",
+      ".abbbbbbbba.....................",
+      ".acccccccca.....................",
+      ".adeeffeeca.....................",
+      ".adefggfeca.....................",
+      ".adefggfeca.....................",
+      ".adeeffeeca.....................",
+      ".adeeeeeeca.....................",
+      "..adeeeeca......................",
+      "..adeeeecaaa....................",
+      "..adeeeechhha...................",
+      "..adeeeeciiga...................",
+      "..adeeeeciijkk...kkk......kkkkkk",
+      "..adeeeeciija...................",
+      "..adeeeeciiia...................",
+      "..adeeeecaaa....................",
+      "..adeeeeca......................",
+      "..adeeeeca......................",
+      "..adeeeeca......................",
+      "..adeeeeca......................",
+      "..adeeeeca......................",
+      "..adeeeecaaa....................",
+      "..adeeeechhha...................",
+      "..adeeeeciiga...................",
+      "..adeeeeciijkkkkk...kkkkkk...kkk",
+      "..adeeeeciija...................",
+      "..adeeeeciiia...................",
+      "..adeeeecaaa....................",
+      "..adeeeeca......................",
+      "..adeeeeca......................",
+      ".aadeeeecaa.....................",
+      "abbbbbbbbbba...................."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "textureLight",
+       "of": "body"
+      },
+      "c": {
+       "rule": "textureLight",
+       "of": "body",
+       "against": "body",
+       "from": 0.4
+      },
+      "d": {
+       "rule": "textureTone",
+       "of": "body"
+      },
+      "e": "body",
+      "f": "accent",
+      "g": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      },
+      "h": {
+       "rule": "textureLight",
+       "of": {
+        "rule": "shadeTo",
+        "of": "body",
+        "drop": 0.2,
+        "floor": 0.17
+       },
+       "against": {
+        "rule": "shadeTo",
+        "of": "body",
+        "drop": 0.2,
+        "floor": 0.17
+       },
+       "from": 0.4
+      },
+      "i": {
+       "rule": "shadeTo",
+       "of": "body",
+       "drop": 0.2,
+       "floor": 0.17
+      },
+      "j": "glow",
+      "k": {
+       "rule": "tone",
+       "of": "glow",
+       "by": 1.6
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      36,
+      8
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..............aaaaaaaa..",
+      ".............abbbbbbbba.",
+      ".............acccccccca.",
+      ".............adeeffeeca.",
+      ".............adefggfeca.",
+      ".............adefggfeca.",
+      ".............adeeffeeca.",
+      ".............adeeeeeeca.",
+      "..............adeeeeca..",
+      "............aaadeeeeca..",
+      "...........ahhhdeeeeca..",
+      "...........agiideeeeca..",
+      "jjjjjj.....akiideeeeca..",
+      "...........akiideeeeca..",
+      "...........aiiideeeeca..",
+      "............aaadeeeeca..",
+      "..............adeeeeca..",
+      "..............adeeeeca..",
+      "..............adeeeeca..",
+      "..............adeeeeca..",
+      "..............adeeeeca..",
+      "............aaadeeeeca..",
+      "...........ahhhdeeeeca..",
+      "...........agiideeeeca..",
+      "jjj........akiideeeeca..",
+      "...........akiideeeeca..",
+      "...........aiiideeeeca..",
+      "............aaadeeeeca..",
+      "..............adeeeeca..",
+      "..............adeeeeca..",
+      ".............aadeeeecaa.",
+      "............abbbbbbbbbba"
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "textureLight",
+       "of": "body"
+      },
+      "c": {
+       "rule": "textureLight",
+       "of": "body",
+       "against": "body",
+       "from": 0.4
+      },
+      "d": {
+       "rule": "textureTone",
+       "of": "body"
+      },
+      "e": "body",
+      "f": "accent",
+      "g": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      },
+      "h": {
+       "rule": "textureLight",
+       "of": {
+        "rule": "shadeTo",
+        "of": "body",
+        "drop": 0.2,
+        "floor": 0.17
+       },
+       "against": {
+        "rule": "shadeTo",
+        "of": "body",
+        "drop": 0.2,
+        "floor": 0.17
+       },
+       "from": 0.4
+      },
+      "i": {
+       "rule": "shadeTo",
+       "of": "body",
+       "drop": 0.2,
+       "floor": 0.17
+      },
+      "j": {
+       "rule": "tone",
+       "of": "glow",
+       "by": 1.6
+      },
+      "k": "glow"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      4,
+      40
+     ],
+     "anchor": "tl",
+     "rows": [
+      "abbbbbbbbbba....................",
+      "acddddddddba....................",
+      "aceeffeeffba....................",
+      "aceffeeffeba....................",
+      "acffeeffeeba....................",
+      "acddddddddba....................",
+      ".aaaaaaaaaa....................."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "textureLight",
+       "of": "body",
+       "against": "body",
+       "from": 0.4
+      },
+      "c": {
+       "rule": "textureTone",
+       "of": "body"
+      },
+      "d": "body",
+      "e": "accent",
+      "f": {
+       "rule": "shadeTo",
+       "of": "body",
+       "drop": 0.2,
+       "floor": 0.17
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      36,
+      40
+     ],
+     "anchor": "tl",
+     "rows": [
+      "............abbbbbbbbbba",
+      "............acddddddddba",
+      "............aceeffeeffba",
+      "............aceffeeffeba",
+      "............acffeeffeeba",
+      "............acddddddddba",
+      ".............aaaaaaaaaa."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "textureLight",
+       "of": "body",
+       "against": "body",
+       "from": 0.4
+      },
+      "c": {
+       "rule": "textureTone",
+       "of": "body"
+      },
+      "d": "body",
+      "e": "accent",
+      "f": {
+       "rule": "shadeTo",
+       "of": "body",
+       "drop": 0.2,
+       "floor": 0.17
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

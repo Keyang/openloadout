@@ -1,0 +1,1417 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "tiles-pit",
+ "name": "Pits and the void",
+ "blurb": "Holes in a space station floor that open onto drifting stars, mist or a reactor glow, with a plated inner wall and warning lights running round the rim; change what is below, how deep the wall shows, the colours and the speed.",
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "pit-single",
+ "styles": [
+  "pixel"
+ ],
+ "meta": {
+  "type": "tileset",
+  "role": "world/tile",
+  "themes": [
+   "sci-fi",
+   "space"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "shooter"
+  ],
+  "view": "top-down",
+  "words": [
+   "pit",
+   "hole",
+   "void",
+   "chasm",
+   "gap",
+   "shaft",
+   "hatch",
+   "drop",
+   "fall",
+   "hazard",
+   "stars",
+   "reactor",
+   "mist",
+   "bottomless"
+  ],
+  "license": "draft"
+ },
+ "palette": [
+  {
+   "id": "land",
+   "label": "Floor edge",
+   "default": "#566182",
+   "material": "metal",
+   "swatches": [
+    "#566182",
+    "#6b7896",
+    "#6660b6",
+    "#a87894"
+   ]
+  },
+  {
+   "id": "hull",
+   "label": "Inner wall",
+   "default": "#6b7896",
+   "material": "metal",
+   "swatches": [
+    "#6b7896",
+    "#566182",
+    "#9aa6c0",
+    "#6660b6",
+    "#a87894"
+   ]
+  },
+  {
+   "id": "glow",
+   "label": "Warning lights",
+   "default": "#f2a030",
+   "material": "signal",
+   "swatches": [
+    "#f2a030",
+    "#5fe0f0",
+    "#e2473f",
+    "#9fe040",
+    "#b48af8",
+    "#4f9ff0",
+    "#5fd47a"
+   ]
+  }
+ ],
+ "controls": [
+  {
+   "key": "below",
+   "kind": "choice",
+   "label": "Below",
+   "options": [
+    {
+     "value": "space",
+     "label": "Space"
+    },
+    {
+     "value": "mist",
+     "label": "Mist"
+    },
+    {
+     "value": "reactor",
+     "label": "Reactor"
+    }
+   ],
+   "default": "space"
+  },
+  {
+   "key": "height",
+   "kind": "range",
+   "label": "Depth",
+   "lo": "Shallow",
+   "hi": "Deep",
+   "min": 6,
+   "max": 14,
+   "step": 1,
+   "default": 10
+  },
+  {
+   "key": "pieces",
+   "kind": "range",
+   "label": "Specks",
+   "lo": "Few",
+   "hi": "Many",
+   "default": 0.5
+  },
+  {
+   "key": "land",
+   "kind": "colour",
+   "label": "Floor edge"
+  },
+  {
+   "key": "hull",
+   "kind": "colour",
+   "label": "Inner wall"
+  },
+  {
+   "key": "glow",
+   "kind": "colour",
+   "label": "Warning lights"
+  },
+  {
+   "key": "speed",
+   "standard": "speed"
+  }
+ ],
+ "body": {
+  "tiles": {
+   "tile": 32,
+   "groups": [
+    {
+     "name": "pit",
+     "kind": "block",
+     "use": "hole",
+     "pieces": [
+      "block",
+      "narrow"
+     ],
+     "fills": 3,
+     "frames": 8,
+     "fps": 6,
+     "outline": false,
+     "pictures": {
+      "left": [
+       {
+        "gen": "tile.pit",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "pit-left",
+        "below": {
+         "from": "below",
+         "pick": {
+          "space": "space",
+          "mist": "mist",
+          "reactor": "reactor"
+         }
+        },
+        "height": {
+         "from": "height",
+         "map": [
+          [
+           6,
+           6
+          ],
+          [
+           14,
+           14
+          ]
+         ]
+        },
+        "pieces": {
+         "from": "pieces",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "land": "land",
+        "hull": "hull",
+        "lights": "glow"
+       }
+      ],
+      "top": [
+       {
+        "gen": "tile.pit",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "pit-top",
+        "below": {
+         "from": "below",
+         "pick": {
+          "space": "space",
+          "mist": "mist",
+          "reactor": "reactor"
+         }
+        },
+        "height": {
+         "from": "height",
+         "map": [
+          [
+           6,
+           6
+          ],
+          [
+           14,
+           14
+          ]
+         ]
+        },
+        "pieces": {
+         "from": "pieces",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "land": "land",
+        "hull": "hull",
+        "lights": "glow"
+       }
+      ],
+      "right": [
+       {
+        "gen": "tile.pit",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "pit-right",
+        "below": {
+         "from": "below",
+         "pick": {
+          "space": "space",
+          "mist": "mist",
+          "reactor": "reactor"
+         }
+        },
+        "height": {
+         "from": "height",
+         "map": [
+          [
+           6,
+           6
+          ],
+          [
+           14,
+           14
+          ]
+         ]
+        },
+        "pieces": {
+         "from": "pieces",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "land": "land",
+        "hull": "hull",
+        "lights": "glow"
+       }
+      ],
+      "side-l": [
+       {
+        "gen": "tile.pit",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "pit-side-l",
+        "below": {
+         "from": "below",
+         "pick": {
+          "space": "space",
+          "mist": "mist",
+          "reactor": "reactor"
+         }
+        },
+        "height": {
+         "from": "height",
+         "map": [
+          [
+           6,
+           6
+          ],
+          [
+           14,
+           14
+          ]
+         ]
+        },
+        "pieces": {
+         "from": "pieces",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "land": "land",
+        "hull": "hull",
+        "lights": "glow"
+       }
+      ],
+      "fill": [
+       {
+        "gen": "tile.pit",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "pit-fill",
+        "below": {
+         "from": "below",
+         "pick": {
+          "space": "space",
+          "mist": "mist",
+          "reactor": "reactor"
+         }
+        },
+        "height": {
+         "from": "height",
+         "map": [
+          [
+           6,
+           6
+          ],
+          [
+           14,
+           14
+          ]
+         ]
+        },
+        "pieces": {
+         "from": "pieces",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "land": "land",
+        "hull": "hull",
+        "lights": "glow"
+       }
+      ],
+      "fill-b": [
+       {
+        "gen": "tile.pit",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "pit-fill-b",
+        "below": {
+         "from": "below",
+         "pick": {
+          "space": "space",
+          "mist": "mist",
+          "reactor": "reactor"
+         }
+        },
+        "height": {
+         "from": "height",
+         "map": [
+          [
+           6,
+           6
+          ],
+          [
+           14,
+           14
+          ]
+         ]
+        },
+        "pieces": {
+         "from": "pieces",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "land": "land",
+        "hull": "hull",
+        "lights": "glow"
+       }
+      ],
+      "fill-c": [
+       {
+        "gen": "tile.pit",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "pit-fill-c",
+        "below": {
+         "from": "below",
+         "pick": {
+          "space": "space",
+          "mist": "mist",
+          "reactor": "reactor"
+         }
+        },
+        "height": {
+         "from": "height",
+         "map": [
+          [
+           6,
+           6
+          ],
+          [
+           14,
+           14
+          ]
+         ]
+        },
+        "pieces": {
+         "from": "pieces",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "land": "land",
+        "hull": "hull",
+        "lights": "glow"
+       }
+      ],
+      "side-r": [
+       {
+        "gen": "tile.pit",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "pit-side-r",
+        "below": {
+         "from": "below",
+         "pick": {
+          "space": "space",
+          "mist": "mist",
+          "reactor": "reactor"
+         }
+        },
+        "height": {
+         "from": "height",
+         "map": [
+          [
+           6,
+           6
+          ],
+          [
+           14,
+           14
+          ]
+         ]
+        },
+        "pieces": {
+         "from": "pieces",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "land": "land",
+        "hull": "hull",
+        "lights": "glow"
+       }
+      ],
+      "bottom-l": [
+       {
+        "gen": "tile.pit",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "pit-bottom-l",
+        "below": {
+         "from": "below",
+         "pick": {
+          "space": "space",
+          "mist": "mist",
+          "reactor": "reactor"
+         }
+        },
+        "height": {
+         "from": "height",
+         "map": [
+          [
+           6,
+           6
+          ],
+          [
+           14,
+           14
+          ]
+         ]
+        },
+        "pieces": {
+         "from": "pieces",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "land": "land",
+        "hull": "hull",
+        "lights": "glow"
+       }
+      ],
+      "bottom": [
+       {
+        "gen": "tile.pit",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "pit-bottom",
+        "below": {
+         "from": "below",
+         "pick": {
+          "space": "space",
+          "mist": "mist",
+          "reactor": "reactor"
+         }
+        },
+        "height": {
+         "from": "height",
+         "map": [
+          [
+           6,
+           6
+          ],
+          [
+           14,
+           14
+          ]
+         ]
+        },
+        "pieces": {
+         "from": "pieces",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "land": "land",
+        "hull": "hull",
+        "lights": "glow"
+       }
+      ],
+      "bottom-r": [
+       {
+        "gen": "tile.pit",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "pit-bottom-r",
+        "below": {
+         "from": "below",
+         "pick": {
+          "space": "space",
+          "mist": "mist",
+          "reactor": "reactor"
+         }
+        },
+        "height": {
+         "from": "height",
+         "map": [
+          [
+           6,
+           6
+          ],
+          [
+           14,
+           14
+          ]
+         ]
+        },
+        "pieces": {
+         "from": "pieces",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "land": "land",
+        "hull": "hull",
+        "lights": "glow"
+       }
+      ],
+      "inner-tl": [
+       {
+        "gen": "tile.pit",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "pit-inner-tl",
+        "below": {
+         "from": "below",
+         "pick": {
+          "space": "space",
+          "mist": "mist",
+          "reactor": "reactor"
+         }
+        },
+        "height": {
+         "from": "height",
+         "map": [
+          [
+           6,
+           6
+          ],
+          [
+           14,
+           14
+          ]
+         ]
+        },
+        "pieces": {
+         "from": "pieces",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "land": "land",
+        "hull": "hull",
+        "lights": "glow"
+       }
+      ],
+      "inner-tr": [
+       {
+        "gen": "tile.pit",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "pit-inner-tr",
+        "below": {
+         "from": "below",
+         "pick": {
+          "space": "space",
+          "mist": "mist",
+          "reactor": "reactor"
+         }
+        },
+        "height": {
+         "from": "height",
+         "map": [
+          [
+           6,
+           6
+          ],
+          [
+           14,
+           14
+          ]
+         ]
+        },
+        "pieces": {
+         "from": "pieces",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "land": "land",
+        "hull": "hull",
+        "lights": "glow"
+       }
+      ],
+      "inner-bl": [
+       {
+        "gen": "tile.pit",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "pit-inner-bl",
+        "below": {
+         "from": "below",
+         "pick": {
+          "space": "space",
+          "mist": "mist",
+          "reactor": "reactor"
+         }
+        },
+        "height": {
+         "from": "height",
+         "map": [
+          [
+           6,
+           6
+          ],
+          [
+           14,
+           14
+          ]
+         ]
+        },
+        "pieces": {
+         "from": "pieces",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "land": "land",
+        "hull": "hull",
+        "lights": "glow"
+       }
+      ],
+      "inner-br": [
+       {
+        "gen": "tile.pit",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "pit-inner-br",
+        "below": {
+         "from": "below",
+         "pick": {
+          "space": "space",
+          "mist": "mist",
+          "reactor": "reactor"
+         }
+        },
+        "height": {
+         "from": "height",
+         "map": [
+          [
+           6,
+           6
+          ],
+          [
+           14,
+           14
+          ]
+         ]
+        },
+        "pieces": {
+         "from": "pieces",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "land": "land",
+        "hull": "hull",
+        "lights": "glow"
+       }
+      ],
+      "strip-l": [
+       {
+        "gen": "tile.pit",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "pit-strip-l",
+        "below": {
+         "from": "below",
+         "pick": {
+          "space": "space",
+          "mist": "mist",
+          "reactor": "reactor"
+         }
+        },
+        "height": {
+         "from": "height",
+         "map": [
+          [
+           6,
+           6
+          ],
+          [
+           14,
+           14
+          ]
+         ]
+        },
+        "pieces": {
+         "from": "pieces",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "land": "land",
+        "hull": "hull",
+        "lights": "glow"
+       }
+      ],
+      "strip-m": [
+       {
+        "gen": "tile.pit",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "pit-strip-m",
+        "below": {
+         "from": "below",
+         "pick": {
+          "space": "space",
+          "mist": "mist",
+          "reactor": "reactor"
+         }
+        },
+        "height": {
+         "from": "height",
+         "map": [
+          [
+           6,
+           6
+          ],
+          [
+           14,
+           14
+          ]
+         ]
+        },
+        "pieces": {
+         "from": "pieces",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "land": "land",
+        "hull": "hull",
+        "lights": "glow"
+       }
+      ],
+      "strip-r": [
+       {
+        "gen": "tile.pit",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "pit-strip-r",
+        "below": {
+         "from": "below",
+         "pick": {
+          "space": "space",
+          "mist": "mist",
+          "reactor": "reactor"
+         }
+        },
+        "height": {
+         "from": "height",
+         "map": [
+          [
+           6,
+           6
+          ],
+          [
+           14,
+           14
+          ]
+         ]
+        },
+        "pieces": {
+         "from": "pieces",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "land": "land",
+        "hull": "hull",
+        "lights": "glow"
+       }
+      ],
+      "col-t": [
+       {
+        "gen": "tile.pit",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "pit-col-t",
+        "below": {
+         "from": "below",
+         "pick": {
+          "space": "space",
+          "mist": "mist",
+          "reactor": "reactor"
+         }
+        },
+        "height": {
+         "from": "height",
+         "map": [
+          [
+           6,
+           6
+          ],
+          [
+           14,
+           14
+          ]
+         ]
+        },
+        "pieces": {
+         "from": "pieces",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "land": "land",
+        "hull": "hull",
+        "lights": "glow"
+       }
+      ],
+      "col-m": [
+       {
+        "gen": "tile.pit",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "pit-col-m",
+        "below": {
+         "from": "below",
+         "pick": {
+          "space": "space",
+          "mist": "mist",
+          "reactor": "reactor"
+         }
+        },
+        "height": {
+         "from": "height",
+         "map": [
+          [
+           6,
+           6
+          ],
+          [
+           14,
+           14
+          ]
+         ]
+        },
+        "pieces": {
+         "from": "pieces",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "land": "land",
+        "hull": "hull",
+        "lights": "glow"
+       }
+      ],
+      "col-b": [
+       {
+        "gen": "tile.pit",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "pit-col-b",
+        "below": {
+         "from": "below",
+         "pick": {
+          "space": "space",
+          "mist": "mist",
+          "reactor": "reactor"
+         }
+        },
+        "height": {
+         "from": "height",
+         "map": [
+          [
+           6,
+           6
+          ],
+          [
+           14,
+           14
+          ]
+         ]
+        },
+        "pieces": {
+         "from": "pieces",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "land": "land",
+        "hull": "hull",
+        "lights": "glow"
+       }
+      ],
+      "single": [
+       {
+        "gen": "tile.pit",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "pit-single",
+        "below": {
+         "from": "below",
+         "pick": {
+          "space": "space",
+          "mist": "mist",
+          "reactor": "reactor"
+         }
+        },
+        "height": {
+         "from": "height",
+         "map": [
+          [
+           6,
+           6
+          ],
+          [
+           14,
+           14
+          ]
+         ]
+        },
+        "pieces": {
+         "from": "pieces",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "land": "land",
+        "hull": "hull",
+        "lights": "glow"
+       }
+      ]
+     },
+     "decals": [
+      {
+       "name": "a",
+       "place": "rim",
+       "label": "Broken girder",
+       "frames": 1,
+       "outline": false,
+       "draw": [
+        {
+         "gen": "tile.pit",
+         "v": 1,
+         "at": [
+          16,
+          16
+         ],
+         "picture": "pit-deco-a",
+         "below": {
+          "from": "below",
+          "pick": {
+           "space": "space",
+           "mist": "mist",
+           "reactor": "reactor"
+          }
+         },
+         "height": {
+          "from": "height",
+          "map": [
+           [
+            6,
+            6
+           ],
+           [
+            14,
+            14
+           ]
+          ]
+         },
+         "pieces": {
+          "from": "pieces",
+          "map": [
+           [
+            0,
+            0
+           ],
+           [
+            1,
+            1
+           ]
+          ]
+         },
+         "land": "land",
+         "hull": "hull",
+         "lights": "glow"
+        }
+       ]
+      },
+      {
+       "name": "b",
+       "place": "rim",
+       "label": "Hanging cables",
+       "frames": 8,
+       "outline": false,
+       "draw": [
+        {
+         "gen": "tile.pit",
+         "v": 1,
+         "at": [
+          16,
+          16
+         ],
+         "picture": "pit-deco-b",
+         "below": {
+          "from": "below",
+          "pick": {
+           "space": "space",
+           "mist": "mist",
+           "reactor": "reactor"
+          }
+         },
+         "height": {
+          "from": "height",
+          "map": [
+           [
+            6,
+            6
+           ],
+           [
+            14,
+            14
+           ]
+          ]
+         },
+         "pieces": {
+          "from": "pieces",
+          "map": [
+           [
+            0,
+            0
+           ],
+           [
+            1,
+            1
+           ]
+          ]
+         },
+         "land": "land",
+         "hull": "hull",
+         "lights": "glow"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "clips": {
+  "pit-left": {
+   "label": "Pit: top left corner"
+  },
+  "pit-top": {
+   "label": "Pit: top"
+  },
+  "pit-right": {
+   "label": "Pit: top right corner"
+  },
+  "pit-side-l": {
+   "label": "Pit: left side"
+  },
+  "pit-fill": {
+   "label": "Pit: middle",
+   "frames": 1
+  },
+  "pit-fill-b": {
+   "label": "Pit: middle, version B"
+  },
+  "pit-fill-c": {
+   "label": "Pit: middle, version C"
+  },
+  "pit-side-r": {
+   "label": "Pit: right side"
+  },
+  "pit-bottom-l": {
+   "label": "Pit: bottom left corner"
+  },
+  "pit-bottom": {
+   "label": "Pit: bottom"
+  },
+  "pit-bottom-r": {
+   "label": "Pit: bottom right corner"
+  },
+  "pit-inner-tl": {
+   "label": "Pit: inside corner, top left"
+  },
+  "pit-inner-tr": {
+   "label": "Pit: inside corner, top right"
+  },
+  "pit-inner-bl": {
+   "label": "Pit: inside corner, bottom left"
+  },
+  "pit-inner-br": {
+   "label": "Pit: inside corner, bottom right"
+  },
+  "pit-strip-l": {
+   "label": "Pit: strip, left end"
+  },
+  "pit-strip-m": {
+   "label": "Pit: strip, middle"
+  },
+  "pit-strip-r": {
+   "label": "Pit: strip, right end"
+  },
+  "pit-col-t": {
+   "label": "Pit: column, top"
+  },
+  "pit-col-m": {
+   "label": "Pit: column, middle"
+  },
+  "pit-col-b": {
+   "label": "Pit: column, bottom"
+  },
+  "pit-single": {
+   "label": "Pit: single tile"
+  },
+  "pit-deco-a": {
+   "label": "Broken girder"
+  },
+  "pit-deco-b": {
+   "label": "Hanging cables"
+  }
+ }
+}

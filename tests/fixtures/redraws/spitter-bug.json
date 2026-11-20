@@ -1,0 +1,263 @@
+{
+ "id": "spitter-bug",
+ "frozen": "2026-11-20",
+ "source": "sprites/spitter-bug.js",
+ "sha256": "15b882e41119ff3987e76a9acf15fe2b70a5e373f6d8fe9451b5e6d6b5de0b87",
+ "name": "Spitter",
+ "blurb": "A squat hive bug with a glowing acid sac on its back: it sits still, swells and spits, and can dig itself into the floor. Change its size, sac, mouth, horns and colours.",
+ "meta": {
+  "type": "creature",
+  "role": "characters/enemy",
+  "themes": [
+   "sci-fi",
+   "space",
+   "horror"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "shooter"
+  ],
+  "view": "top-down",
+  "words": [
+   "spitter",
+   "bug",
+   "alien",
+   "insect",
+   "acid",
+   "sac",
+   "spit",
+   "shoot",
+   "burrow",
+   "ranged",
+   "enemy",
+   "turret",
+   "hive",
+   "slimy"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  48,
+  48
+ ],
+ "pivot": [
+  24,
+  42
+ ],
+ "grounded": false,
+ "preview": "idle",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "bulk": {
+   "kind": "range",
+   "label": "Sac",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Bloated",
+   "group": "Look"
+  },
+  "shape": {
+   "kind": "choice",
+   "label": "Mouth",
+   "def": "round",
+   "options": [
+    {
+     "value": "round",
+     "label": "Round"
+    },
+    {
+     "value": "three-way",
+     "label": "Three-way"
+    },
+    {
+     "value": "slit",
+     "label": "Slit"
+    }
+   ],
+   "group": "Look"
+  },
+  "horns": {
+   "kind": "choice",
+   "label": "Horns",
+   "def": "none",
+   "options": [
+    {
+     "value": "none",
+     "label": "None"
+    },
+    {
+     "value": "crest",
+     "label": "Crest"
+    },
+    {
+     "value": "spines",
+     "label": "Spines"
+    }
+   ],
+   "group": "Look"
+  },
+  "hornLength": {
+   "kind": "range",
+   "label": "Length",
+   "def": 1,
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "lo": "Short",
+   "hi": "Long",
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Shell",
+   "def": "#ca9eda",
+   "swatches": [
+    "#ca9eda",
+    "#9aa6c0",
+    "#e8ecf2",
+    "#c2c9d6",
+    "#f2c230"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Sac",
+   "def": "#b04a8a",
+   "swatches": [
+    "#b04a8a",
+    "#e2473f",
+    "#3f6fd1",
+    "#6b7896",
+    "#566182"
+   ],
+   "group": "Colors"
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Acid",
+   "def": "#9fe040",
+   "swatches": [
+    "#9fe040",
+    "#5fe0f0",
+    "#f2a030",
+    "#b48af8",
+    "#5fd47a",
+    "#f0ead8"
+   ],
+   "group": "Colors"
+  },
+  "bounce": {
+   "kind": "range",
+   "label": "Bounce",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Calm",
+   "hi": "Bouncy",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    7,
+    10
+   ]
+  },
+  "shoot": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    9,
+    15,
+    20
+   ]
+  },
+  "burrow": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  },
+  "hurt": {
+   "frames": 4,
+   "loop": false,
+   "fps": [
+    6,
+    9,
+    13
+   ]
+  },
+  "die": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  }
+ },
+ "sounds": {
+  "shoot": [
+   {
+    "sound": "laser-shot",
+    "frame": 4,
+    "preset": "Alien ray",
+    "volume": 0.7
+   }
+  ],
+  "hurt": [
+   {
+    "sound": "bolt-impact",
+    "frame": 0,
+    "preset": "On flesh",
+    "volume": 0.9
+   }
+  ],
+  "die": [
+   {
+    "sound": "bug-splat",
+    "frame": 0,
+    "preset": "Big burst",
+    "volume": 1
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-roguelite-scifi"
+ ]
+}

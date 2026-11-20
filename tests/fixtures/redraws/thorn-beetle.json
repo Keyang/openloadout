@@ -1,0 +1,301 @@
+{
+ "id": "thorn-beetle",
+ "frozen": "2026-11-20",
+ "source": "sprites/thorn-beetle.js",
+ "sha256": "4f83832d378e24af0da5943fd3138dd27351e3aec75e774701f45254335d8fc3",
+ "name": "Thorn beetle",
+ "blurb": "A low armoured beetle that jabs with its horn and curls up into a spiked dome. Change its shell, thorns, legs, horns, eyes and colours.",
+ "meta": {
+  "type": "creature",
+  "role": "characters/enemy",
+  "themes": [
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "platformer"
+  ],
+  "view": "side",
+  "words": [
+   "beetle",
+   "bug",
+   "insect",
+   "scarab",
+   "shell",
+   "thorns",
+   "horn",
+   "crawl",
+   "jab",
+   "curl",
+   "armoured",
+   "enemy",
+   "patrol"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  48,
+  48
+ ],
+ "pivot": [
+  24,
+  42
+ ],
+ "grounded": true,
+ "preview": "walk",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "shell": {
+   "kind": "range",
+   "label": "Shell",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Flat",
+   "hi": "Domed",
+   "group": "Look"
+  },
+  "spikes": {
+   "kind": "range",
+   "label": "Thorns",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "legs": {
+   "kind": "range",
+   "label": "Legs",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Short",
+   "hi": "Long",
+   "group": "Look"
+  },
+  "eyes": {
+   "kind": "choice",
+   "label": "Eyes",
+   "def": "dots",
+   "options": [
+    {
+     "value": "dots",
+     "label": "Dots"
+    },
+    {
+     "value": "angry",
+     "label": "Angry"
+    },
+    {
+     "value": "glow",
+     "label": "Glow"
+    }
+   ],
+   "group": "Look"
+  },
+  "horns": {
+   "kind": "choice",
+   "label": "Horns",
+   "def": "stag",
+   "options": [
+    {
+     "value": "stag",
+     "label": "Stag"
+    },
+    {
+     "value": "rhino",
+     "label": "Rhino"
+    },
+    {
+     "value": "none",
+     "label": "None"
+    }
+   ],
+   "group": "Look"
+  },
+  "hornLength": {
+   "kind": "range",
+   "label": "Length",
+   "def": 1,
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "lo": "Short",
+   "hi": "Long",
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Shell",
+   "def": "#7a4fc4",
+   "swatches": [
+    "#7a4fc4",
+    "#9bd18a",
+    "#c9423a",
+    "#f2c230",
+    "#c2c9d6",
+    "#3f6fd1"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Legs and underside",
+   "def": "#7a4f33",
+   "swatches": [
+    "#7a4f33",
+    "#a06a3c",
+    "#f0ead8",
+    "#a8612a",
+    "#5a3a22",
+    "#c98a4a"
+   ],
+   "group": "Colors"
+  },
+  "bounce": {
+   "kind": "range",
+   "label": "Bounce",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Calm",
+   "hi": "Bouncy",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    7,
+    10
+   ]
+  },
+  "walk": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "attack": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    8,
+    14,
+    19
+   ]
+  },
+  "block": {
+   "frames": 6,
+   "loop": false,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "hurt": {
+   "frames": 4,
+   "loop": false,
+   "fps": [
+    6,
+    9,
+    13
+   ]
+  },
+  "die": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  }
+ },
+ "sounds": {
+  "walk": [
+   {
+    "sound": "footstep-gravel",
+    "frame": 0,
+    "preset": "Sneaking",
+    "volume": 0.3
+   },
+   {
+    "sound": "footstep-gravel",
+    "frame": 4,
+    "preset": "Sneaking",
+    "volume": 0.3
+   }
+  ],
+  "attack": [
+   {
+    "sound": "whoosh",
+    "frame": 3,
+    "preset": "Quick swipe",
+    "volume": 0.7
+   }
+  ],
+  "block": [
+   {
+    "sound": "metal-hit",
+    "frame": 1,
+    "preset": "Tin can",
+    "volume": 0.7
+   }
+  ],
+  "hurt": [
+   {
+    "sound": "punch",
+    "frame": 0,
+    "preset": "Light jab",
+    "volume": 0.9
+   }
+  ],
+  "die": [
+   {
+    "sound": "enemy-squish",
+    "frame": 0,
+    "preset": "Crunch",
+    "volume": 1
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-platformer-fantasy"
+ ]
+}

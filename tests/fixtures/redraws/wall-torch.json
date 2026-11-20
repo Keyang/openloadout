@@ -1,0 +1,191 @@
+{
+ "id": "wall-torch",
+ "frozen": "2026-11-20",
+ "source": "sprites/wall-torch.js",
+ "sha256": "d272fb067a5b7682859c8ac43a83d5f6cf7f878bb3d86605bc15af9af19a836e",
+ "name": "Wall torch",
+ "blurb": "A torch burning in a wall bracket, which can be put out and lit again. Change the bracket, the flame, its halo and sparks, and the colours.",
+ "meta": {
+  "type": "prop",
+  "role": "world/prop",
+  "themes": [
+   "fantasy",
+   "dungeon"
+  ],
+  "gameTypes": [
+   "platformer"
+  ],
+  "view": "side",
+  "words": [
+   "torch",
+   "flame",
+   "fire",
+   "light",
+   "sconce",
+   "lamp",
+   "burn",
+   "ignite",
+   "castle",
+   "cave",
+   "wall",
+   "flicker"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  48
+ ],
+ "pivot": [
+  16,
+  34
+ ],
+ "grounded": false,
+ "preview": "idle",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "iron",
+   "options": [
+    {
+     "value": "iron",
+     "label": "Iron ring"
+    },
+    {
+     "value": "wood",
+     "label": "Wooden block"
+    },
+    {
+     "value": "sconce",
+     "label": "Sconce"
+    }
+   ],
+   "group": "Look"
+  },
+  "height": {
+   "kind": "range",
+   "label": "Height",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Short",
+   "hi": "Tall",
+   "group": "Look"
+  },
+  "halo": {
+   "kind": "toggle",
+   "label": "Halo",
+   "def": true,
+   "group": "Look"
+  },
+  "sparks": {
+   "kind": "toggle",
+   "label": "Sparks",
+   "def": true,
+   "group": "Look"
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Glow",
+   "def": "#e08a2c",
+   "swatches": [
+    "#e08a2c",
+    "#4fd8ee",
+    "#f2c230",
+    "#a4c44a",
+    "#c9423a",
+    "#7a4fc4"
+   ],
+   "group": "Colors"
+  },
+  "metal": {
+   "kind": "color",
+   "label": "Metal",
+   "def": "#c2c9d6",
+   "swatches": [
+    "#c2c9d6",
+    "#f2c230",
+    "#8f97a8",
+    "#5d6475",
+    "#e6c545",
+    "#c98a4a"
+   ],
+   "group": "Colors"
+  },
+  "flicker": {
+   "kind": "range",
+   "label": "Flicker",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Steady",
+   "hi": "Wild",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    8,
+    12
+   ]
+  },
+  "out": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "ignite": {
+   "frames": 6,
+   "loop": false,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  }
+ },
+ "sounds": {
+  "idle": [
+   {
+    "sound": "fire",
+    "preset": "Torch",
+    "frame": 0,
+    "volume": 0.35
+   }
+  ],
+  "ignite": [
+   {
+    "sound": "whoosh",
+    "preset": "Quick swipe",
+    "frame": 1,
+    "volume": 0.7
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-platformer-fantasy"
+ ]
+}

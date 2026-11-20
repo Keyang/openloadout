@@ -1,0 +1,41 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "swarm-mite",
+ "name": "Swarm mite",
+ "blurb": "A tiny hive bug made for crowds of fifty: it skitters, nips and pops. Change its size, legs, body, eyes and colours.",
+ "meta": {"type":"creature","role":"characters/enemy","themes":["sci-fi","space","horror"],"gameTypes":["roguelike-action","shooter"],"view":"top-down","words":["mite","swarm","bug","tick","critter","insect","horde","skitter","nip","pop","tiny","enemy","alien","survivors"],"license":"draft"},
+ "size": [32,32],
+ "pivot": [16,28],
+ "grounded": false,
+ "preview": "walk",
+ "styles": ["pixel"],
+ "palette": [
+  {"id":"body","label":"Body","default":"#b04a8a","material":"paint","swatches":["#b04a8a","#a87894","#e2473f","#2fb3a8"]},
+  {"id":"glow","label":"Eyes","default":"#9fe040","material":"light","swatches":["#9fe040","#5fe0f0","#f2a030","#b48af8","#5fd47a","#f0ead8"]}
+ ],
+ "controls": [
+  {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+  {"key":"legs","kind":"choice","label":"Legs","options":["four","six","eight"],"default":"six"},
+  {"key":"shape","kind":"choice","label":"Shape","options":["round","long","spiky"],"default":"round"},
+  {"key":"eyes","kind":"choice","label":"Eyes","options":["one","two","many"],"default":"two"},
+  {"key":"body","kind":"colour","label":"Body"},
+  {"key":"glow","kind":"colour","label":"Eyes"},
+  {"key":"bounce","kind":"range","label":"Bounce","lo":"Calm","hi":"Bouncy","default":0.5,"group":"Motion"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": { "pictures": {
+  "nodes": [
+   {"id":"body","parent":null,"at":[16,28]}
+  ],
+  "draw": [
+   {"id":"creature","gen":"bug.mite","v":1,"on":"body","at":[0,0],"size":{"from":"size","map":[[0,0],[1,1]]},"legs":{"from":"legs","pick":{"four":"four","six":"six","eight":"eight"}},"shape":{"from":"shape","pick":{"round":"round","long":"long","spiky":"spiky"}},"eyes":{"from":"eyes","pick":{"one":"one","two":"two","many":"many"}},"body":"body","lit":"glow","bounce":{"from":"bounce","map":[[0,0],[1,1]]}}
+  ] } },
+ "clips": {
+  "idle": {"frames":8,"fps":7,"label":"Idle"},
+  "walk": {"frames":8,"fps":10,"label":"Skitter"},
+  "attack": {"frames":6,"fps":13,"loop":false,"label":"Nip"},
+  "hurt": {"frames":4,"fps":9,"loop":false,"label":"Hurt"},
+  "die": {"frames":6,"fps":10,"loop":false,"label":"Pop","sounds":[{"sound":"bug-splat","frame":0,"preset":"Mite pop","volume":0.7}]}
+ }
+}

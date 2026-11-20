@@ -1,0 +1,226 @@
+{
+ "id": "save-crystal",
+ "frozen": "2026-11-20",
+ "source": "sprites/save-crystal.js",
+ "sha256": "5dfd3821f14aaa203bc688fc2dd049d98e32e443fc31d7df48da3bc2b8696bfb",
+ "name": "Save crystal",
+ "blurb": "A glowing crystal that floats over a pedestal and flashes when the game is saved; change its cut, size, ring, pedestal, colours, float and pulse.",
+ "meta": {
+  "type": "prop",
+  "role": "world/prop",
+  "themes": [
+   "fantasy"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "top-down-rpg"
+  ],
+  "view": "top-down",
+  "words": [
+   "save",
+   "crystal",
+   "save point",
+   "checkpoint",
+   "shrine",
+   "gem",
+   "glow",
+   "float",
+   "activate",
+   "magic",
+   "pedestal",
+   "heal"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  48
+ ],
+ "pivot": [
+  16,
+  46
+ ],
+ "grounded": true,
+ "preview": "idle",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "shape": {
+   "kind": "choice",
+   "label": "Shape",
+   "def": "shard",
+   "options": [
+    {
+     "value": "shard",
+     "label": "Shard"
+    },
+    {
+     "value": "prism",
+     "label": "Prism"
+    },
+    {
+     "value": "orb",
+     "label": "Orb"
+    },
+    {
+     "value": "star",
+     "label": "Star"
+    }
+   ],
+   "group": "Look"
+  },
+  "rings": {
+   "kind": "toggle",
+   "label": "Ring",
+   "def": true,
+   "group": "Look"
+  },
+  "pedestal": {
+   "kind": "choice",
+   "label": "Pedestal",
+   "def": "stone",
+   "options": [
+    {
+     "value": "stone",
+     "label": "Stone"
+    },
+    {
+     "value": "roots",
+     "label": "Roots"
+    },
+    {
+     "value": "none",
+     "label": "None"
+    }
+   ],
+   "group": "Look"
+  },
+  "pedestalSize": {
+   "kind": "range",
+   "label": "Size",
+   "def": 1,
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "pedestalColour": {
+   "kind": "color",
+   "label": "Colour",
+   "def": "#a8a4a0",
+   "swatches": [
+    "#a8a4a0",
+    "#7e84a0",
+    "#5a5f7a",
+    "#9a6a3e",
+    "#c9a06a",
+    "#f0ead8"
+   ],
+   "group": "Colors"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Crystal",
+   "def": "#4fd8ee",
+   "swatches": [
+    "#4fd8ee",
+    "#c9423a",
+    "#7fe0a0",
+    "#7a4fc4",
+    "#f2c230"
+   ],
+   "group": "Colors"
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Glow",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#f4e06a",
+    "#9fd8f4",
+    "#7aa0f4",
+    "#e8662c"
+   ],
+   "group": "Colors"
+  },
+  "bob": {
+   "kind": "range",
+   "label": "Float",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Still",
+   "hi": "Floaty",
+   "group": "Motion"
+  },
+  "flicker": {
+   "kind": "range",
+   "label": "Flicker",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Steady",
+   "hi": "Wild",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    8,
+    12
+   ]
+  },
+  "activate": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  }
+ },
+ "sounds": {
+  "activate": [
+   {
+    "sound": "save-chime",
+    "preset": "Save point",
+    "frame": 1,
+    "volume": 0.8
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-rpg-fantasy"
+ ]
+}

@@ -1,0 +1,53 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "thorn-beetle",
+ "name": "Thorn beetle",
+ "blurb": "A low armoured beetle that jabs with its horn and curls up into a spiked dome. Change its shell, thorns, legs, horns, eyes and colours.",
+ "meta": {"type":"creature","role":"characters/enemy","themes":["fantasy","forest"],"gameTypes":["platformer"],"view":"side","words":["beetle","bug","insect","scarab","shell","thorns","horn","crawl","jab","curl","armoured","enemy","patrol"],"license":"draft"},
+ "size": [48,48],
+ "pivot": [24,42],
+ "grounded": true,
+ "preview": "walk",
+ "styles": ["pixel"],
+ "palette": [
+  {"id":"body","label":"Shell","default":"#7a4fc4","material":"paint","swatches":["#7a4fc4","#9bd18a","#c9423a","#f2c230","#c2c9d6","#3f6fd1"]},
+  {"id":"accent","label":"Legs and underside","default":"#7a4f33","material":"paint","swatches":["#7a4f33","#a06a3c","#f0ead8","#a8612a","#5a3a22","#c98a4a"]}
+ ],
+ "controls": [
+  {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+  {"key":"shell","kind":"range","label":"Shell","lo":"Flat","hi":"Domed","default":0.5},
+  {"key":"spikes","kind":"range","label":"Thorns","lo":"Few","hi":"Many","default":0.5},
+  {"key":"legs","kind":"range","label":"Legs","lo":"Short","hi":"Long","default":0.5},
+  {"key":"eyes","kind":"choice","label":"Eyes","options":["dots","angry","glow"],"default":"dots"},
+  {"key":"horns","kind":"choice","label":"Horns","options":["stag","rhino","none"],"default":"stag"},
+  {"key":"hornLength","kind":"range","label":"Length","lo":"Short","hi":"Long","min":0.65,"max":1.35,"step":0.05,"default":1},
+  {"key":"body","kind":"colour","label":"Shell"},
+  {"key":"accent","kind":"colour","label":"Legs and underside"},
+  {"key":"bounce","kind":"range","label":"Bounce","lo":"Calm","hi":"Bouncy","default":0.5,"group":"Motion"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "parts": {"horns":{"label":"Horns","params":["horns","hornLength"],"none":"none","socket":"head"}},
+ "points": [
+  {"id":"head","on":"head","at":[0,0]}
+ ],
+ "body": { "pictures": {
+  "nodes": [
+   {"id":"body","parent":null,"at":[24,42]},
+   {"id":"head","parent":null,"at":[0,0]}
+  ],
+  "draw": [
+   {"id":"creature","gen":"bug.beetle","v":1,"on":"body","at":[0,0],"size":{"from":"size","map":[[0,0],[1,1]]},"shell":{"from":"shell","map":[[0,0],[1,1]]},"spikes":{"from":"spikes","map":[[0,0],[1,1]]},"legs":{"from":"legs","map":[[0,0],[1,1]]},"eyes":{"from":"eyes","pick":{"dots":"dots","angry":"angry","glow":"glow"}},"horns":{"from":"horns","pick":{"stag":"stag","rhino":"rhino","none":"none"}},"hornLength":{"from":"hornLength","map":[[0.65,0.65],[1.35,1.35]]},"body":"body","accent":"accent","bounce":{"from":"bounce","map":[[0,0],[1,1]]}}
+  ],
+  "motion": [
+   {"gen":"bug.beetle.points","v":1,"at":[24,42],"size":{"from":"size","map":[[0,0],[1,1]]},"shell":{"from":"shell","map":[[0,0],[1,1]]},"spikes":{"from":"spikes","map":[[0,0],[1,1]]},"legs":{"from":"legs","map":[[0,0],[1,1]]},"eyes":{"from":"eyes","pick":{"dots":"dots","angry":"angry","glow":"glow"}},"horns":{"from":"horns","pick":{"stag":"stag","rhino":"rhino","none":"none"}},"hornLength":{"from":"hornLength","map":[[0.65,0.65],[1.35,1.35]]},"bounce":{"from":"bounce","map":[[0,0],[1,1]]}}
+  ] } },
+ "clips": {
+  "idle": {"frames":8,"fps":7,"label":"Idle"},
+  "walk": {"frames":8,"fps":10,"label":"Walk","sounds":[{"sound":"footstep-gravel","frame":0,"preset":"Sneaking","volume":0.3},{"sound":"footstep-gravel","frame":4,"preset":"Sneaking","volume":0.3}]},
+  "attack": {"frames":8,"fps":13,"loop":false,"label":"Horn jab","sounds":[{"sound":"whoosh","frame":3,"preset":"Quick swipe","volume":0.7}]},
+  "block": {"frames":6,"fps":10,"loop":false,"label":"Curl up","sounds":[{"sound":"metal-hit","frame":1,"preset":"Tin can","volume":0.7}]},
+  "hurt": {"frames":4,"fps":9,"loop":false,"label":"Hurt","sounds":[{"sound":"punch","frame":0,"preset":"Light jab","volume":0.9}]},
+  "die": {"frames":8,"fps":10,"loop":false,"label":"Die","sounds":[{"sound":"enemy-squish","frame":0,"preset":"Crunch","volume":1}]}
+ }
+}

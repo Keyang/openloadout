@@ -1,0 +1,49 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "crow-scout",
+ "name": "Crow scout",
+ "blurb": "A sharp-beaked bird that hovers, flies and dives, with something to carry in its claws. Change its size, wings, beak, crest, eyes and colours.",
+ "meta": {"type":"creature","role":"characters/enemy","themes":["fantasy","forest"],"gameTypes":["platformer"],"view":"side","words":["crow","raven","bird","scout","flyer","wings","beak","feathers","fly","hover","dive","swoop","enemy","carry"],"license":"draft"},
+ "size": [48,48],
+ "pivot": [24,24],
+ "grounded": false,
+ "preview": "fly",
+ "styles": ["pixel"],
+ "palette": [
+  {"id":"body","label":"Feathers","default":"#5d6475","material":"skin","swatches":["#5d6475","#9bd18a","#7a4fc4","#3f8a4f","#c9423a","#7a4f33","#3f9fd1"]},
+  {"id":"accent","label":"Beak and feet","default":"#e08a2c","material":"paint","swatches":["#e08a2c","#f2c230","#f0ead8","#4fd8ee","#a4c44a"]}
+ ],
+ "controls": [
+  {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+  {"key":"span","kind":"range","label":"Wings","lo":"Short","hi":"Wide","default":0.5},
+  {"key":"beak","kind":"range","label":"Beak","lo":"Short","hi":"Long","default":0.5},
+  {"key":"crest","kind":"choice","label":"Crest","options":["none","tuft","spiky"],"default":"none"},
+  {"key":"eyes","kind":"choice","label":"Eyes","options":["dot","angry","glow"],"default":"dot"},
+  {"key":"held","kind":"choice","label":"Carries","options":["none","lantern","sack","bomb"],"default":"none"},
+  {"key":"heldSize","kind":"range","label":"Size","lo":"Small","hi":"Big","default":1,"min":0.65,"max":1.35,"step":0.05},
+  {"key":"body","kind":"colour","label":"Feathers"},
+  {"key":"accent","kind":"colour","label":"Beak and feet"},
+  {"key":"flap","kind":"range","label":"Flap","lo":"Small","hi":"Wide","default":0.5,"group":"Motion"},
+  {"key":"bob","kind":"range","label":"Float","lo":"Still","hi":"Floaty","default":0.5,"group":"Motion"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "parts": {"held":{"label":"Carries","params":["held","heldSize"],"none":"none","socket":"hand"}},
+ "points": [{"id":"hand","on":"hand","at":[0,0]}],
+ "body": { "pictures": {
+  "nodes": [{"id":"body","parent":null,"at":[24,24]},{"id":"hand","parent":null,"at":[0,0]}],
+  "draw": [
+   {"id":"creature","gen":"creature.crow-scout","v":1,"on":"body","at":[0,0],"picture":"clip","size":{"from":"size"},"span":{"from":"span"},"beak":{"from":"beak"},"held":{"from":"held"},"heldSize":{"from":"heldSize"},"flap":{"from":"flap"},"bob":{"from":"bob"},"crest":{"from":"crest"},"eyes":{"from":"eyes"},"body":"body","accent":"accent"}
+  ],
+  "motion": [
+   {"gen":"creature.crow-scout.points","v":1,"at":[24,24],"size":{"from":"size"},"span":{"from":"span"},"beak":{"from":"beak"},"held":{"from":"held"},"heldSize":{"from":"heldSize"},"flap":{"from":"flap"},"bob":{"from":"bob"}}
+  ]
+ } },
+ "clips": {
+  "idle": {"label":"Hover","frames":8,"fps":7},
+  "fly": {"frames":8,"fps":12,"sounds":[{"sound":"whoosh","frame":1,"preset":"Quick swipe","volume":0.35}]},
+  "attack": {"label":"Dive","frames":8,"fps":13,"loop":false,"sounds":[{"sound":"whoosh","frame":3,"preset":"Heavy swing","volume":0.7}]},
+  "hurt": {"frames":4,"fps":9,"loop":false,"sounds":[{"sound":"punch","frame":0,"preset":"Light jab","volume":0.9}]},
+  "die": {"frames":8,"fps":10,"loop":false,"sounds":[{"sound":"enemy-squish","frame":0,"preset":"Squish","volume":1}]}
+ }
+}

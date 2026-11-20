@@ -1,0 +1,37 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "campfire",
+ "name": "Campfire",
+ "blurb": "A crackling fire. Change its colour for magic or poison flames.",
+ "meta": {"type":"prop","role":"world/prop","themes":["fantasy","forest"],"gameTypes":["platformer","turn-based-rpg"],"view":"side","words":["campfire","fire","flame","bonfire","torch","burn","flicker","camp","checkpoint","rest","warmth","magic fire"],"license":"draft"},
+ "size": [48,48],
+ "pivot": [24,44],
+ "preview": "burn",
+ "styles": ["pixel"],
+ "palette": [
+  {"id":"colour","label":"Flame colour","default":"#f2701a","material":"fire","swatches":["#f2701a","#e8382c","#f0b020","#3f8fe8","#4fc44a","#a05ae0","#e85a9c","#2fc4b0"]},
+  {"id":"wood","label":"Wood","default":"#8a5a34","material":"wood","swatches":["#8a5a34","#5e4030","#a9865a","#6e6a70","#3d3344"]}
+ ],
+ "controls": [
+  {"key":"height","kind":"range","label":"Flame height","lo":"Low","hi":"Tall","default":0.5},
+  {"key":"width","kind":"range","label":"Flame width","lo":"Thin","hi":"Wide","default":0.5},
+  {"key":"side","kind":"range","label":"Side flames","lo":"None","hi":"Big","default":0.6},
+  {"key":"heat","kind":"range","label":"Heat","lo":"Cool","hi":"White-hot","default":0.5},
+  {"key":"base","kind":"choice","label":"Base","options":["logs","tipi","stones","none"],"default":"logs"},
+  {"key":"sparks","kind":"range","label":"Sparks","lo":"None","hi":"Lots","default":0.5},
+  {"key":"colour","kind":"colour","label":"Flame colour"},
+  {"key":"wood","kind":"colour","label":"Wood","when":{"base":["logs","tipi"]}},
+  {"key":"flicker","kind":"range","label":"Flicker","lo":"Steady","hi":"Wild","default":0.5,"group":"Motion"},
+  {"key":"wind","kind":"range","label":"Wind","lo":"Still","hi":"Windy","default":0.15,"group":"Motion"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": { "pictures": { "nodes": [], "draw": [
+  {"id":"burn","gen":"fire.camp","v":1,"clip":["burn"],"picture":"burn","at":[24,44],"height":{"from":"height","map":[[0,0],[1,1]],"round":"none"},"width":{"from":"width","map":[[0,0],[1,1]],"round":"none"},"side":{"from":"side","map":[[0,0],[1,1]],"round":"none"},"heat":{"from":"heat","map":[[0,0],[1,1]],"round":"none"},"base":{"from":"base","pick":{"logs":"logs","tipi":"tipi","stones":"stones","none":"none"}},"sparks":{"from":"sparks","map":[[0,0],[1,1]],"round":"none"},"colour":"colour","wood":"wood","flicker":{"from":"flicker","map":[[0,0],[1,1]],"round":"none"},"wind":{"from":"wind","map":[[0,0],[1,1]],"round":"none"}},
+  {"id":"ignite","gen":"fire.camp","v":1,"clip":["ignite"],"picture":"ignite","at":[24,44],"height":{"from":"height","map":[[0,0],[1,1]],"round":"none"},"width":{"from":"width","map":[[0,0],[1,1]],"round":"none"},"side":{"from":"side","map":[[0,0],[1,1]],"round":"none"},"heat":{"from":"heat","map":[[0,0],[1,1]],"round":"none"},"base":{"from":"base","pick":{"logs":"logs","tipi":"tipi","stones":"stones","none":"none"}},"sparks":{"from":"sparks","map":[[0,0],[1,1]],"round":"none"},"colour":"colour","wood":"wood","flicker":{"from":"flicker","map":[[0,0],[1,1]],"round":"none"},"wind":{"from":"wind","map":[[0,0],[1,1]],"round":"none"}}
+ ] } },
+ "clips": {
+  "burn": {"frames":8,"fps":10,"sounds":[{"sound":"fire","frame":0}]},
+  "ignite": {"frames":8,"fps":10,"loop":false,"sounds":[{"sound":"whoosh","frame":1,"preset":"Heavy swing"},{"sound":"fire","frame":0}]}
+ }
+}

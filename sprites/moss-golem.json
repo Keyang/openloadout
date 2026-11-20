@@ -1,0 +1,54 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "moss-golem",
+ "name": "Moss golem",
+ "blurb": "A boss: a hunched giant of stacked boulders with a glowing core in its chest. Change its size, bulk, arms, head, growth, core and colours.",
+ "meta": {"type":"creature","role":"characters/boss","themes":["fantasy","forest"],"gameTypes":["platformer"],"view":"side","words":["golem","giant","stone","rock","boulder","moss","guardian","monster","slam","smash","roar","stagger","weak point","boss fight"],"license":"draft"},
+ "size": [96,96],
+ "pivot": [44,90],
+ "grounded": true,
+ "preview": "walk",
+ "styles": ["pixel"],
+ "palette": [
+  {"id":"growthColour","label":"Colour","default":"#a4c44a","material":"plant","swatches":["#a4c44a","#3f8a4f","#6aa83e","#e08a2c"]},
+  {"id":"stone","label":"Stone","default":"#8f97a8","material":"stone","swatches":["#8f97a8","#5d6475","#f0ead8","#6b7280"]},
+  {"id":"glow","label":"Glow","default":"#4fd8ee","material":"light","swatches":["#4fd8ee","#e08a2c","#f2c230","#a4c44a","#c9423a","#7a4fc4"]}
+ ],
+ "controls": [
+  {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+  {"key":"bulk","kind":"range","label":"Bulk","lo":"Lean","hi":"Massive","default":0.5},
+  {"key":"arms","kind":"range","label":"Arms","lo":"Short","hi":"Long","default":0.5},
+  {"key":"shape","kind":"choice","label":"Head","options":["boulder","slab","horned"],"default":"boulder"},
+  {"key":"wear","kind":"range","label":"Wear","lo":"New","hi":"Worn","default":0.4},
+  {"key":"growth","kind":"choice","label":"Growth","options":["moss","mushrooms","saplings","none"],"default":"moss"},
+  {"key":"growthSize","kind":"range","label":"Size","lo":"Small","hi":"Big","default":1,"min":0.65,"max":1.35,"step":0.05},
+  {"key":"growthColour","kind":"colour","label":"Colour","when":{"growth":["moss","mushrooms","saplings"]}},
+  {"key":"core","kind":"choice","label":"Core","options":["gem","rune","eye"],"default":"gem"},
+  {"key":"coreSize","kind":"range","label":"Size","lo":"Small","hi":"Big","default":1,"min":0.7,"max":1.3,"step":0.05},
+  {"key":"stone","kind":"colour","label":"Stone"},
+  {"key":"glow","kind":"colour","label":"Glow"},
+  {"key":"bounce","kind":"range","label":"Bounce","lo":"Calm","hi":"Bouncy","default":0.5,"group":"Motion"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "parts": {"growth":{"label":"Growth","params":["growth","growthSize"],"none":"none","socket":"back"},"core":{"label":"Core","params":["core","coreSize"],"socket":"core"}},
+ "points": [{"id":"hand","on":"hand","at":[0,0]},{"id":"offhand","on":"offhand","at":[0,0]},{"id":"head","on":"head","at":[0,0]},{"id":"back","on":"back","at":[0,0]},{"id":"feet","on":"feet","at":[0,0]},{"id":"core","on":"core","at":[0,0]}],
+ "body": { "pictures": {
+  "nodes": [{"id":"body","parent":null,"at":[44,90]},{"id":"hand","parent":null,"at":[0,0]},{"id":"offhand","parent":null,"at":[0,0]},{"id":"head","parent":null,"at":[0,0]},{"id":"back","parent":null,"at":[0,0]},{"id":"feet","parent":null,"at":[0,0]},{"id":"core","parent":null,"at":[0,0]}],
+  "draw": [
+   {"id":"creature","gen":"creature.moss-golem","v":1,"on":"body","at":[0,0],"picture":"clip","size":{"from":"size"},"bulk":{"from":"bulk"},"arms":{"from":"arms"},"bounce":{"from":"bounce"},"shape":{"from":"shape"},"wear":{"from":"wear"},"growth":{"from":"growth"},"growthSize":{"from":"growthSize"},"growthColour":"growthColour","core":{"from":"core"},"coreSize":{"from":"coreSize"},"stone":"stone","shine":"glow"}
+  ],
+  "motion": [
+   {"gen":"creature.moss-golem.points","v":1,"at":[44,90],"size":{"from":"size"},"bulk":{"from":"bulk"},"arms":{"from":"arms"},"bounce":{"from":"bounce"}}
+  ]
+ } },
+ "clips": {
+  "idle": {"frames":8,"fps":7},
+  "walk": {"frames":8,"fps":10,"sounds":[{"sound":"golem-slam","preset":"Distant quake","frame":0,"volume":0.5},{"sound":"golem-slam","preset":"Distant quake","frame":4,"volume":0.5}]},
+  "attack": {"label":"Slam","frames":12,"fps":11,"loop":false,"sounds":[{"sound":"golem-slam","preset":"Boss slam","frame":7,"volume":1}]},
+  "roar": {"frames":10,"fps":10,"loop":false,"sounds":[{"sound":"whoosh","preset":"Heavy swing","frame":2,"volume":1}]},
+  "hurt": {"frames":4,"fps":9,"loop":false,"sounds":[{"sound":"punch","preset":"Heavy body blow","frame":0,"volume":0.9}]},
+  "stagger": {"frames":8,"fps":10,"loop":false,"sounds":[{"sound":"crate-break","preset":"Barrel","frame":0,"volume":0.8}]},
+  "die": {"frames":12,"fps":10,"loop":false,"sounds":[{"sound":"golem-slam","preset":"Boulder drop","frame":0,"volume":1},{"sound":"crate-break","preset":"Crate","frame":7,"volume":1}]}
+ }
+}

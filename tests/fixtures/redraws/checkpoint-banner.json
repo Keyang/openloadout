@@ -1,0 +1,202 @@
+{
+ "id": "checkpoint-banner",
+ "frozen": "2026-11-20",
+ "source": "sprites/checkpoint-banner.js",
+ "sha256": "dd9db5f6ddf2d09c11eed801e227b67ab356b8cfe17e3c8dfa5b7c772e7c3a48",
+ "name": "Checkpoint banner",
+ "blurb": "A flag that runs up its pole and flies when a checkpoint is reached. Change the pole, the cut of the flag, its emblem, colours and how much it waves.",
+ "meta": {
+  "type": "prop",
+  "role": "world/prop",
+  "themes": [
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "platformer"
+  ],
+  "view": "side",
+  "words": [
+   "flag",
+   "banner",
+   "checkpoint",
+   "pole",
+   "pennant",
+   "save",
+   "raise",
+   "wave",
+   "respawn",
+   "goal",
+   "cloth",
+   "emblem"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  64
+ ],
+ "pivot": [
+  16,
+  62
+ ],
+ "grounded": true,
+ "preview": "down",
+ "params": {
+  "height": {
+   "kind": "range",
+   "label": "Height",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Short",
+   "hi": "Tall",
+   "group": "Look"
+  },
+  "shape": {
+   "kind": "choice",
+   "label": "Shape",
+   "def": "swallowtail",
+   "options": [
+    "pennant",
+    "banner",
+    "swallowtail"
+   ],
+   "group": "Look"
+  },
+  "finial": {
+   "kind": "toggle",
+   "label": "Ball on top",
+   "def": true,
+   "group": "Look"
+  },
+  "emblem": {
+   "kind": "choice",
+   "label": "Emblem",
+   "def": "star",
+   "options": [
+    "none",
+    "star",
+    "skull",
+    "sun"
+   ],
+   "group": "Look"
+  },
+  "emblemColour": {
+   "kind": "color",
+   "label": "Colour",
+   "def": "#f2c230",
+   "swatches": [
+    "#f2c230",
+    "#c9423a",
+    "#7a4fc4",
+    "#f0ead8",
+    "#4fd8ee",
+    "#a4c44a"
+   ],
+   "group": "Colors"
+  },
+  "cloth": {
+   "kind": "color",
+   "label": "Cloth",
+   "def": "#3f6fd1",
+   "swatches": [
+    "#3f6fd1",
+    "#c9423a",
+    "#f2c230",
+    "#7a4fc4",
+    "#f0ead8",
+    "#e08a2c",
+    "#e6c545",
+    "#4f9d57"
+   ],
+   "group": "Colors"
+  },
+  "wood": {
+   "kind": "color",
+   "label": "Wood",
+   "def": "#a06a3c",
+   "swatches": [
+    "#a06a3c",
+    "#7a4f33",
+    "#f0ead8",
+    "#a8612a",
+    "#5a3a22",
+    "#c98a4a"
+   ],
+   "group": "Colors"
+  },
+  "sway": {
+   "kind": "range",
+   "label": "Sway",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Still",
+   "hi": "Swaying",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "down": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "raise": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  },
+  "up": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    8,
+    12
+   ]
+  }
+ },
+ "sounds": {
+  "raise": [
+   {
+    "sound": "whoosh",
+    "preset": "Quick swipe",
+    "frame": 1,
+    "volume": 0.7
+   },
+   {
+    "sound": "chime-success",
+    "preset": "Quick confirm",
+    "frame": 6,
+    "volume": 0.8
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-platformer-fantasy"
+ ]
+}

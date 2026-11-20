@@ -1,0 +1,370 @@
+{
+ "id": "moss-golem",
+ "frozen": "2026-11-20",
+ "source": "sprites/moss-golem.js",
+ "sha256": "5139a023f27eeeb0ce56f2d576b063b57465c5f2aa55fd83cdc874e6312492f8",
+ "name": "Moss golem",
+ "blurb": "A boss: a hunched giant of stacked boulders with a glowing core in its chest. Change its size, bulk, arms, head, growth, core and colours.",
+ "meta": {
+  "type": "creature",
+  "role": "characters/boss",
+  "themes": [
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "platformer"
+  ],
+  "view": "side",
+  "words": [
+   "golem",
+   "giant",
+   "stone",
+   "rock",
+   "boulder",
+   "moss",
+   "guardian",
+   "monster",
+   "slam",
+   "smash",
+   "roar",
+   "stagger",
+   "weak point",
+   "boss fight"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  96,
+  96
+ ],
+ "pivot": [
+  44,
+  90
+ ],
+ "grounded": true,
+ "preview": "walk",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "bulk": {
+   "kind": "range",
+   "label": "Bulk",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Lean",
+   "hi": "Massive",
+   "group": "Look"
+  },
+  "arms": {
+   "kind": "range",
+   "label": "Arms",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Short",
+   "hi": "Long",
+   "group": "Look"
+  },
+  "shape": {
+   "kind": "choice",
+   "label": "Head",
+   "def": "boulder",
+   "options": [
+    {
+     "value": "boulder",
+     "label": "Boulder"
+    },
+    {
+     "value": "slab",
+     "label": "Slab"
+    },
+    {
+     "value": "horned",
+     "label": "Horned"
+    }
+   ],
+   "group": "Look"
+  },
+  "wear": {
+   "kind": "range",
+   "label": "Wear",
+   "def": 0.4,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "New",
+   "hi": "Worn",
+   "group": "Look"
+  },
+  "growth": {
+   "kind": "choice",
+   "label": "Growth",
+   "def": "moss",
+   "options": [
+    {
+     "value": "moss",
+     "label": "Moss"
+    },
+    {
+     "value": "mushrooms",
+     "label": "Mushrooms"
+    },
+    {
+     "value": "saplings",
+     "label": "Saplings"
+    },
+    {
+     "value": "none",
+     "label": "None"
+    }
+   ],
+   "group": "Look"
+  },
+  "growthSize": {
+   "kind": "range",
+   "label": "Size",
+   "def": 1,
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "growthColour": {
+   "kind": "color",
+   "label": "Colour",
+   "def": "#a4c44a",
+   "swatches": [
+    "#a4c44a",
+    "#3f8a4f",
+    "#6aa83e",
+    "#e08a2c"
+   ],
+   "group": "Colors"
+  },
+  "core": {
+   "kind": "choice",
+   "label": "Core",
+   "def": "gem",
+   "options": [
+    {
+     "value": "gem",
+     "label": "Gem"
+    },
+    {
+     "value": "rune",
+     "label": "Rune"
+    },
+    {
+     "value": "eye",
+     "label": "Eye"
+    }
+   ],
+   "group": "Look"
+  },
+  "coreSize": {
+   "kind": "range",
+   "label": "Size",
+   "def": 1,
+   "min": 0.7,
+   "max": 1.3,
+   "step": 0.05,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "stone": {
+   "kind": "color",
+   "label": "Stone",
+   "def": "#8f97a8",
+   "swatches": [
+    "#8f97a8",
+    "#5d6475",
+    "#f0ead8",
+    "#6b7280"
+   ],
+   "group": "Colors"
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Glow",
+   "def": "#4fd8ee",
+   "swatches": [
+    "#4fd8ee",
+    "#e08a2c",
+    "#f2c230",
+    "#a4c44a",
+    "#c9423a",
+    "#7a4fc4"
+   ],
+   "group": "Colors"
+  },
+  "bounce": {
+   "kind": "range",
+   "label": "Bounce",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Calm",
+   "hi": "Bouncy",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    7,
+    10
+   ]
+  },
+  "walk": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "attack": {
+   "frames": 12,
+   "loop": false,
+   "fps": [
+    7,
+    12,
+    16
+   ]
+  },
+  "roar": {
+   "frames": 10,
+   "loop": false,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "hurt": {
+   "frames": 4,
+   "loop": false,
+   "fps": [
+    6,
+    9,
+    13
+   ]
+  },
+  "stagger": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "die": {
+   "frames": 12,
+   "loop": false,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  }
+ },
+ "sounds": {
+  "walk": [
+   {
+    "sound": "golem-slam",
+    "preset": "Distant quake",
+    "frame": 0,
+    "volume": 0.5
+   },
+   {
+    "sound": "golem-slam",
+    "preset": "Distant quake",
+    "frame": 4,
+    "volume": 0.5
+   }
+  ],
+  "roar": [
+   {
+    "sound": "whoosh",
+    "preset": "Heavy swing",
+    "frame": 2,
+    "volume": 1
+   }
+  ],
+  "attack": [
+   {
+    "sound": "golem-slam",
+    "preset": "Boss slam",
+    "frame": 7,
+    "volume": 1
+   }
+  ],
+  "hurt": [
+   {
+    "sound": "punch",
+    "preset": "Heavy body blow",
+    "frame": 0,
+    "volume": 0.9
+   }
+  ],
+  "stagger": [
+   {
+    "sound": "crate-break",
+    "preset": "Barrel",
+    "frame": 0,
+    "volume": 0.8
+   }
+  ],
+  "die": [
+   {
+    "sound": "golem-slam",
+    "preset": "Boulder drop",
+    "frame": 0,
+    "volume": 1
+   },
+   {
+    "sound": "crate-break",
+    "preset": "Crate",
+    "frame": 7,
+    "volume": 1
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-platformer-fantasy"
+ ]
+}

@@ -1,0 +1,42 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "inn",
+ "name": "Inn",
+ "blurb": "A two-storey village inn with a double door that opens, windows that light up at night and a hanging picture sign. Change its width, roof, chimney, sign and colours.",
+ "meta": {"type":"prop","role":"world/building","themes":["fantasy","farm"],"gameTypes":["turn-based-rpg","top-down-rpg"],"view":"top-down","words":["inn","tavern","pub","hotel","house","village","sign","door","open","enter","rest","sleep","night","timber"],"license":"draft"},
+ "size": [128,96],
+ "pivot": [64,92],
+ "preview": "closed",
+ "styles": ["pixel"],
+ "palette": [
+  {"id":"signColour","label":"Colour","default":"#f2c230","material":"paint","swatches":["#f2c230","#c9423a","#f0ead8","#7fe0a0","#4fd8ee","#c8553a"]},
+  {"id":"wall","label":"Walls","default":"#f0ead8","material":"stone","swatches":["#f0ead8","#a8a4a0","#c9a06a","#a8c8d8","#9fd8f4"]},
+  {"id":"roofColour","label":"Roof colour","default":"#c8553a","material":"earth","swatches":["#c8553a","#5a5f7a","#e6c96a","#9a6a3e","#2f8f9d"]},
+  {"id":"wood","label":"Beams and door","default":"#9a6a3e","material":"wood","swatches":["#9a6a3e","#a8612a","#5a3a22","#c8553a","#5a5f7a","#2f8f9d"]},
+  {"id":"glow","label":"Window light","default":"#f4e06a","material":"light","swatches":["#f4e06a","#4fd8ee","#e8662c","#7aa0f4","#7fe0a0","#7a4fc4"]}
+ ],
+ "controls": [
+  {"key":"width","kind":"range","label":"Width","lo":"Narrow","hi":"Wide","default":0.5},
+  {"key":"roof","kind":"choice","label":"Roof","options":["thatch","tile","slate"],"default":"tile"},
+  {"key":"chimney","kind":"toggle","label":"Chimney","default":true},
+  {"key":"sign","kind":"choice","label":"Sign","options":["mug","bed","moon","none"],"default":"mug"},
+  {"key":"signColour","kind":"colour","label":"Colour","when":{"sign":["mug","bed","moon"]}},
+  {"key":"wall","kind":"colour","label":"Walls"},
+  {"key":"roofColour","kind":"colour","label":"Roof colour"},
+  {"key":"wood","kind":"colour","label":"Beams and door"},
+  {"key":"glow","kind":"colour","label":"Window light"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "parts": {"sign":{"label":"Sign","params":["sign"],"none":"none"}},
+ "body": { "pictures": { "nodes": [], "draw": [
+  {"id":"closed","gen":"building.inn","v":1,"clip":["closed"],"picture":"closed","at":[64,92],"width":{"from":"width","map":[[0,0],[1,1]],"round":"none"},"roof":{"from":"roof","pick":{"thatch":"thatch","tile":"tile","slate":"slate"}},"chimney":{"from":"chimney","pick":{"true":true,"false":false}},"sign":{"from":"sign","pick":{"mug":"mug","bed":"bed","moon":"moon","none":"none"}},"signColour":"signColour","wall":"wall","roofColour":"roofColour","wood":"wood","glowColour":"glow"},
+  {"id":"open","gen":"building.inn","v":1,"clip":["open"],"picture":"open","at":[64,92],"width":{"from":"width","map":[[0,0],[1,1]],"round":"none"},"roof":{"from":"roof","pick":{"thatch":"thatch","tile":"tile","slate":"slate"}},"chimney":{"from":"chimney","pick":{"true":true,"false":false}},"sign":{"from":"sign","pick":{"mug":"mug","bed":"bed","moon":"moon","none":"none"}},"signColour":"signColour","wall":"wall","roofColour":"roofColour","wood":"wood","glowColour":"glow"},
+  {"id":"lit","gen":"building.inn","v":1,"clip":["lit"],"picture":"lit","at":[64,92],"width":{"from":"width","map":[[0,0],[1,1]],"round":"none"},"roof":{"from":"roof","pick":{"thatch":"thatch","tile":"tile","slate":"slate"}},"chimney":{"from":"chimney","pick":{"true":true,"false":false}},"sign":{"from":"sign","pick":{"mug":"mug","bed":"bed","moon":"moon","none":"none"}},"signColour":"signColour","wall":"wall","roofColour":"roofColour","wood":"wood","glowColour":"glow"}
+ ] } },
+ "clips": {
+  "closed": {"frames":1,"fps":8},
+  "open": {"frames":6,"fps":12,"loop":false,"sounds":[{"sound":"door-creak","frame":0,"preset":"Wooden door","volume":0.8}]},
+  "lit": {"frames":8,"fps":8,"label":"Night"}
+ }
+}

@@ -1,0 +1,39 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "checkpoint-banner",
+ "name": "Checkpoint banner",
+ "blurb": "A flag that runs up its pole and flies when a checkpoint is reached. Change the pole, the cut of the flag, its emblem, colours and how much it waves.",
+ "meta": {"type":"prop","role":"world/prop","themes":["fantasy","forest"],"gameTypes":["platformer"],"view":"side","words":["flag","banner","checkpoint","pole","pennant","save","raise","wave","respawn","goal","cloth","emblem"],"license":"draft"},
+ "size": [32,64],
+ "pivot": [16,62],
+ "preview": "down",
+ "styles": ["pixel"],
+ "palette": [
+  {"id":"emblemColour","label":"Colour","default":"#f2c230","material":"paint","swatches":["#f2c230","#c9423a","#7a4fc4","#f0ead8","#4fd8ee","#a4c44a"]},
+  {"id":"cloth","label":"Cloth","default":"#3f6fd1","material":"cloth","swatches":["#3f6fd1","#c9423a","#f2c230","#7a4fc4","#f0ead8","#e08a2c","#e6c545","#4f9d57"]},
+  {"id":"wood","label":"Wood","default":"#a06a3c","material":"wood","swatches":["#a06a3c","#7a4f33","#f0ead8","#a8612a","#5a3a22","#c98a4a"]}
+ ],
+ "controls": [
+  {"key":"height","kind":"range","label":"Height","lo":"Short","hi":"Tall","default":0.5},
+  {"key":"shape","kind":"choice","label":"Shape","options":["pennant","banner","swallowtail"],"default":"swallowtail"},
+  {"key":"finial","kind":"toggle","label":"Ball on top","default":true},
+  {"key":"emblem","kind":"choice","label":"Emblem","options":["none","star","skull","sun"],"default":"star"},
+  {"key":"emblemColour","kind":"colour","label":"Colour","when":{"emblem":["star","skull","sun"]}},
+  {"key":"cloth","kind":"colour","label":"Cloth"},
+  {"key":"wood","kind":"colour","label":"Wood"},
+  {"key":"sway","kind":"range","label":"Sway","lo":"Still","hi":"Swaying","default":0.5,"group":"Motion"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "parts": {"emblem":{"label":"Emblem","params":["emblem"],"none":"none"}},
+ "body": { "pictures": { "nodes": [], "draw": [
+  {"id":"down","gen":"flag.checkpoint","v":1,"clip":["down"],"picture":"down","at":[16,62],"height":{"from":"height","map":[[0,0],[1,1]],"round":"none"},"shape":{"from":"shape","pick":{"pennant":"pennant","banner":"banner","swallowtail":"swallowtail"}},"finial":{"from":"finial","pick":{"true":true,"false":false}},"emblem":{"from":"emblem","pick":{"none":"none","star":"star","skull":"skull","sun":"sun"}},"emblemColour":"emblemColour","cloth":"cloth","wood":"wood","sway":{"from":"sway","map":[[0,0],[1,1]],"round":"none"}},
+  {"id":"raise","gen":"flag.checkpoint","v":1,"clip":["raise"],"picture":"raise","at":[16,62],"height":{"from":"height","map":[[0,0],[1,1]],"round":"none"},"shape":{"from":"shape","pick":{"pennant":"pennant","banner":"banner","swallowtail":"swallowtail"}},"finial":{"from":"finial","pick":{"true":true,"false":false}},"emblem":{"from":"emblem","pick":{"none":"none","star":"star","skull":"skull","sun":"sun"}},"emblemColour":"emblemColour","cloth":"cloth","wood":"wood","sway":{"from":"sway","map":[[0,0],[1,1]],"round":"none"}},
+  {"id":"up","gen":"flag.checkpoint","v":1,"clip":["up"],"picture":"up","at":[16,62],"height":{"from":"height","map":[[0,0],[1,1]],"round":"none"},"shape":{"from":"shape","pick":{"pennant":"pennant","banner":"banner","swallowtail":"swallowtail"}},"finial":{"from":"finial","pick":{"true":true,"false":false}},"emblem":{"from":"emblem","pick":{"none":"none","star":"star","skull":"skull","sun":"sun"}},"emblemColour":"emblemColour","cloth":"cloth","wood":"wood","sway":{"from":"sway","map":[[0,0],[1,1]],"round":"none"}}
+ ] } },
+ "clips": {
+  "down": {"frames":1,"fps":8,"label":"Inactive"},
+  "raise": {"frames":8,"fps":12,"loop":false,"sounds":[{"sound":"whoosh","preset":"Quick swipe","frame":1,"volume":0.7},{"sound":"chime-success","preset":"Quick confirm","frame":6,"volume":0.8}]},
+  "up": {"frames":8,"fps":8,"label":"Active"}
+ }
+}

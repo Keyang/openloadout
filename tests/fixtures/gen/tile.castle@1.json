@@ -1,0 +1,215 @@
+{
+ "id": "tile.castle",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "piece": "stone-left",
+    "stone": "stone",
+    "wall": "wall",
+    "growth": "growth",
+    "joint": "joint",
+    "mortar": "mortar",
+    "mossOn": "mossOn",
+    "trim": "trim",
+    "lit": "lit",
+    "frame": "frame"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      0,
+      0
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "abcccccccccccccccbddeededdcccccc",
+      "afcccccccccccccccbggggggggcccccc",
+      "afhccccccccccccccbciiiiiiccccccc",
+      "afhhcccccccccccccbcccccccccccccc",
+      "afhhhbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "afhhhbjjjbffffffffffffjjjbffffff",
+      "afhhhbffjbffffffffffffffjbffffff",
+      "afhhhbfffbfffffffffffffffbffffff",
+      "afhhhbfffbfffffffffffffffbffffff",
+      "abbbbbfffbfffffffffffffffbffffff",
+      "afhhhbfffbfffffffffffffffbffffff",
+      "afhhhbfffbfffffffffffffffbffffff",
+      "afhhhbfffbfffffffffffffffbffffff",
+      "afhhhbfffbfffffffffffffffbffffff",
+      "afhhhbfffbfffffffffffffffbffffff",
+      "afhhhbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "afhhhbfffffffffjjjbfffffffffffff",
+      "afhhhbfffffffffffjbfffffffffffff",
+      "afhhhbffffffffffffbfffffffffffff",
+      "afhhhbffffffffffffbfffffffffffff",
+      "afhhhbffffffffffffbfffffffffffff",
+      "afhhhbffffffffffffbfffffffffffff",
+      "afhhhbffffffffffffbfffffffffffff",
+      "afhhhbffffffffffffbfffffffffffff",
+      "afhhhbffffffffffffbfffffffffffff",
+      "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "afhhhbffffjjjbffffffffffffjjjbff",
+      "afhhhbffffffjbffffffffffffffjbff",
+      "afhhhbfffffffbfffffffffffffffbff",
+      "afhhhbfffffffbfffffffffffffffbff",
+      "afhhhbfffffffbfffffffffffffffbff"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "joint",
+      "c": "stone.light",
+      "d": "growth",
+      "e": "growth.light",
+      "f": "stone",
+      "g": "growth.dark",
+      "h": "trim",
+      "i": "growth.deep",
+      "j": "lit"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "piece": "stone-col-t",
+    "stone": "stone",
+    "wall": "wall",
+    "growth": "growth",
+    "joint": "joint",
+    "mortar": "mortar",
+    "mossOn": "mossOn",
+    "trim": "trim",
+    "lit": "lit",
+    "frame": "frame"
+   },
+   "ctx": {
+    "t": 0.375,
+    "frame": 3,
+    "frames": 8,
+    "loop": true
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      0,
+      0
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "abcccccccccccccccbddeededdccccca",
+      "afcccccccccccccccbggggggggccccca",
+      "afhccccccccccccccbciiiiiicccccca",
+      "afhhcccccccccccccbccccccccccccca",
+      "afhhhbbbbbbbbbbbbbbbbbbbbbbcccca",
+      "afhhhbjjjbffffffffffffjjjbbcccca",
+      "afhhhbffjbffffffffffffffjbbcccca",
+      "afhhhbfffbfffffffffffffffbbcccca",
+      "afhhhbfffbfffffffffffffffbbcccca",
+      "abbbbbfffbfffffffffffffffbbbbbba",
+      "afhhhbfffbfffffffffffffffbbcccca",
+      "afhhhbfffbfffffffffffffffbbcccca",
+      "afhhhbfffbfffffffffffffffbbcccca",
+      "afhhhbfffbfffffffffffffffbbcccca",
+      "afhhhbfffbfffffffffffffffbbcccca",
+      "afhhhbbbbbbbbbbbbbbbbbbbbbbcccca",
+      "afhhhbfffffffffjjjbfffffffbcccca",
+      "afhhhbfffffffffffjbfffffffbcccca",
+      "afhhhbffffffffffffbfffffffbcccca",
+      "afhhhbffffffffffffbfffffffbcccca",
+      "afhhhbffffffffffffbfffffffbcccca",
+      "afhhhbffffffffffffbfffffffbcccca",
+      "afhhhbffffffffffffbfffffffbcccca",
+      "afhhhbffffffffffffbfffffffbcccca",
+      "afhhhbffffffffffffbfffffffbcccca",
+      "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbba",
+      "afhhhbffffjjjbffffffffffffbcccca",
+      "afhhhbffffffjbffffffffffffbcccca",
+      "afhhhbfffffffbffffffffffffbcccca",
+      "afhhhbfffffffbffffffffffffbcccca",
+      "afhhhbfffffffbffffffffffffbcccca"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "joint",
+      "c": "stone.light",
+      "d": "growth",
+      "e": "growth.light",
+      "f": "stone",
+      "g": "growth.dark",
+      "h": "trim",
+      "i": "growth.deep",
+      "j": "lit"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     40,
+     20
+    ],
+    "piece": "stone-deco-b",
+    "stone": "stone",
+    "wall": "wall",
+    "growth": "growth",
+    "joint": "joint",
+    "mortar": "mortar",
+    "mossOn": "mossOn",
+    "trim": "trim",
+    "lit": "lit",
+    "frame": "frame"
+   },
+   "ctx": {
+    "t": 0.5,
+    "frame": 4,
+    "frames": 8,
+    "loop": true
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      29,
+      13
+     ],
+     "anchor": "tl",
+     "rows": [
+      "............aaaaaa...",
+      ".......aaaaaaaaaaaa..",
+      "...aaaaaaaaaaaaaaaaa.",
+      "...baaaaaaaaaaaaaaaa.",
+      "...aaaaaaaaaaaaaaaa..",
+      "..baaaaabbaaaaaaaa...",
+      ".baaaaaaaaaaaaaaaa...",
+      ".baaaaaaaaaabbaaa....",
+      "bbbaaaaaaaaaaaaaa..aa",
+      "bbbaaabbaaabbaaaaa...",
+      ".bbbbaaaabbbbbaaaa...",
+      ".bbbbbbbb..bbbbbb....",
+      "...bbbb.....bbbb.....",
+      ".................aa..",
+      ".......aa............"
+     ],
+     "key": {
+      "a": "growth",
+      "b": "growth.dark"
+     }
+    }
+   ]
+  }
+ ]
+}

@@ -5,8 +5,7 @@
 // one, then the cracks. Moss is the code's patch: its lobes cut to the rock or wedge, with a dark line of its own colour
 // round it inside the stone. Each wedge's node sits at its own shape's wedge middle (a pick on Shape), so a wedge turns
 // and shrinks about the point rockBreak turns it about.
-import { head, clip, build, B } from './lib.mjs';
-import { hash, easeOut } from '../../engine/motion.js';
+import { head, clip, build, B, hash, easeOut } from './lib.mjs';
 const h = head('boulder-chunk', { stone: 'stone', accent: 'plant' });
 h.palette.push({ id: 'shine', default: '#ffffff', material: 'light', detail: true });
 const TAU = Math.PI * 2, SEED = 4, RM = 8.5;                 // the middle size's radius before the shape's k

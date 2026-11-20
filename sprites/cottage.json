@@ -1,0 +1,39 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "cottage",
+ "name": "Cottage",
+ "blurb": "A small timber-framed village house whose door opens and whose windows light up at night. Change its width, roof, chimney, windows and colours.",
+ "meta": {"type":"prop","role":"world/building","themes":["fantasy","farm"],"gameTypes":["turn-based-rpg","top-down-rpg"],"view":"top-down","words":["cottage","house","home","hut","village","door","open","enter","window","chimney","thatched","timber","night","cosy"],"license":"draft"},
+ "size": [96,96],
+ "pivot": [48,92],
+ "preview": "closed",
+ "styles": ["pixel"],
+ "palette": [
+  {"id":"wall","label":"Walls","default":"#f0ead8","material":"stone","swatches":["#f0ead8","#a8a4a0","#c9a06a","#a8c8d8","#9fd8f4"]},
+  {"id":"roofColour","label":"Roof colour","default":"#e6c96a","material":"earth","swatches":["#e6c96a","#c8553a","#5a5f7a","#9a6a3e","#2f8f9d"]},
+  {"id":"wood","label":"Beams and door","default":"#9a6a3e","material":"wood","swatches":["#9a6a3e","#a8612a","#5a3a22","#c8553a","#5a5f7a","#2f8f9d"]},
+  {"id":"glow","label":"Window light","default":"#f4e06a","material":"light","swatches":["#f4e06a","#4fd8ee","#e8662c","#7aa0f4","#7fe0a0","#7a4fc4"]}
+ ],
+ "controls": [
+  {"key":"width","kind":"range","label":"Width","lo":"Narrow","hi":"Wide","default":0.5},
+  {"key":"roof","kind":"choice","label":"Roof","options":["thatch","tile","slate"],"default":"thatch"},
+  {"key":"chimney","kind":"toggle","label":"Chimney","default":true},
+  {"key":"windows","kind":"choice","label":"Windows","options":["one","two"],"default":"two"},
+  {"key":"wall","kind":"colour","label":"Walls"},
+  {"key":"roofColour","kind":"colour","label":"Roof colour"},
+  {"key":"wood","kind":"colour","label":"Beams and door"},
+  {"key":"glow","kind":"colour","label":"Window light"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": { "pictures": { "nodes": [], "draw": [
+  {"id":"closed","gen":"building.cottage","v":1,"clip":["closed"],"picture":"closed","at":[48,92],"width":{"from":"width","map":[[0,0],[1,1]],"round":"none"},"roof":{"from":"roof","pick":{"thatch":"thatch","tile":"tile","slate":"slate"}},"chimney":{"from":"chimney","pick":{"true":true,"false":false}},"windows":{"from":"windows","pick":{"one":"one","two":"two"}},"wall":"wall","roofColour":"roofColour","wood":"wood","glowColour":"glow"},
+  {"id":"open","gen":"building.cottage","v":1,"clip":["open"],"picture":"open","at":[48,92],"width":{"from":"width","map":[[0,0],[1,1]],"round":"none"},"roof":{"from":"roof","pick":{"thatch":"thatch","tile":"tile","slate":"slate"}},"chimney":{"from":"chimney","pick":{"true":true,"false":false}},"windows":{"from":"windows","pick":{"one":"one","two":"two"}},"wall":"wall","roofColour":"roofColour","wood":"wood","glowColour":"glow"},
+  {"id":"lit","gen":"building.cottage","v":1,"clip":["lit"],"picture":"lit","at":[48,92],"width":{"from":"width","map":[[0,0],[1,1]],"round":"none"},"roof":{"from":"roof","pick":{"thatch":"thatch","tile":"tile","slate":"slate"}},"chimney":{"from":"chimney","pick":{"true":true,"false":false}},"windows":{"from":"windows","pick":{"one":"one","two":"two"}},"wall":"wall","roofColour":"roofColour","wood":"wood","glowColour":"glow"}
+ ] } },
+ "clips": {
+  "closed": {"frames":1,"fps":8},
+  "open": {"frames":6,"fps":12,"loop":false,"sounds":[{"sound":"door-creak","frame":0,"preset":"Wooden door","volume":0.8}]},
+  "lit": {"frames":8,"fps":8,"label":"Night"}
+ }
+}

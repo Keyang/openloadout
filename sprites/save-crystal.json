@@ -1,0 +1,104 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "save-crystal",
+ "name": "Save crystal",
+ "blurb": "A glowing crystal that floats over a pedestal and flashes when the game is saved; change its cut, size, ring, pedestal, colours, float and pulse.",
+ "meta": {
+  "type": "prop",
+  "role": "world/prop",
+  "themes": ["fantasy"],
+  "gameTypes": ["turn-based-rpg","top-down-rpg"],
+  "view": "top-down",
+  "words": ["save","crystal","save point","checkpoint","shrine","gem","glow","float","activate","magic","pedestal","heal"],
+  "license": "draft"
+ },
+ "size": [32,48],
+ "pivot": [16,46],
+ "preview": "idle",
+ "styles": ["pixel"],
+ "palette": [
+  {
+   "id": "pedestalColour",
+   "label": "Colour",
+   "default": "#a8a4a0",
+   "material": "stone",
+   "swatches": ["#a8a4a0","#7e84a0","#5a5f7a","#9a6a3e","#c9a06a","#f0ead8"]
+  },
+  {"id":"body","label":"Crystal","default":"#4fd8ee","material":"magic","swatches":["#4fd8ee","#c9423a","#7fe0a0","#7a4fc4","#f2c230"]},
+  {"id":"glow","label":"Glow","default":"#f0ead8","material":"light","swatches":["#f0ead8","#f4e06a","#9fd8f4","#7aa0f4","#e8662c"]}
+ ],
+ "controls": [
+  {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+  {
+   "key": "shape",
+   "kind": "choice",
+   "label": "Shape",
+   "options": [{"value":"shard","label":"Shard"},{"value":"prism","label":"Prism"},{"value":"orb","label":"Orb"},{"value":"star","label":"Star"}],
+   "default": "shard"
+  },
+  {"key":"rings","kind":"toggle","label":"Ring","default":true},
+  {
+   "key": "pedestal",
+   "kind": "choice",
+   "label": "Pedestal",
+   "options": [{"value":"stone","label":"Stone"},{"value":"roots","label":"Roots"},{"value":"none","label":"None"}],
+   "default": "stone"
+  },
+  {"key":"pedestalSize","kind":"range","label":"Size","lo":"Small","hi":"Big","default":1,"min":0.65,"max":1.35,"step":0.05},
+  {"key":"pedestalColour","kind":"colour","label":"Colour","when":{"pedestal":["stone","roots"]}},
+  {"key":"body","kind":"colour","label":"Crystal"},
+  {"key":"glow","kind":"colour","label":"Glow"},
+  {"key":"bob","kind":"range","label":"Float","lo":"Still","hi":"Floaty","default":0.5,"group":"Motion"},
+  {"key":"flicker","kind":"range","label":"Flicker","lo":"Steady","hi":"Wild","default":0.5,"group":"Motion"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "parts": {"pedestal":{"label":"Pedestal","params":["pedestal","pedestalSize"],"none":"none"}},
+ "body": {
+  "pictures": {
+   "nodes": [],
+   "draw": [
+    {
+     "id": "idle",
+     "gen": "crystal.save",
+     "v": 1,
+     "at": [16,46],
+     "clip": ["idle"],
+     "picture": "idle",
+     "size": {"from":"size","map":[[0,0],[1,1]],"round":"none"},
+     "shape": {"from":"shape","pick":{"shard":"shard","prism":"prism","orb":"orb","star":"star"}},
+     "rings": {"from":"rings","pick":{"true":true,"false":false}},
+     "pedestal": {"from":"pedestal","pick":{"stone":"stone","roots":"roots","none":"none"}},
+     "pedestalSize": {"from":"pedestalSize","map":[[0.65,0.65],[1.35,1.35]],"round":"none"},
+     "pedestalColour": "pedestalColour",
+     "body": "body",
+     "glowing": "glow",
+     "bob": {"from":"bob","map":[[0,0],[1,1]],"round":"none"},
+     "flicker": {"from":"flicker","map":[[0,0],[1,1]],"round":"none"}
+    },
+    {
+     "id": "activate",
+     "gen": "crystal.save",
+     "v": 1,
+     "at": [16,46],
+     "clip": ["activate"],
+     "picture": "activate",
+     "size": {"from":"size","map":[[0,0],[1,1]],"round":"none"},
+     "shape": {"from":"shape","pick":{"shard":"shard","prism":"prism","orb":"orb","star":"star"}},
+     "rings": {"from":"rings","pick":{"true":true,"false":false}},
+     "pedestal": {"from":"pedestal","pick":{"stone":"stone","roots":"roots","none":"none"}},
+     "pedestalSize": {"from":"pedestalSize","map":[[0.65,0.65],[1.35,1.35]],"round":"none"},
+     "pedestalColour": "pedestalColour",
+     "body": "body",
+     "glowing": "glow",
+     "bob": {"from":"bob","map":[[0,0],[1,1]],"round":"none"},
+     "flicker": {"from":"flicker","map":[[0,0],[1,1]],"round":"none"}
+    }
+   ]
+  }
+ },
+ "clips": {
+  "idle": {"frames":8,"fps":8,"label":"Glow"},
+  "activate": {"frames":8,"fps":12,"loop":false,"sounds":[{"sound":"save-chime","preset":"Save point","frame":1,"volume":0.8}]}
+ }
+}

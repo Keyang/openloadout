@@ -1,0 +1,231 @@
+{
+ "id": "swarm-mite",
+ "frozen": "2026-11-20",
+ "source": "sprites/swarm-mite.js",
+ "sha256": "c7e5214a86fa714bbf820da633b171fb8df6109cdc65e3806f4cfc3fd9da3ebc",
+ "name": "Swarm mite",
+ "blurb": "A tiny hive bug made for crowds of fifty: it skitters, nips and pops. Change its size, legs, body, eyes and colours.",
+ "meta": {
+  "type": "creature",
+  "role": "characters/enemy",
+  "themes": [
+   "sci-fi",
+   "space",
+   "horror"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "shooter"
+  ],
+  "view": "top-down",
+  "words": [
+   "mite",
+   "swarm",
+   "bug",
+   "tick",
+   "critter",
+   "insect",
+   "horde",
+   "skitter",
+   "nip",
+   "pop",
+   "tiny",
+   "enemy",
+   "alien",
+   "survivors"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  28
+ ],
+ "grounded": false,
+ "preview": "walk",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "legs": {
+   "kind": "choice",
+   "label": "Legs",
+   "def": "six",
+   "options": [
+    {
+     "value": "four",
+     "label": "Four"
+    },
+    {
+     "value": "six",
+     "label": "Six"
+    },
+    {
+     "value": "eight",
+     "label": "Eight"
+    }
+   ],
+   "group": "Look"
+  },
+  "shape": {
+   "kind": "choice",
+   "label": "Shape",
+   "def": "round",
+   "options": [
+    {
+     "value": "round",
+     "label": "Round"
+    },
+    {
+     "value": "long",
+     "label": "Long"
+    },
+    {
+     "value": "spiky",
+     "label": "Spiky"
+    }
+   ],
+   "group": "Look"
+  },
+  "eyes": {
+   "kind": "choice",
+   "label": "Eyes",
+   "def": "two",
+   "options": [
+    {
+     "value": "one",
+     "label": "One"
+    },
+    {
+     "value": "two",
+     "label": "Two"
+    },
+    {
+     "value": "many",
+     "label": "Many"
+    }
+   ],
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Body",
+   "def": "#b04a8a",
+   "swatches": [
+    "#b04a8a",
+    "#a87894",
+    "#e2473f",
+    "#2fb3a8"
+   ],
+   "group": "Colors"
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Eyes",
+   "def": "#9fe040",
+   "swatches": [
+    "#9fe040",
+    "#5fe0f0",
+    "#f2a030",
+    "#b48af8",
+    "#5fd47a",
+    "#f0ead8"
+   ],
+   "group": "Colors"
+  },
+  "bounce": {
+   "kind": "range",
+   "label": "Bounce",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Calm",
+   "hi": "Bouncy",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    7,
+    10
+   ]
+  },
+  "walk": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "attack": {
+   "frames": 6,
+   "loop": false,
+   "fps": [
+    8,
+    14,
+    19
+   ]
+  },
+  "hurt": {
+   "frames": 4,
+   "loop": false,
+   "fps": [
+    6,
+    9,
+    13
+   ]
+  },
+  "die": {
+   "frames": 6,
+   "loop": false,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  }
+ },
+ "sounds": {
+  "die": [
+   {
+    "sound": "bug-splat",
+    "frame": 0,
+    "preset": "Mite pop",
+    "volume": 0.7
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-roguelite-scifi"
+ ]
+}

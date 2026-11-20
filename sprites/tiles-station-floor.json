@@ -1,0 +1,2267 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "tiles-station-floor",
+ "name": "Station floor",
+ "blurb": "Metal deck plating for a top-down space station, with a darker inset walkway, grates, a vent fan, hazard paint and floor lights; change the colours, the plate layout, the rim and how worn it is.",
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "plate-single",
+ "styles": [
+  "pixel"
+ ],
+ "meta": {
+  "type": "tileset",
+  "role": "world/tile",
+  "themes": [
+   "sci-fi",
+   "space"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "shooter"
+  ],
+  "view": "top-down",
+  "words": [
+   "floor",
+   "deck",
+   "plating",
+   "metal",
+   "panel",
+   "walkway",
+   "grate",
+   "vent",
+   "hazard",
+   "station",
+   "spaceship",
+   "room",
+   "corridor",
+   "walk"
+  ],
+  "license": "draft"
+ },
+ "palette": [
+  {
+   "id": "floor",
+   "label": "Floor",
+   "default": "#566182",
+   "material": "metal",
+   "swatches": [
+    "#566182",
+    "#6b7896",
+    "#6660b6",
+    "#a87894"
+   ]
+  },
+  {
+   "id": "plate",
+   "label": "Plating",
+   "default": "#434d6d",
+   "material": "metal",
+   "swatches": [
+    "#434d6d",
+    "#566182",
+    "#6b7896",
+    "#6660b6",
+    "#a87894"
+   ]
+  },
+  {
+   "id": "accent",
+   "label": "Hazard paint",
+   "default": "#f2a030",
+   "material": "warning",
+   "swatches": [
+    "#f2a030",
+    "#2fb3a8",
+    "#e2473f",
+    "#3f6fd1",
+    "#5fe0f0",
+    "#9fe040"
+   ]
+  },
+  {
+   "id": "glow",
+   "label": "Floor lights",
+   "default": "#2fb3a8",
+   "material": "light",
+   "swatches": [
+    "#2fb3a8",
+    "#5fe0f0",
+    "#e2473f",
+    "#9fe040",
+    "#f2a030",
+    "#b48af8",
+    "#4f9ff0",
+    "#5fd47a"
+   ]
+  }
+ ],
+ "controls": [
+  {
+   "key": "style",
+   "kind": "choice",
+   "label": "Style",
+   "options": [
+    {
+     "value": "panels",
+     "label": "Panels"
+    },
+    {
+     "value": "grid",
+     "label": "Grid"
+    },
+    {
+     "value": "hex",
+     "label": "Honeycomb"
+    }
+   ],
+   "default": "panels"
+  },
+  {
+   "key": "edge",
+   "kind": "range",
+   "label": "Edge",
+   "lo": "Thin",
+   "hi": "Deep",
+   "min": 3,
+   "max": 6,
+   "step": 1,
+   "default": 4
+  },
+  {
+   "key": "texture",
+   "kind": "range",
+   "label": "Texture",
+   "lo": "Plain",
+   "hi": "Busy",
+   "default": 0.5
+  },
+  {
+   "key": "wear",
+   "kind": "range",
+   "label": "Wear",
+   "lo": "New",
+   "hi": "Worn",
+   "default": 0.4
+  },
+  {
+   "key": "floor",
+   "kind": "colour",
+   "label": "Floor"
+  },
+  {
+   "key": "plate",
+   "kind": "colour",
+   "label": "Plating"
+  },
+  {
+   "key": "accent",
+   "kind": "colour",
+   "label": "Hazard paint"
+  },
+  {
+   "key": "glow",
+   "kind": "colour",
+   "label": "Floor lights"
+  },
+  {
+   "key": "speed",
+   "standard": "speed"
+  }
+ ],
+ "body": {
+  "tiles": {
+   "tile": 32,
+   "decalOrder": "last",
+   "groups": [
+    {
+     "name": "floor",
+     "kind": "floor",
+     "fills": 3,
+     "fps": 6,
+     "outline": false,
+     "pictures": {
+      "fill": [
+       {
+        "gen": "tile.station-floor",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "floor-fill",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "grid": "grid",
+          "hex": "hex"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "floor": "floor",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ],
+      "fill-b": [
+       {
+        "gen": "tile.station-floor",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "floor-fill-b",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "grid": "grid",
+          "hex": "hex"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "floor": "floor",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ],
+      "fill-c": [
+       {
+        "gen": "tile.station-floor",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "floor-fill-c",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "grid": "grid",
+          "hex": "hex"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "floor": "floor",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ]
+     },
+     "decals": [
+      {
+       "name": "a",
+       "place": "on",
+       "label": "Grate",
+       "outline": false,
+       "draw": [
+        {
+         "gen": "tile.station-floor",
+         "v": 1,
+         "at": [
+          16,
+          16
+         ],
+         "picture": "floor-deco-a",
+         "style": {
+          "from": "style",
+          "pick": {
+           "panels": "panels",
+           "grid": "grid",
+           "hex": "hex"
+          }
+         },
+         "edge": {
+          "from": "edge",
+          "map": [
+           [
+            3,
+            3
+           ],
+           [
+            6,
+            6
+           ]
+          ]
+         },
+         "texture": {
+          "from": "texture",
+          "map": [
+           [
+            0,
+            0
+           ],
+           [
+            1,
+            1
+           ]
+          ]
+         },
+         "wear": {
+          "from": "wear",
+          "map": [
+           [
+            0,
+            0
+           ],
+           [
+            1,
+            1
+           ]
+          ]
+         },
+         "floor": "floor",
+         "plate": "plate",
+         "accent": "accent",
+         "lights": "glow"
+        }
+       ]
+      },
+      {
+       "name": "b",
+       "place": "on",
+       "label": "Vent fan",
+       "frames": 8,
+       "outline": false,
+       "draw": [
+        {
+         "gen": "tile.station-floor",
+         "v": 1,
+         "at": [
+          16,
+          16
+         ],
+         "picture": "floor-deco-b",
+         "style": {
+          "from": "style",
+          "pick": {
+           "panels": "panels",
+           "grid": "grid",
+           "hex": "hex"
+          }
+         },
+         "edge": {
+          "from": "edge",
+          "map": [
+           [
+            3,
+            3
+           ],
+           [
+            6,
+            6
+           ]
+          ]
+         },
+         "texture": {
+          "from": "texture",
+          "map": [
+           [
+            0,
+            0
+           ],
+           [
+            1,
+            1
+           ]
+          ]
+         },
+         "wear": {
+          "from": "wear",
+          "map": [
+           [
+            0,
+            0
+           ],
+           [
+            1,
+            1
+           ]
+          ]
+         },
+         "floor": "floor",
+         "plate": "plate",
+         "accent": "accent",
+         "lights": "glow"
+        }
+       ]
+      },
+      {
+       "name": "c",
+       "place": "on",
+       "label": "Hazard strip",
+       "outline": false,
+       "draw": [
+        {
+         "gen": "tile.station-floor",
+         "v": 1,
+         "at": [
+          16,
+          16
+         ],
+         "picture": "floor-deco-c",
+         "style": {
+          "from": "style",
+          "pick": {
+           "panels": "panels",
+           "grid": "grid",
+           "hex": "hex"
+          }
+         },
+         "edge": {
+          "from": "edge",
+          "map": [
+           [
+            3,
+            3
+           ],
+           [
+            6,
+            6
+           ]
+          ]
+         },
+         "texture": {
+          "from": "texture",
+          "map": [
+           [
+            0,
+            0
+           ],
+           [
+            1,
+            1
+           ]
+          ]
+         },
+         "wear": {
+          "from": "wear",
+          "map": [
+           [
+            0,
+            0
+           ],
+           [
+            1,
+            1
+           ]
+          ]
+         },
+         "floor": "floor",
+         "plate": "plate",
+         "accent": "accent",
+         "lights": "glow"
+        }
+       ]
+      },
+      {
+       "name": "d",
+       "place": "on",
+       "label": "Goo splat",
+       "outline": false,
+       "draw": [
+        {
+         "gen": "tile.station-floor",
+         "v": 1,
+         "at": [
+          16,
+          16
+         ],
+         "picture": "floor-deco-d",
+         "style": {
+          "from": "style",
+          "pick": {
+           "panels": "panels",
+           "grid": "grid",
+           "hex": "hex"
+          }
+         },
+         "edge": {
+          "from": "edge",
+          "map": [
+           [
+            3,
+            3
+           ],
+           [
+            6,
+            6
+           ]
+          ]
+         },
+         "texture": {
+          "from": "texture",
+          "map": [
+           [
+            0,
+            0
+           ],
+           [
+            1,
+            1
+           ]
+          ]
+         },
+         "wear": {
+          "from": "wear",
+          "map": [
+           [
+            0,
+            0
+           ],
+           [
+            1,
+            1
+           ]
+          ]
+         },
+         "floor": "floor",
+         "plate": "plate",
+         "accent": "accent",
+         "lights": "glow"
+        }
+       ]
+      },
+      {
+       "name": "e",
+       "place": "on",
+       "label": "Scorch mark",
+       "outline": false,
+       "draw": [
+        {
+         "gen": "tile.station-floor",
+         "v": 1,
+         "at": [
+          16,
+          16
+         ],
+         "picture": "floor-deco-e",
+         "style": {
+          "from": "style",
+          "pick": {
+           "panels": "panels",
+           "grid": "grid",
+           "hex": "hex"
+          }
+         },
+         "edge": {
+          "from": "edge",
+          "map": [
+           [
+            3,
+            3
+           ],
+           [
+            6,
+            6
+           ]
+          ]
+         },
+         "texture": {
+          "from": "texture",
+          "map": [
+           [
+            0,
+            0
+           ],
+           [
+            1,
+            1
+           ]
+          ]
+         },
+         "wear": {
+          "from": "wear",
+          "map": [
+           [
+            0,
+            0
+           ],
+           [
+            1,
+            1
+           ]
+          ]
+         },
+         "floor": "floor",
+         "plate": "plate",
+         "accent": "accent",
+         "lights": "glow"
+        }
+       ]
+      },
+      {
+       "name": "f",
+       "place": "on",
+       "label": "Floor light",
+       "frames": 8,
+       "outline": false,
+       "draw": [
+        {
+         "gen": "tile.station-floor",
+         "v": 1,
+         "at": [
+          16,
+          16
+         ],
+         "picture": "floor-deco-f",
+         "style": {
+          "from": "style",
+          "pick": {
+           "panels": "panels",
+           "grid": "grid",
+           "hex": "hex"
+          }
+         },
+         "edge": {
+          "from": "edge",
+          "map": [
+           [
+            3,
+            3
+           ],
+           [
+            6,
+            6
+           ]
+          ]
+         },
+         "texture": {
+          "from": "texture",
+          "map": [
+           [
+            0,
+            0
+           ],
+           [
+            1,
+            1
+           ]
+          ]
+         },
+         "wear": {
+          "from": "wear",
+          "map": [
+           [
+            0,
+            0
+           ],
+           [
+            1,
+            1
+           ]
+          ]
+         },
+         "floor": "floor",
+         "plate": "plate",
+         "accent": "accent",
+         "lights": "glow"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "plate",
+     "kind": "block",
+     "use": "ground",
+     "pieces": [
+      "block",
+      "narrow"
+     ],
+     "fills": 3,
+     "outline": false,
+     "pictures": {
+      "left": [
+       {
+        "gen": "tile.station-floor",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "plate-left",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "grid": "grid",
+          "hex": "hex"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "floor": "floor",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ],
+      "top": [
+       {
+        "gen": "tile.station-floor",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "plate-top",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "grid": "grid",
+          "hex": "hex"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "floor": "floor",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ],
+      "right": [
+       {
+        "gen": "tile.station-floor",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "plate-right",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "grid": "grid",
+          "hex": "hex"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "floor": "floor",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ],
+      "side-l": [
+       {
+        "gen": "tile.station-floor",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "plate-side-l",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "grid": "grid",
+          "hex": "hex"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "floor": "floor",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ],
+      "fill": [
+       {
+        "gen": "tile.station-floor",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "plate-fill",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "grid": "grid",
+          "hex": "hex"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "floor": "floor",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ],
+      "fill-b": [
+       {
+        "gen": "tile.station-floor",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "plate-fill-b",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "grid": "grid",
+          "hex": "hex"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "floor": "floor",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ],
+      "fill-c": [
+       {
+        "gen": "tile.station-floor",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "plate-fill-c",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "grid": "grid",
+          "hex": "hex"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "floor": "floor",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ],
+      "side-r": [
+       {
+        "gen": "tile.station-floor",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "plate-side-r",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "grid": "grid",
+          "hex": "hex"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "floor": "floor",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ],
+      "bottom-l": [
+       {
+        "gen": "tile.station-floor",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "plate-bottom-l",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "grid": "grid",
+          "hex": "hex"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "floor": "floor",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ],
+      "bottom": [
+       {
+        "gen": "tile.station-floor",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "plate-bottom",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "grid": "grid",
+          "hex": "hex"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "floor": "floor",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ],
+      "bottom-r": [
+       {
+        "gen": "tile.station-floor",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "plate-bottom-r",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "grid": "grid",
+          "hex": "hex"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "floor": "floor",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ],
+      "inner-tl": [
+       {
+        "gen": "tile.station-floor",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "plate-inner-tl",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "grid": "grid",
+          "hex": "hex"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "floor": "floor",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ],
+      "inner-tr": [
+       {
+        "gen": "tile.station-floor",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "plate-inner-tr",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "grid": "grid",
+          "hex": "hex"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "floor": "floor",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ],
+      "inner-bl": [
+       {
+        "gen": "tile.station-floor",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "plate-inner-bl",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "grid": "grid",
+          "hex": "hex"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "floor": "floor",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ],
+      "inner-br": [
+       {
+        "gen": "tile.station-floor",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "plate-inner-br",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "grid": "grid",
+          "hex": "hex"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "floor": "floor",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ],
+      "strip-l": [
+       {
+        "gen": "tile.station-floor",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "plate-strip-l",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "grid": "grid",
+          "hex": "hex"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "floor": "floor",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ],
+      "strip-m": [
+       {
+        "gen": "tile.station-floor",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "plate-strip-m",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "grid": "grid",
+          "hex": "hex"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "floor": "floor",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ],
+      "strip-r": [
+       {
+        "gen": "tile.station-floor",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "plate-strip-r",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "grid": "grid",
+          "hex": "hex"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "floor": "floor",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ],
+      "col-t": [
+       {
+        "gen": "tile.station-floor",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "plate-col-t",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "grid": "grid",
+          "hex": "hex"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "floor": "floor",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ],
+      "col-m": [
+       {
+        "gen": "tile.station-floor",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "plate-col-m",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "grid": "grid",
+          "hex": "hex"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "floor": "floor",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ],
+      "col-b": [
+       {
+        "gen": "tile.station-floor",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "plate-col-b",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "grid": "grid",
+          "hex": "hex"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "floor": "floor",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ],
+      "single": [
+       {
+        "gen": "tile.station-floor",
+        "v": 1,
+        "at": [
+         16,
+         16
+        ],
+        "picture": "plate-single",
+        "style": {
+         "from": "style",
+         "pick": {
+          "panels": "panels",
+          "grid": "grid",
+          "hex": "hex"
+         }
+        },
+        "edge": {
+         "from": "edge",
+         "map": [
+          [
+           3,
+           3
+          ],
+          [
+           6,
+           6
+          ]
+         ]
+        },
+        "texture": {
+         "from": "texture",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "wear": {
+         "from": "wear",
+         "map": [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        },
+        "floor": "floor",
+        "plate": "plate",
+        "accent": "accent",
+        "lights": "glow"
+       }
+      ]
+     }
+    }
+   ]
+  }
+ },
+ "clips": {
+  "floor-fill": {
+   "label": "Deck"
+  },
+  "floor-fill-b": {
+   "label": "Deck, version B"
+  },
+  "floor-fill-c": {
+   "label": "Deck, version C"
+  },
+  "plate-left": {
+   "label": "Plating: top left corner"
+  },
+  "plate-top": {
+   "label": "Plating: top"
+  },
+  "plate-right": {
+   "label": "Plating: top right corner"
+  },
+  "plate-side-l": {
+   "label": "Plating: left side"
+  },
+  "plate-fill": {
+   "label": "Plating: middle"
+  },
+  "plate-fill-b": {
+   "label": "Plating: middle, version B"
+  },
+  "plate-fill-c": {
+   "label": "Plating: middle, version C"
+  },
+  "plate-side-r": {
+   "label": "Plating: right side"
+  },
+  "plate-bottom-l": {
+   "label": "Plating: bottom left corner"
+  },
+  "plate-bottom": {
+   "label": "Plating: bottom"
+  },
+  "plate-bottom-r": {
+   "label": "Plating: bottom right corner"
+  },
+  "plate-inner-tl": {
+   "label": "Plating: inside corner, top left"
+  },
+  "plate-inner-tr": {
+   "label": "Plating: inside corner, top right"
+  },
+  "plate-inner-bl": {
+   "label": "Plating: inside corner, bottom left"
+  },
+  "plate-inner-br": {
+   "label": "Plating: inside corner, bottom right"
+  },
+  "plate-strip-l": {
+   "label": "Plating: strip, left end"
+  },
+  "plate-strip-m": {
+   "label": "Plating: strip, middle"
+  },
+  "plate-strip-r": {
+   "label": "Plating: strip, right end"
+  },
+  "plate-col-t": {
+   "label": "Plating: column, top"
+  },
+  "plate-col-m": {
+   "label": "Plating: column, middle"
+  },
+  "plate-col-b": {
+   "label": "Plating: column, bottom"
+  },
+  "plate-single": {
+   "label": "Plating: single tile"
+  },
+  "floor-deco-a": {
+   "label": "Grate"
+  },
+  "floor-deco-b": {
+   "label": "Vent fan"
+  },
+  "floor-deco-c": {
+   "label": "Hazard strip"
+  },
+  "floor-deco-d": {
+   "label": "Goo splat"
+  },
+  "floor-deco-e": {
+   "label": "Scorch mark"
+  },
+  "floor-deco-f": {
+   "label": "Floor light"
+  }
+ }
+}

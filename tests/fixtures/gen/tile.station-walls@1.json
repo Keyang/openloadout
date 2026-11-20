@@ -1,0 +1,372 @@
+{
+ "id": "tile.station-walls",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "picture": "wall-left",
+    "hull": "hull",
+    "plate": "plate",
+    "accent": "accent",
+    "lights": "glow"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      0,
+      0
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "acccccccccccccccccccccccccccccde",
+      "accccccccccccccccccccccccccccfde",
+      "accbffffffffffffffffffffffffffde",
+      "accbffffffffffffffffffffffffffde",
+      "accbffffffffffffffffffffffffffde",
+      "accbffffffffffffffffffffffffffde",
+      "accbffffffffffffffffffffffffffde",
+      "accbffffffffffffffffffffffffffde",
+      "accbffffffffffffffffffffffffffde",
+      "accbffffffffffffffffffffffffffde",
+      "accbffffffffffffffffffffffffffde",
+      "accbffffffffffffffffffffffffffde",
+      "accbffffffffffffffffffffffffffde",
+      "accbffffffffffffffffffffffffffde",
+      "accbffffffffffffffffffffffffffde",
+      "accbffffffffffffffffffffffffffde",
+      "accbffffffffffffffffffffffffffde",
+      "accbffffffffffffffffffffffffffde",
+      "accbffffffffffffffffffffffffffde",
+      "accbffffffffffffffffffffffffffde",
+      "accbffffffffffffffffffffffffffde",
+      "accbffffffffffffffffffffffffffde",
+      "accbffffffffffffffffffffffffffde",
+      "accbffffffffffffffffffffffffffde",
+      "accbffffffffffffffffffffffffffde",
+      "accbffffffffffffffffffffffffffde",
+      "accbffffffffffffffffffffffffffde",
+      "acbfffffffffffffffffffffffffffde",
+      "acffffffffffffffffffffffffffffde",
+      "acffffffffffffffffffffffffffffde"
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "textureLight",
+       "of": "hull"
+      },
+      "c": "hull",
+      "d": {
+       "rule": "textureLight",
+       "of": {
+        "rule": "shadeApart",
+        "of": "plate",
+        "under": "hull",
+        "drop": 0.2,
+        "self": 0.08,
+        "floor": 0.2
+       },
+       "from": 0.4
+      },
+      "e": {
+       "rule": "textureTone",
+       "of": {
+        "rule": "shadeApart",
+        "of": "plate",
+        "under": "hull",
+        "drop": 0.2,
+        "self": 0.08,
+        "floor": 0.2
+       }
+      },
+      "f": {
+       "rule": "shadeApart",
+       "of": "plate",
+       "under": "hull",
+       "drop": 0.2,
+       "self": 0.08,
+       "floor": 0.2
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     10,
+     20
+    ],
+    "picture": "wall-strip-l",
+    "hull": "hull",
+    "plate": "plate",
+    "accent": "accent",
+    "lights": "glow",
+    "style": "plated",
+    "edge": 6,
+    "texture": 1,
+    "wear": 1
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": true,
+    "frames": 1,
+    "frame": 0
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      -6,
+      4
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "acccccccccccccccccccccccccccccde",
+      "accccccccccccccccccccccccccccfde",
+      "acccccccccccccccccccccccccccffde",
+      "accccccccccccccccccccccccccfffde",
+      "accccbffffffffdeffffffffffffffde",
+      "accccbffffffffdeffffffffffffffde",
+      "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "aggggggggggggggggggggggggggggggg",
+      "agffffffffffffgggghhhhhhhhhhhhgg",
+      "aggggggggggggggggggggggggggggggg",
+      "acccccccigcccccccccigcccccccccig",
+      "aibcccccigcibccccccigcibccccibig",
+      "agicccccigcgiccccccigcgiccccgiig",
+      "acccccccigcccccccccigcccccccccig",
+      "accccccciggggggggggggcccccccccig",
+      "acccccccigiiiiiiiiiigcccccccccig",
+      "aibcccibigcccccccibigcccccccibig",
+      "agicccgiigcccccccgiigcccccccgiig",
+      "acccccgbigcccccccccigcgbccccccig",
+      "abbbbbgibbbbbbbbbbbbbbgibbbbbbbb",
+      "aiiiiigiiiiiiiiiiiiiiigiiiiiiiii",
+      "aggggggigggggggggggggggigggggggg",
+      "ajjjjjggjjjjjjjjjjjjjjggjjjjjjjj",
+      "ajjjjjjgjjjjjjjjjjjjjjjgjjgjjjjj",
+      "ajjgjjjgjjjjggjjjjjjjjjgjgggjjjj",
+      "ajjgjjjgjjjjggjjjjjjjjjjjgggjjjj",
+      "aggggjjjgjjggggjjjjggjjjggggggjj",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+      "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk"
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "textureLight",
+       "of": "hull"
+      },
+      "c": "hull",
+      "d": {
+       "rule": "textureLight",
+       "of": {
+        "rule": "shadeApart",
+        "of": "plate",
+        "under": "hull",
+        "drop": 0.2,
+        "self": 0.08,
+        "floor": 0.2
+       },
+       "from": 0.4
+      },
+      "e": {
+       "rule": "textureTone",
+       "of": {
+        "rule": "shadeApart",
+        "of": "plate",
+        "under": "hull",
+        "drop": 0.2,
+        "self": 0.08,
+        "floor": 0.2
+       }
+      },
+      "f": {
+       "rule": "shadeApart",
+       "of": "plate",
+       "under": "hull",
+       "drop": 0.2,
+       "self": 0.08,
+       "floor": 0.2
+      },
+      "g": {
+       "rule": "textureTone",
+       "of": "hull"
+      },
+      "h": "glow",
+      "i": {
+       "rule": "textureLight",
+       "of": "hull",
+       "from": 0.4
+      },
+      "j": {
+       "rule": "mix",
+       "of": "hull",
+       "with": {
+        "rule": "textureTone",
+        "of": "hull"
+       },
+       "amount": 0.5
+      },
+      "k": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#566182",
+        "with": "#566182",
+        "amount": 0
+       },
+       "tone": "dark"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "picture": "doorway-r",
+    "hull": "hull",
+    "plate": "plate",
+    "accent": "accent",
+    "lights": "glow",
+    "style": "panels",
+    "edge": 6,
+    "texture": 1,
+    "wear": 1
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true,
+    "frames": 1,
+    "frame": 0
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      0,
+      0
+     ],
+     "anchor": "tl",
+     "rows": [
+      "........................aaaaaaaa",
+      "........................abbbbbbb",
+      "........................accccccc",
+      "........................accccccc",
+      "........................accccccc",
+      "........................accccccc",
+      "........................accccbdd",
+      "........................accccbdd",
+      "........................abbbbbbb",
+      "........................aeeeeeee",
+      "........................aedddddd",
+      "........................aeeeeeee",
+      "........................afffdddc",
+      "........................adfffddc",
+      "........................addfffdc",
+      "........................adddfffc",
+      "........................afdddffc",
+      "........................affdddfc",
+      "........................afffdddc",
+      "........................adfffddc",
+      "........................addfffdb",
+      "ggggggggggggggggggggggggabbbbbeh",
+      "ddddddddddddddddddddddddahhhhheh",
+      "ddddddddddddddddddddddddaeeeeeeh",
+      "ddddddddddddddddddddddddaiiiiiee",
+      "ggggggggggggggggggggggggaiiiiiie",
+      "jjjjjjjjjjjjjjjjjjjjjjjjaiieiiie",
+      "ddddddddddddddddddddddddaiieiiie",
+      "ddddddddddddddddddddddddaeeeeiii",
+      "ggggggggggggggggggggggggaaaaaaaa",
+      "........................kkkkkkkk",
+      "........................kkkkkkkk"
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "textureLight",
+       "of": "hull"
+      },
+      "c": "hull",
+      "d": {
+       "rule": "shadeApart",
+       "of": "plate",
+       "under": "hull",
+       "drop": 0.2,
+       "self": 0.08,
+       "floor": 0.2
+      },
+      "e": {
+       "rule": "textureTone",
+       "of": "hull"
+      },
+      "f": "accent",
+      "g": {
+       "rule": "textureTone",
+       "of": {
+        "rule": "shadeApart",
+        "of": "plate",
+        "under": "hull",
+        "drop": 0.2,
+        "self": 0.08,
+        "floor": 0.2
+       }
+      },
+      "h": {
+       "rule": "textureLight",
+       "of": "hull",
+       "from": 0.4
+      },
+      "i": {
+       "rule": "mix",
+       "of": "hull",
+       "with": {
+        "rule": "textureTone",
+        "of": "hull"
+       },
+       "amount": 0.5
+      },
+      "j": {
+       "rule": "textureLight",
+       "of": {
+        "rule": "shadeApart",
+        "of": "plate",
+        "under": "hull",
+        "drop": 0.2,
+        "self": 0.08,
+        "floor": 0.2
+       },
+       "from": 0.4
+      },
+      "k": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#566182",
+        "with": "#566182",
+        "amount": 0
+       },
+       "tone": "dark"
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,3024 @@
+{
+ "id": "building.inn",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     64,
+     92
+    ],
+    "signColour": "signColour",
+    "wall": "wall",
+    "roofColour": "roofColour",
+    "wood": "wood",
+    "glowColour": "glow"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      16,
+      14
+     ],
+     "anchor": "tl",
+     "rows": [
+      "................................",
+      "................................",
+      "................................",
+      "....aa..aa..aa..aa..aa..aa..aa..",
+      "...abcaabcaabcaabcaabcaabcaabcaa",
+      "..abdccddccddccddccddccddccddccd",
+      "..abccddccddccddccddccddccddccdd",
+      "..abdddddddddddddddddddddddddddd",
+      "..abddbbddbbddbbddbbddbbddbbddbb",
+      ".abdbbddbbddbbddbbddbbddbbddbbdd",
+      ".abddddddddddddddddddddddddddddd",
+      ".abcddccddccddccddccddccddccddcc",
+      ".abddddddddddddddddddddddddddddd",
+      ".abdbbddbbddbbddbbddbbddbbddbbdd",
+      ".abbddbbddbbddbbddbbddbbddbbddbb",
+      ".abddddddddddddddddddddddddddddd",
+      "abddccddccddccddccddccddccddccdd",
+      "abdddddddddddddddddddddddddddddd",
+      "abbbddbbddbbddbbddbbddbbddbbddbb",
+      "abddbbddbbddbbddbbddbbddbbddbbdd",
+      "abdddddddddddddddddddddddddddddd",
+      "abccddccddccddccddccddccddccddcc",
+      "abdddddddddddddddddddddddddddddd",
+      "abddbbddbbddbbddbbddbbddbbddbbdd",
+      "abbbdbbbdbbbdbbbdbbbdbbbdbbbdbbb",
+      ".abbaabbaabbaabbaabbaabbaabbaabb",
+      "..aaefaaggaaggaaggaaggaaggaaggaa",
+      "...aeffhhhhhhhhhhhhhhhhhhhhhhhhh",
+      "...aeffhhhhhhhhhhhheffffffffffhh",
+      "...aeffhhhhhhhhhhhheffffffffffhh",
+      "...aeffhhhhhhhhhhhhefiiijiiiffhh",
+      "...aeffhhhhhhhhhhhhefikkjlkkffhh"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "roofColour.dark",
+      "c": "roofColour.light",
+      "d": "roofColour",
+      "e": "wood.dark",
+      "f": "wood",
+      "g": "wall.dark",
+      "h": "wall",
+      "i": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": {
+         "rule": "mix",
+         "of": "#5a5f7a",
+         "with": "#5a5f7a",
+         "amount": 0
+        },
+        "by": -0.5
+       },
+       "tone": "dark"
+      },
+      "j": "wood.light",
+      "k": {
+       "rule": "tone",
+       "of": {
+        "rule": "mix",
+        "of": "#5a5f7a",
+        "with": "#5a5f7a",
+        "amount": 0
+       },
+       "by": -0.5
+      },
+      "l": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": {
+         "rule": "mix",
+         "of": "#5a5f7a",
+         "with": "#5a5f7a",
+         "amount": 0
+        },
+        "by": -0.5
+       },
+       "tone": "light"
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      48,
+      14
+     ],
+     "anchor": "tl",
+     "rows": [
+      "................................",
+      "................................",
+      "................................",
+      "aa..aa..aa..aa..aa..aa..aa..aa..",
+      "bcaabcaabcaabcaabcaabcaabcaabcaa",
+      "dccddccddccddccddccddccddccddccd",
+      "ccddccddccddccddccddccddccddccdd",
+      "dddddddddddddddddddddddddddddddd",
+      "ddbbddbbddbbddbbddbbddbbddbbddbb",
+      "bbddbbddbbddbbddbbddbbddbbddbbdd",
+      "dddddddddddddddddddddddddddddddd",
+      "ddccddccddccddccddccddccddccddcc",
+      "dddddddddddddddddddddddddddddddd",
+      "bbddbbddbbddbbddbbddbbddbbddbbdd",
+      "ddbbddbbddbbddbbddbbddbbddbbddbb",
+      "dddddddddddddddddddddddddddddddd",
+      "ccddccddccddccddccddccddccddccdd",
+      "dddddddddddddddddddddddddddddddd",
+      "ddbbddbbddbbddbbddbbddbbddbbddbb",
+      "bbddbbddbbddbbddbbddbbddbbddbbdd",
+      "dddddddddddddddddddddddddddddddd",
+      "ddccddccddccddccddccddccddccddcc",
+      "dddddddddddddddddddddddddddddddd",
+      "bbddbbddbbddbbddbbddbbddbbddbbdd",
+      "dbbbdbbbdbbbdbbbdbbbdbbbdbbbdbbb",
+      "aabbaabbaabbaabbaabbaabbaabbaabb",
+      "eeaaffaaeeaaeeaaeeaaeeaaeeaaffaa",
+      "ggehffggggggggggggggggggggehffgg",
+      "ggehffggggghffffffffffggggehffgg",
+      "ggehffggggghffffffffffggggehffgg",
+      "ggehffggggghfiiijiiiffggggehffgg",
+      "ggehffggggghfikkjlkkffggggehffgg"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "roofColour.dark",
+      "c": "roofColour.light",
+      "d": "roofColour",
+      "e": "wall.dark",
+      "f": "wood",
+      "g": "wall",
+      "h": "wood.dark",
+      "i": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": {
+         "rule": "mix",
+         "of": "#5a5f7a",
+         "with": "#5a5f7a",
+         "amount": 0
+        },
+        "by": -0.5
+       },
+       "tone": "dark"
+      },
+      "j": "wood.light",
+      "k": {
+       "rule": "tone",
+       "of": {
+        "rule": "mix",
+        "of": "#5a5f7a",
+        "with": "#5a5f7a",
+        "amount": 0
+       },
+       "by": -0.5
+      },
+      "l": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": {
+         "rule": "mix",
+         "of": "#5a5f7a",
+         "with": "#5a5f7a",
+         "amount": 0
+        },
+        "by": -0.5
+       },
+       "tone": "light"
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      80,
+      14
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".......aaaaaaaaaa...............",
+      "......abbbbbbbbbba..............",
+      "......acddddddddda..............",
+      "aa..aa.acccccccbaa..aa..aa..a...",
+      "efaaefaacdcddddbafaaefaaefaaea..",
+      "gffggffacdcddddbaffggffggffgfa..",
+      "ffggffgacccccccbafggffggffggfa..",
+      "gggggggacddddcdbagggggggggggfa..",
+      "ggeeggeacddddcdbageeggeeggeefa..",
+      "eeggeegacddddcdbaeggeeggeeggffa.",
+      "gggggggacccccccbaggggggggggggfa.",
+      "ggffggfacdcddddbagffggffggffgfa.",
+      "gggggggacdcddddbaggggggggggggfa.",
+      "eeggeegacdcddddbaeggeeggeeggefa.",
+      "ggeeggeeaaaaaaaaggeeggeeggeegfa.",
+      "gggggggggggggggggggggggggggggfa.",
+      "ffggffggffggffggffggffggffggfffa",
+      "ggggggggggggggggggggggggggggggfa",
+      "ggeeggeeggeeggeeggeeggeeggeeggfa",
+      "eeggeeggeeggeeggeeggeeggeeggeefa",
+      "ggggggggggggggggggggggggggggggfa",
+      "ggffggffggffggffggffggffggffggfa",
+      "ggggggggggggggggggggggggggggggfa",
+      "eeggeeggeeggeeggeeggeeggeeggeefa",
+      "geeegeeegeeegeeegeeegeeegeeegeea",
+      "aaeeaaeeaaeeaaeeaaeeaaeeaaeeaaea",
+      "hhaahhaahhaahhaahhaahhaahiaaa.a.",
+      "jjjjjjjjjjjjjjjjjjjjjjjjhikka...",
+      "jjikkkkkkkkkkjjjjjjjjjjjhikka...",
+      "jjikkkkkkkkkkjjjjjjjjjjjhikka...",
+      "jjiklllmlllkkjjjjjjjjjjjhikka...",
+      "jjiklnnmonnkkjjjjjjjjjjjhikka..."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#a8a4a0",
+        "with": "#a8a4a0",
+        "amount": 0
+       },
+       "tone": "light"
+      },
+      "c": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#a8a4a0",
+        "with": "#a8a4a0",
+        "amount": 0
+       },
+       "tone": "dark"
+      },
+      "d": {
+       "rule": "mix",
+       "of": "#a8a4a0",
+       "with": "#a8a4a0",
+       "amount": 0
+      },
+      "e": "roofColour.dark",
+      "f": "roofColour.light",
+      "g": "roofColour",
+      "h": "wall.dark",
+      "i": "wood.dark",
+      "j": "wall",
+      "k": "wood",
+      "l": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": {
+         "rule": "mix",
+         "of": "#5a5f7a",
+         "with": "#5a5f7a",
+         "amount": 0
+        },
+        "by": -0.5
+       },
+       "tone": "dark"
+      },
+      "m": "wood.light",
+      "n": {
+       "rule": "tone",
+       "of": {
+        "rule": "mix",
+        "of": "#5a5f7a",
+        "with": "#5a5f7a",
+        "amount": 0
+       },
+       "by": -0.5
+      },
+      "o": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": {
+         "rule": "mix",
+         "of": "#5a5f7a",
+         "with": "#5a5f7a",
+         "amount": 0
+        },
+        "by": -0.5
+       },
+       "tone": "light"
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      16,
+      46
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...abccddddddddddddbcefghfffccdd",
+      "...abccddddddddddddbchhhhhhhccdd",
+      "...abccddddddddddddbceffhfffccdd",
+      "...abccddddddddddddbceffhfffccdd",
+      "...abccddddddddddddbceffhfffccdd",
+      "...abccddddddddddddbccccccccccdd",
+      "...abccddddddddddddbbbbbbbbbbbdd",
+      "...abccddddddddddddddddddddddddd",
+      "...abccddddddddddddddddddddddddd",
+      "...abcchhhhhhhhhhhhhhhhhhhhhhhhh",
+      "...abccccccccccccccccccccccccccc",
+      "...abccbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "....abcciiiiiiiiiiiiiiiiiiiiiiii",
+      "....abcciiiiiiiiiiiiiiiiiiiiiiii",
+      "....abccdddddddddddddddddddddddd",
+      "....abccdddddddddddddddddddddddd",
+      "....abccdddddddddddddddddddddddd",
+      "....abccdddddddddddddddddddddddd",
+      "....abccddddddbccccccccccccccddd",
+      "....abccddddddbccccccccccccccddd",
+      "....abccddddddbceeeeeheeeeeccddd",
+      "....abccddddddbceffffhfggffccddd",
+      "....abccddddddbceffffhggfffccddd",
+      "....abccddddddbceffffhgffffccddd",
+      "....abccddddddbchhhhhhhhhhhccddd",
+      "....abccddddddbceffffhfffffccddd",
+      "....abccddddddbceffffhfffffccddd",
+      "....abccddddddbceffffhfffffccddd",
+      "....abccddddddbceffffhfffffccddd",
+      "....abccddddddbccccccccccccccddd",
+      "....abccddddddbbbbbbbbbbbbbbbddd",
+      "....abccdddddhhhhhhhhhhhhhhhhhdd"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "wood.dark",
+      "c": "wood",
+      "d": "wall",
+      "e": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": {
+         "rule": "mix",
+         "of": "#5a5f7a",
+         "with": "#5a5f7a",
+         "amount": 0
+        },
+        "by": -0.5
+       },
+       "tone": "dark"
+      },
+      "f": {
+       "rule": "tone",
+       "of": {
+        "rule": "mix",
+        "of": "#5a5f7a",
+        "with": "#5a5f7a",
+        "amount": 0
+       },
+       "by": -0.5
+      },
+      "g": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": {
+         "rule": "mix",
+         "of": "#5a5f7a",
+         "with": "#5a5f7a",
+         "amount": 0
+        },
+        "by": -0.5
+       },
+       "tone": "light"
+      },
+      "h": "wood.light",
+      "i": "wall.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      48,
+      46
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aabcddaaaaacdefghfffddaaaabcddaa",
+      "aabcddaaaaacdhhhhhhhddaaaabcddaa",
+      "aabcddaaaaacdeffhfffddaaaabcddaa",
+      "aabcddaaaaacdeffhfffddaaaabcddaa",
+      "aabcddaaaaacdeffhfffddaaaabcddaa",
+      "aabcddaaaaacddddddddddaaaabcddaa",
+      "aabcddaaaaacccccccccccaaaabcddaa",
+      "aabcddaaaaaaaaaaaaaaaaaaaabcddaa",
+      "aabcddaaaaaaaaaaaaaaaaaaaabcddaa",
+      "hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh",
+      "dddddddddddddddddddddddddddddddd",
+      "cccccccccccccccccccccccccccccccc",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "aaaachhhhhhhhhhhhhhhhhhhhhhhaaaa",
+      "aaaacdddddddddddddddddddddddaaaa",
+      "aaaacdccccccccccccccccccccddaaaa",
+      "aaaacdddddcddddcdddddcdddcddaaaa",
+      "aaaacdddddcddddcdddddcdddcddaaaa",
+      "aaaacdddddcddddcdddddcdddcddaaaa",
+      "aaaacdddddcddddcdddddcdddcddaaaa",
+      "aaaacdddddcddddcdddddcdddcddaaaa",
+      "aaaacdccccccccccccccccccccddaaaa",
+      "aaaacdccccccccccccccccccccddaaaa",
+      "aaaacdddddcddddcdddddcdddcddaaaa",
+      "aaaacdddddcddddcdddddcdddcddaaaa",
+      "aaaacdddddcddddcdddddcdddcddaaaa",
+      "aaaacdddddcddddcdddddcdddcddaaaa",
+      "aaaacdddddcddddcdddddcdddcddaaaa",
+      "aaaacdddddcddddcdddddcdddcddaaaa",
+      "aaaacdddddcdiidcddiidcdddcddaaaa",
+      "aaaacdddddcdiidcddiidcdddcddaaaa"
+     ],
+     "key": {
+      "a": "wall",
+      "b": "wall.dark",
+      "c": "wood.dark",
+      "d": "wood",
+      "e": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": {
+         "rule": "mix",
+         "of": "#5a5f7a",
+         "with": "#5a5f7a",
+         "amount": 0
+        },
+        "by": -0.5
+       },
+       "tone": "dark"
+      },
+      "f": {
+       "rule": "tone",
+       "of": {
+        "rule": "mix",
+        "of": "#5a5f7a",
+        "with": "#5a5f7a",
+        "amount": 0
+       },
+       "by": -0.5
+      },
+      "g": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": {
+         "rule": "mix",
+         "of": "#5a5f7a",
+         "with": "#5a5f7a",
+         "amount": 0
+        },
+        "by": -0.5
+       },
+       "tone": "light"
+      },
+      "h": "wood.light",
+      "i": {
+       "rule": "mix",
+       "of": "#f2c230",
+       "with": "#f2c230",
+       "amount": 0
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      80,
+      46
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aabcdefgeeeccaaaaaaaaaaahbcci...",
+      "aabcgggggggccaaaaaaaaaaahbcci...",
+      "aabcdeegeeeccaaaaaaaaaaahbcci...",
+      "aabcdeegeeeccaaaaaaaaaaahbcci...",
+      "aabcdeegeeeccaaaaaaaaaaahbcci...",
+      "aabccccccccccaaaaaaaaaaahbcci...",
+      "aabbbbbbbbbbbaaaaaaaaaaahbcci...",
+      "aaaaaaaaaaaaaaaaaaaaaaaahbcci...",
+      "aaaaaaaaaaaaaaaaaaaaaaaahbcci...",
+      "gggggggggggggggggggggggggbcci...",
+      "cccccccccccccccccccccccccbcci...",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbcci...",
+      "hhhhhhhhhhhhhhhhhhhhhhhhbcci....",
+      "hhhhhhhhhhhhhhhhhhhhhhhhbcci....",
+      "aaaiaaaaaaaaaaaaaaaaaaahbcci....",
+      "aaijiiiiiiiiiiiiaaaaaaahbcci....",
+      "aaijjjjjjjjjjjjjiaaaaaahbcci....",
+      "aaijijjiiiiiijijiaaaaaahbcci....",
+      "aaijijiiiiiiijiiaaaaaaahbcci....",
+      "aaijgggggggggggiaaaaaaahbcci....",
+      "aaaickkkkkkkkkciaaaaaaahbcci....",
+      "aaaicklllllkkkciaaaaaaahbcci....",
+      "aaaicklllllkkkciaaaaaaahbcci....",
+      "aaaickkllllllkciaaaaaaahbcci....",
+      "aaaickkllllklkciaaaaaaahbcci....",
+      "aaaickkllllklkciaaaaaaahbcci....",
+      "aaaickkllllllkciaaaaaaahbcci....",
+      "aaaickkllllkkkciaaaaaaahbcci....",
+      "aaaibbbbbbbbbbbiaaaaaaahbcci....",
+      "aaaaiiiiiiiiiiiaaaaaaaahbcci....",
+      "aaaaaaaaaaaaaaaaaaaaaaahbcci....",
+      "aaaaaaaaaaaaaaaaaaaaaaahbcci...."
+     ],
+     "key": {
+      "a": "wall",
+      "b": "wood.dark",
+      "c": "wood",
+      "d": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": {
+         "rule": "mix",
+         "of": "#5a5f7a",
+         "with": "#5a5f7a",
+         "amount": 0
+        },
+        "by": -0.5
+       },
+       "tone": "dark"
+      },
+      "e": {
+       "rule": "tone",
+       "of": {
+        "rule": "mix",
+        "of": "#5a5f7a",
+        "with": "#5a5f7a",
+        "amount": 0
+       },
+       "by": -0.5
+      },
+      "f": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": {
+         "rule": "mix",
+         "of": "#5a5f7a",
+         "with": "#5a5f7a",
+         "amount": 0
+        },
+        "by": -0.5
+       },
+       "tone": "light"
+      },
+      "g": "wood.light",
+      "h": "wall.dark",
+      "i": "ink",
+      "j": {
+       "rule": "mix",
+       "of": "#5a5f7a",
+       "with": "#5a5f7a",
+       "amount": 0
+      },
+      "k": "signColour",
+      "l": {
+       "rule": "standOut",
+       "against": "signColour",
+       "from": [
+        {
+         "rule": "mix",
+         "of": "#f0ead8",
+         "with": "#f0ead8",
+         "amount": 0
+        },
+        "ink"
+       ]
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      16,
+      78
+     ],
+     "anchor": "tl",
+     "rows": [
+      "....abccdddddddddddddddddddddddd",
+      "....abccdddddddddddddddddddddddd",
+      "....abcceeeeeeeeeeeeeeeeeeeeeeee",
+      "....abcccccccccccccccccccccccccc",
+      "....abccbbbbbbbbbbbbbbbbbbbbbbbb",
+      "....abccffffffffffffffffffffffff",
+      "....abccdddddddddddddddddddddddd",
+      "....abccdddddddddddddddddddddddd",
+      "....abccdddddddddddddddddddddddd",
+      "....abccdddddddddddddddddddddddd",
+      "....abccdddddddddddddddddddddddd",
+      "....abcceeeeeeeeeeeeeeeeeeeeeeee",
+      "....abcccccccccccccccccccccccccc",
+      "....abccbbbbbbbbbbbbbbbbbbbbbbbb"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "wood.dark",
+      "c": "wood",
+      "d": "wall",
+      "e": "wood.light",
+      "f": "wall.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      48,
+      78
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaabcccccbccccbcccccbcccbccaaaa",
+      "aaaabcccccbccccbcccccbcccbccaaaa",
+      "ddddbcccccbccccbcccccbcccbccdddd",
+      "ccccbcccccbccccbcccccbcccbcccccc",
+      "bbbbbcbbbbbbbbbbbbbbbbbbbbccbbbb",
+      "eeeebcbbbbbbbbbbbbbbbbbbbbcceeee",
+      "aaaabcccccbccccbcccccbcccbccaaaa",
+      "aaaabcccccbccccbcccccbcccbccaaaa",
+      "aaaabcccccbccccbcccccbcccbccaaaa",
+      "aaaabcccccbccccbcccccbcccbccaaaa",
+      "aaaabcccccbccccbcccccbcccbccaaaa",
+      "ddddbcccccbccccbcccccbcccbccdddd",
+      "ccffffffffffffffffffffffffffffcc",
+      "bbggggggggggggggggggggggggggggbb"
+     ],
+     "key": {
+      "a": "wall",
+      "b": "wood.dark",
+      "c": "wood",
+      "d": "wood.light",
+      "e": "wall.dark",
+      "f": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#a8a4a0",
+        "with": "#a8a4a0",
+        "amount": 0
+       },
+       "tone": "light"
+      },
+      "g": {
+       "rule": "mix",
+       "of": "#a8a4a0",
+       "with": "#a8a4a0",
+       "amount": 0
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      80,
+      78
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaaaaaaaaaaaaaaaaaabcdde....",
+      "aaaaaaaaaaaaaaaaaaaaaaabcdde....",
+      "ffffffffffffffffffffffffcdde....",
+      "ddddddddddddddddddddddddcdde....",
+      "cccccccccccccccccccccccccdde....",
+      "bbbbbbbbbbbbbbbbbbbbbbbbcdde....",
+      "aaaaaaaaaaaaaaaaaaaaaaabcdde....",
+      "aaaaaaaaaaaaaaaaaaaaaaabcdde....",
+      "aaaaaaaaaaaaaaaaaaaaaaabcdde....",
+      "aaaaaaaaaaaaaaaaaaaaaaabcdde....",
+      "aaaaaaaaaaaaaaaaaaaaaaabcdde....",
+      "ffffffffffffffffffffffffcdde....",
+      "ddddddddddddddddddddddddcdde....",
+      "cccccccccccccccccccccccccdde...."
+     ],
+     "key": {
+      "a": "wall",
+      "b": "wall.dark",
+      "c": "wood.dark",
+      "d": "wood",
+      "e": "ink",
+      "f": "wood.light"
+     }
+    },
+    {
+     "kind": "rect",
+     "at": [
+      21,
+      92
+     ],
+     "size": [
+      86,
+      1
+     ],
+     "paint": "ink",
+     "shade": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     64,
+     92
+    ],
+    "signColour": "signColour",
+    "wall": "wall",
+    "roofColour": "roofColour",
+    "wood": "wood",
+    "glowColour": "glow",
+    "picture": "open"
+   },
+   "ctx": {
+    "t": 0.4,
+    "loop": false,
+    "frames": 6,
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      16,
+      14
+     ],
+     "anchor": "tl",
+     "rows": [
+      "................................",
+      "................................",
+      "................................",
+      "....aa..aa..aa..aa..aa..aa..aa..",
+      "...abcaabcaabcaabcaabcaabcaabcaa",
+      "..abdccddccddccddccddccddccddccd",
+      "..abccddccddccddccddccddccddccdd",
+      "..abdddddddddddddddddddddddddddd",
+      "..abddbbddbbddbbddbbddbbddbbddbb",
+      ".abdbbddbbddbbddbbddbbddbbddbbdd",
+      ".abddddddddddddddddddddddddddddd",
+      ".abcddccddccddccddccddccddccddcc",
+      ".abddddddddddddddddddddddddddddd",
+      ".abdbbddbbddbbddbbddbbddbbddbbdd",
+      ".abbddbbddbbddbbddbbddbbddbbddbb",
+      ".abddddddddddddddddddddddddddddd",
+      "abddccddccddccddccddccddccddccdd",
+      "abdddddddddddddddddddddddddddddd",
+      "abbbddbbddbbddbbddbbddbbddbbddbb",
+      "abddbbddbbddbbddbbddbbddbbddbbdd",
+      "abdddddddddddddddddddddddddddddd",
+      "abccddccddccddccddccddccddccddcc",
+      "abdddddddddddddddddddddddddddddd",
+      "abddbbddbbddbbddbbddbbddbbddbbdd",
+      "abbbdbbbdbbbdbbbdbbbdbbbdbbbdbbb",
+      ".abbaabbaabbaabbaabbaabbaabbaabb",
+      "..aaefaaggaaggaaggaaggaaggaaggaa",
+      "...aeffhhhhhhhhhhhhhhhhhhhhhhhhh",
+      "...aeffhhhhhhhhhhhheffffffffffhh",
+      "...aeffhhhhhhhhhhhheffffffffffhh",
+      "...aeffhhhhhhhhhhhhefiiijiiiffhh",
+      "...aeffhhhhhhhhhhhhefikkjlkkffhh"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "roofColour.dark",
+      "c": "roofColour.light",
+      "d": "roofColour",
+      "e": "wood.dark",
+      "f": "wood",
+      "g": "wall.dark",
+      "h": "wall",
+      "i": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": {
+         "rule": "mix",
+         "of": "#5a5f7a",
+         "with": "#5a5f7a",
+         "amount": 0
+        },
+        "by": -0.5
+       },
+       "tone": "dark"
+      },
+      "j": "wood.light",
+      "k": {
+       "rule": "tone",
+       "of": {
+        "rule": "mix",
+        "of": "#5a5f7a",
+        "with": "#5a5f7a",
+        "amount": 0
+       },
+       "by": -0.5
+      },
+      "l": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": {
+         "rule": "mix",
+         "of": "#5a5f7a",
+         "with": "#5a5f7a",
+         "amount": 0
+        },
+        "by": -0.5
+       },
+       "tone": "light"
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      48,
+      14
+     ],
+     "anchor": "tl",
+     "rows": [
+      "................................",
+      "................................",
+      "................................",
+      "aa..aa..aa..aa..aa..aa..aa..aa..",
+      "bcaabcaabcaabcaabcaabcaabcaabcaa",
+      "dccddccddccddccddccddccddccddccd",
+      "ccddccddccddccddccddccddccddccdd",
+      "dddddddddddddddddddddddddddddddd",
+      "ddbbddbbddbbddbbddbbddbbddbbddbb",
+      "bbddbbddbbddbbddbbddbbddbbddbbdd",
+      "dddddddddddddddddddddddddddddddd",
+      "ddccddccddccddccddccddccddccddcc",
+      "dddddddddddddddddddddddddddddddd",
+      "bbddbbddbbddbbddbbddbbddbbddbbdd",
+      "ddbbddbbddbbddbbddbbddbbddbbddbb",
+      "dddddddddddddddddddddddddddddddd",
+      "ccddccddccddccddccddccddccddccdd",
+      "dddddddddddddddddddddddddddddddd",
+      "ddbbddbbddbbddbbddbbddbbddbbddbb",
+      "bbddbbddbbddbbddbbddbbddbbddbbdd",
+      "dddddddddddddddddddddddddddddddd",
+      "ddccddccddccddccddccddccddccddcc",
+      "dddddddddddddddddddddddddddddddd",
+      "bbddbbddbbddbbddbbddbbddbbddbbdd",
+      "dbbbdbbbdbbbdbbbdbbbdbbbdbbbdbbb",
+      "aabbaabbaabbaabbaabbaabbaabbaabb",
+      "eeaaffaaeeaaeeaaeeaaeeaaeeaaffaa",
+      "ggehffggggggggggggggggggggehffgg",
+      "ggehffggggghffffffffffggggehffgg",
+      "ggehffggggghffffffffffggggehffgg",
+      "ggehffggggghfiiijiiiffggggehffgg",
+      "ggehffggggghfikkjlkkffggggehffgg"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "roofColour.dark",
+      "c": "roofColour.light",
+      "d": "roofColour",
+      "e": "wall.dark",
+      "f": "wood",
+      "g": "wall",
+      "h": "wood.dark",
+      "i": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": {
+         "rule": "mix",
+         "of": "#5a5f7a",
+         "with": "#5a5f7a",
+         "amount": 0
+        },
+        "by": -0.5
+       },
+       "tone": "dark"
+      },
+      "j": "wood.light",
+      "k": {
+       "rule": "tone",
+       "of": {
+        "rule": "mix",
+        "of": "#5a5f7a",
+        "with": "#5a5f7a",
+        "amount": 0
+       },
+       "by": -0.5
+      },
+      "l": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": {
+         "rule": "mix",
+         "of": "#5a5f7a",
+         "with": "#5a5f7a",
+         "amount": 0
+        },
+        "by": -0.5
+       },
+       "tone": "light"
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      80,
+      14
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".......aaaaaaaaaa...............",
+      "......abbbbbbbbbba..............",
+      "......acddddddddda..............",
+      "aa..aa.acccccccbaa..aa..aa..a...",
+      "efaaefaacdcddddbafaaefaaefaaea..",
+      "gffggffacdcddddbaffggffggffgfa..",
+      "ffggffgacccccccbafggffggffggfa..",
+      "gggggggacddddcdbagggggggggggfa..",
+      "ggeeggeacddddcdbageeggeeggeefa..",
+      "eeggeegacddddcdbaeggeeggeeggffa.",
+      "gggggggacccccccbaggggggggggggfa.",
+      "ggffggfacdcddddbagffggffggffgfa.",
+      "gggggggacdcddddbaggggggggggggfa.",
+      "eeggeegacdcddddbaeggeeggeeggefa.",
+      "ggeeggeeaaaaaaaaggeeggeeggeegfa.",
+      "gggggggggggggggggggggggggggggfa.",
+      "ffggffggffggffggffggffggffggfffa",
+      "ggggggggggggggggggggggggggggggfa",
+      "ggeeggeeggeeggeeggeeggeeggeeggfa",
+      "eeggeeggeeggeeggeeggeeggeeggeefa",
+      "ggggggggggggggggggggggggggggggfa",
+      "ggffggffggffggffggffggffggffggfa",
+      "ggggggggggggggggggggggggggggggfa",
+      "eeggeeggeeggeeggeeggeeggeeggeefa",
+      "geeegeeegeeegeeegeeegeeegeeegeea",
+      "aaeeaaeeaaeeaaeeaaeeaaeeaaeeaaea",
+      "hhaahhaahhaahhaahhaahhaahiaaa.a.",
+      "jjjjjjjjjjjjjjjjjjjjjjjjhikka...",
+      "jjikkkkkkkkkkjjjjjjjjjjjhikka...",
+      "jjikkkkkkkkkkjjjjjjjjjjjhikka...",
+      "jjiklllmlllkkjjjjjjjjjjjhikka...",
+      "jjiklnnmonnkkjjjjjjjjjjjhikka..."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#a8a4a0",
+        "with": "#a8a4a0",
+        "amount": 0
+       },
+       "tone": "light"
+      },
+      "c": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#a8a4a0",
+        "with": "#a8a4a0",
+        "amount": 0
+       },
+       "tone": "dark"
+      },
+      "d": {
+       "rule": "mix",
+       "of": "#a8a4a0",
+       "with": "#a8a4a0",
+       "amount": 0
+      },
+      "e": "roofColour.dark",
+      "f": "roofColour.light",
+      "g": "roofColour",
+      "h": "wall.dark",
+      "i": "wood.dark",
+      "j": "wall",
+      "k": "wood",
+      "l": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": {
+         "rule": "mix",
+         "of": "#5a5f7a",
+         "with": "#5a5f7a",
+         "amount": 0
+        },
+        "by": -0.5
+       },
+       "tone": "dark"
+      },
+      "m": "wood.light",
+      "n": {
+       "rule": "tone",
+       "of": {
+        "rule": "mix",
+        "of": "#5a5f7a",
+        "with": "#5a5f7a",
+        "amount": 0
+       },
+       "by": -0.5
+      },
+      "o": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": {
+         "rule": "mix",
+         "of": "#5a5f7a",
+         "with": "#5a5f7a",
+         "amount": 0
+        },
+        "by": -0.5
+       },
+       "tone": "light"
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      16,
+      46
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...abccddddddddddddbcefghfffccdd",
+      "...abccddddddddddddbchhhhhhhccdd",
+      "...abccddddddddddddbceffhfffccdd",
+      "...abccddddddddddddbceffhfffccdd",
+      "...abccddddddddddddbceffhfffccdd",
+      "...abccddddddddddddbccccccccccdd",
+      "...abccddddddddddddbbbbbbbbbbbdd",
+      "...abccddddddddddddddddddddddddd",
+      "...abccddddddddddddddddddddddddd",
+      "...abcchhhhhhhhhhhhhhhhhhhhhhhhh",
+      "...abccccccccccccccccccccccccccc",
+      "...abccbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "....abcciiiiiiiiiiiiiiiiiiiiiiii",
+      "....abcciiiiiiiiiiiiiiiiiiiiiiii",
+      "....abccdddddddddddddddddddddddd",
+      "....abccdddddddddddddddddddddddd",
+      "....abccdddddddddddddddddddddddd",
+      "....abccdddddddddddddddddddddddd",
+      "....abccddddddbccccccccccccccddd",
+      "....abccddddddbccccccccccccccddd",
+      "....abccddddddbceeeeeheeeeeccddd",
+      "....abccddddddbceffffhfggffccddd",
+      "....abccddddddbceffffhggfffccddd",
+      "....abccddddddbceffffhgffffccddd",
+      "....abccddddddbchhhhhhhhhhhccddd",
+      "....abccddddddbceffffhfffffccddd",
+      "....abccddddddbceffffhfffffccddd",
+      "....abccddddddbceffffhfffffccddd",
+      "....abccddddddbceffffhfffffccddd",
+      "....abccddddddbccccccccccccccddd",
+      "....abccddddddbbbbbbbbbbbbbbbddd",
+      "....abccdddddhhhhhhhhhhhhhhhhhdd"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "wood.dark",
+      "c": "wood",
+      "d": "wall",
+      "e": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": {
+         "rule": "mix",
+         "of": "#5a5f7a",
+         "with": "#5a5f7a",
+         "amount": 0
+        },
+        "by": -0.5
+       },
+       "tone": "dark"
+      },
+      "f": {
+       "rule": "tone",
+       "of": {
+        "rule": "mix",
+        "of": "#5a5f7a",
+        "with": "#5a5f7a",
+        "amount": 0
+       },
+       "by": -0.5
+      },
+      "g": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": {
+         "rule": "mix",
+         "of": "#5a5f7a",
+         "with": "#5a5f7a",
+         "amount": 0
+        },
+        "by": -0.5
+       },
+       "tone": "light"
+      },
+      "h": "wood.light",
+      "i": "wall.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      48,
+      46
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aabcddaaaaacdefghfffddaaaabcddaa",
+      "aabcddaaaaacdhhhhhhhddaaaabcddaa",
+      "aabcddaaaaacdeffhfffddaaaabcddaa",
+      "aabcddaaaaacdeffhfffddaaaabcddaa",
+      "aabcddaaaaacdeffhfffddaaaabcddaa",
+      "aabcddaaaaacddddddddddaaaabcddaa",
+      "aabcddaaaaacccccccccccaaaabcddaa",
+      "aabcddaaaaaaaaaaaaaaaaaaaabcddaa",
+      "aabcddaaaaaaaaaaaaaaaaaaaabcddaa",
+      "hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh",
+      "dddddddddddddddddddddddddddddddd",
+      "cccccccccccccccccccccccccccccccc",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "aaaachhhhhhhhhhhhhhhhhhhhhhhaaaa",
+      "aaaacdddddddddddddddddddddddaaaa",
+      "aaaacdcccicccijjjjccccicccddaaaa",
+      "aaaacdcccicccijjjjccccicccddaaaa",
+      "aaaacdcccicccijjjjccccicccddaaaa",
+      "aaaacdcccicccijjjjicccicccddaaaa",
+      "aaaacdccciiiiijjjjiiiiicccddaaaa",
+      "aaaacdciiiiiiijjjjciiiiiicddaaaa",
+      "aaaacdiiiicccijjjjcccciiiiddaaaa",
+      "aaaacdiccicccijjjjccccicciddaaaa",
+      "aaaacdcccicccijjjjccccicccddaaaa",
+      "aaaacdcccicccijjjjccccicccddaaaa",
+      "aaaacdcccicccijjjjccccicccddaaaa",
+      "aaaacdcccicccijjjjccccicccddaaaa",
+      "aaaacdcccickcijjjjcckcicccddaaaa",
+      "aaaacdcccickcijjjjcckcicccddaaaa",
+      "aaaacdcccicccijjjjccccicccddaaaa",
+      "aaaacdcccicccijjjjccccicccddaaaa"
+     ],
+     "key": {
+      "a": "wall",
+      "b": "wall.dark",
+      "c": "wood.dark",
+      "d": "wood",
+      "e": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": {
+         "rule": "mix",
+         "of": "#5a5f7a",
+         "with": "#5a5f7a",
+         "amount": 0
+        },
+        "by": -0.5
+       },
+       "tone": "dark"
+      },
+      "f": {
+       "rule": "tone",
+       "of": {
+        "rule": "mix",
+        "of": "#5a5f7a",
+        "with": "#5a5f7a",
+        "amount": 0
+       },
+       "by": -0.5
+      },
+      "g": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": {
+         "rule": "mix",
+         "of": "#5a5f7a",
+         "with": "#5a5f7a",
+         "amount": 0
+        },
+        "by": -0.5
+       },
+       "tone": "light"
+      },
+      "h": "wood.light",
+      "i": "wood.deep",
+      "j": {
+       "rule": "mix",
+       "of": {
+        "rule": "tone",
+        "of": {
+         "rule": "mix",
+         "of": "#5a5f7a",
+         "with": "#5a5f7a",
+         "amount": 0
+        },
+        "by": -1.6
+       },
+       "with": "ink",
+       "amount": 0.35
+      },
+      "k": {
+       "rule": "mix",
+       "of": "#f2c230",
+       "with": "#f2c230",
+       "amount": 0
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      80,
+      46
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aabcdefgeeeccaaaaaaaaaaahbcci...",
+      "aabcgggggggccaaaaaaaaaaahbcci...",
+      "aabcdeegeeeccaaaaaaaaaaahbcci...",
+      "aabcdeegeeeccaaaaaaaaaaahbcci...",
+      "aabcdeegeeeccaaaaaaaaaaahbcci...",
+      "aabccccccccccaaaaaaaaaaahbcci...",
+      "aabbbbbbbbbbbaaaaaaaaaaahbcci...",
+      "aaaaaaaaaaaaaaaaaaaaaaaahbcci...",
+      "aaaaaaaaaaaaaaaaaaaaaaaahbcci...",
+      "gggggggggggggggggggggggggbcci...",
+      "cccccccccccccccccccccccccbcci...",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbcci...",
+      "hhhhhhhhhhhhhhhhhhhhhhhhbcci....",
+      "hhhhhhhhhhhhhhhhhhhhhhhhbcci....",
+      "aaaiaaaaaaaaaaaaaaaaaaahbcci....",
+      "aaijiiiiiiiiiiiiaaaaaaahbcci....",
+      "aaijjjjjjjjjjjjjiaaaaaahbcci....",
+      "aaijijjiiiiiijijiaaaaaahbcci....",
+      "aaijijiiiiiiijiiaaaaaaahbcci....",
+      "aaijgggggggggggiaaaaaaahbcci....",
+      "aaaickkkkkkkkkciaaaaaaahbcci....",
+      "aaaicklllllkkkciaaaaaaahbcci....",
+      "aaaicklllllkkkciaaaaaaahbcci....",
+      "aaaickkllllllkciaaaaaaahbcci....",
+      "aaaickkllllklkciaaaaaaahbcci....",
+      "aaaickkllllklkciaaaaaaahbcci....",
+      "aaaickkllllllkciaaaaaaahbcci....",
+      "aaaickkllllkkkciaaaaaaahbcci....",
+      "aaaibbbbbbbbbbbiaaaaaaahbcci....",
+      "aaaaiiiiiiiiiiiaaaaaaaahbcci....",
+      "aaaaaaaaaaaaaaaaaaaaaaahbcci....",
+      "aaaaaaaaaaaaaaaaaaaaaaahbcci...."
+     ],
+     "key": {
+      "a": "wall",
+      "b": "wood.dark",
+      "c": "wood",
+      "d": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": {
+         "rule": "mix",
+         "of": "#5a5f7a",
+         "with": "#5a5f7a",
+         "amount": 0
+        },
+        "by": -0.5
+       },
+       "tone": "dark"
+      },
+      "e": {
+       "rule": "tone",
+       "of": {
+        "rule": "mix",
+        "of": "#5a5f7a",
+        "with": "#5a5f7a",
+        "amount": 0
+       },
+       "by": -0.5
+      },
+      "f": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": {
+         "rule": "mix",
+         "of": "#5a5f7a",
+         "with": "#5a5f7a",
+         "amount": 0
+        },
+        "by": -0.5
+       },
+       "tone": "light"
+      },
+      "g": "wood.light",
+      "h": "wall.dark",
+      "i": "ink",
+      "j": {
+       "rule": "mix",
+       "of": "#5a5f7a",
+       "with": "#5a5f7a",
+       "amount": 0
+      },
+      "k": "signColour",
+      "l": {
+       "rule": "standOut",
+       "against": "signColour",
+       "from": [
+        {
+         "rule": "mix",
+         "of": "#f0ead8",
+         "with": "#f0ead8",
+         "amount": 0
+        },
+        "ink"
+       ]
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      16,
+      78
+     ],
+     "anchor": "tl",
+     "rows": [
+      "....abccdddddddddddddddddddddddd",
+      "....abccdddddddddddddddddddddddd",
+      "....abcceeeeeeeeeeeeeeeeeeeeeeee",
+      "....abcccccccccccccccccccccccccc",
+      "....abccbbbbbbbbbbbbbbbbbbbbbbbb",
+      "....abccffffffffffffffffffffffff",
+      "....abccdddddddddddddddddddddddd",
+      "....abccdddddddddddddddddddddddd",
+      "....abccdddddddddddddddddddddddd",
+      "....abccdddddddddddddddddddddddd",
+      "....abccdddddddddddddddddddddddd",
+      "....abcceeeeeeeeeeeeeeeeeeeeeeee",
+      "....abcccccccccccccccccccccccccc",
+      "....abccbbbbbbbbbbbbbbbbbbbbbbbb"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "wood.dark",
+      "c": "wood",
+      "d": "wall",
+      "e": "wood.light",
+      "f": "wall.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      48,
+      78
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaabcbbbdbbbdeeeebbbbdbbbccaaaa",
+      "aaaabcbbbdbbbdeeeedbbbdbbbccaaaa",
+      "ffffbcbbbdddddeeeedddddbbbccffff",
+      "ccccbcbdddddddeeeebddddddbcccccc",
+      "bbbbbcddddbbbdeeeebbbbddddccbbbb",
+      "ggggbcdbbdbbbdeeeebbbbdbbdccgggg",
+      "aaaabcbbbdbbbdeeeebbbbdbbbccaaaa",
+      "aaaabcbbbdbbbdeeeebbbbdbbbccaaaa",
+      "aaaabcbbbdbbbdeeeebbbbdbbbccaaaa",
+      "aaaabcbbbdbbbhhhhhhbbbdbbbccaaaa",
+      "aaaabcbbbdhhhhhhhhhhhhdbbbccaaaa",
+      "ffffbcbhhhhhhhhhhhhhhhhhhbccffff",
+      "cciiiiiiiiiiiiiiiiiiiiiiiiiiiicc",
+      "bbjjjjjjjjjjjjjjjjjjjjjjjjjjjjbb"
+     ],
+     "key": {
+      "a": "wall",
+      "b": "wood.dark",
+      "c": "wood",
+      "d": "wood.deep",
+      "e": {
+       "rule": "mix",
+       "of": {
+        "rule": "tone",
+        "of": {
+         "rule": "mix",
+         "of": "#5a5f7a",
+         "with": "#5a5f7a",
+         "amount": 0
+        },
+        "by": -1.6
+       },
+       "with": "ink",
+       "amount": 0.35
+      },
+      "f": "wood.light",
+      "g": "wall.dark",
+      "h": {
+       "rule": "tone",
+       "of": {
+        "rule": "mix",
+        "of": "#c9a06a",
+        "with": "#c9a06a",
+        "amount": 0
+       },
+       "by": -1.2
+      },
+      "i": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#a8a4a0",
+        "with": "#a8a4a0",
+        "amount": 0
+       },
+       "tone": "light"
+      },
+      "j": {
+       "rule": "mix",
+       "of": "#a8a4a0",
+       "with": "#a8a4a0",
+       "amount": 0
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      80,
+      78
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaaaaaaaaaaaaaaaaaabcdde....",
+      "aaaaaaaaaaaaaaaaaaaaaaabcdde....",
+      "ffffffffffffffffffffffffcdde....",
+      "ddddddddddddddddddddddddcdde....",
+      "cccccccccccccccccccccccccdde....",
+      "bbbbbbbbbbbbbbbbbbbbbbbbcdde....",
+      "aaaaaaaaaaaaaaaaaaaaaaabcdde....",
+      "aaaaaaaaaaaaaaaaaaaaaaabcdde....",
+      "aaaaaaaaaaaaaaaaaaaaaaabcdde....",
+      "aaaaaaaaaaaaaaaaaaaaaaabcdde....",
+      "aaaaaaaaaaaaaaaaaaaaaaabcdde....",
+      "ffffffffffffffffffffffffcdde....",
+      "ddddddddddddddddddddddddcdde....",
+      "cccccccccccccccccccccccccdde...."
+     ],
+     "key": {
+      "a": "wall",
+      "b": "wall.dark",
+      "c": "wood.dark",
+      "d": "wood",
+      "e": "ink",
+      "f": "wood.light"
+     }
+    },
+    {
+     "kind": "rect",
+     "at": [
+      21,
+      92
+     ],
+     "size": [
+      86,
+      1
+     ],
+     "paint": "ink",
+     "shade": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     64,
+     92
+    ],
+    "signColour": "signColour",
+    "wall": "wall",
+    "roofColour": "roofColour",
+    "wood": "wood",
+    "glowColour": "glow",
+    "picture": "lit"
+   },
+   "ctx": {
+    "t": 0.375,
+    "loop": true,
+    "frames": 8,
+    "frame": 3
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      16,
+      12
+     ],
+     "anchor": "tl",
+     "rows": [
+      "................................",
+      "................................",
+      "................................",
+      "................................",
+      "................................",
+      "....aa..aa..aa..aa..aa..aa..aa..",
+      "...abcaabcaabcaabcaabcaabcaabcaa",
+      "..abdccddccddccddccddccddccddccd",
+      "..abccddccddccddccddccddccddccdd",
+      "..abdddddddddddddddddddddddddddd",
+      "..abddbbddbbddbbddbbddbbddbbddbb",
+      ".abdbbddbbddbbddbbddbbddbbddbbdd",
+      ".abddddddddddddddddddddddddddddd",
+      ".abcddccddccddccddccddccddccddcc",
+      ".abddddddddddddddddddddddddddddd",
+      ".abdbbddbbddbbddbbddbbddbbddbbdd",
+      ".abbddbbddbbddbbddbbddbbddbbddbb",
+      ".abddddddddddddddddddddddddddddd",
+      "abddccddccddccddccddccddccddccdd",
+      "abdddddddddddddddddddddddddddddd",
+      "abbbddbbddbbddbbddbbddbbddbbddbb",
+      "abddbbddbbddbbddbbddbbddbbddbbdd",
+      "abdddddddddddddddddddddddddddddd",
+      "abccddccddccddccddccddccddccddcc",
+      "abdddddddddddddddddddddddddddddd",
+      "abddbbddbbddbbddbbddbbddbbddbbdd",
+      "abbbdbbbdbbbdbbbdbbbdbbbdbbbdbbb",
+      ".abbaabbaabbaabbaabbaabbaabbaabb",
+      "..aaefaaggaaggaaggaaggaaggaaggaa",
+      "...aeffhhhhhhhhhhhiiiiiiiiiiiiih",
+      "...aeffhhhhhhhhhhiieffffffffffii",
+      "...aeffhhhhhhhhhhiieffffffffffii"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "roofColour.dark",
+      "c": "roofColour.light",
+      "d": "roofColour",
+      "e": "wood.dark",
+      "f": "wood",
+      "g": "wall.dark",
+      "h": "wall",
+      "i": {
+       "rule": "mix",
+       "of": "wall",
+       "with": "glow",
+       "amount": 0.45
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      48,
+      12
+     ],
+     "anchor": "tl",
+     "rows": [
+      "................................",
+      "................................",
+      "................................",
+      "................................",
+      "................................",
+      "aa..aa..aa..aa..aa..aa..aa..aa..",
+      "bcaabcaabcaabcaabcaabcaabcaabcaa",
+      "dccddccddccddccddccddccddccddccd",
+      "ccddccddccddccddccddccddccddccdd",
+      "dddddddddddddddddddddddddddddddd",
+      "ddbbddbbddbbddbbddbbddbbddbbddbb",
+      "bbddbbddbbddbbddbbddbbddbbddbbdd",
+      "dddddddddddddddddddddddddddddddd",
+      "ddccddccddccddccddccddccddccddcc",
+      "dddddddddddddddddddddddddddddddd",
+      "bbddbbddbbddbbddbbddbbddbbddbbdd",
+      "ddbbddbbddbbddbbddbbddbbddbbddbb",
+      "dddddddddddddddddddddddddddddddd",
+      "ccddccddccddccddccddccddccddccdd",
+      "dddddddddddddddddddddddddddddddd",
+      "ddbbddbbddbbddbbddbbddbbddbbddbb",
+      "bbddbbddbbddbbddbbddbbddbbddbbdd",
+      "dddddddddddddddddddddddddddddddd",
+      "ddccddccddccddccddccddccddccddcc",
+      "dddddddddddddddddddddddddddddddd",
+      "bbddbbddbbddbbddbbddbbddbbddbbdd",
+      "dbbbdbbbdbbbdbbbdbbbdbbbdbbbdbbb",
+      "aabbaabbaabbaabbaabbaabbaabbaabb",
+      "eeaaffaaeeaaeeaaeeaaeeaaeeaaffaa",
+      "ggehffgggggiiiiiiiiiiiggggehffgg",
+      "ggehffggggihffffffffffigggehffgg",
+      "ggehffggggihffffffffffigggehffgg"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "roofColour.dark",
+      "c": "roofColour.light",
+      "d": "roofColour",
+      "e": "wall.dark",
+      "f": "wood",
+      "g": "wall",
+      "h": "wood.dark",
+      "i": {
+       "rule": "mix",
+       "of": "wall",
+       "with": "glow",
+       "amount": 0.45
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      80,
+      12
+     ],
+     "anchor": "tl",
+     "rows": [
+      "......abababba..................",
+      ".......aaaaaaa..................",
+      ".......cccccccccc...............",
+      "......cddddddddddc..............",
+      "......cefffffffffc..............",
+      "cc..cc.ceeeeeeedcc..cc..cc..c...",
+      "ghccghccefeffffdchccghccghccgc..",
+      "ihhiihhcefeffffdchhiihhiihhihc..",
+      "hhiihhiceeeeeeedchiihhiihhiihc..",
+      "iiiiiiiceffffefdciiiiiiiiiiihc..",
+      "iiggiigceffffefdciggiiggiigghc..",
+      "ggiiggiceffffefdcgiiggiiggiihhc.",
+      "iiiiiiiceeeeeeedciiiiiiiiiiiihc.",
+      "iihhiihcefeffffdcihhiihhiihhihc.",
+      "iiiiiiicefeffffdciiiiiiiiiiiihc.",
+      "ggiiggicefeffffdcgiiggiiggiighc.",
+      "iiggiiggcccccccciiggiiggiiggihc.",
+      "iiiiiiiiiiiiiiiiiiiiiiiiiiiiihc.",
+      "hhiihhiihhiihhiihhiihhiihhiihhhc",
+      "iiiiiiiiiiiiiiiiiiiiiiiiiiiiiihc",
+      "iiggiiggiiggiiggiiggiiggiiggiihc",
+      "ggiiggiiggiiggiiggiiggiiggiigghc",
+      "iiiiiiiiiiiiiiiiiiiiiiiiiiiiiihc",
+      "iihhiihhiihhiihhiihhiihhiihhiihc",
+      "iiiiiiiiiiiiiiiiiiiiiiiiiiiiiihc",
+      "ggiiggiiggiiggiiggiiggiiggiigghc",
+      "igggigggigggigggigggigggigggiggc",
+      "ccggccggccggccggccggccggccggccgc",
+      "jjccjjccjjccjjccjjccjjccjkccc.c.",
+      "llmmmmmmmmmmmllllllllllljknnc...",
+      "lmknnnnnnnnnnmlllllllllljknnc...",
+      "lmknnnnnnnnnnmlllllllllljknnc..."
+     ],
+     "key": {
+      "a": {
+       "rule": "tone",
+       "of": {
+        "rule": "tone",
+        "of": {
+         "rule": "mix",
+         "of": "#a8a4a0",
+         "with": "#a8a4a0",
+         "amount": 0
+        },
+        "by": 0.45
+       },
+       "by": -1
+      },
+      "b": {
+       "rule": "tone",
+       "of": {
+        "rule": "mix",
+        "of": "#a8a4a0",
+        "with": "#a8a4a0",
+        "amount": 0
+       },
+       "by": 0.45
+      },
+      "c": "ink",
+      "d": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#a8a4a0",
+        "with": "#a8a4a0",
+        "amount": 0
+       },
+       "tone": "light"
+      },
+      "e": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#a8a4a0",
+        "with": "#a8a4a0",
+        "amount": 0
+       },
+       "tone": "dark"
+      },
+      "f": {
+       "rule": "mix",
+       "of": "#a8a4a0",
+       "with": "#a8a4a0",
+       "amount": 0
+      },
+      "g": "roofColour.dark",
+      "h": "roofColour.light",
+      "i": "roofColour",
+      "j": "wall.dark",
+      "k": "wood.dark",
+      "l": "wall",
+      "m": {
+       "rule": "mix",
+       "of": "wall",
+       "with": "glow",
+       "amount": 0.45
+      },
+      "n": "wood"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      16,
+      44
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...abccddddddddddeebcfffbfffccee",
+      "...abccddddddddddeebcfggbggfccee",
+      "...abccddddddddddeebcfggbggfccee",
+      "...abccddddddddddeebcbbbbbbbccee",
+      "...abccddddddddddeebcfggbggfccee",
+      "...abccddddddddddeebcfggbggfccee",
+      "...abccddddddddddeebcfffbfffccee",
+      "...abccddddddddddeebccccccccccee",
+      "...abccddddddddddeebbbbbbbbbbbee",
+      "...abccdddddddddddeeeeeeeeeeeeed",
+      "...abccddddddddddddeeeeeeeeeeedd",
+      "...abcchhhhhhhhhhhhhhhhhhhhhhhhh",
+      "...abccccccccccccccccccccccccccc",
+      "...abccbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "....abcciiiiiiiiiiiiiiiiiiiiiiii",
+      "....abcciiiiiiiiiiiiiiiiiiiiiiii",
+      "....abccdddddddddddddddddddddddd",
+      "....abccdddddddddddddddddddddddd",
+      "....abccdddddddddddddddddddddddd",
+      "....abccddddddeeeeeeeeeeeeeeeddd",
+      "....abccdddddebccccccccccccccedd",
+      "....abccdddddebccccccccccccccedd",
+      "....abccdddddebcjjjjjbjjjjjccedd",
+      "....abccdddddebcjffffbffffjccedd",
+      "....abccdddddebcjffffbffffjccedd",
+      "....abccdddddebcjffggbggffjccedd",
+      "....abccdddddebcbbbbbbbbbbbccedd",
+      "....abccdddddebcjffggbggffjccedd",
+      "....abccdddddebcjffffbffffjccedd",
+      "....abccdddddebcjffffbffffjccedd",
+      "....abccdddddebcjjjjjbjjjjjccedd",
+      "....abccdddddebccccccccccccccedd"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "wood.dark",
+      "c": "wood",
+      "d": "wall",
+      "e": {
+       "rule": "mix",
+       "of": "wall",
+       "with": "glow",
+       "amount": 0.45
+      },
+      "f": "glow",
+      "g": {
+       "rule": "tone",
+       "of": "glow",
+       "by": 1.2
+      },
+      "h": "wood.light",
+      "i": "wall.dark",
+      "j": {
+       "rule": "tone",
+       "of": "glow",
+       "by": -0.7
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      48,
+      44
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aabcddaaaaecdfffcfffddeaaabcddaa",
+      "aabcddaaaaecdfffcfffddeaaabcddaa",
+      "aabcddaaaaecdffgcgffddeaaabcddaa",
+      "aabcddaaaaecdcccccccddeaaabcddaa",
+      "aabcddaaaaecdffgcgffddeaaabcddaa",
+      "aabcddaaaaecdfffcfffddeaaabcddaa",
+      "aabcddaaaaecdfffcfffddeaaabcddaa",
+      "aabcddaaaaecddddddddddeaaabcddaa",
+      "aabcddaaaaeccccccccccceaaabcddaa",
+      "aabcddaaaaaeeeeeeeeeeeaaaabcddaa",
+      "aabcddaaaaaaaaaaaaaaaaaaaabcddaa",
+      "hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh",
+      "dddddddddddddddddddddddddddddddd",
+      "cccccccccccccccccccccccccccccccc",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "aaaachhhhhhhhhhhhhhhhhhhhhhhaaaa",
+      "aaaacdddddddddddddddddddddddaaaa",
+      "aaaacdccccccccccccccccccccddaaaa",
+      "aaaacdddddcddddcdddddcdddcddaaaa",
+      "aaaacdddddcddddcdddddcdddcddaaaa",
+      "aaaacdddddcddddcdddddcdddcddaaaa",
+      "aaaacdddddcddddcdddddcdddcddaaaa",
+      "aaaacdddddcddddcdddddcdddcddaaaa",
+      "aaaacdccccccccccccccccccccddaaaa",
+      "aaaacdccccccccccccccccccccddaaaa",
+      "aaaacdddddcddddcdddddcdddcddaaaa",
+      "aaaacdddddcddddcdddddcdddcddaaaa",
+      "aaaacdddddcddddcdddddcdddcddaaaa",
+      "aaaacdddddcddddcdddddcdddcddaaaa",
+      "aaaacdddddcddddcdddddcdddcddaaaa",
+      "aaaacdddddcddddcdddddcdddcddaaaa"
+     ],
+     "key": {
+      "a": "wall",
+      "b": "wall.dark",
+      "c": "wood.dark",
+      "d": "wood",
+      "e": {
+       "rule": "mix",
+       "of": "wall",
+       "with": "glow",
+       "amount": 0.45
+      },
+      "f": "glow",
+      "g": {
+       "rule": "tone",
+       "of": "glow",
+       "by": 1.2
+      },
+      "h": "wood.light"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      80,
+      44
+     ],
+     "anchor": "tl",
+     "rows": [
+      "abcdeeeceeeddbaaaaaaaaaafcddg...",
+      "abcdehhchheddbaaaaaaaaaafcddg...",
+      "abcdehiciheddbaaaaaaaaaafcddg...",
+      "abcdcccccccddbaaaaaaaaaafcddg...",
+      "abcdehiciheddbaaaaaaaaaafcddg...",
+      "abcdehhchheddbaaaaaaaaaafcddg...",
+      "abcdeeeceeeddbaaaaaaaaaafcddg...",
+      "abcddddddddddbaaaaaaaaaafcddg...",
+      "abcccccccccccbaaaaaaaaaafcddg...",
+      "aabbbbbbbbbbbaaaaaaaaaaafcddg...",
+      "aaaaaaaaaaaaaaaaaaaaaaaafcddg...",
+      "jjjjjjjjjjjjjjjjjjjjjjjjjcddg...",
+      "dddddddddddddddddddddddddcddg...",
+      "ccccccccccccccccccccccccccddg...",
+      "ffffffffffffffffffffffffcddg....",
+      "ffffffffffffffffffffffffcddg....",
+      "aaagaaaaaaaaaaaaaaaaaaafcddg....",
+      "aagkggggggggggggaaaaaaafcddg....",
+      "aagkkkkkkkkkkkkkgaaaaaafcddg....",
+      "aagkgkkggggggkgkgaaaaaafcddg....",
+      "aagkgkgggggggkggaaaaaaafcddg....",
+      "aagkjjjjjjjjjjjgaaaaaaafcddg....",
+      "aaagdllllllllldgaaaaaaafcddg....",
+      "aaaagdlmmmmmllldgaaaaaafcddg....",
+      "aaaagdlmmmmmllldgaaaaaafcddg....",
+      "aaaagdllmmmmmmldgaaaaaafcddg....",
+      "aaaagdllmmmmlmldgaaaaaafcddg....",
+      "aaaagdllmmmmlmldgaaaaaafcddg....",
+      "aaaagdllmmmmmmldgaaaaaafcddg....",
+      "aaaagdllmmmmllldgaaaaaafcddg....",
+      "aaaagcccccccccccgaaaaaafcddg....",
+      "aaaaagggggggggggaaaaaaafcddg...."
+     ],
+     "key": {
+      "a": "wall",
+      "b": {
+       "rule": "mix",
+       "of": "wall",
+       "with": "glow",
+       "amount": 0.45
+      },
+      "c": "wood.dark",
+      "d": "wood",
+      "e": {
+       "rule": "tone",
+       "of": "glow",
+       "by": -0.7
+      },
+      "f": "wall.dark",
+      "g": "ink",
+      "h": "glow",
+      "i": {
+       "rule": "tone",
+       "of": "glow",
+       "by": 1.2
+      },
+      "j": "wood.light",
+      "k": {
+       "rule": "mix",
+       "of": "#5a5f7a",
+       "with": "#5a5f7a",
+       "amount": 0
+      },
+      "l": "signColour",
+      "m": {
+       "rule": "standOut",
+       "against": "signColour",
+       "from": [
+        {
+         "rule": "mix",
+         "of": "#f0ead8",
+         "with": "#f0ead8",
+         "amount": 0
+        },
+        "ink"
+       ]
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      16,
+      76
+     ],
+     "anchor": "tl",
+     "rows": [
+      "....abccdddddebbbbbbbbbbbbbbbedd",
+      "....abccdddddfffffffffffffffffdd",
+      "....abccddddddeeeeeeeeeeeeeeeddd",
+      "....abccdddddddddddddddddddddddd",
+      "....abccffffffffffffffffffffffff",
+      "....abcccccccccccccccccccccccccc",
+      "....abccbbbbbbbbbbbbbbbbbbbbbbbb",
+      "....abccgggggggggggggggggggggggg",
+      "....abccdddddddddddddddddddddddd",
+      "....abccdddddddddddddddddddddddd",
+      "....abccdddddddddddddddddddddddd",
+      "....abccdddddddddddddddddddddddd",
+      "....abccdddddddddddddddddddddddd",
+      "....abccffffffffffffffffffffffff",
+      "....abcccccccccccccccccccccccccc",
+      "....abccbbbbbbbbbbbbbbbbbbbbbbbb"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "wood.dark",
+      "c": "wood",
+      "d": "wall",
+      "e": {
+       "rule": "mix",
+       "of": "wall",
+       "with": "glow",
+       "amount": 0.45
+      },
+      "f": "wood.light",
+      "g": "wall.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      48,
+      76
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaabcccccbcddcbccddcbcccbccaaaa",
+      "aaaabcccccbcddcbccddcbcccbccaaaa",
+      "aaaabcccccbccccbcccccbcccbccaaaa",
+      "aaaabcccccbccccbcccccbcccbccaaaa",
+      "eeeebcccccbccccbcccccbcccbcceeee",
+      "ccccbcccccbccccbcccccbcccbcccccc",
+      "bbbbbcbbbbbbbbbbbbbbbbbbbbccbbbb",
+      "ffffbcbbbbbbbbbbbbbbbbbbbbccffff",
+      "aaaabcccccbccccbcccccbcccbccaaaa",
+      "aaaabcccccbccccbcccccbcccbccaaaa",
+      "aaaabcccccbccccbcccccbcccbccaaaa",
+      "aaaabcccccbccccbcccccbcccbccaaaa",
+      "aaaabcccccbccccbcccccbcccbccaaaa",
+      "eeeebcccccbccccbcccccbcccbcceeee",
+      "ccggggggggggggggggggggggggggggcc",
+      "bbhhhhhhhhhhhhhhhhhhhhhhhhhhhhbb"
+     ],
+     "key": {
+      "a": "wall",
+      "b": "wood.dark",
+      "c": "wood",
+      "d": {
+       "rule": "mix",
+       "of": "#f2c230",
+       "with": "#f2c230",
+       "amount": 0
+      },
+      "e": "wood.light",
+      "f": "wall.dark",
+      "g": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "#a8a4a0",
+        "with": "#a8a4a0",
+        "amount": 0
+       },
+       "tone": "light"
+      },
+      "h": {
+       "rule": "mix",
+       "of": "#a8a4a0",
+       "with": "#a8a4a0",
+       "amount": 0
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      80,
+      76
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaaaaaaaaaaaaaaaaaabcdde....",
+      "aaaaaaaaaaaaaaaaaaaaaaabcdde....",
+      "aaaaaaaaaaaaaaaaaaaaaaabcdde....",
+      "aaaaaaaaaaaaaaaaaaaaaaabcdde....",
+      "ffffffffffffffffffffffffcdde....",
+      "ddddddddddddddddddddddddcdde....",
+      "cccccccccccccccccccccccccdde....",
+      "bbbbbbbbbbbbbbbbbbbbbbbbcdde....",
+      "aaaaaaaaaaaaaaaaaaaaaaabcdde....",
+      "aaaaaaaaaaaaaaaaaaaaaaabcdde....",
+      "aaaaaaaaaaaaaaaaaaaaaaabcdde....",
+      "aaaaaaaaaaaaaaaaaaaaaaabcdde....",
+      "aaaaaaaaaaaaaaaaaaaaaaabcdde....",
+      "ffffffffffffffffffffffffcdde....",
+      "ddddddddddddddddddddddddcdde....",
+      "cccccccccccccccccccccccccdde...."
+     ],
+     "key": {
+      "a": "wall",
+      "b": "wall.dark",
+      "c": "wood.dark",
+      "d": "wood",
+      "e": "ink",
+      "f": "wood.light"
+     }
+    },
+    {
+     "kind": "rect",
+     "at": [
+      84,
+      2
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": {
+       "rule": "tone",
+       "of": {
+        "rule": "mix",
+        "of": "#a8a4a0",
+        "with": "#a8a4a0",
+        "amount": 0
+       },
+       "by": -0.4
+      },
+      "by": -1
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      83,
+      3
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": {
+       "rule": "tone",
+       "of": {
+        "rule": "mix",
+        "of": "#a8a4a0",
+        "with": "#a8a4a0",
+        "amount": 0
+       },
+       "by": -0.4
+      },
+      "by": -1
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      84,
+      3
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": {
+       "rule": "mix",
+       "of": "#a8a4a0",
+       "with": "#a8a4a0",
+       "amount": 0
+      },
+      "by": -0.4
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      85,
+      3
+     ],
+     "size": [
+      2,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": {
+       "rule": "tone",
+       "of": {
+        "rule": "mix",
+        "of": "#a8a4a0",
+        "with": "#a8a4a0",
+        "amount": 0
+       },
+       "by": -0.4
+      },
+      "by": -1
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      82,
+      4
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": {
+       "rule": "tone",
+       "of": {
+        "rule": "mix",
+        "of": "#a8a4a0",
+        "with": "#a8a4a0",
+        "amount": 0
+       },
+       "by": -0.4
+      },
+      "by": -1
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      83,
+      4
+     ],
+     "size": [
+      4,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": {
+       "rule": "mix",
+       "of": "#a8a4a0",
+       "with": "#a8a4a0",
+       "amount": 0
+      },
+      "by": -0.4
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      87,
+      4
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": {
+       "rule": "tone",
+       "of": {
+        "rule": "mix",
+        "of": "#a8a4a0",
+        "with": "#a8a4a0",
+        "amount": 0
+       },
+       "by": -0.4
+      },
+      "by": -1
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      81,
+      5
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": {
+       "rule": "tone",
+       "of": {
+        "rule": "mix",
+        "of": "#a8a4a0",
+        "with": "#a8a4a0",
+        "amount": 0
+       },
+       "by": -0.4
+      },
+      "by": -1
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      82,
+      5
+     ],
+     "size": [
+      5,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": {
+       "rule": "mix",
+       "of": "#a8a4a0",
+       "with": "#a8a4a0",
+       "amount": 0
+      },
+      "by": -0.4
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      87,
+      5
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": {
+       "rule": "tone",
+       "of": {
+        "rule": "mix",
+        "of": "#a8a4a0",
+        "with": "#a8a4a0",
+        "amount": 0
+       },
+       "by": -0.4
+      },
+      "by": -1
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      81,
+      6
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": {
+       "rule": "tone",
+       "of": {
+        "rule": "mix",
+        "of": "#a8a4a0",
+        "with": "#a8a4a0",
+        "amount": 0
+       },
+       "by": -0.4
+      },
+      "by": -1
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      82,
+      6
+     ],
+     "size": [
+      5,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": {
+       "rule": "mix",
+       "of": "#a8a4a0",
+       "with": "#a8a4a0",
+       "amount": 0
+      },
+      "by": -0.4
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      87,
+      6
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": {
+       "rule": "tone",
+       "of": {
+        "rule": "mix",
+        "of": "#a8a4a0",
+        "with": "#a8a4a0",
+        "amount": 0
+       },
+       "by": -0.4
+      },
+      "by": -1
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      82,
+      7
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": {
+       "rule": "tone",
+       "of": {
+        "rule": "mix",
+        "of": "#a8a4a0",
+        "with": "#a8a4a0",
+        "amount": 0
+       },
+       "by": -0.4
+      },
+      "by": -1
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      83,
+      7
+     ],
+     "size": [
+      3,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": {
+       "rule": "mix",
+       "of": "#a8a4a0",
+       "with": "#a8a4a0",
+       "amount": 0
+      },
+      "by": -0.4
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      86,
+      7
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": {
+       "rule": "tone",
+       "of": {
+        "rule": "mix",
+        "of": "#a8a4a0",
+        "with": "#a8a4a0",
+        "amount": 0
+       },
+       "by": -0.4
+      },
+      "by": -1
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      90,
+      7
+     ],
+     "size": [
+      2,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": {
+       "rule": "mix",
+       "of": "#a8a4a0",
+       "with": "#a8a4a0",
+       "amount": 0
+      },
+      "by": -1
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      83,
+      8
+     ],
+     "size": [
+      3,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": {
+       "rule": "tone",
+       "of": {
+        "rule": "mix",
+        "of": "#a8a4a0",
+        "with": "#a8a4a0",
+        "amount": 0
+       },
+       "by": -0.4
+      },
+      "by": -1
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      88,
+      8
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": {
+       "rule": "tone",
+       "of": {
+        "rule": "mix",
+        "of": "#a8a4a0",
+        "with": "#a8a4a0",
+        "amount": 0
+       },
+       "by": 0.45
+      },
+      "by": -1
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      89,
+      8
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": {
+       "rule": "mix",
+       "of": "#a8a4a0",
+       "with": "#a8a4a0",
+       "amount": 0
+      },
+      "by": -1
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      90,
+      8
+     ],
+     "size": [
+      2,
+      1
+     ],
+     "paint": {
+      "rule": "mix",
+      "of": "#a8a4a0",
+      "with": "#a8a4a0",
+      "amount": 0
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      92,
+      8
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": {
+       "rule": "mix",
+       "of": "#a8a4a0",
+       "with": "#a8a4a0",
+       "amount": 0
+      },
+      "by": -1
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      87,
+      9
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": {
+       "rule": "tone",
+       "of": {
+        "rule": "mix",
+        "of": "#a8a4a0",
+        "with": "#a8a4a0",
+        "amount": 0
+       },
+       "by": 0.45
+      },
+      "by": -1
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      88,
+      9
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": {
+       "rule": "mix",
+       "of": "#a8a4a0",
+       "with": "#a8a4a0",
+       "amount": 0
+      },
+      "by": 0.45
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      89,
+      9
+     ],
+     "size": [
+      3,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": {
+       "rule": "tone",
+       "of": {
+        "rule": "mix",
+        "of": "#a8a4a0",
+        "with": "#a8a4a0",
+        "amount": 0
+       },
+       "by": 0.45
+      },
+      "by": -1
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      92,
+      9
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": {
+      "rule": "mix",
+      "of": "#a8a4a0",
+      "with": "#a8a4a0",
+      "amount": 0
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      93,
+      9
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": {
+       "rule": "mix",
+       "of": "#a8a4a0",
+       "with": "#a8a4a0",
+       "amount": 0
+      },
+      "by": -1
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      86,
+      10
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": {
+       "rule": "tone",
+       "of": {
+        "rule": "mix",
+        "of": "#a8a4a0",
+        "with": "#a8a4a0",
+        "amount": 0
+       },
+       "by": 0.45
+      },
+      "by": -1
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      87,
+      10
+     ],
+     "size": [
+      2,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": {
+       "rule": "mix",
+       "of": "#a8a4a0",
+       "with": "#a8a4a0",
+       "amount": 0
+      },
+      "by": 0.45
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      89,
+      10
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": {
+       "rule": "tone",
+       "of": {
+        "rule": "mix",
+        "of": "#a8a4a0",
+        "with": "#a8a4a0",
+        "amount": 0
+       },
+       "by": 0.45
+      },
+      "by": -1
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      90,
+      10
+     ],
+     "size": [
+      2,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": {
+       "rule": "mix",
+       "of": "#a8a4a0",
+       "with": "#a8a4a0",
+       "amount": 0
+      },
+      "by": 0.45
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      92,
+      10
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": {
+       "rule": "tone",
+       "of": {
+        "rule": "mix",
+        "of": "#a8a4a0",
+        "with": "#a8a4a0",
+        "amount": 0
+       },
+       "by": 0.45
+      },
+      "by": -1
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      93,
+      10
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": {
+       "rule": "mix",
+       "of": "#a8a4a0",
+       "with": "#a8a4a0",
+       "amount": 0
+      },
+      "by": -1
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      86,
+      11
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": {
+       "rule": "tone",
+       "of": {
+        "rule": "mix",
+        "of": "#a8a4a0",
+        "with": "#a8a4a0",
+        "amount": 0
+       },
+       "by": 0.45
+      },
+      "by": -1
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      87,
+      11
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": {
+       "rule": "mix",
+       "of": "#a8a4a0",
+       "with": "#a8a4a0",
+       "amount": 0
+      },
+      "by": 0.45
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      88,
+      11
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": {
+       "rule": "tone",
+       "of": {
+        "rule": "mix",
+        "of": "#a8a4a0",
+        "with": "#a8a4a0",
+        "amount": 0
+       },
+       "by": 0.45
+      },
+      "by": -1
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      89,
+      11
+     ],
+     "size": [
+      4,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": {
+       "rule": "mix",
+       "of": "#a8a4a0",
+       "with": "#a8a4a0",
+       "amount": 0
+      },
+      "by": 0.45
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      93,
+      11
+     ],
+     "size": [
+      1,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": {
+       "rule": "tone",
+       "of": {
+        "rule": "mix",
+        "of": "#a8a4a0",
+        "with": "#a8a4a0",
+        "amount": 0
+       },
+       "by": 0.45
+      },
+      "by": -1
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      21,
+      92
+     ],
+     "size": [
+      86,
+      1
+     ],
+     "paint": "ink",
+     "shade": 0
+    }
+   ]
+  }
+ ]
+}

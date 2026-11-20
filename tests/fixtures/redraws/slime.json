@@ -1,0 +1,272 @@
+{
+ "id": "slime",
+ "frozen": "2026-11-20",
+ "source": "sprites/slime.js",
+ "sha256": "0c5ea6073248ca9d7d557347d2ebc1915714f2173524b820eba520ab1014f1ec",
+ "name": "Slime",
+ "blurb": "A bouncy blob. Pick a colour, a face and something to wear.",
+ "meta": {
+  "type": "creature",
+  "role": "characters/enemy",
+  "themes": [
+   "fantasy",
+   "dungeon",
+   "candy"
+  ],
+  "gameTypes": [
+   "platformer",
+   "turn-based-rpg"
+  ],
+  "view": "side",
+  "words": [
+   "slime",
+   "blob",
+   "goo",
+   "jelly",
+   "ooze",
+   "gel",
+   "enemy",
+   "monster",
+   "bounce",
+   "hop",
+   "squish",
+   "jump"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  48,
+  48
+ ],
+ "pivot": [
+  22,
+  42
+ ],
+ "grounded": true,
+ "preview": "hop",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Tiny",
+   "hi": "Huge",
+   "group": "Look"
+  },
+  "shape": {
+   "kind": "range",
+   "label": "Shape",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Flat",
+   "hi": "Tall",
+   "group": "Look"
+  },
+  "eyes": {
+   "kind": "choice",
+   "label": "Eyes",
+   "def": "cute",
+   "options": [
+    {
+     "value": "cute",
+     "label": "Cute"
+    },
+    {
+     "value": "dots",
+     "label": "Dots"
+    },
+    {
+     "value": "angry",
+     "label": "Angry"
+    },
+    {
+     "value": "sleepy",
+     "label": "Sleepy"
+    },
+    {
+     "value": "one",
+     "label": "One"
+    }
+   ],
+   "group": "Look"
+  },
+  "topping": {
+   "kind": "choice",
+   "label": "On top",
+   "def": "none",
+   "options": [
+    {
+     "value": "none",
+     "label": "None"
+    },
+    {
+     "value": "crown",
+     "label": "Crown"
+    },
+    {
+     "value": "sprout",
+     "label": "Sprout"
+    },
+    {
+     "value": "horns",
+     "label": "Horns"
+    },
+    {
+     "value": "bow",
+     "label": "Bow"
+    }
+   ],
+   "group": "Look"
+  },
+  "shine": {
+   "kind": "toggle",
+   "label": "Shine",
+   "def": true,
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Colour",
+   "def": "#5fc46b",
+   "swatches": [
+    "#5fc46b",
+    "#3fb3c9",
+    "#4f7fe0",
+    "#9a62d6",
+    "#e0609a",
+    "#e2574c",
+    "#e89a35",
+    "#e6cf4a",
+    "#8a93a6"
+   ],
+   "group": "Colors"
+  },
+  "wobble": {
+   "kind": "range",
+   "label": "Wobble",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Firm",
+   "hi": "Jelly",
+   "group": "Motion"
+  },
+  "hop": {
+   "kind": "range",
+   "label": "Hop height",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Low",
+   "hi": "High",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    8,
+    12
+   ]
+  },
+  "hop": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    12,
+    16
+   ]
+  },
+  "attack": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    8,
+    14,
+    19
+   ]
+  },
+  "hurt": {
+   "frames": 4,
+   "loop": false,
+   "fps": [
+    6,
+    9,
+    13
+   ]
+  },
+  "die": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  }
+ },
+ "sounds": {
+  "hop": [
+   {
+    "sound": "jump",
+    "frame": 1,
+    "preset": "Tiny hop"
+   },
+   {
+    "sound": "footstep-gravel",
+    "frame": 6,
+    "preset": "Sneaking"
+   }
+  ],
+  "attack": [
+   {
+    "sound": "whoosh",
+    "frame": 3,
+    "preset": "Quick swipe"
+   }
+  ],
+  "hurt": [
+   {
+    "sound": "punch",
+    "frame": 0,
+    "preset": "Light jab"
+   }
+  ],
+  "die": [
+   {
+    "sound": "enemy-squish",
+    "frame": 0,
+    "preset": "Squish",
+    "volume": 1
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "dungeon-starter",
+  "kit-platformer-fantasy",
+  "kit-rpg-fantasy"
+ ]
+}

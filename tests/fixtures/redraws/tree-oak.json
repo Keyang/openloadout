@@ -1,0 +1,196 @@
+{
+ "id": "tree-oak",
+ "frozen": "2026-11-20",
+ "source": "sprites/tree-oak.js",
+ "sha256": "df5a2ee8e16cbf885553dbc46d67eeaf8978802e64679a99dd10f1fffac7e218",
+ "name": "Oak tree",
+ "blurb": "A broad leafy tree for a top-down map that sways in the wind and drops leaves when shaken; change its size, crown, trunk, fruit and colours.",
+ "meta": {
+  "type": "prop",
+  "role": "world/prop",
+  "themes": [
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "top-down-rpg"
+  ],
+  "view": "top-down",
+  "words": [
+   "tree",
+   "oak",
+   "apple tree",
+   "forest",
+   "woods",
+   "leaves",
+   "trunk",
+   "orchard",
+   "sway",
+   "shake",
+   "shade",
+   "nature"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  64,
+  80
+ ],
+ "pivot": [
+  32,
+  76
+ ],
+ "grounded": true,
+ "preview": "sway",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.8,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "shape": {
+   "kind": "choice",
+   "label": "Shape",
+   "def": "round",
+   "options": [
+    "round",
+    "wide",
+    "layered"
+   ],
+   "group": "Look"
+  },
+  "thickness": {
+   "kind": "range",
+   "label": "Thickness",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Thin",
+   "hi": "Chunky",
+   "group": "Look"
+  },
+  "fruit": {
+   "kind": "choice",
+   "label": "Fruit",
+   "def": "none",
+   "options": [
+    "none",
+    "apples",
+    "blossom"
+   ],
+   "group": "Look"
+  },
+  "fruitColour": {
+   "kind": "color",
+   "label": "Colour",
+   "def": "#c8553a",
+   "swatches": [
+    "#c8553a",
+    "#f2c230",
+    "#c9423a",
+    "#f0ead8",
+    "#7fe0a0",
+    "#4fd8ee"
+   ],
+   "group": "Colors"
+  },
+  "leaf": {
+   "kind": "color",
+   "label": "Leaves",
+   "def": "#4f9d57",
+   "swatches": [
+    "#4f9d57",
+    "#7fbf5a",
+    "#357a4c",
+    "#e6c96a"
+   ],
+   "group": "Colors"
+  },
+  "wood": {
+   "kind": "color",
+   "label": "Wood",
+   "def": "#9a6a3e",
+   "swatches": [
+    "#9a6a3e",
+    "#c9a06a",
+    "#a8612a",
+    "#5a3a22",
+    "#c98a4a"
+   ],
+   "group": "Colors"
+  },
+  "sway": {
+   "kind": "range",
+   "label": "Sway",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Still",
+   "hi": "Swaying",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "sway": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    8,
+    12
+   ]
+  },
+  "shake": {
+   "frames": 6,
+   "loop": false,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  }
+ },
+ "sounds": {
+  "shake": [
+   {
+    "sound": "footstep-grass",
+    "frame": 0,
+    "preset": "Tall grass",
+    "volume": 0.6
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-rpg-fantasy"
+ ]
+}

@@ -1,0 +1,565 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "tiles-meadow",
+ "name": "Meadow and paths",
+ "blurb": "Grass and winding dirt paths for a top-down map, with tufts, flowers, pebbles and tall grass; change the colours, how ragged the path border is and how worn the path.",
+ "size": [32,32],
+ "pivot": [16,16],
+ "grounded": false,
+ "preview": "path-right",
+ "styles": ["pixel"],
+ "meta": {
+  "type": "tileset",
+  "role": "world/tile",
+  "themes": ["fantasy","forest","farm"],
+  "gameTypes": ["turn-based-rpg","top-down-rpg"],
+  "view": "top-down",
+  "words": ["grass","meadow","field","lawn","path","road","trail","dirt","sand","flowers","ground","walk","overworld","map"],
+  "license": "draft"
+ },
+ "palette": [
+  {
+   "id": "grass",
+   "label": "Grass",
+   "default": "#7fbf5a",
+   "material": "plant",
+   "swatches": ["#7fbf5a","#4f9d57","#357a4c","#e6c96a"]
+  },
+  {
+   "id": "path",
+   "label": "Path",
+   "default": "#c9a06a",
+   "material": "earth",
+   "swatches": ["#c9a06a","#e6c96a","#a8a4a0","#f0ead8"]
+  },
+  {
+   "id": "flowers",
+   "label": "Flowers",
+   "default": "#c8553a",
+   "material": "plant",
+   "swatches": ["#c8553a","#c9423a","#f2c230","#2f8f9d","#7a4fc4","#f0ead8","#e08a2c","#e6c545"]
+  },
+  {"id":"sand","material":"earth","derive":{"rule":"raisedGround","of":"path"}},
+  {"id":"grain","material":"earth","derive":{"rule":"textureTone","of":"sand"}},
+  {"id":"blade","material":"plant","derive":{"rule":"textureTone","of":"grass"}},
+  {"id":"tip","material":"plant","derive":{"rule":"textureLight","of":"grass"}},
+  {"id":"cobble","default":"#a8a4a0","material":"stone","detail":true}
+ ],
+ "controls": [
+  {"key":"edge","kind":"range","label":"Edge","lo":"Thin","hi":"Deep","min":3,"max":7,"step":1,"default":5},
+  {"key":"texture","kind":"range","label":"Texture","lo":"Plain","hi":"Busy","default":0.5},
+  {"key":"wear","kind":"range","label":"Wear","lo":"New","hi":"Worn","default":0.4},
+  {"key":"stones","kind":"toggle","label":"Pebbles","default":true},
+  {"key":"grass","kind":"colour","label":"Grass"},
+  {"key":"path","kind":"colour","label":"Path"},
+  {"key":"flowers","kind":"colour","label":"Flowers"}
+ ],
+ "body": {
+  "tiles": {
+   "tile": 32,
+   "decalOrder": "last",
+   "groups": [
+    {
+     "name": "grass",
+     "kind": "floor",
+     "fills": 3,
+     "outline": false,
+     "pictures": {
+      "fill": [
+       {
+        "gen": "tile.meadow",
+        "v": 1,
+        "at": [16,16],
+        "piece": "grass-fill",
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stones": {"from":"stones"},
+        "grass": "grass",
+        "blade": "blade",
+        "tip": "tip"
+       }
+      ],
+      "fill-b": [
+       {
+        "gen": "tile.meadow",
+        "v": 1,
+        "at": [16,16],
+        "piece": "grass-fill-b",
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stones": {"from":"stones"},
+        "grass": "grass",
+        "blade": "blade",
+        "tip": "tip"
+       }
+      ],
+      "fill-c": [
+       {
+        "gen": "tile.meadow",
+        "v": 1,
+        "at": [16,16],
+        "piece": "grass-fill-c",
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stones": {"from":"stones"},
+        "grass": "grass",
+        "blade": "blade",
+        "tip": "tip"
+       }
+      ]
+     },
+     "decals": [
+      {
+       "name": "a",
+       "place": "on",
+       "label": "Grass tuft",
+       "draw": [
+        {
+         "gen": "tile.meadow",
+         "v": 1,
+         "at": [16,16],
+         "piece": "grass-deco-a",
+         "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+         "texture": {"from":"texture"},
+         "wear": {"from":"wear"},
+         "stones": {"from":"stones"},
+         "grass": "grass",
+         "blade": "blade"
+        }
+       ]
+      },
+      {
+       "name": "b",
+       "place": "on",
+       "label": "Flowers",
+       "draw": [
+        {
+         "gen": "tile.meadow",
+         "v": 1,
+         "at": [16,16],
+         "piece": "grass-deco-b",
+         "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+         "texture": {"from":"texture"},
+         "wear": {"from":"wear"},
+         "stones": {"from":"stones"},
+         "grass": "grass",
+         "blade": "blade",
+         "flowers": "flowers"
+        }
+       ]
+      },
+      {
+       "name": "c",
+       "place": "on",
+       "label": "Pebbles",
+       "draw": [
+        {
+         "gen": "tile.meadow",
+         "v": 1,
+         "at": [16,16],
+         "piece": "grass-deco-c",
+         "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+         "texture": {"from":"texture"},
+         "wear": {"from":"wear"},
+         "stones": {"from":"stones"},
+         "blade": "blade",
+         "cobble": "cobble"
+        }
+       ]
+      },
+      {
+       "name": "d",
+       "place": "on",
+       "label": "Tall grass",
+       "draw": [
+        {
+         "gen": "tile.meadow",
+         "v": 1,
+         "at": [16,16],
+         "piece": "grass-deco-d",
+         "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+         "texture": {"from":"texture"},
+         "wear": {"from":"wear"},
+         "stones": {"from":"stones"},
+         "grass": "grass",
+         "blade": "blade"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "path",
+     "kind": "block",
+     "use": "ground",
+     "pieces": ["block","narrow"],
+     "fills": 3,
+     "outline": false,
+     "pictures": {
+      "left": [
+       {
+        "gen": "tile.meadow",
+        "v": 1,
+        "at": [16,16],
+        "piece": "path-left",
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stones": {"from":"stones"},
+        "path": "path",
+        "sand": "sand",
+        "grain": "grain",
+        "cobble": "cobble"
+       }
+      ],
+      "top": [
+       {
+        "gen": "tile.meadow",
+        "v": 1,
+        "at": [16,16],
+        "piece": "path-top",
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stones": {"from":"stones"},
+        "path": "path",
+        "sand": "sand",
+        "grain": "grain",
+        "cobble": "cobble"
+       }
+      ],
+      "right": [
+       {
+        "gen": "tile.meadow",
+        "v": 1,
+        "at": [16,16],
+        "piece": "path-right",
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stones": {"from":"stones"},
+        "path": "path",
+        "sand": "sand",
+        "grain": "grain",
+        "cobble": "cobble"
+       }
+      ],
+      "side-l": [
+       {
+        "gen": "tile.meadow",
+        "v": 1,
+        "at": [16,16],
+        "piece": "path-side-l",
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stones": {"from":"stones"},
+        "path": "path",
+        "sand": "sand",
+        "grain": "grain",
+        "cobble": "cobble"
+       }
+      ],
+      "fill": [
+       {
+        "gen": "tile.meadow",
+        "v": 1,
+        "at": [16,16],
+        "piece": "path-fill",
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stones": {"from":"stones"},
+        "path": "path",
+        "sand": "sand",
+        "grain": "grain",
+        "cobble": "cobble"
+       }
+      ],
+      "fill-b": [
+       {
+        "gen": "tile.meadow",
+        "v": 1,
+        "at": [16,16],
+        "piece": "path-fill-b",
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stones": {"from":"stones"},
+        "path": "path",
+        "sand": "sand",
+        "grain": "grain",
+        "cobble": "cobble"
+       }
+      ],
+      "fill-c": [
+       {
+        "gen": "tile.meadow",
+        "v": 1,
+        "at": [16,16],
+        "piece": "path-fill-c",
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stones": {"from":"stones"},
+        "path": "path",
+        "sand": "sand",
+        "grain": "grain",
+        "cobble": "cobble"
+       }
+      ],
+      "side-r": [
+       {
+        "gen": "tile.meadow",
+        "v": 1,
+        "at": [16,16],
+        "piece": "path-side-r",
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stones": {"from":"stones"},
+        "path": "path",
+        "sand": "sand",
+        "grain": "grain",
+        "cobble": "cobble"
+       }
+      ],
+      "bottom-l": [
+       {
+        "gen": "tile.meadow",
+        "v": 1,
+        "at": [16,16],
+        "piece": "path-bottom-l",
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stones": {"from":"stones"},
+        "path": "path",
+        "sand": "sand",
+        "grain": "grain",
+        "cobble": "cobble"
+       }
+      ],
+      "bottom": [
+       {
+        "gen": "tile.meadow",
+        "v": 1,
+        "at": [16,16],
+        "piece": "path-bottom",
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stones": {"from":"stones"},
+        "path": "path",
+        "sand": "sand",
+        "grain": "grain",
+        "cobble": "cobble"
+       }
+      ],
+      "bottom-r": [
+       {
+        "gen": "tile.meadow",
+        "v": 1,
+        "at": [16,16],
+        "piece": "path-bottom-r",
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stones": {"from":"stones"},
+        "path": "path",
+        "sand": "sand",
+        "grain": "grain",
+        "cobble": "cobble"
+       }
+      ],
+      "inner-tl": [
+       {
+        "gen": "tile.meadow",
+        "v": 1,
+        "at": [16,16],
+        "piece": "path-inner-tl",
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stones": {"from":"stones"},
+        "path": "path",
+        "sand": "sand",
+        "grain": "grain",
+        "cobble": "cobble"
+       }
+      ],
+      "inner-tr": [
+       {
+        "gen": "tile.meadow",
+        "v": 1,
+        "at": [16,16],
+        "piece": "path-inner-tr",
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stones": {"from":"stones"},
+        "path": "path",
+        "sand": "sand",
+        "grain": "grain",
+        "cobble": "cobble"
+       }
+      ],
+      "inner-bl": [
+       {
+        "gen": "tile.meadow",
+        "v": 1,
+        "at": [16,16],
+        "piece": "path-inner-bl",
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stones": {"from":"stones"},
+        "path": "path",
+        "sand": "sand",
+        "grain": "grain",
+        "cobble": "cobble"
+       }
+      ],
+      "inner-br": [
+       {
+        "gen": "tile.meadow",
+        "v": 1,
+        "at": [16,16],
+        "piece": "path-inner-br",
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stones": {"from":"stones"},
+        "path": "path",
+        "sand": "sand",
+        "grain": "grain",
+        "cobble": "cobble"
+       }
+      ],
+      "strip-l": [
+       {
+        "gen": "tile.meadow",
+        "v": 1,
+        "at": [16,16],
+        "piece": "path-strip-l",
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stones": {"from":"stones"},
+        "path": "path",
+        "sand": "sand",
+        "grain": "grain",
+        "cobble": "cobble"
+       }
+      ],
+      "strip-m": [
+       {
+        "gen": "tile.meadow",
+        "v": 1,
+        "at": [16,16],
+        "piece": "path-strip-m",
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stones": {"from":"stones"},
+        "path": "path",
+        "sand": "sand",
+        "grain": "grain",
+        "cobble": "cobble"
+       }
+      ],
+      "strip-r": [
+       {
+        "gen": "tile.meadow",
+        "v": 1,
+        "at": [16,16],
+        "piece": "path-strip-r",
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stones": {"from":"stones"},
+        "path": "path",
+        "sand": "sand",
+        "grain": "grain",
+        "cobble": "cobble"
+       }
+      ],
+      "col-t": [
+       {
+        "gen": "tile.meadow",
+        "v": 1,
+        "at": [16,16],
+        "piece": "path-col-t",
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stones": {"from":"stones"},
+        "path": "path",
+        "sand": "sand",
+        "grain": "grain",
+        "cobble": "cobble"
+       }
+      ],
+      "col-m": [
+       {
+        "gen": "tile.meadow",
+        "v": 1,
+        "at": [16,16],
+        "piece": "path-col-m",
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stones": {"from":"stones"},
+        "path": "path",
+        "sand": "sand",
+        "grain": "grain",
+        "cobble": "cobble"
+       }
+      ],
+      "col-b": [
+       {
+        "gen": "tile.meadow",
+        "v": 1,
+        "at": [16,16],
+        "piece": "path-col-b",
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stones": {"from":"stones"},
+        "path": "path",
+        "sand": "sand",
+        "grain": "grain",
+        "cobble": "cobble"
+       }
+      ],
+      "single": [
+       {
+        "gen": "tile.meadow",
+        "v": 1,
+        "at": [16,16],
+        "piece": "path-single",
+        "edge": {"from":"edge","map":[[3,3],[7,7]],"round":"px"},
+        "texture": {"from":"texture"},
+        "wear": {"from":"wear"},
+        "stones": {"from":"stones"},
+        "path": "path",
+        "sand": "sand",
+        "grain": "grain",
+        "cobble": "cobble"
+       }
+      ]
+     }
+    }
+   ]
+  }
+ },
+ "clips": {
+  "grass-fill": {"label":"Grass"},
+  "grass-fill-b": {"label":"Grass, version B"},
+  "grass-fill-c": {"label":"Grass, version C"}
+ }
+}

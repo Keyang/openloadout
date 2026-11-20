@@ -1,0 +1,303 @@
+{
+ "id": "crow-scout",
+ "frozen": "2026-11-20",
+ "source": "sprites/crow-scout.js",
+ "sha256": "704cae93f51386d1c509f461b0a628337e39e725808e6689a8547867be62c85e",
+ "name": "Crow scout",
+ "blurb": "A sharp-beaked bird that hovers, flies and dives, with something to carry in its claws. Change its size, wings, beak, crest, eyes and colours.",
+ "meta": {
+  "type": "creature",
+  "role": "characters/enemy",
+  "themes": [
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "platformer"
+  ],
+  "view": "side",
+  "words": [
+   "crow",
+   "raven",
+   "bird",
+   "scout",
+   "flyer",
+   "wings",
+   "beak",
+   "feathers",
+   "fly",
+   "hover",
+   "dive",
+   "swoop",
+   "enemy",
+   "carry"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  48,
+  48
+ ],
+ "pivot": [
+  24,
+  24
+ ],
+ "grounded": false,
+ "preview": "fly",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "span": {
+   "kind": "range",
+   "label": "Wings",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Short",
+   "hi": "Wide",
+   "group": "Look"
+  },
+  "beak": {
+   "kind": "range",
+   "label": "Beak",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Short",
+   "hi": "Long",
+   "group": "Look"
+  },
+  "crest": {
+   "kind": "choice",
+   "label": "Crest",
+   "def": "none",
+   "options": [
+    {
+     "value": "none",
+     "label": "None"
+    },
+    {
+     "value": "tuft",
+     "label": "Tuft"
+    },
+    {
+     "value": "spiky",
+     "label": "Spiky"
+    }
+   ],
+   "group": "Look"
+  },
+  "eyes": {
+   "kind": "choice",
+   "label": "Eyes",
+   "def": "dot",
+   "options": [
+    {
+     "value": "dot",
+     "label": "Dot"
+    },
+    {
+     "value": "angry",
+     "label": "Angry"
+    },
+    {
+     "value": "glow",
+     "label": "Glow"
+    }
+   ],
+   "group": "Look"
+  },
+  "held": {
+   "kind": "choice",
+   "label": "Carries",
+   "def": "none",
+   "options": [
+    {
+     "value": "none",
+     "label": "None"
+    },
+    {
+     "value": "lantern",
+     "label": "Lantern"
+    },
+    {
+     "value": "sack",
+     "label": "Sack"
+    },
+    {
+     "value": "bomb",
+     "label": "Bomb"
+    }
+   ],
+   "group": "Look"
+  },
+  "heldSize": {
+   "kind": "range",
+   "label": "Size",
+   "def": 1,
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Feathers",
+   "def": "#5d6475",
+   "swatches": [
+    "#5d6475",
+    "#9bd18a",
+    "#7a4fc4",
+    "#3f8a4f",
+    "#c9423a",
+    "#7a4f33",
+    "#3f9fd1"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Beak and feet",
+   "def": "#e08a2c",
+   "swatches": [
+    "#e08a2c",
+    "#f2c230",
+    "#f0ead8",
+    "#4fd8ee",
+    "#a4c44a"
+   ],
+   "group": "Colors"
+  },
+  "flap": {
+   "kind": "range",
+   "label": "Flap",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Wide",
+   "group": "Motion"
+  },
+  "bob": {
+   "kind": "range",
+   "label": "Float",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Still",
+   "hi": "Floaty",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    7,
+    10
+   ]
+  },
+  "fly": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  },
+  "attack": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    8,
+    14,
+    19
+   ]
+  },
+  "hurt": {
+   "frames": 4,
+   "loop": false,
+   "fps": [
+    6,
+    9,
+    13
+   ]
+  },
+  "die": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  }
+ },
+ "sounds": {
+  "fly": [
+   {
+    "sound": "whoosh",
+    "frame": 1,
+    "preset": "Quick swipe",
+    "volume": 0.35
+   }
+  ],
+  "attack": [
+   {
+    "sound": "whoosh",
+    "frame": 3,
+    "preset": "Heavy swing",
+    "volume": 0.7
+   }
+  ],
+  "hurt": [
+   {
+    "sound": "punch",
+    "frame": 0,
+    "preset": "Light jab",
+    "volume": 0.9
+   }
+  ],
+  "die": [
+   {
+    "sound": "enemy-squish",
+    "frame": 0,
+    "preset": "Squish",
+    "volume": 1
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-platformer-fantasy"
+ ]
+}

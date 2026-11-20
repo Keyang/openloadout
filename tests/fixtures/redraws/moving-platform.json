@@ -1,0 +1,159 @@
+{
+ "id": "moving-platform",
+ "frozen": "2026-11-20",
+ "source": "sprites/moving-platform.js",
+ "sha256": "acefa030e2f49a72351257f94fce78158de74f0aae150fee9e44888fb2b85431",
+ "name": "Moving platform",
+ "blurb": "A floating platform to ride, with a gear turning underneath; change its width, what it is made of, the chains it hangs from, the colours and how much it bobs.",
+ "meta": {
+  "type": "prop",
+  "role": "world/platform",
+  "themes": [
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "platformer"
+  ],
+  "view": "side",
+  "words": [
+   "platform",
+   "moving",
+   "lift",
+   "elevator",
+   "floating",
+   "ride",
+   "gear",
+   "chains",
+   "ledge",
+   "move",
+   "travel",
+   "wooden",
+   "stone"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  64,
+  32
+ ],
+ "pivot": [
+  32,
+  8
+ ],
+ "grounded": false,
+ "preview": "idle",
+ "params": {
+  "width": {
+   "kind": "range",
+   "label": "Width",
+   "def": 48,
+   "min": 40,
+   "max": 62,
+   "step": 2,
+   "lo": "Narrow",
+   "hi": "Wide",
+   "group": "Look"
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "wood",
+   "options": [
+    {
+     "value": "wood",
+     "label": "Wood"
+    },
+    {
+     "value": "stone",
+     "label": "Stone"
+    },
+    {
+     "value": "metal",
+     "label": "Metal"
+    }
+   ],
+   "group": "Look"
+  },
+  "chains": {
+   "kind": "toggle",
+   "label": "Chains",
+   "def": true,
+   "group": "Look"
+  },
+  "wood": {
+   "kind": "color",
+   "label": "Deck",
+   "def": "#a06a3c",
+   "swatches": [
+    "#a06a3c",
+    "#7a4f33",
+    "#f0ead8",
+    "#a8612a",
+    "#8f97a8",
+    "#a4c44a"
+   ],
+   "group": "Colors"
+  },
+  "metal": {
+   "kind": "color",
+   "label": "Metal",
+   "def": "#c2c9d6",
+   "swatches": [
+    "#c2c9d6",
+    "#f2c230",
+    "#5d6475",
+    "#e6c545",
+    "#c98a4a"
+   ],
+   "group": "Colors"
+  },
+  "bob": {
+   "kind": "range",
+   "label": "Float",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Still",
+   "hi": "Floaty",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    8,
+    12
+   ]
+  },
+  "move": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [],
+ "bundles": [
+  "kit-platformer-fantasy"
+ ]
+}

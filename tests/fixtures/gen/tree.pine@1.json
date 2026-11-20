@@ -1,0 +1,320 @@
+{
+ "id": "tree.pine",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     24,
+     76
+    ],
+    "leaf": "leaf",
+    "wood": "wood"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      9,
+      23
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..............aa..............",
+      ".............abca.............",
+      "............abccca............",
+      "............abccca............",
+      "...........abccccca...........",
+      "...........abccccca...........",
+      "..........abccccccca..........",
+      "..........abccccccca..........",
+      ".........abccccccccca.........",
+      ".........abccccccccca.........",
+      "........abccccccccccca........",
+      "........abccccccccccca........",
+      ".......abbccccccddcdcca.......",
+      ".......abbccccccccdccca.......",
+      ".......abbbccbbccccbbba.......",
+      ".......abbbcbbbbccbbba........",
+      "........abbaabbbcaaaa.........",
+      "........ababbabbabba..........",
+      ".........abbbabbabbba.........",
+      "........abbccbaabcccca........",
+      "........abcccbbbccdcca........",
+      ".......accccccbbcccccca.......",
+      "......abcccbccccccccccba......",
+      ".....abbccbbbcccddcccdbba.....",
+      ".....abbbabbbccbbbccabdbba....",
+      ".....abba.abbbbbbbbcaabba.....",
+      "......aa..abbaaabbba..aa......",
+      ".........abaabbbababa.........",
+      ".......aacbbbbbbbabbcaa.......",
+      "......accccbbcccbbbddcca......",
+      ".....acccccccccccbcccdcca.....",
+      "....acccccccccccccccccccca...."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "leaf.dark",
+      "c": "leaf",
+      "d": "leaf.light"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      9,
+      55
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...abcccbccccccccddcccddcba...",
+      "..abbbcbbbccccbccccdccccdbba..",
+      "..abbbabbbbccbbbccbbbbcadbba..",
+      "...aba.abbbbabbbbabbbba.aba...",
+      "....a..aabbababbabaabaa..a....",
+      "......abbaabbbaabbbbabba......",
+      ".....accbbbbcbbbbcbbbbcca.....",
+      "....accccbbcccbbccccbcdcca....",
+      "...acccccccccccccccccccccca...",
+      ".aaccbbccccccccccddccccddccaa.",
+      "abbccbbbcccbcccccbcdcbbccddbba",
+      "abbaabbbccbbbcccbbbcbbbbcaabba",
+      "abba.abbbabbbbcebbbaabbbba.aba",
+      ".aa..abba.abbbeeeba..abba...a.",
+      "......aa...abeeeeea...aa......",
+      "...........aeeeeeea...........",
+      "...........aeeeeeea...........",
+      "...........aefffffa...........",
+      "...........affffffa...........",
+      "..........aefffffffa..........",
+      "..........aeeeeeeeea..........",
+      "...........aaaaaaaa..........."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "leaf.dark",
+      "c": "leaf",
+      "d": "leaf.light",
+      "e": "wood.dark",
+      "f": "wood"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     24,
+     76
+    ],
+    "leaf": "leaf",
+    "wood": "wood",
+    "picture": "sway"
+   },
+   "ctx": {
+    "t": 0.4,
+    "loop": false,
+    "frames": 6,
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      9,
+      23
+     ],
+     "anchor": "tl",
+     "rows": [
+      "................aa............",
+      "...............abca...........",
+      "..............abccca..........",
+      "..............abccca..........",
+      ".............abccccca.........",
+      ".............abccccca.........",
+      "............abccccccca........",
+      "............abccccccca........",
+      "...........abccccccccca.......",
+      "...........abccccccccca.......",
+      "..........abccccccccccca......",
+      ".........abccccccccccca.......",
+      "........abbccccccddcdcca......",
+      "........abbccccccccdccca......",
+      "........abbbccbbccccbbba......",
+      "........abbbcbbbbccbbba.......",
+      ".........abbaabbbcaaaa........",
+      ".........ababbabbabba.........",
+      "..........abbbabbabbba........",
+      ".........abbccbaabcccca.......",
+      ".........abcccbbbccdcca.......",
+      "........accccccbbcccccca......",
+      ".......abcccbccccccccccba.....",
+      "......abbccbbbcccddcccdbba....",
+      "......abbbabbbccbbbccabdbba...",
+      "......abba.abbbbbbbbcaabba....",
+      ".......aa..abbaaabbba..aa.....",
+      "..........abaabbbababa........",
+      "........aacbbbbbbbabbcaa......",
+      ".......accccbbcccbbbddcca.....",
+      "......acccccccccccbcccdcca....",
+      ".....acccccccccccccccccccca..."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "leaf.dark",
+      "c": "leaf",
+      "d": "leaf.light"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      9,
+      55
+     ],
+     "anchor": "tl",
+     "rows": [
+      "....abcccbccccccccddcccddcba..",
+      "...abbbcbbbccccbccccdccccdbba.",
+      "...abbbabbbbccbbbccbbbbcadbba.",
+      "....aba.abbbbabbbbabbbba.aba..",
+      ".....a..aabbababbabaabaa..a...",
+      ".......abbaabbbaabbbbabba.....",
+      ".....aaccbbbbcbbbbcbbbbcca....",
+      "....accccbbcccbbccccbcdcca....",
+      "...acccccccccccccccccccccca...",
+      ".aaccbbccccccccccddccccddccaa.",
+      "abbccbbbcccbcccccbcdcbbccddbba",
+      "abbaabbbccbbbcccbbbcbbbbcaabba",
+      "abba.abbbabbbbcebbbaabbbba.aba",
+      ".aa..abba.abbbeeeba..abba...a.",
+      "......aa...abeeeeea...aa......",
+      "...........aeeeeeea...........",
+      "...........aeeeeeea...........",
+      "...........aefffffa...........",
+      "...........affffffa...........",
+      "..........aefffffffa..........",
+      "..........aeeeeeeeea..........",
+      "...........aaaaaaaa..........."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "leaf.dark",
+      "c": "leaf",
+      "d": "leaf.light",
+      "e": "wood.dark",
+      "f": "wood"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     24,
+     76
+    ],
+    "leaf": "leaf",
+    "wood": "wood",
+    "picture": "shake"
+   },
+   "ctx": {
+    "t": 0.375,
+    "loop": true,
+    "frames": 8,
+    "frame": 3
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      8,
+      23
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...............aa..............",
+      "..............abca.............",
+      ".............abccca............",
+      ".............abccca............",
+      "............abccccca...........",
+      "............abccccca...........",
+      "...........abccccccca..........",
+      "...........abccccccca..........",
+      "..........abccccccccca.........",
+      "..........abccccccccca.........",
+      ".........abccccccccccca........",
+      ".........abccccccccccca........",
+      "........abbccccccddcdcca.......",
+      "........abbccccccccdccca.......",
+      "........abbbccbbccccbbba.......",
+      "........abbbcbbbbccbbba........",
+      ".........abbaabbbcaaaa.........",
+      ".........ababbabbabba..........",
+      "..........abbbabbabbba.........",
+      ".........abbccbaabcccca........",
+      ".........abcccbbbccdcca........",
+      "........accccccbbcccccca.......",
+      ".......abcccbccccccccccba......",
+      "......abbccbbbcccddcccdbba.....",
+      "......abbbabbbccbbbccabdbba....",
+      "......abba.abbbbbbbbcaabba.....",
+      ".......aa..abbaaabbba..aa......",
+      "..........abaabbbababa.........",
+      "........aacbbbbbbbabbcaa.......",
+      ".......accccbbcccbbbddcca......",
+      "......acccccccccccbcccdcca.....",
+      ".....acccccccccccccccccccca...."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "leaf.dark",
+      "c": "leaf",
+      "d": "leaf.light"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      8,
+      55
+     ],
+     "anchor": "tl",
+     "rows": [
+      "....abcccbccccccccddcccddcbbb..",
+      "...abbbcbbbccccbccccdccccdbba..",
+      "...abbbabbbbccbbbccbbbbcadbba..",
+      "..c.aba.abbbbabbbbabbbba.aba...",
+      ".c...a..aabbababbabaabaa..a....",
+      "c......abbaabbbaabbbbabba......",
+      "......accbbbbcbbbbcbbbbcca.....",
+      ".....accccbbcccbbccccbcdcca....",
+      "....acccccccccccccccccccccca...",
+      "..aaccbbccccccccccddccccddccaa.",
+      ".abbccbbbcccbcccccbcdcbbccddbbb",
+      ".abbaabbbccbbbcccbbbcbbbbcaabba",
+      ".abba.abbbabbbbcebbbaabbbba.aba",
+      "..aa..abba.abbbeeeba..abba...a.",
+      "..ccc..aa...abeeeeea...aa......",
+      "............aeeeeeea...........",
+      "............aeeeeeea...........",
+      "............aefffffa...........",
+      "............affffffa...........",
+      "...........aefffffffa..........",
+      "...........aeeeeeeeea..........",
+      "............aaaaaaaa..........."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "leaf.dark",
+      "c": "leaf",
+      "d": "leaf.light",
+      "e": "wood.dark",
+      "f": "wood"
+     }
+    }
+   ]
+  }
+ ]
+}

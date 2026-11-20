@@ -1,0 +1,195 @@
+{
+ "id": "tile.village.wood",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "piece": "plank-fill",
+    "stone": "stone",
+    "growth": "growth",
+    "wood": "wood",
+    "seam": "seam",
+    "fibre": "fibre",
+    "sheen": "sheen"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      0,
+      0
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaaaaaaaaaaaaaabaaaaaaaaaaaa",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "aaaaaaaaaaabaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaabaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaabaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaabaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaabaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaabaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaabaaaaaaaaaaaaaaaaaaaa",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaabaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaabaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaabaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaabaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaabaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaabaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaabaaaaa",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "aaaaabaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaabaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaabaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaabaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaabaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaabaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaabaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "aaaaaaaaaaaaaaaaaaabaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaabaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaabaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaabaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaabaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaabaaaaaaaaaaaa"
+     ],
+     "key": {
+      "a": "wood",
+      "b": "seam"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "piece": "fence-h",
+    "stone": "stone",
+    "growth": "growth",
+    "wood": "wood",
+    "seam": "seam",
+    "fibre": "fibre",
+    "sheen": "sheen"
+   },
+   "ctx": {
+    "t": 0.375,
+    "frame": 3,
+    "frames": 8,
+    "loop": true
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      0,
+      8
+     ],
+     "anchor": "tl",
+     "rows": [
+      "............................aa..",
+      "...........................abba.",
+      "..........................abbbba",
+      "..........................acddba",
+      "..........................acddba",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaacddba",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbacddba",
+      "ddddddddddddddddddddddddddacddba",
+      "ccccccccccccccccccccccccccacddba",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaacddba",
+      "..........................acddba",
+      "..........................acddba",
+      "..........................acddba",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaacddba",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbacddba",
+      "ddddddddddddddddddddddddddacddba",
+      "ccccccccccccccccccccccccccacddba",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaacddba",
+      "..........................acddba",
+      "..........................acddba",
+      "..........................acddba",
+      "..........................acddba",
+      "..........................acccca",
+      "...........................aaaa."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "wood.light",
+      "c": "wood.dark",
+      "d": "wood"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     40,
+     20
+    ],
+    "piece": "fence-post",
+    "stone": "stone",
+    "growth": "growth",
+    "wood": "wood",
+    "seam": "seam",
+    "fibre": "fibre",
+    "sheen": "sheen"
+   },
+   "ctx": {
+    "t": 0.5,
+    "frame": 4,
+    "frames": 8,
+    "loop": true
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      50,
+      12
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..aa..",
+      ".abba.",
+      "abbbba",
+      "acddba",
+      "acddba",
+      "acddba",
+      "acddba",
+      "acddba",
+      "acddba",
+      "acddba",
+      "acddba",
+      "acddba",
+      "acddba",
+      "acddba",
+      "acddba",
+      "acddba",
+      "acddba",
+      "acddba",
+      "acddba",
+      "acddba",
+      "acddba",
+      "acddba",
+      "acccca",
+      ".aaaa."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "wood.light",
+      "c": "wood.dark",
+      "d": "wood"
+     }
+    }
+   ]
+  }
+ ]
+}

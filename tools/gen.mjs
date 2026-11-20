@@ -158,7 +158,8 @@ function rowValues(t, size) {
   if (t.type === 'seed') return [0, 1, 2, 3];
   if (t.type === 'count') return t.hi - t.lo <= 7 ? Array.from({ length: t.hi - t.lo + 1 }, (_, i) => t.lo + i) : [t.lo, Math.round((t.lo + t.hi) / 2), t.hi];
   if (t.type === 'px' || t.type === 'share' || t.type === 'angle') {
-    const hi = t.type === 'px' ? Math.min(t.hi, Math.max(size[0], size[1])) : t.hi, lo = t.type === 'px' ? Math.max(t.lo, -Math.max(size[0], size[1])) : t.lo;
+    const lo = t.type === 'px' ? Math.max(t.lo, -Math.max(size[0], size[1])) : t.lo;
+    const hi = t.type === 'px' ? Math.max(lo, Math.min(t.hi, Math.max(size[0], size[1]))) : t.hi;   // never below lo: a width of 40 to 62 in a 32 px cell shows 40, not 32 (platform.moving@1's deck)
     // whole pixels for a px argument whose range is in whole pixels (a scale of 0.1..4 keeps its fraction)
     const mid = t.type === 'px' && Number.isInteger(lo) && Number.isInteger(hi) ? Math.round((lo + hi) / 2) : Math.round(((lo + hi) / 2) * 100) / 100;
     return [...new Set([lo, mid, hi])];

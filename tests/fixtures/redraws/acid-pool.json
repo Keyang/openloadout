@@ -1,0 +1,180 @@
+{
+ "id": "acid-pool",
+ "frozen": "2026-11-20",
+ "source": "sprites/acid-pool.js",
+ "sha256": "8c4fd4dd6af3edf5394e75aa92bf060b2c5f8851a6006f3d8eda9c554c494d9f",
+ "name": "Acid pool",
+ "blurb": "A boiling puddle of acid on the floor, seen from above: bubbles swell and burst and its edge wobbles; it can dry to a dark stain and spread again. Change its size, shape, bubbles, rim and colours.",
+ "meta": {
+  "type": "prop",
+  "role": "world/hazard",
+  "themes": [
+   "sci-fi",
+   "space",
+   "horror"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "shooter"
+  ],
+  "view": "top-down",
+  "words": [
+   "acid",
+   "pool",
+   "puddle",
+   "goo",
+   "slime",
+   "hazard",
+   "bubble",
+   "boil",
+   "spread",
+   "fade",
+   "stain",
+   "damage",
+   "toxic",
+   "floor"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  48,
+  32
+ ],
+ "pivot": [
+  24,
+  16
+ ],
+ "grounded": false,
+ "preview": "idle",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "shape": {
+   "kind": "choice",
+   "label": "Shape",
+   "def": "round",
+   "options": [
+    "round",
+    "splat",
+    "long"
+   ],
+   "group": "Look"
+  },
+  "pieces": {
+   "kind": "range",
+   "label": "Bubbles",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "crust": {
+   "kind": "toggle",
+   "label": "Dark rim",
+   "def": true,
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Body",
+   "def": "#9fe040",
+   "swatches": [
+    "#9fe040",
+    "#2fb3a8",
+    "#4f9ff0",
+    "#5fe0f0",
+    "#b04a8a"
+   ],
+   "group": "Colors"
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Shine",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#e8ecf2",
+    "#f6d3b0",
+    "#c2c9d6"
+   ],
+   "group": "Colors"
+  },
+  "wobble": {
+   "kind": "range",
+   "label": "Wobble",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Firm",
+   "hi": "Wobbly",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    8,
+    12
+   ]
+  },
+  "fade": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  },
+  "spawn": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  }
+ },
+ "sounds": {
+  "idle": [
+   {
+    "sound": "bubbles",
+    "preset": "Boiling",
+    "frame": 0,
+    "volume": 0.35
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-roguelite-scifi"
+ ]
+}

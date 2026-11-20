@@ -1,0 +1,374 @@
+{
+ "id": "ember-wyrm",
+ "frozen": "2026-11-20",
+ "source": "sprites/ember-wyrm.js",
+ "sha256": "3c5cdb7624b2d7b97676d27dbb7c5d82c83608c6d39770be4751821fcff12c0a",
+ "name": "Ember wyrm",
+ "blurb": "A boss: a long-necked dragon crouched on four legs that bites, breathes fire and beats its wings. Change its size, neck, bulk, spines, wings, horns, tail and colours.",
+ "meta": {
+  "type": "creature",
+  "role": "characters/boss",
+  "themes": [
+   "fantasy",
+   "dungeon"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "platformer"
+  ],
+  "view": "side",
+  "words": [
+   "dragon",
+   "wyrm",
+   "drake",
+   "wyvern",
+   "monster",
+   "wings",
+   "horns",
+   "bite",
+   "fire breath",
+   "burn",
+   "buffet",
+   "roar",
+   "boss fight",
+   "scaly"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  128,
+  96
+ ],
+ "pivot": [
+  56,
+  90
+ ],
+ "grounded": false,
+ "preview": "idle",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "length": {
+   "kind": "range",
+   "label": "Neck",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Short",
+   "hi": "Long",
+   "group": "Look"
+  },
+  "bulk": {
+   "kind": "range",
+   "label": "Bulk",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Lean",
+   "hi": "Heavy",
+   "group": "Look"
+  },
+  "spines": {
+   "kind": "choice",
+   "label": "Spines",
+   "def": "ridge",
+   "options": [
+    {
+     "value": "none",
+     "label": "None"
+    },
+    {
+     "value": "ridge",
+     "label": "Ridge"
+    },
+    {
+     "value": "sails",
+     "label": "Sails"
+    }
+   ],
+   "group": "Look"
+  },
+  "wings": {
+   "kind": "choice",
+   "label": "Wings",
+   "def": "large",
+   "options": [
+    {
+     "value": "large",
+     "label": "Large"
+    },
+    {
+     "value": "small",
+     "label": "Small"
+    },
+    {
+     "value": "tattered",
+     "label": "Tattered"
+    },
+    {
+     "value": "none",
+     "label": "None"
+    }
+   ],
+   "group": "Look"
+  },
+  "wingSpan": {
+   "kind": "range",
+   "label": "Span",
+   "def": 1,
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "lo": "Small",
+   "hi": "Wide",
+   "group": "Look"
+  },
+  "horns": {
+   "kind": "choice",
+   "label": "Horns",
+   "def": "swept",
+   "options": [
+    {
+     "value": "swept",
+     "label": "Swept"
+    },
+    {
+     "value": "ram",
+     "label": "Ram"
+    },
+    {
+     "value": "crown",
+     "label": "Crown"
+    },
+    {
+     "value": "none",
+     "label": "None"
+    }
+   ],
+   "group": "Look"
+  },
+  "hornLength": {
+   "kind": "range",
+   "label": "Length",
+   "def": 1,
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "lo": "Short",
+   "hi": "Long",
+   "group": "Look"
+  },
+  "tail": {
+   "kind": "choice",
+   "label": "Tail",
+   "def": "spade",
+   "options": [
+    {
+     "value": "spade",
+     "label": "Spade"
+    },
+    {
+     "value": "club",
+     "label": "Club"
+    },
+    {
+     "value": "flame",
+     "label": "Flame"
+    }
+   ],
+   "group": "Look"
+  },
+  "tailLength": {
+   "kind": "range",
+   "label": "Length",
+   "def": 1,
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "lo": "Short",
+   "hi": "Long",
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Hide",
+   "def": "#c9423a",
+   "swatches": [
+    "#c9423a",
+    "#4f9d57",
+    "#7a4fc4",
+    "#8e3a4a",
+    "#2f8f9d",
+    "#3f6fd1"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Belly and wings",
+   "def": "#e6c96a",
+   "swatches": [
+    "#e6c96a",
+    "#d8d8e0",
+    "#c9a06a",
+    "#a8a4a0",
+    "#f2c230"
+   ],
+   "group": "Colors"
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Fire",
+   "def": "#e8662c",
+   "swatches": [
+    "#e8662c",
+    "#4fd8ee",
+    "#7aa0f4",
+    "#f4e06a",
+    "#7fe0a0"
+   ],
+   "group": "Colors"
+  },
+  "bounce": {
+   "kind": "range",
+   "label": "Bounce",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Calm",
+   "hi": "Bouncy",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    7,
+    10
+   ]
+  },
+  "attack": {
+   "frames": 12,
+   "loop": false,
+   "fps": [
+    7,
+    12,
+    16
+   ]
+  },
+  "breath": {
+   "frames": 12,
+   "loop": false,
+   "fps": [
+    7,
+    12,
+    16
+   ]
+  },
+  "buffet": {
+   "frames": 10,
+   "loop": false,
+   "fps": [
+    7,
+    12,
+    16
+   ]
+  },
+  "hurt": {
+   "frames": 4,
+   "loop": false,
+   "fps": [
+    6,
+    9,
+    13
+   ]
+  },
+  "die": {
+   "frames": 12,
+   "loop": false,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  }
+ },
+ "sounds": {
+  "attack": [
+   {
+    "sound": "punch",
+    "preset": "Heavy body blow",
+    "frame": 7,
+    "volume": 1
+   }
+  ],
+  "breath": [
+   {
+    "sound": "wyrm-roar",
+    "preset": "Fire breath",
+    "frame": 1,
+    "volume": 1
+   }
+  ],
+  "buffet": [
+   {
+    "sound": "whoosh",
+    "preset": "Heavy swing",
+    "frame": 4,
+    "volume": 1
+   }
+  ],
+  "hurt": [
+   {
+    "sound": "punch",
+    "preset": "Heavy body blow",
+    "frame": 0,
+    "volume": 0.9
+   }
+  ],
+  "die": [
+   {
+    "sound": "wyrm-roar",
+    "preset": "Distant growl",
+    "frame": 0,
+    "volume": 1
+   },
+   {
+    "sound": "monster-fade",
+    "preset": "Big beast falls",
+    "frame": 8,
+    "volume": 1
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-rpg-fantasy"
+ ]
+}

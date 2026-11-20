@@ -1,0 +1,122 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "upgrade-pedestal",
+ "name": "Upgrade pedestal",
+ "blurb": "A stand that offers an upgrade as a turning hologram, which streaks away when it is taken. Change the stand, the hologram, its size, float and colours.",
+ "meta": {
+  "type": "prop",
+  "role": "world/prop",
+  "themes": ["sci-fi","space"],
+  "gameTypes": ["roguelike-action","shooter"],
+  "view": "top-down",
+  "words": ["pedestal","upgrade","hologram","altar","stand","shop","powerup","reward","choose","activate","take","projector","glowing"],
+  "license": "draft"
+ },
+ "size": [32,48],
+ "pivot": [16,46],
+ "preview": "idle",
+ "styles": ["pixel"],
+ "palette": [
+  {
+   "id": "body",
+   "label": "Body",
+   "default": "#6b7896",
+   "material": "metal",
+   "swatches": ["#6b7896","#566182","#434d6d","#3f6fd1","#2fb3a8","#4f9ff0"]
+  },
+  {
+   "id": "accent",
+   "label": "Lights",
+   "default": "#2fb3a8",
+   "material": "signal",
+   "swatches": ["#2fb3a8","#f2a030","#e2473f","#3f6fd1","#5fe0f0","#9fe040"]
+  },
+  {
+   "id": "glow",
+   "label": "Hologram colour",
+   "default": "#b48af8",
+   "material": "light",
+   "swatches": ["#b48af8","#5fe0f0","#e2473f","#9fe040","#f2a030","#4f9ff0","#5fd47a"]
+  }
+ ],
+ "controls": [
+  {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+  {
+   "key": "style",
+   "kind": "choice",
+   "label": "Style",
+   "options": [{"value":"pillar","label":"Pillar"},{"value":"ring","label":"Ring"},{"value":"claw","label":"Claw"}],
+   "default": "pillar"
+  },
+  {
+   "key": "shape",
+   "kind": "choice",
+   "label": "Hologram",
+   "options": [{"value":"cube","label":"Cube"},{"value":"orb","label":"Orb"},{"value":"arrow","label":"Arrow"},{"value":"star","label":"Star"}],
+   "default": "cube"
+  },
+  {"key":"body","kind":"colour","label":"Body"},
+  {"key":"accent","kind":"colour","label":"Lights"},
+  {"key":"glow","kind":"colour","label":"Hologram colour"},
+  {"key":"bob","kind":"range","label":"Float","lo":"Still","hi":"Floaty","default":0.5,"group":"Motion"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": {
+  "pictures": {
+   "nodes": [],
+   "draw": [
+    {
+     "id": "idle",
+     "gen": "pedestal.upgrade",
+     "v": 1,
+     "at": [16,46],
+     "clip": ["idle"],
+     "picture": "idle",
+     "size": {"from":"size","map":[[0,0],[1,1]],"round":"none"},
+     "style": {"from":"style","pick":{"pillar":"pillar","ring":"ring","claw":"claw"}},
+     "shape": {"from":"shape","pick":{"cube":"cube","orb":"orb","arrow":"arrow","star":"star"}},
+     "body": "body",
+     "accent": "accent",
+     "glowing": "glow",
+     "bob": {"from":"bob","map":[[0,0],[1,1]],"round":"none"}
+    },
+    {
+     "id": "activate",
+     "gen": "pedestal.upgrade",
+     "v": 1,
+     "at": [16,46],
+     "clip": ["activate"],
+     "picture": "activate",
+     "size": {"from":"size","map":[[0,0],[1,1]],"round":"none"},
+     "style": {"from":"style","pick":{"pillar":"pillar","ring":"ring","claw":"claw"}},
+     "shape": {"from":"shape","pick":{"cube":"cube","orb":"orb","arrow":"arrow","star":"star"}},
+     "body": "body",
+     "accent": "accent",
+     "glowing": "glow",
+     "bob": {"from":"bob","map":[[0,0],[1,1]],"round":"none"}
+    },
+    {
+     "id": "taken",
+     "gen": "pedestal.upgrade",
+     "v": 1,
+     "at": [16,46],
+     "clip": ["taken"],
+     "picture": "taken",
+     "size": {"from":"size","map":[[0,0],[1,1]],"round":"none"},
+     "style": {"from":"style","pick":{"pillar":"pillar","ring":"ring","claw":"claw"}},
+     "shape": {"from":"shape","pick":{"cube":"cube","orb":"orb","arrow":"arrow","star":"star"}},
+     "body": "body",
+     "accent": "accent",
+     "glowing": "glow",
+     "bob": {"from":"bob","map":[[0,0],[1,1]],"round":"none"}
+    }
+   ]
+  }
+ },
+ "clips": {
+  "idle": {"frames":8,"fps":8},
+  "activate": {"frames":8,"fps":12,"loop":false,"sounds":[{"sound":"upgrade-get","preset":"Upgrade","frame":1}]},
+  "taken": {"frames":1,"fps":8}
+ }
+}

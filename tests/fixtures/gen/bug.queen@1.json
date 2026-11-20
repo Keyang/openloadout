@@ -1,0 +1,4400 @@
+{
+ "id": "bug.queen",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "body": "body",
+    "accent": "accent",
+    "lit": "glow",
+    "at": [
+     48,
+     88
+    ]
+   },
+   "ctx": {
+    "clip": "idle",
+    "frame": 0
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      30,
+      30
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".a",
+      "ab"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      32,
+      24
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..............aa",
+      "..........aaaabb",
+      ".......aaacccbbb",
+      "....aaaccdddebbb",
+      "..aaccdddddfebbg",
+      "aacddddddddfebbb",
+      "cddddddddddfeebb",
+      "dddddddbbbbffeeb"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "accent",
+      "c": "body.light",
+      "d": "body",
+      "e": "accent.dark",
+      "f": "body.dark",
+      "g": "glow.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      48,
+      24
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aa..............",
+      "bbaaaa..........",
+      "bbbcccaaa.......",
+      "dbbbeccccaaa....",
+      "ddbbeeeeccccaa..",
+      "dbbbeeeeeeecccaa",
+      "bbbbeeeeeeeeeccc",
+      "bbbeeeeeeeeeeeec"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "accent",
+      "c": "body.light",
+      "d": "glow.dark",
+      "e": "body"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      64,
+      30
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a.",
+      "ba"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body.light"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      15,
+      47
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a"
+     ],
+     "key": {
+      "a": "ink"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      16,
+      32
+     ],
+     "anchor": "tl",
+     "rows": [
+      "............aabb",
+      "...........acbbb",
+      "...........abbbb",
+      "..........abbbbb",
+      ".........acbbbbb",
+      "........acbbbddd",
+      "........acbbeddd",
+      ".......acbbcedfg",
+      ".......acbbcedff",
+      "......accbbceedd",
+      "......accbbcceee",
+      "......accbbbcccc",
+      "......accbbbbcbb",
+      "......accbbbbcbb",
+      "aaaa..accbbbbcbb",
+      "hhhha.acddddbbcb"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body",
+      "c": "body.dark",
+      "d": "accent",
+      "e": "accent.dark",
+      "f": "glow",
+      "g": "glow.light",
+      "h": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.55
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      32,
+      32
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaabcccccddbb",
+      "aaaaddbceeccaddd",
+      "aaadddbceeccaaaa",
+      "aaadadbbccccaaaa",
+      "aaadaddbbbbaaaaa",
+      "caadaaddddaaaaaa",
+      "ccaddaaaaaaaaaaa",
+      "ccaadaaaaaaaaaaa",
+      "ccaadccccaaaaaaa",
+      "ccaabceeccaaaaaa",
+      "baadbbeeccaaaaaa",
+      "aaaddbbbbaaaaaaa",
+      "aaaaddddddaaaaaa",
+      "aaaaaaaaadddaaaa",
+      "aaaaaaaaaaaadddd",
+      "aaaaccccaaaaaaaa"
+     ],
+     "key": {
+      "a": "body",
+      "b": "accent.dark",
+      "c": "accent",
+      "d": "body.dark",
+      "e": "glow.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      48,
+      32
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aabbbbbbbbbbbbbb",
+      "cbbbbbbbbbbcbbbb",
+      "bbbbbbbbbbbccbbb",
+      "bbbbbbbbbbbbcbbb",
+      "bbbbbbbbbbbbcbbb",
+      "bbbbbbbbbbbbcbbb",
+      "bbbbbddddbbccbbb",
+      "bbbbddddddbcbbbb",
+      "bbbaddeedddcbbbb",
+      "bbcaadeedddbbbbb",
+      "bbccaaddddbbbbbb",
+      "bbbccaaaacbbbbbb",
+      "bbbbccccbbbbbbbb",
+      "bbbbcccbbbbddbbb",
+      "ccccbbbbbadddddb",
+      "bbbbbbbbcadfgddb"
+     ],
+     "key": {
+      "a": "accent.dark",
+      "b": "body",
+      "c": "body.dark",
+      "d": "accent",
+      "e": "glow.dark",
+      "f": "glow",
+      "g": "glow.light"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      64,
+      32
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aabb............",
+      "caaab...........",
+      "cccab...........",
+      "cccaab..........",
+      "ccccaab.........",
+      "ccdccaab........",
+      "ccdcccab........",
+      "ccdcccaab.......",
+      "ccdccccab.......",
+      "ccdccccaab......",
+      "ccdcccccab......",
+      "ccdcccccab......",
+      "ccdcccccab......",
+      "ccdcccccab......",
+      "ccdcccccab..bbbb",
+      "cdcceeeeab.bffff"
+     ],
+     "key": {
+      "a": "body.light",
+      "b": "ink",
+      "c": "body",
+      "d": "body.dark",
+      "e": "accent",
+      "f": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.55
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      80,
+      47
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a"
+     ],
+     "key": {
+      "a": "ink"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      13,
+      48
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..a",
+      "..a",
+      "..a",
+      "..a",
+      "..a",
+      ".ab",
+      ".ab",
+      ".ab",
+      ".ab",
+      "abb",
+      "abb",
+      "aba",
+      "aba",
+      "aba",
+      ".a."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.55
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      16,
+      48
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaabbccccccded",
+      "aaaaaafcccgcccde",
+      "aaahhefccgggccdd",
+      "aabbbefcccgcccdd",
+      "aab.beffccccccdd",
+      "aab.beeffccccddd",
+      "ab...beeffffdddd",
+      "ab....beeeeedddd",
+      "ab.....bbeeeeddd",
+      "b........bebbedd",
+      "b.........baabdd",
+      ".........bhaaabe",
+      "........bihaaabb",
+      "..b.....bihaaaba",
+      ".babbbbbbihhhhaa",
+      "baaaaaaaaijjjjha"
+     ],
+     "key": {
+      "a": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.55
+      },
+      "b": "ink",
+      "c": "accent",
+      "d": "body",
+      "e": "body.dark",
+      "f": "accent.dark",
+      "g": "glow.dark",
+      "h": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "dark"
+      },
+      "i": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "body",
+        "with": {
+         "rule": "mix",
+         "of": "#f0ead8",
+         "with": "#f0ead8",
+         "amount": 0
+        },
+        "amount": 0.6
+       },
+       "tone": "dark"
+      },
+      "j": {
+       "rule": "mix",
+       "of": "body",
+       "with": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "amount": 0.6
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      32,
+      48
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaabcccccaaaaaaa",
+      "aadbcefccaaaaaac",
+      "dadbceeccaaaaabc",
+      "dddbbccccaaaadbc",
+      "adddbbbbaaaaadbc",
+      "aaaddddaaaaaadbb",
+      "aaaaddaaaaaaaddb",
+      "aaaaaaddaaaaaadd",
+      "aaaaaaaaddddaaaa",
+      "aaaaaaaaaddddddd",
+      "aaaaaadddggggggg",
+      "aaaaadgghhhhhhhh",
+      "daaddhhhhhhhhhhi",
+      "iddghhhhhhhhhhij",
+      "hiihhhhhhhihhhij",
+      "hhhihhhhhijihhij"
+     ],
+     "key": {
+      "a": "body",
+      "b": "accent.dark",
+      "c": "accent",
+      "d": "body.dark",
+      "e": "glow",
+      "f": "glow.light",
+      "g": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "light"
+      },
+      "h": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.55
+      },
+      "i": "ink",
+      "j": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "body",
+        "with": {
+         "rule": "mix",
+         "of": "#f0ead8",
+         "with": "#f0ead8",
+         "amount": 0
+        },
+        "amount": 0.6
+       },
+       "tone": "dark"
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      48,
+      48
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaaabcdeedda",
+      "dddaaaaabcccddca",
+      "ddddaaaabbbccbab",
+      "ffddaaaaaabbaabb",
+      "ffddaaaaaaaaabba",
+      "ddddaaaaaaaabaaa",
+      "cccaaaaaaabbaaaa",
+      "bbaaaaaabbaaaaaa",
+      "aaaabbbbaaaaaaaa",
+      "bbbbbbbaaaaaaaaa",
+      "gggggggbbbaaaaaa",
+      "hhhhhhggggbaaaaa",
+      "ihhhhhhhhggbbaaa",
+      "jihhhhhhhhgggbai",
+      "jihhhihhhhhhgiih",
+      "jihhijihhhhhihhh"
+     ],
+     "key": {
+      "a": "body",
+      "b": "body.dark",
+      "c": "accent.dark",
+      "d": "accent",
+      "e": "glow",
+      "f": "glow.dark",
+      "g": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "light"
+      },
+      "h": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.55
+      },
+      "i": "ink",
+      "j": {
+       "rule": "mix",
+       "of": "body",
+       "with": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "amount": 0.6
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      64,
+      48
+     ],
+     "anchor": "tl",
+     "rows": [
+      "abaccccccddeeeee",
+      "bafcccgccceeeeee",
+      "abfccghgcceeieee",
+      "abfcccgcccedddee",
+      "abffccccccd..dee",
+      "abbffccccd...dee",
+      "aabbffffd.....de",
+      "aaabbbbd......de",
+      "aaaaaajd......de",
+      "aaaddad........d",
+      "aadeed.........d",
+      "adieeed.........",
+      "ddieeekd........",
+      "edieeekd.....d..",
+      "eeiiiikdddddded.",
+      "eelkkkkeeeeeeeed"
+     ],
+     "key": {
+      "a": "body",
+      "b": "body.dark",
+      "c": "accent",
+      "d": "ink",
+      "e": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.55
+      },
+      "f": "accent.dark",
+      "g": "glow",
+      "h": "glow.light",
+      "i": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "dark"
+      },
+      "j": "body.light",
+      "k": {
+       "rule": "mix",
+       "of": "body",
+       "with": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "amount": 0.6
+      },
+      "l": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "body",
+        "with": {
+         "rule": "mix",
+         "of": "#f0ead8",
+         "with": "#f0ead8",
+         "amount": 0
+        },
+        "amount": 0.6
+       },
+       "tone": "dark"
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      80,
+      48
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a..",
+      "a..",
+      "a..",
+      "a..",
+      "a..",
+      "ba.",
+      "ba.",
+      "ba.",
+      "ba.",
+      "bba",
+      "bba",
+      "aba",
+      "aba",
+      "aba",
+      ".a."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.55
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      13,
+      66
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..a",
+      "..a",
+      "..a",
+      "..a",
+      "..a",
+      ".ab",
+      ".ab",
+      ".ab",
+      ".ab",
+      "abb",
+      "aba",
+      "aba",
+      ".a."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.55
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      16,
+      64
+     ],
+     "anchor": "tl",
+     "rows": [
+      "abbbbbbbbcddddee",
+      "abbbeeeeecddddae",
+      "bbbaaaaaacddda.a",
+      "bbba....acddda..",
+      "bbba....acddda..",
+      "bba.....adddda..",
+      "bba....acdddda..",
+      "ba.....acddda...",
+      "ba.....acddda...",
+      "ba.....acddda...",
+      "a......acddda...",
+      "a......accdda...",
+      "........acdda...",
+      "........acdda...",
+      "........acdda...",
+      "........acdda..."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.55
+      },
+      "c": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "body",
+        "with": {
+         "rule": "mix",
+         "of": "#f0ead8",
+         "with": "#f0ead8",
+         "amount": 0
+        },
+        "amount": 0.6
+       },
+       "tone": "dark"
+      },
+      "d": {
+       "rule": "mix",
+       "of": "body",
+       "with": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "amount": 0.6
+      },
+      "e": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "dark"
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      32,
+      64
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaabaaacbdebcbe",
+      "caaaabaaabdeebee",
+      "cccaaabbabddeeee",
+      "bbccaabdbbbebbbb",
+      ".bbccaabdebbffff",
+      ".bcbcccbbbfaaaaa",
+      "..bcbbcbfaaaaaaa",
+      "...bbcbaaaaaaaaa",
+      ".....bcaaaaagggg",
+      ".....bcahghighig",
+      ".....bcghghhghhg",
+      ".....bccgggggggg",
+      "......bccaaaaagg",
+      ".......bccaaaaaa",
+      "........bcaaaaaa",
+      "........bccaaaaa"
+     ],
+     "key": {
+      "a": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.55
+      },
+      "b": "ink",
+      "c": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "dark"
+      },
+      "d": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "body",
+        "with": {
+         "rule": "mix",
+         "of": "#f0ead8",
+         "with": "#f0ead8",
+         "amount": 0
+        },
+        "amount": 0.6
+       },
+       "tone": "dark"
+      },
+      "e": {
+       "rule": "mix",
+       "of": "body",
+       "with": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "amount": 0.6
+      },
+      "f": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "light"
+      },
+      "g": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "deep"
+      },
+      "h": "glow",
+      "i": "glow.light"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      48,
+      64
+     ],
+     "anchor": "tl",
+     "rows": [
+      "abcbaabddddbdddd",
+      "aabaaabdddbddddd",
+      "aaaaaabdbbdddddc",
+      "bbbbabbbabddddbb",
+      "eeeebbaabddddbb.",
+      "dddeeebbbcdcbeb.",
+      "dddddeeebcbbcb..",
+      "dddddddeebdbb...",
+      "ffffddddeeb.....",
+      "fghfghfgdeb.....",
+      "fggfggfgfeb.....",
+      "ffffffffdeb.....",
+      "ffdddddddb......",
+      "ddddddddb.......",
+      "dddddddb........",
+      "ddddddeb........"
+     ],
+     "key": {
+      "a": {
+       "rule": "mix",
+       "of": "body",
+       "with": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "amount": 0.6
+      },
+      "b": "ink",
+      "c": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "dark"
+      },
+      "d": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.55
+      },
+      "e": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "light"
+      },
+      "f": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "deep"
+      },
+      "g": "glow",
+      "h": "glow.light"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      64,
+      64
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aabccccaaaaaaaad",
+      "adbbccceeeeeaaad",
+      "d.dbcccddddddaaa",
+      "..dbcccd....daaa",
+      "..dbcccd....daaa",
+      "..dbcccd.....daa",
+      "..dbbcccd....daa",
+      "...dbcccd.....da",
+      "...dbcccd.....da",
+      "...dbcccd.....da",
+      "...dbcccd......d",
+      "...dbcccd......d",
+      "...dbccd........",
+      "...dbccd........",
+      "...dbccd........",
+      "...dbccd........"
+     ],
+     "key": {
+      "a": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.55
+      },
+      "b": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "body",
+        "with": {
+         "rule": "mix",
+         "of": "#f0ead8",
+         "with": "#f0ead8",
+         "amount": 0
+        },
+        "amount": 0.6
+       },
+       "tone": "dark"
+      },
+      "c": {
+       "rule": "mix",
+       "of": "body",
+       "with": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "amount": 0.6
+      },
+      "d": "ink",
+      "e": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "dark"
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      80,
+      66
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a..",
+      "a..",
+      "a..",
+      "a..",
+      "a..",
+      "ba.",
+      "ba.",
+      "ba.",
+      "ba.",
+      "bba",
+      "aba",
+      "aba",
+      ".a."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.55
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      24,
+      80
+     ],
+     "anchor": "tl",
+     "rows": [
+      "abcca",
+      "abbca",
+      ".abca",
+      ".abca",
+      ".abca",
+      ".abca",
+      ".abba",
+      "..aba",
+      "...a."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "body",
+        "with": {
+         "rule": "mix",
+         "of": "#f0ead8",
+         "with": "#f0ead8",
+         "amount": 0
+        },
+        "amount": 0.6
+       },
+       "tone": "dark"
+      },
+      "c": {
+       "rule": "mix",
+       "of": "body",
+       "with": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "amount": 0.6
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      40,
+      80
+     ],
+     "anchor": "tl",
+     "rows": [
+      "abcccdee",
+      "abffccee",
+      "abffaaac",
+      "abbfa..a",
+      ".abfa...",
+      ".abba...",
+      "..abba..",
+      "...aa..."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "body",
+        "with": {
+         "rule": "mix",
+         "of": "#f0ead8",
+         "with": "#f0ead8",
+         "amount": 0
+        },
+        "amount": 0.6
+       },
+       "tone": "dark"
+      },
+      "c": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "dark"
+      },
+      "d": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.55
+      },
+      "e": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "deep"
+      },
+      "f": {
+       "rule": "mix",
+       "of": "body",
+       "with": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "amount": 0.6
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      48,
+      80
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aabbbcde",
+      "aaccfdde",
+      "ceeefdde",
+      "e..efdde",
+      "...efde.",
+      "...edde.",
+      "..effe..",
+      "...ee..."
+     ],
+     "key": {
+      "a": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "deep"
+      },
+      "b": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.55
+      },
+      "c": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "dark"
+      },
+      "d": {
+       "rule": "mix",
+       "of": "body",
+       "with": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "amount": 0.6
+      },
+      "e": "ink",
+      "f": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "body",
+        "with": {
+         "rule": "mix",
+         "of": "#f0ead8",
+         "with": "#f0ead8",
+         "amount": 0
+        },
+        "amount": 0.6
+       },
+       "tone": "dark"
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      67,
+      80
+     ],
+     "anchor": "tl",
+     "rows": [
+      "abcca",
+      "abcca",
+      "abca.",
+      "abca.",
+      "abca.",
+      "abca.",
+      "abca.",
+      "aba..",
+      ".a..."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "body",
+        "with": {
+         "rule": "mix",
+         "of": "#f0ead8",
+         "with": "#f0ead8",
+         "amount": 0
+        },
+        "amount": 0.6
+       },
+       "tone": "dark"
+      },
+      "c": {
+       "rule": "mix",
+       "of": "body",
+       "with": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "amount": 0.6
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "body": "body",
+    "accent": "accent",
+    "lit": "glow",
+    "at": [
+     48,
+     88
+    ],
+    "size": 1,
+    "bulk": 1,
+    "legs": "eight",
+    "pieces": 1,
+    "horns": "antlers",
+    "hornLength": 1.35,
+    "wings": "veil",
+    "wingSpan": 1.35,
+    "bounce": 1
+   },
+   "ctx": {
+    "clip": "spawn",
+    "frame": 4
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      23,
+      9
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...a.....",
+      "..abaaaaa",
+      "..abbcccc",
+      "..acbcccc",
+      ".abccbccc",
+      ".acccbccc",
+      "abccccbcc"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "accent.dark",
+      "c": "accent"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      32,
+      4
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...............a",
+      "..............ab",
+      ".............abb",
+      "...........aabbb",
+      "..........abbbbb",
+      ".........abbbbbb",
+      "a.......abbbbbbc",
+      "baaaaaaabbbbbbbc",
+      "bbbbbbbbbbbbbbbc",
+      "bbbbbbbbbccbbbcd",
+      "bbbbbbbbcddccccd",
+      "bbbbbbbbbcdddddd"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "accent",
+      "c": "glow",
+      "d": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      48,
+      3
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a...............",
+      "ba..............",
+      "ba..............",
+      "bca.............",
+      "bccaa...........",
+      "bcccca..........",
+      "dccccca.........",
+      "edccccca......aa",
+      "edccccccaaaaaacc",
+      "edcccccccccccccc",
+      "eedcccddcccccccc",
+      "eeddddeedccccccc",
+      "eeeeeeedcccccccc"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "accent.dark",
+      "c": "accent",
+      "d": "glow",
+      "e": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      64,
+      9
+     ],
+     "anchor": "tl",
+     "rows": [
+      "....aa...",
+      "aaaabca..",
+      "bbbbcba..",
+      "bbbbcba..",
+      "bbbcbbba.",
+      "bbbcbbba.",
+      "bbcbbbbba"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "accent",
+      "c": "accent.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      11,
+      22
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aaaa",
+      "abbcc",
+      ".abbc",
+      ".abcb",
+      ".abcc",
+      ".abcc",
+      ".abcc",
+      ".abcc",
+      ".abcc",
+      ".abcc"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "accent.dark",
+      "c": "accent"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      16,
+      16
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".......abbbbbcbb",
+      "......acbbbbbbcb",
+      "......abbbbbbbcb",
+      ".....abbbbbbbbbd",
+      "..aaabbbbbbbbdee",
+      "aabbbbbbbbbdeeee",
+      "bbbbbbbbbbeeeeee",
+      "bbbbbbbbdeeeeeee",
+      "bbbbbbbeeeeeeeee",
+      "bbbbbbeeeeeeeeee",
+      "cbbbbeeeeeeeeeee",
+      "bccbfeeeeeeeeeee",
+      "bbbfeeeeeeeeeeef",
+      "bbbeeeeefeeeeeee",
+      "bbfeeeeeggggeeee",
+      "bffeeeeggggggeee"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "accent",
+      "c": "accent.dark",
+      "d": "body.light",
+      "e": "body",
+      "f": "body.dark",
+      "g": "accent.light"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      32,
+      16
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaaaabcdddde",
+      "aaaaabbbfffcddee",
+      "aabbffffffgacdee",
+      "bfffffffffgcddde",
+      "ffffffffffcddddd",
+      "fffffffffcdddddd",
+      "fffffhhhcddccccd",
+      "ffffhhhhhccgaacd",
+      "gffahhijhhhgggac",
+      "gfgaahiihhhffggc",
+      "gfggaahhhhfffffc",
+      "gffggaaaafffhhhh",
+      "ffffggggfffhhhhh",
+      "gfffffffffahhijh",
+      "gffffffffgaahiih",
+      "gfffhhfffggaahhh"
+     ],
+     "key": {
+      "a": "accent",
+      "b": "body.light",
+      "c": "glow",
+      "d": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      },
+      "e": {
+       "rule": "tone",
+       "of": "glow",
+       "by": -1
+      },
+      "f": "body",
+      "g": "body.dark",
+      "h": "accent.light",
+      "i": "glow.light",
+      "j": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      48,
+      16
+     ],
+     "anchor": "tl",
+     "rows": [
+      "abbbbbcddddddddd",
+      "aabbbceeeeeddddd",
+      "fabbcgggggeeeedd",
+      "abbbbcgggggggeee",
+      "bbbbbbcggggggggg",
+      "bbbbbbbcgggggggg",
+      "bbccccbbchhhgggg",
+      "bbcdggcchhhhhggg",
+      "bcigggidhjfhhggi",
+      "bcggggidhjjhhggi",
+      "bcggggiddhhhhggi",
+      "cgggggiiddddgggi",
+      "hggggggiiiiggggg",
+      "hhgggggghhgggggi",
+      "hhgggghhhhhhgggi",
+      "hggggdhhhhhhhggi"
+     ],
+     "key": {
+      "a": {
+       "rule": "tone",
+       "of": "glow",
+       "by": -1
+      },
+      "b": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      },
+      "c": "glow",
+      "d": "accent",
+      "e": "body.light",
+      "f": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      },
+      "g": "body",
+      "h": "accent.light",
+      "i": "body.dark",
+      "j": "glow.light"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      64,
+      16
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aabaaaaac.......",
+      "abaaaaaaac......",
+      "abaaaaaaac......",
+      "daaaaaaaaac.....",
+      "dddaaaaaaaaccc..",
+      "eedddaaaaaaaaacc",
+      "eeeeddaaaaaaaaaa",
+      "eeeeedddaaaaaaaa",
+      "eeeeeeeddaaaaaaa",
+      "eeeeeeeeddaaaaaa",
+      "eeeeeeeeeddaaaab",
+      "eeeeeeeeeeddabba",
+      "feeeeeeeeeeddaaa",
+      "eeeeeeefeeeedaaa",
+      "eeeeeeefeeeeddaa",
+      "eeeeeeeefeeeedda"
+     ],
+     "key": {
+      "a": "accent",
+      "b": "accent.dark",
+      "c": "ink",
+      "d": "body.light",
+      "e": "body",
+      "f": "body.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      80,
+      22
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaa.",
+      "bbbca",
+      "bcca.",
+      "cbba.",
+      "bbba.",
+      "bbba.",
+      "bbba.",
+      "bbba.",
+      "bbba.",
+      "bbba."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "accent",
+      "c": "accent.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      6,
+      32
+     ],
+     "anchor": "tl",
+     "rows": [
+      "......abbb",
+      ".....acbbb",
+      ".....abbbb",
+      "....abbbbb",
+      "...acbbbbb",
+      "...addbbbe",
+      ".aaddddbbe",
+      "accdddfdde",
+      ".acddfgffe",
+      "..adddfggf",
+      "..adddbfgg",
+      ".adddcbfgg",
+      ".adddccbfg",
+      ".addaacffg",
+      ".addaafggg",
+      "adddffgggg"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "accent",
+      "c": "accent.dark",
+      "d": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.55
+      },
+      "e": "body.dark",
+      "f": "glow",
+      "g": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      16,
+      32
+     ],
+     "anchor": "tl",
+     "rows": [
+      "abccccaddefdddcc",
+      "abcccbaadeedddcc",
+      "bbcccbbaaddddccc",
+      "bcccccbbaaaacccc",
+      "bccccccbbbbccccc",
+      "bcccgccbcccccccc",
+      "bccghgcbcccccccc",
+      "bccghgccbccccccc",
+      "bcghhgccbccccccc",
+      "gcghhgccbbcccccc",
+      "hghhhgdddbcccccc",
+      "hhhhhggggggccccd",
+      "hhhhhhhhhhhgccad",
+      "hiihhhhhhggjcbaa",
+      "iifihhhhgjkljbba",
+      "hiihhhggdjkljbbb"
+     ],
+     "key": {
+      "a": "accent",
+      "b": "body.dark",
+      "c": "body",
+      "d": "accent.light",
+      "e": "glow.light",
+      "f": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      },
+      "g": "glow",
+      "h": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      },
+      "i": {
+       "rule": "tone",
+       "of": "glow",
+       "by": -1
+      },
+      "j": "ink",
+      "k": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "body",
+        "with": {
+         "rule": "mix",
+         "of": "#f0ead8",
+         "with": "#f0ead8",
+         "amount": 0
+        },
+        "amount": 0.6
+       },
+       "tone": "dark"
+      },
+      "l": {
+       "rule": "mix",
+       "of": "body",
+       "with": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "amount": 0.6
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      32,
+      32
+     ],
+     "anchor": "tl",
+     "rows": [
+      "abcdddddbbaacccc",
+      "bacdefddbbbaaaab",
+      "bacdfgfdbbbbbbbb",
+      "bacccfdcbbbbbddd",
+      "baaaccabbbbbdddd",
+      "bbbaaabbbbbcddef",
+      "bbbbbbaabbaccdfg",
+      "bbbbbbbbaaaaccdf",
+      "bbbbbbbbbbbaaccc",
+      "bbbbbbbbbbbbaaaa",
+      "ddddbbbbbbbbbbbb",
+      "dddddbbbbbbbbbbb",
+      "defdddbbbbbbbbbb",
+      "dfgfddbbbbbbbbbd",
+      "cdfddbbbbbbbbbcd",
+      "ccccbbbbbbbbbacc"
+     ],
+     "key": {
+      "a": "body.dark",
+      "b": "body",
+      "c": "accent",
+      "d": "accent.light",
+      "e": "glow.light",
+      "f": {
+       "rule": "mix",
+       "of": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "with": "glow",
+       "amount": 0.5
+      },
+      "g": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      48,
+      32
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaabcddefdddaab",
+      "aaaabcddeedddaba",
+      "aaaabccddddddbaa",
+      "daaabbcccddcbbaa",
+      "ddaaabbbccbbbaaa",
+      "dddaaaabbabaaaaa",
+      "gddaaaaabbaaaaaa",
+      "ddaaabbbaaaaaaaa",
+      "cbbbbaaaaaaaaadd",
+      "aaaaaaaaaaaaacdd",
+      "aaaaaaaaaaaabcde",
+      "aaaaaaaaaaaabcdg",
+      "ddddaaaaaaaabccd",
+      "dddddaaaaaaabbcc",
+      "defdddaaaaaaabbb",
+      "deedddaaaaaaaaaa"
+     ],
+     "key": {
+      "a": "body",
+      "b": "body.dark",
+      "c": "accent",
+      "d": "accent.light",
+      "e": "glow.light",
+      "f": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      },
+      "g": {
+       "rule": "mix",
+       "of": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "with": "glow",
+       "amount": 0.5
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      64,
+      32
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaaabaaaaacd",
+      "aaaaaaaabaaaaacd",
+      "aaaaaaaabaaaaacc",
+      "aaaaaaaabaaaaaac",
+      "aaaaaaaabaaaaaac",
+      "aaaaaaaabaaeaaac",
+      "aaaaaaaffaegeaaa",
+      "aaaaaaffffegeaaa",
+      "ffaaadfhifeggeaa",
+      "fffabddijieggeae",
+      "iffabbddifegggeg",
+      "jifaaeeeeeeggggg",
+      "iffaeggggggggggg",
+      "ddaakeeggggggllg",
+      "baakmnkeggggljll",
+      "abbkmnkdeegggllg"
+     ],
+     "key": {
+      "a": "body",
+      "b": "body.dark",
+      "c": "body.light",
+      "d": "accent",
+      "e": "glow",
+      "f": "accent.light",
+      "g": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      },
+      "h": "glow.light",
+      "i": {
+       "rule": "mix",
+       "of": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "with": "glow",
+       "amount": 0.5
+      },
+      "j": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      },
+      "k": "ink",
+      "l": {
+       "rule": "tone",
+       "of": "glow",
+       "by": -1
+      },
+      "m": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "body",
+        "with": {
+         "rule": "mix",
+         "of": "#f0ead8",
+         "with": "#f0ead8",
+         "amount": 0
+        },
+        "amount": 0.6
+       },
+       "tone": "dark"
+      },
+      "n": {
+       "rule": "mix",
+       "of": "body",
+       "with": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "amount": 0.6
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      80,
+      32
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaab......",
+      "aaaab.....",
+      "aaaab.....",
+      "aaaaab....",
+      "aaaaaab...",
+      "caaaddb...",
+      "caaddddb..",
+      "cddedddfb.",
+      "ceegeddb..",
+      "eggedddb..",
+      "ggeadddb..",
+      "ggeaadddb.",
+      "geaaadddb.",
+      "geeabbddb.",
+      "gggebbddb.",
+      "ggggeedddb"
+     ],
+     "key": {
+      "a": "accent",
+      "b": "ink",
+      "c": "body.light",
+      "d": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.55
+      },
+      "e": "glow",
+      "f": "accent.dark",
+      "g": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      4,
+      48
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..abbcdddddd",
+      "..abbacccccc",
+      "..abaa..aefc",
+      "..ababaaaefc",
+      ".abbbbbbbefc",
+      ".abbbbbbbbbc",
+      "..aabbbgggbc",
+      "..abbbaaaggg",
+      "..abbba..aaa",
+      "..abbba.....",
+      "..abba......",
+      ".abbba......",
+      ".abba.......",
+      ".abba.......",
+      ".abba...aa..",
+      "abba...abbaa"
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.55
+      },
+      "c": "glow",
+      "d": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      },
+      "e": "accent.dark",
+      "f": "accent",
+      "g": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "dark"
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      16,
+      48
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaabccdeedfgg",
+      "aaaaaaabffdedfff",
+      "aaabaaabffdehdff",
+      "aabgbbaabfdehdff",
+      "aabggdbbabdeedff",
+      "abigggdebhddhhdf",
+      "abiigggdeeehhhdf",
+      "bjjjjgggddeeehhd",
+      "ddddjjgggdddeehd",
+      "....dddgddjideeh",
+      ".......dddjjjdeh",
+      "........deddjdee",
+      "........dehhdhde",
+      ".....dddehhhhdde",
+      "dddddiiieeeehhjd",
+      "iiiiiiiiehheeeeh"
+     ],
+     "key": {
+      "a": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      },
+      "b": "glow",
+      "c": "accent.light",
+      "d": "ink",
+      "e": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "body",
+        "with": {
+         "rule": "mix",
+         "of": "#f0ead8",
+         "with": "#f0ead8",
+         "amount": 0
+        },
+        "amount": 0.6
+       },
+       "tone": "dark"
+      },
+      "f": "body",
+      "g": "body.dark",
+      "h": {
+       "rule": "mix",
+       "of": "body",
+       "with": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "amount": 0.6
+      },
+      "i": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.55
+      },
+      "j": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "dark"
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      32,
+      48
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaabbbbbbbbbbaac",
+      "aabbbbbbbbbbbbaa",
+      "baaabbbbbbbbbbba",
+      "bbbbaabbbbbbbbbb",
+      "bbbbbbaaaabbbbbb",
+      "bbbbbbbbbbaaaaaa",
+      "bbbbbbbbbbbbbbbb",
+      "bbbbbbbbbbbaaaaa",
+      "bbbbbbbaaaaddddd",
+      "ebbbbaadddffffff",
+      "ebbaadffffffffff",
+      "geadffffffffffff",
+      "ggefffffffffffff",
+      "hggeffffffffffff",
+      "ggggefffffffffff",
+      "gggggeffiiiiiiii"
+     ],
+     "key": {
+      "a": "body.dark",
+      "b": "body",
+      "c": "accent",
+      "d": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "light"
+      },
+      "e": "ink",
+      "f": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.55
+      },
+      "g": {
+       "rule": "mix",
+       "of": "body",
+       "with": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "amount": 0.6
+      },
+      "h": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "body",
+        "with": {
+         "rule": "mix",
+         "of": "#f0ead8",
+         "with": "#f0ead8",
+         "amount": 0
+        },
+        "amount": 0.6
+       },
+       "tone": "dark"
+      },
+      "i": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "dark"
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      48,
+      48
+     ],
+     "anchor": "tl",
+     "rows": [
+      "abbbbccccccccccc",
+      "aaaaccccccccccdd",
+      "dddcccccccccdddc",
+      "ccccccccccddcccc",
+      "ccccccddddcccccc",
+      "ddddddcccccccccc",
+      "cccccccccccccccc",
+      "dddddccccccccccc",
+      "eeeeeddddccccccc",
+      "ffffeeeeeddccccg",
+      "ffffffffeeeddccg",
+      "ffffffffffeeedgh",
+      "ffffffffffffeghh",
+      "ffffffffffffghhh",
+      "fffffffffffghhhh",
+      "iiiiiiiiffghhhhh"
+     ],
+     "key": {
+      "a": "accent",
+      "b": "accent.light",
+      "c": "body",
+      "d": "body.dark",
+      "e": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "light"
+      },
+      "f": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.55
+      },
+      "g": "ink",
+      "h": {
+       "rule": "mix",
+       "of": "body",
+       "with": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "amount": 0.6
+      },
+      "i": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "dark"
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      64,
+      48
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aabcdecffghhhhhh",
+      "bbbcecaaghhhhhhh",
+      "bbcdecbaghhhghhh",
+      "bbcdecbghhggaghh",
+      "bbceecghggcbbghh",
+      "bcdeccegecbbijgh",
+      "bceeeeedcbbbjjgh",
+      "cdeeedccbbbjjkkg",
+      "ceeecccbbbkkcccc",
+      "deecjjccaccc....",
+      "eeckjkccc.......",
+      "eeckccec........",
+      "ecdceeec........",
+      "ecceeeeeccc.....",
+      "cjeeeeddjjjccccc",
+      "eeeddeeejjjjjjjj"
+     ],
+     "key": {
+      "a": "body.dark",
+      "b": "body",
+      "c": "ink",
+      "d": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "body",
+        "with": {
+         "rule": "mix",
+         "of": "#f0ead8",
+         "with": "#f0ead8",
+         "amount": 0
+        },
+        "amount": 0.6
+       },
+       "tone": "dark"
+      },
+      "e": {
+       "rule": "mix",
+       "of": "body",
+       "with": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "amount": 0.6
+      },
+      "f": "accent",
+      "g": "glow",
+      "h": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      },
+      "i": "body.light",
+      "j": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.55
+      },
+      "k": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "dark"
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      80,
+      48
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaabccd..",
+      "bbbbbbdccd..",
+      "beed..ddcd..",
+      "beedddcdcd..",
+      "beecccccccd.",
+      "bcccccccccd.",
+      "bcccfcccdd..",
+      "fffdddcccd..",
+      "ddd..dcccd..",
+      ".....dcccd..",
+      "......dccd..",
+      "......dcccd.",
+      ".......dccd.",
+      ".......dccd.",
+      "..dd...dccd.",
+      "ddccd...dccd"
+     ],
+     "key": {
+      "a": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      },
+      "b": "glow",
+      "c": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.55
+      },
+      "d": "ink",
+      "e": "accent",
+      "f": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "dark"
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      4,
+      64
+     ],
+     "anchor": "tl",
+     "rows": [
+      "abba..abbbbb",
+      "abba..abbbbb",
+      "aba...abbbbc",
+      "aba...abbbaa",
+      ".a....abbba.",
+      "......abba..",
+      ".....abbba..",
+      ".....abbba..",
+      ".....abba...",
+      ".....abba...",
+      "....abba....",
+      "....abba....",
+      "....abba....",
+      "....aba.....",
+      "...abba.....",
+      "...aba......"
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.55
+      },
+      "c": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "dark"
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      16,
+      64
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaabbcddddecc",
+      "abbbbeeecddddeee",
+      "eeeee..edddde..e",
+      "......ecdddde...",
+      "......ecdddde...",
+      "......ecddde....",
+      "......ecddde....",
+      "......ecddde....",
+      "......ecddde....",
+      "......ecddde....",
+      "......ecdde.....",
+      "......ecdde.....",
+      "......ecdde.....",
+      "......ecdde.....",
+      "......ecdde.....",
+      "......eccde....."
+     ],
+     "key": {
+      "a": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.55
+      },
+      "b": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "dark"
+      },
+      "c": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "body",
+        "with": {
+         "rule": "mix",
+         "of": "#f0ead8",
+         "with": "#f0ead8",
+         "amount": 0
+        },
+        "amount": 0.6
+       },
+       "tone": "dark"
+      },
+      "d": {
+       "rule": "mix",
+       "of": "body",
+       "with": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "amount": 0.6
+      },
+      "e": "ink"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      32,
+      64
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaabbbcddddddddd",
+      "ccaabbbcdddddddc",
+      "cecaabbbcccccccf",
+      "ccecaabbccffffdd",
+      "cececaacfddddddd",
+      ".cececcddddddddd",
+      "..ceccdddddddddd",
+      "...cceddddgggggg",
+      "....cedhgghighig",
+      "....ceehgghhghhg",
+      ".....cedgggggggg",
+      ".....ceeddddgggg",
+      "......ceeddddddd",
+      ".......ceedddddd",
+      ".......caeddddgg",
+      ".......cbeeddggg"
+     ],
+     "key": {
+      "a": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "body",
+        "with": {
+         "rule": "mix",
+         "of": "#f0ead8",
+         "with": "#f0ead8",
+         "amount": 0
+        },
+        "amount": 0.6
+       },
+       "tone": "dark"
+      },
+      "b": {
+       "rule": "mix",
+       "of": "body",
+       "with": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "amount": 0.6
+      },
+      "c": "ink",
+      "d": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.55
+      },
+      "e": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "dark"
+      },
+      "f": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "light"
+      },
+      "g": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "deep"
+      },
+      "h": "glow.light",
+      "i": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      48,
+      64
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaaaabcccccd",
+      "baaaaaaabcccccbb",
+      "ebbbbbbbcccccbab",
+      "eeeeeebbccccbabb",
+      "aaaaaeeebccbabeb",
+      "aaaaaaaeebbfbab.",
+      "aaaaaaaaeebbfb..",
+      "ggggggaaaeebb...",
+      "ghighigghaeb....",
+      "ghhghhgghaeb....",
+      "ggggggggaab.....",
+      "ggggaaaaaeb.....",
+      "aaaaaaaaab......",
+      "aaaaaaaab.......",
+      "ggaaaaacb.......",
+      "gggaaaecb......."
+     ],
+     "key": {
+      "a": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.55
+      },
+      "b": "ink",
+      "c": {
+       "rule": "mix",
+       "of": "body",
+       "with": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "amount": 0.6
+      },
+      "d": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "body",
+        "with": {
+         "rule": "mix",
+         "of": "#f0ead8",
+         "with": "#f0ead8",
+         "amount": 0
+        },
+        "amount": 0.6
+       },
+       "tone": "dark"
+      },
+      "e": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "light"
+      },
+      "f": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "dark"
+      },
+      "g": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "deep"
+      },
+      "h": "glow.light",
+      "i": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      64,
+      64
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aabaccccddddeeee",
+      "bbbaacccbbbddddd",
+      "b..bacccb..bbbbb",
+      "...baccccb......",
+      "...baacccb......",
+      "....bacccb......",
+      "....bacccb......",
+      "....bacccb......",
+      "....bacccb......",
+      "....baaccb......",
+      ".....baccb......",
+      ".....baccb......",
+      ".....baccb......",
+      ".....baccb......",
+      ".....baccb......",
+      ".....baccb......"
+     ],
+     "key": {
+      "a": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "body",
+        "with": {
+         "rule": "mix",
+         "of": "#f0ead8",
+         "with": "#f0ead8",
+         "amount": 0
+        },
+        "amount": 0.6
+       },
+       "tone": "dark"
+      },
+      "b": "ink",
+      "c": {
+       "rule": "mix",
+       "of": "body",
+       "with": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "amount": 0.6
+      },
+      "d": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "dark"
+      },
+      "e": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.55
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      80,
+      64
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaab..baab",
+      "caaaab..baab",
+      "caaaab...bab",
+      "bbaaab...bab",
+      ".baaab....b.",
+      "..baab......",
+      "..baaab.....",
+      "..baaab.....",
+      "...baab.....",
+      "...baab.....",
+      "....baab....",
+      "....baab....",
+      "....baab....",
+      ".....bab....",
+      ".....baab...",
+      "......bab..."
+     ],
+     "key": {
+      "a": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.55
+      },
+      "b": "ink",
+      "c": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "dark"
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      8,
+      80
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a"
+     ],
+     "key": {
+      "a": "ink"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      23,
+      80
+     ],
+     "anchor": "tl",
+     "rows": [
+      "abca",
+      "abca",
+      "abca",
+      "aba.",
+      "aba.",
+      "aba.",
+      ".a.."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "body",
+        "with": {
+         "rule": "mix",
+         "of": "#f0ead8",
+         "with": "#f0ead8",
+         "amount": 0
+        },
+        "amount": 0.6
+       },
+       "tone": "dark"
+      },
+      "c": {
+       "rule": "mix",
+       "of": "body",
+       "with": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "amount": 0.6
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      37,
+      80
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".abccdddeef",
+      ".acccaadeef",
+      "abcca..aaaa",
+      "abba.......",
+      ".aba.......",
+      ".aba.......",
+      ".aba.......",
+      "..a........"
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "body",
+        "with": {
+         "rule": "mix",
+         "of": "#f0ead8",
+         "with": "#f0ead8",
+         "amount": 0
+        },
+        "amount": 0.6
+       },
+       "tone": "dark"
+      },
+      "c": {
+       "rule": "mix",
+       "of": "body",
+       "with": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "amount": 0.6
+      },
+      "d": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "dark"
+      },
+      "e": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "deep"
+      },
+      "f": "glow.light"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      48,
+      80
+     ],
+     "anchor": "tl",
+     "rows": [
+      "abbccdeffg.",
+      "abbdggeefg.",
+      "gggg..geefg",
+      ".......gefg",
+      ".......geg.",
+      ".......geg.",
+      ".......geg.",
+      "........g.."
+     ],
+     "key": {
+      "a": "glow.light",
+      "b": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "deep"
+      },
+      "c": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.55
+      },
+      "d": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "dark"
+      },
+      "e": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "body",
+        "with": {
+         "rule": "mix",
+         "of": "#f0ead8",
+         "with": "#f0ead8",
+         "amount": 0
+        },
+        "amount": 0.6
+       },
+       "tone": "dark"
+      },
+      "f": {
+       "rule": "mix",
+       "of": "body",
+       "with": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "amount": 0.6
+      },
+      "g": "ink"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      69,
+      80
+     ],
+     "anchor": "tl",
+     "rows": [
+      "abca",
+      "abca",
+      "abba",
+      ".aba",
+      ".aba",
+      ".aba",
+      "..a."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "body",
+        "with": {
+         "rule": "mix",
+         "of": "#f0ead8",
+         "with": "#f0ead8",
+         "amount": 0
+        },
+        "amount": 0.6
+       },
+       "tone": "dark"
+      },
+      "c": {
+       "rule": "mix",
+       "of": "body",
+       "with": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "amount": 0.6
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      87,
+      80
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a"
+     ],
+     "key": {
+      "a": "ink"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "body": "body",
+    "accent": "accent",
+    "lit": "glow",
+    "at": [
+     20,
+     30
+    ],
+    "picture": "die",
+    "legs": "four",
+    "horns": "none",
+    "wings": "stubs"
+   },
+   "ctx": {
+    "frame": 7
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      -7,
+      -43
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a"
+     ],
+     "key": {
+      "a": "glow"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      12,
+      -54
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".a....",
+      "aba...",
+      "aba...",
+      "aba...",
+      "aba...",
+      "abba..",
+      "abba..",
+      "abbba.",
+      "abbba.",
+      "abbba.",
+      ".abbba",
+      ".abbba"
+     ],
+     "key": {
+      "a": "glow",
+      "b": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      30,
+      -52
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".....a",
+      "....ab",
+      "....ab",
+      "....ab",
+      "...aba",
+      "..abba",
+      "..abba",
+      ".abba.",
+      "abbba.",
+      "abbba."
+     ],
+     "key": {
+      "a": "glow",
+      "b": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      36,
+      -51
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a",
+      "a",
+      "a"
+     ],
+     "key": {
+      "a": "glow"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      -8,
+      -42
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aba.........",
+      "abba........",
+      ".aabaa......",
+      "...abba.....",
+      "...abbbaa...",
+      "....abbbba..",
+      ".....abbbbaa",
+      "......abbbbb",
+      ".......abbbb",
+      ".......abbbb",
+      "........abbb",
+      ".........abb",
+      "..........ab",
+      "...........a",
+      "...........a"
+     ],
+     "key": {
+      "a": "glow",
+      "b": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      4,
+      -42
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".........abbba..",
+      ".........abbbba.",
+      ".........abbbba.",
+      ".........abbbba.",
+      ".........abbbbba",
+      ".........abbbbba",
+      ".........abbbbbb",
+      "a........abbbbbb",
+      "baa......abbbbbb",
+      "bbba.....abbbbbb",
+      "bbbbaa...abbbbbb",
+      "bbbbbba..abaaaaa",
+      "bbbbbbbaaaaccccc",
+      "bbbbbbbaaccccccc",
+      "bbbbbbaacccccccc",
+      "abbbbaaccccccccc"
+     ],
+     "key": {
+      "a": "glow",
+      "b": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      },
+      "c": {
+       "rule": "mix",
+       "of": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "with": "glow",
+       "amount": 0.5
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      20,
+      -42
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".........abbba..",
+      "........abbbba..",
+      "........abbbba..",
+      ".......abbbbba..",
+      "......abbbbba...",
+      "......abbbbba...",
+      "a....abbbbbba...",
+      "a....abbbbba....",
+      "a...abbbbbba....",
+      "ba.abbbbbbba....",
+      "aa.abbbbbbba....",
+      "caaaaabbbba.....",
+      "ccccccaabba.....",
+      "ccccccccaaa...aa",
+      "cccccccccaaaaabb",
+      "ccccccccccaabbbb"
+     ],
+     "key": {
+      "a": "glow",
+      "b": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      },
+      "c": {
+       "rule": "mix",
+       "of": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "with": "glow",
+       "amount": 0.5
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      36,
+      -36
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...............a",
+      ".............aab",
+      "...........aabbb",
+      "........aaabbbaa",
+      ".....aaabbbbba..",
+      "...aabbbbbbaa...",
+      "aaabbbbbbba.....",
+      "bbbbbbbbba......",
+      "bbbbbbbba.......",
+      "bbbbbbaa........"
+     ],
+     "key": {
+      "a": "glow",
+      "b": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      52,
+      -36
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a.",
+      "ba",
+      "a."
+     ],
+     "key": {
+      "a": "glow",
+      "b": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      -18,
+      -22
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aaaaa",
+      "abbbbb",
+      ".aaaaa"
+     ],
+     "key": {
+      "a": "glow",
+      "b": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      -12,
+      -23
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...............a",
+      "aaaaaaaaaaaaaaab",
+      "bbbbbbbbbbbbbbbb",
+      "bbbbbbbbbbbbbbbb",
+      "aaaabbbbbbbbbbbb",
+      "....aaabbbbbbbbb",
+      ".......aaaabbbbb",
+      "...........aaaab",
+      "...............a",
+      "................",
+      "................",
+      "................",
+      "..............aa"
+     ],
+     "key": {
+      "a": "glow",
+      "b": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      4,
+      -26
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".abbaaccccccccbb",
+      "..abacccccccbbbb",
+      "...accccccbbbbbb",
+      "aaaacccccbbbbbbb",
+      "bbaccccccbbbbbbb",
+      "bbacccccbbbbbbdd",
+      "bbacccccbbbbbddd",
+      "bbaccccbbbbbdddd",
+      "bbaccccbbbbbddde",
+      "bacccccbbbbbdded",
+      "bbaccccbbbbbddde",
+      "aaaccccbbbbbdddd",
+      "..acccccbbbbbddd",
+      ".aacccccbbbbbbdd",
+      "abaccccccbbbbbbb",
+      "bbbacccccbbbbbbb"
+     ],
+     "key": {
+      "a": "glow",
+      "b": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      },
+      "c": {
+       "rule": "mix",
+       "of": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "with": "glow",
+       "amount": 0.5
+      },
+      "d": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      },
+      "e": {
+       "rule": "tone",
+       "of": "glow",
+       "by": -1
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      20,
+      -26
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaabbbbbbbbccaaa",
+      "aaaaabbbbbbbcaaa",
+      "aaaaaaabbbbbbcaa",
+      "aaaaaaaabbbbbcaa",
+      "aaaaaaaabbbbbbca",
+      "dddaaaaaabbbbbcc",
+      "ddddaaaaabbbbbc.",
+      "eddddaaaaabbbbcc",
+      "dedddaaaaabbbbca",
+      "ddeddaaaaabbbbbc",
+      "dedddaaaaabbbbca",
+      "eddddaaaaabbbbca",
+      "ddddaaaaabbbbbca",
+      "dddaaaaaabbbbbca",
+      "aaaaaaaabbbbbbca",
+      "aaaaaaaabbbbbccc"
+     ],
+     "key": {
+      "a": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      },
+      "b": {
+       "rule": "mix",
+       "of": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "with": "glow",
+       "amount": 0.5
+      },
+      "c": "glow",
+      "d": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      },
+      "e": {
+       "rule": "tone",
+       "of": "glow",
+       "by": -1
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      36,
+      -26
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaab..........",
+      "aaaab...........",
+      "aaab............",
+      "abb.............",
+      "b...............",
+      "................",
+      "................",
+      "bb..............",
+      "aabbbb..........",
+      "aaaaaabbbb......",
+      "aaaaaaaaaabbb...",
+      "aaaaaaaaaaaaabbb",
+      "aaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaa",
+      "aabbbbbbbbbbbbbb",
+      "bb.............."
+     ],
+     "key": {
+      "a": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      },
+      "b": "glow"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      52,
+      -15
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a......",
+      "baaaaa.",
+      "bbbbbba",
+      "aaaaaa."
+     ],
+     "key": {
+      "a": "glow",
+      "b": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      -13,
+      0
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a",
+      "b",
+      "a",
+      "a",
+      "a",
+      "a"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "glow"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      -12,
+      -10
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".............abb",
+      "............abbb",
+      "...........abbbb",
+      ".........aabbbbb",
+      "........abbbbbbb",
+      ".......abbbbbbbb",
+      "......abbbbbbbaa",
+      "....aabbbbbbaa..",
+      ".ccabbbbbaaa....",
+      "caabbbaaa..cc..c",
+      "abbbaacccccddcce",
+      "bbaaddddddfdddcc",
+      "aadfffdddgfdddhc",
+      "dddccffffgfddddd",
+      "ddc..ccccgffffdd",
+      "ddc.....cghhhhfd"
+     ],
+     "key": {
+      "a": "glow",
+      "b": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      },
+      "c": "ink",
+      "d": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.55
+      },
+      "e": "body.dark",
+      "f": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "dark"
+      },
+      "g": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "body",
+        "with": {
+         "rule": "mix",
+         "of": "#f0ead8",
+         "with": "#f0ead8",
+         "amount": 0
+        },
+        "amount": 0.6
+       },
+       "tone": "dark"
+      },
+      "h": {
+       "rule": "mix",
+       "of": "body",
+       "with": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "amount": 0.6
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      4,
+      -10
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaabccccccaaaaaa",
+      "aaaabcccccccaaaa",
+      "aaaabbccccccccaa",
+      "aaaaabbccccccccc",
+      "aaabbbbbcccccccc",
+      "abbdeebbbccccccc",
+      "b...dfbaabbccccc",
+      "...dffbaaaabbbbb",
+      ".ddffbaaaaaaabfb",
+      "dggffbaaaaaaabfb",
+      "eggffbaaaaaabfff",
+      "eeeffbaaaaabffff",
+      "dddfbaaaaaabffff",
+      "hhhfbaaaaabfffff",
+      "hhhhbaaaaabfffff",
+      "hhhbaaaaabffffff"
+     ],
+     "key": {
+      "a": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      },
+      "b": "glow",
+      "c": {
+       "rule": "mix",
+       "of": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "with": "glow",
+       "amount": 0.5
+      },
+      "d": "ink",
+      "e": "body.dark",
+      "f": "accent.dark",
+      "g": "body",
+      "h": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.55
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      20,
+      -10
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaabbbbbbc..",
+      "aaaaabbbbbbbcac.",
+      "aaabbbbbbbbccaac",
+      "bbbbbbbbbbccaaaa",
+      "bbbbbbbbbccaaaaa",
+      "bbbbbbbbccaaaaaa",
+      "bbbbbbccccaaaaaa",
+      "bcccccacddcaaaaa",
+      "caaaaaacdddccaaa",
+      "aaaaaaacdddddcaa",
+      "caaaaaacdddddecc",
+      "caaaaaacdddddfee",
+      "caaaaaacdddddfff",
+      "dcaaaaacdddddfff",
+      "dcaaaaacddddgggh",
+      "ddcaaaacdddhhhhh"
+     ],
+     "key": {
+      "a": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      },
+      "b": {
+       "rule": "mix",
+       "of": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "with": "glow",
+       "amount": 0.5
+      },
+      "c": "glow",
+      "d": "accent.dark",
+      "e": "ink",
+      "f": "body",
+      "g": "body.dark",
+      "h": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.55
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      36,
+      -7
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a...............",
+      "ba..............",
+      "ba..............",
+      "bba.............",
+      "bbba............",
+      "bbbba........cc.",
+      "bbbbba.....ccddc",
+      "bbbbbacccccddddd",
+      "abbbbbaddddddddd",
+      "caabbbbaddddeddd",
+      "ddeabbbbaeeccddd",
+      "ddeeaabbbac..cdd",
+      "ddfgggabba...cdd"
+     ],
+     "key": {
+      "a": "glow",
+      "b": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      },
+      "c": "ink",
+      "d": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.55
+      },
+      "e": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "dark"
+      },
+      "f": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "body",
+        "with": {
+         "rule": "mix",
+         "of": "#f0ead8",
+         "with": "#f0ead8",
+         "amount": 0
+        },
+        "amount": 0.6
+       },
+       "tone": "dark"
+      },
+      "g": {
+       "rule": "mix",
+       "of": "body",
+       "with": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "amount": 0.6
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      52,
+      0
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a",
+      "a",
+      "a",
+      "a",
+      "a",
+      "a"
+     ],
+     "key": {
+      "a": "ink"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      -15,
+      6
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".ab",
+      ".ab",
+      ".ab",
+      ".ab",
+      "abb",
+      "abb",
+      "aba",
+      "aba",
+      "aba",
+      ".a."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.55
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      -12,
+      6
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aab.....bcddddee",
+      "ab......bcddddbe",
+      "ab......bcdddb.b",
+      "ab......bcdddb..",
+      "b.......bcdddb..",
+      "b.......bddddb..",
+      ".......bcddddb..",
+      ".......bcdddb...",
+      ".......bcdddb...",
+      ".......bcdddb...",
+      ".......bcdddb...",
+      ".......bccddb...",
+      "........bcddb...",
+      "........bcddb...",
+      "........bcddb..b",
+      "........bcddb.bf"
+     ],
+     "key": {
+      "a": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.55
+      },
+      "b": "ink",
+      "c": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "body",
+        "with": {
+         "rule": "mix",
+         "of": "#f0ead8",
+         "with": "#f0ead8",
+         "amount": 0
+        },
+        "amount": 0.6
+       },
+       "tone": "dark"
+      },
+      "d": {
+       "rule": "mix",
+       "of": "body",
+       "with": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "amount": 0.6
+      },
+      "e": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "dark"
+      },
+      "f": "glow.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      4,
+      6
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaabccccbddddddd",
+      "eaabccccbddddddd",
+      "eeebcccbfddddddd",
+      "ghbcccbagghfdddd",
+      ".gbcccbagghfffff",
+      "..bccbeagghfiiii",
+      ".bccbgegggiaaaaa",
+      ".bccb.ggiaaaaaaa",
+      ".bcbg.gaaaaaaaaa",
+      "bcbbbgeaaaaajjjj",
+      "bcbkbgeajjjjjjjj",
+      "bcbkggejjjjjjjjj",
+      ".b.g.geejjjjjjjj",
+      "......geeaaaaajj",
+      "g......geeaaaaaa",
+      "bg....gbbeaaaaaa"
+     ],
+     "key": {
+      "a": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.55
+      },
+      "b": "glow",
+      "c": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      },
+      "d": "accent.dark",
+      "e": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "dark"
+      },
+      "f": "body",
+      "g": "ink",
+      "h": "body.dark",
+      "i": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "light"
+      },
+      "j": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "deep"
+      },
+      "k": "glow.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      20,
+      6
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aabccccbaaddeeee",
+      "aabccccbafgeeeee",
+      "aaabcccbffeeeeed",
+      "aaabcccbdeeeeegg",
+      "fffbcccbdeeeeg..",
+      "hhhhbcccbdedg...",
+      "eeehbcccbdffg...",
+      "eeeebcccbiiig...",
+      "eeeeebccbggg....",
+      "jjjjebccbhg.....",
+      "jjjjjjbcbhg.....",
+      "jjjjjjbcbhg.....",
+      "jjjjjjbcbhg.....",
+      "jjeeeebcbg......",
+      "eeeeeeebg......g",
+      "eeeeeeekkg.....g"
+     ],
+     "key": {
+      "a": "accent.dark",
+      "b": "glow",
+      "c": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      },
+      "d": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "dark"
+      },
+      "e": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.55
+      },
+      "f": "body",
+      "g": "ink",
+      "h": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "light"
+      },
+      "i": "body.dark",
+      "j": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "deep"
+      },
+      "k": "glow.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      36,
+      6
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aabccccddedd.faa",
+      "afbbcccf.deed.fa",
+      "f.fbcccf..ded.fa",
+      "..fbcccf...d..fa",
+      "..fbcccf.......f",
+      "..fbcccf.......f",
+      "..fbbcccf.......",
+      "...fbcccf.......",
+      "...fbcccf.......",
+      "...fbcccf.......",
+      "...fbcccf.......",
+      "...fbcccf.......",
+      "...fbccf........",
+      "ff.fbccf........",
+      "gdffbccf........",
+      "gddfbccf........"
+     ],
+     "key": {
+      "a": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.55
+      },
+      "b": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "body",
+        "with": {
+         "rule": "mix",
+         "of": "#f0ead8",
+         "with": "#f0ead8",
+         "amount": 0
+        },
+        "amount": 0.6
+       },
+       "tone": "dark"
+      },
+      "c": {
+       "rule": "mix",
+       "of": "body",
+       "with": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "amount": 0.6
+      },
+      "d": "glow",
+      "e": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      },
+      "f": "ink",
+      "g": "glow.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      52,
+      6
+     ],
+     "anchor": "tl",
+     "rows": [
+      "ab.",
+      "ab.",
+      "ab.",
+      "ab.",
+      "aab",
+      "aab",
+      "bab",
+      "bab",
+      "bab",
+      ".b."
+     ],
+     "key": {
+      "a": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.55
+      },
+      "b": "ink"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      -4,
+      22
+     ],
+     "anchor": "tl",
+     "rows": [
+      "abcca.ad",
+      "abbca..a",
+      ".abca...",
+      ".abca...",
+      ".abca...",
+      ".abca...",
+      ".abba...",
+      "..aba...",
+      "...a...."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "body",
+        "with": {
+         "rule": "mix",
+         "of": "#f0ead8",
+         "with": "#f0ead8",
+         "amount": 0
+        },
+        "amount": 0.6
+       },
+       "tone": "dark"
+      },
+      "c": {
+       "rule": "mix",
+       "of": "body",
+       "with": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "amount": 0.6
+      },
+      "d": "glow.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      4,
+      22
+     ],
+     "anchor": "tl",
+     "rows": [
+      "ab...baaaccddddd",
+      "b.....bbbecccddd",
+      ".......bfeeecccc",
+      ".......bfeebbbbc",
+      ".......bfeb....b",
+      ".......bfeb.....",
+      ".......bffb.....",
+      "........bfb.....",
+      ".........b......"
+     ],
+     "key": {
+      "a": "glow.dark",
+      "b": "ink",
+      "c": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "dark"
+      },
+      "d": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.55
+      },
+      "e": {
+       "rule": "mix",
+       "of": "body",
+       "with": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "amount": 0.6
+      },
+      "f": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "body",
+        "with": {
+         "rule": "mix",
+         "of": "#f0ead8",
+         "with": "#f0ead8",
+         "amount": 0
+        },
+        "amount": 0.6
+       },
+       "tone": "dark"
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      20,
+      22
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaabcc......c",
+      "aaaaadec........",
+      "aaddffeec.......",
+      "dcghhffec.......",
+      "ccgghhfec.......",
+      "..cggcfec.......",
+      "...cccfec.......",
+      ".....cfc........",
+      "......c........."
+     ],
+     "key": {
+      "a": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.55
+      },
+      "b": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "light"
+      },
+      "c": "ink",
+      "d": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "body",
+        "by": -0.55
+       },
+       "tone": "dark"
+      },
+      "e": {
+       "rule": "mix",
+       "of": "body",
+       "with": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "amount": 0.6
+      },
+      "f": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "body",
+        "with": {
+         "rule": "mix",
+         "of": "#f0ead8",
+         "with": "#f0ead8",
+         "amount": 0
+        },
+        "amount": 0.6
+       },
+       "tone": "dark"
+      },
+      "g": "glow.dark",
+      "h": "glow"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      36,
+      22
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aabbcddb",
+      "bb.bcddb",
+      "...bcdb.",
+      "...bcdb.",
+      "...bcdb.",
+      "...bcdb.",
+      "...bcdb.",
+      "...bcb..",
+      "....b..."
+     ],
+     "key": {
+      "a": "glow.dark",
+      "b": "ink",
+      "c": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "body",
+        "with": {
+         "rule": "mix",
+         "of": "#f0ead8",
+         "with": "#f0ead8",
+         "amount": 0
+        },
+        "amount": 0.6
+       },
+       "tone": "dark"
+      },
+      "d": {
+       "rule": "mix",
+       "of": "body",
+       "with": {
+        "rule": "mix",
+        "of": "#f0ead8",
+        "with": "#f0ead8",
+        "amount": 0
+       },
+       "amount": 0.6
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

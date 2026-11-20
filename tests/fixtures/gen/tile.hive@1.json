@@ -1,0 +1,255 @@
+{
+ "id": "tile.hive",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "picture": "hive-fill",
+    "flesh": "flesh",
+    "growth": "growth",
+    "lights": "glow"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      0,
+      0
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaabaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaacabaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaacadaaaaaaaaaaaaaaaaaaccaaaaa",
+      "aaaaacabbaaaaaaaaaaaaaaaabcaaaaa",
+      "aaaaaacbabbbaaaaaaaaaaaaabbaaaaa",
+      "aaaaaacabaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaacbaaaaaaabaaaaaaaaaaaaaaa",
+      "aaaaaaacadaaaaacbaaadaaaaaaaaaaa",
+      "aaaaaaaacaaaaaacbabbaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaacbbaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaacbaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaadaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaabaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaabaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaadbaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaabaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaabbbabaaaaaa",
+      "aaaaaccaaaaaaaaaaaaacccabbaaaaaa",
+      "aaaaabcaaaaaaaaaaaaaaaaccadaaaaa",
+      "aaaaabbaaaaaaaaaaaaaaaaaacbaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaacabaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaacaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+     ],
+     "key": {
+      "a": "flesh",
+      "b": {
+       "rule": "textureLight",
+       "of": "flesh",
+       "from": 0.55
+      },
+      "c": {
+       "rule": "textureTone",
+       "of": "flesh"
+      },
+      "d": "flesh.light"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     10,
+     20
+    ],
+    "picture": "wall-inner-tr",
+    "flesh": "flesh",
+    "growth": "growth",
+    "lights": "glow",
+    "veins": 1,
+    "edge": 5,
+    "texture": 1,
+    "wet": true
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": true,
+    "frames": 1,
+    "frame": 0
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      -6,
+      4
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaaaaaaaaaaaaaaaaaaabaaaaacd",
+      "aaaaaaaaaaaaaaaaaaaaaaaabaaaaacc",
+      "aaaaaaaaaaaaaaaaaaaaaaaaabaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaabaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaabaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaabaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaabb",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+     ],
+     "key": {
+      "a": {
+       "rule": "sunkTone",
+       "of": "growth",
+       "under": "flesh",
+       "drop": 0.09,
+       "floor": 0.26
+      },
+      "b": {
+       "rule": "textureTone",
+       "of": {
+        "rule": "sunkTone",
+        "of": "growth",
+        "under": "flesh",
+        "drop": 0.09,
+        "floor": 0.26
+       }
+      },
+      "c": {
+       "rule": "textureLight",
+       "of": {
+        "rule": "sunkTone",
+        "of": "growth",
+        "under": "flesh",
+        "drop": 0.09,
+        "floor": 0.26
+       }
+      },
+      "d": {
+       "rule": "mix",
+       "of": "#231b33",
+       "with": "#231b33",
+       "amount": 0
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "picture": "hive-deco-d",
+    "flesh": "flesh",
+    "growth": "growth",
+    "lights": "glow",
+    "veins": 1,
+    "edge": 5,
+    "texture": 1,
+    "wet": true
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true,
+    "frames": 1,
+    "frame": 0
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      0,
+      0
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".....aaaaaaa.aaaaaa.............",
+      "....aaaaaaaaaaaaaaaa............",
+      "...aaaaaaaaaaaaaaaaa............",
+      "..aaaaaaaaaaaaaaaaaa............",
+      ".aaaaaaaaaaaaaaaaaaa............",
+      "aaaaaabbaaaaaaaaaaa.............",
+      "aaaaabbbaaaaaaaaaa..............",
+      "aaaacbbaaaacaaaaaa..............",
+      "aaaaaccaaaacaaacaaa.............",
+      "aaaaaaaaaaacaadaaaaa............",
+      "aaaaaaaaaaccccacaaaaa...........",
+      "aaaaaaaaadcbbacaaaaaaa..........",
+      "aaaaaaaacaaaabaaaaaaaaa.........",
+      "aaaaaaacaaaaaaaaaaaaaaa....aaaa.",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaabbaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaabbbaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaacbbaaaaaaaaaaaaaaaa",
+      ".aaa.....aaaaaccaacaaaaaaaaaaaaa",
+      ".........aaaaaaaabacaaaaacaaaaaa",
+      "..........aaaaaaaabaccaacaaaaaaa",
+      "...........aaaaaaaabbacdaaaaaaaa",
+      "............aaaaaadcccaaaaaaaaaa",
+      ".............aaaacacaaaaaaaaaaaa",
+      "..............aaaacaaaaaaaaaaaaa",
+      "..............aaacaaaaaaaaaaaaaa",
+      "..............aaaaaaaaaaaaaaaaaa",
+      ".............aaaaaaaaaaaaaaaaaa.",
+      ".............aaaaaaaaaaaaaaaaa..",
+      ".............aaaaaaaaaaaaaaaa...",
+      ".............aaaaaaaaaaaaaaa....",
+      "..............aaaaa.aaaaaaa....."
+     ],
+     "key": {
+      "a": "flesh",
+      "b": {
+       "rule": "textureTone",
+       "of": "flesh"
+      },
+      "c": {
+       "rule": "textureLight",
+       "of": "flesh",
+       "from": 0.55
+      },
+      "d": "flesh.light"
+     }
+    }
+   ]
+  }
+ ]
+}
