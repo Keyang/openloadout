@@ -2,14 +2,188 @@
 // a file in sprites/ is a sprite, a file in sounds/ is a sound or a music track,
 // a file in bundles/ is a bundle, a file bundles/specs/<id>.plan.json is the plan of a kit.
 // Used by the build, the checkers and the tests.
+//
+// DATA SPRITES (docs/data-sprites.md, build item B9; section 10 DQ1: data sprites are sprites/<id>.json). A sprite is
+// either a code file, sprites/<id>.js (a program, or the studio's fixed data wrapper, docs/studio.md 2.4), or a data
+// file, sprites/<id>.json: one loadout-sprite definition (version 2, or version 1), JSON only. Both kinds live side by
+// side until the removals (section 5); one id has one file. A data file is never imported: it is read as JSON, the
+// pieces it names are read from the project's pieces/ (engine/pieces.js, tools/lib/pieces-index.mjs), and it is drawn by
+// the project's own engine/data-sprite.js dataSprite, checked as a library file (strict: gaps in meta are errors; a
+// sound cue must name a sound in sounds/). So the build, the catalogue, the pictures, search, tools/check.mjs and
+// tools/render.mjs take it like any sprite. Its catalogue row carries `rev`, a short hash of its definition (dataRev).
+// The file goes through the project's catalog/sprite-schema.js parseSpriteJson first (Contract 15 rule 6: 128 KB, nesting
+// and __proto__ refused before anything else runs on it; a file over 128 KB is not even read), and the sprite drawn
+// takes any frame number, as a code sprite does (engine/data-frames.js framesInClip, the one app/catalog.js uses).
+//
+// pieces/ in the build: piecesProblems(root) is what the validate step refuses (an invalid piece file, a released
+// version whose content changed or whose file is gone; Contract 15 rule 5), and refreshDataPictures removes the
+// pictures of a data sprite whose pieces changed, so the thumbnails step draws them again.
 import fs from 'node:fs';
 import path from 'node:path';
+import crypto from 'node:crypto';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { checkDataFile } from './data-file.mjs';
+import { canonicalJson, nodePieceReader, buildPiecesIndex, checkPins, readPins, pieceFilesFor } from './pieces-index.mjs';
+import * as ownFrames from '../../engine/data-frames.js';
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 
 const isAsset = (f, ext) => f.endsWith(ext) && !f.startsWith('_') && f !== 'index.js' && f !== 'index.json';
+/** Is this file name (in sprites/) a sprite: a code file <id>.js or a data file <id>.json, not a helper (_*) or an index. */
+export const isSpriteFile = (f) => isAsset(f, '.js') || isAsset(f, '.json');
+const idOfFile = (f) => f.replace(/\.(js|json)$/, '');
+const SPRITE_ID = /^[a-z0-9][a-z0-9-]*$/;
+
+/** The file of a sprite by its id: sprites/<id>.js or sprites/<id>.json as an absolute path (the code file when both exist), or null. Only a plain id, never a path. */
+export function findSpriteFile(root = ROOT, id) {
+  if (typeof id !== 'string' || !SPRITE_ID.test(id)) return null;
+  for (const ext of ['.js', '.json']) { const f = path.join(root, 'sprites', `${id}${ext}`); if (fs.existsSync(f)) return f; }
+  return null;
+}
+
+/** Every sprite id of a project, code and data files alike, sorted (for "Known: ..." lists). */
+export function spriteIds(root = ROOT) {
+  const dir = path.join(root, 'sprites');
+  if (!fs.existsSync(dir)) return [];
+  return [...new Set(fs.readdirSync(dir).filter(isSpriteFile).map(idOfFile))].sort();
+}
+
+/** The revision of a data sprite's definition: 12 hex characters of SHA-256 over its canonical JSON, so spacing and key order do not count (docs/data-sprites.md 2.8). */
+export function dataRev(definition) {
+  return crypto.createHash('sha256').update(canonicalJson(definition)).digest('hex').slice(0, 12);
+}
+
+/** The ids of a project's sounds (sounds/<id>.json), what a data sprite's cues may name. */
+function soundIdsOf(root) {
+  const dir = path.join(root, 'sounds');
+  return fs.existsSync(dir) ? fs.readdirSync(dir).filter((f) => isAsset(f, '.json')).map((f) => f.slice(0, -5)).sort() : [];
+}
+
+// a project's own engine, once per project folder: its dataSprite and its piece store, given a disk reader of its pieces/
+const engines = new Map();
+function dataEngine(root) {
+  if (!engines.has(root)) {
+    const p = (async () => {
+      const at = (rel) => {
+        const f = path.join(root, rel);
+        if (!fs.existsSync(f)) throw new Error(`${rel} is missing in ${root}: a data sprite is drawn by the project's own engine`);
+        return import(pathToFileURL(f).href);
+      };
+      const [D, P, S] = await Promise.all([at('engine/data-sprite.js'), at('engine/pieces.js'), at('catalog/sprite-schema.js')]);
+      // the project's own framesInClip (engine/data-frames.js, in its picture and quality keys); a copy made before it existed uses this one's
+      const F = fs.existsSync(path.join(root, 'engine', 'data-frames.js')) ? await at('engine/data-frames.js') : ownFrames;
+      const store = P.sitePieces();
+      store.useReader(nodePieceReader(root));
+      return { dataSprite: D.dataSprite, framesInClip: F.framesInClip, store, parse: S.parseSpriteJson, maxBytes: S.SPRITE_LIMITS?.jsonBytes ?? 128 * 1024 };
+    })();
+    p.catch(() => engines.delete(root));
+    engines.set(root, p);
+  }
+  return engines.get(root);
+}
+
+/** Reads and draws one data file: { def (the sprite), value (the definition as written) }; throws an Error that starts with the file's name. */
+async function readDataSprite(root, file, { soundIds } = {}) {
+  root = path.resolve(root);
+  const abs = path.resolve(root, file);
+  const inside = abs.startsWith(root + path.sep);
+  const rel = inside ? path.relative(root, abs).split(path.sep).join('/') : abs;
+  const { dataSprite, framesInClip, store, parse, maxBytes } = await dataEngine(root);
+  // the wall first (Contract 15 rule 6): too big is refused before it is read, then parseSpriteJson (nesting, __proto__)
+  let size;
+  try { size = fs.statSync(abs).size; } catch (e) { throw new Error(`${rel}: cannot be read (${e.code || e.message})`); }
+  if (size > maxBytes) throw new Error(`${rel}: the definition is ${Math.ceil(size / 1024)} KB of text; the most is ${Math.round(maxBytes / 1024)} KB`);
+  let text;
+  try { text = fs.readFileSync(abs, 'utf8'); } catch (e) { throw new Error(`${rel}: cannot be read (${e.code || e.message})`); }
+  const parsed = parse(text);
+  if (!parsed.ok) {
+    const e = parsed.errors.join('; ');
+    throw new Error(/not JSON/.test(e) ? `${rel}: not valid JSON (${e})` : `${rel}: ${e}`);
+  }
+  // a library file holds no such keys at all (parseSpriteJson drops them and warns)
+  const proto = parsed.warnings.find((w) => /__proto__/.test(w));
+  if (proto) throw new Error(`${rel}: ${proto}; take them out of the file`);
+  const value = parsed.value;
+  const got = await store.loadFor(value);
+  if (!got.ok) throw new Error(`${rel}: a piece it uses could not be loaded: ${got.errors.slice(0, 6).join('; ')}`);
+  let def;
+  try { def = dataSprite(value, { strict: true, soundIds: soundIds ?? soundIdsOf(root) }); } catch (e) { throw new Error(`${rel}: ${e.message}`); }
+  return { def: framesInClip(def), value };
+}
+
+/**
+ * Loads one data sprite file (sprites/<id>.json, or any path) with the engine and pieces of the project at root, checked
+ * as a library file. Returns the sprite (what defineSprite returns); throws an Error that starts with the file's name.
+ * Arguments: root (the project folder), file (absolute, or relative to root), { soundIds } (default: the project's sounds).
+ */
+export async function loadDataSprite(root = ROOT, file, opts = {}) {
+  return (await readDataSprite(root, file, opts)).def;
+}
+
+/**
+ * What the build's validate step refuses in pieces/ (build item B9; Contract 15 rule 5, a released version never changes):
+ * every piece file that is not valid (tools/lib/pieces-index.mjs buildPiecesIndex), every pinned version whose content
+ * changed, and every pinned version whose file is gone. A version with no pin yet is not refused (it is pinned when
+ * released: node tools/lib/pieces-index.mjs --pin). Returns [messages], each naming the file or the version; [] when
+ * there is no pieces/. Arguments: root (the project).
+ */
+export function piecesProblems(root = ROOT) {
+  if (!fs.existsSync(path.join(root, 'pieces'))) return [];
+  const { index, errors } = buildPiecesIndex({ root });
+  let pins;
+  try { pins = readPins(root); } catch (e) { return [...errors, `pieces/_pins.json: not valid JSON (${e.message})`]; }
+  const p = checkPins(index, pins);
+  return [
+    ...errors,
+    ...p.changed.map((r) => `${r} is released (pinned in pieces/_pins.json) and its content changed: put the change in a new version instead, and put this one back`),
+    ...p.gone.map((r) => `${r} is released (pinned in pieces/_pins.json) and its file is gone: put the file back; a released version is never removed`),
+  ];
+}
+
+// the files besides pieces/ a data sprite's pictures are keyed on: what reads and cleans it before engine/ draws it.
+// [name, file]: the name is what the key hashes, always a path relative to a project (never an absolute path), so the
+// same project gives the same keys in any checkout; the file is where it is read (the project's schema, these tools' own loaders).
+const TOOLS_LIB = path.dirname(fileURLToPath(import.meta.url));
+const PICTURE_LOADERS = [
+  ['catalog/sprite-schema.js', (root) => path.join(root, 'catalog', 'sprite-schema.js')],
+  ['tools/lib/assets.mjs', () => path.join(TOOLS_LIB, 'assets.mjs')],
+  ['tools/lib/pieces-index.mjs', () => path.join(TOOLS_LIB, 'pieces-index.mjs')],
+];
+
+/**
+ * Removes the thumbnail and strip of every data sprite whose pieces or loaders changed since the last build, so
+ * tools/lib/thumbs.mjs writeImages (which keys pictures on the sprite's own file and on engine/ and rigs/, not on pieces/
+ * or catalog/) draws them again. A data sprite's key is the content of every piece file it loads, with what those use
+ * (pieceFilesFor), and of what reads it before drawing (the project's catalog/sprite-schema.js, this file and
+ * pieces-index.mjs), kept in <root>/.cache/build.json as dataPictures. Call it just before writeImages. Returns the ids whose pictures were removed.
+ * Arguments: { root, sprites (loadSprites' list) }.
+ */
+export function refreshDataPictures({ root = ROOT, sprites = [] } = {}) {
+  const cacheFile = path.join(root, '.cache', 'build.json');
+  let cache = {};
+  try { cache = JSON.parse(fs.readFileSync(cacheFile, 'utf8')); } catch { cache = {}; }
+  const old = cache.dataPictures ?? {};
+  const now = {}, removed = [];
+  for (const s of sprites) {
+    if (!s.data) continue;
+    let definition = null;
+    try { definition = JSON.parse(fs.readFileSync(path.join(root, s.file), 'utf8')); } catch { continue; }
+    const { files, missing } = pieceFilesFor(definition, { root });
+    const h = crypto.createHash('sha1');
+    // what reads the file before engine/ draws it (thumbs.mjs keys on engine/ and rigs/ only): the project's schema and these loaders
+    for (const [name, where] of PICTURE_LOADERS) { const a = where(root); h.update(name); h.update('\0'); h.update(fs.existsSync(a) ? fs.readFileSync(a) : '(missing)'); h.update('\0'); }
+    for (const f of files) { h.update(f); h.update('\0'); h.update(fs.readFileSync(path.join(root, f))); h.update('\0'); }
+    for (const f of missing) { h.update(f); h.update('\0(missing)\0'); }
+    now[s.id] = h.digest('hex');
+    if (old[s.id] === now[s.id]) continue;
+    const pics = [`generated/thumbs/${s.id}.png`, `generated/strips/${s.id}.png`].map((f) => path.join(root, f)).filter((f) => fs.existsSync(f));
+    for (const f of pics) fs.rmSync(f);
+    if (pics.length) removed.push(s.id);
+  }
+  fs.mkdirSync(path.dirname(cacheFile), { recursive: true });
+  fs.writeFileSync(cacheFile, JSON.stringify({ ...cache, dataPictures: now }, null, 2) + '\n');
+  return removed.sort();
+}
 
 /** Reads a JSON file; a parse error names the file (rel) and the problem. */
 function readJSON(abs, rel) {
@@ -17,12 +191,31 @@ function readJSON(abs, rel) {
   try { return JSON.parse(text); } catch (e) { throw new Error(`${rel}: not valid JSON (${e.message})`); }
 }
 
-/** [{ id, file, def }] — def is what defineSprite returned. Sorted by id. */
+/**
+ * [{ id, file, def }] — def is what defineSprite returned. Sorted by file name. A data file (sprites/<id>.json) also
+ * has data: true and rev (dataRev of its definition). Throws naming the file for one that cannot be loaded, and for an
+ * id that has both a code file and a data file.
+ */
 export async function loadSprites(root = ROOT) {
   const dir = path.join(root, 'sprites');
   const out = [];
-  for (const f of fs.readdirSync(dir).filter((x) => isAsset(x, '.js')).sort()) {
+  const names = fs.readdirSync(dir).filter(isSpriteFile).sort();
+  const seen = new Map();
+  for (const f of names) {
+    const id = idOfFile(f);
+    if (seen.has(id)) throw new Error(`sprites/${seen.get(id)} and sprites/${f}: one sprite has one file; keep the code file or the data file, not both`);
+    seen.set(id, f);
+  }
+  const soundIds = names.some((f) => f.endsWith('.json')) ? soundIdsOf(root) : null;
+  for (const f of names) {
     const file = path.join(dir, f);
+    if (f.endsWith('.json')) {
+      const id = f.slice(0, -5);
+      const { def, value } = await readDataSprite(root, file, { soundIds });
+      if (def.id !== id) throw new Error(`sprites/${f}: "id" must be "${id}" (found ${def.id})`);
+      out.push({ id, file: `sprites/${f}`, def, data: true, rev: dataRev(value) });
+      continue;
+    }
     let def;
     // a file made in the studio must be exactly its data form before it is run (docs/studio.md 2.4); throws naming the file
     checkDataFile(fs.readFileSync(file, 'utf8'), `sprites/${f}`);

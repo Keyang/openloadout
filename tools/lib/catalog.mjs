@@ -78,7 +78,7 @@ export function buildCatalog({ sprites = [], sounds = [], bundles = [] }) {
   }).sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
 
   const assets = [];
-  for (const { id, file, def } of sprites) {
+  for (const { id, file, def, rev } of sprites) {
     const tech = spriteTech(def);
     const preview = tech.clips.find((c) => c.name === def.preview) ?? tech.clips[0];
     assets.push({
@@ -87,6 +87,7 @@ export function buildCatalog({ sprites = [], sounds = [], bundles = [] }) {
       styles: stylesOf(def),          // the styles it can be drawn and exported in, best first (Contract 12)
       bundles: [],
       src: file,
+      ...(rev ? { rev } : {}),        // a data sprite (sprites/<id>.json): the revision of its definition (docs/data-sprites.md 2.8)
       tech,
       thumb: thumbPath(id),
       strip: stripPath(id),

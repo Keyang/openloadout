@@ -8,7 +8,8 @@ import { builtinModules } from 'node:module';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-const IMPORT_RE = /(?:^|\n)\s*(?:import|export)\s[^;]*?from\s*['"]([^'"]+)['"]|import\(\s*['"]([^'"]+)['"]\s*\)|(?:^|\n)\s*import\s*['"]([^'"]+)['"]/g;
+// (no quote before `from`: `export const X = { a: ['from'] }` is not an import)
+const IMPORT_RE = /(?:^|\n)\s*(?:import|export)\s[^;'"`]*?from\s*['"]([^'"]+)['"]|import\(\s*['"]([^'"]+)['"]\s*\)|(?:^|\n)\s*import\s*['"]([^'"]+)['"]/g;
 
 function walk(file, seen = new Map()) {
   if (seen.has(file)) return seen;

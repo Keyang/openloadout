@@ -4,7 +4,10 @@
 // what each rule means. Run after every change:
 //
 //   node tools/check.mjs                 every sprite found in sprites/
-//   node tools/check.mjs <id|file> ...   one or more sprites, by id or by file path
+//   node tools/check.mjs <id|file> ...   one or more sprites, by id or by file path: a code file sprites/<id>.js or a
+//                                        data file sprites/<id>.json (build item B9: keyed on its definition, the
+//                                        generators and pieces it names and the checker, so editing one generator
+//                                        re-checks only the sprites naming it; tools/lib/quality-run.mjs)
 //   --json                               machine-readable: { ok, metaChecked, notice, sprites: [{ id, file, ok, errors, warnings, metrics, cached }] }
 //   --no-cache                           check again even when nothing changed
 //   --cache-file <path>                  use another cache file (default .cache/quality.json)

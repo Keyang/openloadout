@@ -12,6 +12,10 @@
 // row (`studio: true`, `madeIn: 'studio'`) and registers it, and loadSprite(id) gives dataSprite(data). It is data drawn
 // by framework code, so it needs no worker. app/bag.js followStudio keeps them the ones the bag holds. The checker is
 // large and loaded on demand, so a registration takes a moment: loadCatalog() and loadSprite() wait for the ones under way.
+import { framesInClip } from '../engine/data-frames.js';
+
+/** Makes a data sprite draw any frame number inside its clip (engine/data-frames.js); handed on for the bag and older callers. */
+export { framesInClip };
 export const CATALOG_URL = 'generated/catalog.json';
 
 let catalog = null, loading = null;
@@ -93,7 +97,8 @@ export function addRuntimeAsset(row, definition) {
   forget(row.id);
   const data = row.kind === 'sprite' && isStudioData(definition);
   const entry = { row, definition: data ? { data: definition.data } : definition, program: null, now: null };
-  if (data) { if (definition.sprite) { entry.program = Promise.resolve(definition.sprite); entry.now = definition.sprite; } }      // else made by loadSprite
+  // a studio sprite's own sprite, when handed over, draws any frame number too (framesInClip: frame -1 and `frames` of the sprite page's clock)
+  if (data) { if (definition.sprite) { const sp = framesInClip(definition.sprite); entry.program = Promise.resolve(sp); entry.now = sp; } }      // else made by loadSprite
   else if (row.kind === 'sprite') { entry.program = Promise.resolve(definition); entry.now = definition; }
   else entry.program = Promise.resolve(definition);
   made.set(row.id, entry);
@@ -200,7 +205,7 @@ export function loadSprite(id) {
   const mine = madeNow(id);      // (null once the catalogue holds the id: then the library's file is loaded below)
   if (mine && mine.row.kind === 'sprite' && isStudioData(mine.definition)) {
     if (!mine.program) {
-      const p = import('../engine/data-sprite.js').then((m) => { const s = m.dataSprite(mine.definition.data); mine.now = s; return s; });
+      const p = import('../engine/data-sprite.js').then((m) => { const s = framesInClip(m.dataSprite(mine.definition.data)); mine.now = s; return s; });
       p.catch(() => { if (mine.program === p) mine.program = null; });
       mine.program = p;
     }
@@ -210,11 +215,32 @@ export function loadSprite(id) {
   if (mine && mine.row.kind === 'sprite') return Promise.resolve(typeof mine.definition.whenReady === 'function' ? mine.definition.whenReady() : null).then(() => mine.definition);
   if (!sprites.has(id)) {
     if (catalog && assetById(id)?.kind !== 'sprite') return Promise.reject(new Error(`"${id}" is not a sprite on this site`));
-    const p = import(`../sprites/${id}.js`).then((m) => { arrived.set(id, m.default); return m.default; });
+    // a data sprite (src sprites/<id>.json; docs/data-sprites.md, build item B9) is fetched and drawn by framework code, never imported
+    const src = assetById(id)?.src;
+    const p = (typeof src === 'string' && src.endsWith('.json') ? loadDataFile(src) : import(`../sprites/${id}.js`).then((m) => m.default))
+      .then((s) => { arrived.set(id, s); return s; });
     p.catch(() => { sprites.delete(id); });      // a later call may try again
     sprites.set(id, p);
   }
   return sprites.get(id);
+}
+
+/**
+ * A library data sprite from its file (src, e.g. sprites/coin.json): the text fetched and read through
+ * catalog/sprite-schema.js parseSpriteJson (Contract 15 rule 6: the 128 KB, nesting and __proto__ wall before anything
+ * else runs on it), the pieces it names loaded into the site's store, then engine/data-sprite.js dataSprite, drawing any
+ * frame number (framesInClip). Rejects with an Error that starts with src.
+ */
+async function loadDataFile(src) {
+  const r = await fetch(src);
+  if (!r.ok) throw new Error(`${src}: ${r.status}`);
+  const text = await r.text();
+  const [D, P, S] = await Promise.all([import('../engine/data-sprite.js'), import('../engine/pieces.js'), import('../catalog/sprite-schema.js')]);
+  const parsed = S.parseSpriteJson(text);
+  if (!parsed.ok) throw new Error(`${src}: ${parsed.errors.join('; ')}`);
+  const got = await P.sitePieces().loadFor(parsed.value);
+  if (!got.ok) throw new Error(`${src}: ${got.errors.join('; ')}`);
+  return framesInClip(D.dataSprite(parsed.value));
 }
 
 /** A sprite's program if it has already been loaded, otherwise null. Never waits. */

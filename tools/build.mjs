@@ -4,6 +4,7 @@
 //   validate    every asset's meta and every bundle (exit 1 with what to fix)
 //   quality     quality/sprite.js and quality/sound.js over every asset (exit 1 with which file, what is wrong, what to do)
 //   framework   generated/api.json, framework.js, api.md
+//   pieces      generated/pieces.json, when the project has pieces/ (every piece file is checked in validate)
 //   thumbnails  generated/thumbs/ and generated/strips/ (unchanged assets are skipped; hashes in .cache/build.json)
 //   search      generated/search.sqlite, when tools/lib/search-index.mjs exists
 //   catalogue   generated/catalog.json and generated/sounds.json
@@ -22,7 +23,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { ROOT, loadAssets } from './lib/assets.mjs';
+import { ROOT, loadAssets, piecesProblems, refreshDataPictures } from './lib/assets.mjs';
 import { buildCatalog } from './lib/catalog.mjs';
 import { writeImages } from './lib/thumbs.mjs';
 import { validateMeta, validateBundle } from '../catalog/schema.js';
@@ -61,8 +62,8 @@ if (!fs.existsSync(path.join(root, 'sprites')) || !fs.existsSync(path.join(root,
 }
 const rel = (p) => path.relative(root, p) || '.';
 
-/** What --dist copies: everything the browser loads, nothing the build or tests use. */
-const DIST = ['index.html', 'app', 'engine', 'rigs', 'sound', 'sprites', 'sounds', 'bundles', 'catalog', 'search', 'quality', 'generated', 'vendor'];
+/** What --dist copies: everything the browser loads, nothing the build or tests use (pieces/: what data sprites name, build item B9). */
+const DIST = ['index.html', 'app', 'engine', 'rigs', 'sound', 'sprites', 'sounds', 'bundles', 'catalog', 'search', 'quality', 'pieces', 'generated', 'vendor'];
 
 const rows = [];
 const started = performance.now();
@@ -136,8 +137,12 @@ await step('validate', async () => {
   // ("is a sprite; move it to the sprites list") is a symptom of the shared id, not a fault in the bundle
   const sharedQuoted = shared.map(([id]) => `"${id}"`);
   for (const { file, ...b } of bundles) for (const e of validateBundle(b, known).errors) if (!sharedQuoted.some((q) => e.includes(q))) problems.push(`${file}: ${e}`);
+  // pieces/ (shared data that data sprites name; build item B9): every piece file must be valid, as framework code must
+  // load, and a released (pinned) version never changes and is never removed (Contract 15 rule 5)
+  problems.push(...piecesProblems(root));
   if (problems.length) stop(`${problems.length} problem${problems.length > 1 ? 's' : ''} to fix`, problems);
-  return `${sprites.length} sprites, ${known.sound.length} sounds, ${known.music.length} music, ${bundles.length} bundles`;
+  const data = sprites.filter((s) => s.data).length;
+  return `${sprites.length} sprites${data ? ` (${data} data files)` : ''}, ${known.sound.length} sounds, ${known.music.length} music, ${bundles.length} bundles`;
 });
 
 // ---- quality (before anything is written) -----------------------------------------------
@@ -184,13 +189,24 @@ wrote = true;
 await step('framework', async () => (await import(pathToFileURL(path.join(ROOT, 'tools', 'lib', 'api.mjs')).href)).writeApi({ root }));
 // ==== end W5-A ====
 
+// the pieces index (docs/data-sprites.md, build item B7): generated/pieces.json, what the site's piece store lists
+if (exists('pieces')) {
+  await step('pieces', async () => {
+    const r = (await import(pathToFileURL(path.join(ROOT, 'tools', 'lib', 'pieces-index.mjs')).href)).writePiecesIndex({ root });
+    if (!r.file) throw new Error(`the pieces index was not written: ${r.errors.join('; ')}`);
+    return `${r.count} pieces -> ${r.file}`;
+  });
+}
+
 // ready-made versions of every asset (docs/site-design.md, section 4): generated/versions.json, read by the library and asset pages
 await step('versions', async () => (await import(pathToFileURL(path.join(ROOT, 'tools', 'lib', 'versions-build.mjs')).href)).writeVersions({ root }));
 
 // ---- thumbnails and strips -------------------------------------------------------------
 await step('thumbnails', async () => {
+  // a data sprite whose pieces changed has its pictures removed first, so they are drawn again (writeImages keys on the file, engine/ and rigs/)
+  const redrawn = refreshDataPictures({ root, sprites: loaded.sprites });
   const r = writeImages({ root, sprites: loaded.sprites, sounds: loaded.sounds, force: has('--force') });
-  return `${r.made.length} made, ${r.skipped.length} skipped, ${r.removed.length} removed`;
+  return `${r.made.length} made, ${r.skipped.length} skipped, ${r.removed.length} removed${redrawn.length ? ` (${redrawn.length} data sprite${redrawn.length === 1 ? '' : 's'} redrawn: a piece or a loader changed)` : ''}`;
 });
 
 // ---- search index ----------------------------------------------------------------------

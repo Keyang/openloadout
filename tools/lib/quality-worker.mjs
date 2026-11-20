@@ -1,5 +1,6 @@
 // Worker thread for tools/lib/quality-run.mjs: checks one asset per message.
 // workerData: { root }. Message in: { i, kind: 'sprite' | 'sound', file }. Message out: { i, result }.
+// A sprite file is a code file (imported) or a data file, <id>.json (tools/lib/assets.mjs loadDataSprite: read, never imported).
 import fs from 'node:fs';
 import path from 'node:path';
 import { parentPort, workerData } from 'node:worker_threads';
@@ -9,6 +10,7 @@ const { root } = workerData;
 const url = (f) => pathToFileURL(f).href;
 const { checkSprite } = await import(url(path.join(root, 'quality', 'sprite.js')));
 const { checkSound } = await import(url(path.join(root, 'quality', 'sound.js')));
+// the data checks of a data sprite (quality/data-checks.js, build item B9) are run by checkSprite itself
 
 let validateMeta;
 const schema = path.join(root, 'catalog', 'schema.js');
@@ -27,7 +29,11 @@ async function checkOne({ kind, file }) {
   const base = path.basename(file).replace(/\.(js|mjs|json)$/, '');
   if (kind === 'sprite') {
     let def;
-    try { def = (await import(url(file))).default; } catch (e) { return failed(base, `cannot be loaded: ${e.message}`); }
+    if (file.endsWith('.json')) {
+      // a data sprite (sprites/<id>.json, build item B9): read as JSON and drawn by the project's engine/data-sprite.js, never imported
+      const { loadDataSprite } = await import('./assets.mjs');
+      try { def = await loadDataSprite(root, file, { soundIds: [...soundIndex.keys()] }); } catch (e) { return failed(base, `cannot be loaded: ${String(e.message).replace(/^.*?\.json: /, '')}`); }
+    } else try { def = (await import(url(file))).default; } catch (e) { return failed(base, `cannot be loaded: ${e.message}`); }
     if (!def || typeof def.render !== 'function' || !def.clips) return failed(base, 'cannot be loaded: the default export is not a sprite made with defineSprite');
     const r = checkSprite(def, { soundIndex, validateMeta });
     if (def.id !== base) r.errors.unshift(`id "${def.id}" must match the file name "${base}"`);

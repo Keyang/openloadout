@@ -25,6 +25,7 @@ import { outsideMaterial, colourGap, materialById, unsaidMaterial, MATERIAL_IDS 
 import { stylesOf, styleById, styleIds } from '../engine/styles.js';
 import { Surface } from '../engine/surface.js';
 import { cleanVersions } from '../engine/versions.js';
+import { dataChecks } from './data-checks.js';
 
 const BLOCK_JOINS = blockJoins({ narrow: true, lanes: true });    // every pair of block pieces (the 13, the 7 narrow ones, the 9 lane ones) that can touch: [[a, axis, b], ...]
 
@@ -389,6 +390,10 @@ export function checkSprite(def, options = {}) {
     metrics.outsideMs = Math.round((now() - t1) * 10) / 10;
     if (outside && outside.calls.length) warnings.push(`draws outside the surface's calls: the sprite's own code reads pixels back or writes the pixel buffer directly (${outside.calls.join(', ')}; first at ${outside.where}). That only works on the pixel grid, so the sprite can never be given another style (docs/architecture.md, Contract 12). Do it with a framework helper, or keep in mind that it stays pixel-only`);
   }
+  // a version 2 data sprite's data checks (quality/data-checks.js: stamp out of frame, slot never painted, cost); nothing for any other sprite
+  const data = dataChecks(def);
+  errors.push(...data.errors); warnings.push(...data.warnings);
+  Object.assign(metrics, data.metrics);
   metrics.ms = Math.round((now() - t0) * 10) / 10;
   return { errors, warnings, metrics };
 }
