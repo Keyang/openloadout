@@ -1,0 +1,2609 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "rogue-walker",
+ "name": "Rogue (map)",
+ "blurb": "The rogue as seen on the map, sneaking and dashing in four directions with a scarf trailing behind. Change the build, hood, scarf, blades and colours.",
+ "meta": {
+  "type": "character",
+  "role": "characters/player",
+  "themes": [
+   "fantasy"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "top-down-rpg"
+  ],
+  "view": "top-down",
+  "words": [
+   "rogue",
+   "thief",
+   "assassin",
+   "ninja",
+   "party member",
+   "hood",
+   "scarf",
+   "daggers",
+   "walk",
+   "run",
+   "dash",
+   "sneak",
+   "overworld",
+   "stealthy"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  48,
+  48
+ ],
+ "pivot": [
+  24,
+  42
+ ],
+ "grounded": false,
+ "preview": "walk_down",
+ "palette": [
+  {
+   "id": "skin",
+   "label": "Skin",
+   "default": "#f6d3b0",
+   "material": "skin",
+   "swatches": [
+    "#f6d3b0",
+    "#e8b088",
+    "#c98a5c",
+    "#9a6240",
+    "#6e4428",
+    "#9bd18a",
+    "#b9a7e0"
+   ]
+  },
+  {
+   "id": "hair",
+   "label": "Hair",
+   "default": "#e6c96a",
+   "material": "plant",
+   "swatches": [
+    "#e6c96a",
+    "#9a6a3e",
+    "#c9423a",
+    "#f0ead8",
+    "#5a3a22",
+    "#a8612a",
+    "#e0b040",
+    "#d8d8e0"
+   ]
+  },
+  {
+   "id": "outfit",
+   "label": "Outfit",
+   "default": "#2f8f9d",
+   "material": "cloth",
+   "swatches": [
+    "#2f8f9d",
+    "#3f6fd1",
+    "#7a4fc4",
+    "#c9423a",
+    "#8e3a4a",
+    "#4f9d57",
+    "#e08a2c",
+    "#e6c545"
+   ]
+  },
+  {
+   "id": "trim",
+   "label": "Scarf and trim",
+   "default": "#5a5f7a",
+   "material": "cloth",
+   "swatches": [
+    "#5a5f7a",
+    "#a8a4a0",
+    "#c9423a",
+    "#f2c230",
+    "#c8553a",
+    "#2f8f9d",
+    "#7a4fc4",
+    "#f0ead8"
+   ]
+  },
+  {
+   "id": "bottom",
+   "derive": {
+    "rule": "tone",
+    "of": "outfit",
+    "by": -0.6
+   },
+   "material": "cloth"
+  },
+  {
+   "id": "beltTone",
+   "derive": {
+    "rule": "tone",
+    "of": "trim",
+    "by": 0.85
+   },
+   "material": "cloth"
+  },
+  {
+   "id": "steel",
+   "default": "#c2c9d6",
+   "material": "metal",
+   "detail": true
+  },
+  {
+   "id": "steelShade",
+   "derive": {
+    "rule": "tone",
+    "of": "steel",
+    "by": 0
+   },
+   "material": "metal"
+  },
+  {
+   "id": "gold",
+   "default": "#f2c230",
+   "material": "metal",
+   "detail": true
+  }
+ ],
+ "body": {
+  "rig": {
+   "extends": {
+    "use": "base:person-topdown-rogue",
+    "v": 2,
+    "paint": {
+     "top": "outfit",
+     "bottom": "bottom",
+     "boots": "trim",
+     "topFar": "outfit.dark",
+     "bottomFar": "bottom.dark"
+    },
+    "clips": []
+   },
+   "shapes": [
+    {
+     "id": "scarf",
+     "kind": "use",
+     "use": "part:topdown-scarf",
+     "v": 2,
+     "on": "chest",
+     "z": 0,
+     "paint": {
+      "cloth": "trim"
+     },
+     "args": {
+      "kind": {
+       "from": "scarf",
+       "pick": {
+        "short": "short",
+        "long": "long",
+        "none": "long"
+       }
+      },
+      "length": {
+       "from": "scarfLength",
+       "map": [
+        [
+         0.65,
+         0.65
+        ],
+        [
+         1.35,
+         1.35
+        ]
+       ]
+      }
+     },
+     "when": {
+      "scarf": [
+       "short",
+       "long"
+      ]
+     }
+    },
+    {
+     "id": "scarfRun0",
+     "kind": "use",
+     "use": "part:topdown-scarf",
+     "v": 2,
+     "on": "chest",
+     "z": 0,
+     "paint": {
+      "cloth": "trim"
+     },
+     "args": {
+      "kind": {
+       "from": "scarf",
+       "pick": {
+        "short": "short",
+        "long": "long",
+        "none": "long"
+       }
+      },
+      "length": {
+       "from": "scarfLength",
+       "map": [
+        [
+         0.65,
+         0.65
+        ],
+        [
+         1.35,
+         1.35
+        ]
+       ]
+      },
+      "pose": "run0"
+     },
+     "when": {
+      "scarf": [
+       "short",
+       "long"
+      ]
+     },
+     "hidden": true
+    },
+    {
+     "id": "scarfRun1",
+     "kind": "use",
+     "use": "part:topdown-scarf",
+     "v": 2,
+     "on": "chest",
+     "z": 0,
+     "paint": {
+      "cloth": "trim"
+     },
+     "args": {
+      "kind": {
+       "from": "scarf",
+       "pick": {
+        "short": "short",
+        "long": "long",
+        "none": "long"
+       }
+      },
+      "length": {
+       "from": "scarfLength",
+       "map": [
+        [
+         0.65,
+         0.65
+        ],
+        [
+         1.35,
+         1.35
+        ]
+       ]
+      },
+      "pose": "run1"
+     },
+     "when": {
+      "scarf": [
+       "short",
+       "long"
+      ]
+     },
+     "hidden": true
+    },
+    {
+     "id": "scarfRun2",
+     "kind": "use",
+     "use": "part:topdown-scarf",
+     "v": 2,
+     "on": "chest",
+     "z": 0,
+     "paint": {
+      "cloth": "trim"
+     },
+     "args": {
+      "kind": {
+       "from": "scarf",
+       "pick": {
+        "short": "short",
+        "long": "long",
+        "none": "long"
+       }
+      },
+      "length": {
+       "from": "scarfLength",
+       "map": [
+        [
+         0.65,
+         0.65
+        ],
+        [
+         1.35,
+         1.35
+        ]
+       ]
+      },
+      "pose": "run2"
+     },
+     "when": {
+      "scarf": [
+       "short",
+       "long"
+      ]
+     },
+     "hidden": true
+    },
+    {
+     "id": "scarfRun3",
+     "kind": "use",
+     "use": "part:topdown-scarf",
+     "v": 2,
+     "on": "chest",
+     "z": 0,
+     "paint": {
+      "cloth": "trim"
+     },
+     "args": {
+      "kind": {
+       "from": "scarf",
+       "pick": {
+        "short": "short",
+        "long": "long",
+        "none": "long"
+       }
+      },
+      "length": {
+       "from": "scarfLength",
+       "map": [
+        [
+         0.65,
+         0.65
+        ],
+        [
+         1.35,
+         1.35
+        ]
+       ]
+      },
+      "pose": "run3"
+     },
+     "when": {
+      "scarf": [
+       "short",
+       "long"
+      ]
+     },
+     "hidden": true
+    },
+    {
+     "id": "scarfRun4",
+     "kind": "use",
+     "use": "part:topdown-scarf",
+     "v": 2,
+     "on": "chest",
+     "z": 0,
+     "paint": {
+      "cloth": "trim"
+     },
+     "args": {
+      "kind": {
+       "from": "scarf",
+       "pick": {
+        "short": "short",
+        "long": "long",
+        "none": "long"
+       }
+      },
+      "length": {
+       "from": "scarfLength",
+       "map": [
+        [
+         0.65,
+         0.65
+        ],
+        [
+         1.35,
+         1.35
+        ]
+       ]
+      },
+      "pose": "run4"
+     },
+     "when": {
+      "scarf": [
+       "short",
+       "long"
+      ]
+     },
+     "hidden": true
+    },
+    {
+     "id": "scarfRun5",
+     "kind": "use",
+     "use": "part:topdown-scarf",
+     "v": 2,
+     "on": "chest",
+     "z": 0,
+     "paint": {
+      "cloth": "trim"
+     },
+     "args": {
+      "kind": {
+       "from": "scarf",
+       "pick": {
+        "short": "short",
+        "long": "long",
+        "none": "long"
+       }
+      },
+      "length": {
+       "from": "scarfLength",
+       "map": [
+        [
+         0.65,
+         0.65
+        ],
+        [
+         1.35,
+         1.35
+        ]
+       ]
+      },
+      "pose": "run5"
+     },
+     "when": {
+      "scarf": [
+       "short",
+       "long"
+      ]
+     },
+     "hidden": true
+    },
+    {
+     "id": "scarfRun6",
+     "kind": "use",
+     "use": "part:topdown-scarf",
+     "v": 2,
+     "on": "chest",
+     "z": 0,
+     "paint": {
+      "cloth": "trim"
+     },
+     "args": {
+      "kind": {
+       "from": "scarf",
+       "pick": {
+        "short": "short",
+        "long": "long",
+        "none": "long"
+       }
+      },
+      "length": {
+       "from": "scarfLength",
+       "map": [
+        [
+         0.65,
+         0.65
+        ],
+        [
+         1.35,
+         1.35
+        ]
+       ]
+      },
+      "pose": "run6"
+     },
+     "when": {
+      "scarf": [
+       "short",
+       "long"
+      ]
+     },
+     "hidden": true
+    },
+    {
+     "id": "scarfRun7",
+     "kind": "use",
+     "use": "part:topdown-scarf",
+     "v": 2,
+     "on": "chest",
+     "z": 0,
+     "paint": {
+      "cloth": "trim"
+     },
+     "args": {
+      "kind": {
+       "from": "scarf",
+       "pick": {
+        "short": "short",
+        "long": "long",
+        "none": "long"
+       }
+      },
+      "length": {
+       "from": "scarfLength",
+       "map": [
+        [
+         0.65,
+         0.65
+        ],
+        [
+         1.35,
+         1.35
+        ]
+       ]
+      },
+      "pose": "run7"
+     },
+     "when": {
+      "scarf": [
+       "short",
+       "long"
+      ]
+     },
+     "hidden": true
+    },
+    {
+     "id": "belt",
+     "kind": "use",
+     "use": "part:topdown-belt-buckle",
+     "v": 1,
+     "on": "waist",
+     "z": 40,
+     "paint": {
+      "belt": "beltTone",
+      "buckle": "steel"
+     }
+    },
+    {
+     "id": "hair",
+     "kind": "use",
+     "use": "part:topdown-hair",
+     "v": 1,
+     "on": "head",
+     "z": 50,
+     "paint": {
+      "hair": "hair"
+     },
+     "args": {
+      "style": {
+       "from": "hairStyle",
+       "pick": {
+        "short": "short",
+        "long": "long",
+        "spiky": "spiky",
+        "ponytail": "ponytail"
+       }
+      },
+      "hatted": false
+     },
+     "when": {
+      "headgear": [
+       "bandana",
+       "mask",
+       "none"
+      ]
+     }
+    },
+    {
+     "id": "headCloth",
+     "kind": "use",
+     "use": "part:topdown-head-cloth",
+     "v": 1,
+     "on": "head",
+     "z": 50,
+     "paint": {
+      "cloth": "outfit"
+     },
+     "args": {
+      "kind": {
+       "from": "headgear",
+       "pick": {
+        "hood": "hood",
+        "bandana": "bandana",
+        "mask": "mask",
+        "none": "hood"
+       }
+      },
+      "size": {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.5,
+         0.5
+        ],
+        [
+         1.8,
+         1.8
+        ]
+       ]
+      }
+     },
+     "when": {
+      "headgear": [
+       "hood",
+       "bandana",
+       "mask"
+      ]
+     }
+    },
+    {
+     "id": "blade",
+     "kind": "use",
+     "use": "held:topdown-blades",
+     "v": 2,
+     "on": "reachF",
+     "z": 60,
+     "paint": {
+      "metal": "steelShade",
+      "hilt": "gold"
+     },
+     "args": {
+      "kind": {
+       "from": "weapon",
+       "pick": {
+        "daggers": "daggers",
+        "short sword": "short sword",
+        "claws": "claws",
+        "none": "daggers"
+       }
+      },
+      "length": {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         0.65
+        ],
+        [
+         1.35,
+         1.35
+        ]
+       ]
+      }
+     },
+     "when": {
+      "weapon": [
+       "daggers",
+       "short sword",
+       "claws"
+      ]
+     }
+    },
+    {
+     "id": "bladeOff",
+     "kind": "use",
+     "use": "held:topdown-blades-off",
+     "v": 2,
+     "on": "reachB",
+     "z": 60,
+     "paint": {
+      "metal": "steelShade",
+      "hilt": "gold"
+     },
+     "args": {
+      "kind": {
+       "from": "weapon",
+       "pick": {
+        "daggers": "daggers",
+        "claws": "claws",
+        "short sword": "daggers",
+        "none": "daggers"
+       }
+      },
+      "length": {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         0.65
+        ],
+        [
+         1.35,
+         1.35
+        ]
+       ]
+      }
+     },
+     "when": {
+      "weapon": [
+       "daggers",
+       "claws"
+      ]
+     }
+    }
+   ]
+  }
+ },
+ "controls": [
+  {
+   "key": "height",
+   "kind": "range",
+   "label": "Height",
+   "lo": "Short",
+   "hi": "Tall",
+   "default": 0.5,
+   "scales": {
+    "bones": [
+     "hip",
+     "spine",
+     "thiF",
+     "thiB",
+     "shnF",
+     "shnB",
+     "legF",
+     "legB",
+     "legIF",
+     "legIB"
+    ],
+    "by": [
+     0.82,
+     1.2
+    ]
+   }
+  },
+  {
+   "key": "build",
+   "kind": "range",
+   "label": "Build",
+   "lo": "Slim",
+   "hi": "Stocky",
+   "default": 0.5,
+   "scales": {
+    "bones": [
+     "shoulderF",
+     "shoulderB"
+    ],
+    "by": [
+     0.6,
+     1.3
+    ]
+   }
+  },
+  {
+   "key": "hairStyle",
+   "kind": "choice",
+   "label": "Hair",
+   "options": [
+    "short",
+    "long",
+    "spiky",
+    "ponytail"
+   ],
+   "default": "short",
+   "when": {
+    "headgear": [
+     "bandana",
+     "mask",
+     "none"
+    ]
+   }
+  },
+  {
+   "key": "headgear",
+   "kind": "choice",
+   "label": "Headgear",
+   "options": [
+    "hood",
+    "bandana",
+    "mask",
+    "none"
+   ],
+   "default": "hood"
+  },
+  {
+   "key": "headgearSize",
+   "kind": "range",
+   "label": "Size",
+   "lo": "Small",
+   "hi": "Big",
+   "min": 0.5,
+   "max": 1.8,
+   "step": 0.05,
+   "default": 1
+  },
+  {
+   "key": "scarf",
+   "kind": "choice",
+   "label": "Scarf",
+   "options": [
+    "short",
+    "long",
+    "none"
+   ],
+   "default": "long"
+  },
+  {
+   "key": "scarfLength",
+   "kind": "range",
+   "label": "Length",
+   "lo": "Short",
+   "hi": "Long",
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "default": 1
+  },
+  {
+   "key": "weapon",
+   "kind": "choice",
+   "label": "Weapon",
+   "options": [
+    "daggers",
+    "short sword",
+    "claws",
+    "none"
+   ],
+   "default": "daggers"
+  },
+  {
+   "key": "weaponLength",
+   "kind": "range",
+   "label": "Length",
+   "lo": "Short",
+   "hi": "Long",
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "default": 1
+  },
+  {
+   "key": "skin",
+   "kind": "colour",
+   "label": "Skin"
+  },
+  {
+   "key": "hair",
+   "kind": "colour",
+   "label": "Hair",
+   "when": {
+    "headgear": [
+     "bandana",
+     "mask",
+     "none"
+    ]
+   }
+  },
+  {
+   "key": "outfit",
+   "kind": "colour",
+   "label": "Outfit"
+  },
+  {
+   "key": "trim",
+   "kind": "colour",
+   "label": "Scarf and trim"
+  },
+  {
+   "key": "bounce",
+   "kind": "range",
+   "label": "Bounce",
+   "lo": "Calm",
+   "hi": "Bouncy",
+   "default": 0.5,
+   "group": "Motion"
+  },
+  {
+   "key": "stride",
+   "kind": "range",
+   "label": "Stride",
+   "lo": "Small steps",
+   "hi": "Big steps",
+   "default": 0.5,
+   "group": "Motion"
+  },
+  {
+   "key": "speed",
+   "standard": "speed"
+  }
+ ],
+ "parts": {
+  "headgear": {
+   "label": "Headgear",
+   "params": [
+    "headgear",
+    "headgearSize"
+   ],
+   "none": "none",
+   "socket": "head",
+   "shapes": [
+    "headCloth"
+   ]
+  },
+  "scarf": {
+   "label": "Scarf",
+   "params": [
+    "scarf",
+    "scarfLength"
+   ],
+   "none": "none",
+   "socket": "back",
+   "shapes": [
+    "scarf"
+   ]
+  },
+  "weapon": {
+   "label": "Weapon",
+   "params": [
+    "weapon",
+    "weaponLength"
+   ],
+   "none": "none",
+   "socket": "hand",
+   "shapes": [
+    "blade",
+    "bladeOff"
+   ]
+  }
+ },
+ "clips": {
+  "idle_down": {
+   "from": {
+    "from": "weapon",
+    "pick": {
+     "daggers": "idle-armed-down",
+     "short sword": "idle-armed-down",
+     "claws": "idle-armed-down",
+     "none": "idle-bare-down"
+    }
+   },
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "idle_up": {
+   "from": {
+    "from": "weapon",
+    "pick": {
+     "daggers": "idle-armed-up",
+     "short sword": "idle-armed-up",
+     "claws": "idle-armed-up",
+     "none": "idle-bare-up"
+    }
+   },
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "idle_side": {
+   "from": {
+    "from": "weapon",
+    "pick": {
+     "daggers": "idle-armed-side",
+     "short sword": "idle-armed-side",
+     "claws": "idle-armed-side",
+     "none": "idle-bare-side"
+    }
+   },
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.shnF",
+      "bones.toeF",
+      "bones.thiB",
+      "bones.shnB",
+      "bones.toeB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "first",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "walk_down": {
+   "from": {
+    "from": "weapon",
+    "pick": {
+     "daggers": "walk-armed-down",
+     "short sword": "walk-armed-down",
+     "claws": "walk-armed-down",
+     "none": "walk-bare-down"
+    }
+   },
+   "sounds": [
+    {
+     "sound": "footstep-grass",
+     "frame": 0,
+     "preset": "Grass",
+     "volume": 0.45
+    },
+    {
+     "sound": "footstep-grass",
+     "frame": 4,
+     "preset": "Grass",
+     "volume": 0.45
+    }
+   ],
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.8
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.8
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.armF",
+      "bones.elbF",
+      "bones.wriF",
+      "bones.cuffF",
+      "bones.handF",
+      "bones.rimAF",
+      "stretch.armF",
+      "stretch.rimAF",
+      "bones.armB",
+      "bones.elbB",
+      "bones.wriB",
+      "bones.cuffB",
+      "bones.handB",
+      "bones.rimAB",
+      "stretch.armB",
+      "stretch.rimAB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.armF",
+      "bones.elbF",
+      "bones.wriF",
+      "bones.cuffF",
+      "bones.handF",
+      "bones.rimAF",
+      "stretch.armF",
+      "stretch.rimAF",
+      "bones.armB",
+      "bones.elbB",
+      "bones.wriB",
+      "bones.cuffB",
+      "bones.handB",
+      "bones.rimAB",
+      "stretch.armB",
+      "stretch.rimAB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "walk_up": {
+   "from": {
+    "from": "weapon",
+    "pick": {
+     "daggers": "walk-armed-up",
+     "short sword": "walk-armed-up",
+     "claws": "walk-armed-up",
+     "none": "walk-bare-up"
+    }
+   },
+   "sounds": [
+    {
+     "sound": "footstep-grass",
+     "frame": 0,
+     "preset": "Grass",
+     "volume": 0.45
+    },
+    {
+     "sound": "footstep-grass",
+     "frame": 4,
+     "preset": "Grass",
+     "volume": 0.45
+    }
+   ],
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.6
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        2.25
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "walk_side": {
+   "from": {
+    "from": "weapon",
+    "pick": {
+     "daggers": "walk-armed-side",
+     "short sword": "walk-armed-side",
+     "claws": "walk-armed-side",
+     "none": "walk-bare-side"
+    }
+   },
+   "sounds": [
+    {
+     "sound": "footstep-grass",
+     "frame": 0,
+     "preset": "Grass",
+     "volume": 0.45
+    },
+    {
+     "sound": "footstep-grass",
+     "frame": 4,
+     "preset": "Grass",
+     "volume": 0.45
+    }
+   ],
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.6
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        2.25
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.shnF",
+      "bones.toeF",
+      "bones.thiB",
+      "bones.shnB",
+      "bones.toeB",
+      "bones.legF",
+      "stretch.legF",
+      "bones.legB",
+      "stretch.legB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.7
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.shnF",
+      "bones.toeF",
+      "bones.thiB",
+      "bones.shnB",
+      "bones.toeB",
+      "bones.legF",
+      "stretch.legF",
+      "bones.legB",
+      "stretch.legB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.8
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.1
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.armF",
+      "bones.elbF",
+      "bones.wriF",
+      "bones.cuffF",
+      "bones.handF",
+      "bones.rimAF",
+      "stretch.armF",
+      "stretch.rimAF",
+      "bones.armB",
+      "bones.elbB",
+      "bones.wriB",
+      "bones.cuffB",
+      "bones.handB",
+      "bones.rimAB",
+      "stretch.armB",
+      "stretch.rimAB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.7
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.armF",
+      "bones.elbF",
+      "bones.wriF",
+      "bones.cuffF",
+      "bones.handF",
+      "bones.rimAF",
+      "stretch.armF",
+      "stretch.rimAF",
+      "bones.armB",
+      "bones.elbB",
+      "bones.wriB",
+      "bones.cuffB",
+      "bones.handB",
+      "bones.rimAB",
+      "stretch.armB",
+      "stretch.rimAB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.7
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.spine"
+     ],
+     "about": 0,
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.75
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "run_down": {
+   "from": {
+    "from": "weapon",
+    "pick": {
+     "daggers": "run-armed-down",
+     "short sword": "run-armed-down",
+     "claws": "run-armed-down",
+     "none": "run-bare-down"
+    }
+   },
+   "sounds": [
+    {
+     "sound": "footstep-grass",
+     "frame": 0,
+     "preset": "Tall grass",
+     "volume": 0.45
+    },
+    {
+     "sound": "footstep-grass",
+     "frame": 4,
+     "preset": "Tall grass",
+     "volume": 0.45
+    }
+   ],
+   "frameEdits": {
+    "0": {
+     "hide": [
+      "scarf"
+     ],
+     "show": [
+      "scarfRun0"
+     ]
+    },
+    "1": {
+     "hide": [
+      "scarf"
+     ],
+     "show": [
+      "scarfRun1"
+     ]
+    },
+    "2": {
+     "hide": [
+      "scarf"
+     ],
+     "show": [
+      "scarfRun2"
+     ]
+    },
+    "3": {
+     "hide": [
+      "scarf"
+     ],
+     "show": [
+      "scarfRun3"
+     ]
+    },
+    "4": {
+     "hide": [
+      "scarf"
+     ],
+     "show": [
+      "scarfRun4"
+     ]
+    },
+    "5": {
+     "hide": [
+      "scarf"
+     ],
+     "show": [
+      "scarfRun5"
+     ]
+    },
+    "6": {
+     "hide": [
+      "scarf"
+     ],
+     "show": [
+      "scarfRun6"
+     ]
+    },
+    "7": {
+     "hide": [
+      "scarf"
+     ],
+     "show": [
+      "scarfRun7"
+     ]
+    }
+   },
+   "travel": [
+    {
+     "tracks": [
+      "root.1"
+     ],
+     "about": 0,
+     "side": "below",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.7
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB",
+      "bones.legB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.75
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "stretch.toeF",
+      "bones.thiB",
+      "bones.toeB",
+      "stretch.toeB",
+      "bones.legF",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.75
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB",
+      "bones.legB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.8
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "stretch.toeF",
+      "bones.thiB",
+      "bones.toeB",
+      "stretch.toeB",
+      "bones.legF",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.8
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.armF",
+      "bones.elbF",
+      "bones.wriF",
+      "bones.cuffF",
+      "bones.handF",
+      "bones.rimAF",
+      "stretch.armF",
+      "stretch.rimAF",
+      "bones.armB",
+      "bones.elbB",
+      "bones.wriB",
+      "bones.cuffB",
+      "bones.handB",
+      "bones.rimAB",
+      "stretch.armB",
+      "stretch.rimAB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.8
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.1
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "stretch.spine"
+     ],
+     "about": 1,
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.5
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        0.85
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "run_up": {
+   "from": {
+    "from": "weapon",
+    "pick": {
+     "daggers": "run-armed-up",
+     "short sword": "run-armed-up",
+     "claws": "run-armed-up",
+     "none": "run-bare-up"
+    }
+   },
+   "sounds": [
+    {
+     "sound": "footstep-grass",
+     "frame": 0,
+     "preset": "Tall grass",
+     "volume": 0.45
+    },
+    {
+     "sound": "footstep-grass",
+     "frame": 4,
+     "preset": "Tall grass",
+     "volume": 0.45
+    }
+   ],
+   "frameEdits": {
+    "0": {
+     "hide": [
+      "scarf"
+     ],
+     "show": [
+      "scarfRun0"
+     ]
+    },
+    "1": {
+     "hide": [
+      "scarf"
+     ],
+     "show": [
+      "scarfRun1"
+     ]
+    },
+    "2": {
+     "hide": [
+      "scarf"
+     ],
+     "show": [
+      "scarfRun2"
+     ]
+    },
+    "3": {
+     "hide": [
+      "scarf"
+     ],
+     "show": [
+      "scarfRun3"
+     ]
+    },
+    "4": {
+     "hide": [
+      "scarf"
+     ],
+     "show": [
+      "scarfRun4"
+     ]
+    },
+    "5": {
+     "hide": [
+      "scarf"
+     ],
+     "show": [
+      "scarfRun5"
+     ]
+    },
+    "6": {
+     "hide": [
+      "scarf"
+     ],
+     "show": [
+      "scarfRun6"
+     ]
+    },
+    "7": {
+     "hide": [
+      "scarf"
+     ],
+     "show": [
+      "scarfRun7"
+     ]
+    }
+   },
+   "travel": [
+    {
+     "tracks": [
+      "root.1"
+     ],
+     "about": 0,
+     "side": "below",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.7
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.8
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.8
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.armF",
+      "bones.elbF",
+      "bones.wriF",
+      "bones.cuffF",
+      "bones.handF",
+      "bones.rimAF",
+      "stretch.armF",
+      "stretch.rimAF",
+      "bones.armB",
+      "bones.elbB",
+      "bones.wriB",
+      "bones.cuffB",
+      "bones.handB",
+      "bones.rimAB",
+      "stretch.armB",
+      "stretch.rimAB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.7
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "run_side": {
+   "from": {
+    "from": "weapon",
+    "pick": {
+     "daggers": "run-armed-side",
+     "short sword": "run-armed-side",
+     "claws": "run-armed-side",
+     "none": "run-bare-side"
+    }
+   },
+   "sounds": [
+    {
+     "sound": "footstep-grass",
+     "frame": 0,
+     "preset": "Tall grass",
+     "volume": 0.45
+    },
+    {
+     "sound": "footstep-grass",
+     "frame": 4,
+     "preset": "Tall grass",
+     "volume": 0.45
+    }
+   ],
+   "frameEdits": {
+    "0": {
+     "hide": [
+      "scarf"
+     ],
+     "show": [
+      "scarfRun0"
+     ]
+    },
+    "1": {
+     "hide": [
+      "scarf"
+     ],
+     "show": [
+      "scarfRun1"
+     ]
+    },
+    "2": {
+     "hide": [
+      "scarf"
+     ],
+     "show": [
+      "scarfRun2"
+     ]
+    },
+    "3": {
+     "hide": [
+      "scarf"
+     ],
+     "show": [
+      "scarfRun3"
+     ]
+    },
+    "4": {
+     "hide": [
+      "scarf"
+     ],
+     "show": [
+      "scarfRun4"
+     ]
+    },
+    "5": {
+     "hide": [
+      "scarf"
+     ],
+     "show": [
+      "scarfRun5"
+     ]
+    },
+    "6": {
+     "hide": [
+      "scarf"
+     ],
+     "show": [
+      "scarfRun6"
+     ]
+    },
+    "7": {
+     "hide": [
+      "scarf"
+     ],
+     "show": [
+      "scarfRun7"
+     ]
+    }
+   },
+   "travel": [
+    {
+     "tracks": [
+      "root.1"
+     ],
+     "about": 0,
+     "side": "below",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.7
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.shnF",
+      "bones.toeF",
+      "bones.thiB",
+      "bones.shnB",
+      "bones.toeB",
+      "bones.legF",
+      "stretch.legF",
+      "bones.legB",
+      "stretch.legB",
+      "bones.legIF",
+      "bones.legIB",
+      "stretch.legIB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.6
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.shnF",
+      "bones.toeF",
+      "bones.thiB",
+      "bones.shnB",
+      "bones.toeB",
+      "bones.legF",
+      "stretch.legF",
+      "bones.legB",
+      "stretch.legB",
+      "bones.legIF",
+      "bones.legIB",
+      "stretch.legIB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.1
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.armF",
+      "bones.elbF",
+      "bones.wriF",
+      "bones.cuffF",
+      "bones.handF",
+      "bones.rimAF",
+      "stretch.armF",
+      "stretch.rimAF",
+      "bones.armB",
+      "bones.elbB",
+      "bones.wriB",
+      "bones.cuffB",
+      "bones.handB",
+      "bones.rimAB",
+      "stretch.armB",
+      "stretch.rimAB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "stretch.spine"
+     ],
+     "about": 1,
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        1.15
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.15
+       ]
+      ]
+     }
+    }
+   ]
+  }
+ },
+ "made": {
+  "in": "library",
+  "from": "code:rogue-walker",
+  "by": "migration batch M7 (/sprite-forge redraw)"
+ }
+}

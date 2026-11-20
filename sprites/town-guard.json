@@ -1,0 +1,3491 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "town-guard",
+ "name": "Town guard",
+ "blurb": "A soldier who stands at a gate, walks his round and bars the way. Change his build, weapon, shield, headgear and colours.",
+ "meta": {
+  "type": "character",
+  "role": "characters/npc",
+  "themes": [
+   "fantasy",
+   "farm"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "top-down-rpg"
+  ],
+  "view": "top-down",
+  "words": [
+   "guard",
+   "soldier",
+   "sentry",
+   "watchman",
+   "halberd",
+   "shield",
+   "helmet",
+   "gate",
+   "patrol",
+   "walk",
+   "block",
+   "stern"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  48,
+  48
+ ],
+ "pivot": [
+  24,
+  42
+ ],
+ "grounded": false,
+ "preview": "walk_down",
+ "palette": [
+  {
+   "id": "skin",
+   "label": "Skin",
+   "default": "#f6d3b0",
+   "material": "skin",
+   "swatches": [
+    "#f6d3b0",
+    "#e8b088",
+    "#c98a5c",
+    "#9a6240",
+    "#6e4428",
+    "#9bd18a",
+    "#b9a7e0"
+   ]
+  },
+  {
+   "id": "outfit",
+   "label": "Tabard",
+   "default": "#3f6fd1",
+   "material": "cloth",
+   "swatches": [
+    "#3f6fd1",
+    "#7a4fc4",
+    "#2f8f9d",
+    "#c9423a",
+    "#8e3a4a",
+    "#4f9d57"
+   ]
+  },
+  {
+   "id": "trim",
+   "label": "Border and belt",
+   "default": "#e6c96a",
+   "material": "cloth",
+   "swatches": [
+    "#e6c96a",
+    "#f2c230",
+    "#f0ead8",
+    "#e08a2c",
+    "#e6c545"
+   ]
+  },
+  {
+   "id": "metal",
+   "label": "Metal",
+   "default": "#c2c9d6",
+   "material": "metal",
+   "swatches": [
+    "#c2c9d6",
+    "#f2c230",
+    "#a8a4a0",
+    "#a8806a",
+    "#5a5f7a",
+    "#8f97a8",
+    "#e6c545",
+    "#c98a4a"
+   ]
+  },
+  {
+   "id": "mail",
+   "default": "#a8a4a0",
+   "material": "metal",
+   "detail": true
+  },
+  {
+   "id": "hose",
+   "default": "#7e84a0",
+   "material": "cloth",
+   "detail": true
+  },
+  {
+   "id": "wood",
+   "default": "#9a6a3e",
+   "material": "wood",
+   "detail": true
+  },
+  {
+   "id": "hair",
+   "default": "#9a6a3e",
+   "material": "plant",
+   "detail": true
+  },
+  {
+   "id": "gold",
+   "default": "#f2c230",
+   "material": "metal",
+   "detail": true
+  }
+ ],
+ "body": {
+  "rig": {
+   "extends": {
+    "use": "base:person-topdown-guard",
+    "v": 2,
+    "paint": {
+     "top": "mail",
+     "bottom": "hose",
+     "boots": "wood",
+     "topFar": "mail.dark",
+     "bottomFar": "hose.dark"
+    },
+    "clips": []
+   },
+   "shapes": [
+    {
+     "id": "tabard",
+     "kind": "use",
+     "use": "part:topdown-tabard",
+     "v": 1,
+     "on": "chest",
+     "z": 40,
+     "paint": {
+      "cloth": "outfit",
+      "trim": "trim"
+     },
+     "args": {
+      "kind": "tabard"
+     }
+    },
+    {
+     "id": "belt",
+     "kind": "use",
+     "use": "part:topdown-belt",
+     "v": 2,
+     "on": "waist",
+     "z": 41,
+     "paint": {
+      "belt": {
+       "rule": "bandTone",
+       "of": "trim",
+       "under": [
+        "outfit"
+       ]
+      }
+     }
+    },
+    {
+     "id": "hair",
+     "kind": "use",
+     "use": "part:topdown-hair",
+     "v": 1,
+     "on": "head",
+     "z": 50,
+     "paint": {
+      "hair": "hair"
+     },
+     "args": {
+      "style": "short",
+      "hatted": {
+       "from": "headgear",
+       "pick": {
+        "helmet": true,
+        "kettle hat": true,
+        "none": false
+       }
+      }
+     }
+    },
+    {
+     "id": "helmet",
+     "kind": "use",
+     "use": "part:topdown-helmet",
+     "v": 1,
+     "on": "head",
+     "z": 50,
+     "paint": {
+      "metal": "metal",
+      "plume": "trim"
+     },
+     "args": {
+      "size": {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.5,
+         0.5
+        ],
+        [
+         1.8,
+         1.8
+        ]
+       ]
+      }
+     },
+     "when": {
+      "headgear": [
+       "helmet"
+      ]
+     }
+    },
+    {
+     "id": "kettle",
+     "kind": "use",
+     "use": "part:topdown-kettle-hat",
+     "v": 1,
+     "on": "head",
+     "z": 50,
+     "paint": {
+      "metal": "metal"
+     },
+     "args": {
+      "size": {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.5,
+         0.5
+        ],
+        [
+         1.8,
+         1.8
+        ]
+       ]
+      }
+     },
+     "when": {
+      "headgear": [
+       "kettle hat"
+      ]
+     }
+    },
+    {
+     "id": "shield",
+     "kind": "use",
+     "use": "part:topdown-shield",
+     "v": 1,
+     "on": "cuffB",
+     "z": 50,
+     "paint": {
+      "metal": "metal",
+      "boss": "trim"
+     },
+     "args": {
+      "kind": {
+       "from": "shield",
+       "pick": {
+        "round": "round",
+        "kite": "kite",
+        "none": "round"
+       }
+      },
+      "size": {
+       "from": "shieldSize",
+       "map": [
+        [
+         0.65,
+         0.65
+        ],
+        [
+         1.35,
+         1.35
+        ]
+       ]
+      }
+     },
+     "when": {
+      "shield": [
+       "round",
+       "kite"
+      ]
+     }
+    },
+    {
+     "id": "halberd",
+     "kind": "use",
+     "use": "held:topdown-polearm",
+     "v": 4,
+     "on": "reachF",
+     "z": 60,
+     "paint": {
+      "metal": "metal",
+      "wood": "wood"
+     },
+     "args": {
+      "kind": "halberd",
+      "length": {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         15.6
+        ],
+        [
+         1,
+         24
+        ],
+        [
+         1.15,
+         26
+        ],
+        [
+         1.35,
+         26
+        ]
+       ]
+      }
+     },
+     "when": {
+      "weapon": [
+       "halberd"
+      ]
+     }
+    },
+    {
+     "id": "pike",
+     "kind": "use",
+     "use": "held:topdown-polearm",
+     "v": 4,
+     "on": "reachF",
+     "z": 60,
+     "paint": {
+      "metal": "metal",
+      "wood": "wood"
+     },
+     "args": {
+      "kind": "pike",
+      "length": {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         15
+        ],
+        [
+         1,
+         23
+        ],
+        [
+         1.15,
+         25.5714
+        ],
+        [
+         1.35,
+         25.5714
+        ]
+       ]
+      }
+     },
+     "when": {
+      "weapon": [
+       "spear"
+      ]
+     }
+    },
+    {
+     "id": "sword",
+     "kind": "use",
+     "use": "held:topdown-weapon",
+     "v": 1,
+     "on": "reachF",
+     "z": 60,
+     "paint": {
+      "metal": "metal",
+      "wood": "wood",
+      "hilt": "gold"
+     },
+     "args": {
+      "kind": "sword",
+      "length": {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         7.15
+        ],
+        [
+         1.15,
+         12.65
+        ],
+        [
+         1.35,
+         12.65
+        ]
+       ]
+      }
+     },
+     "when": {
+      "weapon": [
+       "sword"
+      ]
+     }
+    },
+    {
+     "id": "rimB",
+     "kind": "line",
+     "on": "rimAB",
+     "from": [
+      0,
+      0
+     ],
+     "to": [
+      3,
+      0
+     ],
+     "paint": "mail.dark",
+     "z": 30,
+     "hidden": false,
+     "thick": 3,
+     "when": [
+      {
+       "weapon": [
+        "halberd",
+        "spear",
+        "sword"
+       ]
+      },
+      {
+       "shield": [
+        "round",
+        "kite"
+       ]
+      },
+      {
+       "clip": [
+        "idle_down",
+        "idle_up",
+        "idle_side",
+        "walk_down",
+        "walk_up",
+        "walk_side"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "rimB2",
+     "kind": "line",
+     "on": "rimAB",
+     "from": [
+      3,
+      0
+     ],
+     "to": [
+      6,
+      0
+     ],
+     "paint": "mail.dark",
+     "z": 30,
+     "hidden": false,
+     "thick": 3,
+     "when": [
+      {
+       "weapon": [
+        "halberd",
+        "spear",
+        "sword"
+       ]
+      },
+      {
+       "shield": [
+        "round",
+        "kite"
+       ]
+      },
+      {
+       "clip": [
+        "idle_down",
+        "idle_up",
+        "idle_side",
+        "walk_down",
+        "walk_up",
+        "walk_side"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "rimBIn",
+     "kind": "limb",
+     "on": "rimIB",
+     "width": 3,
+     "paint": "mail.dark",
+     "z": 30,
+     "hidden": true,
+     "when": [
+      {
+       "weapon": [
+        "halberd",
+        "spear",
+        "sword"
+       ]
+      },
+      {
+       "shield": [
+        "round",
+        "kite"
+       ]
+      },
+      {
+       "clip": [
+        "idle_down",
+        "idle_up",
+        "idle_side",
+        "walk_down",
+        "walk_up",
+        "walk_side"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "rimTopB",
+     "kind": "stamp",
+     "on": "armTopB",
+     "at": [
+      -2.5,
+      -1.5
+     ],
+     "rows": [
+      "..."
+     ],
+     "key": {
+      "d": "mail.dark"
+     },
+     "variants": {
+      "r001": [
+       "..d"
+      ],
+      "r010": [
+       ".d."
+      ],
+      "r011": [
+       ".dd"
+      ],
+      "r100": [
+       "d.."
+      ],
+      "r101": [
+       "d.d"
+      ],
+      "r110": [
+       "dd."
+      ],
+      "r111": [
+       "ddd"
+      ]
+     },
+     "z": 30,
+     "when": [
+      {
+       "weapon": [
+        "halberd",
+        "spear",
+        "sword"
+       ]
+      },
+      {
+       "shield": [
+        "round",
+        "kite"
+       ]
+      },
+      {
+       "clip": [
+        "idle_down",
+        "idle_up",
+        "idle_side",
+        "walk_down",
+        "walk_up",
+        "walk_side"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "rimLowB",
+     "kind": "stamp",
+     "on": "cuffB",
+     "at": [
+      1.5,
+      -1.5
+     ],
+     "rows": [
+      "..."
+     ],
+     "key": {
+      "d": "mail.dark"
+     },
+     "variants": {
+      "r001": [
+       "..d"
+      ],
+      "r010": [
+       ".d."
+      ],
+      "r011": [
+       ".dd"
+      ],
+      "r100": [
+       "d.."
+      ],
+      "r101": [
+       "d.d"
+      ],
+      "r110": [
+       "dd."
+      ],
+      "r111": [
+       "ddd"
+      ]
+     },
+     "z": 30,
+     "when": [
+      {
+       "weapon": [
+        "halberd",
+        "spear",
+        "sword"
+       ]
+      },
+      {
+       "shield": [
+        "round",
+        "kite"
+       ]
+      },
+      {
+       "clip": [
+        "idle_down",
+        "idle_up",
+        "idle_side",
+        "walk_down",
+        "walk_up",
+        "walk_side"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "sleeveB",
+     "kind": "limb",
+     "on": "armB",
+     "width": 3,
+     "paint": "mail",
+     "z": 31,
+     "when": [
+      {
+       "weapon": [
+        "halberd",
+        "spear",
+        "sword"
+       ]
+      },
+      {
+       "shield": [
+        "round",
+        "kite"
+       ]
+      },
+      {
+       "clip": [
+        "idle_down",
+        "idle_up",
+        "idle_side",
+        "walk_down",
+        "walk_up",
+        "walk_side"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "sleeveBIn",
+     "kind": "limb",
+     "on": "armIB",
+     "width": 3,
+     "paint": "mail",
+     "z": 31,
+     "hidden": true,
+     "when": [
+      {
+       "weapon": [
+        "halberd",
+        "spear",
+        "sword"
+       ]
+      },
+      {
+       "shield": [
+        "round",
+        "kite"
+       ]
+      },
+      {
+       "clip": [
+        "idle_down",
+        "idle_up",
+        "idle_side",
+        "walk_down",
+        "walk_up",
+        "walk_side"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "sleeveBDot",
+     "kind": "line",
+     "on": "armIB",
+     "from": [
+      0,
+      0
+     ],
+     "to": [
+      0,
+      0
+     ],
+     "paint": "mail",
+     "z": 31,
+     "hidden": true,
+     "thick": 3,
+     "when": [
+      {
+       "weapon": [
+        "halberd",
+        "spear",
+        "sword"
+       ]
+      },
+      {
+       "shield": [
+        "round",
+        "kite"
+       ]
+      },
+      {
+       "clip": [
+        "idle_down",
+        "idle_up",
+        "idle_side",
+        "walk_down",
+        "walk_up",
+        "walk_side"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "rimBDot",
+     "kind": "line",
+     "on": "rimIB",
+     "from": [
+      0,
+      0
+     ],
+     "to": [
+      0,
+      0
+     ],
+     "paint": "mail.dark",
+     "z": 30,
+     "hidden": true,
+     "thick": 3,
+     "when": [
+      {
+       "weapon": [
+        "halberd",
+        "spear",
+        "sword"
+       ]
+      },
+      {
+       "shield": [
+        "round",
+        "kite"
+       ]
+      },
+      {
+       "clip": [
+        "idle_down",
+        "idle_up",
+        "idle_side",
+        "walk_down",
+        "walk_up",
+        "walk_side"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "fistB",
+     "kind": "stamp",
+     "on": "fistB",
+     "at": [
+      0,
+      0
+     ],
+     "rows": [
+      "sss",
+      "sss"
+     ],
+     "key": {
+      "s": "skin",
+      "S": "skin.dark"
+     },
+     "variants": {
+      "far": [
+       "SSS",
+       "SSS"
+      ]
+     },
+     "z": 60,
+     "when": [
+      {
+       "weapon": [
+        "halberd",
+        "spear",
+        "sword"
+       ]
+      },
+      {
+       "shield": [
+        "round",
+        "kite"
+       ]
+      },
+      {
+       "clip": [
+        "idle_down",
+        "idle_up",
+        "idle_side",
+        "walk_down",
+        "walk_up",
+        "walk_side"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "rimF",
+     "kind": "line",
+     "on": "rimAF",
+     "from": [
+      0,
+      0
+     ],
+     "to": [
+      3,
+      0
+     ],
+     "paint": "mail.dark",
+     "z": 33,
+     "hidden": false,
+     "thick": 3,
+     "when": [
+      {
+       "weapon": [
+        "halberd",
+        "spear",
+        "sword"
+       ]
+      },
+      {
+       "shield": [
+        "round",
+        "kite"
+       ]
+      },
+      {
+       "clip": [
+        "idle_down",
+        "idle_up",
+        "idle_side",
+        "walk_down",
+        "walk_up",
+        "walk_side"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "rimF2",
+     "kind": "line",
+     "on": "rimAF",
+     "from": [
+      3,
+      0
+     ],
+     "to": [
+      6,
+      0
+     ],
+     "paint": "mail.dark",
+     "z": 33,
+     "hidden": false,
+     "thick": 3,
+     "when": [
+      {
+       "weapon": [
+        "halberd",
+        "spear",
+        "sword"
+       ]
+      },
+      {
+       "shield": [
+        "round",
+        "kite"
+       ]
+      },
+      {
+       "clip": [
+        "idle_down",
+        "idle_up",
+        "idle_side",
+        "walk_down",
+        "walk_up",
+        "walk_side"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "rimFIn",
+     "kind": "limb",
+     "on": "rimIF",
+     "width": 3,
+     "paint": "mail.dark",
+     "z": 33,
+     "hidden": true,
+     "when": [
+      {
+       "weapon": [
+        "halberd",
+        "spear",
+        "sword"
+       ]
+      },
+      {
+       "shield": [
+        "round",
+        "kite"
+       ]
+      },
+      {
+       "clip": [
+        "idle_down",
+        "idle_up",
+        "idle_side",
+        "walk_down",
+        "walk_up",
+        "walk_side"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "rimTopF",
+     "kind": "stamp",
+     "on": "armTopF",
+     "at": [
+      -2.5,
+      -1.5
+     ],
+     "rows": [
+      "..."
+     ],
+     "key": {
+      "d": "mail.dark"
+     },
+     "variants": {
+      "r001": [
+       "..d"
+      ],
+      "r010": [
+       ".d."
+      ],
+      "r011": [
+       ".dd"
+      ],
+      "r100": [
+       "d.."
+      ],
+      "r101": [
+       "d.d"
+      ],
+      "r110": [
+       "dd."
+      ],
+      "r111": [
+       "ddd"
+      ]
+     },
+     "z": 33,
+     "when": [
+      {
+       "weapon": [
+        "halberd",
+        "spear",
+        "sword"
+       ]
+      },
+      {
+       "shield": [
+        "round",
+        "kite"
+       ]
+      },
+      {
+       "clip": [
+        "idle_down",
+        "idle_up",
+        "idle_side",
+        "walk_down",
+        "walk_up",
+        "walk_side"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "rimLowF",
+     "kind": "stamp",
+     "on": "cuffF",
+     "at": [
+      1.5,
+      -1.5
+     ],
+     "rows": [
+      "..."
+     ],
+     "key": {
+      "d": "mail.dark"
+     },
+     "variants": {
+      "r001": [
+       "..d"
+      ],
+      "r010": [
+       ".d."
+      ],
+      "r011": [
+       ".dd"
+      ],
+      "r100": [
+       "d.."
+      ],
+      "r101": [
+       "d.d"
+      ],
+      "r110": [
+       "dd."
+      ],
+      "r111": [
+       "ddd"
+      ]
+     },
+     "z": 33,
+     "when": [
+      {
+       "weapon": [
+        "halberd",
+        "spear",
+        "sword"
+       ]
+      },
+      {
+       "shield": [
+        "round",
+        "kite"
+       ]
+      },
+      {
+       "clip": [
+        "idle_down",
+        "idle_up",
+        "idle_side",
+        "walk_down",
+        "walk_up",
+        "walk_side"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "sleeveF",
+     "kind": "limb",
+     "on": "armF",
+     "width": 3,
+     "paint": "mail",
+     "z": 34,
+     "when": [
+      {
+       "weapon": [
+        "halberd",
+        "spear",
+        "sword"
+       ]
+      },
+      {
+       "shield": [
+        "round",
+        "kite"
+       ]
+      },
+      {
+       "clip": [
+        "idle_down",
+        "idle_up",
+        "idle_side",
+        "walk_down",
+        "walk_up",
+        "walk_side"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "sleeveFIn",
+     "kind": "limb",
+     "on": "armIF",
+     "width": 3,
+     "paint": "mail",
+     "z": 34,
+     "hidden": true,
+     "when": [
+      {
+       "weapon": [
+        "halberd",
+        "spear",
+        "sword"
+       ]
+      },
+      {
+       "shield": [
+        "round",
+        "kite"
+       ]
+      },
+      {
+       "clip": [
+        "idle_down",
+        "idle_up",
+        "idle_side",
+        "walk_down",
+        "walk_up",
+        "walk_side"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "sleeveFDot",
+     "kind": "line",
+     "on": "armIF",
+     "from": [
+      0,
+      0
+     ],
+     "to": [
+      0,
+      0
+     ],
+     "paint": "mail",
+     "z": 34,
+     "hidden": true,
+     "thick": 3,
+     "when": [
+      {
+       "weapon": [
+        "halberd",
+        "spear",
+        "sword"
+       ]
+      },
+      {
+       "shield": [
+        "round",
+        "kite"
+       ]
+      },
+      {
+       "clip": [
+        "idle_down",
+        "idle_up",
+        "idle_side",
+        "walk_down",
+        "walk_up",
+        "walk_side"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "rimFDot",
+     "kind": "line",
+     "on": "rimIF",
+     "from": [
+      0,
+      0
+     ],
+     "to": [
+      0,
+      0
+     ],
+     "paint": "mail.dark",
+     "z": 33,
+     "hidden": true,
+     "thick": 3,
+     "when": [
+      {
+       "weapon": [
+        "halberd",
+        "spear",
+        "sword"
+       ]
+      },
+      {
+       "shield": [
+        "round",
+        "kite"
+       ]
+      },
+      {
+       "clip": [
+        "idle_down",
+        "idle_up",
+        "idle_side",
+        "walk_down",
+        "walk_up",
+        "walk_side"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "fistF",
+     "kind": "stamp",
+     "on": "fistF",
+     "at": [
+      0,
+      0
+     ],
+     "rows": [
+      "sss",
+      "sss"
+     ],
+     "key": {
+      "s": "skin",
+      "S": "skin.dark"
+     },
+     "variants": {
+      "far": [
+       "SSS",
+       "SSS"
+      ]
+     },
+     "z": 62,
+     "when": [
+      {
+       "weapon": [
+        "halberd",
+        "spear",
+        "sword"
+       ]
+      },
+      {
+       "shield": [
+        "round",
+        "kite"
+       ]
+      },
+      {
+       "clip": [
+        "idle_down",
+        "idle_up",
+        "idle_side",
+        "walk_down",
+        "walk_up",
+        "walk_side"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "sleeveBSide",
+     "kind": "limb",
+     "on": "armB",
+     "width": 3,
+     "paint": "mail.dark",
+     "z": 5,
+     "hidden": true,
+     "when": [
+      {
+       "weapon": [
+        "halberd",
+        "spear",
+        "sword"
+       ]
+      },
+      {
+       "shield": [
+        "round",
+        "kite"
+       ]
+      },
+      {
+       "clip": [
+        "idle_down",
+        "idle_up",
+        "idle_side",
+        "walk_down",
+        "walk_up",
+        "walk_side"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "sleeveBSideIn",
+     "kind": "limb",
+     "on": "armIB",
+     "width": 3,
+     "paint": "mail.dark",
+     "z": 5,
+     "hidden": true,
+     "when": [
+      {
+       "weapon": [
+        "halberd",
+        "spear",
+        "sword"
+       ]
+      },
+      {
+       "shield": [
+        "round",
+        "kite"
+       ]
+      },
+      {
+       "clip": [
+        "idle_down",
+        "idle_up",
+        "idle_side",
+        "walk_down",
+        "walk_up",
+        "walk_side"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "sleeveBSideDot",
+     "kind": "line",
+     "on": "armIB",
+     "from": [
+      0,
+      0
+     ],
+     "to": [
+      0,
+      0
+     ],
+     "paint": "mail.dark",
+     "z": 5,
+     "hidden": true,
+     "thick": 3,
+     "when": [
+      {
+       "weapon": [
+        "halberd",
+        "spear",
+        "sword"
+       ]
+      },
+      {
+       "shield": [
+        "round",
+        "kite"
+       ]
+      },
+      {
+       "clip": [
+        "idle_down",
+        "idle_up",
+        "idle_side",
+        "walk_down",
+        "walk_up",
+        "walk_side"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "rimFL",
+     "kind": "line",
+     "on": "rimAF",
+     "from": [
+      0,
+      0
+     ],
+     "to": [
+      3,
+      0
+     ],
+     "paint": "mail.dark",
+     "z": 70,
+     "hidden": true,
+     "thick": 3,
+     "when": [
+      {
+       "weapon": [
+        "halberd",
+        "spear",
+        "sword"
+       ]
+      },
+      {
+       "shield": [
+        "round",
+        "kite"
+       ]
+      },
+      {
+       "clip": [
+        "idle_down",
+        "idle_up",
+        "idle_side",
+        "walk_down",
+        "walk_up",
+        "walk_side"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "rimFL2",
+     "kind": "line",
+     "on": "rimAF",
+     "from": [
+      3,
+      0
+     ],
+     "to": [
+      6,
+      0
+     ],
+     "paint": "mail.dark",
+     "z": 70,
+     "hidden": true,
+     "thick": 3,
+     "when": [
+      {
+       "weapon": [
+        "halberd",
+        "spear",
+        "sword"
+       ]
+      },
+      {
+       "shield": [
+        "round",
+        "kite"
+       ]
+      },
+      {
+       "clip": [
+        "idle_down",
+        "idle_up",
+        "idle_side",
+        "walk_down",
+        "walk_up",
+        "walk_side"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "rimFLIn",
+     "kind": "limb",
+     "on": "rimIF",
+     "width": 3,
+     "paint": "mail.dark",
+     "z": 70,
+     "hidden": true,
+     "when": [
+      {
+       "weapon": [
+        "halberd",
+        "spear",
+        "sword"
+       ]
+      },
+      {
+       "shield": [
+        "round",
+        "kite"
+       ]
+      },
+      {
+       "clip": [
+        "idle_down",
+        "idle_up",
+        "idle_side",
+        "walk_down",
+        "walk_up",
+        "walk_side"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "rimFLDot",
+     "kind": "line",
+     "on": "rimIF",
+     "from": [
+      0,
+      0
+     ],
+     "to": [
+      0,
+      0
+     ],
+     "paint": "mail.dark",
+     "z": 70,
+     "hidden": true,
+     "thick": 3,
+     "when": [
+      {
+       "weapon": [
+        "halberd",
+        "spear",
+        "sword"
+       ]
+      },
+      {
+       "shield": [
+        "round",
+        "kite"
+       ]
+      },
+      {
+       "clip": [
+        "idle_down",
+        "idle_up",
+        "idle_side",
+        "walk_down",
+        "walk_up",
+        "walk_side"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "rimFR",
+     "kind": "line",
+     "on": "rimAB",
+     "from": [
+      0,
+      0
+     ],
+     "to": [
+      3,
+      0
+     ],
+     "paint": "mail.dark",
+     "z": 70,
+     "hidden": true,
+     "thick": 3,
+     "when": [
+      {
+       "weapon": [
+        "halberd",
+        "spear",
+        "sword"
+       ]
+      },
+      {
+       "shield": [
+        "round",
+        "kite"
+       ]
+      },
+      {
+       "clip": [
+        "idle_down",
+        "idle_up",
+        "idle_side",
+        "walk_down",
+        "walk_up",
+        "walk_side"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "rimFR2",
+     "kind": "line",
+     "on": "rimAB",
+     "from": [
+      3,
+      0
+     ],
+     "to": [
+      6,
+      0
+     ],
+     "paint": "mail.dark",
+     "z": 70,
+     "hidden": true,
+     "thick": 3,
+     "when": [
+      {
+       "weapon": [
+        "halberd",
+        "spear",
+        "sword"
+       ]
+      },
+      {
+       "shield": [
+        "round",
+        "kite"
+       ]
+      },
+      {
+       "clip": [
+        "idle_down",
+        "idle_up",
+        "idle_side",
+        "walk_down",
+        "walk_up",
+        "walk_side"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "rimFRIn",
+     "kind": "limb",
+     "on": "rimIB",
+     "width": 3,
+     "paint": "mail.dark",
+     "z": 70,
+     "hidden": true,
+     "when": [
+      {
+       "weapon": [
+        "halberd",
+        "spear",
+        "sword"
+       ]
+      },
+      {
+       "shield": [
+        "round",
+        "kite"
+       ]
+      },
+      {
+       "clip": [
+        "idle_down",
+        "idle_up",
+        "idle_side",
+        "walk_down",
+        "walk_up",
+        "walk_side"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "rimFRDot",
+     "kind": "line",
+     "on": "rimIB",
+     "from": [
+      0,
+      0
+     ],
+     "to": [
+      0,
+      0
+     ],
+     "paint": "mail.dark",
+     "z": 70,
+     "hidden": true,
+     "thick": 3,
+     "when": [
+      {
+       "weapon": [
+        "halberd",
+        "spear",
+        "sword"
+       ]
+      },
+      {
+       "shield": [
+        "round",
+        "kite"
+       ]
+      },
+      {
+       "clip": [
+        "idle_down",
+        "idle_up",
+        "idle_side",
+        "walk_down",
+        "walk_up",
+        "walk_side"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "barArmF",
+     "kind": "stamp",
+     "on": "armTopF",
+     "at": [
+      -2,
+      -9
+     ],
+     "rows": [
+      ".......aaa",
+      ".......aaa",
+      ".......aa.",
+      ".......aa.",
+      ".......aa.",
+      ".......aa.",
+      ".......aa.",
+      ".......bbb",
+      ".......bbb"
+     ],
+     "variants": {
+      "held": [
+       "aaaaaaaaaa",
+       "bbbaaaaaaa",
+       "bbbaaaaaa.",
+       "..........",
+       "..........",
+       "..........",
+       "..........",
+       "..........",
+       ".........."
+      ]
+     },
+     "key": {
+      "a": "mail",
+      "b": "skin"
+     },
+     "z": 34,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "none"
+      ],
+      "shield": [
+       "none"
+      ],
+      "clip": [
+       "block"
+      ]
+     }
+    },
+    {
+     "id": "barArmB",
+     "kind": "stamp",
+     "on": "armTopB",
+     "at": [
+      -2,
+      -2
+     ],
+     "rows": [
+      "aaa",
+      "aaa",
+      ".aa",
+      ".aa",
+      ".aa",
+      ".aa",
+      ".aa",
+      "bbb",
+      "bbb",
+      "..."
+     ],
+     "variants": {
+      "held": [
+       "aaa",
+       "aaa",
+       ".aa",
+       ".aa",
+       ".aa",
+       ".aa",
+       ".aa",
+       "bbb",
+       "bbb",
+       "c.."
+      ]
+     },
+     "key": {
+      "a": "mail",
+      "b": "skin",
+      "c": "mail.dark"
+     },
+     "z": 31,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "none"
+      ],
+      "shield": [
+       "none"
+      ],
+      "clip": [
+       "block"
+      ]
+     }
+    }
+   ],
+   "directions": {
+    "down": {
+     "shapes": {
+      "rimB2": {
+       "hidden": false
+      },
+      "rimB": {
+       "hidden": false
+      },
+      "rimF2": {
+       "hidden": false
+      },
+      "rimF": {
+       "hidden": false
+      },
+      "rimFL": {
+       "hidden": true
+      },
+      "rimFL2": {
+       "hidden": true
+      },
+      "rimFR": {
+       "hidden": true
+      },
+      "rimFR2": {
+       "hidden": true
+      },
+      "sleeveBSide": {
+       "hidden": true
+      },
+      "sleeveBDot": {
+       "hidden": true
+      },
+      "rimBDot": {
+       "hidden": true
+      },
+      "rimBIn": {
+       "hidden": true
+      },
+      "sleeveBIn": {
+       "hidden": true
+      },
+      "sleeveFDot": {
+       "hidden": true
+      },
+      "rimFDot": {
+       "hidden": true
+      },
+      "rimFIn": {
+       "hidden": true
+      },
+      "sleeveFIn": {
+       "hidden": true
+      },
+      "sleeveBSideDot": {
+       "hidden": true
+      },
+      "rimFLIn": {
+       "hidden": true
+      },
+      "rimFLDot": {
+       "hidden": true
+      },
+      "rimFRIn": {
+       "hidden": true
+      },
+      "rimFRDot": {
+       "hidden": true
+      },
+      "sleeveBSideIn": {
+       "hidden": true
+      },
+      "fistB": {
+       "z": 60
+      },
+      "fistF": {
+       "z": 62
+      }
+     }
+    },
+    "up": {
+     "shapes": {
+      "rimB2": {
+       "hidden": false
+      },
+      "rimB": {
+       "hidden": false
+      },
+      "rimF2": {
+       "hidden": false
+      },
+      "rimF": {
+       "hidden": false
+      },
+      "rimFL": {
+       "hidden": true
+      },
+      "rimFL2": {
+       "hidden": true
+      },
+      "rimFR": {
+       "hidden": true
+      },
+      "rimFR2": {
+       "hidden": true
+      },
+      "sleeveBSide": {
+       "hidden": true
+      },
+      "sleeveBDot": {
+       "hidden": true
+      },
+      "rimBDot": {
+       "hidden": true
+      },
+      "rimBIn": {
+       "hidden": true
+      },
+      "sleeveBIn": {
+       "hidden": true
+      },
+      "sleeveFDot": {
+       "hidden": true
+      },
+      "rimFDot": {
+       "hidden": true
+      },
+      "rimFIn": {
+       "hidden": true
+      },
+      "sleeveFIn": {
+       "hidden": true
+      },
+      "sleeveBSideDot": {
+       "hidden": true
+      },
+      "rimFLIn": {
+       "hidden": true
+      },
+      "rimFLDot": {
+       "hidden": true
+      },
+      "rimFRIn": {
+       "hidden": true
+      },
+      "rimFRDot": {
+       "hidden": true
+      },
+      "sleeveBSideIn": {
+       "hidden": true
+      },
+      "fistB": {
+       "z": 32
+      },
+      "fistF": {
+       "z": 35
+      }
+     }
+    },
+    "side": {
+     "shapes": {
+      "rimB2": {
+       "hidden": true
+      },
+      "rimB": {
+       "hidden": true
+      },
+      "rimF2": {
+       "hidden": true
+      },
+      "rimF": {
+       "hidden": true
+      },
+      "rimFL": {
+       "hidden": false
+      },
+      "rimFL2": {
+       "hidden": false
+      },
+      "rimFR": {
+       "hidden": false
+      },
+      "rimFR2": {
+       "hidden": false
+      },
+      "sleeveBSide": {
+       "hidden": false
+      },
+      "sleeveBDot": {
+       "hidden": true
+      },
+      "rimBDot": {
+       "hidden": true
+      },
+      "rimBIn": {
+       "hidden": true
+      },
+      "sleeveBIn": {
+       "hidden": true
+      },
+      "sleeveFDot": {
+       "hidden": true
+      },
+      "rimFDot": {
+       "hidden": true
+      },
+      "rimFIn": {
+       "hidden": true
+      },
+      "sleeveFIn": {
+       "hidden": true
+      },
+      "sleeveBSideDot": {
+       "hidden": true
+      },
+      "rimFLIn": {
+       "hidden": true
+      },
+      "rimFLDot": {
+       "hidden": true
+      },
+      "rimFRIn": {
+       "hidden": true
+      },
+      "rimFRDot": {
+       "hidden": true
+      },
+      "sleeveBSideIn": {
+       "hidden": true
+      },
+      "sleeveB": {
+       "hidden": true
+      },
+      "fistB": {
+       "z": 6
+      },
+      "sleeveF": {
+       "z": 71
+      },
+      "fistF": {
+       "z": 72
+      },
+      "rimTopF": {
+       "z": 70
+      },
+      "rimLowF": {
+       "z": 70
+      }
+     }
+    }
+   }
+  }
+ },
+ "controls": [
+  {
+   "key": "height",
+   "kind": "range",
+   "label": "Height",
+   "lo": "Short",
+   "hi": "Tall",
+   "default": 0.5,
+   "scales": {
+    "bones": [
+     "hip",
+     "spine",
+     "thiF",
+     "thiB",
+     "shnF",
+     "shnB",
+     "legF",
+     "legB",
+     "legIF",
+     "legIB"
+    ],
+    "by": [
+     0.85,
+     1.15
+    ]
+   }
+  },
+  {
+   "key": "build",
+   "kind": "range",
+   "label": "Build",
+   "lo": "Slim",
+   "hi": "Stocky",
+   "default": 0.5,
+   "scales": {
+    "bones": [
+     "shoulderF",
+     "shoulderB"
+    ],
+    "by": [
+     0.7,
+     1.3
+    ]
+   }
+  },
+  {
+   "key": "weapon",
+   "kind": "choice",
+   "label": "Weapon",
+   "options": [
+    "halberd",
+    "spear",
+    "sword",
+    "none"
+   ],
+   "default": "halberd"
+  },
+  {
+   "key": "weaponLength",
+   "kind": "range",
+   "label": "Length",
+   "lo": "Short",
+   "hi": "Long",
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "default": 1
+  },
+  {
+   "key": "shield",
+   "kind": "choice",
+   "label": "Shield",
+   "options": [
+    "none",
+    "round",
+    "kite"
+   ],
+   "default": "none"
+  },
+  {
+   "key": "shieldSize",
+   "kind": "range",
+   "label": "Size",
+   "lo": "Small",
+   "hi": "Big",
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "default": 1
+  },
+  {
+   "key": "headgear",
+   "kind": "choice",
+   "label": "Headgear",
+   "options": [
+    "helmet",
+    "kettle hat",
+    "none"
+   ],
+   "default": "helmet"
+  },
+  {
+   "key": "headgearSize",
+   "kind": "range",
+   "label": "Size",
+   "lo": "Small",
+   "hi": "Big",
+   "min": 0.5,
+   "max": 1.8,
+   "step": 0.05,
+   "default": 1
+  },
+  {
+   "key": "skin",
+   "kind": "colour",
+   "label": "Skin"
+  },
+  {
+   "key": "outfit",
+   "kind": "colour",
+   "label": "Tabard"
+  },
+  {
+   "key": "trim",
+   "kind": "colour",
+   "label": "Border and belt"
+  },
+  {
+   "key": "metal",
+   "kind": "colour",
+   "label": "Metal",
+   "when": [
+    {
+     "weapon": [
+      "halberd",
+      "spear",
+      "sword"
+     ]
+    },
+    {
+     "shield": [
+      "round",
+      "kite"
+     ]
+    },
+    {
+     "headgear": [
+      "helmet",
+      "kettle hat"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "bounce",
+   "kind": "range",
+   "label": "Bounce",
+   "lo": "Calm",
+   "hi": "Bouncy",
+   "default": 0.5,
+   "group": "Motion"
+  },
+  {
+   "key": "stride",
+   "kind": "range",
+   "label": "Stride",
+   "lo": "Small steps",
+   "hi": "Big steps",
+   "default": 0.5,
+   "group": "Motion"
+  },
+  {
+   "key": "speed",
+   "standard": "speed"
+  }
+ ],
+ "parts": {
+  "weapon": {
+   "label": "Weapon",
+   "params": [
+    "weapon",
+    "weaponLength"
+   ],
+   "none": "none",
+   "socket": "hand",
+   "shapes": [
+    "halberd",
+    "pike",
+    "sword"
+   ]
+  },
+  "shield": {
+   "label": "Shield",
+   "params": [
+    "shield",
+    "shieldSize"
+   ],
+   "none": "none",
+   "socket": "offhand",
+   "shapes": [
+    "shield"
+   ]
+  },
+  "headgear": {
+   "label": "Headgear",
+   "params": [
+    "headgear",
+    "headgearSize"
+   ],
+   "none": "none",
+   "socket": "head",
+   "shapes": [
+    "helmet",
+    "kettle"
+   ]
+  }
+ },
+ "clips": {
+  "idle_down": {
+   "from": {
+    "from": "weapon",
+    "pick": {
+     "halberd": "idle-pole-down",
+     "spear": "idle-pole-down",
+     "sword": "idle-sword-down",
+     "none": "idle-bare-down"
+    }
+   },
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "idle_up": {
+   "from": {
+    "from": "weapon",
+    "pick": {
+     "halberd": "idle-pole-up",
+     "spear": "idle-pole-up",
+     "sword": "idle-sword-up",
+     "none": "idle-bare-up"
+    }
+   },
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "idle_side": {
+   "from": {
+    "from": "weapon",
+    "pick": {
+     "halberd": "idle-pole-side",
+     "spear": "idle-pole-side",
+     "sword": "idle-sword-side",
+     "none": "idle-bare-side"
+    }
+   },
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.shnF",
+      "bones.toeF",
+      "bones.thiB",
+      "bones.shnB",
+      "bones.toeB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "first",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "root.0"
+     ],
+     "about": 0,
+     "by": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        0
+       ],
+       [
+        0.75,
+        0
+       ],
+       [
+        0.8,
+        0.25
+       ],
+       [
+        0.85,
+        0.25
+       ],
+       [
+        0.9,
+        0.5
+       ],
+       [
+        0.95,
+        0.75
+       ],
+       [
+        1,
+        1
+       ],
+       [
+        1.05,
+        1.25
+       ],
+       [
+        1.1,
+        1.5
+       ],
+       [
+        1.15,
+        2
+       ],
+       [
+        1.25,
+        2
+       ],
+       [
+        1.3,
+        2.25
+       ],
+       [
+        1.35,
+        2.25
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "root.0"
+     ],
+     "about": 0,
+     "by": {
+      "from": "weapon",
+      "pick": {
+       "halberd": 1,
+       "spear": 0.6,
+       "sword": 1,
+       "none": 1
+      }
+     }
+    }
+   ]
+  },
+  "walk_down": {
+   "from": {
+    "from": "weapon",
+    "pick": {
+     "halberd": "walk-pole-down",
+     "spear": "walk-pole-down",
+     "sword": "walk-sword-down",
+     "none": "walk-bare-down"
+    }
+   },
+   "sounds": [
+    {
+     "sound": "footstep-gravel",
+     "frame": 0,
+     "preset": "Boots",
+     "volume": 0.45
+    },
+    {
+     "sound": "footstep-gravel",
+     "frame": 4,
+     "preset": "Boots",
+     "volume": 0.45
+    }
+   ],
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.8
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.armF",
+      "bones.elbF",
+      "bones.wriF",
+      "bones.cuffF",
+      "bones.handF",
+      "stretch.armF",
+      "bones.armB",
+      "bones.elbB",
+      "bones.wriB",
+      "bones.cuffB",
+      "bones.handB",
+      "bones.rimAB",
+      "stretch.armB",
+      "stretch.rimAB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.armF",
+      "bones.elbF",
+      "bones.wriF",
+      "bones.cuffF",
+      "bones.handF",
+      "stretch.armF",
+      "bones.armB",
+      "bones.elbB",
+      "bones.wriB",
+      "bones.cuffB",
+      "bones.handB",
+      "bones.rimAB",
+      "stretch.armB",
+      "stretch.rimAB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "walk_up": {
+   "from": {
+    "from": "weapon",
+    "pick": {
+     "halberd": "walk-pole-up",
+     "spear": "walk-pole-up",
+     "sword": "walk-sword-up",
+     "none": "walk-bare-up"
+    }
+   },
+   "sounds": [
+    {
+     "sound": "footstep-gravel",
+     "frame": 0,
+     "preset": "Boots",
+     "volume": 0.45
+    },
+    {
+     "sound": "footstep-gravel",
+     "frame": 4,
+     "preset": "Boots",
+     "volume": 0.45
+    }
+   ],
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.8
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.52
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.259
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.259
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.armF",
+      "bones.elbF",
+      "bones.wriF",
+      "bones.cuffF",
+      "bones.handF",
+      "stretch.armF",
+      "bones.armB",
+      "bones.elbB",
+      "bones.wriB",
+      "bones.cuffB",
+      "bones.handB",
+      "bones.rimAB",
+      "stretch.armB",
+      "stretch.rimAB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.8
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.armF",
+      "bones.elbF",
+      "bones.wriF",
+      "bones.cuffF",
+      "bones.handF",
+      "stretch.armF",
+      "bones.armB",
+      "bones.elbB",
+      "bones.wriB",
+      "bones.cuffB",
+      "bones.handB",
+      "bones.rimAB",
+      "stretch.armB",
+      "stretch.rimAB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.8
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.3
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "walk_side": {
+   "from": {
+    "from": "weapon",
+    "pick": {
+     "halberd": "walk-pole-side",
+     "spear": "walk-pole-side",
+     "sword": "walk-sword-side",
+     "none": "walk-bare-side"
+    }
+   },
+   "sounds": [
+    {
+     "sound": "footstep-gravel",
+     "frame": 0,
+     "preset": "Boots",
+     "volume": 0.45
+    },
+    {
+     "sound": "footstep-gravel",
+     "frame": 4,
+     "preset": "Boots",
+     "volume": 0.45
+    }
+   ],
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.8
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.shnF",
+      "bones.toeF",
+      "bones.thiB",
+      "bones.shnB",
+      "bones.toeB",
+      "bones.legF",
+      "stretch.legF",
+      "bones.legB",
+      "stretch.legB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.688
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.shnF",
+      "bones.toeF",
+      "bones.thiB",
+      "bones.shnB",
+      "bones.toeB",
+      "bones.legF",
+      "stretch.legF",
+      "bones.legB",
+      "stretch.legB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.1
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.armF",
+      "bones.elbF",
+      "bones.wriF",
+      "bones.cuffF",
+      "bones.handF",
+      "bones.rimAF",
+      "stretch.armF",
+      "stretch.rimAF",
+      "bones.armB",
+      "bones.elbB",
+      "bones.wriB",
+      "bones.cuffB",
+      "bones.handB",
+      "bones.rimAB",
+      "stretch.armB",
+      "stretch.rimAB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.1
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.armF",
+      "bones.elbF",
+      "bones.wriF",
+      "bones.cuffF",
+      "bones.handF",
+      "bones.rimAF",
+      "stretch.armF",
+      "stretch.rimAF",
+      "bones.armB",
+      "bones.elbB",
+      "bones.wriB",
+      "bones.cuffB",
+      "bones.handB",
+      "bones.rimAB",
+      "stretch.armB",
+      "stretch.rimAB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.1
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "root.0"
+     ],
+     "about": 0,
+     "by": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        0
+       ],
+       [
+        0.75,
+        0
+       ],
+       [
+        0.8,
+        0.25
+       ],
+       [
+        0.85,
+        0.25
+       ],
+       [
+        0.9,
+        0.5
+       ],
+       [
+        0.95,
+        0.75
+       ],
+       [
+        1,
+        1
+       ],
+       [
+        1.05,
+        1.25
+       ],
+       [
+        1.1,
+        1.5
+       ],
+       [
+        1.15,
+        2
+       ],
+       [
+        1.25,
+        2
+       ],
+       [
+        1.3,
+        2.25
+       ],
+       [
+        1.35,
+        2.25
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "root.0"
+     ],
+     "about": 0,
+     "by": {
+      "from": "weapon",
+      "pick": {
+       "halberd": 1,
+       "spear": 0.6,
+       "sword": 1,
+       "none": 1
+      }
+     }
+    }
+   ]
+  },
+  "block": {
+   "from": {
+    "from": "weapon",
+    "pick": {
+     "halberd": "block-pole",
+     "spear": "block-pole",
+     "sword": "block-sword",
+     "none": "block-sword"
+    }
+   },
+   "sounds": [
+    {
+     "sound": "metal-hit",
+     "frame": 1,
+     "preset": "Tin can",
+     "volume": 0.7,
+     "when": [
+      {
+       "weapon": [
+        "halberd",
+        "spear",
+        "sword"
+       ]
+      },
+      {
+       "shield": [
+        "round",
+        "kite"
+       ]
+      }
+     ]
+    }
+   ],
+   "frameEdits": {
+    "0": {
+     "show": [
+      "barArmF",
+      "barArmB"
+     ]
+    },
+    "1": {
+     "show": [
+      "barArmF",
+      "barArmB"
+     ],
+     "swap": {
+      "barArmF": "held",
+      "barArmB": "held"
+     }
+    },
+    "2": {
+     "show": [
+      "barArmF",
+      "barArmB"
+     ],
+     "swap": {
+      "barArmF": "held",
+      "barArmB": "held"
+     }
+    },
+    "3": {
+     "show": [
+      "barArmF",
+      "barArmB"
+     ],
+     "swap": {
+      "barArmF": "held",
+      "barArmB": "held"
+     }
+    },
+    "4": {
+     "show": [
+      "barArmF",
+      "barArmB"
+     ],
+     "swap": {
+      "barArmF": "held",
+      "barArmB": "held"
+     }
+    },
+    "5": {
+     "show": [
+      "barArmF",
+      "barArmB"
+     ]
+    }
+   }
+  }
+ },
+ "made": {
+  "in": "library",
+  "from": "code:town-guard",
+  "by": "migration batch M7 (/sprite-forge redraw)"
+ }
+}

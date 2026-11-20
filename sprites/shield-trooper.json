@@ -1,0 +1,497 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "shield-trooper",
+ "name": "Shield trooper",
+ "blurb": "An enemy soldier in dark armour who walks, shoots and blocks from behind a tall shield. Change the build, shield, weapon, headgear and colours.",
+ "meta": {
+  "type": "character",
+  "role": "characters/enemy",
+  "themes": ["sci-fi","space"],
+  "gameTypes": ["roguelike-action","shooter"],
+  "view": "top-down",
+  "words": ["trooper","soldier","guard","enemy","shield","riot","armour","rifle","baton","shoot","block","walk","security"],
+  "license": "draft" },
+ "size": [48,48],
+ "pivot": [24,42],
+ "grounded": false,
+ "preview": "walk_down",
+ "palette": [
+  {
+   "id": "skin",
+   "label": "Skin",
+   "default": "#f6d3b0",
+   "material": "skin",
+   "swatches": ["#f6d3b0","#e8b088","#c98a5c","#9a6240","#6e4428","#9bd18a","#b9a7e0"] },
+  {
+   "id": "outfit",
+   "label": "Armour",
+   "default": "#6b7896",
+   "material": "metal",
+   "swatches": ["#6b7896","#2fb3a8","#a87894","#6660b6"] },
+  {
+   "id": "trim",
+   "label": "Plates, gloves and boots",
+   "default": "#434d6d",
+   "material": "metal",
+   "swatches": ["#434d6d","#9aa6c0","#c2c9d6","#f0ead8"] },
+  {
+   "id": "glow",
+   "label": "Lights",
+   "default": "#e2473f",
+   "material": "light",
+   "swatches": ["#e2473f","#9fe040","#f2a030","#b48af8"] },
+  {
+   "id": "bottom",
+   "derive": {
+    "rule": "tone",
+    "of": "outfit",
+    "by": -0.4 },
+   "material": "cloth" },
+  {
+   "id": "hairTone",
+   "derive": {
+    "rule": "standOut",
+    "against": "skin",
+    "from": ["plate","core"] },
+   "material": "plant" },
+  {
+   "id": "steel",
+   "default": "#c2c9d6",
+   "material": "metal",
+   "detail": true },
+  {
+   "id": "steelShade",
+   "derive": {
+    "rule": "tone",
+    "of": "steel",
+    "by": 0 },
+   "material": "metal" },
+  {
+   "id": "plate",
+   "default": "#434d6d",
+   "material": "metal",
+   "detail": true },
+  {
+   "id": "core",
+   "default": "#f0ead8",
+   "material": "light",
+   "detail": true } ],
+ "body": {
+  "rig": {
+   "extends": {
+    "use": "base:person-topdown-trooper",
+    "v": 3,
+    "paint": {"top":"outfit","bottom":"bottom","boots":"trim","topFar":"outfit.dark","bottomFar":"bottom.dark"},
+    "clips": [] },
+   "shapes": [
+    {"id":"gloveB-down","kind":"stamp","on":"fistB","at":[0,0],"rows":["ggg","ggg"],"key":{"g":"trim"},"z":60.6,"when":{"direction":["down"]}},
+    {"id":"gloveF-down","kind":"stamp","on":"fistF","at":[0,0],"rows":["ggg","ggg"],"key":{"g":"trim"},"z":62.6,"when":{"direction":["down"]}},
+    {"id":"gloveB-up","kind":"stamp","on":"fistB","at":[0,0],"rows":["ggg","ggg"],"key":{"g":"trim"},"z":36,"when":{"direction":["up"]}},
+    {"id":"gloveF-up","kind":"stamp","on":"fistF","at":[0,0],"rows":["ggg","ggg"],"key":{"g":"trim"},"z":36.1,"when":{"direction":["up"]}},
+    {"id":"gloveB-side","kind":"stamp","on":"fistB","at":[0,0],"rows":["ggg","ggg"],"key":{"g":"trim.dark"},"z":6.6,"when":{"direction":["side"]}},
+    {"id":"gloveF-side","kind":"stamp","on":"fistF","at":[0,0],"rows":["ggg","ggg"],"key":{"g":"trim"},"z":72.6,"when":{"direction":["side"]}},
+    {"id":"suit","kind":"use","use":"part:topdown-suit-trim","v":1,"on":"chest","z":40,"paint":{"trim":"trim","strap":"plate","light":"glow","plate":"trim"},"args":{"spine":"wide","straps":false,"lights":false,"plates":true}},
+    {"id":"hair","kind":"use","use":"part:topdown-hair","v":2,"on":"head","z":50,"paint":{"hair":"hairTone"},"args":{"style":"short","hatted":false},"when":{"headgear":["mask","none"]}},
+    {"id":"helmet","kind":"use","use":"part:topdown-visor-helmet","v":2,"on":"head","z":50,"paint":{"shell":"outfit","visor":"glow"},"args":{"size":{"from":"headgearSize","map":[[0.5,0.5],[1.8,1.8]]}},"when":{"headgear":["helmet"]}},
+    {"id":"mask","kind":"use","use":"part:topdown-lens-mask","v":2,"on":"head","z":50,"paint":{"mask":"trim","lens":"glow"},"args":{"size":{"from":"headgearSize","map":[[0.5,0.5],[1.8,1.8]]}},"when":{"headgear":["mask"]}},
+    {"id":"shield","kind":"use","use":"part:topdown-body-shield","v":2,"on":"shieldCarryAt","z":50,"paint":{"face":"outfit","glow":"glow","inset":"trim","core":"core"},"args":{"kind":{"from":"shield","pick":{"riot":"riot","energy":"energy","round":"round","none":"riot"}},"size":{"from":"shieldSize","map":[[0.65,0.65],[1.35,1.35]]}},"when":{"shield":["riot","energy","round"],"direction":["down","up"]}},
+    {"id":"shieldPlanted","kind":"use","use":"part:topdown-body-shield","v":2,"on":"shieldPlantAt","z":50,"paint":{"face":"outfit","glow":"glow","inset":"trim","core":"core"},"args":{"kind":{"from":"shield","pick":{"riot":"riot","energy":"energy","round":"round","none":"riot"}},"size":{"from":"shieldSize","map":[[0.65,0.65],[1.35,1.35]]}},"when":{"shield":["riot","energy","round"],"direction":["down"]},"hidden":true},
+    {"id":"shieldSide","kind":"use","use":"part:topdown-body-shield","v":2,"on":"cuffB","z":50,"paint":{"face":"outfit","glow":"glow","inset":"trim","core":"core"},"args":{"kind":{"from":"shield","pick":{"riot":"riot","energy":"energy","round":"round","none":"riot"}},"size":{"from":"shieldSize","map":[[0.65,0.65],[1.35,1.35]]}},"when":{"shield":["riot","energy","round"],"direction":["side"]}},
+    {"id":"weapon","kind":"use","use":"held:topdown-guns","v":2,"on":"reachF","z":60,"paint":{"metal":"steelShade","grip":"plate","cell":"glow"},"args":{"kind":{"from":"weapon","pick":{"rifle":"rifle","pistol":"pistol","baton":"baton","none":"rifle"}},"length":{"from":"weaponLength","map":[[0.65,0.65],[1.35,1.35]]}},"when":{"weapon":["rifle","pistol","baton"]}},
+    {"id":"weaponEnd","kind":"use","use":"held:topdown-guns","v":2,"on":"reachF","z":60,"paint":{"metal":"steelShade","grip":"plate","cell":"glow"},"args":{"kind":{"from":"weapon","pick":{"rifle":"rifle","pistol":"pistol","baton":"baton","none":"rifle"}},"length":{"from":"weaponLength","map":[[0.65,0.65],[1.35,1.35]]},"view":"end"},"when":{"weapon":["rifle","pistol","baton"]},"hidden":true},
+    {"id":"weaponDie","kind":"use","use":"held:topdown-guns","v":2,"on":"reachF","z":60,"paint":{"metal":"steelShade","grip":"plate","cell":"glow"},"args":{"kind":{"from":"weapon","pick":{"rifle":"rifle","pistol":"pistol","baton":"baton","none":"rifle"}},"length":{"from":"weaponLength","map":[[0.65,0.65],[1.15,1.15],[1.35,1.15]]}},"when":{"weapon":["rifle","pistol","baton"]},"hidden":true},
+    {"id":"dieTip","kind":"stamp","on":"root","at":[-23.5,-8.5],"rows":["..........aaaaaaa.....","........aaaaaaaaa.....",".......aaaaaaaaaaa....","......baaaaaaaaaaaa...","......baaaaaaaaaaaa...","......baaaaaaaaaaaa...",".....baaaaaaaaaaaa....",".....babcaaaaacbaa....","....dbbaaaaaaaaaaad...","...eeebbaaaaaaaaaedd..","..eeeebbabbbaaaeeed...",".eeeeedbbbbbbbeeeed...",".eeefffgggggggfffff...",".hhh.eeeeeeeeeeehhgg..",".....hgggggggggg.eee..","....hgggggggggg.eee...","....hhhhhhhhhhh.......","....ijjj...ijjj.......","....ijjj...ijjj.......","...iiii...iiii........","...eeee...eeee........","...eeee...eeee........","...ffff...ffff........"],"key":{"a":"skin","b":"skin.dark","c":"ink","d":"trim.light","e":"trim","f":"trim.dark","g":"outfit","h":"outfit.dark","i":"bottom.dark","j":"bottom"},"variants":{"f2":["..........aaaaaaa.....","........aaaaaaaaa.....",".......aaaaaaaaaaa....","......baaaaaaaaaaaa...","......baaaaaaaaaaaa...","......baaaaaaaaaaaa...",".....baaaaaaaaaaaa....",".....babcaaaaacbaa....","....dbbaaaaaaaaaaad...","...eeebbaaaaaaaaaedd..","..eeeebbabbbaaaeeed...",".eeeeedbbbbbbbeeeed...",".eeefffgggggggfffff...",".hhh.eeeeeeeeeeehhgg..",".....hgggggggggg.eee..","....hgggggggggg.eee...","....hhhhhhhhhhh.......","....ijjj...ijjj.......","....ijjj...ijjj.......","...iiii...iiii........","...eeee...eeee........","...eeee...eeee........","...ffff...ffff........"],"f3":["......................","......................","......................","......................","..............aaaaaaa.","............aaaaaaaaa.","...........aaaaaaaaaaa",".........baaaaaaaaaaaa",".........baaaaaaaaaaaa","........baaaaaaaaaaaa.","........baaaaaaaaaaaa.","......dbabcaaaaacbaad.",".....eebbaaaaaaaaaaadd","...hfeeebbaaaaaaaaaeed","..eeeeeebbabbbaaaeeed.","..eee..ffbbbbbbbfffff.","......hggggggggghhgg..","......hggggggggghhhgg.",".....hhhhhhhhhhh.eee..",".....iiii...iiii.eee..","....eeee...eeee.......","....eeee...eeee.......","...ffff...ffff........"]},"z":1,"hidden":true},
+    {"id":"dieLie","kind":"stamp","on":"root","at":[-10.5,-0.5],"rows":["..............................","...........aab................","...........aabbcddd...........","...........aaebcaadd..........",".............eecaaad.ffffff...","caaghhhhhhebbaecaaadffffffff..","caaghhhhhhebbabcaaafffiffffff.","caaghhhhhhebbabbccifffjfffffff","caagggggggebbabbbbifffffffffff","..........ebbabbbbiiffffffffff","..........ebbabbbbiiffffffffff","caaghhhhhhebbabbbbiiffffffffff","caaghhhhhhebbabbbbifffffffffff","caaghhhhhhebbabbcciiffjfffffff","caagggggggebbabcdddiififfffff.","..........eeeaecaaddiiffffff..","..............bcaaad.iiiiii...","............aabcaaad..........","............aabcaaa...........","............aae..............."],"key":{"a":"trim","b":"outfit","c":"trim.dark","d":"trim.light","e":"outfit.dark","f":"skin","g":"bottom.dark","h":"bottom","i":"skin.dark","j":"ink"},"variants":{"f4":["..............................","...........aab................","...........aabbcddd...........","...........aaebcaadd..........",".............eecaaad.ffffff...","caaghhhhhhebbaecaaadffffffff..","caaghhhhhhebbabcaaafffiffffff.","caaghhhhhhebbabbccifffjfffffff","caagggggggebbabbbbifffffffffff","..........ebbabbbbiiffffffffff","..........ebbabbbbiiffffffffff","caaghhhhhhebbabbbbiiffffffffff","caaghhhhhhebbabbbbifffffffffff","caaghhhhhhebbabbcciiffjfffffff","caagggggggebbabcdddiififfffff.","..........eeeaecaaddiiffffff..","..............bcaaad.iiiiii...","............aabcaaad..........","............aabcaaa...........","............aae..............."],"f5":["..............................","..............................","..........eaabb.ddd...........","..........eaabbcaadd..........","..........eaaeecaaad.ffffff...","caaghhhhhheeeaecaaadffffffff..","caaghhhhhhebbaecaaafffiffffff.","caaghhhhhhebbabbccifffjfffffff","caagggggggebbabbbbifffffffffff","..........ebbabbbbiiffffffffff","..........ebbabbbbiiffffffffff","caaghhhhhhebbabbbbiiffffffffff","caaghhhhhhebbabbbbifffffffffff","caaghhhhhhebbabbcciiffjfffffff","caagggggggebbabcdddiififfffff.","..........eeeaecaaddiiffffff..","...........aabbcaaad.iiiiii...","...........aabbcaaad..........","...........aaee.aaa...........",".............................."],"f6":["..............................","...........aab................","...........aabbcddd...........","...........aaebcaadd..........",".............eecaaad.ffffff...","caaghhhhhhebbaecaaadffffffff..","caaghhhhhhebbabcaaafffiffffff.","caaghhhhhhebbabbccifffjfffffff","caagggggggebbabbbbifffffffffff","..........ebbabbbbiiffffffffff","..........ebbabbbbiiffffffffff","caaghhhhhhebbabbbbiiffffffffff","caaghhhhhhebbabbbbifffffffffff","caaghhhhhhebbabbcciiffjfffffff","caagggggggebbabcdddiififfffff.","..........eeeaecaaddiiffffff..","...........eaabcaaad.iiiiii...","...........eaabcaaad..........","...........eaae.aaa...........",".............................."],"f7":["..............................","..............................","..........aabbb.ddd...........","..........aabbbcaadd..........","..........aaeeecaaad.ffffff...","caaghhhhhheeeaecaaadffffffff..","caaghhhhhhebbaecaaafffiffffff.","caaghhhhhhebbabbccifffjfffffff","caagggggggebbabbbbifffffffffff","..........ebbabbbbiiffffffffff","..........ebbabbbbiiffffffffff","caaghhhhhhebbabbbbiiffffffffff","caaghhhhhhebbabbbbifffffffffff","caaghhhhhhebbabbcciiffjfffffff","caagggggggebbaecdddiififfffff.","..........eeeabcaaddiiffffff..","..........aabbbcaaad.iiiiii...","..........aabbbcaaad..........","..........aaeee.aaa...........",".............................."]},"z":1,"hidden":true},
+    {"id":"hairLie2","kind":"use","use":"part:topdown-hair","v":2,"on":"root","z":4,"hidden":true,"paint":{"hair":"hairTone"},"args":{"style":"short","hatted":false,"pose":"f2"},"when":{"headgear":["mask","none"]}},
+    {"id":"hairLie3","kind":"use","use":"part:topdown-hair","v":2,"on":"root","z":4,"hidden":true,"paint":{"hair":"hairTone"},"args":{"style":"short","hatted":false,"pose":"f3"},"when":{"headgear":["mask","none"]}},
+    {"id":"hairLie","kind":"use","use":"part:topdown-hair","v":2,"on":"root","z":4,"hidden":true,"paint":{"hair":"hairTone"},"args":{"style":"short","hatted":false,"pose":"lie"},"when":{"headgear":["mask","none"]}},
+    {"id":"helmetLie2","kind":"use","use":"part:topdown-visor-helmet","v":2,"on":"root","z":6,"hidden":true,"paint":{"shell":"outfit","visor":"glow"},"args":{"size":{"from":"headgearSize","map":[[0.5,0.5],[1.8,1.8]]},"pose":"f2"},"when":{"headgear":["helmet"]}},
+    {"id":"helmetLie3","kind":"use","use":"part:topdown-visor-helmet","v":2,"on":"root","z":6,"hidden":true,"paint":{"shell":"outfit","visor":"glow"},"args":{"size":{"from":"headgearSize","map":[[0.5,0.5],[1.8,1.8]]},"pose":"f3"},"when":{"headgear":["helmet"]}},
+    {"id":"helmetLie","kind":"use","use":"part:topdown-visor-helmet","v":2,"on":"root","z":6,"hidden":true,"paint":{"shell":"outfit","visor":"glow"},"args":{"size":{"from":"headgearSize","map":[[0.5,0.5],[1.8,1.8]]},"pose":"lie"},"when":{"headgear":["helmet"]}},
+    {"id":"maskLie2","kind":"use","use":"part:topdown-lens-mask","v":2,"on":"root","z":6,"hidden":true,"paint":{"mask":"trim","lens":"glow"},"args":{"size":{"from":"headgearSize","map":[[0.5,0.5],[1.8,1.8]]},"pose":"f2"},"when":{"headgear":["mask"]}},
+    {"id":"maskLie3","kind":"use","use":"part:topdown-lens-mask","v":2,"on":"root","z":6,"hidden":true,"paint":{"mask":"trim","lens":"glow"},"args":{"size":{"from":"headgearSize","map":[[0.5,0.5],[1.8,1.8]]},"pose":"f3"},"when":{"headgear":["mask"]}},
+    {"id":"maskLie","kind":"use","use":"part:topdown-lens-mask","v":2,"on":"root","z":6,"hidden":true,"paint":{"mask":"trim","lens":"glow"},"args":{"size":{"from":"headgearSize","map":[[0.5,0.5],[1.8,1.8]]},"pose":"lie"},"when":{"headgear":["mask"]}},
+    {"id":"shieldLie2","kind":"use","use":"part:topdown-body-shield","v":2,"on":"root","z":8,"hidden":true,"paint":{"face":"outfit","glow":"glow","inset":"trim","core":"core"},"args":{"kind":{"from":"shield","pick":{"riot":"riot","energy":"energy","round":"round","none":"riot"}},"size":{"from":"shieldSize","map":[[0.65,0.65],[1.35,1.35]]},"pose":"f2"},"when":{"shield":["riot","energy","round"]}},
+    {"id":"shieldLie3","kind":"use","use":"part:topdown-body-shield","v":2,"on":"root","z":8,"hidden":true,"paint":{"face":"outfit","glow":"glow","inset":"trim","core":"core"},"args":{"kind":{"from":"shield","pick":{"riot":"riot","energy":"energy","round":"round","none":"riot"}},"size":{"from":"shieldSize","map":[[0.65,0.65],[1.35,1.35]]},"pose":"f3"},"when":{"shield":["riot","energy","round"]}},
+    {"id":"shieldLie","kind":"use","use":"part:topdown-body-shield","v":2,"on":"root","z":8,"hidden":true,"paint":{"face":"outfit","glow":"glow","inset":"trim","core":"core"},"args":{"kind":{"from":"shield","pick":{"riot":"riot","energy":"energy","round":"round","none":"riot"}},"size":{"from":"shieldSize","map":[[0.65,0.65],[1.35,1.35]]},"pose":"lie"},"when":{"shield":["riot","energy","round"]}},
+    {"id":"flare-rifle-ray","kind":"line","from":[{"from":"weaponLength","map":[[0.65,9],[1,12.5],[1.35,12.5]]},0],"to":[{"from":"weaponLength","map":[[0.65,12],[1,15.5],[1.35,15.5]]},0],"paint":"glow","when":{"direction":["up","side"],"weapon":["rifle"]},"on":"reachF","glow":true,"z":95,"hidden":true},
+    {"id":"flare-rifle-arms","kind":"line","from":[{"from":"weaponLength","map":[[0.65,6],[1,9.5],[1.35,9.5]]},0],"to":[{"from":"weaponLength","map":[[0.65,10],[1,13.5],[1.35,13.5]]},0],"paint":"glow","on":"reachF","glow":true,"z":95,"hidden":true,"when":{"weapon":["rifle"]}},
+    {"id":"flare-rifle-bar","kind":"line","from":[{"from":"weaponLength","map":[[0.65,8],[1,11.5],[1.35,11.5]]},-2],"to":[{"from":"weaponLength","map":[[0.65,8],[1,11.5],[1.35,11.5]]},2],"paint":"glow","on":"reachF","glow":true,"z":95,"hidden":true,"when":{"weapon":["rifle"]}},
+    {"id":"flare-rifle-core","kind":"line","from":[{"from":"weaponLength","map":[[0.65,7],[1,10.5],[1.35,10.5]]},0],"to":[{"from":"weaponLength","map":[[0.65,9],[1,12.5],[1.35,12.5]]},0],"paint":"core","on":"reachF","glow":true,"z":95,"hidden":true,"when":{"weapon":["rifle"]}},
+    {"id":"flare-rifle-coreBar","kind":"line","from":[{"from":"weaponLength","map":[[0.65,8],[1,11.5],[1.35,11.5]]},-1],"to":[{"from":"weaponLength","map":[[0.65,8],[1,11.5],[1.35,11.5]]},1],"paint":"core","on":"reachF","glow":true,"z":95,"hidden":true,"when":{"weapon":["rifle"]}},
+    {"id":"flare-pistol-ray","kind":"line","from":[{"from":"weaponLength","map":[[0.65,5.75],[1,7.5],[1.35,7.5]]},0],"to":[{"from":"weaponLength","map":[[0.65,8.75],[1,10.5],[1.35,10.5]]},0],"paint":"glow","when":{"direction":["up","side"],"weapon":["pistol"]},"on":"reachF","glow":true,"z":95,"hidden":true},
+    {"id":"flare-pistol-arms","kind":"line","from":[{"from":"weaponLength","map":[[0.65,2.75],[1,4.5],[1.35,4.5]]},0],"to":[{"from":"weaponLength","map":[[0.65,6.75],[1,8.5],[1.35,8.5]]},0],"paint":"glow","on":"reachF","glow":true,"z":95,"hidden":true,"when":{"weapon":["pistol"]}},
+    {"id":"flare-pistol-bar","kind":"line","from":[{"from":"weaponLength","map":[[0.65,4.75],[1,6.5],[1.35,6.5]]},-2],"to":[{"from":"weaponLength","map":[[0.65,4.75],[1,6.5],[1.35,6.5]]},2],"paint":"glow","on":"reachF","glow":true,"z":95,"hidden":true,"when":{"weapon":["pistol"]}},
+    {"id":"flare-pistol-core","kind":"line","from":[{"from":"weaponLength","map":[[0.65,3.75],[1,5.5],[1.35,5.5]]},0],"to":[{"from":"weaponLength","map":[[0.65,5.75],[1,7.5],[1.35,7.5]]},0],"paint":"core","on":"reachF","glow":true,"z":95,"hidden":true,"when":{"weapon":["pistol"]}},
+    {"id":"flare-pistol-coreBar","kind":"line","from":[{"from":"weaponLength","map":[[0.65,4.75],[1,6.5],[1.35,6.5]]},-1],"to":[{"from":"weaponLength","map":[[0.65,4.75],[1,6.5],[1.35,6.5]]},1],"paint":"core","on":"reachF","glow":true,"z":95,"hidden":true,"when":{"weapon":["pistol"]}},
+    {"id":"scan-down-t125","kind":"line","on":"shieldCarryAt","from":[{"from":"shieldSize","map":[[0.65,-5.5],[0.7374,-5.5],[0.7375,-5.5],[0.9124,-5.5],[0.9125,-3.5],[1.0874,-3.5],[1.0875,-3.5],[1.2624,-3.5],[1.2625,-3.5],[1.35,-3.5]]},{"from":"shieldSize","map":[[0.65,2],[0.7374,2],[0.7375,0],[0.9124,0],[0.9125,-1],[1.0874,-1],[1.0875,-2],[1.2624,-2],[1.2625,-3],[1.35,-3]]}],"to":[{"from":"shieldSize","map":[[0.65,-5.5],[0.7374,-5.5],[0.7375,-5.5],[0.9124,-5.5],[0.9125,-3.5],[1.0874,-3.5],[1.0875,-3.5],[1.2624,-3.5],[1.2625,-3.5],[1.35,-3.5]]},{"from":"shieldSize","map":[[0.65,4],[0.7374,4],[0.7375,6],[0.9124,6],[0.9125,7],[1.0874,7],[1.0875,8],[1.2624,8],[1.2625,9],[1.35,9]]}],"paint":"core","z":81.5,"hidden":true,"when":{"shield":["energy"],"direction":["down"]}},
+    {"id":"scan-down-row0","kind":"line","on":"shieldCarryAt","from":[{"from":"shieldSize","map":[[0.65,-4.5],[0.7374,-4.5],[0.7375,-3.5],[0.9124,-3.5],[0.9125,-1.5],[1.0874,-1.5],[1.0875,-1.5],[1.2624,-1.5],[1.2625,-1.5],[1.35,-1.5]]},{"from":"shieldSize","map":[[0.65,3],[0.7374,3],[0.7375,2],[0.9124,2],[0.9125,1],[1.0874,1],[1.0875,0],[1.2624,0],[1.2625,-1],[1.35,-1]]}],"to":[{"from":"shieldSize","map":[[0.65,-4.5],[0.7374,-4.5],[0.7375,-3.5],[0.9124,-3.5],[0.9125,-1.5],[1.0874,-1.5],[1.0875,-1.5],[1.2624,-1.5],[1.2625,-1.5],[1.35,-1.5]]},{"from":"shieldSize","map":[[0.65,3],[0.7374,3],[0.7375,4],[0.9124,4],[0.9125,5],[1.0874,5],[1.0875,6],[1.2624,6],[1.2625,7],[1.35,7]]}],"paint":"glow","z":81.49,"hidden":true,"when":{"shield":["energy"],"direction":["down"]}},
+    {"id":"scan-down-t200","kind":"line","on":"shieldCarryAt","from":[{"from":"shieldSize","map":[[0.65,-6.5],[0.7374,-6.5],[0.7375,-6.5],[0.9124,-6.5],[0.9125,-4.5],[1.0874,-4.5],[1.0875,-5.5],[1.2624,-5.5],[1.2625,-5.5],[1.35,-5.5]]},{"from":"shieldSize","map":[[0.65,1],[0.7374,1],[0.7375,-1],[0.9124,-1],[0.9125,-2],[1.0874,-2],[1.0875,-3],[1.2624,-3],[1.2625,-4],[1.35,-4]]}],"to":[{"from":"shieldSize","map":[[0.65,-6.5],[0.7374,-6.5],[0.7375,-6.5],[0.9124,-6.5],[0.9125,-4.5],[1.0874,-4.5],[1.0875,-5.5],[1.2624,-5.5],[1.2625,-5.5],[1.35,-5.5]]},{"from":"shieldSize","map":[[0.65,5],[0.7374,5],[0.7375,7],[0.9124,7],[0.9125,8],[1.0874,8],[1.0875,9],[1.2624,9],[1.2625,10],[1.35,10]]}],"paint":"core","z":81.5,"hidden":true,"when":{"shield":["energy"],"direction":["down"]}},
+    {"id":"scan-down-t250","kind":"line","on":"shieldCarryAt","from":[{"from":"shieldSize","map":[[0.65,-6.5],[0.7374,-6.5],[0.7375,-6.5],[0.9124,-6.5],[0.9125,-5.5],[1.0874,-5.5],[1.0875,-6.5],[1.2624,-6.5],[1.2625,-6.5],[1.35,-6.5]]},{"from":"shieldSize","map":[[0.65,1],[0.7374,1],[0.7375,-1],[0.9124,-1],[0.9125,-2],[1.0874,-2],[1.0875,-3],[1.2624,-3],[1.2625,-4],[1.35,-4]]}],"to":[{"from":"shieldSize","map":[[0.65,-6.5],[0.7374,-6.5],[0.7375,-6.5],[0.9124,-6.5],[0.9125,-5.5],[1.0874,-5.5],[1.0875,-6.5],[1.2624,-6.5],[1.2625,-6.5],[1.35,-6.5]]},{"from":"shieldSize","map":[[0.65,5],[0.7374,5],[0.7375,7],[0.9124,7],[0.9125,8],[1.0874,8],[1.0875,9],[1.2624,9],[1.2625,10],[1.35,10]]}],"paint":"core","z":81.5,"hidden":true,"when":{"shield":["energy"],"direction":["down"]}},
+    {"id":"scan-down-t333","kind":"line","on":"shieldCarryAt","from":[{"from":"shieldSize","map":[[0.65,-7.5],[0.7374,-7.5],[0.7375,-7.5],[0.9124,-7.5],[0.9125,-6.5],[1.0874,-6.5],[1.0875,-7.5],[1.2624,-7.5],[1.2625,-7.5],[1.35,-7.5]]},{"from":"shieldSize","map":[[0.65,0],[0.7374,0],[0.7375,-1],[0.9124,-1],[0.9125,-2],[1.0874,-2],[1.0875,-3],[1.2624,-3],[1.2625,-4],[1.35,-4]]}],"to":[{"from":"shieldSize","map":[[0.65,-7.5],[0.7374,-7.5],[0.7375,-7.5],[0.9124,-7.5],[0.9125,-6.5],[1.0874,-6.5],[1.0875,-7.5],[1.2624,-7.5],[1.2625,-7.5],[1.35,-7.5]]},{"from":"shieldSize","map":[[0.65,6],[0.7374,6],[0.7375,7],[0.9124,7],[0.9125,8],[1.0874,8],[1.0875,9],[1.2624,9],[1.2625,10],[1.35,10]]}],"paint":"core","z":81.5,"hidden":true,"when":{"shield":["energy"],"direction":["down"]}},
+    {"id":"scan-down-t375","kind":"line","on":"shieldCarryAt","from":[{"from":"shieldSize","map":[[0.65,-8.5],[0.7374,-8.5],[0.7375,-8.5],[0.9124,-8.5],[0.9125,-7.5],[1.0874,-7.5],[1.0875,-8.5],[1.2624,-8.5],[1.2625,-8.5],[1.35,-8.5]]},{"from":"shieldSize","map":[[0.65,0],[0.7374,0],[0.7375,-1],[0.9124,-1],[0.9125,-2],[1.0874,-2],[1.0875,-3],[1.2624,-3],[1.2625,-4],[1.35,-4]]}],"to":[{"from":"shieldSize","map":[[0.65,-8.5],[0.7374,-8.5],[0.7375,-8.5],[0.9124,-8.5],[0.9125,-7.5],[1.0874,-7.5],[1.0875,-8.5],[1.2624,-8.5],[1.2625,-8.5],[1.35,-8.5]]},{"from":"shieldSize","map":[[0.65,6],[0.7374,6],[0.7375,7],[0.9124,7],[0.9125,8],[1.0874,8],[1.0875,9],[1.2624,9],[1.2625,10],[1.35,10]]}],"paint":"core","z":81.5,"hidden":true,"when":{"shield":["energy"],"direction":["down"]}},
+    {"id":"scan-down-t400","kind":"line","on":"shieldCarryAt","from":[{"from":"shieldSize","map":[[0.65,-8.5],[0.7374,-8.5],[0.7375,-8.5],[0.9124,-8.5],[0.9125,-7.5],[1.0874,-7.5],[1.0875,-9.5],[1.2624,-9.5],[1.2625,-9.5],[1.35,-9.5]]},{"from":"shieldSize","map":[[0.65,0],[0.7374,0],[0.7375,-1],[0.9124,-1],[0.9125,-2],[1.0874,-2],[1.0875,-3],[1.2624,-3],[1.2625,-4],[1.35,-4]]}],"to":[{"from":"shieldSize","map":[[0.65,-8.5],[0.7374,-8.5],[0.7375,-8.5],[0.9124,-8.5],[0.9125,-7.5],[1.0874,-7.5],[1.0875,-9.5],[1.2624,-9.5],[1.2625,-9.5],[1.35,-9.5]]},{"from":"shieldSize","map":[[0.65,6],[0.7374,6],[0.7375,7],[0.9124,7],[0.9125,8],[1.0874,8],[1.0875,9],[1.2624,9],[1.2625,10],[1.35,10]]}],"paint":"core","z":81.5,"hidden":true,"when":{"shield":["energy"],"direction":["down"]}},
+    {"id":"scan-down-t500","kind":"line","on":"shieldCarryAt","from":[{"from":"shieldSize","map":[[0.65,-9.5],[0.7374,-9.5],[0.7375,-9.5],[0.9124,-9.5],[0.9125,-9.5],[1.0874,-9.5],[1.0875,-10.5],[1.2624,-10.5],[1.2625,-10.5],[1.35,-10.5]]},{"from":"shieldSize","map":[[0.65,0],[0.7374,0],[0.7375,-1],[0.9124,-1],[0.9125,-2],[1.0874,-2],[1.0875,-3],[1.2624,-3],[1.2625,-4],[1.35,-4]]}],"to":[{"from":"shieldSize","map":[[0.65,-9.5],[0.7374,-9.5],[0.7375,-9.5],[0.9124,-9.5],[0.9125,-9.5],[1.0874,-9.5],[1.0875,-10.5],[1.2624,-10.5],[1.2625,-10.5],[1.35,-10.5]]},{"from":"shieldSize","map":[[0.65,6],[0.7374,6],[0.7375,7],[0.9124,7],[0.9125,8],[1.0874,8],[1.0875,9],[1.2624,9],[1.2625,10],[1.35,10]]}],"paint":"core","z":81.5,"hidden":true,"when":{"shield":["energy"],"direction":["down"]}},
+    {"id":"scan-down-t600","kind":"line","on":"shieldCarryAt","from":[{"from":"shieldSize","map":[[0.65,-10.5],[0.7374,-10.5],[0.7375,-11.5],[0.9124,-11.5],[0.9125,-11.5],[1.0874,-11.5],[1.0875,-12.5],[1.2624,-12.5],[1.2625,-12.5],[1.35,-12.5]]},{"from":"shieldSize","map":[[0.65,0],[0.7374,0],[0.7375,-1],[0.9124,-1],[0.9125,-2],[1.0874,-2],[1.0875,-3],[1.2624,-3],[1.2625,-4],[1.35,-4]]}],"to":[{"from":"shieldSize","map":[[0.65,-10.5],[0.7374,-10.5],[0.7375,-11.5],[0.9124,-11.5],[0.9125,-11.5],[1.0874,-11.5],[1.0875,-12.5],[1.2624,-12.5],[1.2625,-12.5],[1.35,-12.5]]},{"from":"shieldSize","map":[[0.65,6],[0.7374,6],[0.7375,7],[0.9124,7],[0.9125,8],[1.0874,8],[1.0875,9],[1.2624,9],[1.2625,10],[1.35,10]]}],"paint":"core","z":81.5,"hidden":true,"when":{"shield":["energy"],"direction":["down"]}},
+    {"id":"scan-down-t625","kind":"line","on":"shieldCarryAt","from":[{"from":"shieldSize","map":[[0.65,-10.5],[0.7374,-10.5],[0.7375,-11.5],[0.9124,-11.5],[0.9125,-11.5],[1.0874,-11.5],[1.0875,-13.5],[1.2624,-13.5],[1.2625,-13.5],[1.35,-13.5]]},{"from":"shieldSize","map":[[0.65,0],[0.7374,0],[0.7375,-1],[0.9124,-1],[0.9125,-2],[1.0874,-2],[1.0875,-3],[1.2624,-3],[1.2625,-4],[1.35,-4]]}],"to":[{"from":"shieldSize","map":[[0.65,-10.5],[0.7374,-10.5],[0.7375,-11.5],[0.9124,-11.5],[0.9125,-11.5],[1.0874,-11.5],[1.0875,-13.5],[1.2624,-13.5],[1.2625,-13.5],[1.35,-13.5]]},{"from":"shieldSize","map":[[0.65,6],[0.7374,6],[0.7375,7],[0.9124,7],[0.9125,8],[1.0874,8],[1.0875,9],[1.2624,9],[1.2625,10],[1.35,10]]}],"paint":"core","z":81.5,"hidden":true,"when":{"shield":["energy"],"direction":["down"]}},
+    {"id":"scan-down-t667","kind":"line","on":"shieldCarryAt","from":[{"from":"shieldSize","map":[[0.65,-11.5],[0.7374,-11.5],[0.7375,-12.5],[0.9124,-12.5],[0.9125,-12.5],[1.0874,-12.5],[1.0875,-14.5],[1.2624,-14.5],[1.2625,-14.5],[1.35,-14.5]]},{"from":"shieldSize","map":[[0.65,0],[0.7374,0],[0.7375,-1],[0.9124,-1],[0.9125,-2],[1.0874,-2],[1.0875,-3],[1.2624,-3],[1.2625,-4],[1.35,-4]]}],"to":[{"from":"shieldSize","map":[[0.65,-11.5],[0.7374,-11.5],[0.7375,-12.5],[0.9124,-12.5],[0.9125,-12.5],[1.0874,-12.5],[1.0875,-14.5],[1.2624,-14.5],[1.2625,-14.5],[1.35,-14.5]]},{"from":"shieldSize","map":[[0.65,6],[0.7374,6],[0.7375,7],[0.9124,7],[0.9125,8],[1.0874,8],[1.0875,9],[1.2624,9],[1.2625,10],[1.35,10]]}],"paint":"core","z":81.5,"hidden":true,"when":{"shield":["energy"],"direction":["down"]}},
+    {"id":"scan-down-t750","kind":"line","on":"shieldCarryAt","from":[{"from":"shieldSize","map":[[0.65,-11.5],[0.7374,-11.5],[0.7375,-13.5],[0.9124,-13.5],[0.9125,-13.5],[1.0874,-13.5],[1.0875,-15.5],[1.2624,-15.5],[1.2625,-15.5],[1.35,-15.5]]},{"from":"shieldSize","map":[[0.65,0],[0.7374,0],[0.7375,-1],[0.9124,-1],[0.9125,-2],[1.0874,-2],[1.0875,-3],[1.2624,-3],[1.2625,-4],[1.35,-4]]}],"to":[{"from":"shieldSize","map":[[0.65,-11.5],[0.7374,-11.5],[0.7375,-13.5],[0.9124,-13.5],[0.9125,-13.5],[1.0874,-13.5],[1.0875,-15.5],[1.2624,-15.5],[1.2625,-15.5],[1.35,-15.5]]},{"from":"shieldSize","map":[[0.65,6],[0.7374,6],[0.7375,7],[0.9124,7],[0.9125,8],[1.0874,8],[1.0875,9],[1.2624,9],[1.2625,10],[1.35,10]]}],"paint":"core","z":81.5,"hidden":true,"when":{"shield":["energy"],"direction":["down"]}},
+    {"id":"scan-down-t800","kind":"line","on":"shieldCarryAt","from":[{"from":"shieldSize","map":[[0.65,-12.5],[0.7374,-12.5],[0.7375,-13.5],[0.9124,-13.5],[0.9125,-14.5],[1.0874,-14.5],[1.0875,-16.5],[1.2624,-16.5],[1.2625,-16.5],[1.35,-16.5]]},{"from":"shieldSize","map":[[0.65,1],[0.7374,1],[0.7375,-1],[0.9124,-1],[0.9125,-2],[1.0874,-2],[1.0875,-3],[1.2624,-3],[1.2625,-4],[1.35,-4]]}],"to":[{"from":"shieldSize","map":[[0.65,-12.5],[0.7374,-12.5],[0.7375,-13.5],[0.9124,-13.5],[0.9125,-14.5],[1.0874,-14.5],[1.0875,-16.5],[1.2624,-16.5],[1.2625,-16.5],[1.35,-16.5]]},{"from":"shieldSize","map":[[0.65,5],[0.7374,5],[0.7375,7],[0.9124,7],[0.9125,8],[1.0874,8],[1.0875,9],[1.2624,9],[1.2625,10],[1.35,10]]}],"paint":"core","z":81.5,"hidden":true,"when":{"shield":["energy"],"direction":["down"]}},
+    {"id":"scan-down-t875","kind":"line","on":"shieldCarryAt","from":[{"from":"shieldSize","map":[[0.65,-13.5],[0.7374,-13.5],[0.7375,-14.5],[0.9124,-14.5],[0.9125,-15.5],[1.0874,-15.5],[1.0875,-18.5],[1.2624,-18.5],[1.2625,-18.5],[1.35,-18.5]]},{"from":"shieldSize","map":[[0.65,2],[0.7374,2],[0.7375,0],[0.9124,0],[0.9125,-1],[1.0874,-1],[1.0875,-2],[1.2624,-2],[1.2625,-3],[1.35,-3]]}],"to":[{"from":"shieldSize","map":[[0.65,-13.5],[0.7374,-13.5],[0.7375,-14.5],[0.9124,-14.5],[0.9125,-15.5],[1.0874,-15.5],[1.0875,-18.5],[1.2624,-18.5],[1.2625,-18.5],[1.35,-18.5]]},{"from":"shieldSize","map":[[0.65,4],[0.7374,4],[0.7375,6],[0.9124,6],[0.9125,7],[1.0874,7],[1.0875,8],[1.2624,8],[1.2625,9],[1.35,9]]}],"paint":"core","z":81.5,"hidden":true,"when":{"shield":["energy"],"direction":["down"]}},
+    {"id":"scan-up-t125","kind":"line","on":"shieldCarryAt","from":[{"from":"shieldSize","map":[[0.65,-5.5],[0.7374,-5.5],[0.7375,-5.5],[0.9124,-5.5],[0.9125,-3.5],[1.0874,-3.5],[1.0875,-3.5],[1.2624,-3.5],[1.2625,-3.5],[1.35,-3.5]]},{"from":"shieldSize","map":[[0.65,-5],[0.7374,-5],[0.7375,-7],[0.9124,-7],[0.9125,-8],[1.0874,-8],[1.0875,-9],[1.2624,-9],[1.2625,-10],[1.35,-10]]}],"to":[{"from":"shieldSize","map":[[0.65,-5.5],[0.7374,-5.5],[0.7375,-5.5],[0.9124,-5.5],[0.9125,-3.5],[1.0874,-3.5],[1.0875,-3.5],[1.2624,-3.5],[1.2625,-3.5],[1.35,-3.5]]},{"from":"shieldSize","map":[[0.65,-3],[0.7374,-3],[0.7375,-1],[0.9124,-1],[0.9125,0],[1.0874,0],[1.0875,1],[1.2624,1],[1.2625,2],[1.35,2]]}],"paint":"core","z":5.5,"hidden":true,"when":{"shield":["energy"],"direction":["up"]}},
+    {"id":"scan-up-row0","kind":"line","on":"shieldCarryAt","from":[{"from":"shieldSize","map":[[0.65,-4.5],[0.7374,-4.5],[0.7375,-3.5],[0.9124,-3.5],[0.9125,-1.5],[1.0874,-1.5],[1.0875,-1.5],[1.2624,-1.5],[1.2625,-1.5],[1.35,-1.5]]},{"from":"shieldSize","map":[[0.65,-4],[0.7374,-4],[0.7375,-5],[0.9124,-5],[0.9125,-6],[1.0874,-6],[1.0875,-7],[1.2624,-7],[1.2625,-8],[1.35,-8]]}],"to":[{"from":"shieldSize","map":[[0.65,-4.5],[0.7374,-4.5],[0.7375,-3.5],[0.9124,-3.5],[0.9125,-1.5],[1.0874,-1.5],[1.0875,-1.5],[1.2624,-1.5],[1.2625,-1.5],[1.35,-1.5]]},{"from":"shieldSize","map":[[0.65,-4],[0.7374,-4],[0.7375,-3],[0.9124,-3],[0.9125,-2],[1.0874,-2],[1.0875,-1],[1.2624,-1],[1.2625,0],[1.35,0]]}],"paint":"glow","z":5.49,"hidden":true,"when":{"shield":["energy"],"direction":["up"]}},
+    {"id":"scan-up-t200","kind":"line","on":"shieldCarryAt","from":[{"from":"shieldSize","map":[[0.65,-6.5],[0.7374,-6.5],[0.7375,-6.5],[0.9124,-6.5],[0.9125,-4.5],[1.0874,-4.5],[1.0875,-5.5],[1.2624,-5.5],[1.2625,-5.5],[1.35,-5.5]]},{"from":"shieldSize","map":[[0.65,-6],[0.7374,-6],[0.7375,-8],[0.9124,-8],[0.9125,-9],[1.0874,-9],[1.0875,-10],[1.2624,-10],[1.2625,-11],[1.35,-11]]}],"to":[{"from":"shieldSize","map":[[0.65,-6.5],[0.7374,-6.5],[0.7375,-6.5],[0.9124,-6.5],[0.9125,-4.5],[1.0874,-4.5],[1.0875,-5.5],[1.2624,-5.5],[1.2625,-5.5],[1.35,-5.5]]},{"from":"shieldSize","map":[[0.65,-2],[0.7374,-2],[0.7375,0],[0.9124,0],[0.9125,1],[1.0874,1],[1.0875,2],[1.2624,2],[1.2625,3],[1.35,3]]}],"paint":"core","z":5.5,"hidden":true,"when":{"shield":["energy"],"direction":["up"]}},
+    {"id":"scan-up-t250","kind":"line","on":"shieldCarryAt","from":[{"from":"shieldSize","map":[[0.65,-6.5],[0.7374,-6.5],[0.7375,-6.5],[0.9124,-6.5],[0.9125,-5.5],[1.0874,-5.5],[1.0875,-6.5],[1.2624,-6.5],[1.2625,-6.5],[1.35,-6.5]]},{"from":"shieldSize","map":[[0.65,-6],[0.7374,-6],[0.7375,-8],[0.9124,-8],[0.9125,-9],[1.0874,-9],[1.0875,-10],[1.2624,-10],[1.2625,-11],[1.35,-11]]}],"to":[{"from":"shieldSize","map":[[0.65,-6.5],[0.7374,-6.5],[0.7375,-6.5],[0.9124,-6.5],[0.9125,-5.5],[1.0874,-5.5],[1.0875,-6.5],[1.2624,-6.5],[1.2625,-6.5],[1.35,-6.5]]},{"from":"shieldSize","map":[[0.65,-2],[0.7374,-2],[0.7375,0],[0.9124,0],[0.9125,1],[1.0874,1],[1.0875,2],[1.2624,2],[1.2625,3],[1.35,3]]}],"paint":"core","z":5.5,"hidden":true,"when":{"shield":["energy"],"direction":["up"]}},
+    {"id":"scan-up-t375","kind":"line","on":"shieldCarryAt","from":[{"from":"shieldSize","map":[[0.65,-8.5],[0.7374,-8.5],[0.7375,-8.5],[0.9124,-8.5],[0.9125,-7.5],[1.0874,-7.5],[1.0875,-8.5],[1.2624,-8.5],[1.2625,-8.5],[1.35,-8.5]]},{"from":"shieldSize","map":[[0.65,-7],[0.7374,-7],[0.7375,-8],[0.9124,-8],[0.9125,-9],[1.0874,-9],[1.0875,-10],[1.2624,-10],[1.2625,-11],[1.35,-11]]}],"to":[{"from":"shieldSize","map":[[0.65,-8.5],[0.7374,-8.5],[0.7375,-8.5],[0.9124,-8.5],[0.9125,-7.5],[1.0874,-7.5],[1.0875,-8.5],[1.2624,-8.5],[1.2625,-8.5],[1.35,-8.5]]},{"from":"shieldSize","map":[[0.65,-1],[0.7374,-1],[0.7375,0],[0.9124,0],[0.9125,1],[1.0874,1],[1.0875,2],[1.2624,2],[1.2625,3],[1.35,3]]}],"paint":"core","z":5.5,"hidden":true,"when":{"shield":["energy"],"direction":["up"]}},
+    {"id":"scan-up-t400","kind":"line","on":"shieldCarryAt","from":[{"from":"shieldSize","map":[[0.65,-8.5],[0.7374,-8.5],[0.7375,-8.5],[0.9124,-8.5],[0.9125,-7.5],[1.0874,-7.5],[1.0875,-9.5],[1.2624,-9.5],[1.2625,-9.5],[1.35,-9.5]]},{"from":"shieldSize","map":[[0.65,-7],[0.7374,-7],[0.7375,-8],[0.9124,-8],[0.9125,-9],[1.0874,-9],[1.0875,-10],[1.2624,-10],[1.2625,-11],[1.35,-11]]}],"to":[{"from":"shieldSize","map":[[0.65,-8.5],[0.7374,-8.5],[0.7375,-8.5],[0.9124,-8.5],[0.9125,-7.5],[1.0874,-7.5],[1.0875,-9.5],[1.2624,-9.5],[1.2625,-9.5],[1.35,-9.5]]},{"from":"shieldSize","map":[[0.65,-1],[0.7374,-1],[0.7375,0],[0.9124,0],[0.9125,1],[1.0874,1],[1.0875,2],[1.2624,2],[1.2625,3],[1.35,3]]}],"paint":"core","z":5.5,"hidden":true,"when":{"shield":["energy"],"direction":["up"]}},
+    {"id":"scan-up-t500","kind":"line","on":"shieldCarryAt","from":[{"from":"shieldSize","map":[[0.65,-9.5],[0.7374,-9.5],[0.7375,-9.5],[0.9124,-9.5],[0.9125,-9.5],[1.0874,-9.5],[1.0875,-10.5],[1.2624,-10.5],[1.2625,-10.5],[1.35,-10.5]]},{"from":"shieldSize","map":[[0.65,-7],[0.7374,-7],[0.7375,-8],[0.9124,-8],[0.9125,-9],[1.0874,-9],[1.0875,-10],[1.2624,-10],[1.2625,-11],[1.35,-11]]}],"to":[{"from":"shieldSize","map":[[0.65,-9.5],[0.7374,-9.5],[0.7375,-9.5],[0.9124,-9.5],[0.9125,-9.5],[1.0874,-9.5],[1.0875,-10.5],[1.2624,-10.5],[1.2625,-10.5],[1.35,-10.5]]},{"from":"shieldSize","map":[[0.65,-1],[0.7374,-1],[0.7375,0],[0.9124,0],[0.9125,1],[1.0874,1],[1.0875,2],[1.2624,2],[1.2625,3],[1.35,3]]}],"paint":"core","z":5.5,"hidden":true,"when":{"shield":["energy"],"direction":["up"]}},
+    {"id":"scan-up-t600","kind":"line","on":"shieldCarryAt","from":[{"from":"shieldSize","map":[[0.65,-10.5],[0.7374,-10.5],[0.7375,-11.5],[0.9124,-11.5],[0.9125,-11.5],[1.0874,-11.5],[1.0875,-12.5],[1.2624,-12.5],[1.2625,-12.5],[1.35,-12.5]]},{"from":"shieldSize","map":[[0.65,-7],[0.7374,-7],[0.7375,-8],[0.9124,-8],[0.9125,-9],[1.0874,-9],[1.0875,-10],[1.2624,-10],[1.2625,-11],[1.35,-11]]}],"to":[{"from":"shieldSize","map":[[0.65,-10.5],[0.7374,-10.5],[0.7375,-11.5],[0.9124,-11.5],[0.9125,-11.5],[1.0874,-11.5],[1.0875,-12.5],[1.2624,-12.5],[1.2625,-12.5],[1.35,-12.5]]},{"from":"shieldSize","map":[[0.65,-1],[0.7374,-1],[0.7375,0],[0.9124,0],[0.9125,1],[1.0874,1],[1.0875,2],[1.2624,2],[1.2625,3],[1.35,3]]}],"paint":"core","z":5.5,"hidden":true,"when":{"shield":["energy"],"direction":["up"]}},
+    {"id":"scan-up-t625","kind":"line","on":"shieldCarryAt","from":[{"from":"shieldSize","map":[[0.65,-10.5],[0.7374,-10.5],[0.7375,-11.5],[0.9124,-11.5],[0.9125,-11.5],[1.0874,-11.5],[1.0875,-13.5],[1.2624,-13.5],[1.2625,-13.5],[1.35,-13.5]]},{"from":"shieldSize","map":[[0.65,-7],[0.7374,-7],[0.7375,-8],[0.9124,-8],[0.9125,-9],[1.0874,-9],[1.0875,-10],[1.2624,-10],[1.2625,-11],[1.35,-11]]}],"to":[{"from":"shieldSize","map":[[0.65,-10.5],[0.7374,-10.5],[0.7375,-11.5],[0.9124,-11.5],[0.9125,-11.5],[1.0874,-11.5],[1.0875,-13.5],[1.2624,-13.5],[1.2625,-13.5],[1.35,-13.5]]},{"from":"shieldSize","map":[[0.65,-1],[0.7374,-1],[0.7375,0],[0.9124,0],[0.9125,1],[1.0874,1],[1.0875,2],[1.2624,2],[1.2625,3],[1.35,3]]}],"paint":"core","z":5.5,"hidden":true,"when":{"shield":["energy"],"direction":["up"]}},
+    {"id":"scan-up-t750","kind":"line","on":"shieldCarryAt","from":[{"from":"shieldSize","map":[[0.65,-11.5],[0.7374,-11.5],[0.7375,-13.5],[0.9124,-13.5],[0.9125,-13.5],[1.0874,-13.5],[1.0875,-15.5],[1.2624,-15.5],[1.2625,-15.5],[1.35,-15.5]]},{"from":"shieldSize","map":[[0.65,-7],[0.7374,-7],[0.7375,-8],[0.9124,-8],[0.9125,-9],[1.0874,-9],[1.0875,-10],[1.2624,-10],[1.2625,-11],[1.35,-11]]}],"to":[{"from":"shieldSize","map":[[0.65,-11.5],[0.7374,-11.5],[0.7375,-13.5],[0.9124,-13.5],[0.9125,-13.5],[1.0874,-13.5],[1.0875,-15.5],[1.2624,-15.5],[1.2625,-15.5],[1.35,-15.5]]},{"from":"shieldSize","map":[[0.65,-1],[0.7374,-1],[0.7375,0],[0.9124,0],[0.9125,1],[1.0874,1],[1.0875,2],[1.2624,2],[1.2625,3],[1.35,3]]}],"paint":"core","z":5.5,"hidden":true,"when":{"shield":["energy"],"direction":["up"]}},
+    {"id":"scan-up-t800","kind":"line","on":"shieldCarryAt","from":[{"from":"shieldSize","map":[[0.65,-12.5],[0.7374,-12.5],[0.7375,-13.5],[0.9124,-13.5],[0.9125,-14.5],[1.0874,-14.5],[1.0875,-16.5],[1.2624,-16.5],[1.2625,-16.5],[1.35,-16.5]]},{"from":"shieldSize","map":[[0.65,-6],[0.7374,-6],[0.7375,-8],[0.9124,-8],[0.9125,-9],[1.0874,-9],[1.0875,-10],[1.2624,-10],[1.2625,-11],[1.35,-11]]}],"to":[{"from":"shieldSize","map":[[0.65,-12.5],[0.7374,-12.5],[0.7375,-13.5],[0.9124,-13.5],[0.9125,-14.5],[1.0874,-14.5],[1.0875,-16.5],[1.2624,-16.5],[1.2625,-16.5],[1.35,-16.5]]},{"from":"shieldSize","map":[[0.65,-2],[0.7374,-2],[0.7375,0],[0.9124,0],[0.9125,1],[1.0874,1],[1.0875,2],[1.2624,2],[1.2625,3],[1.35,3]]}],"paint":"core","z":5.5,"hidden":true,"when":{"shield":["energy"],"direction":["up"]}},
+    {"id":"scan-up-t875","kind":"line","on":"shieldCarryAt","from":[{"from":"shieldSize","map":[[0.65,-13.5],[0.7374,-13.5],[0.7375,-14.5],[0.9124,-14.5],[0.9125,-15.5],[1.0874,-15.5],[1.0875,-18.5],[1.2624,-18.5],[1.2625,-18.5],[1.35,-18.5]]},{"from":"shieldSize","map":[[0.65,-5],[0.7374,-5],[0.7375,-7],[0.9124,-7],[0.9125,-8],[1.0874,-8],[1.0875,-9],[1.2624,-9],[1.2625,-10],[1.35,-10]]}],"to":[{"from":"shieldSize","map":[[0.65,-13.5],[0.7374,-13.5],[0.7375,-14.5],[0.9124,-14.5],[0.9125,-15.5],[1.0874,-15.5],[1.0875,-18.5],[1.2624,-18.5],[1.2625,-18.5],[1.35,-18.5]]},{"from":"shieldSize","map":[[0.65,-3],[0.7374,-3],[0.7375,-1],[0.9124,-1],[0.9125,0],[1.0874,0],[1.0875,1],[1.2624,1],[1.2625,2],[1.35,2]]}],"paint":"core","z":5.5,"hidden":true,"when":{"shield":["energy"],"direction":["up"]}},
+    {"id":"scan-side-t125","kind":"line","on":"cuffB","from":[{"from":"shieldSize","map":[[0.65,6],[0.7374,6],[0.7375,6],[0.9124,6],[0.9125,8],[1.0874,8],[1.0875,8],[1.2624,8],[1.2625,7],[1.35,7]]},{"from":"shieldSize","map":[[0.65,4],[0.7374,4],[0.7375,4],[0.9124,4],[0.9125,5],[1.0874,5],[1.0875,6],[1.2624,6],[1.2625,6],[1.35,6]]}],"to":[{"from":"shieldSize","map":[[0.65,6],[0.7374,6],[0.7375,6],[0.9124,6],[0.9125,8],[1.0874,8],[1.0875,8],[1.2624,8],[1.2625,7],[1.35,7]]},{"from":"shieldSize","map":[[0.65,5],[0.7374,5],[0.7375,5],[0.9124,5],[0.9125,6],[1.0874,6],[1.0875,7],[1.2624,7],[1.2625,7],[1.35,7]]}],"paint":"core","z":81.5,"hidden":true,"when":{"shield":["energy"],"direction":["side"]}},
+    {"id":"scan-side-row0","kind":"line","on":"cuffB","from":[{"from":"shieldSize","map":[[0.65,7],[0.7374,7],[0.7375,8],[0.9124,8],[0.9125,10],[1.0874,10],[1.0875,10],[1.2624,10],[1.2625,10],[1.35,10]]},{"from":"shieldSize","map":[[0.65,4],[0.7374,4],[0.7375,4],[0.9124,4],[0.9125,5],[1.0874,5],[1.0875,6],[1.2624,6],[1.2625,6],[1.35,6]]}],"to":[{"from":"shieldSize","map":[[0.65,7],[0.7374,7],[0.7375,8],[0.9124,8],[0.9125,10],[1.0874,10],[1.0875,10],[1.2624,10],[1.2625,10],[1.35,10]]},{"from":"shieldSize","map":[[0.65,4],[0.7374,4],[0.7375,4],[0.9124,4],[0.9125,5],[1.0874,5],[1.0875,6],[1.2624,6],[1.2625,6],[1.35,6]]}],"paint":"glow","z":81.49,"hidden":true,"when":{"shield":["energy"],"direction":["side"]}},
+    {"id":"scan-side-row1","kind":"line","on":"cuffB","from":[{"from":"shieldSize","map":[[0.65,7],[0.7374,7],[0.7375,8],[0.9124,8],[0.9125,10],[1.0874,10],[1.0875,10],[1.2624,10],[1.2625,10],[1.35,10]]},{"from":"shieldSize","map":[[0.65,5],[0.7374,5],[0.7375,5],[0.9124,5],[0.9125,6],[1.0874,6],[1.0875,7],[1.2624,7],[1.2625,7],[1.35,7]]}],"to":[{"from":"shieldSize","map":[[0.65,7],[0.7374,7],[0.7375,8],[0.9124,8],[0.9125,10],[1.0874,10],[1.0875,10],[1.2624,10],[1.2625,10],[1.35,10]]},{"from":"shieldSize","map":[[0.65,5],[0.7374,5],[0.7375,5],[0.9124,5],[0.9125,6],[1.0874,6],[1.0875,7],[1.2624,7],[1.2625,7],[1.35,7]]}],"paint":"glow.light","z":81.49,"hidden":true,"when":{"shield":["energy"],"direction":["side"]}},
+    {"id":"scan-side-t200","kind":"line","on":"cuffB","from":[{"from":"shieldSize","map":[[0.65,5],[0.7374,5],[0.7375,5],[0.9124,5],[0.9125,7],[1.0874,7],[1.0875,6],[1.2624,6],[1.2625,6],[1.35,6]]},{"from":"shieldSize","map":[[0.65,4],[0.7374,4],[0.7375,4],[0.9124,4],[0.9125,5],[1.0874,5],[1.0875,6],[1.2624,6],[1.2625,6],[1.35,6]]}],"to":[{"from":"shieldSize","map":[[0.65,5],[0.7374,5],[0.7375,5],[0.9124,5],[0.9125,7],[1.0874,7],[1.0875,6],[1.2624,6],[1.2625,6],[1.35,6]]},{"from":"shieldSize","map":[[0.65,5],[0.7374,5],[0.7375,5],[0.9124,5],[0.9125,6],[1.0874,6],[1.0875,7],[1.2624,7],[1.2625,7],[1.35,7]]}],"paint":"core","z":81.5,"hidden":true,"when":{"shield":["energy"],"direction":["side"]}},
+    {"id":"scan-side-t250","kind":"line","on":"cuffB","from":[{"from":"shieldSize","map":[[0.65,5],[0.7374,5],[0.7375,5],[0.9124,5],[0.9125,6],[1.0874,6],[1.0875,5],[1.2624,5],[1.2625,5],[1.35,5]]},{"from":"shieldSize","map":[[0.65,4],[0.7374,4],[0.7375,4],[0.9124,4],[0.9125,5],[1.0874,5],[1.0875,6],[1.2624,6],[1.2625,6],[1.35,6]]}],"to":[{"from":"shieldSize","map":[[0.65,5],[0.7374,5],[0.7375,5],[0.9124,5],[0.9125,6],[1.0874,6],[1.0875,5],[1.2624,5],[1.2625,5],[1.35,5]]},{"from":"shieldSize","map":[[0.65,5],[0.7374,5],[0.7375,5],[0.9124,5],[0.9125,6],[1.0874,6],[1.0875,7],[1.2624,7],[1.2625,7],[1.35,7]]}],"paint":"core","z":81.5,"hidden":true,"when":{"shield":["energy"],"direction":["side"]}},
+    {"id":"scan-side-t375","kind":"line","on":"cuffB","from":[{"from":"shieldSize","map":[[0.65,3],[0.7374,3],[0.7375,3],[0.9124,3],[0.9125,4],[1.0874,4],[1.0875,3],[1.2624,3],[1.2625,2],[1.35,2]]},{"from":"shieldSize","map":[[0.65,4],[0.7374,4],[0.7375,4],[0.9124,4],[0.9125,5],[1.0874,5],[1.0875,6],[1.2624,6],[1.2625,6],[1.35,6]]}],"to":[{"from":"shieldSize","map":[[0.65,3],[0.7374,3],[0.7375,3],[0.9124,3],[0.9125,4],[1.0874,4],[1.0875,3],[1.2624,3],[1.2625,2],[1.35,2]]},{"from":"shieldSize","map":[[0.65,5],[0.7374,5],[0.7375,5],[0.9124,5],[0.9125,6],[1.0874,6],[1.0875,7],[1.2624,7],[1.2625,7],[1.35,7]]}],"paint":"core","z":81.5,"hidden":true,"when":{"shield":["energy"],"direction":["side"]}},
+    {"id":"scan-side-t400","kind":"line","on":"cuffB","from":[{"from":"shieldSize","map":[[0.65,3],[0.7374,3],[0.7375,3],[0.9124,3],[0.9125,4],[1.0874,4],[1.0875,2],[1.2624,2],[1.2625,1],[1.35,1]]},{"from":"shieldSize","map":[[0.65,4],[0.7374,4],[0.7375,4],[0.9124,4],[0.9125,5],[1.0874,5],[1.0875,6],[1.2624,6],[1.2625,6],[1.35,6]]}],"to":[{"from":"shieldSize","map":[[0.65,3],[0.7374,3],[0.7375,3],[0.9124,3],[0.9125,4],[1.0874,4],[1.0875,2],[1.2624,2],[1.2625,1],[1.35,1]]},{"from":"shieldSize","map":[[0.65,5],[0.7374,5],[0.7375,5],[0.9124,5],[0.9125,6],[1.0874,6],[1.0875,7],[1.2624,7],[1.2625,7],[1.35,7]]}],"paint":"core","z":81.5,"hidden":true,"when":{"shield":["energy"],"direction":["side"]}},
+    {"id":"scan-side-t500","kind":"line","on":"cuffB","from":[{"from":"shieldSize","map":[[0.65,2],[0.7374,2],[0.7375,2],[0.9124,2],[0.9125,2],[1.0874,2],[1.0875,1],[1.2624,1],[1.2625,-1],[1.35,-1]]},{"from":"shieldSize","map":[[0.65,4],[0.7374,4],[0.7375,4],[0.9124,4],[0.9125,5],[1.0874,5],[1.0875,6],[1.2624,6],[1.2625,6],[1.35,6]]}],"to":[{"from":"shieldSize","map":[[0.65,2],[0.7374,2],[0.7375,2],[0.9124,2],[0.9125,2],[1.0874,2],[1.0875,1],[1.2624,1],[1.2625,-1],[1.35,-1]]},{"from":"shieldSize","map":[[0.65,5],[0.7374,5],[0.7375,5],[0.9124,5],[0.9125,6],[1.0874,6],[1.0875,7],[1.2624,7],[1.2625,7],[1.35,7]]}],"paint":"core","z":81.5,"hidden":true,"when":{"shield":["energy"],"direction":["side"]}},
+    {"id":"scan-side-t600","kind":"line","on":"cuffB","from":[{"from":"shieldSize","map":[[0.65,1],[0.7374,1],[0.7375,0],[0.9124,0],[0.9125,0],[1.0874,0],[1.0875,-1],[1.2624,-1],[1.2625,-3],[1.35,-3]]},{"from":"shieldSize","map":[[0.65,4],[0.7374,4],[0.7375,4],[0.9124,4],[0.9125,5],[1.0874,5],[1.0875,6],[1.2624,6],[1.2625,6],[1.35,6]]}],"to":[{"from":"shieldSize","map":[[0.65,1],[0.7374,1],[0.7375,0],[0.9124,0],[0.9125,0],[1.0874,0],[1.0875,-1],[1.2624,-1],[1.2625,-3],[1.35,-3]]},{"from":"shieldSize","map":[[0.65,5],[0.7374,5],[0.7375,5],[0.9124,5],[0.9125,6],[1.0874,6],[1.0875,7],[1.2624,7],[1.2625,7],[1.35,7]]}],"paint":"core","z":81.5,"hidden":true,"when":{"shield":["energy"],"direction":["side"]}},
+    {"id":"scan-side-t625","kind":"line","on":"cuffB","from":[{"from":"shieldSize","map":[[0.65,1],[0.7374,1],[0.7375,0],[0.9124,0],[0.9125,0],[1.0874,0],[1.0875,-2],[1.2624,-2],[1.2625,-4],[1.35,-4]]},{"from":"shieldSize","map":[[0.65,4],[0.7374,4],[0.7375,4],[0.9124,4],[0.9125,5],[1.0874,5],[1.0875,6],[1.2624,6],[1.2625,6],[1.35,6]]}],"to":[{"from":"shieldSize","map":[[0.65,1],[0.7374,1],[0.7375,0],[0.9124,0],[0.9125,0],[1.0874,0],[1.0875,-2],[1.2624,-2],[1.2625,-4],[1.35,-4]]},{"from":"shieldSize","map":[[0.65,5],[0.7374,5],[0.7375,5],[0.9124,5],[0.9125,6],[1.0874,6],[1.0875,7],[1.2624,7],[1.2625,7],[1.35,7]]}],"paint":"core","z":81.5,"hidden":true,"when":{"shield":["energy"],"direction":["side"]}},
+    {"id":"scan-side-t750","kind":"line","on":"cuffB","from":[{"from":"shieldSize","map":[[0.65,0],[0.7374,0],[0.7375,-2],[0.9124,-2],[0.9125,-2],[1.0874,-2],[1.0875,-4],[1.2624,-4],[1.2625,-6],[1.35,-6]]},{"from":"shieldSize","map":[[0.65,4],[0.7374,4],[0.7375,4],[0.9124,4],[0.9125,5],[1.0874,5],[1.0875,6],[1.2624,6],[1.2625,6],[1.35,6]]}],"to":[{"from":"shieldSize","map":[[0.65,0],[0.7374,0],[0.7375,-2],[0.9124,-2],[0.9125,-2],[1.0874,-2],[1.0875,-4],[1.2624,-4],[1.2625,-6],[1.35,-6]]},{"from":"shieldSize","map":[[0.65,5],[0.7374,5],[0.7375,5],[0.9124,5],[0.9125,6],[1.0874,6],[1.0875,7],[1.2624,7],[1.2625,7],[1.35,7]]}],"paint":"core","z":81.5,"hidden":true,"when":{"shield":["energy"],"direction":["side"]}},
+    {"id":"scan-side-t800","kind":"line","on":"cuffB","from":[{"from":"shieldSize","map":[[0.65,-1],[0.7374,-1],[0.7375,-2],[0.9124,-2],[0.9125,-3],[1.0874,-3],[1.0875,-5],[1.2624,-5],[1.2625,-8],[1.35,-8]]},{"from":"shieldSize","map":[[0.65,4],[0.7374,4],[0.7375,4],[0.9124,4],[0.9125,5],[1.0874,5],[1.0875,6],[1.2624,6],[1.2625,6],[1.35,6]]}],"to":[{"from":"shieldSize","map":[[0.65,-1],[0.7374,-1],[0.7375,-2],[0.9124,-2],[0.9125,-3],[1.0874,-3],[1.0875,-5],[1.2624,-5],[1.2625,-8],[1.35,-8]]},{"from":"shieldSize","map":[[0.65,5],[0.7374,5],[0.7375,5],[0.9124,5],[0.9125,6],[1.0874,6],[1.0875,7],[1.2624,7],[1.2625,7],[1.35,7]]}],"paint":"core","z":81.5,"hidden":true,"when":{"shield":["energy"],"direction":["side"]}},
+    {"id":"scan-side-t875","kind":"line","on":"cuffB","from":[{"from":"shieldSize","map":[[0.65,-2],[0.7374,-2],[0.7375,-3],[0.9124,-3],[0.9125,-4],[1.0874,-4],[1.0875,-7],[1.2624,-7],[1.2625,-9],[1.35,-9]]},{"from":"shieldSize","map":[[0.65,4],[0.7374,4],[0.7375,4],[0.9124,4],[0.9125,5],[1.0874,5],[1.0875,6],[1.2624,6],[1.2625,6],[1.35,6]]}],"to":[{"from":"shieldSize","map":[[0.65,-2],[0.7374,-2],[0.7375,-3],[0.9124,-3],[0.9125,-4],[1.0874,-4],[1.0875,-7],[1.2624,-7],[1.2625,-9],[1.35,-9]]},{"from":"shieldSize","map":[[0.65,5],[0.7374,5],[0.7375,5],[0.9124,5],[0.9125,6],[1.0874,6],[1.0875,7],[1.2624,7],[1.2625,7],[1.35,7]]}],"paint":"core","z":81.5,"hidden":true,"when":{"shield":["energy"],"direction":["side"]}},
+    {"id":"scanP-t200","kind":"line","on":"shieldPlantAt","from":[{"from":"shieldSize","map":[[0.65,-6.5],[0.7374,-6.5],[0.7375,-6.5],[0.9124,-6.5],[0.9125,-4.5],[1.0874,-4.5],[1.0875,-5.5],[1.2624,-5.5],[1.2625,-5.5],[1.35,-5.5]]},{"from":"shieldSize","map":[[0.65,1],[0.7374,1],[0.7375,-1],[0.9124,-1],[0.9125,-2],[1.0874,-2],[1.0875,-3],[1.2624,-3],[1.2625,-4],[1.35,-4]]}],"to":[{"from":"shieldSize","map":[[0.65,-6.5],[0.7374,-6.5],[0.7375,-6.5],[0.9124,-6.5],[0.9125,-4.5],[1.0874,-4.5],[1.0875,-5.5],[1.2624,-5.5],[1.2625,-5.5],[1.35,-5.5]]},{"from":"shieldSize","map":[[0.65,5],[0.7374,5],[0.7375,7],[0.9124,7],[0.9125,8],[1.0874,8],[1.0875,9],[1.2624,9],[1.2625,10],[1.35,10]]}],"paint":"core","z":81.5,"hidden":true,"when":{"shield":["energy"],"direction":["down"]}},
+    {"id":"scanP-row0","kind":"line","on":"shieldPlantAt","from":[{"from":"shieldSize","map":[[0.65,-4.5],[0.7374,-4.5],[0.7375,-3.5],[0.9124,-3.5],[0.9125,-1.5],[1.0874,-1.5],[1.0875,-1.5],[1.2624,-1.5],[1.2625,-1.5],[1.35,-1.5]]},{"from":"shieldSize","map":[[0.65,3],[0.7374,3],[0.7375,2],[0.9124,2],[0.9125,1],[1.0874,1],[1.0875,0],[1.2624,0],[1.2625,-1],[1.35,-1]]}],"to":[{"from":"shieldSize","map":[[0.65,-4.5],[0.7374,-4.5],[0.7375,-3.5],[0.9124,-3.5],[0.9125,-1.5],[1.0874,-1.5],[1.0875,-1.5],[1.2624,-1.5],[1.2625,-1.5],[1.35,-1.5]]},{"from":"shieldSize","map":[[0.65,3],[0.7374,3],[0.7375,4],[0.9124,4],[0.9125,5],[1.0874,5],[1.0875,6],[1.2624,6],[1.2625,7],[1.35,7]]}],"paint":"glow","z":81.49,"hidden":true,"when":{"shield":["energy"],"direction":["down"]}},
+    {"id":"scanP-t400","kind":"line","on":"shieldPlantAt","from":[{"from":"shieldSize","map":[[0.65,-8.5],[0.7374,-8.5],[0.7375,-8.5],[0.9124,-8.5],[0.9125,-7.5],[1.0874,-7.5],[1.0875,-9.5],[1.2624,-9.5],[1.2625,-9.5],[1.35,-9.5]]},{"from":"shieldSize","map":[[0.65,0],[0.7374,0],[0.7375,-1],[0.9124,-1],[0.9125,-2],[1.0874,-2],[1.0875,-3],[1.2624,-3],[1.2625,-4],[1.35,-4]]}],"to":[{"from":"shieldSize","map":[[0.65,-8.5],[0.7374,-8.5],[0.7375,-8.5],[0.9124,-8.5],[0.9125,-7.5],[1.0874,-7.5],[1.0875,-9.5],[1.2624,-9.5],[1.2625,-9.5],[1.35,-9.5]]},{"from":"shieldSize","map":[[0.65,6],[0.7374,6],[0.7375,7],[0.9124,7],[0.9125,8],[1.0874,8],[1.0875,9],[1.2624,9],[1.2625,10],[1.35,10]]}],"paint":"core","z":81.5,"hidden":true,"when":{"shield":["energy"],"direction":["down"]}},
+    {"id":"scanP-t600","kind":"line","on":"shieldPlantAt","from":[{"from":"shieldSize","map":[[0.65,-10.5],[0.7374,-10.5],[0.7375,-11.5],[0.9124,-11.5],[0.9125,-11.5],[1.0874,-11.5],[1.0875,-12.5],[1.2624,-12.5],[1.2625,-12.5],[1.35,-12.5]]},{"from":"shieldSize","map":[[0.65,0],[0.7374,0],[0.7375,-1],[0.9124,-1],[0.9125,-2],[1.0874,-2],[1.0875,-3],[1.2624,-3],[1.2625,-4],[1.35,-4]]}],"to":[{"from":"shieldSize","map":[[0.65,-10.5],[0.7374,-10.5],[0.7375,-11.5],[0.9124,-11.5],[0.9125,-11.5],[1.0874,-11.5],[1.0875,-12.5],[1.2624,-12.5],[1.2625,-12.5],[1.35,-12.5]]},{"from":"shieldSize","map":[[0.65,6],[0.7374,6],[0.7375,7],[0.9124,7],[0.9125,8],[1.0874,8],[1.0875,9],[1.2624,9],[1.2625,10],[1.35,10]]}],"paint":"core","z":81.5,"hidden":true,"when":{"shield":["energy"],"direction":["down"]}},
+    {"id":"scanP-t800","kind":"line","on":"shieldPlantAt","from":[{"from":"shieldSize","map":[[0.65,-12.5],[0.7374,-12.5],[0.7375,-13.5],[0.9124,-13.5],[0.9125,-14.5],[1.0874,-14.5],[1.0875,-16.5],[1.2624,-16.5],[1.2625,-16.5],[1.35,-16.5]]},{"from":"shieldSize","map":[[0.65,1],[0.7374,1],[0.7375,-1],[0.9124,-1],[0.9125,-2],[1.0874,-2],[1.0875,-3],[1.2624,-3],[1.2625,-4],[1.35,-4]]}],"to":[{"from":"shieldSize","map":[[0.65,-12.5],[0.7374,-12.5],[0.7375,-13.5],[0.9124,-13.5],[0.9125,-14.5],[1.0874,-14.5],[1.0875,-16.5],[1.2624,-16.5],[1.2625,-16.5],[1.35,-16.5]]},{"from":"shieldSize","map":[[0.65,5],[0.7374,5],[0.7375,7],[0.9124,7],[0.9125,8],[1.0874,8],[1.0875,9],[1.2624,9],[1.2625,10],[1.35,10]]}],"paint":"core","z":81.5,"hidden":true,"when":{"shield":["energy"],"direction":["down"]}} ],
+   "bones": [
+    {"id":"shieldCarry","parent":"root","angle":180,"length":1},
+    {"id":"shieldPlant","parent":"root","angle":-33.69,"length":3.606} ],
+   "nodes": [
+    {"id":"shieldCarryAt","parent":"shieldCarry","angle":-180},
+    {"id":"shieldPlantAt","parent":"shieldPlant","angle":33.69} ] } },
+ "controls": [
+  {
+   "key": "height",
+   "kind": "range",
+   "label": "Height",
+   "lo": "Short",
+   "hi": "Tall",
+   "default": 0.5,
+   "scales": {
+    "bones": ["hip","spine","thiF","thiB","shnF","shnB","legF","legB","legIF","legIB"],
+    "by": [0.84,1.2] } },
+  {
+   "key": "build",
+   "kind": "range",
+   "label": "Build",
+   "lo": "Slim",
+   "hi": "Stocky",
+   "default": 0.8,
+   "scales": {
+    "bones": ["shoulderF","shoulderB"],
+    "by": [0.6,1.3] } },
+  {
+   "key": "shield",
+   "kind": "choice",
+   "label": "Shield",
+   "options": [
+    {"value":"riot","label":"Riot shield"},
+    {"value":"energy","label":"Energy shield"},
+    {"value":"round","label":"Round shield"},
+    "none" ],
+   "default": "riot" },
+  {
+   "key": "shieldSize",
+   "kind": "range",
+   "label": "Size",
+   "lo": "Small",
+   "hi": "Big",
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "default": 1 },
+  {
+   "key": "weapon",
+   "kind": "choice",
+   "label": "Weapon",
+   "options": ["rifle","pistol","baton","none"],
+   "default": "rifle" },
+  {
+   "key": "weaponLength",
+   "kind": "range",
+   "label": "Length",
+   "lo": "Short",
+   "hi": "Long",
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "default": 1 },
+  {
+   "key": "headgear",
+   "kind": "choice",
+   "label": "Headgear",
+   "options": ["helmet","mask","none"],
+   "default": "helmet" },
+  {
+   "key": "headgearSize",
+   "kind": "range",
+   "label": "Size",
+   "lo": "Small",
+   "hi": "Big",
+   "min": 0.5,
+   "max": 1.8,
+   "step": 0.05,
+   "default": 1 },
+  {
+   "key": "skin",
+   "kind": "colour",
+   "label": "Skin" },
+  {
+   "key": "outfit",
+   "kind": "colour",
+   "label": "Armour" },
+  {
+   "key": "trim",
+   "kind": "colour",
+   "label": "Plates, gloves and boots" },
+  {
+   "key": "glow",
+   "kind": "colour",
+   "label": "Lights",
+   "when": [
+    {"headgear":["helmet","mask"]},
+    {"shield":["riot","energy","round"]} ] },
+  {
+   "key": "bounce",
+   "kind": "range",
+   "label": "Bounce",
+   "lo": "Calm",
+   "hi": "Bouncy",
+   "default": 0.5,
+   "group": "Motion" },
+  {
+   "key": "stride",
+   "kind": "range",
+   "label": "Stride",
+   "lo": "Small steps",
+   "hi": "Big steps",
+   "default": 0.5,
+   "group": "Motion" },
+  {
+   "key": "speed",
+   "standard": "speed" } ],
+ "parts": {
+  "shield": {
+   "label": "Shield",
+   "params": ["shield","shieldSize"],
+   "none": "none",
+   "socket": "offhand",
+   "shapes": ["shield","shieldSide"] },
+  "weapon": {
+   "label": "Weapon",
+   "params": ["weapon","weaponLength"],
+   "none": "none",
+   "socket": "hand",
+   "shapes": ["weapon","weaponDie"] },
+  "headgear": {
+   "label": "Headgear",
+   "params": ["headgear","headgearSize"],
+   "none": "none",
+   "socket": "head",
+   "shapes": ["helmet","mask"] } },
+ "clips": {
+  "idle_down": {
+   "from": {
+    "from": "weapon",
+    "pick": {"rifle":"idle-gun-down","pistol":"idle-gun-down","baton":"idle-baton-down","none":"idle-gun-down"} },
+   "travel": [
+    {"tracks":["stretch.hip"],"about":"most","by":{"from":"bounce","map":[[0,1],[0.59,1],[0.6,2],[1,2]]}},
+    {"tracks":["bones.thiF","bones.toeF","bones.shnB"],"about":"least","by":{"from":"bounce","map":[[0,1],[0.59,1],[0.6,2],[1,2]]}},
+    {"tracks":["bones.shnF","bones.thiB","bones.toeB","stretch.legF","stretch.legB"],"about":"most","by":{"from":"bounce","map":[[0,1],[0.59,1],[0.6,2],[1,2]]}} ],
+   "frameEdits": {
+    "1": {"show":["scan-down-t125","scan-down-row0"]},
+    "2": {"show":["scan-down-t250","scan-down-row0"]},
+    "3": {"show":["scan-down-t375","scan-down-row0"]},
+    "4": {"show":["scan-down-t500","scan-down-row0"]},
+    "5": {"show":["scan-down-t625","scan-down-row0"]},
+    "6": {"show":["scan-down-t750","scan-down-row0"]},
+    "7": {"show":["scan-down-t875","scan-down-row0"]} } },
+  "idle_up": {
+   "from": {
+    "from": "weapon",
+    "pick": {"rifle":"idle-gun-up","pistol":"idle-gun-up","baton":"idle-baton-up","none":"idle-gun-up"} },
+   "travel": [
+    {"tracks":["stretch.hip"],"about":"most","by":{"from":"bounce","map":[[0,1],[0.59,1],[0.6,2],[1,2]]}},
+    {"tracks":["bones.shnF","bones.thiB","bones.toeB"],"about":"least","by":{"from":"bounce","map":[[0,1],[0.59,1],[0.6,2],[1,2]]}},
+    {"tracks":["bones.thiF","bones.toeF","bones.shnB","stretch.legF","stretch.legB"],"about":"most","by":{"from":"bounce","map":[[0,1],[0.59,1],[0.6,2],[1,2]]}} ],
+   "frameEdits": {
+    "1": {"show":["scan-up-t125","scan-up-row0"]},
+    "2": {"show":["scan-up-t250","scan-up-row0"]},
+    "3": {"show":["scan-up-t375","scan-up-row0"]},
+    "4": {"show":["scan-up-t500","scan-up-row0"]},
+    "5": {"show":["scan-up-t625","scan-up-row0"]},
+    "6": {"show":["scan-up-t750","scan-up-row0"]},
+    "7": {"show":["scan-up-t875","scan-up-row0"]} } },
+  "idle_side": {
+   "from": {
+    "from": "weapon",
+    "pick": {"rifle":"idle-gun-side","pistol":"idle-gun-side","baton":"idle-baton-side","none":"idle-gun-side"} },
+   "travel": [
+    {"tracks":["stretch.hip"],"about":"most","by":{"from":"bounce","map":[[0,1],[0.59,1],[0.6,2],[1,2]]}},
+    {"tracks":["bones.thiF","bones.shnF","bones.toeF","bones.thiB","bones.shnB","bones.toeB","stretch.legF","stretch.legB"],"about":"first","by":{"from":"bounce","map":[[0,1],[0.59,1],[0.6,2],[1,2]]}} ],
+   "frameEdits": {
+    "1": {"show":["scan-side-t125","scan-side-row0","scan-side-row1"]},
+    "2": {"show":["scan-side-t250","scan-side-row0","scan-side-row1"]},
+    "3": {"show":["scan-side-t375","scan-side-row0","scan-side-row1"]},
+    "4": {"show":["scan-side-t500","scan-side-row0","scan-side-row1"]},
+    "5": {"show":["scan-side-t625","scan-side-row0","scan-side-row1"]},
+    "6": {"show":["scan-side-t750","scan-side-row0","scan-side-row1"]},
+    "7": {"show":["scan-side-t875","scan-side-row0","scan-side-row1"]} } },
+  "walk_down": {
+   "from": {
+    "from": "weapon",
+    "pick": {"rifle":"walk-gun-down","pistol":"walk-gun-down","baton":"walk-baton-down","none":"walk-gun-down"} },
+   "sounds": [
+    {"sound":"footstep-metal","frame":0,"preset":"Boots on deck","volume":0.45},
+    {"sound":"footstep-metal","frame":4,"preset":"Boots on deck","volume":0.45} ],
+   "travel": [
+    {"tracks":["stretch.hip"],"about":"most","by":{"from":"bounce","map":[[0,0.7],[0.5,1],[1,1.6]]}},
+    {"tracks":["bones.thiF","bones.toeF","bones.shnB"],"about":"least","by":{"from":"stride","map":[[0,0.9],[0.5,1],[1,1.2]]}},
+    {"tracks":["bones.shnF","bones.thiB","bones.toeB","stretch.legF","stretch.legB"],"about":"most","by":{"from":"stride","map":[[0,0.9],[0.5,1],[1,1.2]]}},
+    {"tracks":["bones.thiF","bones.toeF","bones.shnB"],"about":"least","by":{"from":"bounce","map":[[0,0.9],[0.5,1],[1,2]]}},
+    {"tracks":["bones.shnF","bones.thiB","bones.toeB","stretch.legF","stretch.legB"],"about":"most","by":{"from":"bounce","map":[[0,0.9],[0.5,1],[1,2]]}},
+    {"tracks":["bones.elbF","bones.wriF","bones.cuffF","bones.handF","stretch.armF","stretch.rimAF","bones.armB","bones.elbB","bones.wriB","bones.cuffB","bones.handB","bones.rimAB","stretch.armB","stretch.rimAB"],"about":"mid","by":{"from":"bounce","map":[[0,0.5],[0.5,1],[1,1.3]]}},
+    {"tracks":["bones.elbF","bones.wriF","bones.cuffF","bones.handF","stretch.armF","stretch.rimAF","bones.armB","bones.elbB","bones.wriB","bones.cuffB","bones.handB","bones.rimAB","stretch.armB","stretch.rimAB"],"about":"mid","by":{"from":"stride","map":[[0,0.5],[0.5,1],[1,1.3]]}} ],
+   "frameEdits": {
+    "1": {"show":["scan-down-t125","scan-down-row0"]},
+    "2": {"show":["scan-down-t250","scan-down-row0"]},
+    "3": {"show":["scan-down-t375","scan-down-row0"]},
+    "4": {"show":["scan-down-t500","scan-down-row0"]},
+    "5": {"show":["scan-down-t625","scan-down-row0"]},
+    "6": {"show":["scan-down-t750","scan-down-row0"]},
+    "7": {"show":["scan-down-t875","scan-down-row0"]} } },
+  "walk_up": {
+   "from": {
+    "from": "weapon",
+    "pick": {"rifle":"walk-gun-up","pistol":"walk-gun-up","baton":"walk-baton-up","none":"walk-gun-up"} },
+   "sounds": [
+    {"sound":"footstep-metal","frame":0,"preset":"Boots on deck","volume":0.45},
+    {"sound":"footstep-metal","frame":4,"preset":"Boots on deck","volume":0.45} ],
+   "travel": [
+    {"tracks":["stretch.hip"],"about":"most","by":{"from":"bounce","map":[[0,0.7],[0.5,1],[1,2.25]]}},
+    {"tracks":["bones.shnF","bones.thiB","bones.toeB"],"about":"least","by":{"from":"stride","map":[[0,0.9],[0.5,1],[1,1.2]]}},
+    {"tracks":["bones.thiF","bones.toeF","bones.shnB","stretch.legF","stretch.legB"],"about":"most","by":{"from":"stride","map":[[0,0.9],[0.5,1],[1,1.2]]}},
+    {"tracks":["bones.shnF","bones.thiB","bones.toeB"],"about":"least","by":{"from":"bounce","map":[[0,0.9],[0.5,1],[1,1.2]]}},
+    {"tracks":["bones.thiF","bones.toeF","bones.shnB","stretch.legF","stretch.legB"],"about":"most","by":{"from":"bounce","map":[[0,0.9],[0.5,1],[1,1.2]]}},
+    {"tracks":["bones.elbF","bones.wriF","bones.cuffF","bones.handF","stretch.armF","stretch.rimAF","bones.armB","bones.elbB","bones.wriB","bones.cuffB","bones.handB","bones.rimAB","stretch.armB","stretch.rimAB"],"about":"mid","by":{"from":"bounce","map":[[0,0.7],[0.5,1],[1,1.1]]}},
+    {"tracks":["bones.elbF","bones.wriF","bones.cuffF","bones.handF","stretch.armF","stretch.rimAF","bones.armB","bones.elbB","bones.wriB","bones.cuffB","bones.handB","bones.rimAB","stretch.armB","stretch.rimAB"],"about":"mid","by":{"from":"stride","map":[[0,1],[0.5,1],[1,1.1]]}} ],
+   "frameEdits": {
+    "1": {"show":["scan-up-t125","scan-up-row0"]},
+    "2": {"show":["scan-up-t250","scan-up-row0"]},
+    "3": {"show":["scan-up-t375","scan-up-row0"]},
+    "4": {"show":["scan-up-t500","scan-up-row0"]},
+    "5": {"show":["scan-up-t625","scan-up-row0"]},
+    "6": {"show":["scan-up-t750","scan-up-row0"]},
+    "7": {"show":["scan-up-t875","scan-up-row0"]} } },
+  "walk_side": {
+   "from": {
+    "from": "weapon",
+    "pick": {"rifle":"walk-gun-side","pistol":"walk-gun-side","baton":"walk-baton-side","none":"walk-gun-side"} },
+   "sounds": [
+    {"sound":"footstep-metal","frame":0,"preset":"Boots on deck","volume":0.45},
+    {"sound":"footstep-metal","frame":4,"preset":"Boots on deck","volume":0.45} ],
+   "travel": [
+    {"tracks":["stretch.hip"],"about":"most","by":{"from":"bounce","map":[[0,0.7],[0.5,1],[1,1.8]]}},
+    {"tracks":["bones.thiF","bones.shnF","bones.toeF","bones.thiB","bones.shnB","bones.toeB","bones.legF","stretch.legF","bones.legB","stretch.legB"],"about":"mid","by":{"from":"stride","map":[[0,0.7],[0.5,1],[1,1.2]]}},
+    {"tracks":["bones.thiF","bones.shnF","bones.toeF","bones.thiB","bones.shnB","bones.toeB","bones.legF","stretch.legF","bones.legB","stretch.legB"],"about":"mid","by":{"from":"bounce","map":[[0,0.8],[0.5,1],[1,1.1]]}},
+    {"tracks":["bones.armF","bones.elbF","bones.wriF","bones.cuffF","bones.handF","bones.rimAF","stretch.armF","stretch.rimAF","bones.armB","bones.elbB","bones.wriB","bones.cuffB","bones.handB","bones.rimAB","stretch.armB","stretch.rimAB"],"about":"mid","by":{"from":"bounce","map":[[0,1],[0.5,1],[1,2]]}},
+    {"tracks":["bones.armF","bones.elbF","bones.wriF","bones.cuffF","bones.handF","bones.rimAF","stretch.armF","stretch.rimAF","bones.armB","bones.elbB","bones.wriB","bones.cuffB","bones.handB","bones.rimAB","stretch.armB","stretch.rimAB"],"about":"mid","by":{"from":"stride","map":[[0,0.7],[0.5,1],[1,2]]}},
+    {"tracks":["bones.spine"],"about":0,"by":{"from":"stride","map":[[0,0.5],[0.5,1],[1,1]]}} ],
+   "frameEdits": {
+    "1": {"show":["scan-side-t125","scan-side-row0","scan-side-row1"]},
+    "2": {"show":["scan-side-t250","scan-side-row0","scan-side-row1"]},
+    "3": {"show":["scan-side-t375","scan-side-row0","scan-side-row1"]},
+    "4": {"show":["scan-side-t500","scan-side-row0","scan-side-row1"]},
+    "5": {"show":["scan-side-t625","scan-side-row0","scan-side-row1"]},
+    "6": {"show":["scan-side-t750","scan-side-row0","scan-side-row1"]},
+    "7": {"show":["scan-side-t875","scan-side-row0","scan-side-row1"]} } },
+  "shoot_down": {
+   "from": {
+    "from": "weapon",
+    "pick": {"rifle":"shoot-gun-down","pistol":"shoot-gun-down","baton":"shoot-jab-down","none":"shoot-jab-down"} },
+   "sounds": [
+    {"sound":"laser-shot","frame":1,"preset":"Heavy cannon","volume":0.85,"when":{"weapon":["rifle","pistol"]}},
+    {"sound":"bolt-impact","frame":2,"preset":"On metal","volume":0.7,"when":{"weapon":["baton","none"]}} ],
+   "frameEdits": {
+    "0": {"hide":["weapon"],"show":["weaponEnd"]},
+    "1": {"show":["flare-rifle-ray","flare-rifle-arms","flare-rifle-bar","flare-rifle-core","flare-rifle-coreBar","flare-pistol-ray","flare-pistol-arms","flare-pistol-bar","flare-pistol-core","flare-pistol-coreBar","weaponEnd","scan-down-t200","scan-down-row0"],"hide":["weapon"]},
+    "2": {"hide":["weapon"],"show":["weaponEnd","scan-down-t400","scan-down-row0"]},
+    "3": {"hide":["weapon"],"show":["weaponEnd","scan-down-t600","scan-down-row0"]},
+    "4": {"hide":["weapon"],"show":["weaponEnd","scan-down-t800","scan-down-row0"]} } },
+  "shoot_up": {
+   "from": {
+    "from": "weapon",
+    "pick": {"rifle":"shoot-gun-up","pistol":"shoot-gun-up","baton":"shoot-jab-up","none":"shoot-jab-up"} },
+   "sounds": [
+    {"sound":"laser-shot","frame":1,"preset":"Heavy cannon","volume":0.85,"when":{"weapon":["rifle","pistol"]}},
+    {"sound":"bolt-impact","frame":2,"preset":"On metal","volume":0.7,"when":{"weapon":["baton","none"]}} ],
+   "frameEdits": {
+    "1": {"show":["flare-rifle-ray","flare-rifle-arms","flare-rifle-bar","flare-rifle-core","flare-rifle-coreBar","flare-pistol-ray","flare-pistol-arms","flare-pistol-bar","flare-pistol-core","flare-pistol-coreBar","scan-up-t200","scan-up-row0"]},
+    "2": {"show":["scan-up-t400","scan-up-row0"]},
+    "3": {"show":["scan-up-t600","scan-up-row0"]},
+    "4": {"show":["scan-up-t800","scan-up-row0"]} } },
+  "shoot_side": {
+   "from": {
+    "from": "weapon",
+    "pick": {"rifle":"shoot-gun-side","pistol":"shoot-gun-side","baton":"shoot-jab-side","none":"shoot-jab-side"} },
+   "sounds": [
+    {"sound":"laser-shot","frame":1,"preset":"Heavy cannon","volume":0.85,"when":{"weapon":["rifle","pistol"]}},
+    {"sound":"bolt-impact","frame":2,"preset":"On metal","volume":0.7,"when":{"weapon":["baton","none"]}} ],
+   "frameEdits": {
+    "1": {"show":["flare-rifle-ray","flare-rifle-arms","flare-rifle-bar","flare-rifle-core","flare-rifle-coreBar","flare-pistol-ray","flare-pistol-arms","flare-pistol-bar","flare-pistol-core","flare-pistol-coreBar","scan-side-t200","scan-side-row0","scan-side-row1"]},
+    "2": {"show":["scan-side-t400","scan-side-row0","scan-side-row1"]},
+    "3": {"show":["scan-side-t600","scan-side-row0","scan-side-row1"]},
+    "4": {"show":["scan-side-t800","scan-side-row0","scan-side-row1"]} } },
+  "block": {
+   "from": {
+    "from": "weapon",
+    "pick": {"rifle":"block","pistol":"block","baton":"block-baton","none":"block"} },
+   "sounds": [
+    {"sound":"bolt-impact","frame":1,"preset":"On metal","volume":0.7,"when":{"shield":["riot","energy","round"]}} ],
+   "frameEdits": {
+    "1": {"hide":["shield"],"show":["shieldPlanted","scanP-t200","scanP-row0"]},
+    "2": {"hide":["shield"],"show":["shieldPlanted","scanP-t400","scanP-row0"]},
+    "3": {"hide":["shield"],"show":["shieldPlanted","scanP-t600","scanP-row0"]},
+    "4": {"hide":["shield"],"show":["shieldPlanted","scanP-t800","scanP-row0"]} } },
+  "hurt": {
+   "from": {
+    "from": "weapon",
+    "pick": {"rifle":"hurt","pistol":"hurt","baton":"hurt-baton","none":"hurt"} },
+   "sounds": [
+    {"sound":"bolt-impact","frame":0,"preset":"On flesh","volume":0.9} ],
+   "frameEdits": {
+    "1": {"show":["scan-down-t333","scan-down-row0"]},
+    "2": {"show":["scan-down-t667","scan-down-row0"]} } },
+  "die": {
+   "from": {
+    "from": "weapon",
+    "pick": {"rifle":"die","pistol":"die","baton":"die-baton","none":"die"} },
+   "sounds": [
+    {"sound":"ranger-hurt","frame":0,"preset":"Critical"} ],
+   "frameEdits": {
+    "2": {"hide":["hair","helmet","mask","shield","suit","shieldSide","gloveB-down","gloveF-down","gloveB-up","gloveF-up","gloveB-side","gloveF-side","weapon"],"show":["hairLie2","helmetLie2","maskLie2","shieldLie2","weaponDie"]},
+    "3": {"hide":["hair","helmet","mask","shield","suit","shieldSide","gloveB-down","gloveF-down","gloveB-up","gloveF-up","gloveB-side","gloveF-side","weapon"],"show":["hairLie3","helmetLie3","maskLie3","shieldLie3","weaponDie"]},
+    "4": {"hide":["hair","helmet","mask","shield","suit","shieldSide","gloveB-down","gloveF-down","gloveB-up","gloveF-up","gloveB-side","gloveF-side","weapon"],"show":["hairLie","helmetLie","maskLie","shieldLie","weaponDie"]},
+    "5": {"hide":["hair","helmet","mask","shield","suit","shieldSide","gloveB-down","gloveF-down","gloveB-up","gloveF-up","gloveB-side","gloveF-side","weapon"],"show":["hairLie","helmetLie","maskLie","shieldLie","weaponDie"]},
+    "6": {"hide":["hair","helmet","mask","shield","suit","shieldSide","gloveB-down","gloveF-down","gloveB-up","gloveF-up","gloveB-side","gloveF-side","weapon"],"show":["hairLie","helmetLie","maskLie","shieldLie","weaponDie"]},
+    "7": {"hide":["hair","helmet","mask","shield","suit","shieldSide","gloveB-down","gloveF-down","gloveB-up","gloveF-up","gloveB-side","gloveF-side","weapon"],"show":["hairLie","helmetLie","maskLie","shieldLie","weaponDie"]} } } },
+ "made": {
+  "in": "library",
+  "from": "code:shield-trooper",
+  "by": "migration batch M7 (/sprite-forge redraw)" } }

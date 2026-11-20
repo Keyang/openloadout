@@ -1,0 +1,42 @@
+{
+ "format": "loadout-piece",
+ "version": 1,
+ "id": "part:topdown-neck",
+ "v": 1,
+ "name": "Long neck",
+ "about": "The neck of a head carried two rows high, skin in the chin's shadow from under the head to the collar, on the chest node (use z 40) of base:person-topdown-merchant.",
+ "slots": [
+  {
+   "id": "skin",
+   "label": "Skin",
+   "default": "#e0a878",
+   "material": "skin" } ],
+ "made": {
+  "by": "tools/bake-topdown-m7.mjs",
+  "from": "rigs/topdown.js" },
+ "body": {
+  "draw": [
+   {
+    "id": "neck-down",
+    "kind": "stamp",
+    "at": [-2,-1.5],
+    "rows": ["aaa","aaa","aaa"],
+    "key": {"a":"skin.dark"},
+    "z": 0,
+    "when": {"direction":["down"]} },
+   {
+    "id": "neck-up",
+    "kind": "stamp",
+    "at": [-2,-1.5],
+    "rows": ["aaa","aaa","aaa"],
+    "key": {"a":"skin.dark"},
+    "z": 0,
+    "when": {"direction":["up"]} },
+   {
+    "id": "neck-side",
+    "kind": "stamp",
+    "at": [-2,-0.5],
+    "rows": ["aaa","aaa","aaa"],
+    "key": {"a":"skin.dark"},
+    "z": 0,
+    "when": {"direction":["side"]} } ] } }

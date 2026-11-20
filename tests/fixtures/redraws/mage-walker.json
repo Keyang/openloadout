@@ -1,0 +1,403 @@
+{
+ "id": "mage-walker",
+ "frozen": "2026-11-20",
+ "source": "sprites/mage-walker.js",
+ "sha256": "ce131d3ba77b4b625d7396c892a7435a0284b6c1f4c797923c618f27d6aa9b44",
+ "name": "Mage (map)",
+ "blurb": "The mage as seen on the map, walking in four directions and casting a spell. Change the hat, staff, beard, robe and the colour of the magic.",
+ "meta": {
+  "type": "character",
+  "role": "characters/player",
+  "themes": [
+   "fantasy"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "top-down-rpg"
+  ],
+  "view": "top-down",
+  "words": [
+   "mage",
+   "wizard",
+   "sorcerer",
+   "spellcaster",
+   "party member",
+   "staff",
+   "robe",
+   "beard",
+   "walk",
+   "cast",
+   "spell",
+   "magic",
+   "overworld",
+   "old"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  48,
+  48
+ ],
+ "pivot": [
+  24,
+  42
+ ],
+ "grounded": false,
+ "preview": "walk_down",
+ "params": {
+  "height": {
+   "kind": "range",
+   "label": "Height",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Short",
+   "hi": "Tall",
+   "group": "Look"
+  },
+  "build": {
+   "kind": "range",
+   "label": "Build",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slim",
+   "hi": "Stocky",
+   "group": "Look"
+  },
+  "length": {
+   "kind": "range",
+   "label": "Robe",
+   "def": 0.85,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Knee",
+   "hi": "Floor",
+   "group": "Look"
+  },
+  "headgear": {
+   "kind": "choice",
+   "label": "Headgear",
+   "def": "pointed",
+   "options": [
+    {
+     "value": "pointed",
+     "label": "Pointed"
+    },
+    {
+     "value": "wide",
+     "label": "Wide"
+    },
+    {
+     "value": "hood",
+     "label": "Hood"
+    },
+    {
+     "value": "none",
+     "label": "None"
+    }
+   ],
+   "group": "Look"
+  },
+  "headgearSize": {
+   "kind": "range",
+   "label": "Size",
+   "def": 1,
+   "min": 0.5,
+   "max": 1.8,
+   "step": 0.05,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "weapon": {
+   "kind": "choice",
+   "label": "Weapon",
+   "def": "staff",
+   "options": [
+    {
+     "value": "staff",
+     "label": "Staff"
+    },
+    {
+     "value": "wand",
+     "label": "Wand"
+    },
+    {
+     "value": "orb",
+     "label": "Orb"
+    },
+    {
+     "value": "none",
+     "label": "None"
+    }
+   ],
+   "group": "Look"
+  },
+  "weaponLength": {
+   "kind": "range",
+   "label": "Length",
+   "def": 1,
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "lo": "Short",
+   "hi": "Long",
+   "group": "Look"
+  },
+  "beard": {
+   "kind": "choice",
+   "label": "Beard",
+   "def": "long",
+   "options": [
+    {
+     "value": "long",
+     "label": "Long"
+    },
+    {
+     "value": "short",
+     "label": "Short"
+    },
+    {
+     "value": "none",
+     "label": "None"
+    }
+   ],
+   "group": "Look"
+  },
+  "beardLength": {
+   "kind": "range",
+   "label": "Length",
+   "def": 1,
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "lo": "Short",
+   "hi": "Long",
+   "group": "Look"
+  },
+  "skin": {
+   "kind": "color",
+   "label": "Skin",
+   "def": "#f6d3b0",
+   "swatches": [
+    "#f6d3b0",
+    "#e8b088",
+    "#c98a5c",
+    "#9a6240",
+    "#6e4428",
+    "#9bd18a",
+    "#b9a7e0"
+   ],
+   "group": "Colors"
+  },
+  "hair": {
+   "kind": "color",
+   "label": "Hair and beard",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#9a6a3e",
+    "#e6c96a",
+    "#c9423a",
+    "#5a3a22",
+    "#a8612a",
+    "#e0b040",
+    "#d8d8e0"
+   ],
+   "group": "Colors"
+  },
+  "outfit": {
+   "kind": "color",
+   "label": "Outfit",
+   "def": "#7a4fc4",
+   "swatches": [
+    "#7a4fc4",
+    "#3f6fd1",
+    "#2f8f9d",
+    "#c9423a",
+    "#8e3a4a",
+    "#4f9d57",
+    "#e08a2c",
+    "#e6c545"
+   ],
+   "group": "Colors"
+  },
+  "trim": {
+   "kind": "color",
+   "label": "Trim",
+   "def": "#f2c230",
+   "swatches": [
+    "#f2c230",
+    "#c9423a",
+    "#c8553a",
+    "#2f8f9d",
+    "#7a4fc4",
+    "#f0ead8",
+    "#e08a2c",
+    "#e6c545"
+   ],
+   "group": "Colors"
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Glow",
+   "def": "#4fd8ee",
+   "swatches": [
+    "#4fd8ee",
+    "#e8662c",
+    "#7aa0f4",
+    "#f4e06a",
+    "#7fe0a0",
+    "#7a4fc4"
+   ],
+   "group": "Colors"
+  },
+  "bounce": {
+   "kind": "range",
+   "label": "Bounce",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Calm",
+   "hi": "Bouncy",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle_down": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    7,
+    10
+   ]
+  },
+  "idle_up": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    7,
+    10
+   ]
+  },
+  "idle_side": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    7,
+    10
+   ]
+  },
+  "walk_down": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "walk_up": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "walk_side": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "cast": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  }
+ },
+ "sounds": {
+  "walk_down": [
+   {
+    "sound": "footstep-grass",
+    "frame": 0,
+    "preset": "Grass",
+    "volume": 0.45
+   },
+   {
+    "sound": "footstep-grass",
+    "frame": 4,
+    "preset": "Grass",
+    "volume": 0.45
+   }
+  ],
+  "walk_up": [
+   {
+    "sound": "footstep-grass",
+    "frame": 0,
+    "preset": "Grass",
+    "volume": 0.45
+   },
+   {
+    "sound": "footstep-grass",
+    "frame": 4,
+    "preset": "Grass",
+    "volume": 0.45
+   }
+  ],
+  "walk_side": [
+   {
+    "sound": "footstep-grass",
+    "frame": 0,
+    "preset": "Grass",
+    "volume": 0.45
+   },
+   {
+    "sound": "footstep-grass",
+    "frame": 4,
+    "preset": "Grass",
+    "volume": 0.45
+   }
+  ],
+  "cast": [
+   {
+    "sound": "magic-spell",
+    "frame": 2,
+    "preset": "Quick zap",
+    "volume": 0.8
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-rpg-fantasy"
+ ]
+}

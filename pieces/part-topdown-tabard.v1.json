@@ -1,0 +1,76 @@
+{
+ "format": "loadout-piece",
+ "version": 1,
+ "id": "part:topdown-tabard",
+ "v": 1,
+ "name": "Tabard",
+ "about": "A sleeveless panel of cloth over the chest and back: a tabard to the knee with a border, or a smock's bib to the hip; on the chest node (use z 40).",
+ "slots": [
+  {
+   "id": "cloth",
+   "label": "Tabard",
+   "default": "#3a6ea5",
+   "material": "cloth" },
+  {
+   "id": "trim",
+   "label": "Border",
+   "default": "#c9423a",
+   "material": "cloth" } ],
+ "args": {
+  "kind": {
+   "type": "word",
+   "options": ["tabard","smock"],
+   "default": "tabard" } },
+ "made": {
+  "by": "tools/bake-topdown-m7.mjs",
+  "from": "rigs/topdown.js" },
+ "body": {
+  "draw": [
+   {
+    "id": "tabard-down",
+    "kind": "stamp",
+    "at": [0,-3.5],
+    "rows": ["abbbbba","abbbbba","abbbbba","abbbbba","abbbbba","abbbbba","abbbbba","abbbbba","abbbbba","abbbbba","abbbbba","abbbbba","abbbbba","aaaaaaa"],
+    "key": {"a":"trim","b":"cloth"},
+    "z": 0,
+    "when": {"direction":["down"],"kind":["tabard"]} },
+   {
+    "id": "smock-down",
+    "kind": "stamp",
+    "at": [0,-3.5],
+    "rows": ["abbbbbb","abbbbbb","abbbbbb","abbbbbb","abbbbbb","abbbbbb","abbbbbb","abbbbbb","aaaaaaa"],
+    "key": {"a":"cloth.dark","b":"cloth"},
+    "z": 0,
+    "when": {"direction":["down"],"kind":["smock"]} },
+   {
+    "id": "tabard-up",
+    "kind": "stamp",
+    "at": [0,-3.5],
+    "rows": ["abbbbba","abbbbba","abbbbba","abbbbba","abbbbba","abbbbba","abbbbba","abbbbba","abbbbba","abbbbba","abbbbba","abbbbba","abbbbba","aaaaaaa"],
+    "key": {"a":"trim","b":"cloth"},
+    "z": 0,
+    "when": {"direction":["up"],"kind":["tabard"]} },
+   {
+    "id": "smock-up",
+    "kind": "stamp",
+    "at": [0,-3.5],
+    "rows": ["abbbbbb","abbbbbb","abbbbbb","abbbbbb","abbbbbb","abbbbbb","abbbbbb","abbbbbb","aaaaaaa"],
+    "key": {"a":"cloth.dark","b":"cloth"},
+    "z": 0,
+    "when": {"direction":["up"],"kind":["smock"]} },
+   {
+    "id": "tabard-side",
+    "kind": "stamp",
+    "at": [0,-3.5],
+    "rows": ["abbbbbbc","abbbbbbc","abbbbbbc","abbbbbbc","abbbbbbc","abbbbbbc","abbbbbbc","abbbbbbc","abbbbbbc","abbbbbbc","abbbbbbc","abbbbbbc","abbbbbbc","cccccccc"],
+    "key": {"a":"cloth.dark","b":"cloth","c":"trim"},
+    "z": 0,
+    "when": {"direction":["side"],"kind":["tabard"]} },
+   {
+    "id": "smock-side",
+    "kind": "stamp",
+    "at": [0,-3.5],
+    "rows": ["abbbbbbb","abbbbbbb","abbbbbbb","abbbbbbb","abbbbbbb","abbbbbbb","abbbbbbb","abbbbbbb","aaaaaaaa"],
+    "key": {"a":"cloth.dark","b":"cloth"},
+    "z": 0,
+    "when": {"direction":["side"],"kind":["smock"]} } ] } }

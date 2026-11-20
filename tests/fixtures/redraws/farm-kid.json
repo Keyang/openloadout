@@ -1,0 +1,437 @@
+{
+ "id": "farm-kid",
+ "frozen": "2026-11-20",
+ "source": "sprites/farm-kid.js",
+ "sha256": "0a8553eed47f5110e526b29819569d34bac3f0b93bdf95876ef84665ea0f1043",
+ "name": "Village child",
+ "blurb": "A small, bouncy village child who rocks on its heels and runs with both arms in the air. Change the height, head, hair, hat, what it carries and the colours.",
+ "meta": {
+  "type": "character",
+  "role": "characters/npc",
+  "themes": [
+   "fantasy",
+   "farm"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "top-down-rpg"
+  ],
+  "view": "top-down",
+  "words": [
+   "child",
+   "kid",
+   "villager",
+   "youngster",
+   "peasant",
+   "walk",
+   "run",
+   "play",
+   "basket",
+   "flower",
+   "townsfolk",
+   "cheerful"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  48,
+  48
+ ],
+ "pivot": [
+  24,
+  42
+ ],
+ "grounded": false,
+ "preview": "walk_down",
+ "params": {
+  "height": {
+   "kind": "range",
+   "label": "Height",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Short",
+   "hi": "Tall",
+   "group": "Look"
+  },
+  "head": {
+   "kind": "range",
+   "label": "Head",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "hairStyle": {
+   "kind": "choice",
+   "label": "Hair",
+   "def": "short",
+   "options": [
+    {
+     "value": "short",
+     "label": "Short"
+    },
+    {
+     "value": "bowl",
+     "label": "Bowl"
+    },
+    {
+     "value": "pigtails",
+     "label": "Pigtails"
+    },
+    {
+     "value": "spiky",
+     "label": "Spiky"
+    }
+   ],
+   "group": "Look",
+   "when": {
+    "headgear": [
+     "none",
+     "bow"
+    ]
+   }
+  },
+  "held": {
+   "kind": "choice",
+   "label": "Carries",
+   "def": "none",
+   "options": [
+    {
+     "value": "none",
+     "label": "None"
+    },
+    {
+     "value": "stick",
+     "label": "Stick"
+    },
+    {
+     "value": "basket",
+     "label": "Basket"
+    },
+    {
+     "value": "flower",
+     "label": "Flower"
+    }
+   ],
+   "group": "Look"
+  },
+  "heldSize": {
+   "kind": "range",
+   "label": "Size",
+   "def": 1,
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "headgear": {
+   "kind": "choice",
+   "label": "Headgear",
+   "def": "none",
+   "options": [
+    {
+     "value": "none",
+     "label": "None"
+    },
+    {
+     "value": "straw hat",
+     "label": "Straw hat"
+    },
+    {
+     "value": "cap",
+     "label": "Cap"
+    },
+    {
+     "value": "bow",
+     "label": "Bow"
+    }
+   ],
+   "group": "Look"
+  },
+  "headgearSize": {
+   "kind": "range",
+   "label": "Size",
+   "def": 1,
+   "min": 0.5,
+   "max": 1.8,
+   "step": 0.05,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "skin": {
+   "kind": "color",
+   "label": "Skin",
+   "def": "#f6d3b0",
+   "swatches": [
+    "#f6d3b0",
+    "#e8b088",
+    "#c98a5c",
+    "#9a6240",
+    "#6e4428",
+    "#9bd18a",
+    "#b9a7e0"
+   ],
+   "group": "Colors"
+  },
+  "hair": {
+   "kind": "color",
+   "label": "Hair",
+   "def": "#9a6a3e",
+   "swatches": [
+    "#9a6a3e",
+    "#e6c96a",
+    "#c9423a",
+    "#f0ead8",
+    "#5a3a22",
+    "#a8612a",
+    "#e0b040",
+    "#d8d8e0"
+   ],
+   "group": "Colors"
+  },
+  "outfit": {
+   "kind": "color",
+   "label": "Smock",
+   "def": "#e6c96a",
+   "swatches": [
+    "#e6c96a",
+    "#e08a2c",
+    "#7fbf5a",
+    "#c9a06a",
+    "#7aa0f4",
+    "#4fd8ee",
+    "#a8c8d8"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Collar, belt and shoes",
+   "def": "#c8553a",
+   "swatches": [
+    "#c8553a",
+    "#c9423a",
+    "#2f8f9d",
+    "#7a4fc4",
+    "#3f6fd1",
+    "#8e3a4a",
+    "#4f9d57"
+   ],
+   "group": "Colors"
+  },
+  "bounce": {
+   "kind": "range",
+   "label": "Bounce",
+   "def": 0.7,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Calm",
+   "hi": "Bouncy",
+   "group": "Motion"
+  },
+  "stride": {
+   "kind": "range",
+   "label": "Stride",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small steps",
+   "hi": "Big steps",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle_down": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    7,
+    10
+   ]
+  },
+  "idle_up": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    7,
+    10
+   ]
+  },
+  "idle_side": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    7,
+    10
+   ]
+  },
+  "walk_down": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "walk_up": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "walk_side": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "run_down": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    9,
+    15,
+    20
+   ]
+  },
+  "run_up": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    9,
+    15,
+    20
+   ]
+  },
+  "run_side": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    9,
+    15,
+    20
+   ]
+  }
+ },
+ "sounds": {
+  "walk_down": [
+   {
+    "sound": "footstep-grass",
+    "frame": 0,
+    "preset": "Grass",
+    "volume": 0.45
+   },
+   {
+    "sound": "footstep-grass",
+    "frame": 4,
+    "preset": "Grass",
+    "volume": 0.45
+   }
+  ],
+  "walk_up": [
+   {
+    "sound": "footstep-grass",
+    "frame": 0,
+    "preset": "Grass",
+    "volume": 0.45
+   },
+   {
+    "sound": "footstep-grass",
+    "frame": 4,
+    "preset": "Grass",
+    "volume": 0.45
+   }
+  ],
+  "walk_side": [
+   {
+    "sound": "footstep-grass",
+    "frame": 0,
+    "preset": "Grass",
+    "volume": 0.45
+   },
+   {
+    "sound": "footstep-grass",
+    "frame": 4,
+    "preset": "Grass",
+    "volume": 0.45
+   }
+  ],
+  "run_down": [
+   {
+    "sound": "footstep-grass",
+    "frame": 0,
+    "preset": "Grass",
+    "volume": 0.3
+   },
+   {
+    "sound": "footstep-grass",
+    "frame": 4,
+    "preset": "Grass",
+    "volume": 0.3
+   }
+  ],
+  "run_up": [
+   {
+    "sound": "footstep-grass",
+    "frame": 0,
+    "preset": "Grass",
+    "volume": 0.3
+   },
+   {
+    "sound": "footstep-grass",
+    "frame": 4,
+    "preset": "Grass",
+    "volume": 0.3
+   }
+  ],
+  "run_side": [
+   {
+    "sound": "footstep-grass",
+    "frame": 0,
+    "preset": "Grass",
+    "volume": 0.3
+   },
+   {
+    "sound": "footstep-grass",
+    "frame": 4,
+    "preset": "Grass",
+    "volume": 0.3
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-rpg-fantasy"
+ ]
+}

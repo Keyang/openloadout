@@ -1,0 +1,39 @@
+{
+ "format": "loadout-piece",
+ "version": 1,
+ "id": "part:topdown-spectacles",
+ "v": 1,
+ "name": "Spectacles",
+ "about": "Round spectacles: two rings across the nose facing down, one ring and its arm from the side, nothing from behind; on the head node (use z 50).",
+ "slots": [
+  {
+   "id": "wire",
+   "label": "Frame",
+   "default": "#3f5068",
+   "material": "metal" },
+  {
+   "id": "lens",
+   "label": "Glint",
+   "default": "#f0ead8",
+   "material": "light" } ],
+ "made": {
+  "by": "tools/bake-topdown-m7.mjs",
+  "from": "rigs/topdown.js" },
+ "body": {
+  "draw": [
+   {
+    "id": "spectacles-down",
+    "kind": "stamp",
+    "at": [-1,-5.5],
+    "rows": [".aa.....aa.","ab.aaaaa.ba","a..a...a..a",".aa.....aa."],
+    "key": {"a":"wire","b":"lens"},
+    "z": 8,
+    "when": {"direction":["down"]} },
+   {
+    "id": "spectacles-side",
+    "kind": "stamp",
+    "at": [-1,-2.5],
+    "rows": [".....aa.","aaaaa.ba","....a..a",".....aa."],
+    "key": {"a":"wire","b":"lens"},
+    "z": 8,
+    "when": {"direction":["side"]} } ] } }

@@ -1,0 +1,1612 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "merchant",
+ "name": "Merchant",
+ "blurb": "A tall, lean trader who stands at a stall, counts on his fingers and waves customers over. Change the pack, headgear, spectacles, what is held and the colours.",
+ "meta": {
+  "type": "character",
+  "role": "characters/npc",
+  "themes": [
+   "fantasy",
+   "farm"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "top-down-rpg"
+  ],
+  "view": "top-down",
+  "words": [
+   "merchant",
+   "trader",
+   "shopkeeper",
+   "vendor",
+   "seller",
+   "shop",
+   "stall",
+   "buy",
+   "sell",
+   "talk",
+   "wave",
+   "apron",
+   "backpack"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  48,
+  48
+ ],
+ "pivot": [
+  24,
+  42
+ ],
+ "grounded": false,
+ "preview": "idle_down",
+ "palette": [
+  {
+   "id": "skin",
+   "label": "Skin",
+   "default": "#f6d3b0",
+   "material": "skin",
+   "swatches": [
+    "#f6d3b0",
+    "#e8b088",
+    "#c98a5c",
+    "#9a6240",
+    "#6e4428",
+    "#9bd18a",
+    "#b9a7e0"
+   ]
+  },
+  {
+   "id": "hair",
+   "label": "Hair",
+   "default": "#9a6a3e",
+   "material": "plant",
+   "swatches": [
+    "#9a6a3e",
+    "#e6c96a",
+    "#c9423a",
+    "#f0ead8",
+    "#5a3a22",
+    "#a8612a",
+    "#e0b040",
+    "#d8d8e0"
+   ]
+  },
+  {
+   "id": "outfit",
+   "label": "Outfit",
+   "default": "#e6c96a",
+   "material": "cloth",
+   "swatches": [
+    "#e6c96a",
+    "#3f6fd1",
+    "#7a4fc4",
+    "#2f8f9d",
+    "#c9423a",
+    "#8e3a4a",
+    "#4f9d57",
+    "#e08a2c"
+   ]
+  },
+  {
+   "id": "accent",
+   "label": "Apron",
+   "default": "#c8553a",
+   "material": "cloth",
+   "swatches": [
+    "#c8553a",
+    "#f2c230",
+    "#c9423a",
+    "#f0ead8",
+    "#7fe0a0",
+    "#4fd8ee"
+   ]
+  },
+  {
+   "id": "bottom",
+   "derive": {
+    "rule": "tone",
+    "of": "outfit",
+    "by": -0.6
+   },
+   "material": "cloth"
+  },
+  {
+   "id": "wood",
+   "default": "#9a6a3e",
+   "material": "wood",
+   "detail": true
+  },
+  {
+   "id": "canvas",
+   "default": "#c9a06a",
+   "material": "cloth",
+   "detail": true
+  },
+  {
+   "id": "sackcloth",
+   "default": "#f0ead8",
+   "material": "cloth",
+   "detail": true
+  },
+  {
+   "id": "rug",
+   "default": "#2f8f9d",
+   "material": "cloth",
+   "detail": true
+  },
+  {
+   "id": "lamp",
+   "default": "#f4e06a",
+   "material": "light",
+   "detail": true
+  },
+  {
+   "id": "gold",
+   "default": "#f2c230",
+   "material": "metal",
+   "detail": true
+  },
+  {
+   "id": "wire",
+   "default": "#5a5f7a",
+   "material": "metal",
+   "detail": true
+  }
+ ],
+ "body": {
+  "rig": {
+   "extends": {
+    "use": "base:person-topdown-merchant",
+    "v": 2,
+    "paint": {
+     "top": "outfit",
+     "bottom": "bottom",
+     "boots": "wood",
+     "topFar": "outfit.dark",
+     "bottomFar": "bottom.dark"
+    },
+    "clips": []
+   },
+   "shapes": [
+    {
+     "id": "cuffB-down",
+     "kind": "stamp",
+     "on": "fistB",
+     "at": [
+      -1,
+      0
+     ],
+     "rows": [
+      "ccc"
+     ],
+     "key": {
+      "c": "accent"
+     },
+     "z": 60.5,
+     "when": {
+      "direction": [
+       "down"
+      ]
+     }
+    },
+    {
+     "id": "cuffF-down",
+     "kind": "stamp",
+     "on": "fistF",
+     "at": [
+      -1,
+      0
+     ],
+     "rows": [
+      "ccc"
+     ],
+     "key": {
+      "c": "accent"
+     },
+     "z": 62.5,
+     "when": {
+      "direction": [
+       "down"
+      ]
+     }
+    },
+    {
+     "id": "cuffB-up",
+     "kind": "stamp",
+     "on": "fistB",
+     "at": [
+      -1,
+      0
+     ],
+     "rows": [
+      "ccc"
+     ],
+     "key": {
+      "c": "accent"
+     },
+     "z": 32.5,
+     "when": {
+      "direction": [
+       "up"
+      ]
+     }
+    },
+    {
+     "id": "cuffF-up",
+     "kind": "stamp",
+     "on": "fistF",
+     "at": [
+      -1,
+      0
+     ],
+     "rows": [
+      "ccc"
+     ],
+     "key": {
+      "c": "accent"
+     },
+     "z": 35.5,
+     "when": {
+      "direction": [
+       "up"
+      ]
+     }
+    },
+    {
+     "id": "cuffB-side",
+     "kind": "stamp",
+     "on": "fistB",
+     "at": [
+      -1,
+      0
+     ],
+     "rows": [
+      "ccc"
+     ],
+     "key": {
+      "c": "accent.dark"
+     },
+     "z": 6.5,
+     "when": {
+      "direction": [
+       "side"
+      ]
+     }
+    },
+    {
+     "id": "cuffF-side",
+     "kind": "stamp",
+     "on": "fistF",
+     "at": [
+      -1,
+      0
+     ],
+     "rows": [
+      "ccc"
+     ],
+     "key": {
+      "c": "accent"
+     },
+     "z": 72.5,
+     "when": {
+      "direction": [
+       "side"
+      ]
+     }
+    },
+    {
+     "id": "neck",
+     "kind": "use",
+     "use": "part:topdown-neck",
+     "v": 1,
+     "on": "chest",
+     "z": 40,
+     "paint": {
+      "skin": "skin"
+     }
+    },
+    {
+     "id": "apron",
+     "kind": "use",
+     "use": "part:topdown-apron",
+     "v": 1,
+     "on": "chest",
+     "z": 41,
+     "paint": {
+      "cloth": "accent"
+     }
+    },
+    {
+     "id": "pack",
+     "kind": "use",
+     "use": "part:topdown-travel-pack",
+     "v": 1,
+     "on": "chest",
+     "z": 0,
+     "paint": {
+      "cloth": "canvas",
+      "wood": "wood",
+      "rug": "rug",
+      "light": "lamp",
+      "strap": "wood"
+     },
+     "args": {
+      "kind": {
+       "from": "pack",
+       "pick": {
+        "backpack": "backpack",
+        "crate": "crate",
+        "sack": "sack",
+        "none": "backpack"
+       }
+      },
+      "size": {
+       "from": "packSize",
+       "map": [
+        [
+         0.65,
+         0.65
+        ],
+        [
+         1.35,
+         1.35
+        ]
+       ]
+      }
+     },
+     "when": {
+      "pack": [
+       "backpack",
+       "crate"
+      ]
+     }
+    },
+    {
+     "id": "sack",
+     "kind": "use",
+     "use": "part:topdown-travel-pack",
+     "v": 1,
+     "on": "chest",
+     "z": 0,
+     "paint": {
+      "cloth": "sackcloth",
+      "wood": "wood",
+      "rug": "rug",
+      "light": "lamp",
+      "strap": "wood"
+     },
+     "args": {
+      "kind": {
+       "from": "pack",
+       "pick": {
+        "backpack": "backpack",
+        "crate": "crate",
+        "sack": "sack",
+        "none": "backpack"
+       }
+      },
+      "size": {
+       "from": "packSize",
+       "map": [
+        [
+         0.65,
+         0.65
+        ],
+        [
+         1.35,
+         1.35
+        ]
+       ]
+      }
+     },
+     "when": {
+      "pack": [
+       "sack"
+      ]
+     }
+    },
+    {
+     "id": "hair",
+     "kind": "use",
+     "use": "part:topdown-hair",
+     "v": 1,
+     "on": "head",
+     "z": 50,
+     "paint": {
+      "hair": "hair"
+     },
+     "args": {
+      "style": "ponytail",
+      "hatted": {
+       "from": "headgear",
+       "pick": {
+        "turban": true,
+        "cap": true,
+        "straw hat": true,
+        "none": false
+       }
+      }
+     }
+    },
+    {
+     "id": "turban",
+     "kind": "use",
+     "use": "part:topdown-turban",
+     "v": 1,
+     "on": "head",
+     "z": 50,
+     "paint": {
+      "cloth": "accent",
+      "jewel": "gold"
+     },
+     "args": {
+      "size": {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.5,
+         0.5
+        ],
+        [
+         1.6,
+         1.6
+        ],
+        [
+         1.8,
+         1.6
+        ]
+       ]
+      }
+     },
+     "when": {
+      "headgear": [
+       "turban"
+      ]
+     }
+    },
+    {
+     "id": "cap",
+     "kind": "use",
+     "use": "part:topdown-cap-peaked",
+     "v": 1,
+     "on": "head",
+     "z": 50,
+     "paint": {
+      "cloth": "accent"
+     },
+     "args": {
+      "size": {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.5,
+         0.5
+        ],
+        [
+         1.6,
+         1.6
+        ],
+        [
+         1.8,
+         1.6
+        ]
+       ]
+      }
+     },
+     "when": {
+      "headgear": [
+       "cap"
+      ]
+     }
+    },
+    {
+     "id": "strawHat",
+     "kind": "use",
+     "use": "part:topdown-straw-hat",
+     "v": 1,
+     "on": "head",
+     "z": 50,
+     "paint": {
+      "cloth": "lamp",
+      "band": "accent"
+     },
+     "args": {
+      "size": {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.5,
+         0.5
+        ],
+        [
+         1.6,
+         1.6
+        ],
+        [
+         1.8,
+         1.6
+        ]
+       ]
+      }
+     },
+     "when": {
+      "headgear": [
+       "straw hat"
+      ]
+     }
+    },
+    {
+     "id": "spectacles",
+     "kind": "use",
+     "use": "part:topdown-spectacles",
+     "v": 1,
+     "on": "head",
+     "z": 50,
+     "paint": {
+      "wire": "wire",
+      "lens": "sackcloth"
+     },
+     "when": {
+      "spectacles": [
+       true
+      ]
+     }
+    },
+    {
+     "id": "goods",
+     "kind": "use",
+     "use": "held:topdown-trade-goods",
+     "v": 1,
+     "on": "cuffF",
+     "z": 60,
+     "paint": {
+      "metal": "gold",
+      "leather": "wood",
+      "coins": "gold"
+     },
+     "args": {
+      "kind": {
+       "from": "held",
+       "pick": {
+        "coin purse": "purse",
+        "scale": "scale",
+        "none": "purse"
+       }
+      },
+      "length": {
+       "from": "heldSize",
+       "map": [
+        [
+         0.65,
+         0.65
+        ],
+        [
+         1.35,
+         1.35
+        ]
+       ]
+      }
+     },
+     "when": {
+      "held": [
+       "coin purse",
+       "scale"
+      ]
+     }
+    },
+    {
+     "id": "talk-hand-0",
+     "kind": "stamp",
+     "on": "root",
+     "at": [
+      -20,
+      6.5
+     ],
+     "rows": [
+      "a",
+      "a"
+     ],
+     "key": {
+      "a": "skin"
+     },
+     "z": 80,
+     "hidden": true
+    },
+    {
+     "id": "talk-hand-1",
+     "kind": "stamp",
+     "on": "root",
+     "at": [
+      -19,
+      6.5
+     ],
+     "rows": [
+      "a",
+      "a"
+     ],
+     "key": {
+      "a": "skin"
+     },
+     "z": 80,
+     "hidden": true
+    },
+    {
+     "id": "talk-hand-2",
+     "kind": "stamp",
+     "on": "root",
+     "at": [
+      -21,
+      6.5
+     ],
+     "rows": [
+      "a.a",
+      "a.a"
+     ],
+     "key": {
+      "a": "skin"
+     },
+     "z": 80,
+     "hidden": true
+    },
+    {
+     "id": "talk-hand-3",
+     "kind": "stamp",
+     "on": "root",
+     "at": [
+      -19,
+      6.5
+     ],
+     "rows": [
+      "a.a",
+      "a.a"
+     ],
+     "key": {
+      "a": "skin"
+     },
+     "z": 80,
+     "hidden": true
+    },
+    {
+     "id": "talk-hand-4",
+     "kind": "stamp",
+     "on": "root",
+     "at": [
+      -20,
+      6.5
+     ],
+     "rows": [
+      "a.a.a",
+      "a.a.a"
+     ],
+     "key": {
+      "a": "skin"
+     },
+     "z": 80,
+     "hidden": true
+    },
+    {
+     "id": "talk-hand-5",
+     "kind": "stamp",
+     "on": "root",
+     "at": [
+      -19,
+      6.5
+     ],
+     "rows": [
+      "a.a.a",
+      "a.a.a"
+     ],
+     "key": {
+      "a": "skin"
+     },
+     "z": 80,
+     "hidden": true
+    },
+    {
+     "id": "wave-hand-1",
+     "kind": "stamp",
+     "on": "root",
+     "at": [
+      -22,
+      6.5
+     ],
+     "rows": [
+      "..aaa",
+      "..aaa",
+      "..aaa",
+      "..bbb",
+      ".cddd",
+      ".ddd.",
+      "cddd.",
+      "cdd..",
+      "ccc.."
+     ],
+     "key": {
+      "a": "skin",
+      "b": "accent",
+      "c": "outfit.dark",
+      "d": "outfit"
+     },
+     "z": 80,
+     "hidden": true
+    },
+    {
+     "id": "wave-hand-2",
+     "kind": "stamp",
+     "on": "root",
+     "at": [
+      -27,
+      9.5
+     ],
+     "rows": [
+      "...aaa",
+      "...aaa",
+      "...aaa",
+      "...bbb",
+      "..cddd",
+      "..ddd.",
+      "dddd..",
+      "cddd..",
+      "cdd...",
+      "ccc..."
+     ],
+     "key": {
+      "a": "skin",
+      "b": "accent",
+      "c": "outfit.dark",
+      "d": "outfit"
+     },
+     "z": 80,
+     "hidden": true
+    },
+    {
+     "id": "wave-hand-3",
+     "kind": "stamp",
+     "on": "root",
+     "at": [
+      -28,
+      9.5
+     ],
+     "rows": [
+      "aaa.",
+      "aaa.",
+      "aaa.",
+      "bbb.",
+      "cdd.",
+      "cdd.",
+      "ccdd",
+      ".cdd",
+      ".cdd",
+      ".cdd",
+      ".ccc"
+     ],
+     "key": {
+      "a": "skin",
+      "b": "accent",
+      "c": "outfit.dark",
+      "d": "outfit"
+     },
+     "z": 80,
+     "hidden": true
+    },
+    {
+     "id": "wave-hand-4",
+     "kind": "stamp",
+     "on": "root",
+     "at": [
+      -27,
+      10.5
+     ],
+     "rows": [
+      "..aaa",
+      "..aaa",
+      "..aaa",
+      "..bbb",
+      ".cddd",
+      ".cdd.",
+      "dddd.",
+      "cddd.",
+      "cdd..",
+      "ccc.."
+     ],
+     "key": {
+      "a": "skin",
+      "b": "accent",
+      "c": "outfit.dark",
+      "d": "outfit"
+     },
+     "z": 80,
+     "hidden": true
+    },
+    {
+     "id": "wave-hand-5",
+     "kind": "stamp",
+     "on": "root",
+     "at": [
+      -28,
+      9.5
+     ],
+     "rows": [
+      "aaa",
+      "aaa",
+      "aaa",
+      "bbb",
+      "cdd",
+      "cdd",
+      "cdd",
+      "cdd",
+      "cdd",
+      "cdd",
+      "ccc"
+     ],
+     "key": {
+      "a": "skin",
+      "b": "accent",
+      "c": "outfit.dark",
+      "d": "outfit"
+     },
+     "z": 80,
+     "hidden": true
+    },
+    {
+     "id": "wave-hand-6",
+     "kind": "stamp",
+     "on": "root",
+     "at": [
+      -22,
+      6.5
+     ],
+     "rows": [
+      "..aaa",
+      "..aaa",
+      "..aaa",
+      "..bbb",
+      ".cddd",
+      ".ddd.",
+      "cddd.",
+      "cdd..",
+      "ccc.."
+     ],
+     "key": {
+      "a": "skin",
+      "b": "accent",
+      "c": "outfit.dark",
+      "d": "outfit"
+     },
+     "z": 80,
+     "hidden": true
+    }
+   ]
+  }
+ },
+ "controls": [
+  {
+   "key": "height",
+   "kind": "range",
+   "label": "Height",
+   "lo": "Short",
+   "hi": "Tall",
+   "default": 0.5,
+   "scales": {
+    "bones": [
+     "hip",
+     "spine",
+     "thiF",
+     "thiB",
+     "shnF",
+     "shnB",
+     "legF",
+     "legB",
+     "legIF",
+     "legIB"
+    ],
+    "by": [
+     0.9,
+     1.08
+    ]
+   }
+  },
+  {
+   "key": "build",
+   "kind": "range",
+   "label": "Build",
+   "lo": "Slim",
+   "hi": "Stocky",
+   "default": 0.3,
+   "scales": {
+    "bones": [
+     "shoulderF",
+     "shoulderB"
+    ],
+    "by": [
+     0.6,
+     1.3
+    ]
+   }
+  },
+  {
+   "key": "spectacles",
+   "kind": "toggle",
+   "label": "Spectacles",
+   "default": true
+  },
+  {
+   "key": "pack",
+   "kind": "choice",
+   "label": "Pack",
+   "options": [
+    "backpack",
+    "crate",
+    "sack",
+    "none"
+   ],
+   "default": "backpack"
+  },
+  {
+   "key": "packSize",
+   "kind": "range",
+   "label": "Size",
+   "lo": "Small",
+   "hi": "Big",
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "default": 1
+  },
+  {
+   "key": "headgear",
+   "kind": "choice",
+   "label": "Headgear",
+   "options": [
+    "turban",
+    "cap",
+    "straw hat",
+    "none"
+   ],
+   "default": "turban"
+  },
+  {
+   "key": "headgearSize",
+   "kind": "range",
+   "label": "Size",
+   "lo": "Small",
+   "hi": "Big",
+   "min": 0.5,
+   "max": 1.8,
+   "step": 0.05,
+   "default": 1
+  },
+  {
+   "key": "held",
+   "kind": "choice",
+   "label": "Held",
+   "options": [
+    "none",
+    "coin purse",
+    "scale"
+   ],
+   "default": "none"
+  },
+  {
+   "key": "heldSize",
+   "kind": "range",
+   "label": "Size",
+   "lo": "Small",
+   "hi": "Big",
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "default": 1
+  },
+  {
+   "key": "skin",
+   "kind": "colour",
+   "label": "Skin"
+  },
+  {
+   "key": "hair",
+   "kind": "colour",
+   "label": "Hair"
+  },
+  {
+   "key": "outfit",
+   "kind": "colour",
+   "label": "Outfit"
+  },
+  {
+   "key": "accent",
+   "kind": "colour",
+   "label": "Apron"
+  },
+  {
+   "key": "bounce",
+   "kind": "range",
+   "label": "Bounce",
+   "lo": "Calm",
+   "hi": "Bouncy",
+   "default": 0.5,
+   "group": "Motion"
+  },
+  {
+   "key": "speed",
+   "standard": "speed"
+  }
+ ],
+ "parts": {
+  "pack": {
+   "label": "Pack",
+   "params": [
+    "pack",
+    "packSize"
+   ],
+   "none": "none",
+   "socket": "back",
+   "shapes": [
+    "pack",
+    "sack"
+   ]
+  },
+  "headgear": {
+   "label": "Headgear",
+   "params": [
+    "headgear",
+    "headgearSize"
+   ],
+   "none": "none",
+   "socket": "head",
+   "shapes": [
+    "turban",
+    "cap",
+    "strawHat"
+   ]
+  },
+  "held": {
+   "label": "Held",
+   "params": [
+    "held",
+    "heldSize"
+   ],
+   "none": "none",
+   "socket": "hand",
+   "shapes": [
+    "goods"
+   ]
+  }
+ },
+ "clips": {
+  "idle_down": {
+   "from": {
+    "from": "held",
+    "pick": {
+     "none": "idle-bare-down",
+     "coin purse": "idle-held-down",
+     "scale": "idle-held-down"
+    }
+   },
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "idle_up": {
+   "from": {
+    "from": "held",
+    "pick": {
+     "none": "idle-bare-up",
+     "coin purse": "idle-held-up",
+     "scale": "idle-held-up"
+    }
+   },
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "idle_side": {
+   "from": {
+    "from": "held",
+    "pick": {
+     "none": "idle-bare-side",
+     "coin purse": "idle-held-side",
+     "scale": "idle-held-side"
+    }
+   },
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.shnF",
+      "bones.toeF",
+      "bones.thiB",
+      "bones.shnB",
+      "bones.toeB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "first",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "talk": {
+   "from": {
+    "from": "held",
+    "pick": {
+     "none": "talk-bare",
+     "coin purse": "talk-held",
+     "scale": "talk-held"
+    }
+   },
+   "frameEdits": {
+    "0": {
+     "show": [
+      "talk-hand-0"
+     ]
+    },
+    "1": {
+     "show": [
+      "talk-hand-1"
+     ]
+    },
+    "2": {
+     "show": [
+      "talk-hand-2"
+     ]
+    },
+    "3": {
+     "show": [
+      "talk-hand-3"
+     ]
+    },
+    "4": {
+     "show": [
+      "talk-hand-4"
+     ]
+    },
+    "5": {
+     "show": [
+      "talk-hand-5"
+     ]
+    }
+   },
+   "travel": [
+    {
+     "tracks": [
+      "stretch.elbF",
+      "stretch.wriF"
+     ],
+     "about": 0,
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        1.05
+       ],
+       [
+        1,
+        1.05
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.armF",
+      "bones.rimAF"
+     ],
+     "about": 0,
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        0.9
+       ],
+       [
+        1,
+        0.9
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.cuffF"
+     ],
+     "about": 0,
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        0.6
+       ],
+       [
+        1,
+        0.6
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "wave": {
+   "from": {
+    "from": "held",
+    "pick": {
+     "none": "wave-bare",
+     "coin purse": "wave-held",
+     "scale": "wave-held"
+    }
+   },
+   "frameEdits": {
+    "1": {
+     "show": [
+      "wave-hand-1"
+     ]
+    },
+    "2": {
+     "show": [
+      "wave-hand-2"
+     ]
+    },
+    "3": {
+     "show": [
+      "wave-hand-3"
+     ]
+    },
+    "4": {
+     "show": [
+      "wave-hand-4"
+     ]
+    },
+    "5": {
+     "show": [
+      "wave-hand-5"
+     ]
+    },
+    "6": {
+     "show": [
+      "wave-hand-6"
+     ]
+    }
+   },
+   "travel": [
+    {
+     "tracks": [
+      "stretch.elbF",
+      "stretch.wriF"
+     ],
+     "about": 0,
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        1.05
+       ],
+       [
+        1,
+        1.05
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.armF",
+      "bones.rimAF"
+     ],
+     "about": 0,
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        0.9
+       ],
+       [
+        1,
+        0.9
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.cuffF"
+     ],
+     "about": 0,
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        0.6
+       ],
+       [
+        1,
+        0.6
+       ]
+      ]
+     }
+    }
+   ]
+  }
+ },
+ "made": {
+  "in": "library",
+  "from": "code:merchant",
+  "by": "migration batch M7 (/sprite-forge redraw)"
+ }
+}

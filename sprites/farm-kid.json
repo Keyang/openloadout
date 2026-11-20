@@ -1,0 +1,2635 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "farm-kid",
+ "name": "Village child",
+ "blurb": "A small, bouncy village child who rocks on its heels and runs with both arms in the air. Change the height, head, hair, hat, what it carries and the colours.",
+ "meta": {
+  "type": "character",
+  "role": "characters/npc",
+  "themes": [
+   "fantasy",
+   "farm"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "top-down-rpg"
+  ],
+  "view": "top-down",
+  "words": [
+   "child",
+   "kid",
+   "villager",
+   "youngster",
+   "peasant",
+   "walk",
+   "run",
+   "play",
+   "basket",
+   "flower",
+   "townsfolk",
+   "cheerful"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  48,
+  48
+ ],
+ "pivot": [
+  24,
+  42
+ ],
+ "grounded": false,
+ "preview": "walk_down",
+ "palette": [
+  {
+   "id": "skin",
+   "label": "Skin",
+   "default": "#f6d3b0",
+   "material": "skin",
+   "swatches": [
+    "#f6d3b0",
+    "#e8b088",
+    "#c98a5c",
+    "#9a6240",
+    "#6e4428",
+    "#9bd18a",
+    "#b9a7e0"
+   ]
+  },
+  {
+   "id": "hair",
+   "label": "Hair",
+   "default": "#9a6a3e",
+   "material": "plant",
+   "swatches": [
+    "#9a6a3e",
+    "#e6c96a",
+    "#c9423a",
+    "#f0ead8",
+    "#5a3a22",
+    "#a8612a",
+    "#e0b040",
+    "#d8d8e0"
+   ]
+  },
+  {
+   "id": "outfit",
+   "label": "Smock",
+   "default": "#e6c96a",
+   "material": "cloth",
+   "swatches": [
+    "#e6c96a",
+    "#e08a2c",
+    "#7fbf5a",
+    "#c9a06a",
+    "#7aa0f4",
+    "#4fd8ee",
+    "#a8c8d8"
+   ]
+  },
+  {
+   "id": "accent",
+   "label": "Collar, belt and shoes",
+   "default": "#c8553a",
+   "material": "cloth",
+   "swatches": [
+    "#c8553a",
+    "#c9423a",
+    "#2f8f9d",
+    "#7a4fc4",
+    "#3f6fd1",
+    "#8e3a4a",
+    "#4f9d57"
+   ]
+  },
+  {
+   "id": "wood",
+   "default": "#9a6a3e",
+   "material": "wood",
+   "detail": true
+  },
+  {
+   "id": "wicker",
+   "default": "#c9a06a",
+   "material": "wood",
+   "detail": true
+  },
+  {
+   "id": "straw",
+   "default": "#e6c96a",
+   "material": "plant",
+   "detail": true
+  },
+  {
+   "id": "apple",
+   "default": "#c9423a",
+   "material": "plant",
+   "detail": true
+  },
+  {
+   "id": "leaf",
+   "default": "#4f9d57",
+   "material": "plant",
+   "detail": true
+  },
+  {
+   "id": "petal",
+   "default": "#f0ead8",
+   "material": "plant",
+   "detail": true
+  },
+  {
+   "id": "gold",
+   "default": "#f2c230",
+   "material": "metal",
+   "detail": true
+  }
+ ],
+ "body": {
+  "rig": {
+   "extends": {
+    "use": "base:person-topdown-child",
+    "v": 2,
+    "paint": {
+     "top": "skin",
+     "bottom": "skin",
+     "boots": "accent",
+     "topFar": "skin.dark",
+     "bottomFar": "skin.dark"
+    },
+    "clips": [],
+    "drop": [
+     "skull"
+    ]
+   },
+   "shapes": [
+    {
+     "id": "skull11x10",
+     "kind": "stamp",
+     "on": "headTop",
+     "at": [
+      -5,
+      -5.5
+     ],
+     "rows": [
+      "..aaaaaaa..",
+      ".caaaaaaaa.",
+      ".aaaaaaaaa.",
+      "caaaaaaaaaa",
+      "caaaaaaaaaa",
+      "caaaaaaaaaa",
+      "ccaaaaaaaaa",
+      ".caaaaaaaa.",
+      ".ccaaaaaaa.",
+      "..ccccccc.."
+     ],
+     "key": {
+      "a": "skin",
+      "c": "skin.dark"
+     },
+     "z": 50,
+     "when": {
+      "head": [
+       {
+        "below": 0.125
+       }
+      ]
+     }
+    },
+    {
+     "id": "skull11x11",
+     "kind": "stamp",
+     "on": "headTop",
+     "at": [
+      -5,
+      -5.5
+     ],
+     "rows": [
+      "..aaaaaaa..",
+      ".aaaaaaaaa.",
+      "caaaaaaaaaa",
+      "caaaaaaaaaa",
+      "caaaaaaaaaa",
+      "caaaaaaaaaa",
+      "caaaaaaaaaa",
+      "ccaaaaaaaaa",
+      ".ccaaaaaaa.",
+      "..ccccccc.."
+     ],
+     "key": {
+      "a": "skin",
+      "c": "skin.dark"
+     },
+     "z": 50,
+     "when": {
+      "head": [
+       {
+        "atLeast": 0.125,
+        "below": 0.2
+       }
+      ]
+     }
+    },
+    {
+     "id": "skull13x11",
+     "kind": "stamp",
+     "on": "headTop",
+     "at": [
+      -5,
+      -6.5
+     ],
+     "rows": [
+      "..aaaaaaaaa..",
+      ".aaaaaaaaaaa.",
+      "caaaaaaaaaaaa",
+      "caaaaaaaaaaaa",
+      "caaaaaaaaaaaa",
+      "caaaaaaaaaaaa",
+      "caaaaaaaaaaaa",
+      "ccaaaaaaaaaaa",
+      ".ccaaaaaaaaa.",
+      "..ccccccccc.."
+     ],
+     "key": {
+      "a": "skin",
+      "c": "skin.dark"
+     },
+     "z": 50,
+     "when": {
+      "head": [
+       {
+        "atLeast": 0.2,
+        "below": 0.375
+       }
+      ]
+     }
+    },
+    {
+     "id": "skull13x12",
+     "kind": "stamp",
+     "on": "headTop",
+     "at": [
+      -6,
+      -6.5
+     ],
+     "rows": [
+      "...aaaaaaa...",
+      "..aaaaaaaaa..",
+      ".aaaaaaaaaaa.",
+      "caaaaaaaaaaaa",
+      "caaaaaaaaaaaa",
+      "caaaaaaaaaaaa",
+      "caaaaaaaaaaaa",
+      "caaaaaaaaaaaa",
+      "ccaaaaaaaaaaa",
+      ".ccaaaaaaaaa.",
+      "..ccaaaaaaa..",
+      "...ccccccc..."
+     ],
+     "key": {
+      "a": "skin",
+      "c": "skin.dark"
+     },
+     "z": 50,
+     "when": {
+      "head": [
+       {
+        "atLeast": 0.375,
+        "below": 0.625
+       }
+      ]
+     }
+    },
+    {
+     "id": "skull13x13",
+     "kind": "stamp",
+     "on": "headTop",
+     "at": [
+      -6,
+      -6.5
+     ],
+     "rows": [
+      "..aaaaaaaaa..",
+      ".caaaaaaaaaa.",
+      ".aaaaaaaaaaa.",
+      "caaaaaaaaaaaa",
+      "caaaaaaaaaaaa",
+      "caaaaaaaaaaaa",
+      "caaaaaaaaaaaa",
+      "caaaaaaaaaaaa",
+      "ccaaaaaaaaaaa",
+      ".caaaaaaaaaa.",
+      ".ccaaaaaaaaa.",
+      "..ccccccccc.."
+     ],
+     "key": {
+      "a": "skin",
+      "c": "skin.dark"
+     },
+     "z": 50,
+     "when": {
+      "head": [
+       {
+        "atLeast": 0.625
+       }
+      ]
+     }
+    },
+    {
+     "id": "smock-down",
+     "kind": "stamp",
+     "at": [
+      0,
+      -2.5
+     ],
+     "rows": [
+      "abbbb",
+      "abbbb",
+      "abbbb",
+      "abbbb",
+      "abbbb",
+      "aaaaa"
+     ],
+     "key": {
+      "a": "outfit.dark",
+      "b": "outfit"
+     },
+     "z": 40,
+     "when": {
+      "direction": [
+       "down"
+      ]
+     },
+     "on": "chest"
+    },
+    {
+     "id": "skirt-down",
+     "kind": "stamp",
+     "at": [
+      -1,
+      -5.5
+     ],
+     "rows": [
+      ".abbbbbbbb.",
+      ".bbbbbbbbb.",
+      "abbbbbbbbbb",
+      "abbbbbbbbbb",
+      "aaaaaaaaaaa"
+     ],
+     "key": {
+      "a": "outfit.dark",
+      "b": "outfit"
+     },
+     "z": 40,
+     "when": {
+      "direction": [
+       "down"
+      ]
+     },
+     "on": "waist"
+    },
+    {
+     "id": "belt-down",
+     "kind": "stamp",
+     "at": [
+      -1,
+      -3.5
+     ],
+     "rows": [
+      "aaaaaaa"
+     ],
+     "key": {
+      "a": "accent"
+     },
+     "z": 41,
+     "when": {
+      "direction": [
+       "down"
+      ]
+     },
+     "on": "waist"
+    },
+    {
+     "id": "collar-down",
+     "kind": "stamp",
+     "at": [
+      0,
+      -3.5
+     ],
+     "rows": [
+      "aaaaaaa",
+      "aaaaaaa",
+      ".bbbbb."
+     ],
+     "key": {
+      "a": "accent",
+      "b": "accent.dark"
+     },
+     "z": 46,
+     "when": {
+      "direction": [
+       "down"
+      ]
+     },
+     "on": "chest"
+    },
+    {
+     "id": "smock-up",
+     "kind": "stamp",
+     "at": [
+      0,
+      -2.5
+     ],
+     "rows": [
+      "abbbb",
+      "abbbb",
+      "abbbb",
+      "abbbb",
+      "abbbb",
+      "aaaaa"
+     ],
+     "key": {
+      "a": "outfit.dark",
+      "b": "outfit"
+     },
+     "z": 40,
+     "when": {
+      "direction": [
+       "up"
+      ]
+     },
+     "on": "chest"
+    },
+    {
+     "id": "skirt-up",
+     "kind": "stamp",
+     "at": [
+      -1,
+      -5.5
+     ],
+     "rows": [
+      ".abbbbbbbb.",
+      ".bbbbbbbbb.",
+      "abbbbbbbbbb",
+      "abbbbbbbbbb",
+      "aaaaaaaaaaa"
+     ],
+     "key": {
+      "a": "outfit.dark",
+      "b": "outfit"
+     },
+     "z": 40,
+     "when": {
+      "direction": [
+       "up"
+      ]
+     },
+     "on": "waist"
+    },
+    {
+     "id": "belt-up",
+     "kind": "stamp",
+     "at": [
+      -1,
+      -3.5
+     ],
+     "rows": [
+      "aaaaaaa"
+     ],
+     "key": {
+      "a": "accent"
+     },
+     "z": 41,
+     "when": {
+      "direction": [
+       "up"
+      ]
+     },
+     "on": "waist"
+    },
+    {
+     "id": "smock-side",
+     "kind": "stamp",
+     "at": [
+      0,
+      -3.5
+     ],
+     "rows": [
+      "abbbbbb",
+      "abbbbbb",
+      "abbbbbb",
+      "abbbbbb",
+      "abbbbbb",
+      "aaaaaaa"
+     ],
+     "key": {
+      "a": "outfit.dark",
+      "b": "outfit"
+     },
+     "z": 40,
+     "when": {
+      "direction": [
+       "side"
+      ]
+     },
+     "on": "chest"
+    },
+    {
+     "id": "skirt-side",
+     "kind": "stamp",
+     "at": [
+      -1,
+      -5.5
+     ],
+     "rows": [
+      ".abbbbbbbb.",
+      ".abbbbbbbb.",
+      ".bbbbbbbbb.",
+      "abbbbbbbbbb",
+      "aaaaaaaaaaa"
+     ],
+     "key": {
+      "a": "outfit.dark",
+      "b": "outfit"
+     },
+     "z": 40,
+     "when": {
+      "direction": [
+       "side"
+      ]
+     },
+     "on": "waist"
+    },
+    {
+     "id": "belt-side",
+     "kind": "stamp",
+     "at": [
+      -1,
+      -3.5
+     ],
+     "rows": [
+      "aaaaaaa"
+     ],
+     "key": {
+      "a": "accent"
+     },
+     "z": 41,
+     "when": {
+      "direction": [
+       "side"
+      ]
+     },
+     "on": "waist"
+    },
+    {
+     "id": "collar-side",
+     "kind": "stamp",
+     "at": [
+      1,
+      -3.5
+     ],
+     "rows": [
+      "aaaaaaa",
+      "aaaaaaa"
+     ],
+     "key": {
+      "a": "accent"
+     },
+     "z": 46,
+     "when": {
+      "direction": [
+       "side"
+      ]
+     },
+     "on": "chest"
+    },
+    {
+     "id": "hair",
+     "kind": "use",
+     "use": "part:topdown-hair",
+     "v": 1,
+     "on": "headTop",
+     "z": 50,
+     "paint": {
+      "hair": "hair"
+     },
+     "args": {
+      "style": {
+       "from": "hairStyle",
+       "pick": {
+        "short": "short",
+        "bowl": "short",
+        "pigtails": "short",
+        "spiky": "spiky"
+       }
+      },
+      "hatted": false
+     },
+     "when": {
+      "headgear": [
+       "none",
+       "bow"
+      ]
+     }
+    },
+    {
+     "id": "hairHatted",
+     "kind": "use",
+     "use": "part:topdown-hair",
+     "v": 1,
+     "on": "headTop",
+     "z": 50,
+     "paint": {
+      "hair": "hair"
+     },
+     "args": {
+      "style": "short",
+      "hatted": true
+     },
+     "when": {
+      "headgear": [
+       "straw hat",
+       "cap"
+      ]
+     }
+    },
+    {
+     "id": "hairdo",
+     "kind": "use",
+     "use": "part:topdown-hairdo",
+     "v": 1,
+     "on": "headTop",
+     "z": 50,
+     "paint": {
+      "hair": "hair",
+      "tie": "accent"
+     },
+     "args": {
+      "style": {
+       "from": "hairStyle",
+       "pick": {
+        "bowl": "bowl",
+        "pigtails": "pigtails",
+        "short": "bowl",
+        "spiky": "bowl"
+       }
+      }
+     },
+     "when": {
+      "headgear": [
+       "none",
+       "bow"
+      ],
+      "hairStyle": [
+       "bowl",
+       "pigtails"
+      ]
+     }
+    },
+    {
+     "id": "strawHat",
+     "kind": "use",
+     "use": "part:topdown-straw-hat",
+     "v": 1,
+     "on": "headTop",
+     "z": 50,
+     "paint": {
+      "cloth": "straw",
+      "band": "accent"
+     },
+     "args": {
+      "size": {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.5,
+         0.5
+        ],
+        [
+         1.8,
+         1.8
+        ]
+       ]
+      }
+     },
+     "when": {
+      "headgear": [
+       "straw hat"
+      ]
+     }
+    },
+    {
+     "id": "cap",
+     "kind": "use",
+     "use": "part:topdown-cap-peaked",
+     "v": 1,
+     "on": "headTop",
+     "z": 50,
+     "paint": {
+      "cloth": "accent"
+     },
+     "args": {
+      "size": {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.5,
+         0.5
+        ],
+        [
+         1.8,
+         1.8
+        ]
+       ]
+      }
+     },
+     "when": {
+      "headgear": [
+       "cap"
+      ]
+     }
+    },
+    {
+     "id": "bow",
+     "kind": "use",
+     "use": "part:topdown-hair-bow",
+     "v": 1,
+     "on": "headTop",
+     "z": 50,
+     "paint": {
+      "ribbon": "accent"
+     },
+     "args": {
+      "size": {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.5,
+         0.5
+        ],
+        [
+         1.8,
+         1.8
+        ]
+       ]
+      }
+     },
+     "when": {
+      "headgear": [
+       "bow"
+      ]
+     }
+    },
+    {
+     "id": "stick",
+     "kind": "use",
+     "use": "held:topdown-stick",
+     "v": 2,
+     "on": "reachF",
+     "z": 60,
+     "paint": {
+      "wood": "wood"
+     },
+     "args": {
+      "length": {
+       "from": "heldSize",
+       "map": [
+        [
+         0.65,
+         0.65
+        ],
+        [
+         1.35,
+         1.35
+        ]
+       ]
+      }
+     },
+     "when": {
+      "held": [
+       "stick"
+      ]
+     }
+    },
+    {
+     "id": "basket",
+     "kind": "use",
+     "use": "held:topdown-basket",
+     "v": 1,
+     "on": "cuffF",
+     "z": 60,
+     "paint": {
+      "wicker": "wicker",
+      "fill": "apple"
+     },
+     "args": {
+      "length": {
+       "from": "heldSize",
+       "map": [
+        [
+         0.65,
+         0.65
+        ],
+        [
+         1.175,
+         1.175
+        ],
+        [
+         1.35,
+         1.175
+        ]
+       ]
+      }
+     },
+     "when": {
+      "held": [
+       "basket"
+      ]
+     }
+    },
+    {
+     "id": "flower",
+     "kind": "use",
+     "use": "held:topdown-flower",
+     "v": 2,
+     "on": "reachF",
+     "z": 60,
+     "paint": {
+      "stem": "leaf",
+      "petal": "petal",
+      "heart": "gold"
+     },
+     "args": {
+      "length": {
+       "from": "heldSize",
+       "map": [
+        [
+         0.65,
+         0.65
+        ],
+        [
+         1.35,
+         1.35
+        ]
+       ]
+      }
+     },
+     "when": {
+      "held": [
+       "flower"
+      ]
+     }
+    }
+   ],
+   "bones": [
+    {
+     "id": "headUp",
+     "parent": "head",
+     "angle": 180,
+     "length": 2
+    },
+    {
+     "id": "headAt",
+     "parent": "headUp",
+     "from": 1,
+     "angle": 180,
+     "length": 2
+    }
+   ],
+   "nodes": [
+    {
+     "id": "headTop",
+     "parent": "headAt",
+     "angle": 0
+    }
+   ]
+  }
+ },
+ "controls": [
+  {
+   "key": "height",
+   "kind": "range",
+   "label": "Height",
+   "lo": "Short",
+   "hi": "Tall",
+   "default": 0.5,
+   "scales": {
+    "bones": [
+     "hip",
+     "spine",
+     "thiF",
+     "thiB",
+     "shnF",
+     "shnB",
+     "legF",
+     "legB",
+     "legIF",
+     "legIB"
+    ],
+    "by": [
+     0.8,
+     1.04
+    ]
+   }
+  },
+  {
+   "key": "head",
+   "kind": "range",
+   "label": "Head",
+   "lo": "Small",
+   "hi": "Big",
+   "default": 0.5,
+   "scales": {
+    "bones": [
+     "headAt"
+    ],
+    "by": [
+     1.5,
+     0.5
+    ]
+   }
+  },
+  {
+   "key": "hairStyle",
+   "kind": "choice",
+   "label": "Hair",
+   "options": [
+    "short",
+    "bowl",
+    "pigtails",
+    "spiky"
+   ],
+   "default": "short",
+   "when": {
+    "headgear": [
+     "none",
+     "bow"
+    ]
+   }
+  },
+  {
+   "key": "held",
+   "kind": "choice",
+   "label": "Carries",
+   "options": [
+    "none",
+    "stick",
+    "basket",
+    "flower"
+   ],
+   "default": "none"
+  },
+  {
+   "key": "heldSize",
+   "kind": "range",
+   "label": "Size",
+   "lo": "Small",
+   "hi": "Big",
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "default": 1
+  },
+  {
+   "key": "headgear",
+   "kind": "choice",
+   "label": "Headgear",
+   "options": [
+    "none",
+    "straw hat",
+    "cap",
+    "bow"
+   ],
+   "default": "none"
+  },
+  {
+   "key": "headgearSize",
+   "kind": "range",
+   "label": "Size",
+   "lo": "Small",
+   "hi": "Big",
+   "min": 0.5,
+   "max": 1.8,
+   "step": 0.05,
+   "default": 1
+  },
+  {
+   "key": "skin",
+   "kind": "colour",
+   "label": "Skin"
+  },
+  {
+   "key": "hair",
+   "kind": "colour",
+   "label": "Hair"
+  },
+  {
+   "key": "outfit",
+   "kind": "colour",
+   "label": "Smock"
+  },
+  {
+   "key": "accent",
+   "kind": "colour",
+   "label": "Collar, belt and shoes"
+  },
+  {
+   "key": "bounce",
+   "kind": "range",
+   "label": "Bounce",
+   "lo": "Calm",
+   "hi": "Bouncy",
+   "default": 0.7,
+   "group": "Motion"
+  },
+  {
+   "key": "stride",
+   "kind": "range",
+   "label": "Stride",
+   "lo": "Small steps",
+   "hi": "Big steps",
+   "default": 0.5,
+   "group": "Motion"
+  },
+  {
+   "key": "speed",
+   "standard": "speed"
+  }
+ ],
+ "parts": {
+  "held": {
+   "label": "Carries",
+   "params": [
+    "held",
+    "heldSize"
+   ],
+   "none": "none",
+   "socket": "hand",
+   "shapes": [
+    "stick",
+    "basket",
+    "flower"
+   ]
+  },
+  "headgear": {
+   "label": "Headgear",
+   "params": [
+    "headgear",
+    "headgearSize"
+   ],
+   "none": "none",
+   "socket": "head",
+   "shapes": [
+    "strawHat",
+    "cap",
+    "bow"
+   ]
+  }
+ },
+ "clips": {
+  "idle_down": {
+   "from": {
+    "from": "held",
+    "pick": {
+     "none": "idle-bare-down",
+     "stick": "idle-held-down",
+     "basket": "idle-held-down",
+     "flower": "idle-held-down"
+    }
+   },
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.5
+       ],
+       [
+        0.59,
+        0.5
+       ],
+       [
+        0.6,
+        1
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.5
+       ],
+       [
+        0.59,
+        0.5
+       ],
+       [
+        0.6,
+        1
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.5
+       ],
+       [
+        0.59,
+        0.5
+       ],
+       [
+        0.6,
+        1
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "idle_up": {
+   "from": {
+    "from": "held",
+    "pick": {
+     "none": "idle-bare-up",
+     "stick": "idle-held-up",
+     "basket": "idle-held-up",
+     "flower": "idle-held-up"
+    }
+   },
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.5
+       ],
+       [
+        0.59,
+        0.5
+       ],
+       [
+        0.6,
+        1
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.5
+       ],
+       [
+        0.59,
+        0.5
+       ],
+       [
+        0.6,
+        1
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.5
+       ],
+       [
+        0.59,
+        0.5
+       ],
+       [
+        0.6,
+        1
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "idle_side": {
+   "from": {
+    "from": "held",
+    "pick": {
+     "none": "idle-bare-side",
+     "stick": "idle-held-side",
+     "basket": "idle-held-side",
+     "flower": "idle-held-side"
+    }
+   },
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.5
+       ],
+       [
+        0.59,
+        0.5
+       ],
+       [
+        0.6,
+        1
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.shnF",
+      "bones.toeF",
+      "bones.thiB",
+      "bones.shnB",
+      "bones.toeB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "first",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.5
+       ],
+       [
+        0.59,
+        0.5
+       ],
+       [
+        0.6,
+        1
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "walk_down": {
+   "from": {
+    "from": "held",
+    "pick": {
+     "none": "walk-bare-down",
+     "stick": "walk-held-down",
+     "basket": "walk-held-down",
+     "flower": "walk-held-down"
+    }
+   },
+   "sounds": [
+    {
+     "sound": "footstep-grass",
+     "frame": 0,
+     "preset": "Grass",
+     "volume": 0.45
+    },
+    {
+     "sound": "footstep-grass",
+     "frame": 4,
+     "preset": "Grass",
+     "volume": 0.45
+    }
+   ],
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        0.7,
+        1
+       ],
+       [
+        1,
+        1.258
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.688
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.1
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.688
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.1
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.8
+       ],
+       [
+        0.7,
+        1
+       ],
+       [
+        1,
+        1.141
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.8
+       ],
+       [
+        0.7,
+        1
+       ],
+       [
+        1,
+        1.141
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.armF",
+      "bones.elbF",
+      "bones.wriF",
+      "bones.cuffF",
+      "bones.handF",
+      "stretch.armF",
+      "stretch.rimAF",
+      "bones.armB",
+      "bones.elbB",
+      "bones.wriB",
+      "bones.cuffB",
+      "bones.handB",
+      "stretch.armB",
+      "stretch.rimAB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.7,
+        1
+       ],
+       [
+        1,
+        1.1
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.armF",
+      "bones.elbF",
+      "bones.wriF",
+      "bones.cuffF",
+      "bones.handF",
+      "stretch.armF",
+      "stretch.rimAF",
+      "bones.armB",
+      "bones.elbB",
+      "bones.wriB",
+      "bones.cuffB",
+      "bones.handB",
+      "stretch.armB",
+      "stretch.rimAB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "walk_up": {
+   "from": {
+    "from": "held",
+    "pick": {
+     "none": "walk-bare-up",
+     "stick": "walk-held-up",
+     "basket": "walk-held-up",
+     "flower": "walk-held-up"
+    }
+   },
+   "sounds": [
+    {
+     "sound": "footstep-grass",
+     "frame": 0,
+     "preset": "Grass",
+     "volume": 0.45
+    },
+    {
+     "sound": "footstep-grass",
+     "frame": 4,
+     "preset": "Grass",
+     "volume": 0.45
+    }
+   ],
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.1
+       ],
+       [
+        0.7,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.688
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.1
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.688
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.1
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.8
+       ],
+       [
+        0.7,
+        1
+       ],
+       [
+        1,
+        1.141
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.8
+       ],
+       [
+        0.7,
+        1
+       ],
+       [
+        1,
+        1.141
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.armF",
+      "bones.elbF",
+      "bones.wriF",
+      "bones.cuffF",
+      "bones.handF",
+      "stretch.armF",
+      "stretch.rimAF",
+      "bones.armB",
+      "bones.elbB",
+      "bones.wriB",
+      "bones.cuffB",
+      "bones.handB",
+      "bones.rimAB",
+      "stretch.armB",
+      "stretch.rimAB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.4
+       ],
+       [
+        0.7,
+        1
+       ],
+       [
+        1,
+        1.1
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.armF",
+      "bones.elbF",
+      "bones.wriF",
+      "bones.cuffF",
+      "bones.handF",
+      "stretch.armF",
+      "stretch.rimAF",
+      "bones.armB",
+      "bones.elbB",
+      "bones.wriB",
+      "bones.cuffB",
+      "bones.handB",
+      "bones.rimAB",
+      "stretch.armB",
+      "stretch.rimAB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.4
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.1
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "walk_side": {
+   "from": {
+    "from": "held",
+    "pick": {
+     "none": "walk-bare-side",
+     "stick": "walk-held-side",
+     "basket": "walk-held-side",
+     "flower": "walk-held-side"
+    }
+   },
+   "sounds": [
+    {
+     "sound": "footstep-grass",
+     "frame": 0,
+     "preset": "Grass",
+     "volume": 0.45
+    },
+    {
+     "sound": "footstep-grass",
+     "frame": 4,
+     "preset": "Grass",
+     "volume": 0.45
+    }
+   ],
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.5
+       ],
+       [
+        0.7,
+        1
+       ],
+       [
+        1,
+        1.1
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.shnF",
+      "bones.toeF",
+      "bones.thiB",
+      "bones.shnB",
+      "bones.toeB",
+      "bones.legF",
+      "stretch.legF",
+      "bones.legB",
+      "stretch.legB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.6
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.1
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.shnF",
+      "bones.toeF",
+      "bones.thiB",
+      "bones.shnB",
+      "bones.toeB",
+      "bones.legF",
+      "stretch.legF",
+      "bones.legB",
+      "stretch.legB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.8
+       ],
+       [
+        0.7,
+        1
+       ],
+       [
+        1,
+        1.141
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.armF",
+      "bones.elbF",
+      "bones.wriF",
+      "bones.cuffF",
+      "bones.handF",
+      "bones.rimAF",
+      "stretch.armF",
+      "stretch.rimAF",
+      "bones.armB",
+      "bones.elbB",
+      "bones.wriB",
+      "bones.cuffB",
+      "bones.handB",
+      "bones.rimAB",
+      "stretch.armB",
+      "stretch.rimAB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.7
+       ],
+       [
+        0.7,
+        1
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.armF",
+      "bones.elbF",
+      "bones.wriF",
+      "bones.cuffF",
+      "bones.handF",
+      "bones.rimAF",
+      "stretch.armF",
+      "stretch.rimAF",
+      "bones.armB",
+      "bones.elbB",
+      "bones.wriB",
+      "bones.cuffB",
+      "bones.handB",
+      "bones.rimAB",
+      "stretch.armB",
+      "stretch.rimAB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.5
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.spine"
+     ],
+     "about": 0,
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.25
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "run_down": {
+   "from": {
+    "from": "held",
+    "pick": {
+     "none": "run-bare-down",
+     "stick": "run-held-down",
+     "basket": "run-held-down",
+     "flower": "run-held-down"
+    }
+   },
+   "sounds": [
+    {
+     "sound": "footstep-grass",
+     "frame": 0,
+     "preset": "Grass",
+     "volume": 0.3
+    },
+    {
+     "sound": "footstep-grass",
+     "frame": 4,
+     "preset": "Grass",
+     "volume": 0.3
+    }
+   ],
+   "travel": [
+    {
+     "tracks": [
+      "root.1"
+     ],
+     "about": 0,
+     "side": "below",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.4
+       ],
+       [
+        0.7,
+        1
+       ],
+       [
+        1,
+        1.226
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.1
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "stretch.toeF",
+      "bones.thiB",
+      "bones.toeB",
+      "stretch.toeB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.1
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.7,
+        1
+       ],
+       [
+        1,
+        1.176
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "stretch.toeF",
+      "bones.thiB",
+      "bones.toeB",
+      "stretch.toeB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.7,
+        1
+       ],
+       [
+        1,
+        1.176
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "stretch.spine"
+     ],
+     "about": 1,
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        1.15
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.15
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "run_up": {
+   "from": {
+    "from": "held",
+    "pick": {
+     "none": "run-bare-up",
+     "stick": "run-held-up",
+     "basket": "run-held-up",
+     "flower": "run-held-up"
+    }
+   },
+   "sounds": [
+    {
+     "sound": "footstep-grass",
+     "frame": 0,
+     "preset": "Grass",
+     "volume": 0.3
+    },
+    {
+     "sound": "footstep-grass",
+     "frame": 4,
+     "preset": "Grass",
+     "volume": 0.3
+    }
+   ],
+   "travel": [
+    {
+     "tracks": [
+      "root.1"
+     ],
+     "about": 0,
+     "side": "below",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.472
+       ],
+       [
+        0.7,
+        1
+       ],
+       [
+        1,
+        1.226
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.25
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.25
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.7,
+        1
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.7,
+        1
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.armF",
+      "bones.elbF",
+      "bones.wriF",
+      "bones.cuffF",
+      "bones.handF",
+      "stretch.armF",
+      "stretch.rimAF",
+      "bones.armB",
+      "bones.elbB",
+      "bones.wriB",
+      "bones.cuffB",
+      "bones.handB",
+      "bones.rimAB",
+      "stretch.armB",
+      "stretch.rimAB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.7,
+        1
+       ],
+       [
+        1,
+        1.4
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "stretch.spine"
+     ],
+     "about": 1,
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        2
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "run_side": {
+   "from": {
+    "from": "held",
+    "pick": {
+     "none": "run-bare-side",
+     "stick": "run-held-side",
+     "basket": "run-held-side",
+     "flower": "run-held-side"
+    }
+   },
+   "sounds": [
+    {
+     "sound": "footstep-grass",
+     "frame": 0,
+     "preset": "Grass",
+     "volume": 0.3
+    },
+    {
+     "sound": "footstep-grass",
+     "frame": 4,
+     "preset": "Grass",
+     "volume": 0.3
+    }
+   ],
+   "travel": [
+    {
+     "tracks": [
+      "root.1"
+     ],
+     "about": 0,
+     "side": "below",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.4
+       ],
+       [
+        0.7,
+        1
+       ],
+       [
+        1,
+        1.226
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.shnF",
+      "bones.toeF",
+      "bones.thiB",
+      "bones.shnB",
+      "bones.toeB",
+      "bones.legF",
+      "stretch.legF",
+      "bones.legB",
+      "stretch.legB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.6
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.1
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.shnF",
+      "bones.toeF",
+      "bones.thiB",
+      "bones.shnB",
+      "bones.toeB",
+      "bones.legF",
+      "stretch.legF",
+      "bones.legB",
+      "stretch.legB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.7,
+        1
+       ],
+       [
+        1,
+        1.1
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.armF",
+      "bones.elbF",
+      "bones.wriF",
+      "bones.cuffF",
+      "bones.handF",
+      "bones.rimAF",
+      "stretch.armF",
+      "stretch.rimAF",
+      "bones.armB",
+      "bones.elbB",
+      "bones.wriB",
+      "bones.cuffB",
+      "bones.handB",
+      "bones.rimAB",
+      "stretch.armB",
+      "stretch.rimAB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.7
+       ],
+       [
+        0.7,
+        1
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.spine"
+     ],
+     "about": 0,
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.25
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "stretch.spine"
+     ],
+     "about": 1,
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.5
+       ]
+      ]
+     }
+    }
+   ]
+  }
+ },
+ "made": {
+  "in": "library",
+  "from": "code:farm-kid",
+  "by": "migration batch M7 (/sprite-forge redraw)"
+ }
+}

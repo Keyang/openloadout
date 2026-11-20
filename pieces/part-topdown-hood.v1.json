@@ -1,0 +1,80 @@
+{
+ "format": "loadout-piece",
+ "version": 1,
+ "id": "part:topdown-hood",
+ "v": 1,
+ "name": "Hood",
+ "about": "A cloth hood round the head, the face open facing down and sideways, pulled lower over the brow with its size; on the head node (use z 50), over no hair.",
+ "slots": [
+  {
+   "id": "cloth",
+   "label": "Hood",
+   "default": "#3a6ea5",
+   "material": "cloth" } ],
+ "args": {
+  "size": {
+   "type": "px",
+   "lo": 0.5,
+   "hi": 1.8,
+   "default": 1 } },
+ "made": {
+  "by": "tools/bake-topdown-m7.mjs",
+  "from": "rigs/topdown.js" },
+ "body": {
+  "draw": [
+   {
+    "id": "topdown-hood-down-0_5",
+    "kind": "stamp",
+    "at": [-7,-7.5],
+    "rows": ["...aaaaaaaaa...","..aaaaaaaaaaa..",".aaaaaaaaaaaaa.","baaaaaaaaaaaaaa","baaabbbbbbbbbaa","baa.........baa","baa.........baa","baa.........baa","baa.........baa","baa.........baa","bba.........baa",".bb.........ba.","..b.........b.."],
+    "key": {"a":"cloth","b":"cloth.dark"},
+    "z": 6,
+    "when": {"direction":["down"],"size":[{"below":0.9}]} },
+   {
+    "id": "topdown-hood-down-1",
+    "kind": "stamp",
+    "at": [-7,-7.5],
+    "rows": ["...aaaaaaaaa...","..aaaaaaaaaaa..",".aaaaaaaaaaaaa.","baaaaaaaaaaaaaa","baaaaaaaaaaaaaa","baaabbbbbbbbbaa","baa.........baa","baa.........baa","baa.........baa","baa.........baa","bba.........baa",".bb.........ba.","..b.........b.."],
+    "key": {"a":"cloth","b":"cloth.dark"},
+    "z": 6,
+    "when": {"direction":["down"],"size":[{"atLeast":0.9,"below":1.5}]} },
+   {
+    "id": "topdown-hood-down-1_6",
+    "kind": "stamp",
+    "at": [-7,-7.5],
+    "rows": ["...aaaaaaaaa...","..aaaaaaaaaaa..",".aaaaaaaaaaaaa.","baaaaaaaaaaaaaa","baaaaaaaaaaaaaa","baaaaaaaaaaaaaa","baaabbbbbbbbbaa","baa.........baa","baa.........baa","baa.........baa","bba.........baa",".bb.........ba.","..b.........b.."],
+    "key": {"a":"cloth","b":"cloth.dark"},
+    "z": 6,
+    "when": {"direction":["down"],"size":[{"atLeast":1.5}]} },
+   {
+    "id": "topdown-hood-up-0_5",
+    "kind": "stamp",
+    "at": [-7,-7.5],
+    "rows": ["...aaaaaaaaa...","..aaaaaaaaaaa..",".baaaaaaaaaaaa.","bbaaaaaaaaaaaaa","bbaaaaaaaaaaaaa","bbaaaaaaaaaaaaa","bbaaaaaaaaaaaaa","bbaaabaaaaaaaaa","bbaaabaaaaaaaaa","bbbaabaaaaaaaaa","bbbbabaaaaaaaaa",".bbbbbbaaaaaaa.","..bbbbbaabbbb..","...bbbbaabbb...","......baa......","......bba......",".......b......."],
+    "key": {"a":"cloth","b":"cloth.dark"},
+    "z": 6,
+    "when": {"direction":["up"]} },
+   {
+    "id": "topdown-hood-side-0_5",
+    "kind": "stamp",
+    "at": [-7,-7.5],
+    "rows": ["...aaaaaaaaa...","..aaaaaaaaaaa..",".aaaaaaaaaaaaa.","baaaaaaaaaaaaaa","baaaaaaaaaabbbb","baaaaaaaaa.....","baaaaaaaaa.....","baaaaaaaaa.....","baaaaaaaaa.....","baaaaaaaaa.....","bbaaaaaaaa.....",".bbaaaaaaa.....","..bbaaaaaa.....","...bbbbbbb....."],
+    "key": {"a":"cloth","b":"cloth.dark"},
+    "z": 6,
+    "when": {"direction":["side"],"size":[{"below":0.9}]} },
+   {
+    "id": "topdown-hood-side-1",
+    "kind": "stamp",
+    "at": [-7,-7.5],
+    "rows": ["...aaaaaaaaa...","..aaaaaaaaaaa..",".aaaaaaaaaaaaa.","baaaaaaaaaaaaaa","baaaaaaaaaaaaaa","baaaaaaaaabbbbb","baaaaaaaa......","baaaaaaaa......","baaaaaaaa......","baaaaaaaa......","bbaaaaaaa......",".bbaaaaaa......","..bbaaaaa......","...bbbbbb......"],
+    "key": {"a":"cloth","b":"cloth.dark"},
+    "z": 6,
+    "when": {"direction":["side"],"size":[{"atLeast":0.9,"below":1.5}]} },
+   {
+    "id": "topdown-hood-side-1_6",
+    "kind": "stamp",
+    "at": [-7,-7.5],
+    "rows": ["...aaaaaaaaa...","..aaaaaaaaaaa..",".aaaaaaaaaaaaa.","baaaaaaaaaaaaaa","baaaaaaaaaaaaaa","baaaaaaaaaaaaaa","baaaaaaaabbbbbb","baaaaaaa.......","baaaaaaa.......","baaaaaaa.......","bbaaaaaa.......",".bbaaaaa.......","..bbaaaa.......","...bbbbb......."],
+    "key": {"a":"cloth","b":"cloth.dark"},
+    "z": 6,
+    "when": {"direction":["side"],"size":[{"atLeast":1.5}]} } ] } }

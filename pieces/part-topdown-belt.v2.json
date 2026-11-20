@@ -1,0 +1,42 @@
+{
+ "format": "loadout-piece",
+ "version": 1,
+ "id": "part:topdown-belt",
+ "v": 2,
+ "name": "Belt",
+ "about": "A belt round the waist in exactly the colour it is given (map it to a band tone to stand clear of the cloth), on the waist node.",
+ "slots": [
+  {
+   "id": "belt",
+   "label": "Belt",
+   "default": "#9a3a2e",
+   "material": "cloth" } ],
+ "made": {
+  "by": "part:topdown-belt@1 with its colour as given, not its shadow tone (migration batch M7b)",
+  "from": "rigs/topdown.js" },
+ "body": {
+  "draw": [
+   {
+    "id": "belt-down",
+    "kind": "stamp",
+    "at": [-3,-4.5],
+    "rows": ["ccccccccc"],
+    "key": {"c":"belt"},
+    "z": 1,
+    "when": {"direction":["down"]} },
+   {
+    "id": "belt-up",
+    "kind": "stamp",
+    "at": [-3,-4.5],
+    "rows": ["ccccccccc"],
+    "key": {"c":"belt"},
+    "z": 1,
+    "when": {"direction":["up"]} },
+   {
+    "id": "belt-side",
+    "kind": "stamp",
+    "at": [-3,-3.5],
+    "rows": ["cccccccc"],
+    "key": {"c":"belt"},
+    "z": 1,
+    "when": {"direction":["side"]} } ] } }

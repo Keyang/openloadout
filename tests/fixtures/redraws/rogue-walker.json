@@ -1,0 +1,479 @@
+{
+ "id": "rogue-walker",
+ "frozen": "2026-11-20",
+ "source": "sprites/rogue-walker.js",
+ "sha256": "3964fd89cce1bacc44b9121e07057c09bd9ebba8eb700469d12bd33789ae9b3c",
+ "name": "Rogue (map)",
+ "blurb": "The rogue as seen on the map, sneaking and dashing in four directions with a scarf trailing behind. Change the build, hood, scarf, blades and colours.",
+ "meta": {
+  "type": "character",
+  "role": "characters/player",
+  "themes": [
+   "fantasy"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "top-down-rpg"
+  ],
+  "view": "top-down",
+  "words": [
+   "rogue",
+   "thief",
+   "assassin",
+   "ninja",
+   "party member",
+   "hood",
+   "scarf",
+   "daggers",
+   "walk",
+   "run",
+   "dash",
+   "sneak",
+   "overworld",
+   "stealthy"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  48,
+  48
+ ],
+ "pivot": [
+  24,
+  42
+ ],
+ "grounded": false,
+ "preview": "walk_down",
+ "params": {
+  "height": {
+   "kind": "range",
+   "label": "Height",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Short",
+   "hi": "Tall",
+   "group": "Look"
+  },
+  "build": {
+   "kind": "range",
+   "label": "Build",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slim",
+   "hi": "Stocky",
+   "group": "Look"
+  },
+  "hairStyle": {
+   "kind": "choice",
+   "label": "Hair",
+   "def": "short",
+   "options": [
+    {
+     "value": "short",
+     "label": "Short"
+    },
+    {
+     "value": "long",
+     "label": "Long"
+    },
+    {
+     "value": "spiky",
+     "label": "Spiky"
+    },
+    {
+     "value": "ponytail",
+     "label": "Ponytail"
+    }
+   ],
+   "group": "Look",
+   "when": {
+    "headgear": [
+     "bandana",
+     "mask",
+     "none"
+    ]
+   }
+  },
+  "headgear": {
+   "kind": "choice",
+   "label": "Headgear",
+   "def": "hood",
+   "options": [
+    {
+     "value": "hood",
+     "label": "Hood"
+    },
+    {
+     "value": "bandana",
+     "label": "Bandana"
+    },
+    {
+     "value": "mask",
+     "label": "Mask"
+    },
+    {
+     "value": "none",
+     "label": "None"
+    }
+   ],
+   "group": "Look"
+  },
+  "headgearSize": {
+   "kind": "range",
+   "label": "Size",
+   "def": 1,
+   "min": 0.5,
+   "max": 1.8,
+   "step": 0.05,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "scarf": {
+   "kind": "choice",
+   "label": "Scarf",
+   "def": "long",
+   "options": [
+    {
+     "value": "short",
+     "label": "Short"
+    },
+    {
+     "value": "long",
+     "label": "Long"
+    },
+    {
+     "value": "none",
+     "label": "None"
+    }
+   ],
+   "group": "Look"
+  },
+  "scarfLength": {
+   "kind": "range",
+   "label": "Length",
+   "def": 1,
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "lo": "Short",
+   "hi": "Long",
+   "group": "Look"
+  },
+  "weapon": {
+   "kind": "choice",
+   "label": "Weapon",
+   "def": "daggers",
+   "options": [
+    {
+     "value": "daggers",
+     "label": "Daggers"
+    },
+    {
+     "value": "short sword",
+     "label": "Short sword"
+    },
+    {
+     "value": "claws",
+     "label": "Claws"
+    },
+    {
+     "value": "none",
+     "label": "None"
+    }
+   ],
+   "group": "Look"
+  },
+  "weaponLength": {
+   "kind": "range",
+   "label": "Length",
+   "def": 1,
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "lo": "Short",
+   "hi": "Long",
+   "group": "Look"
+  },
+  "skin": {
+   "kind": "color",
+   "label": "Skin",
+   "def": "#f6d3b0",
+   "swatches": [
+    "#f6d3b0",
+    "#e8b088",
+    "#c98a5c",
+    "#9a6240",
+    "#6e4428",
+    "#9bd18a",
+    "#b9a7e0"
+   ],
+   "group": "Colors"
+  },
+  "hair": {
+   "kind": "color",
+   "label": "Hair",
+   "def": "#e6c96a",
+   "swatches": [
+    "#e6c96a",
+    "#9a6a3e",
+    "#c9423a",
+    "#f0ead8",
+    "#5a3a22",
+    "#a8612a",
+    "#e0b040",
+    "#d8d8e0"
+   ],
+   "group": "Colors",
+   "when": {
+    "headgear": [
+     "bandana",
+     "mask",
+     "none"
+    ]
+   }
+  },
+  "outfit": {
+   "kind": "color",
+   "label": "Outfit",
+   "def": "#2f8f9d",
+   "swatches": [
+    "#2f8f9d",
+    "#3f6fd1",
+    "#7a4fc4",
+    "#c9423a",
+    "#8e3a4a",
+    "#4f9d57",
+    "#e08a2c",
+    "#e6c545"
+   ],
+   "group": "Colors"
+  },
+  "trim": {
+   "kind": "color",
+   "label": "Scarf and trim",
+   "def": "#5a5f7a",
+   "swatches": [
+    "#5a5f7a",
+    "#a8a4a0",
+    "#c9423a",
+    "#f2c230",
+    "#c8553a",
+    "#2f8f9d",
+    "#7a4fc4",
+    "#f0ead8"
+   ],
+   "group": "Colors"
+  },
+  "bounce": {
+   "kind": "range",
+   "label": "Bounce",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Calm",
+   "hi": "Bouncy",
+   "group": "Motion"
+  },
+  "stride": {
+   "kind": "range",
+   "label": "Stride",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small steps",
+   "hi": "Big steps",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle_down": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    7,
+    10
+   ]
+  },
+  "idle_up": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    7,
+    10
+   ]
+  },
+  "idle_side": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    7,
+    10
+   ]
+  },
+  "walk_down": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "walk_up": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "walk_side": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "run_down": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    9,
+    15,
+    20
+   ]
+  },
+  "run_up": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    9,
+    15,
+    20
+   ]
+  },
+  "run_side": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    9,
+    15,
+    20
+   ]
+  }
+ },
+ "sounds": {
+  "walk_down": [
+   {
+    "sound": "footstep-grass",
+    "frame": 0,
+    "preset": "Grass",
+    "volume": 0.45
+   },
+   {
+    "sound": "footstep-grass",
+    "frame": 4,
+    "preset": "Grass",
+    "volume": 0.45
+   }
+  ],
+  "walk_up": [
+   {
+    "sound": "footstep-grass",
+    "frame": 0,
+    "preset": "Grass",
+    "volume": 0.45
+   },
+   {
+    "sound": "footstep-grass",
+    "frame": 4,
+    "preset": "Grass",
+    "volume": 0.45
+   }
+  ],
+  "walk_side": [
+   {
+    "sound": "footstep-grass",
+    "frame": 0,
+    "preset": "Grass",
+    "volume": 0.45
+   },
+   {
+    "sound": "footstep-grass",
+    "frame": 4,
+    "preset": "Grass",
+    "volume": 0.45
+   }
+  ],
+  "run_down": [
+   {
+    "sound": "footstep-grass",
+    "frame": 0,
+    "preset": "Tall grass",
+    "volume": 0.45
+   },
+   {
+    "sound": "footstep-grass",
+    "frame": 4,
+    "preset": "Tall grass",
+    "volume": 0.45
+   }
+  ],
+  "run_up": [
+   {
+    "sound": "footstep-grass",
+    "frame": 0,
+    "preset": "Tall grass",
+    "volume": 0.45
+   },
+   {
+    "sound": "footstep-grass",
+    "frame": 4,
+    "preset": "Tall grass",
+    "volume": 0.45
+   }
+  ],
+  "run_side": [
+   {
+    "sound": "footstep-grass",
+    "frame": 0,
+    "preset": "Tall grass",
+    "volume": 0.45
+   },
+   {
+    "sound": "footstep-grass",
+    "frame": 4,
+    "preset": "Tall grass",
+    "volume": 0.45
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-rpg-fantasy"
+ ]
+}

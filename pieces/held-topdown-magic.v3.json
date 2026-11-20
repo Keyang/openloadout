@@ -1,0 +1,79 @@
+{
+ "format": "loadout-piece",
+ "version": 1,
+ "id": "held:topdown-magic",
+ "v": 3,
+ "name": "Staff, wand or orb",
+ "about": "A staff or a wand without its lit end, as shapes along the reachF bone (use z 60) at the bone angle, as rigs/topdown.js smallItem draws them; the sprite draws the light.",
+ "slots": [
+  {
+   "id": "wood",
+   "label": "Wood",
+   "default": "#9a6a3e",
+   "material": "wood" } ],
+ "args": {
+  "length": {
+   "type": "px",
+   "lo": 0.65,
+   "hi": 1.35,
+   "default": 1 },
+  "kind": {
+   "type": "word",
+   "options": ["staff","wand","orb"],
+   "default": "staff" } },
+ "made": {
+  "by": "tests/unit/m7-topdown-held.test.mjs magic(): the code calls written in the reachF frame (migration batch M7c; M7_PIECES=write)",
+  "from": "rigs/topdown.js" },
+ "body": {
+  "draw": [
+   {
+    "id": "staff-down-0",
+    "kind": "limb",
+    "from": [-9,0],
+    "to": [{"from":"length","map":[[0.65,7.8],[1.35,16.2]]},0],
+    "width": 2,
+    "paint": "wood",
+    "z": 1,
+    "when": {"direction":["down"],"kind":["staff"]} },
+   {
+    "id": "staff-side-0",
+    "kind": "limb",
+    "from": [-9,0],
+    "to": [{"from":"length","map":[[0.65,7.8],[1.35,16.2]]},0],
+    "width": 2,
+    "paint": "wood",
+    "z": 5,
+    "when": {"direction":["side"],"kind":["staff"]} },
+   {
+    "id": "staff-up-0",
+    "kind": "limb",
+    "from": [-9,0],
+    "to": [{"from":"length","map":[[0.65,7.8],[1.35,16.2]]},0],
+    "width": 2,
+    "paint": "wood",
+    "z": -59,
+    "when": {"direction":["up"],"kind":["staff"]} },
+   {
+    "id": "wand-down-0",
+    "kind": "line",
+    "from": [-1.5,0],
+    "to": [{"from":"length","map":[[0.65,5.85],[1.35,12.15]]},0],
+    "paint": "wood",
+    "z": 1,
+    "when": {"direction":["down"],"kind":["wand"]} },
+   {
+    "id": "wand-side-0",
+    "kind": "line",
+    "from": [-1.5,0],
+    "to": [{"from":"length","map":[[0.65,5.85],[1.35,12.15]]},0],
+    "paint": "wood",
+    "z": 5,
+    "when": {"direction":["side"],"kind":["wand"]} },
+   {
+    "id": "wand-up-0",
+    "kind": "line",
+    "from": [-1.5,0],
+    "to": [{"from":"length","map":[[0.65,5.85],[1.35,12.15]]},0],
+    "paint": "wood",
+    "z": -59,
+    "when": {"direction":["up"],"kind":["wand"]} } ] } }

@@ -106,6 +106,93 @@ node), v across (right on a node; on the hip bone, which points up, v is to the 
 such a frame are written the same way round: `r: [along u, along v]`, so `[vertical, horizontal]` on a node.
 `extends.paint` maps the base's slots (`skin`, `top`, `bottom`, `boots`, `topFar`, `bottomFar`) to the sprite's.
 
+### Migration batch M7: the nine top-down people (`tools/bake-topdown-m7.mjs`, temporary)
+
+Made by `tools/bake-topdown-m7.mjs` from `rigs/topdown.js`, `rigs/topdown-riot.js` and `rigs/topdown-sneak.js` (it
+loads a copy of `tools/bake-topdown.mjs` with three hooks; that file is unchanged). `node tools/bake-topdown-m7.mjs
+--write` writes version 1 of its pieces and bases, `--lying` the version 2 pieces below; neither rewrites a file, and
+no mode writes a version in the baker's `REPLACED` list (versions replaced before release; see "Replaced before
+release" below).
+
+**Bases with carries.** `base:person-topdown-{sword,guard,mage,child,rogue,merchant,ranger,trooper}@1` are
+`base:person-topdown-walker@1`'s rig (byte for byte) with the clips a character who carries something needs, keyed from
+the code rig's pose with that carry (a sword up, a pole at attention, a staff as a walking stick, a gun in both hands,
+a body shield, the rogue's dash, the child's rock and flail, the merchant's count and wave). They are eight files
+because one piece holds at most 128 KB and their clips are 417 KB (`base:person-topdown@1` alone is 116 KB), and a
+base cannot extend another base; a fix to the rig is a rerun of the baker, which bakes all eight. A clip a sprite's
+`from` picks by a setting is named with a dash before its direction (`swing-down`, `idle-pole-side`): without pieces
+loaded the validator checks a picked name against `CLIP_NAME` (`catalog/sprite-schema.js`), which has no underscore.
+
+**`reachF`, `reachB`** (these eight bases only): bones from `handF` / `handB` along what that hand holds, 10 px at rest,
+stretched by the pose's reach (the code rig draws a held thing pointing at the camera shorter), so a held piece on one
+turns and foreshortens as the code rig draws it. `held:topdown-weapon`, `-polearm`, `-stick`, `-flower`, `-magic`,
+`-blades`, `-guns` hang on `reachF` (u along the thing), `-blades-off` on `reachB`; `held:topdown-basket` and
+`-trade-goods` hang from `cuffF`. B16b's `held:topdown-cane` and `-lantern` keep `root` and `cuffF` on the walker base.
+
+**Worn pieces at version 2: `pose`.** The base's `die` shows its own pictures from frame 2 (`dieTip`, `dieLie`), and
+a worn piece's stamps cannot turn. `part:topdown-hair`, `-cape`, `-suit-pack`, `-body-shield`, `-helmet`, `-crown`,
+`-visor-helmet`, `-visor`, `-hood` and `-lens-mask` at version 2 take `pose`: `stand` (version 1's drawing), `f2`, `f3`
+(the tipping frames) or `lie` (frames 4 to 7), which draws only the thing's picture in that frame, on the `root` node.
+A dying sprite uses each such piece standing and once per pose (`hairLie2`, `hairLie3`, `hairLie`, hidden), its `die`
+frame edits hide the standing use and show that frame's, and it gives its own `dieTip` and `dieLie` (same ids, so they
+replace the base's) with what it always wears. `part:topdown-scarf@2` takes `pose` `rest` or `run0` to `run7`: the
+tail whipped out behind the rogue's dash in that run frame, one use per frame shown by the run clips' frame edits.
+
+**Bases at version 2: keyed at the code sprite's defaults** (`node tools/bake-topdown-m7.mjs --bases2`; second review
+of M7). Version 1 keyed every clip with the code rig fitted to the biggest headgear and the longest weapon, where the
+code rig crouches the body or moves it aside, so the mage stood 4 px shorter at every setting and the guard 7 px off the
+pivot from the side. `base:person-topdown-{guard,mage,child,rogue,merchant,ranger,trooper}@2` key the same clips (same
+names) at the code sprite's own defaults (`AT_DEFAULTS` in the baker: its headgear and weapon at size 1, the child's
+Bounce 0.7 and slight build); the ranger's adds `shoot-beam-*`, `die-beam` and `dodge-beam` for the longer beam gun, and
+the trooper's `shoot-jab-*` stays fitted to the longest baton (the trooper's in use is `@3`, below). The few settings that then reach the frame's edge are held
+in by each sprite's own tables (a top end that stops growing, a Height range a pixel or two short; the batch's report
+lists them). `base:person-topdown-sword` stays at version 1. Version 1 of the seven was never released and nothing
+used it: it was removed with its pins (M7b). The child's smock is farm-kid's own stamps (`m7ChildGarments`), read on
+the code child, not the adult garment pieces.
+
+**Held things drawn at the bone's angle (M7b, M7c).** A held thing on `reachF` or `reachB` is the code's own drawing
+calls written in the bone's frame ([u along the thing from the hand, v across it]: a code point `to(dist, turn)` is
+`[dist cos(turn), dist sin(turn)]`), its lengths bound to the piece's `length`, so the renderer draws it at the bone's
+angle as the code does. The first versions were pixel read-backs taken with the thing pointing down and turned with the
+bone, which broke into single pixels and outline gaps at an angle. On a bone stretched by the pose's reach the
+stretch scales every u, where the code keeps its fixed offsets: the parts may slide up to a pixel against each other.
+- `held:topdown-polearm@4`: the halberd (shaft, a clipped disc of a blade as a polygon, hook, spike) or the pike (shaft,
+  leaf head, socket) as shapes at the reachF bone's angle (`tests/unit/m7-topdown-pieces.test.mjs` `polearm()`).
+- `held:topdown-blades@2`, `-blades-off@2`: the rogue's dagger, short sword or claws, and the second of a pair on
+  `reachB` (from the side the far one in the metal's `far` ramp); `held:topdown-guns@2`: the ranger's blaster, scatter
+  and beam (the cell lit) and the trooper's rifle, pistol and baton, with `view: "end"` for a gun the code sees end on
+  (reach under 0.7, facing down, pointing within 17.5 degrees of the camera: the sprites show it by frame edits on those
+  frames); `held:topdown-stick@2`; `held:topdown-flower@2` (the bloom a stamp on the tip, upright on the pixel the
+  code centres it on); `held:topdown-magic@3`: the staff and the wand without the lit end, which the sprite draws (an
+  orb is only light: nothing). Made by `tests/unit/m7-topdown-held.test.mjs` (`M7_PIECES=write`), which also holds each
+  against the code at every frame a clip turns it to. A sprite whose slot for a held thing is a detail slot (flat)
+  maps it to a derived slot (`tone` by 0) so the thing is shaded as the code shades it.
+- `part:topdown-belt@2`: version 1 with its colour as given (key `c: belt`), not its shadow tone.
+- `held:topdown-magic@2` (version 1 without the lit end, still a read-back) is replaced by `@3`.
+
+**`base:person-topdown-walker@2`** (M7c): version 1 with its `talk` keyed again with the free hand raised as the code
+elder raises it (`node tools/bake-topdown-m7.mjs --walker2`; a sprite's own keys cannot swap the base's stamps, so the
+gesture is the base's). village-elder extends it.
+
+**`base:person-topdown-trooper@3`** (M7c review): version 2's clips byte for byte, and the same clips again for a
+baton (`idle-baton-*`, `walk-baton-*`, `block-baton`, `hurt-baton`, `die-baton`), and `idle_*`, `walk_*` again as
+`idle-gun-*`, `walk-gun-*` (a name a setting picks has no underscore): the code carries a baton raised
+(`carry: 'up'`) and a gun at the hip (`'ready'`), and version 2 keyed all but the jab for the gun, so the baton hung tip
+down. shield-trooper picks them for a baton (`node tools/bake-topdown-m7.mjs --trooper3`; `trooperV3`).
+
+**Replaced before release.** Never released and named by nothing, removed with their pins: `held:topdown-polearm@1` to `@3`, `held:topdown-magic@1` and `@2`, `held:topdown-blades@1`,
+`-blades-off@1`, `-guns@1`, `-stick@1`, `-flower@1`, `part:topdown-{body-shield,cape,collar,crown,lens-mask,scarf,
+suit-pack,visor-helmet,visor}@1` and `base:person-topdown-{child,guard,mage,merchant,ranger,rogue,trooper}@1`. To look
+at one again: `node tools/bake-topdown-m7.mjs --replaced <dir>` writes every version in the baker's `REPLACED` list into
+a folder outside `pieces/`, byte for byte as removed (checked against the removed files in M7c); the three the baker
+never made (`held:topdown-polearm@2`, `@3`, `held:topdown-magic@2`) are kept in `tests/fixtures/m7-replaced/`. Their
+pin lines were taken out by hand (M7b, M7c), against `_pins.json`'s "never remove a line": that note is for released
+versions, and these never were (docs/data-sprites.md 3.1: a version stays until nothing names it); from M7c on a
+replaced M7 version that is pinned keeps its pin and its file. Old base versions kept that no sprite uses:
+`base:person-topdown@1` and `base:person-topdown-walker@1` (B16b's, released; B16b's fixtures and tests use them),
+and `base:person-topdown-trooper@2` (pinned, replaced by `@3`, which holds its clips; `KEPT` in
+`tests/unit/m7-topdown-pieces.test.mjs`).
+
 ## The side-view person (B16a): `base:person-side`, `part:*`, `held:*`
 
 Made by `tools/bake-person-side.mjs` from `rigs/humanoid.js` and the code Hero's parts (temporary, deleted with the

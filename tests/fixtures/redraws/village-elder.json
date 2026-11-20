@@ -1,0 +1,372 @@
+{
+ "id": "village-elder",
+ "frozen": "2026-11-20",
+ "source": "sprites/village-elder.js",
+ "sha256": "05206ecb72e8d06c1bab6eb520e3cc919e2bc2adc56c0d596ceae8786c6307d4",
+ "name": "Village elder",
+ "blurb": "An old villager bent over a walking stick, who walks slowly and talks. Change the stoop, beard, cap, what is held and the colours.",
+ "meta": {
+  "type": "character",
+  "role": "characters/npc",
+  "themes": [
+   "fantasy",
+   "farm"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "top-down-rpg"
+  ],
+  "view": "top-down",
+  "words": [
+   "elder",
+   "old man",
+   "villager",
+   "grandfather",
+   "sage",
+   "quest giver",
+   "beard",
+   "cane",
+   "walk",
+   "talk",
+   "village",
+   "wise"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  48,
+  48
+ ],
+ "pivot": [
+  24,
+  42
+ ],
+ "grounded": false,
+ "preview": "walk_down",
+ "params": {
+  "height": {
+   "kind": "range",
+   "label": "Height",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Short",
+   "hi": "Tall",
+   "group": "Look"
+  },
+  "build": {
+   "kind": "range",
+   "label": "Build",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slim",
+   "hi": "Stocky",
+   "group": "Look"
+  },
+  "stoop": {
+   "kind": "range",
+   "label": "Stoop",
+   "def": 0.55,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Upright",
+   "hi": "Bent",
+   "group": "Look"
+  },
+  "held": {
+   "kind": "choice",
+   "label": "Held",
+   "def": "cane",
+   "options": [
+    {
+     "value": "cane",
+     "label": "Cane"
+    },
+    {
+     "value": "lantern",
+     "label": "Lantern"
+    },
+    {
+     "value": "none",
+     "label": "None"
+    }
+   ],
+   "group": "Look"
+  },
+  "heldSize": {
+   "kind": "range",
+   "label": "Size",
+   "def": 1,
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "beard": {
+   "kind": "choice",
+   "label": "Beard",
+   "def": "long",
+   "options": [
+    {
+     "value": "long",
+     "label": "Long"
+    },
+    {
+     "value": "short",
+     "label": "Short"
+    },
+    {
+     "value": "none",
+     "label": "None"
+    }
+   ],
+   "group": "Look"
+  },
+  "beardLength": {
+   "kind": "range",
+   "label": "Length",
+   "def": 1,
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "lo": "Short",
+   "hi": "Long",
+   "group": "Look"
+  },
+  "headgear": {
+   "kind": "choice",
+   "label": "Headgear",
+   "def": "none",
+   "options": [
+    {
+     "value": "none",
+     "label": "None"
+    },
+    {
+     "value": "cap",
+     "label": "Cap"
+    },
+    {
+     "value": "circlet",
+     "label": "Circlet"
+    }
+   ],
+   "group": "Look"
+  },
+  "headgearSize": {
+   "kind": "range",
+   "label": "Size",
+   "def": 1,
+   "min": 0.5,
+   "max": 1.8,
+   "step": 0.05,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "skin": {
+   "kind": "color",
+   "label": "Skin",
+   "def": "#f6d3b0",
+   "swatches": [
+    "#f6d3b0",
+    "#e8b088",
+    "#c98a5c",
+    "#9a6240",
+    "#6e4428",
+    "#9bd18a",
+    "#b9a7e0"
+   ],
+   "group": "Colors"
+  },
+  "hair": {
+   "kind": "color",
+   "label": "Hair",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#9a6a3e",
+    "#e6c96a",
+    "#c9423a",
+    "#5a3a22",
+    "#a8612a",
+    "#e0b040",
+    "#d8d8e0"
+   ],
+   "group": "Colors"
+  },
+  "outfit": {
+   "kind": "color",
+   "label": "Robe",
+   "def": "#a8a4a0",
+   "swatches": [
+    "#a8a4a0",
+    "#3f6fd1",
+    "#7a4fc4",
+    "#2f8f9d",
+    "#c9423a",
+    "#8e3a4a",
+    "#4f9d57",
+    "#e08a2c"
+   ],
+   "group": "Colors"
+  },
+  "trim": {
+   "kind": "color",
+   "label": "Trim",
+   "def": "#c8553a",
+   "swatches": [
+    "#c8553a",
+    "#c9423a",
+    "#f2c230",
+    "#2f8f9d",
+    "#7a4fc4",
+    "#f0ead8",
+    "#e08a2c",
+    "#e6c545"
+   ],
+   "group": "Colors"
+  },
+  "bounce": {
+   "kind": "range",
+   "label": "Bounce",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Calm",
+   "hi": "Bouncy",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle_down": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    7,
+    10
+   ]
+  },
+  "idle_up": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    7,
+    10
+   ]
+  },
+  "idle_side": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    7,
+    10
+   ]
+  },
+  "walk_down": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "walk_up": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "walk_side": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "talk": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    7,
+    10
+   ]
+  }
+ },
+ "sounds": {
+  "walk_down": [
+   {
+    "sound": "footstep-grass",
+    "frame": 0,
+    "preset": "Dirt path",
+    "volume": 0.45
+   },
+   {
+    "sound": "footstep-grass",
+    "frame": 4,
+    "preset": "Dirt path",
+    "volume": 0.45
+   }
+  ],
+  "walk_up": [
+   {
+    "sound": "footstep-grass",
+    "frame": 0,
+    "preset": "Dirt path",
+    "volume": 0.45
+   },
+   {
+    "sound": "footstep-grass",
+    "frame": 4,
+    "preset": "Dirt path",
+    "volume": 0.45
+   }
+  ],
+  "walk_side": [
+   {
+    "sound": "footstep-grass",
+    "frame": 0,
+    "preset": "Dirt path",
+    "volume": 0.45
+   },
+   {
+    "sound": "footstep-grass",
+    "frame": 4,
+    "preset": "Dirt path",
+    "volume": 0.45
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-rpg-fantasy"
+ ]
+}

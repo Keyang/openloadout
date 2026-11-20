@@ -1,0 +1,76 @@
+{
+ "format": "loadout-piece",
+ "version": 1,
+ "id": "part:topdown-hairdo",
+ "v": 1,
+ "name": "Bowl cut or pigtails",
+ "about": "A child's bowl cut or two pigtails tied with a ribbon, on the head node (use z 50).",
+ "slots": [
+  {
+   "id": "hair",
+   "label": "Hair",
+   "default": "#8a5a34",
+   "material": "plant" },
+  {
+   "id": "tie",
+   "label": "Ribbon",
+   "default": "#c9423a",
+   "material": "cloth" } ],
+ "args": {
+  "style": {
+   "type": "word",
+   "options": ["bowl","pigtails"],
+   "default": "bowl" } },
+ "made": {
+  "by": "tools/bake-topdown-m7.mjs",
+  "from": "rigs/topdown.js" },
+ "body": {
+  "draw": [
+   {
+    "id": "bowl-down",
+    "kind": "stamp",
+    "at": [-7,-7.5],
+    "rows": [".....aaaaa.....","..aaaaaaaaaaa..",".baaaaaaaaaaaa.",".baaaaaaaaaaaa.",".aaaaaaaaaaaaa.","baaaaaaaaaaaaaa","baaabbbbbbbbbaa","baa.........baa","bba.........baa",".bb.........bb."],
+    "key": {"a":"hair","b":"hair.dark"},
+    "z": 4,
+    "when": {"direction":["down"],"style":["bowl"]} },
+   {
+    "id": "pigtails-down",
+    "kind": "stamp",
+    "at": [-1,-9.5],
+    "rows": ["..abb.........cba..",".cabb.........cbab.",".bbbb.........ccbb.","cbbc...........cccb","cb...............cc","c.................c"],
+    "key": {"a":"tie","b":"hair","c":"hair.dark"},
+    "z": 4,
+    "when": {"direction":["down"],"style":["pigtails"]} },
+   {
+    "id": "bowl-up",
+    "kind": "stamp",
+    "at": [-7,-7.5],
+    "rows": [".....aaaaa.....","..baaaaaaaaaa..",".bbaaaaaaaaaaa.",".baaaaaaaaaaaa.",".baaaaaaaaaaaa.","bbaaaaaaaaaaaaa","bbaaaaaaaaaaaaa","bbbaaaaaaaaaaaa","bbbaaaaaaaaaaaa",".bbbbbbbbbbbbb.",".bbbbbbbbbbbbb."],
+    "key": {"a":"hair","b":"hair.dark"},
+    "z": 4,
+    "when": {"direction":["up"],"style":["bowl"]} },
+   {
+    "id": "pigtails-up",
+    "kind": "stamp",
+    "at": [-1,-9.5],
+    "rows": ["..abb.........cba..",".cabb.........cbab.",".bbbb.........ccbb.","cbbc...........cccb","cb...............cc","c.................c"],
+    "key": {"a":"tie","b":"hair","c":"hair.dark"},
+    "z": 4,
+    "when": {"direction":["up"],"style":["pigtails"]} },
+   {
+    "id": "bowl-side",
+    "kind": "stamp",
+    "at": [-7,-7.5],
+    "rows": [".....aaaaa.....","..aaaaaaaaaaa..",".baaaaaaaaaaaa.",".baaaaaaaaaaaa.",".aaaaaaaaaaaaa.","baaaaaaaaaaaaaa","baaaaaaabbbbbbb","baaaaaa........","bbaaaaa........",".baaaaa........",".bbbbbb........"],
+    "key": {"a":"hair","b":"hair.dark"},
+    "z": 4,
+    "when": {"direction":["side"],"style":["bowl"]} },
+   {
+    "id": "pigtails-side",
+    "kind": "stamp",
+    "at": [-1,-9.5],
+    "rows": ["...abb","..babb",".bbbbc","cbbb..","cbc...","c....."],
+    "key": {"a":"tie","b":"hair","c":"hair.dark"},
+    "z": 4,
+    "when": {"direction":["side"],"style":["pigtails"]} } ] } }

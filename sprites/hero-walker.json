@@ -1,0 +1,3659 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "hero-walker",
+ "name": "Hero (map)",
+ "blurb": "The hero as seen on the map, walking and fighting in four directions. Change the build, hair, gear and colours.",
+ "meta": {
+  "type": "character",
+  "role": "characters/player",
+  "themes": [
+   "fantasy"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "top-down-rpg"
+  ],
+  "view": "top-down",
+  "words": [
+   "hero",
+   "knight",
+   "adventurer",
+   "player",
+   "warrior",
+   "sword",
+   "cape",
+   "walk",
+   "attack",
+   "explore",
+   "overworld",
+   "village"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  48,
+  48
+ ],
+ "pivot": [
+  24,
+  42
+ ],
+ "grounded": false,
+ "preview": "walk_down",
+ "palette": [
+  {
+   "id": "skin",
+   "label": "Skin",
+   "default": "#f6d3b0",
+   "material": "skin",
+   "swatches": [
+    "#f6d3b0",
+    "#e8b088",
+    "#c98a5c",
+    "#9a6240",
+    "#6e4428",
+    "#9bd18a",
+    "#b9a7e0"
+   ]
+  },
+  {
+   "id": "hair",
+   "label": "Hair",
+   "default": "#9a6a3e",
+   "material": "plant",
+   "swatches": [
+    "#9a6a3e",
+    "#e6c96a",
+    "#c9423a",
+    "#f0ead8",
+    "#5a3a22",
+    "#a8612a",
+    "#e0b040",
+    "#d8d8e0"
+   ]
+  },
+  {
+   "id": "outfit",
+   "label": "Outfit",
+   "default": "#3f6fd1",
+   "material": "cloth",
+   "swatches": [
+    "#3f6fd1",
+    "#7a4fc4",
+    "#2f8f9d",
+    "#c9423a",
+    "#8e3a4a",
+    "#4f9d57",
+    "#e08a2c",
+    "#e6c545"
+   ]
+  },
+  {
+   "id": "trim",
+   "label": "Cape and trim",
+   "default": "#c9423a",
+   "material": "cloth",
+   "swatches": [
+    "#c9423a",
+    "#f2c230",
+    "#c8553a",
+    "#2f8f9d",
+    "#7a4fc4",
+    "#f0ead8",
+    "#e08a2c",
+    "#e6c545"
+   ]
+  },
+  {
+   "id": "metal",
+   "label": "Metal",
+   "default": "#c2c9d6",
+   "material": "metal",
+   "swatches": [
+    "#c2c9d6",
+    "#f2c230",
+    "#a8a4a0",
+    "#a8806a",
+    "#5a5f7a",
+    "#8f97a8",
+    "#e6c545",
+    "#c98a4a"
+   ]
+  },
+  {
+   "id": "bottom",
+   "derive": {
+    "rule": "tone",
+    "of": "outfit",
+    "by": -0.6
+   },
+   "material": "cloth"
+  },
+  {
+   "id": "wood",
+   "default": "#9a6a3e",
+   "material": "wood",
+   "detail": true
+  },
+  {
+   "id": "gold",
+   "default": "#f2c230",
+   "material": "metal",
+   "detail": true
+  },
+  {
+   "id": "shine",
+   "default": "#ffffff",
+   "material": "light",
+   "detail": true
+  }
+ ],
+ "body": {
+  "rig": {
+   "extends": {
+    "use": "base:person-topdown-sword",
+    "v": 1,
+    "paint": {
+     "top": "outfit",
+     "bottom": "bottom",
+     "boots": "wood",
+     "topFar": "outfit.dark",
+     "bottomFar": "bottom.dark"
+    },
+    "clips": []
+   },
+   "shapes": [
+    {
+     "id": "cuffB-down",
+     "kind": "stamp",
+     "on": "fistB",
+     "at": [
+      -1,
+      0
+     ],
+     "rows": [
+      "ccc"
+     ],
+     "key": {
+      "c": "trim"
+     },
+     "z": 60.5,
+     "when": {
+      "direction": [
+       "down"
+      ]
+     }
+    },
+    {
+     "id": "cuffF-down",
+     "kind": "stamp",
+     "on": "fistF",
+     "at": [
+      -1,
+      0
+     ],
+     "rows": [
+      "ccc"
+     ],
+     "key": {
+      "c": "trim"
+     },
+     "z": 62.5,
+     "when": {
+      "direction": [
+       "down"
+      ]
+     }
+    },
+    {
+     "id": "cuffB-up",
+     "kind": "stamp",
+     "on": "fistB",
+     "at": [
+      -1,
+      0
+     ],
+     "rows": [
+      "ccc"
+     ],
+     "key": {
+      "c": "trim"
+     },
+     "z": 32.5,
+     "when": {
+      "direction": [
+       "up"
+      ]
+     }
+    },
+    {
+     "id": "cuffF-up",
+     "kind": "stamp",
+     "on": "fistF",
+     "at": [
+      -1,
+      0
+     ],
+     "rows": [
+      "ccc"
+     ],
+     "key": {
+      "c": "trim"
+     },
+     "z": 35.5,
+     "when": {
+      "direction": [
+       "up"
+      ]
+     }
+    },
+    {
+     "id": "cuffB-side",
+     "kind": "stamp",
+     "on": "fistB",
+     "at": [
+      -1,
+      0
+     ],
+     "rows": [
+      "ccc"
+     ],
+     "key": {
+      "c": "trim.dark"
+     },
+     "z": 6.5,
+     "when": {
+      "direction": [
+       "side"
+      ]
+     }
+    },
+    {
+     "id": "cuffF-side",
+     "kind": "stamp",
+     "on": "fistF",
+     "at": [
+      -1,
+      0
+     ],
+     "rows": [
+      "ccc"
+     ],
+     "key": {
+      "c": "trim"
+     },
+     "z": 72.5,
+     "when": {
+      "direction": [
+       "side"
+      ]
+     }
+    },
+    {
+     "id": "cape",
+     "kind": "use",
+     "use": "part:topdown-cape",
+     "v": 2,
+     "on": "chest",
+     "z": 0,
+     "paint": {
+      "cloth": "trim",
+      "clasp": "gold"
+     },
+     "args": {
+      "kind": {
+       "from": "cape",
+       "pick": {
+        "plain": "plain",
+        "tattered": "tattered",
+        "none": "plain"
+       }
+      },
+      "length": {
+       "from": "capeLength",
+       "map": [
+        [
+         0.3,
+         0.3
+        ],
+        [
+         1.8,
+         1.8
+        ]
+       ]
+      }
+     },
+     "when": {
+      "cape": [
+       "plain",
+       "tattered"
+      ]
+     }
+    },
+    {
+     "id": "hem",
+     "kind": "use",
+     "use": "part:topdown-hem",
+     "v": 1,
+     "on": "waist",
+     "z": 40,
+     "paint": {
+      "trim": "trim"
+     }
+    },
+    {
+     "id": "hair",
+     "kind": "use",
+     "use": "part:topdown-hair",
+     "v": 2,
+     "on": "head",
+     "z": 50,
+     "paint": {
+      "hair": "hair"
+     },
+     "args": {
+      "style": {
+       "from": "hairStyle",
+       "pick": {
+        "short": "short",
+        "long": "long",
+        "spiky": "spiky",
+        "ponytail": "ponytail"
+       }
+      },
+      "hatted": {
+       "from": "headgear",
+       "pick": {
+        "helmet": true,
+        "crown": false,
+        "none": false
+       }
+      }
+     }
+    },
+    {
+     "id": "helmet",
+     "kind": "use",
+     "use": "part:topdown-helmet",
+     "v": 2,
+     "on": "head",
+     "z": 50,
+     "paint": {
+      "metal": "metal",
+      "plume": "trim"
+     },
+     "args": {
+      "size": {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.5,
+         0.5
+        ],
+        [
+         1.8,
+         1.8
+        ]
+       ]
+      }
+     },
+     "when": {
+      "headgear": [
+       "helmet"
+      ]
+     }
+    },
+    {
+     "id": "crown",
+     "kind": "use",
+     "use": "part:topdown-crown",
+     "v": 2,
+     "on": "head",
+     "z": 50,
+     "paint": {
+      "metal": "metal",
+      "gem": "trim"
+     },
+     "args": {
+      "size": {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.5,
+         0.5
+        ],
+        [
+         1.8,
+         1.8
+        ]
+       ]
+      }
+     },
+     "when": {
+      "headgear": [
+       "crown"
+      ]
+     }
+    },
+    {
+     "id": "sword",
+     "kind": "use",
+     "use": "held:topdown-weapon",
+     "v": 1,
+     "on": "reachF",
+     "z": 60,
+     "paint": {
+      "metal": "metal",
+      "wood": "wood",
+      "hilt": "gold"
+     },
+     "args": {
+      "kind": "sword",
+      "length": {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         7.15
+        ],
+        [
+         1.35,
+         14.85
+        ]
+       ]
+      }
+     },
+     "when": {
+      "weapon": [
+       "sword"
+      ]
+     }
+    },
+    {
+     "id": "axe",
+     "kind": "use",
+     "use": "held:topdown-weapon",
+     "v": 1,
+     "on": "reachF",
+     "z": 60,
+     "paint": {
+      "metal": "metal",
+      "wood": "wood",
+      "hilt": "gold"
+     },
+     "args": {
+      "kind": "axe",
+      "length": {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         6.5
+        ],
+        [
+         1.35,
+         13.5
+        ]
+       ]
+      }
+     },
+     "when": {
+      "weapon": [
+       "axe"
+      ]
+     }
+    },
+    {
+     "id": "spear",
+     "kind": "use",
+     "use": "held:topdown-weapon",
+     "v": 1,
+     "on": "reachF",
+     "z": 60,
+     "paint": {
+      "metal": "metal",
+      "wood": "wood",
+      "hilt": "gold"
+     },
+     "args": {
+      "kind": "spear",
+      "length": {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         9.1
+        ],
+        [
+         1,
+         14
+        ],
+        [
+         1.35,
+         16
+        ]
+       ]
+      }
+     },
+     "when": {
+      "weapon": [
+       "spear"
+      ]
+     }
+    },
+    {
+     "id": "dieTip",
+     "kind": "stamp",
+     "on": "root",
+     "at": [
+      -23.5,
+      -8.5
+     ],
+     "rows": [
+      "..........aaaaaaa.....",
+      "........aaaaaaaaa.....",
+      ".......aaaaaaaaaaa....",
+      "......baaaaaaaaaaaa...",
+      "......baaaaaaaaaaaa...",
+      "......baaaaaaaaaaaa...",
+      ".....baaaaaaaaaaaa....",
+      ".....babcaaaaacbaa....",
+      ".....bbaaaaaaaaaaa....",
+      ".....dbbaaaaaaaaad....",
+      ".eeeddbbabbbaaadd.....",
+      ".aaaddfbbbbbbbffdd....",
+      ".aaad.fdddddddffdd....",
+      ".fff..fdddddddffeee...",
+      "......fdddddddd.aaa...",
+      ".....fdddddddd.aaa....",
+      ".....eeeeeeeee........",
+      ".....ghh...ghh........",
+      ".....ghh...ghh........",
+      "....ggg...ggg.........",
+      "....iii...iii.........",
+      "....iii...iii.........",
+      "....jjj...jjj........."
+     ],
+     "key": {
+      "a": "skin",
+      "b": "skin.dark",
+      "c": "ink",
+      "d": "outfit",
+      "e": "trim",
+      "f": "outfit.dark",
+      "g": "bottom.dark",
+      "h": "bottom",
+      "i": "wood",
+      "j": "wood.dark"
+     },
+     "variants": {
+      "f2": [
+       "..........aaaaaaa.....",
+       "........aaaaaaaaa.....",
+       ".......aaaaaaaaaaa....",
+       "......baaaaaaaaaaaa...",
+       "......baaaaaaaaaaaa...",
+       "......baaaaaaaaaaaa...",
+       ".....baaaaaaaaaaaa....",
+       ".....babcaaaaacbaa....",
+       ".....bbaaaaaaaaaaa....",
+       ".....dbbaaaaaaaaad....",
+       ".eeeddbbabbbaaadd.....",
+       ".aaaddfbbbbbbbffdd....",
+       ".aaad.fdddddddffdd....",
+       ".fff..fdddddddffeee...",
+       "......fdddddddd.aaa...",
+       ".....fdddddddd.aaa....",
+       ".....eeeeeeeee........",
+       ".....ghh...ghh........",
+       ".....ghh...ghh........",
+       "....ggg...ggg.........",
+       "....iii...iii.........",
+       "....iii...iii.........",
+       "....jjj...jjj........."
+      ],
+      "f3": [
+       "......................",
+       "......................",
+       "......................",
+       "......................",
+       "..............aaaaaaa.",
+       "............aaaaaaaaa.",
+       "...........aaaaaaaaaaa",
+       ".........baaaaaaaaaaaa",
+       ".........baaaaaaaaaaaa",
+       "........baaaaaaaaaaaa.",
+       "........baaaaaaaaaaaa.",
+       ".......babcaaaaacbaa..",
+       ".......bbaaaaaaaaaaa..",
+       "....eeedbbaaaaaaaaad..",
+       "...aaadfbbabbbaaafdd..",
+       "...aaa..fbbbbbbbffdd..",
+       ".......fdddddddffdd...",
+       ".......fdddddddffeee..",
+       "......eeeeeeeee.aaa...",
+       "......ggg...ggg.aaa...",
+       ".....iii...iii........",
+       ".....iii...iii........",
+       "....jjj...jjj........."
+      ]
+     },
+     "z": 1,
+     "hidden": true
+    },
+    {
+     "id": "dieLie",
+     "kind": "stamp",
+     "on": "root",
+     "at": [
+      -9.5,
+      -0.5
+     ],
+     "rows": [
+      "..............................",
+      "...........aab................",
+      "...........aabccc.............",
+      "...........aabccccc..aaaaaa...",
+      ".............ddddcc.aaaaaaaa..",
+      "effghhhhhhbccddddddaaaiaaaaaa.",
+      "effghhhhhhbcccccddiaaajaaaaaaa",
+      "effgggggggbccccccciaaaaaaaaaaa",
+      "..........bccccccciiaaaaaaaaaa",
+      "..........bccccccciiaaaaaaaaaa",
+      "effghhhhhhbccccccciiaaaaaaaaaa",
+      "effghhhhhhbccccccciaaaaaaaaaaa",
+      "effgggggggbcccccddiiaajaaaaaaa",
+      "..........bdddddccciiaiaaaaaa.",
+      "..............ccccc.iiaaaaaa..",
+      "............aabcccd..iiiiii...",
+      "............aabcd.............",
+      "............aab..............."
+     ],
+     "key": {
+      "a": "skin",
+      "b": "trim",
+      "c": "outfit",
+      "d": "outfit.dark",
+      "e": "wood.dark",
+      "f": "wood",
+      "g": "bottom.dark",
+      "h": "bottom",
+      "i": "skin.dark",
+      "j": "ink"
+     },
+     "variants": {
+      "f4": [
+       "..............................",
+       "...........aab................",
+       "...........aabccc.............",
+       "...........aabccccc..aaaaaa...",
+       ".............ddddcc.aaaaaaaa..",
+       "effghhhhhhbccddddddaaaiaaaaaa.",
+       "effghhhhhhbcccccddiaaajaaaaaaa",
+       "effgggggggbccccccciaaaaaaaaaaa",
+       "..........bccccccciiaaaaaaaaaa",
+       "..........bccccccciiaaaaaaaaaa",
+       "effghhhhhhbccccccciiaaaaaaaaaa",
+       "effghhhhhhbccccccciaaaaaaaaaaa",
+       "effgggggggbcccccddiiaajaaaaaaa",
+       "..........bdddddccciiaiaaaaaa.",
+       "..............ccccc.iiaaaaaa..",
+       "............aabcccd..iiiiii...",
+       "............aabcd.............",
+       "............aab..............."
+      ],
+      "f5": [
+       "..............................",
+       "..........daab................",
+       "..........daabcc..............",
+       "..........daabccccc..aaaaaa...",
+       ".............ddddcc.aaaaaaaa..",
+       "effghhhhhhbccddddddaaaiaaaaaa.",
+       "effghhhhhhbcccccddiaaajaaaaaaa",
+       "effgggggggbccccccciaaaaaaaaaaa",
+       "..........bccccccciiaaaaaaaaaa",
+       "..........bccccccciiaaaaaaaaaa",
+       "effghhhhhhbccccccciiaaaaaaaaaa",
+       "effghhhhhhbccccccciaaaaaaaaaaa",
+       "effgggggggbccccdddiiaajaaaaaaa",
+       "..........bddddcccciiaiaaaaaa.",
+       "...........aabccccc.iiaaaaaa..",
+       "...........aabccddd..iiiiii...",
+       "...........aabd...............",
+       ".............................."
+      ],
+      "f6": [
+       "..............................",
+       "...........aab................",
+       "...........aabccc.............",
+       "...........aabccccc..aaaaaa...",
+       ".............ddddcc.aaaaaaaa..",
+       "effghhhhhhbccddddddaaaiaaaaaa.",
+       "effghhhhhhbcccccddiaaajaaaaaaa",
+       "effgggggggbccccccciaaaaaaaaaaa",
+       "..........bccccccciiaaaaaaaaaa",
+       "..........bccccccciiaaaaaaaaaa",
+       "effghhhhhhbccccccciiaaaaaaaaaa",
+       "effghhhhhhbccccccciaaaaaaaaaaa",
+       "effgggggggbcccccddiiaajaaaaaaa",
+       "..........bdddddccciiaiaaaaaa.",
+       ".............cccccc.iiaaaaaa..",
+       "...........daabcccd..iiiiii...",
+       "...........daabdd.............",
+       "...........daab..............."
+      ],
+      "f7": [
+       "..............................",
+       "..............................",
+       "..........aabcc...............",
+       "..........aabcccccc..aaaaaa...",
+       "..........aabddcccc.aaaaaaaa..",
+       "effghhhhhhbddddddddaaaiaaaaaa.",
+       "effghhhhhhbcccddddiaaajaaaaaaa",
+       "effgggggggbccccccciaaaaaaaaaaa",
+       "..........bccccccciiaaaaaaaaaa",
+       "..........bccccccciiaaaaaaaaaa",
+       "effghhhhhhbccccccciiaaaaaaaaaa",
+       "effghhhhhhbccccccciaaaaaaaaaaa",
+       "effgggggggbcccddddiiaajaaaaaaa",
+       "..........bdddccccciiaiaaaaaa.",
+       "..........aabcccccc.iiaaaaaa..",
+       "..........aabcccddd..iiiiii...",
+       "..........aabdd...............",
+       ".............................."
+      ]
+     },
+     "z": 1,
+     "hidden": true
+    },
+    {
+     "id": "capeLie2",
+     "kind": "use",
+     "use": "part:topdown-cape",
+     "v": 2,
+     "on": "root",
+     "z": 2,
+     "hidden": true,
+     "paint": {
+      "cloth": "trim",
+      "clasp": "gold"
+     },
+     "args": {
+      "kind": {
+       "from": "cape",
+       "pick": {
+        "plain": "plain",
+        "tattered": "tattered",
+        "none": "plain"
+       }
+      },
+      "length": {
+       "from": "capeLength",
+       "map": [
+        [
+         0.3,
+         0.3
+        ],
+        [
+         1,
+         1
+        ],
+        [
+         1.8,
+         1.3
+        ]
+       ]
+      },
+      "pose": "f2"
+     },
+     "when": {
+      "cape": [
+       "plain",
+       "tattered"
+      ]
+     }
+    },
+    {
+     "id": "capeLie3",
+     "kind": "use",
+     "use": "part:topdown-cape",
+     "v": 2,
+     "on": "root",
+     "z": 2,
+     "hidden": true,
+     "paint": {
+      "cloth": "trim",
+      "clasp": "gold"
+     },
+     "args": {
+      "kind": {
+       "from": "cape",
+       "pick": {
+        "plain": "plain",
+        "tattered": "tattered",
+        "none": "plain"
+       }
+      },
+      "length": {
+       "from": "capeLength",
+       "map": [
+        [
+         0.3,
+         0.3
+        ],
+        [
+         1,
+         1
+        ],
+        [
+         1.8,
+         1.3
+        ]
+       ]
+      },
+      "pose": "f3"
+     },
+     "when": {
+      "cape": [
+       "plain",
+       "tattered"
+      ]
+     }
+    },
+    {
+     "id": "capeLie",
+     "kind": "use",
+     "use": "part:topdown-cape",
+     "v": 2,
+     "on": "root",
+     "z": 2,
+     "hidden": true,
+     "paint": {
+      "cloth": "trim",
+      "clasp": "gold"
+     },
+     "args": {
+      "kind": {
+       "from": "cape",
+       "pick": {
+        "plain": "plain",
+        "tattered": "tattered",
+        "none": "plain"
+       }
+      },
+      "length": {
+       "from": "capeLength",
+       "map": [
+        [
+         0.3,
+         0.3
+        ],
+        [
+         1,
+         1
+        ],
+        [
+         1.8,
+         1.3
+        ]
+       ]
+      },
+      "pose": "lie"
+     },
+     "when": {
+      "cape": [
+       "plain",
+       "tattered"
+      ]
+     }
+    },
+    {
+     "id": "hairLie2",
+     "kind": "use",
+     "use": "part:topdown-hair",
+     "v": 2,
+     "on": "root",
+     "z": 4,
+     "hidden": true,
+     "paint": {
+      "hair": "hair"
+     },
+     "args": {
+      "style": {
+       "from": "hairStyle",
+       "pick": {
+        "short": "short",
+        "long": "long",
+        "spiky": "spiky",
+        "ponytail": "ponytail"
+       }
+      },
+      "hatted": {
+       "from": "headgear",
+       "pick": {
+        "helmet": true,
+        "crown": false,
+        "none": false
+       }
+      },
+      "pose": "f2"
+     }
+    },
+    {
+     "id": "hairLie3",
+     "kind": "use",
+     "use": "part:topdown-hair",
+     "v": 2,
+     "on": "root",
+     "z": 4,
+     "hidden": true,
+     "paint": {
+      "hair": "hair"
+     },
+     "args": {
+      "style": {
+       "from": "hairStyle",
+       "pick": {
+        "short": "short",
+        "long": "long",
+        "spiky": "spiky",
+        "ponytail": "ponytail"
+       }
+      },
+      "hatted": {
+       "from": "headgear",
+       "pick": {
+        "helmet": true,
+        "crown": false,
+        "none": false
+       }
+      },
+      "pose": "f3"
+     }
+    },
+    {
+     "id": "hairLie",
+     "kind": "use",
+     "use": "part:topdown-hair",
+     "v": 2,
+     "on": "root",
+     "z": 4,
+     "hidden": true,
+     "paint": {
+      "hair": "hair"
+     },
+     "args": {
+      "style": {
+       "from": "hairStyle",
+       "pick": {
+        "short": "short",
+        "long": "long",
+        "spiky": "spiky",
+        "ponytail": "ponytail"
+       }
+      },
+      "hatted": {
+       "from": "headgear",
+       "pick": {
+        "helmet": true,
+        "crown": false,
+        "none": false
+       }
+      },
+      "pose": "lie"
+     }
+    },
+    {
+     "id": "helmetLie2",
+     "kind": "use",
+     "use": "part:topdown-helmet",
+     "v": 2,
+     "on": "root",
+     "z": 6,
+     "hidden": true,
+     "paint": {
+      "metal": "metal",
+      "plume": "trim"
+     },
+     "args": {
+      "size": {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.5,
+         0.5
+        ],
+        [
+         1.8,
+         1.8
+        ]
+       ]
+      },
+      "pose": "f2"
+     },
+     "when": {
+      "headgear": [
+       "helmet"
+      ]
+     }
+    },
+    {
+     "id": "helmetLie3",
+     "kind": "use",
+     "use": "part:topdown-helmet",
+     "v": 2,
+     "on": "root",
+     "z": 6,
+     "hidden": true,
+     "paint": {
+      "metal": "metal",
+      "plume": "trim"
+     },
+     "args": {
+      "size": {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.5,
+         0.5
+        ],
+        [
+         1.8,
+         1.8
+        ]
+       ]
+      },
+      "pose": "f3"
+     },
+     "when": {
+      "headgear": [
+       "helmet"
+      ]
+     }
+    },
+    {
+     "id": "helmetLie",
+     "kind": "use",
+     "use": "part:topdown-helmet",
+     "v": 2,
+     "on": "root",
+     "z": 6,
+     "hidden": true,
+     "paint": {
+      "metal": "metal",
+      "plume": "trim"
+     },
+     "args": {
+      "size": {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.5,
+         0.5
+        ],
+        [
+         1.8,
+         1.8
+        ]
+       ]
+      },
+      "pose": "lie"
+     },
+     "when": {
+      "headgear": [
+       "helmet"
+      ]
+     }
+    },
+    {
+     "id": "crownLie2",
+     "kind": "use",
+     "use": "part:topdown-crown",
+     "v": 2,
+     "on": "root",
+     "z": 6,
+     "hidden": true,
+     "paint": {
+      "metal": "metal",
+      "gem": "trim"
+     },
+     "args": {
+      "size": {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.5,
+         0.5
+        ],
+        [
+         1.8,
+         1.8
+        ]
+       ]
+      },
+      "pose": "f2"
+     },
+     "when": {
+      "headgear": [
+       "crown"
+      ]
+     }
+    },
+    {
+     "id": "crownLie3",
+     "kind": "use",
+     "use": "part:topdown-crown",
+     "v": 2,
+     "on": "root",
+     "z": 6,
+     "hidden": true,
+     "paint": {
+      "metal": "metal",
+      "gem": "trim"
+     },
+     "args": {
+      "size": {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.5,
+         0.5
+        ],
+        [
+         1.8,
+         1.8
+        ]
+       ]
+      },
+      "pose": "f3"
+     },
+     "when": {
+      "headgear": [
+       "crown"
+      ]
+     }
+    },
+    {
+     "id": "crownLie",
+     "kind": "use",
+     "use": "part:topdown-crown",
+     "v": 2,
+     "on": "root",
+     "z": 6,
+     "hidden": true,
+     "paint": {
+      "metal": "metal",
+      "gem": "trim"
+     },
+     "args": {
+      "size": {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.5,
+         0.5
+        ],
+        [
+         1.8,
+         1.8
+        ]
+       ]
+      },
+      "pose": "lie"
+     },
+     "when": {
+      "headgear": [
+       "crown"
+      ]
+     }
+    },
+    {
+     "id": "slash-sword-down-4-0",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        10.8743
+       ],
+       [
+        1,
+        14
+       ],
+       [
+        1.35,
+        14
+       ]
+      ]
+     },
+     "a0": 141.5655,
+     "a1": 234.143,
+     "thick": 2,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "sword"
+      ]
+     }
+    },
+    {
+     "id": "slash-sword-down-4-1",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        7.8743
+       ],
+       [
+        1,
+        11.3904
+       ],
+       [
+        1.35,
+        13
+       ]
+      ]
+     },
+     "a0": 164.4838,
+     "a1": 204.6509,
+     "thick": 1,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "sword"
+      ]
+     }
+    },
+    {
+     "id": "slash-sword-down-5-0",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        6.403
+       ],
+       [
+        1,
+        8.9025
+       ],
+       [
+        1.35,
+        8.9025
+       ]
+      ]
+     },
+     "a0": 113.0415,
+     "a1": 169.035,
+     "thick": 2,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "sword"
+      ]
+     }
+    },
+    {
+     "id": "slash-axe-down-4-0",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        10.289
+       ],
+       [
+        1,
+        13.0722
+       ],
+       [
+        1.35,
+        14.2092
+       ]
+      ]
+     },
+     "a0": 141.5655,
+     "a1": 235.3186,
+     "thick": 2,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "axe"
+      ]
+     }
+    },
+    {
+     "id": "slash-axe-down-4-1",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        7.289
+       ],
+       [
+        1,
+        10.0722
+       ],
+       [
+        1.35,
+        11.7092
+       ]
+      ]
+     },
+     "a0": 164.4838,
+     "a1": 205.4738,
+     "thick": 1,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "axe"
+      ]
+     }
+    },
+    {
+     "id": "slash-axe-down-5-0",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        5.8386
+       ],
+       [
+        1,
+        7.771
+       ],
+       [
+        1.35,
+        9.0844
+       ]
+      ]
+     },
+     "a0": 113.0415,
+     "a1": 170.3967,
+     "thick": 2,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "axe"
+      ]
+     }
+    },
+    {
+     "id": "slash-spear-down-4-0",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        12.6462
+       ],
+       [
+        1,
+        14
+       ],
+       [
+        1.35,
+        14
+       ]
+      ]
+     },
+     "a0": 141.5655,
+     "a1": 231.228,
+     "thick": 2,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "spear"
+      ]
+     }
+    },
+    {
+     "id": "slash-spear-down-4-1",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        9.6462
+       ],
+       [
+        1,
+        13
+       ],
+       [
+        1.35,
+        13
+       ]
+      ]
+     },
+     "a0": 164.4838,
+     "a1": 202.6104,
+     "thick": 1,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "spear"
+      ]
+     }
+    },
+    {
+     "id": "slash-spear-down-5-0",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        8.1151
+       ],
+       [
+        1,
+        8.8648
+       ],
+       [
+        1.35,
+        8.8648
+       ]
+      ]
+     },
+     "a0": 113.0415,
+     "a1": 166.1163,
+     "thick": 2,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "spear"
+      ]
+     }
+    },
+    {
+     "id": "slash-sword-up-4-0",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        9.1474
+       ],
+       [
+        1,
+        12
+       ],
+       [
+        1.35,
+        12
+       ]
+      ]
+     },
+     "a0": -58.4877,
+     "a1": 43.9826,
+     "thick": 2,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "sword"
+      ]
+     }
+    },
+    {
+     "id": "slash-sword-up-4-1",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        6.1474
+       ],
+       [
+        1,
+        9.7979
+       ],
+       [
+        1.35,
+        12.5
+       ]
+      ]
+     },
+     "a0": -35.5694,
+     "a1": 11.5226,
+     "thick": 1,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "sword"
+      ]
+     }
+    },
+    {
+     "id": "slash-axe-up-4-0",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        8.5447
+       ],
+       [
+        1,
+        11.8395
+       ],
+       [
+        1.35,
+        12.1426
+       ]
+      ]
+     },
+     "a0": -58.4877,
+     "a1": 45.6018,
+     "thick": 2,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "axe"
+      ]
+     }
+    },
+    {
+     "id": "slash-axe-up-4-1",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        5.5447
+       ],
+       [
+        1,
+        8.8395
+       ],
+       [
+        1.35,
+        11.1426
+       ]
+      ]
+     },
+     "a0": -35.5694,
+     "a1": 12.6561,
+     "thick": 1,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "axe"
+      ]
+     }
+    },
+    {
+     "id": "slash-spear-up-4-0",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        10.9822
+       ],
+       [
+        1,
+        12
+       ],
+       [
+        1.35,
+        12
+       ]
+      ]
+     },
+     "a0": -58.4877,
+     "a1": 40.1619,
+     "thick": 2,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "spear"
+      ]
+     }
+    },
+    {
+     "id": "slash-spear-up-4-1",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        7.9822
+       ],
+       [
+        1,
+        12.5
+       ],
+       [
+        1.35,
+        12.5
+       ]
+      ]
+     },
+     "a0": -35.5694,
+     "a1": 8.8482,
+     "thick": 1,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "spear"
+      ]
+     }
+    },
+    {
+     "id": "slash-sword-side-4-0",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        14.1142
+       ],
+       [
+        1,
+        15
+       ],
+       [
+        1.35,
+        15
+       ]
+      ]
+     },
+     "a0": -159.0834,
+     "a1": 1.1922,
+     "thick": 2,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "sword"
+      ]
+     }
+    },
+    {
+     "id": "slash-sword-side-4-1",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        11.1142
+       ],
+       [
+        1,
+        13
+       ],
+       [
+        1.35,
+        13
+       ]
+      ]
+     },
+     "a0": -109.2819,
+     "a1": -21.7261,
+     "thick": 1,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "sword"
+      ]
+     }
+    },
+    {
+     "id": "slash-sword-side-5-0",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        7.0229
+       ],
+       [
+        1,
+        10.833
+       ],
+       [
+        1.35,
+        12.1641
+       ]
+      ]
+     },
+     "a0": -45.2145,
+     "a1": 26.8638,
+     "thick": 2,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "sword"
+      ]
+     }
+    },
+    {
+     "id": "slash-sword-side-5-1",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        4.0229
+       ],
+       [
+        1,
+        7.833
+       ],
+       [
+        1.35,
+        11.6641
+       ]
+      ]
+     },
+     "a0": -21.8721,
+     "a1": 3.9455,
+     "thick": 1,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "sword"
+      ]
+     }
+    },
+    {
+     "id": "slash-axe-side-4-0",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        13.4642
+       ],
+       [
+        1,
+        15
+       ],
+       [
+        1.35,
+        15
+       ]
+      ]
+     },
+     "a0": -158.1873,
+     "a1": 1.1922,
+     "thick": 2,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "axe"
+      ]
+     }
+    },
+    {
+     "id": "slash-axe-side-4-1",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        10.4642
+       ],
+       [
+        1,
+        13
+       ],
+       [
+        1.35,
+        13
+       ]
+      ]
+     },
+     "a0": -108.6546,
+     "a1": -21.7261,
+     "thick": 1,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "axe"
+      ]
+     }
+    },
+    {
+     "id": "slash-axe-side-5-0",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        6.3845
+       ],
+       [
+        1,
+        9.8403
+       ],
+       [
+        1.35,
+        12.191
+       ]
+      ]
+     },
+     "a0": -46.1784,
+     "a1": 26.8638,
+     "thick": 2,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "axe"
+      ]
+     }
+    },
+    {
+     "id": "slash-axe-side-5-1",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        3.3845
+       ],
+       [
+        1,
+        6.8403
+       ],
+       [
+        1.35,
+        10.691
+       ]
+      ]
+     },
+     "a0": -22.5469,
+     "a1": 3.9455,
+     "thick": 1,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "axe"
+      ]
+     }
+    },
+    {
+     "id": "slash-spear-side-4-0",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        15
+       ],
+       [
+        1,
+        15
+       ],
+       [
+        1.35,
+        15
+       ]
+      ]
+     },
+     "a0": -158.3428,
+     "a1": 1.1922,
+     "thick": 2,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "spear"
+      ]
+     }
+    },
+    {
+     "id": "slash-spear-side-4-1",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        13
+       ],
+       [
+        1,
+        13
+       ],
+       [
+        1.35,
+        13
+       ]
+      ]
+     },
+     "a0": -108.7634,
+     "a1": -21.7261,
+     "thick": 1,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "spear"
+      ]
+     }
+    },
+    {
+     "id": "slash-spear-side-5-0",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        8.9484
+       ],
+       [
+        1,
+        12
+       ],
+       [
+        1.35,
+        12
+       ]
+      ]
+     },
+     "a0": -43.1611,
+     "a1": 26.8638,
+     "thick": 2,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "spear"
+      ]
+     }
+    },
+    {
+     "id": "slash-spear-side-5-1",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        5.9484
+       ],
+       [
+        1,
+        10.8173
+       ],
+       [
+        1.35,
+        12.5
+       ]
+      ]
+     },
+     "a0": -20.4348,
+     "a1": 3.9455,
+     "thick": 1,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "spear"
+      ]
+     }
+    }
+   ]
+  }
+ },
+ "controls": [
+  {
+   "key": "height",
+   "kind": "range",
+   "label": "Height",
+   "lo": "Short",
+   "hi": "Tall",
+   "default": 0.5,
+   "scales": {
+    "bones": [
+     "hip",
+     "spine",
+     "thiF",
+     "thiB",
+     "shnF",
+     "shnB",
+     "legF",
+     "legB",
+     "legIF",
+     "legIB"
+    ],
+    "by": [
+     0.82,
+     1.18
+    ]
+   }
+  },
+  {
+   "key": "build",
+   "kind": "range",
+   "label": "Build",
+   "lo": "Slim",
+   "hi": "Stocky",
+   "default": 0.5,
+   "scales": {
+    "bones": [
+     "shoulderF",
+     "shoulderB"
+    ],
+    "by": [
+     0.6,
+     1.3
+    ]
+   }
+  },
+  {
+   "key": "hairStyle",
+   "kind": "choice",
+   "label": "Hair",
+   "options": [
+    "short",
+    "long",
+    "spiky",
+    "ponytail"
+   ],
+   "default": "short"
+  },
+  {
+   "key": "weapon",
+   "kind": "choice",
+   "label": "Weapon",
+   "options": [
+    "sword",
+    "axe",
+    "spear",
+    "none"
+   ],
+   "default": "sword"
+  },
+  {
+   "key": "weaponLength",
+   "kind": "range",
+   "label": "Length",
+   "lo": "Short",
+   "hi": "Long",
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "default": 1
+  },
+  {
+   "key": "headgear",
+   "kind": "choice",
+   "label": "Headgear",
+   "options": [
+    "helmet",
+    "crown",
+    "none"
+   ],
+   "default": "helmet"
+  },
+  {
+   "key": "headgearSize",
+   "kind": "range",
+   "label": "Size",
+   "lo": "Small",
+   "hi": "Big",
+   "min": 0.5,
+   "max": 1.8,
+   "step": 0.05,
+   "default": 1
+  },
+  {
+   "key": "cape",
+   "kind": "choice",
+   "label": "Cape",
+   "options": [
+    "plain",
+    "tattered",
+    "none"
+   ],
+   "default": "plain"
+  },
+  {
+   "key": "capeLength",
+   "kind": "range",
+   "label": "Length",
+   "lo": "Short",
+   "hi": "Long",
+   "min": 0.3,
+   "max": 1.8,
+   "step": 0.05,
+   "default": 1
+  },
+  {
+   "key": "skin",
+   "kind": "colour",
+   "label": "Skin"
+  },
+  {
+   "key": "hair",
+   "kind": "colour",
+   "label": "Hair"
+  },
+  {
+   "key": "outfit",
+   "kind": "colour",
+   "label": "Outfit"
+  },
+  {
+   "key": "trim",
+   "kind": "colour",
+   "label": "Cape and trim"
+  },
+  {
+   "key": "metal",
+   "kind": "colour",
+   "label": "Metal",
+   "when": [
+    {
+     "weapon": [
+      "sword",
+      "axe",
+      "spear"
+     ]
+    },
+    {
+     "headgear": [
+      "helmet",
+      "crown"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "bounce",
+   "kind": "range",
+   "label": "Bounce",
+   "lo": "Calm",
+   "hi": "Bouncy",
+   "default": 0.5,
+   "group": "Motion"
+  },
+  {
+   "key": "stride",
+   "kind": "range",
+   "label": "Stride",
+   "lo": "Small steps",
+   "hi": "Big steps",
+   "default": 0.5,
+   "group": "Motion"
+  },
+  {
+   "key": "speed",
+   "standard": "speed"
+  }
+ ],
+ "parts": {
+  "weapon": {
+   "label": "Weapon",
+   "params": [
+    "weapon",
+    "weaponLength"
+   ],
+   "none": "none",
+   "socket": "hand",
+   "shapes": [
+    "sword",
+    "axe",
+    "spear"
+   ]
+  },
+  "headgear": {
+   "label": "Headgear",
+   "params": [
+    "headgear",
+    "headgearSize"
+   ],
+   "none": "none",
+   "socket": "head",
+   "shapes": [
+    "helmet",
+    "crown"
+   ]
+  },
+  "cape": {
+   "label": "Cape",
+   "params": [
+    "cape",
+    "capeLength"
+   ],
+   "none": "none",
+   "socket": "back",
+   "shapes": [
+    "cape"
+   ]
+  }
+ },
+ "clips": {
+  "idle_down": {
+   "from": "idle_down",
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "idle_up": {
+   "from": "idle_up",
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "idle_side": {
+   "from": "idle_side",
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.shnF",
+      "bones.toeF",
+      "bones.thiB",
+      "bones.shnB",
+      "bones.toeB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "first",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "walk_down": {
+   "from": "walk_down",
+   "sounds": [
+    {
+     "sound": "footstep-grass",
+     "frame": 0,
+     "preset": "Grass",
+     "volume": 0.45
+    },
+    {
+     "sound": "footstep-grass",
+     "frame": 4,
+     "preset": "Grass",
+     "volume": 0.45
+    }
+   ],
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.45
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.8
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.8
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.armF",
+      "bones.elbF",
+      "bones.wriF",
+      "bones.cuffF",
+      "bones.handF",
+      "bones.rimAF",
+      "stretch.armF",
+      "stretch.rimAF",
+      "bones.armB",
+      "bones.elbB",
+      "bones.wriB",
+      "bones.cuffB",
+      "bones.handB",
+      "bones.rimAB",
+      "stretch.armB",
+      "stretch.rimAB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.1
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "walk_up": {
+   "from": "walk_up",
+   "sounds": [
+    {
+     "sound": "footstep-grass",
+     "frame": 0,
+     "preset": "Grass",
+     "volume": 0.45
+    },
+    {
+     "sound": "footstep-grass",
+     "frame": 4,
+     "preset": "Grass",
+     "volume": 0.45
+    }
+   ],
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.8
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.armF",
+      "bones.elbF",
+      "bones.wriF",
+      "bones.cuffF",
+      "bones.handF",
+      "bones.rimAF",
+      "stretch.armF",
+      "stretch.rimAF",
+      "bones.armB",
+      "bones.elbB",
+      "bones.wriB",
+      "bones.cuffB",
+      "bones.handB",
+      "bones.rimAB",
+      "stretch.armB",
+      "stretch.rimAB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.8
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.armF",
+      "bones.elbF",
+      "bones.wriF",
+      "bones.cuffF",
+      "bones.handF",
+      "bones.rimAF",
+      "stretch.armF",
+      "stretch.rimAF",
+      "bones.armB",
+      "bones.elbB",
+      "bones.wriB",
+      "bones.cuffB",
+      "bones.handB",
+      "bones.rimAB",
+      "stretch.armB",
+      "stretch.rimAB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.8
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.1
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "walk_side": {
+   "from": "walk_side",
+   "sounds": [
+    {
+     "sound": "footstep-grass",
+     "frame": 0,
+     "preset": "Grass",
+     "volume": 0.45
+    },
+    {
+     "sound": "footstep-grass",
+     "frame": 4,
+     "preset": "Grass",
+     "volume": 0.45
+    }
+   ],
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.8
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.3
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.shnF",
+      "bones.toeF",
+      "bones.thiB",
+      "bones.shnB",
+      "bones.toeB",
+      "bones.legF",
+      "stretch.legF",
+      "bones.legB",
+      "stretch.legB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.7
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.shnF",
+      "bones.toeF",
+      "bones.thiB",
+      "bones.shnB",
+      "bones.toeB",
+      "bones.legF",
+      "stretch.legF",
+      "bones.legB",
+      "stretch.legB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.1
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.armF",
+      "bones.elbF",
+      "bones.wriF",
+      "bones.cuffF",
+      "bones.handF",
+      "bones.rimAF",
+      "stretch.armF",
+      "stretch.rimAF",
+      "bones.armB",
+      "bones.elbB",
+      "bones.wriB",
+      "bones.cuffB",
+      "bones.handB",
+      "bones.rimAB",
+      "stretch.armB",
+      "stretch.rimAB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.8
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.1
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.armF",
+      "bones.elbF",
+      "bones.wriF",
+      "bones.cuffF",
+      "bones.handF",
+      "bones.rimAF",
+      "stretch.armF",
+      "stretch.rimAF",
+      "bones.armB",
+      "bones.elbB",
+      "bones.wriB",
+      "bones.cuffB",
+      "bones.handB",
+      "bones.rimAB",
+      "stretch.armB",
+      "stretch.rimAB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.1
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.spine"
+     ],
+     "about": 0,
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.5
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "attack_down": {
+   "from": {
+    "from": "weapon",
+    "pick": {
+     "sword": "swing-down",
+     "axe": "swing-axe-down",
+     "spear": "swing-spear-down",
+     "none": "punch-down"
+    }
+   },
+   "sounds": [
+    {
+     "sound": "sword-slash",
+     "frame": 3,
+     "preset": "Quick dagger",
+     "volume": 0.7,
+     "when": {
+      "weapon": [
+       "sword",
+       "axe",
+       "spear"
+      ]
+     }
+    },
+    {
+     "sound": "whoosh",
+     "frame": 3,
+     "preset": "Quick swipe",
+     "volume": 0.7,
+     "when": {
+      "weapon": [
+       "none"
+      ]
+     }
+    }
+   ],
+   "frameEdits": {
+    "4": {
+     "show": [
+      "slash-sword-down-4-0",
+      "slash-sword-down-4-1",
+      "slash-axe-down-4-0",
+      "slash-axe-down-4-1",
+      "slash-spear-down-4-0",
+      "slash-spear-down-4-1"
+     ]
+    },
+    "5": {
+     "show": [
+      "slash-sword-down-5-0",
+      "slash-axe-down-5-0",
+      "slash-spear-down-5-0"
+     ]
+    }
+   }
+  },
+  "attack_up": {
+   "from": {
+    "from": "weapon",
+    "pick": {
+     "sword": "swing-up",
+     "axe": "swing-axe-up",
+     "spear": "swing-spear-up",
+     "none": "punch-up"
+    }
+   },
+   "sounds": [
+    {
+     "sound": "sword-slash",
+     "frame": 3,
+     "preset": "Quick dagger",
+     "volume": 0.7,
+     "when": {
+      "weapon": [
+       "sword",
+       "axe",
+       "spear"
+      ]
+     }
+    },
+    {
+     "sound": "whoosh",
+     "frame": 3,
+     "preset": "Quick swipe",
+     "volume": 0.7,
+     "when": {
+      "weapon": [
+       "none"
+      ]
+     }
+    }
+   ],
+   "frameEdits": {
+    "4": {
+     "show": [
+      "slash-sword-up-4-0",
+      "slash-sword-up-4-1",
+      "slash-axe-up-4-0",
+      "slash-axe-up-4-1",
+      "slash-spear-up-4-0",
+      "slash-spear-up-4-1"
+     ],
+     "nudge": [
+      0,
+      1
+     ]
+    },
+    "5": {
+     "nudge": [
+      0,
+      1
+     ]
+    }
+   }
+  },
+  "attack_side": {
+   "from": {
+    "from": "weapon",
+    "pick": {
+     "sword": "swing-side",
+     "axe": "swing-axe-side",
+     "spear": "swing-spear-side",
+     "none": "punch-side"
+    }
+   },
+   "sounds": [
+    {
+     "sound": "sword-slash",
+     "frame": 3,
+     "preset": "Quick dagger",
+     "volume": 0.7,
+     "when": {
+      "weapon": [
+       "sword",
+       "axe",
+       "spear"
+      ]
+     }
+    },
+    {
+     "sound": "whoosh",
+     "frame": 3,
+     "preset": "Quick swipe",
+     "volume": 0.7,
+     "when": {
+      "weapon": [
+       "none"
+      ]
+     }
+    }
+   ],
+   "frameEdits": {
+    "4": {
+     "show": [
+      "slash-sword-side-4-0",
+      "slash-sword-side-4-1",
+      "slash-axe-side-4-0",
+      "slash-axe-side-4-1",
+      "slash-spear-side-4-0",
+      "slash-spear-side-4-1"
+     ]
+    },
+    "5": {
+     "show": [
+      "slash-sword-side-5-0",
+      "slash-sword-side-5-1",
+      "slash-axe-side-5-0",
+      "slash-axe-side-5-1",
+      "slash-spear-side-5-0",
+      "slash-spear-side-5-1"
+     ]
+    }
+   }
+  },
+  "hurt": {
+   "from": "hurt",
+   "sounds": [
+    {
+     "sound": "punch",
+     "frame": 0,
+     "preset": "Light jab",
+     "volume": 0.9
+    }
+   ]
+  },
+  "die": {
+   "from": "die",
+   "sounds": [
+    {
+     "sound": "punch",
+     "frame": 0,
+     "preset": "Heavy body blow"
+    }
+   ],
+   "frameEdits": {
+    "2": {
+     "hide": [
+      "cape",
+      "hair",
+      "helmet",
+      "crown",
+      "hem",
+      "cuffB-down",
+      "cuffF-down",
+      "cuffB-up",
+      "cuffF-up",
+      "cuffB-side",
+      "cuffF-side"
+     ],
+     "show": [
+      "capeLie2",
+      "hairLie2",
+      "helmetLie2",
+      "crownLie2"
+     ]
+    },
+    "3": {
+     "hide": [
+      "cape",
+      "hair",
+      "helmet",
+      "crown",
+      "hem",
+      "cuffB-down",
+      "cuffF-down",
+      "cuffB-up",
+      "cuffF-up",
+      "cuffB-side",
+      "cuffF-side"
+     ],
+     "show": [
+      "capeLie3",
+      "hairLie3",
+      "helmetLie3",
+      "crownLie3"
+     ]
+    },
+    "4": {
+     "hide": [
+      "cape",
+      "hair",
+      "helmet",
+      "crown",
+      "hem",
+      "cuffB-down",
+      "cuffF-down",
+      "cuffB-up",
+      "cuffF-up",
+      "cuffB-side",
+      "cuffF-side"
+     ],
+     "show": [
+      "capeLie",
+      "hairLie",
+      "helmetLie",
+      "crownLie"
+     ]
+    },
+    "5": {
+     "hide": [
+      "cape",
+      "hair",
+      "helmet",
+      "crown",
+      "hem",
+      "cuffB-down",
+      "cuffF-down",
+      "cuffB-up",
+      "cuffF-up",
+      "cuffB-side",
+      "cuffF-side"
+     ],
+     "show": [
+      "capeLie",
+      "hairLie",
+      "helmetLie",
+      "crownLie"
+     ]
+    },
+    "6": {
+     "hide": [
+      "cape",
+      "hair",
+      "helmet",
+      "crown",
+      "hem",
+      "cuffB-down",
+      "cuffF-down",
+      "cuffB-up",
+      "cuffF-up",
+      "cuffB-side",
+      "cuffF-side"
+     ],
+     "show": [
+      "capeLie",
+      "hairLie",
+      "helmetLie",
+      "crownLie"
+     ]
+    },
+    "7": {
+     "hide": [
+      "cape",
+      "hair",
+      "helmet",
+      "crown",
+      "hem",
+      "cuffB-down",
+      "cuffF-down",
+      "cuffB-up",
+      "cuffF-up",
+      "cuffB-side",
+      "cuffF-side"
+     ],
+     "show": [
+      "capeLie",
+      "hairLie",
+      "helmetLie",
+      "crownLie"
+     ]
+    }
+   }
+  }
+ },
+ "made": {
+  "in": "library",
+  "from": "code:hero-walker",
+  "by": "migration batch M7 (/sprite-forge redraw)"
+ }
+}

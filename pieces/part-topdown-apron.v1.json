@@ -1,0 +1,42 @@
+{
+ "format": "loadout-piece",
+ "version": 1,
+ "id": "part:topdown-apron",
+ "v": 1,
+ "name": "Apron",
+ "about": "An apron: a bib and a panel down the legs with a tie and a pocket facing down, its edge from the side, its strings from behind; on the chest node (use z 40).",
+ "slots": [
+  {
+   "id": "cloth",
+   "label": "Apron",
+   "default": "#c9423a",
+   "material": "cloth" } ],
+ "made": {
+  "by": "tools/bake-topdown-m7.mjs",
+  "from": "rigs/topdown.js" },
+ "body": {
+  "draw": [
+   {
+    "id": "apron-down",
+    "kind": "stamp",
+    "at": [1,-3.5],
+    "rows": [".a...a.",".baaaa.",".baaaa.",".baaaa.",".baaaa.",".aaaaa.","bbbbbbb","baaaaaa","baaaaaa","baabbba","baaaaaa","baaaaaa","baaaaaa","bbbbbbb"],
+    "key": {"a":"cloth","b":"cloth.dark"},
+    "z": 0,
+    "when": {"direction":["down"]} },
+   {
+    "id": "apron-up",
+    "kind": "stamp",
+    "at": [7,-4.5],
+    "rows": ["aaabbbaaa","...a.a...","...a.a..."],
+    "key": {"a":"cloth","b":"cloth.dark"},
+    "z": 0,
+    "when": {"direction":["up"]} },
+   {
+    "id": "apron-side",
+    "kind": "stamp",
+    "at": [2,-4.5],
+    "rows": [".......abb",".......abb",".......abb",".......abb",".......abb","baaaaaaabb","b......abb",".......abb",".......abb",".......abb",".......abb",".......abb",".......aaa"],
+    "key": {"a":"cloth.dark","b":"cloth"},
+    "z": 0,
+    "when": {"direction":["side"]} } ] } }

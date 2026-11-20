@@ -1,0 +1,47 @@
+{
+ "format": "loadout-piece",
+ "version": 1,
+ "id": "part:topdown-belt-buckle",
+ "v": 1,
+ "name": "Belt with a buckle",
+ "about": "A belt round the waist with a metal buckle at the front, on the waist node (use z 40).",
+ "slots": [
+  {
+   "id": "belt",
+   "label": "Belt",
+   "default": "#5d6475",
+   "material": "cloth" },
+  {
+   "id": "buckle",
+   "label": "Buckle",
+   "default": "#c2c9d6",
+   "material": "metal" } ],
+ "made": {
+  "by": "tools/bake-topdown-m7.mjs",
+  "from": "rigs/topdown.js" },
+ "body": {
+  "draw": [
+   {
+    "id": "topdown-belt-buckle-down",
+    "kind": "stamp",
+    "at": [-3,-4.5],
+    "rows": ["aaaabaaaa"],
+    "key": {"a":"belt.dark","b":"buckle"},
+    "z": 0,
+    "when": {"direction":["down"]} },
+   {
+    "id": "topdown-belt-buckle-up",
+    "kind": "stamp",
+    "at": [-3,-4.5],
+    "rows": ["aaaaaaaaa"],
+    "key": {"a":"belt.dark"},
+    "z": 0,
+    "when": {"direction":["up"]} },
+   {
+    "id": "topdown-belt-buckle-side",
+    "kind": "stamp",
+    "at": [-3,-3.5],
+    "rows": ["aaaaaaab"],
+    "key": {"a":"belt.dark","b":"buckle"},
+    "z": 0,
+    "when": {"direction":["side"]} } ] } }

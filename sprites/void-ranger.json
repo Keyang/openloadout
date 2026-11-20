@@ -1,0 +1,3870 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "void-ranger",
+ "name": "Ranger",
+ "blurb": "A salvager in a pale space suit who walks, shoots and dodges in four directions. Change the build, gun, headgear, pack and colours.",
+ "meta": {
+  "type": "character",
+  "role": "characters/player",
+  "themes": [
+   "sci-fi",
+   "space"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "shooter"
+  ],
+  "view": "top-down",
+  "words": [
+   "ranger",
+   "astronaut",
+   "salvager",
+   "marine",
+   "player",
+   "hero",
+   "gun",
+   "blaster",
+   "shoot",
+   "dodge",
+   "walk",
+   "helmet",
+   "jetpack",
+   "twin stick"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  48,
+  48
+ ],
+ "pivot": [
+  24,
+  42
+ ],
+ "grounded": false,
+ "preview": "walk_down",
+ "palette": [
+  {
+   "id": "skin",
+   "label": "Skin",
+   "default": "#f6d3b0",
+   "material": "skin",
+   "swatches": [
+    "#f6d3b0",
+    "#e8b088",
+    "#c98a5c",
+    "#9a6240",
+    "#6e4428",
+    "#9bd18a",
+    "#b9a7e0"
+   ]
+  },
+  {
+   "id": "outfit",
+   "label": "Suit",
+   "default": "#e8ecf2",
+   "material": "cloth",
+   "swatches": [
+    "#e8ecf2",
+    "#c2c9d6",
+    "#9aa6c0",
+    "#6b7896",
+    "#4f9ff0"
+   ]
+  },
+  {
+   "id": "trim",
+   "label": "Stripes, gloves and boots",
+   "default": "#3f6fd1",
+   "material": "cloth",
+   "swatches": [
+    "#3f6fd1",
+    "#2fb3a8",
+    "#5fe0f0",
+    "#b48af8"
+   ]
+  },
+  {
+   "id": "glow",
+   "label": "Lights",
+   "default": "#5fe0f0",
+   "material": "light",
+   "swatches": [
+    "#5fe0f0",
+    "#b48af8",
+    "#4f9ff0",
+    "#5fd47a"
+   ]
+  },
+  {
+   "id": "hairTone",
+   "derive": {
+    "rule": "standOut",
+    "against": "skin",
+    "from": [
+     "plate",
+     "cream"
+    ]
+   },
+   "material": "plant"
+  },
+  {
+   "id": "cream",
+   "default": "#f0ead8",
+   "material": "plant",
+   "detail": true
+  },
+  {
+   "id": "hoodTone",
+   "derive": {
+    "rule": "tone",
+    "of": "outfit",
+    "by": -1
+   },
+   "material": "cloth"
+  },
+  {
+   "id": "panel",
+   "default": "#9aa6c0",
+   "material": "metal",
+   "detail": true
+  },
+  {
+   "id": "panelShade",
+   "derive": {
+    "rule": "tone",
+    "of": "panel",
+    "by": 0
+   },
+   "material": "metal"
+  },
+  {
+   "id": "hull",
+   "default": "#6b7896",
+   "material": "cloth",
+   "detail": true
+  },
+  {
+   "id": "plate",
+   "default": "#434d6d",
+   "material": "metal",
+   "detail": true
+  }
+ ],
+ "body": {
+  "rig": {
+   "extends": {
+    "use": "base:person-topdown-ranger",
+    "v": 2,
+    "paint": {
+     "top": "outfit",
+     "bottom": "outfit",
+     "boots": "trim",
+     "topFar": "outfit.dark",
+     "bottomFar": "outfit.dark"
+    },
+    "clips": []
+   },
+   "shapes": [
+    {
+     "id": "gloveB-down",
+     "kind": "stamp",
+     "on": "fistB",
+     "at": [
+      0,
+      0
+     ],
+     "rows": [
+      "ggg",
+      "ggg"
+     ],
+     "key": {
+      "g": "trim"
+     },
+     "z": 60.6,
+     "when": {
+      "direction": [
+       "down"
+      ]
+     }
+    },
+    {
+     "id": "gloveF-down",
+     "kind": "stamp",
+     "on": "fistF",
+     "at": [
+      0,
+      0
+     ],
+     "rows": [
+      "ggg",
+      "ggg"
+     ],
+     "key": {
+      "g": "trim"
+     },
+     "z": 62.6,
+     "when": {
+      "direction": [
+       "down"
+      ]
+     }
+    },
+    {
+     "id": "gloveB-up",
+     "kind": "stamp",
+     "on": "fistB",
+     "at": [
+      0,
+      0
+     ],
+     "rows": [
+      "ggg",
+      "ggg"
+     ],
+     "key": {
+      "g": "trim"
+     },
+     "z": 36,
+     "when": {
+      "direction": [
+       "up"
+      ]
+     }
+    },
+    {
+     "id": "gloveF-up",
+     "kind": "stamp",
+     "on": "fistF",
+     "at": [
+      0,
+      0
+     ],
+     "rows": [
+      "ggg",
+      "ggg"
+     ],
+     "key": {
+      "g": "trim"
+     },
+     "z": 36.1,
+     "when": {
+      "direction": [
+       "up"
+      ]
+     }
+    },
+    {
+     "id": "gloveB-side",
+     "kind": "stamp",
+     "on": "fistB",
+     "at": [
+      0,
+      0
+     ],
+     "rows": [
+      "ggg",
+      "ggg"
+     ],
+     "key": {
+      "g": "trim.dark"
+     },
+     "z": 6.6,
+     "when": {
+      "direction": [
+       "side"
+      ]
+     }
+    },
+    {
+     "id": "gloveF-side",
+     "kind": "stamp",
+     "on": "fistF",
+     "at": [
+      0,
+      0
+     ],
+     "rows": [
+      "ggg",
+      "ggg"
+     ],
+     "key": {
+      "g": "trim"
+     },
+     "z": 72.6,
+     "when": {
+      "direction": [
+       "side"
+      ]
+     }
+    },
+    {
+     "id": "suit",
+     "kind": "use",
+     "use": "part:topdown-suit-trim",
+     "v": 1,
+     "on": "chest",
+     "z": 40,
+     "paint": {
+      "trim": "trim",
+      "strap": "hull",
+      "light": "glow",
+      "plate": "plate"
+     },
+     "args": {
+      "spine": "narrow",
+      "straps": {
+       "from": "pack",
+       "pick": {
+        "none": false,
+        "tank": true,
+        "antenna": true,
+        "jet": true
+       }
+      },
+      "lights": true,
+      "plates": false
+     }
+    },
+    {
+     "id": "pack",
+     "kind": "use",
+     "use": "part:topdown-suit-pack",
+     "v": 2,
+     "on": "chest",
+     "z": 0,
+     "paint": {
+      "casing": "panel",
+      "light": "glow"
+     },
+     "args": {
+      "kind": {
+       "from": "pack",
+       "pick": {
+        "tank": "tank",
+        "antenna": "antenna",
+        "jet": "jet",
+        "none": "tank"
+       }
+      },
+      "size": {
+       "from": "packSize",
+       "map": [
+        [
+         0.65,
+         0.65
+        ],
+        [
+         1.35,
+         1.35
+        ]
+       ]
+      }
+     },
+     "when": {
+      "pack": [
+       "tank",
+       "antenna",
+       "jet"
+      ]
+     }
+    },
+    {
+     "id": "hair",
+     "kind": "use",
+     "use": "part:topdown-hair",
+     "v": 2,
+     "on": "head",
+     "z": 50,
+     "paint": {
+      "hair": "hairTone"
+     },
+     "args": {
+      "style": "short",
+      "hatted": false
+     },
+     "when": {
+      "headgear": [
+       "visor",
+       "none"
+      ]
+     }
+    },
+    {
+     "id": "helmet",
+     "kind": "use",
+     "use": "part:topdown-visor-helmet",
+     "v": 2,
+     "on": "head",
+     "z": 50,
+     "paint": {
+      "shell": "outfit",
+      "visor": "glow"
+     },
+     "args": {
+      "size": {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.5,
+         0.5
+        ],
+        [
+         1.8,
+         1.8
+        ]
+       ]
+      }
+     },
+     "when": {
+      "headgear": [
+       "helmet"
+      ]
+     }
+    },
+    {
+     "id": "visor",
+     "kind": "use",
+     "use": "part:topdown-visor",
+     "v": 2,
+     "on": "head",
+     "z": 50,
+     "paint": {
+      "glass": "glow",
+      "strap": "panel"
+     },
+     "args": {
+      "size": {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.5,
+         0.5
+        ],
+        [
+         1.8,
+         1.8
+        ]
+       ]
+      }
+     },
+     "when": {
+      "headgear": [
+       "visor"
+      ]
+     }
+    },
+    {
+     "id": "hood",
+     "kind": "use",
+     "use": "part:topdown-hood",
+     "v": 2,
+     "on": "head",
+     "z": 50,
+     "paint": {
+      "cloth": "hoodTone"
+     },
+     "args": {
+      "size": {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.5,
+         0.5
+        ],
+        [
+         1.8,
+         1.8
+        ]
+       ]
+      }
+     },
+     "when": {
+      "headgear": [
+       "hood"
+      ]
+     }
+    },
+    {
+     "id": "gun",
+     "kind": "use",
+     "use": "held:topdown-guns",
+     "v": 2,
+     "on": "reachF",
+     "z": 60,
+     "paint": {
+      "metal": "panelShade",
+      "grip": "plate",
+      "cell": "glow"
+     },
+     "args": {
+      "kind": {
+       "from": "weapon",
+       "pick": {
+        "blaster": "blaster",
+        "scatter": "scatter",
+        "beam": "beam",
+        "none": "blaster"
+       }
+      },
+      "length": {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         0.65
+        ],
+        [
+         1.15,
+         1.15
+        ],
+        [
+         1.35,
+         1.15
+        ]
+       ]
+      }
+     },
+     "when": {
+      "weapon": [
+       "blaster",
+       "scatter",
+       "beam"
+      ]
+     }
+    },
+    {
+     "id": "gunEnd",
+     "kind": "use",
+     "use": "held:topdown-guns",
+     "v": 2,
+     "on": "reachF",
+     "z": 60,
+     "paint": {
+      "metal": "panelShade",
+      "grip": "plate",
+      "cell": "glow"
+     },
+     "args": {
+      "kind": {
+       "from": "weapon",
+       "pick": {
+        "blaster": "blaster",
+        "scatter": "scatter",
+        "beam": "beam",
+        "none": "blaster"
+       }
+      },
+      "length": {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         0.65
+        ],
+        [
+         1.15,
+         1.15
+        ],
+        [
+         1.35,
+         1.15
+        ]
+       ]
+      },
+      "view": "end"
+     },
+     "when": {
+      "weapon": [
+       "blaster",
+       "scatter",
+       "beam"
+      ]
+     },
+     "hidden": true
+    },
+    {
+     "id": "dieTip",
+     "kind": "stamp",
+     "on": "root",
+     "at": [
+      -23.5,
+      -8.5
+     ],
+     "rows": [
+      "..........aaaaaaa.....",
+      "........aaaaaaaaa.....",
+      ".......aaaaaaaaaaa....",
+      "......baaaaaaaaaaaa...",
+      "......baaaaaaaaaaaa...",
+      "......baaaaaaaaaaaa...",
+      ".....baaaaaaaaaaaa....",
+      ".....babcaaaaacbaa....",
+      ".....bbaaaaaaaaaaa....",
+      ".....dbbaaaaaaaaad....",
+      "...deebbabbbaaaee.....",
+      ".fffddgbbbbbbbggdd....",
+      ".fffd.gddeeeddggdd....",
+      ".ggg..fffffffffggdd...",
+      "......gdddddddd.fff...",
+      ".....gdddddddd.fff....",
+      ".....ggggggggg........",
+      ".....gdd...gdd........",
+      ".....gdd...gdd........",
+      "....ggg...ggg.........",
+      "....fff...fff.........",
+      "....fff...fff.........",
+      "....hhh...hhh........."
+     ],
+     "key": {
+      "a": "skin",
+      "b": "skin.dark",
+      "c": "ink",
+      "d": "outfit",
+      "e": "glow",
+      "f": "trim",
+      "g": "outfit.dark",
+      "h": "trim.dark"
+     },
+     "variants": {
+      "f2": [
+       "..........aaaaaaa.....",
+       "........aaaaaaaaa.....",
+       ".......aaaaaaaaaaa....",
+       "......baaaaaaaaaaaa...",
+       "......baaaaaaaaaaaa...",
+       "......baaaaaaaaaaaa...",
+       ".....baaaaaaaaaaaa....",
+       ".....babcaaaaacbaa....",
+       ".....bbaaaaaaaaaaa....",
+       ".....dbbaaaaaaaaad....",
+       "...deebbabbbaaaee.....",
+       ".fffddgbbbbbbbggdd....",
+       ".fffd.gddeeeddggdd....",
+       ".ggg..fffffffffggdd...",
+       "......gdddddddd.fff...",
+       ".....gdddddddd.fff....",
+       ".....ggggggggg........",
+       ".....gdd...gdd........",
+       ".....gdd...gdd........",
+       "....ggg...ggg.........",
+       "....fff...fff.........",
+       "....fff...fff.........",
+       "....hhh...hhh........."
+      ],
+      "f3": [
+       "......................",
+       "......................",
+       "......................",
+       "......................",
+       "..............aaaaaaa.",
+       "............aaaaaaaaa.",
+       "...........aaaaaaaaaaa",
+       ".........baaaaaaaaaaaa",
+       ".........baaaaaaaaaaaa",
+       "........baaaaaaaaaaaa.",
+       "........baaaaaaaaaaaa.",
+       ".......babcaaaaacbaa..",
+       ".......bbaaaaaaaaaaa..",
+       "....gddebbaaaaaaaaae..",
+       "...fffdgbbabbbaaagdd..",
+       "...fff..fbbbbbbbfgdd..",
+       ".......gdddddddggdd...",
+       ".......gdddddddgggdd..",
+       "......ggggggggg.fff...",
+       "......ggg...ggg.fff...",
+       ".....fff...fff........",
+       ".....fff...fff........",
+       "....hhh...hhh........."
+      ]
+     },
+     "z": 1,
+     "hidden": true
+    },
+    {
+     "id": "dieLie",
+     "kind": "stamp",
+     "on": "root",
+     "at": [
+      -9.5,
+      -0.5
+     ],
+     "rows": [
+      "..............................",
+      "...........aab................",
+      "...........aabbbb.............",
+      "...........aacbbbdb..eeeeee...",
+      ".............ccccdb.eeeeeeee..",
+      "faacbbbbbbcbbaccccceeegeeeeee.",
+      "faacbbbbbbcbbabbccgeeeheeeeeee",
+      "faaccccccccbbabbbbgeeeeeeeeeee",
+      "..........cbbabddbggeeeeeeeeee",
+      "..........cbbabddbggeeeeeeeeee",
+      "faacbbbbbbcbbabdibggeeeeeeeeee",
+      "faacbbbbbbcbbabbbbgeeeeeeeeeee",
+      "faaccccccccbbabbccggeeheeeeeee",
+      "..........cccaccbbbggegeeeeee.",
+      "..............bbbdb.ggeeeeee..",
+      "............aabbbdc..gggggg...",
+      "............aabbc.............",
+      "............aac..............."
+     ],
+     "key": {
+      "a": "trim",
+      "b": "outfit",
+      "c": "outfit.dark",
+      "d": "glow",
+      "e": "skin",
+      "f": "trim.dark",
+      "g": "skin.dark",
+      "h": "ink",
+      "i": "glow.light"
+     },
+     "variants": {
+      "f4": [
+       "..............................",
+       "...........aab................",
+       "...........aabbbb.............",
+       "...........aacbbbdb..eeeeee...",
+       ".............ccccdb.eeeeeeee..",
+       "faacbbbbbbcbbaccccceeegeeeeee.",
+       "faacbbbbbbcbbabbccgeeeheeeeeee",
+       "faaccccccccbbabbbbgeeeeeeeeeee",
+       "..........cbbabddbggeeeeeeeeee",
+       "..........cbbabddbggeeeeeeeeee",
+       "faacbbbbbbcbbabdibggeeeeeeeeee",
+       "faacbbbbbbcbbabbbbgeeeeeeeeeee",
+       "faaccccccccbbabbccggeeheeeeeee",
+       "..........cccaccbbbggegeeeeee.",
+       "..............bbbdb.ggeeeeee..",
+       "............aabbbdc..gggggg...",
+       "............aabbc.............",
+       "............aac..............."
+      ],
+      "f5": [
+       "..............................",
+       "..........caa.................",
+       "..........caabbb..............",
+       "..........caacbbbdb..eeeeee...",
+       ".............ccccdb.eeeeeeee..",
+       "faacbbbbbbcbbaccccceeegeeeeee.",
+       "faacbbbbbbcbbabbccgeeeheeeeeee",
+       "faaccccccccbbabbbbgeeeeeeeeeee",
+       "..........cbbabddbggeeeeeeeeee",
+       "..........cbbabddbggeeeeeeeeee",
+       "faacbbbbbbcbbabdibggeeeeeeeeee",
+       "faacbbbbbbcbbabbbbgeeeeeeeeeee",
+       "faaccccccccbbabcccggeeheeeeeee",
+       "..........cccacbbbbggegeeeeee.",
+       "...........aabbbbdb.ggeeeeee..",
+       "...........aabbbcdc..gggggg...",
+       "...........aacc...............",
+       ".............................."
+      ],
+      "f6": [
+       "..............................",
+       "...........aab................",
+       "...........aabbbb.............",
+       "...........aacbbbdb..eeeeee...",
+       ".............ccccdb.eeeeeeee..",
+       "faacbbbbbbcbbaccccceeegeeeeee.",
+       "faacbbbbbbcbbabbccgeeeheeeeeee",
+       "faaccccccccbbabbbbgeeeeeeeeeee",
+       "..........cbbabddbggeeeeeeeeee",
+       "..........cbbabddbggeeeeeeeeee",
+       "faacbbbbbbcbbabdibggeeeeeeeeee",
+       "faacbbbbbbcbbabbbbgeeeeeeeeeee",
+       "faaccccccccbbabbccggeeheeeeeee",
+       "..........cccaccbbbggegeeeeee.",
+       ".............bbbbdb.ggeeeeee..",
+       "...........caabbbdc..gggggg...",
+       "...........caabcc.............",
+       "...........caa................"
+      ],
+      "f7": [
+       "..............................",
+       "..............................",
+       "..........aabbb...............",
+       "..........aabbbbbdb..eeeeee...",
+       "..........aacccbbdb.eeeeeeee..",
+       "faacbbbbbbcccaccccceeegeeeeee.",
+       "faacbbbbbbcbbaccccgeeeheeeeeee",
+       "faaccccccccbbabbbbgeeeeeeeeeee",
+       "..........cbbabddbggeeeeeeeeee",
+       "..........cbbabddbggeeeeeeeeee",
+       "faacbbbbbbcbbabdibggeeeeeeeeee",
+       "faacbbbbbbcbbabbbbgeeeeeeeeeee",
+       "faaccccccccbbaccccggeeheeeeeee",
+       "..........cccabbbbbggegeeeeee.",
+       "..........aabbbbbdb.ggeeeeee..",
+       "..........aabbbbcdc..gggggg...",
+       "..........aaccc...............",
+       ".............................."
+      ]
+     },
+     "z": 1,
+     "hidden": true
+    },
+    {
+     "id": "packLie2",
+     "kind": "use",
+     "use": "part:topdown-suit-pack",
+     "v": 2,
+     "on": "root",
+     "z": 2,
+     "hidden": true,
+     "paint": {
+      "casing": "panel",
+      "light": "glow"
+     },
+     "args": {
+      "kind": {
+       "from": "pack",
+       "pick": {
+        "tank": "tank",
+        "antenna": "antenna",
+        "jet": "jet",
+        "none": "tank"
+       }
+      },
+      "size": {
+       "from": "packSize",
+       "map": [
+        [
+         0.65,
+         0.65
+        ],
+        [
+         1.35,
+         1.35
+        ]
+       ]
+      },
+      "pose": "f2"
+     },
+     "when": {
+      "pack": [
+       "tank",
+       "antenna",
+       "jet"
+      ]
+     }
+    },
+    {
+     "id": "packLie3",
+     "kind": "use",
+     "use": "part:topdown-suit-pack",
+     "v": 2,
+     "on": "root",
+     "z": 2,
+     "hidden": true,
+     "paint": {
+      "casing": "panel",
+      "light": "glow"
+     },
+     "args": {
+      "kind": {
+       "from": "pack",
+       "pick": {
+        "tank": "tank",
+        "antenna": "antenna",
+        "jet": "jet",
+        "none": "tank"
+       }
+      },
+      "size": {
+       "from": "packSize",
+       "map": [
+        [
+         0.65,
+         0.65
+        ],
+        [
+         1.35,
+         1.35
+        ]
+       ]
+      },
+      "pose": "f3"
+     },
+     "when": {
+      "pack": [
+       "tank",
+       "antenna",
+       "jet"
+      ]
+     }
+    },
+    {
+     "id": "packLie",
+     "kind": "use",
+     "use": "part:topdown-suit-pack",
+     "v": 2,
+     "on": "root",
+     "z": 2,
+     "hidden": true,
+     "paint": {
+      "casing": "panel",
+      "light": "glow"
+     },
+     "args": {
+      "kind": {
+       "from": "pack",
+       "pick": {
+        "tank": "tank",
+        "antenna": "antenna",
+        "jet": "jet",
+        "none": "tank"
+       }
+      },
+      "size": {
+       "from": "packSize",
+       "map": [
+        [
+         0.65,
+         0.65
+        ],
+        [
+         1.35,
+         1.35
+        ]
+       ]
+      },
+      "pose": "lie"
+     },
+     "when": {
+      "pack": [
+       "tank",
+       "antenna",
+       "jet"
+      ]
+     }
+    },
+    {
+     "id": "hairLie2",
+     "kind": "use",
+     "use": "part:topdown-hair",
+     "v": 2,
+     "on": "root",
+     "z": 4,
+     "hidden": true,
+     "paint": {
+      "hair": "hairTone"
+     },
+     "args": {
+      "style": "short",
+      "hatted": false,
+      "pose": "f2"
+     },
+     "when": {
+      "headgear": [
+       "visor",
+       "none"
+      ]
+     }
+    },
+    {
+     "id": "hairLie3",
+     "kind": "use",
+     "use": "part:topdown-hair",
+     "v": 2,
+     "on": "root",
+     "z": 4,
+     "hidden": true,
+     "paint": {
+      "hair": "hairTone"
+     },
+     "args": {
+      "style": "short",
+      "hatted": false,
+      "pose": "f3"
+     },
+     "when": {
+      "headgear": [
+       "visor",
+       "none"
+      ]
+     }
+    },
+    {
+     "id": "hairLie",
+     "kind": "use",
+     "use": "part:topdown-hair",
+     "v": 2,
+     "on": "root",
+     "z": 4,
+     "hidden": true,
+     "paint": {
+      "hair": "hairTone"
+     },
+     "args": {
+      "style": "short",
+      "hatted": false,
+      "pose": "lie"
+     },
+     "when": {
+      "headgear": [
+       "visor",
+       "none"
+      ]
+     }
+    },
+    {
+     "id": "helmetLie2",
+     "kind": "use",
+     "use": "part:topdown-visor-helmet",
+     "v": 2,
+     "on": "root",
+     "z": 6,
+     "hidden": true,
+     "paint": {
+      "shell": "outfit",
+      "visor": "glow"
+     },
+     "args": {
+      "size": {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.5,
+         0.5
+        ],
+        [
+         1.8,
+         1.8
+        ]
+       ]
+      },
+      "pose": "f2"
+     },
+     "when": {
+      "headgear": [
+       "helmet"
+      ]
+     }
+    },
+    {
+     "id": "helmetLie3",
+     "kind": "use",
+     "use": "part:topdown-visor-helmet",
+     "v": 2,
+     "on": "root",
+     "z": 6,
+     "hidden": true,
+     "paint": {
+      "shell": "outfit",
+      "visor": "glow"
+     },
+     "args": {
+      "size": {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.5,
+         0.5
+        ],
+        [
+         1.8,
+         1.8
+        ]
+       ]
+      },
+      "pose": "f3"
+     },
+     "when": {
+      "headgear": [
+       "helmet"
+      ]
+     }
+    },
+    {
+     "id": "helmetLie",
+     "kind": "use",
+     "use": "part:topdown-visor-helmet",
+     "v": 2,
+     "on": "root",
+     "z": 6,
+     "hidden": true,
+     "paint": {
+      "shell": "outfit",
+      "visor": "glow"
+     },
+     "args": {
+      "size": {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.5,
+         0.5
+        ],
+        [
+         1.8,
+         1.8
+        ]
+       ]
+      },
+      "pose": "lie"
+     },
+     "when": {
+      "headgear": [
+       "helmet"
+      ]
+     }
+    },
+    {
+     "id": "visorLie2",
+     "kind": "use",
+     "use": "part:topdown-visor",
+     "v": 2,
+     "on": "root",
+     "z": 6,
+     "hidden": true,
+     "paint": {
+      "glass": "glow",
+      "strap": "panel"
+     },
+     "args": {
+      "size": {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.5,
+         0.5
+        ],
+        [
+         1.8,
+         1.8
+        ]
+       ]
+      },
+      "pose": "f2"
+     },
+     "when": {
+      "headgear": [
+       "visor"
+      ]
+     }
+    },
+    {
+     "id": "visorLie3",
+     "kind": "use",
+     "use": "part:topdown-visor",
+     "v": 2,
+     "on": "root",
+     "z": 6,
+     "hidden": true,
+     "paint": {
+      "glass": "glow",
+      "strap": "panel"
+     },
+     "args": {
+      "size": {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.5,
+         0.5
+        ],
+        [
+         1.8,
+         1.8
+        ]
+       ]
+      },
+      "pose": "f3"
+     },
+     "when": {
+      "headgear": [
+       "visor"
+      ]
+     }
+    },
+    {
+     "id": "visorLie",
+     "kind": "use",
+     "use": "part:topdown-visor",
+     "v": 2,
+     "on": "root",
+     "z": 6,
+     "hidden": true,
+     "paint": {
+      "glass": "glow",
+      "strap": "panel"
+     },
+     "args": {
+      "size": {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.5,
+         0.5
+        ],
+        [
+         1.8,
+         1.8
+        ]
+       ]
+      },
+      "pose": "lie"
+     },
+     "when": {
+      "headgear": [
+       "visor"
+      ]
+     }
+    },
+    {
+     "id": "hoodLie2",
+     "kind": "use",
+     "use": "part:topdown-hood",
+     "v": 2,
+     "on": "root",
+     "z": 6,
+     "hidden": true,
+     "paint": {
+      "cloth": "hoodTone"
+     },
+     "args": {
+      "size": {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.5,
+         0.5
+        ],
+        [
+         1.8,
+         1.8
+        ]
+       ]
+      },
+      "pose": "f2"
+     },
+     "when": {
+      "headgear": [
+       "hood"
+      ]
+     }
+    },
+    {
+     "id": "hoodLie3",
+     "kind": "use",
+     "use": "part:topdown-hood",
+     "v": 2,
+     "on": "root",
+     "z": 6,
+     "hidden": true,
+     "paint": {
+      "cloth": "hoodTone"
+     },
+     "args": {
+      "size": {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.5,
+         0.5
+        ],
+        [
+         1.8,
+         1.8
+        ]
+       ]
+      },
+      "pose": "f3"
+     },
+     "when": {
+      "headgear": [
+       "hood"
+      ]
+     }
+    },
+    {
+     "id": "hoodLie",
+     "kind": "use",
+     "use": "part:topdown-hood",
+     "v": 2,
+     "on": "root",
+     "z": 6,
+     "hidden": true,
+     "paint": {
+      "cloth": "hoodTone"
+     },
+     "args": {
+      "size": {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.5,
+         0.5
+        ],
+        [
+         1.8,
+         1.8
+        ]
+       ]
+      },
+      "pose": "lie"
+     },
+     "when": {
+      "headgear": [
+       "hood"
+      ]
+     }
+    },
+    {
+     "id": "flare-blaster-ray",
+     "kind": "line",
+     "from": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         7.7
+        ],
+        [
+         1,
+         10.5
+        ],
+        [
+         1.15,
+         10.5
+        ],
+        [
+         1.35,
+         10.5
+        ]
+       ]
+      },
+      0
+     ],
+     "to": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         11.7
+        ],
+        [
+         1,
+         14.5
+        ],
+        [
+         1.15,
+         14.5
+        ],
+        [
+         1.35,
+         14.5
+        ]
+       ]
+      },
+      0
+     ],
+     "paint": "glow",
+     "when": {
+      "direction": [
+       "up",
+       "side"
+      ],
+      "weapon": [
+       "blaster"
+      ]
+     },
+     "on": "reachF",
+     "glow": true,
+     "z": 95,
+     "hidden": true
+    },
+    {
+     "id": "flare-blaster-arms",
+     "kind": "line",
+     "from": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         4.7
+        ],
+        [
+         1,
+         7.5
+        ],
+        [
+         1.15,
+         7.5
+        ],
+        [
+         1.35,
+         7.5
+        ]
+       ]
+      },
+      0
+     ],
+     "to": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         8.7
+        ],
+        [
+         1,
+         11.5
+        ],
+        [
+         1.15,
+         11.5
+        ],
+        [
+         1.35,
+         11.5
+        ]
+       ]
+      },
+      0
+     ],
+     "paint": "glow",
+     "on": "reachF",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "blaster"
+      ]
+     }
+    },
+    {
+     "id": "flare-blaster-bar",
+     "kind": "line",
+     "from": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         6.7
+        ],
+        [
+         1,
+         9.5
+        ],
+        [
+         1.15,
+         9.5
+        ],
+        [
+         1.35,
+         9.5
+        ]
+       ]
+      },
+      -2
+     ],
+     "to": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         6.7
+        ],
+        [
+         1,
+         9.5
+        ],
+        [
+         1.15,
+         9.5
+        ],
+        [
+         1.35,
+         9.5
+        ]
+       ]
+      },
+      2
+     ],
+     "paint": "glow",
+     "on": "reachF",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "blaster"
+      ]
+     }
+    },
+    {
+     "id": "flare-blaster-core",
+     "kind": "line",
+     "from": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         5.7
+        ],
+        [
+         1,
+         8.5
+        ],
+        [
+         1.15,
+         8.5
+        ],
+        [
+         1.35,
+         8.5
+        ]
+       ]
+      },
+      0
+     ],
+     "to": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         7.7
+        ],
+        [
+         1,
+         10.5
+        ],
+        [
+         1.15,
+         10.5
+        ],
+        [
+         1.35,
+         10.5
+        ]
+       ]
+      },
+      0
+     ],
+     "paint": "cream",
+     "on": "reachF",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "blaster"
+      ]
+     }
+    },
+    {
+     "id": "flare-blaster-coreBar",
+     "kind": "line",
+     "from": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         6.7
+        ],
+        [
+         1,
+         9.5
+        ],
+        [
+         1.15,
+         9.5
+        ],
+        [
+         1.35,
+         9.5
+        ]
+       ]
+      },
+      -1
+     ],
+     "to": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         6.7
+        ],
+        [
+         1,
+         9.5
+        ],
+        [
+         1.15,
+         9.5
+        ],
+        [
+         1.35,
+         9.5
+        ]
+       ]
+      },
+      1
+     ],
+     "paint": "cream",
+     "on": "reachF",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "blaster"
+      ]
+     }
+    },
+    {
+     "id": "flare-scatter-ray",
+     "kind": "line",
+     "from": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         8.35
+        ],
+        [
+         1,
+         11.5
+        ],
+        [
+         1.15,
+         11.5
+        ],
+        [
+         1.35,
+         11.5
+        ]
+       ]
+      },
+      0
+     ],
+     "to": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         12.35
+        ],
+        [
+         1,
+         15.5
+        ],
+        [
+         1.15,
+         15.5
+        ],
+        [
+         1.35,
+         15.5
+        ]
+       ]
+      },
+      0
+     ],
+     "paint": "glow",
+     "when": {
+      "direction": [
+       "up",
+       "side"
+      ],
+      "weapon": [
+       "scatter"
+      ]
+     },
+     "on": "reachF",
+     "glow": true,
+     "z": 95,
+     "hidden": true
+    },
+    {
+     "id": "flare-scatter-arms",
+     "kind": "line",
+     "from": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         5.35
+        ],
+        [
+         1,
+         8.5
+        ],
+        [
+         1.15,
+         8.5
+        ],
+        [
+         1.35,
+         8.5
+        ]
+       ]
+      },
+      0
+     ],
+     "to": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         9.35
+        ],
+        [
+         1,
+         12.5
+        ],
+        [
+         1.15,
+         12.5
+        ],
+        [
+         1.35,
+         12.5
+        ]
+       ]
+      },
+      0
+     ],
+     "paint": "glow",
+     "on": "reachF",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "scatter"
+      ]
+     }
+    },
+    {
+     "id": "flare-scatter-bar",
+     "kind": "line",
+     "from": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         7.35
+        ],
+        [
+         1,
+         10.5
+        ],
+        [
+         1.15,
+         10.5
+        ],
+        [
+         1.35,
+         10.5
+        ]
+       ]
+      },
+      -2
+     ],
+     "to": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         7.35
+        ],
+        [
+         1,
+         10.5
+        ],
+        [
+         1.15,
+         10.5
+        ],
+        [
+         1.35,
+         10.5
+        ]
+       ]
+      },
+      2
+     ],
+     "paint": "glow",
+     "on": "reachF",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "scatter"
+      ]
+     }
+    },
+    {
+     "id": "flare-scatter-core",
+     "kind": "line",
+     "from": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         6.35
+        ],
+        [
+         1,
+         9.5
+        ],
+        [
+         1.15,
+         9.5
+        ],
+        [
+         1.35,
+         9.5
+        ]
+       ]
+      },
+      0
+     ],
+     "to": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         8.35
+        ],
+        [
+         1,
+         11.5
+        ],
+        [
+         1.15,
+         11.5
+        ],
+        [
+         1.35,
+         11.5
+        ]
+       ]
+      },
+      0
+     ],
+     "paint": "cream",
+     "on": "reachF",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "scatter"
+      ]
+     }
+    },
+    {
+     "id": "flare-scatter-coreBar",
+     "kind": "line",
+     "from": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         7.35
+        ],
+        [
+         1,
+         10.5
+        ],
+        [
+         1.15,
+         10.5
+        ],
+        [
+         1.35,
+         10.5
+        ]
+       ]
+      },
+      -1
+     ],
+     "to": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         7.35
+        ],
+        [
+         1,
+         10.5
+        ],
+        [
+         1.15,
+         10.5
+        ],
+        [
+         1.35,
+         10.5
+        ]
+       ]
+      },
+      1
+     ],
+     "paint": "cream",
+     "on": "reachF",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "scatter"
+      ]
+     }
+    },
+    {
+     "id": "flare-beam-ray",
+     "kind": "line",
+     "from": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         9.95
+        ],
+        [
+         1,
+         14.5
+        ],
+        [
+         1.15,
+         14.5
+        ],
+        [
+         1.35,
+         14.5
+        ]
+       ]
+      },
+      0
+     ],
+     "to": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         12.95
+        ],
+        [
+         1,
+         17.5
+        ],
+        [
+         1.15,
+         17.5
+        ],
+        [
+         1.35,
+         17.5
+        ]
+       ]
+      },
+      0
+     ],
+     "paint": "glow",
+     "when": {
+      "direction": [
+       "up",
+       "side"
+      ],
+      "weapon": [
+       "beam"
+      ]
+     },
+     "on": "reachF",
+     "glow": true,
+     "z": 95,
+     "hidden": true
+    },
+    {
+     "id": "flare-beam-arms",
+     "kind": "line",
+     "from": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         6.95
+        ],
+        [
+         1,
+         11.5
+        ],
+        [
+         1.15,
+         11.5
+        ],
+        [
+         1.35,
+         11.5
+        ]
+       ]
+      },
+      0
+     ],
+     "to": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         10.95
+        ],
+        [
+         1,
+         15.5
+        ],
+        [
+         1.15,
+         15.5
+        ],
+        [
+         1.35,
+         15.5
+        ]
+       ]
+      },
+      0
+     ],
+     "paint": "glow",
+     "on": "reachF",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "beam"
+      ]
+     }
+    },
+    {
+     "id": "flare-beam-bar",
+     "kind": "line",
+     "from": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         8.95
+        ],
+        [
+         1,
+         13.5
+        ],
+        [
+         1.15,
+         13.5
+        ],
+        [
+         1.35,
+         13.5
+        ]
+       ]
+      },
+      -2
+     ],
+     "to": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         8.95
+        ],
+        [
+         1,
+         13.5
+        ],
+        [
+         1.15,
+         13.5
+        ],
+        [
+         1.35,
+         13.5
+        ]
+       ]
+      },
+      2
+     ],
+     "paint": "glow",
+     "on": "reachF",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "beam"
+      ]
+     }
+    },
+    {
+     "id": "flare-beam-core",
+     "kind": "line",
+     "from": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         7.95
+        ],
+        [
+         1,
+         12.5
+        ],
+        [
+         1.15,
+         12.5
+        ],
+        [
+         1.35,
+         12.5
+        ]
+       ]
+      },
+      0
+     ],
+     "to": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         9.95
+        ],
+        [
+         1,
+         14.5
+        ],
+        [
+         1.15,
+         14.5
+        ],
+        [
+         1.35,
+         14.5
+        ]
+       ]
+      },
+      0
+     ],
+     "paint": "cream",
+     "on": "reachF",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "beam"
+      ]
+     }
+    },
+    {
+     "id": "flare-beam-coreBar",
+     "kind": "line",
+     "from": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         8.95
+        ],
+        [
+         1,
+         13.5
+        ],
+        [
+         1.15,
+         13.5
+        ],
+        [
+         1.35,
+         13.5
+        ]
+       ]
+      },
+      -1
+     ],
+     "to": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         8.95
+        ],
+        [
+         1,
+         13.5
+        ],
+        [
+         1.15,
+         13.5
+        ],
+        [
+         1.35,
+         13.5
+        ]
+       ]
+      },
+      1
+     ],
+     "paint": "cream",
+     "on": "reachF",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "beam"
+      ]
+     }
+    },
+    {
+     "id": "dodgeStreaks-2",
+     "kind": "stamp",
+     "on": "root",
+     "at": [
+      -30.5,
+      -6
+     ],
+     "rows": [
+      "aa.........",
+      "bb.........",
+      "bb.......bb",
+      "bb.......bb",
+      "bb.......bb",
+      "cc.......cc",
+      "cc.......cc",
+      "cc.......cc"
+     ],
+     "key": {
+      "a": "glow.dark",
+      "b": "glow",
+      "c": "cream"
+     },
+     "glow": true,
+     "z": 95,
+     "hidden": true
+    },
+    {
+     "id": "dodgeStreaks-3",
+     "kind": "stamp",
+     "on": "root",
+     "at": [
+      -27.5,
+      -6
+     ],
+     "rows": [
+      "aa.........",
+      "bb.........",
+      "bb.......bb",
+      "bb.......bb",
+      "cc.......cc",
+      "cc.......cc"
+     ],
+     "key": {
+      "a": "glow.dark",
+      "b": "glow",
+      "c": "cream"
+     },
+     "glow": true,
+     "z": 95,
+     "hidden": true
+    },
+    {
+     "id": "dodgeStreaks-4",
+     "kind": "stamp",
+     "on": "root",
+     "at": [
+      -26.5,
+      -6
+     ],
+     "rows": [
+      "aa.........",
+      "bb.........",
+      "bb.......bb",
+      "cc.......cc",
+      "cc.......cc"
+     ],
+     "key": {
+      "a": "glow.dark",
+      "b": "glow",
+      "c": "cream"
+     },
+     "glow": true,
+     "z": 95,
+     "hidden": true
+    },
+    {
+     "id": "dodgeStreaks-5",
+     "kind": "stamp",
+     "on": "root",
+     "at": [
+      -25.5,
+      -6
+     ],
+     "rows": [
+      "aa.........",
+      "bb.........",
+      "cc.......cc"
+     ],
+     "key": {
+      "a": "glow.dark",
+      "b": "glow",
+      "c": "cream"
+     },
+     "glow": true,
+     "z": 95,
+     "hidden": true
+    }
+   ]
+  }
+ },
+ "controls": [
+  {
+   "key": "height",
+   "kind": "range",
+   "label": "Height",
+   "lo": "Short",
+   "hi": "Tall",
+   "default": 0.5,
+   "scales": {
+    "bones": [
+     "hip",
+     "spine",
+     "thiF",
+     "thiB",
+     "shnF",
+     "shnB",
+     "legF",
+     "legB",
+     "legIF",
+     "legIB"
+    ],
+    "by": [
+     0.86,
+     1.16
+    ]
+   }
+  },
+  {
+   "key": "build",
+   "kind": "range",
+   "label": "Build",
+   "lo": "Slim",
+   "hi": "Stocky",
+   "default": 0.5,
+   "scales": {
+    "bones": [
+     "shoulderF",
+     "shoulderB"
+    ],
+    "by": [
+     0.6,
+     1.3
+    ]
+   }
+  },
+  {
+   "key": "weapon",
+   "kind": "choice",
+   "label": "Weapon",
+   "options": [
+    "blaster",
+    {
+     "value": "scatter",
+     "label": "Scatter gun"
+    },
+    {
+     "value": "beam",
+     "label": "Beam gun"
+    },
+    "none"
+   ],
+   "default": "blaster"
+  },
+  {
+   "key": "weaponLength",
+   "kind": "range",
+   "label": "Length",
+   "lo": "Short",
+   "hi": "Long",
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "default": 1
+  },
+  {
+   "key": "headgear",
+   "kind": "choice",
+   "label": "Headgear",
+   "options": [
+    "helmet",
+    "visor",
+    "hood",
+    "none"
+   ],
+   "default": "helmet"
+  },
+  {
+   "key": "headgearSize",
+   "kind": "range",
+   "label": "Size",
+   "lo": "Small",
+   "hi": "Big",
+   "min": 0.5,
+   "max": 1.8,
+   "step": 0.05,
+   "default": 1
+  },
+  {
+   "key": "pack",
+   "kind": "choice",
+   "label": "Pack",
+   "options": [
+    "none",
+    {
+     "value": "tank",
+     "label": "Air tank"
+    },
+    {
+     "value": "antenna",
+     "label": "Radio"
+    },
+    {
+     "value": "jet",
+     "label": "Jet pack"
+    }
+   ],
+   "default": "none"
+  },
+  {
+   "key": "packSize",
+   "kind": "range",
+   "label": "Size",
+   "lo": "Small",
+   "hi": "Big",
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "default": 1
+  },
+  {
+   "key": "skin",
+   "kind": "colour",
+   "label": "Skin"
+  },
+  {
+   "key": "outfit",
+   "kind": "colour",
+   "label": "Suit"
+  },
+  {
+   "key": "trim",
+   "kind": "colour",
+   "label": "Stripes, gloves and boots"
+  },
+  {
+   "key": "glow",
+   "kind": "colour",
+   "label": "Lights"
+  },
+  {
+   "key": "bounce",
+   "kind": "range",
+   "label": "Bounce",
+   "lo": "Calm",
+   "hi": "Bouncy",
+   "default": 0.5,
+   "group": "Motion"
+  },
+  {
+   "key": "stride",
+   "kind": "range",
+   "label": "Stride",
+   "lo": "Small steps",
+   "hi": "Big steps",
+   "default": 0.5,
+   "group": "Motion"
+  },
+  {
+   "key": "speed",
+   "standard": "speed"
+  }
+ ],
+ "parts": {
+  "weapon": {
+   "label": "Weapon",
+   "params": [
+    "weapon",
+    "weaponLength"
+   ],
+   "none": "none",
+   "socket": "hand",
+   "shapes": [
+    "gun"
+   ]
+  },
+  "headgear": {
+   "label": "Headgear",
+   "params": [
+    "headgear",
+    "headgearSize"
+   ],
+   "none": "none",
+   "socket": "head",
+   "shapes": [
+    "helmet",
+    "visor",
+    "hood"
+   ]
+  },
+  "pack": {
+   "label": "Pack",
+   "params": [
+    "pack",
+    "packSize"
+   ],
+   "none": "none",
+   "socket": "back",
+   "shapes": [
+    "pack"
+   ]
+  }
+ },
+ "clips": {
+  "idle_down": {
+   "from": "idle_down",
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "idle_up": {
+   "from": "idle_up",
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "idle_side": {
+   "from": "idle_side",
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.shnF",
+      "bones.toeF",
+      "bones.thiB",
+      "bones.shnB",
+      "bones.toeB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "first",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "walk_down": {
+   "from": "walk_down",
+   "sounds": [
+    {
+     "sound": "footstep-metal",
+     "frame": 0,
+     "preset": "Boots on deck",
+     "volume": 0.45
+    },
+    {
+     "sound": "footstep-metal",
+     "frame": 4,
+     "preset": "Boots on deck",
+     "volume": 0.45
+    }
+   ],
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.6
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.52
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.259
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.259
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.armF",
+      "bones.elbF",
+      "bones.wriF",
+      "bones.cuffF",
+      "bones.handF",
+      "bones.rimAF",
+      "stretch.armF",
+      "stretch.rimAF",
+      "bones.armB",
+      "bones.elbB",
+      "bones.wriB",
+      "bones.cuffB",
+      "bones.handB",
+      "bones.rimAB",
+      "stretch.armB",
+      "stretch.rimAB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "walk_up": {
+   "from": "walk_up",
+   "sounds": [
+    {
+     "sound": "footstep-metal",
+     "frame": 0,
+     "preset": "Boots on deck",
+     "volume": 0.45
+    },
+    {
+     "sound": "footstep-metal",
+     "frame": 4,
+     "preset": "Boots on deck",
+     "volume": 0.45
+    }
+   ],
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        2.25
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.armF",
+      "bones.elbF",
+      "bones.wriF",
+      "bones.cuffF",
+      "bones.handF",
+      "bones.rimAF",
+      "stretch.armF",
+      "stretch.rimAF",
+      "bones.armB",
+      "bones.elbB",
+      "bones.wriB",
+      "bones.cuffB",
+      "bones.handB",
+      "stretch.armB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.5
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.5
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.armF",
+      "bones.elbF",
+      "bones.wriF",
+      "bones.cuffF",
+      "bones.handF",
+      "bones.rimAF",
+      "stretch.armF",
+      "stretch.rimAF",
+      "bones.armB",
+      "bones.elbB",
+      "bones.wriB",
+      "bones.cuffB",
+      "bones.handB",
+      "stretch.armB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.5
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.4
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "walk_side": {
+   "from": "walk_side",
+   "sounds": [
+    {
+     "sound": "footstep-metal",
+     "frame": 0,
+     "preset": "Boots on deck",
+     "volume": 0.45
+    },
+    {
+     "sound": "footstep-metal",
+     "frame": 4,
+     "preset": "Boots on deck",
+     "volume": 0.45
+    }
+   ],
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.6
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        2.25
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.shnF",
+      "bones.toeF",
+      "bones.thiB",
+      "bones.shnB",
+      "bones.toeB",
+      "bones.legF",
+      "stretch.legF",
+      "bones.legB",
+      "stretch.legB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.7
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.shnF",
+      "bones.toeF",
+      "bones.thiB",
+      "bones.shnB",
+      "bones.toeB",
+      "bones.legF",
+      "stretch.legF",
+      "bones.legB",
+      "stretch.legB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.8
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.1
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.armF",
+      "bones.elbF",
+      "bones.wriF",
+      "bones.cuffF",
+      "bones.handF",
+      "bones.rimAF",
+      "stretch.armF",
+      "stretch.rimAF",
+      "bones.armB",
+      "bones.elbB",
+      "bones.wriB",
+      "bones.cuffB",
+      "bones.handB",
+      "bones.rimAB",
+      "stretch.armB",
+      "stretch.rimAB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.4
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.armF",
+      "bones.elbF",
+      "bones.wriF",
+      "bones.cuffF",
+      "bones.handF",
+      "bones.rimAF",
+      "stretch.armF",
+      "stretch.rimAF",
+      "bones.armB",
+      "bones.elbB",
+      "bones.wriB",
+      "bones.cuffB",
+      "bones.handB",
+      "bones.rimAB",
+      "stretch.armB",
+      "stretch.rimAB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.6
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.spine"
+     ],
+     "about": 0,
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.5
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "shoot_down": {
+   "from": {
+    "from": "weapon",
+    "pick": {
+     "blaster": "shoot-gun-down",
+     "scatter": "shoot-gun-down",
+     "beam": "shoot-beam-down",
+     "none": "shoot-bare-down"
+    }
+   },
+   "sounds": [
+    {
+     "sound": "laser-shot",
+     "frame": 1,
+     "preset": "Pew",
+     "volume": 0.85,
+     "when": {
+      "weapon": [
+       "blaster",
+       "beam"
+      ]
+     }
+    },
+    {
+     "sound": "scatter-blast",
+     "frame": 1,
+     "preset": "Scatter gun",
+     "volume": 0.85,
+     "when": {
+      "weapon": [
+       "scatter"
+      ]
+     }
+    }
+   ],
+   "frameEdits": {
+    "0": {
+     "hide": [
+      "gun"
+     ],
+     "show": [
+      "gunEnd"
+     ]
+    },
+    "1": {
+     "show": [
+      "flare-blaster-ray",
+      "flare-blaster-arms",
+      "flare-blaster-bar",
+      "flare-blaster-core",
+      "flare-blaster-coreBar",
+      "flare-scatter-ray",
+      "flare-scatter-arms",
+      "flare-scatter-bar",
+      "flare-scatter-core",
+      "flare-scatter-coreBar",
+      "flare-beam-ray",
+      "flare-beam-arms",
+      "flare-beam-bar",
+      "flare-beam-core",
+      "flare-beam-coreBar",
+      "gunEnd"
+     ],
+     "hide": [
+      "gun"
+     ]
+    },
+    "2": {
+     "hide": [
+      "gun"
+     ],
+     "show": [
+      "gunEnd"
+     ]
+    },
+    "3": {
+     "hide": [
+      "gun"
+     ],
+     "show": [
+      "gunEnd"
+     ]
+    },
+    "4": {
+     "hide": [
+      "gun"
+     ],
+     "show": [
+      "gunEnd"
+     ]
+    }
+   }
+  },
+  "shoot_up": {
+   "from": {
+    "from": "weapon",
+    "pick": {
+     "blaster": "shoot-gun-up",
+     "scatter": "shoot-gun-up",
+     "beam": "shoot-beam-up",
+     "none": "shoot-bare-up"
+    }
+   },
+   "sounds": [
+    {
+     "sound": "laser-shot",
+     "frame": 1,
+     "preset": "Pew",
+     "volume": 0.85,
+     "when": {
+      "weapon": [
+       "blaster",
+       "beam"
+      ]
+     }
+    },
+    {
+     "sound": "scatter-blast",
+     "frame": 1,
+     "preset": "Scatter gun",
+     "volume": 0.85,
+     "when": {
+      "weapon": [
+       "scatter"
+      ]
+     }
+    }
+   ],
+   "frameEdits": {
+    "1": {
+     "show": [
+      "flare-blaster-ray",
+      "flare-blaster-arms",
+      "flare-blaster-bar",
+      "flare-blaster-core",
+      "flare-blaster-coreBar",
+      "flare-scatter-ray",
+      "flare-scatter-arms",
+      "flare-scatter-bar",
+      "flare-scatter-core",
+      "flare-scatter-coreBar",
+      "flare-beam-ray",
+      "flare-beam-arms",
+      "flare-beam-bar",
+      "flare-beam-core",
+      "flare-beam-coreBar"
+     ]
+    }
+   }
+  },
+  "shoot_side": {
+   "from": {
+    "from": "weapon",
+    "pick": {
+     "blaster": "shoot-gun-side",
+     "scatter": "shoot-gun-side",
+     "beam": "shoot-beam-side",
+     "none": "shoot-bare-side"
+    }
+   },
+   "sounds": [
+    {
+     "sound": "laser-shot",
+     "frame": 1,
+     "preset": "Pew",
+     "volume": 0.85,
+     "when": {
+      "weapon": [
+       "blaster",
+       "beam"
+      ]
+     }
+    },
+    {
+     "sound": "scatter-blast",
+     "frame": 1,
+     "preset": "Scatter gun",
+     "volume": 0.85,
+     "when": {
+      "weapon": [
+       "scatter"
+      ]
+     }
+    }
+   ],
+   "frameEdits": {
+    "1": {
+     "show": [
+      "flare-blaster-ray",
+      "flare-blaster-arms",
+      "flare-blaster-bar",
+      "flare-blaster-core",
+      "flare-blaster-coreBar",
+      "flare-scatter-ray",
+      "flare-scatter-arms",
+      "flare-scatter-bar",
+      "flare-scatter-core",
+      "flare-scatter-coreBar",
+      "flare-beam-ray",
+      "flare-beam-arms",
+      "flare-beam-bar",
+      "flare-beam-core",
+      "flare-beam-coreBar"
+     ]
+    }
+   }
+  },
+  "dodge": {
+   "from": {
+    "from": "weapon",
+    "pick": {
+     "blaster": "dodge",
+     "scatter": "dodge",
+     "beam": "dodge-beam",
+     "none": "dodge"
+    }
+   },
+   "sounds": [
+    {
+     "sound": "dodge-dash",
+     "frame": 1,
+     "preset": "Dodge roll",
+     "volume": 0.7
+    }
+   ],
+   "frameEdits": {
+    "2": {
+     "show": [
+      "dodgeStreaks-2"
+     ]
+    },
+    "3": {
+     "show": [
+      "dodgeStreaks-3"
+     ]
+    },
+    "4": {
+     "show": [
+      "dodgeStreaks-4"
+     ],
+     "nudge": [
+      0,
+      -1
+     ]
+    },
+    "5": {
+     "show": [
+      "dodgeStreaks-5"
+     ]
+    }
+   }
+  },
+  "hurt": {
+   "from": "hurt",
+   "sounds": [
+    {
+     "sound": "ranger-hurt",
+     "frame": 0,
+     "preset": "Hit",
+     "volume": 0.9
+    }
+   ],
+   "frameEdits": {
+    "1": {
+     "nudge": [
+      0,
+      1
+     ]
+    }
+   }
+  },
+  "die": {
+   "from": {
+    "from": "weapon",
+    "pick": {
+     "blaster": "die",
+     "scatter": "die",
+     "beam": "die-beam",
+     "none": "die"
+    }
+   },
+   "sounds": [
+    {
+     "sound": "ranger-hurt",
+     "frame": 0,
+     "preset": "Critical"
+    },
+    {
+     "sound": "footstep-metal",
+     "frame": 5,
+     "preset": "Heavy mech",
+     "volume": 0.8
+    }
+   ],
+   "frameEdits": {
+    "2": {
+     "hide": [
+      "pack",
+      "hair",
+      "helmet",
+      "visor",
+      "hood",
+      "suit",
+      "gloveB-down",
+      "gloveF-down",
+      "gloveB-up",
+      "gloveF-up",
+      "gloveB-side",
+      "gloveF-side"
+     ],
+     "show": [
+      "packLie2",
+      "hairLie2",
+      "helmetLie2",
+      "visorLie2",
+      "hoodLie2"
+     ]
+    },
+    "3": {
+     "hide": [
+      "pack",
+      "hair",
+      "helmet",
+      "visor",
+      "hood",
+      "suit",
+      "gloveB-down",
+      "gloveF-down",
+      "gloveB-up",
+      "gloveF-up",
+      "gloveB-side",
+      "gloveF-side"
+     ],
+     "show": [
+      "packLie3",
+      "hairLie3",
+      "helmetLie3",
+      "visorLie3",
+      "hoodLie3"
+     ]
+    },
+    "4": {
+     "hide": [
+      "pack",
+      "hair",
+      "helmet",
+      "visor",
+      "hood",
+      "suit",
+      "gloveB-down",
+      "gloveF-down",
+      "gloveB-up",
+      "gloveF-up",
+      "gloveB-side",
+      "gloveF-side"
+     ],
+     "show": [
+      "packLie",
+      "hairLie",
+      "helmetLie",
+      "visorLie",
+      "hoodLie"
+     ]
+    },
+    "5": {
+     "hide": [
+      "pack",
+      "hair",
+      "helmet",
+      "visor",
+      "hood",
+      "suit",
+      "gloveB-down",
+      "gloveF-down",
+      "gloveB-up",
+      "gloveF-up",
+      "gloveB-side",
+      "gloveF-side"
+     ],
+     "show": [
+      "packLie",
+      "hairLie",
+      "helmetLie",
+      "visorLie",
+      "hoodLie"
+     ]
+    },
+    "6": {
+     "hide": [
+      "pack",
+      "hair",
+      "helmet",
+      "visor",
+      "hood",
+      "suit",
+      "gloveB-down",
+      "gloveF-down",
+      "gloveB-up",
+      "gloveF-up",
+      "gloveB-side",
+      "gloveF-side"
+     ],
+     "show": [
+      "packLie",
+      "hairLie",
+      "helmetLie",
+      "visorLie",
+      "hoodLie"
+     ]
+    },
+    "7": {
+     "hide": [
+      "pack",
+      "hair",
+      "helmet",
+      "visor",
+      "hood",
+      "suit",
+      "gloveB-down",
+      "gloveF-down",
+      "gloveB-up",
+      "gloveF-up",
+      "gloveB-side",
+      "gloveF-side"
+     ],
+     "show": [
+      "packLie",
+      "hairLie",
+      "helmetLie",
+      "visorLie",
+      "hoodLie"
+     ]
+    }
+   }
+  }
+ },
+ "made": {
+  "in": "library",
+  "from": "code:void-ranger",
+  "by": "migration batch M7 (/sprite-forge redraw)"
+ }
+}

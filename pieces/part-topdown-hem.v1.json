@@ -1,0 +1,42 @@
+{
+ "format": "loadout-piece",
+ "version": 1,
+ "id": "part:topdown-hem",
+ "v": 1,
+ "name": "Tunic hem",
+ "about": "A band of colour along the hem of the tunic, on the waist node (use z 40).",
+ "slots": [
+  {
+   "id": "trim",
+   "label": "Hem",
+   "default": "#c9423a",
+   "material": "cloth" } ],
+ "made": {
+  "by": "tools/bake-topdown-m7.mjs",
+  "from": "rigs/topdown.js" },
+ "body": {
+  "draw": [
+   {
+    "id": "topdown-hem-down",
+    "kind": "stamp",
+    "at": [-1,-4.5],
+    "rows": ["aaaaaaaaa"],
+    "key": {"a":"trim"},
+    "z": 0,
+    "when": {"direction":["down"]} },
+   {
+    "id": "topdown-hem-up",
+    "kind": "stamp",
+    "at": [-1,-4.5],
+    "rows": ["aaaaaaaaa"],
+    "key": {"a":"trim"},
+    "z": 0,
+    "when": {"direction":["up"]} },
+   {
+    "id": "topdown-hem-side",
+    "kind": "stamp",
+    "at": [-1,-3.5],
+    "rows": ["aaaaaaaa"],
+    "key": {"a":"trim"},
+    "z": 0,
+    "when": {"direction":["side"]} } ] } }

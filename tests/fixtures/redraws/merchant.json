@@ -1,0 +1,313 @@
+{
+ "id": "merchant",
+ "frozen": "2026-11-20",
+ "source": "sprites/merchant.js",
+ "sha256": "79e638708be287f25ae4b71138b45a4d350eb9a421ef01b72a8b37158ed5e99f",
+ "name": "Merchant",
+ "blurb": "A tall, lean trader who stands at a stall, counts on his fingers and waves customers over. Change the pack, headgear, spectacles, what is held and the colours.",
+ "meta": {
+  "type": "character",
+  "role": "characters/npc",
+  "themes": [
+   "fantasy",
+   "farm"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "top-down-rpg"
+  ],
+  "view": "top-down",
+  "words": [
+   "merchant",
+   "trader",
+   "shopkeeper",
+   "vendor",
+   "seller",
+   "shop",
+   "stall",
+   "buy",
+   "sell",
+   "talk",
+   "wave",
+   "apron",
+   "backpack"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  48,
+  48
+ ],
+ "pivot": [
+  24,
+  42
+ ],
+ "grounded": false,
+ "preview": "idle_down",
+ "params": {
+  "height": {
+   "kind": "range",
+   "label": "Height",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Short",
+   "hi": "Tall",
+   "group": "Look"
+  },
+  "build": {
+   "kind": "range",
+   "label": "Build",
+   "def": 0.3,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slim",
+   "hi": "Stocky",
+   "group": "Look"
+  },
+  "spectacles": {
+   "kind": "toggle",
+   "label": "Spectacles",
+   "def": true,
+   "group": "Look"
+  },
+  "pack": {
+   "kind": "choice",
+   "label": "Pack",
+   "def": "backpack",
+   "options": [
+    {
+     "value": "backpack",
+     "label": "Backpack"
+    },
+    {
+     "value": "crate",
+     "label": "Crate"
+    },
+    {
+     "value": "sack",
+     "label": "Sack"
+    },
+    {
+     "value": "none",
+     "label": "None"
+    }
+   ],
+   "group": "Look"
+  },
+  "packSize": {
+   "kind": "range",
+   "label": "Size",
+   "def": 1,
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "headgear": {
+   "kind": "choice",
+   "label": "Headgear",
+   "def": "turban",
+   "options": [
+    {
+     "value": "turban",
+     "label": "Turban"
+    },
+    {
+     "value": "cap",
+     "label": "Cap"
+    },
+    {
+     "value": "straw hat",
+     "label": "Straw hat"
+    },
+    {
+     "value": "none",
+     "label": "None"
+    }
+   ],
+   "group": "Look"
+  },
+  "headgearSize": {
+   "kind": "range",
+   "label": "Size",
+   "def": 1,
+   "min": 0.5,
+   "max": 1.8,
+   "step": 0.05,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "held": {
+   "kind": "choice",
+   "label": "Held",
+   "def": "none",
+   "options": [
+    {
+     "value": "none",
+     "label": "None"
+    },
+    {
+     "value": "coin purse",
+     "label": "Coin purse"
+    },
+    {
+     "value": "scale",
+     "label": "Scale"
+    }
+   ],
+   "group": "Look"
+  },
+  "heldSize": {
+   "kind": "range",
+   "label": "Size",
+   "def": 1,
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "skin": {
+   "kind": "color",
+   "label": "Skin",
+   "def": "#f6d3b0",
+   "swatches": [
+    "#f6d3b0",
+    "#e8b088",
+    "#c98a5c",
+    "#9a6240",
+    "#6e4428",
+    "#9bd18a",
+    "#b9a7e0"
+   ],
+   "group": "Colors"
+  },
+  "hair": {
+   "kind": "color",
+   "label": "Hair",
+   "def": "#9a6a3e",
+   "swatches": [
+    "#9a6a3e",
+    "#e6c96a",
+    "#c9423a",
+    "#f0ead8",
+    "#5a3a22",
+    "#a8612a",
+    "#e0b040",
+    "#d8d8e0"
+   ],
+   "group": "Colors"
+  },
+  "outfit": {
+   "kind": "color",
+   "label": "Outfit",
+   "def": "#e6c96a",
+   "swatches": [
+    "#e6c96a",
+    "#3f6fd1",
+    "#7a4fc4",
+    "#2f8f9d",
+    "#c9423a",
+    "#8e3a4a",
+    "#4f9d57",
+    "#e08a2c"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Apron",
+   "def": "#c8553a",
+   "swatches": [
+    "#c8553a",
+    "#f2c230",
+    "#c9423a",
+    "#f0ead8",
+    "#7fe0a0",
+    "#4fd8ee"
+   ],
+   "group": "Colors"
+  },
+  "bounce": {
+   "kind": "range",
+   "label": "Bounce",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Calm",
+   "hi": "Bouncy",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle_down": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    7,
+    10
+   ]
+  },
+  "idle_up": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    7,
+    10
+   ]
+  },
+  "idle_side": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    7,
+    10
+   ]
+  },
+  "talk": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    7,
+    10
+   ]
+  },
+  "wave": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [],
+ "bundles": [
+  "kit-rpg-fantasy"
+ ]
+}

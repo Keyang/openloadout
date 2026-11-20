@@ -1,0 +1,72 @@
+{
+ "format": "loadout-piece",
+ "version": 1,
+ "id": "held:topdown-stick",
+ "v": 2,
+ "name": "Stick",
+ "about": "A stick with a twig, held up, as shapes along the reachF bone (use z 60), drawn at the bone angle as rigs/topdown.js townItem draws it.",
+ "slots": [
+  {
+   "id": "wood",
+   "label": "Wood",
+   "default": "#9a6a3e",
+   "material": "wood" } ],
+ "args": {
+  "length": {
+   "type": "px",
+   "lo": 0.65,
+   "hi": 1.35,
+   "default": 1 } },
+ "made": {
+  "by": "tests/unit/m7-topdown-held.test.mjs stick(): the code calls written in the reachF frame (migration batch M7c; M7_PIECES=write)",
+  "from": "rigs/topdown.js" },
+ "body": {
+  "draw": [
+   {
+    "id": "stick-down-0",
+    "kind": "line",
+    "from": [-1.5,0],
+    "to": [{"from":"length","map":[[0.65,5.85],[1.35,12.15]]},0],
+    "paint": "wood",
+    "z": 1,
+    "when": {"direction":["down"]} },
+   {
+    "id": "stick-down-1",
+    "kind": "line",
+    "from": [{"from":"length","map":[[0.65,3.51],[1.35,7.29]]},0],
+    "to": [{"from":"length","map":[[0.65,5.0019],[1.35,8.7819]]},1.88],
+    "paint": "wood",
+    "z": 1.01,
+    "when": {"direction":["down"]} },
+   {
+    "id": "stick-side-0",
+    "kind": "line",
+    "from": [-1.5,0],
+    "to": [{"from":"length","map":[[0.65,5.85],[1.35,12.15]]},0],
+    "paint": "wood",
+    "z": 5,
+    "when": {"direction":["side"]} },
+   {
+    "id": "stick-side-1",
+    "kind": "line",
+    "from": [{"from":"length","map":[[0.65,3.51],[1.35,7.29]]},0],
+    "to": [{"from":"length","map":[[0.65,5.0019],[1.35,8.7819]]},1.88],
+    "paint": "wood",
+    "z": 5.01,
+    "when": {"direction":["side"]} },
+   {
+    "id": "stick-up-0",
+    "kind": "line",
+    "from": [-1.5,0],
+    "to": [{"from":"length","map":[[0.65,5.85],[1.35,12.15]]},0],
+    "paint": "wood",
+    "z": -59,
+    "when": {"direction":["up"]} },
+   {
+    "id": "stick-up-1",
+    "kind": "line",
+    "from": [{"from":"length","map":[[0.65,3.51],[1.35,7.29]]},0],
+    "to": [{"from":"length","map":[[0.65,5.0019],[1.35,8.7819]]},-1.88],
+    "paint": "wood",
+    "z": -58.99,
+    "when": {"direction":["up"]} } ] } }
