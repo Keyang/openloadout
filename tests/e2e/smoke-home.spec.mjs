@@ -14,13 +14,13 @@ test('the landing page says what Loadout is and where to go', async ({ page }) =
   const main = page.locator('main.v2.landing');
   await expect(main.locator('h1')).toHaveText('Game art, sound and music you can change.');
   await expect(main.locator('h1')).toHaveCount(1);
-  await expect(page.getByRole('navigation', { name: 'Main' }).getByRole('link')).toHaveText(['Library', 'Kits', 'Play']);
+  await expect(page.getByRole('navigation', { name: 'Main' }).getByRole('link')).toHaveText(['Library', 'Kits', 'Play', 'Studio']);
   const first = main.locator('section.hero');
   await expect(first.getByRole('link', { name: 'Browse everything' })).toHaveAttribute('href', '#/browse');
   await expect(first.getByRole('link', { name: 'Change the Hero' })).toHaveAttribute('href', '#/sprite/knight');
   await expect(first.locator('.btn-primary')).toHaveCount(1);
   // the footer is on this page, with the ways into the site
-  await expect(page.getByRole('navigation', { name: 'Footer' }).getByRole('link')).toHaveText(['Library', 'Kits', 'Play', 'Bag']);
+  await expect(page.getByRole('navigation', { name: 'Footer' }).getByRole('link')).toHaveText(['Library', 'Kits', 'Play', 'Studio', 'Bag']);
 });
 
 test('the numbers are the catalogue\'s', async ({ page }) => {

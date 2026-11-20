@@ -361,7 +361,7 @@ test.describe('on a phone (375 px)', () => {
     await menu.click();
     await expect(menu).toHaveAttribute('aria-expanded', 'true');
     await expect(nav).toBeVisible();
-    await expect(nav.getByRole('link')).toHaveText(['Library', 'Kits', 'Play']);
+    await expect(nav.getByRole('link')).toHaveText(['Library', 'Kits', 'Play', 'Studio']);
     for (const a of await nav.getByRole('link').all()) expect((await a.boundingBox()).height).toBeGreaterThanOrEqual(36);      // big enough for a thumb
     expect(await hasHorizontalScroll(page)).toBe(false);
     // choosing a page goes there and the menu is closed again
@@ -387,7 +387,7 @@ test.describe('on a phone (375 px)', () => {
 
 test('on a wide screen the header shows its links and no menu button', async ({ page }) => {
   await openRoute(page, '/');
-  await expect(page.getByRole('navigation', { name: 'Main' }).getByRole('link')).toHaveText(['Library', 'Kits', 'Play']);
+  await expect(page.getByRole('navigation', { name: 'Main' }).getByRole('link')).toHaveText(['Library', 'Kits', 'Play', 'Studio']);
   await expect(page.locator('header .menu-btn')).toBeHidden();
 });
 

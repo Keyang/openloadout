@@ -31,6 +31,8 @@ for (const size of [{ width: 1440, height: 900 }, { width: 1024, height: 768 }, 
     await page.getByRole('button', { name: 'Surprise me' }).first().click();
     const card = page.locator('.kit-top');
     const look = page.locator('.bundle-look');
+    // the card fills in after "Surprise me" (its pictures load): measure once it has stopped changing size
+    await expect.poll(async () => { const h1 = (await box(card)).height; await page.waitForTimeout(250); return h1 === (await box(card)).height; }).toBe(true);
     const before = await box(card), lookBefore = await box(look);
     await page.getByRole('button', { name: 'Add the whole kit to my bag' }).click();
     const status = page.locator('.bundle-actions .status');
