@@ -159,13 +159,8 @@
    "id": "wet",
    "material": "stone",
    "derive": {
-    "rule": "tone",
-    "of": {
-     "rule": "ramp",
-     "of": "floor",
-     "tone": "light"
-    },
-    "by": 0.5
+    "rule": "textureLight",
+    "of": "floor"
    }
   }
  ],

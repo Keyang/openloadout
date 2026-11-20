@@ -12,7 +12,7 @@ const V = { skin: '#f6d3b0', outfit: '#2f8f9d', trim: '#5a5f7a', weapon: 'dagger
 
 test('data-rules: the registry is frozen, names exactly the documented rules, and says what each takes', () => {
   assert.ok(Object.isFrozen(COLOUR_RULES));
-  assert.deepEqual(Object.keys(COLOUR_RULES).sort(), ['apart', 'bandTone', 'choose', 'mix', 'ramp', 'standOut', 'tone']);
+  assert.deepEqual(Object.keys(COLOUR_RULES).sort(), ['apart', 'bandTone', 'choose', 'mix', 'ramp', 'standOut', 'textureLight', 'textureTone', 'tone']);   // texture*: build item B15b (tests/unit/texture-rules.test.mjs)
   for (const [name, r] of Object.entries(COLOUR_RULES)) {
     assert.ok(Object.isFrozen(r) && Object.isFrozen(r.args), name);
     assert.equal(typeof r.about, 'string', name);

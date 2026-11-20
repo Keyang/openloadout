@@ -4,7 +4,8 @@
  "family": "layout",
  "fixtures": [
   "tiles/tiles-cave.json",
-  "tiles/tiles-dungeon.json"
+  "tiles/tiles-dungeon.json",
+  "tiles/tiles-platforms.json"
  ],
  "frames": {
   "tiles/tiles-cave.json rock-left 0": "4c6cd25f",
@@ -85,6 +86,17 @@
   "tiles/tiles-dungeon.json pit-col-b 0": "6883e945",
   "tiles/tiles-dungeon.json pit-single 0": "362da704",
   "tiles/tiles-dungeon.json stairs-down 0": "f2a5ce7d",
-  "tiles/tiles-dungeon.json stairs-up 0": "75177ffa"
+  "tiles/tiles-dungeon.json stairs-up 0": "75177ffa",
+  "tiles/tiles-platforms.json plank-thin-l 0": "0a04d4c6",
+  "tiles/tiles-platforms.json plank-thin-m 0": "5b0daebb",
+  "tiles/tiles-platforms.json plank-thin-r 0": "fb8b2e64",
+  "tiles/tiles-platforms.json ladder-cap 0": "f2266de3",
+  "tiles/tiles-platforms.json ladder-mid 0": "0d34b25a",
+  "tiles/tiles-platforms.json ladder-foot 0": "8da6e4ca",
+  "tiles/tiles-platforms.json vine-cap 0": "187b4630",
+  "tiles/tiles-platforms.json vine-mid 0": "2d1a1826",
+  "tiles/tiles-platforms.json vine-foot 0": "548fee76",
+  "tiles/tiles-platforms.json post-cap 0": "fb44876d",
+  "tiles/tiles-platforms.json post-mid 0": "dcabc995"
  }
 }

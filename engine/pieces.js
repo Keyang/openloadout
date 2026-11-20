@@ -22,6 +22,7 @@
 // Pure JavaScript: runs unchanged in the browser and in Node; nothing here touches a page or the disk.
 import { plainData } from '../catalog/plain-data.js';
 import { MATERIAL_IDS } from './materials.js';
+import { checkMaterialPiece } from '../catalog/sprite-schema.js';   // build item B15b: a material piece's body is always checked
 
 /** The kinds of piece: what each is, and the body field it is drawn from (null: the kind's own module checks it). */
 export const PIECE_KINDS = Object.freeze({
@@ -164,6 +165,13 @@ export function deepFreeze(x) {
 }
 
 /**
+ * The body checks every piece of a kind gets in validatePiece, whatever `check` hook a caller gives (build item B15b):
+ * a material piece is held to the material rules (catalog/sprite-schema.js checkMaterialPiece), so no store, index or
+ * tool hands one out that a tileset would refuse at load. { kind: check(piece) -> { errors, warnings } }.
+ */
+export const KIND_CHECKS = Object.freeze({ material: checkMaterialPiece });
+
+/**
  * Checks one piece file: the plain-data wall, the envelope (format, id, v, name, about, slots, args, made, body and
  * the field its kind needs, the pieces it names) and then, if the envelope passed, the hook `check(piece)` for the
  * body's own rules (the v2 schema supplies it; it may return { errors, warnings }, a list of errors, or nothing).
@@ -235,6 +243,7 @@ export function validatePiece(input, opts = {}) {
       if (inherited(n)) { errors.push(`args.${n}: ${inheritedError(n)}`); continue; }
       const a = piece.args[n];
       if (!isObj(a) || typeof a.type !== 'string' || !/^[a-z]+$/.test(a.type)) errors.push(`args.${n}: needs a type (px, share, count, word, flag, paint...)`);
+      else if (Number.isFinite(a.lo) && Number.isFinite(a.hi) && a.lo > a.hi) errors.push(`args.${n}: lo ${a.lo} is above hi ${a.hi}; give lo no more than hi`);   // B15b
     }
   }
   if (piece.made !== undefined && !isObj(piece.made)) errors.push('made: an object { by, on, from }');
@@ -251,6 +260,16 @@ export function validatePiece(input, opts = {}) {
     if (uses.length > PIECE_LIMITS.uses) errors.push(`body: uses ${uses.length} pieces; the most is ${PIECE_LIMITS.uses}`);
   }
   if (errors.length) return done();
+  // the body rules of the kinds whose rules are the v2 schema's (KIND_CHECKS), whatever hook the caller gives (B15b)
+  const own = ref ? KIND_CHECKS[ref.kind] : null;
+  if (own && opts.check !== own) {
+    try {
+      const r = own(piece);
+      if (Array.isArray(r?.errors)) errors.push(...r.errors.map(String));
+      if (Array.isArray(r?.warnings)) warnings.push(...r.warnings.map(String));
+    } catch (e) { errors.push(`The piece's body could not be checked: ${String(e?.message ?? e).slice(0, 160)}`); }
+    if (errors.length) return done();
+  }
   if (typeof opts.check === 'function') {
     try {
       const r = opts.check(piece);
@@ -265,7 +284,8 @@ export function validatePiece(input, opts = {}) {
  * What a check of a `use` needs to know of a checked piece, in the shape the v2 schema reads (B1's `pieces.piece`):
  * { id, v, kind, slots: [slot ids], needsPaint: [the slot ids with no default, which a use must map or bind by name],
  * args? (when it takes any), cost, and for a base bones (bones and nodes), shapes
- * and clips ({ name: { frames } }), for a font glyphs (its characters, sorted) }. cost is an estimate for the
+ * and clips ({ name: { frames } }), for a font glyphs (its characters, sorted), for a material fills (its number of fill
+ * versions, which a tileset group's fills is held to) }. cost is an estimate for the
  * definition's budget: the primitives it lists (a base's shapes, a part's draw list), 1 for a stamp, else 0.
  * Arguments: piece.
  */
@@ -283,6 +303,7 @@ export function pieceSummary(piece) {
     out.clips = Object.fromEntries(Object.keys(clips).map((k) => [k, { frames: isObj(clips[k]) && Number.isInteger(clips[k].frames) ? clips[k].frames : 1 }]));
   }
   if (kind === 'font') out.glyphs = isObj(b.glyphs) ? Object.keys(b.glyphs).sort().join('') : '';
+  if (kind === 'material') { const m = isObj(b.material) ? b.material : b; out.fills = Array.isArray(m.fill?.versions) ? m.fill.versions.length : 0; }   // B15b: a tileset's fills are checked against it
   out.cost = kind === 'stamp' ? 1 : kind === 'base' ? ids(isObj(b.rig) ? b.rig.shapes : []).length : Array.isArray(b.draw) ? b.draw.length : 0;
   return out;
 }
@@ -314,7 +335,7 @@ export function pieceRegistry(source) {
     const out = { id: e.id, v: e.v, kind: e.kind, slots: (e.slots || []).map((s) => (typeof s === 'string' ? s : s.id)),
       needsPaint: (e.slots || []).filter((s) => typeof s === 'string' || s.default === undefined).map((s) => (typeof s === 'string' ? s : s.id)) };
     if (e.args && Object.keys(e.args).length) out.args = e.args;
-    for (const k of ['bones', 'shapes', 'clips', 'glyphs']) if (e[k] !== undefined) out[k] = e[k];
+    for (const k of ['bones', 'shapes', 'clips', 'glyphs', 'fills']) if (e[k] !== undefined) out[k] = e[k];
     out.cost = e.cost ?? 0;
     return out;
   };

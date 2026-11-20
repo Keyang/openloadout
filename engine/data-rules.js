@@ -16,7 +16,13 @@
 //     bandTone  { of, under: [c], least? }         engine/tones.js bandTone(): the tone a thin band is painted in on cloth
 //     ramp      { of, tone: light|base|dark|deep } one tone of engine/color.js ramp(of)
 //     choose    { when, then, else }               `then` while the settings match `when` (as a control's `when`
-//                                                  reads them: { key: [values] }, or a list of such, any one enough), else `else`
+//                                                  reads them: { key: [values] }, or a list of such, any one enough; a
+//                                                  value may be a threshold on a slider, { atLeast: 0.35 }), else `else`
+//     textureTone  { of, against? }                engine/tiles.js textureTone(of, against): the dark tone marks in a
+//                                                  colour are painted in, kept apart from `against` (default of) under
+//                                                  every whole-bundle look (B15b)
+//     textureLight { of, against?, from? }         engine/tiles.js textureLight(of, against, from): the light tone, the
+//                                                  same way, searched from `from` (0.1..1) of the way to the light (B15b)
 // The checks (names, arguments, ranges, references, depth) are catalog/studio-schema.js's; this module evaluates and
 // never throws: anything it cannot read paints FALLBACK.
 //
@@ -25,6 +31,7 @@
 import { tone, ramp, mix, pick } from './color.js';
 import { bandTone } from './tones.js';
 import { apart } from '../rigs/humanoid-figure.js';
+import { textureTone, textureLight } from './tiles.js';   // build item B15b: the tilesets' texture tones (tiles.js does not import this module)
 
 const HEX = /^#[0-9a-fA-F]{6}$/;
 const isObj = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
@@ -53,16 +60,43 @@ export const COLOUR_RULES = Object.freeze({
   bandTone: Object.freeze({ about: 'The tone of a colour that a thin band (a belt, a strap) is painted in so it stands clear of the cloth under it: engine/tones.js bandTone.', args: Object.freeze({ of: arg('colour'), under: arg('colours', { most: 4 }), least: arg('number', { min: 0, max: 1, optional: true }) }) }),
   ramp: Object.freeze({ about: 'One tone of the three-tone ramp of a colour (light, base, dark, deep): engine/color.js ramp.', args: Object.freeze({ of: arg('colour'), tone: arg('word', { values: Object.freeze(['light', 'base', 'dark', 'deep']) }) }) }),
   choose: Object.freeze({ about: 'One of two colours by the settings: then while they match when (as a control\'s when reads them), else otherwise.', args: Object.freeze({ when: arg('when'), then: arg('colour'), else: arg('colour') }) }),
+  textureTone: Object.freeze({ about: 'The dark tone marks in a colour (joints, grain, blades) are painted in, kept apart from against (default the colour) under every whole-bundle look: engine/tiles.js textureTone.', args: Object.freeze({ of: arg('colour'), against: arg('colour', { optional: true }) }) }),
+  textureLight: Object.freeze({ about: 'The light tone marks in a colour (glints, wet streaks, tips) are painted in, kept apart from against (default the colour) under every whole-bundle look, searched from `from` of the way to its light: engine/tiles.js textureLight.', args: Object.freeze({ of: arg('colour'), against: arg('colour', { optional: true }), from: arg('number', { min: 0.1, max: 1, optional: true }) }) }),
 });
 
 /**
- * True when settings match a `when` as a control's `when` reads them: { key: [values] } (every key at one of its values)
- * or a list of such (any one enough); colours compare without regard to case; no `when` is always true.
- * Arguments: when, values (the settings: { key: value }).
+ * The words of a threshold, an entry of a `when` list that names a slider (Contract 3; build item B15b): atLeast (>=),
+ * above (>), atMost (<=), below (<); `{ "wear": [{ "atLeast": 0.35 }] }` holds while wear >= 0.35. No arguments.
+ */
+export const WHEN_BOUNDS = Object.freeze(['atLeast', 'above', 'atMost', 'below']);
+
+/**
+ * True when a setting's value matches one entry of a `when` list (Contract 3), the one rule every reader of a `when`
+ * shares (engine/resolve.js whenHolds, whenMatches here): a plain entry is the value itself (colours without regard to
+ * case); a threshold { atLeast?, above?, atMost?, below? } holds for a number that meets every bound it gives (none
+ * given, a bound that is not a number, an unknown word or a value that is not a number: false). Arguments: entry, value.
+ */
+export function whenValueHolds(entry, value) {
+  if (!isObj(entry)) return same(entry, value);
+  if (typeof value !== 'number' || !Number.isFinite(value)) return false;
+  let bounds = 0;
+  for (const k of Object.keys(entry)) {
+    const b = entry[k];
+    if (!WHEN_BOUNDS.includes(k) || typeof b !== 'number' || !Number.isFinite(b)) return false;
+    bounds++;
+    if (k === 'atLeast' ? !(value >= b) : k === 'above' ? !(value > b) : k === 'atMost' ? !(value <= b) : !(value < b)) return false;
+  }
+  return bounds > 0;
+}
+
+/**
+ * True when settings match a `when` as a control's `when` reads them: { key: [entries] } (every key at one of its
+ * entries: a value, or a threshold on a slider, whenValueHolds) or a list of such (any one enough); colours compare
+ * without regard to case; no `when` is always true. Arguments: when, values (the settings: { key: value }).
  */
 export function whenMatches(when, values = {}) {
   if (when === undefined || when === null) return true;
-  const one = (alt) => isObj(alt) && Object.entries(alt).every(([k, list]) => (Array.isArray(list) ? list : [list]).some((v) => same(v, values?.[k])));
+  const one = (alt) => isObj(alt) && Object.entries(alt).every(([k, list]) => (Array.isArray(list) ? list : [list]).some((v) => whenValueHolds(v, values?.[k])));
   return Array.isArray(when) ? when.some(one) : one(when);
 }
 const same = (a, b) => (typeof a === 'string' && typeof b === 'string' && HEX.test(a) && HEX.test(b) ? a.toLowerCase() === b.toLowerCase() : Object.is(a, b) || (a === 0 && b === 0));
@@ -111,6 +145,8 @@ function evaluate(e, v, depth) {
       const t = ['light', 'base', 'dark', 'deep'].includes(e.tone) ? e.tone : 'base';
       return ramp(of())[t];
     }
+    case 'textureTone': { const c = of(); return textureTone(c, e.against === undefined ? c : evaluate(e.against, v, depth + 1)); }
+    case 'textureLight': { const c = of(); return textureLight(c, e.against === undefined ? c : evaluate(e.against, v, depth + 1), n(e.from, 1)); }
     case 'choose': return evaluate(whenMatches(isObj(e.when) || Array.isArray(e.when) ? e.when : { '': [] }, v) ? e.then : e.else, v, depth + 1);
     default: return FALLBACK;
   }

@@ -45,7 +45,7 @@ import { validateStudio, ID_PATTERN, SPRITE_ID_PATTERN, RESERVED_IDS, STANDARD_C
 import { plainData } from './plain-data.js';
 import { validateMeta, META_FIELDS, SPRITE_TYPES, SPRITE_ROLES, VIEWS, LICENSES, THEMES, GAME_TYPES } from './schema.js';
 import { MATERIAL_IDS } from '../engine/materials.js';
-import { COLOUR_RULES, PAINT_DEPTH } from '../engine/data-rules.js';
+import { COLOUR_RULES, PAINT_DEPTH, WHEN_BOUNDS, whenValueHolds } from '../engine/data-rules.js';   // WHEN_BOUNDS: build item B15b (thresholds)
 import { swatches as paletteSwatches } from '../engine/palettes.js';
 import { styleIds } from '../engine/styles.js';
 import { PRIMITIVE_KINDS as GEN_PRIMITIVE_KINDS, TONES, FIXED_PAINTS as GEN_FIXED_PAINTS, STAMP_ANCHORS as GEN_STAMP_ANCHORS, PLACEABLE_KINDS as GEN_PLACEABLE_KINDS } from '../engine/gen/args.js';
@@ -95,8 +95,15 @@ export const PRIMITIVE_KINDS = GEN_PRIMITIVE_KINDS;
 /** The tones a paint ref may ask of a slot: "gold.light", "gold.dark" ... (engine/gen/args.js TONES). */
 export const PAINT_TONES = TONES;
 
-/** Paints a definition may name without a palette slot (engine/gen/args.js FIXED_PAINTS: ink, clear, white). */
+/** Paints a definition may name without a palette slot (engine/gen/args.js FIXED_PAINTS: ink, clear). */
 export const FIXED_PAINTS = GEN_FIXED_PAINTS;
+
+/**
+ * Paints a palette slot's `derive` rule may name besides the slots and FIXED_PAINTS (build item B15b): white, so a light
+ * mark is a colour mixed toward white as the library's are (engine/tiles.js textureLight). Nowhere else: a sprite that
+ * paints white declares a slot. A slot called white wins over it.
+ */
+export const DERIVE_PAINTS = Object.freeze(['white']);
 
 /** The kinds of a control in version 2; "slider" is version 1's word for "range" and is kept. */
 export const CONTROL_KINDS = Object.freeze(['range', 'slider', 'choice', 'toggle', 'colour']);
@@ -376,6 +383,9 @@ function lookupGenerator(C, id, v) {
   return { entry, versions };
 }
 
+/** The piece id of a use's text ("material:dirt", without @v), or null. */
+const parsePieceUse = (u) => (/^[a-z]+:[a-z][a-z0-9-]{0,39}$/.test(u) ? u : null);
+
 function lookupPiece(C, id, v) {
   const reg = C.pieceReg;
   if (!reg) return { entry: undefined, versions: [] };
@@ -527,6 +537,11 @@ function pairOf(C, place, field, v, [alo, ahi], [blo, bhi], { need = false, clam
 function paintRef(C, place, v, depth = 0) {
   if (typeof v === 'string') {
     if (FIXED_PAINTS.includes(v)) return v;
+    if (DERIVE_PAINTS.includes(v) && !C.slots.has(v)) {   // B15b: white, inside a derived slot's rule only
+      if (C.inDerive) return v;
+      C.err(`${place}: ${q(v)} is a fixed paint only inside a derived slot's rule (palette derive: { "rule": "mix", "of": "floor.light", "with": "white", "amount": 0.3 }); to paint ${v}, add a slot for it`);
+      return undefined;
+    }
     if (HEX_RE.test(v)) { C.err(`${place}: ${q(v)} is a colour written out; a colour belongs in the palette: add a slot and paint with its name`); return undefined; }
     const [slot, tone, more] = v.split('.');
     if (more !== undefined || !C.slots.has(slot)) { C.err(`${place}: ${q(v)}: ${q(slot)} is not a colour of the palette (${someOf([...C.slots.keys()])}), nor ${listOf(FIXED_PAINTS)}`); return undefined; }
@@ -594,10 +609,12 @@ function colourRule(C, place, e, depth) {
 
 /**
  * A `when` (Contract 3): { key: [values] } or a list of such (any one enough), each key a control other than `self`,
- * each value one that control takes. With scene, also { clip: [names] } (checked once the clips are known) and
+ * each value one that control takes, or for a slider a threshold { atLeast?, above?, atMost?, below? } (checkThreshold;
+ * build item B15b), except where the site reads the `when` as values (a control's own, `self`, and a sound cue's, `site`:
+ * engine/sprite.js). With scene, also { clip: [names] } (checked once the clips are known) and
  * { direction: [down | up | side] }. Marks each control used. Returns the cleaned copy or undefined after an error.
  */
-function checkWhen(C, place, w, { self = null, scene = false } = {}) {
+function checkWhen(C, place, w, { self = null, scene = false, site = false } = {}) {
   const one = (alt) => {
     if (!isObj(alt) || !Object.keys(alt).length) { C.err(`${place}: when must be { key: [values] } naming at least one control, or a list of them; got ${say(alt)}`); return undefined; }
     const out = {};
@@ -606,7 +623,7 @@ function checkWhen(C, place, w, { self = null, scene = false } = {}) {
       const values = Array.isArray(raw) ? raw : [raw];
       if (!values.length || values.length > L.options) { C.err(`${place}: when lists ${q(k)} with ${values.length} values; give 1 to ${L.options}`); ok = false; continue; }
       if (SCENE_KEYS.has(k)) {
-        if (!scene) { C.err(`${place}: when names ${q(k)}; a control's when names other controls (clip and direction are for shapes, emitters and layer items)`); ok = false; continue; }
+        if (!scene) { C.err(`${place}: when names ${q(k)}; this when names controls only (clip and direction may be named in the when of a shape, a generator call, an emitter or a layer item)`); ok = false; continue; }
         if (k === 'direction') {
           const bad = values.filter((v) => !TOPDOWN_DIRECTIONS.includes(v));
           if (bad.length) { C.err(`${place}: when lists the direction ${bad.map(say).join(', ')}; directions are ${listOf(TOPDOWN_DIRECTIONS)}`); ok = false; continue; }
@@ -621,10 +638,15 @@ function checkWhen(C, place, w, { self = null, scene = false } = {}) {
       if (k === self) { C.err(`${place}: when cannot depend on itself (${q(k)})`); ok = false; continue; }
       const d = C.table.get(k);
       if (!d) { C.err(`${place}: when names ${q(k)}, which is not one of the sprite's controls (${someOf([...C.table.keys()])})`); ok = false; continue; }
-      const bad = values.filter((v) => !fits(d, v));
+      const limits = values.filter(isObj);   // thresholds (B15b)
+      if (limits.length && (self !== null || site)) { C.err(`${place}: when lists a threshold for ${q(k)}; a threshold cannot stand in a control's when or a sound's when (the site reads those as values: list the values instead)`); ok = false; continue; }
+      const kept = limits.map((x) => checkThreshold(C, place, k, d, x));
+      if (kept.some((x) => x === undefined)) { ok = false; continue; }
+      const bad = values.filter((v) => !isObj(v) && !fits(d, v));
       if (bad.length) { C.err(`${place}: when lists ${bad.map(say).join(', ')} for ${q(k)}, which it can never be; it takes ${shown(d)}`); ok = false; continue; }
       C.used.add(k);
-      out[k] = d.kind === 'colour' ? values.map((v) => v.toLowerCase()) : [...values];
+      let n = 0;
+      out[k] = values.map((v) => (isObj(v) ? kept[n++] : d.kind === 'colour' ? v.toLowerCase() : v));
     }
     return ok ? out : undefined;
   };
@@ -634,6 +656,33 @@ function checkWhen(C, place, w, { self = null, scene = false } = {}) {
     return alts.every(Boolean) ? alts : undefined;
   }
   return one(w);
+}
+
+/**
+ * A threshold in a `when` list (build item B15b): { atLeast?, above?, atMost?, below? } on a slider (d.kind range), at
+ * least one bound, at most one lower (atLeast or above) and one upper (atMost or below), each a number inside the
+ * slider's range, and able to hold for some value of it. Returns the cleaned threshold or undefined after an error.
+ */
+function checkThreshold(C, place, key, d, x) {
+  const words = `${WHEN_BOUNDS.slice(0, -1).join(', ')} or ${WHEN_BOUNDS[WHEN_BOUNDS.length - 1]}`;
+  if (d.kind !== 'range') { C.err(`${place}: when lists a threshold ${say(x)} for ${q(key)}; a threshold is for a slider (a number), and ${q(key)} takes ${shown(d)}`); return undefined; }
+  const keys = Object.keys(x);
+  const odd = keys.filter((k) => !WHEN_BOUNDS.includes(k));
+  if (!keys.length || odd.length) { C.err(`${place}: a threshold for ${q(key)} is { ${WHEN_BOUNDS.map((b) => `${b}?`).join(', ')} } with at least one of ${words}${odd.length ? `; ${odd.slice(0, 4).map(q).join(', ')} is not one` : ''}`); return undefined; }
+  const out = {};
+  for (const k of WHEN_BOUNDS) {
+    if (!Object.hasOwn(x, k)) continue;
+    const b = x[k];
+    if (!fin(b)) { C.err(`${place}: a threshold's ${k} for ${q(key)} must be a number; got ${say(b)}`); return undefined; }
+    if (b < d.min || b > d.max) { C.err(`${place}: when lists the threshold ${k} ${b} for ${q(key)}, outside its range; it takes ${shown(d)}`); return undefined; }
+    out[k] = b;
+  }
+  if (Object.hasOwn(out, 'atLeast') && Object.hasOwn(out, 'above')) { C.err(`${place}: a threshold for ${q(key)} gives one lower bound (atLeast or above), not both`); return undefined; }
+  if (Object.hasOwn(out, 'atMost') && Object.hasOwn(out, 'below')) { C.err(`${place}: a threshold for ${q(key)} gives one upper bound (atMost or below), not both`); return undefined; }
+  const lo = out.atLeast ?? out.above ?? d.min, loOpen = Object.hasOwn(out, 'above');
+  const hi = out.atMost ?? out.below ?? d.max, hiOpen = Object.hasOwn(out, 'below');
+  if (lo > hi || (lo === hi && (loOpen || hiOpen))) { C.err(`${place}: the threshold ${say(x)} for ${q(key)} can never hold (${key} takes ${shown(d)})`); return undefined; }
+  return out;
 }
 
 function fits(d, v) {
@@ -1479,8 +1528,9 @@ function emittersOf(C, where, raw) {
  * 1, in this sprite's frame, since keys may lower its size arguments but never raise them (checkKey) and an amount is
  * held to 0..1 when it draws. An emitter whose generator has no bound is refused, so is one over a frame's cap, and so
  * are emitters that can draw together and are over it in all: every emitter counts as on in every frame, apart from
- * those its `when` (a control's settings: the values the `when`s list and one more none lists) or its `clip` keep
- * apart. Conditions it does not read count as holding, so the sum is never less than a frame can hold; the work is at
+ * those its `when` (a control's settings: the values the `when`s list and one more none lists; for a slider whose `when`s
+ * hold thresholds, each number they name and the slider's min and max, a point between each two, read with whenValueHolds) or its
+ * `clip` keep apart. Conditions it does not read count as holding, so the sum is never less than a frame can hold; the work is at
  * most 4,096 sums of at most 16 emitters (L.emitters), whatever the clips and keys.
  */
 function boundEmitters(C) {
@@ -1502,10 +1552,26 @@ function boundEmitters(C) {
   // the control settings that decide which emitters' whens hold: each key the whens name, its listed values and one more
   const alts = (w) => (Array.isArray(w) ? w : isObj(w) ? [w] : []).filter(isObj);
   const domains = new Map();
+  const cuts = new Map();   // a key with a threshold (B15b): every number its whens name, plain or a bound
   for (const e of ems) for (const alt of alts(e.when)) for (const [k, vs] of Object.entries(alt)) {
     if (SCENE_KEYS.has(k) || !Array.isArray(vs)) continue;
     const d = domains.get(k) ?? domains.set(k, new Set()).get(k);
-    for (const v of vs) d.add(v);
+    for (const v of vs) if (isObj(v)) { const c = cuts.get(k) ?? cuts.set(k, new Set()).get(k); for (const b of Object.values(v)) if (fin(b)) c.add(b); } else d.add(v);
+  }
+  // a slider whose whens hold thresholds is tried at each number they name, between each two and past each end (in its
+  // range), so every stretch where the whens hold the same way is tried once and thresholds are read as they are drawn
+  for (const [k, c] of cuts) {
+    const d = domains.get(k), def = C.table?.get(k);
+    const lo = fin(def?.min) ? def.min : -Infinity, hi = fin(def?.max) ? def.max : Infinity;
+    // the slider's own ends count as named (review B15b round 3): the stretch past a strict bound is then tried at its
+    // end, and a point between each two named numbers; one step past each end only where the slider has no end
+    const inRange = [...c, ...[...d].filter(fin)].filter((t) => t >= lo && t <= hi);
+    const pts = [...new Set([...inRange, ...[lo, hi].filter(fin)])].sort((a, b) => a - b);
+    const tries = new Set(pts);
+    pts.forEach((p, i) => { if (i + 1 < pts.length) tries.add((p + pts[i + 1]) / 2); });
+    if (pts.length && !fin(hi)) tries.add(pts[pts.length - 1] + 1);
+    if (pts.length && !fin(lo)) tries.add(pts[0] - 1);
+    for (const t of tries) if (t >= lo && t <= hi) d.add(t);
   }
   const OTHER = Symbol('other');
   let settings = [{}];
@@ -1516,7 +1582,8 @@ function boundEmitters(C) {
   const holds = (w, set) => {
     if (w === undefined || set === null) return true;
     const list = alts(w);
-    return !list.length || list.some((alt) => Object.entries(alt).every(([k, vs]) => !Array.isArray(vs) || !Object.hasOwn(set, k) || vs.includes(set[k])));
+    // each entry read by the one rule (engine/data-rules.js whenValueHolds), so a threshold holds where it is drawn
+    return !list.length || list.some((alt) => Object.entries(alt).every(([k, vs]) => !Array.isArray(vs) || !Object.hasOwn(set, k) || vs.some((v) => whenValueHolds(v, set[k]))));
   };
   let worst = 0, where = null;
   for (const set of settings) {
@@ -2027,7 +2094,15 @@ function tileFillCount(C, place, g, shared) {
     return;
   }
   const m = g.material ?? shared;
-  if (!isObj(m) || Object.hasOwn(m, 'use')) return;
+  if (!isObj(m)) return;
+  if (Object.hasOwn(m, 'use')) {
+    // a material piece: its summary says how many fill versions it has (engine/pieces.js pieceSummary; build item B15b)
+    const r = typeof m.use === 'string' && Number.isInteger(m.v) ? parsePieceUse(m.use) : null;
+    const e = r ? lookupPiece(C, r, m.v).entry : null;
+    const n = g.fills ?? 1, v = e && Number.isInteger(e.fills) ? e.fills : null;
+    if (v !== null && n > 1 && v < n) C.err(`${place}: fills ${n} asks for ${n} different middles, but its material ${m.use} has ${v ? `${v} fill version${v === 1 ? '' : 's'}` : 'no fill versions'}; ask for ${Math.max(1, v)} at most, or use a material with ${n}`);
+    return;
+  }
   const n = g.fills ?? 1, v = Array.isArray(m.fill?.versions) ? m.fill.versions.length : 0;
   const has = v ? `${v} fill version${v === 1 ? '' : 's'}` : 'no fill versions';
   if (n > 1 && v < n) C.err(`${place}: fills ${n} asks for ${n} different middles, but its material has ${has}; give fill.versions ${n} draw lists (the first may be [])`);
@@ -2152,7 +2227,9 @@ function derivesOf(C) {
   for (const { o, place, rule } of pending) {
     const before = new Set(C.painted);
     C.painted = new Set();
+    C.inDerive = true;   // B15b: DERIVE_PAINTS may be named here
     const x = isObj(rule) ? colourRule(C, `${place}: derive`, rule, 0) : (C.err(`${place}: derive must be a colour rule { "rule": "tone", "of": ..., ... }; got ${say(rule)}`), undefined);
+    C.inDerive = false;
     deps.set(o.id, [...C.painted]);
     for (const s of C.painted) before.add(s);
     C.painted = before;
@@ -2564,7 +2641,7 @@ function checkClip(C, name, c, written) {
       const x = { sound: id, frame: s.frame };
       const pr = text(C, sp, 'preset', s.preset, L.nameChars); if (pr !== undefined) x.preset = pr;
       const vol = num(C, sp, 'volume', s.volume, 0, 1); if (vol !== undefined) x.volume = vol;
-      if (s.when !== undefined) { const w = checkWhen(C, sp, s.when); if (w === undefined) return; x.when = w; }
+      if (s.when !== undefined) { const w = checkWhen(C, sp, s.when, { site: true }); if (w === undefined) return; x.when = w; }
       o.sounds.push(x);
     });
   }

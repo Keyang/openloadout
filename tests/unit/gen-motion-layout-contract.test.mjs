@@ -8,7 +8,9 @@
 //   LAYOUTS (family "layout", docs/data-sprites.md 4.3): every registered layout, pinned by the frame lists it lays out
 //     for its fixtures (every clip, first, middle and last frame, default settings), fuzzed over random settings, clips
 //     and frames, and laid out twice the same from two separate builds. A new layout adds a row to LAYOUT_FIXTURES (its
-//     own fixture definitions) and pins with GEN_GOLDEN_WRITE=1; until then this test names it.
+//     own fixture definitions) and pins with GEN_GOLDEN_WRITE=1; until then this test names it. A layout no library
+//     sprite uses yet is not released: GEN_GOLDEN_REWRITE=<key>[,<key>] rewrites its golden on purpose and says which
+//     frames changed (tests/helpers/golden-rewrite.mjs; build item B15b), never by deleting the file.
 // Built by B8 for its motions and pictures@1, after the B8 review; written for B12 to B15's layouts too.
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -19,8 +21,10 @@ import { MOTION_TARGETS } from '../../engine/gen/motion.js';
 import { dataSprite, dataFrameList } from '../../engine/data-sprite.js';
 import { defaultParams } from '../../engine/sprite.js';
 import { stampPixels, SHAPE_CAPS } from '../../engine/gen/args.js';
+import { rewriteKeys, layoutUsers, frameDiff, rewriteSummary } from '../helpers/golden-rewrite.mjs';
 
 const WRITE = process.env.GEN_GOLDEN_WRITE === '1';
+const REWRITE = rewriteKeys(process.env);   // unreleased layouts whose goldens are rewritten on purpose (B15b)
 const NUMBER_TYPES = new Set(['px', 'share', 'count', 'angle', 'seed']);
 const PHASES = [0, 0.25, 0.5, 0.75, 1];
 const isObj = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
@@ -140,7 +144,7 @@ const LAYOUT_FIXTURES = {
   'panel@1': ['panel/bare-panel.json'],
   'emitters@1': ['hit-spark.json', 'emitters/blaster-bolt.json', 'emitters/plasma-burst.json', 'emitters/hit-spark.json'],
   'layers@1': ['bg-forest.json', 'layers/bg-starfield.json', 'layers/bg-forest-wide.json'],
-  'tiles@1': ['tiles/tiles-cave.json', 'tiles/tiles-dungeon.json'],   // build item B15 (tiles-forest.json needs the test pieces)
+  'tiles@1': ['tiles/tiles-cave.json', 'tiles/tiles-dungeon.json', 'tiles/tiles-platforms.json'],   // build items B15, B15b (tiles-forest.json needs the test pieces)
 };
 const layouts = () => registry.generators().filter((g) => g.family === 'layout');
 const load = (p) => dataSprite(JSON.parse(fs.readFileSync(new URL(p, FIX), 'utf8')));
@@ -157,9 +161,20 @@ function layoutFrames(key) {
   return out;
 }
 
-test('every registered layout names its fixtures and has a golden file (pin a new one with GEN_GOLDEN_WRITE=1)', () => {
+test('every registered layout names its fixtures and has a golden file (pin a new one with GEN_GOLDEN_WRITE=1)', (t) => {
   const unnamed = layouts().filter((g) => !LAYOUT_FIXTURES[g.key]).map((g) => g.key);
   assert.deepEqual(unnamed, [], 'layouts with no fixtures in LAYOUT_FIXTURES');
+  // GEN_GOLDEN_REWRITE: every key checked before anything is written
+  const unknown = [...REWRITE].filter((k) => !layouts().some((g) => g.key === k && LAYOUT_FIXTURES[k]));
+  assert.deepEqual(unknown, [], `GEN_GOLDEN_REWRITE names ${unknown.join(', ')}: not a registered layout with fixtures (${layouts().map((g) => g.key).join(', ')})`);
+  const released = [...REWRITE].map((k) => [k, layoutUsers(layouts().find((g) => g.key === k).id)]).filter(([, users]) => users.length);
+  assert.deepEqual(released, [], 'GEN_GOLDEN_REWRITE names a released layout (a library sprite uses it): a different output is a new version');
+  for (const g of layouts().filter((x) => REWRITE.has(x.key))) {
+    const frames = layoutFrames(g.key);
+    const d = frameDiff(readGolden(g.key)?.frames ?? {}, frames);
+    fs.writeFileSync(goldenPath(g.key), `${JSON.stringify({ id: g.id, v: g.v, family: 'layout', fixtures: LAYOUT_FIXTURES[g.key], frames }, null, 1)}\n`);
+    t.diagnostic(rewriteSummary(g.key, d, Object.keys(frames).length));
+  }
   const missing = [];
   for (const g of layouts()) {
     if (readGolden(g.key)) continue;

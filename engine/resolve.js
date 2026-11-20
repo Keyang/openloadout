@@ -52,10 +52,10 @@
 // pieces, slots added), and a cap reached is an error, never a hang. Every function returns plain data and never throws.
 // Deterministic: no clock, no randomness; the same definition and settings give the same result.
 // Pure JavaScript with no page, worker or Node in it: the site, the build and the tests all import this file.
-import { paintColour, COLOUR_RULES, FALLBACK, whenMatches } from './data-rules.js';
+import { paintColour, COLOUR_RULES, FALLBACK, whenMatches, whenValueHolds } from './data-rules.js';   // whenValueHolds: build item B15b (thresholds)
 import { ramp, farRamp, INK, hexToRgb } from './color.js';
 import { lerp } from './motion.js';
-import { lostPaints } from './draw-list.js';
+import { lostPaints, DRAW_LIST_OPS } from './draw-list.js';
 import { restMaterial } from './materials.js';
 import { parsePieceRef, pieceRegistry } from './pieces.js';
 import { validateSprite, plainSpriteData, checkMaterialPiece } from '../catalog/sprite-schema.js';   // checkMaterialPiece: build item B15 review
@@ -290,7 +290,7 @@ function splitWhen(when, ctx) {
         continue;
       }
       if (!ctx.T.has(k)) { ok = false; break; }
-      if (!vals.some((v) => same(v, valueOf(ctx.T, ctx.params, k)))) { ok = false; break; }
+      if (!vals.some((v) => whenValueHolds(v, valueOf(ctx.T, ctx.params, k)))) { ok = false; break; }   // a value, or a threshold on a slider (B15b)
       if (ctx.def && !effective(ctx.T, ctx.def, k, ctx.params, ctx.trail ?? [])) { ok = false; break; }
     }
     if (!ok) continue;
@@ -321,8 +321,8 @@ function effective(T, def, key, params, trail) {
 }
 
 /**
- * Whether a `when` holds at these settings (Contract 3: every key at one of its values, a list any one; a control named
- * must itself be in effect): true or false, or null when it depends on clip or direction and no scene ({ clip,
+ * Whether a `when` holds at these settings (Contract 3: every key at one of its values or thresholds, engine/data-rules.js
+ * whenValueHolds; a list any one; a control named must itself be in effect): true or false, or null when it depends on clip or direction and no scene ({ clip,
  * direction }) is given. Settings left out take their defaults. Never throws. Arguments: def, when, params, scene.
  */
 export function whenHolds(def, when, params = {}, scene = undefined) {
@@ -420,7 +420,7 @@ function ruleWithColours(rule, palette, params, T, depth) {
   const hex = (x) => { const h = hexOf(x, palette, params, T, depth + 1); if (!h) lost = true; return h; };
   for (const [name, a] of Object.entries(spec)) {
     const v = rule[name];
-    if (v === undefined) { if (a.kind === 'colour' || a.kind === 'colours') lost = true; continue; }
+    if (v === undefined) { if ((a.kind === 'colour' || a.kind === 'colours') && !a.optional) lost = true; continue; }   // an optional colour (B15b: textureTone's against) is the rule's own default
     if (a.kind === 'colour') out[name] = hex(v);
     else if (a.kind === 'colours') {
       if (!Array.isArray(v) || !v.length) lost = true;
@@ -437,6 +437,7 @@ function hexOf(ref, palette, params, T, depth = 0) {
   if (typeof ref === 'string') {
     if (ref === 'ink') return INK.toLowerCase();
     if (ref === 'clear') return null;
+    if (ref === 'white') return slotHex(palette, 'white') ?? '#ffffff';   // B15b: a derive rule's fixed white (catalog/sprite-schema.js DERIVE_PAINTS); a slot called white wins
     if (HEX.test(ref)) return ref.toLowerCase();
     const dot = ref.indexOf('.');
     const base = slotHex(palette, dot < 0 ? ref : ref.slice(0, dot));
@@ -896,7 +897,12 @@ function rigOf(S, env, rig, depth) {
   const out = { ...brig, ...mine };
   out.bones = mergeById(brig.bones ?? [], mine.bones ?? []);
   if (brig.nodes || mine.nodes) out.nodes = mergeById(brig.nodes ?? [], mine.nodes ?? []);
-  out.shapes = mergeById(baseShapes, mine.shapes ?? []);
+  // a base's operations (cut, outline, tint) go after everything the sprite adds, replaced by id with another operation
+  // or not (build item B16a2): an operation splits draw-list's z order, and a base's ground cut must reach the sprite's
+  // parts too; a replacement that is not an operation stays in the base's place, as any replaced shape does
+  const baseOps = new Set(baseShapes.filter((s) => isObj(s) && typeof s.id === 'string' && DRAW_LIST_OPS.includes(s.kind)).map((s) => s.id));
+  const merged = mergeById(baseShapes, mine.shapes ?? []), isBaseOp = (s) => isObj(s) && baseOps.has(s.id) && DRAW_LIST_OPS.includes(s.kind);
+  out.shapes = [...merged.filter((s) => !isBaseOp(s)), ...merged.filter(isBaseOp)];
   for (const f of ['ik', 'points']) if (brig[f] || mine[f]) out[f] = mergeById(brig[f] ?? [], mine[f] ?? []);
   if (isObj(brig.directions) || isObj(mine.directions)) {
     const d = {};
