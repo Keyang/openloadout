@@ -13,7 +13,7 @@ const SPRITES = FIRST.length ? FIRST : C.sprites.filter((a) => ['character', 'cr
 const ONE_OF_EACH = [...new Set(C.sprites.map((a) => a.type))].map((type) => C.sprites.find((a) => a.type === type).id);
 const EVERY_KIND = [...new Set([...SPRITES, ...ONE_OF_EACH])];
 /** A sprite's own program, loaded from its file. */
-const spriteProgram = async (id) => (await import(`../../sprites/${id}.js`)).default;
+const spriteProgram = async (id) => { const A = await import('../../tools/lib/assets.mjs'), f = A.findSpriteFile(A.ROOT, id); return f?.endsWith('.json') ? A.loadDataSprite(A.ROOT, f) : (await import(`../../sprites/${id}.js`)).default; };   // a data sprite (sprites/<id>.json, P1) or a code file
 
 const stage = (page) => page.locator('canvas.stage');
 const strip = (page) => page.locator('.strip .cell canvas');

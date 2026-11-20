@@ -10,12 +10,16 @@ import { renderFrame, defaultParams } from '../../engine/sprite.js';
 import { sitePieces } from '../../engine/pieces.js';
 import { nodePieceReader } from '../../tools/lib/pieces-index.mjs';
 import { dataProject, badgeDef, tuftDef, asFile } from '../helpers/data-sprites.mjs';
+import { CODE_STANDIN, useCodeStandIn } from '../helpers/code-standin.mjs';
+
+// a code sprite under an id no library sprite uses (the library's own are all being redrawn as data)
+useCodeStandIn();
 
 const project = dataProject({ data: { badge: badgeDef(), 'tuft-pot': tuftDef() }, pieces: true });
 sitePieces().useReader(nodePieceReader(project));
 
 const row = (id, src) => ({ id, kind: 'sprite', name: id, bundles: [], src, tech: { soundIds: [] } });
-const CATALOG = { version: 1, assets: [row('badge', 'sprites/badge.json'), row('tuft-pot', 'sprites/tuft-pot.json'), row('coin', 'sprites/coin.js'), row('gone', 'sprites/gone.json')], bundles: [] };
+const CATALOG = { version: 1, assets: [row('badge', 'sprites/badge.json'), row('tuft-pot', 'sprites/tuft-pot.json'), row(CODE_STANDIN, `sprites/${CODE_STANDIN}.js`), row('gone', 'sprites/gone.json')], bundles: [] };
 
 let copy = 0;
 const real = globalThis.fetch;
@@ -59,9 +63,10 @@ test('the pieces a data sprite uses are loaded before it is drawn', async () => 
 
 test('a code sprite is still imported, and a data file that is missing rejects (and may be tried again)', async () => {
   const { m, asked } = await fresh();
-  const coin = await m.loadSprite('coin');
-  assert.equal(coin.id, 'coin');
-  assert.ok(!asked.some((u) => u.includes('coin')), 'a code sprite is imported, not fetched');
+  const code = await m.loadSprite(CODE_STANDIN);      // a code file (tests/helpers/code-standin.mjs)
+  assert.equal(code.id, CODE_STANDIN);
+  assert.equal(typeof code.render, 'function');
+  assert.ok(!asked.some((u) => u.includes(CODE_STANDIN)), 'a code sprite is imported, not fetched');
   await assert.rejects(m.loadSprite('gone'), /sprites\/gone\.json/);
   fs.writeFileSync(path.join(project, 'sprites', 'gone.json'), asFile(badgeDef('gone')));
   assert.equal((await m.loadSprite('gone')).id, 'gone', 'a failed load is not kept');

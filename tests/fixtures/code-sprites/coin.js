@@ -1,10 +1,14 @@
+// FROZEN COPY, not a sprite: sprites/coin.js as it was before P1 (2026-11-20), when coin was redrawn as data (sprites/coin.json)
+// and the code file deleted. Kept only as the reference the port tests compare with (gen-b8-ports, data-sprite-v2-b8,
+// ui-export) and as a stand-in code sprite for the loader tests (tests/helpers/data-sprites.mjs copies it into a scratch
+// project's sprites/ with its imports put back to '../engine/'). Never edit it; the build never scans tests/.
 // Coin: a flat disc that turns around its upright axis. No skeleton.
 // The disc is one shape squeezed sideways by cos(angle); its thickness shows
 // as a band on the side that is turning away. With other settings it reads as
 // a token (octagon, hole) or a gem medal (square, gem).
-import { defineSprite, range, choice, color, toggle } from '../engine/sprite.js';
-import { lerp, wave, keys, clamp, fract, easeOut, PI } from '../engine/motion.js';
-import { ramp, tone, mix, hexToRgb, INK } from '../engine/color.js';
+import { defineSprite, range, choice, color, toggle } from '../../../engine/sprite.js';
+import { lerp, wave, keys, clamp, fract, easeOut, PI } from '../../../engine/motion.js';
+import { ramp, tone, mix, hexToRgb, INK } from '../../../engine/color.js';
 
 const W = 32, GROUND = 30;
 const METALS = ['#f2c230', '#c9ced9', '#cf8a4a', '#6f7a94', '#5fc4a0', '#e8dca8'];

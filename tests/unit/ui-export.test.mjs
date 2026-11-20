@@ -4,7 +4,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { defineSprite, renderSheet, renderFrame, defaultParams, cleanParams, range, clipStretch } from '../../engine/sprite.js';
 import { col, INK } from '../../engine/color.js';
-import coin from '../../sprites/coin.js';
+import coin from '../fixtures/code-sprites/coin.js';   // the code file as it was before P1 (a code sprite to export)
 import slime from '../../sprites/slime.js';
 import dialogue from '../../sprites/ui-dialogue.js';
 import menu from '../../sprites/ui-battle-menu.js';

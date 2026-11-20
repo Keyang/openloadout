@@ -157,7 +157,7 @@ test('a download under a look that changes shapes lists the settings each sprite
     const png = Buffer.from(zip.file(entry.sheet).data).toString('base64');
     const same = await page.evaluate(async ({ png, id, clip, row, fw, fh, params, theme }) => {
       const { renderThemedFrame } = await import('/engine/theme.js');
-      const sprite = (await import(`/sprites/${id}.js`)).default;
+      const sprite = await (async () => { const C = await import('/app/catalog.js'); await C.loadCatalog(); return C.loadSprite(id); })();   // a code file or a data file (P1)
       const bmp = await createImageBitmap(new Blob([Uint8Array.from(atob(png), (c) => c.charCodeAt(0))], { type: 'image/png' }));
       const cv = new OffscreenCanvas(fw, fh), g = cv.getContext('2d');
       g.drawImage(bmp, 0, row * fh, fw, fh, 0, 0, fw, fh);

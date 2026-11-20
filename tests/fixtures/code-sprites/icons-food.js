@@ -1,3 +1,7 @@
+// FROZEN COPY, not a sprite: sprites/icons-food.js as it was before P1 (2026-11-20), when icons-food was redrawn as data (sprites/icons-food.json)
+// and the code file deleted. Kept only as the reference the port tests compare with (gen-b8-ports, data-sprite-v2-b8,
+// ui-export) and as a stand-in code sprite for the loader tests (tests/helpers/data-sprites.mjs copies it into a scratch
+// project's sprites/ with its imports put back to '../engine/'). Never edit it; the build never scans tests/.
 // Food icons (core-sprites-2, batch K17): eight things to eat for a farming inventory, a cooking menu
 // or an RPG bag, one clip each. Every shape comes from the icon helpers (engine/icons.js for the
 // layout and the style controls, engine/icons-more.js for the food shapes, which reach the food
@@ -10,12 +14,12 @@
 // stem (mushroom: plain brown with gills, never a red cap with spots) and a wide bowl on a foot (soup).
 // Colours: Fruit paints the apple, Greens the apple's leaf, the carrot's top and the herb in the soup,
 // Bowl the soup bowl; everything else is a fixed Thornwood colour.
-import { defineSprite, range, color, toggle } from '../engine/sprite.js';
-import { INK } from '../engine/color.js';
-import { PALETTE } from '../engine/palettes.js';
-import { ICON_SIZE, ICON_PIVOT, ICON_LEAN, iconClips, iconFit, iconTidy } from '../engine/icons.js';
-import { iconFood, iconFish, iconEgg, iconRoot, iconBowl } from '../engine/icons-more.js';
-import { iconMushroomPlain } from '../engine/icons-craft.js';
+import { defineSprite, range, color, toggle } from '../../../engine/sprite.js';
+import { INK } from '../../../engine/color.js';
+import { PALETTE } from '../../../engine/palettes.js';
+import { ICON_SIZE, ICON_PIVOT, ICON_LEAN, iconClips, iconFit, iconTidy } from '../../../engine/icons.js';
+import { iconFood, iconFish, iconEgg, iconRoot, iconBowl } from '../../../engine/icons-more.js';
+import { iconMushroomPlain } from '../../../engine/icons-craft.js';
 
 const P = PALETTE.thornwood, H = PALETTE.hearthvale;
 

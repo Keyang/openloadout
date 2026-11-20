@@ -1,14 +1,18 @@
+// FROZEN COPY, not a sprite: sprites/crate.js as it was before P1 (2026-11-20), when crate was redrawn as data (sprites/crate.json)
+// and the code file deleted. Kept only as the reference the port tests compare with (gen-b8-ports, data-sprite-v2-b8,
+// ui-export) and as a stand-in code sprite for the loader tests (tests/helpers/data-sprites.mjs copies it into a scratch
+// project's sprites/ with its imports put back to '../engine/'). Never edit it; the build never scans tests/.
 // Breakable crate: a box, a barrel or a clay pot that rocks when hit and bursts into pieces.
 // The whole container is drawn upright on its own layer; `hurt` leans that layer with tilt()
 // (whole rows and columns slide, so nothing goes soft), and `break` splits it in two and then swaps
 // it for boards and splinters from engine/fx.js that fall to the ground line.
-import { defineSprite, range, choice, color, toggle } from '../engine/sprite.js';
-import { lerp, clamp, PI } from '../engine/motion.js';
-import { ramp, tone, pick, INK } from '../engine/color.js';
-import { Surface, ellipseIn, rectIn, tilt, cropped } from '../engine/surface.js';
-import { PALETTE, swatches } from '../engine/palettes.js';
-import { chunks } from '../engine/fx.js';
-import { drawMark } from '../engine/marks.js';
+import { defineSprite, range, choice, color, toggle } from '../../../engine/sprite.js';
+import { lerp, clamp, PI } from '../../../engine/motion.js';
+import { ramp, tone, pick, INK } from '../../../engine/color.js';
+import { Surface, ellipseIn, rectIn, tilt, cropped } from '../../../engine/surface.js';
+import { PALETTE, swatches } from '../../../engine/palettes.js';
+import { chunks } from '../../../engine/fx.js';
+import { drawMark } from '../../../engine/marks.js';
 
 const P = PALETTE.thornwood;
 const W = 32, CX = 16, GROUND = 29;       // the lowest body row; its outline lands on the pivot row

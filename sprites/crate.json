@@ -1,0 +1,1259 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "crate",
+ "name": "Breakable crate",
+ "blurb": "A crate, barrel or clay pot that rocks when hit and smashes into pieces. Change its size, stamp, metal bands and colours.",
+ "meta": {
+  "type": "prop",
+  "role": "world/prop",
+  "themes": [
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "platformer"
+  ],
+  "view": "side",
+  "words": [
+   "crate",
+   "box",
+   "barrel",
+   "pot",
+   "vase",
+   "container",
+   "break",
+   "smash",
+   "destroy",
+   "hit",
+   "loot",
+   "wooden",
+   "obstacle"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  30
+ ],
+ "styles": [
+  "pixel"
+ ],
+ "preview": "idle",
+ "palette": [
+  {
+   "id": "wood",
+   "label": "Wood",
+   "default": "#a06a3c",
+   "material": "wood",
+   "swatches": [
+    "#a06a3c",
+    "#7a4f33",
+    "#f0ead8",
+    "#a8612a",
+    "#5a3a22",
+    "#c98a4a"
+   ]
+  },
+  {
+   "id": "metal",
+   "label": "Metal",
+   "default": "#c2c9d6",
+   "material": "metal",
+   "swatches": [
+    "#c2c9d6",
+    "#f2c230",
+    "#8f97a8",
+    "#5d6475",
+    "#e6c545",
+    "#c98a4a"
+   ]
+  },
+  {
+   "id": "cream",
+   "default": "#f0ead8",
+   "material": "paint",
+   "detail": true
+  },
+  {
+   "id": "splinter",
+   "material": "wood",
+   "derive": {
+    "rule": "tone",
+    "of": "wood",
+    "by": 0.7
+   }
+  },
+  {
+   "id": "crumb",
+   "material": "wood",
+   "derive": {
+    "rule": "tone",
+    "of": "wood",
+    "by": -0.4
+   }
+  },
+  {
+   "id": "stamp",
+   "material": "paint",
+   "derive": {
+    "rule": "standOut",
+    "against": "wood",
+    "from": [
+     "cream",
+     {
+      "rule": "tone",
+      "of": "wood",
+      "by": -2.2
+     }
+    ]
+   }
+  },
+  {
+   "id": "stamp-on-dark",
+   "material": "paint",
+   "derive": {
+    "rule": "standOut",
+    "against": {
+     "rule": "ramp",
+     "of": "wood",
+     "tone": "dark"
+    },
+    "from": [
+     "cream",
+     {
+      "rule": "tone",
+      "of": "wood",
+      "by": -2.2
+     }
+    ]
+   }
+  }
+ ],
+ "controls": [
+  {
+   "key": "size",
+   "kind": "range",
+   "label": "Size",
+   "lo": "Small",
+   "hi": "Big",
+   "default": 0.5
+  },
+  {
+   "key": "style",
+   "kind": "choice",
+   "label": "Style",
+   "options": [
+    "crate",
+    "barrel",
+    "pot"
+   ],
+   "default": "crate"
+  },
+  {
+   "key": "bands",
+   "kind": "toggle",
+   "label": "Metal bands",
+   "default": true
+  },
+  {
+   "key": "mark",
+   "kind": "choice",
+   "label": "Stamp",
+   "options": [
+    "none",
+    "leaf",
+    "skull",
+    "star"
+   ],
+   "default": "none"
+  },
+  {
+   "key": "pieces",
+   "kind": "range",
+   "label": "Pieces",
+   "lo": "Few",
+   "hi": "Many",
+   "default": 0.5
+  },
+  {
+   "key": "metal",
+   "kind": "colour",
+   "label": "Metal",
+   "when": {
+    "bands": [
+     true
+    ]
+   }
+  },
+  {
+   "key": "speed",
+   "standard": "speed"
+  }
+ ],
+ "body": {
+  "pictures": {
+   "nodes": [
+    {
+     "id": "crate",
+     "parent": null,
+     "at": [
+      0,
+      0
+     ]
+    }
+   ],
+   "draw": [
+    {
+     "id": "box",
+     "gen": "container",
+     "v": 1,
+     "on": "crate",
+     "at": [
+      16,
+      30
+     ],
+     "style": {
+      "from": "style",
+      "pick": {
+       "crate": "crate",
+       "barrel": "barrel",
+       "pot": "pot"
+      }
+     },
+     "size": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        15
+       ],
+       [
+        1,
+        23
+       ]
+      ],
+      "round": "px"
+     },
+     "bands": {
+      "from": "bands",
+      "pick": {
+       "true": true,
+       "false": false
+      }
+     },
+     "mark": {
+      "from": "mark",
+      "pick": {
+       "none": "none",
+       "leaf": "leaf",
+       "skull": "skull",
+       "star": "star"
+      }
+     },
+     "wood": "wood",
+     "metal": "metal",
+     "markPaint": {
+      "from": "style",
+      "pick": {
+       "crate": "stamp-on-dark",
+       "barrel": "stamp",
+       "pot": "stamp"
+      }
+     }
+    },
+    {
+     "id": "swollen",
+     "gen": "container",
+     "v": 1,
+     "on": "crate",
+     "at": [
+      16,
+      30
+     ],
+     "style": {
+      "from": "style",
+      "pick": {
+       "crate": "crate",
+       "barrel": "barrel",
+       "pot": "pot"
+      }
+     },
+     "size": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        15
+       ],
+       [
+        1,
+        23
+       ]
+      ],
+      "round": "px"
+     },
+     "bands": {
+      "from": "bands",
+      "pick": {
+       "true": true,
+       "false": false
+      }
+     },
+     "mark": {
+      "from": "mark",
+      "pick": {
+       "none": "none",
+       "leaf": "leaf",
+       "skull": "skull",
+       "star": "star"
+      }
+     },
+     "wood": "wood",
+     "metal": "metal",
+     "markPaint": {
+      "from": "style",
+      "pick": {
+       "crate": "stamp-on-dark",
+       "barrel": "stamp",
+       "pot": "stamp"
+      }
+     },
+     "grow": 1,
+     "hidden": true
+    },
+    {
+     "id": "split",
+     "gen": "container",
+     "v": 1,
+     "on": "crate",
+     "at": [
+      16,
+      30
+     ],
+     "style": {
+      "from": "style",
+      "pick": {
+       "crate": "crate",
+       "barrel": "barrel",
+       "pot": "pot"
+      }
+     },
+     "size": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        15
+       ],
+       [
+        1,
+        23
+       ]
+      ],
+      "round": "px"
+     },
+     "bands": {
+      "from": "bands",
+      "pick": {
+       "true": true,
+       "false": false
+      }
+     },
+     "mark": {
+      "from": "mark",
+      "pick": {
+       "none": "none",
+       "leaf": "leaf",
+       "skull": "skull",
+       "star": "star"
+      }
+     },
+     "wood": "wood",
+     "metal": "metal",
+     "markPaint": {
+      "from": "style",
+      "pick": {
+       "crate": "stamp-on-dark",
+       "barrel": "stamp",
+       "pot": "stamp"
+      }
+     },
+     "split": true,
+     "hidden": true
+    },
+    {
+     "id": "crumbs",
+     "kind": "stamp",
+     "at": [
+      9,
+      29
+     ],
+     "rows": [
+      "aa......aaa...aa"
+     ],
+     "key": {
+      "a": "crumb"
+     },
+     "hidden": true
+    },
+    {
+     "kind": "outline",
+     "paint": "ink"
+    }
+   ],
+   "per": {
+    "break": {
+     "hide": [
+      "box"
+     ]
+    }
+   },
+   "motion": [
+    {
+     "gen": "prop.rock",
+     "v": 1,
+     "node": "crate",
+     "clip": [
+      "hurt"
+     ],
+     "lean": 8.594366926962348
+    }
+   ],
+   "emitters": [
+    {
+     "id": "splinters",
+     "gen": "chunks",
+     "v": 1,
+     "at": [
+      16,
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         22.5
+        ],
+        [
+         1,
+         18.5
+        ]
+       ]
+      }
+     ],
+     "count": {
+      "from": "pieces",
+      "map": [
+       [
+        0,
+        4
+       ],
+       [
+        1,
+        9
+       ]
+      ],
+      "round": "px"
+     },
+     "seed": 11,
+     "dist": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        12
+       ],
+       [
+        1,
+        15
+       ]
+      ]
+     },
+     "rise": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        9
+       ],
+       [
+        1,
+        14
+       ]
+      ]
+     },
+     "size": 2.6,
+     "thick": 1,
+     "spread": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        4.5
+       ],
+       [
+        1,
+        6.9
+       ]
+      ]
+     },
+     "spin": 1.5,
+     "floor": 29,
+     "land": 0.88,
+     "shrink": 0.1,
+     "paint": "splinter",
+     "area": {
+      "x0": 1,
+      "y0": 1,
+      "x1": 31,
+      "y1": 30
+     }
+    },
+    {
+     "id": "boards",
+     "gen": "chunks",
+     "v": 1,
+     "when": {
+      "style": [
+       "crate"
+      ]
+     },
+     "floor": 29,
+     "area": {
+      "x0": 2,
+      "y0": 2,
+      "x1": 30,
+      "y1": 30
+     },
+     "ink": true,
+     "at": [
+      16,
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         22.5
+        ],
+        [
+         1,
+         18.5
+        ]
+       ]
+      }
+     ],
+     "count": {
+      "from": "pieces",
+      "map": [
+       [
+        0,
+        3
+       ],
+       [
+        1,
+        8
+       ]
+      ],
+      "round": "px"
+     },
+     "seed": 2,
+     "dist": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        9
+       ],
+       [
+        1,
+        12
+       ]
+      ]
+     },
+     "rise": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        8
+       ],
+       [
+        1,
+        12
+       ]
+      ]
+     },
+     "size": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        6.9
+       ],
+       [
+        1,
+        10.58
+       ]
+      ]
+     },
+     "thick": 3,
+     "spread": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        6.3
+       ],
+       [
+        1,
+        9.66
+       ]
+      ]
+     },
+     "spin": 0.5,
+     "land": 0.95,
+     "shrink": 0.3,
+     "restShrink": 0.6,
+     "paint": "wood"
+    },
+    {
+     "id": "staves",
+     "gen": "chunks",
+     "v": 1,
+     "when": {
+      "style": [
+       "barrel"
+      ]
+     },
+     "floor": 29,
+     "area": {
+      "x0": 2,
+      "y0": 2,
+      "x1": 30,
+      "y1": 30
+     },
+     "ink": true,
+     "at": [
+      16,
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         22.5
+        ],
+        [
+         1,
+         18.5
+        ]
+       ]
+      }
+     ],
+     "count": {
+      "from": "pieces",
+      "map": [
+       [
+        0,
+        3
+       ],
+       [
+        1,
+        8
+       ]
+      ],
+      "round": "px"
+     },
+     "seed": 2,
+     "dist": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        9
+       ],
+       [
+        1,
+        12
+       ]
+      ]
+     },
+     "rise": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        8
+       ],
+       [
+        1,
+        12
+       ]
+      ]
+     },
+     "size": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        8.25
+       ],
+       [
+        1,
+        12.65
+       ]
+      ]
+     },
+     "thick": 2,
+     "restThick": 3,
+     "spread": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        6.3
+       ],
+       [
+        1,
+        9.66
+       ]
+      ]
+     },
+     "spin": 0.5,
+     "land": 0.95,
+     "shrink": 0.3,
+     "restShrink": 0.6,
+     "paint": "wood"
+    },
+    {
+     "id": "sherdLeft",
+     "gen": "chunks",
+     "v": 1,
+     "when": {
+      "style": [
+       "pot"
+      ]
+     },
+     "floor": 29,
+     "area": {
+      "x0": 2,
+      "y0": 2,
+      "x1": 30,
+      "y1": 30
+     },
+     "ink": true,
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         12.8421
+        ],
+        [
+         1,
+         11.1579
+        ]
+       ]
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         23.5
+        ],
+        [
+         1,
+         19.5
+        ]
+       ]
+      }
+     ],
+     "count": {
+      "from": "pieces",
+      "map": [
+       [
+        0,
+        2
+       ],
+       [
+        1,
+        4
+       ]
+      ],
+      "round": "px"
+     },
+     "seed": 4,
+     "dist": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        7
+       ],
+       [
+        1,
+        10
+       ]
+      ]
+     },
+     "rise": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        6
+       ],
+       [
+        1,
+        10
+       ]
+      ]
+     },
+     "size": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        5
+       ],
+       [
+        1,
+        7.5
+       ]
+      ]
+     },
+     "thick": 2,
+     "restThick": 3,
+     "spread": 2,
+     "spin": 0.8,
+     "land": 0.95,
+     "shrink": 0.25,
+     "restShrink": 0.5,
+     "paint": "wood"
+    },
+    {
+     "id": "sherdRight",
+     "gen": "chunks",
+     "v": 1,
+     "when": {
+      "style": [
+       "pot"
+      ]
+     },
+     "floor": 29,
+     "area": {
+      "x0": 2,
+      "y0": 2,
+      "x1": 30,
+      "y1": 30
+     },
+     "ink": true,
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         19.1579
+        ],
+        [
+         1,
+         20.8421
+        ]
+       ]
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         23.5
+        ],
+        [
+         1,
+         19.5
+        ]
+       ]
+      }
+     ],
+     "count": {
+      "from": "pieces",
+      "map": [
+       [
+        0,
+        2
+       ],
+       [
+        1,
+        4
+       ]
+      ],
+      "round": "px"
+     },
+     "seed": 5,
+     "dist": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        7
+       ],
+       [
+        1,
+        10
+       ]
+      ]
+     },
+     "rise": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        6
+       ],
+       [
+        1,
+        10
+       ]
+      ]
+     },
+     "size": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        5
+       ],
+       [
+        1,
+        7.5
+       ]
+      ]
+     },
+     "thick": 2,
+     "restThick": 3,
+     "spread": 2,
+     "spin": 0.8,
+     "land": 0.95,
+     "shrink": 0.25,
+     "restShrink": 0.5,
+     "paint": "wood"
+    },
+    {
+     "id": "sherdTop",
+     "gen": "chunks",
+     "v": 1,
+     "when": {
+      "style": [
+       "pot"
+      ]
+     },
+     "floor": 29,
+     "area": {
+      "x0": 2,
+      "y0": 2,
+      "x1": 30,
+      "y1": 30
+     },
+     "ink": true,
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         16
+        ],
+        [
+         1,
+         16
+        ]
+       ]
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         18.5
+        ],
+        [
+         1,
+         14.5
+        ]
+       ]
+      }
+     ],
+     "count": {
+      "from": "pieces",
+      "map": [
+       [
+        0,
+        2
+       ],
+       [
+        1,
+        4
+       ]
+      ],
+      "round": "px"
+     },
+     "seed": 6,
+     "dist": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        7
+       ],
+       [
+        1,
+        10
+       ]
+      ]
+     },
+     "rise": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        6
+       ],
+       [
+        1,
+        10
+       ]
+      ]
+     },
+     "size": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        5
+       ],
+       [
+        1,
+        7.5
+       ]
+      ]
+     },
+     "thick": 2,
+     "restThick": 3,
+     "spread": 2,
+     "spin": 0.8,
+     "land": 0.95,
+     "shrink": 0.25,
+     "restShrink": 0.5,
+     "paint": "wood"
+    },
+    {
+     "id": "bandBits",
+     "gen": "chunks",
+     "v": 1,
+     "when": {
+      "bands": [
+       true
+      ]
+     },
+     "floor": 29,
+     "area": {
+      "x0": 2,
+      "y0": 2,
+      "x1": 30,
+      "y1": 30
+     },
+     "ink": true,
+     "at": [
+      16,
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         20.5
+        ],
+        [
+         1,
+         16.5
+        ]
+       ]
+      }
+     ],
+     "count": 2,
+     "seed": 7,
+     "dist": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        7.2
+       ],
+       [
+        1,
+        9.6
+       ]
+      ]
+     },
+     "rise": 10,
+     "size": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        5.1
+       ],
+       [
+        1,
+        7.82
+       ]
+      ]
+     },
+     "thick": 2,
+     "spread": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        4.5
+       ],
+       [
+        1,
+        6.9
+       ]
+      ]
+     },
+     "land": 0.8,
+     "shrink": 0.3,
+     "restShrink": 0.55,
+     "paint": "metal"
+    }
+   ]
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 1,
+   "fps": 8
+  },
+  "hurt": {
+   "frames": 4,
+   "fps": 9,
+   "loop": false,
+   "frameEdits": {
+    "0": {
+     "flash": true
+    }
+   },
+   "sounds": [
+    {
+     "sound": "punch",
+     "preset": "Light jab",
+     "frame": 0,
+     "volume": 0.9
+    }
+   ]
+  },
+  "break": {
+   "frames": 8,
+   "fps": 12,
+   "loop": false,
+   "frameEdits": {
+    "0": {
+     "show": [
+      "swollen"
+     ],
+     "flash": true
+    },
+    "1": {
+     "show": [
+      "split"
+     ]
+    },
+    "5": {
+     "show": [
+      "crumbs"
+     ]
+    },
+    "6": {
+     "show": [
+      "crumbs"
+     ]
+    },
+    "7": {
+     "show": [
+      "crumbs"
+     ]
+    }
+   },
+   "keys": [
+    {
+     "t": 0.2571428571428572,
+     "ease": "linear",
+     "emit": {
+      "splinters": {
+       "amount": 0
+      },
+      "boards": {
+       "amount": 0
+      },
+      "staves": {
+       "amount": 0
+      },
+      "sherdLeft": {
+       "amount": 0
+      },
+      "sherdRight": {
+       "amount": 0
+      },
+      "sherdTop": {
+       "amount": 0
+      },
+      "bandBits": {
+       "amount": 0
+      }
+     }
+    },
+    {
+     "t": 1,
+     "emit": {
+      "splinters": {
+       "amount": 1
+      },
+      "boards": {
+       "amount": 1
+      },
+      "staves": {
+       "amount": 1
+      },
+      "sherdLeft": {
+       "amount": 1
+      },
+      "sherdRight": {
+       "amount": 1
+      },
+      "sherdTop": {
+       "amount": 1
+      },
+      "bandBits": {
+       "amount": 1
+      }
+     }
+    }
+   ],
+   "sounds": [
+    {
+     "sound": "crate-break",
+     "preset": "Crate",
+     "frame": 0,
+     "volume": 0.8
+    }
+   ]
+  }
+ }
+}

@@ -2,6 +2,7 @@
 // It runs in Node with a stand-in fetch. Each test imports its own copy of the module (it keeps what it loaded).
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { CODE_STANDIN, useCodeStandIn } from '../helpers/code-standin.mjs';
 
 const CATALOG = {
   version: 1,
@@ -105,15 +106,16 @@ test('loadSprite refuses an id the catalogue does not list as a sprite, without 
 });
 
 test('loadSprite loads a sprite program once; spriteNow gives it at once afterwards; loadSprites skips what is missing', async () => {
-  const { m } = await fresh({ body: { version: 1, assets: [{ id: 'coin', kind: 'sprite', tech: {} }, { id: 'ghost-of-a-file', kind: 'sprite', tech: {} }], bundles: [] } });
+  useCodeStandIn();      // a code file under an id no library sprite uses (tests/helpers/code-standin.mjs)
+  const { m } = await fresh({ body: { version: 1, assets: [{ id: CODE_STANDIN, kind: 'sprite', tech: {} }, { id: 'ghost-of-a-file', kind: 'sprite', tech: {} }], bundles: [] } });
   await m.loadCatalog();
-  assert.equal(m.spriteNow('coin'), null, 'not loaded yet');
-  const coin = await m.loadSprite('coin');
-  assert.equal(coin.id, 'coin');
-  assert.equal(await m.loadSprite('coin'), coin);
-  assert.equal(m.spriteNow('coin'), coin);
+  assert.equal(m.spriteNow(CODE_STANDIN), null, 'not loaded yet');
+  const coin = await m.loadSprite(CODE_STANDIN);
+  assert.equal(coin.id, CODE_STANDIN);
+  assert.equal(await m.loadSprite(CODE_STANDIN), coin);
+  assert.equal(m.spriteNow(CODE_STANDIN), coin);
   // several at once: the one whose file is not there is left out and does not stop the rest
-  const got = await m.loadSprites(['coin', 'ghost-of-a-file', 'coin']);
-  assert.deepEqual(Object.keys(got), ['coin']);
+  const got = await m.loadSprites([CODE_STANDIN, 'ghost-of-a-file', CODE_STANDIN]);
+  assert.deepEqual(Object.keys(got), [CODE_STANDIN]);
   assert.equal(m.spriteNow('ghost-of-a-file'), null);
 });

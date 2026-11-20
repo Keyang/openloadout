@@ -92,7 +92,12 @@ export function dataProject({ data = {}, code = [], sounds = [], pieces = false,
   for (const d of FRAMEWORK) fs.cpSync(path.join(ROOT, d), path.join(root, d), { recursive: true });
   for (const d of ['sprites', 'sounds', 'bundles', 'pieces']) fs.mkdirSync(path.join(root, d), { recursive: true });
   for (const [id, def] of Object.entries(data)) fs.writeFileSync(path.join(root, 'sprites', `${id}.json`), typeof def === 'string' ? def : asFile(def));
-  for (const id of code) fs.copyFileSync(path.join(ROOT, 'sprites', `${id}.js`), path.join(root, 'sprites', `${id}.js`));
+  for (const id of code) {
+    // a code sprite since redrawn as data (P1: coin, crate, icons-food) comes from its frozen copy, imports put back
+    const frozen = path.join(ROOT, 'tests', 'fixtures', 'code-sprites', `${id}.js`);
+    if (!fs.existsSync(path.join(ROOT, 'sprites', `${id}.js`)) && fs.existsSync(frozen)) fs.writeFileSync(path.join(root, 'sprites', `${id}.js`), fs.readFileSync(frozen, 'utf8').replaceAll("from '../../../engine/", "from '../engine/"));
+    else fs.copyFileSync(path.join(ROOT, 'sprites', `${id}.js`), path.join(root, 'sprites', `${id}.js`));
+  }
   if (Array.isArray(sounds)) for (const id of sounds) fs.copyFileSync(path.join(ROOT, 'sounds', `${id}.json`), path.join(root, 'sounds', `${id}.json`));
   else for (const [id, patch] of Object.entries(sounds)) fs.writeFileSync(path.join(root, 'sounds', `${id}.json`), JSON.stringify(patch));
   if (pieces) for (const f of fs.readdirSync(path.join(ROOT, 'tests', 'fixtures', 'pieces', 'pieces'))) fs.copyFileSync(path.join(ROOT, 'tests', 'fixtures', 'pieces', 'pieces', f), path.join(root, 'pieces', f));

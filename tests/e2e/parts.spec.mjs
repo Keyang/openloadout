@@ -1,6 +1,7 @@
 // Parts on the sprite page: each part is its own block of controls in the editing panel's Parts tab (app/panel.js),
 // apart from the sprite's own controls (Shape, Colours, Motion).
 import { test, expect, openRoute, canvasGroupStats, setRange, waitForDrawn, openTab, partBlock, control, downloadButton } from '../helpers/test.mjs';
+import { CODE_STANDIN, codeStandInRow, serveCodeStandIn } from '../helpers/code-standin.mjs';
 
 const strip = (page) => page.locator('.strip .cell canvas');
 const stripHash = async (page) => (await canvasGroupStats(strip(page))).hash;
@@ -150,11 +151,12 @@ test.describe('phone width', () => {
 
 // ---- controls and sounds that only apply sometimes (`when`) ---------------------------------------
 
-// A small sprite served in place of sprites/coin.js, so these tests do not depend on what any real sprite declares.
+// A small code sprite served under an id no library sprite uses (tests/helpers/code-standin.mjs: the library's own code
+// sprites are all being redrawn as data), so these tests do not depend on what any real sprite declares.
 const WHEN_SPRITE = `
 import { defineSprite, range, choice, color, toggle } from '../engine/sprite.js';
 export default defineSprite({
-  id: 'coin', name: 'Test badge', kind: 'Item', blurb: 'A badge for tests.',
+  id: '${CODE_STANDIN}', name: 'Test badge', kind: 'Item', blurb: 'A badge for tests.',
   size: [24, 24], pivot: [12, 22],
   params: {
     size: range('Size', 0.5, { lo: 'Small', hi: 'Big' }),
@@ -176,6 +178,7 @@ export default defineSprite({
     if (p.emblem === 'heart') g.rect(9, 11, 6, 2, p.inlay);
   },
 });`;
+const WHEN_ROW = codeStandInRow({ clips: [{ name: 'idle', frames: 4, fps: 6 }, { name: 'flip', frames: 4, fps: 8 }], controls: 8 });
 const field = control;
 /** Is the control offered at all, whichever tab is open? (A control that is not in effect is `hidden`.) */
 const offered = (page, key, yes) => expect(field(page, key)).toHaveJSProperty('hidden', !yes);
@@ -183,8 +186,8 @@ const coloursTab = (page) => page.getByRole('tab', { name: 'Colours' });
 
 test.describe('controls that only matter sometimes', () => {
   test.beforeEach(async ({ page }) => {
-    await page.route(/\/sprites\/coin\.js(\?.*)?$/, (r) => r.fulfill({ status: 200, contentType: 'text/javascript', body: WHEN_SPRITE }));
-    await openRoute(page, '/sprite/coin');
+    await serveCodeStandIn(page, WHEN_SPRITE, WHEN_ROW);
+    await openRoute(page, `/sprite/${CODE_STANDIN}`);
     await expect(page.getByRole('heading', { name: 'Test badge' })).toBeVisible();
   });
 
@@ -299,8 +302,8 @@ test.describe('sounds that only play sometimes', () => {
 
 test.describe('a control that depends on a hidden control', () => {
   test('is hidden too, even while the hidden one is still switched on', async ({ page }) => {
-    await page.route(/\/sprites\/coin\.js(\?.*)?$/, (r) => r.fulfill({ status: 200, contentType: 'text/javascript', body: WHEN_SPRITE }));
-    await openRoute(page, '/sprite/coin');
+    await serveCodeStandIn(page, WHEN_SPRITE, WHEN_ROW);
+    await openRoute(page, `/sprite/${CODE_STANDIN}`);
     await expect(field(page, 'rim')).toBeHidden();
     await expect(field(page, 'emblem')).toBeVisible();
     await page.getByRole('group', { name: 'Emblem' }).getByRole('button', { name: 'Star' }).click();

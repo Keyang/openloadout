@@ -10,9 +10,9 @@ import { dataSprite } from '../../engine/data-sprite.js';
 import { validateSprite } from '../../catalog/sprite-schema.js';
 import { renderFrame, defaultParams } from '../../engine/sprite.js';
 import { checkSprite } from '../../quality/sprite.js';
-import coinCode from '../../sprites/coin.js';
-import crateCode from '../../sprites/crate.js';
-import iconsCode from '../../sprites/icons-food.js';
+import coinCode from '../fixtures/code-sprites/coin.js';     // the code files as they were before P1 redrew them as data
+import crateCode from '../fixtures/code-sprites/crate.js';
+import iconsCode from '../fixtures/code-sprites/icons-food.js';
 
 const load = (id) => JSON.parse(fs.readFileSync(new URL(`../fixtures/v2/pictures/${id}.json`, import.meta.url), 'utf8'));
 const CODE = { coin: coinCode, crate: crateCode, 'icons-food': iconsCode };

@@ -41,7 +41,7 @@ test('the fixtures pass: no errors, no warnings, the cost measured', () => {
 });
 
 test('a code sprite, or a version 1 studio sprite, is not looked at (nothing, no metrics)', async () => {
-  const crate = (await import('../../sprites/crate.js')).default;
+  const crate = (await import('../fixtures/code-sprites/crate.js')).default;   // the code file as it was before P1
   assert.deepEqual(dataChecks(crate), { errors: [], warnings: [], metrics: {} });
 });
 

@@ -25,8 +25,8 @@ import { renderFrame, defaultParams } from '../../engine/sprite.js';
 import { paintColour } from '../../engine/data-rules.js';
 import { drawList } from '../../engine/draw-list.js';
 import { runGenerator } from '../../engine/gen/index.js';
-import coinSprite from '../../sprites/coin.js';
-import crateSprite from '../../sprites/crate.js';
+import coinSprite from '../fixtures/code-sprites/coin.js';     // the code files as they were before P1 redrew them as data
+import crateSprite from '../fixtures/code-sprites/crate.js';
 
 const DEG = 180 / PI;
 const run = (node, ctx = {}) => {
