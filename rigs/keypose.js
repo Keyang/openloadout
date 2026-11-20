@@ -358,3 +358,129 @@ export function snapKeys(keys, clip) {
     merged: frames.filter((f) => byFrame.get(f).count > 1).map((f) => ({ frame: f, keys: byFrame.get(f).count })),
   };
 }
+
+// ---- travel: how far a clip's keys move (build item F5; docs/data-sprites.md 2.2 "Motion sliders") ----------------
+// A data sprite cannot scale a clip's motion by code, so a clip may list `travel` entries, { tracks, by, about? }:
+// every numeric track a path names ("root.1", "ik.legF.0") or that lies under it ("ik.legF", "bones") moves `by`
+// times as far from its pivot as its keys say. Pivots (about): first (the track's value at its earliest key, the
+// default), mid (halfway between its least and most), least, most, or a number. engine/resolve.js works `by` out at
+// the person's settings and calls travelKeys on each resolved clip, so the keys are scaled before they are blended.
+
+/** The caps of travelKeys: entries read per clip, tracks per entry, path segments per track, the largest factor (each entry's by is held to 0..most). */
+export const TRAVEL_LIMITS = Object.freeze({ entries: 16, tracks: 16, segments: 4, most: 3 });
+
+/** The named pivots a travel entry scales about (`about`); a number is also a pivot. */
+export const TRAVEL_ABOUT = Object.freeze(['first', 'mid', 'least', 'most']);
+
+/** The sides a travel entry may keep to (`side`): only the values below (less than) or above (more than) the pivot move; left out, both. */
+export const TRAVEL_SIDES = Object.freeze(['below', 'above']);
+
+const TRAVEL_FIXED = new Set(['t', 'ease', ...VIS_FIELDS, 'swap', 'emit']);   // never scaled: times, eases, shape lists, stamp swaps, emitter keys (priced once, B12b)
+
+// A track path as segments, or null: text of 1..TRAVEL_LIMITS.segments dot-separated names, none empty or a prototype name, not a fixed field.
+function travelPath(s) {
+  if (typeof s !== 'string' || !s || s.length > 160) return null;
+  const segs = s.split('.');
+  if (segs.length > TRAVEL_LIMITS.segments || segs.some((x) => !x || BAD_KEYS.has(x)) || TRAVEL_FIXED.has(segs[0])) return null;
+  return segs;
+}
+
+// One entry made safe: { paths, k, about } or null when it does nothing (no good track, a factor of 1 or not a number, a bad pivot).
+function travelEntry(e) {
+  if (!isPlain(e) || !Array.isArray(e.tracks) || typeof e.by !== 'number' || !Number.isFinite(e.by)) return null;
+  const k = Math.min(TRAVEL_LIMITS.most, Math.max(0, e.by));
+  if (k === 1) return null;
+  const about = e.about === undefined ? 'first' : e.about;
+  if (!(TRAVEL_ABOUT.includes(about) || (typeof about === 'number' && Number.isFinite(about)))) return null;
+  if (e.side !== undefined && !TRAVEL_SIDES.includes(e.side)) return null;
+  const paths = e.tracks.slice(0, TRAVEL_LIMITS.tracks).map(travelPath).filter(Boolean);
+  return paths.length ? { paths, k, about, side: e.side } : null;
+}
+
+const under = (track, path) => track.length <= path.length && track.every((s, i) => s === String(path[i]));
+
+// Write v at path inside a copied key (the path exists: it came from leaves() of that key).
+function putAt(o, path, v) {
+  let x = o;
+  for (let d = 0; d < path.length - 1; d++) x = x[path[d]];
+  x[path[path.length - 1]] = v;
+}
+
+/**
+ * Scale how far a clip's keys travel: a fresh copy of keys with each named track moved `by` times as far from its pivot.
+ * Arguments: keys, the clip's keys; entries, [{ tracks: ["root.1", "ik.legF", ...], by: number, about?: first | mid |
+ * least | most | number }] applied in order (by held to 0..TRAVEL_LIMITS.most; by exactly 1 leaves a track as it is);
+ * limit(path) -> [lo, hi] | null, what each scaled value is held to. t, ease, show, hide, swap and emit never move.
+ * Never throws; the keys given are not changed.
+ */
+export function travelKeys(keys, entries, { limit } = {}) {
+  const out = Array.isArray(keys) ? keys.slice(0, LIM.list).map((k) => copyData(k) ?? null) : [];
+  const list = Array.isArray(entries) ? entries.slice(0, TRAVEL_LIMITS.entries).map(travelEntry).filter(Boolean) : [];
+  const hold = (path, v) => {
+    if (typeof limit !== 'function') return v;
+    let r;
+    try { r = limit(path); } catch { return v; }
+    return Array.isArray(r) && Number.isFinite(r[0]) && Number.isFinite(r[1]) && r[0] <= r[1] ? Math.min(r[1], Math.max(r[0], v)) : v;
+  };
+  for (const { paths, k, about, side } of list) {
+    // every numeric leaf a path names, by track: its keys in time order (a key's place in the list breaks ties)
+    const byTrack = new Map();
+    const timed = out.map((key, i) => ({ key, i })).filter(({ key }) => isPlain(key) && typeof key.t === 'number' && Number.isFinite(key.t));
+    timed.sort((a, b) => a.key.t - b.key.t || a.i - b.i);
+    for (const { key } of timed) {
+      for (const [field, value] of fieldsOf(key)) {
+        if (TRAVEL_FIXED.has(field)) continue;
+        leaves(value, [field], 1, (path, v) => {
+          if (typeof v !== 'number' || !paths.some((p) => under(p, path))) return;
+          const id = path.join('\u0001');
+          let tr = byTrack.get(id);
+          if (!tr) { if (byTrack.size >= LIM.tracks) return; tr = { path, at: [] }; byTrack.set(id, tr); }
+          tr.at.push({ key, v });
+        });
+      }
+    }
+    for (const tr of byTrack.values()) {
+      const vs = tr.at.map((a) => a.v);
+      const lo = Math.min(...vs), hi = Math.max(...vs);
+      const pivot = typeof about === 'number' ? about : about === 'mid' ? (lo + hi) / 2 : about === 'least' ? lo : about === 'most' ? hi : vs[0];
+      for (const a of tr.at) {
+        if ((side === 'below' && !(a.v < pivot)) || (side === 'above' && !(a.v > pivot))) continue;   // only that side of the pivot moves
+        const v = hold(tr.path, pivot + (a.v - pivot) * k);
+        if (Number.isFinite(v)) putAt(a.key, tr.path, v === 0 ? 0 : v);
+      }
+    }
+  }
+  return out;
+}
+
+/**
+ * The track paths a clip's travel names that no key of the clip moves (review fix of build item F5): each such path,
+ * once, in the order named, whatever its factor (a slider at its middle still hears of "ik.lefF"); t, ease, show, hide,
+ * swap and emit always count as missed. engine/resolve.js turns them into warnings, since a base's IK chains are not in
+ * the summary the schema checks against. Arguments: keys, entries (as travelKeys). Never throws.
+ */
+export function travelMisses(keys, entries) {
+  const ks = Array.isArray(keys) ? keys.slice(0, LIM.list).filter(isPlain) : [];
+  const out = [];
+  for (const e of Array.isArray(entries) ? entries.slice(0, TRAVEL_LIMITS.entries) : []) {
+    if (!isPlain(e) || !Array.isArray(e.tracks)) continue;
+    for (const s of e.tracks.slice(0, TRAVEL_LIMITS.tracks)) {
+      if (typeof s !== 'string' || !s || s.length > 160 || out.includes(s)) continue;
+      const segs = s.split('.');
+      if (segs.some((x) => !x || BAD_KEYS.has(x))) continue;
+      const path = travelPath(s);
+      let hit = false;
+      if (path) {
+        for (const key of ks) {
+          for (const [field, value] of fieldsOf(key)) {
+            if (hit || TRAVEL_FIXED.has(field) || field !== path[0]) continue;
+            leaves(value, [field], 1, (p, v) => { if (!hit && typeof v === 'number' && under(path, p)) hit = true; });
+          }
+          if (hit) break;
+        }
+      }
+      if (!hit) out.push(s);
+    }
+  }
+  return out;
+}

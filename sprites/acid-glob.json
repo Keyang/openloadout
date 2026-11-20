@@ -1,0 +1,502 @@
+{
+  "format": "loadout-sprite",
+  "version": 2,
+  "id": "acid-glob",
+  "name": "Acid glob",
+  "blurb": "A wobbling blob of acid that sheds drips as it flies and splats into a puddle, drawn flying right so a game can turn it to the way it flies. Change its size, shape, drips and colours.",
+  "meta": {
+    "type": "projectile",
+    "role": "effects/projectile",
+    "themes": ["sci-fi","space","horror"],
+    "gameTypes": ["roguelike-action","shooter","arcade"],
+    "view": "top-down",
+    "words": ["acid","glob","blob","spit","goo","slime","venom","drip","fly","hit","splat","puddle","bug attack","sticky"],
+    "license": "draft"
+  },
+  "size": [32,32],
+  "pivot": [16,16],
+  "grounded": false,
+  "preview": "fly",
+  "styles": ["pixel"],
+  "palette": [
+    {"id":"body","label":"Body","default":"#9fe040","material":"water","swatches":["#9fe040","#2fb3a8","#4f9ff0","#5fe0f0","#b04a8a"]},
+    {"id":"glow","label":"Shine","default":"#f0ead8","material":"light","swatches":["#f0ead8","#e8ecf2","#f6d3b0","#c2c9d6"]}
+  ],
+  "controls": [
+    {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+    {"key":"shape","kind":"choice","label":"Shape","options":["round","teardrop","cluster"],"default":"round"},
+    {"key":"pieces","kind":"range","label":"Drips","lo":"Few","hi":"Many","default":0.5},
+    {"key":"body","kind":"colour","label":"Body"},
+    {"key":"glow","kind":"colour","label":"Shine"},
+    {"key":"wobble","kind":"range","label":"Wobble","lo":"Firm","hi":"Wobbly","default":0.5,"group":"Motion"},
+    {"key":"speed","standard":"speed"}
+  ],
+  "body": {
+    "pictures": {
+      "nodes": [
+        {"id":"glob","parent":null,"at":[20,16]},
+        {"id":"spin","parent":"glob","at":[0,0]},
+        {"id":"tail","parent":"glob","at":[1,0]},
+        {"id":"splat","parent":null,"at":[16,16],"scale":{"from":"size","map":[[0,0.75],[1,1.25]]}},
+        {"id":"flecks","parent":null,"at":[16,16],"scale":{"from":"size","map":[[0,0.85],[0.5,0.95],[1,1]]}},
+        {"id":"rd0","parent":null,"at":[15.2,16]},
+        {"id":"rd1","parent":null,"at":[15.2,16]},
+        {"id":"rd2","parent":null,"at":[15.2,16]},
+        {"id":"rd3","parent":null,"at":[15.2,16]},
+        {"id":"rd4","parent":null,"at":[15.2,16]},
+        {"id":"td0","parent":null,"at":[11.7,16]},
+        {"id":"td1","parent":null,"at":[11.7,16]},
+        {"id":"td2","parent":null,"at":[11.7,16]},
+        {"id":"td3","parent":null,"at":[11.7,16]},
+        {"id":"td4","parent":null,"at":[11.7,16]},
+        {"id":"p0","parent":null,"at":[16,16]},
+        {"id":"p1","parent":null,"at":[16,16]},
+        {"id":"p2","parent":null,"at":[16,16]},
+        {"id":"p3","parent":null,"at":[16,16]},
+        {"id":"p4","parent":null,"at":[16,16]},
+        {"id":"p5","parent":null,"at":[16,16]},
+        {"id":"p6","parent":null,"at":[16,16]}
+      ],
+      "draw": [
+        {"id":"rDrip0","kind":"ellipse","on":"rd0","at":[0,0],"r":[{"from":"size","map":[[0,1.8],[1,2.4]]},{"from":"size","map":[[0,1.8],[1,2.4]]}],"paint":"body","shade":1,"group":"drips","when":{"shape":["round","cluster"],"clip":["fly"]}},
+        {"id":"rDripDot0","kind":"dot","on":"rd0","at":[0,0],"paint":"body","group":"drips","when":{"shape":["round","cluster"],"clip":["fly"]}},
+        {"id":"rDrip1","kind":"ellipse","on":"rd1","at":[0,0],"r":[{"from":"size","map":[[0,1.8],[1,2.4]]},{"from":"size","map":[[0,1.8],[1,2.4]]}],"paint":"body","shade":1,"group":"drips","when":{"shape":["round","cluster"],"pieces":[{"atLeast":0.625}],"clip":["fly"]}},
+        {"id":"rDripDot1","kind":"dot","on":"rd1","at":[0,0],"paint":"body","group":"drips","when":{"shape":["round","cluster"],"pieces":[{"atLeast":0.625}],"clip":["fly"]}},
+        {"id":"rDrip2","kind":"ellipse","on":"rd2","at":[0,0],"r":[{"from":"size","map":[[0,1.8],[1,2.4]]},{"from":"size","map":[[0,1.8],[1,2.4]]}],"paint":"body","shade":1,"group":"drips","when":{"shape":["round","cluster"],"pieces":[{"atLeast":0.125}],"clip":["fly"]}},
+        {"id":"rDripDot2","kind":"dot","on":"rd2","at":[0,0],"paint":"body","group":"drips","when":{"shape":["round","cluster"],"pieces":[{"atLeast":0.125}],"clip":["fly"]}},
+        {"id":"rDrip3","kind":"ellipse","on":"rd3","at":[0,0],"r":[{"from":"size","map":[[0,1.8],[1,2.4]]},{"from":"size","map":[[0,1.8],[1,2.4]]}],"paint":"body","shade":1,"group":"drips","when":{"shape":["round","cluster"],"pieces":[{"atLeast":0.875}],"clip":["fly"]}},
+        {"id":"rDripDot3","kind":"dot","on":"rd3","at":[0,0],"paint":"body","group":"drips","when":{"shape":["round","cluster"],"pieces":[{"atLeast":0.875}],"clip":["fly"]}},
+        {"id":"rDrip4","kind":"ellipse","on":"rd4","at":[0,0],"r":[{"from":"size","map":[[0,1.8],[1,2.4]]},{"from":"size","map":[[0,1.8],[1,2.4]]}],"paint":"body","shade":1,"group":"drips","when":{"shape":["round","cluster"],"pieces":[{"atLeast":0.375}],"clip":["fly"]}},
+        {"id":"rDripDot4","kind":"dot","on":"rd4","at":[0,0],"paint":"body","group":"drips","when":{"shape":["round","cluster"],"pieces":[{"atLeast":0.375}],"clip":["fly"]}},
+        {"id":"tDrip0","kind":"ellipse","on":"td0","at":[0,0],"r":[{"from":"size","map":[[0,1.8],[1,2.4]]},{"from":"size","map":[[0,1.8],[1,2.4]]}],"paint":"body","shade":1,"group":"drips","when":{"shape":["teardrop"],"clip":["fly"]}},
+        {"id":"tDripDot0","kind":"dot","on":"td0","at":[0,0],"paint":"body","group":"drips","when":{"shape":["teardrop"],"clip":["fly"]}},
+        {"id":"tDrip1","kind":"ellipse","on":"td1","at":[0,0],"r":[{"from":"size","map":[[0,1.8],[1,2.4]]},{"from":"size","map":[[0,1.8],[1,2.4]]}],"paint":"body","shade":1,"group":"drips","when":{"shape":["teardrop"],"pieces":[{"atLeast":0.625}],"clip":["fly"]}},
+        {"id":"tDripDot1","kind":"dot","on":"td1","at":[0,0],"paint":"body","group":"drips","when":{"shape":["teardrop"],"pieces":[{"atLeast":0.625}],"clip":["fly"]}},
+        {"id":"tDrip2","kind":"ellipse","on":"td2","at":[0,0],"r":[{"from":"size","map":[[0,1.8],[1,2.4]]},{"from":"size","map":[[0,1.8],[1,2.4]]}],"paint":"body","shade":1,"group":"drips","when":{"shape":["teardrop"],"pieces":[{"atLeast":0.125}],"clip":["fly"]}},
+        {"id":"tDripDot2","kind":"dot","on":"td2","at":[0,0],"paint":"body","group":"drips","when":{"shape":["teardrop"],"pieces":[{"atLeast":0.125}],"clip":["fly"]}},
+        {"id":"tDrip3","kind":"ellipse","on":"td3","at":[0,0],"r":[{"from":"size","map":[[0,1.8],[1,2.4]]},{"from":"size","map":[[0,1.8],[1,2.4]]}],"paint":"body","shade":1,"group":"drips","when":{"shape":["teardrop"],"pieces":[{"atLeast":0.875}],"clip":["fly"]}},
+        {"id":"tDripDot3","kind":"dot","on":"td3","at":[0,0],"paint":"body","group":"drips","when":{"shape":["teardrop"],"pieces":[{"atLeast":0.875}],"clip":["fly"]}},
+        {"id":"tDrip4","kind":"ellipse","on":"td4","at":[0,0],"r":[{"from":"size","map":[[0,1.8],[1,2.4]]},{"from":"size","map":[[0,1.8],[1,2.4]]}],"paint":"body","shade":1,"group":"drips","when":{"shape":["teardrop"],"pieces":[{"atLeast":0.375}],"clip":["fly"]}},
+        {"id":"tDripDot4","kind":"dot","on":"td4","at":[0,0],"paint":"body","group":"drips","when":{"shape":["teardrop"],"pieces":[{"atLeast":0.375}],"clip":["fly"]}},
+        {"paint":"body","shade":1,"group":"goo","id":"ball","kind":"ellipse","on":"glob","at":[0,0],"r":[{"from":"size","map":[[0,4.5],[1,7.5]]},{"from":"size","map":[[0,4.5],[1,7.5]]}],"when":{"shape":["round"],"clip":["fly"]}},
+        {"paint":"body","shade":1,"group":"goo","id":"tearBall","kind":"ellipse","on":"glob","at":[1,0],"r":[{"from":"size","map":[[0,3.96],[1,6.6]]},{"from":"size","map":[[0,3.96],[1,6.6]]}],"when":{"shape":["teardrop"],"clip":["fly"]}},
+        {"paint":"body","shade":1,"group":"goo","id":"bulge","kind":"ellipse","on":"spin","at":[{"from":"size","map":[[0,3.24],[1,5.4]]},{"from":"size","map":[[0,0],[1,0]]}],"r":[{"from":"size","map":[[0,1.8],[1,3]]},{"from":"size","map":[[0,1.8],[1,3]]}],"when":{"shape":["round","teardrop"],"clip":["fly"]}},
+        {
+          "paint": "body",
+          "shade": 1,
+          "group": "goo",
+          "id": "tail",
+          "kind": "poly",
+          "on": "tail",
+          "points": [
+            [{"from":"size","map":[[0,-8.55],[1,-14.25]]},0],
+            [{"from":"size","map":[[0,-3.1177],[1,-5.1962]]},{"from":"size","map":[[0,-1.8],[1,-3]]}],
+            [{"from":"size","map":[[0,-1.8],[1,-3]]},{"from":"size","map":[[0,-3.1177],[1,-5.1962]]}],
+            [{"from":"size","map":[[0,0],[1,0]]},{"from":"size","map":[[0,-3.6],[1,-6]]}],
+            [{"from":"size","map":[[0,1.8],[1,3]]},{"from":"size","map":[[0,-3.1177],[1,-5.1962]]}],
+            [{"from":"size","map":[[0,3.1177],[1,5.1962]]},{"from":"size","map":[[0,-1.8],[1,-3]]}],
+            [{"from":"size","map":[[0,3.6],[1,6]]},{"from":"size","map":[[0,0],[1,0]]}],
+            [{"from":"size","map":[[0,1.2471],[1,2.0785]]},{"from":"size","map":[[0,1.8],[1,3]]}],
+            [{"from":"size","map":[[0,-1.8],[1,-3]]},{"from":"size","map":[[0,3.6],[1,6]]}]
+          ],
+          "when": {"shape":["teardrop"],"clip":["fly"]}
+        },
+        {"paint":"body","shade":1,"group":"goo","id":"lump1","kind":"ellipse","on":"spin","at":[{"from":"size","map":[[0,1.89],[1,3.15]]},{"from":"size","map":[[0,0],[1,0]]}],"r":[{"from":"size","map":[[0,2.97],[1,4.95]]},{"from":"size","map":[[0,2.97],[1,4.95]]}],"when":{"shape":["cluster"],"clip":["fly"]}},
+        {
+          "paint": "body",
+          "shade": 1,
+          "group": "goo",
+          "id": "lump2",
+          "kind": "ellipse",
+          "on": "spin",
+          "at": [{"from":"size","map":[[0,-1.4565],[1,-2.4276]]},{"from":"size","map":[[0,2.001],[1,3.335]]}],
+          "r": [{"from":"size","map":[[0,2.25],[1,3.75]]},{"from":"size","map":[[0,2.25],[1,3.75]]}],
+          "when": {"shape":["cluster"],"clip":["fly"]}
+        },
+        {"paint":"body","shade":1,"group":"goo","id":"lump3","kind":"ellipse","on":"spin","at":[{"from":"size","map":[[0,-1.0822],[1,-1.8036]]},{"from":"size","map":[[0,-2.4736],[1,-4.1227]]}],"r":[{"from":"size","map":[[0,1.8],[1,3]]},{"from":"size","map":[[0,1.8],[1,3]]}],"when":{"shape":["cluster"],"clip":["fly"]}},
+        {"id":"drop0","kind":"ellipse","on":"p0","at":[0,0],"r":[1.6,1.6],"paint":"body","shade":1,"group":"drops","when":{"clip":["hit"]}},
+        {"id":"dropDot0","kind":"dot","on":"p0","at":[0,0],"paint":"body","group":"drops","when":{"clip":["hit"]}},
+        {"id":"drop1","kind":"ellipse","on":"p1","at":[0,0],"r":[1.6,1.6],"paint":"body","shade":1,"group":"drops","when":{"clip":["hit"]}},
+        {"id":"dropDot1","kind":"dot","on":"p1","at":[0,0],"paint":"body","group":"drops","when":{"clip":["hit"]}},
+        {"id":"drop2","kind":"ellipse","on":"p2","at":[0,0],"r":[1.6,1.6],"paint":"body","shade":1,"group":"drops","when":{"clip":["hit"]}},
+        {"id":"dropDot2","kind":"dot","on":"p2","at":[0,0],"paint":"body","group":"drops","when":{"clip":["hit"]}},
+        {"id":"drop3","kind":"ellipse","on":"p3","at":[0,0],"r":[1.6,1.6],"paint":"body","shade":1,"group":"drops","when":{"pieces":[{"atLeast":0.125}],"clip":["hit"]}},
+        {"id":"dropDot3","kind":"dot","on":"p3","at":[0,0],"paint":"body","group":"drops","when":{"pieces":[{"atLeast":0.125}],"clip":["hit"]}},
+        {"id":"drop4","kind":"ellipse","on":"p4","at":[0,0],"r":[1.6,1.6],"paint":"body","shade":1,"group":"drops","when":{"pieces":[{"atLeast":0.375}],"clip":["hit"]}},
+        {"id":"dropDot4","kind":"dot","on":"p4","at":[0,0],"paint":"body","group":"drops","when":{"pieces":[{"atLeast":0.375}],"clip":["hit"]}},
+        {"id":"drop5","kind":"ellipse","on":"p5","at":[0,0],"r":[1.6,1.6],"paint":"body","shade":1,"group":"drops","when":{"pieces":[{"atLeast":0.625}],"clip":["hit"]}},
+        {"id":"dropDot5","kind":"dot","on":"p5","at":[0,0],"paint":"body","group":"drops","when":{"pieces":[{"atLeast":0.625}],"clip":["hit"]}},
+        {"id":"drop6","kind":"ellipse","on":"p6","at":[0,0],"r":[1.6,1.6],"paint":"body","shade":1,"group":"drops","when":{"pieces":[{"atLeast":0.875}],"clip":["hit"]}},
+        {"id":"dropDot6","kind":"dot","on":"p6","at":[0,0],"paint":"body","group":"drops","when":{"pieces":[{"atLeast":0.875}],"clip":["hit"]}},
+        {"paint":"body","shade":1,"group":"goo","id":"slap","kind":"ellipse","on":"splat","at":[0,0],"r":[7.14,7.14],"when":{"clip":["hit"]}},
+        {
+          "paint": "body",
+          "shade": 1,
+          "group": "goo",
+          "id": "splat0",
+          "kind": "poly",
+          "on": "splat",
+          "points": [[0,0],[5,0],[4.3,0.6],[3.8,1.1],[3.8,1.7],[4.1,2.6],[4.2,3.6],[3.7,4.3],[2.7,4.3],[1.7,3.6],[0.9,2.9],[0.4,2.7],[0,3.1],[-0.5,3.8],[-1.2,4],[-1.7,3.6],[-1.8,2.8],[-1.7,2],[-1.9,1.6],[-2.6,1.7],[-3.8,1.7],[-4.9,1.4],[-5.4,0.8],[-5,0]],
+          "when": {"clip":["hit"]}
+        },
+        {
+          "paint": "body",
+          "shade": 1,
+          "group": "goo",
+          "id": "splat1",
+          "kind": "poly",
+          "on": "splat",
+          "points": [[0,0],[-5,0],[-4.3,-0.6],[-3.8,-1.1],[-3.8,-1.7],[-4.1,-2.6],[-4.2,-3.6],[-3.7,-4.3],[-2.7,-4.3],[-1.7,-3.6],[-0.9,-2.9],[-0.4,-2.7],[0,-3.1],[0.5,-3.8],[1.2,-4],[1.7,-3.6],[1.8,-2.8],[1.7,-2],[1.9,-1.6],[2.6,-1.7],[3.8,-1.7],[4.9,-1.4],[5.4,-0.8],[5,0]],
+          "when": {"clip":["hit"]}
+        },
+        {"paint":"body","shade":1,"group":"goo","id":"fleck10","kind":"ellipse","on":"flecks","at":[-6.5,-4.4],"r":[0.9326704931279113,0.9326704931279113],"when":{"pieces":[{"below":0.125}],"clip":["hit"]}},
+        {"paint":"body","shade":1,"group":"goo","id":"fleck11","kind":"ellipse","on":"flecks","at":[8.1,1.5],"r":[1.1612430733096388,1.1612430733096388],"when":{"pieces":[{"below":0.125}],"clip":["hit"]}},
+        {"paint":"body","shade":1,"group":"goo","id":"fleck20","kind":"ellipse","on":"flecks","at":[-7.6,-2.1],"r":[0.9326704931279113,0.9326704931279113],"when":{"pieces":[{"atLeast":0.125,"below":0.375}],"clip":["hit"]}},
+        {"paint":"body","shade":1,"group":"goo","id":"fleck21","kind":"ellipse","on":"flecks","at":[4.1,-7.1],"r":[1.1612430733096388,1.1612430733096388],"when":{"pieces":[{"atLeast":0.125,"below":0.375}],"clip":["hit"]}},
+        {"paint":"body","shade":1,"group":"goo","id":"fleck22","kind":"ellipse","on":"flecks","at":[2.1,8.2],"r":[1.0513593315346432,1.0513593315346432],"when":{"pieces":[{"atLeast":0.125,"below":0.375}],"clip":["hit"]}},
+        {"paint":"body","shade":1,"group":"goo","id":"fleck30","kind":"ellipse","on":"flecks","at":[-7.8,-0.9],"r":[0.9326704931279113,0.9326704931279113],"when":{"pieces":[{"atLeast":0.375,"below":0.625}],"clip":["hit"]}},
+        {"paint":"body","shade":1,"group":"goo","id":"fleck31","kind":"ellipse","on":"flecks","at":[-0.7,-8.2],"r":[1.1612430733096388,1.1612430733096388],"when":{"pieces":[{"atLeast":0.375,"below":0.625}],"clip":["hit"]}},
+        {"paint":"body","shade":1,"group":"goo","id":"fleck32","kind":"ellipse","on":"flecks","at":[8.4,1],"r":[1.0513593315346432,1.0513593315346432],"when":{"pieces":[{"atLeast":0.375,"below":0.625}],"clip":["hit"]}},
+        {"paint":"body","shade":1,"group":"goo","id":"fleck33","kind":"ellipse","on":"flecks","at":[-5.3,6.8],"r":[0.8719829284985151,0.8719829284985151],"when":{"pieces":[{"atLeast":0.375,"below":0.625}],"clip":["hit"]}},
+        {"paint":"body","shade":1,"group":"goo","id":"fleck40","kind":"ellipse","on":"flecks","at":[-7.9,-0.1],"r":[0.9326704931279113,0.9326704931279113],"when":{"pieces":[{"atLeast":0.625,"below":0.875}],"clip":["hit"]}},
+        {"paint":"body","shade":1,"group":"goo","id":"fleck41","kind":"ellipse","on":"flecks","at":[-3.6,-7.4],"r":[1.1612430733096388,1.1612430733096388],"when":{"pieces":[{"atLeast":0.625,"below":0.875}],"clip":["hit"]}},
+        {"paint":"body","shade":1,"group":"goo","id":"fleck42","kind":"ellipse","on":"flecks","at":[6.9,-4.8],"r":[1.0513593315346432,1.0513593315346432],"when":{"pieces":[{"atLeast":0.625,"below":0.875}],"clip":["hit"]}},
+        {"paint":"body","shade":1,"group":"goo","id":"fleck43","kind":"ellipse","on":"flecks","at":[4,7.6],"r":[0.8719829284985151,0.8719829284985151],"when":{"pieces":[{"atLeast":0.625,"below":0.875}],"clip":["hit"]}},
+        {"paint":"body","shade":1,"group":"goo","id":"fleck44","kind":"ellipse","on":"flecks","at":[-1.3,7.7],"r":[0.9717556496283839,0.9717556496283839],"when":{"pieces":[{"atLeast":0.625,"below":0.875}],"clip":["hit"]}},
+        {"paint":"body","shade":1,"group":"goo","id":"fleck50","kind":"ellipse","on":"flecks","at":[-7.8,0.4],"r":[0.9326704931279113,0.9326704931279113],"when":{"pieces":[{"atLeast":0.875}],"clip":["hit"]}},
+        {"paint":"body","shade":1,"group":"goo","id":"fleck51","kind":"ellipse","on":"flecks","at":[-5.3,-6.2],"r":[1.1612430733096388,1.1612430733096388],"when":{"pieces":[{"atLeast":0.875}],"clip":["hit"]}},
+        {"paint":"body","shade":1,"group":"goo","id":"fleck52","kind":"ellipse","on":"flecks","at":[3.9,-7.5],"r":[1.0513593315346432,1.0513593315346432],"when":{"pieces":[{"atLeast":0.875}],"clip":["hit"]}},
+        {"paint":"body","shade":1,"group":"goo","id":"fleck53","kind":"ellipse","on":"flecks","at":[8.2,2.7],"r":[0.8719829284985151,0.8719829284985151],"when":{"pieces":[{"atLeast":0.875}],"clip":["hit"]}},
+        {"paint":"body","shade":1,"group":"goo","id":"fleck54","kind":"ellipse","on":"flecks","at":[5,5.9],"r":[0.9717556496283839,0.9717556496283839],"when":{"pieces":[{"atLeast":0.875}],"clip":["hit"]}},
+        {"paint":"body","shade":1,"group":"goo","id":"fleck55","kind":"ellipse","on":"flecks","at":[-4.4,7.2],"r":[0.9852514683734627,0.9852514683734627],"when":{"pieces":[{"atLeast":0.875}],"clip":["hit"]}},
+        {
+          "paint": "body",
+          "shade": 1,
+          "group": "goo",
+          "id": "pool0",
+          "kind": "poly",
+          "on": "splat",
+          "points": [[0,0],[5,0],[4.6,0.7],[4.1,1.2],[3.6,1.7],[3.3,2.2],[3.2,2.8],[3,3.5],[2.7,4.1],[2.1,4.6],[1.4,4.8],[0.6,4.5],[0,3.8],[-0.4,3.1],[-0.7,2.4],[-0.9,2],[-1.2,1.9],[-1.8,2.1],[-2.6,2.2],[-3.5,2.3],[-4.4,2],[-5,1.5],[-5.2,0.8],[-5,0]],
+          "when": {"clip":["hit"]}
+        },
+        {
+          "paint": "body",
+          "shade": 1,
+          "group": "goo",
+          "id": "pool1",
+          "kind": "poly",
+          "on": "splat",
+          "points": [[0,0],[-5,0],[-4.6,-0.7],[-4.1,-1.2],[-3.6,-1.7],[-3.3,-2.2],[-3.2,-2.8],[-3,-3.5],[-2.7,-4.1],[-2.1,-4.6],[-1.4,-4.8],[-0.6,-4.5],[0,-3.8],[0.4,-3.1],[0.7,-2.4],[0.9,-2],[1.2,-1.9],[1.8,-2.1],[2.6,-2.2],[3.5,-2.3],[4.4,-2],[5,-1.5],[5.2,-0.8],[5,0]],
+          "when": {"clip":["hit"]}
+        },
+        {"paint":"body","shade":1,"group":"goo","id":"poolMid","kind":"ellipse","on":"splat","at":[0,0],"r":[3.72,3],"when":{"clip":["hit"]}},
+        {"id":"shine","kind":"arc","on":"glob","at":[{"from":"size","map":[[0,0.54],[1,0.9]]},{"from":"size","map":[[0,-0.54],[1,-0.9]]}],"r":{"from":"size","map":[[0,2.25],[1,3.75]]},"a0":105,"a1":170,"thick":1,"paint":"glow","when":{"clip":["fly"]}},
+        {"id":"shineDot","kind":"dot","on":"glob","at":[{"from":"size","map":[[0,-1.89],[1,-3.15]]},{"from":"size","map":[[0,1.125],[1,1.875]]}],"paint":"glow","when":{"clip":["fly"]}},
+        {"id":"splatShine","kind":"arc","on":"splat","at":[0.6,-0.6],"r":2.4,"a0":100,"a1":175,"thick":2,"paint":"glow","when":{"clip":["hit"]}},
+        {"id":"splatDot","kind":"dot","on":"splat","at":[-1.7,0.8],"paint":"glow","when":{"clip":["hit"]}},
+        {"kind":"outline","paint":"ink"}
+      ],
+      "motion": [{"gen":"pickup.bob","v":1,"node":"glob","clip":["fly"],"height":{"from":"wobble","map":[[0,0],[1,1.5]]}}]
+    }
+  },
+  "clips": {
+    "fly": {
+      "frames": 8,
+      "fps": 12,
+      "travel": [
+        {"tracks":["nodes.rd0.move","nodes.rd1.move","nodes.rd2.move","nodes.rd3.move","nodes.rd4.move"],"by":{"from":"size","map":[[0,0.8421],[0.5,1],[0.815,1.0994],[1,1.0526]]},"about":0},
+        {"tracks":["nodes.td0.move","nodes.td1.move","nodes.td2.move","nodes.td3.move","nodes.td4.move"],"by":{"from":"size","map":[[0,1.039],[0.265,1.1422],[0.5,1],[1,0.6981]]},"about":0}
+      ],
+      "keys": [
+        {
+          "t": 0,
+          "ease": "hold",
+          "nodes": {
+            "spin": {"turn":0},
+            "tail": {"turn":0},
+            "rd0": {"move":[0,0],"scale":1},
+            "rd1": {"move":[-1.9,-0.54],"scale":0.92},
+            "rd2": {"move":[-3.8,1.02],"scale":0.77},
+            "rd3": {"move":[-5.7,-1.88],"scale":0.56},
+            "rd4": {"move":[-7.6,1.95],"scale":0.3},
+            "td0": {"move":[0,0],"scale":1},
+            "td1": {"move":[-1.54,-0.54],"scale":0.92},
+            "td2": {"move":[-3.08,1.02],"scale":0.77},
+            "td3": {"move":[-4.62,-1.88],"scale":0.56},
+            "td4": {"move":[-6.16,1.95],"scale":0.3}
+          },
+          "show": ["rDrip0","rDripDot0","rDrip1","rDripDot1","rDrip2","rDripDot2","rDrip3","rDripDot3","rDrip4","rDripDot4","tDrip0","tDripDot0","tDrip1","tDripDot1","tDrip2","tDripDot2","tDrip3","tDripDot3","tDrip4","tDripDot4"]
+        },
+        {
+          "t": 0.125,
+          "ease": "hold",
+          "nodes": {
+            "spin": {"turn":45},
+            "tail": {"turn":14.14},
+            "rd0": {"move":[-1.19,0.33],"scale":0.96},
+            "rd1": {"move":[-3.09,-0.88],"scale":0.83},
+            "rd2": {"move":[-4.99,1.34],"scale":0.64},
+            "rd3": {"move":[-6.89,-2.27],"scale":0.4},
+            "rd4": {"move":[-8.79,2.26],"scale":0.15},
+            "td0": {"move":[-0.96,0.33],"scale":0.96},
+            "td1": {"move":[-2.5,-0.88],"scale":0.83},
+            "td2": {"move":[-4.04,1.34],"scale":0.64},
+            "td3": {"move":[-5.58,-2.27],"scale":0.4},
+            "td4": {"move":[-7.12,2.26],"scale":0.15}
+          },
+          "show": ["rDrip0","rDripDot0","rDrip1","rDripDot1","rDrip2","rDripDot2","rDrip3","rDripDot3","tDrip0","tDripDot0","tDrip1","tDripDot1","tDrip2","tDripDot2","tDrip3","tDripDot3"],
+          "hide": ["rDrip4","rDripDot4","tDrip4","tDripDot4"]
+        },
+        {
+          "t": 0.25,
+          "ease": "hold",
+          "nodes": {
+            "spin": {"turn":90},
+            "tail": {"turn":20},
+            "rd0": {"move":[-2.37,0.67],"scale":0.89},
+            "rd1": {"move":[-4.28,-1.22],"scale":0.72},
+            "rd2": {"move":[-6.17,1.66],"scale":0.5},
+            "rd3": {"move":[-8.07,-2.66],"scale":0.23},
+            "rd4": {"move":[-0.48,0.12],"scale":0.99},
+            "td0": {"move":[-1.92,0.67],"scale":0.89},
+            "td1": {"move":[-3.46,-1.22],"scale":0.72},
+            "td2": {"move":[-5,1.66],"scale":0.5},
+            "td3": {"move":[-6.54,-2.66],"scale":0.23},
+            "td4": {"move":[-0.39,0.12],"scale":0.99}
+          },
+          "show": ["rDrip0","rDripDot0","rDrip1","rDripDot1","rDrip2","rDripDot2","rDrip3","rDripDot3","rDrip4","rDripDot4","tDrip0","tDripDot0","tDrip1","tDripDot1","tDrip2","tDripDot2","tDrip3","tDripDot3","tDrip4","tDripDot4"]
+        },
+        {
+          "t": 0.375,
+          "ease": "hold",
+          "nodes": {
+            "spin": {"turn":135},
+            "tail": {"turn":14.14},
+            "rd0": {"move":[-3.56,1],"scale":0.79},
+            "rd1": {"move":[-5.46,-1.56],"scale":0.59},
+            "rd2": {"move":[-7.36,1.98],"scale":0.33},
+            "rd3": {"move":[-9.26,-3.05],"scale":0.15},
+            "rd4": {"move":[-1.66,0.43],"scale":0.94},
+            "td0": {"move":[-2.89,1],"scale":0.79},
+            "td1": {"move":[-4.43,-1.56],"scale":0.59},
+            "td2": {"move":[-5.97,1.98],"scale":0.33},
+            "td3": {"move":[-7.51,-3.05],"scale":0.15},
+            "td4": {"move":[-1.35,0.43],"scale":0.94}
+          },
+          "show": ["rDrip0","rDripDot0","rDrip1","rDripDot1","rDrip2","rDripDot2","rDrip4","rDripDot4","tDrip0","tDripDot0","tDrip1","tDripDot1","tDrip2","tDripDot2","tDrip4","tDripDot4"],
+          "hide": ["rDrip3","rDripDot3","tDrip3","tDripDot3"]
+        },
+        {
+          "t": 0.5,
+          "ease": "hold",
+          "nodes": {
+            "spin": {"turn":180},
+            "tail": {"turn":0},
+            "rd0": {"move":[-4.75,1.34],"scale":0.67},
+            "rd1": {"move":[-6.65,-1.9],"scale":0.43},
+            "rd2": {"move":[-8.55,2.3],"scale":0.16},
+            "rd3": {"move":[-0.95,-0.31],"scale":0.97},
+            "rd4": {"move":[-2.85,0.73],"scale":0.85},
+            "td0": {"move":[-3.85,1.34],"scale":0.67},
+            "td1": {"move":[-5.39,-1.9],"scale":0.43},
+            "td2": {"move":[-6.93,2.3],"scale":0.16},
+            "td3": {"move":[-0.77,-0.31],"scale":0.97},
+            "td4": {"move":[-2.31,0.73],"scale":0.85}
+          },
+          "show": ["rDrip0","rDripDot0","rDrip1","rDripDot1","rDrip2","rDripDot2","rDrip3","rDripDot3","rDrip4","rDripDot4","tDrip0","tDripDot0","tDrip1","tDripDot1","tDrip2","tDripDot2","tDrip3","tDripDot3","tDrip4","tDripDot4"]
+        },
+        {
+          "t": 0.625,
+          "ease": "hold",
+          "nodes": {
+            "spin": {"turn":225},
+            "tail": {"turn":-14.14},
+            "rd0": {"move":[-5.94,1.67],"scale":0.53},
+            "rd1": {"move":[-7.84,-2.23],"scale":0.26},
+            "rd2": {"move":[-0.24,0.06],"scale":1},
+            "rd3": {"move":[-2.14,-0.7],"scale":0.91},
+            "rd4": {"move":[-4.04,1.04],"scale":0.75},
+            "td0": {"move":[-4.81,1.67],"scale":0.53},
+            "td1": {"move":[-6.35,-2.23],"scale":0.26},
+            "td2": {"move":[-0.19,0.06],"scale":1},
+            "td3": {"move":[-1.73,-0.7],"scale":0.91},
+            "td4": {"move":[-3.27,1.04],"scale":0.75}
+          },
+          "show": ["rDrip0","rDripDot0","rDrip1","rDripDot1","rDrip2","rDripDot2","rDrip3","rDripDot3","rDrip4","rDripDot4","tDrip0","tDripDot0","tDrip1","tDripDot1","tDrip2","tDripDot2","tDrip3","tDripDot3","tDrip4","tDripDot4"]
+        },
+        {
+          "t": 0.75,
+          "ease": "hold",
+          "nodes": {
+            "spin": {"turn":270},
+            "tail": {"turn":-20},
+            "rd0": {"move":[-7.12,2.01],"scale":0.37},
+            "rd1": {"move":[-9.02,-2.57],"scale":0.15},
+            "rd2": {"move":[-1.42,0.38],"scale":0.95},
+            "rd3": {"move":[-3.33,-1.1],"scale":0.81},
+            "rd4": {"move":[-5.22,1.34],"scale":0.62},
+            "td0": {"move":[-5.77,2.01],"scale":0.37},
+            "td1": {"move":[-7.31,-2.57],"scale":0.15},
+            "td2": {"move":[-1.15,0.38],"scale":0.95},
+            "td3": {"move":[-2.69,-1.1],"scale":0.81},
+            "td4": {"move":[-4.24,1.34],"scale":0.62}
+          },
+          "show": ["rDrip0","rDripDot0","rDrip2","rDripDot2","rDrip3","rDripDot3","rDrip4","rDripDot4","tDrip0","tDripDot0","tDrip2","tDripDot2","tDrip3","tDripDot3","tDrip4","tDripDot4"],
+          "hide": ["rDrip1","rDripDot1","tDrip1","tDripDot1"]
+        },
+        {
+          "t": 0.875,
+          "ease": "hold",
+          "nodes": {
+            "spin": {"turn":315},
+            "tail": {"turn":-14.14},
+            "rd0": {"move":[-8.31,2.34],"scale":0.19},
+            "rd1": {"move":[-0.71,-0.2],"scale":0.98},
+            "rd2": {"move":[-2.61,0.7],"scale":0.87},
+            "rd3": {"move":[-4.51,-1.49],"scale":0.7},
+            "rd4": {"move":[-6.41,1.65],"scale":0.47},
+            "td0": {"move":[-6.74,2.34],"scale":0.19},
+            "td1": {"move":[-0.58,-0.2],"scale":0.98},
+            "td2": {"move":[-2.12,0.7],"scale":0.87},
+            "td3": {"move":[-3.66,-1.49],"scale":0.7},
+            "td4": {"move":[-5.2,1.65],"scale":0.47}
+          },
+          "show": ["rDrip0","rDripDot0","rDrip1","rDripDot1","rDrip2","rDripDot2","rDrip3","rDripDot3","rDrip4","rDripDot4","tDrip0","tDripDot0","tDrip1","tDripDot1","tDrip2","tDripDot2","tDrip3","tDripDot3","tDrip4","tDripDot4"]
+        }
+      ]
+    },
+    "hit": {
+      "frames": 8,
+      "fps": 16,
+      "loop": false,
+      "label": "Splat",
+      "frameEdits": {"0":{"flash":true}},
+      "travel": [
+        {"tracks":["nodes.p0.move","nodes.p1.move","nodes.p2.move","nodes.p3.move","nodes.p4.move","nodes.p5.move","nodes.p6.move"],"by":{"from":"size","map":[[0,0.75],[0.5,1],[0.643,1.0714],[1,1.0714]]},"about":0}
+      ],
+      "keys": [
+        {
+          "t": 0,
+          "ease": "hold",
+          "nodes": {"splat":{"scale":1.05},"flecks":{"scale":1.05}},
+          "show": ["slap"],
+          "hide": [
+            "splat0", "splat1", "fleck10", "fleck11", "fleck20", "fleck21", "fleck22", "fleck30", "fleck31", "fleck32", "fleck33", "fleck40", "fleck41", "fleck42", "fleck43", "fleck44", "fleck50", "fleck51", "fleck52", "fleck53", "fleck54", "fleck55", "pool0", "pool1", "poolMid", "splatShine", "splatDot", "drop0",
+            "dropDot0", "drop1", "dropDot1", "drop2", "dropDot2", "drop3", "dropDot3", "drop4", "dropDot4", "drop5", "dropDot5", "drop6", "dropDot6"
+          ]
+        },
+        {
+          "t": 0.14285714285714285,
+          "ease": "hold",
+          "nodes": {"splat":{"scale":1.45},"flecks":{"scale":1.4},"p0":{"move":[0,0],"scale":1},"p1":{"move":[0,0],"scale":1},"p2":{"move":[0,0],"scale":1},"p3":{"move":[0,0],"scale":1},"p4":{"move":[0,0],"scale":1},"p5":{"move":[0,0],"scale":1},"p6":{"move":[0,0],"scale":1}},
+          "show": [
+            "splat0", "splat1", "fleck10", "fleck11", "fleck20", "fleck21", "fleck22", "fleck30", "fleck31", "fleck32", "fleck33", "fleck40", "fleck41", "fleck42", "fleck43", "fleck44", "fleck50", "fleck51", "fleck52", "fleck53", "fleck54", "fleck55", "splatShine", "splatDot", "drop0", "dropDot0", "drop1", "dropDot1",
+            "drop2", "dropDot2", "drop3", "dropDot3", "drop4", "dropDot4", "drop5", "dropDot5", "drop6", "dropDot6"
+          ],
+          "hide": ["slap","pool0","pool1","poolMid"]
+        },
+        {
+          "t": 0.2857142857142857,
+          "ease": "hold",
+          "nodes": {
+            "splat": {"scale":1.74},
+            "flecks": {"scale":1.4},
+            "p0": {"move":[1.99,-2.42],"scale":0.86},
+            "p1": {"move":[2.15,0.49],"scale":0.83},
+            "p2": {"move":[-1.55,-2.22],"scale":0.87},
+            "p3": {"move":[-0.17,2.59],"scale":0.86},
+            "p4": {"move":[2.33,-0.38],"scale":0.88},
+            "p5": {"move":[1.04,-3.14],"scale":0.84},
+            "p6": {"move":[-1.09,2.55],"scale":0.86}
+          },
+          "show": [
+            "splat0", "splat1", "fleck10", "fleck11", "fleck20", "fleck21", "fleck22", "fleck30", "fleck31", "fleck32", "fleck33", "fleck40", "fleck41", "fleck42", "fleck43", "fleck44", "fleck50", "fleck51", "fleck52", "fleck53", "fleck54", "fleck55", "splatShine", "splatDot", "drop0", "dropDot0", "drop1", "dropDot1",
+            "drop2", "dropDot2", "drop3", "dropDot3", "drop4", "dropDot4", "drop5", "dropDot5", "drop6", "dropDot6"
+          ],
+          "hide": ["slap","pool0","pool1","poolMid"]
+        },
+        {
+          "t": 0.42857142857142855,
+          "ease": "hold",
+          "nodes": {
+            "splat": {"scale":1.65},
+            "flecks": {"scale":1.4},
+            "p0": {"move":[4.4,-5.35],"scale":0.64},
+            "p1": {"move":[4.23,0.97],"scale":0.62},
+            "p2": {"move":[-3.72,-5.33],"scale":0.65},
+            "p3": {"move":[-0.37,5.71],"scale":0.64},
+            "p4": {"move":[5.7,-0.93],"scale":0.66},
+            "p5": {"move":[2.19,-6.57],"scale":0.63},
+            "p6": {"move":[-2.43,5.7],"scale":0.64}
+          },
+          "show": [
+            "splat0", "splat1", "fleck10", "fleck11", "fleck20", "fleck21", "fleck22", "fleck30", "fleck31", "fleck32", "fleck33", "fleck40", "fleck41", "fleck42", "fleck43", "fleck44", "fleck50", "fleck51", "fleck52", "fleck53", "fleck54", "fleck55", "splatShine", "splatDot", "drop0", "dropDot0", "drop1", "dropDot1",
+            "drop2", "dropDot2", "drop3", "dropDot3", "drop4", "dropDot4", "drop5", "dropDot5", "drop6", "dropDot6"
+          ],
+          "hide": ["slap","pool0","pool1","poolMid"]
+        },
+        {
+          "t": 0.5714285714285714,
+          "ease": "hold",
+          "nodes": {
+            "splat": {"scale":1.51},
+            "flecks": {"scale":1.4},
+            "p0": {"move":[6.13,-7.45],"scale":0.43},
+            "p1": {"move":[5.72,1.31],"scale":0.41},
+            "p2": {"move":[-5.27,-7.56],"scale":0.44},
+            "p3": {"move":[-0.51,7.94],"scale":0.43},
+            "p4": {"move":[8.11,-1.33],"scale":0.44},
+            "p5": {"move":[3,-9.02],"scale":0.42},
+            "p6": {"move":[-3.39,7.94],"scale":0.43}
+          },
+          "show": [
+            "splat0", "splat1", "fleck10", "fleck11", "fleck20", "fleck21", "fleck22", "fleck30", "fleck31", "fleck32", "fleck33", "fleck40", "fleck41", "fleck42", "fleck43", "fleck44", "fleck50", "fleck51", "fleck52", "fleck53", "fleck54", "fleck55", "splatShine", "splatDot", "drop0", "dropDot0", "drop1", "dropDot1",
+            "drop2", "dropDot2", "drop3", "dropDot3", "drop4", "dropDot4", "drop5", "dropDot5", "drop6", "dropDot6"
+          ],
+          "hide": ["slap","pool0","pool1","poolMid"]
+        },
+        {
+          "t": 0.7142857142857143,
+          "ease": "hold",
+          "nodes": {
+            "splat": {"scale":1.27},
+            "flecks": {"scale":1.27},
+            "p0": {"move":[7.16,-8.71],"scale":0.21},
+            "p1": {"move":[6.61,1.52],"scale":0.21},
+            "p2": {"move":[-6.2,-8.89],"scale":0.22},
+            "p3": {"move":[-0.6,9.28],"scale":0.21},
+            "p4": {"move":[9.55,-1.56],"scale":0.22},
+            "p5": {"move":[3.49,-10.49],"scale":0.21},
+            "p6": {"move":[-3.96,9.29],"scale":0.21}
+          },
+          "show": [
+            "splat0", "splat1", "fleck10", "fleck11", "fleck20", "fleck21", "fleck22", "fleck30", "fleck31", "fleck32", "fleck33", "fleck40", "fleck41", "fleck42", "fleck43", "fleck44", "fleck50", "fleck51", "fleck52", "fleck53", "fleck54", "fleck55", "splatShine", "splatDot", "drop0", "dropDot0", "drop1", "dropDot1",
+            "drop2", "dropDot2", "drop3", "dropDot3", "drop4", "dropDot4", "drop5", "dropDot5", "drop6", "dropDot6"
+          ],
+          "hide": ["slap","pool0","pool1","poolMid"]
+        },
+        {
+          "t": 0.8571428571428571,
+          "ease": "hold",
+          "nodes": {"splat":{"scale":0.95},"flecks":{"scale":0.95}},
+          "show": ["pool0","pool1","poolMid","splatShine","splatDot"],
+          "hide": [
+            "slap", "splat0", "splat1", "fleck10", "fleck11", "fleck20", "fleck21", "fleck22", "fleck30", "fleck31", "fleck32", "fleck33", "fleck40", "fleck41", "fleck42", "fleck43", "fleck44", "fleck50", "fleck51", "fleck52", "fleck53", "fleck54", "fleck55", "drop0", "dropDot0", "drop1", "dropDot1", "drop2",
+            "dropDot2", "drop3", "dropDot3", "drop4", "dropDot4", "drop5", "dropDot5", "drop6", "dropDot6"
+          ]
+        },
+        {
+          "t": 1,
+          "ease": "hold",
+          "nodes": {"splat":{"scale":0.85},"flecks":{"scale":0.85}},
+          "show": ["pool0","pool1","poolMid","splatShine","splatDot"],
+          "hide": [
+            "slap", "splat0", "splat1", "fleck10", "fleck11", "fleck20", "fleck21", "fleck22", "fleck30", "fleck31", "fleck32", "fleck33", "fleck40", "fleck41", "fleck42", "fleck43", "fleck44", "fleck50", "fleck51", "fleck52", "fleck53", "fleck54", "fleck55", "drop0", "dropDot0", "drop1", "dropDot1", "drop2",
+            "dropDot2", "drop3", "dropDot3", "drop4", "dropDot4", "drop5", "dropDot5", "drop6", "dropDot6"
+          ]
+        }
+      ],
+      "sounds": [{"sound":"bug-splat","preset":"Mite pop","frame":0,"volume":0.7}]
+    }
+  }
+}

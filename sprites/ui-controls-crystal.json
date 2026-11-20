@@ -1,0 +1,1513 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "ui-controls-crystal",
+ "name": "Crystal checkboxes and cursor",
+ "blurb": "The small pieces of a settings screen in cut crystal: a ticked and an empty box, a round option, an on/off switch, a faceted shard pointer that nudges and crystal brackets round a chosen slot; change the style, corners, band, colours and speed.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/cursor",
+  "themes": [
+   "neutral",
+   "fantasy"
+  ],
+  "gameTypes": [
+   "arcade",
+   "turn-based-rpg",
+   "puzzle",
+   "top-down-rpg"
+  ],
+  "view": "none",
+  "words": [
+   "checkbox",
+   "radio",
+   "switch",
+   "cursor",
+   "pointer",
+   "toggle",
+   "selector",
+   "crystal",
+   "ice",
+   "frost"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "check-on",
+ "styles": [
+  "pixel"
+ ],
+ "palette": [
+  {
+   "id": "face",
+   "label": "Stone",
+   "default": "#3f5068",
+   "material": "interface",
+   "swatches": [
+    "#3f5068",
+    "#7a4f33",
+    "#434d6d",
+    "#8e3a4a"
+   ]
+  },
+  {
+   "id": "frame",
+   "label": "Crystal",
+   "default": "#8fd0f0",
+   "material": "interface",
+   "swatches": [
+    "#8fd0f0",
+    "#9bd18a",
+    "#5fe0f0",
+    "#7fe0a0"
+   ]
+  },
+  {
+   "id": "accent",
+   "label": "Tick",
+   "default": "#4fd8ee",
+   "material": "interface",
+   "swatches": [
+    "#4fd8ee",
+    "#c9423a",
+    "#a4c44a",
+    "#b48af8",
+    "#f4e06a"
+   ]
+  },
+  {
+   "id": "glint",
+   "default": "#ffffff",
+   "material": "light",
+   "detail": true
+  }
+ ],
+ "controls": [
+  {
+   "key": "style",
+   "kind": "choice",
+   "label": "Style",
+   "options": [
+    {
+     "value": "ice",
+     "label": "Ice"
+    },
+    {
+     "value": "rime",
+     "label": "Rime"
+    },
+    {
+     "value": "shard",
+     "label": "Shard"
+    }
+   ],
+   "default": "ice",
+   "group": "Look"
+  },
+  {
+   "key": "corner",
+   "kind": "range",
+   "label": "Corner",
+   "lo": "Square",
+   "hi": "Round",
+   "default": 0.5,
+   "group": "Look"
+  },
+  {
+   "key": "border",
+   "kind": "range",
+   "label": "Border",
+   "lo": "Thin",
+   "hi": "Thick",
+   "default": 0.5,
+   "group": "Look"
+  },
+  {
+   "key": "face",
+   "kind": "colour",
+   "label": "Stone",
+   "group": "Colors"
+  },
+  {
+   "key": "frame",
+   "kind": "colour",
+   "label": "Crystal",
+   "group": "Colors"
+  },
+  {
+   "key": "accent",
+   "kind": "colour",
+   "label": "Tick",
+   "group": "Colors"
+  },
+  {
+   "key": "speed",
+   "standard": "speed"
+  }
+ ],
+ "versions": [
+  {
+   "name": "Ice",
+   "params": {}
+  },
+  {
+   "name": "Ruby frost",
+   "params": {
+    "style": "rime",
+    "accent": "#c9423a",
+    "face": "#7a4f33"
+   }
+  },
+  {
+   "name": "Shard",
+   "params": {
+    "style": "shard",
+    "frame": "#5fe0f0",
+    "face": "#7a4f33"
+   }
+  },
+  {
+   "name": "Garnet",
+   "params": {
+    "face": "#8e3a4a",
+    "frame": "#7fe0a0",
+    "accent": "#f4e06a"
+   }
+  },
+  {
+   "name": "Jade",
+   "params": {
+    "frame": "#9bd18a",
+    "accent": "#a4c44a"
+   }
+  }
+ ],
+ "body": {
+  "panel": {
+   "skin": {
+    "use": "skin:crystal",
+    "v": 2,
+    "paint": {
+     "face": "face",
+     "frame": "frame",
+     "accent": "accent"
+    }
+   },
+   "piece": {
+    "gen": "ui.toggle",
+    "v": 2,
+    "clip": [
+     "check-on"
+    ],
+    "style": {
+     "from": "style"
+    },
+    "corner": {
+     "from": "corner",
+     "map": [
+      [
+       0,
+       0
+      ],
+      [
+       0.5,
+       2
+      ],
+      [
+       1,
+       2
+      ]
+     ],
+     "round": "px"
+    },
+    "border": {
+     "from": "border",
+     "map": [
+      [
+       0,
+       1
+      ],
+      [
+       0.249,
+       1
+      ],
+      [
+       0.25,
+       2
+      ],
+      [
+       1,
+       2
+      ]
+     ],
+     "round": "px"
+    },
+    "kind": "check",
+    "checked": true,
+    "at": [
+     16,
+     16
+    ],
+    "size": 20,
+    "trim": [],
+    "topTrim": [],
+    "rightTrim": [],
+    "along": [],
+    "gleamTrim": [],
+    "gleamTop": [],
+    "gleamRight": [],
+    "rings": [
+     "ink",
+     "frame"
+    ],
+    "bandAt": 1,
+    "lit": false,
+    "edge": "round",
+    "bevel": "outer",
+    "bevelDepth": 0.6,
+    "facets": {
+     "from": "style"
+    }
+   },
+   "states": [
+    "check-on",
+    "check-off",
+    "radio-on",
+    "radio-off",
+    "switch-on",
+    "switch-off",
+    "pointer",
+    "selector"
+   ],
+   "draw": [
+    {
+     "gen": "ui.toggle",
+     "v": 2,
+     "clip": [
+      "check-off"
+     ],
+     "style": {
+      "from": "style"
+     },
+     "corner": {
+      "from": "corner",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        0.5,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "border": {
+      "from": "border",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.249,
+        1
+       ],
+       [
+        0.25,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "kind": "check",
+     "checked": false,
+     "at": [
+      16,
+      16
+     ],
+     "size": 20,
+     "trim": [],
+     "topTrim": [],
+     "rightTrim": [],
+     "along": [],
+     "gleamTrim": [],
+     "gleamTop": [],
+     "gleamRight": [],
+     "rings": [
+      "ink",
+      "frame"
+     ],
+     "bandAt": 1,
+     "lit": false,
+     "edge": "round",
+     "bevel": "outer",
+     "bevelDepth": 0.6,
+     "facets": {
+      "from": "style"
+     }
+    },
+    {
+     "gen": "ui.toggle",
+     "v": 2,
+     "clip": [
+      "radio-on"
+     ],
+     "style": {
+      "from": "style"
+     },
+     "corner": {
+      "from": "corner",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        0.5,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "border": {
+      "from": "border",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.249,
+        1
+       ],
+       [
+        0.25,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "kind": "radio",
+     "checked": true,
+     "at": [
+      16,
+      16
+     ],
+     "size": 20,
+     "trim": [],
+     "topTrim": [],
+     "rightTrim": [],
+     "along": [],
+     "gleamTrim": [],
+     "gleamTop": [],
+     "gleamRight": [],
+     "rings": [
+      "ink",
+      "frame"
+     ],
+     "bandAt": 1,
+     "lit": false,
+     "edge": "round",
+     "bevel": "outer",
+     "bevelDepth": 0.6,
+     "facets": {
+      "from": "style"
+     }
+    },
+    {
+     "gen": "ui.toggle",
+     "v": 2,
+     "clip": [
+      "radio-off"
+     ],
+     "style": {
+      "from": "style"
+     },
+     "corner": {
+      "from": "corner",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        0.5,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "border": {
+      "from": "border",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.249,
+        1
+       ],
+       [
+        0.25,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "kind": "radio",
+     "checked": false,
+     "at": [
+      16,
+      16
+     ],
+     "size": 20,
+     "trim": [],
+     "topTrim": [],
+     "rightTrim": [],
+     "along": [],
+     "gleamTrim": [],
+     "gleamTop": [],
+     "gleamRight": [],
+     "rings": [
+      "ink",
+      "frame"
+     ],
+     "bandAt": 1,
+     "lit": false,
+     "edge": "round",
+     "bevel": "outer",
+     "bevelDepth": 0.6,
+     "facets": {
+      "from": "style"
+     }
+    },
+    {
+     "gen": "ui.toggle",
+     "v": 2,
+     "clip": [
+      "switch-on"
+     ],
+     "style": {
+      "from": "style"
+     },
+     "corner": {
+      "from": "corner",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        0.5,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "border": {
+      "from": "border",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.249,
+        1
+       ],
+       [
+        0.25,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "kind": "switch",
+     "checked": true,
+     "at": [
+      16,
+      16
+     ],
+     "size": 28,
+     "trim": [],
+     "topTrim": [],
+     "rightTrim": [],
+     "along": [],
+     "gleamTrim": [],
+     "gleamTop": [],
+     "gleamRight": [],
+     "rings": [
+      "ink",
+      "frame"
+     ],
+     "bandAt": 1,
+     "lit": false,
+     "edge": "round",
+     "bevel": "outer",
+     "bevelDepth": 0.6,
+     "facets": {
+      "from": "style"
+     }
+    },
+    {
+     "gen": "ui.toggle",
+     "v": 2,
+     "clip": [
+      "switch-off"
+     ],
+     "style": {
+      "from": "style"
+     },
+     "corner": {
+      "from": "corner",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        0.5,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "border": {
+      "from": "border",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.249,
+        1
+       ],
+       [
+        0.25,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "kind": "switch",
+     "checked": false,
+     "at": [
+      16,
+      16
+     ],
+     "size": 28,
+     "trim": [],
+     "topTrim": [],
+     "rightTrim": [],
+     "along": [],
+     "gleamTrim": [],
+     "gleamTop": [],
+     "gleamRight": [],
+     "rings": [
+      "ink",
+      "frame"
+     ],
+     "bandAt": 1,
+     "lit": false,
+     "edge": "round",
+     "bevel": "outer",
+     "bevelDepth": 0.6,
+     "facets": {
+      "from": "style"
+     }
+    },
+    {
+     "gen": "ui.pointer",
+     "v": 2,
+     "clip": [
+      "pointer"
+     ],
+     "style": {
+      "from": "style"
+     },
+     "corner": {
+      "from": "corner",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        0.5,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "border": {
+      "from": "border",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.249,
+        1
+       ],
+       [
+        0.25,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "at": [
+      4,
+      16
+     ],
+     "len": 20,
+     "reach": 2,
+     "art": [
+      {
+       "kind": "stamp",
+       "at": [
+        0,
+        -5
+       ],
+       "rows": [
+        "......aaa...........",
+        ".....abbbaaa........",
+        "...aabbcbbbbaa......",
+        "..abbbbbbbbbbbaaa...",
+        ".abbbbbbbbbbbbbbbaa.",
+        "adeeecccccccccceeeda",
+        ".adddddddddddddddaa.",
+        "..addddddddddddaa...",
+        "...adddddddddaa.....",
+        "....addddddaa.......",
+        ".....adddaa.........",
+        "......aaa..........."
+       ],
+       "key": {
+        "a": "ink",
+        "b": {
+         "rule": "tone",
+         "of": "frame",
+         "by": 0.85
+        },
+        "c": "accent",
+        "d": {
+         "rule": "tone",
+         "of": "frame",
+         "by": -0.6
+        },
+        "e": "frame"
+       }
+      }
+     ],
+     "tip": [
+      19,
+      0
+     ]
+    },
+    {
+     "gen": "ui.selector",
+     "v": 2,
+     "clip": [
+      "selector"
+     ],
+     "style": {
+      "from": "style"
+     },
+     "corner": {
+      "from": "corner",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        0.5,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "border": {
+      "from": "border",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.249,
+        1
+       ],
+       [
+        0.25,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "at": [
+      1,
+      1
+     ],
+     "size": [
+      30,
+      30
+     ],
+     "len": 4,
+     "steps": "eased",
+     "trim": [],
+     "topTrim": [],
+     "rightTrim": [],
+     "along": [],
+     "gleamTrim": [],
+     "gleamTop": [],
+     "gleamRight": [],
+     "lit": false,
+     "marks": "none",
+     "bends": [
+      {
+       "kind": "stamp",
+       "at": [
+        0,
+        0
+       ],
+       "rows": [
+        "dlll",
+        "d.ll",
+        "dd..",
+        "dd.."
+       ],
+       "key": {
+        "d": {
+         "rule": "tone",
+         "of": "frame",
+         "by": -0.6
+        },
+        "l": {
+         "rule": "tone",
+         "of": "frame",
+         "by": 0.85
+        }
+       },
+       "when": {
+        "style": [
+         "ice"
+        ]
+       }
+      },
+      {
+       "kind": "stamp",
+       "at": [
+        -3,
+        0
+       ],
+       "rows": [
+        "dlll",
+        "ll.l",
+        "..dl",
+        "..dd"
+       ],
+       "key": {
+        "d": {
+         "rule": "tone",
+         "of": "frame",
+         "by": -0.6
+        },
+        "l": {
+         "rule": "tone",
+         "of": "frame",
+         "by": 0.85
+        }
+       },
+       "when": {
+        "style": [
+         "ice"
+        ]
+       }
+      },
+      {
+       "kind": "stamp",
+       "at": [
+        -3,
+        -3
+       ],
+       "rows": [
+        "..ll",
+        "..ll",
+        "dd.l",
+        "dddd"
+       ],
+       "key": {
+        "d": {
+         "rule": "tone",
+         "of": "frame",
+         "by": -0.6
+        },
+        "l": {
+         "rule": "tone",
+         "of": "frame",
+         "by": 0.85
+        }
+       },
+       "when": {
+        "style": [
+         "ice"
+        ]
+       }
+      },
+      {
+       "kind": "stamp",
+       "at": [
+        0,
+        -3
+       ],
+       "rows": [
+        "dl..",
+        "dd..",
+        "d.dl",
+        "dddd"
+       ],
+       "key": {
+        "d": {
+         "rule": "tone",
+         "of": "frame",
+         "by": -0.6
+        },
+        "l": {
+         "rule": "tone",
+         "of": "frame",
+         "by": 0.85
+        }
+       },
+       "when": {
+        "style": [
+         "ice"
+        ]
+       }
+      },
+      {
+       "kind": "stamp",
+       "at": [
+        0,
+        0
+       ],
+       "rows": [
+        "dlll",
+        "dwll",
+        "dd..",
+        "dd.."
+       ],
+       "key": {
+        "d": {
+         "rule": "tone",
+         "of": "frame",
+         "by": -0.6
+        },
+        "l": {
+         "rule": "tone",
+         "of": "frame",
+         "by": 0.85
+        },
+        "w": "glint"
+       },
+       "when": {
+        "style": [
+         "ice"
+        ]
+       }
+      },
+      {
+       "kind": "stamp",
+       "at": [
+        -3,
+        0
+       ],
+       "rows": [
+        "dlll",
+        "dlwl",
+        "..dl",
+        "..dd"
+       ],
+       "key": {
+        "d": {
+         "rule": "tone",
+         "of": "frame",
+         "by": -0.6
+        },
+        "l": {
+         "rule": "tone",
+         "of": "frame",
+         "by": 0.85
+        },
+        "w": "glint"
+       },
+       "when": {
+        "style": [
+         "ice"
+        ]
+       }
+      },
+      {
+       "kind": "stamp",
+       "at": [
+        -3,
+        -3
+       ],
+       "rows": [
+        "..ll",
+        "..ll",
+        "dd.l",
+        "dddd"
+       ],
+       "key": {
+        "d": {
+         "rule": "tone",
+         "of": "frame",
+         "by": -0.6
+        },
+        "l": {
+         "rule": "tone",
+         "of": "frame",
+         "by": 0.85
+        }
+       },
+       "when": {
+        "style": [
+         "ice"
+        ]
+       }
+      },
+      {
+       "kind": "stamp",
+       "at": [
+        0,
+        -3
+       ],
+       "rows": [
+        "dl..",
+        "dd..",
+        "d.dl",
+        "dddd"
+       ],
+       "key": {
+        "d": {
+         "rule": "tone",
+         "of": "frame",
+         "by": -0.6
+        },
+        "l": {
+         "rule": "tone",
+         "of": "frame",
+         "by": 0.85
+        }
+       },
+       "when": {
+        "style": [
+         "ice"
+        ]
+       }
+      },
+      {
+       "kind": "stamp",
+       "at": [
+        0,
+        0
+       ],
+       "rows": [
+        "dlll",
+        "d.ll",
+        "dd..",
+        "dd.."
+       ],
+       "key": {
+        "d": {
+         "rule": "tone",
+         "of": "frame",
+         "by": -0.6
+        },
+        "l": {
+         "rule": "tone",
+         "of": "frame",
+         "by": 0.85
+        }
+       },
+       "when": {
+        "style": [
+         "rime"
+        ]
+       }
+      },
+      {
+       "kind": "stamp",
+       "at": [
+        -3,
+        0
+       ],
+       "rows": [
+        "dlll",
+        "dd.l",
+        "..dl",
+        "..dd"
+       ],
+       "key": {
+        "d": {
+         "rule": "tone",
+         "of": "frame",
+         "by": -0.6
+        },
+        "l": {
+         "rule": "tone",
+         "of": "frame",
+         "by": 0.85
+        }
+       },
+       "when": {
+        "style": [
+         "rime"
+        ]
+       }
+      },
+      {
+       "kind": "stamp",
+       "at": [
+        -3,
+        -3
+       ],
+       "rows": [
+        "..ll",
+        "..ll",
+        "dd.l",
+        "dddd"
+       ],
+       "key": {
+        "d": {
+         "rule": "tone",
+         "of": "frame",
+         "by": -0.6
+        },
+        "l": {
+         "rule": "tone",
+         "of": "frame",
+         "by": 0.85
+        }
+       },
+       "when": {
+        "style": [
+         "rime"
+        ]
+       }
+      },
+      {
+       "kind": "stamp",
+       "at": [
+        0,
+        -3
+       ],
+       "rows": [
+        "dl..",
+        "dd..",
+        "d.dl",
+        "dddd"
+       ],
+       "key": {
+        "d": {
+         "rule": "tone",
+         "of": "frame",
+         "by": -0.6
+        },
+        "l": {
+         "rule": "tone",
+         "of": "frame",
+         "by": 0.85
+        }
+       },
+       "when": {
+        "style": [
+         "rime"
+        ]
+       }
+      },
+      {
+       "kind": "stamp",
+       "at": [
+        0,
+        0
+       ],
+       "rows": [
+        "dlll",
+        "d.ll",
+        "dd..",
+        "dd.."
+       ],
+       "key": {
+        "d": {
+         "rule": "tone",
+         "of": "frame",
+         "by": -0.6
+        },
+        "l": {
+         "rule": "tone",
+         "of": "frame",
+         "by": 0.85
+        }
+       },
+       "when": {
+        "style": [
+         "shard"
+        ]
+       }
+      },
+      {
+       "kind": "stamp",
+       "at": [
+        -3,
+        0
+       ],
+       "rows": [
+        "dlll",
+        "dd.l",
+        "..dl",
+        "..dd"
+       ],
+       "key": {
+        "d": {
+         "rule": "tone",
+         "of": "frame",
+         "by": -0.6
+        },
+        "l": {
+         "rule": "tone",
+         "of": "frame",
+         "by": 0.85
+        }
+       },
+       "when": {
+        "style": [
+         "shard"
+        ]
+       }
+      },
+      {
+       "kind": "stamp",
+       "at": [
+        -3,
+        -3
+       ],
+       "rows": [
+        "..ll",
+        "..ll",
+        "ddll",
+        "ddld"
+       ],
+       "key": {
+        "d": {
+         "rule": "tone",
+         "of": "frame",
+         "by": -0.6
+        },
+        "l": {
+         "rule": "tone",
+         "of": "frame",
+         "by": 0.85
+        }
+       },
+       "when": {
+        "style": [
+         "shard"
+        ]
+       }
+      },
+      {
+       "kind": "stamp",
+       "at": [
+        0,
+        -3
+       ],
+       "rows": [
+        "dl..",
+        "dd..",
+        "ddll",
+        "ddld"
+       ],
+       "key": {
+        "d": {
+         "rule": "tone",
+         "of": "frame",
+         "by": -0.6
+        },
+        "l": {
+         "rule": "tone",
+         "of": "frame",
+         "by": 0.85
+        }
+       },
+       "when": {
+        "style": [
+         "shard"
+        ]
+       }
+      },
+      {
+       "kind": "stamp",
+       "at": [
+        0,
+        0
+       ],
+       "rows": [
+        "dlll",
+        "d.ll",
+        "dd..",
+        "dd.."
+       ],
+       "key": {
+        "d": {
+         "rule": "tone",
+         "of": "frame",
+         "by": -0.6
+        },
+        "l": {
+         "rule": "tone",
+         "of": "frame",
+         "by": 0.85
+        }
+       },
+       "when": {
+        "style": [
+         "shard"
+        ]
+       }
+      },
+      {
+       "kind": "stamp",
+       "at": [
+        -3,
+        0
+       ],
+       "rows": [
+        "dlll",
+        "dd.l",
+        "..dl",
+        "..dd"
+       ],
+       "key": {
+        "d": {
+         "rule": "tone",
+         "of": "frame",
+         "by": -0.6
+        },
+        "l": {
+         "rule": "tone",
+         "of": "frame",
+         "by": 0.85
+        }
+       },
+       "when": {
+        "style": [
+         "shard"
+        ]
+       }
+      },
+      {
+       "kind": "stamp",
+       "at": [
+        -3,
+        -3
+       ],
+       "rows": [
+        "..wl",
+        "..dl",
+        "lddl",
+        "lddl"
+       ],
+       "key": {
+        "d": {
+         "rule": "tone",
+         "of": "frame",
+         "by": -0.6
+        },
+        "l": {
+         "rule": "tone",
+         "of": "frame",
+         "by": 0.85
+        },
+        "w": "glint"
+       },
+       "when": {
+        "style": [
+         "shard"
+        ]
+       }
+      },
+      {
+       "kind": "stamp",
+       "at": [
+        0,
+        -3
+       ],
+       "rows": [
+        "dw..",
+        "dl..",
+        "dldd",
+        "dldd"
+       ],
+       "key": {
+        "d": {
+         "rule": "tone",
+         "of": "frame",
+         "by": -0.6
+        },
+        "l": {
+         "rule": "tone",
+         "of": "frame",
+         "by": 0.85
+        },
+        "w": "glint"
+       },
+       "when": {
+        "style": [
+         "shard"
+        ]
+       }
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "clips": {
+  "check-on": {
+   "frames": 1,
+   "fps": 8,
+   "label": "Ticked box, while the option is on",
+   "noText": true,
+   "sounds": [
+    {
+     "sound": "menu-glass-toggle",
+     "preset": "Switch on",
+     "frame": 0,
+     "volume": 0.6
+    }
+   ]
+  },
+  "check-off": {
+   "frames": 1,
+   "fps": 8,
+   "label": "Empty box, while the option is off",
+   "noText": true
+  },
+  "radio-on": {
+   "frames": 1,
+   "fps": 8,
+   "label": "Chosen dot, for the one option picked",
+   "noText": true
+  },
+  "radio-off": {
+   "frames": 1,
+   "fps": 8,
+   "label": "Empty dot, for each option not picked",
+   "noText": true
+  },
+  "switch-on": {
+   "frames": 1,
+   "fps": 8,
+   "label": "Switch, while the setting is on",
+   "noText": true,
+   "sounds": [
+    {
+     "sound": "menu-glass-toggle",
+     "preset": "Switch on",
+     "frame": 0,
+     "volume": 0.6
+    }
+   ]
+  },
+  "switch-off": {
+   "frames": 1,
+   "fps": 8,
+   "label": "Switch, while the setting is off",
+   "noText": true
+  },
+  "pointer": {
+   "frames": 8,
+   "fps": 8,
+   "label": "Pointer, beside the item the player is on",
+   "noText": true
+  },
+  "selector": {
+   "frames": 8,
+   "fps": 8,
+   "label": "Selector, round the slot the player is on",
+   "noText": true
+  }
+ }
+}

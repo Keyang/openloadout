@@ -1,0 +1,426 @@
+{
+ "id": "bone-soldier",
+ "frozen": "2026-11-20",
+ "source": "sprites/bone-soldier.js",
+ "sha256": "5a264762416cb2b28d95469833c9c9302658244ff5ade0dc7801ef9e6e2a1a62",
+ "name": "Skeleton soldier",
+ "blurb": "A rattling skeleton with glowing eyes for a battle screen. Change its bones, weapon, shield, headgear and how much it rattles.",
+ "meta": {
+  "type": "creature",
+  "role": "characters/enemy",
+  "themes": [
+   "fantasy",
+   "dungeon"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "platformer"
+  ],
+  "view": "side",
+  "words": [
+   "skeleton",
+   "undead",
+   "bones",
+   "skull",
+   "soldier",
+   "warrior",
+   "attack",
+   "block",
+   "collapse",
+   "battle",
+   "crypt",
+   "spooky",
+   "rattle"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  64,
+  64
+ ],
+ "pivot": [
+  28,
+  58
+ ],
+ "grounded": false,
+ "preview": "walk",
+ "params": {
+  "height": {
+   "kind": "range",
+   "label": "Height",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Short",
+   "hi": "Tall",
+   "group": "Look"
+  },
+  "thickness": {
+   "kind": "range",
+   "label": "Bones",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Thin",
+   "hi": "Thick",
+   "group": "Look"
+  },
+  "head": {
+   "kind": "range",
+   "label": "Head",
+   "def": 0.55,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "weapon": {
+   "kind": "choice",
+   "label": "Weapon",
+   "def": "sword",
+   "options": [
+    {
+     "value": "sword",
+     "label": "Sword"
+    },
+    {
+     "value": "axe",
+     "label": "Axe"
+    },
+    {
+     "value": "spear",
+     "label": "Spear"
+    },
+    {
+     "value": "none",
+     "label": "None"
+    }
+   ],
+   "group": "Look"
+  },
+  "weaponLength": {
+   "kind": "range",
+   "label": "Length",
+   "def": 1,
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "lo": "Short",
+   "hi": "Long",
+   "group": "Look"
+  },
+  "weaponAngle": {
+   "kind": "range",
+   "label": "Hold angle",
+   "def": 0,
+   "min": -10,
+   "max": 40,
+   "step": 1,
+   "lo": "Upright",
+   "hi": "Forward",
+   "group": "Look"
+  },
+  "shield": {
+   "kind": "choice",
+   "label": "Shield",
+   "def": "round",
+   "options": [
+    {
+     "value": "round",
+     "label": "Round"
+    },
+    {
+     "value": "kite",
+     "label": "Kite"
+    },
+    {
+     "value": "broken",
+     "label": "Broken"
+    },
+    {
+     "value": "none",
+     "label": "None"
+    }
+   ],
+   "group": "Look"
+  },
+  "shieldSize": {
+   "kind": "range",
+   "label": "Size",
+   "def": 1,
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "headgear": {
+   "kind": "choice",
+   "label": "Headgear",
+   "def": "none",
+   "options": [
+    {
+     "value": "none",
+     "label": "None"
+    },
+    {
+     "value": "helmet",
+     "label": "Helmet"
+    },
+    {
+     "value": "crown",
+     "label": "Crown"
+    },
+    {
+     "value": "horned",
+     "label": "Horned"
+    }
+   ],
+   "group": "Look"
+  },
+  "headgearSize": {
+   "kind": "range",
+   "label": "Size",
+   "def": 1,
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Bone",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#a8a4a0",
+    "#e6c96a",
+    "#7fe0a0"
+   ],
+   "group": "Colors"
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Eyes",
+   "def": "#4fd8ee",
+   "swatches": [
+    "#4fd8ee",
+    "#e8662c",
+    "#7aa0f4",
+    "#f4e06a",
+    "#7fe0a0",
+    "#7a4fc4"
+   ],
+   "group": "Colors"
+  },
+  "metal": {
+   "kind": "color",
+   "label": "Metal",
+   "def": "#a8806a",
+   "swatches": [
+    "#a8806a",
+    "#c2c9d6",
+    "#f2c230",
+    "#5a5f7a",
+    "#8f97a8",
+    "#e6c545",
+    "#c98a4a"
+   ],
+   "group": "Colors",
+   "when": [
+    {
+     "weapon": [
+      "sword",
+      "axe",
+      "spear"
+     ]
+    },
+    {
+     "shield": [
+      "round",
+      "kite",
+      "broken"
+     ]
+    },
+    {
+     "headgear": [
+      "helmet",
+      "crown",
+      "horned"
+     ]
+    }
+   ]
+  },
+  "wobble": {
+   "kind": "range",
+   "label": "Rattle",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Firm",
+   "hi": "Loose",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    7,
+    10
+   ]
+  },
+  "walk": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "attack": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    8,
+    14,
+    19
+   ]
+  },
+  "block": {
+   "frames": 6,
+   "loop": false,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "hurt": {
+   "frames": 4,
+   "loop": false,
+   "fps": [
+    6,
+    9,
+    13
+   ]
+  },
+  "die": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  }
+ },
+ "sounds": {
+  "walk": [
+   {
+    "sound": "footstep-gravel",
+    "frame": 0,
+    "preset": "Sneaking",
+    "volume": 0.45
+   },
+   {
+    "sound": "footstep-gravel",
+    "frame": 4,
+    "preset": "Sneaking",
+    "volume": 0.45
+   }
+  ],
+  "attack": [
+   {
+    "sound": "sword-slash",
+    "frame": 3,
+    "preset": "Heavy blade",
+    "volume": 0.7,
+    "when": {
+     "weapon": [
+      "sword",
+      "axe",
+      "spear"
+     ]
+    }
+   },
+   {
+    "sound": "whoosh",
+    "frame": 3,
+    "preset": "Quick swipe",
+    "volume": 0.7,
+    "when": {
+     "weapon": [
+      "none"
+     ]
+    }
+   }
+  ],
+  "block": [
+   {
+    "sound": "metal-hit",
+    "frame": 1,
+    "preset": "Tin can",
+    "volume": 0.7,
+    "when": [
+     {
+      "shield": [
+       "round",
+       "kite",
+       "broken"
+      ]
+     },
+     {
+      "weapon": [
+       "sword",
+       "axe",
+       "spear"
+      ]
+     }
+    ]
+   }
+  ],
+  "hurt": [
+   {
+    "sound": "punch",
+    "frame": 0,
+    "preset": "Light jab",
+    "volume": 0.9
+   }
+  ],
+  "die": [
+   {
+    "sound": "monster-fade",
+    "frame": 0,
+    "preset": "Bones collapse",
+    "volume": 1
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-rpg-fantasy"
+ ]
+}

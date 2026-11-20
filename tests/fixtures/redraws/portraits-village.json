@@ -1,0 +1,286 @@
+{
+ "id": "portraits-village",
+ "frozen": "2026-11-20",
+ "source": "sprites/portraits-village.js",
+ "sha256": "e1042d622b1b36876bcb30ff1b7db83c470ece6e7caae906913f9df6b46c09ce",
+ "name": "Villager portraits",
+ "blurb": "Faces of the village elder, the merchant, the town guard and the farm child for dialogue boxes: neutral, happy and worried. Change the border, the zoom and each person's colour.",
+ "meta": {
+  "type": "icon",
+  "role": "interface/icon",
+  "themes": [
+   "fantasy",
+   "farm"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "top-down-rpg"
+  ],
+  "view": "front",
+  "words": [
+   "portrait",
+   "face",
+   "avatar",
+   "villager",
+   "elder",
+   "merchant",
+   "guard",
+   "child",
+   "townsfolk",
+   "dialogue",
+   "talk",
+   "happy",
+   "worried",
+   "quest"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  48,
+  48
+ ],
+ "pivot": [
+  24,
+  24
+ ],
+ "grounded": false,
+ "preview": "elder-neutral",
+ "params": {
+  "frame": {
+   "kind": "choice",
+   "label": "Border",
+   "def": "none",
+   "options": [
+    {
+     "value": "none",
+     "label": "None"
+    },
+    {
+     "value": "round",
+     "label": "Round"
+    },
+    {
+     "value": "square",
+     "label": "Square"
+    }
+   ],
+   "group": "Look"
+  },
+  "size": {
+   "kind": "range",
+   "label": "Zoom",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Head and shoulders",
+   "hi": "Face",
+   "group": "Look"
+  },
+  "backing": {
+   "kind": "color",
+   "label": "Backing",
+   "def": "#4a609c",
+   "swatches": [
+    "#4a609c",
+    "#9a6a3e",
+    "#f0ead8",
+    "#5a5f7a",
+    "#2f8f9d"
+   ],
+   "group": "Colors",
+   "when": {
+    "frame": [
+     "round",
+     "square"
+    ]
+   }
+  },
+  "skin": {
+   "kind": "color",
+   "label": "Skin",
+   "def": "#f6d3b0",
+   "swatches": [
+    "#f6d3b0",
+    "#e8b088",
+    "#c98a5c",
+    "#9a6240",
+    "#6e4428",
+    "#9bd18a",
+    "#b9a7e0"
+   ],
+   "group": "Colors"
+  },
+  "elder": {
+   "kind": "color",
+   "label": "Elder's robe",
+   "def": "#a8a4a0",
+   "swatches": [
+    "#a8a4a0",
+    "#e08a2c",
+    "#c9a06a",
+    "#8f97a8"
+   ],
+   "group": "Colors"
+  },
+  "merchant": {
+   "kind": "color",
+   "label": "Merchant's shirt",
+   "def": "#e6c96a",
+   "swatches": [
+    "#e6c96a",
+    "#e08a2c",
+    "#7fbf5a",
+    "#c9a06a",
+    "#7aa0f4",
+    "#4fd8ee",
+    "#a8c8d8"
+   ],
+   "group": "Colors"
+  },
+  "guard": {
+   "kind": "color",
+   "label": "Guard's tabard",
+   "def": "#3f6fd1",
+   "swatches": [
+    "#3f6fd1",
+    "#7a4fc4",
+    "#2f8f9d",
+    "#c9423a",
+    "#8e3a4a",
+    "#4f9d57"
+   ],
+   "group": "Colors"
+  },
+  "kid": {
+   "kind": "color",
+   "label": "Child's collar",
+   "def": "#c8553a",
+   "swatches": [
+    "#c8553a",
+    "#c9423a",
+    "#2f8f9d",
+    "#7a4fc4",
+    "#3f6fd1",
+    "#8e3a4a",
+    "#4f9d57"
+   ],
+   "group": "Colors"
+  }
+ },
+ "clips": {
+  "elder-neutral": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "elder-happy": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "elder-worried": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "merchant-neutral": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "merchant-happy": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "merchant-worried": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "guard-neutral": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "guard-happy": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "guard-worried": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "kid-neutral": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "kid-happy": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "kid-worried": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [],
+ "bundles": [
+  "kit-rpg-fantasy"
+ ]
+}

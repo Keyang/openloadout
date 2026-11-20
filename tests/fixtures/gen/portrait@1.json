@@ -1,0 +1,872 @@
+{
+ "id": "portrait",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     24,
+     24
+    ],
+    "skin": "skin",
+    "white": "white",
+    "backing": "backing",
+    "edge": "edge",
+    "hair": "short",
+    "hairPaint": "wood",
+    "hairLight": 0.4523,
+    "outfit": "hero",
+    "collar": "mantle",
+    "outfitPaints": {
+     "trim": "crimson",
+     "panel": "hero",
+     "clasp": "gold"
+    },
+    "build": 0.6,
+    "headgear": "helmet",
+    "gearPaints": {
+     "cloth": "roof",
+     "metal": "steel",
+     "plume": "crimson"
+    }
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      5,
+      3
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..................aaa...........",
+      ".............aaaaabbba..........",
+      "............abbbbbbbbba.........",
+      "..........aaabbbbbbbbba.........",
+      ".........abbbbbbbbbbbbba........",
+      ".........abbaaaaaaaaaaaaa.......",
+      ".........aaacccccccccccccaa.....",
+      "........aacdddddddddddddccca....",
+      ".......aadddddddddddddddddcca...",
+      ".......aeddddddddddddddddddcca..",
+      "......aeddddddddddddddddddddcca.",
+      "......aedddddddddddddddddddddca.",
+      ".....aeedddddddddddddddddddddcca",
+      ".....aedddddddaaaaaaaaaaaaaaaaaa",
+      ".....aeddddddacccccccccccccccccc",
+      "....aeeddddaaccccccccccccccccccc",
+      "....aaaaaaacccaaaaaddaaaaaaaaaaa",
+      "...acccccccccafffffddffffffghha.",
+      "...acccccccaaiiiiffddiiiiifghha.",
+      "....aaaaaaahgffffffffffffffghha.",
+      "....ahhhhhhhgaaaffffffaaaffghha.",
+      ".....ahhhhhhgjaaffffffjaaffghha.",
+      ".....ahhhhhhgjaaffffffjaafffgga.",
+      "......aakkggfaaafffflfaaafffffa.",
+      ".......alllffffffffflffffffffa..",
+      ".......allllfffffffllffffffffa..",
+      "........allllffffffffffffffffa..",
+      ".........allllffffaaaaffffffa...",
+      "..........alllllfffffffffffa....",
+      "...........alllllllffffflla.....",
+      "............aallllllllllla......",
+      "..............aaalllllaaa......."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "crimson",
+      "c": "steel",
+      "d": "steel.dark",
+      "e": "steel.deep",
+      "f": "skin",
+      "g": {
+       "rule": "ifLight",
+       "of": "skin",
+       "above": 0.20229999999999998,
+       "then": {
+        "rule": "ifLight",
+        "of": "skin",
+        "above": 0.7022999999999999,
+        "then": "skin",
+        "else": {
+         "rule": "tone",
+         "of": "wood",
+         "by": -1
+        }
+       },
+       "else": "skin"
+      },
+      "h": "wood",
+      "i": {
+       "rule": "ifLight",
+       "of": "skin",
+       "above": 0.7523,
+       "then": "wood",
+       "else": {
+        "rule": "ifLight",
+        "of": "skin",
+        "above": 0.1523,
+        "then": {
+         "rule": "ifLight",
+         "of": "skin",
+         "above": 0.5,
+         "then": {
+          "rule": "tone",
+          "of": "wood",
+          "by": -1
+         },
+         "else": "ink"
+        },
+        "else": "wood"
+       }
+      },
+      "j": "white",
+      "k": {
+       "rule": "ifLight",
+       "of": "skin",
+       "above": 0.20229999999999998,
+       "then": {
+        "rule": "ifLight",
+        "of": "skin",
+        "above": 0.7022999999999999,
+        "then": {
+         "rule": "ramp",
+         "of": "skin",
+         "tone": "dark"
+        },
+        "else": {
+         "rule": "tone",
+         "of": "wood",
+         "by": -1
+        }
+       },
+       "else": {
+        "rule": "ramp",
+        "of": "skin",
+        "tone": "dark"
+       }
+      },
+      "l": "skin.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      37,
+      3
+     ],
+     "anchor": "tl",
+     "rows": [
+      "....",
+      "....",
+      "....",
+      "....",
+      "....",
+      "....",
+      "....",
+      "....",
+      "....",
+      "....",
+      "....",
+      "....",
+      "....",
+      "....",
+      "a...",
+      "ba..",
+      "a...",
+      "....",
+      "....",
+      "....",
+      "....",
+      "....",
+      "....",
+      "....",
+      "....",
+      "....",
+      "....",
+      "....",
+      "....",
+      "....",
+      "....",
+      "...."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "steel"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      5,
+      35
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..............abbaaaaaa.........",
+      "............aaabbbbbbbaa........",
+      "........aaaaccabddddddacaaaa....",
+      ".....aaaccccccabbbbbbbacccccaaa.",
+      "...aaccccccccceaaaaaaaeeccccccca",
+      "..acccccceeeeaaaaafffaaeeeeeeccc",
+      ".aeccceeaaaaaggggafffagaaaaaeeec",
+      ".acccaaagggggggggafffaggggggaaee",
+      "aeccagggggggggggggaaagggggggggaa",
+      "aecagggggggggggggggggggggggggggg",
+      "aeaggggggggggggggggggggggggggggg",
+      ".aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "skin.dark",
+      "c": "crimson",
+      "d": "skin",
+      "e": "crimson.dark",
+      "f": "gold",
+      "g": "hero"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      37,
+      35
+     ],
+     "anchor": "tl",
+     "rows": [
+      "....",
+      "....",
+      "....",
+      "....",
+      "....",
+      "aa..",
+      "bba.",
+      "cba.",
+      "ccba",
+      "acca",
+      "daca",
+      "aaa."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "crimson",
+      "c": "crimson.dark",
+      "d": "hero"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     20,
+     30
+    ],
+    "skin": "skin",
+    "white": "white",
+    "backing": "backing",
+    "edge": "edge",
+    "hair": "short",
+    "hairPaint": "wood",
+    "hairLight": 0.4523,
+    "outfit": "cobble",
+    "collar": "tabard",
+    "outfitPaints": {
+     "trim": "wheat",
+     "panel": "hero"
+    },
+    "build": 0.9,
+    "headgear": "helmet",
+    "gearPaints": {
+     "cloth": "roof",
+     "metal": "steel",
+     "plume": "wheat"
+    },
+    "carried": "halberd",
+    "carriedPaints": {
+     "metal": "steel",
+     "wood": "wood"
+    },
+    "mood": "worried",
+    "zoom": 1,
+    "frame": "round"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      -3,
+      7
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..................aaaaaaaaaa....",
+      "...............aaabbbbbbbbbbaaa.",
+      ".............aabbbbbbbbbbbbbbbba",
+      "...........aabbbbbbaaaaaaaabbbbb",
+      ".........aabbbbaaaaccccccccaaaab",
+      "........aabbbaaaaacccccccccccaaa",
+      ".......abbbbaadacccccccccccccadd",
+      "......abbbaaddaccccccaaaaaaacadd",
+      ".....abbbaaddacccaaaaeeeeeeeaaaa",
+      "....aabbaadddacaaeeefffffffeeeee",
+      "....abbaadddaaaefffffffffffffffe",
+      "...abbbaeaddagffffffffffffffffff",
+      "...abbafeadagfffffffffffffffffff",
+      "..abbaafeadaffffffffffffffffffff",
+      "..abbaffeaagffffffffffffffffffff",
+      ".abbaaffeaggffffffffffffffffffff",
+      ".abbagggaaggffffffffffffffffffff",
+      ".abbaaaahagfffffffffffffffffffff",
+      "abbbadahhagfffffffffaaaaaaaaaaaa",
+      "abbaddahaggfffffffaaeeeeeeeeeeee",
+      "abbaddahaggfffffaaeeeeeeeeeeeeee",
+      "abbaddahaggffffaeeeeaaaaaffaaaaa",
+      "abbaddahaaaaaaaeeeaaijjiiffijjii",
+      "abbaddaaeeeeeeeeaaijjiiiiffiiijj",
+      "abbaddaaeeeeeeeahkjiiiiiiiiiiiii",
+      "abbaddahaaaaaaahhkiaaaiiiiiiiaaa",
+      "abbaddahahhhhhhhhkilaaiiiiiiilaa",
+      "abbbadahahhhhhhhhkilaaiiiiiiilaa",
+      ".abbadahhahhhhhhhkiaaaiiiimiiaaa",
+      ".abbadahhaaannnkkiiiiiiiiimiiiii",
+      ".abbaaahhadammmiiiiiiiiiimmiiiii",
+      "..abbaahhaddammmiiiiiiiiiiiiiiii"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "edge",
+      "c": "wheat",
+      "d": "backing",
+      "e": "steel",
+      "f": "steel.dark",
+      "g": "steel.deep",
+      "h": "wood",
+      "i": "skin",
+      "j": {
+       "rule": "ifLight",
+       "of": "skin",
+       "above": 0.7523,
+       "then": "wood",
+       "else": {
+        "rule": "ifLight",
+        "of": "skin",
+        "above": 0.1523,
+        "then": {
+         "rule": "ifLight",
+         "of": "skin",
+         "above": 0.5,
+         "then": {
+          "rule": "tone",
+          "of": "wood",
+          "by": -1
+         },
+         "else": "ink"
+        },
+        "else": "wood"
+       }
+      },
+      "k": {
+       "rule": "ifLight",
+       "of": "skin",
+       "above": 0.20229999999999998,
+       "then": {
+        "rule": "ifLight",
+        "of": "skin",
+        "above": 0.7022999999999999,
+        "then": "skin",
+        "else": {
+         "rule": "tone",
+         "of": "wood",
+         "by": -1
+        }
+       },
+       "else": "skin"
+      },
+      "l": "white",
+      "m": "skin.dark",
+      "n": {
+       "rule": "ifLight",
+       "of": "skin",
+       "above": 0.20229999999999998,
+       "then": {
+        "rule": "ifLight",
+        "of": "skin",
+        "above": 0.7022999999999999,
+        "then": {
+         "rule": "ramp",
+         "of": "skin",
+         "tone": "dark"
+        },
+        "else": {
+         "rule": "tone",
+         "of": "wood",
+         "by": -1
+        }
+       },
+       "else": {
+        "rule": "ramp",
+        "of": "skin",
+        "tone": "dark"
+       }
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      29,
+      7
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..............",
+      "..............",
+      "a.............",
+      "baa...........",
+      "bbbaa.........",
+      "abbbaa........",
+      "aabbbba.......",
+      "ccaabbba......",
+      "cccaabbba.....",
+      "aaccaabbaa....",
+      "ddaacaabba....",
+      "edddacabbba...",
+      "eeeddacabba...",
+      "eeeedacaabba..",
+      "eeeeddacabba..",
+      "eeaeeddaaabba.",
+      "eafaeedacabba.",
+      "affaeedacabba.",
+      "affaaaaaaabbba",
+      "affadddddaabba",
+      "daaddddddaabba",
+      "aaaaaaaaacabba",
+      "gghiiiacccabba",
+      "gghiiiacccabba",
+      "jghiiiacccabba",
+      "gghiiiacccabba",
+      "gghiiiacccabba",
+      "ggghhhaccabbba",
+      "ggggggaccabba.",
+      "gggggacccabba.",
+      "gggggaccaabba.",
+      "gggggaccabba.."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "edge",
+      "c": "backing",
+      "d": "steel",
+      "e": "steel.dark",
+      "f": "white",
+      "g": "skin",
+      "h": {
+       "rule": "ifLight",
+       "of": "skin",
+       "above": 0.20229999999999998,
+       "then": {
+        "rule": "ifLight",
+        "of": "skin",
+        "above": 0.7022999999999999,
+        "then": "skin",
+        "else": {
+         "rule": "tone",
+         "of": "wood",
+         "by": -1
+        }
+       },
+       "else": "skin"
+      },
+      "i": "wood",
+      "j": {
+       "rule": "ifLight",
+       "of": "skin",
+       "above": 0.7523,
+       "then": "wood",
+       "else": {
+        "rule": "ifLight",
+        "of": "skin",
+        "above": 0.1523,
+        "then": {
+         "rule": "ifLight",
+         "of": "skin",
+         "above": 0.5,
+         "then": {
+          "rule": "tone",
+          "of": "wood",
+          "by": -1
+         },
+         "else": "ink"
+        },
+        "else": "wood"
+       }
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      -3,
+      39
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..abbaaccaddaeeeefffffffffffffff",
+      "...abbaccadddaeeeeffffffaaafffff",
+      "...abbbacaddddaeeeeffffafffaffff",
+      "....abbaaddddddaeeeeefffffffffff",
+      "....aabbaaddddddaeeeeeeeefffffee",
+      ".....abbbaaddddddaaeeeeeeeeeeeee",
+      "......abbbaadddddddaaaaeeeeeaaaa",
+      ".......abbbbaaddddddaeeaaaaaeadd",
+      "........aabbbaaadddaaeeeeeeeeaaa",
+      ".........aabbbbaaaagaefffffaaaab",
+      "...........aabbbbbbaaaaaaaabbbbb",
+      ".............aabbbbbbbbbbbbbbbba",
+      "...............aaabbbbbbbbbbaaa.",
+      "..................aaaaaaaaaa...."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "edge",
+      "c": "wood",
+      "d": "backing",
+      "e": "skin.dark",
+      "f": "skin",
+      "g": "cobble.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      29,
+      39
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaabccbbddb..",
+      "aaaabccbddb...",
+      "aaabccbdddb...",
+      "aabccbbddb....",
+      "ebccbbddbb....",
+      "bccbbdddb.....",
+      "ccbbdddb......",
+      "bbddddb.......",
+      "bdddbb........",
+      "dddbb.........",
+      "dbb...........",
+      "b.............",
+      "..............",
+      ".............."
+     ],
+     "key": {
+      "a": "skin",
+      "b": "ink",
+      "c": "backing",
+      "d": "edge",
+      "e": "skin.dark"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     24,
+     24
+    ],
+    "skin": "skin",
+    "white": "white",
+    "backing": "backing",
+    "edge": "edge",
+    "hair": "long",
+    "hairPaint": "cream",
+    "hairLight": 0.9166,
+    "outfit": "mage",
+    "collar": "vee",
+    "outfitPaints": {
+     "trim": "gold",
+     "panel": "hero"
+    },
+    "age": "elder",
+    "build": 0.7,
+    "brows": "bushy",
+    "beard": "long",
+    "beardPaint": "cream",
+    "beardLight": 0.9166,
+    "headgear": "hat-pointed",
+    "gearPaints": {
+     "cloth": "mage",
+     "metal": "steel",
+     "band": "gold"
+    },
+    "talk": true,
+    "frame": "square",
+    "zoom": 0
+   },
+   "ctx": {
+    "frame": 2,
+    "frames": 4,
+    "loop": true,
+    "size": [
+     48,
+     48
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      1,
+      1
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      ".abbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "abbaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "abbaccccccccccccccccccaaaaadddac",
+      "abbacccccccccccccccccaedddddeacc",
+      "abbacccccccccccccccccaddddddaccc",
+      "abbacccccccccccccccaadddddaacccc",
+      "abbaccccccccccccccaddddddddacccc",
+      "abbacccccccccccaaaddddddddddaacc",
+      "abbaccccccccccafffffffffffffffac",
+      "abbacccccccccaffffffaaaaaafffffa",
+      "abbacccccccaaaaaaaaaddddddaaaaaa",
+      "abbacccccaaddddddddddddddddddddd",
+      "abbaccccaedddddddddddddddddddddd",
+      "abbaccccaeeeeedddddddddddddddddd",
+      "abbacccccaaaaeeeeeeeeeeeeeeeeeee",
+      "abbacccccccagaaaaaaaaaaaaaaaaaaa",
+      "abbacccccccaggggghhhhiiihhhhijgg",
+      "abbacccccccagggggjiiiiiiiiiiijgg",
+      "abbacccccccagggggjiiiiiiiiiiijgg",
+      "abbacccccccagggggjaaiiiiiaaiijgg",
+      "abbacccccccagggggjkaiiiiikaiijgg",
+      "abbacccccccaggglgjaaillmiaaiiijl",
+      "abbacccccccalnloliiilggmlliiiilg",
+      "abbacccccccaoalollllggmmgglllllg",
+      "abbacccccccaogloolggggggggglgggg",
+      "abbacccccccaogloolggakkkaggglggl",
+      "abbacccccccaoglooollaaaaalllgggl",
+      "abbacccccccaogglooooaaaaagggggao",
+      "abbacccccccaogggaooogggggggggaao",
+      "abbacccccccaogggaaoooggggggggaao"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "edge",
+      "c": "backing",
+      "d": "mage",
+      "e": "mage.dark",
+      "f": "gold",
+      "g": "cream",
+      "h": {
+       "rule": "ifLight",
+       "of": "skin",
+       "above": 0.6166,
+       "then": {
+        "rule": "ifLight",
+        "of": "skin",
+        "above": 0.5,
+        "then": {
+         "rule": "tone",
+         "of": "cream",
+         "by": -1
+        },
+        "else": "ink"
+       },
+       "else": "cream"
+      },
+      "i": "skin",
+      "j": {
+       "rule": "ifLight",
+       "of": "skin",
+       "above": 0.6666,
+       "then": {
+        "rule": "tone",
+        "of": "cream",
+        "by": -1
+       },
+       "else": "skin"
+      },
+      "k": "white",
+      "l": {
+       "rule": "ifLight",
+       "of": "skin",
+       "above": 0.6666,
+       "then": {
+        "rule": "tone",
+        "of": "cream",
+        "by": -1
+       },
+       "else": {
+        "rule": "ramp",
+        "of": "cream",
+        "tone": "dark"
+       }
+      },
+      "m": "skin.dark",
+      "n": {
+       "rule": "ifLight",
+       "of": "skin",
+       "above": 0.6666,
+       "then": {
+        "rule": "tone",
+        "of": "cream",
+        "by": -1
+       },
+       "else": "ink"
+      },
+      "o": "cream.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      33,
+      1
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaaaaaaa..",
+      "bbbbbbbbbbbba.",
+      "bbbbbbbbbbbbba",
+      "aaaaaaaaaaabba",
+      "ccccccccccabba",
+      "ccccccccccabba",
+      "ccccccccccabba",
+      "ccccccccccabba",
+      "ccccccccccabba",
+      "ccccccccccabba",
+      "ccccccccccabba",
+      "ccccccccccabba",
+      "aaacccccccabba",
+      "dddaacccccabba",
+      "dddddaccccabba",
+      "deeeacccccabba",
+      "aaaaccccccabba",
+      "faccccccccabba",
+      "acccccccccabba",
+      "gaccccccccabba",
+      "gaccccccccabba",
+      "gaccccccccabba",
+      "gaccccccccabba",
+      "haccccccccabba",
+      "faccccccccabba",
+      "haccccccccabba",
+      "haccccccccabba",
+      "faccccccccabba",
+      "faccccccccabba",
+      "faccccccccabba",
+      "faccccccccabba",
+      "iaccccccccabba"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "edge",
+      "c": "backing",
+      "d": "mage",
+      "e": "mage.dark",
+      "f": "cream",
+      "g": {
+       "rule": "ifLight",
+       "of": "skin",
+       "above": 0.6666,
+       "then": {
+        "rule": "tone",
+        "of": "cream",
+        "by": -1
+       },
+       "else": "ink"
+      },
+      "h": {
+       "rule": "ifLight",
+       "of": "skin",
+       "above": 0.6666,
+       "then": {
+        "rule": "tone",
+        "of": "cream",
+        "by": -1
+       },
+       "else": {
+        "rule": "ramp",
+        "of": "cream",
+        "tone": "dark"
+       }
+      },
+      "i": "cream.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      1,
+      33
+     ],
+     "anchor": "tl",
+     "rows": [
+      "abbacccccccadeeeaadddeeeeeeeaaaa",
+      "abbacccccccadeeeafadddeeeeeaffaa",
+      "abbaccccccaadddaffadddeeeeafffag",
+      "abbacccccahhaaaafffadddeeeaffagg",
+      "abbacccccahhggggaffaddddeafffagg",
+      "abbacccccahhggggafffaddddaffaggg",
+      "abbacccccahhgggggafffaddaffagggg",
+      "abbacccccahhgggggafffiaafffagggg",
+      "abbacccccahhggggggafffiiffaggggg",
+      "abbacccccahhgggggggaffifffaggggg",
+      "abbaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      ".abbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "edge",
+      "c": "backing",
+      "d": "cream.dark",
+      "e": "cream",
+      "f": "gold",
+      "g": "mage",
+      "h": "mage.dark",
+      "i": "skin"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      33,
+      33
+     ],
+     "anchor": "tl",
+     "rows": [
+      "abbbbbbbbbacca",
+      "bbbbbbbbbbacca",
+      "aabbbbbbbbacca",
+      "ddabbbbbbbacca",
+      "ddabbbbbbbacca",
+      "ddabbbbbbbacca",
+      "ddabbbbbbbacca",
+      "ddabbbbbbbacca",
+      "ddabbbbbbbacca",
+      "ddabbbbbbbacca",
+      "aaaaaaaaaaacca",
+      "ccccccccccccca",
+      "cccccccccccca.",
+      "aaaaaaaaaaaa.."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "backing",
+      "c": "edge",
+      "d": "mage"
+     }
+    }
+   ]
+  }
+ ]
+}

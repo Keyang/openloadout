@@ -1,0 +1,204 @@
+{
+ "id": "ui-bars-rpg",
+ "frozen": "2026-11-20",
+ "source": "sprites/ui-bars-rpg.js",
+ "sha256": "d024f15bc85de9dc70100e57c3e28da173bef00eea95d54fbe8e323afa0948c8",
+ "name": "Health and magic bars",
+ "blurb": "A bar housing with three fill strips (health, magic, a turn gauge) and a white flash; change its style, corners, border and colours.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/bar",
+  "themes": [
+   "fantasy",
+   "neutral"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "top-down-rpg",
+   "arcade"
+  ],
+  "view": "none",
+  "words": [
+   "bar",
+   "health",
+   "life",
+   "magic",
+   "mana",
+   "gauge",
+   "meter",
+   "hud",
+   "status",
+   "fill",
+   "drain",
+   "flash"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  64,
+  16
+ ],
+ "pivot": [
+  32,
+  8
+ ],
+ "grounded": false,
+ "preview": "frame",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "solid",
+   "options": [
+    {
+     "value": "solid",
+     "label": "Solid"
+    },
+    {
+     "value": "segmented",
+     "label": "Segmented"
+    },
+    {
+     "value": "ornate",
+     "label": "Ornate"
+    }
+   ],
+   "group": "Look"
+  },
+  "corner": {
+   "kind": "range",
+   "label": "Corner",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Square",
+   "hi": "Round",
+   "group": "Look"
+  },
+  "border": {
+   "kind": "range",
+   "label": "Border",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Thin",
+   "hi": "Thick",
+   "group": "Look"
+  },
+  "shine": {
+   "kind": "toggle",
+   "label": "Shine",
+   "def": true,
+   "group": "Look"
+  },
+  "frame": {
+   "kind": "color",
+   "label": "Frame",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#f6d3b0",
+    "#c9d2dd",
+    "#fdf277",
+    "#a7e5fa"
+   ],
+   "group": "Colors"
+  },
+  "fill": {
+   "kind": "color",
+   "label": "Health",
+   "def": "#7fe0a0",
+   "swatches": [
+    "#7fe0a0",
+    "#7fbf5a",
+    "#c9423a",
+    "#c8553a",
+    "#f4e06a",
+    "#4fd8ee"
+   ],
+   "group": "Colors"
+  },
+  "fillB": {
+   "kind": "color",
+   "label": "Magic",
+   "def": "#3f6fd1",
+   "swatches": [
+    "#3f6fd1",
+    "#7a4fc4",
+    "#4fa8d8",
+    "#2f8f9d",
+    "#4fd8ee",
+    "#7aa0f4"
+   ],
+   "group": "Colors"
+  },
+  "fillC": {
+   "kind": "color",
+   "label": "Gauge",
+   "def": "#f2c230",
+   "swatches": [
+    "#f2c230",
+    "#e8662c",
+    "#f4e06a",
+    "#e6c96a",
+    "#f0ead8",
+    "#c2c9d6"
+   ],
+   "group": "Colors"
+  }
+ },
+ "clips": {
+  "frame": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "fill": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "fill-b": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "fill-c": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "flash": {
+   "frames": 4,
+   "loop": false,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [],
+ "bundles": [
+  "kit-rpg-fantasy"
+ ]
+}

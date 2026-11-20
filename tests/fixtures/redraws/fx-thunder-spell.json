@@ -1,0 +1,171 @@
+{
+ "id": "fx-thunder-spell",
+ "frozen": "2026-11-20",
+ "source": "sprites/fx-thunder-spell.js",
+ "sha256": "d8795fbb9cc413e07b374a73582da938fde36e58a8e256ee9f270d0ee4ad1eea",
+ "name": "Thunder spell",
+ "blurb": "A lightning bolt that strikes the target from above and leaves sparks skittering on the ground. Change its width, forks, zigzag, style, sparks and colours.",
+ "meta": {
+  "type": "effect",
+  "role": "effects/magic",
+  "themes": [
+   "fantasy"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "roguelike-action",
+   "platformer"
+  ],
+  "view": "side",
+  "words": [
+   "thunder",
+   "lightning",
+   "bolt",
+   "spell",
+   "magic",
+   "strike",
+   "shock",
+   "storm",
+   "electric",
+   "zap",
+   "attack",
+   "flash",
+   "spark"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  64,
+  96
+ ],
+ "pivot": [
+  32,
+  90
+ ],
+ "grounded": false,
+ "preview": "burst",
+ "params": {
+  "width": {
+   "kind": "range",
+   "label": "Width",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Narrow",
+   "hi": "Wide",
+   "group": "Look"
+  },
+  "pieces": {
+   "kind": "range",
+   "label": "Forks",
+   "def": 3,
+   "min": 1,
+   "max": 5,
+   "step": 1,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "wobble": {
+   "kind": "range",
+   "label": "Zigzag",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Smooth",
+   "hi": "Jagged",
+   "group": "Look"
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "bolt",
+   "options": [
+    {
+     "value": "bolt",
+     "label": "Bolt"
+    },
+    {
+     "value": "chain",
+     "label": "Chain"
+    },
+    {
+     "value": "pillar",
+     "label": "Pillar"
+    }
+   ],
+   "group": "Look"
+  },
+  "sparks": {
+   "kind": "toggle",
+   "label": "Sparks",
+   "def": true,
+   "group": "Look"
+  },
+  "core": {
+   "kind": "color",
+   "label": "Core",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#f6d3b0",
+    "#9fd8f4",
+    "#a8c8d8"
+   ],
+   "group": "Colors"
+  },
+  "edge": {
+   "kind": "color",
+   "label": "Edge",
+   "def": "#f4e06a",
+   "swatches": [
+    "#f4e06a",
+    "#e8662c",
+    "#7a4fc4",
+    "#2f8f9d",
+    "#c9423a",
+    "#7fe0a0",
+    "#7aa0f4"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "burst": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    9,
+    15,
+    20
+   ]
+  }
+ },
+ "sounds": {
+  "burst": [
+   {
+    "sound": "thunder-crack",
+    "preset": "Thunder spell",
+    "frame": 1,
+    "volume": 1
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-rpg-fantasy"
+ ]
+}

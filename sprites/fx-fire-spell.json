@@ -1,0 +1,36 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "fx-fire-spell",
+ "name": "Fire spell",
+ "blurb": "A fire spell for a battle screen: flames erupt under the target, and sparks gather into a flame in the caster's hand. Change its size, height, tongues, style, embers, flicker and colours.",
+ "meta": {"type":"effect","role":"effects/magic","themes":["fantasy"],"gameTypes":["turn-based-rpg","roguelike-action","platformer"],"view":"side","words":["fire","flame","spell","magic","burn","blaze","pillar","eruption","ember","cast","attack","inferno","hot"],"license":"draft"},
+ "size": [64,64],
+ "pivot": [32,58],
+ "grounded": false,
+ "preview": "burst",
+ "styles": ["pixel"],
+ "palette": [
+  {"id":"core","label":"Core","default":"#f4e06a","material":"fire","swatches":["#f4e06a","#f0ead8","#f6d3b0","#9fd8f4"]},
+  {"id":"edge","label":"Edge","default":"#e8662c","material":"fire","swatches":["#e8662c","#7a4fc4","#2f8f9d","#c9423a","#7fe0a0","#7aa0f4"]}
+ ],
+ "controls": [
+  {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+  {"key":"height","kind":"range","label":"Height","lo":"Short","hi":"Tall","default":0.5},
+  {"key":"pieces","kind":"range","label":"Tongues","lo":"Few","hi":"Many","default":5,"min":3,"max":7,"step":1},
+  {"key":"style","kind":"choice","label":"Style","options":["pillar","ball","ring"],"default":"pillar"},
+  {"key":"sparks","kind":"toggle","label":"Embers","default":true},
+  {"key":"core","kind":"colour","label":"Core"},
+  {"key":"edge","kind":"colour","label":"Edge"},
+  {"key":"flicker","kind":"range","label":"Flicker","lo":"Steady","hi":"Wild","default":0.5,"group":"Motion"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": { "emitters": [
+  {"id":"burst","gen":"effect.fx-fire-spell","v":1,"clip":["burst"],"picture":"burst","at":[32,58],"size":{"from":"size","map":[[0,0],[1,1]]},"height":{"from":"height","map":[[0,0],[1,1]]},"pieces":{"from":"pieces","map":[[3,3],[7,7]],"round":"px"},"style":{"from":"style","pick":{"pillar":"pillar","ball":"ball","ring":"ring"}},"sparks":{"from":"sparks","pick":{"true":true,"false":false}},"core":"core","edge":"edge","flicker":{"from":"flicker","map":[[0,0],[1,1]]}},
+  {"id":"cast","gen":"effect.fx-fire-spell","v":1,"clip":["cast"],"picture":"cast","at":[32,58],"size":{"from":"size","map":[[0,0],[1,1]]},"height":{"from":"height","map":[[0,0],[1,1]]},"pieces":{"from":"pieces","map":[[3,3],[7,7]],"round":"px"},"style":{"from":"style","pick":{"pillar":"pillar","ball":"ball","ring":"ring"}},"sparks":{"from":"sparks","pick":{"true":true,"false":false}},"core":"core","edge":"edge","flicker":{"from":"flicker","map":[[0,0],[1,1]]}}
+ ] },
+ "clips": {
+  "burst": {"frames":10,"fps":14,"loop":false,"sounds":[{"sound":"wyrm-roar","preset":"Fire breath","frame":1,"volume":0.8}]},
+  "cast": {"frames":8,"fps":12,"loop":false,"sounds":[{"sound":"magic-spell","preset":"Quick zap","frame":1,"volume":0.8}]}
+ }
+}

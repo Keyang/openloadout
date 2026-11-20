@@ -1,0 +1,247 @@
+{
+ "id": "icons-map",
+ "frozen": "2026-11-20",
+ "source": "sprites/icons-map.js",
+ "sha256": "74a4e4da2aae425e00b5465f013bd87eb142136e3799d0597c8863e738473d8b",
+ "name": "Map marker icons",
+ "blurb": "Eight map marks for a world map or a quest log, from a pin and a flag to a dig spot, a town, a shop, treasure, danger and \"you are here\"; show them as pictures or on pin badges and change their weight, shine, size and colours.",
+ "meta": {
+  "type": "icon",
+  "role": "interface/icon",
+  "themes": [
+   "neutral",
+   "fantasy",
+   "farm"
+  ],
+  "gameTypes": [
+   "top-down-rpg",
+   "turn-based-rpg",
+   "farming-sim",
+   "roguelike-action"
+  ],
+  "view": "none",
+  "words": [
+   "map",
+   "marker",
+   "pin",
+   "waypoint",
+   "flag",
+   "quest",
+   "dig",
+   "town",
+   "shop",
+   "treasure",
+   "danger",
+   "you are here",
+   "minimap",
+   "location"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "pin",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "picture",
+   "options": [
+    {
+     "value": "picture",
+     "label": "Picture"
+    },
+    {
+     "value": "badge",
+     "label": "Badge"
+    }
+   ],
+   "group": "Look"
+  },
+  "bold": {
+   "kind": "toggle",
+   "label": "Bold",
+   "def": false,
+   "group": "Look"
+  },
+  "shine": {
+   "kind": "toggle",
+   "label": "Shine",
+   "def": true,
+   "group": "Look"
+  },
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "face": {
+   "kind": "color",
+   "label": "Badge colour",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#9bd18a",
+    "#8fd0f0",
+    "#f6d3b0",
+    "#7fb0b8"
+   ],
+   "group": "Colors",
+   "when": {
+    "style": [
+     "badge"
+    ]
+   }
+  },
+  "body": {
+   "kind": "color",
+   "label": "Marker",
+   "def": "#c9423a",
+   "swatches": [
+    "#c9423a",
+    "#3f6fd1",
+    "#f2c230",
+    "#3f8a4f",
+    "#7a4fc4",
+    "#e08a2c"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Second colour",
+   "def": "#a06a3c",
+   "swatches": [
+    "#a06a3c",
+    "#7a4f33",
+    "#c2c9d6",
+    "#5d6475"
+   ],
+   "group": "Colors"
+  }
+ },
+ "clips": {
+  "pin": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "flag": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "dig": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "town": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "shop": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "treasure": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "danger": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "here": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [
+  {
+   "name": "Map marks",
+   "params": {}
+  },
+  {
+   "name": "Pin badges",
+   "params": {
+    "style": "badge"
+   }
+  },
+  {
+   "name": "Blue route",
+   "params": {
+    "body": "#3f6fd1",
+    "accent": "#5d6475"
+   }
+  },
+  {
+   "name": "Bold and big",
+   "params": {
+    "bold": true,
+    "size": 1
+   }
+  },
+  {
+   "name": "Gold quest",
+   "params": {
+    "body": "#f2c230",
+    "accent": "#7a4f33",
+    "style": "badge",
+    "face": "#9bd18a"
+   }
+  }
+ ],
+ "bundles": []
+}

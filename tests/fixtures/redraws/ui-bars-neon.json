@@ -1,0 +1,263 @@
+{
+ "id": "ui-bars-neon",
+ "frozen": "2026-11-20",
+ "source": "sprites/ui-bars-neon.js",
+ "sha256": "65f82bce636f289c93095a2136f388c7de87cf10391df0335274fa186859d918",
+ "name": "Neon bars and slider",
+ "blurb": "A bar housing outlined in a glowing neon tube with three fill strips (health, magic, a gauge), a white flash, a slider track and its knob; change the style, corners, tube thickness, glow and colours.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/bar",
+  "themes": [
+   "neutral",
+   "sci-fi",
+   "city"
+  ],
+  "gameTypes": [
+   "arcade",
+   "shooter",
+   "racing",
+   "roguelike-action"
+  ],
+  "view": "none",
+  "words": [
+   "bar",
+   "health",
+   "energy",
+   "slider",
+   "meter",
+   "progress",
+   "neon",
+   "glow",
+   "tube",
+   "night"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  64,
+  16
+ ],
+ "pivot": [
+  32,
+  8
+ ],
+ "grounded": false,
+ "preview": "frame",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "tube",
+   "options": [
+    {
+     "value": "tube",
+     "label": "Tube"
+    },
+    {
+     "value": "double",
+     "label": "Double"
+    },
+    {
+     "value": "sign",
+     "label": "Sign"
+    }
+   ],
+   "group": "Look"
+  },
+  "corner": {
+   "kind": "range",
+   "label": "Corner",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Square",
+   "hi": "Round",
+   "group": "Look"
+  },
+  "border": {
+   "kind": "range",
+   "label": "Border",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Thin",
+   "hi": "Thick",
+   "group": "Look"
+  },
+  "halo": {
+   "kind": "toggle",
+   "label": "Glow",
+   "def": true,
+   "group": "Look"
+  },
+  "frame": {
+   "kind": "color",
+   "label": "Tube",
+   "def": "#8fd0f0",
+   "swatches": [
+    "#8fd0f0",
+    "#9bd18a",
+    "#c2c9d6",
+    "#5fe0f0",
+    "#7fe0a0"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Second tube",
+   "def": "#e08a2c",
+   "swatches": [
+    "#e08a2c",
+    "#7a4fc4",
+    "#f2c230",
+    "#b48af8",
+    "#ca9eda"
+   ],
+   "group": "Colors",
+   "when": {
+    "style": [
+     "double"
+    ]
+   }
+  },
+  "fill": {
+   "kind": "color",
+   "label": "Health",
+   "def": "#6aa83e",
+   "swatches": [
+    "#6aa83e",
+    "#3f8a4f",
+    "#c9423a",
+    "#e08a2c",
+    "#4fd8ee",
+    "#f2c230"
+   ],
+   "group": "Colors"
+  },
+  "fillB": {
+   "kind": "color",
+   "label": "Magic",
+   "def": "#3f6fd1",
+   "swatches": [
+    "#3f6fd1",
+    "#3f9fd1",
+    "#4fd8ee",
+    "#8fd0f0",
+    "#4f9ff0"
+   ],
+   "group": "Colors"
+  },
+  "fillC": {
+   "kind": "color",
+   "label": "Gauge",
+   "def": "#f2c230",
+   "swatches": [
+    "#f2c230",
+    "#e08a2c",
+    "#a4c44a",
+    "#a06a3c",
+    "#c2c9d6"
+   ],
+   "group": "Colors"
+  }
+ },
+ "clips": {
+  "frame": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "fill": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "fill-b": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "fill-c": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "flash": {
+   "frames": 4,
+   "loop": false,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "slider": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "knob": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [
+  {
+   "name": "Sky bars",
+   "params": {}
+  },
+  {
+   "name": "Double",
+   "params": {
+    "style": "double",
+    "accent": "#7a4fc4"
+   }
+  },
+  {
+   "name": "Cyan sign",
+   "params": {
+    "style": "sign",
+    "frame": "#5fe0f0"
+   }
+  },
+  {
+   "name": "Mint, no glow",
+   "params": {
+    "halo": false,
+    "frame": "#9bd18a",
+    "fill": "#4fd8ee"
+   }
+  }
+ ],
+ "bundles": []
+}

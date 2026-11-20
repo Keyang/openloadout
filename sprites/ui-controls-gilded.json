@@ -1,0 +1,972 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "ui-controls-gilded",
+ "name": "Stone and gold checkboxes",
+ "blurb": "The small pieces of a settings screen in carved stone and gold: a ticked and an empty box, a round gem option, an on/off switch, a gold arrow pointer with a gem and corner brackets round a chosen slot; change the style, corners, band, colours and speed.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/cursor",
+  "themes": [
+   "neutral",
+   "fantasy",
+   "dungeon"
+  ],
+  "gameTypes": [
+   "arcade",
+   "turn-based-rpg",
+   "top-down-rpg",
+   "card-game"
+  ],
+  "view": "none",
+  "words": [
+   "checkbox",
+   "tick",
+   "option",
+   "radio",
+   "switch",
+   "toggle",
+   "pointer",
+   "cursor",
+   "arrow",
+   "select",
+   "settings",
+   "stone",
+   "gold",
+   "gem"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "check-on",
+ "styles": [
+  "pixel"
+ ],
+ "palette": [
+  {
+   "id": "face",
+   "label": "Stone",
+   "default": "#3f5068",
+   "material": "interface",
+   "swatches": [
+    "#3f5068",
+    "#7a4f33",
+    "#434d6d",
+    "#8e3a4a"
+   ]
+  },
+  {
+   "id": "frame",
+   "label": "Gold",
+   "default": "#f0ead8",
+   "material": "interface",
+   "swatches": [
+    "#f0ead8",
+    "#c2c9d6",
+    "#f6d3b0",
+    "#f4e06a",
+    "#e6c96a"
+   ]
+  },
+  {
+   "id": "accent",
+   "label": "Gems and tick",
+   "default": "#4fd8ee",
+   "material": "interface",
+   "swatches": [
+    "#4fd8ee",
+    "#c9423a",
+    "#a4c44a",
+    "#3f6fd1",
+    "#e08a2c"
+   ]
+  }
+ ],
+ "controls": [
+  {
+   "key": "style",
+   "kind": "choice",
+   "label": "Style",
+   "options": [
+    {
+     "value": "temple",
+     "label": "Temple"
+    },
+    {
+     "value": "royal",
+     "label": "Royal"
+    },
+    {
+     "value": "ruin",
+     "label": "Ruin"
+    }
+   ],
+   "default": "temple",
+   "group": "Look"
+  },
+  {
+   "key": "corner",
+   "kind": "range",
+   "label": "Corner",
+   "lo": "Square",
+   "hi": "Round",
+   "default": 0.5,
+   "group": "Look"
+  },
+  {
+   "key": "border",
+   "kind": "range",
+   "label": "Border",
+   "lo": "Thin",
+   "hi": "Thick",
+   "default": 0.5,
+   "group": "Look"
+  },
+  {
+   "key": "face",
+   "kind": "colour",
+   "label": "Stone",
+   "group": "Colors"
+  },
+  {
+   "key": "frame",
+   "kind": "colour",
+   "label": "Gold",
+   "group": "Colors"
+  },
+  {
+   "key": "accent",
+   "kind": "colour",
+   "label": "Gems and tick",
+   "group": "Colors"
+  },
+  {
+   "key": "speed",
+   "standard": "speed"
+  }
+ ],
+ "versions": [
+  {
+   "name": "Temple",
+   "params": {}
+  },
+  {
+   "name": "Royal ruby",
+   "params": {
+    "style": "royal",
+    "accent": "#c9423a"
+   }
+  },
+  {
+   "name": "Ruin",
+   "params": {
+    "style": "ruin",
+    "face": "#7a4f33",
+    "frame": "#e6c96a"
+   }
+  },
+  {
+   "name": "Silver",
+   "params": {
+    "frame": "#c2c9d6",
+    "accent": "#3f6fd1"
+   }
+  },
+  {
+   "name": "Bright gold",
+   "params": {
+    "frame": "#f4e06a",
+    "accent": "#a4c44a"
+   }
+  }
+ ],
+ "body": {
+  "panel": {
+   "skin": {
+    "use": "skin:gilded",
+    "v": 3,
+    "paint": {
+     "face": "face",
+     "frame": "frame",
+     "accent": "accent"
+    }
+   },
+   "piece": {
+    "gen": "ui.toggle",
+    "v": 2,
+    "clip": [
+     "check-on"
+    ],
+    "style": {
+     "from": "style"
+    },
+    "corner": {
+     "from": "corner",
+     "map": [
+      [
+       0,
+       1
+      ],
+      [
+       0.5,
+       3
+      ],
+      [
+       1,
+       3
+      ]
+     ],
+     "round": "px"
+    },
+    "border": {
+     "from": "border",
+     "map": [
+      [
+       0,
+       1
+      ],
+      [
+       0.249,
+       1
+      ],
+      [
+       0.25,
+       2
+      ],
+      [
+       1,
+       2
+      ]
+     ],
+     "round": "px"
+    },
+    "kind": "check",
+    "checked": true,
+    "at": [
+     16,
+     16
+    ],
+    "size": 20,
+    "trim": [],
+    "topTrim": [],
+    "rightTrim": [],
+    "along": [],
+    "gleamTrim": [],
+    "gleamTop": [],
+    "gleamRight": [],
+    "lit": false,
+    "bevel": "skin",
+    "bevelDepth": 1,
+    "rings": [
+     "ink",
+     "frame",
+     "ink"
+    ],
+    "bandAt": 1,
+    "fillet": {
+     "from": "style",
+     "pick": {
+      "temple": true,
+      "royal": false,
+      "ruin": false
+     }
+    },
+    "plate": {
+     "from": "style"
+    },
+    "plateSize": 4,
+    "edge": {
+     "from": "style",
+     "pick": {
+      "temple": "cut",
+      "royal": "round",
+      "ruin": "chip"
+     }
+    },
+    "cracks": {
+     "from": "style",
+     "pick": {
+      "temple": false,
+      "royal": false,
+      "ruin": true
+     }
+    }
+   },
+   "states": [
+    "check-on",
+    "check-off",
+    "radio-on",
+    "radio-off",
+    "switch-on",
+    "switch-off",
+    "pointer",
+    "selector"
+   ],
+   "draw": [
+    {
+     "gen": "ui.toggle",
+     "v": 2,
+     "clip": [
+      "check-off"
+     ],
+     "style": {
+      "from": "style"
+     },
+     "corner": {
+      "from": "corner",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.5,
+        3
+       ],
+       [
+        1,
+        3
+       ]
+      ],
+      "round": "px"
+     },
+     "border": {
+      "from": "border",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.249,
+        1
+       ],
+       [
+        0.25,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "kind": "check",
+     "checked": false,
+     "at": [
+      16,
+      16
+     ],
+     "size": 20,
+     "trim": [],
+     "topTrim": [],
+     "rightTrim": [],
+     "along": [],
+     "gleamTrim": [],
+     "gleamTop": [],
+     "gleamRight": [],
+     "lit": false,
+     "bevel": "skin",
+     "bevelDepth": 1,
+     "rings": [
+      "ink",
+      "frame",
+      "ink"
+     ],
+     "bandAt": 1,
+     "fillet": {
+      "from": "style",
+      "pick": {
+       "temple": true,
+       "royal": false,
+       "ruin": false
+      }
+     },
+     "plate": {
+      "from": "style"
+     },
+     "plateSize": 4,
+     "edge": {
+      "from": "style",
+      "pick": {
+       "temple": "cut",
+       "royal": "round",
+       "ruin": "chip"
+      }
+     },
+     "cracks": {
+      "from": "style",
+      "pick": {
+       "temple": false,
+       "royal": false,
+       "ruin": true
+      }
+     }
+    },
+    {
+     "gen": "ui.toggle",
+     "v": 2,
+     "clip": [
+      "radio-on"
+     ],
+     "style": {
+      "from": "style"
+     },
+     "corner": {
+      "from": "corner",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.5,
+        3
+       ],
+       [
+        1,
+        3
+       ]
+      ],
+      "round": "px"
+     },
+     "border": {
+      "from": "border",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.249,
+        1
+       ],
+       [
+        0.25,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "kind": "radio",
+     "checked": true,
+     "at": [
+      16,
+      16
+     ],
+     "size": 20,
+     "trim": [],
+     "topTrim": [],
+     "rightTrim": [],
+     "along": [],
+     "gleamTrim": [],
+     "gleamTop": [],
+     "gleamRight": [],
+     "lit": false,
+     "bevel": "skin",
+     "bevelDepth": 1,
+     "rings": [
+      "ink",
+      "frame",
+      "ink"
+     ],
+     "bandAt": 1,
+     "edge": "round"
+    },
+    {
+     "gen": "ui.toggle",
+     "v": 2,
+     "clip": [
+      "radio-off"
+     ],
+     "style": {
+      "from": "style"
+     },
+     "corner": {
+      "from": "corner",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.5,
+        3
+       ],
+       [
+        1,
+        3
+       ]
+      ],
+      "round": "px"
+     },
+     "border": {
+      "from": "border",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.249,
+        1
+       ],
+       [
+        0.25,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "kind": "radio",
+     "checked": false,
+     "at": [
+      16,
+      16
+     ],
+     "size": 20,
+     "trim": [],
+     "topTrim": [],
+     "rightTrim": [],
+     "along": [],
+     "gleamTrim": [],
+     "gleamTop": [],
+     "gleamRight": [],
+     "lit": false,
+     "bevel": "skin",
+     "bevelDepth": 1,
+     "rings": [
+      "ink",
+      "frame",
+      "ink"
+     ],
+     "bandAt": 1,
+     "edge": "round"
+    },
+    {
+     "gen": "ui.toggle",
+     "v": 2,
+     "clip": [
+      "switch-on"
+     ],
+     "style": {
+      "from": "style"
+     },
+     "corner": {
+      "from": "corner",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.5,
+        3
+       ],
+       [
+        1,
+        3
+       ]
+      ],
+      "round": "px"
+     },
+     "border": {
+      "from": "border",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.249,
+        1
+       ],
+       [
+        0.25,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "kind": "switch",
+     "checked": true,
+     "at": [
+      16,
+      16
+     ],
+     "size": 28,
+     "trim": [],
+     "topTrim": [],
+     "rightTrim": [],
+     "along": [],
+     "gleamTrim": [],
+     "gleamTop": [],
+     "gleamRight": [],
+     "lit": false,
+     "bevel": "none",
+     "bevelDepth": 1,
+     "knobLight": true,
+     "edge": {
+      "from": "style",
+      "pick": {
+       "temple": "cut",
+       "royal": "round",
+       "ruin": "cut"
+      }
+     },
+     "plate": {
+      "from": "style",
+      "pick": {
+       "temple": "temple",
+       "royal": "none",
+       "ruin": "ruin"
+      }
+     },
+     "plateSize": 3,
+     "cracks": {
+      "from": "style",
+      "pick": {
+       "temple": false,
+       "royal": false,
+       "ruin": true
+      }
+     }
+    },
+    {
+     "gen": "ui.toggle",
+     "v": 2,
+     "clip": [
+      "switch-off"
+     ],
+     "style": {
+      "from": "style"
+     },
+     "corner": {
+      "from": "corner",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.5,
+        3
+       ],
+       [
+        1,
+        3
+       ]
+      ],
+      "round": "px"
+     },
+     "border": {
+      "from": "border",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.249,
+        1
+       ],
+       [
+        0.25,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "kind": "switch",
+     "checked": false,
+     "at": [
+      16,
+      16
+     ],
+     "size": 28,
+     "trim": [],
+     "topTrim": [],
+     "rightTrim": [],
+     "along": [],
+     "gleamTrim": [],
+     "gleamTop": [],
+     "gleamRight": [],
+     "lit": false,
+     "bevel": "none",
+     "bevelDepth": 1,
+     "knobLight": true,
+     "edge": {
+      "from": "style",
+      "pick": {
+       "temple": "cut",
+       "royal": "round",
+       "ruin": "cut"
+      }
+     },
+     "plate": {
+      "from": "style",
+      "pick": {
+       "temple": "temple",
+       "royal": "none",
+       "ruin": "ruin"
+      }
+     },
+     "plateSize": 3,
+     "cracks": {
+      "from": "style",
+      "pick": {
+       "temple": false,
+       "royal": false,
+       "ruin": true
+      }
+     }
+    },
+    {
+     "gen": "ui.pointer",
+     "v": 2,
+     "clip": [
+      "pointer"
+     ],
+     "style": {
+      "from": "style"
+     },
+     "corner": {
+      "from": "corner",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.5,
+        3
+       ],
+       [
+        1,
+        3
+       ]
+      ],
+      "round": "px"
+     },
+     "border": {
+      "from": "border",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.249,
+        1
+       ],
+       [
+        0.25,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "at": [
+      4,
+      16
+     ],
+     "len": 20,
+     "reach": 2,
+     "art": [
+      {
+       "kind": "stamp",
+       "at": [
+        0,
+        -6
+       ],
+       "rows": [
+        "..........a.........",
+        ".........abaa.......",
+        ".........abbba......",
+        ".aaaaaaaaabbbbaa....",
+        "acccccccccbbbbdbaa..",
+        "acccccccccbeefbbbba.",
+        "acccccccccbeeebbbbba",
+        "acccccccccbeeebbbba.",
+        "acccccccccbbbbbbaa..",
+        ".aaaaaaaaabbbbaa....",
+        ".........abbba......",
+        ".........abaa.......",
+        "..........a........."
+       ],
+       "key": {
+        "a": "ink",
+        "b": "frame",
+        "c": "frame.dark",
+        "d": "frame.light",
+        "e": "accent",
+        "f": "accent.light"
+       }
+      }
+     ],
+     "tip": [
+      19,
+      0
+     ]
+    },
+    {
+     "gen": "ui.selector",
+     "v": 2,
+     "clip": [
+      "selector"
+     ],
+     "style": {
+      "from": "style"
+     },
+     "corner": {
+      "from": "corner",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.5,
+        3
+       ],
+       [
+        1,
+        3
+       ]
+      ],
+      "round": "px"
+     },
+     "border": {
+      "from": "border",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.249,
+        1
+       ],
+       [
+        0.25,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "at": [
+      1,
+      1
+     ],
+     "size": [
+      30,
+      30
+     ],
+     "len": 4,
+     "steps": "held",
+     "lit": true,
+     "extras": true
+    }
+   ]
+  }
+ },
+ "clips": {
+  "check-on": {
+   "frames": 1,
+   "fps": 8,
+   "label": "Ticked box, while the option is on",
+   "noText": true,
+   "sounds": [
+    {
+     "sound": "menu-confirm",
+     "preset": "Soft tick",
+     "frame": 0,
+     "volume": 0.6
+    }
+   ]
+  },
+  "check-off": {
+   "frames": 1,
+   "fps": 8,
+   "label": "Empty box, while the option is off",
+   "noText": true
+  },
+  "radio-on": {
+   "frames": 1,
+   "fps": 8,
+   "label": "Chosen dot, for the one option picked",
+   "noText": true
+  },
+  "radio-off": {
+   "frames": 1,
+   "fps": 8,
+   "label": "Empty dot, for each option not picked",
+   "noText": true
+  },
+  "switch-on": {
+   "frames": 1,
+   "fps": 8,
+   "label": "Switch, while the setting is on",
+   "noText": true,
+   "sounds": [
+    {
+     "sound": "menu-confirm",
+     "preset": "Soft tick",
+     "frame": 0,
+     "volume": 0.6
+    }
+   ]
+  },
+  "switch-off": {
+   "frames": 1,
+   "fps": 8,
+   "label": "Switch, while the setting is off",
+   "noText": true
+  },
+  "pointer": {
+   "frames": 8,
+   "fps": 8,
+   "label": "Pointer, beside the item the player is on",
+   "noText": true
+  },
+  "selector": {
+   "frames": 8,
+   "fps": 8,
+   "label": "Selector, round the slot the player is on",
+   "noText": true
+  }
+ }
+}

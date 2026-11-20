@@ -1,0 +1,41 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "confetti",
+ "name": "Confetti",
+ "blurb": "A burst of confetti for a win or a level clear: a white pop, then paper, streamers or glitter thrown up and fluttering down. Change its size, the pieces, the spread, the style and the three colours.",
+ "meta": {"type":"effect","role":"effects/spark","themes":["neutral","candy"],"gameTypes":["arcade","puzzle","card-game","racing"],"view":"none","words":["confetti","celebration","party","streamers","glitter","win","victory","level clear","new record","hooray","burst","paper"],"license":"draft"},
+ "size": [64,64],
+ "pivot": [32,32],
+ "grounded": false,
+ "preview": "burst",
+ "styles": ["pixel"],
+ "versions": [
+  {"name":"Party","params":{}},
+  {"name":"Gold shower","params":{"body":"#e08a2c","trim":"#f0ead8"}},
+  {"name":"Streamers","params":{"style":"streamers"}},
+  {"name":"Glitter","params":{"style":"glitter","body":"#7a4fc4","accent":"#9bd18a","trim":"#4fd8ee"}},
+  {"name":"Small pop","params":{"size":0,"pieces":6,"spread":0}}
+ ],
+ "palette": [
+  {"id":"body","label":"Main colour","default":"#c9423a","material":"paint","swatches":["#c9423a","#e08a2c","#7a4fc4","#7a4f33"]},
+  {"id":"accent","label":"Accent colour","default":"#f2c230","material":"paint","swatches":["#f2c230","#a4c44a","#9bd18a","#6aa83e"]},
+  {"id":"trim","label":"Trim colour","default":"#3f6fd1","material":"paint","swatches":["#3f6fd1","#4fd8ee","#f0ead8","#8fd0f0"]}
+ ],
+ "controls": [
+  {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+  {"key":"pieces","kind":"range","label":"Pieces","lo":"Few","hi":"Many","default":12,"min":6,"max":18,"step":1},
+  {"key":"spread","kind":"range","label":"Spread","lo":"Tight","hi":"Wide","default":0.5},
+  {"key":"style","kind":"choice","label":"Style","options":["paper","streamers","glitter"],"default":"paper"},
+  {"key":"body","kind":"colour","label":"Main colour"},
+  {"key":"accent","kind":"colour","label":"Accent colour"},
+  {"key":"trim","kind":"colour","label":"Trim colour"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": { "emitters": [
+  {"id":"burst","gen":"effect.confetti","v":1,"clip":["burst"],"picture":"burst","at":[32,32],"size":{"from":"size","map":[[0,0],[1,1]]},"pieces":{"from":"pieces","map":[[6,6],[18,18]],"round":"px"},"spread":{"from":"spread","map":[[0,0],[1,1]]},"style":{"from":"style","pick":{"paper":"paper","streamers":"streamers","glitter":"glitter"}},"body":"body","accent":"accent","trim":"trim"}
+ ] },
+ "clips": {
+  "burst": {"frames":12,"fps":14,"loop":false,"sounds":[{"sound":"chime-success","preset":"Quick confirm","frame":0,"volume":0.8}]}
+ }
+}

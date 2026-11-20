@@ -1,0 +1,218 @@
+{
+ "id": "snowfall",
+ "frozen": "2026-11-20",
+ "source": "sprites/snowfall.js",
+ "sha256": "647f95b8400833395e4798568bcb03ac80eb2ccaf32006881f1dbae2925594c9",
+ "name": "Snowfall",
+ "blurb": "Snow drifting down over the whole screen, swaying as it falls, as soft snow, a blizzard driving at 45 degrees or sleet. Change how many flakes, their size, the style, the sway, the far snow, the colours and the speed. Lay copies 62 px apart (each over its neighbours' empty border) to cover the screen.",
+ "meta": {
+  "type": "effect",
+  "role": "effects/weather",
+  "themes": [
+   "neutral",
+   "forest"
+  ],
+  "gameTypes": [
+   "platformer",
+   "top-down-rpg",
+   "farming-sim",
+   "puzzle"
+  ],
+  "view": "none",
+  "words": [
+   "snow",
+   "snowfall",
+   "snowflakes",
+   "flakes",
+   "blizzard",
+   "sleet",
+   "winter",
+   "cold",
+   "falling",
+   "drifting",
+   "frosty",
+   "overlay"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  64,
+  64
+ ],
+ "pivot": [
+  32,
+  32
+ ],
+ "grounded": false,
+ "preview": "loop",
+ "params": {
+  "pieces": {
+   "kind": "range",
+   "label": "Flakes",
+   "def": 7,
+   "min": 4,
+   "max": 12,
+   "step": 1,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look",
+   "when": {
+    "style": [
+     "soft",
+     "blizzard"
+    ]
+   }
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "soft",
+   "options": [
+    {
+     "value": "soft",
+     "label": "Soft"
+    },
+    {
+     "value": "blizzard",
+     "label": "Blizzard"
+    },
+    {
+     "value": "sleet",
+     "label": "Sleet"
+    }
+   ],
+   "group": "Look"
+  },
+  "sway": {
+   "kind": "range",
+   "label": "Sway",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Still",
+   "hi": "Swaying",
+   "group": "Motion"
+  },
+  "layers": {
+   "kind": "toggle",
+   "label": "Far snow",
+   "def": true,
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Snow",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#d8d8e0",
+    "#8fd0f0",
+    "#c2c9d6",
+    "#9bd18a"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Far snow",
+   "def": "#7fb0b8",
+   "swatches": [
+    "#7fb0b8",
+    "#8f97a8",
+    "#5d6475",
+    "#8696dc"
+   ],
+   "group": "Colors",
+   "when": {
+    "layers": [
+     true
+    ]
+   }
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "loop": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  }
+ },
+ "sounds": {
+  "loop": [
+   {
+    "sound": "wind",
+    "frame": 0,
+    "preset": "Storm",
+    "volume": 0.35,
+    "when": {
+     "style": [
+      "blizzard"
+     ]
+    }
+   }
+  ]
+ },
+ "versions": [
+  {
+   "name": "Snowfall",
+   "params": {}
+  },
+  {
+   "name": "Blizzard",
+   "params": {
+    "style": "blizzard",
+    "pieces": 12
+   }
+  },
+  {
+   "name": "Sleet",
+   "params": {
+    "style": "sleet",
+    "pieces": 9
+   }
+  },
+  {
+   "name": "Big flakes",
+   "params": {
+    "size": 1,
+    "pieces": 4
+   }
+  },
+  {
+   "name": "Still night",
+   "params": {
+    "sway": 0,
+    "layers": false,
+    "body": "#8fd0f0"
+   }
+  }
+ ],
+ "bundles": []
+}

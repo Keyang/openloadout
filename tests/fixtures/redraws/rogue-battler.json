@@ -1,0 +1,472 @@
+{
+ "id": "rogue-battler",
+ "frozen": "2026-11-20",
+ "source": "sprites/rogue-battler.js",
+ "sha256": "b1da25c33bfaafd18d05a0cc553566b6f33aa26c0ffb441b23eec08e6f7451e9",
+ "name": "Rogue",
+ "blurb": "A hooded rogue for a battle screen or a platformer, who stabs twice, throws a knife and tosses a dagger to cheer. Change the build, hood, scarf, blades and colours.",
+ "meta": {
+  "type": "character",
+  "role": "characters/player",
+  "view": "side",
+  "license": "draft",
+  "themes": [
+   "fantasy"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "platformer"
+  ],
+  "words": [
+   "rogue",
+   "thief",
+   "assassin",
+   "ninja",
+   "party member",
+   "hood",
+   "scarf",
+   "daggers",
+   "stab",
+   "throw",
+   "run",
+   "jump",
+   "sneaky",
+   "battle"
+  ]
+ },
+ "size": [
+  64,
+  64
+ ],
+ "pivot": [
+  28,
+  58
+ ],
+ "grounded": true,
+ "preview": "walk",
+ "params": {
+  "height": {
+   "kind": "range",
+   "label": "Height",
+   "def": 0.45,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Short",
+   "hi": "Tall",
+   "group": "Look"
+  },
+  "build": {
+   "kind": "range",
+   "label": "Build",
+   "def": 0.3,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slim",
+   "hi": "Stocky",
+   "group": "Look"
+  },
+  "head": {
+   "kind": "range",
+   "label": "Head",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "weapon": {
+   "kind": "choice",
+   "label": "Weapon",
+   "def": "daggers",
+   "options": [
+    {
+     "value": "daggers",
+     "label": "Daggers"
+    },
+    {
+     "value": "short sword",
+     "label": "Short sword"
+    },
+    {
+     "value": "claws",
+     "label": "Claws"
+    },
+    {
+     "value": "none",
+     "label": "None"
+    }
+   ],
+   "group": "Look"
+  },
+  "weaponLength": {
+   "kind": "range",
+   "label": "Length",
+   "def": 1,
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "lo": "Short",
+   "hi": "Long",
+   "group": "Look"
+  },
+  "weaponAngle": {
+   "kind": "range",
+   "label": "Hold angle",
+   "def": 0,
+   "min": -10,
+   "max": 40,
+   "step": 1,
+   "lo": "Upright",
+   "hi": "Forward",
+   "group": "Look"
+  },
+  "headgear": {
+   "kind": "choice",
+   "label": "Headgear",
+   "def": "hood",
+   "options": [
+    {
+     "value": "hood",
+     "label": "Hood"
+    },
+    {
+     "value": "bandana",
+     "label": "Bandana"
+    },
+    {
+     "value": "mask",
+     "label": "Mask"
+    },
+    {
+     "value": "none",
+     "label": "None"
+    }
+   ],
+   "group": "Look"
+  },
+  "headgearSize": {
+   "kind": "range",
+   "label": "Size",
+   "def": 1,
+   "min": 0.5,
+   "max": 1.8,
+   "step": 0.05,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "scarf": {
+   "kind": "choice",
+   "label": "Scarf",
+   "def": "long",
+   "options": [
+    {
+     "value": "short",
+     "label": "Short"
+    },
+    {
+     "value": "long",
+     "label": "Long"
+    },
+    {
+     "value": "none",
+     "label": "None"
+    }
+   ],
+   "group": "Look"
+  },
+  "scarfLength": {
+   "kind": "range",
+   "label": "Length",
+   "def": 1,
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "lo": "Short",
+   "hi": "Long",
+   "group": "Look"
+  },
+  "skin": {
+   "kind": "color",
+   "label": "Skin",
+   "def": "#f6d3b0",
+   "swatches": [
+    "#f6d3b0",
+    "#e8b088",
+    "#c98a5c",
+    "#9a6240",
+    "#6e4428",
+    "#9bd18a",
+    "#b9a7e0"
+   ],
+   "group": "Colors"
+  },
+  "outfit": {
+   "kind": "color",
+   "label": "Outfit",
+   "def": "#2f8f9d",
+   "swatches": [
+    "#2f8f9d",
+    "#3f6fd1",
+    "#7a4fc4",
+    "#c9423a",
+    "#8e3a4a",
+    "#4f9d57",
+    "#e08a2c",
+    "#e6c545"
+   ],
+   "group": "Colors"
+  },
+  "trim": {
+   "kind": "color",
+   "label": "Scarf and trim",
+   "def": "#5a5f7a",
+   "swatches": [
+    "#5a5f7a",
+    "#a8a4a0",
+    "#c9423a",
+    "#f2c230",
+    "#c8553a",
+    "#2f8f9d",
+    "#7a4fc4",
+    "#f0ead8"
+   ],
+   "group": "Colors"
+  },
+  "metal": {
+   "kind": "color",
+   "label": "Metal",
+   "def": "#c2c9d6",
+   "swatches": [
+    "#c2c9d6",
+    "#f2c230",
+    "#a8a4a0",
+    "#a8806a",
+    "#5a5f7a",
+    "#8f97a8",
+    "#e6c545",
+    "#c98a4a"
+   ],
+   "group": "Colors",
+   "when": {
+    "weapon": [
+     "daggers",
+     "short sword",
+     "claws"
+    ]
+   }
+  },
+  "bounce": {
+   "kind": "range",
+   "label": "Bounce",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Calm",
+   "hi": "Bouncy",
+   "group": "Motion"
+  },
+  "stride": {
+   "kind": "range",
+   "label": "Stride",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small steps",
+   "hi": "Big steps",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    7,
+    10
+   ]
+  },
+  "walk": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "run": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    9,
+    15,
+    20
+   ]
+  },
+  "jump": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    7,
+    12,
+    16
+   ]
+  },
+  "attack": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    8,
+    14,
+    19
+   ]
+  },
+  "shoot": {
+   "frames": 6,
+   "loop": false,
+   "fps": [
+    9,
+    15,
+    20
+   ]
+  },
+  "hurt": {
+   "frames": 4,
+   "loop": false,
+   "fps": [
+    6,
+    9,
+    13
+   ]
+  },
+  "die": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "victory": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    8,
+    12
+   ]
+  }
+ },
+ "sounds": {
+  "walk": [
+   {
+    "sound": "footstep-gravel",
+    "frame": 0,
+    "preset": "Sneaking",
+    "volume": 0.45
+   },
+   {
+    "sound": "footstep-gravel",
+    "frame": 4,
+    "preset": "Sneaking",
+    "volume": 0.45
+   }
+  ],
+  "run": [
+   {
+    "sound": "footstep-gravel",
+    "frame": 0,
+    "preset": "Sneaking",
+    "volume": 0.45
+   },
+   {
+    "sound": "footstep-gravel",
+    "frame": 4,
+    "preset": "Sneaking",
+    "volume": 0.45
+   }
+  ],
+  "jump": [
+   {
+    "sound": "jump",
+    "frame": 2,
+    "preset": "Tiny hop",
+    "volume": 0.7
+   }
+  ],
+  "attack": [
+   {
+    "sound": "sword-slash",
+    "frame": 3,
+    "preset": "Quick dagger",
+    "volume": 0.7,
+    "when": {
+     "weapon": [
+      "daggers",
+      "short sword",
+      "claws"
+     ]
+    }
+   },
+   {
+    "sound": "whoosh",
+    "frame": 3,
+    "preset": "Quick swipe",
+    "volume": 0.7,
+    "when": {
+     "weapon": [
+      "none"
+     ]
+    }
+   }
+  ],
+  "shoot": [
+   {
+    "sound": "whoosh",
+    "frame": 1,
+    "preset": "Quick swipe",
+    "volume": 0.85
+   }
+  ],
+  "hurt": [
+   {
+    "sound": "punch",
+    "frame": 0,
+    "preset": "Light jab",
+    "volume": 0.9
+   }
+  ],
+  "die": [
+   {
+    "sound": "punch",
+    "frame": 0,
+    "preset": "Heavy body blow",
+    "volume": 1
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-rpg-fantasy"
+ ]
+}

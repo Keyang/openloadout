@@ -1,0 +1,965 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "explosion-small",
+ "name": "Small explosion",
+ "blurb": "A cartoon blast: a white flash, a boiling ball that opens into a ring, flying embers and a ring of smoke. Change its size, embers, spread, style, smoke and colours.",
+ "meta": {
+  "type": "effect",
+  "role": "effects/explosion",
+  "themes": [
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "platformer",
+   "turn-based-rpg",
+   "roguelike-action",
+   "shooter",
+   "arcade"
+  ],
+  "view": "none",
+  "words": [
+   "explosion",
+   "blast",
+   "boom",
+   "bomb",
+   "explode",
+   "burst",
+   "fire",
+   "smoke",
+   "embers",
+   "destroy",
+   "bang",
+   "hot"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  48,
+  48
+ ],
+ "pivot": [
+  24,
+  24
+ ],
+ "grounded": false,
+ "preview": "burst",
+ "palette": [
+  {
+   "id": "core",
+   "label": "Core",
+   "default": "#f0ead8",
+   "material": "fire",
+   "swatches": [
+    "#f0ead8",
+    "#f6d3b0",
+    "#8fd0f0",
+    "#9bd18a",
+    "#c2c9d6"
+   ]
+  },
+  {
+   "id": "edge",
+   "label": "Edge",
+   "default": "#e08a2c",
+   "material": "fire",
+   "swatches": [
+    "#e08a2c",
+    "#c9423a",
+    "#4fd8ee",
+    "#7a4fc4",
+    "#a4c44a",
+    "#3f6fd1"
+   ]
+  },
+  {
+   "id": "mid",
+   "material": "fire",
+   "derive": {
+    "rule": "mix",
+    "of": "core",
+    "with": "edge",
+    "amount": 0.5
+   }
+  },
+  {
+   "id": "rim",
+   "material": "fire",
+   "derive": {
+    "rule": "tone",
+    "of": "edge",
+    "by": -1
+   }
+  },
+  {
+   "id": "shine",
+   "default": "#ffffff",
+   "material": "light",
+   "detail": true
+  },
+  {
+   "id": "soot",
+   "default": "#8f97a8",
+   "material": "stone",
+   "detail": true
+  },
+  {
+   "id": "soot-dark",
+   "default": "#5d6475",
+   "material": "stone",
+   "detail": true
+  },
+  {
+   "id": "soot-mid",
+   "material": "stone",
+   "derive": {
+    "rule": "mix",
+    "of": "soot",
+    "with": "soot-dark",
+    "amount": 0.5
+   }
+  },
+  {
+   "id": "soot-rim",
+   "material": "stone",
+   "derive": {
+    "rule": "tone",
+    "of": "soot-dark",
+    "by": -0.45
+   }
+  }
+ ],
+ "controls": [
+  {
+   "key": "size",
+   "kind": "range",
+   "label": "Size",
+   "lo": "Small",
+   "hi": "Big",
+   "default": 0.5
+  },
+  {
+   "key": "pieces",
+   "kind": "range",
+   "label": "Pieces",
+   "lo": "Few",
+   "hi": "Many",
+   "min": 4,
+   "max": 12,
+   "step": 1,
+   "default": 8
+  },
+  {
+   "key": "spread",
+   "kind": "range",
+   "label": "Spread",
+   "lo": "Tight",
+   "hi": "Wide",
+   "default": 0.5
+  },
+  {
+   "key": "style",
+   "kind": "choice",
+   "label": "Style",
+   "options": [
+    "round",
+    "star",
+    "ring"
+   ],
+   "default": "round"
+  },
+  {
+   "key": "smoke",
+   "kind": "toggle",
+   "label": "Smoke",
+   "default": true
+  },
+  {
+   "key": "core",
+   "kind": "colour",
+   "label": "Core"
+  },
+  {
+   "key": "edge",
+   "kind": "colour",
+   "label": "Edge"
+  },
+  {
+   "key": "speed",
+   "standard": "speed"
+  }
+ ],
+ "body": {
+  "emitters": [
+   {
+    "id": "smoke",
+    "gen": "puff.ring",
+    "v": 1,
+    "when": {
+     "smoke": [
+      true
+     ]
+    },
+    "at": [
+     24,
+     24
+    ],
+    "count": 7,
+    "r0": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       10.302
+      ],
+      [
+       1,
+       13.332
+      ]
+     ]
+    },
+    "r1": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       12.44825
+      ],
+      [
+       1,
+       16.1095
+      ]
+     ]
+    },
+    "size": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       2.5
+      ],
+      [
+       1,
+       3.1
+      ]
+     ]
+    },
+    "last": 1.3,
+    "hold": 0.3,
+    "rise": 2,
+    "cool": 0.4,
+    "uneven": 1,
+    "lobes": 2,
+    "seed": 2,
+    "begin": 0.714,
+    "paints": [
+     "soot",
+     "soot-mid",
+     "soot-dark",
+     "soot-rim"
+    ]
+   },
+   {
+    "id": "shock",
+    "gen": "ring",
+    "v": 1,
+    "when": {
+     "style": [
+      "ring"
+     ]
+    },
+    "at": [
+     24,
+     24
+    ],
+    "r0": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       5.95
+      ],
+      [
+       1,
+       7.7
+      ]
+     ]
+    },
+    "r1": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       10.73125
+      ],
+      [
+       1,
+       13.8875
+      ]
+     ]
+    },
+    "thick": 4,
+    "seed": 4,
+    "end": 0.928571,
+    "paints": [
+     "core",
+     "mid",
+     "edge",
+     "rim"
+    ]
+   },
+   {
+    "id": "rays",
+    "gen": "starburst",
+    "v": 1,
+    "when": {
+     "style": [
+      "star"
+     ]
+    },
+    "at": [
+     24,
+     24
+    ],
+    "points": 8,
+    "turn": 22.5,
+    "r": [
+     0,
+     {
+      "from": "size",
+      "map": [
+       [
+        0,
+        10.625
+       ],
+       [
+        1,
+        13.75
+       ]
+      ]
+     }
+    ],
+    "width": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       3.4
+      ],
+      [
+       1,
+       4.4
+      ]
+     ]
+    },
+    "paints": [
+     "shine",
+     "core"
+    ]
+   },
+   {
+    "id": "flash",
+    "gen": "blast.grow",
+    "v": 1,
+    "when": {
+     "style": [
+      "round",
+      "star"
+     ]
+    },
+    "at": [
+     24,
+     24
+    ],
+    "r": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       7.82
+      ],
+      [
+       1,
+       10.12
+      ]
+     ]
+    },
+    "bumps": {
+     "from": "style",
+     "pick": {
+      "round": 7,
+      "star": 8,
+      "ring": 7
+     }
+    },
+    "bump": 0,
+    "points": {
+     "from": "style",
+     "pick": {
+      "round": false,
+      "star": true,
+      "ring": false
+     }
+    },
+    "paints": [
+     "shine",
+     "shine",
+     "core",
+     "edge"
+    ]
+   },
+   {
+    "id": "ball",
+    "gen": "blast.grow",
+    "v": 1,
+    "when": {
+     "style": [
+      "round",
+      "star"
+     ]
+    },
+    "at": [
+     24,
+     24
+    ],
+    "r": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       11.39
+      ],
+      [
+       1,
+       14.74
+      ]
+     ]
+    },
+    "bumps": {
+     "from": "style",
+     "pick": {
+      "round": 7,
+      "star": 8,
+      "ring": 7
+     }
+    },
+    "bump": {
+     "from": "style",
+     "pick": {
+      "round": 0.17,
+      "star": 0.42,
+      "ring": 0.17
+     }
+    },
+    "points": {
+     "from": "style",
+     "pick": {
+      "round": false,
+      "star": true,
+      "ring": false
+     }
+    },
+    "seed": 2,
+    "paints": [
+     "core",
+     "mid",
+     "edge",
+     "rim"
+    ]
+   },
+   {
+    "id": "arcs",
+    "gen": "ring",
+    "v": 1,
+    "when": [
+     {
+      "style": [
+       "round",
+       "star"
+      ],
+      "smoke": [
+       false
+      ]
+     }
+    ],
+    "at": [
+     24,
+     24
+    ],
+    "r0": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       8.5
+      ],
+      [
+       1,
+       11
+      ]
+     ]
+    },
+    "r1": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       12.019
+      ],
+      [
+       1,
+       15.554
+      ]
+     ]
+    },
+    "thick": 2,
+    "seed": 3,
+    "begin": 0,
+    "end": 1,
+    "paints": [
+     "shine",
+     "core",
+     "mid",
+     "edge",
+     "rim"
+    ]
+   },
+   {
+    "id": "r-flash",
+    "gen": "blast.grow",
+    "v": 1,
+    "when": {
+     "style": [
+      "ring"
+     ]
+    },
+    "at": [
+     24,
+     24
+    ],
+    "r": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       5.27
+      ],
+      [
+       1,
+       6.82
+      ]
+     ]
+    },
+    "bumps": {
+     "from": "style",
+     "pick": {
+      "round": 7,
+      "star": 8,
+      "ring": 7
+     }
+    },
+    "bump": 0,
+    "points": {
+     "from": "style",
+     "pick": {
+      "round": false,
+      "star": true,
+      "ring": false
+     }
+    },
+    "paints": [
+     "shine",
+     "shine",
+     "core",
+     "edge"
+    ]
+   },
+   {
+    "id": "r-ball",
+    "gen": "blast.grow",
+    "v": 1,
+    "when": {
+     "style": [
+      "ring"
+     ]
+    },
+    "at": [
+     24,
+     24
+    ],
+    "r": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       6.29
+      ],
+      [
+       1,
+       8.14
+      ]
+     ]
+    },
+    "bumps": {
+     "from": "style",
+     "pick": {
+      "round": 7,
+      "star": 8,
+      "ring": 7
+     }
+    },
+    "bump": {
+     "from": "style",
+     "pick": {
+      "round": 0.17,
+      "star": 0.42,
+      "ring": 0.17
+     }
+    },
+    "points": {
+     "from": "style",
+     "pick": {
+      "round": false,
+      "star": true,
+      "ring": false
+     }
+    },
+    "paints": [
+     "core",
+     "mid",
+     "edge",
+     "rim"
+    ]
+   },
+   {
+    "id": "embers",
+    "gen": "embers",
+    "v": 1,
+    "at": [
+     24,
+     24
+    ],
+    "count": {
+     "from": "pieces",
+     "map": [
+      [
+       4,
+       4
+      ],
+      [
+       5,
+       5
+      ],
+      [
+       6,
+       6
+      ],
+      [
+       7,
+       7
+      ],
+      [
+       8,
+       8
+      ],
+      [
+       9,
+       9
+      ],
+      [
+       10,
+       10
+      ],
+      [
+       11,
+       11
+      ],
+      [
+       12,
+       12
+      ]
+     ],
+     "round": "px"
+    },
+    "r0": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       13.1303
+      ],
+      [
+       1,
+       16.1098
+      ]
+     ]
+    },
+    "r1": {
+     "from": "spread",
+     "map": [
+      [
+       0,
+       17.5846
+      ],
+      [
+       1,
+       21.6555
+      ]
+     ]
+    },
+    "size": 2,
+    "tail": 0,
+    "hold": 0.55,
+    "gravity": 1.5,
+    "seed": 4,
+    "begin": 0.428571,
+    "paints": [
+     "core",
+     "mid",
+     "edge",
+     "rim"
+    ]
+   }
+  ]
+ },
+ "clips": {
+  "burst": {
+   "frames": 8,
+   "fps": 16,
+   "loop": false,
+   "keys": [
+    {
+     "t": 0,
+     "emit": {
+      "rays": {
+       "amount": 1
+      },
+      "flash": {
+       "amount": 1
+      },
+      "ball": {
+       "amount": 0
+      },
+      "arcs": {
+       "amount": 0
+      },
+      "r-flash": {
+       "amount": 1
+      },
+      "r-ball": {
+       "amount": 0
+      }
+     }
+    },
+    {
+     "t": 0.14285714285714285,
+     "emit": {
+      "rays": {
+       "amount": 0
+      },
+      "flash": {
+       "amount": 0
+      },
+      "ball": {
+       "amount": 1,
+       "scale": 0.7910447761194029,
+       "hole": 0,
+       "cool": 0,
+       "heat": 0.7,
+       "gaps": 0,
+       "turn": 40.11
+      },
+      "arcs": {
+       "amount": 0
+      },
+      "r-flash": {
+       "amount": 0
+      },
+      "r-ball": {
+       "amount": 1,
+       "scale": 1,
+       "cool": 0,
+       "heat": 0.65,
+       "turn": 40.11
+      }
+     }
+    },
+    {
+     "t": 0.2857142857142857,
+     "emit": {
+      "rays": {
+       "amount": 0
+      },
+      "flash": {
+       "amount": 0
+      },
+      "ball": {
+       "amount": 1,
+       "scale": 0.8582089552238805,
+       "hole": 0,
+       "cool": 0,
+       "heat": 0.4,
+       "gaps": 0,
+       "turn": 80.21
+      },
+      "arcs": {
+       "amount": 0
+      },
+      "r-flash": {
+       "amount": 0
+      },
+      "r-ball": {
+       "amount": 1,
+       "scale": 0.9459459459459459,
+       "cool": 0,
+       "heat": 0.4,
+       "turn": 80.21
+      }
+     }
+    },
+    {
+     "t": 0.42857142857142855,
+     "emit": {
+      "rays": {
+       "amount": 0
+      },
+      "flash": {
+       "amount": 0
+      },
+      "ball": {
+       "amount": 1,
+       "scale": 0.8894029850746268,
+       "hole": 0.31884544386642055,
+       "cool": 1,
+       "heat": 0.5,
+       "gaps": 0,
+       "turn": 120.32
+      },
+      "arcs": {
+       "amount": 0
+      },
+      "r-flash": {
+       "amount": 0
+      },
+      "r-ball": {
+       "amount": 1,
+       "scale": 0.7027027027027027,
+       "cool": 1,
+       "heat": 0.5,
+       "turn": 120.32
+      }
+     }
+    },
+    {
+     "t": 0.5714285714285714,
+     "emit": {
+      "rays": {
+       "amount": 0
+      },
+      "flash": {
+       "amount": 0
+      },
+      "ball": {
+       "amount": 1,
+       "scale": 0.9497014925373134,
+       "hole": 0.5873015873015873,
+       "cool": 1,
+       "heat": 0.2,
+       "gaps": 0,
+       "turn": 160.43
+      },
+      "arcs": {
+       "amount": 0
+      },
+      "r-flash": {
+       "amount": 0
+      },
+      "r-ball": {
+       "amount": 1,
+       "scale": 0.4054054054054054,
+       "cool": 2,
+       "heat": 0.5,
+       "turn": 160.43
+      }
+     }
+    },
+    {
+     "t": 0.7142857142857143,
+     "emit": {
+      "rays": {
+       "amount": 0
+      },
+      "flash": {
+       "amount": 0
+      },
+      "ball": {
+       "amount": 1,
+       "scale": 0.9949253731343284,
+       "hole": 0.803030303030303,
+       "cool": 2,
+       "heat": 0.5,
+       "gaps": 0.3,
+       "turn": 200.54
+      },
+      "arcs": {
+       "amount": 0
+      },
+      "r-flash": {
+       "amount": 0
+      },
+      "r-ball": {
+       "amount": 0
+      }
+     }
+    },
+    {
+     "t": 0.8571428571428571,
+     "emit": {
+      "rays": {
+       "amount": 0
+      },
+      "flash": {
+       "amount": 0
+      },
+      "ball": {
+       "amount": 0
+      },
+      "arcs": {
+       "amount": 1
+      },
+      "r-flash": {
+       "amount": 0
+      },
+      "r-ball": {
+       "amount": 0
+      }
+     }
+    },
+    {
+     "t": 1,
+     "emit": {
+      "rays": {
+       "amount": 0
+      },
+      "flash": {
+       "amount": 0
+      },
+      "ball": {
+       "amount": 0
+      },
+      "arcs": {
+       "amount": 0
+      },
+      "r-flash": {
+       "amount": 0
+      },
+      "r-ball": {
+       "amount": 0
+      }
+     }
+    }
+   ]
+  }
+ }
+}

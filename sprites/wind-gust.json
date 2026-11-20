@@ -1,0 +1,39 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "wind-gust",
+ "name": "Wind gust",
+ "blurb": "Wind blowing to the right: thin streaks of different lengths slide across and fade, with dust or glints carried along, as a patch to place over a field, a cliff or a road. Change how many streaks, their length and spread, what the wind carries and the colours.",
+ "meta": {"type":"effect","role":"effects/weather","themes":["neutral"],"gameTypes":["platformer","top-down-rpg","racing","farming-sim"],"view":"none","words":["wind","gust","breeze","gale","air","blow","draft","dust storm","speed lines","weather"],"license":"draft"},
+ "size": [64,64],
+ "pivot": [32,32],
+ "grounded": false,
+ "preview": "loop",
+ "styles": ["pixel"],
+ "versions": [
+  {"name":"Breeze","params":{}},
+  {"name":"Gale","params":{"pieces":10,"length":1}},
+  {"name":"Dust storm","params":{"style":"dust","core":"#e6c96a","accent":"#7a4f33"}},
+  {"name":"Sparkling air","params":{"style":"glints","core":"#4fd8ee"}},
+  {"name":"Light air","params":{"pieces":3,"length":0}}
+ ],
+ "palette": [
+  {"id":"core","label":"Streaks","default":"#f0ead8","material":"sky","swatches":["#f0ead8","#7fb0b8","#8fd0f0","#4fd8ee","#e6c96a"]},
+  {"id":"accent","label":"Dust","default":"#a06a3c","material":"earth","swatches":["#a06a3c","#7a4f33","#8f97a8","#5d6475"]}
+ ],
+ "controls": [
+  {"key":"pieces","kind":"range","label":"Streaks","lo":"Few","hi":"Many","default":6,"min":3,"max":10,"step":1},
+  {"key":"length","kind":"range","label":"Length","lo":"Short","hi":"Long","default":0.5},
+  {"key":"spread","kind":"range","label":"Spread","lo":"Tight","hi":"Wide","default":0.5},
+  {"key":"style","kind":"choice","label":"Style","options":["lines","dust","glints"],"default":"lines"},
+  {"key":"core","kind":"colour","label":"Streaks"},
+  {"key":"accent","kind":"colour","label":"Dust","when":{"style":["dust"]}},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": { "emitters": [
+  {"id":"loop","gen":"effect.wind-gust","v":1,"clip":["loop"],"picture":"loop","at":[32,32],"pieces":{"from":"pieces","map":[[3,3],[10,10]],"round":"px"},"length":{"from":"length","map":[[0,0],[1,1]]},"spread":{"from":"spread","map":[[0,0],[1,1]]},"style":{"from":"style","pick":{"lines":"lines","dust":"dust","glints":"glints"}},"core":"core","accent":"accent"}
+ ] },
+ "clips": {
+  "loop": {"frames":8,"fps":10,"sounds":[{"sound":"wind","preset":"Breeze","frame":0,"volume":0.35}]}
+ }
+}

@@ -42,14 +42,12 @@ const IDS = RECORDS.map((r) => r.id);
 /** The controls a record says the redraw dropped (section 7: "a removed control's value is dropped"), each with the reason: { key: why }. Batch M6. */
 const droppedOf = (r) => new Set(Object.keys(r.dropped ?? {}));
 /**
- * The only controls a redraw may drop today: the Motion sliders that scale a baked person's bob, step or shake. A person
- * base (base:person-side, base:person-topdown-*) bakes its clips at the code rig's middle Bounce, Stride and Wobble and a
- * clip key takes no binding, so nothing can scale them yet (reviews of M6, issues 5 to 7). This is not a decision to drop
- * them: Contract 15 rule 10 says redraws keep control keys, and Keyang decides whether these may go or the framework
- * gains a slider that scales a clip's motion. The check below only holds a record to the case as it stands: the sprite
- * really extends a person base, that base takes no setting of that name, and the reason names that base.
+ * The controls a redraw may drop: none. Contract 15 rule 10 (Keyang's DQ3): redraws keep control keys. The Motion
+ * sliders (Bounce, Stride, Wobble, Rattle) that M6 and M7 once dropped are kept with a clip `travel` (build item F5,
+ * docs/data-sprites.md 2.2 "Motion sliders"; batch M6b removed the allowance), so a record that lists one as dropped
+ * fails here. The checks on `dropped` below stay for a case Keyang allows by name.
  */
-const DROPPABLE = Object.freeze(['bounce', 'stride', 'wobble']);
+const DROPPABLE = Object.freeze([]);
 const PERSON_BASE = /^base:person-[a-z-]+$/;
 
 const fileOf = (id) => path.join(ROOT, 'sprites', `${id}.json`);
@@ -260,6 +258,8 @@ test('a bag stored before the redraw, and a bag link made before it, open each r
         const a = renderFrame(s, c, 0, p), b = renderFrame(s, c, 0, plain);
         assert.ok(solid(a) > 12 || drawn(s, c, p) > 12, `${how} ${it.id} ${c} draws`);
         differs ||= a.data.some((v, i) => v !== b.data[i]);
+        // an effect whose first frame is a flash the settings do not reach (enemy-poof's white ball, batch E2): its later frames
+        for (let f = 1; !differs && f < s.clips[c].frames; f++) { const fa = renderFrame(s, c, f, p), fb = renderFrame(s, c, f, plain); differs = fa.data.some((v, i) => v !== fb.data[i]); }
       }
       assert.ok(differs, `${how} ${it.id}: the saved values change the picture`);
     }

@@ -1,0 +1,214 @@
+{
+ "id": "guard-flash",
+ "frozen": "2026-11-20",
+ "source": "sprites/guard-flash.js",
+ "sha256": "6d49590cf9299edf10470ecfc42c3127ce272832e02da209fe82818afc56c884",
+ "name": "Block flash",
+ "blurb": "The flash of a blocked or parried hit: a crescent, a six-sided barrier or a cross of light that bursts white, throws sparks back at the attacker and breaks apart. Change its size, sparks, spread, style and colours.",
+ "meta": {
+  "type": "effect",
+  "role": "effects/spark",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "platformer",
+   "roguelike-action",
+   "arcade",
+   "turn-based-rpg"
+  ],
+  "view": "side",
+  "words": [
+   "block",
+   "parry",
+   "guard",
+   "deflect",
+   "clash",
+   "shield",
+   "barrier",
+   "spark",
+   "flash",
+   "defend",
+   "counter",
+   "ward"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "burst",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "pieces": {
+   "kind": "range",
+   "label": "Sparks",
+   "def": 5,
+   "min": 3,
+   "max": 8,
+   "step": 1,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "spread": {
+   "kind": "range",
+   "label": "Spread",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Tight",
+   "hi": "Wide",
+   "group": "Look"
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "arc",
+   "options": [
+    {
+     "value": "arc",
+     "label": "Arc"
+    },
+    {
+     "value": "dome",
+     "label": "Dome"
+    },
+    {
+     "value": "cross",
+     "label": "Cross"
+    }
+   ],
+   "group": "Look"
+  },
+  "core": {
+   "kind": "color",
+   "label": "Core",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#8fd0f0",
+    "#9bd18a",
+    "#f6d3b0"
+   ],
+   "group": "Colors"
+  },
+  "edge": {
+   "kind": "color",
+   "label": "Edge",
+   "def": "#3f6fd1",
+   "swatches": [
+    "#3f6fd1",
+    "#e08a2c",
+    "#c9423a",
+    "#4fd8ee",
+    "#7a4fc4",
+    "#a4c44a",
+    "#c2c9d6",
+    "#f2c230"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "burst": {
+   "frames": 6,
+   "loop": false,
+   "fps": [
+    10,
+    17,
+    23
+   ]
+  }
+ },
+ "sounds": {
+  "burst": [
+   {
+    "sound": "metal-hit",
+    "preset": "Sword clash",
+    "frame": 0,
+    "volume": 0.8,
+    "when": {
+     "style": [
+      "arc",
+      "cross"
+     ]
+    }
+   },
+   {
+    "sound": "shield-break",
+    "preset": "Small crack",
+    "frame": 0,
+    "volume": 0.8,
+    "when": {
+     "style": [
+      "dome"
+     ]
+    }
+   }
+  ]
+ },
+ "versions": [
+  {
+   "name": "Parry",
+   "params": {}
+  },
+  {
+   "name": "Magic barrier",
+   "params": {
+    "style": "dome",
+    "edge": "#4fd8ee"
+   }
+  },
+  {
+   "name": "Steel cross",
+   "params": {
+    "style": "cross",
+    "edge": "#c2c9d6"
+   }
+  },
+  {
+   "name": "Perfect block",
+   "params": {
+    "size": 1,
+    "edge": "#f2c230"
+   }
+  },
+  {
+   "name": "Small tick",
+   "params": {
+    "size": 0,
+    "pieces": 3
+   }
+  }
+ ],
+ "bundles": []
+}

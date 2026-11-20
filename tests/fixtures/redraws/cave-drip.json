@@ -1,0 +1,195 @@
+{
+ "id": "cave-drip",
+ "frozen": "2026-11-20",
+ "source": "sprites/cave-drip.js",
+ "sha256": "06f075e19d89cba75bd62ce8d454b03946102117147e4a303603ce91d5f20034",
+ "name": "Cave drip",
+ "blurb": "Water dripping from a cave ceiling: a drop swells, stretches, falls and lands with a small splash, ring or puddle, as a patch to place under a ceiling. Change the drop size, the fall, how many drips, what happens where it lands and the colours.",
+ "meta": {
+  "type": "effect",
+  "role": "effects/weather",
+  "themes": [
+   "neutral",
+   "dungeon"
+  ],
+  "gameTypes": [
+   "platformer",
+   "roguelike-action",
+   "puzzle"
+  ],
+  "view": "side",
+  "words": [
+   "drip",
+   "drop",
+   "water",
+   "leak",
+   "cave",
+   "ceiling",
+   "stalactite",
+   "damp",
+   "puddle",
+   "splash",
+   "slime",
+   "falling"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  64,
+  64
+ ],
+ "pivot": [
+  32,
+  62
+ ],
+ "grounded": false,
+ "preview": "loop",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "fall": {
+   "kind": "range",
+   "label": "Fall",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Short",
+   "hi": "Long",
+   "group": "Look"
+  },
+  "pieces": {
+   "kind": "range",
+   "label": "Drips",
+   "def": 1,
+   "min": 1,
+   "max": 3,
+   "step": 1,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "splash",
+   "options": [
+    {
+     "value": "splash",
+     "label": "Splash"
+    },
+    {
+     "value": "ripple",
+     "label": "Ripple"
+    },
+    {
+     "value": "puddle",
+     "label": "Puddle"
+    }
+   ],
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Water",
+   "def": "#3f9fd1",
+   "swatches": [
+    "#3f9fd1",
+    "#4fd8ee",
+    "#3f6fd1",
+    "#7fb0b8",
+    "#e08a2c",
+    "#a4c44a",
+    "#9bd18a"
+   ],
+   "group": "Colors"
+  },
+  "core": {
+   "kind": "color",
+   "label": "Foam",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#f2c230",
+    "#8fd0f0",
+    "#c2c9d6"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "loop": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  }
+ },
+ "sounds": {
+  "loop": [
+   {
+    "sound": "bubbles",
+    "preset": "Slow drips",
+    "frame": 0,
+    "volume": 0.35
+   }
+  ]
+ },
+ "versions": [
+  {
+   "name": "Water drip",
+   "params": {}
+  },
+  {
+   "name": "Slime drip",
+   "params": {
+    "style": "puddle",
+    "body": "#9bd18a"
+   }
+  },
+  {
+   "name": "Lava drip",
+   "params": {
+    "body": "#e08a2c",
+    "core": "#f2c230"
+   }
+  },
+  {
+   "name": "Steady drips",
+   "params": {
+    "pieces": 3
+   }
+  },
+  {
+   "name": "Long fall",
+   "params": {
+    "fall": 1,
+    "size": 0
+   }
+  }
+ ],
+ "bundles": []
+}

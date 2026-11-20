@@ -1,0 +1,175 @@
+{
+ "id": "stand.apart",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "of": "rock",
+    "behind": [
+     "sky"
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      0
+     ],
+     "size": [
+      32,
+      32
+     ],
+     "paint": {
+      "rule": "stand.apart",
+      "v": 1,
+      "of": "rock",
+      "air": "clear",
+      "depth": 0.5,
+      "behind": [
+       "sky"
+      ],
+      "also": [
+       "clear"
+      ],
+      "night": false,
+      "darkest": 0,
+      "way": "auto",
+      "step": 0.08
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "of": "land",
+    "air": "sky",
+    "depth": 0.4,
+    "behind": [
+     "rock"
+    ],
+    "also": [
+     "sky"
+    ],
+    "night": true
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      0
+     ],
+     "size": [
+      32,
+      32
+     ],
+     "paint": {
+      "rule": "stand.apart",
+      "v": 1,
+      "of": "land",
+      "air": "sky",
+      "depth": 0.4,
+      "behind": [
+       "rock"
+      ],
+      "also": [
+       "sky"
+      ],
+      "night": true,
+      "darkest": 0,
+      "way": "auto",
+      "step": 0.08
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "of": "land.dark",
+    "air": "sky",
+    "depth": 0,
+    "behind": [
+     "rock",
+     "land"
+    ],
+    "darkest": 0.26
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      0
+     ],
+     "size": [
+      32,
+      32
+     ],
+     "paint": {
+      "rule": "stand.apart",
+      "v": 1,
+      "of": "land.dark",
+      "air": "sky",
+      "depth": 0,
+      "behind": [
+       "rock",
+       "land"
+      ],
+      "also": [
+       "clear"
+      ],
+      "night": false,
+      "darkest": 0.26,
+      "way": "auto",
+      "step": 0.08
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "of": "land",
+    "air": "void",
+    "depth": 0.2,
+    "behind": [
+     "rock"
+    ],
+    "also": [
+     "sky"
+    ],
+    "way": "lighter"
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      0
+     ],
+     "size": [
+      32,
+      32
+     ],
+     "paint": {
+      "rule": "stand.apart",
+      "v": 1,
+      "of": "land",
+      "air": "void",
+      "depth": 0.2,
+      "behind": [
+       "rock"
+      ],
+      "also": [
+       "sky"
+      ],
+      "night": false,
+      "darkest": 0,
+      "way": "lighter",
+      "step": 0.08
+     }
+    }
+   ]
+  }
+ ]
+}

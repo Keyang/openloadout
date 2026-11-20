@@ -1,0 +1,199 @@
+{
+ "id": "smoke-plume",
+ "frozen": "2026-11-20",
+ "source": "sprites/smoke-plume.js",
+ "sha256": "829474f0157a10fa2d1eda0c902372af7f34bfb9a9ac292d642669f9a9776568",
+ "name": "Smoke plume",
+ "blurb": "A column of smoke or steam rising from a chimney, a wreck or a vent, which can die down. Change its size, puffs, drift, style and colours.",
+ "meta": {
+  "type": "effect",
+  "role": "effects/dust",
+  "themes": [
+   "neutral",
+   "city",
+   "fantasy"
+  ],
+  "gameTypes": [
+   "platformer",
+   "top-down-rpg",
+   "shooter",
+   "farming-sim"
+  ],
+  "view": "side",
+  "words": [
+   "smoke",
+   "plume",
+   "chimney",
+   "steam",
+   "vent",
+   "soot",
+   "fumes",
+   "column",
+   "rising",
+   "wreck",
+   "burnt",
+   "die down",
+   "fade"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  48,
+  48
+ ],
+ "pivot": [
+  24,
+  46
+ ],
+ "grounded": false,
+ "preview": "loop",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "pieces": {
+   "kind": "range",
+   "label": "Puffs",
+   "def": 5,
+   "min": 3,
+   "max": 8,
+   "step": 1,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "drift": {
+   "kind": "range",
+   "label": "Drift",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Still",
+   "hi": "Windy",
+   "group": "Look"
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "smoke",
+   "options": [
+    {
+     "value": "smoke",
+     "label": "Smoke"
+    },
+    {
+     "value": "steam",
+     "label": "Steam"
+    },
+    {
+     "value": "soot",
+     "label": "Soot"
+    }
+   ],
+   "group": "Look"
+  },
+  "core": {
+   "kind": "color",
+   "label": "Light smoke",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#7fb0b8",
+    "#8fd0f0",
+    "#d8d8e0"
+   ],
+   "group": "Colors"
+  },
+  "edge": {
+   "kind": "color",
+   "label": "Dark smoke",
+   "def": "#8f97a8",
+   "swatches": [
+    "#8f97a8",
+    "#5d6475",
+    "#3f5068",
+    "#6b7280",
+    "#a4c44a"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "loop": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "fade": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [
+  {
+   "name": "Chimney smoke",
+   "params": {}
+  },
+  {
+   "name": "Steam vent",
+   "params": {
+    "style": "steam",
+    "drift": 0,
+    "core": "#8fd0f0"
+   }
+  },
+  {
+   "name": "Black smoke",
+   "params": {
+    "style": "soot",
+    "core": "#7fb0b8",
+    "edge": "#5d6475"
+   }
+  },
+  {
+   "name": "Windy",
+   "params": {
+    "drift": 1,
+    "pieces": 7
+   }
+  },
+  {
+   "name": "Wisp",
+   "params": {
+    "size": 0,
+    "pieces": 3
+   }
+  }
+ ],
+ "bundles": []
+}

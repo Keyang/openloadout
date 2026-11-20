@@ -1,0 +1,272 @@
+{
+ "id": "ui-controls-gilded",
+ "frozen": "2026-11-20",
+ "source": "sprites/ui-controls-gilded.js",
+ "sha256": "9ff6846fe2167a6c7c104a37ddf6411871d93484772e6942e8ce436dc9500ecc",
+ "name": "Stone and gold checkboxes",
+ "blurb": "The small pieces of a settings screen in carved stone and gold: a ticked and an empty box, a round gem option, an on/off switch, a gold arrow pointer with a gem and corner brackets round a chosen slot; change the style, corners, band, colours and speed.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/cursor",
+  "themes": [
+   "neutral",
+   "fantasy",
+   "dungeon"
+  ],
+  "gameTypes": [
+   "arcade",
+   "turn-based-rpg",
+   "top-down-rpg",
+   "card-game"
+  ],
+  "view": "none",
+  "words": [
+   "checkbox",
+   "tick",
+   "option",
+   "radio",
+   "switch",
+   "toggle",
+   "pointer",
+   "cursor",
+   "arrow",
+   "select",
+   "settings",
+   "stone",
+   "gold",
+   "gem"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "check-on",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "temple",
+   "options": [
+    {
+     "value": "temple",
+     "label": "Temple"
+    },
+    {
+     "value": "royal",
+     "label": "Royal"
+    },
+    {
+     "value": "ruin",
+     "label": "Ruin"
+    }
+   ],
+   "group": "Look"
+  },
+  "corner": {
+   "kind": "range",
+   "label": "Corner",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Square",
+   "hi": "Round",
+   "group": "Look"
+  },
+  "border": {
+   "kind": "range",
+   "label": "Border",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Thin",
+   "hi": "Thick",
+   "group": "Look"
+  },
+  "face": {
+   "kind": "color",
+   "label": "Stone",
+   "def": "#3f5068",
+   "swatches": [
+    "#3f5068",
+    "#7a4f33",
+    "#434d6d",
+    "#8e3a4a"
+   ],
+   "group": "Colors"
+  },
+  "frame": {
+   "kind": "color",
+   "label": "Gold",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#c2c9d6",
+    "#f6d3b0",
+    "#f4e06a",
+    "#e6c96a"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Gems and tick",
+   "def": "#4fd8ee",
+   "swatches": [
+    "#4fd8ee",
+    "#c9423a",
+    "#a4c44a",
+    "#3f6fd1",
+    "#e08a2c"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "check-on": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "check-off": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "radio-on": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "radio-off": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "switch-on": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "switch-off": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "pointer": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    8,
+    12
+   ]
+  },
+  "selector": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    8,
+    12
+   ]
+  }
+ },
+ "sounds": {
+  "check-on": [
+   {
+    "sound": "menu-confirm",
+    "preset": "Soft tick",
+    "frame": 0,
+    "volume": 0.6
+   }
+  ],
+  "switch-on": [
+   {
+    "sound": "menu-confirm",
+    "preset": "Soft tick",
+    "frame": 0,
+    "volume": 0.6
+   }
+  ]
+ },
+ "versions": [
+  {
+   "name": "Temple",
+   "params": {}
+  },
+  {
+   "name": "Royal ruby",
+   "params": {
+    "style": "royal",
+    "accent": "#c9423a"
+   }
+  },
+  {
+   "name": "Ruin",
+   "params": {
+    "style": "ruin",
+    "face": "#7a4f33",
+    "frame": "#e6c96a"
+   }
+  },
+  {
+   "name": "Silver",
+   "params": {
+    "frame": "#c2c9d6",
+    "accent": "#3f6fd1"
+   }
+  },
+  {
+   "name": "Bright gold",
+   "params": {
+    "frame": "#f4e06a",
+    "accent": "#a4c44a"
+   }
+  }
+ ],
+ "bundles": []
+}

@@ -35,6 +35,18 @@
 //   ui.pointer@1   a pointer: an arrow head on a short tail that nudges toward what it points at once a loop
 //   ui.selector@1  four corner brackets round a slot that step in and back out once a loop
 //   ui.area@1      draws nothing: a clip's text areas and slice as data, for a board whose own piece measures otherwise
+// Added by migration batch M8b (the control sets and the neon bars; at the end of this module):
+//   ui.trough.lit@1  ui.trough@1 lit as a neon tube: a glow ring inside a housing's opening, a rail with a light core
+//   ui.toggle@2      the code's tick, radio dot and banded switch with its smaller inked knob
+//   ui.pointer@2     a pointer drawn from its own pixel art, whose measure gives its moving tip as the attach point `tip`
+//   ui.selector@2    the code's brackets: lit at the bend, a core line, and its step patterns (pulse, between, held, grow)
+// and (review M8b round 1) the code sets' band marks on ui.toggle@2 (tube, gap, twist, bevel, facets, plates, bites,
+// card, cracks ...), the styles on ui.selector@2 (second tube, stripes, gap, flower, knot), the sign's gaps on
+// ui.trough.lit@1, and:
+//   ui.strip.lit@1   ui.strip@1 with a short run at the start of its top row (the code's barFill shine: the RPG bars)
+// and (review M8b round 2) ui.selector@2's `bends` (per-corner stamps over each bracket's bend: the crystal bevel) and
+// `eased` steps (the code's pulse, its first frame the pose between), its vine stripes kept on their columns as it
+// creeps, and ui.pointer@2's `blink` (the neon core going dark on one frame in eight).
 // Each returns rects (spans of one paint, merged down) and stamps; SKIN_MEASURES gives the slice and text area of each
 // (Contract 8), joined to UI_MEASURES in engine/gen/ui-pieces.js.
 //
@@ -189,6 +201,9 @@ function raster() {
     set(px2, py2, p) { if (p !== undefined && p !== null) cells.set(`${px2},${py2}`, keyOf(p)); },
     get(px2, py2) { return cells.get(`${px2},${py2}`); },
     has(px2, py2) { return cells.has(`${px2},${py2}`); },
+    // migration batch M8b (ui.toggle@2's marks): a pixel's paint, and taking a pixel out
+    paintAt(px2, py2) { const id = cells.get(`${px2},${py2}`); return id === undefined ? undefined : keys.get(order[id]).paint; },
+    del(px2, py2) { cells.delete(`${px2},${py2}`); },
     prims(layers = []) {
       const out = [], covered = new Map();
       for (const { D, bases } of layers) {
@@ -1025,4 +1040,663 @@ const fitted = (fn) => (a, ctx = {}) => fitMeasure(fn(a, ctx), ctx.size);
 export const SKIN_MEASURES = Object.freeze({
   'ui.slab@1': fitted(measureSlab), 'ui.trough@1': fitted(measureTrough), 'ui.strip@1': fitted(measureStrip),
   'ui.toggle@1': () => ({}), 'ui.pointer@1': () => ({}), 'ui.selector@1': fitted(measureSelector), 'ui.area@1': measureArea,
+  // migration batch M8b: the second versions and the lit trough (below)
+  'ui.trough.lit@1': fitted(measureTrough), 'ui.toggle@2': () => ({}), 'ui.pointer@2': measurePointer2, 'ui.selector@2': fitted(measureSelector),
+  // review M8b round 1: the RPG bars' fill lit as the code's barFill
+  'ui.strip.lit@1': fitted(measureStrip),
+});
+
+// ---- the lit trough and the second versions (migration batch M8b) --------------------------------------------------
+// The control sets (sprites/ui-controls-*.json) and the neon bars redrawn as data: each draws what the code helpers drew
+// (engine/ui-skins.js skinCheck, skinRadio, skinSwitch, skinPointer, skinSelector, skinSlider; engine/ui-neon-tube.js
+// neonBarTube) closer than version 1, which stays as it was (its goldens) until no asset names it. Each takes every
+// argument of the piece it extends, so a skin's arguments reach both.
+
+/** The pieces migration batch M8b added to this module, "<id>@<v>" each (all family "ui"): the lit trough and three second versions. */
+export const SKIN_PIECES_2 = Object.freeze(['ui.trough.lit@1', 'ui.toggle@2', 'ui.pointer@2', 'ui.selector@2', 'ui.strip.lit@1']);
+
+const isClear = (p) => p === undefined || p === null || p === 'clear';
+/** The pixels of a shape test sampled at pixel centres in a box, as rows [[y, x0, x1]] (one run per row: convex shapes). */
+function rowsOfTest(x, y, w, h, inside) {
+  const out = [];
+  for (let py2 = y; py2 < y + h; py2++) {
+    let a = null, b = null;
+    for (let px2 = x; px2 < x + w; px2++) if (inside(px2 + 0.5, py2 + 0.5)) { if (a === null) a = px2; b = px2; }
+    if (a !== null) out.push([py2, a, b]);
+  }
+  return out;
+}
+/** The pixels (as "x,y" keys) 4-next to a set of pixels and not in it: the ink outline the code drew round a shape. */
+function inkRound(cells) {
+  const out = new Set();
+  for (const k of cells) {
+    const [px2, py2] = k.split(',').map(Number);
+    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const n = `${px2 + dx},${py2 + dy}`; if (!cells.has(n)) out.add(n); }
+  }
+  return out;
+}
+const cellXY = (k) => k.split(',').map(Number);
+
+/**
+ * ui.trough.lit@1: ui.trough@1 lit as a tube, as the code's neonBarTube drew the neon bars: `glowRing` (with extras on)
+ * rings the inside of a housing's opening and is a rail's band; `core` is a rail's trough (a light core inside its band)
+ * and with `twoTubes` the lower half of it is the accent (a second tube). With none of them it draws exactly as ui.trough@1. A generator of
+ * its own rather than ui.trough@2, so the other skin families' bars keep naming the newest ui.trough.
+ */
+export const uiTroughLit = defineGenerator({
+  id: 'ui.trough.lit', v: 1, family: 'ui',
+  about: 'A skinned bar housing round its opening, or a slider\'s rail, lit as a tube: a glow inside the opening, a rail with a light core.',
+  args: {
+    ...uiTrough.args,
+    glowRing: paint({ default: 'clear', about: 'With extras on: a ring just inside a housing\'s opening and a rail\'s band, a neon tube\'s glow (clear: none)' }),
+    core: paint({ default: 'clear', about: 'A rail\'s trough: the light core inside its band (clear: the trough that `trough` says)' }),
+    twoTubes: flag({ default: false, about: 'The lower half of a rail\'s core in the accent: a second tube' }),
+    sign: flag({ default: false, about: 'Neon sign: the tube broken where it bends at each corner (its pixels on the corner\'s diagonal and one beside), in the face\'s tone -1' }),
+  },
+  // version 1's bound over the rows it draws (a rail at most 6), and the glow ring and the second tube's rows as rects
+  cost: (a) => { const [w, h0] = sizeOf(a), h = Math.min(h0, a.role === 'rail' ? 6 : TROUGH_MAX); return 24 + (SKIN_RINGS + 4) * areaCount(h) + (OVERRIDES_PER_ROW + 2 * Math.ceil(w / 8)) * (h + 2) + 2 * 16 + ornamentCost(w, h, a.every) + 2 * (h + 2) + 4; },
+  run(a) {
+    const T = troughGeom(a);
+    const { x, y, w, h, rings, o } = T;
+    if (w < 3 || h < 3) return [];
+    const rail = a.role === 'rail', open = o.w > 0 && o.h > 0;
+    const glow = a.extras && !isClear(a.glowRing) ? a.glowRing : null;
+    const R = raster();
+    const D = depthGrid(edgeRows(a.edge, x, y, w, h, clampI(a.corner, 0, rail ? 2 : 4)), { x, y, w, h });
+    const well = a.trough === 'well';
+    const band = rail && glow ? glow : rings.find((r) => r.band)?.paint ?? a.frame;
+    const trough = rail && !isClear(a.core) ? a.core : a.trough === 'ink' ? mixOf(a.ink, a.frame, 0.2) : well ? a.face : mixOf(a.face, a.ink, 0.55);
+    const low = rail && a.twoTubes ? a.accent : null, mid = y + (h >> 1);
+    const inO = (px2, py2) => open && px2 >= o.x && px2 < o.x + o.w && py2 >= o.y && py2 < o.y + o.h;
+    const faceAt = (px2, py2) => {
+      if (inO(px2, py2)) {
+        if (T.pitch && (px2 - o.x + 1) % T.pitch === 0) return a.divider;
+        if (!rail && glow && (px2 === o.x || py2 === o.y || px2 === o.x + o.w - 1 || py2 === o.y + o.h - 1)) return glow;
+        if (low && py2 >= mid) return low;
+        return py2 === o.y && !rail ? shadeOf(trough, well ? -0.5 : -1) : trough;
+      }
+      if (!rail && open && px2 >= o.x - 1 && px2 <= o.x + o.w && py2 >= o.y - 1 && py2 <= o.y + o.h && (px2 === o.x - 1 || px2 === o.x + o.w)) return a.rim;
+      return band;
+    };
+    paintSlab(R, D, rings.map((r) => (r.band && rail && glow ? { ...r, paint: glow } : r)), band, a, faceAt);
+    // review M8b round 1: the sign's gaps (moreSkinMarks sign), on the rings only, never on ink
+    if (a.sign) for (const [cx, cy, sx, sy] of boxCorners({ x, y, w, h })) for (let i = 0; i < Math.min(w, h) >> 1; i++) for (const [u, v] of [[i, i], [i + 1, i]]) {
+      const px2 = cx + sx * u, py2 = cy + sy * v, dd = D.at(px2, py2);
+      if (dd >= 2 && dd <= rings.length && !inO(px2, py2) && R.paintAt(px2, py2) !== a.ink) R.set(px2, py2, shadeOf(a.face, -1));
+    }
+    if (!rail && open) {
+      for (let px2 = o.x - 1; px2 <= o.x + o.w; px2++) { R.set(px2, o.y - 1, a.rim); R.set(px2, o.y + o.h, a.rim); }
+      for (let py2 = o.y; py2 < o.y + o.h; py2++) { R.set(o.x - 1, py2, a.rim); R.set(o.x + o.w, py2, a.rim); }
+    }
+    if (a.notches) {
+      for (let px2 = x + 8; px2 < x + w - 8; px2 += 8) for (let py2 = y + 1; py2 < y + h - 1; py2++) {
+        const dd = D.at(px2, py2);
+        if (dd > 1 && dd <= rings.length && rings[dd - 1].band) R.set(px2, py2, a.ink);
+      }
+    }
+    const inside = (px2, py2) => D.at(px2, py2) > 0 && !inO(px2, py2), ring = (px2, py2) => inside(px2, py2) && D.at(px2, py2) <= rings.length;
+    const deep = (px2, py2) => inside(px2, py2) && D.at(px2, py2) <= rings.length + 1;
+    return [...R.prims([{ D, bases: basesOf(rings, band, trough) }]), ...ornaments(a, { x, y, w, h }, inside, ring, deep)];
+  },
+});
+
+// ---- the code sets' band marks on a toggle (review M8b round 1: each family's look at its defaults) ----------------
+// Ports of what engine/ui-skins-more.js moreSkinMarks, engine/ui-grove-vine.js groveMarks, engine/ui-neon-tube.js
+// neonGrowBand, engine/ui-crystal-frost.js (icicles, ferns, shards), engine/ui-gilded.js gildedCorners and
+// engine/ui-paper.js paperMarks and engine/paper-tear.js tearEdges drew over the code sets' check boxes, options and
+// switches, each an argument of ui.toggle@2 that a sprite names (per style through a pick): no mark is ever on unless
+// asked for, so a call without them draws as before (the flat set's pixels).
+
+/** Gold, as a paint a generator may hand on (the code's PALETTE.thornwood.gold, a bloom flower's heart): the identity mix. */
+const GOLD_PAINT = Object.freeze({ rule: 'mix', of: '#f2c230', with: '#f2c230', amount: 0 });
+/** White, as a paint a generator may hand on (the code's '#ffffff': an icicle's or a shard's tip). */
+const WHITE_PAINT = Object.freeze({ rule: 'mix', of: '#ffffff', with: '#ffffff', amount: 0 });
+
+/** The gilded corner plates of engine/ui-gilded.js (top left corner, row from the outline in): T the outer row's bevel, S the outer column's, G gold, L lit, D dark, o ink, g the gem's place, x a chip. */
+const GILDED_PLATES = Object.freeze({
+  temple: ['TTTTTT', 'SgggGG', 'SgggGG', 'SgggGo', 'SGGGoo', 'SGGo..'],
+  royal: ['TTTTTT', 'SgggDL', 'SgggDD', 'SgggDL', 'SDDDDD', 'SLDLD.'],
+  ruin: ['xx.xx.', 'xgggDo', '.gggDD', '.ggg.o', 'xD.o..', 'xoD...'],
+});
+const PLATE_BASE = { temple: 'G', royal: 'G', ruin: 'D' }, PLATE_MARK = { temple: 'o', royal: 'L', ruin: 'o' };
+
+/** The band marks ui.toggle@2 takes beside version 1's arguments (each off by default). Their colours are the code's tones of the piece's own paints (so a toggle names few paints: gen-node-origin holds a generator to 12). */
+const TOGGLE_MARK_ARGS = Object.freeze({
+  tube: word(['none', 'tube', 'double', 'sign'], { default: 'none', about: 'Neon: a light core in the band (tube, double: a gap of the face outside it; double: a second tube of the accent; sign: the band broken at its bends)' }),
+  vine: word(['none', 'vine', 'bark', 'bloom'], { default: 'none', about: 'Grove: the band twisted every 2 px (vine, bloom: with flowers and buds), or bark: its inner lines dark, with knots' }),
+  twistIn: count(0, 2, { default: 0, about: 'How many pixels each twist stripe runs on over the face (or a switch\'s track)' }),
+  bevel: word(['none', 'outer', 'skin', 'frosted'], { default: 'none', about: 'The band bevelled: outer (crystal, its outer line), skin (candy, gilded: outer line lit up and right, every line dark down and left) or frosted (as skin, lit wherever it faces up)' }),
+  bevelDepth: share({ default: 0.5, about: 'How much darker the bevel\'s dark side is (the code: crystal 0.6, candy 0.5, gilded 1); its light side is the frame\'s tone +0.85' }),
+  facets: word(['none', 'ice', 'rime', 'shard'], { default: 'none', about: 'Crystal: icicles hanging from the top band, a frost fern in from each corner (its tip the accent), or shards standing on the bottom band' }),
+  plate: word(['none', 'temple', 'royal', 'ruin'], { default: 'none', about: 'Gilded: the code\'s gold corner plate of that style in each corner (no gem: a mark in its middle)' }),
+  plateSize: count(1, 6, { default: 4, about: 'How many rows and columns of the plate are drawn' }),
+  fillet: flag({ default: false, about: 'Gilded temple: a ring of the frame inside every ring, the face\'s first ring (its gold fillet)' }),
+  stripes: flag({ default: false, about: 'Candy striped: the band\'s pixels on every third diagonal in the frame\'s tone -1.5' }),
+  gloss: flag({ default: false, about: 'Candy jelly: the face\'s first row where it faces up in the face\'s tone +0.45' }),
+  bites: flag({ default: false, about: 'Paper torn: 2 px bites along the sides (a box two a side, a switch two in its top and bottom), inked again' }),
+  card: count(0, 6, { default: 0, about: 'Paper card: the top right corner folded down this many px and the face\'s bottom two rows in its dark tone; 0: none' }),
+  cracks: flag({ default: false, about: 'Gilded ruin: the code\'s two cracks, a box\'s from its band into the stone (a lit lip beside each), a switch\'s across its band' }),
+  trackOff: paint({ default: 'clear', about: 'A switch\'s track when off (clear: the face\'s dark tone)' }),
+  trackEnd: paint({ default: 'clear', about: 'An on switch\'s track from its knob\'s middle to its end in this (paper: the rule, so no accent shows beside the knob); clear: the track' }),
+});
+
+/** The paints a ui.toggle@2 call's band marks draw with, from its words and flags: each the code's tone of the piece's own paints (engine/ui-skins-more.js moreSkinTones, engine/ui-skins.js skinTones), null when off. */
+function toggleMarkPaints(a) {
+  const t = a.tube ?? 'none', v = a.vine ?? 'none';
+  return {
+    core: t !== 'none' ? shadeOf(a.frame, 0.85) : null,
+    gapRing: t === 'tube' || t === 'double' ? a.face : null,
+    inner: t === 'double' ? a.accent : v === 'bark' ? shadeOf(a.frame, -1) : null,
+    bandInner: v === 'bark' ? shadeOf(a.frame, -1) : null,
+    gap: t === 'sign' ? shadeOf(a.face, -1) : null,
+    gapClip: t === 'sign' ? shadeOf(a.frame, -1) : null,
+    twist: v === 'vine' || v === 'bloom' ? shadeOf(a.frame, -1) : null,
+    knot: v === 'bark' ? shadeOf(a.face, 0.45) : null,
+    flower: v === 'bloom' ? a.accent : null,
+    faceRing: a.fillet ? a.frame : null,
+    diagonal: a.stripes ? shadeOf(a.frame, -1.5) : null,
+    gloss: a.gloss ? shadeOf(a.face, 0.45) : null,
+    light: shadeOf(a.frame, 0.85), dark: shadeOf(a.frame, -clamp01(fin(a.bevelDepth) ? a.bevelDepth : 0.5) * 1),
+  };
+}
+
+/** Does a ui.toggle@2 call ask for any band mark (its cost then counts a rect a pixel). */
+function toggleMarked(a) {
+  return (a.tube && a.tube !== 'none') || (a.vine && a.vine !== 'none') || (a.bevel && a.bevel !== 'none') || (a.facets && a.facets !== 'none') || (a.plate && a.plate !== 'none')
+    || !!a.fillet || !!a.stripes || !!a.gloss || !!a.bites || a.card > 0 || !!a.cracks || !isClear(a.trackOff) || !isClear(a.trackEnd);
+}
+
+/** An upper bound on the stamps ornaments returns for these arguments over a w x h box: each corner list's stamps times its places (4, 2 or 1), and the along lists' runs when they hold a stamp (ornamentCost, counted from the lists given). */
+function ornamentCostOf(a, w, h) {
+  const n = (l) => Math.min(Array.isArray(l) ? l.length : 0, SKIN_TRIMS), al = (l) => (Array.isArray(l) && l.length ? 1 : 0);
+  const e = Math.max(4, fin(a.every) ? a.every : 4), runs = 2 * (Math.ceil(Math.max(0, w) / e) + 1) + 2 * (Math.ceil(Math.max(0, h) / e) + 1);
+  return 4 * n(a.trim) + 2 * n(a.topTrim) + n(a.rightTrim) + 2 * runs * al(a.along)
+    + (a.extras ? 4 * n(a.extra) + 2 * n(a.extraTop) + 2 * runs * al(a.extraAlong) : 0) + (a.gleam ? 4 * n(a.gleamTrim) + 2 * n(a.gleamTop) + n(a.gleamRight) : 0);
+}
+
+/** The code's ruin cracks (sprites/ui-controls-gilded.js): ink and the stone's lit lip, in pixels from a 20 px box's or a 28 x 16 switch's top left. */
+const RUIN_CRACKS = Object.freeze({
+  box: { ink: [[7, 1], [7, 2], [6, 3], [6, 4], [5, 5], [5, 6], [4, 7], [18, 13], [17, 13], [16, 14], [15, 14], [14, 15], [13, 15]], lip: [[7, 4], [6, 5], [6, 6], [5, 7], [15, 13], [14, 14], [13, 14]] },
+  // a switch's two cracks (the code drew them with engine/rock.js crack, seeds 4 and 8): across the band, top right and bottom left
+  switch: { ink: [[20, 1], [20, 2], [19, 3], [19, 4], [18, 5], [19, 6], [8, 9], [9, 10], [8, 11], [8, 12], [7, 13], [7, 14]], lip: [] },
+});
+
+/** ui.toggle@2's rings: the skin's (ringList) with the tube's gap ring after the outline, every band line after the first in the bark's dark tone, the second the tube's core (neither then lit as the band), the second tube or the bark's dark ring just inside the band, and the gilded fillet inside them all; band lines carry `line` (0 the outer one). */
+function toggleRings(a, { onSwitch = false } = {}) {
+  const M = toggleMarkPaints(a);
+  const base = ringList(a), out = [];
+  if (M.gapRing && !onSwitch) base.splice(1, 0, { paint: M.gapRing, band: false });
+  let line = 0;
+  base.forEach((r, i) => {
+    if (!r.band) { out.push(r); return; }
+    let p = null;
+    if (line >= 1 && M.bandInner) p = M.bandInner;
+    if (line === 1 && M.core) p = M.core;
+    out.push(p === null ? { ...r, line } : { paint: p, band: false, line });
+    line++;
+    if (!(base[i + 1] && base[i + 1].band) && M.inner) out.push({ paint: M.inner, band: false, innerRing: true });
+  });
+  if (M.faceRing && !onSwitch) out.push({ paint: M.faceRing, band: false });
+  return out;
+}
+
+/** The four corners of a box as [corner x, corner y, step x, step y]: top left, top right, bottom right, bottom left. */
+const boxCorners = (b) => [[b.x, b.y, 1, 1], [b.x + b.w - 1, b.y, -1, 1], [b.x + b.w - 1, b.y + b.h - 1, -1, -1], [b.x, b.y + b.h - 1, 1, -1]];
+
+/**
+ * Draws ui.toggle@2's band marks into the raster R of a toggle (its depth grid D, rings as toggleRings gives them, box
+ * b, arguments a, `inside` the face's or the track's paint), in the order the code drew them: the bevel, the twist,
+ * the bark's knots, the bloom's flowers and buds, the sign's gaps and clips, the crystal's facets, the gilded plates,
+ * the bottom trims, then the torn bites. Returns late(T, keepOff): the marks drawn after the tick, dot or knob (raster
+ * T): the card's edge and fold and the `marks` stamps, never on keepOff pixels' ink.
+ */
+function toggleMarks(R, D, rings, b, a, inside) {
+  const C = boxCorners(b), local = (c, u, v) => [C[c][0] + C[c][2] * u, C[c][1] + C[c][3] * v];
+  const nR = rings.length;
+  const lastBand = rings.reduce((m, r, i) => (r.line !== undefined ? i + 1 : m), 0);   // the depth of the band's inner line
+  const isBand = (px2, py2) => { const d = D.at(px2, py2); return d >= 1 && d <= nR && rings[d - 1].line !== undefined; };
+  const isFace = (px2, py2) => D.at(px2, py2) > lastBand && !(rings[D.at(px2, py2) - 1]?.paint === a.ink);
+  const free = (px2, py2) => D.at(px2, py2) >= 2 && R.paintAt(px2, py2) !== a.ink;
+  const M = toggleMarkPaints(a), light = M.light, dark = M.dark;
+  const box = a.kind === 'switch' ? null : { x: b.x + 5, y: b.y + 5, w: b.w - 10, h: b.h - 10 };   // the middle the crystal marks keep clear (the tick, the dot)
+  const inMiddle = (px2, py2) => !!box && px2 >= box.x && px2 < box.x + box.w && py2 >= box.y && py2 < box.y + box.h;
+  // first step along a corner's diagonal (from the corner pixel) past the band onto the face, as moreSkinMarks' firstInside
+  const diag = (c, du = 1, dv = 1, u0 = 0, v0 = 0) => {
+    let passed = false;
+    for (let i = 0; i < Math.max(b.w, b.h); i++) { const [px2, py2] = local(c, u0 + du * i, v0 + dv * i); if (isBand(px2, py2)) passed = true; else if (passed && isFace(px2, py2)) return i; }
+    return 2;
+  };
+  // the bevel (moreSkinMarks crystal; engine/ui-skins.js rings for candy and gilded)
+  if (a.bevel === 'outer' || a.bevel === 'skin' || a.bevel === 'frosted') for (let j = 0; j < D.h; j++) for (let i = 0; i < D.w; i++) {
+    const px2 = D.x + i, py2 = D.y + j, d = D.at(px2, py2), r = rings[d - 1];
+    if (!d || !r || r.line === undefined || (a.bevel === 'outer' && r.line !== 0)) continue;
+    const lowLeft = D.at(px2 - 1, py2 + 1) < d, topSide = D.at(px2, py2 - 1) < d, topRight = topSide || D.at(px2 + 1, py2) < d;
+    if (a.bevel === 'frosted' && topSide) R.set(px2, py2, light);
+    else if (lowLeft) R.set(px2, py2, dark);
+    else if (topRight && r.line === 0) R.set(px2, py2, light);
+  }
+  // the candy stripes (candyMarks striped): every third diagonal of the band
+  if (M.diagonal) for (let j = 0; j < D.h; j++) for (let i = 0; i < D.w; i++) { const px2 = D.x + i, py2 = D.y + j; if (((px2 + py2) % 3 + 3) % 3 === 0 && isBand(px2, py2)) R.set(px2, py2, M.diagonal); }
+  // the frosted icing's drips (engine/ui-candy.js candyMarks frosted): from under the top band, over the ink line, onto the face
+  if (a.bevel === 'frosted') {
+    const drips = [[4, 2], [5, 3], [7, 1]];
+    for (const [cx, sx] of [[b.x, 1], [b.x + b.w - 1, -1]]) drips.forEach(([u, len], i) => {
+      const px2 = cx + sx * u, n = sx > 0 ? len : drips[(i + 1) % drips.length][1];
+      let py2 = b.y; while (py2 < b.y + b.h && !isBand(px2, py2)) py2++;
+      while (py2 < b.y + b.h && isBand(px2, py2)) py2++;
+      for (let k2 = 0; k2 < n && py2 + k2 < b.y + b.h; k2++) if (D.at(px2, py2 + k2) > 0 && !isBand(px2, py2 + k2)) R.set(px2, py2 + k2, light);
+    });
+  }
+  // the gloss (engine/ui-skins.js rings, candy jelly): the face's first ring where it faces up
+  if (M.gloss) for (let j = 0; j < D.h; j++) for (let i = 0; i < D.w; i++) {
+    const px2 = D.x + i, py2 = D.y + j, d = D.at(px2, py2);
+    if (d === nR + 1 && D.at(px2, py2 - 1) < d) R.set(px2, py2, M.gloss);
+  }
+  // the track's end (the paper set's switchGap): from the knob's middle column to the end, on an on switch
+  if (!isClear(a.trackEnd) && a.kind === 'switch' && a.checked) {
+    const kh = b.h - 4, from = Math.ceil(b.x + b.w - 2 - kh + kh / 2);
+    for (let j = 0; j < D.h; j++) for (let i = 0; i < D.w; i++) { const px2 = D.x + i, py2 = D.y + j; if (px2 >= from && D.at(px2, py2) > nR) R.set(px2, py2, a.trackEnd); }
+  }
+  // the twist (groveMarks): across the band of each corner quarter, a stripe every 2 px, running twistIn px on over the face
+  if (M.twist) {
+    const hw = b.w >> 1, hh = b.h >> 1, tin = clampI(a.twistIn, 0, 2);
+    for (let c = 0; c < 4; c++) for (let v = 0; v < hh; v++) for (let u = 0; u < hw; u++) {
+      const [px2, py2] = local(c, u, v);
+      if (!isBand(px2, py2)) continue;
+      let du = 0; while (du < u && isBand(...local(c, u - du - 1, v))) du++;
+      let dv = 0; while (dv < v && isBand(...local(c, u, v - dv - 1))) dv++;
+      if ((dv <= du ? u : v) % 2 !== 0) continue;
+      R.set(px2, py2, M.twist);
+      const step = (n) => (dv <= du ? local(c, u, v + n) : local(c, u + n, v));
+      if (tin && !isBand(...step(1))) for (let n = 1; n <= tin; n++) { const [qx, qy] = step(n); if (!isFace(qx, qy)) break; R.set(qx, qy, M.twist); }
+    }
+  }
+  // the bark's knots (moreSkinMarks bark): 2 x 2, one past the first pixel of the face on each corner's diagonal
+  if (M.knot) for (let c = 0; c < 4; c++) { const m = diag(c) + 1; for (const [u, v] of [[m, m], [m + 1, m], [m, m + 1], [m + 1, m + 1]]) { const q = local(c, u, v); if (free(...q)) R.set(...q, M.knot); } }
+  // the bloom (groveMarks): a flower in each top corner, a bud on the band in each bottom corner
+  if (M.flower) {
+    const rim = toneOf(M.flower, 'dark'), heart = GOLD_PAINT;
+    for (const c of [2, 3]) { const m = diag(c) + 1; const q2 = local(c, m, 2), q1 = local(c, m, 1); if (free(...q2)) R.set(...q2, M.flower); if (free(...q1)) R.set(...q1, rim); }
+    for (const c of [0, 1]) {
+      const i0 = diag(c) + 1;
+      const cells = [[0, 0, heart], [1, 0], [-1, 0], [0, 1], [0, -1]].map(([u, v, p]) => [...local(c, i0 + u, i0 + v), p ?? M.flower]);
+      if (!cells.every(([px2, py2]) => free(px2, py2))) continue;
+      const own = new Set(cells.map(([px2, py2]) => `${px2},${py2}`));
+      for (const [px2, py2] of cells) for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const k2 = `${px2 + dx},${py2 + dy}`; if (!own.has(k2) && free(px2 + dx, py2 + dy)) R.set(px2 + dx, py2 + dy, rim); }
+      for (const [px2, py2, p] of cells) R.set(px2, py2, p);
+    }
+  }
+  // the sign's gaps (moreSkinMarks sign): the band's pixels on each corner's diagonal and one beside, a clip just inside
+  if (M.gap) for (let c = 0; c < 4; c++) {
+    for (let i = 0; i <= Math.max(b.w, b.h); i++) for (const [u, v] of [[i, i], [i + 1, i]]) { const q = local(c, u, v); if (isBand(...q) && free(...q)) R.set(...q, M.gap); }
+    let m = 0, passed = false;
+    while (m < Math.min(b.w, b.h) >> 1) { const q = local(c, m, m); if (isBand(...q)) passed = true; else if (passed && isFace(...q)) break; m++; }
+    for (const [u, v] of [[m, m], [m + 1, m], [m, m + 1], [m + 1, m + 1]]) { const q = local(c, u, v); if (free(...q) && !inMiddle(...q)) R.set(...q, M.gapClip); }
+  }
+  // the crystal's facets (moreSkinMarks ice and shard; the control sets' ferns, engine/ui-crystal-frost.js)
+  if (a.facets === 'ice') for (const c of [0, 1]) {
+    const m = diag(c);
+    for (const [u, len] of [[m + 1, 2], [m + 2, 3], [m + 4, 1]]) {
+      const v = diag(c, 0, 1, u, 0);
+      for (let i = 0; i < len; i++) { const q = local(c, u, v + i); if (free(...q) && !inMiddle(...q)) R.set(...q, i === len - 1 ? WHITE_PAINT : light); }
+    }
+  }
+  if (a.facets === 'shard') for (const c of [2, 3]) {
+    const m = diag(c);
+    for (const [u, hgt] of [[m, 4], [m + 3, 3], [m + 5, 2]]) {
+      let v = 0; while (v < b.h && D.at(...local(c, u, v)) < 2) v++;
+      for (let i = 0; i < hgt; i++) {
+        const l = local(c, u, v + i), r = local(c, u + 1, v + i);
+        if (i < hgt - 1 && free(...l) && !inMiddle(...l)) R.set(...l, c === 3 ? dark : light);
+        if (free(...r) && !inMiddle(...r)) R.set(...r, i === hgt - 1 ? WHITE_PAINT : c === 3 ? light : dark);
+      }
+    }
+  }
+  if (a.facets === 'rime') {
+    // a 3 px stem starting `back` px out on the band along each corner's diagonal, one branch at its 2nd and 3rd pixels on
+    // alternate sides, its tip the accent; on a switch only at the two corners away from the knob, on its track
+    const back = a.kind === 'radio' ? 2 : 1;
+    const which = a.kind === 'switch' ? (a.checked ? [0, 3] : [1, 2]) : [0, 1, 2, 3];
+    const can = (px2, py2) => { const p = R.paintAt(px2, py2); return p !== undefined && p !== a.ink && (isFace(px2, py2) || isBand(px2, py2)); };
+    for (const c of which) {
+      let k2 = -1; for (let i = 0; i < Math.min(b.w, b.h); i++) if (isFace(...local(c, i, i))) { k2 = i; break; }
+      if (k2 < back) continue;
+      const s = k2 - back, put = (u, v, p) => { const q = local(c, s + u, s + v); if (can(...q)) R.set(...q, p); };
+      for (let i = 0; i < 3; i++) put(i, i, light);
+      put(3, 3, a.accent);
+      for (let i = 1; i <= 2; i++) { if (i % 2) put(i + 1, i - 1, light); else put(i - 1, i + 1, light); }
+    }
+  }
+  // the gilded plates (gildedCorners without gems): the outer row and column bevelled, gold, lit, dark, ink and chips
+  const cleared = [];
+  if (a.plate && a.plate !== 'none' && GILDED_PLATES[a.plate]) {
+    const rows = GILDED_PLATES[a.plate], size = clampI(a.plateSize, 1, 6);
+    for (let c = 0; c < 4; c++) {
+      const [, , sx, sy] = C[c];
+      for (let j = 0; j < size; j++) for (let i = 0; i < size; i++) {
+        let ch = rows[j][i];
+        if (ch === '.') continue;
+        const [px2, py2] = local(c, i + 1, j + 1);
+        if (D.at(px2, py2) < 2) continue;
+        if (ch === 'g') ch = i === 2 && j === 2 ? PLATE_MARK[a.plate] : PLATE_BASE[a.plate];
+        if (ch === 'x') {
+          R.set(px2, py2, a.ink);
+          for (const [ox, oy] of [[px2 - sx, py2], [px2, py2 - sy], [px2 - sx, py2 - sy]]) {
+            if (D.at(ox, oy) !== 1) continue;
+            if (!D.at(ox - sx, oy) || !D.at(ox, oy - sy)) cleared.push([ox, oy]);
+          }
+          continue;
+        }
+        const p = ch === 'T' ? (sy > 0 ? light : dark) : ch === 'S' ? (sx > 0 ? dark : light) : ch === 'G' ? a.frame : ch === 'L' ? light : ch === 'D' ? dark : a.ink;
+        R.set(px2, py2, p);
+      }
+    }
+  }
+  // the torn bites (tearEdges): 2 px in from the side at each bite, every pixel of the piece next to one inked
+  if (a.bites) {
+    const n = b.w;
+    const bites = a.kind === 'switch' ? [['top', Math.round(n * 8 / 28)], ['top', Math.round(n * 15 / 28)], ['bottom', Math.round(n * 11 / 28)], ['bottom', Math.round(n * 18 / 28)]]
+      : a.kind === 'check' ? ['top', 'right', 'bottom', 'left'].flatMap((side, k2) => [[side, 5 + (k2 % 2)], [side, n - 8 + (k2 % 2)]]) : [];
+    for (const [side, at] of bites) for (let k2 = 0; k2 < 2; k2++) {
+      const across = side === 'top' || side === 'bottom', len = across ? b.h : b.w;
+      for (let s = 0, taken = 0; s < len && taken < 2; s++) {
+        const px2 = across ? b.x + at + k2 : side === 'left' ? b.x + s : b.x + b.w - 1 - s;
+        const py2 = across ? (side === 'top' ? b.y + s : b.y + b.h - 1 - s) : b.y + at + k2;
+        if (!D.at(px2, py2)) { if (taken) break; continue; }
+        cleared.push([px2, py2]); taken++;
+      }
+    }
+  }
+  const gone = new Set(cleared.map(([px2, py2]) => `${px2},${py2}`));
+  const clear = (px2, py2) => { if (px2 >= D.x && py2 >= D.y && px2 < D.x + D.w && py2 < D.y + D.h) D.d[(py2 - D.y) * D.w + (px2 - D.x)] = 0; R.del(px2, py2); };
+  for (const [px2, py2] of cleared) clear(px2, py2);
+  if (a.bites) for (const k2 of gone) { const [px2, py2] = cellXY(k2); for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) if (D.at(px2 + dx, py2 + dy) > 0 && !gone.has(`${px2 + dx},${py2 + dy}`)) R.set(px2 + dx, py2 + dy, a.ink); }
+
+  return (T, keepOff = new Set()) => {
+    const top = (px2, py2) => { const p = T.paintAt(px2, py2); return p !== undefined ? p : R.paintAt(px2, py2); };
+    const drawn = (px2, py2) => D.at(px2, py2) > 0 || T.has(px2, py2);
+    // the card (paperMarks card): the face's bottom two rows above the ink in its dark tone, then the fold over it
+    const F = clampI(a.card, 0, 6);
+    if (F > 0) {
+      for (let px2 = b.x; px2 < b.x + b.w; px2++) for (const py2 of [b.y + b.h - 3, b.y + b.h - 2]) if (drawn(px2, py2) && top(px2, py2) === a.face) T.set(px2, py2, shadeOf(a.face, -1));
+      const Fd = Math.max(2, F), cx = b.x + b.w - 1;
+      for (let v = 0; v <= Fd; v++) for (let u = 0; u <= Fd; u++) {
+        const px2 = cx - u, py2 = b.y + v;
+        if (!drawn(px2, py2)) continue;
+        if (u + v < Fd) { clear(px2, py2); T.del(px2, py2); } else if (u + v === Fd || u === Fd || v === Fd) T.set(px2, py2, a.ink); else T.set(px2, py2, shadeOf(a.face, -0.5));
+      }
+    }
+    // the ruin's cracks, last over everything inside the slab (the code drew them after the tick and the knob)
+    if (a.cracks) {
+      const C2 = a.kind === 'switch' ? RUIN_CRACKS.switch : a.kind === 'check' ? RUIN_CRACKS.box : null;
+      if (C2) { for (const [u, v] of C2.ink) if (drawn(b.x + u, b.y + v)) T.set(b.x + u, b.y + v, a.ink); for (const [u, v] of C2.lip) if (drawn(b.x + u, b.y + v)) T.set(b.x + u, b.y + v, shadeOf(a.face, 0.45)); }
+    }
+  };
+}
+
+/**
+ * ui.toggle@2: a skinned check box, radio option or switch as the code drew them: the box's rings with a tick of two
+ * 2 px strokes of the accent inked round (P(0.27, 0.5) to P(0.43, 0.68) to P(0.73, 0.3) of the box); the option's
+ * rings with a dot a fifth of its size across, a light pixel up and right and ink round it; the switch a pill (cut
+ * corners with edge cut) of ink, a band of the frame and the track (the accent on, the face's dark tone off), its knob
+ * 2 px smaller than the track inside it, inked round, at the end it is set to. The skin's ornaments as version 1.
+ */
+export const uiToggle2 = defineGenerator({
+  id: 'ui.toggle', v: 2, family: 'ui',
+  about: 'A skinned check box, radio option or on/off switch, on or off, as the code drew them: its tick, dot and banded switch, with the code sets\' band marks.',
+  args: {
+    ...uiToggle.args,
+    knobLight: flag({ default: false, about: 'A light pixel on a switch\'s knob, up and right (candy, gilded)' }),
+    ...TOGGLE_MARK_ARGS,
+  },
+  // version 1's bound, and the tick or dot with its ink, the knob and its ring as rects; with any band mark, a rect a pixel
+  cost: (a) => { const s = clampI(a.size, 8, 40); return 24 + 2 * (SKIN_RINGS + 4) * areaCount(s) + OVERRIDES_PER_ROW * (s + 2) + ornamentCostOf(a, s, s) + 6 * (s + 4) + 8 + (toggleMarked(a) ? 3 * (s + 4) + 16 : 0); },
+  run(a) {
+    const b = toggleBox(a);
+    const R = raster();
+    const k = clampI(a.corner, 0, 4);
+    if (a.kind === 'switch') {
+      const cut = a.edge === 'cut';
+      const rows = cut ? cutRows(b.x, b.y, b.w, b.h, 3) : rowsOfTest(b.x, b.y, b.w, b.h, (px2, py2) => {
+        const r = b.h / 2, cy = b.y + r;
+        if (px2 < b.x + r) return (px2 - (b.x + r)) ** 2 + (py2 - cy) ** 2 <= r * r;
+        if (px2 > b.x + b.w - r) return (px2 - (b.x + b.w - r)) ** 2 + (py2 - cy) ** 2 <= r * r;
+        return true;
+      });
+      const D = depthGrid(rows, b);
+      const track = a.checked ? a.accent : isClear(a.trackOff) ? toneOf(a.face, 'dark') : a.trackOff;
+      // a tube (a core given): a band of `border` lines, its second the core, and `inner` inside it, over the track
+      const M = toggleMarkPaints(a), tube = !!(M.core || M.inner);
+      const rings = tube ? toggleRings({ ...a, rings: ['ink', a.frame], bandAt: 1, border: M.core ? a.border : 1 }, { onSwitch: true }) : [{ paint: a.ink, band: false }, { paint: a.frame, band: true, line: 0 }];
+      paintSlab(R, D, rings, a.frame, { ...a, lit: false }, () => track);
+      const late = toggleMarks(R, D, rings, b, a, track);
+      const kh = b.h - 4, kx = a.checked ? b.x + b.w - 2 - kh : b.x + 2, ky = b.y + 2;
+      const r = kh / 2 - 1, cx = kx + kh / 2, cy = ky + kh / 2;
+      const knobIn = cut ? (px2, py2) => { const ix = Math.floor(px2 - kx - 1), iy = Math.floor(py2 - ky - 1), n = kh - 2; return ix >= 0 && iy >= 0 && ix < n && iy < n && ix + iy >= 2 && n - 1 - ix + iy >= 2 && 2 * (n - 1) - ix - iy >= 2 && ix + n - 1 - iy >= 2; }
+        : (px2, py2) => (px2 - cx) ** 2 + (py2 - cy) ** 2 <= r * r;
+      const knob = new Set();
+      for (let py2 = ky; py2 < ky + kh; py2++) for (let px2 = kx; px2 < kx + kh; px2++) if (knobIn(px2 + 0.5, py2 + 0.5)) knob.add(`${px2},${py2}`);
+      const ring = inkRound(knob);
+      const keepOff = new Set([...knob, ...ring]);
+      const inside = (px2, py2) => D.at(px2, py2) > 0 && !keepOff.has(`${px2},${py2}`);
+      const orn = ornaments(a, b, inside);
+      const K = raster();
+      for (const c of ring) K.set(...cellXY(c), a.ink);
+      for (const c of knob) K.set(...cellXY(c), a.knob);
+      if (a.knobLight) K.set(kx + kh - 4, ky + 3, toneOf(a.knob, 'light'));
+      late(K, keepOff);
+      return [...R.prims([{ D, bases: basesOf(rings, a.frame, track) }]), ...orn, ...K.prims()];
+    }
+    const rows = a.kind === 'radio' ? discRows(b.x, b.y, b.w) : edgeRows(a.edge, b.x, b.y, b.w, b.h, k);
+    const D = depthGrid(rows, b);
+    const rings = toggleRings(a);
+    paintSlab(R, D, rings, a.frame, a, () => a.face);
+    const late = toggleMarks(R, D, rings, b, a, a.face);
+    const inside = (px2, py2) => D.at(px2, py2) > 0;
+    const M = raster();
+    if (a.checked && a.kind === 'check') {
+      const P = (u, v) => [b.x + Math.round(u * b.w), b.y + Math.round(v * b.w)];
+      const segs = [[P(0.27, 0.5), P(0.43, 0.68)], [P(0.43, 0.68), P(0.73, 0.3)]];
+      const tick = new Set();
+      for (const [[x0, y0], [x1, y1]] of segs) {
+        const dx = x1 - x0, dy = y1 - y0, len2 = dx * dx + dy * dy || 1e-6;
+        for (let py2 = Math.min(y0, y1) - 2; py2 <= Math.max(y0, y1) + 2; py2++) for (let px2 = Math.min(x0, x1) - 2; px2 <= Math.max(x0, x1) + 2; px2++) {
+          const cx = px2 + 0.5, cy = py2 + 0.5;
+          let t = ((cx - x0) * dx + (cy - y0) * dy) / len2;
+          t = t < 0 ? 0 : t > 1 ? 1 : t;
+          const ex = cx - (x0 + dx * t), ey = cy - (y0 + dy * t);
+          if (ex * ex + ey * ey <= 1) tick.add(`${px2},${py2}`);
+        }
+      }
+      for (const c of inkRound(tick)) M.set(...cellXY(c), a.ink);
+      for (const c of tick) M.set(...cellXY(c), a.accent);
+    } else if (a.checked && a.kind === 'radio') {
+      const rr = Math.max(2.5, b.w * 0.2), mx = b.x + b.w / 2, my = b.y + b.w / 2;
+      const dot = new Set();
+      for (let py2 = Math.floor(my - rr) - 1; py2 <= my + rr; py2++) for (let px2 = Math.floor(mx - rr) - 1; px2 <= mx + rr; px2++) {
+        if ((px2 + 0.5 - mx) ** 2 + (py2 + 0.5 - my) ** 2 <= rr * rr) dot.add(`${px2},${py2}`);
+      }
+      for (const c of inkRound(dot)) M.set(...cellXY(c), a.ink);
+      for (const c of dot) M.set(...cellXY(c), a.accent);
+      M.set(Math.floor(mx + rr / 2), Math.floor(my - rr / 2), toneOf(a.accent, 'light'));
+    }
+    late(M, new Set());
+    return [...R.prims([{ D, bases: basesOf(rings, a.frame, a.face) }]), ...ornaments(a, b, inside), ...M.prims()];
+  },
+});
+
+/** Most stamps a pointer's art may hold. */
+const POINTER_ART = 8;
+
+/**
+ * ui.pointer@2: a pointer pointing right that nudges up to `reach` px toward what it points at once a loop (as version
+ * 1), drawn from its own pixel art when given one (`art`: stamps, `at` from its tail end on its centre row; the code
+ * sets' drop, shard, leaf, chevron, nib and arrow), else as version 1. Its measure gives its tip, `tip` px from `at`
+ * moved by the nudge, as the attach point `tip` (the code's socket: the middle of its row, angle a quarter turn: right).
+ */
+export const uiPointer2 = defineGenerator({
+  id: 'ui.pointer', v: 2, family: 'ui',
+  about: 'A skinned pointer that nudges toward what it points at once a loop, drawn from its own pixel art when given one; its tip is an attach point.',
+  args: {
+    ...uiPointer.args,
+    art: primitives({ default: [], about: `The pointer as pixel stamps pointing right (at most ${POINTER_ART}; other primitives are not drawn), \`at\` from its tail end on its centre row; none: version 1` }),
+    tip: point({ lo: -40, hi: 40, default: [19, 0], about: 'Its hot spot from `at` before the nudge: the attach point `tip` (the code sets: 19 px along, on the centre row)' }),
+    // review M8b round 2: the neon pointer's core goes dark on one frame in eight, as the code's moreSkinPointer drew it
+    blink: paint({ default: 'clear', about: 'On the last frame of every eight, the art\'s pixels in the accent take this paint (the neon core going dark; clear: none)' }),
+  },
+  keyable: [],
+  cost: (a) => 24 + 4 * areaCount(16) + OVERRIDES_PER_ROW * 18 + ornamentCost(clampI(a.len, 8, 28), 16, a.every) + POINTER_ART,
+  run(a, ctx) {
+    // review M8b rounds 1 and 2 (issues 8 and 5): art past the 8th stamp is an error, never dropped unseen; a stamp's own
+    // shape is checked with the arguments (rows, at, key); any other primitive among them is not drawn, as the art's
+    // description says (the generator contract has every primitive list run, so it cannot be an error)
+    const given = Array.isArray(a.art) ? a.art : [];
+    if (given.length > POINTER_ART) throw new Error(`art: at most ${POINTER_ART} stamps (it has ${given.length})`);
+    const art = stampsOf(given, POINTER_ART);
+    if (!art.length) return uiPointer.run(a, ctx);
+    const t = fin(ctx?.t) ? ctx.t : 0;
+    const x = Math.floor(a.at[0]) + nudge(t, clampI(a.reach, 0, 3)), y = Math.floor(a.at[1]);
+    // blink: the code's frame number, floor(t x 8) of the loop; on the 8th the accent's letters take the blink paint
+    const dark = !isClear(a.blink) && Math.floor((((t % 1) + 1) % 1) * 8 + 1e-9) % 8 === 7;
+    const same = (p) => JSON.stringify(p) === JSON.stringify(a.accent);
+    return art.map((s) => ({ kind: 'stamp', at: [x + Math.round(s.at[0]), y + Math.round(s.at[1])], anchor: 'tl', rows: padded(rowsOf(s)), key: Object.fromEntries(Object.entries(s.key).map(([k, p]) => [k, dark && same(p) ? a.blink : p])) }));
+  },
+});
+
+/** ui.pointer@2's measure: no slice or text area; its tip as the attach point `tip` at this frame's nudge. */
+function measurePointer2(a, ctx = {}) {
+  const t = fin(ctx.t) ? ctx.t : 0, tip = Array.isArray(a.tip) ? a.tip : [19, 0];
+  const at = Array.isArray(a.at) ? a.at : [0, 0];
+  const x = Math.floor(fin(at[0]) ? at[0] : 0) + nudge(t, clampI(a.reach, 0, 3)) + Math.round(fin(tip[0]) ? tip[0] : 0);
+  const y = Math.floor(fin(at[1]) ? at[1] : 0) + Math.round(fin(tip[1]) ? tip[1] : 0) + 0.5;
+  return { points: { tip: { x, y, angle: Math.PI / 2 } } };
+}
+
+/** The step patterns of the code sets' selectors over a loop of 8: [step in, arm longer by, buds] per frame, or 'both' (the between pose). */
+const SELECTOR_STEPS = Object.freeze({
+  between: ['both', 0, 0, 0, 'both', 1, 1, 1],                         // candy: through a between pose that holds both
+  eased: ['both', 0, 0, 1, 1, 1, 1, 0],                                  // the code's pulse (out 3, in 4, out 1), its first frame between (review M8b round 2)
+  held: [0, 0, 1, 1, 1, 1, 0, 0],                                        // gilded: two frames out, four in, two out
+  grow: [[0, 0, 0], [1, 0, 0], [2, 0, 0], [2, 1, 0], [2, 1, 2], [1, 0, 2], [0, 0, 2], [0, 0, 1]],   // grove: creeping in, a bud opening
+});
+/** Most stamps a selector's bends may hold: four corners, out and stepped in. */
+const SELECTOR_BENDS = 8;
+/** The frames of the held pattern whose gem catches the light. */
+const HELD_GLINT = Object.freeze([0, 1, 0, 0, 1, 0, 0, 1]);
+
+/**
+ * ui.selector@2: four skinned corner brackets round a slot (its box `at`, `size`), as the code's skinSelector drew them:
+ * each an L whose arms are `len` px long and `thick` lines thick, 1 px in from the box and stepping 1 px further in
+ * once a loop, inked round; `lit` gives the two pixels at the bend of its outer line the band's light tone, `core` its
+ * second line (a neon tube's light core), extras a gem of the accent at the bend. `steps`: pulse (out half the loop,
+ * in half), between (through a pose that holds both), held (two frames out, four in, two out; the gem catching the
+ * light) or grow (creeping in 2 px while the arms grow 1 px and a bud of the accent opens at their ends).
+ */
+export const uiSelector2 = defineGenerator({
+  id: 'ui.selector', v: 2, family: 'ui',
+  about: 'Four skinned corner brackets round a slot that step in and back out once a loop, as the code drew them: lit at the bend, a core line, four step patterns.',
+  args: {
+    ...uiSelector.args,
+    steps: word(['pulse', 'between', 'held', 'grow', 'eased'], { default: 'pulse', about: 'How it steps over a loop: pulse, between (a pose holding both), held (gilded), grow (arms creep in, buds open), eased (the code\'s pulse: out 3 frames, in 4, out 1, its first frame the pose between)' }),
+    core: paint({ default: 'clear', about: 'The second line of each arm: a neon tube\'s light core (clear: the band)' }),
+    // review M8b round 1: the code sets' styles reach the selector (neon double and sign, grove vine, bark and bloom, crystal)
+    marks: word(['none', 'double', 'sign', 'vine', 'bark', 'bloom', 'rime', 'shard'], { default: 'none', about: 'A style\'s marks: double (a second tube), sign (broken at the bend), vine (twisted), bark (a knot), bloom (flower, buds), rime (frost tip), shard (glint)' }),
+    // review M8b round 2: the crystal bevel (light face, the colour, dark side, a glint), written as data per corner
+    bends: primitives({ default: [], about: `Stamps recolouring the bracket at each bend (TL, TR, BR, BL; at most ${SELECTOR_BENDS}, the last four stepped in; stamps only), \`at\` from the bend, not mirrored` }),
+  },
+  cost: (a) => { const [, h] = sizeOf(a); const marked = !!a.marks && a.marks !== 'none';
+    return 16 + 16 * (h + 2) + (marked ? 16 * (clampI(a.len, 3, 12) + 4) : 0); },
+  run(a, ctx) {
+    const t = fin(ctx?.t) ? ctx.t : 0;
+    const box = boxOf(a), len = clampI(a.len, 3, 12), thick = clampI(a.thick, 1, 3);
+    const given = Array.isArray(a.bends) ? a.bends : [];
+    if (given.length > SELECTOR_BENDS) throw new Error(`bends: at most ${SELECTOR_BENDS} stamps (it has ${given.length})`);
+    const bends = stampsOf(given, SELECTOR_BENDS).map((s) => ({ rows: padded(rowsOf(s)), dx: Math.round(s.at[0]), dy: Math.round(s.at[1]), key: s.key }));
+    const i8 = a.steps === 'held' ? Math.round(t * 8) % 8 : Math.floor(fract(t) * 8 + 1e-6) % 8;
+    const pose = a.steps === 'between' || a.steps === 'eased' ? SELECTOR_STEPS[a.steps][i8] : a.steps === 'held' ? SELECTOR_STEPS.held[i8] : a.steps === 'grow' ? SELECTOR_STEPS.grow[i8] : pulse(t) >= 0.5 ? 1 : 0;
+    const accent = a.steps === 'held' && HELD_GLINT[i8] ? toneOf(a.accent, 'light') : a.accent;
+    // one pose's cells: "x,y" -> paint
+    const cells = (step, grow = 0, buds = 0) => {
+      const out = new Map();
+      const corners = [[box.x, box.y, 1, 1], [box.x + box.w - 1, box.y, -1, 1], [box.x + box.w - 1, box.y + box.h - 1, -1, -1], [box.x, box.y + box.h - 1, 1, -1]];
+      corners.forEach(([cx, cy, sx, sy], ci) => {
+        const ox = cx + sx * (1 + step), oy = cy + sy * (1 + step), arm = len + grow;
+        for (let i = 0; i < arm; i++) for (let j = 0; j < thick; j++) {
+          const p = j === 1 && !isClear(a.core) ? a.core : a.lit && j === 0 && i < 2 ? toneOf(a.frame, 'light') : a.frame;
+          out.set(`${ox + sx * i},${oy + sy * j}`, p);
+          out.set(`${ox + sx * j},${oy + sy * i}`, p);
+        }
+        // review M8b round 1: a style's marks, in the code's tones of the piece's own paints
+        const mk = a.marks ?? 'none';
+        const inner = mk === 'double' ? a.accent : null, stripes = mk === 'vine' || mk === 'bloom' ? shadeOf(a.frame, -1) : null, gap = mk === 'sign' ? shadeOf(a.face, -1) : null;
+        if (inner) for (let i = 0; i < arm; i++) for (const k of [`${ox + sx * i},${oy + sy * thick}`, `${ox + sx * thick},${oy + sy * i}`]) if (!out.has(k)) out.set(k, inner);
+        // the twist stays on its columns as the bracket steps in (review M8b round 2: the code's stripes did not move): a
+        // pixel's place along the L is the larger of its two distances from the bend, so the bend square is striped by rings
+        if (stripes) for (let i = 1 - (step % 2); i < arm; i += 2) for (let j = 0; j < thick && j <= i; j++) { out.set(`${ox + sx * i},${oy + sy * j}`, stripes); out.set(`${ox + sx * j},${oy + sy * i}`, stripes); }
+        if (gap) for (const k of [...out.keys()]) { const [px2, py2] = cellXY(k), u = (px2 - ox) * sx, v = (py2 - oy) * sy; if (u >= 0 && v >= 0 && Math.abs(u - v) <= 1) out.set(k, gap); }
+        for (let j = 0; j < buds; j++) { out.set(`${ox + sx * arm},${oy + sy * j}`, a.accent); out.set(`${ox + sx * j},${oy + sy * arm}`, a.accent); }
+        if (a.extras) out.set(`${ox},${oy}`, accent);
+        if (mk === 'bloom') {
+          const rim = toneOf(a.accent, 'dark');
+          if (sy > 0) {
+            for (const [u, v] of [[0, 0], [2, 0], [0, 2], [3, 1], [1, 3]]) { const k = `${ox + sx * u},${oy + sy * v}`; if (out.has(k)) out.set(k, rim); }
+            for (const [u, v, p] of [[1, 1, GOLD_PAINT], [0, 1], [2, 1], [1, 0], [1, 2]]) out.set(`${ox + sx * u},${oy + sy * v}`, p ?? a.accent);
+          } else { out.set(`${ox + sx * 3},${oy}`, rim); out.set(`${ox + sx * 3},${oy + sy}`, a.accent); }
+        }
+        // the knot one in from the bend: bark's dark knot, rime's frost tip (the accent), shard's glint on the bottom brackets
+        const knot = mk === 'bark' ? shadeOf(a.frame, -1) : mk === 'rime' ? a.accent : mk === 'shard' && sy < 0 ? shadeOf(a.frame, 0.85) : null;
+        if (knot && out.has(`${ox + sx},${oy + sy}`)) out.set(`${ox + sx},${oy + sy}`, knot);
+        // the bend stamps: this corner's (the stepped-in pose's when there are eight), on the bracket's own pixels only
+        const bend = bends[(step >= 1 && bends.length > 4 ? 4 : 0) + ci];
+        // (walking the bracket's pixels, this corner's quarter, not the stamp's: a huge stamp costs no more)
+        if (bend) for (const k of [...out.keys()]) {
+          const [px2, py2] = cellXY(k), u = (px2 - ox) * sx, v = (py2 - oy) * sy;
+          if (u < 0 || v < 0 || u > arm + 1 || v > arm + 1) continue;
+          const ch = bend.rows[py2 - oy - bend.dy]?.[px2 - ox - bend.dx];
+          if (ch && ch !== '.' && Object.hasOwn(bend.key, ch)) out.set(k, bend.key[ch]);
+        }
+      });
+      return out;
+    };
+    const R = raster();
+    const layer = (m) => { const ink = inkRound(new Set(m.keys())); return { m, ink }; };
+    const poses = pose === 'both' ? [layer(cells(1)), layer(cells(0))] : Array.isArray(pose) ? [layer(cells(pose[0], pose[1], pose[2]))] : [layer(cells(pose))];
+    // as the code's unionInked: the first pose's colour wins, then the next's, and ink only where no pose has colour
+    for (const { ink } of poses) for (const k of ink) R.set(...cellXY(k), a.ink);
+    for (const { m } of [...poses].reverse()) for (const [k, p] of m) R.set(...cellXY(k), p);
+    return R.prims();
+  },
+});
+
+/**
+ * ui.strip.lit@1: ui.strip@1 with the code's barFill shine (sprites/ui-bars-rpg.js): over its top row (gloss: the fill's
+ * light tone), a run of `glintLen` pixels from its `glintAt`th column in `glintPaint`, flashing toward the shine with the
+ * rest of the strip and skipping the compartment lines. A generator of its own rather than ui.strip@2, so the other skin
+ * families' bars keep naming the newest ui.strip. With no glint paint it draws exactly as ui.strip@1.
+ */
+export const uiStripLit = defineGenerator({
+  id: 'ui.strip.lit', v: 1, family: 'ui',
+  about: 'A bar\'s fill strip as ui.strip, with a short glint at the start of its top row, as the code\'s barFill drew it.',
+  args: {
+    ...uiStrip.args,
+    glintAt: count(0, 16, { default: 2, about: 'The column of the top row its glint starts at, from the strip\'s start' }),
+    glintLen: count(0, 8, { default: 3, about: 'How many pixels long its glint is' }),
+    glintPaint: paint({ default: 'clear', about: 'The glint\'s paint (clear: none, as ui.strip@1)' }),
+  },
+  // ui.strip@1's bound, and the glint's row
+  cost: (a) => { const [w, h0] = sizeOf(a), h = Math.min(h0, TROUGH_MAX); return 8 + (2 * 16 + 8) * (h + 1) + 2 * (Math.ceil(w / 32) + 1) * (Math.ceil(h / 32) + 1) + clampI(a.glintLen, 0, 8); },
+  run(a, ctx) {
+    const base = uiStrip.run(a, ctx);
+    if (isClear(a.glintPaint) || !(a.glintLen > 0)) return base;
+    const T = troughGeom({ ...a, role: 'housing', edge: 'round', corner: 0 });
+    const { o } = T;
+    const n = Math.round(o.w * clamp01(a.value));
+    if (n <= 0 || o.h <= 0) return base;
+    const t = fin(ctx?.t) ? ctx.t : 0;
+    const amount = clamp01(a.flash) * (a.fade ? (ctx?.loop ? 0.5 + 0.5 * Math.cos(2 * Math.PI * t) : 1 - clamp01(t)) : 1);
+    const p = amount > 0 ? mixOf(a.glintPaint, a.shine, amount) : a.glintPaint;
+    const R = raster();
+    for (let i = clampI(a.glintAt, 0, 16); i < Math.min(n, clampI(a.glintAt, 0, 16) + clampI(a.glintLen, 0, 8)); i++) if (!(T.pitch && (i + 1) % T.pitch === 0)) R.set(o.x + i, o.y, p);
+    return [...base, ...R.prims()];
+  },
 });

@@ -1,0 +1,216 @@
+{
+ "id": "spawn-warp",
+ "frozen": "2026-11-20",
+ "source": "sprites/spawn-warp.js",
+ "sha256": "3898caef835c0bf37f364cc58311b4584da29731fc716bb77805a0cb8f4ff395",
+ "name": "Spawn warning",
+ "blurb": "A warning ring on the floor where an enemy is about to appear: it pulses, snaps open with a column of light, and closes to a dot. Change its size, style, rings, tick marks, colours and flicker.",
+ "meta": {
+  "type": "effect",
+  "role": "effects/magic",
+  "themes": [
+   "sci-fi",
+   "space"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "shooter"
+  ],
+  "view": "top-down",
+  "words": [
+   "spawn",
+   "warning",
+   "warp",
+   "teleport",
+   "portal",
+   "ring",
+   "marker",
+   "telegraph",
+   "summon",
+   "appear",
+   "rift",
+   "beacon",
+   "danger"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  48,
+  48
+ ],
+ "pivot": [
+  24,
+  24
+ ],
+ "grounded": false,
+ "preview": "warn",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "ring",
+   "options": [
+    {
+     "value": "ring",
+     "label": "Ring"
+    },
+    {
+     "value": "hex",
+     "label": "Hex"
+    },
+    {
+     "value": "rift",
+     "label": "Rift"
+    }
+   ],
+   "group": "Look"
+  },
+  "rings": {
+   "kind": "choice",
+   "label": "Rings",
+   "def": "two",
+   "options": [
+    {
+     "value": "one",
+     "label": "One"
+    },
+    {
+     "value": "two",
+     "label": "Two"
+    },
+    {
+     "value": "three",
+     "label": "Three"
+    }
+   ],
+   "group": "Look"
+  },
+  "pieces": {
+   "kind": "range",
+   "label": "Ticks",
+   "def": 8,
+   "min": 4,
+   "max": 12,
+   "step": 1,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "core": {
+   "kind": "color",
+   "label": "Core",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#e8ecf2",
+    "#c2c9d6",
+    "#f2c230",
+    "#ca9eda"
+   ],
+   "group": "Colors"
+  },
+  "edge": {
+   "kind": "color",
+   "label": "Edge",
+   "def": "#e2473f",
+   "swatches": [
+    "#e2473f",
+    "#5fe0f0",
+    "#9fe040",
+    "#f2a030",
+    "#b48af8",
+    "#4f9ff0"
+   ],
+   "group": "Colors"
+  },
+  "flicker": {
+   "kind": "range",
+   "label": "Flicker",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Steady",
+   "hi": "Wild",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "warn": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "burst": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    9,
+    15,
+    20
+   ]
+  },
+  "close": {
+   "frames": 6,
+   "loop": false,
+   "fps": [
+    9,
+    15,
+    20
+   ]
+  }
+ },
+ "sounds": {
+  "warn": [
+   {
+    "sound": "tech-click",
+    "preset": "Hover",
+    "frame": 0,
+    "volume": 0.6
+   },
+   {
+    "sound": "tech-click",
+    "preset": "Hover",
+    "frame": 4,
+    "volume": 0.6
+   }
+  ],
+  "burst": [
+   {
+    "sound": "warp-out",
+    "preset": "Spawn in",
+    "frame": 1
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-roguelite-scifi"
+ ]
+}

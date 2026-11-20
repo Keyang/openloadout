@@ -1,0 +1,390 @@
+{
+ "id": "road-bandit",
+ "frozen": "2026-11-20",
+ "source": "sprites/road-bandit.js",
+ "sha256": "b1e35ca23ed782a1e97d475ea5489a053172f84a21476a2b423a5deb3525088b",
+ "name": "Bandit",
+ "blurb": "A masked robber for a battle screen, who clubs the party and snatches a bag of coins. Change the build, weapon, headgear, pack and colours.",
+ "meta": {
+  "type": "character",
+  "role": "characters/enemy",
+  "view": "side",
+  "license": "draft",
+  "themes": [
+   "fantasy"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "platformer"
+  ],
+  "words": [
+   "bandit",
+   "robber",
+   "thief",
+   "outlaw",
+   "highwayman",
+   "thug",
+   "club",
+   "kerchief",
+   "steal",
+   "attack",
+   "walk",
+   "ambush",
+   "battle",
+   "rough"
+  ]
+ },
+ "size": [
+  64,
+  64
+ ],
+ "pivot": [
+  28,
+  58
+ ],
+ "grounded": true,
+ "preview": "walk",
+ "params": {
+  "height": {
+   "kind": "range",
+   "label": "Height",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Short",
+   "hi": "Tall",
+   "group": "Look"
+  },
+  "build": {
+   "kind": "range",
+   "label": "Build",
+   "def": 0.75,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slim",
+   "hi": "Stocky",
+   "group": "Look"
+  },
+  "head": {
+   "kind": "range",
+   "label": "Head",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "weapon": {
+   "kind": "choice",
+   "label": "Weapon",
+   "def": "club",
+   "options": [
+    {
+     "value": "club",
+     "label": "Club"
+    },
+    {
+     "value": "cutlass",
+     "label": "Cutlass"
+    },
+    {
+     "value": "sling",
+     "label": "Sling"
+    },
+    {
+     "value": "none",
+     "label": "None"
+    }
+   ],
+   "group": "Look"
+  },
+  "weaponLength": {
+   "kind": "range",
+   "label": "Length",
+   "def": 1,
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "lo": "Short",
+   "hi": "Long",
+   "group": "Look"
+  },
+  "weaponAngle": {
+   "kind": "range",
+   "label": "Hold angle",
+   "def": 0,
+   "min": -10,
+   "max": 40,
+   "step": 1,
+   "lo": "Upright",
+   "hi": "Forward",
+   "group": "Look"
+  },
+  "headgear": {
+   "kind": "choice",
+   "label": "Headgear",
+   "def": "bandana",
+   "options": [
+    {
+     "value": "bandana",
+     "label": "Bandana"
+    },
+    {
+     "value": "wide hat",
+     "label": "Wide hat"
+    },
+    {
+     "value": "hood",
+     "label": "Hood"
+    },
+    {
+     "value": "none",
+     "label": "None"
+    }
+   ],
+   "group": "Look"
+  },
+  "headgearSize": {
+   "kind": "range",
+   "label": "Size",
+   "def": 1,
+   "min": 0.5,
+   "max": 1.8,
+   "step": 0.05,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "pack": {
+   "kind": "choice",
+   "label": "Pack",
+   "def": "none",
+   "options": [
+    {
+     "value": "none",
+     "label": "None"
+    },
+    {
+     "value": "loot sack",
+     "label": "Loot sack"
+    },
+    {
+     "value": "quiver",
+     "label": "Quiver"
+    }
+   ],
+   "group": "Look"
+  },
+  "packSize": {
+   "kind": "range",
+   "label": "Size",
+   "def": 1,
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "skin": {
+   "kind": "color",
+   "label": "Skin",
+   "def": "#f6d3b0",
+   "swatches": [
+    "#f6d3b0",
+    "#e8b088",
+    "#c98a5c",
+    "#9a6240",
+    "#6e4428",
+    "#9bd18a",
+    "#b9a7e0"
+   ],
+   "group": "Colors"
+  },
+  "outfit": {
+   "kind": "color",
+   "label": "Coat",
+   "def": "#8e3a4a",
+   "swatches": [
+    "#8e3a4a",
+    "#3f6fd1",
+    "#7a4fc4",
+    "#2f8f9d",
+    "#c9423a",
+    "#4f9d57"
+   ],
+   "group": "Colors"
+  },
+  "trim": {
+   "kind": "color",
+   "label": "Kerchief and trim",
+   "def": "#9a6a3e",
+   "swatches": [
+    "#9a6a3e",
+    "#c9a06a",
+    "#e6c96a",
+    "#a8a4a0",
+    "#c8553a",
+    "#f0ead8"
+   ],
+   "group": "Colors"
+  },
+  "bounce": {
+   "kind": "range",
+   "label": "Bounce",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Calm",
+   "hi": "Bouncy",
+   "group": "Motion"
+  },
+  "stride": {
+   "kind": "range",
+   "label": "Stride",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small steps",
+   "hi": "Big steps",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    7,
+    10
+   ]
+  },
+  "walk": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "attack": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    8,
+    14,
+    19
+   ]
+  },
+  "steal": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    8,
+    14,
+    19
+   ]
+  },
+  "hurt": {
+   "frames": 4,
+   "loop": false,
+   "fps": [
+    6,
+    9,
+    13
+   ]
+  },
+  "die": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  }
+ },
+ "sounds": {
+  "walk": [
+   {
+    "sound": "footstep-gravel",
+    "frame": 0,
+    "preset": "Boots",
+    "volume": 0.45
+   },
+   {
+    "sound": "footstep-gravel",
+    "frame": 4,
+    "preset": "Boots",
+    "volume": 0.45
+   }
+  ],
+  "attack": [
+   {
+    "sound": "whoosh",
+    "frame": 3,
+    "preset": "Heavy swing",
+    "volume": 0.7
+   },
+   {
+    "sound": "punch",
+    "frame": 4,
+    "preset": "Heavy body blow",
+    "volume": 0.85
+   }
+  ],
+  "steal": [
+   {
+    "sound": "whoosh",
+    "frame": 3,
+    "preset": "Quick swipe",
+    "volume": 0.7
+   },
+   {
+    "sound": "coin-pickup",
+    "frame": 5,
+    "preset": "Dull token",
+    "volume": 0.7
+   }
+  ],
+  "hurt": [
+   {
+    "sound": "punch",
+    "frame": 0,
+    "preset": "Light jab",
+    "volume": 0.9
+   }
+  ],
+  "die": [
+   {
+    "sound": "monster-fade",
+    "frame": 0,
+    "preset": "Monster fades",
+    "volume": 1
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-rpg-fantasy"
+ ]
+}

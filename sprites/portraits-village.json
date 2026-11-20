@@ -1,0 +1,1157 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "portraits-village",
+ "name": "Villager portraits",
+ "blurb": "Faces of the village elder, the merchant, the town guard and the farm child for dialogue boxes: neutral, happy and worried. Change the border, the zoom and each person's colour.",
+ "meta": {
+  "type": "icon",
+  "role": "interface/icon",
+  "themes": [
+   "fantasy",
+   "farm"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "top-down-rpg"
+  ],
+  "view": "front",
+  "words": [
+   "portrait",
+   "face",
+   "avatar",
+   "villager",
+   "elder",
+   "merchant",
+   "guard",
+   "child",
+   "townsfolk",
+   "dialogue",
+   "talk",
+   "happy",
+   "worried",
+   "quest"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  48,
+  48
+ ],
+ "pivot": [
+  24,
+  24
+ ],
+ "grounded": false,
+ "preview": "elder-neutral",
+ "styles": [
+  "pixel"
+ ],
+ "palette": [
+  {
+   "id": "backing",
+   "label": "Backing",
+   "default": "#4a609c",
+   "material": "interface",
+   "swatches": [
+    "#4a609c",
+    "#9a6a3e",
+    "#f0ead8",
+    "#5a5f7a",
+    "#2f8f9d"
+   ]
+  },
+  {
+   "id": "skin",
+   "label": "Skin",
+   "default": "#f6d3b0",
+   "material": "skin",
+   "swatches": [
+    "#f6d3b0",
+    "#e8b088",
+    "#c98a5c",
+    "#9a6240",
+    "#6e4428",
+    "#9bd18a",
+    "#b9a7e0"
+   ]
+  },
+  {
+   "id": "elder",
+   "label": "Elder's robe",
+   "default": "#a8a4a0",
+   "material": "cloth",
+   "swatches": [
+    "#a8a4a0",
+    "#e08a2c",
+    "#c9a06a",
+    "#8f97a8"
+   ]
+  },
+  {
+   "id": "merchant",
+   "label": "Merchant's shirt",
+   "default": "#e6c96a",
+   "material": "cloth",
+   "swatches": [
+    "#e6c96a",
+    "#e08a2c",
+    "#7fbf5a",
+    "#c9a06a",
+    "#7aa0f4",
+    "#4fd8ee",
+    "#a8c8d8"
+   ]
+  },
+  {
+   "id": "guard",
+   "label": "Guard's tabard",
+   "default": "#3f6fd1",
+   "material": "cloth",
+   "swatches": [
+    "#3f6fd1",
+    "#7a4fc4",
+    "#2f8f9d",
+    "#c9423a",
+    "#8e3a4a",
+    "#4f9d57"
+   ]
+  },
+  {
+   "id": "kid",
+   "label": "Child's collar",
+   "default": "#c8553a",
+   "material": "cloth",
+   "swatches": [
+    "#c8553a",
+    "#c9423a",
+    "#2f8f9d",
+    "#7a4fc4",
+    "#3f6fd1",
+    "#8e3a4a",
+    "#4f9d57"
+   ]
+  },
+  {
+   "id": "wood",
+   "default": "#9a6a3e",
+   "material": "plant",
+   "detail": true
+  },
+  {
+   "id": "cream",
+   "default": "#f0ead8",
+   "material": "plant",
+   "detail": true
+  },
+  {
+   "id": "wheat",
+   "default": "#e6c96a",
+   "material": "cloth",
+   "detail": true
+  },
+  {
+   "id": "roof",
+   "default": "#c8553a",
+   "material": "cloth",
+   "detail": true
+  },
+  {
+   "id": "cobble",
+   "default": "#a8a4a0",
+   "material": "metal",
+   "detail": true
+  },
+  {
+   "id": "steel",
+   "default": "#c2c9d6",
+   "material": "metal",
+   "detail": true
+  }
+ ],
+ "controls": [
+  {
+   "key": "frame",
+   "kind": "choice",
+   "label": "Border",
+   "options": [
+    "none",
+    "round",
+    "square"
+   ],
+   "default": "none",
+   "group": "Look"
+  },
+  {
+   "key": "size",
+   "kind": "range",
+   "label": "Zoom",
+   "lo": "Head and shoulders",
+   "hi": "Face",
+   "default": 0.5,
+   "group": "Look"
+  },
+  {
+   "key": "backing",
+   "kind": "colour",
+   "label": "Backing",
+   "group": "Colors",
+   "when": {
+    "frame": [
+     "round",
+     "square"
+    ]
+   }
+  },
+  {
+   "key": "skin",
+   "kind": "colour",
+   "label": "Skin",
+   "group": "Colors"
+  },
+  {
+   "key": "elder",
+   "kind": "colour",
+   "label": "Elder's robe",
+   "group": "Colors"
+  },
+  {
+   "key": "merchant",
+   "kind": "colour",
+   "label": "Merchant's shirt",
+   "group": "Colors"
+  },
+  {
+   "key": "guard",
+   "kind": "colour",
+   "label": "Guard's tabard",
+   "group": "Colors"
+  },
+  {
+   "key": "kid",
+   "kind": "colour",
+   "label": "Child's collar",
+   "group": "Colors"
+  }
+ ],
+ "body": {
+  "pictures": {
+   "draw": [],
+   "pictures": {
+    "elder-neutral": {
+     "label": "Elder, neutral",
+     "draw": [
+      {
+       "gen": "portrait",
+       "v": 1,
+       "at": [
+        24,
+        24
+       ],
+       "zoom": {
+        "from": "size",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "frame": {
+        "from": "frame",
+        "pick": {
+         "none": "none",
+         "round": "round",
+         "square": "square"
+        }
+       },
+       "backing": "backing",
+       "edge": "cream",
+       "skin": "skin",
+       "white": {
+        "rule": "tone",
+        "of": "cream",
+        "by": 3
+       },
+       "age": "elder",
+       "build": 0.3,
+       "brows": "bushy",
+       "hair": "balding",
+       "hairPaint": "cream",
+       "hairLight": 0.916635,
+       "beard": "long",
+       "beardPaint": "cream",
+       "beardLight": 0.916635,
+       "outfit": "elder",
+       "collar": "vee",
+       "outfitPaints": {
+        "trim": {
+         "rule": "choose",
+         "when": {
+          "elder": [
+           "#c8553a"
+          ]
+         },
+         "then": {
+          "rule": "tone",
+          "of": "roof",
+          "by": 0.85
+         },
+         "else": "roof"
+        }
+       }
+      }
+     ]
+    },
+    "elder-happy": {
+     "label": "Elder, happy",
+     "draw": [
+      {
+       "gen": "portrait",
+       "v": 1,
+       "at": [
+        24,
+        24
+       ],
+       "zoom": {
+        "from": "size",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "frame": {
+        "from": "frame",
+        "pick": {
+         "none": "none",
+         "round": "round",
+         "square": "square"
+        }
+       },
+       "backing": "backing",
+       "edge": "cream",
+       "skin": "skin",
+       "white": {
+        "rule": "tone",
+        "of": "cream",
+        "by": 3
+       },
+       "mood": "happy",
+       "age": "elder",
+       "build": 0.3,
+       "brows": "bushy",
+       "hair": "balding",
+       "hairPaint": "cream",
+       "hairLight": 0.916635,
+       "beard": "long",
+       "beardPaint": "cream",
+       "beardLight": 0.916635,
+       "outfit": "elder",
+       "collar": "vee",
+       "outfitPaints": {
+        "trim": {
+         "rule": "choose",
+         "when": {
+          "elder": [
+           "#c8553a"
+          ]
+         },
+         "then": {
+          "rule": "tone",
+          "of": "roof",
+          "by": 0.85
+         },
+         "else": "roof"
+        }
+       }
+      }
+     ]
+    },
+    "elder-worried": {
+     "label": "Elder, worried",
+     "draw": [
+      {
+       "gen": "portrait",
+       "v": 1,
+       "at": [
+        24,
+        24
+       ],
+       "zoom": {
+        "from": "size",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "frame": {
+        "from": "frame",
+        "pick": {
+         "none": "none",
+         "round": "round",
+         "square": "square"
+        }
+       },
+       "backing": "backing",
+       "edge": "cream",
+       "skin": "skin",
+       "white": {
+        "rule": "tone",
+        "of": "cream",
+        "by": 3
+       },
+       "mood": "worried",
+       "age": "elder",
+       "build": 0.3,
+       "brows": "bushy",
+       "hair": "balding",
+       "hairPaint": "cream",
+       "hairLight": 0.916635,
+       "beard": "long",
+       "beardPaint": "cream",
+       "beardLight": 0.916635,
+       "outfit": "elder",
+       "collar": "vee",
+       "outfitPaints": {
+        "trim": {
+         "rule": "choose",
+         "when": {
+          "elder": [
+           "#c8553a"
+          ]
+         },
+         "then": {
+          "rule": "tone",
+          "of": "roof",
+          "by": 0.85
+         },
+         "else": "roof"
+        }
+       }
+      }
+     ]
+    },
+    "merchant-neutral": {
+     "label": "Merchant, neutral",
+     "draw": [
+      {
+       "gen": "portrait",
+       "v": 1,
+       "at": [
+        24,
+        24
+       ],
+       "zoom": {
+        "from": "size",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "frame": {
+        "from": "frame",
+        "pick": {
+         "none": "none",
+         "round": "round",
+         "square": "square"
+        }
+       },
+       "backing": "backing",
+       "edge": "cream",
+       "skin": "skin",
+       "white": {
+        "rule": "tone",
+        "of": "cream",
+        "by": 3
+       },
+       "build": 0.2,
+       "neck": 1,
+       "hair": "ponytail",
+       "hairPaint": "wood",
+       "hairLight": 0.452298,
+       "headgear": "turban",
+       "outfit": "merchant",
+       "collar": "apron",
+       "gearPaints": {
+        "cloth": "roof",
+        "jewel": {
+         "rule": "tone",
+         "of": {
+          "rule": "hueTone",
+          "of": "wheat",
+          "tone": "mid"
+         },
+         "by": 0.1
+        }
+       },
+       "spectacles": {
+        "wire": {
+         "rule": "tone",
+         "of": "steel",
+         "by": -1.6
+        },
+        "lens": "cream"
+       },
+       "outfitPaints": {
+        "trim": {
+         "rule": "choose",
+         "when": {
+          "merchant": [
+           "#c8553a"
+          ]
+         },
+         "then": {
+          "rule": "tone",
+          "of": "roof",
+          "by": 0.85
+         },
+         "else": "roof"
+        }
+       }
+      }
+     ]
+    },
+    "merchant-happy": {
+     "label": "Merchant, happy",
+     "draw": [
+      {
+       "gen": "portrait",
+       "v": 1,
+       "at": [
+        24,
+        24
+       ],
+       "zoom": {
+        "from": "size",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "frame": {
+        "from": "frame",
+        "pick": {
+         "none": "none",
+         "round": "round",
+         "square": "square"
+        }
+       },
+       "backing": "backing",
+       "edge": "cream",
+       "skin": "skin",
+       "white": {
+        "rule": "tone",
+        "of": "cream",
+        "by": 3
+       },
+       "mood": "happy",
+       "build": 0.2,
+       "neck": 1,
+       "hair": "ponytail",
+       "hairPaint": "wood",
+       "hairLight": 0.452298,
+       "headgear": "turban",
+       "outfit": "merchant",
+       "collar": "apron",
+       "gearPaints": {
+        "cloth": "roof",
+        "jewel": {
+         "rule": "tone",
+         "of": {
+          "rule": "hueTone",
+          "of": "wheat",
+          "tone": "mid"
+         },
+         "by": 0.1
+        }
+       },
+       "spectacles": {
+        "wire": {
+         "rule": "tone",
+         "of": "steel",
+         "by": -1.6
+        },
+        "lens": "cream"
+       },
+       "outfitPaints": {
+        "trim": {
+         "rule": "choose",
+         "when": {
+          "merchant": [
+           "#c8553a"
+          ]
+         },
+         "then": {
+          "rule": "tone",
+          "of": "roof",
+          "by": 0.85
+         },
+         "else": "roof"
+        }
+       }
+      }
+     ]
+    },
+    "merchant-worried": {
+     "label": "Merchant, worried",
+     "draw": [
+      {
+       "gen": "portrait",
+       "v": 1,
+       "at": [
+        24,
+        24
+       ],
+       "zoom": {
+        "from": "size",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "frame": {
+        "from": "frame",
+        "pick": {
+         "none": "none",
+         "round": "round",
+         "square": "square"
+        }
+       },
+       "backing": "backing",
+       "edge": "cream",
+       "skin": "skin",
+       "white": {
+        "rule": "tone",
+        "of": "cream",
+        "by": 3
+       },
+       "mood": "worried",
+       "build": 0.2,
+       "neck": 1,
+       "hair": "ponytail",
+       "hairPaint": "wood",
+       "hairLight": 0.452298,
+       "headgear": "turban",
+       "outfit": "merchant",
+       "collar": "apron",
+       "gearPaints": {
+        "cloth": "roof",
+        "jewel": {
+         "rule": "tone",
+         "of": {
+          "rule": "hueTone",
+          "of": "wheat",
+          "tone": "mid"
+         },
+         "by": 0.1
+        }
+       },
+       "spectacles": {
+        "wire": {
+         "rule": "tone",
+         "of": "steel",
+         "by": -1.6
+        },
+        "lens": "cream"
+       },
+       "outfitPaints": {
+        "trim": {
+         "rule": "choose",
+         "when": {
+          "merchant": [
+           "#c8553a"
+          ]
+         },
+         "then": {
+          "rule": "tone",
+          "of": "roof",
+          "by": 0.85
+         },
+         "else": "roof"
+        }
+       }
+      }
+     ]
+    },
+    "guard-neutral": {
+     "label": "Guard, neutral",
+     "draw": [
+      {
+       "gen": "portrait",
+       "v": 1,
+       "at": [
+        24,
+        24
+       ],
+       "zoom": {
+        "from": "size",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "frame": {
+        "from": "frame",
+        "pick": {
+         "none": "none",
+         "round": "round",
+         "square": "square"
+        }
+       },
+       "backing": "backing",
+       "edge": "cream",
+       "skin": "skin",
+       "white": {
+        "rule": "tone",
+        "of": "cream",
+        "by": 3
+       },
+       "build": 0.9,
+       "hair": "short",
+       "hairPaint": "wood",
+       "hairLight": 0.452298,
+       "headgear": "helmet",
+       "outfit": "cobble",
+       "collar": "tabard",
+       "carried": "halberd",
+       "gearPaints": {
+        "metal": "steel",
+        "plume": "wheat"
+       },
+       "outfitPaints": {
+        "panel": "guard",
+        "trim": "wheat"
+       },
+       "carriedPaints": {
+        "metal": "steel",
+        "wood": "wood"
+       }
+      }
+     ]
+    },
+    "guard-happy": {
+     "label": "Guard, happy",
+     "draw": [
+      {
+       "gen": "portrait",
+       "v": 1,
+       "at": [
+        24,
+        24
+       ],
+       "zoom": {
+        "from": "size",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "frame": {
+        "from": "frame",
+        "pick": {
+         "none": "none",
+         "round": "round",
+         "square": "square"
+        }
+       },
+       "backing": "backing",
+       "edge": "cream",
+       "skin": "skin",
+       "white": {
+        "rule": "tone",
+        "of": "cream",
+        "by": 3
+       },
+       "mood": "happy",
+       "build": 0.9,
+       "hair": "short",
+       "hairPaint": "wood",
+       "hairLight": 0.452298,
+       "headgear": "helmet",
+       "outfit": "cobble",
+       "collar": "tabard",
+       "carried": "halberd",
+       "gearPaints": {
+        "metal": "steel",
+        "plume": "wheat"
+       },
+       "outfitPaints": {
+        "panel": "guard",
+        "trim": "wheat"
+       },
+       "carriedPaints": {
+        "metal": "steel",
+        "wood": "wood"
+       }
+      }
+     ]
+    },
+    "guard-worried": {
+     "label": "Guard, worried",
+     "draw": [
+      {
+       "gen": "portrait",
+       "v": 1,
+       "at": [
+        24,
+        24
+       ],
+       "zoom": {
+        "from": "size",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "frame": {
+        "from": "frame",
+        "pick": {
+         "none": "none",
+         "round": "round",
+         "square": "square"
+        }
+       },
+       "backing": "backing",
+       "edge": "cream",
+       "skin": "skin",
+       "white": {
+        "rule": "tone",
+        "of": "cream",
+        "by": 3
+       },
+       "mood": "worried",
+       "build": 0.9,
+       "hair": "short",
+       "hairPaint": "wood",
+       "hairLight": 0.452298,
+       "headgear": "helmet",
+       "outfit": "cobble",
+       "collar": "tabard",
+       "carried": "halberd",
+       "gearPaints": {
+        "metal": "steel",
+        "plume": "wheat"
+       },
+       "outfitPaints": {
+        "panel": "guard",
+        "trim": "wheat"
+       },
+       "carriedPaints": {
+        "metal": "steel",
+        "wood": "wood"
+       }
+      }
+     ]
+    },
+    "kid-neutral": {
+     "label": "Child, neutral",
+     "draw": [
+      {
+       "gen": "portrait",
+       "v": 1,
+       "at": [
+        24,
+        24
+       ],
+       "zoom": {
+        "from": "size",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "frame": {
+        "from": "frame",
+        "pick": {
+         "none": "none",
+         "round": "round",
+         "square": "square"
+        }
+       },
+       "backing": "backing",
+       "edge": "cream",
+       "skin": "skin",
+       "white": {
+        "rule": "tone",
+        "of": "cream",
+        "by": 3
+       },
+       "age": "child",
+       "hair": "short",
+       "hairPaint": "wood",
+       "hairLight": 0.452298,
+       "outfit": "wheat",
+       "collar": "collar",
+       "outfitPaints": {
+        "trim": {
+         "rule": "choose",
+         "when": {
+          "kid": [
+           "#e6c96a"
+          ]
+         },
+         "then": {
+          "rule": "tone",
+          "of": "kid",
+          "by": 0.85
+         },
+         "else": "kid"
+        }
+       }
+      }
+     ]
+    },
+    "kid-happy": {
+     "label": "Child, happy",
+     "draw": [
+      {
+       "gen": "portrait",
+       "v": 1,
+       "at": [
+        24,
+        24
+       ],
+       "zoom": {
+        "from": "size",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "frame": {
+        "from": "frame",
+        "pick": {
+         "none": "none",
+         "round": "round",
+         "square": "square"
+        }
+       },
+       "backing": "backing",
+       "edge": "cream",
+       "skin": "skin",
+       "white": {
+        "rule": "tone",
+        "of": "cream",
+        "by": 3
+       },
+       "mood": "happy",
+       "age": "child",
+       "hair": "short",
+       "hairPaint": "wood",
+       "hairLight": 0.452298,
+       "outfit": "wheat",
+       "collar": "collar",
+       "outfitPaints": {
+        "trim": {
+         "rule": "choose",
+         "when": {
+          "kid": [
+           "#e6c96a"
+          ]
+         },
+         "then": {
+          "rule": "tone",
+          "of": "kid",
+          "by": 0.85
+         },
+         "else": "kid"
+        }
+       }
+      }
+     ]
+    },
+    "kid-worried": {
+     "label": "Child, worried",
+     "draw": [
+      {
+       "gen": "portrait",
+       "v": 1,
+       "at": [
+        24,
+        24
+       ],
+       "zoom": {
+        "from": "size",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "frame": {
+        "from": "frame",
+        "pick": {
+         "none": "none",
+         "round": "round",
+         "square": "square"
+        }
+       },
+       "backing": "backing",
+       "edge": "cream",
+       "skin": "skin",
+       "white": {
+        "rule": "tone",
+        "of": "cream",
+        "by": 3
+       },
+       "mood": "worried",
+       "age": "child",
+       "hair": "short",
+       "hairPaint": "wood",
+       "hairLight": 0.452298,
+       "outfit": "wheat",
+       "collar": "collar",
+       "outfitPaints": {
+        "trim": {
+         "rule": "choose",
+         "when": {
+          "kid": [
+           "#e6c96a"
+          ]
+         },
+         "then": {
+          "rule": "tone",
+          "of": "kid",
+          "by": 0.85
+         },
+         "else": "kid"
+        }
+       }
+      }
+     ]
+    }
+   }
+  }
+ },
+ "clips": {
+  "elder-neutral": {
+   "frames": 1,
+   "fps": 1,
+   "label": "Elder, neutral"
+  },
+  "elder-happy": {
+   "frames": 1,
+   "fps": 1,
+   "label": "Elder, happy"
+  },
+  "elder-worried": {
+   "frames": 1,
+   "fps": 1,
+   "label": "Elder, worried"
+  },
+  "merchant-neutral": {
+   "frames": 1,
+   "fps": 1,
+   "label": "Merchant, neutral"
+  },
+  "merchant-happy": {
+   "frames": 1,
+   "fps": 1,
+   "label": "Merchant, happy"
+  },
+  "merchant-worried": {
+   "frames": 1,
+   "fps": 1,
+   "label": "Merchant, worried"
+  },
+  "guard-neutral": {
+   "frames": 1,
+   "fps": 1,
+   "label": "Guard, neutral"
+  },
+  "guard-happy": {
+   "frames": 1,
+   "fps": 1,
+   "label": "Guard, happy"
+  },
+  "guard-worried": {
+   "frames": 1,
+   "fps": 1,
+   "label": "Guard, worried"
+  },
+  "kid-neutral": {
+   "frames": 1,
+   "fps": 1,
+   "label": "Child, neutral"
+  },
+  "kid-happy": {
+   "frames": 1,
+   "fps": 1,
+   "label": "Child, happy"
+  },
+  "kid-worried": {
+   "frames": 1,
+   "fps": 1,
+   "label": "Child, worried"
+  }
+ }
+}

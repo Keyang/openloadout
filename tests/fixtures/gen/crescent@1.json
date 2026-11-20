@@ -1,0 +1,133 @@
+{
+ "id": "crescent",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     32,
+     32
+    ],
+    "length": 50,
+    "angle": -40,
+    "bulge": 12,
+    "width": 8,
+    "paints": [
+     "p1",
+     "p2",
+     "p3",
+     "p4"
+    ]
+   },
+   "primitives": []
+  },
+  {
+   "args": {
+    "at": [
+     30,
+     22
+    ],
+    "length": 46,
+    "angle": 66,
+    "bulge": 9,
+    "flip": true,
+    "width": 10,
+    "start": 0.22,
+    "thin": 0.72,
+    "jag": 2.4,
+    "teeth": 9,
+    "seed": 3,
+    "cool": 1,
+    "paints": [
+     "p0",
+     "p1",
+     "p2",
+     "p3",
+     "p4"
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      14,
+      21
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".a...............",
+      "abaa.............",
+      ".abba............",
+      "..abbaa..........",
+      "..abbbbaaaaa.....",
+      "..ababcbbbbbaa.aa",
+      "...a.abcccccbbabb",
+      ".....abccbcdccbcb",
+      "......abbabcccccb",
+      "......abaabbbbbbb"
+     ],
+     "key": {
+      "a": "p4",
+      "b": "p3",
+      "c": "p2",
+      "d": "p1"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     32,
+     32
+    ],
+    "length": 54,
+    "angle": 140,
+    "bulge": 14,
+    "width": 5,
+    "claws": 3,
+    "gap": 7,
+    "head": 0.5,
+    "end": 0.6,
+    "paints": [
+     "p3",
+     "p4"
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      8,
+      13
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...........a...........",
+      "..........aba..........",
+      ".........abba..........",
+      "........abba...........",
+      ".......abbba.....a.....",
+      "......abbba.....aba....",
+      ".....abbbba....aba.....",
+      "....abbbba....abba.....",
+      "....abbbba...abbba.....",
+      "...abbbba...abbba.....a",
+      "...abbbba..abbbba....ab",
+      "..abbbba..abbbba....aba",
+      "..abbbba.abbbbba...abba",
+      ".abbbbbaabbbbba...abba.",
+      ".abbbba.abbbbba..abbba.",
+      ".abbbbaabbbbba..abbba..",
+      "abbbbbaabbbbba.abbbba..",
+      "abbbbbabbbbba.abbbba..."
+     ],
+     "key": {
+      "a": "p4",
+      "b": "p3"
+     }
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,199 @@
+{
+ "id": "splash-burst",
+ "frozen": "2026-11-20",
+ "source": "sprites/splash-burst.js",
+ "sha256": "c49dd8172f24dc53cda63672e271bbce527d0437bff77133bc7f72bd99ac57ce",
+ "name": "Splash",
+ "blurb": "Something falling into water, seen from the side: a crown or jet of water whose drops arc out and fall back while a ring spreads along the surface. Change its size, drops, spread, style and colours.",
+ "meta": {
+  "type": "effect",
+  "role": "effects/dust",
+  "themes": [
+   "neutral",
+   "underwater"
+  ],
+  "gameTypes": [
+   "platformer",
+   "top-down-rpg",
+   "farming-sim",
+   "arcade"
+  ],
+  "view": "side",
+  "words": [
+   "splash",
+   "water",
+   "plunge",
+   "drops",
+   "droplets",
+   "ripple",
+   "dive",
+   "fall in",
+   "pond",
+   "lake",
+   "wet",
+   "mud"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  48,
+  48
+ ],
+ "pivot": [
+  24,
+  46
+ ],
+ "grounded": false,
+ "preview": "burst",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "pieces": {
+   "kind": "range",
+   "label": "Drops",
+   "def": 6,
+   "min": 3,
+   "max": 10,
+   "step": 1,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "spread": {
+   "kind": "range",
+   "label": "Spread",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Tight",
+   "hi": "Wide",
+   "group": "Look"
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "crown",
+   "options": [
+    {
+     "value": "crown",
+     "label": "Crown"
+    },
+    {
+     "value": "column",
+     "label": "Column"
+    },
+    {
+     "value": "ripple",
+     "label": "Ripple"
+    }
+   ],
+   "group": "Look"
+  },
+  "core": {
+   "kind": "color",
+   "label": "Foam",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#f2c230",
+    "#a06a3c",
+    "#8fd0f0",
+    "#c2c9d6"
+   ],
+   "group": "Colors"
+  },
+  "edge": {
+   "kind": "color",
+   "label": "Water",
+   "def": "#3f9fd1",
+   "swatches": [
+    "#3f9fd1",
+    "#4fd8ee",
+    "#3f6fd1",
+    "#7fb0b8",
+    "#e08a2c",
+    "#a4c44a",
+    "#7a4f33"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "burst": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    10,
+    17,
+    23
+   ]
+  }
+ },
+ "sounds": {
+  "burst": [
+   {
+    "sound": "water-splash",
+    "preset": "Diver",
+    "frame": 0,
+    "volume": 0.8
+   }
+  ]
+ },
+ "versions": [
+  {
+   "name": "Splash",
+   "params": {}
+  },
+  {
+   "name": "Big plunge",
+   "params": {
+    "style": "column",
+    "size": 1,
+    "pieces": 10
+   }
+  },
+  {
+   "name": "Pebble plop",
+   "params": {
+    "style": "ripple",
+    "size": 0
+   }
+  },
+  {
+   "name": "Mud splash",
+   "params": {
+    "core": "#a06a3c",
+    "edge": "#7a4f33"
+   }
+  },
+  {
+   "name": "Lava splash",
+   "params": {
+    "core": "#f2c230",
+    "edge": "#e08a2c"
+   }
+  }
+ ],
+ "bundles": []
+}

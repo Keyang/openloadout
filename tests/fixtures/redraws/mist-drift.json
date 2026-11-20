@@ -1,0 +1,199 @@
+{
+ "id": "mist-drift",
+ "frozen": "2026-11-20",
+ "source": "sprites/mist-drift.js",
+ "sha256": "7e5714891c5d4af1c6ae19cfe5ea97bc6c13e38c95f9df26b081f916936e32e7",
+ "name": "Drifting mist",
+ "blurb": "Low wisps of mist that swell, drift right and thin out along the ground, as a patch to place over a pond, a path or a graveyard. Change the size and number of wisps, how high and how far they drift, their shape and colours.",
+ "meta": {
+  "type": "effect",
+  "role": "effects/weather",
+  "themes": [
+   "neutral",
+   "forest",
+   "horror"
+  ],
+  "gameTypes": [
+   "platformer",
+   "top-down-rpg",
+   "puzzle",
+   "roguelike-action"
+  ],
+  "view": "side",
+  "words": [
+   "mist",
+   "fog",
+   "haze",
+   "vapour",
+   "ground fog",
+   "swamp",
+   "graveyard",
+   "drift",
+   "creepy",
+   "morning",
+   "weather"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  64,
+  64
+ ],
+ "pivot": [
+  32,
+  62
+ ],
+ "grounded": false,
+ "preview": "loop",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "pieces": {
+   "kind": "range",
+   "label": "Wisps",
+   "def": 5,
+   "min": 3,
+   "max": 8,
+   "step": 1,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "reach": {
+   "kind": "range",
+   "label": "Reach",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Low",
+   "hi": "High",
+   "group": "Look"
+  },
+  "drift": {
+   "kind": "range",
+   "label": "Drift",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Still",
+   "hi": "Drifting",
+   "group": "Look"
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "soft",
+   "options": [
+    {
+     "value": "soft",
+     "label": "Soft"
+    },
+    {
+     "value": "wispy",
+     "label": "Wispy"
+    },
+    {
+     "value": "blocky",
+     "label": "Blocky"
+    }
+   ],
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Mist",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#d8d8e0",
+    "#8fd0f0",
+    "#9bd18a"
+   ],
+   "group": "Colors"
+  },
+  "edge": {
+   "kind": "color",
+   "label": "Mist shadow",
+   "def": "#7fb0b8",
+   "swatches": [
+    "#7fb0b8",
+    "#8696dc",
+    "#8f97a8",
+    "#3f8a4f",
+    "#5d6475"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "loop": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [
+  {
+   "name": "Morning mist",
+   "params": {}
+  },
+  {
+   "name": "Swamp fog",
+   "params": {
+    "body": "#9bd18a",
+    "edge": "#3f8a4f"
+   }
+  },
+  {
+   "name": "Graveyard fog",
+   "params": {
+    "style": "wispy",
+    "body": "#d8d8e0",
+    "edge": "#8696dc"
+   }
+  },
+  {
+   "name": "Ground fog",
+   "params": {
+    "reach": 0,
+    "pieces": 8
+   }
+  },
+  {
+   "name": "Thick bank",
+   "params": {
+    "size": 1,
+    "reach": 1,
+    "style": "soft"
+   }
+  }
+ ],
+ "bundles": []
+}

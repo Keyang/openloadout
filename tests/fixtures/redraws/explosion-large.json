@@ -1,0 +1,191 @@
+{
+ "id": "explosion-large",
+ "frozen": "2026-11-20",
+ "source": "sprites/explosion-large.js",
+ "sha256": "42dd4f45b0d412bf29beb4cc3d9f3574a66f1320dba68f6fe5cc05634372ec67",
+ "name": "Large explosion",
+ "blurb": "A big explosion for barrels and bosses: a white flash, a fireball that tears open into a ring, then smoke, scrap and sparks, plus a smoke column for the wreck. Change its size, pieces, spread, bulges, style, soot and colours.",
+ "meta": {
+  "type": "effect",
+  "role": "effects/explosion",
+  "themes": [
+   "sci-fi",
+   "space"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "shooter",
+   "arcade"
+  ],
+  "view": "none",
+  "words": [
+   "explosion",
+   "blast",
+   "boom",
+   "fireball",
+   "explode",
+   "destroy",
+   "barrel",
+   "boss death",
+   "smoke",
+   "wreckage",
+   "shockwave",
+   "debris",
+   "big"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  96,
+  96
+ ],
+ "pivot": [
+  48,
+  48
+ ],
+ "grounded": false,
+ "preview": "burst",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "pieces": {
+   "kind": "range",
+   "label": "Pieces",
+   "def": 8,
+   "min": 4,
+   "max": 12,
+   "step": 1,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "spread": {
+   "kind": "range",
+   "label": "Spread",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Tight",
+   "hi": "Wide",
+   "group": "Look"
+  },
+  "lobes": {
+   "kind": "range",
+   "label": "Bulges",
+   "def": 6,
+   "min": 4,
+   "max": 9,
+   "step": 1,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "fire",
+   "options": [
+    {
+     "value": "fire",
+     "label": "Fire"
+    },
+    {
+     "value": "plasma",
+     "label": "Plasma"
+    },
+    {
+     "value": "shock-ring",
+     "label": "Shock ring"
+    }
+   ],
+   "group": "Look"
+  },
+  "soot": {
+   "kind": "toggle",
+   "label": "Soot",
+   "def": true,
+   "group": "Look"
+  },
+  "core": {
+   "kind": "color",
+   "label": "Core",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#e8ecf2",
+    "#f6d3b0",
+    "#f2c230"
+   ],
+   "group": "Colors"
+  },
+  "edge": {
+   "kind": "color",
+   "label": "Edge",
+   "def": "#f2a030",
+   "swatches": [
+    "#f2a030",
+    "#5fe0f0",
+    "#e2473f",
+    "#9fe040",
+    "#b48af8",
+    "#4f9ff0"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "burst": {
+   "frames": 12,
+   "loop": false,
+   "fps": [
+    9,
+    15,
+    20
+   ]
+  },
+  "smoke": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  }
+ },
+ "sounds": {
+  "burst": [
+   {
+    "sound": "explosion",
+    "preset": "Grenade",
+    "frame": 0,
+    "volume": 1
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-roguelite-scifi"
+ ]
+}

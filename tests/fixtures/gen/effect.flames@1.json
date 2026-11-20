@@ -1,0 +1,216 @@
+{
+ "id": "effect.flames",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "core": "p0",
+    "edge": "p1",
+    "picture": "loop"
+   },
+   "ctx": {
+    "frame": 0,
+    "frames": 8,
+    "t": 0,
+    "loop": true,
+    "size": [
+     32,
+     32
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      8,
+      -1
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".......a........",
+      "......aba.......",
+      "......aba.......",
+      "......abba......",
+      "......abbba.....",
+      "......abbbba....",
+      "...aaabbcbba....",
+      "..abbabbcbbaaa..",
+      "..ababbccbbabba.",
+      ".abbabbccbbbba..",
+      "abbbabcccbabba..",
+      "abcbbbcccbabcba.",
+      "abccbbcdccbbccba",
+      ".abccbcddcbcccba",
+      "abcdccccdcbcdcba",
+      "abccbbbbcccbccba",
+      ".abbaaaabbbabba.",
+      "..aa....aaa.aa.."
+     ],
+     "key": {
+      "a": {
+       "rule": "tone",
+       "of": "p1",
+       "by": -1.6
+      },
+      "b": "p1",
+      "c": {
+       "rule": "mix",
+       "of": "p0",
+       "with": "p1",
+       "amount": 0.5
+      },
+      "d": "p0"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "core": "p0",
+    "edge": "p1",
+    "picture": "ignite"
+   },
+   "ctx": {
+    "frame": 3,
+    "frames": 8,
+    "t": 0.375,
+    "loop": true,
+    "size": [
+     32,
+     32
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      8,
+      -1
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".........a......",
+      "........aba.....",
+      ".......abba.....",
+      "......abbba.....",
+      "......abba..a...",
+      "..a..abbba.aba..",
+      ".aba.accbc.abba.",
+      "abbaabbcbba.abba",
+      "abbaabccbbacabba",
+      ".abbbbcccbbabcba",
+      ".abcbbcccccbccba",
+      ".acccbccccbcccba",
+      "abbccbccdcbcccba",
+      "abcdcbccdcbcdcba",
+      "abcdcbccdcbccba.",
+      "abccbbbbccbbcba.",
+      ".abbaaaabbbabba.",
+      "..aa....aaa.aa.."
+     ],
+     "key": {
+      "a": {
+       "rule": "tone",
+       "of": "p1",
+       "by": -1.6
+      },
+      "b": "p1",
+      "c": {
+       "rule": "mix",
+       "of": "p0",
+       "with": "p1",
+       "amount": 0.5
+      },
+      "d": "p0"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "size": 1,
+    "width": 1,
+    "pieces": 4,
+    "style": "magic",
+    "sparks": true,
+    "core": "p0",
+    "edge": "p1",
+    "flicker": 1,
+    "picture": "loop"
+   },
+   "ctx": {
+    "frame": 5,
+    "frames": 8,
+    "t": 0.625,
+    "loop": true,
+    "size": [
+     32,
+     32
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      5,
+      -7
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...a.................",
+      "..aba........c.......",
+      "...a........cac......",
+      ".......d....cac......",
+      "............cac......",
+      "..a.....c..caaac.....",
+      ".aba...cac.caaac.....",
+      "..a....caccaaaac.....",
+      "......caaacaadac.c...",
+      "......caaacaddaccac..",
+      "......caaacaddaccac..",
+      "....c.cadaaaddaccac..",
+      "...caccadaaaddacaaac.",
+      "...caccaddaaddacadaac",
+      "..caaacaddaaddacaddac",
+      "..cadacaddaadbdaaddac",
+      "..cadaaddddddbdadddac",
+      "..cadaadbdddbbdadddac",
+      ".cadddddbbddbbdddbdac",
+      "caddbdddbbddbbbddbdac",
+      "caddbddddbdddbbddddac",
+      ".caaddaaaddaaddaaadac",
+      "..ccaacccaaccaacccaac",
+      "....cc...cc..cc...cc."
+     ],
+     "key": {
+      "a": "p1",
+      "b": "p0",
+      "c": {
+       "rule": "tone",
+       "of": "p1",
+       "by": -1.6
+      },
+      "d": {
+       "rule": "mix",
+       "of": "p0",
+       "with": "p1",
+       "amount": 0.5
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

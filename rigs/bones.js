@@ -464,6 +464,10 @@ export function rigList(rig, J, pose = {}, opt = {}) {
   const out = [], sources = [], skipped = [], errors = [];
   const skip = (s, index, why) => { if (skipped.length < 200) skipped.push({ index, id: typeof s?.id === 'string' ? s.id : null, kind: typeof s?.kind === 'string' ? s.kind : s?.gen !== undefined ? 'gen' : null, why }); };
   let calls = 0, fctx = null, over = 0, overCalls = 0, overAt = -1;
+  // bones and nodes past the cap are not solved (bonesOf), so say so (batch M6b: they were dropped in silence)
+  const solvable = (l) => (Array.isArray(l) ? l.filter((b) => isObj(b) && typeof b.id === 'string').length : 0);
+  const rigCount = isObj(rig) ? solvable(rig.bones) + (v2 ? solvable(rig.nodes) : 0) : 0, rigCap = v2 ? LIM2.nodes : CAP.bones;
+  if (rigCount > rigCap) skipped.push({ index: -1, id: null, kind: 'bone', why: `the rig has ${rigCount} bones and nodes; at most ${rigCap} are drawn, so ${rigCount - rigCap} are left out with the shapes on them` });
   // a version 2 frame's own primitives stop two short of draw-list's cap, so the flash and the outline always fit
   const room = v2 ? LIM2.shapes - 2 : CAP.shapes;
   /** Whether the frame's list is full: then the shape (or `n` primitives of it) is counted as left out. */

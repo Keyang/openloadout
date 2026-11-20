@@ -1,0 +1,39 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "petal-fall",
+ "name": "Falling petals",
+ "blurb": "Blossom, rose petals or fluffy seeds drifting and spinning down over the whole screen. Change how many petals, their size, the style, the sway, the two colours and the speed. Lay copies 62 px apart (each over its neighbours' empty border) to cover the screen.",
+ "meta": {"type":"effect","role":"effects/weather","themes":["neutral","farm","forest"],"gameTypes":["top-down-rpg","farming-sim","puzzle","card-game"],"view":"none","words":["petals","blossom","cherry blossom","rose petals","flowers","seeds","dandelion","spring","wedding","drifting","falling","overlay"],"license":"draft"},
+ "size": [64,64],
+ "pivot": [32,32],
+ "grounded": false,
+ "preview": "loop",
+ "styles": ["pixel"],
+ "versions": [
+  {"name":"Blossom","params":{}},
+  {"name":"Rose petals","params":{"style":"rose","body":"#c9423a","accent":"#7a4fc4"}},
+  {"name":"Seeds on the wind","params":{"style":"seeds","body":"#f0ead8","pieces":6}},
+  {"name":"Golden petals","params":{"body":"#f2c230","accent":"#e08a2c"}},
+  {"name":"Light drift","params":{"pieces":4,"sway":1}}
+ ],
+ "palette": [
+  {"id":"body","label":"Petals","default":"#f6d3b0","material":"plant","swatches":["#f6d3b0","#f0ead8","#c9423a","#f2c230","#ca9eda"]},
+  {"id":"accent","label":"Second petals","default":"#7a4fc4","material":"plant","swatches":["#7a4fc4","#e08a2c","#a4c44a","#4fd8ee","#3f6fd1"]}
+ ],
+ "controls": [
+  {"key":"pieces","kind":"range","label":"Petals","lo":"Few","hi":"Many","default":8,"min":4,"max":12,"step":1},
+  {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5,"when":{"style":["blossom","rose"]}},
+  {"key":"style","kind":"choice","label":"Style","options":["blossom","rose","seeds"],"default":"blossom"},
+  {"key":"sway","kind":"range","label":"Sway","lo":"Still","hi":"Swaying","default":0.5,"group":"Motion"},
+  {"key":"body","kind":"colour","label":"Petals"},
+  {"key":"accent","kind":"colour","label":"Second petals"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": { "emitters": [
+  {"id":"loop","gen":"effect.petal-fall","v":1,"clip":["loop"],"picture":"loop","at":[32,32],"pieces":{"from":"pieces","map":[[4,4],[12,12]],"round":"px"},"size":{"from":"size","map":[[0,0],[1,1]]},"style":{"from":"style","pick":{"blossom":"blossom","rose":"rose","seeds":"seeds"}},"sway":{"from":"sway","map":[[0,0],[1,1]]},"body":"body","accent":"accent"}
+ ] },
+ "clips": {
+  "loop": {"frames":8,"fps":10}
+ }
+}

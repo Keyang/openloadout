@@ -1,0 +1,252 @@
+{
+ "id": "bomb-pickup",
+ "frozen": "2026-11-20",
+ "source": "sprites/bomb-pickup.js",
+ "sha256": "2034852786b995e1c38fdcddd61366389b4dd637f5b21df3eb6c7fd83a13b40f",
+ "name": "Bomb",
+ "blurb": "A floating bomb to pick up: an iron ball, a stick or a bundle of three, with a fuse that can burn and spark. Change the kind, fuse length, its size, sparkle and colours.",
+ "meta": {
+  "type": "pickup",
+  "role": "items/pickup",
+  "themes": [
+   "neutral",
+   "fantasy",
+   "dungeon"
+  ],
+  "gameTypes": [
+   "top-down-rpg",
+   "platformer",
+   "arcade",
+   "roguelike-action"
+  ],
+  "view": "front",
+  "words": [
+   "bomb",
+   "explosive",
+   "dynamite",
+   "blast",
+   "fuse",
+   "spark",
+   "stick",
+   "collect",
+   "pickup",
+   "item",
+   "iron",
+   "boom"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  30
+ ],
+ "grounded": false,
+ "preview": "idle",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "shape": {
+   "kind": "choice",
+   "label": "Shape",
+   "def": "round",
+   "options": [
+    {
+     "value": "round",
+     "label": "Round"
+    },
+    {
+     "value": "stick",
+     "label": "Stick"
+    },
+    {
+     "value": "bundle",
+     "label": "Bundle"
+    }
+   ],
+   "group": "Look"
+  },
+  "fuse": {
+   "kind": "range",
+   "label": "Fuse",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Short",
+   "hi": "Long",
+   "group": "Look"
+  },
+  "lit": {
+   "kind": "toggle",
+   "label": "Lit",
+   "def": true,
+   "group": "Look"
+  },
+  "sparkle": {
+   "kind": "toggle",
+   "label": "Sparkle",
+   "def": true,
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Shell",
+   "def": "#5d6475",
+   "swatches": [
+    "#5d6475",
+    "#c2c9d6",
+    "#f2c230",
+    "#8f97a8",
+    "#e6c545",
+    "#c9423a"
+   ],
+   "group": "Colors",
+   "material": "paint"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Rope",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#a06a3c",
+    "#7a4f33",
+    "#a8612a",
+    "#5a3a22",
+    "#c98a4a"
+   ],
+   "group": "Colors"
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Spark",
+   "def": "#e08a2c",
+   "swatches": [
+    "#e08a2c",
+    "#4fd8ee",
+    "#f2c230",
+    "#a4c44a",
+    "#c9423a",
+    "#7a4fc4"
+   ],
+   "group": "Colors",
+   "material": "fire",
+   "when": {
+    "lit": [
+     true
+    ]
+   }
+  },
+  "bob": {
+   "kind": "range",
+   "label": "Float",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Still",
+   "hi": "Floaty",
+   "group": "Motion"
+  },
+  "pop": {
+   "kind": "range",
+   "label": "Pop height",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Low",
+   "hi": "High",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "collect": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    9,
+    15,
+    20
+   ]
+  }
+ },
+ "sounds": {
+  "collect": [
+   {
+    "sound": "item-get",
+    "preset": "Gritty",
+    "frame": 1,
+    "volume": 0.7
+   }
+  ]
+ },
+ "versions": [
+  {
+   "name": "Iron bomb",
+   "params": {}
+  },
+  {
+   "name": "Blasting stick",
+   "params": {
+    "shape": "stick",
+    "body": "#c9423a"
+   }
+  },
+  {
+   "name": "Bundle of three",
+   "params": {
+    "shape": "bundle",
+    "body": "#c9423a",
+    "fuse": 0.8
+   }
+  },
+  {
+   "name": "Unlit",
+   "params": {
+    "lit": false
+   }
+  },
+  {
+   "name": "Long fuse",
+   "params": {
+    "fuse": 1,
+    "glow": "#f2c230"
+   }
+  }
+ ],
+ "bundles": []
+}

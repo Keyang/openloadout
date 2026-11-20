@@ -1,0 +1,172 @@
+{
+ "id": "plasma-orb",
+ "frozen": "2026-11-20",
+ "source": "sprites/plasma-orb.js",
+ "sha256": "f407bfbc8f74fa1e1448d7ff84f0026a29618ff1c3c05b35fc04c6d2c1117db4",
+ "name": "Enemy plasma orb",
+ "blurb": "A wobbling ball of hostile plasma with a swirl turning inside it, drawn pointing right so a game can turn it to the way it flies; it bursts into a ring of embers. Change its size, style, swirl, tail and colours.",
+ "meta": {
+  "type": "projectile",
+  "role": "effects/projectile",
+  "themes": [
+   "sci-fi",
+   "space"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "shooter",
+   "arcade"
+  ],
+  "view": "top-down",
+  "words": [
+   "plasma",
+   "orb",
+   "ball",
+   "energy",
+   "enemy shot",
+   "bullet",
+   "swirl",
+   "shoot",
+   "fly",
+   "hit",
+   "burst",
+   "danger",
+   "hostile"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "fly",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "orb",
+   "options": [
+    {
+     "value": "orb",
+     "label": "Orb"
+    },
+    {
+     "value": "ring",
+     "label": "Ring"
+    },
+    {
+     "value": "spiky",
+     "label": "Spiky"
+    }
+   ],
+   "group": "Look"
+  },
+  "swirl": {
+   "kind": "toggle",
+   "label": "Swirl",
+   "def": true,
+   "group": "Look"
+  },
+  "length": {
+   "kind": "range",
+   "label": "Length",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Short",
+   "hi": "Long",
+   "group": "Look"
+  },
+  "core": {
+   "kind": "color",
+   "label": "Core",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#e8ecf2",
+    "#f6d3b0",
+    "#c2c9d6"
+   ],
+   "group": "Colors"
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Glow",
+   "def": "#e2473f",
+   "swatches": [
+    "#e2473f",
+    "#5fe0f0",
+    "#9fe040",
+    "#f2a030",
+    "#b48af8",
+    "#4f9ff0",
+    "#5fd47a"
+   ],
+   "group": "Colors"
+  },
+  "wobble": {
+   "kind": "range",
+   "label": "Wobble",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Firm",
+   "hi": "Wobbly",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "fly": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  },
+  "hit": {
+   "frames": 6,
+   "loop": false,
+   "fps": [
+    10,
+    17,
+    23
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [],
+ "bundles": [
+  "kit-roguelite-scifi"
+ ]
+}

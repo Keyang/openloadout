@@ -1,0 +1,39 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "splash-burst",
+ "name": "Splash",
+ "blurb": "Something falling into water, seen from the side: a crown or jet of water whose drops arc out and fall back while a ring spreads along the surface. Change its size, drops, spread, style and colours.",
+ "meta": {"type":"effect","role":"effects/dust","themes":["neutral","underwater"],"gameTypes":["platformer","top-down-rpg","farming-sim","arcade"],"view":"side","words":["splash","water","plunge","drops","droplets","ripple","dive","fall in","pond","lake","wet","mud"],"license":"draft"},
+ "size": [48,48],
+ "pivot": [24,46],
+ "grounded": false,
+ "preview": "burst",
+ "styles": ["pixel"],
+ "versions": [
+  {"name":"Splash","params":{}},
+  {"name":"Big plunge","params":{"style":"column","size":1,"pieces":10}},
+  {"name":"Pebble plop","params":{"style":"ripple","size":0}},
+  {"name":"Mud splash","params":{"core":"#a06a3c","edge":"#7a4f33"}},
+  {"name":"Lava splash","params":{"core":"#f2c230","edge":"#e08a2c"}}
+ ],
+ "palette": [
+  {"id":"core","label":"Foam","default":"#f0ead8","material":"water","swatches":["#f0ead8","#f2c230","#a06a3c","#8fd0f0","#c2c9d6"]},
+  {"id":"edge","label":"Water","default":"#3f9fd1","material":"water","swatches":["#3f9fd1","#4fd8ee","#3f6fd1","#7fb0b8","#e08a2c","#a4c44a","#7a4f33"]}
+ ],
+ "controls": [
+  {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+  {"key":"pieces","kind":"range","label":"Drops","lo":"Few","hi":"Many","default":6,"min":3,"max":10,"step":1},
+  {"key":"spread","kind":"range","label":"Spread","lo":"Tight","hi":"Wide","default":0.5},
+  {"key":"style","kind":"choice","label":"Style","options":["crown","column","ripple"],"default":"crown"},
+  {"key":"core","kind":"colour","label":"Foam"},
+  {"key":"edge","kind":"colour","label":"Water"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": { "emitters": [
+  {"id":"burst","gen":"effect.splash-burst","v":1,"clip":["burst"],"picture":"burst","at":[24,46],"size":{"from":"size","map":[[0,0],[1,1]]},"pieces":{"from":"pieces","map":[[3,3],[10,10]],"round":"px"},"spread":{"from":"spread","map":[[0,0],[1,1]]},"style":{"from":"style","pick":{"crown":"crown","column":"column","ripple":"ripple"}},"core":"core","edge":"edge"}
+ ] },
+ "clips": {
+  "burst": {"frames":8,"fps":16,"loop":false,"sounds":[{"sound":"water-splash","preset":"Diver","frame":0,"volume":0.8}]}
+ }
+}

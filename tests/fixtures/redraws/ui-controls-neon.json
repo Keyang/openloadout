@@ -1,0 +1,270 @@
+{
+ "id": "ui-controls-neon",
+ "frozen": "2026-11-20",
+ "source": "sprites/ui-controls-neon.js",
+ "sha256": "d7cdcb81fd7418e7ca637646692a5881708a16aa30980985a51b9abe9ede2068",
+ "name": "Neon checkboxes and cursor",
+ "blurb": "The small pieces of a settings screen in glowing neon tube: a ticked and an empty box, a round option, an on/off switch, a hollow tube arrow that nudges and flickers and tube brackets round a chosen slot; change the style, corners, tube, colours and speed.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/cursor",
+  "themes": [
+   "neutral",
+   "sci-fi",
+   "city"
+  ],
+  "gameTypes": [
+   "arcade",
+   "shooter",
+   "racing",
+   "roguelike-action"
+  ],
+  "view": "none",
+  "words": [
+   "checkbox",
+   "radio",
+   "switch",
+   "cursor",
+   "pointer",
+   "toggle",
+   "selector",
+   "neon",
+   "glow",
+   "tube"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "check-on",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "tube",
+   "options": [
+    {
+     "value": "tube",
+     "label": "Tube"
+    },
+    {
+     "value": "double",
+     "label": "Double"
+    },
+    {
+     "value": "sign",
+     "label": "Sign"
+    }
+   ],
+   "group": "Look"
+  },
+  "corner": {
+   "kind": "range",
+   "label": "Corner",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Square",
+   "hi": "Round",
+   "group": "Look"
+  },
+  "border": {
+   "kind": "range",
+   "label": "Border",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Thin",
+   "hi": "Thick",
+   "group": "Look"
+  },
+  "face": {
+   "kind": "color",
+   "label": "Wall",
+   "def": "#3f5068",
+   "swatches": [
+    "#3f5068",
+    "#7a4f33",
+    "#434d6d",
+    "#8e3a4a"
+   ],
+   "group": "Colors"
+  },
+  "frame": {
+   "kind": "color",
+   "label": "Tube",
+   "def": "#8fd0f0",
+   "swatches": [
+    "#8fd0f0",
+    "#9bd18a",
+    "#c2c9d6",
+    "#5fe0f0",
+    "#7fe0a0"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Tick",
+   "def": "#e08a2c",
+   "swatches": [
+    "#e08a2c",
+    "#7a4fc4",
+    "#f2c230",
+    "#b48af8",
+    "#ca9eda"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "check-on": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "check-off": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "radio-on": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "radio-off": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "switch-on": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "switch-off": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "pointer": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    8,
+    12
+   ]
+  },
+  "selector": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    8,
+    12
+   ]
+  }
+ },
+ "sounds": {
+  "check-on": [
+   {
+    "sound": "menu-console-toggle",
+    "preset": "Switch on",
+    "frame": 0,
+    "volume": 0.6
+   }
+  ],
+  "switch-on": [
+   {
+    "sound": "menu-console-toggle",
+    "preset": "Switch on",
+    "frame": 0,
+    "volume": 0.6
+   }
+  ]
+ },
+ "versions": [
+  {
+   "name": "Sky",
+   "params": {}
+  },
+  {
+   "name": "Pink tick",
+   "params": {
+    "style": "double",
+    "accent": "#ca9eda"
+   }
+  },
+  {
+   "name": "Cyan sign",
+   "params": {
+    "style": "sign",
+    "frame": "#5fe0f0"
+   }
+  },
+  {
+   "name": "Wine mint",
+   "params": {
+    "face": "#8e3a4a",
+    "frame": "#7fe0a0",
+    "accent": "#7a4fc4"
+   }
+  },
+  {
+   "name": "Square steel",
+   "params": {
+    "corner": 0,
+    "frame": "#c2c9d6"
+   }
+  }
+ ],
+ "bundles": [
+  "kit-puzzle-gridline"
+ ]
+}

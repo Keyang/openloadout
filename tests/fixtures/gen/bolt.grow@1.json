@@ -1,0 +1,125 @@
+{
+ "id": "bolt.grow",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     38,
+     2
+    ],
+    "length": 87,
+    "angle": -4,
+    "kinks": 6,
+    "zigzag": 3,
+    "sway": 7,
+    "width": 5,
+    "forks": 3,
+    "forkLength": 0.28,
+    "forkAngle": 52,
+    "seed": 3,
+    "paints": [
+     "p0",
+     "p1",
+     "p2",
+     "p3",
+     "p4"
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      27,
+      20
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...a",
+      "..ab",
+      "..ab",
+      ".abb",
+      ".abb",
+      "abcb",
+      "abcb",
+      "abcb",
+      ".abb",
+      ".abb",
+      "..ab"
+     ],
+     "key": {
+      "a": "p4",
+      "b": "p3",
+      "c": "p2"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     38,
+     2
+    ],
+    "length": 87,
+    "angle": -4,
+    "width": 5,
+    "thin": 0.68,
+    "forks": 3,
+    "forkLength": 0.17,
+    "cool": 2,
+    "seed": 3,
+    "paints": [
+     "p0",
+     "p1",
+     "p2",
+     "p3",
+     "p4"
+    ]
+   },
+   "primitives": []
+  },
+  {
+   "args": {
+    "at": [
+     32,
+     2
+    ],
+    "length": 60,
+    "width": 3,
+    "thin": 0.2,
+    "lead": 0.9,
+    "fade": 0.1,
+    "cool": 3,
+    "paints": [
+     "p0",
+     "p1",
+     "p2",
+     "p3",
+     "p4"
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      29,
+      18
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".a",
+      "ab",
+      "ab",
+      "ab",
+      ".a"
+     ],
+     "key": {
+      "a": "p4",
+      "b": "p3"
+     }
+    }
+   ]
+  }
+ ]
+}

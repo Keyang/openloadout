@@ -1,0 +1,433 @@
+{
+ "id": "ui.strip.lit",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     1,
+     1
+    ],
+    "size": [
+     62,
+     14
+    ],
+    "fill": "accent",
+    "shine": "frame"
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      5,
+      5
+     ],
+     "size": [
+      54,
+      5
+     ],
+     "paint": "accent",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      5,
+      10
+     ],
+     "size": [
+      54,
+      1
+     ],
+     "paint": "accent.dark",
+     "shade": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     1,
+     1
+    ],
+    "size": [
+     62,
+     14
+    ],
+    "fill": "accent",
+    "shine": "frame",
+    "gloss": true,
+    "glintPaint": "face"
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      5,
+      5
+     ],
+     "size": [
+      54,
+      1
+     ],
+     "paint": "accent.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      5,
+      6
+     ],
+     "size": [
+      54,
+      4
+     ],
+     "paint": "accent",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      5,
+      10
+     ],
+     "size": [
+      54,
+      1
+     ],
+     "paint": "accent.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      7,
+      5
+     ],
+     "size": [
+      3,
+      1
+     ],
+     "paint": "face",
+     "shade": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     1,
+     1
+    ],
+    "size": [
+     62,
+     14
+    ],
+    "fill": "accent",
+    "shine": "frame",
+    "gloss": true,
+    "glintPaint": "face",
+    "segments": 5,
+    "flash": 1,
+    "fade": true
+   },
+   "ctx": {
+    "t": 0.3333333333333333,
+    "loop": false,
+    "frames": 4,
+    "frame": 1
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      5,
+      5
+     ],
+     "size": [
+      10,
+      1
+     ],
+     "paint": {
+      "rule": "mix",
+      "of": "accent.light",
+      "with": "frame",
+      "amount": 0.6666666666666667
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      16,
+      5
+     ],
+     "size": [
+      10,
+      1
+     ],
+     "paint": {
+      "rule": "mix",
+      "of": "accent.light",
+      "with": "frame",
+      "amount": 0.6666666666666667
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      27,
+      5
+     ],
+     "size": [
+      10,
+      1
+     ],
+     "paint": {
+      "rule": "mix",
+      "of": "accent.light",
+      "with": "frame",
+      "amount": 0.6666666666666667
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      38,
+      5
+     ],
+     "size": [
+      10,
+      1
+     ],
+     "paint": {
+      "rule": "mix",
+      "of": "accent.light",
+      "with": "frame",
+      "amount": 0.6666666666666667
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      49,
+      5
+     ],
+     "size": [
+      10,
+      1
+     ],
+     "paint": {
+      "rule": "mix",
+      "of": "accent.light",
+      "with": "frame",
+      "amount": 0.6666666666666667
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      5,
+      6
+     ],
+     "size": [
+      10,
+      4
+     ],
+     "paint": {
+      "rule": "mix",
+      "of": "accent",
+      "with": "frame",
+      "amount": 0.6666666666666667
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      16,
+      6
+     ],
+     "size": [
+      10,
+      4
+     ],
+     "paint": {
+      "rule": "mix",
+      "of": "accent",
+      "with": "frame",
+      "amount": 0.6666666666666667
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      27,
+      6
+     ],
+     "size": [
+      10,
+      4
+     ],
+     "paint": {
+      "rule": "mix",
+      "of": "accent",
+      "with": "frame",
+      "amount": 0.6666666666666667
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      38,
+      6
+     ],
+     "size": [
+      10,
+      4
+     ],
+     "paint": {
+      "rule": "mix",
+      "of": "accent",
+      "with": "frame",
+      "amount": 0.6666666666666667
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      49,
+      6
+     ],
+     "size": [
+      10,
+      4
+     ],
+     "paint": {
+      "rule": "mix",
+      "of": "accent",
+      "with": "frame",
+      "amount": 0.6666666666666667
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      5,
+      10
+     ],
+     "size": [
+      10,
+      1
+     ],
+     "paint": {
+      "rule": "mix",
+      "of": "accent.dark",
+      "with": "frame",
+      "amount": 0.6666666666666667
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      16,
+      10
+     ],
+     "size": [
+      10,
+      1
+     ],
+     "paint": {
+      "rule": "mix",
+      "of": "accent.dark",
+      "with": "frame",
+      "amount": 0.6666666666666667
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      27,
+      10
+     ],
+     "size": [
+      10,
+      1
+     ],
+     "paint": {
+      "rule": "mix",
+      "of": "accent.dark",
+      "with": "frame",
+      "amount": 0.6666666666666667
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      38,
+      10
+     ],
+     "size": [
+      10,
+      1
+     ],
+     "paint": {
+      "rule": "mix",
+      "of": "accent.dark",
+      "with": "frame",
+      "amount": 0.6666666666666667
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      49,
+      10
+     ],
+     "size": [
+      10,
+      1
+     ],
+     "paint": {
+      "rule": "mix",
+      "of": "accent.dark",
+      "with": "frame",
+      "amount": 0.6666666666666667
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      7,
+      5
+     ],
+     "size": [
+      3,
+      1
+     ],
+     "paint": {
+      "rule": "mix",
+      "of": "face",
+      "with": "frame",
+      "amount": 0.6666666666666667
+     },
+     "shade": 0
+    }
+   ]
+  }
+ ]
+}

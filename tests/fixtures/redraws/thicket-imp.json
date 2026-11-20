@@ -1,0 +1,395 @@
+{
+ "id": "thicket-imp",
+ "frozen": "2026-11-20",
+ "source": "sprites/thicket-imp.js",
+ "sha256": "f49d0d77d2d431e03a13c8d0bda39ab6b1f4d7a154c3dda64f595202c3326a28",
+ "name": "Thicket imp",
+ "blurb": "A pot-bellied flying trickster of the woods that claws and throws hexes. Change its belly, ears, eyes, wings, horns, tail and colours.",
+ "meta": {
+  "type": "creature",
+  "role": "characters/enemy",
+  "themes": [
+   "fantasy"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "platformer"
+  ],
+  "view": "side",
+  "words": [
+   "imp",
+   "goblin",
+   "gremlin",
+   "pixie",
+   "trickster",
+   "flyer",
+   "hover",
+   "claw",
+   "hex",
+   "curse",
+   "cast",
+   "wings",
+   "woodland",
+   "mischief"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  48,
+  48
+ ],
+ "pivot": [
+  24,
+  24
+ ],
+ "grounded": false,
+ "preview": "fly",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "belly": {
+   "kind": "range",
+   "label": "Belly",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slim",
+   "hi": "Round",
+   "group": "Look"
+  },
+  "ears": {
+   "kind": "range",
+   "label": "Ears",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Huge",
+   "group": "Look"
+  },
+  "eyes": {
+   "kind": "choice",
+   "label": "Eyes",
+   "def": "sly",
+   "options": [
+    {
+     "value": "sly",
+     "label": "Sly"
+    },
+    {
+     "value": "wide",
+     "label": "Wide"
+    },
+    {
+     "value": "angry",
+     "label": "Angry"
+    }
+   ],
+   "group": "Look"
+  },
+  "wings": {
+   "kind": "choice",
+   "label": "Wings",
+   "def": "leaf",
+   "options": [
+    {
+     "value": "leaf",
+     "label": "Leaf"
+    },
+    {
+     "value": "bat",
+     "label": "Bat"
+    },
+    {
+     "value": "moth",
+     "label": "Moth"
+    },
+    {
+     "value": "none",
+     "label": "None"
+    }
+   ],
+   "group": "Look"
+  },
+  "wingSpan": {
+   "kind": "range",
+   "label": "Span",
+   "def": 1,
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "lo": "Short",
+   "hi": "Wide",
+   "group": "Look"
+  },
+  "horns": {
+   "kind": "choice",
+   "label": "Horns",
+   "def": "none",
+   "options": [
+    {
+     "value": "none",
+     "label": "None"
+    },
+    {
+     "value": "nubs",
+     "label": "Nubs"
+    },
+    {
+     "value": "curled",
+     "label": "Curled"
+    },
+    {
+     "value": "twig",
+     "label": "Twig"
+    }
+   ],
+   "group": "Look"
+  },
+  "hornLength": {
+   "kind": "range",
+   "label": "Length",
+   "def": 1,
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "lo": "Short",
+   "hi": "Long",
+   "group": "Look"
+  },
+  "tail": {
+   "kind": "choice",
+   "label": "Tail",
+   "def": "none",
+   "options": [
+    {
+     "value": "none",
+     "label": "None"
+    },
+    {
+     "value": "thin",
+     "label": "Thin"
+    },
+    {
+     "value": "leafy",
+     "label": "Leafy"
+    }
+   ],
+   "group": "Look"
+  },
+  "tailLength": {
+   "kind": "range",
+   "label": "Length",
+   "def": 1,
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "lo": "Short",
+   "hi": "Long",
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Body",
+   "def": "#4f9d57",
+   "swatches": [
+    "#4f9d57",
+    "#7a4fc4",
+    "#c9423a",
+    "#8e3a4a",
+    "#2f8f9d",
+    "#7fbf5a"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Wings and ears",
+   "def": "#7a4fc4",
+   "swatches": [
+    "#7a4fc4",
+    "#f2c230",
+    "#c9423a",
+    "#f0ead8",
+    "#7fe0a0",
+    "#4fd8ee",
+    "#c8553a"
+   ],
+   "group": "Colors"
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Eyes and hex",
+   "def": "#7a4fc4",
+   "swatches": [
+    "#7a4fc4",
+    "#4fd8ee",
+    "#e8662c",
+    "#7aa0f4",
+    "#f4e06a",
+    "#7fe0a0"
+   ],
+   "group": "Colors"
+  },
+  "flap": {
+   "kind": "range",
+   "label": "Flap",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Wide",
+   "group": "Motion",
+   "when": {
+    "wings": [
+     "leaf",
+     "bat",
+     "moth"
+    ]
+   }
+  },
+  "bob": {
+   "kind": "range",
+   "label": "Float",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Still",
+   "hi": "Floaty",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    7,
+    10
+   ]
+  },
+  "fly": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  },
+  "attack": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    8,
+    14,
+    19
+   ]
+  },
+  "cast": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "hurt": {
+   "frames": 4,
+   "loop": false,
+   "fps": [
+    6,
+    9,
+    13
+   ]
+  },
+  "die": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  }
+ },
+ "sounds": {
+  "fly": [
+   {
+    "sound": "whoosh",
+    "frame": 1,
+    "preset": "Quick swipe",
+    "volume": 0.35,
+    "when": {
+     "wings": [
+      "leaf",
+      "bat",
+      "moth"
+     ]
+    }
+   }
+  ],
+  "attack": [
+   {
+    "sound": "whoosh",
+    "frame": 3,
+    "preset": "Quick swipe",
+    "volume": 0.7
+   }
+  ],
+  "cast": [
+   {
+    "sound": "magic-spell",
+    "frame": 2,
+    "preset": "Curse",
+    "volume": 0.8
+   }
+  ],
+  "hurt": [
+   {
+    "sound": "punch",
+    "frame": 0,
+    "preset": "Light jab",
+    "volume": 0.9
+   }
+  ],
+  "die": [
+   {
+    "sound": "monster-fade",
+    "frame": 0,
+    "preset": "Monster fades",
+    "volume": 1
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-rpg-fantasy"
+ ]
+}

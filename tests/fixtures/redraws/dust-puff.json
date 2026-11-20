@@ -1,0 +1,183 @@
+{
+ "id": "dust-puff",
+ "frozen": "2026-11-20",
+ "source": "sprites/dust-puff.js",
+ "sha256": "8703b74c5d7273b12db02e82fa236618cdc28ef9a8893323a386c2295c89c38f",
+ "name": "Dust puff",
+ "blurb": "Dust kicked up on the ground: a landing burst, a running puff and a wall-slide trickle. Change its size, number of puffs, spread, style, rise and colours.",
+ "meta": {
+  "type": "effect",
+  "role": "effects/dust",
+  "themes": [
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "platformer",
+   "roguelike-action",
+   "arcade"
+  ],
+  "view": "side",
+  "words": [
+   "dust",
+   "puff",
+   "smoke",
+   "cloud",
+   "land",
+   "landing",
+   "run",
+   "skid",
+   "slide",
+   "jump",
+   "kick",
+   "dirt",
+   "footstep"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  30
+ ],
+ "grounded": false,
+ "preview": "burst",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "pieces": {
+   "kind": "range",
+   "label": "Pieces",
+   "def": 4,
+   "min": 2,
+   "max": 6,
+   "step": 1,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "spread": {
+   "kind": "range",
+   "label": "Spread",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Tight",
+   "hi": "Wide",
+   "group": "Look"
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "round",
+   "options": [
+    {
+     "value": "round",
+     "label": "Round"
+    },
+    {
+     "value": "wispy",
+     "label": "Wispy"
+    },
+    {
+     "value": "chunky",
+     "label": "Chunky"
+    }
+   ],
+   "group": "Look"
+  },
+  "rise": {
+   "kind": "range",
+   "label": "Rise",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Low",
+   "hi": "High",
+   "group": "Look"
+  },
+  "core": {
+   "kind": "color",
+   "label": "Core",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#f6d3b0",
+    "#c2c9d6",
+    "#f2c230"
+   ],
+   "group": "Colors"
+  },
+  "edge": {
+   "kind": "color",
+   "label": "Edge",
+   "def": "#8f97a8",
+   "swatches": [
+    "#8f97a8",
+    "#7a4f33",
+    "#a06a3c",
+    "#5d6475"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "burst": {
+   "frames": 6,
+   "loop": false,
+   "fps": [
+    10,
+    17,
+    23
+   ]
+  },
+  "kick": {
+   "frames": 4,
+   "loop": false,
+   "fps": [
+    9,
+    15,
+    20
+   ]
+  },
+  "slide": {
+   "frames": 6,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [],
+ "bundles": [
+  "kit-platformer-fantasy"
+ ]
+}

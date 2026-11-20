@@ -1,0 +1,42 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "zap-crackle",
+ "name": "Electric crackle",
+ "blurb": "Electricity crackling over something shocked, or one bright zap with a ring of sparks. Change its size, the arcs, their style and forks, the flicker and colours.",
+ "meta": {"type":"effect","role":"effects/spark","themes":["neutral","sci-fi","fantasy"],"gameTypes":["shooter","roguelike-action","turn-based-rpg","platformer"],"view":"none","words":["electric","electricity","shock","zap","spark","lightning","stun","shocked","static","short circuit","crackle","energy"],"license":"draft"},
+ "size": [32,32],
+ "pivot": [16,16],
+ "grounded": false,
+ "preview": "loop",
+ "styles": ["pixel"],
+ "versions": [
+  {"name":"Shocked","params":{}},
+  {"name":"Overcharged","params":{"size":1,"pieces":5,"forks":true}},
+  {"name":"Static","params":{"style":"sparks","edge":"#f2c230"}},
+  {"name":"Short circuit","params":{"style":"ring","edge":"#c9423a"}},
+  {"name":"Faint buzz","params":{"size":0,"pieces":2,"flicker":0}}
+ ],
+ "palette": [
+  {"id":"core","label":"Core","default":"#f0ead8","material":"light","swatches":["#f0ead8","#8fd0f0","#9bd18a","#c2c9d6","#f6d3b0"]},
+  {"id":"edge","label":"Light","default":"#4fd8ee","material":"magic","swatches":["#4fd8ee","#e08a2c","#f2c230","#a4c44a","#c9423a","#7a4fc4","#5fe0f0"]}
+ ],
+ "controls": [
+  {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+  {"key":"pieces","kind":"range","label":"Arcs","lo":"Few","hi":"Many","default":3,"min":2,"max":5,"step":1},
+  {"key":"style","kind":"choice","label":"Style","options":["arcs","sparks","ring"],"default":"arcs"},
+  {"key":"forks","kind":"toggle","label":"Forks","default":false,"when":{"style":["arcs"]}},
+  {"key":"core","kind":"colour","label":"Core"},
+  {"key":"edge","kind":"colour","label":"Light"},
+  {"key":"flicker","kind":"range","label":"Flicker","lo":"Steady","hi":"Wild","default":0.5,"group":"Motion"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": { "emitters": [
+  {"id":"loop","gen":"effect.zap-crackle","v":1,"clip":["loop"],"picture":"loop","at":[16,16],"size":{"from":"size","map":[[0,0],[1,1]]},"pieces":{"from":"pieces","map":[[2,2],[5,5]],"round":"px"},"style":{"from":"style","pick":{"arcs":"arcs","sparks":"sparks","ring":"ring"}},"forks":{"from":"forks","pick":{"true":true,"false":false}},"core":"core","edge":"edge","flicker":{"from":"flicker","map":[[0,0],[1,1]]}},
+  {"id":"burst","gen":"effect.zap-crackle","v":1,"clip":["burst"],"picture":"burst","at":[16,16],"size":{"from":"size","map":[[0,0],[1,1]]},"pieces":{"from":"pieces","map":[[2,2],[5,5]],"round":"px"},"style":{"from":"style","pick":{"arcs":"arcs","sparks":"sparks","ring":"ring"}},"forks":{"from":"forks","pick":{"true":true,"false":false}},"core":"core","edge":"edge","flicker":{"from":"flicker","map":[[0,0],[1,1]]}}
+ ] },
+ "clips": {
+  "loop": {"frames":8,"fps":10},
+  "burst": {"frames":6,"fps":16,"loop":false,"sounds":[{"sound":"thunder-crack","preset":"Small spark","frame":0,"volume":0.8}]}
+ }
+}

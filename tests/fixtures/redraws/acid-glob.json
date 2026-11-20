@@ -1,0 +1,175 @@
+{
+ "id": "acid-glob",
+ "frozen": "2026-11-20",
+ "source": "sprites/acid-glob.js",
+ "sha256": "3e795e238c6f96fc82a359271282f19448e4f90609c02ea8a2e95607ca94de38",
+ "name": "Acid glob",
+ "blurb": "A wobbling blob of acid that sheds drips as it flies and splats into a puddle, drawn flying right so a game can turn it to the way it flies. Change its size, shape, drips and colours.",
+ "meta": {
+  "type": "projectile",
+  "role": "effects/projectile",
+  "themes": [
+   "sci-fi",
+   "space",
+   "horror"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "shooter",
+   "arcade"
+  ],
+  "view": "top-down",
+  "words": [
+   "acid",
+   "glob",
+   "blob",
+   "spit",
+   "goo",
+   "slime",
+   "venom",
+   "drip",
+   "fly",
+   "hit",
+   "splat",
+   "puddle",
+   "bug attack",
+   "sticky"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "fly",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "shape": {
+   "kind": "choice",
+   "label": "Shape",
+   "def": "round",
+   "options": [
+    {
+     "value": "round",
+     "label": "Round"
+    },
+    {
+     "value": "teardrop",
+     "label": "Teardrop"
+    },
+    {
+     "value": "cluster",
+     "label": "Cluster"
+    }
+   ],
+   "group": "Look"
+  },
+  "pieces": {
+   "kind": "range",
+   "label": "Drips",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Body",
+   "def": "#9fe040",
+   "swatches": [
+    "#9fe040",
+    "#2fb3a8",
+    "#4f9ff0",
+    "#5fe0f0",
+    "#b04a8a"
+   ],
+   "group": "Colors"
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Shine",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#e8ecf2",
+    "#f6d3b0",
+    "#c2c9d6"
+   ],
+   "group": "Colors"
+  },
+  "wobble": {
+   "kind": "range",
+   "label": "Wobble",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Firm",
+   "hi": "Wobbly",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "fly": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  },
+  "hit": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    10,
+    17,
+    23
+   ]
+  }
+ },
+ "sounds": {
+  "hit": [
+   {
+    "sound": "bug-splat",
+    "preset": "Mite pop",
+    "frame": 0,
+    "volume": 0.7
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-roguelite-scifi"
+ ]
+}

@@ -1,0 +1,45 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "flames",
+ "name": "Flames",
+ "blurb": "Fire with nothing under it, to lay over anything that burns; it can be snuffed out and lit again. Change its size, width, tongues, style, sparks, flicker and colours.",
+ "meta": {"type":"effect","role":"effects/spark","themes":["neutral","fantasy","dungeon"],"gameTypes":["platformer","top-down-rpg","roguelike-action","turn-based-rpg"],"view":"side","words":["fire","flames","flame","burning","blaze","burn","ignite","snuff","embers","on fire","hazard","hot"],"license":"draft"},
+ "size": [32,32],
+ "pivot": [16,30],
+ "grounded": false,
+ "preview": "loop",
+ "styles": ["pixel"],
+ "versions": [
+  {"name":"Burning","params":{}},
+  {"name":"Blaze","params":{"size":1,"pieces":4,"sparks":true}},
+  {"name":"Spirit flame","params":{"style":"magic","core":"#f0ead8","edge":"#4fd8ee"}},
+  {"name":"Poison fire","params":{"core":"#a4c44a","edge":"#7a4fc4"}},
+  {"name":"Small flame","params":{"size":0,"pieces":1,"width":0}}
+ ],
+ "palette": [
+  {"id":"core","label":"Core","default":"#f2c230","material":"fire","swatches":["#f2c230","#f0ead8","#a4c44a","#9bd18a","#f6d3b0"]},
+  {"id":"edge","label":"Flame","default":"#e08a2c","material":"fire","swatches":["#e08a2c","#4fd8ee","#c9423a","#7a4fc4","#3f6fd1","#5fe0f0"]}
+ ],
+ "controls": [
+  {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+  {"key":"width","kind":"range","label":"Width","lo":"Narrow","hi":"Wide","default":0.5},
+  {"key":"pieces","kind":"range","label":"Tongues","lo":"Few","hi":"Many","default":3,"min":1,"max":4,"step":1},
+  {"key":"style","kind":"choice","label":"Style","options":["torch","wild","magic"],"default":"torch"},
+  {"key":"sparks","kind":"toggle","label":"Sparks","default":false},
+  {"key":"core","kind":"colour","label":"Core"},
+  {"key":"edge","kind":"colour","label":"Flame"},
+  {"key":"flicker","kind":"range","label":"Flicker","lo":"Steady","hi":"Wild","default":0.5,"group":"Motion"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": { "emitters": [
+  {"id":"loop","gen":"effect.flames","v":1,"clip":["loop"],"picture":"loop","at":[16,30],"size":{"from":"size","map":[[0,0],[1,1]]},"width":{"from":"width","map":[[0,0],[1,1]]},"pieces":{"from":"pieces","map":[[1,1],[4,4]],"round":"px"},"style":{"from":"style","pick":{"torch":"torch","wild":"wild","magic":"magic"}},"sparks":{"from":"sparks","pick":{"true":true,"false":false}},"core":"core","edge":"edge","flicker":{"from":"flicker","map":[[0,0],[1,1]]}},
+  {"id":"out","gen":"effect.flames","v":1,"clip":["out"],"picture":"out","at":[16,30],"size":{"from":"size","map":[[0,0],[1,1]]},"width":{"from":"width","map":[[0,0],[1,1]]},"pieces":{"from":"pieces","map":[[1,1],[4,4]],"round":"px"},"style":{"from":"style","pick":{"torch":"torch","wild":"wild","magic":"magic"}},"sparks":{"from":"sparks","pick":{"true":true,"false":false}},"core":"core","edge":"edge","flicker":{"from":"flicker","map":[[0,0],[1,1]]}},
+  {"id":"ignite","gen":"effect.flames","v":1,"clip":["ignite"],"picture":"ignite","at":[16,30],"size":{"from":"size","map":[[0,0],[1,1]]},"width":{"from":"width","map":[[0,0],[1,1]]},"pieces":{"from":"pieces","map":[[1,1],[4,4]],"round":"px"},"style":{"from":"style","pick":{"torch":"torch","wild":"wild","magic":"magic"}},"sparks":{"from":"sparks","pick":{"true":true,"false":false}},"core":"core","edge":"edge","flicker":{"from":"flicker","map":[[0,0],[1,1]]}}
+ ] },
+ "clips": {
+  "loop": {"frames":8,"fps":10,"sounds":[{"sound":"fire","preset":"Torch","frame":0,"volume":0.35}]},
+  "out": {"frames":6,"fps":12,"loop":false},
+  "ignite": {"frames":6,"fps":12,"loop":false,"sounds":[{"sound":"whoosh","preset":"Quick swipe","frame":0,"volume":0.8}]}
+ }
+}

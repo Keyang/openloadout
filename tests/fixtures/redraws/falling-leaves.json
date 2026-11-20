@@ -1,0 +1,186 @@
+{
+ "id": "falling-leaves",
+ "frozen": "2026-11-20",
+ "source": "sprites/falling-leaves.js",
+ "sha256": "a14e51f7d7ed08f60e127077a73ac2cd43044f342df6e431dc4ef3084354867f",
+ "name": "Falling leaves",
+ "blurb": "Leaves in two colours turning over as they fall and sway through the whole scene, drifting, fluttering or blown slantwise by a gust. Change how many leaves, their size, the style, the sway, the colours and the speed. Lay copies 62 px apart (each over its neighbours' empty border) to cover the screen.",
+ "meta": {
+  "type": "effect",
+  "role": "effects/weather",
+  "themes": [
+   "neutral",
+   "forest",
+   "farm"
+  ],
+  "gameTypes": [
+   "platformer",
+   "top-down-rpg",
+   "farming-sim",
+   "puzzle"
+  ],
+  "view": "none",
+  "words": [
+   "leaves",
+   "falling leaves",
+   "autumn",
+   "fall",
+   "foliage",
+   "drifting",
+   "flutter",
+   "gust",
+   "breeze",
+   "season",
+   "overlay"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  64,
+  64
+ ],
+ "pivot": [
+  32,
+  32
+ ],
+ "grounded": false,
+ "preview": "loop",
+ "params": {
+  "pieces": {
+   "kind": "range",
+   "label": "Leaves",
+   "def": 5,
+   "min": 3,
+   "max": 9,
+   "step": 1,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "drift",
+   "options": [
+    {
+     "value": "drift",
+     "label": "Drift"
+    },
+    {
+     "value": "flutter",
+     "label": "Flutter"
+    },
+    {
+     "value": "gust",
+     "label": "Gust"
+    }
+   ],
+   "group": "Look"
+  },
+  "sway": {
+   "kind": "range",
+   "label": "Sway",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Still",
+   "hi": "Swaying",
+   "group": "Motion"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Leaves",
+   "def": "#e08a2c",
+   "swatches": [
+    "#e08a2c",
+    "#c9423a",
+    "#3f8a4f",
+    "#7a4f33"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Second leaves",
+   "def": "#f2c230",
+   "swatches": [
+    "#f2c230",
+    "#a4c44a",
+    "#6aa83e",
+    "#a06a3c"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "loop": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [
+  {
+   "name": "Autumn",
+   "params": {}
+  },
+  {
+   "name": "Summer green",
+   "params": {
+    "body": "#3f8a4f",
+    "accent": "#6aa83e"
+   }
+  },
+  {
+   "name": "Gusty",
+   "params": {
+    "style": "gust",
+    "pieces": 9
+   }
+  },
+  {
+   "name": "A few big leaves",
+   "params": {
+    "pieces": 3,
+    "size": 1,
+    "style": "flutter"
+   }
+  },
+  {
+   "name": "Red and brown",
+   "params": {
+    "body": "#c9423a",
+    "accent": "#a06a3c"
+   }
+  }
+ ],
+ "bundles": []
+}

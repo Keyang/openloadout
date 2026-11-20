@@ -1,0 +1,167 @@
+{
+ "id": "scatter-pellet",
+ "frozen": "2026-11-20",
+ "source": "sprites/scatter-pellet.js",
+ "sha256": "4c86bda949381f899cb40119fc64c26024d7919274ceb0deb80d3353840b756f",
+ "name": "Scatter pellet",
+ "blurb": "One small shot from a scatter gun: a bright dot with a short tail, drawn pointing right so a game can turn it to any angle; it pops into four sparks. Change its size, shape, tail and colours.",
+ "meta": {
+  "type": "projectile",
+  "role": "effects/projectile",
+  "themes": [
+   "sci-fi",
+   "space"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "shooter",
+   "arcade"
+  ],
+  "view": "top-down",
+  "words": [
+   "pellet",
+   "shot",
+   "bullet",
+   "buckshot",
+   "shotgun",
+   "scatter",
+   "spread",
+   "spark",
+   "shoot",
+   "fly",
+   "hit",
+   "player shot",
+   "small"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  16,
+  16
+ ],
+ "pivot": [
+  8,
+  8
+ ],
+ "grounded": false,
+ "preview": "fly",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "shape": {
+   "kind": "choice",
+   "label": "Shape",
+   "def": "round",
+   "options": [
+    {
+     "value": "round",
+     "label": "Round"
+    },
+    {
+     "value": "shard",
+     "label": "Shard"
+    },
+    {
+     "value": "spark",
+     "label": "Spark"
+    }
+   ],
+   "group": "Look"
+  },
+  "length": {
+   "kind": "range",
+   "label": "Length",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Short",
+   "hi": "Long",
+   "group": "Look"
+  },
+  "core": {
+   "kind": "color",
+   "label": "Core",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#e8ecf2",
+    "#f6d3b0",
+    "#c2c9d6"
+   ],
+   "group": "Colors"
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Glow",
+   "def": "#3f6fd1",
+   "swatches": [
+    "#3f6fd1",
+    "#5fe0f0",
+    "#e2473f",
+    "#9fe040",
+    "#f2a030",
+    "#b48af8",
+    "#4f9ff0",
+    "#5fd47a"
+   ],
+   "group": "Colors"
+  },
+  "flicker": {
+   "kind": "range",
+   "label": "Flicker",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Steady",
+   "hi": "Wild",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "fly": {
+   "frames": 4,
+   "loop": true,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  },
+  "hit": {
+   "frames": 4,
+   "loop": false,
+   "fps": [
+    10,
+    17,
+    23
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [],
+ "bundles": [
+  "kit-roguelite-scifi"
+ ]
+}

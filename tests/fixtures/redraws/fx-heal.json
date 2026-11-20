@@ -1,0 +1,183 @@
+{
+ "id": "fx-heal",
+ "frozen": "2026-11-20",
+ "source": "sprites/fx-heal.js",
+ "sha256": "7f1f99778574bd2b7850af1ae6a1f5d63ccc7dd0681bd120afb6f785d6fb73c3",
+ "name": "Heal",
+ "blurb": "A healing spell: a ring of light opens on the ground and small motes rise and fade, once or as a lasting glow. Change its size, the motes and how high they rise, the ring and colours.",
+ "meta": {
+  "type": "effect",
+  "role": "effects/magic",
+  "themes": [
+   "fantasy"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "roguelike-action",
+   "platformer"
+  ],
+  "view": "side",
+  "words": [
+   "heal",
+   "cure",
+   "restore",
+   "recover",
+   "regenerate",
+   "health",
+   "buff",
+   "blessing",
+   "spell",
+   "magic",
+   "rise",
+   "sparkle",
+   "gentle"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  64,
+  64
+ ],
+ "pivot": [
+  32,
+  58
+ ],
+ "grounded": false,
+ "preview": "burst",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "pieces": {
+   "kind": "range",
+   "label": "Motes",
+   "def": 6,
+   "min": 4,
+   "max": 10,
+   "step": 1,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "rise": {
+   "kind": "range",
+   "label": "Rise",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Low",
+   "hi": "High",
+   "group": "Look"
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "plus",
+   "options": [
+    {
+     "value": "plus",
+     "label": "Plus"
+    },
+    {
+     "value": "leaf",
+     "label": "Leaf"
+    },
+    {
+     "value": "star",
+     "label": "Star"
+    },
+    {
+     "value": "heart",
+     "label": "Heart"
+    }
+   ],
+   "group": "Look"
+  },
+  "rings": {
+   "kind": "toggle",
+   "label": "Ring",
+   "def": true,
+   "group": "Look"
+  },
+  "core": {
+   "kind": "color",
+   "label": "Core",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#f4e06a",
+    "#f6d3b0",
+    "#9fd8f4"
+   ],
+   "group": "Colors"
+  },
+  "edge": {
+   "kind": "color",
+   "label": "Edge",
+   "def": "#7fe0a0",
+   "swatches": [
+    "#7fe0a0",
+    "#e8662c",
+    "#7a4fc4",
+    "#2f8f9d",
+    "#c9423a",
+    "#7aa0f4"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "burst": {
+   "frames": 10,
+   "loop": false,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  },
+  "loop": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  }
+ },
+ "sounds": {
+  "burst": [
+   {
+    "sound": "heal-shimmer",
+    "preset": "Heal",
+    "frame": 0,
+    "volume": 0.8
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-rpg-fantasy"
+ ]
+}

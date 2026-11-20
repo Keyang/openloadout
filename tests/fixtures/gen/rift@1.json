@@ -1,0 +1,160 @@
+{
+ "id": "rift",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     24,
+     20
+    ],
+    "length": 21,
+    "across": 9,
+    "seed": 2,
+    "paints": [
+     "p1",
+     "p3",
+     "p4"
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      20,
+      8
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...a.....",
+      "..aba....",
+      "..aba....",
+      "..abba...",
+      "...abba..",
+      "...abba..",
+      "..abcba..",
+      ".abcba...",
+      "abcba....",
+      "abccba...",
+      ".abccbaa.",
+      "..abccbba",
+      "..aabcbba",
+      ".abbcbaa.",
+      ".abcba...",
+      "abcba....",
+      ".abcba...",
+      "..abba...",
+      "...abba..",
+      "...abba..",
+      "..abba...",
+      "..aba....",
+      "...aba..."
+     ],
+     "key": {
+      "a": "p4",
+      "b": "p3",
+      "c": "p1"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     24,
+     20
+    ],
+    "length": 21,
+    "across": 9,
+    "scale": 0.6,
+    "open": 0.5,
+    "angle": 60,
+    "teeth": 4,
+    "jag": 0.7,
+    "cool": 1,
+    "seed": 3,
+    "paints": [
+     "p1",
+     "p2",
+     "p3",
+     "p4"
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      19,
+      14
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aa.....",
+      "abba....",
+      ".aaba...",
+      "..aaaa..",
+      ".abbbba.",
+      "..aaaa..",
+      "...a....",
+      "..aba.a.",
+      "...a.aba",
+      ".....aba",
+      "......a."
+     ],
+     "key": {
+      "a": "p4",
+      "b": "p3"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     24,
+     20
+    ],
+    "length": 18,
+    "across": 6,
+    "rim": false,
+    "paints": [
+     "p3",
+     "p4"
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      21,
+      11
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..a...",
+      "..a...",
+      "..a...",
+      "...a..",
+      "...aa.",
+      "..aa..",
+      ".aaa..",
+      "aaa...",
+      ".aaa..",
+      "..aaa.",
+      "...aaa",
+      "..aaa.",
+      "..aa..",
+      ".aa...",
+      "..aa..",
+      "...a..",
+      "...a..",
+      "...a.."
+     ],
+     "key": {
+      "a": "p3"
+     }
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,182 @@
+{
+ "id": "boulder-chunk",
+ "frozen": "2026-11-20",
+ "source": "sprites/boulder-chunk.js",
+ "sha256": "dc6946ebdb91ca63a740a4bc8c58a583df62199e6e7f70dc1fb5509542960dd3",
+ "name": "Boss rock",
+ "blurb": "A tumbling rock thrown by the moss golem, which shatters into shards and dust. Change its size, shape, moss, cracks, pieces and colours.",
+ "meta": {
+  "type": "projectile",
+  "role": "effects/projectile",
+  "themes": [
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "platformer",
+   "arcade"
+  ],
+  "view": "side",
+  "words": [
+   "rock",
+   "boulder",
+   "stone",
+   "chunk",
+   "rubble",
+   "throw",
+   "tumble",
+   "shatter",
+   "smash",
+   "boss attack",
+   "golem",
+   "mossy",
+   "heavy"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "fly",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "shape": {
+   "kind": "choice",
+   "label": "Shape",
+   "def": "round",
+   "options": [
+    {
+     "value": "round",
+     "label": "Round"
+    },
+    {
+     "value": "jagged",
+     "label": "Jagged"
+    },
+    {
+     "value": "slab",
+     "label": "Slab"
+    }
+   ],
+   "group": "Look"
+  },
+  "mossy": {
+   "kind": "toggle",
+   "label": "Mossy",
+   "def": true,
+   "group": "Look"
+  },
+  "wear": {
+   "kind": "range",
+   "label": "Wear",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "New",
+   "hi": "Worn",
+   "group": "Look"
+  },
+  "pieces": {
+   "kind": "range",
+   "label": "Pieces",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "stone": {
+   "kind": "color",
+   "label": "Stone",
+   "def": "#8f97a8",
+   "swatches": [
+    "#8f97a8",
+    "#5d6475",
+    "#f0ead8",
+    "#6b7280"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Moss",
+   "def": "#a4c44a",
+   "swatches": [
+    "#a4c44a",
+    "#6aa83e",
+    "#3f8a4f",
+    "#9bd18a"
+   ],
+   "group": "Colors",
+   "when": {
+    "mossy": [
+     true
+    ]
+   }
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "fly": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  },
+  "hit": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    10,
+    17,
+    23
+   ]
+  }
+ },
+ "sounds": {
+  "hit": [
+   {
+    "sound": "golem-slam",
+    "preset": "Boulder drop",
+    "frame": 0,
+    "volume": 0.7
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-platformer-fantasy"
+ ]
+}

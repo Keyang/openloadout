@@ -1,0 +1,40 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "fireflies",
+ "name": "Fireflies",
+ "blurb": "Small lights drifting over a pond, a meadow or a night path, each glowing, dimming and blinking on its own, as a patch to place where it is dark. Change the size of the glow, how many, how far they roam, the style, the flicker and the colours.",
+ "meta": {"type":"effect","role":"environment/lighting","themes":["neutral","forest","farm"],"gameTypes":["top-down-rpg","platformer","farming-sim","puzzle"],"view":"none","words":["fireflies","lights","glow","wisps","will o wisp","night","summer","pond","meadow","blink","magic","spirits"],"license":"draft"},
+ "size": [64,64],
+ "pivot": [32,32],
+ "grounded": false,
+ "preview": "loop",
+ "styles": ["pixel"],
+ "versions": [
+  {"name":"Fireflies","params":{}},
+  {"name":"Spirit wisps","params":{"style":"wisps","glow":"#4fd8ee"}},
+  {"name":"Dust in light","params":{"style":"specks","glow":"#f2c230","pieces":9}},
+  {"name":"Night swarm","params":{"pieces":9,"spread":1}},
+  {"name":"Lone firefly","params":{"pieces":1,"spread":0}}
+ ],
+ "palette": [
+  {"id":"core","label":"Core","default":"#f0ead8","material":"light","swatches":["#f0ead8","#9bd18a","#8fd0f0","#c2c9d6","#d8d8e0"]},
+  {"id":"glow","label":"Glow","default":"#a4c44a","material":"light","swatches":["#a4c44a","#4fd8ee","#e08a2c","#f2c230","#c9423a","#7a4fc4"]}
+ ],
+ "controls": [
+  {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+  {"key":"pieces","kind":"range","label":"Lights","lo":"Few","hi":"Many","default":5,"min":1,"max":9,"step":1},
+  {"key":"spread","kind":"range","label":"Spread","lo":"Tight","hi":"Wide","default":0.5},
+  {"key":"style","kind":"choice","label":"Style","options":["fireflies","wisps","specks"],"default":"fireflies"},
+  {"key":"flicker","kind":"range","label":"Flicker","lo":"Steady","hi":"Wild","default":0.5,"group":"Motion"},
+  {"key":"core","kind":"colour","label":"Core"},
+  {"key":"glow","kind":"colour","label":"Glow"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": { "emitters": [
+  {"id":"loop","gen":"effect.fireflies","v":1,"clip":["loop"],"picture":"loop","at":[32,32],"size":{"from":"size","map":[[0,0],[1,1]]},"pieces":{"from":"pieces","map":[[1,1],[9,9]],"round":"px"},"spread":{"from":"spread","map":[[0,0],[1,1]]},"style":{"from":"style","pick":{"fireflies":"fireflies","wisps":"wisps","specks":"specks"}},"flicker":{"from":"flicker","map":[[0,0],[1,1]]},"core":"core","glowPaint":"glow"}
+ ] },
+ "clips": {
+  "loop": {"frames":8,"fps":10}
+ }
+}

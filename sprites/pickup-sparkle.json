@@ -1,0 +1,35 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "pickup-sparkle",
+ "name": "Pickup sparkle",
+ "blurb": "Twinkles for a collected thing: a ring that spreads and fades, and a shimmer that loops round a rare item. Change the size, number, spread, style, drift and colours.",
+ "meta": {"type":"effect","role":"effects/spark","themes":["fantasy","forest"],"gameTypes":["platformer","turn-based-rpg","roguelike-action","arcade","puzzle"],"view":"none","words":["sparkle","twinkle","glitter","shimmer","shine","glint","collect","pickup","reward","treasure","rare","magic","star"],"license":"draft"},
+ "size": [32,32],
+ "pivot": [16,16],
+ "grounded": false,
+ "preview": "burst",
+ "styles": ["pixel"],
+ "palette": [
+  {"id":"core","label":"Core","default":"#f0ead8","material":"light","swatches":["#f0ead8","#f6d3b0","#8fd0f0","#9bd18a","#c2c9d6"]},
+  {"id":"edge","label":"Edge","default":"#f2c230","material":"light","swatches":["#f2c230","#e08a2c","#c9423a","#4fd8ee","#7a4fc4","#a4c44a","#3f6fd1"]}
+ ],
+ "controls": [
+  {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+  {"key":"pieces","kind":"range","label":"Pieces","lo":"Few","hi":"Many","default":6,"min":4,"max":8,"step":1},
+  {"key":"spread","kind":"range","label":"Spread","lo":"Tight","hi":"Wide","default":0.5},
+  {"key":"style","kind":"choice","label":"Style","options":["plus","diamond","dot"],"default":"plus"},
+  {"key":"rise","kind":"range","label":"Rise","lo":"Low","hi":"High","default":0.5},
+  {"key":"core","kind":"colour","label":"Core"},
+  {"key":"edge","kind":"colour","label":"Edge"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": { "emitters": [
+  {"id":"burst","gen":"effect.pickup-sparkle","v":1,"clip":["burst"],"picture":"burst","at":[16,16],"size":{"from":"size","map":[[0,0],[1,1]]},"pieces":{"from":"pieces","map":[[4,4],[8,8]],"round":"px"},"spread":{"from":"spread","map":[[0,0],[1,1]]},"style":{"from":"style","pick":{"plus":"plus","diamond":"diamond","dot":"dot"}},"rise":{"from":"rise","map":[[0,0],[1,1]]},"core":"core","edge":"edge"},
+  {"id":"loop","gen":"effect.pickup-sparkle","v":1,"clip":["loop"],"picture":"loop","at":[16,16],"size":{"from":"size","map":[[0,0],[1,1]]},"pieces":{"from":"pieces","map":[[4,4],[8,8]],"round":"px"},"spread":{"from":"spread","map":[[0,0],[1,1]]},"style":{"from":"style","pick":{"plus":"plus","diamond":"diamond","dot":"dot"}},"rise":{"from":"rise","map":[[0,0],[1,1]]},"core":"core","edge":"edge"}
+ ] },
+ "clips": {
+  "burst": {"frames":8,"fps":14,"loop":false},
+  "loop": {"frames":8,"fps":10}
+ }
+}

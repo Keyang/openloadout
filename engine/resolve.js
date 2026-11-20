@@ -60,7 +60,8 @@ import { lerp } from './motion.js';
 import { lostPaints, DRAW_LIST_OPS } from './draw-list.js';
 import { restMaterial } from './materials.js';
 import { parsePieceRef, pieceRegistry } from './pieces.js';
-import { validateSprite, plainSpriteData, checkMaterialPiece } from '../catalog/sprite-schema.js';   // checkMaterialPiece: build item B15 review
+import { validateSprite, plainSpriteData, checkMaterialPiece, SPRITE_LIMITS } from '../catalog/sprite-schema.js';   // checkMaterialPiece: build item B15 review; SPRITE_LIMITS: F5 (travel's ranges)
+import { travelKeys, travelMisses, TRAVEL_LIMITS } from '../rigs/keypose.js';   // build item F5: a clip's travel (motion sliders)
 import * as SITE from './gen/index.js';
 import { tileClips, tileClipNames } from './gen/tiles-clips.js';
 
@@ -973,7 +974,7 @@ function clipsOf(S, def, names, baseClips, baseEnv, speed, laid = null, taken = 
     const r = {
       label: typeof c?.label === 'string' ? c.label : typeof b?.label === 'string' ? b.label : typeof lay?.label === 'string' ? lay.label : cap(name),
       frames, fps: fpsBase * k, fpsBase, loop: typeof pickOf('loop') === 'boolean' ? pickOf('loop') : true,
-      keys: clone(Array.isArray(pickOf('keys')) ? pickOf('keys') : []),
+      keys: travelled(S, def, c, clone(Array.isArray(pickOf('keys')) ? pickOf('keys') : []), name),   // build item F5: moved as far as the clip's travel says
       frameEdits: { ...clone(isObj(b?.frameEdits) ? b.frameEdits : {}), ...clone(isObj(c?.frameEdits) ? c.frameEdits : {}) },
       sounds: c && c.sounds !== undefined ? cuesOf(S, S.env, c.sounds) : b ? cuesOf(S, baseEnv ?? S.env, b.sounds) : [],
     };
@@ -984,6 +985,26 @@ function clipsOf(S, def, names, baseClips, baseEnv, speed, laid = null, taken = 
     out[name] = r;
   }
   return out;
+}
+
+/**
+ * A clip's keys moved as far as its own `travel` says at these settings (build item F5; docs/data-sprites.md 2.2 "Motion
+ * sliders"): each entry's `by` worked out (a number, or a binding as bindingValue reads it), then rigs/keypose.js
+ * travelKeys, each value held to its key field's range (root, IK and node moves in the frame, angles, stretch, scale).
+ * The keys are those the clip plays (its own or the base clip it inherits or picks); no travel gives them back as they are.
+ */
+function travelled(S, def, c, keys, name) {
+  if (!isObj(c) || !Array.isArray(c.travel) || !c.travel.length) return keys;
+  // review fix: a path no key moves (a mistyped base IK chain, which the schema cannot see) is said, not silently skipped
+  for (const p of travelMisses(keys, c.travel)) S.warn(`Clip ${say(name)}: travel names ${say(p)}, which no key of the clip moves; it does nothing (check the track's name against the clip's keys)`);
+  const entries = c.travel.slice(0, TRAVEL_LIMITS.entries).map((e) => (isObj(e) ? { tracks: e.tracks, about: e.about, side: e.side, by: fin(e.by) ? e.by : isObj(e.by) ? bindingValue(e.by, S.params, S.T) : undefined } : null));
+  const size = Array.isArray(def.size) ? def.size : [];
+  const W = fin(size[0]) && size[0] > 0 ? size[0] : 64, H = fin(size[1]) && size[1] > 0 ? size[1] : 64;
+  const A = SPRITE_LIMITS.angle;
+  const across = (axis) => (axis === 0 ? [-W, W] : [-H, H]);
+  const limit = (p) => (p[0] === 'root' ? across(p[1]) : p[0] === 'ik' ? across(p[2]) : p[0] === 'bones' ? [-A, A] : p[0] === 'stretch' ? [...SPRITE_LIMITS.stretch]
+    : p[0] === 'nodes' ? (p[2] === 'turn' ? [-A, A] : p[2] === 'scale' ? [...SPRITE_LIMITS.scale] : p[2] === 'move' ? across(p[3]) : null) : null);
+  return travelKeys(keys, entries, { limit });
 }
 
 /** The scale of each bone and shape at these settings from sliders with `scales` (version 2's by: [smallest, biggest] across the slider; version 1's: the value itself); sliders scaling the same one multiply. */

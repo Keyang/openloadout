@@ -1,0 +1,39 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "cave-drip",
+ "name": "Cave drip",
+ "blurb": "Water dripping from a cave ceiling: a drop swells, stretches, falls and lands with a small splash, ring or puddle, as a patch to place under a ceiling. Change the drop size, the fall, how many drips, what happens where it lands and the colours.",
+ "meta": {"type":"effect","role":"effects/weather","themes":["neutral","dungeon"],"gameTypes":["platformer","roguelike-action","puzzle"],"view":"side","words":["drip","drop","water","leak","cave","ceiling","stalactite","damp","puddle","splash","slime","falling"],"license":"draft"},
+ "size": [64,64],
+ "pivot": [32,62],
+ "grounded": false,
+ "preview": "loop",
+ "styles": ["pixel"],
+ "versions": [
+  {"name":"Water drip","params":{}},
+  {"name":"Slime drip","params":{"style":"puddle","body":"#9bd18a"}},
+  {"name":"Lava drip","params":{"body":"#e08a2c","core":"#f2c230"}},
+  {"name":"Steady drips","params":{"pieces":3}},
+  {"name":"Long fall","params":{"fall":1,"size":0}}
+ ],
+ "palette": [
+  {"id":"body","label":"Water","default":"#3f9fd1","material":"water","swatches":["#3f9fd1","#4fd8ee","#3f6fd1","#7fb0b8","#e08a2c","#a4c44a","#9bd18a"]},
+  {"id":"core","label":"Foam","default":"#f0ead8","material":"water","swatches":["#f0ead8","#f2c230","#8fd0f0","#c2c9d6"]}
+ ],
+ "controls": [
+  {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+  {"key":"fall","kind":"range","label":"Fall","lo":"Short","hi":"Long","default":0.5},
+  {"key":"pieces","kind":"range","label":"Drips","lo":"Few","hi":"Many","default":1,"min":1,"max":3,"step":1},
+  {"key":"style","kind":"choice","label":"Style","options":["splash","ripple","puddle"],"default":"splash"},
+  {"key":"body","kind":"colour","label":"Water"},
+  {"key":"core","kind":"colour","label":"Foam"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": { "emitters": [
+  {"id":"loop","gen":"effect.cave-drip","v":1,"clip":["loop"],"picture":"loop","at":[32,62],"size":{"from":"size","map":[[0,0],[1,1]]},"fall":{"from":"fall","map":[[0,0],[1,1]]},"pieces":{"from":"pieces","map":[[1,1],[3,3]],"round":"px"},"style":{"from":"style","pick":{"splash":"splash","ripple":"ripple","puddle":"puddle"}},"body":"body","core":"core"}
+ ] },
+ "clips": {
+  "loop": {"frames":8,"fps":10,"sounds":[{"sound":"bubbles","preset":"Slow drips","frame":0,"volume":0.35}]}
+ }
+}

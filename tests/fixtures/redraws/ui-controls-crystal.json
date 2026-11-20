@@ -1,0 +1,268 @@
+{
+ "id": "ui-controls-crystal",
+ "frozen": "2026-11-20",
+ "source": "sprites/ui-controls-crystal.js",
+ "sha256": "2416f96c938a02a831cf9e17ce7059afd078cc175302dc978eaa7d8a3688d7ff",
+ "name": "Crystal checkboxes and cursor",
+ "blurb": "The small pieces of a settings screen in cut crystal: a ticked and an empty box, a round option, an on/off switch, a faceted shard pointer that nudges and crystal brackets round a chosen slot; change the style, corners, band, colours and speed.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/cursor",
+  "themes": [
+   "neutral",
+   "fantasy"
+  ],
+  "gameTypes": [
+   "arcade",
+   "turn-based-rpg",
+   "puzzle",
+   "top-down-rpg"
+  ],
+  "view": "none",
+  "words": [
+   "checkbox",
+   "radio",
+   "switch",
+   "cursor",
+   "pointer",
+   "toggle",
+   "selector",
+   "crystal",
+   "ice",
+   "frost"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "check-on",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "ice",
+   "options": [
+    {
+     "value": "ice",
+     "label": "Ice"
+    },
+    {
+     "value": "rime",
+     "label": "Rime"
+    },
+    {
+     "value": "shard",
+     "label": "Shard"
+    }
+   ],
+   "group": "Look"
+  },
+  "corner": {
+   "kind": "range",
+   "label": "Corner",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Square",
+   "hi": "Round",
+   "group": "Look"
+  },
+  "border": {
+   "kind": "range",
+   "label": "Border",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Thin",
+   "hi": "Thick",
+   "group": "Look"
+  },
+  "face": {
+   "kind": "color",
+   "label": "Stone",
+   "def": "#3f5068",
+   "swatches": [
+    "#3f5068",
+    "#7a4f33",
+    "#434d6d",
+    "#8e3a4a"
+   ],
+   "group": "Colors"
+  },
+  "frame": {
+   "kind": "color",
+   "label": "Crystal",
+   "def": "#8fd0f0",
+   "swatches": [
+    "#8fd0f0",
+    "#9bd18a",
+    "#5fe0f0",
+    "#7fe0a0"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Tick",
+   "def": "#4fd8ee",
+   "swatches": [
+    "#4fd8ee",
+    "#c9423a",
+    "#a4c44a",
+    "#b48af8",
+    "#f4e06a"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "check-on": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "check-off": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "radio-on": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "radio-off": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "switch-on": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "switch-off": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "pointer": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    8,
+    12
+   ]
+  },
+  "selector": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    8,
+    12
+   ]
+  }
+ },
+ "sounds": {
+  "check-on": [
+   {
+    "sound": "menu-glass-toggle",
+    "preset": "Switch on",
+    "frame": 0,
+    "volume": 0.6
+   }
+  ],
+  "switch-on": [
+   {
+    "sound": "menu-glass-toggle",
+    "preset": "Switch on",
+    "frame": 0,
+    "volume": 0.6
+   }
+  ]
+ },
+ "versions": [
+  {
+   "name": "Ice",
+   "params": {}
+  },
+  {
+   "name": "Ruby frost",
+   "params": {
+    "style": "rime",
+    "accent": "#c9423a",
+    "face": "#7a4f33"
+   }
+  },
+  {
+   "name": "Shard",
+   "params": {
+    "style": "shard",
+    "frame": "#5fe0f0",
+    "face": "#7a4f33"
+   }
+  },
+  {
+   "name": "Garnet",
+   "params": {
+    "face": "#8e3a4a",
+    "frame": "#7fe0a0",
+    "accent": "#f4e06a"
+   }
+  },
+  {
+   "name": "Jade",
+   "params": {
+    "frame": "#9bd18a",
+    "accent": "#a4c44a"
+   }
+  }
+ ],
+ "bundles": []
+}

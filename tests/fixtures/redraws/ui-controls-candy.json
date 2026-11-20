@@ -1,0 +1,270 @@
+{
+ "id": "ui-controls-candy",
+ "frozen": "2026-11-20",
+ "source": "sprites/ui-controls-candy.js",
+ "sha256": "14d9f2e9459f67f7e38a68147fd543ea0722d142653a9473ba293f965c2ff5d7",
+ "name": "Candy checkboxes and cursor",
+ "blurb": "The small pieces of a settings screen in boiled sugar: a ticked and an empty box, a round option, a jelly on/off switch, a glossy drop pointer and sugar brackets round a chosen slot; change the style, corners, rim, colours and speed.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/cursor",
+  "themes": [
+   "neutral",
+   "candy"
+  ],
+  "gameTypes": [
+   "arcade",
+   "puzzle",
+   "card-game",
+   "racing"
+  ],
+  "view": "none",
+  "words": [
+   "checkbox",
+   "tick",
+   "option",
+   "radio",
+   "switch",
+   "toggle",
+   "pointer",
+   "cursor",
+   "arrow",
+   "select",
+   "settings",
+   "candy",
+   "sugar",
+   "glossy"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "check-on",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "jelly",
+   "options": [
+    {
+     "value": "jelly",
+     "label": "Jelly"
+    },
+    {
+     "value": "striped",
+     "label": "Striped"
+    },
+    {
+     "value": "frosted",
+     "label": "Frosted"
+    }
+   ],
+   "group": "Look"
+  },
+  "corner": {
+   "kind": "range",
+   "label": "Corner",
+   "def": 0.75,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Square",
+   "hi": "Round",
+   "group": "Look"
+  },
+  "border": {
+   "kind": "range",
+   "label": "Border",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Thin",
+   "hi": "Thick",
+   "group": "Look"
+  },
+  "face": {
+   "kind": "color",
+   "label": "Candy",
+   "def": "#7a4f33",
+   "swatches": [
+    "#7a4f33",
+    "#3f5068",
+    "#8e3a4a",
+    "#434d6d"
+   ],
+   "group": "Colors"
+  },
+  "frame": {
+   "kind": "color",
+   "label": "Sugar",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#f6d3b0",
+    "#8fd0f0",
+    "#9bd18a"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Tick",
+   "def": "#4fd8ee",
+   "swatches": [
+    "#4fd8ee",
+    "#e08a2c",
+    "#c2c9d6",
+    "#6aa83e",
+    "#a4c44a"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "check-on": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "check-off": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "radio-on": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "radio-off": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "switch-on": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "switch-off": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "pointer": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    8,
+    12
+   ]
+  },
+  "selector": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    8,
+    12
+   ]
+  }
+ },
+ "sounds": {
+  "check-on": [
+   {
+    "sound": "ui-click",
+    "preset": "Glass tick",
+    "frame": 0,
+    "volume": 0.6
+   }
+  ],
+  "switch-on": [
+   {
+    "sound": "ui-click",
+    "preset": "Glass tick",
+    "frame": 0,
+    "volume": 0.6
+   }
+  ]
+ },
+ "versions": [
+  {
+   "name": "Toffee",
+   "params": {}
+  },
+  {
+   "name": "Cherry stripe",
+   "params": {
+    "style": "striped",
+    "face": "#8e3a4a"
+   }
+  },
+  {
+   "name": "Blueberry frost",
+   "params": {
+    "style": "frosted",
+    "face": "#3f5068",
+    "frame": "#8fd0f0"
+   }
+  },
+  {
+   "name": "Liquorice",
+   "params": {
+    "face": "#434d6d",
+    "accent": "#e08a2c"
+   }
+  },
+  {
+   "name": "Caramel",
+   "params": {
+    "frame": "#f6d3b0",
+    "accent": "#6aa83e"
+   }
+  }
+ ],
+ "bundles": []
+}

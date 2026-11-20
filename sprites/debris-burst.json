@@ -1,0 +1,35 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "debris-burst",
+ "name": "Debris",
+ "blurb": "What flies off a dead enemy: metal scrap that tumbles and comes to rest, or bug goo that splashes and flattens. Change its size, number of pieces, spread, kind of scrap, tumbling and colours.",
+ "meta": {"type":"effect","role":"effects/dust","themes":["sci-fi","space"],"gameTypes":["roguelike-action","shooter"],"view":"top-down","words":["debris","scrap","wreckage","shrapnel","metal","bolts","goo","slime","splat","gibs","break","destroy","death","remains"],"license":"draft"},
+ "size": [48,48],
+ "pivot": [24,24],
+ "grounded": false,
+ "preview": "burst",
+ "styles": ["pixel"],
+ "palette": [
+  {"id":"body","label":"Scrap","default":"#9aa6c0","material":"metal","swatches":["#9aa6c0","#6b7896","#b04a8a","#ca9eda","#e8ecf2","#566182"]},
+  {"id":"accent","label":"Goo","default":"#9fe040","material":"magic","swatches":["#9fe040","#2fb3a8","#4f9ff0","#5fe0f0","#b04a8a"]}
+ ],
+ "controls": [
+  {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+  {"key":"pieces","kind":"range","label":"Pieces","lo":"Few","hi":"Many","default":6,"min":3,"max":9,"step":1},
+  {"key":"spread","kind":"range","label":"Spread","lo":"Tight","hi":"Wide","default":0.5},
+  {"key":"style","kind":"choice","label":"Style","options":["plates","shards","bolts"],"default":"plates"},
+  {"key":"spin","kind":"toggle","label":"Tumble","default":true},
+  {"key":"body","kind":"colour","label":"Scrap"},
+  {"key":"accent","kind":"colour","label":"Goo"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": { "emitters": [
+  {"id":"burst","gen":"effect.debris-burst","v":1,"clip":["burst"],"picture":"burst","at":[24,24],"size":{"from":"size","map":[[0,0],[1,1]]},"pieces":{"from":"pieces","map":[[3,3],[9,9]],"round":"px"},"spread":{"from":"spread","map":[[0,0],[1,1]]},"style":{"from":"style","pick":{"plates":"plates","shards":"shards","bolts":"bolts"}},"spin":{"from":"spin","pick":{"true":true,"false":false}},"body":"body","accent":"accent"},
+  {"id":"goo","gen":"effect.debris-burst","v":1,"clip":["goo"],"picture":"goo","at":[24,24],"size":{"from":"size","map":[[0,0],[1,1]]},"pieces":{"from":"pieces","map":[[3,3],[9,9]],"round":"px"},"spread":{"from":"spread","map":[[0,0],[1,1]]},"style":{"from":"style","pick":{"plates":"plates","shards":"shards","bolts":"bolts"}},"spin":{"from":"spin","pick":{"true":true,"false":false}},"body":"body","accent":"accent"}
+ ] },
+ "clips": {
+  "burst": {"frames":8,"fps":14,"loop":false},
+  "goo": {"frames":8,"fps":14,"loop":false}
+ }
+}

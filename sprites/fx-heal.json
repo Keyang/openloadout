@@ -1,0 +1,1059 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "fx-heal",
+ "name": "Heal",
+ "blurb": "A healing spell: a ring of light opens on the ground and small motes rise and fade, once or as a lasting glow. Change its size, the motes and how high they rise, the ring and colours.",
+ "meta": {
+  "type": "effect",
+  "role": "effects/magic",
+  "themes": [
+   "fantasy"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "roguelike-action",
+   "platformer"
+  ],
+  "view": "side",
+  "words": [
+   "heal",
+   "cure",
+   "restore",
+   "recover",
+   "regenerate",
+   "health",
+   "buff",
+   "blessing",
+   "spell",
+   "magic",
+   "rise",
+   "sparkle",
+   "gentle"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  64,
+  64
+ ],
+ "pivot": [
+  32,
+  58
+ ],
+ "grounded": false,
+ "preview": "burst",
+ "palette": [
+  {
+   "id": "core",
+   "label": "Core",
+   "default": "#f0ead8",
+   "material": "light",
+   "swatches": [
+    "#f0ead8",
+    "#f4e06a",
+    "#f6d3b0",
+    "#9fd8f4"
+   ]
+  },
+  {
+   "id": "edge",
+   "label": "Edge",
+   "default": "#7fe0a0",
+   "material": "signal",
+   "swatches": [
+    "#7fe0a0",
+    "#e8662c",
+    "#7a4fc4",
+    "#2f8f9d",
+    "#c9423a",
+    "#7aa0f4"
+   ]
+  },
+  {
+   "id": "mid",
+   "material": "signal",
+   "derive": {
+    "rule": "mix",
+    "of": "core",
+    "with": "edge",
+    "amount": 0.5
+   }
+  },
+  {
+   "id": "rim",
+   "material": "signal",
+   "derive": {
+    "rule": "tone",
+    "of": "edge",
+    "by": -1
+   }
+  },
+  {
+   "id": "shine",
+   "default": "#ffffff",
+   "material": "light",
+   "detail": true
+  }
+ ],
+ "controls": [
+  {
+   "key": "size",
+   "kind": "range",
+   "label": "Size",
+   "lo": "Small",
+   "hi": "Big",
+   "default": 0.5
+  },
+  {
+   "key": "pieces",
+   "kind": "range",
+   "label": "Motes",
+   "lo": "Few",
+   "hi": "Many",
+   "min": 4,
+   "max": 10,
+   "step": 1,
+   "default": 6
+  },
+  {
+   "key": "rise",
+   "kind": "range",
+   "label": "Rise",
+   "lo": "Low",
+   "hi": "High",
+   "default": 0.5
+  },
+  {
+   "key": "style",
+   "kind": "choice",
+   "label": "Style",
+   "options": [
+    "plus",
+    "leaf",
+    "star",
+    "heart"
+   ],
+   "default": "plus"
+  },
+  {
+   "key": "rings",
+   "kind": "toggle",
+   "label": "Ring",
+   "default": true
+  },
+  {
+   "key": "core",
+   "kind": "colour",
+   "label": "Core"
+  },
+  {
+   "key": "edge",
+   "kind": "colour",
+   "label": "Edge"
+  },
+  {
+   "key": "speed",
+   "standard": "speed"
+  }
+ ],
+ "body": {
+  "nodes": [
+   {
+    "id": "ring",
+    "parent": null,
+    "at": [
+     32,
+     55
+    ]
+   }
+  ],
+  "draw": [
+   {
+    "id": "loop-ring",
+    "kind": "ellipse",
+    "on": "ring",
+    "hidden": true,
+    "when": {
+     "rings": [
+      true
+     ]
+    },
+    "at": [
+     0,
+     0
+    ],
+    "r": [
+     {
+      "from": "size",
+      "map": [
+       [
+        0,
+        9.82
+       ],
+       [
+        1,
+        14.78
+       ]
+      ]
+     },
+     {
+      "from": "size",
+      "map": [
+       [
+        0,
+        3.446
+       ],
+       [
+        1,
+        4.934
+       ]
+      ]
+     }
+    ],
+    "paint": "mid"
+   },
+   {
+    "id": "loop-hole",
+    "kind": "ellipse",
+    "on": "ring",
+    "hidden": true,
+    "when": {
+     "rings": [
+      true
+     ]
+    },
+    "at": [
+     0,
+     0
+    ],
+    "r": [
+     {
+      "from": "size",
+      "map": [
+       [
+        0,
+        7.82
+       ],
+       [
+        1,
+        12.78
+       ]
+      ]
+     },
+     {
+      "from": "size",
+      "map": [
+       [
+        0,
+        2.146
+       ],
+       [
+        1,
+        3.634
+       ]
+      ]
+     }
+    ],
+    "paint": "clear"
+   },
+   {
+    "kind": "outline",
+    "paint": "rim"
+   }
+  ],
+  "emitters": [
+   {
+    "id": "ring",
+    "gen": "ring",
+    "v": 1,
+    "clip": [
+     "burst"
+    ],
+    "when": {
+     "rings": [
+      true
+     ]
+    },
+    "at": [
+     32,
+     55
+    ],
+    "r0": 3,
+    "r1": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       14
+      ],
+      [
+       1,
+       22
+      ]
+     ]
+    },
+    "thick": 3,
+    "squash": 0.3,
+    "seed": 4,
+    "paints": [
+     "core",
+     "mid",
+     "edge",
+     "rim"
+    ],
+    "area": {
+     "x0": 1,
+     "y0": 1,
+     "x1": 63,
+     "y1": 59
+    }
+   },
+   {
+    "id": "well",
+    "gen": "beam.lift",
+    "v": 1,
+    "clip": [
+     "burst"
+    ],
+    "at": [
+     32,
+     56
+    ],
+    "width": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       7
+      ],
+      [
+       0.05,
+       7
+      ],
+      [
+       0.075,
+       8
+      ],
+      [
+       0.25,
+       8
+      ],
+      [
+       0.275,
+       9
+      ],
+      [
+       0.45,
+       9
+      ],
+      [
+       0.475,
+       10
+      ],
+      [
+       0.65,
+       10
+      ],
+      [
+       0.675,
+       11
+      ],
+      [
+       0.85,
+       11
+      ],
+      [
+       0.875,
+       12
+      ],
+      [
+       1,
+       12
+      ]
+     ],
+     "round": "px"
+    },
+    "height": {
+     "from": "rise",
+     "map": [
+      [
+       0,
+       19.5
+      ],
+      [
+       1,
+       37.5
+      ]
+     ]
+    },
+    "dash": 2,
+    "gap": 2,
+    "solid": 0.3,
+    "seed": 2,
+    "paints": [
+     "core",
+     "mid",
+     "edge",
+     "rim"
+    ]
+   },
+   {
+    "id": "flash",
+    "gen": "blast.grow",
+    "v": 1,
+    "clip": [
+     "burst"
+    ],
+    "at": [
+     32,
+     58
+    ],
+    "r": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       6
+      ],
+      [
+       1,
+       9
+      ]
+     ]
+    },
+    "bump": 0,
+    "heat": 0.8,
+    "paints": [
+     "shine",
+     "core",
+     "mid",
+     "edge",
+     "rim"
+    ],
+    "area": {
+     "x0": 1,
+     "y0": 1,
+     "x1": 63,
+     "y1": 58
+    }
+   },
+   {
+    "id": "glow",
+    "gen": "blast.grow",
+    "v": 1,
+    "clip": [
+     "burst"
+    ],
+    "at": [
+     32,
+     58
+    ],
+    "r": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       4
+      ],
+      [
+       1,
+       6
+      ]
+     ]
+    },
+    "bump": 0,
+    "heat": 0.6,
+    "paints": [
+     "core",
+     "mid",
+     "edge",
+     "rim"
+    ],
+    "area": {
+     "x0": 1,
+     "y0": 1,
+     "x1": 63,
+     "y1": 58
+    }
+   },
+   {
+    "id": "rise",
+    "gen": "motes",
+    "v": 1,
+    "at": [
+     32,
+     53
+    ],
+    "count": {
+     "from": "pieces",
+     "map": [
+      [
+       4,
+       4
+      ],
+      [
+       5,
+       5
+      ],
+      [
+       6,
+       6
+      ],
+      [
+       7,
+       7
+      ],
+      [
+       8,
+       8
+      ],
+      [
+       9,
+       9
+      ],
+      [
+       10,
+       10
+      ]
+     ],
+     "round": "px"
+    },
+    "rise": {
+     "from": "rise",
+     "map": [
+      [
+       0,
+       26
+      ],
+      [
+       1,
+       50
+      ]
+     ]
+    },
+    "width": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       20
+      ],
+      [
+       1,
+       34
+      ]
+     ]
+    },
+    "size": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       7.2
+      ],
+      [
+       1,
+       11
+      ]
+     ]
+    },
+    "shape": {
+     "from": "style",
+     "pick": {
+      "plus": "plus",
+      "leaf": "leaf",
+      "star": "star",
+      "heart": "heart"
+     }
+    },
+    "sway": 1.6,
+    "seed": 5,
+    "paints": [
+     "core",
+     "mid",
+     "edge",
+     "rim"
+    ],
+    "area": {
+     "x0": 1,
+     "y0": 1,
+     "x1": 63,
+     "y1": 58
+    },
+    "clip": [
+     "burst"
+    ],
+    "loop": false,
+    "stagger": 0.5
+   },
+   {
+    "id": "shimmer",
+    "gen": "beam.lift",
+    "v": 1,
+    "clip": [
+     "loop"
+    ],
+    "at": [
+     32,
+     56
+    ],
+    "width": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       6
+      ],
+      [
+       0.1,
+       6
+      ],
+      [
+       0.125,
+       7
+      ],
+      [
+       0.35,
+       7
+      ],
+      [
+       0.375,
+       8
+      ],
+      [
+       0.575,
+       8
+      ],
+      [
+       0.6,
+       9
+      ],
+      [
+       0.825,
+       9
+      ],
+      [
+       0.85,
+       10
+      ],
+      [
+       1,
+       10
+      ]
+     ],
+     "round": "px"
+    },
+    "height": {
+     "from": "rise",
+     "map": [
+      [
+       0,
+       13
+      ],
+      [
+       1,
+       25
+      ]
+     ]
+    },
+    "dash": 2,
+    "gap": 3,
+    "solid": 0.15,
+    "cycles": 1,
+    "seed": 2,
+    "paints": [
+     "core",
+     "mid",
+     "edge",
+     "rim"
+    ]
+   },
+   {
+    "id": "drift",
+    "gen": "motes",
+    "v": 1,
+    "at": [
+     32,
+     53
+    ],
+    "count": {
+     "from": "pieces",
+     "map": [
+      [
+       4,
+       4
+      ],
+      [
+       5,
+       5
+      ],
+      [
+       6,
+       6
+      ],
+      [
+       7,
+       7
+      ],
+      [
+       8,
+       8
+      ],
+      [
+       9,
+       9
+      ],
+      [
+       10,
+       10
+      ]
+     ],
+     "round": "px"
+    },
+    "rise": {
+     "from": "rise",
+     "map": [
+      [
+       0,
+       26
+      ],
+      [
+       1,
+       50
+      ]
+     ]
+    },
+    "width": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       20
+      ],
+      [
+       1,
+       34
+      ]
+     ]
+    },
+    "size": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       7.2
+      ],
+      [
+       1,
+       11
+      ]
+     ]
+    },
+    "shape": {
+     "from": "style",
+     "pick": {
+      "plus": "plus",
+      "leaf": "leaf",
+      "star": "star",
+      "heart": "heart"
+     }
+    },
+    "sway": 1.6,
+    "seed": 5,
+    "paints": [
+     "core",
+     "mid",
+     "edge",
+     "rim"
+    ],
+    "area": {
+     "x0": 1,
+     "y0": 1,
+     "x1": 63,
+     "y1": 58
+    },
+    "clip": [
+     "loop"
+    ],
+    "loop": true
+   }
+  ]
+ },
+ "clips": {
+  "burst": {
+   "frames": 10,
+   "fps": 12,
+   "loop": false,
+   "keys": [
+    {
+     "t": 0,
+     "emit": {
+      "well": {
+       "amount": 1,
+       "scale": 0.25,
+       "phase": 0
+      },
+      "flash": {
+       "amount": 1
+      },
+      "glow": {
+       "amount": 0
+      }
+     }
+    },
+    {
+     "t": 0.1111111111111111,
+     "emit": {
+      "well": {
+       "amount": 1,
+       "scale": 0.6,
+       "phase": 0.333
+      },
+      "flash": {
+       "amount": 0
+      },
+      "glow": {
+       "amount": 1
+      }
+     }
+    },
+    {
+     "t": 0.2222222222222222,
+     "emit": {
+      "well": {
+       "amount": 1,
+       "scale": 0.9,
+       "phase": 0.667
+      },
+      "flash": {
+       "amount": 0
+      },
+      "glow": {
+       "amount": 0
+      }
+     }
+    },
+    {
+     "t": 0.3333333333333333,
+     "emit": {
+      "well": {
+       "amount": 1,
+       "scale": 1,
+       "phase": 1
+      },
+      "flash": {
+       "amount": 0
+      },
+      "glow": {
+       "amount": 0
+      }
+     }
+    },
+    {
+     "t": 0.4444444444444444,
+     "emit": {
+      "well": {
+       "amount": 1,
+       "scale": 0.85,
+       "phase": 1.333
+      },
+      "flash": {
+       "amount": 0
+      },
+      "glow": {
+       "amount": 0
+      }
+     }
+    },
+    {
+     "t": 0.5555555555555556,
+     "emit": {
+      "well": {
+       "amount": 1,
+       "scale": 0.6,
+       "phase": 1.667
+      },
+      "flash": {
+       "amount": 0
+      },
+      "glow": {
+       "amount": 0
+      }
+     }
+    },
+    {
+     "t": 0.6666666666666666,
+     "emit": {
+      "well": {
+       "amount": 1,
+       "scale": 0.35,
+       "phase": 2
+      },
+      "flash": {
+       "amount": 0
+      },
+      "glow": {
+       "amount": 0
+      }
+     }
+    },
+    {
+     "t": 0.7777777777777778,
+     "emit": {
+      "well": {
+       "amount": 1,
+       "scale": 0.15,
+       "phase": 2.333
+      },
+      "flash": {
+       "amount": 0
+      },
+      "glow": {
+       "amount": 0
+      }
+     }
+    },
+    {
+     "t": 0.8888888888888888,
+     "emit": {
+      "well": {
+       "amount": 0
+      },
+      "flash": {
+       "amount": 0
+      },
+      "glow": {
+       "amount": 0
+      }
+     }
+    },
+    {
+     "t": 1,
+     "emit": {
+      "well": {
+       "amount": 0
+      },
+      "flash": {
+       "amount": 0
+      },
+      "glow": {
+       "amount": 0
+      }
+     }
+    }
+   ],
+   "sounds": [
+    {
+     "sound": "heal-shimmer",
+     "preset": "Heal",
+     "frame": 0,
+     "volume": 0.8
+    }
+   ]
+  },
+  "loop": {
+   "label": "Regenerate",
+   "frames": 8,
+   "fps": 10,
+   "keys": [
+    {
+     "t": 0,
+     "show": [
+      "loop-ring",
+      "loop-hole"
+     ],
+     "nodes": {
+      "ring": {
+       "scale": 1
+      }
+     }
+    },
+    {
+     "t": 0.125,
+     "show": [
+      "loop-ring",
+      "loop-hole"
+     ],
+     "nodes": {
+      "ring": {
+       "scale": 1.06
+      }
+     }
+    },
+    {
+     "t": 0.25,
+     "show": [
+      "loop-ring",
+      "loop-hole"
+     ],
+     "nodes": {
+      "ring": {
+       "scale": 1.1
+      }
+     }
+    },
+    {
+     "t": 0.375,
+     "show": [
+      "loop-ring",
+      "loop-hole"
+     ],
+     "nodes": {
+      "ring": {
+       "scale": 1.06
+      }
+     }
+    },
+    {
+     "t": 0.5,
+     "show": [
+      "loop-ring",
+      "loop-hole"
+     ],
+     "nodes": {
+      "ring": {
+       "scale": 1
+      }
+     }
+    },
+    {
+     "t": 0.625,
+     "show": [
+      "loop-ring",
+      "loop-hole"
+     ],
+     "nodes": {
+      "ring": {
+       "scale": 1.06
+      }
+     }
+    },
+    {
+     "t": 0.75,
+     "show": [
+      "loop-ring",
+      "loop-hole"
+     ],
+     "nodes": {
+      "ring": {
+       "scale": 1.1
+      }
+     }
+    },
+    {
+     "t": 0.875,
+     "show": [
+      "loop-ring",
+      "loop-hole"
+     ],
+     "nodes": {
+      "ring": {
+       "scale": 1.06
+      }
+     }
+    }
+   ]
+  }
+ }
+}

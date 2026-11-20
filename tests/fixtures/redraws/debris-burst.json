@@ -1,0 +1,172 @@
+{
+ "id": "debris-burst",
+ "frozen": "2026-11-20",
+ "source": "sprites/debris-burst.js",
+ "sha256": "e1398e7e1b8d3381a33273d0d61b9ba8d9b002a0712d126f39ee96a8c15db78e",
+ "name": "Debris",
+ "blurb": "What flies off a dead enemy: metal scrap that tumbles and comes to rest, or bug goo that splashes and flattens. Change its size, number of pieces, spread, kind of scrap, tumbling and colours.",
+ "meta": {
+  "type": "effect",
+  "role": "effects/dust",
+  "themes": [
+   "sci-fi",
+   "space"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "shooter"
+  ],
+  "view": "top-down",
+  "words": [
+   "debris",
+   "scrap",
+   "wreckage",
+   "shrapnel",
+   "metal",
+   "bolts",
+   "goo",
+   "slime",
+   "splat",
+   "gibs",
+   "break",
+   "destroy",
+   "death",
+   "remains"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  48,
+  48
+ ],
+ "pivot": [
+  24,
+  24
+ ],
+ "grounded": false,
+ "preview": "burst",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "pieces": {
+   "kind": "range",
+   "label": "Pieces",
+   "def": 6,
+   "min": 3,
+   "max": 9,
+   "step": 1,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "spread": {
+   "kind": "range",
+   "label": "Spread",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Tight",
+   "hi": "Wide",
+   "group": "Look"
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "plates",
+   "options": [
+    {
+     "value": "plates",
+     "label": "Plates"
+    },
+    {
+     "value": "shards",
+     "label": "Shards"
+    },
+    {
+     "value": "bolts",
+     "label": "Bolts"
+    }
+   ],
+   "group": "Look"
+  },
+  "spin": {
+   "kind": "toggle",
+   "label": "Tumble",
+   "def": true,
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Scrap",
+   "def": "#9aa6c0",
+   "swatches": [
+    "#9aa6c0",
+    "#6b7896",
+    "#b04a8a",
+    "#ca9eda",
+    "#e8ecf2",
+    "#566182"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Goo",
+   "def": "#9fe040",
+   "swatches": [
+    "#9fe040",
+    "#2fb3a8",
+    "#4f9ff0",
+    "#5fe0f0",
+    "#b04a8a"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "burst": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    9,
+    15,
+    20
+   ]
+  },
+  "goo": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    9,
+    15,
+    20
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [],
+ "bundles": [
+  "kit-roguelite-scifi"
+ ]
+}

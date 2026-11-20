@@ -1,0 +1,186 @@
+{
+ "id": "rain-ripples",
+ "frozen": "2026-11-20",
+ "source": "sprites/rain-ripples.js",
+ "sha256": "eedf1b24254c4ca01631d5809855fd0d7de2d9acf54c69bd10ccecfd5827d3ad",
+ "name": "Rain on water",
+ "blurb": "Raindrops striking a pond, a puddle or a flooded floor, seen from above: each opens a flat ring that breaks into arcs, as a patch to lay over water. Change the ring size, how many drops, how wide they fall, rings or splashes, and the colours.",
+ "meta": {
+  "type": "effect",
+  "role": "effects/weather",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "top-down-rpg",
+   "farming-sim",
+   "puzzle",
+   "platformer"
+  ],
+  "view": "top-down",
+  "words": [
+   "rain",
+   "raindrops",
+   "ripples",
+   "rings",
+   "puddle",
+   "pond",
+   "drizzle",
+   "downpour",
+   "storm",
+   "wet",
+   "weather",
+   "splash"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  64,
+  64
+ ],
+ "pivot": [
+  32,
+  32
+ ],
+ "grounded": false,
+ "preview": "loop",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "pieces": {
+   "kind": "range",
+   "label": "Drops",
+   "def": 5,
+   "min": 3,
+   "max": 10,
+   "step": 1,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "spread": {
+   "kind": "range",
+   "label": "Spread",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Tight",
+   "hi": "Wide",
+   "group": "Look"
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "rings",
+   "options": [
+    {
+     "value": "rings",
+     "label": "Rings"
+    },
+    {
+     "value": "splashes",
+     "label": "Splashes"
+    },
+    {
+     "value": "both",
+     "label": "Both"
+    }
+   ],
+   "group": "Look"
+  },
+  "core": {
+   "kind": "color",
+   "label": "Foam",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#8fd0f0",
+    "#c2c9d6",
+    "#d8d8e0"
+   ],
+   "group": "Colors"
+  },
+  "edge": {
+   "kind": "color",
+   "label": "Water",
+   "def": "#3f9fd1",
+   "swatches": [
+    "#3f9fd1",
+    "#4fd8ee",
+    "#3f6fd1",
+    "#7fb0b8",
+    "#e08a2c",
+    "#a4c44a"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "loop": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [
+  {
+   "name": "Drizzle",
+   "params": {}
+  },
+  {
+   "name": "Downpour",
+   "params": {
+    "pieces": 10,
+    "style": "both"
+   }
+  },
+  {
+   "name": "Puddle",
+   "params": {
+    "spread": 0,
+    "size": 0
+   }
+  },
+  {
+   "name": "Big drops",
+   "params": {
+    "size": 1,
+    "pieces": 3
+   }
+  },
+  {
+   "name": "Night rain",
+   "params": {
+    "core": "#8fd0f0",
+    "edge": "#3f6fd1"
+   }
+  }
+ ],
+ "bundles": []
+}

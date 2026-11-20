@@ -1,0 +1,198 @@
+{
+ "id": "fx-fire-spell",
+ "frozen": "2026-11-20",
+ "source": "sprites/fx-fire-spell.js",
+ "sha256": "08e88d219b81d85980d967fe06400eca7f05e34f35932fedb62e5fdffc5657c2",
+ "name": "Fire spell",
+ "blurb": "A fire spell for a battle screen: flames erupt under the target, and sparks gather into a flame in the caster's hand. Change its size, height, tongues, style, embers, flicker and colours.",
+ "meta": {
+  "type": "effect",
+  "role": "effects/magic",
+  "themes": [
+   "fantasy"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "roguelike-action",
+   "platformer"
+  ],
+  "view": "side",
+  "words": [
+   "fire",
+   "flame",
+   "spell",
+   "magic",
+   "burn",
+   "blaze",
+   "pillar",
+   "eruption",
+   "ember",
+   "cast",
+   "attack",
+   "inferno",
+   "hot"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  64,
+  64
+ ],
+ "pivot": [
+  32,
+  58
+ ],
+ "grounded": false,
+ "preview": "burst",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "height": {
+   "kind": "range",
+   "label": "Height",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Short",
+   "hi": "Tall",
+   "group": "Look"
+  },
+  "pieces": {
+   "kind": "range",
+   "label": "Tongues",
+   "def": 5,
+   "min": 3,
+   "max": 7,
+   "step": 1,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "pillar",
+   "options": [
+    {
+     "value": "pillar",
+     "label": "Pillar"
+    },
+    {
+     "value": "ball",
+     "label": "Ball"
+    },
+    {
+     "value": "ring",
+     "label": "Ring"
+    }
+   ],
+   "group": "Look"
+  },
+  "sparks": {
+   "kind": "toggle",
+   "label": "Embers",
+   "def": true,
+   "group": "Look"
+  },
+  "core": {
+   "kind": "color",
+   "label": "Core",
+   "def": "#f4e06a",
+   "swatches": [
+    "#f4e06a",
+    "#f0ead8",
+    "#f6d3b0",
+    "#9fd8f4"
+   ],
+   "group": "Colors"
+  },
+  "edge": {
+   "kind": "color",
+   "label": "Edge",
+   "def": "#e8662c",
+   "swatches": [
+    "#e8662c",
+    "#7a4fc4",
+    "#2f8f9d",
+    "#c9423a",
+    "#7fe0a0",
+    "#7aa0f4"
+   ],
+   "group": "Colors"
+  },
+  "flicker": {
+   "kind": "range",
+   "label": "Flicker",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Steady",
+   "hi": "Wild",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "burst": {
+   "frames": 10,
+   "loop": false,
+   "fps": [
+    9,
+    15,
+    20
+   ]
+  },
+  "cast": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  }
+ },
+ "sounds": {
+  "burst": [
+   {
+    "sound": "wyrm-roar",
+    "preset": "Fire breath",
+    "frame": 1,
+    "volume": 0.8
+   }
+  ],
+  "cast": [
+   {
+    "sound": "magic-spell",
+    "preset": "Quick zap",
+    "frame": 1,
+    "volume": 0.8
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-rpg-fantasy"
+ ]
+}

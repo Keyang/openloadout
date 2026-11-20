@@ -52,6 +52,7 @@ import { styleIds } from '../engine/styles.js';
 import { PRIMITIVE_KINDS as GEN_PRIMITIVE_KINDS, TONES, FIXED_PAINTS as GEN_FIXED_PAINTS, STAMP_ANCHORS as GEN_STAMP_ANCHORS, PLACEABLE_KINDS as GEN_PLACEABLE_KINDS } from '../engine/gen/args.js';
 import * as SITE_GENERATORS from '../engine/gen/index.js';
 import { tileClipNames, groupDrawsMiddles, TILE_DECAL_ORDERS } from '../engine/gen/tiles-clips.js';
+import { TRAVEL_LIMITS, TRAVEL_ABOUT, TRAVEL_SIDES } from '../rigs/keypose.js';   // build item F5: a clip's travel (motion sliders)
 
 // ---- the tables ---------------------------------------------------------------------------------------------------
 
@@ -1335,7 +1336,8 @@ function rigBody(C, r, top) {
       const o = { id, parent };
       if (parent === null) { o.at = pairOf(C, place, 'at', b.at, [-C.W, 2 * C.W], [-C.H, 2 * C.H], { need: true, clamp: true }); if (b.from !== undefined) C.warn(`${place}: from is only for one that hangs from another; dropped`); }
       else { if (b.at !== undefined) C.warn(`${place}: at is only for a root (no parent); dropped`); const f = num(C, place, 'from', b.from, 0, 1); if (f !== undefined) o.from = f; }
-      o.angle = num(C, place, 'angle', b.angle ?? 0, -L.angle, L.angle);
+      // a node's angle may be bound to a setting (batch M6b: a Hold angle slider turns the node a weapon is drawn on); a bone's stays a number, which keys pose
+      o.angle = isNode && isBindingLike(b.angle) ? numOrBind(C, place, 'angle', b.angle, -L.angle, L.angle)?.value : num(C, place, 'angle', b.angle ?? 0, -L.angle, L.angle);
       if (isNode) { if (b.length !== undefined && b.length !== 0) C.err(`${place}: a node has no length (it is a pivot); put a bone in bones for something with length`); }
       else o.length = num(C, place, 'length', b.length, 1, P, { need: true });
       const lo = num(C, place, 'min', b.min, -L.angle, L.angle), hi = num(C, place, 'max', b.max, -L.angle, L.angle);
@@ -1351,7 +1353,9 @@ function rigBody(C, r, top) {
   if (r.bones === undefined && !base) C.err(`${where}: bones are missing; give the bones, or extend a base piece ("extends": { "use": "base:person-side", "v": 1 })`);
   out.bones = boneList(r.bones, false);
   if (r.nodes !== undefined) out.nodes = boneList(r.nodes, true);
-  if (out.bones.length + (out.nodes?.length ?? 0) > L.nodes) C.err(`${where}: has ${out.bones.length + (out.nodes?.length ?? 0)} bones and nodes; the most is ${L.nodes}`);
+  // the base's bones and nodes count too (batch M6b): rigs/bones.js solves at most L.nodes of the merged rig
+  const inBase = Array.isArray(base?.entry?.bones) ? base.entry.bones.length : 0, inRig = out.bones.length + (out.nodes?.length ?? 0) + inBase;
+  if (inRig > L.nodes) C.err(`${where}: has ${inRig} bones and nodes${inBase ? ` with its base's ${inBase} (${base.id}@${base.v})` : ''}; the most a rig draws is ${L.nodes}`);
   C.cost.nodes += out.bones.length + (out.nodes?.length ?? 0);
   checkTree(C, tree, new Set([...nodes].filter(([, n]) => n.base).map(([k]) => k)), 'bone');
   // shapes
@@ -2488,7 +2492,7 @@ function partsOf(C, raw) {
   return out;
 }
 
-const CLIP_FIELDS = ['label', 'frames', 'fps', 'loop', 'keys', 'frameEdits', 'sounds', 'from', 'noText'];   // noText: migration batch M9 (an interface clip with no room for words, engine/ui.js)
+const CLIP_FIELDS = ['label', 'frames', 'fps', 'loop', 'keys', 'frameEdits', 'sounds', 'from', 'noText', 'travel'];   // noText: migration batch M9 (an interface clip with no room for words, engine/ui.js); travel: build item F5 (motion sliders)
 const EDIT_FIELDS = ['nudge', 'show', 'hide', 'flash', 'swap'];
 const SOUND_FIELDS = ['sound', 'frame', 'preset', 'volume', 'when'];
 
@@ -2581,6 +2585,79 @@ function checkKey(C, place, k) {
   return o;
 }
 
+// ---- travel: motion sliders (build item F5; docs/data-sprites.md 2.2 "Motion sliders"; rigs/keypose.js travelKeys) ----
+
+/** The key fields whose numbers a clip's travel may scale, by body: what each body's keys move (never t, ease, show, hide, swap or emit). */
+export const TRAVEL_TRACKS = Object.freeze({ rig: Object.freeze(['root', 'bones', 'ik', 'stretch']), pictures: Object.freeze(['root', 'nodes']), emitters: Object.freeze(['root', 'nodes']) });
+const TRAVEL_FIELDS = ['tracks', 'by', 'about', 'side'];
+const TRACK_SEG = /^[a-zA-Z0-9][a-zA-Z0-9-]{0,39}$/;
+const AXIS = new Set(['0', '1']);
+
+/** One track path of a travel entry: a numeric key field of the body, then (optionally) its id and axis, as the keys write them. True when it names one. */
+function travelTrack(C, place, s, allowed) {
+  const segs = typeof s === 'string' && s.length <= 160 ? s.split('.') : null;
+  const words = `name a number the keys move: ${listOf(allowed)}, optionally with an id and an axis under it (as "root.1", "bones.<bone>", "ik.<chain>.0", "nodes.<node>.turn")`;
+  if (!segs || segs.length > TRAVEL_LIMITS.segments || segs.some((x) => !TRACK_SEG.test(x) || RESERVED.has(x)) || !allowed.includes(segs[0])) { C.err(`${place}: ${q(typeof s === 'string' ? s : say(s))} is not a track travel can scale; ${words}`); return false; }
+  const [field, id, a, b] = segs;
+  const deeper = (n) => { if (segs.length > n) { C.err(`${place}: ${q(s)}: ${segs.slice(0, n).join('.')} goes no deeper; ${words}`); return true; } return false; };
+  if (field === 'root') {
+    if (id !== undefined && !AXIS.has(id)) { C.err(`${place}: ${q(s)}: root takes 0 (across) or 1 (down)`); return false; }
+    return !deeper(2);
+  }
+  if (field === 'bones' || field === 'stretch') {
+    if (id !== undefined && !C.nodes?.has(id) && !(C.loose && ID_PATTERN.test(id))) { C.err(`${place}: ${q(s)}: ${q(id)} is not a bone or node of the body`); return false; }
+    return !deeper(2);
+  }
+  if (field === 'ik') {
+    const baseIk = Array.isArray(C.base?.entry?.ik) ? C.base.entry.ik.filter((x) => typeof x === 'string') : null;   // F5 review fix: a summary that lists the base's chains has them checked
+    if (id !== undefined && baseIk && !C.ik?.has(id) && !baseIk.includes(id)) { C.err(`${place}: ${q(s)}: ${q(id)} is not an IK chain of the body or its base (${someOf([...(C.ik?.keys?.() ?? []), ...baseIk])})`); return false; }
+    if (id !== undefined && !C.ik?.has(id) && !((C.loose || C.base) && ID_PATTERN.test(id))) { C.err(`${place}: ${q(s)}: ${q(id)} is not an IK chain of the body`); return false; }   // a summary without chains (pieceSummary gives none yet): any id on a base; engine/resolve.js warns of a path no key moves
+    if (a !== undefined && !AXIS.has(a)) { C.err(`${place}: ${q(s)}: an IK target takes 0 (across) or 1 (down)`); return false; }
+    return !deeper(3);
+  }
+  // nodes (pictures, emitters): nodes.<node>.turn | move[.0|.1] | scale
+  if (id !== undefined && !C.nodes?.has(id)) { C.err(`${place}: ${q(s)}: ${q(id)} is not a node of the body`); return false; }
+  if (a !== undefined && !['turn', 'move', 'scale'].includes(a)) { C.err(`${place}: ${q(s)}: a node's keys move by turn, move or scale`); return false; }
+  if (a === 'move') { if (b !== undefined && !AXIS.has(b)) { C.err(`${place}: ${q(s)}: move takes 0 (across) or 1 (down)`); return false; } return true; }
+  return !deeper(3);
+}
+
+/**
+ * A clip's travel (build item F5): [{ tracks: [paths], by: number | binding, about?: first | mid | least | most | number, side?: below | above }],
+ * at most TRAVEL_LIMITS.entries. `by` is checked as any binding to a number from 0 to TRAVEL_LIMITS.most (so the control it
+ * binds is in use). Returns the cleaned list, or undefined after an error.
+ */
+function travelOf(C, place, raw) {
+  const allowed = TRAVEL_TRACKS[C.bodyKind];
+  if (!allowed) { C.err(`${place}: travel scales how far a clip's keys move; a ${C.bodyKind ?? 'bodiless'} body has no keys that move (rig, pictures and emitters bodies do)`); return undefined; }
+  const xs = list(C, place, raw, TRAVEL_LIMITS.entries, { what: 'travel entries' });
+  if (!xs) return undefined;
+  const out = [];
+  let ok = true;
+  xs.forEach((e, i) => {
+    const p = `${place}, travel ${i + 1}`;
+    if (!isObj(e)) { C.err(`${p}: must be { tracks, by, about? }; got ${say(e)}`); ok = false; return; }
+    knownOnly(C, p, e, TRAVEL_FIELDS);
+    const ts = list(C, p, e.tracks, TRAVEL_LIMITS.tracks, { min: 1, what: 'tracks', need: true });
+    const tracks = [];
+    let good = !!ts;
+    for (const s of ts ?? []) {
+      if (!travelTrack(C, p, s, allowed)) { good = false; continue; }
+      if (tracks.includes(s)) C.warn(`${p}: ${q(s)} is listed twice; kept once`); else tracks.push(s);
+    }
+    const by = numOrBind(C, p, 'by', e.by, 0, TRAVEL_LIMITS.most, { need: true });
+    let about;
+    if (e.about !== undefined) {
+      if (TRAVEL_ABOUT.includes(e.about) || (fin(e.about) && Math.abs(e.about) <= L.angle)) about = e.about;
+      else { C.err(`${p}: about must be first, mid, least, most or a number from -${L.angle} to ${L.angle} (the value the tracks are scaled from); got ${say(e.about)}`); good = false; }
+    }
+    if (e.side !== undefined && !TRAVEL_SIDES.includes(e.side)) { C.err(`${p}: side must be below or above (only the values on that side of the pivot move; leave it out for both); got ${say(e.side)}`); good = false; }
+    if (!good || !by) { ok = false; return; }
+    out.push({ tracks, by: by.value, ...(about !== undefined ? { about } : {}), ...(e.side !== undefined ? { side: e.side } : {}) });
+  });
+  return ok ? out : undefined;
+}
+
 /** One stamp swap: a stamp of the body and one of its variants (null: back to its own rows). */
 function swapOne(C, place, id, x) {
   const variants = C.stamps.get(id);
@@ -2628,7 +2705,11 @@ function checkClip(C, name, c, written) {
   } else if (C.takenClips?.has(name)) inherited = C.baseClips?.get(C.takenClips.get(name)) ?? {};   // B4x: a clip extends.clips takes
   let frames;
   if (c.frames === undefined && (inherited || written)) frames = fin(inherited?.frames) ? inherited.frames : undefined;
-  else if (!Number.isInteger(c.frames) || c.frames < 1 || c.frames > L.framesPerClip) { C.err(`${place}: frames must be a whole number from 1 to ${L.framesPerClip}; got ${say(c.frames)}`); frames = 1; }
+  else if (!Number.isInteger(c.frames) || c.frames < 1 || c.frames > L.framesPerClip) {
+    // F5 review fix: a clip of a base's name written without from replaces the base's clip; say how to keep it instead
+    const keep = c.frames === undefined && C.base && !inherited && C.baseClips?.has(name) ? `; this clip replaces ${C.base.id}'s clip ${q(name)}: to keep that clip and change it (a travel, sounds), add "from": ${q(name)}` : '';
+    C.err(`${place}: frames must be a whole number from 1 to ${L.framesPerClip}; got ${say(c.frames)}${keep}`); frames = 1;
+  }
   else frames = c.frames;
   if (c.frames !== undefined && frames !== undefined) o.frames = frames;
   if (c.fps !== undefined || (!inherited && !written)) o.fps = num(C, place, 'fps', c.fps ?? std?.fps ?? 10, 1, L.fps);
@@ -2644,6 +2725,8 @@ function checkClip(C, name, c, written) {
   if (sorted.some((k, i) => k !== keys[i])) { C.warn(`${place}: keys were not in order of t; put in order`); keys = sorted; }
   for (let i = 1; i < keys.length; i++) if (keys[i].t !== undefined && keys[i - 1].t !== undefined && Math.abs(keys[i].t - keys[i - 1].t) < 1e-6) C.err(`${place}: two keys are at the same point (t ${keys[i].t}); merge them or move one`);
   if (c.keys !== undefined || (!inherited && !written)) o.keys = keys;
+  // travel: how far the keys move, by a setting (build item F5)
+  if (c.travel !== undefined) { const tv = travelOf(C, place, c.travel); if (tv) o.travel = tv; }
   // frame edits
   if (c.frameEdits !== undefined) {
     if (!isObj(c.frameEdits)) C.err(`${place}: frameEdits must be an object of frame number: changes; got ${say(c.frameEdits)}`);

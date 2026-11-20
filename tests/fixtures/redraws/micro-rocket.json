@@ -1,0 +1,205 @@
+{
+ "id": "micro-rocket",
+ "frozen": "2026-11-20",
+ "source": "sprites/micro-rocket.js",
+ "sha256": "b25bb4503336bd3fdad7a4484ceec3f8c28f6bf78188a79e72f3933efc323381",
+ "name": "Micro rocket",
+ "blurb": "A small missile with a flame and a smoke trail, drawn pointing right so a game can turn it to the way it flies. Change its length, nose, fins, smoke and colours.",
+ "meta": {
+  "type": "projectile",
+  "role": "effects/projectile",
+  "themes": [
+   "sci-fi",
+   "space"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "shooter",
+   "arcade"
+  ],
+  "view": "top-down",
+  "words": [
+   "rocket",
+   "missile",
+   "warhead",
+   "launcher",
+   "homing",
+   "smoke",
+   "flame",
+   "shoot",
+   "fly",
+   "hit",
+   "explode",
+   "heavy weapon"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  16
+ ],
+ "pivot": [
+  16,
+  8
+ ],
+ "grounded": false,
+ "preview": "fly",
+ "params": {
+  "length": {
+   "kind": "range",
+   "label": "Length",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Short",
+   "hi": "Long",
+   "group": "Look"
+  },
+  "shape": {
+   "kind": "choice",
+   "label": "Nose",
+   "def": "round",
+   "options": [
+    {
+     "value": "round",
+     "label": "Round"
+    },
+    {
+     "value": "pointed",
+     "label": "Pointed"
+    },
+    {
+     "value": "flat",
+     "label": "Flat"
+    }
+   ],
+   "group": "Look"
+  },
+  "fins": {
+   "kind": "choice",
+   "label": "Fins",
+   "def": "small",
+   "options": [
+    {
+     "value": "none",
+     "label": "None"
+    },
+    {
+     "value": "small",
+     "label": "Small"
+    },
+    {
+     "value": "swept",
+     "label": "Swept"
+    }
+   ],
+   "group": "Look"
+  },
+  "smoke": {
+   "kind": "toggle",
+   "label": "Smoke",
+   "def": true,
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Body",
+   "def": "#9aa6c0",
+   "swatches": [
+    "#9aa6c0",
+    "#6b7896",
+    "#b04a8a",
+    "#ca9eda",
+    "#e8ecf2",
+    "#566182"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Stripe",
+   "def": "#2fb3a8",
+   "swatches": [
+    "#2fb3a8",
+    "#f2a030",
+    "#e2473f",
+    "#3f6fd1",
+    "#5fe0f0",
+    "#9fe040"
+   ],
+   "group": "Colors"
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Flame",
+   "def": "#f2a030",
+   "swatches": [
+    "#f2a030",
+    "#5fe0f0",
+    "#e2473f",
+    "#9fe040",
+    "#b48af8",
+    "#4f9ff0",
+    "#5fd47a"
+   ],
+   "group": "Colors"
+  },
+  "wobble": {
+   "kind": "range",
+   "label": "Wobble",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Firm",
+   "hi": "Wobbly",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "fly": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  },
+  "hit": {
+   "frames": 6,
+   "loop": false,
+   "fps": [
+    10,
+    17,
+    23
+   ]
+  }
+ },
+ "sounds": {
+  "hit": [
+   {
+    "sound": "explosion",
+    "preset": "Fireworks pop",
+    "frame": 0,
+    "volume": 0.8
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-roguelite-scifi"
+ ]
+}

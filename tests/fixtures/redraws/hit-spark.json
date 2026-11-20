@@ -1,0 +1,158 @@
+{
+ "id": "hit-spark",
+ "frozen": "2026-11-20",
+ "source": "sprites/hit-spark.js",
+ "sha256": "f4e03c0c4e54ca3388f4a5043dd3957047e2e63573c57e5482b2d85aa10e3319",
+ "name": "Hit spark",
+ "blurb": "The flash where a hit lands: a white star whose rays fly outward and fade. Change its size, rays, style, turn and colours.",
+ "meta": {
+  "type": "effect",
+  "role": "effects/spark",
+  "themes": [
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "platformer",
+   "turn-based-rpg",
+   "roguelike-action",
+   "arcade"
+  ],
+  "view": "none",
+  "words": [
+   "hit",
+   "spark",
+   "impact",
+   "flash",
+   "star",
+   "slash",
+   "strike",
+   "clash",
+   "damage",
+   "burst",
+   "attack",
+   "sharp"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "burst",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "pieces": {
+   "kind": "range",
+   "label": "Pieces",
+   "def": 6,
+   "min": 4,
+   "max": 8,
+   "step": 1,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "star",
+   "options": [
+    {
+     "value": "star",
+     "label": "Star"
+    },
+    {
+     "value": "slash",
+     "label": "Slash"
+    },
+    {
+     "value": "ring",
+     "label": "Ring"
+    }
+   ],
+   "group": "Look"
+  },
+  "twist": {
+   "kind": "range",
+   "label": "Twist",
+   "def": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Straight",
+   "hi": "Turned",
+   "group": "Look"
+  },
+  "core": {
+   "kind": "color",
+   "label": "Core",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#f6d3b0",
+    "#8fd0f0",
+    "#9bd18a",
+    "#c2c9d6"
+   ],
+   "group": "Colors"
+  },
+  "edge": {
+   "kind": "color",
+   "label": "Edge",
+   "def": "#f2c230",
+   "swatches": [
+    "#f2c230",
+    "#e08a2c",
+    "#c9423a",
+    "#4fd8ee",
+    "#7a4fc4",
+    "#a4c44a",
+    "#3f6fd1"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "burst": {
+   "frames": 5,
+   "loop": false,
+   "fps": [
+    10,
+    17,
+    23
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [],
+ "bundles": [
+  "kit-platformer-fantasy"
+ ]
+}

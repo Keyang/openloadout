@@ -1,0 +1,186 @@
+{
+ "id": "bg-battle-dungeon",
+ "frozen": "2026-11-20",
+ "source": "sprites/bg-battle-dungeon.js",
+ "sha256": "330d4f76ead82249c6f6cc578da5faa0c0f70d0f6fe4c19c936fe3badf199242",
+ "name": "Dungeon battle backdrop",
+ "blurb": "A torch-lit hall for a side-view battle screen in three layers that repeat sideways (a dark wall of arches, pillars with flickering torches, a flagstone floor with the fighters' feet on row 150): scroll far at 0.1, mid at 0.4 and near at 0.7 of the camera's speed. Change the stone, the floor, the torch light, the number of torches and pillars and the height of the arches.",
+ "meta": {
+  "type": "background",
+  "role": "environment/background",
+  "themes": [
+   "fantasy",
+   "dungeon"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "card-game"
+  ],
+  "view": "side",
+  "words": [
+   "battle",
+   "fight",
+   "encounter",
+   "arena",
+   "crypt",
+   "vault",
+   "hall",
+   "pillars",
+   "arches",
+   "torches",
+   "flagstones",
+   "flicker",
+   "backdrop",
+   "underground"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  320,
+  180
+ ],
+ "pivot": [
+  160,
+  180
+ ],
+ "grounded": false,
+ "preview": "far",
+ "params": {
+  "torches": {
+   "kind": "range",
+   "label": "Torches",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "height": {
+   "kind": "range",
+   "label": "Height",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Low arches",
+   "hi": "High arches",
+   "group": "Look"
+  },
+  "density": {
+   "kind": "range",
+   "label": "Density",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Few pillars",
+   "hi": "Many pillars",
+   "group": "Look"
+  },
+  "haze": {
+   "kind": "range",
+   "label": "Haze",
+   "def": 0.35,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Clear",
+   "hi": "Misty",
+   "group": "Look"
+  },
+  "stone": {
+   "kind": "color",
+   "label": "Stone",
+   "def": "#5a5f7a",
+   "swatches": [
+    "#5a5f7a",
+    "#8e3a4a",
+    "#357a4c",
+    "#7a4fc4"
+   ],
+   "group": "Colors"
+  },
+  "floor": {
+   "kind": "color",
+   "label": "Floor",
+   "def": "#7e84a0",
+   "swatches": [
+    "#7e84a0",
+    "#a8a4a0",
+    "#c9a06a",
+    "#e6c96a"
+   ],
+   "group": "Colors"
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Torch light",
+   "def": "#e8662c",
+   "swatches": [
+    "#e8662c",
+    "#4fd8ee",
+    "#7aa0f4",
+    "#f4e06a",
+    "#7fe0a0",
+    "#7a4fc4"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "far": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    3,
+    4,
+    6
+   ]
+  },
+  "mid": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    3,
+    4,
+    6
+   ]
+  },
+  "near": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    3,
+    4,
+    6
+   ]
+  }
+ },
+ "sounds": {
+  "mid": [
+   {
+    "sound": "fire",
+    "preset": "Torch",
+    "frame": 0,
+    "volume": 0.35
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-rpg-fantasy"
+ ]
+}

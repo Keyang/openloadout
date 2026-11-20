@@ -1,0 +1,155 @@
+{
+ "id": "hit-flash",
+ "frozen": "2026-11-20",
+ "source": "sprites/hit-flash.js",
+ "sha256": "2d1037c8b28a952743bdbea6779a250ca3d65283f7769796528cadec1b840046",
+ "name": "Energy hit",
+ "blurb": "The flash where an energy shot lands: a white dot, a thin ring that opens, and shards flying off it. Change its size, shards, style, turn and colours.",
+ "meta": {
+  "type": "effect",
+  "role": "effects/spark",
+  "themes": [
+   "sci-fi",
+   "space"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "shooter",
+   "arcade"
+  ],
+  "view": "none",
+  "words": [
+   "hit",
+   "impact",
+   "flash",
+   "spark",
+   "ring",
+   "shard",
+   "laser",
+   "energy",
+   "zap",
+   "damage",
+   "strike",
+   "burst"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "burst",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "pieces": {
+   "kind": "range",
+   "label": "Pieces",
+   "def": 6,
+   "min": 4,
+   "max": 8,
+   "step": 1,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "ring",
+   "options": [
+    {
+     "value": "ring",
+     "label": "Ring"
+    },
+    {
+     "value": "cross",
+     "label": "Cross"
+    },
+    {
+     "value": "splash",
+     "label": "Splash"
+    }
+   ],
+   "group": "Look"
+  },
+  "twist": {
+   "kind": "range",
+   "label": "Twist",
+   "def": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Straight",
+   "hi": "Turned",
+   "group": "Look"
+  },
+  "core": {
+   "kind": "color",
+   "label": "Core",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#e8ecf2",
+    "#f6d3b0",
+    "#f2c230"
+   ],
+   "group": "Colors"
+  },
+  "edge": {
+   "kind": "color",
+   "label": "Edge",
+   "def": "#5fe0f0",
+   "swatches": [
+    "#5fe0f0",
+    "#e2473f",
+    "#9fe040",
+    "#f2a030",
+    "#b48af8",
+    "#4f9ff0"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "burst": {
+   "frames": 5,
+   "loop": false,
+   "fps": [
+    10,
+    17,
+    23
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [],
+ "bundles": [
+  "kit-roguelite-scifi"
+ ]
+}

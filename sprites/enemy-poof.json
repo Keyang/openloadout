@@ -1,0 +1,32 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "enemy-poof",
+ "name": "Defeat poof",
+ "blurb": "The puff an enemy leaves when it is defeated: a bright ball that breaks into puffs, with stars or skulls drifting up. Change its size, number of puffs, spread, style and colours.",
+ "meta": {"type":"effect","role":"effects/dust","themes":["fantasy","forest"],"gameTypes":["platformer","turn-based-rpg","roguelike-action","arcade"],"view":"none","words":["poof","puff","smoke","cloud","defeat","vanish","die","enemy","kill","stars","skull","burst","pop","disappear"],"license":"draft"},
+ "size": [48,48],
+ "pivot": [24,24],
+ "grounded": false,
+ "preview": "burst",
+ "styles": ["pixel"],
+ "palette": [
+  {"id":"core","label":"Core","default":"#f0ead8","material":"light","swatches":["#f0ead8","#f6d3b0","#8fd0f0","#9bd18a","#c2c9d6"]},
+  {"id":"edge","label":"Edge","default":"#7a4fc4","material":"magic","swatches":["#7a4fc4","#e08a2c","#c9423a","#4fd8ee","#a4c44a","#3f6fd1"]}
+ ],
+ "controls": [
+  {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+  {"key":"pieces","kind":"range","label":"Pieces","lo":"Few","hi":"Many","default":6,"min":4,"max":8,"step":1},
+  {"key":"spread","kind":"range","label":"Spread","lo":"Tight","hi":"Wide","default":0.5},
+  {"key":"style","kind":"choice","label":"Style","options":["cloud","stars","skulls"],"default":"stars"},
+  {"key":"core","kind":"colour","label":"Core"},
+  {"key":"edge","kind":"colour","label":"Edge"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": { "emitters": [
+  {"id":"burst","gen":"effect.enemy-poof","v":1,"clip":["burst"],"picture":"burst","at":[24,24],"size":{"from":"size","map":[[0,0],[1,1]]},"pieces":{"from":"pieces","map":[[4,4],[8,8]],"round":"px"},"spread":{"from":"spread","map":[[0,0],[1,1]]},"style":{"from":"style","pick":{"cloud":"cloud","stars":"stars","skulls":"skulls"}},"core":"core","edge":"edge"}
+ ] },
+ "clips": {
+  "burst": {"frames":8,"fps":14,"loop":false}
+ }
+}

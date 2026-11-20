@@ -1,0 +1,351 @@
+{
+ "id": "effect.enemy-poof",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     24,
+     24
+    ],
+    "core": "p0",
+    "edge": "p1",
+    "picture": "burst"
+   },
+   "ctx": {
+    "frame": 0,
+    "frames": 8,
+    "t": 0,
+    "loop": true,
+    "size": [
+     48,
+     48
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      14,
+      14
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".........aa.........",
+      "......aaabbaaa......",
+      "....aabbbbbbbbaa....",
+      "...abbbbbbbbbbbba...",
+      "..abbbbbbbbbbbbbba..",
+      "..abbbbccccccbbbba..",
+      ".abbbbccccccccbbbba.",
+      ".abbbccccccccccbbba.",
+      ".abbbccccccccccbbba.",
+      "abbbbccccccccccbbbba",
+      "abbbbccccccccccbbbba",
+      ".abbbccccccccccbbba.",
+      ".abbbccccccccccbbba.",
+      ".abbbbccccccccbbbba.",
+      "..abbbbccccccbbbba..",
+      "..abbbbbbbbbbbbbba..",
+      "...abbbbbbbbbbbba...",
+      "....aabbbbbbbbaa....",
+      "......aaabbaaa......",
+      ".........aa........."
+     ],
+     "key": {
+      "a": "p1",
+      "b": "p0",
+      "c": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     24,
+     24
+    ],
+    "core": "p0",
+    "edge": "p1",
+    "picture": "burst"
+   },
+   "ctx": {
+    "frame": 3,
+    "frames": 8,
+    "t": 0.375,
+    "loop": true,
+    "size": [
+     48,
+     48
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      10,
+      9
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...........aaaaa...........",
+      "..........abbbbbaa.........",
+      ".........abbbbbbbba........",
+      "........abbbbbbbbba........",
+      ".....aaaabbbbbbbbbbaaa.....",
+      "....abbbbaabbbbbbbbabbaa...",
+      "...abbbbbbbabbbbbbbbabbba..",
+      "..abbbbbbbbbabbbbbbbabbbba.",
+      ".acbbbbbbbbbabbbbbbabbbbbba",
+      ".acbbbbbbbbbbabbbbbabbbbbba",
+      ".acbbbbbbbbbbabbbbabbbbbbba",
+      ".acbbbbbbbbbbabbbcabbbbbbba",
+      ".accbbbbbbbbacccaabbbbbbbba",
+      "..acbaaaabbbaaaaccbbbbbbbba",
+      "..aaabbbbaaa....accbbbbbba.",
+      "..abbbbbbbba...acaccccccaa.",
+      ".acbbbbbbbbbaaaabbaaaaaaba.",
+      ".acbbbbbbbbbabacbbbbbbbbbba",
+      ".abbbbbbbbbbbaacbbbbbbbbbba",
+      "accbbbbbbbbbbaacbbbbbbbbbba",
+      ".acbbbbbbbbbbaacbbbbbbbbbba",
+      ".acbbbbbbbbbabaccbbbbbbbbba",
+      ".accbbbbbbbbabbacbbbbbbbbba",
+      "..accbbbbbbabbbacccbbbbbca.",
+      "...accccccabbbbbaacccccaa..",
+      "....aaaaaabbbbbbbbaaaaa....",
+      ".......accbbbbbbbba........",
+      "........acccbbbbba.........",
+      ".........aaccccca..........",
+      "...........aaaaa..........."
+     ],
+     "key": {
+      "a": {
+       "rule": "tone",
+       "of": "p1",
+       "by": -1
+      },
+      "b": "p0",
+      "c": {
+       "rule": "mix",
+       "of": "p0",
+       "with": "p1",
+       "amount": 0.5
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     24,
+     24
+    ],
+    "size": 1,
+    "pieces": 8,
+    "spread": 1,
+    "style": "skulls",
+    "core": "p0",
+    "edge": "p1",
+    "picture": "burst"
+   },
+   "ctx": {
+    "frame": 5,
+    "frames": 8,
+    "t": 0.625,
+    "loop": true,
+    "size": [
+     48,
+     48
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      3,
+      4
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...................aaaa.........",
+      "..................abccca........",
+      "..................accccca.......",
+      ".................abbcccca.......",
+      "........a.........abcccca.....aa",
+      "......aacaa.......abbbba.....acc",
+      ".....abcccca.......aaaa.....abcc",
+      ".....abcccca................abcc",
+      ".....abcccca................abcc",
+      ".....abbccca................abbc",
+      "......abbba..................abb",
+      ".......aaa....................aa",
+      "................................",
+      "................................",
+      "...aaaaa..........aaaaa.........",
+      "..addddda........addddda........",
+      ".addddddda......addddddda......a",
+      "addddddddda....addddddddda....ad",
+      "addaadaadda....addaadaadda....ad",
+      "addaadaadda....addaadaadda....ad",
+      "addddadddda....addddadddda....ad",
+      ".addddddda......addddddda......a",
+      "..adadada........adadada........",
+      "..adadada........adadada........",
+      "...a.a.a..........a.a.a.........",
+      "................................",
+      "................................",
+      ".......aaa......................",
+      "......accca..................aaa",
+      ".....abcccca................abcc",
+      ".....abccccca...............abcc",
+      ".....abccccca...............abcc"
+     ],
+     "key": {
+      "a": {
+       "rule": "tone",
+       "of": "p1",
+       "by": -1
+      },
+      "b": "p1",
+      "c": {
+       "rule": "mix",
+       "of": "p0",
+       "with": "p1",
+       "amount": 0.5
+      },
+      "d": "p0"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      35,
+      4
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".........",
+      ".........",
+      ".........",
+      ".........",
+      "a........",
+      "ba.......",
+      "bba......",
+      "bbba.....",
+      "bbba.....",
+      "bba......",
+      "ca.......",
+      "a........",
+      ".........",
+      ".........",
+      ".aaaaa...",
+      "addddda..",
+      "ddddddda.",
+      "dddddddda",
+      "daadaadda",
+      "daadaadda",
+      "dddadddda",
+      "ddddddda.",
+      "adadada..",
+      "adadada..",
+      ".a.a.a...",
+      ".........",
+      ".........",
+      ".........",
+      "aa.......",
+      "bba......",
+      "bba......",
+      "bba......"
+     ],
+     "key": {
+      "a": {
+       "rule": "tone",
+       "of": "p1",
+       "by": -1
+      },
+      "b": {
+       "rule": "mix",
+       "of": "p0",
+       "with": "p1",
+       "amount": 0.5
+      },
+      "c": "p1",
+      "d": "p0"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      3,
+      36
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".....abbbcca......aaaa......abcc",
+      "......aabba......acccca.....abbb",
+      "........aa......abccccca.....aaa",
+      "................abccccca........",
+      "................abbcccca........",
+      ".................abbcca.........",
+      "..................abba..........",
+      "...................aa..........."
+     ],
+     "key": {
+      "a": {
+       "rule": "tone",
+       "of": "p1",
+       "by": -1
+      },
+      "b": "p1",
+      "c": {
+       "rule": "mix",
+       "of": "p0",
+       "with": "p1",
+       "amount": 0.5
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      35,
+      36
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aab......",
+      "ccb......",
+      "bb.......",
+      ".........",
+      ".........",
+      ".........",
+      ".........",
+      "........."
+     ],
+     "key": {
+      "a": {
+       "rule": "mix",
+       "of": "p0",
+       "with": "p1",
+       "amount": 0.5
+      },
+      "b": {
+       "rule": "tone",
+       "of": "p1",
+       "by": -1
+      },
+      "c": "p1"
+     }
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,187 @@
+{
+ "id": "dizzy-ring",
+ "frozen": "2026-11-20",
+ "source": "sprites/dizzy-ring.js",
+ "sha256": "570146134fab0ca63c9fa5a846e4043bf4b7974413d31e9f31c561a202ce3905",
+ "name": "Dizzy ring",
+ "blurb": "A dazed status: little stars, pluses or dots running round a flattened ring over a stunned head. Change its size, how many marks, their style, how round the ring is and colours.",
+ "meta": {
+  "type": "effect",
+  "role": "effects/spark",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "platformer",
+   "arcade",
+   "roguelike-action",
+   "turn-based-rpg"
+  ],
+  "view": "side",
+  "words": [
+   "dizzy",
+   "dazed",
+   "stunned",
+   "stun",
+   "stars",
+   "seeing stars",
+   "confused",
+   "knocked out",
+   "spin",
+   "circle",
+   "status",
+   "head"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "loop",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "pieces": {
+   "kind": "range",
+   "label": "Marks",
+   "def": 3,
+   "min": 2,
+   "max": 5,
+   "step": 1,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "stars",
+   "options": [
+    {
+     "value": "stars",
+     "label": "Stars"
+    },
+    {
+     "value": "pluses",
+     "label": "Pluses"
+    },
+    {
+     "value": "dots",
+     "label": "Dots"
+    }
+   ],
+   "group": "Look"
+  },
+  "depth": {
+   "kind": "range",
+   "label": "Ring depth",
+   "def": 0.75,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Flat",
+   "hi": "Round",
+   "group": "Look"
+  },
+  "core": {
+   "kind": "color",
+   "label": "Core",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#8fd0f0",
+    "#9bd18a",
+    "#c2c9d6",
+    "#f6d3b0"
+   ],
+   "group": "Colors"
+  },
+  "edge": {
+   "kind": "color",
+   "label": "Edge",
+   "def": "#f2c230",
+   "swatches": [
+    "#f2c230",
+    "#c9423a",
+    "#7a4fc4",
+    "#4fd8ee",
+    "#a4c44a",
+    "#3f6fd1",
+    "#e08a2c"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "loop": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [
+  {
+   "name": "Seeing stars",
+   "params": {}
+  },
+  {
+   "name": "Sleepy dots",
+   "params": {
+    "style": "dots",
+    "edge": "#3f6fd1"
+   }
+  },
+  {
+   "name": "Big daze",
+   "params": {
+    "size": 1,
+    "pieces": 5
+   }
+  },
+  {
+   "name": "Stunned sparks",
+   "params": {
+    "style": "pluses",
+    "edge": "#c9423a"
+   }
+  },
+  {
+   "name": "Wide loop",
+   "params": {
+    "depth": 1
+   }
+  }
+ ],
+ "bundles": []
+}

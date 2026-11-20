@@ -1,0 +1,43 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "mist-drift",
+ "name": "Drifting mist",
+ "blurb": "Low wisps of mist that swell, drift right and thin out along the ground, as a patch to place over a pond, a path or a graveyard. Change the size and number of wisps, how high and how far they drift, their shape and colours.",
+ "meta": {"type":"effect","role":"effects/weather","themes":["neutral","forest","horror"],"gameTypes":["platformer","top-down-rpg","puzzle","roguelike-action"],"view":"side","words":["mist","fog","haze","vapour","ground fog","swamp","graveyard","drift","creepy","morning","weather"],"license":"draft"},
+ "size": [64,64],
+ "pivot": [32,62],
+ "grounded": false,
+ "preview": "loop",
+ "styles": ["pixel"],
+ "versions": [
+  {"name":"Morning mist","params":{}},
+  {"name":"Swamp fog","params":{"body":"#9bd18a","edge":"#3f8a4f"}},
+  {"name":"Graveyard fog","params":{"style":"wispy","body":"#d8d8e0","edge":"#8696dc"}},
+  {"name":"Ground fog","params":{"reach":0,"pieces":8}},
+  {"name":"Thick bank","params":{"size":1,"reach":1,"style":"soft"}}
+ ],
+ "palette": [
+  {"id":"body","label":"Mist","default":"#f0ead8","material":"sky","swatches":["#f0ead8","#d8d8e0","#8fd0f0","#9bd18a"]},
+  {"id":"edge","label":"Mist shadow","default":"#7fb0b8","material":"sky","swatches":["#7fb0b8","#8696dc","#8f97a8","#3f8a4f","#5d6475"]},
+  {"id":"shade","material":"sky","derive":{"rule":"mix","of":"body","with":"edge","amount":0.45}}
+ ],
+ "controls": [
+  {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+  {"key":"pieces","kind":"range","label":"Wisps","lo":"Few","hi":"Many","default":5,"min":3,"max":8,"step":1},
+  {"key":"reach","kind":"range","label":"Reach","lo":"Low","hi":"High","default":0.5},
+  {"key":"drift","kind":"range","label":"Drift","lo":"Still","hi":"Drifting","default":0.5},
+  {"key":"style","kind":"choice","label":"Style","options":["soft","wispy","blocky"],"default":"soft"},
+  {"key":"body","kind":"colour","label":"Mist"},
+  {"key":"edge","kind":"colour","label":"Mist shadow"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": { "emitters": [
+  {"id":"bank-soft","when":{"style":["soft"]},"shape":"round","gen":"mist","v":1,"at":[3,60],"width":58,"count":{"from":"pieces","map":[[3,3],[8,8]],"round":"px"},"seed":2,"dist":{"from":"drift","map":[[0,2],[1,14]]},"angle":90,"rise":{"from":"reach","map":[[0,1],[1,9]]},"lift":{"from":"reach","map":[[0,0],[1,10]]},"size":{"from":"size","map":[[0,2.6],[1,4.6]]},"lobes":3,"stretch":1.8,"floor":61,"paints":["body","shade","edge"]},
+  {"id":"bank-wispy","when":{"style":["wispy"]},"shape":"wispy","gen":"mist","v":1,"at":[3,60],"width":58,"count":{"from":"pieces","map":[[3,3],[8,8]],"round":"px"},"seed":2,"dist":{"from":"drift","map":[[0,2],[1,14]]},"angle":90,"rise":{"from":"reach","map":[[0,1],[1,9]]},"lift":{"from":"reach","map":[[0,0],[1,10]]},"size":{"from":"size","map":[[0,2.6],[1,4.6]]},"lobes":3,"stretch":1.8,"floor":61,"paints":["body","shade","edge"]},
+  {"id":"bank-blocky","when":{"style":["blocky"]},"shape":"chunky","gen":"mist","v":1,"at":[3,60],"width":58,"count":{"from":"pieces","map":[[3,3],[8,8]],"round":"px"},"seed":2,"dist":{"from":"drift","map":[[0,2],[1,14]]},"angle":90,"rise":{"from":"reach","map":[[0,1],[1,9]]},"lift":{"from":"reach","map":[[0,0],[1,10]]},"size":{"from":"size","map":[[0,2.6],[1,4.6]]},"lobes":3,"stretch":1.8,"floor":61,"paints":["body","shade","edge"]}
+ ] },
+ "clips": {
+  "loop": {"frames":8,"fps":10}
+ }
+}

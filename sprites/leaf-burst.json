@@ -1,0 +1,39 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "leaf-burst",
+ "name": "Leaf burst",
+ "blurb": "Leaves flying from a cut bush or a shaken tree and settling on the ground. Change its size, how many leaves, the spread, burst or shower, and the two leaf colours.",
+ "meta": {"type":"effect","role":"effects/dust","themes":["neutral","forest","farm"],"gameTypes":["top-down-rpg","platformer","farming-sim","arcade"],"view":"side","words":["leaves","leaf","bush","cut","shake","tree","mow","grass","hedge","foliage","autumn","scatter","burst"],"license":"draft"},
+ "size": [48,48],
+ "pivot": [24,46],
+ "grounded": false,
+ "preview": "burst",
+ "styles": ["pixel"],
+ "versions": [
+  {"name":"Cut bush","params":{}},
+  {"name":"Autumn","params":{"body":"#e08a2c","accent":"#f2c230"}},
+  {"name":"Blossom","params":{"body":"#f0ead8","accent":"#7a4fc4"}},
+  {"name":"Tree shake","params":{"style":"shower","spread":1,"pieces":12}},
+  {"name":"A few leaves","params":{"size":0,"pieces":4}}
+ ],
+ "palette": [
+  {"id":"body","label":"Leaves","default":"#3f8a4f","material":"plant","swatches":["#3f8a4f","#a4c44a","#e08a2c","#f0ead8"]},
+  {"id":"accent","label":"Sunlit leaves","default":"#6aa83e","material":"plant","swatches":["#6aa83e","#f2c230","#7a4fc4","#9bd18a"]}
+ ],
+ "controls": [
+  {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+  {"key":"pieces","kind":"range","label":"Leaves","lo":"Few","hi":"Many","default":8,"min":4,"max":12,"step":1},
+  {"key":"spread","kind":"range","label":"Spread","lo":"Tight","hi":"Wide","default":0.5},
+  {"key":"style","kind":"choice","label":"Style","options":["burst","shower"],"default":"burst"},
+  {"key":"body","kind":"colour","label":"Leaves"},
+  {"key":"accent","kind":"colour","label":"Sunlit leaves"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": { "emitters": [
+  {"id":"burst","gen":"effect.leaf-burst","v":1,"clip":["burst"],"picture":"burst","at":[24,46],"size":{"from":"size","map":[[0,0],[1,1]]},"pieces":{"from":"pieces","map":[[4,4],[12,12]],"round":"px"},"spread":{"from":"spread","map":[[0,0],[1,1]]},"style":{"from":"style","pick":{"burst":"burst","shower":"shower"}},"body":"body","accent":"accent"}
+ ] },
+ "clips": {
+  "burst": {"frames":12,"fps":14,"loop":false,"sounds":[{"sound":"bush-rustle","preset":"Small bush","frame":0,"volume":0.8}]}
+ }
+}

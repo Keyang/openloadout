@@ -1,0 +1,33 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "fx-thunder-spell",
+ "name": "Thunder spell",
+ "blurb": "A lightning bolt that strikes the target from above and leaves sparks skittering on the ground. Change its width, forks, zigzag, style, sparks and colours.",
+ "meta": {"type":"effect","role":"effects/magic","themes":["fantasy"],"gameTypes":["turn-based-rpg","roguelike-action","platformer"],"view":"side","words":["thunder","lightning","bolt","spell","magic","strike","shock","storm","electric","zap","attack","flash","spark"],"license":"draft"},
+ "size": [64,96],
+ "pivot": [32,90],
+ "grounded": false,
+ "preview": "burst",
+ "styles": ["pixel"],
+ "palette": [
+  {"id":"core","label":"Core","default":"#f0ead8","material":"light","swatches":["#f0ead8","#f6d3b0","#9fd8f4","#a8c8d8"]},
+  {"id":"edge","label":"Edge","default":"#f4e06a","material":"light","swatches":["#f4e06a","#e8662c","#7a4fc4","#2f8f9d","#c9423a","#7fe0a0","#7aa0f4"]}
+ ],
+ "controls": [
+  {"key":"width","kind":"range","label":"Width","lo":"Narrow","hi":"Wide","default":0.5},
+  {"key":"pieces","kind":"range","label":"Forks","lo":"Few","hi":"Many","default":3,"min":1,"max":5,"step":1},
+  {"key":"wobble","kind":"range","label":"Zigzag","lo":"Smooth","hi":"Jagged","default":0.5},
+  {"key":"style","kind":"choice","label":"Style","options":["bolt","chain","pillar"],"default":"bolt"},
+  {"key":"sparks","kind":"toggle","label":"Sparks","default":true},
+  {"key":"core","kind":"colour","label":"Core"},
+  {"key":"edge","kind":"colour","label":"Edge"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": { "emitters": [
+  {"id":"burst","gen":"effect.fx-thunder-spell","v":1,"clip":["burst"],"picture":"burst","at":[32,90],"width":{"from":"width","map":[[0,0],[1,1]]},"pieces":{"from":"pieces","map":[[1,1],[5,5]],"round":"px"},"wobble":{"from":"wobble","map":[[0,0],[1,1]]},"style":{"from":"style","pick":{"bolt":"bolt","chain":"chain","pillar":"pillar"}},"sparks":{"from":"sparks","pick":{"true":true,"false":false}},"core":"core","edge":"edge"}
+ ] },
+ "clips": {
+  "burst": {"frames":8,"fps":14,"loop":false,"sounds":[{"sound":"thunder-crack","preset":"Thunder spell","frame":1,"volume":1}]}
+ }
+}

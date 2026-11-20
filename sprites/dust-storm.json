@@ -1,0 +1,42 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "dust-storm",
+ "name": "Dust storm",
+ "blurb": "Sand and grit streaming sideways across the whole screen, as a sandstorm, a haze of fine dust or blown debris with tumbling leaves. Change how many grains, how long, the style, the sway, the colours and the speed. Lay copies 62 px apart (each over its neighbours' empty border) to cover the screen.",
+ "meta": {"type":"effect","role":"effects/weather","themes":["neutral","farm"],"gameTypes":["top-down-rpg","racing","shooter","platformer"],"view":"none","words":["dust","sandstorm","sand","grit","wind","windy","desert","wasteland","debris","blowing","haze","overlay"],"license":"draft"},
+ "size": [64,64],
+ "pivot": [32,32],
+ "grounded": false,
+ "preview": "loop",
+ "styles": ["pixel"],
+ "versions": [
+  {"name":"Sandstorm","params":{}},
+  {"name":"Golden sand","params":{"body":"#e6c96a","pieces":10}},
+  {"name":"Dust haze","params":{"style":"dust","length":1}},
+  {"name":"Debris","params":{"style":"debris","pieces":6}},
+  {"name":"Grey grit","params":{"body":"#8f97a8","accent":"#5d6475"}},
+  {"name":"Light breeze","params":{"pieces":4,"length":0}}
+ ],
+ "palette": [
+  {"id":"body","label":"Sand","default":"#f0ead8","material":"earth","swatches":["#f0ead8","#8f97a8","#7fb0b8","#e6c96a","#c9a06a"]},
+  {"id":"accent","label":"Dark grains","default":"#a06a3c","material":"earth","swatches":["#a06a3c","#7a4f33","#5d6475","#e08a2c"]}
+ ],
+ "controls": [
+  {"key":"pieces","kind":"range","label":"Grains","lo":"Few","hi":"Many","default":8,"min":4,"max":12,"step":1},
+  {"key":"length","kind":"range","label":"Length","lo":"Short","hi":"Long","default":0.5},
+  {"key":"style","kind":"choice","label":"Style","options":["sand","dust","debris"],"default":"sand"},
+  {"key":"sway","kind":"range","label":"Sway","lo":"Still","hi":"Swaying","default":0.5,"group":"Motion"},
+  {"key":"body","kind":"colour","label":"Sand"},
+  {"key":"accent","kind":"colour","label":"Dark grains"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": { "emitters": [
+  {"id":"sand","gen":"fall.field","v":2,"at":[1,1],"period":62,"axis":"right","cols":{"from":"pieces","map":[[4,4],[12,12]],"round":"px"},"sway":{"from":"sway","map":[[0,0],[1,3]]},"swayCycles":1,"seed":26,"when":{"style":["sand"]},"rows":3,"laps":3,"turns":1,"shape":"grain","size":{"from":"length","map":[[0,2],[1,6]],"round":"px"},"paints":["body","accent"]},
+  {"id":"dust","gen":"fall.field","v":2,"at":[1,1],"period":62,"axis":"right","cols":{"from":"pieces","map":[[4,4],[12,12]],"round":"px"},"sway":{"from":"sway","map":[[0,0],[1,3]]},"swayCycles":1,"seed":26,"when":{"style":["dust"]},"rows":4,"laps":2,"turns":1,"shape":"dot","size":1,"alt":"grain","altSize":{"from":"length","map":[[0,2],[1,6]],"round":"px"},"paints":["body","accent"]},
+  {"id":"debris","gen":"fall.field","v":2,"at":[1,1],"period":62,"axis":"right","cols":{"from":"pieces","map":[[4,4],[12,12]],"round":"px"},"sway":{"from":"sway","map":[[0,0],[1,3]]},"swayCycles":1,"seed":26,"when":{"style":["debris"]},"rows":2,"laps":3,"turns":2,"shape":"grain","size":{"from":"length","map":[[0,2],[1,6]],"round":"px"},"alt":"leaf","altSize":4,"paints":["body","accent","accent"]}
+ ] },
+ "clips": {
+  "loop": {"frames":8,"fps":10,"sounds":[{"sound":"wind","frame":0,"preset":"Storm","volume":0.35}]}
+ }
+}

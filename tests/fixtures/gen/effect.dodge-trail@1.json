@@ -1,0 +1,299 @@
+{
+ "id": "effect.dodge-trail",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     24,
+     24
+    ],
+    "core": "p0",
+    "edge": "p1",
+    "picture": "burst"
+   },
+   "ctx": {
+    "frame": 0,
+    "frames": 8,
+    "t": 0,
+    "loop": true,
+    "size": [
+     48,
+     48
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      6,
+      13
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...................a...aaaaaaa..",
+      "..........aaabbccccccaaccccccca.",
+      "........aabbbbabbbbbacccccccccca",
+      "..cbbbbabbbbbabbcccacccdddddddcc",
+      "......abbbbbabbcccaccdddddddddcc",
+      "..bbbabbbbbbabbcccaccddddddddddc",
+      ".....abbbbbabbccccaccdddddddddcc",
+      "bbbbbabbbbbaccccccaccdddddddddcc",
+      "cccccabbbbbbabbcccaccddddddddcca",
+      "...bbbabbbbbabcccccaccddddddcca.",
+      ".......abbbbbabbcccaccdddddcca..",
+      "bbbbbbabbbbbcccccccaccdddddcca..",
+      "......abbbbbbabbcccaccdddddcca..",
+      "bbbbbbabbbbbbabccccaccdddddcca..",
+      ".cccccabbbbbabbccccaccdddddcca..",
+      "bbbbbbbbbbbbabbccccaccdcddcca...",
+      "......abbbababbcbccaccdcddcca...",
+      ".bbbbabbbbbcccccccacccdadccca...",
+      ".....abbbbababbcacacccdadccca...",
+      "bbbbbabbbbbbccccccaccccacccca...",
+      "......aaa.aabbbbabaccccacccca...",
+      "............aaaa.aaaaaa.aaaa...."
+     ],
+     "key": {
+      "a": {
+       "rule": "tone",
+       "of": "p1",
+       "by": -1
+      },
+      "b": "p1",
+      "c": {
+       "rule": "mix",
+       "of": "p0",
+       "with": "p1",
+       "amount": 0.5
+      },
+      "d": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      38,
+      13
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..",
+      "..",
+      "..",
+      "a.",
+      "a.",
+      "ba",
+      "a.",
+      "a.",
+      "..",
+      "..",
+      "..",
+      "..",
+      "..",
+      "..",
+      "..",
+      "..",
+      "..",
+      "..",
+      "..",
+      "..",
+      "..",
+      ".."
+     ],
+     "key": {
+      "a": {
+       "rule": "tone",
+       "of": "p1",
+       "by": -1
+      },
+      "b": {
+       "rule": "mix",
+       "of": "p0",
+       "with": "p1",
+       "amount": 0.5
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     24,
+     24
+    ],
+    "core": "p0",
+    "edge": "p1",
+    "picture": "burst"
+   },
+   "ctx": {
+    "frame": 3,
+    "frames": 8,
+    "t": 0.375,
+    "loop": true,
+    "size": [
+     48,
+     48
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      12,
+      15
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..................aa....",
+      ".bbbbcccc.....baaabbaa..",
+      "..............abbbbbbba.",
+      "..........bbbabbbbbbbbba",
+      ".........aaaabbbbbbbbbba",
+      "......bbbbbbabbbbbbbbbba",
+      "..bbbbbaaaaaabbbbbbbbbba",
+      "........bbbbbabbbbbbbba.",
+      "........aaaaaabbbbbbba..",
+      "......bbbbbbbabbbbbbba..",
+      "........aaaaaabbbbbbba..",
+      "........abbbbabbbbbba...",
+      ".bbbbbccaa.aaabbbbbba...",
+      "........aabbbabbbbbba...",
+      "........a.aaabbbabbba...",
+      ".....bbbbbbbabbbabbba...",
+      "............abbbabbba...",
+      "bbbbcccc.....aaa.aaa...."
+     ],
+     "key": {
+      "a": {
+       "rule": "tone",
+       "of": "p1",
+       "by": -1
+      },
+      "b": "p1",
+      "c": {
+       "rule": "mix",
+       "of": "p0",
+       "with": "p1",
+       "amount": 0.5
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     24,
+     24
+    ],
+    "size": 1,
+    "length": 1,
+    "pieces": 6,
+    "style": "sparks",
+    "core": "p0",
+    "edge": "p1",
+    "picture": "burst"
+   },
+   "ctx": {
+    "frame": 5,
+    "frames": 8,
+    "t": 0.625,
+    "loop": true,
+    "size": [
+     48,
+     48
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      1,
+      13
+     ],
+     "anchor": "tl",
+     "rows": [
+      "....a............aabb...........",
+      "................................",
+      "......a.........................",
+      "a...............................",
+      "a..................aabb.........",
+      "..........a....................a",
+      ".a...........................aaa",
+      "............................aaaa",
+      "............................aaaa",
+      "a...............abb.........aaaa",
+      ".............................aaa",
+      "a............................aaa",
+      "....a.......................aaaa",
+      "a..a................aabb....aaaa",
+      "............................aa.a",
+      "a........a..................aa.a",
+      "............................aa.a",
+      "................................",
+      "a.................abb...........",
+      ".....a..........................",
+      "....a...........................",
+      "................................",
+      "...............abb.............."
+     ],
+     "key": {
+      "a": {
+       "rule": "tone",
+       "of": "p1",
+       "by": -1
+      },
+      "b": "p1"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      33,
+      13
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...",
+      "...",
+      "...",
+      "...",
+      "...",
+      "a..",
+      "aaa",
+      "aaa",
+      "aaa",
+      "aaa",
+      "aa.",
+      "a..",
+      "a..",
+      "a..",
+      "a..",
+      "a..",
+      "a..",
+      "...",
+      "...",
+      "...",
+      "...",
+      "...",
+      "..."
+     ],
+     "key": {
+      "a": {
+       "rule": "tone",
+       "of": "p1",
+       "by": -1
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

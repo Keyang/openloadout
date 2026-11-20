@@ -1,0 +1,47 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "snowfall",
+ "name": "Snowfall",
+ "blurb": "Snow drifting down over the whole screen, swaying as it falls, as soft snow, a blizzard driving at 45 degrees or sleet. Change how many flakes, their size, the style, the sway, the far snow, the colours and the speed. Lay copies 62 px apart to cover the screen.",
+ "meta": {"type":"effect","role":"effects/weather","themes":["neutral","forest"],"gameTypes":["platformer","top-down-rpg","farming-sim","puzzle"],"view":"none","words":["snow","snowfall","snowflakes","flakes","blizzard","sleet","winter","cold","falling","drifting","frosty","overlay"],"license":"draft"},
+ "size": [64,64],
+ "pivot": [32,32],
+ "grounded": false,
+ "preview": "loop",
+ "styles": ["pixel"],
+ "versions": [
+  {"name":"Snowfall","params":{}},
+  {"name":"Blizzard","params":{"style":"blizzard","pieces":12}},
+  {"name":"Sleet","params":{"style":"sleet","pieces":9}},
+  {"name":"Big flakes","params":{"size":1,"pieces":4}},
+  {"name":"Still night","params":{"sway":0,"layers":false,"body":"#8fd0f0"}}
+ ],
+ "palette": [
+  {"id":"body","label":"Snow","default":"#f0ead8","material":"water","swatches":["#f0ead8","#d8d8e0","#8fd0f0","#c2c9d6","#9bd18a"]},
+  {"id":"accent","label":"Far snow","default":"#7fb0b8","material":"water","swatches":["#7fb0b8","#8f97a8","#5d6475","#8696dc"]},
+  {"id":"dim","material":"water","derive":{"rule":"tone","of":"body","by":-0.3}},
+  {"id":"glint","material":"water","derive":{"rule":"tone","of":"body","by":0.6}},
+  {"id":"tip","material":"water","derive":{"rule":"tone","of":"body","by":-0.6}}
+ ],
+ "controls": [
+  {"key":"pieces","kind":"range","label":"Flakes","lo":"Few","hi":"Many","default":7,"min":4,"max":12,"step":1},
+  {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5,"when":{"style":["soft","blizzard"]}},
+  {"key":"style","kind":"choice","label":"Style","options":["soft","blizzard","sleet"],"default":"soft"},
+  {"key":"sway","kind":"range","label":"Sway","lo":"Still","hi":"Swaying","default":0.5,"group":"Motion"},
+  {"key":"layers","kind":"toggle","label":"Far snow","default":true},
+  {"key":"body","kind":"colour","label":"Snow"},
+  {"key":"accent","kind":"colour","label":"Far snow","when":{"layers":[true]}},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": { "emitters": [
+  {"id":"far-flakes","gen":"fall.field","v":2,"at":[1,1],"period":62,"cols":{"from":"pieces","map":[[4,2],[12,6]],"round":"px"},"seed":15,"rows":{"from":"style","pick":{"soft":4,"blizzard":3,"sleet":3}},"laps":{"from":"style","pick":{"soft":1,"blizzard":2,"sleet":1}},"slant":{"from":"style","pick":{"soft":"none","blizzard":"right","sleet":"none"}},"sway":{"from":"sway","map":[[0,0],[1,3]]},"swayCycles":2,"shift":[17,23],"paints":["accent"],"when":{"layers":[true],"style":["soft","blizzard"]},"shape":"flake","size":{"from":"size","map":[[0,1],[0.74,1],[0.76,2],[1,2]],"round":"px"}},
+  {"id":"far-sleet","gen":"fall.field","v":2,"at":[1,1],"period":62,"cols":{"from":"pieces","map":[[4,2],[12,6]],"round":"px"},"seed":15,"rows":{"from":"style","pick":{"soft":4,"blizzard":3,"sleet":3}},"laps":{"from":"style","pick":{"soft":1,"blizzard":2,"sleet":1}},"slant":{"from":"style","pick":{"soft":"none","blizzard":"right","sleet":"none"}},"sway":{"from":"sway","map":[[0,0],[1,3]]},"swayCycles":2,"shift":[17,23],"paints":["accent"],"when":{"layers":[true],"style":["sleet"]},"shape":"streak","size":3,"alt":"dot","altSize":1},
+  {"id":"flakes-small","gen":"fall.field","v":2,"at":[1,1],"period":62,"cols":{"from":"pieces","map":[[4,4],[12,12]],"round":"px"},"seed":26,"rows":{"from":"style","pick":{"soft":4,"blizzard":3,"sleet":3}},"laps":{"from":"style","pick":{"soft":1,"blizzard":3,"sleet":2}},"slant":{"from":"style","pick":{"soft":"none","blizzard":"right","sleet":"none"}},"sway":{"from":"sway","map":[[0,0],[1,3]]},"swayCycles":2,"when":{"style":["soft","blizzard"],"size":[{"below":0.25}]},"shape":"flake","size":1,"paints":["body","dim"]},
+  {"id":"flakes","gen":"fall.field","v":2,"at":[1,1],"period":62,"cols":{"from":"pieces","map":[[4,4],[12,12]],"round":"px"},"seed":26,"rows":{"from":"style","pick":{"soft":4,"blizzard":3,"sleet":3}},"laps":{"from":"style","pick":{"soft":1,"blizzard":3,"sleet":2}},"slant":{"from":"style","pick":{"soft":"none","blizzard":"right","sleet":"none"}},"sway":{"from":"sway","map":[[0,0],[1,3]]},"swayCycles":2,"when":{"style":["soft","blizzard"],"size":[{"atLeast":0.25}]},"shape":"flake","size":{"from":"size","map":[[0,1],[1,3]],"round":"px"},"paints":["body","dim"],"head":"glint","tail":"tip"},
+  {"id":"sleet","gen":"fall.field","v":2,"at":[1,1],"period":62,"cols":{"from":"pieces","map":[[4,4],[12,12]],"round":"px"},"seed":26,"rows":{"from":"style","pick":{"soft":4,"blizzard":3,"sleet":3}},"laps":{"from":"style","pick":{"soft":1,"blizzard":3,"sleet":2}},"slant":{"from":"style","pick":{"soft":"none","blizzard":"right","sleet":"none"}},"sway":{"from":"sway","map":[[0,0],[1,3]]},"swayCycles":2,"when":{"style":["sleet"]},"shape":"streak","size":3,"alt":"dot","altSize":2,"paints":["body","dim"],"head":"glint"}
+ ] },
+ "clips": {
+  "loop": {"frames":8,"fps":10,"sounds":[{"sound":"wind","frame":0,"preset":"Storm","volume":0.35,"when":{"style":["blizzard"]}}]}
+ }
+}

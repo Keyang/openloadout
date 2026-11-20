@@ -1,0 +1,41 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "sun-rays",
+ "name": "Sun rays",
+ "blurb": "Shafts of light falling through a canopy, a window or a hole in a ceiling, with dashes running down them or a slow swell, and dust glinting in the light. Change the number of rays, their length, spread and slant, the style and the colours.",
+ "meta": {"type":"effect","role":"environment/lighting","themes":["neutral","forest","dungeon"],"gameTypes":["platformer","top-down-rpg","puzzle","farming-sim"],"view":"none","words":["sun rays","sunbeam","light shaft","god rays","moonlight","window light","shine","dust","glow","holy"],"license":"draft"},
+ "size": [64,64],
+ "pivot": [32,32],
+ "grounded": false,
+ "preview": "loop",
+ "styles": ["pixel"],
+ "versions": [
+  {"name":"Sunbeams","params":{}},
+  {"name":"Moonlight","params":{"edge":"#8fd0f0"}},
+  {"name":"Holy light","params":{"style":"solid","pieces":7}},
+  {"name":"Dusty attic","params":{"motes":true,"slant":1,"edge":"#a06a3c"}},
+  {"name":"Single shaft","params":{"pieces":1,"spread":0}}
+ ],
+ "palette": [
+  {"id":"core","label":"Core","default":"#f0ead8","material":"light","swatches":["#f0ead8","#9bd18a","#c2c9d6","#f6d3b0","#d8d8e0"]},
+  {"id":"edge","label":"Light","default":"#f2c230","material":"light","swatches":["#f2c230","#4fd8ee","#e08a2c","#a4c44a","#c9423a","#7a4fc4","#8fd0f0","#a06a3c"]}
+ ],
+ "controls": [
+  {"key":"pieces","kind":"range","label":"Rays","lo":"Few","hi":"Many","default":4,"min":1,"max":7,"step":1},
+  {"key":"length","kind":"range","label":"Length","lo":"Short","hi":"Long","default":0.5},
+  {"key":"spread","kind":"range","label":"Spread","lo":"Tight","hi":"Wide","default":0.5},
+  {"key":"slant","kind":"range","label":"Slant","lo":"Straight down","hi":"Slanted","default":0.5},
+  {"key":"style","kind":"choice","label":"Style","options":["dashed","solid"],"default":"dashed"},
+  {"key":"motes","kind":"toggle","label":"Dust","default":false},
+  {"key":"core","kind":"colour","label":"Core"},
+  {"key":"edge","kind":"colour","label":"Light"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": { "emitters": [
+  {"id":"loop","gen":"effect.sun-rays","v":1,"clip":["loop"],"picture":"loop","at":[32,32],"pieces":{"from":"pieces","map":[[1,1],[7,7]],"round":"px"},"length":{"from":"length","map":[[0,0],[1,1]]},"spread":{"from":"spread","map":[[0,0],[1,1]]},"slant":{"from":"slant","map":[[0,0],[1,1]]},"style":{"from":"style","pick":{"dashed":"dashed","solid":"solid"}},"motes":{"from":"motes","pick":{"true":true,"false":false}},"core":"core","edge":"edge"}
+ ] },
+ "clips": {
+  "loop": {"frames":8,"fps":10}
+ }
+}

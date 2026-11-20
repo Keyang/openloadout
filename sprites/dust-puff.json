@@ -1,0 +1,44 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "dust-puff",
+ "name": "Dust puff",
+ "blurb": "Dust kicked up on the ground: a landing burst, a running puff and a wall-slide trickle. Change its size, number of puffs, spread, style, rise and colours.",
+ "meta": {"type":"effect","role":"effects/dust","themes":["fantasy","forest"],"gameTypes":["platformer","roguelike-action","arcade"],"view":"side","words":["dust","puff","smoke","cloud","land","landing","run","skid","slide","jump","kick","dirt","footstep"],"license":"draft"},
+ "size": [32,32],
+ "pivot": [16,30],
+ "grounded": false,
+ "preview": "burst",
+ "styles": ["pixel"],
+ "palette": [
+  {"id":"core","label":"Core","default":"#f0ead8","material":"earth","swatches":["#f0ead8","#f6d3b0","#c2c9d6","#f2c230"]},
+  {"id":"edge","label":"Edge","default":"#8f97a8","material":"earth","swatches":["#8f97a8","#7a4f33","#a06a3c","#5d6475"]},
+  {"id":"mid","material":"earth","derive":{"rule":"mix","of":"core","with":"edge","amount":0.5}},
+  {"id":"rim","material":"earth","derive":{"rule":"tone","of":"edge","by":-1}}
+ ],
+ "controls": [
+  {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+  {"key":"pieces","kind":"range","label":"Pieces","lo":"Few","hi":"Many","default":4,"min":2,"max":6,"step":1},
+  {"key":"spread","kind":"range","label":"Spread","lo":"Tight","hi":"Wide","default":0.5},
+  {"key":"style","kind":"choice","label":"Style","options":["round","wispy","chunky"],"default":"round"},
+  {"key":"rise","kind":"range","label":"Rise","lo":"Low","hi":"High","default":0.5},
+  {"key":"core","kind":"colour","label":"Core"},
+  {"key":"edge","kind":"colour","label":"Edge"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": { "emitters": [
+  {"id":"left-small","at":[15,28],"seed":1,"angle":-90,"count":{"from":"pieces","map":[[2,1],[3,2],[4,2],[5,3],[6,3]],"round":"px"},"gen":"puffs","v":1,"clip":["burst"],"when":{"size":[{"below":0.34}]},"stagger":0.18,"arc":17.19,"dist":{"from":"spread","map":[[0,6.6499999999999995],[1,11.875]]},"rise":{"from":"rise","map":[[0,1],[1,9]]},"size":{"from":"size","map":[[0,2.5],[1,4]]},"shape":{"from":"style","pick":{"round":"round","wispy":"wispy","chunky":"chunky"}},"lobes":3,"floor":30,"paints":["core","mid","edge","rim"]},
+  {"id":"right-small","at":[17,28],"seed":2,"angle":90,"count":{"from":"pieces","map":[[2,1],[3,1],[4,2],[5,2],[6,3]],"round":"px"},"gen":"puffs","v":1,"clip":["burst"],"when":{"size":[{"below":0.34}]},"stagger":0.18,"arc":17.19,"dist":{"from":"spread","map":[[0,6.6499999999999995],[1,11.875]]},"rise":{"from":"rise","map":[[0,1],[1,9]]},"size":{"from":"size","map":[[0,2.5],[1,4]]},"shape":{"from":"style","pick":{"round":"round","wispy":"wispy","chunky":"chunky"}},"lobes":3,"floor":30,"paints":["core","mid","edge","rim"]},
+  {"id":"left-middle","at":[15,28],"seed":1,"angle":-90,"count":{"from":"pieces","map":[[2,1],[3,2],[4,2],[5,3],[6,3]],"round":"px"},"gen":"puffs","v":1,"clip":["burst"],"when":{"size":[{"atLeast":0.34,"below":0.67}]},"stagger":0.18,"arc":17.19,"dist":{"from":"spread","map":[[0,5.95],[1,10.625]]},"rise":{"from":"rise","map":[[0,1],[1,9]]},"size":{"from":"size","map":[[0,2.5],[1,4]]},"shape":{"from":"style","pick":{"round":"round","wispy":"wispy","chunky":"chunky"}},"lobes":3,"floor":30,"paints":["core","mid","edge","rim"]},
+  {"id":"right-middle","at":[17,28],"seed":2,"angle":90,"count":{"from":"pieces","map":[[2,1],[3,1],[4,2],[5,2],[6,3]],"round":"px"},"gen":"puffs","v":1,"clip":["burst"],"when":{"size":[{"atLeast":0.34,"below":0.67}]},"stagger":0.18,"arc":17.19,"dist":{"from":"spread","map":[[0,5.95],[1,10.625]]},"rise":{"from":"rise","map":[[0,1],[1,9]]},"size":{"from":"size","map":[[0,2.5],[1,4]]},"shape":{"from":"style","pick":{"round":"round","wispy":"wispy","chunky":"chunky"}},"lobes":3,"floor":30,"paints":["core","mid","edge","rim"]},
+  {"id":"left-big","at":[15,28],"seed":1,"angle":-90,"count":{"from":"pieces","map":[[2,1],[3,2],[4,2],[5,3],[6,3]],"round":"px"},"gen":"puffs","v":1,"clip":["burst"],"when":{"size":[{"atLeast":0.67}]},"stagger":0.18,"arc":17.19,"dist":{"from":"spread","map":[[0,5.25],[1,9.375]]},"rise":{"from":"rise","map":[[0,1],[1,9]]},"size":{"from":"size","map":[[0,2.5],[1,4]]},"shape":{"from":"style","pick":{"round":"round","wispy":"wispy","chunky":"chunky"}},"lobes":3,"floor":30,"paints":["core","mid","edge","rim"]},
+  {"id":"right-big","at":[17,28],"seed":2,"angle":90,"count":{"from":"pieces","map":[[2,1],[3,1],[4,2],[5,2],[6,3]],"round":"px"},"gen":"puffs","v":1,"clip":["burst"],"when":{"size":[{"atLeast":0.67}]},"stagger":0.18,"arc":17.19,"dist":{"from":"spread","map":[[0,5.25],[1,9.375]]},"rise":{"from":"rise","map":[[0,1],[1,9]]},"size":{"from":"size","map":[[0,2.5],[1,4]]},"shape":{"from":"style","pick":{"round":"round","wispy":"wispy","chunky":"chunky"}},"lobes":3,"floor":30,"paints":["core","mid","edge","rim"]},
+  {"id":"kick","gen":"puffs","v":1,"clip":["kick"],"at":[19,28],"count":{"from":"pieces","map":[[2,2],[3,2],[4,3],[5,3],[6,4]],"round":"px"},"seed":4,"stagger":0.3,"angle":-107.19,"arc":28.65,"dist":{"from":"spread","map":[[0,5],[1,11]]},"rise":{"from":"rise","map":[[0,1],[1,8]]},"size":{"from":"size","map":[[0,2.125],[1,3.4]]},"shape":{"from":"style","pick":{"round":"round","wispy":"wispy","chunky":"chunky"}},"lobes":3,"floor":30,"paints":["core","mid","edge","rim"]},
+  {"id":"slide","gen":"puffs","v":1,"clip":["slide"],"loop":true,"at":[16,28],"count":{"from":"pieces","map":[[2,2],[6,6]],"round":"px"},"seed":6,"angle":186.88,"arc":{"from":"spread","map":[[0,8.594],[1,40.107]]},"dist":{"from":"rise","map":[[0,11],[1,22]]},"rise":0,"size":{"from":"size","map":[[0,1.95],[1,3.12]]},"shape":{"from":"style","pick":{"round":"round","wispy":"wispy","chunky":"chunky"}},"lobes":2,"floor":30,"paints":["core","mid","edge","rim"]}
+ ] },
+ "clips": {
+  "burst": {"frames":6,"fps":16,"loop":false},
+  "kick": {"frames":4,"fps":14,"loop":false},
+  "slide": {"frames":6,"fps":10}
+ }
+}

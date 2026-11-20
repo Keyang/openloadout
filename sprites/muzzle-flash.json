@@ -1,0 +1,32 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "muzzle-flash",
+ "name": "Muzzle flash",
+ "blurb": "The flash at the tip of a gun, spreading to the right from the muzzle. Change its size, reach, style, number of prongs and colours.",
+ "meta": {"type":"effect","role":"effects/spark","themes":["sci-fi","space"],"gameTypes":["roguelike-action","shooter","arcade"],"view":"top-down","words":["muzzle","flash","gun","gunfire","shot","shoot","fire","blast","barrel","spark","laser","bright"],"license":"draft"},
+ "size": [32,32],
+ "pivot": [8,16],
+ "grounded": false,
+ "preview": "burst",
+ "styles": ["pixel"],
+ "palette": [
+  {"id":"core","label":"Core","default":"#f0ead8","material":"light","swatches":["#f0ead8","#e8ecf2","#f6d3b0","#f2c230"]},
+  {"id":"edge","label":"Edge","default":"#5fe0f0","material":"light","swatches":["#5fe0f0","#e2473f","#9fe040","#f2a030","#b48af8","#4f9ff0"]}
+ ],
+ "controls": [
+  {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+  {"key":"length","kind":"range","label":"Length","lo":"Short","hi":"Long","default":0.5},
+  {"key":"style","kind":"choice","label":"Style","options":["star","cone","ring"],"default":"star"},
+  {"key":"pieces","kind":"choice","label":"Prongs","options":["one","three","five"],"default":"three"},
+  {"key":"core","kind":"colour","label":"Core"},
+  {"key":"edge","kind":"colour","label":"Edge"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": { "emitters": [
+  {"id":"burst","gen":"effect.muzzle-flash","v":1,"clip":["burst"],"picture":"burst","at":[8,16],"size":{"from":"size","map":[[0,0],[1,1]]},"length":{"from":"length","map":[[0,0],[1,1]]},"style":{"from":"style","pick":{"star":"star","cone":"cone","ring":"ring"}},"pieces":{"from":"pieces","pick":{"one":"one","three":"three","five":"five"}},"core":"core","edge":"edge"}
+ ] },
+ "clips": {
+  "burst": {"frames":4,"fps":20,"loop":false}
+ }
+}

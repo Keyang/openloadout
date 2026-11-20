@@ -1,0 +1,32 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "dodge-trail",
+ "name": "Dodge trail",
+ "blurb": "The fading blurs and speed lines a dodge to the right leaves behind. Change its size, length, number of streaks, style and colours.",
+ "meta": {"type":"effect","role":"effects/dust","themes":["sci-fi","space"],"gameTypes":["roguelike-action","shooter"],"view":"top-down","words":["dodge","dash","trail","afterimage","blur","ghost","speed lines","streak","roll","blink","evade","thruster","fast"],"license":"draft"},
+ "size": [48,48],
+ "pivot": [24,24],
+ "grounded": false,
+ "preview": "burst",
+ "styles": ["pixel"],
+ "palette": [
+  {"id":"core","label":"Core","default":"#f0ead8","material":"light","swatches":["#f0ead8","#e8ecf2","#c2c9d6","#f2c230","#ca9eda"]},
+  {"id":"edge","label":"Edge","default":"#5fe0f0","material":"light","swatches":["#5fe0f0","#e2473f","#9fe040","#f2a030","#b48af8","#4f9ff0"]}
+ ],
+ "controls": [
+  {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+  {"key":"length","kind":"range","label":"Length","lo":"Short","hi":"Long","default":0.5},
+  {"key":"pieces","kind":"range","label":"Streaks","lo":"Few","hi":"Many","default":4,"min":2,"max":6,"step":1},
+  {"key":"style","kind":"choice","label":"Style","options":["streaks","ghosts","sparks"],"default":"streaks"},
+  {"key":"core","kind":"colour","label":"Core"},
+  {"key":"edge","kind":"colour","label":"Edge"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": { "emitters": [
+  {"id":"burst","gen":"effect.dodge-trail","v":1,"clip":["burst"],"picture":"burst","at":[24,24],"size":{"from":"size","map":[[0,0],[1,1]]},"length":{"from":"length","map":[[0,0],[1,1]]},"pieces":{"from":"pieces","map":[[2,2],[6,6]],"round":"px"},"style":{"from":"style","pick":{"streaks":"streaks","ghosts":"ghosts","sparks":"sparks"}},"core":"core","edge":"edge"}
+ ] },
+ "clips": {
+  "burst": {"frames":6,"fps":16,"loop":false}
+ }
+}

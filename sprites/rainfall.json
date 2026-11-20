@@ -1,0 +1,46 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "rainfall",
+ "name": "Rain",
+ "blurb": "Rain falling over the whole screen, near streaks long and bright over far ones short and dim, as drizzle, rain or a slanting storm. Change how many drops, how long, the style, the far rain, the colours and the speed. Lay copies 62 px apart to cover the screen.",
+ "meta": {"type":"effect","role":"effects/weather","themes":["neutral","forest","city"],"gameTypes":["platformer","top-down-rpg","farming-sim","shooter"],"view":"none","words":["rain","raindrops","shower","drizzle","downpour","storm","rainy","wet","falling","overlay","gloomy"],"license":"draft"},
+ "size": [64,64],
+ "pivot": [32,32],
+ "grounded": false,
+ "preview": "loop",
+ "styles": ["pixel"],
+ "versions": [
+  {"name":"Rain","params":{}},
+  {"name":"Drizzle","params":{"style":"drizzle","pieces":6}},
+  {"name":"Storm","params":{"style":"storm","pieces":12,"length":1}},
+  {"name":"Light shower","params":{"pieces":4,"layers":false}},
+  {"name":"Night rain","params":{"body":"#c2c9d6","accent":"#5d6475"}}
+ ],
+ "palette": [
+  {"id":"body","label":"Rain","default":"#8fd0f0","material":"water","swatches":["#8fd0f0","#f0ead8","#3f9fd1","#c2c9d6","#d8d8e0"]},
+  {"id":"accent","label":"Far rain","default":"#7fb0b8","material":"water","swatches":["#7fb0b8","#8f97a8","#5d6475","#8696dc"]},
+  {"id":"head","material":"water","derive":{"rule":"tone","of":"body","by":0.6}},
+  {"id":"tail","material":"water","derive":{"rule":"tone","of":"body","by":-0.45}}
+ ],
+ "controls": [
+  {"key":"pieces","kind":"range","label":"Drops","lo":"Few","hi":"Many","default":8,"min":4,"max":12,"step":1},
+  {"key":"length","kind":"range","label":"Length","lo":"Short","hi":"Long","default":0.5,"when":{"style":["rain","storm"]}},
+  {"key":"style","kind":"choice","label":"Style","options":["drizzle","rain","storm"],"default":"rain"},
+  {"key":"layers","kind":"toggle","label":"Far rain","default":true},
+  {"key":"body","kind":"colour","label":"Rain"},
+  {"key":"accent","kind":"colour","label":"Far rain","when":{"layers":[true]}},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": { "emitters": [
+  {"id":"far-drizzle","gen":"fall.field","v":2,"at":[1,1],"period":62,"rows":{"from":"style","pick":{"drizzle":3,"rain":2,"storm":2}},"slant":{"from":"style","pick":{"drizzle":"none","rain":"none","storm":"right"}},"cols":{"from":"pieces","map":[[4,2],[12,6]],"round":"px"},"laps":{"from":"style","pick":{"drizzle":1,"rain":3,"storm":3}},"seed":15,"shift":[17,23],"paints":["accent"],"when":{"layers":[true],"style":["drizzle"]},"shape":"dot","size":1,"alt":"streak","altSize":2},
+  {"id":"far-rain","gen":"fall.field","v":2,"at":[1,1],"period":62,"rows":{"from":"style","pick":{"drizzle":3,"rain":2,"storm":2}},"slant":{"from":"style","pick":{"drizzle":"none","rain":"none","storm":"right"}},"cols":{"from":"pieces","map":[[4,2],[12,6]],"round":"px"},"laps":{"from":"style","pick":{"drizzle":1,"rain":3,"storm":3}},"seed":15,"shift":[17,23],"paints":["accent"],"when":{"layers":[true],"style":["rain"]},"shape":"streak","size":{"from":"length","map":[[0,2],[1,5]],"round":"px"}},
+  {"id":"far-storm","gen":"fall.field","v":2,"at":[1,1],"period":62,"rows":{"from":"style","pick":{"drizzle":3,"rain":2,"storm":2}},"slant":{"from":"style","pick":{"drizzle":"none","rain":"none","storm":"right"}},"cols":{"from":"pieces","map":[[4,2],[12,6]],"round":"px"},"laps":{"from":"style","pick":{"drizzle":1,"rain":3,"storm":3}},"seed":15,"shift":[17,23],"paints":["accent"],"when":{"layers":[true],"style":["storm"]},"shape":"streak","size":{"from":"length","map":[[0,3],[1,6]],"round":"px"}},
+  {"id":"drizzle","gen":"fall.field","v":2,"at":[1,1],"period":62,"rows":{"from":"style","pick":{"drizzle":3,"rain":2,"storm":2}},"slant":{"from":"style","pick":{"drizzle":"none","rain":"none","storm":"right"}},"cols":{"from":"pieces","map":[[4,4],[12,12]],"round":"px"},"seed":26,"laps":2,"when":{"style":["drizzle"]},"shape":"dot","size":2,"alt":"streak","altSize":2,"paints":["body","body","tail","tail"],"head":"head"},
+  {"id":"rain","gen":"fall.field","v":2,"at":[1,1],"period":62,"rows":{"from":"style","pick":{"drizzle":3,"rain":2,"storm":2}},"slant":{"from":"style","pick":{"drizzle":"none","rain":"none","storm":"right"}},"cols":{"from":"pieces","map":[[4,4],[12,12]],"round":"px"},"seed":26,"laps":4,"when":{"style":["rain"]},"shape":"streak","size":{"from":"length","map":[[0,3],[1,9]],"round":"px"},"paints":["body"],"head":"head","tail":"tail"},
+  {"id":"storm","gen":"fall.field","v":2,"at":[1,1],"period":62,"rows":{"from":"style","pick":{"drizzle":3,"rain":2,"storm":2}},"slant":{"from":"style","pick":{"drizzle":"none","rain":"none","storm":"right"}},"cols":{"from":"pieces","map":[[4,4],[12,12]],"round":"px"},"seed":26,"laps":5,"when":{"style":["storm"]},"shape":"streak","size":{"from":"length","map":[[0,5],[1,11]],"round":"px"},"paints":["body"],"head":"head","tail":"tail"}
+ ] },
+ "clips": {
+  "loop": {"frames":8,"fps":10,"sounds":[{"sound":"wind","frame":0,"preset":"Storm","volume":0.35,"when":{"style":["storm"]}}]}
+ }
+}

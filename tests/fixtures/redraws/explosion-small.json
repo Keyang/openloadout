@@ -1,0 +1,164 @@
+{
+ "id": "explosion-small",
+ "frozen": "2026-11-20",
+ "source": "sprites/explosion-small.js",
+ "sha256": "4085107132099fb68bbc64c0498f4b708b698d32a133d1a2c247dbd45722c821",
+ "name": "Small explosion",
+ "blurb": "A cartoon blast: a white flash, a boiling ball that opens into a ring, flying embers and a ring of smoke. Change its size, embers, spread, style, smoke and colours.",
+ "meta": {
+  "type": "effect",
+  "role": "effects/explosion",
+  "themes": [
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "platformer",
+   "turn-based-rpg",
+   "roguelike-action",
+   "shooter",
+   "arcade"
+  ],
+  "view": "none",
+  "words": [
+   "explosion",
+   "blast",
+   "boom",
+   "bomb",
+   "explode",
+   "burst",
+   "fire",
+   "smoke",
+   "embers",
+   "destroy",
+   "bang",
+   "hot"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  48,
+  48
+ ],
+ "pivot": [
+  24,
+  24
+ ],
+ "grounded": false,
+ "preview": "burst",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "pieces": {
+   "kind": "range",
+   "label": "Pieces",
+   "def": 8,
+   "min": 4,
+   "max": 12,
+   "step": 1,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "spread": {
+   "kind": "range",
+   "label": "Spread",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Tight",
+   "hi": "Wide",
+   "group": "Look"
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "round",
+   "options": [
+    {
+     "value": "round",
+     "label": "Round"
+    },
+    {
+     "value": "star",
+     "label": "Star"
+    },
+    {
+     "value": "ring",
+     "label": "Ring"
+    }
+   ],
+   "group": "Look"
+  },
+  "smoke": {
+   "kind": "toggle",
+   "label": "Smoke",
+   "def": true,
+   "group": "Look"
+  },
+  "core": {
+   "kind": "color",
+   "label": "Core",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#f6d3b0",
+    "#8fd0f0",
+    "#9bd18a",
+    "#c2c9d6"
+   ],
+   "group": "Colors"
+  },
+  "edge": {
+   "kind": "color",
+   "label": "Edge",
+   "def": "#e08a2c",
+   "swatches": [
+    "#e08a2c",
+    "#c9423a",
+    "#4fd8ee",
+    "#7a4fc4",
+    "#a4c44a",
+    "#3f6fd1"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "burst": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    10,
+    17,
+    23
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [],
+ "bundles": [
+  "kit-platformer-fantasy"
+ ]
+}

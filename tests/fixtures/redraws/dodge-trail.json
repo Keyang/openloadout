@@ -1,0 +1,156 @@
+{
+ "id": "dodge-trail",
+ "frozen": "2026-11-20",
+ "source": "sprites/dodge-trail.js",
+ "sha256": "a7b1c486eee0b8c6433792061a1a8ce5d2c9ceb197d27335f7194137d6e4c298",
+ "name": "Dodge trail",
+ "blurb": "The fading blurs and speed lines a dodge to the right leaves behind. Change its size, length, number of streaks, style and colours.",
+ "meta": {
+  "type": "effect",
+  "role": "effects/dust",
+  "themes": [
+   "sci-fi",
+   "space"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "shooter"
+  ],
+  "view": "top-down",
+  "words": [
+   "dodge",
+   "dash",
+   "trail",
+   "afterimage",
+   "blur",
+   "ghost",
+   "speed lines",
+   "streak",
+   "roll",
+   "blink",
+   "evade",
+   "thruster",
+   "fast"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  48,
+  48
+ ],
+ "pivot": [
+  24,
+  24
+ ],
+ "grounded": false,
+ "preview": "burst",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "length": {
+   "kind": "range",
+   "label": "Length",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Short",
+   "hi": "Long",
+   "group": "Look"
+  },
+  "pieces": {
+   "kind": "range",
+   "label": "Streaks",
+   "def": 4,
+   "min": 2,
+   "max": 6,
+   "step": 1,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "streaks",
+   "options": [
+    {
+     "value": "streaks",
+     "label": "Streaks"
+    },
+    {
+     "value": "ghosts",
+     "label": "Ghosts"
+    },
+    {
+     "value": "sparks",
+     "label": "Sparks"
+    }
+   ],
+   "group": "Look"
+  },
+  "core": {
+   "kind": "color",
+   "label": "Core",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#e8ecf2",
+    "#c2c9d6",
+    "#f2c230",
+    "#ca9eda"
+   ],
+   "group": "Colors"
+  },
+  "edge": {
+   "kind": "color",
+   "label": "Edge",
+   "def": "#5fe0f0",
+   "swatches": [
+    "#5fe0f0",
+    "#e2473f",
+    "#9fe040",
+    "#f2a030",
+    "#b48af8",
+    "#4f9ff0"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "burst": {
+   "frames": 6,
+   "loop": false,
+   "fps": [
+    10,
+    17,
+    23
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [],
+ "bundles": [
+  "kit-roguelite-scifi"
+ ]
+}

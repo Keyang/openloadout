@@ -1,0 +1,39 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "guard-flash",
+ "name": "Block flash",
+ "blurb": "The flash of a blocked or parried hit: a crescent, a six-sided barrier or a cross of light that bursts white, throws sparks back at the attacker and breaks apart. Change its size, sparks, spread, style and colours.",
+ "meta": {"type":"effect","role":"effects/spark","themes":["neutral"],"gameTypes":["platformer","roguelike-action","arcade","turn-based-rpg"],"view":"side","words":["block","parry","guard","deflect","clash","shield","barrier","spark","flash","defend","counter","ward"],"license":"draft"},
+ "size": [32,32],
+ "pivot": [16,16],
+ "grounded": false,
+ "preview": "burst",
+ "styles": ["pixel"],
+ "palette": [
+  {"id":"core","label":"Core","default":"#f0ead8","material":"light","swatches":["#f0ead8","#8fd0f0","#9bd18a","#f6d3b0"]},
+  {"id":"edge","label":"Edge","default":"#3f6fd1","material":"light","swatches":["#3f6fd1","#e08a2c","#c9423a","#4fd8ee","#7a4fc4","#a4c44a","#c2c9d6","#f2c230"]}
+ ],
+ "controls": [
+  {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+  {"key":"pieces","kind":"range","label":"Sparks","lo":"Few","hi":"Many","default":5,"min":3,"max":8,"step":1},
+  {"key":"spread","kind":"range","label":"Spread","lo":"Tight","hi":"Wide","default":0.5},
+  {"key":"style","kind":"choice","label":"Style","options":["arc","dome","cross"],"default":"arc"},
+  {"key":"core","kind":"colour","label":"Core"},
+  {"key":"edge","kind":"colour","label":"Edge"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": { "emitters": [
+  {"id":"burst","gen":"effect.guard-flash","v":1,"clip":["burst"],"picture":"burst","at":[16,16],"size":{"from":"size","map":[[0,0],[1,1]]},"pieces":{"from":"pieces","map":[[3,3],[8,8]],"round":"px"},"spread":{"from":"spread","map":[[0,0],[1,1]]},"style":{"from":"style","pick":{"arc":"arc","dome":"dome","cross":"cross"}},"core":"core","edge":"edge"}
+ ] },
+ "clips": {
+  "burst": {"frames":6,"fps":16,"loop":false,"sounds":[{"sound":"metal-hit","preset":"Sword clash","frame":0,"volume":0.8,"when":{"style":["arc","cross"]}},{"sound":"shield-break","preset":"Small crack","frame":0,"volume":0.8,"when":{"style":["dome"]}}]}
+ },
+ "versions": [
+  {"name":"Parry","params":{}},
+  {"name":"Magic barrier","params":{"style":"dome","edge":"#4fd8ee"}},
+  {"name":"Steel cross","params":{"style":"cross","edge":"#c2c9d6"}},
+  {"name":"Perfect block","params":{"size":1,"edge":"#f2c230"}},
+  {"name":"Small tick","params":{"size":0,"pieces":3}}
+ ]
+}

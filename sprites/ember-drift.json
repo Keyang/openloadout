@@ -1,0 +1,40 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "ember-drift",
+ "name": "Drifting embers",
+ "blurb": "Glowing embers rising and swaying above lava, a burning village or a forge, cooling to dark dots before they vanish, as a patch to place over the heat. Change their size and number, how wide and how high they rise, embers, ash or sparks, and the colours.",
+ "meta": {"type":"effect","role":"effects/weather","themes":["neutral","dungeon","fantasy"],"gameTypes":["platformer","roguelike-action","top-down-rpg","shooter"],"view":"side","words":["embers","sparks","ash","cinders","fire","lava","forge","burning","rise","glow","heat"],"license":"draft"},
+ "size": [64,64],
+ "pivot": [32,62],
+ "grounded": false,
+ "preview": "loop",
+ "styles": ["pixel"],
+ "versions": [
+  {"name":"Embers","params":{}},
+  {"name":"Falling ash","params":{"style":"ash","core":"#f0ead8","edge":"#8f97a8"}},
+  {"name":"Magic sparks","params":{"style":"sparks","core":"#f0ead8","edge":"#4fd8ee"}},
+  {"name":"Inferno","params":{"pieces":14,"rise":1,"spread":1}},
+  {"name":"Few sparks","params":{"pieces":4,"size":0}}
+ ],
+ "palette": [
+  {"id":"core","label":"Core","default":"#f2c230","material":"fire","swatches":["#f2c230","#f0ead8","#f6d3b0","#c2c9d6"]},
+  {"id":"edge","label":"Embers","default":"#e08a2c","material":"fire","swatches":["#e08a2c","#4fd8ee","#c9423a","#7a4fc4","#a4c44a","#8f97a8"]}
+ ],
+ "controls": [
+  {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+  {"key":"pieces","kind":"range","label":"Pieces","lo":"Few","hi":"Many","default":8,"min":4,"max":14,"step":1},
+  {"key":"spread","kind":"range","label":"Spread","lo":"Tight","hi":"Wide","default":0.5},
+  {"key":"rise","kind":"range","label":"Rise","lo":"Low","hi":"High","default":0.5},
+  {"key":"style","kind":"choice","label":"Style","options":["embers","ash","sparks"],"default":"embers"},
+  {"key":"core","kind":"colour","label":"Core"},
+  {"key":"edge","kind":"colour","label":"Embers"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": { "emitters": [
+  {"id":"loop","gen":"effect.ember-drift","v":1,"clip":["loop"],"picture":"loop","at":[32,62],"size":{"from":"size","map":[[0,0],[1,1]]},"pieces":{"from":"pieces","map":[[4,4],[14,14]],"round":"px"},"spread":{"from":"spread","map":[[0,0],[1,1]]},"rise":{"from":"rise","map":[[0,0],[1,1]]},"style":{"from":"style","pick":{"embers":"embers","ash":"ash","sparks":"sparks"}},"core":"core","edge":"edge"}
+ ] },
+ "clips": {
+  "loop": {"frames":8,"fps":10}
+ }
+}

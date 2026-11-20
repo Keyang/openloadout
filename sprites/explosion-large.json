@@ -1,0 +1,36 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "explosion-large",
+ "name": "Large explosion",
+ "blurb": "A big explosion for barrels and bosses: a white flash, a fireball that tears open into a ring, then smoke, scrap and sparks, plus a smoke column for the wreck. Change its size, pieces, spread, bulges, style, soot and colours.",
+ "meta": {"type":"effect","role":"effects/explosion","themes":["sci-fi","space"],"gameTypes":["roguelike-action","shooter","arcade"],"view":"none","words":["explosion","blast","boom","fireball","explode","destroy","barrel","boss death","smoke","wreckage","shockwave","debris","big"],"license":"draft"},
+ "size": [96,96],
+ "pivot": [48,48],
+ "grounded": false,
+ "preview": "burst",
+ "styles": ["pixel"],
+ "palette": [
+  {"id":"core","label":"Core","default":"#f0ead8","material":"fire","swatches":["#f0ead8","#e8ecf2","#f6d3b0","#f2c230"]},
+  {"id":"edge","label":"Edge","default":"#f2a030","material":"fire","swatches":["#f2a030","#5fe0f0","#e2473f","#9fe040","#b48af8","#4f9ff0"]}
+ ],
+ "controls": [
+  {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+  {"key":"pieces","kind":"range","label":"Pieces","lo":"Few","hi":"Many","default":8,"min":4,"max":12,"step":1},
+  {"key":"spread","kind":"range","label":"Spread","lo":"Tight","hi":"Wide","default":0.5},
+  {"key":"lobes","kind":"range","label":"Bulges","lo":"Few","hi":"Many","default":6,"min":4,"max":9,"step":1},
+  {"key":"style","kind":"choice","label":"Style","options":["fire","plasma",{"value":"shock-ring","label":"Shock ring"}],"default":"fire"},
+  {"key":"soot","kind":"toggle","label":"Soot","default":true},
+  {"key":"core","kind":"colour","label":"Core"},
+  {"key":"edge","kind":"colour","label":"Edge"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": { "emitters": [
+  {"id":"burst","gen":"effect.explosion-large","v":1,"clip":["burst"],"picture":"burst","at":[48,48],"size":{"from":"size","map":[[0,0],[1,1]]},"pieces":{"from":"pieces","map":[[4,4],[12,12]],"round":"px"},"spread":{"from":"spread","map":[[0,0],[1,1]]},"lobes":{"from":"lobes","map":[[4,4],[9,9]],"round":"px"},"style":{"from":"style","pick":{"fire":"fire","plasma":"plasma","shock-ring":"shock-ring"}},"soot":{"from":"soot","pick":{"true":true,"false":false}},"core":"core","edge":"edge"},
+  {"id":"smoke","gen":"effect.explosion-large","v":1,"clip":["smoke"],"picture":"smoke","at":[48,48],"size":{"from":"size","map":[[0,0],[1,1]]},"pieces":{"from":"pieces","map":[[4,4],[12,12]],"round":"px"},"spread":{"from":"spread","map":[[0,0],[1,1]]},"lobes":{"from":"lobes","map":[[4,4],[9,9]],"round":"px"},"style":{"from":"style","pick":{"fire":"fire","plasma":"plasma","shock-ring":"shock-ring"}},"soot":{"from":"soot","pick":{"true":true,"false":false}},"core":"core","edge":"edge"}
+ ] },
+ "clips": {
+  "burst": {"frames":12,"fps":14,"loop":false,"sounds":[{"sound":"explosion","preset":"Grenade","frame":0,"volume":1}]},
+  "smoke": {"frames":8,"fps":10,"loop":true}
+ }
+}

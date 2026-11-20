@@ -1,0 +1,269 @@
+{
+ "id": "ui-controls-paper",
+ "frozen": "2026-11-20",
+ "source": "sprites/ui-controls-paper.js",
+ "sha256": "23e22f0f6e4ffb931c6130aa85f90c91212d3c1755a256f451edf9af70e739db",
+ "name": "Paper checkboxes and cursor",
+ "blurb": "The small pieces of a settings screen in paper and ink: a ticked and an empty box, a round option, an on/off switch, an inked arrow pointer and corner brackets round a chosen slot; change the style, corners, rule, colours and speed.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/cursor",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "arcade",
+   "puzzle",
+   "card-game",
+   "farming-sim"
+  ],
+  "view": "none",
+  "words": [
+   "checkbox",
+   "tick",
+   "option",
+   "radio",
+   "switch",
+   "toggle",
+   "pointer",
+   "cursor",
+   "arrow",
+   "select",
+   "settings",
+   "paper",
+   "ink"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "check-on",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "sheet",
+   "options": [
+    {
+     "value": "sheet",
+     "label": "Sheet"
+    },
+    {
+     "value": "torn",
+     "label": "Torn"
+    },
+    {
+     "value": "card",
+     "label": "Card"
+    }
+   ],
+   "group": "Look"
+  },
+  "corner": {
+   "kind": "range",
+   "label": "Corner",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Square",
+   "hi": "Round",
+   "group": "Look"
+  },
+  "border": {
+   "kind": "range",
+   "label": "Border",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Thin",
+   "hi": "Thick",
+   "group": "Look"
+  },
+  "face": {
+   "kind": "color",
+   "label": "Paper",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#e6c96a",
+    "#f6d3b0",
+    "#c2c9d6",
+    "#9bd18a"
+   ],
+   "group": "Colors"
+  },
+  "frame": {
+   "kind": "color",
+   "label": "Ink",
+   "def": "#3f5068",
+   "swatches": [
+    "#3f5068",
+    "#7a4f33",
+    "#434d6d",
+    "#8e3a4a"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Tick",
+   "def": "#c9423a",
+   "swatches": [
+    "#c9423a",
+    "#e08a2c",
+    "#f2c230",
+    "#4fd8ee",
+    "#a4c44a",
+    "#3f6fd1"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "check-on": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "check-off": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "radio-on": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "radio-off": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "switch-on": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "switch-off": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "pointer": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    8,
+    12
+   ]
+  },
+  "selector": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    8,
+    12
+   ]
+  }
+ },
+ "sounds": {
+  "check-on": [
+   {
+    "sound": "ui-click",
+    "preset": "Soft tap",
+    "frame": 0,
+    "volume": 0.6
+   }
+  ],
+  "switch-on": [
+   {
+    "sound": "ui-click",
+    "preset": "Soft tap",
+    "frame": 0,
+    "volume": 0.6
+   }
+  ]
+ },
+ "versions": [
+  {
+   "name": "Notebook",
+   "params": {}
+  },
+  {
+   "name": "Torn",
+   "params": {
+    "style": "torn",
+    "accent": "#a4c44a"
+   }
+  },
+  {
+   "name": "Index card",
+   "params": {
+    "style": "card",
+    "face": "#e6c96a"
+   }
+  },
+  {
+   "name": "Brown ink",
+   "params": {
+    "frame": "#7a4f33",
+    "accent": "#e08a2c"
+   }
+  },
+  {
+   "name": "Mint and blue",
+   "params": {
+    "face": "#9bd18a",
+    "accent": "#3f6fd1"
+   }
+  }
+ ],
+ "bundles": []
+}

@@ -1,0 +1,189 @@
+{
+ "id": "bg-castle",
+ "frozen": "2026-11-20",
+ "source": "sprites/bg-castle.js",
+ "sha256": "520df07e42b62a776aa735034b3e6db5f92bd4313c7b3f161c66256e1a901fa0",
+ "name": "Castle backdrop",
+ "blurb": "Far towers, a castle wall and a row of columns with banners, in three layers that repeat sideways: scroll far at 0.1, mid at 0.4 and near at 0.7 of the camera's speed. Change the time of day, the stone, the banners, the lit windows and the height of the walls.",
+ "meta": {
+  "type": "background",
+  "role": "environment/background",
+  "themes": [
+   "fantasy",
+   "dungeon"
+  ],
+  "gameTypes": [
+   "platformer"
+  ],
+  "view": "side",
+  "words": [
+   "castle",
+   "fortress",
+   "wall",
+   "towers",
+   "battlements",
+   "columns",
+   "banners",
+   "arcade",
+   "cloister",
+   "interior",
+   "backdrop",
+   "parallax",
+   "dusk",
+   "night"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  320,
+  180
+ ],
+ "pivot": [
+  160,
+  180
+ ],
+ "grounded": false,
+ "preview": "far",
+ "params": {
+  "time": {
+   "kind": "choice",
+   "label": "Time of day",
+   "def": "dusk",
+   "options": [
+    {
+     "value": "day",
+     "label": "Day"
+    },
+    {
+     "value": "dusk",
+     "label": "Dusk"
+    },
+    {
+     "value": "night",
+     "label": "Night"
+    }
+   ],
+   "group": "Look"
+  },
+  "windows": {
+   "kind": "range",
+   "label": "Lit windows",
+   "def": 0.45,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "height": {
+   "kind": "range",
+   "label": "Height",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Low walls",
+   "hi": "High walls",
+   "group": "Look"
+  },
+  "density": {
+   "kind": "range",
+   "label": "Density",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Few columns",
+   "hi": "Many columns",
+   "group": "Look"
+  },
+  "haze": {
+   "kind": "range",
+   "label": "Haze",
+   "def": 0.35,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Clear",
+   "hi": "Misty",
+   "group": "Look"
+  },
+  "sky": {
+   "kind": "color",
+   "label": "Sky",
+   "def": "#8696dc",
+   "swatches": [
+    "#8696dc",
+    "#8fd0f0",
+    "#7fb0b8",
+    "#f0ead8",
+    "#3f9fd1",
+    "#e08a2c"
+   ],
+   "group": "Colors"
+  },
+  "land": {
+   "kind": "color",
+   "label": "Stone",
+   "def": "#5d6475",
+   "swatches": [
+    "#5d6475",
+    "#8f97a8",
+    "#f0ead8",
+    "#3f5068",
+    "#a4c44a",
+    "#6b7280"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Banners",
+   "def": "#c9423a",
+   "swatches": [
+    "#c9423a",
+    "#f2c230",
+    "#7a4fc4",
+    "#f0ead8",
+    "#4fd8ee",
+    "#a4c44a"
+   ],
+   "group": "Colors"
+  }
+ },
+ "clips": {
+  "far": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    4,
+    4,
+    4
+   ]
+  },
+  "mid": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    4,
+    4,
+    4
+   ]
+  },
+  "near": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    4,
+    4,
+    4
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [],
+ "bundles": [
+  "kit-platformer-fantasy"
+ ]
+}

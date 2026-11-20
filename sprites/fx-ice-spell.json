@@ -1,0 +1,35 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "fx-ice-spell",
+ "name": "Ice spell",
+ "blurb": "An ice spell for a battle screen: spikes jut up under the target, glint and shatter, and frost gathers into a crystal in the caster's hand. Change its size, height, spikes, style, mist and colours.",
+ "meta": {"type":"effect","role":"effects/magic","themes":["fantasy"],"gameTypes":["turn-based-rpg","roguelike-action","platformer"],"view":"side","words":["ice","frost","spell","magic","freeze","spike","crystal","snowflake","shatter","cast","attack","cold","blizzard"],"license":"draft"},
+ "size": [64,64],
+ "pivot": [32,58],
+ "grounded": false,
+ "preview": "burst",
+ "styles": ["pixel"],
+ "palette": [
+  {"id":"core","label":"Core","default":"#f0ead8","material":"light","swatches":["#f0ead8","#f4e06a","#f6d3b0","#9fd8f4"]},
+  {"id":"edge","label":"Edge","default":"#7aa0f4","material":"light","swatches":["#7aa0f4","#e8662c","#7a4fc4","#2f8f9d","#c9423a","#7fe0a0"]}
+ ],
+ "controls": [
+  {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+  {"key":"height","kind":"range","label":"Height","lo":"Short","hi":"Tall","default":0.5},
+  {"key":"pieces","kind":"range","label":"Spikes","lo":"Few","hi":"Many","default":5,"min":3,"max":7,"step":1},
+  {"key":"style","kind":"choice","label":"Style","options":["spikes","crystal","snowflake"],"default":"spikes"},
+  {"key":"mist","kind":"toggle","label":"Mist","default":true},
+  {"key":"core","kind":"colour","label":"Core"},
+  {"key":"edge","kind":"colour","label":"Edge"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": { "emitters": [
+  {"id":"burst","gen":"effect.fx-ice-spell","v":1,"clip":["burst"],"picture":"burst","at":[32,58],"size":{"from":"size","map":[[0,0],[1,1]]},"height":{"from":"height","map":[[0,0],[1,1]]},"pieces":{"from":"pieces","map":[[3,3],[7,7]],"round":"px"},"style":{"from":"style","pick":{"spikes":"spikes","crystal":"crystal","snowflake":"snowflake"}},"mist":{"from":"mist","pick":{"true":true,"false":false}},"core":"core","edge":"edge"},
+  {"id":"cast","gen":"effect.fx-ice-spell","v":1,"clip":["cast"],"picture":"cast","at":[32,58],"size":{"from":"size","map":[[0,0],[1,1]]},"height":{"from":"height","map":[[0,0],[1,1]]},"pieces":{"from":"pieces","map":[[3,3],[7,7]],"round":"px"},"style":{"from":"style","pick":{"spikes":"spikes","crystal":"crystal","snowflake":"snowflake"}},"mist":{"from":"mist","pick":{"true":true,"false":false}},"core":"core","edge":"edge"}
+ ] },
+ "clips": {
+  "burst": {"frames":10,"fps":14,"loop":false,"sounds":[{"sound":"ice-shatter","preset":"Ice spell","frame":2,"volume":0.85}]},
+  "cast": {"frames":8,"fps":12,"loop":false,"sounds":[{"sound":"magic-spell","preset":"Quick zap","frame":1,"volume":0.8}]}
+ }
+}

@@ -1,0 +1,42 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "charge-up",
+ "name": "Charge up",
+ "blurb": "Energy gathering into a pulsing core before a big shot or special move, then released in a flash. Change its size, the sparks, how they gather, the twist, the pulse and colours.",
+ "meta": {"type":"effect","role":"effects/magic","themes":["neutral","fantasy","sci-fi"],"gameTypes":["shooter","turn-based-rpg","platformer","roguelike-action"],"view":"none","words":["charge","charging","power up","energy","gather","release","special move","super","charge shot","focus","spark","glow"],"license":"draft"},
+ "size": [48,48],
+ "pivot": [24,24],
+ "grounded": false,
+ "preview": "loop",
+ "styles": ["pixel"],
+ "palette": [
+  {"id":"core","label":"Core","default":"#f0ead8","material":"light","swatches":["#f0ead8","#c9423a","#8fd0f0","#c2c9d6","#f6d3b0"]},
+  {"id":"edge","label":"Edge","default":"#4fd8ee","material":"light","swatches":["#4fd8ee","#e08a2c","#7a4fc4","#a4c44a","#3f6fd1","#f2c230","#5fe0f0"]}
+ ],
+ "controls": [
+  {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+  {"key":"pieces","kind":"range","label":"Sparks","lo":"Few","hi":"Many","default":8,"min":4,"max":12,"step":1},
+  {"key":"style","kind":"choice","label":"Style","options":["spiral","rings","pull"],"default":"spiral"},
+  {"key":"twist","kind":"range","label":"Twist","lo":"Straight","hi":"Turned","default":0.5,"when":{"style":["spiral"]}},
+  {"key":"core","kind":"colour","label":"Core"},
+  {"key":"edge","kind":"colour","label":"Edge"},
+  {"key":"flicker","kind":"range","label":"Flicker","lo":"Steady","hi":"Wild","default":0.5,"group":"Motion"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": { "emitters": [
+  {"id":"loop","gen":"effect.charge-up","v":1,"clip":["loop"],"picture":"loop","at":[24,24],"size":{"from":"size","map":[[0,0],[1,1]]},"pieces":{"from":"pieces","map":[[4,4],[12,12]],"round":"px"},"style":{"from":"style","pick":{"spiral":"spiral","rings":"rings","pull":"pull"}},"twist":{"from":"twist","map":[[0,0],[1,1]]},"core":"core","edge":"edge","flicker":{"from":"flicker","map":[[0,0],[1,1]]}},
+  {"id":"burst","gen":"effect.charge-up","v":1,"clip":["burst"],"picture":"burst","at":[24,24],"size":{"from":"size","map":[[0,0],[1,1]]},"pieces":{"from":"pieces","map":[[4,4],[12,12]],"round":"px"},"style":{"from":"style","pick":{"spiral":"spiral","rings":"rings","pull":"pull"}},"twist":{"from":"twist","map":[[0,0],[1,1]]},"core":"core","edge":"edge","flicker":{"from":"flicker","map":[[0,0],[1,1]]}}
+ ] },
+ "clips": {
+  "loop": {"frames":8,"fps":10,"loop":true},
+  "burst": {"frames":8,"fps":16,"loop":false,"sounds":[{"sound":"magic-spell","preset":"Quick zap","frame":0,"volume":0.8}]}
+ },
+ "versions": [
+  {"name":"Charging","params":{}},
+  {"name":"Full power","params":{"size":1,"pieces":12,"edge":"#f2c230"}},
+  {"name":"Dark charge","params":{"core":"#c9423a","edge":"#7a4fc4"}},
+  {"name":"Ring charge","params":{"style":"rings","edge":"#3f6fd1"}},
+  {"name":"Pull","params":{"style":"pull","twist":0}}
+ ]
+}

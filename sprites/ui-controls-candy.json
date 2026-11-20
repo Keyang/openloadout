@@ -1,0 +1,1008 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "ui-controls-candy",
+ "name": "Candy checkboxes and cursor",
+ "blurb": "The small pieces of a settings screen in boiled sugar: a ticked and an empty box, a round option, a jelly on/off switch, a glossy drop pointer and sugar brackets round a chosen slot; change the style, corners, rim, colours and speed.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/cursor",
+  "themes": [
+   "neutral",
+   "candy"
+  ],
+  "gameTypes": [
+   "arcade",
+   "puzzle",
+   "card-game",
+   "racing"
+  ],
+  "view": "none",
+  "words": [
+   "checkbox",
+   "tick",
+   "option",
+   "radio",
+   "switch",
+   "toggle",
+   "pointer",
+   "cursor",
+   "arrow",
+   "select",
+   "settings",
+   "candy",
+   "sugar",
+   "glossy"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "check-on",
+ "styles": [
+  "pixel"
+ ],
+ "palette": [
+  {
+   "id": "face",
+   "label": "Candy",
+   "default": "#7a4f33",
+   "material": "interface",
+   "swatches": [
+    "#7a4f33",
+    "#3f5068",
+    "#8e3a4a",
+    "#434d6d"
+   ]
+  },
+  {
+   "id": "frame",
+   "label": "Sugar",
+   "default": "#f0ead8",
+   "material": "interface",
+   "swatches": [
+    "#f0ead8",
+    "#f6d3b0",
+    "#8fd0f0",
+    "#9bd18a"
+   ]
+  },
+  {
+   "id": "accent",
+   "label": "Tick",
+   "default": "#4fd8ee",
+   "material": "interface",
+   "swatches": [
+    "#4fd8ee",
+    "#e08a2c",
+    "#c2c9d6",
+    "#6aa83e",
+    "#a4c44a"
+   ]
+  },
+  {
+   "id": "shine",
+   "default": "#ffffff",
+   "material": "light",
+   "detail": true
+  }
+ ],
+ "controls": [
+  {
+   "key": "style",
+   "kind": "choice",
+   "label": "Style",
+   "options": [
+    {
+     "value": "jelly",
+     "label": "Jelly"
+    },
+    {
+     "value": "striped",
+     "label": "Striped"
+    },
+    {
+     "value": "frosted",
+     "label": "Frosted"
+    }
+   ],
+   "default": "jelly",
+   "group": "Look"
+  },
+  {
+   "key": "corner",
+   "kind": "range",
+   "label": "Corner",
+   "lo": "Square",
+   "hi": "Round",
+   "default": 0.75,
+   "group": "Look"
+  },
+  {
+   "key": "border",
+   "kind": "range",
+   "label": "Border",
+   "lo": "Thin",
+   "hi": "Thick",
+   "default": 0.5,
+   "group": "Look"
+  },
+  {
+   "key": "face",
+   "kind": "colour",
+   "label": "Candy",
+   "group": "Colors"
+  },
+  {
+   "key": "frame",
+   "kind": "colour",
+   "label": "Sugar",
+   "group": "Colors"
+  },
+  {
+   "key": "accent",
+   "kind": "colour",
+   "label": "Tick",
+   "group": "Colors"
+  },
+  {
+   "key": "speed",
+   "standard": "speed"
+  }
+ ],
+ "versions": [
+  {
+   "name": "Toffee",
+   "params": {}
+  },
+  {
+   "name": "Cherry stripe",
+   "params": {
+    "style": "striped",
+    "face": "#8e3a4a"
+   }
+  },
+  {
+   "name": "Blueberry frost",
+   "params": {
+    "style": "frosted",
+    "face": "#3f5068",
+    "frame": "#8fd0f0"
+   }
+  },
+  {
+   "name": "Liquorice",
+   "params": {
+    "face": "#434d6d",
+    "accent": "#e08a2c"
+   }
+  },
+  {
+   "name": "Caramel",
+   "params": {
+    "frame": "#f6d3b0",
+    "accent": "#6aa83e"
+   }
+  }
+ ],
+ "body": {
+  "panel": {
+   "skin": {
+    "use": "skin:candy",
+    "v": 3,
+    "paint": {
+     "face": "face",
+     "frame": "frame",
+     "accent": "accent"
+    }
+   },
+   "piece": {
+    "gen": "ui.toggle",
+    "v": 2,
+    "clip": [
+     "check-on"
+    ],
+    "style": {
+     "from": "style"
+    },
+    "corner": {
+     "from": "corner",
+     "map": [
+      [
+       0,
+       0
+      ],
+      [
+       0.5,
+       2
+      ],
+      [
+       1,
+       2
+      ]
+     ],
+     "round": "px"
+    },
+    "border": {
+     "from": "border",
+     "map": [
+      [
+       0,
+       1
+      ],
+      [
+       0.249,
+       1
+      ],
+      [
+       0.25,
+       2
+      ],
+      [
+       1,
+       2
+      ]
+     ],
+     "round": "px"
+    },
+    "kind": "check",
+    "checked": true,
+    "at": [
+     16,
+     16
+    ],
+    "size": 20,
+    "trim": [],
+    "topTrim": [],
+    "rightTrim": [],
+    "along": [],
+    "gleamTrim": [],
+    "gleamTop": [],
+    "gleamRight": [],
+    "rings": [
+     "ink",
+     "frame",
+     "ink"
+    ],
+    "bandAt": 1,
+    "lit": false,
+    "edge": "round",
+    "bevel": {
+     "from": "style",
+     "pick": {
+      "jelly": "skin",
+      "striped": "skin",
+      "frosted": "frosted"
+     }
+    },
+    "bevelDepth": 0.5,
+    "stripes": {
+     "from": "style",
+     "pick": {
+      "jelly": false,
+      "striped": true,
+      "frosted": false
+     }
+    },
+    "gloss": {
+     "from": "style",
+     "pick": {
+      "jelly": true,
+      "striped": false,
+      "frosted": false
+     }
+    }
+   },
+   "states": [
+    "check-on",
+    "check-off",
+    "radio-on",
+    "radio-off",
+    "switch-on",
+    "switch-off",
+    "pointer",
+    "selector"
+   ],
+   "draw": [
+    {
+     "gen": "ui.toggle",
+     "v": 2,
+     "clip": [
+      "check-off"
+     ],
+     "style": {
+      "from": "style"
+     },
+     "corner": {
+      "from": "corner",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        0.5,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "border": {
+      "from": "border",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.249,
+        1
+       ],
+       [
+        0.25,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "kind": "check",
+     "checked": false,
+     "at": [
+      16,
+      16
+     ],
+     "size": 20,
+     "trim": [],
+     "topTrim": [],
+     "rightTrim": [],
+     "along": [],
+     "gleamTrim": [],
+     "gleamTop": [],
+     "gleamRight": [],
+     "rings": [
+      "ink",
+      "frame",
+      "ink"
+     ],
+     "bandAt": 1,
+     "lit": false,
+     "edge": "round",
+     "bevel": {
+      "from": "style",
+      "pick": {
+       "jelly": "skin",
+       "striped": "skin",
+       "frosted": "frosted"
+      }
+     },
+     "bevelDepth": 0.5,
+     "stripes": {
+      "from": "style",
+      "pick": {
+       "jelly": false,
+       "striped": true,
+       "frosted": false
+      }
+     },
+     "gloss": {
+      "from": "style",
+      "pick": {
+       "jelly": true,
+       "striped": false,
+       "frosted": false
+      }
+     }
+    },
+    {
+     "gen": "ui.toggle",
+     "v": 2,
+     "clip": [
+      "radio-on"
+     ],
+     "style": {
+      "from": "style"
+     },
+     "corner": {
+      "from": "corner",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        0.5,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "border": {
+      "from": "border",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.249,
+        1
+       ],
+       [
+        0.25,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "kind": "radio",
+     "checked": true,
+     "at": [
+      16,
+      16
+     ],
+     "size": 20,
+     "trim": [],
+     "topTrim": [],
+     "rightTrim": [],
+     "along": [],
+     "gleamTrim": [],
+     "gleamTop": [],
+     "gleamRight": [],
+     "rings": [
+      "ink",
+      "frame",
+      "ink"
+     ],
+     "bandAt": 1,
+     "lit": false,
+     "edge": "round",
+     "bevel": {
+      "from": "style",
+      "pick": {
+       "jelly": "skin",
+       "striped": "skin",
+       "frosted": "frosted"
+      }
+     },
+     "bevelDepth": 0.5,
+     "stripes": {
+      "from": "style",
+      "pick": {
+       "jelly": false,
+       "striped": true,
+       "frosted": false
+      }
+     },
+     "gloss": {
+      "from": "style",
+      "pick": {
+       "jelly": true,
+       "striped": false,
+       "frosted": false
+      }
+     }
+    },
+    {
+     "gen": "ui.toggle",
+     "v": 2,
+     "clip": [
+      "radio-off"
+     ],
+     "style": {
+      "from": "style"
+     },
+     "corner": {
+      "from": "corner",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        0.5,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "border": {
+      "from": "border",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.249,
+        1
+       ],
+       [
+        0.25,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "kind": "radio",
+     "checked": false,
+     "at": [
+      16,
+      16
+     ],
+     "size": 20,
+     "trim": [],
+     "topTrim": [],
+     "rightTrim": [],
+     "along": [],
+     "gleamTrim": [],
+     "gleamTop": [],
+     "gleamRight": [],
+     "rings": [
+      "ink",
+      "frame",
+      "ink"
+     ],
+     "bandAt": 1,
+     "lit": false,
+     "edge": "round",
+     "bevel": {
+      "from": "style",
+      "pick": {
+       "jelly": "skin",
+       "striped": "skin",
+       "frosted": "frosted"
+      }
+     },
+     "bevelDepth": 0.5,
+     "stripes": {
+      "from": "style",
+      "pick": {
+       "jelly": false,
+       "striped": true,
+       "frosted": false
+      }
+     },
+     "gloss": {
+      "from": "style",
+      "pick": {
+       "jelly": true,
+       "striped": false,
+       "frosted": false
+      }
+     }
+    },
+    {
+     "gen": "ui.toggle",
+     "v": 2,
+     "clip": [
+      "switch-on"
+     ],
+     "style": {
+      "from": "style"
+     },
+     "corner": {
+      "from": "corner",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        0.5,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "border": {
+      "from": "border",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.249,
+        1
+       ],
+       [
+        0.25,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "kind": "switch",
+     "checked": true,
+     "at": [
+      16,
+      16
+     ],
+     "size": 28,
+     "trim": [],
+     "topTrim": [],
+     "rightTrim": [],
+     "along": [],
+     "gleamTrim": [],
+     "gleamTop": [],
+     "gleamRight": [],
+     "rings": [
+      "ink",
+      "frame",
+      "ink"
+     ],
+     "bandAt": 1,
+     "lit": false,
+     "edge": "round",
+     "bevel": {
+      "from": "style",
+      "pick": {
+       "jelly": "none",
+       "striped": "none",
+       "frosted": "frosted"
+      }
+     },
+     "bevelDepth": 0.5,
+     "stripes": {
+      "from": "style",
+      "pick": {
+       "jelly": false,
+       "striped": true,
+       "frosted": false
+      }
+     },
+     "gloss": false,
+     "knobLight": true
+    },
+    {
+     "gen": "ui.toggle",
+     "v": 2,
+     "clip": [
+      "switch-off"
+     ],
+     "style": {
+      "from": "style"
+     },
+     "corner": {
+      "from": "corner",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        0.5,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "border": {
+      "from": "border",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.249,
+        1
+       ],
+       [
+        0.25,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "kind": "switch",
+     "checked": false,
+     "at": [
+      16,
+      16
+     ],
+     "size": 28,
+     "trim": [],
+     "topTrim": [],
+     "rightTrim": [],
+     "along": [],
+     "gleamTrim": [],
+     "gleamTop": [],
+     "gleamRight": [],
+     "rings": [
+      "ink",
+      "frame",
+      "ink"
+     ],
+     "bandAt": 1,
+     "lit": false,
+     "edge": "round",
+     "bevel": {
+      "from": "style",
+      "pick": {
+       "jelly": "none",
+       "striped": "none",
+       "frosted": "frosted"
+      }
+     },
+     "bevelDepth": 0.5,
+     "stripes": {
+      "from": "style",
+      "pick": {
+       "jelly": false,
+       "striped": true,
+       "frosted": false
+      }
+     },
+     "gloss": false,
+     "knobLight": true
+    },
+    {
+     "gen": "ui.pointer",
+     "v": 2,
+     "clip": [
+      "pointer"
+     ],
+     "style": {
+      "from": "style"
+     },
+     "corner": {
+      "from": "corner",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        0.5,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "border": {
+      "from": "border",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.249,
+        1
+       ],
+       [
+        0.25,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "at": [
+      4,
+      16
+     ],
+     "len": 20,
+     "reach": 2,
+     "art": [
+      {
+       "kind": "stamp",
+       "at": [
+        0,
+        -6
+       ],
+       "rows": [
+        "..........a.........",
+        ".........abaaa......",
+        "........abbbbba.....",
+        ".aaaaaaabbbbbbba....",
+        "accccccbbbbdebbbaa..",
+        "accccccbbbbbbbbbbba.",
+        "accccccbbbbbbbbbbbba",
+        "accccccbbbbbbbbbbba.",
+        "accccccbbbbbbbbbaa..",
+        ".aaaaaaabbbbbbba....",
+        "........abbbbba.....",
+        ".........abaaa......",
+        "..........a........."
+       ],
+       "key": {
+        "a": "ink",
+        "b": "accent",
+        "c": "frame",
+        "d": "shine",
+        "e": "accent.light"
+       }
+      }
+     ],
+     "tip": [
+      19,
+      0
+     ]
+    },
+    {
+     "gen": "ui.selector",
+     "v": 2,
+     "clip": [
+      "selector"
+     ],
+     "style": {
+      "from": "style"
+     },
+     "corner": {
+      "from": "corner",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        0.5,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "border": {
+      "from": "border",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.249,
+        1
+       ],
+       [
+        0.25,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "at": [
+      1,
+      1
+     ],
+     "size": [
+      30,
+      30
+     ],
+     "len": 4,
+     "steps": "between",
+     "lit": true
+    }
+   ]
+  }
+ },
+ "clips": {
+  "check-on": {
+   "frames": 1,
+   "fps": 8,
+   "label": "Ticked box, while the option is on",
+   "noText": true,
+   "sounds": [
+    {
+     "sound": "ui-click",
+     "preset": "Glass tick",
+     "frame": 0,
+     "volume": 0.6
+    }
+   ]
+  },
+  "check-off": {
+   "frames": 1,
+   "fps": 8,
+   "label": "Empty box, while the option is off",
+   "noText": true
+  },
+  "radio-on": {
+   "frames": 1,
+   "fps": 8,
+   "label": "Chosen dot, for the one option picked",
+   "noText": true
+  },
+  "radio-off": {
+   "frames": 1,
+   "fps": 8,
+   "label": "Empty dot, for each option not picked",
+   "noText": true
+  },
+  "switch-on": {
+   "frames": 1,
+   "fps": 8,
+   "label": "Switch, while the setting is on",
+   "noText": true,
+   "sounds": [
+    {
+     "sound": "ui-click",
+     "preset": "Glass tick",
+     "frame": 0,
+     "volume": 0.6
+    }
+   ]
+  },
+  "switch-off": {
+   "frames": 1,
+   "fps": 8,
+   "label": "Switch, while the setting is off",
+   "noText": true
+  },
+  "pointer": {
+   "frames": 8,
+   "fps": 8,
+   "label": "Pointer, beside the item the player is on",
+   "noText": true
+  },
+  "selector": {
+   "frames": 8,
+   "fps": 8,
+   "label": "Selector, round the slot the player is on",
+   "noText": true
+  }
+ }
+}

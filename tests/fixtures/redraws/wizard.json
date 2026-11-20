@@ -1,0 +1,471 @@
+{
+ "id": "wizard",
+ "frozen": "2026-11-20",
+ "source": "sprites/wizard.js",
+ "sha256": "eb27c063d15dc779cfdd93958dfb8ac90e17c129dcfa17e72f0b3af3d6ea5f41",
+ "name": "Wizard",
+ "blurb": "A robed spell-caster with a glowing staff. Change the hat, beard, robe and magic.",
+ "meta": {
+  "type": "character",
+  "role": "characters/player",
+  "themes": [
+   "fantasy",
+   "dungeon",
+   "forest"
+  ],
+  "gameTypes": [
+   "platformer",
+   "turn-based-rpg"
+  ],
+  "view": "side",
+  "words": [
+   "wizard",
+   "mage",
+   "sorcerer",
+   "magician",
+   "witch",
+   "spellcaster",
+   "necromancer",
+   "staff",
+   "magic",
+   "spell",
+   "cast",
+   "robe",
+   "hero"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  64,
+  64
+ ],
+ "pivot": [
+  28,
+  58
+ ],
+ "grounded": false,
+ "preview": "cast",
+ "params": {
+  "height": {
+   "kind": "range",
+   "label": "Height",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Short",
+   "hi": "Tall",
+   "group": "Look"
+  },
+  "build": {
+   "kind": "range",
+   "label": "Build",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slim",
+   "hi": "Stout",
+   "group": "Look"
+  },
+  "head": {
+   "kind": "range",
+   "label": "Head",
+   "def": 0.55,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "hat": {
+   "kind": "choice",
+   "label": "Hat",
+   "def": "pointed",
+   "options": [
+    {
+     "value": "pointed",
+     "label": "Pointed"
+    },
+    {
+     "value": "crooked",
+     "label": "Crooked"
+    },
+    {
+     "value": "wide",
+     "label": "Wide"
+    },
+    {
+     "value": "hood",
+     "label": "Hood"
+    }
+   ],
+   "group": "Look"
+  },
+  "beard": {
+   "kind": "choice",
+   "label": "Beard",
+   "def": "long",
+   "options": [
+    {
+     "value": "long",
+     "label": "Long"
+    },
+    {
+     "value": "short",
+     "label": "Short"
+    },
+    {
+     "value": "none",
+     "label": "None"
+    }
+   ],
+   "group": "Look"
+  },
+  "staff": {
+   "kind": "choice",
+   "label": "Staff",
+   "def": "orb",
+   "options": [
+    {
+     "value": "orb",
+     "label": "Orb"
+    },
+    {
+     "value": "crystal",
+     "label": "Crystal"
+    },
+    {
+     "value": "crook",
+     "label": "Crook"
+    }
+   ],
+   "group": "Look"
+  },
+  "staffLength": {
+   "kind": "range",
+   "label": "Length",
+   "def": 1,
+   "min": 0.6,
+   "max": 1.3,
+   "step": 0.05,
+   "lo": "Short",
+   "hi": "Tall",
+   "group": "Look"
+  },
+  "staffAngle": {
+   "kind": "range",
+   "label": "Hold angle",
+   "def": 0,
+   "min": -6,
+   "max": 14,
+   "step": 1,
+   "lo": "Upright",
+   "hi": "Forward",
+   "group": "Look"
+  },
+  "robeLen": {
+   "kind": "range",
+   "label": "Robe length",
+   "def": 0.85,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Knee",
+   "hi": "Floor",
+   "group": "Look"
+  },
+  "skin": {
+   "kind": "color",
+   "label": "Skin",
+   "def": "#f6d3b0",
+   "swatches": [
+    "#f6d3b0",
+    "#e8b088",
+    "#c98a5c",
+    "#9a6240",
+    "#6e4428",
+    "#9bd18a",
+    "#b9a7e0"
+   ],
+   "group": "Colors"
+  },
+  "beardColor": {
+   "kind": "color",
+   "label": "Hair and beard",
+   "def": "#d8d8e0",
+   "swatches": [
+    "#2b2233",
+    "#5a3a22",
+    "#a8612a",
+    "#e0b040",
+    "#d8d8e0",
+    "#c9423a",
+    "#3f7fd1",
+    "#e670b0"
+   ],
+   "group": "Colors",
+   "when": [
+    {
+     "hat": [
+      "pointed",
+      "crooked",
+      "wide"
+     ]
+    },
+    {
+     "beard": [
+      "long",
+      "short"
+     ]
+    }
+   ]
+  },
+  "robe": {
+   "kind": "color",
+   "label": "Robe",
+   "def": "#7a4fc4",
+   "swatches": [
+    "#c9423a",
+    "#e08a2c",
+    "#e6c545",
+    "#4f9d57",
+    "#2f8f9d",
+    "#3f6fd1",
+    "#7a4fc4",
+    "#d65a9c",
+    "#6b7280",
+    "#3a3350",
+    "#f0ead8"
+   ],
+   "group": "Colors"
+  },
+  "trim": {
+   "kind": "color",
+   "label": "Trim",
+   "def": "#e6c545",
+   "swatches": [
+    "#c9423a",
+    "#e08a2c",
+    "#e6c545",
+    "#4f9d57",
+    "#2f8f9d",
+    "#3f6fd1",
+    "#7a4fc4",
+    "#d65a9c",
+    "#6b7280",
+    "#3a3350",
+    "#f0ead8"
+   ],
+   "group": "Colors"
+  },
+  "magic": {
+   "kind": "color",
+   "label": "Magic",
+   "def": "#4fd8ee",
+   "swatches": [
+    "#4fd8ee",
+    "#6fe86a",
+    "#f4e04a",
+    "#ff8a3c",
+    "#ff5a8a",
+    "#b98cff"
+   ],
+   "group": "Colors"
+  },
+  "spell": {
+   "kind": "range",
+   "label": "Spell size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Spark",
+   "hi": "Blast",
+   "group": "Motion"
+  },
+  "bounce": {
+   "kind": "range",
+   "label": "Bounce",
+   "def": 0.4,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Calm",
+   "hi": "Bouncy",
+   "group": "Motion"
+  },
+  "stride": {
+   "kind": "range",
+   "label": "Stride",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small steps",
+   "hi": "Big steps",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    7,
+    10
+   ]
+  },
+  "walk": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "run": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    9,
+    15,
+    20
+   ]
+  },
+  "jump": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    7,
+    12,
+    16
+   ]
+  },
+  "cast": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    7,
+    12,
+    16
+   ]
+  },
+  "hurt": {
+   "frames": 4,
+   "loop": false,
+   "fps": [
+    6,
+    9,
+    13
+   ]
+  },
+  "die": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "victory": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    8,
+    12
+   ]
+  },
+  "talk": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    7,
+    10
+   ]
+  }
+ },
+ "sounds": {
+  "walk": [
+   {
+    "sound": "footstep-gravel",
+    "frame": 0,
+    "preset": "Sneaking"
+   },
+   {
+    "sound": "footstep-gravel",
+    "frame": 4,
+    "preset": "Sneaking"
+   }
+  ],
+  "run": [
+   {
+    "sound": "footstep-gravel",
+    "frame": 0,
+    "preset": "Sneaking"
+   },
+   {
+    "sound": "footstep-gravel",
+    "frame": 4,
+    "preset": "Sneaking"
+   }
+  ],
+  "jump": [
+   {
+    "sound": "jump",
+    "frame": 2,
+    "preset": "Tiny hop"
+   }
+  ],
+  "cast": [
+   {
+    "sound": "magic-spell",
+    "frame": 2
+   }
+  ],
+  "hurt": [
+   {
+    "sound": "punch",
+    "frame": 0,
+    "preset": "Light jab"
+   }
+  ],
+  "die": [
+   {
+    "sound": "punch",
+    "frame": 0,
+    "preset": "Heavy body blow",
+    "volume": 1
+   },
+   {
+    "sound": "land-thud",
+    "frame": 5,
+    "preset": "Soft landing",
+    "volume": 1
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-platformer-fantasy",
+  "kit-rpg-fantasy",
+  "wizard-camp"
+ ]
+}

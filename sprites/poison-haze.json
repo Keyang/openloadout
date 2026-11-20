@@ -1,0 +1,42 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "poison-haze",
+ "name": "Poison haze",
+ "blurb": "Poison hanging over a fighter or the ground: rising bubbles, a churning cloud or small skulls, and a puff of gas. Change its size, how many, spread, rise, style and colours.",
+ "meta": {"type":"effect","role":"effects/magic","themes":["neutral","fantasy","horror"],"gameTypes":["top-down-rpg","turn-based-rpg","roguelike-action","platformer"],"view":"side","words":["poison","poisoned","toxic","gas","haze","bubbles","venom","curse","sick","cloud","fumes","status","puff"],"license":"draft"},
+ "size": [48,48],
+ "pivot": [24,46],
+ "grounded": false,
+ "preview": "loop",
+ "styles": ["pixel"],
+ "versions": [
+  {"name":"Poisoned","params":{}},
+  {"name":"Toxic cloud","params":{"style":"cloud","spread":1}},
+  {"name":"Curse","params":{"style":"skulls","core":"#f0ead8","edge":"#c9423a"}},
+  {"name":"Swamp gas","params":{"style":"cloud","core":"#a4c44a","edge":"#3f8a4f"}},
+  {"name":"Faint","params":{"size":0,"pieces":3}}
+ ],
+ "palette": [
+  {"id":"core","label":"Core","default":"#9bd18a","material":"magic","swatches":["#9bd18a","#f0ead8","#f2c230","#a4c44a"]},
+  {"id":"edge","label":"Poison","default":"#7a4fc4","material":"warning","swatches":["#7a4fc4","#e08a2c","#c9423a","#4fd8ee","#3f6fd1","#3f8a4f","#9fe040"]}
+ ],
+ "controls": [
+  {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+  {"key":"pieces","kind":"range","label":"Pieces","lo":"Few","hi":"Many","default":5,"min":3,"max":8,"step":1},
+  {"key":"spread","kind":"range","label":"Spread","lo":"Tight","hi":"Wide","default":0.5},
+  {"key":"rise","kind":"range","label":"Rise","lo":"Low","hi":"High","default":0.5},
+  {"key":"style","kind":"choice","label":"Style","options":["bubbles","cloud","skulls"],"default":"bubbles"},
+  {"key":"core","kind":"colour","label":"Core"},
+  {"key":"edge","kind":"colour","label":"Poison"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": { "emitters": [
+  {"id":"loop","gen":"effect.poison-haze","v":1,"clip":["loop"],"picture":"loop","at":[24,46],"size":{"from":"size","map":[[0,0],[1,1]]},"pieces":{"from":"pieces","map":[[3,3],[8,8]],"round":"px"},"spread":{"from":"spread","map":[[0,0],[1,1]]},"rise":{"from":"rise","map":[[0,0],[1,1]]},"style":{"from":"style","pick":{"bubbles":"bubbles","cloud":"cloud","skulls":"skulls"}},"core":"core","edge":"edge"},
+  {"id":"burst","gen":"effect.poison-haze","v":1,"clip":["burst"],"picture":"burst","at":[24,46],"size":{"from":"size","map":[[0,0],[1,1]]},"pieces":{"from":"pieces","map":[[3,3],[8,8]],"round":"px"},"spread":{"from":"spread","map":[[0,0],[1,1]]},"rise":{"from":"rise","map":[[0,0],[1,1]]},"style":{"from":"style","pick":{"bubbles":"bubbles","cloud":"cloud","skulls":"skulls"}},"core":"core","edge":"edge"}
+ ] },
+ "clips": {
+  "loop": {"frames":8,"fps":10,"sounds":[{"sound":"bubbles","preset":"Slow drips","frame":0,"volume":0.35,"when":{"style":["bubbles"]}}]},
+  "burst": {"frames":8,"fps":16,"loop":false,"sounds":[{"sound":"whoosh","preset":"Quick swipe","frame":0,"volume":0.7}]}
+ }
+}

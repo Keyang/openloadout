@@ -1,0 +1,183 @@
+{
+ "id": "heart",
+ "frozen": "2026-11-20",
+ "source": "sprites/heart.js",
+ "sha256": "7c1e2090aca77db4694ad0e528d76b186184151b21354acede81f1260a07d97a",
+ "name": "Heart",
+ "blurb": "A beating heart that gives health back. Change its shape, size, wings, shine, colour and how hard it beats.",
+ "meta": {
+  "type": "pickup",
+  "role": "items/pickup",
+  "themes": [
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "platformer",
+   "arcade",
+   "roguelike-action"
+  ],
+  "view": "front",
+  "words": [
+   "heart",
+   "health",
+   "life",
+   "heal",
+   "love",
+   "hp",
+   "beat",
+   "collect",
+   "pickup",
+   "extra life",
+   "recover",
+   "winged"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  30
+ ],
+ "grounded": false,
+ "preview": "idle",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "shape": {
+   "kind": "choice",
+   "label": "Shape",
+   "def": "classic",
+   "options": [
+    {
+     "value": "classic",
+     "label": "Classic"
+    },
+    {
+     "value": "round",
+     "label": "Round"
+    },
+    {
+     "value": "pixel",
+     "label": "Pixel"
+    },
+    {
+     "value": "crystal",
+     "label": "Crystal"
+    }
+   ],
+   "group": "Look"
+  },
+  "wings": {
+   "kind": "toggle",
+   "label": "Wings",
+   "def": false,
+   "group": "Look"
+  },
+  "shine": {
+   "kind": "toggle",
+   "label": "Shine",
+   "def": true,
+   "group": "Look"
+  },
+  "sparkle": {
+   "kind": "toggle",
+   "label": "Sparkle",
+   "def": true,
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Heart",
+   "def": "#c9423a",
+   "swatches": [
+    "#c9423a",
+    "#e08a2c",
+    "#4fd8ee",
+    "#7a4fc4",
+    "#a4c44a",
+    "#3f6fd1"
+   ],
+   "group": "Colors"
+  },
+  "bob": {
+   "kind": "range",
+   "label": "Beat",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Gentle",
+   "hi": "Strong",
+   "group": "Motion"
+  },
+  "pop": {
+   "kind": "range",
+   "label": "Pop height",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Low",
+   "hi": "High",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "collect": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    9,
+    15,
+    20
+   ]
+  }
+ },
+ "sounds": {
+  "collect": [
+   {
+    "sound": "gem-pickup",
+    "preset": "Heart",
+    "frame": 1,
+    "volume": 0.7
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-platformer-fantasy"
+ ]
+}

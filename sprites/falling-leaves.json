@@ -1,0 +1,39 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "falling-leaves",
+ "name": "Falling leaves",
+ "blurb": "Leaves in two colours turning over as they fall and sway through the whole scene, drifting, fluttering or blown slantwise by a gust. Change how many leaves, their size, the style, the sway, the colours and the speed. Lay copies 62 px apart to cover the screen.",
+ "meta": {"type":"effect","role":"effects/weather","themes":["neutral","forest","farm"],"gameTypes":["platformer","top-down-rpg","farming-sim","puzzle"],"view":"none","words":["leaves","falling leaves","autumn","fall","foliage","drifting","flutter","gust","breeze","season","overlay"],"license":"draft"},
+ "size": [64,64],
+ "pivot": [32,32],
+ "grounded": false,
+ "preview": "loop",
+ "styles": ["pixel"],
+ "versions": [
+  {"name":"Autumn","params":{}},
+  {"name":"Summer green","params":{"body":"#3f8a4f","accent":"#6aa83e"}},
+  {"name":"Gusty","params":{"style":"gust","pieces":9}},
+  {"name":"A few big leaves","params":{"pieces":3,"size":1,"style":"flutter"}},
+  {"name":"Red and brown","params":{"body":"#c9423a","accent":"#a06a3c"}}
+ ],
+ "palette": [
+  {"id":"body","label":"Leaves","default":"#e08a2c","material":"plant","swatches":["#e08a2c","#c9423a","#3f8a4f","#7a4f33"]},
+  {"id":"accent","label":"Second leaves","default":"#f2c230","material":"plant","swatches":["#f2c230","#a4c44a","#6aa83e","#a06a3c"]}
+ ],
+ "controls": [
+  {"key":"pieces","kind":"range","label":"Leaves","lo":"Few","hi":"Many","default":5,"min":3,"max":9,"step":1},
+  {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+  {"key":"style","kind":"choice","label":"Style","options":["drift","flutter","gust"],"default":"drift"},
+  {"key":"sway","kind":"range","label":"Sway","lo":"Still","hi":"Swaying","default":0.5,"group":"Motion"},
+  {"key":"body","kind":"colour","label":"Leaves"},
+  {"key":"accent","kind":"colour","label":"Second leaves"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": { "emitters": [
+  {"id":"loop","gen":"effect.falling-leaves","v":1,"clip":["loop"],"picture":"loop","at":[32,32],"pieces":{"from":"pieces","map":[[3,3],[9,9]],"round":"px"},"size":{"from":"size","map":[[0,0],[1,1]]},"style":{"from":"style","pick":{"drift":"drift","flutter":"flutter","gust":"gust"}},"sway":{"from":"sway","map":[[0,0],[1,1]]},"body":"body","accent":"accent"}
+ ] },
+ "clips": {
+  "loop": {"frames":8,"fps":10}
+ }
+}

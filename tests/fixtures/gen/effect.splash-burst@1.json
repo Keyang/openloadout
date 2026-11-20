@@ -1,0 +1,213 @@
+{
+ "id": "effect.splash-burst",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     24,
+     24
+    ],
+    "core": "p0",
+    "edge": "p1",
+    "picture": "burst"
+   },
+   "ctx": {
+    "frame": 0,
+    "frames": 8,
+    "t": 0,
+    "loop": true,
+    "size": [
+     48,
+     48
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      10,
+      3
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..............a..............",
+      ".............aba.............",
+      "...........aaabaaa...........",
+      "...........acabaaa...........",
+      "......a.....abdba.....a......",
+      ".....aba....abdba....aba.....",
+      ".....aba....abdba....aba.....",
+      ".....abba...abdba...abba.....",
+      ".....abdba..abdba..abdba.....",
+      ".....abddba.abdba.abddba.....",
+      ".....abddba.abdba.abddba.....",
+      ".aa..abdcdbaabdbaabdcdba..aa.",
+      "abba..abddbaabdbaabddba..abba",
+      "abdbaaabddbaabdbaabddbaaabdba",
+      "abddbbabddbabdcdbabddbabbddba",
+      ".abddbaabddbdcccdbddbaabddba.",
+      ".abdcdbabdcdcccccdcdbabdcdba.",
+      "..abdcdbdcccccccccccdbdcdba..",
+      "...abdcdcccccccccccccdcdba...",
+      "...abdddddddddddddddddddba...",
+      "....abbbbbbbbbbbbbbbbbbba...."
+     ],
+     "key": {
+      "a": {
+       "rule": "tone",
+       "of": "p1",
+       "by": -1
+      },
+      "b": "p1",
+      "c": "p0",
+      "d": {
+       "rule": "mix",
+       "of": "p0",
+       "with": "p1",
+       "amount": 0.5
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     24,
+     24
+    ],
+    "core": "p0",
+    "edge": "p1",
+    "picture": "burst"
+   },
+   "ctx": {
+    "frame": 3,
+    "frames": 8,
+    "t": 0.375,
+    "loop": true,
+    "size": [
+     48,
+     48
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      12,
+      2
+     ],
+     "anchor": "tl",
+     "rows": [
+      "............aa...........",
+      "............aaa..........",
+      ".............aa.aaa......",
+      ".......aa.......aaa......",
+      ".......aa................",
+      ".........................",
+      ".....................aa..",
+      ".....................aa..",
+      ".........................",
+      ".........................",
+      ".........................",
+      "............b............",
+      "...........bcb...........",
+      "...........bcb...........",
+      "......b...bcacb...b......",
+      ".....bcb..bcacb..bcb.....",
+      ".....bccb.bcacb.bccb.....",
+      ".....bccb.bcacb.bccb.....",
+      "aaaaabcacbbcacbbcacbaaaa.",
+      "abbbbbcacbbcacbbcacbbbbb.",
+      "bcccccaaaccaaaccaaacccccb",
+      ".bcccccccccccccccccccccb."
+     ],
+     "key": {
+      "a": {
+       "rule": "mix",
+       "of": "p0",
+       "with": "p1",
+       "amount": 0.5
+      },
+      "b": {
+       "rule": "tone",
+       "of": "p1",
+       "by": -1
+      },
+      "c": "p1"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     24,
+     24
+    ],
+    "size": 1,
+    "pieces": 10,
+    "spread": 1,
+    "style": "ripple",
+    "core": "p0",
+    "edge": "p1",
+    "picture": "burst"
+   },
+   "ctx": {
+    "frame": 5,
+    "frames": 8,
+    "t": 0.625,
+    "loop": true,
+    "size": [
+     48,
+     48
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      4,
+      19
+     ],
+     "anchor": "tl",
+     "rows": [
+      "....aaaaaaaaaaaa...aaaaaaaaaaaaa",
+      "aa.......bbbbbbbbbbbbbbbbbbbbbb.",
+      "aa.......bbbbbbbbbbbbbbbbbbbbbb.",
+      "....aaaaaaaaaaaaa.aaaaaaaaaaaaaa",
+      "...............................a"
+     ],
+     "key": {
+      "a": "p1",
+      "b": {
+       "rule": "mix",
+       "of": "p0",
+       "with": "p1",
+       "amount": 0.5
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      36,
+      19
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaa....",
+      "......aa",
+      "......aa",
+      "aaaa....",
+      "........"
+     ],
+     "key": {
+      "a": "p1"
+     }
+    }
+   ]
+  }
+ ]
+}

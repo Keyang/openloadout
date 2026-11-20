@@ -1,0 +1,177 @@
+{
+ "id": "arrow",
+ "frozen": "2026-11-20",
+ "source": "sprites/arrow.js",
+ "sha256": "fa293c3ac48a318378363e46f4987019d9a5c255f0d4f7a355fa0bff48fe78c2",
+ "name": "Arrow",
+ "blurb": "An arrow that flies to the right and sticks, quivering, where it hits. Change its length, head, feathers, trail and colours.",
+ "meta": {
+  "type": "projectile",
+  "role": "effects/projectile",
+  "themes": [
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "platformer",
+   "arcade",
+   "shooter"
+  ],
+  "view": "side",
+  "words": [
+   "arrow",
+   "bolt",
+   "dart",
+   "bow",
+   "archer",
+   "shot",
+   "shoot",
+   "fly",
+   "hit",
+   "stuck",
+   "ranged attack",
+   "feather",
+   "wooden"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  16
+ ],
+ "pivot": [
+  16,
+  8
+ ],
+ "grounded": false,
+ "preview": "fly",
+ "params": {
+  "length": {
+   "kind": "range",
+   "label": "Length",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Short",
+   "hi": "Long",
+   "group": "Look"
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "broad",
+   "options": [
+    {
+     "value": "broad",
+     "label": "Broad"
+    },
+    {
+     "value": "needle",
+     "label": "Needle"
+    },
+    {
+     "value": "barbed",
+     "label": "Barbed"
+    },
+    {
+     "value": "blunt",
+     "label": "Blunt"
+    }
+   ],
+   "group": "Look"
+  },
+  "trail": {
+   "kind": "toggle",
+   "label": "Trail",
+   "def": true,
+   "group": "Look"
+  },
+  "wood": {
+   "kind": "color",
+   "label": "Wood",
+   "def": "#a06a3c",
+   "swatches": [
+    "#a06a3c",
+    "#7a4f33",
+    "#f0ead8",
+    "#a8612a",
+    "#5a3a22",
+    "#c98a4a"
+   ],
+   "group": "Colors"
+  },
+  "metal": {
+   "kind": "color",
+   "label": "Metal",
+   "def": "#c2c9d6",
+   "swatches": [
+    "#c2c9d6",
+    "#f2c230",
+    "#8f97a8",
+    "#5d6475",
+    "#e6c545"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Feathers",
+   "def": "#c9423a",
+   "swatches": [
+    "#c9423a",
+    "#7a4fc4",
+    "#4fd8ee",
+    "#a4c44a"
+   ],
+   "group": "Colors"
+  },
+  "wobble": {
+   "kind": "range",
+   "label": "Wobble",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Firm",
+   "hi": "Wobbly",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "fly": {
+   "frames": 4,
+   "loop": true,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  },
+  "hit": {
+   "frames": 6,
+   "loop": false,
+   "fps": [
+    10,
+    17,
+    23
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [],
+ "bundles": [
+  "kit-platformer-fantasy"
+ ]
+}

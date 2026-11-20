@@ -1,0 +1,172 @@
+{
+ "id": "bg-starfield",
+ "frozen": "2026-11-20",
+ "source": "sprites/bg-starfield.js",
+ "sha256": "9106ec2a7dd1b16ede9dc8f8b8b0e4fc5c11061a3f893f04166b6a99f45662dd",
+ "name": "Starfield",
+ "blurb": "Deep space with nebula clouds, twinkling stars and a planet, a ringed planet or drifting wreckage along the bottom, in three layers that repeat sideways: scroll far at 0.1, mid at 0.4 and near at 0.7 of the camera's speed. Change the colours, how many stars there are and whether they twinkle.",
+ "meta": {
+  "type": "background",
+  "role": "environment/background",
+  "themes": [
+   "sci-fi",
+   "space"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "shooter"
+  ],
+  "view": "none",
+  "words": [
+   "stars",
+   "starfield",
+   "night sky",
+   "galaxy",
+   "nebula",
+   "planet",
+   "rings",
+   "wreckage",
+   "cosmos",
+   "backdrop",
+   "parallax",
+   "menu",
+   "twinkle",
+   "scroll"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  320,
+  180
+ ],
+ "pivot": [
+  160,
+  180
+ ],
+ "grounded": false,
+ "preview": "far",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "planet",
+   "options": [
+    {
+     "value": "planet",
+     "label": "Planet edge"
+    },
+    {
+     "value": "ringed",
+     "label": "Ringed planet"
+    },
+    {
+     "value": "wreckage",
+     "label": "Wreckage"
+    }
+   ],
+   "group": "Look"
+  },
+  "stars": {
+   "kind": "range",
+   "label": "Stars",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "sparkle": {
+   "kind": "toggle",
+   "label": "Sparkle",
+   "def": true,
+   "group": "Look"
+  },
+  "sky": {
+   "kind": "color",
+   "label": "Space",
+   "def": "#434d6d",
+   "swatches": [
+    "#434d6d",
+    "#566182",
+    "#6660b6",
+    "#6b7896",
+    "#a87894"
+   ],
+   "group": "Colors"
+  },
+  "haze": {
+   "kind": "color",
+   "label": "Nebula",
+   "def": "#6660b6",
+   "swatches": [
+    "#6660b6",
+    "#b48af8",
+    "#6b7896",
+    "#9aa6c0",
+    "#2fb3a8",
+    "#566182"
+   ],
+   "group": "Colors"
+  },
+  "land": {
+   "kind": "color",
+   "label": "Planet",
+   "def": "#2fb3a8",
+   "swatches": [
+    "#2fb3a8",
+    "#6b7896",
+    "#566182",
+    "#434d6d",
+    "#ca9eda"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "far": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    3,
+    4,
+    6
+   ]
+  },
+  "mid": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    3,
+    4,
+    6
+   ]
+  },
+  "near": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    3,
+    4,
+    6
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [],
+ "bundles": [
+  "kit-roguelite-scifi"
+ ]
+}

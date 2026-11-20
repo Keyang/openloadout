@@ -1,0 +1,420 @@
+{
+ "id": "icon.badge",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "paint": "body",
+    "face": "face",
+    "draw": [
+     {
+      "gen": "icon.body",
+      "v": 1,
+      "shapes": [
+       {
+        "kind": "poly",
+        "points": [
+         [
+          -8.4,
+          -9.6
+         ],
+         [
+          -6,
+          -9.6
+         ],
+         [
+          -6,
+          11.5
+         ],
+         [
+          -8.4,
+          11.5
+         ]
+        ],
+        "paint": "accent"
+       },
+       {
+        "kind": "ellipse",
+        "at": [
+         -7.2,
+         -10
+        ],
+        "r": [
+         1.8,
+         1.6
+        ],
+        "paint": "accent"
+       }
+      ],
+      "paint": "accent",
+      "soft": 0
+     },
+     {
+      "gen": "icon.rim",
+      "v": 1,
+      "shapes": [
+       {
+        "kind": "poly",
+        "points": [
+         [
+          -6,
+          -9.6
+         ],
+         [
+          10.6,
+          -5
+         ],
+         [
+          -6,
+          -0.4
+         ]
+        ],
+        "paint": "body"
+       }
+      ],
+      "paint": "ink"
+     },
+     {
+      "gen": "icon.body",
+      "v": 1,
+      "shapes": [
+       {
+        "kind": "poly",
+        "points": [
+         [
+          -6,
+          -9.6
+         ],
+         [
+          10.6,
+          -5
+         ],
+         [
+          -6,
+          -0.4
+         ]
+        ],
+        "paint": "body"
+       }
+      ],
+      "paint": "body",
+      "soft": 0
+     }
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      6,
+      4
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".......aaaaaa.......",
+      ".....aabbbbbbaa.....",
+      "....abcaaaaaabba....",
+      "...acaaddddddaaba...",
+      "..acaddaaadddddaba..",
+      ".aeaddafaaaaaaddaba.",
+      ".aeaddaaebaaaaadaba.",
+      ".aadddaaebbbeeaadaa.",
+      "aeadddaaeeeaaaaddaba",
+      "aeadddafaaaaaadddaba",
+      "aeadddafaaaddddddaba",
+      ".aadddafaddddddddaa.",
+      ".aeaddafadddddddaba.",
+      ".aeaddafadddddddaba.",
+      "..aeaddadddddddaca..",
+      "...aeaaddddddaaca...",
+      "....aeeaaaaaacca....",
+      ".....aeecccccca.....",
+      "......aeecccca......",
+      ".......aeccca.......",
+      ".......aeecba.......",
+      "........aeea........",
+      ".........aa........."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body.light",
+      "c": "body",
+      "d": "face",
+      "e": "body.dark",
+      "f": "accent.dark"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "paint": "body",
+    "face": "face",
+    "size": 1,
+    "tip": 11.5,
+    "pinGrow": 0.15,
+    "snap": true,
+    "draw": [
+     {
+      "gen": "icon.body",
+      "v": 1,
+      "shapes": [
+       {
+        "kind": "poly",
+        "points": [
+         [
+          -10,
+          -8
+         ],
+         [
+          10,
+          -8
+         ],
+         [
+          0,
+          10
+         ]
+        ],
+        "paint": "body"
+       }
+      ],
+      "paint": "body",
+      "soft": 0
+     }
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      5,
+      3
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".......aaaaaaaa.......",
+      ".....aabbbbbbbbaa.....",
+      "....abcaaaaaaaabba....",
+      "...accaddddddddabba...",
+      "..aecaddddddddddabba..",
+      "..acaddddddddddddaba..",
+      ".aeadddaaaaaaaaaddaba.",
+      ".aeaddaeebbbbbbbadaba.",
+      ".aaddddaeccccccadddaa.",
+      "aeaddddaeeccccbadddaba",
+      "aeadddddaeecccaddddaba",
+      "aeaddddddaeccadddddaba",
+      ".aeadddddaeebaddddaca.",
+      ".aeaddddddaeadddddaba.",
+      ".aeeadddddaeaddddacba.",
+      "..aeaddddddadddddaca..",
+      "...aeaaddddddddaaca...",
+      "....aeeaddddddacca....",
+      ".....aeeaaaaaacca.....",
+      "......aeecccccca......",
+      ".......aeccccca.......",
+      ".......aeecccba.......",
+      "........aeecca........",
+      ".........aeca.........",
+      ".........aeea.........",
+      "..........aa.........."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body.light",
+      "c": "body",
+      "d": "face",
+      "e": "body.dark"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "paint": "body",
+    "face": "face",
+    "size": 0,
+    "tip": 7.8,
+    "shiny": false,
+    "draw": [
+     {
+      "kind": "stamp",
+      "at": [
+       0,
+       0
+      ],
+      "rows": [
+       "....++..+.",
+       "...++++.+.",
+       "..+++++++.",
+       ".++++++++.",
+       "----------",
+       ".x#######.",
+       ".x#######.",
+       ".x##..###.",
+       ".x##..###.",
+       ".x##..###."
+      ],
+      "key": {
+       "+": "accent",
+       "-": "accent.dark",
+       "x": "pale.dark",
+       "#": "pale"
+      }
+     },
+     {
+      "kind": "stamp",
+      "at": [
+       0,
+       0
+      ],
+      "rows": [
+       "......",
+       "......",
+       "......",
+       "......",
+       "......",
+       "......",
+       "......",
+       "....##",
+       "....##",
+       "....##"
+      ],
+      "key": {
+       "#": "body"
+      }
+     }
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      6,
+      6
+     ],
+     "anchor": "tl",
+     "rows": [
+      "......aaaaaaaa......",
+      "....aabbaaaabbaa....",
+      "...abbaaccccaabba...",
+      "..adbacccaaccaabba..",
+      "..abacccaeeaaeaaba..",
+      ".adacccaeeeeaeacaba.",
+      ".abaccaeeeeeeeacaba.",
+      "adaccaeeeeeeeeaccaba",
+      "adacaffffffffffacaba",
+      "adaccaghhhhhhhaccaba",
+      "adaccaghhhhhhhaccaba",
+      "adaccaghhbbhhhaccaba",
+      ".adacaghhbbhhhacaba.",
+      ".adacaghhbbhhhacaba.",
+      "..adacaaaaaaaacaba..",
+      "...adaccccccccaba...",
+      "....adaaaccaaaba....",
+      ".....adddaabbda.....",
+      "......aaddddaa......",
+      "........aaaa........"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body",
+      "c": "face",
+      "d": "body.dark",
+      "e": "accent",
+      "f": "accent.dark",
+      "g": "pale.dark",
+      "h": "pale"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "draw": [
+     {
+      "gen": "icon.body",
+      "v": 1,
+      "shapes": [
+       {
+        "gen": "taper",
+        "v": 1,
+        "from": [
+         -8.2,
+         -8.2
+        ],
+        "to": [
+         8.2,
+         8.2
+        ],
+        "r0": 2.9,
+        "paint": "body"
+       },
+       {
+        "gen": "taper",
+        "v": 1,
+        "from": [
+         -8.2,
+         8.2
+        ],
+        "to": [
+         8.2,
+         -8.2
+        ],
+        "r0": 2.9,
+        "paint": "body"
+       }
+      ],
+      "paint": "body",
+      "soft": 0
+     }
+    ],
+    "pin": false,
+    "grow": 0.5,
+    "size": 0.7
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      4,
+      4
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...aa..............aa...",
+      "..abbaa..........aabba..",
+      ".accbbba........abccbba.",
+      "adccccbba......acccccbba",
+      "addccccbba....acccccccba",
+      ".adcccccbba..acccccccca.",
+      ".addcccccbbaaccccccccba.",
+      "..addcccccbbccccccccca..",
+      "...addcccccccccccccca...",
+      "....addcccccccccccca....",
+      ".....addcccccccccca.....",
+      "......adccccccccca......",
+      "......acccccccccba......",
+      ".....accccccccccbba.....",
+      "....accccccccccccbba....",
+      "...accccccccccccccbba...",
+      "..acccccccccddcccccbba..",
+      ".adccccccccaaddcccccbba.",
+      ".acccccccca..addcccccba.",
+      "adccccccca....addccccbba",
+      "addccccca......addccccba",
+      ".addccda........adddcca.",
+      "..addaa..........aadda..",
+      "...aa..............aa..."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body.light",
+      "c": "body",
+      "d": "body.dark"
+     }
+    }
+   ]
+  }
+ ]
+}

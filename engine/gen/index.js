@@ -35,12 +35,16 @@ import './prize-items.js';   // migration batch M2: the ten pickups' shape gener
 import './world-props.js';   // migration batch M3: the library props' shape generators (spring.pad@1 ...), ports of their code
 import './motion-sheen.js';  // migration batch M1: pickup.sheen@1, the glint sweep of a floating pickup (engine/gen/motion-sheen.js)
 import './chip.js';          // migration batch M1: chip@1 and chip.turn@1, the credit chip's turning face (engine/gen/chip.js)
+import './faces.js';         // migration batch M4b: portrait@1, the portrait sets' faces, a port of engine/faces.js (engine/gen/faces.js)
+import './icon-badges.js';   // migration batch M4b: icon.badge@1, the map marks' badge pins (engine/gen/icon-badges.js)
 import './cell.js';          // migration batch M1: cell@1 and cell.pulse@1, the health cell's charge and beat (engine/gen/cell.js)
 import { SKIN_FRAME_GENERATORS } from './ui-skin.js';      // migration batch M8: ui.slab, ui.trough, ui.strip, ui.toggle, ui.pointer, ui.selector, ui.area, the skin families' pieces (engine/gen/ui-skin.js)
 import './text.js';          // migration batch M9: font.cell@1 and the text ports, the interface pieces' pixel letters (engine/gen/text.js)
 import './ui-inputs.js';     // migration batch M9: key.cap, key.wide, pad.dpad, pad.face, mouse, stick: the input pictures' ports (engine/gen/ui-inputs.js)
 import './ui-hud.js';        // migration batch M9: damage.digits, status.icons, crosshair ...: the HUD pictures' ports (engine/gen/ui-hud.js)
 import './ui-bubbles.js';    // migration batch M9: emote.marks, the bubbles and the name plate: their ports (engine/gen/ui-bubbles.js)
+import './scenery.js';      // migration batch M10: the backdrops' scenery generators (tall.trees@1, pillars@1 ...), ports of their code
+import { SCENERY_FRAME_GENERATORS } from './scenery-frame.js';
 import { BACKDROP_FRAME_GENERATORS } from './backdrop-frame.js';
 import { CHIPS_STAMP_BOUNDS, CHIPS_SIZE_KEYS } from './fx-chips.js';
 import { SPIN_STAMP_BOUNDS, SPIN_SIZE_KEYS } from './fx-spin.js';
@@ -48,6 +52,9 @@ import { FX_STAMP_BOUNDS, FX_SIZE_KEYS } from './fx-burst.js';   // not from bac
 import { QUAD_STAMP_BOUNDS, QUAD_SIZE_KEYS } from './fx-quad.js';
 import { GRID_FRAME_GENERATORS } from './grid.js';   // imports nothing of backdrop.js, so it is whole here
 import { B12C_STAMP_BOUNDS, B12C_SIZE_KEYS, B12C_FRAME_GENERATORS } from './fx-b12c.js';   // build item B12c: the other 20 effect behaviours (engine/gen/fx-glints.js, fx-debris.js, fx-fire.js, fx-spells.js, fx-fields.js)
+import { E2_STAMP_BOUNDS, E2_SIZE_KEYS, E2_FRAME_GENERATORS } from './fx-e2.js';   // migration batch E2: the effect behaviours its redraws needed (engine/gen/fx-e2.js)
+import { E1_STAMP_BOUNDS, E1_SIZE_KEYS, E1_FRAME_GENERATORS } from './fx-e1.js';   // build item E1: the behaviours the hit, blast and spell redraws add (engine/gen/fx-e1.js)
+import { E1_EFFECT_STAMP_BOUNDS, E1_EFFECT_SIZE_KEYS } from './fx-e1-effects.js';   // build item E1: ten library effects ported whole (engine/gen/fx-e1-effects.js)
 
 /** Declares and registers a generator version in the site's registry; returns its frozen entry (engine/gen/registry.js). */
 export { defineGenerator } from './registry.js';
@@ -92,6 +99,8 @@ export const ORIGIN_FIXED = Object.freeze({ 'gem.cut@1': 2, 'glint@1': 2, 'icon.
 export const STAMP_BOUNDS = Object.freeze({
   ...FX_STAMP_BOUNDS,
   ...B12C_STAMP_BOUNDS,
+  ...E1_STAMP_BOUNDS,                      // engine/gen/fx-e1.js: build item E1's behaviours
+  ...E1_EFFECT_STAMP_BOUNDS,               // engine/gen/fx-e1-effects.js: build item E1's effect ports
   // engine/gen/fx.js and fx-items.js (B2, B8): a twinkle is one stamp of at most 9 x 9; a pickup burst at most three
   // twinkles of size 1 and one of size 2 (its dots are not stamps); chunks are polygons and dots
   'twinkle@1': () => 81,
@@ -103,6 +112,7 @@ export const STAMP_BOUNDS = Object.freeze({
   'drop.motes@1': () => 0,
   ...SPIN_STAMP_BOUNDS,                    // engine/gen/fx-spin.js: whole-pixel rects only, no stamps
   ...QUAD_STAMP_BOUNDS,                    // engine/gen/fx-quad.js: the square ring's four corner cells; the rays are rects
+  ...E2_STAMP_BOUNDS,                      // engine/gen/fx-e2.js: migration batch E2's behaviours
 });
 
 /**
@@ -113,6 +123,8 @@ export const STAMP_BOUNDS = Object.freeze({
 export const SIZE_KEYS = Object.freeze({
   ...FX_SIZE_KEYS,
   ...B12C_SIZE_KEYS,
+  ...E1_SIZE_KEYS,                         // engine/gen/fx-e1.js: build item E1's behaviours
+  ...E1_EFFECT_SIZE_KEYS,                  // engine/gen/fx-e1-effects.js: build item E1's effect ports (a port keys nothing)
   'twinkle@1': Object.freeze([]),          // its cost (1) and its bound (81) read no argument
   'pickup.burst@1': Object.freeze([]),
   'chunks@1': Object.freeze([]),
@@ -121,12 +133,16 @@ export const SIZE_KEYS = Object.freeze({
   'drop.motes@1': Object.freeze([]),
   ...SPIN_SIZE_KEYS,                       // engine/gen/fx-spin.js: nothing keyable
   ...QUAD_SIZE_KEYS,                       // engine/gen/fx-quad.js: their keyable arguments price nothing
+  ...E2_SIZE_KEYS,                         // engine/gen/fx-e2.js: migration batch E2's behaviours
 });
 
 /** Generators that work in frame pixels by design, never on a node's own coordinates, each with why: "<id>@<v>" -> reason. */
 export const FRAME_GENERATORS = Object.freeze({
   ...BACKDROP_FRAME_GENERATORS,      // build item B14: backdrops wrap across the layer's width (engine/gen/backdrop.js)
+  ...SCENERY_FRAME_GENERATORS,       // migration batch M10: the backdrops' scenery wraps across the layer's width (engine/gen/scenery.js)
   ...B12C_FRAME_GENERATORS,          // build item B12c: the other effect behaviours keep to the frame's 1 px border, fall.field to the frame (engine/gen/fx-b12c.js)
+  ...E2_FRAME_GENERATORS,            // migration batch E2: its effect behaviours (engine/gen/fx-e2.js)
+  ...E1_FRAME_GENERATORS,            // build item E1: its behaviours keep to the frame's 1 px border as B12c's do (engine/gen/fx-e1.js)
   ...SKIN_FRAME_GENERATORS,          // migration batch M8: ui.area@1 draws nothing; its text areas and slice are frame pixels (engine/gen/ui-skin.js)
   'pickup.burst@1': 'an effect that keeps its sparkles 3 px inside the frame: name it as an emitter (the pictures layout puts an emitter on its node\'s frame first), not in a draw list on a node',
   'chunks@1': 'an effect whose floor row and box are frame rows and columns: name it as an emitter, not in a draw list on a node',

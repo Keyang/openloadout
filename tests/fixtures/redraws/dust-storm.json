@@ -1,0 +1,202 @@
+{
+ "id": "dust-storm",
+ "frozen": "2026-11-20",
+ "source": "sprites/dust-storm.js",
+ "sha256": "6996f0d57df63b5c4978afb26a3b49dfce7201b9e7e7439c6c8c6950ce007ea5",
+ "name": "Dust storm",
+ "blurb": "Sand and grit streaming sideways across the whole screen, as a sandstorm, a haze of fine dust or blown debris with tumbling leaves. Change how many grains, how long, the style, the sway, the colours and the speed. Lay copies 62 px apart (each over its neighbours' empty border) to cover the screen.",
+ "meta": {
+  "type": "effect",
+  "role": "effects/weather",
+  "themes": [
+   "neutral",
+   "farm"
+  ],
+  "gameTypes": [
+   "top-down-rpg",
+   "racing",
+   "shooter",
+   "platformer"
+  ],
+  "view": "none",
+  "words": [
+   "dust",
+   "sandstorm",
+   "sand",
+   "grit",
+   "wind",
+   "windy",
+   "desert",
+   "wasteland",
+   "debris",
+   "blowing",
+   "haze",
+   "overlay"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  64,
+  64
+ ],
+ "pivot": [
+  32,
+  32
+ ],
+ "grounded": false,
+ "preview": "loop",
+ "params": {
+  "pieces": {
+   "kind": "range",
+   "label": "Grains",
+   "def": 8,
+   "min": 4,
+   "max": 12,
+   "step": 1,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "length": {
+   "kind": "range",
+   "label": "Length",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Short",
+   "hi": "Long",
+   "group": "Look"
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "sand",
+   "options": [
+    {
+     "value": "sand",
+     "label": "Sand"
+    },
+    {
+     "value": "dust",
+     "label": "Dust"
+    },
+    {
+     "value": "debris",
+     "label": "Debris"
+    }
+   ],
+   "group": "Look"
+  },
+  "sway": {
+   "kind": "range",
+   "label": "Sway",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Still",
+   "hi": "Swaying",
+   "group": "Motion"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Sand",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#8f97a8",
+    "#7fb0b8",
+    "#e6c96a",
+    "#c9a06a"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Dark grains",
+   "def": "#a06a3c",
+   "swatches": [
+    "#a06a3c",
+    "#7a4f33",
+    "#5d6475",
+    "#e08a2c"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "loop": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  }
+ },
+ "sounds": {
+  "loop": [
+   {
+    "sound": "wind",
+    "frame": 0,
+    "preset": "Storm",
+    "volume": 0.35
+   }
+  ]
+ },
+ "versions": [
+  {
+   "name": "Sandstorm",
+   "params": {}
+  },
+  {
+   "name": "Golden sand",
+   "params": {
+    "body": "#e6c96a",
+    "pieces": 10
+   }
+  },
+  {
+   "name": "Dust haze",
+   "params": {
+    "style": "dust",
+    "length": 1
+   }
+  },
+  {
+   "name": "Debris",
+   "params": {
+    "style": "debris",
+    "pieces": 6
+   }
+  },
+  {
+   "name": "Grey grit",
+   "params": {
+    "body": "#8f97a8",
+    "accent": "#5d6475"
+   }
+  },
+  {
+   "name": "Light breeze",
+   "params": {
+    "pieces": 4,
+    "length": 0
+   }
+  }
+ ],
+ "bundles": []
+}

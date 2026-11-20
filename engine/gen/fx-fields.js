@@ -21,7 +21,7 @@ const mod = (v, m) => ((v % m) + m) % m;
 const snap = (v) => Math.round(v * 4096) / 4096;
 
 /** engine/weather.js fallLattice: `cols` columns over the period (never closer than 0.6 of the even spacing), `rows` pieces each. */
-function fallLattice(cols, rows, period, s) {
+export function fallLattice(cols, rows, period, s) {
   const gap = 0.6, w = period / cols, step = period / rows, out = [];
   for (let i = 0; i < cols; i++) {
     const x = snap((i + hash(i, s * 977 + 11) * (1 - gap)) * w);
@@ -32,7 +32,7 @@ function fallLattice(cols, rows, period, s) {
 }
 
 /** engine/weather.js fallAt: where one lattice piece is at loop progress u, modulo the period, and its turn. */
-function fallAt(piece, u, { rows, period, laps, slant, sway, swayCycles, turns, axis }) {
+export function fallAt(piece, u, { rows, period, laps, slant, sway, swayCycles, turns, axis }) {
   const step = period / rows;
   const along = snap(mod(piece.y + laps * u * step, period));
   const phase = hash(piece.col, 9173);
@@ -67,7 +67,7 @@ const ASH_SMALL = [[0, 0], [1, 0], [0, 1]];
 const ASH_BIG = [[0, 0], [0, -1], [1, 0], [-1, 1], [0, 1]];
 
 /** engine/weather.js pieceCells: the whole-pixel cells of one piece round its anchor, each with its paint ref. */
-function pieceCells(shape, { size = 1, colour: c, rim, core, angle = 0, turn = 0 }) {
+export function pieceCells(shape, { size = 1, colour: c, rim, core, angle = 0, turn = 0 }) {
   const rimOf = () => rim ?? toneRule(c, -1);
   switch (shape) {
     case 'dot': {

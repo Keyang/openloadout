@@ -1,0 +1,1167 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "portraits-party",
+ "name": "Party portraits",
+ "blurb": "Faces of the hero, the mage and the rogue for dialogue boxes and party menus: neutral, happy, hurt and talking. Change the border, the zoom and each person's colour.",
+ "meta": {
+  "type": "icon",
+  "role": "interface/icon",
+  "themes": [
+   "fantasy"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "top-down-rpg"
+  ],
+  "view": "front",
+  "words": [
+   "portrait",
+   "face",
+   "avatar",
+   "hero",
+   "mage",
+   "rogue",
+   "party",
+   "dialogue",
+   "talk",
+   "happy",
+   "hurt",
+   "status",
+   "headshot"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  48,
+  48
+ ],
+ "pivot": [
+  24,
+  24
+ ],
+ "grounded": false,
+ "preview": "hero-neutral",
+ "styles": [
+  "pixel"
+ ],
+ "palette": [
+  {
+   "id": "backing",
+   "label": "Backing",
+   "default": "#4a609c",
+   "material": "interface",
+   "swatches": [
+    "#4a609c",
+    "#9a6a3e",
+    "#f0ead8",
+    "#5a5f7a",
+    "#2f8f9d"
+   ]
+  },
+  {
+   "id": "skin",
+   "label": "Skin",
+   "default": "#f6d3b0",
+   "material": "skin",
+   "swatches": [
+    "#f6d3b0",
+    "#e8b088",
+    "#c98a5c",
+    "#9a6240",
+    "#6e4428",
+    "#9bd18a",
+    "#b9a7e0"
+   ]
+  },
+  {
+   "id": "hero",
+   "label": "Hero's tunic",
+   "default": "#3f6fd1",
+   "material": "cloth",
+   "swatches": [
+    "#3f6fd1",
+    "#7a4fc4",
+    "#2f8f9d",
+    "#8e3a4a",
+    "#4f9d57",
+    "#e08a2c",
+    "#e6c545"
+   ]
+  },
+  {
+   "id": "mage",
+   "label": "Mage's robe and hat",
+   "default": "#7a4fc4",
+   "material": "cloth",
+   "swatches": [
+    "#7a4fc4",
+    "#3f6fd1",
+    "#2f8f9d",
+    "#c9423a",
+    "#8e3a4a",
+    "#4f9d57",
+    "#e08a2c"
+   ]
+  },
+  {
+   "id": "rogue",
+   "label": "Rogue's hood",
+   "default": "#2f8f9d",
+   "material": "cloth",
+   "swatches": [
+    "#2f8f9d",
+    "#3f6fd1",
+    "#7a4fc4",
+    "#c9423a",
+    "#8e3a4a",
+    "#4f9d57",
+    "#e08a2c",
+    "#e6c545"
+   ]
+  },
+  {
+   "id": "wood",
+   "default": "#9a6a3e",
+   "material": "plant",
+   "detail": true
+  },
+  {
+   "id": "cream",
+   "default": "#f0ead8",
+   "material": "plant",
+   "detail": true
+  },
+  {
+   "id": "wheat",
+   "default": "#e6c96a",
+   "material": "plant",
+   "detail": true
+  },
+  {
+   "id": "crimson",
+   "default": "#c9423a",
+   "material": "cloth",
+   "detail": true
+  },
+  {
+   "id": "slate",
+   "default": "#5a5f7a",
+   "material": "cloth",
+   "detail": true
+  },
+  {
+   "id": "gold",
+   "default": "#f2c230",
+   "material": "metal",
+   "detail": true
+  },
+  {
+   "id": "steel",
+   "default": "#c2c9d6",
+   "material": "metal",
+   "detail": true
+  }
+ ],
+ "controls": [
+  {
+   "key": "frame",
+   "kind": "choice",
+   "label": "Border",
+   "options": [
+    "none",
+    "round",
+    "square"
+   ],
+   "default": "none",
+   "group": "Look"
+  },
+  {
+   "key": "size",
+   "kind": "range",
+   "label": "Zoom",
+   "lo": "Head and shoulders",
+   "hi": "Face",
+   "default": 0.5,
+   "group": "Look"
+  },
+  {
+   "key": "backing",
+   "kind": "colour",
+   "label": "Backing",
+   "group": "Colors",
+   "when": {
+    "frame": [
+     "round",
+     "square"
+    ]
+   }
+  },
+  {
+   "key": "skin",
+   "kind": "colour",
+   "label": "Skin",
+   "group": "Colors"
+  },
+  {
+   "key": "hero",
+   "kind": "colour",
+   "label": "Hero's tunic",
+   "group": "Colors"
+  },
+  {
+   "key": "mage",
+   "kind": "colour",
+   "label": "Mage's robe and hat",
+   "group": "Colors"
+  },
+  {
+   "key": "rogue",
+   "kind": "colour",
+   "label": "Rogue's hood",
+   "group": "Colors"
+  }
+ ],
+ "body": {
+  "pictures": {
+   "draw": [],
+   "pictures": {
+    "hero-neutral": {
+     "label": "Hero, neutral",
+     "draw": [
+      {
+       "gen": "portrait",
+       "v": 1,
+       "at": [
+        24,
+        24
+       ],
+       "zoom": {
+        "from": "size",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "frame": {
+        "from": "frame",
+        "pick": {
+         "none": "none",
+         "round": "round",
+         "square": "square"
+        }
+       },
+       "backing": "backing",
+       "edge": "cream",
+       "skin": "skin",
+       "white": {
+        "rule": "tone",
+        "of": "cream",
+        "by": 3
+       },
+       "build": 0.6,
+       "hair": "short",
+       "hairPaint": "wood",
+       "hairLight": 0.452298,
+       "headgear": "helmet",
+       "outfit": "hero",
+       "collar": "mantle",
+       "gearPaints": {
+        "metal": "steel",
+        "plume": "crimson"
+       },
+       "outfitPaints": {
+        "trim": {
+         "rule": "choose",
+         "when": {
+          "hero": [
+           "#c9423a"
+          ]
+         },
+         "then": {
+          "rule": "tone",
+          "of": "crimson",
+          "by": 0.85
+         },
+         "else": "crimson"
+        },
+        "clasp": "gold"
+       }
+      }
+     ]
+    },
+    "hero-happy": {
+     "label": "Hero, happy",
+     "draw": [
+      {
+       "gen": "portrait",
+       "v": 1,
+       "at": [
+        24,
+        24
+       ],
+       "zoom": {
+        "from": "size",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "frame": {
+        "from": "frame",
+        "pick": {
+         "none": "none",
+         "round": "round",
+         "square": "square"
+        }
+       },
+       "backing": "backing",
+       "edge": "cream",
+       "skin": "skin",
+       "white": {
+        "rule": "tone",
+        "of": "cream",
+        "by": 3
+       },
+       "mood": "happy",
+       "build": 0.6,
+       "hair": "short",
+       "hairPaint": "wood",
+       "hairLight": 0.452298,
+       "headgear": "helmet",
+       "outfit": "hero",
+       "collar": "mantle",
+       "gearPaints": {
+        "metal": "steel",
+        "plume": "crimson"
+       },
+       "outfitPaints": {
+        "trim": {
+         "rule": "choose",
+         "when": {
+          "hero": [
+           "#c9423a"
+          ]
+         },
+         "then": {
+          "rule": "tone",
+          "of": "crimson",
+          "by": 0.85
+         },
+         "else": "crimson"
+        },
+        "clasp": "gold"
+       }
+      }
+     ]
+    },
+    "hero-hurt": {
+     "label": "Hero, hurt",
+     "draw": [
+      {
+       "gen": "portrait",
+       "v": 1,
+       "at": [
+        24,
+        24
+       ],
+       "zoom": {
+        "from": "size",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "frame": {
+        "from": "frame",
+        "pick": {
+         "none": "none",
+         "round": "round",
+         "square": "square"
+        }
+       },
+       "backing": "backing",
+       "edge": "cream",
+       "skin": "skin",
+       "white": {
+        "rule": "tone",
+        "of": "cream",
+        "by": 3
+       },
+       "mood": "hurt",
+       "build": 0.6,
+       "hair": "short",
+       "hairPaint": "wood",
+       "hairLight": 0.452298,
+       "headgear": "helmet",
+       "outfit": "hero",
+       "collar": "mantle",
+       "gearPaints": {
+        "metal": "steel",
+        "plume": "crimson"
+       },
+       "outfitPaints": {
+        "trim": {
+         "rule": "choose",
+         "when": {
+          "hero": [
+           "#c9423a"
+          ]
+         },
+         "then": {
+          "rule": "tone",
+          "of": "crimson",
+          "by": 0.85
+         },
+         "else": "crimson"
+        },
+        "clasp": "gold"
+       }
+      }
+     ]
+    },
+    "hero-talk": {
+     "label": "Hero, talking",
+     "draw": [
+      {
+       "gen": "portrait",
+       "v": 1,
+       "at": [
+        24,
+        24
+       ],
+       "zoom": {
+        "from": "size",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "frame": {
+        "from": "frame",
+        "pick": {
+         "none": "none",
+         "round": "round",
+         "square": "square"
+        }
+       },
+       "backing": "backing",
+       "edge": "cream",
+       "skin": "skin",
+       "white": {
+        "rule": "tone",
+        "of": "cream",
+        "by": 3
+       },
+       "talk": true,
+       "build": 0.6,
+       "hair": "short",
+       "hairPaint": "wood",
+       "hairLight": 0.452298,
+       "headgear": "helmet",
+       "outfit": "hero",
+       "collar": "mantle",
+       "gearPaints": {
+        "metal": "steel",
+        "plume": "crimson"
+       },
+       "outfitPaints": {
+        "trim": {
+         "rule": "choose",
+         "when": {
+          "hero": [
+           "#c9423a"
+          ]
+         },
+         "then": {
+          "rule": "tone",
+          "of": "crimson",
+          "by": 0.85
+         },
+         "else": "crimson"
+        },
+        "clasp": "gold"
+       }
+      }
+     ]
+    },
+    "mage-neutral": {
+     "label": "Mage, neutral",
+     "draw": [
+      {
+       "gen": "portrait",
+       "v": 1,
+       "at": [
+        24,
+        24
+       ],
+       "zoom": {
+        "from": "size",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "frame": {
+        "from": "frame",
+        "pick": {
+         "none": "none",
+         "round": "round",
+         "square": "square"
+        }
+       },
+       "backing": "backing",
+       "edge": "cream",
+       "skin": "skin",
+       "white": {
+        "rule": "tone",
+        "of": "cream",
+        "by": 3
+       },
+       "age": "elder",
+       "build": 0.7,
+       "brows": "bushy",
+       "hair": "long",
+       "hairPaint": {
+        "rule": "tone",
+        "of": "cream",
+        "by": -0.7
+       },
+       "hairLight": 0.72222,
+       "beard": "long",
+       "beardPaint": "cream",
+       "beardLight": 0.916635,
+       "headgear": "hat-pointed",
+       "outfit": "mage",
+       "collar": "vee",
+       "gearPaints": {
+        "cloth": "mage",
+        "band": "gold"
+       },
+       "outfitPaints": {
+        "trim": {
+         "rule": "choose",
+         "when": {
+          "mage": [
+           "#f2c230"
+          ]
+         },
+         "then": {
+          "rule": "tone",
+          "of": "gold",
+          "by": 0.85
+         },
+         "else": "gold"
+        }
+       }
+      }
+     ]
+    },
+    "mage-happy": {
+     "label": "Mage, happy",
+     "draw": [
+      {
+       "gen": "portrait",
+       "v": 1,
+       "at": [
+        24,
+        24
+       ],
+       "zoom": {
+        "from": "size",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "frame": {
+        "from": "frame",
+        "pick": {
+         "none": "none",
+         "round": "round",
+         "square": "square"
+        }
+       },
+       "backing": "backing",
+       "edge": "cream",
+       "skin": "skin",
+       "white": {
+        "rule": "tone",
+        "of": "cream",
+        "by": 3
+       },
+       "mood": "happy",
+       "age": "elder",
+       "build": 0.7,
+       "brows": "bushy",
+       "hair": "long",
+       "hairPaint": {
+        "rule": "tone",
+        "of": "cream",
+        "by": -0.7
+       },
+       "hairLight": 0.72222,
+       "beard": "long",
+       "beardPaint": "cream",
+       "beardLight": 0.916635,
+       "headgear": "hat-pointed",
+       "outfit": "mage",
+       "collar": "vee",
+       "gearPaints": {
+        "cloth": "mage",
+        "band": "gold"
+       },
+       "outfitPaints": {
+        "trim": {
+         "rule": "choose",
+         "when": {
+          "mage": [
+           "#f2c230"
+          ]
+         },
+         "then": {
+          "rule": "tone",
+          "of": "gold",
+          "by": 0.85
+         },
+         "else": "gold"
+        }
+       }
+      }
+     ]
+    },
+    "mage-hurt": {
+     "label": "Mage, hurt",
+     "draw": [
+      {
+       "gen": "portrait",
+       "v": 1,
+       "at": [
+        24,
+        24
+       ],
+       "zoom": {
+        "from": "size",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "frame": {
+        "from": "frame",
+        "pick": {
+         "none": "none",
+         "round": "round",
+         "square": "square"
+        }
+       },
+       "backing": "backing",
+       "edge": "cream",
+       "skin": "skin",
+       "white": {
+        "rule": "tone",
+        "of": "cream",
+        "by": 3
+       },
+       "mood": "hurt",
+       "age": "elder",
+       "build": 0.7,
+       "brows": "bushy",
+       "hair": "long",
+       "hairPaint": {
+        "rule": "tone",
+        "of": "cream",
+        "by": -0.7
+       },
+       "hairLight": 0.72222,
+       "beard": "long",
+       "beardPaint": "cream",
+       "beardLight": 0.916635,
+       "headgear": "hat-pointed",
+       "outfit": "mage",
+       "collar": "vee",
+       "gearPaints": {
+        "cloth": "mage",
+        "band": "gold"
+       },
+       "outfitPaints": {
+        "trim": {
+         "rule": "choose",
+         "when": {
+          "mage": [
+           "#f2c230"
+          ]
+         },
+         "then": {
+          "rule": "tone",
+          "of": "gold",
+          "by": 0.85
+         },
+         "else": "gold"
+        }
+       }
+      }
+     ]
+    },
+    "mage-talk": {
+     "label": "Mage, talking",
+     "draw": [
+      {
+       "gen": "portrait",
+       "v": 1,
+       "at": [
+        24,
+        24
+       ],
+       "zoom": {
+        "from": "size",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "frame": {
+        "from": "frame",
+        "pick": {
+         "none": "none",
+         "round": "round",
+         "square": "square"
+        }
+       },
+       "backing": "backing",
+       "edge": "cream",
+       "skin": "skin",
+       "white": {
+        "rule": "tone",
+        "of": "cream",
+        "by": 3
+       },
+       "talk": true,
+       "age": "elder",
+       "build": 0.7,
+       "brows": "bushy",
+       "hair": "long",
+       "hairPaint": {
+        "rule": "tone",
+        "of": "cream",
+        "by": -0.7
+       },
+       "hairLight": 0.72222,
+       "beard": "long",
+       "beardPaint": "cream",
+       "beardLight": 0.916635,
+       "headgear": "hat-pointed",
+       "outfit": "mage",
+       "collar": "vee",
+       "gearPaints": {
+        "cloth": "mage",
+        "band": "gold"
+       },
+       "outfitPaints": {
+        "trim": {
+         "rule": "choose",
+         "when": {
+          "mage": [
+           "#f2c230"
+          ]
+         },
+         "then": {
+          "rule": "tone",
+          "of": "gold",
+          "by": 0.85
+         },
+         "else": "gold"
+        }
+       }
+      }
+     ]
+    },
+    "rogue-neutral": {
+     "label": "Rogue, neutral",
+     "draw": [
+      {
+       "gen": "portrait",
+       "v": 1,
+       "at": [
+        24,
+        24
+       ],
+       "zoom": {
+        "from": "size",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "frame": {
+        "from": "frame",
+        "pick": {
+         "none": "none",
+         "round": "round",
+         "square": "square"
+        }
+       },
+       "backing": "backing",
+       "edge": "cream",
+       "skin": "skin",
+       "white": {
+        "rule": "tone",
+        "of": "cream",
+        "by": 3
+       },
+       "build": 0.35,
+       "hair": "bald",
+       "hairPaint": "wheat",
+       "hairLight": 0.779769,
+       "headgear": "hood",
+       "outfit": "rogue",
+       "collar": "scarf",
+       "gearPaints": {
+        "cloth": "rogue"
+       },
+       "outfitPaints": {
+        "trim": {
+         "rule": "choose",
+         "when": {
+          "rogue": [
+           "#5a5f7a"
+          ]
+         },
+         "then": {
+          "rule": "tone",
+          "of": "slate",
+          "by": 0.85
+         },
+         "else": "slate"
+        }
+       }
+      }
+     ]
+    },
+    "rogue-happy": {
+     "label": "Rogue, happy",
+     "draw": [
+      {
+       "gen": "portrait",
+       "v": 1,
+       "at": [
+        24,
+        24
+       ],
+       "zoom": {
+        "from": "size",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "frame": {
+        "from": "frame",
+        "pick": {
+         "none": "none",
+         "round": "round",
+         "square": "square"
+        }
+       },
+       "backing": "backing",
+       "edge": "cream",
+       "skin": "skin",
+       "white": {
+        "rule": "tone",
+        "of": "cream",
+        "by": 3
+       },
+       "mood": "happy",
+       "build": 0.35,
+       "hair": "bald",
+       "hairPaint": "wheat",
+       "hairLight": 0.779769,
+       "headgear": "hood",
+       "outfit": "rogue",
+       "collar": "scarf",
+       "gearPaints": {
+        "cloth": "rogue"
+       },
+       "outfitPaints": {
+        "trim": {
+         "rule": "choose",
+         "when": {
+          "rogue": [
+           "#5a5f7a"
+          ]
+         },
+         "then": {
+          "rule": "tone",
+          "of": "slate",
+          "by": 0.85
+         },
+         "else": "slate"
+        }
+       }
+      }
+     ]
+    },
+    "rogue-hurt": {
+     "label": "Rogue, hurt",
+     "draw": [
+      {
+       "gen": "portrait",
+       "v": 1,
+       "at": [
+        24,
+        24
+       ],
+       "zoom": {
+        "from": "size",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "frame": {
+        "from": "frame",
+        "pick": {
+         "none": "none",
+         "round": "round",
+         "square": "square"
+        }
+       },
+       "backing": "backing",
+       "edge": "cream",
+       "skin": "skin",
+       "white": {
+        "rule": "tone",
+        "of": "cream",
+        "by": 3
+       },
+       "mood": "hurt",
+       "build": 0.35,
+       "hair": "bald",
+       "hairPaint": "wheat",
+       "hairLight": 0.779769,
+       "headgear": "hood",
+       "outfit": "rogue",
+       "collar": "scarf",
+       "gearPaints": {
+        "cloth": "rogue"
+       },
+       "outfitPaints": {
+        "trim": {
+         "rule": "choose",
+         "when": {
+          "rogue": [
+           "#5a5f7a"
+          ]
+         },
+         "then": {
+          "rule": "tone",
+          "of": "slate",
+          "by": 0.85
+         },
+         "else": "slate"
+        }
+       }
+      }
+     ]
+    },
+    "rogue-talk": {
+     "label": "Rogue, talking",
+     "draw": [
+      {
+       "gen": "portrait",
+       "v": 1,
+       "at": [
+        24,
+        24
+       ],
+       "zoom": {
+        "from": "size",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "frame": {
+        "from": "frame",
+        "pick": {
+         "none": "none",
+         "round": "round",
+         "square": "square"
+        }
+       },
+       "backing": "backing",
+       "edge": "cream",
+       "skin": "skin",
+       "white": {
+        "rule": "tone",
+        "of": "cream",
+        "by": 3
+       },
+       "talk": true,
+       "build": 0.35,
+       "hair": "bald",
+       "hairPaint": "wheat",
+       "hairLight": 0.779769,
+       "headgear": "hood",
+       "outfit": "rogue",
+       "collar": "scarf",
+       "gearPaints": {
+        "cloth": "rogue"
+       },
+       "outfitPaints": {
+        "trim": {
+         "rule": "choose",
+         "when": {
+          "rogue": [
+           "#5a5f7a"
+          ]
+         },
+         "then": {
+          "rule": "tone",
+          "of": "slate",
+          "by": 0.85
+         },
+         "else": "slate"
+        }
+       }
+      }
+     ]
+    }
+   }
+  }
+ },
+ "clips": {
+  "hero-neutral": {
+   "frames": 1,
+   "fps": 1,
+   "label": "Hero, neutral"
+  },
+  "hero-happy": {
+   "frames": 1,
+   "fps": 1,
+   "label": "Hero, happy"
+  },
+  "hero-hurt": {
+   "frames": 1,
+   "fps": 1,
+   "label": "Hero, hurt"
+  },
+  "hero-talk": {
+   "frames": 4,
+   "fps": 8,
+   "label": "Hero, talking"
+  },
+  "mage-neutral": {
+   "frames": 1,
+   "fps": 1,
+   "label": "Mage, neutral"
+  },
+  "mage-happy": {
+   "frames": 1,
+   "fps": 1,
+   "label": "Mage, happy"
+  },
+  "mage-hurt": {
+   "frames": 1,
+   "fps": 1,
+   "label": "Mage, hurt"
+  },
+  "mage-talk": {
+   "frames": 4,
+   "fps": 8,
+   "label": "Mage, talking"
+  },
+  "rogue-neutral": {
+   "frames": 1,
+   "fps": 1,
+   "label": "Rogue, neutral"
+  },
+  "rogue-happy": {
+   "frames": 1,
+   "fps": 1,
+   "label": "Rogue, happy"
+  },
+  "rogue-hurt": {
+   "frames": 1,
+   "fps": 1,
+   "label": "Rogue, hurt"
+  },
+  "rogue-talk": {
+   "frames": 4,
+   "fps": 8,
+   "label": "Rogue, talking"
+  }
+ }
+}

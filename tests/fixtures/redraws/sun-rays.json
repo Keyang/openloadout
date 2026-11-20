@@ -1,0 +1,202 @@
+{
+ "id": "sun-rays",
+ "frozen": "2026-11-20",
+ "source": "sprites/sun-rays.js",
+ "sha256": "3e3aae1b42332189129840fce6f75a6f7c077657e85b92a7180ad3996be581ab",
+ "name": "Sun rays",
+ "blurb": "Shafts of light falling through a canopy, a window or a hole in a ceiling, with dashes running down them or a slow swell, and dust glinting in the light. Change the number of rays, their length, spread and slant, the style and the colours.",
+ "meta": {
+  "type": "effect",
+  "role": "environment/lighting",
+  "themes": [
+   "neutral",
+   "forest",
+   "dungeon"
+  ],
+  "gameTypes": [
+   "platformer",
+   "top-down-rpg",
+   "puzzle",
+   "farming-sim"
+  ],
+  "view": "none",
+  "words": [
+   "sun rays",
+   "sunbeam",
+   "light shaft",
+   "god rays",
+   "moonlight",
+   "window light",
+   "shine",
+   "dust",
+   "glow",
+   "holy"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  64,
+  64
+ ],
+ "pivot": [
+  32,
+  32
+ ],
+ "grounded": false,
+ "preview": "loop",
+ "params": {
+  "pieces": {
+   "kind": "range",
+   "label": "Rays",
+   "def": 4,
+   "min": 1,
+   "max": 7,
+   "step": 1,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "length": {
+   "kind": "range",
+   "label": "Length",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Short",
+   "hi": "Long",
+   "group": "Look"
+  },
+  "spread": {
+   "kind": "range",
+   "label": "Spread",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Tight",
+   "hi": "Wide",
+   "group": "Look"
+  },
+  "slant": {
+   "kind": "range",
+   "label": "Slant",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Straight down",
+   "hi": "Slanted",
+   "group": "Look"
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "dashed",
+   "options": [
+    {
+     "value": "dashed",
+     "label": "Dashed"
+    },
+    {
+     "value": "solid",
+     "label": "Solid"
+    }
+   ],
+   "group": "Look"
+  },
+  "motes": {
+   "kind": "toggle",
+   "label": "Dust",
+   "def": false,
+   "group": "Look"
+  },
+  "core": {
+   "kind": "color",
+   "label": "Core",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#9bd18a",
+    "#c2c9d6",
+    "#f6d3b0",
+    "#d8d8e0"
+   ],
+   "group": "Colors"
+  },
+  "edge": {
+   "kind": "color",
+   "label": "Light",
+   "def": "#f2c230",
+   "swatches": [
+    "#f2c230",
+    "#4fd8ee",
+    "#e08a2c",
+    "#a4c44a",
+    "#c9423a",
+    "#7a4fc4",
+    "#8fd0f0",
+    "#a06a3c"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "loop": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [
+  {
+   "name": "Sunbeams",
+   "params": {}
+  },
+  {
+   "name": "Moonlight",
+   "params": {
+    "edge": "#8fd0f0"
+   }
+  },
+  {
+   "name": "Holy light",
+   "params": {
+    "style": "solid",
+    "pieces": 7
+   }
+  },
+  {
+   "name": "Dusty attic",
+   "params": {
+    "motes": true,
+    "slant": 1,
+    "edge": "#a06a3c"
+   }
+  },
+  {
+   "name": "Single shaft",
+   "params": {
+    "pieces": 1,
+    "spread": 0
+   }
+  }
+ ],
+ "bundles": []
+}

@@ -1,0 +1,234 @@
+{
+ "id": "poison-haze",
+ "frozen": "2026-11-20",
+ "source": "sprites/poison-haze.js",
+ "sha256": "8e9bb51422468cb6312e45f616418f2427919b4d067e2f670ebb4af9efa84d54",
+ "name": "Poison haze",
+ "blurb": "Poison hanging over a fighter or the ground: rising bubbles, a churning cloud or small skulls, and a puff of gas. Change its size, how many, spread, rise, style and colours.",
+ "meta": {
+  "type": "effect",
+  "role": "effects/magic",
+  "themes": [
+   "neutral",
+   "fantasy",
+   "horror"
+  ],
+  "gameTypes": [
+   "top-down-rpg",
+   "turn-based-rpg",
+   "roguelike-action",
+   "platformer"
+  ],
+  "view": "side",
+  "words": [
+   "poison",
+   "poisoned",
+   "toxic",
+   "gas",
+   "haze",
+   "bubbles",
+   "venom",
+   "curse",
+   "sick",
+   "cloud",
+   "fumes",
+   "status",
+   "puff"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  48,
+  48
+ ],
+ "pivot": [
+  24,
+  46
+ ],
+ "grounded": false,
+ "preview": "loop",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "pieces": {
+   "kind": "range",
+   "label": "Pieces",
+   "def": 5,
+   "min": 3,
+   "max": 8,
+   "step": 1,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "spread": {
+   "kind": "range",
+   "label": "Spread",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Tight",
+   "hi": "Wide",
+   "group": "Look"
+  },
+  "rise": {
+   "kind": "range",
+   "label": "Rise",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Low",
+   "hi": "High",
+   "group": "Look"
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "bubbles",
+   "options": [
+    {
+     "value": "bubbles",
+     "label": "Bubbles"
+    },
+    {
+     "value": "cloud",
+     "label": "Cloud"
+    },
+    {
+     "value": "skulls",
+     "label": "Skulls"
+    }
+   ],
+   "group": "Look"
+  },
+  "core": {
+   "kind": "color",
+   "label": "Core",
+   "def": "#9bd18a",
+   "swatches": [
+    "#9bd18a",
+    "#f0ead8",
+    "#f2c230",
+    "#a4c44a"
+   ],
+   "group": "Colors"
+  },
+  "edge": {
+   "kind": "color",
+   "label": "Poison",
+   "def": "#7a4fc4",
+   "swatches": [
+    "#7a4fc4",
+    "#e08a2c",
+    "#c9423a",
+    "#4fd8ee",
+    "#3f6fd1",
+    "#3f8a4f",
+    "#9fe040"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "loop": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "burst": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    10,
+    17,
+    23
+   ]
+  }
+ },
+ "sounds": {
+  "loop": [
+   {
+    "sound": "bubbles",
+    "preset": "Slow drips",
+    "frame": 0,
+    "volume": 0.35,
+    "when": {
+     "style": [
+      "bubbles"
+     ]
+    }
+   }
+  ],
+  "burst": [
+   {
+    "sound": "whoosh",
+    "preset": "Quick swipe",
+    "frame": 0,
+    "volume": 0.7
+   }
+  ]
+ },
+ "versions": [
+  {
+   "name": "Poisoned",
+   "params": {}
+  },
+  {
+   "name": "Toxic cloud",
+   "params": {
+    "style": "cloud",
+    "spread": 1
+   }
+  },
+  {
+   "name": "Curse",
+   "params": {
+    "style": "skulls",
+    "core": "#f0ead8",
+    "edge": "#c9423a"
+   }
+  },
+  {
+   "name": "Swamp gas",
+   "params": {
+    "style": "cloud",
+    "core": "#a4c44a",
+    "edge": "#3f8a4f"
+   }
+  },
+  {
+   "name": "Faint",
+   "params": {
+    "size": 0,
+    "pieces": 3
+   }
+  }
+ ],
+ "bundles": []
+}

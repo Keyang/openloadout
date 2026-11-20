@@ -1,0 +1,798 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "ui-bars-neon",
+ "name": "Neon bars and slider",
+ "blurb": "A bar housing outlined in a glowing neon tube with three fill strips (health, magic, a gauge), a white flash, a slider track and its knob; change the style, corners, tube thickness, glow and colours.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/bar",
+  "themes": [
+   "neutral",
+   "sci-fi",
+   "city"
+  ],
+  "gameTypes": [
+   "arcade",
+   "shooter",
+   "racing",
+   "roguelike-action"
+  ],
+  "view": "none",
+  "words": [
+   "bar",
+   "health",
+   "energy",
+   "slider",
+   "meter",
+   "progress",
+   "neon",
+   "glow",
+   "tube",
+   "night"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  64,
+  16
+ ],
+ "pivot": [
+  32,
+  8
+ ],
+ "grounded": false,
+ "preview": "frame",
+ "styles": [
+  "pixel"
+ ],
+ "palette": [
+  {
+   "id": "frame",
+   "label": "Tube",
+   "default": "#8fd0f0",
+   "material": "interface",
+   "swatches": [
+    "#8fd0f0",
+    "#9bd18a",
+    "#c2c9d6",
+    "#5fe0f0",
+    "#7fe0a0"
+   ]
+  },
+  {
+   "id": "accent",
+   "label": "Second tube",
+   "default": "#e08a2c",
+   "material": "interface",
+   "swatches": [
+    "#e08a2c",
+    "#7a4fc4",
+    "#f2c230",
+    "#b48af8",
+    "#ca9eda"
+   ]
+  },
+  {
+   "id": "fill",
+   "label": "Health",
+   "default": "#6aa83e",
+   "material": "interface",
+   "swatches": [
+    "#6aa83e",
+    "#3f8a4f",
+    "#c9423a",
+    "#e08a2c",
+    "#4fd8ee",
+    "#f2c230"
+   ]
+  },
+  {
+   "id": "fillB",
+   "label": "Magic",
+   "default": "#3f6fd1",
+   "material": "interface",
+   "swatches": [
+    "#3f6fd1",
+    "#3f9fd1",
+    "#4fd8ee",
+    "#8fd0f0",
+    "#4f9ff0"
+   ]
+  },
+  {
+   "id": "fillC",
+   "label": "Gauge",
+   "default": "#f2c230",
+   "material": "interface",
+   "swatches": [
+    "#f2c230",
+    "#e08a2c",
+    "#a4c44a",
+    "#a06a3c",
+    "#c2c9d6"
+   ]
+  },
+  {
+   "id": "white",
+   "default": "#ffffff",
+   "material": "light",
+   "detail": true
+  },
+  {
+   "id": "wall",
+   "default": "#3f5068",
+   "material": "interface",
+   "detail": true
+  }
+ ],
+ "controls": [
+  {
+   "key": "style",
+   "kind": "choice",
+   "label": "Style",
+   "options": [
+    {
+     "value": "tube",
+     "label": "Tube"
+    },
+    {
+     "value": "double",
+     "label": "Double"
+    },
+    {
+     "value": "sign",
+     "label": "Sign"
+    }
+   ],
+   "default": "tube",
+   "group": "Look"
+  },
+  {
+   "key": "corner",
+   "kind": "range",
+   "label": "Corner",
+   "lo": "Square",
+   "hi": "Round",
+   "default": 0.5,
+   "group": "Look"
+  },
+  {
+   "key": "border",
+   "kind": "range",
+   "label": "Border",
+   "lo": "Thin",
+   "hi": "Thick",
+   "default": 0.5,
+   "group": "Look"
+  },
+  {
+   "key": "halo",
+   "kind": "toggle",
+   "label": "Glow",
+   "default": true,
+   "group": "Look"
+  },
+  {
+   "key": "frame",
+   "kind": "colour",
+   "label": "Tube",
+   "group": "Colors"
+  },
+  {
+   "key": "accent",
+   "kind": "colour",
+   "label": "Second tube",
+   "group": "Colors",
+   "when": {
+    "style": [
+     "double"
+    ]
+   }
+  },
+  {
+   "key": "fill",
+   "kind": "colour",
+   "label": "Health",
+   "group": "Colors"
+  },
+  {
+   "key": "fillB",
+   "kind": "colour",
+   "label": "Magic",
+   "group": "Colors"
+  },
+  {
+   "key": "fillC",
+   "kind": "colour",
+   "label": "Gauge",
+   "group": "Colors"
+  }
+ ],
+ "versions": [
+  {
+   "name": "Sky bars",
+   "params": {}
+  },
+  {
+   "name": "Double",
+   "params": {
+    "style": "double",
+    "accent": "#7a4fc4"
+   }
+  },
+  {
+   "name": "Cyan sign",
+   "params": {
+    "style": "sign",
+    "frame": "#5fe0f0"
+   }
+  },
+  {
+   "name": "Mint, no glow",
+   "params": {
+    "halo": false,
+    "frame": "#9bd18a",
+    "fill": "#4fd8ee"
+   }
+  }
+ ],
+ "body": {
+  "panel": {
+   "skin": {
+    "use": "skin:neon",
+    "v": 1,
+    "paint": {
+     "face": "wall",
+     "frame": "frame",
+     "accent": "accent",
+     "shine": "white"
+    }
+   },
+   "piece": {
+    "gen": "ui.trough.lit",
+    "v": 1,
+    "at": [
+     1,
+     1
+    ],
+    "size": [
+     62,
+     14
+    ],
+    "style": {
+     "from": "style"
+    },
+    "corner": {
+     "from": "corner",
+     "map": [
+      [
+       0,
+       0
+      ],
+      [
+       1,
+       4
+      ]
+     ]
+    },
+    "border": {
+     "from": "border",
+     "map": [
+      [
+       0,
+       1
+      ],
+      [
+       0.749,
+       1
+      ],
+      [
+       0.75,
+       2
+      ],
+      [
+       1,
+       2
+      ]
+     ],
+     "round": "px"
+    },
+    "extras": {
+     "from": "halo"
+    },
+    "clip": [
+     "frame"
+    ],
+    "edges": 4,
+    "rings": [
+     "ink",
+     "frame",
+     "frame.light",
+     "frame"
+    ],
+    "bandAt": 3,
+    "trough": "dark",
+    "glowRing": "frame.dark",
+    "core": "frame.light",
+    "extra": [],
+    "extraAlong": [],
+    "rim": {
+     "from": "style",
+     "pick": {
+      "tube": "ink",
+      "double": "accent",
+      "sign": "ink"
+     }
+    },
+    "twoTubes": {
+     "from": "style",
+     "pick": {
+      "tube": false,
+      "double": true,
+      "sign": false
+     }
+    },
+    "trim": [],
+    "sign": {
+     "from": "style",
+     "pick": {
+      "tube": false,
+      "double": false,
+      "sign": true
+     }
+    }
+   },
+   "states": [
+    "frame",
+    "fill",
+    "fill-b",
+    "fill-c",
+    "flash",
+    "slider",
+    "knob"
+   ],
+   "draw": [
+    {
+     "gen": "ui.strip",
+     "v": 1,
+     "clip": [
+      "fill"
+     ],
+     "at": [
+      1,
+      1
+     ],
+     "size": [
+      62,
+      14
+     ],
+     "style": {
+      "from": "style"
+     },
+     "border": {
+      "from": "border",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.749,
+        1
+       ],
+       [
+        0.75,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "fill": "fill",
+     "shine": "white",
+     "edges": 4,
+     "rings": [
+      "ink",
+      "frame",
+      "frame.light",
+      "frame"
+     ],
+     "bandAt": 3,
+     "gloss": false
+    },
+    {
+     "gen": "ui.strip",
+     "v": 1,
+     "clip": [
+      "fill-b"
+     ],
+     "at": [
+      1,
+      1
+     ],
+     "size": [
+      62,
+      14
+     ],
+     "style": {
+      "from": "style"
+     },
+     "border": {
+      "from": "border",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.749,
+        1
+       ],
+       [
+        0.75,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "fill": "fillB",
+     "shine": "white",
+     "edges": 4,
+     "rings": [
+      "ink",
+      "frame",
+      "frame.light",
+      "frame"
+     ],
+     "bandAt": 3,
+     "gloss": false
+    },
+    {
+     "gen": "ui.strip",
+     "v": 1,
+     "clip": [
+      "fill-c"
+     ],
+     "at": [
+      1,
+      1
+     ],
+     "size": [
+      62,
+      14
+     ],
+     "style": {
+      "from": "style"
+     },
+     "border": {
+      "from": "border",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.749,
+        1
+       ],
+       [
+        0.75,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "fill": "fillC",
+     "shine": "white",
+     "edges": 4,
+     "rings": [
+      "ink",
+      "frame",
+      "frame.light",
+      "frame"
+     ],
+     "bandAt": 3,
+     "gloss": false
+    },
+    {
+     "gen": "ui.strip",
+     "v": 1,
+     "clip": [
+      "flash"
+     ],
+     "at": [
+      1,
+      1
+     ],
+     "size": [
+      62,
+      14
+     ],
+     "style": {
+      "from": "style"
+     },
+     "border": {
+      "from": "border",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.749,
+        1
+       ],
+       [
+        0.75,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "fill": "fill",
+     "shine": "white",
+     "flash": 1,
+     "fade": true,
+     "edges": 4,
+     "rings": [
+      "ink",
+      "frame",
+      "frame.light",
+      "frame"
+     ],
+     "bandAt": 3,
+     "gloss": false
+    },
+    {
+     "gen": "ui.trough.lit",
+     "v": 1,
+     "at": [
+      1,
+      1
+     ],
+     "size": [
+      62,
+      14
+     ],
+     "style": {
+      "from": "style"
+     },
+     "corner": {
+      "from": "corner",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        4
+       ]
+      ]
+     },
+     "extras": {
+      "from": "halo"
+     },
+     "clip": [
+      "slider"
+     ],
+     "role": "rail",
+     "rings": [
+      "ink",
+      "frame",
+      "frame.light",
+      {
+       "from": "style",
+       "pick": {
+        "tube": "ink",
+        "double": "accent",
+        "sign": "ink"
+       }
+      }
+     ],
+     "bandAt": 1,
+     "trough": "dark",
+     "glowRing": "frame.dark",
+     "core": "frame.light",
+     "extra": [],
+     "extraAlong": [],
+     "rim": {
+      "from": "style",
+      "pick": {
+       "tube": "ink",
+       "double": "accent",
+       "sign": "ink"
+      }
+     },
+     "twoTubes": {
+      "from": "style",
+      "pick": {
+       "tube": false,
+       "double": true,
+       "sign": false
+      }
+     },
+     "trim": [],
+     "sign": {
+      "from": "style",
+      "pick": {
+       "tube": false,
+       "double": false,
+       "sign": true
+      }
+     }
+    },
+    {
+     "gen": "ui.slab",
+     "v": 1,
+     "clip": [
+      "knob"
+     ],
+     "role": "knob",
+     "at": [
+      26,
+      1
+     ],
+     "size": [
+      12,
+      14
+     ],
+     "style": {
+      "from": "style"
+     },
+     "corner": {
+      "from": "corner",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        4
+       ]
+      ]
+     },
+     "extras": {
+      "from": "halo"
+     },
+     "rings": [
+      "ink",
+      {
+       "from": "halo",
+       "pick": {
+        "true": "frame.dark",
+        "false": "wall"
+       }
+      },
+      "frame",
+      {
+       "from": "style",
+       "pick": {
+        "tube": "frame.light",
+        "double": "accent",
+        "sign": "frame.light"
+       }
+      }
+     ],
+     "bandAt": 2,
+     "extra": [],
+     "extraAlong": []
+    },
+    {
+     "id": "sign-knob",
+     "kind": "stamp",
+     "at": [
+      26,
+      1
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..iiiiiiii..",
+      ".igttttttgi.",
+      "itggccccggti",
+      "igchhhhhhcgi",
+      "igghhwwhhggi",
+      "itghwwwwhgti",
+      "itchwwwwhcti",
+      "itchwwwwhcti",
+      "itghwwwwhgti",
+      "igghhwwhhggi",
+      "igchhhhhhcgi",
+      "itggccccggti",
+      ".igttttttgi.",
+      "..iiiiiiii.."
+     ],
+     "key": {
+      "i": "ink",
+      "g": {
+       "rule": "tone",
+       "of": "wall",
+       "by": -1
+      },
+      "h": {
+       "from": "halo",
+       "pick": {
+        "true": {
+         "rule": "tone",
+         "of": "frame",
+         "by": -1
+        },
+        "false": "wall"
+       }
+      },
+      "t": "frame",
+      "c": {
+       "rule": "tone",
+       "of": "frame",
+       "by": 0.85
+      },
+      "w": "wall"
+     },
+     "when": {
+      "style": [
+       "sign"
+      ],
+      "clip": [
+       "knob"
+      ]
+     }
+    }
+   ]
+  }
+ },
+ "clips": {
+  "frame": {
+   "frames": 1,
+   "fps": 8,
+   "label": "Housing"
+  },
+  "fill": {
+   "frames": 1,
+   "fps": 8,
+   "label": "Health"
+  },
+  "fill-b": {
+   "frames": 1,
+   "fps": 8,
+   "label": "Magic"
+  },
+  "fill-c": {
+   "frames": 1,
+   "fps": 8,
+   "label": "Gauge"
+  },
+  "flash": {
+   "frames": 4,
+   "fps": 8,
+   "loop": false,
+   "label": "Flash"
+  },
+  "slider": {
+   "frames": 1,
+   "fps": 8,
+   "label": "Slider track"
+  },
+  "knob": {
+   "frames": 1,
+   "fps": 8,
+   "label": "Slider knob"
+  }
+ }
+}

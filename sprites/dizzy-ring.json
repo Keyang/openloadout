@@ -1,0 +1,39 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "dizzy-ring",
+ "name": "Dizzy ring",
+ "blurb": "A dazed status: little stars, pluses or dots running round a flattened ring over a stunned head. Change its size, how many marks, their style, how round the ring is and colours.",
+ "meta": {"type":"effect","role":"effects/spark","themes":["neutral"],"gameTypes":["platformer","arcade","roguelike-action","turn-based-rpg"],"view":"side","words":["dizzy","dazed","stunned","stun","stars","seeing stars","confused","knocked out","spin","circle","status","head"],"license":"draft"},
+ "size": [32,32],
+ "pivot": [16,16],
+ "grounded": false,
+ "preview": "loop",
+ "styles": ["pixel"],
+ "versions": [
+  {"name":"Seeing stars","params":{}},
+  {"name":"Sleepy dots","params":{"style":"dots","edge":"#3f6fd1"}},
+  {"name":"Big daze","params":{"size":1,"pieces":5}},
+  {"name":"Stunned sparks","params":{"style":"pluses","edge":"#c9423a"}},
+  {"name":"Wide loop","params":{"depth":1}}
+ ],
+ "palette": [
+  {"id":"core","label":"Core","default":"#f0ead8","material":"light","swatches":["#f0ead8","#8fd0f0","#9bd18a","#c2c9d6","#f6d3b0"]},
+  {"id":"edge","label":"Edge","default":"#f2c230","material":"light","swatches":["#f2c230","#c9423a","#7a4fc4","#4fd8ee","#a4c44a","#3f6fd1","#e08a2c"]}
+ ],
+ "controls": [
+  {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+  {"key":"pieces","kind":"range","label":"Marks","lo":"Few","hi":"Many","default":3,"min":2,"max":5,"step":1},
+  {"key":"style","kind":"choice","label":"Style","options":["stars","pluses","dots"],"default":"stars"},
+  {"key":"depth","kind":"range","label":"Ring depth","lo":"Flat","hi":"Round","default":0.75},
+  {"key":"core","kind":"colour","label":"Core"},
+  {"key":"edge","kind":"colour","label":"Edge"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": { "emitters": [
+  {"id":"loop","gen":"effect.dizzy-ring","v":1,"clip":["loop"],"picture":"loop","at":[16,16],"size":{"from":"size","map":[[0,0],[1,1]]},"pieces":{"from":"pieces","map":[[2,2],[5,5]],"round":"px"},"style":{"from":"style","pick":{"stars":"stars","pluses":"pluses","dots":"dots"}},"depth":{"from":"depth","map":[[0,0],[1,1]]},"core":"core","edge":"edge"}
+ ] },
+ "clips": {
+  "loop": {"frames":8,"fps":10}
+ }
+}

@@ -1,0 +1,39 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "rain-ripples",
+ "name": "Rain on water",
+ "blurb": "Raindrops striking a pond, a puddle or a flooded floor, seen from above: each opens a flat ring that breaks into arcs, as a patch to lay over water. Change the ring size, how many drops, how wide they fall, rings or splashes, and the colours.",
+ "meta": {"type":"effect","role":"effects/weather","themes":["neutral"],"gameTypes":["top-down-rpg","farming-sim","puzzle","platformer"],"view":"top-down","words":["rain","raindrops","ripples","rings","puddle","pond","drizzle","downpour","storm","wet","weather","splash"],"license":"draft"},
+ "size": [64,64],
+ "pivot": [32,32],
+ "grounded": false,
+ "preview": "loop",
+ "styles": ["pixel"],
+ "versions": [
+  {"name":"Drizzle","params":{}},
+  {"name":"Downpour","params":{"pieces":10,"style":"both"}},
+  {"name":"Puddle","params":{"spread":0,"size":0}},
+  {"name":"Big drops","params":{"size":1,"pieces":3}},
+  {"name":"Night rain","params":{"core":"#8fd0f0","edge":"#3f6fd1"}}
+ ],
+ "palette": [
+  {"id":"core","label":"Foam","default":"#f0ead8","material":"water","swatches":["#f0ead8","#8fd0f0","#c2c9d6","#d8d8e0"]},
+  {"id":"edge","label":"Water","default":"#3f9fd1","material":"water","swatches":["#3f9fd1","#4fd8ee","#3f6fd1","#7fb0b8","#e08a2c","#a4c44a"]}
+ ],
+ "controls": [
+  {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+  {"key":"pieces","kind":"range","label":"Drops","lo":"Few","hi":"Many","default":5,"min":3,"max":10,"step":1},
+  {"key":"spread","kind":"range","label":"Spread","lo":"Tight","hi":"Wide","default":0.5},
+  {"key":"style","kind":"choice","label":"Style","options":["rings","splashes","both"],"default":"rings"},
+  {"key":"core","kind":"colour","label":"Foam"},
+  {"key":"edge","kind":"colour","label":"Water"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": { "emitters": [
+  {"id":"loop","gen":"effect.rain-ripples","v":1,"clip":["loop"],"picture":"loop","at":[32,32],"size":{"from":"size","map":[[0,0],[1,1]]},"pieces":{"from":"pieces","map":[[3,3],[10,10]],"round":"px"},"spread":{"from":"spread","map":[[0,0],[1,1]]},"style":{"from":"style","pick":{"rings":"rings","splashes":"splashes","both":"both"}},"core":"core","edge":"edge"}
+ ] },
+ "clips": {
+  "loop": {"frames":8,"fps":10}
+ }
+}

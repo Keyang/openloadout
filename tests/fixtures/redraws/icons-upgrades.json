@@ -1,0 +1,236 @@
+{
+ "id": "icons-upgrades",
+ "frozen": "2026-11-20",
+ "source": "sprites/icons-upgrades.js",
+ "sha256": "a746bfc50c9e532975f1dadc3a422967116f3debe0580bf84545604f1062f5ef",
+ "name": "Upgrade icons",
+ "blurb": "Ten flat sign pictures for upgrade cards, from damage and fire rate to regeneration and dash; change the plate behind them, their weight, shine, size and three colours.",
+ "meta": {
+  "type": "icon",
+  "role": "items/icon",
+  "themes": [
+   "sci-fi",
+   "space"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "shooter",
+   "arcade"
+  ],
+  "view": "none",
+  "words": [
+   "upgrade",
+   "perk",
+   "powerup",
+   "buff",
+   "skill",
+   "ability",
+   "damage",
+   "speed",
+   "shield",
+   "magnet",
+   "critical",
+   "heal",
+   "dash",
+   "level up"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "damage",
+ "params": {
+  "backing": {
+   "kind": "choice",
+   "label": "Plate",
+   "def": "hex",
+   "options": [
+    {
+     "value": "none",
+     "label": "None"
+    },
+    {
+     "value": "hex",
+     "label": "Hexagon"
+    },
+    {
+     "value": "circle",
+     "label": "Circle"
+    }
+   ],
+   "group": "Look"
+  },
+  "bold": {
+   "kind": "toggle",
+   "label": "Bold",
+   "def": false,
+   "group": "Look"
+  },
+  "shine": {
+   "kind": "toggle",
+   "label": "Shine",
+   "def": true,
+   "group": "Look"
+  },
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "face": {
+   "kind": "color",
+   "label": "Plate colour",
+   "def": "#434d6d",
+   "swatches": [
+    "#434d6d",
+    "#566182",
+    "#6b7896",
+    "#3f6fd1",
+    "#6660b6"
+   ],
+   "group": "Colors",
+   "when": {
+    "backing": [
+     "hex",
+     "circle"
+    ]
+   }
+  },
+  "body": {
+   "kind": "color",
+   "label": "Picture",
+   "def": "#5fe0f0",
+   "swatches": [
+    "#5fe0f0",
+    "#e8ecf2",
+    "#5fd47a",
+    "#c2c9d6",
+    "#ca9eda"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Second colour",
+   "def": "#f2a030",
+   "swatches": [
+    "#f2a030",
+    "#f2c230",
+    "#9fe040",
+    "#b48af8",
+    "#f0ead8"
+   ],
+   "group": "Colors"
+  }
+ },
+ "clips": {
+  "damage": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "fire-rate": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "speed": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "multishot": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "pierce": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "magnet": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "shield": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "crit": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "regen": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "dash": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [],
+ "bundles": [
+  "kit-roguelite-scifi"
+ ]
+}

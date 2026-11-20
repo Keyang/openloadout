@@ -1,0 +1,185 @@
+{
+ "id": "orbit-blade",
+ "frozen": "2026-11-20",
+ "source": "sprites/orbit-blade.js",
+ "sha256": "5f8fd6da3d9030eaf2b99dc6f14c316a317a44aa39da6ce87051796ec7e95994",
+ "name": "Orbit blade",
+ "blurb": "A spinning blade that circles its owner, seen from above, with a lit cutting edge; it throws sparks where it bites. Change its size, style, number of blades, motion arcs and colours.",
+ "meta": {
+  "type": "projectile",
+  "role": "effects/projectile",
+  "themes": [
+   "sci-fi",
+   "space"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "shooter",
+   "arcade"
+  ],
+  "view": "top-down",
+  "words": [
+   "blade",
+   "saw",
+   "shuriken",
+   "disc",
+   "orbit",
+   "spinning",
+   "circle",
+   "spin",
+   "cut",
+   "hit",
+   "upgrade",
+   "horde survival",
+   "sharp"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "fly",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "saw",
+   "options": [
+    {
+     "value": "saw",
+     "label": "Saw"
+    },
+    {
+     "value": "star",
+     "label": "Star"
+    },
+    {
+     "value": "crescent",
+     "label": "Crescent"
+    }
+   ],
+   "group": "Look"
+  },
+  "blades": {
+   "kind": "choice",
+   "label": "Blades",
+   "def": "three",
+   "options": [
+    {
+     "value": "two",
+     "label": "Two"
+    },
+    {
+     "value": "three",
+     "label": "Three"
+    },
+    {
+     "value": "four",
+     "label": "Four"
+    }
+   ],
+   "group": "Look"
+  },
+  "trail": {
+   "kind": "toggle",
+   "label": "Trail",
+   "def": true,
+   "group": "Look"
+  },
+  "metal": {
+   "kind": "color",
+   "label": "Metal",
+   "def": "#c2c9d6",
+   "swatches": [
+    "#c2c9d6",
+    "#9aa6c0",
+    "#6b7896",
+    "#f2c230",
+    "#8f97a8",
+    "#e6c545",
+    "#c98a4a",
+    "#5d6475"
+   ],
+   "group": "Colors"
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Edge",
+   "def": "#5fe0f0",
+   "swatches": [
+    "#5fe0f0",
+    "#e2473f",
+    "#9fe040",
+    "#f2a030",
+    "#b48af8",
+    "#4f9ff0",
+    "#5fd47a"
+   ],
+   "group": "Colors"
+  },
+  "wobble": {
+   "kind": "range",
+   "label": "Wobble",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Firm",
+   "hi": "Wobbly",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "fly": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  },
+  "hit": {
+   "frames": 4,
+   "loop": false,
+   "fps": [
+    10,
+    17,
+    23
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [],
+ "bundles": [
+  "kit-roguelite-scifi"
+ ]
+}

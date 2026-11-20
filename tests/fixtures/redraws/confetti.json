@@ -1,0 +1,210 @@
+{
+ "id": "confetti",
+ "frozen": "2026-11-20",
+ "source": "sprites/confetti.js",
+ "sha256": "eb70bead4b25fee296b4f73d41c43a41435879d351a0139fd5789f3320807bd1",
+ "name": "Confetti",
+ "blurb": "A burst of confetti for a win or a level clear: a white pop, then paper, streamers or glitter thrown up and fluttering down. Change its size, the pieces, the spread, the style and the three colours.",
+ "meta": {
+  "type": "effect",
+  "role": "effects/spark",
+  "themes": [
+   "neutral",
+   "candy"
+  ],
+  "gameTypes": [
+   "arcade",
+   "puzzle",
+   "card-game",
+   "racing"
+  ],
+  "view": "none",
+  "words": [
+   "confetti",
+   "celebration",
+   "party",
+   "streamers",
+   "glitter",
+   "win",
+   "victory",
+   "level clear",
+   "new record",
+   "hooray",
+   "burst",
+   "paper"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  64,
+  64
+ ],
+ "pivot": [
+  32,
+  32
+ ],
+ "grounded": false,
+ "preview": "burst",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "pieces": {
+   "kind": "range",
+   "label": "Pieces",
+   "def": 12,
+   "min": 6,
+   "max": 18,
+   "step": 1,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "spread": {
+   "kind": "range",
+   "label": "Spread",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Tight",
+   "hi": "Wide",
+   "group": "Look"
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "paper",
+   "options": [
+    {
+     "value": "paper",
+     "label": "Paper"
+    },
+    {
+     "value": "streamers",
+     "label": "Streamers"
+    },
+    {
+     "value": "glitter",
+     "label": "Glitter"
+    }
+   ],
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Main colour",
+   "def": "#c9423a",
+   "swatches": [
+    "#c9423a",
+    "#e08a2c",
+    "#7a4fc4",
+    "#7a4f33"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Accent colour",
+   "def": "#f2c230",
+   "swatches": [
+    "#f2c230",
+    "#a4c44a",
+    "#9bd18a",
+    "#6aa83e"
+   ],
+   "group": "Colors"
+  },
+  "trim": {
+   "kind": "color",
+   "label": "Trim colour",
+   "def": "#3f6fd1",
+   "swatches": [
+    "#3f6fd1",
+    "#4fd8ee",
+    "#f0ead8",
+    "#8fd0f0"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "burst": {
+   "frames": 12,
+   "loop": false,
+   "fps": [
+    9,
+    15,
+    20
+   ]
+  }
+ },
+ "sounds": {
+  "burst": [
+   {
+    "sound": "chime-success",
+    "preset": "Quick confirm",
+    "frame": 0,
+    "volume": 0.8
+   }
+  ]
+ },
+ "versions": [
+  {
+   "name": "Party",
+   "params": {}
+  },
+  {
+   "name": "Gold shower",
+   "params": {
+    "body": "#e08a2c",
+    "trim": "#f0ead8"
+   }
+  },
+  {
+   "name": "Streamers",
+   "params": {
+    "style": "streamers"
+   }
+  },
+  {
+   "name": "Glitter",
+   "params": {
+    "style": "glitter",
+    "body": "#7a4fc4",
+    "accent": "#9bd18a",
+    "trim": "#4fd8ee"
+   }
+  },
+  {
+   "name": "Small pop",
+   "params": {
+    "size": 0,
+    "pieces": 6,
+    "spread": 0
+   }
+  }
+ ],
+ "bundles": [
+  "kit-puzzle-gridline"
+ ]
+}

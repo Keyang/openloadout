@@ -163,10 +163,9 @@ test('codeSpritesWhere finds the code on a rig, the frozen copy first, one per i
 
 // Files that still import a library code sprite by id, each with why (they belong to builders working on them now:
 // the frozen copies they need are already in tests/fixtures/code-sprites/, so each switch is one line: codeSprite(id)).
-const KNOWN = {
-  'tests/unit/gen-b12-fx.test.mjs': 'B12b: port test against blaster-bolt (frozen)',
-  'tests/unit/data-sprite-v2-emitters.test.mjs': 'B12b: redraws against blaster-bolt, plasma-burst, hit-spark (frozen)',
-};
+// (none now: data-sprite-v2-emitters.test.mjs reads the frozen copies of blaster-bolt, plasma-burst and hit-spark since
+// batches E1 and E2; review E1, issue 3)
+const KNOWN = {};
 // Files allowed to name sprites/<id>.js of the real project: the helper that does it for everyone, this file, and
 // conversion-c1, which reads a candidate code file and skips it, saying so, once it is gone (due to go in P3).
 const HELPERS = new Set(['tests/helpers/library.mjs', 'tests/unit/tests-migration-ready.test.mjs', 'tests/unit/conversion-c1.test.mjs']);

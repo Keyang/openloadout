@@ -1,0 +1,181 @@
+{
+ "id": "fireball",
+ "frozen": "2026-11-20",
+ "source": "sprites/fireball.js",
+ "sha256": "ac8ed923075caef459a08391967d1d828329b981bd688a331928ff74b3a9481e",
+ "name": "Fireball",
+ "blurb": "A ball of flame with a streaming tail that bursts into a ring of embers. Change its size, style, tail, sparks and colours.",
+ "meta": {
+  "type": "projectile",
+  "role": "effects/projectile",
+  "themes": [
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "platformer",
+   "arcade",
+   "shooter"
+  ],
+  "view": "side",
+  "words": [
+   "fireball",
+   "fire",
+   "flame",
+   "spell",
+   "magic",
+   "comet",
+   "skull",
+   "shot",
+   "fly",
+   "hit",
+   "burn",
+   "ember",
+   "wizard attack"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "fly",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "ball",
+   "options": [
+    {
+     "value": "ball",
+     "label": "Ball"
+    },
+    {
+     "value": "comet",
+     "label": "Comet"
+    },
+    {
+     "value": "skull",
+     "label": "Skull"
+    }
+   ],
+   "group": "Look"
+  },
+  "length": {
+   "kind": "range",
+   "label": "Length",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Short",
+   "hi": "Long",
+   "group": "Look"
+  },
+  "sparks": {
+   "kind": "toggle",
+   "label": "Sparks",
+   "def": true,
+   "group": "Look"
+  },
+  "core": {
+   "kind": "color",
+   "label": "Core",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#f2c230",
+    "#f6d3b0",
+    "#8fd0f0",
+    "#9bd18a"
+   ],
+   "group": "Colors"
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Glow",
+   "def": "#e08a2c",
+   "swatches": [
+    "#e08a2c",
+    "#c9423a",
+    "#4fd8ee",
+    "#7a4fc4",
+    "#a4c44a",
+    "#3f6fd1"
+   ],
+   "group": "Colors"
+  },
+  "flicker": {
+   "kind": "range",
+   "label": "Flicker",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Steady",
+   "hi": "Wild",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "fly": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  },
+  "hit": {
+   "frames": 6,
+   "loop": false,
+   "fps": [
+    10,
+    17,
+    23
+   ]
+  }
+ },
+ "sounds": {
+  "hit": [
+   {
+    "sound": "whoosh",
+    "preset": "Heavy swing",
+    "frame": 0,
+    "volume": 0.7
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-platformer-fantasy"
+ ]
+}

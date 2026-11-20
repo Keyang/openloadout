@@ -1,0 +1,123 @@
+{
+  "format": "loadout-sprite",
+  "version": 2,
+  "id": "arrow",
+  "name": "Arrow",
+  "blurb": "An arrow that flies to the right and sticks, quivering, where it hits. Change its length, head, feathers, trail and colours.",
+  "meta": {
+    "type": "projectile",
+    "role": "effects/projectile",
+    "themes": ["fantasy","forest"],
+    "gameTypes": ["platformer","arcade","shooter"],
+    "view": "side",
+    "words": ["arrow","bolt","dart","bow","archer","shot","shoot","fly","hit","stuck","ranged attack","feather","wooden"],
+    "license": "draft"
+  },
+  "size": [32,16],
+  "pivot": [16,8],
+  "grounded": false,
+  "preview": "fly",
+  "styles": ["pixel"],
+  "palette": [
+    {"id":"wood","label":"Wood","default":"#a06a3c","material":"wood","swatches":["#a06a3c","#7a4f33","#f0ead8","#a8612a","#5a3a22","#c98a4a"]},
+    {"id":"metal","label":"Metal","default":"#c2c9d6","material":"metal","swatches":["#c2c9d6","#f2c230","#8f97a8","#5d6475","#e6c545"]},
+    {"id":"accent","label":"Feathers","default":"#c9423a","material":"cloth","swatches":["#c9423a","#7a4fc4","#4fd8ee","#a4c44a"]},
+    {"id":"shine","default":"#ffffff","material":"light","detail":true}
+  ],
+  "controls": [
+    {"key":"length","kind":"range","label":"Length","lo":"Short","hi":"Long","default":0.5},
+    {"key":"style","kind":"choice","label":"Style","options":["broad","needle","barbed","blunt"],"default":"broad"},
+    {"key":"trail","kind":"toggle","label":"Trail","default":true},
+    {"key":"wood","kind":"colour","label":"Wood"},
+    {"key":"metal","kind":"colour","label":"Metal"},
+    {"key":"accent","kind":"colour","label":"Feathers"},
+    {"key":"wobble","kind":"range","label":"Wobble","lo":"Firm","hi":"Wobbly","default":0.5,"group":"Motion"},
+    {"key":"speed","standard":"speed"}
+  ],
+  "body": {
+    "pictures": {
+      "nodes": [
+        {"id":"arrow","parent":null,"at":[16,8]},
+        {"id":"tail","parent":"arrow","at":[{"from":"length","map":[[0,-7],[0.1249,-7],[0.125,-8],[0.3749,-8],[0.375,-9],[0.6249,-9],[0.625,-10],[0.8749,-10],[0.875,-11],[1,-11]],"round":"px"},0]},
+        {"id":"head","parent":"arrow","at":[{"from":"length","map":[[0,7],[0.1249,7],[0.125,8],[0.3749,8],[0.375,9],[0.6249,9],[0.625,10],[0.8749,10],[0.875,11],[1,11]],"round":"px"},0]}
+      ],
+      "draw": [
+        {"id":"shaftBack","kind":"rect","on":"tail","at":[0,-1],"size":[{"from":"length","map":[[0,5],[0.1249,5],[0.125,5],[0.3749,5],[0.375,6],[0.6249,6],[0.625,7],[0.8749,7],[0.875,7],[1,7]],"round":"px"},1],"paint":"wood.base"},
+        {
+          "id": "shaftFront",
+          "kind": "rect",
+          "on": "arrow",
+          "at": [{"from":"length","map":[[0,-2],[0.1249,-2],[0.125,-3],[0.3749,-3],[0.375,-3],[0.6249,-3],[0.625,-3],[0.8749,-3],[0.875,-4],[1,-4]],"round":"px"},-1],
+          "size": [{"from":"length","map":[[0,9],[0.1249,9],[0.125,11],[0.3749,11],[0.375,12],[0.6249,12],[0.625,13],[0.8749,13],[0.875,15],[1,15]],"round":"px"},1],
+          "paint": "wood.base"
+        },
+        {"id":"vaneUp","kind":"stamp","on":"tail","at":[-1,-4],"anchor":"tl","rows":["......",".aaa..","..aaaa"],"variants":{"rest":["......",".aaa..","..aaaa"],"flat":["......","..aa..","..aaaa"],"flared":["aa....",".aaa..","..aaaa"]},"key":{"a":"accent.base"}},
+        {"id":"vaneDown","kind":"stamp","on":"tail","at":[-1,0],"anchor":"tl","rows":["..dddd",".ddd..","......"],"variants":{"rest":["..dddd",".ddd..","......"],"flat":["..dddd","..dd..","......"],"flared":["..dddd",".ddd..","dd...."]},"key":{"d":"accent.dark"}},
+        {"id":"head-broad","kind":"stamp","on":"head","at":[-5,-3],"anchor":"tl","rows":["mm...","mmmm.","hhhhh","llll.","ll..."],"variants":{"sunk":["mm...","mm...","hhccc","ll...","ll..."]},"key":{"m":"metal.base","l":"metal.dark","h":"metal.light","c":"clear"},"when":{"style":["broad"]}},
+        {"id":"head-needle","kind":"stamp","on":"head","at":[-6,-2],"anchor":"tl","rows":["mmm...","hhhhhh","lll..."],"variants":{"sunk":["mm....","hhcccc","ll...."]},"key":{"m":"metal.base","l":"metal.dark","h":"metal.light","c":"clear"},"when":{"style":["needle"]}},
+        {
+          "id": "head-barbed",
+          "kind": "stamp",
+          "on": "head",
+          "at": [-6,-4],
+          "anchor": "tl",
+          "rows": ["mmm...","..mm..","..mmm.","..hhhh","..lll.","..ll..","lll..."],
+          "variants": {"sunk":["mmm...","..mm..","..mm..","..hhcc","..ll..","..ll..","lll..."]},
+          "key": {"m":"metal.base","l":"metal.dark","h":"metal.light","c":"clear"},
+          "when": {"style":["barbed"]}
+        },
+        {"id":"head-blunt","kind":"stamp","on":"head","at":[-5,-3],"anchor":"tl","rows":[".mmm.","mmmmm","hhhhh","lllll",".lll."],"variants":{"sunk":[".m...","mm...","hhccc","ll...",".l..."]},"key":{"m":"metal.base","l":"metal.dark","h":"metal.light","c":"clear"},"when":{"style":["blunt"]}},
+        {"kind":"outline","paint":"ink"}
+      ],
+      "motion": [{"gen":"pickup.bob","v":1,"node":"tail","clip":["fly"],"height":{"from":"wobble","map":[[0,0],[1,1.2]]}}],
+      "emitters": [
+        {"id":"trail1","gen":"streaks","v":1,"clip":["fly"],"on":"tail","at":[-2,0.5],"when":{"trail":[true]},"count":1,"seed":1,"length":5,"reach":3,"spread":0,"paints":["shine"]},
+        {"id":"trail2","gen":"streaks","v":1,"clip":["fly"],"on":"tail","at":[2,0.5],"when":{"trail":[true]},"count":2,"seed":2,"length":6,"reach":4,"spread":4,"paints":["shine"]},
+        {
+          "id": "splinters",
+          "gen": "particles",
+          "v": 1,
+          "clip": ["hit"],
+          "at": [{"from":"length","map":[[0,22],[0.1249,22],[0.125,23],[0.3749,23],[0.375,24],[0.6249,24],[0.625,25],[0.8749,25],[0.875,26],[1,26]],"round":"px"},7.5],
+          "loop": false,
+          "count": 5,
+          "seed": 2,
+          "stagger": 0.2,
+          "angle": -90,
+          "arc": 149,
+          "dist": 6,
+          "gravity": 2,
+          "size": 1.6,
+          "spread": 1.5,
+          "end": 0.7,
+          "paints": ["shine","wood"]
+        }
+      ]
+    }
+  },
+  "clips": {
+    "fly": {
+      "frames": 4,
+      "fps": 12,
+      "keys": [
+        {"t":0,"ease":"hold","swap":{"vaneUp":"rest","vaneDown":"flared"}},
+        {"t":0.25,"ease":"hold","swap":{"vaneUp":"flared","vaneDown":"rest"}},
+        {"t":0.5,"ease":"hold","swap":{"vaneUp":"rest","vaneDown":"flat"}},
+        {"t":0.75,"ease":"hold","swap":{"vaneUp":"flat","vaneDown":"rest"}}
+      ]
+    },
+    "hit": {
+      "frames": 6,
+      "fps": 16,
+      "loop": false,
+      "keys": [
+        {"t":0,"ease":"hold","swap":{"head-broad":"sunk","head-needle":"sunk","head-barbed":"sunk","head-blunt":"sunk"},"nodes":{"tail":{"move":[0,0]}}},
+        {"t":0.2,"ease":"hold","swap":{"head-broad":"sunk","head-needle":"sunk","head-barbed":"sunk","head-blunt":"sunk"},"nodes":{"tail":{"move":[0,-1]}}},
+        {"t":0.4,"ease":"hold","swap":{"head-broad":"sunk","head-needle":"sunk","head-barbed":"sunk","head-blunt":"sunk"},"nodes":{"tail":{"move":[0,1]}}},
+        {"t":0.6,"ease":"hold","swap":{"head-broad":"sunk","head-needle":"sunk","head-barbed":"sunk","head-blunt":"sunk"},"nodes":{"tail":{"move":[0,-1]}}},
+        {"t":0.8,"ease":"hold","swap":{"head-broad":"sunk","head-needle":"sunk","head-barbed":"sunk","head-blunt":"sunk"},"nodes":{"tail":{"move":[0,1]}}},
+        {"t":1,"ease":"hold","swap":{"head-broad":"sunk","head-needle":"sunk","head-barbed":"sunk","head-blunt":"sunk"},"nodes":{"tail":{"move":[0,0]}}}
+      ]
+    }
+  }
+}

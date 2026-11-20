@@ -1,0 +1,207 @@
+{
+ "id": "rainfall",
+ "frozen": "2026-11-20",
+ "source": "sprites/rainfall.js",
+ "sha256": "bcbb247447be8c061245a627bc9b850f15c08078188fad24c0e5bbb3f1c9d69f",
+ "name": "Rain",
+ "blurb": "Rain falling over the whole screen, near streaks long and bright over far ones short and dim, as drizzle, rain or a slanting storm. Change how many drops, how long, the style, the far rain, the colours and the speed. Lay copies 62 px apart (each over its neighbours' empty border) to cover the screen.",
+ "meta": {
+  "type": "effect",
+  "role": "effects/weather",
+  "themes": [
+   "neutral",
+   "forest",
+   "city"
+  ],
+  "gameTypes": [
+   "platformer",
+   "top-down-rpg",
+   "farming-sim",
+   "shooter"
+  ],
+  "view": "none",
+  "words": [
+   "rain",
+   "raindrops",
+   "shower",
+   "drizzle",
+   "downpour",
+   "storm",
+   "rainy",
+   "wet",
+   "falling",
+   "overlay",
+   "gloomy"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  64,
+  64
+ ],
+ "pivot": [
+  32,
+  32
+ ],
+ "grounded": false,
+ "preview": "loop",
+ "params": {
+  "pieces": {
+   "kind": "range",
+   "label": "Drops",
+   "def": 8,
+   "min": 4,
+   "max": 12,
+   "step": 1,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "length": {
+   "kind": "range",
+   "label": "Length",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Short",
+   "hi": "Long",
+   "group": "Look",
+   "when": {
+    "style": [
+     "rain",
+     "storm"
+    ]
+   }
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "rain",
+   "options": [
+    {
+     "value": "drizzle",
+     "label": "Drizzle"
+    },
+    {
+     "value": "rain",
+     "label": "Rain"
+    },
+    {
+     "value": "storm",
+     "label": "Storm"
+    }
+   ],
+   "group": "Look"
+  },
+  "layers": {
+   "kind": "toggle",
+   "label": "Far rain",
+   "def": true,
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Rain",
+   "def": "#8fd0f0",
+   "swatches": [
+    "#8fd0f0",
+    "#f0ead8",
+    "#3f9fd1",
+    "#c2c9d6",
+    "#d8d8e0"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Far rain",
+   "def": "#7fb0b8",
+   "swatches": [
+    "#7fb0b8",
+    "#8f97a8",
+    "#5d6475",
+    "#8696dc"
+   ],
+   "group": "Colors",
+   "when": {
+    "layers": [
+     true
+    ]
+   }
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "loop": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  }
+ },
+ "sounds": {
+  "loop": [
+   {
+    "sound": "wind",
+    "frame": 0,
+    "preset": "Storm",
+    "volume": 0.35,
+    "when": {
+     "style": [
+      "storm"
+     ]
+    }
+   }
+  ]
+ },
+ "versions": [
+  {
+   "name": "Rain",
+   "params": {}
+  },
+  {
+   "name": "Drizzle",
+   "params": {
+    "style": "drizzle",
+    "pieces": 6
+   }
+  },
+  {
+   "name": "Storm",
+   "params": {
+    "style": "storm",
+    "pieces": 12,
+    "length": 1
+   }
+  },
+  {
+   "name": "Light shower",
+   "params": {
+    "pieces": 4,
+    "layers": false
+   }
+  },
+  {
+   "name": "Night rain",
+   "params": {
+    "body": "#c2c9d6",
+    "accent": "#5d6475"
+   }
+  }
+ ],
+ "bundles": []
+}

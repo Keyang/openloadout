@@ -1,0 +1,1136 @@
+{
+ "id": "paved.course",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "top": 132,
+    "h": 6,
+    "period": 32,
+    "seed": 87,
+    "body": "floor",
+    "joint": "joint",
+    "lit": "floor.light",
+    "dark": "floor.dark"
+   },
+   "ctx": {
+    "size": [
+     320,
+     180
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      132
+     ],
+     "size": [
+      320,
+      6
+     ],
+     "paint": "floor",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      10,
+      132
+     ],
+     "size": [
+      19,
+      6
+     ],
+     "paint": "floor.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      -310,
+      132
+     ],
+     "size": [
+      19,
+      6
+     ],
+     "paint": "floor.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      42,
+      132
+     ],
+     "size": [
+      19,
+      6
+     ],
+     "paint": "floor.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      -278,
+      132
+     ],
+     "size": [
+      19,
+      6
+     ],
+     "paint": "floor.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      74,
+      132
+     ],
+     "size": [
+      19,
+      6
+     ],
+     "paint": "floor.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      -246,
+      132
+     ],
+     "size": [
+      19,
+      6
+     ],
+     "paint": "floor.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      221,
+      132
+     ],
+     "size": [
+      13,
+      6
+     ],
+     "paint": "floor.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      -99,
+      132
+     ],
+     "size": [
+      13,
+      6
+     ],
+     "paint": "floor.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      253,
+      132
+     ],
+     "size": [
+      13,
+      6
+     ],
+     "paint": "floor.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      -67,
+      132
+     ],
+     "size": [
+      13,
+      6
+     ],
+     "paint": "floor.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      10,
+      132
+     ],
+     "size": [
+      2,
+      6
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      29,
+      132
+     ],
+     "size": [
+      2,
+      6
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      42,
+      132
+     ],
+     "size": [
+      2,
+      6
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      61,
+      132
+     ],
+     "size": [
+      2,
+      6
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      74,
+      132
+     ],
+     "size": [
+      2,
+      6
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      93,
+      132
+     ],
+     "size": [
+      2,
+      6
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      106,
+      132
+     ],
+     "size": [
+      2,
+      6
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      125,
+      132
+     ],
+     "size": [
+      2,
+      6
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      138,
+      132
+     ],
+     "size": [
+      2,
+      6
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      157,
+      132
+     ],
+     "size": [
+      2,
+      6
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      170,
+      132
+     ],
+     "size": [
+      2,
+      6
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      189,
+      132
+     ],
+     "size": [
+      2,
+      6
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      202,
+      132
+     ],
+     "size": [
+      2,
+      6
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      221,
+      132
+     ],
+     "size": [
+      2,
+      6
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      234,
+      132
+     ],
+     "size": [
+      2,
+      6
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      253,
+      132
+     ],
+     "size": [
+      2,
+      6
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      266,
+      132
+     ],
+     "size": [
+      2,
+      6
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      285,
+      132
+     ],
+     "size": [
+      2,
+      6
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      298,
+      132
+     ],
+     "size": [
+      2,
+      6
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      317,
+      132
+     ],
+     "size": [
+      2,
+      6
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      132
+     ],
+     "size": [
+      320,
+      1
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      133
+     ],
+     "size": [
+      320,
+      1
+     ],
+     "paint": "floor.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      10,
+      133
+     ],
+     "size": [
+      2,
+      1
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      29,
+      133
+     ],
+     "size": [
+      2,
+      1
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      42,
+      133
+     ],
+     "size": [
+      2,
+      1
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      61,
+      133
+     ],
+     "size": [
+      2,
+      1
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      74,
+      133
+     ],
+     "size": [
+      2,
+      1
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      93,
+      133
+     ],
+     "size": [
+      2,
+      1
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      106,
+      133
+     ],
+     "size": [
+      2,
+      1
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      125,
+      133
+     ],
+     "size": [
+      2,
+      1
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      138,
+      133
+     ],
+     "size": [
+      2,
+      1
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      157,
+      133
+     ],
+     "size": [
+      2,
+      1
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      170,
+      133
+     ],
+     "size": [
+      2,
+      1
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      189,
+      133
+     ],
+     "size": [
+      2,
+      1
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      202,
+      133
+     ],
+     "size": [
+      2,
+      1
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      221,
+      133
+     ],
+     "size": [
+      2,
+      1
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      234,
+      133
+     ],
+     "size": [
+      2,
+      1
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      253,
+      133
+     ],
+     "size": [
+      2,
+      1
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      266,
+      133
+     ],
+     "size": [
+      2,
+      1
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      285,
+      133
+     ],
+     "size": [
+      2,
+      1
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      298,
+      133
+     ],
+     "size": [
+      2,
+      1
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      317,
+      133
+     ],
+     "size": [
+      2,
+      1
+     ],
+     "paint": "joint",
+     "shade": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "top": 145,
+    "h": 13,
+    "period": 64,
+    "calm": true,
+    "seed": 89,
+    "body": "floor",
+    "joint": "joint",
+    "lit": "floor.light",
+    "dark": "floor.dark"
+   },
+   "ctx": {
+    "size": [
+     320,
+     180
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      145
+     ],
+     "size": [
+      320,
+      13
+     ],
+     "paint": "floor",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      20,
+      145
+     ],
+     "size": [
+      2,
+      13
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      58,
+      145
+     ],
+     "size": [
+      2,
+      13
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      84,
+      145
+     ],
+     "size": [
+      2,
+      13
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      122,
+      145
+     ],
+     "size": [
+      2,
+      13
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      148,
+      145
+     ],
+     "size": [
+      2,
+      13
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      186,
+      145
+     ],
+     "size": [
+      2,
+      13
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      212,
+      145
+     ],
+     "size": [
+      2,
+      13
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      250,
+      145
+     ],
+     "size": [
+      2,
+      13
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      276,
+      145
+     ],
+     "size": [
+      2,
+      13
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      314,
+      145
+     ],
+     "size": [
+      2,
+      13
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      145
+     ],
+     "size": [
+      320,
+      1
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      146
+     ],
+     "size": [
+      320,
+      1
+     ],
+     "paint": "floor.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      20,
+      146
+     ],
+     "size": [
+      2,
+      1
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      58,
+      146
+     ],
+     "size": [
+      2,
+      1
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      84,
+      146
+     ],
+     "size": [
+      2,
+      1
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      122,
+      146
+     ],
+     "size": [
+      2,
+      1
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      148,
+      146
+     ],
+     "size": [
+      2,
+      1
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      186,
+      146
+     ],
+     "size": [
+      2,
+      1
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      212,
+      146
+     ],
+     "size": [
+      2,
+      1
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      250,
+      146
+     ],
+     "size": [
+      2,
+      1
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      276,
+      146
+     ],
+     "size": [
+      2,
+      1
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      314,
+      146
+     ],
+     "size": [
+      2,
+      1
+     ],
+     "paint": "joint",
+     "shade": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "top": 20,
+    "h": 10,
+    "period": 48,
+    "shift": 9,
+    "joints": [
+     4,
+     20
+    ],
+    "seed": 2,
+    "body": "floor",
+    "joint": "joint"
+   },
+   "ctx": {
+    "size": [
+     96,
+     48
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      20
+     ],
+     "size": [
+      96,
+      10
+     ],
+     "paint": "floor",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      15,
+      20
+     ],
+     "size": [
+      2,
+      10
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      39,
+      20
+     ],
+     "size": [
+      2,
+      10
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      63,
+      20
+     ],
+     "size": [
+      2,
+      10
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      87,
+      20
+     ],
+     "size": [
+      2,
+      10
+     ],
+     "paint": "joint",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      20
+     ],
+     "size": [
+      96,
+      1
+     ],
+     "paint": "joint",
+     "shade": 0
+    }
+   ]
+  }
+ ]
+}

@@ -22,7 +22,7 @@ import { caseBox, readBoxes, boxShift, touchesEdge } from '../helpers/redraw-box
 const DIR = path.join(ROOT, 'tests', 'fixtures', 'redraw-boxes');
 const records = fs.existsSync(DIR) ? fs.readdirSync(DIR).filter((f) => f.endsWith('.json')).sort() : [];
 // the M1 pickups (docs/data-sprites.md section 9): each must have a record here or an exact one in redraw-pixels/
-const M1 = ['ammo-box', 'arrow-bundle', 'candy', 'coin-pouch', 'credit-chip', 'fruit', 'gem', 'gold-key', 'health-cell'];   // heart and bomb-pickup return with follow-up F4 (docs/progress.md)
+const M1 = ['ammo-box', 'arrow-bundle', 'bomb-pickup', 'candy', 'coin-pouch', 'credit-chip', 'fruit', 'gem', 'gold-key', 'health-cell', 'heart'];   // heart and bomb-pickup back with follow-up F4
 
 test('every M1 redraw has a box record, and each record names a library sprite that is now a data file', () => {
   for (const id of M1) assert.ok(records.includes(`${id}.json`) || fs.existsSync(path.join(ROOT, 'tests', 'fixtures', 'redraw-pixels', `${id}.json`)), `${id}: no record`);

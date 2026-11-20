@@ -12,7 +12,8 @@ import { Surface } from '../../engine/surface.js';
 import * as FX from '../../engine/fx.js';
 import { renderFrame, defaultParams } from '../../engine/sprite.js';
 import { steps } from '../../engine/fx.js';
-import boltCode from '../../sprites/blaster-bolt.js';
+import { codeSprite } from '../helpers/library.mjs';
+const boltCode = await codeSprite('blaster-bolt');   // batch E3: sprites/blaster-bolt.js is data now; its frozen code copy
 
 const RAD = Math.PI / 180;
 const P5 = ['p0', 'p1', 'p2', 'p3', 'p4'];

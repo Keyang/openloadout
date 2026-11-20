@@ -1,0 +1,187 @@
+{
+ "id": "bg-forest",
+ "frozen": "2026-11-20",
+ "source": "sprites/bg-forest.js",
+ "sha256": "8895a3bcedaad808d2d9b014951cc455203c3a2d19f67ccf34c0f9fcc8e6b221",
+ "name": "Forest backdrop",
+ "blurb": "Sky, hills and tall trees in three layers that repeat sideways: scroll far at 0.1, mid at 0.4 and near at 0.7 of the camera's speed. Change the time of day, the colours, the clouds and how thick the forest is.",
+ "meta": {
+  "type": "background",
+  "role": "environment/background",
+  "themes": [
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "platformer"
+  ],
+  "view": "side",
+  "words": [
+   "woodland",
+   "woods",
+   "trees",
+   "hills",
+   "mountains",
+   "sky",
+   "clouds",
+   "backdrop",
+   "scenery",
+   "parallax",
+   "scroll",
+   "sunset",
+   "night",
+   "outdoors"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  320,
+  180
+ ],
+ "pivot": [
+  160,
+  180
+ ],
+ "grounded": false,
+ "preview": "far",
+ "params": {
+  "time": {
+   "kind": "choice",
+   "label": "Time of day",
+   "def": "day",
+   "options": [
+    {
+     "value": "day",
+     "label": "Day"
+    },
+    {
+     "value": "dusk",
+     "label": "Dusk"
+    },
+    {
+     "value": "night",
+     "label": "Night"
+    }
+   ],
+   "group": "Look"
+  },
+  "clouds": {
+   "kind": "range",
+   "label": "Clouds",
+   "def": 0.45,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "height": {
+   "kind": "range",
+   "label": "Height",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Low hills",
+   "hi": "High hills",
+   "group": "Look"
+  },
+  "density": {
+   "kind": "range",
+   "label": "Density",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Few trees",
+   "hi": "Thick forest",
+   "group": "Look"
+  },
+  "haze": {
+   "kind": "range",
+   "label": "Haze",
+   "def": 0.35,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Clear",
+   "hi": "Misty",
+   "group": "Look"
+  },
+  "sky": {
+   "kind": "color",
+   "label": "Sky",
+   "def": "#8fd0f0",
+   "swatches": [
+    "#8fd0f0",
+    "#7fb0b8",
+    "#8696dc",
+    "#f0ead8",
+    "#3f9fd1",
+    "#e08a2c"
+   ],
+   "group": "Colors"
+  },
+  "land": {
+   "kind": "color",
+   "label": "Hills",
+   "def": "#7fb0b8",
+   "swatches": [
+    "#7fb0b8",
+    "#3f8a4f",
+    "#6aa83e",
+    "#5d6475",
+    "#7a4f33",
+    "#8f97a8"
+   ],
+   "group": "Colors"
+  },
+  "leaf": {
+   "kind": "color",
+   "label": "Trees",
+   "def": "#3f8a4f",
+   "swatches": [
+    "#3f8a4f",
+    "#6aa83e",
+    "#a4c44a",
+    "#e08a2c"
+   ],
+   "group": "Colors"
+  }
+ },
+ "clips": {
+  "far": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    4,
+    4,
+    4
+   ]
+  },
+  "mid": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    4,
+    4,
+    4
+   ]
+  },
+  "near": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    4,
+    4,
+    4
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [],
+ "bundles": [
+  "kit-platformer-fantasy"
+ ]
+}

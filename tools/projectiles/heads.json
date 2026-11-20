@@ -1,0 +1,1382 @@
+{
+ "acid-glob": {
+  "name": "Acid glob",
+  "blurb": "A wobbling blob of acid that sheds drips as it flies and splats into a puddle, drawn flying right so a game can turn it to the way it flies. Change its size, shape, drips and colours.",
+  "meta": {
+   "type": "projectile",
+   "role": "effects/projectile",
+   "themes": [
+    "sci-fi",
+    "space",
+    "horror"
+   ],
+   "gameTypes": [
+    "roguelike-action",
+    "shooter",
+    "arcade"
+   ],
+   "view": "top-down",
+   "words": [
+    "acid",
+    "glob",
+    "blob",
+    "spit",
+    "goo",
+    "slime",
+    "venom",
+    "drip",
+    "fly",
+    "hit",
+    "splat",
+    "puddle",
+    "bug attack",
+    "sticky"
+   ],
+   "license": "draft"
+  },
+  "size": [
+   32,
+   32
+  ],
+  "pivot": [
+   16,
+   16
+  ],
+  "grounded": false,
+  "preview": "fly",
+  "params": {
+   "size": {
+    "kind": "range",
+    "label": "Size",
+    "def": 0.5,
+    "min": 0,
+    "max": 1,
+    "step": 0.01,
+    "lo": "Small",
+    "hi": "Big",
+    "group": "Look"
+   },
+   "shape": {
+    "kind": "choice",
+    "label": "Shape",
+    "def": "round",
+    "options": [
+     {
+      "value": "round",
+      "label": "Round"
+     },
+     {
+      "value": "teardrop",
+      "label": "Teardrop"
+     },
+     {
+      "value": "cluster",
+      "label": "Cluster"
+     }
+    ],
+    "group": "Look"
+   },
+   "pieces": {
+    "kind": "range",
+    "label": "Drips",
+    "def": 0.5,
+    "min": 0,
+    "max": 1,
+    "step": 0.01,
+    "lo": "Few",
+    "hi": "Many",
+    "group": "Look"
+   },
+   "body": {
+    "kind": "color",
+    "label": "Body",
+    "def": "#9fe040",
+    "swatches": [
+     "#9fe040",
+     "#2fb3a8",
+     "#4f9ff0",
+     "#5fe0f0",
+     "#b04a8a"
+    ],
+    "group": "Colors"
+   },
+   "glow": {
+    "kind": "color",
+    "label": "Shine",
+    "def": "#f0ead8",
+    "swatches": [
+     "#f0ead8",
+     "#e8ecf2",
+     "#f6d3b0",
+     "#c2c9d6"
+    ],
+    "group": "Colors"
+   },
+   "wobble": {
+    "kind": "range",
+    "label": "Wobble",
+    "def": 0.5,
+    "min": 0,
+    "max": 1,
+    "step": 0.01,
+    "lo": "Firm",
+    "hi": "Wobbly",
+    "group": "Motion"
+   },
+   "speed": {
+    "kind": "range",
+    "label": "Speed",
+    "def": 0.5,
+    "min": 0,
+    "max": 1,
+    "step": 0.01,
+    "lo": "Slow",
+    "hi": "Fast",
+    "group": "Motion"
+   }
+  },
+  "clips": {
+   "fly": {
+    "frames": 8,
+    "loop": true,
+    "fps": [
+     8,
+     13,
+     17
+    ]
+   },
+   "hit": {
+    "frames": 8,
+    "loop": false,
+    "fps": [
+     10,
+     17,
+     23
+    ]
+   }
+  },
+  "sounds": {
+   "hit": [
+    {
+     "sound": "bug-splat",
+     "preset": "Mite pop",
+     "frame": 0,
+     "volume": 0.7
+    }
+   ]
+  }
+ },
+ "arrow": {
+  "name": "Arrow",
+  "blurb": "An arrow that flies to the right and sticks, quivering, where it hits. Change its length, head, feathers, trail and colours.",
+  "meta": {
+   "type": "projectile",
+   "role": "effects/projectile",
+   "themes": [
+    "fantasy",
+    "forest"
+   ],
+   "gameTypes": [
+    "platformer",
+    "arcade",
+    "shooter"
+   ],
+   "view": "side",
+   "words": [
+    "arrow",
+    "bolt",
+    "dart",
+    "bow",
+    "archer",
+    "shot",
+    "shoot",
+    "fly",
+    "hit",
+    "stuck",
+    "ranged attack",
+    "feather",
+    "wooden"
+   ],
+   "license": "draft"
+  },
+  "size": [
+   32,
+   16
+  ],
+  "pivot": [
+   16,
+   8
+  ],
+  "grounded": false,
+  "preview": "fly",
+  "params": {
+   "length": {
+    "kind": "range",
+    "label": "Length",
+    "def": 0.5,
+    "min": 0,
+    "max": 1,
+    "step": 0.01,
+    "lo": "Short",
+    "hi": "Long",
+    "group": "Look"
+   },
+   "style": {
+    "kind": "choice",
+    "label": "Style",
+    "def": "broad",
+    "options": [
+     {
+      "value": "broad",
+      "label": "Broad"
+     },
+     {
+      "value": "needle",
+      "label": "Needle"
+     },
+     {
+      "value": "barbed",
+      "label": "Barbed"
+     },
+     {
+      "value": "blunt",
+      "label": "Blunt"
+     }
+    ],
+    "group": "Look"
+   },
+   "trail": {
+    "kind": "toggle",
+    "label": "Trail",
+    "def": true,
+    "group": "Look"
+   },
+   "wood": {
+    "kind": "color",
+    "label": "Wood",
+    "def": "#a06a3c",
+    "swatches": [
+     "#a06a3c",
+     "#7a4f33",
+     "#f0ead8",
+     "#a8612a",
+     "#5a3a22",
+     "#c98a4a"
+    ],
+    "group": "Colors"
+   },
+   "metal": {
+    "kind": "color",
+    "label": "Metal",
+    "def": "#c2c9d6",
+    "swatches": [
+     "#c2c9d6",
+     "#f2c230",
+     "#8f97a8",
+     "#5d6475",
+     "#e6c545"
+    ],
+    "group": "Colors"
+   },
+   "accent": {
+    "kind": "color",
+    "label": "Feathers",
+    "def": "#c9423a",
+    "swatches": [
+     "#c9423a",
+     "#7a4fc4",
+     "#4fd8ee",
+     "#a4c44a"
+    ],
+    "group": "Colors"
+   },
+   "wobble": {
+    "kind": "range",
+    "label": "Wobble",
+    "def": 0.5,
+    "min": 0,
+    "max": 1,
+    "step": 0.01,
+    "lo": "Firm",
+    "hi": "Wobbly",
+    "group": "Motion"
+   },
+   "speed": {
+    "kind": "range",
+    "label": "Speed",
+    "def": 0.5,
+    "min": 0,
+    "max": 1,
+    "step": 0.01,
+    "lo": "Slow",
+    "hi": "Fast",
+    "group": "Motion"
+   }
+  },
+  "clips": {
+   "fly": {
+    "frames": 4,
+    "loop": true,
+    "fps": [
+     8,
+     13,
+     17
+    ]
+   },
+   "hit": {
+    "frames": 6,
+    "loop": false,
+    "fps": [
+     10,
+     17,
+     23
+    ]
+   }
+  },
+  "sounds": {}
+ },
+ "boulder-chunk": {
+  "name": "Boss rock",
+  "blurb": "A tumbling rock thrown by the moss golem, which shatters into shards and dust. Change its size, shape, moss, cracks, pieces and colours.",
+  "meta": {
+   "type": "projectile",
+   "role": "effects/projectile",
+   "themes": [
+    "fantasy",
+    "forest"
+   ],
+   "gameTypes": [
+    "platformer",
+    "arcade"
+   ],
+   "view": "side",
+   "words": [
+    "rock",
+    "boulder",
+    "stone",
+    "chunk",
+    "rubble",
+    "throw",
+    "tumble",
+    "shatter",
+    "smash",
+    "boss attack",
+    "golem",
+    "mossy",
+    "heavy"
+   ],
+   "license": "draft"
+  },
+  "size": [
+   32,
+   32
+  ],
+  "pivot": [
+   16,
+   16
+  ],
+  "grounded": false,
+  "preview": "fly",
+  "params": {
+   "size": {
+    "kind": "range",
+    "label": "Size",
+    "def": 0.5,
+    "min": 0,
+    "max": 1,
+    "step": 0.01,
+    "lo": "Small",
+    "hi": "Big",
+    "group": "Look"
+   },
+   "shape": {
+    "kind": "choice",
+    "label": "Shape",
+    "def": "round",
+    "options": [
+     {
+      "value": "round",
+      "label": "Round"
+     },
+     {
+      "value": "jagged",
+      "label": "Jagged"
+     },
+     {
+      "value": "slab",
+      "label": "Slab"
+     }
+    ],
+    "group": "Look"
+   },
+   "mossy": {
+    "kind": "toggle",
+    "label": "Mossy",
+    "def": true,
+    "group": "Look"
+   },
+   "wear": {
+    "kind": "range",
+    "label": "Wear",
+    "def": 0.5,
+    "min": 0,
+    "max": 1,
+    "step": 0.01,
+    "lo": "New",
+    "hi": "Worn",
+    "group": "Look"
+   },
+   "pieces": {
+    "kind": "range",
+    "label": "Pieces",
+    "def": 0.5,
+    "min": 0,
+    "max": 1,
+    "step": 0.01,
+    "lo": "Few",
+    "hi": "Many",
+    "group": "Look"
+   },
+   "stone": {
+    "kind": "color",
+    "label": "Stone",
+    "def": "#8f97a8",
+    "swatches": [
+     "#8f97a8",
+     "#5d6475",
+     "#f0ead8",
+     "#6b7280"
+    ],
+    "group": "Colors"
+   },
+   "accent": {
+    "kind": "color",
+    "label": "Moss",
+    "def": "#a4c44a",
+    "swatches": [
+     "#a4c44a",
+     "#6aa83e",
+     "#3f8a4f",
+     "#9bd18a"
+    ],
+    "group": "Colors",
+    "when": {
+     "mossy": [
+      true
+     ]
+    }
+   },
+   "speed": {
+    "kind": "range",
+    "label": "Speed",
+    "def": 0.5,
+    "min": 0,
+    "max": 1,
+    "step": 0.01,
+    "lo": "Slow",
+    "hi": "Fast",
+    "group": "Motion"
+   }
+  },
+  "clips": {
+   "fly": {
+    "frames": 8,
+    "loop": true,
+    "fps": [
+     8,
+     13,
+     17
+    ]
+   },
+   "hit": {
+    "frames": 8,
+    "loop": false,
+    "fps": [
+     10,
+     17,
+     23
+    ]
+   }
+  },
+  "sounds": {
+   "hit": [
+    {
+     "sound": "golem-slam",
+     "preset": "Boulder drop",
+     "frame": 0,
+     "volume": 0.7
+    }
+   ]
+  }
+ },
+ "fireball": {
+  "name": "Fireball",
+  "blurb": "A ball of flame with a streaming tail that bursts into a ring of embers. Change its size, style, tail, sparks and colours.",
+  "meta": {
+   "type": "projectile",
+   "role": "effects/projectile",
+   "themes": [
+    "fantasy",
+    "forest"
+   ],
+   "gameTypes": [
+    "platformer",
+    "arcade",
+    "shooter"
+   ],
+   "view": "side",
+   "words": [
+    "fireball",
+    "fire",
+    "flame",
+    "spell",
+    "magic",
+    "comet",
+    "skull",
+    "shot",
+    "fly",
+    "hit",
+    "burn",
+    "ember",
+    "wizard attack"
+   ],
+   "license": "draft"
+  },
+  "size": [
+   32,
+   32
+  ],
+  "pivot": [
+   16,
+   16
+  ],
+  "grounded": false,
+  "preview": "fly",
+  "params": {
+   "size": {
+    "kind": "range",
+    "label": "Size",
+    "def": 0.5,
+    "min": 0,
+    "max": 1,
+    "step": 0.01,
+    "lo": "Small",
+    "hi": "Big",
+    "group": "Look"
+   },
+   "style": {
+    "kind": "choice",
+    "label": "Style",
+    "def": "ball",
+    "options": [
+     {
+      "value": "ball",
+      "label": "Ball"
+     },
+     {
+      "value": "comet",
+      "label": "Comet"
+     },
+     {
+      "value": "skull",
+      "label": "Skull"
+     }
+    ],
+    "group": "Look"
+   },
+   "length": {
+    "kind": "range",
+    "label": "Length",
+    "def": 0.5,
+    "min": 0,
+    "max": 1,
+    "step": 0.01,
+    "lo": "Short",
+    "hi": "Long",
+    "group": "Look"
+   },
+   "sparks": {
+    "kind": "toggle",
+    "label": "Sparks",
+    "def": true,
+    "group": "Look"
+   },
+   "core": {
+    "kind": "color",
+    "label": "Core",
+    "def": "#f0ead8",
+    "swatches": [
+     "#f0ead8",
+     "#f2c230",
+     "#f6d3b0",
+     "#8fd0f0",
+     "#9bd18a"
+    ],
+    "group": "Colors"
+   },
+   "glow": {
+    "kind": "color",
+    "label": "Glow",
+    "def": "#e08a2c",
+    "swatches": [
+     "#e08a2c",
+     "#c9423a",
+     "#4fd8ee",
+     "#7a4fc4",
+     "#a4c44a",
+     "#3f6fd1"
+    ],
+    "group": "Colors"
+   },
+   "flicker": {
+    "kind": "range",
+    "label": "Flicker",
+    "def": 0.5,
+    "min": 0,
+    "max": 1,
+    "step": 0.01,
+    "lo": "Steady",
+    "hi": "Wild",
+    "group": "Motion"
+   },
+   "speed": {
+    "kind": "range",
+    "label": "Speed",
+    "def": 0.5,
+    "min": 0,
+    "max": 1,
+    "step": 0.01,
+    "lo": "Slow",
+    "hi": "Fast",
+    "group": "Motion"
+   }
+  },
+  "clips": {
+   "fly": {
+    "frames": 8,
+    "loop": true,
+    "fps": [
+     8,
+     13,
+     17
+    ]
+   },
+   "hit": {
+    "frames": 6,
+    "loop": false,
+    "fps": [
+     10,
+     17,
+     23
+    ]
+   }
+  },
+  "sounds": {
+   "hit": [
+    {
+     "sound": "whoosh",
+     "preset": "Heavy swing",
+     "frame": 0,
+     "volume": 0.7
+    }
+   ]
+  }
+ },
+ "micro-rocket": {
+  "name": "Micro rocket",
+  "blurb": "A small missile with a flame and a smoke trail, drawn pointing right so a game can turn it to the way it flies. Change its length, nose, fins, smoke and colours.",
+  "meta": {
+   "type": "projectile",
+   "role": "effects/projectile",
+   "themes": [
+    "sci-fi",
+    "space"
+   ],
+   "gameTypes": [
+    "roguelike-action",
+    "shooter",
+    "arcade"
+   ],
+   "view": "top-down",
+   "words": [
+    "rocket",
+    "missile",
+    "warhead",
+    "launcher",
+    "homing",
+    "smoke",
+    "flame",
+    "shoot",
+    "fly",
+    "hit",
+    "explode",
+    "heavy weapon"
+   ],
+   "license": "draft"
+  },
+  "size": [
+   32,
+   16
+  ],
+  "pivot": [
+   16,
+   8
+  ],
+  "grounded": false,
+  "preview": "fly",
+  "params": {
+   "length": {
+    "kind": "range",
+    "label": "Length",
+    "def": 0.5,
+    "min": 0,
+    "max": 1,
+    "step": 0.01,
+    "lo": "Short",
+    "hi": "Long",
+    "group": "Look"
+   },
+   "shape": {
+    "kind": "choice",
+    "label": "Nose",
+    "def": "round",
+    "options": [
+     {
+      "value": "round",
+      "label": "Round"
+     },
+     {
+      "value": "pointed",
+      "label": "Pointed"
+     },
+     {
+      "value": "flat",
+      "label": "Flat"
+     }
+    ],
+    "group": "Look"
+   },
+   "fins": {
+    "kind": "choice",
+    "label": "Fins",
+    "def": "small",
+    "options": [
+     {
+      "value": "none",
+      "label": "None"
+     },
+     {
+      "value": "small",
+      "label": "Small"
+     },
+     {
+      "value": "swept",
+      "label": "Swept"
+     }
+    ],
+    "group": "Look"
+   },
+   "smoke": {
+    "kind": "toggle",
+    "label": "Smoke",
+    "def": true,
+    "group": "Look"
+   },
+   "body": {
+    "kind": "color",
+    "label": "Body",
+    "def": "#9aa6c0",
+    "swatches": [
+     "#9aa6c0",
+     "#6b7896",
+     "#b04a8a",
+     "#ca9eda",
+     "#e8ecf2",
+     "#566182"
+    ],
+    "group": "Colors"
+   },
+   "accent": {
+    "kind": "color",
+    "label": "Stripe",
+    "def": "#2fb3a8",
+    "swatches": [
+     "#2fb3a8",
+     "#f2a030",
+     "#e2473f",
+     "#3f6fd1",
+     "#5fe0f0",
+     "#9fe040"
+    ],
+    "group": "Colors"
+   },
+   "glow": {
+    "kind": "color",
+    "label": "Flame",
+    "def": "#f2a030",
+    "swatches": [
+     "#f2a030",
+     "#5fe0f0",
+     "#e2473f",
+     "#9fe040",
+     "#b48af8",
+     "#4f9ff0",
+     "#5fd47a"
+    ],
+    "group": "Colors"
+   },
+   "wobble": {
+    "kind": "range",
+    "label": "Wobble",
+    "def": 0.5,
+    "min": 0,
+    "max": 1,
+    "step": 0.01,
+    "lo": "Firm",
+    "hi": "Wobbly",
+    "group": "Motion"
+   },
+   "speed": {
+    "kind": "range",
+    "label": "Speed",
+    "def": 0.5,
+    "min": 0,
+    "max": 1,
+    "step": 0.01,
+    "lo": "Slow",
+    "hi": "Fast",
+    "group": "Motion"
+   }
+  },
+  "clips": {
+   "fly": {
+    "frames": 8,
+    "loop": true,
+    "fps": [
+     8,
+     13,
+     17
+    ]
+   },
+   "hit": {
+    "frames": 6,
+    "loop": false,
+    "fps": [
+     10,
+     17,
+     23
+    ]
+   }
+  },
+  "sounds": {
+   "hit": [
+    {
+     "sound": "explosion",
+     "preset": "Fireworks pop",
+     "frame": 0,
+     "volume": 0.8
+    }
+   ]
+  }
+ },
+ "orbit-blade": {
+  "name": "Orbit blade",
+  "blurb": "A spinning blade that circles its owner, seen from above, with a lit cutting edge; it throws sparks where it bites. Change its size, style, number of blades, motion arcs and colours.",
+  "meta": {
+   "type": "projectile",
+   "role": "effects/projectile",
+   "themes": [
+    "sci-fi",
+    "space"
+   ],
+   "gameTypes": [
+    "roguelike-action",
+    "shooter",
+    "arcade"
+   ],
+   "view": "top-down",
+   "words": [
+    "blade",
+    "saw",
+    "shuriken",
+    "disc",
+    "orbit",
+    "spinning",
+    "circle",
+    "spin",
+    "cut",
+    "hit",
+    "upgrade",
+    "horde survival",
+    "sharp"
+   ],
+   "license": "draft"
+  },
+  "size": [
+   32,
+   32
+  ],
+  "pivot": [
+   16,
+   16
+  ],
+  "grounded": false,
+  "preview": "fly",
+  "params": {
+   "size": {
+    "kind": "range",
+    "label": "Size",
+    "def": 0.5,
+    "min": 0,
+    "max": 1,
+    "step": 0.01,
+    "lo": "Small",
+    "hi": "Big",
+    "group": "Look"
+   },
+   "style": {
+    "kind": "choice",
+    "label": "Style",
+    "def": "saw",
+    "options": [
+     {
+      "value": "saw",
+      "label": "Saw"
+     },
+     {
+      "value": "star",
+      "label": "Star"
+     },
+     {
+      "value": "crescent",
+      "label": "Crescent"
+     }
+    ],
+    "group": "Look"
+   },
+   "blades": {
+    "kind": "choice",
+    "label": "Blades",
+    "def": "three",
+    "options": [
+     {
+      "value": "two",
+      "label": "Two"
+     },
+     {
+      "value": "three",
+      "label": "Three"
+     },
+     {
+      "value": "four",
+      "label": "Four"
+     }
+    ],
+    "group": "Look"
+   },
+   "trail": {
+    "kind": "toggle",
+    "label": "Trail",
+    "def": true,
+    "group": "Look"
+   },
+   "metal": {
+    "kind": "color",
+    "label": "Metal",
+    "def": "#c2c9d6",
+    "swatches": [
+     "#c2c9d6",
+     "#9aa6c0",
+     "#6b7896",
+     "#f2c230",
+     "#8f97a8",
+     "#e6c545",
+     "#c98a4a",
+     "#5d6475"
+    ],
+    "group": "Colors"
+   },
+   "glow": {
+    "kind": "color",
+    "label": "Edge",
+    "def": "#5fe0f0",
+    "swatches": [
+     "#5fe0f0",
+     "#e2473f",
+     "#9fe040",
+     "#f2a030",
+     "#b48af8",
+     "#4f9ff0",
+     "#5fd47a"
+    ],
+    "group": "Colors"
+   },
+   "wobble": {
+    "kind": "range",
+    "label": "Wobble",
+    "def": 0.5,
+    "min": 0,
+    "max": 1,
+    "step": 0.01,
+    "lo": "Firm",
+    "hi": "Wobbly",
+    "group": "Motion"
+   },
+   "speed": {
+    "kind": "range",
+    "label": "Speed",
+    "def": 0.5,
+    "min": 0,
+    "max": 1,
+    "step": 0.01,
+    "lo": "Slow",
+    "hi": "Fast",
+    "group": "Motion"
+   }
+  },
+  "clips": {
+   "fly": {
+    "frames": 8,
+    "loop": true,
+    "fps": [
+     8,
+     13,
+     17
+    ]
+   },
+   "hit": {
+    "frames": 4,
+    "loop": false,
+    "fps": [
+     10,
+     17,
+     23
+    ]
+   }
+  },
+  "sounds": {}
+ },
+ "plasma-orb": {
+  "name": "Enemy plasma orb",
+  "blurb": "A wobbling ball of hostile plasma with a swirl turning inside it, drawn pointing right so a game can turn it to the way it flies; it bursts into a ring of embers. Change its size, style, swirl, tail and colours.",
+  "meta": {
+   "type": "projectile",
+   "role": "effects/projectile",
+   "themes": [
+    "sci-fi",
+    "space"
+   ],
+   "gameTypes": [
+    "roguelike-action",
+    "shooter",
+    "arcade"
+   ],
+   "view": "top-down",
+   "words": [
+    "plasma",
+    "orb",
+    "ball",
+    "energy",
+    "enemy shot",
+    "bullet",
+    "swirl",
+    "shoot",
+    "fly",
+    "hit",
+    "burst",
+    "danger",
+    "hostile"
+   ],
+   "license": "draft"
+  },
+  "size": [
+   32,
+   32
+  ],
+  "pivot": [
+   16,
+   16
+  ],
+  "grounded": false,
+  "preview": "fly",
+  "params": {
+   "size": {
+    "kind": "range",
+    "label": "Size",
+    "def": 0.5,
+    "min": 0,
+    "max": 1,
+    "step": 0.01,
+    "lo": "Small",
+    "hi": "Big",
+    "group": "Look"
+   },
+   "style": {
+    "kind": "choice",
+    "label": "Style",
+    "def": "orb",
+    "options": [
+     {
+      "value": "orb",
+      "label": "Orb"
+     },
+     {
+      "value": "ring",
+      "label": "Ring"
+     },
+     {
+      "value": "spiky",
+      "label": "Spiky"
+     }
+    ],
+    "group": "Look"
+   },
+   "swirl": {
+    "kind": "toggle",
+    "label": "Swirl",
+    "def": true,
+    "group": "Look"
+   },
+   "length": {
+    "kind": "range",
+    "label": "Length",
+    "def": 0.5,
+    "min": 0,
+    "max": 1,
+    "step": 0.01,
+    "lo": "Short",
+    "hi": "Long",
+    "group": "Look"
+   },
+   "core": {
+    "kind": "color",
+    "label": "Core",
+    "def": "#f0ead8",
+    "swatches": [
+     "#f0ead8",
+     "#e8ecf2",
+     "#f6d3b0",
+     "#c2c9d6"
+    ],
+    "group": "Colors"
+   },
+   "glow": {
+    "kind": "color",
+    "label": "Glow",
+    "def": "#e2473f",
+    "swatches": [
+     "#e2473f",
+     "#5fe0f0",
+     "#9fe040",
+     "#f2a030",
+     "#b48af8",
+     "#4f9ff0",
+     "#5fd47a"
+    ],
+    "group": "Colors"
+   },
+   "wobble": {
+    "kind": "range",
+    "label": "Wobble",
+    "def": 0.5,
+    "min": 0,
+    "max": 1,
+    "step": 0.01,
+    "lo": "Firm",
+    "hi": "Wobbly",
+    "group": "Motion"
+   },
+   "speed": {
+    "kind": "range",
+    "label": "Speed",
+    "def": 0.5,
+    "min": 0,
+    "max": 1,
+    "step": 0.01,
+    "lo": "Slow",
+    "hi": "Fast",
+    "group": "Motion"
+   }
+  },
+  "clips": {
+   "fly": {
+    "frames": 8,
+    "loop": true,
+    "fps": [
+     8,
+     13,
+     17
+    ]
+   },
+   "hit": {
+    "frames": 6,
+    "loop": false,
+    "fps": [
+     10,
+     17,
+     23
+    ]
+   }
+  },
+  "sounds": {}
+ },
+ "scatter-pellet": {
+  "name": "Scatter pellet",
+  "blurb": "One small shot from a scatter gun: a bright dot with a short tail, drawn pointing right so a game can turn it to any angle; it pops into four sparks. Change its size, shape, tail and colours.",
+  "meta": {
+   "type": "projectile",
+   "role": "effects/projectile",
+   "themes": [
+    "sci-fi",
+    "space"
+   ],
+   "gameTypes": [
+    "roguelike-action",
+    "shooter",
+    "arcade"
+   ],
+   "view": "top-down",
+   "words": [
+    "pellet",
+    "shot",
+    "bullet",
+    "buckshot",
+    "shotgun",
+    "scatter",
+    "spread",
+    "spark",
+    "shoot",
+    "fly",
+    "hit",
+    "player shot",
+    "small"
+   ],
+   "license": "draft"
+  },
+  "size": [
+   16,
+   16
+  ],
+  "pivot": [
+   8,
+   8
+  ],
+  "grounded": false,
+  "preview": "fly",
+  "params": {
+   "size": {
+    "kind": "range",
+    "label": "Size",
+    "def": 0.5,
+    "min": 0,
+    "max": 1,
+    "step": 0.01,
+    "lo": "Small",
+    "hi": "Big",
+    "group": "Look"
+   },
+   "shape": {
+    "kind": "choice",
+    "label": "Shape",
+    "def": "round",
+    "options": [
+     {
+      "value": "round",
+      "label": "Round"
+     },
+     {
+      "value": "shard",
+      "label": "Shard"
+     },
+     {
+      "value": "spark",
+      "label": "Spark"
+     }
+    ],
+    "group": "Look"
+   },
+   "length": {
+    "kind": "range",
+    "label": "Length",
+    "def": 0.5,
+    "min": 0,
+    "max": 1,
+    "step": 0.01,
+    "lo": "Short",
+    "hi": "Long",
+    "group": "Look"
+   },
+   "core": {
+    "kind": "color",
+    "label": "Core",
+    "def": "#f0ead8",
+    "swatches": [
+     "#f0ead8",
+     "#e8ecf2",
+     "#f6d3b0",
+     "#c2c9d6"
+    ],
+    "group": "Colors"
+   },
+   "glow": {
+    "kind": "color",
+    "label": "Glow",
+    "def": "#3f6fd1",
+    "swatches": [
+     "#3f6fd1",
+     "#5fe0f0",
+     "#e2473f",
+     "#9fe040",
+     "#f2a030",
+     "#b48af8",
+     "#4f9ff0",
+     "#5fd47a"
+    ],
+    "group": "Colors"
+   },
+   "flicker": {
+    "kind": "range",
+    "label": "Flicker",
+    "def": 0.5,
+    "min": 0,
+    "max": 1,
+    "step": 0.01,
+    "lo": "Steady",
+    "hi": "Wild",
+    "group": "Motion"
+   },
+   "speed": {
+    "kind": "range",
+    "label": "Speed",
+    "def": 0.5,
+    "min": 0,
+    "max": 1,
+    "step": 0.01,
+    "lo": "Slow",
+    "hi": "Fast",
+    "group": "Motion"
+   }
+  },
+  "clips": {
+   "fly": {
+    "frames": 4,
+    "loop": true,
+    "fps": [
+     8,
+     13,
+     17
+    ]
+   },
+   "hit": {
+    "frames": 4,
+    "loop": false,
+    "fps": [
+     10,
+     17,
+     23
+    ]
+   }
+  },
+  "sounds": {}
+ }
+}

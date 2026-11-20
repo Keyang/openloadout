@@ -1,0 +1,180 @@
+{
+ "id": "pickup-sparkle",
+ "frozen": "2026-11-20",
+ "source": "sprites/pickup-sparkle.js",
+ "sha256": "fa65248e6e714342abc79c481eb1f890bcb89a227cc1c6b15e1099e829275600",
+ "name": "Pickup sparkle",
+ "blurb": "Twinkles for a collected thing: a ring that spreads and fades, and a shimmer that loops round a rare item. Change the size, number, spread, style, drift and colours.",
+ "meta": {
+  "type": "effect",
+  "role": "effects/spark",
+  "themes": [
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "platformer",
+   "turn-based-rpg",
+   "roguelike-action",
+   "arcade",
+   "puzzle"
+  ],
+  "view": "none",
+  "words": [
+   "sparkle",
+   "twinkle",
+   "glitter",
+   "shimmer",
+   "shine",
+   "glint",
+   "collect",
+   "pickup",
+   "reward",
+   "treasure",
+   "rare",
+   "magic",
+   "star"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "burst",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "pieces": {
+   "kind": "range",
+   "label": "Pieces",
+   "def": 6,
+   "min": 4,
+   "max": 8,
+   "step": 1,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "spread": {
+   "kind": "range",
+   "label": "Spread",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Tight",
+   "hi": "Wide",
+   "group": "Look"
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "plus",
+   "options": [
+    {
+     "value": "plus",
+     "label": "Plus"
+    },
+    {
+     "value": "diamond",
+     "label": "Diamond"
+    },
+    {
+     "value": "dot",
+     "label": "Dot"
+    }
+   ],
+   "group": "Look"
+  },
+  "rise": {
+   "kind": "range",
+   "label": "Rise",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Low",
+   "hi": "High",
+   "group": "Look"
+  },
+  "core": {
+   "kind": "color",
+   "label": "Core",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#f6d3b0",
+    "#8fd0f0",
+    "#9bd18a",
+    "#c2c9d6"
+   ],
+   "group": "Colors"
+  },
+  "edge": {
+   "kind": "color",
+   "label": "Edge",
+   "def": "#f2c230",
+   "swatches": [
+    "#f2c230",
+    "#e08a2c",
+    "#c9423a",
+    "#4fd8ee",
+    "#7a4fc4",
+    "#a4c44a",
+    "#3f6fd1"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "burst": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    9,
+    15,
+    20
+   ]
+  },
+  "loop": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [],
+ "bundles": [
+  "kit-platformer-fantasy"
+ ]
+}

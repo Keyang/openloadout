@@ -1,0 +1,198 @@
+{
+ "id": "wind-gust",
+ "frozen": "2026-11-20",
+ "source": "sprites/wind-gust.js",
+ "sha256": "cf58f084b46d19fc424da279631b6edc244f34f38ee3e425bc55cae8e91ff2b0",
+ "name": "Wind gust",
+ "blurb": "Wind blowing to the right: thin streaks of different lengths slide across and fade, with dust or glints carried along, as a patch to place over a field, a cliff or a road. Change how many streaks, their length and spread, what the wind carries and the colours.",
+ "meta": {
+  "type": "effect",
+  "role": "effects/weather",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "platformer",
+   "top-down-rpg",
+   "racing",
+   "farming-sim"
+  ],
+  "view": "none",
+  "words": [
+   "wind",
+   "gust",
+   "breeze",
+   "gale",
+   "air",
+   "blow",
+   "draft",
+   "dust storm",
+   "speed lines",
+   "weather"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  64,
+  64
+ ],
+ "pivot": [
+  32,
+  32
+ ],
+ "grounded": false,
+ "preview": "loop",
+ "params": {
+  "pieces": {
+   "kind": "range",
+   "label": "Streaks",
+   "def": 6,
+   "min": 3,
+   "max": 10,
+   "step": 1,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "length": {
+   "kind": "range",
+   "label": "Length",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Short",
+   "hi": "Long",
+   "group": "Look"
+  },
+  "spread": {
+   "kind": "range",
+   "label": "Spread",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Tight",
+   "hi": "Wide",
+   "group": "Look"
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "lines",
+   "options": [
+    {
+     "value": "lines",
+     "label": "Lines"
+    },
+    {
+     "value": "dust",
+     "label": "Dust"
+    },
+    {
+     "value": "glints",
+     "label": "Glints"
+    }
+   ],
+   "group": "Look"
+  },
+  "core": {
+   "kind": "color",
+   "label": "Streaks",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#7fb0b8",
+    "#8fd0f0",
+    "#4fd8ee",
+    "#e6c96a"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Dust",
+   "def": "#a06a3c",
+   "swatches": [
+    "#a06a3c",
+    "#7a4f33",
+    "#8f97a8",
+    "#5d6475"
+   ],
+   "group": "Colors",
+   "when": {
+    "style": [
+     "dust"
+    ]
+   }
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "loop": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  }
+ },
+ "sounds": {
+  "loop": [
+   {
+    "sound": "wind",
+    "preset": "Breeze",
+    "frame": 0,
+    "volume": 0.35
+   }
+  ]
+ },
+ "versions": [
+  {
+   "name": "Breeze",
+   "params": {}
+  },
+  {
+   "name": "Gale",
+   "params": {
+    "pieces": 10,
+    "length": 1
+   }
+  },
+  {
+   "name": "Dust storm",
+   "params": {
+    "style": "dust",
+    "core": "#e6c96a",
+    "accent": "#7a4f33"
+   }
+  },
+  {
+   "name": "Sparkling air",
+   "params": {
+    "style": "glints",
+    "core": "#4fd8ee"
+   }
+  },
+  {
+   "name": "Light air",
+   "params": {
+    "pieces": 3,
+    "length": 0
+   }
+  }
+ ],
+ "bundles": []
+}

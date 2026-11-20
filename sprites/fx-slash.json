@@ -1,0 +1,1868 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "fx-slash",
+ "name": "Slash",
+ "blurb": "The mark of a weapon hit: a crescent that sweeps across the target and thins away, or two that cross. Change its size, curve, thickness, style, sparks and colours.",
+ "meta": {
+  "type": "effect",
+  "role": "effects/spark",
+  "themes": [
+   "fantasy"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "roguelike-action",
+   "platformer"
+  ],
+  "view": "side",
+  "words": [
+   "slash",
+   "cut",
+   "sword",
+   "swing",
+   "strike",
+   "claw",
+   "scratch",
+   "hit",
+   "attack",
+   "crescent",
+   "blade",
+   "damage",
+   "sharp"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  64,
+  64
+ ],
+ "pivot": [
+  32,
+  32
+ ],
+ "grounded": false,
+ "preview": "burst",
+ "palette": [
+  {
+   "id": "core",
+   "label": "Core",
+   "default": "#f0ead8",
+   "material": "light",
+   "swatches": [
+    "#f0ead8",
+    "#f4e06a",
+    "#f6d3b0",
+    "#9fd8f4"
+   ]
+  },
+  {
+   "id": "edge",
+   "label": "Edge",
+   "default": "#c2c9d6",
+   "material": "light",
+   "swatches": [
+    "#c2c9d6",
+    "#e8662c",
+    "#7a4fc4",
+    "#2f8f9d",
+    "#c9423a",
+    "#7fe0a0",
+    "#7aa0f4"
+   ]
+  },
+  {
+   "id": "mid",
+   "material": "light",
+   "derive": {
+    "rule": "mix",
+    "of": "core",
+    "with": "edge",
+    "amount": 0.5
+   }
+  },
+  {
+   "id": "rim",
+   "material": "light",
+   "derive": {
+    "rule": "tone",
+    "of": "edge",
+    "by": -1
+   }
+  },
+  {
+   "id": "shine",
+   "default": "#ffffff",
+   "material": "light",
+   "detail": true
+  }
+ ],
+ "controls": [
+  {
+   "key": "size",
+   "kind": "range",
+   "label": "Size",
+   "lo": "Small",
+   "hi": "Big",
+   "default": 0.5
+  },
+  {
+   "key": "length",
+   "kind": "range",
+   "label": "Curve",
+   "lo": "Straight",
+   "hi": "Curved",
+   "default": 0.5
+  },
+  {
+   "key": "thickness",
+   "kind": "range",
+   "label": "Thickness",
+   "lo": "Thin",
+   "hi": "Chunky",
+   "default": 0.5
+  },
+  {
+   "key": "style",
+   "kind": "choice",
+   "label": "Style",
+   "options": [
+    "clean",
+    "jagged",
+    "claw"
+   ],
+   "default": "clean"
+  },
+  {
+   "key": "sparks",
+   "kind": "toggle",
+   "label": "Sparks",
+   "default": true
+  },
+  {
+   "key": "core",
+   "kind": "colour",
+   "label": "Core"
+  },
+  {
+   "key": "edge",
+   "kind": "colour",
+   "label": "Edge"
+  },
+  {
+   "key": "speed",
+   "standard": "speed"
+  }
+ ],
+ "body": {
+  "emitters": [
+   {
+    "id": "blade",
+    "gen": "crescent",
+    "v": 1,
+    "at": [
+     32,
+     32
+    ],
+    "length": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       42
+      ],
+      [
+       1,
+       66
+      ]
+     ]
+    },
+    "angle": -40,
+    "bulge": {
+     "from": "length",
+     "map": [
+      [
+       0,
+       0.6
+      ],
+      [
+       1,
+       16.74
+      ]
+     ]
+    },
+    "teeth": 9,
+    "seed": 3,
+    "paints": [
+     "shine",
+     "core",
+     "mid",
+     "edge",
+     "rim"
+    ],
+    "when": {
+     "style": [
+      "clean"
+     ]
+    },
+    "width": {
+     "from": "thickness",
+     "map": [
+      [
+       0,
+       5
+      ],
+      [
+       1,
+       11.5
+      ]
+     ]
+    }
+   },
+   {
+    "id": "jagged",
+    "gen": "crescent",
+    "v": 1,
+    "at": [
+     32,
+     32
+    ],
+    "length": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       42
+      ],
+      [
+       1,
+       66
+      ]
+     ]
+    },
+    "angle": -40,
+    "bulge": {
+     "from": "length",
+     "map": [
+      [
+       0,
+       0.6
+      ],
+      [
+       1,
+       16.74
+      ]
+     ]
+    },
+    "teeth": 9,
+    "seed": 3,
+    "paints": [
+     "shine",
+     "core",
+     "mid",
+     "edge",
+     "rim"
+    ],
+    "when": {
+     "style": [
+      "jagged"
+     ]
+    },
+    "width": {
+     "from": "thickness",
+     "map": [
+      [
+       0,
+       5
+      ],
+      [
+       1,
+       11.5
+      ]
+     ]
+    },
+    "jag": {
+     "from": "thickness",
+     "map": [
+      [
+       0,
+       2
+      ],
+      [
+       1,
+       3.04
+      ]
+     ]
+    }
+   },
+   {
+    "id": "claw",
+    "gen": "crescent",
+    "v": 1,
+    "at": [
+     32,
+     32
+    ],
+    "length": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       42
+      ],
+      [
+       1,
+       66
+      ]
+     ]
+    },
+    "angle": -40,
+    "bulge": {
+     "from": "length",
+     "map": [
+      [
+       0,
+       0.6
+      ],
+      [
+       1,
+       16.74
+      ]
+     ]
+    },
+    "teeth": 9,
+    "seed": 3,
+    "paints": [
+     "shine",
+     "core",
+     "mid",
+     "edge",
+     "rim"
+    ],
+    "when": {
+     "style": [
+      "claw"
+     ]
+    },
+    "width": {
+     "from": "thickness",
+     "map": [
+      [
+       0,
+       3
+      ],
+      [
+       1,
+       6.9
+      ]
+     ]
+    },
+    "claws": 3,
+    "gap": {
+     "from": "thickness",
+     "map": [
+      [
+       0,
+       5.7
+      ],
+      [
+       1,
+       9.73
+      ]
+     ]
+    }
+   },
+   {
+    "id": "glint0",
+    "gen": "twinkle",
+    "v": 2,
+    "when": {
+     "sparks": [
+      true
+     ]
+    },
+    "at": [
+     32,
+     32
+    ],
+    "size": 3,
+    "paint": "core",
+    "core": "shine"
+   },
+   {
+    "id": "glint1",
+    "gen": "twinkle",
+    "v": 2,
+    "when": {
+     "sparks": [
+      true
+     ]
+    },
+    "at": [
+     32,
+     32
+    ],
+    "size": 3,
+    "paint": "core",
+    "core": "shine"
+   },
+   {
+    "id": "glint2",
+    "gen": "twinkle",
+    "v": 2,
+    "when": {
+     "sparks": [
+      true
+     ]
+    },
+    "at": [
+     32,
+     32
+    ],
+    "size": 3,
+    "paint": "core",
+    "core": "shine"
+   },
+   {
+    "id": "glint3",
+    "gen": "twinkle",
+    "v": 2,
+    "when": {
+     "sparks": [
+      true
+     ]
+    },
+    "at": [
+     32,
+     32
+    ],
+    "size": 3,
+    "paint": "core",
+    "core": "shine"
+   },
+   {
+    "id": "blade-back",
+    "gen": "crescent",
+    "v": 1,
+    "clip": [
+     "cross"
+    ],
+    "at": [
+     32,
+     32
+    ],
+    "length": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       42
+      ],
+      [
+       1,
+       66
+      ]
+     ]
+    },
+    "angle": 40,
+    "bulge": {
+     "from": "length",
+     "map": [
+      [
+       0,
+       0.6
+      ],
+      [
+       1,
+       16.74
+      ]
+     ]
+    },
+    "flip": true,
+    "teeth": 9,
+    "seed": 1,
+    "paints": [
+     "shine",
+     "core",
+     "mid",
+     "edge",
+     "rim"
+    ],
+    "when": {
+     "style": [
+      "clean"
+     ]
+    },
+    "width": {
+     "from": "thickness",
+     "map": [
+      [
+       0,
+       5
+      ],
+      [
+       1,
+       11.5
+      ]
+     ]
+    }
+   },
+   {
+    "id": "jagged-back",
+    "gen": "crescent",
+    "v": 1,
+    "clip": [
+     "cross"
+    ],
+    "at": [
+     32,
+     32
+    ],
+    "length": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       42
+      ],
+      [
+       1,
+       66
+      ]
+     ]
+    },
+    "angle": 40,
+    "bulge": {
+     "from": "length",
+     "map": [
+      [
+       0,
+       0.6
+      ],
+      [
+       1,
+       16.74
+      ]
+     ]
+    },
+    "flip": true,
+    "teeth": 9,
+    "seed": 1,
+    "paints": [
+     "shine",
+     "core",
+     "mid",
+     "edge",
+     "rim"
+    ],
+    "when": {
+     "style": [
+      "jagged"
+     ]
+    },
+    "width": {
+     "from": "thickness",
+     "map": [
+      [
+       0,
+       5
+      ],
+      [
+       1,
+       11.5
+      ]
+     ]
+    },
+    "jag": {
+     "from": "thickness",
+     "map": [
+      [
+       0,
+       2
+      ],
+      [
+       1,
+       3.04
+      ]
+     ]
+    }
+   },
+   {
+    "id": "claw-back",
+    "gen": "crescent",
+    "v": 1,
+    "clip": [
+     "cross"
+    ],
+    "at": [
+     32,
+     32
+    ],
+    "length": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       42
+      ],
+      [
+       1,
+       66
+      ]
+     ]
+    },
+    "angle": 40,
+    "bulge": {
+     "from": "length",
+     "map": [
+      [
+       0,
+       0.6
+      ],
+      [
+       1,
+       16.74
+      ]
+     ]
+    },
+    "flip": true,
+    "teeth": 9,
+    "seed": 1,
+    "paints": [
+     "shine",
+     "core",
+     "mid",
+     "edge",
+     "rim"
+    ],
+    "when": {
+     "style": [
+      "claw"
+     ]
+    },
+    "width": {
+     "from": "thickness",
+     "map": [
+      [
+       0,
+       3
+      ],
+      [
+       1,
+       6.9
+      ]
+     ]
+    },
+    "claws": 3,
+    "gap": {
+     "from": "thickness",
+     "map": [
+      [
+       0,
+       5.7
+      ],
+      [
+       1,
+       9.73
+      ]
+     ]
+    }
+   },
+   {
+    "id": "glint0-back",
+    "gen": "twinkle",
+    "v": 2,
+    "clip": [
+     "cross"
+    ],
+    "when": {
+     "sparks": [
+      true
+     ]
+    },
+    "at": [
+     32,
+     32
+    ],
+    "size": 3,
+    "paint": "core",
+    "core": "shine"
+   },
+   {
+    "id": "glint1-back",
+    "gen": "twinkle",
+    "v": 2,
+    "clip": [
+     "cross"
+    ],
+    "when": {
+     "sparks": [
+      true
+     ]
+    },
+    "at": [
+     32,
+     32
+    ],
+    "size": 3,
+    "paint": "core",
+    "core": "shine"
+   },
+   {
+    "id": "glint2-back",
+    "gen": "twinkle",
+    "v": 2,
+    "clip": [
+     "cross"
+    ],
+    "when": {
+     "sparks": [
+      true
+     ]
+    },
+    "at": [
+     32,
+     32
+    ],
+    "size": 3,
+    "paint": "core",
+    "core": "shine"
+   },
+   {
+    "id": "glint3-back",
+    "gen": "twinkle",
+    "v": 2,
+    "clip": [
+     "cross"
+    ],
+    "when": {
+     "sparks": [
+      true
+     ]
+    },
+    "at": [
+     32,
+     32
+    ],
+    "size": 3,
+    "paint": "core",
+    "core": "shine"
+   }
+  ]
+ },
+ "clips": {
+  "burst": {
+   "frames": 6,
+   "fps": 16,
+   "loop": false,
+   "keys": [
+    {
+     "t": 0,
+     "emit": {
+      "blade": {
+       "amount": 1,
+       "start": 0,
+       "end": 0.72,
+       "thin": 0.9,
+       "cool": 0
+      },
+      "jagged": {
+       "amount": 1,
+       "start": 0,
+       "end": 0.72,
+       "thin": 0.9,
+       "cool": 0
+      },
+      "claw": {
+       "amount": 1,
+       "start": 0,
+       "end": 0.72,
+       "thin": 0.9,
+       "cool": 0
+      },
+      "glint0": {
+       "amount": 1,
+       "at": [
+        32,
+        18
+       ],
+       "size": 2
+      },
+      "glint1": {
+       "amount": 1,
+       "at": [
+        38,
+        35
+       ],
+       "size": 3
+      },
+      "glint2": {
+       "amount": 1,
+       "at": [
+        22,
+        32
+       ],
+       "size": 2
+      },
+      "glint3": {
+       "amount": 1,
+       "at": [
+        30,
+        48
+       ],
+       "size": 3
+      }
+     }
+    },
+    {
+     "t": 0.2,
+     "emit": {
+      "blade": {
+       "amount": 1,
+       "start": 0,
+       "end": 1,
+       "thin": 1,
+       "cool": 1
+      },
+      "jagged": {
+       "amount": 1,
+       "start": 0,
+       "end": 1,
+       "thin": 1,
+       "cool": 1
+      },
+      "claw": {
+       "amount": 1,
+       "start": 0,
+       "end": 1,
+       "thin": 1,
+       "cool": 1
+      },
+      "glint0": {
+       "amount": 1,
+       "at": [
+        30,
+        17
+       ],
+       "size": 3
+      },
+      "glint1": {
+       "amount": 1,
+       "at": [
+        39,
+        37
+       ],
+       "size": 3
+      },
+      "glint2": {
+       "amount": 1,
+       "at": [
+        20,
+        32
+       ],
+       "size": 3
+      },
+      "glint3": {
+       "amount": 1,
+       "at": [
+        31,
+        51
+       ],
+       "size": 3
+      }
+     }
+    },
+    {
+     "t": 0.4,
+     "emit": {
+      "blade": {
+       "amount": 1,
+       "start": 0.22,
+       "end": 1,
+       "thin": 0.72,
+       "cool": 1
+      },
+      "jagged": {
+       "amount": 1,
+       "start": 0.22,
+       "end": 1,
+       "thin": 0.72,
+       "cool": 1
+      },
+      "claw": {
+       "amount": 1,
+       "start": 0.22,
+       "end": 1,
+       "thin": 0.72,
+       "cool": 1
+      },
+      "glint0": {
+       "amount": 1,
+       "at": [
+        28,
+        17
+       ],
+       "size": 3
+      },
+      "glint1": {
+       "amount": 1,
+       "at": [
+        39,
+        39
+       ],
+       "size": 2
+      },
+      "glint2": {
+       "amount": 1,
+       "at": [
+        18,
+        32
+       ],
+       "size": 3
+      },
+      "glint3": {
+       "amount": 1,
+       "at": [
+        32,
+        53
+       ],
+       "size": 2
+      }
+     }
+    },
+    {
+     "t": 0.6,
+     "emit": {
+      "blade": {
+       "amount": 1,
+       "start": 0.5,
+       "end": 1,
+       "thin": 0.45,
+       "cool": 2
+      },
+      "jagged": {
+       "amount": 1,
+       "start": 0.5,
+       "end": 1,
+       "thin": 0.45,
+       "cool": 2
+      },
+      "claw": {
+       "amount": 1,
+       "start": 0.5,
+       "end": 1,
+       "thin": 0.45,
+       "cool": 2
+      },
+      "glint0": {
+       "amount": 1,
+       "at": [
+        25,
+        16
+       ],
+       "size": 2
+      },
+      "glint1": {
+       "amount": 1,
+       "at": [
+        40,
+        41
+       ],
+       "size": 1
+      },
+      "glint2": {
+       "amount": 1,
+       "at": [
+        16,
+        31
+       ],
+       "size": 2
+      },
+      "glint3": {
+       "amount": 1,
+       "at": [
+        33,
+        55
+       ],
+       "size": 1
+      }
+     }
+    },
+    {
+     "t": 0.8,
+     "emit": {
+      "blade": {
+       "amount": 1,
+       "start": 0.74,
+       "end": 1,
+       "thin": 0.26,
+       "cool": 3
+      },
+      "jagged": {
+       "amount": 1,
+       "start": 0.74,
+       "end": 1,
+       "thin": 0.26,
+       "cool": 3
+      },
+      "claw": {
+       "amount": 1,
+       "start": 0.74,
+       "end": 1,
+       "thin": 0.26,
+       "cool": 3
+      },
+      "glint0": {
+       "amount": 1,
+       "at": [
+        23,
+        16
+       ],
+       "size": 1
+      },
+      "glint1": {
+       "amount": 1,
+       "at": [
+        41,
+        43
+       ],
+       "size": 1
+      },
+      "glint2": {
+       "amount": 1,
+       "at": [
+        14,
+        31
+       ],
+       "size": 1
+      },
+      "glint3": {
+       "amount": 1,
+       "at": [
+        35,
+        57
+       ],
+       "size": 1
+      }
+     }
+    },
+    {
+     "t": 1,
+     "emit": {
+      "blade": {
+       "amount": 1,
+       "start": 0.9,
+       "end": 1,
+       "thin": 0.1,
+       "cool": 4
+      },
+      "jagged": {
+       "amount": 1,
+       "start": 0.9,
+       "end": 1,
+       "thin": 0.1,
+       "cool": 4
+      },
+      "claw": {
+       "amount": 1,
+       "start": 0.9,
+       "end": 1,
+       "thin": 0.1,
+       "cool": 4
+      },
+      "glint0": {
+       "amount": 1,
+       "at": [
+        21,
+        15
+       ],
+       "size": 1
+      },
+      "glint1": {
+       "amount": 1,
+       "at": [
+        41,
+        45
+       ],
+       "size": 1
+      },
+      "glint2": {
+       "amount": 1,
+       "at": [
+        12,
+        31
+       ],
+       "size": 1
+      },
+      "glint3": {
+       "amount": 1,
+       "at": [
+        36,
+        60
+       ],
+       "size": 1
+      }
+     }
+    }
+   ],
+   "sounds": [
+    {
+     "sound": "sword-slash",
+     "preset": "Quick dagger",
+     "frame": 1,
+     "volume": 0.7
+    }
+   ]
+  },
+  "cross": {
+   "label": "Cross slash",
+   "frames": 8,
+   "fps": 16,
+   "loop": false,
+   "keys": [
+    {
+     "t": 0,
+     "emit": {
+      "blade": {
+       "amount": 1,
+       "start": 0,
+       "end": 0.72,
+       "thin": 0.9,
+       "cool": 0
+      },
+      "jagged": {
+       "amount": 1,
+       "start": 0,
+       "end": 0.72,
+       "thin": 0.9,
+       "cool": 0
+      },
+      "claw": {
+       "amount": 1,
+       "start": 0,
+       "end": 0.72,
+       "thin": 0.9,
+       "cool": 0
+      },
+      "glint0": {
+       "amount": 1,
+       "at": [
+        32,
+        18
+       ],
+       "size": 2
+      },
+      "glint1": {
+       "amount": 1,
+       "at": [
+        38,
+        35
+       ],
+       "size": 3
+      },
+      "glint2": {
+       "amount": 1,
+       "at": [
+        22,
+        32
+       ],
+       "size": 2
+      },
+      "glint3": {
+       "amount": 1,
+       "at": [
+        30,
+        48
+       ],
+       "size": 3
+      },
+      "blade-back": {
+       "amount": 0
+      },
+      "jagged-back": {
+       "amount": 0
+      },
+      "claw-back": {
+       "amount": 0
+      },
+      "glint0-back": {
+       "amount": 0
+      },
+      "glint1-back": {
+       "amount": 0
+      },
+      "glint2-back": {
+       "amount": 0
+      },
+      "glint3-back": {
+       "amount": 0
+      }
+     }
+    },
+    {
+     "t": 0.14285714285714285,
+     "emit": {
+      "blade": {
+       "amount": 1,
+       "start": 0,
+       "end": 1,
+       "thin": 1,
+       "cool": 1
+      },
+      "jagged": {
+       "amount": 1,
+       "start": 0,
+       "end": 1,
+       "thin": 1,
+       "cool": 1
+      },
+      "claw": {
+       "amount": 1,
+       "start": 0,
+       "end": 1,
+       "thin": 1,
+       "cool": 1
+      },
+      "glint0": {
+       "amount": 1,
+       "at": [
+        30,
+        17
+       ],
+       "size": 3
+      },
+      "glint1": {
+       "amount": 1,
+       "at": [
+        39,
+        37
+       ],
+       "size": 3
+      },
+      "glint2": {
+       "amount": 1,
+       "at": [
+        20,
+        32
+       ],
+       "size": 3
+      },
+      "glint3": {
+       "amount": 1,
+       "at": [
+        31,
+        51
+       ],
+       "size": 3
+      },
+      "blade-back": {
+       "amount": 0
+      },
+      "jagged-back": {
+       "amount": 0
+      },
+      "claw-back": {
+       "amount": 0
+      },
+      "glint0-back": {
+       "amount": 0
+      },
+      "glint1-back": {
+       "amount": 0
+      },
+      "glint2-back": {
+       "amount": 0
+      },
+      "glint3-back": {
+       "amount": 0
+      }
+     }
+    },
+    {
+     "t": 0.2857142857142857,
+     "emit": {
+      "blade": {
+       "amount": 1,
+       "start": 0.22,
+       "end": 1,
+       "thin": 0.72,
+       "cool": 1
+      },
+      "jagged": {
+       "amount": 1,
+       "start": 0.22,
+       "end": 1,
+       "thin": 0.72,
+       "cool": 1
+      },
+      "claw": {
+       "amount": 1,
+       "start": 0.22,
+       "end": 1,
+       "thin": 0.72,
+       "cool": 1
+      },
+      "glint0": {
+       "amount": 1,
+       "at": [
+        28,
+        17
+       ],
+       "size": 3
+      },
+      "glint1": {
+       "amount": 1,
+       "at": [
+        39,
+        39
+       ],
+       "size": 2
+      },
+      "glint2": {
+       "amount": 1,
+       "at": [
+        18,
+        32
+       ],
+       "size": 3
+      },
+      "glint3": {
+       "amount": 1,
+       "at": [
+        32,
+        53
+       ],
+       "size": 2
+      },
+      "blade-back": {
+       "amount": 0
+      },
+      "jagged-back": {
+       "amount": 0
+      },
+      "claw-back": {
+       "amount": 0
+      },
+      "glint0-back": {
+       "amount": 0
+      },
+      "glint1-back": {
+       "amount": 0
+      },
+      "glint2-back": {
+       "amount": 0
+      },
+      "glint3-back": {
+       "amount": 0
+      }
+     }
+    },
+    {
+     "t": 0.42857142857142855,
+     "emit": {
+      "blade": {
+       "amount": 1,
+       "start": 0.5,
+       "end": 1,
+       "thin": 0.45,
+       "cool": 2
+      },
+      "jagged": {
+       "amount": 1,
+       "start": 0.5,
+       "end": 1,
+       "thin": 0.45,
+       "cool": 2
+      },
+      "claw": {
+       "amount": 1,
+       "start": 0.5,
+       "end": 1,
+       "thin": 0.45,
+       "cool": 2
+      },
+      "glint0": {
+       "amount": 1,
+       "at": [
+        25,
+        16
+       ],
+       "size": 2
+      },
+      "glint1": {
+       "amount": 1,
+       "at": [
+        40,
+        41
+       ],
+       "size": 1
+      },
+      "glint2": {
+       "amount": 1,
+       "at": [
+        16,
+        31
+       ],
+       "size": 2
+      },
+      "glint3": {
+       "amount": 1,
+       "at": [
+        33,
+        55
+       ],
+       "size": 1
+      },
+      "blade-back": {
+       "amount": 1,
+       "start": 0,
+       "end": 0.72,
+       "thin": 0.9,
+       "cool": 0
+      },
+      "jagged-back": {
+       "amount": 1,
+       "start": 0,
+       "end": 0.72,
+       "thin": 0.9,
+       "cool": 0
+      },
+      "claw-back": {
+       "amount": 1,
+       "start": 0,
+       "end": 0.72,
+       "thin": 0.9,
+       "cool": 0
+      },
+      "glint0-back": {
+       "amount": 1,
+       "at": [
+        28,
+        14
+       ],
+       "size": 2
+      },
+      "glint1-back": {
+       "amount": 1,
+       "at": [
+        23,
+        36
+       ],
+       "size": 3
+      },
+      "glint2-back": {
+       "amount": 1,
+       "at": [
+        42,
+        30
+       ],
+       "size": 2
+      },
+      "glint3-back": {
+       "amount": 1,
+       "at": [
+        32,
+        45
+       ],
+       "size": 3
+      }
+     }
+    },
+    {
+     "t": 0.5714285714285714,
+     "emit": {
+      "blade": {
+       "amount": 1,
+       "start": 0.74,
+       "end": 1,
+       "thin": 0.26,
+       "cool": 3
+      },
+      "jagged": {
+       "amount": 1,
+       "start": 0.74,
+       "end": 1,
+       "thin": 0.26,
+       "cool": 3
+      },
+      "claw": {
+       "amount": 1,
+       "start": 0.74,
+       "end": 1,
+       "thin": 0.26,
+       "cool": 3
+      },
+      "glint0": {
+       "amount": 1,
+       "at": [
+        23,
+        16
+       ],
+       "size": 1
+      },
+      "glint1": {
+       "amount": 1,
+       "at": [
+        41,
+        43
+       ],
+       "size": 1
+      },
+      "glint2": {
+       "amount": 1,
+       "at": [
+        14,
+        31
+       ],
+       "size": 1
+      },
+      "glint3": {
+       "amount": 1,
+       "at": [
+        35,
+        57
+       ],
+       "size": 1
+      },
+      "blade-back": {
+       "amount": 1,
+       "start": 0,
+       "end": 1,
+       "thin": 1,
+       "cool": 1
+      },
+      "jagged-back": {
+       "amount": 1,
+       "start": 0,
+       "end": 1,
+       "thin": 1,
+       "cool": 1
+      },
+      "claw-back": {
+       "amount": 1,
+       "start": 0,
+       "end": 1,
+       "thin": 1,
+       "cool": 1
+      },
+      "glint0-back": {
+       "amount": 1,
+       "at": [
+        31,
+        13
+       ],
+       "size": 3
+      },
+      "glint1-back": {
+       "amount": 1,
+       "at": [
+        22,
+        38
+       ],
+       "size": 3
+      },
+      "glint2-back": {
+       "amount": 1,
+       "at": [
+        45,
+        30
+       ],
+       "size": 3
+      },
+      "glint3-back": {
+       "amount": 1,
+       "at": [
+        32,
+        47
+       ],
+       "size": 3
+      }
+     }
+    },
+    {
+     "t": 0.7142857142857143,
+     "emit": {
+      "blade": {
+       "amount": 1,
+       "start": 0.9,
+       "end": 1,
+       "thin": 0.1,
+       "cool": 4
+      },
+      "jagged": {
+       "amount": 1,
+       "start": 0.9,
+       "end": 1,
+       "thin": 0.1,
+       "cool": 4
+      },
+      "claw": {
+       "amount": 1,
+       "start": 0.9,
+       "end": 1,
+       "thin": 0.1,
+       "cool": 4
+      },
+      "glint0": {
+       "amount": 1,
+       "at": [
+        21,
+        15
+       ],
+       "size": 1
+      },
+      "glint1": {
+       "amount": 1,
+       "at": [
+        41,
+        45
+       ],
+       "size": 1
+      },
+      "glint2": {
+       "amount": 1,
+       "at": [
+        12,
+        31
+       ],
+       "size": 1
+      },
+      "glint3": {
+       "amount": 1,
+       "at": [
+        36,
+        60
+       ],
+       "size": 1
+      },
+      "blade-back": {
+       "amount": 1,
+       "start": 0.22,
+       "end": 1,
+       "thin": 0.72,
+       "cool": 1
+      },
+      "jagged-back": {
+       "amount": 1,
+       "start": 0.22,
+       "end": 1,
+       "thin": 0.72,
+       "cool": 1
+      },
+      "claw-back": {
+       "amount": 1,
+       "start": 0.22,
+       "end": 1,
+       "thin": 0.72,
+       "cool": 1
+      },
+      "glint0-back": {
+       "amount": 1,
+       "at": [
+        33,
+        13
+       ],
+       "size": 3
+      },
+      "glint1-back": {
+       "amount": 1,
+       "at": [
+        20,
+        40
+       ],
+       "size": 2
+      },
+      "glint2-back": {
+       "amount": 1,
+       "at": [
+        47,
+        29
+       ],
+       "size": 3
+      },
+      "glint3-back": {
+       "amount": 1,
+       "at": [
+        31,
+        49
+       ],
+       "size": 2
+      }
+     }
+    },
+    {
+     "t": 0.8571428571428571,
+     "emit": {
+      "blade": {
+       "amount": 0
+      },
+      "jagged": {
+       "amount": 0
+      },
+      "claw": {
+       "amount": 0
+      },
+      "glint0": {
+       "amount": 0
+      },
+      "glint1": {
+       "amount": 0
+      },
+      "glint2": {
+       "amount": 0
+      },
+      "glint3": {
+       "amount": 0
+      },
+      "blade-back": {
+       "amount": 1,
+       "start": 0.5,
+       "end": 1,
+       "thin": 0.45,
+       "cool": 2
+      },
+      "jagged-back": {
+       "amount": 1,
+       "start": 0.5,
+       "end": 1,
+       "thin": 0.45,
+       "cool": 2
+      },
+      "claw-back": {
+       "amount": 1,
+       "start": 0.5,
+       "end": 1,
+       "thin": 0.45,
+       "cool": 2
+      },
+      "glint0-back": {
+       "amount": 1,
+       "at": [
+        35,
+        12
+       ],
+       "size": 2
+      },
+      "glint1-back": {
+       "amount": 1,
+       "at": [
+        19,
+        42
+       ],
+       "size": 1
+      },
+      "glint2-back": {
+       "amount": 1,
+       "at": [
+        49,
+        29
+       ],
+       "size": 2
+      },
+      "glint3-back": {
+       "amount": 1,
+       "at": [
+        30,
+        50
+       ],
+       "size": 1
+      }
+     }
+    },
+    {
+     "t": 1,
+     "emit": {
+      "blade": {
+       "amount": 0
+      },
+      "jagged": {
+       "amount": 0
+      },
+      "claw": {
+       "amount": 0
+      },
+      "glint0": {
+       "amount": 0
+      },
+      "glint1": {
+       "amount": 0
+      },
+      "glint2": {
+       "amount": 0
+      },
+      "glint3": {
+       "amount": 0
+      },
+      "blade-back": {
+       "amount": 1,
+       "start": 0.74,
+       "end": 1,
+       "thin": 0.26,
+       "cool": 3
+      },
+      "jagged-back": {
+       "amount": 1,
+       "start": 0.74,
+       "end": 1,
+       "thin": 0.26,
+       "cool": 3
+      },
+      "claw-back": {
+       "amount": 1,
+       "start": 0.74,
+       "end": 1,
+       "thin": 0.26,
+       "cool": 3
+      },
+      "glint0-back": {
+       "amount": 1,
+       "at": [
+        37,
+        12
+       ],
+       "size": 1
+      },
+      "glint1-back": {
+       "amount": 1,
+       "at": [
+        18,
+        45
+       ],
+       "size": 1
+      },
+      "glint2-back": {
+       "amount": 1,
+       "at": [
+        51,
+        28
+       ],
+       "size": 1
+      },
+      "glint3-back": {
+       "amount": 1,
+       "at": [
+        29,
+        52
+       ],
+       "size": 1
+      }
+     }
+    }
+   ],
+   "sounds": [
+    {
+     "sound": "sword-slash",
+     "preset": "Quick dagger",
+     "frame": 1,
+     "volume": 0.7
+    },
+    {
+     "sound": "sword-slash",
+     "preset": "Quick dagger",
+     "frame": 4,
+     "volume": 0.7
+    }
+   ]
+  }
+ }
+}

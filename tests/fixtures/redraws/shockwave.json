@@ -1,0 +1,208 @@
+{
+ "id": "shockwave",
+ "frozen": "2026-11-20",
+ "source": "sprites/shockwave.js",
+ "sha256": "b5f34ceabb3327752409a6f798d32ef3056faf5d9fc45cd7f2a7ca20ed6ad547",
+ "name": "Shockwave",
+ "blurb": "A ground shockwave from a heavy landing or a slam: a white flash, a flat ring racing out along the ground, dust and flying chips. Change its size, chips, spread, height, style and colours.",
+ "meta": {
+  "type": "effect",
+  "role": "effects/dust",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "platformer",
+   "roguelike-action",
+   "arcade",
+   "top-down-rpg"
+  ],
+  "view": "side",
+  "words": [
+   "shockwave",
+   "slam",
+   "stomp",
+   "quake",
+   "impact",
+   "landing",
+   "ground pound",
+   "shock",
+   "ring",
+   "dust",
+   "rocks",
+   "tremor",
+   "heavy"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  64,
+  64
+ ],
+ "pivot": [
+  32,
+  62
+ ],
+ "grounded": false,
+ "preview": "burst",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "pieces": {
+   "kind": "range",
+   "label": "Rocks",
+   "def": 4,
+   "min": 2,
+   "max": 8,
+   "step": 1,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "spread": {
+   "kind": "range",
+   "label": "Spread",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Tight",
+   "hi": "Wide",
+   "group": "Look"
+  },
+  "height": {
+   "kind": "range",
+   "label": "Height",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Short",
+   "hi": "Tall",
+   "group": "Look"
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "dust",
+   "options": [
+    {
+     "value": "dust",
+     "label": "Dust"
+    },
+    {
+     "value": "energy",
+     "label": "Energy"
+    },
+    {
+     "value": "quake",
+     "label": "Quake"
+    }
+   ],
+   "group": "Look"
+  },
+  "core": {
+   "kind": "color",
+   "label": "Core",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#f2c230",
+    "#8fd0f0",
+    "#c2c9d6",
+    "#f6d3b0"
+   ],
+   "group": "Colors"
+  },
+  "edge": {
+   "kind": "color",
+   "label": "Edge",
+   "def": "#8f97a8",
+   "swatches": [
+    "#8f97a8",
+    "#e08a2c",
+    "#c9423a",
+    "#4fd8ee",
+    "#7a4fc4",
+    "#a4c44a",
+    "#3f6fd1"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "burst": {
+   "frames": 10,
+   "loop": false,
+   "fps": [
+    10,
+    17,
+    23
+   ]
+  }
+ },
+ "sounds": {
+  "burst": [
+   {
+    "sound": "land-thud",
+    "preset": "Heavy landing",
+    "frame": 0,
+    "volume": 0.8
+   }
+  ]
+ },
+ "versions": [
+  {
+   "name": "Ground slam",
+   "params": {}
+  },
+  {
+   "name": "Energy wave",
+   "params": {
+    "style": "energy",
+    "edge": "#4fd8ee"
+   }
+  },
+  {
+   "name": "Quake",
+   "params": {
+    "style": "quake",
+    "pieces": 8
+   }
+  },
+  {
+   "name": "Low ripple",
+   "params": {
+    "height": 0,
+    "spread": 1
+   }
+  },
+  {
+   "name": "Small thump",
+   "params": {
+    "size": 0
+   }
+  }
+ ],
+ "bundles": []
+}

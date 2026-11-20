@@ -40,7 +40,10 @@
 // colour resolve.js could not work out is flagged lost: true on its palette entry; the layout refuses a frame that
 // paints one (engine/draw-list.js lostPaints), reading the flag, never the colour, so a palette's real #ff00ff draws.
 // A frame's colour work is bounded (COLOUR_BUDGET, clear.of weighed as 60). Run as a plain generator, a colour rule
-// draws a swatch.
+// draws a swatch. M10b: the rules a layer item names are worked out before it runs (ownPaintsIn), each distinct rule
+// once a frame (the budget's memo), so a generator copies a slot's name into its primitives, not the rule; the frame's
+// slots are then named in the order the primitives first paint them (byFirstUse), as before. The colour rules of
+// engine/gen/scenery.js (stand.apart@1) are worked out here too (SCENERY_COLOUR_WORK).
 //
 // Pure: no DOM, no Node, no clock, no randomness (seeds through engine/motion.js hash). Runs unchanged in the browser
 // and in Node.
@@ -53,6 +56,8 @@ import { PALETTES, applyColour } from '../theme.js';
 import { COLOUR_RULES, FALLBACK, whenMatches } from '../data-rules.js';
 import { sceneItems, paintHex } from '../resolve.js';
 import { lostPaints } from '../draw-list.js';
+// migration batch M10b: the colour rules engine/gen/scenery.js adds (stand.apart@1), read only when a frame works one out
+import { SCENERY_COLOUR_WORK } from './scenery.js';
 
 const isObj = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
 const fin = (v) => typeof v === 'number' && Number.isFinite(v);
@@ -134,16 +139,39 @@ const sine = (u) => Math.cos(TAU * u);
  * Arguments: { base, height, seed, peaks, shape ('round' | 'jagged'), rough (0..1) }, W.
  */
 export function ridgeOutline({ base = 140, height = 40, seed: s = 1, peaks = 4, shape = 'round', rough = 0.35 } = {}, W = 320) {
+  // the same outline asked for again (a ridge, then a treeline or a fill standing on it) is the one already made, its
+  // values at the column centres worked out once (M10b: a layer in 10 ms, docs/data-sprites.md 4.2)
+  const key = `${base}|${height}|${s}|${peaks}|${shape}|${rough}|${W}`;
+  const made = OUTLINES.get(key);
+  if (made) return made;
+  const f = ridgeOutlineOf(base, height, s, peaks, shape, rough, W);
+  const at = new Float64Array(Math.max(0, Math.min(1280, Math.floor(W)))).fill(NaN);
+  const out = (x) => {
+    const i = x - 0.5;
+    if (!(i >= 0 && i < at.length && Number.isInteger(i))) return f(x);
+    const v = at[i];
+    return v === v ? v : (at[i] = f(x));
+  };
+  if (OUTLINES.size > 256) OUTLINES.clear();
+  OUTLINES.set(key, out);
+  return out;
+}
+/** The outlines ridgeOutline has made, by their arguments (at most 256 kept). */
+const OUTLINES = new Map();
+/** ridgeOutline's outline, made afresh. */
+function ridgeOutlineOf(base, height, s, peaks, shape, rough, W) {
   const main = shape === 'jagged' ? tri : sine;
   const p = Math.max(1, Math.round(peaks));
   const ph = (k) => hash(s, k);
   const slow = p > 1 ? [[1, 0.42], [Math.max(1, p - 1), p > 2 ? 0.3 : 0]] : [];
   const fast = [[p * 2 + 1, 0.2], [p * 3 + 2, 0.12], [p * 5 + 1, 0.07]];
+  // the seeded numbers worked out once (the same products, in the same order, as written out per column)
+  const p1 = ph(1), S = slow.map(([k, a], i) => [k, a * (0.6 + 0.4 * ph(10 + i)), ph(20 + i)]), F = fast.map(([k, a], i) => [k, rough * a, ph(30 + i)]);
   const raw = (x) => {
     const u = mod(x, W) / W;
-    let v = main(u * p + ph(1));
-    for (let i = 0; i < slow.length; i++) v += slow[i][1] * (0.6 + 0.4 * ph(10 + i)) * sine(u * slow[i][0] + ph(20 + i));
-    if (rough > 0) for (let i = 0; i < fast.length; i++) v += rough * fast[i][1] * main(u * fast[i][0] + ph(30 + i));
+    let v = main(u * p + p1);
+    for (let i = 0; i < S.length; i++) v += S[i][1] * sine(u * S[i][0] + S[i][2]);
+    if (rough > 0) for (let i = 0; i < F.length; i++) v += F[i][1] * main(u * F[i][0] + F[i][2]);
     return v;
   };
   let lo = Infinity, hi = -Infinity;
@@ -904,7 +932,7 @@ export const clearOfRule = defineGenerator({
  */
 const COLOUR_BUDGET = Object.freeze({ walk: 40000, work: 1500 });
 /** What working out one colour rule costs of COLOUR_BUDGET.work (1 if not named): clear.of searches up to 96 tones under every site palette (about 0.4 ms at worst), so a frame works out about 24 different ones at most (a library background uses 6 at most). */
-const COLOUR_WEIGHT = Object.freeze({ 'clear.of': 60 });
+const COLOUR_WEIGHT = Object.freeze({ 'clear.of': 60, 'stand.apart': 120 });      // stand.apart@1 (engine/gen/scenery.js): up to two clear.of searches
 
 /** The objects and lists inside the colour rules anywhere in a call's arguments (0 when it names none). */
 function ruleNodesIn(v, depth = 0) {
@@ -934,7 +962,27 @@ function paintWalk(v, depth = 0, acc = { nodes: 0, own: false }) {
  * answer is null and budget.over is set).
  */
 export function workOutColour(ref, palette = {}, params = {}, reg = null, depth = 0, budget = null) {
+  // a budget with a memo (a Map: the layers layout's, one a frame) works out each distinct rule once and charges it once,
+  // so a chain of colour rules named inside several paints (a tone, its lit tone and its dark one) costs what it holds
+  const memo = budget && budget.memo instanceof Map && isObj(ref) ? budget.memo : null;
+  if (!memo) return workOut(ref, palette, params, reg, depth, budget);
+  // each entry keeps how many levels below its own the working out went (span): it is handed back, and kept, only where
+  // depth + span stays within the cap of 8, so an answer never depends on the depth it was first met at (review of M10b)
+  const key = JSON.stringify(ref), hit = memo.get(key);
+  if (hit && depth + hit.span <= 8) { budget.deepest = Math.max(budget.deepest ?? 0, depth + hit.span); return hit.out; }
+  const before = budget.deepest ?? 0;
+  budget.deepest = depth;
+  const out = workOut(ref, palette, params, reg, depth, budget);
+  const span = budget.deepest - depth;
+  budget.deepest = Math.max(before, budget.deepest);
+  if (!budget.over && depth + span <= 8) memo.set(key, { out, span });
+  return out;
+}
+
+/** workOutColour without its memo (it calls workOutColour for what lies inside, so the memo reaches every level). */
+function workOut(ref, palette, params, reg, depth, budget) {
   try {
+    if (budget && budget.memo && depth > (budget.deepest ?? 0)) budget.deepest = depth;
     if (depth > 8) return null;
     if (typeof ref === 'string') return paintHex(ref, palette, params);
     if (!isObj(ref) || typeof ref.rule !== 'string') return null;
@@ -953,7 +1001,7 @@ export function workOutColour(ref, palette = {}, params = {}, reg = null, depth 
     if (ref.rule === 'choose') return workOutColour(taken(ref), palette, params, reg, depth + 1, budget);
     if (Object.hasOwn(COLOUR_RULES, ref.rule)) { const r = sub(ref, depth); return lost || budget?.over ? null : paintHex(r, palette, params); }
     const v = fin(ref.v) ? ref.v : 1, key = `${ref.rule}@${v}`;
-    const work = COLOUR_WORK[key];
+    const work = Object.hasOwn(COLOUR_WORK, key) ? COLOUR_WORK[key] : Object.hasOwn(SCENERY_COLOUR_WORK, key) ? SCENERY_COLOUR_WORK[key] : null;
     const entry = (reg && typeof reg.generator === 'function' ? reg.generator(ref.rule, v) : null) ?? siteGenerator(ref.rule, v);
     if (!work || !entry || entry.family !== 'colour') return null;
     const args = {};
@@ -989,12 +1037,44 @@ function slotsRead(v, palette, out = [], depth = 0) {
  */
 function finishOwnPaints(p, S, depth = 0) {
   if (!isObj(p) || depth > 6) return p;
-  const fix = (v) => {
+  const fix = (v) => ownPaint(v, S);
+  const out = { ...p };
+  if (Object.hasOwn(p, 'paint')) out.paint = fix(p.paint);
+  if (isObj(p.key)) out.key = Object.fromEntries(Object.entries(p.key).map(([k, v]) => [k, fix(v)]));
+  if (Array.isArray(p.stops)) out.stops = p.stops.map(fix);
+  if (p.kind === 'text' && Object.hasOwn(p, 'outline')) out.outline = fix(p.outline);
+  for (const f of ['area', 'shape']) if (isObj(p[f])) out[f] = finishOwnPaints(p[f], S, depth + 1);
+  return out;
+}
+
+/** Generators that read the rule of their paint (sky.bands gives each band a sky.look's `at`): their `paint` is left as written for them to read. */
+const PAINT_READERS = new Set(['sky.bands@1']);
+
+/**
+ * A layer item with every paint inside it that holds one of this module's colour rules worked out once, before the item
+ * runs (ownPaint: a slot of the frame's own): a generator then copies a slot's name into each primitive it gives, not
+ * the whole rule, and the registry checks a name (docs/data-sprites.md 4.2, a layer in 10 ms; build item B14c's "work
+ * the rules out once a frame"). `when` is left alone, and so is the paint of a PAINT_READERS generator.
+ */
+function ownPaintsIn(v, S, depth = 0) {
+  if (!v || typeof v !== 'object' || depth > 24) return v;
+  if (Array.isArray(v)) return v.map((x) => ownPaintsIn(x, S, depth + 1));
+  if (typeof v.rule === 'string') return ownPaint(v, S);
+  const reads = typeof v.gen === 'string' && PAINT_READERS.has(`${v.gen}@${fin(v.v) ? v.v : 1}`);
+  return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, k === 'when' || (reads && k === 'paint') ? x : ownPaintsIn(x, S, depth + 1)]));
+}
+
+/** True when a paint reads a slot the frame made (ownPaintsIn worked a rule out to it before a generator wrapped it in a tone): engine/resolve.js does not know that slot, so the paint is worked out here. */
+const readsFrameSlot = (v, S) => S.synth.size > 0 && slotsRead(v, S.palette).some((k) => !Object.hasOwn(S.base, k));
+
+/** One paint with this module's colour rules worked out to a slot of the frame's own (see finishOwnPaints); any other paint as it is. Throws as finishOwnPaints says. */
+function ownPaint(v, S) {
+  {
     if (!v || typeof v !== 'object') return v;
     const w = paintWalk(v);
     S.walked += w.nodes;
     if (S.walked > COLOUR_BUDGET.walk) throw new Error(`layer ${S.clip}: its colour rules are too much to read in one frame (more than ${COLOUR_BUDGET.walk} parts of paints): nest fewer colour rules, or paint fewer things with a big one`);
-    if (!w.own) return v;
+    if (!w.own && !readsFrameSlot(v, S)) return v;
     const text = JSON.stringify(v);
     if (S.seen.has(text)) return S.seen.get(text);
     const hex = workOutColour(v, S.palette, S.params, S.reg, 0, S.work);
@@ -1013,14 +1093,40 @@ function finishOwnPaints(p, S, depth = 0) {
     }
     S.seen.set(text, id);
     return id;
+  }
+}
+
+/**
+ * The frame's own slots (finishOwnPaints, ownPaintsIn) renamed <stem>-r<n> in the order the primitives first paint them
+ * (paint, key, stops, a text's outline, area, shape), n from 501 for each stem, past the ids the palette has: the names a
+ * frame had when its slots were made from its primitives one by one. Returns { list, palette (the slots painted, by
+ * their new names) }.
+ */
+function byFirstUse(prims, S, base) {
+  const made = new Set(S.synth.values()), to = new Map(), next = new Map(), taken = new Set(Object.keys(base)), palette = {};
+  if (!made.size) return { list: prims, palette };
+  const name = (id) => {
+    if (!made.has(id)) return id;
+    if (to.has(id)) return to.get(id);
+    const stem = id.slice(0, id.lastIndexOf('-r'));
+    let n = next.get(stem) ?? 501;
+    while (taken.has(`${stem}-r${n}`)) n++;
+    const nu = `${stem}-r${n}`;
+    next.set(stem, n + 1); taken.add(nu); to.set(id, nu); palette[nu] = S.palette[id];
+    return nu;
   };
-  const out = { ...p };
-  if (Object.hasOwn(p, 'paint')) out.paint = fix(p.paint);
-  if (isObj(p.key)) out.key = Object.fromEntries(Object.entries(p.key).map(([k, v]) => [k, fix(v)]));
-  if (Array.isArray(p.stops)) out.stops = p.stops.map(fix);
-  if (p.kind === 'text' && Object.hasOwn(p, 'outline')) out.outline = fix(p.outline);
-  for (const f of ['area', 'shape']) if (isObj(p[f])) out[f] = finishOwnPaints(p[f], S, depth + 1);
-  return out;
+  const ref = (v) => { if (typeof v !== 'string') return v; const dot = v.indexOf('.'); return dot < 0 ? name(v) : `${name(v.slice(0, dot))}${v.slice(dot)}`; };
+  const fix = (p, depth = 0) => {
+    if (!isObj(p) || depth > 6) return p;
+    const out = { ...p };
+    if (Object.hasOwn(p, 'paint')) out.paint = ref(p.paint);
+    if (isObj(p.key)) out.key = Object.fromEntries(Object.entries(p.key).map(([k, v]) => [k, ref(v)]));
+    if (Array.isArray(p.stops)) out.stops = p.stops.map(ref);
+    if (p.kind === 'text' && Object.hasOwn(p, 'outline')) out.outline = ref(p.outline);
+    for (const f of ['area', 'shape']) if (isObj(p[f])) out[f] = fix(p[f], depth + 1);
+    return out;
+  };
+  return { list: prims.map((p) => fix(p)), palette };
 }
 
 /** True when a primitive still needs engine/resolve.js expandFrame: a piece (`use`), or a paint that is not a plain slot, tone, ink or clear (an engine/data-rules.js colour rule). */
@@ -1081,12 +1187,16 @@ function layout(input, ctx) {
     try { const c = (reg ?? { checkCall: siteCheckCall }).checkCall(call); if (fin(c?.cost)) cost = Math.max(1, c.cost); } catch { cost = 1; }
     if (nodes * cost > COLOUR_BUDGET.walk * 4) throw new Error(`layer ${String(ctx.clip).slice(0, 24)}: ${String(call.gen).slice(0, 24)} copies ${nodes} parts of colour rules into up to ${cost} shapes, too much to read in one frame: nest fewer colour rules, or paint fewer things with a big one`);
   }
+  const S = { palette: Object.fromEntries(Object.entries(R.palette ?? {}).map(([k, v]) => [k, { ...v }])), base: R.palette ?? {}, params: R.params ?? {}, reg, synth: new Map(), seen: new Map(), walked: 0, work: { left: COLOUR_BUDGET.work, memo: new Map() }, clip: ctx.clip };
+  // this module's colour rules worked out once, in the items, before they run (ownPaintsIn): what a call copies into
+  // its primitives is then a slot's name
+  const ready = items.map((it) => ownPaintsIn(it, S));
   const plainCtx = { t: ctx.t, frame: ctx.frame, frames: ctx.frames, loop: ctx.loop, size: [...ctx.size], clip: ctx.clip, direction: null };
-  const r = (reg ?? { expandList: siteExpandList }).expandList(items, plainCtx);
+  const r = (reg ?? { expandList: siteExpandList }).expandList(ready, plainCtx);
   if (!r.ok) throw new Error(`layer ${ctx.clip}: ${r.errors.slice(0, 6).join('; ')}`);
-  const S = { palette: Object.fromEntries(Object.entries(R.palette ?? {}).map(([k, v]) => [k, { ...v }])), params: R.params ?? {}, reg, synth: new Map(), seen: new Map(), walked: 0, work: { left: COLOUR_BUDGET.work }, clip: ctx.clip };
-  const own = r.primitives.map((p) => finishOwnPaints(p, S));
-  const mine = Object.fromEntries(Object.entries(S.palette).filter(([k]) => !Object.hasOwn(R.palette ?? {}, k)));
+  // the frame's own slots named in the order the primitives first paint them (as when each was made from the
+  // primitives, before ownPaintsIn: a frame's list is the same), those no primitive paints left out
+  const { list: own, palette: mine } = byFirstUse(r.primitives.map((p) => finishOwnPaints(p, S)), S, R.palette ?? {});
   // pieces and engine/data-rules.js rules (input.expand) only for the primitives that hold them: a fill's polygons,
   // painted with slots, are checked once (by the registry, above), not twice (section 4.2: a layer in 10 ms)
   const list = [];

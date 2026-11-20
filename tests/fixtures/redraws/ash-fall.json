@@ -1,0 +1,206 @@
+{
+ "id": "ash-fall",
+ "frozen": "2026-11-20",
+ "source": "sprites/ash-fall.js",
+ "sha256": "161e524c44ce71d2808a22f0c27b872174f661cf92cd97892f5ae299033500e9",
+ "name": "Falling ash",
+ "blurb": "Ash tumbling down over the whole screen, as grey flecks, glowing cinders that blink as they tumble, or fine soot. Change how many flakes, their size, the style, the sway, the colours and the speed. Lay copies 62 px apart (each over its neighbours' empty border) to cover the screen.",
+ "meta": {
+  "type": "effect",
+  "role": "effects/weather",
+  "themes": [
+   "neutral",
+   "dungeon",
+   "horror"
+  ],
+  "gameTypes": [
+   "platformer",
+   "roguelike-action",
+   "top-down-rpg",
+   "shooter"
+  ],
+  "view": "none",
+  "words": [
+   "ash",
+   "ashes",
+   "cinders",
+   "embers",
+   "soot",
+   "volcano",
+   "burned",
+   "smoulder",
+   "fallout",
+   "falling",
+   "gloomy",
+   "overlay"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  64,
+  64
+ ],
+ "pivot": [
+  32,
+  32
+ ],
+ "grounded": false,
+ "preview": "loop",
+ "params": {
+  "pieces": {
+   "kind": "range",
+   "label": "Flakes",
+   "def": 8,
+   "min": 4,
+   "max": 12,
+   "step": 1,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look",
+   "when": {
+    "style": [
+     "ash",
+     "cinders"
+    ]
+   }
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "ash",
+   "options": [
+    {
+     "value": "ash",
+     "label": "Ash"
+    },
+    {
+     "value": "cinders",
+     "label": "Cinders"
+    },
+    {
+     "value": "soot",
+     "label": "Soot"
+    }
+   ],
+   "group": "Look"
+  },
+  "sway": {
+   "kind": "range",
+   "label": "Sway",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Still",
+   "hi": "Swaying",
+   "group": "Motion",
+   "when": {
+    "style": [
+     "ash",
+     "cinders"
+    ]
+   }
+  },
+  "body": {
+   "kind": "color",
+   "label": "Ash",
+   "def": "#8f97a8",
+   "swatches": [
+    "#8f97a8",
+    "#f0ead8",
+    "#5d6475",
+    "#6b7280",
+    "#7fb0b8"
+   ],
+   "group": "Colors"
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Embers",
+   "def": "#e08a2c",
+   "swatches": [
+    "#e08a2c",
+    "#f2c230",
+    "#c9423a",
+    "#4fd8ee"
+   ],
+   "group": "Colors",
+   "when": {
+    "style": [
+     "cinders"
+    ]
+   }
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "loop": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [
+  {
+   "name": "Ash",
+   "params": {}
+  },
+  {
+   "name": "Cinders",
+   "params": {
+    "style": "cinders",
+    "body": "#7fb0b8",
+    "pieces": 10
+   }
+  },
+  {
+   "name": "Soot",
+   "params": {
+    "style": "soot",
+    "body": "#5d6475"
+   }
+  },
+  {
+   "name": "Heavy fall",
+   "params": {
+    "pieces": 12,
+    "size": 1
+   }
+  },
+  {
+   "name": "Cold ash",
+   "params": {
+    "body": "#f0ead8",
+    "sway": 1,
+    "pieces": 5
+   }
+  }
+ ],
+ "bundles": []
+}

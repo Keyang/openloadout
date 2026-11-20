@@ -1,0 +1,146 @@
+{
+  "format": "loadout-sprite",
+  "version": 2,
+  "id": "fireball",
+  "name": "Fireball",
+  "blurb": "A ball of flame with a streaming tail that bursts into a ring of embers. Change its size, style, tail, sparks and colours.",
+  "meta": {
+    "type": "projectile",
+    "role": "effects/projectile",
+    "themes": ["fantasy","forest"],
+    "gameTypes": ["platformer","arcade","shooter"],
+    "view": "side",
+    "words": ["fireball","fire","flame","spell","magic","comet","skull","shot","fly","hit","burn","ember","wizard attack"],
+    "license": "draft"
+  },
+  "size": [32,32],
+  "pivot": [16,16],
+  "grounded": false,
+  "preview": "fly",
+  "styles": ["pixel"],
+  "palette": [
+    {"id":"core","label":"Core","default":"#f0ead8","material":"fire","swatches":["#f0ead8","#f2c230","#f6d3b0","#8fd0f0","#9bd18a"]},
+    {"id":"glow","label":"Glow","default":"#e08a2c","material":"fire","swatches":["#e08a2c","#c9423a","#4fd8ee","#7a4fc4","#a4c44a","#3f6fd1"]},
+    {"id":"mid","material":"fire","derive":{"rule":"mix","of":"core","with":"glow","amount":0.5}},
+    {"id":"rim","material":"fire","derive":{"rule":"tone","of":"glow","by":-1}},
+    {"id":"shine","default":"#ffffff","material":"light","detail":true}
+  ],
+  "controls": [
+    {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+    {"key":"style","kind":"choice","label":"Style","options":["ball","comet","skull"],"default":"ball"},
+    {"key":"length","kind":"range","label":"Length","lo":"Short","hi":"Long","default":0.5},
+    {"key":"sparks","kind":"toggle","label":"Sparks","default":true},
+    {"key":"core","kind":"colour","label":"Core"},
+    {"key":"glow","kind":"colour","label":"Glow"},
+    {"key":"flicker","kind":"range","label":"Flicker","lo":"Steady","hi":"Wild","default":0.5,"group":"Motion"},
+    {"key":"speed","standard":"speed"}
+  ],
+  "body": {
+    "nodes": [
+      {"id":"ball","parent":null,"at":[{"from":"length","map":[[0,18],[1,22]],"round":"px"},16]},
+      {"id":"jaw","parent":"ball","at":[0,0]}
+    ],
+    "draw": [
+      {"id":"cranium","kind":"ellipse","on":"ball","at":[0.5,{"from":"size","map":[[0,-0.5],[0.249,-0.5],[0.25,-1],[1,-1]]}],"r":[{"from":"size","map":[[0,3.046],[1,5.314]]},{"from":"size","map":[[0,2.646],[1,4.914]]}],"paint":"core","shade":1,"group":"bone","when":{"style":["skull"],"clip":["fly"]}},
+      {"id":"jawSmall","kind":"rect","on":"jaw","at":[-1,1],"size":[3,2],"paint":"core","group":"bone","when":{"style":["skull"],"size":[{"below":0.25}],"clip":["fly"]}},
+      {"id":"jawBig","kind":"rect","on":"jaw","at":[-1,{"from":"size","map":[[0,1],[1,2.5]],"round":"px"}],"size":[5,3],"paint":"core","group":"bone","when":{"style":["skull"],"size":[{"atLeast":0.25}],"clip":["fly"]}},
+      {"id":"eyesSmall","kind":"stamp","on":"ball","at":[-1,-1],"rows":["a.a"],"key":{"a":"rim"},"when":{"style":["skull"],"size":[{"below":0.25}],"clip":["fly"]}},
+      {"id":"eyesBig","kind":"stamp","on":"ball","at":[-2,{"from":"size","map":[[0,-2],[1,-3]],"round":"px"}],"rows":["aa..aa","aa..aa","......","...a.."],"key":{"a":"rim"},"when":{"style":["skull"],"size":[{"atLeast":0.25}],"clip":["fly"]}},
+      {"id":"teeth","kind":"stamp","on":"jaw","at":[0,{"from":"size","map":[[0,2],[1,3.5]],"round":"px"}],"rows":["a.a"],"key":{"a":"rim"},"when":{"style":["skull"],"size":[{"atLeast":0.25}],"clip":["fly"]}}
+    ],
+    "emitters": [
+      {"id":"sparks","gen":"particles","v":1,"clip":["fly"],"on":"ball","at":[{"from":"size","map":[[0,-2.1],[1,-3.9]]},0],"z":-2,"when":{"sparks":[true]},"count":8,"seed":3,"angle":-90,"arc":126,"dist":{"from":"length","map":[[0,12],[1,22]]},"gravity":-2,"size":2.4,"lifespan":0.8,"paints":["core","mid","glow","rim"]},
+      {
+        "id": "ball",
+        "gen": "flame",
+        "v": 1,
+        "clip": ["fly"],
+        "z": -1,
+        "when": {"style":["ball"]},
+        "on": "ball",
+        "at": [0,0],
+        "head": {"from":"size","map":[[0,3.5],[1,6.5]]},
+        "angle": -90,
+        "length": {"from":"length","map":[[0,10],[1,18]]},
+        "width": {"from":"size","map":[[0,2.8],[1,5.2]]},
+        "sway": {"from":"flicker","map":[[0,0.4],[1,2.2]]},
+        "cycles": 1,
+        "tongues": 3,
+        "spread": {"from":"size","map":[[0,1.82],[1,3.38]]},
+        "fan": 8,
+        "shorten": 0.35,
+        "slim": 0.4,
+        "heat": 0.55,
+        "paints": ["core","mid","glow","rim"]
+      },
+      {
+        "id": "comet",
+        "gen": "flame",
+        "v": 1,
+        "clip": ["fly"],
+        "z": -1,
+        "when": {"style":["comet"]},
+        "on": "ball",
+        "at": [0,0],
+        "head": {"from":"size","map":[[0,3.22],[1,5.98]]},
+        "angle": -90,
+        "length": {"from":"length","map":[[0,11],[1,22]]},
+        "width": {"from":"size","map":[[0,2.905],[1,5.395]]},
+        "sway": {"from":"flicker","map":[[0,0.3],[1,1.5]]},
+        "cycles": 1,
+        "tongues": 1,
+        "heat": 0.55,
+        "paints": ["core","mid","glow","rim"]
+      },
+      {
+        "id": "hair",
+        "gen": "flame",
+        "v": 1,
+        "clip": ["fly"],
+        "z": -1,
+        "when": {"style":["skull"]},
+        "on": "ball",
+        "at": [0,0],
+        "head": {"from":"size","map":[[0,3.78],[1,7.02]]},
+        "angle": -90,
+        "length": {"from":"length","map":[[0,10],[1,18]]},
+        "width": {"from":"size","map":[[0,2.8],[1,5.2]]},
+        "sway": {"from":"flicker","map":[[0,0.4],[1,2.2]]},
+        "cycles": 1,
+        "tongues": 2,
+        "spread": {"from":"size","map":[[0,2.1],[1,3.9]]},
+        "fan": 25,
+        "shorten": 0.38,
+        "slim": 0.3,
+        "heat": 0.05,
+        "paints": ["mid","mid","glow","rim"]
+      },
+      {"id":"flash","gen":"glow","v":1,"clip":["hit"],"at":[18,16],"r":{"from":"size","map":[[0,7.25],[1,11.75]]},"paints":["shine","core","mid","glow","rim"]},
+      {"id":"burst","gen":"ring","v":1,"clip":["hit"],"at":[18,16],"r0":{"from":"size","map":[[0,4.5],[1,7.5]]},"r1":{"from":"size","map":[[0,9],[1,13.5]]},"thick":4,"seed":2,"paints":["core","mid","glow","glow","rim"]},
+      {"id":"embers","gen":"particles","v":1,"clip":["hit"],"at":[18,16],"loop":false,"count":{"from":"sparks","pick":{"true":10,"false":5}},"seed":5,"stagger":0.15,"angle":180,"arc":360,"dist":{"from":"size","map":[[0,14],[1,20.3]]},"gravity":3,"size":2.4,"paints":["mid","glow","glow","rim"]}
+    ]
+  },
+  "clips": {
+    "fly": {
+      "frames": 8,
+      "fps": 12,
+      "keys": [
+        {"t":0,"ease":"hold","nodes":{"jaw":{"move":[0,1]}}},
+        {"t":0.25,"ease":"hold","nodes":{"jaw":{"move":[0,0]}}},
+        {"t":0.5,"ease":"hold","nodes":{"jaw":{"move":[0,1]}}},
+        {"t":0.75,"ease":"hold","nodes":{"jaw":{"move":[0,0]}}}
+      ]
+    },
+    "hit": {
+      "frames": 6,
+      "fps": 16,
+      "loop": false,
+      "keys": [
+        {"t":0,"ease":"hold","emit":{"flash":{"amount":1,"scale":1}}},
+        {"t":0.2,"ease":"hold","emit":{"flash":{"amount":1,"scale":0.52}}},
+        {"t":0.4,"emit":{"flash":{"amount":0,"scale":0.52}}}
+      ],
+      "sounds": [{"sound":"whoosh","preset":"Heavy swing","frame":0,"volume":0.7}]
+    }
+  }
+}

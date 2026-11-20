@@ -1,0 +1,962 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "ui-controls-grove",
+ "name": "Vine checkboxes and cursor",
+ "blurb": "The small pieces of a settings screen in bark and living vine: a ticked and an empty box, a round option, an on/off switch, a leaf pointer that nudges and vine brackets round a chosen slot; change the style, corners, vine, colours and speed.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/cursor",
+  "themes": [
+   "neutral",
+   "forest",
+   "farm"
+  ],
+  "gameTypes": [
+   "arcade",
+   "farming-sim",
+   "top-down-rpg",
+   "puzzle"
+  ],
+  "view": "none",
+  "words": [
+   "checkbox",
+   "radio",
+   "switch",
+   "cursor",
+   "pointer",
+   "toggle",
+   "selector",
+   "vine",
+   "leaf",
+   "bark"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "check-on",
+ "styles": [
+  "pixel"
+ ],
+ "palette": [
+  {
+   "id": "face",
+   "label": "Bark",
+   "default": "#7a4f33",
+   "material": "interface",
+   "swatches": [
+    "#7a4f33",
+    "#3f5068",
+    "#8e3a4a",
+    "#434d6d"
+   ]
+  },
+  {
+   "id": "frame",
+   "label": "Vine",
+   "default": "#9bd18a",
+   "material": "interface",
+   "swatches": [
+    "#9bd18a",
+    "#7fe0a0",
+    "#e6c96a",
+    "#f0ead8"
+   ]
+  },
+  {
+   "id": "accent",
+   "label": "Tick",
+   "default": "#6aa83e",
+   "material": "interface",
+   "swatches": [
+    "#6aa83e",
+    "#c9423a",
+    "#e08a2c",
+    "#7a4fc4",
+    "#3f6fd1"
+   ]
+  }
+ ],
+ "controls": [
+  {
+   "key": "style",
+   "kind": "choice",
+   "label": "Style",
+   "options": [
+    {
+     "value": "vine",
+     "label": "Vine"
+    },
+    {
+     "value": "bark",
+     "label": "Bark"
+    },
+    {
+     "value": "bloom",
+     "label": "Bloom"
+    }
+   ],
+   "default": "vine",
+   "group": "Look"
+  },
+  {
+   "key": "corner",
+   "kind": "range",
+   "label": "Corner",
+   "lo": "Square",
+   "hi": "Round",
+   "default": 0.75,
+   "group": "Look"
+  },
+  {
+   "key": "border",
+   "kind": "range",
+   "label": "Border",
+   "lo": "Thin",
+   "hi": "Thick",
+   "default": 0.5,
+   "group": "Look"
+  },
+  {
+   "key": "face",
+   "kind": "colour",
+   "label": "Bark",
+   "group": "Colors"
+  },
+  {
+   "key": "frame",
+   "kind": "colour",
+   "label": "Vine",
+   "group": "Colors"
+  },
+  {
+   "key": "accent",
+   "kind": "colour",
+   "label": "Tick",
+   "group": "Colors"
+  },
+  {
+   "key": "speed",
+   "standard": "speed"
+  }
+ ],
+ "versions": [
+  {
+   "name": "Vine",
+   "params": {}
+  },
+  {
+   "name": "Bloom",
+   "params": {
+    "style": "bloom",
+    "accent": "#c9423a"
+   }
+  },
+  {
+   "name": "Bark",
+   "params": {
+    "style": "bark",
+    "frame": "#e6c96a"
+   }
+  },
+  {
+   "name": "Birch night",
+   "params": {
+    "face": "#3f5068",
+    "frame": "#f0ead8",
+    "accent": "#3f6fd1"
+   }
+  },
+  {
+   "name": "Mint berry",
+   "params": {
+    "face": "#8e3a4a",
+    "frame": "#7fe0a0",
+    "accent": "#e08a2c"
+   }
+  }
+ ],
+ "body": {
+  "panel": {
+   "skin": {
+    "use": "skin:grove",
+    "v": 2,
+    "paint": {
+     "face": "face",
+     "frame": "frame",
+     "accent": "accent"
+    }
+   },
+   "piece": {
+    "gen": "ui.toggle",
+    "v": 2,
+    "clip": [
+     "check-on"
+    ],
+    "style": {
+     "from": "style"
+    },
+    "corner": {
+     "from": "corner",
+     "map": [
+      [
+       0,
+       0
+      ],
+      [
+       0.5,
+       2
+      ],
+      [
+       1,
+       2
+      ]
+     ],
+     "round": "px"
+    },
+    "border": {
+     "from": "border",
+     "map": [
+      [
+       0,
+       1
+      ],
+      [
+       0.249,
+       1
+      ],
+      [
+       0.25,
+       2
+      ],
+      [
+       0.749,
+       2
+      ],
+      [
+       0.75,
+       3
+      ],
+      [
+       1,
+       3
+      ]
+     ],
+     "round": "px"
+    },
+    "kind": "check",
+    "checked": true,
+    "at": [
+     16,
+     16
+    ],
+    "size": 20,
+    "trim": [],
+    "topTrim": [],
+    "rightTrim": [],
+    "along": [],
+    "gleamTrim": [],
+    "gleamTop": [],
+    "gleamRight": [],
+    "rings": [
+     "ink",
+     "frame"
+    ],
+    "bandAt": 1,
+    "lit": false,
+    "edge": "round",
+    "vine": {
+     "from": "style"
+    },
+    "twistIn": 1
+   },
+   "states": [
+    "check-on",
+    "check-off",
+    "radio-on",
+    "radio-off",
+    "switch-on",
+    "switch-off",
+    "pointer",
+    "selector"
+   ],
+   "draw": [
+    {
+     "gen": "ui.toggle",
+     "v": 2,
+     "clip": [
+      "check-off"
+     ],
+     "style": {
+      "from": "style"
+     },
+     "corner": {
+      "from": "corner",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        0.5,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "border": {
+      "from": "border",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.249,
+        1
+       ],
+       [
+        0.25,
+        2
+       ],
+       [
+        0.749,
+        2
+       ],
+       [
+        0.75,
+        3
+       ],
+       [
+        1,
+        3
+       ]
+      ],
+      "round": "px"
+     },
+     "kind": "check",
+     "checked": false,
+     "at": [
+      16,
+      16
+     ],
+     "size": 20,
+     "trim": [],
+     "topTrim": [],
+     "rightTrim": [],
+     "along": [],
+     "gleamTrim": [],
+     "gleamTop": [],
+     "gleamRight": [],
+     "rings": [
+      "ink",
+      "frame"
+     ],
+     "bandAt": 1,
+     "lit": false,
+     "edge": "round",
+     "vine": {
+      "from": "style"
+     },
+     "twistIn": 1
+    },
+    {
+     "gen": "ui.toggle",
+     "v": 2,
+     "clip": [
+      "radio-on"
+     ],
+     "style": {
+      "from": "style"
+     },
+     "corner": {
+      "from": "corner",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        0.5,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "border": {
+      "from": "border",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.249,
+        1
+       ],
+       [
+        0.25,
+        2
+       ],
+       [
+        0.749,
+        2
+       ],
+       [
+        0.75,
+        3
+       ],
+       [
+        1,
+        3
+       ]
+      ],
+      "round": "px"
+     },
+     "kind": "radio",
+     "checked": true,
+     "at": [
+      16,
+      16
+     ],
+     "size": 20,
+     "trim": [],
+     "topTrim": [],
+     "rightTrim": [],
+     "along": [],
+     "gleamTrim": [],
+     "gleamTop": [],
+     "gleamRight": [],
+     "rings": [
+      "ink",
+      "frame"
+     ],
+     "bandAt": 1,
+     "lit": false,
+     "edge": "round",
+     "vine": {
+      "from": "style"
+     },
+     "twistIn": 1
+    },
+    {
+     "gen": "ui.toggle",
+     "v": 2,
+     "clip": [
+      "radio-off"
+     ],
+     "style": {
+      "from": "style"
+     },
+     "corner": {
+      "from": "corner",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        0.5,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "border": {
+      "from": "border",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.249,
+        1
+       ],
+       [
+        0.25,
+        2
+       ],
+       [
+        0.749,
+        2
+       ],
+       [
+        0.75,
+        3
+       ],
+       [
+        1,
+        3
+       ]
+      ],
+      "round": "px"
+     },
+     "kind": "radio",
+     "checked": false,
+     "at": [
+      16,
+      16
+     ],
+     "size": 20,
+     "trim": [],
+     "topTrim": [],
+     "rightTrim": [],
+     "along": [],
+     "gleamTrim": [],
+     "gleamTop": [],
+     "gleamRight": [],
+     "rings": [
+      "ink",
+      "frame"
+     ],
+     "bandAt": 1,
+     "lit": false,
+     "edge": "round",
+     "vine": {
+      "from": "style"
+     },
+     "twistIn": 1
+    },
+    {
+     "gen": "ui.toggle",
+     "v": 2,
+     "clip": [
+      "switch-on"
+     ],
+     "style": {
+      "from": "style"
+     },
+     "corner": {
+      "from": "corner",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        0.5,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "border": {
+      "from": "border",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.249,
+        1
+       ],
+       [
+        0.25,
+        2
+       ],
+       [
+        0.749,
+        2
+       ],
+       [
+        0.75,
+        3
+       ],
+       [
+        1,
+        3
+       ]
+      ],
+      "round": "px"
+     },
+     "kind": "switch",
+     "checked": true,
+     "at": [
+      16,
+      16
+     ],
+     "size": 28,
+     "trim": [],
+     "topTrim": [],
+     "rightTrim": [],
+     "along": [],
+     "gleamTrim": [],
+     "gleamTop": [],
+     "gleamRight": [],
+     "rings": [
+      "ink",
+      "frame"
+     ],
+     "bandAt": 1,
+     "lit": false,
+     "edge": "round",
+     "vine": {
+      "from": "style"
+     },
+     "twistIn": 1
+    },
+    {
+     "gen": "ui.toggle",
+     "v": 2,
+     "clip": [
+      "switch-off"
+     ],
+     "style": {
+      "from": "style"
+     },
+     "corner": {
+      "from": "corner",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        0.5,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "border": {
+      "from": "border",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.249,
+        1
+       ],
+       [
+        0.25,
+        2
+       ],
+       [
+        0.749,
+        2
+       ],
+       [
+        0.75,
+        3
+       ],
+       [
+        1,
+        3
+       ]
+      ],
+      "round": "px"
+     },
+     "kind": "switch",
+     "checked": false,
+     "at": [
+      16,
+      16
+     ],
+     "size": 28,
+     "trim": [],
+     "topTrim": [],
+     "rightTrim": [],
+     "along": [],
+     "gleamTrim": [],
+     "gleamTop": [],
+     "gleamRight": [],
+     "rings": [
+      "ink",
+      "frame"
+     ],
+     "bandAt": 1,
+     "lit": false,
+     "edge": "round",
+     "vine": {
+      "from": "style"
+     },
+     "twistIn": 1
+    },
+    {
+     "gen": "ui.pointer",
+     "v": 2,
+     "clip": [
+      "pointer"
+     ],
+     "style": {
+      "from": "style"
+     },
+     "corner": {
+      "from": "corner",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        0.5,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "border": {
+      "from": "border",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.249,
+        1
+       ],
+       [
+        0.25,
+        2
+       ],
+       [
+        0.749,
+        2
+       ],
+       [
+        0.75,
+        3
+       ],
+       [
+        1,
+        3
+       ]
+      ],
+      "round": "px"
+     },
+     "at": [
+      4,
+      16
+     ],
+     "len": 20,
+     "reach": 2,
+     "art": [
+      {
+       "kind": "stamp",
+       "at": [
+        0,
+        -6
+       ],
+       "rows": [
+        "......aa............",
+        "....aabbaa..........",
+        "...abbbbbbaa........",
+        "...abbbbbbbbaa......",
+        "..abbbbbbbbbbbaa....",
+        ".aabbbbbbbbbbbbbaaa.",
+        "accddddddddddddddbba",
+        "acabbbbbbbbbbbbbaaa.",
+        ".aaebbbbbbbbbbaa....",
+        "...abbbbbbbbaa......",
+        "...aeebbeeaa........",
+        "....aaeeaa..........",
+        "......aa............"
+       ],
+       "key": {
+        "a": "ink",
+        "b": "frame",
+        "c": {
+         "rule": "tone",
+         "of": "frame",
+         "by": -1
+        },
+        "d": "accent",
+        "e": {
+         "rule": "tone",
+         "of": "frame",
+         "by": -0.6
+        }
+       }
+      }
+     ],
+     "tip": [
+      19,
+      0
+     ]
+    },
+    {
+     "gen": "ui.selector",
+     "v": 2,
+     "clip": [
+      "selector"
+     ],
+     "style": {
+      "from": "style"
+     },
+     "corner": {
+      "from": "corner",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        0.5,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "round": "px"
+     },
+     "border": {
+      "from": "border",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.249,
+        1
+       ],
+       [
+        0.25,
+        2
+       ],
+       [
+        0.749,
+        2
+       ],
+       [
+        0.75,
+        3
+       ],
+       [
+        1,
+        3
+       ]
+      ],
+      "round": "px"
+     },
+     "at": [
+      1,
+      1
+     ],
+     "size": [
+      30,
+      30
+     ],
+     "len": 7,
+     "steps": "grow",
+     "trim": [],
+     "topTrim": [],
+     "rightTrim": [],
+     "along": [],
+     "gleamTrim": [],
+     "gleamTop": [],
+     "gleamRight": [],
+     "lit": false,
+     "marks": {
+      "from": "style"
+     }
+    }
+   ]
+  }
+ },
+ "clips": {
+  "check-on": {
+   "frames": 1,
+   "fps": 8,
+   "label": "Ticked box, while the option is on",
+   "noText": true,
+   "sounds": [
+    {
+     "sound": "menu-wood-toggle",
+     "preset": "Switch on",
+     "frame": 0,
+     "volume": 0.6
+    }
+   ]
+  },
+  "check-off": {
+   "frames": 1,
+   "fps": 8,
+   "label": "Empty box, while the option is off",
+   "noText": true
+  },
+  "radio-on": {
+   "frames": 1,
+   "fps": 8,
+   "label": "Chosen dot, for the one option picked",
+   "noText": true
+  },
+  "radio-off": {
+   "frames": 1,
+   "fps": 8,
+   "label": "Empty dot, for each option not picked",
+   "noText": true
+  },
+  "switch-on": {
+   "frames": 1,
+   "fps": 8,
+   "label": "Switch, while the setting is on",
+   "noText": true,
+   "sounds": [
+    {
+     "sound": "menu-wood-toggle",
+     "preset": "Switch on",
+     "frame": 0,
+     "volume": 0.6
+    }
+   ]
+  },
+  "switch-off": {
+   "frames": 1,
+   "fps": 8,
+   "label": "Switch, while the setting is off",
+   "noText": true
+  },
+  "pointer": {
+   "frames": 8,
+   "fps": 8,
+   "label": "Pointer, beside the item the player is on",
+   "noText": true
+  },
+  "selector": {
+   "frames": 8,
+   "fps": 8,
+   "label": "Selector, round the slot the player is on",
+   "noText": true
+  }
+ }
+}

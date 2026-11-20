@@ -1,0 +1,133 @@
+{
+  "format": "loadout-sprite",
+  "version": 2,
+  "id": "plasma-orb",
+  "name": "Enemy plasma orb",
+  "blurb": "A wobbling ball of hostile plasma with a swirl turning inside it, drawn pointing right so a game can turn it to the way it flies; it bursts into a ring of embers. Change its size, style, swirl, tail and colours.",
+  "meta": {
+    "type": "projectile",
+    "role": "effects/projectile",
+    "themes": ["sci-fi","space"],
+    "gameTypes": ["roguelike-action","shooter","arcade"],
+    "view": "top-down",
+    "words": ["plasma","orb","ball","energy","enemy shot","bullet","swirl","shoot","fly","hit","burst","danger","hostile"],
+    "license": "draft"
+  },
+  "size": [32,32],
+  "pivot": [16,16],
+  "grounded": false,
+  "preview": "fly",
+  "styles": ["pixel"],
+  "palette": [
+    {"id":"core","label":"Core","default":"#f0ead8","material":"light","swatches":["#f0ead8","#e8ecf2","#f6d3b0","#c2c9d6"]},
+    {"id":"glow","label":"Glow","default":"#e2473f","material":"light","swatches":["#e2473f","#5fe0f0","#9fe040","#f2a030","#b48af8","#4f9ff0","#5fd47a"]},
+    {"id":"mid","material":"light","derive":{"rule":"mix","of":"core","with":"glow","amount":0.5}},
+    {"id":"rim","material":"light","derive":{"rule":"tone","of":"glow","by":-1}},
+    {"id":"shine","default":"#ffffff","material":"light","detail":true}
+  ],
+  "controls": [
+    {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+    {"key":"style","kind":"choice","label":"Style","options":["orb","ring","spiky"],"default":"orb"},
+    {"key":"swirl","kind":"toggle","label":"Swirl","default":true},
+    {"key":"length","kind":"range","label":"Length","lo":"Short","hi":"Long","default":0.5},
+    {"key":"core","kind":"colour","label":"Core"},
+    {"key":"glow","kind":"colour","label":"Glow"},
+    {"key":"wobble","kind":"range","label":"Wobble","lo":"Firm","hi":"Wobbly","default":0.5,"group":"Motion"},
+    {"key":"speed","standard":"speed"}
+  ],
+  "body": {
+    "nodes": [
+      {"id":"ball","parent":null,"at":[{"from":"length","map":[[0,17],[1,20]],"round":"px"},16]},
+      {"id":"swirl","parent":"ball","at":[0,0]},
+      {"id":"spikes","parent":"ball","at":[0,0]}
+    ],
+    "draw": [
+      {"id":"star","clip":["fly"],"gen":"star","v":1,"on":"spikes","at":[0,0],"r":{"from":"size","map":[[0,6.87],[1,9.45]]},"points":6,"inner":0.5,"paint":"glow","group":"spikes","when":{"style":["spiky"]}},
+      {"kind":"outline","paint":"rim","only":"spikes"},
+      {"id":"hoopRim","kind":"ring","on":"ball","at":[0,0],"r":{"from":"size","map":[[0,3.5],[1,6.5]]},"thick":5,"paint":"rim","when":{"style":["ring"],"clip":["fly"]}},
+      {"id":"hoop","kind":"ring","on":"ball","at":[0,0],"r":{"from":"size","map":[[0,3.5],[1,6.5]]},"thick":3,"paint":"glow","when":{"style":["ring"],"clip":["fly"]}},
+      {"id":"line","kind":"ring","on":"ball","at":[0,0],"r":{"from":"size","map":[[0,3.5],[1,6.5]]},"thick":1,"paint":"core","when":{"style":["ring"],"swirl":[false],"clip":["fly"]}},
+      {"id":"chase1","kind":"arc","on":"swirl","at":[0,0],"r":{"from":"size","map":[[0,3.5],[1,6.5]]},"a0":0,"a1":110,"thick":1,"paint":"core","when":{"style":["ring"],"swirl":[true],"clip":["fly"]}},
+      {"id":"chase2","kind":"arc","on":"swirl","at":[0,0],"r":{"from":"size","map":[[0,3.5],[1,6.5]]},"a0":180,"a1":290,"thick":1,"paint":"core","when":{"style":["ring"],"swirl":[true],"clip":["fly"]}},
+      {"id":"arm1","kind":"arc","on":"swirl","at":[0,0],"r":{"from":"size","map":[[0,1.8],[1,3]]},"a0":20,"a1":130,"thick":2,"paint":"glow","z":2,"when":{"style":["orb","spiky"],"swirl":[true],"clip":["fly"]}},
+      {"id":"arm2","kind":"arc","on":"swirl","at":[0,0],"r":{"from":"size","map":[[0,1.8],[1,3]]},"a0":200,"a1":310,"thick":2,"paint":"glow","z":2,"when":{"style":["orb","spiky"],"swirl":[true],"clip":["fly"]}}
+    ],
+    "emitters": [
+      {
+        "id": "orb",
+        "gen": "flame",
+        "v": 1,
+        "clip": ["fly"],
+        "on": "ball",
+        "at": [0,0],
+        "z": 1,
+        "when": {"style":["orb"]},
+        "head": {"from":"size","map":[[0,4.5],[1,7.5]]},
+        "angle": -90,
+        "length": {"from":"length","map":[[0,8],[1,16]]},
+        "width": {"from":"size","map":[[0,3.2],[1,5.2]]},
+        "sway": {"from":"wobble","map":[[0,0],[1,2]]},
+        "cycles": 1,
+        "heat": 0.8,
+        "paints": ["core","mid","glow","glow","rim"]
+      },
+      {
+        "id": "orbSpiky",
+        "gen": "flame",
+        "v": 1,
+        "clip": ["fly"],
+        "on": "ball",
+        "at": [0,0],
+        "z": 1,
+        "when": {"style":["spiky"]},
+        "head": {"from":"size","map":[[0,3.87],[1,6.45]]},
+        "angle": -90,
+        "length": {"from":"length","map":[[0,8],[1,16]]},
+        "width": {"from":"size","map":[[0,3.2],[1,5.2]]},
+        "sway": {"from":"wobble","map":[[0,0],[1,2]]},
+        "cycles": 1,
+        "heat": 0.8,
+        "paints": ["core","mid","glow","glow","rim"]
+      },
+      {
+        "id": "tail",
+        "gen": "flame",
+        "v": 1,
+        "clip": ["fly"],
+        "on": "ball",
+        "at": [{"from":"size","map":[[0,-3.5],[1,-6.5]]},0],
+        "z": -1,
+        "when": {"style":["ring"]},
+        "angle": -90,
+        "length": {"from":"length","map":[[0,3],[1,8]]},
+        "width": {"from":"size","map":[[0,2],[1,3.5]]},
+        "sway": {"from":"wobble","map":[[0,0],[1,2]]},
+        "heat": 0.2,
+        "paints": ["glow","rim"]
+      },
+      {"id":"flash","gen":"glow","v":1,"clip":["hit"],"at":[16,16],"r":{"from":"size","map":[[0,7.5],[1,10.5]]},"paints":["shine","core","mid","glow","rim"]},
+      {"id":"shock","gen":"ring","v":1,"clip":["hit"],"at":[16,16],"r0":{"from":"size","map":[[0,4.5],[1,7.5]]},"r1":{"from":"size","map":[[0,9],[1,13]]},"thick":4,"seed":3,"paints":["core","mid","glow","glow","rim"]},
+      {"id":"embers","gen":"particles","v":1,"clip":["hit"],"at":[16,16],"loop":false,"count":{"from":"style","pick":{"orb":8,"ring":8,"spiky":12}},"seed":6,"stagger":0.15,"angle":180,"arc":360,"dist":{"from":"size","map":[[0,11.7],[1,14]]},"size":2.4,"paints":["mid","glow","glow","rim"]}
+    ]
+  },
+  "clips": {
+    "fly": {
+      "frames": 8,
+      "fps": 12,
+      "keys": [
+        {"t":0,"ease":"linear","nodes":{"swirl":{"turn":0},"spikes":{"turn":0}}},
+        {"t":1,"nodes":{"swirl":{"turn":-180},"spikes":{"turn":60}}}
+      ]
+    },
+    "hit": {
+      "frames": 6,
+      "fps": 16,
+      "loop": false,
+      "keys": [
+        {"t":0,"ease":"hold","emit":{"flash":{"amount":1,"scale":1}}},
+        {"t":0.2,"ease":"hold","emit":{"flash":{"amount":1,"scale":0.68}}},
+        {"t":0.4,"emit":{"flash":{"amount":0,"scale":0.68}}}
+      ]
+    }
+  }
+}

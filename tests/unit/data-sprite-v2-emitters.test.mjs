@@ -17,9 +17,9 @@ import { resolveSprite } from '../../engine/resolve.js';
 import { renderFrame, defaultParams } from '../../engine/sprite.js';
 import { checkSprite } from '../../quality/sprite.js';
 import { validateMeta } from '../../catalog/schema.js';
-import boltCode from '../../sprites/blaster-bolt.js';
-import burstCode from '../../sprites/plasma-burst.js';
-import sparkCode from '../../sprites/hit-spark.js';
+import boltCode from '../fixtures/code-sprites/blaster-bolt.js';
+import burstCode from '../fixtures/code-sprites/plasma-burst.js';   // batch E2: sprites/plasma-burst.js is data now; its frozen code copy
+import sparkCode from '../fixtures/code-sprites/hit-spark.js';   // batch E1: sprites/hit-spark.js is data now; its frozen code copy
 import * as registry from '../../engine/gen/index.js';
 import { emitters as emittersLayout } from '../../engine/gen/emitters.js';
 import { nodeFrame, placeOn } from '../../engine/draw-list.js';

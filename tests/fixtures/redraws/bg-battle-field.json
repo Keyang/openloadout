@@ -1,0 +1,185 @@
+{
+ "id": "bg-battle-field",
+ "frozen": "2026-11-20",
+ "source": "sprites/bg-battle-field.js",
+ "sha256": "83aef492750601dc166f669039df323871ffcf499ef2a2938f8510a79eaf2625",
+ "name": "Field battle backdrop",
+ "blurb": "A meadow for a side-view battle screen in three layers that repeat sideways (sky and soft hills, round trees behind a rail fence, a band of worn earth with the fighters' feet on row 150): scroll far at 0.1, mid at 0.4 and near at 0.7 of the camera's speed. Change the time of day, the clouds, the hills, the trees and the colours of sky, grass and earth.",
+ "meta": {
+  "type": "background",
+  "role": "environment/background",
+  "themes": [
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "card-game"
+  ],
+  "view": "side",
+  "words": [
+   "battle",
+   "fight",
+   "encounter",
+   "arena",
+   "field",
+   "meadow",
+   "grassland",
+   "plains",
+   "hills",
+   "trees",
+   "fence",
+   "backdrop",
+   "scenery",
+   "outdoors"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  320,
+  180
+ ],
+ "pivot": [
+  160,
+  180
+ ],
+ "grounded": false,
+ "preview": "far",
+ "params": {
+  "time": {
+   "kind": "choice",
+   "label": "Time of day",
+   "def": "day",
+   "options": [
+    {
+     "value": "day",
+     "label": "Day"
+    },
+    {
+     "value": "dusk",
+     "label": "Dusk"
+    },
+    {
+     "value": "night",
+     "label": "Night"
+    }
+   ],
+   "group": "Look"
+  },
+  "clouds": {
+   "kind": "range",
+   "label": "Clouds",
+   "def": 0.45,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "height": {
+   "kind": "range",
+   "label": "Height",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Low hills",
+   "hi": "High hills",
+   "group": "Look"
+  },
+  "density": {
+   "kind": "range",
+   "label": "Density",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Few trees",
+   "hi": "Many trees",
+   "group": "Look"
+  },
+  "haze": {
+   "kind": "range",
+   "label": "Haze",
+   "def": 0.35,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Clear",
+   "hi": "Misty",
+   "group": "Look"
+  },
+  "sky": {
+   "kind": "color",
+   "label": "Sky",
+   "def": "#9fd8f4",
+   "swatches": [
+    "#9fd8f4",
+    "#a8c8d8",
+    "#f0ead8",
+    "#e6c96a",
+    "#7aa0f4"
+   ],
+   "group": "Colors"
+  },
+  "land": {
+   "kind": "color",
+   "label": "Grass",
+   "def": "#7fbf5a",
+   "swatches": [
+    "#7fbf5a",
+    "#4f9d57",
+    "#357a4c",
+    "#e6c96a"
+   ],
+   "group": "Colors"
+  },
+  "path": {
+   "kind": "color",
+   "label": "Earth",
+   "def": "#c9a06a",
+   "swatches": [
+    "#c9a06a",
+    "#a8a4a0",
+    "#a8806a",
+    "#f0ead8"
+   ],
+   "group": "Colors"
+  }
+ },
+ "clips": {
+  "far": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    4,
+    4,
+    4
+   ]
+  },
+  "mid": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    4,
+    4,
+    4
+   ]
+  },
+  "near": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    4,
+    4,
+    4
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [],
+ "bundles": [
+  "kit-rpg-fantasy"
+ ]
+}

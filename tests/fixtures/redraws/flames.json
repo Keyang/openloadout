@@ -1,0 +1,244 @@
+{
+ "id": "flames",
+ "frozen": "2026-11-20",
+ "source": "sprites/flames.js",
+ "sha256": "084e39ba6a9d51c5138391f181aadb1058e9e9713e10f0793e74b4c6af40585d",
+ "name": "Flames",
+ "blurb": "Fire with nothing under it, to lay over anything that burns; it can be snuffed out and lit again. Change its size, width, tongues, style, sparks, flicker and colours.",
+ "meta": {
+  "type": "effect",
+  "role": "effects/spark",
+  "themes": [
+   "neutral",
+   "fantasy",
+   "dungeon"
+  ],
+  "gameTypes": [
+   "platformer",
+   "top-down-rpg",
+   "roguelike-action",
+   "turn-based-rpg"
+  ],
+  "view": "side",
+  "words": [
+   "fire",
+   "flames",
+   "flame",
+   "burning",
+   "blaze",
+   "burn",
+   "ignite",
+   "snuff",
+   "embers",
+   "on fire",
+   "hazard",
+   "hot"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  30
+ ],
+ "grounded": false,
+ "preview": "loop",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "width": {
+   "kind": "range",
+   "label": "Width",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Narrow",
+   "hi": "Wide",
+   "group": "Look"
+  },
+  "pieces": {
+   "kind": "range",
+   "label": "Tongues",
+   "def": 3,
+   "min": 1,
+   "max": 4,
+   "step": 1,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "torch",
+   "options": [
+    {
+     "value": "torch",
+     "label": "Torch"
+    },
+    {
+     "value": "wild",
+     "label": "Wild"
+    },
+    {
+     "value": "magic",
+     "label": "Magic"
+    }
+   ],
+   "group": "Look"
+  },
+  "sparks": {
+   "kind": "toggle",
+   "label": "Sparks",
+   "def": false,
+   "group": "Look"
+  },
+  "core": {
+   "kind": "color",
+   "label": "Core",
+   "def": "#f2c230",
+   "swatches": [
+    "#f2c230",
+    "#f0ead8",
+    "#a4c44a",
+    "#9bd18a",
+    "#f6d3b0"
+   ],
+   "group": "Colors"
+  },
+  "edge": {
+   "kind": "color",
+   "label": "Flame",
+   "def": "#e08a2c",
+   "swatches": [
+    "#e08a2c",
+    "#4fd8ee",
+    "#c9423a",
+    "#7a4fc4",
+    "#3f6fd1",
+    "#5fe0f0"
+   ],
+   "group": "Colors"
+  },
+  "flicker": {
+   "kind": "range",
+   "label": "Flicker",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Steady",
+   "hi": "Wild",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "loop": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "out": {
+   "frames": 6,
+   "loop": false,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  },
+  "ignite": {
+   "frames": 6,
+   "loop": false,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  }
+ },
+ "sounds": {
+  "loop": [
+   {
+    "sound": "fire",
+    "preset": "Torch",
+    "frame": 0,
+    "volume": 0.35
+   }
+  ],
+  "ignite": [
+   {
+    "sound": "whoosh",
+    "preset": "Quick swipe",
+    "frame": 0,
+    "volume": 0.8
+   }
+  ]
+ },
+ "versions": [
+  {
+   "name": "Burning",
+   "params": {}
+  },
+  {
+   "name": "Blaze",
+   "params": {
+    "size": 1,
+    "pieces": 4,
+    "sparks": true
+   }
+  },
+  {
+   "name": "Spirit flame",
+   "params": {
+    "style": "magic",
+    "core": "#f0ead8",
+    "edge": "#4fd8ee"
+   }
+  },
+  {
+   "name": "Poison fire",
+   "params": {
+    "core": "#a4c44a",
+    "edge": "#7a4fc4"
+   }
+  },
+  {
+   "name": "Small flame",
+   "params": {
+    "size": 0,
+    "pieces": 1,
+    "width": 0
+   }
+  }
+ ],
+ "bundles": []
+}

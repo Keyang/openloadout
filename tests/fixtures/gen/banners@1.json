@@ -1,0 +1,880 @@
+{
+ "id": "banners",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "count": 3,
+    "offset": 0.5,
+    "cloth": "cloth",
+    "dark": "cloth.dark",
+    "trim": "cloth.light"
+   },
+   "ctx": {
+    "size": [
+     320,
+     180
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "poly",
+     "points": [
+      [
+       42,
+       0
+      ],
+      [
+       64,
+       0
+      ],
+      [
+       64,
+       48
+      ],
+      [
+       53,
+       40
+      ],
+      [
+       42,
+       48
+      ]
+     ],
+     "paint": "cloth",
+     "shade": 0
+    },
+    {
+     "kind": "poly",
+     "points": [
+      [
+       42,
+       0
+      ],
+      [
+       46,
+       0
+      ],
+      [
+       46,
+       45
+      ],
+      [
+       42,
+       48
+      ]
+     ],
+     "paint": "cloth.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      46,
+      28
+     ],
+     "size": [
+      18,
+      4
+     ],
+     "paint": "cloth.light",
+     "shade": 0
+    },
+    {
+     "kind": "poly",
+     "points": [
+      [
+       55,
+       8
+      ],
+      [
+       60,
+       16
+      ],
+      [
+       55,
+       24
+      ],
+      [
+       50,
+       16
+      ]
+     ],
+     "paint": "cloth.light",
+     "shade": 0
+    },
+    {
+     "kind": "poly",
+     "points": [
+      [
+       149,
+       0
+      ],
+      [
+       171,
+       0
+      ],
+      [
+       171,
+       40
+      ],
+      [
+       160,
+       32
+      ],
+      [
+       149,
+       40
+      ]
+     ],
+     "paint": "cloth",
+     "shade": 0
+    },
+    {
+     "kind": "poly",
+     "points": [
+      [
+       149,
+       0
+      ],
+      [
+       153,
+       0
+      ],
+      [
+       153,
+       37
+      ],
+      [
+       149,
+       40
+      ]
+     ],
+     "paint": "cloth.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      153,
+      20
+     ],
+     "size": [
+      18,
+      4
+     ],
+     "paint": "cloth.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      153,
+      12
+     ],
+     "size": [
+      18,
+      4
+     ],
+     "paint": "cloth.light",
+     "shade": 0
+    },
+    {
+     "kind": "poly",
+     "points": [
+      [
+       256,
+       0
+      ],
+      [
+       278,
+       0
+      ],
+      [
+       278,
+       48
+      ],
+      [
+       267,
+       40
+      ],
+      [
+       256,
+       48
+      ]
+     ],
+     "paint": "cloth",
+     "shade": 0
+    },
+    {
+     "kind": "poly",
+     "points": [
+      [
+       256,
+       0
+      ],
+      [
+       260,
+       0
+      ],
+      [
+       260,
+       45
+      ],
+      [
+       256,
+       48
+      ]
+     ],
+     "paint": "cloth.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      260,
+      28
+     ],
+     "size": [
+      18,
+      4
+     ],
+     "paint": "cloth.light",
+     "shade": 0
+    },
+    {
+     "kind": "poly",
+     "points": [
+      [
+       269,
+       8
+      ],
+      [
+       274,
+       16
+      ],
+      [
+       269,
+       24
+      ],
+      [
+       264,
+       16
+      ]
+     ],
+     "paint": "cloth.light",
+     "shade": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "count": 2,
+    "width": 12,
+    "length": 20,
+    "short": 14,
+    "cloth": "cloth",
+    "dark": "cloth.dark",
+    "trim": "cloth.light"
+   },
+   "ctx": {
+    "size": [
+     96,
+     48
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "poly",
+     "points": [
+      [
+       -6,
+       0
+      ],
+      [
+       6,
+       0
+      ],
+      [
+       6,
+       32
+      ],
+      [
+       0,
+       24
+      ],
+      [
+       -6,
+       32
+      ]
+     ],
+     "paint": "cloth",
+     "shade": 0
+    },
+    {
+     "kind": "poly",
+     "points": [
+      [
+       -6,
+       0
+      ],
+      [
+       -2,
+       0
+      ],
+      [
+       -2,
+       29
+      ],
+      [
+       -6,
+       32
+      ]
+     ],
+     "paint": "cloth.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      -2,
+      12
+     ],
+     "size": [
+      8,
+      4
+     ],
+     "paint": "cloth.light",
+     "shade": 0
+    },
+    {
+     "kind": "poly",
+     "points": [
+      [
+       2,
+       8
+      ],
+      [
+       7,
+       16
+      ],
+      [
+       2,
+       24
+      ],
+      [
+       -3,
+       16
+      ]
+     ],
+     "paint": "cloth.light",
+     "shade": 0
+    },
+    {
+     "kind": "poly",
+     "points": [
+      [
+       90,
+       0
+      ],
+      [
+       102,
+       0
+      ],
+      [
+       102,
+       32
+      ],
+      [
+       96,
+       24
+      ],
+      [
+       90,
+       32
+      ]
+     ],
+     "paint": "cloth",
+     "shade": 0
+    },
+    {
+     "kind": "poly",
+     "points": [
+      [
+       90,
+       0
+      ],
+      [
+       94,
+       0
+      ],
+      [
+       94,
+       29
+      ],
+      [
+       90,
+       32
+      ]
+     ],
+     "paint": "cloth.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      94,
+      12
+     ],
+     "size": [
+      8,
+      4
+     ],
+     "paint": "cloth.light",
+     "shade": 0
+    },
+    {
+     "kind": "poly",
+     "points": [
+      [
+       98,
+       8
+      ],
+      [
+       103,
+       16
+      ],
+      [
+       98,
+       24
+      ],
+      [
+       93,
+       16
+      ]
+     ],
+     "paint": "cloth.light",
+     "shade": 0
+    },
+    {
+     "kind": "poly",
+     "points": [
+      [
+       42,
+       0
+      ],
+      [
+       54,
+       0
+      ],
+      [
+       54,
+       26
+      ],
+      [
+       48,
+       18
+      ],
+      [
+       42,
+       26
+      ]
+     ],
+     "paint": "cloth",
+     "shade": 0
+    },
+    {
+     "kind": "poly",
+     "points": [
+      [
+       42,
+       0
+      ],
+      [
+       46,
+       0
+      ],
+      [
+       46,
+       23
+      ],
+      [
+       42,
+       26
+      ]
+     ],
+     "paint": "cloth.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      46,
+      6
+     ],
+     "size": [
+      8,
+      4
+     ],
+     "paint": "cloth.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      46,
+      -2
+     ],
+     "size": [
+      8,
+      4
+     ],
+     "paint": "cloth.light",
+     "shade": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "count": 4,
+    "top": 4,
+    "cloth": "cloth",
+    "dark": "cloth.dark",
+    "trim": "cloth.light",
+    "wrap": false
+   },
+   "ctx": {
+    "size": [
+     320,
+     180
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "poly",
+     "points": [
+      [
+       -11,
+       4
+      ],
+      [
+       11,
+       4
+      ],
+      [
+       11,
+       52
+      ],
+      [
+       0,
+       44
+      ],
+      [
+       -11,
+       52
+      ]
+     ],
+     "paint": "cloth",
+     "shade": 0
+    },
+    {
+     "kind": "poly",
+     "points": [
+      [
+       -11,
+       4
+      ],
+      [
+       -7,
+       4
+      ],
+      [
+       -7,
+       49
+      ],
+      [
+       -11,
+       52
+      ]
+     ],
+     "paint": "cloth.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      -7,
+      32
+     ],
+     "size": [
+      18,
+      4
+     ],
+     "paint": "cloth.light",
+     "shade": 0
+    },
+    {
+     "kind": "poly",
+     "points": [
+      [
+       2,
+       12
+      ],
+      [
+       7,
+       20
+      ],
+      [
+       2,
+       28
+      ],
+      [
+       -3,
+       20
+      ]
+     ],
+     "paint": "cloth.light",
+     "shade": 0
+    },
+    {
+     "kind": "poly",
+     "points": [
+      [
+       69,
+       4
+      ],
+      [
+       91,
+       4
+      ],
+      [
+       91,
+       44
+      ],
+      [
+       80,
+       36
+      ],
+      [
+       69,
+       44
+      ]
+     ],
+     "paint": "cloth",
+     "shade": 0
+    },
+    {
+     "kind": "poly",
+     "points": [
+      [
+       69,
+       4
+      ],
+      [
+       73,
+       4
+      ],
+      [
+       73,
+       41
+      ],
+      [
+       69,
+       44
+      ]
+     ],
+     "paint": "cloth.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      73,
+      24
+     ],
+     "size": [
+      18,
+      4
+     ],
+     "paint": "cloth.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      73,
+      16
+     ],
+     "size": [
+      18,
+      4
+     ],
+     "paint": "cloth.light",
+     "shade": 0
+    },
+    {
+     "kind": "poly",
+     "points": [
+      [
+       149,
+       4
+      ],
+      [
+       171,
+       4
+      ],
+      [
+       171,
+       52
+      ],
+      [
+       160,
+       44
+      ],
+      [
+       149,
+       52
+      ]
+     ],
+     "paint": "cloth",
+     "shade": 0
+    },
+    {
+     "kind": "poly",
+     "points": [
+      [
+       149,
+       4
+      ],
+      [
+       153,
+       4
+      ],
+      [
+       153,
+       49
+      ],
+      [
+       149,
+       52
+      ]
+     ],
+     "paint": "cloth.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      153,
+      32
+     ],
+     "size": [
+      18,
+      4
+     ],
+     "paint": "cloth.light",
+     "shade": 0
+    },
+    {
+     "kind": "poly",
+     "points": [
+      [
+       162,
+       12
+      ],
+      [
+       167,
+       20
+      ],
+      [
+       162,
+       28
+      ],
+      [
+       157,
+       20
+      ]
+     ],
+     "paint": "cloth.light",
+     "shade": 0
+    },
+    {
+     "kind": "poly",
+     "points": [
+      [
+       229,
+       4
+      ],
+      [
+       251,
+       4
+      ],
+      [
+       251,
+       44
+      ],
+      [
+       240,
+       36
+      ],
+      [
+       229,
+       44
+      ]
+     ],
+     "paint": "cloth",
+     "shade": 0
+    },
+    {
+     "kind": "poly",
+     "points": [
+      [
+       229,
+       4
+      ],
+      [
+       233,
+       4
+      ],
+      [
+       233,
+       41
+      ],
+      [
+       229,
+       44
+      ]
+     ],
+     "paint": "cloth.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      233,
+      24
+     ],
+     "size": [
+      18,
+      4
+     ],
+     "paint": "cloth.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      233,
+      16
+     ],
+     "size": [
+      18,
+      4
+     ],
+     "paint": "cloth.light",
+     "shade": 0
+    }
+   ]
+  }
+ ]
+}

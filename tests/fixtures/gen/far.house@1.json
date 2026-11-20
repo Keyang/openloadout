@@ -1,0 +1,365 @@
+{
+ "id": "far.house",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     40,
+     30
+    ],
+    "walls": "wall",
+    "tiles": "roof"
+   },
+   "ctx": {
+    "size": [
+     96,
+     48
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      33,
+      25
+     ],
+     "size": [
+      14,
+      5
+     ],
+     "paint": "wall",
+     "shade": 0
+    },
+    {
+     "kind": "poly",
+     "points": [
+      [
+       31,
+       26
+      ],
+      [
+       35,
+       19
+      ],
+      [
+       45,
+       19
+      ],
+      [
+       49,
+       26
+      ]
+     ],
+     "paint": "roof",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      36,
+      26
+     ],
+     "size": [
+      3,
+      4
+     ],
+     "paint": "roof",
+     "shade": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     92,
+     30
+    ],
+    "width": 15,
+    "chimney": true,
+    "window": true,
+    "walls": "wall",
+    "tiles": "roof",
+    "lamp": "lamp"
+   },
+   "ctx": {
+    "size": [
+     96,
+     48
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      95,
+      17
+     ],
+     "size": [
+      3,
+      4
+     ],
+     "paint": "wall",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      85,
+      25
+     ],
+     "size": [
+      15,
+      5
+     ],
+     "paint": "wall",
+     "shade": 0
+    },
+    {
+     "kind": "poly",
+     "points": [
+      [
+       83,
+       26
+      ],
+      [
+       87,
+       19
+      ],
+      [
+       98,
+       19
+      ],
+      [
+       102,
+       26
+      ]
+     ],
+     "paint": "roof",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      89,
+      26
+     ],
+     "size": [
+      3,
+      4
+     ],
+     "paint": "roof",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      94,
+      27
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "lamp",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      -1,
+      17
+     ],
+     "size": [
+      3,
+      4
+     ],
+     "paint": "wall",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      -11,
+      25
+     ],
+     "size": [
+      15,
+      5
+     ],
+     "paint": "wall",
+     "shade": 0
+    },
+    {
+     "kind": "poly",
+     "points": [
+      [
+       -13,
+       26
+      ],
+      [
+       -9,
+       19
+      ],
+      [
+       2,
+       19
+      ],
+      [
+       6,
+       26
+      ]
+     ],
+     "paint": "roof",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      -7,
+      26
+     ],
+     "size": [
+      3,
+      4
+     ],
+     "paint": "roof",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      -2,
+      27
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "lamp",
+     "shade": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     4,
+     40
+    ],
+    "width": 11,
+    "wall": 4,
+    "roof": 5,
+    "window": true,
+    "walls": "wall",
+    "tiles": "roof"
+   },
+   "ctx": {
+    "size": [
+     96,
+     48
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      -1,
+      36
+     ],
+     "size": [
+      11,
+      4
+     ],
+     "paint": "wall",
+     "shade": 0
+    },
+    {
+     "kind": "poly",
+     "points": [
+      [
+       -3,
+       37
+      ],
+      [
+       1,
+       31
+      ],
+      [
+       8,
+       31
+      ],
+      [
+       12,
+       37
+      ]
+     ],
+     "paint": "roof",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      1,
+      37
+     ],
+     "size": [
+      3,
+      3
+     ],
+     "paint": "roof",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      95,
+      36
+     ],
+     "size": [
+      11,
+      4
+     ],
+     "paint": "wall",
+     "shade": 0
+    },
+    {
+     "kind": "poly",
+     "points": [
+      [
+       93,
+       37
+      ],
+      [
+       97,
+       31
+      ],
+      [
+       104,
+       31
+      ],
+      [
+       108,
+       37
+      ]
+     ],
+     "paint": "roof",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      97,
+      37
+     ],
+     "size": [
+      3,
+      3
+     ],
+     "paint": "roof",
+     "shade": 0
+    }
+   ]
+  }
+ ]
+}

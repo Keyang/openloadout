@@ -1,0 +1,159 @@
+{
+ "id": "enemy-poof",
+ "frozen": "2026-11-20",
+ "source": "sprites/enemy-poof.js",
+ "sha256": "8f30b2658628fed64a4749ab90263bf4390c4b6b0d25aac6b9e6058971bed3dd",
+ "name": "Defeat poof",
+ "blurb": "The puff an enemy leaves when it is defeated: a bright ball that breaks into puffs, with stars or skulls drifting up. Change its size, number of puffs, spread, style and colours.",
+ "meta": {
+  "type": "effect",
+  "role": "effects/dust",
+  "themes": [
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "platformer",
+   "turn-based-rpg",
+   "roguelike-action",
+   "arcade"
+  ],
+  "view": "none",
+  "words": [
+   "poof",
+   "puff",
+   "smoke",
+   "cloud",
+   "defeat",
+   "vanish",
+   "die",
+   "enemy",
+   "kill",
+   "stars",
+   "skull",
+   "burst",
+   "pop",
+   "disappear"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  48,
+  48
+ ],
+ "pivot": [
+  24,
+  24
+ ],
+ "grounded": false,
+ "preview": "burst",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "pieces": {
+   "kind": "range",
+   "label": "Pieces",
+   "def": 6,
+   "min": 4,
+   "max": 8,
+   "step": 1,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "spread": {
+   "kind": "range",
+   "label": "Spread",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Tight",
+   "hi": "Wide",
+   "group": "Look"
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "stars",
+   "options": [
+    {
+     "value": "cloud",
+     "label": "Cloud"
+    },
+    {
+     "value": "stars",
+     "label": "Stars"
+    },
+    {
+     "value": "skulls",
+     "label": "Skulls"
+    }
+   ],
+   "group": "Look"
+  },
+  "core": {
+   "kind": "color",
+   "label": "Core",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#f6d3b0",
+    "#8fd0f0",
+    "#9bd18a",
+    "#c2c9d6"
+   ],
+   "group": "Colors"
+  },
+  "edge": {
+   "kind": "color",
+   "label": "Edge",
+   "def": "#7a4fc4",
+   "swatches": [
+    "#7a4fc4",
+    "#e08a2c",
+    "#c9423a",
+    "#4fd8ee",
+    "#a4c44a",
+    "#3f6fd1"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "burst": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    9,
+    15,
+    20
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [],
+ "bundles": [
+  "kit-platformer-fantasy"
+ ]
+}

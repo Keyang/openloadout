@@ -1,0 +1,39 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "ash-fall",
+ "name": "Falling ash",
+ "blurb": "Ash tumbling down over the whole screen, as grey flecks, glowing cinders that blink as they tumble, or fine soot. Change how many flakes, their size, the style, the sway, the colours and the speed. Lay copies 62 px apart (each over its neighbours' empty border) to cover the screen.",
+ "meta": {"type":"effect","role":"effects/weather","themes":["neutral","dungeon","horror"],"gameTypes":["platformer","roguelike-action","top-down-rpg","shooter"],"view":"none","words":["ash","ashes","cinders","embers","soot","volcano","burned","smoulder","fallout","falling","gloomy","overlay"],"license":"draft"},
+ "size": [64,64],
+ "pivot": [32,32],
+ "grounded": false,
+ "preview": "loop",
+ "styles": ["pixel"],
+ "versions": [
+  {"name":"Ash","params":{}},
+  {"name":"Cinders","params":{"style":"cinders","body":"#7fb0b8","pieces":10}},
+  {"name":"Soot","params":{"style":"soot","body":"#5d6475"}},
+  {"name":"Heavy fall","params":{"pieces":12,"size":1}},
+  {"name":"Cold ash","params":{"body":"#f0ead8","sway":1,"pieces":5}}
+ ],
+ "palette": [
+  {"id":"body","label":"Ash","default":"#8f97a8","material":"stone","swatches":["#8f97a8","#f0ead8","#5d6475","#6b7280","#7fb0b8"]},
+  {"id":"glow","label":"Embers","default":"#e08a2c","material":"fire","swatches":["#e08a2c","#f2c230","#c9423a","#4fd8ee"]}
+ ],
+ "controls": [
+  {"key":"pieces","kind":"range","label":"Flakes","lo":"Few","hi":"Many","default":8,"min":4,"max":12,"step":1},
+  {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5,"when":{"style":["ash","cinders"]}},
+  {"key":"style","kind":"choice","label":"Style","options":["ash","cinders","soot"],"default":"ash"},
+  {"key":"sway","kind":"range","label":"Sway","lo":"Still","hi":"Swaying","default":0.5,"group":"Motion","when":{"style":["ash","cinders"]}},
+  {"key":"body","kind":"colour","label":"Ash"},
+  {"key":"glow","kind":"colour","label":"Embers","when":{"style":["cinders"]}},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": { "emitters": [
+  {"id":"loop","gen":"effect.ash-fall","v":1,"clip":["loop"],"picture":"loop","at":[32,32],"pieces":{"from":"pieces","map":[[4,4],[12,12]],"round":"px"},"size":{"from":"size","map":[[0,0],[1,1]]},"style":{"from":"style","pick":{"ash":"ash","cinders":"cinders","soot":"soot"}},"sway":{"from":"sway","map":[[0,0],[1,1]]},"body":"body","glowPaint":"glow"}
+ ] },
+ "clips": {
+  "loop": {"frames":8,"fps":10}
+ }
+}

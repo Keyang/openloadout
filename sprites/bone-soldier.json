@@ -1,0 +1,485 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "bone-soldier",
+ "name": "Skeleton soldier",
+ "blurb": "A rattling skeleton with glowing eyes for a battle screen. Change its bones, weapon, shield, headgear and how much it rattles.",
+ "meta": {
+  "type": "creature",
+  "role": "characters/enemy",
+  "themes": ["fantasy","dungeon"],
+  "gameTypes": ["turn-based-rpg","platformer"],
+  "view": "side",
+  "words": ["skeleton","undead","bones","skull","soldier","warrior","attack","block","collapse","battle","crypt","spooky","rattle"],
+  "license": "draft"
+ },
+ "size": [64,64],
+ "pivot": [28,58],
+ "grounded": false,
+ "preview": "walk",
+ "styles": ["pixel"],
+ "palette": [
+  {"id":"body","label":"Bone","default":"#f0ead8","material":"stone","swatches":["#f0ead8","#a8a4a0","#e6c96a","#7fe0a0"]},
+  {"id":"glow","label":"Eyes","default":"#4fd8ee","material":"magic","swatches":["#4fd8ee","#e8662c","#7aa0f4","#f4e06a","#7fe0a0","#7a4fc4"]},
+  {"id":"metal","label":"Metal","default":"#a8806a","material":"metal","swatches":["#a8806a","#c2c9d6","#f2c230","#5a5f7a","#8f97a8","#e6c545","#c98a4a"]},
+  {"id":"shine","default":"#ffffff","material":"light","detail":true},
+  {"id":"blade","derive":{"rule":"ramp","of":"metal","tone":"light"},"material":"metal"}
+ ],
+ "body": {
+  "rig": {
+   "extends": {
+    "use": "base:person-side",
+    "v": 7,
+    "paint": {
+     "skin": "body",
+     "top": "body",
+     "bottom": "body",
+     "boots": "body"
+    },
+    "clips": ["idle","walk","attack","block","hurt","die"]
+   },
+   "bones": [
+    {"id":"lift","parent":"ground","angle":90,"length":16}
+   ],
+   "nodes": [
+    {"id":"tip","parent":"handF","angle":10},
+    {"id":"hold","parent":"tip","angle":{"from":"weaponAngle","map":[[-10,0],[40,-50]]}},
+    {"id":"liftTop","parent":"lift","from":1}
+   ],
+   "ik": [
+    {"id":"legF","bones":["thighF","shinF"],"bend":1},
+    {"id":"legB","bones":["thighB","shinB"],"bend":1}
+   ],
+   "points": [
+    {"id":"hand","on":"hold","at":[0,0]},
+    {"id":"head","on":"skull","at":[0,5.4],"angle":90},
+    {"id":"feet","on":"liftTop","at":[-16,-6]}
+   ],
+   "shapes": [
+    {"id":"mouth","kind":"stamp","on":"skull","at":[1.852,-2.25],"rows":["aa"],"key":{"a":"ink"},"hidden":true,"z":63},
+    {"id":"armB","kind":"limb","on":"armBd","width":2,"paint":"body","z":10,"far":true,"when":{"thickness":[{"below":0.75}]}},
+    {"id":"armBThick","kind":"limb","on":"armBd","width":3,"paint":"body","z":10,"far":true,"when":{"thickness":[{"atLeast":0.75}]}},
+    {"id":"foreB","kind":"limb","on":"foreBd","width":2,"paint":"body","z":10,"far":true,"when":{"thickness":[{"below":0.75}]}},
+    {"id":"foreBThick","kind":"limb","on":"foreBd","width":3,"paint":"body","z":10,"far":true,"when":{"thickness":[{"atLeast":0.75}]}},
+    {"id":"thighB","kind":"limb","on":"thighBd","width":2,"paint":"body","z":20,"far":true,"when":{"thickness":[{"below":0.75}]}},
+    {"id":"thighBThick","kind":"limb","on":"thighBd","width":3,"paint":"body","z":20,"far":true,"when":{"thickness":[{"atLeast":0.75}]}},
+    {"id":"shinB","kind":"limb","on":"shinBd","width":2,"paint":"body","z":20,"far":true,"when":{"thickness":[{"below":0.75}]}},
+    {"id":"shinBThick","kind":"limb","on":"shinBd","width":3,"paint":"body","z":20,"far":true,"when":{"thickness":[{"atLeast":0.75}]}},
+    {"id":"thighF","kind":"limb","on":"thighFd","width":2,"paint":"body","z":30,"when":{"thickness":[{"below":0.75}]}},
+    {"id":"thighFThick","kind":"limb","on":"thighFd","width":3,"paint":"body","z":30,"when":{"thickness":[{"atLeast":0.75}]}},
+    {"id":"shinF","kind":"limb","on":"shinFd","width":2,"paint":"body","z":30,"when":{"thickness":[{"below":0.75}]}},
+    {"id":"shinFThick","kind":"limb","on":"shinFd","width":3,"paint":"body","z":30,"when":{"thickness":[{"atLeast":0.75}]}},
+    {"id":"armF","kind":"limb","on":"armFd","width":2,"paint":"body","z":90,"when":{"thickness":[{"below":0.75}]}},
+    {"id":"armFThick","kind":"limb","on":"armFd","width":3,"paint":"body","z":90,"when":{"thickness":[{"atLeast":0.75}]}},
+    {"id":"foreF","kind":"limb","on":"foreFd","width":2,"paint":"body","z":90,"when":{"thickness":[{"below":0.75}]}},
+    {"id":"foreFThick","kind":"limb","on":"foreFd","width":3,"paint":"body","z":90,"when":{"thickness":[{"atLeast":0.75}]}},
+    {"id":"pelvis","kind":"ellipse","on":"waist","at":[0,1],"r":[{"from":"thickness","map":[[0,2.4],[1,3.4]]},{"from":"thickness","map":[[0,1.6],[1,2.4]]}],"paint":"body","shade":0,"z":40},
+    {"id":"pelvisHole","kind":"dot","on":"waist","at":[0,1],"paint":"body.deep","z":41},
+    {"id":"torso","kind":"capsule","on":"trunk","from":0.25,"to":1,"r":[{"from":"thickness","map":[[0,2.4],[1,3.4]]},{"from":"thickness","map":[[0,3],[1,4]]}],"paint":"body.deep","z":50},
+    {"id":"spineBone","kind":"line","on":"trunk","from":[-1,0],"to":[7,0],"thick":1,"paint":"body","z":51},
+    {"id":"rib1","kind":"line","on":"trunk","from":[3,-3],"to":[3,3],"paint":"body","z":52},
+    {"id":"rib2","kind":"line","on":"trunk","from":[4.8,-3.4],"to":[4.8,3.4],"paint":"body","z":52},
+    {"id":"rib3","kind":"line","on":"trunk","from":[6.6,-3.2],"to":[6.6,3.2],"paint":"body","z":52},
+    {"id":"skull","kind":"ellipse","on":"skull","at":[-0.4,0.6],"r":[5.62,4.94],"paint":"body","z":60},
+    {"id":"face","kind":"poly","on":"skull","points":[[-1,0.5],[5,0.5],[5,-4],[-1,-4]],"paint":"body","z":60},
+    {"id":"eye","kind":"stamp","on":"skull","anchor":"tl","at":[-2,2],"rows":["ddd.dd","glg.gl","ggg.gg","...d.."],"key":{"d":"body.deep","g":"glow","l":"glow.light"},"z":62,"variants":{"blink":["ddd.dd","ddd.dd","ddd.dd","...d.."],"lie":["ddd.dd","glg.gl","ggg.gg","...d.."],"lie-blink":["ddd.dd","ddd.dd","ddd.dd","...d.."]}},
+    {"id":"teeth","kind":"stamp","on":"skull","anchor":"tl","at":[0,-3],"rows":[".a.a"],"key":{"a":"ink"},"z":63},
+    {"id":"jaw0","kind":"poly","points":[[-1,-4],[4,-4],[4,-6],[-1,-6]],"paint":"body","z":61,"on":"skull","hidden":true},
+    {"id":"jaw1Gap","kind":"poly","points":[[0,-3.5],[4,-3.5],[4,-5.5],[0,-4.5]],"paint":"ink","shade":0,"z":61,"on":"skull","hidden":true},
+    {"id":"jaw1Bone","kind":"poly","points":[[-1,-4],[4,-5],[4,-7],[-1,-6]],"paint":"body","z":61,"on":"skull","hidden":true},
+    {"id":"jaw2Gap","kind":"poly","points":[[0,-3.5],[4,-3.5],[4,-6.5],[0,-4.5]],"paint":"ink","shade":0,"z":61,"on":"skull","hidden":true},
+    {"id":"jaw2Bone","kind":"poly","points":[[-1,-4],[4,-6],[4,-8],[-1,-6]],"paint":"body","z":61,"on":"skull","hidden":true},
+    {"id":"jaw3Gap","kind":"poly","points":[[0,-3.5],[4,-3.5],[4,-7.5],[0,-4.5]],"paint":"ink","shade":0,"z":61,"on":"skull","hidden":true},
+    {"id":"jaw3Bone","kind":"poly","points":[[-1,-4],[4,-7],[4,-9],[-1,-6]],"paint":"body","z":61,"on":"skull","hidden":true},
+    {"id":"slashWide","kind":"arc","on":"chest","at":[0,0],"r":{"from":"weaponLength","map":[[0.65,14],[1,17],[1.35,19]]},"a0":-85,"a1":100,"thick":2,"paint":"shine","z":96,"hidden":true,"when":{"weapon":["sword","axe"]}},
+    {"id":"slashInner","kind":"arc","on":"chest","at":[0,0],"r":{"from":"weaponLength","map":[[0.65,11],[1,14],[1.35,16]]},"a0":-25,"a1":75,"thick":1,"paint":"shine","z":96,"hidden":true,"when":{"weapon":["sword","axe"]}},
+    {"id":"slashTail","kind":"arc","on":"chest","at":[0,0],"r":{"from":"weaponLength","map":[[0.65,15],[1,19],[1.35,21]]},"a0":98,"a1":120,"thick":2,"paint":"shine","z":96,"hidden":true,"when":{"weapon":["sword","axe"]}},
+    {"id":"shieldRound","kind":"ellipse","on":"handB","at":[0,0],"r":[5,4.5],"paint":"metal","shade":1,"z":12,"when":{"shield":["round"]}},
+    {"id":"shieldBoss","kind":"dot","on":"handB","at":[0,0],"size":2,"paint":"metal.light","z":13,"when":{"shield":["round","kite"]}},
+    {"id":"shieldKite","kind":"poly","on":"handB","points":[[-4.5,-3.5],[-4.5,3.5],[1.5,4],[7,0],[1.5,-4]],"paint":"metal","shade":1,"z":12,"when":{"shield":["kite"]}},
+    {"id":"shieldBroken","kind":"poly","on":"handB","points":[[-4.6,-2],[-3,3.6],[0.5,4.6],[3.8,3.2],[1.5,1],[3,-1.5],[0.5,-2.2],[-1.5,-4.4]],"paint":"metal","shade":1,"z":12,"when":{"shield":["broken"]}},
+    {"id":"shieldCrack","kind":"line","on":"handB","from":[-1.5,-1],"to":[1,2.5],"paint":"metal.deep","z":13,"when":{"shield":["broken"]}},
+    {"id":"cap","kind":"poly","on":"skull","points":[[6.35,1.4],[5.87,2.78],[5.1,4.03],[4.07,5.07],[2.83,5.85],[1.45,6.34],[0,6.5],[-1.45,6.34],[-2.83,5.85],[-4.07,5.07],[-5.1,4.03],[-5.87,2.78],[-6.35,1.4]],"paint":"metal","light":1,"z":65,"when":{"headgear":["helmet","horned"]}},
+    {"id":"capRim","kind":"line","on":"skull","from":[-5.9,1.9],"to":[5.9,1.9],"paint":"metal.dark","z":66,"when":{"headgear":["helmet","horned"]}},
+    {"id":"capCrest","kind":"rect","on":"skull","at":[-1,8],"size":[2,2],"paint":"metal","shade":0,"z":66,"when":{"headgear":["helmet"]}},
+    {"id":"hornF","kind":"poly","on":"skull","points":[[1,6],[3.5,7],[6.5,10.5],[3,8.8],[0.5,7.5]],"paint":"body","shade":1,"z":66,"when":{"headgear":["horned"]}},
+    {"id":"hornB","kind":"poly","on":"skull","points":[[-3,5.5],[-5.5,6.5],[-8.5,10],[-5,8.5],[-2.5,7]],"paint":"body","shade":1,"z":64,"far":true,"when":{"headgear":["horned"]}},
+    {"id":"crown","kind":"use","use":"part:crown","v":4,"on":"headwear","when":{"headgear":["crown"]},"paint":{"gold":"metal","jewel":"glow"}},
+    {"id":"sword","kind":"use","use":"held:sword","v":1,"on":"hold","when":{"weapon":["sword"]},"args":{"length":{"from":"weaponLength","map":[[0.65,8.45],[1,13],[1.35,15.6]]}},"paint":{"metal":"blade"}},
+    {"id":"axe","kind":"use","use":"held:axe","v":1,"on":"hold","when":{"weapon":["axe"]},"args":{"length":{"from":"weaponLength","map":[[0.65,7.8],[1,12],[1.35,14.4]]}},"paint":{"metal":"blade"}},
+    {"id":"spear","kind":"use","use":"held:spear","v":1,"on":"hold","when":{"weapon":["spear"]},"args":{"length":{"from":"weaponLength","map":[[0.65,9.75],[1,15],[1.35,16.5]]}},"paint":{"metal":"blade"}},
+    {"id":"heapLegFthigh","kind":"line","on":"ground","from":[6.65,3.14],"to":[12.35,2.46],"thick":2,"paint":"body","z":31,"hidden":true,"when":{"thickness":[{"below":0.75}]}},
+    {"id":"heapLegFthighThick","kind":"line","on":"ground","from":[6.65,3.14],"to":[12.35,2.46],"thick":3,"paint":"body","z":31,"hidden":true,"when":{"thickness":[{"atLeast":0.75}]}},
+    {"id":"heapLegFshin","kind":"line","on":"ground","from":[12.68,1],"to":[6.93,1],"thick":2,"paint":"body","z":31,"hidden":true,"when":{"thickness":[{"below":0.75}]}},
+    {"id":"heapLegFshinThick","kind":"line","on":"ground","from":[12.68,1],"to":[6.93,1],"thick":3,"paint":"body","z":31,"hidden":true,"when":{"thickness":[{"atLeast":0.75}]}},
+    {"id":"heapLegBthigh","kind":"line","on":"ground","from":[2.25,3.25],"to":[7.75,1.55],"thick":2,"paint":"body","z":21,"far":true,"hidden":true,"when":{"thickness":[{"below":0.75}]}},
+    {"id":"heapLegBthighThick","kind":"line","on":"ground","from":[2.25,3.25],"to":[7.75,1.55],"thick":3,"paint":"body","z":21,"far":true,"hidden":true,"when":{"thickness":[{"atLeast":0.75}]}},
+    {"id":"heapLegBshin","kind":"line","on":"ground","from":[6.37,1.23],"to":[0.63,0.77],"thick":2,"paint":"body","z":21,"far":true,"hidden":true,"when":{"thickness":[{"below":0.75}]}},
+    {"id":"heapLegBshinThick","kind":"line","on":"ground","from":[6.37,1.23],"to":[0.63,0.77],"thick":3,"paint":"body","z":21,"far":true,"hidden":true,"when":{"thickness":[{"atLeast":0.75}]}},
+    {"id":"heapArmFupper","kind":"line","on":"ground","from":[10.14,5.31],"to":[12.86,1.89],"thick":2,"paint":"body","z":31,"hidden":true,"when":{"thickness":[{"below":0.75}]}},
+    {"id":"heapArmFupperThick","kind":"line","on":"ground","from":[10.14,5.31],"to":[12.86,1.89],"thick":3,"paint":"body","z":31,"hidden":true,"when":{"thickness":[{"atLeast":0.75}]}},
+    {"id":"heapArmFfore","kind":"line","on":"ground","from":[12.81,1],"to":[17.19,1],"thick":2,"paint":"body","z":31,"hidden":true,"when":{"thickness":[{"below":0.75}]}},
+    {"id":"heapArmFforeThick","kind":"line","on":"ground","from":[12.81,1],"to":[17.19,1],"thick":3,"paint":"body","z":31,"hidden":true,"when":{"thickness":[{"atLeast":0.75}]}},
+    {"id":"heapArmBupper","kind":"line","on":"ground","from":[1.36,5.11],"to":[-1.36,1.69],"thick":2,"paint":"body","z":21,"far":true,"hidden":true,"when":{"thickness":[{"below":0.75}]}},
+    {"id":"heapArmBupperThick","kind":"line","on":"ground","from":[1.36,5.11],"to":[-1.36,1.69],"thick":3,"paint":"body","z":21,"far":true,"hidden":true,"when":{"thickness":[{"atLeast":0.75}]}},
+    {"id":"heapArmBfore","kind":"line","on":"ground","from":[-0.81,1],"to":[-5.19,1],"thick":2,"paint":"body","z":21,"far":true,"hidden":true,"when":{"thickness":[{"below":0.75}]}},
+    {"id":"heapArmBforeThick","kind":"line","on":"ground","from":[-0.81,1],"to":[-5.19,1],"thick":3,"paint":"body","z":21,"far":true,"hidden":true,"when":{"thickness":[{"atLeast":0.75}]}},
+    {"id":"heapCage","kind":"poly","on":"ground","points":[[12.51,6.16],[10.64,1.74],[1.58,4.7],[4.07,10.6]],"paint":"body.deep","z":50,"hidden":true},
+    {"id":"heapSpine","kind":"line","on":"ground","from":[12.01,3.77],"to":[2.39,7.83],"paint":"body","z":51,"hidden":true},
+    {"id":"heapRib1","kind":"line","on":"ground","from":[10.04,7.64],"to":[7.86,2.48],"paint":"body","z":52,"hidden":true},
+    {"id":"heapRib2","kind":"line","on":"ground","from":[7.85,8.56],"to":[5.67,3.41],"paint":"body","z":52,"hidden":true},
+    {"id":"heapRib3","kind":"line","on":"ground","from":[5.67,9.49],"to":[3.48,4.33],"paint":"body","z":52,"hidden":true},
+    {"id":"heapSkull","kind":"ellipse","on":"ground","at":[5,13.61],"r":[5.62,4.94],"paint":"body","z":60,"hidden":true},
+    {"id":"heapFace","kind":"poly","on":"ground","points":[[4.4,13.51],[10.4,13.51],[10.4,9.01],[4.4,9.01]],"paint":"body","z":60,"hidden":true},
+    {"id":"heapEye","kind":"stamp","on":"ground","anchor":"tl","at":[3.4,15.01],"rows":["ddd.dd","glg.gl","ggg.gg","...d.."],"key":{"d":"body.deep","g":"glow","l":"glow.light"},"z":62,"variants":{"blink":["ddd.dd","ddd.dd","ddd.dd","...d.."],"lie":["ddd.dd","glg.gl","ggg.gg","...d.."],"lie-blink":["ddd.dd","ddd.dd","ddd.dd","...d.."]},"hidden":true},
+    {"id":"heapTeeth","kind":"stamp","on":"ground","anchor":"tl","at":[5.4,10.01],"rows":[".a.a"],"key":{"a":"ink"},"z":63,"hidden":true},
+    {"id":"heapJaw0","kind":"poly","points":[[4.4,9.01],[9.4,9.01],[9.4,7.01],[4.4,7.01]],"paint":"body","z":61,"on":"ground","hidden":true},
+    {"id":"heapJaw1Gap","kind":"poly","points":[[5.4,9.51],[9.4,9.51],[9.4,7.51],[5.4,8.51]],"paint":"ink","shade":0,"z":61,"on":"ground","hidden":true},
+    {"id":"heapJaw1Bone","kind":"poly","points":[[4.4,9.01],[9.4,8.01],[9.4,6.01],[4.4,7.01]],"paint":"body","z":61,"on":"ground","hidden":true},
+    {"id":"heapJaw2Gap","kind":"poly","points":[[5.4,9.51],[9.4,9.51],[9.4,6.51],[5.4,8.51]],"paint":"ink","shade":0,"z":61,"on":"ground","hidden":true},
+    {"id":"heapJaw2Bone","kind":"poly","points":[[4.4,9.01],[9.4,7.01],[9.4,5.01],[4.4,7.01]],"paint":"body","z":61,"on":"ground","hidden":true},
+    {"id":"heapJaw3Gap","kind":"poly","points":[[5.4,9.51],[9.4,9.51],[9.4,5.51],[5.4,8.51]],"paint":"ink","shade":0,"z":61,"on":"ground","hidden":true},
+    {"id":"heapJaw3Bone","kind":"poly","points":[[4.4,9.01],[9.4,6.01],[9.4,4.01],[4.4,7.01]],"paint":"body","z":61,"on":"ground","hidden":true},
+    {"id":"heapCap","kind":"poly","on":"ground","points":[[11.35,15.01],[10.87,16.39],[10.1,17.64],[9.07,18.68],[7.83,19.46],[6.45,19.95],[5,20.11],[3.55,19.95],[2.17,19.46],[0.93,18.68],[-0.1,17.64],[-0.87,16.39],[-1.35,15.01]],"paint":"metal","light":1,"z":65,"when":{"headgear":["helmet","horned"]},"hidden":true},
+    {"id":"heapCapRim","kind":"line","on":"ground","from":[-0.9,15.51],"to":[10.9,15.51],"paint":"metal.dark","z":66,"when":{"headgear":["helmet","horned"]},"hidden":true},
+    {"id":"heapCapCrest","kind":"rect","on":"ground","at":[4,21.61],"size":[2,2],"paint":"metal","shade":0,"z":66,"when":{"headgear":["helmet"]},"hidden":true},
+    {"id":"heapHornF","kind":"poly","on":"ground","points":[[6,19.61],[8.5,20.61],[11.5,24.11],[8,22.41],[5.5,21.11]],"paint":"body","shade":1,"z":66,"when":{"headgear":["horned"]},"hidden":true},
+    {"id":"heapHornB","kind":"poly","on":"ground","points":[[2,19.11],[-0.5,20.11],[-3.5,23.61],[0,22.11],[2.5,20.61]],"paint":"body","shade":1,"z":64,"far":true,"when":{"headgear":["horned"]},"hidden":true},
+    {"id":"heapCrown","kind":"use","use":"part:crown","v":4,"on":"ground","when":{"headgear":["crown"]},"paint":{"gold":"metal","jewel":"glow"},"at":[5,14.61],"hidden":true},
+    {"id":"swordDown","kind":"line","on":"ground","from":[11,1.5],"to":[{"from":"weaponLength","map":[[0.65,16.95],[1,21.5],[1.35,24.1]]},1.5],"thick":2,"paint":"metal","z":80,"hidden":true,"when":{"weapon":["sword"]}},
+    {"id":"swordDownGuard","kind":"line","on":"ground","from":[11,0],"to":[11,4],"paint":"metal.dark","z":81,"hidden":true,"when":{"weapon":["sword"]}},
+    {"id":"swordDownGrip","kind":"line","on":"ground","from":[8.5,1.5],"to":[10,1.5],"paint":"body.dark","z":81,"hidden":true,"when":{"weapon":["sword"]}},
+    {"id":"axeDown","kind":"line","on":"ground","from":[8,1.5],"to":[{"from":"weaponLength","map":[[0.65,14.8],[1,19],[1.35,21.4]]},1.5],"paint":"body.dark","z":80,"hidden":true,"when":{"weapon":["axe"]}},
+    {"id":"axeDownHead","kind":"poly","on":"ground","points":[[{"from":"weaponLength","map":[[0.65,12.8],[1,17],[1.35,19.4]]},1.5],[{"from":"weaponLength","map":[[0.65,14.8],[1,19],[1.35,21.4]]},5.5],[{"from":"weaponLength","map":[[0.65,16.8],[1,21],[1.35,23.4]]},5.5],[{"from":"weaponLength","map":[[0.65,15.8],[1,20],[1.35,22.4]]},1.5]],"paint":"metal","z":81,"hidden":true,"when":{"weapon":["axe"]}},
+    {"id":"spearDown","kind":"line","on":"ground","from":[6,1.5],"to":[{"from":"weaponLength","map":[[0.65,15.75],[1,21],[1.35,22.5]]},1.5],"paint":"body.dark","z":80,"hidden":true,"when":{"weapon":["spear"]}},
+    {"id":"spearDownTip","kind":"poly","on":"ground","points":[[{"from":"weaponLength","map":[[0.65,14.75],[1,20],[1.35,21.5]]},0],[{"from":"weaponLength","map":[[0.65,19.75],[1,25],[1.35,26.5]]},1.5],[{"from":"weaponLength","map":[[0.65,14.75],[1,20],[1.35,21.5]]},3]],"paint":"metal","z":81,"hidden":true,"when":{"weapon":["spear"]}},
+    {"id":"shieldRoundDown","kind":"ellipse","on":"ground","at":[-3,4.5],"r":[5,4.5],"paint":"metal","shade":1,"z":18,"when":{"shield":["round"]},"hidden":true},
+    {"id":"shieldBossDown","kind":"dot","on":"ground","at":[-3,4.5],"size":2,"paint":"metal.light","z":18,"when":{"shield":["round","kite"]},"hidden":true},
+    {"id":"shieldKiteDown","kind":"poly","on":"ground","points":[[-7.5,1],[-7.5,8],[-1.5,8.5],[4,4.5],[-1.5,0.5]],"paint":"metal","shade":1,"z":18,"when":{"shield":["kite"]},"hidden":true},
+    {"id":"shieldBrokenDown","kind":"poly","on":"ground","points":[[-7.6,2.5],[-6,8.1],[-2.5,9.1],[0.8,7.7],[-1.5,5.5],[0,3],[-2.5,2.3],[-4.5,0.1]],"paint":"metal","shade":1,"z":18,"when":{"shield":["broken"]},"hidden":true},
+    {"id":"shieldCrackDown","kind":"line","on":"ground","from":[-4.5,3.5],"to":[-2,7],"paint":"metal.deep","z":18,"when":{"shield":["broken"]},"hidden":true}
+   ]
+  }
+ },
+ "controls": [
+  {"key":"height","kind":"range","label":"Height","lo":"Short","hi":"Tall","default":0.5,"scales":{"bones":["stand","loin","trunk","thighF","shinF","thighB","shinB","spine","armF","foreF","armB","foreB","back","thighFa","thighFd","shinFd","armFa","armFd","foreFd","thighBa","thighBd","shinBd","armBa","armBd","foreBd"],"by":[0.7826,1.2174]}},
+  {"key":"thickness","kind":"range","label":"Bones","lo":"Thin","hi":"Thick","default":0.5},
+  {"key":"head","kind":"range","label":"Head","lo":"Small","hi":"Big","default":0.55,"scales":{"shapes":["skull","cap","capRim","capCrest","hornF","hornB","crown","heapSkull","heapCap","heapCapRim","heapCapCrest","heapHornF","heapHornB","heapCrown"],"by":[0.85,1.15]}},
+  {"key":"weapon","kind":"choice","label":"Weapon","options":["sword","axe","spear","none"],"default":"sword"},
+  {"key":"weaponLength","kind":"range","label":"Length","lo":"Short","hi":"Long","default":1,"min":0.65,"max":1.35,"step":0.05},
+  {"key":"weaponAngle","kind":"range","label":"Hold angle","lo":"Upright","hi":"Forward","default":0,"min":-10,"max":40,"step":1},
+  {"key":"shield","kind":"choice","label":"Shield","options":["round","kite","broken","none"],"default":"round"},
+  {"key":"shieldSize","kind":"range","label":"Size","lo":"Small","hi":"Big","default":1,"min":0.65,"max":1.35,"step":0.05,"scales":{"shapes":["shieldRound","shieldBoss","shieldKite","shieldBroken","shieldCrack","shieldRoundDown","shieldBossDown","shieldKiteDown","shieldBrokenDown","shieldCrackDown"],"by":[0.65,1.35]}},
+  {"key":"headgear","kind":"choice","label":"Headgear","options":["none","helmet","crown","horned"],"default":"none"},
+  {"key":"headgearSize","kind":"range","label":"Size","lo":"Small","hi":"Big","default":1,"min":0.65,"max":1.35,"step":0.05,"scales":{"shapes":["cap","capRim","capCrest","hornF","hornB","crown","heapCap","heapCapRim","heapCapCrest","heapHornF","heapHornB","heapCrown"],"by":[0.9,1.1]}},
+  {"key":"body","kind":"colour","label":"Bone"},
+  {"key":"glow","kind":"colour","label":"Eyes"},
+  {"key":"metal","kind":"colour","label":"Metal","when":[{"weapon":["sword","axe","spear"]},{"shield":["round","kite","broken"]},{"headgear":["helmet","crown","horned"]}]},
+  {"key":"wobble","kind":"range","label":"Rattle","lo":"Firm","hi":"Loose","default":0.5,"group":"Motion"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "parts": {
+  "weapon": {
+   "label": "Weapon",
+   "params": ["weapon","weaponLength","weaponAngle"],
+   "none": "none",
+   "socket": "hand",
+   "shapes": ["sword","axe","spear","swordDown","swordDownGuard","swordDownGrip","axeDown","axeDownHead","spearDown","spearDownTip","slashWide","slashInner","slashTail"]
+  },
+  "shield": {
+   "label": "Shield",
+   "params": ["shield","shieldSize"],
+   "none": "none",
+   "socket": "offhand",
+   "shapes": ["shieldRound","shieldBoss","shieldKite","shieldBroken","shieldCrack","shieldRoundDown","shieldBossDown","shieldKiteDown","shieldBrokenDown","shieldCrackDown"]
+  },
+  "headgear": {
+   "label": "Headgear",
+   "params": ["headgear","headgearSize"],
+   "none": "none",
+   "socket": "head",
+   "shapes": ["cap","capRim","capCrest","hornF","hornB","crown","heapCap","heapCapRim","heapCapCrest","heapHornF","heapHornB","heapCrown"]
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "fps": 7,
+   "loop": true,
+   "keys": [
+    {"t":0,"root":[0,0.095],"bones":{"spine":-0.99,"neck":-3.44,"face":-83.7,"armF":-168.58,"foreF":14.32,"handF":122.38,"armB":-205.77,"foreB":22.92,"back":-177.14,"chest":-87.14,"floor":-252.38,"ground":162.38,"trunk":-4.84,"ankleF":91.03,"stepF":-75.96,"plantF":75.96,"toeF":190.81,"ankleB":112.53,"stepB":-104.04,"plantB":104.04,"toeB":180.45,"thighFa":-180.7,"thighFd":176.61,"shinFa":116.57,"shinFd":-135,"armFa":-182.11,"armFd":180.3,"foreFd":12.53,"thighBa":-181,"thighBd":179.97,"shinBa":45,"shinBd":-75.96,"armBa":192.26,"armBd":-182.54,"foreBd":26.57,"hang":90,"plume":90,"skull":2.76},"stretch":{"seat":1.06,"loin":1.141,"trunk":0.872,"face":0.784,"floor":0.7,"stepF":1.031,"toeF":1.28,"stepB":1.031,"toeB":1.27,"thighFa":1.077,"thighFd":1.1,"shinFd":1.044,"armFa":1.011,"armFd":0.942,"foreFd":1.022,"thighBa":1.076,"thighBd":1.044,"shinBd":1.014,"armBa":0.953,"armBd":1.022,"foreBd":0.914,"spine":0.966,"neck":1.103},"ik":{"legF":[2.1,-1],"legB":[-2.1,-1]},"show":["footF","soleF","footB","soleB"],"hide":["toeF","toeB","mouth"],"swap":{"eye":null}},
+    {"t":0.125,"root":[0,0.176],"bones":{"armF":-167.43,"handF":122.61,"armB":-206.12,"back":-183.5,"floor":-253.09,"ground":163.09,"trunk":-5.81,"ankleF":92.76,"toeF":189.98,"ankleB":114.41,"toeB":179.54,"thighFa":-176.91,"thighFd":174.3,"shinFa":113.2,"shinFd":-135,"armFa":-181.93,"armFd":179.44,"foreFd":12.53,"thighBa":-180.84,"thighBd":178.08,"shinBa":45,"shinBd":-75.96,"armBa":190.46,"armBd":-182.63,"hang":84.34,"plume":101.31,"skull":-4.05,"spine":0.29},"stretch":{"seat":0.979,"loin":1.189,"trunk":0.726,"floor":0.697,"toeF":1.28,"toeB":1.268,"thighFa":0.933,"thighFd":0.937,"shinFd":1.044,"armFa":1.031,"armFd":0.942,"foreFd":1.022,"thighBa":0.916,"thighBd":0.87,"shinBd":1.014,"armBa":0.97,"foreBd":0.914,"spine":0.954,"neck":1.075}},
+    {"t":0.25,"root":[0,0.6],"bones":{"armF":-167.94,"handF":122.5,"armB":-205.96,"back":-186.14,"floor":-256.87,"ground":166.87,"trunk":-5.81,"ankleF":99.39,"toeF":186.79,"ankleB":121.89,"toeB":175.92,"thighFa":-178.87,"thighFd":177.94,"shinFa":104.04,"shinFd":-144.46,"armFa":-178.65,"armFd":178.41,"foreFd":15.26,"thighBa":-180.9,"thighBd":180.98,"shinBa":-144.46,"shinBd":104.04,"armBa":187.17,"armBd":-184.91,"hang":82,"plume":106,"skull":-8.49,"spine":-0.28},"stretch":{"seat":0.555,"loin":1.438,"trunk":0.726,"floor":0.685,"toeF":1.278,"toeB":1.259,"thighFa":1.001,"thighFd":1.014,"shinFd":1.058,"armFa":1.124,"armFd":1.166,"foreFd":1.022,"thighBa":0.988,"thighBd":1.058,"shinBd":1.014,"armBa":1.059,"foreBd":1.143,"spine":1.034,"neck":0.897}},
+    {"t":0.375,"root":[0,1.024],"bones":{"armF":-169.81,"handF":122.13,"armB":-205.4,"back":-183.5,"floor":-260.76,"ground":170.76,"trunk":-4.84,"ankleF":104.18,"toeF":184.48,"ankleB":127.6,"toeB":173.14,"thighFa":-181.37,"thighFd":182.43,"shinFa":-173.66,"shinFd":125.54,"armFa":-171.14,"armFd":181.32,"foreFd":12.53,"thighBa":-181.76,"thighBd":177.05,"shinBa":125.54,"shinBd":-173.66,"armBa":178.83,"armBd":-182.54,"hang":84.34,"plume":101.31,"skull":-7.95,"spine":-2.36},"stretch":{"seat":1.131,"loin":1.1,"trunk":0.872,"floor":0.675,"toeF":1.276,"toeB":1.251,"thighFa":1.062,"thighFd":1.114,"shinFd":1.058,"armFa":0.993,"armFd":0.942,"foreFd":1.022,"thighBa":1.059,"thighBd":1.058,"shinBd":1.114,"armBa":0.939,"foreBd":0.914,"spine":1.046,"neck":0.925}},
+    {"t":0.5,"root":[0,1.2],"bones":{"armF":-171.94,"handF":121.7,"armB":-204.76,"back":-177.14,"floor":-262.41,"ground":172.41,"trunk":-5.81,"ankleF":105.87,"toeF":183.67,"ankleB":129.7,"toeB":172.12,"thighFa":-176.15,"thighFd":181.45,"shinFa":-180,"shinFd":125.54,"armFa":-167.75,"armFd":183.87,"foreFd":-2.73,"thighBa":-179.69,"thighBd":175.13,"shinBa":33.69,"shinBd":-90,"armBa":177.56,"armBd":-184.15,"hang":90,"plume":90,"skull":-2.76,"spine":-4.73},"stretch":{"seat":0.955,"loin":1.203,"trunk":0.726,"floor":0.673,"toeF":1.275,"toeB":1.248,"thighFa":0.952,"thighFd":0.984,"shinFd":1.058,"armFa":1.029,"armFd":0.942,"foreFd":1.166,"thighBa":0.919,"thighBd":0.887,"shinBd":0.984,"armBa":0.977,"foreBd":0.914,"spine":0.966,"neck":1.103}},
+    {"t":0.625,"root":[0,1.024],"bones":{"armF":-173.09,"handF":121.47,"armB":-204.42,"back":-170.77,"floor":-260.76,"ground":170.76,"trunk":-4.84,"ankleF":104.18,"toeF":184.48,"ankleB":127.6,"toeB":173.14,"thighFa":-181.37,"thighFd":182.43,"shinFa":-173.66,"shinFd":125.54,"armFa":-167.8,"armFd":184.61,"foreFd":0,"thighBa":-181.76,"thighBd":177.05,"shinBa":125.54,"shinBd":-173.66,"armBa":178.89,"armBd":-183.58,"hang":95.66,"plume":78.69,"skull":4.05,"spine":-6.01},"stretch":{"seat":1.131,"loin":1.1,"trunk":0.872,"floor":0.675,"toeF":1.276,"toeB":1.251,"thighFa":1.062,"thighFd":1.114,"shinFd":1.058,"armFa":0.988,"armFd":0.942,"foreFd":0.942,"thighBa":1.059,"thighBd":1.058,"shinBd":1.114,"armBa":0.94,"foreBd":0.914,"spine":0.954,"neck":1.075}},
+    {"t":0.75,"root":[0,0.6],"bones":{"armF":-172.58,"handF":121.58,"armB":-204.57,"back":-168.14,"floor":-256.87,"ground":166.87,"trunk":-5.81,"ankleF":99.39,"toeF":186.79,"ankleB":121.89,"toeB":175.92,"thighFa":-178.87,"thighFd":177.94,"shinFa":104.04,"shinFd":-144.46,"armFa":-173.42,"armFd":182.54,"foreFd":2.73,"thighBa":-180.9,"thighBd":180.98,"shinBa":-144.46,"shinBd":104.04,"armBa":187.08,"armBd":-186.21,"hang":98,"plume":74,"skull":8.49,"spine":-5.44},"stretch":{"seat":0.555,"loin":1.438,"trunk":0.726,"floor":0.685,"toeF":1.278,"toeB":1.259,"thighFa":1.001,"thighFd":1.014,"shinFd":1.058,"armFa":1.119,"armFd":1.166,"foreFd":0.942,"thighBa":0.988,"thighBd":1.058,"shinBd":1.014,"armBa":1.062,"foreBd":1.143,"spine":1.034,"neck":0.897},"swap":{"eye":"blink"}},
+    {"t":0.875,"root":[0,0.176],"bones":{"armF":-170.71,"handF":121.95,"armB":-205.13,"back":-170.77,"floor":-253.09,"ground":163.09,"trunk":-5.81,"ankleF":92.76,"toeF":189.98,"ankleB":114.41,"toeB":179.54,"thighFa":-176.91,"thighFd":174.3,"shinFa":113.2,"shinFd":-135,"armFa":-178.48,"armFd":182.61,"foreFd":0,"thighBa":-180.84,"thighBd":178.08,"shinBa":45,"shinBd":-75.96,"armBa":190.49,"armBd":-183.64,"hang":95.66,"plume":78.69,"skull":7.95,"spine":-3.36},"stretch":{"seat":0.979,"loin":1.189,"trunk":0.726,"floor":0.697,"toeF":1.28,"toeB":1.268,"thighFa":0.933,"thighFd":0.937,"shinFd":1.044,"armFa":1.026,"armFd":0.942,"foreFd":0.942,"thighBa":0.916,"thighBd":0.87,"shinBd":1.014,"armBa":0.971,"foreBd":0.914,"spine":1.046,"neck":0.925},"swap":{"eye":null}}
+   ],
+   "frameEdits": {
+    "0": {
+     "show": ["jaw0"]
+    },
+    "1": {
+     "show": ["jaw0"]
+    },
+    "2": {
+     "show": ["jaw1Gap","jaw1Bone"]
+    },
+    "3": {
+     "show": ["jaw1Gap","jaw1Bone"]
+    },
+    "4": {
+     "show": ["jaw0"]
+    },
+    "5": {
+     "show": ["jaw0"]
+    },
+    "6": {
+     "show": ["jaw0"]
+    },
+    "7": {
+     "show": ["jaw0"]
+    }
+   },
+   "travel": [
+    {"tracks":["bones.skull"],"about":0,"by":{"from":"wobble","map":[[0,0.26667],[0.5,1],[1,1.73333]]}},
+    {"tracks":["bones.spine"],"about":-2.86,"by":{"from":"wobble","map":[[0,0.26667],[0.5,1],[1,1.73333]]}},
+    {"tracks":["bones.armFa"],"about":-175.16,"by":{"from":"wobble","map":[[0,0.26667],[0.5,1],[1,1.73333]]}},
+    {"tracks":["bones.armBa"],"about":185.34,"by":{"from":"wobble","map":[[0,0.26667],[0.5,1],[1,1.73333]]}},
+    {"tracks":["stretch.spine"],"about":1,"by":{"from":"wobble","map":[[0,0.26667],[0.5,1],[1,1.73333]]}},
+    {"tracks":["stretch.neck"],"about":1,"by":{"from":"wobble","map":[[0,0.26667],[0.5,1],[1,1.73333]]}}
+   ]
+  },
+  "walk": {
+   "frames": 8,
+   "fps": 10,
+   "loop": true,
+   "keys": [
+    {"t":0,"root":[0,1.3],"bones":{"spine":-4.39,"neck":-3.44,"face":-79.97,"armF":-187.59,"foreF":17.19,"handF":145.96,"armB":-190.03,"foreB":22.92,"back":-173.41,"chest":-83.41,"floor":-263.34,"ground":173.34,"trunk":-11.51,"ankleF":77.86,"stepF":-75.96,"plantF":75.96,"toeF":197.16,"ankleB":132.58,"stepB":-104.04,"plantB":104.04,"toeB":170.71,"thighFa":-176.76,"thighFd":179.19,"shinFa":-180,"shinFd":153.43,"armFa":179.65,"armFd":-179.5,"foreFd":14.04,"thighBa":178.18,"thighBd":-177.34,"shinBa":-33.69,"shinBd":0,"armBa":179.77,"armBd":-177.19,"foreBd":14.04,"hang":90,"plume":90,"skull":3.24},"stretch":{"seat":0.855,"loin":1.262,"trunk":0.737,"face":0.784,"floor":0.671,"stepF":1.031,"toeF":1.277,"stepB":1.031,"toeB":1.243,"thighFa":0.968,"thighFd":0.984,"shinFd":1.1,"armFa":1.053,"armFd":0.942,"foreFd":1.143,"thighBa":0.944,"thighBd":0.887,"shinBd":0.984,"armBa":1.053,"armBd":0.942,"foreBd":1.143,"spine":0.96,"neck":1.121},"ik":{"legF":[5.1,-1],"legB":[-5.1,-1]},"show":["footF","soleF","footB","soleB"],"hide":["toeF","toeB","mouth"]},
+    {"t":0.125,"root":[0,0.525],"bones":{"armF":-183.44,"handF":140.13,"armB":-192.8,"back":-182.41,"floor":-256.19,"ground":166.19,"trunk":-11.51,"ankleF":91.86,"stepF":-110.56,"plantF":110.56,"toeF":190.42,"ankleB":144.11,"stepB":-69.63,"plantB":69.63,"toeB":165.04,"thighFa":-178.45,"thighFd":177.55,"shinFa":104.04,"shinFd":-144.46,"armFa":179.93,"armFd":-181.21,"foreFd":25.35,"thighBa":-180.78,"thighBd":180.59,"shinBa":-144.46,"shinBd":81.87,"armBa":180.8,"armBd":-183.22,"foreBd":35.84,"hang":82,"plume":106,"skull":-4.77,"spine":-2.89},"stretch":{"seat":0.63,"loin":1.394,"trunk":0.737,"floor":0.687,"stepF":1.068,"toeF":1.28,"stepB":0.703,"toeB":1.221,"thighFa":0.99,"thighFd":1.014,"shinFd":1.058,"armFa":1.103,"armFd":1.166,"foreFd":0.942,"thighBa":0.975,"thighBd":1.058,"shinBd":0.87,"armBa":1.102,"armBd":1.231,"foreBd":0.942,"spine":0.945,"neck":1.088},"ik":{"legF":[2.85,-1],"legB":[-3.694,-2.591]},"show":["toeB"],"hide":["footB","soleB"]},
+    {"t":0.25,"root":[0,0],"bones":{"armF":-173.41,"handF":126.05,"armB":-199.48,"back":-173.41,"floor":-251.57,"ground":161.57,"trunk":-9.6,"ankleF":100.66,"stepF":-99.46,"plantF":99.46,"toeF":186.18,"ankleB":132.95,"stepB":-82.15,"plantB":82.15,"toeB":170.53,"thighFa":-180.04,"thighFd":181.66,"shinFa":-153.43,"shinFd":125.54,"armFa":178.87,"armFd":-178.87,"foreFd":14.04,"thighBa":-182.69,"thighBd":178.41,"shinBa":14.04,"shinBd":-90,"armBa":178.52,"armBd":-179.02,"foreBd":26.57,"hang":90,"plume":90,"skull":-9.99,"spine":-3.56},"stretch":{"seat":1.155,"loin":1.085,"trunk":0.882,"floor":0.703,"stepF":1.014,"toeF":1.278,"stepB":1.22,"toeB":1.243,"thighFa":1.063,"thighFd":1.1,"shinFd":1.058,"armFa":0.981,"armFd":0.914,"foreFd":0.942,"thighBa":1.04,"thighBd":1.014,"shinBd":0.984,"armBa":0.992,"armBd":1.022,"foreBd":0.914,"spine":1.04,"neck":0.879},"ik":{"legF":[0.6,-1],"legB":[-0.6,-3.25]}},
+    {"t":0.375,"root":[0,0.525],"bones":{"armF":-163.38,"handF":111.97,"armB":-206.17,"back":-164.41,"floor":-256.19,"ground":166.19,"trunk":-11.51,"ankleF":119.53,"stepF":-87.61,"plantF":87.61,"toeF":177.06,"ankleB":109.95,"stepB":-82.35,"plantB":82.35,"toeB":181.7,"thighFa":-178.73,"thighFd":178.16,"shinFa":33.69,"shinFd":-75.96,"armFa":-181.91,"armFd":183.19,"foreFd":15.26,"thighBa":-179.62,"thighBd":173.82,"shinBa":90,"shinBd":-156.8,"armBa":182.01,"armBd":-175.83,"foreBd":12.53,"hang":98,"plume":74,"skull":-9.36,"spine":-6},"stretch":{"seat":0.63,"loin":1.394,"trunk":0.737,"floor":0.687,"stepF":1.001,"toeF":1.262,"stepB":0.665,"toeB":1.272,"thighFa":0.982,"thighFd":0.887,"shinFd":1.014,"armFa":1.097,"armFd":1.166,"foreFd":1.022,"thighBa":0.972,"thighBd":0.984,"shinBd":0.937,"armBa":1.096,"armBd":1.022,"foreBd":0.942,"spine":1.055,"neck":0.912},"ik":{"legF":[-1.65,-1],"legB":[2.494,-2.591]}},
+    {"t":0.5,"root":[0,1.05],"bones":{"armF":-159.23,"handF":106.14,"armB":-208.93,"back":-173.41,"floor":-261,"ground":171,"trunk":-9.6,"ankleF":130.74,"stepF":-75.96,"plantF":75.96,"toeF":171.61,"ankleB":88.53,"stepB":-104.04,"plantB":104.04,"toeB":192.02,"thighFa":181.03,"thighFd":-179.56,"shinFa":-45,"shinFd":8.13,"armFa":-180.98,"armFd":180.83,"foreFd":12.53,"thighBa":-183.19,"thighBd":181.11,"shinBa":-173.66,"shinBd":135,"armBa":178.86,"armBd":-180.21,"foreBd":22.83,"hang":90,"plume":90,"skull":-3.24,"spine":-8.79},"stretch":{"seat":1.105,"loin":1.115,"trunk":0.882,"floor":0.675,"stepF":1.031,"toeF":1.246,"stepB":1.031,"toeB":1.28,"thighFa":1.068,"thighFd":1.044,"shinFd":0.87,"armFa":0.988,"armFd":0.942,"foreFd":1.022,"thighBa":1.042,"thighBd":1.114,"shinBd":1.044,"armBa":1.005,"armBd":1.143,"foreBd":0.942,"spine":0.96,"neck":1.121},"ik":{"legF":[-3.9,-1],"legB":[3.9,-1]},"show":["footB","soleB"],"hide":["toeB"]},
+    {"t":0.625,"root":[0,0.525],"bones":{"armF":-163.38,"handF":111.97,"armB":-206.17,"back":-182.41,"floor":-256.19,"ground":166.19,"trunk":-11.51,"ankleF":140.8,"stepF":-97.65,"plantF":97.65,"toeF":166.67,"ankleB":101.88,"stepB":-92.39,"plantB":92.39,"toeB":185.59,"thighFa":-178.6,"thighFd":180.45,"shinFa":23.2,"shinFd":-104.04,"armFa":-181.91,"armFd":183.19,"foreFd":15.26,"thighBa":-180.24,"thighBd":181.67,"shinBa":-165.96,"shinBd":125.54,"armBa":182.01,"armBd":-175.83,"foreBd":12.53,"hang":82,"plume":106,"skull":4.77,"spine":-10.29},"stretch":{"seat":0.63,"loin":1.394,"trunk":0.737,"floor":0.687,"stepF":0.665,"toeF":1.228,"stepB":1.001,"toeB":1.277,"thighFa":0.985,"thighFd":0.937,"shinFd":1.014,"armFa":1.097,"armFd":1.166,"foreFd":1.022,"thighBa":0.972,"thighBd":1.014,"shinBd":1.058,"armBa":1.096,"armBd":1.022,"foreBd":0.942,"spine":0.945,"neck":1.088},"ik":{"legF":[-2.494,-2.591],"legB":[1.65,-1]},"show":["toeF"],"hide":["footF","soleF"]},
+    {"t":0.75,"root":[0,0],"bones":{"armF":-173.41,"handF":126.05,"armB":-199.48,"back":-173.41,"floor":-251.57,"ground":161.57,"trunk":-9.6,"ankleF":125.24,"stepF":-97.85,"plantF":97.85,"toeF":174.29,"ankleB":106.81,"stepB":-80.54,"plantB":80.54,"toeB":183.21,"thighFa":-181.53,"thighFd":177.24,"shinFa":96.34,"shinFd":-173.66,"armFa":178.87,"armFd":-178.87,"foreFd":14.04,"thighBa":-181.53,"thighBd":180.34,"shinBa":-144.46,"shinBd":125.54,"armBa":178.52,"armBd":-179.02,"foreBd":26.57,"hang":90,"plume":90,"skull":9.99,"spine":-9.62},"stretch":{"seat":1.155,"loin":1.085,"trunk":0.882,"floor":0.703,"stepF":1.22,"toeF":1.255,"stepB":1.014,"toeB":1.274,"thighFa":1.056,"thighFd":1.114,"shinFd":1.114,"armFa":0.981,"armFd":0.914,"foreFd":0.942,"thighBa":1.056,"thighBd":1.058,"shinBd":1.058,"armBa":0.992,"armBd":1.022,"foreBd":0.914,"spine":1.04,"neck":0.879},"ik":{"legF":[0.6,-3.25],"legB":[-0.6,-1]}},
+    {"t":0.875,"root":[0,0.525],"bones":{"armF":-183.44,"handF":140.13,"armB":-192.8,"back":-164.41,"floor":-256.19,"ground":166.19,"trunk":-11.51,"ankleF":99.66,"stepF":-110.37,"plantF":110.37,"toeF":186.66,"ankleB":121.87,"stepB":-69.44,"plantB":69.44,"toeB":175.93,"thighFa":-178.37,"thighFd":183.29,"shinFa":-104.04,"shinFd":33.69,"armFa":179.93,"armFd":-181.21,"foreFd":25.35,"thighBa":-180.98,"thighBd":179.12,"shinBa":135,"shinBd":-165.96,"armBa":180.8,"armBd":-183.22,"foreBd":35.84,"hang":98,"plume":74,"skull":9.36,"spine":-7.18},"stretch":{"seat":0.63,"loin":1.394,"trunk":0.737,"floor":0.687,"stepF":0.703,"toeF":1.278,"stepB":1.068,"toeB":1.259,"thighFa":1.001,"thighFd":1.014,"shinFd":0.887,"armFa":1.103,"armFd":1.166,"foreFd":0.942,"thighBa":0.977,"thighBd":1.044,"shinBd":1.014,"armBa":1.102,"armBd":1.231,"foreBd":0.942,"spine":1.055,"neck":0.912},"ik":{"legF":[3.694,-2.591],"legB":[-2.85,-1]}}
+   ],
+   "sounds": [
+    {"sound":"footstep-gravel","frame":0,"preset":"Sneaking","volume":0.45},
+    {"sound":"footstep-gravel","frame":4,"preset":"Sneaking","volume":0.45}
+   ],
+   "frameEdits": {
+    "0": {
+     "show": ["jaw0"]
+    },
+    "1": {
+     "show": ["jaw0"]
+    },
+    "2": {
+     "show": ["jaw0"]
+    },
+    "3": {
+     "show": ["jaw0"]
+    },
+    "4": {
+     "show": ["jaw0"]
+    },
+    "5": {
+     "show": ["jaw0"]
+    },
+    "6": {
+     "show": ["jaw0"]
+    },
+    "7": {
+     "show": ["jaw0"]
+    }
+   },
+   "travel": [
+    {"tracks":["bones.skull"],"about":0,"by":{"from":"wobble","map":[[0,0.26667],[0.5,1],[1,1.73333]]}},
+    {"tracks":["bones.spine"],"about":-6.59,"by":{"from":"wobble","map":[[0,0.26667],[0.5,1],[1,1.73333]]}},
+    {"tracks":["stretch.spine"],"about":1,"by":{"from":"wobble","map":[[0,0.26667],[0.5,1],[1,1.73333]]}},
+    {"tracks":["stretch.neck"],"about":1,"by":{"from":"wobble","map":[[0,0.26667],[0.5,1],[1,1.73333]]}}
+   ]
+  },
+  "attack": {
+   "frames": 8,
+   "fps": 13,
+   "loop": false,
+   "keys": [
+    {"t":0,"root":[0,0.095],"bones":{"spine":-2.86,"neck":-3.44,"face":-83.7,"armF":-168.54,"foreF":14.32,"handF":120.32,"armB":-205.78,"foreB":22.92,"back":-177.14,"chest":-87.14,"floor":-252.38,"ground":162.38,"loin":0,"trunk":-4.84,"ankleF":91.03,"stepF":-75.96,"plantF":75.96,"toeF":190.81,"ankleB":112.53,"stepB":-104.04,"plantB":104.04,"toeB":180.45,"thighFa":-180.7,"thighFd":176.61,"shinFa":116.57,"shinFd":-135,"armFa":-174.83,"armFd":180.27,"foreFd":12.53,"thighBa":-181,"thighBd":179.97,"shinBa":45,"shinBd":-75.96,"armBa":184.61,"armBd":-182.53,"foreBd":26.57,"hang":90,"plume":90,"skull":3.24},"stretch":{"seat":1.06,"loin":1.141,"trunk":0.872,"face":0.784,"floor":0.7,"stepF":1.031,"toeF":1.28,"stepB":1.031,"toeB":1.27,"thighFa":1.077,"thighFd":1.1,"shinFd":1.044,"armFa":1.011,"armFd":0.942,"foreFd":1.022,"thighBa":1.076,"thighBd":1.044,"shinBd":1.014,"armBa":0.953,"armBd":1.022,"foreBd":0.914,"spine":0.96,"neck":1.121},"ik":{"legF":[2.1,-1],"legB":[-2.1,-1]},"show":["footF","soleF","footB","soleB"],"hide":["toeF","toeB","mouth"]},
+    {"t":0.14285714285714285,"root":[-0.364,0.19],"bones":{"spine":0.26,"face":-86.82,"armF":-75.71,"foreF":26.3,"handF":65.54,"armB":-204.22,"back":-177.64,"chest":-90.26,"floor":-253.21,"ground":163.21,"loin":-354.93,"trunk":354.93,"ankleF":89.58,"stepF":-75.96,"plantF":75.96,"toeF":191.51,"ankleB":114.12,"toeB":179.68,"thighFa":-180.48,"thighFd":177.37,"shinFa":113.2,"shinFd":-135,"armFa":-179.32,"armFd":178.81,"foreFd":30.96,"thighBa":-184.49,"thighBd":178.36,"shinBa":45,"shinBd":-75.96,"armBa":175.72,"armBd":-178.33,"foreBd":26.57,"hang":92.33,"plume":85.34,"skull":-5.78},"stretch":{"seat":0.965,"loin":0.907,"trunk":0.796,"floor":0.696,"stepF":1.031,"toeF":1.28,"toeB":1.268,"thighFa":0.907,"thighFd":0.937,"shinFd":1.044,"armFa":0.908,"armFd":0.942,"foreFd":0.97,"thighBa":0.914,"thighBd":0.87,"shinBd":1.014,"armBa":1.052,"armBd":1.022,"foreBd":0.914,"spine":0.956,"neck":1.059},"ik":{"legF":[2.464,-1],"legB":[-1.736,-1]}},
+    {"t":0.2857142857142857,"root":[-0.911,0.456],"bones":{"spine":4.97,"face":-91.53,"armF":9.9,"foreF":39.94,"handF":11.66,"armB":-201.87,"back":-177.75,"chest":-94.97,"floor":-255.57,"ground":165.57,"loin":-357.79,"trunk":3.6,"ankleF":89.15,"stepF":-75.96,"plantF":75.96,"toeF":191.72,"ankleB":116.93,"toeB":178.32,"thighFa":-177.34,"thighFd":177.72,"shinFa":104.04,"shinFd":-135,"armFa":175.72,"armFd":-176.54,"foreFd":42.27,"thighBa":-179.61,"thighBd":176.66,"shinBa":33.69,"shinBd":-75.96,"armBa":186,"armBd":-180.41,"foreBd":25.35,"hang":96.41,"plume":77.17,"skull":-10.46},"stretch":{"seat":0.699,"loin":1.354,"trunk":0.726,"floor":0.688,"stepF":1.031,"toeF":1.28,"toeB":1.265,"thighFa":0.988,"thighFd":1.014,"shinFd":1.044,"armFa":0.902,"armFd":0.942,"foreFd":0.824,"thighBa":0.966,"thighBd":0.887,"shinBd":1.014,"armBa":1.056,"armBd":1.166,"foreBd":0.942,"spine":1.059,"neck":0.852},"ik":{"legF":[3.011,-1],"legB":[-1.189,-1]}},
+    {"t":0.42857142857142855,"root":[0.02,0.937],"bones":{"spine":-2.12,"face":-84.44,"armF":27.06,"foreF":45.46,"handF":11.49,"armB":-201.15,"back":-169.88,"chest":-87.88,"floor":-259.96,"ground":169.96,"loin":-359.34,"trunk":354.51,"ankleF":105.16,"stepF":-109.75,"plantF":109.75,"toeF":184.01,"ankleB":126.57,"toeB":173.64,"thighFa":-181.2,"thighFd":178.79,"shinFa":0,"shinFd":-66.8,"armFa":175.24,"armFd":-173.62,"foreFd":36.87,"thighBa":-181.35,"thighBd":177.69,"shinBa":125.54,"shinBd":-173.66,"armBa":183.01,"armBd":-173.77,"foreBd":14.04,"hang":97.11,"plume":75.77,"skull":-7.26},"stretch":{"seat":1.218,"loin":1.049,"trunk":0.872,"floor":0.677,"stepF":0.865,"toeF":1.275,"toeB":1.253,"thighFa":1.049,"thighFd":0.984,"shinFd":0.937,"armFa":1.013,"armFd":1.022,"foreFd":1.022,"thighBa":1.045,"thighBd":1.058,"shinBd":1.114,"armBa":0.932,"armBd":0.942,"foreBd":0.914,"spine":1.018,"neck":1.007},"ik":{"legF":[2.73,-1.777],"legB":[-2.12,-1]},"show":["toeF"],"hide":["footF","soleF"]},
+    {"t":0.5714285714285714,"root":[2.5,2],"bones":{"spine":-21.2,"face":-65.36,"armF":-92.92,"foreF":5.73,"handF":14.32,"armB":-200.34,"back":-166.8,"chest":-68.8,"floor":-270,"ground":180,"loin":-15.16,"trunk":-16.26,"ankleF":99.73,"stepF":-75.96,"plantF":75.96,"toeF":186.63,"ankleB":143.69,"toeB":165.25,"thighFa":-185.23,"thighFd":177.58,"shinFa":90,"shinFd":-144.46,"armFa":-182.48,"armFd":180.03,"foreFd":4.76,"thighBa":-176.27,"thighBd":175.93,"shinBa":45,"shinBd":-104.04,"armBa":187.18,"armBd":-182.51,"foreBd":22.83,"hang":82.89,"plume":104.23,"skull":1.41},"stretch":{"seat":1.155,"loin":1.124,"trunk":0.846,"floor":0.667,"stepF":1.031,"toeF":1.278,"toeB":1.222,"thighFa":0.985,"thighFd":0.984,"shinFd":1.058,"armFa":1.119,"armFd":1.022,"foreFd":1.231,"thighBa":1.063,"thighBd":1.044,"shinBd":1.014,"armBa":1.019,"armBd":1.143,"foreBd":0.942,"spine":0.933,"neck":1.145},"ik":{"legF":[3.6,-1],"legB":[-4.6,-1]},"show":["footF","soleF"],"hide":["toeF"]},
+    {"t":0.7142857142857143,"root":[2.5,1.616],"bones":{"spine":-19.14,"face":-67.42,"armF":-112.08,"foreF":5.73,"handF":2.91,"armB":-199.02,"back":-168.07,"chest":-70.86,"floor":-266.34,"ground":176.34,"loin":-11.48,"trunk":-15.5,"ankleF":96.88,"stepF":-75.96,"plantF":75.96,"toeF":188,"ankleB":138.69,"toeB":167.71,"thighFa":-182.51,"thighFd":179.27,"shinFa":-180,"shinFd":135,"armFa":-178.24,"armFd":174.47,"foreFd":18.43,"thighBa":-176,"thighBd":178.8,"shinBa":135,"shinBd":-186.34,"armBa":180.59,"armBd":-187.43,"foreBd":33.69,"hang":83.59,"plume":102.83,"skull":9.01},"stretch":{"seat":0.539,"loin":1.477,"trunk":0.81,"floor":0.668,"stepF":1.031,"toeF":1.279,"toeB":1.232,"thighFa":0.945,"thighFd":0.984,"shinFd":1.044,"armFa":1.009,"armFd":0.97,"foreFd":1.022,"thighBa":0.992,"thighBd":1.044,"shinBd":1.114,"armBa":0.97,"armBd":0.97,"foreBd":1.166,"spine":1.012,"neck":0.929},"ik":{"legF":[3.6,-1],"legB":[-4.6,-1]}},
+    {"t":0.8571428571428571,"root":[1.516,1.076],"bones":{"spine":-12.59,"face":-73.97,"armF":-138.14,"foreF":9.9,"handF":59.8,"armB":-199.38,"back":-170.03,"chest":-77.41,"floor":-261.25,"ground":171.25,"loin":-14.14,"trunk":-2.85,"ankleF":93.2,"stepF":-70.26,"plantF":70.26,"toeF":189.77,"ankleB":131.12,"toeB":171.42,"thighFa":-185.56,"thighFd":175.5,"shinFa":104.04,"shinFd":-135,"armFa":-178.04,"armFd":175.34,"foreFd":18.43,"thighBa":-176.26,"thighBd":184.07,"shinBa":-54.46,"shinBd":0,"armBa":183.78,"armBd":-178.37,"foreBd":12.53,"hang":87.67,"plume":94.66,"skull":9.83},"stretch":{"seat":1.079,"loin":1.165,"trunk":0.755,"floor":0.675,"stepF":1.062,"toeF":1.28,"toeB":1.246,"thighFa":1.016,"thighFd":1.014,"shinFd":1.044,"armFa":1.056,"armFd":1.022,"foreFd":0.97,"thighBa":1.078,"thighBd":1.058,"shinBd":0.984,"armBa":0.997,"armBd":1.022,"foreBd":0.942,"spine":1.062,"neck":0.887},"ik":{"legF":[3.453,-1],"legB":[-3.616,-1]}},
+    {"t":1,"root":[0,0.095],"bones":{"spine":-2.86,"face":-83.7,"armF":-168.54,"foreF":14.32,"handF":120.32,"armB":-205.78,"back":-177.14,"chest":-87.14,"floor":-252.38,"ground":162.38,"loin":0,"trunk":-4.84,"ankleF":91.03,"stepF":-75.96,"plantF":75.96,"toeF":190.81,"ankleB":112.53,"toeB":180.45,"thighFa":-180.7,"thighFd":176.61,"shinFa":116.57,"shinFd":-135,"armFa":-174.83,"armFd":180.27,"foreFd":12.53,"thighBa":-181,"thighBd":179.97,"shinBa":45,"shinBd":-75.96,"armBa":184.61,"armBd":-182.53,"foreBd":26.57,"hang":90,"plume":90,"skull":3.24},"stretch":{"seat":1.06,"loin":1.141,"trunk":0.872,"floor":0.7,"stepF":1.031,"toeF":1.28,"toeB":1.27,"thighFa":1.077,"thighFd":1.1,"shinFd":1.044,"armFa":1.011,"armFd":0.942,"foreFd":1.022,"thighBa":1.076,"thighBd":1.044,"shinBd":1.014,"armBa":0.953,"armBd":1.022,"foreBd":0.914,"spine":0.96,"neck":1.121},"ik":{"legF":[2.1,-1],"legB":[-2.1,-1]}}
+   ],
+   "sounds": [
+    {"sound":"sword-slash","frame":3,"preset":"Heavy blade","volume":0.7,"when":{"weapon":["sword","axe","spear"]}},
+    {"sound":"whoosh","frame":3,"preset":"Quick swipe","volume":0.7,"when":{"weapon":["none"]}}
+   ],
+   "frameEdits": {
+    "0": {
+     "show": ["jaw0"]
+    },
+    "1": {
+     "show": ["jaw1Gap","jaw1Bone"]
+    },
+    "2": {
+     "show": ["jaw2Gap","jaw2Bone"]
+    },
+    "3": {
+     "show": ["jaw3Gap","jaw3Bone"]
+    },
+    "4": {
+     "show": ["slashWide","slashInner","jaw3Gap","jaw3Bone"]
+    },
+    "5": {
+     "show": ["slashTail","jaw1Gap","jaw1Bone"]
+    },
+    "6": {
+     "show": ["jaw0"]
+    },
+    "7": {
+     "show": ["jaw0"]
+    }
+   },
+   "travel": [
+    {"tracks":["bones.skull"],"about":0,"by":{"from":"wobble","map":[[0,0.26667],[0.5,1],[1,1.73333]]}},
+    {"tracks":["stretch.spine"],"about":1,"by":{"from":"wobble","map":[[0,0.26667],[0.5,1],[1,1.73333]]}},
+    {"tracks":["stretch.neck"],"about":1,"by":{"from":"wobble","map":[[0,0.26667],[0.5,1],[1,1.73333]]}}
+   ]
+  },
+  "block": {
+   "frames": 6,
+   "fps": 10,
+   "loop": false,
+   "keys": [
+    {"t":0,"root":[0,0.095],"bones":{"spine":-2.86,"neck":-3.44,"face":-83.7,"armF":-168.58,"foreF":14.32,"handF":122.38,"armB":-205.77,"foreB":22.92,"back":-177.14,"chest":-87.14,"floor":-252.38,"ground":162.38,"loin":0,"trunk":-4.84,"ankleF":91.03,"stepF":-75.96,"plantF":75.96,"toeF":190.81,"ankleB":112.53,"stepB":-104.04,"plantB":104.04,"toeB":180.45,"thighFa":-180.7,"thighFd":176.61,"shinFa":116.57,"shinFd":-135,"armFa":-174.83,"armFd":180.3,"foreFd":12.53,"thighBa":-181,"thighBd":179.97,"shinBa":45,"shinBd":-75.96,"armBa":184.61,"armBd":-182.54,"foreBd":26.57,"hang":90,"plume":90,"skull":2.76},"stretch":{"seat":1.06,"loin":1.141,"trunk":0.872,"face":0.784,"floor":0.7,"stepF":1.031,"toeF":1.28,"stepB":1.031,"toeB":1.27,"thighFa":1.077,"thighFd":1.1,"shinFd":1.044,"armFa":1.011,"armFd":0.942,"foreFd":1.022,"thighBa":1.076,"thighBd":1.044,"shinBd":1.014,"armBa":0.953,"armBd":1.022,"foreBd":0.914,"spine":0.966,"neck":1.103},"ik":{"legF":[2.1,-1],"legB":[-2.1,-1]},"show":["footF","soleF","footB","soleB"],"hide":["toeF","toeB","mouth"]},
+    {"t":0.2,"root":[0.5,2.2],"bones":{"spine":-4.58,"neck":-10.31,"face":-75.1,"armF":-109.53,"foreF":42.97,"handF":74.58,"armB":-115.26,"foreB":57.3,"back":-180.82,"chest":-85.42,"floor":-271.91,"ground":181.91,"loin":0,"trunk":-10.47,"ankleF":101.04,"toeF":186,"ankleB":146.09,"toeB":164.06,"thighFa":-178.43,"thighFd":176.72,"shinFa":81.87,"shinFd":-144.46,"armFa":-180.33,"armFd":177.88,"foreFd":53.13,"thighBa":-175.55,"thighBd":185.14,"shinBa":-56.31,"shinBd":-14.04,"armBa":-180.13,"armBd":183.4,"foreBd":53.13,"hang":85.2,"plume":99.6,"skull":-7.22},"stretch":{"seat":0.955,"loin":0.909,"trunk":0.809,"floor":0.667,"toeF":1.278,"toeB":1.216,"thighFa":0.898,"thighFd":0.87,"shinFd":1.058,"armFa":1.037,"armFd":1.022,"thighBa":0.926,"thighBd":0.887,"armBa":1.038,"armBd":1.022,"foreBd":1.022,"spine":1,"neck":0.961},"ik":{"legF":[3.6,-1],"legB":[-4.6,-1]}},
+    {"t":0.4,"root":[-1.1,3],"bones":{"spine":1.15,"neck":-10.31,"face":-80.83,"armF":-109.53,"foreF":42.97,"handF":61.97,"armB":-120.99,"foreB":57.3,"back":-173.95,"chest":-91.15,"floor":-279.46,"ground":189.46,"loin":-3.1,"trunk":-352.06,"ankleF":90.23,"toeF":191.2,"ankleB":151.12,"toeB":161.56,"thighFa":-183.04,"thighFd":176.8,"shinFa":75.96,"shinFd":-135,"armFa":-179.37,"armFd":183.72,"foreFd":40.6,"thighBa":-182.95,"thighBd":180.66,"shinBa":-153.43,"shinBd":75.96,"armBa":-180.19,"armBd":183.46,"foreBd":60.26,"hang":96.4,"plume":77.2,"skull":-7.22},"stretch":{"seat":1.155,"loin":1.087,"trunk":0.872,"floor":0.676,"toeF":1.28,"toeB":1.205,"thighFa":1.027,"thighFd":1.014,"shinFd":1.044,"armFa":0.934,"armFd":0.942,"thighBa":1.045,"thighBd":1.1,"armBa":0.933,"armBd":1.022,"foreBd":0.824,"spine":1.034,"neck":0.961},"ik":{"legF":[5.2,-1],"legB":[-3,-1]}},
+    {"t":0.6,"root":[-0.14,2.52],"bones":{"spine":-2.29,"neck":-10.31,"face":-77.39,"armF":-109.53,"foreF":42.97,"handF":69.53,"armB":-117.55,"foreB":57.3,"back":-178.07,"chest":-87.71,"floor":-274.95,"ground":184.95,"loin":-3.39,"trunk":3.39,"ankleF":97.07,"toeF":187.9,"ankleB":148.94,"toeB":162.65,"thighFa":-179.03,"thighFd":178.69,"shinFa":-194.04,"shinFd":135,"armFa":-183.62,"armFd":178.88,"foreFd":53.13,"thighBa":-182.2,"thighBd":181.99,"shinBa":-144.46,"shinBd":75.96,"armBa":-183.03,"armBd":176,"foreBd":63.43,"hang":89.68,"plume":90.64,"skull":2.76},"stretch":{"seat":0.635,"loin":1.394,"trunk":0.722,"floor":0.669,"toeF":1.279,"toeB":1.21,"thighFa":0.982,"thighFd":1.014,"shinFd":1.044,"armFa":1.073,"armFd":1.022,"thighBa":0.971,"thighBd":1.058,"armBa":1.082,"armBd":1.143,"foreBd":1.022,"spine":0.945,"neck":1.103},"ik":{"legF":[4.24,-1],"legB":[-3.96,-1]}},
+    {"t":0.8,"root":[0.34,2.28],"bones":{"spine":-4.01,"neck":-10.31,"face":-75.68,"armF":-109.53,"foreF":42.97,"handF":73.32,"armB":-115.83,"foreB":57.3,"back":-180.13,"chest":-85.99,"floor":-272.67,"ground":182.67,"loin":-5.62,"trunk":0.34,"ankleF":100.1,"toeF":186.45,"ankleB":146.93,"toeB":163.64,"thighFa":-174.61,"thighFd":177.63,"shinFa":75.96,"shinFd":-144.46,"armFa":-182.52,"armFd":179.49,"foreFd":53.13,"thighBa":-177.19,"thighBd":184.73,"shinBa":-56.31,"shinBd":-14.04,"armBa":-182.53,"armBd":185.81,"foreBd":53.13,"hang":86.32,"plume":97.36,"skull":8.93},"stretch":{"seat":0.875,"loin":0.961,"trunk":0.799,"floor":0.667,"toeF":1.278,"toeB":1.214,"thighFa":1.032,"thighFd":1.014,"shinFd":1.058,"armFa":0.995,"armFd":1.022,"thighBa":0.939,"thighBd":0.887,"armBa":1,"armBd":1.022,"foreBd":1.022,"spine":1.055,"neck":0.873},"ik":{"legF":[3.76,-1],"legB":[-4.44,-1]}},
+    {"t":1,"root":[0,0.095],"bones":{"spine":-2.86,"neck":-3.44,"face":-83.7,"armF":-168.58,"foreF":14.32,"handF":122.38,"armB":-205.77,"foreB":22.92,"back":-177.14,"chest":-87.14,"floor":-252.38,"ground":162.38,"loin":0,"trunk":-4.84,"ankleF":91.03,"toeF":190.81,"ankleB":112.53,"toeB":180.45,"thighFa":-180.7,"thighFd":176.61,"shinFa":116.57,"shinFd":-135,"armFa":-174.83,"armFd":180.3,"foreFd":12.53,"thighBa":-181,"thighBd":179.97,"shinBa":45,"shinBd":-75.96,"armBa":184.61,"armBd":-182.54,"foreBd":26.57,"hang":90,"plume":90,"skull":2.76},"stretch":{"seat":1.06,"loin":1.141,"trunk":0.872,"floor":0.7,"toeF":1.28,"toeB":1.27,"thighFa":1.077,"thighFd":1.1,"shinFd":1.044,"armFa":1.011,"armFd":0.942,"thighBa":1.076,"thighBd":1.044,"armBa":0.953,"armBd":1.022,"foreBd":0.914,"spine":0.966,"neck":1.103},"ik":{"legF":[2.1,-1],"legB":[-2.1,-1]}}
+   ],
+   "sounds": [
+    {"sound":"metal-hit","frame":1,"preset":"Tin can","volume":0.7,"when":[{"shield":["round","kite","broken"]},{"weapon":["sword","axe","spear"]}]}
+   ],
+   "frameEdits": {
+    "0": {
+     "show": ["jaw0"]
+    },
+    "1": {
+     "show": ["jaw0"]
+    },
+    "2": {
+     "show": ["jaw0"]
+    },
+    "3": {
+     "show": ["jaw0"]
+    },
+    "4": {
+     "show": ["jaw0"]
+    },
+    "5": {
+     "show": ["jaw0"]
+    }
+   },
+   "travel": [
+    {"tracks":["bones.skull"],"about":0,"by":{"from":"wobble","map":[[0,0.26667],[0.5,1],[1,1.73333]]}},
+    {"tracks":["stretch.spine"],"about":1,"by":{"from":"wobble","map":[[0,0.26667],[0.5,1],[1,1.73333]]}},
+    {"tracks":["stretch.neck"],"about":1,"by":{"from":"wobble","map":[[0,0.26667],[0.5,1],[1,1.73333]]}}
+   ]
+  },
+  "hurt": {
+   "frames": 4,
+   "fps": 9,
+   "loop": false,
+   "keys": [
+    {"t":0,"root":[-1.8,0.9],"bones":{"spine":9.17,"neck":5.16,"face":-104.32,"armF":-139.32,"foreF":34.38,"handF":86.52,"armB":-203.38,"foreB":22.92,"back":-183.77,"chest":-99.17,"floor":-259.61,"ground":169.61,"loin":-353.46,"trunk":7.7,"ankleF":90.33,"stepF":-105.82,"plantF":105.82,"toeF":191.15,"ankleB":127.51,"stepB":-85.24,"plantB":85.24,"toeB":173.18,"thighFa":-179.23,"thighFd":179.47,"shinFa":-173.66,"shinFd":135,"armFa":-189.95,"armFd":174.4,"foreFd":45,"thighBa":-179.38,"thighBd":180.83,"shinBa":-144.46,"shinBd":104.04,"armBa":178.63,"armBd":-178.46,"foreBd":28.07,"hang":94.8,"plume":80.4,"skull":4.06},"stretch":{"seat":1.255,"loin":1.033,"trunk":0.897,"face":0.784,"floor":0.678,"stepF":1.039,"toeF":1.28,"stepB":1.004,"toeB":1.251,"thighFa":1.066,"thighFd":1.114,"shinFd":1.044,"armFa":0.968,"armFd":0.97,"foreFd":1.143,"thighBa":1.045,"thighBd":1.058,"shinBd":1.014,"armBa":0.975,"armBd":0.942,"foreBd":0.942,"spine":0.95,"neck":1.152},"ik":{"legF":[3.54,-1],"legB":[-2.7,-1]},"show":["footF","soleF","footB","soleB"],"hide":["toeF","toeB","mouth"]},
+    {"t":0.3333333333333333,"root":[-3,1.5],"bones":{"spine":17.19,"neck":10.89,"face":-118.07,"armF":-119.84,"handF":77.35,"armB":-201.77,"back":-188.19,"chest":-107.19,"floor":-265.24,"ground":175.24,"loin":-344.83,"trunk":9.63,"ankleF":87.15,"stepF":-94.77,"plantF":94.77,"toeF":192.68,"ankleB":135.94,"stepB":-104.05,"plantB":104.05,"toeB":169.06,"thighFa":-178.18,"thighFd":176.05,"shinFa":90,"shinFd":-135,"armFa":-174.86,"armFd":175.82,"foreFd":40.6,"thighBa":-180.72,"thighBd":179.84,"shinBa":-144.46,"shinBd":90,"armBa":174.75,"armBd":-184.2,"foreBd":40.6,"hang":98,"plume":74,"skull":-12.84},"stretch":{"seat":0.655,"loin":1.124,"trunk":0.876,"floor":0.669,"stepF":1.004,"stepB":1.031,"toeB":1.237,"thighFa":0.995,"thighFd":0.984,"armFa":0.907,"armFd":0.942,"foreFd":1.022,"thighBa":0.97,"thighBd":1.058,"shinBd":0.984,"armBa":0.947,"armBd":0.942,"foreBd":1.022,"spine":1.084,"neck":0.829},"ik":{"legF":[4.5,-1],"legB":[-3.1,-1]}},
+    {"t":0.6666666666666666,"root":[-1.489,0.744],"bones":{"spine":7.09,"neck":3.67,"face":-100.76,"armF":-144.37,"handF":88.89,"armB":-203.79,"back":-182.62,"chest":-97.09,"floor":-258.18,"ground":168.18,"loin":-359.41,"trunk":8.28,"ankleF":90.76,"stepF":-108.53,"plantF":108.53,"toeF":190.95,"ankleB":125.1,"stepB":-104.7,"plantB":104.71,"toeB":174.36,"thighFa":-183.76,"thighFd":178.88,"shinFa":-165.96,"shinFd":135,"armFa":-173.51,"armFd":172.84,"foreFd":45,"thighBa":-176.14,"thighBd":178.52,"shinBa":125.54,"shinBd":-173.66,"armBa":172.56,"armBd":-182.42,"foreBd":40.6,"hang":93.97,"plume":82.06,"skull":8.78},"stretch":{"seat":1.411,"loin":0.641,"trunk":0.954,"floor":0.681,"stepF":1.055,"stepB":1.034,"toeB":1.255,"thighFa":0.975,"thighFd":1.014,"armFa":0.872,"armFd":0.824,"foreFd":1.166,"thighBa":1.027,"thighBd":1.058,"shinBd":1.114,"armBa":0.967,"armBd":1.022,"foreBd":0.942,"spine":0.966,"neck":1.02},"ik":{"legF":[3.291,-1],"legB":[-2.596,-1]}},
+    {"t":1,"root":[0,0.095],"bones":{"spine":-2.86,"neck":-3.44,"face":-83.7,"armF":-168.54,"handF":100.27,"armB":-205.78,"back":-177.14,"chest":-87.14,"floor":-252.38,"ground":162.38,"loin":0,"trunk":-4.84,"ankleF":91.03,"stepF":-75.96,"plantF":75.96,"toeF":190.81,"ankleB":112.53,"stepB":-104.04,"plantB":104.04,"toeB":180.45,"thighFa":-180.7,"thighFd":176.61,"shinFa":116.57,"shinFd":-135,"armFa":-185.53,"armFd":180.27,"foreFd":30.96,"thighBa":-181,"thighBd":179.97,"shinBa":45,"shinBd":-75.96,"armBa":184.61,"armBd":-182.53,"foreBd":26.57,"hang":90,"plume":90,"skull":4.06},"stretch":{"seat":1.06,"loin":1.141,"trunk":0.872,"floor":0.7,"stepF":1.031,"stepB":1.031,"toeB":1.27,"thighFa":1.077,"thighFd":1.1,"armFa":1.011,"armFd":0.942,"foreFd":0.97,"thighBa":1.076,"thighBd":1.044,"shinBd":1.014,"armBa":0.953,"armBd":1.022,"foreBd":0.914,"spine":0.95,"neck":1.152},"ik":{"legF":[2.1,-1],"legB":[-2.1,-1]}}
+   ],
+   "frameEdits": {
+    "0": {
+     "flash": true,
+     "show": ["jaw3Gap","jaw3Bone"]
+    },
+    "1": {
+     "show": ["jaw3Gap","jaw3Bone"]
+    },
+    "2": {
+     "show": ["jaw2Gap","jaw2Bone"]
+    },
+    "3": {
+     "show": ["jaw0"]
+    }
+   },
+   "sounds": [
+    {"sound":"punch","frame":0,"preset":"Light jab","volume":0.9}
+   ],
+   "travel": [
+    {"tracks":["bones.skull"],"about":0,"by":{"from":"wobble","map":[[0,0.26667],[0.5,1],[1,1.73333]]}},
+    {"tracks":["bones.armFa"],"about":-178.29,"by":{"from":"wobble","map":[[0,0.26667],[0.5,1],[1,1.73333]]}},
+    {"tracks":["stretch.spine"],"about":1,"by":{"from":"wobble","map":[[0,0.26667],[0.5,1],[1,1.73333]]}},
+    {"tracks":["stretch.neck"],"about":1,"by":{"from":"wobble","map":[[0,0.26667],[0.5,1],[1,1.73333]]}}
+   ]
+  },
+  "die": {
+   "frames": 8,
+   "fps": 10,
+   "loop": false,
+   "keys": [
+    {"t":0,"root":[-1.8,0.9],"bones":{"spine":9.17,"neck":5.16,"face":-104.32,"armF":-139.32,"foreF":34.38,"handF":86.52,"armB":-203.38,"foreB":22.92,"back":-183.77,"chest":-99.17,"floor":-259.61,"ground":169.61,"loin":-353.46,"trunk":7.7,"ankleF":90.33,"stepF":-105.82,"plantF":105.82,"toeF":191.15,"ankleB":127.51,"stepB":-85.24,"plantB":85.24,"toeB":173.18,"thighFa":-179.23,"thighFd":179.47,"shinFa":-173.66,"shinFd":135,"armFa":-179.25,"armFd":174.4,"foreFd":45,"thighBa":-179.38,"thighBd":180.83,"shinBa":-144.46,"shinBd":104.04,"armBa":178.63,"armBd":-178.46,"foreBd":28.07,"hang":94.8,"plume":80.4,"tip":10,"hold":-50},"stretch":{"seat":1.255,"loin":1.033,"trunk":0.897,"face":0.784,"floor":0.678,"stepF":1.039,"toeF":1.28,"stepB":1.004,"toeB":1.251,"thighFa":1.066,"thighFd":1.114,"shinFd":1.044,"armFa":0.968,"armFd":0.97,"foreFd":1.143,"thighBa":1.045,"thighBd":1.058,"shinBd":1.014,"armBa":0.975,"armBd":0.942,"foreBd":0.942},"ik":{"legF":[3.54,-1],"legB":[-2.7,-1]},"show":["footF","soleF","footB","soleB","armB","armBThick","foreB","foreBThick","thighB","thighBThick","shinB","shinBThick","thighF","thighFThick","shinF","shinFThick","armF","armFThick","foreF","foreFThick","pelvis","pelvisHole","torso","spineBone","rib1","rib2","rib3","skull","eye","teeth","sword","axe","spear","shieldRound","shieldBoss","shieldKite","shieldBroken","shieldCrack","cap","capRim","capCrest","hornF","hornB","crown","face"],"hide":["toeF","toeB","mouth","heapLegFthigh","heapLegFthighThick","heapLegFshin","heapLegFshinThick","heapLegBthigh","heapLegBthighThick","heapLegBshin","heapLegBshinThick","heapArmFupper","heapArmFupperThick","heapArmFfore","heapArmFforeThick","heapArmBupper","heapArmBupperThick","heapArmBfore","heapArmBforeThick","heapCage","heapSpine","heapRib1","heapRib2","heapRib3","heapSkull","heapEye","heapTeeth","heapCap","heapCapRim","heapCapCrest","heapHornF","heapHornB","heapCrown","swordDown","swordDownGuard","swordDownGrip","axeDown","axeDownHead","spearDown","spearDownTip","shieldRoundDown","shieldBossDown","shieldKiteDown","shieldBrokenDown","shieldCrackDown","heapFace"],"swap":{"eye":null,"heapEye":null}},
+    {"t":0.14285714285714285,"root":[-3,1.5],"bones":{"spine":17.19,"neck":10.89,"face":-118.07,"armF":-119.84,"handF":75.67,"armB":-201.77,"back":-188.19,"chest":-107.19,"floor":-265.24,"ground":175.24,"loin":-344.84,"trunk":9.64,"ankleF":87.15,"stepF":-94.76,"plantF":94.76,"toeF":192.68,"ankleB":135.94,"stepB":-104.04,"plantB":104.04,"toeB":169.06,"thighFa":-178.18,"thighFd":176.05,"shinFa":90,"shinFd":-135,"armFa":-177.21,"armFd":175.82,"foreFd":40.6,"thighBa":-180.72,"thighBd":179.85,"shinBa":-144.46,"shinBd":90,"armBa":174.75,"armBd":-184.2,"foreBd":40.6,"hang":98,"plume":74,"tip":9.8,"hold":-49},"stretch":{"seat":0.655,"loin":1.124,"trunk":0.876,"floor":0.669,"stepF":1.004,"toeF":1.28,"stepB":1.031,"toeB":1.237,"thighFa":0.995,"thighFd":0.984,"shinFd":1.044,"armFa":0.907,"armFd":0.942,"foreFd":1.022,"thighBa":0.97,"thighBd":1.058,"shinBd":0.984,"armBa":0.947,"armBd":0.942,"foreBd":1.022},"ik":{"legF":[4.5,-1],"legB":[-3.1,-1]},"show":["fistB","fistF"]},
+    {"t":0.2857142857142857,"root":[-3,4.196],"bones":{"spine":17.19,"neck":10.89,"face":-118.07,"armF":-119.84,"handF":32.67,"armB":-201.77,"back":-188.19,"chest":-107.19,"floor":-290.1,"ground":200.1,"loin":-342.02,"trunk":6.82,"ankleF":101,"stepF":-94.76,"plantF":94.76,"toeF":186.01,"ankleB":162.52,"stepB":-104.04,"plantB":104.04,"toeB":155.84,"thighFa":-175.32,"thighFd":179.08,"shinFa":-215.54,"shinFd":125.54,"armFa":-186.72,"armFd":185.34,"foreFd":28.07,"thighBa":-178.92,"thighBd":176.22,"shinBa":113.2,"shinBd":-206.57,"armBa":176.16,"armBd":-182.88,"foreBd":37.88,"hang":98,"plume":74,"tip":5.8,"hold":-29},"stretch":{"seat":0.96,"loin":0.953,"trunk":0.876,"floor":0.71,"stepF":1.004,"toeF":1.278,"stepB":1.031,"toeB":1.175,"thighFa":1.002,"thighFd":1.058,"shinFd":1.058,"armFa":0.948,"armFd":0.942,"foreFd":0.942,"thighBa":0.92,"thighBd":0.937,"shinBd":1.1,"armBa":1.104,"armBd":1.166,"foreBd":1.022},"ik":{"legF":[4.5,-1],"legB":[-3.1,-1]}},
+    {"t":0.42857142857142855,"root":[-3,6.443],"bones":{"spine":17.19,"neck":10.89,"face":-118.07,"armF":-119.84,"handF":-19.19,"armB":-201.77,"back":-188.19,"chest":-107.19,"floor":-306.52,"ground":216.52,"loin":-344.38,"trunk":9.18,"ankleF":101.81,"stepF":-94.76,"plantF":94.76,"toeF":185.63,"ankleB":183.97,"stepB":-104.04,"plantB":104.04,"toeB":144.79,"thighFa":-178.12,"thighFd":178.41,"shinFa":-234.46,"shinFd":125.54,"armFa":-176.4,"armFd":175.01,"foreFd":40.6,"thighBa":-179.91,"thighBd":183.59,"shinBa":-165.96,"shinBd":45,"armBa":174.61,"armBd":-184.06,"foreBd":40.6,"hang":98,"plume":74,"tip":0.8,"hold":-4},"stretch":{"seat":0.712,"loin":1.092,"trunk":0.876,"floor":0.83,"stepF":1.004,"toeF":1.277,"stepB":1.031,"toeB":1.106,"thighFa":1.024,"thighFd":1.058,"shinFd":1.058,"armFa":0.905,"armFd":0.942,"foreFd":1.022,"thighBa":0.959,"thighBd":1.014,"shinBd":1.044,"armBa":0.934,"armBd":0.942,"foreBd":1.022},"ik":{"legF":[4.5,-1],"legB":[-3.1,-1]}},
+    {"t":0.5714285714285714,"root":[-3,1.5],"bones":{"spine":17.19,"neck":10.89,"face":-118.07,"armF":-119.84,"handF":-27.72,"armB":-201.77,"back":-188.19,"chest":-107.19,"floor":-265.24,"ground":175.24,"loin":-344.84,"trunk":9.64,"ankleF":87.15,"stepF":-94.76,"plantF":94.76,"toeF":192.68,"ankleB":135.94,"stepB":-104.04,"plantB":104.04,"toeB":169.06,"thighFa":-178.18,"thighFd":176.05,"shinFa":90,"shinFd":-135,"armFa":-177.21,"armFd":175.82,"foreFd":40.6,"thighBa":-180.72,"thighBd":179.85,"shinBa":-144.46,"shinBd":90,"armBa":174.75,"armBd":-184.2,"foreBd":40.6,"hang":98,"plume":74,"tip":0,"hold":0},"stretch":{"seat":0.655,"loin":1.124,"trunk":0.876,"floor":0.669,"stepF":1.004,"toeF":1.28,"stepB":1.031,"toeB":1.237,"thighFa":0.995,"thighFd":0.984,"shinFd":1.044,"armFa":0.907,"armFd":0.942,"foreFd":1.022,"thighBa":0.97,"thighBd":1.058,"shinBd":0.984,"armBa":0.947,"armBd":0.942,"foreBd":1.022},"ik":{"legF":[4.5,-1],"legB":[-3.1,-1]},"show":["heapLegFthigh","heapLegFthighThick","heapLegFshin","heapLegFshinThick","heapLegBthigh","heapLegBthighThick","heapLegBshin","heapLegBshinThick","heapArmFupper","heapArmFupperThick","heapArmFfore","heapArmFforeThick","heapArmBupper","heapArmBupperThick","heapArmBfore","heapArmBforeThick","heapCage","heapSpine","heapRib1","heapRib2","heapRib3","heapSkull","heapEye","heapTeeth","heapCap","heapCapRim","heapCapCrest","heapHornF","heapHornB","heapCrown","swordDown","swordDownGuard","swordDownGrip","axeDown","axeDownHead","spearDown","spearDownTip","shieldRoundDown","shieldBossDown","shieldKiteDown","shieldBrokenDown","shieldCrackDown","heapFace"],"hide":["armB","armBThick","foreB","foreBThick","thighB","thighBThick","shinB","shinBThick","thighF","thighFThick","shinF","shinFThick","armF","armFThick","foreF","foreFThick","pelvis","pelvisHole","torso","spineBone","rib1","rib2","rib3","skull","eye","teeth","sword","axe","spear","shieldRound","shieldBoss","shieldKite","shieldBroken","shieldCrack","cap","capRim","capCrest","hornF","hornB","crown","fistB","fistF","footB","soleB","footF","soleF","face"]},
+    {"t":0.7142857142857143,"root":[-3,1.5],"bones":{"spine":17.19,"neck":10.89,"face":-118.07,"armF":-119.84,"handF":-27.72,"armB":-201.77,"back":-188.19,"chest":-107.19,"floor":-265.24,"ground":175.24,"loin":-344.84,"trunk":9.64,"ankleF":87.15,"stepF":-94.76,"plantF":94.76,"toeF":192.68,"ankleB":135.94,"stepB":-104.04,"plantB":104.04,"toeB":169.06,"thighFa":-178.18,"thighFd":176.05,"shinFa":90,"shinFd":-135,"armFa":-177.21,"armFd":175.82,"foreFd":40.6,"thighBa":-180.72,"thighBd":179.85,"shinBa":-144.46,"shinBd":90,"armBa":174.75,"armBd":-184.2,"foreBd":40.6,"hang":98,"plume":74,"tip":0,"hold":0},"stretch":{"seat":0.655,"loin":1.124,"trunk":0.876,"floor":0.669,"stepF":1.004,"toeF":1.28,"stepB":1.031,"toeB":1.237,"thighFa":0.995,"thighFd":0.984,"shinFd":1.044,"armFa":0.907,"armFd":0.942,"foreFd":1.022,"thighBa":0.97,"thighBd":1.058,"shinBd":0.984,"armBa":0.947,"armBd":0.942,"foreBd":1.022},"ik":{"legF":[4.5,-1],"legB":[-3.1,-1]},"swap":{"eye":"blink","heapEye":"blink"}},
+    {"t":0.8571428571428571,"root":[-3,1.5],"bones":{"spine":17.19,"neck":10.89,"face":-118.07,"armF":-119.84,"handF":-27.72,"armB":-201.77,"back":-188.19,"chest":-107.19,"floor":-265.24,"ground":175.24,"loin":-344.84,"trunk":9.64,"ankleF":87.15,"stepF":-94.76,"plantF":94.76,"toeF":192.68,"ankleB":135.94,"stepB":-104.04,"plantB":104.04,"toeB":169.06,"thighFa":-178.18,"thighFd":176.05,"shinFa":90,"shinFd":-135,"armFa":-177.21,"armFd":175.82,"foreFd":40.6,"thighBa":-180.72,"thighBd":179.85,"shinBa":-144.46,"shinBd":90,"armBa":174.75,"armBd":-184.2,"foreBd":40.6,"hang":98,"plume":74,"tip":0,"hold":0},"stretch":{"seat":0.655,"loin":1.124,"trunk":0.876,"floor":0.669,"stepF":1.004,"toeF":1.28,"stepB":1.031,"toeB":1.237,"thighFa":0.995,"thighFd":0.984,"shinFd":1.044,"armFa":0.907,"armFd":0.942,"foreFd":1.022,"thighBa":0.97,"thighBd":1.058,"shinBd":0.984,"armBa":0.947,"armBd":0.942,"foreBd":1.022},"ik":{"legF":[4.5,-1],"legB":[-3.1,-1]}},
+    {"t":1,"root":[-3,1.5],"bones":{"spine":17.19,"neck":10.89,"face":-118.07,"armF":-119.84,"handF":-27.72,"armB":-201.77,"back":-188.19,"chest":-107.19,"floor":-265.24,"ground":175.24,"loin":-344.84,"trunk":9.64,"ankleF":87.15,"stepF":-94.76,"plantF":94.76,"toeF":192.68,"ankleB":135.94,"stepB":-104.04,"plantB":104.04,"toeB":169.06,"thighFa":-178.18,"thighFd":176.05,"shinFa":90,"shinFd":-135,"armFa":-177.21,"armFd":175.82,"foreFd":40.6,"thighBa":-180.72,"thighBd":179.85,"shinBa":-144.46,"shinBd":90,"armBa":174.75,"armBd":-184.2,"foreBd":40.6,"hang":98,"plume":74,"tip":0,"hold":0},"stretch":{"seat":0.655,"loin":1.124,"trunk":0.876,"floor":0.669,"stepF":1.004,"toeF":1.28,"stepB":1.031,"toeB":1.237,"thighFa":0.995,"thighFd":0.984,"shinFd":1.044,"armFa":0.907,"armFd":0.942,"foreFd":1.022,"thighBa":0.97,"thighBd":1.058,"shinBd":0.984,"armBa":0.947,"armBd":0.942,"foreBd":1.022},"ik":{"legF":[4.5,-1],"legB":[-3.1,-1]}}
+   ],
+   "frameEdits": {
+    "0": {
+     "flash": true,
+     "show": ["jaw3Gap","jaw3Bone"]
+    },
+    "1": {
+     "show": ["jaw3Gap","jaw3Bone"]
+    },
+    "2": {
+     "show": ["jaw3Gap","jaw3Bone"]
+    },
+    "3": {
+     "show": ["jaw3Gap","jaw3Bone"]
+    },
+    "4": {
+     "show": ["heapJaw3Gap","heapJaw3Bone"]
+    },
+    "5": {
+     "show": ["heapJaw3Gap","heapJaw3Bone"]
+    },
+    "6": {
+     "show": ["heapJaw2Gap","heapJaw2Bone"]
+    },
+    "7": {
+     "show": ["heapJaw1Gap","heapJaw1Bone"]
+    }
+   },
+   "label": "Collapse",
+   "sounds": [
+    {"sound":"monster-fade","frame":0,"preset":"Bones collapse","volume":1}
+   ],
+   "travel": [
+    {"tracks":["bones.hold"],"about":0,"by":{"from":"weaponAngle","map":[[-10,0],[40,1]]}}
+   ]
+  }
+ },
+ "made": {
+  "in": "library",
+  "from": "code:bone-soldier"
+ }
+}

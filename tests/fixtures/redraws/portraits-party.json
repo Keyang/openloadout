@@ -1,0 +1,274 @@
+{
+ "id": "portraits-party",
+ "frozen": "2026-11-20",
+ "source": "sprites/portraits-party.js",
+ "sha256": "728b128099e2878af7e72637c6dae0e5b60ce4bd8434e0ed3384075b82fbcdaf",
+ "name": "Party portraits",
+ "blurb": "Faces of the hero, the mage and the rogue for dialogue boxes and party menus: neutral, happy, hurt and talking. Change the border, the zoom and each person's colour.",
+ "meta": {
+  "type": "icon",
+  "role": "interface/icon",
+  "themes": [
+   "fantasy"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "top-down-rpg"
+  ],
+  "view": "front",
+  "words": [
+   "portrait",
+   "face",
+   "avatar",
+   "hero",
+   "mage",
+   "rogue",
+   "party",
+   "dialogue",
+   "talk",
+   "happy",
+   "hurt",
+   "status",
+   "headshot"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  48,
+  48
+ ],
+ "pivot": [
+  24,
+  24
+ ],
+ "grounded": false,
+ "preview": "hero-neutral",
+ "params": {
+  "frame": {
+   "kind": "choice",
+   "label": "Border",
+   "def": "none",
+   "options": [
+    {
+     "value": "none",
+     "label": "None"
+    },
+    {
+     "value": "round",
+     "label": "Round"
+    },
+    {
+     "value": "square",
+     "label": "Square"
+    }
+   ],
+   "group": "Look"
+  },
+  "size": {
+   "kind": "range",
+   "label": "Zoom",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Head and shoulders",
+   "hi": "Face",
+   "group": "Look"
+  },
+  "backing": {
+   "kind": "color",
+   "label": "Backing",
+   "def": "#4a609c",
+   "swatches": [
+    "#4a609c",
+    "#9a6a3e",
+    "#f0ead8",
+    "#5a5f7a",
+    "#2f8f9d"
+   ],
+   "group": "Colors",
+   "when": {
+    "frame": [
+     "round",
+     "square"
+    ]
+   }
+  },
+  "skin": {
+   "kind": "color",
+   "label": "Skin",
+   "def": "#f6d3b0",
+   "swatches": [
+    "#f6d3b0",
+    "#e8b088",
+    "#c98a5c",
+    "#9a6240",
+    "#6e4428",
+    "#9bd18a",
+    "#b9a7e0"
+   ],
+   "group": "Colors"
+  },
+  "hero": {
+   "kind": "color",
+   "label": "Hero's tunic",
+   "def": "#3f6fd1",
+   "swatches": [
+    "#3f6fd1",
+    "#7a4fc4",
+    "#2f8f9d",
+    "#8e3a4a",
+    "#4f9d57",
+    "#e08a2c",
+    "#e6c545"
+   ],
+   "group": "Colors"
+  },
+  "mage": {
+   "kind": "color",
+   "label": "Mage's robe and hat",
+   "def": "#7a4fc4",
+   "swatches": [
+    "#7a4fc4",
+    "#3f6fd1",
+    "#2f8f9d",
+    "#c9423a",
+    "#8e3a4a",
+    "#4f9d57",
+    "#e08a2c"
+   ],
+   "group": "Colors"
+  },
+  "rogue": {
+   "kind": "color",
+   "label": "Rogue's hood",
+   "def": "#2f8f9d",
+   "swatches": [
+    "#2f8f9d",
+    "#3f6fd1",
+    "#7a4fc4",
+    "#c9423a",
+    "#8e3a4a",
+    "#4f9d57",
+    "#e08a2c",
+    "#e6c545"
+   ],
+   "group": "Colors"
+  }
+ },
+ "clips": {
+  "hero-neutral": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "hero-happy": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "hero-hurt": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "hero-talk": {
+   "frames": 4,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "mage-neutral": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "mage-happy": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "mage-hurt": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "mage-talk": {
+   "frames": 4,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "rogue-neutral": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "rogue-happy": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "rogue-hurt": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "rogue-talk": {
+   "frames": 4,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [],
+ "bundles": [
+  "kit-rpg-fantasy"
+ ]
+}

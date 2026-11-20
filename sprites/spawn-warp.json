@@ -1,0 +1,37 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "spawn-warp",
+ "name": "Spawn warning",
+ "blurb": "A warning ring on the floor where an enemy is about to appear: it pulses, snaps open with a column of light, and closes to a dot. Change its size, style, rings, tick marks, colours and flicker.",
+ "meta": {"type":"effect","role":"effects/magic","themes":["sci-fi","space"],"gameTypes":["roguelike-action","shooter"],"view":"top-down","words":["spawn","warning","warp","teleport","portal","ring","marker","telegraph","summon","appear","rift","beacon","danger"],"license":"draft"},
+ "size": [48,48],
+ "pivot": [24,24],
+ "grounded": false,
+ "preview": "warn",
+ "styles": ["pixel"],
+ "palette": [
+  {"id":"core","label":"Core","default":"#f0ead8","material":"light","swatches":["#f0ead8","#e8ecf2","#c2c9d6","#f2c230","#ca9eda"]},
+  {"id":"edge","label":"Edge","default":"#e2473f","material":"warning","swatches":["#e2473f","#5fe0f0","#9fe040","#f2a030","#b48af8","#4f9ff0"]}
+ ],
+ "controls": [
+  {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+  {"key":"style","kind":"choice","label":"Style","options":["ring","hex","rift"],"default":"ring"},
+  {"key":"rings","kind":"choice","label":"Rings","options":["one","two","three"],"default":"two"},
+  {"key":"pieces","kind":"range","label":"Ticks","lo":"Few","hi":"Many","default":8,"min":4,"max":12,"step":1},
+  {"key":"core","kind":"colour","label":"Core"},
+  {"key":"edge","kind":"colour","label":"Edge"},
+  {"key":"flicker","kind":"range","label":"Flicker","lo":"Steady","hi":"Wild","default":0.5,"group":"Motion"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": { "emitters": [
+  {"id":"warn","gen":"effect.spawn-warp","v":1,"clip":["warn"],"picture":"warn","at":[24,24],"size":{"from":"size","map":[[0,0],[1,1]]},"style":{"from":"style","pick":{"ring":"ring","hex":"hex","rift":"rift"}},"rings":{"from":"rings","pick":{"one":"one","two":"two","three":"three"}},"pieces":{"from":"pieces","map":[[4,4],[12,12]],"round":"px"},"core":"core","edge":"edge","flicker":{"from":"flicker","map":[[0,0],[1,1]]}},
+  {"id":"burst","gen":"effect.spawn-warp","v":1,"clip":["burst"],"picture":"burst","at":[24,24],"size":{"from":"size","map":[[0,0],[1,1]]},"style":{"from":"style","pick":{"ring":"ring","hex":"hex","rift":"rift"}},"rings":{"from":"rings","pick":{"one":"one","two":"two","three":"three"}},"pieces":{"from":"pieces","map":[[4,4],[12,12]],"round":"px"},"core":"core","edge":"edge","flicker":{"from":"flicker","map":[[0,0],[1,1]]}},
+  {"id":"close","gen":"effect.spawn-warp","v":1,"clip":["close"],"picture":"close","at":[24,24],"size":{"from":"size","map":[[0,0],[1,1]]},"style":{"from":"style","pick":{"ring":"ring","hex":"hex","rift":"rift"}},"rings":{"from":"rings","pick":{"one":"one","two":"two","three":"three"}},"pieces":{"from":"pieces","map":[[4,4],[12,12]],"round":"px"},"core":"core","edge":"edge","flicker":{"from":"flicker","map":[[0,0],[1,1]]}}
+ ] },
+ "clips": {
+  "warn": {"frames":8,"fps":10,"loop":true,"sounds":[{"sound":"tech-click","preset":"Hover","frame":0,"volume":0.6},{"sound":"tech-click","preset":"Hover","frame":4,"volume":0.6}]},
+  "burst": {"frames":8,"fps":14,"loop":false,"sounds":[{"sound":"warp-out","preset":"Spawn in","frame":1}]},
+  "close": {"frames":6,"fps":14,"loop":false}
+ }
+}

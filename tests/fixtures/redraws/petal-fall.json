@@ -1,0 +1,196 @@
+{
+ "id": "petal-fall",
+ "frozen": "2026-11-20",
+ "source": "sprites/petal-fall.js",
+ "sha256": "adbd685b4137652fbe407882d28ca5e7c38b1a46dce0188a6d36c6316f38ba60",
+ "name": "Falling petals",
+ "blurb": "Blossom, rose petals or fluffy seeds drifting and spinning down over the whole screen. Change how many petals, their size, the style, the sway, the two colours and the speed. Lay copies 62 px apart (each over its neighbours' empty border) to cover the screen.",
+ "meta": {
+  "type": "effect",
+  "role": "effects/weather",
+  "themes": [
+   "neutral",
+   "farm",
+   "forest"
+  ],
+  "gameTypes": [
+   "top-down-rpg",
+   "farming-sim",
+   "puzzle",
+   "card-game"
+  ],
+  "view": "none",
+  "words": [
+   "petals",
+   "blossom",
+   "cherry blossom",
+   "rose petals",
+   "flowers",
+   "seeds",
+   "dandelion",
+   "spring",
+   "wedding",
+   "drifting",
+   "falling",
+   "overlay"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  64,
+  64
+ ],
+ "pivot": [
+  32,
+  32
+ ],
+ "grounded": false,
+ "preview": "loop",
+ "params": {
+  "pieces": {
+   "kind": "range",
+   "label": "Petals",
+   "def": 8,
+   "min": 4,
+   "max": 12,
+   "step": 1,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look",
+   "when": {
+    "style": [
+     "blossom",
+     "rose"
+    ]
+   }
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "blossom",
+   "options": [
+    {
+     "value": "blossom",
+     "label": "Blossom"
+    },
+    {
+     "value": "rose",
+     "label": "Rose"
+    },
+    {
+     "value": "seeds",
+     "label": "Seeds"
+    }
+   ],
+   "group": "Look"
+  },
+  "sway": {
+   "kind": "range",
+   "label": "Sway",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Still",
+   "hi": "Swaying",
+   "group": "Motion"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Petals",
+   "def": "#f6d3b0",
+   "swatches": [
+    "#f6d3b0",
+    "#f0ead8",
+    "#c9423a",
+    "#f2c230",
+    "#ca9eda"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Second petals",
+   "def": "#7a4fc4",
+   "swatches": [
+    "#7a4fc4",
+    "#e08a2c",
+    "#a4c44a",
+    "#4fd8ee",
+    "#3f6fd1"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "loop": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [
+  {
+   "name": "Blossom",
+   "params": {}
+  },
+  {
+   "name": "Rose petals",
+   "params": {
+    "style": "rose",
+    "body": "#c9423a",
+    "accent": "#7a4fc4"
+   }
+  },
+  {
+   "name": "Seeds on the wind",
+   "params": {
+    "style": "seeds",
+    "body": "#f0ead8",
+    "pieces": 6
+   }
+  },
+  {
+   "name": "Golden petals",
+   "params": {
+    "body": "#f2c230",
+    "accent": "#e08a2c"
+   }
+  },
+  {
+   "name": "Light drift",
+   "params": {
+    "pieces": 4,
+    "sway": 1
+   }
+  }
+ ],
+ "bundles": []
+}

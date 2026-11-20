@@ -1,0 +1,187 @@
+{
+ "id": "fx-ice-spell",
+ "frozen": "2026-11-20",
+ "source": "sprites/fx-ice-spell.js",
+ "sha256": "443fb83f2a2b97989e9fbe4d7f5796858477a6714c4b9c28eba23b194922d075",
+ "name": "Ice spell",
+ "blurb": "An ice spell for a battle screen: spikes jut up under the target, glint and shatter, and frost gathers into a crystal in the caster's hand. Change its size, height, spikes, style, mist and colours.",
+ "meta": {
+  "type": "effect",
+  "role": "effects/magic",
+  "themes": [
+   "fantasy"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "roguelike-action",
+   "platformer"
+  ],
+  "view": "side",
+  "words": [
+   "ice",
+   "frost",
+   "spell",
+   "magic",
+   "freeze",
+   "spike",
+   "crystal",
+   "snowflake",
+   "shatter",
+   "cast",
+   "attack",
+   "cold",
+   "blizzard"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  64,
+  64
+ ],
+ "pivot": [
+  32,
+  58
+ ],
+ "grounded": false,
+ "preview": "burst",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "height": {
+   "kind": "range",
+   "label": "Height",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Short",
+   "hi": "Tall",
+   "group": "Look"
+  },
+  "pieces": {
+   "kind": "range",
+   "label": "Spikes",
+   "def": 5,
+   "min": 3,
+   "max": 7,
+   "step": 1,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "spikes",
+   "options": [
+    {
+     "value": "spikes",
+     "label": "Spikes"
+    },
+    {
+     "value": "crystal",
+     "label": "Crystal"
+    },
+    {
+     "value": "snowflake",
+     "label": "Snowflake"
+    }
+   ],
+   "group": "Look"
+  },
+  "mist": {
+   "kind": "toggle",
+   "label": "Mist",
+   "def": true,
+   "group": "Look"
+  },
+  "core": {
+   "kind": "color",
+   "label": "Core",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#f4e06a",
+    "#f6d3b0",
+    "#9fd8f4"
+   ],
+   "group": "Colors"
+  },
+  "edge": {
+   "kind": "color",
+   "label": "Edge",
+   "def": "#7aa0f4",
+   "swatches": [
+    "#7aa0f4",
+    "#e8662c",
+    "#7a4fc4",
+    "#2f8f9d",
+    "#c9423a",
+    "#7fe0a0"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "burst": {
+   "frames": 10,
+   "loop": false,
+   "fps": [
+    9,
+    15,
+    20
+   ]
+  },
+  "cast": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  }
+ },
+ "sounds": {
+  "burst": [
+   {
+    "sound": "ice-shatter",
+    "preset": "Ice spell",
+    "frame": 2,
+    "volume": 0.85
+   }
+  ],
+  "cast": [
+   {
+    "sound": "magic-spell",
+    "preset": "Quick zap",
+    "frame": 1,
+    "volume": 0.8
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-rpg-fantasy"
+ ]
+}

@@ -1,0 +1,382 @@
+{
+ "id": "spear-goblin",
+ "frozen": "2026-11-20",
+ "source": "sprites/spear-goblin.js",
+ "sha256": "bd294cca8983d9d69fd54647a1928e2d8818ffe55cb585ee7058207b2e377d5c",
+ "name": "Spear goblin",
+ "blurb": "A small hunched goblin that patrols and lunges with its spear. Change its build, ears, nose, weapon, headgear and colours.",
+ "meta": {
+  "type": "character",
+  "role": "characters/enemy",
+  "themes": [
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "platformer"
+  ],
+  "view": "side",
+  "words": [
+   "goblin",
+   "imp",
+   "gremlin",
+   "grunt",
+   "spear",
+   "guard",
+   "patrol",
+   "thrust",
+   "stab",
+   "walk",
+   "run",
+   "sneaky",
+   "enemy"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  64,
+  64
+ ],
+ "pivot": [
+  28,
+  58
+ ],
+ "grounded": false,
+ "preview": "walk",
+ "params": {
+  "height": {
+   "kind": "range",
+   "label": "Height",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Short",
+   "hi": "Tall",
+   "group": "Look"
+  },
+  "build": {
+   "kind": "range",
+   "label": "Build",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slim",
+   "hi": "Stocky",
+   "group": "Look"
+  },
+  "head": {
+   "kind": "range",
+   "label": "Head",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "ears": {
+   "kind": "range",
+   "label": "Ears",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Huge",
+   "group": "Look"
+  },
+  "nose": {
+   "kind": "choice",
+   "label": "Nose",
+   "def": "long",
+   "options": [
+    {
+     "value": "stub",
+     "label": "Stub"
+    },
+    {
+     "value": "long",
+     "label": "Long"
+    },
+    {
+     "value": "hooked",
+     "label": "Hooked"
+    }
+   ],
+   "group": "Look"
+  },
+  "weapon": {
+   "kind": "choice",
+   "label": "Weapon",
+   "def": "spear",
+   "options": [
+    {
+     "value": "spear",
+     "label": "Spear"
+    },
+    {
+     "value": "club",
+     "label": "Club"
+    },
+    {
+     "value": "dagger",
+     "label": "Dagger"
+    },
+    {
+     "value": "none",
+     "label": "None"
+    }
+   ],
+   "group": "Look"
+  },
+  "weaponLength": {
+   "kind": "range",
+   "label": "Length",
+   "def": 1,
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "lo": "Short",
+   "hi": "Long",
+   "group": "Look"
+  },
+  "weaponAngle": {
+   "kind": "range",
+   "label": "Hold angle",
+   "def": 0,
+   "min": -10,
+   "max": 40,
+   "step": 1,
+   "lo": "Upright",
+   "hi": "Forward",
+   "group": "Look"
+  },
+  "headgear": {
+   "kind": "choice",
+   "label": "Headgear",
+   "def": "hood",
+   "options": [
+    {
+     "value": "hood",
+     "label": "Hood"
+    },
+    {
+     "value": "skullcap",
+     "label": "Skullcap"
+    },
+    {
+     "value": "bone",
+     "label": "Bone"
+    },
+    {
+     "value": "none",
+     "label": "None"
+    }
+   ],
+   "group": "Look"
+  },
+  "headgearSize": {
+   "kind": "range",
+   "label": "Size",
+   "def": 1,
+   "min": 0.5,
+   "max": 1.8,
+   "step": 0.05,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "skin": {
+   "kind": "color",
+   "label": "Skin",
+   "def": "#9bd18a",
+   "swatches": [
+    "#9bd18a",
+    "#a4c44a",
+    "#7fb0b8",
+    "#8f97a8",
+    "#b9a7e0"
+   ],
+   "group": "Colors"
+  },
+  "outfit": {
+   "kind": "color",
+   "label": "Outfit",
+   "def": "#7a4f33",
+   "swatches": [
+    "#7a4f33",
+    "#3f8a4f",
+    "#a06a3c",
+    "#a8612a",
+    "#5a3a22"
+   ],
+   "group": "Colors"
+  },
+  "trim": {
+   "kind": "color",
+   "label": "Belt and hood",
+   "def": "#7a4fc4",
+   "swatches": [
+    "#7a4fc4",
+    "#c9423a",
+    "#f2c230",
+    "#3f6fd1",
+    "#f0ead8",
+    "#e08a2c",
+    "#e6c545",
+    "#4f9d57"
+   ],
+   "group": "Colors"
+  },
+  "bounce": {
+   "kind": "range",
+   "label": "Bounce",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Calm",
+   "hi": "Bouncy",
+   "group": "Motion"
+  },
+  "stride": {
+   "kind": "range",
+   "label": "Stride",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small steps",
+   "hi": "Big steps",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    7,
+    10
+   ]
+  },
+  "walk": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "run": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    9,
+    15,
+    20
+   ]
+  },
+  "attack": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    8,
+    14,
+    19
+   ]
+  },
+  "hurt": {
+   "frames": 4,
+   "loop": false,
+   "fps": [
+    6,
+    9,
+    13
+   ]
+  },
+  "die": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  }
+ },
+ "sounds": {
+  "walk": [
+   {
+    "sound": "footstep-gravel",
+    "frame": 0,
+    "preset": "Sneaking",
+    "volume": 0.45
+   },
+   {
+    "sound": "footstep-gravel",
+    "frame": 4,
+    "preset": "Sneaking",
+    "volume": 0.45
+   }
+  ],
+  "run": [
+   {
+    "sound": "footstep-gravel",
+    "frame": 0,
+    "preset": "Sneaking",
+    "volume": 0.45
+   },
+   {
+    "sound": "footstep-gravel",
+    "frame": 4,
+    "preset": "Sneaking",
+    "volume": 0.45
+   }
+  ],
+  "attack": [
+   {
+    "sound": "whoosh",
+    "frame": 3,
+    "preset": "Quick swipe",
+    "volume": 0.7
+   }
+  ],
+  "hurt": [
+   {
+    "sound": "punch",
+    "frame": 0,
+    "preset": "Light jab",
+    "volume": 0.9
+   }
+  ],
+  "die": [
+   {
+    "sound": "enemy-squish",
+    "frame": 0,
+    "preset": "Crunch",
+    "volume": 1
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-platformer-fantasy"
+ ]
+}

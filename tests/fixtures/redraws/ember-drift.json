@@ -1,0 +1,201 @@
+{
+ "id": "ember-drift",
+ "frozen": "2026-11-20",
+ "source": "sprites/ember-drift.js",
+ "sha256": "86127f4a4fa3700bec69541c4dc859994554cf833ec53d94597f434a7a284ad4",
+ "name": "Drifting embers",
+ "blurb": "Glowing embers rising and swaying above lava, a burning village or a forge, cooling to dark dots before they vanish, as a patch to place over the heat. Change their size and number, how wide and how high they rise, embers, ash or sparks, and the colours.",
+ "meta": {
+  "type": "effect",
+  "role": "effects/weather",
+  "themes": [
+   "neutral",
+   "dungeon",
+   "fantasy"
+  ],
+  "gameTypes": [
+   "platformer",
+   "roguelike-action",
+   "top-down-rpg",
+   "shooter"
+  ],
+  "view": "side",
+  "words": [
+   "embers",
+   "sparks",
+   "ash",
+   "cinders",
+   "fire",
+   "lava",
+   "forge",
+   "burning",
+   "rise",
+   "glow",
+   "heat"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  64,
+  64
+ ],
+ "pivot": [
+  32,
+  62
+ ],
+ "grounded": false,
+ "preview": "loop",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "pieces": {
+   "kind": "range",
+   "label": "Pieces",
+   "def": 8,
+   "min": 4,
+   "max": 14,
+   "step": 1,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "spread": {
+   "kind": "range",
+   "label": "Spread",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Tight",
+   "hi": "Wide",
+   "group": "Look"
+  },
+  "rise": {
+   "kind": "range",
+   "label": "Rise",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Low",
+   "hi": "High",
+   "group": "Look"
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "embers",
+   "options": [
+    {
+     "value": "embers",
+     "label": "Embers"
+    },
+    {
+     "value": "ash",
+     "label": "Ash"
+    },
+    {
+     "value": "sparks",
+     "label": "Sparks"
+    }
+   ],
+   "group": "Look"
+  },
+  "core": {
+   "kind": "color",
+   "label": "Core",
+   "def": "#f2c230",
+   "swatches": [
+    "#f2c230",
+    "#f0ead8",
+    "#f6d3b0",
+    "#c2c9d6"
+   ],
+   "group": "Colors"
+  },
+  "edge": {
+   "kind": "color",
+   "label": "Embers",
+   "def": "#e08a2c",
+   "swatches": [
+    "#e08a2c",
+    "#4fd8ee",
+    "#c9423a",
+    "#7a4fc4",
+    "#a4c44a",
+    "#8f97a8"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "loop": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [
+  {
+   "name": "Embers",
+   "params": {}
+  },
+  {
+   "name": "Falling ash",
+   "params": {
+    "style": "ash",
+    "core": "#f0ead8",
+    "edge": "#8f97a8"
+   }
+  },
+  {
+   "name": "Magic sparks",
+   "params": {
+    "style": "sparks",
+    "core": "#f0ead8",
+    "edge": "#4fd8ee"
+   }
+  },
+  {
+   "name": "Inferno",
+   "params": {
+    "pieces": 14,
+    "rise": 1,
+    "spread": 1
+   }
+  },
+  {
+   "name": "Few sparks",
+   "params": {
+    "pieces": 4,
+    "size": 0
+   }
+  }
+ ],
+ "bundles": []
+}

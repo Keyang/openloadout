@@ -1,0 +1,128 @@
+{
+ "id": "beam.lift",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     32,
+     60
+    ],
+    "width": 9,
+    "height": 40,
+    "paints": [
+     "p0",
+     "p1",
+     "p2",
+     "p3",
+     "p4"
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      29,
+      23
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".a",
+      ".a",
+      "..",
+      "..",
+      "ba",
+      ".a",
+      "..",
+      "a."
+     ],
+     "key": {
+      "a": "p3",
+      "b": "p4"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     32.5,
+     60
+    ],
+    "width": 12,
+    "height": 50,
+    "across": 0.5,
+    "scale": 0.8,
+    "lift": 0.3,
+    "reach": 0.9,
+    "solid": 0.2,
+    "phase": 1.5,
+    "seed": 6,
+    "paints": [
+     "p1",
+     "p2",
+     "p3",
+     "p4"
+    ]
+   },
+   "primitives": []
+  },
+  {
+   "args": {
+    "at": [
+     20,
+     40
+    ],
+    "width": 6,
+    "height": 30,
+    "gap": 3,
+    "cycles": 1,
+    "paints": [
+     "p1",
+     "p2",
+     "p3",
+     "p4"
+    ]
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      17,
+      13
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..a...",
+      "..aa..",
+      "...ab.",
+      "....b.",
+      ".a....",
+      ".aa...",
+      "..aa..",
+      "b..aa.",
+      "....ab",
+      ".a...b",
+      ".ac...",
+      "b.cc..",
+      "b..ca.",
+      "....ab",
+      ".a...b",
+      ".ac...",
+      "a.cc..",
+      "a.cca."
+     ],
+     "key": {
+      "a": "p3",
+      "b": "p4",
+      "c": "p2"
+     }
+    }
+   ]
+  }
+ ]
+}
