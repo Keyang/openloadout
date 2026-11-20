@@ -1,0 +1,202 @@
+{
+ "id": "tech-chest",
+ "frozen": "2026-11-20",
+ "source": "sprites/tech-chest.js",
+ "sha256": "e1089c186d4aca9ce1e7681a93a60b3e65647de9f2eb1bf2824483880944dd74",
+ "name": "Loot cache",
+ "blurb": "A station loot cache whose lid splits and slides apart round a beam of light, then stands empty. Change its size, build, lid, rarity bars, light and colours.",
+ "meta": {
+  "type": "prop",
+  "role": "world/prop",
+  "themes": [
+   "sci-fi",
+   "space"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "shooter"
+  ],
+  "view": "top-down",
+  "words": [
+   "chest",
+   "cache",
+   "loot",
+   "container",
+   "pod",
+   "locker",
+   "treasure",
+   "open",
+   "reward",
+   "credits",
+   "rarity",
+   "metal",
+   "tech"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  30
+ ],
+ "grounded": true,
+ "preview": "closed",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "cache",
+   "options": [
+    "cache",
+    "pod",
+    "locker"
+   ],
+   "group": "Look"
+  },
+  "lid": {
+   "kind": "range",
+   "label": "Lid",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Flat",
+   "hi": "Domed",
+   "group": "Look"
+  },
+  "stripes": {
+   "kind": "choice",
+   "label": "Rarity bars",
+   "def": "one",
+   "options": [
+    "none",
+    "one",
+    "two"
+   ],
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Body",
+   "def": "#6b7896",
+   "swatches": [
+    "#6b7896",
+    "#566182",
+    "#434d6d",
+    "#3f6fd1",
+    "#2fb3a8",
+    "#4f9ff0"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Bar colour",
+   "def": "#f2a030",
+   "swatches": [
+    "#f2a030",
+    "#5fe0f0",
+    "#9fe040",
+    "#f0ead8",
+    "#b48af8",
+    "#f2c230"
+   ],
+   "group": "Colors",
+   "when": {
+    "stripes": [
+     "one",
+     "two"
+    ]
+   }
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Light",
+   "def": "#5fe0f0",
+   "swatches": [
+    "#5fe0f0",
+    "#e2473f",
+    "#9fe040",
+    "#f2a030",
+    "#b48af8",
+    "#4f9ff0",
+    "#5fd47a"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "closed": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    8,
+    12
+   ]
+  },
+  "open": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  },
+  "empty": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  }
+ },
+ "sounds": {
+  "open": [
+   {
+    "sound": "door-hiss",
+    "preset": "Loot cache",
+    "frame": 0,
+    "volume": 0.8
+   },
+   {
+    "sound": "credit-pickup",
+    "preset": "Big payout",
+    "frame": 5,
+    "volume": 0.7
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-roguelite-scifi"
+ ]
+}

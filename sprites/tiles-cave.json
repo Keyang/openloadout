@@ -1,0 +1,769 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "tiles-cave",
+ "name": "Cave rock tiles",
+ "blurb": "Rough faceted rock for caves, with a thin ledge, a dark back wall, stalactites, stalagmites and glowing crystals; change the colours, the lit rim, how jagged, cracked and wet it is.",
+ "size": [32,32],
+ "pivot": [16,16],
+ "grounded": false,
+ "preview": "rock-top",
+ "styles": ["pixel"],
+ "meta": {
+  "type": "tileset",
+  "role": "world/tile",
+  "themes": ["fantasy","dungeon"],
+  "gameTypes": ["platformer"],
+  "view": "side",
+  "words": [
+   "cave",
+   "rock",
+   "stone",
+   "cavern",
+   "underground",
+   "mine",
+   "stalactite",
+   "stalagmite",
+   "crystal",
+   "ground",
+   "wall",
+   "ledge",
+   "walk",
+   "dark"
+  ],
+  "license": "draft"
+ },
+ "palette": [
+  {
+   "id": "rock",
+   "label": "Rock",
+   "default": "#5d6475",
+   "material": "stone",
+   "swatches": ["#5d6475","#8f97a8","#6b7280","#a06a3c"]
+  },
+  {
+   "id": "shade",
+   "label": "Back wall",
+   "default": "#3f5068",
+   "material": "stone",
+   "swatches": ["#3f5068","#7a4f33","#5a3a22","#3a3350"]
+  },
+  {
+   "id": "crystal",
+   "label": "Crystal",
+   "default": "#4fd8ee",
+   "material": "magic",
+   "swatches": ["#4fd8ee","#c9423a","#a4c44a","#7a4fc4","#f2c230"]
+  },
+  {"id":"shine","default":"#ffffff","material":"light","detail":true},
+  {"id":"water","default":"#3f9fd1","material":"water","detail":true},
+  {"id":"hi","material":"stone","derive":{"rule":"tone","of":"rock","by":1.4}},
+  {
+   "id": "dim",
+   "material": "stone",
+   "derive": {"rule":"mix","of":"rock","with":{"rule":"ramp","of":"rock","tone":"dark"},"amount":0.55}
+  },
+  {
+   "id": "wet",
+   "material": "water",
+   "derive": {"rule":"mix","of":{"rule":"ramp","of":"rock","tone":"light"},"with":"shine","amount":0.7}
+  },
+  {"id":"facet","material":"stone","derive":{"rule":"textureLight","of":"rock","against":"rock","from":0.5}},
+  {"id":"crease","material":"stone","derive":{"rule":"textureTone","of":"rock"}},
+  {"id":"mark","material":"stone","derive":{"rule":"textureTone","of":"shade"}}
+ ],
+ "controls": [
+  {"key":"edge","kind":"range","label":"Edge","lo":"Thin","hi":"Deep","min":3,"max":6,"step":1,"default":3},
+  {"key":"jagged","kind":"range","label":"Edges","lo":"Smooth","hi":"Jagged","default":0.5},
+  {"key":"texture","kind":"range","label":"Texture","lo":"Plain","hi":"Busy","default":0.5},
+  {"key":"wear","kind":"range","label":"Wear","lo":"New","hi":"Worn","default":0.3},
+  {"key":"damp","kind":"toggle","label":"Damp","default":false},
+  {"key":"rock","kind":"colour","label":"Rock"},
+  {"key":"shade","kind":"colour","label":"Back wall"},
+  {"key":"crystal","kind":"colour","label":"Crystal"}
+ ],
+ "body": {
+  "tiles": {
+   "tile": 32,
+   "profiles": {
+    "top": [0,0,1.5,1.5,3,3,1.5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1.5,1.5,1.5,3,3,1.5,0,0],
+    "under": [0,0.99,2.01,3,3,3,2.01,0.99,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.99,2.01,3,3,2.01,0,1.5,3,2.01,0],
+    "west": [0,0,0,0,1,2,2,1,0,0,0,0,0,0,1,2,2,2,1,0,0,0,0,0,0,0,2,2,1,0,0,0],
+    "east": [0,0,0,0,0,0,2,2,1,0,0,0,0,0,0,0,0,0,1,2,2,1,0,0,2,2,1,0,0,0,0,0],
+    "broken": [0,1,2,2,1,0,0,1,0,0,1,2,1,0,0,0,1,1,0,2,2,1,0,0,1,0,0,1,2,1,0,1],
+    "wet": [0,0,0,0,1,1,0,0,0,0,1,1,1,1,0,0,0,0,0,0,1,1,0,0,0,0,1,1,1,0,0,0],
+    "lip": [0,0.22,0.4,0.55,0.55,0.55,0.4,0.22,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.22,0.4,0.55,0.55,0.4,0,0.3,0.55,0.4,0],
+    "nick": [0,0,0,0,0,0,0,0,0,0,0,1,2,0,0,0,0,0,0,0,3,4,0,0,0,0,0,0,0,0,0,0]
+   },
+   "groups": [
+    {
+     "name": "rock",
+     "kind": "block",
+     "use": "ground",
+     "pieces": ["block","narrow","thin"],
+     "fills": 3,
+     "thickness": 12,
+     "under": {
+      "depth": 1,
+      "inset": {
+       "profile": "lip",
+       "amount": {
+        "from": "jagged",
+        "map": [
+         [0,0],
+         [0.16666566666666666,0],
+         [0.16666666666666666,1],
+         [0.2487552189054726,1],
+         [0.24875621890547261,1.5],
+         [0.33333233333333334,1.5],
+         [0.3333333333333333,2],
+         [0.505049505050505,2],
+         [0.5050505050505051,2.5],
+         [1,2.5]
+        ]
+       }
+      },
+      "bands": [{"rows":[1,99],"paint":"dim"}]
+     },
+     "material": {
+      "round": {"from":"jagged","map":[[0,1],[0.6,1],[0.60001,2],[1,2]],"round":"px"},
+      "behind": true,
+      "fill": {
+       "base": "rock",
+       "versions": [
+        [
+         {
+          "kind": "stamp",
+          "at": [0,0],
+          "rows": [
+           "...................a",
+           "...................a",
+           "..................a.",
+           ".................a..",
+           "................a...",
+           "...............a....",
+           "..............a.....",
+           ".............a......",
+           "............a.......",
+           "...........a........",
+           "aa........a.........",
+           "..aa.....a..........",
+           "....aa..a...........",
+           "......aa............"
+          ],
+          "key": {"a":"crease"}
+         },
+         {
+          "kind": "stamp",
+          "at": [17,10],
+          "rows": [
+           ".............aa",
+           "............a..",
+           "...........a...",
+           "..........a....",
+           "........ba.....",
+           ".......bbba....",
+           "......bbbba....",
+           ".....bbbbbba...",
+           "....bbbbbbba...",
+           "...bbbbbbba....",
+           "..bbbbbbba.....",
+           "..bbbbbba......",
+           ".bbbbbba.......",
+           "bbbbbba........",
+           "bbbbba.........",
+           ".bbba..........",
+           "..ba...........",
+           "..a............",
+           "..a............",
+           "..a............",
+           "..a............",
+           "..a............"
+          ],
+          "key": {"a":"crease","b":"facet"}
+         },
+         {"kind":"stamp","at":[21,18],"rows":["aab"],"key":{"a":"rock.light","b":"wet"},"when":{"damp":[true]}},
+         {
+          "kind": "stamp",
+          "at": [23,4],
+          "rows": ["a..",".a.",".a.","..a","..a",".a.",".a."],
+          "key": {"a":"crease"},
+          "when": {"wear":[{"atLeast":0.16666666666666666}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [4,20],
+          "rows": ["a..",".a.",".a.","..a","..a",".a.",".a."],
+          "key": {"a":"crease"},
+          "when": {"wear":[{"atLeast":0.8333333333333334}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [8,18],
+          "rows": ["a....",".a...","..a..","...a.","....a","....a","....a","....a","....a"],
+          "key": {"a":"crease"},
+          "when": {"texture":[{"atLeast":0.25}]}
+         },
+         {"kind":"stamp","at":[18,0],"rows":["a","a"],"key":{"a":"facet"},"when":{"texture":[{"atLeast":0.75}]}},
+         {
+          "kind": "stamp",
+          "at": [8,7],
+          "rows": ["......aa.",".....aaaa","....aaaaa","...aaaaa.","..aaaaa..",".aaaaa...","aaaaa....",".aaa.....","..a......"],
+          "key": {"a":"facet"},
+          "when": {"texture":[{"atLeast":0.75}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [0,11],
+          "rows": ["a......",".aa....","...aa..",".....aa"],
+          "key": {"a":"facet"},
+          "when": {"texture":[{"atLeast":0.75}]}
+         },
+         {"kind":"stamp","at":[30,11],"rows":["aa"],"key":{"a":"facet"},"when":{"texture":[{"atLeast":0.75}]}},
+         {
+          "kind": "stamp",
+          "at": [7,19],
+          "rows": ["a....",".a...","..a..","...a.","....a","....a","....a","....a","....a"],
+          "key": {"a":"facet"},
+          "when": {"texture":[{"atLeast":0.75}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [18,28],
+          "rows": ["a","a","a","a"],
+          "key": {"a":"facet"},
+          "when": {"texture":[{"atLeast":0.75}]}
+         }
+        ],
+        [
+         {
+          "kind": "stamp",
+          "at": [19,0],
+          "rows": [
+           "a............",
+           "a............",
+           ".a...........",
+           "..a..........",
+           "...a.........",
+           "....a........",
+           ".....a.......",
+           "......a......",
+           ".......a.....",
+           "........aa...",
+           "..........aaa"
+          ],
+          "key": {"a":"crease"}
+         },
+         {
+          "kind": "stamp",
+          "at": [0,6],
+          "rows": [
+           ".....a......................",
+           "....a.aa....................",
+           "...a..bbaa..................",
+           "..a...bbbbaa................",
+           "aa...bbbbbbbaa..............",
+           ".....bbbbbbbbbaa............",
+           "....bbbbbbbbbbbbaa..........",
+           "....bbbbbbbbbbbbbbaa........",
+           "...bbbbbbbbbbbbbbbbbaa......",
+           "...bbbbbbbbbbbbbbbbbbbaa....",
+           "...bbbbbbbbbbbbbbbbbbbbbaa..",
+           "...bbbbbbbbbbbbbbbbbbbbbbbaa",
+           "...bbbbbbbbbbbbbbbbbbbbbbba.",
+           "...bbbbbbbbbbbbbbbbbbbbbba..",
+           "....bbbbbbbbbbbbbbbbbbbba...",
+           "......bbbbbbbbbbbbbbbbba....",
+           "........bbbbbbbbbbbbbba.....",
+           "..........bbbbbbbbbbba......",
+           "...........bbbbbbbbba.......",
+           ".............bbbbbba........",
+           "...............bbbba........",
+           ".................b.a........",
+           "...................a........",
+           "...................a........",
+           "...................a........",
+           "...................a........"
+          ],
+          "key": {"a":"crease","b":"facet"}
+         },
+         {"kind":"stamp","at":[22,10],"rows":["aab"],"key":{"a":"rock.light","b":"wet"},"when":{"damp":[true]}},
+         {"kind":"stamp","at":[11,13],"rows":["aab"],"key":{"a":"rock.light","b":"wet"},"when":{"damp":[true]}},
+         {
+          "kind": "stamp",
+          "at": [25,22],
+          "rows": ["a..",".a.",".a.","..a","..a",".a.",".a."],
+          "key": {"a":"crease"},
+          "when": {"wear":[{"atLeast":0.16666666666666666}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [5,24],
+          "rows": ["a.....",".a....",".a....","..aaaa"],
+          "key": {"a":"crease"},
+          "when": {"wear":[{"atLeast":0.5}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [10,3],
+          "rows": ["a.......",".a......","..a.....","...aaaaa"],
+          "key": {"a":"crease"},
+          "when": {"texture":[{"atLeast":0.25}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [18,0],
+          "rows": [
+           "a.............",
+           "a.............",
+           "a.............",
+           ".a............",
+           "..a...........",
+           "..aa..........",
+           "..aaa.........",
+           "..aaaa........",
+           "..aaaaa.......",
+           "..aaaaaa......",
+           "...aaaaaaa....",
+           ".....aaa..aaaa",
+           ".......a......"
+          ],
+          "key": {"a":"facet"},
+          "when": {"texture":[{"atLeast":0.75}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [9,4],
+          "rows": ["a.......",".a......","..a.....","...aaaaa"],
+          "key": {"a":"facet"},
+          "when": {"texture":[{"atLeast":0.75}]}
+         },
+         {"kind":"stamp","at":[5,8],"rows":["a"],"key":{"a":"facet"},"when":{"texture":[{"atLeast":0.75}]}},
+         {"kind":"stamp","at":[0,11],"rows":["a"],"key":{"a":"facet"},"when":{"texture":[{"atLeast":0.75}]}},
+         {
+          "kind": "stamp",
+          "at": [18,27],
+          "rows": ["a","a","a","a","a"],
+          "key": {"a":"facet"},
+          "when": {"texture":[{"atLeast":0.75}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [22,10],
+          "rows": ["aab"],
+          "key": {"a":"rock.light","b":"wet"},
+          "when": {"texture":[{"atLeast":0.75}],"damp":[true]}
+         }
+        ],
+        [
+         {
+          "kind": "stamp",
+          "at": [9,0],
+          "rows": [
+           "..........a............",
+           "..........a............",
+           "...........aa..........",
+           "........bbbbbaa........",
+           ".......bbbbbbbba.......",
+           "......bbbbbbbbbba......",
+           ".....bbbbbbbbbbbba.....",
+           "....bbbbbbbbbbbbbba....",
+           "...bbbbbbbbbbbbbbbba...",
+           "..bbbbbbbbbbbbbbbbb.a..",
+           ".bbbbbbbbbbbbbbbbb...aa",
+           "bbbbbbbbbbbbbbbbb......",
+           ".bbbbbbbbbbbbbbb.......",
+           "...bbbbbbbbbbbb........",
+           ".....bbbbbbbbb.........",
+           "......bbbbbbb..........",
+           "........bbbb...........",
+           "..........b............"
+          ],
+          "key": {"a":"crease","b":"facet"}
+         },
+         {
+          "kind": "stamp",
+          "at": [0,10],
+          "rows": [
+           "aa..................",
+           "..a.................",
+           "...a................",
+           "....a...............",
+           ".....a..............",
+           "......a.............",
+           ".......aa...........",
+           ".........aa.........",
+           "...........aa.......",
+           ".............aa.....",
+           "...............a....",
+           "...............a....",
+           "................a...",
+           "................a...",
+           ".................a..",
+           ".................a..",
+           "..................a.",
+           "..................a.",
+           "...................a",
+           "...................a",
+           "...................a",
+           "...................a"
+          ],
+          "key": {"a":"crease"}
+         },
+         {"kind":"stamp","at":[18,7],"rows":["aab"],"key":{"a":"rock.light","b":"wet"},"when":{"damp":[true]}},
+         {"kind":"stamp","at":[8,21],"rows":["aab"],"key":{"a":"rock.light","b":"wet"},"when":{"damp":[true]}},
+         {
+          "kind": "stamp",
+          "at": [5,3],
+          "rows": ["a..",".a.",".a.","..a","..a",".a.",".a."],
+          "key": {"a":"crease"},
+          "when": {"wear":[{"atLeast":0.16666666666666666}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [22,24],
+          "rows": ["a..",".a.",".a.","..a",".a."],
+          "key": {"a":"crease"},
+          "when": {"wear":[{"atLeast":0.5}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [23,18],
+          "rows": ["a...",".a..","..a.","...a","...a","...a","...a","...a"],
+          "key": {"a":"crease"},
+          "when": {"texture":[{"atLeast":0.25}]}
+         },
+         {"kind":"stamp","at":[18,0],"rows":["a","a","a"],"key":{"a":"facet"},"when":{"texture":[{"atLeast":0.75}]}},
+         {"kind":"stamp","at":[28,10],"rows":["a...",".aaa"],"key":{"a":"facet"},"when":{"texture":[{"atLeast":0.75}]}},
+         {
+          "kind": "stamp",
+          "at": [0,11],
+          "rows": [
+           "a..................",
+           ".a.................",
+           "..a................",
+           "...a...............",
+           "....a..............",
+           ".....aa............",
+           ".....aaaa..........",
+           ".....aaaaaa........",
+           "....aaaaaaaaa......",
+           "....aaaaaaaaaaa....",
+           "....aaaaaaaaaaa....",
+           ".....aaaaaaaaaa....",
+           "......aaaaaaaaaa...",
+           ".......aaaaaaaaa...",
+           "........aaaaaaaaa..",
+           ".........aaaa...a..",
+           ".................a.",
+           ".................a.",
+           "..................a",
+           "..................a",
+           "..................a"
+          ],
+          "key": {"a":"facet"},
+          "when": {"texture":[{"atLeast":0.75}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [22,19],
+          "rows": ["a...",".a..","..a.","...a","...a","...a","...a","...a"],
+          "key": {"a":"facet"},
+          "when": {"texture":[{"atLeast":0.75}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [8,21],
+          "rows": ["aab"],
+          "key": {"a":"rock.light","b":"wet"},
+          "when": {"texture":[{"atLeast":0.75}],"damp":[true]}
+         }
+        ]
+       ]
+      },
+      "edges": {
+       "top": {
+        "depth": {"from":"edge","map":[[3,3],[6,6]],"round":"px"},
+        "inset": {"profile":"top","amount":{"from":"jagged","map":[[0,0],[1,1]]}},
+        "bands": [
+         {
+          "rows": "last",
+          "where": {"profile":"broken","in":[2]},
+          "paint": "clear",
+          "when": {"jagged":[{"atLeast":0.16666666666666666}]}
+         },
+         {
+          "rows": "last",
+          "where": {"profile":"broken","in":[1]},
+          "paint": "clear",
+          "when": {"jagged":[{"atLeast":0.3333333333333333}]}
+         },
+         {
+          "rows": "last-1",
+          "where": {"profile":"broken","in":[2]},
+          "paint": "clear",
+          "when": {"jagged":[{"atLeast":0.5}],"edge":[{"atLeast":3.5}]}
+         },
+         {"rows":[1,2],"where":{"profile":"nick","in":[1]},"paint":"crease","when":{"wear":[{"atLeast":0.5}]}},
+         {"rows":[2,99],"where":{"profile":"nick","in":[2]},"paint":"crease","when":{"wear":[{"atLeast":0.5}]}},
+         {
+          "rows": [1,99],
+          "where": {"profile":"nick","in":[3]},
+          "paint": "crease",
+          "when": {"wear":[{"atLeast":0.8333333333333334}]}
+         },
+         {
+          "rows": [1,1],
+          "where": {"profile":"nick","in":[4]},
+          "paint": "crease",
+          "when": {"wear":[{"atLeast":0.8333333333333334}]}
+         },
+         {
+          "rows": [1,1],
+          "where": {"profile":"wet","in":[1]},
+          "paint": {"rule":"choose","when":{"damp":[true]},"then":"wet","else":"hi"}
+         },
+         {"rows":[1,1],"paint":"hi"},
+         {"rows":[2,99],"paint":"rock.light"}
+        ]
+       },
+       "right": {
+        "depth": {"from":"edge","map":[[3,1],[6,4]],"round":"px"},
+        "inset": {"profile":"east","amount":{"from":"jagged","map":[[0,0],[1,1]]}},
+        "bands": [
+         {
+          "rows": "last",
+          "where": {"profile":"broken","in":[2]},
+          "paint": "clear",
+          "when": {"jagged":[{"atLeast":0.16666666666666666}],"edge":[{"atLeast":3.5}]}
+         },
+         {
+          "rows": "last",
+          "where": {"profile":"broken","in":[1]},
+          "paint": "clear",
+          "when": {"jagged":[{"atLeast":0.3333333333333333}],"edge":[{"atLeast":3.5}]}
+         },
+         {
+          "rows": "last-1",
+          "where": {"profile":"broken","in":[2]},
+          "paint": "clear",
+          "when": {"jagged":[{"atLeast":0.5}],"edge":[{"atLeast":4.5}]}
+         },
+         {"rows":[1,99],"paint":"rock.light"}
+        ]
+       },
+       "left": {
+        "depth": 1,
+        "inset": {"profile":"west","amount":{"from":"jagged","map":[[0,0],[1,1]]}},
+        "bands": [{"rows":[1,1],"paint":"dim"}]
+       },
+       "bottom": {
+        "depth": 2,
+        "inset": {"profile":"under","amount":{"from":"jagged","map":[[0,0],[1,1]]}},
+        "bands": [{"rows":[1,99],"paint":"dim"}]
+       }
+      },
+      "outside": [
+       {"x":[25,25],"y":[31,31],"paint":"water.light","when":{"damp":[true]}},
+       {"x":[25,25],"y":[16,31],"paint":"water","when":{"damp":[true]}}
+      ]
+     },
+     "decals": [
+      {
+       "name": "a",
+       "place": "below",
+       "label": "Stalactites",
+       "outline": true,
+       "draw": [
+        {
+         "kind": "stamp",
+         "at": [10,0],
+         "rows": [
+          "aabcaaaaabb",
+          "aabcaaaaabb",
+          "aabcaaaaabb",
+          ".ab.caaaabb",
+          ".ab.cadaab.",
+          ".a..cadaab.",
+          ".a...cdaab.",
+          ".a...cdaab.",
+          ".....cdab..",
+          ".....cadb..",
+          ".....caab..",
+          "......aab..",
+          "......aab..",
+          "......aab..",
+          "......ab...",
+          "......ab...",
+          "......ab...",
+          "......ab...",
+          ".......a...",
+          ".......a...",
+          ".......a..."
+         ],
+         "key": {"a":"rock","b":"rock.light","c":"dim","d":"crease"}
+        },
+        {
+         "kind": "stamp",
+         "at": [17,22],
+         "rows": ["a","b"],
+         "key": {"a":"water","b":"water.light"},
+         "glow": true,
+         "when": {"damp":[true]}
+        },
+        {"kind":"stamp","at":[11,9],"rows":["a"],"key":{"a":"water"},"glow":true,"when":{"damp":[true]}}
+       ]
+      },
+      {
+       "name": "b",
+       "place": "above",
+       "label": "Stalagmites",
+       "outline": true,
+       "draw": [
+        {
+         "kind": "stamp",
+         "at": [10,15],
+         "rows": [
+          "....a.......",
+          "....a.......",
+          "....ab......",
+          "....ab......",
+          "...aab......",
+          "...aab......",
+          "...caab.....",
+          "...caab.....",
+          "..cadab.....",
+          "..cdaaab....",
+          "..cdaaab....",
+          ".cadaabb..a.",
+          ".cadaabb..a.",
+          ".cadaaabbab.",
+          "caaaaaabbaab",
+          "caaaaaabbaab",
+          "caaaaaabbaab"
+         ],
+         "key": {"a":"rock","b":"rock.light","c":"dim","d":"crease"}
+        },
+        {"kind":"stamp","at":[14,16],"rows":["a"],"key":{"a":"wet"},"when":{"damp":[true]}},
+        {"kind":"stamp","at":[15,20],"rows":["a","a"],"key":{"a":"wet"},"when":{"damp":[true]}},
+        {"kind":"stamp","at":[20,27],"rows":["a"],"key":{"a":"wet"},"when":{"damp":[true]}}
+       ]
+      },
+      {
+       "name": "c",
+       "place": "above",
+       "label": "Glowing crystals",
+       "outline": true,
+       "draw": [
+        {
+         "kind": "stamp",
+         "at": [10,11],
+         "rows": [
+          ".....a......",
+          ".....b......",
+          "....abb.....",
+          "....abb.....",
+          "....cbd.....",
+          "...acbdb....",
+          "...acbcb....",
+          "...acbcb....",
+          "...acbcb....",
+          "...acbcb..a.",
+          ".a.acbcb..d.",
+          ".d.acbcb.abb",
+          "abbacbcb.ccb",
+          "acbacbcbaccb",
+          "acbacbcbaccb",
+          "acbacbcbaccb",
+          "acbacccbaccb",
+          "acbacccbaccb",
+          "efffeeeffffe",
+          "eeeeeeeeeeee",
+          "eeeeeeeeeeee"
+         ],
+         "key": {"a":"crystal.dark","b":"crystal.light","c":"crystal","d":"shine","e":"rock","f":"rock.light"}
+        },
+        {
+         "kind": "stamp",
+         "at": [8,7],
+         "rows": [
+          "........a...............",
+          ".......aba..............",
+          "........a...............",
+          "........................",
+          "........................",
+          "........................",
+          "........................",
+          "........................",
+          "........................",
+          "...............a........",
+          "........................",
+          "a......................."
+         ],
+         "key": {"a":"crystal.light","b":"shine"},
+         "glow": true
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "dark",
+     "kind": "floor",
+     "fills": 3,
+     "label": "Back wall",
+     "material": {
+      "ink": "none",
+      "fill": {
+       "base": "shade",
+       "versions": [
+        [
+         {"kind":"stamp","at":[7,8],"rows":["...a..","..a.aa",".a....","a....."],"key":{"a":"mark"}},
+         {
+          "kind": "stamp",
+          "at": [20,21],
+          "rows": ["a...",".a..","..a.","...a"],
+          "key": {"a":"mark"},
+          "when": {"texture":[{"atLeast":0.25}]}
+         },
+         {"kind":"stamp","at":[13,21],"rows":["aa"],"key":{"a":"mark"},"when":{"texture":[{"atLeast":0.75}]}}
+        ],
+        [
+         {"kind":"stamp","at":[19,6],"rows":["a...",".a..","..a.","...a"],"key":{"a":"mark"}},
+         {
+          "kind": "stamp",
+          "at": [6,19],
+          "rows": ["...a..","..a.aa",".a....","a....."],
+          "key": {"a":"mark"},
+          "when": {"texture":[{"atLeast":0.25}]}
+         },
+         {"kind":"stamp","at":[25,18],"rows":["aa"],"key":{"a":"mark"},"when":{"texture":[{"atLeast":0.75}]}}
+        ],
+        [
+         {"kind":"stamp","at":[11,14],"rows":["....a","..aa.",".a...","a...."],"key":{"a":"mark"}},
+         {
+          "kind": "stamp",
+          "at": [22,24],
+          "rows": ["a.....",".a..aa","..aa.."],
+          "key": {"a":"mark"},
+          "when": {"texture":[{"atLeast":0.25}]}
+         },
+         {"kind":"stamp","at":[5,6],"rows":["aa"],"key":{"a":"mark"},"when":{"texture":[{"atLeast":0.75}]}}
+        ]
+       ]
+      }
+     }
+    }
+   ],
+   "decalOrder": "last"
+  }
+ },
+ "clips": {
+  "rock-thin-l": {"label":"Rock ledge: left end"},
+  "rock-thin-m": {"label":"Rock ledge: middle"},
+  "rock-thin-r": {"label":"Rock ledge: right end"},
+  "dark-fill": {"label":"Back wall"},
+  "dark-fill-b": {"label":"Back wall, version B"},
+  "dark-fill-c": {"label":"Back wall, version C"}
+ }
+}

@@ -1,0 +1,183 @@
+{
+ "id": "treasure-chest",
+ "frozen": "2026-11-20",
+ "source": "sprites/treasure-chest.js",
+ "sha256": "2a71b429200fb494d02878365e0db4eca04e0aad4dbdaba85fed301b5ac13ff0",
+ "name": "Treasure chest",
+ "blurb": "A banded chest that bursts open with rays of light, then stands empty. Change its size, style, lid, treasure, light and colours.",
+ "meta": {
+  "type": "prop",
+  "role": "world/prop",
+  "themes": [
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "platformer"
+  ],
+  "view": "side",
+  "words": [
+   "chest",
+   "treasure",
+   "loot",
+   "box",
+   "trunk",
+   "open",
+   "reward",
+   "gold",
+   "coins",
+   "gems",
+   "secret",
+   "wooden",
+   "lock"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  30
+ ],
+ "grounded": true,
+ "preview": "closed",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "wooden",
+   "options": [
+    "wooden",
+    "iron",
+    "royal"
+   ],
+   "group": "Look"
+  },
+  "lid": {
+   "kind": "range",
+   "label": "Lid",
+   "def": 0.6,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Flat",
+   "hi": "Domed",
+   "group": "Look"
+  },
+  "gems": {
+   "kind": "toggle",
+   "label": "Treasure",
+   "def": true,
+   "group": "Look"
+  },
+  "wood": {
+   "kind": "color",
+   "label": "Wood",
+   "def": "#a06a3c",
+   "swatches": [
+    "#a06a3c",
+    "#7a4f33",
+    "#f0ead8",
+    "#a8612a",
+    "#5a3a22",
+    "#c98a4a"
+   ],
+   "group": "Colors"
+  },
+  "metal": {
+   "kind": "color",
+   "label": "Metal",
+   "def": "#f2c230",
+   "swatches": [
+    "#f2c230",
+    "#c2c9d6",
+    "#8f97a8",
+    "#5d6475",
+    "#e6c545",
+    "#c98a4a"
+   ],
+   "group": "Colors"
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Light",
+   "def": "#f2c230",
+   "swatches": [
+    "#f2c230",
+    "#4fd8ee",
+    "#e08a2c",
+    "#a4c44a",
+    "#c9423a",
+    "#7a4fc4"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "closed": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    8,
+    12
+   ]
+  },
+  "open": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  },
+  "empty": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  }
+ },
+ "sounds": {
+  "open": [
+   {
+    "sound": "chest-open",
+    "preset": "Treasure chest",
+    "frame": 0,
+    "volume": 0.8
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-platformer-fantasy"
+ ]
+}

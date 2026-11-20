@@ -1,0 +1,154 @@
+{
+ "id": "score.pop",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "body": "body",
+    "edge": "edge",
+    "lit": "lit"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      1,
+      15
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".........aaaaa.aaaaaaaaaaaaaaa.",
+      "...aaaa.abccccabcccccccccccccca",
+      "..abcccaabdddcabddddddcddddddca",
+      ".aabddcaabbddcabddaaddcddaaddca",
+      "abccddcccabddcabddadddcddadddca",
+      "abddddddcabddcabddadddcddadddca",
+      "abbbddcbbabddcabdddaddcdddaddca",
+      ".aabddcabccddcccddaaddcddaaddca",
+      "..abbbbabddddddcddddddcddddddca",
+      "...aaaaabbbbbbbbbbbbbbbbbbbbbba",
+      "........aaaaaaaaaaaaaaaaaaaaaa."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "tone",
+       "of": "edge",
+       "by": -1
+      },
+      "c": "edge",
+      "d": "body"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "picture": "rise",
+    "number": "x5",
+    "style": "serif",
+    "size": 1,
+    "outline": "rimmed",
+    "body": "body",
+    "edge": "edge",
+    "lit": "lit"
+   },
+   "ctx": {
+    "frame": 1
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      6,
+      11
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...........aaaaaaaa.",
+      "..........abccccccca",
+      "..........abddddddca",
+      ".aaaaa.aaaabddcbbbba",
+      "abccccabccccddcaaaa.",
+      "abdddcccdddcddccccca",
+      "abbbddcddcbbddddddca",
+      ".aabbdddcbabbbbbddca",
+      ".aabcdddccaaaaabddca",
+      "abccddcddcccccccddca",
+      "abdddcbbdddcddddddca",
+      "abbbbbabbbbbbbbbbbba",
+      ".aaaaa.aaaaaaaaaaaa."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "tone",
+       "of": "edge",
+       "by": -1
+      },
+      "c": "edge",
+      "d": "body"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     0,
+     0
+    ],
+    "picture": "rise",
+    "number": "p50",
+    "style": "slim",
+    "size": 0,
+    "outline": "rimmed",
+    "body": "body",
+    "edge": "edge",
+    "lit": "lit"
+   },
+   "ctx": {
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      -8,
+      -2
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...aaa.aaaaaaaaa.",
+      "..abccabccccbccca",
+      ".aabdcabdddccddca",
+      "abccdcccdcccdadca",
+      "abdddddcdddcdadca",
+      "abbbdcbbccdcdadca",
+      ".aabdcabdddcddcba",
+      "..abbbabbbbbbbba.",
+      "...aaa.aaaaaaaa.."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "tone",
+       "of": "edge",
+       "by": -1
+      },
+      "c": "edge",
+      "d": "body"
+     }
+    }
+   ]
+  }
+ ]
+}

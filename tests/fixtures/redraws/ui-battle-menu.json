@@ -1,0 +1,185 @@
+{
+ "id": "ui-battle-menu",
+ "frozen": "2026-11-20",
+ "source": "sprites/ui-battle-menu.js",
+ "sha256": "14511ed918a43fe35c3b1d0ac15ec06347ff1f815467af7b99adcf5d8f7f52e7",
+ "name": "Battle menu",
+ "blurb": "A stretchable command panel with a highlight row, a diamond-headed arrow cursor and a bouncing turn marker; change its style, corners, border and colours.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/panel",
+  "themes": [
+   "fantasy",
+   "neutral"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "top-down-rpg",
+   "card-game"
+  ],
+  "view": "none",
+  "words": [
+   "menu",
+   "command",
+   "battle",
+   "cursor",
+   "arrow",
+   "pointer",
+   "select",
+   "choose",
+   "turn",
+   "marker",
+   "window",
+   "panel"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  96,
+  64
+ ],
+ "pivot": [
+  48,
+  32
+ ],
+ "grounded": false,
+ "preview": "panel",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "plain",
+   "options": [
+    {
+     "value": "plain",
+     "label": "Plain"
+    },
+    {
+     "value": "ornate",
+     "label": "Ornate"
+    },
+    {
+     "value": "scroll",
+     "label": "Scroll"
+    }
+   ],
+   "group": "Look"
+  },
+  "corner": {
+   "kind": "range",
+   "label": "Corner",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Square",
+   "hi": "Round",
+   "group": "Look"
+  },
+  "border": {
+   "kind": "range",
+   "label": "Border",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Thin",
+   "hi": "Thick",
+   "group": "Look"
+  },
+  "face": {
+   "kind": "color",
+   "label": "Face",
+   "def": "#4a609c",
+   "swatches": [
+    "#4a609c",
+    "#5a5f7a",
+    "#8e3a4a",
+    "#6541b9",
+    "#19708e"
+   ],
+   "group": "Colors"
+  },
+  "frame": {
+   "kind": "color",
+   "label": "Frame",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#f6d3b0",
+    "#c9d2dd",
+    "#fdf277",
+    "#a7e5fa"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Accent",
+   "def": "#f2c230",
+   "swatches": [
+    "#f2c230",
+    "#c9423a",
+    "#f0ead8",
+    "#7fe0a0",
+    "#4fd8ee",
+    "#c8553a"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "panel": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "row": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "cursor": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    8,
+    12
+   ]
+  },
+  "turn-marker": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    8,
+    12
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [],
+ "bundles": [
+  "kit-rpg-fantasy"
+ ]
+}

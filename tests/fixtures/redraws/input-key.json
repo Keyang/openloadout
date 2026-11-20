@@ -1,0 +1,235 @@
+{
+ "id": "input-key",
+ "frozen": "2026-11-20",
+ "source": "sprites/input-key.js",
+ "sha256": "92db4e1f529838637d73d0ccf2de0d8d7f28d56c56dd1cdc1c29c4ea1a6f98c3",
+ "name": "Keyboard key",
+ "blurb": "A keyboard key for \"press this\" prompts that sinks and lights up when tapped; change its arrow picture, size, corners, depth and colours.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/icon",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "arcade",
+   "platformer",
+   "puzzle",
+   "shooter"
+  ],
+  "view": "none",
+  "words": [
+   "key",
+   "keyboard",
+   "keycap",
+   "button",
+   "press",
+   "tap",
+   "prompt",
+   "control",
+   "arrow key",
+   "input",
+   "tutorial"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "tap",
+ "params": {
+  "mark": {
+   "kind": "choice",
+   "label": "Picture",
+   "def": "none",
+   "options": [
+    {
+     "value": "none",
+     "label": "None"
+    },
+    {
+     "value": "up",
+     "label": "Up"
+    },
+    {
+     "value": "down",
+     "label": "Down"
+    },
+    {
+     "value": "left",
+     "label": "Left"
+    },
+    {
+     "value": "right",
+     "label": "Right"
+    }
+   ],
+   "group": "Look"
+  },
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "corner": {
+   "kind": "range",
+   "label": "Corner",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Square",
+   "hi": "Round",
+   "group": "Look"
+  },
+  "depth": {
+   "kind": "range",
+   "label": "Depth",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Flat",
+   "hi": "Deep",
+   "group": "Look"
+  },
+  "light": {
+   "kind": "toggle",
+   "label": "Light up",
+   "def": true,
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Key top",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#c2c9d6",
+    "#f6d3b0",
+    "#9bd18a",
+    "#e6c96a"
+   ],
+   "group": "Colors"
+  },
+  "frame": {
+   "kind": "color",
+   "label": "Key side",
+   "def": "#5d6475",
+   "swatches": [
+    "#5d6475",
+    "#7a4f33",
+    "#3f5068",
+    "#7a4fc4",
+    "#434d6d"
+   ],
+   "group": "Colors"
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Light",
+   "def": "#f2c230",
+   "swatches": [
+    "#f2c230",
+    "#4fd8ee",
+    "#a4c44a",
+    "#8fd0f0"
+   ],
+   "group": "Colors",
+   "when": {
+    "light": [
+     true
+    ]
+   }
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "up": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "down": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "tap": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    8,
+    12
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [
+  {
+   "name": "Key",
+   "params": {}
+  },
+  {
+   "name": "Arrow up",
+   "params": {
+    "mark": "up"
+   }
+  },
+  {
+   "name": "Arrow right, flat",
+   "params": {
+    "mark": "right",
+    "depth": 0,
+    "corner": 0
+   }
+  },
+  {
+   "name": "Dark keys",
+   "params": {
+    "body": "#c2c9d6",
+    "frame": "#434d6d",
+    "glow": "#4fd8ee"
+   }
+  },
+  {
+   "name": "Big round key",
+   "params": {
+    "size": 1,
+    "corner": 1
+   }
+  }
+ ],
+ "bundles": []
+}

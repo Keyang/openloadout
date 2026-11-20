@@ -1,0 +1,116 @@
+{
+  "format": "loadout-sprite",
+  "version": 2,
+  "id": "ui-panel-crystal",
+  "name": "Crystal panels",
+  "blurb": "Stretchable boxes of deep ice in a cut crystal band for spell lists, shops and tips: a panel, one with a heading, a list well and a tooltip, with icicles, frost ferns or shards; change the style, corners, band, glints and colours.",
+  "meta": {
+    "type": "ui",
+    "role": "interface/panel",
+    "themes": ["neutral","fantasy"],
+    "gameTypes": ["arcade","turn-based-rpg","puzzle","top-down-rpg"],
+    "view": "none",
+    "words": ["panel","window","box","popup","menu","tooltip","list","crystal","ice","frost","frozen","shard"],
+    "license": "draft"
+  },
+  "size": [96,64],
+  "pivot": [48,32],
+  "grounded": false,
+  "preview": "panel",
+  "styles": ["pixel"],
+  "palette": [
+    {"id":"face","label":"Stone","default":"#3f5068","material":"interface","swatches":["#3f5068","#7a4f33","#434d6d","#8e3a4a"]},
+    {"id":"frame","label":"Crystal","default":"#8fd0f0","material":"interface","swatches":["#8fd0f0","#9bd18a","#5fe0f0","#7fe0a0"]},
+    {
+      "id": "accent",
+      "label": "Sparkles and frost tips",
+      "default": "#4fd8ee",
+      "material": "interface",
+      "swatches": ["#4fd8ee","#c9423a","#a4c44a","#b48af8","#f4e06a"]
+    }
+  ],
+  "controls": [
+    {
+      "key": "style",
+      "kind": "choice",
+      "label": "Style",
+      "options": [{"value":"ice","label":"Ice"},{"value":"rime","label":"Rime"},{"value":"shard","label":"Shard"}],
+      "default": "ice",
+      "group": "Look"
+    },
+    {"key":"corner","kind":"range","label":"Corner","lo":"Square","hi":"Round","default":0.5,"group":"Look"},
+    {"key":"border","kind":"range","label":"Border","lo":"Thin","hi":"Thick","default":0.5,"group":"Look"},
+    {"key":"glints","kind":"toggle","label":"Glints","default":true,"group":"Look"},
+    {"key":"face","kind":"colour","label":"Stone","group":"Colors"},
+    {"key":"frame","kind":"colour","label":"Crystal","group":"Colors"},
+    {"key":"accent","kind":"colour","label":"Sparkles and frost tips","group":"Colors","when":[{"glints":[true]},{"style":["rime"]}]}
+  ],
+  "versions": [
+    {"name":"Ice","params":{}},
+    {"name":"Frost","params":{"style":"rime","accent":"#c9423a","face":"#434d6d","frame":"#7fe0a0","border":1}},
+    {"name":"Shard","params":{"style":"shard","frame":"#5fe0f0","border":1,"face":"#7a4f33","corner":0}},
+    {"name":"Garnet","params":{"face":"#8e3a4a","frame":"#7fe0a0","glints":false}},
+    {"name":"Jade","params":{"frame":"#9bd18a","accent":"#a4c44a","corner":1,"face":"#7a4f33"}}
+  ],
+  "body": {
+    "panel": {
+      "skin": {"use":"skin:crystal","v":2,"paint":{"face":"face","frame":"frame","accent":"accent"}},
+      "piece": {
+        "gen": "ui.slab",
+        "v": 1,
+        "clip": ["panel"],
+        "at": [1,1],
+        "size": [94,62],
+        "style": {"from":"style"},
+        "corner": {"from":"corner","map":[[0,0],[1,4]]},
+        "border": {"from":"border","map":[[0,1],[1,3]]},
+        "gleam": {"from":"glints"}
+      },
+      "states": ["panel","panel-title","inset","tooltip"],
+      "draw": [
+        {
+          "gen": "ui.slab",
+          "v": 1,
+          "clip": ["panel-title"],
+          "role": "title",
+          "at": [1,1],
+          "size": [94,62],
+          "style": {"from":"style"},
+          "corner": {"from":"corner","map":[[0,0],[1,4]]},
+          "border": {"from":"border","map":[[0,1],[1,3]]},
+          "gleam": {"from":"glints"}
+        },
+        {
+          "gen": "ui.slab",
+          "v": 1,
+          "clip": ["inset"],
+          "role": "inset",
+          "at": [1,1],
+          "size": [94,62],
+          "style": {"from":"style"},
+          "corner": {"from":"corner","map":[[0,0],[1,4]]},
+          "border": {"from":"border","map":[[0,1],[1,3]]},
+          "gleam": {"from":"glints"}
+        },
+        {
+          "gen": "ui.slab",
+          "v": 1,
+          "clip": ["tooltip"],
+          "role": "tooltip",
+          "at": [1,1],
+          "size": [94,40],
+          "style": {"from":"style"},
+          "corner": {"from":"corner","map":[[0,0],[1,4]]},
+          "border": {"from":"border","map":[[0,1],[1,3]]},
+          "gleam": {"from":"glints"}
+        }
+      ]
+    }
+  },
+  "clips": {
+    "panel": {"frames":1,"fps":8,"label":"Plain panel"},
+    "panel-title": {"frames":1,"fps":8,"label":"With heading"},
+    "inset": {"frames":1,"fps":8,"label":"List well"},
+    "tooltip": {"frames":1,"fps":8,"label":"Tooltip with a tail"}
+  }
+}

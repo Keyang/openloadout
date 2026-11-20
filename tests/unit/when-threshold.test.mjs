@@ -5,15 +5,15 @@
 //   - engine/resolve.js whenHolds / splitWhen (shapes, stamps, generator calls, band rules, outside rules, layer
 //     items, a piece's args), so an item below its threshold is dropped from the frame;
 //   - catalog/sprite-schema.js checkWhen: a threshold names a slider (or a number arg of a piece), its bounds inside the
-//     slider's range, with at most one lower and one upper bound, and it must be able to hold; it is refused on a
-//     control's own `when` and on a sound cue's (the site reads those through engine/sprite.js, which takes values only).
+//     slider's range, with at most one lower and one upper bound, and it must be able to hold;
+//   - engine/sprite.js inEffect, cueInEffect and cleanWhen (build item F3): a control's own `when` and a sound cue's.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { whenMatches, whenValueHolds, WHEN_BOUNDS } from '../../engine/data-rules.js';
 import { whenHolds, resolvePalette } from '../../engine/resolve.js';
 import { validateSprite, checkMaterialPiece } from '../../catalog/sprite-schema.js';
 import { dataSprite } from '../../engine/data-sprite.js';
-import { renderFrame } from '../../engine/sprite.js';
+import { renderFrame, defineSprite, range, toggle, choice, inEffect, cueInEffect, activeParams, defaultParams } from '../../engine/sprite.js';
 
 const SOIL = '#7a5236', GRASS = '#5aa040';
 const WEAR = { key: 'wear', kind: 'range', label: 'Wear', lo: 'New', hi: 'Worn', default: 0.35 };
@@ -141,15 +141,25 @@ test('the validator refuses a threshold that names no slider, reaches outside it
   assert.match(bad({ wear: [{ atLeast: '0.5' }] }), /atLeast.*number/);
 });
 
-test('a threshold is refused on a control\'s own when and on a sound cue\'s (the site reads those as values)', () => {
+// build item F3: engine/sprite.js reads these with whenValueHolds, so the validator no longer refuses them
+test('a threshold may stand in a control\'s own when and in a sound cue\'s, as on any other when', () => {
   const d = withFill([]);
   d.controls = [WEAR, EDGE, { ...DAMP, when: { wear: [{ atLeast: 0.5 }] } }];
-  assert.match(errorsOf(d), /Control "damp".*threshold.*control's when/s);
+  assert.deepEqual(validateSprite(d).errors, []);
+  assert.deepEqual(validateSprite(d).value.controls.find((c) => c.key === 'damp').when, { wear: [{ atLeast: 0.5 }] }, 'kept as written');
+  // still checked as a threshold: on a slider, inside its range, able to hold
+  const onToggle = withFill([]);
+  onToggle.controls = [WEAR, { ...EDGE, when: { damp: [{ atLeast: 0.5 }] } }, DAMP];
+  assert.match(errorsOf(onToggle), /Control "edge".*threshold is for a slider/s);
+  const outside = withFill([]);
+  outside.controls = [WEAR, EDGE, { ...DAMP, when: { edge: [{ atLeast: 12 }] } }];
+  assert.match(errorsOf(outside), /Control "damp".*outside its range/s);
   const plainValue = withFill([]);
   plainValue.controls = [WEAR, EDGE, { ...DAMP, when: { wear: [0.35, 1] } }];
   assert.deepEqual(validateSprite(plainValue).errors, [], 'values are fine there');
   const cue = (when) => { const x = withFill([]); x.clips = { 'g-fill': { frames: 1, sounds: [{ sound: 'coin-pickup', frame: 0, when }] } }; return x; };
-  assert.match(errorsOf(cue({ wear: [{ atLeast: 0.5 }] })), /threshold.*sound's when/s);
+  assert.deepEqual(validateSprite(cue({ wear: [{ atLeast: 0.5 }] })).errors, [], 'a sound cue\'s when with a threshold passes');
+  assert.match(errorsOf(cue({ wear: [{ atLeast: 0.5, above: 0.6 }] })), /one lower bound/);
   assert.deepEqual(validateSprite(cue({ wear: [1] })).errors, [], 'a sound cue\'s when with values passes');
 });
 
@@ -215,5 +225,107 @@ test('emitters on together only past a strict bound, or between two named number
   assert.equal(budget(two({ size: [{ above: 0.2 }] }, { size: [{ atMost: 0.2 }] })).length, 0, 'above 0.2 and at most 0.2 never meet');
 });
 
-// review B15b issue 3: the follow-up has an owner here until it is done
-test('engine/sprite.js reads a threshold in a control\'s own when and a sound cue\'s when', { todo: 'owner of engine/sprite.js: inEffect, cueInEffect and cleanWhen read entries with engine/data-rules.js whenValueHolds; then catalog/sprite-schema.js checkWhen lifts its refusal (the "cannot stand in a control\'s when or a sound\'s when" error)' }, () => {});
+// review B15b issue 3, done in build item F3: inEffect, cueInEffect and cleanWhen read entries with whenValueHolds
+test('engine/sprite.js reads a threshold in a control\'s own when and a sound cue\'s when', () => {
+  // a data sprite: damp shows at wear >= 0.5; the sound plays at wear 0 or above 0.8
+  const d = withFill([]);
+  d.controls = [WEAR, EDGE, { ...DAMP, when: { wear: [{ atLeast: 0.5 }] } }];
+  d.clips = { 'g-fill': { frames: 1, sounds: [{ sound: 'coin-pickup', frame: 0, when: { wear: [0, { above: 0.8 }] } }] } };
+  const s = dataSprite(d);
+  const at = (wear) => ({ ...defaultParams(s), wear });
+  assert.equal(inEffect(s, 'damp', at(0.35)), false, 'below the threshold: hidden');
+  assert.equal(inEffect(s, 'damp', at(0.5)), true, 'at it');
+  assert.equal(inEffect(s, 'damp', at(0.9)), true, 'past it');
+  assert.equal(activeParams(s, at(0.2)).includes('damp'), false);
+  assert.equal(activeParams(s, at(0.7)).includes('damp'), true);
+  const cue = s.sounds['g-fill'][0];
+  assert.deepEqual(cue.when, { wear: [0, { above: 0.8 }] });
+  assert.deepEqual([0, 0.5, 0.8, 0.81, 1].map((w) => cueInEffect(s, cue, at(w))), [true, false, false, true, true]);
+  assert.equal(cueInEffect(s, { sound: 'x', frame: 0, when: [{ wear: [{ below: 0.1 }] }, { edge: [{ atLeast: 8 }] }] }, { ...at(0.5), edge: 9 }), true, 'alternatives: any one enough');
+
+  // a code sprite (defineSprite) reads them the same way, and a control hidden by a threshold cannot switch another on
+  const code = (moss, extra = {}) => defineSprite({
+    id: 'test-moss', name: 'Test moss', size: [8, 8], pivot: [4, 7],
+    params: { wear: range('Wear', 0.2), moss: toggle('Moss', true, { when: moss }), tuft: choice('Tuft', 'a', ['a', 'b'], { when: { moss: [true] } }) },
+    clips: { idle: { frames: 2, fps: 4 } }, sounds: { idle: [{ sound: 'x', frame: 0, when: { wear: [{ above: 0.25, atMost: 0.75 }] } }] },
+    render() {}, ...extra,
+  });
+  const m = code({ wear: [{ atLeast: 0.5 }] });
+  assert.deepEqual(m.params.moss.when, { wear: [{ atLeast: 0.5 }] });
+  assert.equal(inEffect(m, 'tuft', { wear: 0.3, moss: true, tuft: 'a' }), false, 'moss is below its threshold, so it cannot show tuft');
+  assert.equal(inEffect(m, 'tuft', { wear: 0.6, moss: true, tuft: 'a' }), true);
+  assert.deepEqual([0.25, 0.5, 0.75, 0.8].map((w) => cueInEffect(m, m.sounds.idle[0], { wear: w })), [false, true, true, false]);
+  // a threshold is checked as engine/sprite.js defines the sprite: for a slider, known words, numbers in its range, able to hold
+  assert.throws(() => code({ tuft: [{ atLeast: 0.5 }] }), /threshold.*slider/);
+  assert.throws(() => code({ wear: [{ least: 0.5 }] }), /atLeast, above, atMost or below/);
+  assert.throws(() => code({ wear: [{}] }), /atLeast, above, atMost or below/);
+  assert.throws(() => code({ wear: [{ atLeast: '0.5' }] }), /number/);
+  assert.throws(() => code({ wear: [{ atLeast: 2 }] }), /outside/);
+  assert.throws(() => code({ wear: [{ above: 0.6, below: 0.4 }] }), /can never hold/);
+  assert.throws(() => code({ wear: [{ atLeast: 0.5, above: 0.6 }] }), /one lower bound/);
+  assert.throws(() => code({ wear: [0.5] }, { sounds: { idle: [{ sound: 'x', frame: 0, when: { wear: [{ atMost: -1 }] } }] } }), /sound x on clip idle.*outside/);
+});
+
+// F3 review fix: one checker for a threshold (engine/sprite.js thresholdProblem), used by the validator and by
+// defineSprite, so their rules cannot drift apart; and a number that meets a threshold (whenEntryValue), which the
+// quality bar uses to build a setting where a control limited to a band of a slider is in effect.
+test('thresholdProblem is the one check of a threshold: the validator and defineSprite report the same words', async () => {
+  const { thresholdProblem } = await import('../../engine/sprite.js');
+  const slider = { kind: 'range', min: 0, max: 1, step: 0.01 };
+  assert.equal(thresholdProblem({ atLeast: 0.4, atMost: 0.6 }, slider, 'wear'), '');
+  assert.equal(thresholdProblem({ above: 0.99 }, slider, 'wear'), '');
+  const cases = [
+    [{ atLeast: 0.5 }, { kind: 'toggle' }, /threshold.*"damp".*slider/s, 'damp'],
+    [{}, slider, /atLeast, above, atMost or below/],
+    [{ least: 0.5 }, slider, /atLeast, above, atMost or below.*"least" is not one/s],
+    [{ atLeast: '0.5' }, slider, /atLeast.*number/],
+    [{ atLeast: 1.5 }, slider, /atLeast 1\.5.*"wear".*0 to 1/s],
+    [{ atLeast: 0.2, above: 0.3 }, slider, /one lower bound/],
+    [{ atMost: 0.2, below: 0.3 }, slider, /one upper bound/],
+    [{ atLeast: 0.8, below: 0.5 }, slider, /can never hold/],
+    [{ above: 1 }, slider, /can never hold/],
+  ];
+  for (const [x, d, re, key = 'wear'] of cases) {
+    const said = thresholdProblem(x, d, key);
+    assert.match(said, re, JSON.stringify(x));
+    // the validator says the same words (in a shape's when, after its place)
+    const withD = d.kind === 'range' ? { wear: [x] } : { damp: [x] };
+    assert.ok(errorsOf(withFill([crack(withD)])).includes(said), `validator: ${said}`);
+    // and so does defineSprite, for a control's own when
+    const params = { wear: range('Wear', 0.2), damp: toggle('Damp', false), moss: toggle('Moss', true, { when: withD }) };
+    assert.throws(() => defineSprite({ id: 'test-t', name: 'T', size: [8, 8], pivot: [4, 7], params, clips: { idle: { frames: 1, fps: 4 } }, render() {} }),
+      (e) => e.message.includes(said), `defineSprite: ${said}`);
+  }
+});
+
+test('whenEntryValue gives a setting that meets a when entry: a value as it is, a threshold at the middle of its bounds on the slider\'s step', async () => {
+  const { whenEntryValue } = await import('../../engine/sprite.js');
+  const wear = range('Wear', 0.2), edge = range('Edge', 5, { min: 3, max: 9, step: 1 });
+  assert.equal(whenEntryValue(0.5, wear), 0.5);
+  assert.equal(whenEntryValue('a', choice('Tuft', 'a', ['a', 'b'])), 'a');
+  assert.equal(whenEntryValue({ atLeast: 0.4, atMost: 0.6 }, wear), 0.5);
+  assert.equal(whenEntryValue({ above: 5, below: 7 }, edge), 6);
+  assert.equal(whenEntryValue({ atLeast: 4, below: 5 }, edge), 4, 'on the step when one fits');
+  for (const [x, d] of [[{ above: 0.6 }, wear], [{ below: 0.1 }, wear], [{ atLeast: 1 }, wear], [{ above: 0.4, below: 0.41 }, wear], [{ atMost: 3 }, edge], [{ above: 8 }, edge], [{ above: 5.2, below: 5.8 }, edge]]) {
+    const v = whenEntryValue(x, d);
+    assert.ok(whenValueHolds(x, v) && v >= d.min && v <= d.max, `${JSON.stringify(x)} -> ${v}`);
+  }
+});
+
+test('the quality bar finds where a control limited to a band of a slider applies (a two-sided threshold in its when)', async () => {
+  const { checkSprite } = await import('../../quality/sprite.js');
+  const mk = (when) => defineSprite({
+    id: 'test-moss', name: 'Test moss', blurb: 'A test.', size: [16, 16], pivot: [8, 15],
+    params: { wear: range('Wear', 0.2), moss: toggle('Moss', true, { when }) },
+    clips: { idle: { frames: 1, fps: 4 } },
+    render(g, { p }) {
+      g.rect(2, 2 + Math.round(p.wear * 10), 12, 3, '#7a5236');
+      if (p.wear >= 0.4 && p.wear <= 0.6 && p.moss) g.rect(2, 10, 12, 4, '#5aa040');
+    },
+  });
+  const mossSays = (r) => [...(r.errors ?? []), ...(r.warnings ?? [])].filter((e) => /moss/i.test(e));
+  const byValue = checkSprite(mk({ wear: [0.5] }));
+  const byBand = checkSprite(mk({ wear: [{ atLeast: 0.4, atMost: 0.6 }] }));
+  assert.deepEqual((byBand.errors ?? []).filter((e) => /moss/i.test(e)), [], 'no "can never apply" error');
+  assert.deepEqual(mossSays(byBand).map((e) => e.replace(/wear=[\d.]+/g, 'wear=x')), mossSays(byValue).map((e) => e.replace(/wear=[\d.]+/g, 'wear=x')), 'says what it says for the plain value');
+});

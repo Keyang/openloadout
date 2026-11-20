@@ -1,0 +1,511 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "boulder",
+ "name": "Boulder",
+ "blurb": "A boulder that blocks the way until it is smashed to rubble. Make it round, a slab or a cluster, mossy or bare, cracked or whole, and change its size and colours.",
+ "meta": {
+  "type": "prop",
+  "role": "world/prop",
+  "themes": [
+   "fantasy"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "top-down-rpg"
+  ],
+  "view": "top-down",
+  "words": [
+   "boulder",
+   "rock",
+   "stone",
+   "obstacle",
+   "rubble",
+   "block",
+   "break",
+   "smash",
+   "hit",
+   "blocked path",
+   "mossy",
+   "heavy"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  48,
+  48
+ ],
+ "pivot": [
+  24,
+  44
+ ],
+ "preview": "idle",
+ "styles": [
+  "pixel"
+ ],
+ "palette": [
+  {
+   "id": "stone",
+   "label": "Stone",
+   "default": "#a8a4a0",
+   "material": "stone",
+   "swatches": [
+    "#a8a4a0",
+    "#5a5f7a",
+    "#7e84a0",
+    "#f0ead8",
+    "#c9a06a",
+    "#6b7280",
+    "#8f97a8"
+   ]
+  },
+  {
+   "id": "accent",
+   "label": "Moss",
+   "default": "#4f9d57",
+   "material": "plant",
+   "swatches": [
+    "#4f9d57",
+    "#7fbf5a",
+    "#357a4c",
+    "#e6c96a",
+    "#c8553a"
+   ]
+  },
+  {
+   "id": "shine",
+   "default": "#ffffff",
+   "material": "light",
+   "detail": true
+  }
+ ],
+ "controls": [
+  {
+   "key": "size",
+   "kind": "range",
+   "label": "Size",
+   "lo": "Small",
+   "hi": "Big",
+   "default": 0.5
+  },
+  {
+   "key": "shape",
+   "kind": "choice",
+   "label": "Shape",
+   "options": [
+    "round",
+    "slab",
+    "cluster"
+   ],
+   "default": "round"
+  },
+  {
+   "key": "mossy",
+   "kind": "toggle",
+   "label": "Mossy",
+   "default": true
+  },
+  {
+   "key": "wear",
+   "kind": "range",
+   "label": "Wear",
+   "lo": "New",
+   "hi": "Worn",
+   "default": 0.5
+  },
+  {
+   "key": "pieces",
+   "kind": "range",
+   "label": "Pieces",
+   "lo": "Few",
+   "hi": "Many",
+   "default": 0.5
+  },
+  {
+   "key": "stone",
+   "kind": "colour",
+   "label": "Stone"
+  },
+  {
+   "key": "accent",
+   "kind": "colour",
+   "label": "Moss",
+   "when": {
+    "mossy": [
+     true
+    ]
+   }
+  },
+  {
+   "key": "speed",
+   "standard": "speed"
+  }
+ ],
+ "body": {
+  "pictures": {
+   "nodes": [],
+   "draw": [
+    {
+     "id": "boulder",
+     "gen": "boulder",
+     "v": 1,
+     "at": [
+      24,
+      44
+     ],
+     "shape": {
+      "from": "shape",
+      "pick": {
+       "round": "round",
+       "slab": "slab",
+       "cluster": "cluster"
+      }
+     },
+     "size": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "mossy": {
+      "from": "mossy",
+      "pick": {
+       "true": true,
+       "false": false
+      }
+     },
+     "wear": {
+      "from": "wear",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "pieces": {
+      "from": "pieces",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "stone": "stone",
+     "moss": "accent",
+     "shine": "shine",
+     "clip": [
+      "idle"
+     ]
+    },
+    {
+     "id": "boulder-hurt",
+     "gen": "boulder",
+     "v": 1,
+     "at": [
+      24,
+      44
+     ],
+     "shape": {
+      "from": "shape",
+      "pick": {
+       "round": "round",
+       "slab": "slab",
+       "cluster": "cluster"
+      }
+     },
+     "size": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "mossy": {
+      "from": "mossy",
+      "pick": {
+       "true": true,
+       "false": false
+      }
+     },
+     "wear": {
+      "from": "wear",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "pieces": {
+      "from": "pieces",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "stone": "stone",
+     "moss": "accent",
+     "shine": "shine",
+     "clip": [
+      "hurt"
+     ],
+     "squash": [
+      1,
+      -1,
+      1,
+      0
+     ],
+     "shift": [
+      1,
+      -1,
+      0,
+      0
+     ]
+    },
+    {
+     "kind": "outline",
+     "paint": "ink"
+    },
+    {
+     "id": "boulder-break",
+     "gen": "boulder",
+     "v": 1,
+     "at": [
+      24,
+      44
+     ],
+     "shape": {
+      "from": "shape",
+      "pick": {
+       "round": "round",
+       "slab": "slab",
+       "cluster": "cluster"
+      }
+     },
+     "size": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "mossy": {
+      "from": "mossy",
+      "pick": {
+       "true": true,
+       "false": false
+      }
+     },
+     "wear": {
+      "from": "wear",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "pieces": {
+      "from": "pieces",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "stone": "stone",
+     "moss": "accent",
+     "shine": "shine",
+     "clip": [
+      "break"
+     ],
+     "burst": [
+      0,
+      0.14285714285714285,
+      0.2857142857142857,
+      0.42857142857142855,
+      0.5714285714285714,
+      0.7142857142857143,
+      0.8571428571428571,
+      1
+     ]
+    },
+    {
+     "id": "dust",
+     "gen": "boulder",
+     "v": 1,
+     "at": [
+      24,
+      44
+     ],
+     "shape": {
+      "from": "shape",
+      "pick": {
+       "round": "round",
+       "slab": "slab",
+       "cluster": "cluster"
+      }
+     },
+     "size": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "mossy": {
+      "from": "mossy",
+      "pick": {
+       "true": true,
+       "false": false
+      }
+     },
+     "wear": {
+      "from": "wear",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "pieces": {
+      "from": "pieces",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "stone": "stone",
+     "moss": "accent",
+     "shine": "shine",
+     "clip": [
+      "break"
+     ],
+     "burst": [
+      0,
+      0.14285714285714285,
+      0.2857142857142857,
+      0.42857142857142855,
+      0.5714285714285714,
+      0.7142857142857143,
+      0.8571428571428571,
+      1
+     ],
+     "dust": [
+      -1,
+      0,
+      0.16666666666666666,
+      0.3333333333333333,
+      0.5,
+      0.6666666666666666,
+      0.8333333333333334,
+      1
+     ],
+     "layer": "light"
+    }
+   ]
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 1,
+   "fps": 8
+  },
+  "hurt": {
+   "frames": 4,
+   "fps": 9,
+   "loop": false,
+   "frameEdits": {
+    "0": {
+     "flash": true
+    }
+   },
+   "sounds": [
+    {
+     "sound": "punch",
+     "preset": "Light jab",
+     "frame": 0,
+     "volume": 0.9
+    }
+   ]
+  },
+  "break": {
+   "frames": 8,
+   "fps": 12,
+   "loop": false,
+   "sounds": [
+    {
+     "sound": "stone-door",
+     "preset": "Secret wall",
+     "frame": 0,
+     "volume": 0.7
+    }
+   ]
+  }
+ }
+}

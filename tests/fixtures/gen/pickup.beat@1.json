@@ -1,0 +1,527 @@
+{
+ "id": "pickup.beat",
+ "v": 1,
+ "family": "motion",
+ "cases": [
+  {
+   "args": {},
+   "ctx": {
+    "t": 0,
+    "loop": true
+   },
+   "moves": [
+    {
+     "move": [
+      0,
+      0
+     ],
+     "scale": 1
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 0.25,
+    "loop": true
+   },
+   "moves": [
+    {
+     "move": [
+      0,
+      0
+     ],
+     "scale": 1.06
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 0.5,
+    "loop": true
+   },
+   "moves": [
+    {
+     "move": [
+      0,
+      0
+     ],
+     "scale": 1.0525
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 0.75,
+    "loop": true
+   },
+   "moves": [
+    {
+     "move": [
+      0,
+      0
+     ],
+     "scale": 1
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 1,
+    "loop": true
+   },
+   "moves": [
+    {
+     "move": [
+      0,
+      0
+     ],
+     "scale": 1
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 0,
+    "loop": false
+   },
+   "moves": [
+    {
+     "move": [
+      0,
+      0
+     ],
+     "scale": 1
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 0.25,
+    "loop": false
+   },
+   "moves": [
+    {
+     "move": [
+      0,
+      0
+     ],
+     "scale": 1.06
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 0.5,
+    "loop": false
+   },
+   "moves": [
+    {
+     "move": [
+      0,
+      0
+     ],
+     "scale": 1.0525
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 0.75,
+    "loop": false
+   },
+   "moves": [
+    {
+     "move": [
+      0,
+      0
+     ],
+     "scale": 1
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 1,
+    "loop": false
+   },
+   "moves": [
+    {
+     "move": [
+      0,
+      0
+     ],
+     "scale": 1
+    }
+   ]
+  },
+  {
+   "args": {
+    "amount": 0
+   },
+   "ctx": {
+    "t": 0,
+    "loop": true
+   },
+   "moves": [
+    {
+     "move": [
+      0,
+      0
+     ],
+     "scale": 1
+    }
+   ]
+  },
+  {
+   "args": {
+    "amount": 0
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true
+   },
+   "moves": [
+    {
+     "move": [
+      0,
+      0
+     ],
+     "scale": 1
+    }
+   ]
+  },
+  {
+   "args": {
+    "amount": 0
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": true
+   },
+   "moves": [
+    {
+     "move": [
+      0,
+      0
+     ],
+     "scale": 1
+    }
+   ]
+  },
+  {
+   "args": {
+    "amount": 0
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": true
+   },
+   "moves": [
+    {
+     "move": [
+      0,
+      0
+     ],
+     "scale": 1
+    }
+   ]
+  },
+  {
+   "args": {
+    "amount": 0
+   },
+   "ctx": {
+    "t": 1,
+    "loop": true
+   },
+   "moves": [
+    {
+     "move": [
+      0,
+      0
+     ],
+     "scale": 1
+    }
+   ]
+  },
+  {
+   "args": {
+    "amount": 0
+   },
+   "ctx": {
+    "t": 0,
+    "loop": false
+   },
+   "moves": [
+    {
+     "move": [
+      0,
+      0
+     ],
+     "scale": 1
+    }
+   ]
+  },
+  {
+   "args": {
+    "amount": 0
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": false
+   },
+   "moves": [
+    {
+     "move": [
+      0,
+      0
+     ],
+     "scale": 1
+    }
+   ]
+  },
+  {
+   "args": {
+    "amount": 0
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": false
+   },
+   "moves": [
+    {
+     "move": [
+      0,
+      0
+     ],
+     "scale": 1
+    }
+   ]
+  },
+  {
+   "args": {
+    "amount": 0
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": false
+   },
+   "moves": [
+    {
+     "move": [
+      0,
+      0
+     ],
+     "scale": 1
+    }
+   ]
+  },
+  {
+   "args": {
+    "amount": 0
+   },
+   "ctx": {
+    "t": 1,
+    "loop": false
+   },
+   "moves": [
+    {
+     "move": [
+      0,
+      0
+     ],
+     "scale": 1
+    }
+   ]
+  },
+  {
+   "args": {
+    "amount": 1
+   },
+   "ctx": {
+    "t": 0,
+    "loop": true
+   },
+   "moves": [
+    {
+     "move": [
+      0,
+      0
+     ],
+     "scale": 1
+    }
+   ]
+  },
+  {
+   "args": {
+    "amount": 1
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true
+   },
+   "moves": [
+    {
+     "move": [
+      0,
+      0
+     ],
+     "scale": 1.4
+    }
+   ]
+  },
+  {
+   "args": {
+    "amount": 1
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": true
+   },
+   "moves": [
+    {
+     "move": [
+      0,
+      0
+     ],
+     "scale": 1.35
+    }
+   ]
+  },
+  {
+   "args": {
+    "amount": 1
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": true
+   },
+   "moves": [
+    {
+     "move": [
+      0,
+      0
+     ],
+     "scale": 1
+    }
+   ]
+  },
+  {
+   "args": {
+    "amount": 1
+   },
+   "ctx": {
+    "t": 1,
+    "loop": true
+   },
+   "moves": [
+    {
+     "move": [
+      0,
+      0
+     ],
+     "scale": 1
+    }
+   ]
+  },
+  {
+   "args": {
+    "amount": 1
+   },
+   "ctx": {
+    "t": 0,
+    "loop": false
+   },
+   "moves": [
+    {
+     "move": [
+      0,
+      0
+     ],
+     "scale": 1
+    }
+   ]
+  },
+  {
+   "args": {
+    "amount": 1
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": false
+   },
+   "moves": [
+    {
+     "move": [
+      0,
+      0
+     ],
+     "scale": 1.4
+    }
+   ]
+  },
+  {
+   "args": {
+    "amount": 1
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": false
+   },
+   "moves": [
+    {
+     "move": [
+      0,
+      0
+     ],
+     "scale": 1.35
+    }
+   ]
+  },
+  {
+   "args": {
+    "amount": 1
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": false
+   },
+   "moves": [
+    {
+     "move": [
+      0,
+      0
+     ],
+     "scale": 1
+    }
+   ]
+  },
+  {
+   "args": {
+    "amount": 1
+   },
+   "ctx": {
+    "t": 1,
+    "loop": false
+   },
+   "moves": [
+    {
+     "move": [
+      0,
+      0
+     ],
+     "scale": 1
+    }
+   ]
+  }
+ ]
+}

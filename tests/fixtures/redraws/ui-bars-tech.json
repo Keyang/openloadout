@@ -1,0 +1,207 @@
+{
+ "id": "ui-bars-tech",
+ "frozen": "2026-11-20",
+ "source": "sprites/ui-bars-tech.js",
+ "sha256": "dca20211c8c4c8db7d839cbfd830da4a6719bd1a70babef3d09b98bae7221ad5",
+ "name": "Tech bars",
+ "blurb": "An angular bar housing with three fill strips (health, shield, experience) and a white flash; change its style, cut corners, border, tick marks and colours.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/bar",
+  "themes": [
+   "sci-fi",
+   "neutral"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "shooter",
+   "arcade"
+  ],
+  "view": "none",
+  "words": [
+   "bar",
+   "health",
+   "shield",
+   "experience",
+   "xp",
+   "energy",
+   "gauge",
+   "meter",
+   "hud",
+   "boss",
+   "fill",
+   "drain",
+   "flash",
+   "segmented"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  64,
+  16
+ ],
+ "pivot": [
+  32,
+  8
+ ],
+ "grounded": false,
+ "preview": "frame",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "solid",
+   "options": [
+    {
+     "value": "solid",
+     "label": "Solid"
+    },
+    {
+     "value": "segmented",
+     "label": "Segmented"
+    },
+    {
+     "value": "slanted",
+     "label": "Slanted"
+    }
+   ],
+   "group": "Look"
+  },
+  "corner": {
+   "kind": "range",
+   "label": "Corner",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Square",
+   "hi": "Cut",
+   "group": "Look"
+  },
+  "border": {
+   "kind": "range",
+   "label": "Border",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Thin",
+   "hi": "Thick",
+   "group": "Look"
+  },
+  "ticks": {
+   "kind": "toggle",
+   "label": "Tick marks",
+   "def": false,
+   "group": "Look"
+  },
+  "frame": {
+   "kind": "color",
+   "label": "Frame",
+   "def": "#6b7896",
+   "swatches": [
+    "#6b7896",
+    "#2fb3a8",
+    "#5fe0f0",
+    "#9aa6c0",
+    "#c2c9d6",
+    "#f2a030"
+   ],
+   "group": "Colors"
+  },
+  "fill": {
+   "kind": "color",
+   "label": "Health",
+   "def": "#5fd47a",
+   "swatches": [
+    "#5fd47a",
+    "#9fe040",
+    "#e2473f",
+    "#f2a030",
+    "#2fb3a8",
+    "#f0ead8"
+   ],
+   "group": "Colors"
+  },
+  "fillB": {
+   "kind": "color",
+   "label": "Shield",
+   "def": "#4f9ff0",
+   "swatches": [
+    "#4f9ff0",
+    "#5fe0f0",
+    "#3f6fd1",
+    "#2fb3a8",
+    "#c2c9d6",
+    "#b48af8"
+   ],
+   "group": "Colors"
+  },
+  "fillC": {
+   "kind": "color",
+   "label": "Experience",
+   "def": "#b48af8",
+   "swatches": [
+    "#b48af8",
+    "#f2c230",
+    "#5fe0f0",
+    "#b04a8a",
+    "#f2a030",
+    "#e8ecf2"
+   ],
+   "group": "Colors"
+  }
+ },
+ "clips": {
+  "frame": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "fill": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "fill-b": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "fill-c": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "flash": {
+   "frames": 4,
+   "loop": false,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [],
+ "bundles": [
+  "kit-roguelite-scifi"
+ ]
+}

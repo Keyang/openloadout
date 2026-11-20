@@ -1,0 +1,182 @@
+{
+ "id": "icons-key-items",
+ "frozen": "2026-11-20",
+ "source": "sprites/icons-key-items.js",
+ "sha256": "cd53701afd0b8ec8aea9f31f240d4ab57ade1d424084574cc6be90b79574de7e",
+ "name": "Key item icons",
+ "blurb": "Six story-item icons: a key, a rolled map, a sealed letter, a crystal shard, a coin pouch and a lantern; change their size, tilt, shading, shine and colours.",
+ "meta": {
+  "type": "icon",
+  "role": "items/key",
+  "themes": [
+   "fantasy"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "top-down-rpg",
+   "roguelike-action"
+  ],
+  "view": "none",
+  "words": [
+   "key",
+   "map",
+   "scroll",
+   "letter",
+   "envelope",
+   "crystal",
+   "shard",
+   "pouch",
+   "purse",
+   "lantern",
+   "quest",
+   "story",
+   "inventory",
+   "unlock"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "key",
+ "params": {
+  "shade": {
+   "kind": "toggle",
+   "label": "Extra shading",
+   "def": true,
+   "group": "Look"
+  },
+  "shine": {
+   "kind": "toggle",
+   "label": "Shine",
+   "def": true,
+   "group": "Look"
+  },
+  "tilt": {
+   "kind": "toggle",
+   "label": "Tilt",
+   "def": true,
+   "group": "Look"
+  },
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "metal": {
+   "kind": "color",
+   "label": "Metal",
+   "def": "#f2c230",
+   "swatches": [
+    "#f2c230",
+    "#c2c9d6",
+    "#a8a4a0",
+    "#a8806a",
+    "#8f97a8",
+    "#e6c545",
+    "#c98a4a"
+   ],
+   "group": "Colors"
+  },
+  "paper": {
+   "kind": "color",
+   "label": "Paper",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#e6c96a",
+    "#f6d3b0",
+    "#c9a06a",
+    "#a8c8d8",
+    "#a8a4a0"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Crystal and seal",
+   "def": "#4fd8ee",
+   "swatches": [
+    "#4fd8ee",
+    "#c9423a",
+    "#7fe0a0",
+    "#7a4fc4",
+    "#f2c230"
+   ],
+   "group": "Colors"
+  }
+ },
+ "clips": {
+  "key": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "map": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "letter": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "crystal-shard": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "coin-pouch": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "lantern": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [],
+ "bundles": [
+  "kit-rpg-fantasy"
+ ]
+}

@@ -1,0 +1,619 @@
+{
+ "id": "door.dungeon",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "gen": "door.dungeon",
+    "v": 1,
+    "at": [
+     16,
+     46
+    ],
+    "leaf": "leaf",
+    "metal": "metal",
+    "stone": "stone",
+    "inner": "glow",
+    "hole": "hole",
+    "inkTone": "ink-tone",
+    "shine": "shine"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      2,
+      4
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..........aaaaaaaa..........",
+      ".......aabcbaaaababaa.......",
+      ".....acccbbbaaaabbbcaaa.....",
+      "...accccccbbaaaabbccccaaa...",
+      "..bcccccccddddddddccccccab..",
+      ".ecbbccdddffffffffdddccbbaa.",
+      ".eccbddfffgggghiiifffddbcca.",
+      "eeccdffiihgggghiiiihgffdccaa",
+      "eecdfiiiihgggghiiiihgggfdcca",
+      "eecdiiiiihgggghiiiihggggdcca",
+      "eecdiiiiihgggghiiiihggggdcca",
+      "eecdiiiiihgggghiiiihggggdcca",
+      "eecdiiiiihgggghiiiihggggdcca",
+      "eecdiiiiihgggghiiiihggggdcca",
+      "eecdiiiiihgggghiiiihggggdbba",
+      "eecdiiiiihgggghiiiihggggdcca",
+      "eecdiiiiihgggghiiiihggggdcca",
+      "ebbdjkkkkkkkkkkkkkkkkkkkdcca",
+      "eecdjljllljllljllljllljkdcca",
+      "eecdjjjjjjjjjjjjjjjjjjjjdcca",
+      "eecdffffffffffffffffffffdcca",
+      "ebbdiiiiihgggghiiiihggggdcca",
+      "eecdiiiiihgggghiiiihggggdcca",
+      "eecdiihiihgggghiiiihgghgdcca",
+      "eecdiihiihgggghiiiihgghgdbba",
+      "eecdiihiihgggghiidddddhgdcca",
+      "eecdiihiihgggghidjkkkkdgdcca",
+      "eecdiiiiihgghghidjfffkdgdcca",
+      "eecdiiiiihgghghidjfffkdgdbba",
+      "eecdiiiiihgghghidjlflkdgdcca",
+      "eecdiiiiihgghghidjlflkdgdcca",
+      "ebbdiiiiihgggghidjjjjjdgdcca"
+     ],
+     "key": {
+      "a": "stone.light",
+      "b": "stone.dark",
+      "c": {
+       "rule": "mix",
+       "of": "stone",
+       "with": {
+        "rule": "ramp",
+        "of": "stone",
+        "tone": "light"
+       },
+       "amount": 0.45
+      },
+      "d": "ink",
+      "e": "stone",
+      "f": {
+       "rule": "mix",
+       "of": {
+        "rule": "ramp",
+        "of": "leaf",
+        "tone": "dark"
+       },
+       "with": "ink-tone",
+       "amount": 0.5
+      },
+      "g": {
+       "rule": "mix",
+       "of": "leaf",
+       "with": {
+        "rule": "ramp",
+        "of": "leaf",
+        "tone": "light"
+       },
+       "amount": 0.35
+      },
+      "h": "leaf.dark",
+      "i": "leaf",
+      "j": "metal.dark",
+      "k": "metal.light",
+      "l": "metal"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      2,
+      36
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aabcdddddeffffedecccccffcbbg",
+      "aabcdddddeffffededdeffffcbbg",
+      "aabchiiiiiiiiiiiiiiiiiiicbbg",
+      "ajjchkhkkkhkkkhkkkhkkkhicbbg",
+      "aabchhhhhhhhhhhhhhhhhhhhcbbg",
+      "aabcllllllllllllllllllllcbbg",
+      "aabcllllllllllllllllllllcjjg",
+      "aabchiiiiiiiiiiiiiiiiiiicbbg",
+      "aaachhhhhhhhhhhhhhhhhhhhcaaa",
+      "agggggggggggggggggggggggggga"
+     ],
+     "key": {
+      "a": "stone",
+      "b": {
+       "rule": "mix",
+       "of": "stone",
+       "with": {
+        "rule": "ramp",
+        "of": "stone",
+        "tone": "light"
+       },
+       "amount": 0.45
+      },
+      "c": "ink",
+      "d": "leaf",
+      "e": "leaf.dark",
+      "f": {
+       "rule": "mix",
+       "of": "leaf",
+       "with": {
+        "rule": "ramp",
+        "of": "leaf",
+        "tone": "light"
+       },
+       "amount": 0.35
+      },
+      "g": "stone.light",
+      "h": "metal.dark",
+      "i": "metal.light",
+      "j": "stone.dark",
+      "k": "metal",
+      "l": {
+       "rule": "mix",
+       "of": {
+        "rule": "ramp",
+        "of": "leaf",
+        "tone": "dark"
+       },
+       "with": "ink-tone",
+       "amount": 0.5
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "gen": "door.dungeon",
+    "v": 1,
+    "at": [
+     16,
+     46
+    ],
+    "leaf": "leaf",
+    "metal": "metal",
+    "stone": "stone",
+    "inner": "glow",
+    "hole": "hole",
+    "inkTone": "ink-tone",
+    "shine": "shine",
+    "style": "iron",
+    "corner": 1,
+    "bars": true,
+    "raise": [
+     0,
+     0.06,
+     0.34
+    ]
+   },
+   "ctx": {
+    "t": 0.4,
+    "loop": false,
+    "frames": 6,
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      2,
+      4
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..........aaaaaaaa..........",
+      "........abcbaaaababa........",
+      "......accbcbaaaabcbaaa......",
+      ".....cccccbbaaaabbcccaa.....",
+      "....ccccccbddddddbccccaa....",
+      "...eccccdddfggfggdddcccaa...",
+      "..bbcccdhhhhhhhhhhhhdcccbb..",
+      "..ebbcdiiiiijffjiiiiidcbba..",
+      ".ecccdjiiiiijffjiiiiijdccaa.",
+      ".eccdkkkkkkkkkkkkkkkkkkdcca.",
+      "eeccdklffflffklffflfffkdccaa",
+      "eecdlllllllllllllllllllldcca",
+      "eecdjjjjjjjjjjjjjjjjjjjjdcca",
+      "eecdlkjiiiiijffjiiiiijlkdcca",
+      "eecdlkjiiiiijffjidddddlkdcca",
+      "eecdlkjiiiiijffjdlkkkkdkdcca",
+      "eecdlkjiiiiijffjdljjjkdkdcca",
+      "eecdlkjiiiiijffjdljjjkdkdcca",
+      "eecdlkjiiiiijffjdlfjfkdkdbba",
+      "eecdlkjiiiiijffjdlfjfkdkdcca",
+      "eecdlkjiiiiijffjdllllldkdcca",
+      "ebbdlkjiiiiijffjidddddlkdcca",
+      "eecdlkjiiiiijffjiiiiijlkdcca",
+      "eecdlkkkkkkkkkkkkkkkkkkkdcca",
+      "eecdlllllllllllllllllllldcca",
+      "ebbdjjjjjjjjjjjjjjjjjjjjdcca",
+      "eecdlkjiiiiijffjiiiiijlkdcca",
+      "eecdjjjjjjjjjjjjjjjjjjjjdcca",
+      "eecdlkkkkkkkkkkkkkkkkkkkdbba",
+      "eecdlllllllllllllllllllldcca",
+      "eecddddddddddddddddddddddcca",
+      "eecdggggggggggggggggggggdcca"
+     ],
+     "key": {
+      "a": "stone.light",
+      "b": "stone.dark",
+      "c": {
+       "rule": "mix",
+       "of": "stone",
+       "with": {
+        "rule": "ramp",
+        "of": "stone",
+        "tone": "light"
+       },
+       "amount": 0.45
+      },
+      "d": "ink",
+      "e": "stone",
+      "f": "metal",
+      "g": "hole",
+      "h": "leaf.dark",
+      "i": "leaf",
+      "j": {
+       "rule": "mix",
+       "of": {
+        "rule": "ramp",
+        "of": "leaf",
+        "tone": "dark"
+       },
+       "with": "ink-tone",
+       "amount": 0.5
+      },
+      "k": "metal.light",
+      "l": "metal.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      2,
+      36
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aabcddddddddddddddddddddceef",
+      "aabcddddddddddddddddddddcbbf",
+      "aabcddddddddddddddddddddcbbf",
+      "aeecddddddddddddddddddddcbbf",
+      "aabcddddddddddddddddddddcbbf",
+      "aabcddddddddddddddddddddcbbf",
+      "aabcdddggggggggggggggdddcbbf",
+      "aabcddhhhhhhhhhhhhhhhhddcbbf",
+      "aaacdiiiiiiiiiiiiiiiiiidcaaa",
+      "affffffffffffffffffffffffffa"
+     ],
+     "key": {
+      "a": "stone",
+      "b": {
+       "rule": "mix",
+       "of": "stone",
+       "with": {
+        "rule": "ramp",
+        "of": "stone",
+        "tone": "light"
+       },
+       "amount": 0.45
+      },
+      "c": "ink",
+      "d": "hole",
+      "e": "stone.dark",
+      "f": "stone.light",
+      "g": {
+       "rule": "tone",
+       "of": "hole",
+       "by": 0.5
+      },
+      "h": {
+       "rule": "tone",
+       "of": "hole",
+       "by": 0.85
+      },
+      "i": {
+       "rule": "tone",
+       "of": "hole",
+       "by": 1.2
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "gen": "door.dungeon",
+    "v": 1,
+    "at": [
+     16,
+     46
+    ],
+    "leaf": "leaf",
+    "metal": "metal",
+    "stone": "stone",
+    "inner": "glow",
+    "hole": "hole",
+    "inkTone": "ink-tone",
+    "shine": "shine",
+    "style": "stone",
+    "corner": 0,
+    "heave": [
+     2
+    ],
+    "flash": [
+     1
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      2,
+      4
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aabbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "aacccccdcccdbbbbdcccdccccccb",
+      "aacccccdcccdbbbbdcccdccccccb",
+      "aacccccdcccdbbbbdcccdccccccb",
+      "aacceeeeeeeeeeeeeeeeeeeecccb",
+      "aaceffgggfgggggggggggggheccb",
+      "aaceffgggfgggggggggggggheccb",
+      "aaceffgggfgggggggggggggheccb",
+      "aaceffggfggggggggggggggheccb",
+      "aaceffgggfgggggggggggggheddb",
+      "aaceffggggfggggggffggggheccb",
+      "aaceffgggggfggggggffgggheccb",
+      "addeffgggggfgggggggggggheccb",
+      "aaceffgggggfgggggggggggheccb",
+      "aaceffgggggggggggggggggheccb",
+      "aaceijjjjjjjjjjjjjjjjjjjeccb",
+      "addeiiiiiiiiiiiiiiiiiiiieccb",
+      "aacekkkkkkkkkkkkkkkkkkkkeccb",
+      "aaceffgggggggggggggggggheccb",
+      "aaceffgggggggggggggggggheddb",
+      "aaceffgffffffffffffffggheccb",
+      "aaceffglllllllllllllfggheccb",
+      "aaceffglllllllllllllfggheccb",
+      "aaceffglllllllllleeeeegheddb",
+      "aaceffglllllllllemmmmmeheccb",
+      "aaceffglllllllllemmmmmeheccb",
+      "addeffgllkklllllemmmmmeheccb",
+      "aaceffglllkkllllemmmmmeheccb",
+      "aaceffglllllllllemmmmmeheccb",
+      "aaceffglllllllllemmmmmeheccb",
+      "addeffgggggggggggeeeeegheccb",
+      "aaceffgggggggggggggggggheccb"
+     ],
+     "key": {
+      "a": "stone",
+      "b": "stone.light",
+      "c": {
+       "rule": "mix",
+       "of": "stone",
+       "with": {
+        "rule": "ramp",
+        "of": "stone",
+        "tone": "light"
+       },
+       "amount": 0.45
+      },
+      "d": "stone.dark",
+      "e": "ink",
+      "f": "leaf.dark",
+      "g": "leaf",
+      "h": "leaf.light",
+      "i": "metal.dark",
+      "j": "metal.light",
+      "k": {
+       "rule": "mix",
+       "of": {
+        "rule": "ramp",
+        "of": "leaf",
+        "tone": "dark"
+       },
+       "with": "ink-tone",
+       "amount": 0.5
+      },
+      "l": {
+       "rule": "mix",
+       "of": "leaf",
+       "with": {
+        "rule": "ramp",
+        "of": "leaf",
+        "tone": "dark"
+       },
+       "amount": 0.5
+      },
+      "m": "shine"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      2,
+      36
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aabcdeeeeeeeeeeeeeeeeeeecbbf",
+      "aabcddddddddddddddddddddcggf",
+      "aabchhhhhhhhhhhhhhhhhhhhcbbf",
+      "aabciijjjjjjjjjjjjjjjjjkcbbf",
+      "aabchhhhhhhhhhhhhhhhhhhhcbbf",
+      "aabcdeeeeeeeeeeeeeeeeeeecggf",
+      "aabcddddddddddddddddddddcbbf",
+      "aabccccccccccccccccccccccbbf",
+      "aggclmmmmmmmmmmmmmmmmmmlcaaa",
+      "affffffffffffffffffffffffffa"
+     ],
+     "key": {
+      "a": "stone",
+      "b": {
+       "rule": "mix",
+       "of": "stone",
+       "with": {
+        "rule": "ramp",
+        "of": "stone",
+        "tone": "light"
+       },
+       "amount": 0.45
+      },
+      "c": "ink",
+      "d": "metal.dark",
+      "e": "metal.light",
+      "f": "stone.light",
+      "g": "stone.dark",
+      "h": {
+       "rule": "mix",
+       "of": {
+        "rule": "ramp",
+        "of": "leaf",
+        "tone": "dark"
+       },
+       "with": "ink-tone",
+       "amount": 0.5
+      },
+      "i": "leaf.dark",
+      "j": "leaf",
+      "k": "leaf.light",
+      "l": "hole",
+      "m": {
+       "rule": "tone",
+       "of": "hole",
+       "by": 1.2
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "gen": "door.dungeon",
+    "v": 1,
+    "at": [
+     16,
+     46
+    ],
+    "leaf": "leaf",
+    "metal": "metal",
+    "stone": "stone",
+    "inner": "glow",
+    "hole": "hole",
+    "inkTone": "ink-tone",
+    "shine": "shine",
+    "layer": "light",
+    "dust": [
+     -1,
+     0,
+     0.5
+    ]
+   },
+   "ctx": {
+    "t": 0.4,
+    "loop": false,
+    "frames": 6,
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      3,
+      41
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aa..................aaa.",
+      "abba................abbba",
+      "abbba...............abbba",
+      "abba.................abba",
+      ".aa...................aa."
+     ],
+     "key": {
+      "a": "stone.dark",
+      "b": "stone.light"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "gen": "door.dungeon",
+    "v": 1,
+    "at": [
+     16,
+     46
+    ],
+    "leaf": "leaf",
+    "metal": "metal",
+    "stone": "stone",
+    "inner": "glow",
+    "hole": "hole",
+    "inkTone": "ink-tone",
+    "shine": "shine",
+    "layer": "light",
+    "seal": [
+     1
+    ]
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true,
+    "frames": 8,
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      6,
+      19
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..........a..........",
+      "......aaaabaaaa......",
+      ".....abbbbabbbba.....",
+      "....abbaaa.aaabba....",
+      "...abaac......aaba...",
+      "..aba..c.....cc.aba..",
+      ".abba..c..b..cc.abba.",
+      ".aba....bb.bb....aba.",
+      ".aba...b.....b...aba.",
+      ".aba...b..c..b..caba.",
+      "aba.ccb..ccc..b.c.aba",
+      ".abacc.b..c..b..caba.",
+      ".aba...b.....b...aba.",
+      ".aba....bb.bb....aba.",
+      ".abba..c..b.....abba.",
+      "..aba..c.....cc.aba..",
+      "...abaac.....ccaba...",
+      "....abbaaa.aaabba....",
+      ".....abbbbabbbba.....",
+      "......aaaabaaaa......",
+      "..........a.........."
+     ],
+     "key": {
+      "a": {
+       "rule": "tone",
+       "of": "glow",
+       "by": -1
+      },
+      "b": {
+       "rule": "tone",
+       "of": "glow",
+       "by": 1.6
+      },
+      "c": "shine"
+     }
+    }
+   ]
+  }
+ ]
+}

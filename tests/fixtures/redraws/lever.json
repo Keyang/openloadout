@@ -1,0 +1,170 @@
+{
+ "id": "lever",
+ "frozen": "2026-11-20",
+ "source": "sprites/lever.js",
+ "sha256": "c8e8c598082d0b90c0e8d430070b736e168da6a6a80a0c0a934395110ac01661",
+ "name": "Lever",
+ "blurb": "A lever that is pulled from off to on, with a lamp that lights. Make it a floor lever, a wall switch or a crank, and change its handle, knob and colours.",
+ "meta": {
+  "type": "prop",
+  "role": "world/prop",
+  "themes": [
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "platformer"
+  ],
+  "view": "side",
+  "words": [
+   "lever",
+   "switch",
+   "crank",
+   "handle",
+   "pull",
+   "toggle",
+   "activate",
+   "puzzle",
+   "mechanism",
+   "stone",
+   "trigger"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  30
+ ],
+ "grounded": true,
+ "preview": "off",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "floor",
+   "options": [
+    "floor",
+    "wall",
+    "crank"
+   ],
+   "group": "Look"
+  },
+  "length": {
+   "kind": "range",
+   "label": "Length",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Short",
+   "hi": "Long",
+   "group": "Look"
+  },
+  "knob": {
+   "kind": "toggle",
+   "label": "Knob",
+   "def": true,
+   "group": "Look"
+  },
+  "stone": {
+   "kind": "color",
+   "label": "Stone",
+   "def": "#8f97a8",
+   "swatches": [
+    "#8f97a8",
+    "#5d6475",
+    "#f0ead8",
+    "#3f5068",
+    "#a4c44a",
+    "#6b7280"
+   ],
+   "group": "Colors"
+  },
+  "metal": {
+   "kind": "color",
+   "label": "Metal",
+   "def": "#c2c9d6",
+   "swatches": [
+    "#c2c9d6",
+    "#f2c230",
+    "#8f97a8",
+    "#5d6475",
+    "#e6c545",
+    "#c98a4a"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Knob and lamp",
+   "def": "#c9423a",
+   "swatches": [
+    "#c9423a",
+    "#f2c230",
+    "#7a4fc4",
+    "#f0ead8",
+    "#4fd8ee",
+    "#a4c44a"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "off": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "pull": {
+   "frames": 6,
+   "loop": false,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  },
+  "on": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  }
+ },
+ "sounds": {
+  "pull": [
+   {
+    "sound": "lever-clank",
+    "preset": "Lever",
+    "frame": 2,
+    "volume": 0.8
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-platformer-fantasy"
+ ]
+}

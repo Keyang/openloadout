@@ -1,0 +1,265 @@
+{
+ "id": "timepiece",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     16,
+     17
+    ],
+    "kind": "hourglass",
+    "scale": 0.92,
+    "level": 0.5,
+    "frame": "body",
+    "sand": "accent",
+    "glass": "glass",
+    "face": "face",
+    "hand": "ink",
+    "shine": "shine"
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true,
+    "frames": 8,
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      9,
+      7
+     ],
+     "anchor": "tl",
+     "rows": [
+      "abbbbbbbbbbbbb",
+      "accccccccccccb",
+      "aaaaaaaaaaaaaa",
+      ".a..deeddd..a.",
+      ".a.feeeeegd.a.",
+      ".a.fhheehgd.a.",
+      ".a.fiihhiid.a.",
+      ".a.fjiijjjd.a.",
+      ".a..fjjije..a.",
+      ".a...feee...a.",
+      ".a...eeed...a.",
+      ".a..eeeidd..a.",
+      ".a.feeeiegd.a.",
+      ".a.fehhhhgd.a.",
+      ".a.fhjjjjhd.a.",
+      ".a.fhjjjjjd.a.",
+      ".a..ffhjef..a.",
+      "abbbbbbbbbbbbb",
+      "accccccccccccb",
+      "aaaaaaaaaaaaaa"
+     ],
+     "key": {
+      "a": "body.dark",
+      "b": "body.light",
+      "c": "body",
+      "d": "glass.light",
+      "e": "glass",
+      "f": "glass.dark",
+      "g": "shine",
+      "h": "accent.dark",
+      "i": "accent.light",
+      "j": "accent"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     17
+    ],
+    "kind": "stopwatch",
+    "scale": 1.04,
+    "frame": "body",
+    "sand": "accent",
+    "glass": "glass",
+    "face": "face",
+    "hand": "ink",
+    "shine": "shine"
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true,
+    "frames": 8,
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      8,
+      6
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".....abbbbb.....",
+      ".....aaacca.....",
+      ".......ac.......",
+      ".......ab....bbb",
+      "......bbbb..acc.",
+      "...bbccccbbbbc..",
+      "..acccddddccbb..",
+      ".accdddeedddcbb.",
+      ".acddddddddddcb.",
+      "aaedddddddddddbb",
+      "aaedddddddddddcb",
+      "aaedddddddddddcb",
+      "aaeddddfffffffcb",
+      "aaedddddddddddcb",
+      "aaedddddddddddcb",
+      "aaeeddddddddddcb",
+      ".aaeeddddddddcc.",
+      ".aaaeeeeeddecca.",
+      "..aaaaeeeeccaa..",
+      "....aaaaaaaa....",
+      "......aaaa......"
+     ],
+     "key": {
+      "a": "body.dark",
+      "b": "body.light",
+      "c": "body",
+      "d": "face",
+      "e": "face.dark",
+      "f": "ink"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "kind": "clock",
+    "scale": 0.8,
+    "frame": "body",
+    "sand": "accent",
+    "glass": "glass",
+    "face": "face",
+    "hand": "ink",
+    "shine": "shine"
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": true,
+    "frames": 8,
+    "frame": 4
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      9,
+      8
+     ],
+     "anchor": "tl",
+     "rows": [
+      "......aa......",
+      ".bbbb....abbb.",
+      "accca....aaabb",
+      "aac..bbbb..aab",
+      ".a.accccbbb.a.",
+      "..acddddddbb..",
+      "..aedddddddb..",
+      ".aaddddddddbb.",
+      ".aeddffdddddb.",
+      ".aeeddddddddb.",
+      ".aaedddddddcb.",
+      ".aaeeddddddcb.",
+      "..aaeeddddcc..",
+      "...aaeeeeaa...",
+      "..acaaaaaaaa..",
+      "..a........a..",
+      "..a........a.."
+     ],
+     "key": {
+      "a": "body.dark",
+      "b": "body.light",
+      "c": "body",
+      "d": "face",
+      "e": "face.dark",
+      "f": "ink"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     17
+    ],
+    "kind": "hourglass",
+    "scale": 0.92,
+    "level": 0.1,
+    "collect": true,
+    "frame": "body",
+    "sand": "accent",
+    "glass": "glass",
+    "face": "face",
+    "hand": "ink",
+    "shine": "shine"
+   },
+   "ctx": {
+    "t": 0.5714285714285714,
+    "loop": false,
+    "frames": 8,
+    "frame": 4
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      9,
+      6
+     ],
+     "anchor": "tl",
+     "rows": [
+      "abbbbbbbbbbbbb",
+      "accccccccccccb",
+      "aaaaaaaaaaaaaa",
+      "ac..dddddd..ac",
+      "ac.efffffgd.ac",
+      "ac.efffffgd.ac",
+      "ac.efffffgd.ac",
+      "ac.effffffd.ac",
+      "ac.ehhffhhd.ac",
+      "ac..eihhif..ac",
+      "ac...efif...ac",
+      "ac...ffid...ac",
+      "ac..ffffdd..ac",
+      "ac.efhhhhgd.ac",
+      "ac.ehjjjjgd.ac",
+      "ac.ejjjjjjd.ac",
+      "ac.ejjjjjjd.ac",
+      "ac.ehjjjjjd.ac",
+      "aa..eeeeee..aa",
+      "abbbbbbbbbbbbb",
+      "accccccccccccb",
+      "aaaaaaaaaaaaaa"
+     ],
+     "key": {
+      "a": "body.dark",
+      "b": "body.light",
+      "c": "body",
+      "d": "glass.light",
+      "e": "glass.dark",
+      "f": "glass",
+      "g": "shine",
+      "h": "accent.dark",
+      "i": "accent.light",
+      "j": "accent"
+     }
+    }
+   ]
+  }
+ ]
+}

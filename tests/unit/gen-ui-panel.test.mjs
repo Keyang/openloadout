@@ -21,6 +21,7 @@ import { validatePiece, createPieceStore } from '../../engine/pieces.js';
 import { nodePieceStore, nodePieceReader, readPins, buildPiecesIndex } from '../../tools/lib/pieces-index.mjs';
 import { checkSprite } from '../../quality/sprite.js';
 import { checkSkinPiece, checkSkin, stateLook, prepareCall, SKIN_FIELDS } from '../../engine/gen/ui.js';
+import { codeSprite } from '../helpers/library.mjs';
 
 const FIX = new URL('../fixtures/v2/', import.meta.url);
 const PIECES = new URL('../../pieces/', import.meta.url);
@@ -35,7 +36,9 @@ async function load(rel) {
   assert.ok(r.ok, r.errors.join('; '));
   return dataSprite(def, { pieces: store, strict: true });
 }
-const old = async (id) => (await import(`../../sprites/${id}.js`)).default;
+// the code sprite as it was before its redraw (a frozen copy, tests/fixtures/code-sprites/: migration batch M8 redraws
+// ui-buttons-wood and ui-bars-flat as data, so sprites/ no longer holds their code files)
+const old = (id) => codeSprite(id);
 // every skin in pieces/ (the next ports add skin-candy, skin-gilded ...): the build and the pieces CLI do not run the
 // skin hook yet (tools/lib/pieces-index.mjs passes no `check`), so this test is where a malformed skin is caught
 const SKINS = fs.readdirSync(PIECES).filter((f) => /^skin-[a-z0-9-]+\.v\d+\.json$/.test(f)).sort();

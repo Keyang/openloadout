@@ -1,0 +1,199 @@
+{
+ "id": "icons-consumables",
+ "frozen": "2026-11-20",
+ "source": "sprites/icons-consumables.js",
+ "sha256": "021e5f85c05a763448074b3fd76b6d9c438e2efdb875b71eecf2bb5bae2facd4",
+ "name": "Consumable icons",
+ "blurb": "Eight item-menu icons: potion, mana flask, antidote, bread, herb, a revive candle, bomb and tent; change their size, tilt, shading, shine and colours.",
+ "meta": {
+  "type": "icon",
+  "role": "items/icon",
+  "themes": [
+   "fantasy"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "top-down-rpg",
+   "roguelike-action"
+  ],
+  "view": "none",
+  "words": [
+   "potion",
+   "flask",
+   "bottle",
+   "antidote",
+   "bread",
+   "food",
+   "herb",
+   "candle",
+   "revive",
+   "bomb",
+   "tent",
+   "item",
+   "inventory",
+   "heal"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "potion",
+ "params": {
+  "shade": {
+   "kind": "toggle",
+   "label": "Extra shading",
+   "def": true,
+   "group": "Look"
+  },
+  "shine": {
+   "kind": "toggle",
+   "label": "Shine",
+   "def": true,
+   "group": "Look"
+  },
+  "tilt": {
+   "kind": "toggle",
+   "label": "Tilt",
+   "def": true,
+   "group": "Look"
+  },
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Health",
+   "def": "#c9423a",
+   "swatches": [
+    "#c9423a",
+    "#4fd8ee",
+    "#7fe0a0",
+    "#7a4fc4",
+    "#f2c230"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Mana",
+   "def": "#3f6fd1",
+   "swatches": [
+    "#3f6fd1",
+    "#4fd8ee",
+    "#c9423a",
+    "#7fe0a0",
+    "#7a4fc4",
+    "#f2c230"
+   ],
+   "group": "Colors"
+  },
+  "cloth": {
+   "kind": "color",
+   "label": "Bread and cloth",
+   "def": "#e6c96a",
+   "swatches": [
+    "#e6c96a",
+    "#f0ead8",
+    "#c9a06a",
+    "#c8553a",
+    "#f6d3b0",
+    "#a8a4a0"
+   ],
+   "group": "Colors"
+  }
+ },
+ "clips": {
+  "potion": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "mana-flask": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "antidote": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "bread": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "herb": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "revive-candle": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "bomb": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "tent": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [],
+ "bundles": [
+  "kit-rpg-fantasy"
+ ]
+}

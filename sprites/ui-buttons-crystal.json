@@ -1,0 +1,107 @@
+{
+  "format": "loadout-sprite",
+  "version": 2,
+  "id": "ui-buttons-crystal",
+  "name": "Crystal buttons",
+  "blurb": "A stretchable menu button of deep ice in a cut crystal band lit like a bevel, with icicles, frost ferns or shards, in four states (normal, hover, pressed, disabled) plus a tab and an open tab; change the style, corners, band, glints and colours.",
+  "meta": {
+    "type": "ui",
+    "role": "interface/button",
+    "themes": ["neutral","fantasy"],
+    "gameTypes": ["arcade","turn-based-rpg","puzzle","top-down-rpg"],
+    "view": "none",
+    "words": ["button","crystal","ice","frost","frozen","menu","shard","glass"],
+    "license": "draft"
+  },
+  "size": [96,32],
+  "pivot": [48,16],
+  "grounded": false,
+  "preview": "normal",
+  "styles": ["pixel"],
+  "palette": [
+    {"id":"face","label":"Stone","default":"#3f5068","material":"interface","swatches":["#3f5068","#7a4f33","#434d6d","#8e3a4a"]},
+    {"id":"frame","label":"Crystal","default":"#8fd0f0","material":"interface","swatches":["#8fd0f0","#9bd18a","#5fe0f0","#7fe0a0"]},
+    {
+      "id": "accent",
+      "label": "Sparkles and frost tips",
+      "default": "#4fd8ee",
+      "material": "interface",
+      "swatches": ["#4fd8ee","#c9423a","#a4c44a","#b48af8","#f4e06a"]
+    }
+  ],
+  "controls": [
+    {
+      "key": "style",
+      "kind": "choice",
+      "label": "Style",
+      "options": [{"value":"ice","label":"Ice"},{"value":"rime","label":"Rime"},{"value":"shard","label":"Shard"}],
+      "default": "ice",
+      "group": "Look"
+    },
+    {"key":"corner","kind":"range","label":"Corner","lo":"Square","hi":"Round","default":0.5,"group":"Look"},
+    {"key":"border","kind":"range","label":"Border","lo":"Thin","hi":"Thick","default":0.5,"group":"Look"},
+    {"key":"glints","kind":"toggle","label":"Glints","default":true,"group":"Look"},
+    {"key":"face","kind":"colour","label":"Stone","group":"Colors"},
+    {"key":"frame","kind":"colour","label":"Crystal","group":"Colors"},
+    {"key":"accent","kind":"colour","label":"Sparkles and frost tips","group":"Colors","when":[{"glints":[true]},{"style":["rime"]}]}
+  ],
+  "versions": [
+    {"name":"Ice","params":{}},
+    {"name":"Ruby frost","params":{"style":"rime","frame":"#5fe0f0","accent":"#c9423a","face":"#8e3a4a","border":0}},
+    {"name":"Jade shard","params":{"style":"shard","frame":"#9bd18a","face":"#434d6d","border":1}},
+    {"name":"Mint garnet","params":{"frame":"#7fe0a0","face":"#8e3a4a","glints":false}},
+    {"name":"Amber","params":{"face":"#7a4f33","accent":"#f4e06a","corner":1}}
+  ],
+  "body": {
+    "panel": {
+      "skin": {"use":"skin:crystal","v":2,"paint":{"face":"face","frame":"frame","accent":"accent"}},
+      "piece": {
+        "gen": "ui.slab",
+        "v": 1,
+        "clip": ["normal","hover","pressed","disabled"],
+        "role": "button",
+        "at": [1,1],
+        "size": [94,30],
+        "style": {"from":"style"},
+        "corner": {"from":"corner","map":[[0,0],[1,4]]},
+        "border": {"from":"border","map":[[0,1],[1,3]]},
+        "gleam": {"from":"glints"}
+      },
+      "states": ["normal","hover","pressed","disabled","tab","tab-active"],
+      "draw": [
+        {
+          "gen": "ui.slab",
+          "v": 1,
+          "clip": ["tab"],
+          "role": "tab",
+          "at": [1,1],
+          "size": [94,30],
+          "style": {"from":"style"},
+          "corner": {"from":"corner","map":[[0,0],[1,4]]},
+          "border": {"from":"border","map":[[0,1],[1,3]]},
+          "gleam": {"from":"glints"}
+        },
+        {
+          "gen": "ui.slab",
+          "v": 1,
+          "clip": ["tab-active"],
+          "role": "tab-open",
+          "at": [1,1],
+          "size": [94,31],
+          "style": {"from":"style"},
+          "corner": {"from":"corner","map":[[0,0],[1,4]]},
+          "border": {"from":"border","map":[[0,1],[1,3]]},
+          "gleam": {"from":"glints"}
+        }
+      ]
+    }
+  },
+  "clips": {
+    "normal": {"frames":1,"fps":8,"label":"At rest, not pointed at"},
+    "hover": {"frames":1,"fps":8,"label":"Pointed at by the cursor"},
+    "pressed": {"frames":1,"fps":8,"label":"Held down while pressed","sounds":[{"sound":"menu-glass-confirm","preset":"Select","frame":0,"volume":0.6}]},
+    "disabled": {"frames":1,"fps":8,"label":"Greyed out, not available now"},
+    "tab": {"frames":1,"fps":8,"label":"Tab, for a page that is not open"},
+    "tab-active": {"frames":1,"fps":8,"label":"Open tab, for the page on view","sounds":[{"sound":"menu-glass-move","preset":"Tab","frame":0,"volume":0.6}]}
+  }
+}

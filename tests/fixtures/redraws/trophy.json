@@ -1,0 +1,237 @@
+{
+ "id": "trophy",
+ "frozen": "2026-11-20",
+ "source": "sprites/trophy.js",
+ "sha256": "ec03ad121544a99a7540c2fc374f6b02a418bf67f3b6cf67d78c182ac75e6fa6",
+ "name": "Trophy",
+ "blurb": "A floating prize for the end of a level or a secret: a cup, a medal or a crown. Change the prize, its size, emblem, sparkle and colours.",
+ "meta": {
+  "type": "pickup",
+  "role": "items/pickup",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "arcade",
+   "platformer",
+   "racing",
+   "puzzle"
+  ],
+  "view": "front",
+  "words": [
+   "trophy",
+   "cup",
+   "medal",
+   "crown",
+   "prize",
+   "award",
+   "winner",
+   "champion",
+   "collect",
+   "reward",
+   "secret",
+   "golden"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  30
+ ],
+ "grounded": false,
+ "preview": "idle",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "shape": {
+   "kind": "choice",
+   "label": "Shape",
+   "def": "cup",
+   "options": [
+    "cup",
+    "medal",
+    "crown"
+   ],
+   "group": "Look"
+  },
+  "emblem": {
+   "kind": "choice",
+   "label": "Emblem",
+   "def": "star",
+   "options": [
+    "star",
+    "sun",
+    "diamond",
+    "none"
+   ],
+   "group": "Look"
+  },
+  "sparkle": {
+   "kind": "toggle",
+   "label": "Sparkle",
+   "def": true,
+   "group": "Look"
+  },
+  "metal": {
+   "kind": "color",
+   "label": "Metal",
+   "def": "#f2c230",
+   "swatches": [
+    "#f2c230",
+    "#c2c9d6",
+    "#e6c545",
+    "#c98a4a",
+    "#a8806a"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Ribbon",
+   "def": "#3f6fd1",
+   "swatches": [
+    "#3f6fd1",
+    "#c9423a",
+    "#7a4fc4",
+    "#f0ead8",
+    "#e08a2c",
+    "#4f9d57"
+   ],
+   "group": "Colors",
+   "when": {
+    "shape": [
+     "medal"
+    ]
+   }
+  },
+  "stone": {
+   "kind": "color",
+   "label": "Base",
+   "def": "#5d6475",
+   "swatches": [
+    "#5d6475",
+    "#8f97a8",
+    "#f0ead8",
+    "#3f5068",
+    "#a4c44a",
+    "#6b7280"
+   ],
+   "group": "Colors",
+   "when": {
+    "shape": [
+     "cup"
+    ]
+   }
+  },
+  "bob": {
+   "kind": "range",
+   "label": "Float",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Still",
+   "hi": "Floaty",
+   "group": "Motion"
+  },
+  "pop": {
+   "kind": "range",
+   "label": "Pop height",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Low",
+   "hi": "High",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "collect": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    9,
+    15,
+    20
+   ]
+  }
+ },
+ "sounds": {
+  "collect": [
+   {
+    "sound": "star-pickup",
+    "preset": "Storybook",
+    "frame": 1,
+    "volume": 0.7
+   }
+  ]
+ },
+ "versions": [
+  {
+   "name": "Gold cup",
+   "params": {}
+  },
+  {
+   "name": "Silver medal",
+   "params": {
+    "shape": "medal",
+    "metal": "#c2c9d6"
+   }
+  },
+  {
+   "name": "Crown",
+   "params": {
+    "shape": "crown",
+    "emblem": "diamond"
+   }
+  },
+  {
+   "name": "Bronze cup",
+   "params": {
+    "metal": "#a8806a"
+   }
+  },
+  {
+   "name": "Plain cup",
+   "params": {
+    "emblem": "none",
+    "size": 0.3
+   }
+  }
+ ],
+ "bundles": []
+}

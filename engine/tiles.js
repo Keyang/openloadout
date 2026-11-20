@@ -658,7 +658,35 @@ export function layoutTiles(rows, clips, opts = {}) {
 
 // ---- texture that repeats ---------------------------------------------------------------
 
-const toneCache = new Map();
+/** How many colours textureTone and textureLight each remember: they are colour rules any sprite's settings reach, so their memo tables are capped (build item F3). */
+export const TEXTURE_CACHE_LIMIT = 512;
+
+/** A small least-recently-used cache: get(key), set(key, value), size; at most `limit` entries, the one used longest ago dropped first. For memo tables a long session would otherwise grow without end. */
+export function boundedCache(limit) {
+  if (!Number.isInteger(limit) || limit < 1) throw new Error(`boundedCache: limit must be a whole number of at least 1; got ${limit}`);
+  const m = new Map();   // insertion order is the order of use: the first key is the one used longest ago
+  return {
+    get(key) {
+      if (!m.has(key)) return undefined;
+      const v = m.get(key);
+      m.delete(key); m.set(key, v);
+      return v;
+    },
+    set(key, value) {
+      m.delete(key);
+      m.set(key, value);
+      if (m.size > limit) m.delete(m.keys().next().value);
+    },
+    get size() { return m.size; },
+  };
+}
+
+/** How many colours the texture tone caches hold now: { tone, light } (each at most TEXTURE_CACHE_LIMIT). For tests. */
+export function textureCacheSizes() {
+  return { tone: toneCache.size, light: lightCache.size };
+}
+
+const toneCache = boundedCache(TEXTURE_CACHE_LIMIT);
 /**
  * The tone for marks inside a fill (clods, cracks, seams, pebbles): the dark of the colour's ramp, or the next tone
  * down if some whole-bundle look (engine/theme.js) would turn the dark into the fill's colour and leave the fill plain.
@@ -956,7 +984,7 @@ export function drawDecal(g, draw, { ink = INK } = {}) {
 // and '<prefix>-fill', the body (with other versions, like a block's fill). It has no sides and no underside: it
 // lies in a basin of some block, whose own outline closes it. Worked example: sprites/tiles-water.js.
 
-const lightCache = new Map();
+const lightCache = boundedCache(TEXTURE_CACHE_LIMIT);   // capped like toneCache (build item F3)
 /**
  * The tone for light marks inside a fill (lit facets, glints, streaks on water): the light of the colour's ramp, or the next tone up if some whole-bundle look (engine/theme.js) would turn it into the fill's colour.
  * Arguments: colour: the mark's material, '#rrggbb'. against: the fill's colour when the mark is of another material

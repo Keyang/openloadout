@@ -1,0 +1,209 @@
+{
+ "id": "spring.pad",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "gen": "spring.pad",
+    "v": 1,
+    "at": [
+     16,
+     30
+    ],
+    "body": "body",
+    "metal": "metal",
+    "skin": "cream"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      5,
+      14
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaabbbbbbbbbbbbbbbbaaa",
+      "cccddaaddaaddaaddddccc",
+      "cccddddddddddddddddccc",
+      "ccceeeeeeeeeeeeeeeeccc",
+      "fffeeeeeeeeeeeeeeeefff",
+      "......ffffffff........",
+      ".........ffaaaaaa.....",
+      "......aaaacccccca.....",
+      "......ccccccff........",
+      ".........ffaaaaaa.....",
+      "......aaaacccccca.....",
+      "......ccccccff........",
+      ".........ffaaaaaa.....",
+      "......aaaacccccca.....",
+      "....aaccccccaaaaaa....",
+      "....cccccccccccccc...."
+     ],
+     "key": {
+      "a": "metal.light",
+      "b": "body.light",
+      "c": "metal",
+      "d": "body",
+      "e": "body.dark",
+      "f": "metal.dark"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "gen": "spring.pad",
+    "v": 1,
+    "at": [
+     16,
+     30
+    ],
+    "body": "body",
+    "metal": "metal",
+    "skin": "cream",
+    "style": "leaf",
+    "half": 13,
+    "rest": 19,
+    "coils": 4,
+    "lift": [
+     0,
+     0,
+     0.8,
+     1
+    ],
+    "press": [
+     0,
+     1
+    ]
+   },
+   "ctx": {
+    "t": 0.42857142857142855,
+    "loop": false,
+    "frames": 8,
+    "frame": 3
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      3,
+      13
+     ],
+     "anchor": "tl",
+     "rows": [
+      "........................aa",
+      "ba....aaaaaaaaaaaaaa.aaaa.",
+      "bbaacccccccccccccccccaaa..",
+      ".bbbbbbbbbbbbbbbbbbbbbaaa.",
+      "..bbbbaabaabaabaabaabaab..",
+      "....bbbbbbbbbbbbbbbbbb....",
+      "......ddddddbbeeeeeee.....",
+      "......eeeeeeffffffffe.....",
+      "......ffffffffdddeeee.....",
+      "..........eeeeeeffffe.....",
+      "......eeeffffffff.........",
+      "......ffffdddeeeeeeee.....",
+      "......eeeeeeffffffffe.....",
+      "......fffffffeeeeeeee.....",
+      "......eeeeeeffffffffe.....",
+      ".....effffffffeeeeeee.....",
+      ".....ffffffffffffffff....."
+     ],
+     "key": {
+      "a": "body",
+      "b": "body.dark",
+      "c": "body.light",
+      "d": "metal.dark",
+      "e": "metal.light",
+      "f": "metal"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "gen": "spring.pad",
+    "v": 1,
+    "at": [
+     16,
+     30
+    ],
+    "body": "body",
+    "metal": "metal",
+    "skin": "cream",
+    "style": "drum",
+    "half": 8,
+    "rest": 12,
+    "coils": 2,
+    "press": [
+     0,
+     1
+    ]
+   },
+   "ctx": {
+    "t": 0.14285714285714285,
+    "loop": false,
+    "frames": 8,
+    "frame": 1
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      8,
+      18
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aaaabbbbbbaaaa.",
+      "cccccccccccccccc",
+      ".dddddddddddddd.",
+      ".dedddedddedddd.",
+      ".ddedededededed.",
+      ".fffefffefffeff.",
+      "gggggggggggggggg",
+      "....gggghhhh....",
+      "....hhhchhhh....",
+      "....hhhcccch....",
+      "...hcccchhhhh...",
+      "...cccccccccc..."
+     ],
+     "key": {
+      "a": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "cream",
+        "with": "body",
+        "amount": 0.12
+       },
+       "tone": "light"
+      },
+      "b": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "cream",
+        "with": "body",
+        "amount": 0.12
+       },
+       "tone": "dark"
+      },
+      "c": "metal",
+      "d": "body",
+      "e": {
+       "rule": "mix",
+       "of": "cream",
+       "with": "body",
+       "amount": 0.12
+      },
+      "f": "body.dark",
+      "g": "metal.dark",
+      "h": "metal.light"
+     }
+    }
+   ]
+  }
+ ]
+}

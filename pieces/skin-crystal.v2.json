@@ -1,0 +1,199 @@
+{
+ "format": "loadout-piece",
+ "version": 1,
+ "id": "skin:crystal",
+ "v": 2,
+ "name": "Crystal",
+ "about": "Ice and crystal interface pieces: a dark stone face in a pale crystal band lit from the top right; ice, rime (frost in the corners) or shard (cut corners); glints as ornaments.",
+ "slots": [
+  {
+   "id": "face",
+   "label": "Stone",
+   "default": "#3f5068",
+   "material": "interface"
+  },
+  {
+   "id": "frame",
+   "label": "Crystal",
+   "default": "#8fd0f0",
+   "material": "interface"
+  },
+  {
+   "id": "accent",
+   "label": "Sparkles and frost tips",
+   "default": "#4fd8ee",
+   "material": "interface"
+  },
+  {
+   "id": "fill",
+   "label": "Fill",
+   "default": "#6aa83e",
+   "material": "interface"
+  },
+  {
+   "id": "shine",
+   "label": "Shine",
+   "default": "#ffffff",
+   "material": "light"
+  }
+ ],
+ "made": {
+  "from": "engine/ui-skins-more.js, engine/ui-crystal-frost.js, engine/ui-crystal-trough.js"
+ },
+ "body": {
+  "paint": {
+   "face": "face",
+   "frame": "frame",
+   "accent": "accent",
+   "line": "frame.light",
+   "ledge": "frame.dark",
+   "knob": "frame",
+   "fill": "fill",
+   "shine": "shine",
+   "divider": "ink"
+  },
+  "args": {
+   "*": {
+    "rings": [
+     "ink",
+     "frame.dark",
+     "frame"
+    ],
+    "bandAt": 2,
+    "lit": true,
+    "edge": "round",
+    "hoverFace": 0.1,
+    "hoverBand": 0.45,
+    "every": 8,
+    "start": 7,
+    "gleamTrim": [
+     {
+      "kind": "stamp",
+      "at": [
+       3,
+       3
+      ],
+      "rows": [
+       "..s",
+       ".ss",
+       "..s"
+      ],
+      "key": {
+       "s": "shine"
+      }
+     }
+    ],
+    "gleamTop": [
+     {
+      "kind": "stamp",
+      "at": [
+       4,
+       2
+      ],
+      "rows": [
+       ".a.",
+       "asa",
+       ".a."
+      ],
+      "key": {
+       "s": "shine",
+       "a": "accent"
+      }
+     }
+    ]
+   },
+   "ui.slab": {
+    "titleShade": -1,
+    "lined": true,
+    "gleamMarks": [
+     {
+      "kind": "stamp",
+      "at": [
+       3,
+       0
+      ],
+      "rows": [
+       ".w.",
+       "www",
+       ".w."
+      ],
+      "key": {
+       "w": "shine"
+      }
+     }
+    ]
+   },
+   "ui.strip": {
+    "gloss": true,
+    "shadow": true
+   },
+   "ui.trough": {
+    "trough": "dark"
+   }
+  },
+  "styles": {
+   "ice": {
+    "*": {
+     "edge": "round"
+    }
+   },
+   "rime": {
+    "*": {
+     "trim": [
+      {
+       "kind": "stamp",
+       "at": [
+        2,
+        2
+       ],
+       "rows": [
+        "a.a",
+        ".a.",
+        "a.."
+       ],
+       "key": {
+        "a": "accent"
+       }
+      }
+     ]
+    }
+   },
+   "shard": {
+    "*": {
+     "edge": "cut",
+     "trim": [
+      {
+       "kind": "stamp",
+       "at": [
+        3,
+        3
+       ],
+       "rows": [
+        "l.",
+        ".l"
+       ],
+       "key": {
+        "l": "frame.light"
+       }
+      }
+     ]
+    }
+   }
+  },
+  "states": {
+   "normal": {
+    "lip": 2
+   },
+   "hover": {
+    "lip": 2
+   },
+   "pressed": {
+    "lip": 0
+   },
+   "disabled": {
+    "lip": 2,
+    "desaturate": 1
+   }
+  }
+ }
+}

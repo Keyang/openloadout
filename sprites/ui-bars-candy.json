@@ -1,0 +1,152 @@
+{
+  "format": "loadout-sprite",
+  "version": 2,
+  "id": "ui-bars-candy",
+  "name": "Candy bars and slider",
+  "blurb": "A glossy sugar-rimmed bar housing with three candy fill strips (health, magic, a gauge), a white flash, a slider track and its toffee knob; change the style, corners, rim, shine and colours.",
+  "meta": {
+    "type": "ui",
+    "role": "interface/bar",
+    "themes": ["neutral","candy"],
+    "gameTypes": ["arcade","puzzle","card-game","racing"],
+    "view": "none",
+    "words": ["bar","health","magic","gauge","meter","slider","volume","settings","candy","sugar","glossy","fill","flash","hud"],
+    "license": "draft"
+  },
+  "size": [64,16],
+  "pivot": [32,8],
+  "grounded": false,
+  "preview": "frame",
+  "styles": ["pixel"],
+  "palette": [
+    {"id":"frame","label":"Sugar","default":"#f0ead8","material":"interface","swatches":["#f0ead8","#f6d3b0","#8fd0f0","#9bd18a"]},
+    {"id":"fill","label":"Health","default":"#6aa83e","material":"interface","swatches":["#6aa83e","#3f8a4f","#c9423a","#e08a2c","#4fd8ee","#f2c230"]},
+    {"id":"fillB","label":"Magic","default":"#3f6fd1","material":"interface","swatches":["#3f6fd1","#3f9fd1","#4fd8ee","#8fd0f0","#4f9ff0"]},
+    {"id":"fillC","label":"Gauge","default":"#f2c230","material":"interface","swatches":["#f2c230","#e08a2c","#a4c44a","#a06a3c","#c2c9d6"]},
+    {"id":"white","default":"#ffffff","material":"light","detail":true}
+  ],
+  "controls": [
+    {
+      "key": "style",
+      "kind": "choice",
+      "label": "Style",
+      "options": [{"value":"jelly","label":"Jelly"},{"value":"striped","label":"Striped"},{"value":"frosted","label":"Frosted"}],
+      "default": "jelly",
+      "group": "Look"
+    },
+    {"key":"corner","kind":"range","label":"Corner","lo":"Square","hi":"Round","default":0.75,"group":"Look"},
+    {"key":"border","kind":"range","label":"Border","lo":"Thin","hi":"Thick","default":0.5,"group":"Look"},
+    {"key":"shine","kind":"toggle","label":"Shine","default":true,"group":"Look"},
+    {"key":"frame","kind":"colour","label":"Sugar","group":"Colors"},
+    {"key":"fill","kind":"colour","label":"Health","group":"Colors"},
+    {"key":"fillB","kind":"colour","label":"Magic","group":"Colors"},
+    {"key":"fillC","kind":"colour","label":"Gauge","group":"Colors"}
+  ],
+  "versions": [
+    {"name":"Sugar bars","params":{}},
+    {"name":"Striped","params":{"style":"striped"}},
+    {"name":"Frosted","params":{"style":"frosted","frame":"#8fd0f0"}},
+    {"name":"Matte mint","params":{"shine":false,"frame":"#9bd18a","fill":"#4fd8ee"}}
+  ],
+  "body": {
+    "panel": {
+      "skin": {"use":"skin:candy","v":3,"paint":{"frame":"frame","shine":"white"}},
+      "piece": {
+        "gen": "ui.trough",
+        "v": 1,
+        "at": [1,1],
+        "size": [62,14],
+        "style": {"from":"style"},
+        "corner": {"from":"corner","map":[[0,0],[1,4]]},
+        "border": {"from":"border","map":[[0,1],[1,3]]},
+        "gleam": {"from":"shine"},
+        "clip": ["frame"]
+      },
+      "states": ["frame","fill","fill-b","fill-c","flash","slider","knob"],
+      "draw": [
+        {
+          "gen": "ui.strip",
+          "v": 1,
+          "clip": ["fill"],
+          "at": [1,1],
+          "size": [62,14],
+          "style": {"from":"style"},
+          "border": {"from":"border","map":[[0,1],[1,3]]},
+          "fill": "fill",
+          "shine": "white",
+          "gloss": {"from":"shine"}
+        },
+        {
+          "gen": "ui.strip",
+          "v": 1,
+          "clip": ["fill-b"],
+          "at": [1,1],
+          "size": [62,14],
+          "style": {"from":"style"},
+          "border": {"from":"border","map":[[0,1],[1,3]]},
+          "fill": "fillB",
+          "shine": "white",
+          "gloss": {"from":"shine"}
+        },
+        {
+          "gen": "ui.strip",
+          "v": 1,
+          "clip": ["fill-c"],
+          "at": [1,1],
+          "size": [62,14],
+          "style": {"from":"style"},
+          "border": {"from":"border","map":[[0,1],[1,3]]},
+          "fill": "fillC",
+          "shine": "white",
+          "gloss": {"from":"shine"}
+        },
+        {
+          "gen": "ui.strip",
+          "v": 1,
+          "clip": ["flash"],
+          "at": [1,1],
+          "size": [62,14],
+          "style": {"from":"style"},
+          "border": {"from":"border","map":[[0,1],[1,3]]},
+          "fill": "fill",
+          "shine": "white",
+          "flash": 1,
+          "fade": true,
+          "gloss": {"from":"shine"}
+        },
+        {
+          "gen": "ui.trough",
+          "v": 1,
+          "at": [1,1],
+          "size": [62,14],
+          "style": {"from":"style"},
+          "corner": {"from":"corner","map":[[0,0],[1,4]]},
+          "border": {"from":"border","map":[[0,1],[1,3]]},
+          "gleam": false,
+          "clip": ["slider"],
+          "role": "rail"
+        },
+        {
+          "gen": "ui.slab",
+          "v": 1,
+          "clip": ["knob"],
+          "role": "knob",
+          "at": [26,1],
+          "size": [12,14],
+          "style": {"from":"style"},
+          "corner": {"from":"corner","map":[[0,0],[1,4]]},
+          "gleam": {"from":"shine"}
+        }
+      ]
+    }
+  },
+  "clips": {
+    "frame": {"frames":1,"fps":8,"label":"Housing"},
+    "fill": {"frames":1,"fps":8,"label":"Health"},
+    "fill-b": {"frames":1,"fps":8,"label":"Magic"},
+    "fill-c": {"frames":1,"fps":8,"label":"Gauge"},
+    "flash": {"frames":4,"fps":8,"loop":false,"label":"Flash"},
+    "slider": {"frames":1,"fps":8,"label":"Slider track"},
+    "knob": {"frames":1,"fps":8,"label":"Slider knob"}
+  }
+}

@@ -1,0 +1,277 @@
+{
+ "id": "emote-bubbles",
+ "frozen": "2026-11-20",
+ "source": "sprites/emote-bubbles.js",
+ "sha256": "4a225ae8326d6a66453320c570775fac0b80bb9f32f3dda33996183a3552c55c",
+ "name": "Emote balloons",
+ "blurb": "Nine reaction marks (surprise, question, love, anger, nerves, sleep, a tune, delight, dizziness) in a small pale balloon with a tail that pops open from its tip and shrinks back into it; change the mark, the balloon's shape, tail and size, and the colours.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/icon",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "arcade",
+   "top-down-rpg",
+   "farming-sim",
+   "puzzle"
+  ],
+  "view": "none",
+  "words": [
+   "emote",
+   "balloon",
+   "bubble",
+   "reaction",
+   "heart",
+   "question",
+   "angry",
+   "dizzy",
+   "chat"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  30
+ ],
+ "grounded": false,
+ "preview": "idle",
+ "params": {
+  "emote": {
+   "kind": "choice",
+   "label": "Emote",
+   "def": "exclaim",
+   "options": [
+    {
+     "value": "exclaim",
+     "label": "Exclamation"
+    },
+    {
+     "value": "question",
+     "label": "Question"
+    },
+    {
+     "value": "heart",
+     "label": "Heart"
+    },
+    {
+     "value": "anger",
+     "label": "Anger"
+    },
+    {
+     "value": "sweat",
+     "label": "Sweat"
+    },
+    {
+     "value": "sleep",
+     "label": "Sleep"
+    },
+    {
+     "value": "music",
+     "label": "Music"
+    },
+    {
+     "value": "spark",
+     "label": "Delight"
+    },
+    {
+     "value": "swirl",
+     "label": "Dizzy"
+    }
+   ],
+   "group": "Look"
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Balloon",
+   "def": "round",
+   "options": [
+    {
+     "value": "round",
+     "label": "Round"
+    },
+    {
+     "value": "cloud",
+     "label": "Cloud"
+    },
+    {
+     "value": "shout",
+     "label": "Shout"
+    }
+   ],
+   "group": "Look"
+  },
+  "tail": {
+   "kind": "choice",
+   "label": "Tail",
+   "def": "middle",
+   "options": [
+    {
+     "value": "left",
+     "label": "Left"
+    },
+    {
+     "value": "middle",
+     "label": "Middle"
+    },
+    {
+     "value": "right",
+     "label": "Right"
+    }
+   ],
+   "group": "Look"
+  },
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Balloon",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#f6d3b0",
+    "#c2c9d6",
+    "#9bd18a",
+    "#e6c96a"
+   ],
+   "group": "Colors"
+  },
+  "frame": {
+   "kind": "color",
+   "label": "Line",
+   "def": "#3f5068",
+   "swatches": [
+    "#3f5068",
+    "#7a4f33",
+    "#434d6d",
+    "#8e3a4a"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Mark",
+   "def": "#3f6fd1",
+   "swatches": [
+    "#3f6fd1",
+    "#c9423a",
+    "#7a4fc4",
+    "#3f8a4f",
+    "#3f9fd1"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    8,
+    12
+   ]
+  },
+  "pop": {
+   "frames": 6,
+   "loop": false,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  },
+  "close": {
+   "frames": 6,
+   "loop": false,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  }
+ },
+ "sounds": {
+  "pop": [
+   {
+    "sound": "menu-bubble-open",
+    "preset": "Pop-up",
+    "frame": 0,
+    "volume": 0.5
+   }
+  ],
+  "close": [
+   {
+    "sound": "menu-bubble-close",
+    "preset": "Pop-up",
+    "frame": 0,
+    "volume": 0.5
+   }
+  ]
+ },
+ "versions": [
+  {
+   "name": "Surprise balloon",
+   "params": {}
+  },
+  {
+   "name": "Love",
+   "params": {
+    "emote": "heart",
+    "tail": "right",
+    "accent": "#c9423a"
+   }
+  },
+  {
+   "name": "Dizzy cloud",
+   "params": {
+    "emote": "swirl",
+    "style": "cloud",
+    "accent": "#7a4fc4"
+   }
+  },
+  {
+   "name": "Angry shout",
+   "params": {
+    "emote": "anger",
+    "style": "shout",
+    "body": "#f6d3b0"
+   }
+  },
+  {
+   "name": "Nervous",
+   "params": {
+    "emote": "sweat",
+    "accent": "#3f9fd1",
+    "body": "#c2c9d6",
+    "tail": "left"
+   }
+  }
+ ],
+ "bundles": []
+}

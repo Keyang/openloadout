@@ -1,0 +1,582 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "spike-trap",
+ "name": "Spike trap",
+ "blurb": "A row of floor spikes that sinks, twitches a warning and snaps back out; change what the spikes are made of, how many and how long they are, the base plate and the colours.",
+ "meta": {
+  "type": "prop",
+  "role": "world/hazard",
+  "themes": [
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "platformer"
+  ],
+  "view": "side",
+  "words": [
+   "spikes",
+   "spike",
+   "trap",
+   "hazard",
+   "danger",
+   "retract",
+   "stab",
+   "floor spikes",
+   "thorns",
+   "crystal",
+   "sharp",
+   "damage",
+   "pit"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  30
+ ],
+ "preview": "idle",
+ "styles": [
+  "pixel"
+ ],
+ "palette": [
+  {
+   "id": "metal",
+   "label": "Metal",
+   "default": "#c2c9d6",
+   "material": "metal",
+   "swatches": [
+    "#c2c9d6",
+    "#f2c230",
+    "#8f97a8",
+    "#5d6475",
+    "#e6c545",
+    "#c98a4a"
+   ]
+  },
+  {
+   "id": "accent",
+   "label": "Tips",
+   "default": "#c9423a",
+   "material": "paint",
+   "swatches": [
+    "#c9423a",
+    "#7a4fc4",
+    "#f0ead8",
+    "#4fd8ee",
+    "#a4c44a"
+   ]
+  },
+  {
+   "id": "cream",
+   "default": "#f0ead8",
+   "material": "stone",
+   "detail": true
+  },
+  {
+   "id": "leaf",
+   "default": "#3f8a4f",
+   "material": "plant",
+   "detail": true
+  },
+  {
+   "id": "magic",
+   "default": "#4fd8ee",
+   "material": "magic",
+   "detail": true
+  },
+  {
+   "id": "spike",
+   "material": "metal",
+   "derive": {
+    "rule": "choose",
+    "when": {
+     "style": [
+      "bone"
+     ]
+    },
+    "then": {
+     "rule": "mix",
+     "of": "metal",
+     "with": "cream",
+     "amount": 0.6
+    },
+    "else": {
+     "rule": "choose",
+     "when": {
+      "style": [
+       "thorn"
+      ]
+     },
+     "then": {
+      "rule": "mix",
+      "of": "metal",
+      "with": "leaf",
+      "amount": 0.55
+     },
+     "else": {
+      "rule": "choose",
+      "when": {
+       "style": [
+        "crystal"
+       ]
+      },
+      "then": {
+       "rule": "mix",
+       "of": "metal",
+       "with": "magic",
+       "amount": 0.5
+      },
+      "else": "metal"
+     }
+    }
+   }
+  },
+  {
+   "id": "plate",
+   "material": "metal",
+   "derive": {
+    "rule": "tone",
+    "of": "spike",
+    "by": -0.9
+   }
+  },
+  {
+   "id": "shine",
+   "default": "#ffffff",
+   "material": "light",
+   "detail": true
+  }
+ ],
+ "controls": [
+  {
+   "key": "style",
+   "kind": "choice",
+   "label": "Style",
+   "options": [
+    "metal",
+    "bone",
+    "thorn",
+    "crystal"
+   ],
+   "default": "metal"
+  },
+  {
+   "key": "count",
+   "kind": "choice",
+   "label": "Spikes",
+   "options": [
+    "three",
+    "four",
+    "five"
+   ],
+   "default": "four"
+  },
+  {
+   "key": "length",
+   "kind": "range",
+   "label": "Length",
+   "lo": "Short",
+   "hi": "Long",
+   "default": 0.5
+  },
+  {
+   "key": "base",
+   "kind": "toggle",
+   "label": "Base plate",
+   "default": true
+  },
+  {
+   "key": "metal",
+   "kind": "colour",
+   "label": "Metal"
+  },
+  {
+   "key": "accent",
+   "kind": "colour",
+   "label": "Tips"
+  },
+  {
+   "key": "speed",
+   "standard": "speed"
+  }
+ ],
+ "body": {
+  "pictures": {
+   "nodes": [],
+   "draw": [
+    {
+     "id": "spikes-idle",
+     "gen": "spikes",
+     "v": 1,
+     "clip": [
+      "idle"
+     ],
+     "at": [
+      16,
+      30
+     ],
+     "style": {
+      "from": "style",
+      "pick": {
+       "metal": "metal",
+       "bone": "bone",
+       "thorn": "thorn",
+       "crystal": "crystal"
+      }
+     },
+     "count": {
+      "from": "count",
+      "pick": {
+       "three": 3,
+       "four": 4,
+       "five": 5
+      }
+     },
+     "length": {
+      "from": "length",
+      "map": [
+       [
+        0,
+        12
+       ],
+       [
+        1,
+        22
+       ]
+      ],
+      "round": "px"
+     },
+     "base": {
+      "from": "base",
+      "pick": {
+       "true": true,
+       "false": false
+      }
+     },
+     "body": "spike",
+     "tip": "accent",
+     "plate": "plate",
+     "shine": "shine"
+    },
+    {
+     "id": "spikes-retract",
+     "gen": "spikes",
+     "v": 1,
+     "clip": [
+      "retract"
+     ],
+     "at": [
+      16,
+      30
+     ],
+     "style": {
+      "from": "style",
+      "pick": {
+       "metal": "metal",
+       "bone": "bone",
+       "thorn": "thorn",
+       "crystal": "crystal"
+      }
+     },
+     "count": {
+      "from": "count",
+      "pick": {
+       "three": 3,
+       "four": 4,
+       "five": 5
+      }
+     },
+     "length": {
+      "from": "length",
+      "map": [
+       [
+        0,
+        12
+       ],
+       [
+        1,
+        22
+       ]
+      ],
+      "round": "px"
+     },
+     "base": {
+      "from": "base",
+      "pick": {
+       "true": true,
+       "false": false
+      }
+     },
+     "body": "spike",
+     "tip": "accent",
+     "plate": "plate",
+     "shine": "shine",
+     "out": [
+      1,
+      0.8,
+      0.6,
+      0.4,
+      0.2,
+      0
+     ]
+    },
+    {
+     "id": "spikes-warn",
+     "gen": "spikes",
+     "v": 1,
+     "clip": [
+      "warn"
+     ],
+     "at": [
+      16,
+      30
+     ],
+     "style": {
+      "from": "style",
+      "pick": {
+       "metal": "metal",
+       "bone": "bone",
+       "thorn": "thorn",
+       "crystal": "crystal"
+      }
+     },
+     "count": {
+      "from": "count",
+      "pick": {
+       "three": 3,
+       "four": 4,
+       "five": 5
+      }
+     },
+     "length": {
+      "from": "length",
+      "map": [
+       [
+        0,
+        12
+       ],
+       [
+        1,
+        22
+       ]
+      ],
+      "round": "px"
+     },
+     "base": {
+      "from": "base",
+      "pick": {
+       "true": true,
+       "false": false
+      }
+     },
+     "body": "spike",
+     "tip": "accent",
+     "plate": "plate",
+     "shine": "shine",
+     "out": [
+      0
+     ],
+     "odd": [
+      0,
+      0,
+      1,
+      2
+     ],
+     "even": [
+      0,
+      2,
+      1,
+      0
+     ]
+    },
+    {
+     "id": "spikes-attack",
+     "gen": "spikes",
+     "v": 1,
+     "clip": [
+      "attack"
+     ],
+     "at": [
+      16,
+      30
+     ],
+     "style": {
+      "from": "style",
+      "pick": {
+       "metal": "metal",
+       "bone": "bone",
+       "thorn": "thorn",
+       "crystal": "crystal"
+      }
+     },
+     "count": {
+      "from": "count",
+      "pick": {
+       "three": 3,
+       "four": 4,
+       "five": 5
+      }
+     },
+     "length": {
+      "from": "length",
+      "map": [
+       [
+        0,
+        12
+       ],
+       [
+        1,
+        22
+       ]
+      ],
+      "round": "px"
+     },
+     "base": {
+      "from": "base",
+      "pick": {
+       "true": true,
+       "false": false
+      }
+     },
+     "body": "spike",
+     "tip": "accent",
+     "plate": "plate",
+     "shine": "shine",
+     "out": [
+      0,
+      0.62,
+      1,
+      1,
+      1,
+      1
+     ],
+     "over": [
+      0,
+      0,
+      2,
+      -1,
+      1,
+      0
+     ]
+    },
+    {
+     "kind": "outline",
+     "paint": "ink"
+    },
+    {
+     "id": "glint",
+     "gen": "spikes",
+     "v": 1,
+     "clip": [
+      "attack"
+     ],
+     "at": [
+      16,
+      30
+     ],
+     "style": {
+      "from": "style",
+      "pick": {
+       "metal": "metal",
+       "bone": "bone",
+       "thorn": "thorn",
+       "crystal": "crystal"
+      }
+     },
+     "count": {
+      "from": "count",
+      "pick": {
+       "three": 3,
+       "four": 4,
+       "five": 5
+      }
+     },
+     "length": {
+      "from": "length",
+      "map": [
+       [
+        0,
+        12
+       ],
+       [
+        1,
+        22
+       ]
+      ],
+      "round": "px"
+     },
+     "base": {
+      "from": "base",
+      "pick": {
+       "true": true,
+       "false": false
+      }
+     },
+     "body": "spike",
+     "tip": "accent",
+     "plate": "plate",
+     "shine": "shine",
+     "out": [
+      0,
+      0.62,
+      1,
+      1,
+      1,
+      1
+     ],
+     "over": [
+      0,
+      0,
+      2,
+      -1,
+      1,
+      0
+     ],
+     "layer": "light",
+     "glint": [
+      0,
+      0,
+      1,
+      0
+     ]
+    }
+   ]
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 1,
+   "fps": 8,
+   "label": "Out"
+  },
+  "retract": {
+   "frames": 6,
+   "fps": 9,
+   "loop": false
+  },
+  "warn": {
+   "frames": 4,
+   "fps": 10
+  },
+  "attack": {
+   "frames": 6,
+   "fps": 14,
+   "loop": false,
+   "label": "Extend",
+   "sounds": [
+    {
+     "sound": "sword-slash",
+     "preset": "Quick dagger",
+     "frame": 1,
+     "volume": 0.7
+    }
+   ]
+  }
+ }
+}

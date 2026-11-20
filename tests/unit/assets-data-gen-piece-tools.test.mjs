@@ -28,7 +28,7 @@ test('gen.mjs lists every generator with its family and what it draws', () => {
 });
 
 test('gen.mjs <gen> prints its arguments as a table and a call to copy', () => {
-  const r = tool('gen.mjs', ['twinkle']);
+  const r = tool('gen.mjs', ['twinkle@1']);   // twinkle@1 by name: twinkle@2 (build item B12c) is the newest
   assert.equal(r.status, 0, r.stderr);
   assert.match(r.stdout, /^twinkle@1/m);
   assert.match(r.stdout, /\bsize\s+count\s+0\.\.4\s+1\b/);
@@ -40,7 +40,7 @@ test('gen.mjs <gen> prints its arguments as a table and a call to copy', () => {
 
 test('gen.mjs <gen> --sheet writes a contact sheet across its argument ranges', () => {
   const out = scratch();
-  const r = tool('gen.mjs', ['twinkle', '--sheet', '--out', out]);
+  const r = tool('gen.mjs', ['twinkle@1', '--sheet', '--out', out]);
   assert.equal(r.status, 0, r.stderr + r.stdout);
   const file = path.join(out, 'gen-twinkle@1.png');
   assert.ok(fs.existsSync(file), r.stdout);
@@ -138,7 +138,8 @@ test('piece.mjs <piece>: the `use it` line holds its args with their defaults', 
 test('gen.mjs --sheet draws every cell of every generator it draws alone (none blank, nothing refused)', async () => {
   const { generatorSheet, NOT_DRAWN } = await import('../../tools/gen.mjs');
   const { generators } = await import('../../engine/gen/index.js');
-  const drawn = generators().filter((g) => !NOT_DRAWN[g.family]);
+  // ui.area@1 (batch M8) only marks where text and the stretch border go (Contract 8): it draws nothing by design
+  const drawn = generators().filter((g) => !NOT_DRAWN[g.family] && g.key !== 'ui.area@1');
   assert.ok(drawn.length >= 10, `${drawn.length} generators drawn alone`);
   const bad = [];
   for (const g of drawn) {

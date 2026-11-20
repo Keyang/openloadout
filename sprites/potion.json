@@ -1,0 +1,45 @@
+{ "format": "loadout-sprite", "version": 2, "id": "potion", "name": "Potion",
+  "blurb": "A corked bottle of bubbling potion. Change the bottle, how full it is, the bubbles, the liquid and the glass.",
+  "meta": { "type": "pickup", "role": "items/food", "themes": ["fantasy", "forest", "dungeon"], "gameTypes": ["platformer", "arcade", "roguelike-action"], "view": "front",
+            "words": ["potion", "bottle", "flask", "vial", "elixir", "drink", "heal", "health", "magic", "collect", "pickup", "power up", "glass"], "license": "draft" },
+  "size": [32, 32], "pivot": [16, 30], "grounded": false, "preview": "idle", "styles": ["pixel"],
+  "palette": [
+    { "id": "body", "label": "Liquid", "default": "#c9423a", "material": "signal", "swatches": ["#c9423a", "#e08a2c", "#4fd8ee", "#7a4fc4", "#a4c44a", "#3f6fd1"] },
+    { "id": "accent", "label": "Glass", "default": "#f0ead8", "material": "sky", "swatches": ["#f0ead8", "#8fd0f0", "#c2c9d6", "#9bd18a", "#7fb0b8"] },
+    { "id": "glass", "material": "sky", "derive": { "rule": "mix", "of": "accent", "with": "shine", "amount": 0.25 } },
+    { "id": "cork", "default": "#a06a3c", "material": "wood", "detail": true },
+    { "id": "burst-light", "material": "light", "derive": { "rule": "mix", "of": { "rule": "ramp", "of": "body", "tone": "light" }, "with": "shine", "amount": 0.35 } },
+    { "id": "shine", "default": "#ffffff", "material": "light", "detail": true } ],
+  "controls": [
+    { "key": "size", "kind": "range", "label": "Size", "lo": "Small", "hi": "Big", "default": 0.5 },
+    { "key": "shape", "kind": "choice", "label": "Shape", "options": ["round", "tall", "flask", "vial"], "default": "round" },
+    { "key": "level", "kind": "range", "label": "Fill", "lo": "Low", "hi": "Full", "default": 0.7 },
+    { "key": "bubbles", "kind": "toggle", "label": "Bubbles", "default": true },
+    { "key": "body", "kind": "colour", "label": "Liquid" },
+    { "key": "accent", "kind": "colour", "label": "Glass" },
+    { "key": "bob", "kind": "range", "label": "Float", "lo": "Still", "hi": "Floaty", "default": 0.5, "group": "Motion" },
+    { "key": "pop", "kind": "range", "label": "Pop height", "lo": "Low", "hi": "High", "default": 0.5, "group": "Motion" },
+    { "key": "speed", "standard": "speed" } ],
+  "body": { "pictures": {
+    "nodes": [ { "id": "potion", "parent": null, "at": [16, 17] } ],
+    "draw": [
+      { "id": "bottle", "gen": "potion.bottle", "v": 1, "on": "potion", "at": [0, 0],
+        "height": { "from": "size", "map": [[0, 14], [1, 22]], "round": "px" },
+        "shape": { "from": "shape", "pick": { "round": "round", "tall": "tall", "flask": "flask", "vial": "vial" } },
+        "level": { "from": "level", "map": [[0, 0], [1, 1]], "round": "none" },
+        "bubbles": { "from": "bubbles", "pick": { "true": true, "false": false } },
+        "glass": "glass", "liquid": "body", "cork": "cork", "shine": "shine" },
+      { "kind": "outline", "paint": "ink" } ],
+    "motion": [
+      { "gen": "pickup.bob", "v": 1, "clip": ["idle"], "height": { "from": "bob", "map": [[0, 0], [1, 2]] } },
+      { "gen": "pickup.collect", "v": 1, "node": "potion", "clip": ["collect"], "pop": { "from": "pop", "map": [[0, 0], [1, 1]] },
+        "low": { "from": "size", "map": [[0, 2.8], [1, 0.6]] }, "high": { "from": "size", "map": [[0, 6.2], [1, 1.3]] }, "room": { "from": "size", "map": [[0, 6.2], [1, 1.3]] } } ],
+    "emitters": [
+      { "id": "burst", "gen": "pickup.burst", "v": 1, "on": "potion", "at": [0, 0], "reach": { "from": "size", "map": [[0, 10], [1, 14]] },
+        "sparkle": true, "paint": "body", "bright": "burst-light", "core": "shine" } ] } },
+  "clips": {
+    "idle": { "frames": 8, "fps": 10 },
+    "collect": { "frames": 8, "fps": 14, "loop": false, "frameEdits": { "4": { "flash": true } },
+      "keys": [ { "t": 0, "ease": "hold", "emit": { "burst": { "amount": 0 } } }, { "t": 0.6, "ease": "linear", "emit": { "burst": { "amount": 0 } } },
+                { "t": 1, "emit": { "burst": { "amount": 1 } } } ],
+      "sounds": [ { "sound": "powerup", "preset": "1-up", "frame": 1, "volume": 0.7 } ] } } }

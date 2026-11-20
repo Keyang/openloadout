@@ -1,0 +1,952 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "fuel-barrel",
+ "name": "Fuel barrel",
+ "blurb": "A red barrel that leaks when shot, swells, flashes and explodes. Make it a drum, a gas tank or a fuel cell, and change its size, dents, ribs and colours.",
+ "meta": {
+  "type": "prop",
+  "role": "world/hazard",
+  "themes": [
+   "sci-fi",
+   "space"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "shooter"
+  ],
+  "view": "top-down",
+  "words": [
+   "barrel",
+   "fuel",
+   "drum",
+   "tank",
+   "canister",
+   "explosive",
+   "explode",
+   "shoot",
+   "hazard",
+   "danger",
+   "bomb",
+   "trap",
+   "red",
+   "warning"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  48
+ ],
+ "pivot": [
+  16,
+  46
+ ],
+ "preview": "idle",
+ "styles": [
+  "pixel"
+ ],
+ "palette": [
+  {
+   "id": "body",
+   "label": "Body",
+   "default": "#e2473f",
+   "material": "metal",
+   "swatches": [
+    "#e2473f",
+    "#3f6fd1",
+    "#2fb3a8",
+    "#4f9ff0",
+    "#6b7896",
+    "#566182",
+    "#434d6d"
+   ]
+  },
+  {
+   "id": "accent",
+   "label": "Hazard label",
+   "default": "#f2a030",
+   "material": "paint",
+   "swatches": [
+    "#f2a030",
+    "#5fe0f0",
+    "#9fe040",
+    "#f0ead8",
+    "#b48af8",
+    "#f2c230"
+   ]
+  },
+  {
+   "id": "glow",
+   "label": "Light",
+   "default": "#f2a030",
+   "material": "fire",
+   "swatches": [
+    "#f2a030",
+    "#5fe0f0",
+    "#e2473f",
+    "#9fe040",
+    "#b48af8",
+    "#4f9ff0",
+    "#5fd47a"
+   ]
+  },
+  {
+   "id": "tape",
+   "default": "#434d6d",
+   "material": "metal",
+   "detail": true
+  },
+  {
+   "id": "steel",
+   "default": "#c2c9d6",
+   "material": "metal",
+   "detail": true
+  },
+  {
+   "id": "panel",
+   "default": "#9aa6c0",
+   "material": "metal",
+   "detail": true
+  },
+  {
+   "id": "cream",
+   "default": "#f0ead8",
+   "material": "paint",
+   "detail": true
+  },
+  {
+   "id": "shine",
+   "default": "#ffffff",
+   "material": "light",
+   "detail": true
+  }
+ ],
+ "controls": [
+  {
+   "key": "size",
+   "kind": "range",
+   "label": "Size",
+   "lo": "Small",
+   "hi": "Big",
+   "default": 0.5
+  },
+  {
+   "key": "style",
+   "kind": "choice",
+   "label": "Style",
+   "options": [
+    "barrel",
+    "tank",
+    "cell"
+   ],
+   "default": "barrel"
+  },
+  {
+   "key": "wear",
+   "kind": "range",
+   "label": "Wear",
+   "lo": "New",
+   "hi": "Worn",
+   "default": 0.35
+  },
+  {
+   "key": "bands",
+   "kind": "toggle",
+   "label": "Ribs",
+   "default": true
+  },
+  {
+   "key": "body",
+   "kind": "colour",
+   "label": "Body"
+  },
+  {
+   "key": "accent",
+   "kind": "colour",
+   "label": "Hazard label"
+  },
+  {
+   "key": "glow",
+   "kind": "colour",
+   "label": "Light"
+  },
+  {
+   "key": "speed",
+   "standard": "speed"
+  }
+ ],
+ "body": {
+  "pictures": {
+   "nodes": [],
+   "draw": [
+    {
+     "id": "barrel",
+     "gen": "fuel.barrel",
+     "v": 1,
+     "at": [
+      16,
+      46
+     ],
+     "style": {
+      "from": "style",
+      "pick": {
+       "barrel": "barrel",
+       "tank": "tank",
+       "cell": "cell"
+      }
+     },
+     "size": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "wear": {
+      "from": "wear",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "bands": {
+      "from": "bands",
+      "pick": {
+       "true": true,
+       "false": false
+      }
+     },
+     "body": "body",
+     "accent": "accent",
+     "inner": "glow",
+     "tape": "tape",
+     "steel": "steel",
+     "panel": "panel",
+     "cream": "cream",
+     "shine": "shine",
+     "clip": [
+      "idle"
+     ],
+     "lamp": [
+      2,
+      2,
+      1,
+      0.5,
+      0,
+      0,
+      0,
+      0.5
+     ]
+    },
+    {
+     "id": "barrel-hurt",
+     "gen": "fuel.barrel",
+     "v": 1,
+     "at": [
+      16,
+      46
+     ],
+     "style": {
+      "from": "style",
+      "pick": {
+       "barrel": "barrel",
+       "tank": "tank",
+       "cell": "cell"
+      }
+     },
+     "size": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "wear": {
+      "from": "wear",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "bands": {
+      "from": "bands",
+      "pick": {
+       "true": true,
+       "false": false
+      }
+     },
+     "body": "body",
+     "accent": "accent",
+     "inner": "glow",
+     "tape": "tape",
+     "steel": "steel",
+     "panel": "panel",
+     "cream": "cream",
+     "shine": "shine",
+     "clip": [
+      "hurt"
+     ],
+     "lamp": [
+      1
+     ],
+     "squash": [
+      1,
+      -1,
+      1,
+      0
+     ],
+     "shift": [
+      1,
+      -1,
+      0,
+      0
+     ],
+     "leak": [
+      0,
+      2,
+      5,
+      8
+     ]
+    },
+    {
+     "id": "barrel-fuse",
+     "gen": "fuel.barrel",
+     "v": 1,
+     "at": [
+      16,
+      46
+     ],
+     "style": {
+      "from": "style",
+      "pick": {
+       "barrel": "barrel",
+       "tank": "tank",
+       "cell": "cell"
+      }
+     },
+     "size": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "wear": {
+      "from": "wear",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "bands": {
+      "from": "bands",
+      "pick": {
+       "true": true,
+       "false": false
+      }
+     },
+     "body": "body",
+     "accent": "accent",
+     "inner": "glow",
+     "tape": "tape",
+     "steel": "steel",
+     "panel": "panel",
+     "cream": "cream",
+     "shine": "shine",
+     "clip": [
+      "fuse"
+     ],
+     "lamp": [
+      1
+     ],
+     "leak": [
+      64
+     ],
+     "grow": [
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      2,
+      2
+     ],
+     "tint": [
+      1,
+      0,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1
+     ]
+    },
+    {
+     "id": "barrel-swell",
+     "gen": "fuel.barrel",
+     "v": 1,
+     "at": [
+      16,
+      46
+     ],
+     "style": {
+      "from": "style",
+      "pick": {
+       "barrel": "barrel",
+       "tank": "tank",
+       "cell": "cell"
+      }
+     },
+     "size": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "wear": {
+      "from": "wear",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "bands": {
+      "from": "bands",
+      "pick": {
+       "true": true,
+       "false": false
+      }
+     },
+     "body": "body",
+     "accent": "accent",
+     "inner": "glow",
+     "tape": "tape",
+     "steel": "steel",
+     "panel": "panel",
+     "cream": "cream",
+     "shine": "shine",
+     "clip": [
+      "break"
+     ],
+     "stage": [
+      0,
+      1,
+      -1
+     ],
+     "grow": [
+      2
+     ]
+    },
+    {
+     "kind": "outline",
+     "paint": "ink"
+    },
+    {
+     "id": "blown",
+     "gen": "fuel.barrel",
+     "v": 1,
+     "at": [
+      16,
+      46
+     ],
+     "style": {
+      "from": "style",
+      "pick": {
+       "barrel": "barrel",
+       "tank": "tank",
+       "cell": "cell"
+      }
+     },
+     "size": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "wear": {
+      "from": "wear",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "bands": {
+      "from": "bands",
+      "pick": {
+       "true": true,
+       "false": false
+      }
+     },
+     "body": "body",
+     "accent": "accent",
+     "inner": "glow",
+     "tape": "tape",
+     "steel": "steel",
+     "panel": "panel",
+     "cream": "cream",
+     "shine": "shine",
+     "clip": [
+      "break"
+     ],
+     "stage": [
+      -1,
+      -1,
+      2
+     ],
+     "blast": [
+      0,
+      0,
+      0.07407407407407406,
+      0.25925925925925924,
+      0.4444444444444444,
+      0.6296296296296295,
+      0.8148148148148149,
+      1
+     ]
+    },
+    {
+     "id": "flare",
+     "gen": "fuel.barrel",
+     "v": 1,
+     "at": [
+      16,
+      46
+     ],
+     "style": {
+      "from": "style",
+      "pick": {
+       "barrel": "barrel",
+       "tank": "tank",
+       "cell": "cell"
+      }
+     },
+     "size": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "wear": {
+      "from": "wear",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "bands": {
+      "from": "bands",
+      "pick": {
+       "true": true,
+       "false": false
+      }
+     },
+     "body": "body",
+     "accent": "accent",
+     "inner": "glow",
+     "tape": "tape",
+     "steel": "steel",
+     "panel": "panel",
+     "cream": "cream",
+     "shine": "shine",
+     "clip": [
+      "idle"
+     ],
+     "layer": "light",
+     "flare": [
+      1,
+      1,
+      0
+     ]
+    },
+    {
+     "id": "puddle",
+     "gen": "fuel.barrel",
+     "v": 1,
+     "at": [
+      16,
+      46
+     ],
+     "style": {
+      "from": "style",
+      "pick": {
+       "barrel": "barrel",
+       "tank": "tank",
+       "cell": "cell"
+      }
+     },
+     "size": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "wear": {
+      "from": "wear",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "bands": {
+      "from": "bands",
+      "pick": {
+       "true": true,
+       "false": false
+      }
+     },
+     "body": "body",
+     "accent": "accent",
+     "inner": "glow",
+     "tape": "tape",
+     "steel": "steel",
+     "panel": "panel",
+     "cream": "cream",
+     "shine": "shine",
+     "clip": [
+      "hurt"
+     ],
+     "lamp": [
+      1
+     ],
+     "squash": [
+      1,
+      -1,
+      1,
+      0
+     ],
+     "shift": [
+      1,
+      -1,
+      0,
+      0
+     ],
+     "leak": [
+      0,
+      2,
+      5,
+      8
+     ],
+     "layer": "light",
+     "puddle": [
+      0,
+      0,
+      0,
+      1.6
+     ]
+    },
+    {
+     "id": "fuse-light",
+     "gen": "fuel.barrel",
+     "v": 1,
+     "at": [
+      16,
+      46
+     ],
+     "style": {
+      "from": "style",
+      "pick": {
+       "barrel": "barrel",
+       "tank": "tank",
+       "cell": "cell"
+      }
+     },
+     "size": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "wear": {
+      "from": "wear",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "bands": {
+      "from": "bands",
+      "pick": {
+       "true": true,
+       "false": false
+      }
+     },
+     "body": "body",
+     "accent": "accent",
+     "inner": "glow",
+     "tape": "tape",
+     "steel": "steel",
+     "panel": "panel",
+     "cream": "cream",
+     "shine": "shine",
+     "clip": [
+      "fuse"
+     ],
+     "lamp": [
+      1
+     ],
+     "leak": [
+      64
+     ],
+     "grow": [
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      2,
+      2
+     ],
+     "layer": "light",
+     "flare": [
+      1
+     ],
+     "puddle": [
+      2.4,
+      3,
+      2.4,
+      3,
+      2.4,
+      3,
+      2.4,
+      3
+     ]
+    },
+    {
+     "id": "blast",
+     "gen": "fuel.barrel",
+     "v": 1,
+     "at": [
+      16,
+      46
+     ],
+     "style": {
+      "from": "style",
+      "pick": {
+       "barrel": "barrel",
+       "tank": "tank",
+       "cell": "cell"
+      }
+     },
+     "size": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "wear": {
+      "from": "wear",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "bands": {
+      "from": "bands",
+      "pick": {
+       "true": true,
+       "false": false
+      }
+     },
+     "body": "body",
+     "accent": "accent",
+     "inner": "glow",
+     "tape": "tape",
+     "steel": "steel",
+     "panel": "panel",
+     "cream": "cream",
+     "shine": "shine",
+     "clip": [
+      "break"
+     ],
+     "layer": "light",
+     "stage": [
+      0,
+      1,
+      2
+     ],
+     "blast": [
+      0,
+      0,
+      0.07407407407407406,
+      0.25925925925925924,
+      0.4444444444444444,
+      0.6296296296296295,
+      0.8148148148148149,
+      1
+     ],
+     "ball": [
+      0,
+      1,
+      2,
+      3,
+      0
+     ]
+    }
+   ]
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "fps": 8
+  },
+  "hurt": {
+   "frames": 4,
+   "fps": 9,
+   "loop": false,
+   "frameEdits": {
+    "0": {
+     "flash": true
+    }
+   },
+   "sounds": [
+    {
+     "sound": "bolt-impact",
+     "preset": "On metal",
+     "frame": 0,
+     "volume": 0.9
+    }
+   ]
+  },
+  "fuse": {
+   "frames": 8,
+   "fps": 8
+  },
+  "break": {
+   "frames": 8,
+   "fps": 12,
+   "loop": false,
+   "label": "Explode",
+   "frameEdits": {
+    "0": {
+     "flash": true
+    }
+   },
+   "sounds": [
+    {
+     "sound": "explosion",
+     "preset": "Grenade",
+     "frame": 0
+    }
+   ]
+  }
+ }
+}

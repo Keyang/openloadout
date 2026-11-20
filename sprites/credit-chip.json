@@ -1,0 +1,64 @@
+{
+  "format": "loadout-sprite",
+  "version": 2,
+  "id": "credit-chip",
+  "name": "Credit chip",
+  "blurb": "A spinning six-sided gold chip with a lit circuit on its face: the money of a space station. Change its shape, thickness, mark and colours.",
+  "meta": {"type":"pickup","role":"items/pickup","themes":["sci-fi","space"],"gameTypes":["roguelike-action","shooter","arcade"],"view":"front","words":["credit","chip","money","coin","cash","currency","token","gold","loot","collect","pickup","spin","score","circuit"],"license":"draft"},
+  "size": [32,32],
+  "pivot": [16,30],
+  "grounded": false,
+  "preview": "idle",
+  "styles": ["pixel"],
+  "palette": [
+    {"id":"metal","label":"Metal","default":"#f2c230","material":"metal","swatches":["#f2c230","#c2c9d6","#9aa6c0","#6b7896","#8f97a8","#e6c545","#c98a4a"]},
+    {"id":"glow","label":"Glow","default":"#5fe0f0","material":"light","swatches":["#5fe0f0","#e2473f","#9fe040","#f2a030","#b48af8","#4f9ff0","#5fd47a"]},
+    {"id":"field","material":"metal","derive":{"rule":"mix","of":"metal","with":{"rule":"ramp","of":"metal","tone":"dark"},"amount":0.3}},
+    {"id":"gleam","material":"light","derive":{"rule":"mix","of":{"rule":"ramp","of":"metal","tone":"light"},"with":"shine","amount":0.6}},
+    {"id":"lit","material":"light","derive":{"rule":"mix","of":{"rule":"ramp","of":"glow","tone":"light"},"with":"glow","amount":0.35}},
+    {"id":"flare","material":"light","derive":{"rule":"tone","of":"metal","by":0.9}},
+    {"id":"spark","material":"light","derive":{"rule":"mix","of":{"rule":"ramp","of":"metal","tone":"light"},"with":"shine","amount":0.35}},
+    {"id":"shine","default":"#ffffff","material":"light","detail":true}
+  ],
+  "controls": [
+    {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+    {"key":"shape","kind":"choice","label":"Shape","options":[{"value":"hex","label":"Six sides"},"round","bar"],"default":"hex"},
+    {"key":"thickness","kind":"range","label":"Thickness","lo":"Thin","hi":"Chunky","default":0.4},
+    {"key":"mark","kind":"choice","label":"Mark","options":["circuit","star","plain"],"default":"circuit"},
+    {"key":"sparkle","kind":"toggle","label":"Sparkle","default":true},
+    {"key":"metal","kind":"colour","label":"Metal"},
+    {"key":"glow","kind":"colour","label":"Glow","when":{"mark":["circuit","star"]}},
+    {"key":"bob","kind":"range","label":"Float","lo":"Still","hi":"Floaty","default":0.5,"group":"Motion"},
+    {"key":"pop","kind":"range","label":"Pop height","lo":"Low","hi":"High","default":0.5,"group":"Motion"},
+    {"key":"speed","standard":"speed"}
+  ],
+  "body": { "pictures": {
+    "nodes": [
+      {"id":"it","parent":null,"at":[16,17]}
+    ],
+    "draw": [
+      {"id":"chip-hex","gen":"chip","v":1,"on":"it","at":[0,0],"shape":"hex","when":{"shape":["hex"]},"width":{"from":"size","map":[[0,12],[0.16666,12],[0.16667,14],[0.49999,14],[0.5,16],[0.83333,16],[0.83334,18],[1,18]],"round":"px"},"thick":{"from":"thickness","map":[[0,2],[1,5]],"round":"px"},"mark":{"from":"mark","pick":{"circuit":"circuit","star":"star","plain":"plain"}},"metal":"metal","field":"field","gleam":"gleam","lit":"lit","pad":"shine"},
+      {"id":"chip-round","gen":"chip","v":1,"on":"it","at":[0,0],"shape":"round","when":{"shape":["round"]},"width":{"from":"size","map":[[0,14],[0.33333,14],[0.33334,16],[0.66666,16],[0.66667,18],[0.99999,18],[1,20]],"round":"px"},"thick":{"from":"thickness","map":[[0,2],[1,5]],"round":"px"},"mark":{"from":"mark","pick":{"circuit":"circuit","star":"star","plain":"plain"}},"metal":"metal","field":"field","gleam":"gleam","lit":"lit","pad":"shine"},
+      {"id":"chip-bar","gen":"chip","v":1,"on":"it","at":[0,0],"shape":"bar","when":{"shape":["bar"]},"width":{"from":"size","map":[[0,8],[0.24999,8],[0.25,10],[0.74999,10],[0.75,12],[1,12]],"round":"px"},"thick":{"from":"thickness","map":[[0,2],[1,5]],"round":"px"},"mark":{"from":"mark","pick":{"circuit":"circuit","star":"star","plain":"plain"}},"metal":"metal","field":"field","gleam":"gleam","lit":"lit","pad":"shine"},
+      {"kind":"outline","paint":"ink"},
+      {"id":"sparkle-hex","gen":"gleam","v":1,"on":"it","clip":["idle"],"when":{"sparkle":[true],"shape":["hex"]},"at":[{"from":"size","map":[[0,5],[0.16666,5],[0.16667,6],[0.49999,6],[0.5,7],[0.83333,7],[0.83334,8],[1,8]],"round":"px"},{"from":"size","map":[[0,-6],[0.16666,-6],[0.16667,-7],[0.49999,-7],[0.5,-8],[0.83333,-8],[0.83334,-9],[1,-9]],"round":"px"}],"peak":0,"paint":"flare","core":"shine"},
+      {"id":"sparkle-round","gen":"gleam","v":1,"on":"it","clip":["idle"],"when":{"sparkle":[true],"shape":["round"]},"at":[{"from":"size","map":[[0,6],[0.33333,6],[0.33334,7],[0.66666,7],[0.66667,8],[0.99999,8],[1,9]],"round":"px"},{"from":"size","map":[[0,-6],[0.33333,-6],[0.33334,-7],[0.66666,-7],[0.66667,-8],[0.99999,-8],[1,-9]],"round":"px"}],"peak":0,"paint":"flare","core":"shine"},
+      {"id":"sparkle-bar","gen":"gleam","v":1,"on":"it","clip":["idle"],"when":{"sparkle":[true],"shape":["bar"]},"at":[{"from":"size","map":[[0,3],[0.24999,3],[0.25,4],[0.74999,4],[0.75,5],[1,5]],"round":"px"},{"from":"size","map":[[0,-6],[0.24999,-6],[0.25,-8],[0.74999,-8],[0.75,-10],[1,-10]],"round":"px"}],"peak":0,"paint":"flare","core":"shine"}
+    ],
+    "motion": [
+      {"gen":"pickup.bob","v":1,"clip":["idle"],"height":{"from":"bob","map":[[0,0],[1,2]]}},
+      {"gen":"chip.turn","v":1,"node":"it","clip":["idle"],"mode":"spin"},
+      {"gen":"chip.turn","v":1,"node":"it","clip":["collect"],"mode":"flip"},
+      {"gen":"pickup.collect","v":1,"node":"it","clip":["collect"],"pop":{"from":"pop","map":[[0,0],[1,1]]},"low":{"from":"size","map":[[0,2.79],[0.16666,2.79],[0.16667,2.295],[0.49999,2.295],[0.5,1.8],[0.83333,1.8],[0.83334,1.305],[1,1.305]]},"high":{"from":"size","map":[[0,6.2],[0.16666,6.2],[0.16667,5.1],[0.49999,5.1],[0.5,4],[0.83333,4],[0.83334,2.9],[1,2.9]]},"room":32,"when":{"shape":["hex"]}},
+      {"gen":"pickup.collect","v":1,"node":"it","clip":["collect"],"pop":{"from":"pop","map":[[0,0],[1,1]]},"low":{"from":"size","map":[[0,2.79],[0.33333,2.79],[0.33334,2.295],[0.66666,2.295],[0.66667,1.8],[0.99999,1.8],[1,1.305]]},"high":{"from":"size","map":[[0,6.2],[0.33333,6.2],[0.33334,5.1],[0.66666,5.1],[0.66667,4],[0.99999,4],[1,2.9]]},"room":32,"when":{"shape":["round"]}},
+      {"gen":"pickup.collect","v":1,"node":"it","clip":["collect"],"pop":{"from":"pop","map":[[0,0],[1,1]]},"low":{"from":"size","map":[[0,2.79],[0.24999,2.79],[0.25,1.8],[0.74999,1.8],[0.75,0.81],[1,0.81]]},"high":{"from":"size","map":[[0,6.2],[0.24999,6.2],[0.25,4],[0.74999,4],[0.75,1.8],[1,1.8]]},"room":32,"when":{"shape":["bar"]}}
+    ],
+    "emitters": [
+      {"id":"burst","gen":"pickup.burst","v":1,"on":"it","at":[0,0],"reach":{"from":"size","map":[[0,9],[1,13]]},"sparkle":{"from":"sparkle","pick":{"true":true,"false":false}},"paint":"metal","bright":"spark","core":"shine"}
+    ]
+  } },
+  "clips": {
+    "idle": {"frames":8,"fps":10},
+    "collect": {"frames":8,"fps":14,"loop":false,"frameEdits":{"4":{"flash":true}},"keys":[{"t":0,"ease":"hold","emit":{"burst":{"amount":0}}},{"t":0.7142,"ease":"linear","emit":{"burst":{"amount":0.2857}}},{"t":0.8571,"hide":["chip-hex","chip-round","chip-bar"]},{"t":1,"emit":{"burst":{"amount":1}}}],"sounds":[{"sound":"credit-pickup","preset":"Credit chip","frame":1,"volume":0.7}]}
+  }
+}

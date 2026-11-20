@@ -1,0 +1,230 @@
+{
+ "id": "ui-panel-crystal",
+ "frozen": "2026-11-20",
+ "source": "sprites/ui-panel-crystal.js",
+ "sha256": "11e9c0477452374e946c4df1c08af73faaf08ca984550109d12fdb684d22b345",
+ "name": "Crystal panels",
+ "blurb": "Stretchable boxes of deep ice in a cut crystal band for spell lists, shops and tips: a panel, one with a heading, a list well and a tooltip, with icicles, frost ferns or shards; change the style, corners, band, glints and colours.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/panel",
+  "themes": [
+   "neutral",
+   "fantasy"
+  ],
+  "gameTypes": [
+   "arcade",
+   "turn-based-rpg",
+   "puzzle",
+   "top-down-rpg"
+  ],
+  "view": "none",
+  "words": [
+   "panel",
+   "window",
+   "box",
+   "popup",
+   "menu",
+   "tooltip",
+   "list",
+   "crystal",
+   "ice",
+   "frost",
+   "frozen",
+   "shard"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  96,
+  64
+ ],
+ "pivot": [
+  48,
+  32
+ ],
+ "grounded": false,
+ "preview": "panel",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "ice",
+   "options": [
+    {
+     "value": "ice",
+     "label": "Ice"
+    },
+    {
+     "value": "rime",
+     "label": "Rime"
+    },
+    {
+     "value": "shard",
+     "label": "Shard"
+    }
+   ],
+   "group": "Look"
+  },
+  "corner": {
+   "kind": "range",
+   "label": "Corner",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Square",
+   "hi": "Round",
+   "group": "Look"
+  },
+  "border": {
+   "kind": "range",
+   "label": "Border",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Thin",
+   "hi": "Thick",
+   "group": "Look"
+  },
+  "glints": {
+   "kind": "toggle",
+   "label": "Glints",
+   "def": true,
+   "group": "Look"
+  },
+  "face": {
+   "kind": "color",
+   "label": "Stone",
+   "def": "#3f5068",
+   "swatches": [
+    "#3f5068",
+    "#7a4f33",
+    "#434d6d",
+    "#8e3a4a"
+   ],
+   "group": "Colors"
+  },
+  "frame": {
+   "kind": "color",
+   "label": "Crystal",
+   "def": "#8fd0f0",
+   "swatches": [
+    "#8fd0f0",
+    "#9bd18a",
+    "#5fe0f0",
+    "#7fe0a0"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Sparkles and frost tips",
+   "def": "#4fd8ee",
+   "swatches": [
+    "#4fd8ee",
+    "#c9423a",
+    "#a4c44a",
+    "#b48af8",
+    "#f4e06a"
+   ],
+   "group": "Colors",
+   "when": [
+    {
+     "glints": [
+      true
+     ]
+    },
+    {
+     "style": [
+      "rime"
+     ]
+    }
+   ]
+  }
+ },
+ "clips": {
+  "panel": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "panel-title": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "inset": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "tooltip": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [
+  {
+   "name": "Ice",
+   "params": {}
+  },
+  {
+   "name": "Frost",
+   "params": {
+    "style": "rime",
+    "accent": "#c9423a",
+    "face": "#434d6d",
+    "frame": "#7fe0a0",
+    "border": 1
+   }
+  },
+  {
+   "name": "Shard",
+   "params": {
+    "style": "shard",
+    "frame": "#5fe0f0",
+    "border": 1,
+    "face": "#7a4f33",
+    "corner": 0
+   }
+  },
+  {
+   "name": "Garnet",
+   "params": {
+    "face": "#8e3a4a",
+    "frame": "#7fe0a0",
+    "glints": false
+   }
+  },
+  {
+   "name": "Jade",
+   "params": {
+    "frame": "#9bd18a",
+    "accent": "#a4c44a",
+    "corner": 1,
+    "face": "#7a4f33"
+   }
+  }
+ ],
+ "bundles": []
+}

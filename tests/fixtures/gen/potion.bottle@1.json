@@ -1,0 +1,261 @@
+{
+ "id": "potion.bottle",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     16,
+     17
+    ],
+    "height": 18,
+    "shape": "round",
+    "level": 0.7,
+    "glass": "glass",
+    "liquid": "body",
+    "cork": "cork",
+    "shine": "shine"
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true,
+    "frames": 8,
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      10,
+      8
+     ],
+     "anchor": "tl",
+     "rows": [
+      "....abbb....",
+      "....abbb....",
+      "...ccdddd...",
+      "....ceee....",
+      "....ceed....",
+      "....ceed....",
+      "....eeed....",
+      "..deeeeddd..",
+      ".ceeeeeeedd.",
+      ".eeeeeeeefd.",
+      "ceeegggggfgd",
+      "cggghhhhhfhd",
+      "cihhhhhhhhhd",
+      "ciihhhhhfhhd",
+      ".cihhgghhhe.",
+      ".ciiigghhid.",
+      "..cciiiiec..",
+      "....cccc...."
+     ],
+     "key": {
+      "a": "cork.dark",
+      "b": "cork",
+      "c": "glass.dark",
+      "d": "glass.light",
+      "e": "glass",
+      "f": "shine",
+      "g": "body.light",
+      "h": "body",
+      "i": "body.dark"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     17
+    ],
+    "height": 21,
+    "shape": "flask",
+    "level": 0.3,
+    "glass": "glass",
+    "liquid": "body",
+    "cork": "cork",
+    "shine": "shine"
+   },
+   "ctx": {
+    "t": 0.625,
+    "loop": true,
+    "frames": 8,
+    "frame": 5
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      8,
+      6
+     ],
+     "anchor": "tl",
+     "rows": [
+      "......abbb......",
+      "......abbb......",
+      ".....ccdddd.....",
+      "......ceee......",
+      "......ceed......",
+      "......ceed......",
+      "......ceed......",
+      "......eeed......",
+      ".....ceeedd.....",
+      ".....eeeefd.....",
+      "....ceeeeffd....",
+      "....eeeeeefd....",
+      "...ceeeeeefdd...",
+      "...eeeeeeeefd...",
+      "..cgeeeeeeefdd..",
+      "..ehgggggggffd..",
+      ".cghhhghhhhhggd.",
+      ".ehhhhhgghhhhhd.",
+      "cghhhhhgghhhhhgd",
+      "ciiiiiiiiiiiiiid",
+      ".cccccccccccccc."
+     ],
+     "key": {
+      "a": "cork.dark",
+      "b": "cork",
+      "c": "glass.dark",
+      "d": "glass.light",
+      "e": "glass",
+      "f": "shine",
+      "g": "body.light",
+      "h": "body",
+      "i": "body.dark"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     17
+    ],
+    "height": 14,
+    "shape": "vial",
+    "level": 1,
+    "bubbles": false,
+    "glass": "glass",
+    "liquid": "body",
+    "cork": "cork",
+    "shine": "shine"
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true,
+    "frames": 8,
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      12,
+      10
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..abbb..",
+      "..abbb..",
+      "ccdddddd",
+      ".ceeeee.",
+      ".ceeeed.",
+      ".cfffgd.",
+      ".chiigd.",
+      ".chiigd.",
+      ".chiigd.",
+      ".chiigd.",
+      ".chiiid.",
+      ".chiiid.",
+      ".chhhhd.",
+      "..cccc.."
+     ],
+     "key": {
+      "a": "cork.dark",
+      "b": "cork",
+      "c": "glass.dark",
+      "d": "glass.light",
+      "e": "glass",
+      "f": "body.light",
+      "g": "shine",
+      "h": "body.dark",
+      "i": "body"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     17
+    ],
+    "height": 22,
+    "shape": "tall",
+    "level": 0.7,
+    "collect": true,
+    "glass": "glass",
+    "liquid": "body",
+    "cork": "cork",
+    "shine": "shine"
+   },
+   "ctx": {
+    "t": 0.5714285714285714,
+    "loop": false,
+    "frames": 8,
+    "frame": 4
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      11,
+      5
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...abbb...",
+      "...abbb...",
+      "..ccdddd..",
+      "...ceee...",
+      "...ceed...",
+      "...ceed...",
+      "...ceed...",
+      "...eeed...",
+      ".deeeeddd.",
+      "ceeeeeeedd",
+      "ceeeeeeeed",
+      "ceeeeeeeed",
+      "ceeeeeefed",
+      "ceeeeeefed",
+      "cggggggfgd",
+      "chiiiiifid",
+      "chiiiiifid",
+      "chiiiiifid",
+      "chiiiiifid",
+      "chiiiiiiid",
+      "chiiiiiiid",
+      "chiiggiiid",
+      "chhhgghhhd",
+      ".cccccccc."
+     ],
+     "key": {
+      "a": "cork.dark",
+      "b": "cork",
+      "c": "glass.dark",
+      "d": "glass.light",
+      "e": "glass",
+      "f": "shine",
+      "g": "body.light",
+      "h": "body.dark",
+      "i": "body"
+     }
+    }
+   ]
+  }
+ ]
+}

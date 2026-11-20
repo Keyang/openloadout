@@ -1,0 +1,185 @@
+{
+ "id": "star-charm",
+ "frozen": "2026-11-20",
+ "source": "sprites/star-charm.js",
+ "sha256": "010efa6f8fdf433c6972c95eb8d9a62ffeaab4fd5780ae57a740d5fbbdd1cb0a",
+ "name": "Star charm",
+ "blurb": "A star-shaped gold medallion on a loop that swings, turns and twinkles: the power-up. Change its points, jewel, halo and colours.",
+ "meta": {
+  "type": "pickup",
+  "role": "items/pickup",
+  "themes": [
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "platformer",
+   "arcade",
+   "roguelike-action"
+  ],
+  "view": "front",
+  "words": [
+   "star",
+   "charm",
+   "medallion",
+   "amulet",
+   "badge",
+   "power up",
+   "powerup",
+   "bonus",
+   "invincible",
+   "collect",
+   "pickup",
+   "reward",
+   "magic",
+   "shiny"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  30
+ ],
+ "grounded": false,
+ "preview": "idle",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "shape": {
+   "kind": "choice",
+   "label": "Shape",
+   "def": "five",
+   "options": [
+    "four",
+    "five",
+    "six",
+    "eight"
+   ],
+   "group": "Look"
+  },
+  "jewel": {
+   "kind": "toggle",
+   "label": "Jewel",
+   "def": true,
+   "group": "Look"
+  },
+  "halo": {
+   "kind": "toggle",
+   "label": "Halo",
+   "def": true,
+   "group": "Look"
+  },
+  "sparkle": {
+   "kind": "toggle",
+   "label": "Sparkle",
+   "def": true,
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Metal",
+   "def": "#f2c230",
+   "swatches": [
+    "#f2c230",
+    "#c2c9d6",
+    "#8f97a8",
+    "#e6c545",
+    "#c98a4a"
+   ],
+   "group": "Colors"
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Glow",
+   "def": "#4fd8ee",
+   "swatches": [
+    "#4fd8ee",
+    "#e08a2c",
+    "#a4c44a",
+    "#c9423a",
+    "#7a4fc4"
+   ],
+   "group": "Colors"
+  },
+  "bob": {
+   "kind": "range",
+   "label": "Float",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Still",
+   "hi": "Floaty",
+   "group": "Motion"
+  },
+  "pop": {
+   "kind": "range",
+   "label": "Pop height",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Low",
+   "hi": "High",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "collect": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    9,
+    15,
+    20
+   ]
+  }
+ },
+ "sounds": {
+  "collect": [
+   {
+    "sound": "powerup",
+    "preset": "Charge",
+    "frame": 1,
+    "volume": 0.7
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-platformer-fantasy"
+ ]
+}

@@ -1,0 +1,1587 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "tiles-dungeon",
+ "name": "Dungeon tiles",
+ "blurb": "Flagstone floors, dark walls with a brick face, pits and stairs for top-down dungeon rooms and corridors; change the stone, floor and slime colours, the paving, the kerb, how worn and how damp it is.",
+ "size": [32,32],
+ "pivot": [16,16],
+ "grounded": false,
+ "preview": "wall-bottom",
+ "styles": ["pixel"],
+ "meta": {
+  "type": "tileset",
+  "role": "world/tile",
+  "themes": ["fantasy","dungeon"],
+  "gameTypes": ["turn-based-rpg","top-down-rpg"],
+  "view": "top-down",
+  "words": [
+   "dungeon",
+   "floor",
+   "flagstones",
+   "wall",
+   "bricks",
+   "pit",
+   "hole",
+   "stairs",
+   "corridor",
+   "room",
+   "crypt",
+   "cellar",
+   "explore",
+   "underground"
+  ],
+  "license": "draft"
+ },
+ "palette": [
+  {
+   "id": "stone",
+   "label": "Stone",
+   "default": "#5a5f7a",
+   "material": "stone",
+   "swatches": ["#5a5f7a","#8e3a4a","#357a4c","#7a4fc4"]
+  },
+  {
+   "id": "floor",
+   "label": "Floor",
+   "default": "#7e84a0",
+   "material": "stone",
+   "swatches": ["#7e84a0","#a8a4a0","#c9a06a","#e6c96a"]
+  },
+  {
+   "id": "growth",
+   "label": "Slime and moss",
+   "default": "#4f9d57",
+   "material": "plant",
+   "swatches": ["#4f9d57","#7fbf5a","#357a4c","#e6c96a","#c8553a"]
+  },
+  {"id":"bone","default":"#f0ead8","material":"stone","detail":true},
+  {"id":"iron","default":"#c2c9d6","material":"metal","detail":true},
+  {"id":"water","default":"#4fa8d8","material":"water","detail":true},
+  {"id":"puddle","material":"water","derive":{"rule":"mix","of":"floor","with":"water","amount":0.6}},
+  {"id":"ooze","material":"plant","derive":{"rule":"textureTone","of":"growth","against":"stone"}},
+  {"id":"wet","material":"stone","derive":{"rule":"textureLight","of":"floor"}},
+  {
+   "id": "joint",
+   "material": "stone",
+   "derive": {
+    "rule": "choose",
+    "when": {"style":["slabs"]},
+    "then": {"rule":"stoneShade","of":"floor","with":{"rule":"textureTone","of":"floor"},"start":0.85},
+    "else": {"rule":"stoneShade","of":"floor","with":{"rule":"textureTone","of":"floor"},"start":0.55}
+   }
+  },
+  {
+   "id": "darker",
+   "material": "stone",
+   "derive": {"rule":"stoneShade","of":"floor","with":{"rule":"textureTone","of":"floor"},"start":0.25}
+  },
+  {"id":"glint","material":"stone","derive":{"rule":"textureLight","of":"floor","from":0.5}}
+ ],
+ "controls": [
+  {
+   "key": "style",
+   "kind": "choice",
+   "label": "Style",
+   "options": [{"value":"slabs","label":"Slabs"},{"value":"bricks","label":"Bricks"},{"value":"cobbles","label":"Cobbles"}],
+   "default": "slabs"
+  },
+  {"key":"edge","kind":"range","label":"Edge","lo":"Thin","hi":"Deep","min":3,"max":9,"step":1,"default":5},
+  {"key":"texture","kind":"range","label":"Texture","lo":"Plain","hi":"Busy","default":0.5},
+  {"key":"wear","kind":"range","label":"Wear","lo":"New","hi":"Worn","default":0.35},
+  {"key":"damp","kind":"toggle","label":"Damp","default":false},
+  {"key":"stone","kind":"colour","label":"Stone"},
+  {"key":"floor","kind":"colour","label":"Floor"},
+  {"key":"growth","kind":"colour","label":"Slime and moss"}
+ ],
+ "body": {
+  "tiles": {
+   "tile": 32,
+   "profiles": {
+    "nicks": [0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0],
+    "pj0": [0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0],
+    "pj1": [0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0],
+    "pj2": [0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0],
+    "slime": [0,0,0,0,0,0,3,5,2,0,0,0,0,0,0,0,0,0,0,2,4,0,0,0,0,0,0,3,2,0,0,0],
+    "ooze": [0,0,0,0,0,0,2,4,1,0,0,0,0,0,0,0,0,0,0,1,3,0,0,0,0,0,0,2,1,0,0,0]
+   },
+   "groups": [
+    {
+     "name": "floor",
+     "kind": "floor",
+     "fills": 3,
+     "label": "Floor",
+     "material": {
+      "ink": "none",
+      "fill": {
+       "base": "floor",
+       "versions": [
+        [
+         {
+          "gen": "tile.courses",
+          "v": 1,
+          "heights": [17,15],
+          "joints": [10,29,4,20],
+          "counts": [2,2],
+          "shift": 3,
+          "round": false,
+          "paint": "joint",
+          "when": {"style":["slabs"]}
+         },
+         {
+          "gen": "tile.courses",
+          "v": 1,
+          "heights": [8,8,8,8],
+          "joints": [13,29,5,21,13,29,5,21],
+          "counts": [2,2,2,2],
+          "shift": 3,
+          "round": false,
+          "paint": "joint",
+          "when": {"style":["bricks"]}
+         },
+         {
+          "gen": "tile.courses",
+          "v": 1,
+          "heights": [8,8,8,8],
+          "joints": [3,11,20,28,7,15,23,30,2,10,18,26,6,13,22,29],
+          "counts": [4,4,4,4],
+          "shift": 3,
+          "round": true,
+          "paint": "joint",
+          "when": {"style":["cobbles"]}
+         }
+        ],
+        [
+         {
+          "gen": "tile.courses",
+          "v": 1,
+          "heights": [17,15],
+          "joints": [10,29,4,20],
+          "counts": [2,2],
+          "shift": 3,
+          "round": false,
+          "paint": "joint",
+          "when": {"style":["slabs"]}
+         },
+         {
+          "gen": "tile.courses",
+          "v": 1,
+          "heights": [8,8,8,8],
+          "joints": [13,29,5,21,13,29,5,21],
+          "counts": [2,2,2,2],
+          "shift": 3,
+          "round": false,
+          "paint": "joint",
+          "when": {"style":["bricks"]}
+         },
+         {
+          "gen": "tile.courses",
+          "v": 1,
+          "heights": [8,8,8,8],
+          "joints": [3,11,20,28,7,15,23,30,2,10,18,26,6,13,22,29],
+          "counts": [4,4,4,4],
+          "shift": 3,
+          "round": true,
+          "paint": "joint",
+          "when": {"style":["cobbles"]}
+         },
+         {"kind":"stamp","at":[19,12],"rows":["aaa"],"key":{"a":"wet"},"when":{"style":["slabs"],"damp":[true]}},
+         {"kind":"stamp","at":[6,22],"rows":["aaaa",".aa."],"key":{"a":"wet"},"when":{"style":["slabs"],"damp":[true]}},
+         {
+          "kind": "stamp",
+          "at": [11,19],
+          "rows": [".abaa.","aaaaaa",".aa..."],
+          "key": {"a":{"rule":"textureTone","of":"growth","against":"floor"},"b":"growth"},
+          "when": {"style":["slabs"],"wear":[{"atLeast":0.3}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [10,25],
+          "rows": ["aa"],
+          "key": {"a":"joint"},
+          "when": {"style":["slabs"],"wear":[{"atLeast":0.3333333333333333}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [20,7],
+          "rows": ["a....","a....","aa...","..aa.","....a","....a","....a","....a","....a"],
+          "key": {"a":"joint"},
+          "when": {"style":["slabs"],"wear":[{"atLeast":0.55}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [25,15],
+          "rows": ["a"],
+          "key": {"a":"joint"},
+          "when": {"style":["slabs"],"wear":[{"atLeast":0.6111111111111112}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [4,14],
+          "rows": ["aa"],
+          "key": {"a":"joint"},
+          "when": {"style":["slabs"],"wear":[{"atLeast":0.6666666666666666}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [26,16],
+          "rows": ["a"],
+          "key": {"a":"joint"},
+          "when": {"style":["slabs"],"wear":[{"atLeast":0.7222222222222222}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [21,11],
+          "rows": ["..a","aa.","a.."],
+          "key": {"a":"joint"},
+          "when": {"style":["slabs"],"wear":[{"atLeast":0.8}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [21,12],
+          "rows": ["a"],
+          "key": {"a":"wet"},
+          "when": {"style":["slabs"],"wear":[{"atLeast":0.8}],"damp":[true]}
+         },
+         {
+          "kind": "stamp",
+          "at": [21,14],
+          "rows": ["a"],
+          "key": {"a":"joint"},
+          "when": {"style":["slabs"],"wear":[{"atLeast":0.8333333333333334}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [26,17],
+          "rows": ["a"],
+          "key": {"a":"joint"},
+          "when": {"style":["slabs"],"wear":[{"atLeast":0.8333333333333334}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [9,19],
+          "rows": [".ab","aa."],
+          "key": {"a":{"rule":"textureTone","of":"growth","against":"floor"},"b":"growth"},
+          "when": {"style":["slabs"],"wear":[{"atLeast":0.9}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [13,19],
+          "rows": ["a"],
+          "key": {"a":{"rule":"textureTone","of":"growth","against":"floor"}},
+          "when": {"style":["slabs"],"wear":[{"atLeast":0.9}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [16,19],
+          "rows": ["a.",".a"],
+          "key": {"a":{"rule":"textureTone","of":"growth","against":"floor"}},
+          "when": {"style":["slabs"],"wear":[{"atLeast":0.9}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [14,21],
+          "rows": ["a"],
+          "key": {"a":{"rule":"textureTone","of":"growth","against":"floor"}},
+          "when": {"style":["slabs"],"wear":[{"atLeast":0.9}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [21,11],
+          "rows": ["..a","aa.","a..","a.."],
+          "key": {"a":"floor"},
+          "when": {"style":["slabs"],"wear":[{"atLeast":0.9444444444444444}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [27,15],
+          "rows": [".a","a."],
+          "key": {"a":"joint"},
+          "when": {"style":["slabs"],"wear":[{"atLeast":0.9444444444444444}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [25,16],
+          "rows": ["a"],
+          "key": {"a":"joint"},
+          "when": {"style":["slabs"],"wear":[{"atLeast":0.9444444444444444}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [26,18],
+          "rows": ["a"],
+          "key": {"a":"joint"},
+          "when": {"style":["slabs"],"wear":[{"atLeast":0.9444444444444444}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [21,12],
+          "rows": ["a"],
+          "key": {"a":"wet"},
+          "when": {"style":["slabs"],"wear":[{"atLeast":0.9444444444444444}],"damp":[true]}
+         },
+         {
+          "kind": "stamp",
+          "at": [12,6],
+          "rows": ["aa"],
+          "key": {"a":"joint"},
+          "when": {"style":["slabs"],"wear":[{"atLeast":1}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [11,3],
+          "rows": [
+           "aaaaaaaaaaaaaaaaaa",
+           "aaaaaaaaaaaaaaaaaa",
+           "aaaaaaaaaaaaaaaaaa",
+           "aaaaaaaaaaaaaaaaaa",
+           "aaaaaaaaaaaaaaaaaa",
+           "aaaaaaaaaaaaaaaaaa",
+           "aaaaaaaaaaaaaaaaaa",
+           "aaaaaaaaaaaaaaaaaa",
+           "aaaaaaaaaaaaaaaaaa",
+           "aaaaaaaaaaaaaaaaaa",
+           "aaaaaaaaaaaaaaaaaa",
+           "aaaaaaaaaaaaaaaaaa",
+           "aaaaaaaaaaaaaaaaaa",
+           "aaaaaaaaaaaaaaaaaa",
+           "aaaaaaaaaaaaaaaaaa",
+           "aaaaaaaaaaaaaaaaaa"
+          ],
+          "key": {"a":"darker"},
+          "when": {"style":["slabs"],"texture":[{"atLeast":0.65}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [19,12],
+          "rows": ["aaa"],
+          "key": {"a":"wet"},
+          "when": {"style":["slabs"],"texture":[{"atLeast":0.65}],"damp":[true]}
+         },
+         {
+          "kind": "stamp",
+          "at": [20,7],
+          "rows": ["a....","a....","aa...","..aa.","....a","....a","....a","....a","....a"],
+          "key": {"a":"joint"},
+          "when": {"style":["slabs"],"texture":[{"atLeast":0.65}],"wear":[{"atLeast":0.55}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [25,15],
+          "rows": ["a"],
+          "key": {"a":"joint"},
+          "when": {"style":["slabs"],"texture":[{"atLeast":0.65}],"wear":[{"atLeast":0.6111111111111112}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [26,16],
+          "rows": ["a"],
+          "key": {"a":"joint"},
+          "when": {"style":["slabs"],"texture":[{"atLeast":0.65}],"wear":[{"atLeast":0.7222222222222222}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [21,11],
+          "rows": ["..a","aa.","a.."],
+          "key": {"a":"joint"},
+          "when": {"style":["slabs"],"texture":[{"atLeast":0.65}],"wear":[{"atLeast":0.8}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [21,12],
+          "rows": ["a"],
+          "key": {"a":"wet"},
+          "when": {"style":["slabs"],"texture":[{"atLeast":0.65}],"wear":[{"atLeast":0.8}],"damp":[true]}
+         },
+         {
+          "kind": "stamp",
+          "at": [21,14],
+          "rows": ["a"],
+          "key": {"a":"joint"},
+          "when": {"style":["slabs"],"texture":[{"atLeast":0.65}],"wear":[{"atLeast":0.8333333333333334}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [26,17],
+          "rows": ["a"],
+          "key": {"a":"joint"},
+          "when": {"style":["slabs"],"texture":[{"atLeast":0.65}],"wear":[{"atLeast":0.8333333333333334}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [21,11],
+          "rows": ["..a","aa.","a..","a.."],
+          "key": {"a":"darker"},
+          "when": {"style":["slabs"],"texture":[{"atLeast":0.65}],"wear":[{"atLeast":0.9444444444444444}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [27,15],
+          "rows": [".a","a."],
+          "key": {"a":"joint"},
+          "when": {"style":["slabs"],"texture":[{"atLeast":0.65}],"wear":[{"atLeast":0.9444444444444444}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [25,16],
+          "rows": ["a"],
+          "key": {"a":"joint"},
+          "when": {"style":["slabs"],"texture":[{"atLeast":0.65}],"wear":[{"atLeast":0.9444444444444444}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [26,18],
+          "rows": ["a"],
+          "key": {"a":"joint"},
+          "when": {"style":["slabs"],"texture":[{"atLeast":0.65}],"wear":[{"atLeast":0.9444444444444444}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [21,12],
+          "rows": ["a"],
+          "key": {"a":"wet"},
+          "when": {"style":["slabs"],"texture":[{"atLeast":0.65}],"wear":[{"atLeast":0.9444444444444444}],"damp":[true]}
+         },
+         {
+          "kind": "stamp",
+          "at": [12,6],
+          "rows": ["aa"],
+          "key": {"a":"joint"},
+          "when": {"style":["slabs"],"texture":[{"atLeast":0.65}],"wear":[{"atLeast":1}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [12,10],
+          "rows": ["aaaa"],
+          "key": {"a":"glint"},
+          "when": {"style":["slabs"],"texture":[{"atLeast":0.75}]}
+         },
+         {"kind":"stamp","at":[19,12],"rows":["aaa"],"key":{"a":"wet"},"when":{"style":["bricks"],"damp":[true]}},
+         {"kind":"stamp","at":[6,22],"rows":["aaaa",".aa."],"key":{"a":"wet"},"when":{"style":["bricks"],"damp":[true]}},
+         {
+          "kind": "stamp",
+          "at": [18,18],
+          "rows": [".abaa.","aaaaaa","...a.."],
+          "key": {"a":{"rule":"textureTone","of":"growth","against":"floor"},"b":"growth"},
+          "when": {"style":["bricks"],"wear":[{"atLeast":0.3}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [11,15],
+          "rows": ["aa"],
+          "key": {"a":"joint"},
+          "when": {"style":["bricks"],"wear":[{"atLeast":0.3333333333333333}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [20,7],
+          "rows": ["a.","a.","aa"],
+          "key": {"a":"joint"},
+          "when": {"style":["bricks"],"wear":[{"atLeast":0.55}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [24,11],
+          "rows": ["a","a","a","a","a"],
+          "key": {"a":"joint"},
+          "when": {"style":["bricks"],"wear":[{"atLeast":0.55}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [25,15],
+          "rows": ["a"],
+          "key": {"a":"joint"},
+          "when": {"style":["bricks"],"wear":[{"atLeast":0.6111111111111112}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [4,24],
+          "rows": ["aa"],
+          "key": {"a":"joint"},
+          "when": {"style":["bricks"],"wear":[{"atLeast":0.6666666666666666}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [26,16],
+          "rows": ["a"],
+          "key": {"a":"joint"},
+          "when": {"style":["bricks"],"wear":[{"atLeast":0.7222222222222222}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [22,11],
+          "rows": [".a","a."],
+          "key": {"a":"joint"},
+          "when": {"style":["bricks"],"wear":[{"atLeast":0.8}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [26,17],
+          "rows": ["a"],
+          "key": {"a":"joint"},
+          "when": {"style":["bricks"],"wear":[{"atLeast":0.8333333333333334}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [16,18],
+          "rows": [".ab","aa."],
+          "key": {"a":{"rule":"textureTone","of":"growth","against":"floor"},"b":"growth"},
+          "when": {"style":["bricks"],"wear":[{"atLeast":0.9}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [20,18],
+          "rows": ["a"],
+          "key": {"a":{"rule":"textureTone","of":"growth","against":"floor"}},
+          "when": {"style":["bricks"],"wear":[{"atLeast":0.9}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [22,18],
+          "rows": [".a.","..a","aa."],
+          "key": {"a":{"rule":"textureTone","of":"growth","against":"floor"}},
+          "when": {"style":["bricks"],"wear":[{"atLeast":0.9}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [19,20],
+          "rows": ["aa"],
+          "key": {"a":{"rule":"textureTone","of":"growth","against":"floor"}},
+          "when": {"style":["bricks"],"wear":[{"atLeast":0.9}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [22,11],
+          "rows": [".a","a."],
+          "key": {"a":"floor"},
+          "when": {"style":["bricks"],"wear":[{"atLeast":0.9444444444444444}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [27,15],
+          "rows": [".a","a."],
+          "key": {"a":"joint"},
+          "when": {"style":["bricks"],"wear":[{"atLeast":0.9444444444444444}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [25,16],
+          "rows": ["a"],
+          "key": {"a":"joint"},
+          "when": {"style":["bricks"],"wear":[{"atLeast":0.9444444444444444}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [15,5],
+          "rows": ["aa"],
+          "key": {"a":"joint"},
+          "when": {"style":["bricks"],"wear":[{"atLeast":1}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [14,3],
+          "rows": [
+           "aaaaaaaaaaaaaaa",
+           "aaaaaaaaaaaaaaa",
+           "aaaaaaaaaaaaaaa",
+           "aaaaaaaaaaaaaaa",
+           "aaaaaaaaaaaaaaa",
+           "aaaaaaaaaaaaaaa",
+           "aaaaaaaaaaaaaaa"
+          ],
+          "key": {"a":"darker"},
+          "when": {"style":["bricks"],"texture":[{"atLeast":0.65}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [20,7],
+          "rows": ["a.","a.","aa"],
+          "key": {"a":"joint"},
+          "when": {"style":["bricks"],"texture":[{"atLeast":0.65}],"wear":[{"atLeast":0.55}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [15,5],
+          "rows": ["aa"],
+          "key": {"a":"joint"},
+          "when": {"style":["bricks"],"texture":[{"atLeast":0.65}],"wear":[{"atLeast":1}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [15,22],
+          "rows": ["aaa"],
+          "key": {"a":"glint"},
+          "when": {"style":["bricks"],"texture":[{"atLeast":0.75}]}
+         },
+         {"kind":"stamp","at":[19,12],"rows":["aaa"],"key":{"a":"wet"},"when":{"style":["cobbles"],"damp":[true]}},
+         {
+          "kind": "stamp",
+          "at": [6,22],
+          "rows": ["aaaa",".aa."],
+          "key": {"a":"wet"},
+          "when": {"style":["cobbles"],"damp":[true]}
+         },
+         {
+          "kind": "stamp",
+          "at": [12,18],
+          "rows": [".aba.","aaaaa",".a..."],
+          "key": {"a":{"rule":"textureTone","of":"growth","against":"floor"},"b":"growth"},
+          "when": {"style":["cobbles"],"wear":[{"atLeast":0.3}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [23,7],
+          "rows": ["aa"],
+          "key": {"a":"joint"},
+          "when": {"style":["cobbles"],"wear":[{"atLeast":0.3333333333333333}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [24,12],
+          "rows": ["a","a","a","a"],
+          "key": {"a":"joint"},
+          "when": {"style":["cobbles"],"wear":[{"atLeast":0.55}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [25,15],
+          "rows": ["a"],
+          "key": {"a":"joint"},
+          "when": {"style":["cobbles"],"wear":[{"atLeast":0.6111111111111112}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [17,16],
+          "rows": ["aa"],
+          "key": {"a":"joint"},
+          "when": {"style":["cobbles"],"wear":[{"atLeast":0.6666666666666666}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [26,16],
+          "rows": ["a"],
+          "key": {"a":"joint"},
+          "when": {"style":["cobbles"],"wear":[{"atLeast":0.7222222222222222}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [21,12],
+          "rows": ["aa","a."],
+          "key": {"a":"joint"},
+          "when": {"style":["cobbles"],"wear":[{"atLeast":0.8}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [21,12],
+          "rows": ["a"],
+          "key": {"a":"wet"},
+          "when": {"style":["cobbles"],"wear":[{"atLeast":0.8}],"damp":[true]}
+         },
+         {
+          "kind": "stamp",
+          "at": [21,14],
+          "rows": ["a"],
+          "key": {"a":"joint"},
+          "when": {"style":["cobbles"],"wear":[{"atLeast":0.8333333333333334}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [26,17],
+          "rows": ["a"],
+          "key": {"a":"joint"},
+          "when": {"style":["cobbles"],"wear":[{"atLeast":0.8333333333333334}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [14,20],
+          "rows": ["a"],
+          "key": {"a":{"rule":"textureTone","of":"growth","against":"floor"}},
+          "when": {"style":["cobbles"],"wear":[{"atLeast":0.9}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [21,12],
+          "rows": ["aa","a.","a."],
+          "key": {"a":"floor"},
+          "when": {"style":["cobbles"],"wear":[{"atLeast":0.9444444444444444}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [27,15],
+          "rows": [".a","a."],
+          "key": {"a":"joint"},
+          "when": {"style":["cobbles"],"wear":[{"atLeast":0.9444444444444444}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [25,16],
+          "rows": ["a"],
+          "key": {"a":"joint"},
+          "when": {"style":["cobbles"],"wear":[{"atLeast":0.9444444444444444}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [21,12],
+          "rows": ["a"],
+          "key": {"a":"wet"},
+          "when": {"style":["cobbles"],"wear":[{"atLeast":0.9444444444444444}],"damp":[true]}
+         },
+         {
+          "kind": "stamp",
+          "at": [4,21],
+          "rows": ["aa"],
+          "key": {"a":"joint"},
+          "when": {"style":["cobbles"],"wear":[{"atLeast":1}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [4,3],
+          "rows": [".aaaaa.","aaaaaaa","aaaaaaa","aaaaaaa","aaaaaaa","aaaaaaa",".aaaaa."],
+          "key": {"a":"darker"},
+          "when": {"style":["cobbles"],"texture":[{"atLeast":0.65}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [9,14],
+          "rows": ["aa"],
+          "key": {"a":"glint"},
+          "when": {"style":["cobbles"],"texture":[{"atLeast":0.75}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [3,19],
+          "rows": [".aaaaa.","aaaaaaa","aaaaaaa","aaaaaaa","aaaaaaa","aaaaaaa",".aaaaa."],
+          "key": {"a":"darker"},
+          "when": {"style":["cobbles"],"texture":[{"atLeast":0.9}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [6,22],
+          "rows": ["aaaa",".aa."],
+          "key": {"a":"wet"},
+          "when": {"style":["cobbles"],"texture":[{"atLeast":0.9}],"damp":[true]}
+         },
+         {
+          "kind": "stamp",
+          "at": [4,21],
+          "rows": ["aa"],
+          "key": {"a":"joint"},
+          "when": {"style":["cobbles"],"texture":[{"atLeast":0.9}],"wear":[{"atLeast":1}]}
+         }
+        ],
+        [
+         {
+          "gen": "tile.courses",
+          "v": 1,
+          "heights": [17,15],
+          "joints": [10,29,4,20],
+          "counts": [2,2],
+          "shift": 3,
+          "round": false,
+          "paint": "joint",
+          "when": {"style":["slabs"]}
+         },
+         {
+          "gen": "tile.courses",
+          "v": 1,
+          "heights": [8,8,8,8],
+          "joints": [13,29,5,21,13,29,5,21],
+          "counts": [2,2,2,2],
+          "shift": 3,
+          "round": false,
+          "paint": "joint",
+          "when": {"style":["bricks"]}
+         },
+         {
+          "gen": "tile.courses",
+          "v": 1,
+          "heights": [8,8,8,8],
+          "joints": [3,11,20,28,7,15,23,30,2,10,18,26,6,13,22,29],
+          "counts": [4,4,4,4],
+          "shift": 3,
+          "round": true,
+          "paint": "joint",
+          "when": {"style":["cobbles"]}
+         },
+         {"kind":"stamp","at":[21,8],"rows":["aaaa",".aa."],"key":{"a":"wet"},"when":{"style":["slabs"],"damp":[true]}},
+         {"kind":"stamp","at":[9,25],"rows":["aaa"],"key":{"a":"wet"},"when":{"style":["slabs"],"damp":[true]}},
+         {
+          "kind": "stamp",
+          "at": [11,12],
+          "rows": ["...aa",".aa..","a....","a....","a....",".a..."],
+          "key": {"a":"joint"},
+          "when": {"style":["slabs"],"wear":[{"atLeast":0.25}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [12,18],
+          "rows": ["a"],
+          "key": {"a":"joint"},
+          "when": {"style":["slabs"],"wear":[{"atLeast":0.2777777777777778}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [14,13],
+          "rows": ["aa"],
+          "key": {"a":"joint"},
+          "when": {"style":["slabs"],"wear":[{"atLeast":0.3333333333333333}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [11,18],
+          "rows": ["a"],
+          "key": {"a":"joint"},
+          "when": {"style":["slabs"],"wear":[{"atLeast":0.3888888888888889}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [22,25],
+          "rows": ["aa"],
+          "key": {"a":"joint"},
+          "when": {"style":["slabs"],"wear":[{"atLeast":0.6666666666666666}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [9,20],
+          "rows": ["a"],
+          "key": {"a":"joint"},
+          "when": {"style":["slabs"],"wear":[{"atLeast":0.7222222222222222}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [11,19],
+          "rows": [".abaa.","aaaaaa",".aa..."],
+          "key": {"a":{"rule":"textureTone","of":"growth","against":"floor"},"b":"growth"},
+          "when": {"style":["slabs"],"wear":[{"atLeast":0.75}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [8,17],
+          "rows": ["aa"],
+          "key": {"a":"joint"},
+          "when": {"style":["slabs"],"wear":[{"atLeast":0.8}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [11,17],
+          "rows": ["a"],
+          "key": {"a":"joint"},
+          "when": {"style":["slabs"],"wear":[{"atLeast":0.8}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [7,18],
+          "rows": ["a"],
+          "key": {"a":"joint"},
+          "when": {"style":["slabs"],"wear":[{"atLeast":0.8333333333333334}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [9,21],
+          "rows": ["a"],
+          "key": {"a":"joint"},
+          "when": {"style":["slabs"],"wear":[{"atLeast":0.8333333333333334}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [9,19],
+          "rows": [".ab","aa."],
+          "key": {"a":{"rule":"textureTone","of":"growth","against":"floor"},"b":"growth"},
+          "when": {"style":["slabs"],"wear":[{"atLeast":0.9}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [13,19],
+          "rows": ["a"],
+          "key": {"a":{"rule":"textureTone","of":"growth","against":"floor"}},
+          "when": {"style":["slabs"],"wear":[{"atLeast":0.9}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [16,19],
+          "rows": ["a.",".a"],
+          "key": {"a":{"rule":"textureTone","of":"growth","against":"floor"}},
+          "when": {"style":["slabs"],"wear":[{"atLeast":0.9}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [14,21],
+          "rows": ["a"],
+          "key": {"a":{"rule":"textureTone","of":"growth","against":"floor"}},
+          "when": {"style":["slabs"],"wear":[{"atLeast":0.9}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [9,22],
+          "rows": ["a"],
+          "key": {"a":"joint"},
+          "when": {"style":["slabs"],"wear":[{"atLeast":0.9444444444444444}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [6,24],
+          "rows": ["aa"],
+          "key": {"a":"joint"},
+          "when": {"style":["slabs"],"wear":[{"atLeast":1}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [22,26],
+          "rows": ["aaaa"],
+          "key": {"a":"glint"},
+          "when": {"style":["slabs"],"texture":[{"atLeast":0.75}]}
+         },
+         {"kind":"stamp","at":[21,8],"rows":["aaaa",".aa."],"key":{"a":"wet"},"when":{"style":["bricks"],"damp":[true]}},
+         {"kind":"stamp","at":[9,25],"rows":["aaa"],"key":{"a":"wet"},"when":{"style":["bricks"],"damp":[true]}},
+         {
+          "kind": "stamp",
+          "at": [11,12],
+          "rows": ["...aa",".aa..","a....","a....","a....",".a..."],
+          "key": {"a":"joint"},
+          "when": {"style":["bricks"],"wear":[{"atLeast":0.25}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [17,23],
+          "rows": ["aa"],
+          "key": {"a":"joint"},
+          "when": {"style":["bricks"],"wear":[{"atLeast":0.3333333333333333}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [10,19],
+          "rows": ["a"],
+          "key": {"a":"joint"},
+          "when": {"style":["bricks"],"wear":[{"atLeast":0.5}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [9,20],
+          "rows": ["a"],
+          "key": {"a":"joint"},
+          "when": {"style":["bricks"],"wear":[{"atLeast":0.7222222222222222}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [17,18],
+          "rows": [".abaa.","aaaaaa","....a."],
+          "key": {"a":{"rule":"textureTone","of":"growth","against":"floor"},"b":"growth"},
+          "when": {"style":["bricks"],"wear":[{"atLeast":0.75}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [8,16],
+          "rows": ["..a.","aa.a"],
+          "key": {"a":"joint"},
+          "when": {"style":["bricks"],"wear":[{"atLeast":0.8}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [9,21],
+          "rows": ["a"],
+          "key": {"a":"joint"},
+          "when": {"style":["bricks"],"wear":[{"atLeast":0.8333333333333334}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [16,18],
+          "rows": [".aba","a..."],
+          "key": {"a":{"rule":"textureTone","of":"growth","against":"floor"},"b":"growth"},
+          "when": {"style":["bricks"],"wear":[{"atLeast":0.9}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [22,18],
+          "rows": ["aa.",".aa","aa."],
+          "key": {"a":{"rule":"textureTone","of":"growth","against":"floor"}},
+          "when": {"style":["bricks"],"wear":[{"atLeast":0.9}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [19,20],
+          "rows": ["aa"],
+          "key": {"a":{"rule":"textureTone","of":"growth","against":"floor"}},
+          "when": {"style":["bricks"],"wear":[{"atLeast":0.9}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [9,22],
+          "rows": ["a"],
+          "key": {"a":"joint"},
+          "when": {"style":["bricks"],"wear":[{"atLeast":0.9444444444444444}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [7,14],
+          "rows": ["aa"],
+          "key": {"a":"joint"},
+          "when": {"style":["bricks"],"wear":[{"atLeast":1}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [21,8],
+          "rows": ["aaaa",".aa."],
+          "key": {"a":"wet"},
+          "when": {"style":["cobbles"],"damp":[true]}
+         },
+         {"kind":"stamp","at":[9,25],"rows":["aaa"],"key":{"a":"wet"},"when":{"style":["cobbles"],"damp":[true]}},
+         {
+          "kind": "stamp",
+          "at": [11,12],
+          "rows": ["...a",".aa.","a...","a...","a...",".a.."],
+          "key": {"a":"joint"},
+          "when": {"style":["cobbles"],"wear":[{"atLeast":0.25}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [9,15],
+          "rows": ["aa"],
+          "key": {"a":"joint"},
+          "when": {"style":["cobbles"],"wear":[{"atLeast":0.3333333333333333}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [3,14],
+          "rows": ["aa"],
+          "key": {"a":"joint"},
+          "when": {"style":["cobbles"],"wear":[{"atLeast":0.6666666666666666}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [9,20],
+          "rows": ["a"],
+          "key": {"a":"joint"},
+          "when": {"style":["cobbles"],"wear":[{"atLeast":0.7222222222222222}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [9,10],
+          "rows": [".aba.","aaaaa","...a."],
+          "key": {"a":{"rule":"textureTone","of":"growth","against":"floor"},"b":"growth"},
+          "when": {"style":["cobbles"],"wear":[{"atLeast":0.75}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [9,16],
+          "rows": [".a.","a.a"],
+          "key": {"a":"joint"},
+          "when": {"style":["cobbles"],"wear":[{"atLeast":0.8}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [9,21],
+          "rows": ["a"],
+          "key": {"a":"joint"},
+          "when": {"style":["cobbles"],"wear":[{"atLeast":0.8333333333333334}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [9,22],
+          "rows": ["a"],
+          "key": {"a":"joint"},
+          "when": {"style":["cobbles"],"wear":[{"atLeast":0.9444444444444444}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [20,22],
+          "rows": ["aa"],
+          "key": {"a":"joint"},
+          "when": {"style":["cobbles"],"wear":[{"atLeast":1}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [3,15],
+          "rows": ["aa"],
+          "key": {"a":"glint"},
+          "when": {"style":["cobbles"],"texture":[{"atLeast":0.75}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [21,3],
+          "rows": [".aaaaa.","aaaaaaa","aaaaaaa","aaaaaaa","aaaaaaa","aaaaaaa",".aaaaa."],
+          "key": {"a":"darker"},
+          "when": {"style":["cobbles"],"texture":[{"atLeast":0.8}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [21,8],
+          "rows": ["aaaa",".aa."],
+          "key": {"a":"wet"},
+          "when": {"style":["cobbles"],"texture":[{"atLeast":0.8}],"damp":[true]}
+         }
+        ]
+       ]
+      }
+     },
+     "decals": [
+      {
+       "name": "a",
+       "place": "on",
+       "label": "Cracks",
+       "outline": false,
+       "draw": [
+        {
+         "kind": "stamp",
+         "at": [5,12],
+         "rows": [
+          "..aaaaaaa............",
+          ".abbbbbbbaa...aaaa...",
+          "abbbbbbbbb....ccccaa.",
+          "abbbbbbbb.bb.bbcccbba",
+          ".abbbbbbbbbb.bbbbbbba",
+          "..aabbbbbbbb.bbbbbbba",
+          "....aaabbbbb..bbbbaa.",
+          "...ccccbbbbbbbbbaa...",
+          ".......abbbbbbba.....",
+          "........aaaaaaa......"
+         ],
+         "key": {"a":{"rule":"textureTone","of":"floor"},"b":"puddle","c":{"rule":"textureLight","of":"puddle"}},
+         "when": {"damp":[true]}
+        },
+        {
+         "kind": "stamp",
+         "at": [8,5],
+         "rows": [
+          "...........aa",
+          "..........a..",
+          "..........a..",
+          ".........a...",
+          "aa.aaaaaaa...",
+          "..a...aaaa...",
+          ".......a.....",
+          ".......a.....",
+          "........aa...",
+          ".......aaaa..",
+          "......a..a...",
+          ".........a...",
+          ".........a...",
+          ".........aa.."
+         ],
+         "key": {"a":{"rule":"textureTone","of":"floor"}}
+        }
+       ]
+      },
+      {
+       "name": "b",
+       "place": "on",
+       "label": "Bones",
+       "outline": false,
+       "draw": [
+        {
+         "kind": "stamp",
+         "at": [4,7],
+         "rows": [
+          ".....aaaaa..............",
+          "....aaaaaaa.............",
+          "...bacaaacaa............",
+          "...bcccaccca............",
+          "....bcaaaca.............",
+          ".....bacaa..............",
+          ".....babab..............",
+          ".....b.b.b..............",
+          ".....b.b.b.a........a...",
+          "....dddddddda..aaaaa....",
+          "..........aaa.b.ddddd...",
+          ".........aabaa..........",
+          ".a....aaabdbba..........",
+          "baa.aabbdd.dbd..........",
+          "bbaaaddd....da..........",
+          "dbaad.......baa.......a.",
+          ".bba........baaa.....aaa",
+          ".dbd........aaabbbbbaaad",
+          "..d........bbadddddbbaa.",
+          "...........dbd.....dbba.",
+          "............d.......dbd.",
+          ".....................d.."
+         ],
+         "key": {
+          "a": "bone",
+          "b": "bone.dark",
+          "c": {"rule":"mix","of":"bone.dark","with":"ink","amount":0.6},
+          "d": {"rule":"textureTone","of":"floor"}
+         }
+        }
+       ]
+      },
+      {
+       "name": "c",
+       "place": "on",
+       "label": "Iron grate",
+       "outline": false,
+       "draw": [
+        {
+         "kind": "stamp",
+         "at": [7,8],
+         "rows": [
+          "aaaaaaaaaaaaaaaaaa",
+          "abaacbaacbaacbaaca",
+          "abaacbaacbaacbaaca",
+          "abaacbaacbaacbaaca",
+          "abaacbaacbaacbaaca",
+          "abaacbaacbaacbaaca",
+          "abaacbaacbaacbaaca",
+          "abaacbaacbaacbaaca",
+          "abaacbaacbaacbaaca",
+          "abaacbaacbaacbaaca",
+          "abaacbaacbaacbaaca",
+          "abaacbaacbaacbaaca",
+          "abaacbaacbaacbaaca",
+          "abaacbaacbaacbaaca",
+          "abaacbaacbaacbaaca",
+          "aaaaaaaaaaaaaaaaaa",
+          "dddddddddddddddddd"
+         ],
+         "key": {"a":"iron.deep","b":"iron.dark","c":"ink","d":{"rule":"textureTone","of":"floor"}}
+        },
+        {
+         "kind": "stamp",
+         "at": [12,9],
+         "rows": ["aa.....a","aa.....a","aa......"],
+         "key": {"a":"growth"},
+         "when": {"damp":[true]}
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "wall",
+     "kind": "block",
+     "use": "wall",
+     "label": "Wall",
+     "pieces": ["block","narrow"],
+     "material": {
+      "ink": "ink",
+      "round": 1,
+      "fill": {"base":"stone.dark"},
+      "edges": {
+       "top": {
+        "depth": {"from":"edge","map":[[3,1],[9,4]],"round":"px"},
+        "inset": {"profile":"nicks","amount":{"from":"wear","map":[[0,0],[0.49,0],[0.5,1],[1,1]],"round":"px"}},
+        "bands": [{"rows":[1,1],"paint":"stone.light"},{"rows":[2,99],"paint":"stone"}]
+       },
+       "right": {
+        "depth": {"from":"edge","map":[[3,1],[9,4]],"round":"px"},
+        "bands": [{"rows":[1,1],"paint":"stone.light"},{"rows":[2,99],"paint":"stone"}]
+       },
+       "left": {"depth":{"from":"edge","map":[[3,1],[9,4]],"round":"px"},"bands":[{"rows":[1,99],"paint":"stone"}]}
+      },
+      "face": {
+       "draw": [
+        {
+         "kind": "stamp",
+         "at": [0,0],
+         "rows": [
+          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "bbbbbbcbbbbbbbbbbbbbbbcbbbbbbbbb",
+          "bbbbbbcbbbbbbbbbbbbbbbcbbbbbbbbb",
+          "bbbbbbcbbbbbbbbbbbbbbbcbbbbbbbbb",
+          "bbbbbbcbbbbbbbbbbbbbbbcbbbbbbbbb",
+          "bbbbbbcbbbbbbbbbbbbbbbcbbbbbbbbb",
+          "cccccccccccccccccccccccccccccccc",
+          "bbbbbbbbbbbbbbcbbbbbbbbbbbbbbbcb",
+          "bbbbbbbbbbbbbbcbbbbbbbbbbbbbbbcb",
+          "bbbbbbbbbbbbbbcbbbbbbbbbbbbbbbcb",
+          "bbbbbbbbbbbbbbcbbbbbbbbbbbbbbbcb",
+          "bbbbbbbbbbbbbbcbbbbbbbbbbbbbbbcb",
+          "bbbbbbbbbbbbbbcbbbbbbbbbbbbbbbcb",
+          "cccccccccccccccccccccccccccccccc",
+          "bbbbbbcbbbbbbbbbbbbbbbcbbbbbbbbb",
+          "bbbbbbcbbbbbbbbbbbbbbbcbbbbbbbbb",
+          "bbbbbbcbbbbbbbbbbbbbbbcbbbbbbbbb",
+          "bbbbbbcbbbbbbbbbbbbbbbcbbbbbbbbb",
+          "bbbbbbcbbbbbbbbbbbbbbbcbbbbbbbbb",
+          "bbbbbbcbbbbbbbbbbbbbbbcbbbbbbbbb",
+          "cccccccccccccccccccccccccccccccc",
+          "bbbbbbbbbbbbbbcbbbbbbbbbbbbbbbcb",
+          "bbbbbbbbbbbbbbcbbbbbbbbbbbbbbbcb",
+          "bbbbbbbbbbbbbbcbbbbbbbbbbbbbbbcb",
+          "bbbbbbbbbbbbbbcbbbbbbbbbbbbbbbcb",
+          "bbbbbbbbbbbbbbcbbbbbbbbbbbbbbbcb",
+          "bbbbbbbbbbbbbbcbbbbbbbbbbbbbbbcb",
+          "bbbbbbbbbbbbbbcbbbbbbddbbbbbbbcb",
+          "bbbbbbbbbbbbbbcbbbbbeeeebbbbbbcb"
+         ],
+         "key": {"a":"stone.light","b":"stone","c":"stone.dark","d":"growth","e":"ooze"}
+        },
+        {
+         "kind": "stamp",
+         "at": [27,9],
+         "rows": ["a","a","a","a"],
+         "key": {"a":{"rule":"mix","of":"stone","with":"stone.light","amount":0.7}},
+         "when": {"damp":[true]}
+        },
+        {
+         "kind": "stamp",
+         "at": [9,10],
+         "rows": ["a","a","a","a","a"],
+         "key": {"a":{"rule":"mix","of":"stone","with":"stone.light","amount":0.7}},
+         "when": {"damp":[true]}
+        },
+        {
+         "kind": "stamp",
+         "at": [21,16],
+         "rows": ["a","a","a","a"],
+         "key": {"a":{"rule":"mix","of":"stone","with":"stone.light","amount":0.7}},
+         "when": {"damp":[true]}
+        },
+        {
+         "kind": "stamp",
+         "at": [19,26],
+         "rows": ["..aa..",".abba.","b....b"],
+         "key": {"a":"growth","b":"ooze"},
+         "when": {"wear":[{"atLeast":0.5}]}
+        },
+        {
+         "kind": "stamp",
+         "at": [2,27],
+         "rows": [".aa.","bbbb"],
+         "key": {"a":"growth","b":"ooze"},
+         "when": {"wear":[{"atLeast":0.5}]}
+        },
+        {"kind":"stamp","at":[17,3],"rows":["aa"],"key":{"a":"stone.dark"},"when":{"wear":[{"atLeast":0.6}]}},
+        {"kind":"stamp","at":[8,9],"rows":["aa"],"key":{"a":"stone.dark"},"when":{"wear":[{"atLeast":0.6}]}},
+        {"kind":"stamp","at":[20,11],"rows":["aa"],"key":{"a":"stone.dark"},"when":{"wear":[{"atLeast":0.6}]}},
+        {"kind":"stamp","at":[25,18],"rows":["aa"],"key":{"a":"stone.dark"},"when":{"wear":[{"atLeast":0.6}]}},
+        {
+         "kind": "stamp",
+         "at": [0,7],
+         "rows": ["aaaaaaaaaaaaaa"],
+         "key": {"a":{"rule":"mix","of":"stone","with":"stone.light","amount":0.45}},
+         "when": {"texture":[{"atLeast":0.25}]}
+        },
+        {
+         "kind": "stamp",
+         "at": [15,7],
+         "rows": ["aaaaaaaaaaaaaaa"],
+         "key": {"a":{"rule":"mix","of":"stone","with":"stone.light","amount":0.45}},
+         "when": {"texture":[{"atLeast":0.25}]}
+        },
+        {
+         "kind": "stamp",
+         "at": [31,7],
+         "rows": ["a"],
+         "key": {"a":{"rule":"mix","of":"stone","with":"stone.light","amount":0.45}},
+         "when": {"texture":[{"atLeast":0.25}]}
+        },
+        {
+         "kind": "stamp",
+         "at": [0,14],
+         "rows": ["aaaaaa"],
+         "key": {"a":{"rule":"mix","of":"stone","with":"stone.light","amount":0.45}},
+         "when": {"texture":[{"atLeast":0.25}]}
+        },
+        {
+         "kind": "stamp",
+         "at": [7,14],
+         "rows": ["aaaaaaaaaaaaaaa"],
+         "key": {"a":{"rule":"mix","of":"stone","with":"stone.light","amount":0.45}},
+         "when": {"texture":[{"atLeast":0.25}]}
+        },
+        {
+         "kind": "stamp",
+         "at": [23,14],
+         "rows": ["aaaaaaaaa"],
+         "key": {"a":{"rule":"mix","of":"stone","with":"stone.light","amount":0.45}},
+         "when": {"texture":[{"atLeast":0.25}]}
+        },
+        {
+         "kind": "stamp",
+         "at": [0,21],
+         "rows": ["aaaaaaaaaaaaaa"],
+         "key": {"a":{"rule":"mix","of":"stone","with":"stone.light","amount":0.45}},
+         "when": {"texture":[{"atLeast":0.25}]}
+        },
+        {
+         "kind": "stamp",
+         "at": [15,21],
+         "rows": ["aaaaaaaaaaaaaaa"],
+         "key": {"a":{"rule":"mix","of":"stone","with":"stone.light","amount":0.45}},
+         "when": {"texture":[{"atLeast":0.25}]}
+        },
+        {
+         "kind": "stamp",
+         "at": [31,21],
+         "rows": ["a"],
+         "key": {"a":{"rule":"mix","of":"stone","with":"stone.light","amount":0.45}},
+         "when": {"texture":[{"atLeast":0.25}]}
+        },
+        {
+         "kind": "stamp",
+         "at": [9,14],
+         "rows": ["a"],
+         "key": {"a":{"rule":"mix","of":"stone","with":"stone.light","amount":0.7}},
+         "when": {"texture":[{"atLeast":0.25}],"damp":[true]}
+        }
+       ],
+       "top": "stone.light",
+       "shadow": {"rule":"textureTone","of":"floor"}
+      }
+     }
+    },
+    {
+     "name": "pit",
+     "kind": "block",
+     "use": "hole",
+     "label": "Pit",
+     "pieces": ["block","narrow"],
+     "material": {
+      "ink": "ink",
+      "fill": {"base":"ink"},
+      "edges": {
+       "top": {
+        "depth": {"from":"edge","map":[[3,8],[9,14]],"round":"px"},
+        "bands": [
+         {"rows":{"profile":"ooze"},"paint":"ooze","when":{"damp":[true]}},
+         {"rows":{"profile":"slime"},"paint":"growth","when":{"damp":[true]}},
+         {"rows":[1,1],"paint":"stone.light"},
+         {"rows":[13,99],"paint":"stone.dark"},
+         {"rows":[9,12],"paint":"stone.dark","when":{"edge":[{"below":7.5}]}},
+         {"rows":[5,8],"paint":"stone.dark","when":{"edge":[{"below":3.5}]}},
+         {"rows":"last","paint":"stone.dark"},
+         {"rows":"last-1","paint":"stone.dark"},
+         {"rows":[4,4],"paint":"stone.dark"},
+         {"rows":[8,8],"paint":"stone.dark"},
+         {"rows":[12,12],"paint":"stone.dark"},
+         {"rows":[2,3],"where":{"profile":"pj0","in":[1]},"paint":"stone.dark"},
+         {"rows":[5,7],"where":{"profile":"pj1","in":[1]},"paint":"stone.dark"},
+         {"rows":[9,11],"where":{"profile":"pj2","in":[1]},"paint":"stone.dark"},
+         {"rows":[1,99],"paint":"stone"}
+        ]
+       },
+       "left": {"depth":1,"bands":[{"rows":[1,1],"paint":"stone"}]},
+       "right": {"depth":1,"bands":[{"rows":[1,1],"paint":"stone.dark"}]},
+       "bottom": {"depth":1,"bands":[{"rows":[1,1],"paint":"stone.dark"}]}
+      }
+     }
+    }
+   ],
+   "extra": [
+    {
+     "name": "stairs-down",
+     "label": "Stairs going down",
+     "draw": [
+      {
+       "kind": "stamp",
+       "at": [0,0],
+       "rows": [
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "abbaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "abbaccccccccccccccccccccccccaaaa",
+        "abbaccccccccccccccccccccccccaaaa",
+        "abbaccccccccccccccccccccccccaaaa",
+        "abbaccccccccccccccccccccccccaaaa",
+        "addeffffffffffffffffffffffffeeea",
+        "addeggggggggggggggggggggggggeeea",
+        "addeggggggggggggggggggggggggeeea",
+        "addeggggggggggggggggggggggggeeea",
+        "addeggggggggggggggggggggggggeeea",
+        "ahhbccccccccccccccccccccccccbbba",
+        "ahhbiiiiiiiiiiiiiiiiiiiiiiiibbba",
+        "ahhbiiiiiiiiiiiiiiiiiiiiiiiibbba",
+        "ahhbiiiiiiiiiiiiiiiiiiiiiiiibbba",
+        "ahhbiiiiiiiiiiiiiiiiiiiiiiiibbba",
+        "ahhbiiiiiiiiiiiiiiiiiiiiiiiibbba",
+        "ajjdggggggggggggggggggggggggddda",
+        "ajjdkkkkkkkkkkkkkkkkkkkkkkkkddda",
+        "ajjdkkkkkkkkkkkkkkkkkkkkkkkkddda",
+        "ajjdkkkkkkkkkkkkkkkkkkkkkkkkddda",
+        "ajjdkkkkkkkkkkkkkkkkkkkkkkkkddda",
+        "ajjdkkkkkkkkkkkkkkkkkkkkkkkkddda",
+        "allhiiiiiiiiiiiiiiiiiiiiiiiihhha",
+        "allhmmmmmmmmmmmmmmmmmmmmmmmmhhha",
+        "allhnnnnnnnnnnnnnnnnnnnnnnnnhhha",
+        "allhnnnnnnnnnnnnnnnnnnnnnnnnhhha",
+        "allhnnnnnnnnnnnnnnnnnnnnnnnnhhha",
+        "allhnnnnnnnnnnnnnnnnnnnnnnnnhhha"
+       ],
+       "key": {
+        "a": "ink",
+        "b": "stone.deep",
+        "c": "floor.deep",
+        "d": {"rule":"mix","of":"stone.dark","with":"stone.deep","amount":0.5},
+        "e": {"rule":"mix","of":"stone.deep","with":"ink","amount":0.5},
+        "f": {"rule":"mix","of":"floor.deep","with":"ink","amount":0.5},
+        "g": {"rule":"mix","of":"floor.dark","with":"floor.deep","amount":0.5},
+        "h": "stone.dark",
+        "i": "floor.dark",
+        "j": {"rule":"mix","of":"stone","with":"stone.dark","amount":0.5},
+        "k": {"rule":"mix","of":"floor","with":"floor.dark","amount":0.5},
+        "l": "stone",
+        "m": "floor.light",
+        "n": "floor"
+       }
+      }
+     ]
+    },
+    {
+     "name": "stairs-up",
+     "label": "Stairs going up",
+     "draw": [
+      {
+       "kind": "stamp",
+       "at": [0,0],
+       "rows": [
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "abccddddddddddddddddddddddddeffa",
+        "abccddddddddddddddddddddddddeffa",
+        "abccddddddddddddddddddddddddeffa",
+        "abccddddddddddddddddddddddddeffa",
+        "abccggggggggggggggggggggggggeffa",
+        "abccggggggggggggggggggggggggeffa",
+        "abcchhhhhhhhhhhhhhhhhhhhhhhheffa",
+        "abcchhhhhhhhhhhhhhhhhhhhhhhheffa",
+        "abcchhhhhhhhhhhhhhhhhhhhhhhheffa",
+        "abcchhhhhhhhhhhhhhhhhhhhhhhheffa",
+        "abcciiiiiiiiiiiiiiiiiiiiiiiieffa",
+        "abcciiiiiiiiiiiiiiiiiiiiiiiieffa",
+        "abccggggggggggggggggggggggggeffa",
+        "abccggggggggggggggggggggggggeffa",
+        "abccggggggggggggggggggggggggeffa",
+        "abccggggggggggggggggggggggggeffa",
+        "abccjjjjjjjjjjjjjjjjjjjjjjjjeffa",
+        "abccjjjjjjjjjjjjjjjjjjjjjjjjeffa",
+        "abcciiiiiiiiiiiiiiiiiiiiiiiieffa",
+        "abcciiiiiiiiiiiiiiiiiiiiiiiieffa",
+        "abcciiiiiiiiiiiiiiiiiiiiiiiieffa",
+        "abcciiiiiiiiiiiiiiiiiiiiiiiieffa",
+        "abcckkkkkkkkkkkkkkkkkkkkkkkkeffa",
+        "abcckkkkkkkkkkkkkkkkkkkkkkkkeffa",
+        "abccjjjjjjjjjjjjjjjjjjjjjjjjeffa",
+        "abccjjjjjjjjjjjjjjjjjjjjjjjjeffa",
+        "abccjjjjjjjjjjjjjjjjjjjjjjjjeffa",
+        "abccjjjjjjjjjjjjjjjjjjjjjjjjeffa",
+        "abcclllllllllllllllllllllllleffa",
+        "abcclllllllllllllllllllllllleffa",
+        "abcclllllllllllllllllllllllleffa"
+       ],
+       "key": {
+        "a": "ink",
+        "b": "stone.light",
+        "c": "stone",
+        "d": "floor.light",
+        "e": "stone.deep",
+        "f": "stone.dark",
+        "g": "floor",
+        "h": {"rule":"mix","of":"floor","with":"floor.light","amount":0.5},
+        "i": {"rule":"mix","of":"floor","with":"floor.dark","amount":0.5},
+        "j": "floor.dark",
+        "k": {"rule":"mix","of":"floor.dark","with":"floor.deep","amount":0.5},
+        "l": "floor.deep"
+       }
+      }
+     ]
+    }
+   ],
+   "decalOrder": "last"
+  }
+ },
+ "clips": {
+  "floor-fill": {"label":"Floor"},
+  "floor-fill-b": {"label":"Floor, version B"},
+  "floor-fill-c": {"label":"Floor, version C"}
+ }
+}

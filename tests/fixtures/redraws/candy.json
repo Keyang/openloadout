@@ -1,0 +1,247 @@
+{
+ "id": "candy",
+ "frozen": "2026-11-20",
+ "source": "sprites/candy.js",
+ "sha256": "3098ade41e2f112aa3a3656c31dce33fed5bf5c4ed51d864dd29236a574eb207",
+ "name": "Sweet",
+ "blurb": "A floating glossy sweet worth points: wrapped, a lollipop, a donut or a cupcake. Change the sweet, its size, pattern, sparkle and colours.",
+ "meta": {
+  "type": "pickup",
+  "role": "items/food",
+  "themes": [
+   "neutral",
+   "candy"
+  ],
+  "gameTypes": [
+   "arcade",
+   "puzzle",
+   "platformer"
+  ],
+  "view": "front",
+  "words": [
+   "candy",
+   "sweet",
+   "lollipop",
+   "donut",
+   "cupcake",
+   "toffee",
+   "treat",
+   "sugar",
+   "collect",
+   "pickup",
+   "score",
+   "points",
+   "bonus"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  30
+ ],
+ "grounded": false,
+ "preview": "idle",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "shape": {
+   "kind": "choice",
+   "label": "Shape",
+   "def": "wrapped",
+   "options": [
+    {
+     "value": "wrapped",
+     "label": "Wrapped"
+    },
+    {
+     "value": "lollipop",
+     "label": "Lollipop"
+    },
+    {
+     "value": "donut",
+     "label": "Donut"
+    },
+    {
+     "value": "cupcake",
+     "label": "Cupcake"
+    }
+   ],
+   "group": "Look"
+  },
+  "stripes": {
+   "kind": "choice",
+   "label": "Pattern",
+   "def": "stripes",
+   "options": [
+    {
+     "value": "plain",
+     "label": "Plain"
+    },
+    {
+     "value": "stripes",
+     "label": "Stripes"
+    },
+    {
+     "value": "dots",
+     "label": "Dots"
+    }
+   ],
+   "group": "Look"
+  },
+  "sparkle": {
+   "kind": "toggle",
+   "label": "Sparkle",
+   "def": true,
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Candy",
+   "def": "#c9423a",
+   "swatches": [
+    "#c9423a",
+    "#9bd18a",
+    "#7a4fc4",
+    "#3f8a4f",
+    "#7a4f33",
+    "#3f9fd1",
+    "#f2c230",
+    "#a06a3c"
+   ],
+   "group": "Colors",
+   "material": "paint"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Icing",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#4fd8ee",
+    "#a4c44a",
+    "#3f6fd1",
+    "#d8d8e0"
+   ],
+   "group": "Colors",
+   "when": {
+    "stripes": [
+     "stripes",
+     "dots"
+    ]
+   }
+  },
+  "bob": {
+   "kind": "range",
+   "label": "Float",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Still",
+   "hi": "Floaty",
+   "group": "Motion"
+  },
+  "pop": {
+   "kind": "range",
+   "label": "Pop height",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Low",
+   "hi": "High",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "collect": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    9,
+    15,
+    20
+   ]
+  }
+ },
+ "sounds": {
+  "collect": [
+   {
+    "sound": "item-get",
+    "preset": "Chiptune",
+    "frame": 1,
+    "volume": 0.7
+   }
+  ]
+ },
+ "versions": [
+  {
+   "name": "Cherry drop",
+   "params": {}
+  },
+  {
+   "name": "Mint swirl",
+   "params": {
+    "shape": "lollipop",
+    "stripes": "stripes",
+    "body": "#9bd18a"
+   }
+  },
+  {
+   "name": "Sprinkle ring",
+   "params": {
+    "shape": "donut",
+    "stripes": "dots",
+    "body": "#7a4fc4"
+   }
+  },
+  {
+   "name": "Lemon cake",
+   "params": {
+    "shape": "cupcake",
+    "body": "#f2c230"
+   }
+  },
+  {
+   "name": "Plain toffee",
+   "params": {
+    "stripes": "plain",
+    "body": "#a06a3c"
+   }
+  }
+ ],
+ "bundles": []
+}

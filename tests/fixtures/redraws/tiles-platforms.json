@@ -1,0 +1,236 @@
+{
+ "id": "tiles-platforms",
+ "frozen": "2026-11-20",
+ "source": "sprites/tiles-platforms.js",
+ "sha256": "3610676e1c54959a034adf1d846f7ded6ef7c5a4fdaa99f7cd506022e993ffe2",
+ "name": "Wooden platforms and ladders",
+ "blurb": "One-way wooden platforms with a rope ladder, a vine and a support post; change the kind of platform, its thickness, the rungs, the wear and the colours.",
+ "meta": {
+  "type": "tileset",
+  "role": "world/platform",
+  "themes": [
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "platformer"
+  ],
+  "view": "side",
+  "words": [
+   "platform",
+   "plank",
+   "ladder",
+   "vine",
+   "rope",
+   "post",
+   "bridge",
+   "scaffold",
+   "climb",
+   "jump",
+   "wooden",
+   "ledge"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "plank-thin-l",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "planks",
+   "options": [
+    "planks",
+    "logs",
+    "slab"
+   ],
+   "group": "Look"
+  },
+  "thickness": {
+   "kind": "range",
+   "label": "Thickness",
+   "def": 11,
+   "min": 8,
+   "max": 14,
+   "step": 1,
+   "lo": "Thin",
+   "hi": "Chunky",
+   "group": "Look"
+  },
+  "rungs": {
+   "kind": "choice",
+   "label": "Rungs",
+   "def": "wide",
+   "options": [
+    "wide",
+    "close"
+   ],
+   "group": "Look"
+  },
+  "wear": {
+   "kind": "range",
+   "label": "Wear",
+   "def": 0.3,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "New",
+   "hi": "Worn",
+   "group": "Look"
+  },
+  "wood": {
+   "kind": "color",
+   "label": "Wood",
+   "def": "#a06a3c",
+   "swatches": [
+    "#a06a3c",
+    "#7a4f33",
+    "#f0ead8",
+    "#a8612a",
+    "#5a3a22",
+    "#c98a4a"
+   ],
+   "group": "Colors"
+  },
+  "rope": {
+   "kind": "color",
+   "label": "Rope",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#f2c230",
+    "#8f97a8",
+    "#a4c44a",
+    "#c9423a",
+    "#c98a4a"
+   ],
+   "group": "Colors"
+  },
+  "leaf": {
+   "kind": "color",
+   "label": "Leaf",
+   "def": "#3f8a4f",
+   "swatches": [
+    "#3f8a4f",
+    "#6aa83e",
+    "#a4c44a",
+    "#e08a2c"
+   ],
+   "group": "Colors"
+  }
+ },
+ "clips": {
+  "plank-thin-l": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "plank-thin-m": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "plank-thin-r": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "ladder-cap": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "ladder-mid": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "ladder-foot": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "vine-cap": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "vine-mid": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "vine-foot": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "post-cap": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "post-mid": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [],
+ "bundles": [
+  "kit-platformer-fantasy"
+ ]
+}

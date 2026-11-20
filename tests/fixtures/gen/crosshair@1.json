@@ -1,0 +1,184 @@
+{
+ "id": "crosshair",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "body": "body",
+    "accent": "accent"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      6,
+      6
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".........aa.........",
+      "........abba........",
+      "........abba........",
+      "........abba........",
+      "........abba........",
+      "........abba........",
+      "........abba........",
+      ".........aa.........",
+      ".aaaaaa..aa..aaaaaa.",
+      "abbbbbbaaccaabbbbbba",
+      "abbbbbbaaccaabbbbbba",
+      ".aaaaaa..aa..aaaaaa.",
+      ".........aa.........",
+      "........abba........",
+      "........abba........",
+      "........abba........",
+      "........abba........",
+      "........abba........",
+      "........abba........",
+      ".........aa........."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body",
+      "c": "accent"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "picture": "hit",
+    "style": "chevrons",
+    "size": 1,
+    "gap": 1,
+    "thickness": 1,
+    "spin": true,
+    "body": "body",
+    "accent": "accent"
+   },
+   "ctx": {
+    "frame": 1
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      2,
+      2
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aa......................aa.",
+      "abba....................abba",
+      "abbba....a........a....abbba",
+      ".abbba..aca......aca..abbba.",
+      "..abbba.acca....acca.abbba..",
+      "...abbbaaccca..acccaabbba...",
+      "....aba..acccaaccca..aba....",
+      ".....a....acccccca....a.....",
+      "...aaa.....acccca.....aaa...",
+      "..accca.....acca.....accca..",
+      "...accca.....aa.....accca...",
+      "....accca..........accca....",
+      ".....accca...aa...accca.....",
+      "......accca.abba.accca......",
+      "......accca.abba.accca......",
+      ".....accca...aa...accca.....",
+      "....accca..........accca....",
+      "...accca.....aa.....accca...",
+      "..accca.....acca.....accca..",
+      "...aaa.....acccca.....aaa...",
+      ".....a....acccccca....a.....",
+      "....aba..acccaaccca..aba....",
+      "...abbbaaccca..acccaabbba...",
+      "..abbba.acca....acca.abbba..",
+      ".abbba..aca......aca..abbba.",
+      "abbba....a........a....abbba",
+      "abba....................abba",
+      ".aa......................aa."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "accent",
+      "c": "body"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     0,
+     0
+    ],
+    "picture": "reload",
+    "style": "circle",
+    "size": 0,
+    "gap": 0,
+    "thickness": 0,
+    "body": "body",
+    "accent": "accent"
+   },
+   "ctx": {
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      -9,
+      -14
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".....aaaaaaaa..........",
+      "...aabbbbbbbbaa........",
+      ".aabbbbbbbbbbbbaa......",
+      "abbbbbaaaaaabbbbba.....",
+      ".abaaa......aaabbba....",
+      "..a............abbba...",
+      "......aaaaaa....abcca..",
+      ".....adddddda....acca..",
+      "....adddddddda....acca.",
+      "...aaddaaaaddaa...acca.",
+      "..addaa....aadda..accca",
+      ".addda......addda..acca",
+      ".adda...aa...adda..acca",
+      ".adda..aeea..adda..acca",
+      ".adda..aeea..adda...aa.",
+      ".adda...aa...adda......",
+      ".addda......addda......",
+      "..addaa....aadda.......",
+      "...aaddaaaaddaa........",
+      "....adddddddda.........",
+      ".....adddddda..........",
+      "......aaaaaa..........."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "tone",
+       "of": "body",
+       "by": -0.7
+      },
+      "c": "body",
+      "d": {
+       "rule": "tone",
+       "of": "body",
+       "by": -1.4
+      },
+      "e": "accent"
+     }
+    }
+   ]
+  }
+ ]
+}

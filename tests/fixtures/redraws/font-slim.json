@@ -1,0 +1,200 @@
+{
+ "id": "font-slim",
+ "frozen": "2026-11-20",
+ "source": "sprites/font-slim.js",
+ "sha256": "e4a0f0eb510ff66e601afbd21d87c79974bfa911758a102a4c1deb1c53b10e86",
+ "name": "Slim pixel letters",
+ "blurb": "One-pixel capitals, small letters, digits and punctuation for dialogue and menus, one per 16x20 cell on a shared baseline (trim the empty columns on the right for proportional spacing); change the size, outline, shadow, shine and colours.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/icon",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "arcade",
+   "puzzle",
+   "platformer",
+   "turn-based-rpg"
+  ],
+  "view": "none",
+  "words": [
+   "font",
+   "letters",
+   "alphabet",
+   "text",
+   "thin",
+   "dialogue",
+   "menu",
+   "pixel"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  16,
+  20
+ ],
+ "pivot": [
+  4,
+  13
+ ],
+ "grounded": false,
+ "preview": "upper",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "outline": {
+   "kind": "choice",
+   "label": "Outline",
+   "def": "ink",
+   "options": [
+    {
+     "value": "none",
+     "label": "None"
+    },
+    {
+     "value": "ink",
+     "label": "Ink"
+    },
+    {
+     "value": "rimmed",
+     "label": "Rimmed"
+    }
+   ],
+   "group": "Look"
+  },
+  "shadow": {
+   "kind": "toggle",
+   "label": "Shadow",
+   "def": false,
+   "group": "Look"
+  },
+  "shine": {
+   "kind": "toggle",
+   "label": "Shine",
+   "def": false,
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Letters",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#f2c230",
+    "#8fd0f0",
+    "#9bd18a",
+    "#f6d3b0",
+    "#c2c9d6"
+   ],
+   "group": "Colors"
+  },
+  "edge": {
+   "kind": "color",
+   "label": "Rim",
+   "def": "#3f5068",
+   "swatches": [
+    "#3f5068",
+    "#c9423a",
+    "#3f6fd1",
+    "#7a4fc4",
+    "#3f8a4f",
+    "#7a4f33"
+   ],
+   "group": "Colors",
+   "when": {
+    "outline": [
+     "rimmed"
+    ]
+   }
+  }
+ },
+ "clips": {
+  "upper": {
+   "frames": 26,
+   "loop": true,
+   "fps": [
+    2,
+    2,
+    2
+   ]
+  },
+  "lower": {
+   "frames": 26,
+   "loop": true,
+   "fps": [
+    2,
+    2,
+    2
+   ]
+  },
+  "digits": {
+   "frames": 10,
+   "loop": true,
+   "fps": [
+    2,
+    2,
+    2
+   ]
+  },
+  "marks": {
+   "frames": 18,
+   "loop": true,
+   "fps": [
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [
+  {
+   "name": "Ink letters",
+   "params": {}
+  },
+  {
+   "name": "Big rimmed",
+   "params": {
+    "size": 1,
+    "outline": "rimmed",
+    "edge": "#3f6fd1"
+   }
+  },
+  {
+   "name": "Tiny plain",
+   "params": {
+    "size": 0,
+    "outline": "none",
+    "body": "#9bd18a"
+   }
+  },
+  {
+   "name": "Gold with shadow",
+   "params": {
+    "body": "#f2c230",
+    "shadow": true,
+    "size": 1
+   }
+  },
+  {
+   "name": "Rose shine",
+   "params": {
+    "body": "#f6d3b0",
+    "shine": true,
+    "outline": "rimmed",
+    "edge": "#7a4fc4"
+   }
+  }
+ ],
+ "bundles": []
+}

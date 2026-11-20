@@ -1,0 +1,161 @@
+{
+  "format": "loadout-sprite",
+  "version": 2,
+  "id": "ui-bars-crystal",
+  "name": "Crystal bars and slider",
+  "blurb": "A bar housing in a tube of cut crystal lit like a bevel, with three fill strips (health, mana, a gauge), a white flash, a slider track and its knob; change the style, corners, band, glints and colours.",
+  "meta": {
+    "type": "ui",
+    "role": "interface/bar",
+    "themes": ["neutral","fantasy"],
+    "gameTypes": ["arcade","turn-based-rpg","puzzle","top-down-rpg"],
+    "view": "none",
+    "words": ["bar","health","mana","slider","meter","progress","crystal","ice","frost","frozen"],
+    "license": "draft"
+  },
+  "size": [64,16],
+  "pivot": [32,8],
+  "grounded": false,
+  "preview": "frame",
+  "styles": ["pixel"],
+  "palette": [
+    {"id":"frame","label":"Crystal","default":"#8fd0f0","material":"interface","swatches":["#8fd0f0","#9bd18a","#5fe0f0","#7fe0a0"]},
+    {
+      "id": "accent",
+      "label": "Sparkles and frost tips",
+      "default": "#4fd8ee",
+      "material": "interface",
+      "swatches": ["#4fd8ee","#c9423a","#a4c44a","#b48af8","#f4e06a"]
+    },
+    {"id":"fill","label":"Health","default":"#6aa83e","material":"interface","swatches":["#6aa83e","#3f8a4f","#c9423a","#e08a2c","#4fd8ee","#f2c230"]},
+    {"id":"fillB","label":"Magic","default":"#3f6fd1","material":"interface","swatches":["#3f6fd1","#3f9fd1","#4fd8ee","#8fd0f0","#4f9ff0"]},
+    {"id":"fillC","label":"Gauge","default":"#f2c230","material":"interface","swatches":["#f2c230","#e08a2c","#a4c44a","#a06a3c","#c2c9d6"]},
+    {"id":"white","default":"#ffffff","material":"light","detail":true}
+  ],
+  "controls": [
+    {
+      "key": "style",
+      "kind": "choice",
+      "label": "Style",
+      "options": [{"value":"ice","label":"Ice"},{"value":"rime","label":"Rime"},{"value":"shard","label":"Shard"}],
+      "default": "ice",
+      "group": "Look"
+    },
+    {"key":"corner","kind":"range","label":"Corner","lo":"Square","hi":"Round","default":0.5,"group":"Look"},
+    {"key":"border","kind":"range","label":"Border","lo":"Thin","hi":"Thick","default":0.5,"group":"Look"},
+    {"key":"glints","kind":"toggle","label":"Glints","default":true,"group":"Look"},
+    {"key":"frame","kind":"colour","label":"Crystal","group":"Colors"},
+    {"key":"accent","kind":"colour","label":"Sparkles and frost tips","group":"Colors","when":[{"glints":[true]},{"style":["rime"]}]},
+    {"key":"fill","kind":"colour","label":"Health","group":"Colors"},
+    {"key":"fillB","kind":"colour","label":"Magic","group":"Colors"},
+    {"key":"fillC","kind":"colour","label":"Gauge","group":"Colors"}
+  ],
+  "versions": [
+    {"name":"Ice bars","params":{}},
+    {"name":"Frost ends","params":{"style":"rime","accent":"#c9423a","frame":"#5fe0f0","border":1}},
+    {"name":"Shard, plain","params":{"style":"shard","glints":false,"frame":"#9bd18a","border":1}},
+    {"name":"Mint","params":{"frame":"#7fe0a0","fill":"#4fd8ee"}}
+  ],
+  "body": {
+    "panel": {
+      "skin": {"use":"skin:crystal","v":2,"paint":{"frame":"frame","accent":"accent","shine":"white"}},
+      "piece": {
+        "gen": "ui.trough",
+        "v": 1,
+        "at": [1,1],
+        "size": [62,14],
+        "style": {"from":"style"},
+        "corner": {"from":"corner","map":[[0,0],[1,4]]},
+        "border": {"from":"border","map":[[0,1],[1,3]]},
+        "gleam": {"from":"glints"},
+        "clip": ["frame"],
+        "edges": 8
+      },
+      "states": ["frame","fill","fill-b","fill-c","flash","slider","knob"],
+      "draw": [
+        {
+          "gen": "ui.strip",
+          "v": 1,
+          "clip": ["fill"],
+          "at": [1,1],
+          "size": [62,14],
+          "style": {"from":"style"},
+          "border": {"from":"border","map":[[0,1],[1,3]]},
+          "fill": "fill",
+          "shine": "white",
+          "edges": 8
+        },
+        {
+          "gen": "ui.strip",
+          "v": 1,
+          "clip": ["fill-b"],
+          "at": [1,1],
+          "size": [62,14],
+          "style": {"from":"style"},
+          "border": {"from":"border","map":[[0,1],[1,3]]},
+          "fill": "fillB",
+          "shine": "white",
+          "edges": 8
+        },
+        {
+          "gen": "ui.strip",
+          "v": 1,
+          "clip": ["fill-c"],
+          "at": [1,1],
+          "size": [62,14],
+          "style": {"from":"style"},
+          "border": {"from":"border","map":[[0,1],[1,3]]},
+          "fill": "fillC",
+          "shine": "white",
+          "edges": 8
+        },
+        {
+          "gen": "ui.strip",
+          "v": 1,
+          "clip": ["flash"],
+          "at": [1,1],
+          "size": [62,14],
+          "style": {"from":"style"},
+          "border": {"from":"border","map":[[0,1],[1,3]]},
+          "fill": "fill",
+          "shine": "white",
+          "flash": 1,
+          "fade": true,
+          "edges": 8
+        },
+        {
+          "gen": "ui.trough",
+          "v": 1,
+          "at": [1,1],
+          "size": [62,14],
+          "style": {"from":"style"},
+          "corner": {"from":"corner","map":[[0,0],[1,4]]},
+          "border": {"from":"border","map":[[0,1],[1,3]]},
+          "gleam": false,
+          "clip": ["slider"],
+          "role": "rail"
+        },
+        {
+          "gen": "ui.slab",
+          "v": 1,
+          "clip": ["knob"],
+          "role": "knob",
+          "at": [26,1],
+          "size": [12,14],
+          "style": {"from":"style"},
+          "corner": {"from":"corner","map":[[0,0],[1,4]]},
+          "gleam": {"from":"glints"}
+        }
+      ]
+    }
+  },
+  "clips": {
+    "frame": {"frames":1,"fps":8,"label":"Housing"},
+    "fill": {"frames":1,"fps":8,"label":"Health"},
+    "fill-b": {"frames":1,"fps":8,"label":"Magic"},
+    "fill-c": {"frames":1,"fps":8,"label":"Gauge"},
+    "flash": {"frames":4,"fps":8,"loop":false,"label":"Flash"},
+    "slider": {"frames":1,"fps":8,"label":"Slider track"},
+    "knob": {"frames":1,"fps":8,"label":"Slider knob"}
+  }
+}

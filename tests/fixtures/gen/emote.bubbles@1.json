@@ -1,0 +1,182 @@
+{
+ "id": "emote.bubbles",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "body": "body",
+    "frame": "frame",
+    "accent": "accent"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      4,
+      4
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..aaaaaaaaaaaaaaaaaaaaa..",
+      ".abbbbbbbbbbbbbbbbbbbbba.",
+      "abcccccccccccccccccccccba",
+      "abcccccccccccccccccccccba",
+      "abcccccccccccccccccccccba",
+      "abcccccccccaaacccccccccba",
+      "abccccccccadddaccccccccba",
+      "abccccccccadddaccccccccba",
+      "abccccccccadddaccccccccba",
+      "abccccccccadddaccccccccba",
+      "abccccccccadddaccccccccba",
+      "abccccccccadddaccccccccba",
+      "abccccccccadddaccccccccba",
+      "abcccccccccadacccccccccba",
+      "abcccccccccaaacccccccccba",
+      "abccccccccadddaccccccccba",
+      "abccccccccadddaccccccccba",
+      "abcccccccccaaacccccccccba",
+      "abcccccccccccccccccccccba",
+      "abcccccccccccccccccccccba",
+      ".abbbbbbbbcccccbbbbbbbba.",
+      "..aaaaaaaabcccbaaaaaaaa..",
+      "..........abcba..........",
+      "..........abcba..........",
+      "...........aba...........",
+      "...........aba...........",
+      "............a............"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "frame",
+      "c": "body",
+      "d": "accent"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "picture": "close",
+    "emote": "swirl",
+    "style": "shout",
+    "tail": "right",
+    "size": 1,
+    "body": "body",
+    "frame": "frame",
+    "accent": "accent"
+   },
+   "ctx": {
+    "frame": 1
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      1,
+      1
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a.......a............a.......a",
+      ".aa.....a............a.....aa.",
+      ".abaa..aba..........aba..aaba.",
+      "..abbaabcbaaaaaaaaaabcbaabba..",
+      "..abcbbcccbbbbbbbbbbcccbbcba..",
+      "...abccccccccccccccccccccba...",
+      "...abccccccccccccccccccccba...",
+      "..abccccccccccccccccccccccba..",
+      ".abccccccccccccccccccccccccba.",
+      "..abccccccccccccccccccccccba..",
+      "...abccccccccccccccccccccba...",
+      "...abccccccccccccccccccccba...",
+      "...abccccccccccccccccccccba...",
+      "...abccccccccccccccccccccba...",
+      "...abccccccccccccccccccccba...",
+      "...abccccccccccccccccccccba...",
+      "...abccccccccccccccccccccba...",
+      "...abccccccccccccccccccccba...",
+      "..abccccccccccccccccccccccba..",
+      ".abccccccccccccccccccccccccba.",
+      "..abccccccccccccccccccccccba..",
+      "...abccccccccccccccccccccba...",
+      "...abccccccccccccccccccccba...",
+      "..abcbbcccbbbbbcccccbccbbcba..",
+      "..abbaabcbaaaaabcccbacbaabba..",
+      ".abaa..aba.....abcbaaba..aaba.",
+      ".aa.....a.......abba.a.....aa.",
+      "a.......a........aba.a.......a",
+      "..................aaa.........",
+      "....................a........."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "frame",
+      "c": "body"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     0,
+     0
+    ],
+    "picture": "pop",
+    "emote": "question",
+    "style": "cloud",
+    "tail": "middle",
+    "size": 0,
+    "body": "body",
+    "frame": "frame",
+    "accent": "accent"
+   },
+   "ctx": {
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      -9,
+      -10
+     ],
+     "anchor": "tl",
+     "rows": [
+      "....aa.......aa....",
+      "..aabba.....abbaa..",
+      ".abbccbaaaaabccbba.",
+      ".abcccccccccccccba.",
+      "abcccccccccccccccba",
+      "abcccccccccccccccba",
+      ".abcccccccccccccba.",
+      "..accccccccccccca..",
+      "..accccccccccccca..",
+      "..accccccccccccca..",
+      "..accccccccccccca..",
+      ".abcccccccccccccba.",
+      "abcccccccccccccccba",
+      "abcccccccccccccccba",
+      ".abcccccccccccccba.",
+      ".abbccbaaaaabccbba.",
+      "..aabba.....abbaa..",
+      "....aa.......aa...."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "frame",
+      "c": "body"
+     }
+    }
+   ]
+  }
+ ]
+}

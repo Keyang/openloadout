@@ -1,0 +1,245 @@
+{
+ "id": "ui-timer",
+ "frozen": "2026-11-20",
+ "source": "sprites/ui-timer.js",
+ "sha256": "4f290ccb963a6909dc7776bea8b0d3317f8b880f2ea3b0101c74949f11a02bd6",
+ "name": "Timer",
+ "blurb": "A countdown or lap timer for the screen: a small clock beside the time, a colon that blinks and red digits that flash and shake when time is short, plus the empty case for the game's own digits; change the style, format, size, clock and colours.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/panel",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "arcade",
+   "racing",
+   "puzzle",
+   "platformer"
+  ],
+  "view": "none",
+  "words": [
+   "timer",
+   "clock",
+   "countdown",
+   "time",
+   "seconds",
+   "hud",
+   "hurry",
+   "stopwatch"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  64,
+  24
+ ],
+ "pivot": [
+  32,
+  12
+ ],
+ "grounded": false,
+ "preview": "idle",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "plate",
+   "options": [
+    {
+     "value": "plate",
+     "label": "Plate"
+    },
+    {
+     "value": "strip",
+     "label": "Strip"
+    },
+    {
+     "value": "drum",
+     "label": "Drum"
+    }
+   ],
+   "group": "Look"
+  },
+  "format": {
+   "kind": "choice",
+   "label": "Format",
+   "def": "minutes",
+   "options": [
+    {
+     "value": "seconds",
+     "label": "Seconds"
+    },
+    {
+     "value": "minutes",
+     "label": "Minutes"
+    },
+    {
+     "value": "clock",
+     "label": "Clock"
+    }
+   ],
+   "group": "Look"
+  },
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "icon": {
+   "kind": "toggle",
+   "label": "Clock face",
+   "def": true,
+   "group": "Look"
+  },
+  "face": {
+   "kind": "color",
+   "label": "Windows",
+   "def": "#3f5068",
+   "swatches": [
+    "#3f5068",
+    "#7a4f33",
+    "#434d6d",
+    "#8e3a4a"
+   ],
+   "group": "Colors"
+  },
+  "frame": {
+   "kind": "color",
+   "label": "Case",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#8fd0f0",
+    "#9bd18a",
+    "#c2c9d6",
+    "#f6d3b0"
+   ],
+   "group": "Colors"
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Digits",
+   "def": "#4fd8ee",
+   "swatches": [
+    "#4fd8ee",
+    "#f2c230",
+    "#a4c44a",
+    "#5fe0f0",
+    "#7fe0a0"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "tick": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    8,
+    12
+   ]
+  },
+  "warn": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  },
+  "frame": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  }
+ },
+ "sounds": {
+  "tick": [
+   {
+    "sound": "timer-tick",
+    "preset": "Clock",
+    "frame": 0,
+    "volume": 0.45
+   }
+  ],
+  "warn": [
+   {
+    "sound": "timer-tick",
+    "preset": "Bomb timer",
+    "frame": 0,
+    "volume": 0.6
+   }
+  ]
+ },
+ "versions": [
+  {
+   "name": "Clock",
+   "params": {}
+  },
+  {
+   "name": "Seconds",
+   "params": {
+    "format": "seconds",
+    "size": 1
+   }
+  },
+  {
+   "name": "Long clock",
+   "params": {
+    "format": "clock",
+    "icon": false,
+    "style": "strip"
+   }
+  },
+  {
+   "name": "Mint drum",
+   "params": {
+    "style": "drum",
+    "glow": "#7fe0a0",
+    "face": "#7a4f33"
+   }
+  },
+  {
+   "name": "Wine and rose",
+   "params": {
+    "face": "#8e3a4a",
+    "frame": "#f6d3b0",
+    "glow": "#f2c230"
+   }
+  }
+ ],
+ "bundles": []
+}

@@ -1,0 +1,348 @@
+{
+ "id": "ui-word-pop",
+ "frozen": "2026-11-20",
+ "source": "sprites/ui-word-pop.js",
+ "sha256": "644bd4f7167003ec799a524dc673f844e13199125fd796de66806d7205706fa8",
+ "name": "Word pop",
+ "blurb": "Words a game flashes at the player (Ready, Go!, Level up, Clear, Combo, Bonus, Perfect, Game over) that drop in letter by letter, bob while they show and break into sparkles; change the word, letter style, size, outline, shadow, colours and motion.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/icon",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "arcade",
+   "racing",
+   "puzzle",
+   "shooter"
+  ],
+  "view": "none",
+  "words": [
+   "ready",
+   "go",
+   "level up",
+   "clear",
+   "combo",
+   "bonus",
+   "perfect",
+   "game over",
+   "announcer",
+   "popup",
+   "title"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  96,
+  32
+ ],
+ "pivot": [
+  48,
+  16
+ ],
+ "grounded": false,
+ "preview": "idle",
+ "params": {
+  "word": {
+   "kind": "choice",
+   "label": "Word",
+   "def": "ready",
+   "options": [
+    {
+     "value": "ready",
+     "label": "Ready"
+    },
+    {
+     "value": "go",
+     "label": "Go!"
+    },
+    {
+     "value": "level-up",
+     "label": "Level up"
+    },
+    {
+     "value": "clear",
+     "label": "Clear"
+    },
+    {
+     "value": "combo",
+     "label": "Combo"
+    },
+    {
+     "value": "bonus",
+     "label": "Bonus"
+    },
+    {
+     "value": "perfect",
+     "label": "Perfect"
+    },
+    {
+     "value": "game-over",
+     "label": "Game over"
+    }
+   ],
+   "group": "Look"
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "chunky",
+   "options": [
+    {
+     "value": "chunky",
+     "label": "Chunky"
+    },
+    {
+     "value": "slim",
+     "label": "Slim"
+    },
+    {
+     "value": "rounded",
+     "label": "Rounded"
+    },
+    {
+     "value": "serif",
+     "label": "Serif"
+    }
+   ],
+   "group": "Look"
+  },
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "outline": {
+   "kind": "choice",
+   "label": "Outline",
+   "def": "rimmed",
+   "options": [
+    {
+     "value": "ink",
+     "label": "Ink"
+    },
+    {
+     "value": "rimmed",
+     "label": "Rimmed"
+    }
+   ],
+   "group": "Look"
+  },
+  "shadow": {
+   "kind": "toggle",
+   "label": "Shadow",
+   "def": true,
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Letters",
+   "def": "#f2c230",
+   "swatches": [
+    "#f2c230",
+    "#f0ead8",
+    "#8fd0f0",
+    "#9bd18a",
+    "#f6d3b0",
+    "#c2c9d6"
+   ],
+   "group": "Colors"
+  },
+  "edge": {
+   "kind": "color",
+   "label": "Rim",
+   "def": "#c9423a",
+   "swatches": [
+    "#c9423a",
+    "#3f5068",
+    "#3f6fd1",
+    "#7a4fc4",
+    "#3f8a4f",
+    "#7a4f33"
+   ],
+   "group": "Colors",
+   "when": {
+    "outline": [
+     "rimmed"
+    ]
+   }
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Sparkles",
+   "def": "#4fd8ee",
+   "swatches": [
+    "#4fd8ee",
+    "#e08a2c",
+    "#b48af8",
+    "#a4c44a",
+    "#3f9fd1"
+   ],
+   "group": "Colors"
+  },
+  "bounce": {
+   "kind": "range",
+   "label": "Bounce",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Calm",
+   "hi": "Bouncy",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    8,
+    12
+   ]
+  },
+  "pop": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  },
+  "leave": {
+   "frames": 6,
+   "loop": false,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  }
+ },
+ "sounds": {
+  "pop": [
+   {
+    "sound": "countdown-go",
+    "preset": "Chiptune",
+    "frame": 1,
+    "volume": 0.7,
+    "when": {
+     "word": [
+      "ready",
+      "go"
+     ]
+    }
+   },
+   {
+    "sound": "level-up",
+    "preset": "Chiptune",
+    "frame": 1,
+    "volume": 0.7,
+    "when": {
+     "word": [
+      "level-up"
+     ]
+    }
+   },
+   {
+    "sound": "quest-complete",
+    "preset": "Chiptune",
+    "frame": 1,
+    "volume": 0.7,
+    "when": {
+     "word": [
+      "clear",
+      "perfect"
+     ]
+    }
+   },
+   {
+    "sound": "xp-blip",
+    "preset": "Combo high",
+    "frame": 1,
+    "volume": 0.7,
+    "when": {
+     "word": [
+      "combo",
+      "bonus"
+     ]
+    }
+   },
+   {
+    "sound": "game-over",
+    "preset": "Chiptune",
+    "frame": 1,
+    "volume": 0.7,
+    "when": {
+     "word": [
+      "game-over"
+     ]
+    }
+   }
+  ]
+ },
+ "versions": [
+  {
+   "name": "Ready",
+   "params": {}
+  },
+  {
+   "name": "Go!",
+   "params": {
+    "word": "go",
+    "body": "#9bd18a",
+    "edge": "#3f8a4f"
+   }
+  },
+  {
+   "name": "Level up",
+   "params": {
+    "word": "level-up",
+    "style": "rounded",
+    "body": "#8fd0f0",
+    "edge": "#3f6fd1"
+   }
+  },
+  {
+   "name": "Combo",
+   "params": {
+    "word": "combo",
+    "style": "slim",
+    "body": "#f6d3b0",
+    "edge": "#7a4fc4",
+    "glow": "#e08a2c"
+   }
+  },
+  {
+   "name": "Game over",
+   "params": {
+    "word": "game-over",
+    "style": "serif",
+    "body": "#c2c9d6",
+    "edge": "#3f5068",
+    "bounce": 0
+   }
+  }
+ ],
+ "bundles": []
+}

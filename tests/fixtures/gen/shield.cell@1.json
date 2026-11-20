@@ -1,0 +1,249 @@
+{
+ "id": "shield.cell",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     16,
+     17
+    ],
+    "shape": "hex",
+    "size": 0.4,
+    "casing": "body",
+    "energy": "glow",
+    "band": "band",
+    "shine": "shine"
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true,
+    "frames": 8,
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      8,
+      9
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...aabccccccc...",
+      "..dbbbaaaaaacc..",
+      "..dbbaabbbbbac..",
+      "..bbbaeffffbac..",
+      ".dbbbaefffffbcc.",
+      ".bbbaaeffgffbac.",
+      "dbbbaeffgggffbch",
+      "dbbbaeffghgffbhh",
+      "dbbbaeffghgffbhh",
+      "ddbbbeffgggffbhh",
+      ".dbbbaeffgffehh.",
+      ".ddbbaefffffbhh.",
+      "..dbbbeffffehh..",
+      "..dbbbaeeeebah..",
+      "..ddbbaaaaaaah..",
+      "...ddbbbbbbbb..."
+     ],
+     "key": {
+      "a": "body",
+      "b": "body.dark",
+      "c": "body.light",
+      "d": "body.deep",
+      "e": "glow.dark",
+      "f": "glow",
+      "g": "glow.light",
+      "h": "shine"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     17
+    ],
+    "shape": "orb",
+    "size": 1,
+    "layers": 2,
+    "casing": "body",
+    "energy": "glow",
+    "band": "band",
+    "shine": "shine"
+   },
+   "ctx": {
+    "t": 0.375,
+    "loop": true,
+    "frames": 8,
+    "frame": 3
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      6,
+      7
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".......aaaaaa.......",
+      ".....bbbbbbbbbb.....",
+      "...cdceecddddccee...",
+      "..cddceecdffffdcee..",
+      "..cddceecfffffffce..",
+      ".cdddceecfffggffcee.",
+      ".cddceecfffggggffce.",
+      "ccddceecfffggggffcee",
+      "ccddceecffffggfffcee",
+      "ccddceecfffffffffcee",
+      "ccddceecffffffffdcee",
+      "cccdceecffffffffdcee",
+      "cccdceecddffffdddcee",
+      ".cccceecdddddddddce.",
+      ".cccdceecdddddddcee.",
+      "..cccceecdddddddcg..",
+      "..cccceecddddddceg..",
+      "...ccceecddddccgg...",
+      ".....bbbaaaaagg.....",
+      ".......bggggg......."
+     ],
+     "key": {
+      "a": "body.light",
+      "b": "body.dark",
+      "c": "glow.dark",
+      "d": "glow",
+      "e": "band",
+      "f": "glow.light",
+      "g": "shine"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     17
+    ],
+    "shape": "ring",
+    "size": 0,
+    "layers": 2,
+    "casing": "body",
+    "energy": "glow",
+    "band": "band",
+    "shine": "shine"
+   },
+   "ctx": {
+    "t": 0.625,
+    "loop": true,
+    "frames": 8,
+    "frame": 5
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      9,
+      9
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".....abbb.....",
+      "...cdaeebcc...",
+      "..dddaeebfcc..",
+      ".fdddaaaaffcc.",
+      ".ddd......fdc.",
+      "fddc..dd..ffcc",
+      "fdd..dggd..fdc",
+      "gdc.dggggd.fdc",
+      "gdg.dggggd.fdc",
+      "gdg..dggd..ddc",
+      "gfcg..dd..fddc",
+      ".gdg......ddd.",
+      ".gfccabbbdddc.",
+      "..gfcaeebddd..",
+      "...ffaeebdf...",
+      ".....aaaa....."
+     ],
+     "key": {
+      "a": "body.dark",
+      "b": "body.light",
+      "c": "glow.light",
+      "d": "glow",
+      "e": "body",
+      "f": "glow.dark",
+      "g": "shine"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     17
+    ],
+    "shape": "hex",
+    "size": 1,
+    "layers": 2,
+    "collect": true,
+    "casing": "body",
+    "energy": "glow",
+    "band": "band",
+    "shine": "shine"
+   },
+   "ctx": {
+    "t": 0.5714285714285714,
+    "loop": false,
+    "frames": 8,
+    "frame": 4
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      4,
+      6
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".....aaaaaaaabbbbbb.....",
+      "....cddddddddbbbbbbb....",
+      "....ddccccccccccccbb....",
+      "...cdeffffffffffffcbb...",
+      "...ddeffffffffffffcbb...",
+      "..cdeffeeeeeeeeeeffcbb..",
+      "..ddeffeggggggggeffcbb..",
+      ".cdeffeggggggggggeffcbb.",
+      ".ddeffeggggggggggeffcbb.",
+      "cdeffeggggggggggggeffcaa",
+      "cdeffegggggbbgggggeffcda",
+      "cdeffegggggbbgggggeffcda",
+      "cceffeggggggggggggeffcda",
+      ".cdeffeggggggggggeffedd.",
+      ".cceffeggggggggggeffcda.",
+      "..cdeffeggggggggeffedd..",
+      "..cceffeeeeeeeeeeffcda..",
+      "...cdeffffffffffffedd...",
+      "...cceffffffffffffcda...",
+      "....cdeeeeeeeeeeeedd....",
+      "....ccddddddddddddda....",
+      ".....cccccccccccccc....."
+     ],
+     "key": {
+      "a": "body.light",
+      "b": "shine",
+      "c": "body.dark",
+      "d": "body",
+      "e": "glow.dark",
+      "f": "glow",
+      "g": "glow.light"
+     }
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,192 @@
+{
+ "id": "boulder",
+ "frozen": "2026-11-20",
+ "source": "sprites/boulder.js",
+ "sha256": "9cfa24543157894d1660424bb1f6ea043f3d22358efb2ddf394da7fc2df14ce7",
+ "name": "Boulder",
+ "blurb": "A boulder that blocks the way until it is smashed to rubble. Make it round, a slab or a cluster, mossy or bare, cracked or whole, and change its size and colours.",
+ "meta": {
+  "type": "prop",
+  "role": "world/prop",
+  "themes": [
+   "fantasy"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "top-down-rpg"
+  ],
+  "view": "top-down",
+  "words": [
+   "boulder",
+   "rock",
+   "stone",
+   "obstacle",
+   "rubble",
+   "block",
+   "break",
+   "smash",
+   "hit",
+   "blocked path",
+   "mossy",
+   "heavy"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  48,
+  48
+ ],
+ "pivot": [
+  24,
+  44
+ ],
+ "grounded": true,
+ "preview": "idle",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "shape": {
+   "kind": "choice",
+   "label": "Shape",
+   "def": "round",
+   "options": [
+    "round",
+    "slab",
+    "cluster"
+   ],
+   "group": "Look"
+  },
+  "mossy": {
+   "kind": "toggle",
+   "label": "Mossy",
+   "def": true,
+   "group": "Look"
+  },
+  "wear": {
+   "kind": "range",
+   "label": "Wear",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "New",
+   "hi": "Worn",
+   "group": "Look"
+  },
+  "pieces": {
+   "kind": "range",
+   "label": "Pieces",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "stone": {
+   "kind": "color",
+   "label": "Stone",
+   "def": "#a8a4a0",
+   "swatches": [
+    "#a8a4a0",
+    "#5a5f7a",
+    "#7e84a0",
+    "#f0ead8",
+    "#c9a06a",
+    "#6b7280",
+    "#8f97a8"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Moss",
+   "def": "#4f9d57",
+   "swatches": [
+    "#4f9d57",
+    "#7fbf5a",
+    "#357a4c",
+    "#e6c96a",
+    "#c8553a"
+   ],
+   "group": "Colors",
+   "when": {
+    "mossy": [
+     true
+    ]
+   }
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "hurt": {
+   "frames": 4,
+   "loop": false,
+   "fps": [
+    6,
+    9,
+    13
+   ]
+  },
+  "break": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  }
+ },
+ "sounds": {
+  "hurt": [
+   {
+    "sound": "punch",
+    "preset": "Light jab",
+    "frame": 0,
+    "volume": 0.9
+   }
+  ],
+  "break": [
+   {
+    "sound": "stone-door",
+    "preset": "Secret wall",
+    "frame": 0,
+    "volume": 0.7
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-rpg-fantasy"
+ ]
+}

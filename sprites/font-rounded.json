@@ -1,0 +1,40 @@
+{ "format": "loadout-sprite",
+  "version": 2,
+  "id": "font-rounded",
+  "name": "Rounded pixel letters",
+  "blurb": "Chunky capitals, small letters, digits and punctuation with every corner taken off, one per 16x20 cell on a shared baseline (trim the empty columns on the right for proportional spacing); change the size, outline, shadow, shine and colours.",
+  "meta": {"type": "ui", "role": "interface/icon", "themes": ["neutral"], "gameTypes": ["arcade", "puzzle", "platformer", "turn-based-rpg"], "view": "none", "words": ["font", "letters", "alphabet", "text", "round", "soft", "cute", "pixel"], "license": "draft"},
+  "size": [16,20],
+  "pivot": [4,13],
+  "grounded": false,
+  "preview": "upper",
+  "styles": ["pixel"],
+  "palette": [
+  {"id": "body", "label": "Letters", "default": "#f0ead8", "material": "paint", "swatches": ["#f0ead8", "#f2c230", "#8fd0f0", "#9bd18a", "#f6d3b0", "#c2c9d6"]},
+  {"id": "edge", "label": "Rim", "default": "#3f5068", "material": "paint", "swatches": ["#3f5068", "#c9423a", "#3f6fd1", "#7a4fc4", "#3f8a4f", "#7a4f33"]} ],
+  "controls": [
+  {"key": "size", "kind": "range", "label": "Size", "lo": "Small", "hi": "Big", "default": 0.5},
+  {"key": "outline", "kind": "choice", "label": "Outline", "options": ["none", "ink", "rimmed"], "default": "ink"},
+  {"key": "shadow", "kind": "toggle", "label": "Shadow", "default": false},
+  {"key": "shine", "kind": "toggle", "label": "Shine", "default": false},
+  {"key": "body", "kind": "colour", "label": "Letters"},
+  {"key": "edge", "kind": "colour", "label": "Rim", "when": {"outline": ["rimmed"]}} ],
+  "body": { "pictures": {
+    "nodes": [
+    {"id": "ui", "parent": null, "at": [4,13]} ],
+    "draw": [
+    {"gen": "font.cell", "v": 1, "on": "ui", "at": [0,0], "clip": ["upper"], "row": "upper", "size": {"from": "size", "map": [[0,0], [1,1]], "round": "none"}, "outline": {"from": "outline", "pick": {"none": "none", "ink": "ink", "rimmed": "rimmed"}}, "shadow": {"from": "shadow", "pick": {"true": true, "false": false}}, "shine": {"from": "shine", "pick": {"true": true, "false": false}}, "paint": "body", "edge": "edge", "style": "rounded"},
+    {"gen": "font.cell", "v": 1, "on": "ui", "at": [0,0], "clip": ["lower"], "row": "lower", "size": {"from": "size", "map": [[0,0], [1,1]], "round": "none"}, "outline": {"from": "outline", "pick": {"none": "none", "ink": "ink", "rimmed": "rimmed"}}, "shadow": {"from": "shadow", "pick": {"true": true, "false": false}}, "shine": {"from": "shine", "pick": {"true": true, "false": false}}, "paint": "body", "edge": "edge", "style": "rounded"},
+    {"gen": "font.cell", "v": 1, "on": "ui", "at": [0,0], "clip": ["digits"], "row": "digits", "size": {"from": "size", "map": [[0,0], [1,1]], "round": "none"}, "outline": {"from": "outline", "pick": {"none": "none", "ink": "ink", "rimmed": "rimmed"}}, "shadow": {"from": "shadow", "pick": {"true": true, "false": false}}, "shine": {"from": "shine", "pick": {"true": true, "false": false}}, "paint": "body", "edge": "edge", "style": "rounded"},
+    {"gen": "font.cell", "v": 1, "on": "ui", "at": [0,0], "clip": ["marks"], "row": "marks", "size": {"from": "size", "map": [[0,0], [1,1]], "round": "none"}, "outline": {"from": "outline", "pick": {"none": "none", "ink": "ink", "rimmed": "rimmed"}}, "shadow": {"from": "shadow", "pick": {"true": true, "false": false}}, "shine": {"from": "shine", "pick": {"true": true, "false": false}}, "paint": "body", "edge": "edge", "style": "rounded"} ] } },
+  "clips": {
+    "upper": {"frames": 26, "fps": 2, "label": "Capitals A to Z"},
+    "lower": {"frames": 26, "fps": 2, "label": "Small letters a to z"},
+    "digits": {"frames": 10, "fps": 2, "label": "Digits 0 to 9"},
+    "marks": {"frames": 18, "fps": 2, "label": "Punctuation"} },
+  "versions": [
+  {"name": "Ink letters", "params": {}},
+  {"name": "Candy title", "params": {"size": 1, "outline": "rimmed", "body": "#f6d3b0", "edge": "#c9423a", "shine": true}},
+  {"name": "Small sky", "params": {"size": 0, "body": "#8fd0f0"}},
+  {"name": "Plain gold", "params": {"outline": "none", "body": "#f2c230", "size": 1}},
+  {"name": "Mint shadow", "params": {"body": "#9bd18a", "shadow": true, "outline": "rimmed", "edge": "#7a4f33"}} ] }

@@ -5,6 +5,7 @@
 //   drawList(g, list, { palette, glowRim })   paint a list onto a Surface: { drawn, skipped: [{ index, kind, why }], work }
 //   renderList(w, h, list, opt)                the same on a new Surface: { g, drawn, skipped }
 //   placeOn(prim, frame)                       a primitive written in a node's own frame, placed in frame coordinates
+//                                              (areas and shapes nested past PLACE_DEPTH are dropped: null)
 //   nodeFrame({ at, turn, mirror, scale })     the frame of a picture node (x right, y down, turned clockwise)
 //   boneFrame(start, angle)                    the frame of a solved bone, exactly as rigs/bones.js places its shapes
 //   paintOf(ref, palette)                      what a paint ref paints: '#rrggbb' (flat), a ramp (three tones) or CLEAR
@@ -277,6 +278,14 @@ const scaleR = (r, k) => (k === 1 ? r : fin(r) ? r * k : Array.isArray(r) ? r.ma
  * Arguments: prim (a primitive or operation of this module), frame (from nodeFrame or boneFrame).
  */
 export function placeOn(prim, frame) {
+  return placeAt(prim, frame, 0);
+}
+
+/** How deep placeOn places a dither's or bands' `area` and a cut's `shape` inside one another (a real one is 1 deep); deeper ones are dropped (null), so drawList skips the primitive with a reason. */
+export const PLACE_DEPTH = 6;
+
+// placeOn at a depth of nesting: the area or shape a primitive at PLACE_DEPTH holds is dropped, not placed (build item F3)
+function placeAt(prim, frame, depth) {
   if (!isObj(prim) || !isObj(frame)) return prim;
   const F = frame, out = { ...prim };
   for (const f of ['at', 'from', 'to']) { const p = pt(prim[f]); if (p) out[f] = mapPt(F, p); }
@@ -309,8 +318,8 @@ export function placeOn(prim, frame) {
     // a polygon or rect placed on a mirrored node carries mirror: true, so pixel centres on its edges fall as in the flip
     case 'poly': if (F.mirror) out.mirror = prim.mirror !== true; break;
     case 'stamp': if (F.mirror) out.mirror = !(prim.mirror === true || prim.mirror === 'x'); break;
-    case 'dither': case 'bands': if (isObj(prim.area)) out.area = placeOn(prim.area, F); break;
-    case 'cut': if (isObj(prim.shape)) out.shape = placeOn(prim.shape, F); break;
+    case 'dither': case 'bands': if (isObj(prim.area)) out.area = depth < PLACE_DEPTH ? placeAt(prim.area, F, depth + 1) : null; break;
+    case 'cut': if (isObj(prim.shape)) out.shape = depth < PLACE_DEPTH ? placeAt(prim.shape, F, depth + 1) : null; break;
     default: break;
   }
   return out;

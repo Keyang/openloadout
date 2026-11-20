@@ -25,7 +25,8 @@
 //   clips    STANDARD_CLIPS: every frame of the code pose (an armed body: what the family holds) as one key, so each
 //            frame is the code's joints exactly; flash as a frame edit; each track written only where it changes
 //            (compactKeys). VARIANT_CLIPS: the poses the code draws in their place for other settings (nothing held, a
-//            punch, a thrust, a bow), for a sprite to name with `from`; baked, not yet published (VARIANTS_PUBLISHED)
+//            punch, a thrust, a bow), for a sprite to name with `from` (a name, or a pick by a setting); published since
+//            base:person-side@7 (VARIANTS_PUBLISHED; build item B4x), a sprite taking only the clips its extends.clips lists
 //   points   hand, offhand, head, back, feet (Contract 3 sockets)
 // Drawn, the bare base is within 2 % of the code rig's pixels at every frame but die 1 to 3, where the code turns the
 // head's pixels part way (tests/unit/pieces-person-side.test.mjs). Proportions are not args (a base takes none: extends
@@ -872,13 +873,12 @@ function heldPiece(kind) {
 }
 
 /**
- * Whether the published base carries VARIANT_CLIPS. Not yet: engine/resolve.js (clipNames) gives a sprite every clip
- * of its base, so each sprite on it would gain punch, thrust, the unarmed and bow clips (the Hero would draw a punch
- * with a sword held, past the frame at all sliders high), and a sprite cannot yet pick a base clip by a setting (no
- * weapon: punch). Both are B4's (a clip list on `extends`; `from` taking a choice binding). The variants are baked and
- * tested all the same (basePiece({ variants: true }): 127,833 bytes with them, 3,239 under the 128 KiB cap).
+ * Whether the published base carries VARIANT_CLIPS: yes, since base:person-side@7 (build item B4x). A sprite on it
+ * takes only the clips its `extends.clips` lists (without the list it takes all 18, the variants too) and plays a
+ * variant where a clip's `from` names it, by name or picked by a setting (the Hero: Weapon none, punch). @7 is 127,833
+ * bytes, 3,239 under the 128 KiB piece cap: a further clip set goes in a piece of its own (pieces/README.md).
  */
-export const VARIANTS_PUBLISHED = false;
+export const VARIANTS_PUBLISHED = true;
 
 /** The base piece base:person-side as a plain object (what --write puts in pieces/): the standard clips, and VARIANT_CLIPS when asked. Arguments: { variants }. */
 export function basePiece({ variants = VARIANTS_PUBLISHED } = {}) {

@@ -1,0 +1,365 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "spring-pad",
+ "name": "Spring pad",
+ "blurb": "A pad on a coil spring that launches whoever lands on it; change the pad (plate, leaf or drum), its width and height, the number of coils, the colours and how far it stretches.",
+ "meta": {
+  "type": "prop",
+  "role": "world/platform",
+  "themes": [
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "platformer"
+  ],
+  "view": "side",
+  "words": [
+   "spring",
+   "pad",
+   "bounce",
+   "trampoline",
+   "launch",
+   "jump",
+   "bouncer",
+   "coil",
+   "springboard",
+   "boing",
+   "leaf",
+   "drum"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  30
+ ],
+ "preview": "idle",
+ "styles": [
+  "pixel"
+ ],
+ "palette": [
+  {
+   "id": "body",
+   "label": "Pad",
+   "default": "#3f6fd1",
+   "material": "paint",
+   "swatches": [
+    "#3f6fd1",
+    "#3f8a4f",
+    "#7a4fc4",
+    "#a06a3c",
+    "#e08a2c",
+    "#4f9d57"
+   ]
+  },
+  {
+   "id": "metal",
+   "label": "Spring",
+   "default": "#c2c9d6",
+   "material": "metal",
+   "swatches": [
+    "#c2c9d6",
+    "#f2c230",
+    "#8f97a8",
+    "#5d6475",
+    "#e6c545",
+    "#c98a4a"
+   ]
+  },
+  {
+   "id": "cream",
+   "default": "#f0ead8",
+   "material": "cloth",
+   "detail": true
+  }
+ ],
+ "controls": [
+  {
+   "key": "style",
+   "kind": "choice",
+   "label": "Style",
+   "options": [
+    "plate",
+    "leaf",
+    "drum"
+   ],
+   "default": "plate"
+  },
+  {
+   "key": "width",
+   "kind": "range",
+   "label": "Width",
+   "lo": "Narrow",
+   "hi": "Wide",
+   "default": 0.6
+  },
+  {
+   "key": "height",
+   "kind": "range",
+   "label": "Height",
+   "lo": "Short",
+   "hi": "Tall",
+   "default": 0.5
+  },
+  {
+   "key": "coils",
+   "kind": "range",
+   "label": "Coils",
+   "lo": "Few",
+   "hi": "Many",
+   "default": 3,
+   "min": 2,
+   "max": 4,
+   "step": 1
+  },
+  {
+   "key": "body",
+   "kind": "colour",
+   "label": "Pad"
+  },
+  {
+   "key": "metal",
+   "kind": "colour",
+   "label": "Spring"
+  },
+  {
+   "key": "bounce",
+   "kind": "range",
+   "label": "Bounce",
+   "lo": "Calm",
+   "hi": "Bouncy",
+   "default": 0.75,
+   "group": "Motion"
+  },
+  {
+   "key": "speed",
+   "standard": "speed"
+  }
+ ],
+ "body": {
+  "pictures": {
+   "nodes": [],
+   "draw": [
+    {
+     "id": "pad",
+     "gen": "spring.pad",
+     "v": 1,
+     "clip": [
+      "idle"
+     ],
+     "at": [
+      16,
+      30
+     ],
+     "style": {
+      "from": "style",
+      "pick": {
+       "plate": "plate",
+       "leaf": "leaf",
+       "drum": "drum"
+      }
+     },
+     "half": {
+      "from": "width",
+      "map": [
+       [
+        0,
+        8
+       ],
+       [
+        1,
+        13
+       ]
+      ],
+      "round": "px"
+     },
+     "rest": {
+      "from": "height",
+      "map": [
+       [
+        0,
+        12
+       ],
+       [
+        1,
+        19
+       ]
+      ],
+      "round": "px"
+     },
+     "coils": {
+      "from": "coils",
+      "map": [
+       [
+        2,
+        2
+       ],
+       [
+        4,
+        4
+       ]
+      ],
+      "round": "px"
+     },
+     "bounce": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "body": "body",
+     "metal": "metal",
+     "skin": "cream"
+    },
+    {
+     "id": "pad-bounce",
+     "gen": "spring.pad",
+     "v": 1,
+     "clip": [
+      "bounce"
+     ],
+     "at": [
+      16,
+      30
+     ],
+     "style": {
+      "from": "style",
+      "pick": {
+       "plate": "plate",
+       "leaf": "leaf",
+       "drum": "drum"
+      }
+     },
+     "half": {
+      "from": "width",
+      "map": [
+       [
+        0,
+        8
+       ],
+       [
+        1,
+        13
+       ]
+      ],
+      "round": "px"
+     },
+     "rest": {
+      "from": "height",
+      "map": [
+       [
+        0,
+        12
+       ],
+       [
+        1,
+        19
+       ]
+      ],
+      "round": "px"
+     },
+     "coils": {
+      "from": "coils",
+      "map": [
+       [
+        2,
+        2
+       ],
+       [
+        4,
+        4
+       ]
+      ],
+      "round": "px"
+     },
+     "bounce": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "lift": [
+      0,
+      0,
+      0.8,
+      1,
+      0.3,
+      0,
+      0,
+      0
+     ],
+     "press": [
+      0,
+      1,
+      0
+     ],
+     "sink": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      2,
+      0
+     ],
+     "bump": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0
+     ],
+     "body": "body",
+     "metal": "metal",
+     "skin": "cream"
+    },
+    {
+     "kind": "outline",
+     "paint": "ink"
+    }
+   ]
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 1,
+   "fps": 8
+  },
+  "bounce": {
+   "frames": 8,
+   "fps": 12,
+   "loop": false,
+   "sounds": [
+    {
+     "sound": "spring-boing",
+     "preset": "Spring pad",
+     "frame": 1,
+     "volume": 0.8
+    }
+   ]
+  }
+ }
+}

@@ -1,0 +1,193 @@
+{
+ "id": "ui-buttons-wood",
+ "frozen": "2026-11-20",
+ "source": "sprites/ui-buttons-wood.js",
+ "sha256": "881fd614f7d42409cb1316386788e92534d5f4b41bd8cacd17029e95e89cbcf9",
+ "name": "Wooden buttons",
+ "blurb": "A stretchable wooden menu button in four states (normal, hover, pressed, disabled); change its style, corners, border, nails, grain and colours.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/button",
+  "themes": [
+   "fantasy",
+   "neutral"
+  ],
+  "gameTypes": [
+   "platformer",
+   "turn-based-rpg",
+   "top-down-rpg",
+   "arcade",
+   "puzzle"
+  ],
+  "view": "none",
+  "words": [
+   "button",
+   "menu",
+   "wood",
+   "wooden",
+   "plank",
+   "board",
+   "press",
+   "click",
+   "hover",
+   "start",
+   "pause",
+   "sign",
+   "carved",
+   "stone"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  96,
+  32
+ ],
+ "pivot": [
+  48,
+  16
+ ],
+ "grounded": false,
+ "preview": "normal",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "plank",
+   "options": [
+    {
+     "value": "plank",
+     "label": "Plank"
+    },
+    {
+     "value": "carved",
+     "label": "Carved"
+    },
+    {
+     "value": "stone",
+     "label": "Stone"
+    }
+   ],
+   "group": "Look"
+  },
+  "corner": {
+   "kind": "range",
+   "label": "Corner",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Square",
+   "hi": "Round",
+   "group": "Look"
+  },
+  "border": {
+   "kind": "range",
+   "label": "Border",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Thin",
+   "hi": "Thick",
+   "group": "Look"
+  },
+  "nails": {
+   "kind": "toggle",
+   "label": "Nails",
+   "def": true,
+   "group": "Look"
+  },
+  "texture": {
+   "kind": "range",
+   "label": "Texture",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Plain",
+   "hi": "Busy",
+   "group": "Look"
+  },
+  "face": {
+   "kind": "color",
+   "label": "Face",
+   "def": "#a06a3c",
+   "swatches": [
+    "#a06a3c",
+    "#7a4f33",
+    "#5d6475",
+    "#3f5068",
+    "#c9423a",
+    "#7a4fc4",
+    "#3f6fd1"
+   ],
+   "group": "Colors"
+  },
+  "frame": {
+   "kind": "color",
+   "label": "Frame",
+   "def": "#7a4f33",
+   "swatches": [
+    "#7a4f33",
+    "#f2c230",
+    "#c2c9d6",
+    "#5d6475",
+    "#c9423a",
+    "#f0ead8"
+   ],
+   "group": "Colors"
+  }
+ },
+ "clips": {
+  "normal": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "hover": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "pressed": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "disabled": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  }
+ },
+ "sounds": {
+  "pressed": [
+   {
+    "sound": "ui-click",
+    "preset": "Soft tap",
+    "frame": 0,
+    "volume": 0.6
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-platformer-fantasy"
+ ]
+}

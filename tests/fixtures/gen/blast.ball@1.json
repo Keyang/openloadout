@@ -1,0 +1,176 @@
+{
+ "id": "blast.ball",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     24,
+     24
+    ],
+    "r": 12,
+    "bumps": 7,
+    "bump": 0.18,
+    "paints": [
+     "p1",
+     "p2",
+     "p3",
+     "p4"
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      11,
+      11
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...........aaaa.....",
+      "..........abbbba....",
+      ".........abbbbbba...",
+      ".....aaaabbbbbbbbaaa",
+      "....abbbbbbbbbbbbbbb",
+      "...abbbbbbbbbbbbbbbb",
+      "..abbbbbbbbccccbbbbb",
+      "..abbbbbbccccccccbbb",
+      "..abbbbccccccccccccb",
+      "..abbbbccccccccccccb",
+      "..abbbbccccddddccccb",
+      "..abbbbcccddddddcccb",
+      ".abbbbccccddddddcccb",
+      "abbbbbccccddddddcccb",
+      "abbbbbccccddddddcccb",
+      "abbbbbcccccddddccccb",
+      ".abbbbbccccccccccccb",
+      ".abbbbbbccccccccccbb",
+      "..aabbbbbccccccccbbb",
+      "....abbbbbbbbbbbbbbb"
+     ],
+     "key": {
+      "a": "p4",
+      "b": "p3",
+      "c": "p2",
+      "d": "p1"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     24,
+     24
+    ],
+    "r": 14,
+    "hole": 8,
+    "gaps": 0.3,
+    "seed": 3,
+    "paints": [
+     "p2",
+     "p3",
+     "p4"
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      9,
+      9
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".............aaaa.....",
+      "...........aabbbbaa...",
+      "..........abbbbbbbba..",
+      ".......aaabbccccccbba.",
+      ".....aabbbbccccccccbba",
+      "....abbbccccccbbcccba.",
+      "...abbccccccbbbbbbcba.",
+      "..abbccccbbbaaaaaaba..",
+      "...abcccbbaa......a...",
+      "....abbbba............",
+      ".....aaba.............",
+      ".......a..............",
+      "......................",
+      "......................",
+      ".aaaaaa...............",
+      "abbbbbba..............",
+      "abbccbba..............",
+      "abbcccba..............",
+      "abbcccbba.............",
+      ".abbcbba.............a",
+      "..abbaa.............ab",
+      "...aa..............abb"
+     ],
+     "key": {
+      "a": "p4",
+      "b": "p3",
+      "c": "p2"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16.5,
+     16.5
+    ],
+    "r": 9,
+    "bumps": 6,
+    "bump": 0.3,
+    "points": true,
+    "turn": 20,
+    "heat": 0.8,
+    "paints": [
+     "p0",
+     "p1",
+     "p2",
+     "p3",
+     "p4"
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      7,
+      7
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".......aaa.........",
+      "......abbba........",
+      ".....abbcbbaaaaa...",
+      ".....abcccbbbbbba..",
+      "..aaabbccccbccbba..",
+      ".abbbbccddcccccbba.",
+      "abbccccddddddccba..",
+      "abbccddddedddccba..",
+      ".abccddeeeeedccba..",
+      ".abbcddeeeeeddcbba.",
+      "..abccdeeeeeddccba.",
+      "..abccdddeddddccbba",
+      "..abccddddddccccbba",
+      ".abbcccccddccbbbba.",
+      "..abbccbccccbbaaa..",
+      "..abbbbbbcccba.....",
+      "...aaaaabbcbba.....",
+      "........abbba......",
+      ".........aaa......."
+     ],
+     "key": {
+      "a": "p4",
+      "b": "p3",
+      "c": "p2",
+      "d": "p1",
+      "e": "p0"
+     }
+    }
+   ]
+  }
+ ]
+}

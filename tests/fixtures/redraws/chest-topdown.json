@@ -1,0 +1,184 @@
+{
+ "id": "chest-topdown",
+ "frozen": "2026-11-20",
+ "source": "sprites/chest-topdown.js",
+ "sha256": "3ac86696d8e15a11abaf2fb1d2e4bff8548e401c18260d5d975220674d8652ad",
+ "name": "Chest (top-down)",
+ "blurb": "A banded chest for a top-down map that bursts open with rays of light, then stands empty. Change its size, style, lid, treasure, light and colours.",
+ "meta": {
+  "type": "prop",
+  "role": "world/prop",
+  "themes": [
+   "fantasy"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "top-down-rpg"
+  ],
+  "view": "top-down",
+  "words": [
+   "chest",
+   "treasure",
+   "loot",
+   "box",
+   "trunk",
+   "open",
+   "reward",
+   "gold",
+   "coins",
+   "gems",
+   "secret",
+   "wooden",
+   "lock"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  30
+ ],
+ "grounded": true,
+ "preview": "closed",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "wooden",
+   "options": [
+    "wooden",
+    "iron",
+    "royal"
+   ],
+   "group": "Look"
+  },
+  "lid": {
+   "kind": "range",
+   "label": "Lid",
+   "def": 0.6,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Flat",
+   "hi": "Domed",
+   "group": "Look"
+  },
+  "gems": {
+   "kind": "toggle",
+   "label": "Treasure",
+   "def": true,
+   "group": "Look"
+  },
+  "wood": {
+   "kind": "color",
+   "label": "Wood",
+   "def": "#9a6a3e",
+   "swatches": [
+    "#9a6a3e",
+    "#a8612a",
+    "#5a3a22",
+    "#3f6fd1",
+    "#7a4fc4",
+    "#2f8f9d",
+    "#c9423a",
+    "#8e3a4a"
+   ],
+   "group": "Colors"
+  },
+  "metal": {
+   "kind": "color",
+   "label": "Metal",
+   "def": "#f2c230",
+   "swatches": [
+    "#f2c230",
+    "#c2c9d6",
+    "#a8a4a0",
+    "#e6c545"
+   ],
+   "group": "Colors"
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Light",
+   "def": "#f2c230",
+   "swatches": [
+    "#f2c230",
+    "#4fd8ee",
+    "#e8662c",
+    "#7aa0f4",
+    "#f4e06a",
+    "#7fe0a0",
+    "#7a4fc4"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "closed": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    8,
+    12
+   ]
+  },
+  "open": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  },
+  "empty": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  }
+ },
+ "sounds": {
+  "open": [
+   {
+    "sound": "chest-open",
+    "preset": "Treasure chest",
+    "frame": 0,
+    "volume": 0.8
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-rpg-fantasy"
+ ]
+}

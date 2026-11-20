@@ -1,0 +1,266 @@
+{
+ "id": "crumble.block",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "gen": "crumble.block",
+    "v": 1,
+    "at": [
+     16,
+     30
+    ],
+    "body": "block",
+    "edge": "edge",
+    "shine": "shine"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      2,
+      4
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..aaaabaaaaaaaaaaaaaaaaaaaa.",
+      ".cccccbccccccccccccccccccccc",
+      "dcccccbcccccccccccddcccccccc",
+      "dcccdbcccccccccccccccccccccc",
+      "dccccbcccccccccccccccccccccc",
+      "dccccbbccccccccccccccccccccc",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "daabaabaaaaaabaaaaaaaaaaaaac",
+      "dcccccbccccccbccccccccccbbcc",
+      "dccccccbcccccbccccccccccccbc",
+      "dccccccccccccbccccccccccccbc",
+      "dccccddccccccbcccccccccccccb",
+      "dccccccccccccbcccccccddccccc",
+      "dccccccccccccbcccccccccccccc",
+      "dccccccccccccbcccccccccccccc",
+      "dccccccccccccbcccccccccccccc",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "daaaaaaabaaaaaaaaaabaaaaaaac",
+      "dcccccccbccccccccccbcccccccc",
+      "dcccccccbccccccccccbcccccccc",
+      "dcccccccbcccddcccccbcccccccc",
+      "dcccccccbccccccccccbcccddccc",
+      "dcccccccbccccccccccbcccccccc",
+      "dcccccccbccccccccccbcccccccc",
+      "ddddddddddddddddddddddddddd.",
+      "dddddddddddddddddddddddddd.."
+     ],
+     "key": {
+      "a": "block.light",
+      "b": "edge",
+      "c": "block",
+      "d": "block.dark"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "gen": "crumble.block",
+    "v": 1,
+    "at": [
+     16,
+     30
+    ],
+    "body": "block",
+    "edge": "edge",
+    "shine": "shine",
+    "style": "wood",
+    "wear": 1,
+    "pieces": 8,
+    "wobble": 2,
+    "shake": [
+     0,
+     1,
+     2,
+     3
+    ]
+   },
+   "ctx": {
+    "t": 0.6,
+    "loop": false,
+    "frames": 6,
+    "frame": 3
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      2,
+      4
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaabaaaaaaaaaaaabaaaaa...",
+      "ccccccbccccccccccbbcccccc...",
+      "ccccccbccccccccccbccccccc...",
+      "ccbccbcdddddcccbccbcccbcc...",
+      "ccbccbccccccccccbbbcccbcc...",
+      "dddbcbbccccccdddddbccbc.....",
+      ".bbbbbbcccccc..ccbbcc..cc...",
+      ".aaaaaabaddd.dddddd..dddd...",
+      ".ccccccccb..bbbbbbbbbbbbb...",
+      ".cccccccc.aaaaaaaaaaaaaaba..",
+      ".ccbccccc.ccccccccccccccbc..",
+      ".ccbccccc.cccccccccccccccb..",
+      ".ccccccc..cdddddddcccccbcc..",
+      ".cccccc...cccccccccccccbcc..",
+      ".dddddd..c..dddddccccccccc..",
+      "........cccc.ccccccc.ccccc..",
+      "........ddddd..dddd.dddddd..",
+      ".......bbbbbbbb....bbbbbbb..",
+      ".aaaaaaaaaaaaaaaaaaaaabaaaa.",
+      "ccccccccccccccccccccccbccccc",
+      "ccccccccccccccccccccccbccccc",
+      "ccbccccccccccdddddddbbcccbcc",
+      "ccbcccccccccccccccccbbbbcbcc",
+      "cccccccdddddccccccccbcccbccc",
+      "cccccccccccccccccccbcccccccc",
+      "ddddddddddddddddddbddddddddd"
+     ],
+     "key": {
+      "a": "block.light",
+      "b": "edge",
+      "c": "block",
+      "d": "block.dark"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "gen": "crumble.block",
+    "v": 1,
+    "at": [
+     16,
+     30
+    ],
+    "body": "block",
+    "edge": "edge",
+    "shine": "shine",
+    "style": "ice",
+    "pieces": 4,
+    "crumble": [
+     0,
+     0.5,
+     1
+    ]
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": false,
+    "frames": 3,
+    "frame": 1
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      3,
+      10
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".....aabaaaa..............",
+      ".....abaaaaa..............",
+      ".....abaaaaa..aaaaaaa.....",
+      ".....abbaaaa..aaaaaaa.....",
+      ".....babaaaa..aaabaaa.....",
+      ".....aabaaaa..aaabaaa.....",
+      ".....aabaaaa..aaabaaa.....",
+      ".....aaabaaa..aaabaaa.....",
+      "..............aaabaaa.....",
+      "..........................",
+      "..........................",
+      "..........................",
+      "..........................",
+      "...................aaaaaaa",
+      "aaacaa.............aaaaaaa",
+      "aaaaaa.............aaaaaaa",
+      "aaaaaa.............aaaaaaa",
+      "bbbbbb.............aaaaaaa",
+      "aaaaaa.............aaaaaaa",
+      "aaaaaa.............bbbbaaa"
+     ],
+     "key": {
+      "a": "block",
+      "b": "edge",
+      "c": "shine"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "gen": "crumble.block",
+    "v": 1,
+    "at": [
+     16,
+     30
+    ],
+    "body": "block",
+    "edge": "edge",
+    "shine": "shine",
+    "style": "cloud",
+    "rise": [
+     0,
+     0.62
+    ],
+    "hop": [
+     0,
+     1
+    ],
+    "crumbs": [
+     1,
+     1
+    ]
+   },
+   "ctx": {
+    "t": 0.2,
+    "loop": false,
+    "frames": 6,
+    "frame": 1
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      2,
+      13
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".............aaaaaa.........",
+      "...........abbbbbbaaa.......",
+      "....aacaaabbbbbbbbbbaa......",
+      "..dbbcbbbbbbbbbbbbbbbaa.....",
+      "..dbbcbbbbbbbbbbbbbbbba.....",
+      ".ddbbccbbbbbbbbbbbbbbba.....",
+      ".ddccbcbbbbbbbbbbbbbbbaaa...",
+      ".ddcbbcbbbbbbbbbbbbbbbbbaa..",
+      ".ddbbbcbbbbcbbbbbbbbbcbbcca.",
+      ".dddbbbcbbbcbbbbbbbbbcbbbbc.",
+      ".ddbbbbbbbbcbbbbbbbbccbbbbc.",
+      "..dbbbbbbbcbbbbbbbbccbbbbba.",
+      ".dbbbbbbbcbbbbbbbbbbbbbbbba.",
+      ".dbbbbbbbbbbbbbbbbbbbbbbbba.",
+      "ddbbbbbbbbbbbbbbbbbbbbbbbbaa",
+      "ddbbbbbbbbbbbbbbbbbbbbbbbbba",
+      "ddbbbbbbbbbbbbbbbbbbbbbbbbba"
+     ],
+     "key": {
+      "a": "block.light",
+      "b": "block",
+      "c": "edge",
+      "d": "block.dark"
+     }
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,45 @@
+{ "format": "loadout-sprite",
+  "version": 2,
+  "id": "input-key-wide",
+  "name": "Wide keyboard key",
+  "blurb": "A wide keyboard key or a space bar for \"press this\" prompts that sinks and lights up when tapped; change its shape, picture (return, back, tab, shift), length, corners, depth and colours.",
+  "meta": {"type": "ui", "role": "interface/icon", "themes": ["neutral"], "gameTypes": ["arcade", "platformer", "puzzle", "shooter"], "view": "none", "words": ["key", "keyboard", "space bar", "enter", "return", "shift", "tab", "backspace", "press", "tap", "prompt", "input"], "license": "draft"},
+  "size": [64,32],
+  "pivot": [32,16],
+  "grounded": false,
+  "preview": "tap",
+  "styles": ["pixel"],
+  "palette": [
+  {"id": "body", "label": "Key top", "default": "#f0ead8", "material": "paint", "swatches": ["#f0ead8", "#c2c9d6", "#f6d3b0", "#9bd18a", "#e6c96a"]},
+  {"id": "frame", "label": "Key side", "default": "#5d6475", "material": "interface", "swatches": ["#5d6475", "#7a4f33", "#3f5068", "#7a4fc4", "#434d6d"]},
+  {"id": "glow", "label": "Light", "default": "#f2c230", "material": "interface", "swatches": ["#f2c230", "#4fd8ee", "#a4c44a", "#8fd0f0"]} ],
+  "controls": [
+  {"key": "shape", "kind": "choice", "label": "Shape", "options": ["wide", "long"], "default": "wide"},
+  {"key": "mark", "kind": "choice", "label": "Picture", "options": ["none", {"value": "enter", "label": "Return"}, "back", "tab", "shift"], "default": "enter", "when": {"shape": ["wide"]}},
+  {"key": "size", "kind": "range", "label": "Size", "lo": "Small", "hi": "Big", "default": 0.5},
+  {"key": "corner", "kind": "range", "label": "Corner", "lo": "Square", "hi": "Round", "default": 0.5},
+  {"key": "depth", "kind": "range", "label": "Depth", "lo": "Flat", "hi": "Deep", "default": 0.5},
+  {"key": "light", "kind": "toggle", "label": "Light up", "default": true},
+  {"key": "body", "kind": "colour", "label": "Key top"},
+  {"key": "frame", "kind": "colour", "label": "Key side"},
+  {"key": "glow", "kind": "colour", "label": "Light", "when": {"light": [true]}},
+  {"key": "speed", "standard": "speed"} ],
+  "body": { "panel": {
+    "piece": {"gen": "key.wide", "v": 1, "at": [32,16], "clip": ["up"], "picture": "up", "shape": {"from": "shape", "pick": {"wide": "wide", "long": "long"}}, "mark": {"from": "mark", "pick": {"none": "none", "enter": "enter", "back": "back", "tab": "tab", "shift": "shift"}}, "size": {"from": "size", "map": [[0,0], [1,1]], "round": "none"}, "corner": {"from": "corner", "map": [[0,0], [1,1]], "round": "none"}, "depth": {"from": "depth", "map": [[0,0], [1,1]], "round": "none"}, "lights": {"from": "light", "pick": {"true": true, "false": false}}, "body": "body", "frame": "frame", "lit": "glow"},
+    "states": [
+    "up",
+    "down",
+    "tap" ],
+    "draw": [
+    {"gen": "key.wide", "v": 1, "at": [32,16], "clip": ["down"], "picture": "down", "shape": {"from": "shape", "pick": {"wide": "wide", "long": "long"}}, "mark": {"from": "mark", "pick": {"none": "none", "enter": "enter", "back": "back", "tab": "tab", "shift": "shift"}}, "size": {"from": "size", "map": [[0,0], [1,1]], "round": "none"}, "corner": {"from": "corner", "map": [[0,0], [1,1]], "round": "none"}, "depth": {"from": "depth", "map": [[0,0], [1,1]], "round": "none"}, "lights": {"from": "light", "pick": {"true": true, "false": false}}, "body": "body", "frame": "frame", "lit": "glow"},
+    {"gen": "key.wide", "v": 1, "at": [32,16], "clip": ["tap"], "picture": "tap", "shape": {"from": "shape", "pick": {"wide": "wide", "long": "long"}}, "mark": {"from": "mark", "pick": {"none": "none", "enter": "enter", "back": "back", "tab": "tab", "shift": "shift"}}, "size": {"from": "size", "map": [[0,0], [1,1]], "round": "none"}, "corner": {"from": "corner", "map": [[0,0], [1,1]], "round": "none"}, "depth": {"from": "depth", "map": [[0,0], [1,1]], "round": "none"}, "lights": {"from": "light", "pick": {"true": true, "false": false}}, "body": "body", "frame": "frame", "lit": "glow"} ] } },
+  "clips": {
+    "up": {"frames": 1, "fps": 8, "label": "Up"},
+    "down": {"frames": 1, "fps": 8, "label": "Down"},
+    "tap": {"frames": 8, "fps": 8, "label": "Tap"} },
+  "versions": [
+  {"name": "Enter key", "params": {}},
+  {"name": "Space bar", "params": {"shape": "long"}},
+  {"name": "Shift", "params": {"mark": "shift"}},
+  {"name": "Back, dark", "params": {"mark": "back", "body": "#c2c9d6", "frame": "#434d6d"}},
+  {"name": "Tab, flat", "params": {"mark": "tab", "depth": 0, "corner": 0}} ] }

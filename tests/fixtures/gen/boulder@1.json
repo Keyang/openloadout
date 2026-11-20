@@ -1,0 +1,304 @@
+{
+ "id": "boulder",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "gen": "boulder",
+    "v": 1,
+    "at": [
+     24,
+     44
+    ],
+    "stone": "stone",
+    "moss": "moss",
+    "shine": "shine"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      10,
+      21
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...........aa...............",
+      "........aaaaaaaab...........",
+      "......aaaaaaaaaaa...........",
+      ".....caaaaaaaaaaaa....ab....",
+      "....baaaaaaaaaaaaaaaaaab....",
+      "....aaaaaaaaaaaaaaaaaaabd...",
+      "...aaaaaaaaaaaaaaccaaabdd...",
+      "..caaaaaaaaaaaaabbcccbeed...",
+      "..caaaaaaaaaaaaabebbbeeedd..",
+      ".bcaaaacccaaaacbeeeeeeeedd..",
+      "fbccccbbbccccbbeeeeeeeeedd..",
+      "ffbbbbdddbbbbeeeeeeeeeeeddd.",
+      "ffffdddddddeeeeeeeeeeeedddd.",
+      ".fffddddddddeeeefeeeeeddddd.",
+      "..fffdddddddddfeefffffdddddd",
+      "..ffffdddddddfddddddddfdddd.",
+      "...fffddddddfddddddddddfdd..",
+      "....fffddddfddddddddddddf...",
+      "....fffffdddfdddddddddddd...",
+      ".....ffffffffddddddddddd....",
+      ".......fffffffddfffffff.....",
+      "..........ffffffffffff......",
+      "............ff.............."
+     ],
+     "key": {
+      "a": "moss",
+      "b": {
+       "rule": "tone",
+       "of": "moss",
+       "by": -1
+      },
+      "c": "moss.dark",
+      "d": "stone",
+      "e": "stone.light",
+      "f": "stone.dark"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "gen": "boulder",
+    "v": 1,
+    "at": [
+     24,
+     44
+    ],
+    "stone": "stone",
+    "moss": "moss",
+    "shine": "shine",
+    "shape": "cluster",
+    "size": 1,
+    "wear": 1,
+    "pieces": 1,
+    "squash": [
+     1,
+     -1
+    ],
+    "shift": [
+     1,
+     -1
+    ]
+   },
+   "ctx": {
+    "t": 0.3333333333333333,
+    "loop": false,
+    "frames": 4,
+    "frame": 1
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      7,
+      18
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".........aaa....................",
+      ".......aaaaaabb.................",
+      ".....aaaaaaaaaa.................",
+      "....caaaaaaaaaaa...dd...........",
+      "....caaaaaaaaaaaaaabdd..........",
+      "...baaaeaaaaaaacaaabdd..........",
+      "...ceaaeaaaaaabcccbfdd..........",
+      "....ceeaaaaaaabbbbfffd..........",
+      "....aaeeeaaaabfffffffdd.........",
+      "...aaaacceccbffffffffdd.........",
+      "..ccacbbbbebffffffffffd.........",
+      "eebcbbdddfeffffffffffddd........",
+      "eeebddddddfffffffffffddd........",
+      ".eeeddddddffffefffffddggaaa.....",
+      ".eeedddddddefffefffddgaaaaaaaa..",
+      "..eeeddddeedddddeeeggccaaaaaaa..",
+      "..egggggedddddddddgeebcccaaaaaa.",
+      "...caaaagdddddddddgeedbbccaaaaa.",
+      "...aaaaabgddddddddgeeddfbcccccaa",
+      "..aaaaabfdgdddddddgeeddffbbbbccc",
+      ".aaaaabfffdgddeeeegeedddfffffbbb",
+      "caaacbffffdgeeeeeegeeddddddddddd",
+      "cccbbfffdddg.......eeeeddddddddd",
+      ".bbdddddddd........eeeeeedddeee.",
+      "..eeddeeee...........eeeeeeeee..",
+      "...ee..................eee......"
+     ],
+     "key": {
+      "a": "moss",
+      "b": {
+       "rule": "tone",
+       "of": "moss",
+       "by": -1
+      },
+      "c": "moss.dark",
+      "d": "stone",
+      "e": "stone.dark",
+      "f": "stone.light",
+      "g": "stone.deep"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      39,
+      18
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      "a",
+      "a",
+      ".",
+      ".",
+      ".",
+      "."
+     ],
+     "key": {
+      "a": "stone"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "gen": "boulder",
+    "v": 1,
+    "at": [
+     24,
+     44
+    ],
+    "stone": "stone",
+    "moss": "moss",
+    "shine": "shine",
+    "shape": "slab",
+    "size": 0,
+    "mossy": false,
+    "wear": 0,
+    "burst": [
+     0,
+     0.2,
+     0.4
+    ]
+   },
+   "ctx": {
+    "t": 0.2857142857142857,
+    "loop": false,
+    "frames": 8,
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      8,
+      25
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...............aaaa.............",
+      "..............abbccaa...........",
+      "...............abcdccaa.........",
+      "...............abcdcccba........",
+      "......a........abccbbaa.........",
+      ".....aca.......abbaaa...........",
+      "....accca.......aa......aa......",
+      "...accddcaa............abcaa....",
+      "..accdddccca...........accccaaa.",
+      ".acccddccbaa..........acccddccca",
+      "abccccccaaaca.......aabccddddcca",
+      "abbcccbaaccca......acccccccddca.",
+      ".abbcaaccddca.....abcbbccccccca.",
+      "..abbccccccca.....abccbbbbbbcca.",
+      "...abbcccccca.....abccccccbbba..",
+      "....abbbbbbbba....abccbbbaaaa...",
+      ".....aaaaaaaa.....abbaaaa.......",
+      "...................aa..........."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "stone.dark",
+      "c": "stone",
+      "d": "stone.light"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "gen": "boulder",
+    "v": 1,
+    "at": [
+     24,
+     44
+    ],
+    "stone": "stone",
+    "moss": "moss",
+    "shine": "shine",
+    "layer": "light",
+    "dust": [
+     -1,
+     0,
+     0.5
+    ]
+   },
+   "ctx": {
+    "t": 0.2857142857142857,
+    "loop": false,
+    "frames": 8,
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      14,
+      30
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..............aaa....",
+      ".............abbbaa..",
+      ".............abbbbba.",
+      ".aaa..........abbbbba",
+      "abbba.........abbbbba",
+      "abbba.........abbbba.",
+      ".abba..........aaba..",
+      "..aa.............a..."
+     ],
+     "key": {
+      "a": "stone.dark",
+      "b": {
+       "rule": "tone",
+       "of": "stone",
+       "by": 0.45
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,225 @@
+{
+ "id": "ui-panel-gilded",
+ "frozen": "2026-11-20",
+ "source": "sprites/ui-panel-gilded.js",
+ "sha256": "dd1339a04b742445f02c40515543fd031bb826e35c2ec949251010bc64288c4c",
+ "name": "Stone and gold panels",
+ "blurb": "Stretchable stone plates in carved gold frames for an inventory, a shop or a quest board: a plain plate, a plate with a heading, a list well and a tooltip; change the style, corners, band, gems and colours.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/panel",
+  "themes": [
+   "neutral",
+   "fantasy",
+   "dungeon"
+  ],
+  "gameTypes": [
+   "arcade",
+   "turn-based-rpg",
+   "top-down-rpg",
+   "card-game"
+  ],
+  "view": "none",
+  "words": [
+   "panel",
+   "window",
+   "box",
+   "menu",
+   "stone",
+   "gold",
+   "gem",
+   "plaque",
+   "inventory",
+   "shop",
+   "tooltip",
+   "list",
+   "popup",
+   "carved"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  96,
+  64
+ ],
+ "pivot": [
+  48,
+  32
+ ],
+ "grounded": false,
+ "preview": "panel",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "temple",
+   "options": [
+    {
+     "value": "temple",
+     "label": "Temple"
+    },
+    {
+     "value": "royal",
+     "label": "Royal"
+    },
+    {
+     "value": "ruin",
+     "label": "Ruin"
+    }
+   ],
+   "group": "Look"
+  },
+  "corner": {
+   "kind": "range",
+   "label": "Corner",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Square",
+   "hi": "Round",
+   "group": "Look"
+  },
+  "border": {
+   "kind": "range",
+   "label": "Border",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Thin",
+   "hi": "Thick",
+   "group": "Look"
+  },
+  "gems": {
+   "kind": "toggle",
+   "label": "Gems",
+   "def": true,
+   "group": "Look"
+  },
+  "face": {
+   "kind": "color",
+   "label": "Stone",
+   "def": "#3f5068",
+   "swatches": [
+    "#3f5068",
+    "#7a4f33",
+    "#434d6d",
+    "#8e3a4a"
+   ],
+   "group": "Colors"
+  },
+  "frame": {
+   "kind": "color",
+   "label": "Gold",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#c2c9d6",
+    "#f6d3b0",
+    "#f4e06a",
+    "#e6c96a"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Gems",
+   "def": "#4fd8ee",
+   "swatches": [
+    "#4fd8ee",
+    "#c9423a",
+    "#a4c44a",
+    "#3f6fd1",
+    "#e08a2c"
+   ],
+   "group": "Colors",
+   "when": {
+    "gems": [
+     true
+    ]
+   }
+  }
+ },
+ "clips": {
+  "panel": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "panel-title": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "inset": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "tooltip": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [
+  {
+   "name": "Temple",
+   "params": {}
+  },
+  {
+   "name": "Royal",
+   "params": {
+    "style": "royal",
+    "face": "#7a4f33",
+    "accent": "#c9423a",
+    "border": 1,
+    "corner": 1
+   }
+  },
+  {
+   "name": "Ruin",
+   "params": {
+    "style": "ruin",
+    "gems": false,
+    "face": "#7a4f33",
+    "frame": "#e6c96a"
+   }
+  },
+  {
+   "name": "Silver",
+   "params": {
+    "face": "#8e3a4a",
+    "frame": "#c2c9d6",
+    "accent": "#3f6fd1",
+    "border": 1
+   }
+  },
+  {
+   "name": "Wine vault",
+   "params": {
+    "face": "#8e3a4a",
+    "frame": "#f4e06a"
+   }
+  }
+ ],
+ "bundles": []
+}

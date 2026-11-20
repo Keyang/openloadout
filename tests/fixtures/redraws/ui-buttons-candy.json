@@ -1,0 +1,234 @@
+{
+ "id": "ui-buttons-candy",
+ "frozen": "2026-11-20",
+ "source": "sprites/ui-buttons-candy.js",
+ "sha256": "29adc683f3350a19ae461317937c840e5df4585a255212ae5d23611cf4c578dd",
+ "name": "Candy buttons",
+ "blurb": "A stretchable glossy sugar button and tab, a deep toffee, cherry or blueberry slab in a pale sugar rim, in four states (normal, hover, pressed, disabled) plus a tab and an open tab; change its style, corners, rim, shine and colours.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/button",
+  "themes": [
+   "neutral",
+   "candy"
+  ],
+  "gameTypes": [
+   "arcade",
+   "puzzle",
+   "card-game",
+   "racing"
+  ],
+  "view": "none",
+  "words": [
+   "button",
+   "menu",
+   "candy",
+   "sweet",
+   "sugar",
+   "glossy",
+   "jelly",
+   "tab",
+   "press",
+   "click",
+   "hover",
+   "start",
+   "casual",
+   "toffee"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  96,
+  32
+ ],
+ "pivot": [
+  48,
+  16
+ ],
+ "grounded": false,
+ "preview": "normal",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "jelly",
+   "options": [
+    {
+     "value": "jelly",
+     "label": "Jelly"
+    },
+    {
+     "value": "striped",
+     "label": "Striped"
+    },
+    {
+     "value": "frosted",
+     "label": "Frosted"
+    }
+   ],
+   "group": "Look"
+  },
+  "corner": {
+   "kind": "range",
+   "label": "Corner",
+   "def": 0.75,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Square",
+   "hi": "Round",
+   "group": "Look"
+  },
+  "border": {
+   "kind": "range",
+   "label": "Border",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Thin",
+   "hi": "Thick",
+   "group": "Look"
+  },
+  "shine": {
+   "kind": "toggle",
+   "label": "Shine",
+   "def": true,
+   "group": "Look"
+  },
+  "face": {
+   "kind": "color",
+   "label": "Candy",
+   "def": "#7a4f33",
+   "swatches": [
+    "#7a4f33",
+    "#3f5068",
+    "#8e3a4a",
+    "#434d6d"
+   ],
+   "group": "Colors"
+  },
+  "frame": {
+   "kind": "color",
+   "label": "Sugar",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#f6d3b0",
+    "#8fd0f0",
+    "#9bd18a"
+   ],
+   "group": "Colors"
+  }
+ },
+ "clips": {
+  "normal": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "hover": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "pressed": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "disabled": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "tab": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "tab-active": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  }
+ },
+ "sounds": {
+  "pressed": [
+   {
+    "sound": "ui-click",
+    "preset": "Glass tick",
+    "frame": 0,
+    "volume": 0.6
+   }
+  ],
+  "tab-active": [
+   {
+    "sound": "menu-move",
+    "preset": "Tab",
+    "frame": 0,
+    "volume": 0.6
+   }
+  ]
+ },
+ "versions": [
+  {
+   "name": "Toffee drop",
+   "params": {}
+  },
+  {
+   "name": "Cherry stripe",
+   "params": {
+    "style": "striped",
+    "face": "#8e3a4a"
+   }
+  },
+  {
+   "name": "Blueberry frost",
+   "params": {
+    "style": "frosted",
+    "face": "#3f5068",
+    "frame": "#8fd0f0"
+   }
+  },
+  {
+   "name": "Liquorice mint",
+   "params": {
+    "face": "#434d6d",
+    "frame": "#9bd18a"
+   }
+  },
+  {
+   "name": "Matte caramel",
+   "params": {
+    "frame": "#f6d3b0",
+    "shine": false
+   }
+  }
+ ],
+ "bundles": []
+}

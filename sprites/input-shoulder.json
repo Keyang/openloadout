@@ -1,0 +1,41 @@
+{ "format": "loadout-sprite",
+  "version": 2,
+  "id": "input-shoulder",
+  "name": "Shoulder button",
+  "blurb": "A game controller's shoulder button as a prompt, a long bumper or a curved trigger that presses down; change the button, side, end shape, size, lighting and colours.",
+  "meta": {"type": "ui", "role": "interface/icon", "themes": ["neutral"], "gameTypes": ["arcade", "shooter", "racing", "platformer"], "view": "none", "words": ["shoulder button", "bumper", "trigger", "gamepad", "controller", "press", "squeeze", "prompt", "input", "tutorial"], "license": "draft"},
+  "size": [32,32],
+  "pivot": [16,16],
+  "grounded": false,
+  "preview": "press",
+  "styles": ["pixel"],
+  "palette": [
+  {"id": "body", "label": "Plastic", "default": "#5d6475", "material": "paint", "swatches": ["#5d6475", "#3f5068", "#c2c9d6", "#7a4f33", "#434d6d"]},
+  {"id": "glow", "label": "Lit", "default": "#f2c230", "material": "interface", "swatches": ["#f2c230", "#4fd8ee", "#a4c44a", "#c9423a", "#f0ead8"]},
+  {"id": "shown", "material": "paint", "derive": {"rule": "choose", "when": {"lit": [true]}, "then": "glow", "else": "body"}},
+  {"id": "face", "material": "paint", "derive": {"rule": "ifLight", "of": "shown", "above": 0.76, "then": {"rule": "tone", "of": "shown", "by": -0.3}, "else": "shown"}},
+  {"id": "edge", "material": "light", "derive": {"rule": "ifLight", "of": "shown", "above": 0.76, "then": "shown", "else": {"rule": "tone", "of": "shown", "by": 0.85}}} ],
+  "controls": [
+  {"key": "button", "kind": "choice", "label": "Button", "options": ["bumper", "trigger"], "default": "bumper"},
+  {"key": "side", "kind": "choice", "label": "Side", "options": ["left", "right"], "default": "left"},
+  {"key": "style", "kind": "choice", "label": "Style", "options": ["rounded", "angled"], "default": "rounded", "when": {"button": ["bumper"]}},
+  {"key": "size", "kind": "range", "label": "Size", "lo": "Small", "hi": "Big", "default": 0.5},
+  {"key": "lit", "kind": "toggle", "label": "Lit", "default": true},
+  {"key": "body", "kind": "colour", "label": "Plastic"},
+  {"key": "glow", "kind": "colour", "label": "Lit", "when": {"lit": [true]}},
+  {"key": "speed", "standard": "speed"} ],
+  "body": { "pictures": {
+    "nodes": [
+    {"id": "ui", "parent": null, "at": [16,16]} ],
+    "draw": [
+    {"gen": "pad.shoulder", "v": 1, "on": "ui", "at": [0,0], "clip": ["idle"], "picture": "idle", "button": {"from": "button", "pick": {"bumper": "bumper", "trigger": "trigger"}}, "side": {"from": "side", "pick": {"left": "left", "right": "right"}}, "style": {"from": "style", "pick": {"rounded": "rounded", "angled": "angled"}}, "size": {"from": "size", "map": [[0,0], [1,1]], "round": "none"}, "lit": {"from": "lit", "pick": {"true": true, "false": false}}, "body": "body", "lamp": "glow", "face": "face", "shine": "edge"},
+    {"gen": "pad.shoulder", "v": 1, "on": "ui", "at": [0,0], "clip": ["press"], "picture": "press", "button": {"from": "button", "pick": {"bumper": "bumper", "trigger": "trigger"}}, "side": {"from": "side", "pick": {"left": "left", "right": "right"}}, "style": {"from": "style", "pick": {"rounded": "rounded", "angled": "angled"}}, "size": {"from": "size", "map": [[0,0], [1,1]], "round": "none"}, "lit": {"from": "lit", "pick": {"true": true, "false": false}}, "body": "body", "lamp": "glow", "face": "face", "shine": "edge"} ] } },
+  "clips": {
+    "idle": {"noText": true, "frames": 1, "fps": 8, "label": "Idle"},
+    "press": {"noText": true, "frames": 8, "fps": 8, "label": "Press"} },
+  "versions": [
+  {"name": "Left bumper", "params": {}},
+  {"name": "Right trigger", "params": {"button": "trigger", "side": "right"}},
+  {"name": "Left trigger, blue", "params": {"button": "trigger", "glow": "#4fd8ee"}},
+  {"name": "Angled right bumper", "params": {"side": "right", "style": "angled"}},
+  {"name": "Unlit pale", "params": {"lit": false, "body": "#c2c9d6"}} ] }

@@ -1,0 +1,255 @@
+{
+ "id": "cell",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     16,
+     17
+    ],
+    "shape": "cell",
+    "height": 18,
+    "casing": "steel",
+    "charge": "heal",
+    "shine": "shine"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      11,
+      8
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aaaaaaaa.",
+      "bcccccccaa",
+      "bbccccccca",
+      ".bbbbbbbb.",
+      "..dddddd..",
+      "..eeeeee..",
+      "..eeeeee..",
+      "..ffffgf..",
+      "..fhhhgf..",
+      "..fhhhhf..",
+      "..fhhhhf..",
+      "..fhhhhf..",
+      "..ffffff..",
+      "..dddddd..",
+      ".aaaaaaaa.",
+      "bcccccccaa",
+      "bbccccccca",
+      ".bbbbbbbb."
+     ],
+     "key": {
+      "a": "steel.light",
+      "b": "steel.dark",
+      "c": "steel",
+      "d": "steel.deep",
+      "e": "heal.dark",
+      "f": "heal",
+      "g": "shine",
+      "h": "heal.light"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     17
+    ],
+    "shape": "syringe",
+    "height": 22,
+    "level": 0.3,
+    "beat": 0.5,
+    "casing": "steel",
+    "charge": "heal",
+    "shine": "shine"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      11,
+      6
+     ],
+     "anchor": "tl",
+     "rows": [
+      "....ab....",
+      "....ab....",
+      "....ab....",
+      "....cb....",
+      "...acbb...",
+      "...aaaa...",
+      "..dddddd..",
+      "..eeeeee..",
+      "..eeeeee..",
+      "..ffffff..",
+      "..ffffff..",
+      "..ffffff..",
+      "..ffffff..",
+      "..ffffff..",
+      "..dddddd..",
+      "abbbbbbbbb",
+      "aaaaaccaaa",
+      "....ac....",
+      "....ab....",
+      "....cb....",
+      ".abccbbbb.",
+      ".aaaaaaaa."
+     ],
+     "key": {
+      "a": "steel.dark",
+      "b": "steel.light",
+      "c": "steel",
+      "d": "steel.deep",
+      "e": "heal.light",
+      "f": "heal.dark"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     0,
+     0
+    ],
+    "shape": "pack",
+    "height": 16,
+    "level": 1,
+    "beat": 1,
+    "layer": "halo",
+    "casing": "steel",
+    "charge": "heal",
+    "shine": "shine"
+   },
+   "primitives": []
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     17
+    ],
+    "shape": "pack",
+    "height": 20,
+    "beat": 0.7,
+    "scale": 0.6,
+    "squash": 0.2,
+    "bare": true,
+    "casing": "steel",
+    "charge": "heal",
+    "shine": "shine"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      10,
+      12
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...abaaaa...",
+      "...cddddb...",
+      ".bcbbaaaabb.",
+      "acccdeedacbb",
+      "acaadffdaaaa",
+      "adffffffffda",
+      "adeeeffeeedb",
+      "abbbdffdabcb",
+      "aacbdeedcccb",
+      ".aaaaaaaaaa."
+     ],
+     "key": {
+      "a": "steel.dark",
+      "b": "steel.light",
+      "c": "steel",
+      "d": "steel.deep",
+      "e": "heal.light",
+      "f": "shine"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     17
+    ],
+    "shape": "cell",
+    "height": 18,
+    "level": 0.8,
+    "beat": 0.7,
+    "layer": "halo",
+    "casing": "steel",
+    "charge": "heal",
+    "shine": "shine"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      11,
+      15
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a........a",
+      "a........a",
+      "a........a",
+      "a........a",
+      "a........a",
+      "a........a"
+     ],
+     "key": {
+      "a": "heal.light"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     17
+    ],
+    "shape": "syringe",
+    "height": 22,
+    "level": 1,
+    "beat": 0.92,
+    "layer": "halo",
+    "casing": "steel",
+    "charge": "heal",
+    "shine": "shine"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      11,
+      13
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a........a",
+      "a........a",
+      "a........a",
+      "a........a",
+      "a........a",
+      "a........a",
+      "a........a"
+     ],
+     "key": {
+      "a": "heal.light"
+     }
+    }
+   ]
+  }
+ ]
+}

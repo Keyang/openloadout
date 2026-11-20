@@ -1,0 +1,211 @@
+{
+ "id": "input-face-buttons",
+ "frozen": "2026-11-20",
+ "source": "sprites/input-face-buttons.js",
+ "sha256": "d571b20955c18e4c7c1729da793d92142d3e3355b3627fdc648ffce0353fa4e4",
+ "name": "Face buttons",
+ "blurb": "The four action buttons of a game controller in a diamond, the one to press lit and pressing down; change which button, one big button, size, depth and colours.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/icon",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "arcade",
+   "platformer",
+   "shooter",
+   "racing"
+  ],
+  "view": "none",
+  "words": [
+   "gamepad",
+   "controller",
+   "button",
+   "face button",
+   "action button",
+   "press",
+   "prompt",
+   "input",
+   "tutorial",
+   "control"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "press",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "cluster",
+   "options": [
+    {
+     "value": "cluster",
+     "label": "Four buttons"
+    },
+    {
+     "value": "single",
+     "label": "One button"
+    }
+   ],
+   "group": "Look"
+  },
+  "button": {
+   "kind": "choice",
+   "label": "Button",
+   "def": "bottom",
+   "options": [
+    {
+     "value": "top",
+     "label": "Top"
+    },
+    {
+     "value": "right",
+     "label": "Right"
+    },
+    {
+     "value": "bottom",
+     "label": "Bottom"
+    },
+    {
+     "value": "left",
+     "label": "Left"
+    },
+    {
+     "value": "all",
+     "label": "All"
+    }
+   ],
+   "group": "Look",
+   "when": {
+    "style": [
+     "cluster"
+    ]
+   }
+  },
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "depth": {
+   "kind": "range",
+   "label": "Depth",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Flat",
+   "hi": "Deep",
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Buttons",
+   "def": "#5d6475",
+   "swatches": [
+    "#5d6475",
+    "#3f5068",
+    "#c2c9d6",
+    "#7a4f33",
+    "#434d6d"
+   ],
+   "group": "Colors"
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Lit button",
+   "def": "#f2c230",
+   "swatches": [
+    "#f2c230",
+    "#4fd8ee",
+    "#a4c44a",
+    "#8fd0f0",
+    "#f0ead8"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "press": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    8,
+    12
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [
+  {
+   "name": "Bottom button",
+   "params": {}
+  },
+  {
+   "name": "Top button",
+   "params": {
+    "button": "top",
+    "glow": "#4fd8ee"
+   }
+  },
+  {
+   "name": "Right button",
+   "params": {
+    "button": "right",
+    "glow": "#8fd0f0"
+   }
+  },
+  {
+   "name": "One big button",
+   "params": {
+    "style": "single"
+   }
+  },
+  {
+   "name": "Pale pad, all lit",
+   "params": {
+    "button": "all",
+    "body": "#c2c9d6",
+    "glow": "#a4c44a"
+   }
+  }
+ ],
+ "bundles": []
+}

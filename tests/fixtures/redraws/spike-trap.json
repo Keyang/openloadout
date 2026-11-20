@@ -1,0 +1,178 @@
+{
+ "id": "spike-trap",
+ "frozen": "2026-11-20",
+ "source": "sprites/spike-trap.js",
+ "sha256": "3a754251df77712192c2d0d5e71f1c0daf645ce96ea7146bb969080ef330f568",
+ "name": "Spike trap",
+ "blurb": "A row of floor spikes that sinks, twitches a warning and snaps back out; change what the spikes are made of, how many and how long they are, the base plate and the colours.",
+ "meta": {
+  "type": "prop",
+  "role": "world/hazard",
+  "themes": [
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "platformer"
+  ],
+  "view": "side",
+  "words": [
+   "spikes",
+   "spike",
+   "trap",
+   "hazard",
+   "danger",
+   "retract",
+   "stab",
+   "floor spikes",
+   "thorns",
+   "crystal",
+   "sharp",
+   "damage",
+   "pit"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  30
+ ],
+ "grounded": true,
+ "preview": "idle",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "metal",
+   "options": [
+    "metal",
+    "bone",
+    "thorn",
+    "crystal"
+   ],
+   "group": "Look"
+  },
+  "count": {
+   "kind": "choice",
+   "label": "Spikes",
+   "def": "four",
+   "options": [
+    "three",
+    "four",
+    "five"
+   ],
+   "group": "Look"
+  },
+  "length": {
+   "kind": "range",
+   "label": "Length",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Short",
+   "hi": "Long",
+   "group": "Look"
+  },
+  "base": {
+   "kind": "toggle",
+   "label": "Base plate",
+   "def": true,
+   "group": "Look"
+  },
+  "metal": {
+   "kind": "color",
+   "label": "Metal",
+   "def": "#c2c9d6",
+   "swatches": [
+    "#c2c9d6",
+    "#f2c230",
+    "#8f97a8",
+    "#5d6475",
+    "#e6c545",
+    "#c98a4a"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Tips",
+   "def": "#c9423a",
+   "swatches": [
+    "#c9423a",
+    "#7a4fc4",
+    "#f0ead8",
+    "#4fd8ee",
+    "#a4c44a"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "retract": {
+   "frames": 6,
+   "loop": false,
+   "fps": [
+    6,
+    9,
+    13
+   ]
+  },
+  "warn": {
+   "frames": 4,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "attack": {
+   "frames": 6,
+   "loop": false,
+   "fps": [
+    9,
+    15,
+    20
+   ]
+  }
+ },
+ "sounds": {
+  "attack": [
+   {
+    "sound": "sword-slash",
+    "preset": "Quick dagger",
+    "frame": 1,
+    "volume": 0.7
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-platformer-fantasy"
+ ]
+}

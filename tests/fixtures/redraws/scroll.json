@@ -1,0 +1,241 @@
+{
+ "id": "scroll",
+ "frozen": "2026-11-20",
+ "source": "sprites/scroll.js",
+ "sha256": "18fe7087afa4ea581127ef443794b10466ca474e120280f100bb34133480b229",
+ "name": "Scroll",
+ "blurb": "A floating scroll or sealed letter to collect: a quest item, a spell or a map. Change its kind, size, seal, sparkle and colours.",
+ "meta": {
+  "type": "pickup",
+  "role": "items/key",
+  "themes": [
+   "neutral",
+   "fantasy"
+  ],
+  "gameTypes": [
+   "top-down-rpg",
+   "turn-based-rpg",
+   "platformer",
+   "arcade"
+  ],
+  "view": "front",
+  "words": [
+   "scroll",
+   "letter",
+   "map",
+   "parchment",
+   "paper",
+   "message",
+   "spell",
+   "quest",
+   "note",
+   "seal",
+   "collect",
+   "read"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  30
+ ],
+ "grounded": false,
+ "preview": "idle",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "shape": {
+   "kind": "choice",
+   "label": "Shape",
+   "def": "rolled",
+   "options": [
+    "rolled",
+    "open",
+    "letter"
+   ],
+   "group": "Look"
+  },
+  "seal": {
+   "kind": "toggle",
+   "label": "Seal",
+   "def": true,
+   "group": "Look"
+  },
+  "sparkle": {
+   "kind": "toggle",
+   "label": "Sparkle",
+   "def": true,
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Paper",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#d8d8e0",
+    "#e0b040",
+    "#e6c96a"
+   ],
+   "group": "Colors",
+   "material": "paint"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Ribbon",
+   "def": "#c9423a",
+   "swatches": [
+    "#c9423a",
+    "#f2c230",
+    "#3f6fd1",
+    "#7a4fc4",
+    "#e08a2c",
+    "#4f9d57"
+   ],
+   "group": "Colors",
+   "when": [
+    {
+     "shape": [
+      "rolled"
+     ]
+    },
+    {
+     "seal": [
+      true
+     ]
+    }
+   ]
+  },
+  "wood": {
+   "kind": "color",
+   "label": "Rods",
+   "def": "#a06a3c",
+   "swatches": [
+    "#a06a3c",
+    "#7a4f33",
+    "#a8612a",
+    "#5a3a22",
+    "#c98a4a",
+    "#c2c9d6"
+   ],
+   "group": "Colors",
+   "when": {
+    "shape": [
+     "rolled",
+     "open"
+    ]
+   }
+  },
+  "bob": {
+   "kind": "range",
+   "label": "Float",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Still",
+   "hi": "Floaty",
+   "group": "Motion"
+  },
+  "pop": {
+   "kind": "range",
+   "label": "Pop height",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Low",
+   "hi": "High",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "collect": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    9,
+    15,
+    20
+   ]
+  }
+ },
+ "sounds": {
+  "collect": [
+   {
+    "sound": "item-get",
+    "preset": "Storybook",
+    "frame": 1,
+    "volume": 0.7
+   }
+  ]
+ },
+ "versions": [
+  {
+   "name": "Sealed scroll",
+   "params": {}
+  },
+  {
+   "name": "Open scroll",
+   "params": {
+    "shape": "open",
+    "seal": false
+   }
+  },
+  {
+   "name": "Letter",
+   "params": {
+    "shape": "letter",
+    "accent": "#3f6fd1"
+   }
+  },
+  {
+   "name": "Old map",
+   "params": {
+    "shape": "open",
+    "body": "#e6c96a"
+   }
+  },
+  {
+   "name": "Royal decree",
+   "params": {
+    "accent": "#f2c230",
+    "wood": "#c2c9d6"
+   }
+  }
+ ],
+ "bundles": []
+}

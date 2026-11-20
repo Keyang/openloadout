@@ -1,0 +1,101 @@
+{
+  "format": "loadout-sprite",
+  "version": 2,
+  "id": "ui-buttons-neon",
+  "name": "Neon buttons",
+  "blurb": "A stretchable menu button outlined in a glowing neon tube on a dark wall, in four states (normal, hover, pressed, disabled) plus a tab and an open tab; change the style, corners, tube thickness, glow and colours.",
+  "meta": {
+    "type": "ui",
+    "role": "interface/button",
+    "themes": ["neutral","sci-fi","city"],
+    "gameTypes": ["arcade","shooter","racing","roguelike-action"],
+    "view": "none",
+    "words": ["button","neon","glow","tube","menu","sign","night","retro"],
+    "license": "draft"
+  },
+  "size": [96,32],
+  "pivot": [48,16],
+  "grounded": false,
+  "preview": "normal",
+  "styles": ["pixel"],
+  "palette": [
+    {"id":"face","label":"Wall","default":"#3f5068","material":"interface","swatches":["#3f5068","#7a4f33","#434d6d","#8e3a4a"]},
+    {"id":"frame","label":"Tube","default":"#8fd0f0","material":"interface","swatches":["#8fd0f0","#9bd18a","#c2c9d6","#5fe0f0","#7fe0a0"]},
+    {"id":"accent","label":"Second tube","default":"#e08a2c","material":"interface","swatches":["#e08a2c","#7a4fc4","#f2c230","#b48af8","#ca9eda"]}
+  ],
+  "controls": [
+    {
+      "key": "style",
+      "kind": "choice",
+      "label": "Style",
+      "options": [{"value":"tube","label":"Tube"},{"value":"double","label":"Double"},{"value":"sign","label":"Sign"}],
+      "default": "tube",
+      "group": "Look"
+    },
+    {"key":"corner","kind":"range","label":"Corner","lo":"Square","hi":"Round","default":0.5,"group":"Look"},
+    {"key":"border","kind":"range","label":"Border","lo":"Thin","hi":"Thick","default":0.5,"group":"Look"},
+    {"key":"halo","kind":"toggle","label":"Glow","default":true,"group":"Look"},
+    {"key":"face","kind":"colour","label":"Wall","group":"Colors"},
+    {"key":"frame","kind":"colour","label":"Tube","group":"Colors"},
+    {"key":"accent","kind":"colour","label":"Second tube","group":"Colors","when":{"style":["double"]}}
+  ],
+  "versions": [
+    {"name":"Sky tube","params":{}},
+    {"name":"Double pink","params":{"style":"double","accent":"#ca9eda","frame":"#c2c9d6","face":"#434d6d"}},
+    {"name":"Green sign","params":{"style":"sign","frame":"#9bd18a","face":"#7a4f33"}},
+    {"name":"Mint on wine","params":{"face":"#8e3a4a","frame":"#7fe0a0"}},
+    {"name":"Square cyan, no glow","params":{"halo":false,"corner":0,"frame":"#5fe0f0"}}
+  ],
+  "body": {
+    "panel": {
+      "skin": {"use":"skin:neon","v":1,"paint":{"face":"face","frame":"frame","accent":"accent"}},
+      "piece": {
+        "gen": "ui.slab",
+        "v": 1,
+        "clip": ["normal","hover","pressed","disabled"],
+        "role": "button",
+        "at": [1,1],
+        "size": [94,30],
+        "style": {"from":"style"},
+        "corner": {"from":"corner","map":[[0,0],[1,4]]},
+        "border": {"from":"border","map":[[0,1],[1,3]]},
+        "extras": {"from":"halo"}
+      },
+      "states": ["normal","hover","pressed","disabled","tab","tab-active"],
+      "draw": [
+        {
+          "gen": "ui.slab",
+          "v": 1,
+          "clip": ["tab"],
+          "role": "tab",
+          "at": [1,1],
+          "size": [94,30],
+          "style": {"from":"style"},
+          "corner": {"from":"corner","map":[[0,0],[1,4]]},
+          "border": {"from":"border","map":[[0,1],[1,3]]},
+          "extras": {"from":"halo"}
+        },
+        {
+          "gen": "ui.slab",
+          "v": 1,
+          "clip": ["tab-active"],
+          "role": "tab-open",
+          "at": [1,1],
+          "size": [94,31],
+          "style": {"from":"style"},
+          "corner": {"from":"corner","map":[[0,0],[1,4]]},
+          "border": {"from":"border","map":[[0,1],[1,3]]},
+          "extras": {"from":"halo"}
+        }
+      ]
+    }
+  },
+  "clips": {
+    "normal": {"frames":1,"fps":8,"label":"At rest, not pointed at"},
+    "hover": {"frames":1,"fps":8,"label":"Pointed at by the cursor"},
+    "pressed": {"frames":1,"fps":8,"label":"Held down while pressed","sounds":[{"sound":"menu-console-confirm","preset":"Select","frame":0,"volume":0.6}]},
+    "disabled": {"frames":1,"fps":8,"label":"Greyed out, not available now"},
+    "tab": {"frames":1,"fps":8,"label":"Tab, for a page that is not open"},
+    "tab-active": {"frames":1,"fps":8,"label":"Open tab, for the page on view","sounds":[{"sound":"menu-console-move","preset":"Tab","frame":0,"volume":0.6}]}
+  }
+}

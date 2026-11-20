@@ -1,0 +1,226 @@
+{
+ "id": "meal",
+ "frozen": "2026-11-20",
+ "source": "sprites/meal.js",
+ "sha256": "b1a1d03766d620bf944bbb070c96a64882951e07ed0eed059272a31b0b820d0f",
+ "name": "Hearty meal",
+ "blurb": "A floating roast leg, loaf, cheese or pie that restores a lot of health. Change the food, its size, a bite, steam, sparkle and colours.",
+ "meta": {
+  "type": "pickup",
+  "role": "items/food",
+  "themes": [
+   "neutral",
+   "fantasy"
+  ],
+  "gameTypes": [
+   "platformer",
+   "arcade",
+   "top-down-rpg",
+   "turn-based-rpg"
+  ],
+  "view": "front",
+  "words": [
+   "meal",
+   "food",
+   "meat",
+   "roast",
+   "drumstick",
+   "bread",
+   "loaf",
+   "cheese",
+   "pie",
+   "eat",
+   "heal",
+   "health",
+   "collect",
+   "feast"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  30
+ ],
+ "grounded": false,
+ "preview": "idle",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "shape": {
+   "kind": "choice",
+   "label": "Shape",
+   "def": "drumstick",
+   "options": [
+    "drumstick",
+    "bread",
+    "cheese",
+    "pie"
+   ],
+   "group": "Look"
+  },
+  "bite": {
+   "kind": "toggle",
+   "label": "Bitten",
+   "def": false,
+   "group": "Look"
+  },
+  "steam": {
+   "kind": "toggle",
+   "label": "Steam",
+   "def": false,
+   "group": "Look"
+  },
+  "sparkle": {
+   "kind": "toggle",
+   "label": "Sparkle",
+   "def": true,
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Food",
+   "def": "#a06a3c",
+   "swatches": [
+    "#a06a3c",
+    "#7a4f33",
+    "#a8612a",
+    "#5a3a22",
+    "#c98a4a",
+    "#f2c230",
+    "#e6c96a"
+   ],
+   "group": "Colors",
+   "material": "wood"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Bone",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#d8d8e0",
+    "#e0b040",
+    "#8f97a8"
+   ],
+   "group": "Colors",
+   "when": {
+    "shape": [
+     "drumstick"
+    ]
+   }
+  },
+  "bob": {
+   "kind": "range",
+   "label": "Float",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Still",
+   "hi": "Floaty",
+   "group": "Motion"
+  },
+  "pop": {
+   "kind": "range",
+   "label": "Pop height",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Low",
+   "hi": "High",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "collect": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    9,
+    15,
+    20
+   ]
+  }
+ },
+ "sounds": {
+  "collect": [
+   {
+    "sound": "heart-pickup",
+    "preset": "Storybook",
+    "frame": 1,
+    "volume": 0.7
+   }
+  ]
+ },
+ "versions": [
+  {
+   "name": "Roast leg",
+   "params": {}
+  },
+  {
+   "name": "Bread loaf",
+   "params": {
+    "shape": "bread",
+    "body": "#e6c96a"
+   }
+  },
+  {
+   "name": "Cheese wedge",
+   "params": {
+    "shape": "cheese",
+    "body": "#f2c230",
+    "bite": true
+   }
+  },
+  {
+   "name": "Hot pie",
+   "params": {
+    "shape": "pie",
+    "steam": true
+   }
+  },
+  {
+   "name": "Snack",
+   "params": {
+    "size": 0.3,
+    "bite": true,
+    "steam": false
+   }
+  }
+ ],
+ "bundles": []
+}

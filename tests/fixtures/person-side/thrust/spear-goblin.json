@@ -1,0 +1,114 @@
+{
+  "format": "loadout-sprite",
+  "version": 2,
+  "id": "spear-goblin",
+  "name": "Spear goblin",
+  "blurb": "B4x sketch, not the redraw: the code goblin's clips, its attack picked by Weapon (a spear or a dagger thrusts, a club swings, bare claws punch).",
+  "size": [
+    64,
+    64
+  ],
+  "pivot": [
+    28,
+    58
+  ],
+  "meta": {
+    "type": "character",
+    "role": "characters/enemy",
+    "view": "side",
+    "themes": [
+      "fantasy",
+      "forest"
+    ],
+    "gameTypes": [
+      "platformer"
+    ],
+    "words": [
+      "goblin",
+      "imp",
+      "spear",
+      "thrust",
+      "stab",
+      "enemy"
+    ],
+    "license": "draft"
+  },
+  "palette": [
+    {
+      "id": "skin",
+      "label": "Skin",
+      "default": "#7fae4a",
+      "material": "skin"
+    },
+    {
+      "id": "metal",
+      "label": "Metal",
+      "default": "#8f97a8",
+      "material": "metal"
+    }
+  ],
+  "body": {
+    "rig": {
+      "extends": {
+        "use": "base:person-side",
+        "v": 7,
+        "clips": [
+          "idle",
+          "walk",
+          "run",
+          "attack",
+          "hurt",
+          "die"
+        ]
+      },
+      "shapes": [
+        {
+          "id": "spear",
+          "kind": "use",
+          "use": "held:spear",
+          "v": 1,
+          "on": "handF",
+          "when": {
+            "weapon": [
+              "spear"
+            ]
+          },
+          "paint": {
+            "metal": "metal"
+          }
+        }
+      ]
+    }
+  },
+  "controls": [
+    {
+      "key": "weapon",
+      "kind": "choice",
+      "label": "Weapon",
+      "options": [
+        "spear",
+        "club",
+        "dagger",
+        "none"
+      ],
+      "default": "spear"
+    },
+    {
+      "key": "speed",
+      "standard": "speed"
+    }
+  ],
+  "clips": {
+    "attack": {
+      "from": {
+        "from": "weapon",
+        "pick": {
+          "spear": "thrust",
+          "club": "attack",
+          "dagger": "thrust",
+          "none": "punch"
+        }
+      }
+    }
+  }
+}

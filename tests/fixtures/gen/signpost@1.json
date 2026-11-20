@@ -1,0 +1,325 @@
+{
+ "id": "signpost",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "gen": "signpost",
+    "v": 1,
+    "at": [
+     16,
+     46
+    ],
+    "wood": "wood",
+    "moss": "moss",
+    "chain": "chain",
+    "markPaint": "picture"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      5,
+      16
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..........aaa.........",
+      "..........bcd.........",
+      "eeaaaeaaaaaaaaaaaa....",
+      ".efffefffffffffffaa...",
+      ".eefeffffffgffffffaa..",
+      "..efeffffffffffffffaa.",
+      "..efffffffffffffffffaa",
+      "..fffffffffffffffffff.",
+      ".efffffffffgffffffff..",
+      ".ffffffffffffffffff...",
+      "eeeeeeeeeeeeeeeeee....",
+      "..........bcd.........",
+      "..........bcd.........",
+      "..........bcd.........",
+      "..........bcd.........",
+      "..........bcd.........",
+      "..........bcd.........",
+      "..........bcd.........",
+      "..........bcd.........",
+      "..........bcd.........",
+      "..........bcd.........",
+      "..........bcd.........",
+      "..........bcd.........",
+      "..........bcd.........",
+      "..........bcd.........",
+      "..........bcd.........",
+      "..........bcd.........",
+      "..........bcd.........",
+      "..........bcd.........",
+      "..........bbb........."
+     ],
+     "key": {
+      "a": "wood.light",
+      "b": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "wood",
+        "by": -0.5
+       },
+       "tone": "dark"
+      },
+      "c": {
+       "rule": "tone",
+       "of": "wood",
+       "by": -0.5
+      },
+      "d": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "wood",
+        "by": -0.5
+       },
+       "tone": "light"
+      },
+      "e": "wood.dark",
+      "f": "wood",
+      "g": "wood.deep"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "gen": "signpost",
+    "v": 1,
+    "at": [
+     16,
+     46
+    ],
+    "wood": "wood",
+    "moss": "moss",
+    "chain": "chain",
+    "markPaint": "picture",
+    "style": "hanging",
+    "points": "both",
+    "mark": "skull",
+    "tall": 38,
+    "mossy": true,
+    "wear": 1,
+    "sway": [
+     0,
+     0.13
+    ]
+   },
+   "ctx": {
+    "t": 0.2,
+    "loop": false,
+    "frames": 6,
+    "frame": 1
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      10,
+      8
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".........aaa........",
+      ".........bcd........",
+      "eaaaaaaaaaaaaaaaaaaa",
+      "eeeeeeeeeeeeeeeeeeee",
+      "...fe....bcd..g.e...",
+      "hffffffffffffge.....",
+      "hfhfffffffffffff....",
+      "hiihffffffhhhfff....",
+      "hiihhhhhhjjiihff....",
+      "hiiiejjjjjjjihff....",
+      "eiiiejiijiijihhh....",
+      "eiiiijeijiijiiih....",
+      "eiiiijjjijjjikia....",
+      "eeiiiijjjjjiiika....",
+      "eeiiijijijikik......",
+      "..eeeeeeeekek.......",
+      ".......bcd..........",
+      ".......bcd..........",
+      ".......bcd..........",
+      ".......bcd..........",
+      ".......bcd..........",
+      ".......bcd..........",
+      ".......bcd..........",
+      ".......bcd..........",
+      "......bcd...........",
+      "......bcd...........",
+      "......bcd...........",
+      "......bcd...........",
+      "......bcd...........",
+      "......bck...........",
+      "......bcd...........",
+      "......bcd..........."
+     ],
+     "key": {
+      "a": "wood.light",
+      "b": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "wood",
+        "by": -0.5
+       },
+       "tone": "dark"
+      },
+      "c": {
+       "rule": "tone",
+       "of": "wood",
+       "by": -0.5
+      },
+      "d": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "wood",
+        "by": -0.5
+       },
+       "tone": "light"
+      },
+      "e": "wood.dark",
+      "f": "moss",
+      "g": "chain",
+      "h": "moss.dark",
+      "i": "wood",
+      "j": "picture",
+      "k": "wood.deep"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      10,
+      40
+     ],
+     "anchor": "tl",
+     "rows": [
+      "......abc...........",
+      ".....abd............",
+      "....efdc............",
+      "....eebee...........",
+      "...effffff..........",
+      "...eeeeeee.........."
+     ],
+     "key": {
+      "a": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "wood",
+        "by": -0.5
+       },
+       "tone": "dark"
+      },
+      "b": {
+       "rule": "tone",
+       "of": "wood",
+       "by": -0.5
+      },
+      "c": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "wood",
+        "by": -0.5
+       },
+       "tone": "light"
+      },
+      "d": "wood.deep",
+      "e": "moss.dark",
+      "f": "moss"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "gen": "signpost",
+    "v": 1,
+    "at": [
+     16,
+     46
+    ],
+    "wood": "wood",
+    "moss": "moss",
+    "chain": "chain",
+    "markPaint": "picture",
+    "style": "board",
+    "points": "left",
+    "mark": "exclaim",
+    "tall": 22,
+    "wear": 0.55
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      5,
+      24
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..........aaa.....",
+      "..........bcd.....",
+      ".aaaaeaaaaaaaaaaa.",
+      "effffeffgggfffffaa",
+      "efffefffggghfffffa",
+      "efffefffgggffffffa",
+      "efffefffgggffffffa",
+      "eeeeeeeegggeeeeeee",
+      "effffffffgfffffffa",
+      "efffffffffffffffha",
+      "efffffffggghffffh.",
+      "eeffffffgggfffhh..",
+      ".eeeeeeeeeeeehe...",
+      "..........bcd.....",
+      "..........bcd.....",
+      "..........bcd.....",
+      "..........bcd.....",
+      "..........bcd.....",
+      "..........bcd.....",
+      "..........bcd.....",
+      "..........bcd.....",
+      "..........bbb....."
+     ],
+     "key": {
+      "a": "wood.light",
+      "b": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "wood",
+        "by": -0.5
+       },
+       "tone": "dark"
+      },
+      "c": {
+       "rule": "tone",
+       "of": "wood",
+       "by": -0.5
+      },
+      "d": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "wood",
+        "by": -0.5
+       },
+       "tone": "light"
+      },
+      "e": "wood.dark",
+      "f": "wood",
+      "g": "picture",
+      "h": "wood.deep"
+     }
+    }
+   ]
+  }
+ ]
+}

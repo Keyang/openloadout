@@ -1,0 +1,682 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "chest-topdown",
+ "name": "Chest (top-down)",
+ "blurb": "A banded chest for a top-down map that bursts open with rays of light, then stands empty. Change its size, style, lid, treasure, light and colours.",
+ "meta": {
+  "type": "prop",
+  "role": "world/prop",
+  "themes": [
+   "fantasy"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "top-down-rpg"
+  ],
+  "view": "top-down",
+  "words": [
+   "chest",
+   "treasure",
+   "loot",
+   "box",
+   "trunk",
+   "open",
+   "reward",
+   "gold",
+   "coins",
+   "gems",
+   "secret",
+   "wooden",
+   "lock"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  30
+ ],
+ "preview": "closed",
+ "styles": [
+  "pixel"
+ ],
+ "palette": [
+  {
+   "id": "wood",
+   "label": "Wood",
+   "default": "#9a6a3e",
+   "material": "wood",
+   "swatches": [
+    "#9a6a3e",
+    "#a8612a",
+    "#5a3a22",
+    "#3f6fd1",
+    "#7a4fc4",
+    "#2f8f9d",
+    "#c9423a",
+    "#8e3a4a"
+   ]
+  },
+  {
+   "id": "metal",
+   "label": "Metal",
+   "default": "#f2c230",
+   "material": "metal",
+   "swatches": [
+    "#f2c230",
+    "#c2c9d6",
+    "#a8a4a0",
+    "#e6c545"
+   ]
+  },
+  {
+   "id": "glow",
+   "label": "Light",
+   "default": "#f2c230",
+   "material": "light",
+   "swatches": [
+    "#f2c230",
+    "#4fd8ee",
+    "#e8662c",
+    "#7aa0f4",
+    "#f4e06a",
+    "#7fe0a0",
+    "#7a4fc4"
+   ]
+  },
+  {
+   "id": "gold",
+   "default": "#f2c230",
+   "material": "metal",
+   "detail": true
+  },
+  {
+   "id": "gem",
+   "default": "#4fd8ee",
+   "material": "magic",
+   "detail": true
+  },
+  {
+   "id": "ruby",
+   "default": "#c9423a",
+   "material": "magic",
+   "detail": true
+  },
+  {
+   "id": "shine",
+   "default": "#ffffff",
+   "material": "light",
+   "detail": true
+  }
+ ],
+ "controls": [
+  {
+   "key": "size",
+   "kind": "range",
+   "label": "Size",
+   "lo": "Small",
+   "hi": "Big",
+   "default": 0.5
+  },
+  {
+   "key": "style",
+   "kind": "choice",
+   "label": "Style",
+   "options": [
+    "wooden",
+    "iron",
+    "royal"
+   ],
+   "default": "wooden"
+  },
+  {
+   "key": "lid",
+   "kind": "range",
+   "label": "Lid",
+   "lo": "Flat",
+   "hi": "Domed",
+   "default": 0.6
+  },
+  {
+   "key": "gems",
+   "kind": "toggle",
+   "label": "Treasure",
+   "default": true
+  },
+  {
+   "key": "wood",
+   "kind": "colour",
+   "label": "Wood"
+  },
+  {
+   "key": "metal",
+   "kind": "colour",
+   "label": "Metal"
+  },
+  {
+   "key": "glow",
+   "kind": "colour",
+   "label": "Light"
+  },
+  {
+   "key": "speed",
+   "standard": "speed"
+  }
+ ],
+ "body": {
+  "pictures": {
+   "nodes": [],
+   "draw": [
+    {
+     "id": "chest",
+     "gen": "chest.topdown",
+     "v": 1,
+     "at": [
+      16,
+      30
+     ],
+     "style": {
+      "from": "style",
+      "pick": {
+       "wooden": "wooden",
+       "iron": "iron",
+       "royal": "royal"
+      }
+     },
+     "size": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "lid": {
+      "from": "lid",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "gems": {
+      "from": "gems",
+      "pick": {
+       "true": true,
+       "false": false
+      }
+     },
+     "wood": "wood",
+     "metal": "metal",
+     "inner": "glow",
+     "gold": "gold",
+     "gem": "gem",
+     "ruby": "ruby",
+     "shine": "shine",
+     "clip": [
+      "closed"
+     ]
+    },
+    {
+     "id": "chest-open",
+     "gen": "chest.topdown",
+     "v": 1,
+     "at": [
+      16,
+      30
+     ],
+     "style": {
+      "from": "style",
+      "pick": {
+       "wooden": "wooden",
+       "iron": "iron",
+       "royal": "royal"
+      }
+     },
+     "size": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "lid": {
+      "from": "lid",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "gems": {
+      "from": "gems",
+      "pick": {
+       "true": true,
+       "false": false
+      }
+     },
+     "wood": "wood",
+     "metal": "metal",
+     "inner": "glow",
+     "gold": "gold",
+     "gem": "gem",
+     "ruby": "ruby",
+     "shine": "shine",
+     "clip": [
+      "open"
+     ],
+     "lift": [
+      0,
+      0,
+      3,
+      0
+     ],
+     "open": [
+      0,
+      0,
+      0,
+      1.25,
+      0.85,
+      1.08,
+      1,
+      1
+     ],
+     "wide": [
+      0,
+      1,
+      -1,
+      0
+     ],
+     "tall": [
+      0,
+      -1,
+      1,
+      0
+     ],
+     "inside": [
+      0,
+      0,
+      1,
+      1,
+      2,
+      2,
+      2,
+      2
+     ],
+     "beam": [
+      0,
+      0,
+      0,
+      1.3,
+      1.15,
+      1,
+      0.9,
+      0.8
+     ],
+     "hot": [
+      0,
+      0,
+      0,
+      1,
+      0
+     ],
+     "phase": [
+      0,
+      0.34,
+      0.68,
+      1.02,
+      1.36,
+      1.7,
+      2.04,
+      2.38
+     ],
+     "flick": [
+      0,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1
+     ]
+    },
+    {
+     "id": "chest-empty",
+     "gen": "chest.topdown",
+     "v": 1,
+     "at": [
+      16,
+      30
+     ],
+     "style": {
+      "from": "style",
+      "pick": {
+       "wooden": "wooden",
+       "iron": "iron",
+       "royal": "royal"
+      }
+     },
+     "size": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "lid": {
+      "from": "lid",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "gems": {
+      "from": "gems",
+      "pick": {
+       "true": true,
+       "false": false
+      }
+     },
+     "wood": "wood",
+     "metal": "metal",
+     "inner": "glow",
+     "gold": "gold",
+     "gem": "gem",
+     "ruby": "ruby",
+     "shine": "shine",
+     "clip": [
+      "empty"
+     ],
+     "open": [
+      1
+     ],
+     "inside": [
+      0
+     ]
+    },
+    {
+     "kind": "outline",
+     "paint": "ink"
+    },
+    {
+     "id": "glint",
+     "gen": "chest.topdown",
+     "v": 1,
+     "at": [
+      16,
+      30
+     ],
+     "style": {
+      "from": "style",
+      "pick": {
+       "wooden": "wooden",
+       "iron": "iron",
+       "royal": "royal"
+      }
+     },
+     "size": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "lid": {
+      "from": "lid",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "gems": {
+      "from": "gems",
+      "pick": {
+       "true": true,
+       "false": false
+      }
+     },
+     "wood": "wood",
+     "metal": "metal",
+     "inner": "glow",
+     "gold": "gold",
+     "gem": "gem",
+     "ruby": "ruby",
+     "shine": "shine",
+     "clip": [
+      "closed"
+     ],
+     "glint": [
+      -1,
+      -1,
+      -1,
+      0,
+      0.25,
+      0.5,
+      0.75,
+      1
+     ],
+     "lock": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      2,
+      0
+     ],
+     "layer": "light"
+    },
+    {
+     "id": "rays",
+     "gen": "chest.topdown",
+     "v": 1,
+     "at": [
+      16,
+      30
+     ],
+     "style": {
+      "from": "style",
+      "pick": {
+       "wooden": "wooden",
+       "iron": "iron",
+       "royal": "royal"
+      }
+     },
+     "size": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "lid": {
+      "from": "lid",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "gems": {
+      "from": "gems",
+      "pick": {
+       "true": true,
+       "false": false
+      }
+     },
+     "wood": "wood",
+     "metal": "metal",
+     "inner": "glow",
+     "gold": "gold",
+     "gem": "gem",
+     "ruby": "ruby",
+     "shine": "shine",
+     "clip": [
+      "open"
+     ],
+     "lift": [
+      0,
+      0,
+      3,
+      0
+     ],
+     "open": [
+      0,
+      0,
+      0,
+      1.25,
+      0.85,
+      1.08,
+      1,
+      1
+     ],
+     "wide": [
+      0,
+      1,
+      -1,
+      0
+     ],
+     "tall": [
+      0,
+      -1,
+      1,
+      0
+     ],
+     "inside": [
+      0,
+      0,
+      1,
+      1,
+      2,
+      2,
+      2,
+      2
+     ],
+     "beam": [
+      0,
+      0,
+      0,
+      1.3,
+      1.15,
+      1,
+      0.9,
+      0.8
+     ],
+     "hot": [
+      0,
+      0,
+      0,
+      1,
+      0
+     ],
+     "phase": [
+      0,
+      0.34,
+      0.68,
+      1.02,
+      1.36,
+      1.7,
+      2.04,
+      2.38
+     ],
+     "flick": [
+      0,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1
+     ],
+     "layer": "light"
+    }
+   ]
+  }
+ },
+ "clips": {
+  "closed": {
+   "frames": 8,
+   "fps": 8
+  },
+  "open": {
+   "frames": 8,
+   "fps": 12,
+   "loop": false,
+   "sounds": [
+    {
+     "sound": "chest-open",
+     "preset": "Treasure chest",
+     "frame": 0,
+     "volume": 0.8
+    }
+   ]
+  },
+  "empty": {
+   "frames": 1,
+   "fps": 8
+  }
+ }
+}

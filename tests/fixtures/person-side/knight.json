@@ -139,11 +139,22 @@
     "rig": {
       "extends": {
         "use": "base:person-side",
-        "v": 6,
+        "v": 7,
         "paint": {
           "top": "outfit",
           "bottom": "trousers"
-        }
+        },
+        "clips": [
+          "idle",
+          "walk",
+          "run",
+          "jump",
+          "attack",
+          "hurt",
+          "die",
+          "block",
+          "victory"
+        ]
       },
       "shapes": [
         {
@@ -941,7 +952,15 @@
       "from": "idle"
     },
     "walk": {
-      "from": "walk",
+      "from": {
+        "from": "weapon",
+        "pick": {
+          "sword": "walk",
+          "axe": "walk",
+          "spear": "walk",
+          "none": "walk-unarmed"
+        }
+      },
       "sounds": [
         {
           "sound": "footstep-gravel",
@@ -956,7 +975,15 @@
       ]
     },
     "run": {
-      "from": "run",
+      "from": {
+        "from": "weapon",
+        "pick": {
+          "sword": "run",
+          "axe": "run",
+          "spear": "run",
+          "none": "run-unarmed"
+        }
+      },
       "sounds": [
         {
           "sound": "footstep-gravel",
@@ -987,7 +1014,15 @@
       ]
     },
     "attack": {
-      "from": "attack",
+      "from": {
+        "from": "weapon",
+        "pick": {
+          "sword": "attack",
+          "axe": "attack",
+          "spear": "attack",
+          "none": "punch"
+        }
+      },
       "sounds": [
         {
           "sound": "sword-slash",

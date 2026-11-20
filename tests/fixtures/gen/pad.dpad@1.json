@@ -1,0 +1,259 @@
+{
+ "id": "pad.dpad",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "body": "pad",
+    "lit": "glow"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      3,
+      3
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".........aaaaaaaa.........",
+      "........abbbbbbbba........",
+      "........abbbbbbbba........",
+      "........abbbbcbbba........",
+      "........abbbcccbba........",
+      "........abbbbbbbba........",
+      "........abbbbbbbba........",
+      ".aaaaaaaabbbbbbbbaaaaaaaa.",
+      "adddddddddddddddddddddddda",
+      "adddddddddddddddddddddddda",
+      "adddddddddddeeddddddddddda",
+      "addddfdddddeeeedddddfdddda",
+      "adddffdddddeeeedddddffddda",
+      "addddfddddddeeddddddfdddda",
+      "adddddddddddddddddddddddda",
+      "adddddddddddddddddddddddda",
+      "aggggggggddddddddgggggggga",
+      "aggggggggddddddddgggggggga",
+      ".aaaaaaaaddddddddaaaaaaaa.",
+      "........adddfffdda........",
+      "........addddfddda........",
+      "........adddddddda........",
+      "........adddddddda........",
+      "........agggggggga........",
+      "........agggggggga........",
+      ".........aaaaaaaa........."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "glow",
+      "c": {
+       "rule": "tone",
+       "of": "glow",
+       "by": -0.9
+      },
+      "d": "pad",
+      "e": {
+       "rule": "tone",
+       "of": "pad",
+       "by": -0.35
+      },
+      "f": {
+       "rule": "tone",
+       "of": "pad",
+       "by": -0.9
+      },
+      "g": {
+       "rule": "tone",
+       "of": "pad",
+       "by": -0.8
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "picture": "press",
+    "style": "rocker",
+    "direction": "all",
+    "body": "pad",
+    "lit": "glow"
+   },
+   "ctx": {
+    "frame": 3
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      4,
+      3
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".........aaaaaa.........",
+      "......aaabbbbbbaaa......",
+      ".....acbbbbbbbbbbca.....",
+      "....acbbbbbbbbbbbbca....",
+      "...accdbbbbeebbbbdcca...",
+      "..acbccdbbeeeebbdcccca..",
+      ".acbbbccdbbbbbbdcccccca.",
+      ".acbbbbccdbbbbdccccfcca.",
+      ".abbbbbbccddddccccfffca.",
+      "acbbbbebbccccccccffffcca",
+      "acbbbeebbccggcccffffffca",
+      "acbbbeebbcggggcffhffffca",
+      "acbbbbebbcigggcffhhfffca",
+      "acbbbbbbdccigccffhhfffca",
+      "acdbbbbdccbbbbcffhffffca",
+      "adcbbbdccbbbbbbcffffffda",
+      "adcdbdccbbeeeebbcffffcda",
+      ".accdccbbbbeebbbbcfffca.",
+      ".adcccbbbbbbbbbbbbcfcda.",
+      ".addccdbbbbbbbbbbdccdda.",
+      "..addccddbbbbbbddccdda..",
+      "...addcccddddddcccdda...",
+      "....addddccccccdddda....",
+      ".....adddddddddddda.....",
+      "......aaaddddddaaa......",
+      ".........aaaaaa........."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "pad",
+      "c": {
+       "rule": "tone",
+       "of": "pad",
+       "by": -0.75
+      },
+      "d": {
+       "rule": "tone",
+       "of": "pad",
+       "by": -0.8
+      },
+      "e": {
+       "rule": "tone",
+       "of": "pad",
+       "by": -0.9
+      },
+      "f": {
+       "rule": "tone",
+       "of": "glow",
+       "by": -0.3
+      },
+      "g": {
+       "rule": "tone",
+       "of": "pad",
+       "by": -0.7
+      },
+      "h": {
+       "rule": "tone",
+       "of": {
+        "rule": "tone",
+        "of": "glow",
+        "by": -0.3
+       },
+       "by": -0.9
+      },
+      "i": {
+       "rule": "tone",
+       "of": "pad",
+       "by": 0.4
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     0,
+     0
+    ],
+    "picture": "press",
+    "style": "round",
+    "direction": "left-right",
+    "size": 1,
+    "depth": 1,
+    "body": "pad",
+    "lit": "glow"
+   },
+   "ctx": {
+    "frame": 4
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      -13,
+      -14
+     ],
+     "anchor": "tl",
+     "rows": [
+      "........aaaaaaaaaa........",
+      "......aabbbbbbbbbbaa......",
+      ".....abbbbccccccbbbba.....",
+      "....abbbbbcccdccbbbbba....",
+      "...abbbbbbccdddcbbbbbba...",
+      "..abbbbbbbccccccbbbbbbba..",
+      "..abbbbbbbccccccbbbbbbba..",
+      ".abbbbbbbbccccccbbbbbbbba.",
+      ".abbbbbbbbccccccbbbbbbbba.",
+      "abbbbbbbbbccccccbbbbbbbbba",
+      "abbbbbbbbbccccccbbbbbbbbba",
+      "abbbbbbbbbccccccbbbbbbbbba",
+      "abeeeeeeebccccccbeeeeeeeba",
+      "abeeeeeeebccccccbeeeeeeeba",
+      "abeeefeeebccccccbeeefeeeba",
+      "abeeffeeebccccccbeeeffeeba",
+      "ageeefeeebccccccbeeefeeega",
+      "ageeeeeeebccccccbeeeeeeega",
+      "ageeeeeeebccccccbeeeeeeega",
+      ".agbbbbbbbccccccbbbbbbbga.",
+      ".aggbbbbbbccdddcbbbbbbgga.",
+      "..aggbbbbbcccdccbbbbbgga..",
+      "..agggbbbbccccccbbbbggga..",
+      "...aggggbbbbbbbbbbgggga...",
+      "....agggggggggggggggga....",
+      ".....agggggggggggggga.....",
+      "......aaggggggggggaa......",
+      "........aaaaaaaaaa........"
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "tone",
+       "of": "pad",
+       "by": -0.35
+      },
+      "c": "pad",
+      "d": {
+       "rule": "tone",
+       "of": "pad",
+       "by": -0.9
+      },
+      "e": "glow",
+      "f": {
+       "rule": "tone",
+       "of": "glow",
+       "by": -0.9
+      },
+      "g": {
+       "rule": "tone",
+       "of": "pad",
+       "by": -0.8
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,422 @@
+{
+ "id": "tiles-cave",
+ "frozen": "2026-11-20",
+ "source": "sprites/tiles-cave.js",
+ "sha256": "cd4ca90bde707b3b9c70fc91024dd36befef170b572a697400c74dc6ab8869dd",
+ "name": "Cave rock tiles",
+ "blurb": "Rough faceted rock for caves, with a thin ledge, a dark back wall, stalactites, stalagmites and glowing crystals; change the colours, the lit rim, how jagged, cracked and wet it is.",
+ "meta": {
+  "type": "tileset",
+  "role": "world/tile",
+  "themes": [
+   "fantasy",
+   "dungeon"
+  ],
+  "gameTypes": [
+   "platformer"
+  ],
+  "view": "side",
+  "words": [
+   "cave",
+   "rock",
+   "stone",
+   "cavern",
+   "underground",
+   "mine",
+   "stalactite",
+   "stalagmite",
+   "crystal",
+   "ground",
+   "wall",
+   "ledge",
+   "walk",
+   "dark"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "rock-top",
+ "params": {
+  "edge": {
+   "kind": "range",
+   "label": "Edge",
+   "def": 3,
+   "min": 3,
+   "max": 6,
+   "step": 1,
+   "lo": "Thin",
+   "hi": "Deep",
+   "group": "Look"
+  },
+  "jagged": {
+   "kind": "range",
+   "label": "Edges",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Smooth",
+   "hi": "Jagged",
+   "group": "Look"
+  },
+  "texture": {
+   "kind": "range",
+   "label": "Texture",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Plain",
+   "hi": "Busy",
+   "group": "Look"
+  },
+  "wear": {
+   "kind": "range",
+   "label": "Wear",
+   "def": 0.3,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "New",
+   "hi": "Worn",
+   "group": "Look"
+  },
+  "damp": {
+   "kind": "toggle",
+   "label": "Damp",
+   "def": false,
+   "group": "Look"
+  },
+  "rock": {
+   "kind": "color",
+   "label": "Rock",
+   "def": "#5d6475",
+   "swatches": [
+    "#5d6475",
+    "#8f97a8",
+    "#6b7280",
+    "#a06a3c"
+   ],
+   "group": "Colors"
+  },
+  "shade": {
+   "kind": "color",
+   "label": "Back wall",
+   "def": "#3f5068",
+   "swatches": [
+    "#3f5068",
+    "#7a4f33",
+    "#5a3a22",
+    "#3a3350"
+   ],
+   "group": "Colors"
+  },
+  "crystal": {
+   "kind": "color",
+   "label": "Crystal",
+   "def": "#4fd8ee",
+   "swatches": [
+    "#4fd8ee",
+    "#c9423a",
+    "#a4c44a",
+    "#7a4fc4",
+    "#f2c230"
+   ],
+   "group": "Colors"
+  }
+ },
+ "clips": {
+  "rock-left": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "rock-top": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "rock-right": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "rock-side-l": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "rock-fill": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "rock-fill-b": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "rock-fill-c": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "rock-side-r": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "rock-bottom-l": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "rock-bottom": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "rock-bottom-r": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "rock-inner-tl": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "rock-inner-tr": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "rock-inner-bl": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "rock-inner-br": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "rock-strip-l": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "rock-strip-m": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "rock-strip-r": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "rock-col-t": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "rock-col-m": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "rock-col-b": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "rock-single": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "rock-thin-l": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "rock-thin-m": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "rock-thin-r": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "dark-fill": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "dark-fill-b": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "dark-fill-c": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "rock-deco-a": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "rock-deco-b": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "rock-deco-c": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [],
+ "bundles": [
+  "kit-platformer-fantasy"
+ ]
+}

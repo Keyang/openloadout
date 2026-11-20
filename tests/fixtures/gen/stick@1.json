@@ -1,0 +1,305 @@
+{
+ "id": "stick",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "body": "pad",
+    "accent": "ring",
+    "lit": "glow"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      4,
+      4
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".........aaaaaa.........",
+      "......aaabbbbbbaaa......",
+      ".....abbbbbbbbbbbba.....",
+      "....abbbbccccccbbbba....",
+      "...abbbcccccaaaacbbba...",
+      "..abbbccccaaddddaabbba..",
+      ".abbbccccaddddddddabbba.",
+      ".abbcccccaefffddddacbba.",
+      ".abbccccaedfffdddddabba.",
+      "abbcccccaedffddddddacbba",
+      "abbcccccaedddddddddacbba",
+      "abbcccccaedddddddddacbba",
+      "abbccccccaedddddddaccbba",
+      "abbccccccaeeddddedaccbba",
+      "abbcccccccaaeeeeaacccbba",
+      ".abbccccccccaaaaccccbba.",
+      ".abbccccccccccccccccbba.",
+      ".abbbccccccccccccccbbba.",
+      "..abbbccccccccccccbbba..",
+      "...abbbccccccccccbbba...",
+      "....abbbbccccccbbbba....",
+      ".....abbbbbbbbbbbba.....",
+      "......aaabbbbbbaaa......",
+      ".........aaaaaa........."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "ring",
+      "c": {
+       "rule": "tone",
+       "of": "ring",
+       "by": -1.2
+      },
+      "d": "pad",
+      "e": {
+       "rule": "tone",
+       "of": "pad",
+       "by": -0.7
+      },
+      "f": {
+       "rule": "tone",
+       "of": "pad",
+       "by": 0.7
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "picture": "move",
+    "motion": "spin",
+    "reach": 1,
+    "body": "pad",
+    "accent": "ring",
+    "lit": "glow"
+   },
+   "ctx": {
+    "frame": 3
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      3,
+      3
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".........aaaa.............",
+      "..........bbbbbb...a......",
+      ".......bbbccccccbbb.a.....",
+      "...a..bccccccccccccb.aaa..",
+      "...a.bccccddddddccccb.a...",
+      "..a.bcccddddddddddcccb....",
+      ".a.bcccddddddddddddcccb...",
+      "..bcccddddddddddddddcccb..",
+      "..bccddddddddddddddddccb..",
+      "..bccddddddddddddddddccb.a",
+      ".bccddddddddddddddddddccba",
+      ".bccdddddddbbbbdddddddccba",
+      ".bccdddddbbeeeebbdddddccba",
+      "abccddddbeeeeeeeebddddccb.",
+      "abccddddbfgggeeeebddddccb.",
+      "abccdddbfegggeeeeebdddccb.",
+      "a.bccddbfeggeeeeeebddccb..",
+      "..bccddbfeeeeeeeeebddccb..",
+      "..bcccdbfeeeeeeeeebdcccb..",
+      "...bcccdbfeeeeeeebdcccb.a.",
+      "....bcccbffeeeefedcccb.a..",
+      ".....bccccdffffdccccb.a...",
+      "...aa.bccccccccccccb..a...",
+      ".....a.bbbccccccbbb.......",
+      "......a...bbbbbb..........",
+      ".............aaaa........."
+     ],
+     "key": {
+      "a": "glow",
+      "b": "ink",
+      "c": "ring",
+      "d": {
+       "rule": "tone",
+       "of": "ring",
+       "by": -1.2
+      },
+      "e": "pad",
+      "f": {
+       "rule": "tone",
+       "of": "pad",
+       "by": -0.7
+      },
+      "g": {
+       "rule": "tone",
+       "of": "pad",
+       "by": 0.7
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     0,
+     0
+    ],
+    "picture": "move",
+    "motion": "press",
+    "style": "ridged",
+    "size": 1,
+    "body": "pad",
+    "accent": "ring",
+    "lit": "glow"
+   },
+   "ctx": {
+    "frame": 4
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      -14,
+      -14
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a...a..................a...a",
+      ".a..a......bbbbbb......a..a.",
+      "..a.a...bbbccccccbbb...a.a..",
+      ".......bccccccccccccb.......",
+      "aaa...bccccddddddccccb...aaa",
+      ".....bcccddddddddddcccb.....",
+      "....bccddddddddddddddccb....",
+      "...bccddddddddddddddddccb...",
+      "..bcccdddddbbbbbbdddddcccb..",
+      "..bccdddddbbefefbbdddddccb..",
+      "..bccddddbfeggggfebddddccb..",
+      ".bccddddbfggghhgggebddddccb.",
+      ".bccdddbbeghhhhhhgfbbdddccb.",
+      ".bccdddbegghhhhhhggfbdddccb.",
+      ".bccdddbfghhhhhhhhgebdddccb.",
+      ".bccdddbeghhhhhhhhgfbdddccb.",
+      ".bccdddbfgghhhhhhggebdddccb.",
+      "..bccddbbfghhhhhhgebbddccb..",
+      "..bccdddbeggghhgggfbdddccb..",
+      "..bcccdddbefggggefbdddcccb..",
+      "...bccddddbbfefebbddddccb...",
+      "....bccddddbbbbbbddddccb....",
+      ".....bcccddddddddddcccb.....",
+      "......bccccddddddccccb......",
+      ".......bccccccccccccb.......",
+      "........bbbccccccbbb........",
+      "...........bbbbbb..........."
+     ],
+     "key": {
+      "a": "glow",
+      "b": "ink",
+      "c": "ring",
+      "d": {
+       "rule": "tone",
+       "of": "ring",
+       "by": -1.2
+      },
+      "e": {
+       "rule": "tone",
+       "of": "pad",
+       "by": -1.2
+      },
+      "f": {
+       "rule": "tone",
+       "of": "pad",
+       "by": -1.1
+      },
+      "g": "pad",
+      "h": {
+       "rule": "tone",
+       "of": "pad",
+       "by": 0.3
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "picture": "move",
+    "motion": "left",
+    "style": "flat",
+    "size": 0,
+    "body": "pad",
+    "accent": "ring",
+    "lit": "glow"
+   },
+   "ctx": {
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      3,
+      5
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..........aaaaaa........",
+      "........aabbbbbbaa......",
+      "......aabbbbbbbbbbaa....",
+      ".....abbbbccccccbbbba...",
+      "....abbbccccccccccbbba..",
+      "....abbccccccccccccbba..",
+      "...abbccccaaaaccccccbba.",
+      "...abbccaaddddaaccccbba.",
+      "..abbcccaddddddacccccbba",
+      "..abbccaedffffddaccccbba",
+      ".gabbccaedffffddaccccbba",
+      "ggabbccaedffffddaccccbba",
+      ".gabbccaedffffddaccccbba",
+      "..abbcccaedddddacccccbba",
+      "...abbccaaeeeeaaccccbba.",
+      "...abbccccaaaaccccccbba.",
+      "....abbccccccccccccbba..",
+      "....abbbccccccccccbbba..",
+      ".....abbbbccccccbbbba...",
+      "......aabbbbbbbbbbaa....",
+      "........aabbbbbbaa......",
+      "..........aaaaaa........"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "ring",
+      "c": {
+       "rule": "tone",
+       "of": "ring",
+       "by": -1.2
+      },
+      "d": "pad",
+      "e": {
+       "rule": "tone",
+       "of": "pad",
+       "by": -0.7
+      },
+      "f": {
+       "rule": "tone",
+       "of": "pad",
+       "by": -0.4
+      },
+      "g": "glow"
+     }
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,47 @@
+{ "format": "loadout-sprite",
+  "version": 2,
+  "id": "ui-score-counter",
+  "name": "Score counter",
+  "blurb": "A score plate for the top of the screen: a case with a picture and a row of digit windows, a digit that rolls up like an odometer and a bump when points arrive, plus the empty plate for the game's own digits; change the style, number of digits, size, picture, leading zeros and colours.",
+  "meta": {"type": "ui", "role": "interface/panel", "themes": ["neutral"], "gameTypes": ["arcade", "platformer", "shooter", "puzzle"], "view": "none", "words": ["score", "counter", "points", "digits", "hud", "odometer", "count", "coins"], "license": "draft"},
+  "size": [96,24],
+  "pivot": [48,12],
+  "grounded": false,
+  "preview": "idle",
+  "styles": ["pixel"],
+  "palette": [
+  {"id": "face", "label": "Windows", "default": "#3f5068", "material": "interface", "swatches": ["#3f5068", "#7a4f33", "#434d6d", "#8e3a4a"]},
+  {"id": "frame", "label": "Case", "default": "#f0ead8", "material": "paint", "swatches": ["#f0ead8", "#8fd0f0", "#9bd18a", "#c2c9d6", "#f6d3b0"]},
+  {"id": "glow", "label": "Digits", "default": "#4fd8ee", "material": "light", "swatches": ["#4fd8ee", "#f2c230", "#a4c44a", "#5fe0f0", "#7fe0a0"]} ],
+  "controls": [
+  {"key": "style", "kind": "choice", "label": "Style", "options": ["plate", "strip", "drum"], "default": "plate"},
+  {"key": "digits", "kind": "range", "label": "Digits", "lo": "Few", "hi": "Many", "default": 6, "min": 3, "max": 7, "step": 1},
+  {"key": "size", "kind": "range", "label": "Size", "lo": "Small", "hi": "Big", "default": 0.5},
+  {"key": "icon", "kind": "choice", "label": "Picture", "options": ["none", "star", "coin", "heart"], "default": "star"},
+  {"key": "zeros", "kind": "toggle", "label": "Leading zeros", "default": true, "when": {"digits": [5,6,7]}},
+  {"key": "face", "kind": "colour", "label": "Windows"},
+  {"key": "frame", "kind": "colour", "label": "Case"},
+  {"key": "glow", "kind": "colour", "label": "Digits"},
+  {"key": "speed", "standard": "speed"} ],
+  "body": { "panel": {
+    "piece": {"gen": "score.counter", "v": 1, "at": [48,12], "clip": ["idle"], "picture": "idle", "style": {"from": "style", "pick": {"plate": "plate", "strip": "strip", "drum": "drum"}}, "digits": {"from": "digits", "map": [[3,3], [7,7]], "round": "none"}, "size": {"from": "size", "map": [[0,0], [1,1]], "round": "none"}, "icon": {"from": "icon", "pick": {"none": "none", "star": "star", "coin": "coin", "heart": "heart"}}, "zeros": {"from": "zeros", "pick": {"true": true, "false": false}}, "face": "face", "frame": "frame", "lit": "glow"},
+    "states": [
+    "idle",
+    "roll",
+    "bump",
+    "frame" ],
+    "draw": [
+    {"gen": "score.counter", "v": 1, "at": [48,12], "clip": ["roll"], "picture": "roll", "style": {"from": "style", "pick": {"plate": "plate", "strip": "strip", "drum": "drum"}}, "digits": {"from": "digits", "map": [[3,3], [7,7]], "round": "none"}, "size": {"from": "size", "map": [[0,0], [1,1]], "round": "none"}, "icon": {"from": "icon", "pick": {"none": "none", "star": "star", "coin": "coin", "heart": "heart"}}, "zeros": {"from": "zeros", "pick": {"true": true, "false": false}}, "face": "face", "frame": "frame", "lit": "glow"},
+    {"gen": "score.counter", "v": 1, "at": [48,12], "clip": ["bump"], "picture": "bump", "style": {"from": "style", "pick": {"plate": "plate", "strip": "strip", "drum": "drum"}}, "digits": {"from": "digits", "map": [[3,3], [7,7]], "round": "none"}, "size": {"from": "size", "map": [[0,0], [1,1]], "round": "none"}, "icon": {"from": "icon", "pick": {"none": "none", "star": "star", "coin": "coin", "heart": "heart"}}, "zeros": {"from": "zeros", "pick": {"true": true, "false": false}}, "face": "face", "frame": "frame", "lit": "glow"},
+    {"gen": "score.counter", "v": 1, "at": [48,12], "clip": ["frame"], "picture": "frame", "style": {"from": "style", "pick": {"plate": "plate", "strip": "strip", "drum": "drum"}}, "digits": {"from": "digits", "map": [[3,3], [7,7]], "round": "none"}, "size": {"from": "size", "map": [[0,0], [1,1]], "round": "none"}, "icon": {"from": "icon", "pick": {"none": "none", "star": "star", "coin": "coin", "heart": "heart"}}, "zeros": {"from": "zeros", "pick": {"true": true, "false": false}}, "face": "face", "frame": "frame", "lit": "glow"} ] } },
+  "clips": {
+    "idle": {"noText": true, "frames": 1, "fps": 8, "label": "Showing a score"},
+    "roll": {"noText": true, "frames": 6, "fps": 12, "loop": false, "label": "Count up by one", "sounds": [{"sound": "xp-blip", "preset": "Tiny tick", "frame": 1, "volume": 0.5}]},
+    "bump": {"noText": true, "frames": 4, "fps": 10, "loop": false, "label": "Score up", "sounds": [{"sound": "xp-blip", "preset": "Combo high", "frame": 0, "volume": 0.6}]},
+    "frame": {"frames": 1, "fps": 8, "label": "Empty, for the game's own digits"} },
+  "versions": [
+  {"name": "Score", "params": {}},
+  {"name": "Coins", "params": {"icon": "coin", "digits": 4, "face": "#7a4f33"}},
+  {"name": "Drum", "params": {"style": "drum", "glow": "#5fe0f0", "frame": "#c2c9d6"}},
+  {"name": "Big strip", "params": {"style": "strip", "size": 1, "digits": 5, "icon": "none"}},
+  {"name": "Hearts, no zeros", "params": {"icon": "heart", "zeros": false, "face": "#8e3a4a", "glow": "#7fe0a0"}} ] }

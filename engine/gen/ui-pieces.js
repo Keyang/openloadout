@@ -32,6 +32,8 @@ import { hash, wave } from '../motion.js';
 import {
   UI_SLICE, UI_EDGE, UI_SHADOW, UI_STATES, UI_STYLES, roundRows, cutRows, spanAt, rowsArea, areaCount, spansArea, rectArea, marksToStamps, toneOf, mixOf, shadeOf,
 } from './ui-shapes.js';
+import { SKIN_MEASURES } from './ui-skin.js';
+import { PORT_MEASURES } from './port-measures.js';   // migration batch M9: the interface pictures' ports (engine/gen/port-sprite.js)
 
 const fin = (v) => typeof v === 'number' && Number.isFinite(v);
 const clampI = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.round(fin(v) ? v : lo)));
@@ -692,6 +694,8 @@ export const UI_PIECES = Object.freeze(['ui.panel@1', 'ui.button@1', 'ui.bar@1',
 export const UI_MEASURES = Object.freeze({
   'ui.panel@1': measurePanel, 'ui.button@1': measureButton, 'ui.bar@1': measureBar, 'ui.slider@1': measureSlider,
   'ui.knob@1': measureKnob, 'ui.highlight@1': measureHighlight, 'ui.arrow@1': () => ({}),
+  ...SKIN_MEASURES,   // migration batch M8: the skinned pieces of engine/gen/ui-skin.js
+  ...PORT_MEASURES,   // migration batch M9: the ports that keep a text area or slice (engine/gen/port-measures.js)
 });
 
 /**

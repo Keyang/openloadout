@@ -1,0 +1,257 @@
+{
+ "id": "arrow-bundle",
+ "frozen": "2026-11-20",
+ "source": "sprites/arrow-bundle.js",
+ "sha256": "eaae9272e7431d2284f374d33c7aa7ba764ff048b7b9e361bc2b5fcf90c64f36",
+ "name": "Arrow bundle",
+ "blurb": "Floating arrows to pick up: a leather quiver of fletched arrows, a tied bundle or loose crossbow bolts. Change the kind, how many arrows, its size, sparkle and colours.",
+ "meta": {
+  "type": "pickup",
+  "role": "items/pickup",
+  "themes": [
+   "neutral",
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "top-down-rpg",
+   "platformer",
+   "arcade",
+   "roguelike-action"
+  ],
+  "view": "front",
+  "words": [
+   "arrows",
+   "arrow",
+   "quiver",
+   "bolts",
+   "crossbow",
+   "bow",
+   "ammo",
+   "ammunition",
+   "fletching",
+   "collect",
+   "pickup",
+   "archery",
+   "leather"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  30
+ ],
+ "grounded": false,
+ "preview": "idle",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "shape": {
+   "kind": "choice",
+   "label": "Shape",
+   "def": "quiver",
+   "options": [
+    {
+     "value": "quiver",
+     "label": "Quiver"
+    },
+    {
+     "value": "bundle",
+     "label": "Bundle"
+    },
+    {
+     "value": "bolts",
+     "label": "Bolts"
+    }
+   ],
+   "group": "Look"
+  },
+  "pieces": {
+   "kind": "range",
+   "label": "Arrows",
+   "def": 3,
+   "min": 2,
+   "max": 5,
+   "step": 1,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "sparkle": {
+   "kind": "toggle",
+   "label": "Sparkle",
+   "def": true,
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Leather",
+   "def": "#7a4f33",
+   "swatches": [
+    "#7a4f33",
+    "#5a3a22",
+    "#a8612a",
+    "#3f8a4f"
+   ],
+   "group": "Colors",
+   "when": {
+    "shape": [
+     "quiver"
+    ]
+   }
+  },
+  "wood": {
+   "kind": "color",
+   "label": "Shafts",
+   "def": "#a06a3c",
+   "swatches": [
+    "#a06a3c",
+    "#c98a4a",
+    "#f0ead8",
+    "#e6c96a"
+   ],
+   "group": "Colors"
+  },
+  "metal": {
+   "kind": "color",
+   "label": "Heads",
+   "def": "#c2c9d6",
+   "swatches": [
+    "#c2c9d6",
+    "#f2c230",
+    "#8f97a8",
+    "#5d6475",
+    "#e6c545"
+   ],
+   "group": "Colors"
+  },
+  "trim": {
+   "kind": "color",
+   "label": "Fletching",
+   "def": "#c9423a",
+   "swatches": [
+    "#c9423a",
+    "#f2c230",
+    "#3f6fd1",
+    "#7a4fc4",
+    "#e08a2c",
+    "#c2c9d6",
+    "#a4c44a"
+   ],
+   "group": "Colors"
+  },
+  "bob": {
+   "kind": "range",
+   "label": "Float",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Still",
+   "hi": "Floaty",
+   "group": "Motion"
+  },
+  "pop": {
+   "kind": "range",
+   "label": "Pop height",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Low",
+   "hi": "High",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "collect": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    9,
+    15,
+    20
+   ]
+  }
+ },
+ "sounds": {
+  "collect": [
+   {
+    "sound": "ammo-pickup",
+    "preset": "Arrows",
+    "frame": 1,
+    "volume": 0.7
+   }
+  ]
+ },
+ "versions": [
+  {
+   "name": "Hunter's quiver",
+   "params": {}
+  },
+  {
+   "name": "Tied bundle",
+   "params": {
+    "shape": "bundle",
+    "pieces": 4
+   }
+  },
+  {
+   "name": "Crossbow bolts",
+   "params": {
+    "shape": "bolts",
+    "trim": "#c2c9d6",
+    "wood": "#c98a4a"
+   }
+  },
+  {
+   "name": "Gilded arrows",
+   "params": {
+    "metal": "#f2c230",
+    "trim": "#e08a2c"
+   }
+  },
+  {
+   "name": "Forest quiver",
+   "params": {
+    "body": "#3f8a4f",
+    "trim": "#a4c44a",
+    "pieces": 5
+   }
+  }
+ ],
+ "bundles": []
+}

@@ -1,0 +1,187 @@
+{
+ "id": "hud.roguelite",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "body": "body",
+    "lit": "lit",
+    "accent": "accent",
+    "metal": "metal"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      9,
+      10
+     ],
+     "anchor": "tl",
+     "rows": [
+      "....aaaaaaaa.",
+      "...aabbbbbbaa",
+      "..aaccccddbba",
+      ".aaccceeccdba",
+      "aafccceeccdba",
+      "aafceeeeeecba",
+      "aafceeeeeecba",
+      "aafccceecccba",
+      "aafccceecccaa",
+      "aaffccccccaa.",
+      "aaaffffffaa..",
+      "aaaaaaaaaa...",
+      ".aaaaaaaa...."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body.light",
+      "c": "body",
+      "d": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      },
+      "e": {
+       "rule": "mix",
+       "of": "#f0ead8",
+       "with": "#f0ead8",
+       "amount": 0
+      },
+      "f": "body.dark"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "picture": "room-unknown",
+    "shape": "cell",
+    "bold": false,
+    "shine": false,
+    "body": "body",
+    "lit": "lit",
+    "accent": "accent",
+    "metal": "metal"
+   },
+   "ctx": {
+    "frame": 1
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      10,
+      10
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..aaaaaaaa..",
+      ".abbbbbbbba.",
+      "abcccdddccba",
+      "abccdcccdcba",
+      "abccccccdcba",
+      "abcccccdccba",
+      "abccccdcccba",
+      "abccccccccba",
+      "abccccdcccba",
+      "abccccccccba",
+      ".abbbbbbbba.",
+      "..aaaaaaaa.."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "accent",
+      "c": {
+       "rule": "mix",
+       "of": "ink",
+       "with": "accent",
+       "amount": 0.3
+      },
+      "d": "accent.light"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     0,
+     0
+    ],
+    "picture": "key",
+    "shape": "diamond",
+    "body": "body",
+    "lit": "lit",
+    "accent": "accent",
+    "metal": "metal"
+   },
+   "ctx": {
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      -6,
+      -6
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aaaaaaa...",
+      "aabccccaa..",
+      "aabdeeecaa.",
+      "aabddddfcaa",
+      "aabdddddfca",
+      "aagggggffga",
+      "aagggggggga",
+      "aabddddddca",
+      "aabdhhdddca",
+      "aabdhhdddca",
+      "aabbbbbbbba",
+      "aaaaaaaaaaa",
+      "aaaaaaaaaa."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "metal.dark",
+      "c": "metal.light",
+      "d": "metal",
+      "e": {
+       "rule": "mix",
+       "of": "ink",
+       "with": "metal",
+       "amount": 0.3
+      },
+      "f": {
+       "rule": "mix",
+       "of": "#ffffff",
+       "with": "#ffffff",
+       "amount": 0
+      },
+      "g": {
+       "rule": "mix",
+       "of": "ink",
+       "with": "metal",
+       "amount": 0.62
+      },
+      "h": {
+       "rule": "mix",
+       "of": "#5fe0f0",
+       "with": "#5fe0f0",
+       "amount": 0
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

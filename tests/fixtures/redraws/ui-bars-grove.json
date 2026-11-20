@@ -1,0 +1,268 @@
+{
+ "id": "ui-bars-grove",
+ "frozen": "2026-11-20",
+ "source": "sprites/ui-bars-grove.js",
+ "sha256": "63cdad5c6f0e382be1d5b9f13c1a318d5fd3d520e66c21487caee5fe11cf1cc7",
+ "name": "Vine bars and slider",
+ "blurb": "A bar housing wrapped in a pale living vine with three fill strips (health, magic, a gauge), a white flash, a slider track and its knob; change the style, corners, vine thickness, leaves and colours.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/bar",
+  "themes": [
+   "neutral",
+   "forest",
+   "farm"
+  ],
+  "gameTypes": [
+   "arcade",
+   "farming-sim",
+   "top-down-rpg",
+   "puzzle"
+  ],
+  "view": "none",
+  "words": [
+   "bar",
+   "health",
+   "stamina",
+   "slider",
+   "meter",
+   "progress",
+   "vine",
+   "leaf",
+   "bark",
+   "nature"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  64,
+  16
+ ],
+ "pivot": [
+  32,
+  8
+ ],
+ "grounded": false,
+ "preview": "frame",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "vine",
+   "options": [
+    {
+     "value": "vine",
+     "label": "Vine"
+    },
+    {
+     "value": "bark",
+     "label": "Bark"
+    },
+    {
+     "value": "bloom",
+     "label": "Bloom"
+    }
+   ],
+   "group": "Look"
+  },
+  "corner": {
+   "kind": "range",
+   "label": "Corner",
+   "def": 0.75,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Square",
+   "hi": "Round",
+   "group": "Look"
+  },
+  "border": {
+   "kind": "range",
+   "label": "Border",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Thin",
+   "hi": "Thick",
+   "group": "Look"
+  },
+  "leaves": {
+   "kind": "toggle",
+   "label": "Leaves",
+   "def": true,
+   "group": "Look"
+  },
+  "frame": {
+   "kind": "color",
+   "label": "Vine",
+   "def": "#9bd18a",
+   "swatches": [
+    "#9bd18a",
+    "#7fe0a0",
+    "#e6c96a",
+    "#f0ead8"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Leaves and flowers",
+   "def": "#6aa83e",
+   "swatches": [
+    "#6aa83e",
+    "#c9423a",
+    "#e08a2c",
+    "#7a4fc4",
+    "#3f6fd1"
+   ],
+   "group": "Colors",
+   "when": [
+    {
+     "leaves": [
+      true
+     ]
+    },
+    {
+     "style": [
+      "bloom"
+     ]
+    }
+   ]
+  },
+  "fill": {
+   "kind": "color",
+   "label": "Health",
+   "def": "#6aa83e",
+   "swatches": [
+    "#6aa83e",
+    "#3f8a4f",
+    "#c9423a",
+    "#e08a2c",
+    "#4fd8ee",
+    "#f2c230"
+   ],
+   "group": "Colors"
+  },
+  "fillB": {
+   "kind": "color",
+   "label": "Magic",
+   "def": "#3f6fd1",
+   "swatches": [
+    "#3f6fd1",
+    "#3f9fd1",
+    "#4fd8ee",
+    "#8fd0f0",
+    "#4f9ff0"
+   ],
+   "group": "Colors"
+  },
+  "fillC": {
+   "kind": "color",
+   "label": "Gauge",
+   "def": "#f2c230",
+   "swatches": [
+    "#f2c230",
+    "#e08a2c",
+    "#a4c44a",
+    "#a06a3c",
+    "#c2c9d6"
+   ],
+   "group": "Colors"
+  }
+ },
+ "clips": {
+  "frame": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "fill": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "fill-b": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "fill-c": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "flash": {
+   "frames": 4,
+   "loop": false,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "slider": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "knob": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [
+  {
+   "name": "Vine bars",
+   "params": {}
+  },
+  {
+   "name": "Bloom",
+   "params": {
+    "style": "bloom",
+    "accent": "#c9423a"
+   }
+  },
+  {
+   "name": "Bark, bare",
+   "params": {
+    "style": "bark",
+    "leaves": false
+   }
+  },
+  {
+   "name": "Birch",
+   "params": {
+    "frame": "#f0ead8",
+    "fill": "#4fd8ee"
+   }
+  }
+ ],
+ "bundles": []
+}

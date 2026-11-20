@@ -1,0 +1,169 @@
+{
+ "format": "loadout-piece",
+ "version": 1,
+ "id": "skin:neon",
+ "v": 1,
+ "name": "Neon",
+ "about": "Neon sign interface pieces: a dark wall face inside a glowing tube; tube, double (a second tube of the accent) or sign (bolts in the corners); a glow as ornaments.",
+ "slots": [
+  {
+   "id": "face",
+   "label": "Wall",
+   "default": "#3f5068",
+   "material": "interface"
+  },
+  {
+   "id": "frame",
+   "label": "Tube",
+   "default": "#8fd0f0",
+   "material": "interface"
+  },
+  {
+   "id": "accent",
+   "label": "Second tube",
+   "default": "#e08a2c",
+   "material": "interface"
+  },
+  {
+   "id": "fill",
+   "label": "Fill",
+   "default": "#6aa83e",
+   "material": "interface"
+  },
+  {
+   "id": "shine",
+   "label": "Shine",
+   "default": "#ffffff",
+   "material": "light"
+  }
+ ],
+ "made": {
+  "from": "engine/ui-skins-more.js, engine/ui-neon-tube.js"
+ },
+ "body": {
+  "paint": {
+   "face": "face",
+   "frame": "frame",
+   "accent": "accent",
+   "line": "frame",
+   "ledge": "frame.dark",
+   "knob": "frame",
+   "fill": "fill",
+   "shine": "shine",
+   "divider": "ink"
+  },
+  "args": {
+   "*": {
+    "rings": [
+     "ink",
+     "frame.dark",
+     "frame"
+    ],
+    "bandAt": 2,
+    "lit": false,
+    "edge": "round",
+    "hoverFace": 0.1,
+    "hoverBand": 0.45,
+    "every": 8,
+    "start": 7,
+    "extra": [
+     {
+      "kind": "stamp",
+      "at": [
+       3,
+       3
+      ],
+      "rows": [
+       "l.",
+       ".."
+      ],
+      "key": {
+       "l": "frame.light"
+      }
+     }
+    ],
+    "extraAlong": [
+     {
+      "kind": "stamp",
+      "at": [
+       0,
+       2
+      ],
+      "rows": [
+       "l"
+      ],
+      "key": {
+       "l": "frame.light"
+      }
+     }
+    ]
+   },
+   "ui.slab": {
+    "titleShade": -1,
+    "lined": true
+   },
+   "ui.strip": {
+    "gloss": true,
+    "shadow": false
+   },
+   "ui.trough": {
+    "trough": "dark"
+   }
+  },
+  "styles": {
+   "tube": {
+    "*": {
+     "edge": "round"
+    }
+   },
+   "double": {
+    "*": {
+     "rings": [
+      "ink",
+      "frame",
+      "ink",
+      "accent"
+     ],
+     "bandAt": 1
+    }
+   },
+   "sign": {
+    "*": {
+     "edge": "cut",
+     "trim": [
+      {
+       "kind": "stamp",
+       "at": [
+        3,
+        3
+       ],
+       "rows": [
+        "mi",
+        "ii"
+       ],
+       "key": {
+        "m": "frame.light",
+        "i": "ink"
+       }
+      }
+     ]
+    }
+   }
+  },
+  "states": {
+   "normal": {
+    "lip": 2
+   },
+   "hover": {
+    "lip": 2
+   },
+   "pressed": {
+    "lip": 0
+   },
+   "disabled": {
+    "lip": 2,
+    "desaturate": 1
+   }
+  }
+ }
+}

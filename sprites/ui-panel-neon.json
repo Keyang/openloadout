@@ -1,0 +1,110 @@
+{
+  "format": "loadout-sprite",
+  "version": 2,
+  "id": "ui-panel-neon",
+  "name": "Neon panels",
+  "blurb": "Stretchable dark boxes outlined in a glowing neon tube for menus, score tables and tips: a panel, one with a heading, a list well and a tooltip; change the style, corners, tube thickness, glow and colours.",
+  "meta": {
+    "type": "ui",
+    "role": "interface/panel",
+    "themes": ["neutral","sci-fi","city"],
+    "gameTypes": ["arcade","shooter","racing","roguelike-action"],
+    "view": "none",
+    "words": ["panel","window","box","popup","menu","tooltip","list","neon","glow","tube","sign","night"],
+    "license": "draft"
+  },
+  "size": [96,64],
+  "pivot": [48,32],
+  "grounded": false,
+  "preview": "panel",
+  "styles": ["pixel"],
+  "palette": [
+    {"id":"face","label":"Wall","default":"#3f5068","material":"interface","swatches":["#3f5068","#7a4f33","#434d6d","#8e3a4a"]},
+    {"id":"frame","label":"Tube","default":"#8fd0f0","material":"interface","swatches":["#8fd0f0","#9bd18a","#c2c9d6","#5fe0f0","#7fe0a0"]},
+    {"id":"accent","label":"Second tube","default":"#e08a2c","material":"interface","swatches":["#e08a2c","#7a4fc4","#f2c230","#b48af8","#ca9eda"]}
+  ],
+  "controls": [
+    {
+      "key": "style",
+      "kind": "choice",
+      "label": "Style",
+      "options": [{"value":"tube","label":"Tube"},{"value":"double","label":"Double"},{"value":"sign","label":"Sign"}],
+      "default": "tube",
+      "group": "Look"
+    },
+    {"key":"corner","kind":"range","label":"Corner","lo":"Square","hi":"Round","default":0.5,"group":"Look"},
+    {"key":"border","kind":"range","label":"Border","lo":"Thin","hi":"Thick","default":0.5,"group":"Look"},
+    {"key":"halo","kind":"toggle","label":"Glow","default":true,"group":"Look"},
+    {"key":"face","kind":"colour","label":"Wall","group":"Colors"},
+    {"key":"frame","kind":"colour","label":"Tube","group":"Colors"},
+    {"key":"accent","kind":"colour","label":"Second tube","group":"Colors","when":{"style":["double"]}}
+  ],
+  "versions": [
+    {"name":"Sky box","params":{}},
+    {"name":"Double on cyan","params":{"style":"double","frame":"#5fe0f0","face":"#434d6d"}},
+    {"name":"Green sign","params":{"style":"sign","frame":"#9bd18a","face":"#7a4f33"}},
+    {"name":"Mint wine","params":{"face":"#8e3a4a","frame":"#7fe0a0","border":1}},
+    {"name":"Square steel","params":{"corner":0,"frame":"#c2c9d6","halo":false}}
+  ],
+  "body": {
+    "panel": {
+      "skin": {"use":"skin:neon","v":1,"paint":{"face":"face","frame":"frame","accent":"accent"}},
+      "piece": {
+        "gen": "ui.slab",
+        "v": 1,
+        "clip": ["panel"],
+        "at": [1,1],
+        "size": [94,62],
+        "style": {"from":"style"},
+        "corner": {"from":"corner","map":[[0,0],[1,4]]},
+        "border": {"from":"border","map":[[0,1],[1,3]]},
+        "extras": {"from":"halo"}
+      },
+      "states": ["panel","panel-title","inset","tooltip"],
+      "draw": [
+        {
+          "gen": "ui.slab",
+          "v": 1,
+          "clip": ["panel-title"],
+          "role": "title",
+          "at": [1,1],
+          "size": [94,62],
+          "style": {"from":"style"},
+          "corner": {"from":"corner","map":[[0,0],[1,4]]},
+          "border": {"from":"border","map":[[0,1],[1,3]]},
+          "extras": {"from":"halo"}
+        },
+        {
+          "gen": "ui.slab",
+          "v": 1,
+          "clip": ["inset"],
+          "role": "inset",
+          "at": [1,1],
+          "size": [94,62],
+          "style": {"from":"style"},
+          "corner": {"from":"corner","map":[[0,0],[1,4]]},
+          "border": {"from":"border","map":[[0,1],[1,3]]},
+          "extras": {"from":"halo"}
+        },
+        {
+          "gen": "ui.slab",
+          "v": 1,
+          "clip": ["tooltip"],
+          "role": "tooltip",
+          "at": [1,1],
+          "size": [94,40],
+          "style": {"from":"style"},
+          "corner": {"from":"corner","map":[[0,0],[1,4]]},
+          "border": {"from":"border","map":[[0,1],[1,3]]},
+          "extras": {"from":"halo"}
+        }
+      ]
+    }
+  },
+  "clips": {
+    "panel": {"frames":1,"fps":8,"label":"Plain panel"},
+    "panel-title": {"frames":1,"fps":8,"label":"With heading"},
+    "inset": {"frames":1,"fps":8,"label":"List well"},
+    "tooltip": {"frames":1,"fps":8,"label":"Tooltip with a tail"}
+  }
+}

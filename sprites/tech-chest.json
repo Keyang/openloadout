@@ -1,0 +1,753 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "tech-chest",
+ "name": "Loot cache",
+ "blurb": "A station loot cache whose lid splits and slides apart round a beam of light, then stands empty. Change its size, build, lid, rarity bars, light and colours.",
+ "meta": {
+  "type": "prop",
+  "role": "world/prop",
+  "themes": [
+   "sci-fi",
+   "space"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "shooter"
+  ],
+  "view": "top-down",
+  "words": [
+   "chest",
+   "cache",
+   "loot",
+   "container",
+   "pod",
+   "locker",
+   "treasure",
+   "open",
+   "reward",
+   "credits",
+   "rarity",
+   "metal",
+   "tech"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  30
+ ],
+ "preview": "closed",
+ "styles": [
+  "pixel"
+ ],
+ "palette": [
+  {
+   "id": "body",
+   "label": "Body",
+   "default": "#6b7896",
+   "material": "metal",
+   "swatches": [
+    "#6b7896",
+    "#566182",
+    "#434d6d",
+    "#3f6fd1",
+    "#2fb3a8",
+    "#4f9ff0"
+   ]
+  },
+  {
+   "id": "accent",
+   "label": "Bar colour",
+   "default": "#f2a030",
+   "material": "paint",
+   "swatches": [
+    "#f2a030",
+    "#5fe0f0",
+    "#9fe040",
+    "#f0ead8",
+    "#b48af8",
+    "#f2c230"
+   ]
+  },
+  {
+   "id": "glow",
+   "label": "Light",
+   "default": "#5fe0f0",
+   "material": "light",
+   "swatches": [
+    "#5fe0f0",
+    "#e2473f",
+    "#9fe040",
+    "#f2a030",
+    "#b48af8",
+    "#4f9ff0",
+    "#5fd47a"
+   ]
+  },
+  {
+   "id": "shine",
+   "default": "#ffffff",
+   "material": "light",
+   "detail": true
+  }
+ ],
+ "controls": [
+  {
+   "key": "size",
+   "kind": "range",
+   "label": "Size",
+   "lo": "Small",
+   "hi": "Big",
+   "default": 0.5
+  },
+  {
+   "key": "style",
+   "kind": "choice",
+   "label": "Style",
+   "options": [
+    "cache",
+    "pod",
+    "locker"
+   ],
+   "default": "cache"
+  },
+  {
+   "key": "lid",
+   "kind": "range",
+   "label": "Lid",
+   "lo": "Flat",
+   "hi": "Domed",
+   "default": 0.5
+  },
+  {
+   "key": "stripes",
+   "kind": "choice",
+   "label": "Rarity bars",
+   "options": [
+    "none",
+    "one",
+    "two"
+   ],
+   "default": "one"
+  },
+  {
+   "key": "body",
+   "kind": "colour",
+   "label": "Body"
+  },
+  {
+   "key": "accent",
+   "kind": "colour",
+   "label": "Bar colour",
+   "when": {
+    "stripes": [
+     "one",
+     "two"
+    ]
+   }
+  },
+  {
+   "key": "glow",
+   "kind": "colour",
+   "label": "Light"
+  },
+  {
+   "key": "speed",
+   "standard": "speed"
+  }
+ ],
+ "body": {
+  "pictures": {
+   "nodes": [],
+   "draw": [
+    {
+     "id": "cache",
+     "gen": "cache",
+     "v": 1,
+     "at": [
+      16,
+      30
+     ],
+     "style": {
+      "from": "style",
+      "pick": {
+       "cache": "cache",
+       "pod": "pod",
+       "locker": "locker"
+      }
+     },
+     "size": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "lid": {
+      "from": "lid",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "stripes": {
+      "from": "stripes",
+      "pick": {
+       "none": "none",
+       "one": "one",
+       "two": "two"
+      }
+     },
+     "body": "body",
+     "accent": "accent",
+     "inner": "glow",
+     "shine": "shine",
+     "clip": [
+      "closed"
+     ]
+    },
+    {
+     "id": "cache-open",
+     "gen": "cache",
+     "v": 1,
+     "at": [
+      16,
+      30
+     ],
+     "style": {
+      "from": "style",
+      "pick": {
+       "cache": "cache",
+       "pod": "pod",
+       "locker": "locker"
+      }
+     },
+     "size": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "lid": {
+      "from": "lid",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "stripes": {
+      "from": "stripes",
+      "pick": {
+       "none": "none",
+       "one": "one",
+       "two": "two"
+      }
+     },
+     "body": "body",
+     "accent": "accent",
+     "inner": "glow",
+     "shine": "shine",
+     "clip": [
+      "open"
+     ],
+     "apart": [
+      0,
+      0,
+      0.25,
+      1.25,
+      0.8,
+      1.05,
+      1,
+      1
+     ],
+     "lift": [
+      0,
+      0,
+      1,
+      0
+     ],
+     "wide": [
+      0,
+      1,
+      0
+     ],
+     "inside": [
+      0,
+      0,
+      1,
+      1,
+      2,
+      2,
+      2,
+      2
+     ],
+     "lamp": [
+      1,
+      2,
+      2,
+      2,
+      1,
+      1,
+      1,
+      1
+     ],
+     "flare": [
+      0,
+      1,
+      1,
+      1,
+      0
+     ],
+     "beam": [
+      0,
+      0,
+      0,
+      1,
+      0.95,
+      0.85,
+      0.8,
+      0.75
+     ],
+     "hot": [
+      0,
+      0,
+      0,
+      1,
+      0
+     ],
+     "phase": [
+      0,
+      0.25,
+      0.5,
+      0.75,
+      1,
+      1.25,
+      1.5,
+      1.75
+     ],
+     "prize": [
+      -1,
+      -1,
+      -1,
+      -1,
+      -1,
+      2,
+      1,
+      0
+     ]
+    },
+    {
+     "id": "cache-empty",
+     "gen": "cache",
+     "v": 1,
+     "at": [
+      16,
+      30
+     ],
+     "style": {
+      "from": "style",
+      "pick": {
+       "cache": "cache",
+       "pod": "pod",
+       "locker": "locker"
+      }
+     },
+     "size": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "lid": {
+      "from": "lid",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "stripes": {
+      "from": "stripes",
+      "pick": {
+       "none": "none",
+       "one": "one",
+       "two": "two"
+      }
+     },
+     "body": "body",
+     "accent": "accent",
+     "inner": "glow",
+     "shine": "shine",
+     "clip": [
+      "empty"
+     ],
+     "apart": [
+      1
+     ],
+     "inside": [
+      0
+     ],
+     "lamp": [
+      0
+     ]
+    },
+    {
+     "kind": "outline",
+     "paint": "ink"
+    },
+    {
+     "id": "status",
+     "gen": "cache",
+     "v": 1,
+     "at": [
+      16,
+      30
+     ],
+     "style": {
+      "from": "style",
+      "pick": {
+       "cache": "cache",
+       "pod": "pod",
+       "locker": "locker"
+      }
+     },
+     "size": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "lid": {
+      "from": "lid",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "stripes": {
+      "from": "stripes",
+      "pick": {
+       "none": "none",
+       "one": "one",
+       "two": "two"
+      }
+     },
+     "body": "body",
+     "accent": "accent",
+     "inner": "glow",
+     "shine": "shine",
+     "clip": [
+      "closed"
+     ],
+     "layer": "light",
+     "lamp": [
+      2,
+      1,
+      1,
+      0.5,
+      0,
+      0,
+      0,
+      0.5
+     ]
+    },
+    {
+     "id": "beam",
+     "gen": "cache",
+     "v": 1,
+     "at": [
+      16,
+      30
+     ],
+     "style": {
+      "from": "style",
+      "pick": {
+       "cache": "cache",
+       "pod": "pod",
+       "locker": "locker"
+      }
+     },
+     "size": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "lid": {
+      "from": "lid",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "stripes": {
+      "from": "stripes",
+      "pick": {
+       "none": "none",
+       "one": "one",
+       "two": "two"
+      }
+     },
+     "body": "body",
+     "accent": "accent",
+     "inner": "glow",
+     "shine": "shine",
+     "clip": [
+      "open"
+     ],
+     "apart": [
+      0,
+      0,
+      0.25,
+      1.25,
+      0.8,
+      1.05,
+      1,
+      1
+     ],
+     "lift": [
+      0,
+      0,
+      1,
+      0
+     ],
+     "wide": [
+      0,
+      1,
+      0
+     ],
+     "inside": [
+      0,
+      0,
+      1,
+      1,
+      2,
+      2,
+      2,
+      2
+     ],
+     "lamp": [
+      1,
+      2,
+      2,
+      2,
+      1,
+      1,
+      1,
+      1
+     ],
+     "flare": [
+      0,
+      1,
+      1,
+      1,
+      0
+     ],
+     "beam": [
+      0,
+      0,
+      0,
+      1,
+      0.95,
+      0.85,
+      0.8,
+      0.75
+     ],
+     "hot": [
+      0,
+      0,
+      0,
+      1,
+      0
+     ],
+     "phase": [
+      0,
+      0.25,
+      0.5,
+      0.75,
+      1,
+      1.25,
+      1.5,
+      1.75
+     ],
+     "prize": [
+      -1,
+      -1,
+      -1,
+      -1,
+      -1,
+      2,
+      1,
+      0
+     ],
+     "layer": "light"
+    },
+    {
+     "id": "status-empty",
+     "gen": "cache",
+     "v": 1,
+     "at": [
+      16,
+      30
+     ],
+     "style": {
+      "from": "style",
+      "pick": {
+       "cache": "cache",
+       "pod": "pod",
+       "locker": "locker"
+      }
+     },
+     "size": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "lid": {
+      "from": "lid",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "stripes": {
+      "from": "stripes",
+      "pick": {
+       "none": "none",
+       "one": "one",
+       "two": "two"
+      }
+     },
+     "body": "body",
+     "accent": "accent",
+     "inner": "glow",
+     "shine": "shine",
+     "clip": [
+      "empty"
+     ],
+     "apart": [
+      1
+     ],
+     "inside": [
+      0
+     ],
+     "lamp": [
+      0
+     ],
+     "layer": "light"
+    }
+   ]
+  }
+ },
+ "clips": {
+  "closed": {
+   "frames": 8,
+   "fps": 8
+  },
+  "open": {
+   "frames": 8,
+   "fps": 12,
+   "loop": false,
+   "sounds": [
+    {
+     "sound": "door-hiss",
+     "preset": "Loot cache",
+     "frame": 0,
+     "volume": 0.8
+    },
+    {
+     "sound": "credit-pickup",
+     "preset": "Big payout",
+     "frame": 5,
+     "volume": 0.7
+    }
+   ]
+  },
+  "empty": {
+   "frames": 1,
+   "fps": 8
+  }
+ }
+}

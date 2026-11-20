@@ -1,0 +1,186 @@
+{
+ "id": "potion",
+ "frozen": "2026-11-20",
+ "source": "sprites/potion.js",
+ "sha256": "32293beba85043267d154ffff0390e9d6e3798c3445b8f0e17da1444037552ae",
+ "name": "Potion",
+ "blurb": "A corked bottle of bubbling potion. Change the bottle, how full it is, the bubbles, the liquid and the glass.",
+ "meta": {
+  "type": "pickup",
+  "role": "items/food",
+  "themes": [
+   "fantasy",
+   "forest",
+   "dungeon"
+  ],
+  "gameTypes": [
+   "platformer",
+   "arcade",
+   "roguelike-action"
+  ],
+  "view": "front",
+  "words": [
+   "potion",
+   "bottle",
+   "flask",
+   "vial",
+   "elixir",
+   "drink",
+   "heal",
+   "health",
+   "magic",
+   "collect",
+   "pickup",
+   "power up",
+   "glass"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  30
+ ],
+ "grounded": false,
+ "preview": "idle",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "shape": {
+   "kind": "choice",
+   "label": "Shape",
+   "def": "round",
+   "options": [
+    "round",
+    "tall",
+    "flask",
+    "vial"
+   ],
+   "group": "Look"
+  },
+  "level": {
+   "kind": "range",
+   "label": "Fill",
+   "def": 0.7,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Low",
+   "hi": "Full",
+   "group": "Look"
+  },
+  "bubbles": {
+   "kind": "toggle",
+   "label": "Bubbles",
+   "def": true,
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Liquid",
+   "def": "#c9423a",
+   "swatches": [
+    "#c9423a",
+    "#e08a2c",
+    "#4fd8ee",
+    "#7a4fc4",
+    "#a4c44a",
+    "#3f6fd1"
+   ],
+   "group": "Colors",
+   "material": "signal"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Glass",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#8fd0f0",
+    "#c2c9d6",
+    "#9bd18a",
+    "#7fb0b8"
+   ],
+   "group": "Colors"
+  },
+  "bob": {
+   "kind": "range",
+   "label": "Float",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Still",
+   "hi": "Floaty",
+   "group": "Motion"
+  },
+  "pop": {
+   "kind": "range",
+   "label": "Pop height",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Low",
+   "hi": "High",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "collect": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    9,
+    15,
+    20
+   ]
+  }
+ },
+ "sounds": {
+  "collect": [
+   {
+    "sound": "powerup",
+    "preset": "1-up",
+    "frame": 1,
+    "volume": 0.7
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-platformer-fantasy"
+ ]
+}

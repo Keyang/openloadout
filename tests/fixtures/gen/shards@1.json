@@ -1,0 +1,348 @@
+{
+ "id": "shards",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "count": 6,
+    "seed": 2,
+    "paint": "s1"
+   },
+   "ctx": {
+    "t": 0.3,
+    "loop": false
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      16,
+      22
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a"
+     ],
+     "key": {
+      "a": "s1"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      19,
+      12
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aa"
+     ],
+     "key": {
+      "a": "s1"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      10,
+      14
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a.",
+      "aa"
+     ],
+     "key": {
+      "a": "s1"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      22,
+      17
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a",
+      "a"
+     ],
+     "key": {
+      "a": "s1"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      15,
+      9
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".a",
+      "aa",
+      ".a"
+     ],
+     "key": {
+      "a": "s1"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      19,
+      11
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a"
+     ],
+     "key": {
+      "a": "s1"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     24,
+     20
+    ],
+    "count": 8,
+    "seed": 4,
+    "dist": 18,
+    "gravity": 10,
+    "size": 6,
+    "angle": 180,
+    "arc": 200,
+    "spin": 2,
+    "paint": "g1"
+   },
+   "ctx": {
+    "t": 0.6,
+    "loop": false
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      11,
+      19
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aa"
+     ],
+     "key": {
+      "a": "g1"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      30,
+      18
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a",
+      "a",
+      "a"
+     ],
+     "key": {
+      "a": "g1"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      29,
+      12
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a.",
+      "aa"
+     ],
+     "key": {
+      "a": "g1"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      17,
+      15
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aa",
+      "aa",
+      ".a",
+      ".a"
+     ],
+     "key": {
+      "a": "g1"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      22,
+      10
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aa",
+      ".a"
+     ],
+     "key": {
+      "a": "g1"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      23,
+      12
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".a.",
+      "aaa",
+      "a.."
+     ],
+     "key": {
+      "a": "g1"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      17,
+      16
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aa",
+      "aa",
+      "a."
+     ],
+     "key": {
+      "a": "g1"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      18,
+      14
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..a",
+      "aa."
+     ],
+     "key": {
+      "a": "g1"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "count": 5,
+    "seed": 7,
+    "size": 2,
+    "begin": 0.2,
+    "end": 0.8,
+    "paint": "s2"
+   },
+   "ctx": {
+    "t": 1,
+    "loop": false
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      16,
+      30
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a"
+     ],
+     "key": {
+      "a": "s2.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      21,
+      25
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a"
+     ],
+     "key": {
+      "a": "s2.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      4,
+      24
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a"
+     ],
+     "key": {
+      "a": "s2.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      23,
+      13
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a"
+     ],
+     "key": {
+      "a": "s2.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      17,
+      13
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a"
+     ],
+     "key": {
+      "a": "s2.dark"
+     }
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,156 @@
+{
+ "id": "damage.digits",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "body": "body",
+    "edge": "edge"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      10,
+      9
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..aaaaaaaa.",
+      ".abccccccca",
+      "aabddddddca",
+      "aabddddddca",
+      "aabddaaddca",
+      "aabddaaddca",
+      "aabddaaddca",
+      "aabddaaddca",
+      "aabddaaddca",
+      "aabddddddca",
+      "aabddddddca",
+      "aabbbbbbbba",
+      "aaaaaaaaaa.",
+      ".aaaaaaaa.."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "tone",
+       "of": "edge",
+       "by": -1
+      },
+      "c": "edge",
+      "d": "body"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "picture": "miss",
+    "style": "rounded",
+    "slant": true,
+    "shadow": false,
+    "size": 1,
+    "body": "body",
+    "edge": "edge"
+   },
+   "ctx": {
+    "frame": 1
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      9,
+      9
+     ],
+     "anchor": "tl",
+     "rows": [
+      "........aaaa.",
+      ".....aaabccca",
+      "...aabcccddca",
+      ".aabccdddddca",
+      "abccdddddcbba",
+      "abddddcbbbaa.",
+      "abbbbccccccca",
+      ".aaabddddddca",
+      ".abccccccbbba",
+      ".abdddddcaaa.",
+      ".abbbbbbba...",
+      "..aaaaaaa...."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "tone",
+       "of": "edge",
+       "by": -1
+      },
+      "c": "edge",
+      "d": "body"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     0,
+     0
+    ],
+    "picture": "digit-7",
+    "style": "slim",
+    "size": 0,
+    "body": "body",
+    "edge": "edge"
+   },
+   "ctx": {
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      -5,
+      -7
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..aaaaaa.",
+      ".abccccca",
+      "aabddddca",
+      "aabbbbdca",
+      "aaaaabdca",
+      ".aaaabdca",
+      "...aabdca",
+      "...aabdca",
+      "...aabdca",
+      "...aabdca",
+      "...aabdca",
+      "...aabbba",
+      "...aaaaa.",
+      "....aaa.."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "tone",
+       "of": "edge",
+       "by": -1
+      },
+      "c": "edge",
+      "d": "body"
+     }
+    }
+   ]
+  }
+ ]
+}

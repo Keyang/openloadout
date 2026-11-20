@@ -1,0 +1,175 @@
+{
+ "id": "spring-pad",
+ "frozen": "2026-11-20",
+ "source": "sprites/spring-pad.js",
+ "sha256": "3fed38575ba5c95b5aa0a23affba8b5ad1f9b3418fc4649add08e88c86a25bf5",
+ "name": "Spring pad",
+ "blurb": "A pad on a coil spring that launches whoever lands on it; change the pad (plate, leaf or drum), its width and height, the number of coils, the colours and how far it stretches.",
+ "meta": {
+  "type": "prop",
+  "role": "world/platform",
+  "themes": [
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "platformer"
+  ],
+  "view": "side",
+  "words": [
+   "spring",
+   "pad",
+   "bounce",
+   "trampoline",
+   "launch",
+   "jump",
+   "bouncer",
+   "coil",
+   "springboard",
+   "boing",
+   "leaf",
+   "drum"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  30
+ ],
+ "grounded": true,
+ "preview": "idle",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "plate",
+   "options": [
+    "plate",
+    "leaf",
+    "drum"
+   ],
+   "group": "Look"
+  },
+  "width": {
+   "kind": "range",
+   "label": "Width",
+   "def": 0.6,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Narrow",
+   "hi": "Wide",
+   "group": "Look"
+  },
+  "height": {
+   "kind": "range",
+   "label": "Height",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Short",
+   "hi": "Tall",
+   "group": "Look"
+  },
+  "coils": {
+   "kind": "range",
+   "label": "Coils",
+   "def": 3,
+   "min": 2,
+   "max": 4,
+   "step": 1,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Pad",
+   "def": "#3f6fd1",
+   "swatches": [
+    "#3f6fd1",
+    "#3f8a4f",
+    "#7a4fc4",
+    "#a06a3c",
+    "#e08a2c",
+    "#4f9d57"
+   ],
+   "group": "Colors"
+  },
+  "metal": {
+   "kind": "color",
+   "label": "Spring",
+   "def": "#c2c9d6",
+   "swatches": [
+    "#c2c9d6",
+    "#f2c230",
+    "#8f97a8",
+    "#5d6475",
+    "#e6c545",
+    "#c98a4a"
+   ],
+   "group": "Colors"
+  },
+  "bounce": {
+   "kind": "range",
+   "label": "Bounce",
+   "def": 0.75,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Calm",
+   "hi": "Bouncy",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "bounce": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  }
+ },
+ "sounds": {
+  "bounce": [
+   {
+    "sound": "spring-boing",
+    "preset": "Spring pad",
+    "frame": 1,
+    "volume": 0.8
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-platformer-fantasy"
+ ]
+}

@@ -1,0 +1,256 @@
+{
+ "id": "input-key-wide",
+ "frozen": "2026-11-20",
+ "source": "sprites/input-key-wide.js",
+ "sha256": "720b489ad87d3b8a79aa1b4e47bad0704cd8bbdb982615c890c6a32eff65ea4c",
+ "name": "Wide keyboard key",
+ "blurb": "A wide keyboard key or a space bar for \"press this\" prompts that sinks and lights up when tapped; change its shape, picture (return, back, tab, shift), length, corners, depth and colours.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/icon",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "arcade",
+   "platformer",
+   "puzzle",
+   "shooter"
+  ],
+  "view": "none",
+  "words": [
+   "key",
+   "keyboard",
+   "space bar",
+   "enter",
+   "return",
+   "shift",
+   "tab",
+   "backspace",
+   "press",
+   "tap",
+   "prompt",
+   "input"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  64,
+  32
+ ],
+ "pivot": [
+  32,
+  16
+ ],
+ "grounded": false,
+ "preview": "tap",
+ "params": {
+  "shape": {
+   "kind": "choice",
+   "label": "Shape",
+   "def": "wide",
+   "options": [
+    {
+     "value": "wide",
+     "label": "Wide"
+    },
+    {
+     "value": "long",
+     "label": "Long"
+    }
+   ],
+   "group": "Look"
+  },
+  "mark": {
+   "kind": "choice",
+   "label": "Picture",
+   "def": "enter",
+   "options": [
+    {
+     "value": "none",
+     "label": "None"
+    },
+    {
+     "value": "enter",
+     "label": "Return"
+    },
+    {
+     "value": "back",
+     "label": "Back"
+    },
+    {
+     "value": "tab",
+     "label": "Tab"
+    },
+    {
+     "value": "shift",
+     "label": "Shift"
+    }
+   ],
+   "group": "Look",
+   "when": {
+    "shape": [
+     "wide"
+    ]
+   }
+  },
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "corner": {
+   "kind": "range",
+   "label": "Corner",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Square",
+   "hi": "Round",
+   "group": "Look"
+  },
+  "depth": {
+   "kind": "range",
+   "label": "Depth",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Flat",
+   "hi": "Deep",
+   "group": "Look"
+  },
+  "light": {
+   "kind": "toggle",
+   "label": "Light up",
+   "def": true,
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Key top",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#c2c9d6",
+    "#f6d3b0",
+    "#9bd18a",
+    "#e6c96a"
+   ],
+   "group": "Colors"
+  },
+  "frame": {
+   "kind": "color",
+   "label": "Key side",
+   "def": "#5d6475",
+   "swatches": [
+    "#5d6475",
+    "#7a4f33",
+    "#3f5068",
+    "#7a4fc4",
+    "#434d6d"
+   ],
+   "group": "Colors"
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Light",
+   "def": "#f2c230",
+   "swatches": [
+    "#f2c230",
+    "#4fd8ee",
+    "#a4c44a",
+    "#8fd0f0"
+   ],
+   "group": "Colors",
+   "when": {
+    "light": [
+     true
+    ]
+   }
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "up": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "down": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "tap": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    8,
+    12
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [
+  {
+   "name": "Enter key",
+   "params": {}
+  },
+  {
+   "name": "Space bar",
+   "params": {
+    "shape": "long"
+   }
+  },
+  {
+   "name": "Shift",
+   "params": {
+    "mark": "shift"
+   }
+  },
+  {
+   "name": "Back, dark",
+   "params": {
+    "mark": "back",
+    "body": "#c2c9d6",
+    "frame": "#434d6d"
+   }
+  },
+  {
+   "name": "Tab, flat",
+   "params": {
+    "mark": "tab",
+    "depth": 0,
+    "corner": 0
+   }
+  }
+ ],
+ "bundles": []
+}

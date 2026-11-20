@@ -1,0 +1,576 @@
+{
+ "id": "tiles-dungeon",
+ "frozen": "2026-11-20",
+ "source": "sprites/tiles-dungeon.js",
+ "sha256": "70757403d23d47bbd2ee5267510b50dac12d47a07ddc70b9c0c88d5f05373145",
+ "name": "Dungeon tiles",
+ "blurb": "Flagstone floors, dark walls with a brick face, pits and stairs for top-down dungeon rooms and corridors; change the stone, floor and slime colours, the paving, the kerb, how worn and how damp it is.",
+ "meta": {
+  "type": "tileset",
+  "role": "world/tile",
+  "themes": [
+   "fantasy",
+   "dungeon"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "top-down-rpg"
+  ],
+  "view": "top-down",
+  "words": [
+   "dungeon",
+   "floor",
+   "flagstones",
+   "wall",
+   "bricks",
+   "pit",
+   "hole",
+   "stairs",
+   "corridor",
+   "room",
+   "crypt",
+   "cellar",
+   "explore",
+   "underground"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "wall-bottom",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "slabs",
+   "options": [
+    "slabs",
+    "bricks",
+    "cobbles"
+   ],
+   "group": "Look"
+  },
+  "edge": {
+   "kind": "range",
+   "label": "Edge",
+   "def": 5,
+   "min": 3,
+   "max": 9,
+   "step": 1,
+   "lo": "Thin",
+   "hi": "Deep",
+   "group": "Look"
+  },
+  "texture": {
+   "kind": "range",
+   "label": "Texture",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Plain",
+   "hi": "Busy",
+   "group": "Look"
+  },
+  "wear": {
+   "kind": "range",
+   "label": "Wear",
+   "def": 0.35,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "New",
+   "hi": "Worn",
+   "group": "Look"
+  },
+  "damp": {
+   "kind": "toggle",
+   "label": "Damp",
+   "def": false,
+   "group": "Look"
+  },
+  "stone": {
+   "kind": "color",
+   "label": "Stone",
+   "def": "#5a5f7a",
+   "swatches": [
+    "#5a5f7a",
+    "#8e3a4a",
+    "#357a4c",
+    "#7a4fc4"
+   ],
+   "group": "Colors"
+  },
+  "floor": {
+   "kind": "color",
+   "label": "Floor",
+   "def": "#7e84a0",
+   "swatches": [
+    "#7e84a0",
+    "#a8a4a0",
+    "#c9a06a",
+    "#e6c96a"
+   ],
+   "group": "Colors"
+  },
+  "growth": {
+   "kind": "color",
+   "label": "Slime and moss",
+   "def": "#4f9d57",
+   "swatches": [
+    "#4f9d57",
+    "#7fbf5a",
+    "#357a4c",
+    "#e6c96a",
+    "#c8553a"
+   ],
+   "group": "Colors"
+  }
+ },
+ "clips": {
+  "floor-fill": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "floor-fill-b": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "floor-fill-c": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "wall-left": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-top": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-right": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-side-l": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-fill": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-side-r": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-bottom-l": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-bottom": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-bottom-r": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-inner-tl": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-inner-tr": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-inner-bl": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-inner-br": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-strip-l": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-strip-m": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-strip-r": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-col-t": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-col-m": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-col-b": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "wall-single": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "pit-left": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "pit-top": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "pit-right": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "pit-side-l": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "pit-fill": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "pit-side-r": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "pit-bottom-l": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "pit-bottom": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "pit-bottom-r": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "pit-inner-tl": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "pit-inner-tr": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "pit-inner-bl": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "pit-inner-br": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "pit-strip-l": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "pit-strip-m": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "pit-strip-r": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "pit-col-t": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "pit-col-m": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "pit-col-b": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "pit-single": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "stairs-down": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "stairs-up": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "floor-deco-a": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "floor-deco-b": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "floor-deco-c": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [],
+ "bundles": [
+  "kit-rpg-fantasy"
+ ]
+}

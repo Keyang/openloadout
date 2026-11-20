@@ -1,0 +1,271 @@
+{
+ "id": "ui-bars-crystal",
+ "frozen": "2026-11-20",
+ "source": "sprites/ui-bars-crystal.js",
+ "sha256": "fe6c06ba628fe82dc6b33f990fc4d6a777993805569104eb6febe7c3266a3776",
+ "name": "Crystal bars and slider",
+ "blurb": "A bar housing in a tube of cut crystal lit like a bevel, with three fill strips (health, mana, a gauge), a white flash, a slider track and its knob; change the style, corners, band, glints and colours.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/bar",
+  "themes": [
+   "neutral",
+   "fantasy"
+  ],
+  "gameTypes": [
+   "arcade",
+   "turn-based-rpg",
+   "puzzle",
+   "top-down-rpg"
+  ],
+  "view": "none",
+  "words": [
+   "bar",
+   "health",
+   "mana",
+   "slider",
+   "meter",
+   "progress",
+   "crystal",
+   "ice",
+   "frost",
+   "frozen"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  64,
+  16
+ ],
+ "pivot": [
+  32,
+  8
+ ],
+ "grounded": false,
+ "preview": "frame",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "ice",
+   "options": [
+    {
+     "value": "ice",
+     "label": "Ice"
+    },
+    {
+     "value": "rime",
+     "label": "Rime"
+    },
+    {
+     "value": "shard",
+     "label": "Shard"
+    }
+   ],
+   "group": "Look"
+  },
+  "corner": {
+   "kind": "range",
+   "label": "Corner",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Square",
+   "hi": "Round",
+   "group": "Look"
+  },
+  "border": {
+   "kind": "range",
+   "label": "Border",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Thin",
+   "hi": "Thick",
+   "group": "Look"
+  },
+  "glints": {
+   "kind": "toggle",
+   "label": "Glints",
+   "def": true,
+   "group": "Look"
+  },
+  "frame": {
+   "kind": "color",
+   "label": "Crystal",
+   "def": "#8fd0f0",
+   "swatches": [
+    "#8fd0f0",
+    "#9bd18a",
+    "#5fe0f0",
+    "#7fe0a0"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Sparkles and frost tips",
+   "def": "#4fd8ee",
+   "swatches": [
+    "#4fd8ee",
+    "#c9423a",
+    "#a4c44a",
+    "#b48af8",
+    "#f4e06a"
+   ],
+   "group": "Colors",
+   "when": [
+    {
+     "glints": [
+      true
+     ]
+    },
+    {
+     "style": [
+      "rime"
+     ]
+    }
+   ]
+  },
+  "fill": {
+   "kind": "color",
+   "label": "Health",
+   "def": "#6aa83e",
+   "swatches": [
+    "#6aa83e",
+    "#3f8a4f",
+    "#c9423a",
+    "#e08a2c",
+    "#4fd8ee",
+    "#f2c230"
+   ],
+   "group": "Colors"
+  },
+  "fillB": {
+   "kind": "color",
+   "label": "Magic",
+   "def": "#3f6fd1",
+   "swatches": [
+    "#3f6fd1",
+    "#3f9fd1",
+    "#4fd8ee",
+    "#8fd0f0",
+    "#4f9ff0"
+   ],
+   "group": "Colors"
+  },
+  "fillC": {
+   "kind": "color",
+   "label": "Gauge",
+   "def": "#f2c230",
+   "swatches": [
+    "#f2c230",
+    "#e08a2c",
+    "#a4c44a",
+    "#a06a3c",
+    "#c2c9d6"
+   ],
+   "group": "Colors"
+  }
+ },
+ "clips": {
+  "frame": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "fill": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "fill-b": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "fill-c": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "flash": {
+   "frames": 4,
+   "loop": false,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "slider": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "knob": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [
+  {
+   "name": "Ice bars",
+   "params": {}
+  },
+  {
+   "name": "Frost ends",
+   "params": {
+    "style": "rime",
+    "accent": "#c9423a",
+    "frame": "#5fe0f0",
+    "border": 1
+   }
+  },
+  {
+   "name": "Shard, plain",
+   "params": {
+    "style": "shard",
+    "glints": false,
+    "frame": "#9bd18a",
+    "border": 1
+   }
+  },
+  {
+   "name": "Mint",
+   "params": {
+    "frame": "#7fe0a0",
+    "fill": "#4fd8ee"
+   }
+  }
+ ],
+ "bundles": []
+}

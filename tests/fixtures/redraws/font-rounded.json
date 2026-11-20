@@ -1,0 +1,201 @@
+{
+ "id": "font-rounded",
+ "frozen": "2026-11-20",
+ "source": "sprites/font-rounded.js",
+ "sha256": "f7869f716ac8416cfbf53858d62c4074248eaef4583d68f55267d73bc3f3dd17",
+ "name": "Rounded pixel letters",
+ "blurb": "Chunky capitals, small letters, digits and punctuation with every corner taken off, one per 16x20 cell on a shared baseline (trim the empty columns on the right for proportional spacing); change the size, outline, shadow, shine and colours.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/icon",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "arcade",
+   "puzzle",
+   "platformer",
+   "turn-based-rpg"
+  ],
+  "view": "none",
+  "words": [
+   "font",
+   "letters",
+   "alphabet",
+   "text",
+   "round",
+   "soft",
+   "cute",
+   "pixel"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  16,
+  20
+ ],
+ "pivot": [
+  4,
+  13
+ ],
+ "grounded": false,
+ "preview": "upper",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "outline": {
+   "kind": "choice",
+   "label": "Outline",
+   "def": "ink",
+   "options": [
+    {
+     "value": "none",
+     "label": "None"
+    },
+    {
+     "value": "ink",
+     "label": "Ink"
+    },
+    {
+     "value": "rimmed",
+     "label": "Rimmed"
+    }
+   ],
+   "group": "Look"
+  },
+  "shadow": {
+   "kind": "toggle",
+   "label": "Shadow",
+   "def": false,
+   "group": "Look"
+  },
+  "shine": {
+   "kind": "toggle",
+   "label": "Shine",
+   "def": false,
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Letters",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#f2c230",
+    "#8fd0f0",
+    "#9bd18a",
+    "#f6d3b0",
+    "#c2c9d6"
+   ],
+   "group": "Colors"
+  },
+  "edge": {
+   "kind": "color",
+   "label": "Rim",
+   "def": "#3f5068",
+   "swatches": [
+    "#3f5068",
+    "#c9423a",
+    "#3f6fd1",
+    "#7a4fc4",
+    "#3f8a4f",
+    "#7a4f33"
+   ],
+   "group": "Colors",
+   "when": {
+    "outline": [
+     "rimmed"
+    ]
+   }
+  }
+ },
+ "clips": {
+  "upper": {
+   "frames": 26,
+   "loop": true,
+   "fps": [
+    2,
+    2,
+    2
+   ]
+  },
+  "lower": {
+   "frames": 26,
+   "loop": true,
+   "fps": [
+    2,
+    2,
+    2
+   ]
+  },
+  "digits": {
+   "frames": 10,
+   "loop": true,
+   "fps": [
+    2,
+    2,
+    2
+   ]
+  },
+  "marks": {
+   "frames": 18,
+   "loop": true,
+   "fps": [
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [
+  {
+   "name": "Ink letters",
+   "params": {}
+  },
+  {
+   "name": "Candy title",
+   "params": {
+    "size": 1,
+    "outline": "rimmed",
+    "body": "#f6d3b0",
+    "edge": "#c9423a",
+    "shine": true
+   }
+  },
+  {
+   "name": "Small sky",
+   "params": {
+    "size": 0,
+    "body": "#8fd0f0"
+   }
+  },
+  {
+   "name": "Plain gold",
+   "params": {
+    "outline": "none",
+    "body": "#f2c230",
+    "size": 1
+   }
+  },
+  {
+   "name": "Mint shadow",
+   "params": {
+    "body": "#9bd18a",
+    "shadow": true,
+    "outline": "rimmed",
+    "edge": "#7a4f33"
+   }
+  }
+ ],
+ "bundles": []
+}

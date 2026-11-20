@@ -1,0 +1,244 @@
+{
+ "id": "icons-materials",
+ "frozen": "2026-11-20",
+ "source": "sprites/icons-materials.js",
+ "sha256": "9668038c949394b38e303e9a652969a090d7908980cad5f0c200fda7f55e4a46",
+ "name": "Material icons",
+ "blurb": "Eight raw-material icons: log, planks, stone, ore, ingot, a bolt of cloth, rope and a hide; change their size, tilt, shading, shine and the colours of the wood, stone, metal and cloth.",
+ "meta": {
+  "type": "icon",
+  "role": "items/icon",
+  "themes": [
+   "neutral",
+   "farm",
+   "fantasy"
+  ],
+  "gameTypes": [
+   "farming-sim",
+   "top-down-rpg",
+   "roguelike-action",
+   "arcade"
+  ],
+  "view": "none",
+  "words": [
+   "material",
+   "resource",
+   "log",
+   "planks",
+   "stone",
+   "ore",
+   "ingot",
+   "cloth",
+   "rope",
+   "hide",
+   "crafting",
+   "craft",
+   "build",
+   "mine"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "ingot",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "tilt": {
+   "kind": "toggle",
+   "label": "Tilt",
+   "def": true,
+   "group": "Look"
+  },
+  "shade": {
+   "kind": "toggle",
+   "label": "Extra shading",
+   "def": true,
+   "group": "Look"
+  },
+  "shine": {
+   "kind": "toggle",
+   "label": "Shine",
+   "def": true,
+   "group": "Look"
+  },
+  "wood": {
+   "kind": "color",
+   "label": "Wood",
+   "def": "#a06a3c",
+   "swatches": [
+    "#a06a3c",
+    "#7a4f33",
+    "#a8612a",
+    "#c98a4a",
+    "#f0ead8"
+   ],
+   "group": "Colors"
+  },
+  "stone": {
+   "kind": "color",
+   "label": "Stone",
+   "def": "#8f97a8",
+   "swatches": [
+    "#8f97a8",
+    "#5d6475",
+    "#6b7280",
+    "#a8a4a0"
+   ],
+   "group": "Colors"
+  },
+  "metal": {
+   "kind": "color",
+   "label": "Metal",
+   "def": "#c2c9d6",
+   "swatches": [
+    "#c2c9d6",
+    "#f2c230",
+    "#e6c545",
+    "#a8806a",
+    "#c9423a"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Cloth and hide",
+   "def": "#3f6fd1",
+   "swatches": [
+    "#3f6fd1",
+    "#7a4fc4",
+    "#3f8a4f",
+    "#e08a2c",
+    "#a4c44a"
+   ],
+   "group": "Colors",
+   "material": "cloth"
+  }
+ },
+ "clips": {
+  "log": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "plank": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "stone": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "ore": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "ingot": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "cloth": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "rope": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "hide": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [
+  {
+   "name": "Workshop",
+   "params": {}
+  },
+  {
+   "name": "Upright",
+   "params": {
+    "tilt": false
+   }
+  },
+  {
+   "name": "Copper and dark wood",
+   "params": {
+    "metal": "#a8806a",
+    "wood": "#7a4f33"
+   }
+  },
+  {
+   "name": "Gold ore, red cloth",
+   "params": {
+    "metal": "#f2c230",
+    "accent": "#e08a2c"
+   }
+  },
+  {
+   "name": "Plain and big",
+   "params": {
+    "size": 1,
+    "shade": false,
+    "stone": "#5d6475"
+   }
+  }
+ ],
+ "bundles": []
+}

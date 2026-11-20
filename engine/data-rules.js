@@ -23,6 +23,15 @@
 //                                                  every whole-bundle look (B15b)
 //     textureLight { of, against?, from? }         engine/tiles.js textureLight(of, against, from): the light tone, the
 //                                                  same way, searched from `from` (0.1..1) of the way to the light (B15b)
+//     faceTone  { of, face: top|wall, tone: light|base|dark|deep }   engine/solids.js faceRamps(of): the faces of a
+//                                                  solid lit from above, a pale colour's top in itself (migration M3)
+//     stoneShade { of, with, start? }              engine/paving.js stoneShade(of, with, start): the first mix of a
+//                                                  paving towards its joint colour, from `start` (default 0.4) in steps
+//                                                  of 0.15, that every whole-bundle look keeps apart from it (M5)
+//     lifted    { of, against, beside }          engine/look-tones.js lifted: of lifted until it keeps 3 to 1 against
+//                                                  `against` under every look and 0.1 from `beside` (name plate, M9)
+//     grey      { of }                           engine/look-tones.js grey (engine/ui.js desaturate) (M9)
+//     ifLight   { of, above, then, else }        `then` when brightness(of) > above, else `else` (M9)
 // The checks (names, arguments, ranges, references, depth) are catalog/studio-schema.js's; this module evaluates and
 // never throws: anything it cannot read paints FALLBACK.
 //
@@ -32,6 +41,10 @@ import { tone, ramp, mix, pick } from './color.js';
 import { bandTone } from './tones.js';
 import { apart } from '../rigs/humanoid-figure.js';
 import { textureTone, textureLight } from './tiles.js';   // build item B15b: the tilesets' texture tones (tiles.js does not import this module)
+import { faceRamps } from './solids.js';   // migration batch M3: faceTone, the faces of a solid lit from above (solids.js does not import this module)
+import { stoneShade } from './paving.js';   // migration batch M5: stoneShade, a paving's darker stones and joints (paving.js does not import this module)
+import { hueTone, hued, HUE_TONES } from './hue-tones.js';   // migration batch M4: hueTone and hued, the tool and material icons' tones in their own hue
+import { lifted, grey, ifLight } from './look-tones.js';   // migration batch M9: lifted, grey and ifLight, what the interface code sprites read from a colour's numbers (look-tones.js does not import this module at load)
 
 const HEX = /^#[0-9a-fA-F]{6}$/;
 const isObj = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
@@ -62,6 +75,14 @@ export const COLOUR_RULES = Object.freeze({
   choose: Object.freeze({ about: 'One of two colours by the settings: then while they match when (as a control\'s when reads them), else otherwise.', args: Object.freeze({ when: arg('when'), then: arg('colour'), else: arg('colour') }) }),
   textureTone: Object.freeze({ about: 'The dark tone marks in a colour (joints, grain, blades) are painted in, kept apart from against (default the colour) under every whole-bundle look: engine/tiles.js textureTone.', args: Object.freeze({ of: arg('colour'), against: arg('colour', { optional: true }) }) }),
   textureLight: Object.freeze({ about: 'The light tone marks in a colour (glints, wet streaks, tips) are painted in, kept apart from against (default the colour) under every whole-bundle look, searched from `from` of the way to its light: engine/tiles.js textureLight.', args: Object.freeze({ of: arg('colour'), against: arg('colour', { optional: true }), from: arg('number', { min: 0.1, max: 1, optional: true }) }) }),
+  faceTone: Object.freeze({ about: 'One tone of the top or the wall of a solid lit from above: the top a step lighter than the colour, or, for a colour too pale for that, the top in the colour and the wall a step darker: engine/solids.js faceRamps.', args: Object.freeze({ of: arg('colour'), face: arg('word', { values: Object.freeze(['top', 'wall']) }), tone: arg('word', { values: Object.freeze(['light', 'base', 'dark', 'deep']) }) }) }),   // migration batch M3
+  // migration batch M5 (review round 2): the argument is `start`, not `from`, because a paint holding `from` reads as a binding
+  hueTone: Object.freeze({ about: 'One tone of a colour that keeps its hue, changing only its lightness (light, base, mid, dark, deep), so a brown never turns red in its shadow: engine/hue-tones.js hueTone.', args: Object.freeze({ of: arg('colour'), tone: arg('word', { values: HUE_TONES }) }) }),   // migration batch M4
+  hued: Object.freeze({ about: 'A colour moved lighter or darker in its own hue by the least that parts it by gap points of lightness (0 to 100) from each colour it lies next to: engine/hue-tones.js hued.', args: Object.freeze({ of: arg('colour'), against: arg('colours', { most: 4 }), gap: arg('number', { min: 0, max: 100, optional: true }) }) }),   // migration batch M4
+  stoneShade: Object.freeze({ about: 'A stone a shade darker than its paving, or a joint: the first mix of the colour towards with (its joint colour), from start (default 0.4) in steps of 0.15, that every whole-bundle look keeps apart from the colour; with itself when none is: engine/paving.js stoneShade.', args: Object.freeze({ of: arg('colour'), with: arg('colour'), start: arg('number', { min: 0.1, max: 1, optional: true }) }) }),
+  lifted: Object.freeze({ about: 'A colour lifted (lighter, same hue) in steps of 0.15 until it keeps 3 to 1 contrast against `against` under every whole-bundle look and sits 0.1 in brightness from `beside`; else the first that keeps 3 to 1: tests/fixtures/code-sprites/ui-name-plate.js litBand (engine/look-tones.js lifted).', args: Object.freeze({ of: arg('colour'), against: arg('colour'), beside: arg('colour') }) }),   // migration batch M9
+  grey: Object.freeze({ about: 'The grey of the same brightness as a colour (a disabled button or card): engine/ui.js desaturate (engine/look-tones.js grey).', args: Object.freeze({ of: arg('colour') }) }),   // migration batch M9
+  ifLight: Object.freeze({ about: 'One of two colours by how light a third is: then when its brightness is above `above` (0 to 1), else `else` (a pale face shaded darker, not lighter): engine/look-tones.js ifLight.', args: Object.freeze({ of: arg('colour'), above: arg('number', { min: 0, max: 1 }), then: arg('colour'), else: arg('colour') }) }),   // migration batch M9
 });
 
 /**
@@ -147,6 +168,16 @@ function evaluate(e, v, depth) {
     }
     case 'textureTone': { const c = of(); return textureTone(c, e.against === undefined ? c : evaluate(e.against, v, depth + 1)); }
     case 'textureLight': { const c = of(); return textureLight(c, e.against === undefined ? c : evaluate(e.against, v, depth + 1), n(e.from, 1)); }
+    case 'faceTone': {   // migration batch M3: engine/solids.js faceRamps; the top has no deep tone, so deep there is its dark
+      const R = faceRamps(of()), t = ['light', 'base', 'dark', 'deep'].includes(e.tone) ? e.tone : 'base';
+      return e.face === 'top' ? R.top[t === 'deep' ? 'dark' : t] : R.wall[t];
+    }
+    case 'hueTone': return hueTone(of(), HUE_TONES.includes(e.tone) ? e.tone : 'base');   // migration batch M4
+    case 'hued': return Array.isArray(e.against) && e.against.length ? hued(of(), e.against.map((x) => evaluate(x, v, depth + 1)), n(e.gap, 20)) : FALLBACK;   // migration batch M4
+    case 'stoneShade': return stoneShade(of(), evaluate(e.with, v, depth + 1), n(e.start, 0.4));   // migration batch M5
+    case 'lifted': return lifted(of(), evaluate(e.against, v, depth + 1), evaluate(e.beside, v, depth + 1));   // migration batch M9
+    case 'grey': return grey(of());   // migration batch M9
+    case 'ifLight': return evaluate(ifLight(of(), n(e.above, 0.5), e.then, e.else), v, depth + 1);   // migration batch M9
     case 'choose': return evaluate(whenMatches(isObj(e.when) || Array.isArray(e.when) ? e.when : { '': [] }, v) ? e.then : e.else, v, depth + 1);
     default: return FALLBACK;
   }

@@ -1,0 +1,356 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "signpost",
+ "name": "Signpost",
+ "blurb": "A wooden sign on a post with a picture mark and no words. Change its build, which way it points, its picture, height, moss and wear.",
+ "meta": {
+  "type": "prop",
+  "role": "world/prop",
+  "themes": [
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "platformer"
+  ],
+  "view": "side",
+  "words": [
+   "sign",
+   "signpost",
+   "post",
+   "board",
+   "arrow",
+   "direction",
+   "point",
+   "wobble",
+   "warning",
+   "tutorial",
+   "hint",
+   "wooden",
+   "mossy"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  48
+ ],
+ "pivot": [
+  16,
+  46
+ ],
+ "preview": "idle",
+ "styles": [
+  "pixel"
+ ],
+ "palette": [
+  {
+   "id": "wood",
+   "label": "Wood",
+   "default": "#a06a3c",
+   "material": "wood",
+   "swatches": [
+    "#a06a3c",
+    "#7a4f33",
+    "#f0ead8",
+    "#a8612a",
+    "#5a3a22",
+    "#c98a4a"
+   ]
+  },
+  {
+   "id": "moss",
+   "default": "#a4c44a",
+   "material": "plant",
+   "detail": true
+  },
+  {
+   "id": "chain",
+   "default": "#5d6475",
+   "material": "metal",
+   "detail": true
+  },
+  {
+   "id": "cream",
+   "default": "#f0ead8",
+   "material": "paint",
+   "detail": true
+  },
+  {
+   "id": "picture",
+   "material": "paint",
+   "derive": {
+    "rule": "standOut",
+    "against": "wood",
+    "from": [
+     "cream",
+     {
+      "rule": "tone",
+      "of": "wood",
+      "by": -2.2
+     }
+    ]
+   }
+  }
+ ],
+ "controls": [
+  {
+   "key": "style",
+   "kind": "choice",
+   "label": "Style",
+   "options": [
+    "arrow",
+    "board",
+    "hanging"
+   ],
+   "default": "arrow"
+  },
+  {
+   "key": "points",
+   "kind": "choice",
+   "label": "Points",
+   "options": [
+    "right",
+    "left",
+    "both"
+   ],
+   "default": "right"
+  },
+  {
+   "key": "mark",
+   "kind": "choice",
+   "label": "Picture",
+   "options": [
+    {
+     "value": "none",
+     "label": "None"
+    },
+    {
+     "value": "arrow",
+     "label": "Arrow"
+    },
+    {
+     "value": "skull",
+     "label": "Skull"
+    },
+    {
+     "value": "exclaim",
+     "label": "Warning"
+    }
+   ],
+   "default": "none"
+  },
+  {
+   "key": "height",
+   "kind": "range",
+   "label": "Height",
+   "lo": "Short",
+   "hi": "Tall",
+   "default": 0.5
+  },
+  {
+   "key": "mossy",
+   "kind": "toggle",
+   "label": "Mossy",
+   "default": false
+  },
+  {
+   "key": "wood",
+   "kind": "colour",
+   "label": "Wood"
+  },
+  {
+   "key": "wear",
+   "kind": "range",
+   "label": "Wear",
+   "lo": "New",
+   "hi": "Worn",
+   "default": 0.25
+  },
+  {
+   "key": "speed",
+   "standard": "speed"
+  }
+ ],
+ "body": {
+  "pictures": {
+   "nodes": [],
+   "draw": [
+    {
+     "id": "sign",
+     "gen": "signpost",
+     "v": 1,
+     "clip": [
+      "idle"
+     ],
+     "at": [
+      16,
+      46
+     ],
+     "style": {
+      "from": "style",
+      "pick": {
+       "arrow": "arrow",
+       "board": "board",
+       "hanging": "hanging"
+      }
+     },
+     "points": {
+      "from": "points",
+      "pick": {
+       "right": "right",
+       "left": "left",
+       "both": "both"
+      }
+     },
+     "mark": {
+      "from": "mark",
+      "pick": {
+       "none": "none",
+       "arrow": "arrow",
+       "skull": "skull",
+       "exclaim": "exclaim"
+      }
+     },
+     "tall": {
+      "from": "height",
+      "map": [
+       [
+        0,
+        22
+       ],
+       [
+        1,
+        38
+       ]
+      ],
+      "round": "px"
+     },
+     "mossy": {
+      "from": "mossy",
+      "pick": {
+       "true": true,
+       "false": false
+      }
+     },
+     "wear": {
+      "from": "wear",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "wood": "wood",
+     "moss": "moss",
+     "chain": "chain",
+     "markPaint": "picture"
+    },
+    {
+     "id": "sign-wobble",
+     "gen": "signpost",
+     "v": 1,
+     "clip": [
+      "wobble"
+     ],
+     "at": [
+      16,
+      46
+     ],
+     "style": {
+      "from": "style",
+      "pick": {
+       "arrow": "arrow",
+       "board": "board",
+       "hanging": "hanging"
+      }
+     },
+     "points": {
+      "from": "points",
+      "pick": {
+       "right": "right",
+       "left": "left",
+       "both": "both"
+      }
+     },
+     "mark": {
+      "from": "mark",
+      "pick": {
+       "none": "none",
+       "arrow": "arrow",
+       "skull": "skull",
+       "exclaim": "exclaim"
+      }
+     },
+     "tall": {
+      "from": "height",
+      "map": [
+       [
+        0,
+        22
+       ],
+       [
+        1,
+        38
+       ]
+      ],
+      "round": "px"
+     },
+     "mossy": {
+      "from": "mossy",
+      "pick": {
+       "true": true,
+       "false": false
+      }
+     },
+     "wear": {
+      "from": "wear",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "sway": [
+      0,
+      0.13,
+      -0.09,
+      0.05,
+      -0.02,
+      0
+     ],
+     "wood": "wood",
+     "moss": "moss",
+     "chain": "chain",
+     "markPaint": "picture"
+    },
+    {
+     "kind": "outline",
+     "paint": "ink"
+    }
+   ]
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 1,
+   "fps": 8
+  },
+  "wobble": {
+   "frames": 6,
+   "fps": 12,
+   "loop": false
+  }
+ }
+}

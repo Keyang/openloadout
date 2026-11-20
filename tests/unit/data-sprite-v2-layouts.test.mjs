@@ -136,7 +136,7 @@ test('a body with no layout is refused, naming its build item and the file that 
   assert.deepEqual({ ...NOT_BUILT_BODIES }, { tiles: 'B15', layers: 'B14', panel: 'B13', emitters: 'B12' });
   const r = makeDataSprite(loadV2('hit-spark'), opts({}));
   assert.equal(r.ok, false);
-  assert.match(r.errors[0], /emitters body is not built yet; build item B12.*engine\/gen\/fx\.js.*family "layout".*id "emitters"/);
+  assert.match(r.errors[0], /emitters body is not built yet; build item B12.*engine\/gen\/emitters\.js.*family "layout".*id "emitters"/);
 });
 
 test('a layout that throws or gives no list makes render throw, naming the sprite, clip and frame', () => {

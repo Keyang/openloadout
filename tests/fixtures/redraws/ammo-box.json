@@ -1,0 +1,228 @@
+{
+ "id": "ammo-box",
+ "frozen": "2026-11-20",
+ "source": "sprites/ammo-box.js",
+ "sha256": "38b86c06b4ebf538412c2099f3c38db1ae35294053c9373229375efbf83eace0",
+ "name": "Ammo pack",
+ "blurb": "A floating pack of ammunition: a box of rounds, a magazine or a row of shotgun shells. Change the kind, how many rounds show, its size, sparkle and colours.",
+ "meta": {
+  "type": "pickup",
+  "role": "items/pickup",
+  "themes": [
+   "neutral",
+   "sci-fi",
+   "city"
+  ],
+  "gameTypes": [
+   "shooter",
+   "arcade",
+   "roguelike-action",
+   "platformer"
+  ],
+  "view": "front",
+  "words": [
+   "ammo",
+   "ammunition",
+   "bullets",
+   "rounds",
+   "magazine",
+   "clip",
+   "shells",
+   "cartridges",
+   "reload",
+   "collect",
+   "pickup",
+   "brass",
+   "gun"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  30
+ ],
+ "grounded": false,
+ "preview": "idle",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "shape": {
+   "kind": "choice",
+   "label": "Shape",
+   "def": "box",
+   "options": [
+    {
+     "value": "box",
+     "label": "Box"
+    },
+    {
+     "value": "clip",
+     "label": "Clip"
+    },
+    {
+     "value": "shells",
+     "label": "Shells"
+    }
+   ],
+   "group": "Look"
+  },
+  "load": {
+   "kind": "range",
+   "label": "Rounds",
+   "def": 4,
+   "min": 2,
+   "max": 6,
+   "step": 1,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "sparkle": {
+   "kind": "toggle",
+   "label": "Sparkle",
+   "def": true,
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Box",
+   "def": "#3f8a4f",
+   "swatches": [
+    "#3f8a4f",
+    "#9bd18a",
+    "#7a4fc4",
+    "#c9423a",
+    "#7a4f33",
+    "#3f9fd1",
+    "#5d6475",
+    "#6b7896"
+   ],
+   "group": "Colors",
+   "material": "paint"
+  },
+  "metal": {
+   "kind": "color",
+   "label": "Brass",
+   "def": "#f2c230",
+   "swatches": [
+    "#f2c230",
+    "#c2c9d6",
+    "#8f97a8",
+    "#e6c545",
+    "#c98a4a"
+   ],
+   "group": "Colors"
+  },
+  "bob": {
+   "kind": "range",
+   "label": "Float",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Still",
+   "hi": "Floaty",
+   "group": "Motion"
+  },
+  "pop": {
+   "kind": "range",
+   "label": "Pop height",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Low",
+   "hi": "High",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "collect": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    9,
+    15,
+    20
+   ]
+  }
+ },
+ "sounds": {
+  "collect": [
+   {
+    "sound": "ammo-pickup",
+    "preset": "Bullets",
+    "frame": 1,
+    "volume": 0.7
+   }
+  ]
+ },
+ "versions": [
+  {
+   "name": "Ammo crate",
+   "params": {}
+  },
+  {
+   "name": "Magazine",
+   "params": {
+    "shape": "clip",
+    "body": "#5d6475"
+   }
+  },
+  {
+   "name": "Shotgun shells",
+   "params": {
+    "shape": "shells",
+    "body": "#c9423a"
+   }
+  },
+  {
+   "name": "Full load",
+   "params": {
+    "load": 6,
+    "size": 0.8
+   }
+  },
+  {
+   "name": "Station issue",
+   "params": {
+    "body": "#6b7896",
+    "metal": "#c2c9d6"
+   }
+  }
+ ],
+ "bundles": []
+}

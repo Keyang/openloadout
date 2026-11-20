@@ -4,6 +4,7 @@
 import { rng } from './motion.js';
 import { styleFor, cleanStyles, pixelsOf } from './styles.js';   // styles.js imports this file too; neither uses the other until a call
 import { MATERIAL_IDS } from './materials.js';
+import { WHEN_BOUNDS, whenValueHolds } from './data-rules.js';   // build item F3: a `when` entry read by the one rule (values and thresholds); data-rules.js reaches this file only through calls
 import { cleanVersions } from './versions.js';                    // ready-made versions; versions.js imports this file too, neither uses the other until a call                     // what a colour can be of (Contract 7); it imports nothing
 
 // ---- parameter kinds -------------------------------------------------------
@@ -11,7 +12,8 @@ import { cleanVersions } from './versions.js';                    // ready-made 
 // `hi` are shown as written, so use plain words ("Short" / "Tall").
 // A control that only matters sometimes says so in its options: `when: { otherKey: [values] }`
 // means "in effect only while otherKey is at one of these values" (every listed key must match).
-// `when` may also be a list of such objects: any one of them is enough.
+// `when` may also be a list of such objects: any one of them is enough. For a slider an entry may be a threshold,
+// `when: { wear: [{ atLeast: 0.5 }] }` ("wear >= 0.5"; atLeast, above, atMost, below: Contract 3).
 // A choice whose options were renamed lists the old names: `was: { false: 'none', true: 'plain' }`,
 // so links made before the change still open with the right option.
 // Two options tell a whole-bundle look (engine/theme.js, Contract 7) what a control is, where it cannot tell by itself:
@@ -158,6 +160,7 @@ function cleanWhenOne(def, when, where, self) {
     const values = Array.isArray(raw) ? raw : [raw];
     if (!values.length) throw new Error(`${where}: when lists "${k}" with no values; give at least one`);
     for (const v of values) {
+      if (v !== null && typeof v === 'object' && !Array.isArray(v)) { const bad = thresholdProblem(v, d, k); if (bad) throw new Error(`${where}: ${bad}`); continue; }   // a threshold on a slider (F3)
       const ok = d.kind === 'choice' ? d.options.some((o) => o.value === v)
         : d.kind === 'toggle' ? typeof v === 'boolean'
           : d.kind === 'range' ? typeof v === 'number' && v >= d.min && v <= d.max
@@ -169,16 +172,55 @@ function cleanWhenOne(def, when, where, self) {
   return out;
 }
 
+/**
+ * What is wrong with a threshold in a `when` list (Contract 3; build items B15b, F3), or '' when nothing is: the one check
+ * catalog/sprite-schema.js and defineSprite share. On a slider (d.kind 'range'), { atLeast?, above?, atMost?, below? }
+ * with at least one bound, at most one lower and one upper, each a number inside the slider's range, able to hold for
+ * some value of it. Arguments: x (the threshold), d (the control it names), key (that control's key, for the words).
+ */
+export function thresholdProblem(x, d, key) {
+  const words = `${WHEN_BOUNDS.slice(0, -1).join(', ')} or ${WHEN_BOUNDS[WHEN_BOUNDS.length - 1]}`;
+  const say = (v) => JSON.stringify(v) ?? String(v);
+  if (!d || d.kind !== 'range') return `when lists a threshold ${say(x)} for "${key}"; a threshold is for a slider (a number), and "${key}" is not one`;
+  const keys = Object.keys(x), odd = keys.filter((b) => !WHEN_BOUNDS.includes(b));
+  if (!keys.length || odd.length) return `a threshold for "${key}" is { ${WHEN_BOUNDS.map((b) => `${b}?`).join(', ')} } with at least one of ${words}${odd.length ? `; ${odd.slice(0, 4).map((b) => `"${b}"`).join(', ')} is not one` : ''}`;
+  for (const b of WHEN_BOUNDS) {
+    if (!Object.hasOwn(x, b)) continue;
+    if (typeof x[b] !== 'number' || !Number.isFinite(x[b])) return `a threshold's ${b} for "${key}" must be a number; got ${say(x[b])}`;
+    if (x[b] < d.min || x[b] > d.max) return `when lists the threshold ${b} ${x[b]} for "${key}", outside its range; it takes a number from ${d.min} to ${d.max}`;
+  }
+  if (keys.includes('atLeast') && keys.includes('above')) return `a threshold for "${key}" gives one lower bound (atLeast or above), not both`;
+  if (keys.includes('atMost') && keys.includes('below')) return `a threshold for "${key}" gives one upper bound (atMost or below), not both`;
+  const lo = x.atLeast ?? x.above ?? d.min, hi = x.atMost ?? x.below ?? d.max;
+  if (lo > hi || (lo === hi && (keys.includes('above') || keys.includes('below')))) return `the threshold ${say(x)} for "${key}" can never hold ("${key}" takes a number from ${d.min} to ${d.max})`;
+  return '';
+}
+
+/**
+ * A setting that meets one entry of a `when` list, for building a setting where a control is in effect (quality/sprite.js):
+ * a plain value as it is; a threshold at the middle of its bounds, clamped to the slider's range and put on its step
+ * when a step value still meets it. Arguments: entry, d (the slider the threshold names).
+ */
+export function whenEntryValue(entry, d) {
+  if (entry === null || typeof entry !== 'object' || Array.isArray(entry)) return entry;
+  const min = d?.min ?? 0, max = d?.max ?? 1, step = d?.step > 0 ? d.step : 0;
+  const lo = Math.max(min, entry.atLeast ?? entry.above ?? min), hi = Math.min(max, entry.atMost ?? entry.below ?? max);
+  const mid = (lo + hi) / 2;
+  const onStep = (v) => +(min + Math.round((v - min) / step) * step).toFixed(10);
+  const tries = step ? [onStep(mid), onStep(lo), onStep(lo + step), onStep(hi), onStep(hi - step), mid] : [mid];
+  return tries.find((v) => v >= min && v <= max && whenValueHolds(entry, v)) ?? mid;
+}
+
 const alternatives = (when) => (when ? (Array.isArray(when) ? when : [when]) : []);
 const whenKeys = (when) => [...new Set(alternatives(when).flatMap((alt) => Object.keys(alt)))];
 
 /**
- * True when a `when` holds: one alternative has every listed control at one of its values, and each of those
+ * True when a `when` holds: one alternative has every listed control at one of its values or thresholds (engine/data-rules.js whenValueHolds), and each of those
  * controls is itself in effect (a control hidden by its own `when`, or by its part, cannot switch another on).
  */
 function whenHolds(sprite, when, p, trail) {
   if (!when) return true;
-  return alternatives(when).some((alt) => Object.entries(alt).every(([k, values]) => (Array.isArray(values) ? values : [values]).includes(p[k]) && effective(sprite, k, p, trail)));
+  return alternatives(when).some((alt) => Object.entries(alt).every(([k, values]) => (Array.isArray(values) ? values : [values]).some((v) => whenValueHolds(v, p[k])) && effective(sprite, k, p, trail)));
 }
 
 /** What a control depends on: the controls its `when` names, and the selector of the part it belongs to. */

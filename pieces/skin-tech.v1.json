@@ -1,0 +1,109 @@
+{
+ "format": "loadout-piece",
+ "version": 1,
+ "id": "skin:tech",
+ "v": 1,
+ "name": "Tech",
+ "about": "Station interface pieces: a dark plate inside a lit metal band with cut corners, its trough near black; solid, segmented into compartments, or slanted.",
+ "slots": [
+  {
+   "id": "face",
+   "label": "Plate",
+   "default": "#2a2f45",
+   "material": "interface"
+  },
+  {
+   "id": "frame",
+   "label": "Frame",
+   "default": "#6b7896",
+   "material": "interface"
+  },
+  {
+   "id": "accent",
+   "label": "Light",
+   "default": "#4fd8ee",
+   "material": "interface"
+  },
+  {
+   "id": "fill",
+   "label": "Fill",
+   "default": "#6aa83e",
+   "material": "interface"
+  },
+  {
+   "id": "shine",
+   "label": "Shine",
+   "default": "#ffffff",
+   "material": "light"
+  }
+ ],
+ "made": {
+  "from": "engine/ui.js (techBarHousing, techBarFill)"
+ },
+ "body": {
+  "paint": {
+   "face": "face",
+   "frame": "frame",
+   "accent": "accent",
+   "line": "frame",
+   "ledge": "frame.dark",
+   "knob": "frame",
+   "fill": "fill",
+   "shine": "shine",
+   "divider": "ink"
+  },
+  "args": {
+   "*": {
+    "rings": [
+     "ink",
+     "frame",
+     "ink"
+    ],
+    "bandAt": 1,
+    "lit": true,
+    "edge": "cut",
+    "hoverFace": 0.1,
+    "hoverBand": 0.45
+   },
+   "ui.strip": {
+    "gloss": true,
+    "shadow": true
+   },
+   "ui.trough": {
+    "trough": "ink"
+   }
+  },
+  "styles": {
+   "solid": {
+    "*": {
+     "edge": "cut"
+    }
+   },
+   "segmented": {
+    "*": {
+     "edge": "cut"
+    }
+   },
+   "slanted": {
+    "*": {
+     "edge": "chip"
+    }
+   }
+  },
+  "states": {
+   "normal": {
+    "lip": 2
+   },
+   "hover": {
+    "lip": 2
+   },
+   "pressed": {
+    "lip": 0
+   },
+   "disabled": {
+    "lip": 2,
+    "desaturate": 1
+   }
+  }
+ }
+}

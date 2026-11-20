@@ -128,6 +128,7 @@ import { pieceRegistry, sitePieces } from './pieces.js';
 import { swatches as paletteSwatches } from './palettes.js';
 import { MATERIAL_IDS } from './materials.js';
 import * as SITE_GENERATORS from './gen/index.js';
+import { amountKeyed, emitterCall } from './gen/emit-keys.js';
 
 // The top-down helpers live with the format in catalog/studio-schema.js (since studio item S4b); passed on from here
 // because the studio's templates and pages reach them through this module.
@@ -286,6 +287,7 @@ function baseOf(definition, speed) {
   for (const [name, c] of Object.entries(definition.clips)) {
     const fps = c.fps;
     clips[name] = { frames: c.frames, loop: c.loop, label: c.label, fps: speed ? (p) => fps * lerp(0.65, 1.45, fin(p?.speed) ? p.speed : 0.5) : fps };
+    if (c.noText === true) clips[name].noText = true;   // migration batch M9: no text goes on this clip (engine/ui.js contrastFaults, engine/sheet-info.js)
     if (c.sounds?.length) sounds[name] = c.sounds.map((s) => ({ ...s }));
   }
   return {
@@ -477,7 +479,8 @@ function slotSwatches(slot, hex) {
     let list = [];
     if (typeof s === 'string') list = [s.toLowerCase()];
     else if (isObj(s)) { try { list = paletteSwatches(s.palette, s.family, s.lead === undefined ? {} : { lead: s.lead }); } catch { list = []; } }
-    for (const c of list) if (!out.includes(c) && out.length < 8) out.push(c);
+    // the slot's colour and every listed swatch: the schema takes up to SPRITE_LIMITS.swatches (16) a slot (batch M6)
+    for (const c of list) if (!out.includes(c) && out.length <= 16) out.push(c);
   }
   return out;
 }
@@ -736,18 +739,6 @@ function withPer(draw, per) {
   return at < 0 ? [...draw, ...per] : [...draw.slice(0, at), ...per, ...draw.slice(at)];
 }
 
-/** The ids of emitters that some clip's keys give an `amount`: each is off wherever no key gives it an amount above 0 (see EMITTERS in the header). */
-function amountKeyed(R) {
-  const ids = new Set();
-  for (const c of Object.values(isObj(R.clips) ? R.clips : {})) {
-    for (const k of Array.isArray(c?.keys) ? c.keys : []) {
-      if (!isObj(k?.emit)) continue;
-      for (const [id, e] of Object.entries(k.emit)) if (isObj(e) && e.amount !== undefined) ids.add(id);
-    }
-  }
-  return ids;
-}
-
 /**
  * The built-in layout of a `pictures` body (docs/data-sprites.md 2.5d), used while the registry holds no layout
  * "pictures" (build item B8 registers one from engine/gen/pictures.js, which may call this). A layout function as LAYOUTS
@@ -792,19 +783,13 @@ export function picturesLayout(input, ctx) {
   palette = x.palette;
   groups.push(input.place(x.primitives, frames));
   // emitters (EMITTERS in the header): one that some clip's keys give an amount draws only while it is above 0 here;
-  // one no key gives an amount always draws (its `when` and `clip` still decide)
+  // one no key gives an amount always draws (its `when` and `clip` still decide); the rules are engine/gen/emit-keys.js's,
+  // which hold an amount to 0..1 (build item B12c)
   const keyed = amountKeyed(R);
   const emits = [];
   for (const e of Array.isArray(P.emitters) ? P.emitters : []) {
-    const k = own(pose.emit, e.id);
-    if (keyed.has(e.id) && !(k && fin(k.amount) && k.amount > 0)) continue;
-    const call = { ...e };
-    const entry = typeof gen?.generator === 'function' ? gen.generator(e.gen, e.v) : null;
-    for (const [f, v] of Object.entries(k ?? {})) {
-      if (f === 'amount') { if (entry?.args && Object.hasOwn(entry.args, 'amount')) call.amount = Math.min(1, v); continue; }
-      call[f] = Array.isArray(v) ? [...v] : v;
-    }
-    emits.push(call);
+    const call = emitterCall(e, own(pose.emit, e?.id), keyed, gen);
+    if (call) emits.push(call);
   }
   if (emits.length) {
     const y = input.expand(emits);
@@ -835,7 +820,7 @@ function pictureSockets(R, out) {
 // -- layouts: how a body other than a rig becomes a frame's draw list (LAYOUTS in the header) ----------------------
 
 /** The file each not-yet-built body's layout is registered from (docs/data-sprites.md section 9, the Owns column). */
-const LAYOUT_FILES = Object.freeze({ tiles: 'engine/gen/tiles.js', layers: 'engine/gen/backdrop.js', panel: 'engine/gen/ui.js', emitters: 'engine/gen/fx.js' });
+const LAYOUT_FILES = Object.freeze({ tiles: 'engine/gen/tiles.js', layers: 'engine/gen/backdrop.js', panel: 'engine/gen/ui.js', emitters: 'engine/gen/emitters.js' });
 
 /** An error that already names the sprite, clip and frame (passed on unwrapped). */
 class FrameError extends Error {}
@@ -955,6 +940,7 @@ function buildV2(value, opts = {}) {
     clips[name] = { frames: c.frames, loop: c.loop, label: c.label, fps: speed ? (p) => fps * lerp(0.65, 1.45, fin(p?.speed) ? p.speed : 0.5) : fps };
     // a tile's block kind and a decal's place, as engine/tiles.js blockClips and decoClips leave them (build item B15)
     for (const f of ['block', 'place']) if (typeof c[f] === 'string') clips[name][f] = c[f];
+    if (c.noText === true) clips[name].noText = true;   // migration batch M9: no text goes on this clip (engine/ui.js contrastFaults, engine/sheet-info.js)
   }
   const noClip = (clip) => new Error(`sprite ${id}: no clip "${String(clip).slice(0, 40)}"`);
   const frameOf = (clip, t, frame, p) => {

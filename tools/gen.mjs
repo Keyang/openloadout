@@ -90,6 +90,12 @@ export const SAMPLE_ARGS = Object.freeze({
   token: () => ({ size: 16 }),
   // three copies along the row, not one
   row: () => ({ count: 3 }),
+  // migration batch M10's scenery stands on a ground row of a 320 x 180 layer by default: in a cell, a low ground and small things
+  'round.trees': () => ({ base: 30, count: 2, tall: 20, vary: 4 }),
+  towers: () => ({ base: 30, count: 2 }),
+  'rail.fence': () => ({ base: 28, posts: 4, height: 8 }),
+  'tall.trees': () => ({ foot: 40, count: 2 }),
+  'castle.columns': () => ({ count: 2, spring: 8, shaft: 8, foot: 22 }),
 });
 /** A generator's own sample (SAMPLE_ARGS by id@v, else by id), or undefined. */
 const sampleOf = (entry) => SAMPLE_ARGS[entry.key] ?? SAMPLE_ARGS[entry.id];

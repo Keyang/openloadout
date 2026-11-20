@@ -1,0 +1,41 @@
+{ "format": "loadout-sprite",
+  "version": 2,
+  "id": "emote-bubbles",
+  "name": "Emote balloons",
+  "blurb": "Nine reaction marks (surprise, question, love, anger, nerves, sleep, a tune, delight, dizziness) in a small pale balloon with a tail that pops open from its tip and shrinks back into it; change the mark, the balloon's shape, tail and size, and the colours.",
+  "meta": {"type": "ui", "role": "interface/icon", "themes": ["neutral"], "gameTypes": ["arcade", "top-down-rpg", "farming-sim", "puzzle"], "view": "none", "words": ["emote", "balloon", "bubble", "reaction", "heart", "question", "angry", "dizzy", "chat"], "license": "draft"},
+  "size": [32,32],
+  "pivot": [16,30],
+  "grounded": false,
+  "preview": "idle",
+  "styles": ["pixel"],
+  "palette": [
+  {"id": "body", "label": "Balloon", "default": "#f0ead8", "material": "paint", "swatches": ["#f0ead8", "#f6d3b0", "#c2c9d6", "#9bd18a", "#e6c96a"]},
+  {"id": "frame", "label": "Line", "default": "#3f5068", "material": "interface", "swatches": ["#3f5068", "#7a4f33", "#434d6d", "#8e3a4a"]},
+  {"id": "accent", "label": "Mark", "default": "#3f6fd1", "material": "interface", "swatches": ["#3f6fd1", "#c9423a", "#7a4fc4", "#3f8a4f", "#3f9fd1"]} ],
+  "controls": [
+  {"key": "emote", "kind": "choice", "label": "Emote", "options": [{"value": "exclaim", "label": "Exclamation"}, "question", "heart", "anger", "sweat", "sleep", "music", {"value": "spark", "label": "Delight"}, {"value": "swirl", "label": "Dizzy"}], "default": "exclaim"},
+  {"key": "style", "kind": "choice", "label": "Balloon", "options": ["round", "cloud", "shout"], "default": "round"},
+  {"key": "tail", "kind": "choice", "label": "Tail", "options": ["left", "middle", "right"], "default": "middle"},
+  {"key": "size", "kind": "range", "label": "Size", "lo": "Small", "hi": "Big", "default": 0.5},
+  {"key": "body", "kind": "colour", "label": "Balloon"},
+  {"key": "frame", "kind": "colour", "label": "Line"},
+  {"key": "accent", "kind": "colour", "label": "Mark"},
+  {"key": "speed", "standard": "speed"} ],
+  "body": { "pictures": {
+    "nodes": [
+    {"id": "ui", "parent": null, "at": [16,16]} ],
+    "draw": [
+    {"gen": "emote.bubbles", "v": 1, "on": "ui", "at": [0,0], "clip": ["idle"], "picture": "idle", "emote": {"from": "emote", "pick": {"exclaim": "exclaim", "question": "question", "heart": "heart", "anger": "anger", "sweat": "sweat", "sleep": "sleep", "music": "music", "spark": "spark", "swirl": "swirl"}}, "style": {"from": "style", "pick": {"round": "round", "cloud": "cloud", "shout": "shout"}}, "tail": {"from": "tail", "pick": {"left": "left", "middle": "middle", "right": "right"}}, "size": {"from": "size", "map": [[0,0], [1,1]], "round": "none"}, "body": "body", "frame": "frame", "accent": "accent"},
+    {"gen": "emote.bubbles", "v": 1, "on": "ui", "at": [0,0], "clip": ["pop"], "picture": "pop", "emote": {"from": "emote", "pick": {"exclaim": "exclaim", "question": "question", "heart": "heart", "anger": "anger", "sweat": "sweat", "sleep": "sleep", "music": "music", "spark": "spark", "swirl": "swirl"}}, "style": {"from": "style", "pick": {"round": "round", "cloud": "cloud", "shout": "shout"}}, "tail": {"from": "tail", "pick": {"left": "left", "middle": "middle", "right": "right"}}, "size": {"from": "size", "map": [[0,0], [1,1]], "round": "none"}, "body": "body", "frame": "frame", "accent": "accent"},
+    {"gen": "emote.bubbles", "v": 1, "on": "ui", "at": [0,0], "clip": ["close"], "picture": "close", "emote": {"from": "emote", "pick": {"exclaim": "exclaim", "question": "question", "heart": "heart", "anger": "anger", "sweat": "sweat", "sleep": "sleep", "music": "music", "spark": "spark", "swirl": "swirl"}}, "style": {"from": "style", "pick": {"round": "round", "cloud": "cloud", "shout": "shout"}}, "tail": {"from": "tail", "pick": {"left": "left", "middle": "middle", "right": "right"}}, "size": {"from": "size", "map": [[0,0], [1,1]], "round": "none"}, "body": "body", "frame": "frame", "accent": "accent"} ] } },
+  "clips": {
+    "idle": {"frames": 8, "fps": 8, "label": "Showing"},
+    "pop": {"frames": 6, "fps": 12, "loop": false, "label": "Popping up", "sounds": [{"sound": "menu-bubble-open", "preset": "Pop-up", "frame": 0, "volume": 0.5}]},
+    "close": {"frames": 6, "fps": 12, "loop": false, "label": "Closing", "sounds": [{"sound": "menu-bubble-close", "preset": "Pop-up", "frame": 0, "volume": 0.5}]} },
+  "versions": [
+  {"name": "Surprise balloon", "params": {}},
+  {"name": "Love", "params": {"emote": "heart", "tail": "right", "accent": "#c9423a"}},
+  {"name": "Dizzy cloud", "params": {"emote": "swirl", "style": "cloud", "accent": "#7a4fc4"}},
+  {"name": "Angry shout", "params": {"emote": "anger", "style": "shout", "body": "#f6d3b0"}},
+  {"name": "Nervous", "params": {"emote": "sweat", "accent": "#3f9fd1", "body": "#c2c9d6", "tail": "left"}} ] }

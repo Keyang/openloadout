@@ -27,6 +27,8 @@ import { defineGenerator } from './registry.js';
 import { primitives } from './args.js';
 import { nodeFrame, placeOn } from '../draw-list.js';
 import { sceneItems } from '../resolve.js';
+import { amountKeyed, emitterCall } from './emit-keys.js';
+import { checkKeyedCost } from './emitters.js';
 
 const isObj = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
 const fin = (v) => typeof v === 'number' && Number.isFinite(v);
@@ -60,8 +62,16 @@ function runMotion(gen, call, ctx, warn) {
   });
 }
 
-/** The items with the motions' args ("<generator id>.<argument>") put into the keyable arguments of the calls of that generator on their node (MOTION ARGS above). */
-function keyedItems(items, byNode, gen) {
+/** Whether a motion's value v may replace w, what an emitter sets: numbers not above it (a size argument is lowered, never raised); anything else only when equal. */
+const notAbove = (v, w) => (fin(v) && fin(w) ? v <= w : v === w);
+
+/**
+ * The items with the motions' args ("<generator id>.<argument>") put into the keyable arguments of the calls of that
+ * generator on their node (MOTION ARGS above). For emitters (held): a size argument (the registry's SIZE_KEYS for the
+ * generator, every keyable argument when it has none, as catalog/sprite-schema.js prices them) is only lowered from
+ * what the emitter sets (or its default), never raised, so a motion cannot raise what the validator charged (B12c).
+ */
+function keyedItems(items, byNode, gen, held = false) {
   if (!byNode.size) return items;
   return items.map((item) => {
     if (!isObj(item) || typeof item.gen !== 'string') return item;
@@ -69,12 +79,18 @@ function keyedItems(items, byNode, gen) {
     if (!vals) return item;
     const entry = typeof gen?.generator === 'function' ? gen.generator(item.gen, item.v) : null;
     const keyable = Array.isArray(entry?.keyable) ? entry.keyable : [];
+    const table = held ? gen?.SIZE_KEYS?.[`${item.gen}@${item.v}`] : null;
+    const sized = !held ? [] : Array.isArray(table) ? table : keyable;
     let out = item;
     for (const [name, v] of Object.entries(vals)) {
       const dot = name.lastIndexOf('.');
       if (dot <= 0 || name.slice(0, dot) !== item.gen) continue;
       const k = name.slice(dot + 1);
       if (!keyable.includes(k)) continue;
+      if (sized.includes(k)) {
+        const set = Object.hasOwn(item, k) ? item[k] : entry?.args?.[k]?.default;
+        if (!notAbove(v, set)) continue;
+      }
       if (out === item) out = { ...item };
       out[k] = v;
     }
@@ -94,18 +110,6 @@ function withPer(draw, per) {
   if (!per.length) return draw;
   const at = draw.findIndex((p) => isObj(p) && p.kind === 'outline');
   return at < 0 ? [...draw, ...per] : [...draw.slice(0, at), ...per, ...draw.slice(at)];
-}
-
-/** The ids of emitters that some clip's keys give an `amount`: each is off wherever no key gives it an amount above 0. */
-function amountKeyed(R) {
-  const ids = new Set();
-  for (const c of Object.values(isObj(R.clips) ? R.clips : {})) {
-    for (const k of Array.isArray(c?.keys) ? c.keys : []) {
-      if (!isObj(k?.emit)) continue;
-      for (const [id, e] of Object.entries(k.emit)) if (isObj(e) && e.amount !== undefined) ids.add(id);
-    }
-  }
-  return ids;
 }
 
 const hasFit = (list) => list.some((x) => isObj(x) && x.gen === 'icon.fit');
@@ -155,19 +159,15 @@ function layout(input, ctx) {
   const x = input.expand(body);
   palette = { ...palette, ...x.palette };
   groups.push(input.place(x.primitives, frames));
-  // emitters: one that some clip's keys give an amount draws only while it is above 0 here; one on a node runs in frame pixels
+  // emitters (engine/gen/emit-keys.js, the rules the emitters layout reads): one that some clip's keys give an amount
+  // draws only while it is above 0 here, its amount held to 0..1; a motion lowers its size arguments, never raises
+  // them; one on a node runs in frame pixels; the frame's keyed calls are refused if over its budget before any runs
   const keyed = amountKeyed(R);
   const emits = [];
   for (const e of Array.isArray(P.emitters) ? P.emitters : []) {
-    const k = own(pose.emit, e.id);
-    if (keyed.has(e.id) && !(k && fin(k.amount) && k.amount > 0)) continue;
-    let call = { ...e };
-    const entry = typeof gen?.generator === 'function' ? gen.generator(e.gen, e.v) : null;
-    for (const [f, v] of Object.entries(k ?? {})) {
-      if (f === 'amount') { if (entry?.args && Object.hasOwn(entry.args, 'amount')) call.amount = Math.min(1, v); continue; }
-      call[f] = Array.isArray(v) ? [...v] : v;
-    }
-    [call] = keyedItems([call], byNode, gen);
+    let call = emitterCall(e, own(pose.emit, e?.id), keyed, gen);
+    if (!call) continue;
+    [call] = keyedItems([call], byNode, gen, true);
     if (typeof call.on === 'string') {
       const F = frames.get(call.on);
       if (!F) { warn(`the emitter "${String(call.id)}" is on "${call.on}", which this frame has not got; it is left out`); continue; }
@@ -176,6 +176,7 @@ function layout(input, ctx) {
     }
     emits.push(call);
   }
+  checkKeyedCost(emits, gen);
   if (emits.length) {
     const y = input.expand(emits);
     palette = { ...palette, ...y.palette };

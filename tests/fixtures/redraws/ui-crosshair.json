@@ -1,0 +1,200 @@
+{
+ "id": "ui-crosshair",
+ "frozen": "2026-11-20",
+ "source": "sprites/ui-crosshair.js",
+ "sha256": "1b9e3988681f085d7cfeca2744b927f23d10c5b28172de729e0117281f60e323",
+ "name": "Crosshair",
+ "blurb": "An aiming cursor that breathes, kicks when firing, shows a reload sweep and flashes a hit marker; change its style, size, gap, thickness, spin and colours.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/cursor",
+  "themes": [
+   "sci-fi",
+   "neutral"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "shooter",
+   "arcade"
+  ],
+  "view": "none",
+  "words": [
+   "crosshair",
+   "reticle",
+   "cursor",
+   "aim",
+   "target",
+   "sight",
+   "pointer",
+   "shoot",
+   "reload",
+   "hit",
+   "marker",
+   "mouse"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "idle",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "cross",
+   "options": [
+    {
+     "value": "cross",
+     "label": "Cross"
+    },
+    {
+     "value": "circle",
+     "label": "Circle"
+    },
+    {
+     "value": "brackets",
+     "label": "Brackets"
+    },
+    {
+     "value": "chevrons",
+     "label": "Chevrons"
+    }
+   ],
+   "group": "Look"
+  },
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.6,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "gap": {
+   "kind": "range",
+   "label": "Gap",
+   "def": 0.35,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Tight",
+   "hi": "Open",
+   "group": "Look"
+  },
+  "thickness": {
+   "kind": "range",
+   "label": "Thickness",
+   "def": 0.25,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Thin",
+   "hi": "Chunky",
+   "group": "Look"
+  },
+  "spin": {
+   "kind": "toggle",
+   "label": "Spin",
+   "def": false,
+   "group": "Look",
+   "when": {
+    "style": [
+     "cross",
+     "circle",
+     "chevrons"
+    ]
+   }
+  },
+  "body": {
+   "kind": "color",
+   "label": "Body",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#5fe0f0",
+    "#9fe040",
+    "#f2a030",
+    "#b48af8"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Accent",
+   "def": "#e2473f",
+   "swatches": [
+    "#e2473f",
+    "#f2a030",
+    "#2fb3a8",
+    "#3f6fd1",
+    "#5fe0f0",
+    "#9fe040"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    8,
+    12
+   ]
+  },
+  "shoot": {
+   "frames": 4,
+   "loop": false,
+   "fps": [
+    9,
+    15,
+    20
+   ]
+  },
+  "reload": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "hit": {
+   "frames": 4,
+   "loop": false,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [],
+ "bundles": [
+  "kit-roguelite-scifi"
+ ]
+}

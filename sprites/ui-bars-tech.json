@@ -1,0 +1,147 @@
+{
+  "format": "loadout-sprite",
+  "version": 2,
+  "id": "ui-bars-tech",
+  "name": "Tech bars",
+  "blurb": "An angular bar housing with three fill strips (health, shield, experience) and a white flash; change its style, cut corners, border, tick marks and colours.",
+  "meta": {
+    "type": "ui",
+    "role": "interface/bar",
+    "themes": ["sci-fi","neutral"],
+    "gameTypes": ["roguelike-action","shooter","arcade"],
+    "view": "none",
+    "words": ["bar","health","shield","experience","xp","energy","gauge","meter","hud","boss","fill","drain","flash","segmented"],
+    "license": "draft"
+  },
+  "size": [64,16],
+  "pivot": [32,8],
+  "grounded": false,
+  "preview": "frame",
+  "styles": ["pixel"],
+  "palette": [
+    {"id":"frame","label":"Frame","default":"#6b7896","material":"interface","swatches":["#6b7896","#2fb3a8","#5fe0f0","#9aa6c0","#c2c9d6","#f2a030"]},
+    {"id":"fill","label":"Health","default":"#5fd47a","material":"interface","swatches":["#5fd47a","#9fe040","#e2473f","#f2a030","#2fb3a8","#f0ead8"]},
+    {"id":"fillB","label":"Shield","default":"#4f9ff0","material":"interface","swatches":["#4f9ff0","#5fe0f0","#3f6fd1","#2fb3a8","#c2c9d6","#b48af8"]},
+    {
+      "id": "fillC",
+      "label": "Experience",
+      "default": "#b48af8",
+      "material": "interface",
+      "swatches": ["#b48af8","#f2c230","#5fe0f0","#b04a8a","#f2a030","#e8ecf2"]
+    },
+    {"id":"white","default":"#ffffff","material":"light","detail":true}
+  ],
+  "controls": [
+    {
+      "key": "style",
+      "kind": "choice",
+      "label": "Style",
+      "options": [{"value":"solid","label":"Solid"},{"value":"segmented","label":"Segmented"},{"value":"slanted","label":"Slanted"}],
+      "default": "solid",
+      "group": "Look"
+    },
+    {"key":"corner","kind":"range","label":"Corner","lo":"Square","hi":"Cut","default":0.5,"group":"Look"},
+    {"key":"border","kind":"range","label":"Border","lo":"Thin","hi":"Thick","default":0.5,"group":"Look"},
+    {"key":"ticks","kind":"toggle","label":"Tick marks","default":false,"group":"Look"},
+    {"key":"frame","kind":"colour","label":"Frame","group":"Colors"},
+    {"key":"fill","kind":"colour","label":"Health","group":"Colors"},
+    {"key":"fillB","kind":"colour","label":"Shield","group":"Colors"},
+    {"key":"fillC","kind":"colour","label":"Experience","group":"Colors"}
+  ],
+  "body": {
+    "panel": {
+      "skin": {"use":"skin:tech","v":1,"paint":{"frame":"frame","shine":"white"}},
+      "piece": {
+        "gen": "ui.trough",
+        "v": 1,
+        "at": [1,1],
+        "size": [62,14],
+        "style": {"from":"style"},
+        "corner": {"from":"corner","map":[[0,0],[1,4]]},
+        "border": {"from":"border","map":[[0,1],[1,3]]},
+        "notches": {"from":"ticks"},
+        "caps": {"from":"style","pick":{"solid":0,"segmented":2,"slanted":2}},
+        "segments": {"from":"style","pick":{"solid":0,"segmented":7,"slanted":7}},
+        "clip": ["frame"],
+        "edges": 8,
+        "ends": 16
+      },
+      "states": ["frame","fill","fill-b","fill-c","flash"],
+      "draw": [
+        {
+          "gen": "ui.strip",
+          "v": 1,
+          "clip": ["fill"],
+          "at": [1,1],
+          "size": [62,14],
+          "style": {"from":"style"},
+          "border": {"from":"border","map":[[0,1],[1,3]]},
+          "caps": {"from":"style","pick":{"solid":0,"segmented":2,"slanted":2}},
+          "segments": {"from":"style","pick":{"solid":0,"segmented":7,"slanted":7}},
+          "fill": "fill",
+          "shine": "white",
+          "edges": 8,
+          "ends": 16,
+          "notches": {"from":"ticks"}
+        },
+        {
+          "gen": "ui.strip",
+          "v": 1,
+          "clip": ["fill-b"],
+          "at": [1,1],
+          "size": [62,14],
+          "style": {"from":"style"},
+          "border": {"from":"border","map":[[0,1],[1,3]]},
+          "caps": {"from":"style","pick":{"solid":0,"segmented":2,"slanted":2}},
+          "segments": {"from":"style","pick":{"solid":0,"segmented":7,"slanted":7}},
+          "fill": "fillB",
+          "shine": "white",
+          "edges": 8,
+          "ends": 16,
+          "notches": {"from":"ticks"}
+        },
+        {
+          "gen": "ui.strip",
+          "v": 1,
+          "clip": ["fill-c"],
+          "at": [1,1],
+          "size": [62,14],
+          "style": {"from":"style"},
+          "border": {"from":"border","map":[[0,1],[1,3]]},
+          "caps": {"from":"style","pick":{"solid":0,"segmented":2,"slanted":2}},
+          "segments": {"from":"style","pick":{"solid":0,"segmented":7,"slanted":7}},
+          "fill": "fillC",
+          "shine": "white",
+          "edges": 8,
+          "ends": 16,
+          "notches": {"from":"ticks"}
+        },
+        {
+          "gen": "ui.strip",
+          "v": 1,
+          "clip": ["flash"],
+          "at": [1,1],
+          "size": [62,14],
+          "style": {"from":"style"},
+          "border": {"from":"border","map":[[0,1],[1,3]]},
+          "caps": {"from":"style","pick":{"solid":0,"segmented":2,"slanted":2}},
+          "segments": {"from":"style","pick":{"solid":0,"segmented":7,"slanted":7}},
+          "fill": "fill",
+          "shine": "white",
+          "flash": 1,
+          "fade": true,
+          "edges": 8,
+          "ends": 16,
+          "notches": {"from":"ticks"}
+        }
+      ]
+    }
+  },
+  "clips": {
+    "frame": {"frames":1,"fps":8,"label":"Housing"},
+    "fill": {"frames":1,"fps":8,"label":"Health"},
+    "fill-b": {"frames":1,"fps":8,"label":"Shield"},
+    "fill-c": {"frames":1,"fps":8,"label":"Experience"},
+    "flash": {"frames":4,"fps":8,"loop":false,"label":"Flash"}
+  }
+}

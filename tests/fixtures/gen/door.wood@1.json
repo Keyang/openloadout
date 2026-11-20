@@ -1,0 +1,919 @@
+{
+ "id": "door.wood",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "gen": "door.wood",
+    "v": 1,
+    "at": [
+     24,
+     62
+    ],
+    "wood": "wood",
+    "metal": "metal",
+    "stone": "stone",
+    "hole": "hole",
+    "shine": "shine"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      6,
+      16
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..aabbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "..aaccccaccccccccccccccccccacccc",
+      "..aaccccaccccccccccccccccccacccc",
+      "..aaccccaccccccccccccccccccacccc",
+      "..aaccddddddddddddddddddddddddcc",
+      "..aacdeeeeeeeeeeeeeeeeeeeeeeeedc",
+      "..aacdfffffeggggefffeggggefffedc",
+      "..aacdfffffeggggefffeggggefffedc",
+      "..aaddfffffeggggefffeggggefffedc",
+      "..adhidjjjjjjjjjjjhjjjjjjjjjjjdc",
+      "..adhidihiiihiiihihkfffffffffjda",
+      "..adhidhhhhhhhhhhhhffffffffffjdc",
+      "..adhhdeeeeeeeeeeeheeeeedddeeedc",
+      "..aaddeeeeeeeeeeeeeeeeedddddeedc",
+      "..aacdfffffeggggefffeggdiiidfedc",
+      "..aacdfffffeggggefffegdidddidedc",
+      "..aacdffeffeggggefffegdidedidedc",
+      "..aacdffeffeggggefffegdidddidedc",
+      "..aaadffeffeggggefffeggdiiidfedc",
+      "..aacdffeffeggggefffeggedddffedc",
+      "..aacdfffffeggggefffeggggefffedc",
+      "..aacdfffffeggggefffeggggefffeda",
+      "..aacdfffffeggggefffeggdddddfedc",
+      "..aacdfffffeggggefffegdhiiiidedc",
+      "..aacdfffffeggegefffegdhkkkidedc",
+      "..aacdfffffeggegefffegdhkkkidedc",
+      "..aacdfffffeggegefffegdhllkideda",
+      "..aacdfffffeggegefffegdhklkidedc",
+      "..aacdfffffeggggefffegdhklkidedc",
+      "..aaadfffffeggggefffegdhkkkidedc",
+      "..aacdfffffeggggefffegdhhhhhdedc",
+      "..aacdfffffeggggefffeggdddddfedc"
+     ],
+     "key": {
+      "a": "stone.dark",
+      "b": "stone.light",
+      "c": "stone",
+      "d": "ink",
+      "e": "wood.dark",
+      "f": "wood",
+      "g": {
+       "rule": "mix",
+       "of": "wood",
+       "with": {
+        "rule": "ramp",
+        "of": "wood",
+        "tone": "light"
+       },
+       "amount": 0.35
+      },
+      "h": "metal.dark",
+      "i": "metal.light",
+      "j": "wood.light",
+      "k": "metal",
+      "l": "hole"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      38,
+      16
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aa..",
+      "ba..",
+      "ba..",
+      "ba..",
+      "ba..",
+      "ba..",
+      "ba..",
+      "ba..",
+      "ba..",
+      "ba..",
+      "ca..",
+      "ba..",
+      "ba..",
+      "ba..",
+      "ba..",
+      "ba..",
+      "ba..",
+      "ba..",
+      "ba..",
+      "ba..",
+      "ba..",
+      "ca..",
+      "ba..",
+      "ba..",
+      "ba..",
+      "ba..",
+      "ca..",
+      "ba..",
+      "ba..",
+      "ba..",
+      "ba..",
+      "ba.."
+     ],
+     "key": {
+      "a": "stone.light",
+      "b": "stone",
+      "c": "stone.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      6,
+      48
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..aabcdddddeffffededeffffedddecb",
+      "..aaccdddddeffffededeffffedddecb",
+      "..acghciiiiiiiiiiigiiiiiiiiiiicb",
+      "..acghchghhhghhhghgjdddddddddicb",
+      "..acghcggggggggggggddddddddddicb",
+      "..acggceeeeeeeeeeegeeeeeeeeeeeca",
+      "..aacceeeeeeeeeeeeeeeeeeeeeeeecb",
+      "..aabcdddddeffffedddeffffedddecb",
+      "..aabcdddddeffffedddeffffedddecb",
+      "..aabcdddddeffffedddeffffedddecb",
+      "..bbbcdddddeffffedddeffffedddecb",
+      "..bbbcdddddeffffedddeffffedddecb",
+      "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+     ],
+     "key": {
+      "a": "stone.dark",
+      "b": "stone",
+      "c": "ink",
+      "d": "wood",
+      "e": "wood.dark",
+      "f": {
+       "rule": "mix",
+       "of": "wood",
+       "with": {
+        "rule": "ramp",
+        "of": "wood",
+        "tone": "light"
+       },
+       "amount": 0.35
+      },
+      "g": "metal.dark",
+      "h": "metal.light",
+      "i": "wood.light",
+      "j": "metal",
+      "k": "stone.light"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      38,
+      48
+     ],
+     "anchor": "tl",
+     "rows": [
+      "ab..",
+      "ab..",
+      "ab..",
+      "ab..",
+      "ab..",
+      "cb..",
+      "ab..",
+      "ab..",
+      "ab..",
+      "ab..",
+      "ab..",
+      "ab..",
+      "bbbb",
+      "cccc"
+     ],
+     "key": {
+      "a": "stone",
+      "b": "stone.light",
+      "c": "stone.dark"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "gen": "door.wood",
+    "v": 1,
+    "at": [
+     24,
+     62
+    ],
+    "wood": "wood",
+    "metal": "metal",
+    "stone": "stone",
+    "hole": "hole",
+    "shine": "shine",
+    "style": "arched",
+    "width": 1,
+    "height": 1,
+    "window": true,
+    "lock": "padlock",
+    "lockSize": 1.35,
+    "open": [
+     1,
+     0.9,
+     0.58
+    ]
+   },
+   "ctx": {
+    "t": 0.4,
+    "loop": false,
+    "frames": 6,
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      3,
+      10
+     ],
+     "anchor": "tl",
+     "rows": [
+      "................abaaaaaaba......",
+      ".............aaccbbaaaabbaaaa...",
+      "...........bcccccbbaaaabbcccaab.",
+      ".........acbbcccccbaaaabccccccba",
+      "........ccccbccccddddddddccccbcc",
+      ".......cccccbddddeeeeeeeeddddbcc",
+      "......bccccddffffeeeeeeeeeeeeddc",
+      ".....bcbbcdfggfhhfeeeeeeeeeeeeed",
+      "....bcccbdhhggfhhffeeeeeeeeeeeee",
+      "....bcccdhhhggfhhfgfeeeeeeeeeeee",
+      "...bcccdghhhggfhhfggfeeeeeeeeeee",
+      "...bbbdgghhhggffffggffeeeeeeeeee",
+      "..bbccdgghhhffeiefggfheeeeeeeeee",
+      "..bbcdfgghhheieiefggfheeeeeeeeee",
+      "..bbcdggghhheieiefggfhjeeeeeeeee",
+      "..bbcdggghhheieiefggfhjeeeeeeeee",
+      "..bbcdggghhheieiefggfhjeeeeeeeee",
+      "..bbcdggghhheieiefggfhjeeeeeeeee",
+      "..bbcdgfghhhkkkkkfggfhjeeeeeeeee",
+      "..bbddgfghhhggfhffggfhjeeeeeeeee",
+      "..bdlmdkkkkkkkkkknikkkjeeeeeeeee",
+      "..bdlmdnonoooonnnnggddjeeeeeeeee",
+      "..bdlmdnnnnnnnfffngdddjeeeeeeeee",
+      "..bdlldfffffffffffdodojeeeeeeeee",
+      "..bbddfffffffffhhfdofojeeeeeeeee",
+      "..bbcdggghhhggfhhfdodojeeeeeeeee",
+      "..bbcdggghhhggfhhffdohjeeeeeeeee",
+      "..bbcdggghhhggfhhffgdhjeeeeeeeee",
+      "..bbcdggghhhggfhhffgfhjeeeeeeeee",
+      "..bbbdggghhhggfhhffgfhjeeeeeeeee",
+      "..bbcdggghhhggfhhfggfhjeeeeeeeee",
+      "..bbcdggghhhggfhhfggfhjeeeeeeeee"
+     ],
+     "key": {
+      "a": "stone.light",
+      "b": "stone.dark",
+      "c": "stone",
+      "d": "ink",
+      "e": "hole",
+      "f": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "wood",
+        "by": -0.55
+       },
+       "tone": "dark"
+      },
+      "g": {
+       "rule": "tone",
+       "of": "wood",
+       "by": -0.55
+      },
+      "h": {
+       "rule": "mix",
+       "of": {
+        "rule": "tone",
+        "of": "wood",
+        "by": -0.55
+       },
+       "with": {
+        "rule": "ramp",
+        "of": {
+         "rule": "tone",
+         "of": "wood",
+         "by": -0.55
+        },
+        "tone": "light"
+       },
+       "amount": 0.35
+      },
+      "i": {
+       "rule": "tone",
+       "of": "metal",
+       "by": -0.5
+      },
+      "j": "wood.light",
+      "k": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "wood",
+        "by": -0.55
+       },
+       "tone": "light"
+      },
+      "l": "metal.dark",
+      "m": "metal.light",
+      "n": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "metal",
+        "by": -0.5
+       },
+       "tone": "dark"
+      },
+      "o": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "metal",
+        "by": -0.5
+       },
+       "tone": "light"
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      35,
+      10
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..........",
+      "..........",
+      "..........",
+      "a.........",
+      "aa........",
+      "baa.......",
+      "bbac......",
+      "bccaa.....",
+      "dcbbaa....",
+      "edbbba....",
+      "eedbbac...",
+      "eeedccc...",
+      "eeedbbaa..",
+      "eeeedbba..",
+      "eeeedbba..",
+      "eeeedbba..",
+      "eeeedbba..",
+      "eeeedbba..",
+      "eeeedbba..",
+      "eeeedbba..",
+      "eeeedbba..",
+      "eeeedcca..",
+      "eeeedbba..",
+      "eeeedbba..",
+      "eeeedbba..",
+      "eeeedbba..",
+      "eeeedbba..",
+      "eeeedbba..",
+      "eeeedbba..",
+      "eeeedbba..",
+      "eeeedbba..",
+      "eeeedbba.."
+     ],
+     "key": {
+      "a": "stone.light",
+      "b": "stone",
+      "c": "stone.dark",
+      "d": "ink",
+      "e": "hole"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      3,
+      42
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..aabcdddeeeddfeefddfeghhhhhhhhh",
+      "..aabcdddeeeddfeefddfeghhhhhhhhh",
+      "..aabcdddeeeddfeefddfeghhhhhhhhh",
+      "..aabcdddeeeddfeefddfeghhhhhhhhh",
+      "..aabcdddeeeddfeefddfeghhhhhhhhh",
+      "..aabcdddeeeddfeefddfighhhhhhhhh",
+      "..aabcdddeeeddfeefjiidghhhhhhhhh",
+      "..aabcdddeeeddiiikddddghhhhhhhhh",
+      "..aaccddiiiiiillkkdddfghhhhhhhhh",
+      "..acmncilklkkkkkkkjfffghhhhhhhhh",
+      "..acmnckkkkffffffffffeghhhhhhhhh",
+      "..acmnckfffffffeefddfeghhhhhhhhh",
+      "..acmmcffffeddfeefddfeghhhhhhhhh",
+      "..aaccffdeeeddfeefddfhhhhhhhhhhh",
+      "..aabcdddeeeddfeefhhhhhhhhhhhhhh",
+      "..aabcdddeeeddoooooooooooooooooo",
+      "..bbbcdddeeppppppppppppppppppppp",
+      "..bbbcddqqqqqqqqqqqqqqqqqqqqqqqq",
+      "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+     ],
+     "key": {
+      "a": "stone.dark",
+      "b": "stone",
+      "c": "ink",
+      "d": {
+       "rule": "tone",
+       "of": "wood",
+       "by": -0.55
+      },
+      "e": {
+       "rule": "mix",
+       "of": {
+        "rule": "tone",
+        "of": "wood",
+        "by": -0.55
+       },
+       "with": {
+        "rule": "ramp",
+        "of": {
+         "rule": "tone",
+         "of": "wood",
+         "by": -0.55
+        },
+        "tone": "light"
+       },
+       "amount": 0.35
+      },
+      "f": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "wood",
+        "by": -0.55
+       },
+       "tone": "dark"
+      },
+      "g": "wood.light",
+      "h": "hole",
+      "i": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "wood",
+        "by": -0.55
+       },
+       "tone": "light"
+      },
+      "j": {
+       "rule": "tone",
+       "of": "metal",
+       "by": -0.5
+      },
+      "k": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "metal",
+        "by": -0.5
+       },
+       "tone": "dark"
+      },
+      "l": {
+       "rule": "ramp",
+       "of": {
+        "rule": "tone",
+        "of": "metal",
+        "by": -0.5
+       },
+       "tone": "light"
+      },
+      "m": "metal.dark",
+      "n": "metal.light",
+      "o": {
+       "rule": "tone",
+       "of": "hole",
+       "by": 0.5000000000000001
+      },
+      "p": {
+       "rule": "tone",
+       "of": "hole",
+       "by": 0.8
+      },
+      "q": {
+       "rule": "tone",
+       "of": "hole",
+       "by": 1.1
+      },
+      "r": "stone.light"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      35,
+      42
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaabccd..",
+      "aaaabeed..",
+      "aaaabeed..",
+      "aaaabeed..",
+      "aaaabeed..",
+      "aaabbbbd..",
+      "aabffffb..",
+      "abfbbbbfb.",
+      "abbbbbbbb.",
+      "bfgggggggb",
+      "bfhhhhhhgb",
+      "bfhhaahhgb",
+      "bfhhaahhgb",
+      "bfhhhhhhgb",
+      "bfhhhhhhgb",
+      "bffffffffb",
+      "ibbbbbbbb.",
+      "jjjabeed..",
+      "dddddddddd",
+      "cccccccccc"
+     ],
+     "key": {
+      "a": "hole",
+      "b": "ink",
+      "c": "stone.dark",
+      "d": "stone.light",
+      "e": "stone",
+      "f": "metal.dark",
+      "g": "metal.light",
+      "h": "metal",
+      "i": {
+       "rule": "tone",
+       "of": "hole",
+       "by": 0.8
+      },
+      "j": {
+       "rule": "tone",
+       "of": "hole",
+       "by": 1.1
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "gen": "door.wood",
+    "v": 1,
+    "at": [
+     24,
+     62
+    ],
+    "wood": "wood",
+    "metal": "metal",
+    "stone": "stone",
+    "hole": "hole",
+    "shine": "shine",
+    "style": "iron-bound",
+    "width": 0,
+    "height": 0,
+    "lock": "bar",
+    "lockSize": 0.65,
+    "rattle": [
+     1
+    ],
+    "flash": [
+     1
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      9,
+      22
+     ],
+     "anchor": "tl",
+     "rows": [
+      "abbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "aaaacccccccccccccccccccccccccb",
+      "aaaacccccccccccccccccccccccccb",
+      "..aaccccaccccccccccccacccccc..",
+      "..aaccddddddddddddddddddcccb..",
+      "..aacdefffffffffffffffffdccb..",
+      "..aacdeddddddddddddddddddccb..",
+      "..aaddeghhhhhhhhhhhhhhhhdccb..",
+      "..adghdgigiiigiiigiiigiidccb..",
+      "..adghdgigiiigiiigidddiidccb..",
+      "..adghdgggggggggggdddddgdaab..",
+      "..adggdddddddddddddhhhdddccb..",
+      "..aaddejjjjjjfkkkdhdddhddccb..",
+      "..aaadejjjjjjfkkkdhdjdhddccb..",
+      "..aacdejjfjjjfkkkdhdddhddccb..",
+      "..aacdejjfjjjfkkkkdhhhdjdccb..",
+      "..aacdejjfjjjfkkkkkdddjjdccb..",
+      "..aacdejjfjjjfkkkkkfjjjjdccb..",
+      "..aaadeddddddddddddddddddccb..",
+      "..aacdeghhhhhhhhhhhhhhhhdccb..",
+      "..aacdegigiiigiiigiiigiidccb..",
+      "..aacdegigidddiiidddigiidddb..",
+      "..aacdeggddllldddlllddddllld..",
+      "..aacdeddldllldldllldlldllld..",
+      "..aacdejdldllldldllldlldllld..",
+      "..aacdejdldllldldllldlldllld..",
+      "..aacdejjddllldddlllddddllld..",
+      "..aacdejjjjdddkkkdddjfjjdddb..",
+      "..aacdejjjjjjfkkkkkfjfjjdccb..",
+      "..aaddeddddddddddddddddddccb..",
+      "..adghdghhhhhhhhhhhhhhhhdccb..",
+      "..adghdgigiiigiiigiiigiidccb.."
+     ],
+     "key": {
+      "a": "stone.dark",
+      "b": "stone.light",
+      "c": "stone",
+      "d": "ink",
+      "e": "hole",
+      "f": "wood.dark",
+      "g": "metal.dark",
+      "h": "metal.light",
+      "i": "metal",
+      "j": "wood",
+      "k": {
+       "rule": "mix",
+       "of": "wood",
+       "with": {
+        "rule": "ramp",
+        "of": "wood",
+        "tone": "light"
+       },
+       "amount": 0.35
+      },
+      "l": "shine"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      9,
+      54
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..abcdbceceeeceeeceeeceebffg..",
+      "..abccbcccccccccccccccccbffg..",
+      "..aabbhbbbbbbbbbbbbbbbbbbffg..",
+      "..aafbhiiiiiijkkkkkjiiiibffg..",
+      "..fffbhiiiiiijkkkkkjiiiibffg..",
+      "..fffbhiiiiiijkkkkkjiiiibaag..",
+      "gggggggggggggggggggggggggggggg",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+     ],
+     "key": {
+      "a": "stone.dark",
+      "b": "ink",
+      "c": "metal.dark",
+      "d": "metal.light",
+      "e": "metal",
+      "f": "stone",
+      "g": "stone.light",
+      "h": "hole",
+      "i": "wood",
+      "j": "wood.dark",
+      "k": {
+       "rule": "mix",
+       "of": "wood",
+       "with": {
+        "rule": "ramp",
+        "of": "wood",
+        "tone": "light"
+       },
+       "amount": 0.35
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "gen": "door.wood",
+    "v": 1,
+    "at": [
+     24,
+     62
+    ],
+    "wood": "wood",
+    "metal": "metal",
+    "stone": "stone",
+    "hole": "hole",
+    "shine": "shine",
+    "lock": "none",
+    "flash": [
+     1
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      6,
+      16
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..aabbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "..aaccccaccccccccccccccccccacccc",
+      "..aaccccaccccccccccccccccccacccc",
+      "..aaccccaccccccccccccccccccacccc",
+      "..aaccddddddddddddddddddddddddcc",
+      "..aacdeeeeeeeeeeeeeeeeeeeeeeeedc",
+      "..aacdfffffeggggefffeggggefffedc",
+      "..aacdfffffeggggefffeggggefffedc",
+      "..aaddfffffeggggefffeggggefffedc",
+      "..adhidjjjjjjjjjjjhjjjjjjjjjjjdc",
+      "..adhidihiiihiiihihkfffffffffjda",
+      "..adhidhhhhhhhhhhhhffffffffffjdc",
+      "..adhhdeeeeeeeeeeeheeeeedddeeedc",
+      "..aaddeeeeeeeeeeeeeeeeedddddeedc",
+      "..aacdfffffeggggefffeggdllldfedc",
+      "..aacdfffffeggggefffegdldddldedc",
+      "..aacdffeffeggggefffegdldedldedc",
+      "..aacdffeffeggggefffegdldddldedc",
+      "..aaadffeffeggggefffeggdllldfedc",
+      "..aacdffeffeggggefffeggedddffedc",
+      "..aacdfffffeggggefffeggggefffedc",
+      "..aacdfffffeggggefffeggggefffeda",
+      "..aacdfffffeggggefffeggggefffedc",
+      "..aacdfffffeggggefffeggggefffedc",
+      "..aacdfffffeggegefffeggggefefedc",
+      "..aacdfffffeggegefffeggggefefedc",
+      "..aacdfffffeggegefffeggggefefeda",
+      "..aacdfffffeggegefffeggggefefedc",
+      "..aacdfffffeggggefffeggggefffedc",
+      "..aaadfffffeggggefffeggggefffedc",
+      "..aacdfffffeggggefffeggggefffedc",
+      "..aacdfffffeggggefffeggggefffedc"
+     ],
+     "key": {
+      "a": "stone.dark",
+      "b": "stone.light",
+      "c": "stone",
+      "d": "ink",
+      "e": "wood.dark",
+      "f": "wood",
+      "g": {
+       "rule": "mix",
+       "of": "wood",
+       "with": {
+        "rule": "ramp",
+        "of": "wood",
+        "tone": "light"
+       },
+       "amount": 0.35
+      },
+      "h": "metal.dark",
+      "i": "metal.light",
+      "j": "wood.light",
+      "k": "metal",
+      "l": "shine"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      38,
+      16
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aa..",
+      "ba..",
+      "ba..",
+      "ba..",
+      "ba..",
+      "ba..",
+      "ba..",
+      "ba..",
+      "ba..",
+      "ba..",
+      "ca..",
+      "ba..",
+      "ba..",
+      "ba..",
+      "ba..",
+      "ba..",
+      "ba..",
+      "ba..",
+      "ba..",
+      "ba..",
+      "ba..",
+      "ca..",
+      "ba..",
+      "ba..",
+      "ba..",
+      "ba..",
+      "ca..",
+      "ba..",
+      "ba..",
+      "ba..",
+      "ba..",
+      "ba.."
+     ],
+     "key": {
+      "a": "stone.light",
+      "b": "stone",
+      "c": "stone.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      6,
+      48
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..aabcdddddeffffededeffffedddecb",
+      "..aaccdddddeffffededeffffedddecb",
+      "..acghciiiiiiiiiiigiiiiiiiiiiicb",
+      "..acghchghhhghhhghgjdddddddddicb",
+      "..acghcggggggggggggddddddddddicb",
+      "..acggceeeeeeeeeeegeeeeeeeeeeeca",
+      "..aacceeeeeeeeeeeeeeeeeeeeeeeecb",
+      "..aabcdddddeffffedddeffffedddecb",
+      "..aabcdddddeffffedddeffffedddecb",
+      "..aabcdddddeffffedddeffffedddecb",
+      "..bbbcdddddeffffedddeffffedddecb",
+      "..bbbcdddddeffffedddeffffedddecb",
+      "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+     ],
+     "key": {
+      "a": "stone.dark",
+      "b": "stone",
+      "c": "ink",
+      "d": "wood",
+      "e": "wood.dark",
+      "f": {
+       "rule": "mix",
+       "of": "wood",
+       "with": {
+        "rule": "ramp",
+        "of": "wood",
+        "tone": "light"
+       },
+       "amount": 0.35
+      },
+      "g": "metal.dark",
+      "h": "metal.light",
+      "i": "wood.light",
+      "j": "metal",
+      "k": "stone.light"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      38,
+      48
+     ],
+     "anchor": "tl",
+     "rows": [
+      "ab..",
+      "ab..",
+      "ab..",
+      "ab..",
+      "ab..",
+      "cb..",
+      "ab..",
+      "ab..",
+      "ab..",
+      "ab..",
+      "ab..",
+      "ab..",
+      "bbbb",
+      "cccc"
+     ],
+     "key": {
+      "a": "stone",
+      "b": "stone.light",
+      "c": "stone.dark"
+     }
+    }
+   ]
+  }
+ ]
+}

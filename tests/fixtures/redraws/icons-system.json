@@ -1,0 +1,259 @@
+{
+ "id": "icons-system",
+ "frozen": "2026-11-20",
+ "source": "sprites/icons-system.js",
+ "sha256": "064d0d33656b8f4f0b8af4aa9c4f8bdf655fac793797c0355fbbea59ea91eb43",
+ "name": "Settings icons",
+ "blurb": "Ten settings and pause menu signs, from a cog, sound and mute to save, pause and home; change the plate behind them, their weight, shine, size and three colours.",
+ "meta": {
+  "type": "icon",
+  "role": "interface/icon",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "arcade",
+   "puzzle",
+   "platformer",
+   "card-game"
+  ],
+  "view": "none",
+  "words": [
+   "settings",
+   "options",
+   "menu",
+   "cog",
+   "gear",
+   "sound",
+   "volume",
+   "mute",
+   "music",
+   "display",
+   "controller",
+   "language",
+   "save",
+   "pause"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "settings",
+ "params": {
+  "backing": {
+   "kind": "choice",
+   "label": "Plate",
+   "def": "circle",
+   "options": [
+    "none",
+    "circle",
+    "hex"
+   ],
+   "group": "Look"
+  },
+  "bold": {
+   "kind": "toggle",
+   "label": "Bold",
+   "def": false,
+   "group": "Look"
+  },
+  "shine": {
+   "kind": "toggle",
+   "label": "Shine",
+   "def": true,
+   "group": "Look"
+  },
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "face": {
+   "kind": "color",
+   "label": "Plate colour",
+   "def": "#5d6475",
+   "swatches": [
+    "#5d6475",
+    "#3f6fd1",
+    "#3f5068",
+    "#7a4f33",
+    "#7a4fc4",
+    "#434d6d"
+   ],
+   "group": "Colors",
+   "when": {
+    "backing": [
+     "hex",
+     "circle"
+    ]
+   }
+  },
+  "body": {
+   "kind": "color",
+   "label": "Picture",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#f2c230",
+    "#4fd8ee",
+    "#9bd18a",
+    "#c2c9d6"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Second colour",
+   "def": "#c9423a",
+   "swatches": [
+    "#c9423a",
+    "#e08a2c",
+    "#a4c44a",
+    "#6aa83e"
+   ],
+   "group": "Colors"
+  }
+ },
+ "clips": {
+  "settings": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "sound": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "mute": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "music": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "display": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "controls": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "language": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "save": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "pause": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "home": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [
+  {
+   "name": "Round plates",
+   "params": {}
+  },
+  {
+   "name": "No plates",
+   "params": {
+    "backing": "none",
+    "body": "#c2c9d6"
+   }
+  },
+  {
+   "name": "Gold on hexagons",
+   "params": {
+    "backing": "hex",
+    "body": "#f2c230"
+   }
+  },
+  {
+   "name": "Bold blue",
+   "params": {
+    "bold": true,
+    "face": "#3f6fd1"
+   }
+  },
+  {
+   "name": "Night",
+   "params": {
+    "face": "#434d6d",
+    "body": "#4fd8ee",
+    "accent": "#e08a2c"
+   }
+  }
+ ],
+ "bundles": []
+}

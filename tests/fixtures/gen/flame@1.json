@@ -1,0 +1,165 @@
+{
+ "id": "flame",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     16,
+     28
+    ],
+    "length": 18,
+    "width": 5,
+    "paints": [
+     "p1",
+     "p2",
+     "p3",
+     "p4"
+    ]
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      10,
+      9
+     ],
+     "anchor": "tl",
+     "rows": [
+      "......a......",
+      "....aaba.....",
+      "...abbba.....",
+      "..abbbba.....",
+      "..abbbba.....",
+      ".abbbbba.....",
+      "..abbbbba....",
+      "..abbcbba....",
+      "..abbccbba...",
+      "..abbcccbba..",
+      ".abbbcccbbba.",
+      ".abbcccccbbba",
+      "abbbccccccbba",
+      "abbcccccccbba",
+      "abbccddccbba.",
+      "abbccddccbba.",
+      ".abccddccba..",
+      ".abccccccba..",
+      ".abbbbbbbba..",
+      "..aaaaaaaa..."
+     ],
+     "key": {
+      "a": "p4",
+      "b": "p3",
+      "c": "p2",
+      "d": "p1"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     20,
+     16
+    ],
+    "head": 5,
+    "angle": -90,
+    "length": 14,
+    "width": 4,
+    "paints": [
+     "p1",
+     "p2",
+     "p3",
+     "p4"
+    ]
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": true
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      5,
+      10
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".............aaaa....",
+      "...........aabbbbaa..",
+      "......aaa.abbbcccbba.",
+      ".....abbbaabbcccdcba.",
+      "....abbbbbbcccddddcba",
+      "...abbccccccddddddcba",
+      ".aabbbbbcccdddddddcba",
+      "abbaaaabbbccccddddcba",
+      ".aa....aaabbccccdcba.",
+      "..........abbbcccbba.",
+      "...........aabbbbaa..",
+      ".............aaaa...."
+     ],
+     "key": {
+      "a": "p4",
+      "b": "p3",
+      "c": "p2",
+      "d": "p1"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     24,
+     40
+    ],
+    "length": 14,
+    "width": 4,
+    "tongues": 3,
+    "fan": 25,
+    "spread": 5,
+    "cycles": 2,
+    "heat": 0.7,
+    "paints": [
+     "p0",
+     "p1",
+     "p2",
+     "p3",
+     "p4"
+    ]
+   },
+   "ctx": {
+    "t": 0.125,
+    "loop": true
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      20,
+      25
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...aa.",
+      "..abba",
+      ".abba.",
+      "abbbba",
+      "abcbba",
+      "abbbba"
+     ],
+     "key": {
+      "a": "p4",
+      "b": "p3",
+      "c": "p2"
+     }
+    }
+   ]
+  }
+ ]
+}

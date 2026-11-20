@@ -1,0 +1,230 @@
+{
+ "id": "icons-tools",
+ "frozen": "2026-11-20",
+ "source": "sprites/icons-tools.js",
+ "sha256": "f7e6ef2f41f9f8fb83538f937e92618a2ec48d66ddd342e28aa177649b527c2f",
+ "name": "Tool icons",
+ "blurb": "Eight tool icons: axe, pickaxe, shovel, hoe, hammer, sickle, watering can and fishing rod; change their size, tilt, shading, shine and the colours of the metal, the handles and the grips.",
+ "meta": {
+  "type": "icon",
+  "role": "items/icon",
+  "themes": [
+   "neutral",
+   "farm"
+  ],
+  "gameTypes": [
+   "farming-sim",
+   "top-down-rpg",
+   "roguelike-action",
+   "arcade"
+  ],
+  "view": "none",
+  "words": [
+   "tool",
+   "axe",
+   "pickaxe",
+   "shovel",
+   "hoe",
+   "hammer",
+   "sickle",
+   "watering can",
+   "fishing rod",
+   "chop",
+   "dig",
+   "farm",
+   "craft",
+   "equip"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "axe",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "tilt": {
+   "kind": "toggle",
+   "label": "Tilt",
+   "def": true,
+   "group": "Look"
+  },
+  "shade": {
+   "kind": "toggle",
+   "label": "Extra shading",
+   "def": true,
+   "group": "Look"
+  },
+  "shine": {
+   "kind": "toggle",
+   "label": "Shine",
+   "def": true,
+   "group": "Look"
+  },
+  "metal": {
+   "kind": "color",
+   "label": "Metal",
+   "def": "#c2c9d6",
+   "swatches": [
+    "#c2c9d6",
+    "#f2c230",
+    "#5d6475",
+    "#a8806a",
+    "#e6c545"
+   ],
+   "group": "Colors"
+  },
+  "wood": {
+   "kind": "color",
+   "label": "Handles",
+   "def": "#a06a3c",
+   "swatches": [
+    "#a06a3c",
+    "#7a4f33",
+    "#a8612a",
+    "#c98a4a",
+    "#f0ead8"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Grips",
+   "def": "#c9423a",
+   "swatches": [
+    "#c9423a",
+    "#3f6fd1",
+    "#3f8a4f",
+    "#7a4fc4",
+    "#e08a2c"
+   ],
+   "group": "Colors"
+  }
+ },
+ "clips": {
+  "axe": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "pickaxe": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "shovel": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "hoe": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "hammer": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "sickle": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "watering-can": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "fishing-rod": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [
+  {
+   "name": "Toolshed",
+   "params": {}
+  },
+  {
+   "name": "Gold tools",
+   "params": {
+    "metal": "#f2c230",
+    "accent": "#3f6fd1"
+   }
+  },
+  {
+   "name": "Dark handles",
+   "params": {
+    "wood": "#7a4f33",
+    "accent": "#3f8a4f"
+   }
+  },
+  {
+   "name": "Upright",
+   "params": {
+    "tilt": false
+   }
+  },
+  {
+   "name": "Old iron",
+   "params": {
+    "metal": "#a8806a",
+    "size": 1,
+    "shine": false
+   }
+  }
+ ],
+ "bundles": []
+}

@@ -1,0 +1,310 @@
+{
+ "id": "star.charm",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     16,
+     17
+    ],
+    "points": "five",
+    "size": 0.5,
+    "layer": "charm",
+    "metal": "body",
+    "energy": "glow",
+    "shine": "shine"
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true,
+    "frames": 8,
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      10,
+      8
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".....ab....",
+      "....b..b...",
+      "....bc.a...",
+      ".....bb....",
+      "....cba....",
+      "....caa....",
+      "....aba....",
+      "bbaacccaa..",
+      "cbbcdefcbaa",
+      ".cbcdgfcba.",
+      "..bcdgfca..",
+      "..bcdddc...",
+      ".cbbccca...",
+      ".cbbabba...",
+      ".cab..bb...",
+      ".b.....b..."
+     ],
+     "key": {
+      "a": "body.light",
+      "b": "body",
+      "c": "body.dark",
+      "d": "glow.dark",
+      "e": "shine",
+      "f": "glow.light",
+      "g": "glow"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     17
+    ],
+    "points": "eight",
+    "size": 1,
+    "layer": "charm",
+    "metal": "body",
+    "energy": "glow",
+    "shine": "shine"
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": true,
+    "frames": 8,
+    "frame": 4
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      14,
+      7
+     ],
+     "anchor": "tl",
+     "rows": [
+      "abaa",
+      "ac.b",
+      "aaaa",
+      ".cd.",
+      ".cd.",
+      ".cd.",
+      ".cd.",
+      ".cd.",
+      ".cd.",
+      ".cd.",
+      ".cd.",
+      ".cd.",
+      ".cd.",
+      ".cd.",
+      ".cd.",
+      ".cd.",
+      ".cd.",
+      ".cd.",
+      ".cd.",
+      ".cc."
+     ],
+     "key": {
+      "a": "body",
+      "b": "body.light",
+      "c": "body.dark",
+      "d": {
+       "rule": "mix",
+       "of": "body",
+       "with": {
+        "rule": "ramp",
+        "of": "body",
+        "tone": "dark"
+       },
+       "amount": 0.5
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     17
+    ],
+    "points": "six",
+    "size": 0,
+    "layer": "halo",
+    "metal": "body",
+    "energy": "glow",
+    "shine": "shine"
+   },
+   "ctx": {
+    "t": 0.375,
+    "loop": true,
+    "frames": 8,
+    "frame": 3
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      9,
+      11
+     ],
+     "anchor": "tl",
+     "rows": [
+      "......a......",
+      "...aaabaaa...",
+      "..abbb.bbba..",
+      ".abb.....bba.",
+      "aab.......baa",
+      "ab.........ba",
+      "ab.........ba",
+      "ab.........ba",
+      "ab.........ba",
+      "aab.......baa",
+      ".abb.....bba.",
+      "..abbb.bbba..",
+      "...aaabaaa...",
+      "......a......"
+     ],
+     "key": {
+      "a": {
+       "rule": "tone",
+       "of": "glow",
+       "by": -1
+      },
+      "b": "glow.light"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     17
+    ],
+    "points": "four",
+    "size": 0.5,
+    "layer": "sparkles",
+    "metal": "body",
+    "energy": "glow",
+    "shine": "shine"
+   },
+   "ctx": {
+    "t": 0.875,
+    "loop": true,
+    "frames": 8,
+    "frame": 7
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      12,
+      9
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".........a....",
+      ".........a....",
+      ".......aabaa..",
+      ".........a....",
+      ".........a....",
+      "..............",
+      "..............",
+      "..............",
+      "............c.",
+      "...........cbc",
+      "............c.",
+      "..............",
+      "..............",
+      "..............",
+      "..............",
+      "..............",
+      "..............",
+      "d............."
+     ],
+     "key": {
+      "a": "body.light",
+      "b": "shine",
+      "c": "glow",
+      "d": "glow.light"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     17
+    ],
+    "points": "five",
+    "size": 0.5,
+    "layer": "charm",
+    "collect": true,
+    "metal": "body",
+    "energy": "glow",
+    "shine": "shine"
+   },
+   "ctx": {
+    "t": 0.5714285714285714,
+    "loop": false,
+    "frames": 8,
+    "frame": 4
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      8,
+      7
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".......ab.......",
+      "......b..b......",
+      "......b..a......",
+      "......bbbb......",
+      ".......bc.......",
+      ".......ac.......",
+      "......bbbc......",
+      "......abbc......",
+      "bbcccaddddcccccc",
+      ".bbbbdefffdbbba.",
+      "..bbbdeghfdbba..",
+      "...bbdeggfdba...",
+      "....bdeegfda....",
+      "....bbdeedbc....",
+      "....abbddbbc....",
+      "...bbba..bbbc...",
+      "...bab....bbb...",
+      "...b........b..."
+     ],
+     "key": {
+      "a": "body.light",
+      "b": "body",
+      "c": {
+       "rule": "mix",
+       "of": {
+        "rule": "ramp",
+        "of": "body",
+        "tone": "light"
+       },
+       "with": "shine",
+       "amount": 0.5
+      },
+      "d": "body.dark",
+      "e": "glow.dark",
+      "f": "glow.light",
+      "g": "glow",
+      "h": "shine"
+     }
+    }
+   ]
+  }
+ ]
+}

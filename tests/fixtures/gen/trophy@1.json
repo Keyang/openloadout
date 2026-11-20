@@ -1,0 +1,251 @@
+{
+ "id": "trophy",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     16,
+     17
+    ],
+    "kind": "cup",
+    "scale": 0.93,
+    "emblem": "star",
+    "metal": "metal",
+    "ribbon": "accent",
+    "base": "stone",
+    "shine": "shine"
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true,
+    "frames": 8,
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      7,
+      7
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...abbbbccccccc...",
+      ".ccbbbbaaaaaaaaaa.",
+      "ad.bbbbddaddddc.aa",
+      "a..bbbdddaddddc..a",
+      "a..bbbdaaaaaddc..c",
+      "ab..baadaaaddd..dc",
+      ".bbbbaaaadaddaaaa.",
+      ".....aaaaaaaa.....",
+      ".......aaaa.......",
+      "........ac........",
+      "........dc........",
+      ".......ddcc.......",
+      "......aaaaaa......",
+      "....efffffffff....",
+      "....eggggggggf....",
+      "....eggddddggf....",
+      "....eggddddggf....",
+      "....eggggggggf....",
+      "....eeeeeeeeee...."
+     ],
+     "key": {
+      "a": "metal.dark",
+      "b": "shine",
+      "c": "metal.light",
+      "d": "metal",
+      "e": "stone.dark",
+      "f": "stone.light",
+      "g": "stone"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     17
+    ],
+    "kind": "medal",
+    "scale": 1.06,
+    "emblem": "sun",
+    "metal": "metal",
+    "ribbon": "accent",
+    "base": "stone",
+    "shine": "shine"
+   },
+   "ctx": {
+    "t": 0.375,
+    "loop": true,
+    "frames": 8,
+    "frame": 3
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      10,
+      6
+     ],
+     "anchor": "tl",
+     "rows": [
+      "abbb....abbb",
+      "aabb....bbbb",
+      ".aabb..abbb.",
+      "..abb..bbb..",
+      "..aabbbbbb..",
+      "...aaaabb...",
+      "....aaab....",
+      "....ccdd....",
+      "....ccdd....",
+      "...cceeed...",
+      "...ccefed...",
+      "...cegfed...",
+      "..cceffeed..",
+      "..ceefefed..",
+      "..ceeffeed..",
+      "..heeffeed..",
+      "..hheffeed..",
+      "...heeefg...",
+      "...heefed...",
+      "...heefed...",
+      "...hhefed...",
+      "....hhee...."
+     ],
+     "key": {
+      "a": "accent.dark",
+      "b": "accent",
+      "c": "shine",
+      "d": "metal.light",
+      "e": "metal.dark",
+      "f": {
+       "rule": "tone",
+       "of": "metal",
+       "by": -0.3
+      },
+      "g": "metal",
+      "h": "metal.deep"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     17
+    ],
+    "kind": "crown",
+    "scale": 0.8,
+    "emblem": "diamond",
+    "metal": "metal",
+    "ribbon": "accent",
+    "base": "stone",
+    "shine": "shine"
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true,
+    "frames": 8,
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      8,
+      9
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".......ab.......",
+      ".b.....aa.....b.",
+      "aab....ab....abb",
+      ".ac....db....aa.",
+      ".a....adbb....b.",
+      ".cc..ddddbb..db.",
+      ".ccc.dddddb.ddb.",
+      ".ccbddddddbdddb.",
+      ".ccbbbbbbbbbbbb.",
+      ".cadddddadddddb.",
+      ".caddddaaaddddb.",
+      ".aadddaaaaadddb.",
+      ".aaaaaaaaaaaaaa.",
+      ".bbbbbbbabbbbbb."
+     ],
+     "key": {
+      "a": "metal.dark",
+      "b": "metal.light",
+      "c": "shine",
+      "d": "metal"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     17
+    ],
+    "kind": "cup",
+    "scale": 0.93,
+    "emblem": "none",
+    "collect": true,
+    "metal": "metal",
+    "ribbon": "accent",
+    "base": "stone",
+    "shine": "shine"
+   },
+   "ctx": {
+    "t": 0.5714285714285714,
+    "loop": false,
+    "frames": 8,
+    "frame": 4
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      6,
+      6
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...aaabbbbbbbbbbb...",
+      "..baacccccccccccbb..",
+      ".ccaaaaaaaaaaaaaaaa.",
+      "ac.aaacccccccccbb.ab",
+      "ab..aacccccccccc..ab",
+      "aa..aaaccccccccb..cb",
+      ".aabaaaacccccccbbcc.",
+      "..aaaaaaaaccccaaaa..",
+      "......aaaaaaaa......",
+      "........aaaa........",
+      "........acbb........",
+      "........accb........",
+      "........cccb........",
+      ".......ccccbb.......",
+      "......aaaaaaaa......",
+      "....deeeeeeeeeee....",
+      "....dffffffffffe....",
+      "....dffccccccffe....",
+      "....dffccccccffe....",
+      "....dddddddddddd...."
+     ],
+     "key": {
+      "a": "metal.dark",
+      "b": "metal.light",
+      "c": "metal",
+      "d": "stone.dark",
+      "e": "stone.light",
+      "f": "stone"
+     }
+    }
+   ]
+  }
+ ]
+}

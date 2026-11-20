@@ -1,0 +1,246 @@
+{
+ "id": "ui-bars-candy",
+ "frozen": "2026-11-20",
+ "source": "sprites/ui-bars-candy.js",
+ "sha256": "c7ef779f7da2228b81a53c52a4e100db762ada053807a884abd096c64ea600c3",
+ "name": "Candy bars and slider",
+ "blurb": "A glossy sugar-rimmed bar housing with three candy fill strips (health, magic, a gauge), a white flash, a slider track and its toffee knob; change the style, corners, rim, shine and colours.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/bar",
+  "themes": [
+   "neutral",
+   "candy"
+  ],
+  "gameTypes": [
+   "arcade",
+   "puzzle",
+   "card-game",
+   "racing"
+  ],
+  "view": "none",
+  "words": [
+   "bar",
+   "health",
+   "magic",
+   "gauge",
+   "meter",
+   "slider",
+   "volume",
+   "settings",
+   "candy",
+   "sugar",
+   "glossy",
+   "fill",
+   "flash",
+   "hud"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  64,
+  16
+ ],
+ "pivot": [
+  32,
+  8
+ ],
+ "grounded": false,
+ "preview": "frame",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "jelly",
+   "options": [
+    {
+     "value": "jelly",
+     "label": "Jelly"
+    },
+    {
+     "value": "striped",
+     "label": "Striped"
+    },
+    {
+     "value": "frosted",
+     "label": "Frosted"
+    }
+   ],
+   "group": "Look"
+  },
+  "corner": {
+   "kind": "range",
+   "label": "Corner",
+   "def": 0.75,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Square",
+   "hi": "Round",
+   "group": "Look"
+  },
+  "border": {
+   "kind": "range",
+   "label": "Border",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Thin",
+   "hi": "Thick",
+   "group": "Look"
+  },
+  "shine": {
+   "kind": "toggle",
+   "label": "Shine",
+   "def": true,
+   "group": "Look"
+  },
+  "frame": {
+   "kind": "color",
+   "label": "Sugar",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#f6d3b0",
+    "#8fd0f0",
+    "#9bd18a"
+   ],
+   "group": "Colors"
+  },
+  "fill": {
+   "kind": "color",
+   "label": "Health",
+   "def": "#6aa83e",
+   "swatches": [
+    "#6aa83e",
+    "#3f8a4f",
+    "#c9423a",
+    "#e08a2c",
+    "#4fd8ee",
+    "#f2c230"
+   ],
+   "group": "Colors"
+  },
+  "fillB": {
+   "kind": "color",
+   "label": "Magic",
+   "def": "#3f6fd1",
+   "swatches": [
+    "#3f6fd1",
+    "#3f9fd1",
+    "#4fd8ee",
+    "#8fd0f0",
+    "#4f9ff0"
+   ],
+   "group": "Colors"
+  },
+  "fillC": {
+   "kind": "color",
+   "label": "Gauge",
+   "def": "#f2c230",
+   "swatches": [
+    "#f2c230",
+    "#e08a2c",
+    "#a4c44a",
+    "#a06a3c",
+    "#c2c9d6"
+   ],
+   "group": "Colors"
+  }
+ },
+ "clips": {
+  "frame": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "fill": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "fill-b": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "fill-c": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "flash": {
+   "frames": 4,
+   "loop": false,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "slider": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "knob": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [
+  {
+   "name": "Sugar bars",
+   "params": {}
+  },
+  {
+   "name": "Striped",
+   "params": {
+    "style": "striped"
+   }
+  },
+  {
+   "name": "Frosted",
+   "params": {
+    "style": "frosted",
+    "frame": "#8fd0f0"
+   }
+  },
+  {
+   "name": "Matte mint",
+   "params": {
+    "shine": false,
+    "frame": "#9bd18a",
+    "fill": "#4fd8ee"
+   }
+  }
+ ],
+ "bundles": []
+}

@@ -15,7 +15,8 @@ import { resolveSprite } from '../../engine/resolve.js';
 import { validateSprite } from '../../catalog/sprite-schema.js';
 import { pieceRegistry } from '../../engine/pieces.js';
 import { testPieces } from '../fixtures/resolve/helpers.mjs';
-import forestCode from '../../sprites/tiles-forest.js';
+import { codeSprite } from '../helpers/library.mjs';
+const forestCode = await codeSprite('tiles-forest');   // the frozen copy: the library's is data since migration batch M5
 
 const FIX = new URL('../fixtures/v2/', import.meta.url);
 const load = (p) => JSON.parse(fs.readFileSync(new URL(p, FIX), 'utf8'));

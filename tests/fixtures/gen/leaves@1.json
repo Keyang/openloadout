@@ -1,0 +1,374 @@
+{
+ "id": "leaves",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "count": 5,
+    "seed": 1,
+    "paints": [
+     "g0"
+    ]
+   },
+   "ctx": {
+    "t": 0.4,
+    "loop": false
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      18,
+      14
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..aa.",
+      ".abba",
+      "acbba",
+      "acca.",
+      ".aa.."
+     ],
+     "key": {
+      "a": "g0.deep",
+      "b": "g0",
+      "c": "g0.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      16,
+      11
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aa..",
+      "abca.",
+      "abcca",
+      "abca.",
+      "abba.",
+      ".aa.."
+     ],
+     "key": {
+      "a": "g0.deep",
+      "b": "g0.dark",
+      "c": "g0"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      13,
+      11
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...a...",
+      ".aabaa.",
+      "accbbba",
+      ".accca.",
+      "..aaa.."
+     ],
+     "key": {
+      "a": "g0.deep",
+      "b": "g0",
+      "c": "g0.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      10,
+      11
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aa..",
+      "abca.",
+      "abcca",
+      "abbba",
+      ".aaba",
+      "...a."
+     ],
+     "key": {
+      "a": "g0.deep",
+      "b": "g0.dark",
+      "c": "g0"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      8,
+      14
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aaa..",
+      "abbca.",
+      ".abbba",
+      "..aaa."
+     ],
+     "key": {
+      "a": "g0.deep",
+      "b": "g0.dark",
+      "c": "g0"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     24,
+     18
+    ],
+    "count": 7,
+    "seed": 3,
+    "dist": 12,
+    "gravity": 12,
+    "size": 6,
+    "paints": [
+     "g0",
+     "g1"
+    ],
+    "rim": "b"
+   },
+   "ctx": {
+    "t": 0.8,
+    "loop": false
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      24,
+      21
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aaaa.",
+      "abccca",
+      "abbcca",
+      ".abbba",
+      "..aaa."
+     ],
+     "key": {
+      "a": "b",
+      "b": "g0.dark",
+      "c": "g0"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      24,
+      17
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..aaa.",
+      ".abcca",
+      ".accca",
+      "abbbba",
+      ".aaaa."
+     ],
+     "key": {
+      "a": "b",
+      "b": "g1.dark",
+      "c": "g1"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      25,
+      14
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..a..",
+      ".aba.",
+      "acbba",
+      "acbba",
+      "acba.",
+      "aca..",
+      ".a..."
+     ],
+     "key": {
+      "a": "b",
+      "b": "g0",
+      "c": "g0.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      20,
+      14
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".a...",
+      "abaa.",
+      "abcca",
+      "abcca",
+      "abbba",
+      ".aaa."
+     ],
+     "key": {
+      "a": "b",
+      "b": "g1.dark",
+      "c": "g1"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      16,
+      16
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aaa..",
+      "abcca.",
+      "abccca",
+      "abbba.",
+      ".aaa.."
+     ],
+     "key": {
+      "a": "b",
+      "b": "g0.dark",
+      "c": "g0"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      12,
+      16
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..aa..",
+      ".abba.",
+      "accbba",
+      ".acbba",
+      ".acca.",
+      "..aa.."
+     ],
+     "key": {
+      "a": "b",
+      "b": "g1",
+      "c": "g1.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      11,
+      19
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..aaa..",
+      ".abbba.",
+      "accbbba",
+      ".accca.",
+      "..aaa.."
+     ],
+     "key": {
+      "a": "b",
+      "b": "g0",
+      "c": "g0.dark"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "count": 3,
+    "seed": 9,
+    "size": 4,
+    "paints": [
+     "g1"
+    ]
+   },
+   "ctx": {
+    "t": 0,
+    "loop": false
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      13,
+      14
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..aa.",
+      ".abba",
+      "accca",
+      ".aaa."
+     ],
+     "key": {
+      "a": "g1.deep",
+      "b": "g1",
+      "c": "g1.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      14,
+      14
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aa.",
+      "abca",
+      "abba",
+      ".aba",
+      "..a."
+     ],
+     "key": {
+      "a": "g1.deep",
+      "b": "g1.dark",
+      "c": "g1"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      14,
+      13
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".a..",
+      "aba.",
+      "abca",
+      "abba",
+      ".aba",
+      "..a."
+     ],
+     "key": {
+      "a": "g1.deep",
+      "b": "g1.dark",
+      "c": "g1"
+     }
+    }
+   ]
+  }
+ ]
+}

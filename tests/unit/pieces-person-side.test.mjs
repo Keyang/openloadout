@@ -100,11 +100,11 @@ test('the baker never rewrites a pinned version: a change goes to the next free 
   assert.equal(releasedAs(piece, { 'part:test-cap@1': 'another', 'part:test-cap@2': 'and another' }).v, 3);
 });
 
-test('base: the code rig\'s standard clips, one key a frame, flash as a frame edit; the variants baked and held back', () => {
+test('base: the code rig\'s standard clips, one key a frame, flash as a frame edit; the variants published after them (B4x)', () => {
   const clips = BASE.body.clips;
   const code = H.clipsFor(Object.keys(STANDARD_CLIPS));
-  assert.deepEqual(Object.keys(clips), Object.keys(code));
-  for (const [name, c] of Object.entries(clips)) {
+  assert.deepEqual(Object.keys(clips), [...Object.keys(code), ...Object.keys(VARIANT_CLIPS)]);
+  for (const [name, c] of Object.entries(clips).filter(([n]) => Object.hasOwn(STANDARD_CLIPS, n))) {
     assert.equal(c.frames, code[name].frames, name);
     assert.equal(c.loop, code[name].loop, name);
     // engine/resolve.js plays a clip at fps times lerp(SPEED_FPS[0], SPEED_FPS[1], speed): the middle speed is 0.5
@@ -115,8 +115,9 @@ test('base: the code rig\'s standard clips, one key a frame, flash as a frame ed
   assert.deepEqual(clips.hurt.frameEdits, { 0: { flash: true } });
   assert.deepEqual(clips.die.frameEdits, { 0: { flash: true } });
   assert.equal(clips.idle.frameEdits, undefined);
-  // the variants (punch, thrust, the unarmed and bow clips) are baked and fit in a piece, not published yet (B4)
-  assert.equal(VARIANTS_PUBLISHED, false);
+  // the variants (punch, thrust, the unarmed and bow clips) are baked, fit in a piece and are published since @7 (B4x:
+  // a sprite takes the clips its extends.clips lists, and names a variant with from; tests/unit/person-side-variants)
+  assert.equal(VARIANTS_PUBLISHED, true);
   assert.deepEqual(Object.keys(FULL.body.clips), [...Object.keys(STANDARD_CLIPS), ...Object.keys(VARIANT_CLIPS)]);
   for (const [name, c] of Object.entries(VARIANT_CLIPS)) {
     assert.ok(H.POSES.includes(c.pose) && STANDARD_CLIPS[c.for], name);
@@ -209,16 +210,13 @@ test('the Hero keeps the code knight\'s versions by name and its controls\' keys
   }
 });
 
-test('the Hero\'s clips are the code knight\'s, no more', {
-  todo: 'B1 + B4: engine/resolve.js clipNames gives a sprite every clip of its base, so the Hero also has shoot, cast and talk (section 7: a redraw keeps its clips). Needs a clip list on extends in catalog/sprite-schema.js (its extends takes only use, v, drop and paint) and in engine/resolve.js clipNames; see pieces/README.md, the side-view person, "Not yet"',
-}, () => {
+test('the Hero\'s clips are the code knight\'s, no more (its extends.clips, B4x)', () => {
   assert.deepEqual(Object.keys(hero().sprite.clips), Object.keys(knight.clips));
 });
 
-test('the Hero with no weapon punches, as the code knight does', {
-  todo: 'B1 + B4: a clip\'s from names one base clip (catalog/sprite-schema.js refuses anything but a string); the code knight picks punch when Weapon is none (baked: VARIANT_CLIPS). Needs from to take a choice binding, e.g. { "from": "weapon", "pick": { "none": "punch" } }, in the schema and engine/resolve.js clipsOf, and the variants published (they fit: the base with them is 127,833 of 131,072 bytes; held back until a clip list on extends lets a sprite leave them out)',
-}, () => {
-  assert.equal(hero().sprite.clips.attack.from, 'punch');
+test('the Hero with no weapon punches, as the code knight does (a from picked by Weapon, B4x)', () => {
+  assert.equal(resolveSprite(HERO, { weapon: 'none' }, { pieces: store() }).clips.attack.from, 'punch');
+  assert.equal(resolveSprite(HERO, { weapon: 'sword' }, { pieces: store() }).clips.attack.from, 'attack');
 });
 
 test('the Hero swaps its parts: weapon, headgear, hair, cape', () => {

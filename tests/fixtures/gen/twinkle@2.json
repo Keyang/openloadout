@@ -1,0 +1,99 @@
+{
+ "id": "twinkle",
+ "v": 2,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "size": 2,
+    "paint": "p3",
+    "core": "w"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      14,
+      14
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..a..",
+      "..a..",
+      "aabaa",
+      "..a..",
+      "..a.."
+     ],
+     "key": {
+      "a": "p3",
+      "b": "w"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     1,
+     5
+    ],
+    "size": 3,
+    "paint": "p2",
+    "core": "w"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      1,
+      2
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a...",
+      "a...",
+      "a...",
+      "baaa",
+      "a...",
+      "a...",
+      "a..."
+     ],
+     "key": {
+      "a": "p2",
+      "b": "w"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     10.7,
+     20.2
+    ],
+    "size": 0,
+    "paint": "p1",
+    "core": "w"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      10,
+      20
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a"
+     ],
+     "key": {
+      "a": "p1"
+     }
+    }
+   ]
+  }
+ ]
+}

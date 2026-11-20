@@ -1,0 +1,769 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "icons-weapons",
+ "name": "Weapon icons",
+ "blurb": "Six sci-fi weapon icons seen from the side: blaster, scatter gun, beam, rocket launcher, orbit blades and mine; change the plate behind them, their tilt, shine, size and colours.",
+ "meta": {
+  "type": "icon",
+  "role": "items/weapon",
+  "themes": ["sci-fi", "space"],
+  "gameTypes": ["roguelike-action", "shooter", "arcade"],
+  "view": "none",
+  "words": ["weapon", "gun", "pistol", "blaster", "shotgun", "laser", "rocket launcher", "mine", "blades", "loadout", "equip", "arsenal", "shoot"],
+  "license": "draft"
+ },
+ "size": [32, 32],
+ "pivot": [16, 16],
+ "grounded": false,
+ "preview": "blaster",
+ "styles": ["pixel"],
+ "palette": [
+  {
+   "id": "face",
+   "label": "Plate colour",
+   "default": "#434d6d",
+   "material": "interface",
+   "swatches": ["#434d6d", "#566182", "#6b7896", "#3f6fd1", "#6660b6"]
+  },
+  {"id": "body", "label": "Metal", "default": "#9aa6c0", "material": "metal", "swatches": ["#9aa6c0", "#c2c9d6", "#e8ecf2", "#f2c230", "#ca9eda"]},
+  {
+   "id": "glow",
+   "label": "Glow",
+   "default": "#5fe0f0",
+   "material": "light",
+   "swatches": ["#5fe0f0", "#e2473f", "#9fe040", "#b48af8", "#4f9ff0", "#5fd47a"]
+  },
+  {"id": "white", "default": "#ffffff", "material": "light", "detail": true},
+  {"id": "amber", "default": "#f2a030", "material": "paint", "detail": true}
+ ],
+ "controls": [
+  {"key": "backing", "kind": "choice", "label": "Plate", "options": ["none", {"value": "hex", "label": "Hexagon"}, "circle"], "default": "none"},
+  {"key": "shine", "kind": "toggle", "label": "Shine", "default": true},
+  {"key": "tilt", "kind": "toggle", "label": "Tilt", "default": true},
+  {"key": "size", "kind": "range", "label": "Size", "lo": "Small", "hi": "Big", "default": 0.5},
+  {"key": "face", "kind": "colour", "label": "Plate colour", "when": {"backing": ["hex", "circle"]}},
+  {"key": "body", "kind": "colour", "label": "Metal"},
+  {"key": "glow", "kind": "colour", "label": "Glow"}
+ ],
+ "body": {
+  "pictures": {
+   "draw": [],
+   "pictures": {
+    "blaster": {
+     "label": "Blaster",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {"from": "size", "map": [[0, 0], [1, 1]]},
+       "tilt": false,
+       "turn": 26.5651,
+       "soften": false,
+       "shiny": {"from": "shine", "pick": {"true": true, "false": false}},
+       "fill": {"from": "backing", "pick": {"none": 1, "hex": 0.94, "circle": 0.94}},
+       "plate": {"from": "backing", "pick": {"none": "none", "hex": "hex", "circle": "circle"}},
+       "face": "face",
+       "rise": {"from": "tilt", "pick": {"true": 0.25, "false": 0}},
+       "draw": [
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [{"kind": "poly", "points": [[-7.6, -1.6], [-1.6, -1.6], [-3.6, 8], [-9.6, 8]], "paint": "body.dark"}],
+         "paint": "body.dark",
+         "soft": 0,
+         "lit": 0,
+         "band": "body.deep",
+         "middle": "body.dark",
+         "highlight": "body.dark"
+        },
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [{"kind": "poly", "points": [[-2, -1.6], [3.6, -1.6], [3.6, 3.6], [-2, 3.6]], "paint": "body.dark"}],
+         "minus": [{"kind": "rect", "at": [-3, -2], "size": [5, 4], "paint": "body.dark"}],
+         "paint": "body.dark",
+         "soft": 0,
+         "lit": 0,
+         "band": "body.deep",
+         "middle": "body.dark",
+         "highlight": "body.dark"
+        },
+        {"kind": "poly", "points": [[3, -1.6], [7.6, -1.6], [7.6, 2.2], [3, 2.2]], "paint": "glow", "shade": 0, "light": 0},
+        {"kind": "poly", "points": [[-8.8, -6.8], [7.8, -6.8], [7.8, -1.2], [-8.8, -1.2]], "paint": "body", "shade": 2, "group": "body"},
+        {"kind": "poly", "points": [[7.8, -5.8], [10.6, -5.8], [10.6, -2.2], [7.8, -2.2]], "paint": "body", "shade": 2, "group": "body"},
+        {"kind": "poly", "points": [[-8.4, -8.4], [-5.8, -8.4], [-5.8, -6.8], [-8.4, -6.8]], "paint": "body", "shade": 2, "group": "body"},
+        {"kind": "poly", "points": [[5, -7.8], [6.8, -7.8], [6.8, -6.8], [5, -6.8]], "paint": "body", "shade": 2, "group": "body"},
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [{"kind": "poly", "points": [[9.2, -5.8], [10.6, -5.8], [10.6, -2.2], [9.2, -2.2]], "paint": "body.dark"}],
+         "paint": "body.dark",
+         "soft": 0,
+         "lit": 0,
+         "band": "body.deep",
+         "middle": "body.dark",
+         "highlight": "body.dark"
+        },
+        {"kind": "line", "from": [-6.8, -3.1], "to": [5.4, -3.1], "paint": "body.dark"},
+        {"gen": "icon.glint", "v": 2, "at": [-3, -6.2], "len": 1, "dot": false, "paint": "white"}
+       ]
+      }
+     ]
+    },
+    "scatter": {
+     "label": "Scatter gun",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {"from": "size", "map": [[0, 0], [1, 1]]},
+       "tilt": false,
+       "turn": 26.5651,
+       "soften": false,
+       "shiny": {"from": "shine", "pick": {"true": true, "false": false}},
+       "plate": {"from": "backing", "pick": {"none": "none", "hex": "hex", "circle": "circle"}},
+       "face": "face",
+       "rise": {"from": "tilt", "pick": {"true": 0.25, "false": 0}},
+       "draw": [
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [
+          {
+           "kind": "poly",
+           "points": [[-6.6, -4.4], [-9.2, -3.2], [-11.5, 1.6], [-11.5, 7.2], [-8.2, 7.2], [-7, 3.4], [-4.6, 1.6]],
+           "paint": "body.dark"
+          }
+         ],
+         "paint": "body.dark",
+         "soft": 0,
+         "lit": 0,
+         "band": "body.deep",
+         "middle": "body.dark",
+         "highlight": "body.dark"
+        },
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [{"kind": "poly", "points": [[-5, 1.6], [-1.4, 1.6], [-1.4, 4.6], [-5, 4.6]], "paint": "body.dark"}],
+         "minus": [{"kind": "poly", "points": [[-4, 1], [-2.4, 1], [-2.4, 3.3], [-4, 3.3]], "paint": "body.dark"}],
+         "paint": "body.dark",
+         "soft": 0,
+         "lit": 0,
+         "band": "body.deep",
+         "middle": "body.dark",
+         "highlight": "body.dark"
+        },
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [{"kind": "poly", "points": [[0.6, 1.4], [7.4, 1.4], [7.4, 4.2], [0.6, 4.2]], "paint": "body.dark"}],
+         "paint": "body.dark",
+         "soft": 0,
+         "lit": 0,
+         "band": "body.deep",
+         "middle": "body.dark",
+         "highlight": "body.dark"
+        },
+        {"kind": "poly", "points": [[-7.2, -5], [-2, -5], [-2, 2], [-7.2, 2]], "paint": "body", "shade": 2, "group": "body"},
+        {"kind": "poly", "points": [[-2, -5.6], [11.5, -5.6], [11.5, 1.6], [-2, 1.6]], "paint": "body", "shade": 2, "group": "body"},
+        {"kind": "poly", "points": [[8.8, -7], [11.5, -7], [11.5, 3], [8.8, 3]], "paint": "body", "shade": 2, "group": "body"},
+        {"kind": "line", "from": [-1.2, -2.1], "to": [9, -2.1], "paint": "body.deep"},
+        {
+         "gen": "icon.rim",
+         "v": 1,
+         "shapes": [{"kind": "poly", "points": [[-5.8, -3.4], [-3.4, -3.4], [-3.4, -1], [-5.8, -1]], "paint": "glow"}],
+         "paint": "body.deep"
+        },
+        {"kind": "poly", "points": [[-5.8, -3.4], [-3.4, -3.4], [-3.4, -1], [-5.8, -1]], "paint": "glow", "shade": 0, "light": 0},
+        {"gen": "icon.glint", "v": 2, "at": [4, -5], "len": 1, "dot": false, "paint": "white"}
+       ]
+      }
+     ]
+    },
+    "beam": {
+     "label": "Beam",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {"from": "size", "map": [[0, 0], [1, 1]]},
+       "tilt": false,
+       "turn": 26.5651,
+       "soften": false,
+       "shiny": {"from": "shine", "pick": {"true": true, "false": false}},
+       "plate": {"from": "backing", "pick": {"none": "none", "hex": "hex", "circle": "circle"}},
+       "face": "face",
+       "rise": {"from": "tilt", "pick": {"true": 0.25, "false": 0}},
+       "draw": [
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [{"kind": "poly", "points": [[-11.5, -2.6], [-8.2, -3], [-8.2, 2.2], [-11.5, 3.8]], "paint": "body.dark"}],
+         "paint": "body.dark",
+         "soft": 0,
+         "lit": 0,
+         "band": "body.deep",
+         "middle": "body.dark",
+         "highlight": "body.dark"
+        },
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [{"kind": "poly", "points": [[-7.2, 2.6], [-3.8, 2.6], [-5.4, 7.6], [-8.8, 7.6]], "paint": "body.dark"}],
+         "paint": "body.dark",
+         "soft": 0,
+         "lit": 0,
+         "band": "body.deep",
+         "middle": "body.dark",
+         "highlight": "body.dark"
+        },
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [{"kind": "poly", "points": [[-1.8, -2.3], [10.2, -2.3], [10.2, 0.5], [-1.8, 0.5]], "paint": "body.dark"}],
+         "paint": "body.dark",
+         "soft": 0,
+         "lit": 0,
+         "band": "body.deep",
+         "middle": "body.dark",
+         "highlight": "body.dark"
+        },
+        {"kind": "poly", "points": [[-8.8, -4.8], [-1.6, -4.8], [-1.6, 2.8], [-8.8, 2.8]], "paint": "body", "shade": 2},
+        {"kind": "poly", "points": [[0, -4.8], [2, -4.8], [2, 3], [0, 3]], "paint": "body", "shade": 1, "group": "body"},
+        {"kind": "poly", "points": [[3.6, -4.1], [5.4, -4.1], [5.4, 2.3], [3.6, 2.3]], "paint": "body", "shade": 1, "group": "body"},
+        {"kind": "poly", "points": [[7, -3.4], [8.6, -3.4], [8.6, 1.6], [7, 1.6]], "paint": "body", "shade": 1, "group": "body"},
+        {
+         "gen": "icon.rim",
+         "v": 1,
+         "shapes": [{"kind": "poly", "points": [[-7.2, -3.2], [-3.2, -3.2], [-3.2, -0.6], [-7.2, -0.6]], "paint": "glow"}],
+         "paint": "body.deep"
+        },
+        {"kind": "poly", "points": [[-7.2, -3.2], [-3.2, -3.2], [-3.2, -0.6], [-7.2, -0.6]], "paint": "glow", "shade": 0, "light": 0}
+       ],
+       "lights": [
+        {"gen": "glow", "v": 1, "at": [10.9, -0.9], "r": 2.4, "paints": ["white", "glow", "glow.dark"], "when": {"shine": [true]}},
+        {"gen": "glow", "v": 1, "at": [10.9, -0.9], "r": 2.4, "paints": ["glow", "glow", "glow.dark"], "when": {"shine": [false]}}
+       ]
+      }
+     ]
+    },
+    "rocket": {
+     "label": "Rocket launcher",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {"from": "size", "map": [[0, 0], [1, 1]]},
+       "tilt": false,
+       "turn": 26.5651,
+       "soften": false,
+       "shiny": {"from": "shine", "pick": {"true": true, "false": false}},
+       "plate": {"from": "backing", "pick": {"none": "none", "hex": "hex", "circle": "circle"}},
+       "face": "face",
+       "rise": {"from": "tilt", "pick": {"true": 0.25, "false": 0}},
+       "draw": [
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [{"kind": "poly", "points": [[-0.6, 2], [2.8, 2], [1.4, 7.2], [-2, 7.2]], "paint": "body.dark"}],
+         "paint": "body.dark",
+         "soft": 0,
+         "lit": 0,
+         "band": "body.deep",
+         "middle": "body.dark",
+         "highlight": "body.dark"
+        },
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [{"kind": "poly", "points": [[-6.4, 2], [-3.4, 2], [-4.4, 5], [-7.4, 5]], "paint": "body.dark"}],
+         "paint": "body.dark",
+         "soft": 0,
+         "lit": 0,
+         "band": "body.deep",
+         "middle": "body.dark",
+         "highlight": "body.dark"
+        },
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [{"kind": "poly", "points": [[-1.8, -8], [1.4, -8], [1.4, -5.2], [-1.8, -5.2]], "paint": "body.dark"}],
+         "paint": "body.dark",
+         "soft": 0,
+         "lit": 0,
+         "band": "body.deep",
+         "middle": "body.dark",
+         "highlight": "body.dark"
+        },
+        {"kind": "poly", "points": [[-7.8, -5.2], [6.4, -5.2], [6.4, 2], [-7.8, 2]], "paint": "body", "shade": 2, "group": "body"},
+        {"kind": "poly", "points": [[-7.6, -5.2], [-11.5, -7.4], [-11.5, 4.2], [-7.6, 2]], "paint": "body", "shade": 2, "group": "body"},
+        {"kind": "poly", "points": [[5, -6], [7.4, -6], [7.4, 2.8], [5, 2.8]], "paint": "body", "shade": 2, "group": "body"},
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [{"kind": "poly", "points": [[-9.8, -6.441], [-11.5, -7.4], [-11.5, 4.2], [-9.8, 3.241]], "paint": "body.dark"}],
+         "paint": "body.dark",
+         "flat": true,
+         "band": "body.deep",
+         "middle": "body.dark",
+         "highlight": "body.dark"
+        },
+        {
+         "gen": "icon.rim",
+         "v": 1,
+         "shapes": [{"kind": "poly", "points": [[-5.4, -5.2], [-2.6, -5.2], [-2.6, 2], [-5.4, 2]], "paint": "amber"}],
+         "within": [{"kind": "poly", "points": [[-7.8, -5.2], [6.4, -5.2], [6.4, 2], [-7.8, 2]], "paint": "amber"}],
+         "paint": "body.dark"
+        },
+        {"kind": "poly", "points": [[-5.4, -5.2], [-2.6, -5.2], [-2.6, 2], [-5.4, 2]], "paint": "amber", "shade": 0, "light": 0},
+        {
+         "gen": "icon.rim",
+         "v": 1,
+         "shapes": [{"kind": "poly", "points": [[7.4, -4.4], [9.2, -4], [11.5, -1.6], [9.2, 0.8], [7.4, 1.2]], "paint": "glow"}],
+         "paint": "ink",
+         "over": true
+        },
+        {"kind": "poly", "points": [[7.4, -4.4], [9.2, -4], [11.5, -1.6], [9.2, 0.8], [7.4, 1.2]], "paint": "glow", "shade": 0, "light": 0},
+        {"gen": "icon.glint", "v": 2, "at": [2, -4.6], "len": 1, "dot": false, "paint": "white"}
+       ]
+      }
+     ]
+    },
+    "orbit-blades": {
+     "label": "Orbit blades",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {"from": "size", "map": [[0, 0], [1, 1]]},
+       "tilt": false,
+       "turn": 26.5651,
+       "soften": false,
+       "shiny": {"from": "shine", "pick": {"true": true, "false": false}},
+       "plate": {"from": "backing", "pick": {"none": "none", "hex": "hex", "circle": "circle"}},
+       "face": "face",
+       "draw": [
+        {
+         "kind": "poly",
+         "points": [
+          [5.7, -9.8727],
+          [7.4941, -8.5906],
+          [9.0078, -6.9871],
+          [10.1844, -5.1222],
+          [10.9801, -3.0657],
+          [11.3649, -0.8944],
+          [11.3244, 1.3103],
+          [10.8603, 3.466],
+          [9.9899, 5.492],
+          [9.0415, 2.8855],
+          [8.6423, 1],
+          [8.0682, -0.635],
+          [7.3023, -2.0388],
+          [6.3706, -3.2041],
+          [5.3126, -4.1209],
+          [4.1735, -4.7842],
+          [3, -5.1962]
+         ],
+         "paint": "body",
+         "shade": 1,
+         "when": {"tilt": [true]}
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [5.7, -9.8727],
+          [7.4941, -8.5906],
+          [9.0078, -6.9871],
+          [10.1844, -5.1222],
+          [10.9801, -3.0657],
+          [11.3649, -0.8944],
+          [11.3244, 1.3103],
+          [10.8603, 3.466],
+          [9.9899, 5.492],
+          [9.0415, 2.8855],
+          [8.6423, 1],
+          [8.0682, -0.635],
+          [7.3023, -2.0388],
+          [6.3706, -3.2041],
+          [5.3126, -4.1209],
+          [4.1735, -4.7842],
+          [3, -5.1962]
+         ],
+         "paint": "glow",
+         "shade": 0,
+         "light": 0,
+         "group": "glow",
+         "when": {"tilt": [true]}
+        },
+        {"kind": "cut", "from": "glow", "shape": {"kind": "ellipse", "at": [0, 0], "r": [9.8, 9.8], "paint": "glow"}, "when": {"tilt": [true]}},
+        {
+         "kind": "poly",
+         "points": [
+          [5.7, 9.8727],
+          [3.6927, 10.7854],
+          [1.5472, 11.2945],
+          [-0.6562, 11.3811],
+          [-2.8351, 11.0418],
+          [-4.9078, 10.2895],
+          [-6.797, 9.1521],
+          [-8.4318, 7.6723],
+          [-9.7512, 5.9055],
+          [-7.0197, 6.3874],
+          [-5.1872, 6.9845],
+          [-3.4842, 7.3048],
+          [-1.8855, 7.3434],
+          [-0.4105, 7.1191],
+          [0.9125, 6.6613],
+          [2.0565, 6.0065],
+          [3, 5.1962]
+         ],
+         "paint": "body",
+         "shade": 1,
+         "when": {"tilt": [true]}
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [5.7, 9.8727],
+          [3.6927, 10.7854],
+          [1.5472, 11.2945],
+          [-0.6562, 11.3811],
+          [-2.8351, 11.0418],
+          [-4.9078, 10.2895],
+          [-6.797, 9.1521],
+          [-8.4318, 7.6723],
+          [-9.7512, 5.9055],
+          [-7.0197, 6.3874],
+          [-5.1872, 6.9845],
+          [-3.4842, 7.3048],
+          [-1.8855, 7.3434],
+          [-0.4105, 7.1191],
+          [0.9125, 6.6613],
+          [2.0565, 6.0065],
+          [3, 5.1962]
+         ],
+         "paint": "glow",
+         "shade": 0,
+         "light": 0,
+         "group": "glow-2",
+         "when": {"tilt": [true]}
+        },
+        {"kind": "cut", "from": "glow-2", "shape": {"kind": "ellipse", "at": [0, 0], "r": [9.8, 9.8], "paint": "glow"}, "when": {"tilt": [true]}},
+        {
+         "kind": "poly",
+         "points": [
+          [-11.4, 0],
+          [-11.1867, -2.1948],
+          [-10.5549, -4.3074],
+          [-9.5282, -6.2589],
+          [-8.145, -7.9762],
+          [-6.457, -9.395],
+          [-4.5275, -10.4624],
+          [-2.4285, -11.1383],
+          [-0.2387, -11.3975],
+          [-2.0218, -9.273],
+          [-3.4552, -7.9845],
+          [-4.584, -6.6698],
+          [-5.4169, -5.3046],
+          [-5.9601, -3.915],
+          [-6.2251, -2.5404],
+          [-6.23, -1.2223],
+          [-6, 0]
+         ],
+         "paint": "body",
+         "shade": 1,
+         "when": {"tilt": [true]}
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [-11.4, 0],
+          [-11.1867, -2.1948],
+          [-10.5549, -4.3074],
+          [-9.5282, -6.2589],
+          [-8.145, -7.9762],
+          [-6.457, -9.395],
+          [-4.5275, -10.4624],
+          [-2.4285, -11.1383],
+          [-0.2387, -11.3975],
+          [-2.0218, -9.273],
+          [-3.4552, -7.9845],
+          [-4.584, -6.6698],
+          [-5.4169, -5.3046],
+          [-5.9601, -3.915],
+          [-6.2251, -2.5404],
+          [-6.23, -1.2223],
+          [-6, 0]
+         ],
+         "paint": "glow",
+         "shade": 0,
+         "light": 0,
+         "group": "glow-3",
+         "when": {"tilt": [true]}
+        },
+        {"kind": "cut", "from": "glow-3", "shape": {"kind": "ellipse", "at": [0, 0], "r": [9.8, 9.8], "paint": "glow"}, "when": {"tilt": [true]}},
+        {
+         "kind": "poly",
+         "points": [
+          [0, -11.4],
+          [2.1948, -11.1867],
+          [4.3074, -10.5549],
+          [6.2589, -9.5282],
+          [7.9762, -8.145],
+          [9.395, -6.457],
+          [10.4624, -4.5275],
+          [11.1383, -2.4285],
+          [11.3975, -0.2387],
+          [9.273, -2.0218],
+          [7.9845, -3.4552],
+          [6.6698, -4.584],
+          [5.3046, -5.4169],
+          [3.915, -5.9601],
+          [2.5404, -6.2251],
+          [1.2223, -6.23],
+          [0, -6]
+         ],
+         "paint": "body",
+         "shade": 1,
+         "when": {"tilt": [false]}
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [0, -11.4],
+          [2.1948, -11.1867],
+          [4.3074, -10.5549],
+          [6.2589, -9.5282],
+          [7.9762, -8.145],
+          [9.395, -6.457],
+          [10.4624, -4.5275],
+          [11.1383, -2.4285],
+          [11.3975, -0.2387],
+          [9.273, -2.0218],
+          [7.9845, -3.4552],
+          [6.6698, -4.584],
+          [5.3046, -5.4169],
+          [3.915, -5.9601],
+          [2.5404, -6.2251],
+          [1.2223, -6.23],
+          [0, -6]
+         ],
+         "paint": "glow",
+         "shade": 0,
+         "light": 0,
+         "group": "glow-4",
+         "when": {"tilt": [false]}
+        },
+        {"kind": "cut", "from": "glow-4", "shape": {"kind": "ellipse", "at": [0, 0], "r": [9.8, 9.8], "paint": "glow"}, "when": {"tilt": [false]}},
+        {
+         "kind": "poly",
+         "points": [
+          [9.8727, 5.7],
+          [8.5906, 7.4941],
+          [6.9871, 9.0078],
+          [5.1222, 10.1844],
+          [3.0657, 10.9801],
+          [0.8944, 11.3649],
+          [-1.3103, 11.3244],
+          [-3.466, 10.8603],
+          [-5.492, 9.9899],
+          [-2.8855, 9.0415],
+          [-1, 8.6423],
+          [0.635, 8.0682],
+          [2.0388, 7.3023],
+          [3.2041, 6.3706],
+          [4.1209, 5.3126],
+          [4.7842, 4.1735],
+          [5.1962, 3]
+         ],
+         "paint": "body",
+         "shade": 1,
+         "when": {"tilt": [false]}
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [9.8727, 5.7],
+          [8.5906, 7.4941],
+          [6.9871, 9.0078],
+          [5.1222, 10.1844],
+          [3.0657, 10.9801],
+          [0.8944, 11.3649],
+          [-1.3103, 11.3244],
+          [-3.466, 10.8603],
+          [-5.492, 9.9899],
+          [-2.8855, 9.0415],
+          [-1, 8.6423],
+          [0.635, 8.0682],
+          [2.0388, 7.3023],
+          [3.2041, 6.3706],
+          [4.1209, 5.3126],
+          [4.7842, 4.1735],
+          [5.1962, 3]
+         ],
+         "paint": "glow",
+         "shade": 0,
+         "light": 0,
+         "group": "glow-5",
+         "when": {"tilt": [false]}
+        },
+        {"kind": "cut", "from": "glow-5", "shape": {"kind": "ellipse", "at": [0, 0], "r": [9.8, 9.8], "paint": "glow"}, "when": {"tilt": [false]}},
+        {
+         "kind": "poly",
+         "points": [
+          [-9.8727, 5.7],
+          [-10.7854, 3.6927],
+          [-11.2945, 1.5472],
+          [-11.3811, -0.6562],
+          [-11.0418, -2.8351],
+          [-10.2895, -4.9078],
+          [-9.1521, -6.797],
+          [-7.6723, -8.4318],
+          [-5.9055, -9.7512],
+          [-6.3874, -7.0197],
+          [-6.9845, -5.1872],
+          [-7.3048, -3.4842],
+          [-7.3434, -1.8855],
+          [-7.1191, -0.4105],
+          [-6.6613, 0.9125],
+          [-6.0065, 2.0565],
+          [-5.1962, 3]
+         ],
+         "paint": "body",
+         "shade": 1,
+         "when": {"tilt": [false]}
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [-9.8727, 5.7],
+          [-10.7854, 3.6927],
+          [-11.2945, 1.5472],
+          [-11.3811, -0.6562],
+          [-11.0418, -2.8351],
+          [-10.2895, -4.9078],
+          [-9.1521, -6.797],
+          [-7.6723, -8.4318],
+          [-5.9055, -9.7512],
+          [-6.3874, -7.0197],
+          [-6.9845, -5.1872],
+          [-7.3048, -3.4842],
+          [-7.3434, -1.8855],
+          [-7.1191, -0.4105],
+          [-6.6613, 0.9125],
+          [-6.0065, 2.0565],
+          [-5.1962, 3]
+         ],
+         "paint": "glow",
+         "shade": 0,
+         "light": 0,
+         "group": "glow-6",
+         "when": {"tilt": [false]}
+        },
+        {"kind": "cut", "from": "glow-6", "shape": {"kind": "ellipse", "at": [0, 0], "r": [9.8, 9.8], "paint": "glow"}, "when": {"tilt": [false]}},
+        {"kind": "ellipse", "at": [0, 0], "r": [4.3, 4.3], "paint": "body", "shade": 1},
+        {"gen": "icon.rim", "v": 1, "shapes": [{"kind": "ellipse", "at": [0, 0], "r": [2.3, 2.3], "paint": "glow"}], "paint": "body.deep"},
+        {"kind": "ellipse", "at": [0, 0], "r": [2.3, 2.3], "paint": "glow", "shade": 0, "light": 0}
+       ]
+      }
+     ]
+    },
+    "mine": {
+     "label": "Mine",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {"from": "size", "map": [[0, 0], [1, 1]]},
+       "tilt": false,
+       "turn": 26.5651,
+       "soften": false,
+       "shiny": {"from": "shine", "pick": {"true": true, "false": false}},
+       "plate": {"from": "backing", "pick": {"none": "none", "hex": "hex", "circle": "circle"}},
+       "face": "face",
+       "rise": {"from": "tilt", "pick": {"true": 0.25, "false": 0}},
+       "draw": [
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [
+          {"kind": "poly", "points": [[-11.8, 2], [-8.6, 0.8], [-8.6, 5.2], [-11.8, 4]], "paint": "body.dark"},
+          {"kind": "poly", "points": [[11.8, 2], [8.6, 0.8], [8.6, 5.2], [11.8, 4]], "paint": "body.dark"},
+          {"kind": "poly", "points": [[-5.6, 7.4], [-3.2, 7.4], [-3.2, 10.6], [-5.6, 10.6]], "paint": "body.dark"},
+          {"kind": "poly", "points": [[3.2, 7.4], [5.6, 7.4], [5.6, 10.6], [3.2, 10.6]], "paint": "body.dark"}
+         ],
+         "paint": "body.dark",
+         "soft": 0,
+         "lit": 0,
+         "band": "body.deep",
+         "middle": "body.dark",
+         "highlight": "body.dark"
+        },
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [
+          {"kind": "ellipse", "at": [0, 5.2], "r": [9.8, 4.5], "paint": "body.dark"},
+          {"kind": "poly", "points": [[-9.8, 0.8], [9.8, 0.8], [9.8, 5.2], [-9.8, 5.2]], "paint": "body.dark"}
+         ],
+         "paint": "body.dark",
+         "soft": 0,
+         "lit": 0,
+         "band": "body.deep",
+         "middle": "body.dark",
+         "highlight": "body.dark"
+        },
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [
+          {"kind": "poly", "points": [[-8.2, 10.5], [-5.8, 10.5], [-3.2, 0], [-5.6, 0]], "paint": "amber"},
+          {"kind": "poly", "points": [[-2.6, 10.5], [-0.2, 10.5], [2.4, 0], [0, 0]], "paint": "amber"},
+          {"kind": "poly", "points": [[3, 10.5], [5.4, 10.5], [8, 0], [5.6, 0]], "paint": "amber"}
+         ],
+         "minus": [{"kind": "ellipse", "at": [0, 0.8], "r": [9.8, 4.5], "paint": "amber"}],
+         "within": [
+          {"kind": "ellipse", "at": [0, 5.2], "r": [9.8, 4.5], "paint": "amber"},
+          {"kind": "poly", "points": [[-9.8, 0.8], [9.8, 0.8], [9.8, 5.2], [-9.8, 5.2]], "paint": "amber"}
+         ],
+         "paint": "amber",
+         "flat": true
+        },
+        {"kind": "ellipse", "at": [0, 0.8], "r": [9.8, 4.5], "paint": "body", "shade": 2},
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [{"kind": "ellipse", "at": [0, 0.6], "r": [4.8, 2.4], "paint": "body.dark"}],
+         "paint": "body.dark",
+         "flat": true,
+         "band": "body.deep",
+         "middle": "body.dark",
+         "highlight": "body.dark"
+        },
+        {"gen": "icon.rim", "v": 1, "shapes": [{"kind": "ellipse", "at": [0, -1.8], "r": [2.9, 2.6], "paint": "glow"}], "paint": "ink", "over": true},
+        {"kind": "ellipse", "at": [0, -1.8], "r": [2.9, 2.6], "paint": "glow", "shade": 0, "light": 0}
+       ],
+       "lights": [{"gen": "twinkle", "v": 2, "at": [0, -3.2], "size": 1, "paint": "glow", "core": "white", "when": {"shine": [true]}}]
+      }
+     ]
+    }
+   }
+  }
+ },
+ "clips": {
+  "blaster": {"frames": 1, "fps": 1, "label": "Blaster"},
+  "scatter": {"frames": 1, "fps": 1, "label": "Scatter gun"},
+  "beam": {"frames": 1, "fps": 1, "label": "Beam"},
+  "rocket": {"frames": 1, "fps": 1, "label": "Rocket launcher"},
+  "orbit-blades": {"frames": 1, "fps": 1, "label": "Orbit blades"},
+  "mine": {"frames": 1, "fps": 1, "label": "Mine"}
+ }
+}

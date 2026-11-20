@@ -1,0 +1,270 @@
+{
+ "id": "ui-score-counter",
+ "frozen": "2026-11-20",
+ "source": "sprites/ui-score-counter.js",
+ "sha256": "921ad392e0b3410d2ba6fe4363bf3cc4e62c2a5174a2f7c2a26d67ad311d35ad",
+ "name": "Score counter",
+ "blurb": "A score plate for the top of the screen: a case with a picture and a row of digit windows, a digit that rolls up like an odometer and a bump when points arrive, plus the empty plate for the game's own digits; change the style, number of digits, size, picture, leading zeros and colours.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/panel",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "arcade",
+   "platformer",
+   "shooter",
+   "puzzle"
+  ],
+  "view": "none",
+  "words": [
+   "score",
+   "counter",
+   "points",
+   "digits",
+   "hud",
+   "odometer",
+   "count",
+   "coins"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  96,
+  24
+ ],
+ "pivot": [
+  48,
+  12
+ ],
+ "grounded": false,
+ "preview": "idle",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "plate",
+   "options": [
+    {
+     "value": "plate",
+     "label": "Plate"
+    },
+    {
+     "value": "strip",
+     "label": "Strip"
+    },
+    {
+     "value": "drum",
+     "label": "Drum"
+    }
+   ],
+   "group": "Look"
+  },
+  "digits": {
+   "kind": "range",
+   "label": "Digits",
+   "def": 6,
+   "min": 3,
+   "max": 7,
+   "step": 1,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "icon": {
+   "kind": "choice",
+   "label": "Picture",
+   "def": "star",
+   "options": [
+    {
+     "value": "none",
+     "label": "None"
+    },
+    {
+     "value": "star",
+     "label": "Star"
+    },
+    {
+     "value": "coin",
+     "label": "Coin"
+    },
+    {
+     "value": "heart",
+     "label": "Heart"
+    }
+   ],
+   "group": "Look"
+  },
+  "zeros": {
+   "kind": "toggle",
+   "label": "Leading zeros",
+   "def": true,
+   "group": "Look",
+   "when": {
+    "digits": [
+     5,
+     6,
+     7
+    ]
+   }
+  },
+  "face": {
+   "kind": "color",
+   "label": "Windows",
+   "def": "#3f5068",
+   "swatches": [
+    "#3f5068",
+    "#7a4f33",
+    "#434d6d",
+    "#8e3a4a"
+   ],
+   "group": "Colors"
+  },
+  "frame": {
+   "kind": "color",
+   "label": "Case",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#8fd0f0",
+    "#9bd18a",
+    "#c2c9d6",
+    "#f6d3b0"
+   ],
+   "group": "Colors"
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Digits",
+   "def": "#4fd8ee",
+   "swatches": [
+    "#4fd8ee",
+    "#f2c230",
+    "#a4c44a",
+    "#5fe0f0",
+    "#7fe0a0"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "roll": {
+   "frames": 6,
+   "loop": false,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  },
+  "bump": {
+   "frames": 4,
+   "loop": false,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "frame": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  }
+ },
+ "sounds": {
+  "roll": [
+   {
+    "sound": "xp-blip",
+    "preset": "Tiny tick",
+    "frame": 1,
+    "volume": 0.5
+   }
+  ],
+  "bump": [
+   {
+    "sound": "xp-blip",
+    "preset": "Combo high",
+    "frame": 0,
+    "volume": 0.6
+   }
+  ]
+ },
+ "versions": [
+  {
+   "name": "Score",
+   "params": {}
+  },
+  {
+   "name": "Coins",
+   "params": {
+    "icon": "coin",
+    "digits": 4,
+    "face": "#7a4f33"
+   }
+  },
+  {
+   "name": "Drum",
+   "params": {
+    "style": "drum",
+    "glow": "#5fe0f0",
+    "frame": "#c2c9d6"
+   }
+  },
+  {
+   "name": "Big strip",
+   "params": {
+    "style": "strip",
+    "size": 1,
+    "digits": 5,
+    "icon": "none"
+   }
+  },
+  {
+   "name": "Hearts, no zeros",
+   "params": {
+    "icon": "heart",
+    "zeros": false,
+    "face": "#8e3a4a",
+    "glow": "#7fe0a0"
+   }
+  }
+ ],
+ "bundles": []
+}

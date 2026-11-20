@@ -1,0 +1,220 @@
+{
+ "id": "icons-gear",
+ "frozen": "2026-11-20",
+ "source": "sprites/icons-gear.js",
+ "sha256": "2e7608c61d6bb2486562d23ee385e9e8b1a913df89afc564a1a5230b1b5fc93f",
+ "name": "Equipment icons",
+ "blurb": "Nine equipment icons: sword, staff, dagger, bow, shield, helm, armour, ring and boots; change their size, tilt, shading, shine and the colours of metal, wood, leather and jewels.",
+ "meta": {
+  "type": "icon",
+  "role": "items/weapon",
+  "themes": [
+   "fantasy"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "top-down-rpg",
+   "roguelike-action"
+  ],
+  "view": "none",
+  "words": [
+   "sword",
+   "staff",
+   "dagger",
+   "bow",
+   "shield",
+   "helmet",
+   "armour",
+   "armor",
+   "ring",
+   "boots",
+   "equipment",
+   "gear",
+   "weapon",
+   "equip"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "sword",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "tilt": {
+   "kind": "toggle",
+   "label": "Tilt",
+   "def": true,
+   "group": "Look"
+  },
+  "shade": {
+   "kind": "toggle",
+   "label": "Soft shading",
+   "def": true,
+   "group": "Look"
+  },
+  "shine": {
+   "kind": "toggle",
+   "label": "Shine",
+   "def": true,
+   "group": "Look"
+  },
+  "metal": {
+   "kind": "color",
+   "label": "Metal",
+   "def": "#c2c9d6",
+   "swatches": [
+    "#c2c9d6",
+    "#f2c230",
+    "#a8a4a0",
+    "#a8806a",
+    "#7e84a0"
+   ],
+   "group": "Colors"
+  },
+  "wood": {
+   "kind": "color",
+   "label": "Wood",
+   "def": "#9a6a3e",
+   "swatches": [
+    "#9a6a3e",
+    "#c9a06a",
+    "#e6c96a",
+    "#a8612a",
+    "#5a3a22",
+    "#c98a4a"
+   ],
+   "group": "Colors"
+  },
+  "leather": {
+   "kind": "color",
+   "label": "Leather",
+   "def": "#8e3a4a",
+   "swatches": [
+    "#8e3a4a",
+    "#c8553a",
+    "#2f8f9d",
+    "#357a4c",
+    "#3f6fd1"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Jewels",
+   "def": "#4fd8ee",
+   "swatches": [
+    "#4fd8ee",
+    "#c9423a",
+    "#7fe0a0",
+    "#7a4fc4",
+    "#f2c230"
+   ],
+   "group": "Colors"
+  }
+ },
+ "clips": {
+  "sword": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "staff": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "dagger": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "bow": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "shield": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "helm": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "armour": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "ring": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "boots": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [],
+ "bundles": [
+  "kit-rpg-fantasy"
+ ]
+}

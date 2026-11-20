@@ -19,8 +19,20 @@ import './ui-pieces.js';
 import './ui.js';
 import './backdrop.js';
 import './tiles.js';         // build item B15: tiles@1, the layout of a tileset, its material as data (engine/gen/tiles.js)
+import './icon-sets.js';     // batch M4: icon.fitted, icon.body, icon.rim, icon.flame, icon.plate and oval: what the library icon sets drew in code
+import './prize-items.js';   // migration batch M2: the ten pickups' shape generators (timepiece@1 ...), ports of their code
+import './world-props.js';   // migration batch M3: the library props' shape generators (spring.pad@1 ...), ports of their code
+import './motion-sheen.js';  // migration batch M1: pickup.sheen@1, the glint sweep of a floating pickup (engine/gen/motion-sheen.js)
+import './chip.js';          // migration batch M1: chip@1 and chip.turn@1, the credit chip's turning face (engine/gen/chip.js)
+import './cell.js';          // migration batch M1: cell@1 and cell.pulse@1, the health cell's charge and beat (engine/gen/cell.js)
+import { SKIN_FRAME_GENERATORS } from './ui-skin.js';      // migration batch M8: ui.slab, ui.trough, ui.strip, ui.toggle, ui.pointer, ui.selector, ui.area, the skin families' pieces (engine/gen/ui-skin.js)
+import './text.js';          // migration batch M9: font.cell@1 and the text ports, the interface pieces' pixel letters (engine/gen/text.js)
+import './ui-inputs.js';     // migration batch M9: key.cap, key.wide, pad.dpad, pad.face, mouse, stick: the input pictures' ports (engine/gen/ui-inputs.js)
+import './ui-hud.js';        // migration batch M9: damage.digits, status.icons, crosshair ...: the HUD pictures' ports (engine/gen/ui-hud.js)
+import './ui-bubbles.js';    // migration batch M9: emote.marks, the bubbles and the name plate: their ports (engine/gen/ui-bubbles.js)
 import { BACKDROP_FRAME_GENERATORS } from './backdrop-frame.js';
 import { FX_STAMP_BOUNDS, FX_SIZE_KEYS } from './fx-burst.js';   // not from backdrop.js: it imports resolve.js, which imports this module
+import { B12C_STAMP_BOUNDS, B12C_SIZE_KEYS, B12C_FRAME_GENERATORS } from './fx-b12c.js';   // build item B12c: the other 20 effect behaviours (engine/gen/fx-glints.js, fx-debris.js, fx-fire.js, fx-spells.js, fx-fields.js)
 
 /** Declares and registers a generator version in the site's registry; returns its frozen entry (engine/gen/registry.js). */
 export { defineGenerator } from './registry.js';
@@ -64,6 +76,7 @@ export const ORIGIN_FIXED = Object.freeze({ 'gem.cut@1': 2, 'glint@1': 2, 'icon.
  */
 export const STAMP_BOUNDS = Object.freeze({
   ...FX_STAMP_BOUNDS,
+  ...B12C_STAMP_BOUNDS,
   // engine/gen/fx.js and fx-items.js (B2, B8): a twinkle is one stamp of at most 9 x 9; a pickup burst at most three
   // twinkles of size 1 and one of size 2 (its dots are not stamps); chunks are polygons and dots
   'twinkle@1': () => 81,
@@ -78,6 +91,7 @@ export const STAMP_BOUNDS = Object.freeze({
  */
 export const SIZE_KEYS = Object.freeze({
   ...FX_SIZE_KEYS,
+  ...B12C_SIZE_KEYS,
   'twinkle@1': Object.freeze([]),          // its cost (1) and its bound (81) read no argument
   'pickup.burst@1': Object.freeze([]),
   'chunks@1': Object.freeze([]),
@@ -86,6 +100,8 @@ export const SIZE_KEYS = Object.freeze({
 /** Generators that work in frame pixels by design, never on a node's own coordinates, each with why: "<id>@<v>" -> reason. */
 export const FRAME_GENERATORS = Object.freeze({
   ...BACKDROP_FRAME_GENERATORS,      // build item B14: backdrops wrap across the layer's width (engine/gen/backdrop.js)
+  ...B12C_FRAME_GENERATORS,          // build item B12c: the other effect behaviours keep to the frame's 1 px border, fall.field to the frame (engine/gen/fx-b12c.js)
+  ...SKIN_FRAME_GENERATORS,          // migration batch M8: ui.area@1 draws nothing; its text areas and slice are frame pixels (engine/gen/ui-skin.js)
   'pickup.burst@1': 'an effect that keeps its sparkles 3 px inside the frame: name it as an emitter (the pictures layout puts an emitter on its node\'s frame first), not in a draw list on a node',
   'chunks@1': 'an effect whose floor row and box are frame rows and columns: name it as an emitter, not in a draw list on a node',
   'icon.fit@1': 'lays out a whole icon centred in the frame: an icon set\'s fit, never drawn on a node',

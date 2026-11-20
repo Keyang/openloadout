@@ -1,0 +1,924 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "icons-consumables",
+ "name": "Consumable icons",
+ "blurb": "Eight item-menu icons: potion, mana flask, antidote, bread, herb, a revive candle, bomb and tent; change their size, tilt, shading, shine and colours.",
+ "meta": {
+  "type": "icon",
+  "role": "items/icon",
+  "themes": ["fantasy"],
+  "gameTypes": ["turn-based-rpg", "top-down-rpg", "roguelike-action"],
+  "view": "none",
+  "words": ["potion", "flask", "bottle", "antidote", "bread", "food", "herb", "candle", "revive", "bomb", "tent", "item", "inventory", "heal"],
+  "license": "draft"
+ },
+ "size": [32, 32],
+ "pivot": [16, 16],
+ "grounded": false,
+ "preview": "potion",
+ "styles": ["pixel"],
+ "palette": [
+  {"id": "body", "label": "Health", "default": "#c9423a", "material": "signal", "swatches": ["#c9423a", "#4fd8ee", "#7fe0a0", "#7a4fc4", "#f2c230"]},
+  {
+   "id": "accent",
+   "label": "Mana",
+   "default": "#3f6fd1",
+   "material": "signal",
+   "swatches": ["#3f6fd1", "#4fd8ee", "#c9423a", "#7fe0a0", "#7a4fc4", "#f2c230"]
+  },
+  {
+   "id": "cloth",
+   "label": "Bread and cloth",
+   "default": "#e6c96a",
+   "material": "cloth",
+   "swatches": ["#e6c96a", "#f0ead8", "#c9a06a", "#c8553a", "#f6d3b0", "#a8a4a0"]
+  },
+  {"id": "cream", "default": "#f0ead8", "material": "paint", "detail": true},
+  {"id": "white", "default": "#ffffff", "material": "light", "detail": true},
+  {"id": "heal", "default": "#7fe0a0", "material": "paint", "detail": true},
+  {"id": "pine", "default": "#357a4c", "material": "paint", "detail": true},
+  {"id": "leaf", "default": "#4f9d57", "material": "paint", "detail": true},
+  {"id": "fire", "default": "#e8662c", "material": "paint", "detail": true},
+  {"id": "thunder", "default": "#f4e06a", "material": "paint", "detail": true},
+  {"id": "path", "default": "#c9a06a", "material": "paint", "detail": true},
+  {"id": "slate", "default": "#5a5f7a", "material": "paint", "detail": true}
+ ],
+ "controls": [
+  {"key": "shade", "kind": "toggle", "label": "Extra shading", "default": true},
+  {"key": "shine", "kind": "toggle", "label": "Shine", "default": true},
+  {"key": "tilt", "kind": "toggle", "label": "Tilt", "default": true},
+  {"key": "size", "kind": "range", "label": "Size", "lo": "Small", "hi": "Big", "default": 0.5},
+  {"key": "body", "kind": "colour", "label": "Health"},
+  {"key": "accent", "kind": "colour", "label": "Mana"},
+  {"key": "cloth", "kind": "colour", "label": "Bread and cloth"}
+ ],
+ "body": {
+  "pictures": {
+   "draw": [],
+   "pictures": {
+    "potion": {
+     "label": "Potion",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {"from": "size", "map": [[0, 0], [1, 1]]},
+       "tilt": {"from": "tilt", "pick": {"true": true, "false": false}},
+       "turn": 26.5651,
+       "soften": {"from": "shade", "pick": {"true": true, "false": false}},
+       "shiny": {"from": "shine", "pick": {"true": true, "false": false}},
+       "draw": [
+        {
+         "kind": "poly",
+         "points": [[-2, -11.5], [2, -11.5], [2, -8.5], [-2, -8.5]],
+         "paint": {"rule": "mix", "of": "pine", "with": "fire", "amount": 0.55},
+         "shade": 1,
+         "light": 0
+        },
+        {"kind": "poly", "points": [[-3, -9.5], [3, -9.5], [3, -8.5], [-3, -8.5]], "paint": "cream", "shade": 1, "light": 0, "group": "cream"},
+        {"kind": "poly", "points": [[-2, -8.5], [2, -8.5], [2, -3.5], [-2, -3.5]], "paint": "cream", "shade": 1, "light": 0, "group": "cream"},
+        {"kind": "ellipse", "at": [0, 3.5], "r": [8, 8], "paint": "cream", "shade": 1, "light": 0, "group": "cream"},
+        {"kind": "poly", "points": [[-2, -4.5], [2, -4.5], [2, -3.5], [-2, -3.5]], "paint": "cream", "shade": 1, "light": 0, "group": "cream"},
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [
+          {"kind": "poly", "points": [[-3, -9.5], [3, -9.5], [3, -8.5], [-3, -8.5]], "paint": "body"},
+          {"kind": "poly", "points": [[-2, -8.5], [2, -8.5], [2, -3.5], [-2, -3.5]], "paint": "body"},
+          {"kind": "ellipse", "at": [0, 3.5], "r": [8, 8], "paint": "body"},
+          {"kind": "poly", "points": [[-2, -4.5], [2, -4.5], [2, -3.5], [-2, -3.5]], "paint": "body"}
+         ],
+         "within": [{"kind": "poly", "points": [[-64, 0.3], [64, 0.3], [64, 64.3], [-64, 64.3]], "paint": "body"}],
+         "paint": "body"
+        },
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [
+          {"kind": "poly", "points": [[-3, -9.5], [3, -9.5], [3, -8.5], [-3, -8.5]], "paint": "body.light"},
+          {"kind": "poly", "points": [[-2, -8.5], [2, -8.5], [2, -3.5], [-2, -3.5]], "paint": "body.light"},
+          {"kind": "ellipse", "at": [0, 3.5], "r": [8, 8], "paint": "body.light"},
+          {"kind": "poly", "points": [[-2, -4.5], [2, -4.5], [2, -3.5], [-2, -3.5]], "paint": "body.light"}
+         ],
+         "within": [{"kind": "poly", "points": [[-64, 0.3], [64, 0.3], [64, 1.3], [-64, 1.3]], "paint": "body.light"}],
+         "paint": "body.light",
+         "flat": true,
+         "when": {"shine": [true]}
+        },
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [
+          {
+           "kind": "poly",
+           "points": [[-3, -9.5], [3, -9.5], [3, -8.5], [-3, -8.5]],
+           "paint": {"rule": "mix", "of": "body", "with": {"rule": "ramp", "of": "body", "tone": "dark"}, "amount": 0.5}
+          },
+          {
+           "kind": "poly",
+           "points": [[-2, -8.5], [2, -8.5], [2, -3.5], [-2, -3.5]],
+           "paint": {"rule": "mix", "of": "body", "with": {"rule": "ramp", "of": "body", "tone": "dark"}, "amount": 0.5}
+          },
+          {
+           "kind": "ellipse",
+           "at": [0, 3.5],
+           "r": [8, 8],
+           "paint": {"rule": "mix", "of": "body", "with": {"rule": "ramp", "of": "body", "tone": "dark"}, "amount": 0.5}
+          },
+          {
+           "kind": "poly",
+           "points": [[-2, -4.5], [2, -4.5], [2, -3.5], [-2, -3.5]],
+           "paint": {"rule": "mix", "of": "body", "with": {"rule": "ramp", "of": "body", "tone": "dark"}, "amount": 0.5}
+          }
+         ],
+         "within": [
+          {
+           "kind": "poly",
+           "points": [[-64, 0.3], [64, 0.3], [64, 1.3], [-64, 1.3]],
+           "paint": {"rule": "mix", "of": "body", "with": {"rule": "ramp", "of": "body", "tone": "dark"}, "amount": 0.5}
+          }
+         ],
+         "paint": {"rule": "mix", "of": "body", "with": {"rule": "ramp", "of": "body", "tone": "dark"}, "amount": 0.5},
+         "flat": true,
+         "when": {"shine": [false]}
+        },
+        {"gen": "icon.glint", "v": 2, "at": [3.36, 1.3], "paint": "white"}
+       ]
+      }
+     ]
+    },
+    "mana-flask": {
+     "label": "Mana flask",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {"from": "size", "map": [[0, 0], [1, 1]]},
+       "tilt": {"from": "tilt", "pick": {"true": true, "false": false}},
+       "turn": 26.5651,
+       "soften": {"from": "shade", "pick": {"true": true, "false": false}},
+       "shiny": {"from": "shine", "pick": {"true": true, "false": false}},
+       "draw": [
+        {
+         "kind": "poly",
+         "points": [[-2, -11.5], [2, -11.5], [2, -8.5], [-2, -8.5]],
+         "paint": {"rule": "tone", "of": "slate", "by": 1.45},
+         "shade": 1,
+         "light": 0
+        },
+        {"kind": "poly", "points": [[-3, -9.5], [3, -9.5], [3, -8.5], [-3, -8.5]], "paint": "cream", "shade": 1, "light": 0, "group": "cream"},
+        {"kind": "poly", "points": [[-2, -8.5], [2, -8.5], [2, -3.5], [-2, -3.5]], "paint": "cream", "shade": 1, "light": 0, "group": "cream"},
+        {
+         "kind": "poly",
+         "points": [[-1, -5], [2, -5], [8, 9], [8, 10.5], [7, 11.5], [-1, 11.5]],
+         "paint": "cream",
+         "shade": 1,
+         "light": 0,
+         "group": "cream"
+        },
+        {
+         "kind": "poly",
+         "points": [[1, -5], [-2, -5], [-8, 9], [-8, 10.5], [-7, 11.5], [1, 11.5]],
+         "paint": "cream",
+         "shade": 1,
+         "light": 0,
+         "group": "cream"
+        },
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [
+          {"kind": "poly", "points": [[-3, -9.5], [3, -9.5], [3, -8.5], [-3, -8.5]], "paint": "accent"},
+          {"kind": "poly", "points": [[-2, -8.5], [2, -8.5], [2, -3.5], [-2, -3.5]], "paint": "accent"},
+          {"kind": "poly", "points": [[-1, -5], [2, -5], [8, 9], [8, 10.5], [7, 11.5], [-1, 11.5]], "paint": "accent"},
+          {"kind": "poly", "points": [[1, -5], [-2, -5], [-8, 9], [-8, 10.5], [-7, 11.5], [1, 11.5]], "paint": "accent"}
+         ],
+         "within": [{"kind": "poly", "points": [[-64, -1.25], [64, -1.25], [64, 62.75], [-64, 62.75]], "paint": "accent"}],
+         "paint": "accent"
+        },
+        {
+         "kind": "poly",
+         "points": [[-1, -1.25], [3.6071, -1.25], [4.0357, -0.25], [-1, -0.25]],
+         "paint": "accent.light",
+         "shade": 0,
+         "light": 0,
+         "group": "accent-light",
+         "when": {"shine": [true]}
+        },
+        {
+         "kind": "poly",
+         "points": [[1, -1.25], [-3.6071, -1.25], [-4.0357, -0.25], [1, -0.25]],
+         "paint": "accent.light",
+         "shade": 0,
+         "light": 0,
+         "group": "accent-light",
+         "when": {"shine": [true]}
+        },
+        {
+         "kind": "poly",
+         "points": [[-1, -1.25], [3.6071, -1.25], [4.0357, -0.25], [-1, -0.25]],
+         "paint": {"rule": "mix", "of": "accent", "with": {"rule": "ramp", "of": "accent", "tone": "dark"}, "amount": 0.5},
+         "shade": 0,
+         "light": 0,
+         "group": "part",
+         "when": {"shine": [false]}
+        },
+        {
+         "kind": "poly",
+         "points": [[1, -1.25], [-3.6071, -1.25], [-4.0357, -0.25], [1, -0.25]],
+         "paint": {"rule": "mix", "of": "accent", "with": {"rule": "ramp", "of": "accent", "tone": "dark"}, "amount": 0.5},
+         "shade": 0,
+         "light": 0,
+         "group": "part",
+         "when": {"shine": [false]}
+        },
+        {"gen": "icon.glint", "v": 2, "at": [3.36, -0.25], "paint": "white"},
+        {"kind": "ellipse", "at": [0, -10.3], "r": [2.9, 2.9], "paint": {"rule": "tone", "of": "slate", "by": 1.45}, "shade": 1, "light": 0}
+       ]
+      }
+     ]
+    },
+    "antidote": {
+     "label": "Antidote",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {"from": "size", "map": [[0, 0], [1, 1]]},
+       "tilt": {"from": "tilt", "pick": {"true": true, "false": false}},
+       "turn": 26.5651,
+       "soften": {"from": "shade", "pick": {"true": true, "false": false}},
+       "shiny": {"from": "shine", "pick": {"true": true, "false": false}},
+       "fill": 0.88,
+       "draw": [
+        {
+         "kind": "poly",
+         "points": [[-2.6, -9], [2.6, -9], [2.6, -6], [-2.6, -6]],
+         "paint": {"rule": "mix", "of": "pine", "with": "fire", "amount": 0.55},
+         "shade": 1,
+         "light": 0
+        },
+        {"kind": "poly", "points": [[-3.9, -7], [3.9, -7], [3.9, -6], [-3.9, -6]], "paint": "cream", "shade": 1, "light": 0, "group": "cream"},
+        {"kind": "poly", "points": [[-2.6, -6], [2.6, -6], [2.6, -2], [-2.6, -2]], "paint": "cream", "shade": 1, "light": 0, "group": "cream"},
+        {"kind": "ellipse", "at": [0, 0], "r": [5.2, 3], "paint": "cream", "shade": 1, "light": 0, "group": "cream"},
+        {"kind": "poly", "points": [[-5.2, 0], [5.2, 0], [5.2, 8], [-5.2, 8]], "paint": "cream", "shade": 1, "light": 0, "group": "cream"},
+        {"kind": "poly", "points": [[-3.9, 8], [3.9, 8], [3.9, 9], [-3.9, 9]], "paint": "cream", "shade": 1, "light": 0, "group": "cream"},
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [
+          {"kind": "poly", "points": [[-3.9, -7], [3.9, -7], [3.9, -6], [-3.9, -6]], "paint": "heal"},
+          {"kind": "poly", "points": [[-2.6, -6], [2.6, -6], [2.6, -2], [-2.6, -2]], "paint": "heal"},
+          {"kind": "ellipse", "at": [0, 0], "r": [5.2, 3], "paint": "heal"},
+          {"kind": "poly", "points": [[-5.2, 0], [5.2, 0], [5.2, 8], [-5.2, 8]], "paint": "heal"},
+          {"kind": "poly", "points": [[-3.9, 8], [3.9, 8], [3.9, 9], [-3.9, 9]], "paint": "heal"}
+         ],
+         "within": [{"kind": "poly", "points": [[-64, 0.54], [64, 0.54], [64, 64.54], [-64, 64.54]], "paint": "heal"}],
+         "paint": "heal",
+         "band": "heal.dark"
+        },
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [
+          {"kind": "poly", "points": [[-3.9, -7], [3.9, -7], [3.9, -6], [-3.9, -6]], "paint": "heal.light"},
+          {"kind": "poly", "points": [[-2.6, -6], [2.6, -6], [2.6, -2], [-2.6, -2]], "paint": "heal.light"},
+          {"kind": "ellipse", "at": [0, 0], "r": [5.2, 3], "paint": "heal.light"},
+          {"kind": "poly", "points": [[-5.2, 0], [5.2, 0], [5.2, 8], [-5.2, 8]], "paint": "heal.light"},
+          {"kind": "poly", "points": [[-3.9, 8], [3.9, 8], [3.9, 9], [-3.9, 9]], "paint": "heal.light"}
+         ],
+         "within": [{"kind": "poly", "points": [[-64, 0.54], [64, 0.54], [64, 1.54], [-64, 1.54]], "paint": "heal.light"}],
+         "paint": "heal.light",
+         "flat": true,
+         "when": {"shine": [true]}
+        },
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [
+          {
+           "kind": "poly",
+           "points": [[-3.9, -7], [3.9, -7], [3.9, -6], [-3.9, -6]],
+           "paint": {"rule": "mix", "of": "heal", "with": {"rule": "ramp", "of": "heal", "tone": "dark"}, "amount": 0.5}
+          },
+          {
+           "kind": "poly",
+           "points": [[-2.6, -6], [2.6, -6], [2.6, -2], [-2.6, -2]],
+           "paint": {"rule": "mix", "of": "heal", "with": {"rule": "ramp", "of": "heal", "tone": "dark"}, "amount": 0.5}
+          },
+          {
+           "kind": "ellipse",
+           "at": [0, 0],
+           "r": [5.2, 3],
+           "paint": {"rule": "mix", "of": "heal", "with": {"rule": "ramp", "of": "heal", "tone": "dark"}, "amount": 0.5}
+          },
+          {
+           "kind": "poly",
+           "points": [[-5.2, 0], [5.2, 0], [5.2, 8], [-5.2, 8]],
+           "paint": {"rule": "mix", "of": "heal", "with": {"rule": "ramp", "of": "heal", "tone": "dark"}, "amount": 0.5}
+          },
+          {
+           "kind": "poly",
+           "points": [[-3.9, 8], [3.9, 8], [3.9, 9], [-3.9, 9]],
+           "paint": {"rule": "mix", "of": "heal", "with": {"rule": "ramp", "of": "heal", "tone": "dark"}, "amount": 0.5}
+          }
+         ],
+         "within": [
+          {
+           "kind": "poly",
+           "points": [[-64, 0.54], [64, 0.54], [64, 1.54], [-64, 1.54]],
+           "paint": {"rule": "mix", "of": "heal", "with": {"rule": "ramp", "of": "heal", "tone": "dark"}, "amount": 0.5}
+          }
+         ],
+         "paint": {"rule": "mix", "of": "heal", "with": {"rule": "ramp", "of": "heal", "tone": "dark"}, "amount": 0.5},
+         "flat": true,
+         "when": {"shine": [false]}
+        },
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [
+          {"kind": "poly", "points": [[-3.9, -7], [3.9, -7], [3.9, -6], [-3.9, -6]], "paint": "cream"},
+          {"kind": "poly", "points": [[-2.6, -6], [2.6, -6], [2.6, -2], [-2.6, -2]], "paint": "cream"},
+          {"kind": "ellipse", "at": [0, 0], "r": [5.2, 3], "paint": "cream"},
+          {"kind": "poly", "points": [[-5.2, 0], [5.2, 0], [5.2, 8], [-5.2, 8]], "paint": "cream"},
+          {"kind": "poly", "points": [[-3.9, 8], [3.9, 8], [3.9, 9], [-3.9, 9]], "paint": "cream"}
+         ],
+         "within": [{"kind": "poly", "points": [[-7.2, 3.078], [7.2, 3.078], [7.2, 6.8004], [-7.2, 6.8004]], "paint": "cream"}],
+         "paint": "cream",
+         "soft": 0,
+         "lit": 0
+        },
+        {"gen": "icon.glint", "v": 2, "at": [2.184, 1.54], "paint": "white"},
+        {
+         "kind": "poly",
+         "points": [[-4, -9.8], [4, -9.8], [4, -6.8], [-4, -6.8]],
+         "paint": {"rule": "mix", "of": "pine", "with": "fire", "amount": 0.55},
+         "shade": 1,
+         "light": 0
+        },
+        {"kind": "stamp", "at": [0, 4.9392], "anchor": "c", "rows": [".a.", "aaa", ".a."], "key": {"a": "heal.dark"}}
+       ]
+      }
+     ]
+    },
+    "bread": {
+     "label": "Bread",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {"from": "size", "map": [[0, 0], [1, 1]]},
+       "tilt": {"from": "tilt", "pick": {"true": true, "false": false}},
+       "turn": -26.5651,
+       "soften": {"from": "shade", "pick": {"true": true, "false": false}},
+       "shiny": {"from": "shine", "pick": {"true": true, "false": false}},
+       "draw": [
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [{"kind": "ellipse", "at": [0, 0.5], "r": [11.5, 6.6], "paint": "cloth"}],
+         "minus": [{"kind": "rect", "at": [-13, 5], "size": [26, 4], "paint": "cloth"}],
+         "paint": "cloth",
+         "soft": 3
+        },
+        {"kind": "ellipse", "at": [-7.3, 2.8], "r": [1.1, 1.1], "paint": "cloth.dark", "shade": 0, "light": 0, "group": "cloth-dark"},
+        {"kind": "ellipse", "at": [-4.9, -2], "r": [1.1, 1.1], "paint": "cloth.dark", "shade": 0, "light": 0, "group": "cloth-dark"},
+        {
+         "kind": "poly",
+         "points": [[-6.3161, 3.2919], [-3.9161, -1.5081], [-5.8839, -2.4919], [-8.2839, 2.3081]],
+         "paint": "cloth.dark",
+         "shade": 0,
+         "light": 0,
+         "group": "cloth-dark"
+        },
+        {
+         "kind": "ellipse",
+         "at": [-6.4, 2.2],
+         "r": [1.1, 1.1],
+         "paint": {"rule": "tone", "of": "cloth", "by": 1.5},
+         "shade": 0,
+         "light": 0,
+         "group": "part"
+        },
+        {
+         "kind": "ellipse",
+         "at": [-4, -2.6],
+         "r": [1.1, 1.1],
+         "paint": {"rule": "tone", "of": "cloth", "by": 1.5},
+         "shade": 0,
+         "light": 0,
+         "group": "part"
+        },
+        {
+         "kind": "poly",
+         "points": [[-5.4161, 2.6919], [-3.0161, -2.1081], [-4.9839, -3.0919], [-7.3839, 1.7081]],
+         "paint": {"rule": "tone", "of": "cloth", "by": 1.5},
+         "shade": 0,
+         "light": 0,
+         "group": "part"
+        },
+        {"kind": "ellipse", "at": [-1.8, 2.2], "r": [1.1, 1.1], "paint": "cloth.dark", "shade": 0, "light": 0, "group": "cloth-dark-2"},
+        {"kind": "ellipse", "at": [0.6, -2.6], "r": [1.1, 1.1], "paint": "cloth.dark", "shade": 0, "light": 0, "group": "cloth-dark-2"},
+        {
+         "kind": "poly",
+         "points": [[-0.8161, 2.6919], [1.5839, -2.1081], [-0.3839, -3.0919], [-2.7839, 1.7081]],
+         "paint": "cloth.dark",
+         "shade": 0,
+         "light": 0,
+         "group": "cloth-dark-2"
+        },
+        {
+         "kind": "ellipse",
+         "at": [-0.9, 1.6],
+         "r": [1.1, 1.1],
+         "paint": {"rule": "tone", "of": "cloth", "by": 1.5},
+         "shade": 0,
+         "light": 0,
+         "group": "part-2"
+        },
+        {
+         "kind": "ellipse",
+         "at": [1.5, -3.2],
+         "r": [1.1, 1.1],
+         "paint": {"rule": "tone", "of": "cloth", "by": 1.5},
+         "shade": 0,
+         "light": 0,
+         "group": "part-2"
+        },
+        {
+         "kind": "poly",
+         "points": [[0.0839, 2.0919], [2.4839, -2.7081], [0.5161, -3.6919], [-1.8839, 1.1081]],
+         "paint": {"rule": "tone", "of": "cloth", "by": 1.5},
+         "shade": 0,
+         "light": 0,
+         "group": "part-2"
+        },
+        {"kind": "ellipse", "at": [3.7, 2.8], "r": [1.1, 1.1], "paint": "cloth.dark", "shade": 0, "light": 0, "group": "cloth-dark-3"},
+        {"kind": "ellipse", "at": [6.1, -2], "r": [1.1, 1.1], "paint": "cloth.dark", "shade": 0, "light": 0, "group": "cloth-dark-3"},
+        {
+         "kind": "poly",
+         "points": [[4.6839, 3.2919], [7.0839, -1.5081], [5.1161, -2.4919], [2.7161, 2.3081]],
+         "paint": "cloth.dark",
+         "shade": 0,
+         "light": 0,
+         "group": "cloth-dark-3"
+        },
+        {
+         "kind": "ellipse",
+         "at": [4.6, 2.2],
+         "r": [1.1, 1.1],
+         "paint": {"rule": "tone", "of": "cloth", "by": 1.5},
+         "shade": 0,
+         "light": 0,
+         "group": "part-3"
+        },
+        {
+         "kind": "ellipse",
+         "at": [7, -2.6],
+         "r": [1.1, 1.1],
+         "paint": {"rule": "tone", "of": "cloth", "by": 1.5},
+         "shade": 0,
+         "light": 0,
+         "group": "part-3"
+        },
+        {
+         "kind": "poly",
+         "points": [[5.5839, 2.6919], [7.9839, -2.1081], [6.0161, -3.0919], [3.6161, 1.7081]],
+         "paint": {"rule": "tone", "of": "cloth", "by": 1.5},
+         "shade": 0,
+         "light": 0,
+         "group": "part-3"
+        }
+       ]
+      }
+     ]
+    },
+    "herb": {
+     "label": "Herb",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {"from": "size", "map": [[0, 0], [1, 1]]},
+       "tilt": {"from": "tilt", "pick": {"true": true, "false": false}},
+       "turn": 26.5651,
+       "soften": {"from": "shade", "pick": {"true": true, "false": false}},
+       "shiny": {"from": "shine", "pick": {"true": true, "false": false}},
+       "draw": [
+        {"kind": "ellipse", "at": [-1.2351, 11.8], "r": [1, 1], "paint": "pine", "shade": 1, "light": 0, "group": "pine"},
+        {"kind": "ellipse", "at": [0.0293, 1], "r": [1, 1], "paint": "pine", "shade": 1, "light": 0, "group": "pine"},
+        {
+         "kind": "poly",
+         "points": [[-0.2419, 11.9163], [1.0225, 1.1163], [-0.9639, 0.8837], [-2.2283, 11.6837]],
+         "paint": "pine",
+         "shade": 1,
+         "light": 0,
+         "group": "pine"
+        },
+        {"kind": "ellipse", "at": [0.0293, 1], "r": [1, 1], "paint": "pine", "shade": 1, "light": 0, "group": "pine"},
+        {"kind": "ellipse", "at": [0.9659, -7], "r": [1, 1], "paint": "pine", "shade": 1, "light": 0, "group": "pine"},
+        {
+         "kind": "poly",
+         "points": [[1.0225, 1.1163], [1.9591, -6.8837], [-0.0274, -7.1163], [-0.9639, 0.8837]],
+         "paint": "pine",
+         "shade": 1,
+         "light": 0,
+         "group": "pine"
+        },
+        {
+         "gen": "icon.rim",
+         "v": 1,
+         "shapes": [
+          {"gen": "taper", "v": 1, "from": [-0.4976, 5.5], "to": [-4.3856, 3.124], "r0": 0.7, "r1": 2.7, "paint": "leaf"},
+          {"gen": "taper", "v": 1, "from": [-4.3856, 3.124], "to": [-9.1376, 0.22], "r0": 2.7, "r1": 0.4, "paint": "leaf"}
+         ],
+         "paint": "leaf.dark"
+        },
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [
+          {"gen": "taper", "v": 1, "from": [-0.4976, 5.5], "to": [-4.3856, 3.124], "r0": 0.7, "r1": 2.7, "paint": "leaf"},
+          {"gen": "taper", "v": 1, "from": [-4.3856, 3.124], "to": [-9.1376, 0.22], "r0": 2.7, "r1": 0.4, "paint": "leaf"}
+         ],
+         "paint": "leaf",
+         "soft": 1,
+         "band": "leaf.dark"
+        },
+        {"kind": "line", "from": [-3.0896, 3.916], "to": [-7.2368, 1.3816], "paint": "leaf.light", "when": {"shine": [true]}},
+        {"kind": "line", "from": [-3.0896, 3.916], "to": [-7.2368, 1.3816], "paint": "leaf.dark", "when": {"shine": [false]}},
+        {
+         "gen": "icon.rim",
+         "v": 1,
+         "shapes": [
+          {"gen": "taper", "v": 1, "from": [-0.3571, 4.3], "to": [3.6173, 2.4856], "r0": 0.7, "r1": 2.7, "paint": "leaf"},
+          {"gen": "taper", "v": 1, "from": [3.6173, 2.4856], "to": [8.4749, 0.268], "r0": 2.7, "r1": 0.4, "paint": "leaf"}
+         ],
+         "paint": "leaf.dark"
+        },
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [
+          {"gen": "taper", "v": 1, "from": [-0.3571, 4.3], "to": [3.6173, 2.4856], "r0": 0.7, "r1": 2.7, "paint": "leaf"},
+          {"gen": "taper", "v": 1, "from": [3.6173, 2.4856], "to": [8.4749, 0.268], "r0": 2.7, "r1": 0.4, "paint": "leaf"}
+         ],
+         "paint": "leaf",
+         "soft": 1,
+         "band": "leaf.dark"
+        },
+        {"kind": "line", "from": [2.2925, 3.0904], "to": [6.5319, 1.155], "paint": "leaf.light", "when": {"shine": [true]}},
+        {"kind": "line", "from": [2.2925, 3.0904], "to": [6.5319, 1.155], "paint": "leaf.dark", "when": {"shine": [false]}},
+        {
+         "gen": "icon.rim",
+         "v": 1,
+         "shapes": [
+          {"gen": "taper", "v": 1, "from": [0.4976, -3], "to": [-2.8234, -5.0295], "r0": 0.7, "r1": 2.45, "paint": "leaf"},
+          {"gen": "taper", "v": 1, "from": [-2.8234, -5.0295], "to": [-6.8824, -7.51], "r0": 2.45, "r1": 0.4, "paint": "leaf"}
+         ],
+         "paint": "leaf.dark"
+        },
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [
+          {"gen": "taper", "v": 1, "from": [0.4976, -3], "to": [-2.8234, -5.0295], "r0": 0.7, "r1": 2.45, "paint": "leaf"},
+          {"gen": "taper", "v": 1, "from": [-2.8234, -5.0295], "to": [-6.8824, -7.51], "r0": 2.45, "r1": 0.4, "paint": "leaf"}
+         ],
+         "paint": "leaf",
+         "soft": 1,
+         "band": "leaf.dark"
+        },
+        {"kind": "line", "from": [-1.7164, -4.353], "to": [-5.2588, -6.5178], "paint": "leaf.light", "when": {"shine": [true]}},
+        {"kind": "line", "from": [-1.7164, -4.353], "to": [-5.2588, -6.5178], "paint": "leaf.dark", "when": {"shine": [false]}},
+        {
+         "gen": "icon.rim",
+         "v": 1,
+         "shapes": [
+          {"gen": "taper", "v": 1, "from": [0.638, -4.2], "to": [4.0328, -5.7498], "r0": 0.7, "r1": 2.45, "paint": "leaf"},
+          {"gen": "taper", "v": 1, "from": [4.0328, -5.7498], "to": [8.182, -7.644], "r0": 2.45, "r1": 0.4, "paint": "leaf"}
+         ],
+         "paint": "leaf.dark"
+        },
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [
+          {"gen": "taper", "v": 1, "from": [0.638, -4.2], "to": [4.0328, -5.7498], "r0": 0.7, "r1": 2.45, "paint": "leaf"},
+          {"gen": "taper", "v": 1, "from": [4.0328, -5.7498], "to": [8.182, -7.644], "r0": 2.45, "r1": 0.4, "paint": "leaf"}
+         ],
+         "paint": "leaf",
+         "soft": 1,
+         "band": "leaf.dark"
+        },
+        {"kind": "line", "from": [2.9012, -5.2332], "to": [6.5224, -6.8863], "paint": "leaf.light", "when": {"shine": [true]}},
+        {"kind": "line", "from": [2.9012, -5.2332], "to": [6.5224, -6.8863], "paint": "leaf.dark", "when": {"shine": [false]}},
+        {
+         "gen": "icon.rim",
+         "v": 1,
+         "shapes": [
+          {"gen": "taper", "v": 1, "from": [0.8488, -6], "to": [1.4788, -8.97], "r0": 0.7, "r1": 2.5, "paint": "leaf"},
+          {"gen": "taper", "v": 1, "from": [1.4788, -8.97], "to": [2.2488, -12.6], "r0": 2.5, "r1": 0.4, "paint": "leaf"}
+         ],
+         "paint": "leaf.dark"
+        },
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [
+          {"gen": "taper", "v": 1, "from": [0.8488, -6], "to": [1.4788, -8.97], "r0": 0.7, "r1": 2.5, "paint": "leaf"},
+          {"gen": "taper", "v": 1, "from": [1.4788, -8.97], "to": [2.2488, -12.6], "r0": 2.5, "r1": 0.4, "paint": "leaf"}
+         ],
+         "paint": "leaf",
+         "soft": 1,
+         "band": "leaf.dark"
+        },
+        {"kind": "line", "from": [1.2688, -7.98], "to": [1.9408, -11.148], "paint": "leaf.light", "when": {"shine": [true]}},
+        {"kind": "line", "from": [1.2688, -7.98], "to": [1.9408, -11.148], "paint": "leaf.dark", "when": {"shine": [false]}}
+       ]
+      }
+     ]
+    },
+    "revive-candle": {
+     "label": "Revive candle",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {"from": "size", "map": [[0, 0], [1, 1]]},
+       "tilt": {"from": "tilt", "pick": {"true": true, "false": false}},
+       "turn": 13.2825,
+       "soften": {"from": "shade", "pick": {"true": true, "false": false}},
+       "shiny": {"from": "shine", "pick": {"true": true, "false": false}},
+       "draw": [
+        {
+         "kind": "ellipse",
+         "at": [-8.6, 6.6],
+         "r": [3.4, 3.4],
+         "paint": {"rule": "tone", "of": "slate", "by": 1.45},
+         "shade": 1,
+         "light": 0,
+         "group": "part"
+        },
+        {
+         "kind": "cut",
+         "from": "part",
+         "shape": {"kind": "ellipse", "at": [-8.6, 6.6], "r": [1.4, 1.4], "paint": {"rule": "tone", "of": "slate", "by": 1.45}}
+        },
+        {
+         "kind": "poly",
+         "points": [[-6.5, 6.5], [10.5, 6.5], [7.8, 10.6], [-3.8, 10.6]],
+         "paint": {"rule": "tone", "of": "slate", "by": 1.45},
+         "shade": 2,
+         "light": 0,
+         "group": "part-2"
+        },
+        {
+         "kind": "ellipse",
+         "at": [-6.3, 6.4],
+         "r": [1.1, 1.1],
+         "paint": {"rule": "tone", "of": "slate", "by": 1.45},
+         "shade": 2,
+         "light": 0,
+         "group": "part-2"
+        },
+        {
+         "kind": "ellipse",
+         "at": [10.3, 6.4],
+         "r": [1.1, 1.1],
+         "paint": {"rule": "tone", "of": "slate", "by": 1.45},
+         "shade": 2,
+         "light": 0,
+         "group": "part-2"
+        },
+        {
+         "kind": "poly",
+         "points": [[-6.3, 7.5], [10.3, 7.5], [10.3, 5.3], [-6.3, 5.3]],
+         "paint": {"rule": "tone", "of": "slate", "by": 1.45},
+         "shade": 2,
+         "light": 0,
+         "group": "part-2"
+        },
+        {"kind": "poly", "points": [[-2.4, -1.5], [6, -1.5], [6, 6.4], [-2.4, 6.4]], "paint": "cloth", "shade": 1, "group": "cloth"},
+        {"kind": "ellipse", "at": [1.8, -1.5], "r": [4.4, 1.5], "paint": "cloth", "shade": 1, "group": "cloth"},
+        {"kind": "ellipse", "at": [-2.5, -1], "r": [1.2, 1.2], "paint": "cloth", "shade": 1, "group": "cloth"},
+        {"kind": "ellipse", "at": [-2.7, 2.1], "r": [1.2, 1.2], "paint": "cloth", "shade": 1, "group": "cloth"},
+        {
+         "kind": "poly",
+         "points": [[-3.6975, -1.0773], [-3.8975, 2.0227], [-1.5025, 2.1773], [-1.3025, -0.9227]],
+         "paint": "cloth",
+         "shade": 1,
+         "group": "cloth"
+        },
+        {"kind": "ellipse", "at": [6.1, -1], "r": [1.1, 1.1], "paint": "cloth", "shade": 1, "group": "cloth"},
+        {"kind": "ellipse", "at": [6.2, 0.7], "r": [1.1, 1.1], "paint": "cloth", "shade": 1, "group": "cloth"},
+        {
+         "kind": "poly",
+         "points": [[5.0019, -0.9354], [5.1019, 0.7646], [7.2981, 0.6354], [7.1981, -1.0646]],
+         "paint": "cloth",
+         "shade": 1,
+         "group": "cloth"
+        }
+       ],
+       "lights": [
+        {"kind": "stamp", "at": [1.8, -3.7], "anchor": "tl", "rows": ["a", "a"], "key": {"a": "ink"}},
+        {"gen": "icon.flame", "v": 1, "at": [1.8, -4.7], "h": 8, "w": 6, "paint": "fire", "core": "thunder", "rim": "fire.dark"}
+       ]
+      }
+     ]
+    },
+    "bomb": {
+     "label": "Bomb",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {"from": "size", "map": [[0, 0], [1, 1]]},
+       "tilt": {"from": "tilt", "pick": {"true": true, "false": false}},
+       "turn": 26.5651,
+       "soften": {"from": "shade", "pick": {"true": true, "false": false}},
+       "shiny": {"from": "shine", "pick": {"true": true, "false": false}},
+       "draw": [
+        {"kind": "ellipse", "at": [6.2, -4.2], "r": [0.95, 0.95], "paint": "path", "shade": 0, "light": 0, "group": "path"},
+        {"kind": "ellipse", "at": [8.4, -7.2], "r": [0.95, 0.95], "paint": "path", "shade": 0, "light": 0, "group": "path"},
+        {
+         "kind": "poly",
+         "points": [[6.9661, -3.6382], [9.1661, -6.6382], [7.6339, -7.7618], [5.4339, -4.7618]],
+         "paint": "path",
+         "shade": 0,
+         "light": 0,
+         "group": "path"
+        },
+        {"kind": "ellipse", "at": [8.4, -7.2], "r": [0.95, 0.95], "paint": "path", "shade": 0, "light": 0, "group": "path"},
+        {"kind": "ellipse", "at": [7.6, -10], "r": [0.95, 0.95], "paint": "path", "shade": 0, "light": 0, "group": "path"},
+        {
+         "kind": "poly",
+         "points": [[9.3134, -7.461], [8.5134, -10.261], [6.6866, -9.739], [7.4866, -6.939]],
+         "paint": "path",
+         "shade": 0,
+         "light": 0,
+         "group": "path"
+        },
+        {"kind": "ellipse", "at": [7.6, -10], "r": [0.95, 0.95], "paint": "path", "shade": 0, "light": 0, "group": "path"},
+        {"kind": "ellipse", "at": [5.6, -11.2], "r": [0.95, 0.95], "paint": "path", "shade": 0, "light": 0, "group": "path"},
+        {
+         "kind": "poly",
+         "points": [[8.0888, -10.8146], [6.0888, -12.0146], [5.1112, -10.3854], [7.1112, -9.1854]],
+         "paint": "path",
+         "shade": 0,
+         "light": 0,
+         "group": "path"
+        },
+        {
+         "kind": "poly",
+         "points": [[2.2, -4], [5.9, -0.3], [8.3, -2.7], [4.6, -6.4]],
+         "paint": {"rule": "tone", "of": "slate", "by": 1.45},
+         "shade": 1,
+         "light": 0
+        },
+        {"gen": "icon.rim", "v": 1, "shapes": [{"kind": "ellipse", "at": [-1, 3], "r": [8.1, 8.1], "paint": "slate"}], "paint": "ink"},
+        {"kind": "ellipse", "at": [-1, 3], "r": [8.1, 8.1], "paint": "slate"},
+        {"gen": "icon.glint", "v": 2, "at": [2.5, -1.5], "paint": "white"}
+       ],
+       "lights": [{"gen": "twinkle", "v": 2, "at": [5.6, -11.2], "size": 2, "paint": "fire", "core": "white"}]
+      }
+     ]
+    },
+    "tent": {
+     "label": "Tent",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {"from": "size", "map": [[0, 0], [1, 1]]},
+       "tilt": {"from": "tilt", "pick": {"true": true, "false": false}},
+       "turn": 13.2825,
+       "soften": {"from": "shade", "pick": {"true": true, "false": false}},
+       "shiny": {"from": "shine", "pick": {"true": true, "false": false}},
+       "draw": [
+        {
+         "kind": "ellipse",
+         "at": [-2.6, -6],
+         "r": [0.9, 0.9],
+         "paint": {"rule": "mix", "of": "pine", "with": "fire", "amount": 0.55},
+         "shade": 0,
+         "light": 0,
+         "group": "part"
+        },
+        {
+         "kind": "ellipse",
+         "at": [0.4, -10.6],
+         "r": [0.9, 0.9],
+         "paint": {"rule": "mix", "of": "pine", "with": "fire", "amount": 0.55},
+         "shade": 0,
+         "light": 0,
+         "group": "part"
+        },
+        {
+         "kind": "poly",
+         "points": [[-1.8462, -5.5084], [1.1538, -10.1084], [-0.3538, -11.0916], [-3.3538, -6.4916]],
+         "paint": {"rule": "mix", "of": "pine", "with": "fire", "amount": 0.55},
+         "shade": 0,
+         "light": 0,
+         "group": "part"
+        },
+        {
+         "kind": "ellipse",
+         "at": [-2.6, -6],
+         "r": [0.9, 0.9],
+         "paint": {"rule": "mix", "of": "pine", "with": "fire", "amount": 0.55},
+         "shade": 0,
+         "light": 0,
+         "group": "part"
+        },
+        {
+         "kind": "ellipse",
+         "at": [-5.4, -10.6],
+         "r": [0.9, 0.9],
+         "paint": {"rule": "mix", "of": "pine", "with": "fire", "amount": 0.55},
+         "shade": 0,
+         "light": 0,
+         "group": "part"
+        },
+        {
+         "kind": "poly",
+         "points": [[-1.8312, -6.468], [-4.6312, -11.068], [-6.1688, -10.132], [-3.3688, -5.532]],
+         "paint": {"rule": "mix", "of": "pine", "with": "fire", "amount": 0.55},
+         "shade": 0,
+         "light": 0,
+         "group": "part"
+        },
+        {
+         "kind": "poly",
+         "points": [[-2.6, -7.8], [6.4, -5.4], [11.5, 8.4], [5, 9.5]],
+         "paint": "cloth.light",
+         "shade": 0,
+         "light": 0,
+         "when": {"shine": [true]}
+        },
+        {
+         "kind": "poly",
+         "points": [[-2.6, -7.8], [6.4, -5.4], [11.5, 8.4], [5, 9.5]],
+         "paint": {"rule": "mix", "of": "cloth", "with": {"rule": "ramp", "of": "cloth", "tone": "light"}, "amount": 0.4},
+         "shade": 0,
+         "light": 0,
+         "when": {"shine": [false]}
+        },
+        {"kind": "poly", "points": [[-2.6, -8], [-11.5, 9.5], [5.2, 9.5]], "paint": "cloth", "light": 0},
+        {"kind": "line", "from": [-2.6, -8], "to": [5, 9.4], "paint": "cloth.dark"},
+        {
+         "kind": "poly",
+         "points": [[-3.2, -0.5], [-7, 9.5], [-0.4, 9.5]],
+         "paint": {
+          "rule": "mix",
+          "of": {"rule": "ramp", "of": "cloth", "tone": "deep"},
+          "with": {"rule": "tone", "of": {"rule": "tone", "of": "slate", "by": 1.45}, "by": -2.7},
+          "amount": 0.5
+         },
+         "shade": 0,
+         "light": 0
+        },
+        {
+         "kind": "poly",
+         "points": [[-3.2, -0.5], [-0.4, 9.5], [1.8, 9.5], [-2, -1]],
+         "paint": "cloth.light",
+         "shade": 0,
+         "light": 0,
+         "when": {"shine": [true]}
+        },
+        {
+         "kind": "poly",
+         "points": [[-3.2, -0.5], [-0.4, 9.5], [1.8, 9.5], [-2, -1]],
+         "paint": {"rule": "mix", "of": "cloth", "with": {"rule": "ramp", "of": "cloth", "tone": "light"}, "amount": 0.4},
+         "shade": 0,
+         "light": 0,
+         "when": {"shine": [false]}
+        }
+       ]
+      }
+     ]
+    }
+   }
+  }
+ },
+ "clips": {
+  "potion": {"frames": 1, "fps": 1, "label": "Potion"},
+  "mana-flask": {"frames": 1, "fps": 1, "label": "Mana flask"},
+  "antidote": {"frames": 1, "fps": 1, "label": "Antidote"},
+  "bread": {"frames": 1, "fps": 1, "label": "Bread"},
+  "herb": {"frames": 1, "fps": 1, "label": "Herb"},
+  "revive-candle": {"frames": 1, "fps": 1, "label": "Revive candle"},
+  "bomb": {"frames": 1, "fps": 1, "label": "Bomb"},
+  "tent": {"frames": 1, "fps": 1, "label": "Tent"}
+ }
+}

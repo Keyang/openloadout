@@ -1,0 +1,249 @@
+{
+ "id": "ui-bars-paper",
+ "frozen": "2026-11-20",
+ "source": "sprites/ui-bars-paper.js",
+ "sha256": "d0bd5d7cf1684e726bacc40cdd6cd1305bfe6d94c3f55a75d5a5af7b12bed1a6",
+ "name": "Paper bars and slider",
+ "blurb": "An ink-ruled paper bar housing with three hatched fill strips (health, magic, a gauge), a white flash, a slider track and its knob; change the style, corners, rule, hatching and colours.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/bar",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "arcade",
+   "puzzle",
+   "card-game",
+   "farming-sim"
+  ],
+  "view": "none",
+  "words": [
+   "bar",
+   "health",
+   "magic",
+   "gauge",
+   "meter",
+   "slider",
+   "volume",
+   "settings",
+   "paper",
+   "ink",
+   "hatched",
+   "fill",
+   "flash",
+   "hud"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  64,
+  16
+ ],
+ "pivot": [
+  32,
+  8
+ ],
+ "grounded": false,
+ "preview": "frame",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "sheet",
+   "options": [
+    {
+     "value": "sheet",
+     "label": "Sheet"
+    },
+    {
+     "value": "torn",
+     "label": "Torn"
+    },
+    {
+     "value": "card",
+     "label": "Card"
+    }
+   ],
+   "group": "Look"
+  },
+  "corner": {
+   "kind": "range",
+   "label": "Corner",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Square",
+   "hi": "Round",
+   "group": "Look"
+  },
+  "border": {
+   "kind": "range",
+   "label": "Border",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Thin",
+   "hi": "Thick",
+   "group": "Look"
+  },
+  "hatch": {
+   "kind": "toggle",
+   "label": "Hatching",
+   "def": true,
+   "group": "Look"
+  },
+  "frame": {
+   "kind": "color",
+   "label": "Ink",
+   "def": "#3f5068",
+   "swatches": [
+    "#3f5068",
+    "#7a4f33",
+    "#434d6d",
+    "#8e3a4a"
+   ],
+   "group": "Colors"
+  },
+  "fill": {
+   "kind": "color",
+   "label": "Health",
+   "def": "#6aa83e",
+   "swatches": [
+    "#6aa83e",
+    "#3f8a4f",
+    "#c9423a",
+    "#e08a2c",
+    "#4fd8ee",
+    "#f2c230"
+   ],
+   "group": "Colors"
+  },
+  "fillB": {
+   "kind": "color",
+   "label": "Magic",
+   "def": "#3f6fd1",
+   "swatches": [
+    "#3f6fd1",
+    "#3f9fd1",
+    "#4fd8ee",
+    "#8fd0f0",
+    "#4f9ff0"
+   ],
+   "group": "Colors"
+  },
+  "fillC": {
+   "kind": "color",
+   "label": "Gauge",
+   "def": "#f2c230",
+   "swatches": [
+    "#f2c230",
+    "#e08a2c",
+    "#a4c44a",
+    "#a06a3c",
+    "#c2c9d6"
+   ],
+   "group": "Colors"
+  }
+ },
+ "clips": {
+  "frame": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "fill": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "fill-b": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "fill-c": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "flash": {
+   "frames": 4,
+   "loop": false,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "slider": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "knob": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [
+  {
+   "name": "Ink bars",
+   "params": {}
+  },
+  {
+   "name": "Torn strip",
+   "params": {
+    "style": "torn",
+    "frame": "#8e3a4a"
+   }
+  },
+  {
+   "name": "Clean fill",
+   "params": {
+    "hatch": false,
+    "border": 1,
+    "corner": 1,
+    "frame": "#434d6d",
+    "style": "card"
+   }
+  },
+  {
+   "name": "Brown ink",
+   "params": {
+    "frame": "#7a4f33",
+    "fill": "#c9423a",
+    "style": "card"
+   }
+  }
+ ],
+ "bundles": []
+}

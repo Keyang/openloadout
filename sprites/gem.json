@@ -1,0 +1,77 @@
+{
+  "format": "loadout-sprite",
+  "version": 2,
+  "id": "gem",
+  "name": "Gem",
+  "blurb": "A floating cut jewel that glints, worth more than a coin. Change its cut, size, cut lines, sparkle and colour.",
+  "meta": {"type":"pickup","role":"items/pickup","themes":["fantasy","forest"],"gameTypes":["platformer","arcade","puzzle"],"view":"front","words":["gem","jewel","diamond","crystal","emerald","ruby","treasure","loot","collect","pickup","reward","score","shiny"],"license":"draft"},
+  "size": [32,32],
+  "pivot": [16,30],
+  "grounded": false,
+  "preview": "idle",
+  "styles": ["pixel"],
+  "palette": [
+    {"id":"body","label":"Gem","default":"#4fd8ee","material":"magic","swatches":["#4fd8ee","#c9423a","#a4c44a","#7a4fc4","#f2c230"]},
+    {"id":"gleam","material":"light","derive":{"rule":"mix","of":{"rule":"tone","of":"body","by":0.85},"with":"shine","amount":0.7}},
+    {"id":"spark","material":"light","derive":{"rule":"mix","of":{"rule":"ramp","of":"body","tone":"light"},"with":"shine","amount":0.35}},
+    {"id":"shine","default":"#ffffff","material":"light","detail":true}
+  ],
+  "controls": [
+    {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+    {"key":"shape","kind":"choice","label":"Shape","options":["diamond","emerald","round","shard"],"default":"diamond"},
+    {"key":"facets","kind":"toggle","label":"Cut lines","default":true},
+    {"key":"sparkle","kind":"toggle","label":"Sparkle","default":true},
+    {"key":"body","kind":"colour","label":"Gem"},
+    {"key":"bob","kind":"range","label":"Float","lo":"Still","hi":"Floaty","default":0.5,"group":"Motion"},
+    {"key":"pop","kind":"range","label":"Pop height","lo":"Low","hi":"High","default":0.5,"group":"Motion"},
+    {"key":"speed","standard":"speed"}
+  ],
+  "body": { "pictures": {
+    "nodes": [
+      {"id":"it","parent":null,"at":[16,17]},
+      {"id":"g","parent":null,"at":[16,17]}
+    ],
+    "draw": [
+      {"id":"stone-diamond","on":"it","gen":"gem.cut","v":2,"at":[0,0],"r":[{"from":"size","map":[[0,6],[1,10]],"round":"px"},{"from":"size","map":[[0,5.25],[1,8.75]],"round":"px"}],"cut":"diamond","facets":{"from":"facets","pick":{"true":true,"false":false}},"paint":"body","shine":"shine","when":{"shape":["diamond"]}},
+      {"id":"stone-diamond-wide","on":"it","gen":"gem.cut","v":2,"at":[0,0],"r":[{"from":"size","map":[[0,7.2],[1,12]],"round":"px"},{"from":"size","map":[[0,4],[1,7.2]],"round":"px"}],"cut":"diamond","facets":{"from":"facets","pick":{"true":true,"false":false}},"paint":"body","shine":"shine","when":{"shape":["diamond"]},"hidden":true},
+      {"id":"stone-diamond-tall","on":"it","gen":"gem.cut","v":2,"at":[0,0],"r":[{"from":"size","map":[[0,4.98],[1,8.3]],"round":"px"},{"from":"size","map":[[0,5.85],[1,10.53]],"round":"px"}],"cut":"diamond","facets":{"from":"facets","pick":{"true":true,"false":false}},"paint":"body","shine":"shine","when":{"shape":["diamond"]},"hidden":true},
+      {"id":"stone-diamond-small","on":"it","gen":"gem.cut","v":2,"at":[0,0],"r":[{"from":"size","map":[[0,3.42],[1,5.7]],"round":"px"},{"from":"size","map":[[0,2.85],[1,5.13]],"round":"px"}],"cut":"diamond","facets":false,"paint":"body","shine":"shine","when":{"shape":["diamond"]},"hidden":true},
+      {"id":"stone-emerald","on":"it","gen":"gem.cut","v":2,"at":[0,0],"r":[{"from":"size","map":[[0,4.5],[1,7.5]],"round":"px"},{"from":"size","map":[[0,6],[1,10]],"round":"px"}],"cut":"emerald","facets":{"from":"facets","pick":{"true":true,"false":false}},"paint":"body","shine":"shine","when":{"shape":["emerald"]}},
+      {"id":"stone-emerald-wide","on":"it","gen":"gem.cut","v":2,"at":[0,0],"r":[{"from":"size","map":[[0,6],[1,9.6]],"round":"px"},{"from":"size","map":[[0,4.8],[1,8]],"round":"px"}],"cut":"emerald","facets":{"from":"facets","pick":{"true":true,"false":false}},"paint":"body","shine":"shine","when":{"shape":["emerald"]},"hidden":true},
+      {"id":"stone-emerald-tall","on":"it","gen":"gem.cut","v":2,"at":[0,0],"r":[{"from":"size","map":[[0,4.15],[1,6.64]],"round":"px"},{"from":"size","map":[[0,7.02],[1,11.7]],"round":"px"}],"cut":"emerald","facets":{"from":"facets","pick":{"true":true,"false":false}},"paint":"body","shine":"shine","when":{"shape":["emerald"]},"hidden":true},
+      {"id":"stone-emerald-small","on":"it","gen":"gem.cut","v":2,"at":[0,0],"r":[{"from":"size","map":[[0,2.85],[1,4.56]],"round":"px"},{"from":"size","map":[[0,3.42],[1,5.7]],"round":"px"}],"cut":"emerald","facets":false,"paint":"body","shine":"shine","when":{"shape":["emerald"]},"hidden":true},
+      {"id":"stone-round","on":"it","gen":"gem.cut","v":2,"at":[0,0],"r":[{"from":"size","map":[[0,5.25],[1,8.75]],"round":"px"},{"from":"size","map":[[0,5.25],[1,8.75]],"round":"px"}],"cut":"round","facets":{"from":"facets","pick":{"true":true,"false":false}},"paint":"body","shine":"shine","when":{"shape":["round"]}},
+      {"id":"stone-round-wide","on":"it","gen":"gem.cut","v":2,"at":[0,0],"r":[{"from":"size","map":[[0,6],[1,10.8]],"round":"px"},{"from":"size","map":[[0,4],[1,7.2]],"round":"px"}],"cut":"round","facets":{"from":"facets","pick":{"true":true,"false":false}},"paint":"body","shine":"shine","when":{"shape":["round"]},"hidden":true},
+      {"id":"stone-round-tall","on":"it","gen":"gem.cut","v":2,"at":[0,0],"r":[{"from":"size","map":[[0,4.15],[1,7.47]],"round":"px"},{"from":"size","map":[[0,5.85],[1,10.53]],"round":"px"}],"cut":"round","facets":{"from":"facets","pick":{"true":true,"false":false}},"paint":"body","shine":"shine","when":{"shape":["round"]},"hidden":true},
+      {"id":"stone-round-small","on":"it","gen":"gem.cut","v":2,"at":[0,0],"r":[{"from":"size","map":[[0,2.85],[1,5.13]],"round":"px"},{"from":"size","map":[[0,2.85],[1,5.13]],"round":"px"}],"cut":"round","facets":false,"paint":"body","shine":"shine","when":{"shape":["round"]},"hidden":true},
+      {"id":"stone-shard","on":"it","gen":"gem.cut","v":2,"at":[0,0],"r":[{"from":"size","map":[[0,4.5],[1,7.5]],"round":"px"},{"from":"size","map":[[0,6.75],[1,11.25]],"round":"px"}],"cut":"shard","facets":{"from":"facets","pick":{"true":true,"false":false}},"paint":"body","shine":"shine","when":{"shape":["shard"]}},
+      {"id":"stone-shard-wide","on":"it","gen":"gem.cut","v":2,"at":[0,0],"r":[{"from":"size","map":[[0,6],[1,9.6]],"round":"px"},{"from":"size","map":[[0,5.6],[1,8.8]],"round":"px"}],"cut":"shard","facets":{"from":"facets","pick":{"true":true,"false":false}},"paint":"body","shine":"shine","when":{"shape":["shard"]},"hidden":true},
+      {"id":"stone-shard-tall","on":"it","gen":"gem.cut","v":2,"at":[0,0],"r":[{"from":"size","map":[[0,4.15],[1,6.64]],"round":"px"},{"from":"size","map":[[0,8.19],[1,12.87]],"round":"px"}],"cut":"shard","facets":{"from":"facets","pick":{"true":true,"false":false}},"paint":"body","shine":"shine","when":{"shape":["shard"]},"hidden":true},
+      {"id":"stone-shard-small","on":"it","gen":"gem.cut","v":2,"at":[0,0],"r":[{"from":"size","map":[[0,2.85],[1,4.56]],"round":"px"},{"from":"size","map":[[0,3.99],[1,6.27]],"round":"px"}],"cut":"shard","facets":false,"paint":"body","shine":"shine","when":{"shape":["shard"]},"hidden":true},
+      {"id":"glint-diamond","gen":"glint","v":2,"on":"g","clip":["idle"],"when":{"shape":["diamond"]},"at":[0,0],"r":{"from":"size","map":[[0,6],[1,10]],"round":"px"},"phase":-1.5,"width":0.11,"within":[{"gen":"gem.cut","v":2,"at":[0,0],"r":[{"from":"size","map":[[0,6],[1,10]],"round":"px"},{"from":"size","map":[[0,5.25],[1,8.75]],"round":"px"}],"cut":"diamond","facets":false,"paint":"body","shine":"shine"}],"paint":"gleam"},
+      {"id":"glint-emerald","gen":"glint","v":2,"on":"g","clip":["idle"],"when":{"shape":["emerald"]},"at":[0,0],"r":{"from":"size","map":[[0,6],[1,10]],"round":"px"},"phase":-1.5,"width":0.11,"within":[{"gen":"gem.cut","v":2,"at":[0,0],"r":[{"from":"size","map":[[0,4.5],[1,7.5]],"round":"px"},{"from":"size","map":[[0,6],[1,10]],"round":"px"}],"cut":"emerald","facets":false,"paint":"body","shine":"shine"}],"paint":"gleam"},
+      {"id":"glint-round","gen":"glint","v":2,"on":"g","clip":["idle"],"when":{"shape":["round"]},"at":[0,0],"r":{"from":"size","map":[[0,5.25],[1,8.75]],"round":"px"},"phase":-1.5,"width":0.11,"within":[{"gen":"gem.cut","v":2,"at":[0,0],"r":[{"from":"size","map":[[0,5.25],[1,8.75]],"round":"px"},{"from":"size","map":[[0,5.25],[1,8.75]],"round":"px"}],"cut":"round","facets":false,"paint":"body","shine":"shine"}],"paint":"gleam"},
+      {"id":"glint-shard","gen":"glint","v":2,"on":"g","clip":["idle"],"when":{"shape":["shard"]},"at":[0,0],"r":{"from":"size","map":[[0,6.75],[1,11.25]],"round":"px"},"phase":-1.5,"width":0.11,"within":[{"gen":"gem.cut","v":2,"at":[0,0],"r":[{"from":"size","map":[[0,4.5],[1,7.5]],"round":"px"},{"from":"size","map":[[0,6.75],[1,11.25]],"round":"px"}],"cut":"shard","facets":false,"paint":"body","shine":"shine"}],"paint":"gleam"},
+      {"kind":"outline","paint":"ink"},
+      {"id":"sparkle-diamond","gen":"gleam","v":1,"on":"it","clip":["idle"],"when":{"sparkle":[true],"shape":["diamond"]},"at":[{"from":"size","map":[[0,5],[1,9]],"round":"px"},{"from":"size","map":[[0,-4.25],[1,-7.75]],"round":"px"}],"peak":0.75,"paint":"shine","core":"shine"},
+      {"id":"sparkle-emerald","gen":"gleam","v":1,"on":"it","clip":["idle"],"when":{"sparkle":[true],"shape":["emerald"]},"at":[{"from":"size","map":[[0,3.5],[1,6.5]],"round":"px"},{"from":"size","map":[[0,-5],[1,-9]],"round":"px"}],"peak":0.75,"paint":"shine","core":"shine"},
+      {"id":"sparkle-round","gen":"gleam","v":1,"on":"it","clip":["idle"],"when":{"sparkle":[true],"shape":["round"]},"at":[{"from":"size","map":[[0,4.25],[1,7.75]],"round":"px"},{"from":"size","map":[[0,-4.25],[1,-7.75]],"round":"px"}],"peak":0.75,"paint":"shine","core":"shine"},
+      {"id":"sparkle-shard","gen":"gleam","v":1,"on":"it","clip":["idle"],"when":{"sparkle":[true],"shape":["shard"]},"at":[{"from":"size","map":[[0,3.5],[1,6.5]],"round":"px"},{"from":"size","map":[[0,-5.75],[1,-10.25]],"round":"px"}],"peak":0.75,"paint":"shine","core":"shine"}
+    ],
+    "motion": [
+      {"gen":"pickup.bob","v":1,"clip":["idle"],"height":{"from":"bob","map":[[0,0],[1,2]]}},
+      {"gen":"pickup.sheen","v":1,"node":"g","clip":["idle"]},
+      {"gen":"pickup.collect","v":1,"node":"it","clip":["collect"],"pop":{"from":"pop","map":[[0,0],[1,1]]},"low":{"from":"size","map":[[0,3.15],[0.35714,3.15],[0.35715,2.79],[0.64285,2.79],[0.64286,2.295],[0.92857,2.295],[0.92858,1.8],[1,1.8]]},"high":{"from":"size","map":[[0,7],[0.35714,7],[0.35715,6.2],[0.64285,6.2],[0.64286,5.1],[0.92857,5.1],[0.92858,4],[1,4]]},"room":32,"when":{"shape":["diamond"]}},
+      {"gen":"pickup.collect","v":1,"node":"it","clip":["collect"],"pop":{"from":"pop","map":[[0,0],[1,1]]},"low":{"from":"size","map":[[0,3.15],[0.12499,3.15],[0.125,2.79],[0.37499,2.79],[0.375,2.295],[0.62499,2.295],[0.625,1.8],[0.87499,1.8],[0.875,1.305],[1,1.305]]},"high":{"from":"size","map":[[0,7],[0.12499,7],[0.125,6.2],[0.37499,6.2],[0.375,5.1],[0.62499,5.1],[0.625,4],[0.87499,4],[0.875,2.9],[1,2.9]]},"room":32,"when":{"shape":["emerald"]}},
+      {"gen":"pickup.collect","v":1,"node":"it","clip":["collect"],"pop":{"from":"pop","map":[[0,0],[1,1]]},"low":{"from":"size","map":[[0,3.15],[0.35714,3.15],[0.35715,2.79],[0.64285,2.79],[0.64286,2.295],[0.92857,2.295],[0.92858,1.8],[1,1.8]]},"high":{"from":"size","map":[[0,7],[0.35714,7],[0.35715,6.2],[0.64285,6.2],[0.64286,5.1],[0.92857,5.1],[0.92858,4],[1,4]]},"room":32,"when":{"shape":["round"]}},
+      {"gen":"pickup.collect","v":1,"node":"it","clip":["collect"],"pop":{"from":"pop","map":[[0,0],[1,1]]},"low":{"from":"size","map":[[0,2.79],[0.16666,2.79],[0.16667,2.295],[0.38888,2.295],[0.38889,1.8],[0.61111,1.8],[0.61112,1.305],[0.83333,1.305],[0.83334,0.81],[1,0.81]]},"high":{"from":"size","map":[[0,6.2],[0.16666,6.2],[0.16667,5.1],[0.38888,5.1],[0.38889,4],[0.61111,4],[0.61112,2.9],[0.83333,2.9],[0.83334,1.8],[1,1.8]]},"room":32,"when":{"shape":["shard"]}}
+    ],
+    "emitters": [
+      {"id":"burst","gen":"pickup.burst","v":1,"on":"it","at":[0,0],"reach":{"from":"size","map":[[0,9],[1,12]]},"sparkle":{"from":"sparkle","pick":{"true":true,"false":false}},"paint":"body","bright":"spark","core":"shine"}
+    ]
+  } },
+  "clips": {
+    "idle": {"frames":8,"fps":10},
+    "collect": {"frames":8,"fps":14,"loop":false,"frameEdits":{"1":{"show":["stone-diamond-wide","stone-emerald-wide","stone-round-wide","stone-shard-wide"],"hide":["stone-diamond","stone-emerald","stone-round","stone-shard"]},"2":{"show":["stone-diamond-tall","stone-emerald-tall","stone-round-tall","stone-shard-tall"],"hide":["stone-diamond","stone-emerald","stone-round","stone-shard"]},"4":{"flash":true},"5":{"show":["stone-diamond-small","stone-emerald-small","stone-round-small","stone-shard-small"]}},"keys":[{"t":0,"ease":"hold","emit":{"burst":{"amount":0}}},{"t":0.7142,"ease":"linear","emit":{"burst":{"amount":0.2857}},"hide":["stone-diamond","stone-emerald","stone-round","stone-shard"]},{"t":1,"emit":{"burst":{"amount":1}}}],"sounds":[{"sound":"gem-pickup","preset":"Gem","frame":1,"volume":0.7}]}
+  }
+}

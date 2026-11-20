@@ -1,0 +1,247 @@
+{
+ "id": "spikes",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "gen": "spikes",
+    "v": 1,
+    "at": [
+     16,
+     30
+    ],
+    "body": "spike",
+    "tip": "tip",
+    "plate": "plate",
+    "shine": "shine"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      2,
+      13
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...a......a......a......a...",
+      "...a......a......a......a...",
+      "..aab....aab....aab....aab..",
+      "..aab....aab....aab....aab..",
+      "..ccd....ccd....ccd....ccd..",
+      "..ccd....ccd....ccd....ccd..",
+      "..ccd....ccd....ccd....ccd..",
+      ".cccdd..cccdd..cccdd..cccdd.",
+      ".cccdd..cccdd..cccdd..cccdd.",
+      ".eccdd..eccdd..eccdd..eccdd.",
+      ".eccdd..eccdd..eccdd..eccdd.",
+      ".eccdd..eccdd..eccdd..eccdd.",
+      "ecccdddecccdddecccdddecccddd",
+      "ffffffgffffffgffffffgffffffg",
+      "hhhhhhhhhhhhhhhhhhhhhhhhhhhh",
+      "hgghhhhhhhhhhhhhhhhhhhhhhggh",
+      "ffffffffffffffffffffffffffff"
+     ],
+     "key": {
+      "a": "tip",
+      "b": "tip.light",
+      "c": "spike",
+      "d": "spike.light",
+      "e": "spike.dark",
+      "f": "plate.dark",
+      "g": "plate.light",
+      "h": "plate"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "gen": "spikes",
+    "v": 1,
+    "at": [
+     16,
+     30
+    ],
+    "body": "spike",
+    "tip": "tip",
+    "plate": "plate",
+    "shine": "shine",
+    "style": "thorn",
+    "count": 5,
+    "length": 22,
+    "base": false,
+    "out": [
+     0,
+     0.62,
+     1
+    ],
+    "over": [
+     0,
+     0,
+     2
+    ]
+   },
+   "ctx": {
+    "t": 0.4,
+    "loop": false,
+    "frames": 6,
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      2,
+      6
+     ],
+     "anchor": "tl",
+     "rows": [
+      "....a..........ab.........ab",
+      "...ab..........a..........ab",
+      "...ab.........aa....ab....ab",
+      "...ab....ab...ab....ab...aab",
+      "...ab....ab...ab....ab...aa.",
+      "...ab....ab...ab....ab...ab.",
+      "...cd....ab...cd....ab...cd.",
+      "..ccd...aab...cd...ccd...cd.",
+      "..ccd...ccd..ccd...ccd...cd.",
+      "..ccd...cdd..ccd...ccd..ccd.",
+      "..ccd...cdd..ccd...ccd..ccd.",
+      "..ccd...cd...ccd...cdd..ccd.",
+      "..cdd..ccd...ccd...cdd..ccd.",
+      ".ccdd..ccd...ccd..ccdd..ccd.",
+      ".ccdd..ccd...ccd..ccdd..ccd.",
+      ".ccdd..ccd..cccd..ccdd..ccd.",
+      ".ccdd..ccd..ccdd..ccdd.cccd.",
+      ".ccdd..ccdd.ccdd..ccdd.cccd.",
+      ".ccdd.cccdd.ccdd..ccdd.cccd.",
+      ".ccdd.cccdd.ccdd.cccdd.cccd.",
+      ".ccdd.cccdd.ccdd.cccdd.cccd.",
+      "cccdd.cccdd.ccdd.cccdd.cccdd",
+      "eccdd.eccdd.ecdd.eccdd.eccdd",
+      "eccdd.eccdd.ecdd.eccdd.eccdd"
+     ],
+     "key": {
+      "a": "tip",
+      "b": "tip.light",
+      "c": "spike",
+      "d": "spike.light",
+      "e": "spike.dark"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "gen": "spikes",
+    "v": 1,
+    "at": [
+     16,
+     30
+    ],
+    "body": "spike",
+    "tip": "tip",
+    "plate": "plate",
+    "shine": "shine",
+    "style": "crystal",
+    "count": 3,
+    "length": 12,
+    "out": [
+     0
+    ],
+    "odd": [
+     0,
+     2
+    ],
+    "even": [
+     0,
+     0
+    ]
+   },
+   "ctx": {
+    "t": 0.3333333333333333,
+    "loop": false,
+    "frames": 4,
+    "frame": 1
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      2,
+      21
+     ],
+     "anchor": "tl",
+     "rows": [
+      "......ab................ab..",
+      "....aabb...............aabb.",
+      "...caabb...ab........caabbb.",
+      ".deeefff...aabb.....deeefff.",
+      ".deeefff..caaabbb...deeefff.",
+      "ggggggggghgggggggggggggggggg",
+      "iiiiiiiiiiiiiiiiiiiiiiiiiiii",
+      "ihhiiiiiiiiiiiiiiiiiiiiiihhi",
+      "gggggggggggggggggggggggggggg"
+     ],
+     "key": {
+      "a": "tip",
+      "b": "tip.light",
+      "c": "tip.dark",
+      "d": "spike.dark",
+      "e": "spike",
+      "f": "spike.light",
+      "g": "plate.dark",
+      "h": "plate.light",
+      "i": "plate"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "gen": "spikes",
+    "v": 1,
+    "at": [
+     16,
+     30
+    ],
+    "body": "spike",
+    "tip": "tip",
+    "plate": "plate",
+    "shine": "shine",
+    "layer": "light",
+    "glint": [
+     0,
+     0,
+     1
+    ]
+   },
+   "ctx": {
+    "t": 0.4,
+    "loop": false,
+    "frames": 6,
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      4,
+      11
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".a.............a.",
+      "aba...........aba",
+      ".a.............a."
+     ],
+     "key": {
+      "a": "spike.light",
+      "b": "shine"
+     }
+    }
+   ]
+  }
+ ]
+}

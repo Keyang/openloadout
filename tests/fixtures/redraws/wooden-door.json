@@ -1,0 +1,213 @@
+{
+ "id": "wooden-door",
+ "frozen": "2026-11-20",
+ "source": "sprites/wooden-door.js",
+ "sha256": "5ef82d406d0b2af2ca6739bd34fd91a58702fbb6c488e510f5808562f6c05f51",
+ "name": "Wooden door",
+ "blurb": "A wooden door in a stone frame that swings open or rattles when it is locked. Make it plain, arched or iron-bound, and change its size, window, lock and colours.",
+ "meta": {
+  "type": "prop",
+  "role": "world/door",
+  "themes": [
+   "fantasy",
+   "dungeon"
+  ],
+  "gameTypes": [
+   "platformer"
+  ],
+  "view": "side",
+  "words": [
+   "door",
+   "gate",
+   "doorway",
+   "entrance",
+   "exit",
+   "open",
+   "locked",
+   "lock",
+   "castle",
+   "wooden",
+   "level end",
+   "key"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  48,
+  64
+ ],
+ "pivot": [
+  24,
+  62
+ ],
+ "grounded": true,
+ "preview": "closed",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "plank",
+   "options": [
+    "plank",
+    "arched",
+    "iron-bound"
+   ],
+   "group": "Look"
+  },
+  "width": {
+   "kind": "range",
+   "label": "Width",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Narrow",
+   "hi": "Wide",
+   "group": "Look"
+  },
+  "height": {
+   "kind": "range",
+   "label": "Height",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Short",
+   "hi": "Tall",
+   "group": "Look"
+  },
+  "window": {
+   "kind": "toggle",
+   "label": "Barred window",
+   "def": false,
+   "group": "Look"
+  },
+  "lock": {
+   "kind": "choice",
+   "label": "Lock",
+   "def": "keyhole",
+   "options": [
+    "none",
+    "padlock",
+    "keyhole",
+    "bar"
+   ],
+   "group": "Look"
+  },
+  "lockSize": {
+   "kind": "range",
+   "label": "Size",
+   "def": 1,
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "wood": {
+   "kind": "color",
+   "label": "Wood",
+   "def": "#a06a3c",
+   "swatches": [
+    "#a06a3c",
+    "#7a4f33",
+    "#f0ead8",
+    "#a8612a",
+    "#5a3a22",
+    "#c98a4a"
+   ],
+   "group": "Colors"
+  },
+  "metal": {
+   "kind": "color",
+   "label": "Metal",
+   "def": "#c2c9d6",
+   "swatches": [
+    "#c2c9d6",
+    "#f2c230",
+    "#8f97a8",
+    "#5d6475",
+    "#e6c545",
+    "#c98a4a"
+   ],
+   "group": "Colors"
+  },
+  "stone": {
+   "kind": "color",
+   "label": "Stone",
+   "def": "#8f97a8",
+   "swatches": [
+    "#8f97a8",
+    "#5d6475",
+    "#f0ead8",
+    "#3f5068",
+    "#a4c44a",
+    "#6b7280"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "closed": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "open": {
+   "frames": 6,
+   "loop": false,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  },
+  "locked": {
+   "frames": 4,
+   "loop": false,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  }
+ },
+ "sounds": {
+  "open": [
+   {
+    "sound": "door-creak",
+    "preset": "Wooden door",
+    "frame": 0,
+    "volume": 0.8
+   }
+  ],
+  "locked": [
+   {
+    "sound": "lever-clank",
+    "preset": "Switch",
+    "frame": 0,
+    "volume": 0.7
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-platformer-fantasy"
+ ]
+}

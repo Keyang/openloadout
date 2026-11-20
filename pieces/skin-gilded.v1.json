@@ -1,0 +1,185 @@
+{
+ "format": "loadout-piece",
+ "version": 1,
+ "id": "skin:gilded",
+ "v": 1,
+ "name": "Gilded",
+ "about": "Gilded interface pieces: a dark stone face inside a gold band lit from the top right; temple (cut corners, a key pattern), royal (scrolls) or ruin (chips, cracks); gems as ornaments.",
+ "slots": [
+  {
+   "id": "face",
+   "label": "Stone",
+   "default": "#3f5068",
+   "material": "interface"
+  },
+  {
+   "id": "frame",
+   "label": "Gold",
+   "default": "#f0ead8",
+   "material": "interface"
+  },
+  {
+   "id": "accent",
+   "label": "Gems",
+   "default": "#4fd8ee",
+   "material": "interface"
+  },
+  {
+   "id": "fill",
+   "label": "Fill",
+   "default": "#6aa83e",
+   "material": "interface"
+  },
+  {
+   "id": "shine",
+   "label": "Shine",
+   "default": "#ffffff",
+   "material": "light"
+  }
+ ],
+ "made": {
+  "from": "engine/ui-skins.js, engine/ui-gilded.js, engine/ui-gilded-carve.js"
+ },
+ "body": {
+  "paint": {
+   "face": "face",
+   "frame": "frame",
+   "accent": "accent",
+   "line": "frame",
+   "ledge": "frame.dark",
+   "knob": "frame",
+   "fill": "fill",
+   "shine": "shine",
+   "divider": "ink"
+  },
+  "args": {
+   "*": {
+    "rings": [
+     "ink",
+     "frame",
+     "ink"
+    ],
+    "bandAt": 1,
+    "lit": true,
+    "edge": "round",
+    "hoverFace": 0.1,
+    "hoverBand": 0.45,
+    "every": 4,
+    "start": 6,
+    "extra": [
+     {
+      "kind": "stamp",
+      "at": [
+       1,
+       1
+      ],
+      "rows": [
+       "lab",
+       "aab",
+       "bbb"
+      ],
+      "key": {
+       "l": "accent.light",
+       "a": "accent",
+       "b": "accent.dark"
+      }
+     }
+    ]
+   },
+   "ui.slab": {
+    "titleShade": -1,
+    "lined": false
+   },
+   "ui.strip": {
+    "gloss": false,
+    "shadow": true
+   },
+   "ui.trough": {
+    "trough": "dark",
+    "caps": 4
+   }
+  },
+  "styles": {
+   "temple": {
+    "*": {
+     "edge": "cut",
+     "along": [
+      {
+       "kind": "stamp",
+       "at": [
+        0,
+        1
+       ],
+       "rows": [
+        "i.ii",
+        "i..i"
+       ],
+       "key": {
+        "i": "ink"
+       }
+      }
+     ]
+    }
+   },
+   "royal": {
+    "*": {
+     "edge": "round",
+     "trim": [
+      {
+       "kind": "stamp",
+       "at": [
+        4,
+        1
+       ],
+       "rows": [
+        "d.d",
+        ".d.",
+        "..."
+       ],
+       "key": {
+        "d": "frame.dark"
+       }
+      }
+     ]
+    }
+   },
+   "ruin": {
+    "*": {
+     "edge": "chip",
+     "trim": [
+      {
+       "kind": "stamp",
+       "at": [
+        9,
+        1
+       ],
+       "rows": [
+        "i..",
+        ".i.",
+        ".i."
+       ],
+       "key": {
+        "i": "ink"
+       }
+      }
+     ]
+    }
+   }
+  },
+  "states": {
+   "normal": {
+    "lip": 2
+   },
+   "hover": {
+    "lip": 2
+   },
+   "pressed": {
+    "lip": 0
+   },
+   "disabled": {
+    "lip": 2,
+    "desaturate": 1
+   }
+  }
+ }
+}

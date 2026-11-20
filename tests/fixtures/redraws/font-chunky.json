@@ -1,0 +1,203 @@
+{
+ "id": "font-chunky",
+ "frozen": "2026-11-20",
+ "source": "sprites/font-chunky.js",
+ "sha256": "bb19ba306b23bf6e34be524cccd1ba22caaa6667b59ad729c95b2fc2af918c85",
+ "name": "Chunky pixel letters",
+ "blurb": "Heavy blocky capitals, small letters, digits and punctuation, one per 16x20 cell on a shared baseline (trim the empty columns on the right for proportional spacing); change the size, outline, shadow, shine and colours.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/icon",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "arcade",
+   "puzzle",
+   "platformer",
+   "turn-based-rpg"
+  ],
+  "view": "none",
+  "words": [
+   "font",
+   "letters",
+   "alphabet",
+   "text",
+   "numbers",
+   "title",
+   "score",
+   "pixel",
+   "bold"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  16,
+  20
+ ],
+ "pivot": [
+  4,
+  13
+ ],
+ "grounded": false,
+ "preview": "upper",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "outline": {
+   "kind": "choice",
+   "label": "Outline",
+   "def": "ink",
+   "options": [
+    {
+     "value": "none",
+     "label": "None"
+    },
+    {
+     "value": "ink",
+     "label": "Ink"
+    },
+    {
+     "value": "rimmed",
+     "label": "Rimmed"
+    }
+   ],
+   "group": "Look"
+  },
+  "shadow": {
+   "kind": "toggle",
+   "label": "Shadow",
+   "def": false,
+   "group": "Look"
+  },
+  "shine": {
+   "kind": "toggle",
+   "label": "Shine",
+   "def": false,
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Letters",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#f2c230",
+    "#8fd0f0",
+    "#9bd18a",
+    "#f6d3b0",
+    "#c2c9d6"
+   ],
+   "group": "Colors"
+  },
+  "edge": {
+   "kind": "color",
+   "label": "Rim",
+   "def": "#3f5068",
+   "swatches": [
+    "#3f5068",
+    "#c9423a",
+    "#3f6fd1",
+    "#7a4fc4",
+    "#3f8a4f",
+    "#7a4f33"
+   ],
+   "group": "Colors",
+   "when": {
+    "outline": [
+     "rimmed"
+    ]
+   }
+  }
+ },
+ "clips": {
+  "upper": {
+   "frames": 26,
+   "loop": true,
+   "fps": [
+    2,
+    2,
+    2
+   ]
+  },
+  "lower": {
+   "frames": 26,
+   "loop": true,
+   "fps": [
+    2,
+    2,
+    2
+   ]
+  },
+  "digits": {
+   "frames": 10,
+   "loop": true,
+   "fps": [
+    2,
+    2,
+    2
+   ]
+  },
+  "marks": {
+   "frames": 18,
+   "loop": true,
+   "fps": [
+    2,
+    2,
+    2
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [
+  {
+   "name": "Ink letters",
+   "params": {}
+  },
+  {
+   "name": "Gold title",
+   "params": {
+    "size": 1,
+    "outline": "rimmed",
+    "body": "#f2c230",
+    "edge": "#c9423a",
+    "shadow": true
+   }
+  },
+  {
+   "name": "Small and plain",
+   "params": {
+    "size": 0,
+    "outline": "none",
+    "body": "#8fd0f0"
+   }
+  },
+  {
+   "name": "Two-tone mint",
+   "params": {
+    "outline": "rimmed",
+    "shine": true,
+    "body": "#9bd18a",
+    "edge": "#3f8a4f"
+   }
+  },
+  {
+   "name": "Big steel",
+   "params": {
+    "size": 1,
+    "body": "#c2c9d6",
+    "shadow": true
+   }
+  }
+ ],
+ "bundles": []
+}

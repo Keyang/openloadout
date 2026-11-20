@@ -1,0 +1,422 @@
+{
+ "id": "ui.strip",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     1,
+     1
+    ],
+    "size": [
+     62,
+     14
+    ],
+    "fill": "fill"
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      5,
+      5
+     ],
+     "size": [
+      54,
+      5
+     ],
+     "paint": "fill",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      5,
+      10
+     ],
+     "size": [
+      54,
+      1
+     ],
+     "paint": "fill.dark",
+     "shade": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     1,
+     1
+    ],
+    "size": [
+     62,
+     14
+    ],
+    "segments": 5,
+    "glint": true,
+    "fill": "fill",
+    "shine": "shine"
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      5,
+      5
+     ],
+     "size": [
+      1,
+      3
+     ],
+     "paint": "fill",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      10,
+      5
+     ],
+     "size": [
+      5,
+      1
+     ],
+     "paint": "fill",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      16,
+      5
+     ],
+     "size": [
+      10,
+      5
+     ],
+     "paint": "fill",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      27,
+      5
+     ],
+     "size": [
+      10,
+      5
+     ],
+     "paint": "fill",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      38,
+      5
+     ],
+     "size": [
+      10,
+      5
+     ],
+     "paint": "fill",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      49,
+      5
+     ],
+     "size": [
+      10,
+      5
+     ],
+     "paint": "fill",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      9,
+      6
+     ],
+     "size": [
+      6,
+      1
+     ],
+     "paint": "fill",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      8,
+      7
+     ],
+     "size": [
+      7,
+      1
+     ],
+     "paint": "fill",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      5,
+      8
+     ],
+     "size": [
+      10,
+      2
+     ],
+     "paint": "fill",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      6,
+      5
+     ],
+     "size": [
+      4,
+      1
+     ],
+     "paint": "shine",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      6,
+      6
+     ],
+     "size": [
+      3,
+      1
+     ],
+     "paint": "shine",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      6,
+      7
+     ],
+     "size": [
+      2,
+      1
+     ],
+     "paint": "shine",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      5,
+      10
+     ],
+     "size": [
+      10,
+      1
+     ],
+     "paint": "fill.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      16,
+      10
+     ],
+     "size": [
+      10,
+      1
+     ],
+     "paint": "fill.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      27,
+      10
+     ],
+     "size": [
+      10,
+      1
+     ],
+     "paint": "fill.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      38,
+      10
+     ],
+     "size": [
+      10,
+      1
+     ],
+     "paint": "fill.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      49,
+      10
+     ],
+     "size": [
+      10,
+      1
+     ],
+     "paint": "fill.dark",
+     "shade": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     1,
+     1
+    ],
+    "size": [
+     62,
+     14
+    ],
+    "hatch": true,
+    "gloss": true,
+    "caps": 4,
+    "value": 0.5,
+    "fill": "fill"
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      9,
+      5
+     ],
+     "size": [
+      23,
+      1
+     ],
+     "paint": "fill.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      9,
+      6
+     ],
+     "size": [
+      23,
+      4
+     ],
+     "paint": "fill",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      9,
+      10
+     ],
+     "size": [
+      23,
+      1
+     ],
+     "paint": "fill.dark",
+     "shade": 0
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      9,
+      5
+     ],
+     "anchor": "tl",
+     "rows": [
+      "h...h...h...h...h...h..",
+      "...h...h...h...h...h...",
+      "..h...h...h...h...h...h",
+      ".h...h...h...h...h...h.",
+      "h...h...h...h...h...h.."
+     ],
+     "key": {
+      "h": "fill.dark"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     1,
+     1
+    ],
+    "size": [
+     62,
+     14
+    ],
+    "flash": 1,
+    "fade": true,
+    "fill": "fill",
+    "shine": "shine"
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": false,
+    "frames": 4,
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      5,
+      5
+     ],
+     "size": [
+      54,
+      5
+     ],
+     "paint": {
+      "rule": "mix",
+      "of": "fill",
+      "with": "shine",
+      "amount": 0.5
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      5,
+      10
+     ],
+     "size": [
+      54,
+      1
+     ],
+     "paint": {
+      "rule": "mix",
+      "of": "fill.dark",
+      "with": "shine",
+      "amount": 0.5
+     },
+     "shade": 0
+    }
+   ]
+  }
+ ]
+}

@@ -24,7 +24,8 @@
 //
 // A SKIN PIECE (pieces/skin-<name>.v<v>.json; kind "skin", engine/pieces.js) holds in its body only SKIN_FIELDS:
 //   paint   { <argument>: <paint> }            paints named by the skin's own slots (a use maps them to the sprite's)
-//   args    { "<ui generator id>": { <argument>: <value> } }
+//   args    { "<ui generator id>": { <argument>: <value> } }; "*" (ANY_PIECE) for every piece that declares the
+//           argument with a fitting type (migration batch M8: one skin's look shared by a family's every piece)
 //   styles  { "<style word>": { "<ui generator id>": { <argument>: <value> } } }   (UI_STYLES)
 //   states  { "<state>": { lift (-4..4 whole), lip (0..4 whole), desaturate (0..1) } }
 //   text    a paint: the colour text is made for (dark text on paper); left out, white. A bare slot name of the skin
@@ -57,6 +58,7 @@ function uiEntry(list, id) {
 
 /** Errors for one generator's arguments in a skin: each declared by the generator and of its type (no bindings). */
 function argErrors(list, where, id, args) {
+  if (id === ANY_PIECE) return anyArgErrors(list, where, args);
   const e = uiEntry(list, id);
   if (!e) return [`${where}: "${String(id).slice(0, 40)}" is not an interface piece generator (family "ui")`];
   if (!isObj(args)) return [`${where} ${id}: an object of arguments`];
@@ -66,6 +68,26 @@ function argErrors(list, where, id, args) {
     if (k === 'style' || k === 'state') { out.push(`${where} ${id}: ${k} is set by the panel, not by a skin`); continue; }
     const errs = checkArg(e.args[k], v, { bindings: false, path: `${where} ${id}.${k}` });
     out.push(...errs.map((x) => `${x} (the argument ${k} of ${id}: ${String(JSON.stringify(v)).slice(0, 30)})`));
+  }
+  return out;
+}
+
+/** The key of a skin's `args` (and of a style's) whose arguments go to every interface piece that declares them (migration batch M8): one skin's look shared by its panel, button, bar and controls. */
+export const ANY_PIECE = '*';
+
+/** Errors for the "*" arguments of a skin: each declared by at least one interface piece generator, and of the type of every one that declares it. */
+function anyArgErrors(list, where, args) {
+  if (!isObj(args)) return [`${where} ${ANY_PIECE}: an object of arguments`];
+  const out = [];
+  const ui = new Map();
+  for (const e of list) if (isObj(e) && e.family === 'ui' && (!ui.has(e.id) || ui.get(e.id).v < e.v)) ui.set(e.id, e);
+  for (const [k, v] of Object.entries(args)) {
+    if (k === 'style' || k === 'state') { out.push(`${where} ${ANY_PIECE}: ${k} is set by the panel, not by a skin`); continue; }
+    const takers = [...ui.values()].filter((e) => Object.hasOwn(e.args, k));
+    if (!takers.length) { out.push(`${where} ${ANY_PIECE}: ${k} is not an argument of any interface piece generator`); continue; }
+    // a piece whose argument of that name is of another type is passed over (prepareCall gives it only where it fits)
+    const errs = takers.map((e) => checkArg(e.args[k], v, { bindings: false, path: `${where} ${ANY_PIECE}.${k}` }));
+    if (errs.every((x) => x.length)) out.push(`${where} ${ANY_PIECE}.${k}: fits no interface piece that takes ${k} (${takers.map((e) => e.id).slice(0, 4).join(', ')}): ${errs[0][0]}`);
   }
   return out;
 }
@@ -149,9 +171,13 @@ export function prepareCall(gen, call, skin, { state, look } = {}) {
   const has = (k) => Object.hasOwn(entry.args, k) && k !== 'style' && k !== 'state';
   const out = { gen: call.gen, v: call.v };
   const offer = (src) => { if (isObj(src)) for (const [k, v] of Object.entries(src)) if (has(k)) out[k] = v; };
+  // a skin's "*" arguments reach a piece only where they are of its argument's type
+  const offerAny = (src) => { if (isObj(src)) for (const [k, v] of Object.entries(src)) if (has(k) && !checkArg(entry.args[k], v, { bindings: false }).length) out[k] = v; };
   offer(own(skin, 'paint'));
+  offerAny(own(own(skin, 'args'), ANY_PIECE));
   offer(own(own(skin, 'args'), call.gen));
   const style = typeof call.style === 'string' ? call.style : entry.args.style?.default;
+  offerAny(own(own(own(skin, 'styles'), style), ANY_PIECE));
   offer(own(own(own(skin, 'styles'), style), call.gen));
   for (const [k, v] of Object.entries(call)) if (k !== 'gen' && k !== 'v') out[k] = v;
   if (!Object.hasOwn(call, 'state') && Object.hasOwn(entry.args, 'state')) {
@@ -239,8 +265,11 @@ function layout(input, ctx) {
   const grey = desaturateList(x.primitives, x.palette, R.params, look.desaturate);
   const out = { list: input.place(grey.list), palette: grey.palette };
   if (measured?.slice) out.slice = measured.slice;
+  if (measured?.points) out.points = measured.points;   // migration batch M9: a port's attach points (engine/gen/port-sprite.js)
   const text = textPaint(P.skin);
-  if (measured?.textArea) out.textArea = text !== undefined ? { ...measured.textArea, colour: text } : measured.textArea;
+  // a piece may give two areas (a titled panel's body and heading): each takes the skin's text colour unless it names its own
+  const coloured = (ta) => (text !== undefined && ta.colour === undefined ? { ...ta, colour: text } : ta);
+  if (measured?.textArea) out.textArea = Array.isArray(measured.textArea) ? measured.textArea.map(coloured) : coloured(measured.textArea);
   return out;
 }
 

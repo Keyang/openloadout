@@ -1,0 +1,238 @@
+{
+ "id": "ui-thought-bubble",
+ "frozen": "2026-11-20",
+ "source": "sprites/ui-thought-bubble.js",
+ "sha256": "d8289fbb75f1ba4a46ffb77b6a05731c9276f2e26c9291ebc4cde78ec6713387",
+ "name": "Thought bubble",
+ "blurb": "A stretchable thought cloud with a trail of puffs back to the thinker, that grows out of its trail; change its style, trail, line, shadow and colours.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/panel",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "arcade",
+   "top-down-rpg",
+   "farming-sim",
+   "puzzle"
+  ],
+  "view": "none",
+  "words": [
+   "thought",
+   "bubble",
+   "think",
+   "cloud",
+   "dream",
+   "wonder",
+   "idea",
+   "balloon"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  96,
+  48
+ ],
+ "pivot": [
+  48,
+  24
+ ],
+ "grounded": false,
+ "preview": "bubble",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "cloud",
+   "options": [
+    {
+     "value": "cloud",
+     "label": "Cloud"
+    },
+    {
+     "value": "puff",
+     "label": "Puff"
+    },
+    {
+     "value": "dream",
+     "label": "Dream"
+    }
+   ],
+   "group": "Look"
+  },
+  "trail": {
+   "kind": "choice",
+   "label": "Trail",
+   "def": "down-left",
+   "options": [
+    {
+     "value": "down-left",
+     "label": "Down-left"
+    },
+    {
+     "value": "down-right",
+     "label": "Down-right"
+    },
+    {
+     "value": "up-left",
+     "label": "Up-left"
+    },
+    {
+     "value": "up-right",
+     "label": "Up-right"
+    }
+   ],
+   "group": "Look"
+  },
+  "border": {
+   "kind": "range",
+   "label": "Border",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Thin",
+   "hi": "Thick",
+   "group": "Look"
+  },
+  "shadow": {
+   "kind": "toggle",
+   "label": "Shadow",
+   "def": true,
+   "group": "Look"
+  },
+  "face": {
+   "kind": "color",
+   "label": "Bubble",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#e6c96a",
+    "#f6d3b0",
+    "#c2c9d6",
+    "#9bd18a"
+   ],
+   "group": "Colors"
+  },
+  "frame": {
+   "kind": "color",
+   "label": "Line",
+   "def": "#3f5068",
+   "swatches": [
+    "#3f5068",
+    "#7a4f33",
+    "#434d6d",
+    "#8e3a4a"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Sparkles",
+   "def": "#7a4fc4",
+   "swatches": [
+    "#7a4fc4",
+    "#c9423a",
+    "#3f6fd1",
+    "#3f8a4f",
+    "#e08a2c"
+   ],
+   "group": "Colors",
+   "when": {
+    "style": [
+     "dream"
+    ]
+   }
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "bubble": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "plain": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "open": {
+   "frames": 6,
+   "loop": false,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  }
+ },
+ "sounds": {
+  "open": [
+   {
+    "sound": "menu-bubble-open",
+    "preset": "Pop-up",
+    "frame": 0,
+    "volume": 0.5
+   }
+  ]
+ },
+ "versions": [
+  {
+   "name": "Thought",
+   "params": {}
+  },
+  {
+   "name": "Puff",
+   "params": {
+    "style": "puff",
+    "trail": "down-right"
+   }
+  },
+  {
+   "name": "Dream",
+   "params": {
+    "style": "dream",
+    "face": "#9bd18a",
+    "accent": "#3f6fd1"
+   }
+  },
+  {
+   "name": "Wheat cloud",
+   "params": {
+    "face": "#e6c96a",
+    "frame": "#7a4f33",
+    "trail": "up-left"
+   }
+  },
+  {
+   "name": "Bold wine line",
+   "params": {
+    "border": 1,
+    "shadow": false,
+    "frame": "#8e3a4a",
+    "trail": "up-right"
+   }
+  }
+ ],
+ "bundles": []
+}
