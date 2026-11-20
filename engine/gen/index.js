@@ -13,6 +13,8 @@ import './shine.js';
 import './fx-items.js';
 import './motion.js';
 import './pictures.js';
+import './ui-pieces.js';
+import './ui.js';
 
 /** Declares and registers a generator version in the site's registry; returns its frozen entry (engine/gen/registry.js). */
 export { defineGenerator } from './registry.js';

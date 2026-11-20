@@ -1,0 +1,21 @@
+{ "format": "loadout-sprite", "version": 2, "id": "bare-panel", "name": "Bare panel",
+  "blurb": "A panel body with no skin, every look written into its calls: the panel layout's own fixture (no pieces to load).",
+  "size": [64, 24], "pivot": [32, 12], "grounded": false, "preview": "normal",
+  "meta": { "type": "ui", "role": "interface/button", "view": "none", "themes": ["neutral"], "gameTypes": ["arcade"], "words": ["button", "test", "panel"], "license": "draft" },
+  "palette": [ { "id": "face", "label": "Face", "default": "#3f6fd1", "material": "paint" },
+               { "id": "frame", "label": "Frame", "default": "#f0ead8", "material": "paint" },
+               { "id": "accent", "label": "Accent", "default": "#f2c230", "material": "paint" },
+               { "id": "fill", "label": "Fill", "default": "#6aa83e", "material": "paint" } ],
+  "controls": [ { "key": "corner", "kind": "range", "label": "Corner", "lo": "Square", "hi": "Round", "default": 0.5 },
+                { "key": "glint", "kind": "toggle", "label": "Glint", "default": true } ],
+  "body": { "panel": {
+    "piece": { "gen": "ui.button", "v": 1, "clip": ["normal", "hover", "pressed", "disabled"], "at": [1, 1], "size": [62, 22], "bevel": "lit",
+               "corner": { "from": "corner", "map": [[0, 0], [1, 4]] }, "glint": { "from": "glint" }, "face": "face", "frame": "frame" },
+    "states": { "normal": {}, "hover": {}, "pressed": { "lip": 0 }, "disabled": { "desaturate": 1 }, "more": {}, "flash": {} },
+    "draw": [
+      { "gen": "ui.arrow", "v": 1, "clip": ["more"], "at": [32, 12], "size": 7, "bob": 2, "paint": "accent" },
+      { "gen": "ui.bar", "v": 1, "clip": ["flash"], "at": [1, 4], "size": [62, 16], "bevel": "lit", "frame": "frame", "corner": { "from": "corner", "map": [[0, 0], [1, 4]] } },
+      { "gen": "ui.bar", "v": 1, "clip": ["flash"], "layer": "fill", "at": [1, 4], "size": [62, 16], "bevel": "lit", "fill": "fill", "shine": "frame.light", "flash": 1, "fade": true } ] } },
+  "clips": { "normal": { "frames": 1, "fps": 8 }, "hover": { "frames": 1, "fps": 8 }, "pressed": { "frames": 1, "fps": 8 }, "disabled": { "frames": 1, "fps": 8 },
+             "more": { "frames": 8, "fps": 8, "loop": true }, "flash": { "frames": 4, "fps": 8, "loop": false } },
+  "made": { "in": "library", "from": "new" } }

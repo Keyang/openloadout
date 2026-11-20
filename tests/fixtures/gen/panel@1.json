@@ -1,0 +1,20 @@
+{
+ "id": "panel",
+ "v": 1,
+ "family": "layout",
+ "fixtures": [
+  "panel/bare-panel.json"
+ ],
+ "frames": {
+  "panel/bare-panel.json normal 0": "13c0698d",
+  "panel/bare-panel.json hover 0": "890e3b94",
+  "panel/bare-panel.json pressed 0": "ee37d0fd",
+  "panel/bare-panel.json disabled 0": "5c3b481c",
+  "panel/bare-panel.json more 0": "f15238cd",
+  "panel/bare-panel.json more 4": "f15238cd",
+  "panel/bare-panel.json more 7": "ec815929",
+  "panel/bare-panel.json flash 0": "1b0fbb81",
+  "panel/bare-panel.json flash 2": "1b0c26a6",
+  "panel/bare-panel.json flash 3": "bb5af9e5"
+ }
+}

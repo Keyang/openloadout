@@ -1,0 +1,14 @@
+{ "format": "loadout-piece", "version": 1, "id": "skin:flat", "v": 1, "name": "Flat",
+  "about": "The flat interface look: an ink outline round an unlit band and a flat face; solid, outline (the band set in) or pill ends.",
+  "slots": [ { "id": "face", "label": "Face", "default": "#3f5068", "material": "paint" },
+             { "id": "frame", "label": "Edge", "default": "#f0ead8", "material": "paint" },
+             { "id": "shine", "label": "Shine", "default": "#ffffff", "material": "light" } ],
+  "made": { "from": "engine/ui-skins.js" },
+  "body": {
+    "paint": { "face": "face", "back": "face", "frame": "frame", "shine": "shine" },
+    "args": { "ui.bar": { "bevel": "flat" } },
+    "styles": {
+      "solid": { "ui.bar": { "shape": "round" }, "ui.slider": { "shape": "round" }, "ui.knob": { "shape": "round" } },
+      "outline": { "ui.bar": { "shape": "round" }, "ui.slider": { "shape": "round" }, "ui.knob": { "outlined": true } },
+      "pill": { "ui.bar": { "shape": "pill" }, "ui.slider": { "shape": "pill" }, "ui.knob": { "shape": "pill" } } },
+    "states": { "pressed": { "lip": 0 }, "disabled": { "desaturate": 1 } } } }

@@ -1,4 +1,8 @@
 {
   "about": "Released piece versions and the hash of their content. Added by node tools/lib/pieces-index.mjs --pin; never edit or remove a line: a changed look is a new version.",
-  "pins": {}
+  "pins": {
+    "skin:flat@1": "570bd7b8f1133860",
+    "skin:plain@1": "e2c41af5bea880b3",
+    "skin:wood@1": "5722fd91dd449b34"
+  }
 }

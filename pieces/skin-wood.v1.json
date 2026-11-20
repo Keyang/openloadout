@@ -1,0 +1,18 @@
+{ "format": "loadout-piece", "version": 1, "id": "skin:wood", "v": 1, "name": "Wood",
+  "about": "Wooden interface pieces: a stained board in a darker frame with a pale carved edge, grain, chisel marks or specks and nails; a stone style greys the stain.",
+  "slots": [ { "id": "face", "label": "Face", "default": "#a06a3c", "material": "paint" },
+             { "id": "frame", "label": "Frame", "default": "#7a4f33", "material": "paint" },
+             { "id": "nail", "label": "Nails", "default": "#c2c9d6", "material": "metal" },
+             { "id": "shine", "label": "Shine", "default": "#ffffff", "material": "light" },
+             { "id": "stone", "label": "Stone", "default": "#737868", "material": "stone" } ],
+  "made": { "from": "engine/ui-wood.js" },
+  "body": {
+    "paint": { "face": "face", "frame": "frame", "nail": "nail", "shine": "shine", "stone": "stone" },
+    "args": { "ui.button": { "bevel": "wood", "texture": "grain", "travel": 2 } },
+    "styles": {
+      "plain": { "ui.button": { "texture": "none" } },
+      "framed": { "ui.button": { "texture": "grain" } },
+      "plank": { "ui.button": { "texture": "grain" } },
+      "carved": { "ui.button": { "cut": "cut", "sunken": true, "texture": "chisel" } },
+      "stone": { "ui.button": { "texture": "specks", "greyed": 0.75 } } },
+    "states": { "normal": { "lip": 2 }, "hover": { "lip": 2 }, "pressed": { "lip": 0 }, "disabled": { "lip": 2, "desaturate": 1 } } } }

@@ -1,0 +1,14 @@
+{ "format": "loadout-piece", "version": 1, "id": "skin:plain", "v": 1, "name": "Plain bevel",
+  "about": "The plain interface look: an ink outline, a frame band lit along the top and right, a sunken flat face; ornate studs or a scroll.",
+  "slots": [ { "id": "face", "label": "Face", "default": "#4a609c", "material": "paint" },
+             { "id": "frame", "label": "Frame", "default": "#f0ead8", "material": "paint" },
+             { "id": "accent", "label": "Accent", "default": "#f2c230", "material": "paint" } ],
+  "made": { "from": "engine/ui.js" },
+  "body": {
+    "paint": { "face": "face", "frame": "frame", "accent": "accent", "paint": "accent" },
+    "args": { "ui.button": { "bevel": "lit" }, "ui.bar": { "bevel": "lit" } },
+    "styles": {
+      "plain": { "ui.panel": { "look": "plain" } },
+      "ornate": { "ui.panel": { "look": "ornate" } },
+      "scroll": { "ui.panel": { "look": "scroll" } } },
+    "states": { "pressed": { "lip": 0 }, "disabled": { "desaturate": 1 } } } }

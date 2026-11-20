@@ -137,6 +137,7 @@ const FIX = new URL('../fixtures/v2/', import.meta.url);
 /** The fixture definitions each layout is pinned by (paths under tests/fixtures/v2/). B12 to B15 add their rows. */
 const LAYOUT_FIXTURES = {
   'pictures@1': ['pictures/coin.json', 'pictures/crate.json', 'pictures/icons-food.json'],
+  'panel@1': ['panel/bare-panel.json'],
 };
 const layouts = () => registry.generators().filter((g) => g.family === 'layout');
 const load = (p) => dataSprite(JSON.parse(fs.readFileSync(new URL(p, FIX), 'utf8')));
