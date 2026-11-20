@@ -12,7 +12,7 @@
 // The rest of the family (ngon, bottle, crown.lobes ...) lands one defineGenerator each, test first.
 import { defineGenerator } from './registry.js';
 import { point, px, count, angle, share, word, flag, paint } from './args.js';
-import { Pixels, rampOf, mixOf, tilted, cropped, tilesFor, workCost, polyTest } from './pixels.js';
+import { Pixels, rampOf, mixOf, tilted, cropped, tilesFor, workCost, polyTest, unclipped } from './pixels.js';
 import { ellipseIn, rectIn } from '../surface.js';
 import { markIn } from '../marks.js';
 import { starPoints, gemIn, gemFacets, insetIn, GEM_CUTS } from '../shapes.js';
@@ -380,4 +380,19 @@ export const gemCut = defineGenerator({
     }
     return g.stamps();
   },
+});
+
+// ---- gem.cut@2: gem.cut@1 at any coordinates (build item B10b) -----------------------------------------------------
+
+/**
+ * gem.cut@2: gem.cut@1's gem (the same arguments, the same pixels inside the frame), also where it lies left of or
+ * above the frame's corner, so a gem centred on its node (`on`, `at: [0, 0]`) is drawn whole and moves with the node's
+ * motions. gem.cut@1 kept only the pixels from 0 to the frame's size. Returns stamps; draw the outline after it.
+ */
+export const gemCut2 = defineGenerator({
+  id: 'gem.cut', v: 2, family: 'shape',
+  about: 'A cut gem lit from the top right: shaded facets of a diamond, emerald, round, shard or heart cut, or a polished stone, drawn whole also when centred on a node.',
+  args: gemCut.args,
+  cost: (a) => gemCut.cost(a, {}),
+  run: (a, ctx) => unclipped((b, c) => gemCut.run(b, c), a, ctx, a.at, (b, dx, dy) => ({ ...b, at: [b.at[0] + dx, b.at[1] + dy] })),
 });

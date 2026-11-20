@@ -318,3 +318,35 @@ export function tidied(g) {
   for (const [x, y] of gone) g.set(x, y, null);
   return g;
 }
+
+// ---- drawing at negative coordinates (build item B10b) ---------------------------------------------------------------
+// A call `on` a node is in the node's own coordinates, so a thing centred on its node reaches below 0. Some ports kept
+// only the pixels from 0 to the frame's size (gem.cut@1, glint@1, the icon pen of @1), which drew a node-centred gem as
+// its lower-right quarter. Their @2 versions run the same drawing with its anchor moved into the middle of the largest
+// frame, by whole pixels, and move what it returns back: the pixels sampled are the same, only what lay off the frame
+// is kept now (tests/unit/gen-node-origin.test.mjs holds every generator to it).
+
+/** The frame unclipped() runs a drawing in, and where it puts the drawing's anchor: the largest frame, its middle. */
+export const VIRTUAL_FRAME = Object.freeze({ size: Object.freeze([640, 360]), at: Object.freeze([320, 180]) });
+
+/** A primitive (stamp, dot or shape) moved by whole pixels dx, dy: at, from, to and polygon points. */
+export function movedBy(p, dx, dy) {
+  if (!isObj(p)) return p;
+  const q = { ...p };
+  const mv = (pt) => (Array.isArray(pt) && pt.length === 2 ? [pt[0] + dx, pt[1] + dy] : pt);
+  for (const k of ['at', 'from', 'to']) if (Object.hasOwn(q, k)) q[k] = mv(q[k]);
+  if (Array.isArray(q.points)) q.points = q.points.map(mv);
+  return q;
+}
+
+/**
+ * Runs a drawing that keeps only the pixels inside its frame as if its anchor point `at` sat in the middle of the
+ * largest frame (VIRTUAL_FRAME), and moves what it returns back by the same whole pixels, so it keeps what lies left of
+ * or above the frame's corner (a call on a node centred at the node's origin). run(args, ctx) is the drawing; shift(args,
+ * dx, dy) gives its arguments moved by whole pixels. Pure; what the drawing returns inside the frame is unchanged.
+ */
+export function unclipped(run, a, ctx, at, shift) {
+  const dx = VIRTUAL_FRAME.at[0] - Math.floor(at[0]), dy = VIRTUAL_FRAME.at[1] - Math.floor(at[1]);
+  const out = run(shift(a, dx, dy), { ...ctx, size: [...VIRTUAL_FRAME.size] });
+  return Array.isArray(out) ? out.map((p) => movedBy(p, -dx, -dy)) : out;
+}

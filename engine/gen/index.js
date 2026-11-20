@@ -40,3 +40,17 @@ export { GEN_LIMITS } from './registry.js';
 export { CALL_FIELDS } from './registry.js';
 /** What a generator sees besides its arguments: t, frame, frames, loop, size, clip, direction. */
 export { CTX_FIELDS } from './registry.js';
+
+/**
+ * Released versions that lose what lies left of or above the frame's corner (a call `on` a node centred at its origin
+ * draws a quarter), each with the version that draws it whole: "<id>@<v>" -> the fixed version (build item B10b;
+ * tests/unit/gen-node-origin.test.mjs). They keep their output; new assets name the fixed version.
+ */
+export const ORIGIN_FIXED = Object.freeze({ 'gem.cut@1': 2, 'glint@1': 2, 'icon.paint@1': 2, 'icon.line@1': 2, 'icon.glint@1': 2 });
+
+/** Generators that work in frame pixels by design, never on a node's own coordinates, each with why: "<id>@<v>" -> reason. */
+export const FRAME_GENERATORS = Object.freeze({
+  'pickup.burst@1': 'an effect that keeps its sparkles 3 px inside the frame: name it as an emitter (the pictures layout puts an emitter on its node\'s frame first), not in a draw list on a node',
+  'chunks@1': 'an effect whose floor row and box are frame rows and columns: name it as an emitter, not in a draw list on a node',
+  'icon.fit@1': 'lays out a whole icon centred in the frame: an icon set\'s fit, never drawn on a node',
+});

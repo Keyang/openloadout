@@ -13,7 +13,7 @@
 //       { "gen": "icon.glint", "v": 1, "at": [1, -3.6], "len": 1, "dot": false, "paint": "shine" } ] }
 import { defineGenerator } from './registry.js';
 import { point, px, count, angle, share, flag, paint, primitives, profile } from './args.js';
-import { Pixels, toneOf, mixOf, tidied, tilesFor, workCost, shapeTest } from './pixels.js';
+import { Pixels, toneOf, mixOf, tidied, tilesFor, workCost, shapeTest, unclipped } from './pixels.js';
 import { SHAPE_CAPS } from './args.js';
 import { LEAF_POINTS } from './shape.js';
 import { placedIn } from '../shapes.js';
@@ -404,4 +404,38 @@ export const iconFit = defineGenerator({
     const dx = Math.floor((W - (b.x1 - b.x0 + 3)) / 2) - (b.x0 - 1), dy = Math.floor((H - (b.y1 - b.y0 + 3)) / 2) - (b.y0 - 1);
     return g.stamps().slice(0, 9).map((s) => ({ ...s, at: [s.at[0] + dx, s.at[1] + dy] }));
   },
+});
+
+// ---- @2 of the pen's three generators: drawn whole at any coordinates (build item B10b) ---------------------------
+// The @1 pen keeps to the frame (0 to its size), so an icon body, crease or glint whose pen centre is a node's origin
+// lost what lay left of or above it. Each @2 runs its @1 drawing with the centre moved into the middle of the largest
+// frame by whole pixels and moves the stamps back (pixels.js unclipped): the same pixels inside the frame, the rest kept.
+// icon.fit@1 runs @1 items itself and lays out the whole frame; @2 items inside a fit are run as calls.
+const centreMoved = (b, dx, dy) => ({ ...b, centre: [b.centre[0] + dx, b.centre[1] + dy] });
+
+/** icon.paint@2: icon.paint@1's body (the same arguments and pixels inside the frame), drawn whole when its centre is a node's origin. */
+export const iconPaint2 = defineGenerator({
+  id: 'icon.paint', v: 2, family: 'icon',
+  about: 'One body of an icon: shapes written upright, turned and scaled by the icon pen and shaded the icon way; drawn whole also centred on a node.',
+  args: iconPaint.args,
+  cost: (a, helpers) => iconPaint.cost(a, helpers),
+  run: (a, ctx, { call }) => unclipped((b, c) => paintRun(b, c, call), a, ctx, a.centre, centreMoved),
+});
+
+/** icon.line@2: icon.line@1's crease (the same arguments and pixels inside the frame), drawn whole when its centre is a node's origin. */
+export const iconLine2 = defineGenerator({
+  id: 'icon.line', v: 2, family: 'icon',
+  about: 'A one-pixel crease, fold or string through points written in the icon\'s own space; drawn whole also centred on a node.',
+  args: iconLine.args,
+  cost: (a) => iconLine.cost(a, {}),
+  run: (a, ctx) => unclipped(lineRun, a, ctx, a.centre, centreMoved),
+});
+
+/** icon.glint@2: icon.glint@1's glint (the same arguments and pixels inside the frame), drawn whole when its centre is a node's origin. */
+export const iconGlint2 = defineGenerator({
+  id: 'icon.glint', v: 2, family: 'icon',
+  about: 'The glint of glass, metal or fruit: a short stroke and a pixel, or a three-pixel corner, while Shine is on; drawn whole also centred on a node.',
+  args: iconGlint.args,
+  cost: (a) => iconGlint.cost(a, {}),
+  run: (a, ctx) => unclipped(glintRun, a, ctx, a.centre, centreMoved),
 });

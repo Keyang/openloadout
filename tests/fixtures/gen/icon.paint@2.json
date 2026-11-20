@@ -1,0 +1,187 @@
+{
+ "id": "icon.paint",
+ "v": 2,
+ "cases": [
+  {
+   "args": {
+    "shapes": [
+     {
+      "kind": "ellipse",
+      "at": [
+       0,
+       0
+      ],
+      "r": [
+       6,
+       7
+      ]
+     }
+    ],
+    "paint": "body",
+    "dark": 2,
+    "soft": 0,
+    "lit": 1,
+    "centre": [
+     0,
+     0
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      -6,
+      -7
+     ],
+     "anchor": "tl",
+     "rows": [
+      "....aaaa....",
+      "..bccccaaa..",
+      ".bcccccccaa.",
+      ".bcccccccca.",
+      "bbccccccccaa",
+      "bbccccccccca",
+      "bbccccccccca",
+      "bbccccccccca",
+      "bbbcccccccca",
+      "bbbcccccccca",
+      ".bbbccccccc.",
+      ".bbbbbccccb.",
+      "..bbbbbbbb..",
+      "....bbbb...."
+     ],
+     "key": {
+      "a": "body.light",
+      "b": "body.dark",
+      "c": "body"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "shapes": [
+     {
+      "kind": "ellipse",
+      "at": [
+       0,
+       -1.2
+      ],
+      "r": [
+       11.5,
+       9.4
+      ]
+     }
+    ],
+    "minus": [
+     {
+      "kind": "rect",
+      "at": [
+       -12,
+       -1.2
+      ],
+      "size": [
+       24,
+       11.2
+      ]
+     }
+    ],
+    "paint": "cap",
+    "turn": 13.28,
+    "scale": 0.95,
+    "centre": [
+     -2,
+     3
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      -12,
+      -7
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".....aaaaaaaa........",
+      "...abbbbbbbbaaaa.....",
+      "..cbbbbbbbbbbbbaa....",
+      ".ccbbbbbbbbbbbbbaa...",
+      "dccccccbbbbbbbbbbaa..",
+      "dcccccccccccbbbbbbaa.",
+      "dddddcccccccccccbbba.",
+      "....ddddddcccccccccca",
+      ".........dddddccccccc",
+      ".............dddddccc",
+      ".................dddd"
+     ],
+     "key": {
+      "a": "cap.light",
+      "b": "cap",
+      "c": {
+       "rule": "mix",
+       "of": "cap",
+       "with": {
+        "rule": "ramp",
+        "of": "cap",
+        "tone": "dark"
+       },
+       "amount": 0.5
+      },
+      "d": "cap.dark"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "shapes": [
+     {
+      "kind": "capsule",
+      "from": [
+       0,
+       -4
+      ],
+      "to": [
+       0.6,
+       -9.8
+      ],
+      "r": 1
+     }
+    ],
+    "paint": "soil",
+    "flat": true,
+    "centre": [
+     16,
+     15
+    ],
+    "scale": 1.1,
+    "turn": -26.57,
+    "shiny": false
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      11,
+      4
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aa..",
+      "aa..",
+      "aa..",
+      ".aa.",
+      ".aa.",
+      ".aaa",
+      "..aa",
+      "..aa"
+     ],
+     "key": {
+      "a": "soil"
+     }
+    }
+   ]
+  }
+ ]
+}
