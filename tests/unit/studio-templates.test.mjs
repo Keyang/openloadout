@@ -17,7 +17,7 @@ import { checkSprite } from '../../quality/sprite.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const soundIds = fs.readdirSync(path.join(root, 'sounds')).filter((f) => f.endsWith('.json')).map((f) => f.slice(0, -5));
-const catalogIds = fs.readdirSync(path.join(root, 'sprites')).filter((f) => f.endsWith('.js')).map((f) => f.slice(0, -3));
+const catalogIds = fs.readdirSync(path.join(root, 'sprites')).filter((f) => /\.(js|json)$/.test(f) && !f.startsWith('_')).map((f) => f.replace(/\.(js|json)$/, ''));      // code and data files (docs/data-sprites.md, DQ1)
 const OPTS = { soundIds, catalogIds };
 
 const SIDE = ['two-legs', 'four-legs', 'crawler', 'flyer', 'blob', 'blank'];

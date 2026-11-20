@@ -123,7 +123,7 @@ test('the build lists both new files in the catalogue, with pictures; the asset 
   // one row per asset file in the copy, and nothing else in those folders: everything that was there, and the two new ones
   // (a hand-kept list file would show up here as a file without a row)
   const files = (dir, ext) => fs.readdirSync(path.join(scratch, dir)).filter((f) => f.endsWith(ext) && !f.startsWith('_'));
-  expect(CATALOG.assets.map((x) => x.id).sort()).toEqual([...files('sprites', '.js').map((f) => f.slice(0, -3)), ...files('sounds', '.json').map((f) => f.slice(0, -5))].sort());
+  expect(CATALOG.assets.map((x) => x.id).sort()).toEqual([...files('sprites', '.js').map((f) => f.slice(0, -3)), ...files('sprites', '.json').map((f) => f.slice(0, -5)), ...files('sounds', '.json').map((f) => f.slice(0, -5))].sort());      // a sprite is a code file or a data file
   const s = row(NEW_SPRITE.id), a = row(NEW_SOUND.id), from = row(FROM.sprite);
   expect(s).toMatchObject({ kind: 'sprite', name: NEW_SPRITE.name, src: `sprites/${NEW_SPRITE.id}.js`, type: from.type, role: from.role });
   expect(s.words).toContain(NEW_SPRITE.word);

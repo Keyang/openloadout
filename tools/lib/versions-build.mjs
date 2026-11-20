@@ -12,12 +12,20 @@
 // file, everything it imports, and engine/versions.js with everything that imports, found by tools/lib/imports.mjs), so a
 // build redoes only what changed. The output is the same whether or not the cache was used.
 //
+// A sprite is a code file, sprites/<id>.js (imported), or a data file, sprites/<id>.json (docs/data-sprites.md, DQ1; build
+// item B9c): read and drawn by the project's engine/data-sprite.js through tools/lib/assets.mjs loadSpriteFile, never
+// imported. A data sprite's key is its definition, the pieces it uses (with what those use), the code that reads and draws
+// every data sprite (engine/data-sprite.js, engine/data-frames.js, engine/pieces.js, catalog/sprite-schema.js, with all
+// they import, every generator family included) and the loaders tools/lib/assets.mjs and pieces-index.mjs.
+//
 //   node tools/lib/versions-build.mjs [--root <dir>] [--only id,id] [--no-cache]      write generated/versions.json
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { importGraph } from './imports.mjs';
+import { isSpriteFile, loadSpriteFile } from './assets.mjs';
+import { pieceFilesFor } from './pieces-index.mjs';
 
 const HERE = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 export const VERSIONS_FILE = 'generated/versions.json';
@@ -27,13 +35,31 @@ export const VERSIONS_PER_ASSET = 12;
 
 const sha = (text) => crypto.createHash('sha1').update(text).digest('hex').slice(0, 16);
 
+// what reads and draws every data sprite, besides engine/versions.js (each with everything it imports)
+const DATA_CODE = ['engine/data-sprite.js', 'engine/data-frames.js', 'engine/pieces.js', 'catalog/sprite-schema.js'];
+// the loaders a data sprite goes through before its engine draws it (these tools' own files, named as in any project)
+const TOOLS_LIB = path.dirname(fileURLToPath(import.meta.url));
+const DATA_LOADERS = ['assets.mjs', 'pieces-index.mjs'];
+
 /**
- * The cache key of one asset's versions: a hash of the asset's file and every file that it and engine/versions.js load.
+ * The cache key of one asset's versions: a hash of the asset's file and every file that it and engine/versions.js load;
+ * for a data sprite (.json) also the code that draws it and the pieces it uses (see the top of this file).
  * graph: from importGraph({ root }); file: the asset's absolute path; root: the project folder. An import that cannot be followed changes the key every time.
  */
 export function versionsKey(graph, file, root = HERE) {
-  const { files, unknown } = graph.closure([file, path.join(root, 'engine', 'versions.js')]);
+  const data = file.endsWith('.json') && path.basename(path.dirname(file)) === 'sprites';
+  const { files, unknown } = graph.closure([file, path.join(root, 'engine', 'versions.js'), ...(data ? DATA_CODE.map((f) => path.join(root, f)) : [])]);
   const parts = files.map((f) => `${path.relative(root, f)}:${fs.existsSync(f) ? sha(fs.readFileSync(f)) : '-'}`);
+  if (data) {
+    let definition = null;
+    try { definition = JSON.parse(fs.readFileSync(file, 'utf8')); } catch { /* the load says why; the file's text is in the key already */ }
+    if (definition) {
+      const { files: pieces, missing } = pieceFilesFor(definition, { root });
+      for (const f of pieces) parts.push(`${f}:${sha(fs.readFileSync(path.join(root, f)))}`);
+      for (const f of missing) parts.push(`${f}:-`);
+    }
+    for (const f of DATA_LOADERS) parts.push(`tools/lib/${f}:${sha(fs.readFileSync(path.join(TOOLS_LIB, f)))}`);
+  }
   if (unknown.length) parts.push(String(Date.now()));
   return sha(parts.join('\n'));
 }
@@ -60,12 +86,19 @@ export async function buildVersions({ root = HERE, only = null, cache = null } =
     if (cache) cache[id] = { key, versions: out[id] };
   };
   const spriteDir = path.join(root, 'sprites');
-  for (const f of fs.readdirSync(spriteDir).filter((x) => x.endsWith('.js') && !x.startsWith('_')).sort()) {
-    const id = f.slice(0, -3);
+  const spriteFiles = fs.readdirSync(spriteDir).filter(isSpriteFile).sort();
+  const fileOf = new Map();
+  for (const f of spriteFiles) {
+    const id = f.replace(/\.(js|json)$/, '');
+    if (fileOf.has(id)) throw new Error(`versions: sprites/${fileOf.get(id)} and sprites/${f}: one sprite has one file; keep the code file or the data file, not both`);
+    fileOf.set(id, f);
+  }
+  for (const f of spriteFiles) {
+    const id = f.replace(/\.(js|json)$/, '');
     if (want && !want.has(id)) continue;
     const file = path.join(spriteDir, f);
     await keep(id, file, async () => {
-      const sprite = (await import(pathToFileURL(file).href)).default;      // imported only when its versions must be made
+      const sprite = await loadSpriteFile(root, file);      // loaded only when its versions must be made: a code file imported, a data file read as data
       const dflt = defaultParams(sprite);
       return versionsOf(sprite, VERSIONS_PER_ASSET).map((v) => ({ name: v.name, made: v.made, params: diffOf(v.params, dflt) }));
     });

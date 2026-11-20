@@ -110,6 +110,21 @@ test('each opens on its own page and is drawn from its definition, fetched and n
   expect(asked).toContain('/pieces/stamp-test-clod.v1.json');
 });
 
+// build item B9c: the build makes a data sprite's ready-made versions, and loadout.check(id) loads its file as data
+test('the build made the ready-made versions of both, and loadout.check takes each by its id', async ({ page }) => {
+  test.setTimeout(120_000);
+  const versions = JSON.parse(fs.readFileSync(path.join(scratch, 'dist', 'generated', 'versions.json'), 'utf8'));
+  for (const it of [COIN, POT]) expect(versions[it.id]?.length, `generated/versions.json: ${it.id}`).toBeGreaterThan(0);
+  const asked = [];
+  page.on('request', (r) => asked.push(new URL(r.url()).pathname));
+  await open(page, '/');
+  for (const it of [COIN, POT]) {
+    const r = await page.evaluate((id) => window.loadout.check(id), it.id);
+    expect(r, JSON.stringify(r)).toMatchObject({ id: it.id, kind: 'sprite', ok: true });
+  }
+  expect(asked.filter((p) => /^\/sprites\/zz-data-.*\.js$/.test(p))).toEqual([]);
+});
+
 test('the coin is changed on its page, saved to the bag, drawn there with its settings, and in the package with them', async ({ page }) => {
   test.setTimeout(150_000);
   await page.emulateMedia({ reducedMotion: 'reduce' });      // bag pictures hold still, so they can be read

@@ -121,6 +121,23 @@ export async function loadDataSprite(root = ROOT, file, opts = {}) {
 }
 
 /**
+ * Loads one sprite file of either kind (build item B9c): a data file (.json) with loadDataSprite and the engine and
+ * pieces of the project at root, a code file (.js) imported. With findSpriteFile it is how a tool loads a sprite by id
+ * (tools/scene.mjs, tools/tilemap.mjs, tools/lib/versions-build.mjs). Returns the sprite (what defineSprite returns);
+ * throws an Error that starts with the file's name. Arguments: root, file (absolute, or relative to root), opts (as loadDataSprite takes them).
+ */
+export async function loadSpriteFile(root = ROOT, file, opts = {}) {
+  const abs = path.resolve(root, file);
+  if (abs.endsWith('.json')) return loadDataSprite(root, abs, opts);
+  const rel = abs.startsWith(path.resolve(root) + path.sep) ? path.relative(root, abs).split(path.sep).join('/') : abs;
+  if (!fs.existsSync(abs)) throw new Error(`${rel}: there is no such file`);
+  let def;
+  try { def = (await import(pathToFileURL(abs).href)).default; } catch (e) { throw new Error(`${rel}: ${e.message}`); }
+  if (!def || typeof def.render !== 'function') throw new Error(`${rel}: the default export is not a sprite`);
+  return def;
+}
+
+/**
  * What the build's validate step refuses in pieces/ (build item B9; Contract 15 rule 5, a released version never changes):
  * every piece file that is not valid (tools/lib/pieces-index.mjs buildPiecesIndex), every pinned version whose content
  * changed, and every pinned version whose file is gone. A version with no pin yet is not refused (it is pinned when

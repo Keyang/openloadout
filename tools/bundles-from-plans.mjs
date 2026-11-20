@@ -19,7 +19,7 @@
 //        sprites, sounds, music   what it holds: lists of ids, or of { id, ... } rows
 //        level     optional; "kit" when left out
 //      A full kit holds 40 to 50 sprites, 20 sounds and 2 music tracks (KIT_SIZE in tools/lib/assets.mjs).
-//   2. Make the assets: sprites/<id>.js and sounds/<id>.json for every id the plan lists.
+//   2. Make the assets: sprites/<id>.json (or a code file sprites/<id>.js) and sounds/<id>.json for every id the plan lists.
 //   3. Run this tool, then the build (node tools/build.mjs).
 //
 // THE PALETTE is the one thing a new kit may need in code, because sprites take their colours from
@@ -34,7 +34,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { ROOT, loadPlans, KIT_SIZE } from './lib/assets.mjs';
+import { ROOT, loadPlans, KIT_SIZE, findSpriteFile } from './lib/assets.mjs';
 
 const idsOf = (list) => (list ?? []).map((x) => (typeof x === 'string' ? x : x.id));
 const count = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
@@ -120,7 +120,8 @@ async function main(args) {
       continue;
     }
     const missing = [
-      ...bundle.sprites.filter((id) => !fs.existsSync(path.join(root, 'sprites', `${id}.js`))).map((id) => `sprites/${id}.js`),
+      // a sprite is there as a code file or a data file (findSpriteFile); one still to come is made as a data file (docs/data-sprites.md, DQ1)
+      ...bundle.sprites.filter((id) => !findSpriteFile(root, id)).map((id) => `sprites/${id}.json`),
       ...[...bundle.sounds, ...bundle.music].filter((id) => !fs.existsSync(path.join(root, 'sounds', `${id}.json`))).map((id) => `sounds/${id}.json`),
     ];
     if (missing.length) {

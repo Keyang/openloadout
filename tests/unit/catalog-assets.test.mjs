@@ -6,10 +6,12 @@ import { validateMeta, validateBundle, WORDS_MIN, WORDS_MAX } from '../../catalo
 
 const { sprites, sounds, bundles } = await loadAssets();
 
-test('the scan finds every asset file: one sprite per sprites/*.js, one sound or track per sounds/*.json', async () => {
+test('the scan finds every asset file: one sprite per sprites/*.js or sprites/*.json, one sound or track per sounds/*.json', async () => {
   const fs = await import('node:fs');
   const files = (dir, ext) => fs.readdirSync(new URL(`../../${dir}/`, import.meta.url)).filter((f) => f.endsWith(ext) && !f.startsWith('_') && !f.startsWith('index.')).length;
-  assert.equal(sprites.length, files('sprites', '.js'));
+  // a sprite is a code file or a data file (docs/data-sprites.md, DQ1), both counted
+  assert.equal(sprites.length, files('sprites', '.js') + files('sprites', '.json'));
+  assert.equal(sprites.filter((s) => s.data).length, files('sprites', '.json'));
   assert.equal(sounds.length, files('sounds', '.json'));
   assert.ok(sprites.length >= 7 && sounds.filter((s) => !s.isMusic).length >= 19 && sounds.some((s) => s.isMusic));
 });
