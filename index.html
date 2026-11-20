@@ -6,14 +6,15 @@
   <!--
     The site's content policy (docs/architecture.md, Contract 11, "Safety of run-time assets"). The site is static, so it
     is sent here and not as a header. Everything comes from the site itself:
-      script-src   its own files; blob: for the worker a sprite made on a visit runs in (started from memory so that it
-                   carries this policy); 'wasm-unsafe-eval' for the search library and the search model, which are WebAssembly.
-                   No eval, no inline script, no other site.
-      connect-src  the site only: nothing on the page, and nothing in that worker, can call another site.
-      img-src      the site, plus pictures made in memory (data: and blob:).
+      script-src   its own files, and 'wasm-unsafe-eval' for the search library and the search model, which are WebAssembly.
+                   No eval, no inline script, no script or worker made in memory (blob:), no other site. A sprite made on
+                   a visit is data drawn by the site's own code (docs/data-sprites.md section 5), so nothing it brings runs.
+      worker-src   the site's own worker files only.
+      connect-src  the site only: nothing on the page, and nothing in its workers, can call another site.
+      img-src      the site, plus pictures made in memory (data: and blob:); media-src the same, for sounds.
       style-src    the site's style sheets, plus style attributes the pages set themselves.
   -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' blob: 'wasm-unsafe-eval'; worker-src 'self' blob:; connect-src 'self'; img-src 'self' data: blob:; media-src 'self' data: blob:; font-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; frame-src 'none'; base-uri 'self'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self'; img-src 'self' data: blob:; media-src 'self' data: blob:; font-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; frame-src 'none'; base-uri 'self'; form-action 'none'">
   <title>Loadout</title>
   <!-- Asked for at once, not after the scripts that read it: the list of every asset. Low priority, so the page frame
        and the style sheet come first (tests/unit/site-first-paint.test.mjs). -->

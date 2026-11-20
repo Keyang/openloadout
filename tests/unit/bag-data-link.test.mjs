@@ -50,7 +50,7 @@ test('bag link: round trip, by the async and the plain way, into a new bag on an
   from.add(item(beast(), { draft: 'moss-beast', settings: { params: { fur: '#446644' }, scale: 2 } }));
   for (const link of [await from.toLinkAsync(), from.toLink(), `https://example.test/index.html${await from.toLinkAsync()}`]) {
     const to = createBag(memoryStorage());
-    assert.deepEqual(to.peekLink(link), { count: 2, made: 1, code: 0, studio: 1 });
+    assert.deepEqual(to.peekLink(link), { count: 2, made: 1, studio: 1 });
     assert.equal(to.fromLink(link), 2);
     const [s, d] = to.items();
     assert.equal(s.id, 'coin-pickup');
@@ -63,7 +63,7 @@ test('bag link: round trip, by the async and the plain way, into a new bag on an
     const to2 = createBag(memoryStorage());
     assert.equal(await to2.fromLinkAsync(link, { mode: 'add' }), 2);
     assert.deepEqual(to2.items().map((i) => i.id), ['coin-pickup', 'moss-beast']);
-    assert.deepEqual(await to2.peekLinkAsync(link), { count: 2, made: 1, code: 0, studio: 1 });
+    assert.deepEqual(await to2.peekLinkAsync(link), { count: 2, made: 1, studio: 1 });
   }
 });
 

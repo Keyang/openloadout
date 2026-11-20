@@ -7,7 +7,6 @@ import { fileURLToPath } from 'node:url';
 import { buildApi } from '../../tools/lib/api.mjs';
 import { CALLS } from '../../app/api.js';
 import { ACTIONS, createLoadout, fail } from '../../app/api-core.js';
-import { rewriteImports } from '../../app/api-source.js';
 
 const REAL = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const api = await buildApi({ root: REAL });
@@ -107,95 +106,6 @@ test('an action never throws: junk in, { ok: false, errors } out', async () => {
 test('fail() makes the refusal every action uses', () => {
   assert.deepEqual(fail('one thing is wrong'), { ok: false, errors: ['one thing is wrong'] });
   assert.deepEqual(fail(['a problem', 'another'], { id: 'x' }), { ok: false, id: 'x', errors: ['a problem', 'another'] });
-});
-
-// ---- sprite source: import addresses ---------------------------------------------------------------
-const AT = { base: 'http://localhost:5199/sprites/', origin: 'http://localhost:5199' };
-
-
-test('rewriteImports turns the usual framework paths into full addresses', () => {
-  const src = [
-    "import { defineSprite, range } from '../engine/sprite.js';",
-    'import { lerp } from "../engine/motion.js";',
-    "import * as fx from '../engine/fx.js';",
-    "import {",
-    "  ramp,",
-    "  INK,",
-    "} from '../engine/color.js';",
-    "import '../engine/palettes.js';",
-    "export { hash } from '../engine/motion.js';",
-    "const more = () => import('../rigs/humanoid.js');",
-    'export default defineSprite({});',
-  ].join('\n');
-  const r = rewriteImports(src, AT);
-  assert.equal(r.ok, true, JSON.stringify(r.errors));
-  assert.ok(r.source.includes("from 'http://localhost:5199/engine/sprite.js'"));
-  assert.ok(r.source.includes('from "http://localhost:5199/engine/motion.js"'));
-  assert.ok(r.source.includes("} from 'http://localhost:5199/engine/color.js'"));
-  assert.ok(r.source.includes("import 'http://localhost:5199/engine/palettes.js'"));
-  assert.ok(r.source.includes("export { hash } from 'http://localhost:5199/engine/motion.js'"));
-  assert.ok(r.source.includes("import('http://localhost:5199/rigs/humanoid.js')"));
-  assert.ok(!r.source.includes("'../"), 'no relative address is left');
-  assert.equal(r.source.split('\n').length, src.split('\n').length, 'line numbers stay the same, so an error message points at the right line');
-  assert.deepEqual([...new Set(r.imports)].sort(), ['engine/color.js', 'engine/fx.js', 'engine/motion.js', 'engine/palettes.js', 'engine/sprite.js', 'rigs/humanoid.js'].map((p) => `http://localhost:5199/${p}`));
-});
-
-test('rewriteImports refuses code from anywhere else, and says which line', () => {
-  for (const [spec, why] of [
-    ['https://evil.example/x.js', /another site/],
-    ['//evil.example/x.js', /another site/],
-    ['http://localhost:9999/engine/sprite.js', /another site/],
-    ['data:text/javascript,export default 1', /data:/],
-    ['blob:http://localhost:5199/abc', /blob:/],
-    ['lodash', /not a path/],
-    ['node:fs', /not a path|node:/],
-  ]) {
-    const r = rewriteImports(`const a = 1;\nimport x from '${spec}';\n`, AT);
-    assert.equal(r.ok, false, spec);
-    assert.match(r.errors[0], why, spec);
-    assert.match(r.errors[0], /line 2/, spec);
-    assert.ok(r.errors[0].includes(spec), 'the message names the address');
-  }
-  const dyn = rewriteImports("const f = (name) => import('../engine/' + name);", AT);
-  assert.equal(dyn.ok, false);
-  assert.match(dyn.errors[0], /import\(\)/);
-  const far = rewriteImports("export * from 'https://evil.example/all.js';", AT);
-  assert.equal(far.ok, false);
-});
-
-test('rewriteImports leaves text that only looks like an import alone', () => {
-  const src = [
-    "import { defineSprite } from '../engine/sprite.js';",
-    "// import nothing from 'https://evil.example/comment.js'",
-    "/* import nothing from 'https://evil.example/block.js' */",
-    "const words = \"import x from 'https://evil.example/string.js'\";",
-    "const more = `import('https://evil.example/template.js') ${1 + 1}`;",
-    'const important = 1, reimport = 2;',
-    'const here = import.meta.url;',
-    'const re = /import "x"/;',
-  ].join('\n');
-  const r = rewriteImports(src, AT);
-  assert.equal(r.ok, true, JSON.stringify(r.errors));
-  assert.deepEqual(r.imports, ['http://localhost:5199/engine/sprite.js']);
-  for (const kept of ['comment.js', 'block.js', 'string.js', 'template.js', 'import.meta.url', 'reimport = 2']) assert.ok(r.source.includes(kept), kept);
-});
-
-test('rewriteImports answers junk without throwing', () => {
-  for (const junk of [null, undefined, 42, {}, '']) {
-    const r = rewriteImports(junk, AT);
-    assert.equal(r.ok, false);
-    assert.ok(r.errors[0].length > 10);
-  }
-});
-
-test('rewriteImports keeps imports inside the site\'s own folder when it is told where that is', () => {
-  const at = { base: 'https://someone.example/loadout/sprites/', origin: 'https://someone.example', within: 'https://someone.example/loadout/' };
-  assert.equal(rewriteImports("import { defineSprite } from '../engine/sprite.js';", at).ok, true);
-  for (const spec of ['../../other-project/evil.js', '/other-project/evil.js', 'https://someone.example/evil.js']) {
-    const r = rewriteImports(`import x from '${spec}';`, at);
-    assert.equal(r.ok, false, spec);
-    assert.match(r.errors[0], /outside this site/, spec);
-  }
 });
 
 test('the bag actions for clearing, changing and linking are there', () => {

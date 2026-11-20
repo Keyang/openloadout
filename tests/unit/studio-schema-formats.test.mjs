@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import * as S from '../../catalog/studio-schema.js';
-import { LIMITS } from '../../app/api-source.js';
+import { LIMITS } from '../../app/api-actions.js';
 import { MATERIAL_IDS } from '../../engine/materials.js';
 
 const fixture = (name) => fs.readFileSync(new URL(`../fixtures/studio/${name}.json`, import.meta.url), 'utf8');
@@ -17,7 +17,7 @@ test('exports the validator, the parser and the tables the studio builds from', 
   assert.equal(S.LIBRARY_BODIES[0], 'humanoid', 'the side-view person is the first library body; others are added by their builders (studio item F2)');
 });
 
-test('the caps are the design\'s, and the shared ones equal LIMITS of app/api-source.js', () => {
+test('the caps are the design\'s, and the shared ones equal LIMITS of app/api-actions.js', () => {
   const L = S.STUDIO_LIMITS;
   assert.equal(L.jsonBytes, 64 * 1024);
   assert.equal(L.bones, 48); assert.equal(L.boneDepth, 16); assert.equal(L.shapes, 160); assert.equal(L.polyPoints, 24);

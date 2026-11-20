@@ -40,11 +40,70 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { ACTIONS } from '../../app/api-actions.js';
-import { maskSource } from '../../app/api-source.js';
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 export const FRAMEWORK_FOLDERS = ['engine', 'rigs', 'sound', 'quality', 'catalog'];
 export const API_VERSION = 1;
+
+
+// ---- reading source text ------------------------------------------------------------------------------------
+// (moved here from app/api-source.js, which went with the sandbox for made sources in build item B11: only the build
+// reads framework source text now)
+
+const REGEX_AFTER = /^(?:return|typeof|instanceof|in|of|new|delete|void|throw|case|do|else|yield|await)$/;
+
+/**
+ * Source text with every comment, and the inside of every string, template and regular expression, blanked out
+ * (same length, same line breaks), so a pattern run over it only ever matches code.
+ * Returns { code, strings }: strings lists the quoted strings as { start, end, value } (positions of the quotes).
+ */
+export function maskSource(text) {
+  const src = String(text), n = src.length, out = src.split(''), strings = [];
+  const blank = (a, b) => { for (let k = a; k < b && k < n; k++) if (out[k] !== '\n') out[k] = ' '; };
+  const templates = [];           // brace depth at each ${ we are inside
+  let depth = 0, prev = '', word = '', i = 0;
+  // from just after a ` or the } that ends a ${...}: blank up to the closing ` or the next ${
+  const template = (from) => {
+    let j = from;
+    for (; j < n; j++) {
+      if (src[j] === '\\') { j++; continue; }
+      if (src[j] === '`') { blank(from, j); prev = 'a'; word = ''; return j + 1; }
+      if (src[j] === '$' && src[j + 1] === '{') { blank(from, j); templates.push(depth); prev = '{'; word = ''; return j + 2; }
+    }
+    blank(from, n);
+    return n;
+  };
+  while (i < n) {
+    const c = src[i], d = src[i + 1];
+    if (c === '/' && d === '/') { let e = src.indexOf('\n', i); if (e < 0) e = n; blank(i, e); i = e; continue; }
+    if (c === '/' && d === '*') { let e = src.indexOf('*/', i + 2); e = e < 0 ? n : e + 2; blank(i, e); i = e; continue; }
+    if (c === "'" || c === '"') {
+      let j = i + 1;
+      while (j < n && src[j] !== c && src[j] !== '\n') j += src[j] === '\\' ? 2 : 1;
+      j = Math.min(j, n);
+      strings.push({ start: i, end: Math.min(j + 1, n), value: src.slice(i + 1, j) });
+      blank(i + 1, j); i = j + 1; prev = 'a'; word = '';
+      continue;
+    }
+    if (c === '`') { i = template(i + 1); continue; }
+    if (c === '}' && templates.length && templates[templates.length - 1] === depth) { templates.pop(); i = template(i + 1); continue; }
+    if (c === '/' && (prev === '' || '(,=:[!&|?{};+-*%<>~^'.includes(prev) || REGEX_AFTER.test(word))) {
+      let j = i + 1, inClass = false, closed = false;
+      for (; j < n && src[j] !== '\n'; j++) {
+        if (src[j] === '\\') { j++; continue; }
+        if (src[j] === '[') inClass = true;
+        else if (src[j] === ']') inClass = false;
+        else if (src[j] === '/' && !inClass) { closed = true; break; }
+      }
+      if (closed) { blank(i + 1, j); i = j + 1; while (i < n && /[a-z]/i.test(src[i])) i++; prev = 'a'; word = ''; continue; }
+    }
+    if (/[\w$]/.test(c)) { let j = i; while (j < n && /[\w$]/.test(src[j])) j++; word = src.slice(i, j); prev = 'a'; i = j; continue; }
+    if (c === '{') depth++; else if (c === '}') depth--;
+    if (!/\s/.test(c)) { prev = c; word = ''; }
+    i++;
+  }
+  return { code: out.join(''), strings };
+}
 
 // ---- which files ------------------------------------------------------------------------------------------
 

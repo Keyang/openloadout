@@ -12,6 +12,12 @@
 // row (`studio: true`, `madeIn: 'studio'`) and registers it, and loadSprite(id) gives dataSprite(data). It is data drawn
 // by framework code, so it needs no worker. app/bag.js followStudio keeps them the ones the bag holds. The checker is
 // large and loaded on demand, so a registration takes a moment: loadCatalog() and loadSprite() wait for the ones under way.
+//
+// A sprite made on a visit is data too (build item B11, docs/data-sprites.md section 5): app/api-core.js hands it over
+// with addRuntimeAsset(row, { data, sprite }) and a row with `madeIn: 'visit'`. It is part of the library of this visit
+// (allAssets), but its bag items are { data } like a studio sprite's and keep its id (libraryHas, takenFor), and while it
+// is registered the bag's copies of it are drawn as it (addStudioSprite leaves it in place). A bag item of that id with
+// another definition is never drawn as it: addStudioSprite does not register it (`held`), and the bag gives it a free id.
 import { framesInClip } from '../engine/data-frames.js';
 
 /** Makes a data sprite draw any frame number inside its clip (engine/data-frames.js); handed on for the bag and older callers. */
@@ -64,8 +70,21 @@ export const assetById = (id) => (catalog ? catalog.assets.find((a) => a.id === 
 export const allAssets = () => [...(catalog ? catalog.assets : []), ...runtimeAssets().filter((row) => !row.studio)];
 /** The rows of the studio sprites the bag holds (addStudioSprite), in the order they came. */
 export const studioAssets = () => runtimeAssets().filter((row) => row.studio);
-/** Does the library hold this id: the catalogue, or an asset made on this visit (not a studio sprite from the bag)? False before the catalogue has loaded, for an id only it holds. */
-export const libraryHas = (id) => { const row = assetById(id); return !!row && !row.studio; };
+/**
+ * Does the library hold this id: the catalogue, or an asset made on this visit (not a studio sprite from the bag, and not a
+ * sprite made on this visit as data, B11: that one's bag items are { data } like a studio sprite's and carry its id)?
+ * False before the catalogue has loaded, for an id only it holds.
+ */
+export const libraryHas = (id) => { const row = assetById(id); return !!row && !row.studio && !(row.madeIn === 'visit' && isStudioData(made.get(id)?.definition)); };
+/**
+ * Does an asset outside the bag hold this id against the data sprite `data` (what the bag asks before a data item keeps an
+ * id)? The library's ids, and a sprite made on this visit as data unless `data` is its own definition. Arguments: id, data.
+ */
+export const takenFor = (id, data) => {
+  if (libraryHas(id)) return true;
+  const m = madeNow(id);
+  return !!m && m.row.madeIn === 'visit' && isStudioData(m.definition) && JSON.stringify(m.definition.data) !== JSON.stringify(data);
+};
 export const bundleById = (id) => (catalog ? catalog.bundles.find((b) => b.id === id) ?? null : null);
 export const assetsOfBundle = (bundle) => [...bundle.sprites, ...bundle.sounds, ...bundle.music].map(assetById).filter(Boolean);
 
@@ -133,20 +152,35 @@ function studioRow(sprite, S, stylesOf) {
 /**
  * Take in a sprite made in the studio: check its definition (engine/data-sprite.js, never strict), make its row and
  * register it (addRuntimeAsset). Resolves to { ok, id, errors, warnings }; never rejects. The same id again replaces it;
- * a catalogue id is refused. Arguments: definition (a loadout-sprite, as the bag holds it).
+ * a catalogue id is refused. Arguments: definition (a loadout-sprite, as the bag holds it); opts.visit: true when the bag
+ * holds it as a sprite made with window.loadout on an earlier visit, 'link' when it came in a bag link made by whoever
+ * shared it (its row says so: `madeBefore`, and madeNote).
  */
-export function addStudioSprite(definition) {
+export function addStudioSprite(definition, { visit = false } = {}) {
   const want = definition && typeof definition === 'object' && typeof definition.id === 'string' ? definition.id : null;
   const turn = ++studioCount;
   if (want) studioTurn.set(want, turn);
   const job = (async () => {
     try {
-      const [D, S, St] = await Promise.all([import('../engine/data-sprite.js'), import('../engine/sprite.js'), import('../engine/styles.js')]);
+      const [D, S, St, P] = await Promise.all([import('../engine/data-sprite.js'), import('../engine/sprite.js'), import('../engine/styles.js'), import('../engine/pieces.js')]);
+      // a version 2 definition (a sprite made on a visit, B11) may name pieces: they are loaded first, as for a library file
+      if (definition && typeof definition === 'object' && definition.version === 2) {
+        const got = await P.sitePieces().loadFor(definition);
+        if (!got.ok) return { ok: false, id: want, errors: got.errors, warnings: [] };
+      }
       const r = D.makeDataSprite(definition);
       if (!r.ok) return { ok: false, id: want, errors: r.errors, warnings: r.warnings };
       if (want && studioTurn.get(want) !== turn) return { ok: true, id: want, errors: [], warnings: r.warnings, superseded: true };
+      // a sprite made on this visit as data (window.loadout.make.sprite) holds its id: the bag's items of it (its very
+      // definition) are drawn as it; another definition is not registered under its id (`held`: app/bag.js gives it a free
+      // id), so the bag never draws one sprite and downloads another (build item B11b)
+      const holder = want ? made.get(want) : null;
+      if (holder?.row?.madeIn === 'visit' && isStudioData(holder.definition)) {
+        if (JSON.stringify(holder.definition.data) === JSON.stringify(r.sprite.definition)) return { ok: true, id: want, errors: [], warnings: r.warnings, superseded: true };
+        return { ok: false, held: true, id: want, errors: [`"${want}" is the id of a sprite made on this visit with another definition; the bag gives this one an id of its own`], warnings: r.warnings };
+      }
       const sprite = r.sprite;
-      addRuntimeAsset(studioRow(sprite, S, St.stylesOf), { data: JSON.parse(JSON.stringify(sprite.definition)), sprite });
+      addRuntimeAsset({ ...studioRow(sprite, S, St.stylesOf), ...(visit === true || visit === 'link' ? { madeBefore: visit } : {}) }, { data: JSON.parse(JSON.stringify(sprite.definition)), sprite });
       return { ok: true, id: sprite.id, errors: [], warnings: r.warnings };
     } catch (e) {
       return { ok: false, id: want, errors: [String(e?.message ?? e)], warnings: [] };
@@ -184,6 +218,8 @@ export function removeRuntimeAsset(id) {
 export function madeNote(id) {
   const row = made.get(id)?.row;
   if (!row || assetById(id) !== row) return null;
+  if (row.studio && row.madeBefore === 'link') return { draft: false, text: 'Made with window.loadout by whoever shared the bag link, and kept in your bag. It is drawn from its definition, which is data, not code.' };
+  if (row.studio && row.madeBefore) return { draft: false, text: 'Made with window.loadout on an earlier visit and kept in your bag. It is drawn from its definition, which is data, not code.' };
   if (row.studio) return { draft: false, text: 'Made in the studio and kept in your bag. It is drawn from its definition, which is data, not code.' };
   if (row.ok === false) return { draft: true, text: `Made on this visit. It does not pass the quality bar yet, so it cannot go in the bag. To fix: ${(row.errors ?? []).join(' ')}` };
   return { draft: false, text: 'Made on this visit. It is not part of the catalogue: put it in your bag to keep it.' };
@@ -211,7 +247,7 @@ export function loadSprite(id) {
     }
     return mine.program;
   }
-  // a sprite made on this visit is drawn in a worker: each time it is asked for, what the bag will draw of it is brought first
+  // a sprite program handed over with addRuntimeAsset(row, program) (tests do; since B11 the site hands over data only)
   if (mine && mine.row.kind === 'sprite') return Promise.resolve(typeof mine.definition.whenReady === 'function' ? mine.definition.whenReady() : null).then(() => mine.definition);
   if (!sprites.has(id)) {
     if (catalog && assetById(id)?.kind !== 'sprite') return Promise.reject(new Error(`"${id}" is not a sprite on this site`));
@@ -229,9 +265,10 @@ export function loadSprite(id) {
  * A library data sprite from its file (src, e.g. sprites/coin.json): the text fetched and read through
  * catalog/sprite-schema.js parseSpriteJson (Contract 15 rule 6: the 128 KB, nesting and __proto__ wall before anything
  * else runs on it), the pieces it names loaded into the site's store, then engine/data-sprite.js dataSprite, drawing any
- * frame number (framesInClip). Rejects with an Error that starts with src.
+ * frame number (framesInClip). Rejects with an Error that starts with src. Also used by app/api-worker.js (loadout.check
+ * on a library data sprite), which hands it the file's full address.
  */
-async function loadDataFile(src) {
+export async function loadDataFile(src) {
   const r = await fetch(src);
   if (!r.ok) throw new Error(`${src}: ${r.status}`);
   const text = await r.text();

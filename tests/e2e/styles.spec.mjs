@@ -4,25 +4,55 @@
 //   - a sprite with several styles gets a "Style" choice, and the preview, the strip, the link, the bag item
 //     and the download all follow it;
 //   - a style a sprite does not list is never offered and is refused when asked for.
-// The two extra styles and the two sprites that list them are test fixtures (tests/fixtures/styles/): they are
-// made on the page with loadout.make.sprite, exactly as an agent would, and are not part of the site.
+// The two extra styles and the two sprites that list them are test fixtures (tests/fixtures/styles/), not part of the
+// site. Until build item B11 they were made on the page with loadout.make.sprite(source); make.sprite now takes data
+// only (docs/data-sprites.md section 5), and a data sprite is drawn in the pixel style alone until a draw-list renderer
+// for another style exists (section 2.8, "Styles"). So the test serves the two fixtures as library sprites instead:
+// two rows added to generated/catalog.json, built by the site's own catalogue builder (tools/lib/catalog.mjs), and each
+// fixture served as sprites/<id>.js. Everything the tests check (the page, the link, the bag, the download, the API)
+// treats them as it treats any library sprite with several styles.
+// A sprite made on the page is data now (make.sprite, build items B11, B11b): the last test makes one and takes it through
+// the same seam (its page, render, its bag item, its link, the single download and a bag package next to a fixture in
+// another style). A data sprite lists the pixel style only, so the validator refuses one that lists another.
 // Needs a built site. Run with: npx playwright test tests/e2e/styles.spec.mjs
 import fs from 'node:fs';
 import path from 'node:path';
 import { test, expect, openRoute, waitForDrawn, canvasGroupStats, downloadFrom, readZip, showControl } from '../helpers/test.mjs';
 import { ROOT } from '../helpers/catalog.mjs';
+import { goodData } from '../fixtures/api/data.mjs';
+import { buildCatalog } from '../../tools/lib/catalog.mjs';
+import blobDef from '../fixtures/styles/blob.js';
+import sparkleDef from '../fixtures/styles/sparkle.js';
 
 const fixture = (name) => fs.readFileSync(path.join(ROOT, 'tests/fixtures/styles', name), 'utf8')
-  // written to sit in tests/fixtures/styles/; handed to make.sprite it is read as a file in sprites/
+  // written to sit in tests/fixtures/styles/; served as a file in sprites/
   .replaceAll("'../../../engine/", "'../engine/").replace("'./styles.js'", "'../tests/fixtures/styles/styles.js'");
-const BLOB = fixture('blob.js'), SPARKLE = fixture('sparkle.js');
+const SOURCES = { 'style-blob': fixture('blob.js'), 'style-sparkle': fixture('sparkle.js') };
+// their catalogue rows, as the build writes them; no thumbnail or strip picture (the pages draw them from the sprite)
+const ROWS = buildCatalog({ sprites: [{ id: 'style-blob', file: 'sprites/style-blob.js', def: blobDef }, { id: 'style-sparkle', file: 'sprites/style-sparkle.js', def: sparkleDef }] })
+  .assets.map((row) => ({ ...row, thumb: null, strip: null }));
 const text = (bytes) => new TextDecoder().decode(bytes);
 
-/** Make the two fixture sprites on this page. Both must pass the quality bar in every style they list. */
-async function makeFixtures(page) {
-  const made = await page.evaluate(async ([blob, sparkle]) => [await window.loadout.make.sprite(blob), await window.loadout.make.sprite(sparkle)], [BLOB, SPARKLE]);
-  for (const m of made) expect(m, JSON.stringify(m.errors)).toMatchObject({ ok: true, kept: true, errors: [] });
-  return made;
+/**
+ * Serve the two fixture sprites as library sprites (see the top), on this page and in its workers, from now on and
+ * across reloads; then check both pass the quality bar in every style they list. Call it before the page opens.
+ */
+async function serveFixtures(page) {
+  await page.context().route(/\/generated\/catalog\.json(\?.*)?$/, async (route) => {
+    const res = await route.fetch();
+    const catalog = await res.json();
+    catalog.assets = [...catalog.assets.filter((a) => !SOURCES[a.id]), ...ROWS];
+    await route.fulfill({ response: res, json: catalog });
+  });
+  await page.context().route(/\/sprites\/style-(blob|sparkle)\.js(\?.*)?$/, (route) => {
+    const id = /\/sprites\/(style-[a-z]+)\.js/.exec(route.request().url())[1];
+    return route.fulfill({ status: 200, contentType: 'text/javascript', body: SOURCES[id] });
+  });
+}
+/** The quality bar, on the page, for both fixtures (loadout.check on a library sprite checks every style it lists). */
+async function checkFixtures(page) {
+  const got = await page.evaluate(async () => [await window.loadout.check('style-blob'), await window.loadout.check('style-sparkle')]);
+  for (const c of got) expect(c, JSON.stringify(c.errors)).toMatchObject({ ok: true, errors: [] });
 }
 // the Style choice is in the editing panel's Look tab (app/panel.js)
 const pressed = (page) => page.locator('.style-choice .chip[aria-pressed="true"]');
@@ -123,8 +153,9 @@ test('the shipped site knows one style, and says so on window.loadout', async ({
 });
 
 test('a sprite with three styles: the Style choice has a tab of its own, in plain words, and the pictures follow it', async ({ page }) => {
+  await serveFixtures(page);
   await openRoute(page, '/');
-  await makeFixtures(page);
+  await checkFixtures(page);
   await page.evaluate(() => window.loadout.go('/sprite/style-blob'));
   await waitForDrawn(page);
   const choice = page.locator('.style-choice');
@@ -170,8 +201,8 @@ test('a sprite with three styles: the Style choice has a tab of its own, in plai
 });
 
 test('the style travels: in the link, in the bag item, through a reload and a shared bag link', async ({ page }) => {
+  await serveFixtures(page);
   await openRoute(page, '/');
-  await makeFixtures(page);
   await page.evaluate(() => window.loadout.go('/sprite/style-blob?artstyle=silhouette&tail=false'));
   await waitForDrawn(page);
   await expect(pressed(page)).toHaveText('Silhouette');
@@ -218,8 +249,8 @@ test('the style travels: in the link, in the bag item, through a reload and a sh
 });
 
 test('the download follows the style: a marked PNG sheet for the finish-only style, SVG files for the shape style', async ({ page }) => {
+  await serveFixtures(page);
   await openRoute(page, '/');
-  await makeFixtures(page);
   await page.evaluate(() => window.loadout.go('/sprite/style-blob'));
   await waitForDrawn(page);
   const get = async () => readZip((await downloadFrom(page, () => page.locator('.rx-panel [data-act="download"]').click())).bytes);
@@ -269,8 +300,8 @@ test('the download follows the style: a marked PNG sheet for the finish-only sty
 });
 
 test('the bag package: each item in its own style, and the manifest says which', async ({ page }) => {
+  await serveFixtures(page);
   await openRoute(page, '/');
-  await makeFixtures(page);
   const built = await page.evaluate(async () => {
     const L = window.loadout;
     const added = [await L.bag.add('style-blob', { artStyle: 'outline-svg', scale: 2 }), await L.bag.add('style-blob', { artStyle: 'silhouette' }), await L.bag.add('style-blob', { artStyle: 'pixel' }), await L.bag.add('coin')];
@@ -313,8 +344,8 @@ test('the bag package: each item in its own style, and the manifest says which',
 });
 
 test('a sprite of single pixels lists two styles: the shape style is never offered there, and is refused when asked for', async ({ page }) => {
+  await serveFixtures(page);
   await openRoute(page, '/');
-  await makeFixtures(page);
   await page.evaluate(() => window.loadout.go('/sprite/style-sparkle'));
   await waitForDrawn(page);
   await expect(page.locator('.style-choice .chip')).toHaveText(['Pixel art', 'Silhouette']);
@@ -327,7 +358,7 @@ test('a sprite of single pixels lists two styles: the shape style is never offer
   const got = await page.evaluate(async () => {
     const L = window.loadout;
     return {
-      rows: (await L.assets.list({ runtime: true })).assets.map((a) => [a.id, a.styles]),
+      rows: await Promise.all(['style-blob', 'style-sparkle'].map(async (id) => [id, (await L.assets.get(id)).asset.styles])),
       get: (await L.assets.get('style-sparkle')).asset.styles,
       refused: await L.render('style-sparkle', { artStyle: 'outline-svg' }),
       unknown: await L.render('style-sparkle', { artStyle: 'watercolour' }),
@@ -352,25 +383,12 @@ test('a sprite of single pixels lists two styles: the shape style is never offer
   expect(got.viaCall).toMatchObject({ ok: true, artStyle: 'silhouette' });
 });
 
-test('a sprite made on the page whose own code reads pixels back gets the warning, with the line', async ({ page }) => {
-  await openRoute(page, '/');
-  // the three-style fixture, as a pixel-only sprite with one read-back added just before its outline
-  const source = BLOB.replace("id: 'style-blob'", "id: 'style-reader'").replace("styles: ['pixel', 'silhouette', 'outline-svg'],", '').replace('    g.outline(INK);', '    if (g.get(CX, 20)) g.dot(CX, 20, INK);\n    g.outline(INK);');
-  expect(source).toContain('g.get(CX, 20)');
-  const line = source.split('\n').findIndex((l) => l.includes('g.get(CX, 20)')) + 1;
-  const made = await page.evaluate((src) => window.loadout.make.sprite(src), source);
-  expect(made, JSON.stringify(made.errors)).toMatchObject({ ok: true, errors: [] });      // a warning does not block
-  const warning = made.warnings.find((w) => /draws outside the surface's calls/.test(w));
-  expect(warning, made.warnings.join('\n')).toBeTruthy();
-  expect(warning).toContain(`(get; first at the sprite's source:${line})`);
-  // the clean fixture has none
-  const clean = await page.evaluate((src) => window.loadout.make.sprite(src), BLOB);
-  expect(clean.warnings.filter((w) => /draws outside/.test(w))).toEqual([]);
-});
-
+// (Retired in B11: "a sprite made on the page whose own code reads pixels back gets the warning". make.sprite takes
+// data only, and data cannot read pixels back, so the warning has nothing left to catch on the page; the read-back
+// tracing itself goes in P4, docs/data-sprites.md section 5.)
 test('a sprite with a control called "style" and two art styles: both travel in the link, each under its own name', async ({ page }) => {
+  await serveFixtures(page);
   await openRoute(page, '/');
-  await makeFixtures(page);
   await page.evaluate(() => window.loadout.go('/sprite/style-sparkle?style=cross&artstyle=silhouette'));
   await waitForDrawn(page);
   await expect(pressed(page)).toHaveText('Silhouette');
@@ -388,8 +406,8 @@ test('a sprite with a control called "style" and two art styles: both travel in 
 });
 
 test('the bag page and the playground draw a bag item in its art style; its "Open its page" link carries it', async ({ page }) => {
+  await serveFixtures(page);
   await openRoute(page, '/');
-  await makeFixtures(page);
   const keys = await page.evaluate(async () => [(await window.loadout.bag.add('style-blob', { artStyle: 'silhouette' })).key, (await window.loadout.bag.add('style-blob')).key]);
   const colours = (locator) => locator.evaluate((cv) => {
     const { data } = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height), seen = new Set();
@@ -417,4 +435,59 @@ test('the bag page and the playground draw a bag item in its art style; its "Ope
   expect(painted[1]).toBeGreaterThan(4);
   await page.evaluate(() => window.loadout.go('/play'));
   await waitForDrawn(page);
+});
+
+test('a sprite made on the page as data goes through the style seam in its one style, and a style it cannot be drawn in is refused', async ({ page }) => {
+  await serveFixtures(page);
+  await openRoute(page, '/');
+  await checkFixtures(page);      // (the fixtures' extra styles are known to the page from here on)
+  const made = await page.evaluate(async ([data, other]) => {
+    const L = window.loadout;
+    const listed = await L.make.sprite(other);      // a data sprite that lists a style a data sprite cannot be drawn in
+    const ok = await L.make.sprite(data);
+    const add = [await L.bag.add(data.id), await L.bag.add(data.id, { artStyle: 'silhouette' }), await L.bag.add('style-blob', { artStyle: 'silhouette' })];
+    return {
+      listed, ok, add,
+      styles: (await L.assets.get(data.id)).asset.styles,
+      pixel: await L.render(data.id, { frame: 0, artStyle: 'pixel' }), plain: await L.render(data.id, { frame: 0 }), flat: await L.render(data.id, { frame: 0, artStyle: 'silhouette' }),
+      zip: await L.bag.download({ save: false, data: true }),
+    };
+  }, [goodData('style-made'), { ...goodData('style-made-two'), styles: ['pixel', 'silhouette'] }]);
+  expect(made.listed.ok).toBe(false);
+  expect(made.listed.errors.join('\n')).toMatch(/styles: "silhouette" is not an art style/);
+  expect(made.ok).toMatchObject({ ok: true, kept: true });
+  expect(made.styles).toEqual(['pixel']);
+  expect(made.pixel).toMatchObject({ ok: true, artStyle: 'pixel' });
+  expect(made.pixel.png).toBe(made.plain.png);
+  expect(made.flat.ok).toBe(false);
+  expect(made.flat.errors[0]).toMatch(/"style-made" cannot be drawn in the style "silhouette"\. Its styles are: pixel\./);
+  expect(made.add.map((a) => a.ok)).toEqual([true, false, true]);
+  expect(Object.keys(made.add[0].item.settings)).toEqual(['params', 'cues', 'scale']);      // no style stored for its one style
+  expect(made.add[1].errors[0]).toMatch(/cannot be drawn in the style "silhouette"/);
+  // the bag package: the made sprite in pixel art (a PNG sheet, its definition beside it), the fixture in its silhouette
+  const files = readZip(Buffer.from(made.zip.zip.split(',')[1], 'base64'));
+  const manifest = JSON.parse(text(files.find((f) => f.name === 'manifest.json').data));
+  const [mine, blob] = manifest.assets;
+  expect(mine).toMatchObject({ id: 'style-made', sheet: 'sprites/style-made/style-made.png' });
+  expect('artStyle' in mine).toBe(false);
+  expect(blob).toMatchObject({ id: 'style-blob', artStyle: 'silhouette' });
+  expect(files.map((f) => f.name)).toEqual(expect.arrayContaining(['sprites/style-made/style-made.png', 'sprites/style-made/style-made.json', 'sprites/style-made/style-made.sprite.json']));
+  expect('artStyle' in JSON.parse(text(files.find((f) => f.name === 'sprites/style-made/style-made.json').data))).toBe(false);
+  // its page: no Style choice, no style in the address; the link of the bag carries no style for it
+  await page.evaluate(() => window.loadout.go('/sprite/style-made'));
+  await waitForDrawn(page);
+  await expect(page.locator('.style-choice')).toHaveCount(0);
+  expect(page.url()).not.toContain('artstyle=');
+  const link = await page.evaluate(async () => {
+    const { bag, createBag, memoryStorage } = await import('/app/bag.js');
+    const other = createBag(memoryStorage());
+    await other.fromLinkAsync(bag.toLink());
+    return other.items().map((i) => [i.id, i.settings.artStyle ?? null]);
+  });
+  expect(link).toEqual([['style-made', null], ['style-blob', 'silhouette']]);
+  // the single download from its page: a pixel sheet, its animation list with no style, and its definition
+  const single = readZip((await downloadFrom(page, () => page.locator('.rx-panel [data-act="download"]').click())).bytes);
+  expect(single.map((f) => f.name)).toEqual(expect.arrayContaining(['style-made.png', 'style-made.json']));
+  expect(single.some((f) => f.name.endsWith('.svg'))).toBe(false);
+  expect('artStyle' in JSON.parse(text(single.find((f) => f.name === 'style-made.json').data))).toBe(false);
 });

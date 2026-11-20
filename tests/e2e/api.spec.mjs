@@ -2,7 +2,9 @@
 // from a page script that uses nothing but window.loadout. Needs a built site (generated/api.json and
 // generated/framework.js are written by "node tools/build.mjs").
 import { test, expect, openRoute, downloadFrom, readZip } from '../helpers/test.mjs';
-import { GOOD_SPRITE, GOOD_ID, goodSprite, EMPTY_FRAME, DEAD_CONTROL, NO_META, SYNTAX_ERROR, FOREIGN_IMPORT, NOT_A_SPRITE, GOOD_SOUND } from '../fixtures/api/sources.mjs';
+import { goodData, GOOD_ID, noWords, deadControl, OLD_SOURCE, GOOD_SOUND } from '../fixtures/api/data.mjs';
+
+const GOOD = goodData();
 
 const loaded = (page) => page.evaluate(() => performance.getEntriesByType('resource').map((r) => new URL(r.name).pathname));
 /** Decode a PNG data address in the page and count its pixels that are not see-through. */
@@ -38,7 +40,7 @@ test('window.loadout has the Contract 11 members, and the home page does not pay
   // nothing of the framework's own has been asked for yet
   // (the rigs are not in this list: the home page draws a live line-up of the kits' sprites, whose programs use them)
   const before = await loaded(page);
-  for (const f of ['/app/api-core.js', '/app/api-actions.js', '/app/made.js', '/generated/framework.js', '/generated/api.json', '/quality/sprite.js', '/quality/sound.js']) expect(before, `${f} should load on first use`).not.toContain(f);
+  for (const f of ['/app/api-core.js', '/app/api-actions.js', '/generated/framework.js', '/generated/api.json', '/quality/sprite.js', '/quality/sound.js']) expect(before, `${f} should load on first use`).not.toContain(f);
 
   // first use: the description, then the framework itself, built from the same list
   const got = await page.evaluate(async () => {
@@ -145,32 +147,33 @@ test('check takes a sound patch or a sprite definition made in the page, and kee
   expect(r.kept).toBe(0);
 });
 
-test('with no background workers a sound is still checked (on the page, and it says so); a sprite is refused, because its source never runs in the page', async ({ page }) => {
+test('with no background workers the quality bar runs on the page and says so: a sound and a sprite made as data are both made', async ({ page }) => {
   await page.addInitScript(() => { delete window.Worker; });
   await openRoute(page, '/');
-  const r = await page.evaluate(async ([src, patch]) => {
+  const r = await page.evaluate(async ([data, patch]) => {
     const L = window.loadout;
-    return { sprite: await L.make.sprite(src), sound: await L.make.sound(patch), wav: await L.render(patch.id), listed: (await L.assets.list({ runtime: true })).assets.map((a) => a.id) };
-  }, [GOOD_SPRITE, GOOD_SOUND]);
-  expect(r.sprite.ok).toBe(false);
-  expect(r.sprite.errors[0]).toMatch(/no background workers.*never in the page/);
-  expect(r.listed).toEqual([GOOD_SOUND.id]);
+    return { sprite: await L.make.sprite(data), sound: await L.make.sound(patch), wav: await L.render(patch.id), png: await L.render(data.id, { frame: 0 }), listed: (await L.assets.list({ runtime: true })).assets.map((a) => a.id).sort() };
+  }, [GOOD, GOOD_SOUND]);
+  expect(r.sprite).toMatchObject({ id: GOOD_ID, ok: true, kept: true });
+  expect(r.sprite.warnings.join('\n')).toMatch(/on the page itself/);
+  expect(r.png.ok).toBe(true);
+  expect(r.listed).toEqual([GOOD_ID, GOOD_SOUND.id].sort());
   expect(r.sound.ok).toBe(true);
   expect(r.sound.warnings.join('\n')).toMatch(/on the page itself/);
   expect(r.wav.ok).toBe(true);
   expect(r.wav.wav).toMatch(/^data:audio\/wav;base64,UklGR/);
 });
 
-test('(c) make.sprite with valid source passes the bar, and render gives its picture', async ({ page }) => {
+test('(c) make.sprite with a valid definition passes the bar, and render gives its picture', async ({ page }) => {
   await openRoute(page, '/');
-  const made = await page.evaluate((src) => window.loadout.make.sprite(src), GOOD_SPRITE);
+  const made = await page.evaluate((data) => window.loadout.make.sprite(data), GOOD);
   expect(made).toMatchObject({ id: GOOD_ID, kind: 'sprite', ok: true, errors: [], kept: true, replaced: false });
   expect(Array.isArray(made.warnings)).toBe(true);
 
   const strip = await page.evaluate((id) => window.loadout.render(id, { scale: 2 }), GOOD_ID);
-  expect(strip).toMatchObject({ ok: true, id: GOOD_ID, kind: 'sprite', clip: 'idle', frame: null, frames: 8, width: 8 * 32 * 2, height: 64, scale: 2 });
+  expect(strip).toMatchObject({ ok: true, id: GOOD_ID, kind: 'sprite', clip: 'spin', frame: null, frames: 8, width: 8 * 32 * 2, height: 64, scale: 2 });
   expect(strip.png).toMatch(/^data:image\/png;base64,/);
-  expect(strip.opaque).toBeGreaterThan(8 * 40);
+  expect(strip.opaque).toBeGreaterThan(8 * 30);
   const seen = await pngStats(page, strip.png);
   expect(seen).toEqual({ width: 512, height: 64, opaque: strip.opaque * 4 });
 
@@ -179,7 +182,7 @@ test('(c) make.sprite with valid source passes the bar, and render gives its pic
     const L = window.loadout;
     return {
       plain: await L.render(id, { frame: 0 }),
-      round: await L.render(id, { frame: 0, params: { cut: 'round', nonsense: 1 } }),
+      round: await L.render(id, { frame: 0, params: { shape: 'square', nonsense: 1 } }),
       look: await L.render(id, { frame: 0, look: { colour: { hue: 120 } } }),
       listed: await L.assets.list({ runtime: true }),
       found: await L.assets.search('jewel'),
@@ -191,13 +194,13 @@ test('(c) make.sprite with valid source passes the bar, and render gives its pic
   expect(r.plain).toMatchObject({ ok: true, frame: 0, frames: 1, width: 32, height: 32 });
   expect(r.round.ok).toBe(true);
   expect(r.round.png).not.toBe(r.plain.png);
-  expect(r.round.params.cut).toBe('round');
+  expect(r.round.params.shape).toBe('square');
   expect(r.round.warnings.join(' ')).toMatch(/nonsense/);
   expect(r.look.png).not.toBe(r.plain.png);
   expect(r.listed.assets.map((a) => a.id)).toEqual([GOOD_ID]);
   expect(r.listed.assets[0]).toMatchObject({ kind: 'sprite', runtime: true, ok: true, type: 'pickup', role: 'items/pickup' });
   expect(r.found.assets[0].id).toBe(GOOD_ID);
-  expect(r.got.asset.controls.map((c) => c.key)).toEqual(['size', 'cut', 'colour', 'glint', 'bob', 'speed']);
+  expect(r.got.asset.controls.map((c) => c.key)).toEqual(['metal', 'inlay', 'size', 'thickness', 'shape', 'emblem', 'rim', 'sparkle', 'bob', 'pop', 'speed']);
   expect(r.got.asset.verdict.ok).toBe(true);
   expect(r.similar.ok).toBe(true);
   expect(r.similar.assets.map((a) => a.id)).toContain('coin');          // the other pickup
@@ -205,9 +208,9 @@ test('(c) make.sprite with valid source passes the bar, and render gives its pic
   expect(r.check.metrics).toBeTruthy();
 
   // the same id again replaces it; an id the catalogue uses is refused and names the clash
-  const again = await page.evaluate((src) => window.loadout.make.sprite(src), GOOD_SPRITE);
+  const again = await page.evaluate((data) => window.loadout.make.sprite(data), GOOD);
   expect(again).toMatchObject({ id: GOOD_ID, ok: true, replaced: true });
-  const clash = await page.evaluate((src) => window.loadout.make.sprite(src), goodSprite('coin'));
+  const clash = await page.evaluate((data) => window.loadout.make.sprite(data), goodData('coin'));
   expect(clash.ok).toBe(false);
   expect(clash.id).toBe('coin');
   expect(clash.errors[0]).toMatch(/already an asset in the catalogue/);
@@ -219,25 +222,24 @@ test('(c) make.sprite with valid source passes the bar, and render gives its pic
 
 test('(d) a sprite with a fault comes back ok: false with the checker\'s message', async ({ page }) => {
   await openRoute(page, '/');
-  const r = await page.evaluate(async ([empty, dead, noMeta]) => {
+  const r = await page.evaluate(async ([draft, dead]) => {
     const L = window.loadout;
-    return { empty: await L.make.sprite(empty), dead: await L.make.sprite(dead), noMeta: await L.make.sprite(noMeta), dry: await L.check(dead), listed: await L.assets.list({ runtime: true }) };
-  }, [EMPTY_FRAME, DEAD_CONTROL, NO_META]);
-  expect(r.empty.ok).toBe(false);
-  expect(r.empty.id).toBe('api-test-empty');
-  expect(r.empty.errors.join('\n')).toMatch(/empty|nothing drawn|no pixels/i);
-  expect(r.dead.ok).toBe(false);
-  expect(r.dead.errors.join('\n')).toMatch(/weight/i);
-  expect(r.noMeta.ok).toBe(false);
-  expect(r.noMeta.errors.join('\n')).toMatch(/meta/i);
-  // check(source) gives the same verdict without keeping anything
+    return { draft: await L.make.sprite(draft), dead: await L.make.sprite(dead), dry: await L.check(dead), dryDraft: await L.check(draft), listed: await L.assets.list({ runtime: true }) };
+  }, [noWords(), deadControl()]);
+  // the quality bar fails it: kept as a draft, marked not ok, so it can be drawn while it is fixed
+  expect(r.draft).toMatchObject({ id: 'api-test-nowords', ok: false, kept: true });
+  expect(r.draft.errors.join('\n')).toMatch(/meta\.words/);
+  // the validator refuses it: nothing can be drawn, so nothing is kept
+  expect(r.dead).toMatchObject({ id: 'api-test-dead', ok: false, kept: false });
+  expect(r.dead.errors.join('\n')).toMatch(/"weight"/);
+  // check(definition) gives the same verdicts without keeping anything
   expect(r.dry.ok).toBe(false);
   expect(r.dry.errors).toEqual(r.dead.errors);
-  // a sprite that fails the bar is kept as a draft, marked not ok, so it can be drawn while it is fixed
-  expect(r.listed.assets.map((a) => [a.id, a.ok]).sort()).toEqual([['api-test-dead', false], ['api-test-empty', false], ['api-test-nometa', false]]);
-  const drawn = await page.evaluate(() => window.loadout.render('api-test-empty', { frame: 3 }));
+  expect(r.dryDraft.errors).toEqual(r.draft.errors);
+  expect(r.listed.assets.map((a) => [a.id, a.ok])).toEqual([['api-test-nowords', false]]);
+  const drawn = await page.evaluate(() => window.loadout.render('api-test-nowords', { frame: 3 }));
   expect(drawn.ok).toBe(true);
-  expect(drawn.opaque).toBe(0);
+  expect(drawn.opaque).toBeGreaterThan(0);
 });
 
 test('(e) make.sound with a small patch passes the bar and renders audio', async ({ page }) => {
@@ -280,7 +282,7 @@ test('(f) junk never throws: every action answers { ok: false, errors }', async 
   const asked = [];
   page.on('request', (q) => asked.push(q.url()));
   await openRoute(page, '/');
-  const r = await page.evaluate(async ([syntax, foreign, plain]) => {
+  const r = await page.evaluate(async ([source, broken, plain]) => {
     const L = window.loadout;
     const out = { threw: [], bad: [] };
     const junk = [undefined, null, 42, '', 'no such thing!', {}, [], true, () => 1];
@@ -310,14 +312,14 @@ test('(f) junk never throws: every action answers { ok: false, errors }', async 
         else out[name] = res.errors[0];
       } catch (e) { out.threw.push(`${name}: ${e}`); }
     }
-    out.syntax = await L.make.sprite(syntax);
-    out.foreign = await L.make.sprite(foreign);
+    out.source = await L.make.sprite(source);
+    out.broken = await L.make.sprite(broken);
     out.plain = await L.make.sprite(plain);
-    out.checkSyntax = await L.check(syntax);
+    out.checkBroken = await L.check(broken);
     out.kept = (await L.assets.list({ runtime: true })).total;
     out.hash = location.hash;
     return out;
-  }, [SYNTAX_ERROR, FOREIGN_IMPORT, NOT_A_SPRITE]);
+  }, [OLD_SOURCE, '{ "format": "loadout-sprite", ', { id: 'api-test-plain', name: 'Plain' }]);
   expect(r.threw).toEqual([]);
   expect(r.bad).toEqual([]);
   // the messages say what to do next
@@ -329,13 +331,13 @@ test('(f) junk never throws: every action answers { ok: false, errors }', async 
   expect(r['go wrong kind']).toMatch(/\/sprite\/coin/);
   expect(r['call unknown']).toMatch(/make_sprite/);
   expect(r['download empty']).toMatch(/empty/);
-  expect(r.syntax.ok).toBe(false);
-  expect(r.syntax.errors[0]).toMatch(/not valid JavaScript/);
-  expect(r.checkSyntax.ok).toBe(false);
-  expect(r.foreign.ok).toBe(false);
-  expect(r.foreign.errors[0]).toMatch(/line 3.*example\.com.*another site/);
+  expect(r.source.ok).toBe(false);
+  expect(r.source.errors[0]).toMatch(/no longer.*"loadout-sprite"/);
+  expect(r.broken.ok).toBe(false);
+  expect(r.broken.errors[0]).toMatch(/JSON/);
+  expect(r.checkBroken.ok).toBe(false);
   expect(r.plain.ok).toBe(false);
-  expect(r.plain.errors[0]).toMatch(/export default defineSprite/);
+  expect(r.plain.errors.join('\n')).toMatch(/format/);
   expect(r.kept, 'nothing junk was kept').toBe(0);
   expect(r.hash, 'no junk route was opened').toMatch(/^#?\/?$/);
   expect(asked.filter((u) => /example\.com/.test(u)), 'nothing was fetched from another site').toEqual([]);
@@ -343,21 +345,21 @@ test('(f) junk never throws: every action answers { ok: false, errors }', async 
 
 test('the bag: add, list, look, remove, and the package', async ({ page }) => {
   await openRoute(page, '/');
-  const r = await page.evaluate(async ([src, faulty]) => {
+  const r = await page.evaluate(async ([data, faulty]) => {
     const L = window.loadout;
     const first = await L.bag.add('coin', { params: { size: 1 }, scale: 2 });
     const second = await L.bag.add('coin-pickup');
     const items = await L.bag.items();
     const look = await L.bag.setLook({ colour: { hue: 30 }, mood: 'sunny' });
     const built = await L.bag.download({ save: false, data: true });
-    await L.make.sprite(src);
-    const mine = await L.bag.add('api-test-gem', { params: { cut: 'round' } });
+    await L.make.sprite(data);
+    const mine = await L.bag.add('api-test-gem', { params: { shape: 'square' } });
     const draft = await L.make.sprite(faulty);
     const refused = await L.bag.add(draft.id);
     const removed = await L.bag.remove(second.key);
     const twice = await L.bag.remove(second.key);
     return { first, second, items, look, built, mine, refused, removed, twice, after: await L.bag.items(), header: document.querySelector('header .bag-count')?.textContent };
-  }, [GOOD_SPRITE, DEAD_CONTROL]);
+  }, [GOOD, noWords()]);
   expect(r.first).toMatchObject({ ok: true, count: 1 });
   expect(r.first.item).toMatchObject({ kind: 'sprite', id: 'coin', settings: { params: { size: 1 }, scale: 2 } });
   expect(r.second).toMatchObject({ ok: true, count: 2 });
@@ -370,10 +372,10 @@ test('the bag: add, list, look, remove, and the package', async ({ page }) => {
   expect(r.built.zip).toMatch(/^data:application\/zip;base64,UEsD/);       // "PK"
   // an asset made on this visit goes in with its whole definition; a draft that fails the quality bar is refused
   expect(r.mine).toMatchObject({ ok: true, count: 3 });
-  expect(r.mine.item).toMatchObject({ kind: 'sprite', id: GOOD_ID, settings: { params: { cut: 'round' } }, definition: { source: GOOD_SPRITE } });
+  expect(r.mine.item).toMatchObject({ kind: 'sprite', id: GOOD_ID, settings: { params: { shape: 'square' } }, definition: { data: { format: 'loadout-sprite', version: 2, id: GOOD_ID } } });
   expect(r.refused.ok).toBe(false);
   expect(r.refused.errors[0]).toMatch(/quality bar/);
-  expect(r.refused.errors[0]).toMatch(/weight/i);
+  expect(r.refused.errors[0]).toMatch(/words/);
   expect(r.removed).toEqual({ ok: true, count: 2 });
   expect(r.twice.ok).toBe(false);
   expect(r.after.count).toBe(2);
@@ -382,7 +384,7 @@ test('the bag: add, list, look, remove, and the package', async ({ page }) => {
   // download() starts the browser download of the same package
   const file = await downloadFrom(page, () => page.evaluate(() => window.loadout.bag.download()));
   expect(file.name).toBe('loadout-package.zip');
-  expect(readZip(file.bytes).map((f) => f.name)).toEqual(expect.arrayContaining(['sprites/coin/coin.png', `sprites/${GOOD_ID}/${GOOD_ID}.png`, `sprites/${GOOD_ID}/${GOOD_ID}.source.js`, 'manifest.json']));
+  expect(readZip(file.bytes).map((f) => f.name)).toEqual(expect.arrayContaining(['sprites/coin/coin.png', `sprites/${GOOD_ID}/${GOOD_ID}.png`, `sprites/${GOOD_ID}/${GOOD_ID}.sprite.json`, 'manifest.json']));
 });
 
 test('go opens a page of the site', async ({ page }) => {

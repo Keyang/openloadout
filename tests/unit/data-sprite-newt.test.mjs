@@ -41,7 +41,8 @@ test('data-sprite: the newt becomes a defineSprite result with the definition\'s
 });
 
 test('data-sprite: the cleaned definition is kept on the sprite (definition, with its made), frozen, plain JSON', () => {
-  // where it came from is the definition's: sprite.made means "made on this visit, drawn in a worker" (app/made.js; review F1, issue 1)
+  // where it came from is the definition's (definition.made); the sprite itself has no `made` (review F1, issue 1; the worker
+  // that once marked sprites made on a visit, app/made.js, went in build item B11)
   assert.deepEqual(newt.definition.made, { in: 'studio', from: 'template:four-legs' });
   assert.equal(newt.made, undefined);
   assert.equal(newt.definition.format, 'loadout-sprite');

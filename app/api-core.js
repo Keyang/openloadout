@@ -3,19 +3,23 @@
 //
 // What this file keeps to:
 //   - Every action is async, returns plain data, and never throws: a bad input gives { ok: false, errors: ['...'] }.
-//   - A source made on a visit never runs in the page. It is loaded, checked and drawn in a worker of its own
-//     (app/sandbox-worker.js, driven through app/made.js), with a time limit on every call. The page holds a
-//     stand-in sprite that copies in the pixels the worker sends. Sound patches are data and stay on the page.
-//   - Whatever comes from the bag's storage or from a link is not trusted: it goes through the same worker and
-//     the same quality bar before it is known to the site, after the page has drawn. What fails is listed in the
-//     bag as "needs re-making" and is neither drawn nor exported.
-//   - The quality bar on catalogue sprites and on sounds runs in a background worker (app/api-worker.js).
+//   - Everything made on a visit is data (docs/data-sprites.md section 5, build item B11; Contract 15). A sprite is a
+//     `loadout-sprite` version 2 definition: read through the plain-data wall and checked by catalog/sprite-schema.js,
+//     the pieces it names loaded (engine/pieces.js), and drawn on the page by engine/data-sprite.js. Nothing in it runs,
+//     so it needs no worker of its own. A sound is a patch, also data. Source text is no longer taken anywhere.
+//   - The quality bar on sprites and on sounds runs in a background worker (app/api-worker.js), so the page keeps
+//     answering; it is handed the definition and draws it there with the same framework code.
+//   - What comes from the bag's storage or from a link is not trusted. A sprite there is data, checked again by the bag
+//     and by app/catalog.js before it is drawn. A sound is checked again here, after the page has drawn, and one that
+//     fails is listed in the bag as "needs re-making" and is neither drawn nor exported; so is a sprite kept from before
+//     sprites were data (its definition is source text), which is never run (Keyang's DQ2: made with an older version).
 //   - ACTIONS (app/api-actions.js) is the one list of actions; the object is built from it.
-import { ACTIONS, LOOK, SETTINGS } from './api-actions.js';
-import { LIMITS, fail, rewriteImports, cleanDescription } from './api-source.js';
-import { openSandbox, standIn, MadeError } from './made.js';
+import { ACTIONS, LOOK, SETTINGS, LIMITS } from './api-actions.js';
+import { OLDER_VERSION, OLDER_LINE } from './api.js';
 
-export { ACTIONS, fail };
+export { ACTIONS };
+/** The refusal every action uses: { ok: false, ...extra, errors: [...] }. errors: one message or a list. */
+export const fail = (errors, extra = {}) => ({ ok: false, ...extra, errors: [].concat(errors) });
 
 // ---- small things ---------------------------------------------------------------------------------------
 
@@ -47,7 +51,7 @@ const forAgents = (m) => String(m)
   .replace(/\bcatalog\/schema\.js\b/g, 'the metadata rules (`(await loadout.framework).schema`)')
   .replace(/\bdocs\/[\w-]+\.md\b/g, 'the guide');
 
-// ---- long work that holds no made source: app/api-worker.js -----------------------------------------------------
+// ---- long work in the background: app/api-worker.js ---------------------------------------------------------------
 
 /** run(job, ms) -> Promise of its result, on a background worker when the browser has one, otherwise here after a pause. */
 function createWorker(win, workerUrl) {
@@ -117,6 +121,9 @@ export function createLoadout(env = {}) {
     theme: once(() => import('../engine/theme.js')),
     sfx: once(() => import('../sound/sfx-engine.js')),
     wav: once(() => import('../sound/wav.js')),
+    spriteSchema: once(() => import('../catalog/sprite-schema.js')),
+    dataSprite: once(() => import('../engine/data-sprite.js')),
+    pieces: once(() => import('../engine/pieces.js')),
   };
   const needPage = () => { if (!doc) throw new Problem('This needs the Loadout site open in a browser page; there is no page here.'); };
 
@@ -143,41 +150,30 @@ export function createLoadout(env = {}) {
 
   // ---- assets made on this visit ----
   // id -> { id, kind: 'sprite' | 'sound' | 'music', row, verdict: { ok, errors, warnings }, and
-  //         sprite: source (as given), sandbox (the worker it runs in), def (the stand-in the page draws with);
-  //         sound and music: patch }
+  //         sprite: data (its cleaned loadout-sprite definition), def (its data sprite), made (the token of the make call
+  //         that gave data, app/bag.js madeToken: its bag items carry it); sound and music: patch }
   const runtime = new Map();
   const runtimeRows = () => [...runtime.values()].map((e) => e.row);
-  const letGo = (entry) => { if (entry?.sandbox) entry.sandbox.stop(); };
   /**
    * Keep an asset for the visit: in the registry, in the catalogue module (assetById / loadSprite / loadSound, and with
    * them the pages, the bag, the playground and the export) and, for a sound, in the sound library the pages play from.
-   * An earlier one with the same id is replaced, and its worker stopped.
+   * An earlier one with the same id is replaced. A sprite is registered as data ({ data, sprite }), as the studio's are.
    */
   async function keep(entry) {
     const c = await lib.catalog();
     await watchBag();
     const earlier = runtime.get(entry.id);
-    if (earlier && earlier.sandbox !== entry.sandbox) letGo(earlier);
     if (earlier && earlier.kind !== 'sprite') (await lib.audio()).removeSound(entry.id);
     runtime.set(entry.id, entry);
     if (entry.kind !== 'sprite') (await lib.audio()).addSound(entry.patch);
-    c.addRuntimeAsset(entry.row, entry.kind === 'sprite' ? entry.def : entry.patch);
+    c.addRuntimeAsset(entry.row, entry.kind === 'sprite' ? { data: entry.data, sprite: entry.def } : entry.patch);
     return !!earlier;
   }
-  /** What a bag item of this asset carries: { source } or { patch }. null for a catalogue asset. */
-  const definitionOf = (kind, id) => { const e = runtime.get(id); return e && e.kind === kind ? (kind === 'sprite' ? { source: e.source } : { patch: e.patch }) : null; };
-  const textOf = (kind, definition) => (kind === 'sprite' ? String(definition?.source ?? '') : JSON.stringify(definition?.patch ?? null));
+  /** What a bag item of this asset carries: { data, made } (a sprite's definition and its make call's token) or { patch }. null for a catalogue asset. */
+  const definitionOf = (kind, id) => { const e = runtime.get(id); return e && e.kind === kind ? (kind === 'sprite' ? { data: e.data, made: e.made } : { patch: e.patch }) : null; };
+  const textOf = (kind, definition) => (kind === 'sprite' ? JSON.stringify(definition?.data ?? null) : JSON.stringify(definition?.patch ?? null));
   /** Is this bag item's own definition the one the site knows under its id? Only then is it drawn and exported. */
   const sameDefinition = (item, entry) => !!entry && entry.kind === item.kind && textOf(item.kind, item.definition) === textOf(entry.kind, definitionOf(entry.kind, entry.id));
-  // only a few made sprites keep their worker running: the one used longest ago rests, and starts again when it is needed
-  const recent = [];
-  const touch = (box) => {
-    const i = recent.indexOf(box);
-    if (i >= 0) recent.splice(i, 1);
-    recent.push(box);
-    let running = recent.filter((b) => b.alive()).length;
-    for (const b of recent) { if (running <= LIMITS.workers) break; if (b !== box && b.alive() && !b.busy()) { b.rest(); running--; } }
-  };
   // one make at a time: two for the same id, started together, end as one asset (the later one)
   let turn = Promise.resolve();
   const inTurn = (fn) => { const p = turn.then(() => fn(), () => fn()); turn = p.catch(() => {}); return p; };
@@ -212,7 +208,11 @@ export function createLoadout(env = {}) {
     const row = c.assetById(id);
     return row ? { id, kind: row.kind, row, entry: null } : null;
   }
-  const everyRow = async () => { await restore(); return [...(await lib.catalog()).currentCatalog().assets, ...runtimeRows()]; };
+  /** The rows of what was made on a visit: this visit's, then the data sprites the bag holds (registered by app/bag.js followStudio). */
+  const visitRows = async () => { const c = await lib.catalog(); return [...runtimeRows(), ...(typeof c.studioAssets === 'function' ? c.studioAssets() : []).filter((r) => !runtime.has(r.id))]; };
+  const everyRow = async () => { await restore(); return [...(await lib.catalog()).currentCatalog().assets, ...(await visitRows())]; };
+  /** Is this sprite data (a loadout-sprite definition drawn by engine/data-sprite.js)? */
+  const isData = (def) => !!def && isObj(def.definition) && def.definition.format === 'loadout-sprite';
   const narrowed = (core, rows, f) => core.filterAssets(rows, f.filters).filter((r) => f.runtime === null || !!r.runtime === f.runtime);
   const patchOf = async (a) => a.entry?.patch ?? (await lib.sounds()).soundById[a.id] ?? null;
   const defOf = async (a) => a.entry?.def ?? (await lib.catalog()).loadSprite(a.id);
@@ -233,7 +233,7 @@ export function createLoadout(env = {}) {
     return {
       id: def.id, kind: 'sprite', name: String(def.name), description: String(def.blurb ?? ''), ...metaFields(def.meta, true), styles: stylesOf(def), bundles: [], src: null,
       tech: { frame: [def.size[0], def.size[1]], pivot: [def.pivot[0], def.pivot[1]], grounded: def.grounded !== false, clips, controls: Object.keys(def.params).length, parts: Object.keys(def.parts ?? {}), sounds: soundIds.length, soundIds },
-      thumb: null, strip: null, stripClip: preview.name, stripFrames: preview.frames, stripFps: preview.fps, ...verdictFields(verdict),
+      thumb: null, strip: null, stripClip: preview.name, stripFrames: preview.frames, stripFps: preview.fps, ...verdictFields(verdict), madeIn: 'visit',
     };
   }
   async function soundRow(patch, kind, verdict) {
@@ -246,52 +246,32 @@ export function createLoadout(env = {}) {
     };
   }
 
-  // ---- a made source -> its worker and its stand-in ----
-  let bagNow = null, themeNow = null, engineNow = null, stylesNow = null;
-  /** The settings the bag holds for a made sprite right now, plain and under the bag's look: what the bag page, the playground and the export will draw. */
-  const bagSettings = (def) => {
-    if (!bagNow || !themeNow || !engineNow) return [];
-    const t = themeNow.normalizeTheme(bagNow.theme());
-    return bagNow.items().filter((i) => i.kind === 'sprite' && i.id === def.id).flatMap((i) => {
-      const p = engineNow.cleanParams(def, i.settings.params ?? {}), style = stylesNow ? stylesNow.artStyleOf(def, i.settings.artStyle) : undefined;
-      return [{ params: p, style }, { params: themeNow.themedParams(def, p, t), style }];
-    });
-  };
+  // ---- a sprite definition -> its data sprite ----
+  const SOURCE_GONE = 'Sprite source text (an ES module) is no longer taken: since sprites are data, nothing handed to Loadout runs. Hand over a sprite definition instead: one JSON object { "format": "loadout-sprite", "version": 2, "id", "name", "meta", "size", "palette", "controls", "body", "clips", ... } or its JSON text (loadout.assets.get gives the definition of any sprite that is data, to start from).';
   /**
-   * Start a worker for sprite source text, read the source there, and build the page's stand-in for it.
-   * Resolves to { sandbox, def }; whoever does not keep the sprite stops the sandbox. No part of the source runs on the page.
+   * A sprite definition handed to make.sprite or check, read and drawn on the page: { value (the cleaned definition),
+   * def (its data sprite), warnings }. Nothing in it runs: the plain-data wall and the validator (catalog/sprite-schema.js),
+   * the pieces it names (engine/pieces.js), then engine/data-sprite.js. Throws a Problem: with `errors` (the checker's
+   * words, and `id` when it has one) for a definition that does not pass, with a message for anything that is not one.
    */
-  async function openMade(source, where) {
-    needPage();
-    if (typeof source !== 'string' || !source.trim()) throw new Problem(`${where} takes the sprite's source text: one ES module ending in "export default defineSprite({ ... })". Got ${say(source)}.`);
-    if (source.length > LIMITS.sourceChars) throw new Problem(`${where}: the source is ${source.length.toLocaleString('en')} characters long; the most a sprite may be is ${LIMITS.sourceChars.toLocaleString('en')}. Generic drawing code belongs in the framework, not in the sprite.`);
-    if (typeof win.Worker !== 'function') throw new Problem('This browser has no background workers, and a sprite made on a visit runs only in one, never in the page. Sprites cannot be made here; sounds can.');
-    const rewritten = rewriteImports(source, { base: at('sprites/'), origin: site.origin, within: site.href });
-    if (!rewritten.ok) throw Object.assign(new Problem(''), { errors: rewritten.errors });
-    [engineNow, themeNow, bagNow, stylesNow] = await Promise.all([lib.sprite(), lib.theme(), lib.bag().then((m) => m.bag), lib.styles()]);
-    const box = openSandbox({ env: { Worker: win.Worker, URL: win.URL, Blob: win.Blob }, workerUrl: at('app/sandbox-worker.js'), moduleText: rewritten.source });
-    const sandbox = { ...box, frames: (x) => { touch(box); return box.frames(x); } };
-    try {
-      const { description } = await sandbox.load();
-      const clean = cleanDescription(description);
-      if (!clean.ok) throw Object.assign(new Problem(''), { errors: clean.errors });
-      // Art styles (Contract 12). A style is framework code, registered by the site file that defines it; the source
-      // imports that file where it runs, and the page loads the same site files (never the source) so that it knows
-      // the style too. A style the page still does not know is left out, and the sprite is drawn in the others.
-      let styles = clean.description.styles;
-      if (styles.some((id) => !stylesNow.styleById(id))) await Promise.all(rewritten.imports.map((u) => import(u).catch(() => null)));
-      styles = styles.filter((id) => stylesNow.styleById(id));
-      if (!styles.length) styles = ['pixel'];
-      let def;
-      try { def = standIn({ description: clean.description, engine: engineNow, sandbox, bagSettings, styles, onProblem: (e) => console.warn(`Loadout: the made sprite "${clean.description.id}" could not be drawn.`, e?.message ?? e) }); } catch (e) { throw new Problem(`The sprite is not put together right: ${messageOf(e)}`); }
-      // the first drawing: every clip at its defaults. A render() that never ends is found here, within seconds.
-      about.set(def, { description: clean.description, imports: rewritten.imports });
-      // what a download is about to write of it is looked at first (app/bundle.js asks through this)
-      def.judgeLook = (params, options) => judgeLook(def, params, options);
-      await def.prepare(null);
-      return { sandbox, def };
-    } catch (e) { box.stop(); throw e instanceof MadeError ? new Problem(e.message) : e; }
+  async function readDefinition(input, where) {
+    if (typeof input === 'string' && !input.trim().startsWith('{')) throw new Problem(`${where}: ${SOURCE_GONE} Got ${say(input)}.`);
+    if (typeof input !== 'string' && !isObj(input)) throw new Problem(`${where} takes a sprite definition: one JSON object { "format": "loadout-sprite", "version": 2, ... }, or its JSON text. Got ${say(input)}.`);
+    const [S, D, P] = await Promise.all([lib.spriteSchema(), lib.dataSprite(), lib.pieces()]);
+    const wall = S.plainSpriteData(input);
+    if (!wall.ok) throw Object.assign(new Problem(''), { errors: words(wall.errors) });
+    const d = wall.value;
+    const id = isObj(d) && typeof d.id === 'string' && ID_RE.test(d.id) ? d.id : undefined;
+    if (!isObj(d) || d.format !== 'loadout-sprite') throw Object.assign(new Problem(`${where}: a sprite definition is one JSON object { "format": "loadout-sprite", "version": 2, ... }; this one's format is ${say(isObj(d) ? d.format : d)}.`), { id });
+    if (d.version !== 2) throw Object.assign(new Problem(`${where} takes version 2 of "loadout-sprite"; this one says version ${say(d.version)}. A version 1 definition (the studio's) is valid as version 2 and draws the same: set "version": 2.`), { id });
+    const got = await P.sitePieces().loadFor(d);
+    if (!got.ok) throw Object.assign(new Problem(''), { errors: words(got.errors), id });
+    const r = D.makeDataSprite(d);
+    if (!r.ok) throw Object.assign(new Problem(''), { errors: words(r.errors), id });
+    return { value: JSON.parse(JSON.stringify(r.sprite.definition)), def: r.sprite, warnings: words([...wall.warnings, ...r.warnings]) };
   }
+  /** A definition that does not pass, as the answer make.sprite and check give: the checker's words, nothing kept. null for any other error. */
+  const refusedDefinition = (e, more = {}) => (e instanceof Problem && Array.isArray(e.errors) ? { id: e.id ?? null, kind: 'sprite', ok: false, errors: e.errors, warnings: [], ...more } : null);
   const runtimeSounds = () => [...runtime.values()].filter((e) => e.patch).map((e) => e.patch);
   const words = (v) => list(v).filter((x) => typeof x === 'string').slice(0, 200).map(forAgents);
   const verdictOf = (r, more = {}) => {
@@ -299,83 +279,10 @@ export function createLoadout(env = {}) {
     const warnings = r.onPage ? [...words(r.warnings), 'This browser has no background worker for Loadout, so the check ran on the page itself and the page was busy meanwhile.'] : words(r.warnings);
     return { ok: errors.length === 0, errors, warnings, ...(notes ? { notes } : {}), ...more };
   };
-  /** The sounds a made sprite's clips play, for the bar to look up: [[id, patch]], or null when there is no library to look in. */
-  async function cuedSounds(def) {
-    const cued = [...new Set(Object.values(def.sounds ?? {}).flat().map((c) => c.sound))];
-    if (!cued.length) return [];
-    const library = await lib.sounds().catch(() => null);
-    if (!library) return null;       // the cues are not checked, and the verdict says so
-    return cued.map((id) => [id, runtime.get(id)?.patch ?? library.soundById[id]]).filter(([, patch]) => patch);
-  }
-  // what the bar is handed about a made sprite, kept with its stand-in: { description, imports }
-  const about = new WeakMap();
-  let checkSession = 0;
-  /**
-   * The quality bar on a made sprite. It runs in the background worker that never loads the source, on frames:
-   * the bar looks at the settings it wants, the ones it had no frames for are drawn by the sprite's own worker
-   * (ordinary drawing requests: the source cannot tell them from a page drawing) and kept on the page by settings,
-   * and the bar runs again, until it has seen all it asks for. What the page later shows at those settings is
-   * those same frames. Resolves to { verdict, metrics }.
-   */
-  async function judge(sandbox, def, { tips = true } = {}) {
-    const info = about.get(def), session = ++checkSession, started = performance.now();
-    const sounds = await cuedSounds(def);
-    const left = () => LIMITS.checkMs - (performance.now() - started);
-    const late = () => new Problem(`The quality bar did not finish within ${LIMITS.checkMs / 1000} seconds. It looks at every clip at many settings: a render() that is very slow, or a sprite with very many controls, does this.`);
-    let open = { description: info.description, styles: [...def.styles ?? ['pixel']], imports: info.imports, sounds };
-    let add = [def.framesFor(null)].filter(Boolean), settings = add.length, bytes = 0;
-    try {
-      for (let round = 0; round <= LIMITS.checkRounds; round++) {
-        if (left() <= 0) throw late();
-        const r = await work({ type: 'checkMade', session, open, add }, Math.max(1000, left()));
-        open = null;
-        if (r.verdict) {
-          const verdict = verdictOf(r.verdict);
-          if (sounds === null) verdict.warnings.push('The sounds this sprite plays were not checked: the site\'s sound library could not be read.');
-          const metrics = plain({ ...r.verdict.metrics, settingsDrawn: r.settings, rounds: round + 1 });
-          // Advice about how the source's own code draws can only come from where it runs. It adds warnings for whoever
-          // wrote it; the verdict above was reached from frames and is not touched by it.
-          if (tips) {
-            const said = await sandbox.advice().catch(() => null);
-            for (const w of words(said?.warnings).slice(0, 4)) if (!verdict.warnings.includes(w)) verdict.warnings.push(w.slice(0, 600));
-            if (said && (said.outsideCalls === null || Array.isArray(said.outsideCalls))) metrics.outsideCalls = said.outsideCalls === null ? null : said.outsideCalls.filter((x) => typeof x === 'string').slice(0, 20);
-          }
-          return { verdict, metrics };
-        }
-        // draw what it asked for; each is every clip at one setting, as any page asks
-        add = [];
-        for (const want of list(r.missing)) {
-          if (left() <= 0) throw late();
-          if (++settings > LIMITS.checkSettings) throw new Problem(`The quality bar would have to draw this sprite at more than ${LIMITS.checkSettings} settings. Give it fewer controls, or fewer options.`);
-          try { await def.prepare(want.params, { style: want.style }); } catch (e) { throw new Problem(messageOf(e)); }
-          const frames = def.framesFor(want.params, want.style);
-          if (!frames) throw new Problem('The sprite did not draw the frames the quality bar asked for.');
-          bytes += def.size[0] * def.size[1] * 4 * Object.values(frames.clips).reduce((n, c) => n + c.frames.length, 0);
-          if (bytes > LIMITS.checkBytes) throw new Problem('The quality bar would have to look at more pixels than a sprite made on a visit may have (its frames are too big, or too many).');
-          add.push({ params: frames.params, style: frames.style, clips: frames.clips });
-        }
-      }
-      throw new Problem('The quality bar kept asking for new settings and was stopped. A sprite whose controls change what the bar looks at each time does this.');
-    } catch (e) {
-      work({ type: 'checkMade', session, close: true }, 5000).catch(() => {});
-      throw e instanceof MadeError ? new Problem(e.message) : e;
-    }
-  }
-  /**
-   * One setting of a made sprite, about to be written into a download: the same bar looks at exactly these frames
-   * (every frame of every clip, as kept on the page), and the download then writes those frames and no others.
-   * Resolves to { ok, errors, warnings }; the verdict stays with the frames.
-   */
-  async function judgeLook(def, params, { style } = {}) {
-    try { await def.prepare(params, { style }); } catch (e) { return { ok: false, errors: [messageOf(e)], warnings: [] }; }
-    const known = def.lookVerdict(params, style);
-    if (known) return known;
-    const frames = def.framesFor(params, style), info = about.get(def);
-    if (!frames) return { ok: false, errors: ['The sprite did not draw its frames at these settings.'], warnings: [] };
-    let verdict;
-    try { verdict = verdictOf(await work({ type: 'checkLook', description: info.description, style: frames.style, imports: info.imports, clips: frames.clips, sounds: await cuedSounds(def) }, LIMITS.checkMs)); } catch (e) { return { ok: false, errors: [`It could not be checked (${messageOf(e)}).`], warnings: [] }; }
-    def.keepLookVerdict(params, style, verdict);
-    return verdict;
+  /** The quality bar on a sprite that is data, in the background worker: { verdict, metrics }. data: its cleaned definition. */
+  async function judgeData(data) {
+    const r = await work({ type: 'checkSprite', data, soundsUrl: at('generated/sounds.json'), sounds: runtimeSounds() }, 2 * LIMITS.checkMs);
+    return { verdict: verdictOf(r), metrics: plain(r.metrics) };
   }
   const checkSpriteAt = (url) => work({ type: 'checkSprite', url, soundsUrl: at('generated/sounds.json'), sounds: runtimeSounds() }, 2 * LIMITS.checkMs);
 
@@ -395,8 +302,6 @@ export function createLoadout(env = {}) {
     const warnings = Object.keys(o.params ?? {}).filter((k) => !def.params[k]).map((k) => `"${k}" is not one of this sprite's controls and was ignored. Its controls are: ${Object.keys(def.params).join(', ')}.`);
     const p = S.cleanParams(def, o.params ?? {});
     const T = o.look ? await lib.theme() : null;
-    // a sprite made on this visit is drawn in its own worker: bring the frames first, then they are copied in below
-    if (def.made) { try { await def.prepare(T ? T.themedParams(def, p, T.normalizeTheme(o.look)) : p, { clips: [clip], style }); } catch (e) { throw new Problem(messageOf(e)); } }
     const frames = o.frame === undefined || o.frame === null ? Array.from({ length: count }, (_, f) => f) : [o.frame];
     const [fw, fh] = def.size, W = frames.length * fw * scale, H = fh * scale;
     if (W * H > MAX_PICTURE) throw new Problem(`That picture would be ${W} by ${H} pixels. Ask for one frame, or a smaller scale.`);
@@ -405,7 +310,7 @@ export function createLoadout(env = {}) {
     for (let n = 0; n < frames.length; n++) {
       let g;
       // the picture is the style's own pixels, or its pixel picture of a frame it drew on another kind of surface
-      try { g = Y.pixelsOf(T ? T.renderThemedFrame(def, clip, frames[n], p, o.look, { style }) : S.renderFrame(def, clip, frames[n], p, { style }), style); } catch (e) { throw new Problem(`The sprite's render() failed on clip "${clip}", frame ${frames[n]}${style === 'pixel' ? '' : `, in the style "${style}"`}: ${messageOf(e)}`); }
+      try { g = Y.pixelsOf(T ? T.renderThemedFrame(def, clip, frames[n], p, o.look, { style }) : S.renderFrame(def, clip, frames[n], p, { style }), style); } catch (e) { throw new Problem(`The sprite could not be drawn on clip "${clip}", frame ${frames[n]}${style === 'pixel' ? '' : `, in the style "${style}"`}: ${messageOf(e)}`); }
       for (let y = 0; y < fh; y++) for (let x = 0; x < fw; x++) {
         const v = g.data[y * fw + x];
         if (!v) continue;
@@ -468,6 +373,7 @@ export function createLoadout(env = {}) {
         asset.clips = Object.entries(def.clips).map(([name, c]) => ({ name, label: c.label, frames: c.frames, loop: c.loop }));
         asset.preview = def.preview;
         asset.styles = (await lib.styles()).stylesOf(def);        // the ways it can be drawn and exported, best first (a catalogue built before styles has no such field)
+        if (isData(def)) asset.definition = plain(def.definition);      // what make.sprite takes: a sprite that is data can be started from
       } else {
         const patch = await patchOf(a);
         if (!patch) throw noAsset(id);
@@ -485,7 +391,7 @@ export function createLoadout(env = {}) {
       if (!(Number.isInteger(limit) && limit >= 1)) throw new Problem(`filters.limit must be a whole number, 1 or more. Got ${say(f.limit)}.`);
       const [c, core, b] = await Promise.all([lib.catalog(), lib.core(), lib.browse()]);
       let rows = (await b.finder.ranked(text)).map((id) => c.assetById(id)).filter(Boolean);
-      const mine = runtimeRows();
+      const mine = await visitRows();
       // assets made on this visit are not in the search file: match them by their words and put them first
       if (mine.length) rows = [...(text.trim() ? core.createKeywordIndex(mine).search(text, { limit: mine.length }).map((h) => mine.find((r) => r.id === h.id)).filter(Boolean) : mine), ...rows];
       rows = narrowed(core, rows, f);
@@ -507,37 +413,50 @@ export function createLoadout(env = {}) {
       await restore();
       const entry = runtime.get(id);
       const c = await lib.catalog();
-      if (!entry) throw c.assetById(id) ? new Problem(`"${id}" is a catalogue asset. Only assets made on this visit can be removed.`) : noAsset(id);
+      const row = c.assetById(id);
+      if (!entry) throw row ? new Problem(row.studio ? `"${id}" is kept in the bag as data, not made on this visit. Take it out of the bag (loadout.bag.items() lists the keys; loadout.bag.remove(key)) and it is gone.` : `"${id}" is a catalogue asset. Only assets made on this visit can be removed.`) : noAsset(id);
       const { bag } = await lib.bag();
       const held = bag.items().filter((i) => i.id === id).map((i) => i.key);
       if (held.length) throw new Problem(`"${id}" is in the bag (item ${held.join(', ')}). Take it out first: loadout.bag.remove("${held[0]}").`);
       runtime.delete(id);
-      letGo(entry);
       c.removeRuntimeAsset(id);
       if (entry.kind !== 'sprite') (await lib.audio()).removeSound(id);
       return { ok: true, id, kind: entry.kind };
     },
 
-    'make.sprite': (source) => inTurn(async () => {
-      const { sandbox, def } = await openMade(source, 'loadout.make.sprite(source)');
-      const id = def.id;
-      let kept = false;
+    'make.sprite': (input) => inTurn(async () => {
+      let made;
+      try { made = await readDefinition(input, 'loadout.make.sprite(definition)'); } catch (e) { const r = refusedDefinition(e, { kept: false, replaced: false }); if (r) return r; throw e; }
+      const { value, def } = made, id = def.id;
+      // identity (build item B11b): this call's token (app/bag.js madeToken), and the bag items it may change: those of
+      // this make under this id (the token of the sprite made under it on this visit, or this very call's: the definition
+      // the bag holds, handed over again after a reload). Any other item of the id (a studio sprite, a studio draft's item,
+      // a frozen copy, another made sprite) is never changed: the id is refused while the bag holds one.
       try {
         const c = await lib.catalog();
         const taken = c.currentCatalog().assets.find((x) => x.id === id), mine = runtime.get(id);
         if (taken) throw Object.assign(new Problem(`"${id}" is already an asset in the catalogue (a ${taken.kind}): give the new sprite an id of its own.`), { id });
         if (mine && mine.kind !== 'sprite') throw Object.assign(new Problem(`"${id}" is already a ${mine.kind} made on this visit: give the sprite an id of its own.`), { id });
-        const { verdict } = await judge(sandbox, def);
-        const { bag } = await lib.bag();
-        const held = bag.items().filter((i) => i.id === id);
+        const { bag, madeToken } = await lib.bag();
+        const token = madeToken(value);
+        const own = (i) => { const was = runtime.get(id)?.kind === 'sprite' ? runtime.get(id).made : null; return i.kind === 'sprite' && i.id === id && !!i.made && !i.draft && !i.frozen && (i.made === was || (i.made === token && textOf('sprite', i.definition) === JSON.stringify(value))); };
+        const others = () => bag.items().filter((i) => i.id === id && !own(i));
+        const notMine = (xs) => ({ id, kind: 'sprite', ok: false, errors: [`"${id}" is in the bag as another ${xs[0].kind === 'sprite' ? `sprite (item ${xs.map((i) => i.key).join(', ')}${xs[0].definition?.data?.name ? `, "${xs[0].definition.data.name}"` : ''}: ${xs[0].draft ? 'the item of a studio draft' : xs[0].made ? 'one made with another make call' : xs[0].definition?.data ? 'a studio sprite' : 'made before sprites were data'})` : xs[0].kind}. make.sprite never changes it, so this was not kept: give the new sprite an id of its own, or take that item out of the bag first (loadout.bag.remove("${xs[0].key}")). If it is this very sprite as made on an earlier visit, hand over the version the bag holds first (loadout.assets.get("${id}") gives its definition): a new version made after that reaches its bag items.`], warnings: [], kept: false, replaced: false });
+        if (others().length) return notMine(others());
+        const { verdict } = await judgeData(value);
+        for (const w of made.warnings) if (!verdict.warnings.includes(w)) verdict.warnings.push(w);
+        // (looked at again: the bag may have changed while the bar ran)
+        if (others().length) return notMine(others());
+        const held = bag.items().filter(own);
         // the bag exports what it stored: a failing version never takes the place of one that is in the bag
         if (!verdict.ok && held.length) return { id, kind: 'sprite', ...verdict, errors: [...verdict.errors, `"${id}" is in the bag, so this failing version was not kept: the bag keeps the version that passed. Fix the errors and make it again, or take it out of the bag first (loadout.bag.remove("${held[0].key}")).`], kept: false, replaced: false };
-        const replaced = await keep({ id, kind: 'sprite', source, sandbox, def, verdict, row: await spriteRow(def, verdict) });
-        kept = true;
-        // bag items of it follow the newest version that passes
-        if (replaced && verdict.ok) bag.redefine(id, { source });
+        const replaced = await keep({ id, kind: 'sprite', data: value, def, verdict, made: token, row: await spriteRow(def, verdict) });
+        // the bag items of this make follow the newest version that passes, all at once, and take this call's token
+        if (verdict.ok && held.length) { try { bag.updateDefinition(held[0].key, { data: value, made: token }); } catch { /* they keep the version they have */ } }
+        // anything else that holds the id now (it came in meanwhile) is given an id of its own: what the bag shows is what it downloads
+        bag.settleIds();
         return { id, kind: 'sprite', ...verdict, kept: true, replaced };
-      } catch (e) { throw e instanceof Problem && e.id === undefined ? Object.assign(e, { id }) : e; } finally { if (!kept) sandbox.stop(); }
+      } catch (e) { throw e instanceof Problem && e.id === undefined ? Object.assign(e, { id }) : e; }
     }),
 
     'make.sound': (input) => inTurn(async () => {
@@ -569,7 +488,9 @@ export function createLoadout(env = {}) {
         const a = await find(what);
         if (!a) throw noAsset(what);
         if (a.kind === 'sprite') {
-          if (a.entry) { const { verdict, metrics } = await judge(a.entry.sandbox, a.entry.def); return { id: a.id, kind: a.kind, ...verdict, metrics }; }
+          if (a.entry) { const { verdict, metrics } = await judgeData(a.entry.data); return { id: a.id, kind: a.kind, ...verdict, metrics }; }
+          // a sprite the bag holds as data has no file: it is judged from its definition
+          if (!a.row.src) { const def = await defOf(a); if (isData(def)) { const { verdict, metrics } = await judgeData(plain(def.definition)); return { id: a.id, kind: a.kind, ...verdict, metrics }; } }
           const r = await checkSpriteAt(at(a.row.src ?? `sprites/${a.id}.js`));
           return { id: a.id, kind: a.kind, ...verdictOf(r, { metrics: r.metrics }) };
         }
@@ -578,23 +499,26 @@ export function createLoadout(env = {}) {
         const r = await work({ type: 'checkSound', patch }, a.kind === 'music' ? LIMITS.musicCheckMs : LIMITS.soundCheckMs);
         return { id: a.id, kind: a.kind, ...verdictOf(r, { metrics: r.metrics }) };
       }
-      if (typeof what === 'string') {
-        // source text: read and checked in a worker of its own, which is stopped afterwards; nothing is kept
-        const { sandbox, def } = await openMade(what, 'loadout.check(source)');
-        try { const { verdict, metrics } = await judge(sandbox, def); return { id: def.id, kind: 'sprite', ...verdict, metrics }; } finally { sandbox.stop(); }
+      if (typeof what === 'string' || (isObj(what) && (what.format === 'loadout-sprite' || what.format === 'loadout-rig'))) {
+        // a sprite definition, or its JSON text: read and drawn here, judged in the background; nothing is kept
+        let made;
+        try { made = await readDefinition(what, 'loadout.check(idOrDefinition)'); } catch (e) { const r = refusedDefinition(e); if (r) return r; throw e; }
+        const { verdict, metrics } = await judgeData(made.value);
+        for (const w of made.warnings) if (!verdict.warnings.includes(w)) verdict.warnings.push(w);
+        return { id: made.def.id, kind: 'sprite', ...verdict, metrics };
       }
       if (isObj(what) && typeof what.render === 'function') {
         // a definition built in the page by whoever is calling (with loadout.framework): it is their own page code, and its functions cannot be sent to a worker
         await pause();
         const r = await (await import('./api-worker.js')).runJob({ type: 'checkSprite', def: what, soundsUrl: at('generated/sounds.json'), sounds: runtimeSounds() });
-        return { id: what.id ?? null, kind: 'sprite', ...verdictOf({ ...r, onPage: false }, { metrics: r.metrics }), warnings: [...words(r.warnings), 'A sprite definition handed over as an object is checked on the page itself, so the page was busy meanwhile. Hand over its source text, or make it first and check its id, to check it in the background.'] };
+        return { id: what.id ?? null, kind: 'sprite', ...verdictOf({ ...r, onPage: false }, { metrics: r.metrics }), warnings: [...words(r.warnings), 'A sprite built in the page is checked on the page itself, so the page was busy meanwhile. Hand over a data definition (loadout-sprite), or make it first and check its id, to check it in the background.'] };
       }
       if (isObj(what)) {
         const patch = plain(what);
         const r = await work({ type: 'checkSound', patch }, patch.category === 'music' ? LIMITS.musicCheckMs : LIMITS.soundCheckMs);
         return { id: typeof patch.id === 'string' ? patch.id : null, kind: patch.category === 'music' ? 'music' : 'sound', ...verdictOf(r, { metrics: r.metrics }) };
       }
-      throw new Problem(`loadout.check(idOrDefinition) takes an asset id ("knight"), a sprite's source text, or a sound patch object. Got ${say(what)}.`);
+      throw new Problem(`loadout.check(idOrDefinition) takes an asset id ("knight"), a sprite definition (a loadout-sprite object, or its JSON text), or a sound patch object. Got ${say(what)}.`);
     },
 
     render: async (id, options) => {
@@ -613,7 +537,10 @@ export function createLoadout(env = {}) {
       if (a.entry && !a.entry.verdict.ok) throw new Problem(`"${id}" does not pass the quality bar yet, so it cannot go in the bag. Fix it and make it again under the same id. Its errors: ${a.entry.verdict.errors.join(' | ')}`);
       const { bag } = await lib.bag();
       // an asset made on this visit goes in with its whole definition, so the bag still has it after a reload
-      const key = bag.add({ kind: a.kind, id, settings: kept, ...(a.entry ? { definition: definitionOf(a.kind, id) } : {}) });
+      // (a sprite the bag already holds as data, registered from it, goes in with its definition too)
+      // (a sprite made on this visit goes in with its make call's token, `made`: app/bag.js)
+      const own = a.entry ? definitionOf(a.kind, id) : a.row.studio && a.kind === 'sprite' ? { data: plain((await defOf(a)).definition) } : null;
+      const key = bag.add({ kind: a.kind, id, settings: kept, ...(own ? { definition: own.data !== undefined ? { data: own.data } : own } : {}), ...(own?.made ? { made: own.made } : {}) });
       if (!bag.saved()) { bag.remove(key); throw new Problem(NOT_SAVED(`"${id}" was not added`)); }
       return { ok: true, key, count: bag.count(), item: plain(bag.get(key)), warnings };
     },
@@ -638,7 +565,7 @@ export function createLoadout(env = {}) {
       if (!item) throw new Problem(`There is no bag item with the key "${key}". loadout.bag.items() lists the keys.`);
       if (!isObj(settings)) throw new Problem(`loadout.bag.update(key, settings) takes the item's new settings as an object such as { params: { ... } }. Got ${say(settings)}.`);
       const a = await find(item.id);
-      if (!a || a.kind !== item.kind) throw new Problem(`The bag item "${key}" is "${item.id}", which the site does not know right now${item.definition ? ' (it needs re-making)' : ''}, so its settings cannot be checked.`);
+      if (!a || a.kind !== item.kind) throw new Problem(`The bag item "${key}" is "${item.id}", which the site does not know right now${item.definition && !item.definition.data ? ' (it needs re-making)' : ''}, so its settings cannot be checked.`);
       const { kept, warnings } = await settingsFor(a, settings, 'loadout.bag.update(key, settings)');
       bag.update(key, kept);
       if (!bag.saved()) { bag.update(key, item.settings); throw new Problem(NOT_SAVED('The change was not kept')); }
@@ -758,16 +685,18 @@ export function createLoadout(env = {}) {
   }
 
   // ---- what the bag holds from a link or an earlier visit ----
-  // A bag item of an asset made on a visit carries its definition. That text came from storage or from a link, so it is
-  // not trusted: each one goes through the same worker, the same limits and the same quality bar as a sprite being made,
-  // in the background, after the page has drawn. One that passes becomes known to the site. One that fails, or runs
-  // over a limit, is remembered as "needs re-making": it stays in the bag, by name, and is neither drawn nor exported.
+  // A sound made on a visit carries its patch. That came from storage or from a link, so it is not trusted: each one goes
+  // through the same quality bar as a sound being made, in the background, after the page has drawn. One that passes
+  // becomes known to the site. One that fails, or runs over a limit, is remembered as "needs re-making": it stays in the
+  // bag, by name, and is neither drawn nor exported. A sprite is data ({ data }): the bag and app/catalog.js check and
+  // draw it, with nothing to do here. A sprite kept as source text ({ source }) is never run (DQ2).
   const failed = new Map();        // the item's kind, id and definition -> { name, reason }
   const defKey = (item) => `${item.kind}\n${item.id}\n${textOf(item.kind, item.definition)}`;
-  let busy = 0, queue = Promise.resolve(), listening = false;
-  /** Where a bag item made on a visit stands: { state: 'ready' | 'checking' | 'needs re-making', name?, reason? }; null for a catalogue item. */
+  let busy = 0, queue = Promise.resolve(), listening = false, bagNow = null;
+  /** Where a bag item made on a visit stands: { state: 'ready' | 'checking' | 'needs re-making', name?, reason? }; null for a catalogue item or a sprite that is data. */
   function stateOf(item) {
-    if (!item || !item.definition || item.definition.data) return null;      // a studio sprite is data (Contract 14), checked by app/bag.js
+    if (!item || !item.definition || item.definition.data) return null;      // a sprite that is data (Contracts 14, 15), checked by app/bag.js
+    if (item.kind === 'sprite') return { state: 'needs re-making', name: item.id, reason: OLDER_VERSION, say: OLDER_LINE };      // source text: never run (docs/data-sprites.md, DQ2)
     const entry = runtime.get(item.id);
     if (entry && sameDefinition(item, entry)) return entry.verdict.ok ? { state: 'ready', name: entry.row.name } : { state: 'needs re-making', name: entry.row.name, reason: entry.verdict.errors[0] ?? 'It does not pass the quality bar.' };
     const f = failed.get(defKey(item));
@@ -778,37 +707,24 @@ export function createLoadout(env = {}) {
   async function adopt() {
     const [{ bag }, c] = await Promise.all([lib.bag(), lib.catalog()]);
     let settled = 0;
-    // sounds first: a sprite's check looks up the sounds its clips play
-    const waiting = bag.items().filter((i) => i.definition && !i.definition.data);
-    for (const item of [...waiting.filter((i) => i.kind !== 'sprite'), ...waiting.filter((i) => i.kind === 'sprite')]) {
+    for (const item of bag.items()) {
       if (stateOf(item)?.state !== 'checking') continue;
-      let name = item.id, sandbox = null, kept = false;
+      let name = item.id;
       busy++;
       try {
         if (c.currentCatalog().assets.some((a) => a.id === item.id)) throw new Problem('The catalogue has an asset with this id now.');
-        if (item.kind === 'sprite') {
-          const made = await openMade(item.definition.source, 'The bag');
-          sandbox = made.sandbox;
-          name = made.def.name;
-          if (made.def.id !== item.id) throw new Problem(`Its source defines "${made.def.id}", not "${item.id}".`);
-          const { verdict } = await judge(sandbox, made.def, { tips: false });
-          if (!verdict.ok) throw new Problem(verdict.errors[0]);
-          await keep({ id: item.id, kind: 'sprite', source: item.definition.source, sandbox, def: made.def, verdict, row: await spriteRow(made.def, verdict) });
-          kept = true;
-        } else {
-          const patch = plain(item.definition.patch);
-          if (typeof patch?.name === 'string') name = patch.name.slice(0, 80);
-          const kind = patch?.category === 'music' ? 'music' : 'sound';
-          if (!isObj(patch) || patch.id !== item.id || kind !== item.kind) throw new Problem(`Its patch does not define the ${item.kind} "${item.id}".`);
-          const r = await work({ type: 'checkSound', patch }, kind === 'music' ? LIMITS.musicCheckMs : LIMITS.soundCheckMs);
-          const verdict = verdictOf(r);
-          if (!verdict.ok || !r.metrics?.valid) throw new Problem(verdict.errors[0] ?? 'The patch cannot be played.');
-          await keep({ id: item.id, kind, patch, verdict, row: await soundRow(patch, kind, verdict) });
-        }
+        const patch = plain(item.definition.patch);
+        if (typeof patch?.name === 'string') name = patch.name.slice(0, 80);
+        const kind = patch?.category === 'music' ? 'music' : 'sound';
+        if (!isObj(patch) || patch.id !== item.id || kind !== item.kind) throw new Problem(`Its patch does not define the ${item.kind} "${item.id}".`);
+        const r = await work({ type: 'checkSound', patch }, kind === 'music' ? LIMITS.musicCheckMs : LIMITS.soundCheckMs);
+        const verdict = verdictOf(r);
+        if (!verdict.ok || !r.metrics?.valid) throw new Problem(verdict.errors[0] ?? 'The patch cannot be played.');
+        await keep({ id: item.id, kind, patch, verdict, row: await soundRow(patch, kind, verdict) });
       } catch (e) {
         const reason = e instanceof Problem ? (e.errors ?? [e.message])[0] : `It could not be checked (${messageOf(e)}).`;
         failed.set(defKey(item), { name: String(name), reason: forAgents(reason) });
-      } finally { busy--; if (sandbox && !kept) sandbox.stop(); settled++; }
+      } finally { busy--; settled++; }
     }
     // whoever shows the bag (its page, the playground) draws again: an item is back, or is now known to need re-making
     if (settled) bag.touch();
@@ -839,7 +755,6 @@ export function createLoadout(env = {}) {
     try { return await fn(...args); } catch (e) {
       const extra = e && typeof e.id === 'string' ? { id: e.id } : {};
       if (e instanceof Problem) return fail(e.errors ?? e.message, extra);
-      if (e instanceof MadeError) return fail(e.message, extra);        // a made sprite's worker ran over a limit, or sent something wrong
       return fail(`Loadout could not finish this: ${messageOf(e)}`, extra);
     }
   };
@@ -873,8 +788,6 @@ export function createLoadout(env = {}) {
     /** Is this id a made item the bag holds that has not been settled yet? null when the bag has not been looked at. */
     pending: (id) => (bagNow ? bagNow.items().some((i) => i.id === id && stateOf(i)?.state === 'checking') : null),
     busy: () => busy > 0,
-    /** A made sprite's own numbers: how its drawing through the worker went (requests, frames, hits, misses, ms). */
-    stats: (id) => runtime.get(id)?.def?.stats?.() ?? null,
   });
   return loadout;
 }

@@ -7,7 +7,22 @@
 // so a caller with an input object does loadout.<call>(...args.map((a) => input[a])), or loadout.call(name, input).
 // Lists that the code already holds (palette names) are read from the code, not written out again here.
 import { PALETTES } from '../engine/theme.js';
-import { LIMITS } from './api-source.js';
+
+/**
+ * The limits on the work window.loadout does for a caller, in one place (app/api-core.js and the descriptions below read
+ * them). clips, framesPerClip, frames and controls are the caps a studio definition keeps to as well (catalog/studio-schema.js
+ * STUDIO_LIMITS; a unit test keeps them equal); a version 2 definition has its own, larger ones (catalog/sprite-schema.js SPRITE_LIMITS).
+ */
+export const LIMITS = Object.freeze({
+  clips: 32,                     // animations in one sprite
+  framesPerClip: 64,             // frames in one animation
+  frames: 256,                   // frames in all its animations together
+  controls: 48,
+  definitionKB: 128,             // a version 2 definition, as JSON text (catalog/sprite-schema.js: the plain-data wall)
+  checkMs: 60_000,               // the quality bar on a sprite
+  soundCheckMs: 60_000,          // the quality bar on a sound effect
+  musicCheckMs: 600_000,         // ...and on a music track, which is rendered many times over
+});
 
 const TEXT_OR_LIST = (what) => ({ oneOf: [{ type: 'string' }, { type: 'array', items: { type: 'string' } }], description: what });
 const FILTERS = {
@@ -18,7 +33,7 @@ const FILTERS = {
   gameTypes: TEXT_OR_LIST('platformer, turn-based-rpg, roguelike-action and so on'),
   view: TEXT_OR_LIST('sprites only: side, top-down, front or none'),
   bundle: TEXT_OR_LIST('A bundle id: only assets in that bundle'),
-  runtime: { type: 'boolean', description: 'true: only assets made on this visit with make_sprite or make_sound; false: only catalogue assets' },
+  runtime: { type: 'boolean', description: 'true: only assets made on a visit (with make_sprite or make_sound, or kept in the bag as data); false: only catalogue assets' },
 };
 const ID = (what) => ({ type: 'string', description: what, pattern: '^[a-z][a-z0-9-]*$' });
 const HEX = { type: 'string', pattern: '^#[0-9a-fA-F]{6}$' };
@@ -102,7 +117,7 @@ export const ACTIONS = [
   },
   {
     name: 'assets_get', call: 'assets.get', args: ['id'],
-    description: 'Everything about one asset: its catalogue row plus its controls (the settings render and the bag accept), its clips or styles, and for an asset made on this visit its last quality verdict. A sprite\'s "styles" are the art styles it can be drawn and exported in, best first (render and bag_add take one as "artStyle"); a sound\'s "styles" are its named variations.',
+    description: 'Everything about one asset: its catalogue row plus its controls (the settings render and the bag accept), its clips or styles, for an asset made on this visit its last quality verdict, and for a sprite that is data its whole definition (what make_sprite takes). A sprite\'s "styles" are the art styles it can be drawn and exported in, best first (render and bag_add take one as "artStyle"); a sound\'s "styles" are its named variations.',
     inputSchema: { type: 'object', properties: { id: ID('The asset id, for example "knight" or "coin-pickup"') }, required: ['id'], additionalProperties: false },
   },
   {
@@ -128,9 +143,9 @@ export const ACTIONS = [
     inputSchema: { type: 'object', properties: { id: ID('The id of an asset made on this visit') }, required: ['id'], additionalProperties: false },
   },
   {
-    name: 'make_sprite', call: 'make.sprite', args: ['source'],
-    description: `Define a new sprite on this visit from source text: one ES module written like the sprites of the site, importing the framework by relative path ('../engine/sprite.js', '../engine/fx.js', '../rigs/humanoid.js') and ending in "export default defineSprite({ ... })". The source runs in a worker of its own, never in the page: it has the framework it imports and nothing else (no page, no network, no storage), and it is stopped if it takes too long. The quality bar runs on it and its verdict comes back as { id, ok, errors, warnings }. From then on it behaves like a catalogue asset on this visit: it has a page, can be rendered, put in the bag and exported. One with errors is kept as a draft (it can be rendered and has a page, but cannot go in the bag): fix the source and make it again under the same id, which replaces it; a failing version does not replace one that is in the bag. Limits: source at most ${LIMITS.sourceChars.toLocaleString('en')} characters, a frame at most ${LIMITS.frameWidth} by ${LIMITS.frameHeight} pixels, at most ${LIMITS.framesPerClip} frames in a clip and ${LIMITS.clips} clips, ${LIMITS.loadMs / 1000} seconds to load and ${LIMITS.checkMs / 1000} seconds for the quality bar. The id must not be one the catalogue already uses.`,
-    inputSchema: { type: 'object', properties: { source: { type: 'string', minLength: 1, description: 'The module source text' } }, required: ['source'], additionalProperties: false },
+    name: 'make_sprite', call: 'make.sprite', args: ['definition'],
+    description: `Define a new sprite on this visit from a data definition, "loadout-sprite" version 2: one JSON object { "format": "loadout-sprite", "version": 2, "id", "name", "blurb", "meta", "size", "pivot", "palette", "controls", "body", "clips", ... } (the site's sprites/<id>.json files have exactly this form, and assets_get gives the definition of any sprite that is data: start from one). It is data, never code: shapes, pixel stamps and the framework's generators and pieces are named by id and version with their arguments, and nothing in it runs. It is checked (every field typed, every name looked up, every count capped, its cost under a budget; at most ${LIMITS.definitionKB} KB of JSON) and then drawn by the framework on the page. The quality bar runs on it and its verdict comes back as { id, ok, errors, warnings }. From then on it behaves like a catalogue asset on this visit: it has a page, can be rendered, put in the bag (with its definition, so it is still there after a reload and travels in a link) and exported. A definition that fails the check is not kept (its errors say what to fix). One that fails the quality bar is kept as a draft (it can be rendered and has a page, but cannot go in the bag): fix it and make it again under the same id, which replaces it; a failing version does not replace one that is in the bag, and a passing one replaces it in every bag item of it. Like a catalogue asset, it may be added to the bag more than once, and every item keeps its id. Its bag items carry the "made" token of the make call (a short hash of the definition it made), and make_sprite changes only the bag items of its own token: an id the bag holds for any other sprite (one made in the studio, a studio draft's, one from a shared link, or this sprite as made on an earlier visit) is refused, and that item is never changed. After a reload, hand over the version the bag holds (assets_get gives its definition) to take this sprite up again; a new version made after that reaches its bag items. Sprite source text (code) is no longer taken. The id must not be one the catalogue already uses.`,
+    inputSchema: { type: 'object', properties: { definition: { oneOf: [{ type: 'object', additionalProperties: true }, { type: 'string' }], description: 'The loadout-sprite version 2 definition, as an object or as its JSON text' } }, required: ['definition'], additionalProperties: false },
   },
   {
     name: 'make_sound', call: 'make.sound', args: ['patch'],
@@ -139,8 +154,8 @@ export const ACTIONS = [
   },
   {
     name: 'check', call: 'check', args: ['idOrDefinition'],
-    description: 'Run the quality bar and return its verdict { ok, errors, warnings, metrics } without keeping anything: for an asset id (catalogue or made on this visit), for sprite source text, or for a sound patch.',
-    inputSchema: { type: 'object', properties: { idOrDefinition: { oneOf: [{ type: 'string' }, { type: 'object', additionalProperties: true }], description: 'An asset id, sprite source text, or a sound patch object' } }, required: ['idOrDefinition'], additionalProperties: false },
+    description: 'Run the quality bar and return its verdict { ok, errors, warnings, metrics } without keeping anything: for an asset id (catalogue or made on a visit), for a sprite definition (a loadout-sprite object, or its JSON text), or for a sound patch.',
+    inputSchema: { type: 'object', properties: { idOrDefinition: { oneOf: [{ type: 'string' }, { type: 'object', additionalProperties: true }], description: 'An asset id, a sprite definition (object or JSON text), or a sound patch object' } }, required: ['idOrDefinition'], additionalProperties: false },
   },
   {
     name: 'render', call: 'render', args: ['id', 'options'],
@@ -171,7 +186,7 @@ export const ACTIONS = [
   },
   {
     name: 'bag_add', call: 'bag.add', args: ['id', 'settings'],
-    description: 'Put an asset in the visitor\'s bag with its settings: a catalogue asset, or one made on this visit that passes the quality bar (warnings do not block; a draft with errors is refused). An asset made on this visit goes in with its whole definition, so it is still in the bag after a reload. Returns the new item\'s key. The same asset may be added more than once with different settings.',
+    description: 'Put an asset in the visitor\'s bag with its settings: a catalogue asset, or one made on this visit that passes the quality bar (warnings do not block; a draft with errors is refused). An asset made on this visit goes in with its whole definition, so it is still in the bag after a reload. Returns the new item\'s key. The same asset may be added more than once with different settings, and every item keeps the asset\'s id (a sprite made in the studio is the exception: each of its items has an id of its own). Two different sprites never share an id in the bag: one that comes in under an id another definition already holds (a shared link, a studio sprite) is given that id with a number.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -183,7 +198,7 @@ export const ACTIONS = [
   },
   {
     name: 'bag_items', call: 'bag.items', args: [],
-    description: 'What is in the bag: each item\'s key, kind, id and settings, and the look applied to the whole bag. An item made on a visit also has its definition and a state: "ready", or "needs re-making" with the reason (it came from a link or an earlier visit and did not pass the quality bar again, so it is not drawn or exported).',
+    description: 'What is in the bag: each item\'s key, kind, id and settings, and the look applied to the whole bag. An item made on a visit also has its definition (a sprite: { data }, its loadout-sprite definition; a sound: { patch }). A sound also has a state: "ready", or "needs re-making" with the reason (it came from a link or an earlier visit and did not pass the quality bar again, so it is not drawn or exported); so has an item kept from before sprites were data, which is never drawn again (it was made with an older version of Loadout).',
     inputSchema: { type: 'object', properties: {}, additionalProperties: false },
   },
   {
@@ -203,7 +218,7 @@ export const ACTIONS = [
   },
   {
     name: 'bag_link', call: 'bag.link', args: [],
-    description: `A link that opens this same bag (items, settings and look) in someone else's browser. An item made on a visit travels with its whole source, so a link is refused when it would be longer than the 8,000 characters that chat and mail apps carry safely: share the download then.`,
+    description: `A link that opens this same bag (items, settings and look) in someone else's browser. An item made on a visit travels with its whole definition, so a link is refused when it would be longer than the 8,000 characters that chat and mail apps carry safely: share the download then.`,
     inputSchema: { type: 'object', properties: {}, additionalProperties: false },
   },
   {
@@ -213,7 +228,7 @@ export const ACTIONS = [
   },
   {
     name: 'bag_download', call: 'bag.download', args: ['options'],
-    description: 'Build the bag as one zip package (sprite sheets, their JSON, WAV files, a manifest and a guide; for an asset made on this visit also its source) and start the browser download. Returns the file names and the size.',
+    description: 'Build the bag as one zip package (sprite sheets, their JSON, WAV files, a manifest and a guide; for a sprite made as data also its definition, <id>.sprite.json; for a sound made on this visit its patch) and start the browser download. Returns the file names and the size.',
     inputSchema: {
       type: 'object',
       properties: {

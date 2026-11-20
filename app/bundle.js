@@ -147,7 +147,8 @@ export async function studioSprite(item) {
   try { [D, F] = await Promise.all([import('../engine/data-sprite.js'), import('../catalog/data-file.js')]); } catch (e) { return { sprite: null, errors: [`the studio's file writer could not be loaded: ${String(e?.message ?? e)}`] }; }
   const r = D.makeDataSprite(item.definition.data);
   if (!r.ok || r.sprite.id !== item.id) return { sprite: null, errors: r.ok ? [`its definition is "${r.sprite.id}", not "${item.id}"`] : r.errors };
-  const file = F.writeDataFile(item.definition.data);
+  // a version 2 definition (a sprite made on a visit is data, build item B11) goes out as itself: <id>.sprite.json (<id>.json is the sheet's list)
+  const file = item.definition.data?.version === 2 ? { ok: true, name: `${r.sprite.id}.sprite.json`, text: `${JSON.stringify(r.sprite.definition, null, 1)}\n` } : F.writeDataFile(item.definition.data);
   if (!file.ok) return { sprite: null, errors: file.errors };
   return { sprite: r.sprite, file: { name: file.name, text: file.text } };
 }
@@ -183,8 +184,10 @@ function unique(taken, base, ext = '') {
  * look instead of the package's; its manifest entry then says `look` (the id) and `theme` (that look, complete).
  * Optional: catalog ({ id: { name, role, type } }), onProgress(text).
  * An item whose asset is not on the site, or whose own file cannot be loaded, is left out and named under "missing".
- * An item made on a visit (it carries `definition`, Contract 11) is packaged like any other; its source goes in next to it
- * (<id>.source.js for a sprite, <id>.source.json for a sound or a track) and the manifest marks it madeOnThisVisit.
+ * A sound or a track made on a visit (it carries `definition`, Contract 11) is packaged like any other; its patch goes in
+ * next to it (<id>.source.json) and the manifest marks it madeOnThisVisit. (A sprite made on a visit is data since build
+ * item B11: it is packaged as a studio sprite is, below, its definition written as <id>.sprite.json; an old item that
+ * holds sprite source text is never run and is named under "needsRemaking".)
  * It is packaged from its own definition: only when that definition has been checked again and is the one the site
  * draws under its id. Otherwise nothing of it goes in, and it is named under "needsRemaking". A made sprite's frames
  * at the item's settings are then put through the quality bar before they are written; one that fails there is left
@@ -260,12 +263,6 @@ export async function packageFiles({ items, theme = null, scale = 1, catalog = n
         a.madeIn = 'studio';
         a.source = `sprites/${folder}/${studio.file.name}`;
         files.push({ name: a.source, data: enc.encode(studio.file.text) });
-        a.files.push(a.source);
-      }
-      if (typeof item.definition?.source === 'string') {
-        a.madeOnThisVisit = true;
-        a.source = `sprites/${folder}/${sprite.id}.source.js`;
-        files.push({ name: a.source, data: enc.encode(item.definition.source) });
         a.files.push(a.source);
       }
       assets.push(a);

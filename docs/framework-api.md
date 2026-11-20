@@ -93,9 +93,9 @@ await loadout.assets.search('money', { kind: 'sound', limit: 5 });  // { ok, tot
 await loadout.assets.similar('coin', 4);                            // { ok, id, assets }
 await loadout.assets.remove('my-star');                             // forget an asset made on this visit; { ok, id, kind }
 
-await loadout.make.sprite(sourceText);     // { id, kind, ok, errors, warnings, kept, replaced }
+await loadout.make.sprite(definition);     // { id, kind, ok, errors, warnings, kept, replaced }; a loadout-sprite version 2 object or its JSON text
 await loadout.make.sound(patchObject);     // { id, kind, ok, errors, warnings, notes, kept, replaced }
-await loadout.check('knight');             // { id, kind, ok, errors, warnings, metrics }; also takes source text or a patch
+await loadout.check('knight');             // { id, kind, ok, errors, warnings, metrics }; also takes a sprite definition or a patch
 await loadout.render('coin', { clip: 'spin', scale: 4 });           // { ok, png, artStyle, width, height, frames, opaque, ... }; { artStyle } picks one of the sprite's art styles
 await loadout.render('coin-pickup', { style: 'Gem' });              // { ok, wav, seconds, sampleRate, peak, ... }
 
@@ -114,77 +114,47 @@ The settings of a bag item and the parts of a look are spelled out in each actio
 
 ### A sprite, start to finish
 
-`make.sprite(source)` takes one ES module as text. This one is complete: it passes the quality bar as it stands.
+`make.sprite(definition)` takes one sprite definition: a JSON object of `"format": "loadout-sprite"`, `"version": 2` (or its JSON text). It is the same form as the site's own data files (`sprites/<id>.json`, e.g. `sprites/coin.json`), and **it is data, never code**: shapes, pixel stamps, and the framework's generators and pieces named by id and version with their arguments. Nothing in it runs. Sprite source text (an ES module with `defineSprite` and `render`) is no longer taken anywhere: `make.sprite` and `check` refuse it and say what to hand over instead.
+
+The quickest start is a sprite that is data already. `assets.get(id)` gives its `definition`; change the id, the name, the words and whatever else, and make it:
 
 ```js
-// A star to collect: it floats, and bursts into sparks when taken.
-import { defineSprite, range, choice, color, toggle } from '../engine/sprite.js';
-import { lerp, wave, clamp, TAU } from '../engine/motion.js';
-import { ramp, INK } from '../engine/color.js';
-import { PALETTE, swatches } from '../engine/palettes.js';
-import { sparkles, particles, steps } from '../engine/fx.js';
+const coin = (await loadout.assets.get('coin')).asset.definition;
+const star = { ...coin, id: 'wish-star', name: 'Wish star',
+  blurb: 'A star to collect: it floats, spins and bursts into sparks when taken.',
+  meta: { ...coin.meta, words: ['star', 'wish', 'collect', 'pickup', 'bonus', 'sparkle', 'spin'] } };
+await loadout.make.sprite(star);           // { id: 'wish-star', kind: 'sprite', ok: true, errors: [], warnings: [], kept: true, replaced: false }
+await loadout.render('wish-star', { clip: 'spin', scale: 4 });
+```
 
-const P = PALETTE.thornwood;
-const CX = 16, CY = 16;
-const star = (cx, cy, r, points, turn) => Array.from({ length: points * 2 }, (_, i) => {
-  const a = turn + (i * TAU) / (points * 2), d = i % 2 ? r * 0.48 : r;
-  return [cx + Math.sin(a) * d, cy - Math.cos(a) * d];
-});
+A definition, in outline (the coin, shortened):
 
-export default defineSprite({
-  id: 'wish-star',                         // lowercase letters, digits, dashes; not an id the catalogue uses
-  name: 'Wish star',
-  kind: 'Item',
-  blurb: 'A star to collect. It floats, and bursts into sparks when it is taken.',
-  meta: { type: 'pickup', role: 'items/pickup', themes: ['fantasy'], gameTypes: ['platformer'], view: 'front',
-          words: ['star', 'wish', 'collect', 'pickup', 'bonus', 'treasure', 'sparkle'], license: 'draft' },
-  size: [32, 32],                          // one frame, in pixels
-  pivot: [16, 28],                         // where it touches the ground
-  grounded: false,                         // it floats
-  preview: 'idle',
-  sounds: { collect: [{ sound: 'wish-chime', frame: 0 }] },      // a sound (by id) on a frame of a clip
-  params: {                                // the controls a person sees; every one must change the picture
-    size: range('Size', 0.5, { lo: 'Small', hi: 'Big' }),
-    points: choice('Points', 'five', ['four', 'five', 'six']),
-    colour: color('Colour', swatches('thornwood', 'gem')[4], swatches('thornwood', 'gem')),
-    glint: toggle('Glints', true),
-    bob: range('Float', 0.5, { lo: 'Still', hi: 'Floaty', group: 'Motion' }),
-    speed: range('Speed', 0.5, { lo: 'Slow', hi: 'Fast', group: 'Motion' }),
-  },
-  clips: {                                 // fps may be a number, or a function of the settings
-    idle: { frames: 8, fps: (p) => 8 * lerp(0.65, 1.45, p.speed), loop: true },
-    collect: { frames: 6, fps: (p) => 12 * lerp(0.65, 1.45, p.speed), loop: false },
-  },
-  // g: the frame to draw on. clip: which animation. t: how far through it, 0..1. p: the settings.
-  render(g, { clip, t, p }) {
-    const n = { four: 4, five: 5, six: 6 }[p.points];
-    const full = lerp(7, 11, p.size);
-    const m = ramp(p.colour);
-    if (clip === 'idle') {
-      const cy = CY - Math.round(lerp(0, 2, p.bob) * wave(t));
-      g.poly(star(CX, cy, full, n, 0), m, { shade: 1, light: 1 });
-      g.outline(INK);
-      if (p.glint) sparkles(g, { t, count: 3, seed: 5, big: false, colours: steps(P.gold), area: [CX - 12, CY - 13, CX + 13, CY + 12] });
-      return;
-    }
-    // collect: the star shrinks away while sparks fly out and settle (no frame of a clip may be empty)
-    const r = full * (1 - clamp(t * 1.4));
-    if (r > 2) { g.poly(star(CX, CY, r, n, t * 2), m, { shade: 1, light: 1 }); g.outline(INK); }
-    particles(g, { t, x: CX, y: CY, count: 8, seed: 2, loop: false, arc: TAU, dist: lerp(8, 12, p.size), size: 2, colours: steps(p.colour) });
-    if (p.glint && t < 0.5) sparkles(g, { t, count: 2, seed: 9, big: false, colours: steps(P.gold), area: [CX - 8, CY - 8, CX + 9, CY + 9] });
-  },
-});
+```json
+{
+  "format": "loadout-sprite", "version": 2,
+  "id": "coin", "name": "Coin", "blurb": "A spinning pickup. Make it a gold coin, a shop token or a gem medal.",
+  "meta": { "type": "pickup", "role": "items/pickup", "themes": ["fantasy"], "gameTypes": ["platformer"], "view": "front",
+            "words": ["coin", "gold", "money", "treasure", "collect", "pickup", "spin"], "license": "draft" },
+  "size": [32, 32], "pivot": [16, 30], "grounded": false, "preview": "spin",
+  "palette": [ { "id": "metal", "label": "Metal", "default": "#f2c230", "material": "metal", "swatches": ["#f2c230", "#c9ced9"] } ],
+  "controls": [ { "key": "size", "kind": "range", "label": "Size", "lo": "Small", "hi": "Big", "default": 0.5 } ],
+  "body": { "pictures": {
+    "nodes": [ { "id": "coin", "parent": null, "at": [16, 16] } ],
+    "draw": [ { "id": "face", "gen": "token", "v": 1, "on": "coin", "size": { "from": "size", "map": [[0, 10], [1, 19]], "round": "px" }, "metal": "metal" },
+              { "kind": "outline", "paint": "ink" } ],
+    "motion": [ { "gen": "pickup.spin", "v": 1, "node": "coin", "clip": ["spin"] } ] } },
+  "clips": { "spin": { "frames": 8, "fps": 10 },
+             "collect": { "frames": 8, "fps": 14, "loop": false, "sounds": [{ "sound": "coin-pickup", "frame": 1 }] } }
+}
 ```
 
 What the parts mean:
 
-- **Imports** are the framework, by relative path as if the text were a file in the site's `sprites/` folder: `'../engine/...'`, `'../rigs/...'`. `(await loadout.api).modules` lists every module with its file and every function with its arguments. Nothing else can be imported: an address on another site, a package name, a `data:` or `blob:` address, or an `import()` whose address is not plain text, is refused with its line number before the source is read.
 - **`meta`** is what the catalogue files it under. The allowed values (types, the role tree, themes, game types, views) are data in the framework: `(await loadout.framework).schema`. A wrong value comes back as an error that lists the right ones.
-- **Controls** are made with `range`, `choice`, `color` and `toggle`. The quality bar draws the sprite at both ends of every slider, at every option and with every switch flipped; a control that changes nothing is an error.
-- **`when`** says that a control only matters sometimes. It goes in the control's options and maps other control keys to the values at which this one is in effect: `inlay: color('Emblem colour', '#c9423a', [...], { when: { emblem: ['star', 'heart'] } })` is in effect only while `emblem` is `'star'` or `'heart'`. Every key listed must match. A list of such objects means any one of them is enough: `when: [{ weapon: ['sword'] }, { headgear: ['helmet'] }]`. A control named in a `when` must itself be in effect for the condition to hold. The site hides a control that is not in effect, and the quality bar then accepts that it changes nothing; a control that does nothing at some setting and does not say so with `when` is an error. An entry of `sounds` may carry the same `when`, to play only at those settings.
-- **`parts`** (not used above) groups the controls of something the sprite holds or wears: `parts: { weapon: { label: 'Weapon', params: ['weapon', 'weaponLength'], none: 'none' } }`. The first key is the selector; at its `none` value the part is off and its other controls are not in effect.
-- **Clips** are animations. `t` runs 0 to 1 over a clip; a looping clip must draw the same picture at `t = 0` and `t = 1`.
-- **`render`** draws one frame with the calls of a `Surface` (`g.poly`, `g.ellipse`, `g.rect`, `g.limb`, `g.outline`, ...) and the helpers (`fx`, `tiles`, `backdrop`, `ui`, the rigs). It must be a pure function of `clip`, `t` and `p`: no random numbers, no clock.
+- **`palette`** names the colour slots and what each is made of (`material`, so a look keeps it what it is); a slot with a `label` is a colour control. **`controls`** are the other controls: `range`, `choice`, `toggle`, each with a `key`. The quality bar draws the sprite at both ends of every slider, at every option and with every switch flipped; a control that changes nothing is an error. **`when`** on a control says it only matters sometimes (`"when": { "emblem": ["star", "heart"] }`): the site hides it otherwise, and the bar accepts that it then changes nothing.
+- **`body`** says how it is drawn, and is one of the body kinds (`pictures`, `rig`, `emitters`, `panel`, `layers`, `tiles`). Inside it, **generators** are named by `gen` and `v` with their arguments, and an argument can follow a control (`{ "from": "size", "map": [[0, 10], [1, 19]] }`). The generators and pieces are a fixed, documented list in the framework; a name that is not on it is refused, with the names that are. `docs/data-sprites.md` is the design of the format; the `/sprite-forge` skill is the how-to.
+- **`clips`** are animations: frames, fps, `loop`, and `sounds` (a sound by id on a frame). A looping clip must draw the same picture at its end as at its start.
+- **Limits**: at most 128 KB of JSON and 20 levels of nesting (refused before anything else reads it, and `__proto__`, `constructor` and `prototype` keys are dropped); every count capped (`SPRITE_LIMITS` in `catalog/sprite-schema.js`: 64 clips, 64 frames a clip, 256 frames, 48 controls, frames up to 640 by 360); and a cost budget for what one frame expands to.
 
 ### A sound patch
 
@@ -226,56 +196,38 @@ What the parts mean:
 
 Make the sound before the sprite that cues it: the sprite's check then finds it by its id.
 
-### Where a made source runs, and what it may do
+### How a made sprite is read and drawn
 
-A sprite's source is a program, and whoever calls `make.sprite` may not have written it (it can also arrive in a shared link). So it **never runs in the page**.
+Whoever calls `make.sprite` may not have written the definition, and it can also arrive in a shared link or from the browser's storage. Since build item B11 that needs no sandbox: a definition is data, so nothing in it can run.
 
-- **It runs in a worker of its own** (`app/sandbox-worker.js`), one per made sprite, which the page starts from memory and can stop at any moment. Before the source is read, the worker's ways to the network, to the site's storage, to other workers and to the page are taken away; what is left is the framework the source imports, and arithmetic. Code that reaches for `window`, `document`, `localStorage` or `fetch` stops with an error, which `make.sprite` returns.
-- **The page gets pixels and data, never functions.** The worker sends what the sprite says about itself (its controls, clips, metadata) as data, which the page checks field by field, and then frames as pixels. The page builds an ordinary sprite definition from that data (`app/made.js`), whose `render` copies those pixels in. Pages, cards, the bag, the playground and the exporter use it as they use a catalogue sprite. Catalogue sprites are untouched: they draw on the page as before.
-- **Art styles** (see "Styles" below). A made sprite may list several. For the pixel style the worker sends pixels. For a style whose surface is not a pixel grid it sends what the sprite drew on that surface as plain data: numbers, lists, and short text with nothing in it that could close a tag or a quote. The page checks it, copies it onto a surface of its own and runs the style's finish and exporters itself. A style is framework code: the page loads the site files the source imports (never the source) so that it knows the style, and imports are kept inside the site's own folder.
-- **Frames are cached by settings.** A setting that is not there yet is asked for and the last look drawn stands in until it arrives (about a millisecond for a small sprite). Code that draws once and keeps the result (the exporter, the playground) first waits for `sprite.prepare(settings)`, or `sprite.whenReady()`.
-- **The quality bar never runs next to the source.** The sprite's worker only loads and draws. The bar (`checkSprite`, unchanged) runs in the site's other background worker (`app/api-worker.js`), which never loads a made source, on a sprite that draws only frames it has been handed (`suppliedSprite` in `app/made.js`). It says which settings it looked at and had no frames for; the page has the sprite's worker draw those, as ordinary drawing requests (the same message a page sends when it draws, so the source cannot tell a check from a draw); and the bar runs again, until it has seen everything it asks for (two rounds and about 80 settings for a small sprite). Those frames stay on the page by settings, so what is shown later at those settings is what was judged.
-- **A download looks again at what it writes.** A bag item's settings are usually ones the bar never drew. So before a made sprite is written, the same bar is run on exactly the frames about to be written (every frame of every clip at the item's settings), and the sheet is made from those same frames. A setting that fails is left out of the package and named with the reason (`refused` in `manifest.json` and in what `bag.download()` returns).
-- **Advice about the code** (does it read pixels back, so that it could not be drawn in another art style) can only come from where the code runs. The sprite's worker gives it, as warnings for whoever wrote the source. It is never part of the verdict.
-- **Every call has a time limit.** Over it the worker is stopped, a fresh one is started for the next call, and the action answers `{ ok: false, errors }`.
-- **The site's content policy** (the `Content-Security-Policy` in `index.html`) allows scripts, connections, images, fonts and styles from the site itself only, plus scripts and workers made in memory (`blob:`) and WebAssembly (the search library). No `eval`, no inline script, no other site. The worker carries the same policy, so even a way out the worker forgot to take away does not reach another site.
+- **The plain-data wall comes first.** Text over 128 KB or nested more than 20 levels is refused before it is parsed; `__proto__`, `constructor` and `prototype` keys are dropped wherever they are (`plainSpriteData` in `catalog/sprite-schema.js`). Only then is anything else read.
+- **The validator checks every field** (`catalog/sprite-schema.js`): every field typed, every name looked up (palette slots, controls, nodes, stamps, generators and pieces with their versions), every count capped, the cost of a frame under a budget. A definition that does not pass is refused with the validator's words, and nothing of it is kept.
+- **The framework draws it on the page** (`engine/data-sprite.js`), with the pieces it names loaded from the site (`engine/pieces.js`). Pages, cards, the bag, the playground and the exporter use it as they use a catalogue sprite.
+- **The quality bar runs in the background** (`app/api-worker.js`), so the page keeps answering. It is handed the definition and draws it there with the same framework code. A sprite made on a visit is drawn in the pixel style only (a data sprite lists no other style yet).
+- **A download looks again at what it writes.** A bag item's settings are usually ones the bar never drew, so before a made sprite is written the bar runs on exactly the frames about to be written (every frame of every clip at the item's settings). A setting that fails is left out of the package and named with the reason (`refused` in `manifest.json` and in what `bag.download()` returns).
+- **The site's content policy** (the `Content-Security-Policy` in `index.html`) allows scripts, workers, connections, images, fonts and styles from the site itself only, and WebAssembly (the search library). No `eval`, no inline script, no script or worker made in memory (`blob:`), no other site.
 - **Sound patches are data** and are checked and rendered as before.
+- **Old bags and links.** A sprite kept as source text from before sprites were data (`{ source }` in the bag, `{ s }` in a link) is never run: the bag lists it as needing re-making, "made with an older version of Loadout; ask for a new link" (Keyang's DQ2), and leaves it out of the download.
 
 | Limit | Value |
 |---|---|
-| Source text | 400,000 characters |
-| One frame | 640 by 360 pixels (the largest frame in the catalogue, a backdrop, is 320 by 180) |
-| Frames in a clip, clips, frames in all | 64, 32, 256 |
+| A definition | 128 KB of JSON, 20 levels of nesting |
+| One frame | 640 by 360 pixels |
+| Frames in a clip, clips, frames in all | 64, 64, 256 |
 | Controls | 48 |
-| Reading the source (its top-level code and its imports) | 10 seconds |
-| Drawing | 300 ms a frame, and never less than 3 seconds for one request |
-| The quality bar on a sprite, with all the drawing it asks for | 60 seconds, 600 settings, 12 rounds |
+| The quality bar on a sprite | 2 minutes in the background worker |
 | The quality bar on a sound effect, on a music track | 60 seconds, 10 minutes |
-| Made sprites kept running at once | 8 (the one used longest ago rests, and starts again when needed) |
 
-What remains, stated plainly:
+What remains: **settings nobody looked at.** The bar samples settings (the defaults, both ends of every slider, every option, seeded mixes, the looks). A definition is judged at those, and a download is judged at what it writes, but a page or the playground can show a setting neither drew. This is a risk to what a picture looks like, not to the visitor's machine or data. Firefox and Safari have not been run against the data path (the installed Playwright browsers did not match); it uses JSON, canvas and module workers only.
 
-1. **Settings nobody looked at.** The bar samples settings (the defaults, both ends of every slider, every option, a dozen seeded mixes, the looks). A source can draw anything at a setting that was never drawn for the bar or for a download, and it can guess which settings those are, since the sampling is in the open. Such a frame can be shown on a page or in the playground. It cannot be downloaded: a download checks what it writes. This is a risk to what a picture looks like, not to the visitor's machine or data.
-2. **A source can tell that many settings are being drawn in a row**, and so guess that it is being checked, from the pattern of requests alone. It gains nothing by it: the frames it sends are the frames that are judged, kept and shown.
-3. **The worker belongs to the site's own origin.** Its ways to the site's own storage (IndexedDB, the cache) are closed by taking them away (`TAKEN` in `app/api-source.js`), which is a list to keep up as browsers add new ones, not a wall. A sandboxed frame with an origin of its own around the worker would be a wall; it needs the host to send the framework files with cross-origin headers.
+### Identity in the bag: the `made` token
 
-### Before a public release: Firefox and Safari
+A sprite made with `make.sprite` carries a **`made` token**: a short hash of the make call (`madeToken` in `app/bag.js`, of the definition the call made). Each bag item of it stores the token. The rules (build item B11b):
 
-Everything above was verified in Chromium only (the one browser installed where it was built, 2026-11-18). **Firefox and Safari have not been tested.** Two facts carry the safety of made sprites, and each must be seen to hold in each browser before the site is public:
-
-1. **A worker started from memory carries the page's content policy.** The policy is a `<meta>` tag, and the worker a made source runs in is started from a `blob:` address so that it inherits it. If a browser does not pass a `<meta>` policy on to such a worker, a made source could load a script from, or connect to, another site through anything the removal list misses. Check: in a module worker made from a `Blob`, `fetch`, `import()`, `XMLHttpRequest` and `WebSocket` to another site, and `eval` and `new Function`, are all refused.
-2. **Every name on the removal list is really gone.** For each name in `TAKEN`: it is `undefined` on the worker's global, and no object the global inherits from still has it (browsers put these on different prototypes). Also check that module workers can `import()` a `blob:` module at all, or `make.sprite` does not work there.
-
-Both are one command away, for every browser Playwright has installed (a missing browser is skipped, with the install command):
-
-```
-npx playwright install firefox webkit
-npx playwright test tests/e2e/route2-browsers.spec.mjs
-```
-
-If either fails in a browser, made sprites must be switched off there (answer `make.sprite` with `ok: false`) until it is fixed; the rest of the site does not depend on them.
-
-Measured 2026-11-18 in Chromium, a 32 by 32 sprite with two clips and 14 frames: `make.sprite` 220 to 235 ms in all (worker start, reading the source, the bar's two rounds in the other worker at 7 ms each, the 80 settings and 1,134 frames it asked to be drawn at about 110 ms, the advice run); with the bar next to the source it was 67 to 84 ms, so judging from frames costs about 150 ms a sprite. Checking it again, its frames already there: 51 ms. A download's look at one made sprite: 30 ms the first time, nothing after. One frame at a new setting 1 ms (5 ms at worst), and 0.1 ms once it is kept; a slider dragged through 61 steps in a second made 66 requests and 91 ms of worker time while the page kept every frame (16.7 ms median, 16.8 ms worst); the playground ran at 60 frames a second with it, the same as without, and asked the worker for nothing while playing.
+- **`make.sprite` changes only the bag items of its own token under its id**: the token of the sprite made under that id on this visit, or this very call's (the definition the bag holds, handed over again). A passing version replaces the definition in every one of them, and they take the new call's token.
+- **It never changes anything else.** An id the bag holds for another sprite (one made in the studio, a studio draft's item, a frozen copy, one from a shared link, or this sprite as made on an earlier visit) is refused: `{ ok: false, kept: false }`, and the item is left as it is. After a reload, hand over the version the bag holds first (`assets.get(id)` gives its `definition`); a new version made after that reaches its items.
+- **Two different definitions never share an id in one bag.** Items share an id only when they carry the same token and hold the same definition. One that comes in under an id another definition holds (a link, storage, the studio) gets a free id (`<id>-2`, ...), as a studio sprite does, and numbered it is a sprite of its own: it loses its token. Of items that already share an id wrongly (stored, or written by another tab), the first keeps it.
+- **What the bag shows is what it downloads.** The site registers, under each id, the definition of the bag item that holds it (`app/bag.js` `followStudio`, `app/catalog.js` `addStudioSprite`); a sprite made on this visit holds its id against any other definition, which the bag then numbers.
 
 ### What an asset made on a visit can do
 
@@ -284,14 +236,14 @@ Once made, it behaves like a catalogue asset until the page is left. `app/api-co
 - **Listed and found**: `assets.list`, `assets.get`, `assets.search` and `assets.similar` include it, with `runtime: true`. (The site's own browse view and search box list the built catalogue only.)
 - **Pages**: `go('/sprite/<id>')`, `/sound/<id>`, `/music/<id>` open it, and every control works. The build never drew it, so its row has no pictures (`thumb: null`) and cards draw it live. On its page, what one more click could ask for (each option of a choice, each switch, each other art style) is drawn ahead, so a click shows at once; a slider shows the last look for the millisecond its new frames take.
 - **Drafts**: one that fails the quality bar is kept as a draft (`ok: false`, with its `errors` in its row). A draft can be rendered and has a page, which says what to fix, but it cannot go in the bag: `bag.add` refuses it and its page has no "Add to bag". Warnings do not block. Make it again under the same id to replace it.
-- **The bag**: `bag.add(id, settings)` stores the item with its whole definition (`definition: { source }` for a sprite, `{ patch }` for a sound or a track).
-- **The bag keeps what passed.** Making an asset again with a passing source updates its bag items. Making it again with a failing source while it is in the bag is refused (`ok: false`, `kept: false`): the asset and the bag stay as they were.
+- **The bag**: `bag.add(id, settings)` stores the item with its whole definition (`definition: { data }` and the `made` token for a sprite, `{ patch }` for a sound or a track).
+- **The bag keeps what passed.** Making an asset again with a passing version updates its bag items (for a sprite, those of its token: see above). Making it again with a failing version while it is in the bag is refused (`ok: false`, `kept: false`): the asset and the bag stay as they were.
 - **A failed save is reported.** When the browser's storage for the site is full, `bag.add`, `bag.update` and `bag.setLook` answer `ok: false` and change nothing, and the bag page says that the bag could not be saved.
-- **After a reload, or from a link, nothing is trusted.** (The bag page tells a visitor this in plain words: an item that came broken from a link says to ask the sender for a new one, with what the check found folded under "Details". The `errors` and `reason` in `window.loadout` results are the checker's own words, for whoever can re-make it.) A stored definition is text that anyone could have put there. The site draws its pages first; then each such item is loaded and put through the whole quality bar again, in a worker, with the same limits. Until then it is "checking" (`bag.items()` waits for this). One that passes is known to the site again. One that fails, or runs over a limit, **needs re-making**: the bag page lists it by name with the reason, `bag.items()` gives it `state: 'needs re-making'` and `reason`, and nothing of it is drawn or exported.
-- **A shared bag link** carries the definitions too. A link that holds a made sprite is never opened silently: the bag page says so and waits for the visitor to agree, and what arrives is then checked as above. A link is limited to 8,000 characters (`LINK_LIMIT` in `app/bag.js`), because chat and mail apps cut longer ones short; over that, "Copy link" and `bag.link()` explain and point at the download. Measured: a small pickup (2,800 characters of source) and its sound make a link of 6,700 characters, so a bag with more than one or two made assets is shared as a download, not a link.
+- **After a reload, or from a link, nothing is trusted.** (The bag page tells a visitor this in plain words: an item that came broken from a link says to ask the sender for a new one, with what the check found folded under "Details". The `errors` and `reason` in `window.loadout` results are the checker's own words, for whoever can re-make it.) A stored definition is text that anyone could have put there. A sprite's is data: the bag and the catalogue put it through the plain-data wall and the validator again before it is drawn, and one that does not pass is left out. A sound's patch is put through the whole quality bar again, in a worker, with the same limits, after the site has drawn its pages. Until then it is "checking" (`bag.items()` waits for this). One that passes is known to the site again. One that fails, or runs over a limit, **needs re-making**: the bag page lists it by name with the reason, `bag.items()` gives it `state: 'needs re-making'` and `reason`, and nothing of it is drawn or exported.
+- **A shared bag link** carries the definitions too (a sprite as `{ d: data, m: token }`; such a link is deflated), and what arrives is checked as above. A link is limited to 8,000 characters (`LINK_LIMIT` in `app/bag.js`), because chat and mail apps cut longer ones short; over that, "Copy link" and `bag.link()` explain and point at the download.
 - **The playground** takes it from the bag like anything else: a pickup is collected and its cued sound plays.
-- **The download** holds what the bag stored. A made item goes in only when its own definition is the one that was checked, and its frames at the item's settings pass the bar when they are about to be written (otherwise it is named under `refused`); its sheet, JSON and WAV files are then made as for any asset, its source goes in next to them (`sprites/<id>/<id>.source.js`, `sounds/<id>.source.json`), and its entry in `manifest.json` has `madeOnThisVisit: true` and `source` (the path of that file). Items that need re-making are left out and named: `needsRemaking` in the manifest and in what `bag.download()` returns.
-- **`assets.remove(id)`** forgets it and stops its worker. It refuses a catalogue asset, and an asset that is still in the bag.
+- **The download** holds what the bag stored. A made item goes in only when its own definition is the one that was checked, and its frames at the item's settings pass the bar when they are about to be written (otherwise it is named under `refused`); its sheet, JSON and WAV files are then made as for any asset, and its definition goes in next to them: a sprite's as `sprites/<id>/<id>.sprite.json` (`<id>.json` is the sheet's animation list; its manifest entry has `madeIn` and `source`, the path of that file), a sound's as `sounds/<id>.source.json` (its entry has `madeOnThisVisit: true` and `source`). Items that need re-making are left out and named: `needsRemaking` in the manifest and in what `bag.download()` returns.
+- **`assets.remove(id)`** forgets it. It refuses a catalogue asset, and an asset that is still in the bag.
 
 ### For an MCP server
 
@@ -309,7 +261,7 @@ const result = await window.loadout.call(name, input);
 
 `loadout.call` refuses an unknown tool or an unknown input property with `{ ok: false, errors }`, like every other action. The result is plain data and can be returned as the tool result as it is. Pictures and sounds come back as `data:` addresses (`png`, `wav`, `zip`).
 
-The framework functions are not tools. An agent uses them by writing sprite source text for `make_sprite` that imports them (that source runs in a worker, as above), or by evaluating code of its own in the page against `await loadout.framework`. `(await loadout.api).modules` is what to show the agent so it knows what exists; the two sections above ("A sprite, start to finish" and "A sound patch") are what to show it so it knows what to write.
+The framework functions are not tools. An agent uses them by naming the framework's generators and pieces in a sprite definition for `make_sprite` (data, as above), or by evaluating code of its own in the page against `await loadout.framework`. `(await loadout.api).modules` is what to show the agent so it knows what exists; the two sections above ("A sprite, start to finish" and "A sound patch") are what to show it so it knows what to write.
 
 ## Styles
 

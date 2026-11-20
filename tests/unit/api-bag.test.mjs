@@ -1,5 +1,6 @@
 // The bag keeps the whole definition of an asset made on a visit (Contract 11), so the asset is still there after a
-// reload and travels in a shared link: sprite source text, or a sound patch. app/bag.js runs in Node.
+// reload and travels in a shared link: a sound patch, or (before build item B11) sprite source text, which the site now
+// keeps only to say it was made with an older version of Loadout (app/api.js madeItemState; Keyang's DQ2). app/bag.js runs in Node.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createBag, memoryStorage, LINK_LIMIT, MAX_SOURCE } from '../../app/bag.js';
@@ -47,7 +48,7 @@ test('a shared link carries the definitions and gives them back', () => {
   from.add(gem()); from.add(chime()); from.add({ kind: 'sprite', id: 'knight', settings: {} });
   const link = from.toLink();
   const to = createBag(memoryStorage());
-  assert.deepEqual(to.peekLink(link), { count: 3, made: 2, code: 1 });
+  assert.deepEqual(to.peekLink(link), { count: 3, made: 2, old: 1 }, 'source text is no longer a program that runs: it is counted as old (B11, DQ2)');
   assert.equal(to.fromLink(link), 3);
   assert.deepEqual(to.items().map((i) => [i.kind, i.id, i.definition ?? null]), [['sprite', 'my-gem', { source: SOURCE }], ['sound', 'my-chime', { patch: PATCH }], ['sprite', 'knight', null]]);
   assert.deepEqual(to.items()[0].settings, from.items()[0].settings);

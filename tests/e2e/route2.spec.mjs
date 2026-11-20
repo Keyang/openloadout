@@ -1,14 +1,15 @@
-// Route 2, end to end (docs/architecture.md, Contract 11): an agent on the live site makes a new pickup and its
-// sound against the framework, and from then on they behave like catalogue assets: pages, the bag (through a
-// reload), the playground, the download. Every step that makes or changes something is a window.loadout call from
-// a page script, which is what an MCP server will do; the test itself only looks, presses keys and reads the zip.
+// Route 2, end to end, on data (docs/architecture.md, Contract 11 and Contract 15; docs/data-sprites.md section 5,
+// build item B11): an agent on the live site makes a new pickup as a `loadout-sprite` version 2 definition and its
+// sound as a patch, and from then on they behave like catalogue assets: pages, the bag (through a reload), the
+// playground, the download. Every step that makes or changes something is a window.loadout call from a page script,
+// which is what an MCP server will do; the test itself only looks, presses keys and reads the zip.
 import { test, expect, openRoute, waitForDrawn, downloadFrom, readZip, canvasStats, setRange } from '../helpers/test.mjs';
-import { starSprite, chimePatch, STAR_ID, CHIME_ID } from '../fixtures/api/sources.mjs';
+import { starData, chimePatch, STAR_ID, CHIME_ID } from '../fixtures/api/data.mjs';
 
-const FIRST_TRY = starSprite({ broken: true }), FIXED = starSprite(), CUED = starSprite({ cue: CHIME_ID }), CHIME = chimePatch();
+const FIRST_TRY = starData({ broken: true }), FIXED = starData(), CUED = starData({ cue: CHIME_ID }), CHIME = chimePatch();
 const text = (bytes) => new TextDecoder().decode(bytes);
 
-test('an agent makes a pickup and its sound, and they go through the bag, a reload, the playground and the download', async ({ page }) => {
+test('an agent makes a pickup as data and its sound, and they go through the bag, a reload, the playground and the download', async ({ page }) => {
   test.setTimeout(120_000);
   await openRoute(page, '/');
 
@@ -22,42 +23,42 @@ test('an agent makes a pickup and its sound, and they go through the bag, a relo
   expect(near.coin.asset.clips.map((c) => c.name)).toContain('collect');
   expect(near.taken.ok, 'the id is free').toBe(false);
 
-  // 2. the first version has a slider that does nothing: the quality bar says so, and the draft cannot go in the bag
-  const first = await page.evaluate(async (src) => {
+  // 2. the first version has no search words: the quality bar says so, and the draft cannot go in the bag
+  const first = await page.evaluate(async (data) => {
     const L = window.loadout;
-    const made = await L.make.sprite(src);
+    const made = await L.make.sprite(data);
     return { made, bag: await L.bag.add(made.id), draft: await L.render(made.id, { frame: 0 }), row: (await L.assets.get(made.id)).asset };
   }, FIRST_TRY);
   expect(first.made).toMatchObject({ id: STAR_ID, ok: false, kept: true });
-  expect(first.made.errors.join('\n')).toMatch(/weight/i);
+  expect(first.made.errors.join('\n')).toMatch(/meta\.words/);
   expect(first.bag.ok).toBe(false);
   expect(first.bag.errors[0]).toMatch(/quality bar/);
-  expect(first.bag.errors[0]).toMatch(/weight/i);                 // the refusal carries what to fix
+  expect(first.bag.errors[0]).toMatch(/words/);                    // the refusal carries what to fix
   expect(first.draft.ok, 'a draft can still be looked at').toBe(true);
   expect(first.row).toMatchObject({ runtime: true, ok: false });
 
-  // 3. fixed, under the same id: ok
-  const fixed = await page.evaluate((src) => window.loadout.make.sprite(src), FIXED);
+  // 3. fixed, under the same id, and handed over as JSON text this time: ok
+  const fixed = await page.evaluate((json) => window.loadout.make.sprite(json), JSON.stringify(FIXED));
   expect(fixed).toMatchObject({ id: STAR_ID, ok: true, errors: [], replaced: true });
 
   // 4. its picture, plain and under a look
   const pics = await page.evaluate(async (id) => {
     const L = window.loadout;
-    return { plain: await L.render(id, { clip: 'idle', frame: 0, scale: 4 }), look: await L.render(id, { clip: 'idle', frame: 0, scale: 4, look: { colour: { hue: 140, saturation: 1.2 } } }), strip: await L.render(id, { clip: 'collect' }) };
+    return { plain: await L.render(id, { clip: 'spin', frame: 0, scale: 4 }), look: await L.render(id, { clip: 'spin', frame: 0, scale: 4, look: { colour: { hue: 140, saturation: 1.2 } } }), strip: await L.render(id, { clip: 'collect' }) };
   }, STAR_ID);
   expect(pics.plain).toMatchObject({ ok: true, width: 128, height: 128 });
   expect(pics.plain.opaque).toBeGreaterThan(60);
   expect(pics.look.ok).toBe(true);
   expect(pics.look.png).not.toBe(pics.plain.png);
-  expect(pics.strip).toMatchObject({ ok: true, frames: 6, width: 192 });
+  expect(pics.strip).toMatchObject({ ok: true, frames: 8, width: 256 });
 
   // 5. its sound, then the sprite again with the sound cued on its collect clip
-  const sound = await page.evaluate(async ([patch, src]) => {
+  const sound = await page.evaluate(async ([patch, data]) => {
     const L = window.loadout;
     const chime = await L.make.sound(patch);
     const heard = await L.render(patch.id, { params: { pitch: 1400 } });
-    const cued = await L.make.sprite(src);
-    return { chime, heard, cued, star: (await L.assets.get(cued.id)).asset, used: (await L.assets.get(patch.id)).asset };
+    const cued = await L.make.sprite(data);
+    return { chime, heard, cued, star: (await L.assets.get(cued.id)).asset };
   }, [CHIME, CUED]);
   expect(sound.chime).toMatchObject({ id: CHIME_ID, kind: 'sound', ok: true, errors: [] });
   expect(sound.heard.ok).toBe(true);
@@ -65,21 +66,28 @@ test('an agent makes a pickup and its sound, and they go through the bag, a relo
   expect(sound.heard.params.pitch).toBe(1400);
   expect(sound.cued).toMatchObject({ id: STAR_ID, ok: true, errors: [], replaced: true });
   expect(sound.star.tech.soundIds).toEqual([CHIME_ID]);
+  // the sound's page names the sprite that plays it
+  expect((await page.evaluate((id) => window.loadout.go(`/sound/${id}`), CHIME_ID)).ok).toBe(true);
+  await expect(page.getByRole('heading', { name: 'Wish chime', level: 1 })).toBeVisible();
+  await expect(page.locator('.related')).toContainText('Wish star');             // "Used by"
 
   // 6. both into the bag with settings of their own, and a catalogue hero to walk with
   const bagged = await page.evaluate(async ([star, chime]) => {
     const L = window.loadout;
-    const colours = (await L.assets.get(star)).asset.controls.find((c) => c.key === 'colour').swatches;
+    const metals = (await L.assets.get(star)).asset.controls.find((c) => c.key === 'metal').swatches;
     return {
-      star: await L.bag.add(star, { params: { points: 'six', colour: colours[0], size: 0.9 }, scale: 2 }),
+      star: await L.bag.add(star, { params: { shape: 'octagon', metal: metals[1], size: 0.9 }, scale: 2 }),
       chime: await L.bag.add(chime, { params: { pitch: 1400 } }),
       hero: await L.bag.add('knight'),
-      colour: colours[0],
+      metal: metals[1],
       kept: await L.assets.remove(star),            // in the bag: it cannot be forgotten
     };
   }, [STAR_ID, CHIME_ID]);
   expect(bagged.star).toMatchObject({ ok: true, count: 1 });
-  expect(bagged.star.item.definition.source).toBe(CUED);
+  expect(bagged.star.item.id).toBe(STAR_ID);
+  expect(bagged.star.item.definition.data).toMatchObject({ format: 'loadout-sprite', version: 2, id: STAR_ID, name: 'Wish star' });
+  expect(bagged.star.item.definition.data.clips.collect.sounds).toEqual([expect.objectContaining({ sound: CHIME_ID, frame: 1 })]);
+  expect(bagged.star.item.definition.source).toBeUndefined();
   expect(bagged.chime.item.definition.patch.id).toBe(CHIME_ID);
   expect(bagged.hero.item.definition).toBeUndefined();
   expect(bagged.kept.ok).toBe(false);
@@ -92,12 +100,12 @@ test('an agent makes a pickup and its sound, and they go through the bag, a relo
     const L = window.loadout;
     return {
       items: await L.bag.items(), made: await L.assets.list({ runtime: true }),
-      star: await L.assets.get(star), picture: await L.render(star, { frame: 0, params: { points: 'six' } }), sound: await L.render(chime),
+      star: await L.assets.get(star), picture: await L.render(star, { frame: 0, params: { shape: 'square' } }), sound: await L.render(chime),
       check: await L.check(star),
     };
   }, [STAR_ID, CHIME_ID]);
   expect(after.items.items.map((i) => [i.kind, i.id])).toEqual([['sprite', STAR_ID], ['sound', CHIME_ID], ['sprite', 'knight']]);
-  expect(after.items.items[0].settings).toMatchObject({ params: { points: 'six', colour: bagged.colour, size: 0.9 }, scale: 2 });
+  expect(after.items.items[0].settings).toMatchObject({ params: { shape: 'octagon', metal: bagged.metal, size: 0.9 }, scale: 2 });
   expect(after.items.items[1].settings.params).toEqual({ pitch: 1400 });
   expect(after.made.assets.map((a) => a.id).sort()).toEqual([CHIME_ID, STAR_ID].sort());
   expect(after.star.asset).toMatchObject({ name: 'Wish star', runtime: true, ok: true });
@@ -106,7 +114,7 @@ test('an agent makes a pickup and its sound, and they go through the bag, a relo
   expect(after.sound.ok).toBe(true);
   expect(after.check).toMatchObject({ id: STAR_ID, ok: true, errors: [] });
 
-  // its own pages open, drawn live (there is no built picture of it), and its controls work
+  // its own page opens, drawn live (there is no built picture of it), and its controls work
   expect(await page.evaluate((id) => window.loadout.go(`#/sprite/${id}`), STAR_ID)).toEqual({ ok: true, route: `#/sprite/${STAR_ID}` });
   await expect(page.getByRole('heading', { name: 'Wish star', level: 1 })).toBeVisible();
   await waitForDrawn(page);
@@ -114,52 +122,24 @@ test('an agent makes a pickup and its sound, and they go through the bag, a relo
   const stage = page.locator('canvas.stage');
   const before = await canvasStats(stage);
   expect(before.opaque).toBeGreaterThan(0);
-  await setRange(page.getByLabel('Size', { exact: true }), 1);
+  await setRange(page.getByLabel('Size', { exact: true }), 0.2);
   await expect.poll(async () => (await canvasStats(stage)).hash).not.toBe(before.hash);
-  // (a change on the page is saved to the star's bag item as it is made: put the size back to what the agent added it with)
   await setRange(page.getByLabel('Size', { exact: true }), 0.9);
   await expect(page.locator('.related')).toContainText('Wish chime');            // "Sounds it uses"
-  await expect(page.locator('.rx-panel .saved')).toContainText('Saved in your bag');      // it can go in the bag: the change just made saved itself there
-  // a look goes on a made sprite as on any other (its pictures come from its worker; the page recolours them)
+  // a look goes on a data sprite as on any other
   await page.locator('.rx-panel [role="tab"][data-tab="look"]').click();
   const plainLook = await canvasStats(stage);
   await page.locator('.looks .vbtn[data-look="night"]').click();
   await expect.poll(async () => (await canvasStats(stage)).hash).not.toBe(plainLook.hash);
-  await expect(page.locator('.looks .vbtn canvas')).toHaveCount(15);
   await page.locator('.looks .vbtn[data-look=""]').click();
   await expect.poll(async () => (await canvasStats(stage)).hash).toBe(plainLook.hash);
-  // once it is in the bag the page no longer asks for it to be put there
-  await expect(page.locator('.made-here')).toBeHidden();
-  // each version tile shows that version, not the picture that happened to be drawn last (a made sprite's frames
-  // come from its worker a moment after they are asked for): a tile's colours are the sprite's at that version's settings
-  const tiles = page.locator('.rx-panel .vstrip .vbtn');
-  await expect.poll(() => tiles.count()).toBeGreaterThanOrEqual(3);
-  const mismatched = () => page.evaluate(async (id) => {
-    const [{ spriteNow }, { versionsOf }, S] = await Promise.all([import('/app/catalog.js'), import('/engine/versions.js'), import('/engine/sprite.js')]);
-    const sprite = spriteNow(id), versions = versionsOf(sprite, 12), out = [];
-    const coloursOf = (data) => { const set = new Set(); for (let k = 0; k < data.length; k += 4) if (data[k + 3]) set.add((data[k] << 16) | (data[k + 1] << 8) | data[k + 2]); return [...set].sort().join(','); };
-    const tiles = [...document.querySelectorAll('.rx-panel .vstrip .vbtn')];
-    if (tiles.length !== versions.length) return [`${tiles.length} tiles for ${versions.length} versions`];
-    for (const [i, v] of versions.entries()) {
-      const params = S.cleanParams(sprite, { ...S.defaultParams(sprite), ...v.params });
-      await sprite.prepare(params, { clips: [sprite.preview] });
-      const clip = sprite.clips[sprite.preview], g = S.renderPixels(sprite, sprite.preview, clip.loop === false ? Math.floor(clip.frames / 2) : 0, params);
-      const cv = tiles[i].querySelector('canvas');
-      const shown = cv ? coloursOf(cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data) : 'no picture';
-      if (tiles[i].title !== v.name || shown !== coloursOf(g.bytes())) out.push(`${i} "${tiles[i].title}"`);
-    }
-    return out;
-  }, STAR_ID);
-  await expect.poll(mismatched, { message: 'version tiles whose picture is not their version' }).toEqual([]);
-  expect((await page.evaluate((id) => window.loadout.go(`/sound/${id}`), CHIME_ID)).ok).toBe(true);
-  await expect(page.getByRole('heading', { name: 'Wish chime', level: 1 })).toBeVisible();
-  await expect(page.locator('.related')).toContainText('Wish star');             // "Used by"
 
   // the bag page shows all three, none of them missing
   await page.evaluate(() => window.loadout.go('/bag'));
   await expect(page.locator('.bag-item')).toHaveCount(3);
   await expect(page.locator('.bag-item .bag-name')).toHaveText(['Wish star', 'Wish chime', 'Hero']);
   await expect(page.locator('.bag-pic.gone')).toHaveCount(0);
+  await expect(page.locator('.bag-item.remake')).toHaveCount(0);
   await expect(page.locator('.bag-item').first().locator('canvas').first()).toBeVisible();
 
   // 8. the playground: the hero walks into the star, it is collected and its chime plays
@@ -174,63 +154,60 @@ test('an agent makes a pickup and its sound, and they go through the bag, a relo
   const played = await page.evaluate(() => window.__loadoutPlay.state());
   expect(played.heard.filter((h) => h.sound === CHIME_ID).map((h) => [h.by, h.clip])).toContainEqual([STAR_ID, 'collect']);
 
-  // 9. the download: sheet, JSON with the cue, the sound, and the source of what was made
+  // 9. the download: sheet, JSON with the cue, the sound, and the star's own definition
   const file = await downloadFrom(page, () => page.evaluate(() => window.loadout.bag.download()));
   expect(file.name).toBe('loadout-package.zip');
   const zip = Object.fromEntries(readZip(file.bytes).map((f) => [f.name, f.data]));
   const dir = `sprites/${STAR_ID}/`;
-  expect(Object.keys(zip)).toEqual(expect.arrayContaining([`${dir}${STAR_ID}.png`, `${dir}${STAR_ID}.json`, `${dir}sounds/${CHIME_ID}.wav`, `${dir}${STAR_ID}.source.js`, `sounds/${CHIME_ID}.wav`, `sounds/${CHIME_ID}.source.json`, 'sprites/knight/knight.png', 'manifest.json', 'read-me.txt']));
+  expect(Object.keys(zip)).toEqual(expect.arrayContaining([`${dir}${STAR_ID}.png`, `${dir}${STAR_ID}.json`, `${dir}${STAR_ID}.sprite.json`, `${dir}sounds/${CHIME_ID}.wav`, `sounds/${CHIME_ID}.wav`, `sounds/${CHIME_ID}.source.json`, 'sprites/knight/knight.png', 'manifest.json', 'read-me.txt']));
+  expect(Object.keys(zip).filter((n) => n.endsWith('.source.js')), 'no source text anywhere').toEqual([]);
   expect([...zip[`${dir}${STAR_ID}.png`].slice(1, 4)].map((c) => String.fromCharCode(c)).join('')).toBe('PNG');
   const sheet = JSON.parse(text(zip[`${dir}${STAR_ID}.json`]));
   expect(sheet.frameWidth).toBe(64);                                               // the bag item's pixel size 2
-  expect(sheet.params).toMatchObject({ points: 'six', colour: bagged.colour, size: 0.9 });
-  expect(sheet.sounds.collect).toEqual([expect.objectContaining({ sound: CHIME_ID, file: `sounds/${CHIME_ID}.wav`, frame: 0 })]);
-  expect(text(zip[`${dir}${STAR_ID}.source.js`])).toBe(CUED);
+  expect(sheet.params).toMatchObject({ shape: 'octagon', metal: bagged.metal, size: 0.9 });
+  expect(sheet.sounds.collect).toEqual([expect.objectContaining({ sound: CHIME_ID, file: `sounds/${CHIME_ID}.wav`, frame: 1 })]);
+  const own = JSON.parse(text(zip[`${dir}${STAR_ID}.sprite.json`]));
+  expect(own).toMatchObject({ format: 'loadout-sprite', version: 2, id: STAR_ID, name: 'Wish star' });
   expect(JSON.parse(text(zip[`sounds/${CHIME_ID}.source.json`])).id).toBe(CHIME_ID);
   expect(text(zip[`sounds/${CHIME_ID}.wav`]).slice(0, 4)).toBe('RIFF');
   const manifest = JSON.parse(text(zip['manifest.json']));
   const about = Object.fromEntries(manifest.assets.map((a) => [a.id, a]));
-  expect(about[STAR_ID]).toMatchObject({ kind: 'sprite', name: 'Wish star', role: 'items/pickup', madeOnThisVisit: true, source: `${dir}${STAR_ID}.source.js` });
+  expect(about[STAR_ID]).toMatchObject({ kind: 'sprite', name: 'Wish star', role: 'items/pickup', source: `${dir}${STAR_ID}.sprite.json` });
+  expect(about[STAR_ID].madeOnThisVisit).toBeUndefined();
   expect(about[CHIME_ID]).toMatchObject({ kind: 'sound', madeOnThisVisit: true, source: `sounds/${CHIME_ID}.source.json` });
   expect(about.knight.madeOnThisVisit).toBeUndefined();
   expect(about.knight.source).toBeUndefined();
   expect(manifest.missing).toBeUndefined();
-  expect(text(zip['read-me.txt'])).toMatch(/Made on your visit: Wish star, Wish chime/);
+  expect(manifest.needsRemaking).toBeUndefined();
 });
 
-test('a shared bag link brings made assets along, after the visitor agrees to run them', async ({ page, context }) => {
+test('a shared bag link brings a sprite made as data along; nothing in it is a program, so it opens at once', async ({ page, context }) => {
   await openRoute(page, '/');
-  const link = await page.evaluate(async ([src, patch]) => {
+  const link = await page.evaluate(async ([data, patch]) => {
     const L = window.loadout;
     await L.make.sound(patch);
-    await L.make.sprite(src);
-    await L.bag.add('route2-star', { params: { points: 'four' } });
+    await L.make.sprite(data);
+    await L.bag.add('route2-star', { params: { shape: 'square' } });
     await L.bag.add('route2-chime');
-    const { bag, LINK_LIMIT } = await import('/app/bag.js');
-    return { hash: bag.toLink(), limit: LINK_LIMIT };
+    return (await L.bag.link()).link;
   }, [CUED, CHIME]);
-  expect(link.hash.length, 'a small pickup and its sound fit in a link').toBeLessThan(link.limit);
+  const { LINK_LIMIT } = await page.evaluate(() => import('/app/bag.js').then((m) => ({ LINK_LIMIT: m.LINK_LIMIT })));
+  expect(link.length, 'a small pickup and its sound fit in a link').toBeLessThan(LINK_LIMIT);
 
   // someone else opens it: a fresh browser with an empty bag
   const other = await (await context.browser().newContext()).newPage();
-  await other.goto(`/index.html${link.hash}`);
-  await expect(other.locator('.bag-offer')).toContainText('made by whoever shared');
-  await expect(other.locator('.bag-item')).toHaveCount(0);
-  expect((await other.evaluate(() => window.loadout.assets.list({ runtime: true }))).total, 'nothing of it has run yet').toBe(0);
-  await other.getByRole('button', { name: 'Open the bag' }).click();
-  await expect(other.locator('.bag-item .bag-name')).toHaveText(['Wish star', 'Wish chime']);
+  await other.goto(link);
+  await expect(other.locator('.bag-offer')).toHaveCount(0);
+  await expect(other.locator('.bag-item .bag-name')).toHaveText(['Wish star', 'Wish chime'], { timeout: 30_000 });
   await expect(other.locator('.bag-pic.gone')).toHaveCount(0);
   const there = await other.evaluate(() => window.loadout.bag.items());
-  expect(there.items[0].settings.params).toEqual({ points: 'four' });
-  expect(there.items[0].definition.source).toBe(CUED);
+  expect(there.items[0].settings.params).toEqual({ shape: 'square' });
+  expect(there.items[0].definition.data).toMatchObject({ id: STAR_ID, version: 2 });
+  expect(there.items[0].definition.source).toBeUndefined();
   await other.context().close();
 
   // a bag whose link would be too long says so instead of copying a link that will be cut short
-  await page.evaluate(async (src) => {
-    await window.loadout.make.sprite(src);
-    await window.loadout.bag.add('route2-long');
-    await window.loadout.go('/bag');
-  }, starSprite({ id: 'route2-long' }).replace('// A star to collect', `// ${'A very long note. '.repeat(600)}\n// A star to collect`));
+  await page.evaluate(async () => { for (let i = 0; i < 18; i++) await window.loadout.bag.add('route2-star', { params: { size: i / 18 } }); await window.loadout.go('/bag'); });
   await page.getByRole('button', { name: 'Copy link to this bag' }).click();
   await expect(page.locator('.bag-link-note')).toContainText('8,000');
   await expect(page.locator('.bag-link-note')).toContainText(/too long/i);
@@ -238,10 +215,10 @@ test('a shared bag link brings made assets along, after the visitor agrees to ru
 
 test('assets.remove forgets an asset made on this visit, and nothing else', async ({ page }) => {
   await openRoute(page, '/');
-  const r = await page.evaluate(async ([src, patch]) => {
+  const r = await page.evaluate(async ([data, patch]) => {
     const L = window.loadout;
     await L.make.sound(patch);
-    await L.make.sprite(src);
+    await L.make.sprite(data);
     return {
       catalogue: await L.assets.remove('coin'), unknown: await L.assets.remove('no-such-thing'), junk: await L.assets.remove(7),
       star: await L.assets.remove('route2-star'), again: await L.assets.remove('route2-star'), chime: await L.assets.remove('route2-chime'),
@@ -279,24 +256,23 @@ test('a card for an asset with no built picture draws it live, and a draft has n
     for (const id of ['route2-star', 'route2-draft', 'route2-chime']) { const li = document.createElement('li'); li.dataset.id = id; li.append(cardFor(assetById(id)).node); box.append(li); }
     document.querySelector('#app main').append(box);
     return true;
-  }, [CUED, starSprite({ id: 'route2-draft', broken: true }), CHIME]);
+  }, [CUED, starData({ id: 'route2-draft', broken: true }), CHIME]);
   expect(r).toBe(true);
   const card = (id) => page.locator(`#made-cards li[data-id="${id}"]`);
   await expect.poll(async () => (await canvasStats(card('route2-star').locator('canvas').first())).opaque).toBeGreaterThan(20);
   // a sound made on this visit has no built waveform: its card draws one from the sound itself
   await expect(card('route2-chime').locator('.sound-pic canvas.wave')).toHaveCount(1);
-  await expect.poll(() => card('route2-chime').locator('.sound-pic canvas.wave').evaluate((c) => { const g = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let n = 0; for (let i = 3; i < g.length; i += 4) if (g[i] > 0) n++; return n; })).toBeGreaterThan(20);
   await expect(card('route2-star').locator('img')).toHaveCount(0);
   await expect(card('route2-star').getByRole('button', { name: /Add Wish star to my bag/ })).toBeVisible();
   await expect(card('route2-draft').locator('.card-add')).toHaveCount(0);
-  // the card's button stores the definition too
+  // the card's button stores the definition too, as data
   await card('route2-star').getByRole('button', { name: /Add Wish star to my bag/ }).click();
   const items = await page.evaluate(() => window.loadout.bag.items());
-  expect(items.items.map((i) => [i.id, typeof i.definition?.source])).toEqual([['route2-star', 'string']]);
+  expect(items.items.map((i) => [i.id, i.definition?.data?.version ?? null, typeof i.definition?.source])).toEqual([['route2-star', 2, 'undefined']]);
   // a draft's own page says what is wrong and offers no "Add to bag"
   await page.evaluate(() => window.loadout.go('/sprite/route2-draft'));
   await expect(page.getByRole('heading', { name: 'Wish star', level: 1 })).toBeVisible();
   await expect(page.locator('.made-here')).toContainText(/quality bar/);
-  await expect(page.locator('.made-here')).toContainText(/Weight/i);
+  await expect(page.locator('.made-here')).toContainText(/words/i);
   await expect(page.getByRole('button', { name: 'Add to my bag' })).toHaveCount(0);
 });

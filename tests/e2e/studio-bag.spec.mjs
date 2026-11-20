@@ -132,7 +132,7 @@ test('a studio sprite travels in a deflated link and opens in another browser, c
     const n = await bag.fromLinkAsync(url);
     return { peek, n, items: bag.items() };
   }, link.url);
-  expect(opened.peek).toEqual({ count: 1, made: 1, code: 0, studio: 1 });
+  expect(opened.peek).toEqual({ count: 1, made: 1, studio: 1 });
   expect(opened.n).toBe(1);
   expect(opened.items[0]).toMatchObject({ id: ID, from: 'link' });
   expect(opened.items[0].draft).toBeUndefined();
