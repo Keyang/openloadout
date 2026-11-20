@@ -102,7 +102,8 @@ test('the site registry (engine/gen/index.js) lists its first generators, each d
   for (const k of ['twinkle@1', 'mark@1', 'row@1']) assert.ok(keys.includes(k), k);
   for (const g of gen.generators()) {
     assert.match(g.about, /^[A-Z].*\.$/, `${g.key}: about is one sentence`);
-    assert.ok(Object.keys(g.args).length > 0, `${g.key} takes arguments`);
+    // A motion may take none: node.hide@1 is placed by its call's own `when` and `clip` (F4).
+    if (g.family !== 'motion') assert.ok(Object.keys(g.args).length > 0, `${g.key} takes arguments`);
   }
   const d = gen.describeGenerators();
   assert.equal(d.generators.length, keys.length);
