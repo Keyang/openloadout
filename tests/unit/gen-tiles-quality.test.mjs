@@ -11,8 +11,9 @@ import { dataSprite } from '../../engine/data-sprite.js';
 import { checkSprite } from '../../quality/sprite.js';
 import { validateMeta } from '../../catalog/schema.js';
 import { testPieces } from '../fixtures/resolve/helpers.mjs';
-import caveCode from '../../sprites/tiles-cave.js';
-import dungeonCode from '../../sprites/tiles-dungeon.js';
+import { codeSprite } from '../helpers/library.mjs';
+const caveCode = await codeSprite('tiles-cave');         // the frozen copies: the library's are data since migration batch M5
+const dungeonCode = await codeSprite('tiles-dungeon');
 
 const FIX = new URL('../fixtures/v2/', import.meta.url);
 const load = (p) => JSON.parse(fs.readFileSync(new URL(p, FIX), 'utf8'));

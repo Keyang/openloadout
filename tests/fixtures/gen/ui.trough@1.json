@@ -1,0 +1,1893 @@
+{
+ "id": "ui.trough",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     1,
+     1
+    ],
+    "size": [
+     62,
+     14
+    ],
+    "face": "face",
+    "frame": "frame",
+    "accent": "accent"
+   },
+   "primitives": [
+    {
+     "kind": "poly",
+     "points": [
+      [
+       61,
+       1
+      ],
+      [
+       61,
+       2
+      ],
+      [
+       62,
+       2
+      ],
+      [
+       62,
+       3
+      ],
+      [
+       63,
+       3
+      ],
+      [
+       63,
+       13
+      ],
+      [
+       62,
+       13
+      ],
+      [
+       62,
+       14
+      ],
+      [
+       61,
+       14
+      ],
+      [
+       61,
+       15
+      ],
+      [
+       3,
+       15
+      ],
+      [
+       3,
+       14
+      ],
+      [
+       2,
+       14
+      ],
+      [
+       2,
+       13
+      ],
+      [
+       1,
+       13
+      ],
+      [
+       1,
+       3
+      ],
+      [
+       2,
+       3
+      ],
+      [
+       2,
+       2
+      ],
+      [
+       3,
+       2
+      ],
+      [
+       3,
+       1
+      ]
+     ],
+     "paint": "ink",
+     "shade": 0
+    },
+    {
+     "kind": "poly",
+     "points": [
+      [
+       61,
+       2
+      ],
+      [
+       61,
+       3
+      ],
+      [
+       62,
+       3
+      ],
+      [
+       62,
+       13
+      ],
+      [
+       61,
+       13
+      ],
+      [
+       61,
+       14
+      ],
+      [
+       3,
+       14
+      ],
+      [
+       3,
+       13
+      ],
+      [
+       2,
+       13
+      ],
+      [
+       2,
+       3
+      ],
+      [
+       3,
+       3
+      ],
+      [
+       3,
+       2
+      ]
+     ],
+     "paint": "frame",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      4,
+      4
+     ],
+     "size": [
+      56,
+      8
+     ],
+     "paint": "ink",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      5,
+      5
+     ],
+     "size": [
+      54,
+      6
+     ],
+     "paint": {
+      "rule": "mix",
+      "of": "face",
+      "with": "ink",
+      "amount": 0.55
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      5,
+      5
+     ],
+     "size": [
+      54,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": {
+       "rule": "mix",
+       "of": "face",
+       "with": "ink",
+       "amount": 0.55
+      },
+      "by": -1
+     },
+     "shade": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     1,
+     1
+    ],
+    "size": [
+     62,
+     14
+    ],
+    "lit": true,
+    "trough": "ink",
+    "segments": 5,
+    "face": "face",
+    "frame": "frame",
+    "accent": "accent"
+   },
+   "primitives": [
+    {
+     "kind": "poly",
+     "points": [
+      [
+       61,
+       1
+      ],
+      [
+       61,
+       2
+      ],
+      [
+       62,
+       2
+      ],
+      [
+       62,
+       3
+      ],
+      [
+       63,
+       3
+      ],
+      [
+       63,
+       13
+      ],
+      [
+       62,
+       13
+      ],
+      [
+       62,
+       14
+      ],
+      [
+       61,
+       14
+      ],
+      [
+       61,
+       15
+      ],
+      [
+       3,
+       15
+      ],
+      [
+       3,
+       14
+      ],
+      [
+       2,
+       14
+      ],
+      [
+       2,
+       13
+      ],
+      [
+       1,
+       13
+      ],
+      [
+       1,
+       3
+      ],
+      [
+       2,
+       3
+      ],
+      [
+       2,
+       2
+      ],
+      [
+       3,
+       2
+      ],
+      [
+       3,
+       1
+      ]
+     ],
+     "paint": "ink",
+     "shade": 0
+    },
+    {
+     "kind": "poly",
+     "points": [
+      [
+       61,
+       2
+      ],
+      [
+       61,
+       3
+      ],
+      [
+       62,
+       3
+      ],
+      [
+       62,
+       13
+      ],
+      [
+       61,
+       13
+      ],
+      [
+       61,
+       14
+      ],
+      [
+       3,
+       14
+      ],
+      [
+       3,
+       13
+      ],
+      [
+       2,
+       13
+      ],
+      [
+       2,
+       3
+      ],
+      [
+       3,
+       3
+      ],
+      [
+       3,
+       2
+      ]
+     ],
+     "paint": "frame",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      4,
+      4
+     ],
+     "size": [
+      56,
+      8
+     ],
+     "paint": "ink",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      5,
+      5
+     ],
+     "size": [
+      54,
+      6
+     ],
+     "paint": {
+      "rule": "mix",
+      "of": "ink",
+      "with": "frame",
+      "amount": 0.2
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      15,
+      5
+     ],
+     "size": [
+      1,
+      6
+     ],
+     "paint": "ink",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      26,
+      5
+     ],
+     "size": [
+      1,
+      6
+     ],
+     "paint": "ink",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      37,
+      5
+     ],
+     "size": [
+      1,
+      6
+     ],
+     "paint": "ink",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      48,
+      5
+     ],
+     "size": [
+      1,
+      6
+     ],
+     "paint": "ink",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      4,
+      2
+     ],
+     "size": [
+      57,
+      1
+     ],
+     "paint": "frame.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      4,
+      3
+     ],
+     "size": [
+      58,
+      1
+     ],
+     "paint": "frame.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      60,
+      4
+     ],
+     "size": [
+      2,
+      8
+     ],
+     "paint": "frame.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      2,
+      4
+     ],
+     "size": [
+      2,
+      8
+     ],
+     "paint": "frame.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      2,
+      12
+     ],
+     "size": [
+      58,
+      1
+     ],
+     "paint": "frame.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      3,
+      13
+     ],
+     "size": [
+      57,
+      1
+     ],
+     "paint": "frame.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      5,
+      5
+     ],
+     "size": [
+      10,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": {
+       "rule": "mix",
+       "of": "ink",
+       "with": "frame",
+       "amount": 0.2
+      },
+      "by": -1
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      16,
+      5
+     ],
+     "size": [
+      10,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": {
+       "rule": "mix",
+       "of": "ink",
+       "with": "frame",
+       "amount": 0.2
+      },
+      "by": -1
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      27,
+      5
+     ],
+     "size": [
+      10,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": {
+       "rule": "mix",
+       "of": "ink",
+       "with": "frame",
+       "amount": 0.2
+      },
+      "by": -1
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      38,
+      5
+     ],
+     "size": [
+      10,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": {
+       "rule": "mix",
+       "of": "ink",
+       "with": "frame",
+       "amount": 0.2
+      },
+      "by": -1
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      49,
+      5
+     ],
+     "size": [
+      10,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": {
+       "rule": "mix",
+       "of": "ink",
+       "with": "frame",
+       "amount": 0.2
+      },
+      "by": -1
+     },
+     "shade": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     1,
+     1
+    ],
+    "size": [
+     62,
+     14
+    ],
+    "caps": 4,
+    "notches": true,
+    "edge": "cut",
+    "rings": [
+     "ink",
+     "frame",
+     "ink"
+    ],
+    "bandAt": 1,
+    "lit": true,
+    "extras": true,
+    "gleam": true,
+    "sides": true,
+    "every": 8,
+    "extra": [
+     {
+      "kind": "stamp",
+      "at": [
+       3,
+       1
+      ],
+      "rows": [
+       "a..",
+       "..b"
+      ],
+      "key": {
+       "a": "accent",
+       "b": "frame.light"
+      }
+     }
+    ],
+    "extraAlong": [
+     {
+      "kind": "stamp",
+      "at": [
+       0,
+       1
+      ],
+      "rows": [
+       "ab"
+      ],
+      "key": {
+       "a": "accent",
+       "b": "frame.light"
+      }
+     }
+    ],
+    "gleamTop": [
+     {
+      "kind": "stamp",
+      "at": [
+       5,
+       4
+      ],
+      "rows": [
+       ".b",
+       "bb"
+      ],
+      "key": {
+       "a": "accent",
+       "b": "frame.light"
+      }
+     }
+    ],
+    "trim": [
+     {
+      "kind": "stamp",
+      "at": [
+       2,
+       2
+      ],
+      "rows": [
+       "ab"
+      ],
+      "key": {
+       "a": "accent",
+       "b": "frame.light"
+      }
+     }
+    ],
+    "face": "face",
+    "frame": "frame",
+    "accent": "accent"
+   },
+   "primitives": [
+    {
+     "kind": "poly",
+     "points": [
+      [
+       61,
+       1
+      ],
+      [
+       61,
+       2
+      ],
+      [
+       62,
+       2
+      ],
+      [
+       62,
+       3
+      ],
+      [
+       63,
+       3
+      ],
+      [
+       63,
+       13
+      ],
+      [
+       62,
+       13
+      ],
+      [
+       62,
+       14
+      ],
+      [
+       61,
+       14
+      ],
+      [
+       61,
+       15
+      ],
+      [
+       3,
+       15
+      ],
+      [
+       3,
+       14
+      ],
+      [
+       2,
+       14
+      ],
+      [
+       2,
+       13
+      ],
+      [
+       1,
+       13
+      ],
+      [
+       1,
+       3
+      ],
+      [
+       2,
+       3
+      ],
+      [
+       2,
+       2
+      ],
+      [
+       3,
+       2
+      ],
+      [
+       3,
+       1
+      ]
+     ],
+     "paint": "ink",
+     "shade": 0
+    },
+    {
+     "kind": "poly",
+     "points": [
+      [
+       61,
+       2
+      ],
+      [
+       61,
+       3
+      ],
+      [
+       62,
+       3
+      ],
+      [
+       62,
+       13
+      ],
+      [
+       61,
+       13
+      ],
+      [
+       61,
+       14
+      ],
+      [
+       3,
+       14
+      ],
+      [
+       3,
+       13
+      ],
+      [
+       2,
+       13
+      ],
+      [
+       2,
+       3
+      ],
+      [
+       3,
+       3
+      ],
+      [
+       3,
+       2
+      ]
+     ],
+     "paint": "frame",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      4,
+      4
+     ],
+     "size": [
+      56,
+      8
+     ],
+     "paint": "ink",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      5,
+      5
+     ],
+     "size": [
+      54,
+      6
+     ],
+     "paint": {
+      "rule": "mix",
+      "of": "face",
+      "with": "ink",
+      "amount": 0.55
+     },
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      9,
+      2
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "ink",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      17,
+      2
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "ink",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      25,
+      2
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "ink",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      33,
+      2
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "ink",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      41,
+      2
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "ink",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      49,
+      2
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "ink",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      8,
+      5
+     ],
+     "size": [
+      1,
+      6
+     ],
+     "paint": "ink",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      55,
+      5
+     ],
+     "size": [
+      1,
+      6
+     ],
+     "paint": "ink",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      9,
+      12
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "ink",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      17,
+      12
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "ink",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      25,
+      12
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "ink",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      33,
+      12
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "ink",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      41,
+      12
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "ink",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      49,
+      12
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "ink",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      5,
+      5
+     ],
+     "size": [
+      3,
+      6
+     ],
+     "paint": "frame",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      56,
+      5
+     ],
+     "size": [
+      3,
+      6
+     ],
+     "paint": "frame",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      4,
+      2
+     ],
+     "size": [
+      5,
+      2
+     ],
+     "paint": "frame.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      10,
+      2
+     ],
+     "size": [
+      7,
+      2
+     ],
+     "paint": "frame.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      18,
+      2
+     ],
+     "size": [
+      7,
+      2
+     ],
+     "paint": "frame.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      26,
+      2
+     ],
+     "size": [
+      7,
+      2
+     ],
+     "paint": "frame.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      34,
+      2
+     ],
+     "size": [
+      7,
+      2
+     ],
+     "paint": "frame.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      42,
+      2
+     ],
+     "size": [
+      7,
+      2
+     ],
+     "paint": "frame.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      50,
+      2
+     ],
+     "size": [
+      11,
+      1
+     ],
+     "paint": "frame.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      50,
+      3
+     ],
+     "size": [
+      12,
+      1
+     ],
+     "paint": "frame.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      60,
+      4
+     ],
+     "size": [
+      2,
+      8
+     ],
+     "paint": "frame.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      2,
+      4
+     ],
+     "size": [
+      2,
+      8
+     ],
+     "paint": "frame.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      2,
+      12
+     ],
+     "size": [
+      7,
+      1
+     ],
+     "paint": "frame.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      10,
+      12
+     ],
+     "size": [
+      7,
+      2
+     ],
+     "paint": "frame.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      18,
+      12
+     ],
+     "size": [
+      7,
+      2
+     ],
+     "paint": "frame.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      26,
+      12
+     ],
+     "size": [
+      7,
+      2
+     ],
+     "paint": "frame.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      34,
+      12
+     ],
+     "size": [
+      7,
+      2
+     ],
+     "paint": "frame.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      42,
+      12
+     ],
+     "size": [
+      7,
+      2
+     ],
+     "paint": "frame.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      50,
+      12
+     ],
+     "size": [
+      10,
+      2
+     ],
+     "paint": "frame.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      3,
+      13
+     ],
+     "size": [
+      6,
+      1
+     ],
+     "paint": "frame.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      9,
+      5
+     ],
+     "size": [
+      46,
+      1
+     ],
+     "paint": {
+      "rule": "tone",
+      "of": {
+       "rule": "mix",
+       "of": "face",
+       "with": "ink",
+       "amount": 0.55
+      },
+      "by": -1
+     },
+     "shade": 0
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      3,
+      3
+     ],
+     "anchor": "tl",
+     "rows": [
+      "ab"
+     ],
+     "key": {
+      "a": "accent",
+      "b": "frame.light"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      59,
+      3
+     ],
+     "anchor": "tl",
+     "rows": [
+      "ba"
+     ],
+     "key": {
+      "a": "accent",
+      "b": "frame.light"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      3,
+      12
+     ],
+     "anchor": "tl",
+     "rows": [
+      "ab"
+     ],
+     "key": {
+      "a": "accent",
+      "b": "frame.light"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      59,
+      12
+     ],
+     "anchor": "tl",
+     "rows": [
+      "ba"
+     ],
+     "key": {
+      "a": "accent",
+      "b": "frame.light"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      4,
+      2
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a..",
+      "..b"
+     ],
+     "key": {
+      "a": "accent",
+      "b": "frame.light"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      57,
+      2
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..a",
+      "b.."
+     ],
+     "key": {
+      "a": "accent",
+      "b": "frame.light"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      4,
+      12
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..b",
+      "a.."
+     ],
+     "key": {
+      "a": "accent",
+      "b": "frame.light"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      57,
+      12
+     ],
+     "anchor": "tl",
+     "rows": [
+      "b..",
+      "..a"
+     ],
+     "key": {
+      "a": "accent",
+      "b": "frame.light"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      9,
+      2
+     ],
+     "anchor": "tl",
+     "rows": [
+      "ab"
+     ],
+     "key": {
+      "a": "accent",
+      "b": "frame.light"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      9,
+      13
+     ],
+     "anchor": "tl",
+     "rows": [
+      "ab"
+     ],
+     "key": {
+      "a": "accent",
+      "b": "frame.light"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      17,
+      2
+     ],
+     "anchor": "tl",
+     "rows": [
+      "ab"
+     ],
+     "key": {
+      "a": "accent",
+      "b": "frame.light"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      17,
+      13
+     ],
+     "anchor": "tl",
+     "rows": [
+      "ab"
+     ],
+     "key": {
+      "a": "accent",
+      "b": "frame.light"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      25,
+      2
+     ],
+     "anchor": "tl",
+     "rows": [
+      "ab"
+     ],
+     "key": {
+      "a": "accent",
+      "b": "frame.light"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      25,
+      13
+     ],
+     "anchor": "tl",
+     "rows": [
+      "ab"
+     ],
+     "key": {
+      "a": "accent",
+      "b": "frame.light"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      33,
+      2
+     ],
+     "anchor": "tl",
+     "rows": [
+      "ab"
+     ],
+     "key": {
+      "a": "accent",
+      "b": "frame.light"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      33,
+      13
+     ],
+     "anchor": "tl",
+     "rows": [
+      "ab"
+     ],
+     "key": {
+      "a": "accent",
+      "b": "frame.light"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      41,
+      2
+     ],
+     "anchor": "tl",
+     "rows": [
+      "ab"
+     ],
+     "key": {
+      "a": "accent",
+      "b": "frame.light"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      41,
+      13
+     ],
+     "anchor": "tl",
+     "rows": [
+      "ab"
+     ],
+     "key": {
+      "a": "accent",
+      "b": "frame.light"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      49,
+      2
+     ],
+     "anchor": "tl",
+     "rows": [
+      "ab"
+     ],
+     "key": {
+      "a": "accent",
+      "b": "frame.light"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      49,
+      13
+     ],
+     "anchor": "tl",
+     "rows": [
+      "ab"
+     ],
+     "key": {
+      "a": "accent",
+      "b": "frame.light"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      6,
+      5
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".b",
+      "bb"
+     ],
+     "key": {
+      "b": "frame.light"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      56,
+      5
+     ],
+     "anchor": "tl",
+     "rows": [
+      "b.",
+      "bb"
+     ],
+     "key": {
+      "b": "frame.light"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     1,
+     1
+    ],
+    "size": [
+     62,
+     14
+    ],
+    "role": "rail",
+    "trough": "well",
+    "face": "face",
+    "frame": "frame",
+    "accent": "accent"
+   },
+   "primitives": [
+    {
+     "kind": "poly",
+     "points": [
+      [
+       61,
+       5
+      ],
+      [
+       61,
+       6
+      ],
+      [
+       62,
+       6
+      ],
+      [
+       62,
+       7
+      ],
+      [
+       63,
+       7
+      ],
+      [
+       63,
+       9
+      ],
+      [
+       62,
+       9
+      ],
+      [
+       62,
+       10
+      ],
+      [
+       61,
+       10
+      ],
+      [
+       61,
+       11
+      ],
+      [
+       3,
+       11
+      ],
+      [
+       3,
+       10
+      ],
+      [
+       2,
+       10
+      ],
+      [
+       2,
+       9
+      ],
+      [
+       1,
+       9
+      ],
+      [
+       1,
+       7
+      ],
+      [
+       2,
+       7
+      ],
+      [
+       2,
+       6
+      ],
+      [
+       3,
+       6
+      ],
+      [
+       3,
+       5
+      ]
+     ],
+     "paint": "ink",
+     "shade": 0
+    },
+    {
+     "kind": "poly",
+     "points": [
+      [
+       61,
+       6
+      ],
+      [
+       61,
+       7
+      ],
+      [
+       62,
+       7
+      ],
+      [
+       62,
+       9
+      ],
+      [
+       61,
+       9
+      ],
+      [
+       61,
+       10
+      ],
+      [
+       3,
+       10
+      ],
+      [
+       3,
+       9
+      ],
+      [
+       2,
+       9
+      ],
+      [
+       2,
+       7
+      ],
+      [
+       3,
+       7
+      ],
+      [
+       3,
+       6
+      ]
+     ],
+     "paint": "frame",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      3,
+      7
+     ],
+     "size": [
+      58,
+      2
+     ],
+     "paint": "face",
+     "shade": 0
+    }
+   ]
+  }
+ ]
+}

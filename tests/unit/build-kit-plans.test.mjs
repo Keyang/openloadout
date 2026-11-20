@@ -22,6 +22,7 @@ function makeCopy() {
   fs.cpSync(path.join(REAL, 'bundles'), path.join(dir, 'bundles'), { recursive: true });
   fs.cpSync(path.join(REAL, 'engine'), path.join(dir, 'engine'), { recursive: true });
   fs.cpSync(path.join(REAL, 'sound'), path.join(dir, 'sound'), { recursive: true });   // engine/versions.js names sounds in everyday words (sound/words.js)
+  fs.cpSync(path.join(REAL, 'rigs'), path.join(dir, 'rigs'), { recursive: true });     // engine/sprite.js reads a `when` with engine/data-rules.js, which imports rigs/ (build item F3)
   fs.mkdirSync(path.join(dir, 'sprites'));
   fs.mkdirSync(path.join(dir, 'sounds'));
   // the tool only asks whether an asset's file is there

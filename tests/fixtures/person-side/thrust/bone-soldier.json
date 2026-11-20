@@ -1,0 +1,154 @@
+{
+  "format": "loadout-sprite",
+  "version": 2,
+  "id": "bone-soldier",
+  "name": "Bone soldier",
+  "blurb": "B4x sketch, not the redraw: the code bone soldier's clips, its attack picked by Weapon (a spear thrusts, bare bones punch).",
+  "size": [
+    64,
+    64
+  ],
+  "pivot": [
+    28,
+    58
+  ],
+  "meta": {
+    "type": "creature",
+    "role": "characters/enemy",
+    "view": "side",
+    "themes": [
+      "fantasy",
+      "dungeon"
+    ],
+    "gameTypes": [
+      "turn-based-rpg",
+      "platformer"
+    ],
+    "words": [
+      "skeleton",
+      "undead",
+      "soldier",
+      "attack",
+      "thrust",
+      "collapse"
+    ],
+    "license": "draft"
+  },
+  "palette": [
+    {
+      "id": "bone",
+      "label": "Bone",
+      "default": "#e8e0c8",
+      "material": "stone"
+    },
+    {
+      "id": "metal",
+      "label": "Metal",
+      "default": "#8f97a8",
+      "material": "metal"
+    }
+  ],
+  "body": {
+    "rig": {
+      "extends": {
+        "use": "base:person-side",
+        "v": 7,
+        "paint": {
+          "skin": "bone",
+          "top": "bone",
+          "bottom": "bone",
+          "boots": "bone"
+        },
+        "clips": [
+          "idle",
+          "walk",
+          "attack",
+          "block",
+          "hurt",
+          "die"
+        ]
+      },
+      "shapes": [
+        {
+          "id": "sword",
+          "kind": "use",
+          "use": "held:sword",
+          "v": 1,
+          "on": "handF",
+          "when": {
+            "weapon": [
+              "sword"
+            ]
+          },
+          "paint": {
+            "metal": "metal"
+          }
+        },
+        {
+          "id": "axe",
+          "kind": "use",
+          "use": "held:axe",
+          "v": 1,
+          "on": "handF",
+          "when": {
+            "weapon": [
+              "axe"
+            ]
+          },
+          "paint": {
+            "metal": "metal"
+          }
+        },
+        {
+          "id": "spear",
+          "kind": "use",
+          "use": "held:spear",
+          "v": 1,
+          "on": "handF",
+          "when": {
+            "weapon": [
+              "spear"
+            ]
+          },
+          "paint": {
+            "metal": "metal"
+          }
+        }
+      ]
+    }
+  },
+  "controls": [
+    {
+      "key": "weapon",
+      "kind": "choice",
+      "label": "Weapon",
+      "options": [
+        "sword",
+        "axe",
+        "spear",
+        "none"
+      ],
+      "default": "sword"
+    },
+    {
+      "key": "speed",
+      "standard": "speed"
+    }
+  ],
+  "clips": {
+    "attack": {
+      "from": {
+        "from": "weapon",
+        "pick": {
+          "sword": "attack",
+          "axe": "attack",
+          "spear": "thrust",
+          "none": "punch"
+        }
+      }
+    },
+    "die": {
+      "label": "Collapse"
+    }
+  }
+}

@@ -130,7 +130,7 @@ test('bundles-from-plans counts a data file as the sprite a plan names, and asks
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'loadout-plans-data-'));
   fs.mkdirSync(path.join(dir, 'bundles', 'specs'), { recursive: true });
   fs.copyFileSync(path.join(real, planFile), path.join(dir, 'bundles', 'specs', planFile));
-  for (const d of ['engine', 'sound']) fs.cpSync(path.join(ROOT, d), path.join(dir, d), { recursive: true });
+  for (const d of ['engine', 'sound', 'rigs']) fs.cpSync(path.join(ROOT, d), path.join(dir, d), { recursive: true });   // rigs/: engine/data-rules.js, which engine/sprite.js imports (build item F3), needs it
   for (const d of ['sprites', 'sounds']) fs.mkdirSync(path.join(dir, d));
   const sprites = idsOf(plan.sprites);
   // half the sprites as data files, half as code files (the tool only asks whether a sprite's file is there)

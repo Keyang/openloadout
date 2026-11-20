@@ -1,0 +1,217 @@
+{
+ "id": "ui-panel-candy",
+ "frozen": "2026-11-20",
+ "source": "sprites/ui-panel-candy.js",
+ "sha256": "b2e030ce7b73b2bdcf5f43e6d546ab4da769f400c67d97ca8486655f42a4d0e2",
+ "name": "Candy panels",
+ "blurb": "Stretchable glossy sugar boxes for pop-ups, results and shops: a panel, a panel with a heading, a list well and a tooltip, a deep candy slab in a pale sugar rim with sprinkles; change the style, corners, rim, sprinkles and colours.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/panel",
+  "themes": [
+   "neutral",
+   "candy"
+  ],
+  "gameTypes": [
+   "arcade",
+   "puzzle",
+   "card-game",
+   "racing"
+  ],
+  "view": "none",
+  "words": [
+   "panel",
+   "window",
+   "box",
+   "popup",
+   "menu",
+   "candy",
+   "sweet",
+   "sugar",
+   "sprinkles",
+   "tooltip",
+   "shop",
+   "results",
+   "list",
+   "glossy"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  96,
+  64
+ ],
+ "pivot": [
+  48,
+  32
+ ],
+ "grounded": false,
+ "preview": "panel",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "jelly",
+   "options": [
+    {
+     "value": "jelly",
+     "label": "Jelly"
+    },
+    {
+     "value": "striped",
+     "label": "Striped"
+    },
+    {
+     "value": "frosted",
+     "label": "Frosted"
+    }
+   ],
+   "group": "Look"
+  },
+  "corner": {
+   "kind": "range",
+   "label": "Corner",
+   "def": 0.75,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Square",
+   "hi": "Round",
+   "group": "Look"
+  },
+  "border": {
+   "kind": "range",
+   "label": "Border",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Thin",
+   "hi": "Thick",
+   "group": "Look"
+  },
+  "sprinkles": {
+   "kind": "toggle",
+   "label": "Sprinkles",
+   "def": true,
+   "group": "Look"
+  },
+  "face": {
+   "kind": "color",
+   "label": "Candy",
+   "def": "#7a4f33",
+   "swatches": [
+    "#7a4f33",
+    "#3f5068",
+    "#8e3a4a",
+    "#434d6d"
+   ],
+   "group": "Colors"
+  },
+  "frame": {
+   "kind": "color",
+   "label": "Sugar",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#f6d3b0",
+    "#8fd0f0",
+    "#9bd18a"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Sprinkles",
+   "def": "#4fd8ee",
+   "swatches": [
+    "#4fd8ee",
+    "#e08a2c",
+    "#c2c9d6",
+    "#6aa83e",
+    "#a4c44a"
+   ],
+   "group": "Colors",
+   "when": {
+    "sprinkles": [
+     true
+    ]
+   }
+  }
+ },
+ "clips": {
+  "panel": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "panel-title": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "inset": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "tooltip": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [
+  {
+   "name": "Toffee box",
+   "params": {}
+  },
+  {
+   "name": "Cherry stripe",
+   "params": {
+    "style": "striped",
+    "face": "#8e3a4a"
+   }
+  },
+  {
+   "name": "Frosted blueberry",
+   "params": {
+    "style": "frosted",
+    "face": "#3f5068",
+    "sprinkles": false
+   }
+  },
+  {
+   "name": "Liquorice",
+   "params": {
+    "face": "#434d6d",
+    "accent": "#6aa83e"
+   }
+  },
+  {
+   "name": "Caramel",
+   "params": {
+    "frame": "#f6d3b0",
+    "accent": "#e08a2c"
+   }
+  }
+ ],
+ "bundles": []
+}

@@ -1,0 +1,91 @@
+{
+ "id": "oval",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "r": [
+     6,
+     3
+    ],
+    "paint": "body"
+   },
+   "primitives": [
+    {
+     "kind": "ellipse",
+     "at": [
+      16,
+      16
+     ],
+     "r": [
+      6,
+      3
+     ],
+     "paint": "body"
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     10,
+     20
+    ],
+    "r": [
+     8,
+     4
+    ],
+    "turn": -24,
+    "paint": "body"
+   },
+   "primitives": [
+    {
+     "kind": "ellipse",
+     "at": [
+      10,
+      20
+     ],
+     "r": [
+      8,
+      4
+     ],
+     "turn": -24,
+     "paint": "body"
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "r": [
+     5,
+     5
+    ],
+    "turn": 45,
+    "paint": "gold"
+   },
+   "primitives": [
+    {
+     "kind": "ellipse",
+     "at": [
+      16,
+      16
+     ],
+     "r": [
+      5,
+      5
+     ],
+     "turn": 45,
+     "paint": "gold"
+    }
+   ]
+  }
+ ]
+}

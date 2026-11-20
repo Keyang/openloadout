@@ -1,0 +1,294 @@
+{
+ "id": "motes",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     24,
+     40
+    ],
+    "count": 6,
+    "rise": 30,
+    "paints": [
+     "m",
+     "p1",
+     "p3",
+     "p4"
+    ]
+   },
+   "ctx": {
+    "t": 0.3,
+    "loop": true
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      19,
+      20
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a"
+     ],
+     "key": {
+      "a": "p3"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      23,
+      13
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..a..",
+      ".aba.",
+      "abbba",
+      ".aba.",
+      "..a.."
+     ],
+     "key": {
+      "a": "p4",
+      "b": "p3"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      25,
+      24
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...aaa",
+      "..abbb",
+      ".aabbb",
+      "abbbbb",
+      "abbbbb",
+      "abbbbb",
+      ".aabbb"
+     ],
+     "key": {
+      "a": "p4",
+      "b": "p1"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      15,
+      30
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaa"
+     ],
+     "key": {
+      "a": "p4"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     24,
+     44
+    ],
+    "count": 5,
+    "loop": false,
+    "rise": 28,
+    "width": 18,
+    "size": 9,
+    "shape": "star",
+    "seed": 2,
+    "paints": [
+     "p1",
+     "p2",
+     "p3",
+     "p4"
+    ]
+   },
+   "ctx": {
+    "t": 0.6,
+    "loop": false
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      15,
+      20
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a"
+     ],
+     "key": {
+      "a": "p4"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      25,
+      20
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a"
+     ],
+     "key": {
+      "a": "p4"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      20,
+      21
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a"
+     ],
+     "key": {
+      "a": "p4"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      30,
+      18
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a"
+     ],
+     "key": {
+      "a": "p4"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      22,
+      22
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a"
+     ],
+     "key": {
+      "a": "p4"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     28
+    ],
+    "count": 4,
+    "rise": 18,
+    "size": 5,
+    "shape": "heart",
+    "sway": 2,
+    "paints": [
+     "p2",
+     "p4"
+    ]
+   },
+   "ctx": {
+    "t": 0.8,
+    "loop": true
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      16,
+      10
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..a..",
+      ".aba.",
+      "abbba",
+      ".aba.",
+      "..a.."
+     ],
+     "key": {
+      "a": "p4",
+      "b": "p2"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      10,
+      18
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..a..",
+      ".aba.",
+      "abbba",
+      ".aba.",
+      "..a.."
+     ],
+     "key": {
+      "a": "p4",
+      "b": "p2"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      12,
+      16
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aa.aa.",
+      "abbabba",
+      "abbbbba",
+      ".abbba.",
+      "..aba..",
+      "...a..."
+     ],
+     "key": {
+      "a": "p4",
+      "b": "p2"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      5,
+      18
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aa.aa.",
+      "abbabba",
+      "abbbbba",
+      ".abbba.",
+      "..aba..",
+      "...a..."
+     ],
+     "key": {
+      "a": "p4",
+      "b": "p2"
+     }
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,317 @@
+{
+ "id": "key.wide",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     32,
+     16
+    ],
+    "body": "top",
+    "frame": "side",
+    "lit": "glow"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      10,
+      4
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      ".abbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "abcccccccccccccccccccccccccccccc",
+      "accccccccccccccccccccccccccccccc",
+      "accccccccccccccccccccccccccccccc",
+      "accccccccccccccccccccccccccccccc",
+      "accccccccccccccccccccccccccccccc",
+      "accccccccccccccccccccccccccccccc",
+      "accccccccccccccccccccccccccccccc",
+      "accccccccccccccccccccccccdcccccc",
+      "accccccccccccccccccccccccdcccccc",
+      "accccccccccccccccccdcccccdcccccc",
+      "acccccccccccccccccddcccccdcccccc",
+      "accccccccccccccccdddddddddcccccc",
+      "acccccccccccccccccddcccccccccccc",
+      "accccccccccccccccccdcccccccccccc",
+      "accccccccccccccccccccccccccccccc",
+      "accccccccccccccccccccccccccccccc",
+      "accccccccccccccccccccccccccccccc",
+      "aecccccccccccccccccccccccccccccc",
+      "afeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "afffffffffffffffffffffffffffffff",
+      ".affffffffffffffffffffffffffffff",
+      "..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "top.light",
+      "c": "top",
+      "d": {
+       "rule": "standOut",
+       "against": "top",
+       "from": [
+        {
+         "rule": "mix",
+         "of": "#ffffff",
+         "with": "#ffffff",
+         "amount": 0
+        },
+        "ink"
+       ]
+      },
+      "e": "top.dark",
+      "f": "side"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      42,
+      4
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaaaaa..",
+      "bbbbbbbbbba.",
+      "ccccccccccba",
+      "ccccccccccba",
+      "ccccccccccba",
+      "ccccccccccba",
+      "ccccccccccba",
+      "ccccccccccba",
+      "ccccccccccba",
+      "ccccccccccba",
+      "ccccccccccba",
+      "ccccccccccba",
+      "ccccccccccba",
+      "ccccccccccba",
+      "ccccccccccba",
+      "ccccccccccba",
+      "ccccccccccba",
+      "ccccccccccba",
+      "ccccccccccba",
+      "ccccccccccda",
+      "ddddddddddea",
+      "eeeeeeeeeeea",
+      "eeeeeeeeeea.",
+      "aaaaaaaaaa.."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "top.light",
+      "c": "top",
+      "d": "top.dark",
+      "e": "side"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     32,
+     16
+    ],
+    "picture": "tap",
+    "shape": "long",
+    "size": 1,
+    "body": "top",
+    "frame": "side",
+    "lit": "glow"
+   },
+   "ctx": {
+    "frame": 5
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      1,
+      6
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      ".abbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "abcccccccccccccccccccccccccccccc",
+      "accccccccccccccccccccccccccccccc",
+      "accccccccccccccccccccccccccccccc",
+      "accccccccccccccccccccccccccccccc",
+      "accccccccccccccccccccccccccccccc",
+      "accccccccccccccccccccccccccccccc",
+      "accccccccccccccccccccccccccccccc",
+      "accccccccccccccccccccccccccccccc",
+      "accccccccccccccccccccccccccccccc",
+      "accccccccccccccccccccccccccccccc",
+      "accccccccccccccccccccccccccccccc",
+      "accccccccccccccccccccccccccccccc",
+      "accccccccccccccccccccccccccccccc",
+      "accccccccccccccccccccccccccccccc",
+      "accccccccccccccccccccccccccccccc",
+      "accccccccccccccccccccccccccccccc",
+      "accccccccccccccccccccccccccccccc",
+      "adcccccccccccccccccccccccccccccc",
+      ".adddddddddddddddddddddddddddddd",
+      "..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "glow.light",
+      "c": "glow",
+      "d": "glow.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      33,
+      6
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaa..",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbba.",
+      "ccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccba",
+      "ccccccccccccccccccccccccccccda",
+      "dddddddddddddddddddddddddddda.",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaa.."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "glow.light",
+      "c": "glow",
+      "d": "glow.dark"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     10,
+     4
+    ],
+    "picture": "down",
+    "mark": "back",
+    "corner": 1,
+    "depth": 0,
+    "body": "top",
+    "frame": "side",
+    "lit": "glow"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      -12,
+      -7
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".....aaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "...aabbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "..abbccccccccccccccccccccccccccc",
+      ".abccccccccccccccccccccccccccccc",
+      ".acccccccccccccccccccccccccccccc",
+      "abcccccccccccccccccccccccccccccc",
+      "accccccccccccccccccccccccccccccc",
+      "accccccccccccccccccccccccccccccc",
+      "accccccccccccccccccccccccccccccc",
+      "accccccccccccccccccccccccccccccc",
+      "accccccccccccccccccccccccccccccc",
+      "acccccccccccccccccccddddddcccccc",
+      "accccccccccccccccccdcccccdcccccc",
+      "acccccccccccccccccdccdcdcdcccccc",
+      "accccccccccccccccdccccdccdcccccc",
+      "acccccccccccccccccdccdcdcdcccccc",
+      "accccccccccccccccccdcccccdcccccc",
+      "aeccccccccccccccccccddddddcccccc",
+      ".acccccccccccccccccccccccccccccc",
+      ".aeccccccccccccccccccccccccccccc",
+      "..aeeccccccccccccccccccccccccccc",
+      "...aaeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      ".....aaaaaaaaaaaaaaaaaaaaaaaaaaa"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "glow.light",
+      "c": "glow",
+      "d": {
+       "rule": "standOut",
+       "against": "glow",
+       "from": [
+        {
+         "rule": "mix",
+         "of": "#ffffff",
+         "with": "#ffffff",
+         "amount": 0
+        },
+        "ink"
+       ]
+      },
+      "e": "glow.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      20,
+      -7
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaa.....",
+      "bbbbbbbaa...",
+      "cccccccbba..",
+      "cccccccccba.",
+      "cccccccccba.",
+      "ccccccccccba",
+      "ccccccccccba",
+      "ccccccccccba",
+      "ccccccccccba",
+      "ccccccccccba",
+      "ccccccccccba",
+      "ccccccccccba",
+      "ccccccccccba",
+      "ccccccccccba",
+      "ccccccccccba",
+      "ccccccccccba",
+      "ccccccccccba",
+      "ccccccccccda",
+      "cccccccccba.",
+      "cccccccccda.",
+      "cccccccdda..",
+      "dddddddaa...",
+      "aaaaaaa....."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "glow.light",
+      "c": "glow",
+      "d": "glow.dark"
+     }
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,233 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "ui-buttons-wood",
+ "name": "Wooden buttons",
+ "blurb": "A stretchable wooden menu button in four states (normal, hover, pressed, disabled); change its style, corners, border, nails, grain and colours.",
+ "size": [
+  96,
+  32
+ ],
+ "pivot": [
+  48,
+  16
+ ],
+ "grounded": false,
+ "preview": "normal",
+ "styles": [
+  "pixel"
+ ],
+ "meta": {
+  "type": "ui",
+  "role": "interface/button",
+  "view": "none",
+  "themes": [
+   "fantasy",
+   "neutral"
+  ],
+  "gameTypes": [
+   "platformer",
+   "turn-based-rpg",
+   "top-down-rpg",
+   "arcade",
+   "puzzle"
+  ],
+  "words": [
+   "button",
+   "menu",
+   "wood",
+   "wooden",
+   "plank",
+   "board",
+   "press",
+   "click",
+   "hover",
+   "start",
+   "pause",
+   "sign",
+   "carved",
+   "stone"
+  ],
+  "license": "draft"
+ },
+ "palette": [
+  {
+   "id": "face",
+   "label": "Face",
+   "default": "#a06a3c",
+   "material": "paint",
+   "swatches": [
+    "#a06a3c",
+    "#7a4f33",
+    "#5d6475",
+    "#3f5068",
+    "#c9423a",
+    "#7a4fc4",
+    "#3f6fd1"
+   ]
+  },
+  {
+   "id": "frame",
+   "label": "Frame",
+   "default": "#7a4f33",
+   "material": "paint",
+   "swatches": [
+    "#7a4f33",
+    "#f2c230",
+    "#c2c9d6",
+    "#5d6475",
+    "#c9423a",
+    "#f0ead8"
+   ]
+  }
+ ],
+ "controls": [
+  {
+   "key": "style",
+   "kind": "choice",
+   "label": "Style",
+   "options": [
+    "plank",
+    "carved",
+    "stone"
+   ],
+   "default": "plank",
+   "group": "Look"
+  },
+  {
+   "key": "corner",
+   "kind": "range",
+   "label": "Corner",
+   "lo": "Square",
+   "hi": "Round",
+   "default": 0.5,
+   "group": "Look"
+  },
+  {
+   "key": "border",
+   "kind": "range",
+   "label": "Border",
+   "lo": "Thin",
+   "hi": "Thick",
+   "default": 0.5,
+   "group": "Look"
+  },
+  {
+   "key": "nails",
+   "kind": "toggle",
+   "label": "Nails",
+   "default": true,
+   "group": "Look"
+  },
+  {
+   "key": "texture",
+   "kind": "range",
+   "label": "Texture",
+   "lo": "Plain",
+   "hi": "Busy",
+   "default": 0.5,
+   "group": "Look"
+  }
+ ],
+ "body": {
+  "panel": {
+   "skin": {
+    "use": "skin:wood",
+    "v": 1,
+    "paint": {
+     "face": "face",
+     "frame": "frame"
+    }
+   },
+   "piece": {
+    "gen": "ui.button",
+    "v": 1,
+    "at": [
+     1,
+     1
+    ],
+    "size": [
+     94,
+     30
+    ],
+    "style": {
+     "from": "style"
+    },
+    "corner": {
+     "from": "corner",
+     "map": [
+      [
+       0,
+       0
+      ],
+      [
+       1,
+       4
+      ]
+     ]
+    },
+    "border": {
+     "from": "border",
+     "map": [
+      [
+       0,
+       1
+      ],
+      [
+       1,
+       3
+      ]
+     ]
+    },
+    "nails": {
+     "from": "nails"
+    },
+    "grain": {
+     "from": "texture",
+     "map": [
+      [
+       0,
+       0
+      ],
+      [
+       1,
+       1
+      ]
+     ]
+    }
+   },
+   "states": [
+    "normal",
+    "hover",
+    "pressed",
+    "disabled"
+   ]
+  }
+ },
+ "clips": {
+  "normal": {
+   "frames": 1,
+   "fps": 8
+  },
+  "hover": {
+   "frames": 1,
+   "fps": 8
+  },
+  "pressed": {
+   "frames": 1,
+   "fps": 8,
+   "sounds": [
+    {
+     "sound": "ui-click",
+     "preset": "Soft tap",
+     "frame": 0,
+     "volume": 0.6
+    }
+   ]
+  },
+  "disabled": {
+   "frames": 1,
+   "fps": 8
+  }
+ }
+}

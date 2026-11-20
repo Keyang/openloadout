@@ -34,6 +34,8 @@ import {
 } from './ui-shapes.js';
 import { measureGridbox, measureGridbox2 } from './ui-grid.js';   // the Gridline kit's window, ui.gridbox@1: its measure is listed in UI_MEASURES below
 import { measureGauge } from './ui-gauge.js';   // registers ui.gauge@1 (its own module) and gives its measure
+import { SKIN_MEASURES } from './ui-skin.js';
+import { PORT_MEASURES } from './port-measures.js';   // migration batch M9: the interface pictures' ports (engine/gen/port-sprite.js)
 
 const fin = (v) => typeof v === 'number' && Number.isFinite(v);
 import { measureCounter } from './counter.js';   // the Gridline kit's counter case, ui.counter@1: its measure (the digit windows as text areas) is listed in UI_MEASURES below
@@ -701,6 +703,8 @@ export const UI_MEASURES = Object.freeze({
   'ui.counter@1': measureCounter,   // engine/gen/counter.js
   'ui.screen@1': measureScreen,   // engine/gen/ui-screen.js
   'ui.gridbox@2': measureGridbox2,   // engine/gen/ui-grid.js: the window with the kit's own tube and corners
+  ...SKIN_MEASURES,   // migration batch M8: the skinned pieces of engine/gen/ui-skin.js
+  ...PORT_MEASURES,   // migration batch M9: the ports that keep a text area or slice (engine/gen/port-measures.js)
 });
 
 /**

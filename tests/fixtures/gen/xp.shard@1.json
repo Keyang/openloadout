@@ -1,0 +1,216 @@
+{
+ "id": "xp.shard",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     8,
+     8
+    ],
+    "shape": "shard",
+    "length": 9,
+    "body": "body",
+    "heart": "glow"
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true,
+    "frames": 8,
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      6,
+      4
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..a..",
+      ".baa.",
+      "bbcaa",
+      "bccca",
+      "bccca",
+      "bccca",
+      "bbcba",
+      ".bbb.",
+      "..b.."
+     ],
+     "key": {
+      "a": "body.light",
+      "b": "body",
+      "c": "glow"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     8,
+     8
+    ],
+    "shape": "cube",
+    "length": 10,
+    "body": "body",
+    "heart": "glow"
+   },
+   "ctx": {
+    "t": 0.375,
+    "loop": true,
+    "frames": 8,
+    "frame": 3
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      3,
+      3
+     ],
+     "anchor": "tl",
+     "rows": [
+      "....aa....",
+      "..aabbaa..",
+      "aabbbbbbaa",
+      "aaabbbbacc",
+      "aaaaaacccc",
+      "aaaaaccccc",
+      "aaaaaccccc",
+      "aaaaaccccc",
+      "..aaaccc..",
+      "....ac...."
+     ],
+     "key": {
+      "a": "body",
+      "b": "glow",
+      "c": "body.dark"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     8,
+     8
+    ],
+    "shape": "star",
+    "length": 8,
+    "layer": "pulled",
+    "body": "body",
+    "heart": "glow"
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": true,
+    "frames": 6,
+    "frame": 3
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      3,
+      5
+     ],
+     "anchor": "tl",
+     "rows": [
+      "......a..",
+      "....abca.",
+      "baabbbcaa",
+      "bbbbbbcba",
+      "....bbcb.",
+      "......b.."
+     ],
+     "key": {
+      "a": "body.light",
+      "b": "body",
+      "c": "glow"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     8,
+     8
+    ],
+    "shape": "orb",
+    "length": 9,
+    "layer": "streaks",
+    "body": "body",
+    "heart": "glow"
+   },
+   "ctx": {
+    "t": 0.3333333333333333,
+    "loop": true,
+    "frames": 6,
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      1,
+      12
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a"
+     ],
+     "key": {
+      "a": "body.light"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     8,
+     8
+    ],
+    "shape": "orb",
+    "length": 8,
+    "collect": true,
+    "body": "body",
+    "heart": "glow"
+   },
+   "ctx": {
+    "t": 0.6,
+    "loop": false,
+    "frames": 6,
+    "frame": 3
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      4,
+      4
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..aaaa..",
+      ".bbbbaa.",
+      "bbbccbaa",
+      "bbccccba",
+      "bbccccba",
+      "bbbccbba",
+      ".bbbbbb.",
+      "..bbbb.."
+     ],
+     "key": {
+      "a": "body.light",
+      "b": "body",
+      "c": "glow"
+     }
+    }
+   ]
+  }
+ ]
+}

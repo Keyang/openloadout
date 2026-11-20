@@ -1,0 +1,64 @@
+{
+  "format": "loadout-sprite",
+  "version": 2,
+  "id": "health-cell",
+  "name": "Health cell",
+  "blurb": "A capsule of glowing green charge that beats like a heart and gives health back. Make it a cell, a syringe or a med pack, and change how full it is and its colours.",
+  "meta": {"type":"pickup","role":"items/food","themes":["sci-fi","space"],"gameTypes":["roguelike-action","shooter","arcade"],"view":"front","words":["health","heal","medkit","med pack","capsule","cell","syringe","life","hp","recover","collect","pickup","first aid","glowing"],"license":"draft"},
+  "size": [32,32],
+  "pivot": [16,30],
+  "grounded": false,
+  "preview": "idle",
+  "styles": ["pixel"],
+  "palette": [
+    {"id":"body","label":"Casing","default":"#9aa6c0","material":"metal","swatches":["#9aa6c0","#c2c9d6","#6b7896","#f2c230","#8f97a8","#e6c545","#c98a4a"]},
+    {"id":"glow","label":"Glow","default":"#5fd47a","material":"light","swatches":["#5fd47a","#5fe0f0","#e2473f","#9fe040","#f2a030","#b48af8","#4f9ff0"]},
+    {"id":"spark","material":"light","derive":{"rule":"mix","of":{"rule":"ramp","of":"glow","tone":"light"},"with":"shine","amount":0.35}},
+    {"id":"shine","default":"#ffffff","material":"light","detail":true}
+  ],
+  "controls": [
+    {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+    {"key":"shape","kind":"choice","label":"Shape","options":["cell","syringe",{"value":"cross-pack","label":"Cross pack"}],"default":"cell"},
+    {"key":"level","kind":"range","label":"Fill","lo":"Low","hi":"Full","default":0.8},
+    {"key":"sparkle","kind":"toggle","label":"Sparkle","default":true},
+    {"key":"body","kind":"colour","label":"Casing"},
+    {"key":"glow","kind":"colour","label":"Glow"},
+    {"key":"bob","kind":"range","label":"Float","lo":"Still","hi":"Floaty","default":0.5,"group":"Motion"},
+    {"key":"pop","kind":"range","label":"Pop height","lo":"Low","hi":"High","default":0.5,"group":"Motion"},
+    {"key":"speed","standard":"speed"}
+  ],
+  "body": { "pictures": {
+    "nodes": [
+      {"id":"it","parent":null,"at":[16,17]}
+    ],
+    "draw": [
+      {"id":"cell-cell","gen":"cell","v":1,"on":"it","at":[0,0],"shape":"cell","height":{"from":"size","map":[[0,16],[0.16666,16],[0.16667,18],[0.49999,18],[0.5,20],[0.83333,20],[0.83334,22],[1,22]],"round":"px"},"level":{"from":"level","map":[[0,0],[1,1]]},"casing":"body","charge":"glow","shine":"shine","when":{"shape":["cell"]}},
+      {"id":"cell-syringe","gen":"cell","v":1,"on":"it","at":[0,0],"shape":"syringe","height":{"from":"size","map":[[0,18],[0.16666,18],[0.16667,20],[0.49999,20],[0.5,22],[0.83333,22],[0.83334,24],[1,24]],"round":"px"},"level":{"from":"level","map":[[0,0],[1,1]]},"casing":"body","charge":"glow","shine":"shine","when":{"shape":["syringe"]}},
+      {"id":"cell-cross-pack","gen":"cell","v":1,"on":"it","at":[0,0],"shape":"pack","height":{"from":"size","map":[[0,16],[0.39999,16],[0.4,18],[0.79999,18],[0.8,20],[1,20]],"round":"px"},"level":{"from":"level","map":[[0,0],[1,1]]},"casing":"body","charge":"glow","shine":"shine","when":{"shape":["cross-pack"]}},
+      {"kind":"outline","paint":"ink"},
+      {"id":"halo-cell","gen":"cell","v":1,"on":"it","at":[0,0],"shape":"cell","height":{"from":"size","map":[[0,16],[0.16666,16],[0.16667,18],[0.49999,18],[0.5,20],[0.83333,20],[0.83334,22],[1,22]],"round":"px"},"level":{"from":"level","map":[[0,0],[1,1]]},"casing":"body","charge":"glow","shine":"shine","when":{"shape":["cell"]},"layer":"halo","clip":["idle"]},
+      {"id":"sparkle-cell","gen":"gleam","v":1,"on":"it","clip":["idle"],"when":{"sparkle":[true],"shape":["cell"]},"at":[{"from":"size","map":[[0,4],[0.16666,4],[0.16667,4],[0.49999,4],[0.5,5],[0.83333,5],[0.83334,6],[1,6]],"round":"px"},{"from":"size","map":[[0,-7],[0.16666,-7],[0.16667,-8],[0.49999,-8],[0.5,-9],[0.83333,-9],[0.83334,-10],[1,-10]],"round":"px"}],"peak":0.7,"paint":"glow.light","core":"shine"},
+      {"id":"halo-syringe","gen":"cell","v":1,"on":"it","at":[0,0],"shape":"syringe","height":{"from":"size","map":[[0,18],[0.16666,18],[0.16667,20],[0.49999,20],[0.5,22],[0.83333,22],[0.83334,24],[1,24]],"round":"px"},"level":{"from":"level","map":[[0,0],[1,1]]},"casing":"body","charge":"glow","shine":"shine","when":{"shape":["syringe"]},"layer":"halo","clip":["idle"]},
+      {"id":"sparkle-syringe","gen":"gleam","v":1,"on":"it","clip":["idle"],"when":{"sparkle":[true],"shape":["syringe"]},"at":[{"from":"size","map":[[0,3],[0.16666,3],[0.16667,3],[0.49999,3],[0.5,4],[0.83333,4],[0.83334,4],[1,4]],"round":"px"},{"from":"size","map":[[0,-8],[0.16666,-8],[0.16667,-9],[0.49999,-9],[0.5,-10],[0.83333,-10],[0.83334,-11],[1,-11]],"round":"px"}],"peak":0.7,"paint":"glow.light","core":"shine"},
+      {"id":"halo-cross-pack","gen":"cell","v":1,"on":"it","at":[0,0],"shape":"pack","height":{"from":"size","map":[[0,16],[0.39999,16],[0.4,18],[0.79999,18],[0.8,20],[1,20]],"round":"px"},"level":{"from":"level","map":[[0,0],[1,1]]},"casing":"body","charge":"glow","shine":"shine","when":{"shape":["cross-pack"]},"layer":"halo","clip":["idle"]},
+      {"id":"sparkle-cross-pack","gen":"gleam","v":1,"on":"it","clip":["idle"],"when":{"sparkle":[true],"shape":["cross-pack"]},"at":[{"from":"size","map":[[0,6],[0.39999,6],[0.4,7],[0.79999,7],[0.8,8],[1,8]],"round":"px"},{"from":"size","map":[[0,-7],[0.39999,-7],[0.4,-8],[0.79999,-8],[0.8,-9],[1,-9]],"round":"px"}],"peak":0.7,"paint":"glow.light","core":"shine"}
+    ],
+    "motion": [
+      {"gen":"pickup.bob","v":1,"clip":["idle"],"height":{"from":"bob","map":[[0,0],[1,2]]},"when":[{"shape":["cell","cross-pack"]},{"shape":["syringe"],"size":[{"atMost":0.83333}]}]},
+      {"gen":"pickup.bob","v":1,"clip":["idle"],"height":{"from":"bob","map":[[0,0],[0.5,1],[1,1]]},"when":{"shape":["syringe"],"size":[{"above":0.83333}]}},
+      {"gen":"cell.pulse","v":1,"node":"it","clip":["idle"],"mode":"beat"},
+      {"gen":"cell.pulse","v":1,"node":"it","clip":["collect"],"mode":"collect","when":{"shape":["cell","cross-pack"]}},
+      {"gen":"cell.pulse","v":1,"node":"it","clip":["collect"],"mode":"collect","stretch":{"from":"size","map":[[0,1],[0.83333,1],[0.83334,0.625],[1,0.625]]},"when":{"shape":["syringe"]}},
+      {"gen":"pickup.collect","v":1,"node":"it","clip":["collect"],"pop":{"from":"pop","map":[[0,0],[1,1]]},"low":{"from":"size","map":[[0,2.295],[0.16666,2.295],[0.16667,1.8],[0.49999,1.8],[0.5,1.305],[0.83333,1.305],[0.83334,0.81],[1,0.81]]},"high":{"from":"size","map":[[0,5.1],[0.16666,5.1],[0.16667,4],[0.49999,4],[0.5,2.9],[0.83333,2.9],[0.83334,1.8],[1,1.8]]},"room":32,"when":{"shape":["cell"]}},
+      {"gen":"pickup.collect","v":1,"node":"it","clip":["collect"],"pop":{"from":"pop","map":[[0,0],[1,1]]},"low":{"from":"size","map":[[0,1.8],[0.16666,1.8],[0.16667,1.305],[0.49999,1.305],[0.5,0.81],[0.83333,0.81],[0.83334,0.315],[1,0.315]]},"high":{"from":"size","map":[[0,4],[0.16666,4],[0.16667,2.9],[0.49999,2.9],[0.5,1.8],[0.83333,1.8],[0.83334,0.7],[1,0.7]]},"room":32,"when":{"shape":["syringe"]}},
+      {"gen":"pickup.collect","v":1,"node":"it","clip":["collect"],"pop":{"from":"pop","map":[[0,0],[1,1]]},"low":{"from":"size","map":[[0,2.295],[0.39999,2.295],[0.4,1.8],[0.79999,1.8],[0.8,1.305],[1,1.305]]},"high":{"from":"size","map":[[0,5.1],[0.39999,5.1],[0.4,4],[0.79999,4],[0.8,2.9],[1,2.9]]},"room":32,"when":{"shape":["cross-pack"]}}
+    ],
+    "emitters": [
+      {"id":"burst","gen":"pickup.burst","v":1,"on":"it","at":[0,0],"reach":{"from":"size","map":[[0,10],[1,13]]},"sparkle":{"from":"sparkle","pick":{"true":true,"false":false}},"paint":"glow","bright":"spark","core":"shine"}
+    ]
+  } },
+  "clips": {
+    "idle": {"frames":8,"fps":10},
+    "collect": {"frames":8,"fps":14,"loop":false,"frameEdits":{"4":{"flash":true}},"keys":[{"t":0,"ease":"hold","emit":{"burst":{"amount":0}}},{"t":0.7142,"ease":"linear","emit":{"burst":{"amount":0.2857}}},{"t":0.8571,"hide":["cell-cell","cell-syringe","cell-cross-pack"]},{"t":1,"emit":{"burst":{"amount":1}}}],"sounds":[{"sound":"upgrade-get","preset":"Health cell","frame":1,"volume":0.7}]}
+  }
+}

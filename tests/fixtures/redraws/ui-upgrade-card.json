@@ -1,0 +1,220 @@
+{
+ "id": "ui-upgrade-card",
+ "frozen": "2026-11-20",
+ "source": "sprites/ui-upgrade-card.js",
+ "sha256": "602bedaac4b6dec72d3c9b6392470cbeed1f4d998d050b620a0d4c7690a40803",
+ "name": "Upgrade card",
+ "blurb": "A tall sci-fi card with a square for an icon and a clear area for text, in normal, hover, pressed and disabled states; change its style, rarity, cut corners, border, tech lines and colours.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/panel",
+  "themes": [
+   "sci-fi",
+   "neutral"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "card-game",
+   "arcade"
+  ],
+  "view": "none",
+  "words": [
+   "card",
+   "upgrade",
+   "perk",
+   "choice",
+   "pick",
+   "reward",
+   "level up",
+   "rarity",
+   "panel",
+   "select",
+   "hover",
+   "hologram"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  64,
+  96
+ ],
+ "pivot": [
+  32,
+  48
+ ],
+ "grounded": false,
+ "preview": "normal",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "plate",
+   "options": [
+    {
+     "value": "plate",
+     "label": "Plate"
+    },
+    {
+     "value": "hologram",
+     "label": "Hologram"
+    },
+    {
+     "value": "glass",
+     "label": "Glass"
+    }
+   ],
+   "group": "Look"
+  },
+  "rarity": {
+   "kind": "choice",
+   "label": "Rarity",
+   "def": "common",
+   "options": [
+    {
+     "value": "common",
+     "label": "Common"
+    },
+    {
+     "value": "rare",
+     "label": "Rare"
+    },
+    {
+     "value": "epic",
+     "label": "Epic"
+    }
+   ],
+   "group": "Look"
+  },
+  "corner": {
+   "kind": "range",
+   "label": "Corner",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Square",
+   "hi": "Cut",
+   "group": "Look"
+  },
+  "border": {
+   "kind": "range",
+   "label": "Border",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Thin",
+   "hi": "Thick",
+   "group": "Look"
+  },
+  "lines": {
+   "kind": "toggle",
+   "label": "Tech lines",
+   "def": true,
+   "group": "Look"
+  },
+  "face": {
+   "kind": "color",
+   "label": "Face",
+   "def": "#434d6d",
+   "swatches": [
+    "#434d6d",
+    "#27505c",
+    "#5b2e56",
+    "#30417a",
+    "#383c59"
+   ],
+   "group": "Colors"
+  },
+  "frame": {
+   "kind": "color",
+   "label": "Frame",
+   "def": "#6b7896",
+   "swatches": [
+    "#6b7896",
+    "#2fb3a8",
+    "#5fe0f0",
+    "#9aa6c0",
+    "#c2c9d6",
+    "#f2a030"
+   ],
+   "group": "Colors"
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Glow",
+   "def": "#5fe0f0",
+   "swatches": [
+    "#5fe0f0",
+    "#e2473f",
+    "#9fe040",
+    "#f2a030",
+    "#b48af8",
+    "#4f9ff0",
+    "#5fd47a"
+   ],
+   "group": "Colors"
+  }
+ },
+ "clips": {
+  "normal": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "hover": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "pressed": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "disabled": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  }
+ },
+ "sounds": {
+  "hover": [
+   {
+    "sound": "tech-click",
+    "preset": "Hover",
+    "frame": 0,
+    "volume": 0.6
+   }
+  ],
+  "pressed": [
+   {
+    "sound": "tech-click",
+    "preset": "Select",
+    "frame": 0,
+    "volume": 0.6
+   }
+  ]
+ },
+ "versionsFrom": "review M9 round 2, issue 1: the code had no hand-made versions; these are what its catalogue card offered (engine/versions.js versionsOf(code sprite, 12)), kept as the data file's versions so the card offers the same ones (a data sprite lists its colour controls first, which changes what versionsOf generates)",
+  "versions": [{"name": "Hologram", "params": {"style": "hologram"}}, {"name": "Sky blue frame, glass", "params": {"style": "glass", "frame": "#5fe0f0"}}, {"name": "Orange frame, epic rarity", "params": {"rarity": "epic", "frame": "#f2a030"}}, {"name": "Dark purple face, glass", "params": {"style": "glass", "face": "#5b2e56"}}, {"name": "Dark purple face, hologram", "params": {"style": "hologram", "face": "#5b2e56"}}, {"name": "Orange frame, thin border", "params": {"border": 0, "frame": "#f2a030"}}],
+ "bundles": [
+  "kit-roguelite-scifi"
+ ]
+}

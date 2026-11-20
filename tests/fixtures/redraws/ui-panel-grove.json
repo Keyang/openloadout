@@ -1,0 +1,227 @@
+{
+ "id": "ui-panel-grove",
+ "frozen": "2026-11-20",
+ "source": "sprites/ui-panel-grove.js",
+ "sha256": "8f2612fadc055849098fa467ce246e095a48b45156aa697567c641212d0935cd",
+ "name": "Vine panels",
+ "blurb": "Stretchable dark bark boxes wrapped in a pale living vine for shops, crafting lists and tips: a panel, one with a heading, a list well and a tooltip; change the style, corners, vine thickness, leaves and colours.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/panel",
+  "themes": [
+   "neutral",
+   "forest",
+   "farm"
+  ],
+  "gameTypes": [
+   "arcade",
+   "farming-sim",
+   "top-down-rpg",
+   "puzzle"
+  ],
+  "view": "none",
+  "words": [
+   "panel",
+   "window",
+   "box",
+   "popup",
+   "menu",
+   "tooltip",
+   "list",
+   "vine",
+   "leaf",
+   "bark",
+   "forest",
+   "nature"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  96,
+  64
+ ],
+ "pivot": [
+  48,
+  32
+ ],
+ "grounded": false,
+ "preview": "panel",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "vine",
+   "options": [
+    {
+     "value": "vine",
+     "label": "Vine"
+    },
+    {
+     "value": "bark",
+     "label": "Bark"
+    },
+    {
+     "value": "bloom",
+     "label": "Bloom"
+    }
+   ],
+   "group": "Look"
+  },
+  "corner": {
+   "kind": "range",
+   "label": "Corner",
+   "def": 0.75,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Square",
+   "hi": "Round",
+   "group": "Look"
+  },
+  "border": {
+   "kind": "range",
+   "label": "Border",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Thin",
+   "hi": "Thick",
+   "group": "Look"
+  },
+  "leaves": {
+   "kind": "toggle",
+   "label": "Leaves",
+   "def": true,
+   "group": "Look"
+  },
+  "face": {
+   "kind": "color",
+   "label": "Bark",
+   "def": "#7a4f33",
+   "swatches": [
+    "#7a4f33",
+    "#3f5068",
+    "#8e3a4a",
+    "#434d6d"
+   ],
+   "group": "Colors"
+  },
+  "frame": {
+   "kind": "color",
+   "label": "Vine",
+   "def": "#9bd18a",
+   "swatches": [
+    "#9bd18a",
+    "#7fe0a0",
+    "#e6c96a",
+    "#f0ead8"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Leaves and flowers",
+   "def": "#6aa83e",
+   "swatches": [
+    "#6aa83e",
+    "#c9423a",
+    "#e08a2c",
+    "#7a4fc4",
+    "#3f6fd1"
+   ],
+   "group": "Colors",
+   "when": [
+    {
+     "leaves": [
+      true
+     ]
+    },
+    {
+     "style": [
+      "bloom"
+     ]
+    }
+   ]
+  }
+ },
+ "clips": {
+  "panel": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "panel-title": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "inset": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "tooltip": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [
+  {
+   "name": "Vine",
+   "params": {}
+  },
+  {
+   "name": "Berry bloom",
+   "params": {
+    "style": "bloom",
+    "accent": "#7a4fc4",
+    "face": "#8e3a4a",
+    "frame": "#7fe0a0"
+   }
+  },
+  {
+   "name": "Old bark",
+   "params": {
+    "style": "bark",
+    "frame": "#e6c96a",
+    "border": 1
+   }
+  },
+  {
+   "name": "Mint at night",
+   "params": {
+    "face": "#3f5068",
+    "frame": "#7fe0a0",
+    "accent": "#3f6fd1"
+   }
+  },
+  {
+   "name": "Bare",
+   "params": {
+    "leaves": false,
+    "corner": 0.25,
+    "face": "#434d6d"
+   }
+  }
+ ],
+ "bundles": []
+}

@@ -1,0 +1,685 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "icons-gear",
+ "name": "Equipment icons",
+ "blurb": "Nine equipment icons: sword, staff, dagger, bow, shield, helm, armour, ring and boots; change their size, tilt, shading, shine and the colours of metal, wood, leather and jewels.",
+ "meta": {
+  "type": "icon",
+  "role": "items/weapon",
+  "themes": ["fantasy"],
+  "gameTypes": ["turn-based-rpg", "top-down-rpg", "roguelike-action"],
+  "view": "none",
+  "words": ["sword", "staff", "dagger", "bow", "shield", "helmet", "armour", "armor", "ring", "boots", "equipment", "gear", "weapon", "equip"],
+  "license": "draft"
+ },
+ "size": [32, 32],
+ "pivot": [16, 16],
+ "grounded": false,
+ "preview": "sword",
+ "styles": ["pixel"],
+ "palette": [
+  {"id": "metal", "label": "Metal", "default": "#c2c9d6", "material": "metal", "swatches": ["#c2c9d6", "#f2c230", "#a8a4a0", "#a8806a", "#7e84a0"]},
+  {
+   "id": "wood",
+   "label": "Wood",
+   "default": "#9a6a3e",
+   "material": "wood",
+   "swatches": ["#9a6a3e", "#c9a06a", "#e6c96a", "#a8612a", "#5a3a22", "#c98a4a"]
+  },
+  {"id": "leather", "label": "Leather", "default": "#8e3a4a", "material": "wood", "swatches": ["#8e3a4a", "#c8553a", "#2f8f9d", "#357a4c", "#3f6fd1"]},
+  {"id": "accent", "label": "Jewels", "default": "#4fd8ee", "material": "magic", "swatches": ["#4fd8ee", "#c9423a", "#7fe0a0", "#7a4fc4", "#f2c230"]},
+  {"id": "steel", "default": "#c2c9d6", "material": "paint", "detail": true},
+  {"id": "gold", "default": "#f2c230", "material": "paint", "detail": true},
+  {"id": "metal-fitting", "material": "paint", "derive": {"rule": "standOut", "against": "metal", "from": ["steel", "gold"]}},
+  {"id": "white", "default": "#ffffff", "material": "light", "detail": true},
+  {"id": "cream", "default": "#f0ead8", "material": "paint", "detail": true},
+  {"id": "ink", "default": "#231b33", "material": "paint", "detail": true}
+ ],
+ "controls": [
+  {"key": "size", "kind": "range", "label": "Size", "lo": "Small", "hi": "Big", "default": 0.5},
+  {"key": "tilt", "kind": "toggle", "label": "Tilt", "default": true},
+  {"key": "shade", "kind": "toggle", "label": "Soft shading", "default": true},
+  {"key": "shine", "kind": "toggle", "label": "Shine", "default": true},
+  {"key": "metal", "kind": "colour", "label": "Metal"},
+  {"key": "wood", "kind": "colour", "label": "Wood"},
+  {"key": "leather", "kind": "colour", "label": "Leather"},
+  {"key": "accent", "kind": "colour", "label": "Jewels"}
+ ],
+ "body": {
+  "pictures": {
+   "draw": [],
+   "pictures": {
+    "sword": {
+     "label": "Sword",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {"from": "size", "map": [[0, 0], [1, 1]]},
+       "tilt": {"from": "tilt", "pick": {"true": true, "false": false}},
+       "turn": 45,
+       "soften": {"from": "shade", "pick": {"true": true, "false": false}},
+       "shiny": {"from": "shine", "pick": {"true": true, "false": false}},
+       "draw": [
+        {"kind": "poly", "points": [[-1.4, 6.2], [1.4, 6.2], [1.4, 10.6], [-1.4, 10.6]], "paint": "leather", "shade": 1, "light": 0},
+        {
+         "kind": "poly",
+         "points": [[-2.3, 4.2], [-2.3, -8.35], [0, -11.8], [0, 4.2]],
+         "paint": "metal.light",
+         "shade": 0,
+         "light": 0,
+         "when": {"shine": [true]}
+        },
+        {
+         "kind": "poly",
+         "points": [[-2.3, 4.2], [-2.3, -8.35], [0, -11.8], [0, 4.2]],
+         "paint": "metal",
+         "shade": 0,
+         "light": 0,
+         "when": {"shine": [false]}
+        },
+        {
+         "kind": "poly",
+         "points": [[0, 4.2], [0, -11.8], [2.3, -8.35], [2.3, 4.2]],
+         "paint": {"rule": "mix", "of": "metal", "with": {"rule": "ramp", "of": "metal", "tone": "dark"}, "amount": 0.5},
+         "shade": 0,
+         "light": 0,
+         "when": {"shade": [true]}
+        },
+        {
+         "kind": "poly",
+         "points": [[0, 4.2], [0, -11.8], [2.3, -8.35], [2.3, 4.2]],
+         "paint": "metal",
+         "shade": 0,
+         "light": 0,
+         "when": {"shade": [false], "shine": [true]}
+        },
+        {
+         "kind": "poly",
+         "points": [[0, 4.2], [0, -11.8], [2.3, -8.35], [2.3, 4.2]],
+         "paint": "metal.dark",
+         "shade": 0,
+         "light": 0,
+         "when": {"shade": [false], "shine": [false]}
+        },
+        {
+         "kind": "poly",
+         "points": [[-5.4, 4.2], [5.4, 4.2], [5.4, 6.4], [-5.4, 6.4]],
+         "paint": "metal-fitting",
+         "shade": 1,
+         "light": 0,
+         "group": "metal-fitting"
+        },
+        {"kind": "ellipse", "at": [-5.4, 5.3], "r": [1.5, 1.5], "paint": "metal-fitting", "shade": 1, "light": 0, "group": "metal-fitting"},
+        {"kind": "ellipse", "at": [5.4, 5.3], "r": [1.5, 1.5], "paint": "metal-fitting", "shade": 1, "light": 0, "group": "metal-fitting"},
+        {"kind": "ellipse", "at": [0, 11.6], "r": [2.2, 2.2], "paint": "accent", "shade": 1, "light": 0},
+        {"gen": "icon.glint", "v": 2, "at": [-1.15, -7], "dot": false, "paint": "white"}
+       ]
+      }
+     ]
+    },
+    "staff": {
+     "label": "Staff",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {"from": "size", "map": [[0, 0], [1, 1]]},
+       "tilt": {"from": "tilt", "pick": {"true": true, "false": false}},
+       "turn": 45,
+       "soften": {"from": "shade", "pick": {"true": true, "false": false}},
+       "shiny": {"from": "shine", "pick": {"true": true, "false": false}},
+       "draw": [
+        {"kind": "poly", "points": [[-1.25, -3], [1.25, -3], [1.25, 12.6], [-1.25, 12.6]], "paint": "wood", "shade": 1, "light": 0},
+        {"kind": "poly", "points": [[-1.6, 2], [1.6, 2], [1.6, 6.4], [-1.6, 6.4]], "paint": "leather", "shade": 0, "light": 0},
+        {"kind": "poly", "points": [[-1.6, 10.6], [1.6, 10.6], [1.6, 13], [-1.6, 13]], "paint": "metal", "shade": 1, "light": 0},
+        {
+         "kind": "poly",
+         "points": [[-1.8, -2.4], [-5.6, -4.8], [-6.2, -8], [-4, -8], [-3.6, -6.2], [-1.2, -5]],
+         "paint": "metal",
+         "shade": 1,
+         "light": 0,
+         "group": "metal"
+        },
+        {
+         "kind": "poly",
+         "points": [[1.8, -2.4], [5.6, -4.8], [6.2, -8], [4, -8], [3.6, -6.2], [1.2, -5]],
+         "paint": "metal",
+         "shade": 1,
+         "light": 0,
+         "group": "metal"
+        },
+        {"kind": "poly", "points": [[-2.3, -4.4], [2.3, -4.4], [2.3, -2.4], [-2.3, -2.4]], "paint": "metal", "shade": 1, "light": 0, "group": "metal"},
+        {"gen": "icon.rim", "v": 1, "shapes": [{"kind": "ellipse", "at": [0, -8.4], "r": [3.6, 3.6], "paint": "accent"}], "paint": "ink"},
+        {"kind": "ellipse", "at": [0, -8.4], "r": [3.6, 3.6], "paint": "accent", "shade": 2},
+        {"gen": "icon.glint", "v": 2, "at": [0.9, -10.2], "dot": false, "paint": "white"}
+       ]
+      }
+     ]
+    },
+    "dagger": {
+     "label": "Dagger",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {"from": "size", "map": [[0, 0], [1, 1]]},
+       "tilt": {"from": "tilt", "pick": {"true": true, "false": false}},
+       "turn": 45,
+       "soften": {"from": "shade", "pick": {"true": true, "false": false}},
+       "shiny": {"from": "shine", "pick": {"true": true, "false": false}},
+       "fill": 0.82,
+       "draw": [
+        {"kind": "ellipse", "at": [0, 9.4], "r": [2.9, 2.9], "paint": "metal-fitting", "shade": 1, "light": 0, "group": "metal-fitting"},
+        {"kind": "cut", "from": "metal-fitting", "shape": {"kind": "ellipse", "at": [0, 9.4], "r": [1.2, 1.2], "paint": "metal-fitting"}},
+        {"kind": "poly", "points": [[-1.6, 2.6], [1.6, 2.6], [1.6, 7.2], [-1.6, 7.2]], "paint": "leather", "shade": 1, "light": 0},
+        {
+         "kind": "poly",
+         "points": [[-2.6, 1], [-2.6, -6.5], [-0.6, -11.6], [0.2, -5], [0.2, 1]],
+         "paint": "metal.light",
+         "shade": 0,
+         "light": 0,
+         "when": {"shine": [true]}
+        },
+        {
+         "kind": "poly",
+         "points": [[-2.6, 1], [-2.6, -6.5], [-0.6, -11.6], [0.2, -5], [0.2, 1]],
+         "paint": "metal",
+         "shade": 0,
+         "light": 0,
+         "when": {"shine": [false]}
+        },
+        {
+         "kind": "poly",
+         "points": [[0.2, 1], [0.2, -5], [-0.6, -11.6], [2.6, -7.4], [3.4, -3.4], [3, 1]],
+         "paint": {"rule": "mix", "of": "metal", "with": {"rule": "ramp", "of": "metal", "tone": "dark"}, "amount": 0.5},
+         "shade": 0,
+         "light": 0,
+         "when": {"shade": [true]}
+        },
+        {
+         "kind": "poly",
+         "points": [[0.2, 1], [0.2, -5], [-0.6, -11.6], [2.6, -7.4], [3.4, -3.4], [3, 1]],
+         "paint": "metal",
+         "shade": 0,
+         "light": 0,
+         "when": {"shade": [false], "shine": [true]}
+        },
+        {
+         "kind": "poly",
+         "points": [[0.2, 1], [0.2, -5], [-0.6, -11.6], [2.6, -7.4], [3.4, -3.4], [3, 1]],
+         "paint": "metal.dark",
+         "shade": 0,
+         "light": 0,
+         "when": {"shade": [false], "shine": [false]}
+        },
+        {
+         "kind": "poly",
+         "points": [[-4.6, 0.8], [4.8, 0.8], [4.8, 2.8], [-4.6, 2.8]],
+         "paint": "metal-fitting",
+         "shade": 1,
+         "group": "metal-fitting-2"
+        },
+        {"kind": "ellipse", "at": [4.8, 1.2], "r": [1.5, 1.7], "paint": "metal-fitting", "shade": 1, "group": "metal-fitting-2"},
+        {"gen": "icon.glint", "v": 2, "at": [-1.4, -6], "dot": false, "paint": "white"}
+       ]
+      }
+     ]
+    },
+    "bow": {
+     "label": "Bow",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {"from": "size", "map": [[0, 0], [1, 1]]},
+       "tilt": {"from": "tilt", "pick": {"true": true, "false": false}},
+       "turn": 45,
+       "soften": {"from": "shade", "pick": {"true": true, "false": false}},
+       "shiny": {"from": "shine", "pick": {"true": true, "false": false}},
+       "draw": [
+        {"gen": "icon.line", "v": 2, "path": [1.4, -11.4, 1.4, 11.4], "paint": "cream"},
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [{"kind": "ellipse", "at": [8.2, 0], "r": [14.2, 14.2], "paint": "wood"}],
+         "minus": [{"kind": "ellipse", "at": [14, 0], "r": [16.9, 16.9], "paint": "wood"}],
+         "within": [{"kind": "poly", "points": [[-64, -64], [2.2, -64], [2.2, 64], [-64, 64]], "paint": "wood"}],
+         "paint": "wood",
+         "soft": 1
+        },
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [{"kind": "ellipse", "at": [8.2, 0], "r": [14.2, 14.2], "paint": "leather"}],
+         "minus": [{"kind": "ellipse", "at": [14, 0], "r": [16.9, 16.9], "paint": "leather"}],
+         "within": [{"kind": "poly", "points": [[-9, -2.8], [0, -2.8], [0, 2.8], [-9, 2.8]], "paint": "leather"}],
+         "paint": "leather",
+         "soft": 0,
+         "lit": 0
+        },
+        {"kind": "ellipse", "at": [1.3, -11.6], "r": [1.5, 1.5], "paint": "metal", "shade": 1, "light": 0, "group": "metal"},
+        {"kind": "ellipse", "at": [1.3, 11.6], "r": [1.5, 1.5], "paint": "metal", "shade": 1, "light": 0, "group": "metal"}
+       ]
+      }
+     ]
+    },
+    "shield": {
+     "label": "Shield",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {"from": "size", "map": [[0, 0], [1, 1]]},
+       "tilt": {"from": "tilt", "pick": {"true": true, "false": false}},
+       "turn": 26.5651,
+       "soften": {"from": "shade", "pick": {"true": true, "false": false}},
+       "shiny": {"from": "shine", "pick": {"true": true, "false": false}},
+       "draw": [
+        {
+         "kind": "poly",
+         "points": [[-9.4, -10.6], [9.4, -10.6], [9.6, -1.5], [6.6, 6], [0, 11.6], [-6.6, 6], [-9.6, -1.5]],
+         "paint": "metal",
+         "shade": 2
+        },
+        {
+         "gen": "icon.rim",
+         "v": 1,
+         "shapes": [
+          {
+           "kind": "poly",
+           "points": [[-6.956, -8.344], [6.956, -8.344], [7.104, -1.428], [4.884, 4.272], [0, 8.528], [-4.884, 4.272], [-7.104, -1.428]],
+           "paint": "wood"
+          }
+         ],
+         "paint": "metal.dark"
+        },
+        {
+         "kind": "poly",
+         "points": [[-6.956, -8.344], [6.956, -8.344], [7.104, -1.428], [4.884, 4.272], [0, 8.528], [-4.884, 4.272], [-7.104, -1.428]],
+         "paint": "wood",
+         "light": 0
+        },
+        {"gen": "icon.rim", "v": 1, "shapes": [{"kind": "ellipse", "at": [0, -2.2], "r": [3.4, 3.4], "paint": "metal"}], "paint": "metal.dark"},
+        {"kind": "ellipse", "at": [0, -2.2], "r": [3.4, 3.4], "paint": "metal", "shade": 1},
+        {"kind": "ellipse", "at": [0, -2.2], "r": [1.9, 1.9], "paint": "accent", "shade": 0, "light": 0},
+        {"gen": "icon.glint", "v": 2, "at": [0.6, -3.6], "len": 1, "dot": false, "paint": "white"}
+       ]
+      }
+     ]
+    },
+    "helm": {
+     "label": "Helm",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {"from": "size", "map": [[0, 0], [1, 1]]},
+       "tilt": {"from": "tilt", "pick": {"true": true, "false": false}},
+       "soften": {"from": "shade", "pick": {"true": true, "false": false}},
+       "shiny": {"from": "shine", "pick": {"true": true, "false": false}},
+       "slant": {"from": "tilt", "pick": {"true": 0.25, "false": 0}},
+       "draw": [
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [
+          {"gen": "taper", "v": 1, "from": [-6.4, -3.4], "to": [-9.4, -5.4], "r0": 2.2, "r1": 2, "paint": "cream"},
+          {"gen": "taper", "v": 1, "from": [-9.4, -5.4], "to": [-9.6, -11], "r0": 2, "r1": 0.9, "paint": "cream"}
+         ],
+         "paint": "cream",
+         "soft": 0,
+         "lit": 0
+        },
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [
+          {"gen": "taper", "v": 1, "from": [6.4, -3.4], "to": [9.4, -5.4], "r0": 2.2, "r1": 2, "paint": "cream"},
+          {"gen": "taper", "v": 1, "from": [9.4, -5.4], "to": [9.6, -11], "r0": 2, "r1": 0.9, "paint": "cream"}
+         ],
+         "paint": "cream",
+         "soft": 0,
+         "lit": 0
+        },
+        {"kind": "ellipse", "at": [0, -1.4], "r": [8, 8.8], "paint": "metal", "group": "metal"},
+        {"kind": "poly", "points": [[-8, -1.4], [8, -1.4], [8, 11], [-8, 11]], "paint": "metal", "group": "metal"},
+        {
+         "kind": "poly",
+         "points": [[-4.2, 3.6], [4.2, 3.6], [4.2, 11], [-4.2, 11]],
+         "paint": {"rule": "mix", "of": {"rule": "ramp", "of": "metal", "tone": "deep"}, "with": "ink", "amount": 0.6},
+         "shade": 0,
+         "light": 0
+        },
+        {
+         "kind": "poly",
+         "points": [[-5.8, 3.6], [5.8, 3.6], [5.8, 6], [-5.8, 6]],
+         "paint": {"rule": "mix", "of": {"rule": "ramp", "of": "metal", "tone": "deep"}, "with": "ink", "amount": 0.6},
+         "shade": 0,
+         "light": 0
+        },
+        {
+         "gen": "icon.rim",
+         "v": 1,
+         "shapes": [
+          {"kind": "poly", "points": [[-8.6, 1], [8.6, 1], [8.6, 3.6], [-8.6, 3.6]], "paint": "metal.light"},
+          {"kind": "poly", "points": [[-1.1, 1], [1.1, 1], [1.1, 9], [-1.1, 9]], "paint": "metal.light"}
+         ],
+         "paint": "metal.dark",
+         "when": {"shine": [true]}
+        },
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [
+          {"kind": "poly", "points": [[-8.6, 1], [8.6, 1], [8.6, 3.6], [-8.6, 3.6]], "paint": "metal.light"},
+          {"kind": "poly", "points": [[-1.1, 1], [1.1, 1], [1.1, 9], [-1.1, 9]], "paint": "metal.light"}
+         ],
+         "paint": "metal.light",
+         "soft": 0,
+         "lit": 0,
+         "band": "metal",
+         "middle": "metal.light",
+         "highlight": "metal.light",
+         "when": {"shine": [true]}
+        },
+        {
+         "gen": "icon.rim",
+         "v": 1,
+         "shapes": [
+          {"kind": "poly", "points": [[-8.6, 1], [8.6, 1], [8.6, 3.6], [-8.6, 3.6]], "paint": "metal"},
+          {"kind": "poly", "points": [[-1.1, 1], [1.1, 1], [1.1, 9], [-1.1, 9]], "paint": "metal"}
+         ],
+         "paint": "metal.dark",
+         "when": {"shine": [false]}
+        },
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [
+          {"kind": "poly", "points": [[-8.6, 1], [8.6, 1], [8.6, 3.6], [-8.6, 3.6]], "paint": "metal"},
+          {"kind": "poly", "points": [[-1.1, 1], [1.1, 1], [1.1, 9], [-1.1, 9]], "paint": "metal"}
+         ],
+         "paint": "metal",
+         "soft": 0,
+         "lit": 0,
+         "band": "metal.dark",
+         "middle": "metal",
+         "highlight": "metal",
+         "when": {"shine": [false]}
+        },
+        {"gen": "icon.rim", "v": 1, "shapes": [{"kind": "ellipse", "at": [0, -3.2], "r": [2.1, 2.1], "paint": "accent"}], "paint": "metal.dark"},
+        {"kind": "ellipse", "at": [0, -3.2], "r": [2.1, 2.1], "paint": "accent", "shade": 0, "light": 0},
+        {"gen": "icon.glint", "v": 2, "at": [4, -6.4], "dot": false, "paint": "white"}
+       ]
+      }
+     ]
+    },
+    "armour": {
+     "label": "Armour",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {"from": "size", "map": [[0, 0], [1, 1]]},
+       "tilt": {"from": "tilt", "pick": {"true": true, "false": false}},
+       "soften": {"from": "shade", "pick": {"true": true, "false": false}},
+       "shiny": {"from": "shine", "pick": {"true": true, "false": false}},
+       "slant": {"from": "tilt", "pick": {"true": 0.25, "false": 0}},
+       "draw": [
+        {
+         "kind": "poly",
+         "points": [
+          [-4, -10.8],
+          [-10.6, -9.4],
+          [-11.6, -4.4],
+          [-7.4, -2.6],
+          [-6, 4],
+          [-8.8, 10.8],
+          [8.8, 10.8],
+          [6, 4],
+          [7.4, -2.6],
+          [11.6, -4.4],
+          [10.6, -9.4],
+          [4, -10.8]
+         ],
+         "paint": "metal",
+         "group": "metal"
+        },
+        {"kind": "cut", "from": "metal", "shape": {"kind": "ellipse", "at": [0, -11.8], "r": [3.4, 3.8], "paint": "metal"}},
+        {"kind": "line", "from": [-6.4, -9.8], "to": [-7.2, -2.8], "paint": "metal.dark"},
+        {"kind": "line", "from": [6.4, -9.8], "to": [7.2, -2.8], "paint": "metal.dark"},
+        {"kind": "line", "from": [0, -7.6], "to": [0, 3], "paint": "metal.light", "when": {"shine": [true]}},
+        {"kind": "line", "from": [0, -7.6], "to": [0, 3], "paint": "metal.dark", "when": {"shine": [false]}},
+        {"kind": "line", "from": [-7.4, 8.2], "to": [7.4, 8.2], "paint": "metal.dark"},
+        {
+         "gen": "icon.rim",
+         "v": 1,
+         "shapes": [{"kind": "poly", "points": [[-6.4, 3.6], [6.4, 3.6], [6.4, 6], [-6.4, 6]], "paint": "leather"}],
+         "paint": "metal.dark"
+        },
+        {"kind": "poly", "points": [[-6.4, 3.6], [6.4, 3.6], [6.4, 6], [-6.4, 6]], "paint": "leather", "shade": 1, "light": 0},
+        {"kind": "poly", "points": [[-1.6, 3.2], [1.6, 3.2], [1.6, 6.4], [-1.6, 6.4]], "paint": "metal-fitting", "shade": 0, "light": 0},
+        {"gen": "icon.rim", "v": 1, "shapes": [{"kind": "ellipse", "at": [0, -3.8], "r": [2.1, 2.1], "paint": "accent"}], "paint": "metal.dark"},
+        {"kind": "ellipse", "at": [0, -3.8], "r": [2.1, 2.1], "paint": "accent", "shade": 1, "light": 0}
+       ]
+      }
+     ]
+    },
+    "ring": {
+     "label": "Ring",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {"from": "size", "map": [[0, 0], [1, 1]]},
+       "tilt": {"from": "tilt", "pick": {"true": true, "false": false}},
+       "turn": 26.5651,
+       "soften": {"from": "shade", "pick": {"true": true, "false": false}},
+       "shiny": {"from": "shine", "pick": {"true": true, "false": false}},
+       "fill": 0.86,
+       "draw": [
+        {"kind": "ellipse", "at": [0, 3.4], "r": [8.2, 8.2], "paint": "metal", "shade": 2, "group": "metal"},
+        {"kind": "cut", "from": "metal", "shape": {"kind": "ellipse", "at": [0, 3.4], "r": [5.5, 5.5], "paint": "metal"}},
+        {"kind": "poly", "points": [[-3.6, -6.2], [3.6, -6.2], [2.4, -3.2], [-2.4, -3.2]], "paint": "metal", "shade": 1, "light": 0},
+        {"kind": "poly", "points": [[-2.4, -12], [2.4, -12], [4.8, -9.34], [0, -4.4], [-4.8, -9.34]], "paint": "accent", "shade": 0, "light": 0},
+        {"kind": "poly", "points": [[-1.728, -9.34], [-4.8, -9.34], [-2.4, -12]], "paint": "accent", "shade": 0, "light": 0},
+        {"kind": "poly", "points": [[2.4, -12], [1.728, -9.34], [-1.728, -9.34], [-2.4, -12]], "paint": "accent.light", "shade": 0, "light": 0},
+        {
+         "kind": "poly",
+         "points": [[1.728, -9.34], [2.4, -12], [4.8, -9.34]],
+         "paint": {"rule": "mix", "of": {"rule": "ramp", "of": "accent", "tone": "light"}, "with": "white", "amount": 0.55},
+         "shade": 0,
+         "light": 0,
+         "when": {"shine": [true]}
+        },
+        {
+         "kind": "poly",
+         "points": [[1.728, -9.34], [2.4, -12], [4.8, -9.34]],
+         "paint": "accent.light",
+         "shade": 0,
+         "light": 0,
+         "when": {"shine": [false]}
+        },
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [
+          {
+           "kind": "poly",
+           "points": [[-4.8, -9.34], [-1.728, -9.34], [0, -4.4]],
+           "paint": {"rule": "mix", "of": "accent", "with": {"rule": "ramp", "of": "accent", "tone": "dark"}, "amount": 0.5}
+          }
+         ],
+         "within": [
+          {
+           "kind": "poly",
+           "points": [[-2.4, -12], [2.4, -12], [4.8, -9.34], [0, -4.4], [-4.8, -9.34]],
+           "paint": {"rule": "mix", "of": "accent", "with": {"rule": "ramp", "of": "accent", "tone": "dark"}, "amount": 0.5}
+          }
+         ],
+         "paint": {"rule": "mix", "of": "accent", "with": {"rule": "ramp", "of": "accent", "tone": "dark"}, "amount": 0.5},
+         "soft": 0,
+         "lit": 0,
+         "band": "accent.dark",
+         "highlight": "accent.dark",
+         "when": {"shade": [true]}
+        },
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [{"kind": "poly", "points": [[-4.8, -9.34], [-1.728, -9.34], [0, -4.4]], "paint": "accent.dark"}],
+         "within": [{"kind": "poly", "points": [[-2.4, -12], [2.4, -12], [4.8, -9.34], [0, -4.4], [-4.8, -9.34]], "paint": "accent.dark"}],
+         "paint": "accent.dark",
+         "soft": 0,
+         "lit": 0,
+         "band": "accent.dark",
+         "highlight": "accent.dark",
+         "when": {"shade": [false]}
+        },
+        {"kind": "poly", "points": [[0, -4.4], [-1.728, -9.34], [1.728, -9.34]], "paint": "accent", "shade": 0, "light": 0},
+        {"kind": "poly", "points": [[0, -4.4], [1.728, -9.34], [4.8, -9.34]], "paint": "accent.light", "shade": 0, "light": 0},
+        {"gen": "icon.glint", "v": 2, "at": [1.344, -9.796], "len": 1, "dot": false, "paint": "white"}
+       ]
+      }
+     ]
+    },
+    "boots": {
+     "label": "Boots",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {"from": "size", "map": [[0, 0], [1, 1]]},
+       "tilt": {"from": "tilt", "pick": {"true": true, "false": false}},
+       "soften": {"from": "shade", "pick": {"true": true, "false": false}},
+       "shiny": {"from": "shine", "pick": {"true": true, "false": false}},
+       "slant": {"from": "tilt", "pick": {"true": 0.25, "false": 0}},
+       "draw": [
+        {"kind": "poly", "points": [[-11.2, 5.8], [4.4, 5.8], [4.4, 7.8], [-11.2, 7.8]], "paint": "wood", "shade": 0, "light": 0, "group": "wood"},
+        {"kind": "poly", "points": [[-11.2, 7.8], [-7.6, 7.8], [-7.6, 9.6], [-11.2, 9.6]], "paint": "wood", "shade": 0, "light": 0, "group": "wood"},
+        {
+         "gen": "icon.rim",
+         "v": 1,
+         "shapes": [
+          {
+           "kind": "poly",
+           "points": [[-10.6, -10.8], [-3.6, -10.8], [-3.6, 5.8], [-10.6, 5.8]],
+           "paint": {"rule": "mix", "of": "leather", "with": {"rule": "ramp", "of": "leather", "tone": "dark"}, "amount": 0.5}
+          },
+          {
+           "kind": "poly",
+           "points": [[-10.6, 0.6], [0.8, 0.6], [0.8, 5.8], [-10.6, 5.8]],
+           "paint": {"rule": "mix", "of": "leather", "with": {"rule": "ramp", "of": "leather", "tone": "dark"}, "amount": 0.5}
+          },
+          {
+           "kind": "ellipse",
+           "at": [0.4, 2.6],
+           "r": [4, 3.3],
+           "paint": {"rule": "mix", "of": "leather", "with": {"rule": "ramp", "of": "leather", "tone": "dark"}, "amount": 0.5}
+          }
+         ],
+         "minus": [
+          {
+           "kind": "poly",
+           "points": [[-13.2, 5.8], [6.8, 5.8], [6.8, 10.2], [-13.2, 10.2]],
+           "paint": {"rule": "mix", "of": "leather", "with": {"rule": "ramp", "of": "leather", "tone": "dark"}, "amount": 0.5}
+          }
+         ],
+         "paint": "leather.dark"
+        },
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [
+          {
+           "kind": "poly",
+           "points": [[-10.6, -10.8], [-3.6, -10.8], [-3.6, 5.8], [-10.6, 5.8]],
+           "paint": {"rule": "mix", "of": "leather", "with": {"rule": "ramp", "of": "leather", "tone": "dark"}, "amount": 0.5}
+          },
+          {
+           "kind": "poly",
+           "points": [[-10.6, 0.6], [0.8, 0.6], [0.8, 5.8], [-10.6, 5.8]],
+           "paint": {"rule": "mix", "of": "leather", "with": {"rule": "ramp", "of": "leather", "tone": "dark"}, "amount": 0.5}
+          },
+          {
+           "kind": "ellipse",
+           "at": [0.4, 2.6],
+           "r": [4, 3.3],
+           "paint": {"rule": "mix", "of": "leather", "with": {"rule": "ramp", "of": "leather", "tone": "dark"}, "amount": 0.5}
+          }
+         ],
+         "minus": [
+          {
+           "kind": "poly",
+           "points": [[-13.2, 5.8], [6.8, 5.8], [6.8, 10.2], [-13.2, 10.2]],
+           "paint": {"rule": "mix", "of": "leather", "with": {"rule": "ramp", "of": "leather", "tone": "dark"}, "amount": 0.5}
+          }
+         ],
+         "paint": {"rule": "mix", "of": "leather", "with": {"rule": "ramp", "of": "leather", "tone": "dark"}, "amount": 0.5},
+         "band": "leather.dark",
+         "middle": "leather.dark",
+         "highlight": "leather"
+        },
+        {
+         "gen": "icon.rim",
+         "v": 1,
+         "shapes": [{"kind": "poly", "points": [[-11.6, -13.2], [-2.6, -13.2], [-2.6, -9.6], [-11.6, -9.6]], "paint": "leather"}],
+         "paint": "leather.dark"
+        },
+        {"kind": "poly", "points": [[-11.6, -13.2], [-2.6, -13.2], [-2.6, -9.6], [-11.6, -9.6]], "paint": "leather", "shade": 0, "light": 0},
+        {"kind": "poly", "points": [[-3.8, 8.4], [11.8, 8.4], [11.8, 10.4], [-3.8, 10.4]], "paint": "wood", "shade": 0, "light": 0, "group": "wood-2"},
+        {
+         "kind": "poly",
+         "points": [[-3.8, 10.4], [-0.2, 10.4], [-0.2, 12.2], [-3.8, 12.2]],
+         "paint": "wood",
+         "shade": 0,
+         "light": 0,
+         "group": "wood-2"
+        },
+        {"kind": "poly", "points": [[-3.2, -8.2], [3.8, -8.2], [3.8, 8.4], [-3.2, 8.4]], "paint": "leather", "group": "leather"},
+        {"kind": "poly", "points": [[-3.2, 3.2], [8.2, 3.2], [8.2, 8.4], [-3.2, 8.4]], "paint": "leather", "group": "leather"},
+        {"kind": "ellipse", "at": [7.8, 5.2], "r": [4, 3.3], "paint": "leather", "group": "leather"},
+        {
+         "kind": "cut",
+         "from": "leather",
+         "shape": {"kind": "poly", "points": [[-5.8, 8.4], [14.2, 8.4], [14.2, 12.8], [-5.8, 12.8]], "paint": "leather"}
+        },
+        {
+         "gen": "icon.rim",
+         "v": 1,
+         "shapes": [{"kind": "poly", "points": [[-4.2, -10.6], [4.8, -10.6], [4.8, -7], [-4.2, -7]], "paint": "leather.light"}],
+         "paint": "leather.dark"
+        },
+        {"kind": "poly", "points": [[-4.2, -10.6], [4.8, -10.6], [4.8, -7], [-4.2, -7]], "paint": "leather.light", "shade": 0, "light": 0},
+        {"kind": "poly", "points": [[-3.2, -0.6], [3.8, -0.6], [3.8, 2.2], [-3.2, 2.2]], "paint": "leather.dark", "shade": 0, "light": 0},
+        {"kind": "poly", "points": [[-0.2, -1.8], [3.4, -1.8], [3.4, 3.4], [-0.2, 3.4]], "paint": "metal", "shade": 0, "light": 0}
+       ]
+      }
+     ]
+    }
+   }
+  }
+ },
+ "clips": {
+  "sword": {"frames": 1, "fps": 1, "label": "Sword"},
+  "staff": {"frames": 1, "fps": 1, "label": "Staff"},
+  "dagger": {"frames": 1, "fps": 1, "label": "Dagger"},
+  "bow": {"frames": 1, "fps": 1, "label": "Bow"},
+  "shield": {"frames": 1, "fps": 1, "label": "Shield"},
+  "helm": {"frames": 1, "fps": 1, "label": "Helm"},
+  "armour": {"frames": 1, "fps": 1, "label": "Armour"},
+  "ring": {"frames": 1, "fps": 1, "label": "Ring"},
+  "boots": {"frames": 1, "fps": 1, "label": "Boots"}
+ }
+}

@@ -1,0 +1,255 @@
+{
+ "id": "ui-speech-bubble",
+ "frozen": "2026-11-20",
+ "source": "sprites/ui-speech-bubble.js",
+ "sha256": "445bc82a863d168d698fcdb5b06d5dd2486b04876517a34ef969095e5d1042e5",
+ "name": "Speech bubble",
+ "blurb": "A stretchable speech bubble with a tail pointing at whoever speaks, that pops open from its tail; change its style, tail, corners, line, shadow and colours.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/panel",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "arcade",
+   "top-down-rpg",
+   "turn-based-rpg",
+   "farming-sim"
+  ],
+  "view": "none",
+  "words": [
+   "speech",
+   "bubble",
+   "talk",
+   "dialogue",
+   "balloon",
+   "say",
+   "shout",
+   "chat"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  96,
+  48
+ ],
+ "pivot": [
+  48,
+  24
+ ],
+ "grounded": false,
+ "preview": "bubble",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "round",
+   "options": [
+    {
+     "value": "round",
+     "label": "Round"
+    },
+    {
+     "value": "box",
+     "label": "Box"
+    },
+    {
+     "value": "shout",
+     "label": "Shout"
+    }
+   ],
+   "group": "Look"
+  },
+  "tail": {
+   "kind": "choice",
+   "label": "Tail",
+   "def": "down-left",
+   "options": [
+    {
+     "value": "down-left",
+     "label": "Down-left"
+    },
+    {
+     "value": "down-right",
+     "label": "Down-right"
+    },
+    {
+     "value": "up-left",
+     "label": "Up-left"
+    },
+    {
+     "value": "up-right",
+     "label": "Up-right"
+    },
+    {
+     "value": "left",
+     "label": "Left"
+    },
+    {
+     "value": "right",
+     "label": "Right"
+    }
+   ],
+   "group": "Look"
+  },
+  "corner": {
+   "kind": "range",
+   "label": "Corner",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Square",
+   "hi": "Round",
+   "group": "Look",
+   "when": {
+    "style": [
+     "round",
+     "box"
+    ]
+   }
+  },
+  "border": {
+   "kind": "range",
+   "label": "Border",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Thin",
+   "hi": "Thick",
+   "group": "Look"
+  },
+  "shadow": {
+   "kind": "toggle",
+   "label": "Shadow",
+   "def": true,
+   "group": "Look"
+  },
+  "face": {
+   "kind": "color",
+   "label": "Bubble",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#e6c96a",
+    "#f6d3b0",
+    "#c2c9d6",
+    "#9bd18a"
+   ],
+   "group": "Colors"
+  },
+  "frame": {
+   "kind": "color",
+   "label": "Line",
+   "def": "#3f5068",
+   "swatches": [
+    "#3f5068",
+    "#7a4f33",
+    "#434d6d",
+    "#8e3a4a"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "bubble": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "plain": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "open": {
+   "frames": 6,
+   "loop": false,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  },
+  "tail": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  }
+ },
+ "sounds": {
+  "open": [
+   {
+    "sound": "menu-bubble-open",
+    "preset": "Pop-up",
+    "frame": 0,
+    "volume": 0.5
+   }
+  ]
+ },
+ "versions": [
+  {
+   "name": "Speech",
+   "params": {}
+  },
+  {
+   "name": "Shout",
+   "params": {
+    "style": "shout",
+    "tail": "down-right",
+    "face": "#f6d3b0"
+   }
+  },
+  {
+   "name": "Box, tail up",
+   "params": {
+    "style": "box",
+    "tail": "up-left",
+    "corner": 0
+   }
+  },
+  {
+   "name": "Note on wheat",
+   "params": {
+    "face": "#e6c96a",
+    "frame": "#7a4f33",
+    "tail": "left"
+   }
+  },
+  {
+   "name": "Thick blue line",
+   "params": {
+    "border": 1,
+    "frame": "#434d6d",
+    "face": "#c2c9d6",
+    "shadow": false
+   }
+  }
+ ],
+ "bundles": []
+}

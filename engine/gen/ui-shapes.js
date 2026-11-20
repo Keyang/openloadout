@@ -25,7 +25,10 @@ export const UI_LIP = 2;
 /** The states of an interface piece, the clips of a panel body by default (engine/ui.js BUTTON_STATES). */
 export const UI_STATES = Object.freeze(['normal', 'hover', 'pressed', 'disabled']);
 /** The style words a skin may name looks by (the `style` argument of every piece; the panel layout maps a word to the skin's arguments for it). */
-export const UI_STYLES = Object.freeze(['plain', 'framed', 'carved', 'plank', 'stone', 'ornate', 'scroll', 'solid', 'outline', 'pill']);
+export const UI_STYLES = Object.freeze(['plain', 'framed', 'carved', 'plank', 'stone', 'ornate', 'scroll', 'solid', 'outline', 'pill',
+  // migration batch M8: the style words of the skin families (engine/gen/ui-skin.js; pieces/skin-*.v1.json)
+  'jelly', 'striped', 'frosted', 'ice', 'rime', 'shard', 'temple', 'royal', 'ruin', 'vine', 'bark', 'bloom', 'tube', 'double', 'sign',
+  'sheet', 'torn', 'card', 'segmented', 'slanted']);
 
 // Pixels cut from each row of a corner, outermost row first: the quarter circles pixel artists use (engine/ui.js CUTS).
 const CUTS = [[], [1], [2, 1], [3, 1, 1], [4, 2, 1, 1]];

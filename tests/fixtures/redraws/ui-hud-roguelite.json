@@ -1,0 +1,255 @@
+{
+ "id": "ui-hud-roguelite",
+ "frozen": "2026-11-20",
+ "source": "sprites/ui-hud-roguelite.js",
+ "sha256": "af0697a00e34a6dad44b175d1e51a34d0c39fa7945d155b6581bd6825b53cbf8",
+ "name": "Roguelite HUD",
+ "blurb": "Health and shield pips, a credit, a key and floor-map rooms (current, boss, shop, unknown) for the top of the screen; change the pip shape, weight, shine and colours.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/bar",
+  "themes": [
+   "sci-fi",
+   "neutral"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "shooter",
+   "arcade"
+  ],
+  "view": "none",
+  "words": [
+   "hud",
+   "health",
+   "pip",
+   "shield",
+   "credit",
+   "money",
+   "key",
+   "keycard",
+   "minimap",
+   "map",
+   "room",
+   "boss",
+   "shop",
+   "status"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  16,
+  16
+ ],
+ "pivot": [
+  8,
+  8
+ ],
+ "grounded": false,
+ "preview": "hp-full",
+ "params": {
+  "shape": {
+   "kind": "choice",
+   "label": "Shape",
+   "def": "block",
+   "options": [
+    {
+     "value": "block",
+     "label": "Block"
+    },
+    {
+     "value": "diamond",
+     "label": "Diamond"
+    },
+    {
+     "value": "cell",
+     "label": "Cell"
+    }
+   ],
+   "group": "Look"
+  },
+  "bold": {
+   "kind": "toggle",
+   "label": "Bold",
+   "def": true,
+   "group": "Look"
+  },
+  "shine": {
+   "kind": "toggle",
+   "label": "Shine",
+   "def": true,
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Health",
+   "def": "#5fd47a",
+   "swatches": [
+    "#5fd47a",
+    "#9fe040",
+    "#e2473f",
+    "#f2a030",
+    "#2fb3a8",
+    "#b04a8a"
+   ],
+   "group": "Colors"
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Shield",
+   "def": "#4f9ff0",
+   "swatches": [
+    "#4f9ff0",
+    "#5fe0f0",
+    "#3f6fd1",
+    "#b48af8",
+    "#2fb3a8",
+    "#c2c9d6"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Empty",
+   "def": "#6b7896",
+   "swatches": [
+    "#6b7896",
+    "#9aa6c0",
+    "#566182",
+    "#a87894",
+    "#6660b6"
+   ],
+   "group": "Colors"
+  },
+  "metal": {
+   "kind": "color",
+   "label": "Credits and keys",
+   "def": "#f2c230",
+   "swatches": [
+    "#f2c230",
+    "#c2c9d6",
+    "#9aa6c0",
+    "#6b7896",
+    "#8f97a8",
+    "#e6c545",
+    "#c98a4a",
+    "#5d6475"
+   ],
+   "group": "Colors"
+  }
+ },
+ "clips": {
+  "hp-full": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "hp-half": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "hp-empty": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "shield-full": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "shield-empty": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "credit": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "key": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "room": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "room-current": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "room-boss": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "room-shop": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "room-unknown": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [],
+ "bundles": [
+  "kit-roguelite-scifi"
+ ]
+}

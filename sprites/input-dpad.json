@@ -1,0 +1,38 @@
+{ "format": "loadout-sprite",
+  "version": 2,
+  "id": "input-dpad",
+  "name": "Direction pad",
+  "blurb": "A game controller's direction pad for \"move\" prompts, the arms to press lit and pressing down; change the direction, style, size, depth and colours.",
+  "meta": {"type": "ui", "role": "interface/icon", "themes": ["neutral"], "gameTypes": ["arcade", "platformer", "puzzle", "top-down-rpg"], "view": "none", "words": ["d-pad", "direction pad", "cross pad", "arrows", "gamepad", "controller", "move", "press", "prompt", "input", "tutorial"], "license": "draft"},
+  "size": [32,32],
+  "pivot": [16,16],
+  "grounded": false,
+  "preview": "press",
+  "styles": ["pixel"],
+  "palette": [
+  {"id": "body", "label": "Pad", "default": "#5d6475", "material": "paint", "swatches": ["#5d6475", "#3f5068", "#c2c9d6", "#7a4f33", "#434d6d"]},
+  {"id": "glow", "label": "Lit", "default": "#f2c230", "material": "interface", "swatches": ["#f2c230", "#4fd8ee", "#a4c44a", "#c9423a", "#f0ead8"]} ],
+  "controls": [
+  {"key": "style", "kind": "choice", "label": "Style", "options": ["cross", "rocker", "round"], "default": "cross"},
+  {"key": "arms", "kind": "choice", "label": "Direction", "options": ["up", "down", "left", "right", {"value": "up-down", "label": "Up and down"}, {"value": "left-right", "label": "Left and right"}, "all", "none"], "default": "up"},
+  {"key": "size", "kind": "range", "label": "Size", "lo": "Small", "hi": "Big", "default": 0.5},
+  {"key": "depth", "kind": "range", "label": "Depth", "lo": "Flat", "hi": "Deep", "default": 0.5},
+  {"key": "body", "kind": "colour", "label": "Pad"},
+  {"key": "glow", "kind": "colour", "label": "Lit", "when": {"arms": ["up", "down", "left", "right", "up-down", "left-right", "all"]}},
+  {"key": "speed", "standard": "speed"} ],
+  "body": { "pictures": {
+    "nodes": [
+    {"id": "ui", "parent": null, "at": [16,16]} ],
+    "draw": [
+    {"gen": "pad.dpad", "v": 1, "on": "ui", "at": [0,0], "clip": ["idle"], "picture": "idle", "style": {"from": "style", "pick": {"cross": "cross", "rocker": "rocker", "round": "round"}}, "direction": {"from": "arms", "pick": {"up": "up", "down": "down", "left": "left", "right": "right", "up-down": "up-down", "left-right": "left-right", "all": "all", "none": "none"}}, "size": {"from": "size", "map": [[0,0], [1,1]], "round": "none"}, "depth": {"from": "depth", "map": [[0,0], [1,1]], "round": "none"}, "body": "body", "lit": "glow"},
+    {"gen": "pad.dpad", "v": 1, "on": "ui", "at": [0,0], "clip": ["press"], "picture": "press", "style": {"from": "style", "pick": {"cross": "cross", "rocker": "rocker", "round": "round"}}, "direction": {"from": "arms", "pick": {"up": "up", "down": "down", "left": "left", "right": "right", "up-down": "up-down", "left-right": "left-right", "all": "all", "none": "none"}}, "size": {"from": "size", "map": [[0,0], [1,1]], "round": "none"}, "depth": {"from": "depth", "map": [[0,0], [1,1]], "round": "none"}, "body": "body", "lit": "glow"} ] } },
+  "clips": {
+    "idle": {"noText": true, "frames": 1, "fps": 8, "label": "Idle"},
+    "press": {"noText": true, "frames": 8, "fps": 8, "label": "Press"} },
+  "versions": [
+  {"name": "Up", "params": {}},
+  {"name": "Left and right", "params": {"glow": "#4fd8ee", "arms": "left-right"}},
+  {"name": "Rocker", "params": {"style": "rocker", "arms": "all"}},
+  {"name": "Round pad", "params": {"style": "round", "arms": "down"}},
+  {"name": "Pale, unlit", "params": {"body": "#c2c9d6", "arms": "none"}} ],
+  "was": {"controls": {"direction": "arms"}} }

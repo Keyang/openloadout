@@ -1,0 +1,37 @@
+{ "format": "loadout-sprite",
+  "version": 2,
+  "id": "input-mouse",
+  "name": "Mouse",
+  "blurb": "A computer mouse seen from above for click, scroll and move prompts, its button lit; change the action, shape, size, cable and colours.",
+  "meta": {"type": "ui", "role": "interface/icon", "themes": ["neutral"], "gameTypes": ["arcade", "shooter", "puzzle", "card-game"], "view": "none", "words": ["mouse", "click", "left click", "right click", "scroll", "wheel", "move", "prompt", "control", "input", "tutorial", "computer"], "license": "draft"},
+  "size": [32,32],
+  "pivot": [16,16],
+  "grounded": false,
+  "preview": "show",
+  "styles": ["pixel"],
+  "palette": [
+  {"id": "body", "label": "Plastic", "default": "#c2c9d6", "material": "paint", "swatches": ["#c2c9d6", "#f0ead8", "#5d6475", "#3f6fd1", "#c9423a"]},
+  {"id": "glow", "label": "Lit button", "default": "#f2c230", "material": "interface", "swatches": ["#f2c230", "#4fd8ee", "#a4c44a", "#e08a2c"]} ],
+  "controls": [
+  {"key": "action", "kind": "choice", "label": "Action", "options": [{"value": "left", "label": "Left click"}, {"value": "right", "label": "Right click"}, {"value": "middle", "label": "Middle click"}, {"value": "wheel", "label": "Scroll"}, "move"], "default": "left"},
+  {"key": "shape", "kind": "choice", "label": "Shape", "options": ["oval", "slim"], "default": "oval"},
+  {"key": "size", "kind": "range", "label": "Size", "lo": "Small", "hi": "Big", "default": 0.5},
+  {"key": "cable", "kind": "toggle", "label": "Cable", "default": false},
+  {"key": "body", "kind": "colour", "label": "Plastic"},
+  {"key": "glow", "kind": "colour", "label": "Lit button"},
+  {"key": "speed", "standard": "speed"} ],
+  "body": { "pictures": {
+    "nodes": [
+    {"id": "ui", "parent": null, "at": [16,16]} ],
+    "draw": [
+    {"gen": "mouse", "v": 1, "on": "ui", "at": [0,0], "clip": ["idle"], "picture": "idle", "action": {"from": "action", "pick": {"left": "left", "right": "right", "middle": "middle", "wheel": "wheel", "move": "move"}}, "shape": {"from": "shape", "pick": {"oval": "oval", "slim": "slim"}}, "size": {"from": "size", "map": [[0,0], [1,1]], "round": "none"}, "cable": {"from": "cable", "pick": {"true": true, "false": false}}, "body": "body", "lit": "glow"},
+    {"gen": "mouse", "v": 1, "on": "ui", "at": [0,0], "clip": ["show"], "picture": "show", "action": {"from": "action", "pick": {"left": "left", "right": "right", "middle": "middle", "wheel": "wheel", "move": "move"}}, "shape": {"from": "shape", "pick": {"oval": "oval", "slim": "slim"}}, "size": {"from": "size", "map": [[0,0], [1,1]], "round": "none"}, "cable": {"from": "cable", "pick": {"true": true, "false": false}}, "body": "body", "lit": "glow"} ] } },
+  "clips": {
+    "idle": {"noText": true, "frames": 1, "fps": 8, "label": "Idle"},
+    "show": {"noText": true, "frames": 8, "fps": 8, "label": "Show it"} },
+  "versions": [
+  {"name": "Left click", "params": {}},
+  {"name": "Right click", "params": {"action": "right"}},
+  {"name": "Scroll", "params": {"action": "wheel", "glow": "#4fd8ee"}},
+  {"name": "Move, corded", "params": {"action": "move", "cable": true}},
+  {"name": "Dark slim", "params": {"shape": "slim", "body": "#5d6475"}} ] }

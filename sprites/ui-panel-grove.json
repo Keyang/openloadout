@@ -1,0 +1,110 @@
+{
+  "format": "loadout-sprite",
+  "version": 2,
+  "id": "ui-panel-grove",
+  "name": "Vine panels",
+  "blurb": "Stretchable dark bark boxes wrapped in a pale living vine for shops, crafting lists and tips: a panel, one with a heading, a list well and a tooltip; change the style, corners, vine thickness, leaves and colours.",
+  "meta": {
+    "type": "ui",
+    "role": "interface/panel",
+    "themes": ["neutral","forest","farm"],
+    "gameTypes": ["arcade","farming-sim","top-down-rpg","puzzle"],
+    "view": "none",
+    "words": ["panel","window","box","popup","menu","tooltip","list","vine","leaf","bark","forest","nature"],
+    "license": "draft"
+  },
+  "size": [96,64],
+  "pivot": [48,32],
+  "grounded": false,
+  "preview": "panel",
+  "styles": ["pixel"],
+  "palette": [
+    {"id":"face","label":"Bark","default":"#7a4f33","material":"interface","swatches":["#7a4f33","#3f5068","#8e3a4a","#434d6d"]},
+    {"id":"frame","label":"Vine","default":"#9bd18a","material":"interface","swatches":["#9bd18a","#7fe0a0","#e6c96a","#f0ead8"]},
+    {"id":"accent","label":"Leaves and flowers","default":"#6aa83e","material":"interface","swatches":["#6aa83e","#c9423a","#e08a2c","#7a4fc4","#3f6fd1"]}
+  ],
+  "controls": [
+    {
+      "key": "style",
+      "kind": "choice",
+      "label": "Style",
+      "options": [{"value":"vine","label":"Vine"},{"value":"bark","label":"Bark"},{"value":"bloom","label":"Bloom"}],
+      "default": "vine",
+      "group": "Look"
+    },
+    {"key":"corner","kind":"range","label":"Corner","lo":"Square","hi":"Round","default":0.75,"group":"Look"},
+    {"key":"border","kind":"range","label":"Border","lo":"Thin","hi":"Thick","default":0.5,"group":"Look"},
+    {"key":"leaves","kind":"toggle","label":"Leaves","default":true,"group":"Look"},
+    {"key":"face","kind":"colour","label":"Bark","group":"Colors"},
+    {"key":"frame","kind":"colour","label":"Vine","group":"Colors"},
+    {"key":"accent","kind":"colour","label":"Leaves and flowers","group":"Colors","when":[{"leaves":[true]},{"style":["bloom"]}]}
+  ],
+  "versions": [
+    {"name":"Vine","params":{}},
+    {"name":"Berry bloom","params":{"style":"bloom","accent":"#7a4fc4","face":"#8e3a4a","frame":"#7fe0a0"}},
+    {"name":"Old bark","params":{"style":"bark","frame":"#e6c96a","border":1}},
+    {"name":"Mint at night","params":{"face":"#3f5068","frame":"#7fe0a0","accent":"#3f6fd1"}},
+    {"name":"Bare","params":{"leaves":false,"corner":0.25,"face":"#434d6d"}}
+  ],
+  "body": {
+    "panel": {
+      "skin": {"use":"skin:grove","v":2,"paint":{"face":"face","frame":"frame","accent":"accent"}},
+      "piece": {
+        "gen": "ui.slab",
+        "v": 1,
+        "clip": ["panel"],
+        "at": [1,1],
+        "size": [94,62],
+        "style": {"from":"style"},
+        "corner": {"from":"corner","map":[[0,0],[1,4]]},
+        "border": {"from":"border","map":[[0,1],[1,3]]},
+        "extras": {"from":"leaves"}
+      },
+      "states": ["panel","panel-title","inset","tooltip"],
+      "draw": [
+        {
+          "gen": "ui.slab",
+          "v": 1,
+          "clip": ["panel-title"],
+          "role": "title",
+          "at": [1,1],
+          "size": [94,62],
+          "style": {"from":"style"},
+          "corner": {"from":"corner","map":[[0,0],[1,4]]},
+          "border": {"from":"border","map":[[0,1],[1,3]]},
+          "extras": {"from":"leaves"}
+        },
+        {
+          "gen": "ui.slab",
+          "v": 1,
+          "clip": ["inset"],
+          "role": "inset",
+          "at": [1,1],
+          "size": [94,62],
+          "style": {"from":"style"},
+          "corner": {"from":"corner","map":[[0,0],[1,4]]},
+          "border": {"from":"border","map":[[0,1],[1,3]]},
+          "extras": {"from":"leaves"}
+        },
+        {
+          "gen": "ui.slab",
+          "v": 1,
+          "clip": ["tooltip"],
+          "role": "tooltip",
+          "at": [1,1],
+          "size": [94,40],
+          "style": {"from":"style"},
+          "corner": {"from":"corner","map":[[0,0],[1,4]]},
+          "border": {"from":"border","map":[[0,1],[1,3]]},
+          "extras": {"from":"leaves"}
+        }
+      ]
+    }
+  },
+  "clips": {
+    "panel": {"frames":1,"fps":8,"label":"Plain panel"},
+    "panel-title": {"frames":1,"fps":8,"label":"With heading"},
+    "inset": {"frames":1,"fps":8,"label":"List well"},
+    "tooltip": {"frames":1,"fps":8,"label":"Tooltip with a tail"}
+  }
+}

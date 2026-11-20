@@ -1,0 +1,205 @@
+{
+ "id": "meal.steam",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     16,
+     18.5
+    ],
+    "kind": "pie",
+    "scale": 0.92,
+    "room": 17.5,
+    "paint": "steam"
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true,
+    "frames": 8,
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      9,
+      2
+     ],
+     "anchor": "tl",
+     "rows": [
+      "............aa..",
+      "..ab.......acca.",
+      "..bdb.....accca.",
+      ".bdddb....acbbb.",
+      "bddddb.....bdddb",
+      ".bdddb.....bdddb",
+      "..bbb......bdddb",
+      "....e.......bbb.",
+      ".............e.."
+     ],
+     "key": {
+      "a": {
+       "rule": "tone",
+       "of": {
+        "rule": "tone",
+        "of": "steam",
+        "by": -0.4
+       },
+       "by": -1
+      },
+      "b": {
+       "rule": "tone",
+       "of": "steam",
+       "by": -1
+      },
+      "c": {
+       "rule": "tone",
+       "of": "steam",
+       "by": -0.4
+      },
+      "d": "steam",
+      "e": {
+       "rule": "tone",
+       "of": {
+        "rule": "tone",
+        "of": "steam",
+        "by": 0.45
+       },
+       "by": -1
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     18.5
+    ],
+    "kind": "drumstick",
+    "scale": 1.06,
+    "room": 17.5,
+    "paint": "steam"
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": true,
+    "frames": 8,
+    "frame": 4
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      10,
+      1
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...........aa..",
+      ".bbb......acca.",
+      "bdddb....accca.",
+      "bdddb....acccab",
+      "bdddb....acccab",
+      ".bbb......aaadb",
+      "............bb."
+     ],
+     "key": {
+      "a": {
+       "rule": "tone",
+       "of": {
+        "rule": "tone",
+        "of": "steam",
+        "by": -0.4
+       },
+       "by": -1
+      },
+      "b": {
+       "rule": "tone",
+       "of": "steam",
+       "by": -1
+      },
+      "c": {
+       "rule": "tone",
+       "of": "steam",
+       "by": -0.4
+      },
+      "d": "steam"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     18.5
+    ],
+    "kind": "bread",
+    "scale": 0.78,
+    "room": 17.5,
+    "paint": "steam"
+   },
+   "ctx": {
+    "t": 0.875,
+    "loop": true,
+    "frames": 8,
+    "frame": 7
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      10,
+      3
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..........aaa..",
+      ".a.......abbba.",
+      ".ccc.....abbba.",
+      "cdddc....abbba.",
+      "cdddc.....abac.",
+      "cdddc.....caddc",
+      ".ccc......cdddc",
+      "...e.......cddc",
+      "............cc."
+     ],
+     "key": {
+      "a": {
+       "rule": "tone",
+       "of": {
+        "rule": "tone",
+        "of": "steam",
+        "by": -0.4
+       },
+       "by": -1
+      },
+      "b": {
+       "rule": "tone",
+       "of": "steam",
+       "by": -0.4
+      },
+      "c": {
+       "rule": "tone",
+       "of": "steam",
+       "by": -1
+      },
+      "d": "steam",
+      "e": {
+       "rule": "tone",
+       "of": {
+        "rule": "tone",
+        "of": "steam",
+        "by": 0.45
+       },
+       "by": -1
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

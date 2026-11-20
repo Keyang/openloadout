@@ -1,0 +1,202 @@
+{
+ "format": "loadout-piece",
+ "version": 1,
+ "id": "skin:candy",
+ "v": 2,
+ "name": "Candy",
+ "about": "Boiled-sugar interface pieces: a deep sugar face in a pale sugar rim lit from the top right; glossy, striped or frosted; sprinkles and one highlight bubble on the lit corner.",
+ "slots": [
+  {
+   "id": "face",
+   "label": "Candy",
+   "default": "#7a4f33",
+   "material": "interface"
+  },
+  {
+   "id": "frame",
+   "label": "Sugar",
+   "default": "#f0ead8",
+   "material": "interface"
+  },
+  {
+   "id": "accent",
+   "label": "Sprinkles",
+   "default": "#4fd8ee",
+   "material": "interface"
+  },
+  {
+   "id": "fill",
+   "label": "Fill",
+   "default": "#6aa83e",
+   "material": "interface"
+  },
+  {
+   "id": "shine",
+   "label": "Shine",
+   "default": "#ffffff",
+   "material": "light"
+  }
+ ],
+ "made": {
+  "from": "engine/ui-skins.js, engine/ui-candy-slab.js"
+ },
+ "body": {
+  "paint": {
+   "face": "face",
+   "frame": "frame",
+   "accent": "accent",
+   "line": "frame",
+   "ledge": "frame.dark",
+   "knob": "frame",
+   "fill": "fill",
+   "shine": "shine",
+   "divider": "ink"
+  },
+  "args": {
+   "*": {
+    "rings": [
+     "ink",
+     "frame",
+     "ink"
+    ],
+    "bandAt": 1,
+    "lit": true,
+    "edge": "round",
+    "hoverFace": 0.1,
+    "hoverBand": 0.45,
+    "sides": true,
+    "every": 8,
+    "start": 7,
+    "extraAlong": [
+     {
+      "kind": "stamp",
+      "at": [
+       0,
+       1
+      ],
+      "rows": [
+       "ab"
+      ],
+      "key": {
+       "a": "accent",
+       "b": "accent.dark"
+      }
+     }
+    ],
+    "extra": [
+     {
+      "kind": "stamp",
+      "at": [
+       3,
+       1
+      ],
+      "rows": [
+       "a..",
+       "..b"
+      ],
+      "key": {
+       "a": "accent",
+       "b": "accent.dark"
+      }
+     }
+    ]
+   },
+   "ui.slab": {
+    "titleShade": -1,
+    "gleamRight": [
+     {
+      "kind": "stamp",
+      "at": [
+       3,
+       2
+      ],
+      "rows": [
+       ".sss",
+       "ssss",
+       "sss.",
+       "ss.."
+      ],
+      "key": {
+       "s": "shine"
+      }
+     }
+    ]
+   },
+   "ui.strip": {
+    "gloss": true,
+    "shadow": true
+   },
+   "ui.trough": {
+    "trough": "dark"
+   }
+  },
+  "styles": {
+   "jelly": {
+    "ui.slab": {
+     "gloss": 2
+    }
+   },
+   "striped": {
+    "*": {
+     "along": [
+      {
+       "kind": "stamp",
+       "at": [
+        0,
+        1
+       ],
+       "rows": [
+        "d...",
+        ".d..",
+        "..d."
+       ],
+       "key": {
+        "d": "frame.dark"
+       }
+      }
+     ],
+     "every": 4,
+     "start": 2
+    }
+   },
+   "frosted": {
+    "ui.slab": {
+     "topTrim": [
+      {
+       "kind": "stamp",
+       "at": [
+        1,
+        1
+       ],
+       "rows": [
+        "llllll",
+        "lllll.",
+        "l.ll.l",
+        "l..l..",
+        "...l.."
+       ],
+       "key": {
+        "l": "frame.light"
+       }
+      }
+     ]
+    }
+   }
+  },
+  "states": {
+   "normal": {
+    "lip": 2
+   },
+   "hover": {
+    "lip": 2
+   },
+   "pressed": {
+    "lip": 0
+   },
+   "disabled": {
+    "lip": 2,
+    "desaturate": 1
+   }
+  }
+ }
+}

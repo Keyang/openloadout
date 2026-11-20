@@ -1,0 +1,195 @@
+{
+ "id": "pad.face",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "body": "pad",
+    "lit": "glow"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      3,
+      2
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...........aaaa...........",
+      "..........abccca..........",
+      ".........abbbbbca.........",
+      "........abbbbbbbca........",
+      "........abbbbbbbca........",
+      "........abbbbbbbca........",
+      "........abbbbbbbba........",
+      "........adbbbbbbda........",
+      "...aaaa.addbbbbdda.aaaa...",
+      "..abccca.adddddda.abccca..",
+      ".abbbbbca.adddda.abbbbbca.",
+      "abbbbbbbca.aaaa.abbbbbbbca",
+      "abbbbbbbca......abbbbbbbca",
+      "abbbbbbbca......abbbbbbbca",
+      "abbbbbbbba......abbbbbbbba",
+      "adbbbbbbda......adbbbbbbda",
+      "addbbbbdda.aaaa.addbbbbdda",
+      ".adddddda.aefffa.adddddda.",
+      "..adddda.aeeeeefa.adddda..",
+      "...aaaa.aeeeeeeefa.aaaa...",
+      "........aeeeeeeefa........",
+      "........aeeeeeeefa........",
+      "........aeeeeeeeea........",
+      "........adeeeeeeda........",
+      "........addeeeedda........",
+      ".........adddddda.........",
+      "..........adddda..........",
+      "...........aaaa..........."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "pad",
+      "c": {
+       "rule": "tone",
+       "of": "pad",
+       "by": 0.85
+      },
+      "d": {
+       "rule": "tone",
+       "of": "pad",
+       "by": -0.5
+      },
+      "e": "glow",
+      "f": {
+       "rule": "tone",
+       "of": "glow",
+       "by": 0.85
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "picture": "press",
+    "button": "all",
+    "size": 1,
+    "body": "pad",
+    "lit": "glow"
+   },
+   "ctx": {
+    "frame": 4
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      2,
+      3
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...........aaaaaa...........",
+      "..........abbbbbba..........",
+      ".........abbbbbbbba.........",
+      ".........abbbbbbbba.........",
+      ".........abbbbbbbba.........",
+      ".........abbbbbbbba.........",
+      ".........abbbbbbbba.........",
+      ".........abbbbbbbba.........",
+      "..........abbbbbba..........",
+      "..aaaaaa...aaaaaa...aaaaaa..",
+      ".abbbbbba..........abbbbbba.",
+      "abbbbbbbba........abbbbbbbba",
+      "abbbbbbbba........abbbbbbbba",
+      "abbbbbbbba........abbbbbbbba",
+      "abbbbbbbba........abbbbbbbba",
+      "abbbbbbbba........abbbbbbbba",
+      "abbbbbbbba........abbbbbbbba",
+      ".abbbbbba..........abbbbbba.",
+      "..aaaaaa...aaaaaa...aaaaaa..",
+      "..........abbbbbba..........",
+      ".........abbbbbbbba.........",
+      ".........abbbbbbbba.........",
+      ".........abbbbbbbba.........",
+      ".........abbbbbbbba.........",
+      ".........abbbbbbbba.........",
+      ".........abbbbbbbba.........",
+      "..........abbbbbba..........",
+      "...........aaaaaa..........."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "glow"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     5,
+     5
+    ],
+    "style": "single",
+    "size": 0,
+    "depth": 1,
+    "body": "pad",
+    "lit": "glow"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      -4,
+      -5
+     ],
+     "anchor": "tl",
+     "rows": [
+      "......aaaaaa......",
+      "....aabbccccaa....",
+      "...abbbbbbbbcca...",
+      "..abbbbbbbbbbbca..",
+      "..abbbbbbbbbbbca..",
+      ".abbbbbbbbbbbbbca.",
+      ".abbbbbbbbbbbbbca.",
+      ".abbbbbbbbbbbbbca.",
+      "abbbbbbbbbbbbbbbca",
+      "adbbbbbbbbbbbbbbda",
+      "adbbbbbbbbbbbbbbda",
+      "adbbbbbbbbbbbbbbda",
+      ".adbbbbbbbbbbbbda.",
+      ".adbbbbbbbbbbbbda.",
+      ".addbbbbbbbbbbdda.",
+      "..adddbbbbbbddda..",
+      "..adddddddddddda..",
+      "...adddddddddda...",
+      "....aaddddddaa....",
+      "......aaaaaa......"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "glow",
+      "c": {
+       "rule": "tone",
+       "of": "glow",
+       "by": 0.85
+      },
+      "d": {
+       "rule": "tone",
+       "of": "pad",
+       "by": -0.5
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

@@ -22,7 +22,9 @@
 //      colour slots painted as engine/pieces.js bindSlots says: the use's paint map, else the palette slot of the same
 //      id, else the slot's default); a base piece (`extends`) merged into the rig by id; skins and materials named
 //      with `use` resolved in place; the scale of each bone and shape from sliders with `scales`;
-//   6. the clips: inherited from the base (`from`), fps at the Speed setting, sound cues whose `when` fails left out.
+//   6. the clips: the base's that `extends.clips` takes (every one without the list), inherited from the base where a
+//      clip says `from` (a clip's name, or a binding that picks one by a setting: B4x), fps at the Speed setting,
+//      sound cues whose `when` fails left out.
 // Generator calls ({ gen, v, ...args }) stay calls, their arguments resolved: they run per frame (expandFrame), where
 // clip and direction are known, through the generator registry (engine/gen/registry.js), and the pieces they place
 // are drawn in, and colour rules still standing in paints become '#rrggbb'.
@@ -41,7 +43,7 @@
 //     body        { kind, <kind>: the body resolved } (kind: rig, tiles, layers, panel, emitters, pictures; an emitters
 //                 body also carries its `nodes` and `draw` beside them, resolved alike), base (the
 //                 base piece "id@v" a rig extends, or null), pieces (every piece drawn, "id@v", sorted),
-//     clips       { name: { label, frames, fps, fpsBase, loop, keys, frameEdits, sounds, from?, noText? } },
+//     clips       { name: { label, frames, fps, fpsBase, loop, keys, frameEdits, sounds, from? } },
 //     points, slice, textArea }
 // A piece drawn in takes the id of its use (so show, hide and frame edits act on the whole piece), the use's `on`, its
 // z added to each item's, and its group, glow, hidden, far, part, shade and light where an item sets none; a use with
@@ -52,10 +54,10 @@
 // pieces, slots added), and a cap reached is an error, never a hang. Every function returns plain data and never throws.
 // Deterministic: no clock, no randomness; the same definition and settings give the same result.
 // Pure JavaScript with no page, worker or Node in it: the site, the build and the tests all import this file.
-import { paintColour, COLOUR_RULES, FALLBACK, whenMatches } from './data-rules.js';
+import { paintColour, COLOUR_RULES, FALLBACK, whenMatches, whenValueHolds } from './data-rules.js';   // whenValueHolds: build item B15b (thresholds)
 import { ramp, farRamp, INK, hexToRgb } from './color.js';
 import { lerp } from './motion.js';
-import { lostPaints } from './draw-list.js';
+import { lostPaints, DRAW_LIST_OPS } from './draw-list.js';
 import { restMaterial } from './materials.js';
 import { parsePieceRef, pieceRegistry } from './pieces.js';
 import { validateSprite, plainSpriteData, checkMaterialPiece } from '../catalog/sprite-schema.js';   // checkMaterialPiece: build item B15 review
@@ -290,7 +292,7 @@ function splitWhen(when, ctx) {
         continue;
       }
       if (!ctx.T.has(k)) { ok = false; break; }
-      if (!vals.some((v) => same(v, valueOf(ctx.T, ctx.params, k)))) { ok = false; break; }
+      if (!vals.some((v) => whenValueHolds(v, valueOf(ctx.T, ctx.params, k)))) { ok = false; break; }   // a value, or a threshold on a slider (B15b)
       if (ctx.def && !effective(ctx.T, ctx.def, k, ctx.params, ctx.trail ?? [])) { ok = false; break; }
     }
     if (!ok) continue;
@@ -321,8 +323,8 @@ function effective(T, def, key, params, trail) {
 }
 
 /**
- * Whether a `when` holds at these settings (Contract 3: every key at one of its values, a list any one; a control named
- * must itself be in effect): true or false, or null when it depends on clip or direction and no scene ({ clip,
+ * Whether a `when` holds at these settings (Contract 3: every key at one of its values or thresholds, engine/data-rules.js
+ * whenValueHolds; a list any one; a control named must itself be in effect): true or false, or null when it depends on clip or direction and no scene ({ clip,
  * direction }) is given. Settings left out take their defaults. Never throws. Arguments: def, when, params, scene.
  */
 export function whenHolds(def, when, params = {}, scene = undefined) {
@@ -420,7 +422,7 @@ function ruleWithColours(rule, palette, params, T, depth) {
   const hex = (x) => { const h = hexOf(x, palette, params, T, depth + 1); if (!h) lost = true; return h; };
   for (const [name, a] of Object.entries(spec)) {
     const v = rule[name];
-    if (v === undefined) { if (a.kind === 'colour' || a.kind === 'colours') lost = true; continue; }
+    if (v === undefined) { if ((a.kind === 'colour' || a.kind === 'colours') && !a.optional) lost = true; continue; }   // an optional colour (B15b: textureTone's against) is the rule's own default
     if (a.kind === 'colour') out[name] = hex(v);
     else if (a.kind === 'colours') {
       if (!Array.isArray(v) || !v.length) lost = true;
@@ -437,6 +439,7 @@ function hexOf(ref, palette, params, T, depth = 0) {
   if (typeof ref === 'string') {
     if (ref === 'ink') return INK.toLowerCase();
     if (ref === 'clear') return null;
+    if (ref === 'white') return slotHex(palette, 'white') ?? '#ffffff';   // B15b: a derive rule's fixed white (catalog/sprite-schema.js DERIVE_PAINTS); a slot called white wins
     if (HEX.test(ref)) return ref.toLowerCase();
     const dot = ref.indexOf('.');
     const base = slotHex(palette, dot < 0 ? ref : ref.slice(0, dot));
@@ -881,7 +884,7 @@ function rigOf(S, env, rig, depth) {
   const own = { ...rig };
   delete own.extends;
   const mine = settle(S, env, own, depth + 1);
-  if (!isObj(rig.extends)) return { rig: mine, base: null, baseClips: null, baseEnv: null };
+  if (!isObj(rig.extends)) return { rig: mine, base: null, baseClips: null, baseEnv: null, taken: null };
   const e = settle(S, env, rig.extends, depth + 1, 'place');
   const { piece, ref, kind } = getPiece(S, e.use, e.v);
   if (kind !== 'base') throw new Stop(`extends takes a base piece; ${ref} is a ${kind}`);
@@ -896,7 +899,12 @@ function rigOf(S, env, rig, depth) {
   const out = { ...brig, ...mine };
   out.bones = mergeById(brig.bones ?? [], mine.bones ?? []);
   if (brig.nodes || mine.nodes) out.nodes = mergeById(brig.nodes ?? [], mine.nodes ?? []);
-  out.shapes = mergeById(baseShapes, mine.shapes ?? []);
+  // a base's operations (cut, outline, tint) go after everything the sprite adds, replaced by id with another operation
+  // or not (build item B16a2): an operation splits draw-list's z order, and a base's ground cut must reach the sprite's
+  // parts too; a replacement that is not an operation stays in the base's place, as any replaced shape does
+  const baseOps = new Set(baseShapes.filter((s) => isObj(s) && typeof s.id === 'string' && DRAW_LIST_OPS.includes(s.kind)).map((s) => s.id));
+  const merged = mergeById(baseShapes, mine.shapes ?? []), isBaseOp = (s) => isObj(s) && baseOps.has(s.id) && DRAW_LIST_OPS.includes(s.kind);
+  out.shapes = [...merged.filter((s) => !isBaseOp(s)), ...merged.filter(isBaseOp)];
   for (const f of ['ik', 'points']) if (brig[f] || mine[f]) out[f] = mergeById(brig[f] ?? [], mine[f] ?? []);
   if (isObj(brig.directions) || isObj(mine.directions)) {
     const d = {};
@@ -909,14 +917,25 @@ function rigOf(S, env, rig, depth) {
   }
   const clips = isObj(body.clips) ? body.clips : isObj(body.rig?.clips) ? body.rig.clips : {};
   delete out.clips;
-  return { rig: out, base: ref, baseClips: clips, baseEnv: benv };
+  return { rig: out, base: ref, baseClips: clips, baseEnv: benv, taken: takenOf(rig.extends.clips) };
 }
 
-/** The clip names of a body: a panel's states, a background's layers, a tileset's tiles (tile.clips, engine/gen/tiles-clips.js), then a base's clips, then the definition's own. */
-function clipNames(def, kind, body, baseClips) {
+/** extends.clips (build item B4x) as a Map from the sprite's clip name to the base's clip, or null when the definition takes every base clip. */
+function takenOf(list) {
+  if (!Array.isArray(list)) return null;
+  const out = new Map();
+  for (const x of list.slice(0, 64)) {
+    const [name, from] = typeof x === 'string' ? [x, x] : isObj(x) ? [x.name, x.from] : [];
+    if (typeof name === 'string' && typeof from === 'string' && !BAD_KEYS.has(name) && !BAD_KEYS.has(from) && !out.has(name)) out.set(name, from);
+  }
+  return out;
+}
+
+/** The clip names of a body: a panel's states, a background's layers, a tileset's tiles (tile.clips, engine/gen/tiles-clips.js), then a base's clips (those extends.clips takes, B4x), then the definition's own. */
+function clipNames(def, kind, body, baseClips, taken = null) {
   const layout = kind === 'panel' ? (Array.isArray(body?.states) ? body.states : ['normal', 'hover', 'pressed', 'disabled'])
     : kind === 'layers' ? (Array.isArray(body) ? body.map((l) => l?.name) : []) : kind === 'tiles' ? tileClipNames(body) : [];
-  return [...new Set([...layout, ...Object.keys(baseClips ?? {}), ...Object.keys(isObj(def.clips) ? def.clips : {})])].filter((n) => typeof n === 'string' && !BAD_KEYS.has(n)).slice(0, 64);
+  return [...new Set([...layout, ...(taken ? taken.keys() : Object.keys(baseClips ?? {})), ...Object.keys(isObj(def.clips) ? def.clips : {})])].filter((n) => typeof n === 'string' && !BAD_KEYS.has(n)).slice(0, 64);
 }
 
 function cuesOf(S, env, list) {
@@ -932,14 +951,19 @@ function cuesOf(S, env, list) {
   return out;
 }
 
-/** The clips at these settings: inherited from the base where they say `from` (or are the base's own), fps at the Speed setting, cues whose `when` fails left out. */
-function clipsOf(S, def, names, baseClips, baseEnv, speed, laid = null) {
+/**
+ * The clips at these settings: inherited from the base where they say `from` (a clip's name, or a binding that picks
+ * one by a setting, B4x) or are a clip the base gives (every base clip, or those extends.clips takes: `taken`), fps
+ * at the Speed setting, cues whose `when` fails left out. A clip's `from` is the base clip it plays, resolved.
+ */
+function clipsOf(S, def, names, baseClips, baseEnv, speed, laid = null, taken = null) {
   const out = {};
   const own = isObj(def.clips) ? def.clips : {};
   const k = speed === null ? 1 : lerp(SPEED_FPS[0], SPEED_FPS[1], speed);
   for (const name of names) {
     const c = isObj(own[name]) ? own[name] : null;
-    const fromName = c && typeof c.from === 'string' ? c.from : c ? null : name;
+    const said = c && c.from !== undefined ? (typeof c.from === 'string' ? c.from : isObj(c.from) ? bindingValue(c.from, S.params, S.T) : null) : undefined;
+    const fromName = said !== undefined ? (typeof said === 'string' && !BAD_KEYS.has(said) ? said : null) : taken ? (taken.has(name) ? taken.get(name) : null) : c ? null : name;
     const b = fromName && isObj(baseClips) && isObj(baseClips[fromName]) ? baseClips[fromName] : null;
     // what the layout says of the clip (a tileset's tile: label, frames, fps, block kind, decal place), under the definition's own
     const lay = isObj(laid) && Object.hasOwn(laid, name) && isObj(laid[name]) ? laid[name] : null;
@@ -953,10 +977,10 @@ function clipsOf(S, def, names, baseClips, baseEnv, speed, laid = null) {
       frameEdits: { ...clone(isObj(b?.frameEdits) ? b.frameEdits : {}), ...clone(isObj(c?.frameEdits) ? c.frameEdits : {}) },
       sounds: c && c.sounds !== undefined ? cuesOf(S, S.env, c.sounds) : b ? cuesOf(S, baseEnv ?? S.env, b.sounds) : [],
     };
-    if (c && typeof c.from === 'string') r.from = c.from;
-    if (c && c.noText === true) r.noText = true;
+    if (fromName && (said !== undefined || taken?.has(name))) r.from = fromName;
     if (lay && typeof lay.block === 'string') r.block = lay.block;
     if (lay && typeof lay.place === 'string') r.place = lay.place;
+    if (c?.noText === true) r.noText = true;   // migration batch M9: an interface clip where no text goes (engine/ui.js contrastFaults)
     out[name] = r;
   }
   return out;
@@ -1026,14 +1050,14 @@ export function resolveSprite(def, settings = {}, opts = {}) {
     };
     const env = { T, params, def: d, pieceDepth: 0, byName: (id) => (Object.hasOwn(palette, id) && !palette[id].piece ? id : undefined), ref: null };
     S.env = env;
-    let body, base = null, baseClips = null, baseEnv = null;
-    if (kind === 'rig') ({ rig: body, base, baseClips, baseEnv } = rigOf(S, env, d.body.rig, 1));
+    let body, base = null, baseClips = null, baseEnv = null, taken = null;
+    if (kind === 'rig') ({ rig: body, base, baseClips, baseEnv, taken } = rigOf(S, env, d.body.rig, 1));
     else body = settle(S, env, d.body[kind], 1);
     // an emitters body's node tree and draw list sit beside its emitters (docs/data-sprites.md 2.5c; build item B12b)
     const beside = kind === 'emitters' ? Object.fromEntries(['nodes', 'draw'].filter((f) => d.body[f] !== undefined).map((f) => [f, settle(S, env, d.body[f], 1)]).filter(([, v]) => v !== DROP)) : null;
     if (body === DROP) body = null;
     const speed = T.get('speed')?.speed ? valueOf(T, params, 'speed') : null;
-    const clips = clipsOf(S, d, clipNames(d, kind, kind === 'panel' ? d.body.panel : kind === 'layers' ? d.body.layers : kind === 'tiles' ? d.body.tiles : null, baseClips), baseClips, baseEnv, speed, kind === 'tiles' ? tileClips(d.body.tiles) : null);
+    const clips = clipsOf(S, d, clipNames(d, kind, kind === 'panel' ? d.body.panel : kind === 'layers' ? d.body.layers : kind === 'tiles' ? d.body.tiles : null, baseClips, taken), baseClips, baseEnv, speed, kind === 'tiles' ? tileClips(d.body.tiles) : null, taken);
     const extra = (f) => (d[f] === undefined ? null : (() => { const v = settle(S, env, d[f], 1); return v === DROP ? null : v; })());
     const rest = restMaterial({ meta: d.meta, materials: d.materials });
     const materials = { rest, slots: Object.fromEntries(Object.entries(palette).map(([id, s]) => [id, s.material ?? rest])) };

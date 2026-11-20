@@ -45,12 +45,13 @@ import { validateStudio, ID_PATTERN, SPRITE_ID_PATTERN, RESERVED_IDS, STANDARD_C
 import { plainData } from './plain-data.js';
 import { validateMeta, META_FIELDS, SPRITE_TYPES, SPRITE_ROLES, VIEWS, LICENSES, THEMES, GAME_TYPES } from './schema.js';
 import { MATERIAL_IDS } from '../engine/materials.js';
-import { COLOUR_RULES, PAINT_DEPTH } from '../engine/data-rules.js';
+import { COLOUR_RULES, PAINT_DEPTH, WHEN_BOUNDS, whenValueHolds } from '../engine/data-rules.js';   // WHEN_BOUNDS: build item B15b (thresholds)
+import { thresholdProblem } from '../engine/sprite.js';   // build item F3: the one check of a threshold, shared with defineSprite (engine/styles.js already brings sprite.js in)
 import { swatches as paletteSwatches } from '../engine/palettes.js';
 import { styleIds } from '../engine/styles.js';
 import { PRIMITIVE_KINDS as GEN_PRIMITIVE_KINDS, TONES, FIXED_PAINTS as GEN_FIXED_PAINTS, STAMP_ANCHORS as GEN_STAMP_ANCHORS, PLACEABLE_KINDS as GEN_PLACEABLE_KINDS } from '../engine/gen/args.js';
 import * as SITE_GENERATORS from '../engine/gen/index.js';
-import { tileClipNames, groupDrawsMiddles } from '../engine/gen/tiles-clips.js';
+import { tileClipNames, groupDrawsMiddles, TILE_DECAL_ORDERS } from '../engine/gen/tiles-clips.js';
 
 // ---- the tables ---------------------------------------------------------------------------------------------------
 
@@ -95,8 +96,15 @@ export const PRIMITIVE_KINDS = GEN_PRIMITIVE_KINDS;
 /** The tones a paint ref may ask of a slot: "gold.light", "gold.dark" ... (engine/gen/args.js TONES). */
 export const PAINT_TONES = TONES;
 
-/** Paints a definition may name without a palette slot (engine/gen/args.js FIXED_PAINTS: ink, clear, white). */
+/** Paints a definition may name without a palette slot (engine/gen/args.js FIXED_PAINTS: ink, clear). */
 export const FIXED_PAINTS = GEN_FIXED_PAINTS;
+
+/**
+ * Paints a palette slot's `derive` rule may name besides the slots and FIXED_PAINTS (build item B15b): white, so a light
+ * mark is a colour mixed toward white as the library's are (engine/tiles.js textureLight). Nowhere else: a sprite that
+ * paints white declares a slot. A slot called white wins over it.
+ */
+export const DERIVE_PAINTS = Object.freeze(['white']);
 
 /** The kinds of a control in version 2; "slider" is version 1's word for "range" and is kept. */
 export const CONTROL_KINDS = Object.freeze(['range', 'slider', 'choice', 'toggle', 'colour']);
@@ -376,6 +384,9 @@ function lookupGenerator(C, id, v) {
   return { entry, versions };
 }
 
+/** The piece id of a use's text ("material:dirt", without @v), or null. */
+const parsePieceUse = (u) => (/^[a-z]+:[a-z][a-z0-9-]{0,39}$/.test(u) ? u : null);
+
 function lookupPiece(C, id, v) {
   const reg = C.pieceReg;
   if (!reg) return { entry: undefined, versions: [] };
@@ -527,6 +538,11 @@ function pairOf(C, place, field, v, [alo, ahi], [blo, bhi], { need = false, clam
 function paintRef(C, place, v, depth = 0) {
   if (typeof v === 'string') {
     if (FIXED_PAINTS.includes(v)) return v;
+    if (DERIVE_PAINTS.includes(v) && !C.slots.has(v)) {   // B15b: white, inside a derived slot's rule only
+      if (C.inDerive) return v;
+      C.err(`${place}: ${q(v)} is a fixed paint only inside a derived slot's rule (palette derive: { "rule": "mix", "of": "floor.light", "with": "white", "amount": 0.3 }); to paint ${v}, add a slot for it`);
+      return undefined;
+    }
     if (HEX_RE.test(v)) { C.err(`${place}: ${q(v)} is a colour written out; a colour belongs in the palette: add a slot and paint with its name`); return undefined; }
     const [slot, tone, more] = v.split('.');
     if (more !== undefined || !C.slots.has(slot)) { C.err(`${place}: ${q(v)}: ${q(slot)} is not a colour of the palette (${someOf([...C.slots.keys()])}), nor ${listOf(FIXED_PAINTS)}`); return undefined; }
@@ -594,7 +610,9 @@ function colourRule(C, place, e, depth) {
 
 /**
  * A `when` (Contract 3): { key: [values] } or a list of such (any one enough), each key a control other than `self`,
- * each value one that control takes. With scene, also { clip: [names] } (checked once the clips are known) and
+ * each value one that control takes, or for a slider a threshold { atLeast?, above?, atMost?, below? } (checkThreshold;
+ * build item B15b), also in a control's own `when` and a sound cue's (engine/sprite.js reads those with the same rule
+ * since build item F3). With scene, also { clip: [names] } (checked once the clips are known) and
  * { direction: [down | up | side] }. Marks each control used. Returns the cleaned copy or undefined after an error.
  */
 function checkWhen(C, place, w, { self = null, scene = false } = {}) {
@@ -606,7 +624,7 @@ function checkWhen(C, place, w, { self = null, scene = false } = {}) {
       const values = Array.isArray(raw) ? raw : [raw];
       if (!values.length || values.length > L.options) { C.err(`${place}: when lists ${q(k)} with ${values.length} values; give 1 to ${L.options}`); ok = false; continue; }
       if (SCENE_KEYS.has(k)) {
-        if (!scene) { C.err(`${place}: when names ${q(k)}; a control's when names other controls (clip and direction are for shapes, emitters and layer items)`); ok = false; continue; }
+        if (!scene) { C.err(`${place}: when names ${q(k)}; this when names controls only (clip and direction may be named in the when of a shape, a generator call, an emitter or a layer item)`); ok = false; continue; }
         if (k === 'direction') {
           const bad = values.filter((v) => !TOPDOWN_DIRECTIONS.includes(v));
           if (bad.length) { C.err(`${place}: when lists the direction ${bad.map(say).join(', ')}; directions are ${listOf(TOPDOWN_DIRECTIONS)}`); ok = false; continue; }
@@ -621,10 +639,14 @@ function checkWhen(C, place, w, { self = null, scene = false } = {}) {
       if (k === self) { C.err(`${place}: when cannot depend on itself (${q(k)})`); ok = false; continue; }
       const d = C.table.get(k);
       if (!d) { C.err(`${place}: when names ${q(k)}, which is not one of the sprite's controls (${someOf([...C.table.keys()])})`); ok = false; continue; }
-      const bad = values.filter((v) => !fits(d, v));
+      const limits = values.filter(isObj);   // thresholds (B15b; in a control's or a sound's when too since F3)
+      const kept = limits.map((x) => checkThreshold(C, place, k, d, x));
+      if (kept.some((x) => x === undefined)) { ok = false; continue; }
+      const bad = values.filter((v) => !isObj(v) && !fits(d, v));
       if (bad.length) { C.err(`${place}: when lists ${bad.map(say).join(', ')} for ${q(k)}, which it can never be; it takes ${shown(d)}`); ok = false; continue; }
       C.used.add(k);
-      out[k] = d.kind === 'colour' ? values.map((v) => v.toLowerCase()) : [...values];
+      let n = 0;
+      out[k] = values.map((v) => (isObj(v) ? kept[n++] : d.kind === 'colour' ? v.toLowerCase() : v));
     }
     return ok ? out : undefined;
   };
@@ -634,6 +656,18 @@ function checkWhen(C, place, w, { self = null, scene = false } = {}) {
     return alts.every(Boolean) ? alts : undefined;
   }
   return one(w);
+}
+
+/**
+ * A threshold in a `when` list (build item B15b), checked by engine/sprite.js thresholdProblem, the one check defineSprite
+ * uses too (build item F3): { atLeast?, above?, atMost?, below? } on a slider (d.kind range), at least one bound, at most
+ * one lower and one upper, each a number inside the slider's range, able to hold. Returns the cleaned threshold (its
+ * bounds in WHEN_BOUNDS order) or undefined after an error.
+ */
+function checkThreshold(C, place, key, d, x) {
+  const bad = thresholdProblem(x, d, key);
+  if (bad) { C.err(`${place}: ${bad}`); return undefined; }
+  return Object.fromEntries(WHEN_BOUNDS.filter((k) => Object.hasOwn(x, k)).map((k) => [k, x[k]]));
 }
 
 function fits(d, v) {
@@ -1195,6 +1229,31 @@ const RIG_FIELDS = ['format', 'version', 'id', 'name', 'view', 'size', 'colours'
 const BONE_FIELDS = ['id', 'parent', 'at', 'from', 'angle', 'length', 'min', 'max', 'label'];
 const NODE_FIELDS = ['id', 'parent', 'at', 'from', 'angle', 'length', 'min', 'max', 'label'];
 
+/**
+ * extends.clips (2.2; build item B4x): which of the base's clips the sprite takes, in this order, each a clip of the
+ * base by name or { name, from } to take it under another name. Without the list a sprite takes every clip of its
+ * base; a clip's own `from` may still name any of them. Sets C.takenClips (Map: the sprite's name -> the base's clip)
+ * and ext.clips (the cleaned list).
+ */
+function takenClips(C, place, raw, ext) {
+  const xs = list(C, place, raw, L.clips, { what: 'clips' });
+  if (!xs) return;
+  const taken = new Map(), out = [];
+  for (const x of xs) {
+    const renamed = isObj(x);
+    if (renamed) knownOnly(C, `${place} clips`, x, ['name', 'from']);
+    const name = renamed ? x.name : x, from = renamed ? x.from : x;
+    if (typeof name !== 'string' || typeof from !== 'string') { C.err(`${place} clips: each is a clip of the base by name, or { "name": "<clip>", "from": "<base clip>" } to take one under another name; got ${say(x)}`); continue; }
+    if (!checkClipName(C, `${place} clips`, name)) continue;
+    if (C.baseClips && !C.baseClips.has(from)) { C.err(`${place} clips: ${q(from)} is not a clip of ${C.base.id} (${someOf([...C.baseClips.keys()])})`); continue; }
+    if (taken.has(name)) { C.err(`${place} clips: ${q(name)} is listed twice; each clip is taken once`); continue; }
+    taken.set(name, from);
+    out.push(renamed ? { name, from } : name);
+  }
+  C.takenClips = taken;
+  ext.clips = out;
+}
+
 /** body.rig: a bone rig, version 1's fields plus extends, nodes, every primitive on a bone, and stamp overlays per direction (2.2). */
 function rigBody(C, r, top) {
   const where = 'Body: rig';
@@ -1219,7 +1278,7 @@ function rigBody(C, r, top) {
     const e = r.extends;
     if (!isObj(e)) C.err(`${where}: extends must be { "use": "base:<name>", "v": 1 }; got ${say(e)}`);
     else {
-      knownOnly(C, `${where}: extends`, e, ['use', 'v', 'drop', 'paint']);
+      knownOnly(C, `${where}: extends`, e, ['use', 'v', 'drop', 'paint', 'clips']);   // clips: build item B4x
       const ref = pieceRef(C, `${where}: extends`, e.use, e.v, 'base');
       if (ref) {
         out.extends = { use: ref.id, v: ref.v };
@@ -1233,6 +1292,7 @@ function rigBody(C, r, top) {
           if (!C.baseClips) C.loose = true;
         } else { C.loose = true; C.baseClips = null; }
         C.cost.expanded += fin(ref.entry?.cost) ? ref.entry.cost : 0;
+        if (e.clips !== undefined) takenClips(C, `${where}: extends`, e.clips, out.extends);
         if (e.drop !== undefined) {
           const xs = list(C, `${where}: extends`, e.drop, L.primitives, { what: 'shapes to drop' });
           if (xs) {
@@ -1478,9 +1538,10 @@ function emittersOf(C, where, raw) {
  * each emitter's bound (engine/gen/index.js STAMP_BOUNDS) at the values it sets (bindings at their largest) and amount
  * 1, in this sprite's frame, since keys may lower its size arguments but never raise them (checkKey) and an amount is
  * held to 0..1 when it draws. An emitter whose generator has no bound is refused, so is one over a frame's cap, and so
- * are emitters that can draw together and are over it in all: every emitter counts as on in every frame, apart from
- * those its `when` (a control's settings: the values the `when`s list and one more none lists) or its `clip` keep
- * apart. Conditions it does not read count as holding, so the sum is never less than a frame can hold; the work is at
+ * are emitters that can draw together and are over it in all, the body's own stamps added (B12c): every emitter counts as on in every frame, apart from
+ * those its `when` (a control's settings: the values the `when`s list and one more none lists; for a slider whose `when`s
+ * hold thresholds, each number they name and the slider's min and max, a point between each two, read with whenValueHolds) or its
+ * `clip` keep apart. Conditions it does not read count as holding, so the sum is never less than a frame can hold; the work is at
  * most 4,096 sums of at most 16 emitters (L.emitters), whatever the clips and keys.
  */
 function boundEmitters(C) {
@@ -1502,10 +1563,26 @@ function boundEmitters(C) {
   // the control settings that decide which emitters' whens hold: each key the whens name, its listed values and one more
   const alts = (w) => (Array.isArray(w) ? w : isObj(w) ? [w] : []).filter(isObj);
   const domains = new Map();
+  const cuts = new Map();   // a key with a threshold (B15b): every number its whens name, plain or a bound
   for (const e of ems) for (const alt of alts(e.when)) for (const [k, vs] of Object.entries(alt)) {
     if (SCENE_KEYS.has(k) || !Array.isArray(vs)) continue;
     const d = domains.get(k) ?? domains.set(k, new Set()).get(k);
-    for (const v of vs) d.add(v);
+    for (const v of vs) if (isObj(v)) { const c = cuts.get(k) ?? cuts.set(k, new Set()).get(k); for (const b of Object.values(v)) if (fin(b)) c.add(b); } else d.add(v);
+  }
+  // a slider whose whens hold thresholds is tried at each number they name, between each two and past each end (in its
+  // range), so every stretch where the whens hold the same way is tried once and thresholds are read as they are drawn
+  for (const [k, c] of cuts) {
+    const d = domains.get(k), def = C.table?.get(k);
+    const lo = fin(def?.min) ? def.min : -Infinity, hi = fin(def?.max) ? def.max : Infinity;
+    // the slider's own ends count as named (review B15b round 3): the stretch past a strict bound is then tried at its
+    // end, and a point between each two named numbers; one step past each end only where the slider has no end
+    const inRange = [...c, ...[...d].filter(fin)].filter((t) => t >= lo && t <= hi);
+    const pts = [...new Set([...inRange, ...[lo, hi].filter(fin)])].sort((a, b) => a - b);
+    const tries = new Set(pts);
+    pts.forEach((p, i) => { if (i + 1 < pts.length) tries.add((p + pts[i + 1]) / 2); });
+    if (pts.length && !fin(hi)) tries.add(pts[pts.length - 1] + 1);
+    if (pts.length && !fin(lo)) tries.add(pts[0] - 1);
+    for (const t of tries) if (t >= lo && t <= hi) d.add(t);
   }
   const OTHER = Symbol('other');
   let settings = [{}];
@@ -1516,7 +1593,8 @@ function boundEmitters(C) {
   const holds = (w, set) => {
     if (w === undefined || set === null) return true;
     const list = alts(w);
-    return !list.length || list.some((alt) => Object.entries(alt).every(([k, vs]) => !Array.isArray(vs) || !Object.hasOwn(set, k) || vs.includes(set[k])));
+    // each entry read by the one rule (engine/data-rules.js whenValueHolds), so a threshold holds where it is drawn
+    return !list.length || list.some((alt) => Object.entries(alt).every(([k, vs]) => !Array.isArray(vs) || !Object.hasOwn(set, k) || vs.some((v) => whenValueHolds(v, set[k]))));
   };
   let worst = 0, where = null;
   for (const set of settings) {
@@ -1530,7 +1608,10 @@ function boundEmitters(C) {
       where = [c === null ? null : `in clip ${q(c)}`, which.length ? `with ${which.join(', ')}` : null].filter(Boolean).join(' ');
     }
   }
-  if (worst > L.stampPixels) C.err(`The emitters can paint up to ${grand(Math.round(worst))} stamp pixels in one frame (${[where, 'those that can draw together; amounts are not read'].filter(Boolean).join(', ')}); a frame may hold ${grand(L.stampPixels)}: make them smaller, or keep them apart with when or clip`);
+  // the stamps the body writes itself (its draw list's, variants included: C.cost.stampPixels) share the frame's cap with
+  // the emitters' (build item B12c); over the cap on their own they are refused below, so they are not counted twice
+  const own = fin(C.cost?.stampPixels) && C.cost.stampPixels <= L.stampPixels ? C.cost.stampPixels : 0;
+  if (worst + own > L.stampPixels) C.err(`The emitters ${own ? 'and the body\'s stamps ' : ''}can paint up to ${grand(Math.round(worst + own))} stamp pixels in one frame (${[where, own ? `${grand(own)} of them the body's own stamps` : null, 'those that can draw together; amounts are not read'].filter(Boolean).join(', ')}); a frame may hold ${grand(L.stampPixels)}: make them smaller, or keep them apart with when or clip`);
 }
 
 /** Whether an emitter's generator must have a stamp bound: the site's own generators must, and so must one from a registry that brings a STAMP_BOUNDS table. */
@@ -1754,7 +1835,7 @@ function layersBody(C, raw) {
   return out;
 }
 
-const TILES_FIELDS = ['tile', 'profiles', 'groups', 'material', 'extra'];
+const TILES_FIELDS = ['tile', 'profiles', 'groups', 'material', 'extra', 'decalOrder'];   // decalOrder: migration batch M5
 const GROUP_FIELDS = ['name', 'kind', 'use', 'pieces', 'fills', 'material', 'decals', 'label', 'frames', 'fps', 'thickness', 'under', 'pictures', 'outline'];   // label ... outline: build item B15
 
 /** body.tiles (2.3): a tile size, named profiles, groups with piece sets and a material as data (or a material piece), decals, extra tiles. */
@@ -1765,6 +1846,10 @@ function tilesBody(C, b) {
   const out = {};
   if (b.tile !== 16 && b.tile !== 32) C.err(`${where}: tile must be 16 or 32 (pixels a side); got ${say(b.tile)}`);
   else out.tile = b.tile;
+  if (b.decalOrder !== undefined) {   // migration batch M5: where the decals go in the clip list (engine/gen/tiles-clips.js)
+    if (!TILE_DECAL_ORDERS.includes(b.decalOrder)) C.err(`${where}: decalOrder must be ${listOf(TILE_DECAL_ORDERS)} ("group": each group's decals after its pieces; "last": after the extra tiles); got ${say(b.decalOrder)}`);
+    else out.decalOrder = b.decalOrder;
+  }
   if (b.tile === 16) C.err(`${where}: 16 px tiles are not drawn yet: engine/tiles.js draws 32 px tiles (make the tileset 32 px)`);   // build item B15: the layout's own reason
   const T = out.tile ?? 32;
   C.profiles = new Map();
@@ -2027,7 +2112,15 @@ function tileFillCount(C, place, g, shared) {
     return;
   }
   const m = g.material ?? shared;
-  if (!isObj(m) || Object.hasOwn(m, 'use')) return;
+  if (!isObj(m)) return;
+  if (Object.hasOwn(m, 'use')) {
+    // a material piece: its summary says how many fill versions it has (engine/pieces.js pieceSummary; build item B15b)
+    const r = typeof m.use === 'string' && Number.isInteger(m.v) ? parsePieceUse(m.use) : null;
+    const e = r ? lookupPiece(C, r, m.v).entry : null;
+    const n = g.fills ?? 1, v = e && Number.isInteger(e.fills) ? e.fills : null;
+    if (v !== null && n > 1 && v < n) C.err(`${place}: fills ${n} asks for ${n} different middles, but its material ${m.use} has ${v ? `${v} fill version${v === 1 ? '' : 's'}` : 'no fill versions'}; ask for ${Math.max(1, v)} at most, or use a material with ${n}`);
+    return;
+  }
   const n = g.fills ?? 1, v = Array.isArray(m.fill?.versions) ? m.fill.versions.length : 0;
   const has = v ? `${v} fill version${v === 1 ? '' : 's'}` : 'no fill versions';
   if (n > 1 && v < n) C.err(`${place}: fills ${n} asks for ${n} different middles, but its material has ${has}; give fill.versions ${n} draw lists (the first may be [])`);
@@ -2152,7 +2245,9 @@ function derivesOf(C) {
   for (const { o, place, rule } of pending) {
     const before = new Set(C.painted);
     C.painted = new Set();
+    C.inDerive = true;   // B15b: DERIVE_PAINTS may be named here
     const x = isObj(rule) ? colourRule(C, `${place}: derive`, rule, 0) : (C.err(`${place}: derive must be a colour rule { "rule": "tone", "of": ..., ... }; got ${say(rule)}`), undefined);
+    C.inDerive = false;
     deps.set(o.id, [...C.painted]);
     for (const s of C.painted) before.add(s);
     C.painted = before;
@@ -2393,7 +2488,7 @@ function partsOf(C, raw) {
   return out;
 }
 
-const CLIP_FIELDS = ['label', 'frames', 'fps', 'loop', 'keys', 'frameEdits', 'sounds', 'from', 'noText'];
+const CLIP_FIELDS = ['label', 'frames', 'fps', 'loop', 'keys', 'frameEdits', 'sounds', 'from', 'noText'];   // noText: migration batch M9 (an interface clip with no room for words, engine/ui.js)
 const EDIT_FIELDS = ['nudge', 'show', 'hide', 'flash', 'swap'];
 const SOUND_FIELDS = ['sound', 'frame', 'preset', 'volume', 'when'];
 
@@ -2495,6 +2590,26 @@ function swapOne(C, place, id, x) {
   return x;
 }
 
+/**
+ * A clip's `from` that picks the base's clip by a setting (2.2; build item B4x): a binding to a choice or on/off, as
+ * any binding is checked, whose every value is a clip of the base ({ from, pick: { option: clip } }, or { from } when
+ * every option of the choice is a clip's name). Sets o.from to the cleaned binding. A sprite's sheet has one number of
+ * frames a clip, so the clips it can pick must have the same number, or the clip gives its own `frames`. Returns what
+ * the clip inherits for the checks that follow ({ frames }), {} when it cannot tell or after an error.
+ */
+function pickedFrom(C, place, b, o, ownFrames = false) {
+  const names = C.baseClips ? [...C.baseClips.keys()] : null;
+  const r = binding(C, place, 'from', b, names ? { kind: 'word', options: names } : { kind: 'any' });
+  if (!r) return {};
+  o.from = r.value;
+  const d = C.table.get(r.value.from);
+  const picks = isObj(r.value.pick) ? Object.values(r.value.pick) : d?.kind === 'choice' ? d.values : [];
+  if (!names) { if (!picks.every((n) => typeof n === 'string' && CLIP_NAME.test(n))) C.err(`${place}: from picks ${say(picks)}; each value is the name of a clip of the base`); return {}; }
+  const frames = picks.map((n) => C.baseClips.get(n)?.frames).filter(fin);
+  if (!ownFrames && new Set(frames).size > 1) C.err(`${place}: from can pick clips of different lengths (${someOf([...new Set(picks)].map((n) => `${n} ${C.baseClips.get(n)?.frames}`))} frames); a sheet has one length a clip: pick clips of one length, or give the clip its own frames`);
+  return frames.length === picks.length && frames.length ? { frames: Math.min(...frames) } : {};
+}
+
 function checkClip(C, name, c, written) {
   const place = `Clip ${q(name)}`;
   if (!isObj(c)) { C.err(`${place}: must be an object with ${listOf(CLIP_FIELDS)}; got ${say(c)}`); return null; }
@@ -2507,9 +2622,10 @@ function checkClip(C, name, c, written) {
   let inherited = null;
   if (c.from !== undefined) {
     if (!C.base) C.warn(`${place}: from names a clip of a base piece; this body extends none, so it was dropped`);
+    else if (isBindingLike(c.from)) inherited = pickedFrom(C, place, c.from, o, c.frames !== undefined);   // B4x: the base clip picked by a setting
     else if (typeof c.from !== 'string' || (C.baseClips && !C.baseClips.has(c.from))) C.err(`${place}: from ${q(c.from)} is not a clip of ${C.base.id}${C.baseClips ? ` (${someOf([...C.baseClips.keys()])})` : ''}`);
     else { o.from = c.from; inherited = C.baseClips?.get(c.from) ?? {}; }
-  }
+  } else if (C.takenClips?.has(name)) inherited = C.baseClips?.get(C.takenClips.get(name)) ?? {};   // B4x: a clip extends.clips takes
   let frames;
   if (c.frames === undefined && (inherited || written)) frames = fin(inherited?.frames) ? inherited.frames : undefined;
   else if (!Number.isInteger(c.frames) || c.frames < 1 || c.frames > L.framesPerClip) { C.err(`${place}: frames must be a whole number from 1 to ${L.framesPerClip}; got ${say(c.frames)}`); frames = 1; }
@@ -2518,6 +2634,8 @@ function checkClip(C, name, c, written) {
   if (c.fps !== undefined || (!inherited && !written)) o.fps = num(C, place, 'fps', c.fps ?? std?.fps ?? 10, 1, L.fps);
   if (c.loop !== undefined && typeof c.loop !== 'boolean') C.err(`${place}: loop must be true or false; got ${say(c.loop)}`);
   if (typeof c.loop === 'boolean') o.loop = c.loop; else if (!inherited && !written) o.loop = std?.loop ?? true;
+  if (c.noText !== undefined && typeof c.noText !== 'boolean') C.err(`${place}: noText must be true or false; got ${say(c.noText)}`);   // migration batch M9: a clip of an interface piece where no text goes (Contract 8, engine/ui.js contrastFaults)
+  else if (c.noText === true) o.noText = true;
   const n = frames ?? L.framesPerClip;
   // keys
   const ks = list(C, place, c.keys, L.keysPerClip, { what: 'keys' }) ?? [];
@@ -2568,8 +2686,6 @@ function checkClip(C, name, c, written) {
       o.sounds.push(x);
     });
   }
-  // noText: the clip never carries the game's text (engine/ui.js, CONTRAST); only a true one is kept
-  if (bool(C, place, 'noText', c.noText) === true) o.noText = true;
   // advice from style guide 4, for bodies that act
   if (C.bodyKind === 'rig') {
     if (Object.hasOwn(CLIP_SYNONYMS, action)) { const s = CLIP_SYNONYMS[action]; C.warn(`${place}: the style guide calls this clip "${s}"; name it ${dir ? `${s}_${dir}` : s} and keep the label ${q(o.label)}`); }
@@ -2582,17 +2698,20 @@ function checkClip(C, name, c, written) {
   return { clip: o, frames: frames ?? 0 };
 }
 
+/** Whether the base gives the sprite any clip: it extends one, and takes its clips (no extends.clips) or some of them (B4x). */
+const baseGives = (C) => !!C.base && !(C.takenClips && C.takenClips.size === 0);
+
 function clipsOf(C, raw) {
   const written = C.layoutClips;           // null: the layout names its clips (tiles)
   const known = written === null ? null : new Set(written);
   if (C.baseClips) for (const k of C.baseClips.keys()) known?.add(k);
   if (raw === undefined) {
-    if (written !== null && !written.length && !C.base) C.err('Clips: give at least one clip (idle is the usual first)');
+    if (written !== null && !written.length && !baseGives(C)) C.err('Clips: give at least one clip (idle is the usual first)');
     return {};
   }
   const names = mapNames(C, 'Clips', raw, L.clips, 'name: clip');
   if (!names) return {};
-  if (!names.length && written !== null && !written.length && !C.base) C.err('Clips: give at least one clip (idle is the usual first)');
+  if (!names.length && written !== null && !written.length && !baseGives(C)) C.err('Clips: give at least one clip (idle is the usual first)');
   const out = {};
   let total = 0;
   for (const name of names) {
@@ -2608,7 +2727,7 @@ function clipsOf(C, raw) {
   if (total > L.frames) C.err(`Clips: have ${total} frames in all; the most is ${L.frames}`);
   C.cost.frames = total;
   if (C.view === 'top-down' && C.bodyKind === 'rig') {
-    const all = new Set([...names, ...(C.baseClips?.keys() ?? [])]);
+    const all = new Set([...names, ...((C.takenClips ?? C.baseClips)?.keys() ?? [])]);
     const missing = ['walk_down', 'walk_up', 'walk_side'].filter((n) => !all.has(n));
     if (missing.length) C.warn(`Clips: a top-down sprite walks in three directions (Contract 2); add ${missing.join(', ')}`);
   }
@@ -2753,7 +2872,7 @@ function setup(C) {
     slots: new Map(), table: new Map(), used: new Set(), painted: new Set(), uses: new Set(), anyPiece: false,
     shapeIds: new Map(), stamps: new Map(), emitters: new Map(), groups: new Set(), points: new Map(), baseShapes: new Set(),
     clipRefs: [], shapeRefs: [], partRefs: [], groupRefs: [], scaleRefs: [], layoutClips: [], closedClips: false,
-    nodes: null, loose: false, base: null, baseClips: null, profiles: null, tileGroups: null, tileExtras: new Set(), view: null,
+    nodes: null, loose: false, base: null, baseClips: null, takenClips: null, profiles: null, tileGroups: null, tileExtras: new Set(), view: null,
   });
 }
 
@@ -2884,9 +3003,9 @@ function checkSpriteV2(C, d) {
   // clips and preview
   const clips = clipsOf(C, d.clips);
   out.clips = clips;
-  const allClips = C.layoutClips === null ? null : [...new Set([...C.layoutClips, ...(C.baseClips ? C.baseClips.keys() : []), ...Object.keys(clips)])];
+  const allClips = C.layoutClips === null ? null : [...new Set([...C.layoutClips, ...(C.takenClips ? C.takenClips.keys() : C.baseClips ? C.baseClips.keys() : []), ...Object.keys(clips)])];   // B4x: the clips extends.clips takes, else every clip of the base
   C.clipList = allClips;
-  if (allClips && C.loose && C.base && !C.baseClips) C.clipList = null;
+  if (allClips && C.loose && C.base && !C.baseClips && !C.takenClips) C.clipList = null;
   const knownClips = C.clipList ? new Set(C.clipList) : null;
   if (!speed && kind && Object.values(clips).some((c) => (c.frames ?? 0) > 1) && kind !== 'panel' && kind !== 'layers' && kind !== 'tiles') C.warn('Controls: there is no speed control; add { "key": "speed", "standard": "speed" } so people can set how fast it moves');
   if (d.preview === undefined) { const first = C.clipList?.[0] ?? Object.keys(clips)[0]; if (first !== undefined) out.preview = first; }

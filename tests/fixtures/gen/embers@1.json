@@ -1,0 +1,527 @@
+{
+ "id": "embers",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     24,
+     24
+    ],
+    "count": 8,
+    "r0": 4,
+    "r1": 16,
+    "paints": [
+     "p1",
+     "p2",
+     "p3",
+     "p4"
+    ]
+   },
+   "ctx": {
+    "t": 0.2,
+    "loop": false
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      25,
+      25
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a...",
+      ".a..",
+      ".aa.",
+      "abca",
+      "abba",
+      ".aa."
+     ],
+     "key": {
+      "a": "p3",
+      "b": "p2",
+      "c": "p1"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      25,
+      23
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...aa.",
+      "aaabca",
+      "..abba",
+      "...aa."
+     ],
+     "key": {
+      "a": "p3",
+      "b": "p2",
+      "c": "p1"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      25,
+      19
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...aa.",
+      "..abca",
+      ".aabba",
+      "a..aa."
+     ],
+     "key": {
+      "a": "p3",
+      "b": "p2",
+      "c": "p1"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      25,
+      17
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aa.",
+      "abca",
+      "abba",
+      "aaa.",
+      "a..."
+     ],
+     "key": {
+      "a": "p3",
+      "b": "p2",
+      "c": "p1"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      20,
+      15
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aa.",
+      "abca",
+      "abba",
+      ".aa.",
+      "..a.",
+      "...a"
+     ],
+     "key": {
+      "a": "p3",
+      "b": "p2",
+      "c": "p1"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      16,
+      18
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aa..",
+      "abca.",
+      "abba.",
+      ".aaaa"
+     ],
+     "key": {
+      "a": "p3",
+      "b": "p2",
+      "c": "p1"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      14,
+      27
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aaaa",
+      "abca.",
+      "abba.",
+      ".aa.."
+     ],
+     "key": {
+      "a": "p3",
+      "b": "p2",
+      "c": "p1"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      20,
+      25
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...a",
+      "..a.",
+      ".aa.",
+      "abca",
+      "abba",
+      ".aa."
+     ],
+     "key": {
+      "a": "p3",
+      "b": "p2",
+      "c": "p1"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     24,
+     24
+    ],
+    "count": 10,
+    "r0": 6,
+    "r1": 18,
+    "size": 3,
+    "tail": 4,
+    "gravity": 4,
+    "turn": 30,
+    "seed": 2,
+    "paints": [
+     "p0",
+     "p1",
+     "p2",
+     "p3",
+     "p4"
+    ]
+   },
+   "ctx": {
+    "t": 0.5,
+    "loop": false
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      26,
+      26
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaa.",
+      "abcca",
+      "abcca",
+      "abbba",
+      ".aaa."
+     ],
+     "key": {
+      "a": "p4",
+      "b": "p2",
+      "c": "p1"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      25,
+      25
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..aaa.",
+      ".abcca",
+      "aabcca",
+      ".abbba",
+      "..aaa."
+     ],
+     "key": {
+      "a": "p4",
+      "b": "p2",
+      "c": "p1"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      26,
+      16
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aaa.",
+      "abcca",
+      "abcca",
+      "abbba",
+      "aaaa."
+     ],
+     "key": {
+      "a": "p4",
+      "b": "p2",
+      "c": "p1"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      26,
+      11
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aaa.",
+      "abcca",
+      "abcca",
+      "abbba",
+      ".aaa.",
+      "a...."
+     ],
+     "key": {
+      "a": "p4",
+      "b": "p2",
+      "c": "p1"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      19,
+      9
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aaa.",
+      "abcca",
+      "abcca",
+      "abbba",
+      ".aaa.",
+      "..a.."
+     ],
+     "key": {
+      "a": "p4",
+      "b": "p2",
+      "c": "p1"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      14,
+      15
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aaa.",
+      "abcca",
+      "abcca",
+      "abbba",
+      ".aaaa"
+     ],
+     "key": {
+      "a": "p4",
+      "b": "p2",
+      "c": "p1"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      11,
+      22
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aaa..",
+      "abcca.",
+      "abccaa",
+      "abbba.",
+      ".aaa.."
+     ],
+     "key": {
+      "a": "p4",
+      "b": "p2",
+      "c": "p1"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      9,
+      26
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aaa..",
+      "abccaa",
+      "abcca.",
+      "abbba.",
+      ".aaa.."
+     ],
+     "key": {
+      "a": "p4",
+      "b": "p2",
+      "c": "p1"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      17,
+      25
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...a.",
+      ".aaa.",
+      "abcca",
+      "abcca",
+      "abbba",
+      ".aaa."
+     ],
+     "key": {
+      "a": "p4",
+      "b": "p2",
+      "c": "p1"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      23,
+      25
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".a...",
+      ".aaa.",
+      "abcca",
+      "abcca",
+      "abbba",
+      ".aaa."
+     ],
+     "key": {
+      "a": "p4",
+      "b": "p2",
+      "c": "p1"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "count": 6,
+    "r1": 12,
+    "paints": [
+     "p1",
+     "p2",
+     "p3",
+     "p4"
+    ]
+   },
+   "ctx": {
+    "t": 0.9,
+    "loop": false
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      19,
+      22
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a"
+     ],
+     "key": {
+      "a": "p3"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      21,
+      14
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a"
+     ],
+     "key": {
+      "a": "p3"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      19,
+      8
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a"
+     ],
+     "key": {
+      "a": "p3"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      13,
+      11
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a"
+     ],
+     "key": {
+      "a": "p3"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      9,
+      14
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a"
+     ],
+     "key": {
+      "a": "p3"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      9,
+      21
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a"
+     ],
+     "key": {
+      "a": "p3"
+     }
+    }
+   ]
+  }
+ ]
+}

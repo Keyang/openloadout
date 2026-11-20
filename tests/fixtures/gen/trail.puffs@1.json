@@ -1,0 +1,207 @@
+{
+ "id": "trail.puffs",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     20,
+     16
+    ],
+    "count": 3,
+    "paints": [
+     "s0",
+     "s1"
+    ]
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      14,
+      14
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aa",
+      "aa",
+      "aa"
+     ],
+     "key": {
+      "a": "s0"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      16,
+      14
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aa.",
+      "aaaa",
+      "aaaa",
+      ".aa."
+     ],
+     "key": {
+      "a": "s0"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     24,
+     16
+    ],
+    "count": 4,
+    "angle": -80,
+    "dist": 12,
+    "size": 6,
+    "spread": 1.2,
+    "seed": 4,
+    "paints": [
+     "s0",
+     "s2"
+    ]
+   },
+   "ctx": {
+    "t": 0.6,
+    "loop": true
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      13,
+      16
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a"
+     ],
+     "key": {
+      "a": "s2"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      15,
+      16
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aa.",
+      "aaaa",
+      "aaaa",
+      ".aa."
+     ],
+     "key": {
+      "a": "s0"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      17,
+      13
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..aa..",
+      ".abba.",
+      "abbbba",
+      "abbbba",
+      "abbbba",
+      ".abba.",
+      "..aa.."
+     ],
+     "key": {
+      "a": "s2",
+      "b": "s0"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      19,
+      13
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..aaaa..",
+      ".abbbba.",
+      "aabbbbba",
+      "aabbbbba",
+      "aaabbbba",
+      ".aaaaaa.",
+      "..aaaa.."
+     ],
+     "key": {
+      "a": "s2",
+      "b": "s0"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     20
+    ],
+    "count": 2,
+    "angle": 180,
+    "dist": 8,
+    "size": 3,
+    "cycles": 2,
+    "paints": [
+     "s1"
+    ]
+   },
+   "ctx": {
+    "t": 0.1,
+    "loop": true
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      16,
+      14
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a"
+     ],
+     "key": {
+      "a": "s1"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      15,
+      17
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aa",
+      "aa",
+      "aa"
+     ],
+     "key": {
+      "a": "s1"
+     }
+    }
+   ]
+  }
+ ]
+}

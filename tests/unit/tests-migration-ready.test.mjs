@@ -165,10 +165,6 @@ test('codeSpritesWhere finds the code on a rig, the frozen copy first, one per i
 // the frozen copies they need are already in tests/fixtures/code-sprites/, so each switch is one line: codeSprite(id)).
 const KNOWN = {
   'tests/unit/gen-b12-fx.test.mjs': 'B12b: port test against blaster-bolt (frozen)',
-  'tests/unit/gen-tiles-clips.test.mjs': 'B15: port test against tiles-forest (frozen)',
-  'tests/unit/gen-tiles-rules.test.mjs': 'B15: download rules against tiles-forest, tiles-cave, tiles-dungeon (frozen)',
-  'tests/unit/gen-tiles-quality.test.mjs': 'B15: quality against tiles-cave, tiles-dungeon (frozen)',
-  'tests/unit/gen-ui-panel.test.mjs': 'B13: port test against ui-buttons-wood, ui-dialogue, ui-bars-flat (frozen)',
   'tests/unit/data-sprite-v2-emitters.test.mjs': 'B12b: redraws against blaster-bolt, plasma-burst, hit-spark (frozen)',
 };
 // Files allowed to name sprites/<id>.js of the real project: the helper that does it for everyone, this file, and

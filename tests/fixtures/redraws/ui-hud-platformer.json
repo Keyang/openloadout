@@ -1,0 +1,240 @@
+{
+ "id": "ui-hud-platformer",
+ "frozen": "2026-11-20",
+ "source": "sprites/ui-hud-platformer.js",
+ "sha256": "ec7778be4936be229dd6a07486ca42967fd8d6ebde7873e9bf8abd9606664815",
+ "name": "Platformer HUD",
+ "blurb": "Hearts (full, half, empty), a coin, a key, a star and a gem for the top of the screen, with a heart breaking and a heart filling; change the heart shape, shine, shadow and colours.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/bar",
+  "themes": [
+   "fantasy",
+   "neutral"
+  ],
+  "gameTypes": [
+   "platformer",
+   "arcade",
+   "puzzle"
+  ],
+  "view": "none",
+  "words": [
+   "hud",
+   "heart",
+   "health",
+   "life",
+   "lives",
+   "coin",
+   "key",
+   "star",
+   "gem",
+   "counter",
+   "score",
+   "status",
+   "lose",
+   "gain"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  16,
+  16
+ ],
+ "pivot": [
+  8,
+  8
+ ],
+ "grounded": false,
+ "preview": "heart-full",
+ "params": {
+  "shape": {
+   "kind": "choice",
+   "label": "Shape",
+   "def": "classic",
+   "options": [
+    {
+     "value": "classic",
+     "label": "Classic"
+    },
+    {
+     "value": "round",
+     "label": "Round"
+    },
+    {
+     "value": "pixel",
+     "label": "Pixel"
+    }
+   ],
+   "group": "Look"
+  },
+  "shine": {
+   "kind": "toggle",
+   "label": "Shine",
+   "def": true,
+   "group": "Look"
+  },
+  "shadow": {
+   "kind": "toggle",
+   "label": "Shadow",
+   "def": true,
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Hearts",
+   "def": "#c9423a",
+   "swatches": [
+    "#c9423a",
+    "#e08a2c",
+    "#7a4fc4",
+    "#4fd8ee",
+    "#a4c44a",
+    "#3f6fd1"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Empty",
+   "def": "#5d6475",
+   "swatches": [
+    "#5d6475",
+    "#8f97a8",
+    "#3f5068",
+    "#7a4f33",
+    "#7fb0b8"
+   ],
+   "group": "Colors"
+  },
+  "metal": {
+   "kind": "color",
+   "label": "Coin, key and star",
+   "def": "#f2c230",
+   "swatches": [
+    "#f2c230",
+    "#c2c9d6",
+    "#8f97a8",
+    "#e6c545",
+    "#c98a4a"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "heart-full": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "heart-half": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "heart-empty": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "coin": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "key": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "key-empty": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "star": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "star-empty": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "gem": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "heart-lose": {
+   "frames": 4,
+   "loop": false,
+   "fps": [
+    5,
+    8,
+    12
+   ]
+  },
+  "heart-gain": {
+   "frames": 4,
+   "loop": false,
+   "fps": [
+    5,
+    8,
+    12
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [],
+ "bundles": [
+  "kit-platformer-fantasy"
+ ]
+}

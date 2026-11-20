@@ -1,0 +1,193 @@
+{
+ "id": "icon.body",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "shapes": [
+     {
+      "kind": "ellipse",
+      "at": [
+       0,
+       0
+      ],
+      "r": [
+       6,
+       7
+      ]
+     }
+    ],
+    "paint": "body"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      10,
+      9
+     ],
+     "anchor": "tl",
+     "rows": [
+      "....aaaa....",
+      "..bccccaaa..",
+      ".dbccccccaa.",
+      ".bbccccccca.",
+      "dbbcccccccaa",
+      "dbbcccccccca",
+      "dbbcccccccca",
+      "dbbbccccccca",
+      "dbbbccccccca",
+      "ddbbbcccccca",
+      ".dbbbbbcccc.",
+      ".ddbbbbbbbb.",
+      "..dddbbbbd..",
+      "....dddd...."
+     ],
+     "key": {
+      "a": "body.light",
+      "b": {
+       "rule": "mix",
+       "of": "body",
+       "with": {
+        "rule": "ramp",
+        "of": "body",
+        "tone": "dark"
+       },
+       "amount": 0.5
+      },
+      "c": "body",
+      "d": "body.dark"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "shapes": [
+     {
+      "kind": "rect",
+      "at": [
+       -5,
+       -5
+      ],
+      "size": [
+       10,
+       10
+      ]
+     }
+    ],
+    "paint": "body",
+    "grow": 0.5,
+    "turn": 30
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      9,
+      9
+     ],
+     "anchor": "tl",
+     "rows": [
+      "....abc.......",
+      "....bdcc......",
+      "...abddccc....",
+      "...bdddddccc..",
+      "..addddddddccc",
+      "..bddddddddddc",
+      ".bbddddddddddc",
+      "abbbbdddddddd.",
+      "abbbbbbddddd..",
+      "aaabbbbbbddc..",
+      "..aaabbbbbd...",
+      "....aaabbbb...",
+      "......aabb....",
+      ".......aaa...."
+     ],
+     "key": {
+      "a": "body.dark",
+      "b": {
+       "rule": "mix",
+       "of": "body",
+       "with": {
+        "rule": "ramp",
+        "of": "body",
+        "tone": "dark"
+       },
+       "amount": 0.5
+      },
+      "c": "body.light",
+      "d": "body"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "shapes": [
+     {
+      "kind": "ellipse",
+      "at": [
+       0,
+       0
+      ],
+      "r": [
+       6,
+       7
+      ]
+     }
+    ],
+    "minus": [
+     {
+      "kind": "ellipse",
+      "at": [
+       0,
+       0
+      ],
+      "r": [
+       2,
+       2
+      ]
+     }
+    ],
+    "paint": "body",
+    "centre": [
+     4,
+     28
+    ],
+    "soften": false
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      -2,
+      21
+     ],
+     "anchor": "tl",
+     "rows": [
+      "....aaaa....",
+      "..abbbbaaa..",
+      ".cbbbbbbbaa.",
+      ".bbbbbbbbba.",
+      "cbbbbbccbbaa",
+      "cbbbb..ccbba",
+      "cbbb....cbba",
+      "cbba....bbba",
+      "cbbaa..bbbba",
+      "ccbbaabbbbba",
+      ".cbbbbbbbbb.",
+      ".ccbbbbbbba.",
+      "..cccbbbbc..",
+      "....cccc...."
+     ],
+     "key": {
+      "a": "body.light",
+      "b": "body",
+      "c": "body.dark"
+     }
+    }
+   ]
+  }
+ ]
+}

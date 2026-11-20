@@ -1,20 +1,32 @@
 # Loadout
 
-Loadout is a website of pixel-art sprites, sound effects and music for 2D games. Every asset is made by code, not stored as a picture or a recording. Each one is a small program with plain-language sliders ("taller", "brighter", "faster"), so a game maker can change it before using it. The site is static files only: it needs no server of its own.
+Loadout is a website of pixel-art sprites, sound effects and music for 2D games. Every asset is made by code, not stored as a picture or a recording: a sound is a patch the sound engine plays, and a sprite is a definition the framework draws (a data file for 3 sprites so far, a small program for the other 226 until they are redrawn as data). Each one has plain-language sliders ("taller", "brighter", "faster"), so a game maker can change it before using it. The site is static files only: it needs no server of its own.
 
 It is for people who make small 2D games and do not draw, record or write code. They search for what the game needs, change it, put it in a bag, try the bag in a playground, and download one zip. Agents can use the same code to make new assets. The folder (`lab/sprite-forge`), the skill id (`sprite-forge`) and the preview entry keep the project's first name, Sprite Forge; Keyang decided on 2026-11-18 to leave them. This is Keyang's own lab experiment, not part of the Innovation Lab project.
 
 ## What is in it today
 
-Counts are of committed files as of 02:10 on 2026-11-19, when the build loop's four goals were checked.
+Counts are of committed files at 05:00 on 2026-11-20 (commit `6773968`). The build loop's four goals were verified in the progress log's entry of 02:30 on 2026-11-19, with 137 sprites, 56 sounds and 6 tracks.
 
 | Thing | Count |
 |---|---|
-| Sprites (`sprites/*.js`) | 137 |
-| Sounds (`sounds/*.json`) | 56 sound effects, ambience loops and jingles |
-| Music tracks (also in `sounds/`) | 6 |
+| Sprites | 229: **3 data files** (`sprites/<id>.json`: `coin`, `crate`, `icons-food`) and 226 code files (`sprites/<id>.js`) |
+| Sounds (`sounds/*.json`) | 175 sound effects, ambience loops and jingles (142, 24 and 9) |
+| Music tracks (also in `sounds/`) | 30 |
 | Bundle files (`bundles/*.json`) | 6: three kits and three small starter bundles |
-| Tests | 2,595 unit tests and 358 browser tests (8 skipped: Firefox and Safari are not installed) |
+| Pieces (`pieces/*.json`, shared drawing data) | 14: 3 interface skins, the top-down person's 2 bases, 7 parts and 2 held things |
+| Named generators (`engine/gen/`) | 64 versions of 59 generators in 12 families |
+| Tests | 381 unit test files and 54 browser test files. Last full runs in `docs/progress.md`: unit 4,570 of 4,586 (2026-11-20 05:00, on exactly commit `87a4e2c`; the log names two failures: the top-down pieces' missing pins, fixed in that commit, and a font file absent from the clean export, which passes in the real folder), browser 634 of 638 (2026-11-20 about 03:59; the 4 were tests of another session's page redesign, fixed in `ed76fd8`) |
+
+**Option B: every sprite becomes data** (Keyang, 2026-11-19 18:10; Contract 15 in `docs/architecture.md`, the design and its build plan in `docs/data-sprites.md`). Where it stands:
+
+| Part | State |
+|---|---|
+| Sprites that are data | 3 of 229 |
+| Kinds of sprite the framework can draw as data | Characters and creatures (bone rigs), props, pickups, icons, interface pieces, backgrounds, effects and projectiles (7 of about 27 effect behaviours), tilesets (3 of 13 ported; the other 10 in progress) |
+| Shared bodies (bases) | The top-down person (from `rigs/topdown.js`); the side-view person in progress; 11 more to come |
+| Made through `window.loadout` | Data only; the sandbox for program text is deleted |
+| Not started | The studio for every kind (the studio works for bone rigs today), the migration of the 226 code sprites, deleting the old code |
 
 A **bundle** is a list of sprites, sounds and tracks that belong together. A **kit** is a bundle for one kind of game, with a plan in `bundles/specs/`. There is one kit for each of three game types picked from the top 100 2D games (`docs/game-types-research.md`):
 
@@ -63,11 +75,12 @@ Pages are addresses after `#/`. Every page keeps its settings in the address, so
 - **Bundle look.** A bundle page (`#/bundle/<id>`) restyles every asset in the bundle at once: colours, pitch, brightness, tempo.
 - **Bag.** "Add to my bag" keeps an asset with its settings. The bag (`#/bag`) lives in the browser and the whole bag travels in one link.
 - **Playground.** `#/play` lets you walk, jump or move in four directions with the bag's characters, over its tiles and backgrounds, with its sounds and music.
+- **Studio.** `#/studio` makes a new sprite on a bone rig: bones and shapes, key-pose animation, frames, sounds on frames; it goes in the bag like any asset (`docs/studio.md`). It does not yet edit the other kinds of data sprite.
 - **Download.** A zip with sprite sheets, JSON, WAV files, tracks, one manifest and a guide. Unity package is shown as "coming later".
 
 ## How an asset is made
 
-Loadout has two layers. The **framework** is the code every asset is written with: drawing (`engine/`), body rigs (`rigs/`), sound and music synthesis (`sound/`), the quality bar (`quality/`) and the looks (`engine/theme.js`, `sound/theme.js`). An **asset** is one file: `sprites/<id>.js` draws every frame of a sprite, and `sounds/<id>.json` is a sound or music patch. Nothing else is stored; there is no list to edit, because the build finds assets by scanning the folders.
+Loadout has two layers. The **framework** is the code every asset is written with: drawing (`engine/`), body rigs (`rigs/`), sound and music synthesis (`sound/`), the quality bar (`quality/`) and the looks (`engine/theme.js`, `sound/theme.js`). An **asset** is one file: `sprites/<id>.json` is a sprite's definition (data that names shapes, pixel stamps, shared pieces and the framework's named generators; no code), and `sounds/<id>.json` is a sound or music patch. 226 older sprites are still `sprites/<id>.js` programs until they are redrawn as data. Nothing else is stored; there is no list to edit, because the build finds assets by scanning the folders.
 
 The rule: code that any other asset could use goes into the framework, not into the asset file. A maker who finds something missing adds a new function or module, with a one-line comment and a test, and does not change what existing functions do (`docs/architecture.md`, Contract 11; `docs/framework-api.md`).
 
@@ -92,6 +105,8 @@ Both checkers run the quality bar (`docs/quality-bar.md`). Errors fail an asset;
 | `tools/render.mjs` | Renders a sprite to contact sheets (clips, variants, one clip close up, the real export) |
 | `tools/tilemap.mjs` | Renders a map from a tileset so the joins between tiles can be looked at |
 | `tools/scene.mjs` | Renders a scene from several tilesets, with props, looks and frames, from a JSON file |
+| `tools/gen.mjs` | Lists the named generators a data sprite can use; `<gen> --sheet` draws one across its arguments |
+| `tools/piece.mjs` | Lists the shared pieces (`pieces/`) with their slots and arguments; `<piece> --sheet` draws one |
 | `tools/rig.mjs` | Lists what a body rig has (poses, parts, held things, sockets) as tables and contact sheets |
 | `tools/bundles-from-plans.mjs` | Writes `bundles/<id>.json` for each kit plan whose assets all exist; `--check` writes nothing. A new kit is new files only: its plan `bundles/specs/<id>.plan.json` (name, game type, the sentence for its page, palette, asset lists) and its assets. The top of the tool says how, including the one code step when a kit brings a new palette |
 | `tools/compose/` | The music kit's command line (`kit.mjs`) and one generator per track that writes its patch (`thornwood_overworld.mjs`, `hearthvale_village.mjs`, `hearthvale_battle.mjs`, `derelict_run.mjs`, `derelict_boss.mjs`, `battle_theme.py`); `verify_music.mjs` lists the notes sounding in each bar; `render_ramp.mjs` renders a loop while one slider climbs |
@@ -101,13 +116,13 @@ Both checkers run the quality bar (`docs/quality-bar.md`). Errors fail an asset;
 
 The site puts the whole framework on `window.loadout`. An agent that drives the page can search the catalogue, define a new sprite or sound at run time (`loadout.make.sprite`, `loadout.make.sound`), run the quality bar on it, render it as a picture, add it to the bag and download. Its description, including 14 actions listed in the form MCP tool lists use, is written by the build to `generated/api.json` and `generated/api.md` (generator: `tools/lib/api.mjs`).
 
-Safety, in two sentences: an asset made at run time runs only inside a worker with network, storage and page access removed, under a same-site content policy, and anything from storage or a shared link is checked again before it is used. This was verified in Chromium only (`docs/architecture.md`, Contract 11; `docs/framework-api.md`).
+Safety, in two sentences: a sprite made at run time is data (a definition, never program text), so nothing in it runs; it is checked field by field and drawn on the page by the framework, under a same-site content policy, and anything from storage or a shared link is checked again before it is used. This was verified in Chromium only (`docs/architecture.md`, Contract 11; `docs/framework-api.md`).
 
 ## Tests
 
 ```bash
-npm test                              # unit tests: node --test tests/unit/*.test.mjs (140 committed files)
-npm run e2e                           # browser tests: Playwright, Chromium (21 files)
+npm test                              # unit tests: node --test tests/unit/*.test.mjs (381 committed files)
+npm run e2e                           # browser tests: Playwright, Chromium (54 files)
 npx playwright test tests/e2e/journey.spec.mjs   # one file
 ```
 
@@ -117,9 +132,9 @@ npx playwright test tests/e2e/journey.spec.mjs   # one file
 - `whole-bundle.spec.mjs`: one look restyles every asset of every bundle in previews, the bag, the playground and the download, and "Start over" restores it.
 - `three-bundles.spec.mjs`: there are at least three kits for at least three kinds of game; every kit (every bundle that has a plan in `bundles/specs/`, however many there are) has 40 to 50 sprites, 20 sounds and 2 tracks, every asset opens, and the playground has a character the keyboard moves. It passes only for kits whose bundle file exists.
 - `newasset.spec.mjs`: a new asset file is found by search and reaches the zip with no other edit.
-- `route2.spec.mjs`, `route2-safety.spec.mjs`: a sprite is made, checked, bagged and exported using `window.loadout` only, and hostile sources fail.
+- `route2.spec.mjs`, `route2-data.spec.mjs`: a sprite is made from a data definition, checked, bagged and exported using `window.loadout` only; program text is refused.
 
-At 21:44 the last full unit run in `docs/progress.md` was 2,089 of 2,100. At 22:16 a spot check of 9 unit test files found 2 failing tests (`rig-describe-data`: new rig modules not yet listed). The full browser suite was not run for this README.
+The last full runs are in the counts table above. Neither suite was run for this README.
 
 ## Documents
 
@@ -127,7 +142,9 @@ At 21:44 the last full unit run in `docs/progress.md` was 2,089 of 2,100. At 22:
 |---|---|
 | `docs/features.md` | Vision, feature list with status, suggested order, decisions made and open |
 | `docs/progress.md` | The build loop's goals, decisions and time log |
-| `docs/architecture.md` | Contracts 1 to 13 that every builder works to |
+| `docs/architecture.md` | Contracts 1 to 15 that every builder works to |
+| `docs/data-sprites.md` | Option B: every sprite as data (format, generators, pieces, removal, migration, build plan with each item's state) |
+| `docs/studio.md` | The studio (`#/studio`): bone rigs, key poses, frames, as data |
 | `docs/framework-api.md` | How to add to the framework; `window.loadout`; safety; styles; rigs |
 | `docs/quality-bar.md`, `docs/review-protocol.md` | What passes, and how a second agent judges |
 | `docs/style-guide.md` | Art, sound and music rules, palettes, names |
@@ -147,8 +164,8 @@ At 21:44 the last full unit run in `docs/progress.md` was 2,089 of 2,100. At 22:
 - **Unity package export is not built.** The zip is engine-neutral with written Unity steps; it has never been imported into Unity.
 - **The MCP server is not built.** `window.loadout` and its description exist.
 - **A second art style is not built.** The framework seam exists and is tested with test-only styles (`docs/architecture.md`, Contract 12).
-- **Rigs as data are partly built** (Contract 13): the generic renderer is not.
-- **Open decisions for Keyang** are listed in `docs/features.md`: R2, R3 and R4 (Contract 13), whether the MCP server is next, the "flat Hero" style test, installing Firefox and Safari, a `footprint` field on sprites, and the search-by-meaning default.
+- **Sprites as data are partly built** (option B, Contract 15): 3 of 229 sprites are data; effects have 7 of about 27 behaviours, 10 of 13 tilesets are still being ported, and the side-view person is still being baked; the migration has not started.
+- **Open decisions for Keyang** are listed in `docs/features.md`: whether the MCP server is next, the "flat Hero" style test, installing Firefox and Safari, a `footprint` field on sprites, and the search-by-meaning default.
 - **Engine steps in the download are untried.** The text for each kind of asset (tilesets, interface pieces, backgrounds) gives Unity and Godot steps written from knowledge of the engines; nothing has been imported into either.
 - **Licences:** every asset records `draft`, and the download's licence file says the terms are not set yet. Choosing terms is Keyang's decision.
 

@@ -1,0 +1,38 @@
+{ "format": "loadout-sprite",
+  "version": 2,
+  "id": "input-face-buttons",
+  "name": "Face buttons",
+  "blurb": "The four action buttons of a game controller in a diamond, the one to press lit and pressing down; change which button, one big button, size, depth and colours.",
+  "meta": {"type": "ui", "role": "interface/icon", "themes": ["neutral"], "gameTypes": ["arcade", "platformer", "shooter", "racing"], "view": "none", "words": ["gamepad", "controller", "button", "face button", "action button", "press", "prompt", "input", "tutorial", "control"], "license": "draft"},
+  "size": [32,32],
+  "pivot": [16,16],
+  "grounded": false,
+  "preview": "press",
+  "styles": ["pixel"],
+  "palette": [
+  {"id": "body", "label": "Buttons", "default": "#5d6475", "material": "paint", "swatches": ["#5d6475", "#3f5068", "#c2c9d6", "#7a4f33", "#434d6d"]},
+  {"id": "glow", "label": "Lit button", "default": "#f2c230", "material": "interface", "swatches": ["#f2c230", "#4fd8ee", "#a4c44a", "#8fd0f0", "#f0ead8"]} ],
+  "controls": [
+  {"key": "style", "kind": "choice", "label": "Style", "options": [{"value": "cluster", "label": "Four buttons"}, {"value": "single", "label": "One button"}], "default": "cluster"},
+  {"key": "button", "kind": "choice", "label": "Button", "options": ["top", "right", "bottom", "left", "all"], "default": "bottom", "when": {"style": ["cluster"]}},
+  {"key": "size", "kind": "range", "label": "Size", "lo": "Small", "hi": "Big", "default": 0.5},
+  {"key": "depth", "kind": "range", "label": "Depth", "lo": "Flat", "hi": "Deep", "default": 0.5},
+  {"key": "body", "kind": "colour", "label": "Buttons"},
+  {"key": "glow", "kind": "colour", "label": "Lit button"},
+  {"key": "speed", "standard": "speed"} ],
+  "body": { "panel": {
+    "piece": {"gen": "pad.face", "v": 1, "at": [16,16], "clip": ["idle"], "picture": "idle", "style": {"from": "style", "pick": {"cluster": "cluster", "single": "single"}}, "button": {"from": "button", "pick": {"top": "top", "right": "right", "bottom": "bottom", "left": "left", "all": "all"}}, "size": {"from": "size", "map": [[0,0], [1,1]], "round": "none"}, "depth": {"from": "depth", "map": [[0,0], [1,1]], "round": "none"}, "body": "body", "lit": "glow"},
+    "states": [
+    "idle",
+    "press" ],
+    "draw": [
+    {"gen": "pad.face", "v": 1, "at": [16,16], "clip": ["press"], "picture": "press", "style": {"from": "style", "pick": {"cluster": "cluster", "single": "single"}}, "button": {"from": "button", "pick": {"top": "top", "right": "right", "bottom": "bottom", "left": "left", "all": "all"}}, "size": {"from": "size", "map": [[0,0], [1,1]], "round": "none"}, "depth": {"from": "depth", "map": [[0,0], [1,1]], "round": "none"}, "body": "body", "lit": "glow"} ] } },
+  "clips": {
+    "idle": {"frames": 1, "fps": 8, "label": "Idle"},
+    "press": {"frames": 8, "fps": 8, "label": "Press"} },
+  "versions": [
+  {"name": "Bottom button", "params": {}},
+  {"name": "Top button", "params": {"button": "top", "glow": "#4fd8ee"}},
+  {"name": "Right button", "params": {"button": "right", "glow": "#8fd0f0"}},
+  {"name": "One big button", "params": {"style": "single"}},
+  {"name": "Pale pad, all lit", "params": {"button": "all", "body": "#c2c9d6", "glow": "#a4c44a"}} ] }

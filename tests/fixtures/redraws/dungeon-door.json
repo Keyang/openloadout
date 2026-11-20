@@ -1,0 +1,204 @@
+{
+ "id": "dungeon-door",
+ "frozen": "2026-11-20",
+ "source": "sprites/dungeon-door.js",
+ "sha256": "47ed4fc907e5c7300bbe283845d2b83493f6bac7c9b8982193790745359c5130",
+ "name": "Dungeon door",
+ "blurb": "A door in a dungeon wall that slides up into the stone, heaves against its lock, or is held by a turning rune seal. Make it wooden, iron-bound or a stone slab, square or arched, with a barred window, and change its colours.",
+ "meta": {
+  "type": "prop",
+  "role": "world/door",
+  "themes": [
+   "fantasy",
+   "dungeon"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "top-down-rpg"
+  ],
+  "view": "top-down",
+  "words": [
+   "door",
+   "gate",
+   "doorway",
+   "entrance",
+   "exit",
+   "open",
+   "locked",
+   "sealed",
+   "seal",
+   "rune",
+   "key",
+   "stone",
+   "boss room",
+   "crypt"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  48
+ ],
+ "pivot": [
+  16,
+  46
+ ],
+ "grounded": true,
+ "preview": "closed",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "wood",
+   "options": [
+    "wood",
+    "iron",
+    "stone"
+   ],
+   "group": "Look"
+  },
+  "corner": {
+   "kind": "range",
+   "label": "Arch",
+   "def": 0.6,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Square",
+   "hi": "Round top",
+   "group": "Look"
+  },
+  "bars": {
+   "kind": "toggle",
+   "label": "Barred window",
+   "def": false,
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Door",
+   "def": "#9a6a3e",
+   "swatches": [
+    "#9a6a3e",
+    "#a8612a",
+    "#5a3a22",
+    "#3f6fd1",
+    "#7a4fc4",
+    "#2f8f9d",
+    "#c9423a",
+    "#8e3a4a"
+   ],
+   "material": "wood",
+   "group": "Colors"
+  },
+  "metal": {
+   "kind": "color",
+   "label": "Metal",
+   "def": "#c2c9d6",
+   "swatches": [
+    "#c2c9d6",
+    "#f2c230",
+    "#a8a4a0",
+    "#e6c545"
+   ],
+   "group": "Colors"
+  },
+  "stone": {
+   "kind": "color",
+   "label": "Stone",
+   "def": "#5a5f7a",
+   "swatches": [
+    "#5a5f7a",
+    "#7e84a0",
+    "#6b7280",
+    "#8f97a8"
+   ],
+   "group": "Colors"
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Seal",
+   "def": "#7a4fc4",
+   "swatches": [
+    "#7a4fc4",
+    "#4fd8ee",
+    "#e8662c",
+    "#7aa0f4",
+    "#f4e06a",
+    "#7fe0a0"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "closed": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "open": {
+   "frames": 6,
+   "loop": false,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  },
+  "locked": {
+   "frames": 4,
+   "loop": false,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  },
+  "sealed": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    8,
+    12
+   ]
+  }
+ },
+ "sounds": {
+  "open": [
+   {
+    "sound": "stone-door",
+    "preset": "Dungeon door",
+    "frame": 0,
+    "volume": 0.8
+   }
+  ],
+  "locked": [
+   {
+    "sound": "error-buzz",
+    "preset": "Soft no",
+    "frame": 0,
+    "volume": 0.6
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-rpg-fantasy"
+ ]
+}

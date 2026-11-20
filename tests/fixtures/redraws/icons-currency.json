@@ -1,0 +1,229 @@
+{
+ "id": "icons-currency",
+ "frozen": "2026-11-20",
+ "source": "sprites/icons-currency.js",
+ "sha256": "739414ea82facd6801c714d4c83ec26fb9a27a5653183cf37c57b0ba233dcc9e",
+ "name": "Currency icons",
+ "blurb": "Eight currency icons for a shop or a top bar: coins, gem, banknote, token, ticket, star, lives and energy; change their size, tilt, shading, shine and the colours of the gold, the paper and the gems.",
+ "meta": {
+  "type": "icon",
+  "role": "interface/icon",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "arcade",
+   "roguelike-action",
+   "farming-sim",
+   "card-game"
+  ],
+  "view": "none",
+  "words": [
+   "currency",
+   "money",
+   "coins",
+   "cash",
+   "gem",
+   "banknote",
+   "token",
+   "ticket",
+   "star",
+   "lives",
+   "energy",
+   "shop",
+   "buy",
+   "reward"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "coins",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "tilt": {
+   "kind": "toggle",
+   "label": "Tilt",
+   "def": true,
+   "group": "Look"
+  },
+  "shade": {
+   "kind": "toggle",
+   "label": "Extra shading",
+   "def": true,
+   "group": "Look"
+  },
+  "shine": {
+   "kind": "toggle",
+   "label": "Shine",
+   "def": true,
+   "group": "Look"
+  },
+  "metal": {
+   "kind": "color",
+   "label": "Gold",
+   "def": "#f2c230",
+   "swatches": [
+    "#f2c230",
+    "#c2c9d6",
+    "#e6c545",
+    "#a8806a",
+    "#c98a4a"
+   ],
+   "group": "Colors"
+  },
+  "paper": {
+   "kind": "color",
+   "label": "Paper",
+   "def": "#9bd18a",
+   "swatches": [
+    "#9bd18a",
+    "#f0ead8",
+    "#a4c44a",
+    "#8fd0f0",
+    "#f6d3b0"
+   ],
+   "group": "Colors",
+   "material": "paint"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Gems and energy",
+   "def": "#4fd8ee",
+   "swatches": [
+    "#4fd8ee",
+    "#c9423a",
+    "#7a4fc4",
+    "#3f6fd1",
+    "#e08a2c"
+   ],
+   "group": "Colors"
+  }
+ },
+ "clips": {
+  "coins": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "gem": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "banknote": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "token": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "ticket": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "star": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "lives": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "energy": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [
+  {
+   "name": "Wallet",
+   "params": {}
+  },
+  {
+   "name": "Silver",
+   "params": {
+    "metal": "#c2c9d6"
+   }
+  },
+  {
+   "name": "Upright",
+   "params": {
+    "tilt": false
+   }
+  },
+  {
+   "name": "Ruby and cream",
+   "params": {
+    "accent": "#c9423a",
+    "paper": "#f0ead8"
+   }
+  },
+  {
+   "name": "Big and plain",
+   "params": {
+    "size": 1,
+    "shade": false,
+    "shine": false
+   }
+  }
+ ],
+ "bundles": []
+}

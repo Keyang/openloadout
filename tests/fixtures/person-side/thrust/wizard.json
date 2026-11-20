@@ -1,0 +1,116 @@
+{
+  "format": "loadout-sprite",
+  "version": 2,
+  "id": "wizard",
+  "name": "Wizard",
+  "blurb": "B4x sketch, not the redraw: the code wizard's clips and a staff jab, the base's thrust under the name attack (the code wizard has no attack).",
+  "size": [
+    64,
+    64
+  ],
+  "pivot": [
+    28,
+    58
+  ],
+  "meta": {
+    "type": "character",
+    "role": "characters/player",
+    "view": "side",
+    "themes": [
+      "fantasy",
+      "dungeon"
+    ],
+    "gameTypes": [
+      "platformer",
+      "turn-based-rpg"
+    ],
+    "words": [
+      "wizard",
+      "mage",
+      "staff",
+      "cast",
+      "thrust",
+      "jab"
+    ],
+    "license": "draft"
+  },
+  "palette": [
+    {
+      "id": "robe",
+      "label": "Robe",
+      "default": "#5a4fc4",
+      "material": "cloth"
+    },
+    {
+      "id": "metal",
+      "label": "Metal",
+      "default": "#8f97a8",
+      "material": "metal"
+    }
+  ],
+  "body": {
+    "rig": {
+      "extends": {
+        "use": "base:person-side",
+        "v": 7,
+        "paint": {
+          "top": "robe"
+        },
+        "clips": [
+          "idle",
+          "walk",
+          "run",
+          "jump",
+          "cast",
+          "hurt",
+          "die",
+          "victory",
+          "talk",
+          {
+            "name": "attack",
+            "from": "thrust"
+          }
+        ]
+      },
+      "shapes": [
+        {
+          "id": "spear",
+          "kind": "use",
+          "use": "held:spear",
+          "v": 1,
+          "on": "handF",
+          "when": {
+            "staff": [
+              "crook"
+            ]
+          },
+          "paint": {
+            "metal": "metal"
+          }
+        }
+      ]
+    }
+  },
+  "controls": [
+    {
+      "key": "staff",
+      "kind": "choice",
+      "label": "Staff",
+      "options": [
+        "orb",
+        "crystal",
+        "crook"
+      ],
+      "default": "orb"
+    },
+    {
+      "key": "speed",
+      "standard": "speed"
+    }
+  ],
+  "clips": {
+    "attack": {
+      "label": "Staff jab"
+    }
+  }
+}

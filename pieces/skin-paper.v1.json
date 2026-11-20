@@ -1,0 +1,162 @@
+{
+ "format": "loadout-piece",
+ "version": 1,
+ "id": "skin:paper",
+ "v": 1,
+ "name": "Paper",
+ "about": "Paper interface pieces: pale paper ruled twice in ink, no bevel, dark text; sheet, torn (chipped corners) or card (cut corners); pins as ornaments.",
+ "slots": [
+  {
+   "id": "face",
+   "label": "Paper",
+   "default": "#f0ead8",
+   "material": "interface"
+  },
+  {
+   "id": "frame",
+   "label": "Ink",
+   "default": "#3f5068",
+   "material": "interface"
+  },
+  {
+   "id": "accent",
+   "label": "Pins",
+   "default": "#c9423a",
+   "material": "interface"
+  },
+  {
+   "id": "fill",
+   "label": "Fill",
+   "default": "#6aa83e",
+   "material": "interface"
+  },
+  {
+   "id": "shine",
+   "label": "Shine",
+   "default": "#ffffff",
+   "material": "light"
+  }
+ ],
+ "made": {
+  "from": "engine/ui-skins.js, engine/ui-paper.js"
+ },
+ "body": {
+  "paint": {
+   "face": "face",
+   "frame": "frame",
+   "accent": "accent",
+   "line": "ink",
+   "ledge": "frame",
+   "knob": "frame",
+   "fill": "fill",
+   "shine": "shine",
+   "divider": "ink"
+  },
+  "args": {
+   "*": {
+    "rings": [
+     "ink",
+     "frame",
+     "face",
+     "frame"
+    ],
+    "bandAt": 1,
+    "lit": false,
+    "edge": "round",
+    "hoverFace": 0.85,
+    "hoverBand": 0,
+    "every": 8,
+    "start": 7,
+    "extraTop": [
+     {
+      "kind": "stamp",
+      "at": [
+       0,
+       0
+      ],
+      "rows": [
+       ".a.",
+       "laa",
+       ".b."
+      ],
+      "key": {
+       "l": "accent.light",
+       "a": "accent",
+       "b": "accent.dark"
+      }
+     }
+    ],
+    "offBand": -0.5
+   },
+   "ui.slab": {
+    "titleShade": -0.5,
+    "lined": true
+   },
+   "ui.strip": {
+    "gloss": false,
+    "shadow": true
+   },
+   "ui.trough": {
+    "trough": "well",
+    "rings": [
+     "ink",
+     "frame",
+     "ink"
+    ],
+    "bandAt": 1
+   }
+  },
+  "styles": {
+   "sheet": {
+    "*": {
+     "edge": "round"
+    }
+   },
+   "torn": {
+    "*": {
+     "edge": "chip",
+     "along": [
+      {
+       "kind": "stamp",
+       "at": [
+        0,
+        1
+       ],
+       "rows": [
+        "i.",
+        ".."
+       ],
+       "key": {
+        "i": "ink"
+       }
+      }
+     ],
+     "every": 7,
+     "start": 5
+    }
+   },
+   "card": {
+    "*": {
+     "edge": "cut",
+     "topTrim": []
+    }
+   }
+  },
+  "states": {
+   "normal": {
+    "lip": 2
+   },
+   "hover": {
+    "lip": 2
+   },
+   "pressed": {
+    "lip": 0
+   },
+   "disabled": {
+    "lip": 2,
+    "desaturate": 1
+   }
+  },
+  "text": "ink"
+ }
+}

@@ -1,0 +1,155 @@
+{
+  "format": "loadout-sprite",
+  "version": 2,
+  "id": "ui-bars-gilded",
+  "name": "Stone and gold bars",
+  "blurb": "A gold bar housing with gem end caps and three fill strips (health, magic, a gauge), a white flash, a gold slider track and its stone knob; change the style, corners, band, gems and colours.",
+  "meta": {
+    "type": "ui",
+    "role": "interface/bar",
+    "themes": ["neutral","fantasy","dungeon"],
+    "gameTypes": ["arcade","turn-based-rpg","top-down-rpg","card-game"],
+    "view": "none",
+    "words": ["bar","health","magic","gauge","meter","boss bar","slider","volume","settings","gold","gem","fill","flash","hud"],
+    "license": "draft"
+  },
+  "size": [64,16],
+  "pivot": [32,8],
+  "grounded": false,
+  "preview": "frame",
+  "styles": ["pixel"],
+  "palette": [
+    {"id":"frame","label":"Gold","default":"#f0ead8","material":"interface","swatches":["#f0ead8","#c2c9d6","#f6d3b0","#f4e06a","#e6c96a"]},
+    {"id":"accent","label":"Gems","default":"#4fd8ee","material":"interface","swatches":["#4fd8ee","#c9423a","#a4c44a","#3f6fd1","#e08a2c"]},
+    {"id":"fill","label":"Health","default":"#6aa83e","material":"interface","swatches":["#6aa83e","#3f8a4f","#c9423a","#e08a2c","#4fd8ee","#f2c230"]},
+    {"id":"fillB","label":"Magic","default":"#3f6fd1","material":"interface","swatches":["#3f6fd1","#3f9fd1","#4fd8ee","#8fd0f0","#4f9ff0"]},
+    {"id":"fillC","label":"Gauge","default":"#f2c230","material":"interface","swatches":["#f2c230","#e08a2c","#a4c44a","#a06a3c","#c2c9d6"]},
+    {"id":"white","default":"#ffffff","material":"light","detail":true}
+  ],
+  "controls": [
+    {
+      "key": "style",
+      "kind": "choice",
+      "label": "Style",
+      "options": [{"value":"temple","label":"Temple"},{"value":"royal","label":"Royal"},{"value":"ruin","label":"Ruin"}],
+      "default": "temple",
+      "group": "Look"
+    },
+    {"key":"corner","kind":"range","label":"Corner","lo":"Square","hi":"Round","default":0.5,"group":"Look"},
+    {"key":"border","kind":"range","label":"Border","lo":"Thin","hi":"Thick","default":0.5,"group":"Look"},
+    {"key":"gems","kind":"toggle","label":"Gems","default":true,"group":"Look"},
+    {"key":"frame","kind":"colour","label":"Gold","group":"Colors"},
+    {"key":"accent","kind":"colour","label":"Gems","group":"Colors","when":{"gems":[true]}},
+    {"key":"fill","kind":"colour","label":"Health","group":"Colors"},
+    {"key":"fillB","kind":"colour","label":"Magic","group":"Colors"},
+    {"key":"fillC","kind":"colour","label":"Gauge","group":"Colors"}
+  ],
+  "versions": [
+    {"name":"Gold bars","params":{}},
+    {"name":"Royal bright gold","params":{"style":"royal","frame":"#f4e06a","accent":"#c9423a"}},
+    {"name":"Plain ruin","params":{"style":"ruin","gems":false}},
+    {"name":"Silver","params":{"frame":"#c2c9d6","accent":"#3f6fd1","fill":"#c9423a"}}
+  ],
+  "body": {
+    "panel": {
+      "skin": {"use":"skin:gilded","v":3,"paint":{"frame":"frame","accent":"accent","shine":"white"}},
+      "piece": {
+        "gen": "ui.trough",
+        "v": 1,
+        "at": [1,1],
+        "size": [62,14],
+        "style": {"from":"style"},
+        "corner": {"from":"corner","map":[[0,0],[1,4]]},
+        "border": {"from":"border","map":[[0,1],[1,3]]},
+        "extras": {"from":"gems"},
+        "clip": ["frame"],
+        "edges": 5
+      },
+      "states": ["frame","fill","fill-b","fill-c","flash","slider","knob"],
+      "draw": [
+        {
+          "gen": "ui.strip",
+          "v": 1,
+          "clip": ["fill"],
+          "at": [1,1],
+          "size": [62,14],
+          "style": {"from":"style"},
+          "border": {"from":"border","map":[[0,1],[1,3]]},
+          "fill": "fill",
+          "shine": "white",
+          "edges": 5
+        },
+        {
+          "gen": "ui.strip",
+          "v": 1,
+          "clip": ["fill-b"],
+          "at": [1,1],
+          "size": [62,14],
+          "style": {"from":"style"},
+          "border": {"from":"border","map":[[0,1],[1,3]]},
+          "fill": "fillB",
+          "shine": "white",
+          "edges": 5
+        },
+        {
+          "gen": "ui.strip",
+          "v": 1,
+          "clip": ["fill-c"],
+          "at": [1,1],
+          "size": [62,14],
+          "style": {"from":"style"},
+          "border": {"from":"border","map":[[0,1],[1,3]]},
+          "fill": "fillC",
+          "shine": "white",
+          "edges": 5
+        },
+        {
+          "gen": "ui.strip",
+          "v": 1,
+          "clip": ["flash"],
+          "at": [1,1],
+          "size": [62,14],
+          "style": {"from":"style"},
+          "border": {"from":"border","map":[[0,1],[1,3]]},
+          "fill": "fill",
+          "shine": "white",
+          "flash": 1,
+          "fade": true,
+          "edges": 5
+        },
+        {
+          "gen": "ui.trough",
+          "v": 1,
+          "at": [1,1],
+          "size": [62,14],
+          "style": {"from":"style"},
+          "corner": {"from":"corner","map":[[0,0],[1,4]]},
+          "border": {"from":"border","map":[[0,1],[1,3]]},
+          "extras": false,
+          "clip": ["slider"],
+          "role": "rail"
+        },
+        {
+          "gen": "ui.slab",
+          "v": 1,
+          "clip": ["knob"],
+          "role": "knob",
+          "at": [26,1],
+          "size": [12,14],
+          "style": {"from":"style"},
+          "corner": {"from":"corner","map":[[0,0],[1,4]]},
+          "extras": {"from":"gems"}
+        }
+      ]
+    }
+  },
+  "clips": {
+    "frame": {"frames":1,"fps":8,"label":"Housing"},
+    "fill": {"frames":1,"fps":8,"label":"Health"},
+    "fill-b": {"frames":1,"fps":8,"label":"Magic"},
+    "fill-c": {"frames":1,"fps":8,"label":"Gauge"},
+    "flash": {"frames":4,"fps":8,"loop":false,"label":"Flash"},
+    "slider": {"frames":1,"fps":8,"label":"Slider track"},
+    "knob": {"frames":1,"fps":8,"label":"Slider knob"}
+  }
+}

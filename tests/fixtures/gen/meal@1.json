@@ -1,0 +1,228 @@
+{
+ "id": "meal",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     16,
+     17
+    ],
+    "kind": "drumstick",
+    "scale": 0.92,
+    "food": "body",
+    "bone": "accent",
+    "filling": "filling",
+    "crumb": "crumb",
+    "gleam": "gleam"
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true,
+    "frames": 8,
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      7,
+      8
+     ],
+     "anchor": "tl",
+     "rows": [
+      "....abbbb..........",
+      "..aaacccbbb........",
+      ".daacbbcccbb.......",
+      "daaabccccccb.......",
+      "daaccccccccbb......",
+      "aaacccccccccb......",
+      "aadcccccccccb......",
+      "aaddccccccccb......",
+      ".ddddcccccccbb.....",
+      "..dddddddddddd.....",
+      "...dddddddddde.....",
+      "............ffe..e.",
+      ".............ffeeee",
+      "..............feeee",
+      "..............eeee.",
+      ".............ffee..",
+      "..............ff..."
+     ],
+     "key": {
+      "a": "gleam",
+      "b": "body.light",
+      "c": "body",
+      "d": "body.dark",
+      "e": "accent",
+      "f": "accent.dark"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     18.5
+    ],
+    "kind": "pie",
+    "scale": 1.06,
+    "bite": true,
+    "food": "body",
+    "bone": "accent",
+    "filling": "filling",
+    "crumb": "crumb",
+    "gleam": "gleam"
+   },
+   "ctx": {
+    "t": 0.75,
+    "loop": true,
+    "frames": 8,
+    "frame": 6
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      5,
+      13
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".....abbabbabbac......",
+      "..abbabdddddddc.......",
+      ".babddddddddddc.......",
+      ".baddddeedeeddcc....c.",
+      "abadddeeddeddeecc..ccb",
+      "ababdddddddddddddccbab",
+      "aaabbaddddddddddbabbbb",
+      "aaabbabbabbabbabbabbbb",
+      ".aaaabbbbbbbbbbbbbbbb.",
+      ".aaaaaaabbbbbbbbbbaaa.",
+      "...aaaaaaaaaaaaaaaa...",
+      "......aaaaaaaaaa......"
+     ],
+     "key": {
+      "a": "body.dark",
+      "b": "body",
+      "c": "crumb",
+      "d": "body.light",
+      "e": "filling"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     17
+    ],
+    "kind": "cheese",
+    "scale": 0.78,
+    "bite": true,
+    "food": "body",
+    "bone": "accent",
+    "filling": "filling",
+    "crumb": "crumb",
+    "gleam": "gleam"
+   },
+   "ctx": {
+    "t": 0.25,
+    "loop": true,
+    "frames": 8,
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      9,
+      14
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..........ab..",
+      "........aaab..",
+      "......aaaaacdb",
+      "....aaaaaceedd",
+      "..aaaaacccccdd",
+      ".aaaacccceecdd",
+      ".aaaceecceecdd",
+      "aaffffffffffdd"
+     ],
+     "key": {
+      "a": "body.light",
+      "b": "crumb",
+      "c": "body",
+      "d": {
+       "rule": "mix",
+       "of": "body",
+       "with": {
+        "rule": "ramp",
+        "of": "body",
+        "tone": "dark"
+       },
+       "amount": 0.5
+      },
+      "e": "body.deep",
+      "f": "body.dark"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     17
+    ],
+    "kind": "bread",
+    "scale": 0.92,
+    "collect": true,
+    "food": "body",
+    "bone": "accent",
+    "filling": "filling",
+    "crumb": "crumb",
+    "gleam": "gleam"
+   },
+   "ctx": {
+    "t": 0.5714285714285714,
+    "loop": false,
+    "frames": 8,
+    "frame": 4
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      6,
+      11
+     ],
+     "anchor": "tl",
+     "rows": [
+      "......aaaaaaaa......",
+      "....abbaaabbaaaa....",
+      "..caabddaabddaabdd..",
+      ".caabddaabddaabddaa.",
+      ".cabddaabddaabddaaa.",
+      "ccaadaaaadaaaadaaaaa",
+      "ccaaaaaaaaaaaaaaaaaa",
+      "ccaaaaaaaaaaaaaaaaaa",
+      "cccaaaaaaaaaaaaaaaaa",
+      "eeeeeeeeeeeeeeeeeeee",
+      ".eeeeeeeeeeeeeeeeee."
+     ],
+     "key": {
+      "a": "body",
+      "b": "crumb",
+      "c": "body.dark",
+      "d": "body.light",
+      "e": "body.deep"
+     }
+    }
+   ]
+  }
+ ]
+}

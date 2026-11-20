@@ -1,0 +1,220 @@
+{
+ "id": "ui-panel-neon",
+ "frozen": "2026-11-20",
+ "source": "sprites/ui-panel-neon.js",
+ "sha256": "866789d0c37d39e3d8d4442934bd64e767bfb5c093b2bbe1812efdc132d2be9d",
+ "name": "Neon panels",
+ "blurb": "Stretchable dark boxes outlined in a glowing neon tube for menus, score tables and tips: a panel, one with a heading, a list well and a tooltip; change the style, corners, tube thickness, glow and colours.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/panel",
+  "themes": [
+   "neutral",
+   "sci-fi",
+   "city"
+  ],
+  "gameTypes": [
+   "arcade",
+   "shooter",
+   "racing",
+   "roguelike-action"
+  ],
+  "view": "none",
+  "words": [
+   "panel",
+   "window",
+   "box",
+   "popup",
+   "menu",
+   "tooltip",
+   "list",
+   "neon",
+   "glow",
+   "tube",
+   "sign",
+   "night"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  96,
+  64
+ ],
+ "pivot": [
+  48,
+  32
+ ],
+ "grounded": false,
+ "preview": "panel",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "tube",
+   "options": [
+    {
+     "value": "tube",
+     "label": "Tube"
+    },
+    {
+     "value": "double",
+     "label": "Double"
+    },
+    {
+     "value": "sign",
+     "label": "Sign"
+    }
+   ],
+   "group": "Look"
+  },
+  "corner": {
+   "kind": "range",
+   "label": "Corner",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Square",
+   "hi": "Round",
+   "group": "Look"
+  },
+  "border": {
+   "kind": "range",
+   "label": "Border",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Thin",
+   "hi": "Thick",
+   "group": "Look"
+  },
+  "halo": {
+   "kind": "toggle",
+   "label": "Glow",
+   "def": true,
+   "group": "Look"
+  },
+  "face": {
+   "kind": "color",
+   "label": "Wall",
+   "def": "#3f5068",
+   "swatches": [
+    "#3f5068",
+    "#7a4f33",
+    "#434d6d",
+    "#8e3a4a"
+   ],
+   "group": "Colors"
+  },
+  "frame": {
+   "kind": "color",
+   "label": "Tube",
+   "def": "#8fd0f0",
+   "swatches": [
+    "#8fd0f0",
+    "#9bd18a",
+    "#c2c9d6",
+    "#5fe0f0",
+    "#7fe0a0"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Second tube",
+   "def": "#e08a2c",
+   "swatches": [
+    "#e08a2c",
+    "#7a4fc4",
+    "#f2c230",
+    "#b48af8",
+    "#ca9eda"
+   ],
+   "group": "Colors",
+   "when": {
+    "style": [
+     "double"
+    ]
+   }
+  }
+ },
+ "clips": {
+  "panel": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "panel-title": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "inset": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "tooltip": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [
+  {
+   "name": "Sky box",
+   "params": {}
+  },
+  {
+   "name": "Double on cyan",
+   "params": {
+    "style": "double",
+    "frame": "#5fe0f0",
+    "face": "#434d6d"
+   }
+  },
+  {
+   "name": "Green sign",
+   "params": {
+    "style": "sign",
+    "frame": "#9bd18a",
+    "face": "#7a4f33"
+   }
+  },
+  {
+   "name": "Mint wine",
+   "params": {
+    "face": "#8e3a4a",
+    "frame": "#7fe0a0",
+    "border": 1
+   }
+  },
+  {
+   "name": "Square steel",
+   "params": {
+    "corner": 0,
+    "frame": "#c2c9d6",
+    "halo": false
+   }
+  }
+ ],
+ "bundles": []
+}

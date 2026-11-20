@@ -1,0 +1,197 @@
+{
+ "id": "key.cap",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "body": "top",
+    "frame": "side",
+    "lit": "glow"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      3,
+      4
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..aaaaaaaaaaaaaaaaaaaaaa..",
+      ".abbbbbbbbbbbbbbbbbbbbbba.",
+      "abccccccccccccccccccccccba",
+      "acccccccccccccccccccccccba",
+      "acccccccccccccccccccccccba",
+      "acccccccccccccccccccccccba",
+      "acccccccccccccccccccccccba",
+      "acccccccccccccccccccccccba",
+      "acccccccccccccccccccccccba",
+      "acccccccccccccccccccccccba",
+      "acccccccccccccccccccccccba",
+      "acccccccccccccccccccccccba",
+      "acccccccccccccccccccccccba",
+      "acccccccccccccccccccccccba",
+      "acccccccccccccccccccccccba",
+      "acccccccccccccccccccccccba",
+      "acccccccccccccccccccccccba",
+      "acccccccccccccccccccccccba",
+      "acccccccccccccccccccccccba",
+      "adccccccccccccccccccccccda",
+      "aeddddddddddddddddddddddea",
+      "aeeeeeeeeeeeeeeeeeeeeeeeea",
+      ".aeeeeeeeeeeeeeeeeeeeeeea.",
+      "..aaaaaaaaaaaaaaaaaaaaaa.."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "top.light",
+      "c": "top",
+      "d": "top.dark",
+      "e": "side"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "picture": "tap",
+    "mark": "up",
+    "size": 1,
+    "corner": 0,
+    "depth": 1,
+    "body": "top",
+    "frame": "side",
+    "lit": "glow"
+   },
+   "ctx": {
+    "frame": 4
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      2,
+      6
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aaaaaaaaaaaaaaaaaaaaaaaaaa.",
+      "abbbbbbbbbbbbbbbbbbbbbbbbbba",
+      "acccccccccccccccccccccccccba",
+      "acccccccccccccccccccccccccba",
+      "acccccccccccccccccccccccccba",
+      "acccccccccccccccccccccccccba",
+      "acccccccccccccccccccccccccba",
+      "acccccccccccccccccccccccccba",
+      "acccccccccccccccccccccccccba",
+      "acccccccccccccccccccccccccba",
+      "acccccccccccccccccccccccccba",
+      "accccccccccccdccccccccccccba",
+      "acccccccccccdddcccccccccccba",
+      "accccccccccdddddccccccccccba",
+      "acccccccccdddddddcccccccccba",
+      "acccccccccccdddcccccccccccba",
+      "acccccccccccdddcccccccccccba",
+      "acccccccccccdddcccccccccccba",
+      "acccccccccccccccccccccccccba",
+      "acccccccccccccccccccccccccba",
+      "acccccccccccccccccccccccccba",
+      "aeeeeeeeeeeeeeeeeeeeeeeeeeea",
+      ".aaaaaaaaaaaaaaaaaaaaaaaaaa."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "glow.light",
+      "c": "glow",
+      "d": {
+       "rule": "standOut",
+       "against": "glow",
+       "from": [
+        {
+         "rule": "mix",
+         "of": "#ffffff",
+         "with": "#ffffff",
+         "amount": 0
+        },
+        "ink"
+       ]
+      },
+      "e": "glow.dark"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     0,
+     0
+    ],
+    "picture": "down",
+    "mark": "left",
+    "lights": false,
+    "size": 0,
+    "body": "top",
+    "frame": "side",
+    "lit": "glow"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      -11,
+      -8
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..aaaaaaaaaaaaaaaaaa..",
+      ".abbbbbbbbbbbbbbbbbba.",
+      "abccccccccccccccccccba",
+      "acccccccccccccccccccba",
+      "acccccccccccccccccccba",
+      "acccccccccccccccccccba",
+      "acccccccccccccccccccba",
+      "acccccccccccccccccccba",
+      "acccccccccdcccccccccba",
+      "accccccccddcccccccccba",
+      "acccccccddddddccccccba",
+      "accccccdddddddccccccba",
+      "acccccccddddddccccccba",
+      "accccccccddcccccccccba",
+      "acccccccccdcccccccccba",
+      "aeccccccccccccccccccea",
+      ".aeeeeeeeeeeeeeeeeeea.",
+      "..aaaaaaaaaaaaaaaaaa.."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "top.light",
+      "c": "top",
+      "d": {
+       "rule": "standOut",
+       "against": "top",
+       "from": [
+        {
+         "rule": "mix",
+         "of": "#ffffff",
+         "with": "#ffffff",
+         "amount": 0
+        },
+        "ink"
+       ]
+      },
+      "e": "top.dark"
+     }
+    }
+   ]
+  }
+ ]
+}

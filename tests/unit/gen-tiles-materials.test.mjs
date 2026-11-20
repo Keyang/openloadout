@@ -53,20 +53,32 @@ const PORTED = {
   'tiles-forest': 'tests/fixtures/v2/tiles-forest.json',
   'tiles-cave': 'tests/fixtures/v2/tiles/tiles-cave.json',
   'tiles-dungeon': 'tests/fixtures/v2/tiles/tiles-dungeon.json',
+  'tiles-platforms': 'tests/fixtures/v2/tiles/tiles-platforms.json',   // B15b: pixel for pixel (tests/unit/gen-tiles-ports.test.mjs)
 };
-// what each of the others needs (read from its code, 2026-11-20), so the migration knows what to add first
+// what each of the others needs (read from its code, 2026-11-20; B15b added thresholds in `when`, a fixed white in a
+// derived slot's rule and the material check in the piece store), so the migration knows what to add first
 const NEEDS = {
-  'tiles-castle': 'courses (tile.courses@1 has the joints; drawCourses\' lit and glint, stoneSpot, stoneTuft are not ported), drawBattlement and drawArchway as tile generators for its extra tiles',
+  'tiles-castle': 'courses (tile.courses@1 has the joints; drawCourses\' lit and glint, stoneSpot, stoneTuft are not ported), engine/rock.js crack as a generator (its wear thresholds can now be written), the moss cap\'s depth from Overgrowth per column (a band rule reading two settings), drawBattlement and drawArchway as tile generators for its extra tiles',
   'tiles-hive': 'the comb and ooze patterns of engine/hive.js and engine/ooze.js as generators (the material\'s `outside` is there now)',
   'tiles-meadow': 'bandStone (half-buried stones that stay upright along every edge of a soft path) as a band field or generator; soft ground, ink "none" and outside are there',
   'tiles-pit': 'animated rims (engine/shafts.js dashedRim: a band that moves with the frame), shaftWall and depthFill (stars, mist, sparks) as generators',
-  'tiles-platforms': 'nothing new: platforms, ladders, vines and posts are pieces drawn by hand (group pictures, stack pieces cap/mid/foot); not written yet',
   'tiles-shore': 'a hole of water with moving shore lines and ripples (engine/water.js, engine/ripples.js) as generators (outside is there now)',
-  'tiles-station-floor': 'plating seams, spots, bolts and rim plates (engine/plating.js) as generators (outside is there now)',
+  'tiles-station-floor': 'plating seams, spots, bolts and rim plates (engine/plating.js) as generators (outside is there now); the plate tone (a mix clamped by brightness) as a colour rule (textureTone and textureLight are colour rules now); the vent fan\'s turning blades and the floor light\'s glow as moving decals',
   'tiles-station-walls': 'bulkhead and plating faces (engine/bulkhead.js, engine/plating.js) as generators for a face picture',
   'tiles-village': 'fences (engine/fences.js) and rock marks as generators; soft paths, courses (tile.courses@1) and a coursed face picture are there',
   'tiles-water': 'moving marks in a liquid\'s body (liquidMarks: dashes, blobs, bubbles, glints) as a generator; rise shapes beyond a travelling profile (lava bubbles); falling streaks; the waterfall\'s foot is a picture',
 };
+
+for (const [id, file] of Object.entries(PORTED)) {
+  test(`${id}: its material as data (${file})`, () => {
+    const s = tilesets.find((x) => x.id === id);
+    const def = JSON.parse(fs.readFileSync(new URL(`../../${file}`, import.meta.url), 'utf8'));
+    assert.equal(def.id, id);
+    assert.ok(def.body?.tiles, 'a tiles body');
+    // every tile it names is one of the library tileset's (the forest fixture redraws its grass only; the ports name them all: gen-tiles-ports)
+    if (s) for (const n of tileClipNames(def.body.tiles)) assert.ok(Object.hasOwn(s.def.clips, n), `${n} is a tile of ${id}`);
+  });
+}
 
 test('every library tileset is either redrawn as data (here or migrated) or has its needs written down', () => {
   for (const s of tilesets) assert.ok(s.data || Object.hasOwn(PORTED, s.id) || Object.hasOwn(NEEDS, s.id), `${s.id}: neither ported nor listed`);

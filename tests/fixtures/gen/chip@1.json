@@ -1,0 +1,210 @@
+{
+ "id": "chip",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     16,
+     17
+    ],
+    "shape": "hex",
+    "width": 14,
+    "metal": "gold",
+    "field": "gold.dark",
+    "gleam": "shine",
+    "lit": "glow",
+    "pad": "shine"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      9,
+      9
+     ],
+     "anchor": "tl",
+     "rows": [
+      "......aa......",
+      "....abccaa....",
+      "..abccccccaa..",
+      "cbcccdccdcccaa",
+      "cccccdccdcccca",
+      "ccccddddddccca",
+      "ccdddccccdddca",
+      "ccccdceecdccca",
+      "ccccdceecdccca",
+      "ccdddccccdddca",
+      "ccccddddddccca",
+      "cccccdccdcccca",
+      "cccccdccdcccbc",
+      "..ccccccccbc..",
+      "....ccccbc....",
+      "......cc......"
+     ],
+     "key": {
+      "a": "gold.light",
+      "b": "gold",
+      "c": "gold.dark",
+      "d": "glow",
+      "e": "shine"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     17
+    ],
+    "shape": "round",
+    "width": 16,
+    "thick": 4,
+    "spin": 60,
+    "sheen": 0.3,
+    "glint": true,
+    "mark": "star",
+    "metal": "gold",
+    "field": "gold.dark",
+    "gleam": "shine",
+    "lit": "glow",
+    "pad": "shine"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      10,
+      9
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...aaabbb...",
+      "..cccccccb..",
+      ".dcccaccccb.",
+      ".dccccccccb.",
+      ".cccccccccb.",
+      "dcccccccccae",
+      "dcccccccccae",
+      "dccccccccaab",
+      "dccccccccaab",
+      "dcccccccaacb",
+      "ddccccccaacb",
+      ".dcccccaaca.",
+      ".dcccccaacb.",
+      ".ddcccaaccb.",
+      "..ddccaaca..",
+      "...dddecc..."
+     ],
+     "key": {
+      "a": "gold",
+      "b": "gold.light",
+      "c": "gold.dark",
+      "d": "gold.deep",
+      "e": "shine"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     0,
+     0
+    ],
+    "shape": "bar",
+    "width": 10,
+    "thick": 2,
+    "spin": 120,
+    "mark": "plain",
+    "scale": 0.6,
+    "squash": 0.2,
+    "metal": "gold",
+    "field": "gold.dark",
+    "gleam": "shine",
+    "lit": "glow",
+    "pad": "shine"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      -2,
+      -4
+     ],
+     "anchor": "tl",
+     "rows": [
+      "abbc",
+      "aabc",
+      "aabc",
+      "aabc",
+      "aabc",
+      "aabc",
+      "aabc",
+      "aaad"
+     ],
+     "key": {
+      "a": "gold.dark",
+      "b": "gold.light",
+      "c": "gold",
+      "d": "gold.deep"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     17
+    ],
+    "shape": "hex",
+    "width": 18,
+    "spin": 90,
+    "metal": "gold",
+    "field": "gold.dark",
+    "gleam": "shine",
+    "lit": "glow",
+    "pad": "shine"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      14,
+      7
+     ],
+     "anchor": "tl",
+     "rows": [
+      "abbc",
+      "accc",
+      "accc",
+      "accc",
+      "accc",
+      "accc",
+      "accc",
+      "accc",
+      "accc",
+      "accc",
+      "accc",
+      "accc",
+      "accc",
+      "accc",
+      "accc",
+      "accc",
+      "accc",
+      "accc",
+      "accc",
+      "aaac"
+     ],
+     "key": {
+      "a": "gold.deep",
+      "b": "gold",
+      "c": "gold.dark"
+     }
+    }
+   ]
+  }
+ ]
+}

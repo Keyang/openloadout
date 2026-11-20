@@ -1,0 +1,208 @@
+{
+ "id": "name.plate",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "face": "face",
+    "frame": "frame",
+    "accent": "accent"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      -15,
+      9
+     ],
+     "anchor": "tl",
+     "rows": [
+      "....aaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "..aabbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      ".aabbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "aaabbccccccccccccccccccccccccccc",
+      "aaabbccccccccccccccccccccccccccc",
+      "aaabbccccccccccccccccccccccccccc",
+      "aaabbccccccccccccccccccccccccccc",
+      "aaabbccccccccccccccccccccccccccc",
+      "aaabbccccccccccccccccccccccccccc",
+      "aaabbccccccccccccccccccccccccccc",
+      "aaabbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "aaaabbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      ".aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "frame",
+      "c": "face"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      17,
+      9
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaa..",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbba.",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbba",
+      "cccccccccccccccccccccccccccbba",
+      "cccccccccccccccccccccccccccbba",
+      "cccccccccccccccccccccccccccbba",
+      "cccccccccccccccccccccccccccbba",
+      "cccccccccccccccccccccccccccbba",
+      "cccccccccccccccccccccccccccbba",
+      "cccccccccccccccccccccccccccbba",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbba",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbba.",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaa..",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaa...."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "frame",
+      "c": "face"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "picture": "pointer",
+    "style": "pointed",
+    "corner": 1,
+    "border": 1,
+    "shadow": false,
+    "face": "face",
+    "frame": "frame",
+    "accent": "accent"
+   },
+   "ctx": {
+    "frame": 1
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      13,
+      18
+     ],
+     "anchor": "tl",
+     "rows": [
+      "abbbbba",
+      "cabbbac",
+      ".cabac.",
+      "..cac..",
+      "...c..."
+     ],
+     "key": {
+      "a": "frame",
+      "b": "face",
+      "c": "ink"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     0,
+     0
+    ],
+    "picture": "plate-lit",
+    "style": "ribbon",
+    "corner": 0,
+    "border": 0,
+    "face": "face",
+    "frame": "frame",
+    "accent": "accent"
+   },
+   "ctx": {
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      -31,
+      -7
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaabbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      ".aaabccccccccccccccccccccccccccc",
+      ".aaaabcaaccccccccccccccccccccccc",
+      "..aaabaddacccccccccccccccccccccc",
+      "..aaaabdddaccccccccccccccccccccc",
+      "...aaabddddacccccccccccccccccccc",
+      "...aaabdddaccccccccccccccccccccc",
+      "...aabaddacccccccccccccccccccccc",
+      "..aaabcaaccccccccccccccccccccccc",
+      "..aabccccccccccccccccccccccccccc",
+      ".aaabbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      ".aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "lifted",
+       "of": "accent",
+       "against": "face",
+       "beside": "frame"
+      },
+      "c": "face",
+      "d": "accent"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      1,
+      -7
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbba.",
+      "cccccccccccccccccccccccccccba.",
+      "cccccccccccccccccccccccaacba..",
+      "ccccccccccccccccccccccaddaba..",
+      "cccccccccccccccccccccadddba...",
+      "ccccccccccccccccccccaddddba...",
+      "cccccccccccccccccccccadddba...",
+      "ccccccccccccccccccccccaddaba..",
+      "cccccccccccccccccccccccaacba..",
+      "cccccccccccccccccccccccccccba.",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbba.",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaa.."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "lifted",
+       "of": "accent",
+       "against": "face",
+       "beside": "frame"
+      },
+      "c": "face",
+      "d": "accent"
+     }
+    }
+   ]
+  }
+ ]
+}

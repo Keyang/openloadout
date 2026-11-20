@@ -1,0 +1,119 @@
+{
+ "id": "icon.flame",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     0,
+     0
+    ],
+    "paint": "fire",
+    "core": "core",
+    "rim": "flare"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      14,
+      10
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..a..",
+      "..b..",
+      ".aba.",
+      "abcba",
+      "abcba",
+      "abbba",
+      ".aaa."
+     ],
+     "key": {
+      "a": "flare",
+      "b": "fire",
+      "c": "core"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     2,
+     -4
+    ],
+    "h": 9,
+    "w": 6,
+    "sway": 1,
+    "paint": "fire",
+    "core": "core",
+    "rim": "flare",
+    "turn": 26.57
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      17,
+      5
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...a.",
+      "..ab.",
+      "..ab.",
+      ".abba",
+      "abcba",
+      "abcba",
+      "abcba",
+      "abbba",
+      ".aaa."
+     ],
+     "key": {
+      "a": "flare",
+      "b": "fire",
+      "c": "core"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     0,
+     0
+    ],
+    "h": 4,
+    "w": 3,
+    "paint": "fire",
+    "core": "core",
+    "rim": "flare",
+    "centre": [
+     3,
+     3
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      2,
+      0
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".a.",
+      "aba",
+      "aba",
+      "aaa"
+     ],
+     "key": {
+      "a": "flare",
+      "b": "fire"
+     }
+    }
+   ]
+  }
+ ]
+}

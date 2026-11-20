@@ -1,0 +1,235 @@
+{
+ "id": "ui-buttons-paper",
+ "frozen": "2026-11-20",
+ "source": "sprites/ui-buttons-paper.js",
+ "sha256": "6ae5db6c46fd3865b7f26fcb74a762bc9e75884ea535118a17fde82bb570bdab",
+ "name": "Paper buttons",
+ "blurb": "A stretchable menu button and tab cut from paper and ruled in ink, in four states (normal, hover, pressed, disabled) plus a tab and an open tab; change its style, corners, rule, shadow and colours.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/button",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "arcade",
+   "puzzle",
+   "card-game",
+   "farming-sim"
+  ],
+  "view": "none",
+  "words": [
+   "button",
+   "menu",
+   "paper",
+   "ink",
+   "tab",
+   "sheet",
+   "card",
+   "press",
+   "click",
+   "hover",
+   "start",
+   "cosy",
+   "notebook",
+   "torn"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  96,
+  32
+ ],
+ "pivot": [
+  48,
+  16
+ ],
+ "grounded": false,
+ "preview": "normal",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "sheet",
+   "options": [
+    {
+     "value": "sheet",
+     "label": "Sheet"
+    },
+    {
+     "value": "torn",
+     "label": "Torn"
+    },
+    {
+     "value": "card",
+     "label": "Card"
+    }
+   ],
+   "group": "Look"
+  },
+  "corner": {
+   "kind": "range",
+   "label": "Corner",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Square",
+   "hi": "Round",
+   "group": "Look"
+  },
+  "border": {
+   "kind": "range",
+   "label": "Border",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Thin",
+   "hi": "Thick",
+   "group": "Look"
+  },
+  "shadow": {
+   "kind": "toggle",
+   "label": "Shadow",
+   "def": true,
+   "group": "Look"
+  },
+  "face": {
+   "kind": "color",
+   "label": "Paper",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#e6c96a",
+    "#f6d3b0",
+    "#c2c9d6",
+    "#9bd18a"
+   ],
+   "group": "Colors"
+  },
+  "frame": {
+   "kind": "color",
+   "label": "Ink",
+   "def": "#3f5068",
+   "swatches": [
+    "#3f5068",
+    "#7a4f33",
+    "#434d6d",
+    "#8e3a4a"
+   ],
+   "group": "Colors"
+  }
+ },
+ "clips": {
+  "normal": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "hover": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "pressed": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "disabled": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "tab": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "tab-active": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  }
+ },
+ "sounds": {
+  "pressed": [
+   {
+    "sound": "ui-click",
+    "preset": "Soft tap",
+    "frame": 0,
+    "volume": 0.6
+   }
+  ],
+  "tab-active": [
+   {
+    "sound": "menu-move",
+    "preset": "Page turn",
+    "frame": 0,
+    "volume": 0.6
+   }
+  ]
+ },
+ "versions": [
+  {
+   "name": "Notebook",
+   "params": {}
+  },
+  {
+   "name": "Torn page",
+   "params": {
+    "style": "torn",
+    "face": "#f6d3b0"
+   }
+  },
+  {
+   "name": "Index card",
+   "params": {
+    "style": "card",
+    "face": "#e6c96a"
+   }
+  },
+  {
+   "name": "Blue print",
+   "params": {
+    "face": "#c2c9d6",
+    "frame": "#434d6d"
+   }
+  },
+  {
+   "name": "Red ink note",
+   "params": {
+    "shadow": false,
+    "corner": 0,
+    "border": 1,
+    "frame": "#8e3a4a"
+   }
+  }
+ ],
+ "bundles": []
+}

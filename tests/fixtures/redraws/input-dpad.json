@@ -1,0 +1,234 @@
+{
+ "id": "input-dpad",
+ "frozen": "2026-11-20",
+ "source": "sprites/input-dpad.js",
+ "sha256": "431dce396bdd65477fb016c7ae48f6812e7712b19feefddece420ebcf1507e59",
+ "name": "Direction pad",
+ "blurb": "A game controller's direction pad for \"move\" prompts, the arms to press lit and pressing down; change the direction, style, size, depth and colours.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/icon",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "arcade",
+   "platformer",
+   "puzzle",
+   "top-down-rpg"
+  ],
+  "view": "none",
+  "words": [
+   "d-pad",
+   "direction pad",
+   "cross pad",
+   "arrows",
+   "gamepad",
+   "controller",
+   "move",
+   "press",
+   "prompt",
+   "input",
+   "tutorial"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "press",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "cross",
+   "options": [
+    {
+     "value": "cross",
+     "label": "Cross"
+    },
+    {
+     "value": "rocker",
+     "label": "Rocker"
+    },
+    {
+     "value": "round",
+     "label": "Round"
+    }
+   ],
+   "group": "Look"
+  },
+  "direction": {
+   "kind": "choice",
+   "label": "Direction",
+   "def": "up",
+   "options": [
+    {
+     "value": "up",
+     "label": "Up"
+    },
+    {
+     "value": "down",
+     "label": "Down"
+    },
+    {
+     "value": "left",
+     "label": "Left"
+    },
+    {
+     "value": "right",
+     "label": "Right"
+    },
+    {
+     "value": "up-down",
+     "label": "Up and down"
+    },
+    {
+     "value": "left-right",
+     "label": "Left and right"
+    },
+    {
+     "value": "all",
+     "label": "All"
+    },
+    {
+     "value": "none",
+     "label": "None"
+    }
+   ],
+   "group": "Look"
+  },
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "depth": {
+   "kind": "range",
+   "label": "Depth",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Flat",
+   "hi": "Deep",
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Pad",
+   "def": "#5d6475",
+   "swatches": [
+    "#5d6475",
+    "#3f5068",
+    "#c2c9d6",
+    "#7a4f33",
+    "#434d6d"
+   ],
+   "group": "Colors"
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Lit",
+   "def": "#f2c230",
+   "swatches": [
+    "#f2c230",
+    "#4fd8ee",
+    "#a4c44a",
+    "#c9423a",
+    "#f0ead8"
+   ],
+   "group": "Colors",
+   "when": {
+    "direction": [
+     "up",
+     "down",
+     "left",
+     "right",
+     "up-down",
+     "left-right",
+     "all"
+    ]
+   }
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "press": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    8,
+    12
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [
+  {
+   "name": "Up",
+   "params": {}
+  },
+  {
+   "name": "Left and right",
+   "params": {
+    "direction": "left-right",
+    "glow": "#4fd8ee"
+   }
+  },
+  {
+   "name": "Rocker",
+   "params": {
+    "style": "rocker",
+    "direction": "all"
+   }
+  },
+  {
+   "name": "Round pad",
+   "params": {
+    "style": "round",
+    "direction": "down"
+   }
+  },
+  {
+   "name": "Pale, unlit",
+   "params": {
+    "direction": "none",
+    "body": "#c2c9d6"
+   }
+  }
+ ],
+ "bundles": []
+}

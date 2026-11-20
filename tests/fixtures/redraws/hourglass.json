@@ -1,0 +1,226 @@
+{
+ "id": "hourglass",
+ "frozen": "2026-11-20",
+ "source": "sprites/hourglass.js",
+ "sha256": "9b944e1ba804bfb1ce4dbe73a19b2493f56231a207cc2f08b08055e5afd3889f",
+ "name": "Time bonus",
+ "blurb": "A floating hourglass, stopwatch or alarm clock that gives extra time. Change its kind, size, sand left, sparkle and colours.",
+ "meta": {
+  "type": "pickup",
+  "role": "items/pickup",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "arcade",
+   "racing",
+   "puzzle",
+   "platformer"
+  ],
+  "view": "front",
+  "words": [
+   "hourglass",
+   "stopwatch",
+   "clock",
+   "timer",
+   "time",
+   "sand",
+   "extra time",
+   "bonus",
+   "countdown",
+   "collect",
+   "pickup",
+   "hurry"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  30
+ ],
+ "grounded": false,
+ "preview": "idle",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "shape": {
+   "kind": "choice",
+   "label": "Shape",
+   "def": "hourglass",
+   "options": [
+    "hourglass",
+    "stopwatch",
+    "clock"
+   ],
+   "group": "Look"
+  },
+  "sand": {
+   "kind": "range",
+   "label": "Sand left",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Little",
+   "hi": "Lots",
+   "group": "Look",
+   "when": {
+    "shape": [
+     "hourglass"
+    ]
+   }
+  },
+  "sparkle": {
+   "kind": "toggle",
+   "label": "Sparkle",
+   "def": true,
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Frame",
+   "def": "#a06a3c",
+   "swatches": [
+    "#a06a3c",
+    "#7a4f33",
+    "#a8612a",
+    "#c98a4a",
+    "#c2c9d6",
+    "#c9423a",
+    "#f2c230"
+   ],
+   "group": "Colors",
+   "material": "paint"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Sand",
+   "def": "#e6c96a",
+   "swatches": [
+    "#e6c96a",
+    "#f0ead8",
+    "#4fd8ee",
+    "#a4c44a",
+    "#7a4fc4"
+   ],
+   "group": "Colors",
+   "when": {
+    "shape": [
+     "hourglass"
+    ]
+   },
+   "material": "earth"
+  },
+  "bob": {
+   "kind": "range",
+   "label": "Float",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Still",
+   "hi": "Floaty",
+   "group": "Motion"
+  },
+  "pop": {
+   "kind": "range",
+   "label": "Pop height",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Low",
+   "hi": "High",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "collect": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    9,
+    15,
+    20
+   ]
+  }
+ },
+ "sounds": {
+  "collect": [
+   {
+    "sound": "item-get",
+    "preset": "Chiptune",
+    "frame": 1,
+    "volume": 0.7
+   }
+  ]
+ },
+ "versions": [
+  {
+   "name": "Hourglass",
+   "params": {}
+  },
+  {
+   "name": "Stopwatch",
+   "params": {
+    "shape": "stopwatch",
+    "body": "#c2c9d6"
+   }
+  },
+  {
+   "name": "Alarm clock",
+   "params": {
+    "shape": "clock",
+    "body": "#c9423a"
+   }
+  },
+  {
+   "name": "Nearly out",
+   "params": {
+    "sand": 0.1,
+    "body": "#c9423a"
+   }
+  },
+  {
+   "name": "Gilded glass",
+   "params": {
+    "body": "#f2c230",
+    "accent": "#4fd8ee"
+   }
+  }
+ ],
+ "bundles": []
+}

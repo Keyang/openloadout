@@ -14,7 +14,7 @@
 // Everything here repeats every 32 px both ways and is the same every time: no Math.random(), and nothing kept
 // between calls but a memo of answers already worked out (stoneShade).
 
-import { TILE } from './tiles.js';
+import { TILE, boundedCache, TEXTURE_CACHE_LIMIT } from './tiles.js';   // the cache: migration M5, stoneShade is a colour rule any sprite's settings reach (engine/data-rules.js)
 import { ramp, mix, brightness, col } from './color.js';
 import { THEME_PRESETS, applyColour } from './theme.js';
 
@@ -76,13 +76,16 @@ export function pavingTone(colour, to = 0.81) {
   return mix(light, '#ffffff', Math.min(0.45, (to - bl) / Math.max(0.001, 1 - bl)));
 }
 
-const shadeCache = new Map();
+// capped, as textureTone's is: a person's colour picks reach it. Made on first use: engine/tiles.js may still be loading
+// when this module is (tiles.js -> theme.js -> ... -> data-rules.js -> paving.js), so its constants are not read here
+let shadeCache = null;
 /**
  * A tone between a paving's body colour and its joint colour that every whole-bundle look (engine/theme.js) keeps apart from the body: for a stone a shade darker than its neighbours, which a softer tone would lose under some look.
  * Arguments: body (the paving's colour, '#rrggbb'); joint (the colour of its joints, the darkest the shade may get); from (0 to 1: where the search starts between the two, default 0.4; it moves towards the joint colour in steps of 0.15 until a tone survives every look, and returns the joint colour when none does).
  */
 export function stoneShade(body, joint, from = 0.4) {
   const key = `${body}/${joint}/${from}`;
+  shadeCache ??= boundedCache(TEXTURE_CACHE_LIMIT);
   let tone = shadeCache.get(key);
   if (tone) return tone;
   const kept = (c) => col(c) !== col(body) && THEME_PRESETS.every((look) => { const to = applyColour(Uint32Array.from([col(body), col(c)]), look.theme.colour); return to[0] !== to[1]; });

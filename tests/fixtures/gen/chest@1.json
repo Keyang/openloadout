@@ -1,0 +1,462 @@
+{
+ "id": "chest",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "gen": "chest",
+    "v": 1,
+    "at": [
+     16,
+     30
+    ],
+    "wood": "wood",
+    "metal": "metal",
+    "inner": "glow",
+    "gold": "gold",
+    "gem": "gem",
+    "ruby": "ruby",
+    "shine": "shine"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      5,
+      14
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..abcaaaaaaaaaaaabca..",
+      ".ddbcddddddddddddbcaa.",
+      "edeeeeeeeeeeeeeeeeeeaa",
+      "eddbcddddddddddddbcdda",
+      "eddbcddddbcccddddbcdda",
+      "bbbbbbbbbbffcbbbbbbbbb",
+      ".eebcddddbffcddddbcdd.",
+      ".eebcddddbggcddddbcdd.",
+      ".eebcddddbggcddddbcdd.",
+      ".eebceeeebbbbeeeebcee.",
+      ".eebcddddddddddddbcdd.",
+      ".eebcddddddddddddbcdd.",
+      ".eebcddddddddddddbcdd.",
+      ".eebceeeeeeeeeeeebcee.",
+      ".eebceeeeeeeeeeeebcee.",
+      ".eebbeeeeeeeeeeeebbee."
+     ],
+     "key": {
+      "a": "wood.light",
+      "b": "metal.dark",
+      "c": "metal.light",
+      "d": "wood",
+      "e": "wood.dark",
+      "f": "metal",
+      "g": {
+       "rule": "tone",
+       "of": "metal",
+       "by": -1.9
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "gen": "chest",
+    "v": 1,
+    "at": [
+     16,
+     30
+    ],
+    "wood": "wood",
+    "metal": "metal",
+    "inner": "glow",
+    "gold": "gold",
+    "gem": "gem",
+    "ruby": "ruby",
+    "shine": "shine",
+    "style": "royal",
+    "size": 1,
+    "lid": 1,
+    "open": [
+     0,
+     0,
+     0,
+     1.25,
+     0.88
+    ],
+    "inside": [
+     0,
+     0,
+     1,
+     1,
+     2
+    ],
+    "beam": [
+     0,
+     0,
+     0,
+     1.3,
+     1.15
+    ],
+    "hot": [
+     0,
+     0,
+     0,
+     1,
+     0
+    ],
+    "phase": [
+     0,
+     0.34,
+     0.68,
+     1.02,
+     1.36
+    ],
+    "flick": [
+     0,
+     1,
+     0,
+     1,
+     0
+    ]
+   },
+   "ctx": {
+    "t": 0.5714285714285714,
+    "loop": false,
+    "frames": 8,
+    "frame": 4
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      4,
+      4
+     ],
+     "anchor": "tl",
+     "rows": [
+      "......aaaaaaaaaaaa......",
+      "....abbbbbbbbbbbbaaa....",
+      "...bbbccccccccccccbaa...",
+      "..bbccccccccccccccccaa..",
+      ".dbecccccccccccccccccaa.",
+      ".bbccccccccccccccccccba.",
+      "dbecccccccccccccccccccaa",
+      "dbeeeeffeeeeeeeeeeeeeeba",
+      "dbbbbffgfhhhhhbbbbbbbbba",
+      "ddddiffffjjjjhhhkkdddddd",
+      ".llljjffjjjjjiijkkhhlll.",
+      ".mmijjjjjiijjjjjjjjhhmm.",
+      ".mmiijjjjjjiijjjiijjhmm.",
+      "daaaaaaaaadaaaaaaaaaadaa",
+      "dbannnnnnndkkannnnnnndba",
+      "dddnnnnnnndkkannnnnnnddd",
+      "oonnnnnnnnddddnnnnnnnnnn",
+      "oooooooooooooooooooooooo",
+      "oonnnnnnnnnnnnnnnnnnnnnn",
+      "oonnnnnnnnnnnnnnnnnnnnnn",
+      "oooooooooooooooooooooooo",
+      "dbbnnnnnnnnnnnnnnnnnndbb",
+      "dbboooooooooooooooooodbb",
+      "dddddddddddddddddddddddd",
+      ".dbb................dbb.",
+      ".ddd................ddd."
+     ],
+     "key": {
+      "a": "metal.light",
+      "b": "metal",
+      "c": {
+       "rule": "mix",
+       "of": {
+        "rule": "tone",
+        "of": "wood",
+        "by": -1.1
+       },
+       "with": "glow",
+       "amount": 0.3
+      },
+      "d": "metal.dark",
+      "e": {
+       "rule": "tone",
+       "of": {
+        "rule": "mix",
+        "of": {
+         "rule": "tone",
+         "of": "wood",
+         "by": -1.1
+        },
+        "with": "glow",
+        "amount": 0.3
+       },
+       "by": -0.8
+      },
+      "f": "gem",
+      "g": "shine",
+      "h": "gold.light",
+      "i": "gold.dark",
+      "j": "gold",
+      "k": "ruby",
+      "l": "glow",
+      "m": {
+       "rule": "mix",
+       "of": "glow",
+       "with": "shine",
+       "amount": 0.6
+      },
+      "n": "wood",
+      "o": "wood.dark"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "gen": "chest",
+    "v": 1,
+    "at": [
+     16,
+     30
+    ],
+    "wood": "wood",
+    "metal": "metal",
+    "inner": "glow",
+    "gold": "gold",
+    "gem": "gem",
+    "ruby": "ruby",
+    "shine": "shine",
+    "style": "iron",
+    "size": 0,
+    "lid": 0,
+    "lift": [
+     0,
+     0,
+     3
+    ],
+    "wide": [
+     0,
+     1,
+     -1
+    ],
+    "tall": [
+     0,
+     -1,
+     1
+    ],
+    "inside": [
+     0,
+     0,
+     1
+    ]
+   },
+   "ctx": {
+    "t": 0.2857142857142857,
+    "loop": false,
+    "frames": 8,
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      8,
+      15
+     ],
+     "anchor": "tl",
+     "rows": [
+      "abbbbbccccbbbbbb",
+      "addddcabbbcddddb",
+      "aaaaacaddbcaaaaa",
+      "..eeecaddbceee..",
+      "..eeecaddbceee..",
+      "..eeecaddbceee..",
+      ".bbbbcaddbcbbbb.",
+      ".adffcaggbcffab.",
+      ".aaffcaggbcffab.",
+      ".adffcaaaacffab.",
+      ".adfffccccfffab.",
+      ".aahhhhhhhhhhab.",
+      ".adffffffffffab.",
+      "addddddddddddddd",
+      "aaaaaaaaaaaaaaaa"
+     ],
+     "key": {
+      "a": "metal.dark",
+      "b": "metal.light",
+      "c": "ink",
+      "d": "metal",
+      "e": "shine",
+      "f": "wood",
+      "g": {
+       "rule": "tone",
+       "of": "metal",
+       "by": -1.9
+      },
+      "h": "wood.dark"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "gen": "chest",
+    "v": 1,
+    "at": [
+     16,
+     30
+    ],
+    "wood": "wood",
+    "metal": "metal",
+    "inner": "glow",
+    "gold": "gold",
+    "gem": "gem",
+    "ruby": "ruby",
+    "shine": "shine",
+    "layer": "light",
+    "glint": [
+     -1,
+     -1,
+     -1,
+     0,
+     0.25,
+     0.5
+    ],
+    "lock": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     1
+    ]
+   },
+   "ctx": {
+    "t": 0.7142857142857143,
+    "loop": false,
+    "frames": 8,
+    "frame": 5
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      13,
+      16
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".a..",
+      "aba.",
+      ".ab.",
+      ".bbb"
+     ],
+     "key": {
+      "a": {
+       "rule": "tone",
+       "of": "metal",
+       "by": 0.9
+      },
+      "b": "shine"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "gen": "chest",
+    "v": 1,
+    "at": [
+     16,
+     30
+    ],
+    "wood": "wood",
+    "metal": "metal",
+    "inner": "glow",
+    "gold": "gold",
+    "gem": "gem",
+    "ruby": "ruby",
+    "shine": "shine",
+    "layer": "light",
+    "open": [
+     0,
+     0,
+     0,
+     1.25,
+     0.88
+    ],
+    "inside": [
+     0,
+     0,
+     1,
+     1,
+     2
+    ],
+    "beam": [
+     0,
+     0,
+     0,
+     1.3,
+     1.15
+    ],
+    "hot": [
+     0,
+     0,
+     0,
+     1,
+     0
+    ],
+    "phase": [
+     0,
+     0.34,
+     0.68,
+     1.02,
+     1.36
+    ],
+    "flick": [
+     0,
+     1,
+     0,
+     1,
+     0
+    ]
+   },
+   "ctx": {
+    "t": 0.42857142857142855,
+    "loop": false,
+    "frames": 8,
+    "frame": 3
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      3,
+      1
+     ],
+     "anchor": "tl",
+     "rows": [
+      "......a......b.....a......",
+      "......ab.....b....ba......",
+      ".......b.....b....b.......",
+      "a......bb....b...bb......a",
+      ".a......b....b...b......a.",
+      "..........................",
+      "....a.....................",
+      "....a................a....",
+      "..aabaa.............aba...",
+      "....a................a....",
+      "....a....................."
+     ],
+     "key": {
+      "a": {
+       "rule": "tone",
+       "of": "glow",
+       "by": 1.6
+      },
+      "b": "shine"
+     }
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,256 @@
+{
+ "id": "ui-buttons-gilded",
+ "frozen": "2026-11-20",
+ "source": "sprites/ui-buttons-gilded.js",
+ "sha256": "0ad784c118363e154a31402d87ec90fda4fd438486ebb46b7df79e779a179256",
+ "name": "Stone and gold buttons",
+ "blurb": "A stretchable menu button and tab of dark carved stone in a lit gold frame with gems, in four states (normal, hover, pressed, disabled) plus a tab and an open tab; change its style, corners, band, gems and colours.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/button",
+  "themes": [
+   "neutral",
+   "fantasy",
+   "dungeon"
+  ],
+  "gameTypes": [
+   "arcade",
+   "turn-based-rpg",
+   "top-down-rpg",
+   "card-game"
+  ],
+  "view": "none",
+  "words": [
+   "button",
+   "menu",
+   "stone",
+   "gold",
+   "gem",
+   "tab",
+   "temple",
+   "royal",
+   "press",
+   "click",
+   "hover",
+   "start",
+   "carved",
+   "ornate"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  96,
+  32
+ ],
+ "pivot": [
+  48,
+  16
+ ],
+ "grounded": false,
+ "preview": "normal",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "temple",
+   "options": [
+    {
+     "value": "temple",
+     "label": "Temple"
+    },
+    {
+     "value": "royal",
+     "label": "Royal"
+    },
+    {
+     "value": "ruin",
+     "label": "Ruin"
+    }
+   ],
+   "group": "Look"
+  },
+  "corner": {
+   "kind": "range",
+   "label": "Corner",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Square",
+   "hi": "Round",
+   "group": "Look"
+  },
+  "border": {
+   "kind": "range",
+   "label": "Border",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Thin",
+   "hi": "Thick",
+   "group": "Look"
+  },
+  "gems": {
+   "kind": "toggle",
+   "label": "Gems",
+   "def": true,
+   "group": "Look"
+  },
+  "face": {
+   "kind": "color",
+   "label": "Stone",
+   "def": "#3f5068",
+   "swatches": [
+    "#3f5068",
+    "#7a4f33",
+    "#434d6d",
+    "#8e3a4a"
+   ],
+   "group": "Colors"
+  },
+  "frame": {
+   "kind": "color",
+   "label": "Gold",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#c2c9d6",
+    "#f6d3b0",
+    "#f4e06a",
+    "#e6c96a"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Gems",
+   "def": "#4fd8ee",
+   "swatches": [
+    "#4fd8ee",
+    "#c9423a",
+    "#a4c44a",
+    "#3f6fd1",
+    "#e08a2c"
+   ],
+   "group": "Colors",
+   "when": {
+    "gems": [
+     true
+    ]
+   }
+  }
+ },
+ "clips": {
+  "normal": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "hover": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "pressed": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "disabled": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "tab": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "tab-active": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  }
+ },
+ "sounds": {
+  "pressed": [
+   {
+    "sound": "menu-confirm",
+    "preset": "Confirm",
+    "frame": 0,
+    "volume": 0.6
+   }
+  ],
+  "tab-active": [
+   {
+    "sound": "menu-move",
+    "preset": "Tab",
+    "frame": 0,
+    "volume": 0.6
+   }
+  ]
+ },
+ "versions": [
+  {
+   "name": "Temple gold",
+   "params": {}
+  },
+  {
+   "name": "Royal",
+   "params": {
+    "style": "royal",
+    "accent": "#c9423a",
+    "face": "#8e3a4a"
+   }
+  },
+  {
+   "name": "Ruin",
+   "params": {
+    "style": "ruin",
+    "gems": false,
+    "face": "#7a4f33",
+    "frame": "#e6c96a"
+   }
+  },
+  {
+   "name": "Silver and night",
+   "params": {
+    "face": "#434d6d",
+    "frame": "#c2c9d6"
+   }
+  },
+  {
+   "name": "Bright gold",
+   "params": {
+    "frame": "#f4e06a",
+    "accent": "#a4c44a"
+   }
+  }
+ ],
+ "bundles": []
+}

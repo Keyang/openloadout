@@ -1,0 +1,39 @@
+{ "format": "loadout-sprite",
+  "version": 2,
+  "id": "ui-score-pop",
+  "name": "Score pop",
+  "blurb": "Points that float up where a coin was taken or an enemy fell, then sparkle away; change the number, letter style, size, outline and colours.",
+  "meta": {"type": "ui", "role": "interface/icon", "themes": ["neutral"], "gameTypes": ["arcade", "platformer", "shooter", "roguelike-action"], "view": "none", "words": ["score", "points", "bonus", "popup", "floating", "combo", "multiplier", "reward"], "license": "draft"},
+  "size": [48,32],
+  "pivot": [24,24],
+  "grounded": false,
+  "preview": "idle",
+  "styles": ["pixel"],
+  "palette": [
+  {"id": "body", "label": "Numbers", "default": "#f2c230", "material": "paint", "swatches": ["#f2c230", "#f0ead8", "#8fd0f0", "#9bd18a", "#f6d3b0", "#c2c9d6"]},
+  {"id": "edge", "label": "Rim", "default": "#7a4f33", "material": "interface", "swatches": ["#7a4f33", "#c9423a", "#3f6fd1", "#7a4fc4", "#3f8a4f", "#3f5068"]},
+  {"id": "glow", "label": "Sparkles", "default": "#4fd8ee", "material": "light", "swatches": ["#4fd8ee", "#e08a2c", "#b48af8", "#a4c44a", "#3f9fd1"]} ],
+  "controls": [
+  {"key": "number", "kind": "choice", "label": "Number", "options": [{"value": "p10", "label": "Plus ten"}, {"value": "p50", "label": "Plus fifty"}, {"value": "p100", "label": "Plus hundred"}, {"value": "p500", "label": "Plus five hundred"}, {"value": "p1000", "label": "Plus thousand"}, {"value": "x2", "label": "Times two"}, {"value": "x5", "label": "Times five"}], "default": "p100"},
+  {"key": "style", "kind": "choice", "label": "Style", "options": ["chunky", "slim", "rounded", "serif"], "default": "chunky"},
+  {"key": "size", "kind": "range", "label": "Size", "lo": "Small", "hi": "Big", "default": 0.5},
+  {"key": "outline", "kind": "choice", "label": "Outline", "options": ["ink", "rimmed"], "default": "rimmed"},
+  {"key": "body", "kind": "colour", "label": "Numbers"},
+  {"key": "edge", "kind": "colour", "label": "Rim", "when": {"outline": ["rimmed"]}},
+  {"key": "glow", "kind": "colour", "label": "Sparkles"},
+  {"key": "speed", "standard": "speed"} ],
+  "body": { "pictures": {
+    "nodes": [
+    {"id": "ui", "parent": null, "at": [24,16]} ],
+    "draw": [
+    {"gen": "score.pop", "v": 1, "on": "ui", "at": [0,0], "clip": ["idle"], "picture": "idle", "number": {"from": "number", "pick": {"p10": "p10", "p50": "p50", "p100": "p100", "p500": "p500", "p1000": "p1000", "x2": "x2", "x5": "x5"}}, "style": {"from": "style", "pick": {"chunky": "chunky", "slim": "slim", "rounded": "rounded", "serif": "serif"}}, "size": {"from": "size", "map": [[0,0], [1,1]], "round": "none"}, "outline": {"from": "outline", "pick": {"ink": "ink", "rimmed": "rimmed"}}, "body": "body", "edge": "edge", "lit": "glow"},
+    {"gen": "score.pop", "v": 1, "on": "ui", "at": [0,0], "clip": ["rise"], "picture": "rise", "number": {"from": "number", "pick": {"p10": "p10", "p50": "p50", "p100": "p100", "p500": "p500", "p1000": "p1000", "x2": "x2", "x5": "x5"}}, "style": {"from": "style", "pick": {"chunky": "chunky", "slim": "slim", "rounded": "rounded", "serif": "serif"}}, "size": {"from": "size", "map": [[0,0], [1,1]], "round": "none"}, "outline": {"from": "outline", "pick": {"ink": "ink", "rimmed": "rimmed"}}, "body": "body", "edge": "edge", "lit": "glow"} ] } },
+  "clips": {
+    "idle": {"frames": 1, "fps": 8, "label": "At rest"},
+    "rise": {"frames": 8, "fps": 12, "loop": false, "label": "Rise and vanish", "sounds": [{"sound": "xp-blip", "preset": "XP shard", "frame": 0, "volume": 0.5}]} },
+  "versions": [
+  {"name": "Plus hundred", "params": {}},
+  {"name": "Plus ten, small", "params": {"number": "p10", "size": 0, "body": "#f0ead8"}},
+  {"name": "Plus thousand", "params": {"number": "p1000", "size": 1, "edge": "#c9423a"}},
+  {"name": "Double", "params": {"number": "x2", "body": "#8fd0f0", "edge": "#3f6fd1", "style": "rounded"}},
+  {"name": "Plus fifty serif", "params": {"number": "p50", "style": "serif", "body": "#9bd18a", "outline": "ink"}} ] }

@@ -1,8 +1,6 @@
 // The on/off and key rules of emitters (docs/data-sprites.md 2.5c "On or off", decided in B6), in one place so every
-// layout that draws emitters reads them alike: the emitters layout (engine/gen/emitters.js, B12) uses these. The
-// pictures layout (engine/gen/pictures.js, B8) and engine/data-sprite.js picturesLayout (B6) still hold their own
-// copies of the same rules (without the amount held to 0..1); they should import these (a follow-up for their owners,
-// recorded in section 9, B12c).
+// layout that draws emitters reads them alike: the emitters layout (engine/gen/emitters.js, B12), the pictures layout
+// (engine/gen/pictures.js, B8) and engine/data-sprite.js picturesLayout (B6) all use these (build item B12c).
 //   - an emitter that some clip's keys give an `amount` is off wherever no key gives it an amount above 0; one that no
 //     key gives an amount always draws (its `when` and `clip` still decide, as for any item);
 //   - a key's other fields set the emitter's call: `at` and the arguments its generator lists as keyable (the validator

@@ -60,9 +60,10 @@ function emitterCalls(input, frames) {
  * (3.4 rule 2; the second B12 review: keyed puffs priced small ran for 2.9 s before the summed cost was refused). The
  * validator refuses a key that sets a size argument above what the emitter sets (catalog/sprite-schema.js checkKey,
  * B12b), so a checked definition never comes near this; it is the layout's own guard for one drawn without that check.
- * A fixed small sum: each call's cost is the registry's (checkCall), at most 16 calls.
+ * A fixed small sum: each call's cost is the registry's (checkCall), at most 16 calls. The pictures layout
+ * (engine/gen/pictures.js) guards its keyed emitter calls with it too (build item B12c).
  */
-function checkKeyedCost(calls, gen) {
+export function checkKeyedCost(calls, gen) {
   if (typeof gen?.checkCall !== 'function') return;
   let total = 0;
   for (const c of calls) {

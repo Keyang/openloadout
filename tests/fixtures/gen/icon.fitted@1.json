@@ -1,0 +1,550 @@
+{
+ "id": "icon.fitted",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "draw": [
+     {
+      "kind": "ellipse",
+      "at": [
+       0,
+       2
+      ],
+      "r": [
+       9,
+       7
+      ],
+      "paint": "gold",
+      "shade": 2
+     },
+     {
+      "kind": "rect",
+      "at": [
+       -3,
+       -10
+      ],
+      "size": [
+       6,
+       8
+      ],
+      "paint": "body",
+      "shade": 1,
+      "group": "neck"
+     },
+     {
+      "kind": "ellipse",
+      "at": [
+       0,
+       -10
+      ],
+      "r": [
+       3,
+       2
+      ],
+      "paint": "body",
+      "shade": 1,
+      "group": "neck"
+     },
+     {
+      "kind": "ellipse",
+      "at": [
+       4,
+       3
+      ],
+      "r": [
+       3,
+       3
+      ],
+      "paint": "rim",
+      "shade": 0,
+      "light": 0
+     }
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      6,
+      4
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".......aaaaaa.......",
+      "......abccddda......",
+      "......abccccda......",
+      "......abccccda......",
+      "......abccccda......",
+      "......abccccda......",
+      "......abccccda......",
+      "......abccccda......",
+      "....aaebccccdeaa....",
+      "...aeffbccccdeeea...",
+      "..affffbbbbbbffeea..",
+      ".agfffffffffffffeea.",
+      "ahgffffffffffffffeea",
+      "ahgffffffffffiiiffea",
+      "ahgfffffffffiiiiifea",
+      "ahgffffffffiiiiiifea",
+      "ahggfffffffiiiiiifea",
+      "ahhgfffffffiiiiiifea",
+      ".ahgggffffffiiiiffa.",
+      ".ahhhggffffffffffha.",
+      "..aahhggggggggggaa..",
+      "....ahhhhhhhhhha....",
+      ".....aaaaaaaaaa....."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body.dark",
+      "c": "body",
+      "d": "body.light",
+      "e": "gold.light",
+      "f": "gold",
+      "g": {
+       "rule": "mix",
+       "of": "gold",
+       "with": {
+        "rule": "ramp",
+        "of": "gold",
+        "tone": "dark"
+       },
+       "amount": 0.5
+      },
+      "h": "gold.dark",
+      "i": "rim"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "draw": [
+     {
+      "kind": "ellipse",
+      "at": [
+       0,
+       2
+      ],
+      "r": [
+       9,
+       7
+      ],
+      "paint": "gold",
+      "shade": 2
+     },
+     {
+      "kind": "rect",
+      "at": [
+       -3,
+       -10
+      ],
+      "size": [
+       6,
+       8
+      ],
+      "paint": "body",
+      "shade": 1,
+      "group": "neck"
+     },
+     {
+      "kind": "ellipse",
+      "at": [
+       0,
+       -10
+      ],
+      "r": [
+       3,
+       2
+      ],
+      "paint": "body",
+      "shade": 1,
+      "group": "neck"
+     },
+     {
+      "kind": "ellipse",
+      "at": [
+       4,
+       3
+      ],
+      "r": [
+       3,
+       3
+      ],
+      "paint": "rim",
+      "shade": 0,
+      "light": 0
+     },
+     {
+      "kind": "cut",
+      "from": "neck",
+      "shape": {
+       "kind": "ellipse",
+       "at": [
+        0,
+        -7
+       ],
+       "r": [
+        1.5,
+        1.5
+       ],
+       "paint": "body"
+      }
+     }
+    ],
+    "size": 1,
+    "fill": 0.8,
+    "turn": 26.57,
+    "grow": 0.5,
+    "lights": [
+     {
+      "gen": "twinkle",
+      "v": 1,
+      "at": [
+       3,
+       -10
+      ],
+      "size": 2,
+      "paint": "fire",
+      "core": "shine"
+     }
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      6,
+      5
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...........aaaaa...",
+      "..........abcccca..",
+      "..........addddcea.",
+      ".........abdbbbdea.",
+      ".........adaaaeefee",
+      "....aaaaabca..ade..",
+      "...agghggdcgaadce..",
+      "..ahhhhhbdcccdda...",
+      ".aihhhhhbbbdddca...",
+      "ajihhhhhhhbbbdgga..",
+      "ajihhhhhhhhhbbhga..",
+      "ajihhhhhhhhhhhhgga.",
+      "ajiihhhhhhkkkkhhga.",
+      "ajjiihhhhkkkkkkhga.",
+      ".ajjihhhhkkkkkkhga.",
+      "..ajiihhhkkkkkkhga.",
+      "..ajjiiihkkkkkkhga.",
+      "...ajjjiiikkkkiia..",
+      "....aajjjjiiijja...",
+      "......aaajjjaaa....",
+      ".........aaa......."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body.dark",
+      "c": "body.light",
+      "d": "body",
+      "e": "fire",
+      "f": "shine",
+      "g": "gold.light",
+      "h": "gold",
+      "i": {
+       "rule": "mix",
+       "of": "gold",
+       "with": {
+        "rule": "ramp",
+        "of": "gold",
+        "tone": "dark"
+       },
+       "amount": 0.5
+      },
+      "j": "gold.dark",
+      "k": "rim"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "draw": [
+     {
+      "kind": "ellipse",
+      "at": [
+       0,
+       2
+      ],
+      "r": [
+       9,
+       7
+      ],
+      "paint": "gold",
+      "shade": 2
+     },
+     {
+      "kind": "rect",
+      "at": [
+       -3,
+       -10
+      ],
+      "size": [
+       6,
+       8
+      ],
+      "paint": "body",
+      "shade": 1,
+      "group": "neck"
+     },
+     {
+      "kind": "ellipse",
+      "at": [
+       0,
+       -10
+      ],
+      "r": [
+       3,
+       2
+      ],
+      "paint": "body",
+      "shade": 1,
+      "group": "neck"
+     },
+     {
+      "kind": "ellipse",
+      "at": [
+       4,
+       3
+      ],
+      "r": [
+       3,
+       3
+      ],
+      "paint": "rim",
+      "shade": 0,
+      "light": 0
+     }
+    ],
+    "centre": [
+     6,
+     26
+    ],
+    "size": 0,
+    "tilt": false,
+    "slant": 0.25
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      -3,
+      16
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".........aaaa.....",
+      "........abbbba....",
+      ".......acdddbba...",
+      ".......acddddba...",
+      ".......acddddba...",
+      "......acddddba....",
+      "......acddddba....",
+      "....aaecddddbeaa..",
+      "..aafggcccccceeea.",
+      ".ahgggggggggggeea.",
+      ".afggggggggggggea.",
+      "ahfggggggggiiigeea",
+      "ahffggggggiiiiigea",
+      "ahfggggggiiiiigea.",
+      "ahffgggggiiiiiga..",
+      "ahhffgggggiiigea..",
+      ".ahhffffggggffa...",
+      ".ahhhhffffhhaa....",
+      "..aaahhhhaaa......",
+      ".....aaaa........."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body.light",
+      "c": "body.dark",
+      "d": "body",
+      "e": "gold.light",
+      "f": {
+       "rule": "mix",
+       "of": "gold",
+       "with": {
+        "rule": "ramp",
+        "of": "gold",
+        "tone": "dark"
+       },
+       "amount": 0.5
+      },
+      "g": "gold",
+      "h": "gold.dark",
+      "i": "rim"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "draw": [
+     {
+      "kind": "ellipse",
+      "at": [
+       0,
+       2
+      ],
+      "r": [
+       9,
+       7
+      ],
+      "paint": "gold",
+      "shade": 2
+     },
+     {
+      "kind": "rect",
+      "at": [
+       -3,
+       -10
+      ],
+      "size": [
+       6,
+       8
+      ],
+      "paint": "body",
+      "shade": 1,
+      "group": "neck"
+     },
+     {
+      "kind": "ellipse",
+      "at": [
+       0,
+       -10
+      ],
+      "r": [
+       3,
+       2
+      ],
+      "paint": "body",
+      "shade": 1,
+      "group": "neck"
+     },
+     {
+      "kind": "ellipse",
+      "at": [
+       4,
+       3
+      ],
+      "r": [
+       3,
+       3
+      ],
+      "paint": "rim",
+      "shade": 0,
+      "light": 0
+     }
+    ],
+    "size": 0.6,
+    "fill": 0.9,
+    "plate": "circle",
+    "face": "face",
+    "grow": 0.5
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      2,
+      2
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..........aaaaaaaa..........",
+      "........aabbbbbbbbaa........",
+      "......aabccccccccbbbaa......",
+      ".....abccccccccccccbbba.....",
+      "....accccccccccccccccbba....",
+      "...accccccccccccccccccbba...",
+      "..accccccccccccccccccccbba..",
+      "..acccccccccccccccccccccba..",
+      ".accccccccccccccccccccccbba.",
+      ".acccccccccccccccccccccccba.",
+      "accccccccccccccccccccccccbba",
+      "acccccccccccccccccccccccccba",
+      "acccccccccccccccccccccccccba",
+      "acccccccccccccccccccccccccba",
+      "acccccccccccccccccccccccccba",
+      "acccccccccccccccccccccccccba",
+      "acccccccccccccccccccccccccba",
+      "acccccccccccccccccccccccccba",
+      ".acccccccccccccccccccccccca.",
+      ".acccccccccccccccccccccccba.",
+      "..acccccccccccccccccccccca..",
+      "..acccccccccccccccccccccba..",
+      "...acccccccccccccccccccca...",
+      "....acccccccccccccccccca....",
+      ".....acccccccccccccccca.....",
+      "......aaccccccccccccaa......",
+      "........aaccccccccaa........",
+      "..........aaaaaaaa.........."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "face.light",
+      "c": "face"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      8,
+      7
+     ],
+     "anchor": "tl",
+     "rows": [
+      "......aaaa......",
+      ".....abbbba.....",
+      "....acdddbba....",
+      "....acddddba....",
+      "....acddddba....",
+      "....acddddba....",
+      "...aacddddbaa...",
+      "..aefcddddbeea..",
+      ".agffccccccfeea.",
+      "ahgffffffffffeea",
+      "ahgffffffiiiifea",
+      "ahgfffffiiiiifea",
+      "ahggffffiiiiiiea",
+      "ahhggffffiiiifea",
+      ".ahhgggfffiifga.",
+      "..ahhhggggggha..",
+      "...aahhhhhhaa...",
+      ".....aaaaaa....."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body.light",
+      "c": "body.dark",
+      "d": "body",
+      "e": "gold.light",
+      "f": "gold",
+      "g": {
+       "rule": "mix",
+       "of": "gold",
+       "with": {
+        "rule": "ramp",
+        "of": "gold",
+        "tone": "dark"
+       },
+       "amount": 0.5
+      },
+      "h": "gold.dark",
+      "i": "rim"
+     }
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,43 @@
+{ "format": "loadout-sprite",
+  "version": 2,
+  "id": "ui-upgrade-card",
+  "name": "Upgrade card",
+  "blurb": "A tall sci-fi card with a square for an icon and a clear area for text, in normal, hover, pressed and disabled states; change its style, rarity, cut corners, border, tech lines and colours.",
+  "meta": {"type": "ui", "role": "interface/panel", "themes": ["sci-fi", "neutral"], "gameTypes": ["roguelike-action", "card-game", "arcade"], "view": "none", "words": ["card", "upgrade", "perk", "choice", "pick", "reward", "level up", "rarity", "panel", "select", "hover", "hologram"], "license": "draft"},
+  "size": [64,96],
+  "pivot": [32,48],
+  "grounded": false,
+  "preview": "normal",
+  "styles": ["pixel"],
+  "palette": [
+  {"id": "face", "label": "Face", "default": "#434d6d", "material": "interface", "swatches": ["#434d6d", "#27505c", "#5b2e56", "#30417a", "#383c59"]},
+  {"id": "frame", "label": "Frame", "default": "#6b7896", "material": "interface", "swatches": ["#6b7896", "#2fb3a8", "#5fe0f0", "#9aa6c0", "#c2c9d6", "#f2a030"]},
+  {"id": "glow", "label": "Glow", "default": "#5fe0f0", "material": "interface", "swatches": ["#5fe0f0", "#e2473f", "#9fe040", "#f2a030", "#b48af8", "#4f9ff0", "#5fd47a"]} ],
+  "controls": [
+  {"key": "style", "kind": "choice", "label": "Style", "options": ["plate", "hologram", "glass"], "default": "plate"},
+  {"key": "rarity", "kind": "choice", "label": "Rarity", "options": ["common", "rare", "epic"], "default": "common"},
+  {"key": "corner", "kind": "range", "label": "Corner", "lo": "Square", "hi": "Cut", "default": 0.5},
+  {"key": "border", "kind": "range", "label": "Border", "lo": "Thin", "hi": "Thick", "default": 0.5},
+  {"key": "lines", "kind": "toggle", "label": "Tech lines", "default": true},
+  {"key": "face", "kind": "colour", "label": "Face"},
+  {"key": "frame", "kind": "colour", "label": "Frame"},
+  {"key": "glow", "kind": "colour", "label": "Glow"} ],
+  "versions": [
+  {"name": "Hologram", "params": {"style": "hologram"}},
+  {"name": "Sky blue frame, glass", "params": {"style": "glass", "frame": "#5fe0f0"}},
+  {"name": "Orange frame, epic rarity", "params": {"rarity": "epic", "frame": "#f2a030"}},
+  {"name": "Dark purple face, glass", "params": {"style": "glass", "face": "#5b2e56"}},
+  {"name": "Dark purple face, hologram", "params": {"style": "hologram", "face": "#5b2e56"}},
+  {"name": "Orange frame, thin border", "params": {"border": 0, "frame": "#f2a030"}} ],
+  "body": { "panel": {
+    "piece": {"gen": "upgrade.card", "v": 2, "at": [32,48], "clip": ["normal"], "picture": "normal", "style": {"from": "style", "pick": {"plate": "plate", "hologram": "hologram", "glass": "glass"}}, "rarity": {"from": "rarity", "pick": {"common": "common", "rare": "rare", "epic": "epic"}}, "corner": {"from": "corner", "map": [[0,0], [1,1]], "round": "none"}, "border": {"from": "border", "map": [[0,0], [1,1]], "round": "none"}, "lines": {"from": "lines", "pick": {"true": true, "false": false}}, "face": "face", "frame": "frame", "lit": "glow"},
+    "states": {"normal": {}, "hover": {}, "pressed": {}, "disabled": {}},
+    "draw": [
+    {"gen": "upgrade.card", "v": 2, "at": [32,48], "clip": ["hover"], "picture": "hover", "style": {"from": "style", "pick": {"plate": "plate", "hologram": "hologram", "glass": "glass"}}, "rarity": {"from": "rarity", "pick": {"common": "common", "rare": "rare", "epic": "epic"}}, "corner": {"from": "corner", "map": [[0,0], [1,1]], "round": "none"}, "border": {"from": "border", "map": [[0,0], [1,1]], "round": "none"}, "lines": {"from": "lines", "pick": {"true": true, "false": false}}, "face": "face", "frame": "frame", "lit": "glow"},
+    {"gen": "upgrade.card", "v": 2, "at": [32,48], "clip": ["pressed"], "picture": "pressed", "style": {"from": "style", "pick": {"plate": "plate", "hologram": "hologram", "glass": "glass"}}, "rarity": {"from": "rarity", "pick": {"common": "common", "rare": "rare", "epic": "epic"}}, "corner": {"from": "corner", "map": [[0,0], [1,1]], "round": "none"}, "border": {"from": "border", "map": [[0,0], [1,1]], "round": "none"}, "lines": {"from": "lines", "pick": {"true": true, "false": false}}, "face": "face", "frame": "frame", "lit": "glow"},
+    {"gen": "upgrade.card", "v": 2, "at": [32,48], "clip": ["disabled"], "picture": "disabled", "style": {"from": "style", "pick": {"plate": "plate", "hologram": "hologram", "glass": "glass"}}, "rarity": {"from": "rarity", "pick": {"common": "common", "rare": "rare", "epic": "epic"}}, "corner": {"from": "corner", "map": [[0,0], [1,1]], "round": "none"}, "border": {"from": "border", "map": [[0,0], [1,1]], "round": "none"}, "lines": {"from": "lines", "pick": {"true": true, "false": false}}, "face": "face", "frame": "frame", "lit": "glow"} ] } },
+  "clips": {
+    "normal": {"frames": 1, "fps": 8, "label": "Normal"},
+    "hover": {"frames": 1, "fps": 8, "label": "Hover", "sounds": [{"sound": "tech-click", "preset": "Hover", "frame": 0, "volume": 0.6}]},
+    "pressed": {"frames": 1, "fps": 8, "label": "Pressed", "sounds": [{"sound": "tech-click", "preset": "Select", "frame": 0, "volume": 0.6}]},
+    "disabled": {"frames": 1, "fps": 8, "label": "Disabled"} } }

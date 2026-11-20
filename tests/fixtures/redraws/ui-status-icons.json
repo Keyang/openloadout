@@ -1,0 +1,227 @@
+{
+ "id": "ui-status-icons",
+ "frozen": "2026-11-20",
+ "source": "sprites/ui-status-icons.js",
+ "sha256": "c1624771e234af5fdfa753e14baa8015d61ca58215014552ca8b330fe9a20d23",
+ "name": "Status marks",
+ "blurb": "Ten tiny status marks: poison, sleep, stun, burn, freeze, attack and defence up and down, and haste; put a round or square plate behind them, make them bold, and change the colours of boosts and ailments.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/icon",
+  "themes": [
+   "fantasy",
+   "neutral"
+  ],
+  "gameTypes": [
+   "turn-based-rpg",
+   "roguelike-action",
+   "arcade"
+  ],
+  "view": "none",
+  "words": [
+   "status",
+   "poison",
+   "sleep",
+   "stun",
+   "burn",
+   "freeze",
+   "haste",
+   "buff",
+   "debuff",
+   "ailment",
+   "condition",
+   "attack",
+   "defence",
+   "badge"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  16,
+  16
+ ],
+ "pivot": [
+  8,
+  8
+ ],
+ "grounded": false,
+ "preview": "poison",
+ "params": {
+  "backing": {
+   "kind": "choice",
+   "label": "Backing",
+   "def": "none",
+   "options": [
+    {
+     "value": "none",
+     "label": "None"
+    },
+    {
+     "value": "round",
+     "label": "Round"
+    },
+    {
+     "value": "square",
+     "label": "Square"
+    }
+   ],
+   "group": "Look"
+  },
+  "bold": {
+   "kind": "toggle",
+   "label": "Bold",
+   "def": false,
+   "group": "Look"
+  },
+  "shine": {
+   "kind": "toggle",
+   "label": "Shine",
+   "def": true,
+   "group": "Look"
+  },
+  "face": {
+   "kind": "color",
+   "label": "Plate",
+   "def": "#4a609c",
+   "swatches": [
+    "#4a609c",
+    "#5a5f7a",
+    "#9a6a3e",
+    "#2f8f9d",
+    "#357a4c",
+    "#8e3a4a"
+   ],
+   "group": "Colors",
+   "when": {
+    "backing": [
+     "round",
+     "square"
+    ]
+   }
+  },
+  "good": {
+   "kind": "color",
+   "label": "Boost",
+   "def": "#7fe0a0",
+   "swatches": [
+    "#7fe0a0",
+    "#7fbf5a",
+    "#4fd8ee",
+    "#f4e06a",
+    "#f2c230",
+    "#7aa0f4"
+   ],
+   "group": "Colors"
+  },
+  "bad": {
+   "kind": "color",
+   "label": "Ailment",
+   "def": "#7a4fc4",
+   "swatches": [
+    "#7a4fc4",
+    "#c9423a",
+    "#e8662c",
+    "#8e3a4a",
+    "#c8553a"
+   ],
+   "group": "Colors"
+  }
+ },
+ "clips": {
+  "poison": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "sleep": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "stun": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "burn": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "freeze": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "attack-up": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "defence-up": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "attack-down": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "defence-down": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "haste": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    1,
+    1,
+    1
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [],
+ "bundles": [
+  "kit-rpg-fantasy"
+ ]
+}

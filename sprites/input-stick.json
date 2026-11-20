@@ -1,0 +1,39 @@
+{ "format": "loadout-sprite",
+  "version": 2,
+  "id": "input-stick",
+  "name": "Thumbstick",
+  "blurb": "A game controller's thumbstick seen from above, its cap pushed, clicked in or turned round with arrows to show how; change the motion, cap style, size, push and colours.",
+  "meta": {"type": "ui", "role": "interface/icon", "themes": ["neutral"], "gameTypes": ["arcade", "shooter", "platformer", "racing"], "view": "none", "words": ["thumbstick", "joystick", "analog stick", "stick", "gamepad", "controller", "move", "push", "rotate", "prompt", "input", "tutorial"], "license": "draft"},
+  "size": [32,32],
+  "pivot": [16,16],
+  "grounded": false,
+  "preview": "move",
+  "styles": ["pixel"],
+  "palette": [
+  {"id": "body", "label": "Stick", "default": "#5d6475", "material": "paint", "swatches": ["#5d6475", "#3f5068", "#c2c9d6", "#7a4f33", "#434d6d"]},
+  {"id": "accent", "label": "Base ring", "default": "#8f97a8", "material": "interface", "swatches": ["#8f97a8", "#f0ead8", "#a06a3c", "#6b7280"]},
+  {"id": "glow", "label": "Arrows", "default": "#f2c230", "material": "interface", "swatches": ["#f2c230", "#4fd8ee", "#a4c44a", "#c9423a"]} ],
+  "controls": [
+  {"key": "motion", "kind": "choice", "label": "Motion", "options": ["up", "down", "left", "right", {"value": "any", "label": "Any way"}, {"value": "press", "label": "Click in"}, {"value": "spin", "label": "Turn round"}], "default": "any"},
+  {"key": "style", "kind": "choice", "label": "Style", "options": ["domed", "ridged", "flat"], "default": "domed"},
+  {"key": "size", "kind": "range", "label": "Size", "lo": "Small", "hi": "Big", "default": 0.5},
+  {"key": "reach", "kind": "range", "label": "Push", "lo": "Small", "hi": "Far", "default": 0.5, "when": {"motion": ["up", "down", "left", "right", "any", "spin"]}},
+  {"key": "body", "kind": "colour", "label": "Stick"},
+  {"key": "accent", "kind": "colour", "label": "Base ring"},
+  {"key": "glow", "kind": "colour", "label": "Arrows"},
+  {"key": "speed", "standard": "speed"} ],
+  "body": { "pictures": {
+    "nodes": [
+    {"id": "ui", "parent": null, "at": [16,16]} ],
+    "draw": [
+    {"gen": "stick", "v": 1, "on": "ui", "at": [0,0], "clip": ["idle"], "picture": "idle", "motion": {"from": "motion", "pick": {"up": "up", "down": "down", "left": "left", "right": "right", "any": "any", "press": "press", "spin": "spin"}}, "style": {"from": "style", "pick": {"domed": "domed", "ridged": "ridged", "flat": "flat"}}, "size": {"from": "size", "map": [[0,0], [1,1]], "round": "none"}, "reach": {"from": "reach", "map": [[0,0], [1,1]], "round": "none"}, "body": "body", "accent": "accent", "lit": "glow"},
+    {"gen": "stick", "v": 1, "on": "ui", "at": [0,0], "clip": ["move"], "picture": "move", "motion": {"from": "motion", "pick": {"up": "up", "down": "down", "left": "left", "right": "right", "any": "any", "press": "press", "spin": "spin"}}, "style": {"from": "style", "pick": {"domed": "domed", "ridged": "ridged", "flat": "flat"}}, "size": {"from": "size", "map": [[0,0], [1,1]], "round": "none"}, "reach": {"from": "reach", "map": [[0,0], [1,1]], "round": "none"}, "body": "body", "accent": "accent", "lit": "glow"} ] } },
+  "clips": {
+    "idle": {"noText": true, "frames": 1, "fps": 8, "label": "Idle"},
+    "move": {"noText": true, "frames": 8, "fps": 8, "label": "Move it"} },
+  "versions": [
+  {"name": "Any way", "params": {}},
+  {"name": "Push up", "params": {"motion": "up", "glow": "#4fd8ee"}},
+  {"name": "Click in", "params": {"motion": "press", "style": "ridged"}},
+  {"name": "Spin", "params": {"motion": "spin", "reach": 1}},
+  {"name": "Pale flat stick", "params": {"style": "flat", "body": "#c2c9d6", "accent": "#a06a3c"}} ] }

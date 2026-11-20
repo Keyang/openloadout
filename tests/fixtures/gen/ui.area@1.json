@@ -1,0 +1,64 @@
+{
+ "id": "ui.area",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     8,
+     17
+    ],
+    "size": [
+     80,
+     39
+    ]
+   },
+   "primitives": []
+  },
+  {
+   "args": {
+    "at": [
+     8,
+     17
+    ],
+    "size": [
+     80,
+     39
+    ],
+    "edge": [
+     48,
+     2
+    ],
+    "also": true,
+    "alsoAt": [
+     8,
+     5
+    ],
+    "alsoSize": [
+     80,
+     11
+    ],
+    "alsoText": "ink",
+    "left": 8,
+    "top": 17,
+    "right": 8,
+    "bottom": 8
+   },
+   "primitives": []
+  },
+  {
+   "args": {
+    "at": [
+     0,
+     0
+    ],
+    "size": [
+     256,
+     256
+    ],
+    "text": "ink"
+   },
+   "primitives": []
+  }
+ ]
+}

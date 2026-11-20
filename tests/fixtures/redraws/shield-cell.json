@@ -1,0 +1,186 @@
+{
+ "id": "shield-cell",
+ "frozen": "2026-11-20",
+ "source": "sprites/shield-cell.js",
+ "sha256": "639b056dc9ec5ac8e38742bed7fd919864ec2686c87f20bd73301f544684d28b",
+ "name": "Shield cell",
+ "blurb": "A six-sided cell of blue shield energy that turns slowly while a light runs round its rim. Make it a shell, an orb or a ring, with one or two layers, in your colours.",
+ "meta": {
+  "type": "pickup",
+  "role": "items/pickup",
+  "themes": [
+   "sci-fi",
+   "space"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "shooter",
+   "arcade"
+  ],
+  "view": "front",
+  "words": [
+   "shield",
+   "cell",
+   "energy",
+   "armour",
+   "barrier",
+   "protect",
+   "battery",
+   "power",
+   "hexagon",
+   "orb",
+   "collect",
+   "pickup",
+   "recharge",
+   "blue"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  30
+ ],
+ "grounded": false,
+ "preview": "idle",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "shape": {
+   "kind": "choice",
+   "label": "Shape",
+   "def": "hex",
+   "options": [
+    "hex",
+    "orb",
+    "ring"
+   ],
+   "group": "Look"
+  },
+  "rings": {
+   "kind": "choice",
+   "label": "Layers",
+   "def": "one",
+   "options": [
+    "one",
+    "two"
+   ],
+   "group": "Look"
+  },
+  "sparkle": {
+   "kind": "toggle",
+   "label": "Sparkle",
+   "def": true,
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Casing",
+   "def": "#9aa6c0",
+   "swatches": [
+    "#9aa6c0",
+    "#c2c9d6",
+    "#6b7896",
+    "#f2c230",
+    "#8f97a8",
+    "#e6c545",
+    "#c98a4a"
+   ],
+   "group": "Colors"
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Glow",
+   "def": "#4f9ff0",
+   "swatches": [
+    "#4f9ff0",
+    "#5fe0f0",
+    "#e2473f",
+    "#9fe040",
+    "#f2a030",
+    "#b48af8",
+    "#5fd47a"
+   ],
+   "group": "Colors"
+  },
+  "bob": {
+   "kind": "range",
+   "label": "Float",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Still",
+   "hi": "Floaty",
+   "group": "Motion"
+  },
+  "pop": {
+   "kind": "range",
+   "label": "Pop height",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Low",
+   "hi": "High",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "collect": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    9,
+    15,
+    20
+   ]
+  }
+ },
+ "sounds": {
+  "collect": [
+   {
+    "sound": "upgrade-get",
+    "preset": "Shield cell",
+    "frame": 1,
+    "volume": 0.7
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-roguelite-scifi"
+ ]
+}

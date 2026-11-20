@@ -1,0 +1,516 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "icons-system",
+ "name": "Settings icons",
+ "blurb": "Ten settings and pause menu signs, from a cog, sound and mute to save, pause and home; change the plate behind them, their weight, shine, size and three colours.",
+ "meta": {
+  "type": "icon",
+  "role": "interface/icon",
+  "themes": ["neutral"],
+  "gameTypes": ["arcade", "puzzle", "platformer", "card-game"],
+  "view": "none",
+  "words": ["settings", "options", "menu", "cog", "gear", "sound", "volume", "mute", "music", "display", "controller", "language", "save", "pause"],
+  "license": "draft"
+ },
+ "size": [32, 32],
+ "pivot": [16, 16],
+ "grounded": false,
+ "preview": "settings",
+ "styles": ["pixel"],
+ "palette": [
+  {
+   "id": "face",
+   "label": "Plate colour",
+   "default": "#5d6475",
+   "material": "interface",
+   "swatches": ["#5d6475", "#3f6fd1", "#3f5068", "#7a4f33", "#7a4fc4", "#434d6d"]
+  },
+  {
+   "id": "body",
+   "label": "Picture",
+   "default": "#f0ead8",
+   "material": "interface",
+   "swatches": ["#f0ead8", "#f2c230", "#4fd8ee", "#9bd18a", "#c2c9d6"]
+  },
+  {"id": "accent", "label": "Second colour", "default": "#c9423a", "material": "interface", "swatches": ["#c9423a", "#e08a2c", "#a4c44a", "#6aa83e"]},
+  {"id": "inkcolour", "default": "#231b33", "material": "paint", "detail": true},
+  {
+   "id": "body-pane",
+   "material": "interface",
+   "derive": {"rule": "mix", "of": {"rule": "ramp", "of": "body", "tone": "deep"}, "with": "inkcolour", "amount": 0.4}
+  }
+ ],
+ "controls": [
+  {"key": "backing", "kind": "choice", "label": "Plate", "options": ["none", "circle", {"value": "hex", "label": "Hexagon"}], "default": "circle"},
+  {"key": "bold", "kind": "toggle", "label": "Bold", "default": false},
+  {"key": "shine", "kind": "toggle", "label": "Shine", "default": true},
+  {"key": "size", "kind": "range", "label": "Size", "lo": "Small", "hi": "Big", "default": 0.5},
+  {"key": "face", "kind": "colour", "label": "Plate colour", "when": {"backing": ["hex", "circle"]}},
+  {"key": "body", "kind": "colour", "label": "Picture"},
+  {"key": "accent", "kind": "colour", "label": "Second colour"}
+ ],
+ "versions": [
+  {"name": "Round plates", "params": {}},
+  {"name": "No plates", "params": {"backing": "none", "body": "#c2c9d6"}},
+  {"name": "Gold on hexagons", "params": {"backing": "hex", "body": "#f2c230"}},
+  {"name": "Bold blue", "params": {"bold": true, "face": "#3f6fd1"}},
+  {"name": "Night", "params": {"face": "#434d6d", "body": "#4fd8ee", "accent": "#e08a2c"}}
+ ],
+ "body": {
+  "pictures": {
+   "draw": [],
+   "pictures": {
+    "settings": {
+     "label": "Settings",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {"from": "size", "map": [[0, 0], [1, 1]]},
+       "tilt": false,
+       "soften": false,
+       "shiny": {"from": "shine", "pick": {"true": true, "false": false}},
+       "plate": {"from": "backing", "pick": {"none": "none", "circle": "circle", "hex": "hex"}},
+       "face": "face",
+       "bold": {"from": "bold", "pick": {"true": true, "false": false}},
+       "draw": [
+        {"kind": "ellipse", "at": [0, 0], "r": [7.6, 7.6], "paint": "body", "shade": 1, "group": "body"},
+        {"kind": "poly", "points": [[-2, -7], [2, -7], [1.6, -11.5], [-1.6, -11.5]], "paint": "body", "shade": 1, "group": "body"},
+        {
+         "kind": "poly",
+         "points": [[3.5355, -6.364], [6.364, -3.5355], [9.2631, -7.0004], [7.0004, -9.2631]],
+         "paint": "body",
+         "shade": 1,
+         "group": "body"
+        },
+        {"kind": "poly", "points": [[7, -2], [7, 2], [11.5000001, 1.6], [11.5000001, -1.6]], "paint": "body", "shade": 1, "group": "body"},
+        {
+         "kind": "poly",
+         "points": [[6.364, 3.5355], [3.5355, 6.364], [7.0004, 9.2631], [9.2631, 7.0004]],
+         "paint": "body",
+         "shade": 1,
+         "group": "body"
+        },
+        {"kind": "poly", "points": [[2, 7], [-2, 7], [-1.6, 11.5000001], [1.6, 11.5000001]], "paint": "body", "shade": 1, "group": "body"},
+        {
+         "kind": "poly",
+         "points": [[-3.5355, 6.364], [-6.364, 3.5355], [-9.2631, 7.0004], [-7.0004, 9.2631]],
+         "paint": "body",
+         "shade": 1,
+         "group": "body"
+        },
+        {"kind": "poly", "points": [[-7, 2], [-7, -2], [-11.5, -1.6], [-11.5, 1.6]], "paint": "body", "shade": 1, "group": "body"},
+        {
+         "kind": "poly",
+         "points": [[-6.364, -3.5355], [-3.5355, -6.364], [-7.0004, -9.2631], [-9.2631, -7.0004]],
+         "paint": "body",
+         "shade": 1,
+         "group": "body"
+        },
+        {
+         "gen": "icon.rim",
+         "v": 1,
+         "shapes": [{"kind": "ellipse", "at": [0, 0], "r": [4.6, 4.6], "paint": "accent"}],
+         "minus": [{"kind": "ellipse", "at": [0, 0], "r": [1.9, 1.9], "paint": "accent"}],
+         "paint": "ink",
+         "over": true
+        },
+        {"kind": "ellipse", "at": [0, 0], "r": [4.6, 4.6], "paint": "accent", "shade": 1, "group": "accent"},
+        {"kind": "cut", "from": "accent", "shape": {"kind": "ellipse", "at": [0, 0], "r": [1.9, 1.9], "paint": "accent"}}
+       ]
+      }
+     ]
+    },
+    "sound": {
+     "label": "Sound",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {"from": "size", "map": [[0, 0], [1, 1]]},
+       "tilt": false,
+       "soften": false,
+       "shiny": {"from": "shine", "pick": {"true": true, "false": false}},
+       "plate": {"from": "backing", "pick": {"none": "none", "circle": "circle", "hex": "hex"}},
+       "face": "face",
+       "bold": {"from": "bold", "pick": {"true": true, "false": false}},
+       "draw": [
+        {"kind": "poly", "points": [[-11.5, -3.6], [-6, -3.6], [-6, 3.6], [-11.5, 3.6]], "paint": "body", "shade": 1, "group": "body"},
+        {"kind": "poly", "points": [[-6.6, -3.6], [0, -9.6], [0, 9.6], [-6.6, 3.6]], "paint": "body", "shade": 1, "group": "body"},
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [
+          {"kind": "ellipse", "at": [-0.6, 0], "r": [6.4, 6.4], "paint": "body", "group": "near"},
+          {"kind": "ellipse", "at": [-0.6, 0], "r": [11, 11], "paint": "body", "group": "far"}
+         ],
+         "holes": [
+          {"kind": "ellipse", "at": [-0.6, 0], "r": [4, 4], "paint": "body", "group": "near"},
+          {"kind": "ellipse", "at": [-0.6, 0], "r": [8.6, 8.6], "paint": "body", "group": "far"}
+         ],
+         "within": [{"kind": "poly", "points": [[2.4, -1.38], [40, -44.62], [40, 44.62], [2.4, 1.38]], "paint": "body"}],
+         "paint": "body",
+         "soft": 0
+        }
+       ]
+      }
+     ]
+    },
+    "mute": {
+     "label": "Mute",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {"from": "size", "map": [[0, 0], [1, 1]]},
+       "tilt": false,
+       "soften": false,
+       "shiny": {"from": "shine", "pick": {"true": true, "false": false}},
+       "plate": {"from": "backing", "pick": {"none": "none", "circle": "circle", "hex": "hex"}},
+       "face": "face",
+       "bold": {"from": "bold", "pick": {"true": true, "false": false}},
+       "draw": [
+        {"kind": "poly", "points": [[-11.5, -3.6], [-6, -3.6], [-6, 3.6], [-11.5, 3.6]], "paint": "body", "shade": 1, "group": "body"},
+        {"kind": "poly", "points": [[-6.6, -3.6], [0, -9.6], [0, 9.6], [-6.6, 3.6]], "paint": "body", "shade": 1, "group": "body"},
+        {"kind": "ellipse", "at": [3, -4], "r": [1.4, 1.4], "paint": "accent", "shade": 1, "group": "accent"},
+        {"kind": "ellipse", "at": [10.4, 4], "r": [1.4, 1.4], "paint": "accent", "shade": 1, "group": "accent"},
+        {
+         "kind": "poly",
+         "points": [[1.9723, -3.0493], [9.3723, 4.9507], [11.4277, 3.0493], [4.0277, -4.9507]],
+         "paint": "accent",
+         "shade": 1,
+         "group": "accent"
+        },
+        {"kind": "ellipse", "at": [3, 4], "r": [1.4, 1.4], "paint": "accent", "shade": 1, "group": "accent"},
+        {"kind": "ellipse", "at": [10.4, -4], "r": [1.4, 1.4], "paint": "accent", "shade": 1, "group": "accent"},
+        {
+         "kind": "poly",
+         "points": [[4.0277, 4.9507], [11.4277, -3.0493], [9.3723, -4.9507], [1.9723, 3.0493]],
+         "paint": "accent",
+         "shade": 1,
+         "group": "accent"
+        }
+       ]
+      }
+     ]
+    },
+    "music": {
+     "label": "Music",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {"from": "size", "map": [[0, 0], [1, 1]]},
+       "tilt": false,
+       "soften": false,
+       "shiny": {"from": "shine", "pick": {"true": true, "false": false}},
+       "plate": {"from": "backing", "pick": {"none": "none", "circle": "circle", "hex": "hex"}},
+       "face": "face",
+       "bold": {"from": "bold", "pick": {"true": true, "false": false}},
+       "draw": [
+        {"kind": "poly", "points": [[-4.2, -6.6], [-2, -6.6], [-2, 8], [-4.2, 8]], "paint": "body", "shade": 1, "group": "body"},
+        {"kind": "poly", "points": [[7.8, -9.2], [10, -9.2], [10, 5.4], [7.8, 5.4]], "paint": "body", "shade": 1, "group": "body"},
+        {"kind": "poly", "points": [[-4.2, -6.6], [10, -10.2], [10, -6.4], [-4.2, -2.8]], "paint": "body", "shade": 1, "group": "body"},
+        {"gen": "oval", "v": 1, "at": [-6.6, 8.2], "r": [4, 2.9], "turn": -24.0642, "paint": "body", "group": "body"},
+        {"gen": "oval", "v": 1, "at": [5.4, 5.6], "r": [4, 2.9], "turn": -24.0642, "paint": "body", "group": "body"}
+       ]
+      }
+     ]
+    },
+    "display": {
+     "label": "Display",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {"from": "size", "map": [[0, 0], [1, 1]]},
+       "tilt": false,
+       "soften": false,
+       "shiny": {"from": "shine", "pick": {"true": true, "false": false}},
+       "plate": {"from": "backing", "pick": {"none": "none", "circle": "circle", "hex": "hex"}},
+       "face": "face",
+       "bold": {"from": "bold", "pick": {"true": true, "false": false}},
+       "draw": [
+        {"kind": "poly", "points": [[-11.5, -8.4], [11.5, -8.4], [11.5, 6], [-11.5, 6]], "paint": "body", "shade": 1, "group": "body"},
+        {"kind": "poly", "points": [[-1.6, 6], [1.6, 6], [1.6, 9.4], [-1.6, 9.4]], "paint": "body", "shade": 1, "group": "body"},
+        {"kind": "poly", "points": [[-5.6, 9], [5.6, 9], [5.6, 11], [-5.6, 11]], "paint": "body", "shade": 1, "group": "body"},
+        {"kind": "poly", "points": [[-9.2, -6.2], [9.2, -6.2], [9.2, 3.8], [-9.2, 3.8]], "paint": "body-pane", "shade": 0, "light": 0},
+        {
+         "kind": "poly",
+         "points": [[-7, -5.5], [-3.4, -5.5], [-3.4, -4.1], [-7, -4.1]],
+         "paint": "body.light",
+         "shade": 0,
+         "light": 0,
+         "group": "body-light"
+        },
+        {
+         "kind": "poly",
+         "points": [[-7.7, -4.8], [-6.3, -4.8], [-6.3, -2.2], [-7.7, -2.2]],
+         "paint": "body.light",
+         "shade": 0,
+         "light": 0,
+         "group": "body-light"
+        },
+        {
+         "kind": "poly",
+         "points": [[3.4, -5.5], [7, -5.5], [7, -4.1], [3.4, -4.1]],
+         "paint": "body.light",
+         "shade": 0,
+         "light": 0,
+         "group": "body-light-2"
+        },
+        {
+         "kind": "poly",
+         "points": [[6.3, -4.8], [7.7, -4.8], [7.7, -2.2], [6.3, -2.2]],
+         "paint": "body.light",
+         "shade": 0,
+         "light": 0,
+         "group": "body-light-2"
+        },
+        {
+         "kind": "poly",
+         "points": [[-7, 1.7], [-3.4, 1.7], [-3.4, 3.1], [-7, 3.1]],
+         "paint": "body.light",
+         "shade": 0,
+         "light": 0,
+         "group": "body-light-3"
+        },
+        {
+         "kind": "poly",
+         "points": [[-7.7, -0.2], [-6.3, -0.2], [-6.3, 2.4], [-7.7, 2.4]],
+         "paint": "body.light",
+         "shade": 0,
+         "light": 0,
+         "group": "body-light-3"
+        },
+        {
+         "kind": "poly",
+         "points": [[3.4, 1.7], [7, 1.7], [7, 3.1], [3.4, 3.1]],
+         "paint": "body.light",
+         "shade": 0,
+         "light": 0,
+         "group": "body-light-4"
+        },
+        {
+         "kind": "poly",
+         "points": [[6.3, -0.2], [7.7, -0.2], [7.7, 2.4], [6.3, 2.4]],
+         "paint": "body.light",
+         "shade": 0,
+         "light": 0,
+         "group": "body-light-4"
+        }
+       ]
+      }
+     ]
+    },
+    "controls": {
+     "label": "Controls",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {"from": "size", "map": [[0, 0], [1, 1]]},
+       "tilt": false,
+       "soften": false,
+       "shiny": {"from": "shine", "pick": {"true": true, "false": false}},
+       "plate": {"from": "backing", "pick": {"none": "none", "circle": "circle", "hex": "hex"}},
+       "face": "face",
+       "bold": {"from": "bold", "pick": {"true": true, "false": false}},
+       "draw": [
+        {"kind": "ellipse", "at": [-6.4, -1.6], "r": [5.4, 5.4], "paint": "body", "shade": 1, "group": "body"},
+        {"kind": "ellipse", "at": [6.4, -1.6], "r": [5.4, 5.4], "paint": "body", "shade": 1, "group": "body"},
+        {"kind": "poly", "points": [[-6.4, 3.8], [6.4, 3.8], [6.4, -7], [-6.4, -7]], "paint": "body", "shade": 1, "group": "body"},
+        {"gen": "taper", "v": 1, "from": [-7.4, 0], "to": [-8.6, 5.6], "r0": 3.6, "r1": 2.9, "paint": "body", "group": "body"},
+        {"gen": "taper", "v": 1, "from": [7.4, 0], "to": [8.6, 5.6], "r0": 3.6, "r1": 2.9, "paint": "body", "group": "body"},
+        {
+         "kind": "poly",
+         "points": [[-8.8, -2.75], [-3.2, -2.75], [-3.2, -0.85], [-8.8, -0.85]],
+         "paint": "accent",
+         "shade": 0,
+         "light": 0,
+         "group": "accent"
+        },
+        {
+         "kind": "poly",
+         "points": [[-6.95, -4.6], [-5.05, -4.6], [-5.05, 1], [-6.95, 1]],
+         "paint": "accent",
+         "shade": 0,
+         "light": 0,
+         "group": "accent"
+        },
+        {"kind": "ellipse", "at": [5, -3.4], "r": [1.3, 1.3], "paint": "accent", "shade": 0, "light": 0, "group": "accent"},
+        {"kind": "ellipse", "at": [7.8, -0.6], "r": [1.3, 1.3], "paint": "accent", "shade": 0, "light": 0, "group": "accent"}
+       ]
+      }
+     ]
+    },
+    "language": {
+     "label": "Language",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {"from": "size", "map": [[0, 0], [1, 1]]},
+       "tilt": false,
+       "soften": false,
+       "shiny": {"from": "shine", "pick": {"true": true, "false": false}},
+       "plate": {"from": "backing", "pick": {"none": "none", "circle": "circle", "hex": "hex"}},
+       "face": "face",
+       "bold": {"from": "bold", "pick": {"true": true, "false": false}},
+       "draw": [
+        {"kind": "ellipse", "at": [0, 0], "r": [11.2, 11.2], "paint": "body", "shade": 1},
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [{"kind": "poly", "points": [[-11.2, -0.6], [11.2, -0.6], [11.2, 0.6], [-11.2, 0.6]], "paint": "body.dark"}],
+         "within": [{"kind": "ellipse", "at": [0, 0], "r": [11.2, 11.2], "paint": "body.dark"}],
+         "paint": "body.dark",
+         "flat": true
+        },
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [{"kind": "ellipse", "at": [0, 0], "r": [5.4, 11.2], "paint": "body.dark"}],
+         "holes": [{"kind": "ellipse", "at": [0, 0], "r": [4.2, 10], "paint": "body.dark"}],
+         "within": [{"kind": "ellipse", "at": [0, 0], "r": [11.2, 11.2], "paint": "body.dark"}],
+         "paint": "body.dark",
+         "flat": true
+        },
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [{"kind": "poly", "points": [[-11.2, -6.2], [11.2, -6.2], [11.2, -5], [-11.2, -5]], "paint": "body.dark"}],
+         "within": [{"kind": "ellipse", "at": [0, 0], "r": [11.2, 11.2], "paint": "body.dark"}],
+         "paint": "body.dark",
+         "flat": true
+        },
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [{"kind": "poly", "points": [[-11.2, 5], [11.2, 5], [11.2, 6.2], [-11.2, 6.2]], "paint": "body.dark"}],
+         "within": [{"kind": "ellipse", "at": [0, 0], "r": [11.2, 11.2], "paint": "body.dark"}],
+         "paint": "body.dark",
+         "flat": true
+        }
+       ]
+      }
+     ]
+    },
+    "save": {
+     "label": "Save",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {"from": "size", "map": [[0, 0], [1, 1]]},
+       "tilt": false,
+       "soften": false,
+       "shiny": {"from": "shine", "pick": {"true": true, "false": false}},
+       "plate": {"from": "backing", "pick": {"none": "none", "circle": "circle", "hex": "hex"}},
+       "face": "face",
+       "bold": {"from": "bold", "pick": {"true": true, "false": false}},
+       "draw": [
+        {"kind": "poly", "points": [[-11.5, 1.6], [11.5, 1.6], [11.5, 10.6], [-11.5, 10.6]], "paint": "body", "shade": 1, "group": "body"},
+        {"kind": "cut", "from": "body", "shape": {"kind": "poly", "points": [[-8.8, 1], [8.8, 1], [8.8, 7.8], [-8.8, 7.8]], "paint": "body"}},
+        {
+         "gen": "icon.rim",
+         "v": 1,
+         "shapes": [
+          {"kind": "poly", "points": [[2.2, -11.5], [2.2, -0.1], [-2.2, -0.1], [-2.2, -11.5]], "paint": "accent"},
+          {"kind": "poly", "points": [[0, 6], [-5.5, -0.6], [0, -0.6], [5.5, -0.6]], "paint": "accent"}
+         ],
+         "paint": "ink",
+         "over": true
+        },
+        {"kind": "poly", "points": [[2.2, -11.5], [2.2, -0.1], [-2.2, -0.1], [-2.2, -11.5]], "paint": "accent", "shade": 1, "group": "accent"},
+        {"kind": "poly", "points": [[0, 6], [-5.5, -0.6], [0, -0.6], [5.5, -0.6]], "paint": "accent", "shade": 1, "group": "accent"}
+       ]
+      }
+     ]
+    },
+    "pause": {
+     "label": "Pause",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {"from": "size", "map": [[0, 0], [1, 1]]},
+       "tilt": false,
+       "soften": false,
+       "shiny": {"from": "shine", "pick": {"true": true, "false": false}},
+       "fill": {"from": "backing", "pick": {"none": 1, "circle": 0.9, "hex": 0.9}},
+       "plate": {"from": "backing", "pick": {"none": "none", "circle": "circle", "hex": "hex"}},
+       "face": "face",
+       "bold": {"from": "bold", "pick": {"true": true, "false": false}},
+       "draw": [
+        {"kind": "poly", "points": [[-8.4, -10.4], [-2.6, -10.4], [-2.6, 10.4], [-8.4, 10.4]], "paint": "body", "shade": 1, "group": "body"},
+        {"kind": "poly", "points": [[2.6, -10.4], [8.4, -10.4], [8.4, 10.4], [2.6, 10.4]], "paint": "body", "shade": 1, "group": "body"}
+       ]
+      }
+     ]
+    },
+    "home": {
+     "label": "Home",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {"from": "size", "map": [[0, 0], [1, 1]]},
+       "tilt": false,
+       "soften": false,
+       "shiny": {"from": "shine", "pick": {"true": true, "false": false}},
+       "plate": {"from": "backing", "pick": {"none": "none", "circle": "circle", "hex": "hex"}},
+       "face": "face",
+       "bold": {"from": "bold", "pick": {"true": true, "false": false}},
+       "draw": [
+        {"kind": "poly", "points": [[-8.4, -1.4], [8.4, -1.4], [8.4, 10.6], [-8.4, 10.6]], "paint": "body", "shade": 1},
+        {
+         "gen": "icon.rim",
+         "v": 1,
+         "shapes": [{"kind": "poly", "points": [[-2.6, 3], [2.6, 3], [2.6, 10.6], [-2.6, 10.6]], "paint": "accent"}],
+         "paint": "ink",
+         "over": true
+        },
+        {"kind": "poly", "points": [[-2.6, 3], [2.6, 3], [2.6, 10.6], [-2.6, 10.6]], "paint": "accent", "shade": 1, "light": 0},
+        {
+         "gen": "icon.rim",
+         "v": 1,
+         "shapes": [
+          {"kind": "poly", "points": [[-11.5, 0.6], [0, -10.6], [11.5, 0.6]], "paint": "body.dark"},
+          {"kind": "poly", "points": [[4.4, -9.6], [7.6, -9.6], [7.6, -3.4], [4.4, -3.4]], "paint": "body.dark"}
+         ],
+         "paint": "ink"
+        },
+        {"kind": "poly", "points": [[-11.5, 0.6], [0, -10.6], [11.5, 0.6]], "paint": "body.dark", "shade": 1, "group": "body-dark"},
+        {"kind": "poly", "points": [[4.4, -9.6], [7.6, -9.6], [7.6, -3.4], [4.4, -3.4]], "paint": "body.dark", "shade": 1, "group": "body-dark"}
+       ]
+      }
+     ]
+    }
+   }
+  }
+ },
+ "clips": {
+  "settings": {"frames": 1, "fps": 1, "label": "Settings"},
+  "sound": {"frames": 1, "fps": 1, "label": "Sound"},
+  "mute": {"frames": 1, "fps": 1, "label": "Mute"},
+  "music": {"frames": 1, "fps": 1, "label": "Music"},
+  "display": {"frames": 1, "fps": 1, "label": "Display"},
+  "controls": {"frames": 1, "fps": 1, "label": "Controls"},
+  "language": {"frames": 1, "fps": 1, "label": "Language"},
+  "save": {"frames": 1, "fps": 1, "label": "Save"},
+  "pause": {"frames": 1, "fps": 1, "label": "Pause"},
+  "home": {"frames": 1, "fps": 1, "label": "Home"}
+ }
+}

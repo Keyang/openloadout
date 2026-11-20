@@ -1,0 +1,692 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "icons-tools",
+ "name": "Tool icons",
+ "blurb": "Eight tool icons: axe, pickaxe, shovel, hoe, hammer, sickle, watering can and fishing rod; change their size, tilt, shading, shine and the colours of the metal, the handles and the grips.",
+ "meta": {
+  "type": "icon",
+  "role": "items/icon",
+  "themes": ["neutral", "farm"],
+  "gameTypes": ["farming-sim", "top-down-rpg", "roguelike-action", "arcade"],
+  "view": "none",
+  "words": ["tool", "axe", "pickaxe", "shovel", "hoe", "hammer", "sickle", "watering can", "fishing rod", "chop", "dig", "farm", "craft", "equip"],
+  "license": "draft"
+ },
+ "size": [32, 32],
+ "pivot": [16, 16],
+ "grounded": false,
+ "preview": "axe",
+ "styles": ["pixel"],
+ "palette": [
+  {"id": "metal", "label": "Metal", "default": "#c2c9d6", "material": "metal", "swatches": ["#c2c9d6", "#f2c230", "#5d6475", "#a8806a", "#e6c545"]},
+  {"id": "wood", "label": "Handles", "default": "#a06a3c", "material": "wood", "swatches": ["#a06a3c", "#7a4f33", "#a8612a", "#c98a4a", "#f0ead8"]},
+  {
+   "id": "accent",
+   "label": "Grips",
+   "default": "#c9423a",
+   "material": "interface",
+   "swatches": ["#c9423a", "#3f6fd1", "#3f8a4f", "#7a4fc4", "#e08a2c"]
+  },
+  {"id": "water", "default": "#3f9fd1", "material": "paint", "detail": true},
+  {"id": "white", "default": "#ffffff", "material": "light", "detail": true},
+  {"id": "cream", "default": "#f0ead8", "material": "paint", "detail": true},
+  {"id": "metal-hued", "material": "metal", "derive": {"rule": "hued", "of": "metal", "against": ["wood"], "gap": 12}},
+  {"id": "grip-hued", "material": "cloth", "derive": {"rule": "hued", "of": "accent", "against": ["metal-hued"], "gap": 20}}
+ ],
+ "controls": [
+  {"key": "size", "kind": "range", "label": "Size", "lo": "Small", "hi": "Big", "default": 0.5},
+  {"key": "tilt", "kind": "toggle", "label": "Tilt", "default": true},
+  {"key": "shade", "kind": "toggle", "label": "Extra shading", "default": true},
+  {"key": "shine", "kind": "toggle", "label": "Shine", "default": true},
+  {"key": "metal", "kind": "colour", "label": "Metal"},
+  {"key": "wood", "kind": "colour", "label": "Handles"},
+  {"key": "accent", "kind": "colour", "label": "Grips"}
+ ],
+ "versions": [
+  {"name": "Toolshed", "params": {}},
+  {"name": "Gold tools", "params": {"metal": "#f2c230", "accent": "#3f6fd1"}},
+  {"name": "Dark handles", "params": {"wood": "#7a4f33", "accent": "#3f8a4f"}},
+  {"name": "Upright", "params": {"tilt": false}},
+  {"name": "Old iron", "params": {"metal": "#a8806a", "size": 1, "shine": false}}
+ ],
+ "body": {
+  "pictures": {
+   "draw": [],
+   "pictures": {
+    "axe": {
+     "label": "Axe",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {"from": "size", "map": [[0, 0], [1, 1]]},
+       "tilt": {"from": "tilt", "pick": {"true": true, "false": false}},
+       "turn": {"from": "tilt", "pick": {"true": 45, "false": 0}},
+       "soften": {"from": "shade", "pick": {"true": true, "false": false}},
+       "shiny": {"from": "shine", "pick": {"true": true, "false": false}},
+       "draw": [
+        {"kind": "poly", "points": [[-1.3, -10.6], [1.3, -10.6], [1.3, 11.5], [-1.3, 11.5]], "paint": "wood", "shade": 1},
+        {
+         "gen": "icon.rim",
+         "v": 1,
+         "shapes": [{"kind": "poly", "points": [[-1.7, -4.4], [1.7, -4.4], [1.7, -0.6], [-1.7, -0.6]], "paint": "grip-hued"}],
+         "paint": {"rule": "ramp", "of": "grip-hued", "tone": "dark"}
+        },
+        {"kind": "poly", "points": [[-1.7, -4.4], [1.7, -4.4], [1.7, -0.6], [-1.7, -0.6]], "paint": "grip-hued", "shade": 0, "light": 0},
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [
+          {"kind": "poly", "points": [[-2.8, -11.4], [2.2, -11.4], [2.2, -6], [-2.8, -6]], "paint": "metal-hued"},
+          {"kind": "poly", "points": [[2, -10.1], [5.2, -10.1], [5.2, -7.1], [2, -7.1]], "paint": "metal-hued"},
+          {"kind": "ellipse", "at": [3.6, -8.6], "r": [7.8, 8.2], "group": "p2", "paint": "metal-hued"}
+         ],
+         "holes": [
+          {"kind": "poly", "points": [[-60, -60], [4.6, -60], [4.6, 60], [-60, 60]], "paint": "metal-hued", "group": "p2"},
+          {"kind": "poly", "points": [[4.6, -10.2], [44.6, -56.2], [44.6, -60], [4.6, -60]], "group": "p2", "paint": "metal-hued"},
+          {"kind": "poly", "points": [[4.6, -7], [44.6, 39], [44.6, 60], [4.6, 60]], "group": "p2", "paint": "metal-hued"}
+         ],
+         "paint": "metal-hued",
+         "soft": 1,
+         "band": {"rule": "ramp", "of": "metal-hued", "tone": "dark"}
+        },
+        {
+         "kind": "ellipse",
+         "at": [3.6, -8.6],
+         "r": [7.8, 8.2],
+         "paint": {"rule": "ramp", "of": "metal-hued", "tone": "light"},
+         "shade": 0,
+         "light": 0,
+         "group": "part",
+         "when": {"shine": [true]}
+        },
+        {
+         "kind": "cut",
+         "from": "part",
+         "shape": {"kind": "poly", "points": [[-60, -60], [4.6, -60], [4.6, 60], [-60, 60]], "paint": {"rule": "ramp", "of": "metal-hued", "tone": "light"}},
+         "when": {"shine": [true]}
+        },
+        {
+         "kind": "cut",
+         "from": "part",
+         "shape": {
+          "kind": "poly",
+          "points": [[4.6, -10.2], [44.6, -56.2], [44.6, -60], [4.6, -60]],
+          "paint": {"rule": "ramp", "of": "metal-hued", "tone": "light"}
+         },
+         "when": {"shine": [true]}
+        },
+        {
+         "kind": "cut",
+         "from": "part",
+         "shape": {"kind": "poly", "points": [[4.6, -7], [44.6, 39], [44.6, 60], [4.6, 60]], "paint": {"rule": "ramp", "of": "metal-hued", "tone": "light"}},
+         "when": {"shine": [true]}
+        },
+        {
+         "kind": "cut",
+         "from": "part",
+         "shape": {"kind": "ellipse", "at": [3.6, -8.6], "r": [6.2, 6.6], "paint": {"rule": "ramp", "of": "metal-hued", "tone": "light"}},
+         "when": {"shine": [true]}
+        },
+        {
+         "kind": "ellipse",
+         "at": [3.6, -8.6],
+         "r": [7.8, 8.2],
+         "paint": "metal-hued",
+         "shade": 0,
+         "light": 0,
+         "group": "metal-hued",
+         "when": {"shine": [false]}
+        },
+        {
+         "kind": "cut",
+         "from": "metal-hued",
+         "shape": {"kind": "poly", "points": [[-60, -60], [4.6, -60], [4.6, 60], [-60, 60]], "paint": "metal-hued"},
+         "when": {"shine": [false]}
+        },
+        {
+         "kind": "cut",
+         "from": "metal-hued",
+         "shape": {"kind": "poly", "points": [[4.6, -10.2], [44.6, -56.2], [44.6, -60], [4.6, -60]], "paint": "metal-hued"},
+         "when": {"shine": [false]}
+        },
+        {
+         "kind": "cut",
+         "from": "metal-hued",
+         "shape": {"kind": "poly", "points": [[4.6, -7], [44.6, 39], [44.6, 60], [4.6, 60]], "paint": "metal-hued"},
+         "when": {"shine": [false]}
+        },
+        {
+         "kind": "cut",
+         "from": "metal-hued",
+         "shape": {"kind": "ellipse", "at": [3.6, -8.6], "r": [6.2, 6.6], "paint": "metal-hued"},
+         "when": {"shine": [false]}
+        }
+       ]
+      }
+     ]
+    },
+    "pickaxe": {
+     "label": "Pickaxe",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {"from": "size", "map": [[0, 0], [1, 1]]},
+       "tilt": {"from": "tilt", "pick": {"true": true, "false": false}},
+       "turn": {"from": "tilt", "pick": {"true": 45, "false": 0}},
+       "soften": {"from": "shade", "pick": {"true": true, "false": false}},
+       "shiny": {"from": "shine", "pick": {"true": true, "false": false}},
+       "draw": [
+        {"kind": "poly", "points": [[-1.3, -8], [1.3, -8], [1.3, 11.5], [-1.3, 11.5]], "paint": "wood", "shade": 1},
+        {
+         "gen": "icon.rim",
+         "v": 1,
+         "shapes": [{"kind": "poly", "points": [[-1.7, -5], [1.7, -5], [1.7, -1.2], [-1.7, -1.2]], "paint": "grip-hued"}],
+         "paint": {"rule": "ramp", "of": "grip-hued", "tone": "dark"}
+        },
+        {"kind": "poly", "points": [[-1.7, -5], [1.7, -5], [1.7, -1.2], [-1.7, -1.2]], "paint": "grip-hued", "shade": 0, "light": 0},
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [
+          {"gen": "taper", "v": 1, "from": [-11, -5.4], "to": [-4.4, -9.4], "r0": 0.6, "r1": 1.9, "paint": "metal-hued"},
+          {"kind": "ellipse", "at": [-4.4, -9.4], "r": [1.9, 1.9], "paint": "metal-hued"},
+          {"kind": "ellipse", "at": [4.4, -9.4], "r": [1.9, 1.9], "paint": "metal-hued"},
+          {"kind": "poly", "points": [[-4.4, -7.5], [4.4, -7.5], [4.4, -11.3], [-4.4, -11.3]], "paint": "metal-hued"},
+          {"gen": "taper", "v": 1, "from": [4.4, -9.4], "to": [11, -5.4], "r0": 1.9, "r1": 0.6, "paint": "metal-hued"},
+          {"kind": "poly", "points": [[-2.1, -12], [2.1, -12], [2.1, -7.6], [-2.1, -7.6]], "paint": "metal-hued"}
+         ],
+         "paint": "metal-hued",
+         "soft": 1,
+         "band": {"rule": "ramp", "of": "metal-hued", "tone": "dark"}
+        }
+       ]
+      }
+     ]
+    },
+    "shovel": {
+     "label": "Shovel",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {"from": "size", "map": [[0, 0], [1, 1]]},
+       "tilt": {"from": "tilt", "pick": {"true": true, "false": false}},
+       "turn": {"from": "tilt", "pick": {"true": 45, "false": 0}},
+       "soften": {"from": "shade", "pick": {"true": true, "false": false}},
+       "shiny": {"from": "shine", "pick": {"true": true, "false": false}},
+       "draw": [
+        {"kind": "poly", "points": [[-1.3, -6], [1.3, -6], [1.3, 11.5], [-1.3, 11.5]], "paint": "wood", "shade": 1},
+        {"kind": "poly", "points": [[-4, 9.5], [4, 9.5], [4, 12.1], [-4, 12.1]], "paint": "wood", "shade": 1},
+        {
+         "gen": "icon.rim",
+         "v": 1,
+         "shapes": [{"kind": "poly", "points": [[-1.7, -2.8], [1.7, -2.8], [1.7, 1], [-1.7, 1]], "paint": "grip-hued"}],
+         "paint": {"rule": "ramp", "of": "grip-hued", "tone": "dark"}
+        },
+        {"kind": "poly", "points": [[-1.7, -2.8], [1.7, -2.8], [1.7, 1], [-1.7, 1]], "paint": "grip-hued", "shade": 0, "light": 0},
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [
+          {"kind": "poly", "points": [[-5, -4.4], [5, -4.4], [5, -8.6], [0, -13.6], [-5, -8.6]], "paint": "metal-hued"},
+          {"kind": "poly", "points": [[-2, -4.6], [2, -4.6], [2, -2.8], [-2, -2.8]], "paint": "metal-hued"}
+         ],
+         "paint": "metal-hued",
+         "soft": 1,
+         "band": {"rule": "hueTone", "of": "metal-hued", "tone": "dark"},
+         "middle": {"rule": "hueTone", "of": "metal-hued", "tone": "mid"},
+         "highlight": {"rule": "hueTone", "of": "metal-hued", "tone": "light"}
+        },
+        {
+         "kind": "poly",
+         "points": [[0, -13.6], [5, -8.6], [5, -4.4], [3, -4.4], [3, -8.6]],
+         "paint": {"rule": "hueTone", "of": "metal-hued", "tone": "light"},
+         "shade": 0,
+         "light": 0,
+         "when": {"shine": [true]}
+        },
+        {
+         "kind": "poly",
+         "points": [[0, -13.6], [5, -8.6], [5, -4.4], [3, -4.4], [3, -8.6]],
+         "paint": "metal-hued",
+         "shade": 0,
+         "light": 0,
+         "when": {"shine": [false]}
+        }
+       ]
+      }
+     ]
+    },
+    "hoe": {
+     "label": "Hoe",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {"from": "size", "map": [[0, 0], [1, 1]]},
+       "tilt": {"from": "tilt", "pick": {"true": true, "false": false}},
+       "turn": {"from": "tilt", "pick": {"true": 45, "false": 0}},
+       "soften": {"from": "shade", "pick": {"true": true, "false": false}},
+       "shiny": {"from": "shine", "pick": {"true": true, "false": false}},
+       "draw": [
+        {"kind": "poly", "points": [[-1.3, -8], [1.3, -8], [1.3, 11.5], [-1.3, 11.5]], "paint": "wood", "shade": 1},
+        {
+         "gen": "icon.rim",
+         "v": 1,
+         "shapes": [{"kind": "poly", "points": [[-1.7, -5], [1.7, -5], [1.7, -1.2], [-1.7, -1.2]], "paint": "grip-hued"}],
+         "paint": {"rule": "ramp", "of": "grip-hued", "tone": "dark"}
+        },
+        {"kind": "poly", "points": [[-1.7, -5], [1.7, -5], [1.7, -1.2], [-1.7, -1.2]], "paint": "grip-hued", "shade": 0, "light": 0},
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [
+          {"kind": "poly", "points": [[-1.9, -11.8], [1.9, -11.8], [1.9, -8.4], [-1.9, -8.4]], "paint": "metal-hued"},
+          {"kind": "poly", "points": [[1.6, -11.8], [8, -11.8], [9.6, -4.6], [5.8, -4.6], [5, -8.6], [1.6, -8.6]], "paint": "metal-hued"}
+         ],
+         "paint": "metal-hued",
+         "soft": 1,
+         "band": {"rule": "ramp", "of": "metal-hued", "tone": "dark"}
+        }
+       ]
+      }
+     ]
+    },
+    "hammer": {
+     "label": "Hammer",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {"from": "size", "map": [[0, 0], [1, 1]]},
+       "tilt": {"from": "tilt", "pick": {"true": true, "false": false}},
+       "turn": {"from": "tilt", "pick": {"true": 45, "false": 0}},
+       "soften": {"from": "shade", "pick": {"true": true, "false": false}},
+       "shiny": {"from": "shine", "pick": {"true": true, "false": false}},
+       "draw": [
+        {"kind": "poly", "points": [[-1.3, -8], [1.3, -8], [1.3, 11.5], [-1.3, 11.5]], "paint": "wood", "shade": 1},
+        {
+         "gen": "icon.rim",
+         "v": 1,
+         "shapes": [{"kind": "poly", "points": [[-1.7, -5], [1.7, -5], [1.7, -1.2], [-1.7, -1.2]], "paint": "grip-hued"}],
+         "paint": {"rule": "ramp", "of": "grip-hued", "tone": "dark"}
+        },
+        {"kind": "poly", "points": [[-1.7, -5], [1.7, -5], [1.7, -1.2], [-1.7, -1.2]], "paint": "grip-hued", "shade": 0, "light": 0},
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [
+          {"kind": "poly", "points": [[-7.4, -12.4], [5, -12.4], [5, -6.2], [-7.4, -6.2]], "paint": "metal-hued"},
+          {"kind": "poly", "points": [[5, -11.6], [7.4, -11.6], [7.4, -7], [5, -7]], "paint": "metal-hued"}
+         ],
+         "paint": "metal-hued",
+         "soft": 1,
+         "band": {"rule": "ramp", "of": "metal-hued", "tone": "dark"}
+        },
+        {
+         "kind": "poly",
+         "points": [[5, -11.6], [7.4, -11.6], [7.4, -7], [5, -7]],
+         "paint": {"rule": "ramp", "of": "metal-hued", "tone": "light"},
+         "shade": 0,
+         "light": 0,
+         "when": {"shine": [true]}
+        },
+        {
+         "kind": "poly",
+         "points": [[5, -11.6], [7.4, -11.6], [7.4, -7], [5, -7]],
+         "paint": "metal-hued",
+         "shade": 0,
+         "light": 0,
+         "when": {"shine": [false]}
+        }
+       ]
+      }
+     ]
+    },
+    "sickle": {
+     "label": "Sickle",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {"from": "size", "map": [[0, 0], [1, 1]]},
+       "tilt": true,
+       "turn": {"from": "tilt", "pick": {"true": 45, "false": 26.5651}},
+       "soften": {"from": "shade", "pick": {"true": true, "false": false}},
+       "shiny": {"from": "shine", "pick": {"true": true, "false": false}},
+       "draw": [
+        {"kind": "poly", "points": [[-6, -1], [-3.2, -1], [-3.2, 13.4], [-6, 13.4]], "paint": "wood", "shade": 1},
+        {
+         "gen": "icon.rim",
+         "v": 1,
+         "shapes": [{"kind": "poly", "points": [[-6.4, -1], [-2.8, -1], [-2.8, 2], [-6.4, 2]], "paint": "grip-hued"}],
+         "paint": {"rule": "ramp", "of": "grip-hued", "tone": "dark"}
+        },
+        {"kind": "poly", "points": [[-6.4, -1], [-2.8, -1], [-2.8, 2], [-6.4, 2]], "paint": "grip-hued", "shade": 0, "light": 0},
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [
+          {"kind": "ellipse", "at": [2.8, -2.4], "r": [8.4, 8.6], "group": "p0", "paint": "metal-hued"},
+          {"kind": "poly", "points": [[-6.1, -3], [-3.1, -3], [-3.1, -0.6], [-6.1, -0.6]], "paint": "metal-hued"}
+         ],
+         "holes": [
+          {"kind": "ellipse", "at": [3.4, 0.2], "r": [7.4, 8], "group": "p0", "paint": "metal-hued"},
+          {"kind": "poly", "points": [[-60, 2.2], [60, 2.2], [60, 60], [-60, 60]], "paint": "metal-hued", "group": "p0"},
+          {"kind": "poly", "points": [[-3.4, -2.4], [2.8, -2.4], [2.8, 60], [-3.4, 60]], "paint": "metal-hued", "group": "p0"}
+         ],
+         "paint": "metal-hued",
+         "soft": 1,
+         "band": {"rule": "hueTone", "of": "metal-hued", "tone": "dark"},
+         "middle": {"rule": "hueTone", "of": "metal-hued", "tone": "mid"},
+         "highlight": {"rule": "hueTone", "of": "metal-hued", "tone": "light"}
+        }
+       ]
+      }
+     ]
+    },
+    "watering-can": {
+     "label": "Watering can",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {"from": "size", "map": [[0, 0], [1, 1]]},
+       "tilt": {"from": "tilt", "pick": {"true": true, "false": false}},
+       "turn": {"from": "tilt", "pick": {"true": 26.5651, "false": 0}},
+       "soften": {"from": "shade", "pick": {"true": true, "false": false}},
+       "shiny": {"from": "shine", "pick": {"true": true, "false": false}},
+       "draw": [
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [
+          {"kind": "ellipse", "at": [-3.5, -2.6], "r": [6.6, 6.6], "group": "p0", "paint": "metal-hued"},
+          {"gen": "taper", "v": 1, "from": [1.6, 6], "to": [8.6, -6.4], "r0": 1.5, "r1": 1.1, "paint": "metal-hued"},
+          {"gen": "oval", "v": 1, "at": [8.6, -6.4], "r": [1.4, 3.3], "turn": -53.2851, "paint": "metal-hued"}
+         ],
+         "holes": [
+          {"kind": "ellipse", "at": [-3.5, -2.6], "r": [4.7, 4.7], "group": "p0", "paint": "metal-hued"},
+          {"kind": "poly", "points": [[-60, -2.6], [60, -2.6], [60, 60], [-60, 60]], "paint": "metal-hued", "group": "p0"}
+         ],
+         "paint": "metal-hued",
+         "soft": 0,
+         "band": {"rule": "ramp", "of": "metal-hued", "tone": "dark"}
+        },
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [
+          {"kind": "poly", "points": [[-10, -2.4], [3, -2.4], [3, 9.4], [-10, 9.4]], "paint": "metal-hued"},
+          {"kind": "ellipse", "at": [-3.5, -2.4], "r": [6.5, 2.6], "paint": "metal-hued"}
+         ],
+         "paint": "metal-hued",
+         "band": {"rule": "ramp", "of": "metal-hued", "tone": "dark"}
+        },
+        {
+         "gen": "icon.rim",
+         "v": 1,
+         "shapes": [
+          {"kind": "poly", "points": [[-10, -2.4], [3, -2.4], [3, 9.4], [-10, 9.4]], "paint": "grip-hued"},
+          {"kind": "ellipse", "at": [-3.5, -2.4], "r": [6.5, 2.6], "paint": "grip-hued"}
+         ],
+         "within": [{"kind": "poly", "points": [[-60, 2.4], [60, 2.4], [60, 5.4], [-60, 5.4]], "paint": "grip-hued"}],
+         "paint": {"rule": "ramp", "of": "metal-hued", "tone": "dark"}
+        },
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [
+          {"kind": "poly", "points": [[-10, -2.4], [3, -2.4], [3, 9.4], [-10, 9.4]], "paint": "grip-hued"},
+          {"kind": "ellipse", "at": [-3.5, -2.4], "r": [6.5, 2.6], "paint": "grip-hued"}
+         ],
+         "within": [{"kind": "poly", "points": [[-60, 2.4], [60, 2.4], [60, 5.4], [-60, 5.4]], "paint": "grip-hued"}],
+         "paint": "grip-hued",
+         "flat": true
+        },
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [
+          {"gen": "taper", "v": 1, "from": [11.2, -3], "to": [11.2, -1.2], "r0": 0.4, "r1": 1, "paint": "water"},
+          {"gen": "taper", "v": 1, "from": [8.8, 0], "to": [8.8, 1.8], "r0": 0.4, "r1": 1, "paint": "water"},
+          {"gen": "taper", "v": 1, "from": [11.6, 2.8], "to": [11.6, 4.6], "r0": 0.4, "r1": 1, "paint": "water"}
+         ],
+         "paint": "water",
+         "soft": 0
+        },
+        {"gen": "icon.glint", "v": 2, "at": [0, -1], "paint": "white"}
+       ]
+      }
+     ]
+    },
+    "fishing-rod": {
+     "label": "Fishing rod",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {"from": "size", "map": [[0, 0], [1, 1]]},
+       "tilt": true,
+       "turn": {"from": "tilt", "pick": {"true": 45, "false": 26.5651}},
+       "soften": {"from": "shade", "pick": {"true": true, "false": false}},
+       "shiny": {"from": "shine", "pick": {"true": true, "false": false}},
+       "draw": [
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [
+          {"gen": "taper", "v": 1, "from": [0, 11.5], "to": [0.6, -5], "r0": 1.5, "r1": 0.9, "paint": "wood"},
+          {"gen": "taper", "v": 1, "from": [0.6, -5], "to": [2, -9.4], "r0": 0.9, "r1": 0.7, "paint": "wood"},
+          {"gen": "taper", "v": 1, "from": [2, -9.4], "to": [4.2, -11.5], "r0": 0.7, "r1": 0.6, "paint": "wood"}
+         ],
+         "paint": "wood",
+         "soft": 0
+        },
+        {"gen": "icon.line", "v": 2, "path": [4.2, -11.5, 13.3924, -2.3076], "paint": "cream", "when": {"tilt": [true]}},
+        {"gen": "icon.line", "v": 2, "path": [4.2, -11.5, 10.0138, 0.1276], "paint": "cream", "when": {"tilt": [false]}},
+        {"kind": "ellipse", "at": [2.9, 5], "r": [2.6, 2.6], "paint": "metal-hued", "shade": 1, "group": "metal-hued"},
+        {"kind": "poly", "points": [[-0.4, 4.2], [2.4, 4.2], [2.4, 5.8], [-0.4, 5.8]], "paint": "metal-hued", "shade": 1, "group": "metal-hued"},
+        {
+         "kind": "ellipse",
+         "at": [13.3924, -2.3076],
+         "r": [0.6, 0.6],
+         "paint": "metal-hued",
+         "shade": 0,
+         "light": 0,
+         "group": "metal-hued-2",
+         "when": {"tilt": [true]}
+        },
+        {
+         "kind": "ellipse",
+         "at": [15.0894, -0.6106],
+         "r": [0.6, 0.6],
+         "paint": "metal-hued",
+         "shade": 0,
+         "light": 0,
+         "group": "metal-hued-2",
+         "when": {"tilt": [true]}
+        },
+        {
+         "kind": "poly",
+         "points": [[12.9681, -1.8833], [14.6652, -0.1863], [15.5137, -1.0348], [13.8167, -2.7319]],
+         "paint": "metal-hued",
+         "shade": 0,
+         "light": 0,
+         "group": "metal-hued-2",
+         "when": {"tilt": [true]}
+        },
+        {
+         "kind": "ellipse",
+         "at": [15.0894, -0.6106],
+         "r": [0.6, 0.6],
+         "paint": "metal-hued",
+         "shade": 0,
+         "light": 0,
+         "group": "metal-hued-2",
+         "when": {"tilt": [true]}
+        },
+        {
+         "kind": "ellipse",
+         "at": [16.5037, -1.7419],
+         "r": [0.6, 0.6],
+         "paint": "metal-hued",
+         "shade": 0,
+         "light": 0,
+         "group": "metal-hued-2",
+         "when": {"tilt": [true]}
+        },
+        {
+         "kind": "poly",
+         "points": [[15.4643, -0.142], [16.8785, -1.2734], [16.1288, -2.2104], [14.7146, -1.0791]],
+         "paint": "metal-hued",
+         "shade": 0,
+         "light": 0,
+         "group": "metal-hued-2",
+         "when": {"tilt": [true]}
+        },
+        {
+         "kind": "ellipse",
+         "at": [16.5037, -1.7419],
+         "r": [0.6, 0.6],
+         "paint": "metal-hued",
+         "shade": 0,
+         "light": 0,
+         "group": "metal-hued-2",
+         "when": {"tilt": [true]}
+        },
+        {
+         "kind": "ellipse",
+         "at": [15.938, -2.8733],
+         "r": [0.6, 0.6],
+         "paint": "metal-hued",
+         "shade": 0,
+         "light": 0,
+         "group": "metal-hued-2",
+         "when": {"tilt": [true]}
+        },
+        {
+         "kind": "poly",
+         "points": [[17.0403, -2.0103], [16.4746, -3.1416], [15.4013, -2.605], [15.967, -1.4736]],
+         "paint": "metal-hued",
+         "shade": 0,
+         "light": 0,
+         "group": "metal-hued-2",
+         "when": {"tilt": [true]}
+        },
+        {
+         "kind": "ellipse",
+         "at": [10.0138, 0.1276],
+         "r": [0.6, 0.6],
+         "paint": "metal-hued",
+         "shade": 0,
+         "light": 0,
+         "group": "metal-hued-3",
+         "when": {"tilt": [false]}
+        },
+        {
+         "kind": "ellipse",
+         "at": [11.0871, 2.2742],
+         "r": [0.6, 0.6],
+         "paint": "metal-hued",
+         "shade": 0,
+         "light": 0,
+         "group": "metal-hued-3",
+         "when": {"tilt": [false]}
+        },
+        {
+         "kind": "poly",
+         "points": [[9.4771, 0.3959], [10.5504, 2.5425], [11.6237, 2.0059], [10.5504, -0.1408]],
+         "paint": "metal-hued",
+         "shade": 0,
+         "light": 0,
+         "group": "metal-hued-3",
+         "when": {"tilt": [false]}
+        },
+        {
+         "kind": "ellipse",
+         "at": [11.0871, 2.2742],
+         "r": [0.6, 0.6],
+         "paint": "metal-hued",
+         "shade": 0,
+         "light": 0,
+         "group": "metal-hued-3",
+         "when": {"tilt": [false]}
+        },
+        {
+         "kind": "ellipse",
+         "at": [12.7865, 1.6481],
+         "r": [0.6, 0.6],
+         "paint": "metal-hued",
+         "shade": 0,
+         "light": 0,
+         "group": "metal-hued-3",
+         "when": {"tilt": [false]}
+        },
+        {
+         "kind": "poly",
+         "points": [[11.2945, 2.8372], [12.9939, 2.2111], [12.5791, 1.0851], [10.8797, 1.7112]],
+         "paint": "metal-hued",
+         "shade": 0,
+         "light": 0,
+         "group": "metal-hued-3",
+         "when": {"tilt": [false]}
+        },
+        {
+         "kind": "ellipse",
+         "at": [12.7865, 1.6481],
+         "r": [0.6, 0.6],
+         "paint": "metal-hued",
+         "shade": 0,
+         "light": 0,
+         "group": "metal-hued-3",
+         "when": {"tilt": [false]}
+        },
+        {
+         "kind": "ellipse",
+         "at": [12.6076, 0.3959],
+         "r": [0.6, 0.6],
+         "paint": "metal-hued",
+         "shade": 0,
+         "light": 0,
+         "group": "metal-hued-3",
+         "when": {"tilt": [false]}
+        },
+        {
+         "kind": "poly",
+         "points": [[13.3805, 1.5632], [13.2016, 0.311], [12.0136, 0.4807], [12.1925, 1.7329]],
+         "paint": "metal-hued",
+         "shade": 0,
+         "light": 0,
+         "group": "metal-hued-3",
+         "when": {"tilt": [false]}
+        }
+       ]
+      }
+     ]
+    }
+   }
+  }
+ },
+ "clips": {
+  "axe": {"frames": 1, "fps": 1, "label": "Axe"},
+  "pickaxe": {"frames": 1, "fps": 1, "label": "Pickaxe"},
+  "shovel": {"frames": 1, "fps": 1, "label": "Shovel"},
+  "hoe": {"frames": 1, "fps": 1, "label": "Hoe"},
+  "hammer": {"frames": 1, "fps": 1, "label": "Hammer"},
+  "sickle": {"frames": 1, "fps": 1, "label": "Sickle"},
+  "watering-can": {"frames": 1, "fps": 1, "label": "Watering can"},
+  "fishing-rod": {"frames": 1, "fps": 1, "label": "Fishing rod"}
+ }
+}

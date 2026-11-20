@@ -1,0 +1,256 @@
+{
+ "id": "coin-pouch",
+ "frozen": "2026-11-20",
+ "source": "sprites/coin-pouch.js",
+ "sha256": "206890b31f4a2fc7f6db7a6b9648134b025f79e06a5b670de1b226963b70fd89",
+ "name": "Money pouch",
+ "blurb": "A floating purse, sack or stack of coins worth a lot of money. Change its kind, size, fullness, spilled coins, sparkle and colours.",
+ "meta": {
+  "type": "pickup",
+  "role": "items/pickup",
+  "themes": [
+   "neutral",
+   "fantasy"
+  ],
+  "gameTypes": [
+   "platformer",
+   "top-down-rpg",
+   "arcade",
+   "turn-based-rpg"
+  ],
+  "view": "front",
+  "words": [
+   "money",
+   "pouch",
+   "purse",
+   "sack",
+   "coins",
+   "gold",
+   "loot",
+   "treasure",
+   "cash",
+   "wealth",
+   "collect",
+   "reward",
+   "bag"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  30
+ ],
+ "grounded": false,
+ "preview": "idle",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "shape": {
+   "kind": "choice",
+   "label": "Shape",
+   "def": "pouch",
+   "options": [
+    {
+     "value": "pouch",
+     "label": "Pouch"
+    },
+    {
+     "value": "sack",
+     "label": "Sack"
+    },
+    {
+     "value": "stack",
+     "label": "Stack"
+    }
+   ],
+   "group": "Look"
+  },
+  "fullness": {
+   "kind": "range",
+   "label": "Fullness",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Lean",
+   "hi": "Bulging",
+   "group": "Look"
+  },
+  "spill": {
+   "kind": "toggle",
+   "label": "Spill",
+   "def": true,
+   "group": "Look"
+  },
+  "sparkle": {
+   "kind": "toggle",
+   "label": "Sparkle",
+   "def": true,
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Leather",
+   "def": "#a06a3c",
+   "swatches": [
+    "#a06a3c",
+    "#7a4f33",
+    "#f0ead8",
+    "#a8612a",
+    "#5a3a22"
+   ],
+   "group": "Colors",
+   "when": {
+    "shape": [
+     "pouch",
+     "sack"
+    ]
+   }
+  },
+  "metal": {
+   "kind": "color",
+   "label": "Metal",
+   "def": "#f2c230",
+   "swatches": [
+    "#f2c230",
+    "#c2c9d6",
+    "#8f97a8",
+    "#5d6475",
+    "#e6c545"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Rope",
+   "def": "#c9423a",
+   "swatches": [
+    "#c9423a",
+    "#7a4fc4",
+    "#4fd8ee",
+    "#a4c44a",
+    "#3f6fd1"
+   ],
+   "group": "Colors",
+   "when": {
+    "shape": [
+     "pouch",
+     "sack"
+    ]
+   }
+  },
+  "bob": {
+   "kind": "range",
+   "label": "Float",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Still",
+   "hi": "Floaty",
+   "group": "Motion"
+  },
+  "pop": {
+   "kind": "range",
+   "label": "Pop height",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Low",
+   "hi": "High",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "collect": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    9,
+    15,
+    20
+   ]
+  }
+ },
+ "sounds": {
+  "collect": [
+   {
+    "sound": "credit-pickup",
+    "preset": "Big payout",
+    "frame": 1,
+    "volume": 0.7
+   }
+  ]
+ },
+ "versions": [
+  {
+   "name": "Coin pouch",
+   "params": {}
+  },
+  {
+   "name": "Loot sack",
+   "params": {
+    "shape": "sack",
+    "fullness": 1,
+    "body": "#f0ead8"
+   }
+  },
+  {
+   "name": "Gold stack",
+   "params": {
+    "shape": "stack",
+    "fullness": 0.8
+   }
+  },
+  {
+   "name": "Silver purse",
+   "params": {
+    "metal": "#c2c9d6",
+    "body": "#7a4f33"
+   }
+  },
+  {
+   "name": "Lean purse",
+   "params": {
+    "fullness": 0,
+    "spill": false,
+    "size": 0.3
+   }
+  }
+ ],
+ "bundles": []
+}

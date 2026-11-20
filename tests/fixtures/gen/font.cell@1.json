@@ -1,0 +1,183 @@
+{
+ "id": "font.cell",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     4,
+     13
+    ],
+    "style": "chunky",
+    "row": "upper",
+    "paint": "body"
+   },
+   "ctx": {
+    "frame": 0
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      3,
+      5
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..aaaa..",
+      ".abbbba.",
+      "abbaabba",
+      "abbaabba",
+      "abbbbbba",
+      "abbaabba",
+      "abbaabba",
+      "abbaabba",
+      ".aa..aa."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     4,
+     13
+    ],
+    "style": "serif",
+    "row": "lower",
+    "size": 1,
+    "outline": "rimmed",
+    "paint": "body",
+    "edge": "edge",
+    "shadow": true,
+    "shine": true
+   },
+   "ctx": {
+    "frame": 6
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      1,
+      5
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...aaaaaa..",
+      "..abccccca.",
+      ".abcddddcca",
+      "aabddaaddca",
+      "aabddaaddca",
+      "aabddaaddca",
+      "aabeeaaeeca",
+      "aabbeeeeeca",
+      "aaabbbbeeca",
+      ".abcccceeca",
+      "aabeeeeecba",
+      "aabbbbbbba.",
+      "aaaaaaaaa..",
+      ".aaaaaaa..."
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "tone",
+       "of": "edge",
+       "by": -1
+      },
+      "c": "edge",
+      "d": "body.light",
+      "e": "body"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     0,
+     0
+    ],
+    "style": "slim",
+    "row": "digits",
+    "size": 0,
+    "outline": "none",
+    "paint": "body",
+    "shadow": true
+   },
+   "ctx": {
+    "frame": 7
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      -1,
+      -5
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aaa",
+      "bbba",
+      "..ba",
+      "..ba",
+      "..ba",
+      "..b."
+     ],
+     "key": {
+      "a": "body",
+      "b": "ink"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     10,
+     15
+    ],
+    "style": "rounded",
+    "row": "marks",
+    "size": 0.6,
+    "outline": "ink",
+    "paint": "body",
+    "shine": true
+   },
+   "ctx": {
+    "frame": 17
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      9,
+      7
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..aa.....",
+      ".abba....",
+      "abaaba...",
+      "abaabaa..",
+      ".accaaca.",
+      "acaacaca.",
+      "acaaacaa.",
+      ".acccacca",
+      "..aaa.aa."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body.light",
+      "c": "body"
+     }
+    }
+   ]
+  }
+ ]
+}

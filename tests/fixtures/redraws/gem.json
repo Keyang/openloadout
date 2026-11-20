@@ -1,0 +1,177 @@
+{
+ "id": "gem",
+ "frozen": "2026-11-20",
+ "source": "sprites/gem.js",
+ "sha256": "b1ad52b15734a4241cf4ebfa4412bc6418f2a9af211e5c893be21d85f7c4b602",
+ "name": "Gem",
+ "blurb": "A floating cut jewel that glints, worth more than a coin. Change its cut, size, cut lines, sparkle and colour.",
+ "meta": {
+  "type": "pickup",
+  "role": "items/pickup",
+  "themes": [
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "platformer",
+   "arcade",
+   "puzzle"
+  ],
+  "view": "front",
+  "words": [
+   "gem",
+   "jewel",
+   "diamond",
+   "crystal",
+   "emerald",
+   "ruby",
+   "treasure",
+   "loot",
+   "collect",
+   "pickup",
+   "reward",
+   "score",
+   "shiny"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  30
+ ],
+ "grounded": false,
+ "preview": "idle",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "shape": {
+   "kind": "choice",
+   "label": "Shape",
+   "def": "diamond",
+   "options": [
+    {
+     "value": "diamond",
+     "label": "Diamond"
+    },
+    {
+     "value": "emerald",
+     "label": "Emerald"
+    },
+    {
+     "value": "round",
+     "label": "Round"
+    },
+    {
+     "value": "shard",
+     "label": "Shard"
+    }
+   ],
+   "group": "Look"
+  },
+  "facets": {
+   "kind": "toggle",
+   "label": "Cut lines",
+   "def": true,
+   "group": "Look"
+  },
+  "sparkle": {
+   "kind": "toggle",
+   "label": "Sparkle",
+   "def": true,
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Gem",
+   "def": "#4fd8ee",
+   "swatches": [
+    "#4fd8ee",
+    "#c9423a",
+    "#a4c44a",
+    "#7a4fc4",
+    "#f2c230"
+   ],
+   "group": "Colors"
+  },
+  "bob": {
+   "kind": "range",
+   "label": "Float",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Still",
+   "hi": "Floaty",
+   "group": "Motion"
+  },
+  "pop": {
+   "kind": "range",
+   "label": "Pop height",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Low",
+   "hi": "High",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  },
+  "collect": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    9,
+    15,
+    20
+   ]
+  }
+ },
+ "sounds": {
+  "collect": [
+   {
+    "sound": "gem-pickup",
+    "preset": "Gem",
+    "frame": 1,
+    "volume": 0.7
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-platformer-fantasy"
+ ]
+}

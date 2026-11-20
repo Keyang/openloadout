@@ -1,0 +1,45 @@
+{ "format": "loadout-sprite",
+  "version": 2,
+  "id": "ui-name-plate",
+  "name": "Name plate",
+  "blurb": "A small stretchable plate for a name over a character, with a level badge, a lit state for the one targeted and a notch pointing down; change its style, corners, band, shadow and colours.",
+  "meta": {"type": "ui", "role": "interface/panel", "themes": ["neutral"], "gameTypes": ["arcade", "top-down-rpg", "turn-based-rpg", "roguelike-action"], "view": "none", "words": ["name", "plate", "label", "tag", "nameplate", "level", "target", "banner"], "license": "draft"},
+  "size": [64,16],
+  "pivot": [32,15],
+  "grounded": false,
+  "preview": "plate",
+  "styles": ["pixel"],
+  "palette": [
+  {"id": "face", "label": "Plate", "default": "#3f5068", "material": "interface", "swatches": ["#3f5068", "#7a4f33", "#434d6d", "#8e3a4a"]},
+  {"id": "frame", "label": "Band", "default": "#f0ead8", "material": "paint", "swatches": ["#f0ead8", "#8fd0f0", "#9bd18a", "#c2c9d6", "#f6d3b0"]},
+  {"id": "accent", "label": "Badge and arrows", "default": "#f2c230", "material": "interface", "swatches": ["#f2c230", "#c9423a", "#4fd8ee", "#a4c44a", "#e08a2c"]} ],
+  "controls": [
+  {"key": "style", "kind": "choice", "label": "Style", "options": ["plain", "ribbon", "pointed"], "default": "plain"},
+  {"key": "corner", "kind": "range", "label": "Corner", "lo": "Square", "hi": "Round", "default": 0.5, "when": {"style": ["plain"]}},
+  {"key": "border", "kind": "range", "label": "Border", "lo": "Thin", "hi": "Thick", "default": 0.5},
+  {"key": "shadow", "kind": "toggle", "label": "Shadow", "default": true},
+  {"key": "face", "kind": "colour", "label": "Plate"},
+  {"key": "frame", "kind": "colour", "label": "Band"},
+  {"key": "accent", "kind": "colour", "label": "Badge and arrows"} ],
+  "body": { "panel": {
+    "piece": {"gen": "name.plate", "v": 1, "at": [32,8], "clip": ["plate"], "picture": "plate", "style": {"from": "style", "pick": {"plain": "plain", "ribbon": "ribbon", "pointed": "pointed"}}, "corner": {"from": "corner", "map": [[0,0], [1,1]], "round": "none"}, "border": {"from": "border", "map": [[0,0], [1,1]], "round": "none"}, "shadow": {"from": "shadow", "pick": {"true": true, "false": false}}, "face": "face", "frame": "frame", "accent": "accent"},
+    "states": [
+    "plate",
+    "plate-badge",
+    "plate-lit",
+    "pointer" ],
+    "draw": [
+    {"gen": "name.plate", "v": 1, "at": [32,8], "clip": ["plate-badge"], "picture": "plate-badge", "style": {"from": "style", "pick": {"plain": "plain", "ribbon": "ribbon", "pointed": "pointed"}}, "corner": {"from": "corner", "map": [[0,0], [1,1]], "round": "none"}, "border": {"from": "border", "map": [[0,0], [1,1]], "round": "none"}, "shadow": {"from": "shadow", "pick": {"true": true, "false": false}}, "face": "face", "frame": "frame", "accent": "accent"},
+    {"gen": "name.plate", "v": 1, "at": [32,8], "clip": ["plate-lit"], "picture": "plate-lit", "style": {"from": "style", "pick": {"plain": "plain", "ribbon": "ribbon", "pointed": "pointed"}}, "corner": {"from": "corner", "map": [[0,0], [1,1]], "round": "none"}, "border": {"from": "border", "map": [[0,0], [1,1]], "round": "none"}, "shadow": {"from": "shadow", "pick": {"true": true, "false": false}}, "face": "face", "frame": "frame", "accent": "accent"},
+    {"gen": "name.plate", "v": 1, "at": [32,8], "clip": ["pointer"], "picture": "pointer", "style": {"from": "style", "pick": {"plain": "plain", "ribbon": "ribbon", "pointed": "pointed"}}, "corner": {"from": "corner", "map": [[0,0], [1,1]], "round": "none"}, "border": {"from": "border", "map": [[0,0], [1,1]], "round": "none"}, "shadow": {"from": "shadow", "pick": {"true": true, "false": false}}, "face": "face", "frame": "frame", "accent": "accent"} ] } },
+  "clips": {
+    "plate": {"frames": 1, "fps": 8, "label": "Name"},
+    "plate-badge": {"frames": 1, "fps": 8, "label": "Name and level badge"},
+    "plate-lit": {"frames": 1, "fps": 8, "label": "Name, while targeted"},
+    "pointer": {"noText": true, "frames": 1, "fps": 8, "label": "Notch, set under the plate's middle"} },
+  "versions": [
+  {"name": "Name plate", "params": {}},
+  {"name": "Ribbon", "params": {"style": "ribbon", "face": "#8e3a4a"}},
+  {"name": "Pointed sky", "params": {"style": "pointed", "frame": "#8fd0f0", "accent": "#c9423a"}},
+  {"name": "Soil and green", "params": {"face": "#7a4f33", "frame": "#9bd18a", "shadow": false}},
+  {"name": "Square steel", "params": {"corner": 0, "frame": "#c2c9d6", "border": 1}} ] }

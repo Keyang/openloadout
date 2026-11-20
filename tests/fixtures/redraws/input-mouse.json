@@ -1,0 +1,201 @@
+{
+ "id": "input-mouse",
+ "frozen": "2026-11-20",
+ "source": "sprites/input-mouse.js",
+ "sha256": "1d1f76811e15289b953bc5a7acc2d396df578b451d92f1561c060474f58dce1c",
+ "name": "Mouse",
+ "blurb": "A computer mouse seen from above for click, scroll and move prompts, its button lit; change the action, shape, size, cable and colours.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/icon",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "arcade",
+   "shooter",
+   "puzzle",
+   "card-game"
+  ],
+  "view": "none",
+  "words": [
+   "mouse",
+   "click",
+   "left click",
+   "right click",
+   "scroll",
+   "wheel",
+   "move",
+   "prompt",
+   "control",
+   "input",
+   "tutorial",
+   "computer"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "show",
+ "params": {
+  "action": {
+   "kind": "choice",
+   "label": "Action",
+   "def": "left",
+   "options": [
+    {
+     "value": "left",
+     "label": "Left click"
+    },
+    {
+     "value": "right",
+     "label": "Right click"
+    },
+    {
+     "value": "middle",
+     "label": "Middle click"
+    },
+    {
+     "value": "wheel",
+     "label": "Scroll"
+    },
+    {
+     "value": "move",
+     "label": "Move"
+    }
+   ],
+   "group": "Look"
+  },
+  "shape": {
+   "kind": "choice",
+   "label": "Shape",
+   "def": "oval",
+   "options": [
+    {
+     "value": "oval",
+     "label": "Oval"
+    },
+    {
+     "value": "slim",
+     "label": "Slim"
+    }
+   ],
+   "group": "Look"
+  },
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "cable": {
+   "kind": "toggle",
+   "label": "Cable",
+   "def": false,
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Plastic",
+   "def": "#c2c9d6",
+   "swatches": [
+    "#c2c9d6",
+    "#f0ead8",
+    "#5d6475",
+    "#3f6fd1",
+    "#c9423a"
+   ],
+   "group": "Colors"
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Lit button",
+   "def": "#f2c230",
+   "swatches": [
+    "#f2c230",
+    "#4fd8ee",
+    "#a4c44a",
+    "#e08a2c"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "show": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    8,
+    12
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [
+  {
+   "name": "Left click",
+   "params": {}
+  },
+  {
+   "name": "Right click",
+   "params": {
+    "action": "right"
+   }
+  },
+  {
+   "name": "Scroll",
+   "params": {
+    "action": "wheel",
+    "glow": "#4fd8ee"
+   }
+  },
+  {
+   "name": "Move, corded",
+   "params": {
+    "action": "move",
+    "cable": true
+   }
+  },
+  {
+   "name": "Dark slim",
+   "params": {
+    "shape": "slim",
+    "body": "#5d6475"
+   }
+  }
+ ],
+ "bundles": []
+}

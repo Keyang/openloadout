@@ -19,7 +19,8 @@
 //   platform  a thin platform alone: '-thin-l', '-thin-m', '-thin-r'
 //   slope     the two slopes alone
 //   stack     something that repeats up and down: '-cap', '-mid', '-foot' (pieces: which of them; default all three)
-// then the group's decals ('<name>-deco-<letter>', each with its place) and last the tileset's extra tiles.
+// then the group's decals ('<name>-deco-<letter>', each with its place) and last the tileset's extra tiles; a body with
+// decalOrder "last" puts every group's decals after the extra tiles instead (the order the code tilesets' sheets had).
 //
 // Pure: no DOM, no Node, no clock. Runs unchanged in the browser and in Node.
 import { blockClips, thinClips, slopeClips, decoClips, liquidClips } from '../tiles.js';
@@ -36,6 +37,9 @@ export const TILE_GROUP_PIECES = Object.freeze({
 
 /** The three pieces of a stack group, top to bottom. */
 export const STACK_PIECES = Object.freeze(['cap', 'mid', 'foot']);
+
+/** Where a tileset's decals go in its clip list (body.tiles.decalOrder): "group" each group's after its pieces (the default), "last" every group's after the extra tiles, as code tilesets that spread decoClips last had them (migration batch M5). */
+export const TILE_DECAL_ORDERS = Object.freeze(['group', 'last']);
 
 // numbers as a definition holds them (fps a number, frames whole)
 const entry = (frames, fps, label, extra = {}) => ({ frames, fps, loop: true, label, ...extra });
@@ -98,13 +102,16 @@ export function tileClips(body) {
   const out = {};
   try {
     if (!isObj(body)) return out;
+    const later = [];   // decalOrder "last": the decals, put after the extra tiles
     for (const g of Array.isArray(body.groups) ? body.groups.slice(0, 64) : []) {
-      for (const [k, v] of Object.entries(groupClips(g))) if (!Object.hasOwn(out, k)) out[k] = v;
+      const decals = body.decalOrder === 'last' && Array.isArray(g?.decals) ? new Set(g.decals.map((d) => `${g.name}-deco-${d?.name}`)) : null;
+      for (const [k, v] of Object.entries(groupClips(g))) if (decals?.has(k)) later.push([k, v]); else if (!Object.hasOwn(out, k)) out[k] = v;
     }
     for (const x of Array.isArray(body.extra) ? body.extra.slice(0, 64) : []) {
       if (!isObj(x) || typeof x.name !== 'string' || !x.name || Object.hasOwn(out, x.name)) continue;
       out[x.name] = entry(1, 6, typeof x.label === 'string' ? x.label : title(x.name));
     }
+    for (const [k, v] of later) if (!Object.hasOwn(out, k)) out[k] = v;
   } catch { return {}; }
   for (const v of Object.values(out)) if (typeof v.fps === 'function') v.fps = 6;
   return out;

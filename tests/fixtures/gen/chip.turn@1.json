@@ -1,0 +1,207 @@
+{
+ "id": "chip.turn",
+ "v": 1,
+ "family": "motion",
+ "cases": [
+  {
+   "args": {},
+   "ctx": {
+    "t": 0,
+    "loop": true
+   },
+   "moves": [
+    {
+     "move": [
+      0,
+      0
+     ],
+     "args": {
+      "chip.spin": 0,
+      "chip.sheen": 0,
+      "chip.glint": true
+     }
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 0.25,
+    "loop": true
+   },
+   "moves": [
+    {
+     "move": [
+      0,
+      0
+     ],
+     "args": {
+      "chip.spin": 45,
+      "chip.sheen": 0.8000000000000003,
+      "chip.glint": true
+     }
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 0.5,
+    "loop": true
+   },
+   "moves": [
+    {
+     "move": [
+      0,
+      0
+     ],
+     "args": {
+      "chip.spin": 90,
+      "chip.sheen": -1.6,
+      "chip.glint": true
+     }
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 0.75,
+    "loop": true
+   },
+   "moves": [
+    {
+     "move": [
+      0,
+      0
+     ],
+     "args": {
+      "chip.spin": 135,
+      "chip.sheen": -0.8,
+      "chip.glint": true
+     }
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 1,
+    "loop": true
+   },
+   "moves": [
+    {
+     "move": [
+      0,
+      0
+     ],
+     "args": {
+      "chip.spin": 0,
+      "chip.sheen": 0,
+      "chip.glint": true
+     }
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 0,
+    "loop": false
+   },
+   "moves": [
+    {
+     "move": [
+      0,
+      0
+     ],
+     "args": {
+      "chip.spin": 0,
+      "chip.sheen": 0,
+      "chip.glint": true
+     }
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 0.25,
+    "loop": false
+   },
+   "moves": [
+    {
+     "move": [
+      0,
+      0
+     ],
+     "args": {
+      "chip.spin": 45,
+      "chip.sheen": 0.8000000000000003,
+      "chip.glint": true
+     }
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 0.5,
+    "loop": false
+   },
+   "moves": [
+    {
+     "move": [
+      0,
+      0
+     ],
+     "args": {
+      "chip.spin": 90,
+      "chip.sheen": -1.6,
+      "chip.glint": true
+     }
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 0.75,
+    "loop": false
+   },
+   "moves": [
+    {
+     "move": [
+      0,
+      0
+     ],
+     "args": {
+      "chip.spin": 135,
+      "chip.sheen": -0.8,
+      "chip.glint": true
+     }
+    }
+   ]
+  },
+  {
+   "args": {},
+   "ctx": {
+    "t": 1,
+    "loop": false
+   },
+   "moves": [
+    {
+     "move": [
+      0,
+      0
+     ],
+     "args": {
+      "chip.spin": 0,
+      "chip.sheen": 0,
+      "chip.glint": true
+     }
+    }
+   ]
+  }
+ ]
+}

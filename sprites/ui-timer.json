@@ -1,0 +1,46 @@
+{ "format": "loadout-sprite",
+  "version": 2,
+  "id": "ui-timer",
+  "name": "Timer",
+  "blurb": "A countdown or lap timer for the screen: a small clock beside the time, a colon that blinks and red digits that flash and shake when time is short, plus the empty case for the game's own digits; change the style, format, size, clock and colours.",
+  "meta": {"type": "ui", "role": "interface/panel", "themes": ["neutral"], "gameTypes": ["arcade", "racing", "puzzle", "platformer"], "view": "none", "words": ["timer", "clock", "countdown", "time", "seconds", "hud", "hurry", "stopwatch"], "license": "draft"},
+  "size": [64,24],
+  "pivot": [32,12],
+  "grounded": false,
+  "preview": "idle",
+  "styles": ["pixel"],
+  "palette": [
+  {"id": "face", "label": "Windows", "default": "#3f5068", "material": "interface", "swatches": ["#3f5068", "#7a4f33", "#434d6d", "#8e3a4a"]},
+  {"id": "frame", "label": "Case", "default": "#f0ead8", "material": "paint", "swatches": ["#f0ead8", "#8fd0f0", "#9bd18a", "#c2c9d6", "#f6d3b0"]},
+  {"id": "glow", "label": "Digits", "default": "#4fd8ee", "material": "light", "swatches": ["#4fd8ee", "#f2c230", "#a4c44a", "#5fe0f0", "#7fe0a0"]} ],
+  "controls": [
+  {"key": "style", "kind": "choice", "label": "Style", "options": ["plate", "strip", "drum"], "default": "plate"},
+  {"key": "format", "kind": "choice", "label": "Format", "options": ["seconds", "minutes", "clock"], "default": "minutes"},
+  {"key": "size", "kind": "range", "label": "Size", "lo": "Small", "hi": "Big", "default": 0.5},
+  {"key": "icon", "kind": "toggle", "label": "Clock face", "default": true},
+  {"key": "face", "kind": "colour", "label": "Windows"},
+  {"key": "frame", "kind": "colour", "label": "Case"},
+  {"key": "glow", "kind": "colour", "label": "Digits"},
+  {"key": "speed", "standard": "speed"} ],
+  "body": { "panel": {
+    "piece": {"gen": "timer", "v": 1, "at": [32,12], "clip": ["idle"], "picture": "idle", "style": {"from": "style", "pick": {"plate": "plate", "strip": "strip", "drum": "drum"}}, "format": {"from": "format", "pick": {"seconds": "seconds", "minutes": "minutes", "clock": "clock"}}, "size": {"from": "size", "map": [[0,0], [1,1]], "round": "none"}, "icon": {"from": "icon", "pick": {"true": true, "false": false}}, "face": "face", "frame": "frame", "lit": "glow"},
+    "states": [
+    "idle",
+    "tick",
+    "warn",
+    "frame" ],
+    "draw": [
+    {"gen": "timer", "v": 1, "at": [32,12], "clip": ["tick"], "picture": "tick", "style": {"from": "style", "pick": {"plate": "plate", "strip": "strip", "drum": "drum"}}, "format": {"from": "format", "pick": {"seconds": "seconds", "minutes": "minutes", "clock": "clock"}}, "size": {"from": "size", "map": [[0,0], [1,1]], "round": "none"}, "icon": {"from": "icon", "pick": {"true": true, "false": false}}, "face": "face", "frame": "frame", "lit": "glow"},
+    {"gen": "timer", "v": 1, "at": [32,12], "clip": ["warn"], "picture": "warn", "style": {"from": "style", "pick": {"plate": "plate", "strip": "strip", "drum": "drum"}}, "format": {"from": "format", "pick": {"seconds": "seconds", "minutes": "minutes", "clock": "clock"}}, "size": {"from": "size", "map": [[0,0], [1,1]], "round": "none"}, "icon": {"from": "icon", "pick": {"true": true, "false": false}}, "face": "face", "frame": "frame", "lit": "glow"},
+    {"gen": "timer", "v": 1, "at": [32,12], "clip": ["frame"], "picture": "frame", "style": {"from": "style", "pick": {"plate": "plate", "strip": "strip", "drum": "drum"}}, "format": {"from": "format", "pick": {"seconds": "seconds", "minutes": "minutes", "clock": "clock"}}, "size": {"from": "size", "map": [[0,0], [1,1]], "round": "none"}, "icon": {"from": "icon", "pick": {"true": true, "false": false}}, "face": "face", "frame": "frame", "lit": "glow"} ] } },
+  "clips": {
+    "idle": {"noText": true, "frames": 1, "fps": 8, "label": "Showing a time"},
+    "tick": {"noText": true, "frames": 8, "fps": 8, "label": "Ticking", "sounds": [{"sound": "timer-tick", "preset": "Clock", "frame": 0, "volume": 0.45}]},
+    "warn": {"noText": true, "frames": 8, "fps": 12, "label": "Running out", "sounds": [{"sound": "timer-tick", "preset": "Bomb timer", "frame": 0, "volume": 0.6}]},
+    "frame": {"frames": 1, "fps": 8, "label": "Empty, for the game's own digits"} },
+  "versions": [
+  {"name": "Clock", "params": {}},
+  {"name": "Seconds", "params": {"format": "seconds", "size": 1}},
+  {"name": "Long clock", "params": {"format": "clock", "icon": false, "style": "strip"}},
+  {"name": "Mint drum", "params": {"style": "drum", "glow": "#7fe0a0", "face": "#7a4f33"}},
+  {"name": "Wine and rose", "params": {"face": "#8e3a4a", "frame": "#f6d3b0", "glow": "#f2c230"}} ] }

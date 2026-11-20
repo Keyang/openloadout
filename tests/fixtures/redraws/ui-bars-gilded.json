@@ -1,0 +1,268 @@
+{
+ "id": "ui-bars-gilded",
+ "frozen": "2026-11-20",
+ "source": "sprites/ui-bars-gilded.js",
+ "sha256": "b7cc1e575769a3c3cd2daf6742f28e49993e3248ee1a75fd4cb3326bbd1e8c67",
+ "name": "Stone and gold bars",
+ "blurb": "A gold bar housing with gem end caps and three fill strips (health, magic, a gauge), a white flash, a gold slider track and its stone knob; change the style, corners, band, gems and colours.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/bar",
+  "themes": [
+   "neutral",
+   "fantasy",
+   "dungeon"
+  ],
+  "gameTypes": [
+   "arcade",
+   "turn-based-rpg",
+   "top-down-rpg",
+   "card-game"
+  ],
+  "view": "none",
+  "words": [
+   "bar",
+   "health",
+   "magic",
+   "gauge",
+   "meter",
+   "boss bar",
+   "slider",
+   "volume",
+   "settings",
+   "gold",
+   "gem",
+   "fill",
+   "flash",
+   "hud"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  64,
+  16
+ ],
+ "pivot": [
+  32,
+  8
+ ],
+ "grounded": false,
+ "preview": "frame",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "temple",
+   "options": [
+    {
+     "value": "temple",
+     "label": "Temple"
+    },
+    {
+     "value": "royal",
+     "label": "Royal"
+    },
+    {
+     "value": "ruin",
+     "label": "Ruin"
+    }
+   ],
+   "group": "Look"
+  },
+  "corner": {
+   "kind": "range",
+   "label": "Corner",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Square",
+   "hi": "Round",
+   "group": "Look"
+  },
+  "border": {
+   "kind": "range",
+   "label": "Border",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Thin",
+   "hi": "Thick",
+   "group": "Look"
+  },
+  "gems": {
+   "kind": "toggle",
+   "label": "Gems",
+   "def": true,
+   "group": "Look"
+  },
+  "frame": {
+   "kind": "color",
+   "label": "Gold",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#c2c9d6",
+    "#f6d3b0",
+    "#f4e06a",
+    "#e6c96a"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Gems",
+   "def": "#4fd8ee",
+   "swatches": [
+    "#4fd8ee",
+    "#c9423a",
+    "#a4c44a",
+    "#3f6fd1",
+    "#e08a2c"
+   ],
+   "group": "Colors",
+   "when": {
+    "gems": [
+     true
+    ]
+   }
+  },
+  "fill": {
+   "kind": "color",
+   "label": "Health",
+   "def": "#6aa83e",
+   "swatches": [
+    "#6aa83e",
+    "#3f8a4f",
+    "#c9423a",
+    "#e08a2c",
+    "#4fd8ee",
+    "#f2c230"
+   ],
+   "group": "Colors"
+  },
+  "fillB": {
+   "kind": "color",
+   "label": "Magic",
+   "def": "#3f6fd1",
+   "swatches": [
+    "#3f6fd1",
+    "#3f9fd1",
+    "#4fd8ee",
+    "#8fd0f0",
+    "#4f9ff0"
+   ],
+   "group": "Colors"
+  },
+  "fillC": {
+   "kind": "color",
+   "label": "Gauge",
+   "def": "#f2c230",
+   "swatches": [
+    "#f2c230",
+    "#e08a2c",
+    "#a4c44a",
+    "#a06a3c",
+    "#c2c9d6"
+   ],
+   "group": "Colors"
+  }
+ },
+ "clips": {
+  "frame": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "fill": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "fill-b": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "fill-c": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "flash": {
+   "frames": 4,
+   "loop": false,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "slider": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "knob": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [
+  {
+   "name": "Gold bars",
+   "params": {}
+  },
+  {
+   "name": "Royal bright gold",
+   "params": {
+    "style": "royal",
+    "frame": "#f4e06a",
+    "accent": "#c9423a"
+   }
+  },
+  {
+   "name": "Plain ruin",
+   "params": {
+    "style": "ruin",
+    "gems": false
+   }
+  },
+  {
+   "name": "Silver",
+   "params": {
+    "frame": "#c2c9d6",
+    "accent": "#3f6fd1",
+    "fill": "#c9423a"
+   }
+  }
+ ],
+ "bundles": []
+}

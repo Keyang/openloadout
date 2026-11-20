@@ -17,7 +17,7 @@
 // once, exactly as before styles existed. With more styles, every message about what a style draws starts
 // with `style "<id>": `; faults of the sprite itself (controls, metadata, sounds) are reported once.
 
-import { renderFrame, defaultParams, cleanParams, randomParams, clipFps, inEffect, partList } from '../engine/sprite.js';
+import { renderFrame, defaultParams, cleanParams, randomParams, clipFps, inEffect, partList, whenEntryValue } from '../engine/sprite.js';   // whenEntryValue: build item F3 (a threshold in a control's when)
 import { brightness, hexToRgb, rgbToHsl } from '../engine/color.js';
 import { blockJoins, classifyTiles } from '../engine/tiles.js';
 import { THEME_PRESETS, applyColour, themedParams, spriteMaterials, lookColours, randomTheme, toneNeed } from '../engine/theme.js';
@@ -821,13 +821,14 @@ function checkStyle(def, { soundIndex, validateMeta } = {}, pass) {
   }
 
   // A setting where control `key` is in effect: the defaults, with each key of one of its
-  // `when` alternatives at its first listed value (and, in turn, whatever that key needs),
+  // `when` alternatives at its first listed value (a threshold at a number that meets it: whenEntryValue)
+  // (and, in turn, whatever that key needs),
   // and its part's selector at an option that is not `none`. Null when no alternative works.
   function settingWhereItApplies(key) {
     const enable = (k2, p, depth) => {
       if (depth > 8) return;
       const alt = whenAlternatives(params[k2]?.when)[0];
-      if (alt) for (const [k3, vals] of Object.entries(alt)) { p[k3] = vals[0]; enable(k3, p, depth + 1); }
+      if (alt) for (const [k3, vals] of Object.entries(alt)) { p[k3] = whenEntryValue(vals[0], params[k3]); enable(k3, p, depth + 1); }
       const part = parts.find((x) => x.controls.includes(k2));
       if (part && part.none !== undefined) {
         const none = Array.isArray(part.none) ? part.none : [part.none];
@@ -841,7 +842,7 @@ function checkStyle(def, { soundIndex, validateMeta } = {}, pass) {
     const alts = whenAlternatives(params[key]?.when);
     for (const alt of alts.length ? alts : [{}]) {
       const p = { ...dflt };
-      for (const [k2, vals] of Object.entries(alt)) { p[k2] = vals[0]; enable(k2, p, 1); }
+      for (const [k2, vals] of Object.entries(alt)) { p[k2] = whenEntryValue(vals[0], params[k2]); enable(k2, p, 1); }
       const part = parts.find((x) => x.controls.includes(key));
       if (part && part.none !== undefined) {
         const none = Array.isArray(part.none) ? part.none : [part.none];

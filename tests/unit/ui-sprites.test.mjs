@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 // The first interface set (kit-rpg-fantasy, batch R20): dialogue box, battle menu, bars, damage digits.
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -36,19 +37,27 @@ function looks(s) {
 test('ids, frames, pivots, clips and controls are exactly the specification rows', () => {
   assert.deepEqual([dialogue.id, dialogue.size, dialogue.pivot], ['ui-dialogue', [96, 48], [48, 24]]);
   assert.deepEqual(clipList(dialogue), ['box 1', 'name-tag 1', 'choice 1', 'next 8 loop']);
-  assert.deepEqual(Object.keys(dialogue.params), ['style', 'corner', 'border', 'shadow', 'face', 'frame', 'accent', 'speed']);
+  // colours first since its redraw as a data file (migration batch M9; engine/data-sprite.js paramsV2, as ui-bars-rpg below)
+  assert.deepEqual(Object.keys(dialogue.params), ['face', 'frame', 'accent', 'style', 'corner', 'border', 'shadow', 'speed']);
 
   assert.deepEqual([menu.id, menu.size, menu.pivot], ['ui-battle-menu', [96, 64], [48, 32]]);
   assert.deepEqual(clipList(menu), ['panel 1', 'row 1', 'cursor 8 loop', 'turn-marker 8 loop']);
-  assert.deepEqual(Object.keys(menu.params), ['style', 'corner', 'border', 'face', 'frame', 'accent', 'speed']);
+  assert.deepEqual(Object.keys(menu.params), ['face', 'frame', 'accent', 'style', 'corner', 'border', 'speed'], 'colours first (M9)');
 
   assert.deepEqual([bars.id, bars.size, bars.pivot], ['ui-bars-rpg', [64, 16], [32, 8]]);
   assert.deepEqual(clipList(bars), ['frame 1', 'fill 1', 'fill-b 1', 'fill-c 1', 'flash 4 once']);
-  assert.deepEqual(Object.keys(bars.params), ['style', 'corner', 'border', 'shine', 'frame', 'fill', 'fillB', 'fillC']);
+  // the same controls in the same order on each tab of the sprite page (app/panel-model.js spriteTabOf: colours on
+  // Colours, the rest on Shape). A data sprite (migration batch M8) lists its colour controls first
+  // (engine/data-sprite.js paramsV2), so the full list moved them ahead: a change to the API's `controls` order only.
+  const colourKeys = (s) => Object.keys(s.params).filter((k) => s.params[k].kind === 'color');
+  assert.deepEqual(Object.keys(bars.params).filter((k) => bars.params[k].kind !== 'color'), ['style', 'corner', 'border', 'shine']);
+  assert.deepEqual(colourKeys(bars), ['frame', 'fill', 'fillB', 'fillC']);
+  // colours first only once the bars are a data file (batch M8); the code file keeps its own order until then
+  if (existsSync(new URL('../../sprites/ui-bars-rpg.json', import.meta.url))) assert.deepEqual(Object.keys(bars.params), ['frame', 'fill', 'fillB', 'fillC', 'style', 'corner', 'border', 'shine'], 'colours first: engine/data-sprite.js paramsV2');
 
   assert.deepEqual([digits.id, digits.size, digits.pivot], ['ui-damage-digits', [16, 16], [8, 8]]);
   assert.deepEqual(clipList(digits), [...Array.from({ length: 10 }, (_, i) => `digit-${i} 1`), 'plus 1', 'minus 1', 'crit 1', 'miss 1']);
-  assert.deepEqual(Object.keys(digits.params), ['style', 'slant', 'shadow', 'size', 'body', 'edge']);
+  assert.deepEqual(Object.keys(digits.params), ['body', 'edge', 'style', 'slant', 'shadow', 'size'], 'colours first (M9)');
 
   assert.deepEqual(choices(dialogue, 'style'), ['plain', 'ornate', 'scroll']);
   assert.deepEqual(choices(menu, 'style'), ['plain', 'ornate', 'scroll']);

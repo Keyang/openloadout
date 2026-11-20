@@ -1,0 +1,2015 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "lever",
+ "name": "Lever",
+ "blurb": "A lever that is pulled from off to on, with a lamp that lights. Make it a floor lever, a wall switch or a crank, and change its handle, knob and colours.",
+ "meta": {
+  "type": "prop",
+  "role": "world/prop",
+  "themes": [
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "platformer"
+  ],
+  "view": "side",
+  "words": [
+   "lever",
+   "switch",
+   "crank",
+   "handle",
+   "pull",
+   "toggle",
+   "activate",
+   "puzzle",
+   "mechanism",
+   "stone",
+   "trigger"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  30
+ ],
+ "preview": "off",
+ "styles": [
+  "pixel"
+ ],
+ "palette": [
+  {
+   "id": "stone",
+   "label": "Stone",
+   "default": "#8f97a8",
+   "material": "stone",
+   "swatches": [
+    "#8f97a8",
+    "#5d6475",
+    "#f0ead8",
+    "#3f5068",
+    "#a4c44a",
+    "#6b7280"
+   ]
+  },
+  {
+   "id": "metal",
+   "label": "Metal",
+   "default": "#c2c9d6",
+   "material": "metal",
+   "swatches": [
+    "#c2c9d6",
+    "#f2c230",
+    "#8f97a8",
+    "#5d6475",
+    "#e6c545",
+    "#c98a4a"
+   ]
+  },
+  {
+   "id": "accent",
+   "label": "Knob and lamp",
+   "default": "#c9423a",
+   "material": "paint",
+   "swatches": [
+    "#c9423a",
+    "#f2c230",
+    "#7a4fc4",
+    "#f0ead8",
+    "#4fd8ee",
+    "#a4c44a"
+   ]
+  },
+  {
+   "id": "hub",
+   "material": "metal",
+   "derive": {
+    "rule": "tone",
+    "of": "metal",
+    "by": -1.6
+   }
+  },
+  {
+   "id": "hub-crank",
+   "material": "metal",
+   "derive": {
+    "rule": "tone",
+    "of": "metal",
+    "by": -1.5
+   }
+  },
+  {
+   "id": "grip",
+   "material": "metal",
+   "derive": {
+    "rule": "ramp",
+    "of": "metal",
+    "tone": "dark"
+   }
+  },
+  {
+   "id": "lamp-off",
+   "material": "paint",
+   "derive": {
+    "rule": "tone",
+    "of": "accent",
+    "by": -1.7
+   }
+  },
+  {
+   "id": "sweep",
+   "material": "light",
+   "derive": {
+    "rule": "tone",
+    "of": "metal",
+    "by": 0.9
+   }
+  },
+  {
+   "id": "shine",
+   "default": "#ffffff",
+   "material": "light",
+   "detail": true
+  }
+ ],
+ "controls": [
+  {
+   "key": "style",
+   "kind": "choice",
+   "label": "Style",
+   "options": [
+    {
+     "value": "floor",
+     "label": "Floor lever"
+    },
+    {
+     "value": "wall",
+     "label": "Wall switch"
+    },
+    {
+     "value": "crank",
+     "label": "Crank"
+    }
+   ],
+   "default": "floor"
+  },
+  {
+   "key": "length",
+   "kind": "range",
+   "label": "Length",
+   "lo": "Short",
+   "hi": "Long",
+   "default": 0.5
+  },
+  {
+   "key": "knob",
+   "kind": "toggle",
+   "label": "Knob",
+   "default": true
+  },
+  {
+   "key": "stone",
+   "kind": "colour",
+   "label": "Stone"
+  },
+  {
+   "key": "metal",
+   "kind": "colour",
+   "label": "Metal"
+  },
+  {
+   "key": "accent",
+   "kind": "colour",
+   "label": "Knob and lamp"
+  },
+  {
+   "key": "speed",
+   "standard": "speed"
+  }
+ ],
+ "body": {
+  "pictures": {
+   "nodes": [
+    {
+     "id": "handle-floor",
+     "parent": null,
+     "at": [
+      16,
+      22
+     ]
+    },
+    {
+     "id": "handle-wall",
+     "parent": null,
+     "at": [
+      16,
+      20
+     ]
+    },
+    {
+     "id": "handle-crank",
+     "parent": null,
+     "at": [
+      16,
+      20
+     ]
+    }
+   ],
+   "draw": [
+    {
+     "id": "arm-crank",
+     "gen": "taper",
+     "v": 1,
+     "on": "handle-crank",
+     "from": [
+      0,
+      0
+     ],
+     "to": [
+      0,
+      {
+       "from": "length",
+       "map": [
+        [
+         0,
+         -12
+        ],
+        [
+         1,
+         -15
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "r0": 1,
+     "paint": "metal",
+     "group": "handle-crank",
+     "when": {
+      "style": [
+       "crank"
+      ]
+     }
+    },
+    {
+     "id": "shine-crank",
+     "kind": "line",
+     "on": "handle-crank",
+     "from": [
+      0.5,
+      -1
+     ],
+     "to": [
+      0.5,
+      {
+       "from": "length",
+       "map": [
+        [
+         0,
+         -9
+        ],
+        [
+         1,
+         -12
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "paint": "metal.light",
+     "group": "handle-crank",
+     "when": {
+      "style": [
+       "crank"
+      ]
+     }
+    },
+    {
+     "id": "knob-crank",
+     "kind": "stamp",
+     "on": "handle-crank",
+     "at": [
+      0,
+      {
+       "from": "length",
+       "map": [
+        [
+         0,
+         -12
+        ],
+        [
+         1,
+         -15
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "anchor": "c",
+     "rows": [
+      "..iiii..",
+      ".illlli.",
+      "idbbblli",
+      "idbbbbli",
+      "idbbbbli",
+      "iddbbbli",
+      ".iddddi.",
+      "..iiii.."
+     ],
+     "key": {
+      "i": "ink",
+      "l": "accent.light",
+      "b": "accent",
+      "d": "accent.dark"
+     },
+     "z": 5,
+     "when": {
+      "style": [
+       "crank"
+      ],
+      "knob": [
+       true
+      ]
+     }
+    },
+    {
+     "id": "grip-crank",
+     "gen": "taper",
+     "v": 1,
+     "on": "handle-crank",
+     "from": [
+      0,
+      {
+       "from": "length",
+       "map": [
+        [
+         0,
+         -9
+        ],
+        [
+         1,
+         -12
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "to": [
+      0,
+      {
+       "from": "length",
+       "map": [
+        [
+         0,
+         -12
+        ],
+        [
+         1,
+         -15
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "r0": 1.5,
+     "paint": "grip",
+     "group": "handle-crank",
+     "when": {
+      "style": [
+       "crank"
+      ],
+      "knob": [
+       false
+      ]
+     },
+     "z": 1
+    },
+    {
+     "kind": "outline",
+     "paint": "ink",
+     "only": "handle-crank"
+    },
+    {
+     "id": "tooth-1",
+     "kind": "poly",
+     "on": "handle-crank",
+     "points": [
+      [
+       4.0,
+       0.0
+      ],
+      [
+       7.0,
+       0.0
+      ],
+      [
+       6.87,
+       1.37
+      ],
+      [
+       6.47,
+       2.68
+      ],
+      [
+       3.7,
+       1.53
+      ]
+     ],
+     "paint": "metal.base",
+     "group": "wheel",
+     "when": {
+      "style": [
+       "crank"
+      ]
+     }
+    },
+    {
+     "id": "tooth-2",
+     "kind": "poly",
+     "on": "handle-crank",
+     "points": [
+      [
+       2.83,
+       2.83
+      ],
+      [
+       4.95,
+       4.95
+      ],
+      [
+       3.89,
+       5.82
+      ],
+      [
+       2.68,
+       6.47
+      ],
+      [
+       1.53,
+       3.7
+      ]
+     ],
+     "paint": "metal.base",
+     "group": "wheel",
+     "when": {
+      "style": [
+       "crank"
+      ]
+     }
+    },
+    {
+     "id": "tooth-3",
+     "kind": "poly",
+     "on": "handle-crank",
+     "points": [
+      [
+       0.0,
+       4.0
+      ],
+      [
+       0.0,
+       7.0
+      ],
+      [
+       -1.37,
+       6.87
+      ],
+      [
+       -2.68,
+       6.47
+      ],
+      [
+       -1.53,
+       3.7
+      ]
+     ],
+     "paint": "metal.base",
+     "group": "wheel",
+     "when": {
+      "style": [
+       "crank"
+      ]
+     }
+    },
+    {
+     "id": "tooth-4",
+     "kind": "poly",
+     "on": "handle-crank",
+     "points": [
+      [
+       -2.83,
+       2.83
+      ],
+      [
+       -4.95,
+       4.95
+      ],
+      [
+       -5.82,
+       3.89
+      ],
+      [
+       -6.47,
+       2.68
+      ],
+      [
+       -3.7,
+       1.53
+      ]
+     ],
+     "paint": "metal.base",
+     "group": "wheel",
+     "when": {
+      "style": [
+       "crank"
+      ]
+     }
+    },
+    {
+     "id": "tooth-5",
+     "kind": "poly",
+     "on": "handle-crank",
+     "points": [
+      [
+       -4.0,
+       0.0
+      ],
+      [
+       -7.0,
+       0.0
+      ],
+      [
+       -6.87,
+       -1.37
+      ],
+      [
+       -6.47,
+       -2.68
+      ],
+      [
+       -3.7,
+       -1.53
+      ]
+     ],
+     "paint": "metal.base",
+     "group": "wheel",
+     "when": {
+      "style": [
+       "crank"
+      ]
+     }
+    },
+    {
+     "id": "tooth-6",
+     "kind": "poly",
+     "on": "handle-crank",
+     "points": [
+      [
+       -2.83,
+       -2.83
+      ],
+      [
+       -4.95,
+       -4.95
+      ],
+      [
+       -3.89,
+       -5.82
+      ],
+      [
+       -2.68,
+       -6.47
+      ],
+      [
+       -1.53,
+       -3.7
+      ]
+     ],
+     "paint": "metal.base",
+     "group": "wheel",
+     "when": {
+      "style": [
+       "crank"
+      ]
+     }
+    },
+    {
+     "id": "tooth-7",
+     "kind": "poly",
+     "on": "handle-crank",
+     "points": [
+      [
+       -0.0,
+       -4.0
+      ],
+      [
+       -0.0,
+       -7.0
+      ],
+      [
+       1.37,
+       -6.87
+      ],
+      [
+       2.68,
+       -6.47
+      ],
+      [
+       1.53,
+       -3.7
+      ]
+     ],
+     "paint": "metal.base",
+     "group": "wheel",
+     "when": {
+      "style": [
+       "crank"
+      ]
+     }
+    },
+    {
+     "id": "tooth-8",
+     "kind": "poly",
+     "on": "handle-crank",
+     "points": [
+      [
+       2.83,
+       -2.83
+      ],
+      [
+       4.95,
+       -4.95
+      ],
+      [
+       5.82,
+       -3.89
+      ],
+      [
+       6.47,
+       -2.68
+      ],
+      [
+       3.7,
+       -1.53
+      ]
+     ],
+     "paint": "metal.base",
+     "group": "wheel",
+     "when": {
+      "style": [
+       "crank"
+      ]
+     }
+    },
+    {
+     "id": "wheel-face",
+     "kind": "ellipse",
+     "on": "handle-crank",
+     "at": [
+      0,
+      0
+     ],
+     "r": [
+      4.5,
+      4.5
+     ],
+     "paint": "metal",
+     "light": 1,
+     "group": "wheel",
+     "when": {
+      "style": [
+       "crank"
+      ]
+     },
+     "z": 1
+    },
+    {
+     "id": "hub",
+     "kind": "ellipse",
+     "on": "handle-crank",
+     "at": [
+      0,
+      0
+     ],
+     "r": [
+      2,
+      2
+     ],
+     "paint": "hub-crank.base",
+     "group": "wheel",
+     "when": {
+      "style": [
+       "crank"
+      ]
+     },
+     "z": 2
+    },
+    {
+     "kind": "outline",
+     "paint": "ink",
+     "only": "wheel"
+    },
+    {
+     "id": "block",
+     "kind": "rect",
+     "at": [
+      8,
+      24
+     ],
+     "size": [
+      16,
+      6
+     ],
+     "paint": "stone",
+     "shade": 2,
+     "group": "stone-crank",
+     "when": {
+      "style": [
+       "crank"
+      ]
+     }
+    },
+    {
+     "kind": "rect",
+     "at": [
+      8,
+      24
+     ],
+     "size": [
+      16,
+      1
+     ],
+     "paint": "stone.light",
+     "when": {
+      "style": [
+       "crank"
+      ]
+     },
+     "group": "stone-crank",
+     "z": 1
+    },
+    {
+     "kind": "outline",
+     "paint": "ink",
+     "only": "stone-crank"
+    },
+    {
+     "id": "slab",
+     "kind": "rect",
+     "at": [
+      6,
+      26
+     ],
+     "size": [
+      20,
+      4
+     ],
+     "paint": "stone",
+     "shade": 2,
+     "group": "stone-floor",
+     "when": {
+      "style": [
+       "floor"
+      ]
+     }
+    },
+    {
+     "id": "step",
+     "kind": "rect",
+     "at": [
+      10,
+      23
+     ],
+     "size": [
+      12,
+      3
+     ],
+     "paint": "stone",
+     "shade": 2,
+     "group": "stone-floor",
+     "when": {
+      "style": [
+       "floor"
+      ]
+     }
+    },
+    {
+     "kind": "rect",
+     "at": [
+      10,
+      23
+     ],
+     "size": [
+      12,
+      1
+     ],
+     "paint": "stone.light",
+     "when": {
+      "style": [
+       "floor"
+      ]
+     },
+     "group": "stone-floor",
+     "z": 1
+    },
+    {
+     "kind": "rect",
+     "at": [
+      6,
+      26
+     ],
+     "size": [
+      4,
+      1
+     ],
+     "paint": "stone.light",
+     "when": {
+      "style": [
+       "floor"
+      ]
+     },
+     "group": "stone-floor",
+     "z": 1
+    },
+    {
+     "kind": "rect",
+     "at": [
+      22,
+      26
+     ],
+     "size": [
+      4,
+      1
+     ],
+     "paint": "stone.light",
+     "when": {
+      "style": [
+       "floor"
+      ]
+     },
+     "group": "stone-floor",
+     "z": 1
+    },
+    {
+     "kind": "outline",
+     "paint": "ink",
+     "only": "stone-floor"
+    },
+    {
+     "id": "hump",
+     "kind": "poly",
+     "points": [
+      [
+       12,
+       23
+      ],
+      [
+       12.2,
+       21.95
+      ],
+      [
+       12.76,
+       21
+      ],
+      [
+       13.65,
+       20.25
+      ],
+      [
+       14.76,
+       19.77
+      ],
+      [
+       16,
+       19.6
+      ],
+      [
+       17.24,
+       19.77
+      ],
+      [
+       18.35,
+       20.25
+      ],
+      [
+       19.24,
+       21
+      ],
+      [
+       19.8,
+       21.95
+      ],
+      [
+       20,
+       23
+      ]
+     ],
+     "paint": "metal",
+     "light": 1,
+     "group": "hump",
+     "when": {
+      "style": [
+       "floor"
+      ]
+     }
+    },
+    {
+     "kind": "outline",
+     "paint": "ink",
+     "only": "hump"
+    },
+    {
+     "id": "plate",
+     "kind": "rect",
+     "at": [
+      10,
+      12
+     ],
+     "size": [
+      12,
+      18
+     ],
+     "paint": "stone",
+     "shade": 2,
+     "group": "stone-wall",
+     "when": {
+      "style": [
+       "wall"
+      ]
+     }
+    },
+    {
+     "id": "plate-top",
+     "kind": "ellipse",
+     "at": [
+      16,
+      12.5
+     ],
+     "r": [
+      6,
+      4
+     ],
+     "paint": "stone",
+     "shade": 2,
+     "group": "stone-wall",
+     "when": {
+      "style": [
+       "wall"
+      ]
+     }
+    },
+    {
+     "kind": "rect",
+     "at": [
+      11,
+      28
+     ],
+     "size": [
+      10,
+      1
+     ],
+     "paint": "stone.dark",
+     "when": {
+      "style": [
+       "wall"
+      ]
+     },
+     "group": "stone-wall",
+     "z": 1
+    },
+    {
+     "kind": "outline",
+     "paint": "ink",
+     "only": "stone-wall"
+    },
+    {
+     "id": "slot",
+     "kind": "rect",
+     "at": [
+      12,
+      19
+     ],
+     "size": [
+      8,
+      3
+     ],
+     "paint": "metal",
+     "light": 1,
+     "group": "slot",
+     "when": {
+      "style": [
+       "wall"
+      ]
+     }
+    },
+    {
+     "kind": "rect",
+     "at": [
+      13,
+      20
+     ],
+     "size": [
+      6,
+      1
+     ],
+     "paint": "hub.base",
+     "when": {
+      "style": [
+       "wall"
+      ]
+     },
+     "group": "slot",
+     "z": 1
+    },
+    {
+     "kind": "outline",
+     "paint": "ink",
+     "only": "slot"
+    },
+    {
+     "id": "arm-floor",
+     "gen": "taper",
+     "v": 1,
+     "on": "handle-floor",
+     "from": [
+      0,
+      0
+     ],
+     "to": [
+      0,
+      {
+       "from": "length",
+       "map": [
+        [
+         0,
+         -9
+        ],
+        [
+         1,
+         -14
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "r0": 1,
+     "paint": "metal",
+     "group": "handle-floor",
+     "when": {
+      "style": [
+       "floor"
+      ]
+     }
+    },
+    {
+     "id": "shine-floor",
+     "kind": "line",
+     "on": "handle-floor",
+     "from": [
+      0.5,
+      -1
+     ],
+     "to": [
+      0.5,
+      {
+       "from": "length",
+       "map": [
+        [
+         0,
+         -6
+        ],
+        [
+         1,
+         -11
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "paint": "metal.light",
+     "group": "handle-floor",
+     "when": {
+      "style": [
+       "floor"
+      ]
+     }
+    },
+    {
+     "id": "knob-floor",
+     "kind": "stamp",
+     "on": "handle-floor",
+     "at": [
+      0,
+      {
+       "from": "length",
+       "map": [
+        [
+         0,
+         -9
+        ],
+        [
+         1,
+         -14
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "anchor": "c",
+     "rows": [
+      "..iiii..",
+      ".illlli.",
+      "idbbblli",
+      "idbbbbli",
+      "idbbbbli",
+      "iddbbbli",
+      ".iddddi.",
+      "..iiii.."
+     ],
+     "key": {
+      "i": "ink",
+      "l": "accent.light",
+      "b": "accent",
+      "d": "accent.dark"
+     },
+     "z": 5,
+     "when": {
+      "style": [
+       "floor"
+      ],
+      "knob": [
+       true
+      ]
+     }
+    },
+    {
+     "id": "grip-floor",
+     "gen": "taper",
+     "v": 1,
+     "on": "handle-floor",
+     "from": [
+      0,
+      {
+       "from": "length",
+       "map": [
+        [
+         0,
+         -6
+        ],
+        [
+         1,
+         -11
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "to": [
+      0,
+      {
+       "from": "length",
+       "map": [
+        [
+         0,
+         -9
+        ],
+        [
+         1,
+         -14
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "r0": 1.5,
+     "paint": "grip",
+     "group": "handle-floor",
+     "when": {
+      "style": [
+       "floor"
+      ],
+      "knob": [
+       false
+      ]
+     },
+     "z": 1
+    },
+    {
+     "kind": "outline",
+     "paint": "ink",
+     "only": "handle-floor"
+    },
+    {
+     "id": "arm-wall",
+     "gen": "taper",
+     "v": 1,
+     "on": "handle-wall",
+     "from": [
+      0,
+      0
+     ],
+     "to": [
+      0,
+      {
+       "from": "length",
+       "map": [
+        [
+         0,
+         -8
+        ],
+        [
+         1,
+         -12
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "r0": 1,
+     "paint": "metal",
+     "group": "handle-wall",
+     "when": {
+      "style": [
+       "wall"
+      ]
+     }
+    },
+    {
+     "id": "shine-wall",
+     "kind": "line",
+     "on": "handle-wall",
+     "from": [
+      0.5,
+      -1
+     ],
+     "to": [
+      0.5,
+      {
+       "from": "length",
+       "map": [
+        [
+         0,
+         -5
+        ],
+        [
+         1,
+         -9
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "paint": "metal.light",
+     "group": "handle-wall",
+     "when": {
+      "style": [
+       "wall"
+      ]
+     }
+    },
+    {
+     "id": "knob-wall",
+     "kind": "stamp",
+     "on": "handle-wall",
+     "at": [
+      0,
+      {
+       "from": "length",
+       "map": [
+        [
+         0,
+         -8
+        ],
+        [
+         1,
+         -12
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "anchor": "c",
+     "rows": [
+      "..iiii..",
+      ".illlli.",
+      "idbbblli",
+      "idbbbbli",
+      "idbbbbli",
+      "iddbbbli",
+      ".iddddi.",
+      "..iiii.."
+     ],
+     "key": {
+      "i": "ink",
+      "l": "accent.light",
+      "b": "accent",
+      "d": "accent.dark"
+     },
+     "z": 5,
+     "when": {
+      "style": [
+       "wall"
+      ],
+      "knob": [
+       true
+      ]
+     }
+    },
+    {
+     "id": "grip-wall",
+     "gen": "taper",
+     "v": 1,
+     "on": "handle-wall",
+     "from": [
+      0,
+      {
+       "from": "length",
+       "map": [
+        [
+         0,
+         -5
+        ],
+        [
+         1,
+         -9
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "to": [
+      0,
+      {
+       "from": "length",
+       "map": [
+        [
+         0,
+         -8
+        ],
+        [
+         1,
+         -12
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "r0": 1.5,
+     "paint": "grip",
+     "group": "handle-wall",
+     "when": {
+      "style": [
+       "wall"
+      ],
+      "knob": [
+       false
+      ]
+     },
+     "z": 1
+    },
+    {
+     "kind": "outline",
+     "paint": "ink",
+     "only": "handle-wall"
+    },
+    {
+     "id": "lamp-floor",
+     "kind": "stamp",
+     "at": [
+      13,
+      26
+     ],
+     "when": {
+      "style": [
+       "floor"
+      ]
+     },
+     "rows": [
+      ".iiii.",
+      "iddddi",
+      "iddddi",
+      ".iiii."
+     ],
+     "key": {
+      "i": "ink",
+      "d": "lamp-off",
+      "L": "accent.light",
+      "W": "shine"
+     },
+     "variants": {
+      "lit": [
+       ".iiii.",
+       "iLLWLi",
+       "iLLLLi",
+       ".iiii."
+      ],
+      "white": [
+       ".iiii.",
+       "iWWWWi",
+       "iWWWWi",
+       ".iiii."
+      ]
+     }
+    },
+    {
+     "id": "lamp-wall",
+     "kind": "stamp",
+     "at": [
+      13,
+      24
+     ],
+     "when": {
+      "style": [
+       "wall"
+      ]
+     },
+     "rows": [
+      ".iiii.",
+      "iddddi",
+      "iddddi",
+      ".iiii."
+     ],
+     "key": {
+      "i": "ink",
+      "d": "lamp-off",
+      "L": "accent.light",
+      "W": "shine"
+     },
+     "variants": {
+      "lit": [
+       ".iiii.",
+       "iLLWLi",
+       "iLLLLi",
+       ".iiii."
+      ],
+      "white": [
+       ".iiii.",
+       "iWWWWi",
+       "iWWWWi",
+       ".iiii."
+      ]
+     }
+    },
+    {
+     "id": "lamp-crank",
+     "kind": "stamp",
+     "at": [
+      13,
+      25
+     ],
+     "when": {
+      "style": [
+       "crank"
+      ]
+     },
+     "rows": [
+      ".iiii.",
+      "iddddi",
+      "iddddi",
+      ".iiii."
+     ],
+     "key": {
+      "i": "ink",
+      "d": "lamp-off",
+      "L": "accent.light",
+      "W": "shine"
+     },
+     "variants": {
+      "lit": [
+       ".iiii.",
+       "iLLWLi",
+       "iLLLLi",
+       ".iiii."
+      ],
+      "white": [
+       ".iiii.",
+       "iWWWWi",
+       "iWWWWi",
+       ".iiii."
+      ]
+     }
+    },
+    {
+     "id": "sweep1-floor",
+     "kind": "arc",
+     "at": [
+      16,
+      22
+     ],
+     "r": {
+      "from": "length",
+      "map": [
+       [
+        0,
+        10.5
+       ],
+       [
+        1,
+        15.5
+       ]
+      ]
+     },
+     "a0": 213.5,
+     "a1": 200.65,
+     "thick": 1,
+     "paint": "sweep",
+     "hidden": true,
+     "when": {
+      "style": [
+       "floor"
+      ]
+     }
+    },
+    {
+     "id": "sweep2-floor",
+     "kind": "arc",
+     "at": [
+      16,
+      22
+     ],
+     "r": {
+      "from": "length",
+      "map": [
+       [
+        0,
+        10.5
+       ],
+       [
+        1,
+        15.5
+       ]
+      ]
+     },
+     "a0": 183.55,
+     "a1": 148.69,
+     "thick": 1,
+     "paint": "sweep",
+     "hidden": true,
+     "when": {
+      "style": [
+       "floor"
+      ]
+     }
+    },
+    {
+     "id": "spark-floor",
+     "gen": "twinkle",
+     "v": 2,
+     "at": [
+      19,
+      26
+     ],
+     "size": 1,
+     "paint": "accent.light",
+     "core": "shine",
+     "hidden": true,
+     "when": {
+      "style": [
+       "floor"
+      ]
+     }
+    },
+    {
+     "id": "flare-floor",
+     "gen": "twinkle",
+     "v": 2,
+     "at": [
+      19,
+      26
+     ],
+     "size": 2,
+     "paint": "accent.light",
+     "core": "shine",
+     "hidden": true,
+     "when": {
+      "style": [
+       "floor"
+      ]
+     }
+    },
+    {
+     "id": "sweep1-wall",
+     "kind": "arc",
+     "at": [
+      16,
+      20
+     ],
+     "r": {
+      "from": "length",
+      "map": [
+       [
+        0,
+        9.5
+       ],
+       [
+        1,
+        13.5
+       ]
+      ]
+     },
+     "a0": 223.8,
+     "a1": 203.74,
+     "thick": 1,
+     "paint": "sweep",
+     "hidden": true,
+     "when": {
+      "style": [
+       "wall"
+      ]
+     }
+    },
+    {
+     "id": "sweep2-wall",
+     "kind": "arc",
+     "at": [
+      16,
+      20
+     ],
+     "r": {
+      "from": "length",
+      "map": [
+       [
+        0,
+        9.5
+       ],
+       [
+        1,
+        13.5
+       ]
+      ]
+     },
+     "a0": 184.58,
+     "a1": 136.12,
+     "thick": 1,
+     "paint": "sweep",
+     "hidden": true,
+     "when": {
+      "style": [
+       "wall"
+      ]
+     }
+    },
+    {
+     "id": "spark-wall",
+     "gen": "twinkle",
+     "v": 2,
+     "at": [
+      19,
+      24
+     ],
+     "size": 1,
+     "paint": "accent.light",
+     "core": "shine",
+     "hidden": true,
+     "when": {
+      "style": [
+       "wall"
+      ]
+     }
+    },
+    {
+     "id": "flare-wall",
+     "gen": "twinkle",
+     "v": 2,
+     "at": [
+      19,
+      24
+     ],
+     "size": 2,
+     "paint": "accent.light",
+     "core": "shine",
+     "hidden": true,
+     "when": {
+      "style": [
+       "wall"
+      ]
+     }
+    },
+    {
+     "id": "sweep1-crank",
+     "kind": "arc",
+     "at": [
+      16,
+      20
+     ],
+     "r": {
+      "from": "length",
+      "map": [
+       [
+        0,
+        13.5
+       ],
+       [
+        1,
+        16.5
+       ]
+      ]
+     },
+     "a0": 212.4,
+     "a1": 200.32,
+     "thick": 1,
+     "paint": "sweep",
+     "hidden": true,
+     "when": {
+      "style": [
+       "crank"
+      ]
+     }
+    },
+    {
+     "id": "sweep2-crank",
+     "kind": "arc",
+     "at": [
+      16,
+      20
+     ],
+     "r": {
+      "from": "length",
+      "map": [
+       [
+        0,
+        13.5
+       ],
+       [
+        1,
+        16.5
+       ]
+      ]
+     },
+     "a0": 183.44,
+     "a1": 150.03,
+     "thick": 1,
+     "paint": "sweep",
+     "hidden": true,
+     "when": {
+      "style": [
+       "crank"
+      ]
+     }
+    },
+    {
+     "id": "spark-crank",
+     "gen": "twinkle",
+     "v": 2,
+     "at": [
+      19,
+      25
+     ],
+     "size": 1,
+     "paint": "accent.light",
+     "core": "shine",
+     "hidden": true,
+     "when": {
+      "style": [
+       "crank"
+      ]
+     }
+    },
+    {
+     "id": "flare-crank",
+     "gen": "twinkle",
+     "v": 2,
+     "at": [
+      19,
+      25
+     ],
+     "size": 2,
+     "paint": "accent.light",
+     "core": "shine",
+     "hidden": true,
+     "when": {
+      "style": [
+       "crank"
+      ]
+     }
+    }
+   ]
+  }
+ },
+ "clips": {
+  "off": {
+   "frames": 1,
+   "fps": 8,
+   "keys": [
+    {
+     "t": 0,
+     "nodes": {
+      "handle-floor": {
+       "turn": -35.5
+      },
+      "handle-wall": {
+       "turn": -45.8
+      },
+      "handle-crank": {
+       "turn": -34.4
+      }
+     }
+    }
+   ]
+  },
+  "pull": {
+   "frames": 6,
+   "fps": 12,
+   "loop": false,
+   "keys": [
+    {
+     "t": 0,
+     "ease": "linear",
+     "nodes": {
+      "handle-floor": {
+       "turn": -35.5
+      },
+      "handle-wall": {
+       "turn": -45.8
+      },
+      "handle-crank": {
+       "turn": -34.4
+      }
+     }
+    },
+    {
+     "t": 0.2,
+     "ease": "linear",
+     "nodes": {
+      "handle-floor": {
+       "turn": -10.65
+      },
+      "handle-wall": {
+       "turn": -13.74
+      },
+      "handle-crank": {
+       "turn": -10.32
+      }
+     }
+    },
+    {
+     "t": 0.4,
+     "ease": "linear",
+     "nodes": {
+      "handle-floor": {
+       "turn": 43.31
+      },
+      "handle-wall": {
+       "turn": 55.88
+      },
+      "handle-crank": {
+       "turn": 41.97
+      }
+     }
+    },
+    {
+     "t": 0.6,
+     "ease": "linear",
+     "nodes": {
+      "handle-floor": {
+       "turn": 31.24
+      },
+      "handle-wall": {
+       "turn": 40.3
+      },
+      "handle-crank": {
+       "turn": 30.27
+      }
+     }
+    },
+    {
+     "t": 0.8,
+     "ease": "linear",
+     "nodes": {
+      "handle-floor": {
+       "turn": 37.28
+      },
+      "handle-wall": {
+       "turn": 48.09
+      },
+      "handle-crank": {
+       "turn": 36.12
+      }
+     }
+    },
+    {
+     "t": 1,
+     "ease": "linear",
+     "nodes": {
+      "handle-floor": {
+       "turn": 35.5
+      },
+      "handle-wall": {
+       "turn": 45.8
+      },
+      "handle-crank": {
+       "turn": 34.4
+      }
+     }
+    }
+   ],
+   "frameEdits": {
+    "1": {
+     "show": [
+      "sweep1-floor",
+      "sweep1-wall",
+      "sweep1-crank"
+     ]
+    },
+    "2": {
+     "show": [
+      "sweep2-floor",
+      "sweep2-wall",
+      "sweep2-crank",
+      "flare-floor",
+      "flare-wall",
+      "flare-crank"
+     ],
+     "swap": {
+      "lamp-floor": "white",
+      "lamp-wall": "white",
+      "lamp-crank": "white"
+     }
+    },
+    "3": {
+     "swap": {
+      "lamp-floor": "lit",
+      "lamp-wall": "lit",
+      "lamp-crank": "lit"
+     },
+     "show": [
+      "spark-floor",
+      "spark-wall",
+      "spark-crank"
+     ]
+    },
+    "4": {
+     "swap": {
+      "lamp-floor": "lit",
+      "lamp-wall": "lit",
+      "lamp-crank": "lit"
+     },
+     "show": [
+      "spark-floor",
+      "spark-wall",
+      "spark-crank"
+     ]
+    },
+    "5": {
+     "swap": {
+      "lamp-floor": "lit",
+      "lamp-wall": "lit",
+      "lamp-crank": "lit"
+     },
+     "show": [
+      "spark-floor",
+      "spark-wall",
+      "spark-crank"
+     ]
+    }
+   },
+   "sounds": [
+    {
+     "sound": "lever-clank",
+     "preset": "Lever",
+     "frame": 2,
+     "volume": 0.8
+    }
+   ]
+  },
+  "on": {
+   "frames": 1,
+   "fps": 8,
+   "keys": [
+    {
+     "t": 0,
+     "nodes": {
+      "handle-floor": {
+       "turn": 35.5
+      },
+      "handle-wall": {
+       "turn": 45.8
+      },
+      "handle-crank": {
+       "turn": 34.4
+      }
+     }
+    }
+   ],
+   "frameEdits": {
+    "0": {
+     "swap": {
+      "lamp-floor": "lit",
+      "lamp-wall": "lit",
+      "lamp-crank": "lit"
+     },
+     "show": [
+      "spark-floor",
+      "spark-wall",
+      "spark-crank"
+     ]
+    }
+   }
+  }
+ }
+}

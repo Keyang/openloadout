@@ -1,0 +1,45 @@
+{ "format": "loadout-sprite",
+  "version": 2,
+  "id": "ui-speech-bubble",
+  "name": "Speech bubble",
+  "blurb": "A stretchable speech bubble with a tail pointing at whoever speaks, that pops open from its tail; change its style, tail, corners, line, shadow and colours.",
+  "meta": {"type": "ui", "role": "interface/panel", "themes": ["neutral"], "gameTypes": ["arcade", "top-down-rpg", "turn-based-rpg", "farming-sim"], "view": "none", "words": ["speech", "bubble", "talk", "dialogue", "balloon", "say", "shout", "chat"], "license": "draft"},
+  "size": [96,48],
+  "pivot": [48,24],
+  "grounded": false,
+  "preview": "bubble",
+  "styles": ["pixel"],
+  "palette": [
+  {"id": "face", "label": "Bubble", "default": "#f0ead8", "material": "paint", "swatches": ["#f0ead8", "#e6c96a", "#f6d3b0", "#c2c9d6", "#9bd18a"]},
+  {"id": "frame", "label": "Line", "default": "#3f5068", "material": "interface", "swatches": ["#3f5068", "#7a4f33", "#434d6d", "#8e3a4a"]} ],
+  "controls": [
+  {"key": "style", "kind": "choice", "label": "Style", "options": ["round", "box", "shout"], "default": "round"},
+  {"key": "tail", "kind": "choice", "label": "Tail", "options": ["down-left", "down-right", "up-left", "up-right", "left", "right"], "default": "down-left"},
+  {"key": "corner", "kind": "range", "label": "Corner", "lo": "Square", "hi": "Round", "default": 0.5, "when": {"style": ["round", "box"]}},
+  {"key": "border", "kind": "range", "label": "Border", "lo": "Thin", "hi": "Thick", "default": 0.5},
+  {"key": "shadow", "kind": "toggle", "label": "Shadow", "default": true},
+  {"key": "face", "kind": "colour", "label": "Bubble"},
+  {"key": "frame", "kind": "colour", "label": "Line"},
+  {"key": "speed", "standard": "speed"} ],
+  "body": { "panel": {
+    "piece": {"gen": "speech.bubble", "v": 1, "at": [48,24], "clip": ["bubble"], "picture": "bubble", "style": {"from": "style", "pick": {"round": "round", "box": "box", "shout": "shout"}}, "tail": {"from": "tail", "pick": {"down-left": "down-left", "down-right": "down-right", "up-left": "up-left", "up-right": "up-right", "left": "left", "right": "right"}}, "corner": {"from": "corner", "map": [[0,0], [1,1]], "round": "none"}, "border": {"from": "border", "map": [[0,0], [1,1]], "round": "none"}, "shadow": {"from": "shadow", "pick": {"true": true, "false": false}}, "face": "face", "frame": "frame"},
+    "states": [
+    "bubble",
+    "plain",
+    "open",
+    "tail" ],
+    "draw": [
+    {"gen": "speech.bubble", "v": 1, "at": [48,24], "clip": ["plain"], "picture": "plain", "style": {"from": "style", "pick": {"round": "round", "box": "box", "shout": "shout"}}, "tail": {"from": "tail", "pick": {"down-left": "down-left", "down-right": "down-right", "up-left": "up-left", "up-right": "up-right", "left": "left", "right": "right"}}, "corner": {"from": "corner", "map": [[0,0], [1,1]], "round": "none"}, "border": {"from": "border", "map": [[0,0], [1,1]], "round": "none"}, "shadow": {"from": "shadow", "pick": {"true": true, "false": false}}, "face": "face", "frame": "frame"},
+    {"gen": "speech.bubble", "v": 1, "at": [48,24], "clip": ["open"], "picture": "open", "style": {"from": "style", "pick": {"round": "round", "box": "box", "shout": "shout"}}, "tail": {"from": "tail", "pick": {"down-left": "down-left", "down-right": "down-right", "up-left": "up-left", "up-right": "up-right", "left": "left", "right": "right"}}, "corner": {"from": "corner", "map": [[0,0], [1,1]], "round": "none"}, "border": {"from": "border", "map": [[0,0], [1,1]], "round": "none"}, "shadow": {"from": "shadow", "pick": {"true": true, "false": false}}, "face": "face", "frame": "frame"},
+    {"gen": "speech.bubble", "v": 1, "at": [48,24], "clip": ["tail"], "picture": "tail", "style": {"from": "style", "pick": {"round": "round", "box": "box", "shout": "shout"}}, "tail": {"from": "tail", "pick": {"down-left": "down-left", "down-right": "down-right", "up-left": "up-left", "up-right": "up-right", "left": "left", "right": "right"}}, "corner": {"from": "corner", "map": [[0,0], [1,1]], "round": "none"}, "border": {"from": "border", "map": [[0,0], [1,1]], "round": "none"}, "shadow": {"from": "shadow", "pick": {"true": true, "false": false}}, "face": "face", "frame": "frame"} ] } },
+  "clips": {
+    "bubble": {"frames": 1, "fps": 8, "label": "With a tail"},
+    "plain": {"frames": 1, "fps": 8, "label": "No tail"},
+    "open": {"noText": true, "frames": 6, "fps": 12, "loop": false, "label": "Opening", "sounds": [{"sound": "menu-bubble-open", "preset": "Pop-up", "frame": 0, "volume": 0.5}]},
+    "tail": {"noText": true, "frames": 1, "fps": 8, "label": "Tail alone, for any point along an edge"} },
+  "versions": [
+  {"name": "Speech", "params": {}},
+  {"name": "Shout", "params": {"style": "shout", "tail": "down-right", "face": "#f6d3b0"}},
+  {"name": "Box, tail up", "params": {"style": "box", "tail": "up-left", "corner": 0}},
+  {"name": "Note on wheat", "params": {"face": "#e6c96a", "frame": "#7a4f33", "tail": "left"}},
+  {"name": "Thick blue line", "params": {"border": 1, "frame": "#434d6d", "face": "#c2c9d6", "shadow": false}} ] }

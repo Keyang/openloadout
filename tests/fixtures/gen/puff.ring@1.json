@@ -1,0 +1,183 @@
+{
+ "id": "puff.ring",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     24,
+     24
+    ],
+    "count": 6,
+    "r0": 4,
+    "r1": 14,
+    "size": 4,
+    "paints": [
+     "s0",
+     "s1",
+     "s2"
+    ]
+   },
+   "ctx": {
+    "t": 0.3,
+    "loop": false
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      12,
+      12
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...........aaa.....",
+      "..........abbba....",
+      ".........abbbba....",
+      ".........abbbba....",
+      "...aaa...abbbbaaa..",
+      "..abbba...aaaabbba.",
+      ".abbbbba.....abbbba",
+      ".abbbbba.....abbbba",
+      "..abbba......abbba.",
+      "...aaa........aaa..",
+      "...................",
+      "...................",
+      "..aaa.......a......",
+      ".abbba....aabaaaaa.",
+      "abbbbba..abbbbbbbba",
+      "abbbbba..abbbbbbbba",
+      "abbbbba..abbbbbbbba",
+      ".abbba....abbabbba.",
+      "..aaa......aa.aaa.."
+     ],
+     "key": {
+      "a": "s2",
+      "b": "s0"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     24,
+     26
+    ],
+    "count": 7,
+    "r0": 6,
+    "r1": 16,
+    "size": 5,
+    "hold": 0.2,
+    "rise": 4,
+    "lobes": 3,
+    "seed": 2,
+    "paints": [
+     "s0",
+     "s1",
+     "s2"
+    ]
+   },
+   "ctx": {
+    "t": 0.6,
+    "loop": false
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      6,
+      8
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..........aaa........aaa.",
+      ".........abbbaa.....abbba",
+      "........abbbbbba...abbbbb",
+      "........abbbbbba..abbbbbb",
+      ".........aababa....abaaaa",
+      "...........a.a......a....",
+      ".........................",
+      ".........................",
+      ".........................",
+      "...aa................aa..",
+      "..abba..............abbaa",
+      ".abbba.............abbbbb",
+      "abbbbba...........abbbbbb",
+      "abbbbba............abbbba",
+      ".aaaaa..............aaaa.",
+      ".........................",
+      ".........................",
+      "......aa........a.....a..",
+      ".....abba......aba...aba.",
+      "....abbbba....abbbaaabbba",
+      "...abbbbbba..abbbbbbbbbbb",
+      "....abbbbba..abbbbbabbbbb",
+      ".....aaaaa....aaaaa.aaaaa"
+     ],
+     "key": {
+      "a": "s2",
+      "b": "s0"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     24,
+     24
+    ],
+    "count": 5,
+    "r0": 3,
+    "r1": 12,
+    "size": 4,
+    "apart": true,
+    "turn": 30,
+    "paints": [
+     "s0",
+     "s1",
+     "s2"
+    ]
+   },
+   "ctx": {
+    "t": 0.15,
+    "loop": false
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      15,
+      14
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".........a......",
+      ".......aabaa....",
+      "......acbbbba...",
+      "......abbbbba...",
+      "..aaaaccbbbba...",
+      ".abbbbacbbbbaa..",
+      "acbbbbbacccabba.",
+      "acbbbbbaaaabbbba",
+      "accbbbbaacbbbbba",
+      ".acaaaaaaccbbbba",
+      "..abbbba.acccca.",
+      ".acbbbbbacaaaaa.",
+      ".acbbbbbacbbbbba",
+      ".acbbbbbacbbbbba",
+      ".accbbbbaccbbba.",
+      "..acccca.accca..",
+      "...aaaa...aaa..."
+     ],
+     "key": {
+      "a": "s2",
+      "b": "s0",
+      "c": "s1"
+     }
+    }
+   ]
+  }
+ ]
+}

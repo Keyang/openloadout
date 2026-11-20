@@ -1,0 +1,324 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "tiles-forest",
+ "name": "Forest ground tiles",
+ "blurb": "Grassy earth for a side-view level, with a ledge, slopes and small plants; change the colours, how deep the grass is and how lumpy the ground.",
+ "size": [32,32],
+ "pivot": [16,16],
+ "grounded": false,
+ "preview": "grass-top",
+ "styles": ["pixel"],
+ "meta": {
+  "type": "tileset",
+  "role": "world/tile",
+  "themes": ["fantasy","forest"],
+  "gameTypes": ["platformer"],
+  "view": "side",
+  "words": ["grass","ground","dirt","soil","earth","floor","terrain","hill","slope","ledge","walk","level","meadow"],
+  "license": "draft"
+ },
+ "palette": [
+  {
+   "id": "grass",
+   "label": "Grass",
+   "default": "#6aa83e",
+   "material": "plant",
+   "swatches": ["#6aa83e","#3f8a4f","#a4c44a","#9bd18a"]
+  },
+  {
+   "id": "soil",
+   "label": "Soil",
+   "default": "#7a4f33",
+   "material": "earth",
+   "swatches": ["#7a4f33","#a06a3c","#8f97a8","#5d6475"]
+  },
+  {
+   "id": "stone",
+   "label": "Stone",
+   "default": "#8f97a8",
+   "material": "stone",
+   "swatches": ["#8f97a8","#5d6475","#f0ead8","#3f5068","#a4c44a","#6b7280"]
+  },
+  {
+   "id": "flowers",
+   "label": "Flowers",
+   "default": "#c9423a",
+   "material": "plant",
+   "swatches": ["#c9423a","#f2c230","#7a4fc4","#f0ead8","#4fd8ee","#a4c44a"]
+  },
+  {"id":"clod","material":"earth","derive":{"rule":"textureTone","of":"soil"}},
+  {"id":"pebble","material":"stone","derive":{"rule":"textureTone","of":"stone","against":"soil"}},
+  {"id":"pebble-lit","material":"stone","derive":{"rule":"mix","of":"stone","with":"pebble","amount":0.4}},
+  {"id":"root","material":"wood","derive":{"rule":"mix","of":"soil.light","with":"soil","amount":0.45}},
+  {"id":"petal-hi","material":"plant","derive":{"rule":"mix","of":"flowers.light","with":"white","amount":0.6}}
+ ],
+ "controls": [
+  {"key":"edge","kind":"range","label":"Edge","lo":"Thin","hi":"Deep","min":5,"max":9,"step":1,"default":7},
+  {"key":"bumps","kind":"range","label":"Surface","lo":"Flat","hi":"Lumpy","min":0,"max":3,"step":1,"default":1},
+  {"key":"texture","kind":"range","label":"Texture","lo":"Plain","hi":"Busy","default":0.5},
+  {"key":"roots","kind":"toggle","label":"Roots","default":false},
+  {"key":"grass","kind":"colour","label":"Grass"},
+  {"key":"soil","kind":"colour","label":"Soil"},
+  {"key":"stone","kind":"colour","label":"Stone"},
+  {"key":"flowers","kind":"colour","label":"Flowers"}
+ ],
+ "body": {
+  "tiles": {
+   "tile": 32,
+   "profiles": {
+    "dips": [0,0,0,0.3,0.67,1,1,0.67,0.3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.3,0.67,1,1,0.67,0.3,0,0,0],
+    "hang": [1,2,1,0,0,1,2,3,2,0,0,1,1,0,2,3,1,0,0,1,2,1,0,0,1,3,2,1,0,0,2,1],
+    "rag": [2,1,2,2.5,2.5,2,1,0,1,2.5,2.5,2,2,2.5,1,0,2,2.5,2.5,2,1,2,2.5,2.5,2,0,1,2,2.5,2.5,1,2],
+    "dent-l": [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
+    "dent-r": [0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    "under": [0,0,1,1,2,0.55,0,0.55,2,3.2,2,1,0.55,0,0,1,2,2,0.55,0,0.55,1,2,3.2,2,1,0,0,0.55,1,0,0],
+    "under-ledge": [0,0,1,1,1,1,0,1,1,1,1,1,1,0,0,1,1,1,1,0,1,1,1,1,1,1,0,0,1,1,0,0],
+    "root": [0,0,0,0,0,0,1,0,0,0,0,0,0,2,0,0,0,0,0,3,0,0,0,0,0,0,0,4,0,0,0,0],
+    "root-kink": [0,0,0,0,0,0,0,1,0,0,0,0,0,0,2,0,0,0,0,0,3,0,0,0,0,0,0,0,4,0,0,0]
+   },
+   "groups": [
+    {
+     "name": "grass",
+     "kind": "block",
+     "use": "ground",
+     "pieces": ["block","narrow","thin","slope"],
+     "fills": 3,
+     "thickness": 12,
+     "under": {"depth":1,"inset":{"profile":"under-ledge","amount":1},"bands":[{"rows":[1,99],"paint":"soil.dark"}]},
+     "material": {
+      "fill": {
+       "base": "soil",
+       "versions": [
+        [
+         {
+          "kind": "stamp",
+          "at": [7,10],
+          "rows": ["aa",".a"],
+          "key": {"a":"clod"},
+          "when": {"texture":[{"atLeast":0.16666666666666666}]}
+         },
+         {"kind":"stamp","at":[13,22],"rows":["aa",".a"],"key":{"a":"clod"},"when":{"texture":[{"atLeast":0.5}]}},
+         {
+          "kind": "stamp",
+          "at": [19,6],
+          "rows": [".ab","aaa","aaa"],
+          "key": {"a":"pebble","b":"pebble-lit"},
+          "when": {"texture":[{"atLeast":0.8333333333333334}]}
+         }
+        ],
+        [
+         {"kind":"stamp","at":[18,7],"rows":["aa",".a"],"key":{"a":"clod"}},
+         {
+          "kind": "stamp",
+          "at": [26,4],
+          "rows": ["aa",".a"],
+          "key": {"a":"clod"},
+          "when": {"texture":[{"atLeast":0.16666666666666666}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [6,19],
+          "rows": ["aa.......aaa.......","..aaa..aa...aa...aa",".....aa.......aaa.."],
+          "key": {"a":"clod"},
+          "when": {"texture":[{"atLeast":0.16666666666666666}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [6,20],
+          "rows": ["aa.......aaa.......","..aaa..aa...aa...aa",".....aa.......aaa.."],
+          "key": {"a":"clod"},
+          "when": {"texture":[{"atLeast":0.8333333333333334}]}
+         }
+        ],
+        [
+         {"kind":"stamp","at":[4,25],"rows":[".ab","aaa","aaa"],"key":{"a":"pebble","b":"pebble-lit"}},
+         {
+          "kind": "stamp",
+          "at": [22,13],
+          "rows": ["aa",".a"],
+          "key": {"a":"clod"},
+          "when": {"texture":[{"atLeast":0.16666666666666666}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [16,6],
+          "rows": [".ab","aaa","aaa"],
+          "key": {"a":"pebble","b":"pebble-lit"},
+          "when": {"texture":[{"atLeast":0.5}]}
+         },
+         {
+          "kind": "stamp",
+          "at": [21,26],
+          "rows": ["aa",".a"],
+          "key": {"a":"clod"},
+          "when": {"texture":[{"atLeast":0.8333333333333334}]}
+         }
+        ]
+       ]
+      },
+      "round": 1,
+      "edges": {
+       "top": {
+        "depth": {
+         "from": "edge",
+         "map": [[5,5],[5.4999,5],[5.5,6],[6.4999,6],[6.5,7],[7.4999,7],[7.5,8],[8.4999,8],[8.5,9],[9,9]],
+         "round": "px"
+        },
+        "wrap": 4,
+        "tuck": true,
+        "inset": {
+         "profile": "dips",
+         "amount": {
+          "from": "bumps",
+          "map": [[0,0],[0.4999,0],[0.5,1],[1.4999,1],[1.5,2],[2.4999000000000002,2],[2.5,3],[3,3]],
+          "round": "px"
+         }
+        },
+        "ragged": {
+         "profile": "rag",
+         "amount": {"from":"edge","map":[[5,0.55],[5.4999,0.55],[5.5,0.9],[6.4999,0.9],[6.5,1],[9,1]],"round":"none"}
+        },
+        "bands": [
+         {"rows":"last","paint":"soil.dark"},
+         {"rows":[1,1],"paint":"grass.light"},
+         {"rows":"last-1","paint":"grass.dark"},
+         {"rows":[2,2],"where":{"profile":"hang","in":[0]},"paint":"grass.light"},
+         {"rows":[3,4],"where":{"profile":"hang","in":[2]},"paint":"grass","when":{"edge":[{"atLeast":8.5}]}},
+         {"rows":[3,3],"where":{"profile":"hang","in":[2]},"paint":"grass","when":{"edge":[{"atLeast":7.5}]}},
+         {"rows":[3,5],"where":{"profile":"hang","in":[3]},"paint":"grass","when":{"edge":[{"atLeast":8.5}]}},
+         {"rows":[3,4],"where":{"profile":"hang","in":[3]},"paint":"grass","when":{"edge":[{"atLeast":7.5}]}},
+         {"rows":[3,3],"where":{"profile":"hang","in":[3]},"paint":"grass","when":{"edge":[{"atLeast":6.5}]}},
+         {"rows":[3,99],"where":{"profile":"hang","in":[2,3]},"paint":"grass.dark"},
+         {"rows":[1,99],"paint":"grass"}
+        ]
+       },
+       "left": {
+        "depth": 1,
+        "inset": {"profile":"dent-l","amount":{"from":"bumps","map":[[0,0],[0.4999,0],[0.5,1],[3,1]],"round":"px"}},
+        "bands": [{"rows":[1,99],"paint":"soil.dark"}]
+       },
+       "right": {"inset":{"profile":"dent-r","amount":{"from":"bumps","map":[[0,0],[0.4999,0],[0.5,1],[3,1]],"round":"px"}}},
+       "bottom": {
+        "depth": {"from":"roots","pick":{"true":11,"false":2}},
+        "tuck": 2,
+        "inset": {"profile":"under","amount":{"from":"roots","pick":{"true":0.8,"false":1}}},
+        "bands": [
+         {"rows":[1,6],"where":{"profile":"root","in":[1]},"paint":"root","when":{"roots":[true]}},
+         {"rows":[7,9],"where":{"profile":"root-kink","in":[1]},"paint":"root","when":{"roots":[true]}},
+         {"rows":[1,3],"where":{"profile":"root","in":[2]},"paint":"root","when":{"roots":[true]}},
+         {"rows":[4,6],"where":{"profile":"root-kink","in":[2]},"paint":"root","when":{"roots":[true]}},
+         {"rows":[1,7],"where":{"profile":"root","in":[3]},"paint":"root","when":{"roots":[true]}},
+         {"rows":[8,10],"where":{"profile":"root-kink","in":[3]},"paint":"root","when":{"roots":[true]}},
+         {"rows":[1,4],"where":{"profile":"root","in":[4]},"paint":"root","when":{"roots":[true]}},
+         {"rows":[5,7],"where":{"profile":"root-kink","in":[4]},"paint":"root","when":{"roots":[true]}},
+         {"rows":[1,2],"paint":"soil.dark"}
+        ]
+       }
+      }
+     },
+     "decals": [
+      {
+       "name": "a",
+       "place": "above",
+       "label": "Grass tuft",
+       "outline": false,
+       "draw": [
+        {
+         "kind": "stamp",
+         "at": [10,23],
+         "rows": [
+          ".....a......",
+          ".....b.a....",
+          "...a.b.b....",
+          "...cabab.a..",
+          ".a.cbbcbac..",
+          ".bacbbcbbc..",
+          "abbcbbcbbca.",
+          "cbbcbbcbbcba",
+          "cbbcbbcbbcbb"
+         ],
+         "key": {"a":"grass.light","b":"grass","c":"grass.dark"}
+        }
+       ]
+      },
+      {
+       "name": "b",
+       "place": "above",
+       "label": "Flowers",
+       "outline": false,
+       "draw": [
+        {
+         "kind": "stamp",
+         "at": [10,19],
+         "rows": [
+          ".....aab......",
+          ".....aca......",
+          ".....daa......",
+          "......e...aab.",
+          "aab...e...aca.",
+          "aca...e...daa.",
+          "daa...e....e..",
+          ".e....e....e..",
+          ".e....eff..e..",
+          ".e....e....eff",
+          ".eff..e....e..",
+          ".e....e....e..",
+          ".e....e....e.."
+         ],
+         "key": {"a":"flowers","b":"flowers.light","c":"petal-hi","d":"flowers.dark","e":"grass.dark","f":"grass"}
+        }
+       ]
+      },
+      {
+       "name": "c",
+       "place": "above",
+       "label": "Half-buried stone",
+       "outline": true,
+       "draw": [
+        {
+         "kind": "stamp",
+         "at": [10,26],
+         "rows": ["...aaaaaa...","..bccbccaa..",".bbcbccccaa.",".bccbccccca.",".bcccccccca.","bbbcccccccaa"],
+         "key": {"a":"stone.light","b":"stone.dark","c":"stone"}
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "clips": {
+  "grass-left": {"label":"Grass: top left corner"},
+  "grass-top": {"label":"Grass: top"},
+  "grass-right": {"label":"Grass: top right corner"},
+  "grass-side-l": {"label":"Grass: left side"},
+  "grass-fill": {"label":"Grass: middle"},
+  "grass-fill-b": {"label":"Grass: middle, version B"},
+  "grass-fill-c": {"label":"Grass: middle, version C"},
+  "grass-side-r": {"label":"Grass: right side"},
+  "grass-bottom-l": {"label":"Grass: bottom left corner"},
+  "grass-bottom": {"label":"Grass: bottom"},
+  "grass-bottom-r": {"label":"Grass: bottom right corner"},
+  "grass-inner-tl": {"label":"Grass: inside corner, top left"},
+  "grass-inner-tr": {"label":"Grass: inside corner, top right"},
+  "grass-inner-bl": {"label":"Grass: inside corner, bottom left"},
+  "grass-inner-br": {"label":"Grass: inside corner, bottom right"},
+  "grass-strip-l": {"label":"Grass: strip, left end"},
+  "grass-strip-m": {"label":"Grass: strip, middle"},
+  "grass-strip-r": {"label":"Grass: strip, right end"},
+  "grass-col-t": {"label":"Grass: column, top"},
+  "grass-col-m": {"label":"Grass: column, middle"},
+  "grass-col-b": {"label":"Grass: column, bottom"},
+  "grass-single": {"label":"Grass: single tile"},
+  "grass-thin-l": {"label":"Grass ledge: left end"},
+  "grass-thin-m": {"label":"Grass ledge: middle"},
+  "grass-thin-r": {"label":"Grass ledge: right end"},
+  "grass-slope-up": {"label":"Grass: slope up"},
+  "grass-slope-down": {"label":"Grass: slope down"},
+  "grass-deco-a": {"label":"Grass tuft"},
+  "grass-deco-b": {"label":"Flowers"},
+  "grass-deco-c": {"label":"Half-buried stone"}
+ }
+}

@@ -1,0 +1,682 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "wooden-door",
+ "name": "Wooden door",
+ "blurb": "A wooden door in a stone frame that swings open or rattles when it is locked. Make it plain, arched or iron-bound, and change its size, window, lock and colours.",
+ "meta": {
+  "type": "prop",
+  "role": "world/door",
+  "themes": [
+   "fantasy",
+   "dungeon"
+  ],
+  "gameTypes": [
+   "platformer"
+  ],
+  "view": "side",
+  "words": [
+   "door",
+   "gate",
+   "doorway",
+   "entrance",
+   "exit",
+   "open",
+   "locked",
+   "lock",
+   "castle",
+   "wooden",
+   "level end",
+   "key"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  48,
+  64
+ ],
+ "pivot": [
+  24,
+  62
+ ],
+ "preview": "closed",
+ "styles": [
+  "pixel"
+ ],
+ "palette": [
+  {
+   "id": "wood",
+   "label": "Wood",
+   "default": "#a06a3c",
+   "material": "wood",
+   "swatches": [
+    "#a06a3c",
+    "#7a4f33",
+    "#f0ead8",
+    "#a8612a",
+    "#5a3a22",
+    "#c98a4a"
+   ]
+  },
+  {
+   "id": "metal",
+   "label": "Metal",
+   "default": "#c2c9d6",
+   "material": "metal",
+   "swatches": [
+    "#c2c9d6",
+    "#f2c230",
+    "#8f97a8",
+    "#5d6475",
+    "#e6c545",
+    "#c98a4a"
+   ]
+  },
+  {
+   "id": "stone",
+   "label": "Stone",
+   "default": "#8f97a8",
+   "material": "stone",
+   "swatches": [
+    "#8f97a8",
+    "#5d6475",
+    "#f0ead8",
+    "#3f5068",
+    "#a4c44a",
+    "#6b7280"
+   ]
+  },
+  {
+   "id": "hole",
+   "default": "#30334b",
+   "material": "stone",
+   "detail": true
+  },
+  {
+   "id": "shine",
+   "default": "#ffffff",
+   "material": "light",
+   "detail": true
+  }
+ ],
+ "controls": [
+  {
+   "key": "style",
+   "kind": "choice",
+   "label": "Style",
+   "options": [
+    {
+     "value": "plank",
+     "label": "Plank"
+    },
+    {
+     "value": "arched",
+     "label": "Arched"
+    },
+    {
+     "value": "iron-bound",
+     "label": "Iron-bound"
+    }
+   ],
+   "default": "plank"
+  },
+  {
+   "key": "width",
+   "kind": "range",
+   "label": "Width",
+   "lo": "Narrow",
+   "hi": "Wide",
+   "default": 0.5
+  },
+  {
+   "key": "height",
+   "kind": "range",
+   "label": "Height",
+   "lo": "Short",
+   "hi": "Tall",
+   "default": 0.5
+  },
+  {
+   "key": "window",
+   "kind": "toggle",
+   "label": "Barred window",
+   "default": false
+  },
+  {
+   "key": "lock",
+   "kind": "choice",
+   "label": "Lock",
+   "options": [
+    {
+     "value": "none",
+     "label": "None"
+    },
+    {
+     "value": "padlock",
+     "label": "Padlock"
+    },
+    {
+     "value": "keyhole",
+     "label": "Keyhole"
+    },
+    {
+     "value": "bar",
+     "label": "Bar"
+    }
+   ],
+   "default": "keyhole"
+  },
+  {
+   "key": "lockSize",
+   "kind": "range",
+   "label": "Size",
+   "lo": "Small",
+   "hi": "Big",
+   "default": 1,
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05
+  },
+  {
+   "key": "wood",
+   "kind": "colour",
+   "label": "Wood"
+  },
+  {
+   "key": "metal",
+   "kind": "colour",
+   "label": "Metal"
+  },
+  {
+   "key": "stone",
+   "kind": "colour",
+   "label": "Stone"
+  },
+  {
+   "key": "speed",
+   "standard": "speed"
+  }
+ ],
+ "parts": {
+  "lock": {
+   "label": "Lock",
+   "params": [
+    "lock",
+    "lockSize"
+   ],
+   "none": "none",
+   "socket": "lock"
+  }
+ },
+ "points": [
+  {
+   "id": "lock",
+   "on": "latch",
+   "at": [
+    0,
+    0
+   ],
+   "angle": 0
+  }
+ ],
+ "body": {
+  "pictures": {
+   "nodes": [
+    {
+     "id": "latch",
+     "parent": null,
+     "at": [
+      {
+       "from": "width",
+       "map": [
+        [
+         0,
+         28
+        ],
+        [
+         1,
+         34
+        ]
+       ],
+       "round": "px"
+      },
+      {
+       "from": "height",
+       "map": [
+        [
+         0,
+         46
+        ],
+        [
+         1,
+         40
+        ]
+       ],
+       "round": "px"
+      }
+     ]
+    }
+   ],
+   "draw": [
+    {
+     "id": "door",
+     "gen": "door.wood",
+     "v": 1,
+     "at": [
+      24,
+      62
+     ],
+     "style": {
+      "from": "style",
+      "pick": {
+       "plank": "plank",
+       "arched": "arched",
+       "iron-bound": "iron-bound"
+      }
+     },
+     "width": {
+      "from": "width",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "height": {
+      "from": "height",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "window": {
+      "from": "window",
+      "pick": {
+       "true": true,
+       "false": false
+      }
+     },
+     "lock": {
+      "from": "lock",
+      "pick": {
+       "none": "none",
+       "padlock": "padlock",
+       "keyhole": "keyhole",
+       "bar": "bar"
+      }
+     },
+     "lockSize": {
+      "from": "lockSize",
+      "map": [
+       [
+        0.65,
+        0.65
+       ],
+       [
+        1.35,
+        1.35
+       ]
+      ]
+     },
+     "wood": "wood",
+     "metal": "metal",
+     "stone": "stone",
+     "hole": "hole",
+     "shine": "shine",
+     "clip": [
+      "closed"
+     ]
+    },
+    {
+     "id": "door-open",
+     "gen": "door.wood",
+     "v": 1,
+     "at": [
+      24,
+      62
+     ],
+     "style": {
+      "from": "style",
+      "pick": {
+       "plank": "plank",
+       "arched": "arched",
+       "iron-bound": "iron-bound"
+      }
+     },
+     "width": {
+      "from": "width",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "height": {
+      "from": "height",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "window": {
+      "from": "window",
+      "pick": {
+       "true": true,
+       "false": false
+      }
+     },
+     "lock": {
+      "from": "lock",
+      "pick": {
+       "none": "none",
+       "padlock": "padlock",
+       "keyhole": "keyhole",
+       "bar": "bar"
+      }
+     },
+     "lockSize": {
+      "from": "lockSize",
+      "map": [
+       [
+        0.65,
+        0.65
+       ],
+       [
+        1.35,
+        1.35
+       ]
+      ]
+     },
+     "wood": "wood",
+     "metal": "metal",
+     "stone": "stone",
+     "hole": "hole",
+     "shine": "shine",
+     "clip": [
+      "open"
+     ],
+     "open": [
+      1,
+      0.9,
+      0.58,
+      0.28,
+      0.08,
+      0.14
+     ]
+    },
+    {
+     "id": "door-locked",
+     "gen": "door.wood",
+     "v": 1,
+     "at": [
+      24,
+      62
+     ],
+     "style": {
+      "from": "style",
+      "pick": {
+       "plank": "plank",
+       "arched": "arched",
+       "iron-bound": "iron-bound"
+      }
+     },
+     "width": {
+      "from": "width",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "height": {
+      "from": "height",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "window": {
+      "from": "window",
+      "pick": {
+       "true": true,
+       "false": false
+      }
+     },
+     "lock": {
+      "from": "lock",
+      "pick": {
+       "none": "none",
+       "padlock": "padlock",
+       "keyhole": "keyhole",
+       "bar": "bar"
+      }
+     },
+     "lockSize": {
+      "from": "lockSize",
+      "map": [
+       [
+        0.65,
+        0.65
+       ],
+       [
+        1.35,
+        1.35
+       ]
+      ]
+     },
+     "wood": "wood",
+     "metal": "metal",
+     "stone": "stone",
+     "hole": "hole",
+     "shine": "shine",
+     "clip": [
+      "locked"
+     ],
+     "rattle": [
+      1,
+      -1,
+      1,
+      0
+     ],
+     "flash": [
+      1,
+      0
+     ]
+    },
+    {
+     "kind": "outline",
+     "paint": "ink"
+    }
+   ]
+  }
+ },
+ "clips": {
+  "closed": {
+   "frames": 1,
+   "fps": 8
+  },
+  "open": {
+   "frames": 6,
+   "fps": 12,
+   "loop": false,
+   "keys": [
+    {
+     "t": 0,
+     "ease": "linear",
+     "nodes": {
+      "latch": {
+       "move": [
+        0,
+        0
+       ]
+      }
+     }
+    },
+    {
+     "t": 0.2,
+     "ease": "linear",
+     "nodes": {
+      "latch": {
+       "move": [
+        -2,
+        0
+       ]
+      }
+     }
+    },
+    {
+     "t": 0.4,
+     "ease": "linear",
+     "nodes": {
+      "latch": {
+       "move": [
+        -10,
+        0
+       ]
+      }
+     }
+    },
+    {
+     "t": 0.6,
+     "ease": "linear",
+     "nodes": {
+      "latch": {
+       "move": [
+        -17,
+        0
+       ]
+      }
+     }
+    },
+    {
+     "t": 0.8,
+     "ease": "linear",
+     "nodes": {
+      "latch": {
+       "move": [
+        -18,
+        0
+       ]
+      }
+     }
+    },
+    {
+     "t": 1,
+     "ease": "linear",
+     "nodes": {
+      "latch": {
+       "move": [
+        -18,
+        0
+       ]
+      }
+     }
+    }
+   ],
+   "sounds": [
+    {
+     "sound": "door-creak",
+     "preset": "Wooden door",
+     "frame": 0,
+     "volume": 0.8
+    }
+   ]
+  },
+  "locked": {
+   "frames": 4,
+   "fps": 12,
+   "loop": false,
+   "keys": [
+    {
+     "t": 0,
+     "ease": "linear",
+     "nodes": {
+      "latch": {
+       "move": [
+        1,
+        0
+       ]
+      }
+     }
+    },
+    {
+     "t": 0.3333333333333333,
+     "ease": "linear",
+     "nodes": {
+      "latch": {
+       "move": [
+        -1,
+        0
+       ]
+      }
+     }
+    },
+    {
+     "t": 0.6666666666666666,
+     "ease": "linear",
+     "nodes": {
+      "latch": {
+       "move": [
+        1,
+        0
+       ]
+      }
+     }
+    },
+    {
+     "t": 1,
+     "ease": "linear",
+     "nodes": {
+      "latch": {
+       "move": [
+        0,
+        0
+       ]
+      }
+     }
+    }
+   ],
+   "sounds": [
+    {
+     "sound": "lever-clank",
+     "preset": "Switch",
+     "frame": 0,
+     "volume": 0.7
+    }
+   ]
+  }
+ }
+}

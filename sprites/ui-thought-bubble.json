@@ -1,0 +1,43 @@
+{ "format": "loadout-sprite",
+  "version": 2,
+  "id": "ui-thought-bubble",
+  "name": "Thought bubble",
+  "blurb": "A stretchable thought cloud with a trail of puffs back to the thinker, that grows out of its trail; change its style, trail, line, shadow and colours.",
+  "meta": {"type": "ui", "role": "interface/panel", "themes": ["neutral"], "gameTypes": ["arcade", "top-down-rpg", "farming-sim", "puzzle"], "view": "none", "words": ["thought", "bubble", "think", "cloud", "dream", "wonder", "idea", "balloon"], "license": "draft"},
+  "size": [96,48],
+  "pivot": [48,24],
+  "grounded": false,
+  "preview": "bubble",
+  "styles": ["pixel"],
+  "palette": [
+  {"id": "face", "label": "Bubble", "default": "#f0ead8", "material": "paint", "swatches": ["#f0ead8", "#e6c96a", "#f6d3b0", "#c2c9d6", "#9bd18a"]},
+  {"id": "frame", "label": "Line", "default": "#3f5068", "material": "interface", "swatches": ["#3f5068", "#7a4f33", "#434d6d", "#8e3a4a"]},
+  {"id": "accent", "label": "Sparkles", "default": "#7a4fc4", "material": "interface", "swatches": ["#7a4fc4", "#c9423a", "#3f6fd1", "#3f8a4f", "#e08a2c"]} ],
+  "controls": [
+  {"key": "style", "kind": "choice", "label": "Style", "options": ["cloud", "puff", "dream"], "default": "cloud"},
+  {"key": "trail", "kind": "choice", "label": "Trail", "options": ["down-left", "down-right", "up-left", "up-right"], "default": "down-left"},
+  {"key": "border", "kind": "range", "label": "Border", "lo": "Thin", "hi": "Thick", "default": 0.5},
+  {"key": "shadow", "kind": "toggle", "label": "Shadow", "default": true},
+  {"key": "face", "kind": "colour", "label": "Bubble"},
+  {"key": "frame", "kind": "colour", "label": "Line"},
+  {"key": "accent", "kind": "colour", "label": "Sparkles", "when": {"style": ["dream"]}},
+  {"key": "speed", "standard": "speed"} ],
+  "body": { "panel": {
+    "piece": {"gen": "thought.bubble", "v": 1, "at": [48,24], "clip": ["bubble"], "picture": "bubble", "style": {"from": "style", "pick": {"cloud": "cloud", "puff": "puff", "dream": "dream"}}, "trail": {"from": "trail", "pick": {"down-left": "down-left", "down-right": "down-right", "up-left": "up-left", "up-right": "up-right"}}, "border": {"from": "border", "map": [[0,0], [1,1]], "round": "none"}, "shadow": {"from": "shadow", "pick": {"true": true, "false": false}}, "face": "face", "frame": "frame", "accent": "accent"},
+    "states": [
+    "bubble",
+    "plain",
+    "open" ],
+    "draw": [
+    {"gen": "thought.bubble", "v": 1, "at": [48,24], "clip": ["plain"], "picture": "plain", "style": {"from": "style", "pick": {"cloud": "cloud", "puff": "puff", "dream": "dream"}}, "trail": {"from": "trail", "pick": {"down-left": "down-left", "down-right": "down-right", "up-left": "up-left", "up-right": "up-right"}}, "border": {"from": "border", "map": [[0,0], [1,1]], "round": "none"}, "shadow": {"from": "shadow", "pick": {"true": true, "false": false}}, "face": "face", "frame": "frame", "accent": "accent"},
+    {"gen": "thought.bubble", "v": 1, "at": [48,24], "clip": ["open"], "picture": "open", "style": {"from": "style", "pick": {"cloud": "cloud", "puff": "puff", "dream": "dream"}}, "trail": {"from": "trail", "pick": {"down-left": "down-left", "down-right": "down-right", "up-left": "up-left", "up-right": "up-right"}}, "border": {"from": "border", "map": [[0,0], [1,1]], "round": "none"}, "shadow": {"from": "shadow", "pick": {"true": true, "false": false}}, "face": "face", "frame": "frame", "accent": "accent"} ] } },
+  "clips": {
+    "bubble": {"frames": 1, "fps": 8, "label": "With a trail"},
+    "plain": {"frames": 1, "fps": 8, "label": "No trail"},
+    "open": {"noText": true, "frames": 6, "fps": 10, "loop": false, "label": "Opening", "sounds": [{"sound": "menu-bubble-open", "preset": "Pop-up", "frame": 0, "volume": 0.5}]} },
+  "versions": [
+  {"name": "Thought", "params": {}},
+  {"name": "Puff", "params": {"style": "puff", "trail": "down-right"}},
+  {"name": "Dream", "params": {"style": "dream", "face": "#9bd18a", "accent": "#3f6fd1"}},
+  {"name": "Wheat cloud", "params": {"face": "#e6c96a", "frame": "#7a4f33", "trail": "up-left"}},
+  {"name": "Bold wine line", "params": {"border": 1, "shadow": false, "frame": "#8e3a4a", "trail": "up-right"}} ] }

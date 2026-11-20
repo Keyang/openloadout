@@ -1,0 +1,677 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "ui-panel-wood",
+ "name": "Wooden panels",
+ "blurb": "Stretchable wooden boxes for menus and pop-ups: a framed board, a board with a heading strip and a parchment scroll; change the corners, border, nails, grain and colours.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/panel",
+  "themes": [
+   "fantasy",
+   "neutral"
+  ],
+  "gameTypes": [
+   "platformer",
+   "turn-based-rpg",
+   "top-down-rpg",
+   "arcade",
+   "puzzle"
+  ],
+  "view": "none",
+  "words": [
+   "panel",
+   "window",
+   "box",
+   "menu",
+   "pause",
+   "popup",
+   "wood",
+   "wooden",
+   "board",
+   "frame",
+   "scroll",
+   "parchment",
+   "title",
+   "story"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  96,
+  64
+ ],
+ "pivot": [
+  48,
+  32
+ ],
+ "grounded": false,
+ "preview": "panel",
+ "styles": [
+  "pixel"
+ ],
+ "palette": [
+  {
+   "id": "face",
+   "label": "Face",
+   "default": "#a06a3c",
+   "material": "interface",
+   "swatches": [
+    "#a06a3c",
+    "#7a4f33",
+    "#5d6475",
+    "#3f5068",
+    "#c9423a",
+    "#7a4fc4",
+    "#3f6fd1"
+   ]
+  },
+  {
+   "id": "frame",
+   "label": "Frame",
+   "default": "#7a4f33",
+   "material": "interface",
+   "swatches": [
+    "#7a4f33",
+    "#f2c230",
+    "#c2c9d6",
+    "#5d6475",
+    "#c9423a",
+    "#f0ead8"
+   ]
+  },
+  {
+   "id": "accent",
+   "label": "Parchment",
+   "default": "#f0ead8",
+   "material": "interface",
+   "swatches": [
+    "#f0ead8",
+    "#f6d3b0",
+    "#c2c9d6",
+    "#9bd18a",
+    "#8fd0f0"
+   ]
+  },
+  {
+   "id": "nail",
+   "default": "#c2c9d6",
+   "material": "metal",
+   "detail": true
+  }
+ ],
+ "controls": [
+  {
+   "key": "corner",
+   "kind": "range",
+   "label": "Corner",
+   "lo": "Square",
+   "hi": "Round",
+   "default": 0.5,
+   "group": "Look"
+  },
+  {
+   "key": "border",
+   "kind": "range",
+   "label": "Border",
+   "lo": "Thin",
+   "hi": "Thick",
+   "default": 0.5,
+   "group": "Look"
+  },
+  {
+   "key": "nails",
+   "kind": "toggle",
+   "label": "Nails",
+   "default": true,
+   "group": "Look"
+  },
+  {
+   "key": "texture",
+   "kind": "range",
+   "label": "Texture",
+   "lo": "Plain",
+   "hi": "Busy",
+   "default": 0.5,
+   "group": "Look"
+  },
+  {
+   "key": "face",
+   "kind": "colour",
+   "label": "Face",
+   "group": "Colors"
+  },
+  {
+   "key": "frame",
+   "kind": "colour",
+   "label": "Frame",
+   "group": "Colors"
+  },
+  {
+   "key": "accent",
+   "kind": "colour",
+   "label": "Parchment",
+   "group": "Colors"
+  }
+ ],
+ "body": {
+  "panel": {
+   "skin": {
+    "use": "skin:wood",
+    "v": 1,
+    "paint": {
+     "face": "face",
+     "frame": "frame",
+     "nail": "nail"
+    }
+   },
+   "piece": {
+    "gen": "ui.area",
+    "v": 1,
+    "clip": [
+     "panel"
+    ],
+    "at": [
+     8,
+     8
+    ],
+    "size": [
+     80,
+     48
+    ],
+    "edge": [
+     48,
+     2
+    ],
+    "left": 8,
+    "top": 8,
+    "right": 8,
+    "bottom": 8
+   },
+   "states": [
+    "panel",
+    "panel-title",
+    "panel-scroll"
+   ],
+   "draw": [
+    {
+     "gen": "ui.area",
+     "v": 1,
+     "clip": [
+      "panel-scroll"
+     ],
+     "at": [
+      {
+       "from": "border",
+       "map": [
+        [
+         0,
+         4
+        ],
+        [
+         1,
+         6
+        ]
+       ],
+       "round": "px"
+      },
+      7
+     ],
+     "size": [
+      {
+       "from": "border",
+       "map": [
+        [
+         0,
+         88
+        ],
+        [
+         1,
+         84
+        ]
+       ],
+       "round": "px"
+      },
+      51
+     ],
+     "edge": [
+      48,
+      3
+     ],
+     "text": "ink",
+     "left": 8,
+     "top": 8,
+     "right": 8,
+     "bottom": 8
+    },
+    {
+     "gen": "ui.area",
+     "v": 1,
+     "clip": [
+      "panel-title"
+     ],
+     "at": [
+      8,
+      {
+       "from": "border",
+       "map": [
+        [
+         0,
+         16
+        ],
+        [
+         0.5,
+         17
+        ],
+        [
+         1,
+         17
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "size": [
+      80,
+      {
+       "from": "border",
+       "map": [
+        [
+         0,
+         40
+        ],
+        [
+         0.5,
+         39
+        ],
+        [
+         1,
+         39
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "edge": [
+      48,
+      2
+     ],
+     "also": true,
+     "alsoAt": [
+      8,
+      {
+       "from": "border",
+       "map": [
+        [
+         0,
+         4
+        ],
+        [
+         0.5,
+         5
+        ],
+        [
+         1,
+         5
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "alsoSize": [
+      80,
+      11
+     ],
+     "alsoText": "ink",
+     "left": 8,
+     "top": {
+      "from": "border",
+      "map": [
+       [
+        0,
+        16
+       ],
+       [
+        0.5,
+        17
+       ],
+       [
+        1,
+        17
+       ]
+      ],
+      "round": "px"
+     },
+     "right": 8,
+     "bottom": 8
+    },
+    {
+     "gen": "ui.button",
+     "v": 1,
+     "at": [
+      1,
+      1
+     ],
+     "size": [
+      94,
+      62
+     ],
+     "style": "framed",
+     "travel": 0,
+     "lip": 0,
+     "corner": {
+      "from": "corner",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        4
+       ]
+      ]
+     },
+     "border": {
+      "from": "border",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        1,
+        3
+       ]
+      ]
+     },
+     "nails": {
+      "from": "nails"
+     },
+     "grain": {
+      "from": "texture",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "clip": [
+      "panel",
+      "panel-title"
+     ]
+    },
+    {
+     "gen": "ui.slab",
+     "v": 1,
+     "clip": [
+      "panel-title"
+     ],
+     "at": [
+      {
+       "from": "border",
+       "map": [
+        [
+         0,
+         3
+        ],
+        [
+         0.5,
+         4
+        ],
+        [
+         1,
+         4
+        ]
+       ],
+       "round": "px"
+      },
+      {
+       "from": "border",
+       "map": [
+        [
+         0,
+         3
+        ],
+        [
+         0.5,
+         4
+        ],
+        [
+         1,
+         4
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "size": [
+      {
+       "from": "border",
+       "map": [
+        [
+         0,
+         90
+        ],
+        [
+         0.5,
+         88
+        ],
+        [
+         1,
+         88
+        ]
+       ],
+       "round": "px"
+      },
+      13
+     ],
+     "rings": [
+      "ink"
+     ],
+     "bandAt": 0,
+     "border": 1,
+     "lit": false,
+     "edge": "round",
+     "corner": 0,
+     "face": "accent",
+     "frame": "ink",
+     "accent": "accent",
+     "ink": "ink"
+    },
+    {
+     "kind": "stamp",
+     "clip": [
+      "panel-title"
+     ],
+     "when": {
+      "nails": [
+       true
+      ]
+     },
+     "at": [
+      {
+       "from": "border",
+       "map": [
+        [
+         0,
+         4
+        ],
+        [
+         0.5,
+         5
+        ],
+        [
+         1,
+         5
+        ]
+       ],
+       "round": "px"
+      },
+      {
+       "from": "border",
+       "map": [
+        [
+         0,
+         4
+        ],
+        [
+         0.5,
+         5
+        ],
+        [
+         1,
+         5
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "anchor": "tl",
+     "rows": [
+      "nll",
+      "nnl",
+      "inn"
+     ],
+     "key": {
+      "n": "nail",
+      "l": "nail.light",
+      "i": "ink"
+     }
+    },
+    {
+     "kind": "stamp",
+     "clip": [
+      "panel-title"
+     ],
+     "when": {
+      "nails": [
+       true
+      ]
+     },
+     "at": [
+      {
+       "from": "border",
+       "map": [
+        [
+         0,
+         92
+        ],
+        [
+         0.5,
+         91
+        ],
+        [
+         1,
+         91
+        ]
+       ],
+       "round": "px"
+      },
+      {
+       "from": "border",
+       "map": [
+        [
+         0,
+         4
+        ],
+        [
+         0.5,
+         5
+        ],
+        [
+         1,
+         5
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "anchor": "tr",
+     "rows": [
+      "nll",
+      "nnl",
+      "inn"
+     ],
+     "key": {
+      "n": "nail",
+      "l": "nail.light",
+      "i": "ink"
+     }
+    },
+    {
+     "gen": "ui.panel",
+     "v": 1,
+     "clip": [
+      "panel-scroll"
+     ],
+     "at": [
+      1,
+      1
+     ],
+     "size": [
+      94,
+      62
+     ],
+     "look": "scroll",
+     "corner": {
+      "from": "corner",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        4
+       ]
+      ]
+     },
+     "border": {
+      "from": "border",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        1,
+        3
+       ]
+      ]
+     },
+     "face": "accent",
+     "frame": {
+      "rule": "mix",
+      "of": "face",
+      "with": "ink",
+      "amount": 0.4
+     },
+     "accent": "frame"
+    }
+   ]
+  }
+ },
+ "clips": {
+  "panel": {
+   "frames": 1,
+   "fps": 8,
+   "label": "Panel"
+  },
+  "panel-title": {
+   "frames": 1,
+   "fps": 8,
+   "label": "Titled panel"
+  },
+  "panel-scroll": {
+   "frames": 1,
+   "fps": 8,
+   "label": "Scroll"
+  }
+ }
+}

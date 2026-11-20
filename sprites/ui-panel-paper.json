@@ -1,0 +1,111 @@
+{
+  "format": "loadout-sprite",
+  "version": 2,
+  "id": "ui-panel-paper",
+  "name": "Paper panels",
+  "blurb": "Stretchable paper boxes ruled in ink for menus and notes: a pinned sheet, a sheet with a heading, a list well and a tooltip; change the style, corners, rule, pins and colours.",
+  "meta": {
+    "type": "ui",
+    "role": "interface/panel",
+    "themes": ["neutral"],
+    "gameTypes": ["arcade","puzzle","card-game","farming-sim"],
+    "view": "none",
+    "words": ["panel","window","box","menu","paper","note","sheet","ink","pin","tooltip","quest log","list","popup","cosy"],
+    "license": "draft"
+  },
+  "size": [96,64],
+  "pivot": [48,32],
+  "grounded": false,
+  "preview": "panel",
+  "styles": ["pixel"],
+  "palette": [
+    {"id":"face","label":"Paper","default":"#f0ead8","material":"interface","swatches":["#f0ead8","#e6c96a","#f6d3b0","#c2c9d6","#9bd18a"]},
+    {"id":"frame","label":"Ink","default":"#3f5068","material":"interface","swatches":["#3f5068","#7a4f33","#434d6d","#8e3a4a"]},
+    {"id":"accent","label":"Pins","default":"#c9423a","material":"interface","swatches":["#c9423a","#e08a2c","#f2c230","#4fd8ee","#a4c44a","#3f6fd1"]}
+  ],
+  "controls": [
+    {
+      "key": "style",
+      "kind": "choice",
+      "label": "Style",
+      "options": [{"value":"sheet","label":"Sheet"},{"value":"torn","label":"Torn"},{"value":"card","label":"Card"}],
+      "default": "sheet",
+      "group": "Look"
+    },
+    {"key":"corner","kind":"range","label":"Corner","lo":"Square","hi":"Round","default":0.5,"group":"Look"},
+    {"key":"border","kind":"range","label":"Border","lo":"Thin","hi":"Thick","default":0.5,"group":"Look"},
+    {"key":"pins","kind":"toggle","label":"Pins","default":true,"group":"Look"},
+    {"key":"face","kind":"colour","label":"Paper","group":"Colors"},
+    {"key":"frame","kind":"colour","label":"Ink","group":"Colors"},
+    {"key":"accent","kind":"colour","label":"Pins","group":"Colors","when":{"pins":[true]}}
+  ],
+  "versions": [
+    {"name":"Notebook","params":{}},
+    {"name":"Pinned card","params":{"style":"card","accent":"#f2c230","face":"#f6d3b0"}},
+    {"name":"Torn page","params":{"style":"torn","pins":false,"frame":"#8e3a4a"}},
+    {"name":"Old letter","params":{"face":"#e6c96a","frame":"#7a4f33"}},
+    {"name":"Mint memo","params":{"face":"#9bd18a","accent":"#3f6fd1"}}
+  ],
+  "body": {
+    "panel": {
+      "skin": {"use":"skin:paper","v":3,"paint":{"face":"face","frame":"frame","accent":"accent"}},
+      "piece": {
+        "gen": "ui.slab",
+        "v": 1,
+        "clip": ["panel"],
+        "at": [1,1],
+        "size": [94,62],
+        "style": {"from":"style"},
+        "corner": {"from":"corner","map":[[0,0],[1,4]]},
+        "border": {"from":"border","map":[[0,1],[1,3]]},
+        "extras": {"from":"pins"}
+      },
+      "states": ["panel","panel-title","inset","tooltip"],
+      "draw": [
+        {
+          "gen": "ui.slab",
+          "v": 1,
+          "clip": ["panel-title"],
+          "role": "title",
+          "at": [1,1],
+          "size": [94,62],
+          "style": {"from":"style"},
+          "corner": {"from":"corner","map":[[0,0],[1,4]]},
+          "border": {"from":"border","map":[[0,1],[1,3]]},
+          "extras": {"from":"pins"},
+          "titleShade": 0
+        },
+        {
+          "gen": "ui.slab",
+          "v": 1,
+          "clip": ["inset"],
+          "role": "inset",
+          "at": [1,1],
+          "size": [94,62],
+          "style": {"from":"style"},
+          "corner": {"from":"corner","map":[[0,0],[1,4]]},
+          "border": {"from":"border","map":[[0,1],[1,3]]},
+          "extras": {"from":"pins"}
+        },
+        {
+          "gen": "ui.slab",
+          "v": 1,
+          "clip": ["tooltip"],
+          "role": "tooltip",
+          "at": [1,1],
+          "size": [94,40],
+          "style": {"from":"style"},
+          "corner": {"from":"corner","map":[[0,0],[1,4]]},
+          "border": {"from":"border","map":[[0,1],[1,3]]},
+          "extras": {"from":"pins"}
+        }
+      ]
+    }
+  },
+  "clips": {
+    "panel": {"frames":1,"fps":8,"label":"Panel"},
+    "panel-title": {"frames":1,"fps":8,"label":"With heading"},
+    "inset": {"frames":1,"fps":8,"label":"List well"},
+    "tooltip": {"frames":1,"fps":8,"label":"Tooltip"}
+  }
+}

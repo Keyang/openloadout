@@ -1,0 +1,172 @@
+{
+ "id": "icon.plate",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "face": "face"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      3,
+      2
+     ],
+     "anchor": "tl",
+     "rows": [
+      "............aa............",
+      "..........aabbaa..........",
+      "........aabccbbbaa........",
+      "......aabccccccbbbaa......",
+      "....aabccccccccccbbbaa....",
+      "..aabccccccccccccccbbbaa..",
+      ".abccccccccccccccccccbbba.",
+      "accccccccccccccccccccccbba",
+      "acccccccccccccccccccccccba",
+      "acccccccccccccccccccccccba",
+      "acccccccccccccccccccccccba",
+      "acccccccccccccccccccccccba",
+      "acccccccccccccccccccccccba",
+      "acccccccccccccccccccccccba",
+      "acccccccccccccccccccccccba",
+      "acccccccccccccccccccccccba",
+      "acccccccccccccccccccccccba",
+      "acccccccccccccccccccccccba",
+      "acccccccccccccccccccccccba",
+      "acccccccccccccccccccccccba",
+      "acccccccccccccccccccccccba",
+      ".acccccccccccccccccccccca.",
+      "..aaccccccccccccccccccaa..",
+      "....aaccccccccccccccaa....",
+      "......aaccccccccccaa......",
+      "........aaccccccaa........",
+      "..........aaccaa..........",
+      "............aa............"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "face.light",
+      "c": "face"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16,
+     16
+    ],
+    "shape": "circle",
+    "size": 1,
+    "face": "face",
+    "shine": false
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      1,
+      1
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...........aaaaaaaa...........",
+      ".........aabbbbbbbbaa.........",
+      ".......aabbbbbbbbbbbbaa.......",
+      "......abbbbbbbbbbbbbbbba......",
+      ".....abbbbbbbbbbbbbbbbbba.....",
+      "....abbbbbbbbbbbbbbbbbbbba....",
+      "...abbbbbbbbbbbbbbbbbbbbbba...",
+      "..abbbbbbbbbbbbbbbbbbbbbbbba..",
+      "..abbbbbbbbbbbbbbbbbbbbbbbba..",
+      ".abbbbbbbbbbbbbbbbbbbbbbbbbba.",
+      ".abbbbbbbbbbbbbbbbbbbbbbbbbba.",
+      "abbbbbbbbbbbbbbbbbbbbbbbbbbbba",
+      "abbbbbbbbbbbbbbbbbbbbbbbbbbbba",
+      "abbbbbbbbbbbbbbbbbbbbbbbbbbbba",
+      "abbbbbbbbbbbbbbbbbbbbbbbbbbbba",
+      "abbbbbbbbbbbbbbbbbbbbbbbbbbbba",
+      "abbbbbbbbbbbbbbbbbbbbbbbbbbbba",
+      "abbbbbbbbbbbbbbbbbbbbbbbbbbbba",
+      "abbbbbbbbbbbbbbbbbbbbbbbbbbbba",
+      ".abbbbbbbbbbbbbbbbbbbbbbbbbba.",
+      ".abbbbbbbbbbbbbbbbbbbbbbbbbba.",
+      "..abbbbbbbbbbbbbbbbbbbbbbbba..",
+      "..abbbbbbbbbbbbbbbbbbbbbbbba..",
+      "...abbbbbbbbbbbbbbbbbbbbbba...",
+      "....abbbbbbbbbbbbbbbbbbbba....",
+      ".....abbbbbbbbbbbbbbbbbba.....",
+      "......abbbbbbbbbbbbbbbba......",
+      ".......aabbbbbbbbbbbbaa.......",
+      ".........aabbbbbbbbaa.........",
+      "...........aaaaaaaa..........."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "face"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     10,
+     12
+    ],
+    "shape": "hex",
+    "size": 0,
+    "face": "face"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      -2,
+      -1
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...........aa...........",
+      ".........aabbaa.........",
+      ".......aabccbbbaa.......",
+      ".....aabccccccbbbaa.....",
+      "...aabccccccccccbbbaa...",
+      ".aabccccccccccccccbbbaa.",
+      "abccccccccccccccccccbbba",
+      "acccccccccccccccccccccba",
+      "acccccccccccccccccccccba",
+      "acccccccccccccccccccccba",
+      "acccccccccccccccccccccba",
+      "acccccccccccccccccccccba",
+      "acccccccccccccccccccccba",
+      "acccccccccccccccccccccba",
+      "acccccccccccccccccccccba",
+      "acccccccccccccccccccccba",
+      "acccccccccccccccccccccba",
+      "acccccccccccccccccccccba",
+      "acccccccccccccccccccccba",
+      "acccccccccccccccccccccba",
+      ".aaccccccccccccccccccaa.",
+      "...aaccccccccccccccaa...",
+      ".....aaccccccccccaa.....",
+      ".......aaccccccaa.......",
+      ".........aaccaa.........",
+      "...........aa..........."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "face.light",
+      "c": "face"
+     }
+    }
+   ]
+  }
+ ]
+}

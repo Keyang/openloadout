@@ -1,0 +1,160 @@
+{
+ "id": "signpost",
+ "frozen": "2026-11-20",
+ "source": "sprites/signpost.js",
+ "sha256": "dda2feb886117497b68e02257c6c3f985ac0c86c964410fadea724eb820ec0fc",
+ "name": "Signpost",
+ "blurb": "A wooden sign on a post with a picture mark and no words. Change its build, which way it points, its picture, height, moss and wear.",
+ "meta": {
+  "type": "prop",
+  "role": "world/prop",
+  "themes": [
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "platformer"
+  ],
+  "view": "side",
+  "words": [
+   "sign",
+   "signpost",
+   "post",
+   "board",
+   "arrow",
+   "direction",
+   "point",
+   "wobble",
+   "warning",
+   "tutorial",
+   "hint",
+   "wooden",
+   "mossy"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  48
+ ],
+ "pivot": [
+  16,
+  46
+ ],
+ "grounded": true,
+ "preview": "idle",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "arrow",
+   "options": [
+    "arrow",
+    "board",
+    "hanging"
+   ],
+   "group": "Look"
+  },
+  "points": {
+   "kind": "choice",
+   "label": "Points",
+   "def": "right",
+   "options": [
+    "right",
+    "left",
+    "both"
+   ],
+   "group": "Look"
+  },
+  "mark": {
+   "kind": "choice",
+   "label": "Picture",
+   "def": "none",
+   "options": [
+    "none",
+    "arrow",
+    "skull",
+    "exclaim"
+   ],
+   "group": "Look"
+  },
+  "height": {
+   "kind": "range",
+   "label": "Height",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Short",
+   "hi": "Tall",
+   "group": "Look"
+  },
+  "mossy": {
+   "kind": "toggle",
+   "label": "Mossy",
+   "def": false,
+   "group": "Look"
+  },
+  "wood": {
+   "kind": "color",
+   "label": "Wood",
+   "def": "#a06a3c",
+   "swatches": [
+    "#a06a3c",
+    "#7a4f33",
+    "#f0ead8",
+    "#a8612a",
+    "#5a3a22",
+    "#c98a4a"
+   ],
+   "group": "Colors"
+  },
+  "wear": {
+   "kind": "range",
+   "label": "Wear",
+   "def": 0.25,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "New",
+   "hi": "Worn",
+   "group": "Look"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "wobble": {
+   "frames": 6,
+   "loop": false,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [],
+ "bundles": [
+  "kit-platformer-fantasy"
+ ]
+}

@@ -1,0 +1,220 @@
+{
+ "id": "ui-panel-flat",
+ "frozen": "2026-11-20",
+ "source": "sprites/ui-panel-flat.js",
+ "sha256": "6d76965f3c0e595eb63bd278b0fd5fa5b8a1f15f9a3503adbaae859f1b1e002d",
+ "name": "Flat panels",
+ "blurb": "Stretchable flat boxes with no light or bevel for menus and results: a plain panel, one with a heading, a list well and a tooltip, each with a coloured focus line; change the style, corners, edge, shadow and colours.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/panel",
+  "themes": [
+   "neutral",
+   "city"
+  ],
+  "gameTypes": [
+   "arcade",
+   "puzzle",
+   "card-game",
+   "racing"
+  ],
+  "view": "none",
+  "words": [
+   "panel",
+   "window",
+   "box",
+   "menu",
+   "flat",
+   "modern",
+   "pause",
+   "results",
+   "tooltip",
+   "list",
+   "popup",
+   "card",
+   "clean",
+   "minimal"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  96,
+  64
+ ],
+ "pivot": [
+  48,
+  32
+ ],
+ "grounded": false,
+ "preview": "panel",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "solid",
+   "options": [
+    {
+     "value": "solid",
+     "label": "Solid"
+    },
+    {
+     "value": "outline",
+     "label": "Outline"
+    },
+    {
+     "value": "pill",
+     "label": "Pill"
+    }
+   ],
+   "group": "Look"
+  },
+  "corner": {
+   "kind": "range",
+   "label": "Corner",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Square",
+   "hi": "Round",
+   "group": "Look",
+   "when": {
+    "style": [
+     "solid",
+     "outline"
+    ]
+   }
+  },
+  "border": {
+   "kind": "range",
+   "label": "Border",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Thin",
+   "hi": "Thick",
+   "group": "Look"
+  },
+  "shadow": {
+   "kind": "toggle",
+   "label": "Shadow",
+   "def": false,
+   "group": "Look"
+  },
+  "face": {
+   "kind": "color",
+   "label": "Face",
+   "def": "#3f5068",
+   "swatches": [
+    "#3f5068",
+    "#7a4f33",
+    "#434d6d",
+    "#8e3a4a"
+   ],
+   "group": "Colors"
+  },
+  "frame": {
+   "kind": "color",
+   "label": "Edge",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#8fd0f0",
+    "#9bd18a",
+    "#c2c9d6",
+    "#f6d3b0"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Focus",
+   "def": "#4fd8ee",
+   "swatches": [
+    "#4fd8ee",
+    "#e08a2c",
+    "#a4c44a",
+    "#6aa83e",
+    "#5fe0f0"
+   ],
+   "group": "Colors"
+  }
+ },
+ "clips": {
+  "panel": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "panel-title": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "inset": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "tooltip": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [
+  {
+   "name": "Blue panel",
+   "params": {}
+  },
+  {
+   "name": "Outlined",
+   "params": {
+    "style": "outline",
+    "border": 1
+   }
+  },
+  {
+   "name": "Rounded wine",
+   "params": {
+    "style": "pill",
+    "face": "#8e3a4a",
+    "accent": "#a4c44a"
+   }
+  },
+  {
+   "name": "Brown with shadow",
+   "params": {
+    "face": "#7a4f33",
+    "shadow": true
+   }
+  },
+  {
+   "name": "Night",
+   "params": {
+    "face": "#434d6d",
+    "accent": "#5fe0f0",
+    "frame": "#8fd0f0"
+   }
+  }
+ ],
+ "bundles": []
+}

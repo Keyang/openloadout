@@ -1,0 +1,99 @@
+{
+  "format": "loadout-sprite",
+  "version": 2,
+  "id": "ui-buttons-candy",
+  "name": "Candy buttons",
+  "blurb": "A stretchable glossy sugar button and tab, a deep toffee, cherry or blueberry slab in a pale sugar rim, in four states (normal, hover, pressed, disabled) plus a tab and an open tab; change its style, corners, rim, shine and colours.",
+  "meta": {
+    "type": "ui",
+    "role": "interface/button",
+    "themes": ["neutral","candy"],
+    "gameTypes": ["arcade","puzzle","card-game","racing"],
+    "view": "none",
+    "words": ["button","menu","candy","sweet","sugar","glossy","jelly","tab","press","click","hover","start","casual","toffee"],
+    "license": "draft"
+  },
+  "size": [96,32],
+  "pivot": [48,16],
+  "grounded": false,
+  "preview": "normal",
+  "styles": ["pixel"],
+  "palette": [
+    {"id":"face","label":"Candy","default":"#7a4f33","material":"interface","swatches":["#7a4f33","#3f5068","#8e3a4a","#434d6d"]},
+    {"id":"frame","label":"Sugar","default":"#f0ead8","material":"interface","swatches":["#f0ead8","#f6d3b0","#8fd0f0","#9bd18a"]}
+  ],
+  "controls": [
+    {
+      "key": "style",
+      "kind": "choice",
+      "label": "Style",
+      "options": [{"value":"jelly","label":"Jelly"},{"value":"striped","label":"Striped"},{"value":"frosted","label":"Frosted"}],
+      "default": "jelly",
+      "group": "Look"
+    },
+    {"key":"corner","kind":"range","label":"Corner","lo":"Square","hi":"Round","default":0.75,"group":"Look"},
+    {"key":"border","kind":"range","label":"Border","lo":"Thin","hi":"Thick","default":0.5,"group":"Look"},
+    {"key":"shine","kind":"toggle","label":"Shine","default":true,"group":"Look"},
+    {"key":"face","kind":"colour","label":"Candy","group":"Colors"},
+    {"key":"frame","kind":"colour","label":"Sugar","group":"Colors"}
+  ],
+  "versions": [
+    {"name":"Toffee drop","params":{}},
+    {"name":"Cherry stripe","params":{"style":"striped","face":"#8e3a4a"}},
+    {"name":"Blueberry frost","params":{"style":"frosted","face":"#3f5068","frame":"#8fd0f0"}},
+    {"name":"Liquorice mint","params":{"face":"#434d6d","frame":"#9bd18a"}},
+    {"name":"Matte caramel","params":{"frame":"#f6d3b0","shine":false}}
+  ],
+  "body": {
+    "panel": {
+      "skin": {"use":"skin:candy","v":3,"paint":{"face":"face","frame":"frame"}},
+      "piece": {
+        "gen": "ui.slab",
+        "v": 1,
+        "clip": ["normal","hover","pressed","disabled"],
+        "role": "button",
+        "at": [1,1],
+        "size": [94,30],
+        "style": {"from":"style"},
+        "corner": {"from":"corner","map":[[0,0],[1,4]]},
+        "border": {"from":"border","map":[[0,1],[1,3]]},
+        "gleam": {"from":"shine"}
+      },
+      "states": ["normal","hover","pressed","disabled","tab","tab-active"],
+      "draw": [
+        {
+          "gen": "ui.slab",
+          "v": 1,
+          "clip": ["tab"],
+          "role": "tab",
+          "at": [1,1],
+          "size": [94,30],
+          "style": {"from":"style"},
+          "corner": {"from":"corner","map":[[0,0],[1,4]]},
+          "border": {"from":"border","map":[[0,1],[1,3]]},
+          "gleam": {"from":"shine"}
+        },
+        {
+          "gen": "ui.slab",
+          "v": 1,
+          "clip": ["tab-active"],
+          "role": "tab-open",
+          "at": [1,1],
+          "size": [94,31],
+          "style": {"from":"style"},
+          "corner": {"from":"corner","map":[[0,0],[1,4]]},
+          "border": {"from":"border","map":[[0,1],[1,3]]},
+          "gleam": {"from":"shine"}
+        }
+      ]
+    }
+  },
+  "clips": {
+    "normal": {"frames":1,"fps":8,"label":"Normal"},
+    "hover": {"frames":1,"fps":8,"label":"Hover"},
+    "pressed": {"frames":1,"fps":8,"label":"Pressed","sounds":[{"sound":"ui-click","preset":"Glass tick","frame":0,"volume":0.6}]},
+    "disabled": {"frames":1,"fps":8,"label":"Disabled"},
+    "tab": {"frames":1,"fps":8,"label":"Tab, for a page that is not open"},
+    "tab-active": {"frames":1,"fps":8,"label":"Open tab, for the page on view","sounds":[{"sound":"menu-move","preset":"Tab","frame":0,"volume":0.6}]}
+  }
+}

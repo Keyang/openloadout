@@ -1,0 +1,202 @@
+{
+ "format": "loadout-piece",
+ "version": 1,
+ "id": "skin:grove",
+ "v": 2,
+ "name": "Grove",
+ "about": "Forest interface pieces: a bark face inside a green vine band lit from the top right; vine (leaves along the sides), bark (knots) or bloom (flowers); leaves as ornaments.",
+ "slots": [
+  {
+   "id": "face",
+   "label": "Bark",
+   "default": "#7a4f33",
+   "material": "interface"
+  },
+  {
+   "id": "frame",
+   "label": "Vine",
+   "default": "#9bd18a",
+   "material": "interface"
+  },
+  {
+   "id": "accent",
+   "label": "Leaves and flowers",
+   "default": "#6aa83e",
+   "material": "interface"
+  },
+  {
+   "id": "fill",
+   "label": "Fill",
+   "default": "#6aa83e",
+   "material": "interface"
+  },
+  {
+   "id": "shine",
+   "label": "Shine",
+   "default": "#ffffff",
+   "material": "light"
+  }
+ ],
+ "made": {
+  "from": "engine/ui-skins-more.js, engine/ui-grove-vine.js"
+ },
+ "body": {
+  "paint": {
+   "face": "face",
+   "frame": "frame",
+   "accent": "accent",
+   "line": "frame",
+   "ledge": "face.dark",
+   "knob": "frame",
+   "fill": "fill",
+   "shine": "shine",
+   "divider": "ink"
+  },
+  "args": {
+   "*": {
+    "rings": [
+     "ink",
+     "frame",
+     "ink"
+    ],
+    "bandAt": 1,
+    "lit": true,
+    "edge": "round",
+    "hoverFace": 0.1,
+    "hoverBand": 0.45,
+    "every": 16,
+    "start": 10,
+    "sides": true,
+    "along": [
+     {
+      "kind": "stamp",
+      "at": [
+       0,
+       1
+      ],
+      "rows": [
+       "d",
+       "."
+      ],
+      "key": {
+       "d": "frame.dark"
+      }
+     }
+    ],
+    "extra": [
+     {
+      "kind": "stamp",
+      "at": [
+       3,
+       0
+      ],
+      "rows": [
+       ".ll.",
+       "lldd",
+       ".dd."
+      ],
+      "key": {
+       "l": "accent.light",
+       "d": "accent"
+      }
+     }
+    ],
+    "extraAlong": [
+     {
+      "kind": "stamp",
+      "at": [
+       0,
+       0
+      ],
+      "rows": [
+       ".ll.",
+       "lldd",
+       ".dd."
+      ],
+      "key": {
+       "l": "accent.light",
+       "d": "accent"
+      }
+     }
+    ]
+   },
+   "ui.slab": {
+    "titleShade": -1
+   },
+   "ui.strip": {
+    "gloss": true,
+    "shadow": true
+   },
+   "ui.trough": {
+    "trough": "dark"
+   }
+  },
+  "styles": {
+   "vine": {
+    "*": {
+     "every": 24,
+     "start": 14
+    }
+   },
+   "bark": {
+    "*": {
+     "along": [
+      {
+       "kind": "stamp",
+       "at": [
+        0,
+        1
+       ],
+       "rows": [
+        "dd.",
+        ".d."
+       ],
+       "key": {
+        "d": "frame.dark"
+       }
+      }
+     ],
+     "every": 10,
+     "start": 8
+    }
+   },
+   "bloom": {
+    "*": {
+     "trim": [
+      {
+       "kind": "stamp",
+       "at": [
+        2,
+        2
+       ],
+       "rows": [
+        ".w.",
+        "wyw",
+        ".w."
+       ],
+       "key": {
+        "w": "shine",
+        "y": "accent.light"
+       }
+      }
+     ]
+    }
+   }
+  },
+  "states": {
+   "normal": {
+    "lip": 2
+   },
+   "hover": {
+    "lip": 2
+   },
+   "pressed": {
+    "lip": 0
+   },
+   "disabled": {
+    "lip": 2,
+    "desaturate": 1
+   }
+  }
+ }
+}

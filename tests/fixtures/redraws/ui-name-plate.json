@@ -1,0 +1,213 @@
+{
+ "id": "ui-name-plate",
+ "frozen": "2026-11-20",
+ "source": "sprites/ui-name-plate.js",
+ "sha256": "e4721534cce5a591014796d1ad9387411ab990e2bc0761bc46778b5b05402b5a",
+ "name": "Name plate",
+ "blurb": "A small stretchable plate for a name over a character, with a level badge, a lit state for the one targeted and a notch pointing down; change its style, corners, band, shadow and colours.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/panel",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "arcade",
+   "top-down-rpg",
+   "turn-based-rpg",
+   "roguelike-action"
+  ],
+  "view": "none",
+  "words": [
+   "name",
+   "plate",
+   "label",
+   "tag",
+   "nameplate",
+   "level",
+   "target",
+   "banner"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  64,
+  16
+ ],
+ "pivot": [
+  32,
+  15
+ ],
+ "grounded": false,
+ "preview": "plate",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "plain",
+   "options": [
+    {
+     "value": "plain",
+     "label": "Plain"
+    },
+    {
+     "value": "ribbon",
+     "label": "Ribbon"
+    },
+    {
+     "value": "pointed",
+     "label": "Pointed"
+    }
+   ],
+   "group": "Look"
+  },
+  "corner": {
+   "kind": "range",
+   "label": "Corner",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Square",
+   "hi": "Round",
+   "group": "Look",
+   "when": {
+    "style": [
+     "plain"
+    ]
+   }
+  },
+  "border": {
+   "kind": "range",
+   "label": "Border",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Thin",
+   "hi": "Thick",
+   "group": "Look"
+  },
+  "shadow": {
+   "kind": "toggle",
+   "label": "Shadow",
+   "def": true,
+   "group": "Look"
+  },
+  "face": {
+   "kind": "color",
+   "label": "Plate",
+   "def": "#3f5068",
+   "swatches": [
+    "#3f5068",
+    "#7a4f33",
+    "#434d6d",
+    "#8e3a4a"
+   ],
+   "group": "Colors"
+  },
+  "frame": {
+   "kind": "color",
+   "label": "Band",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#8fd0f0",
+    "#9bd18a",
+    "#c2c9d6",
+    "#f6d3b0"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Badge and arrows",
+   "def": "#f2c230",
+   "swatches": [
+    "#f2c230",
+    "#c9423a",
+    "#4fd8ee",
+    "#a4c44a",
+    "#e08a2c"
+   ],
+   "group": "Colors"
+  }
+ },
+ "clips": {
+  "plate": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "plate-badge": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "plate-lit": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "pointer": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [
+  {
+   "name": "Name plate",
+   "params": {}
+  },
+  {
+   "name": "Ribbon",
+   "params": {
+    "style": "ribbon",
+    "face": "#8e3a4a"
+   }
+  },
+  {
+   "name": "Pointed sky",
+   "params": {
+    "style": "pointed",
+    "frame": "#8fd0f0",
+    "accent": "#c9423a"
+   }
+  },
+  {
+   "name": "Soil and green",
+   "params": {
+    "face": "#7a4f33",
+    "frame": "#9bd18a",
+    "shadow": false
+   }
+  },
+  {
+   "name": "Square steel",
+   "params": {
+    "corner": 0,
+    "frame": "#c2c9d6",
+    "border": 1
+   }
+  }
+ ],
+ "bundles": []
+}

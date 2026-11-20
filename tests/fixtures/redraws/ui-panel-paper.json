@@ -1,0 +1,219 @@
+{
+ "id": "ui-panel-paper",
+ "frozen": "2026-11-20",
+ "source": "sprites/ui-panel-paper.js",
+ "sha256": "b51936ed7b026ca90e733194bc50bb3006629c53dda4aad3f75403c79a445729",
+ "name": "Paper panels",
+ "blurb": "Stretchable paper boxes ruled in ink for menus and notes: a pinned sheet, a sheet with a heading, a list well and a tooltip; change the style, corners, rule, pins and colours.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/panel",
+  "themes": [
+   "neutral"
+  ],
+  "gameTypes": [
+   "arcade",
+   "puzzle",
+   "card-game",
+   "farming-sim"
+  ],
+  "view": "none",
+  "words": [
+   "panel",
+   "window",
+   "box",
+   "menu",
+   "paper",
+   "note",
+   "sheet",
+   "ink",
+   "pin",
+   "tooltip",
+   "quest log",
+   "list",
+   "popup",
+   "cosy"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  96,
+  64
+ ],
+ "pivot": [
+  48,
+  32
+ ],
+ "grounded": false,
+ "preview": "panel",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "sheet",
+   "options": [
+    {
+     "value": "sheet",
+     "label": "Sheet"
+    },
+    {
+     "value": "torn",
+     "label": "Torn"
+    },
+    {
+     "value": "card",
+     "label": "Card"
+    }
+   ],
+   "group": "Look"
+  },
+  "corner": {
+   "kind": "range",
+   "label": "Corner",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Square",
+   "hi": "Round",
+   "group": "Look"
+  },
+  "border": {
+   "kind": "range",
+   "label": "Border",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Thin",
+   "hi": "Thick",
+   "group": "Look"
+  },
+  "pins": {
+   "kind": "toggle",
+   "label": "Pins",
+   "def": true,
+   "group": "Look"
+  },
+  "face": {
+   "kind": "color",
+   "label": "Paper",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#e6c96a",
+    "#f6d3b0",
+    "#c2c9d6",
+    "#9bd18a"
+   ],
+   "group": "Colors"
+  },
+  "frame": {
+   "kind": "color",
+   "label": "Ink",
+   "def": "#3f5068",
+   "swatches": [
+    "#3f5068",
+    "#7a4f33",
+    "#434d6d",
+    "#8e3a4a"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Pins",
+   "def": "#c9423a",
+   "swatches": [
+    "#c9423a",
+    "#e08a2c",
+    "#f2c230",
+    "#4fd8ee",
+    "#a4c44a",
+    "#3f6fd1"
+   ],
+   "group": "Colors",
+   "when": {
+    "pins": [
+     true
+    ]
+   }
+  }
+ },
+ "clips": {
+  "panel": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "panel-title": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "inset": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "tooltip": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [
+  {
+   "name": "Notebook",
+   "params": {}
+  },
+  {
+   "name": "Pinned card",
+   "params": {
+    "style": "card",
+    "accent": "#f2c230",
+    "face": "#f6d3b0"
+   }
+  },
+  {
+   "name": "Torn page",
+   "params": {
+    "style": "torn",
+    "pins": false,
+    "frame": "#8e3a4a"
+   }
+  },
+  {
+   "name": "Old letter",
+   "params": {
+    "face": "#e6c96a",
+    "frame": "#7a4f33"
+   }
+  },
+  {
+   "name": "Mint memo",
+   "params": {
+    "face": "#9bd18a",
+    "accent": "#3f6fd1"
+   }
+  }
+ ],
+ "bundles": []
+}

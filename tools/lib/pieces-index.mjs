@@ -46,7 +46,9 @@ export function pieceHash(value) {
 
 /**
  * Scans <root>/pieces, checks every piece file (engine/pieces.js validatePiece, with the body hook `check` when
- * given) and what each uses against the rest. Returns { index, errors, warnings }: the index holds the valid pieces
+ * given; a material piece's body is always held to the material rules, engine/pieces.js KIND_CHECKS, so the index never
+ * lists one a tileset would refuse, and its row says how many fill versions it has: build item B15b) and what each uses
+ * against the rest. Returns { index, errors, warnings }: the index holds the valid pieces
  * only; errors start with the file they are about. Arguments: { root, check }.
  */
 export function buildPiecesIndex({ root = ROOT, check = null } = {}) {

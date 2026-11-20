@@ -1,0 +1,193 @@
+{
+ "id": "crumble-block",
+ "frozen": "2026-11-20",
+ "source": "sprites/crumble-block.js",
+ "sha256": "a9ad591fa95bee0e52eedfd226d675e8954c5bfd5d38a5dd6c43620f996576ca",
+ "name": "Crumbling block",
+ "blurb": "A block that shakes, falls to pieces when stood on and grows back; change what it is made of, how cracked it is, how many pieces it breaks into, its colours and how hard it shakes.",
+ "meta": {
+  "type": "prop",
+  "role": "world/platform",
+  "themes": [
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "platformer"
+  ],
+  "view": "side",
+  "words": [
+   "block",
+   "crumble",
+   "crumbling",
+   "falling",
+   "platform",
+   "break",
+   "shake",
+   "respawn",
+   "collapse",
+   "brick",
+   "trap",
+   "cracked",
+   "fragile"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  30
+ ],
+ "grounded": true,
+ "preview": "idle",
+ "params": {
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "stone",
+   "options": [
+    "stone",
+    "wood",
+    "ice",
+    "cloud"
+   ],
+   "group": "Look"
+  },
+  "wear": {
+   "kind": "range",
+   "label": "Wear",
+   "def": 0.4,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "New",
+   "hi": "Worn",
+   "group": "Look"
+  },
+  "pieces": {
+   "kind": "range",
+   "label": "Pieces",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Few",
+   "hi": "Many",
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Body",
+   "def": "#8f97a8",
+   "swatches": [
+    "#8f97a8",
+    "#f0ead8",
+    "#a4c44a",
+    "#7fb0b8",
+    "#a06a3c"
+   ],
+   "material": "stone",
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Cracks and edges",
+   "def": "#5d6475",
+   "swatches": [
+    "#5d6475",
+    "#3f5068",
+    "#7a4f33",
+    "#7a4fc4",
+    "#3f8a4f",
+    "#c9423a"
+   ],
+   "material": "stone",
+   "group": "Colors"
+  },
+  "wobble": {
+   "kind": "range",
+   "label": "Wobble",
+   "def": 0.4,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Firm",
+   "hi": "Wobbly",
+   "group": "Motion"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "shake": {
+   "frames": 6,
+   "loop": true,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  },
+  "break": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  },
+  "respawn": {
+   "frames": 6,
+   "loop": false,
+   "fps": [
+    7,
+    11,
+    15
+   ]
+  }
+ },
+ "sounds": {
+  "shake": [
+   {
+    "sound": "crate-break",
+    "preset": "Twig snap",
+    "frame": 0,
+    "volume": 0.5
+   }
+  ],
+  "break": [
+   {
+    "sound": "crate-break",
+    "preset": "Crate",
+    "frame": 0,
+    "volume": 0.8
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-platformer-fantasy"
+ ]
+}

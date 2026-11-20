@@ -1,0 +1,203 @@
+{
+ "id": "fuel-barrel",
+ "frozen": "2026-11-20",
+ "source": "sprites/fuel-barrel.js",
+ "sha256": "54afd52e77048d123e0b7b7d2305c0ba4695f2d2b115662fd15bb55763eb731c",
+ "name": "Fuel barrel",
+ "blurb": "A red barrel that leaks when shot, swells, flashes and explodes. Make it a drum, a gas tank or a fuel cell, and change its size, dents, ribs and colours.",
+ "meta": {
+  "type": "prop",
+  "role": "world/hazard",
+  "themes": [
+   "sci-fi",
+   "space"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "shooter"
+  ],
+  "view": "top-down",
+  "words": [
+   "barrel",
+   "fuel",
+   "drum",
+   "tank",
+   "canister",
+   "explosive",
+   "explode",
+   "shoot",
+   "hazard",
+   "danger",
+   "bomb",
+   "trap",
+   "red",
+   "warning"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  48
+ ],
+ "pivot": [
+  16,
+  46
+ ],
+ "grounded": true,
+ "preview": "idle",
+ "params": {
+  "size": {
+   "kind": "range",
+   "label": "Size",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Small",
+   "hi": "Big",
+   "group": "Look"
+  },
+  "style": {
+   "kind": "choice",
+   "label": "Style",
+   "def": "barrel",
+   "options": [
+    "barrel",
+    "tank",
+    "cell"
+   ],
+   "group": "Look"
+  },
+  "wear": {
+   "kind": "range",
+   "label": "Wear",
+   "def": 0.35,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "New",
+   "hi": "Worn",
+   "group": "Look"
+  },
+  "bands": {
+   "kind": "toggle",
+   "label": "Ribs",
+   "def": true,
+   "group": "Look"
+  },
+  "body": {
+   "kind": "color",
+   "label": "Body",
+   "def": "#e2473f",
+   "swatches": [
+    "#e2473f",
+    "#3f6fd1",
+    "#2fb3a8",
+    "#4f9ff0",
+    "#6b7896",
+    "#566182",
+    "#434d6d"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Hazard label",
+   "def": "#f2a030",
+   "swatches": [
+    "#f2a030",
+    "#5fe0f0",
+    "#9fe040",
+    "#f0ead8",
+    "#b48af8",
+    "#f2c230"
+   ],
+   "group": "Colors"
+  },
+  "glow": {
+   "kind": "color",
+   "label": "Light",
+   "def": "#f2a030",
+   "swatches": [
+    "#f2a030",
+    "#5fe0f0",
+    "#e2473f",
+    "#9fe040",
+    "#b48af8",
+    "#4f9ff0",
+    "#5fd47a"
+   ],
+   "group": "Colors"
+  },
+  "speed": {
+   "kind": "range",
+   "label": "Speed",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Slow",
+   "hi": "Fast",
+   "group": "Motion"
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    8,
+    12
+   ]
+  },
+  "hurt": {
+   "frames": 4,
+   "loop": false,
+   "fps": [
+    6,
+    9,
+    13
+   ]
+  },
+  "fuse": {
+   "frames": 8,
+   "loop": true,
+   "fps": [
+    5,
+    8,
+    12
+   ]
+  },
+  "break": {
+   "frames": 8,
+   "loop": false,
+   "fps": [
+    8,
+    13,
+    17
+   ]
+  }
+ },
+ "sounds": {
+  "hurt": [
+   {
+    "sound": "bolt-impact",
+    "preset": "On metal",
+    "frame": 0,
+    "volume": 0.9
+   }
+  ],
+  "break": [
+   {
+    "sound": "explosion",
+    "preset": "Grenade",
+    "frame": 0
+   }
+  ]
+ },
+ "versions": [],
+ "bundles": [
+  "kit-roguelite-scifi"
+ ]
+}

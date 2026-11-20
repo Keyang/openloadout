@@ -1,0 +1,110 @@
+{
+  "format": "loadout-sprite",
+  "version": 2,
+  "id": "ui-panel-flat",
+  "name": "Flat panels",
+  "blurb": "Stretchable flat boxes with no light or bevel for menus and results: a plain panel, one with a heading, a list well and a tooltip, each with a coloured focus line; change the style, corners, edge, shadow and colours.",
+  "meta": {
+    "type": "ui",
+    "role": "interface/panel",
+    "themes": ["neutral","city"],
+    "gameTypes": ["arcade","puzzle","card-game","racing"],
+    "view": "none",
+    "words": ["panel","window","box","menu","flat","modern","pause","results","tooltip","list","popup","card","clean","minimal"],
+    "license": "draft"
+  },
+  "size": [96,64],
+  "pivot": [48,32],
+  "grounded": false,
+  "preview": "panel",
+  "styles": ["pixel"],
+  "palette": [
+    {"id":"face","label":"Face","default":"#3f5068","material":"interface","swatches":["#3f5068","#7a4f33","#434d6d","#8e3a4a"]},
+    {"id":"frame","label":"Edge","default":"#f0ead8","material":"interface","swatches":["#f0ead8","#8fd0f0","#9bd18a","#c2c9d6","#f6d3b0"]},
+    {"id":"accent","label":"Focus","default":"#4fd8ee","material":"interface","swatches":["#4fd8ee","#e08a2c","#a4c44a","#6aa83e","#5fe0f0"]}
+  ],
+  "controls": [
+    {
+      "key": "style",
+      "kind": "choice",
+      "label": "Style",
+      "options": [{"value":"solid","label":"Solid"},{"value":"outline","label":"Outline"},{"value":"pill","label":"Pill"}],
+      "default": "solid",
+      "group": "Look"
+    },
+    {"key":"corner","kind":"range","label":"Corner","lo":"Square","hi":"Round","default":0.5,"group":"Look","when":{"style":["solid","outline"]}},
+    {"key":"border","kind":"range","label":"Border","lo":"Thin","hi":"Thick","default":0.5,"group":"Look"},
+    {"key":"shadow","kind":"toggle","label":"Shadow","default":false,"group":"Look"},
+    {"key":"face","kind":"colour","label":"Face","group":"Colors"},
+    {"key":"frame","kind":"colour","label":"Edge","group":"Colors"},
+    {"key":"accent","kind":"colour","label":"Focus","group":"Colors"}
+  ],
+  "versions": [
+    {"name":"Blue panel","params":{}},
+    {"name":"Outlined","params":{"style":"outline","border":1}},
+    {"name":"Rounded wine","params":{"style":"pill","face":"#8e3a4a","accent":"#a4c44a"}},
+    {"name":"Brown with shadow","params":{"face":"#7a4f33","shadow":true}},
+    {"name":"Night","params":{"face":"#434d6d","accent":"#5fe0f0","frame":"#8fd0f0"}}
+  ],
+  "body": {
+    "panel": {
+      "skin": {"use":"skin:flat","v":3,"paint":{"face":"face","frame":"frame","accent":"accent"}},
+      "piece": {
+        "gen": "ui.slab",
+        "v": 1,
+        "clip": ["panel"],
+        "at": [1,1],
+        "size": [94,62],
+        "style": {"from":"style"},
+        "corner": {"from":"corner","map":[[0,0],[1,4]]},
+        "border": {"from":"border","map":[[0,1],[1,3]]},
+        "shadow": {"from":"shadow"}
+      },
+      "states": ["panel","panel-title","inset","tooltip"],
+      "draw": [
+        {
+          "gen": "ui.slab",
+          "v": 1,
+          "clip": ["panel-title"],
+          "role": "title",
+          "at": [1,1],
+          "size": [94,62],
+          "style": {"from":"style"},
+          "corner": {"from":"corner","map":[[0,0],[1,4]]},
+          "border": {"from":"border","map":[[0,1],[1,3]]},
+          "shadow": {"from":"shadow"}
+        },
+        {
+          "gen": "ui.slab",
+          "v": 1,
+          "clip": ["inset"],
+          "role": "inset",
+          "at": [1,1],
+          "size": [94,62],
+          "style": {"from":"style"},
+          "corner": {"from":"corner","map":[[0,0],[1,4]]},
+          "border": {"from":"border","map":[[0,1],[1,3]]},
+          "shadow": {"from":"shadow"}
+        },
+        {
+          "gen": "ui.slab",
+          "v": 1,
+          "clip": ["tooltip"],
+          "role": "tooltip",
+          "at": [1,1],
+          "size": [94,40],
+          "style": {"from":"style"},
+          "corner": {"from":"corner","map":[[0,0],[1,4]]},
+          "border": {"from":"border","map":[[0,1],[1,3]]},
+          "shadow": {"from":"shadow"}
+        }
+      ]
+    }
+  },
+  "clips": {
+    "panel": {"frames":1,"fps":8,"label":"Panel"},
+    "panel-title": {"frames":1,"fps":8,"label":"With heading"},
+    "inset": {"frames":1,"fps":8,"label":"List well"},
+    "tooltip": {"frames":1,"fps":8,"label":"Tooltip"}
+  }
+}

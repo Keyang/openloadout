@@ -1,0 +1,416 @@
+{
+ "id": "tiles-forest",
+ "frozen": "2026-11-20",
+ "source": "sprites/tiles-forest.js",
+ "sha256": "3ff51a1408bd8ca37b97b02e29849dde074872c51f7c7a65f1f5d0a03e6bd1e8",
+ "name": "Forest ground tiles",
+ "blurb": "Grassy earth for a side-view level, with a ledge, slopes and small plants; change the colours, how deep the grass is and how lumpy the ground.",
+ "meta": {
+  "type": "tileset",
+  "role": "world/tile",
+  "themes": [
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "platformer"
+  ],
+  "view": "side",
+  "words": [
+   "grass",
+   "ground",
+   "dirt",
+   "soil",
+   "earth",
+   "floor",
+   "terrain",
+   "hill",
+   "slope",
+   "ledge",
+   "walk",
+   "level",
+   "meadow"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "grass-top",
+ "params": {
+  "edge": {
+   "kind": "range",
+   "label": "Edge",
+   "def": 7,
+   "min": 5,
+   "max": 9,
+   "step": 1,
+   "lo": "Thin",
+   "hi": "Deep",
+   "group": "Look"
+  },
+  "bumps": {
+   "kind": "range",
+   "label": "Surface",
+   "def": 1,
+   "min": 0,
+   "max": 3,
+   "step": 1,
+   "lo": "Flat",
+   "hi": "Lumpy",
+   "group": "Look"
+  },
+  "texture": {
+   "kind": "range",
+   "label": "Texture",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Plain",
+   "hi": "Busy",
+   "group": "Look"
+  },
+  "roots": {
+   "kind": "toggle",
+   "label": "Roots",
+   "def": false,
+   "group": "Look"
+  },
+  "grass": {
+   "kind": "color",
+   "label": "Grass",
+   "def": "#6aa83e",
+   "swatches": [
+    "#6aa83e",
+    "#3f8a4f",
+    "#a4c44a",
+    "#9bd18a"
+   ],
+   "group": "Colors"
+  },
+  "soil": {
+   "kind": "color",
+   "label": "Soil",
+   "def": "#7a4f33",
+   "swatches": [
+    "#7a4f33",
+    "#a06a3c",
+    "#8f97a8",
+    "#5d6475"
+   ],
+   "group": "Colors"
+  },
+  "stone": {
+   "kind": "color",
+   "label": "Stone",
+   "def": "#8f97a8",
+   "swatches": [
+    "#8f97a8",
+    "#5d6475",
+    "#f0ead8",
+    "#3f5068",
+    "#a4c44a",
+    "#6b7280"
+   ],
+   "group": "Colors"
+  },
+  "flowers": {
+   "kind": "color",
+   "label": "Flowers",
+   "def": "#c9423a",
+   "swatches": [
+    "#c9423a",
+    "#f2c230",
+    "#7a4fc4",
+    "#f0ead8",
+    "#4fd8ee",
+    "#a4c44a"
+   ],
+   "group": "Colors"
+  }
+ },
+ "clips": {
+  "grass-left": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "grass-top": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "grass-right": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "grass-side-l": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "grass-fill": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "grass-fill-b": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "grass-fill-c": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "grass-side-r": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "grass-bottom-l": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "grass-bottom": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "grass-bottom-r": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "grass-inner-tl": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "grass-inner-tr": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "grass-inner-bl": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "grass-inner-br": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "grass-strip-l": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "grass-strip-m": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "grass-strip-r": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "grass-col-t": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "grass-col-m": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "grass-col-b": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "grass-single": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "grass-thin-l": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "grass-thin-m": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "grass-thin-r": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "grass-slope-up": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "grass-slope-down": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "grass-deco-a": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "grass-deco-b": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  },
+  "grass-deco-c": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    6,
+    6,
+    6
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [],
+ "bundles": [
+  "kit-platformer-fantasy"
+ ]
+}

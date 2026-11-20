@@ -1,0 +1,151 @@
+{
+ "id": "scorch",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     16.5,
+     24
+    ],
+    "r": [
+     12,
+     5
+    ],
+    "paint": "b",
+    "paints": [
+     "p0",
+     "p1",
+     "p2",
+     "p3",
+     "p4"
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      5,
+      19
+     ],
+     "anchor": "tl",
+     "rows": [
+      "......aaaaaaaaa........",
+      ".....aaaa..aaaaaaaaa...",
+      ".aaaaa.............aaa.",
+      "a..................aaaa",
+      "aaaa...............aaaa",
+      "aaaa...............aa..",
+      "aaaa...............aaaa",
+      ".aaaaa...........aaaa..",
+      "...aaaaaa..aaaaaaaa....",
+      "......aaaaaaaaaaa......"
+     ],
+     "key": {
+      "a": "b"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     16.5,
+     24
+    ],
+    "r": [
+     12,
+     5
+    ],
+    "spread": 0.4,
+    "heat": 0.8,
+    "embers": 6,
+    "seed": 2,
+    "paint": "b",
+    "paints": [
+     "p0",
+     "p1",
+     "p2",
+     "p3",
+     "p4"
+    ]
+   },
+   "ctx": {
+    "frame": 3
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      8,
+      20
+     ],
+     "anchor": "tl",
+     "rows": [
+      "......aaaa.......",
+      "..aaaa......aaa..",
+      ".aaa......bb.aaa.",
+      "aaa.......b...aaa",
+      "aaa......b..b.aaa",
+      "..aa..........aa.",
+      "..aaaaaabaaaaa...",
+      "......aaaaa......"
+     ],
+     "key": {
+      "a": "b",
+      "b": "p1"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     20.5,
+     20
+    ],
+    "r": [
+     9,
+     4
+    ],
+    "hole": 0,
+    "gaps": 0.4,
+    "heat": 0.3,
+    "paint": "b",
+    "paints": [
+     "p1",
+     "p2",
+     "p3",
+     "p4"
+    ]
+   },
+   "ctx": {
+    "frame": 1
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      13,
+      16
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".......aaaaa...",
+      "a......aa......",
+      ".aababaaa..ab..",
+      "...aaaa.b..aaaa",
+      ".......aaaa....",
+      "...aaaaaa......",
+      ".aa..aa..aa..aa",
+      ".....aa....a..."
+     ],
+     "key": {
+      "a": "b",
+      "b": "p3"
+     }
+    }
+   ]
+  }
+ ]
+}

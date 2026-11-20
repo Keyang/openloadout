@@ -1,0 +1,39 @@
+{ "format": "loadout-sprite",
+  "version": 2,
+  "id": "emote-marks",
+  "name": "Emote marks",
+  "blurb": "Nine rimmed reaction marks that pop up over a character's head and keep moving while they show (surprise, question, love, anger, nerves, sleep, a tune, delight, dizziness); change the mark, its size, boldness, shadow, colours and motion.",
+  "meta": {"type": "ui", "role": "interface/icon", "themes": ["neutral"], "gameTypes": ["arcade", "top-down-rpg", "farming-sim", "turn-based-rpg"], "view": "none", "words": ["emote", "exclamation", "question", "heart", "angry", "sweat", "sleep", "music", "delight", "dizzy", "reaction"], "license": "draft"},
+  "size": [32,32],
+  "pivot": [16,30],
+  "grounded": false,
+  "preview": "idle",
+  "styles": ["pixel"],
+  "palette": [
+  {"id": "body", "label": "Mark", "default": "#e08a2c", "material": "paint", "swatches": ["#e08a2c", "#c9423a", "#3f6fd1", "#7a4fc4", "#3f8a4f", "#3f9fd1"]},
+  {"id": "edge", "label": "Rim", "default": "#f0ead8", "material": "interface", "swatches": ["#f0ead8", "#f6d3b0", "#c2c9d6", "#f2c230"]} ],
+  "controls": [
+  {"key": "emote", "kind": "choice", "label": "Emote", "options": [{"value": "exclaim", "label": "Exclamation"}, "question", "heart", "anger", "sweat", "sleep", "music", {"value": "spark", "label": "Delight"}, {"value": "swirl", "label": "Dizzy"}], "default": "exclaim"},
+  {"key": "size", "kind": "range", "label": "Size", "lo": "Small", "hi": "Big", "default": 0.5},
+  {"key": "bold", "kind": "toggle", "label": "Bold", "default": false, "when": {"emote": ["exclaim", "question", "anger", "sleep", "music", "spark", "swirl"]}},
+  {"key": "shadow", "kind": "toggle", "label": "Shadow", "default": true},
+  {"key": "body", "kind": "colour", "label": "Mark"},
+  {"key": "edge", "kind": "colour", "label": "Rim"},
+  {"key": "bounce", "kind": "range", "label": "Bounce", "lo": "Calm", "hi": "Bouncy", "default": 0.5, "group": "Motion"},
+  {"key": "speed", "standard": "speed"} ],
+  "body": { "pictures": {
+    "nodes": [
+    {"id": "ui", "parent": null, "at": [16,16]} ],
+    "draw": [
+    {"gen": "emote.marks", "v": 1, "on": "ui", "at": [0,0], "clip": ["idle"], "picture": "idle", "emote": {"from": "emote", "pick": {"exclaim": "exclaim", "question": "question", "heart": "heart", "anger": "anger", "sweat": "sweat", "sleep": "sleep", "music": "music", "spark": "spark", "swirl": "swirl"}}, "size": {"from": "size", "map": [[0,0], [1,1]], "round": "none"}, "bold": {"from": "bold", "pick": {"true": true, "false": false}}, "shadow": {"from": "shadow", "pick": {"true": true, "false": false}}, "body": "body", "edge": "edge", "bounce": {"from": "bounce", "map": [[0,0], [1,1]], "round": "none"}},
+    {"gen": "emote.marks", "v": 1, "on": "ui", "at": [0,0], "clip": ["pop"], "picture": "pop", "emote": {"from": "emote", "pick": {"exclaim": "exclaim", "question": "question", "heart": "heart", "anger": "anger", "sweat": "sweat", "sleep": "sleep", "music": "music", "spark": "spark", "swirl": "swirl"}}, "size": {"from": "size", "map": [[0,0], [1,1]], "round": "none"}, "bold": {"from": "bold", "pick": {"true": true, "false": false}}, "shadow": {"from": "shadow", "pick": {"true": true, "false": false}}, "body": "body", "edge": "edge", "bounce": {"from": "bounce", "map": [[0,0], [1,1]], "round": "none"}} ] } },
+  "clips": {
+    "idle": {"frames": 8, "fps": 8, "label": "Showing"},
+    "pop": {"frames": 6, "fps": 12, "loop": false, "label": "Popping up", "sounds": [{"sound": "notify-ping", "preset": "Storybook", "frame": 1, "volume": 0.5}]} },
+  "versions": [
+  {"name": "Surprise", "params": {}},
+  {"name": "Question", "params": {"emote": "question", "body": "#3f6fd1"}},
+  {"name": "Love", "params": {"emote": "heart", "size": 1, "body": "#c9423a"}},
+  {"name": "Sleepy", "params": {"emote": "sleep", "body": "#3f6fd1", "edge": "#c2c9d6"}},
+  {"name": "Delight", "params": {"emote": "spark", "body": "#3f8a4f"}},
+  {"name": "Humming", "params": {"emote": "music", "body": "#7a4fc4", "bold": true}} ] }

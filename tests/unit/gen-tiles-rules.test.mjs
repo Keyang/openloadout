@@ -20,9 +20,10 @@ import { spriteGuide } from '../../app/guide.js';
 import { rowFromSprite } from '../../app/play/roles.js';
 import { guideFaults } from '../helpers/download-check.mjs';
 import { testPieces } from '../fixtures/resolve/helpers.mjs';
-import forestCode from '../../sprites/tiles-forest.js';
-import caveCode from '../../sprites/tiles-cave.js';
-import dungeonCode from '../../sprites/tiles-dungeon.js';
+import { codeSprite } from '../helpers/library.mjs';
+const forestCode = await codeSprite('tiles-forest');     // the frozen copies: the library's are data since migration batch M5
+const caveCode = await codeSprite('tiles-cave');
+const dungeonCode = await codeSprite('tiles-dungeon');
 
 const FIX = new URL('../fixtures/v2/', import.meta.url);
 const load = (p) => JSON.parse(fs.readFileSync(new URL(p, FIX), 'utf8'));

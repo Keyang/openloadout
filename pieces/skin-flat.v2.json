@@ -1,0 +1,129 @@
+{
+ "format": "loadout-piece",
+ "version": 1,
+ "id": "skin:flat",
+ "v": 2,
+ "name": "Flat",
+ "about": "The flat interface look: an ink outline round an unlit band and a flat face; solid, outline (the band set in) or pill ends; a focus line of the accent.",
+ "slots": [
+  {
+   "id": "face",
+   "label": "Face",
+   "default": "#3f5068",
+   "material": "interface"
+  },
+  {
+   "id": "frame",
+   "label": "Edge",
+   "default": "#f0ead8",
+   "material": "interface"
+  },
+  {
+   "id": "accent",
+   "label": "Focus",
+   "default": "#4fd8ee",
+   "material": "interface"
+  },
+  {
+   "id": "fill",
+   "label": "Fill",
+   "default": "#6aa83e",
+   "material": "interface"
+  },
+  {
+   "id": "shine",
+   "label": "Shine",
+   "default": "#ffffff",
+   "material": "light"
+  }
+ ],
+ "made": {
+  "from": "engine/ui-skins.js"
+ },
+ "body": {
+  "paint": {
+   "face": "face",
+   "frame": "frame",
+   "accent": "accent",
+   "line": "accent",
+   "ledge": "face.dark",
+   "knob": "frame",
+   "fill": "fill",
+   "shine": "shine",
+   "divider": "ink"
+  },
+  "args": {
+   "*": {
+    "rings": [
+     "ink",
+     "frame"
+    ],
+    "bandAt": 1,
+    "lit": false,
+    "edge": "round",
+    "hoverFace": 0.1,
+    "hoverBand": 0.45
+   },
+   "ui.slab": {
+    "titleShade": -1,
+    "lined": true
+   },
+   "ui.strip": {
+    "gloss": false,
+    "shadow": false,
+    "rings": [
+     "ink",
+     "frame",
+     "ink"
+    ],
+    "bandAt": 1
+   },
+   "ui.trough": {
+    "trough": "dark",
+    "rings": [
+     "ink",
+     "frame",
+     "ink"
+    ],
+    "bandAt": 1
+   }
+  },
+  "styles": {
+   "solid": {
+    "*": {
+     "edge": "round"
+    }
+   },
+   "outline": {
+    "*": {
+     "rings": [
+      "ink",
+      "face",
+      "frame"
+     ],
+     "bandAt": 2
+    }
+   },
+   "pill": {
+    "*": {
+     "edge": "pill"
+    }
+   }
+  },
+  "states": {
+   "normal": {
+    "lip": 2
+   },
+   "hover": {
+    "lip": 2
+   },
+   "pressed": {
+    "lip": 0
+   },
+   "disabled": {
+    "lip": 2,
+    "desaturate": 1
+   }
+  }
+ }
+}

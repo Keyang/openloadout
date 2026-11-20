@@ -1,0 +1,168 @@
+{
+ "id": "ui-panel-wood",
+ "frozen": "2026-11-20",
+ "source": "sprites/ui-panel-wood.js",
+ "sha256": "1c4c6ee3348fc2035d75e95e2a8fe14b9c85dcc830d49e07148294c62c983c2f",
+ "name": "Wooden panels",
+ "blurb": "Stretchable wooden boxes for menus and pop-ups: a framed board, a board with a heading strip and a parchment scroll; change the corners, border, nails, grain and colours.",
+ "meta": {
+  "type": "ui",
+  "role": "interface/panel",
+  "themes": [
+   "fantasy",
+   "neutral"
+  ],
+  "gameTypes": [
+   "platformer",
+   "turn-based-rpg",
+   "top-down-rpg",
+   "arcade",
+   "puzzle"
+  ],
+  "view": "none",
+  "words": [
+   "panel",
+   "window",
+   "box",
+   "menu",
+   "pause",
+   "popup",
+   "wood",
+   "wooden",
+   "board",
+   "frame",
+   "scroll",
+   "parchment",
+   "title",
+   "story"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  96,
+  64
+ ],
+ "pivot": [
+  48,
+  32
+ ],
+ "grounded": false,
+ "preview": "panel",
+ "params": {
+  "corner": {
+   "kind": "range",
+   "label": "Corner",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Square",
+   "hi": "Round",
+   "group": "Look"
+  },
+  "border": {
+   "kind": "range",
+   "label": "Border",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Thin",
+   "hi": "Thick",
+   "group": "Look"
+  },
+  "nails": {
+   "kind": "toggle",
+   "label": "Nails",
+   "def": true,
+   "group": "Look"
+  },
+  "texture": {
+   "kind": "range",
+   "label": "Texture",
+   "def": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "lo": "Plain",
+   "hi": "Busy",
+   "group": "Look"
+  },
+  "face": {
+   "kind": "color",
+   "label": "Face",
+   "def": "#a06a3c",
+   "swatches": [
+    "#a06a3c",
+    "#7a4f33",
+    "#5d6475",
+    "#3f5068",
+    "#c9423a",
+    "#7a4fc4",
+    "#3f6fd1"
+   ],
+   "group": "Colors"
+  },
+  "frame": {
+   "kind": "color",
+   "label": "Frame",
+   "def": "#7a4f33",
+   "swatches": [
+    "#7a4f33",
+    "#f2c230",
+    "#c2c9d6",
+    "#5d6475",
+    "#c9423a",
+    "#f0ead8"
+   ],
+   "group": "Colors"
+  },
+  "accent": {
+   "kind": "color",
+   "label": "Parchment",
+   "def": "#f0ead8",
+   "swatches": [
+    "#f0ead8",
+    "#f6d3b0",
+    "#c2c9d6",
+    "#9bd18a",
+    "#8fd0f0"
+   ],
+   "group": "Colors"
+  }
+ },
+ "clips": {
+  "panel": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "panel-title": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  },
+  "panel-scroll": {
+   "frames": 1,
+   "loop": true,
+   "fps": [
+    8,
+    8,
+    8
+   ]
+  }
+ },
+ "sounds": {},
+ "versions": [],
+ "bundles": [
+  "kit-platformer-fantasy"
+ ]
+}

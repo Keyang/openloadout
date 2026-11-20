@@ -1,0 +1,579 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "supply-crate",
+ "name": "Supply crate",
+ "blurb": "A metal crate, canister or locker that rocks when shot and bursts open. Change its size, straps, hazard label, the number of scraps and its colours.",
+ "meta": {
+  "type": "prop",
+  "role": "world/prop",
+  "themes": [
+   "sci-fi",
+   "space"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "shooter"
+  ],
+  "view": "top-down",
+  "words": [
+   "crate",
+   "box",
+   "container",
+   "canister",
+   "locker",
+   "supplies",
+   "cargo",
+   "break",
+   "shoot",
+   "destroy",
+   "loot",
+   "metal",
+   "obstacle",
+   "cover"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  30
+ ],
+ "preview": "idle",
+ "styles": [
+  "pixel"
+ ],
+ "palette": [
+  {
+   "id": "body",
+   "label": "Body",
+   "default": "#6b7896",
+   "material": "metal",
+   "swatches": [
+    "#6b7896",
+    "#566182",
+    "#434d6d",
+    "#3f6fd1",
+    "#2fb3a8",
+    "#4f9ff0"
+   ]
+  },
+  {
+   "id": "accent",
+   "label": "Label colour",
+   "default": "#f2a030",
+   "material": "paint",
+   "swatches": [
+    "#f2a030",
+    "#5fe0f0",
+    "#9fe040",
+    "#f0ead8",
+    "#b48af8",
+    "#f2c230"
+   ]
+  },
+  {
+   "id": "plate",
+   "default": "#434d6d",
+   "material": "metal",
+   "detail": true
+  },
+  {
+   "id": "cream",
+   "default": "#f0ead8",
+   "material": "paint",
+   "detail": true
+  },
+  {
+   "id": "steel",
+   "default": "#c2c9d6",
+   "material": "metal",
+   "detail": true
+  },
+  {
+   "id": "label-ink",
+   "material": "paint",
+   "derive": {
+    "rule": "standOut",
+    "against": "accent",
+    "from": [
+     "plate",
+     "cream"
+    ]
+   }
+  },
+  {
+   "id": "strap",
+   "material": "metal",
+   "derive": {
+    "rule": "standOut",
+    "against": "body",
+    "from": [
+     "steel",
+     "plate"
+    ]
+   }
+  }
+ ],
+ "controls": [
+  {
+   "key": "size",
+   "kind": "range",
+   "label": "Size",
+   "lo": "Small",
+   "hi": "Big",
+   "default": 0.5
+  },
+  {
+   "key": "style",
+   "kind": "choice",
+   "label": "Style",
+   "options": [
+    "crate",
+    "canister",
+    "locker"
+   ],
+   "default": "crate"
+  },
+  {
+   "key": "straps",
+   "kind": "toggle",
+   "label": "Straps",
+   "default": true
+  },
+  {
+   "key": "mark",
+   "kind": "choice",
+   "label": "Label",
+   "options": [
+    "none",
+    "cross",
+    "bolt",
+    "skull"
+   ],
+   "default": "bolt"
+  },
+  {
+   "key": "pieces",
+   "kind": "range",
+   "label": "Pieces",
+   "lo": "Few",
+   "hi": "Many",
+   "default": 0.5
+  },
+  {
+   "key": "body",
+   "kind": "colour",
+   "label": "Body"
+  },
+  {
+   "key": "accent",
+   "kind": "colour",
+   "label": "Label colour",
+   "when": {
+    "mark": [
+     "cross",
+     "bolt",
+     "skull"
+    ]
+   }
+  },
+  {
+   "key": "speed",
+   "standard": "speed"
+  }
+ ],
+ "body": {
+  "pictures": {
+   "nodes": [],
+   "draw": [
+    {
+     "id": "crate-idle",
+     "gen": "supply.crate",
+     "v": 1,
+     "at": [
+      16,
+      30
+     ],
+     "style": {
+      "from": "style",
+      "pick": {
+       "crate": "crate",
+       "canister": "canister",
+       "locker": "locker"
+      }
+     },
+     "size": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "straps": {
+      "from": "straps",
+      "pick": {
+       "true": true,
+       "false": false
+      }
+     },
+     "mark": {
+      "from": "mark",
+      "pick": {
+       "none": "none",
+       "cross": "cross",
+       "bolt": "bolt",
+       "skull": "skull"
+      }
+     },
+     "scraps": {
+      "from": "pieces",
+      "map": [
+       [
+        0,
+        3
+       ],
+       [
+        1,
+        10
+       ]
+      ],
+      "round": "px"
+     },
+     "body": "body",
+     "accent": "accent",
+     "labelInk": "label-ink",
+     "strap": "strap",
+     "clip": [
+      "idle"
+     ]
+    },
+    {
+     "id": "crate-hurt",
+     "gen": "supply.crate",
+     "v": 1,
+     "at": [
+      16,
+      30
+     ],
+     "style": {
+      "from": "style",
+      "pick": {
+       "crate": "crate",
+       "canister": "canister",
+       "locker": "locker"
+      }
+     },
+     "size": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "straps": {
+      "from": "straps",
+      "pick": {
+       "true": true,
+       "false": false
+      }
+     },
+     "mark": {
+      "from": "mark",
+      "pick": {
+       "none": "none",
+       "cross": "cross",
+       "bolt": "bolt",
+       "skull": "skull"
+      }
+     },
+     "scraps": {
+      "from": "pieces",
+      "map": [
+       [
+        0,
+        3
+       ],
+       [
+        1,
+        10
+       ]
+      ],
+      "round": "px"
+     },
+     "body": "body",
+     "accent": "accent",
+     "labelInk": "label-ink",
+     "strap": "strap",
+     "clip": [
+      "hurt"
+     ],
+     "squash": [
+      1,
+      -1,
+      1,
+      0
+     ],
+     "shift": [
+      1,
+      -1,
+      0,
+      0
+     ]
+    },
+    {
+     "id": "crate-break",
+     "gen": "supply.crate",
+     "v": 1,
+     "at": [
+      16,
+      30
+     ],
+     "style": {
+      "from": "style",
+      "pick": {
+       "crate": "crate",
+       "canister": "canister",
+       "locker": "locker"
+      }
+     },
+     "size": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "straps": {
+      "from": "straps",
+      "pick": {
+       "true": true,
+       "false": false
+      }
+     },
+     "mark": {
+      "from": "mark",
+      "pick": {
+       "none": "none",
+       "cross": "cross",
+       "bolt": "bolt",
+       "skull": "skull"
+      }
+     },
+     "scraps": {
+      "from": "pieces",
+      "map": [
+       [
+        0,
+        3
+       ],
+       [
+        1,
+        10
+       ]
+      ],
+      "round": "px"
+     },
+     "body": "body",
+     "accent": "accent",
+     "labelInk": "label-ink",
+     "strap": "strap",
+     "clip": [
+      "break"
+     ],
+     "stage": [
+      1,
+      2,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3
+     ],
+     "fly": [
+      0,
+      0,
+      0.0566,
+      0.2453,
+      0.434,
+      0.6226,
+      0.8113,
+      1
+     ],
+     "flat": [
+      0.5,
+      0.5,
+      0.6,
+      0.25,
+      0.7,
+      0.5
+     ]
+    },
+    {
+     "kind": "outline",
+     "paint": "ink"
+    },
+    {
+     "id": "scraps",
+     "gen": "supply.crate",
+     "v": 1,
+     "at": [
+      16,
+      30
+     ],
+     "style": {
+      "from": "style",
+      "pick": {
+       "crate": "crate",
+       "canister": "canister",
+       "locker": "locker"
+      }
+     },
+     "size": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     },
+     "straps": {
+      "from": "straps",
+      "pick": {
+       "true": true,
+       "false": false
+      }
+     },
+     "mark": {
+      "from": "mark",
+      "pick": {
+       "none": "none",
+       "cross": "cross",
+       "bolt": "bolt",
+       "skull": "skull"
+      }
+     },
+     "scraps": {
+      "from": "pieces",
+      "map": [
+       [
+        0,
+        3
+       ],
+       [
+        1,
+        10
+       ]
+      ],
+      "round": "px"
+     },
+     "body": "body",
+     "accent": "accent",
+     "labelInk": "label-ink",
+     "strap": "strap",
+     "clip": [
+      "break"
+     ],
+     "stage": [
+      1,
+      2,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3
+     ],
+     "fly": [
+      0,
+      0,
+      0.0566,
+      0.2453,
+      0.434,
+      0.6226,
+      0.8113,
+      1
+     ],
+     "flat": [
+      0.5,
+      0.5,
+      0.6,
+      0.25,
+      0.7,
+      0.5
+     ],
+     "layer": "light"
+    }
+   ]
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 1,
+   "fps": 8
+  },
+  "hurt": {
+   "frames": 4,
+   "fps": 9,
+   "loop": false,
+   "frameEdits": {
+    "0": {
+     "flash": true
+    }
+   },
+   "sounds": [
+    {
+     "sound": "bolt-impact",
+     "preset": "On metal",
+     "frame": 0,
+     "volume": 0.9
+    }
+   ]
+  },
+  "break": {
+   "frames": 8,
+   "fps": 12,
+   "loop": false,
+   "frameEdits": {
+    "0": {
+     "flash": true
+    }
+   },
+   "sounds": [
+    {
+     "sound": "shield-break",
+     "preset": "Small crack",
+     "frame": 0,
+     "volume": 0.8
+    }
+   ]
+  }
+ }
+}

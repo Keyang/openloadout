@@ -5,9 +5,11 @@
 // renderer to paint, the draw list of each frame (engine/data-sprite.js dataFrameList), over its clips and frames at a
 // set of settings, tried in this order until the work cap (MAX_LISTS) is reached:
 //   1 the defaults, at every frame;
-//   2 each control alone at each of its other values: a range at both ends and at each turning point of a map that
-//     reads it (a binding { from, map } whose output stops rising or falling there), a choice at every option, a toggle
-//     flipped, and any value a `when` of the definition names for it (a colour, a range value);
+//   2 each control alone at each of its other values, in three rounds (build item B15b): first a choice at every
+//     option, a toggle flipped and a colour at any value a `when` names; then each range at both ends and at any value
+//     a `when` of the definition names for it (a threshold's bounds: { atLeast: 0.35 } names 0.35); then each range
+//     at each turning point of a map that reads it (a binding { from, map } whose output stops rising or falling there)
+//     (so what a toggle paints is seen before the frame lists run out on a tileset of many tiles);
 //   3 every toggle on, then every toggle off, together;
 //   4 the controls' values together: every combination of the choices, the toggles, the sliders (each at its default,
 //     its ends and those turning points) and the values `when`s name, when there are at most MAX_COMBOS of them (then
@@ -116,7 +118,9 @@ function readDefinition(def) {
       for (const [k, raw] of Object.entries(alt)) {
         if (!SAFE_KEY(k)) continue;
         if (!whenValues.has(k)) whenValues.set(k, []);
-        for (const x of Array.isArray(raw) ? raw : [raw]) if (whenValues.get(k).length < 64 && !whenValues.get(k).includes(x)) whenValues.get(k).push(x);
+        // a threshold (build item B15b) is tried at its bounds: { atLeast: 0.35 } names 0.35
+        const xs = (Array.isArray(raw) ? raw : [raw]).flatMap((x) => (isObj(x) ? Object.values(x).filter((b) => typeof b === 'number' && Number.isFinite(b)) : [x]));
+        for (const x of xs) if (whenValues.get(k).length < 64 && !whenValues.get(k).includes(x)) whenValues.get(k).push(x);
       }
     }
   };
@@ -168,20 +172,25 @@ function settingsOf(sprite, { whenValues, turns, read, bareRead }) {
   // the standard Speed slider sets the fps only (engine/resolve.js), never what a frame draws, unless the definition reads it
   const speedKeys = new Set((Array.isArray(sprite.definition?.controls) ? sprite.definition.controls : []).filter((c) => c?.standard === 'speed').map(() => 'speed'));
   const inRange = (d) => (v) => typeof v === 'number' && Number.isFinite(v) && v >= d.min && v <= d.max;
-  // the values of each control the combinations are made of (a slider: its default, its ends, its maps' turning points)
-  const dims = [];
+  // the values of each control the combinations are made of (a slider: its default, its ends, the values `when`s name
+  // and its maps' turning points). Each is tried alone first, in three rounds (build item B15b): the choices, toggles
+  // and colours; then each slider's ends and the values `when`s name for it; then the sliders' turning points. A
+  // tileset of 48 tiles has frame lists for a dozen settings, and what a toggle paints must not wait behind them.
+  const dims = [], rounds = [[], [], []];
   for (const [k, d] of Object.entries(params)) {
     if (!isObj(d)) continue;
     let values;
     if (d.kind === 'choice') values = (d.options ?? []).map((o) => (isObj(o) ? o.value : o));
     else if (d.kind === 'toggle') values = [d.def, !d.def];
-    else if (d.kind === 'range') values = [d.def, d.min, d.max, ...named(k, d), ...(turns.get(k) ?? []).filter(inRange(d))];
+    else if (d.kind === 'range') values = [d.def, d.min, d.max, ...named(k, d).filter(inRange(d)), ...(turns.get(k) ?? []).filter(inRange(d))];
     else values = [d.def, ...named(k, d)];
     values = [...new Set(values)];
-    for (const v of values) if (v !== d.def) add(say({ [k]: v }), { [k]: v });
+    const first = d.kind === 'range' ? new Set([d.min, d.max, ...named(k, d)]) : null;
+    for (const v of values) if (v !== d.def) rounds[!first ? 0 : first.has(v) ? 1 : 2].push([k, v]);
     if (d.kind === 'range' && speedKeys.has(k) && !read.has(k)) continue;
     if (values.length > 1) dims.push([k, values]);
   }
+  for (const round of rounds) for (const [k, v] of round) add(say({ [k]: v }), { [k]: v });
   const toggles = Object.entries(params).filter(([, d]) => d?.kind === 'toggle').map(([k]) => k);
   if (toggles.length > 1) {
     add('every toggle on', Object.fromEntries(toggles.map((k) => [k, true])));

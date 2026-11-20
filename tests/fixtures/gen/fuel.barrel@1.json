@@ -1,0 +1,741 @@
+{
+ "id": "fuel.barrel",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "gen": "fuel.barrel",
+    "v": 1,
+    "at": [
+     16,
+     46
+    ],
+    "body": "body",
+    "accent": "accent",
+    "inner": "glow",
+    "tape": "tape",
+    "steel": "steel",
+    "panel": "panel",
+    "cream": "cream",
+    "shine": "shine",
+    "lamp": [
+     1
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      7,
+      19
+     ],
+     "anchor": "tl",
+     "rows": [
+      "....aaaabbcaaaa....",
+      ".aaaddddbbbddddaaa.",
+      "addddddeeeeedddddda",
+      "addffddeeeeedddddda",
+      "gaaadddddddddddaaah",
+      "gggfaaaaaaaaaaafhhg",
+      "ggggfffffffffffgggh",
+      "gggfgggggggggggfhhh",
+      "fggfffffffffffffhha",
+      "gffhfffffffffffhaag",
+      "gggghgghhhhhhhhgggh",
+      "gggfgghggggggggfhhh",
+      "iggfffffffffffffhhe",
+      "ieejfffffffffffjjee",
+      "eeijeejjeejjeejjeej",
+      "eiieejjeejjeejjeejj",
+      "iieejjeejjeejjeejje",
+      "ieejjeejjeejjeejjee",
+      "geijeejjeejjeejjeeh",
+      "gggfejjeejjeejjfhhh",
+      "fggffffffffffggfhha",
+      "gffhfffffffffghhaag",
+      "gggghhhhhhhhhhhgggh",
+      "gggfgggggggggggfhhh",
+      "gggfffffffffffffhhh",
+      ".ggggfffffffffffgg.",
+      "....ggggggggggg...."
+     ],
+     "key": {
+      "a": {
+       "rule": "faceTone",
+       "of": "body",
+       "face": "top",
+       "tone": "light"
+      },
+      "b": "glow",
+      "c": "shine",
+      "d": {
+       "rule": "faceTone",
+       "of": "body",
+       "face": "top",
+       "tone": "base"
+      },
+      "e": "tape",
+      "f": {
+       "rule": "faceTone",
+       "of": "body",
+       "face": "wall",
+       "tone": "base"
+      },
+      "g": {
+       "rule": "faceTone",
+       "of": "body",
+       "face": "wall",
+       "tone": "dark"
+      },
+      "h": {
+       "rule": "faceTone",
+       "of": "body",
+       "face": "wall",
+       "tone": "light"
+      },
+      "i": {
+       "rule": "tone",
+       "of": "accent",
+       "by": -1
+      },
+      "j": "accent"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "gen": "fuel.barrel",
+    "v": 1,
+    "at": [
+     16,
+     46
+    ],
+    "body": "body",
+    "accent": "accent",
+    "inner": "glow",
+    "tape": "tape",
+    "steel": "steel",
+    "panel": "panel",
+    "cream": "cream",
+    "shine": "shine",
+    "style": "tank",
+    "size": 1,
+    "wear": 1,
+    "lamp": [
+     1
+    ],
+    "squash": [
+     1,
+     -1
+    ],
+    "shift": [
+     1,
+     -1
+    ],
+    "leak": [
+     0,
+     2
+    ]
+   },
+   "ctx": {
+    "t": 0.3333333333333333,
+    "loop": false,
+    "frames": 4,
+    "frame": 1
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      7,
+      11
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".......aab.......",
+      ".......aaa.......",
+      ".....ccccccc.....",
+      ".......ddd.......",
+      ".......ddd.......",
+      ".....eedddee.....",
+      "..eefffffffeeee..",
+      ".fffffffffeeeeee.",
+      "ffffffffffeeeefee",
+      "ffffffffffffffffe",
+      "ffffffffffffffffe",
+      "gfffffffffffffffg",
+      "hgfffffffffffffgg",
+      "ihgggfffffffgggge",
+      "iihhhggggggggggee",
+      "hiiiihiiiiigeeeeh",
+      "hhiiiigggggeeeehg",
+      "hhhhhigggggehhhgg",
+      "hhhhhhhhhhhhggggg",
+      "hhhhhhhiiiighhggg",
+      "hhhhjhghhhhhhhggg",
+      "hhhhjjjjjjjghgggg",
+      "hhhhjgjkkkgjjhggg",
+      "hhhcccjkkgjjjhggg",
+      "hhhcccjkkkjjjhggg",
+      "hhhhajjjkjjjjhggg",
+      "hhhhajjjjjjjjhggg",
+      "ihhhjjjkkkjjhhgge",
+      "iihhjjjkgkjjhggee",
+      "hiihhjjgjjjjhheeh",
+      "hhiiihghhhhheeehh",
+      "hhhhhigggggehhhgg"
+     ],
+     "key": {
+      "a": "glow",
+      "b": "shine",
+      "c": "tape",
+      "d": "steel",
+      "e": {
+       "rule": "faceTone",
+       "of": "body",
+       "face": "top",
+       "tone": "light"
+      },
+      "f": {
+       "rule": "faceTone",
+       "of": "body",
+       "face": "top",
+       "tone": "base"
+      },
+      "g": {
+       "rule": "faceTone",
+       "of": "body",
+       "face": "wall",
+       "tone": "light"
+      },
+      "h": {
+       "rule": "faceTone",
+       "of": "body",
+       "face": "wall",
+       "tone": "dark"
+      },
+      "i": {
+       "rule": "faceTone",
+       "of": "body",
+       "face": "wall",
+       "tone": "base"
+      },
+      "j": "accent",
+      "k": {
+       "rule": "standOut",
+       "against": "accent",
+       "from": [
+        "tape",
+        "cream"
+       ]
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      7,
+      43
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aaaaaaaaaaaabbb.",
+      "..aaaaccaaaabaa..",
+      ".....aaaaaaa....."
+     ],
+     "key": {
+      "a": {
+       "rule": "faceTone",
+       "of": "body",
+       "face": "wall",
+       "tone": "dark"
+      },
+      "b": {
+       "rule": "faceTone",
+       "of": "body",
+       "face": "wall",
+       "tone": "light"
+      },
+      "c": {
+       "rule": "faceTone",
+       "of": "body",
+       "face": "wall",
+       "tone": "base"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "gen": "fuel.barrel",
+    "v": 1,
+    "at": [
+     16,
+     46
+    ],
+    "body": "body",
+    "accent": "accent",
+    "inner": "glow",
+    "tape": "tape",
+    "steel": "steel",
+    "panel": "panel",
+    "cream": "cream",
+    "shine": "shine",
+    "style": "cell",
+    "size": 0,
+    "bands": false,
+    "lamp": [
+     1
+    ],
+    "leak": [
+     64
+    ],
+    "grow": [
+     0,
+     0,
+     0,
+     1
+    ],
+    "tint": [
+     1,
+     0,
+     0,
+     1
+    ]
+   },
+   "ctx": {
+    "t": 0.42857142857142855,
+    "loop": false,
+    "frames": 8,
+    "frame": 3
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      9,
+      25
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...aaaaaaaaa...",
+      ".aaaaaaaaaaaaa.",
+      "aaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaa",
+      ".aaaaaaaaaaaaa.",
+      "...aaaaaaaaa..."
+     ],
+     "key": {
+      "a": {
+       "rule": "tone",
+       "of": "glow",
+       "by": 1.6
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "gen": "fuel.barrel",
+    "v": 1,
+    "at": [
+     16,
+     46
+    ],
+    "body": "body",
+    "accent": "accent",
+    "inner": "glow",
+    "tape": "tape",
+    "steel": "steel",
+    "panel": "panel",
+    "cream": "cream",
+    "shine": "shine",
+    "stage": [
+     0,
+     1
+    ],
+    "grow": [
+     2
+    ]
+   },
+   "ctx": {
+    "t": 0.14285714285714285,
+    "loop": false,
+    "frames": 8,
+    "frame": 1
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      4,
+      19
+     ],
+     "anchor": "tl",
+     "rows": [
+      "....aaaabb......baaaa....",
+      "aaaaccccbbd.....bccccaaaa",
+      "acccccccddd....ddccccccca",
+      "acceecccddc....ddccccccca",
+      "faaaaccccca....cccccaaaag",
+      "fffeeaaaaae....aaaaaeeggf",
+      "fffffeeeeef....eeeeeffffg",
+      "fffeefffffe....fffffeeggg",
+      "effeeeeeeee....eeeeeeegga",
+      "feeggeeeeeg....eeeeeggaaf",
+      "fffffgffggf....gggggffffg",
+      "fffeeffgffe....fffffeeggg",
+      "dffeeeeeeee....eeeeeeeggd",
+      "hhddieeeeed....eeeeeiiddi",
+      "hddiiddiidi....iiddiiddii",
+      "ddhiddiiddi....iddiiddiid",
+      "dhhddiiddid....ddiiddiidd",
+      "hhddiiddiid....diiddiiddi",
+      "fddiiddiiddi...iiddiiddig",
+      ".fffeediidee..iddiieeggg.",
+      ".effeeeeeeee..eeeeffegga.",
+      ".feeggeeeegg..eeeefggaaf.",
+      ".fffffggggff..gggggffffg.",
+      ".fffeeffffee..fffffeeggg.",
+      ".fffeeeeeeee..eeeeeeeggg.",
+      "..fffffeeeff..eeeeeefff..",
+      "......ffff....fffff......"
+     ],
+     "key": {
+      "a": {
+       "rule": "faceTone",
+       "of": "body",
+       "face": "top",
+       "tone": "light"
+      },
+      "b": {
+       "rule": "tone",
+       "of": "glow",
+       "by": -1.9
+      },
+      "c": {
+       "rule": "faceTone",
+       "of": "body",
+       "face": "top",
+       "tone": "base"
+      },
+      "d": "tape",
+      "e": {
+       "rule": "faceTone",
+       "of": "body",
+       "face": "wall",
+       "tone": "base"
+      },
+      "f": {
+       "rule": "faceTone",
+       "of": "body",
+       "face": "wall",
+       "tone": "dark"
+      },
+      "g": {
+       "rule": "faceTone",
+       "of": "body",
+       "face": "wall",
+       "tone": "light"
+      },
+      "h": {
+       "rule": "tone",
+       "of": "accent",
+       "by": -1
+      },
+      "i": "accent"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "gen": "fuel.barrel",
+    "v": 1,
+    "at": [
+     16,
+     46
+    ],
+    "body": "body",
+    "accent": "accent",
+    "inner": "glow",
+    "tape": "tape",
+    "steel": "steel",
+    "panel": "panel",
+    "cream": "cream",
+    "shine": "shine",
+    "stage": [
+     -1,
+     -1,
+     2
+    ],
+    "blast": [
+     0,
+     0,
+     0.07407407407407406,
+     0.25925925925925924,
+     0.4444444444444444,
+     0.6296296296296295,
+     0.8148148148148149,
+     1
+    ]
+   },
+   "ctx": {
+    "t": 0.5714285714285714,
+    "loop": false,
+    "frames": 8,
+    "frame": 4
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      4,
+      21
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..aa....................",
+      ".abba...................",
+      "..abca..................",
+      "..abba..........aa......",
+      "...aa.........aacca..a..",
+      "............aaccccaaaca.",
+      "...........acccccbaccca.",
+      ".........aacccccaabccba.",
+      "........abbcccba.abbaa..",
+      "......aa.abcbaa...aa....",
+      "....aaccaabaa...........",
+      "...acccccaa.............",
+      ".aacccccba..............",
+      "abbcccbaa......aa.......",
+      ".abccaa.......abcaa.....",
+      ".abba.........abbbca....",
+      "..aa...ddddddddaaba.....",
+      "....dd..dddddddddaddd...",
+      "..ddddd...........dddd..",
+      ".dddd........e......dddd",
+      "....d...............dddd",
+      ".dddd...............dddd",
+      ".dddd...............dddd",
+      "..dddd............dddd..",
+      "....ddddddddddddddddd...",
+      ".......ddddddddddd......"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body.dark",
+      "c": "body",
+      "d": {
+       "rule": "tone",
+       "of": "tape",
+       "by": -0.9
+      },
+      "e": {
+       "rule": "tone",
+       "of": "glow",
+       "by": 1.6
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "gen": "fuel.barrel",
+    "v": 1,
+    "at": [
+     16,
+     46
+    ],
+    "body": "body",
+    "accent": "accent",
+    "inner": "glow",
+    "tape": "tape",
+    "steel": "steel",
+    "panel": "panel",
+    "cream": "cream",
+    "shine": "shine",
+    "layer": "light",
+    "stage": [
+     0,
+     1,
+     2
+    ],
+    "blast": [
+     0,
+     0,
+     0.07407407407407406,
+     0.25925925925925924,
+     0.4444444444444444,
+     0.6296296296296295,
+     0.8148148148148149,
+     1
+    ],
+    "ball": [
+     0,
+     1,
+     2,
+     3,
+     0
+    ]
+   },
+   "ctx": {
+    "t": 0.42857142857142855,
+    "loop": false,
+    "frames": 8,
+    "frame": 3
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      6,
+      26
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".......aaaaaa.......",
+      ".....aabbbbbbaa.....",
+      "...aabb......bbaa...",
+      "..aab..........baa..",
+      "..ab....aaaaa...ba..",
+      ".ab....aacccaa...ba.",
+      ".ab...dccbbbbcb..ba.",
+      "ab....addbbbbca...ba",
+      "ab..dbdeebebfca...ba",
+      "ab..d.acfbebfca...ba",
+      "ab..d.acfbbbfca...ba",
+      "ab....accfffccab..ba",
+      "ab.....aacccaa....ba",
+      ".ab.....aaaaa....ba.",
+      ".ab......bb......ba.",
+      "..ab.....bb.....ba..",
+      "..aab.....d....baa..",
+      "...aabb......bbaa...",
+      ".....aabbbbbbaa.....",
+      ".......aaaaaa......."
+     ],
+     "key": {
+      "a": {
+       "rule": "tone",
+       "of": "glow",
+       "by": -1
+      },
+      "b": {
+       "rule": "tone",
+       "of": "glow",
+       "by": 1.6
+      },
+      "c": "glow",
+      "d": "body",
+      "e": "shine",
+      "f": {
+       "rule": "mix",
+       "of": {
+        "rule": "tone",
+        "of": "glow",
+        "by": 1.6
+       },
+       "with": "glow",
+       "amount": 0.5
+      }
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "gen": "fuel.barrel",
+    "v": 1,
+    "at": [
+     16,
+     46
+    ],
+    "body": "body",
+    "accent": "accent",
+    "inner": "glow",
+    "tape": "tape",
+    "steel": "steel",
+    "panel": "panel",
+    "cream": "cream",
+    "shine": "shine",
+    "layer": "light",
+    "flare": [
+     1
+    ],
+    "puddle": [
+     2.4
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      8,
+      18
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".......aaa.",
+      "......abbba",
+      "......abbba",
+      ".......aaa.",
+      "...........",
+      "...........",
+      "...........",
+      "...........",
+      "...........",
+      "...........",
+      "...........",
+      "...........",
+      "...........",
+      "...........",
+      "...........",
+      "...........",
+      "...........",
+      "...........",
+      "...........",
+      "...........",
+      "...........",
+      "...........",
+      "...........",
+      "...........",
+      "..ccc......",
+      ".caaac.....",
+      "caaaac.....",
+      ".caaac.....",
+      "..ccc......"
+     ],
+     "key": {
+      "a": "glow",
+      "b": "shine",
+      "c": {
+       "rule": "tone",
+       "of": "glow",
+       "by": -1
+      }
+     }
+    }
+   ]
+  }
+ ]
+}
