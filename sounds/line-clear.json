@@ -1,0 +1,46 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "line-clear",
+  "name": "Line clear",
+  "category": "ui",
+  "description": "A full line wiped away: a rising rush of air under one to three quick bell notes that climb, one more for each line cleared. Change its pitch, the number of lines, its length, the bells' shimmer and the rush. The same every time.",
+  "meta": {
+    "type": "sfx",
+    "role": "interface/reward",
+    "themes": ["neutral"],
+    "gameTypes": ["puzzle", "arcade"],
+    "words": ["line", "clear", "row", "wipe", "sweep", "bell", "chime", "score", "reward", "match", "vanish", "tidy"],
+    "license": "draft"
+  },
+  "duration": "length",
+  "params": [
+    { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 260, "max": 1050, "default": 523, "scale": "log" },
+    { "id": "lines", "label": "Lines", "min": 1, "max": 3, "default": 1, "step": 1 },
+    { "id": "length", "label": "Length", "unit": "s", "min": 0.25, "max": 0.8, "default": 0.4, "scale": "log" },
+    { "id": "shimmer", "label": "Shimmer", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "sweep", "label": "Sweep", "min": 0, "max": 1, "default": 0.5 }
+  ],
+  "nodes": [
+    { "id": "strike", "type": "clock", "rate": "1 / (length * 0.16)", "count": "lines" },
+    { "id": "note", "type": "seq", "steps": [0, 4, 7], "trig": "strike" },
+    { "id": "hz", "type": "expr", "expr": "pitch * semi(note)" },
+    { "id": "glint", "type": "ad", "attack": 0.001, "decay": "length * 0.3", "curve": 2, "trig": "strike" },
+    { "id": "partial", "type": "osc", "wave": "sine", "freq": "hz * 3" },
+    { "id": "bell", "type": "osc", "wave": "sine", "freq": "hz", "pm": "partial * glint * (0.06 + shimmer * 0.42)" },
+    { "id": "high", "type": "osc", "wave": "sine", "freq": "hz * 4" },
+    { "id": "ringAmp", "type": "ad", "attack": 0.002, "decay": "length * (1 - (lines - 1) * 0.16) - 0.004", "curve": 2.6, "trig": "strike" },
+    { "id": "bells", "type": "expr", "expr": "(bell + high * glint * shimmer * 0.35) * ringAmp" },
+    { "id": "air", "type": "noise", "seed": 31 },
+    { "id": "climb", "type": "env", "points": [[0, 600], ["length * 0.8", 6000, "exp"]] },
+    { "id": "wipe", "type": "filter", "mode": "bp", "in": "air", "freq": "climb", "q": 2.2 },
+    { "id": "wipeAmp", "type": "env", "points": [[0, 0.25], ["length * 0.55", 1, 1.6], ["length * 0.8", 0.5], ["length - 0.005", 0, 2]] },
+    { "id": "sum", "type": "expr", "expr": "bells * 0.8 + wipe * wipeAmp * sweep * 0.6" },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "sum", "freq": 80 }
+  ],
+  "out": "clean",
+  "presets": {
+    "Single": { "lines": 1 },
+    "Double": { "lines": 2, "length": 0.5 },
+    "Triple": { "lines": 3, "length": 0.6 }
+  }
+}

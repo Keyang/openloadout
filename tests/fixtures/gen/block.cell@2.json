@@ -1,0 +1,160 @@
+{
+ "id": "block.cell",
+ "v": 2,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     6,
+     1
+    ],
+    "size": 4,
+    "edge": 1,
+    "paint": "body"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      6,
+      1
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaa",
+      "abba",
+      "acca",
+      "aaaa"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body.light",
+      "c": "body.dark"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     0,
+     0
+    ],
+    "size": 5,
+    "style": "gem",
+    "paint": "body",
+    "shine": "shine"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      0,
+      0
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaa",
+      "abcca",
+      "adeca",
+      "afffa",
+      "aaaaa"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body.light",
+      "c": "shine",
+      "d": "body",
+      "e": {
+       "rule": "tone",
+       "of": "body",
+       "by": 0.4
+      },
+      "f": "body.dark"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     -8,
+     -8
+    ],
+    "size": 16,
+    "style": "glass",
+    "edge": 1,
+    "symbol": "triangle",
+    "paint": "body.light",
+    "shine": "shine"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      -8,
+      -8
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaaaaaaaaaaa",
+      "abbbbbbbbbbbccca",
+      "abddddddddddbbca",
+      "abdddddddddbbdca",
+      "abddddddddddddba",
+      "abdddddeedddddba",
+      "abdddddeedddddba",
+      "abddddeeeeddddba",
+      "abddddeeeeddddba",
+      "abdddeeeeeedddba",
+      "abdddeeeeeedddba",
+      "abddddddddddddba",
+      "abddddddddddddba",
+      "abddddddddddddba",
+      "abbbbbbbbbbbbbba",
+      "aaaaaaaaaaaaaaaa"
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "tone",
+       "of": {
+        "rule": "ramp",
+        "of": {
+         "rule": "ramp",
+         "of": "body",
+         "tone": "light"
+        },
+        "tone": "light"
+       },
+       "by": 1
+      },
+      "c": "shine",
+      "d": {
+       "rule": "tone",
+       "of": {
+        "rule": "ramp",
+        "of": "body",
+        "tone": "light"
+       },
+       "by": 0.3
+      },
+      "e": {
+       "rule": "tone",
+       "of": {
+        "rule": "ramp",
+        "of": {
+         "rule": "ramp",
+         "of": "body",
+         "tone": "light"
+        },
+        "tone": "deep"
+       },
+       "by": -1
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

@@ -62,7 +62,7 @@ test('bundle ids and short names reach the same palette', () => {
   assert.equal(PALETTE.roguelite, PALETTE.derelict);
   assert.equal(PALETTE.scifi, PALETTE.derelict);
   // aliases do not show up when listing the palettes
-  assert.deepEqual(Object.keys(PALETTE).sort(), ['derelict', 'hearthvale', 'thornwood']);
+  assert.deepEqual(Object.keys(PALETTE).sort(), ['derelict', 'gridline', 'hearthvale', 'thornwood']);
   assert.throws(() => palette('kit-space-opera'), /unknown bundle/);
 });
 

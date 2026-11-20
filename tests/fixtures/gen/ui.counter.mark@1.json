@@ -1,0 +1,169 @@
+{
+ "id": "ui.counter.mark",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "paint": "glow"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      0,
+      1
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".....aaa.....",
+      "...aaabaaa...",
+      ".aaabbbbbaaa.",
+      "aabbbbabbbbaa",
+      "abbbaaaaabbba",
+      "abaaaaaaaaaba",
+      "aaaaaabaaaaaa",
+      ".aaabbbbbaaa.",
+      "aabbbbabbbbaa",
+      "abbbaaaaabbba",
+      "abaaa...aaaba",
+      "aaa.......aaa"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "glow"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "name": "lines",
+    "at": [
+     4,
+     5
+    ],
+    "paint": "glow"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      4,
+      6
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaaaaaaaa",
+      "abbbbbbbbbbba",
+      "abbbbbbbbbbba",
+      "aaaaaaaaaaaaa",
+      "aaaaaaaaaaaaa",
+      "abbbbbbbbbbba",
+      "abbbbbbbbbbba",
+      "aaaaaaaaaaaaa",
+      "aaaaaaaaaaaaa",
+      "abbbbbbbbbbba",
+      "abbbbbbbbbbba",
+      "aaaaaaaaaaaaa"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "glow"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "name": "speed",
+    "at": [
+     -6,
+     -6
+    ],
+    "paint": "glow",
+    "play": "bump",
+    "flash": "shine"
+   },
+   "ctx": {
+    "frame": 1,
+    "frames": 4,
+    "t": 0.34
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      -5,
+      -6
+     ],
+     "anchor": "tl",
+     "rows": [
+      "abaabbbaaba",
+      "abaabbbaaba",
+      "abaabbbaaba",
+      "abaabbbaaba",
+      "aaaabbbaaaa",
+      "aaaabbbaaaa",
+      "abbbbbbbbba",
+      "aabbbbbbbaa",
+      ".aabbbbbaa.",
+      "..aabbbaa..",
+      "...aabaa...",
+      "....aaa...."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "glow"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "name": "combo",
+    "at": [
+     4,
+     5
+    ],
+    "paint": "glow.light",
+    "play": "bump",
+    "flash": "shine",
+    "ink": "face.deep"
+   },
+   "ctx": {
+    "frame": 0,
+    "frames": 4,
+    "t": 0
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      4,
+      5
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaaaa....",
+      "abbbbbbba....",
+      "abbbbbbba....",
+      "abbaaabba....",
+      "abbaaabbaaaaa",
+      "abbaabbbbbbba",
+      "abbbbbbbbbbba",
+      "abbbbbbbaabba",
+      "aaaaabbaaabba",
+      "....abbaaabba",
+      "....abbbbbbba",
+      "....abbbbbbba",
+      "....aaaaaaaaa"
+     ],
+     "key": {
+      "a": "face.deep",
+      "b": "shine"
+     }
+    }
+   ]
+  }
+ ]
+}

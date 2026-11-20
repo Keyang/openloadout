@@ -1,0 +1,32 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "block-bump",
+  "name": "Blocked move",
+  "category": "ui",
+  "description": "A soft refusal for a move that cannot happen: a dull, short, low thunk that bends down and stops dead. Change its pitch, length, how far it drops and its buzz. The same every time.",
+  "meta": { "type": "sfx", "role": "interface/error", "themes": ["neutral"], "gameTypes": ["puzzle", "arcade"],
+    "words": ["bump", "blocked", "thunk", "wall", "refuse", "denied", "no", "stuck", "invalid", "tap", "dull", "nudge"], "license": "draft" },
+  "duration": "length + 0.012",
+  "params": [
+    { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 150, "max": 600, "default": 262, "scale": "log" },
+    { "id": "length", "label": "Length", "unit": "s", "min": 0.04, "max": 0.14, "default": 0.07, "scale": "log" },
+    { "id": "drop", "label": "Drop", "unit": "semitones", "min": 0, "max": 12, "default": 5, "step": 1 },
+    { "id": "grit", "label": "Grit", "min": 0, "max": 1, "default": 0.2 }
+  ],
+  "nodes": [
+    { "id": "bend", "type": "env", "points": [[0, "pitch"], ["length * 0.6", "pitch * semi(-drop)", "exp"]] },
+    { "id": "body", "type": "osc", "wave": "square", "freq": "bend" },
+    { "id": "buzz", "type": "osc", "wave": "pulse", "width": 0.12, "freq": "bend" },
+    { "id": "dull", "type": "filter", "mode": "lp", "in": "body", "freq": "1100 + grit * 500", "q": 0.6 },
+    { "id": "rough", "type": "shaper", "in": "dull + buzz * grit * 0.6", "drive": "1 + grit * 3", "mode": "tanh" },
+    { "id": "top", "type": "filter", "mode": "lp", "in": "rough", "freq": "1400 + grit * 2600", "q": 0.6 },
+    { "id": "lean", "type": "filter", "mode": "hp", "in": "top", "freq": 380, "q": 0.6 },
+    { "id": "amp", "type": "ad", "attack": 0.001, "decay": "length", "curve": 2.2 }
+  ],
+  "out": "(lean + top * 0.4) * amp",
+  "presets": {
+    "Wall tap": {},
+    "Can't turn": { "pitch": 330, "drop": 9 },
+    "Soft no": { "grit": 0, "length": 0.1 }
+  }
+}

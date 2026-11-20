@@ -1,0 +1,48 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "block-slam",
+  "name": "Hard drop",
+  "category": "impact",
+  "description": "A fast rush of air down into a solid thump with a bright click, for a piece dropped straight to the bottom. Change its weight, length, brightness, rush and snap.",
+  "meta": { "type": "sfx", "role": "actions/land", "themes": ["neutral"], "gameTypes": ["puzzle", "arcade"],
+    "words": ["slam", "drop", "hard drop", "land", "thump", "thud", "block", "piece", "fall", "stack", "impact", "punchy"], "license": "draft" },
+  "duration": "length * (0.9 + weight * 0.2)",
+  "params": [
+    { "id": "weight", "label": "Weight", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "length", "label": "Length", "unit": "s", "min": 0.12, "max": 0.35, "default": 0.22, "scale": "log" },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "rush", "label": "Rush", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "snap", "label": "Snap", "min": 0, "max": 1, "default": 0.5 }
+  ],
+  "nodes": [
+    { "id": "hiss", "type": "noise" },
+    { "id": "fall", "type": "env", "points": [[0, "3000 * rnd(0.85, 1.15)"], ["(0.012 + rush * 0.056)", "500 * rnd(0.9, 1.1)", "exp"]] },
+    { "id": "air", "type": "filter", "mode": "bp", "in": "hiss", "freq": "fall", "q": 2.2 },
+    { "id": "airAmp", "type": "env", "points": [[0, 0.5], ["(0.012 + rush * 0.056) * 0.85", 1, 1.6], ["(0.012 + rush * 0.056) + 0.01", 0, "lin"]] },
+
+    { "id": "hit", "type": "clock", "rate": 1, "count": 1, "delay": "0.012 + rush * 0.056" },
+    { "id": "sink", "type": "env", "trig": "hit", "start": 160, "points": [[0, "160 * rnd(0.92, 1.08) * pow(2, (0.5 - weight) * 0.9)"], [0.07, "60 * pow(2, (0.5 - weight) * 0.9)", "exp"]] },
+    { "id": "thump", "type": "osc", "wave": "sine", "freq": "sink" },
+    { "id": "thumpAmp", "type": "ad", "trig": "hit", "attack": 0.001, "decay": "(length * (0.9 + weight * 0.2) - 0.005 - (0.012 + rush * 0.056)) * 0.95", "curve": 3 },
+
+    { "id": "note", "type": "osc", "wave": "square", "freq": "weight < 0.34 ? 880 : (weight <= 0.66 ? 784 : 659)" },
+    { "id": "noteTone", "type": "filter", "mode": "lp", "in": "note", "freq": "1400 + bright * 7000 - weight * 500", "q": 0.7 },
+    { "id": "noteAmp", "type": "ad", "trig": "hit", "attack": 0.0005, "decay": "0.03 + (length * (0.9 + weight * 0.2) - 0.005 - (0.012 + rush * 0.056)) * 0.6", "curve": 2.6 },
+
+    { "id": "tickAmp", "type": "ad", "trig": "hit", "attack": 0.0003, "decay": 0.014, "curve": 2 },
+    { "id": "tick", "type": "crush", "in": "hiss * tickAmp", "bits": 3, "rate": "3500 + bright * 7000" },
+
+    { "id": "slap", "type": "filter", "mode": "bp", "in": "hiss", "freq": "900 - weight * 350", "q": 0.9 },
+    { "id": "slapAmp", "type": "ad", "trig": "hit", "attack": 0.0008, "decay": "0.03 + weight * 0.04", "curve": 2.5 },
+
+    { "id": "body", "type": "shaper", "in": "thump * thumpAmp * (0.75 + weight * 0.5) * rnd(0.92, 1.08) + slap * slapAmp * (0.9 + weight * 0.9)", "drive": 1.8, "mode": "tanh" },
+    { "id": "sum", "type": "expr", "expr": "body * 0.8 + noteTone * noteAmp * (0.5 + snap * 0.34 + weight * 0.2) + tick * (0.05 + snap * 1.5) * (0.5 + bright * 0.6) + air * airAmp * (0.15 + rush * 2.05)" },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "sum", "freq": 30 }
+  ],
+  "out": "clean",
+  "presets": {
+    "Hard drop": {},
+    "Heavy slam": { "weight": 0.85, "length": 0.32 },
+    "Small piece": { "weight": 0.2, "rush": 0.25 }
+  }
+}

@@ -1,0 +1,470 @@
+{
+ "id": "ui.counter",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "face": "face",
+    "frame": "frame"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      1,
+      1
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..aaaaaaaaaaaaaaaaaaaaaaaaaa..",
+      ".abbbbbbbbbbbbbbbbbbbbbbbbbba.",
+      "abaaaaaaaaaaaaaaaaaaaaaaaaaaba",
+      "acaccccccccccccccccccccccccaba",
+      "acacccccaaaaaaaaaaaaaaaaaaaaba",
+      "acacccccadddddddddddddddddaaba",
+      "acacccccaeeeeeeeeeeeeeeeeeaaba",
+      "acacccccaeeeeeeeeeeeeeeeeeaaba",
+      "acacccccaeeeeeeeeeeeeeeeeeaaba",
+      "acacccccaeeeeeeeeeeeeeeeeeaaba",
+      "acacccccaeeeeeeeeeeeeeeeeeaaba",
+      "acacccccaeeeeeeeeeeeeeeeeeaaba",
+      "acacccccaeeeeeeeeeeeeeeeeeaaba",
+      "acacccccaeeeeeeeeeeeeeeeeeaaba",
+      "acacccccaeeeeeeeeeeeeeeeeeaaba",
+      "acacccccaaaaaaaaaaaaaaaaaaaaba",
+      "acaccccccccccccccccccccccccaba",
+      "acaccccccccccccccccccccccccaba",
+      "acaccccccccccccccccccccccccaba",
+      "acaaaaaaaaaaaaaaaaaaaaaaaaaaba",
+      ".acccccccccccccccccccccccccba.",
+      "..aaaaaaaaaaaaaaaaaaaaaaaaaa.."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "frame.light",
+      "c": "frame.dark",
+      "d": {
+       "rule": "tone",
+       "of": "face",
+       "by": 0.6
+      },
+      "e": "face"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     1,
+     1
+    ],
+    "width": 62,
+    "height": 22,
+    "count": 3,
+    "style": "strip",
+    "picture": 13,
+    "face": "face",
+    "frame": "frame",
+    "text": "shine"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      1,
+      1
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      ".abbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "abaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "acaaaaaaaaaaaaaaaccccccccccccccc",
+      "acadddddddddddddacccccccccccccca",
+      "acadddddddddddddacccccccccccccca",
+      "acadddddddddddddacccccccccccccca",
+      "acadddddddddddddacccccccccccccca",
+      "acadddddddddddddacccccccccccccca",
+      "acadddddddddddddacccccccccccccca",
+      "acadddddddddddddaceecceecceeccca",
+      "acadddddddddddddaceecceecceeccca",
+      "acadddddddddddddacccccccccccccca",
+      "acadddddddddddddacccccccccccccca",
+      "acadddddddddddddacccccccccccccca",
+      "acadddddddddddddacccccccccccccca",
+      "acadddddddddddddaccccccccccccccc",
+      "acaaaaaaaaaaaaaaaccccccccccccccc",
+      "acaccccccccccccccccccccccccccccc",
+      "acaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      ".acccccccccccccccccccccccccccccc",
+      "..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "frame.light",
+      "c": "frame.dark",
+      "d": "face",
+      "e": "frame.deep"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      33,
+      1
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaa..",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbba.",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaba",
+      "cccccccccccccccccccccccccccaba",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaba",
+      "ddddddddddddddddddddddddddaaba",
+      "eeeeeeeeeeeeeeeeeeeeeeeeeeaaba",
+      "eeeeeeeeeeeeeeeeeeeeeeeeeeaaba",
+      "eeeeeeeeeeeeeeeeeeeeeeeeeeaaba",
+      "eeeeeeeeeeeeeeeeeeeeeeeeeeaaba",
+      "eeeeeeeeeeeeeeeeeeeeeeeeeeaaba",
+      "eeeeeeeeeeeeeeeeeeeeeeeeeeaaba",
+      "eeeeeeeeeeeeeeeeeeeeeeeeeeaaba",
+      "eeeeeeeeeeeeeeeeeeeeeeeeeeaaba",
+      "eeeeeeeeeeeeeeeeeeeeeeeeeeaaba",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaba",
+      "cccccccccccccccccccccccccccaba",
+      "cccccccccccccccccccccccccccaba",
+      "cccccccccccccccccccccccccccaba",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaba",
+      "cccccccccccccccccccccccccccba.",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaa.."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "frame.light",
+      "c": "frame.dark",
+      "d": {
+       "rule": "tone",
+       "of": "face",
+       "by": 0.6
+      },
+      "e": "face"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     -31,
+     -11
+    ],
+    "width": 62,
+    "height": 22,
+    "count": 4,
+    "big": 1,
+    "style": "drum",
+    "picture": 13,
+    "face": "face",
+    "frame": "frame"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      -31,
+      -11
+     ],
+     "anchor": "tl",
+     "rows": [
+      "..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      ".abbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "abaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "acaaaaaaaaaaaaaaaccaaaaaaaaabaaa",
+      "acadddddddddddddacaaeeeeeeeabaee",
+      "acadddddddddddddacafffffffffbfff",
+      "acadddddddddddddacadddddddddbddd",
+      "acadddddddddddddacadddddddddbddd",
+      "acadddddddddddddacadddddddddbddd",
+      "acadddddddddddddacadddddddddbddd",
+      "acadddddddddddddacadddddddddbddd",
+      "acadddddddddddddacadddddddddbddd",
+      "acadddddddddddddacadddddddddbddd",
+      "acadddddddddddddacadddddddddbddd",
+      "acadddddddddddddacadddddddddbddd",
+      "acadddddddddddddacafffffffffbfff",
+      "acadddddddddddddacaaeeeeeeeabaee",
+      "acaaaaaaaaaaaaaaaccaaaaaaaaabaaa",
+      "acaccccccccccccccccccccccccccccc",
+      "acaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      ".acccccccccccccccccccccccccccccc",
+      "..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "frame.light",
+      "c": "frame.dark",
+      "d": "face",
+      "e": {
+       "rule": "tone",
+       "of": {
+        "rule": "tone",
+        "of": "face",
+        "by": -1
+       },
+       "by": -1
+      },
+      "f": {
+       "rule": "tone",
+       "of": "face",
+       "by": -1
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      1,
+      -11
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaa..",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbba.",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaba",
+      "aaaaaabaaaaaaaaabaaaaaaaaacaba",
+      "dddddabadddddddabadddddddaaaba",
+      "eeeeeebeeeeeeeeebeeeeeeeeeaaba",
+      "ffffffbfffffffffbfffffffffaaba",
+      "ffffffbfffffffffbfffffffffaaba",
+      "ffffffbfffffffffbfffffffffaaba",
+      "ffffffbfffffffffbfffffffffaaba",
+      "ffffffbfffffffffbfffffffffaaba",
+      "ffffffbfffffffffbfffffffffaaba",
+      "ffffffbfffffffffbfffffffffaaba",
+      "ffffffbfffffffffbfffffffffaaba",
+      "ffffffbfffffffffbfffffffffaaba",
+      "eeeeeebeeeeeeeeebeeeeeeeeeaaba",
+      "dddddabadddddddabadddddddaaaba",
+      "aaaaaabaaaaaaaaabaaaaaaaaacaba",
+      "cccccccccccccccccccccccccccaba",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaba",
+      "cccccccccccccccccccccccccccba.",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaa.."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "frame.light",
+      "c": "frame.dark",
+      "d": {
+       "rule": "tone",
+       "of": {
+        "rule": "tone",
+        "of": "face",
+        "by": -1
+       },
+       "by": -1
+      },
+      "e": {
+       "rule": "tone",
+       "of": "face",
+       "by": -1
+      },
+      "f": "face"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     0,
+     0
+    ],
+    "width": 94,
+    "height": 22,
+    "count": 6,
+    "big": 0,
+    "style": "plate",
+    "band": 2,
+    "corner": 0,
+    "face": "face.light",
+    "frame": {
+     "rule": "mix",
+     "of": "frame",
+     "with": "shine",
+     "amount": 0.5
+    }
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      0,
+      0
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "acbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "accaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "accacccccccccccccccccccccccccccc",
+      "accacccccccccccccccccccccccccccc",
+      "accaccccccccccccccccccccccccccca",
+      "accaccccccccccccccccccccccccccca",
+      "accaccccccccccccccccccccccccccca",
+      "accaccccccccccccccccccccccccccca",
+      "accaccccccccccccccccccccccccccca",
+      "accaccccccccccccccccccccccccccca",
+      "accaccccccccccccccccccccccccccca",
+      "accaccccccccccccccccccccccccccca",
+      "accaccccccccccccccccccccccccccca",
+      "accacccccccccccccccccccccccccccc",
+      "accacccccccccccccccccccccccccccc",
+      "accacccccccccccccccccccccccccccc",
+      "accaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "accccccccccccccccccccccccccccccc",
+      "accccccccccccccccccccccccccccccc",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "frame",
+        "with": "shine",
+        "amount": 0.5
+       },
+       "tone": "light"
+      },
+      "c": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "frame",
+        "with": "shine",
+        "amount": 0.5
+       },
+       "tone": "dark"
+      }
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      32,
+      0
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "cccccccccccccccccccccccccccccccc",
+      "cccccccccccccccccccccccccccccccc",
+      "aaaaaaaacaaaaaaaaacaaaaaaaaacaaa",
+      "dddddddacadddddddacadddddddacadd",
+      "dddddddacadddddddacadddddddacadd",
+      "dddddddacadddddddacadddddddacadd",
+      "dddddddacadddddddacadddddddacadd",
+      "dddddddacadddddddacadddddddacadd",
+      "dddddddacadddddddacadddddddacadd",
+      "dddddddacadddddddacadddddddacadd",
+      "aaaaaaaacaaaaaaaaacaaaaaaaaacaaa",
+      "cccccccccccccccccccccccccccccccc",
+      "cccccccccccccccccccccccccccccccc",
+      "cccccccccccccccccccccccccccccccc",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "cccccccccccccccccccccccccccccccc",
+      "cccccccccccccccccccccccccccccccc",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "frame",
+        "with": "shine",
+        "amount": 0.5
+       },
+       "tone": "light"
+      },
+      "c": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "frame",
+        "with": "shine",
+        "amount": 0.5
+       },
+       "tone": "dark"
+      },
+      "d": "face.light"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      64,
+      0
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbba",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbba",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaabba",
+      "ccccccccccccccccccccccccccabba",
+      "ccccccccccccccccccccccccccabba",
+      "aaaaaacaaaaaaaaacaaaaaaaaaabba",
+      "dddddacadddddddacadddddddaabba",
+      "dddddacadddddddacadddddddaabba",
+      "dddddacadddddddacadddddddaabba",
+      "dddddacadddddddacadddddddaabba",
+      "dddddacadddddddacadddddddaabba",
+      "dddddacadddddddacadddddddaabba",
+      "dddddacadddddddacadddddddaabba",
+      "aaaaaacaaaaaaaaacaaaaaaaaaabba",
+      "ccccccccccccccccccccccccccabba",
+      "ccccccccccccccccccccccccccabba",
+      "ccccccccccccccccccccccccccabba",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaabba",
+      "cccccccccccccccccccccccccccbba",
+      "ccccccccccccccccccccccccccccba",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+     ],
+     "key": {
+      "a": "ink",
+      "b": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "frame",
+        "with": "shine",
+        "amount": 0.5
+       },
+       "tone": "light"
+      },
+      "c": {
+       "rule": "ramp",
+       "of": {
+        "rule": "mix",
+        "of": "frame",
+        "with": "shine",
+        "amount": 0.5
+       },
+       "tone": "dark"
+      },
+      "d": "face.light"
+     }
+    }
+   ]
+  }
+ ]
+}

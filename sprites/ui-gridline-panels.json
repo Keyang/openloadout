@@ -1,0 +1,42 @@
+{ "format": "loadout-sprite", "version": 2, "id": "ui-gridline-panels", "name": "Round panels",
+  "blurb": "Stretchable dark panels for the screens round a puzzle round: pause with a pause badge, results split into labels and numbers, game over with tumbled corner blocks, and a new-best panel whose corners light up in turn; change the style, corners, border, heading and colours.",
+  "meta": { "type": "ui", "role": "interface/panel", "themes": ["neutral", "sci-fi"], "gameTypes": ["puzzle", "arcade"], "view": "none",
+            "words": ["pause", "results", "game over", "record", "best", "panel", "popup", "score", "summary", "screen"], "license": "draft" },
+  "size": [96, 64], "pivot": [48, 32], "grounded": false, "preview": "pause", "styles": ["pixel"],
+  "stylesWhy": "The kit is pixel only until the flat style has been looked at (specification, decision P5); the frame, the corner blocks, the pause bars and the notch are laid pixel by pixel by ui.screen@1.",
+  "palette": [
+    { "id": "face", "label": "Panel", "default": "#2a3058", "material": "paint", "swatches": ["#2a3058", "#3a4278", "#1e4658", "#6a3a8e"] },
+    { "id": "frame", "label": "Frame", "default": "#c2c9d6", "material": "paint", "swatches": ["#c2c9d6", "#5fe0f0", "#f2dc4c", "#e6e8f6"] },
+    { "id": "accent", "label": "Corner blocks", "default": "#f2609e", "material": "paint", "swatches": ["#f2609e", "#46d8a8", "#a6dc46", "#f2c230", "#f5875a"] },
+    { "id": "gold", "default": "#f2c230", "material": "light", "detail": true },
+    { "id": "cream", "default": "#f0ead8", "material": "light", "detail": true },
+    { "id": "reward", "material": "light", "derive": { "rule": "choose", "when": { "accent": ["#f2c230"] }, "then": "cream", "else": "gold" } },
+    { "id": "shine", "default": "#ffffff", "material": "light", "detail": true } ],
+  "controls": [
+    { "key": "style", "kind": "choice", "label": "Style", "options": ["blocks", "plate", "tube"], "default": "blocks", "group": "Look" },
+    { "key": "corner", "kind": "range", "label": "Corner", "lo": "Square", "hi": "Round", "default": 0.5, "group": "Look", "when": { "style": ["tube", "plate"] } },
+    { "key": "border", "kind": "range", "label": "Border", "lo": "Thin", "hi": "Thick", "default": 0.5, "group": "Look" },
+    { "key": "title", "kind": "toggle", "label": "Title strip", "default": true, "group": "Look" },
+    { "key": "face", "kind": "colour", "label": "Panel" },
+    { "key": "frame", "kind": "colour", "label": "Frame" },
+    { "key": "accent", "kind": "colour", "label": "Corner blocks", "when": { "style": ["blocks"] } },
+    { "key": "speed", "standard": "speed" } ],
+  "versions": [
+    { "name": "Block panel", "params": {} },
+    { "name": "Pearl plate", "params": { "style": "plate", "frame": "#e6e8f6" } },
+    { "name": "Neon", "params": { "style": "tube", "frame": "#5fe0f0", "face": "#1e4658" } },
+    { "name": "Plum and lemon", "params": { "face": "#6a3a8e", "frame": "#f2dc4c" } },
+    { "name": "No title", "params": { "title": false, "border": 1, "accent": "#46d8a8" } } ],
+  "body": { "panel": {
+    "skin": { "use": "skin:flat", "v": 1, "paint": { "face": "face", "frame": "frame", "shine": "shine" } },
+    "piece": { "gen": "ui.screen", "v": 1, "clip": ["pause"], "at": [1, 1], "size": [94, 62], "look": { "from": "style", "pick": { "blocks": "blocks", "plate": "plate", "tube": "tube" } }, "corner": { "from": "corner", "map": [[0, 0], [1, 4]] }, "border": { "from": "border", "map": [[0, 1], [1, 3]] }, "accent": "accent", "reward": "reward", "shine": "shine", "title": { "from": "title", "pick": { "true": true, "false": false } }, "badge": "pause" },
+    "states": ["pause", "results", "game-over", "record"],
+    "draw": [
+      { "gen": "ui.screen", "v": 1, "clip": ["results"], "at": [1, 1], "size": [94, 62], "look": { "from": "style", "pick": { "blocks": "blocks", "plate": "plate", "tube": "tube" } }, "corner": { "from": "corner", "map": [[0, 0], [1, 4]] }, "border": { "from": "border", "map": [[0, 1], [1, 3]] }, "accent": "accent", "reward": "reward", "shine": "shine", "title": { "from": "title", "pick": { "true": true, "false": false } }, "divide": 0.6 },
+      { "gen": "ui.screen", "v": 1, "clip": ["game-over"], "at": [1, 1], "size": [94, 62], "look": { "from": "style", "pick": { "blocks": "blocks", "plate": "plate", "tube": "tube" } }, "corner": { "from": "corner", "map": [[0, 0], [1, 4]] }, "border": { "from": "border", "map": [[0, 1], [1, 3]] }, "accent": "accent", "reward": "reward", "shine": "shine", "fallen": true, "notch": true },
+      { "gen": "ui.screen", "v": 1, "clip": ["record"], "at": [1, 1], "size": [94, 62], "look": { "from": "style", "pick": { "blocks": "blocks", "plate": "plate", "tube": "tube" } }, "corner": { "from": "corner", "map": [[0, 0], [1, 4]] }, "border": { "from": "border", "map": [[0, 1], [1, 3]] }, "accent": "accent", "reward": "reward", "shine": "shine", "runner": true, "blink": true } ] } },
+  "clips": {
+    "pause": { "frames": 1, "fps": 8, "label": "Pause panel, while the game is stopped" },
+    "results": { "frames": 1, "fps": 8, "label": "Results panel, when a round ends with its numbers" },
+    "game-over": { "frames": 1, "fps": 8, "label": "Game over panel, after the stack reaches the top" },
+    "record": { "frames": 8, "fps": 8, "loop": true, "label": "New best panel, while a record score is shown" } } }

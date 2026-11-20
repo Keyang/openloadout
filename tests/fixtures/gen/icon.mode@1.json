@@ -1,0 +1,527 @@
+{
+ "id": "icon.mode",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "name": "endless",
+    "cell": "body",
+    "paint": "accent"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      4,
+      11
+     ],
+     "anchor": "tl",
+     "rows": [
+      "......aaaaaaaaa........",
+      "...aaabbbbbbbbbaaa.a...",
+      ".aabbbaaaaaaaaabbbaba..",
+      "abbaaa.........aaabbba.",
+      "aba.............abbbbba",
+      "aba..............aabaa.",
+      "abbaaa.........aaabba..",
+      ".aabbbaaaaaaaaabbbaa...",
+      "...aaabbbbbbbbbaaa.....",
+      "......aaaaaaaaa........"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "accent"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      11,
+      5
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaa",
+      "abbbbba",
+      "acdddba",
+      "acdddba",
+      "acdddba",
+      "accccca",
+      "aaaaaaa"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body.light",
+      "c": "body.dark",
+      "d": "body"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      11,
+      12
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaa",
+      "abbbbba",
+      "acdddba",
+      "acdddba",
+      "acdddba",
+      "accccca",
+      "aaaaaaa"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body.light",
+      "c": "body.dark",
+      "d": "body"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      11,
+      19
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaa",
+      "abbbbba",
+      "acdddba",
+      "acdddba",
+      "acdddba",
+      "accccca",
+      "aaaaaaa"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body.light",
+      "c": "body.dark",
+      "d": "body"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      4,
+      16
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aba...............aba",
+      "abbaaa.........aaabba",
+      ".aabbbaaaaaaaaabbbaa.",
+      "...aaabbbbbbbbbaaa...",
+      "......aaaaaaaaa......"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "accent"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "name": "timed",
+    "at": [
+     0,
+     0
+    ],
+    "size": 1,
+    "bold": true,
+    "cell": "body",
+    "paint": "accent",
+    "shine": "shine"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      -6,
+      -13
+     ],
+     "anchor": "tl",
+     "rows": [
+      "........aaa........",
+      ".......abbba.......",
+      ".......abbba.......",
+      "......aaaaaaa......",
+      "....aabbbbbbbaa....",
+      "...abbbbbbbbbbba...",
+      "..abbbaabbbaabbba..",
+      ".abbba.abbba.abbba.",
+      ".abba..abbba..abba.",
+      "abba...abbba...abba",
+      "abba...abbba...abba",
+      "abba...abbbaa..abba",
+      "abba...abbbbbaaabba",
+      "abba....abbbbbbabba",
+      "abba.....aaaabaabba",
+      "abba.........a.abba",
+      ".abba.........abba.",
+      ".abbba.......abbba.",
+      "..abbbaaaaaaabbba..",
+      "...abbbbbbbbbbba...",
+      "....aabbbbbbbaa....",
+      "......aaaaaaa......"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "accent"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      -13,
+      3
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaaaaa",
+      "abbbbbbcca",
+      "adbbbbbbca",
+      "addeeeebba",
+      "addeeeebba",
+      "addeeeebba",
+      "addeeeebba",
+      "adddddddba",
+      "adddddddda",
+      "aaaaaaaaaa"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body.light",
+      "c": "shine",
+      "d": "body.dark",
+      "e": "body"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      -7,
+      5
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".a",
+      ".a",
+      "..",
+      "a."
+     ],
+     "key": {
+      "a": "shine"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "name": "puzzle",
+    "at": [
+     16,
+     16
+    ],
+    "size": 0,
+    "span": [
+     18,
+     22
+    ],
+    "cell": "body",
+    "paint": "accent"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      9,
+      15
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aaaaaaaaaaaa.",
+      "abaabbaabbaaba",
+      "aaaaaaaaaaaaba",
+      "aaaaaaaaaaaaaa",
+      "abbaabaaabbaaa",
+      ".aaaabaabaaaa.",
+      "....aaaaba....",
+      "....aaaaaa....",
+      "....abbaaa....",
+      ".....aaaa....."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "accent"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      10,
+      6
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaa",
+      "abba",
+      "acca",
+      "aaaa"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body.light",
+      "c": "body.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      14,
+      6
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaa",
+      "abba",
+      "acca",
+      "aaaa"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body.light",
+      "c": "body.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      18,
+      6
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaa",
+      "abba",
+      "acca",
+      "aaaa"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body.light",
+      "c": "body.dark"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      14,
+      10
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaa",
+      "abba",
+      "acca",
+      "aaaa"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body.light",
+      "c": "body.dark"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "name": "daily",
+    "at": [
+     48,
+     32
+    ],
+    "size": 0.5,
+    "span": [
+     18,
+     22
+    ],
+    "bold": true,
+    "cell": "body",
+    "paint": "accent",
+    "shine": "shine"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      40,
+      22
+     ],
+     "anchor": "tl",
+     "rows": [
+      "....aa....aa....",
+      "...abba..abba...",
+      ".aaabbaaaabbaaa.",
+      "acccbbccccbbccca",
+      "acccbbccccbbccca",
+      "acccccccccccccca",
+      "acccccccccccccca",
+      "acddddddddddddda",
+      "acddddddddddddda",
+      "acddddddddddddda",
+      "acddddddddddddda",
+      "acddddddddddddda",
+      "acddddddddddddda",
+      "acddddddddddddda",
+      "acddddddddddddda",
+      "acddddddddddddda",
+      "acddddddddddddda",
+      "acddddddddddddda",
+      "acccccccccccccca",
+      ".aaaaaaaaaaaaaa."
+     ],
+     "key": {
+      "a": "ink",
+      "b": "accent.light",
+      "c": "accent.dark",
+      "d": "accent"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      44,
+      31
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaa",
+      "abbbcca",
+      "adeeeca",
+      "adeeeba",
+      "adeeeba",
+      "addddda",
+      "aaaaaaa"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body.light",
+      "c": "shine",
+      "d": "body.dark",
+      "e": "body"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      48,
+      33
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a",
+      "a"
+     ],
+     "key": {
+      "a": "shine"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "name": "practice",
+    "at": [
+     16,
+     16
+    ],
+    "size": 0.25,
+    "cell": "body",
+    "paint": "accent",
+    "shine": "shine"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      5,
+      5
+     ],
+     "anchor": "tl",
+     "rows": [
+      "........aaaaaa........",
+      "......aabbbbbbaa......",
+      "....aabbaabaaabbaa....",
+      "...abbaa.aba..aabba...",
+      "..abba...aba....abba..",
+      "..aba.....a......aba..",
+      ".aba..............aba.",
+      ".aba..............aba.",
+      "aba................aba",
+      "abaaa............aaaba",
+      "abbbba..........abbbba",
+      "abaaa............aaaba",
+      "aba................aba",
+      "aba................aba",
+      ".aba..............aba.",
+      ".aba..............aba.",
+      "..aba.....a......aba..",
+      "..abba...aba....abba..",
+      "...abbaa.aba..aabba...",
+      "....aabbaabaaabbaa....",
+      "......aabbbbbbaa......",
+      "........aaaaaa........"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "accent"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      12,
+      12
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaaaaa",
+      "abbbbcca",
+      "adeeeeca",
+      "adeeeeba",
+      "adeeeeba",
+      "adeeeeba",
+      "adddddda",
+      "aaaaaaaa"
+     ],
+     "key": {
+      "a": "ink",
+      "b": "body.light",
+      "c": "shine",
+      "d": "body.dark",
+      "e": "body"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      17,
+      14
+     ],
+     "anchor": "tl",
+     "rows": [
+      "a",
+      "a"
+     ],
+     "key": {
+      "a": "shine"
+     }
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,2093 @@
+{
+ "id": "grid.towers",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "paint": "land"
+   },
+   "ctx": {
+    "size": [
+     320,
+     180
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      172
+     ],
+     "size": [
+      320,
+      8
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      8,
+      132
+     ],
+     "size": [
+      8,
+      48
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      16,
+      140
+     ],
+     "size": [
+      8,
+      40
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      24,
+      140
+     ],
+     "size": [
+      8,
+      40
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      32,
+      140
+     ],
+     "size": [
+      8,
+      40
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      56,
+      148
+     ],
+     "size": [
+      8,
+      32
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      64,
+      140
+     ],
+     "size": [
+      8,
+      40
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      88,
+      132
+     ],
+     "size": [
+      8,
+      48
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      96,
+      148
+     ],
+     "size": [
+      8,
+      32
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      120,
+      148
+     ],
+     "size": [
+      8,
+      32
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      128,
+      140
+     ],
+     "size": [
+      8,
+      40
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      136,
+      156
+     ],
+     "size": [
+      8,
+      24
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      144,
+      148
+     ],
+     "size": [
+      8,
+      32
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      184,
+      140
+     ],
+     "size": [
+      8,
+      40
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      192,
+      148
+     ],
+     "size": [
+      8,
+      32
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      208,
+      140
+     ],
+     "size": [
+      8,
+      40
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      216,
+      140
+     ],
+     "size": [
+      8,
+      40
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      224,
+      132
+     ],
+     "size": [
+      8,
+      48
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      232,
+      140
+     ],
+     "size": [
+      8,
+      40
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      264,
+      156
+     ],
+     "size": [
+      8,
+      24
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      272,
+      140
+     ],
+     "size": [
+      8,
+      40
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      280,
+      164
+     ],
+     "size": [
+      8,
+      16
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      288,
+      156
+     ],
+     "size": [
+      8,
+      24
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      296,
+      164
+     ],
+     "size": [
+      8,
+      16
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      304,
+      164
+     ],
+     "size": [
+      8,
+      16
+     ],
+     "paint": "land",
+     "shade": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "tall": 8,
+    "seed": 4,
+    "paint": "land",
+    "alt": "land.light",
+    "lit": "glow",
+    "unlit": "land.deep"
+   },
+   "ctx": {
+    "size": [
+     320,
+     180
+    ],
+    "t": 0.5,
+    "loop": true,
+    "frames": 8,
+    "frame": 4
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      172
+     ],
+     "size": [
+      320,
+      8
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      132
+     ],
+     "size": [
+      8,
+      48
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      8,
+      140
+     ],
+     "size": [
+      8,
+      40
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      16,
+      140
+     ],
+     "size": [
+      8,
+      40
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      24,
+      124
+     ],
+     "size": [
+      8,
+      56
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      40,
+      132
+     ],
+     "size": [
+      8,
+      48
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      48,
+      116
+     ],
+     "size": [
+      8,
+      64
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      56,
+      124
+     ],
+     "size": [
+      8,
+      56
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      64,
+      132
+     ],
+     "size": [
+      8,
+      48
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      88,
+      116
+     ],
+     "size": [
+      8,
+      64
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      96,
+      132
+     ],
+     "size": [
+      8,
+      48
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      128,
+      140
+     ],
+     "size": [
+      8,
+      40
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      136,
+      132
+     ],
+     "size": [
+      8,
+      48
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      144,
+      140
+     ],
+     "size": [
+      8,
+      40
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      152,
+      124
+     ],
+     "size": [
+      8,
+      56
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      160,
+      124
+     ],
+     "size": [
+      8,
+      56
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      168,
+      140
+     ],
+     "size": [
+      8,
+      40
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      216,
+      132
+     ],
+     "size": [
+      8,
+      48
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      224,
+      124
+     ],
+     "size": [
+      8,
+      56
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      232,
+      116
+     ],
+     "size": [
+      8,
+      64
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      240,
+      140
+     ],
+     "size": [
+      8,
+      40
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      248,
+      156
+     ],
+     "size": [
+      8,
+      24
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      256,
+      156
+     ],
+     "size": [
+      8,
+      24
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      288,
+      132
+     ],
+     "size": [
+      8,
+      48
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      296,
+      140
+     ],
+     "size": [
+      8,
+      40
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      304,
+      132
+     ],
+     "size": [
+      8,
+      48
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      312,
+      124
+     ],
+     "size": [
+      8,
+      56
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      156
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      16,
+      164
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      16,
+      156
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      24,
+      156
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      24,
+      148
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      24,
+      132
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      40,
+      148
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      48,
+      156
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      48,
+      116
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      56,
+      132
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      64,
+      148
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      64,
+      140
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      88,
+      164
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      88,
+      156
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      88,
+      148
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      88,
+      116
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      96,
+      156
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      136,
+      132
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      152,
+      164
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      152,
+      140
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      152,
+      124
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      160,
+      164
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      160,
+      156
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      168,
+      156
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      216,
+      156
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      216,
+      132
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      224,
+      164
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      224,
+      148
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      224,
+      124
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      232,
+      164
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      232,
+      156
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      256,
+      164
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      296,
+      164
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      296,
+      156
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      296,
+      140
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      312,
+      156
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      312,
+      124
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      24,
+      172
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      48,
+      172
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      80,
+      172
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      120,
+      172
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      144,
+      172
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      152,
+      172
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      248,
+      172
+     ],
+     "size": [
+      8,
+      8
+     ],
+     "paint": "land.light",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      2,
+      166
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "glow",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      2,
+      150
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "glow",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      2,
+      134
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "land.deep",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      10,
+      166
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "glow",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      10,
+      150
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "land.deep",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      18,
+      166
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "land.deep",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      26,
+      158
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "glow",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      26,
+      142
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "land.deep",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      26,
+      134
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "glow",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      26,
+      126
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "land.deep",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      42,
+      142
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "land.deep",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      50,
+      142
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "land.deep",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      50,
+      134
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "glow",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      58,
+      158
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "glow",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      58,
+      150
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "glow",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      66,
+      158
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "glow",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      66,
+      142
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "land.deep",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      90,
+      150
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "glow",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      98,
+      166
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "land.deep",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      98,
+      150
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "land.deep",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      98,
+      134
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "glow",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      146,
+      150
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "land.deep",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      154,
+      142
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "glow",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      162,
+      166
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "glow",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      162,
+      142
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "land.deep",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      170,
+      166
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "glow",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      170,
+      142
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "land.deep",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      218,
+      150
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "glow",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      226,
+      166
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "land.deep",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      226,
+      134
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "glow",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      234,
+      158
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "glow",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      242,
+      158
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "glow",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      250,
+      166
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "glow",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      298,
+      150
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "glow",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      306,
+      134
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "glow",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      314,
+      158
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "land.deep",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      314,
+      142
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "glow",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      314,
+      134
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "glow",
+     "shade": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "tall": 3,
+    "slots": 4,
+    "cell": 8,
+    "base": 60,
+    "strip": 0,
+    "paint": "land",
+    "lit": "glow",
+    "windows": 0.5
+   },
+   "ctx": {
+    "size": [
+     128,
+     64
+    ],
+    "t": 0.25,
+    "loop": true,
+    "frames": 8,
+    "frame": 2
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      36
+     ],
+     "size": [
+      8,
+      24
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      8,
+      44
+     ],
+     "size": [
+      8,
+      16
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      16,
+      44
+     ],
+     "size": [
+      8,
+      16
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      24,
+      44
+     ],
+     "size": [
+      8,
+      16
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      40,
+      44
+     ],
+     "size": [
+      8,
+      16
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      48,
+      36
+     ],
+     "size": [
+      8,
+      24
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      64,
+      36
+     ],
+     "size": [
+      8,
+      24
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      72,
+      44
+     ],
+     "size": [
+      8,
+      16
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      96,
+      44
+     ],
+     "size": [
+      8,
+      16
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      104,
+      44
+     ],
+     "size": [
+      8,
+      16
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      112,
+      44
+     ],
+     "size": [
+      8,
+      16
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      120,
+      44
+     ],
+     "size": [
+      8,
+      16
+     ],
+     "paint": "land",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      2,
+      54
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "glow",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      2,
+      46
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "glow",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      18,
+      54
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "glow",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      26,
+      46
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "glow",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      66,
+      38
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "glow",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      74,
+      54
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "glow",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      106,
+      54
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "glow",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      114,
+      54
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "glow",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      114,
+      46
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "glow",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      122,
+      46
+     ],
+     "size": [
+      4,
+      4
+     ],
+     "paint": "glow",
+     "shade": 0
+    }
+   ]
+  }
+ ]
+}

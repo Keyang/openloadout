@@ -19,6 +19,17 @@ import './ui-pieces.js';
 import './ui.js';
 import './backdrop.js';
 import './tiles.js';         // build item B15: tiles@1, the layout of a tileset, its material as data (engine/gen/tiles.js)
+import './block.js';         // the Gridline kit: block.cell@1 and block.ghost@1, a puzzle cell and its landing preview (engine/gen/block.js)
+import './grid.js';          // the Gridline kit's backdrop: grid.lines, grid.lights, grid.towers, grid.shapes, grid.band, grid.runner (engine/gen/grid.js)
+import './fx-drop.js';       // the Gridline kit: light.columns@1 and drop.motes@1, the streaks above a dropped piece and its landing dust (engine/gen/fx-drop.js)
+import './fx-chips.js';      // the Gridline kit: chip.burst@1 and checker.fade@1, a cleared cell breaking into chips or blinking out (engine/gen/fx-chips.js)
+import './ui-grid.js';       // the Gridline kit: ui.gridbox@1, the dark window of its boxes and panels (engine/gen/ui-grid.js)
+import './counter.js';       // the Gridline kit: ui.counter@1, ui.counter.digits@1 and ui.counter.mark@1, a stat counter's case, digits and picture (engine/gen/counter.js)
+import './fx-spin.js';       // the Gridline kit: spark.swirl@1, a ring of sparks whirling out from a white core (engine/gen/fx-spin.js)
+import './block-badge.js';   // the Gridline kit: block.badge@1 and block.badgeRim@1, the title emblem's cells and the light round them (engine/gen/block-badge.js)
+import './fx-quad.js';       // the Gridline kit: square.ring@1 and ray.lines@1, the square ring and grid rays of a big clear (engine/gen/fx-quad.js)
+import './block-buddy.js';   // the Gridline kit: block.buddy@1, the block buddy's joined cells, face and feet in its four acts (engine/gen/block-buddy.js)
+import './icon-modes.js';    // the Gridline kit: icon.mode@1, the eight signs of a mode-select screen, cells and thin marks (engine/gen/icon-modes.js)
 import './icon-sets.js';     // batch M4: icon.fitted, icon.body, icon.rim, icon.flame, icon.plate and oval: what the library icon sets drew in code
 import './prize-items.js';   // migration batch M2: the ten pickups' shape generators (timepiece@1 ...), ports of their code
 import './world-props.js';   // migration batch M3: the library props' shape generators (spring.pad@1 ...), ports of their code
@@ -31,7 +42,11 @@ import './ui-inputs.js';     // migration batch M9: key.cap, key.wide, pad.dpad,
 import './ui-hud.js';        // migration batch M9: damage.digits, status.icons, crosshair ...: the HUD pictures' ports (engine/gen/ui-hud.js)
 import './ui-bubbles.js';    // migration batch M9: emote.marks, the bubbles and the name plate: their ports (engine/gen/ui-bubbles.js)
 import { BACKDROP_FRAME_GENERATORS } from './backdrop-frame.js';
+import { CHIPS_STAMP_BOUNDS, CHIPS_SIZE_KEYS } from './fx-chips.js';
+import { SPIN_STAMP_BOUNDS, SPIN_SIZE_KEYS } from './fx-spin.js';
 import { FX_STAMP_BOUNDS, FX_SIZE_KEYS } from './fx-burst.js';   // not from backdrop.js: it imports resolve.js, which imports this module
+import { QUAD_STAMP_BOUNDS, QUAD_SIZE_KEYS } from './fx-quad.js';
+import { GRID_FRAME_GENERATORS } from './grid.js';   // imports nothing of backdrop.js, so it is whole here
 import { B12C_STAMP_BOUNDS, B12C_SIZE_KEYS, B12C_FRAME_GENERATORS } from './fx-b12c.js';   // build item B12c: the other 20 effect behaviours (engine/gen/fx-glints.js, fx-debris.js, fx-fire.js, fx-spells.js, fx-fields.js)
 
 /** Declares and registers a generator version in the site's registry; returns its frozen entry (engine/gen/registry.js). */
@@ -82,6 +97,12 @@ export const STAMP_BOUNDS = Object.freeze({
   'twinkle@1': () => 81,
   'pickup.burst@1': () => 3 * 9 + 25,
   'chunks@1': () => 0,
+  ...CHIPS_STAMP_BOUNDS,                   // engine/gen/fx-chips.js: whole-pixel rects only, no stamps
+  // engine/gen/fx-drop.js: whole-pixel rects only, no stamps
+  'light.columns@1': () => 0,
+  'drop.motes@1': () => 0,
+  ...SPIN_STAMP_BOUNDS,                    // engine/gen/fx-spin.js: whole-pixel rects only, no stamps
+  ...QUAD_STAMP_BOUNDS,                    // engine/gen/fx-quad.js: the square ring's four corner cells; the rays are rects
 });
 
 /**
@@ -95,6 +116,11 @@ export const SIZE_KEYS = Object.freeze({
   'twinkle@1': Object.freeze([]),          // its cost (1) and its bound (81) read no argument
   'pickup.burst@1': Object.freeze([]),
   'chunks@1': Object.freeze([]),
+  ...CHIPS_SIZE_KEYS,                      // engine/gen/fx-chips.js: their keyable arguments price nothing
+  'light.columns@1': Object.freeze([]),    // nothing keyable: it plays over the clip phase
+  'drop.motes@1': Object.freeze([]),
+  ...SPIN_SIZE_KEYS,                       // engine/gen/fx-spin.js: nothing keyable
+  ...QUAD_SIZE_KEYS,                       // engine/gen/fx-quad.js: their keyable arguments price nothing
 });
 
 /** Generators that work in frame pixels by design, never on a node's own coordinates, each with why: "<id>@<v>" -> reason. */
@@ -115,4 +141,5 @@ export const FRAME_GENERATORS = Object.freeze({
   'shot.bar@1': 'a bar of light whose nose and tail keep 3 px inside the frame: name it as an emitter, not in a draw list on a node',
   // build item B15: a tile's pattern wraps round the tile's 32 px (engine/gen/tiles.js)
   'tile.courses@1': 'stone courses that wrap round the tile\'s 32 px: name it in a tile\'s fill version or face picture, not on a node',
+  ...GRID_FRAME_GENERATORS,          // the Gridline backdrop's generators work across the layer's width (engine/gen/grid.js)
 });

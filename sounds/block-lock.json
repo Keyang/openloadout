@@ -1,0 +1,40 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "block-lock",
+  "name": "Lock in",
+  "category": "ui",
+  "description": "A piece clicking into place: a tight click into a short soft ping. Change its pitch, length, brightness and how hard the click snaps.",
+  "meta": {
+    "type": "sfx",
+    "role": "actions/land",
+    "themes": ["neutral"],
+    "gameTypes": ["puzzle", "arcade"],
+    "words": ["lock", "place", "land", "settle", "click", "ping", "snap", "piece", "block", "drop", "set", "tidy"],
+    "license": "draft"
+  },
+  "duration": "length",
+  "params": [
+    { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 300, "max": 1600, "default": 660, "scale": "log" },
+    { "id": "length", "label": "Length", "unit": "s", "min": 0.05, "max": 0.14, "default": 0.07, "scale": "log" },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "snap", "label": "Snap", "min": 0, "max": 1, "default": 0.5 }
+  ],
+  "nodes": [
+    { "id": "ping", "type": "osc", "wave": "tri", "freq": "pitch" },
+    { "id": "octave", "type": "osc", "wave": "sine", "freq": "pitch * 2" },
+    { "id": "top", "type": "osc", "wave": "sine", "freq": "pitch * 4" },
+    { "id": "body", "type": "filter", "mode": "lp", "in": "ping + octave * bright * 0.55 + top * bright * bright * 0.3", "freq": "1400 + bright * 9000" },
+    { "id": "amp", "type": "ad", "attack": 0.001, "decay": "length - 0.002", "curve": 2.4 },
+    { "id": "hiss", "type": "noise", "seed": 12 },
+    { "id": "tick", "type": "filter", "mode": "bp", "in": "hiss", "freq": "2200 + bright * 3800", "q": 1.2 },
+    { "id": "tickAmp", "type": "ad", "attack": 0.0003, "decay": 0.006, "curve": 2.2 },
+    { "id": "sum", "type": "expr", "expr": "body * amp * (0.75 + snap * 0.25) + tick * tickAmp * snap * 1.6" },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "sum", "freq": 60 }
+  ],
+  "out": "clean",
+  "presets": {
+    "Click in": {},
+    "Soft lock": { "snap": 0.15, "bright": 0.3 },
+    "Glass lock": { "pitch": 1320, "length": 0.12, "bright": 0.8 }
+  }
+}

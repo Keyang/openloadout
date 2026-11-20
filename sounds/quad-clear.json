@@ -1,0 +1,69 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "quad-clear",
+  "name": "Four-line clear",
+  "category": "ui",
+  "description": "The big clear: a soft low whump, then five bell notes climbing over a bright rush of air, the last one held as a ringing chord with a shimmering tail. Change its pitch, the time between notes, the shimmer, the room and the rush. The same every time.",
+  "meta": {
+    "type": "sfx",
+    "role": "interface/reward",
+    "themes": ["neutral"],
+    "gameTypes": ["puzzle", "arcade"],
+    "words": ["four", "lines", "clear", "quad", "big", "bells", "chime", "climb", "whump", "reward", "score", "bonus", "wipe"],
+    "license": "draft"
+  },
+  "duration": "speed * 4 + 0.6 + space * 2",
+  "params": [
+    { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 260, "max": 1050, "default": 523, "scale": "log" },
+    { "id": "speed", "label": "Time between notes", "unit": "s", "min": 0.05, "max": 0.12, "default": 0.08 },
+    { "id": "shimmer", "label": "Shimmer", "min": 0, "max": 1, "default": 0.6 },
+    { "id": "space", "label": "Room", "min": 0, "max": 0.1, "default": 0.05 },
+    { "id": "sweep", "label": "Sweep", "min": 0, "max": 1, "default": 0.5 }
+  ],
+  "nodes": [
+    { "id": "fall", "type": "env", "points": [[0, 150], [0.09, 55, "exp"]] },
+    { "id": "thud", "type": "osc", "wave": "sine", "freq": "fall" },
+    { "id": "thudAmp", "type": "ad", "attack": 0.004, "decay": 0.2, "curve": 2.2 },
+    { "id": "puff", "type": "noise", "seed": 17 },
+    { "id": "puffTone", "type": "filter", "mode": "lp", "in": "puff", "freq": 700, "q": 0.7 },
+    { "id": "puffAmp", "type": "ad", "attack": 0.003, "decay": 0.07, "curve": 2 },
+    { "id": "whump", "type": "expr", "expr": "thud * thudAmp + puffTone * puffAmp * 0.5" },
+
+    { "id": "strike", "type": "clock", "rate": "1 / speed", "count": 5 },
+    { "id": "note", "type": "seq", "steps": [-5, 0, 2, 7, 12], "trig": "strike" },
+    { "id": "hz", "type": "expr", "expr": "pitch * semi(note)" },
+    { "id": "glint", "type": "ad", "attack": 0.001, "decay": "speed * 1.2 + 0.03", "curve": 2, "trig": "strike" },
+    { "id": "partial", "type": "osc", "wave": "sine", "freq": "hz * 3" },
+    { "id": "bell", "type": "osc", "wave": "sine", "freq": "hz", "pm": "partial * glint * (0.06 + shimmer * 0.42)" },
+    { "id": "high", "type": "osc", "wave": "sine", "freq": "hz * 4" },
+    { "id": "runAmp", "type": "ad", "attack": 0.002, "decay": "speed * 2 + 0.1", "curve": 2.4, "trig": "strike" },
+    { "id": "run", "type": "expr", "expr": "(bell + high * glint * shimmer * 0.35) * runAmp" },
+
+    { "id": "land", "type": "clock", "rate": 1, "count": 1, "delay": "speed * 4" },
+    { "id": "holdAmp", "type": "ad", "attack": 0.003, "decay": "0.56 + space * 2", "curve": 2.2, "trig": "land" },
+    { "id": "holdGlint", "type": "ad", "attack": 0.001, "decay": 0.3, "curve": 1.6, "trig": "land" },
+    { "id": "topPart", "type": "osc", "wave": "sine", "freq": "pitch * 6" },
+    { "id": "top", "type": "osc", "wave": "sine", "freq": "pitch * 2", "pm": "topPart * holdGlint * (0.05 + shimmer * 0.3)" },
+    { "id": "fifth", "type": "osc", "wave": "tri", "freq": "pitch * semi(7)" },
+    { "id": "root", "type": "osc", "wave": "tri", "freq": "pitch" },
+    { "id": "flutter", "type": "osc", "wave": "sine", "freq": 13 },
+    { "id": "spark", "type": "osc", "wave": "sine", "freq": "pitch * 8" },
+    { "id": "sparkB", "type": "osc", "wave": "sine", "freq": "pitch * semi(7) * 4" },
+    { "id": "chord", "type": "expr", "expr": "(top * 0.6 + fifth * 0.32 + root * 0.3 + (spark + sparkB * 0.7) * shimmer * 0.22 * (0.5 + 0.5 * flutter)) * holdAmp" },
+
+    { "id": "air", "type": "noise", "seed": 31 },
+    { "id": "climb", "type": "env", "points": [[0, 900], ["speed * 4", 8000, "exp"]] },
+    { "id": "wipe", "type": "filter", "mode": "bp", "in": "air", "freq": "climb", "q": 2 },
+    { "id": "wipeAmp", "type": "env", "points": [[0, 0.2], ["speed * 4", 1, 1.6], ["speed * 4 + 0.12", 0.25], ["speed * 4 + 0.3", 0, 2]] },
+
+    { "id": "sum", "type": "expr", "expr": "whump * 0.7 + run * 0.7 + chord * 0.75 + wipe * wipeAmp * sweep * 0.6" },
+    { "id": "room", "type": "reverb", "in": "sum", "size": 0.5, "damp": 0.3, "mix": "space * 3" },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "room", "freq": 40 }
+  ],
+  "out": "clean",
+  "presets": {
+    "Four lines": {},
+    "Spin four": { "space": 0.1, "shimmer": 0.9 },
+    "Streak of fours": { "speed": 0.06, "pitch": 587 }
+  }
+}

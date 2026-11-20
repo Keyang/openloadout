@@ -1,4 +1,5 @@
-// The three bundle palettes (docs/style-guide.md section 3) and the swatch lists
+// The four palettes (the three bundle palettes of docs/style-guide.md section 3, and
+// Gridline of bundles/specs/kit-puzzle-gridline.md) and the swatch lists
 // for colour controls built from them. Pure data and functions: runs in Node and
 // in the browser.
 //
@@ -12,7 +13,7 @@
 //
 // Palette keys (lower case, like every colour name: PALETTE.Thornwood is undefined):
 // `thornwood` (kit-platformer-fantasy), `hearthvale` (kit-rpg-fantasy),
-// `derelict` (kit-roguelite-scifi). The functions accept any case for bundle, material and lead. The bundle ids and the short names `platformer`,
+// `derelict` (kit-roguelite-scifi), `gridline` (kit-puzzle-gridline; by its key only, its bundle id is no alias). The functions accept any case for bundle, material and lead. The bundle ids and the short names `platformer`,
 // `rpg`, `roguelite` / `scifi` also work everywhere a palette is named, but are not
 // listed by Object.keys(PALETTE).
 //
@@ -53,6 +54,15 @@ const derelict = {
   heal: '#5fd47a', shield: '#4f9ff0', xp: '#b48af8', nebula: '#6660b6', cream: '#f0ead8', skin: '#f6d3b0',
 };
 
+// kit-puzzle-gridline (bundles/specs/kit-puzzle-gridline.md): bright abstract shapes on a dark grid
+const gridline = {
+  ink: '#231b33', void: '#12152b', well: '#2a3058', line: '#3a4278', deep: '#1e4658', plum: '#6a3a8e',
+  slate: '#4f5894', dusk: '#6e78b4', mist: '#a3abd8', pearl: '#e6e8f6', cream: '#f0ead8', rose: '#f2609e',
+  coral: '#f5875a', lemon: '#f2dc4c', lime: '#a6dc46', mint: '#46d8a8', sky: '#56c4f2', teal: '#2a9a9a',
+  violet: '#7d52e6', hero: '#3f6fd1', cyan: '#5fe0f0', red: '#e2473f', gold: '#f2c230', steel: '#c2c9d6',
+  skin: '#f6d3b0',
+};
+
 /** Maps each bundle id to its palette key ('kit-platformer-fantasy' -> 'thornwood'). No arguments: a frozen object. */
 export const BUNDLE_PALETTE = Object.freeze({
   'kit-platformer-fantasy': 'thornwood',
@@ -62,14 +72,14 @@ export const BUNDLE_PALETTE = Object.freeze({
 
 const ALIASES = { ...BUNDLE_PALETTE, platformer: 'thornwood', rpg: 'hearthvale', roguelite: 'derelict', scifi: 'derelict' };
 
-const P = { thornwood: Object.freeze(thornwood), hearthvale: Object.freeze(hearthvale), derelict: Object.freeze(derelict) };
+const P = { thornwood: Object.freeze(thornwood), hearthvale: Object.freeze(hearthvale), derelict: Object.freeze(derelict), gridline: Object.freeze(gridline) };
 for (const [alias, name] of Object.entries(ALIASES)) Object.defineProperty(P, alias, { value: P[name], enumerable: false });
 
-/** The three palettes as frozen { name: '#rrggbb' } objects, keyed thornwood, hearthvale, derelict (aliases: bundle ids, platformer, rpg, roguelite, scifi). No arguments. */
+/** The four palettes as frozen { name: '#rrggbb' } objects, keyed thornwood, hearthvale, derelict, gridline (aliases: bundle ids, platformer, rpg, roguelite, scifi). No arguments. */
 export const PALETTE = Object.freeze(P);
 
 /** Per palette key, the colour names that are never swatches: the outline and "background only" colours. No arguments: frozen lists. */
-export const NEVER_SWATCH = Object.freeze({ thornwood: Object.freeze(['ink']), hearthvale: Object.freeze(['ink']), derelict: Object.freeze(['ink', 'void']) });
+export const NEVER_SWATCH = Object.freeze({ thornwood: Object.freeze(['ink']), hearthvale: Object.freeze(['ink']), derelict: Object.freeze(['ink', 'void']), gridline: Object.freeze(['ink', 'void']) });
 
 // ---- swatch groups -----------------------------------------------------------
 // Each material lists palette colour names (first, in order of fit) and then extra
@@ -161,6 +171,33 @@ const GROUPS = {
     face: ['plate', 'deck', 'hull', 'teal', 'panel'],
     frame: ['teal', 'cyan', 'panel', 'steel', 'amber'],
   },
+  // no wood, stone or plants in the grid world: those words give its nearest colours.
+  // void is the backdrop's darkness but never a swatch, so `sky` and `ground` start with well
+  gridline: {
+    skin: ['skin', ...SKIN],
+    hair: ['pearl', 'lemon', 'rose', 'plum', ...HAIR],
+    outfit: ['hero', 'rose', 'teal', 'violet', 'slate', 'mint'],
+    trim: ['lemon', 'cyan', 'rose', 'mint', 'coral', 'pearl'],
+    metal: ['steel', 'mist', 'gold', 'dusk', ...METAL],
+    wood: ['coral', 'gold', 'dusk', 'slate', '#c98a4a'],
+    stone: ['slate', 'dusk', 'mist', 'line', '#8f97a8'],
+    body: ['hero', 'rose', 'teal', 'violet', 'lemon', 'mint', 'coral'],
+    accent: ['rose', 'mint', 'lime', 'gold', 'coral', 'cyan'],
+    glow: ['cyan', 'lemon', 'mint', 'rose', 'lime', 'pearl'],
+    core: ['cream', 'pearl', 'lemon', 'cyan', 'mint'],
+    edge: ['rose', 'cyan', 'lemon', 'violet', 'mint', 'coral'],
+    gem: ['violet', 'rose', 'cyan', 'lemon', 'mint'],
+    shell: ['teal', 'violet', 'rose', 'plum', 'slate'],
+    grass: ['lime', 'mint', 'teal', 'lemon'],
+    leaf: ['mint', 'lime', 'teal', 'lemon'],
+    ground: ['well', 'line', 'deep', 'plum', 'slate'],
+    water: ['sky', 'cyan', 'teal', 'hero', 'mint'],
+    sky: ['well', 'line', 'deep', 'plum', 'slate'],
+    land: ['violet', 'teal', 'hero', 'dusk', 'plum'],
+    haze: ['dusk', 'mist', 'violet', 'slate', 'line'],
+    face: ['well', 'line', 'deep', 'plum'],
+    frame: ['steel', 'cyan', 'lemon', 'pearl', 'mist'],
+  },
 };
 
 // Spec words that mean one of the materials above.
@@ -169,12 +206,12 @@ const SAME_AS = { rock: 'stone', cloth: 'outfit', fur: 'body', light: 'glow', en
 const MIN_BRIGHTNESS = 0.18;
 const HEX = /^#[0-9a-f]{6}$/i;
 
-/** Returns the palette key ('thornwood', 'hearthvale', 'derelict'); throws for an unknown name. Arguments: bundle: a palette key, bundle id or short name, any case. */
+/** Returns the palette key ('thornwood', 'hearthvale', 'derelict', 'gridline'); throws for an unknown name. Arguments: bundle: a palette key, bundle id or short name, any case. */
 export function paletteName(bundle) {
   const key = String(bundle).toLowerCase();
   if (key in GROUPS) return key;
   if (key in ALIASES) return ALIASES[key];
-  throw new Error(`unknown bundle "${bundle}": use thornwood, hearthvale, derelict or a bundle id (${Object.keys(BUNDLE_PALETTE).join(', ')})`);
+  throw new Error(`unknown bundle "${bundle}": use thornwood, hearthvale, derelict, gridline or a bundle id (${Object.keys(BUNDLE_PALETTE).join(', ')})`);
 }
 
 /** Returns the frozen palette object. Arguments: bundle: a palette key, bundle id or short name, any case. */

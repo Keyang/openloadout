@@ -155,14 +155,29 @@ export function guideFaults({ row, json, text: whole }) {
     say(new RegExp(`Each tile is ${fw} x ${fh} pixels`).test(flat), `the text does not give the tile size (${fw} x ${fh})`);
     say(/not an animation/.test(flat), 'the text does not say that a row is one tile, not an animation');
     say(!/Each row is one animation/.test(flat), 'the text calls the rows animations');
-    say(/Tile Palette/.test(flat) && /Rule Tile/.test(flat), 'Unity: a tile palette and a rule tile');
-    say(/TileSet/.test(flat) && /terrain/i.test(flat), 'Godot: a TileSet and its terrains');
+    // a tileset with no group at all (the cells of a puzzle: every tile is "other") has no rule to give: the game puts each tile in its cell, and the text says so and how
+    const placed = Array.isArray(json.tiles?.groups) && json.tiles.groups.length === 0 && Array.isArray(json.tiles.other) && json.tiles.other.length > 0;
+    if (placed) {
+      say(/Tile Palette/.test(flat) && /TileSet/.test(flat), 'Unity: a tile palette; Godot: a TileSet');
+      say(!/Rule Tile for each|terrain/i.test(flat) && !/"needs"/.test(flat), 'no rule picks a tile of this tileset, and the text gives rule tiles, terrains or "needs"');
+      say(/your game puts each one in its cell/.test(flat) && /SetTile\(/.test(flat) && /set_cell\(/.test(flat), 'the game places every tile of this tileset, and the text does not say so, or how in Unity (SetTile) and Godot (set_cell)');
+    } else if (json.tiles?.groups?.length > 0 && json.tiles.groups.every((g) => g.rules.length <= 1)) {
+      // groups, but each is one tile (the floor of a board with hand-placed walls and markers): no rule chooses between tiles, so a rule tile or a terrain has nothing to do, and the text must not send the reader to set one up
+      say(/Tile Palette/.test(flat) && /TileSet/.test(flat), 'Unity: a tile palette; Godot: a TileSet');
+      say(!/Rule Tile for each|terrain/i.test(flat) && !/"needs"|"rules"/.test(flat), 'no rule chooses between the tiles of this tileset, and the text gives rule tiles, terrains, "rules" or "needs"');
+      say(/No rule chooses between these tiles/.test(flat) && /put it in every cell that holds the group/.test(flat), 'every group of this tileset is one tile, and the text does not say that no rule chooses between tiles and that a group\'s tile goes in every cell of the group');
+      say(/SetTile\(/.test(flat) && /set_cell\(/.test(flat), 'the tiles of this tileset are painted or placed by the game, and the text does not say how to place one in Unity (SetTile) and Godot (set_cell)');
+    } else {
+      say(/Tile Palette/.test(flat) && /Rule Tile/.test(flat), 'Unity: a tile palette and a rule tile');
+      say(/TileSet/.test(flat) && /terrain/i.test(flat), 'Godot: a TileSet and its terrains');
+    }
     say(!/AnimatedSprite2D/.test(text), 'the text gives the steps for an animated sprite');
-    say(json.tiles && Array.isArray(json.tiles.groups) && json.tiles.groups.length > 0, 'the JSON has no "tiles" (what each tile is and what it needs round it)');
+    say(json.tiles && Array.isArray(json.tiles.groups) && (json.tiles.groups.length > 0 || placed), 'the JSON has no "tiles" (what each tile is and what it needs round it)');
     for (const [name, a] of anims) {
       const line = rowLine(text, a.row, name) ?? '';
       if (a.frames === 1) say(!/per second/.test(line), `"${name}" is one still tile, and its line gives a speed`);
       else say(/per second/.test(line), `"${name}" moves, and its line gives no speed`);
+      if (a.frames > 1) say((a.loop === false) === /plays once/.test(line), a.loop === false ? `"${name}" plays once, and its line does not say so` : `"${name}" repeats, and its line says it plays once`);
       say(json.tiles?.tiles?.[name] || json.tiles?.other?.includes(name), `the JSON does not say what the tile "${name}" is`);
     }
     for (const g of json.tiles?.groups ?? []) {

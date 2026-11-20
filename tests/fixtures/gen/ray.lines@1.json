@@ -1,0 +1,3617 @@
+{
+ "id": "ray.lines",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "at": [
+     48,
+     48
+    ],
+    "paints": [
+     "shine",
+     "core",
+     "mid",
+     "edge",
+     "rim"
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      54,
+      47
+     ],
+     "size": [
+      5,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      37,
+      47
+     ],
+     "size": [
+      5,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      47,
+      54
+     ],
+     "size": [
+      2,
+      5
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      47,
+      37
+     ],
+     "size": [
+      2,
+      5
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      59,
+      47
+     ],
+     "size": [
+      4,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      33,
+      47
+     ],
+     "size": [
+      4,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      47,
+      59
+     ],
+     "size": [
+      2,
+      4
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      47,
+      33
+     ],
+     "size": [
+      2,
+      4
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      63,
+      47
+     ],
+     "size": [
+      5,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      28,
+      47
+     ],
+     "size": [
+      5,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      47,
+      63
+     ],
+     "size": [
+      2,
+      5
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      47,
+      28
+     ],
+     "size": [
+      2,
+      5
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      68,
+      47
+     ],
+     "size": [
+      4,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      24,
+      47
+     ],
+     "size": [
+      4,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      47,
+      68
+     ],
+     "size": [
+      2,
+      4
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      47,
+      24
+     ],
+     "size": [
+      2,
+      4
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      54,
+      53
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      41,
+      53
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      54,
+      41
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      41,
+      41
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      55,
+      54
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      40,
+      54
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      55,
+      40
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      40,
+      40
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      56,
+      55
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      39,
+      55
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      56,
+      39
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      39,
+      39
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      57,
+      56
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      38,
+      56
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      57,
+      38
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      38,
+      38
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      58,
+      57
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      37,
+      57
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      58,
+      37
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      37,
+      37
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      59,
+      58
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      36,
+      58
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      59,
+      36
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      36,
+      36
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      60,
+      59
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      35,
+      59
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      60,
+      35
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      35,
+      35
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      61,
+      60
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      34,
+      60
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      61,
+      34
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      34,
+      34
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      62,
+      61
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      33,
+      61
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      62,
+      33
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      33,
+      33
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      63,
+      62
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      32,
+      62
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      63,
+      32
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      32,
+      32
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      64,
+      63
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      31,
+      63
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      64,
+      31
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      31,
+      31
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      65,
+      64
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      30,
+      64
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      65,
+      30
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      30,
+      30
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      66,
+      65
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      29,
+      65
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      66,
+      29
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      29,
+      29
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      67,
+      66
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      28,
+      66
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      67,
+      28
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      28,
+      28
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      68,
+      67
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      27,
+      67
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      68,
+      27
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      27,
+      27
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      69,
+      68
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      26,
+      68
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      69,
+      26
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      26,
+      26
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      70,
+      69
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      25,
+      69
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      70,
+      25
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      25,
+      25
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      71,
+      70
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      24,
+      70
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      71,
+      24
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      24,
+      24
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     48,
+     48
+    ],
+    "reach": 30,
+    "r0": 0.26,
+    "r1": 0.95,
+    "room": 47,
+    "paints": [
+     "shine",
+     "core",
+     "mid",
+     "edge",
+     "rim"
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      56,
+      47
+     ],
+     "size": [
+      6,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      34,
+      47
+     ],
+     "size": [
+      6,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      47,
+      56
+     ],
+     "size": [
+      2,
+      6
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      47,
+      34
+     ],
+     "size": [
+      2,
+      6
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      62,
+      47
+     ],
+     "size": [
+      5,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      29,
+      47
+     ],
+     "size": [
+      5,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      47,
+      62
+     ],
+     "size": [
+      2,
+      5
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      47,
+      29
+     ],
+     "size": [
+      2,
+      5
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      67,
+      47
+     ],
+     "size": [
+      5,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      24,
+      47
+     ],
+     "size": [
+      5,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      47,
+      67
+     ],
+     "size": [
+      2,
+      5
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      47,
+      24
+     ],
+     "size": [
+      2,
+      5
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      72,
+      47
+     ],
+     "size": [
+      5,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      19,
+      47
+     ],
+     "size": [
+      5,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      47,
+      72
+     ],
+     "size": [
+      2,
+      5
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      47,
+      19
+     ],
+     "size": [
+      2,
+      5
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      56,
+      55
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      39,
+      55
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      56,
+      39
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      39,
+      39
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      57,
+      56
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      38,
+      56
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      57,
+      38
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      38,
+      38
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      58,
+      57
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      37,
+      57
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      58,
+      37
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      37,
+      37
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      59,
+      58
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      36,
+      58
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      59,
+      36
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      36,
+      36
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      60,
+      59
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      35,
+      59
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      60,
+      35
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      35,
+      35
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      61,
+      60
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      34,
+      60
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      61,
+      34
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      34,
+      34
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "shine",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      62,
+      61
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      33,
+      61
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      62,
+      33
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      33,
+      33
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      63,
+      62
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      32,
+      62
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      63,
+      32
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      32,
+      32
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      64,
+      63
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      31,
+      63
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      64,
+      31
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      31,
+      31
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      65,
+      64
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      30,
+      64
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      65,
+      30
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      30,
+      30
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      66,
+      65
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      29,
+      65
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      66,
+      29
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      29,
+      29
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      67,
+      66
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      28,
+      66
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      67,
+      28
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      28,
+      28
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      68,
+      67
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      27,
+      67
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      68,
+      27
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      27,
+      27
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      69,
+      68
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      26,
+      68
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      69,
+      26
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      26,
+      26
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      70,
+      69
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      25,
+      69
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      70,
+      25
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      25,
+      25
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      71,
+      70
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      24,
+      70
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      71,
+      24
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      24,
+      24
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      72,
+      71
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      23,
+      71
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      72,
+      23
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      23,
+      23
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      73,
+      72
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      22,
+      72
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      73,
+      22
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      22,
+      22
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      74,
+      73
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      21,
+      73
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      74,
+      21
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      21,
+      21
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      75,
+      74
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      20,
+      74
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      75,
+      20
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      20,
+      20
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      76,
+      75
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      19,
+      75
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      76,
+      19
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      19,
+      19
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     48,
+     48
+    ],
+    "reach": 30,
+    "r0": 0.34,
+    "r1": 1.08,
+    "cool": 1,
+    "dash": 4,
+    "gap": 3,
+    "phase": 0.5,
+    "room": 47,
+    "paints": [
+     "shine",
+     "core",
+     "mid",
+     "edge",
+     "rim"
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      59,
+      47
+     ],
+     "size": [
+      4,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      33,
+      47
+     ],
+     "size": [
+      4,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      47,
+      59
+     ],
+     "size": [
+      2,
+      4
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      47,
+      33
+     ],
+     "size": [
+      2,
+      4
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      66,
+      47
+     ],
+     "size": [
+      4,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      26,
+      47
+     ],
+     "size": [
+      4,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      47,
+      66
+     ],
+     "size": [
+      2,
+      4
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      47,
+      26
+     ],
+     "size": [
+      2,
+      4
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      73,
+      47
+     ],
+     "size": [
+      4,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      19,
+      47
+     ],
+     "size": [
+      4,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      47,
+      73
+     ],
+     "size": [
+      2,
+      4
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      47,
+      19
+     ],
+     "size": [
+      2,
+      4
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      59,
+      58
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      36,
+      58
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      59,
+      36
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      36,
+      36
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      60,
+      59
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      35,
+      59
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      60,
+      35
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      35,
+      35
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      61,
+      60
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      34,
+      60
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      61,
+      34
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      34,
+      34
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      62,
+      61
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      33,
+      61
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      62,
+      33
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      33,
+      33
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "core",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      66,
+      65
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      29,
+      65
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      66,
+      29
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      29,
+      29
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      67,
+      66
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      28,
+      66
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      67,
+      28
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      28,
+      28
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      68,
+      67
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      27,
+      67
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      68,
+      27
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      27,
+      27
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      69,
+      68
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      26,
+      68
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      69,
+      26
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      26,
+      26
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "mid",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      73,
+      72
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      22,
+      72
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      73,
+      22
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      22,
+      22
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      74,
+      73
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      21,
+      73
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      74,
+      21
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      21,
+      21
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      75,
+      74
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      20,
+      74
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      75,
+      20
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      20,
+      20
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      76,
+      75
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      19,
+      75
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      76,
+      19
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      19,
+      19
+     ],
+     "size": [
+      1,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     0,
+     0
+    ],
+    "reach": 20,
+    "r0": 0.4,
+    "r1": 0.6,
+    "cool": 3,
+    "slanted": false,
+    "room": 15,
+    "paints": [
+     "core",
+     "edge"
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      8,
+      -1
+     ],
+     "size": [
+      4,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      -12,
+      -1
+     ],
+     "size": [
+      4,
+      2
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      -1,
+      8
+     ],
+     "size": [
+      2,
+      4
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      -1,
+      -12
+     ],
+     "size": [
+      2,
+      4
+     ],
+     "paint": "edge",
+     "shade": 0,
+     "light": 0
+    }
+   ]
+  }
+ ]
+}

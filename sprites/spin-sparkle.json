@@ -1,0 +1,615 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "spin-sparkle",
+ "name": "Spin sparkle",
+ "blurb": "A ring of sparks that whirls out from a white core: the flourish for a piece spun into a tight slot. Change the size, the number of sparks, how far they turn, their style and colours.",
+ "meta": {
+  "type": "effect",
+  "role": "effects/magic",
+  "themes": [
+   "neutral",
+   "sci-fi"
+  ],
+  "gameTypes": [
+   "puzzle",
+   "arcade"
+  ],
+  "view": "none",
+  "words": [
+   "spin",
+   "twist",
+   "bonus",
+   "sparkle",
+   "swirl",
+   "trick",
+   "turn",
+   "reward",
+   "star",
+   "special"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  48,
+  48
+ ],
+ "pivot": [
+  24,
+  24
+ ],
+ "grounded": false,
+ "preview": "burst",
+ "styles": [
+  "pixel"
+ ],
+ "versions": [
+  {
+   "name": "Gold spin",
+   "params": {}
+  },
+  {
+   "name": "Violet stars",
+   "params": {
+    "style": "stars",
+    "edge": "#7d52e6"
+   }
+  },
+  {
+   "name": "Rose arcs",
+   "params": {
+    "style": "arcs",
+    "edge": "#f2609e",
+    "twist": 1
+   }
+  },
+  {
+   "name": "Small mint",
+   "params": {
+    "size": 0,
+    "edge": "#46d8a8",
+    "pieces": 4
+   }
+  }
+ ],
+ "palette": [
+  {
+   "id": "core",
+   "label": "Core",
+   "default": "#f0ead8",
+   "material": "light",
+   "swatches": [
+    "#f0ead8",
+    "#e6e8f6",
+    "#f2dc4c",
+    "#5fe0f0"
+   ]
+  },
+  {
+   "id": "edge",
+   "label": "Edge",
+   "default": "#f2c230",
+   "material": "light",
+   "swatches": [
+    "#f2c230",
+    "#7d52e6",
+    "#f2609e",
+    "#46d8a8",
+    "#f5875a"
+   ]
+  },
+  {
+   "id": "mid",
+   "material": "light",
+   "derive": {
+    "rule": "mix",
+    "of": "core",
+    "with": "edge",
+    "amount": 0.5
+   }
+  },
+  {
+   "id": "rim",
+   "material": "light",
+   "derive": {
+    "rule": "tone",
+    "of": "edge",
+    "by": -1
+   }
+  },
+  {
+   "id": "shine",
+   "default": "#ffffff",
+   "material": "light",
+   "detail": true
+  }
+ ],
+ "controls": [
+  {
+   "key": "size",
+   "kind": "range",
+   "label": "Size",
+   "lo": "Small",
+   "hi": "Big",
+   "default": 0.5
+  },
+  {
+   "key": "pieces",
+   "kind": "range",
+   "label": "Sparks",
+   "lo": "Few",
+   "hi": "Many",
+   "min": 4,
+   "max": 8,
+   "step": 1,
+   "default": 6
+  },
+  {
+   "key": "twist",
+   "kind": "range",
+   "label": "Turn",
+   "lo": "Little",
+   "hi": "Much",
+   "default": 0.5
+  },
+  {
+   "key": "style",
+   "kind": "choice",
+   "label": "Style",
+   "options": [
+    "squares",
+    "stars",
+    "arcs"
+   ],
+   "default": "squares"
+  },
+  {
+   "key": "core",
+   "kind": "colour",
+   "label": "Core"
+  },
+  {
+   "key": "edge",
+   "kind": "colour",
+   "label": "Edge"
+  },
+  {
+   "key": "speed",
+   "standard": "speed"
+  }
+ ],
+ "body": {
+  "emitters": [
+   {
+    "id": "squares",
+    "gen": "spark.swirl",
+    "v": 1,
+    "clip": [
+     "burst"
+    ],
+    "when": {
+     "style": [
+      "squares"
+     ]
+    },
+    "at": [
+     24,
+     24
+    ],
+    "count": {
+     "from": "pieces",
+     "map": [
+      [
+       4,
+       4
+      ],
+      [
+       8,
+       8
+      ]
+     ],
+     "round": "px"
+    },
+    "r0": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       4.8
+      ],
+      [
+       1,
+       6.72
+      ]
+     ]
+    },
+    "r1": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       14.4
+      ],
+      [
+       1,
+       20.16
+      ]
+     ]
+    },
+    "turn": {
+     "from": "twist",
+     "map": [
+      [
+       0,
+       0.25
+      ],
+      [
+       1,
+       0.75
+      ]
+     ]
+    },
+    "mark": "square",
+    "size": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       3
+      ],
+      [
+       0.2999,
+       3
+      ],
+      [
+       0.3,
+       4
+      ],
+      [
+       0.7,
+       4
+      ],
+      [
+       0.7001,
+       5
+      ],
+      [
+       1,
+       5
+      ]
+     ],
+     "round": "px"
+    },
+    "core": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       2
+      ],
+      [
+       0.2999,
+       2
+      ],
+      [
+       0.3,
+       3
+      ],
+      [
+       0.7,
+       3
+      ],
+      [
+       0.7001,
+       4
+      ],
+      [
+       1,
+       4
+      ]
+     ],
+     "round": "px"
+    },
+    "trails": 2,
+    "begin": 0.1111,
+    "room": 23,
+    "paints": [
+     "shine",
+     "core",
+     "mid",
+     "edge",
+     "rim"
+    ]
+   },
+   {
+    "id": "stars",
+    "gen": "spark.swirl",
+    "v": 1,
+    "clip": [
+     "burst"
+    ],
+    "when": {
+     "style": [
+      "stars"
+     ]
+    },
+    "at": [
+     24,
+     24
+    ],
+    "count": {
+     "from": "pieces",
+     "map": [
+      [
+       4,
+       4
+      ],
+      [
+       8,
+       8
+      ]
+     ],
+     "round": "px"
+    },
+    "r0": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       4.8
+      ],
+      [
+       1,
+       6.72
+      ]
+     ]
+    },
+    "r1": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       14.4
+      ],
+      [
+       1,
+       20.16
+      ]
+     ]
+    },
+    "turn": {
+     "from": "twist",
+     "map": [
+      [
+       0,
+       0.25
+      ],
+      [
+       1,
+       0.75
+      ]
+     ]
+    },
+    "mark": "star",
+    "size": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       3
+      ],
+      [
+       0.2999,
+       3
+      ],
+      [
+       0.3,
+       3
+      ],
+      [
+       0.7,
+       3
+      ],
+      [
+       0.7001,
+       4
+      ],
+      [
+       1,
+       4
+      ]
+     ],
+     "round": "px"
+    },
+    "core": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       2
+      ],
+      [
+       0.2999,
+       2
+      ],
+      [
+       0.3,
+       3
+      ],
+      [
+       0.7,
+       3
+      ],
+      [
+       0.7001,
+       4
+      ],
+      [
+       1,
+       4
+      ]
+     ],
+     "round": "px"
+    },
+    "trails": 2,
+    "begin": 0.1111,
+    "room": 23,
+    "paints": [
+     "shine",
+     "core",
+     "mid",
+     "edge",
+     "rim"
+    ]
+   },
+   {
+    "id": "arcs",
+    "gen": "spark.swirl",
+    "v": 1,
+    "clip": [
+     "burst"
+    ],
+    "when": {
+     "style": [
+      "arcs"
+     ]
+    },
+    "at": [
+     24,
+     24
+    ],
+    "count": {
+     "from": "pieces",
+     "map": [
+      [
+       4,
+       4
+      ],
+      [
+       8,
+       8
+      ]
+     ],
+     "round": "px"
+    },
+    "r0": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       4.8
+      ],
+      [
+       1,
+       6.72
+      ]
+     ]
+    },
+    "r1": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       14.4
+      ],
+      [
+       1,
+       20.16
+      ]
+     ]
+    },
+    "turn": {
+     "from": "twist",
+     "map": [
+      [
+       0,
+       0.25
+      ],
+      [
+       1,
+       0.75
+      ]
+     ]
+    },
+    "mark": "arc",
+    "size": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       3
+      ],
+      [
+       0.2999,
+       3
+      ],
+      [
+       0.3,
+       4
+      ],
+      [
+       0.7,
+       4
+      ],
+      [
+       0.7001,
+       5
+      ],
+      [
+       1,
+       5
+      ]
+     ],
+     "round": "px"
+    },
+    "core": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       2
+      ],
+      [
+       0.2999,
+       2
+      ],
+      [
+       0.3,
+       3
+      ],
+      [
+       0.7,
+       3
+      ],
+      [
+       0.7001,
+       4
+      ],
+      [
+       1,
+       4
+      ]
+     ],
+     "round": "px"
+    },
+    "trails": 2,
+    "begin": 0.1111,
+    "room": 23,
+    "paints": [
+     "shine",
+     "core",
+     "mid",
+     "edge",
+     "rim"
+    ]
+   }
+  ]
+ },
+ "clips": {
+  "burst": {
+   "frames": 10,
+   "fps": 14,
+   "loop": false
+  }
+ }
+}

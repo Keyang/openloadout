@@ -1,0 +1,236 @@
+{
+ "id": "ui.counter.digits",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "paint": "glow"
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      11,
+      8
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aaa.....aaaaaa",
+      "..aa.........aa",
+      "..aa.........aa",
+      "..aa.....aaaaaa",
+      "..aa.....aa....",
+      "..aa.....aa....",
+      "aaaaaa...aaaaaa"
+     ],
+     "key": {
+      "a": "glow"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     1,
+     1
+    ],
+    "width": 62,
+    "height": 22,
+    "count": 3,
+    "style": "strip",
+    "picture": 13,
+    "value": 12,
+    "play": "roll",
+    "paint": "glow"
+   },
+   "ctx": {
+    "frame": 2,
+    "frames": 6,
+    "t": 0.4
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      43,
+      7
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".........aa....",
+      ".aaa.....aa....",
+      "..aa.....aaaaaa",
+      "..aa...........",
+      "..aa...........",
+      "..aa.....aaaaaa",
+      "..aa.........aa",
+      "aaaaaa.......aa",
+      "...........aaa."
+     ],
+     "key": {
+      "a": "glow"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     -31,
+     -11
+    ],
+    "width": 62,
+    "height": 22,
+    "count": 4,
+    "big": 1,
+    "style": "drum",
+    "picture": 13,
+    "value": 1999,
+    "play": "roll",
+    "paint": "glow"
+   },
+   "ctx": {
+    "frame": 1,
+    "frames": 6,
+    "t": 0.2
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      -11,
+      -6
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...aa.....aa...aa...aa...aa...aa",
+      "...aa.....aa...aa...aa...aa...aa",
+      "...aa.....aaaaaaa...aaaaaaa...aa",
+      "...aa..........aa........aa.....",
+      "...aa..........aa........aa.....",
+      "aaaaaaa...aaaaaaa...aaaaaaa...aa",
+      "aaaaaaa...aaaaaaa...aaaaaaa...aa",
+      "................................",
+      "................................",
+      "aaaaaaa...aaaaaaa...aaaaaaa...aa",
+      "aaaaaaa...aaaaaaa...aaaaaaa...aa"
+     ],
+     "key": {
+      "a": "glow"
+     }
+    },
+    {
+     "kind": "stamp",
+     "at": [
+      21,
+      -6
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...aa",
+      "...aa",
+      "aaaaa",
+      "...aa",
+      "...aa",
+      "aaaaa",
+      "aaaaa",
+      ".....",
+      ".....",
+      "aaaaa",
+      "aaaaa"
+     ],
+     "key": {
+      "a": "glow"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     1,
+     1
+    ],
+    "width": 62,
+    "height": 22,
+    "count": 2,
+    "big": 0,
+    "style": "plate",
+    "picture": 13,
+    "value": 7,
+    "play": "bump",
+    "paint": "glow",
+    "flash": "shine"
+   },
+   "ctx": {
+    "frame": 0,
+    "frames": 4,
+    "t": 0
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      53,
+      9
+     ],
+     "anchor": "tl",
+     "rows": [
+      "aaaaa",
+      "...aa",
+      "...aa",
+      "...aa",
+      "...aa"
+     ],
+     "key": {
+      "a": "shine"
+     }
+    }
+   ]
+  },
+  {
+   "args": {
+    "at": [
+     1,
+     1
+    ],
+    "width": 62,
+    "height": 22,
+    "count": 3,
+    "picture": 13,
+    "value": 12,
+    "play": "bump",
+    "paint": "glow",
+    "flash": "shine"
+   },
+   "ctx": {
+    "frame": 1,
+    "frames": 4,
+    "t": 0.34
+   },
+   "primitives": [
+    {
+     "kind": "stamp",
+     "at": [
+      43,
+      7
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".aaa.....aaaaaa",
+      "..aa.........aa",
+      "..aa.........aa",
+      "..aa.....aaaaaa",
+      "..aa.....aa....",
+      "..aa.....aa....",
+      "aaaaaa...aaaaaa"
+     ],
+     "key": {
+      "a": "glow"
+     }
+    }
+   ]
+  }
+ ]
+}

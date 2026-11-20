@@ -1,0 +1,33 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "spin-bonus",
+  "name": "Spin bonus",
+  "category": "magic",
+  "description": "A bright twirl that climbs and spins faster as it rises, with a sprinkle of tiny high ticks. Change its pitch, length, how fast it twirls and how much it shimmers.",
+  "meta": { "type": "sfx", "role": "interface/reward", "themes": ["neutral"], "gameTypes": ["puzzle", "arcade"],
+    "words": ["spin", "twirl", "bonus", "reward", "twist", "rotate", "trick", "swirl", "sparkle", "shimmer", "rising", "clean"], "license": "draft" },
+  "duration": "length",
+  "params": [
+    { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 400, "max": 1600, "default": 660, "scale": "log" },
+    { "id": "length", "label": "Length", "unit": "s", "min": 0.3, "max": 0.75, "default": 0.5, "scale": "log" },
+    { "id": "twirl", "label": "Twirl", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "shimmer", "label": "Shimmer", "min": 0, "max": 1, "default": 0.5 }
+  ],
+  "nodes": [
+    { "id": "sweep", "type": "env", "points": [[0, "pitch"], ["length * 0.8", "pitch * 2", "exp"]] },
+    { "id": "spin", "type": "osc", "wave": "sine", "freq": "(7 + twirl * 22) * sweep / pitch" },
+    { "id": "fm", "type": "osc", "wave": "sine", "freq": "sweep * 2" },
+    { "id": "body", "type": "osc", "wave": "sine", "freq": "sweep", "pm": "fm * (0.22 + shimmer * 0.2 + spin * 0.16)" },
+    { "id": "tone", "type": "filter", "mode": "lp", "in": "body * (0.62 + spin * 0.38)", "freq": "2200 + shimmer * 9000" },
+    { "id": "amp", "type": "ad", "attack": 0.003, "decay": "length - 0.003", "curve": 1.6 },
+    { "id": "tickClock", "type": "clock", "rate": 16 },
+    { "id": "tickAmp", "type": "ad", "attack": 0.0005, "decay": 0.016, "curve": 2.5, "trig": "tickClock" },
+    { "id": "tick", "type": "osc", "wave": "sine", "freq": "pitch * 8" }
+  ],
+  "out": "(tone + tick * tickAmp * shimmer * 0.9) * amp",
+  "presets": {
+    "Spin": {},
+    "Mini spin": { "length": 0.32, "twirl": 0.3 },
+    "Big spin": { "length": 0.72, "twirl": 0.8 }
+  }
+}

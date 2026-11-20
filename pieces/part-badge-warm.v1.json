@@ -1,0 +1,330 @@
+{
+ "format": "loadout-piece",
+ "version": 1,
+ "id": "part:badge-warm",
+ "v": 1,
+ "name": "Prism and Ember badge",
+ "about": "A title badge of Gridline puzzle cells (diamond, arrow, steps or ring) in the Prism or Ember colours, drawn by block.badge@1 round its middle, that can build itself or take a band of light.",
+ "slots": [
+  {
+   "id": "block-rose",
+   "label": "Rose",
+   "default": "#f2609e",
+   "material": "paint"
+  },
+  {
+   "id": "block-coral",
+   "label": "Coral",
+   "default": "#f5875a",
+   "material": "paint"
+  },
+  {
+   "id": "block-lemon",
+   "label": "Lemon",
+   "default": "#f2dc4c",
+   "material": "paint"
+  },
+  {
+   "id": "block-lime",
+   "label": "Lime",
+   "default": "#a6dc46",
+   "material": "paint"
+  },
+  {
+   "id": "block-teal",
+   "label": "Teal",
+   "default": "#2a9a9a",
+   "material": "paint"
+  },
+  {
+   "id": "block-violet",
+   "label": "Violet",
+   "default": "#7d52e6",
+   "material": "paint"
+  },
+  {
+   "id": "block-pearl",
+   "label": "Pearl",
+   "default": "#e6e8f6",
+   "material": "paint"
+  },
+  {
+   "id": "block-gold",
+   "label": "Gold",
+   "default": "#f2c230",
+   "material": "paint"
+  },
+  {
+   "id": "block-plum",
+   "label": "Plum",
+   "default": "#6a3a8e",
+   "material": "paint"
+  },
+  {
+   "id": "block-cream",
+   "label": "Cream",
+   "default": "#f0ead8",
+   "material": "paint"
+  }
+ ],
+ "args": {
+  "scheme": {
+   "type": "word",
+   "options": [
+    "prism",
+    "ember"
+   ],
+   "default": "prism"
+  },
+  "shape": {
+   "type": "word",
+   "options": [
+    "diamond",
+    "arrow",
+    "stairs",
+    "ring"
+   ],
+   "default": "diamond"
+  },
+  "cell": {
+   "type": "count",
+   "lo": 6,
+   "hi": 16,
+   "default": 8
+  },
+  "style": {
+   "type": "word",
+   "options": [
+    "bevel",
+    "gem",
+    "glass",
+    "pillow",
+    "frame"
+   ],
+   "default": "bevel"
+  },
+  "edge": {
+   "type": "count",
+   "lo": 1,
+   "hi": 3,
+   "default": 2
+  },
+  "play": {
+   "type": "word",
+   "options": [
+    "rest",
+    "build",
+    "shine"
+   ],
+   "default": "rest"
+  },
+  "room": {
+   "type": "count",
+   "lo": 0,
+   "hi": 64,
+   "default": 64
+  }
+ },
+ "made": {
+  "by": "the sprite-forge skill",
+  "from": "bundles/specs/kit-puzzle-gridline.md (gridline-emblem, BLOCK_SCHEMES)"
+ },
+ "body": {
+  "draw": [
+   {
+    "id": "prism",
+    "gen": "block.badge",
+    "v": 1,
+    "at": [
+     0,
+     0
+    ],
+    "shape": {
+     "from": "shape",
+     "pick": {
+      "diamond": "diamond",
+      "arrow": "arrow",
+      "stairs": "stairs",
+      "ring": "ring"
+     }
+    },
+    "cell": {
+     "from": "cell",
+     "map": [
+      [
+       6,
+       6
+      ],
+      [
+       16,
+       16
+      ]
+     ],
+     "round": "px"
+    },
+    "style": {
+     "from": "style",
+     "pick": {
+      "bevel": "bevel",
+      "gem": "gem",
+      "glass": "glass",
+      "pillow": "pillow",
+      "frame": "frame"
+     }
+    },
+    "edge": {
+     "from": "edge",
+     "map": [
+      [
+       1,
+       1
+      ],
+      [
+       3,
+       3
+      ]
+     ],
+     "round": "px"
+    },
+    "paints": [
+     "block-rose",
+     "block-coral",
+     "block-lemon",
+     "block-lime",
+     "block-teal",
+     "block-violet",
+     "block-pearl"
+    ],
+    "flash": {
+     "rule": "tone",
+     "of": "block-pearl",
+     "by": 3
+    },
+    "play": {
+     "from": "play",
+     "pick": {
+      "rest": "rest",
+      "build": "build",
+      "shine": "shine"
+     }
+    },
+    "room": {
+     "from": "room",
+     "map": [
+      [
+       0,
+       0
+      ],
+      [
+       64,
+       64
+      ]
+     ],
+     "round": "px"
+    },
+    "when": {
+     "scheme": [
+      "prism"
+     ]
+    }
+   },
+   {
+    "id": "ember",
+    "gen": "block.badge",
+    "v": 1,
+    "at": [
+     0,
+     0
+    ],
+    "shape": {
+     "from": "shape",
+     "pick": {
+      "diamond": "diamond",
+      "arrow": "arrow",
+      "stairs": "stairs",
+      "ring": "ring"
+     }
+    },
+    "cell": {
+     "from": "cell",
+     "map": [
+      [
+       6,
+       6
+      ],
+      [
+       16,
+       16
+      ]
+     ],
+     "round": "px"
+    },
+    "style": {
+     "from": "style",
+     "pick": {
+      "bevel": "bevel",
+      "gem": "gem",
+      "glass": "glass",
+      "pillow": "pillow",
+      "frame": "frame"
+     }
+    },
+    "edge": {
+     "from": "edge",
+     "map": [
+      [
+       1,
+       1
+      ],
+      [
+       3,
+       3
+      ]
+     ],
+     "round": "px"
+    },
+    "paints": [
+     "block-coral",
+     "block-lemon",
+     "block-gold",
+     "block-rose",
+     "block-plum",
+     "block-violet",
+     "block-cream"
+    ],
+    "flash": {
+     "rule": "tone",
+     "of": "block-pearl",
+     "by": 3
+    },
+    "play": {
+     "from": "play",
+     "pick": {
+      "rest": "rest",
+      "build": "build",
+      "shine": "shine"
+     }
+    },
+    "room": {
+     "from": "room",
+     "map": [
+      [
+       0,
+       0
+      ],
+      [
+       64,
+       64
+      ]
+     ],
+     "round": "px"
+    },
+    "when": {
+     "scheme": [
+      "ember"
+     ]
+    }
+   }
+  ]
+ }
+}

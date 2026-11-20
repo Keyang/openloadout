@@ -1,0 +1,126 @@
+{
+ "id": "grid.runner",
+ "v": 1,
+ "cases": [
+  {
+   "args": {
+    "row": 160,
+    "paint": "glow"
+   },
+   "ctx": {
+    "size": [
+     320,
+     180
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      272,
+      160
+     ],
+     "size": [
+      48,
+      1
+     ],
+     "paint": "glow",
+     "shade": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "row": 152,
+    "length": 48,
+    "paint": "glow",
+    "dim": "glow.dark"
+   },
+   "ctx": {
+    "size": [
+     320,
+     180
+    ],
+    "t": 0.5,
+    "loop": true,
+    "frames": 8,
+    "frame": 4
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      152
+     ],
+     "size": [
+      320,
+      1
+     ],
+     "paint": "glow.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      112,
+      152
+     ],
+     "size": [
+      48,
+      1
+     ],
+     "paint": "glow",
+     "shade": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "row": 10,
+    "length": 20,
+    "thick": 2,
+    "paint": "glow",
+    "dim": "glow.dark"
+   },
+   "ctx": {
+    "size": [
+     64,
+     64
+    ],
+    "t": 0.95,
+    "loop": true,
+    "frames": 8,
+    "frame": 7
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      0,
+      10
+     ],
+     "size": [
+      64,
+      2
+     ],
+     "paint": "glow.dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      41,
+      10
+     ],
+     "size": [
+      20,
+      2
+     ],
+     "paint": "glow",
+     "shade": 0
+    }
+   ]
+  }
+ ]
+}
