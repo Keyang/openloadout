@@ -1,5 +1,5 @@
 // The studio page's advice (docs/studio.md sections 4 and 6; Contract 14 rule 7; build plan item S12). The quality bar is
-// offered as advice only ("What the library would ask"), worked out in a background worker, in everyday words, and never
+// offered as advice only ("What the quality bar would ask"), worked out in a background worker, in everyday words, and never
 // blocks the bag or a download. The pixel-art warnings sit next to what they are about: a shape too thin to draw on its
 // row, stray pixels on the frame's thumbnail and under "This frame", the fill band under the frame size and as dashed
 // boxes on the picture; every advice line is a button that selects what it is about.
@@ -19,7 +19,7 @@ const tab = (page, name) => page.getByRole('tab', { name, exact: true });
 const draft = (page) => page.evaluate(() => { const id = decodeURIComponent(location.hash.split('/')[2].split('?')[0]); return JSON.parse(localStorage.getItem('loadout-studio-v1')).drafts[id].definition; });
 const DEV_WORDS = /\b(params?|clip|pivot|metrics|render|threw|seed|preset|toggle|undefined|null|NaN)\b|`/;
 
-test('what the library would ask: on request, in a background worker, in everyday words, never blocking', async ({ page }) => {
+test('what the quality bar would ask: on request, in a background worker, in everyday words, never blocking', async ({ page }) => {
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
   await newFrom(page, 'blob');

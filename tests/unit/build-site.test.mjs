@@ -60,7 +60,7 @@ test('builds the catalogue, thumbnails and strips for the copy', () => {
 });
 
 test('G3: a new sprite file and a new sound file appear in the catalogue with no other edit', () => {
-  fs.copyFileSync(path.join(FIX, 'test-gem.js'), path.join(root, 'sprites', 'test-gem.js'));
+  fs.copyFileSync(path.join(FIX, 'test-gem.json'), path.join(root, 'sprites', 'test-gem.json'));
   fs.copyFileSync(path.join(FIX, 'test-pop.json'), path.join(root, 'sounds', 'test-pop.json'));
   const r = build(root);
   assert.equal(r.code, 0, r.out);
@@ -70,7 +70,7 @@ test('G3: a new sprite file and a new sound file appear in the catalogue with no
   const pop = cat.assets.find((a) => a.id === 'test-pop');
   assert.ok(gem && pop, 'both new assets are listed');
   assert.equal(gem.kind, 'sprite');
-  assert.equal(gem.src, 'sprites/test-gem.js');
+  assert.equal(gem.src, 'sprites/test-gem.json');
   assert.deepEqual(gem.tech.frame, [16, 16]);
   assert.equal(gem.tech.sounds, 1);
   assert.deepEqual(gem.words.slice(0, 2), ['gem', 'jewel']);
@@ -98,18 +98,24 @@ test('a second build skips assets whose source has not changed', () => {
   assert.match(r2.out, /\b1 made\b/, r2.out);
 });
 
-test('a change to a shared _helper file in sprites/ redraws the sprites', () => {
-  const helper = path.join(root, 'sprites', '_test-helper.js');
-  fs.writeFileSync(helper, 'export const x = 1;\n');
-  const r = build(root);
-  assert.equal(r.code, 0, r.out);
-  assert.match(r.out, new RegExp(`\\b${real.sprites.length + 1} made\\b`), r.out);
-  fs.rmSync(helper);
+test('a code file in sprites/, a shared _helper too, stops the build before anything is written (R4a)', () => {
+  const before = fs.readFileSync(path.join(root, 'generated', 'catalog.json'), 'utf8');
+  for (const name of ['_test-helper.js', 'old-sprite.js']) {
+    const f = path.join(root, 'sprites', name);
+    fs.writeFileSync(f, 'export const x = 1;\n');
+    const r = build(root);
+    fs.rmSync(f);
+    assert.equal(r.code, 1, r.out);
+    assert.match(r.out, new RegExp(`sprites/${name.replace('.', '\\.')}: a code sprite`), r.out);
+    assert.match(r.out, /\/sprite-forge/, r.out);
+    assert.doesNotMatch(r.out, /\n\s+at /, 'no stack trace');
+    assert.equal(fs.readFileSync(path.join(root, 'generated', 'catalog.json'), 'utf8'), before, 'the catalogue the site reads is as it was');
+  }
   assert.equal(build(root).code, 0);
 });
 
 test('removing an asset removes its pictures', () => {
-  fs.rmSync(path.join(root, 'sprites', 'test-gem.js'));
+  fs.rmSync(path.join(root, 'sprites', 'test-gem.json'));
   fs.rmSync(path.join(root, 'sounds', 'test-pop.json'));
   const r = build(root);
   assert.equal(r.code, 0, r.out);
@@ -172,14 +178,14 @@ test('exits 1 naming the file when a sound or bundle is not valid JSON', () => {
   }
 });
 
-test('exits 1 naming the file when a sprite file throws on import', () => {
-  const f = path.join(root, 'sprites', 'broken-sprite.js');
-  fs.writeFileSync(f, "import { defineSprite } from '../engine/sprite.js';\nexport default defineSprite({ id: 'broken-sprite' });\n");
+test('exits 1 naming the file when a sprite file cannot be loaded', () => {
+  const f = path.join(root, 'sprites', 'broken-sprite.json');
+  fs.writeFileSync(f, JSON.stringify({ format: 'loadout-sprite', version: 2, id: 'broken-sprite' }));
   const r = build(root);
   fs.rmSync(f);
   assert.equal(r.code, 1, r.out);
-  assert.match(r.out, /sprites\/broken-sprite\.js/, r.out);
-  assert.match(r.out, /missing "name"/, r.out);
+  assert.match(r.out, /sprites\/broken-sprite\.json/, r.out);
+  assert.match(r.out, /name/i, r.out);
 });
 
 test('--root with no folder prints how to use it', () => {
@@ -193,7 +199,7 @@ test('--dist copies the publishable site and nothing else', () => {
   const r = build(root, '--dist');
   assert.equal(r.code, 0, r.out);
   const dist = path.join(root, 'dist');
-  // the knight's file is sprites/knight.js, or sprites/knight.json once redrawn as data
+  // the knight's file is sprites/knight.json
   for (const p of ['index.html', 'app', 'engine', real.sprites.find((s) => s.id === 'knight').file, 'sounds/coin-pickup.json', 'bundles/dungeon-starter.json', 'generated/catalog.json', 'generated/thumbs/knight.png']) {
     assert.ok(fs.existsSync(path.join(dist, p)), `dist/${p}`);
   }
@@ -250,10 +256,10 @@ const fullBuild = (root, ...args) => {
   return { code: r.status, out: r.stdout + r.stderr };
 };
 const addNewAssets = (root) => {
-  fs.copyFileSync(path.join(FIX, 'test-gem.js'), path.join(root, 'sprites', 'test-gem.js'));
+  fs.copyFileSync(path.join(FIX, 'test-gem.json'), path.join(root, 'sprites', 'test-gem.json'));
   fs.copyFileSync(path.join(FIX, 'test-pop.json'), path.join(root, 'sounds', 'test-pop.json'));
 };
-const removeNewAssets = (root) => { fs.rmSync(path.join(root, 'sprites', 'test-gem.js'), { force: true }); fs.rmSync(path.join(root, 'sounds', 'test-pop.json'), { force: true }); };
+const removeNewAssets = (root) => { fs.rmSync(path.join(root, 'sprites', 'test-gem.json'), { force: true }); fs.rmSync(path.join(root, 'sounds', 'test-pop.json'), { force: true }); };
 
 test('a new asset that fails the quality bar stops the build and leaves generated/ exactly as it was', () => {
   stubQuality(root, []);
@@ -270,7 +276,7 @@ test('a new asset that fails the quality bar stops the build and leaves generate
   assert.equal(cat.assets.some((a) => a.id === 'test-gem'), false, 'the failing sprite is not in the catalogue the site reads');
   assert.equal(JSON.parse(fs.readFileSync(path.join(root, 'generated', 'sounds.json'), 'utf8')).patches.some((p) => p.id === 'test-pop'), false, 'nor is the sound that came with it');
   // the message: which file, what is wrong, what to do, and that the site was not changed
-  assert.match(r.out, /sprites\/test-gem\.js/);
+  assert.match(r.out, /sprites\/test-gem\.json/);
   assert.match(r.out, /Test gem/);
   assert.match(r.out, /What is wrong:\s+shine frame 0 \/ default: nothing drawn/);
   assert.match(r.out, /What to do:/);
@@ -334,13 +340,16 @@ test('two assets with one id: one message that names both files, and nothing mis
   // a sprite named like a sound that a bundle lists (taken from the real bundles, whichever they are today)
   const soundId = real.bundles.flatMap((b) => b.sounds)[0];
   assert.ok(soundId, 'a bundle lists a sound');
-  const f = path.join(root, 'sprites', `${soundId}.js`);
-  fs.writeFileSync(f, fs.readFileSync(path.join(FIX, 'test-gem.js'), 'utf8').replace("id: 'test-gem'", `id: '${soundId}'`).replace("sounds: { shine: [{ sound: 'test-pop', frame: 0 }] },", ''));
+  const f = path.join(root, 'sprites', `${soundId}.json`);
+  const gem = JSON.parse(fs.readFileSync(path.join(FIX, 'test-gem.json'), 'utf8'));
+  gem.id = soundId;
+  delete gem.clips.shine.sounds;
+  fs.writeFileSync(f, JSON.stringify(gem));
   const r = build(root);
   fs.rmSync(f);
   assert.equal(r.code, 1, r.out);
   assert.match(r.out, /1 problem to fix/, r.out);
-  assert.ok(r.out.includes(`sprites/${soundId}.js`) && r.out.includes(`sounds/${soundId}.json`), 'both files are named');
+  assert.ok(r.out.includes(`sprites/${soundId}.json`) && r.out.includes(`sounds/${soundId}.json`), 'both files are named');
   assert.match(r.out, /rename/i, 'it says what to do');
   assert.doesNotMatch(r.out, /bundles\//, 'no bundle is blamed for it');
   assert.doesNotMatch(r.out, /move it to/, r.out);

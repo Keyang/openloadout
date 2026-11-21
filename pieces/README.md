@@ -196,12 +196,15 @@ and `base:person-topdown-trooper@2` (pinned, replaced by `@3`, which holds its c
 
 ## The side-view person (B16a): `base:person-side`, `part:*`, `held:*`
 
-Made by `tools/bake-person-side.mjs` from `rigs/humanoid.js` and the code Hero's parts (temporary, deleted with the
-code rigs); never edit these files by hand: change the baker and run `node tools/bake-person-side.mjs --write`, then
-`node tools/bake-person-side.mjs` (all `unchanged`) and `node --test tests/unit/pieces-person-side.test.mjs`. A changed
-piece goes to the next version by itself (a pinned one is never rewritten); pin it when it is released. `--sheet`
-writes `out/person-side-knight.png`: the Hero rebuilt from the pieces (`tests/fixtures/person-side/knight.json`, the
-worked example) beside the frozen code Hero (`tests/fixtures/code-sprites/knight.js`), every clip, and the difference.
+Made by `tools/bake-person-side.mjs` from `rigs/humanoid.js` and the code Hero's parts. **Both were deleted in R2b
+(2026-11-21)**, together with the code rig's frozen copies (`knight`, `wizard`, `spear-goblin`, `bone-soldier`, `thicket-imp`):
+these files are pinned data nothing rebuilds, so never edit one (`pieces/_pins.json` pins every released version; a change is
+a new version written by hand and pinned with `node tools/lib/pieces-index.mjs --pin`). The commands below that name the baker
+(`--write`, `--sheet`) are history, kept to say how each file was made. What the baker was tested against is recorded:
+`tests/fixtures/person-side/code-rig-clips.json` (the code rig's clip table), `code-rig-joints.json` (where its joints were in
+every frame of every clip), `code-moves.json` (its walk and run at Bounce and Stride), `tests/fixtures/code-frames/person-side-base.json`
+(its bare body in every frame), and the code Hero's frames in `tests/fixtures/code-replay/knight.json`;
+`tests/unit/pieces-person-side.test.mjs` holds the base to them.
 Latest versions: `base:person-side@6`, `part:hair@2`, `part:hair-long@1`, `part:ponytail@1`, `part:hair-nape@2`,
 `part:helmet@3`, `part:plume@1`, `part:crown@4`, `part:cape@1`, `part:cape-ground@2`, `part:belt@1`, `held:sword@1`,
 `held:axe@1`, `held:spear@1`. Older versions are kept only for their pins; nothing uses them.

@@ -13,9 +13,10 @@ import { workOutColour, COLOUR_WORK, BACKDROP_FRAME_GENERATORS, columnPolys } fr
 import { renderList } from '../../engine/draw-list.js';
 import { Surface } from '../../engine/surface.js';
 import { ridge, litEdge, fillBelow, fillBetween, skyLook, scatter as oldScatter } from '../../engine/backdrop.js';
-import { arch, spaceLook } from '../../engine/space.js';
+import { oldReplay } from '../helpers/old-replay.mjs';
 import { mix } from '../../engine/color.js';
 
+const OLD = oldReplay('gen-backdrop-goldens');   // what engine/space.js (deleted by R3) drew and answered, recorded in the order of the calls (tests/helpers/old-replay.mjs)
 const WIDE = { size: [96, 48] };
 const CASES = {
   'scatter@1': [
@@ -166,7 +167,7 @@ test('sky.look is engine/backdrop.js skyLook at day and dusk (and a rosier dawn)
 });
 
 test('space.look, haze, lit.tone and clear.of are the code helpers they port', () => {
-  const s = spaceLook('#7fb8e0', '#141a33');
+  const s = OLD.value();
   assert.equal(work({ rule: 'space.look', v: 1, of: 'sky', deep: 'void', at: 0 }), s.bands[0]);
   assert.equal(work({ rule: 'space.look', v: 1, of: 'sky', deep: 'void', at: 1 }), s.bands[2]);
   assert.equal(work({ rule: 'space.look', v: 1, of: 'sky', deep: 'void', what: 'air' }), s.air);
@@ -203,11 +204,7 @@ test('ridge@1 fills exactly what backdrop.js ridge + fillBelow + litEdge + fillB
 });
 
 test('swell@1 and fill.below@1 fill exactly what space.js arch with fillBelow and fillBetween fill', () => {
-  const old = new Surface(320, 180);
-  const limb = arch({ base: 156, height: 13, at: 160 }), sunlit = arch({ base: 5, height: -4, at: 232 });
-  fillBelow(old, limb, '#2fb3a8');
-  fillBetween(old, limb, (x) => limb(x) + sunlit(x), '#a0a8b8');
-  fillBelow(old, (x) => limb(x + 40) + 23, '#6a7280');
+  const old = OLD.surface(320, 180);
   const r1 = registry.runGenerator({ gen: 'swell', v: 1, base: 156, height: 13, at: 160, paint: 'land', rim: { depth: 5, grow: 4, at: 232, paint: 'lit' } }, { size: [320, 180] });
   const r2 = registry.runGenerator({ gen: 'fill.below', v: 1, ground: { kind: 'swell', base: 156, height: 13, at: 160 }, dx: -40, dy: 23, paint: 'rock' }, { size: [320, 180] });
   assert.ok(r1.ok && r2.ok, [...r1.errors, ...r2.errors].join('; '));

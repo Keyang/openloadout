@@ -14,11 +14,12 @@ import assert from 'node:assert/strict';
 import * as registry from '../../engine/gen/index.js';
 import { checkGeneratorContract } from '../helpers/gen-harness.mjs';
 import { Surface, ellipseIn, capsuleIn, polyIn, rectIn } from '../../engine/surface.js';
-import { ramp, tone, INK } from '../../engine/color.js';
-import { twinkle } from '../../engine/fx.js';
-import { iconPen, iconPaint, iconOver, iconBold, iconFlame, iconPlate, iconSlant, iconRise, iconTidy, iconLine, ICON_LEAN, ICON_SLANT } from '../../engine/icons.js';
+import { tone, INK } from '../../engine/color.js';
 import { paintColour } from '../../engine/data-rules.js';
 import { drawList } from '../../engine/draw-list.js';
+import { oldReplay } from '../helpers/old-replay.mjs';
+
+const OLD = oldReplay('gen-icon-sets');   // what engine/icons.js (deleted by R3) drew, recorded in the order of the calls (tests/helpers/old-replay.mjs)
 
 const DEG = 180 / Math.PI;
 const run = (node, ctx = { size: [32, 32] }) => {
@@ -44,6 +45,7 @@ function differ(a, b) {
 const same = (a, b, label) => assert.deepEqual(differ(a, b).slice(0, 6), [], `${label}: pixels differ`);
 const HEX = { body: '#c9423a', gold: '#f2c230', ink: INK, rim: '#5a2a2a', face: '#4a609c', fire: '#e8662c', core: '#f4e06a', flare: '#a8402a', shine: '#ffffff' };
 
+const ICON_LEAN = Math.atan(0.5), ICON_SLANT = 0.25;   // what engine/icons.js (deleted by R3) said: the lean of an icon, and the slant of a worn thing's rows
 const PENS = [[ICON_LEAN, 1, true, true], [-ICON_LEAN / 2, 0.83, false, true], [0, 1.17, true, false]];
 const CASES = [
   { tests: [ellipseIn(1.5, 0, 9.6, 5.4)], shapes: [{ kind: 'ellipse', at: [1.5, 0], r: [9.6, 5.4] }], opt: { soft: 1 }, args: { soft: 1 } },
@@ -55,9 +57,7 @@ const CASES = [
 
 test('icon.body@1 paints what engine/icons.js iconPaint paints, through the plain pen and through iconBold\'s', () => {
   for (const [i, c] of CASES.entries()) for (const [angle, scale, shade, shine] of PENS) for (const bold of [0, 0.5]) {
-    const plain = iconPen({ tilt: true, angle, scale, shade, shine, cx: 16, cy: 16, span: [1, 1] });
-    const pen = bold ? iconBold(plain, bold) : plain;
-    const want = iconPaint(new Surface(32, 32), pen, c.tests, ramp(HEX.body), c.opt);
+    const want = OLD.surface(32, 32);
     const prims = run({ gen: 'icon.body', v: 1, shapes: c.shapes, paint: 'body', ...c.args, grow: bold, scale, turn: angle * DEG, soften: shade, shiny: shine });
     same(draw(prims, HEX), want, `case ${i} angle ${angle.toFixed(2)} scale ${scale} bold ${bold}`);
   }
@@ -65,11 +65,10 @@ test('icon.body@1 paints what engine/icons.js iconPaint paints, through the plai
 
 test('icon.body@1 with a band (and middle, highlight) paints iconPaint\'s hand-made ramp: tones of colours of their own', () => {
   for (const [angle, scale, shade, shine] of PENS) {
-    const pen = iconPen({ tilt: true, angle, scale, shade, shine, cx: 16, cy: 16, span: [1, 1] });
-    const want = iconPaint(new Surface(32, 32), pen, CASES[0].tests, { base: HEX.gold, dark: HEX.rim, light: HEX.rim }, { soft: 0, light: 0 });
+    const want = OLD.surface(32, 32);
     const prims = run({ gen: 'icon.body', v: 1, shapes: CASES[0].shapes, paint: 'gold', band: 'rim', soft: 0, lit: 0, scale, turn: angle * DEG, soften: shade, shiny: shine });
     same(draw(prims, HEX), want, `band angle ${angle.toFixed(2)}`);
-    const want2 = iconPaint(new Surface(32, 32), pen, CASES[1].tests, { base: HEX.gold, dark: HEX.rim, light: HEX.body, mid: HEX.fire }, { soft: 2, minus: CASES[1].opt.minus });
+    const want2 = OLD.surface(32, 32);
     const prims2 = run({ gen: 'icon.body', v: 1, shapes: CASES[1].shapes, minus: CASES[1].args.minus, paint: 'gold', band: 'rim', middle: 'fire', highlight: 'body', scale, turn: angle * DEG, soften: shade, shiny: shine });
     same(draw(prims2, HEX), want2, `a whole hand-made ramp, angle ${angle.toFixed(2)}`);
   }
@@ -78,9 +77,7 @@ test('icon.body@1 with a band (and middle, highlight) paints iconPaint\'s hand-m
 test('icon.body@1 with holes grows a ring as one shape (iconBold of ringIn: its opening narrows), with minus as iconPaint cuts', async () => {
   const { ringIn } = await import('../../engine/shapes.js');
   for (const [angle, scale] of PENS) for (const bold of [0, 0.5]) {
-    const plain = iconPen({ tilt: true, angle, scale, cx: 16, cy: 16, span: [1, 1] });
-    const pen = bold ? iconBold(plain, bold) : plain;
-    const want = iconPaint(new Surface(32, 32), pen, [ringIn(0, 0, 9, 3), rectIn(-12, -1, 4, 2)], ramp(HEX.body), { soft: 0, minus: rectIn(6, -2, 6, 4) });
+    const want = OLD.surface(32, 32);
     const prims = run({ gen: 'icon.body', v: 1, shapes: [{ kind: 'ellipse', at: [0, 0], r: [9, 9] }, { kind: 'rect', at: [-12, -1], size: [4, 2] }], holes: [{ kind: 'ellipse', at: [0, 0], r: [6, 6] }], minus: [{ kind: 'rect', at: [6, -2], size: [6, 4] }], paint: 'body', soft: 0, grow: bold, scale, turn: angle * DEG });
     same(draw(prims, HEX), want, `ring angle ${angle.toFixed(2)} bold ${bold}`);
   }
@@ -88,9 +85,7 @@ test('icon.body@1 with holes grows a ring as one shape (iconBold of ringIn: its 
 
 test('icon.rim@1 paints iconPaint\'s rim (with `over` inside icon.fitted, iconOver\'s parting line: tested there)', () => {
   for (const [i, c] of CASES.entries()) for (const [angle, scale] of PENS) for (const bold of [0, 0.5]) {
-    const plain = iconPen({ tilt: true, angle, scale, cx: 16, cy: 16, span: [1, 1] });
-    const pen = bold ? iconBold(plain, bold) : plain;
-    const want = iconPaint(new Surface(32, 32), pen, c.tests, ramp(HEX.body), { ...c.opt, rim: HEX.rim });
+    const want = OLD.surface(32, 32);
     const rim = run({ gen: 'icon.rim', v: 1, shapes: c.shapes, minus: c.args.minus ?? [], within: c.args.within ?? [], paint: 'rim', grow: bold, scale, turn: angle * DEG });
     const body = run({ gen: 'icon.body', v: 1, shapes: c.shapes, paint: 'body', ...c.args, grow: bold, scale, turn: angle * DEG });
     same(draw(body, HEX, draw(rim, HEX)), want, `rim case ${i} angle ${angle.toFixed(2)} bold ${bold}`);
@@ -100,8 +95,7 @@ test('icon.rim@1 paints iconPaint\'s rim (with `over` inside icon.fitted, iconOv
 
 test('icon.flame@1 paints iconFlame: no ink line, rising straight up, rimmed with a darker tone', () => {
   for (const [angle, scale] of PENS) for (const [h, w, sway] of [[7, 5, 0], [8, 6, 0], [6, 4, 1]]) {
-    const pen = iconPen({ tilt: true, angle, scale, cx: 16, cy: 16, span: [1, 1] });
-    const want = iconFlame(new Surface(32, 32), pen, 1.5, -6, { h, w, sway, colours: [HEX.core, HEX.fire] });
+    const want = OLD.surface(32, 32);
     const prims = run({ gen: 'icon.flame', v: 1, at: [1.5, -6], h, w, sway, paint: 'fire', core: 'core', rim: 'flare', scale, turn: angle * DEG });
     same(draw(prims, { ...HEX, flare: tone(HEX.fire, -1) }), want, `flame ${h} ${w} ${sway} angle ${angle.toFixed(2)}`);
   }
@@ -109,8 +103,7 @@ test('icon.flame@1 paints iconFlame: no ink line, rising straight up, rimmed wit
 
 test('icon.plate@1 paints iconPlate: a hexagon or a disc with its own ink line, sized by Size', () => {
   for (const shape of ['hex', 'circle']) for (const size of [0, 0.3, 0.5, 0.8, 1]) for (const shine of [true, false]) {
-    const want = new Surface(32, 32);
-    iconPlate(want, { shape, size, face: HEX.face, shine });
+    const want = OLD.surface(32, 32);
     const prims = run({ gen: 'icon.plate', v: 1, at: [16, 16], shape, size, face: 'face', shine });
     same(draw(prims, HEX), want, `${shape} size ${size} shine ${shine}`);
   }
@@ -122,34 +115,20 @@ const BODIES = [
   { tests: [ellipseIn(4, 3, 3, 3)], prims: [{ kind: 'ellipse', at: [4, 3], r: [3, 3], paint: 'rim', shade: 0, light: 0 }], paint: 'rim', opt: { flat: true } },
 ];
 const CUT = { kind: 'cut', from: 'neck', shape: { kind: 'ellipse', at: [0, -7], r: [1.5, 1.5], paint: 'body' } };
-const paintBodies = (s, pen, cut = false) => { for (const [i, b] of BODIES.entries()) iconPaint(s, pen, b.tests, ramp(HEX[b.paint]), { ...b.opt, ...(cut && i === 1 ? { minus: ellipseIn(0, -7, 1.5, 1.5) } : {}) }); };
 const bodyPrims = BODIES.flatMap((b) => b.prims);
 const SIZES = [0, 0.2, 0.5, 0.7, 1];
 
 test('icon.fitted@1 draws its shapes as iconPaint bodies (shade, light, group, cut), its creases, and fits them as iconFit does', async () => {
-  const { iconFit } = await import('../../engine/icons.js');
   for (const size of SIZES) for (const fill of [1, 0.86]) for (const [tilt, angle] of [[true, ICON_LEAN], [false, ICON_LEAN], [true, -Math.PI / 4]]) for (const [shade, shine] of [[true, true], [false, false]]) {
-    const want = new Surface(32, 32);
-    iconFit(want, { size, fill, tilt, angle, shade, shine }, (s, p) => { paintBodies(s, p, true); iconLine(s, p, [[-6, 2], [6, 2]], HEX.rim, { over: true }); iconTidy(s).outline(INK); });
+    const want = OLD.surface(32, 32);
     const prims = run({ gen: 'icon.fitted', v: 1, size, fill, tilt, turn: angle * DEG, soften: shade, shiny: shine, draw: [...bodyPrims, CUT, { kind: 'line', from: [-6, 2], to: [6, 2], paint: 'rim' }] });
     same(draw(prims, HEX), want, `size ${size} fill ${fill} tilt ${tilt} angle ${angle.toFixed(2)} shade ${shade}`);
   }
 });
 
 test('icon.fitted@1 puts its lights on after the ink line, and draws bold (iconBold), calls with the pen and stamps at icon points', async () => {
-  const { iconFit } = await import('../../engine/icons.js');
   for (const size of SIZES) {
-    const want = new Surface(32, 32);
-    iconFit(want, { size, tilt: true, angle: ICON_LEAN }, (s, p) => {
-      const b = iconBold(p, 0.5);
-      paintBodies(s, b);
-      iconOver(s, b, ellipseIn(-4, 4, 3, 3), HEX.fire, { soft: 0, light: 0 });
-      const [x, y] = p.pt(0, 2).map(Math.floor);
-      s.rect(x - 1, y, 3, 1, HEX.rim).rect(x, y - 1, 1, 3, HEX.rim);
-      iconTidy(s).outline(INK);
-      twinkle(s, ...p.pt(3, -10), 2, HEX.fire);
-      iconFlame(s, p, 6, -6, { colours: [HEX.core, HEX.fire] });
-    });
+    const want = OLD.surface(32, 32);
     const prims = run({ gen: 'icon.fitted', v: 1, size, turn: ICON_LEAN * DEG, grow: 0.5, draw: [
       ...bodyPrims,
       { gen: 'icon.rim', v: 1, shapes: [{ kind: 'ellipse', at: [-4, 4], r: [3, 3], paint: 'ink' }], paint: 'ink', over: true },
@@ -164,23 +143,17 @@ test('icon.fitted@1 puts its lights on after the ink line, and draws bold (iconB
 });
 
 test('icon.fitted@1 leans by rows (iconSlant) and raises by columns (iconRise), its lights where the lean moved them', async () => {
-  const { iconFit } = await import('../../engine/icons.js');
   for (const size of SIZES) for (const slope of [ICON_SLANT, 0.5]) {
-    const want = new Surface(32, 32);
-    iconFit(want, { size, tilt: false, angle: 0 }, (s, p) => { iconSlant(s, slope, (u) => paintBodies(u, p)); iconTidy(s).outline(INK); });
+    const want = OLD.surface(32, 32);
     same(draw(run({ gen: 'icon.fitted', v: 1, size, tilt: false, slant: slope, draw: bodyPrims }), HEX), want, `slant ${slope} size ${size}`);
-    const up = new Surface(32, 32);
-    iconFit(up, { size, tilt: false, shade: false }, (s, p) => { const moved = iconRise(s, slope, (u) => paintBodies(u, p)); iconTidy(s).outline(INK); twinkle(s, ...moved(...p.pt(4, 3)), 1, HEX.fire); });
+    const up = OLD.surface(32, 32);
     same(draw(run({ gen: 'icon.fitted', v: 1, size, tilt: false, soften: false, rise: slope, draw: bodyPrims, lights: [{ gen: 'twinkle', v: 1, at: [4, 3], size: 1, paint: 'fire', core: 'shine' }] }), HEX), up, `rise ${slope} size ${size}`);
   }
 });
 
 test('icon.fitted@1 on a plate draws iconPlate first and fits the icon to its room, as the settings icons did', async () => {
-  const { iconFit } = await import('../../engine/icons.js');
   for (const shape of ['hex', 'circle']) for (const size of SIZES) for (const [fill, shine] of [[1, true], [0.9, false]]) {
-    const want = new Surface(32, 32);
-    const plate = iconPlate(want, { shape, size, face: HEX.face, shine });
-    iconFit(want, { size, tilt: false, angle: 0, shade: false, shine, fill, span: [plate.room, plate.room] }, (s, p) => { paintBodies(s, iconBold(p, 0.5)); iconTidy(s).outline(INK); });
+    const want = OLD.surface(32, 32);
     const prims = run({ gen: 'icon.fitted', v: 1, size, fill, tilt: false, soften: false, shiny: shine, grow: 0.5, plate: shape, face: 'face', draw: bodyPrims });
     same(draw(prims, HEX), want, `${shape} plate, size ${size}, fill ${fill}`);
   }
@@ -188,14 +161,12 @@ test('icon.fitted@1 on a plate draws iconPlate first and fits the icon to its ro
 
 test('oval@1 is a turned ellipse, as placedIn turns ellipseIn, and joins an icon.fitted body by its group', async () => {
   const { placedIn } = await import('../../engine/shapes.js');
-  const { iconFit } = await import('../../engine/icons.js');
   for (const turn of [-24, 0, 33, 90]) {
     const want = new Surface(32, 32).fill(0, 0, 32, 32, placedIn(ellipseIn(0, 0, 9, 5), 16, 15, { angle: turn / DEG }), HEX.gold);
     same(draw(run({ gen: 'oval', v: 1, at: [16, 15], r: [9, 5], turn, paint: 'gold' }).map((p) => ({ ...p, shade: 0 })), HEX), want, `oval ${turn}`);
   }
   for (const size of SIZES) {
-    const want = new Surface(32, 32);
-    iconFit(want, { size, tilt: false, shade: false }, (s, p) => { iconPaint(s, p, [rectIn(-2, -10, 3, 16), placedIn(ellipseIn(0, 0, 4, 2.9), -4, 7, { angle: -0.42 })], ramp(HEX.body), { soft: 0 }); iconTidy(s).outline(INK); });
+    const want = OLD.surface(32, 32);
     const prims = run({ gen: 'icon.fitted', v: 1, size, tilt: false, soften: false, draw: [
       { kind: 'rect', at: [-2, -10], size: [3, 16], paint: 'body', shade: 1, group: 'note' },
       { gen: 'oval', v: 1, at: [-4, 7], r: [4, 2.9], turn: -0.42 * DEG, paint: 'body', group: 'note' },
@@ -218,14 +189,13 @@ function cogTeeth() {
 }
 
 test('icon.fitted@1 with room 32 searches for the scale in the 32 px frame as iconFit did: a try too big is measured as the frame cut it', async () => {
-  const { iconFit } = await import('../../engine/icons.js');
   // a long thing on the diagonal (the tool icons' axe at Size 0.8 to 1 settled elsewhere without its room)
   const tests = [rectIn(-1.3, -10.6, 2.6, 22.1), ellipseIn(4, -8.6, 7.8, 8.2)];
   const prims = [{ kind: 'rect', at: [-1.3, -10.6], size: [2.6, 22.1], paint: 'body', group: 'a' }, { kind: 'ellipse', at: [4, -8.6], r: [7.8, 8.2], paint: 'body', group: 'a' }];
   let without = 0;
   for (let i = 0; i <= 100; i += 2) for (const angle of [Math.PI / 4, -Math.PI / 4]) {
-    const size = i / 100, want = new Surface(32, 32);
-    iconFit(want, { size, tilt: true, angle, shade: true, shine: true }, (s, p) => { iconPaint(s, p, tests, ramp(HEX.body), { soft: 1 }); iconTidy(s).outline(INK); });
+    const size = i / 100;
+    const want = OLD.surface(32, 32);
     const call = { gen: 'icon.fitted', v: 1, size, turn: angle * DEG, draw: prims.map((q) => ({ ...q, shade: 2 })) };
     same(draw(run({ ...call, room: 32 }), HEX), want, `room 32, size ${size}, angle ${angle.toFixed(2)}`);
     if (differ(draw(run(call), HEX), want).length) without++;
@@ -237,9 +207,7 @@ test('icon.body@1 with grouped holes: two rings in one body are shaded as one, a
   const { ringIn } = await import('../../engine/shapes.js');
   const wedge = [[2.4, -1.38], [40, -44.62], [40, 44.62], [2.4, 1.38]];
   for (const [angle, scale, shade, shine] of PENS) for (const bold of [0, 0.5]) {
-    const plain = iconPen({ tilt: true, angle, scale, shade, shine, cx: 16, cy: 16, span: [1, 1] });
-    const pen = bold ? iconBold(plain, bold) : plain;
-    const want = iconPaint(new Surface(32, 32), pen, [ringIn(-0.6, 0, 6.4, 2.4), ringIn(-0.6, 0, 11, 2.4)], ramp(HEX.body), { soft: 0, clip: polyIn(wedge) });
+    const want = OLD.surface(32, 32);
     const prims = run({ gen: 'icon.body', v: 1, shapes: [{ kind: 'ellipse', at: [-0.6, 0], r: [6.4, 6.4], group: 'near' }, { kind: 'ellipse', at: [-0.6, 0], r: [11, 11], group: 'far' }],
       holes: [{ kind: 'ellipse', at: [-0.6, 0], r: [4, 4], group: 'near' }, { kind: 'ellipse', at: [-0.6, 0], r: [8.6, 8.6], group: 'far' }], within: [{ kind: 'poly', points: wedge }], paint: 'body', soft: 0, grow: bold, scale, turn: angle * DEG, soften: shade, shiny: shine });
     same(draw(prims, HEX), want, `two rings, angle ${angle.toFixed(2)} bold ${bold}`);
@@ -249,10 +217,7 @@ test('icon.body@1 with grouped holes: two rings in one body are shaded as one, a
 test('icon.body@1 with grouped holes: a half ring (a ring less a half plane, as a lambda drew it) beside a whole shape, grown as one', async () => {
   const { ringIn } = await import('../../engine/shapes.js');
   for (const [angle, scale] of PENS) for (const bold of [0, 0.5]) {
-    const plain = iconPen({ tilt: true, angle, scale, cx: 16, cy: 16, span: [1, 1] });
-    const pen = bold ? iconBold(plain, bold) : plain;
-    const arch = ringIn(-3.5, -2.6, 6.6, 1.9);
-    const want = iconPaint(new Surface(32, 32), pen, [(px, py) => arch(px, py) && py < -2.6, capsuleIn(1.6, 6, 8.6, -6.4, 1.5, 1.5)], ramp(HEX.body), { soft: 0 });
+    const want = OLD.surface(32, 32);
     const prims = run({ gen: 'icon.body', v: 1, shapes: [{ kind: 'ellipse', at: [-3.5, -2.6], r: [6.6, 6.6], group: 'arch' }, { kind: 'capsule', from: [1.6, 6], to: [8.6, -6.4], r: [1.5, 1.5] }],
       holes: [{ kind: 'ellipse', at: [-3.5, -2.6], r: [4.7, 4.7], group: 'arch' }, { kind: 'rect', at: [-64, -2.6], size: [128, 128], group: 'arch' }], paint: 'body', soft: 0, grow: bold, scale, turn: angle * DEG });
     same(draw(prims, HEX), want, `half ring, angle ${angle.toFixed(2)} bold ${bold}`);

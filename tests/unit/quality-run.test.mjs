@@ -13,7 +13,7 @@ const tmp = () => fs.mkdtempSync(path.join(os.tmpdir(), 'quality-run-'));
 
 test('runs sprites and sounds, then serves unchanged assets from the cache', async () => {
   const dir = tmp(), cacheFile = path.join(dir, 'quality.json');
-  const job = { sprites: [path.join(FX, 'sprite-files', 'q-good.js')], sounds: [path.join(FX, 'sounds', 'good-blip.json'), path.join(FX, 'sounds', 'silent.json')], cacheFile };
+  const job = { sprites: [path.join(FX, 'sprite-files', 'q-good.json')], sounds: [path.join(FX, 'sounds', 'good-blip.json'), path.join(FX, 'sounds', 'silent.json')], cacheFile };
   const a = await runQuality(job);
   assert.equal(a.results.length, 3);
   assert.deepEqual(a.results.map((r) => [r.kind, r.id, r.cached]), [['sprite', 'q-good', false], ['sound', 'q-blip', false], ['sound', 'q-silent', false]]);
@@ -40,21 +40,21 @@ test('a changed asset is checked again', async () => {
 });
 
 test('a sprite file that cannot be loaded is reported as that sprite\'s error, and the run goes on', async () => {
-  const r = await runQuality({ sprites: [path.join(FX, 'sprite-files', 'q-bad-parts.js'), path.join(FX, 'sprite-files', 'q-good.js')], sounds: [], cache: false });
+  const r = await runQuality({ sprites: [path.join(FX, 'sprite-files', 'q-bad-parts.json'), path.join(FX, 'sprite-files', 'q-good.json')], sounds: [], cache: false });
   assert.equal(r.results.length, 2);
   const bad = r.results.find((x) => x.id === 'q-bad-parts');
   assert.equal(bad.ok, false);
-  assert.match(bad.errors[0], /cannot be loaded: .*"hatShape" is not one of the sprite's controls/);
+  assert.match(bad.errors[0], /cannot be loaded: .*"hatShape".* not one of the sprite's controls/);
   const good = r.results.find((x) => x.id === 'q-good');
   assert.ok(good.metrics.looks > 0, 'the next sprite was still checked');
   assert.ok(!good.errors.some((e) => /cannot be loaded/.test(e)));
 });
 
 test('a result is keyed on the asset, the checker and the metadata rules (the detail is in build-quality-cache.test.mjs)', () => {
-  const file = path.join(FX, 'sprite-files', 'q-good.js');
+  const file = path.join(FX, 'sprite-files', 'q-good.json');
   const { files, open } = assetFiles(ROOT, 'sprite', file);
   const rel = files.map((f) => path.relative(ROOT, f).split(path.sep).join('/'));
-  for (const need of ['tests/fixtures/quality/sprite-files/q-good.js', 'engine/sprite.js', 'quality/sprite.js', 'catalog/schema.js']) assert.ok(rel.includes(need), need);
+  for (const need of ['tests/fixtures/quality/sprite-files/q-good.json', 'engine/data-sprite.js', 'quality/sprite.js', 'catalog/schema.js']) assert.ok(rel.includes(need), need);
   assert.equal(open, false);
   assert.deepEqual(assetFiles(ROOT, 'sprite', file).files, files, 'stable');
 });

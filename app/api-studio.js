@@ -5,7 +5,7 @@
 //   const { draft } = await s.create({ from: 'template:four-legs', name: 'Moss beast' });
 //   const { definition } = await s.get(draft);  definition.colours.fur = '#4f9d57';  await s.set(draft, definition);
 //   const { png } = await s.render(draft, { clip: 'walk', scale: 4 });       // the walk, every frame in one row
-//   const { name, text } = await s.file(draft);                              // sprites/<id>.js for the library
+//   const { name, text } = await s.file(draft);                              // a file to keep (a version 1 draft's .js is not a library file since R4a: library.ok is false)
 //
 // Each member is also an action in app/api-actions.js (studio_create, studio_render, ...), so generated/api.json lists
 // it for an MCP server. app/api-core.js loads this file the first time a studio action is called.
@@ -465,13 +465,13 @@ export function createStudio(env = {}) {
       let r;
       try { r = checkSprite(made.sprite, { validateMeta, ...(soundIndex ? { soundIndex } : {}) }); } catch (e) { throw new Problem(`The quality bar could not look at it: ${messageOf(e)}`); }
       const suggestions = [...r.warnings, ...(soundIndex ? [] : ['The sounds it plays were not checked: the sound library could not be read.'])];
-      return { ok: true, passes: r.errors.length === 0, problems: r.errors, suggestions, metrics: plain(r.metrics), note: 'Advice only: a studio sprite goes in the bag and downloads whatever this says. These are what the library would ask before taking it as a file in sprites/.' };
+      return { ok: true, passes: r.errors.length === 0, problems: r.errors, suggestions, metrics: plain(r.metrics), note: 'Advice only: a studio sprite goes in the bag and downloads whatever this says. These are what the quality bar asks of a library sprite, which is a data file sprites/<id>.json made with the /sprite-forge skill.' };
     },
 
     toBag: async (draft) => {
       const d = draftOf(draft);
       const m = await bagModule();
-      if (!bagHolds(m, d.value)) throw new Problem(`Not yet: the bag cannot hold a sprite made in the studio until it learns to (studio work item S8). Meanwhile, studio_file gives the library file (sprites/${d.value.id}.js) and studio_render gives pictures.`);
+      if (!bagHolds(m, d.value)) throw new Problem(`Not yet: the bag cannot hold a sprite made in the studio until it learns to (studio work item S8). Meanwhile, studio_file gives the draft as a file and studio_render gives pictures.`);
       if (d.entry.bagKey && inBag(m, d.entry.bagKey)) {
         if (typeof m.bag.updateDefinition === 'function') m.bag.updateDefinition(d.entry.bagKey, { data: d.value });
         return { ok: true, draft: d.name, key: d.entry.bagKey, added: false, saved: !store.pending() && kept, warnings: [] };
@@ -491,7 +491,9 @@ export function createStudio(env = {}) {
       const w = F.writeDataFile(value, opts);
       if (!w.ok) throw new Problem(w.errors, { warnings: w.warnings });
       const strict = F.writeDataFile(value, { ...opts, strict: true });
-      return { ok: true, name: w.name, text: w.text, warnings: [...w.warnings, ...(problem ? [problem] : [])], library: { ok: strict.ok, errors: strict.errors } };
+      // a version 1 definition is the studio's own form: the library refuses its .js file (build item R4a), whatever the strict check says
+      const closed = `The library takes only a data sprite (sprites/${value.id}.json, format "loadout-sprite", version 2), made with the /sprite-forge skill; it refuses this version 1 studio file (${w.name}). Keep the file as your own copy.`;
+      return { ok: true, name: w.name, text: w.text, warnings: [...w.warnings, ...(problem ? [problem] : [])], library: { ok: false, errors: [closed, ...strict.errors] } };
     },
 
     remove: async (draft) => {

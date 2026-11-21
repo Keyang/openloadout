@@ -11,10 +11,10 @@ import { checkGeneratorContract } from '../helpers/gen-harness.mjs';
 import { STAMP_BOUNDS, SIZE_KEYS, FRAME_GENERATORS } from '../../engine/gen/index.js';
 import { stampPixels } from '../../engine/gen/args.js';
 import { Surface } from '../../engine/surface.js';
-import * as SPELLS from '../../engine/spells.js';
-import { spikesIn } from '../../engine/blast.js';
-import * as FLOOR from '../../engine/fx-floor.js';
 import { ellipseIn } from '../../engine/surface.js';
+import { oldReplay } from '../helpers/old-replay.mjs';
+
+const OLD = oldReplay('gen-fx-e1');   // what the modules that are gone (engine/spells.js, blast.js, fx-floor.js) drew, recorded in the order of the calls (tests/helpers/old-replay.mjs)
 
 const HEX = { p0: '#ffffff', p1: '#f0ead8', p2: '#f1c584', p3: '#f2a030', p4: '#8a5410' };
 const P5 = ['p0', 'p1', 'p2', 'p3', 'p4'];
@@ -154,26 +154,10 @@ test('crescent@1 draws what engine/spells.js crescent draws: its ends through at
     { at: [32, 32], length: 44, angle: 150, bulge: 10, width: 4, claws: 4, gap: 5, paints: P4 },
     { at: [32, 32], length: 40, angle: 130, bulge: 9, width: 4, claws: 5, gap: 4, seed: 2, jag: 1, paints: P5 },
   ];
-  // the strokes a claw mark draws, written out for each count: [sideways offset, share of the length, share of the width], the middle one last
-  const CLAWS = {
-    1: () => [[0, 1, 1]],
-    2: (gp) => [[-gp, 1 - 0.17, 0.87], [0, 1, 1]],
-    3: (gp) => [[-gp, 1 - 0.17, 0.87], [gp, 1 - 0.17, 0.87], [0, 1, 1]],
-    4: (gp) => [[-gp, 1 - 0.17, 0.87], [gp, 1 - 0.17, 0.87], [-2 * gp, 1 - 0.17 * 2, 0.87], [0, 1, 1]],
-    5: (gp) => [[-gp, 1 - 0.17, 0.87], [gp, 1 - 0.17, 0.87], [-2 * gp, 1 - 0.17 * 2, 0.87], [2 * gp, 1 - 0.17 * 2, 0.87], [0, 1, 1]],
-  };
   let lit = 0;
   for (const o of cases) {
     const mine = drawn({ gen: 'crescent', v: 1, ...o }, size);
-    const theirs = new Surface(64, 64);
-    const C = o.paints.slice(Math.min(o.paints.length - 1, o.cool ?? 0)).map((p) => HEX[p]);
-    const A = (o.angle * Math.PI) / 180, ux = Math.sin(A), uy = Math.cos(A);
-    const strokes = CLAWS[o.claws ?? 1](o.gap);
-    for (const [off, len, wide] of strokes) {
-      const cx = o.at[0] - uy * off, cy = o.at[1] + ux * off, h = (o.length * len) / 2;
-      SPELLS.crescent(theirs, { x0: cx - ux * h, y0: cy - uy * h, x1: cx + ux * h, y1: cy + uy * h, bulge: o.flip ? -o.bulge : o.bulge, width: o.width * wide * (o.thin ?? 1), from: o.start ?? 0, to: o.end ?? 1,
-        head: o.head ?? 0.65, jag: o.jag ?? 0, teeth: o.teeth ?? 7, seed: o.seed ?? 0, colours: C });
-    }
+    const theirs = OLD.surface(64, 64);
     assert.equal(offBy(mine, theirs), 0, JSON.stringify(o));
     if (theirs.data.some((v) => v >>> 24)) lit++;
   }
@@ -196,7 +180,6 @@ test('crescent@1 stays within its stamp bound at any length, width, bow, jag and
 
 test('spike.fan@1 draws what engine/blast.js spikesIn and a disc draw as one blob, outlined in the paint rim steps cooler', () => {
   const size = [32, 32];
-  const clip = (px, py) => px >= 1 && py >= 1 && px < 31 && py < 31;
   const cases = [
     { at: [8.5, 15.5], count: 3, angle: 90, arc: 180, length: 16, short: 0.68, width: 5.5, disc: 3.2, paints: ['p1', 'p3'] },
     { at: [8.5, 15.5], count: 5, angle: 90, arc: 92, length: 18, grow: 1.1, from: 0.28, short: 1, width: 6, thin: 0.55, belly: 0.74, disc: 1.8, cool: 1, paints: P5 },
@@ -205,11 +188,7 @@ test('spike.fan@1 draws what engine/blast.js spikesIn and a disc draw as one blo
   ];
   for (const o of cases) {
     const mine = drawn({ gen: 'spike.fan', v: 1, ...o }, size);
-    const theirs = new Surface(32, 32);
-    const C = o.paints.slice(Math.min(o.paints.length - 1, o.cool ?? 0)), rim = C[o.rim ?? 1];
-    const r1 = o.length * (o.grow ?? 1), r0 = r1 * (o.from ?? 0);
-    const fan = spikesIn(o.at[0], o.at[1], { count: o.count, angle: (o.angle * Math.PI) / 180, arc: (o.arc * Math.PI) / 180, r0, r1, short: o.short ?? 0.6, width: o.width * (o.thin ?? 1), belly: o.belly ?? 0.3, hair: o.hair ?? true });
-    theirs.blob([fan, ...(o.disc ? [ellipseIn(o.at[0], o.at[1], o.disc, o.disc)] : [])], HEX[C[0]], { shade: 0, clip, ...(rim ? { outline: HEX[rim] } : {}) });
+    const theirs = OLD.surface(32, 32);
     assert.equal(offBy(mine, theirs), 0, JSON.stringify(o));
     assert.ok(theirs.data.some((v) => v >>> 24));
   }
@@ -234,9 +213,7 @@ test('floor.ring@1 draws what engine/fx-floor.js floorRing draws (r x scale; deg
   ];
   for (const o of cases) {
     const mine = drawn({ gen: 'floor.ring', v: 1, ...o }, size);
-    const theirs = new Surface(48, 48);
-    FLOOR.floorRing(theirs, { x: o.at[0], y: o.at[1], r: o.r * (o.scale ?? 1), squash: o.squash, thick: o.thick ?? 2, sides: o.sides ?? 0, turn: ((o.turn ?? 0) * Math.PI) / 180,
-      gaps: o.gaps ?? 0, open: o.open ?? 0.3, phase: ((o.phase ?? 0) * Math.PI) / 180, heat: o.heat ?? 1, rim: o.rim, colours: o.paints.map((p) => HEX[p]) });
+    const theirs = OLD.surface(48, 48);
     assert.equal(offBy(mine, theirs), 0, JSON.stringify(o));
     assert.ok(theirs.data.some((v) => v >>> 24));
   }
@@ -251,10 +228,7 @@ test('rift@1 draws what engine/fx-floor.js riftIn painted with lightShape draws 
   ];
   for (const o of cases) {
     const mine = drawn({ gen: 'rift', v: 1, ...o }, size);
-    const theirs = new Surface(48, 48);
-    const s = o.scale ?? 1, C = o.paints.map((p) => HEX[p]);
-    const tear = FLOOR.riftIn(o.at[0], o.at[1], o.length * s, o.across * s, { seed: o.seed ?? 0, teeth: o.teeth ?? 3, jag: o.jag ?? 0.5, open: o.open ?? 1, angle: ((o.angle ?? 90) * Math.PI) / 180 });
-    FLOOR.lightShape(theirs, tear, { colours: C.length >= 3 ? C.slice(1) : C, heart: C.length >= 3 ? C[0] : null, rim: o.rim });
+    const theirs = OLD.surface(48, 48);
     assert.equal(offBy(mine, theirs), 0, JSON.stringify(o));
     assert.ok(theirs.data.some((v) => v >>> 24));
   }

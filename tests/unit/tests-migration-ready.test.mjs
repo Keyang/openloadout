@@ -89,14 +89,12 @@ test('codeSprite: a code file with no frozen copy is read from sprites/; with ne
   assert.throws(() => codeSpriteAsFile('zz-not-a-sprite'), /zz-not-a-sprite/);
 });
 
-test('codeSpriteModule hands over named exports; codeSpriteAsFile puts the imports back for a project\'s sprites/ folder', async () => {
-  const knight = await codeSpriteModule('knight');
-  assert.equal(knight.default.id, 'knight');
-  assert.equal(typeof knight.weaponReach, 'function');
-  const text = codeSpriteAsFile('knight');
+test('codeSpriteModule hands over the module; codeSpriteAsFile puts the imports back for a project\'s sprites/ folder', async () => {
+  const slime = await codeSpriteModule('slime');   // (no frozen copy has named exports now that rigs/humanoid.js and its Hero, with weaponReach, are gone: R2b)
+  assert.equal(slime.default.id, 'slime');
+  const text = codeSpriteAsFile('slime');
   assert.ok(!text.includes("'../../../"), 'no import left pointing out of tests/');
   assert.match(text, /from '\.\.\/engine\/sprite\.js'/);
-  assert.match(text, /from '\.\.\/rigs\//);
 });
 
 test('no frozen copy is in the fixed data form: the two that were (rogue-battler, road-bandit) went with the library-body path (build item R1)', () => {
@@ -122,14 +120,14 @@ test('every frozen copy is pinned by its SHA-256 in SHA256SUMS, and no copy has 
   assert.deepEqual(changed, [], 'never edit a frozen copy (tests/fixtures/code-sprites/README.md): a test that needs a changed drawing tests the library asset');
 });
 
-test('codeSpritesWhere finds the code on a rig, the frozen copy first, one per id', () => {
-  const onRig = codeSpritesWhere(/rigs\/humanoid\.js/);   // the one code rig left after R2 (it goes with its five copies, when engine/data-rules.js stops importing apart from the figure module)
-  assert.ok(onRig.length >= 5, `${onRig.length}`);
-  assert.equal(new Set(onRig.map((s) => s.id)).size, onRig.length);
-  const hero = onRig.find((s) => s.id === 'knight');
-  assert.ok(hero, 'knight is on the rig');
-  assert.equal(hero.file, path.join(FROZEN_DIR, 'knight.js'));
-  for (const s of onRig) assert.equal(s.file, codeSpriteFile(s.id));
+test('codeSpritesWhere finds the code that uses a module, the frozen copy first, one per id', () => {
+  const onFx = codeSpritesWhere(/engine\/fx\.js/);   // (the code rigs it once looked for, rigs/humanoid.js last, are gone: R2b)
+  assert.ok(onFx.length >= 5, `${onFx.length}`);
+  assert.equal(new Set(onFx.map((s) => s.id)).size, onFx.length);
+  const crate = onFx.find((s) => s.id === 'crate');
+  assert.ok(crate, 'crate uses engine/fx.js');
+  assert.equal(crate.file, path.join(FROZEN_DIR, 'crate.js'));
+  for (const s of onFx) assert.equal(s.file, codeSpriteFile(s.id));
 });
 
 // ---- no test goes around the helpers -----------------------------------------------------------------------------

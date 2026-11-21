@@ -8,16 +8,16 @@
 //   node tools/render.mjs <id> --scale 6        bigger pixels (default 4)
 //   node tools/render.mjs <id> --clip fly      -> out/<id>-fly.png: just that clip, big pixels (scale 8), for close inspection
 //   node tools/render.mjs <id> --sheet          also write the real export: out/<id>.png + out/<id>.json
-//   node tools/render.mjs <file>                a sprite file by path: a code file (.js) or a data file (.json)
+//   node tools/render.mjs <file>                a sprite file by path: a data file (.json)
 //   node tools/render.mjs <id> --out <dir>      write the pictures to <dir> instead of out/
 // --set applies to the clips sheet and --clip close-ups; the variants sheet always uses its own looks.
-// A sprite is sprites/<id>.js (a program) or sprites/<id>.json (data, drawn by engine/data-sprite.js; build item B9).
+// A sprite is sprites/<id>.json (data, drawn by engine/data-sprite.js; build item B9). A code file (.js) is refused (build item R4a).
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
 import { encodePNG } from './png.mjs';
 import { renderFrame, renderSheet, defaultParams, cleanParams, randomParams } from '../engine/sprite.js';
-import { findSpriteFile, spriteIds, loadDataSprite } from './lib/assets.mjs';
+import { findSpriteFile, spriteIds, loadSpriteFile, refuseCodeId, CodeSpriteError } from './lib/assets.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -30,16 +30,15 @@ args.forEach((a, i) => { if (a === '--set') { const [k, ...v] = args[i + 1].spli
 const defaultScale = Number(flag('scale', 4));
 const scale = defaultScale;
 
-// there is no list of sprites: sprites/<id>.js or sprites/<id>.json is the sprite, and it is loaded directly
-const asPath = !!arg && (/\.(m?js|json)$/.test(arg) || arg.includes('/') || arg.includes(path.sep));
+// there is no list of sprites: sprites/<id>.json is the sprite, and it is loaded directly
+const asPath = !!arg && (/\.(m?js|cjs|ts|json)$/.test(arg) || arg.includes('/') || arg.includes(path.sep));
 const spriteFile = asPath ? path.resolve(arg) : findSpriteFile(root, arg);
 let sprite = null;
 if (spriteFile && fs.existsSync(spriteFile)) {
-  if (spriteFile.endsWith('.json')) {
-    try { sprite = await loadDataSprite(root, spriteFile); } catch (e) { console.error(e.message); process.exit(1); }
-  } else sprite = (await import(pathToFileURL(spriteFile).href)).default;
+  try { sprite = await loadSpriteFile(root, spriteFile); } catch (e) { console.error(e.message); process.exit(1); }   // a code file is refused with the way to make it as data
 }
 if (!sprite) {
+  if (!asPath) { try { refuseCodeId(root, arg); } catch (e) { if (!(e instanceof CodeSpriteError)) throw e; console.error(e.message); process.exit(1); } }   // an id that exists only as a code file
   console.error(`Unknown sprite "${arg}". Known: ${spriteIds(root).join(', ')}`);
   process.exit(1);
 }

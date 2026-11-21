@@ -1,8 +1,13 @@
 // The side-view person as data (build item B16a; docs/data-sprites.md sections 1.1, 3.3, 7 and 9 row B16): the base
 // piece base:person-side baked from rigs/humanoid.js, and the parts people swap on it (hair, headgear, cape, belt,
-// held things) as part and held pieces, all written by tools/bake-person-side.mjs. Held to here:
-//   - the pieces in pieces/ are exactly what the baker writes, each a valid piece, loadable, and released (pinned);
-//     a changed piece is a new version, never a rewritten pinned one
+// held things) as part and held pieces, all written by tools/bake-person-side.mjs. R2b (2026-11-21) deleted the rig and
+// the baker: the pieces in pieces/ are pinned data nothing rebuilds, and what this test measured against the code rig
+// is read from records made before it went (tests/fixtures/person-side/code-rig-clips.json, code-rig-joints.json,
+// tests/fixtures/code-frames/person-side-base.json), the code Hero's frames from its replay (tests/fixtures/code-replay/knight.json,
+// tests/helpers/code-replay.mjs). What is dropped with the baker: that pieces/ equals what it writes, and its release rule
+// (the next free version when a pin has other content), which pieces-index.test.mjs holds for every piece. Held to here:
+//   - each piece in pieces/ is a valid piece, loadable, and released (pinned); a changed piece is a new version, never
+//     a rewritten pinned one
 //   - the base has the code rig's standard clips (frames, speed, loop) with one key a frame, and at every frame of
 //     every clip (the variants too) its bones put the hips, neck, knees, ankles, elbows, hands and head where the code
 //     rig does, and its drawn limbs run between the code's snapped joints
@@ -23,11 +28,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import * as H from '../../rigs/humanoid.js';
-import {
-  bakedPieces, basePiece, codePose, codeFrame, frameDiff, STANDARD_CLIPS, VARIANT_CLIPS, BASE_CLIPS, VARIANTS_PUBLISHED,
-  D0, trunkOf, heroSheet, releasedAs, GROUND_CUT, SCALES,
-} from '../../tools/bake-person-side.mjs';
 import { validatePiece, createPieceStore, PIECE_LIMITS } from '../../engine/pieces.js';
 import { readPins, pieceHash } from '../../tools/lib/pieces-index.mjs';
 import { solveRig } from '../../rigs/bones.js';
@@ -35,17 +35,64 @@ import { clipPose } from '../../rigs/keypose.js';
 import { makeDataSprite } from '../../engine/data-sprite.js';
 import { renderFrame, defaultParams } from '../../engine/sprite.js';
 import { checkSprite } from '../../quality/sprite.js';
-import { codeSprite } from '../helpers/library.mjs';   // the code Hero, its frozen copy once sprites/knight.js is redrawn (T1)
+import { codeSprite } from '../helpers/library.mjs';   // the code Hero: its frozen copy, or its recorded replay once the copy is gone (R2b)
+import { codeFrames } from '../helpers/code-frames.mjs';
 import { SPEED_FPS, resolveSprite } from '../../engine/resolve.js';
 import { col, INK } from '../../engine/color.js';
 import { DRAW_LIST_OPS } from '../../engine/draw-list.js';
 
 const ROOT = new URL('../../', import.meta.url);
 const knight = await codeSprite('knight');
-const BAKED = bakedPieces();
+const json = (rel) => JSON.parse(fs.readFileSync(new URL(rel, ROOT), 'utf8'));
+// the pieces the baker wrote (tools/bake-person-side.mjs, deleted by R2b), the base first
+const BAKED_FILES = ['pieces/base-person-side.v7.json', 'pieces/part-hair.v2.json', 'pieces/part-hair-long.v1.json', 'pieces/part-ponytail.v1.json', 'pieces/part-hair-nape.v2.json', 'pieces/part-helmet.v3.json', 'pieces/part-plume.v1.json', 'pieces/part-crown.v4.json', 'pieces/part-cape.v1.json', 'pieces/part-cape-ground.v2.json', 'pieces/part-belt.v1.json', 'pieces/held-sword.v1.json', 'pieces/held-axe.v1.json', 'pieces/held-spear.v1.json'];
+const BAKED = BAKED_FILES.map((file) => ({ file, value: json(file) }));
 const BASE = BAKED[0].value;
-/** The base with its variant clips (VARIANT_CLIPS), as a version no file holds. */
-const FULL = { ...basePiece({ variants: true }), v: 999 };
+/** The base with its variant clips (VARIANT_CLIPS), as a version no file holds (@7 is the base with them). */
+const FULL = { ...BASE, v: 999 };
+/** The standard clips of the base and the variants beside them (what the baker listed; the code rig's clip table is in code-rig-clips.json). */
+const STANDARD_CLIPS = Object.freeze({
+  idle: { pose: 'idle', frames: 8, fps: 7, loop: true }, walk: { pose: 'walk', frames: 8, fps: 10, loop: true }, run: { pose: 'run', frames: 8, fps: 14, loop: true },
+  jump: { pose: 'jump', frames: 8, fps: 11, loop: false }, attack: { pose: 'attack', frames: 8, fps: 13, loop: false }, shoot: { pose: 'shoot', frames: 6, fps: 14, loop: false },
+  cast: { pose: 'cast', frames: 8, fps: 10, loop: false }, block: { pose: 'block', frames: 6, fps: 10, loop: false }, hurt: { pose: 'hurt', frames: 4, fps: 9, loop: false },
+  die: { pose: 'die', frames: 8, fps: 10, loop: false }, victory: { pose: 'victory', frames: 8, fps: 8, loop: true }, talk: { pose: 'talk', frames: 8, fps: 7, loop: true },
+});
+const VARIANT_CLIPS = Object.freeze({
+  'walk-unarmed': { pose: 'walk', frames: 8, fps: 10, loop: true, for: 'walk' }, 'run-unarmed': { pose: 'run', frames: 8, fps: 14, loop: true, for: 'run' },
+  'talk-unarmed': { pose: 'talk', frames: 8, fps: 7, loop: true, for: 'talk' }, punch: { pose: 'punch', frames: 8, fps: 13, loop: false, for: 'attack' },
+  thrust: { pose: 'thrust', frames: 8, fps: 13, loop: false, for: 'attack' }, 'shoot-bow': { pose: 'shoot', frames: 6, fps: 14, loop: false, for: 'shoot' },
+});
+const BASE_CLIPS = Object.freeze({ ...STANDARD_CLIPS, ...VARIANT_CLIPS });
+const GROUND = 58;                                              // the row the feet rest above (rigs/humanoid.js GROUND)
+/** The ground cut the base carries, last in its shapes (everything from the ground row to the bottom and edges of any frame cleared). */
+const GROUND_CUT = Object.freeze({ id: 'groundCut', kind: 'cut', on: 'ground', shape: { kind: 'poly', points: [[-1000, 0], [1000, 0], [1000, -1000], [-1000, -1000]] } });
+/** The sliders a sprite scales the base by, with the bones and shapes each scales and by how much (what the baker put in SCALES). */
+const SCALES = {
+  height: { bones: ['stand', 'loin', 'trunk', 'thighF', 'shinF', 'thighB', 'shinB', 'spine', 'armF', 'foreF', 'armB', 'foreB', 'back', 'thighFa', 'thighFd', 'shinFd', 'armFa', 'armFd', 'foreFd', 'thighBa', 'thighBd', 'shinBd', 'armBa', 'armBd', 'foreBd'], by: [0.7826, 1.2174] },
+  build: { shapes: ['pelvis', 'torso', 'thighF', 'thighB'], by: [0.7541, 1.2459] },
+  head: { shapes: ['skull'], by: [0.8214, 1.1786] },
+};
+const CODE_CLIPS = json('tests/fixtures/person-side/code-rig-clips.json');
+const CODE_JOINTS = json('tests/fixtures/person-side/code-rig-joints.json').frames;
+const CODE_BASE = codeFrames('person-side-base');
+/** The code rig's pose facts of one frame (the head turn, in radians). */
+const codePose = (clip, f) => CODE_JOINTS[`${clip} ${f}`];
+/** How two frames differ: { diff (pixels not the same), drawn (pixels drawn in either), share (diff / drawn) }. */
+function frameDiff(a, b) {
+  let diff = 0, drawn = 0;
+  for (let i = 0; i < a.data.length; i++) { if (a.data[i] || b.data[i]) drawn++; if (a.data[i] !== b.data[i]) diff++; }
+  return { diff, drawn, share: drawn ? diff / drawn : 0 };
+}
+/** The data sprite's share of pixels that differ from the code sprite's over each clip of the code sprite, at their defaults: { clip: share }. */
+function heroShares(data, code) {
+  const pd = defaultParams(data), pc = defaultParams(code), shares = {};
+  for (const [clip, c] of Object.entries(code.clips)) {
+    let diff = 0, drawn = 0;
+    for (let f = 0; f < c.frames; f++) { const d = frameDiff(renderFrame(code, clip, f, pc), renderFrame(data, clip, f, pd)); diff += d.diff; drawn += d.drawn; }
+    shares[clip] = drawn ? diff / drawn : 0;
+  }
+  return shares;
+}
 const store = (extra = []) => {
   const s = createPieceStore();
   for (const { file, value } of BAKED) s.add(JSON.stringify(value), file.split('/').pop());
@@ -71,18 +118,17 @@ function shares() {
   const r = makeDataSprite(person(FULL), { pieces: store([FULL]) });
   assert.ok(r.ok, r.errors.join('; '));
   const p = defaultParams(r.sprite);
-  memo = framesOf(BASE_CLIPS).map(([clip, f]) => ({ clip, f, ...frameDiff(codeFrame(clip, f, LOOK), renderFrame(r.sprite, clip, f, p)) }));
+  memo = framesOf(BASE_CLIPS).map(([clip, f]) => ({ clip, f, ...frameDiff({ data: CODE_BASE.frame('', clip, f) }, renderFrame(r.sprite, clip, f, p)) }));
   return memo;
 }
 const pct = (x) => `${x.clip} ${x.f}: ${(x.share * 100).toFixed(1)} % (${x.diff} of ${x.drawn})`;
 /** The frames where rigs/humanoid.js turns the head's pixels part way (die 1 to 3): a turned bitmap, never drawn by data. */
-const TURNING = (x) => { const t = codePose(x.clip, x.f).headTurn || 0; return t > 0 && Math.abs(t - Math.PI / 2) > 1e-9; };
+const TURNING = (x) => { const t = codePose(x.clip, x.f).headTurn; return t > 0 && Math.abs(t - Math.PI / 2) > 1e-9; };
 
-test('the pieces in pieces/ are what the baker writes, each valid, loadable and released', () => {
+test('the pieces in pieces/ (the base and the side-view parts) are each valid, loadable and released', () => {
   const pins = readPins(new URL('.', ROOT).pathname);
   for (const { file, value } of BAKED) {
     const text = fs.readFileSync(new URL(file, ROOT), 'utf8');
-    assert.deepEqual(JSON.parse(text), JSON.parse(JSON.stringify(value)), `${file}: node tools/bake-person-side.mjs --write`);
     const v = validatePiece(text, { file: file.split('/').pop() });
     assert.ok(v.ok, `${file}: ${v.errors.join('; ')}`);
     assert.deepEqual(v.warnings, [], file);
@@ -92,17 +138,9 @@ test('the pieces in pieces/ are what the baker writes, each valid, loadable and 
   for (const { value } of BAKED) assert.ok(s.get(value.id, value.v), `${value.id} loads`);
 });
 
-test('the baker never rewrites a pinned version: a change goes to the next free one', () => {
-  const piece = { id: 'part:test-cap', v: 1, name: 'Cap' };
-  assert.equal(releasedAs(piece, {}).v, 1, 'nothing pinned: version 1');
-  assert.equal(releasedAs(piece, { 'part:test-cap@1': pieceHash({ ...piece, v: 1 }) }).v, 1, 'pinned with this content: unchanged');
-  assert.equal(releasedAs(piece, { 'part:test-cap@1': 'another' }).v, 2, 'pinned with other content: the next version');
-  assert.equal(releasedAs(piece, { 'part:test-cap@1': 'another', 'part:test-cap@2': 'and another' }).v, 3);
-});
-
 test('base: the code rig\'s standard clips, one key a frame, flash as a frame edit; the variants published after them (B4x)', () => {
   const clips = BASE.body.clips;
-  const code = H.clipsFor(Object.keys(STANDARD_CLIPS));
+  const code = Object.fromEntries(Object.entries(CODE_CLIPS.clips).map(([n, c]) => [n, { frames: c.frames, loop: c.loop, fps: () => c.fps }]));   // the code rig's clip table (code-rig-clips.json)
   assert.deepEqual(Object.keys(clips), [...Object.keys(code), ...Object.keys(VARIANT_CLIPS)]);
   for (const [name, c] of Object.entries(clips).filter(([n]) => Object.hasOwn(STANDARD_CLIPS, n))) {
     assert.equal(c.frames, code[name].frames, name);
@@ -117,10 +155,9 @@ test('base: the code rig\'s standard clips, one key a frame, flash as a frame ed
   assert.equal(clips.idle.frameEdits, undefined);
   // the variants (punch, thrust, the unarmed and bow clips) are baked, fit in a piece and are published since @7 (B4x:
   // a sprite takes the clips its extends.clips lists, and names a variant with from; tests/unit/person-side-variants)
-  assert.equal(VARIANTS_PUBLISHED, true);
   assert.deepEqual(Object.keys(FULL.body.clips), [...Object.keys(STANDARD_CLIPS), ...Object.keys(VARIANT_CLIPS)]);
   for (const [name, c] of Object.entries(VARIANT_CLIPS)) {
-    assert.ok(H.POSES.includes(c.pose) && STANDARD_CLIPS[c.for], name);
+    assert.ok(CODE_CLIPS.poses.includes(c.pose) && STANDARD_CLIPS[c.for], name);
     assert.deepEqual([FULL.body.clips[name].frames, FULL.body.clips[name].loop], [STANDARD_CLIPS[c.for].frames, STANDARD_CLIPS[c.for].loop], name);
   }
   const bytes = Buffer.byteLength(JSON.stringify(FULL));
@@ -133,7 +170,7 @@ test('base: at every frame of every clip its bones put every joint where the cod
   const near = (a, b, what) => assert.ok(Math.hypot(a[0] - b[0], a[1] - b[1]) < 0.01, `${what}: ${a} vs ${b}`);
   const odd = (v) => Math.floor(v) + 0.5;
   for (const [clip, f] of framesOf(BASE_CLIPS)) {
-    const P = codePose(clip, f), C = H.solve(P, D0);
+    const P = codePose(clip, f), C = P;   // the code rig's pose and its solved joints, recorded together (code-rig-joints.json)
     const J = solveRig(rig, clipPose(FULL.body.clips[clip], f)).bones;
     const at = `${clip} ${f}`;
     near(J.stand.end, C.hip, `${at} hips`);
@@ -155,10 +192,10 @@ test('base: at every frame of every clip its bones put every joint where the cod
       near(J[`fore${s}d`].end, A.hand.map(Math.round), `${at} drawn forearm ${s}, to`);
     }
     // the torso's carriers end on the half-pixel grid, where the code's capsule and pelvis are
-    const t = trunkOf(C, D0);
+    const t = { trunk: C.trunk };
     near(J.trunk.end, [J.loin.end[0] + Math.sin(t.trunk.angle) * t.trunk.length, J.loin.end[1] + Math.cos(t.trunk.angle) * t.trunk.length], `${at} torso`);
     near(J.seat.end.map((v) => Math.round(v * 2) / 2), [Math.round(C.hip[0] * 2) / 2, Math.round(C.hip[1]) + 1], `${at} pelvis (where the renderer puts the seat's end)`);
-    assert.ok(Math.abs(J.ground.start[1] - H.GROUND) < 0.01, `${at}: the ground node on the ground row`);
+    assert.ok(Math.abs(J.ground.start[1] - GROUND) < 0.01, `${at}: the ground node on the ground row`);
   }
 });
 
@@ -266,14 +303,14 @@ test('the Hero never draws under the ground row, in any clip, version, choice or
   const under = [];
   for (const set of settings) for (const [clip, c] of Object.entries(s.clips)) for (let f = 0; f < c.frames; f++) {
     const y = low(renderFrame(s, clip, f, { ...defaultParams(s), ...set }));
-    if (y > H.GROUND) under.push(`${clip} ${f} at ${JSON.stringify(set)}: row ${y}`);
+    if (y > GROUND) under.push(`${clip} ${f} at ${JSON.stringify(set)}: row ${y}`);
   }
   assert.deepEqual(under.slice(0, 10), [], `${under.length} frames under the ground`);
 });
 
 test('the Hero beside the code knight: every clip of the code sprite, close in pixels', () => {
   const s = hero().sprite;
-  const sheet = heroSheet(s, knight);
+  const sheet = { shares: heroShares(s, knight) };
   // measured 2026-11-20 (B16a2): idle 9.2, walk 7.7, run 8.6, jump 9.2, attack 14.1, hurt 9.9, block 11.9, victory
   // 11.6 %: the code knight's tunic and helmet shading, the slash trail and the Head default (0.55, where the base's
   // bones are 0.5's). Die 17.2 % (25.6 before the cape hung down while falling and lay on the ground, part:cape-ground):
@@ -361,7 +398,7 @@ test('a sprite on the base that writes no cut stays on the ground in every clip,
   for (const set of [{}, ...Object.keys(SCALES).flatMap((k) => [{ [k]: 0 }, { [k]: 1 }]), Object.fromEntries(Object.keys(SCALES).map((k) => [k, 1]))]) {
     for (const [clip, c] of Object.entries(r.sprite.clips)) for (let f = 0; f < c.frames; f++) {
       const y = low(renderFrame(r.sprite, clip, f, { ...defaultParams(r.sprite), ...set }));
-      if (y > H.GROUND) under.push(`${clip} ${f} at ${JSON.stringify(set)}: row ${y}`);
+      if (y > GROUND) under.push(`${clip} ${f} at ${JSON.stringify(set)}: row ${y}`);
     }
   }
   assert.deepEqual(under.slice(0, 10), [], `${under.length} frames under the ground`);
@@ -409,7 +446,7 @@ test('at any frame size the base keeps what it draws on the ground: its cut reac
       const sets = what === 'the Hero' ? [{}, { capeLength: 1.8 }, { cape: 'tattered', capeLength: 0.3 }, { height: 0 }, { height: 1, head: 1 }] : [{}];
       for (const set of sets) for (const [clip, c] of Object.entries(r.sprite.clips)) for (let f = 0; f < c.frames; f++) {
         const y = low(renderFrame(r.sprite, clip, f, { ...defaultParams(r.sprite), ...set }));
-        if (y > H.GROUND) under.push(`${what} at ${size}, ${clip} ${f} ${JSON.stringify(set)}: row ${y}`);
+        if (y > GROUND) under.push(`${what} at ${size}, ${clip} ${f} ${JSON.stringify(set)}: row ${y}`);
       }
     }
   }
@@ -460,7 +497,7 @@ test('a die played at any number of frames keeps the cape on the ground where th
   const box = SETS.map((set) => {
     const b = { x0: Infinity, x1: -Infinity, y0: Infinity, y1: -Infinity };
     for (let f = 4; f < 8; f++) for (const [x, y] of capeGround(h0, h1, 'die', f, set)) { b.x0 = Math.min(b.x0, x); b.x1 = Math.max(b.x1, x); b.y0 = Math.min(b.y0, y); b.y1 = Math.max(b.y1, y); }
-    assert.ok(b.x1 >= b.x0 && b.y1 <= H.GROUND, `${JSON.stringify(set)}: the cape lies on the ground in die 4 to 7`);
+    assert.ok(b.x1 >= b.x0 && b.y1 <= GROUND, `${JSON.stringify(set)}: the cape lies on the ground in die 4 to 7`);
     return b;
   });
   const bad = [];
@@ -475,7 +512,7 @@ test('a die played at any number of frames keeps the cape on the ground where th
     SETS.forEach((set, k) => {
       if (size[0] > 96 && k) return;                         // the largest frame at the defaults only (time)
       for (const clip of ['die', 'fall']) for (let f = 0; f < a.clips[clip].frames; f++) {
-        const out = capeGround(a, b, clip, f, set).filter(([x, y]) => !(dropped && y > H.GROUND) && !(x >= box[k].x0 - 1 && x <= box[k].x1 + 1 && y >= box[k].y0 && y <= box[k].y1));
+        const out = capeGround(a, b, clip, f, set).filter(([x, y]) => !(dropped && y > GROUND) && !(x >= box[k].x0 - 1 && x <= box[k].x1 + 1 && y >= box[k].y0 && y <= box[k].y1));
         if (out.length) bad.push(`${clip} ${f}/${a.clips[clip].frames} at ${size}${dropped ? ', cut dropped' : ''} ${JSON.stringify(set)}: ${out.length} px off the ground strip, e.g. ${JSON.stringify(out[0])}`);
       }
     });
@@ -494,11 +531,11 @@ test('the base\'s cut clears everything under the ground to the edges of the lar
   const under = [];
   for (const [clip, c] of Object.entries(r.sprite.clips)) for (let f = 0; f < c.frames; f++) {
     const y = low(renderFrame(r.sprite, clip, f, defaultParams(r.sprite)));
-    if (y > H.GROUND) under.push(`${clip} ${f}: row ${y}`);
+    if (y > GROUND) under.push(`${clip} ${f}: row ${y}`);
   }
   assert.deepEqual(under.slice(0, 10), [], `${under.length} frames draw under the ground`);
   const dropped = makeDataSprite({ ...def, body: { rig: { ...def.body.rig, extends: { ...def.body.rig.extends, drop: ['groundCut'] } } } }, { pieces: store() });
   assert.ok(dropped.ok, dropped.errors.join('; '));
   const g = renderFrame(dropped.sprite, 'idle', 0, defaultParams(dropped.sprite));
-  for (const [x, y] of [[0, 359], [639, 359], [0, H.GROUND + 1], [639, H.GROUND + 1]]) assert.ok(g.data[y * g.w + x], `the probe reaches (${x}, ${y})`);
+  for (const [x, y] of [[0, 359], [639, 359], [0, GROUND + 1], [639, GROUND + 1]]) assert.ok(g.data[y * g.w + x], `the probe reaches (${x}, ${y})`);
 });

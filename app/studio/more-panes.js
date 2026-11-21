@@ -1,7 +1,7 @@
 // The studio panel's part 2 (docs/studio.md sections 3 to 6; items S10 and S12): what the four tabs of app/studio/panes.js
 // add. Move: Mirror legs, the keys between frames (the swing light) with a way to remove them. Frames: Sounds on
 // this frame (the library's sound effects by name, with play), this frame's pixel warnings, the fill band. Look & name:
-// the advice ("What the library would ask": the quality bar in everyday words, in a background worker, never blocking)
+// the advice ("What the quality bar would ask": the quality bar in everyday words, in a background worker, never blocking)
 // and the pixel-art warnings, each a button that selects what it is about. Every change goes through E.commit.
 import { el } from '../ui.js';
 import { row, head, btn, icon, select, fieldId } from './bits.js';
@@ -176,13 +176,13 @@ function adviceItem(E, it) {
   return el('li', { class: `adv adv-${it.level ?? 'pixel'}`, 'data-advice': it.kind ?? it.level }, go ? el('button', { type: 'button', class: 'adv-btn', onclick: go }, body) : el('div', { class: 'adv-btn is-still' }, body));
 }
 
-/** The advice section of Look & name: "What the library would ask", run on request; the pixel warnings with it. */
+/** The advice section of Look & name: "What the quality bar would ask", run on request; the pixel warnings with it. */
 export function adviceSection(E) {
   const { def } = E.S;
   const a = E.S.advice ?? { state: 'idle' };
   const fresh = a.def === def;
-  const out = [head('What the library would ask', btn(a.state === 'working' && fresh ? 'Checking…' : a.state === 'idle' ? 'Check it' : 'Check again', () => askAdvice(E), { 'data-k': 'check-it', 'data-act': 'advice', disabled: a.state === 'working' && fresh }))];
-  out.push(el('p', { class: 'pane-note' }, 'Advice only: it goes in your bag, plays and downloads whatever this says. These are what the library would ask before taking it as a file of its own, and the pixel-art rules it keeps.'));
+  const out = [head('What the quality bar would ask', btn(a.state === 'working' && fresh ? 'Checking…' : a.state === 'idle' ? 'Check it' : 'Check again', () => askAdvice(E), { 'data-k': 'check-it', 'data-act': 'advice', disabled: a.state === 'working' && fresh }))];
+  out.push(el('p', { class: 'pane-note' }, 'Advice only: it goes in your bag, plays and downloads whatever this says. These are what the quality bar a library sprite is held to would ask, and the pixel-art rules it keeps. A studio file is not a library file: the library takes only data sprites made with the /sprite-forge skill.'));
   // the shapes too thin to draw are known at once; the rest is worked out on request
   const thin = A.thinShapes(def).map((w) => ({ ...w, level: 'pixel' }));
   const list = el('ul', { class: 'adv-list', 'aria-live': 'polite' });
@@ -194,10 +194,10 @@ export function adviceSection(E) {
     const pixels = (a.result?.pixels ?? []).filter((p) => !(p.kind === 'thin' || p.kind === 'too-thin')).map((p) => ({ ...p, level: 'pixel' }));
     const items = [...(fresh ? thin : []), ...pixels, ...(bar?.ok ? bar.items : [])];
     if (bar && !bar.ok) out.push(el('p', { class: 'adv-status' }, bar.message));
-    if (!items.length) out.push(el('p', { class: 'adv-status is-fine', role: 'status' }, 'Nothing to ask: the library would take it as it is.'));
+    if (!items.length) out.push(el('p', { class: 'adv-status is-fine', role: 'status' }, 'Nothing to ask: the quality bar finds nothing to change.'));
     else {
       const asks = bar?.ok ? bar.asks : 0;
-      out.push(el('p', { class: 'adv-status', role: 'status' }, `${items.length} thing${items.length === 1 ? '' : 's'} to look at${asks ? `, ${asks} the library would ask to be changed` : ''}. Pick one to see it.`));
+      out.push(el('p', { class: 'adv-status', role: 'status' }, `${items.length} thing${items.length === 1 ? '' : 's'} to look at${asks ? `, ${asks} the quality bar would ask to be changed` : ''}. Pick one to see it.`));
       list.replaceChildren(...items.map((it) => adviceItem(E, it)));
     }
   } else if (thin.length) list.replaceChildren(...thin.map((it) => adviceItem(E, it)));

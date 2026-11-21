@@ -4,10 +4,10 @@
 // what each rule means. Run after every change:
 //
 //   node tools/check.mjs                 every sprite found in sprites/
-//   node tools/check.mjs <id|file> ...   one or more sprites, by id or by file path: a code file sprites/<id>.js or a
-//                                        data file sprites/<id>.json (build item B9: keyed on its definition, the
-//                                        generators and pieces it names and the checker, so editing one generator
-//                                        re-checks only the sprites naming it; tools/lib/quality-run.mjs)
+//   node tools/check.mjs <id|file> ...   one or more sprites, by id or by file path: a data file sprites/<id>.json
+//                                        (build item B9: keyed on its definition, the generators and pieces it names
+//                                        and the checker, so editing one generator re-checks only the sprites naming
+//                                        it; tools/lib/quality-run.mjs). A code file (.js) is refused (build item R4a).
 //   --json                               machine-readable: { ok, metaChecked, notice, sprites: [{ id, file, ok, errors, warnings, metrics, cached }] }
 //   --no-cache                           check again even when nothing changed
 //   --cache-file <path>                  use another cache file (default .cache/quality.json)
@@ -17,7 +17,7 @@
 // catalog/schema.js's validateMeta when that file exists.
 import fs from 'node:fs';
 import path from 'node:path';
-import { ROOT } from './lib/assets.mjs';
+import { ROOT, CodeSpriteError } from './lib/assets.mjs';
 import { runQuality, UnknownAsset } from './lib/quality-run.mjs';
 
 const args = process.argv.slice(2);
@@ -31,7 +31,7 @@ let run;
 try {
   run = await runQuality({ sprites: ids.length ? ids : undefined, sounds: [], cache: !args.includes('--no-cache'), cacheFile });
 } catch (e) {
-  if (e instanceof UnknownAsset) { console.error(e.message); process.exit(1); }
+  if (e instanceof UnknownAsset || e instanceof CodeSpriteError) { console.error(e.message); process.exit(1); }
   throw e;
 }
 if (run.notice) say(`note: ${run.notice}`);

@@ -5,34 +5,17 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as registry from '../../engine/gen/index.js';
 import { checkGeneratorContract } from '../helpers/gen-harness.mjs';
-import { Surface } from '../../engine/surface.js';
-import { placedIn, anyIn } from '../../engine/shapes.js';
-import { cellIn, drawCharge, haloIn } from '../../engine/gadgets.js';
-import { ramp, mix } from '../../engine/color.js';
 import { dataSprite } from '../../engine/data-sprite.js';
 import { defaultParams, renderFrame } from '../../engine/sprite.js';
 import { keys } from '../../engine/motion.js';
+import { oldReplay } from '../helpers/old-replay.mjs';
 
+const OLD = oldReplay('gen-shape-cell');   // what engine/gadgets.js (deleted by R3) drew, recorded in the order of the calls (tests/helpers/old-replay.mjs)
 const PAL = { casing: '#c2c9d6', glow: '#4fd17a' };
-const even = (v) => 2 * Math.round(v / 2);
 
 /** What sprites/health-cell.js painted for one look, on a 32 x 32 Surface centred on (16, 17): the body, then (layer halo) the halo. */
 function oldCell({ shape, height, level, beat, scale = 1, squash = 0, bare = false }, layer) {
-  const g = new Surface(32, 32), h = even(height), C = cellIn(h, shape);
-  const whole = anyIn(C.casing, C.seams, C.window);
-  const put = (test) => placedIn(test, 16, 17, { sx: scale * (1 + squash), sy: scale * (1 - squash) });
-  const M = ramp(PAL.casing), G = ramp(PAL.glow);
-  if (layer === 'body') {
-    g.blob([put(C.casing)], M, { light: 1 });
-    g.fill(0, 0, 32, 32, put(C.seams), M.deep);
-    const lit = drawCharge(g, C.window, PAL.glow, { from: C.fill[0], to: C.fill[1], level: bare ? 1 : level, beat, empty: G.dark, place: put });
-    if (!bare && beat < 0.3) g.fill(0, 0, 32, 32, put(C.shine), '#ffffff', { clip: lit.wet });
-  } else if (beat >= 0.6) {
-    const scratch = new Surface(32, 32);
-    const lit = drawCharge(scratch, C.window, PAL.glow, { from: C.fill[0], to: C.fill[1], level: bare ? 1 : level, beat, empty: G.dark, place: put });
-    g.fill(0, 0, 32, 32, haloIn(put(whole), lit.wet), beat >= 0.95 ? mix(G.light, '#ffffff', 0.4) : G.light);
-  }
-  return g;
+  return OLD.surface(32, 32);
 }
 /** What cell@1 paints for the same look, drawn through a data sprite. */
 function newCell(o, layer) {

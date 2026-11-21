@@ -324,7 +324,7 @@ function studioActions() {
     },
     {
       name: 'studio_advice', call: 'studio.advice', args: ['draftOrDefinition'],
-      description: 'What the quality bar would say about a draft, as advice: { passes, problems (what the library would refuse), suggestions, metrics }. A studio sprite is not held to the bar: it goes in the bag and downloads whatever this says. The bar applies when the file is added to the library (sprites/<id>.js).',
+      description: 'What the quality bar would say about a draft, as advice: { passes, problems (what the library would refuse), suggestions, metrics }. A studio sprite is not held to the bar: it goes in the bag and downloads whatever this says. It is the bar a library sprite is held to (a data sprite sprites/<id>.json, version 2, made with the /sprite-forge skill); a version 1 studio draft cannot become a library file as it is.',
       inputSchema: { type: 'object', properties: { draftOrDefinition: EITHER }, required: ['draftOrDefinition'], additionalProperties: false },
     },
     {
@@ -334,7 +334,7 @@ function studioActions() {
     },
     {
       name: 'studio_file', call: 'studio.file', args: ['draftOrDefinition'],
-      description: 'The draft as a file for the library: { name: "<id>.js", text }, a fixed three-line wrapper around the definition as JSON (data, never code) to put in sprites/. library tells whether the library would take it as it is (its stricter checks: full metadata), with the reasons when not.',
+      description: 'The draft as a file to keep: { name, text }, a version 1 draft as "<id>.js" (a fixed three-line wrapper around the definition as JSON: data, never code), a version 2 draft as "<id>.json". Only a version 2 file is a library sprite (sprites/<id>.json); the library refuses a version 1 .js file (build item R4a). library.ok tells whether the library would take it as it is (its stricter checks: full metadata), with the reasons when not.',
       inputSchema: { type: 'object', properties: { draftOrDefinition: EITHER }, required: ['draftOrDefinition'], additionalProperties: false },
     },
     {

@@ -1,0 +1,69 @@
+{
+ "about": "What rigs/humanoid.js pose() did for the code Hero's walk and run at Bounce and Stride 0, 0.5 and 1 (the other at 0.5): the range over the eight frames of the crouch (walk) or lift (run) `body`, of the front foot's x `step` and y `lift`, and of the front arm's angle `arm`. Keyed `<clip>` then `<bounce>,<stride>`. Recorded 2026-11-21 from rigs/humanoid.js (deleted by R2b) for tests/unit/person-side-travel.test.mjs, which held the data Hero's travel to the code rig's own ratios.",
+ "moves": {
+  "walk": {
+   "0.5,0.5": {
+    "body": 1.05,
+    "step": 9,
+    "lift": 2.25,
+    "arm": 0.49500000000000005
+   },
+   "0,0.5": {
+    "body": 0.3,
+    "step": 9,
+    "lift": 1.5,
+    "arm": 0.3825
+   },
+   "1,0.5": {
+    "body": 1.8,
+    "step": 9,
+    "lift": 3,
+    "arm": 0.6075
+   },
+   "0.5,0": {
+    "body": 1.05,
+    "step": 6,
+    "lift": 2.25,
+    "arm": 0.3825
+   },
+   "0.5,1": {
+    "body": 1.05,
+    "step": 12,
+    "lift": 2.25,
+    "arm": 0.6075
+   }
+  },
+  "run": {
+   "0.5,0.5": {
+    "body": 1.5371322893124002,
+    "step": 11.225328947368421,
+    "lift": 4.249946522021183,
+    "arm": 1.26
+   },
+   "0,0.5": {
+    "body": 0.647213595499958,
+    "step": 11.225328947368421,
+    "lift": 2.999962250838482,
+    "arm": 0.96
+   },
+   "1,0.5": {
+    "body": 2.4270509831248424,
+    "step": 11.225328947368421,
+    "lift": 5.499930793203884,
+    "arm": 1.56
+   },
+   "0.5,0": {
+    "body": 1.5371322893124002,
+    "step": 8.634868421052632,
+    "lift": 4.249946522021183,
+    "arm": 1.26
+   },
+   "0.5,1": {
+    "body": 1.5371322893124002,
+    "step": 13.81578947368421,
+    "lift": 4.249946522021183,
+    "arm": 1.26
+   }
+  }
+ }
+}

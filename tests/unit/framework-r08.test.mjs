@@ -1,5 +1,6 @@
 // Framework additions made with batch R08 (village tiles and market stall): engine/paving.js, engine/fences.js,
 // engine/stalls.js, and the scene tool tools/scene.mjs.
+// R3 (2026-11-21): engine/stalls.js (awning, layGoods, layOver) went with its tests; paving, fences, tools/scene.mjs and the tiles-village blocks stay.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
@@ -13,7 +14,6 @@ import { TILE, patternFill, textureTone, classifyTiles } from '../../engine/tile
 import { THEME_PRESETS, applyColour } from '../../engine/theme.js';
 import { drawHerringbone, paintStone, pavingTone, stoneShade } from '../../engine/paving.js';
 import { FENCE_PIECES, FENCE, drawFence } from '../../engine/fences.js';
-import { AWNING_STYLES, GOODS, layOver, awningShape, awning, pole, counter, layGoods } from '../../engine/stalls.js';
 import { composeScene, sceneLooks, lookIds, loadSprite } from '../../tools/scene.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -101,73 +101,6 @@ test('fence pieces: rails run off both edges, the post is closed, and whole clip
 test('a worn fence differs from a new one, and no ink means no ink', () => {
   assert.ok(!same(fence('h'), fence('h', { worn: 1 })));
   assert.equal(count(fence('h', { ink: null }), INK), 0);
-});
-
-// ---- engine/stalls.js ---------------------------------------------------------------------------------------
-test('layOver inks the rim of the thing in front only where it lies on drawn pixels', () => {
-  const g = new Surface(16, 16).rect(2, 6, 12, 4, '#888888');
-  const front = new Surface(16, 16).rect(6, 2, 4, 12, '#ff0000');
-  layOver(g, front);
-  assert.equal(g.get(5, 7), col(INK)); assert.equal(g.get(10, 7), col(INK));
-  assert.equal(g.get(5, 3), 0, 'no ink beside it where nothing was drawn');
-  assert.equal(g.get(7, 7), col('#ff0000'));
-  const plain = layOver(new Surface(16, 16).rect(2, 6, 12, 4, '#888888'), front, null);
-  assert.equal(count(plain, INK), 0);
-});
-test('awningShape: still when sway is 0, a loop that closes, tied at the corners, scallops hang lower', () => {
-  const o = { x: 7, y: 6, w: 50, rise: 9, drop: 6 };
-  const still = awningShape(o);
-  assert.equal(still.eave, 15);
-  for (let px = 7; px < 57; px++) assert.equal(still.bottomAt(px), 20);
-  assert.ok(still.left(6) > still.left(14) && still.right(6) < still.right(14), 'narrower at the back edge');
-  assert.equal(still.left(14), 7); assert.equal(still.right(14), 56);
-  const a = awningShape({ ...o, t: 0, sway: 2 }), b = awningShape({ ...o, t: 1, sway: 2 }), c = awningShape({ ...o, t: 0.5, sway: 2 });
-  let moved = 0;
-  for (let px = 7; px < 57; px++) { assert.equal(a.bottomAt(px), b.bottomAt(px)); if (a.bottomAt(px) !== c.bottomAt(px)) moved++; assert.ok(Math.abs(a.bottomAt(px) - 20) <= 2); }
-  assert.ok(moved > 10);
-  assert.equal(a.bottomAt(7), 20); assert.equal(a.bottomAt(56), 20);
-  const sc = awningShape({ ...o, style: 'scalloped' });
-  const rows = new Set(); for (let px = 7; px < 57; px++) rows.add(sc.bottomAt(px));
-  assert.ok(rows.size >= 3, 'a scalloped edge is not level');
-  assert.throws(() => awningShape({ ...o, style: 'tent' }), /no awning style/);
-  assert.deepEqual([...AWNING_STYLES], ['striped', 'plain', 'scalloped']);
-});
-test('awning: every style draws something different, the accent shows in each, and nothing leaves its box', () => {
-  const draw = (style, over = {}) => { const g = new Surface(64, 64); awning(g, { x: 7, y: 6, w: 50, style, cloth: '#c8553a', accent: '#f0ead8', ...over }); return g; };
-  const pictures = AWNING_STYLES.map((s) => draw(s));
-  for (let i = 0; i < 3; i++) for (let j = i + 1; j < 3; j++) assert.ok(!same(pictures[i], pictures[j]));
-  for (const style of AWNING_STYLES) {
-    let changed = 0; const a = draw(style), b = draw(style, { accent: '#f2c230' });
-    for (let i = 0; i < a.data.length; i++) if (a.data[i] !== b.data[i]) changed++;
-    assert.ok(changed >= 40, `${style}: the accent changes ${changed} px`);
-    const box = a.bounds();
-    assert.ok(box.x0 >= 7 && box.x1 <= 56 && box.y0 >= 6 && box.y1 <= 23);
-    assert.equal(count(a, INK), 0, 'nothing behind it: no line of its own');
-  }
-  assert.ok(!same(draw('striped', { t: 0.25, sway: 2 }), draw('striped', { t: 0.75, sway: 2 })), 'it flaps');
-});
-test('pole and counter: a far pole is darker, a counter says where goods go', () => {
-  const near = pole(new Surface(16, 32), { x: 4, y: 2, h: 20, wood: '#9a6a3e' }), far = pole(new Surface(16, 32), { x: 4, y: 2, h: 20, wood: '#9a6a3e', far: true });
-  assert.equal(drawn(near), 40); assert.ok(!same(near, far));
-  const g = new Surface(64, 64), c = counter(g, { x: 12, y: 40, w: 40, wood: '#9a6a3e' });
-  assert.deepEqual(c.top, { x: 11, y: 40, w: 42, h: 6 });
-  assert.deepEqual(c.span, { x: 14, y: 43, w: 36 });
-  const b = g.bounds();
-  assert.deepEqual([b.x0, b.x1, b.y0, b.y1], [11, 52, 40, 59]);
-});
-test('layGoods: four kinds, each different, none taller than 13 px, a narrow counter gets fewer groups', () => {
-  const K = { a: '#c9423a', b: '#f2c230', c: '#4f9d57', basket: '#e6c96a', crust: '#c9a06a', glass: '#f0ead8', cork: '#9a6a3e', metal: '#c2c9d6', trim: '#f2c230', grip: '#9a6a3e' };
-  const lay = (kind, w = 36) => layGoods(new Surface(64, 64), kind, { x: 14, y: 43, w, colours: K });
-  assert.deepEqual([...GOODS], ['fruit', 'potions', 'weapons', 'bread']);
-  const pictures = GOODS.map((k) => lay(k));
-  for (let i = 0; i < 4; i++) {
-    const b = pictures[i].bounds();
-    assert.ok(drawn(pictures[i]) > 100, GOODS[i]);
-    assert.ok(b.y0 >= 43 - 13 && b.y1 <= 45 && b.x0 >= 14 - 2 && b.x1 <= 14 + 36 + 1, `${GOODS[i]} stays on the counter: ${JSON.stringify(b)}`);
-    for (let j = i + 1; j < 4; j++) assert.ok(!same(pictures[i], pictures[j]));
-    assert.ok(drawn(lay(GOODS[i], 28)) < drawn(pictures[i]), `${GOODS[i]}: fewer on a narrow counter`);
-  }
-  assert.throws(() => lay('hats'), /no goods "hats"/);
 });
 
 // ---- tools/scene.mjs ----------------------------------------------------------------------------------------

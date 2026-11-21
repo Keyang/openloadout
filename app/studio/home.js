@@ -1,6 +1,6 @@
 // The studio's first page, #/studio (docs/studio.md section 5; item S9): "Make a new one" opens the starting bodies (the
-// templates, side view and top-down, and the Hero from the library); "Open a file" reads a studio file (sprites/<id>.js
-// in the data form, or the JSON); the drafts kept on this computer are listed newest first, each opened or removed.
+// templates, side view and top-down, and the Hero from the library); "Open a file" reads a studio file (<id>.js
+// in the data form, or the JSON; the library no longer takes it, build item R4a); the drafts kept on this computer are listed newest first, each opened or removed.
 // When the saved drafts cannot be read whole, the page says so, saves nothing over them, and offers to download what is
 // there and then to start afresh (app/studio/drafts.js problem, savedText, startAfresh).
 import { el, header, saveBlob } from '../ui.js';
@@ -211,7 +211,7 @@ export function homePage(app, { drafts, kept, query }) {
   const main = el('main', { class: 'v2 home studio-home' },
     el('div', { class: 'st-intro' },
       el('h1', { class: 'h2' }, 'Studio'),
-      el('p', { class: 'lede' }, `Make your own sprite: pick a body, shape it, make it move, name it. ${kept ? 'It is kept on this computer as you go, and downloads' : 'It downloads'} as a file for the library or a sheet for your game.`),
+      el('p', { class: 'lede' }, `Make your own sprite: pick a body, shape it, make it move, name it. ${kept ? 'It is kept on this computer as you go, and downloads' : 'It downloads'} as a studio file to keep or a sheet for your game.`),
       el('div', { class: 'st-intro-acts' }, newBtn, openBtn, fileIn),
       trouble,
       kept ? null : el('p', { class: 'not-kept', role: 'note' }, el('strong', {}, 'This browser is not saving for this site. '), 'What you make here is gone when the tab closes: download the file before you leave.'),

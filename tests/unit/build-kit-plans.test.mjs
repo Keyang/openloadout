@@ -27,7 +27,7 @@ function makeCopy() {
   fs.mkdirSync(path.join(dir, 'sounds'));
   // the tool only asks whether an asset's file is there
   for (const { plan } of realPlans) {
-    for (const id of idsOf(plan.sprites)) fs.writeFileSync(path.join(dir, 'sprites', `${id}.js`), '');
+    for (const id of idsOf(plan.sprites)) fs.writeFileSync(path.join(dir, 'sprites', `${id}.json`), '{}');
     for (const id of [...idsOf(plan.sounds), ...idsOf(plan.music)]) fs.writeFileSync(path.join(dir, 'sounds', `${id}.json`), '{}');
   }
   return dir;
@@ -157,7 +157,7 @@ test('assets still to come are listed, the bundle is not written, and --check ex
   writePlan(root, plan);
   const r = run(root);
   assert.equal(r.code, 0, r.out);
-  assert.match(r.out, /kit-fourth-test: not written, 1 asset still to come: sprites\/not-drawn-yet\.js/);
+  assert.match(r.out, /kit-fourth-test: not written, 1 asset still to come: sprites\/not-drawn-yet\.json/);
   assert.equal(fs.existsSync(path.join(root, 'bundles', 'kit-fourth-test.json')), false);
   assert.equal(run(root, '--check').code, 1);
 });

@@ -28,15 +28,29 @@ Rules:
   (`codeSpriteAsFile` does the same for one file), the frozen copy first, as `codeSprite` reads it.
 - **When a copy goes:** a frozen copy is deleted together with the last framework test that reads it, in the removal
   items R1 to R4 (docs/data-sprites.md section 5). Until then this folder is a caller of the code rigs and drawing
-  helpers its copies import (`rigs/humanoid.js`, `engine/fx.js`, `engine/tiles.js`, `engine/ui*.js`,
-  ...): a check that lists a module's importers before removing it counts `tests/fixtures/code-sprites/` too, and
+  helpers its copies import (`engine/fx.js`, `engine/tiles.js`, `engine/shapes.js`, ...): a check that lists a module's importers before removing it counts `tests/fixtures/code-sprites/` too, and
   removing a module means deleting the copies that import it and the framework tests that read them, in the same item.
   **R2 (2026-11-21)** did that for every code rig but the side-view one: 14 copies went (the nine top-down people, `scout-drone`,
   `moss-golem`, `security-bot`, `vendor-bot`, `warden-mech`), each with its `SHA256SUMS` line. What a test compared with
   one of them is held by a record instead where it could be: `tests/fixtures/redraw-pixels/moss-golem.json` and
   `redraw-pixels-c3/<id>.json` (pixels), `redraw-sockets/moss-golem.json` and the `sockets` of the c3 records (attach points),
   `redraw-boxes/<id>.json` (the boxes of the nine top-down people). The five copies left on `rigs/humanoid.js` (`bone-soldier`,
-  `knight`, `spear-goblin`, `thicket-imp`, `wizard`) go with `rigs/humanoid.js` (it waits for `engine/data-rules.js` to stop taking `apart` from `rigs/humanoid-figure.js`).
+  `knight`, `spear-goblin`, `thicket-imp`, `wizard`) went in **R2b (2026-11-21)** with `rigs/humanoid.js`, `humanoid-figure.js`,
+  `humanoid-describe.js` and `tools/bake-person-side.mjs`, after `apart` moved into `engine/data-rules.js`.
+  **R3 (2026-11-21)** deleted 36 more, with the 73 drawing helper modules they imported: 35 of them were compared with by a kept
+  test and are replaced by a **replay record**, one JSON file per copy in `tests/fixtures/code-replay/<id>.json`: every
+  frame the code drew (palette indices, deflated), and every answer of its `sockets()`, `slice()`, `textArea()` and clip `fps()`,
+  in each call the tests that read it made, keyed by a hash of the call's arguments (`tests/helpers/code-replay.mjs`).
+  `codeSprite(id)` returns `replaySprite(id)` when the copy is gone: a sprite built from the record, so `renderFrame`,
+  `renderPixels`, `frameSockets`, `clipStretch` and `clipFps` work at the settings the tests used, and a call the record does
+  not hold FAILS, naming the sprite, the clip, the frame and the settings. `icons-weapons` was read by no kept test and
+  went with its module. The record of a copy comes from running the tests that read it in a `git archive` tree that still
+  had the code (a recorder that wraps the copy's `render`, `sockets`, `slice`, `textArea` and `fps`); each record's `about`
+  says which tests. What a *generator* test compared with a deleted helper module (not with a copy) is in
+  `tests/fixtures/old-code/<test>.json`, read through `tests/helpers/old-replay.mjs` (see its head).
+  A copy that is still here stays because the modules it imports are kept (a generator, a colour rule or the app imports
+  them) and a kept test reads it: the tilesets and the writers in `tests/helpers/ports/`, `bg-forest`, `bg-castle`, `coin`,
+  `crate`, the creatures, the props, the interface pieces and the fonts.
 
 ## The guard and what it cannot see
 

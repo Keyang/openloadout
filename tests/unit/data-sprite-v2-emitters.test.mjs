@@ -17,9 +17,10 @@ import { resolveSprite } from '../../engine/resolve.js';
 import { renderFrame, defaultParams } from '../../engine/sprite.js';
 import { checkSprite } from '../../quality/sprite.js';
 import { validateMeta } from '../../catalog/schema.js';
-import boltCode from '../fixtures/code-sprites/blaster-bolt.js';
 import burstCode from '../fixtures/code-sprites/plasma-burst.js';   // batch E2: sprites/plasma-burst.js is data now; its frozen code copy
 import sparkCode from '../fixtures/code-sprites/hit-spark.js';   // batch E1: sprites/hit-spark.js is data now; its frozen code copy
+import { codeSprite } from '../helpers/library.mjs';   // the frozen copy, or its recorded replay once the copy is gone (R3)
+const boltCode = await codeSprite('blaster-bolt');   // batch E3: sprites/blaster-bolt.js is data now; its code copy is a replay (engine/shots.js went in R3)
 import * as registry from '../../engine/gen/index.js';
 import { emitters as emittersLayout } from '../../engine/gen/emitters.js';
 import { nodeFrame, placeOn } from '../../engine/draw-list.js';

@@ -594,6 +594,58 @@ test('api-studio: file gives the library file, which reads back to the draft', a
   assert.equal((await s.file('nobody')).ok, false);
 });
 
+test('api-studio: a version 1 file says the library refuses it (build item R4a), and no text tells the visitor to put it in sprites/', async () => {
+  const s = studioWith();
+  const { draft, definition } = await s.create('two-legs', 'Zz newt');
+  assert.equal(definition.version, 1, 'the template is still the studio form');
+  const r = await s.file(draft);
+  assert.equal(r.ok, true, JSON.stringify(r.errors));
+  assert.match(r.name, /\.js$/);
+  assert.equal(r.library.ok, false, 'the library takes no .js file, whatever the strict check says');
+  assert.match(r.library.errors[0], /\/sprite-forge/);
+  assert.match(r.library.errors[0], /sprites\/zz-newt\.json/);
+  assert.match(r.library.errors[0], /version 2/);
+  for (const f of ['../../app/api-studio.js', '../../app/api-actions.js', '../../app/studio/editor.js', '../../app/bundle.js']) {
+    const text = fs.readFileSync(new URL(f, import.meta.url), 'utf8');
+    assert.doesNotMatch(text, /Put it in the library's sprites folder|a file for the library: \{ name: "<id>\.js"|library file \(sprites\/\$\{[^}]*\}\.js\)|drop it into sprites\/ to make it part of the library/, f);
+  }
+});
+
+test('api-studio: no text of the studio or the API tells anyone a studio .js file is, or would be taken as, a library file (R4a)', async () => {
+  // every action description, the advice note, and the source of app/, catalog/ and the studio's schema: the same claim, whoever reads it
+  const stale = [
+    /sprites\/<id>\.js\b/, /sprites\/moss-newt\.js\b/,
+    /as a file for the library or a sheet/i, /and the file for the library\./i, /File for the library \(\$\{[^}]*\.js\)/, /goes into the library as sprites/,
+    /before taking it as a file of its own/i, /library would ask before taking/i,
+    /when the file is added to the library/i,
+  ];
+  for (const a of ACTIONS) for (const re of stale) assert.doesNotMatch(String(a.description), re, `action ${a.name}`);
+  const files = [];
+  const walk = (dir) => { for (const e of fs.readdirSync(new URL(dir, import.meta.url), { withFileTypes: true })) { if (e.isDirectory()) walk(`${dir}${e.name}/`); else if (/\.(js|mjs)$/.test(e.name)) files.push(`${dir}${e.name}`); } };
+  walk('../../app/'); walk('../../catalog/'); files.push('../../tools/lib/data-file.mjs');
+  // the dynamic `import(.../sprites/${id}.js)` of app/api-core.js, api-worker.js and catalog.js is code, not text: the R4b list (docs/data-sprites.md section 9)
+  // app/api-core.js, api-worker.js and catalog.js still hold the dynamic `import(.../sprites/${id}.js)` seam and say so: that is code, not a claim about studio files, and is the R4b list (docs/data-sprites.md section 9)
+  const seam = /app\/(api-core|api-worker|catalog)\.js$/;
+  for (const f of files) {
+    if (seam.test(f)) continue;
+    const text = fs.readFileSync(new URL(f, import.meta.url), 'utf8');
+    for (const re of stale) assert.doesNotMatch(text, re, `${f}: ${re}`);
+  }
+  // the v1 editor's Download entry, the advice pane's note and the advice the API gives, by what they say
+  const editor = fs.readFileSync(new URL('../../app/studio/editor.js', import.meta.url), 'utf8');
+  assert.match(editor, /label: `Studio file to keep \(\$\{S\.def\.id\}\.js\)`/);
+  const panes = fs.readFileSync(new URL('../../app/studio/more-panes.js', import.meta.url), 'utf8');
+  assert.doesNotMatch(panes, /the library would take it as it is|What the library would ask/, 'the v1 advice pane no longer promises the library takes a v1 file');
+  const s = studioWith();
+  const { draft } = await s.create('two-legs', 'Zz newt');
+  const adv = await s.advice(draft);
+  assert.equal(adv.ok, true, JSON.stringify(adv));
+  assert.match(adv.note, /\/sprite-forge|not a library file|cannot become a library file/, 'the advice note says a v1 studio file does not go in the library');
+  const studioAdvice = ACTIONS.find((a) => a.name === 'studio_advice').description;
+  assert.match(studioAdvice, /sprites\/<id>\.json/);
+  assert.match(studioAdvice, /\/sprite-forge/);
+});
+
 // ---- the bag -----------------------------------------------------------------------------------------------------
 
 test('api-studio: toBag says "not yet" while the bag cannot hold a studio sprite', async () => {

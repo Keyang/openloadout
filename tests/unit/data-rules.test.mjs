@@ -4,9 +4,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as RULES from '../../engine/data-rules.js';
-import { COLOUR_RULES, paintColour, whenMatches } from '../../engine/data-rules.js';
+import { COLOUR_RULES, paintColour, whenMatches, apart } from '../../engine/data-rules.js';
 import { tone, ramp, mix, pick } from '../../engine/color.js';
-import { apart } from '../../rigs/humanoid-figure.js';
 import { bandTone } from '../../engine/tones.js';
 
 const V = { skin: '#f6d3b0', outfit: '#2f8f9d', trim: '#5a5f7a', weapon: 'daggers', headgear: 'wide hat', size: 1.2 };

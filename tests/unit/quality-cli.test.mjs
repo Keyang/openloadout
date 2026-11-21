@@ -41,7 +41,7 @@ test('check.mjs with an unknown id fails', () => {
 });
 
 test('check.mjs reports a sprite that cannot be defined as that sprite\'s error, without crashing', () => {
-  const bad = 'tests/fixtures/quality/sprite-files/q-bad-parts.js', good = 'tests/fixtures/quality/sprite-files/q-good.js';
+  const bad = 'tests/fixtures/quality/sprite-files/q-bad-parts.json', good = 'tests/fixtures/quality/sprite-files/q-good.json';
   const r = node('tools/check.mjs', bad, good, '--json', '--no-cache');
   const out = JSON.parse(r.stdout);
   assert.equal(r.status, 1);

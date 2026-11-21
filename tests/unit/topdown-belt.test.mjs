@@ -1,13 +1,12 @@
-// A belt stands clear of the cloth under it: one rule (engine/tones.js: bandTone) for the belt of the top-down rig
-// (rigs/topdown.js, deleted in R2 with its belt tests) and the belt of the side-view figure (rigs/humanoid-figure.js).
+// A belt stands clear of the cloth under it: one rule (engine/tones.js: bandTone), which engine/data-rules.js names as the
+// `bandTone` colour rule. (The belts of the top-down rig, rigs/topdown.js, and of the side-view figure,
+// rigs/humanoid-figure.js, were drawn with it; their tests went in R2 and R2b, 2026-11-21.)
 // (The test of the battle Rogue's belt read the frozen copy of rogue-battler, a library body, which went in build item R1.)
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { Surface } from '../../engine/surface.js';
 import { col, ramp, brightness, INK } from '../../engine/color.js';
 import { bandTone } from '../../engine/tones.js';
-import * as H from '../../rigs/humanoid.js';
-import * as Fig from '../../rigs/humanoid-figure.js';
 
 const mixed = (a, b) => '#' + [1, 3, 5].map((i) => Math.round((parseInt(a.slice(i, i + 2), 16) + parseInt(b.slice(i, i + 2), 16)) / 2).toString(16).padStart(2, '0')).join('');
 const lum = (v) => (0.299 * (v & 255) + 0.587 * ((v >> 8) & 255) + 0.114 * ((v >> 16) & 255)) / 255;
@@ -36,24 +35,4 @@ test('bandTone: the shadow tone when it is clear of the cloth, else whichever of
   assert.equal(bandTone(r, r.dark), r.light, 'a ramp is taken as it is');
   assert.equal(bandTone('#a8a4a0', r.dark, 0.01), r.light);
   assert.equal(bandTone('#a8a4a0', '#8a8690', 0.3), bandTone('#a8a4a0', '#8a8690', 0.3), 'the same answer every time');
-});
-
-test('side-view figure: its belt follows the same rule', () => {
-  const beltOn = (top, colour) => {
-    const g = new Surface(...H.SIZE), d = H.dims({}), P = H.pose('idle', 0, {}, d);
-    let at = null;
-    H.draw(g, P, d, { skin: '#f6d3b0', top, bottom: top, boots: '#9a6a3e', hair: '#5a3a22', hairStyle: 'short' }, { torso: (gg, J, PP, dd) => { at = [Math.round(J.hip[0]), Math.round(J.hip[1]) - 2]; Fig.belt(gg, J, PP, dd, { colour }); } });
-    // the belt is the row of pixels through the hips: find its colour among the three tones of the belt's colour
-    const tones = Object.values(ramp(colour)).filter((c) => typeof c === 'string').map((c) => col(c));
-    const seen = new Map();
-    for (let y = at[1] - 2; y <= at[1] + 3; y++) for (let x = at[0] - 6; x <= at[0] + 6; x++) { const v = g.get(x, y); if (tones.includes(v)) seen.set(v, (seen.get(v) ?? 0) + 1); }
-    assert.ok(seen.size >= 1, `no belt found on ${top}`);
-    return [...seen.entries()].sort((a, b) => b[1] - a[1])[0][0];
-  };
-  const pale = ramp('#a8a4a0');
-  assert.equal(beltOn('#f0ead8', '#a8a4a0'), col(pale.dark), 'on pale cloth the belt keeps its shadow tone');
-  for (const top of ['#6d6980', '#2f8f9d', '#5a5f7a']) {
-    const belt = beltOn(top, '#a8a4a0'), cloth = col(ramp(top).base);
-    assert.ok(Math.abs(lum(belt) - lum(cloth)) >= 0.12, `on ${top}: belt ${lum(belt).toFixed(2)} on cloth ${lum(cloth).toFixed(2)}`);
-  }
 });

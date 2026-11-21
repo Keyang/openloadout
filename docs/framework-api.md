@@ -5,7 +5,7 @@ This is the guide to Contract 11 of `docs/architecture.md`. Read it before you a
 ## Two layers
 
 1. **The framework** is the code every asset is made with: drawing (`engine/`), body rigs (`rigs/`), sound and music synthesis, analysis and looks (`sound/`), the quality bar (`quality/`), and the metadata rules (`catalog/schema.js`). It starts simple and grows.
-2. **The assets** are one file each (`sprites/<id>.js`, `sounds/<id>.json`). An asset file holds only what is particular to that asset. The framework turns it into pixels and samples on demand.
+2. **The assets** are one file each (`sprites/<id>.json`, a data definition with no code; `sounds/<id>.json`). The build refuses a code file in `sprites/` (build item R4a). An asset file holds only what is particular to that asset. The framework turns it into pixels and samples on demand.
 
 When an asset needs something the framework does not have (a shape, a pose, a pattern, a synthesis block, a measurement), add it to the framework so the next asset can use it. Generic drawing or synthesis code inside an asset file is a review finding.
 
@@ -296,22 +296,15 @@ A style registers itself when its file is loaded. Put a real style in its own mo
 
 ### How a sprite opts in
 
-```js
-export default defineSprite({
-  id: 'blob', ...
-  styles: ['pixel', 'flat'],                   // best first; left out means ['pixel']
-  render(g, { clip, t, p, style }) {
-    g.ellipse(CX, cy, r, ry, BODY);            // the body: shape calls, shared by every style
-    // the detail layer: the pixel version is the usual case, and other styles branch off it
-    if (style === 'flat') g.ellipse(CX - 2.5, ey, 1, 1.4, INK);       // a drawn eye
-    else g.dot(CX - 3, ey, INK);                                       // a one-pixel eye
-    g.outline(INK);
-  },
-});
+```json
+{ "format": "loadout-sprite", "version": 2, "id": "blob", "...": "...",
+  "styles": ["pixel", "flat"] }
 ```
 
+A sprite is a data file (`sprites/<id>.json`; a code sprite with a `render()` function is refused by the build, build item R4a), so it opts in with the `styles` list: best first; left out means `["pixel"]`. What draws each style is the framework (the renderers and the generators), never the sprite's own code.
+
 - List a style only if the sprite reads well in it. A sprite drawn mostly with single pixels (`dot`, `line`) does not list a style whose surface drops them; the site then never offers that style for it.
-- Branch on `ctx.style` for the detail layer only (eyes, highlights, trim), and keep the pixel branch as the `else`, so the pixel drawing is never at risk.
+- A generator that draws a detail layer (eyes, highlights, trim) branches on the style inside the framework and keeps the pixel branch as the `else`, so the pixel drawing is never at risk.
 - A control may have the key `style`. The chosen art style never uses that name where a control's key can appear: it is `artStyle` in a bag item, in `loadout.render` and `loadout.bag.add`, in the sheet JSON and the manifest, and `artstyle=` in a page link. Inside `render(g, ctx)` the art style is `ctx.style` and a control called `style` is `ctx.p.style`.
 - Asking for a style a sprite does not list is an error everywhere (`renderFrame`, `renderSheet`, `exportSheet`, `loadout.render`, `loadout.bag.add`); nothing falls back to another style.
 
@@ -326,9 +319,9 @@ On the page: `loadout.render(id, { artStyle })` draws in an art style, `loadout.
 
 ## Rigs
 
-**R2 (2026-11-21): the code rigs that draw are deleted** (`docs/data-sprites.md` section 5, Contract 15 rule 11): `rigs/topdown.js` with `topdown-riot.js`, `topdown-sneak.js` and `topdown-describe.js`, `creature-topdown.js`, `quadruped.js`, `crawler.js`, `bigbody.js`, `hive-bug.js`, `brood-queen.js`, `guard-bot.js`, `mech-walker.js`, `kiosk.js` and `kiosk-describe.js`, and `tools/rig.mjs` (the tables and contact sheets of a rig's description) with the `rig-describe-*` tests. A body is a bone rig in data (`rigs/bones.js` draws it, `rigs/keypose.js` poses it, `rigs/studio-templates.js` starts one) or a base piece in `pieces/`; **to see what a body offers, run `node tools/piece.mjs` (every piece, its slots and arguments) and `node tools/piece.mjs <kind:name> --sheet` (a contact sheet), and read the generators with `node skills/sprite-forge/context.mjs generators`.**
+**R2 and R2b (2026-11-21): the code rigs that draw are deleted** (`docs/data-sprites.md` section 5, Contract 15 rule 11): `rigs/topdown.js` with `topdown-riot.js`, `topdown-sneak.js` and `topdown-describe.js`, `creature-topdown.js`, `quadruped.js`, `crawler.js`, `bigbody.js`, `hive-bug.js`, `brood-queen.js`, `guard-bot.js`, `mech-walker.js`, `kiosk.js` and `kiosk-describe.js`, and `tools/rig.mjs` (the tables and contact sheets of a rig's description) with the `rig-describe-*` tests. A body is a bone rig in data (`rigs/bones.js` draws it, `rigs/keypose.js` poses it, `rigs/studio-templates.js` starts one) or a base piece in `pieces/`; **to see what a body offers, run `node tools/piece.mjs` (every piece, its slots and arguments) and `node tools/piece.mjs <kind:name> --sheet` (a contact sheet), and read the generators with `node skills/sprite-forge/context.mjs generators`.**
 
-What is still code: the side-view person. `rigs/humanoid.js` and `rigs/humanoid-figure.js` draw it, `rigs/humanoid-describe.js` (the one description left, `RIG`; in `generated/api.json` under `rigs`, and `(await loadout.framework).humanoidDescribe.RIG` on the page) lists its poses and parts. No test proves that description true any more (`rig-describe-*` went with the tool). The three files stay only while their last callers do: five frozen copies and the tests that read them, `tools/bake-person-side.mjs`, and `engine/data-rules.js`, which takes `apart` (a colour rule) from the figure module. Do not add to them; a new part of the side-view person is a piece (`pieces/part-*.json`).
+**R2b (2026-11-21): the side-view person is data now too.** `rigs/humanoid.js`, `rigs/humanoid-figure.js` and `rigs/humanoid-describe.js` (and with it the `rigs` section of `generated/api.json`, `humanoidDescribe` on `(await loadout.framework)`, and the `rigs` part of the API page) are deleted; `apart` (a colour rule) lives in `engine/data-rules.js`. No code rig is left in `rigs/`: a new part of the side-view person is a piece (`pieces/part-*.json`).
 
 ## Studio definitions: what a definition may name
 

@@ -10,10 +10,18 @@ import { checkGeneratorContract } from '../helpers/gen-harness.mjs';
 import { Surface } from '../../engine/surface.js';
 import { brightness, INK } from '../../engine/color.js';
 import { PALETTE } from '../../engine/palettes.js';
-import { portrait as codePortrait, talkStep, FACE_MOODS, FACE_HAIR, FACE_HEADGEAR, FACE_COLLARS, FACE_BEARDS } from '../../engine/faces.js';
+import { oldReplay } from '../helpers/old-replay.mjs';
 import { paintColour } from '../../engine/data-rules.js';
 import { drawList } from '../../engine/draw-list.js';
 
+const OLD = oldReplay('gen-faces-portrait');   // what engine/faces.js (deleted by R3) drew, recorded in the order of the calls (tests/helpers/old-replay.mjs)
+// what engine/faces.js offered: every mood, hair style, headgear, collar and beard word, and the mouth's step by clip frame
+const FACE_MOODS = ['neutral', 'happy', 'worried', 'hurt', 'angry', 'surprised'];
+const FACE_HAIR = ['short', 'long', 'spiky', 'ponytail', 'bald', 'bowl', 'pigtails', 'balding'];
+const FACE_HEADGEAR = ['none', 'helmet', 'kettle hat', 'hat-pointed', 'hat-wide', 'hood', 'turban', 'cap'];
+const FACE_COLLARS = ['none', 'mantle', 'scarf', 'collar', 'vee', 'apron', 'tabard'];
+const FACE_BEARDS = ['none', 'short', 'long'];
+const talkStep = (frame) => [0, 1, 2, 1][frame % 4];
 const P = PALETTE.hearthvale;
 // the slots a portrait call names here, and their colours
 const HEX = {
@@ -61,7 +69,7 @@ const PEOPLE = {
 // skins: the default, a dark one, one close to the wood hair and one close to the cream hair and beard
 const SKINS = { skin: P.skin, dark: '#5a3a22', near: '#a87850', pale: '#efe6d2' };
 
-function codeDraw(person, o) { return codePortrait(new Surface(48, 48), person, o); }
+function codeDraw(person, o) { return OLD.surface(48, 48); }
 function genDraw(args, o, palette, ctx = { size: [48, 48] }) {
   const r = registry.runGenerator({ gen: 'portrait', v: 1, at: [24, 24], ...args, ...o }, ctx);
   assert.ok(r.ok, r.errors.join('; '));

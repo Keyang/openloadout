@@ -1,23 +1,19 @@
 // Runs the quality bar (quality/sprite.js, quality/sound.js) over many assets at once:
 // across worker threads, with each result cached in .cache/quality.json.
 //
-// What a cached result is keyed on: the files that asset really loads, and nothing else.
+// A SPRITE is a data file (R4a: a code file is refused, see below) and is keyed on what draws and checks it (the list
+// under A DATA SPRITE). A SOUND is keyed on the files it really loads, and nothing else:
 //   - the asset's own file;
-//   - for a sprite, every module it imports, followed through their imports (its rig, the engine modules
-//     the rig uses, a shared helper sprites/_*.js), read from the source text by tools/lib/imports.mjs;
-//   - the checker's code: quality/sprite.js or quality/sound.js with everything it imports, catalog/schema.js,
-//     and the worker that calls them (tools/lib/quality-worker.mjs);
-//   - for a sprite, the sounds its cues name (only those).
-//   quality/sprite.js runs the data checks (quality/data-checks.js) on every sprite, but they look only at a version 2
-//   data sprite (one engine/data-sprite.js made); for any other they return nothing. So a code sprite's key holds
-//   quality/data-checks.js itself but not what it imports (engine/data-sprite.js and, through it, every generator
-//   family): editing a generator does not re-check the code sprites. A code file that is a data sprite (the studio's
-//   wrapper) imports engine/data-sprite.js itself, so its key has it anyway.
-// So an edit to one rig re-checks the sprites on that rig, an edit to the sound engine re-checks the sounds,
-// and an edit to a file nothing loads re-checks nothing. If any module behind an asset holds an import that
-// cannot be followed by reading it (import(someVariable)), that asset is keyed on the whole of engine/, rigs/,
-// sound/ and quality/ instead, so a stale pass is never served. A crashed check is never cached.
-// assetFiles() returns the list for one asset. Used by tools/check.mjs, tools/sfx.mjs and tools/build.mjs.
+//   - the checker's code: quality/sound.js with everything it imports (found from the source text by
+//     tools/lib/imports.mjs), catalog/schema.js, and the worker that calls them (tools/lib/quality-worker.mjs).
+// So an edit to the sound engine re-checks the sounds, and an edit to a file nothing loads re-checks nothing. If any
+// module behind a sound holds an import that cannot be followed by reading it (import(someVariable)), that sound is
+// keyed on the whole of engine/, rigs/, sound/ and quality/ instead, so a stale pass is never served. A crashed check
+// is never cached. assetFiles() returns the list for one asset. Used by tools/check.mjs, tools/sfx.mjs and tools/build.mjs.
+//
+// A CODE SPRITE IS REFUSED (build item R4a, docs/data-sprites.md section 5): a file in sprites/ that is not a data file
+// <id>.json (a .js or .mjs program, an old <id>.js, a helper _x.js) stops runQuality, spriteFiles and assetFiles with
+// assets.mjs codeSpriteRefusal, whether the run lists sprites/ or is handed the file by path or id; it is never imported.
 //
 // A DATA SPRITE (sprites/<id>.json, docs/data-sprites.md 4.2, build item B9) loads no module of its own, so it is keyed
 // on what draws and checks it (dataSpriteDeps):
@@ -60,7 +56,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { Worker } from 'node:worker_threads';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { ROOT, isSpriteFile, findSpriteFile, spriteIds } from './assets.mjs';
+import { ROOT, isSpriteFile, isCodeSpriteFile, findSpriteFile, spriteIds, assertNoCodeSprites, refuseCodeId, CodeSpriteError } from './assets.mjs';
 import { importGraph } from './imports.mjs';
 import { pieceFilesFor } from './pieces-index.mjs';
 import { usesOf } from '../../engine/pieces.js';
@@ -83,9 +79,18 @@ function walk(dir, out = []) {
   }
   return out;
 }
+/** Throws the refusal of a code sprite file (assets.mjs CodeSpriteError), naming it as the project would (sprites/x.js), or as the path when it is outside the project. Arguments: root, file (absolute or relative to the project). */
+function refuseSpriteFile(root, file) {
+  const abs = path.resolve(root, file);
+  const rel = abs.startsWith(root + path.sep) ? path.relative(root, abs).split(path.sep).join('/') : abs;
+  if (isCodeSpriteFile(abs)) throw new CodeSpriteError(rel);
+  throw new Error(`${rel}: not a sprite file; a sprite is a data file sprites/<id>.json (format "loadout-sprite", version 2), made with the /sprite-forge skill`);
+}
+
 /**
  * The files a cached result for one asset depends on (see the top of this file).
- * kind: 'sprite' or 'sound'; file: the asset's file; graph: an importGraph() to share between many calls.
+ * kind: 'sprite' or 'sound'; file: the asset's file (a sprite's is a .json data file; any other is refused, R4a);
+ * graph: an importGraph() to share between many calls.
  * Returns { files, missing, open }: absolute paths, sorted; `missing` are files that are named but not on disk
  * (creating one changes the key); `open` is true when an import could not be followed, in which case `files`
  * holds the whole framework.
@@ -93,8 +98,11 @@ function walk(dir, out = []) {
 export function assetFiles(root = ROOT, kind, file, graph) {
   root = path.resolve(root);
   graph ??= importGraph({ root });
-  if (kind === 'sprite' && String(file).endsWith('.json')) return dataSpriteFiles(root, file, graph);
-  const starts = [path.resolve(file), path.join(root, 'quality', kind === 'sprite' ? 'sprite.js' : 'sound.js'), ...DEP_FILES.map((f) => path.join(root, f))];
+  if (kind === 'sprite') {
+    if (String(file).endsWith('.json')) return dataSpriteFiles(root, file, graph);
+    refuseSpriteFile(root, file);
+  }
+  const starts = [path.resolve(file), path.join(root, 'quality', 'sound.js'), ...DEP_FILES.map((f) => path.join(root, f))];
   const checks = path.join(root, 'quality', 'data-checks.js');
   const c = closureWhere(graph, starts, (from) => from !== checks);
   // the worker loads the checker by a path it works out while running (the lines above name those files), so it is
@@ -377,7 +385,7 @@ function keyMaker(root, rules = new Set()) {
     return h.digest('hex');
   };
   return (kind, file) => {
-    if (kind === 'sprite' && file.endsWith('.json')) return dataKey(file);
+    if (kind === 'sprite') { if (file.endsWith('.json')) return dataKey(file); refuseSpriteFile(root, file); }
     const { files, missing } = assetFiles(root, kind, file, graph);
     const h = crypto.createHash('sha1').update(`v${VERSION}\0${kind}\0`);
     for (const f of files) { h.update(path.relative(root, f)); h.update('\0'); h.update(digest(f)); h.update('\0'); }
@@ -408,13 +416,14 @@ export class UnknownAsset extends Error {
 
 function spriteFiles(root, list) {
   const dir = path.join(root, 'sprites');
-  // code files (<id>.js) and data files (<id>.json, build item B9)
+  // data files only (<id>.json, build item B9); a code file in sprites/ stops the run (R4a), a code file named in the list too
+  if (list === undefined) assertNoCodeSprites(root);
   const all = fs.existsSync(dir) ? fs.readdirSync(dir).filter(isSpriteFile).sort() : [];
   if (list === undefined) return all.map((f) => path.join(dir, f));
   return list.map((x) => {
-    if (/\.(m?js|json)$/.test(x) || x.includes('/') || x.includes(path.sep)) return path.resolve(x);
+    if (/\.(m?js|cjs|ts|json)$/.test(x) || x.includes('/') || x.includes(path.sep)) { if (!x.endsWith('.json')) refuseSpriteFile(root, x); return path.resolve(x); }
     const f = findSpriteFile(root, x);
-    if (!f) throw new UnknownAsset('sprite', x, spriteIds(root));
+    if (!f) { refuseCodeId(root, x); throw new UnknownAsset('sprite', x, spriteIds(root)); }
     return f;
   });
 }
@@ -527,7 +536,7 @@ export async function runQuality({ root = ROOT, sprites, sounds, cache = true, c
 
 const isCrash = (e) => /^checker (crashed|stopped)/.test(e);
 /** The id to hand to tools/check.mjs: the file's own name when it is in sprites/, otherwise the path. */
-const spriteArg = (file) => (/^sprites\/[^/]+\.(m?js|json)$/.test(file) ? path.basename(file).replace(/\.(m?js|json)$/, '') : file);
+const spriteArg = (file) => (/^sprites\/[^/]+\.json$/.test(file) ? path.basename(file).replace(/\.json$/, '') : file);
 
 function whatToDo(r) {
   const errors = r.errors ?? [];

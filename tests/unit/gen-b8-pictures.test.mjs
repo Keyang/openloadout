@@ -14,10 +14,10 @@ import { dataSprite, dataFrameList } from '../../engine/data-sprite.js';
 import { renderFrame, defaultParams } from '../../engine/sprite.js';
 import { generator, runGenerator } from '../../engine/gen/index.js';
 import { drawList } from '../../engine/draw-list.js';
-import { Surface, ellipseIn } from '../../engine/surface.js';
-import { iconFit, iconPaint, iconGlint, iconTidy } from '../../engine/icons.js';
-import { INK } from '../../engine/color.js';
+import { Surface } from '../../engine/surface.js';
 
+import { oldReplay } from '../helpers/old-replay.mjs';
+const OLD = oldReplay('gen-b8-pictures');   // what engine/icons.js (deleted by R3) drew and answered, recorded in the order of the calls (tests/helpers/old-replay.mjs)
 const META = (type, role, view, words) => ({ type, role, view, themes: ['fantasy'], gameTypes: ['platformer'], words, license: 'draft' });
 const same = (a, b) => a.w === b.w && a.h === b.h && a.data.every((v, i) => v === b.data[i]);
 const solid = (g) => g.data.filter((v) => v >>> 24).length;
@@ -114,8 +114,7 @@ test('the body\'s fit fits each picture to the Size slider; a picture with its o
   assert.equal(side(renderFrame(s, 'round', 0, { ...p, size: 0 })), 20, 'Small: the longer side 20 px, outline included (engine/icons.js iconFit)');
   assert.equal(side(renderFrame(s, 'round', 0, { ...p, size: 1 })), 26, 'Big: 26 px');
   // the middle as engine/icons.js iconFit finds it for the same shape (its search stops at 22 here, not 23)
-  const old = new Surface(32, 32);
-  iconFit(old, { size: 0.5, tilt: true, angle: 26.57 * Math.PI / 180 }, (g, pen) => { iconPaint(g, pen, ellipseIn(0, 0, 8, 11), '#f0ead8', { soft: 3 }); iconGlint(g, pen, 3, -6); iconTidy(g).outline(INK); });
+  const old = OLD.surface(32, 32);
   assert.equal(side(renderFrame(s, 'round', 0, p)), side(old));
   assert.deepEqual(renderFrame(s, 'round', 0, p).bounds(), old.bounds(), 'placed where iconFit places it');
   const b = renderFrame(s, 'round', 0, p).bounds();

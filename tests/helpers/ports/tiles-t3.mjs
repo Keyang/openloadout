@@ -113,7 +113,8 @@ export const written = async (id) => `${JSON.stringify(await definition(id), nul
 /** The redraw record of one tileset (tests/fixtures/redraws/<id>.json), read from its frozen code copy. Arguments: id. */
 export async function record(id) {
   const code = await codeSprite(id);
-  const src = fs.readFileSync(new URL(`../../fixtures/code-sprites/${id}.js`, import.meta.url), 'utf8').split('\n').slice(3).join('\n').replaceAll("from '../../../engine/", "from '../engine/");
+  const file = new URL(`../../fixtures/code-sprites/${id}.js`, import.meta.url);   // (tiles-hive's copy went in R3: its replay has no source, so its record says so)
+  const src = fs.existsSync(file) ? fs.readFileSync(file, 'utf8').split('\n').slice(3).join('\n').replaceAll("from '../../../engine/", "from '../engine/") : '';
   const clips = Object.fromEntries(Object.entries(code.clips).map(([k, c]) => [k, { frames: c.frames, loop: c.loop !== false, fps: [0, 0.5, 1].map((speed) => clipFps(code, k, cleanParams(code, { speed }))) }]));
   return {
     id, frozen: '2026-11-20', source: `sprites/${id}.js`, sha256: crypto.createHash('sha256').update(src).digest('hex'),

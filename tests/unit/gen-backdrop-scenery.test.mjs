@@ -16,21 +16,19 @@ import { SCENERY_FRAME_GENERATORS } from '../../engine/gen/scenery-frame.js';
 import { renderList } from '../../engine/draw-list.js';
 import { Surface } from '../../engine/surface.js';
 import { battlements as oldBattlements, fillBelow, tidy as oldTidy } from '../../engine/backdrop.js';
-import { pavedFloor, groundMarks, farHouse, pillar as oldPillar, wallRing as oldWallRing, lightPatch as oldLightPatch } from '../../engine/scenery.js';
-import { wrapped as oldWrapped } from '../../engine/backdrop.js';
-import { hash as mhash, wave as mwave, lerp as mlerp } from '../../engine/motion.js';
 import { rectIn } from '../../engine/surface.js';
 import fs from 'node:fs';
 import { tidyPlan, TIDY_LIMITS } from '../../engine/gen/scenery.js';
 import { validateSprite } from '../../catalog/sprite-schema.js';
 import { makeDataSprite } from '../../engine/data-sprite.js';
 import { renderFrame, defaultParams } from '../../engine/sprite.js';
-import { standApart, standOutLighter } from '../../engine/scenery.js';
+import { oldReplay } from '../helpers/old-replay.mjs';
 import { recede, standOut } from '../../engine/backdrop.js';
 import { workOutColour } from '../../engine/gen/backdrop.js';
 import { SCENERY_COLOUR_RULES } from '../../engine/gen/scenery.js';
 import { PALETTE as SITE_PALETTE } from '../../engine/palettes.js';
 
+const OLD = oldReplay('gen-backdrop-scenery');   // what engine/scenery.js (deleted by R3) drew and answered, recorded in the order of the calls (tests/helpers/old-replay.mjs)
 const LAYER = { size: [320, 180] };
 const SMALL = { size: [96, 48] };
 const GROUND = { kind: 'ridge', base: 30, height: 8, seed: 9, peaks: 2, rough: 0.1 };
@@ -206,8 +204,7 @@ test('battlements@1 fills what engine/backdrop.js battlements and fillBelow fill
 test('paved.course@1 courses, back to front, draw what engine/scenery.js pavedFloor drew', () => {
   const courses = [{ h: 6, period: 32 }, { h: 7, period: 40, shift: 9 }, { h: 13, period: 64 }, { h: 22, period: 80, shift: 23 }];
   const colours = { body: '#7e84a0', joint: '#3a3d4f', lit: '#a8aec4', shade: '#6a7088' };
-  const old = new Surface(320, 180);
-  pavedFloor(old, { top: 132, courses, joints: [[10, 29], [4, 20]], colours, shaded: 0.22, clear: [146, 154], seed: 3 });
+  const old = OLD.surface(320, 180);
   const prims = [];
   let y = 132;
   courses.forEach((c, k) => {
@@ -222,12 +219,10 @@ test('paved.course@1 courses, back to front, draw what engine/scenery.js pavedFl
 });
 
 test('ground.marks@1 and far.house@1 put their marks and walls where engine/scenery.js groundMarks and farHouse did', () => {
-  const old = new Surface(320, 180);
-  groundMarks(old, { top: 144, bottom: 172, count: 13, seed: 6, clear: [145, 153], pebbles: 0.3, colours: { dark: '#808080', stone: '#808080', light: '#808080' } });
+  const old = OLD.surface(320, 180);
   const r = registry.runGenerator({ gen: 'ground.marks', v: 1, top: 144, bottom: 172, count: 13, seed: 6, keep: [145, 153], pebbles: 0.3, dark: 'x', stone: 'x', gleam: 'x' }, LAYER);
   assert.deepEqual([...cover(r.primitives, [320, 180]).data], [...old.data]);
-  const house = new Surface(96, 48);
-  farHouse(house, 40, 30, { width: 15, wall: 5, roof: 6, chimney: true, tones: { wall: '#808080', roof: '#808080', window: '#808080' } });
+  const house = OLD.surface(96, 48);
   const h = registry.runGenerator({ gen: 'far.house', v: 1, at: [40, 30], width: 15, chimney: true, window: true, walls: 'x', tiles: 'x', lamp: 'x' }, { size: [96, 48] });
   assert.deepEqual([...cover(h.primitives, [96, 48]).data].map((v) => !!v), [...house.data].map((v) => !!v));
 });
@@ -257,25 +252,13 @@ test('castle.columns@1 draws the columns of sprites/bg-castle.js near layer pixe
 test('pillars@1 and wall.torches@1 draw the pillars, rings, lit faces, glow and cups of sprites/bg-battle-dungeon.js mid layer pixel for pixel (the flames apart)', () => {
   // the code's mid layer (tests/fixtures/code-sprites/bg-battle-dungeon.js): engine/scenery.js lightPatch, pillar, wallRing,
   // wallTorch's cup; KINDS by turns, pillar i with seed i + 1, the face patch clipped to its pillar's shaft
-  const KINDS3 = [{ width: 22, capital: 4, foot: 5, courses: 13, collars: [] }, { width: 16, capital: 5, foot: 4, courses: 0, collars: [30, 84] }, { width: 20, capital: 3, foot: 7, courses: 19, collars: [52] }];
   const C = { warm0: '#402020', warm1: '#603030', light: '#c0c0c0', base: '#808080', dark: '#404040', iron: '#202060', ironLit: '#e0c040', face0: '#a06040', face1: '#c08050', f1: '#ffff00', f2: '#ffcc00', f3: '#ff8800', f4: '#cc4400' };
   const pal = { palette: Object.fromEntries(Object.entries(C).map(([k, hex]) => [k, { hex }])) };
   const tones = { light: C.light, base: C.base, dark: C.dark };
   let cases = 0;
   for (const n of [2, 3, 4, 5]) for (const torches of [0, 0.5, 1]) for (const t of [0, 0.375]) {
-    const y = n % 2 ? 60 : 49, span = 320 / n, at = (i) => Math.round(i * span);
-    const order = [...Array(n).keys()].sort((a, b) => (b % 2) - (a % 2) || a - b);
-    const lit = new Set(order.slice(0, Math.max(1, Math.floor(mlerp(1, n, torches) + 1e-6))));
-    const flick = (i) => 0.75 + 0.15 * mwave(t, mhash(i, 3)) + 0.1 * mwave(2 * t, mhash(i, 4));
-    const old = new Surface(320, 180);
-    for (const i of lit) oldLightPatch(old, at(i), y - 5, 25, [C.warm0, C.warm1], { level: flick(i), seed: i });
-    for (let i = 0; i < n; i++) {
-      const kind = KINDS3[n % 2 && i === n - 1 ? 2 : i % 2];
-      const box = oldPillar(old, at(i), { top: 0, bottom: 121, ...kind, seed: i + 1, tones });
-      if (!lit.has(i)) { oldWallRing(old, at(i), y - 4, { links: 2 + (i % 3), colour: C.iron }); continue; }
-      oldWrapped(at(i), kind.width, (x) => oldLightPatch(old, x, y - 3, 13, [C.face0, C.face1], { level: flick(i), squash: 1.4, seed: i + 9, clip: rectIn(x - kind.width / 2, box.top + 3, kind.width, box.bottom - box.top - 3) }));
-      oldWrapped(at(i), 13, (cx) => { old.rect(cx - 1, y + 3, 3, 7, C.iron).rect(cx - 4, y + 8, 6, 2, C.iron).rect(cx - 3, y, 7, 4, C.iron).rect(cx - 3, y, 7, 1, C.ironLit); });
-    }
+    const y = n % 2 ? 60 : 49;
+    const old = OLD.surface(320, 180);
     const ctx = { ...LAYER, t, loop: true, frames: 8, frame: 0 };
     const common = { count: n, lit: torches, y, flame: ['f1', 'f2', 'f3', 'f4'], iron: 'iron', ironLit: 'ironLit' };
     const glow = registry.runGenerator({ gen: 'wall.torches', v: 1, ...common, show: 'glow', reach: 25, warm: ['warm0', 'warm1'] }, ctx);
@@ -508,12 +491,12 @@ test('stand.apart@1 is engine/scenery.js standApart (and standOutLighter) of eng
     const depth = (i % 11) / 10, night = i % 3 === 2, darkest = i % 4 === 1 ? 0.26 : 0;
     const pal = { of: { hex: of }, air: { hex: air }, b1: { hex: b1 }, b2: { hex: b2 }, a1: { hex: a1 } };
     const rule = { rule: 'stand.apart', v: 1, of: 'of', air: 'air', depth, behind: ['b1', 'b2'], also: ['a1'], night, darkest };
-    const want = standApart(night, darkest)(recede(of, depth, air), [b1, b2], [a1]);
+    const want = OLD.value();
     assert.equal(workOutColour(rule, pal, {}), want, `${JSON.stringify({ of, air, b1, b2, a1, depth, night, darkest })}`);
     // with no air: the colour itself, not receded
-    assert.equal(workOutColour({ ...rule, air: 'clear' }, pal, {}), standApart(night, darkest)(of, [b1, b2], [a1]));
+    assert.equal(workOutColour({ ...rule, air: 'clear' }, pal, {}), OLD.value());
     // way lighter: engine/scenery.js standOutLighter (the dungeon's tones), by day
-    if (!night) assert.equal(workOutColour({ rule: 'stand.apart', v: 1, of: 'of', air: 'air', depth, behind: ['b1'], also: ['a1'], way: 'lighter' }, pal, {}), standOutLighter(recede(of, depth, air), [b1], { also: [a1] }));
+    if (!night) assert.equal(workOutColour({ rule: 'stand.apart', v: 1, of: 'of', air: 'air', depth, behind: ['b1'], also: ['a1'], way: 'lighter' }, pal, {}), OLD.value());
     // one behind and nothing else, by day: engine/backdrop.js standOut
     assert.equal(workOutColour({ rule: 'stand.apart', v: 1, of: 'of', behind: ['b1'] }, pal, {}), standOut(of, [b1]));
     n++;
@@ -577,16 +560,13 @@ test('edge.band@1 fills what engine/backdrop.js fillBetween(outline, shifted(out
   }
 });
 
-test('tufts@1 fills what the field\'s code filled under engine/scenery.js tufts: the grass edge, the dark band under it, the fringe along the bottom', async () => {
-  const { tufts: oldTufts } = await import('../../engine/scenery.js');
-  const { fillBelow: oldBelow, fillBetween: oldBetween, shifted: oldShifted } = await import('../../engine/backdrop.js');
-  for (const [a, draw] of [
-    [{ base: 132, count: 30, seed: 3, height: 6 }, (g, o) => oldBelow(g, o, '#40a040')],
-    [{ base: 132, count: 30, seed: 3, height: 6, from: 4, to: 139 }, (g, o) => oldBetween(g, oldShifted(o, 0, 4), () => 139, '#40a040')],
-    [{ base: 177, count: 22, seed: 8, height: 7 }, (g, o) => oldBelow(g, o, '#40a040')],
+test('tufts@1 fills what the field\'s code filled under engine/scenery.js tufts: the grass edge, the dark band under it, the fringe along the bottom', () => {
+  for (const a of [
+    { base: 132, count: 30, seed: 3, height: 6 },
+    { base: 132, count: 30, seed: 3, height: 6, from: 4, to: 139 },
+    { base: 177, count: 22, seed: 8, height: 7 },
   ]) {
-    const old = new Surface(320, 180);
-    draw(old, oldTufts({ base: a.base, count: a.count, seed: a.seed, height: a.height }));
+    const old = OLD.surface(320, 180);
     const out = registry.runGenerator({ gen: 'tufts', v: 1, ...a, paint: 'grass' }, LAYER);
     assert.ok(out.ok, out.errors.join('; '));
     const now = renderList(320, 180, out.primitives, { palette: { grass: '#40a040' } }).g;

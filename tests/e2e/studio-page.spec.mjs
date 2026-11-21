@@ -162,10 +162,10 @@ test('journey (c): fewer frames keep the motion; the anchor snaps to the feet', 
   await expect.poll(async () => (await draft(page)).clips.walk.fps).toBe(8);
 });
 
-test('journey (d): the file for the library and the sheet download', async ({ page }) => {
+test('journey (d): the studio file to keep and the sheet download', async ({ page }) => {
   await newFrom(page, 'blob');
   await page.getByRole('button', { name: 'Download' }).click();
-  const file = await downloadFrom(page, () => page.getByRole('menuitem', { name: /File for the library/ }).click());
+  const file = await downloadFrom(page, () => page.getByRole('menuitem', { name: /Studio file to keep/ }).click());
   expect(file.name).toMatch(/^[a-z][a-z0-9-]*\.js$/);
   const text = file.bytes.toString('utf8');
   expect(text.split('\n')[0]).toContain('Made in the Loadout studio');

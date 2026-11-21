@@ -1,6 +1,7 @@
 // The library file form of a studio sprite (docs/studio.md 2.4 and section 8, item S7; docs/architecture.md,
-// Contract 14 rule 8). A sprite made in the studio goes into the library as sprites/<id>.js, so the site and every tool
-// load it as they load any sprite, but the file is data. It has exactly this form and nothing else:
+// Contract 14 rule 8). A sprite made in the studio (version 1) downloads as <id>.js, the visitor's own copy; since build
+// item R4a it is NOT a library file (the library takes only data sprites, sprites/<id>.json of version 2, made with the
+// /sprite-forge skill). The file is data. It has exactly this form and nothing else:
 //
 //   // Made in the Loadout studio. This file is data: open it in the studio (#/studio, "Open a file") to change it.
 //   import { dataSprite } from '../engine/data-sprite.js';
@@ -21,11 +22,10 @@
 // object literal reads __proto__ differently from JSON). Any text that parses as such JSON is, as JavaScript, exactly
 // the same object literal, so importing the module runs nothing but dataSprite on that data.
 //
-// The build (tools/lib/assets.mjs loadSprites) calls checkDataFile() on every sprite file before importing it: a file
-// that carries the studio comment ("Made in the Loadout studio", anywhere in it) must be exactly this form and its
-// definition must pass validation in strict mode (route 1: gaps in meta are errors for a library file only; the studio,
-// the bag and export do not use strict). Otherwise the build stops with a plain message naming the file.
-// A file without the studio comment is an ordinary sprite program and is left to the ordinary checks.
+// Until build item R4a the build (tools/lib/assets.mjs loadSprites) called checkDataFile() on every sprite file before
+// importing it. It no longer does: the build refuses every code file in sprites/, this form included (assets.mjs
+// codeSpriteRefusal), so this file is the studio's own writer and reader ("Open a file"), not a way into the library.
+// checkDataFile() still says whether a text is exactly this form with a definition that passes strict validation.
 //
 // Pure (no Node imports, no DOM), so the studio page can use the writer in the browser too.
 
@@ -93,7 +93,7 @@ function nestingOf(s, stopAt) {
   return most;
 }
 
-/** The file name a sprite file path ends in, without ".js" (sprites/moss-newt.js -> moss-newt), or null. */
+/** The file name a sprite file path ends in, without ".js" (moss-newt.js -> moss-newt), or null. */
 function idOfFile(file) {
   if (typeof file !== 'string') return null;
   const base = file.split(/[\\/]/).pop();
@@ -112,7 +112,7 @@ export function claimsStudioForm(text) {
  * Reads a studio library file back to its definition without running it. Returns { ok, errors, warnings, value }: value is
  * the JSON inside dataSprite(...) when the file has exactly the fixed form (null otherwise, and then nothing else is
  * checked); ok also needs that JSON to pass validation and, when the file name is known, its id to match the name. Never throws.
- * Arguments: text (the file's text), opts { file (its path, e.g. "sprites/moss-newt.js": the id must match it), strict,
+ * Arguments: text (the file's text), opts { file (its path, e.g. "moss-newt.js": the id must match it), strict,
  * soundIds, catalogIds (passed to engine/data-sprite.js validateDataSprite) }.
  */
 export function readDataFile(text, opts = {}) {
@@ -161,7 +161,7 @@ export function readDataFile(text, opts = {}) {
 }
 
 /**
- * Writes a studio definition as the text of its library file, sprites/<id>.js, in the one fixed form. Returns
+ * Writes a studio definition as the text of its version 1 studio file, <id>.js, in the one fixed form (the visitor's own copy to keep; it is not a library file: since build item R4a the library takes only data sprites, sprites/<id>.json of version 2, made with the /sprite-forge skill). Returns
  * { ok, errors, warnings, name, text } (name "<id>.js"; name and text null when not ok); never throws. The definition is
  * validated and the cleaned copy is written; the text is read back before it is returned.
  * Arguments: definition (a loadout-sprite, an object or JSON text), opts { strict (refuse gaps the library would refuse;
@@ -186,7 +186,7 @@ export function writeDataFile(definition, opts = {}) {
  * The build's check of one sprite file, done before the file is imported: returns null for a file that does not claim the
  * studio form (an ordinary sprite program), the definition for a studio file of exactly the fixed form whose definition
  * passes strict validation, and throws an Error whose message starts with the file's name otherwise.
- * Arguments: text (the file's text), file (its path as shown, e.g. "sprites/moss-newt.js"), opts (as readDataFile takes them; strict defaults to true).
+ * Arguments: text (the file's text), file (its path as shown, e.g. "moss-newt.js"), opts (as readDataFile takes them; strict defaults to true).
  */
 export function checkDataFile(text, file, opts = {}) {
   if (!claimsStudioForm(text)) return null;

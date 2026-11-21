@@ -2,7 +2,7 @@
 
 Written 2026-11-19 for Keyang's request: "create studio page -- sprite: allowing create rig / animation / frame and sprites. we will add music & sound track editing in future." Status: **built (items S1 to S12, F1, F2); the library-body path of version 1 was removed in build item R1 (2026-11-20, section 3)**; where the text below describes a library body, a key field of one, `body.paint` or `studio.bake`, it describes what was removed. The contract it adds is Contract 14 in `docs/architecture.md`. Every claim about existing code below was checked against the file named.
 
-Keyang's decisions (binding): (1) rigs can be data, made in the browser; the code rigs stay and the studio can start from them. (2) A studio sprite goes to the bag (playground, zip, share links) and downloads as a file an agent drops into `sprites/`. (3) Animation is key poses in data, blended by the engine (R4 = yes). "Frame" = frame count, speed, looping, per-frame adjustments, anchor, attach points. (4) Non-technical creators, everyday words; not held to the quality bar, but safe: a definition is data, never code. (5) Sound and music editing later: leave room, build nothing.
+Keyang's decisions (binding): (1) rigs can be data, made in the browser; the code rigs stay and the studio can start from them. (2) A studio sprite goes to the bag (playground, zip, share links) and downloads as a file (since R4a, 2026-11-21, a studio `.js` file is the visitor's own copy and no longer something an agent drops into `sprites/`: the library takes data sprites `sprites/<id>.json` made with the `/sprite-forge` skill). (3) Animation is key poses in data, blended by the engine (R4 = yes). "Frame" = frame count, speed, looping, per-frame adjustments, anchor, attach points. (4) Non-technical creators, everyday words; not held to the quality bar, but safe: a definition is data, never code. (5) Sound and music editing later: leave room, build nothing.
 
 ## 1. The idea in five lines
 
@@ -10,7 +10,7 @@ Keyang's decisions (binding): (1) rigs can be data, made in the browser; the cod
 - A body is a **bone rig** (`loadout-rig`, all data: bones, shapes on bones, joints, attach points). A version 1 definition used to have a second kind, a **library body** (a code rig with a data layer; the side-view person of `rigs/humanoid.js` through `rigs/humanoid-figure.js`); it is removed (build item R1, section 3): a library sprite is data now, and the studio opens its definition as a copy.
 - Every clip is **key poses**: a few numbers per key, blended by one framework function. A key is written, or made by dragging; the "bake" that turned a code rig's formula pose into keys went with the library bodies (R1).
 - The framework turns the JSON into an ordinary `defineSprite` result (`dataSprite(json)`), so the bag, playground, export and quality bar take it like any sprite. **No code from the definition ever runs**, so it needs no worker and can travel in a link.
-- Download for the library = `sprites/<id>.js` that is a fixed two-line wrapper around the JSON. The build scans folders as today; the quality bar applies there (route 1), not in the studio.
+- Download of a version 1 studio sprite = `<id>.js`, a fixed wrapper around the JSON, the visitor's own copy. **Since build item R4a (2026-11-21) it is not a library file**: the build refuses a code file in `sprites/`, and a library sprite is `sprites/<id>.json` of version 2, made with the `/sprite-forge` skill. The quality bar applies to library sprites (route 1), not in the studio.
 
 ## 2. Data formats
 
@@ -136,9 +136,11 @@ Rules the F1 review settled for a library body's figure are gone with it (Remove
 
 `engine/data-sprite.js` (new) exports `dataSprite(json)`: validate, then `defineSprite({...})` with a `render(g, { clip, t, frame, p })` that is framework code. So `renderSheet`, `describeSheet`, the theme (Contract 7), styles (Contract 12, pixel only) and the quality bar work unchanged. The catalogue row is derived from that result as for any sprite (Contract 4).
 
-### 2.4 From the studio to `sprites/`: a `.js` file that is data
+### 2.4 From the studio to `sprites/`: a `.js` file that is data (HISTORY: superseded by R4a)
 
-**Choice: `sprites/<id>.js`, generated, of exactly this form**, not a `.json` file:
+**Superseded (build items B9 and R4a, 2026-11-21).** The library no longer takes this file: the build refuses any code file in `sprites/`, and Keyang answered DQ1 `.json` (`docs/data-sprites.md` section 10). A library sprite is `sprites/<id>.json`, version 2, made with the `/sprite-forge` skill. The writer below (`catalog/data-file.js`) still makes the version 1 studio file as the visitor's own copy, and the studio still opens it ("Open a file"). What follows is the design as it was when written.
+
+**Choice (as it was): `sprites/<id>.js`, generated, of exactly this form**, not a `.json` file:
 
 ```js
 // Made in the Loadout studio. This file is data: open it in the studio (#/studio, "Open a file") to change it.
@@ -148,7 +150,7 @@ export default dataSprite({ ...the definition, as JSON... });
 
 A library sprite converted from its code file (`made: { in: "library", from: "code:<id>" }`, F2) has the same form with a line 1 that is true for it: `// Converted from code to data for the Loadout library. This file is data, not code: the build refuses it with anything else in it.` The writer picks line 1 from `made.in` and the reader refuses a line 1 that says otherwise (`catalog/data-file.js headerFor`).
 
-Why: the site and the tools load a sprite as the module `sprites/<id>.js` (checked: `app/catalog.js loadSprite` imports `../sprites/${id}.js`; `tools/lib/assets.mjs` imports every `.js` in `sprites/`; `app/api-core.js`, `tools/render.mjs`, `scene.mjs`, `tilemap.mjs`, `bundles-from-plans.mjs` and `lib/quality-run.mjs` build that path). A `.json` sprite means changing all of them, the catalogue's `src`, the quality cache key and the "new file is found" test. The wrapper changes none. It stays data: `tools/lib/data-file.mjs` (new) reads the middle back as JSON and the build refuses a file that claims the header but is not exactly this form (so nobody hand-edits code into it). It also answers R2 for every future data sprite: "a JSON object inside one fixed call".
+Why (as it was; no longer true): the site and the tools loaded a sprite as the module `sprites/<id>.js` (checked: `app/catalog.js loadSprite` imported `../sprites/${id}.js`; `tools/lib/assets.mjs` imported every `.js` in `sprites/`; `app/api-core.js`, `tools/render.mjs`, `scene.mjs`, `tilemap.mjs`, `bundles-from-plans.mjs` and `lib/quality-run.mjs` build that path). A `.json` sprite means changing all of them, the catalogue's `src`, the quality cache key and the "new file is found" test. The wrapper changes none. It stays data: `tools/lib/data-file.mjs` (new) reads the middle back as JSON and the build refuses a file that claims the header but is not exactly this form (so nobody hand-edits code into it). It also answers R2 for every future data sprite: "a JSON object inside one fixed call".
 
 ## 3. The code rigs and the studio
 
@@ -287,7 +289,7 @@ All under `loadout.studio`, plain data in and out, never throwing (`{ ok: false,
 | `studio.render(draftOrDefinition, { clip, frame, params, scale, bones })` | `studio_render` | PNG data address of a frame or strip; `bones: true` draws the skeleton over it |
 | `studio.advice(draft)` | `studio_advice` | The quality bar's findings, as advice |
 | `studio.toBag(draft)` | `studio_to_bag` | Put in the bag (linked: later sets update it) |
-| `studio.file(draft)` | `studio_file` | `{ name: "<id>.js", text }`: the library file |
+| `studio.file(draft)` | `studio_file` | `{ name: "<id>.js", text, library }`: the file to keep (version 1: `.js`, not a library file, `library.ok` false since R4a; version 2: `<id>.json`) |
 | `studio.open(draft, mode)` | (`go`) | Opens the page |
 
 An agent can therefore build the whole newt with `create` + `set` + `render` + `toBag` + `file`, the same as a person.

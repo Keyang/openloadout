@@ -3,8 +3,9 @@
 // a sprite can name them with `from`, and the Hero (tests/fixtures/person-side/knight.json) rebuilt to keep exactly the
 // code knight's clips (a clip list on `extends`) and to punch, walk and run unarmed with Weapon none (a `from` that
 // picks by a setting), as sprites/knight.js does. Held to here:
-//   - base:person-side@7 in pieces/ is the base with its variant clips, what tools/bake-person-side.mjs writes, pinned,
-//     and under the 128 KB piece cap; the released @6 is unchanged (no variant clips)
+//   - base:person-side@7 in pieces/ is the base with its variant clips, pinned, and under the 128 KB piece cap; the
+//     released @6 is unchanged (no variant clips). (tools/bake-person-side.mjs wrote them and went in R2b, 2026-11-21: that
+//     pieces/ equals what it writes is no longer held; the pins hold the content)
 //   - the Hero extends @7, takes the code knight's clips and no more, and picks walk, run and attack by Weapon; at each
 //     setting a clip's keys are the base clip's it picked; with no weapon it is close in pixels to the code knight with
 //     none, closer than the armed clips would be
@@ -13,7 +14,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { bakedPieces, STANDARD_CLIPS, VARIANT_CLIPS, VARIANTS_PUBLISHED } from '../../tools/bake-person-side.mjs';
 import { validatePiece, createPieceStore, pieceRegistry, PIECE_LIMITS } from '../../engine/pieces.js';
 import { readPins, pieceHash } from '../../tools/lib/pieces-index.mjs';
 import { validateSprite } from '../../catalog/sprite-schema.js';
@@ -30,19 +30,19 @@ const BASE7 = json(V7);
 const HERO = json('tests/fixtures/person-side/knight.json');
 const SKETCHES = ['bone-soldier', 'spear-goblin', 'wizard'];
 const sketch = (id) => json(`tests/fixtures/person-side/thrust/${id}.json`);
-/** Every piece the baker writes, as on disk (the Hero's parts and the base). */
+/** The names of the base's standard clips and of its variants (what the baker listed). */
+const STANDARD_CLIPS = Object.fromEntries(['idle', 'walk', 'run', 'jump', 'attack', 'shoot', 'cast', 'block', 'hurt', 'die', 'victory', 'talk'].map((n) => [n, true]));
+const VARIANT_CLIPS = Object.fromEntries(['walk-unarmed', 'run-unarmed', 'talk-unarmed', 'punch', 'thrust', 'shoot-bow'].map((n) => [n, true]));
+/** The pieces the baker wrote, as on disk (the Hero's parts and the base). */
+const BAKED_FILES = [V7, 'pieces/part-hair.v2.json', 'pieces/part-hair-long.v1.json', 'pieces/part-ponytail.v1.json', 'pieces/part-hair-nape.v2.json', 'pieces/part-helmet.v3.json', 'pieces/part-plume.v1.json', 'pieces/part-crown.v4.json', 'pieces/part-cape.v1.json', 'pieces/part-cape-ground.v2.json', 'pieces/part-belt.v1.json', 'pieces/held-sword.v1.json', 'pieces/held-axe.v1.json', 'pieces/held-spear.v1.json'];
 const store = () => {
   const s = createPieceStore();
-  for (const { file } of bakedPieces()) s.add(read(file), file.split('/').pop());
+  for (const file of BAKED_FILES) s.add(read(file), file.split('/').pop());
   return s;
 };
 const knight = await codeSprite('knight');
 
-test('base:person-side@7 is the base with its variant clips: what the baker writes, pinned, under the piece cap', () => {
-  assert.equal(VARIANTS_PUBLISHED, true);
-  const base = bakedPieces()[0];
-  assert.equal(base.file, V7, 'the baker writes the base as @7');
-  assert.deepEqual(BASE7, JSON.parse(JSON.stringify(base.value)), 'node tools/bake-person-side.mjs --write');
+test('base:person-side@7 is the base with its variant clips, pinned, under the piece cap', () => {
   assert.deepEqual(Object.keys(BASE7.body.clips), [...Object.keys(STANDARD_CLIPS), ...Object.keys(VARIANT_CLIPS)]);
   for (const name of ['punch', 'thrust', 'walk-unarmed', 'run-unarmed', 'talk-unarmed', 'shoot-bow']) assert.ok(BASE7.body.clips[name], name);
   const text = read(V7);

@@ -8,6 +8,7 @@
 //   engine/shapes.js   clippedIn  a shape test kept only inside a box (the upper half of a rounded box: a chest lid)
 //   engine/surface.js  leanRoom   the steepest lean() a picture can take and keep clear of the frame's sides
 // Also pinned here, as the crate uses it: cropped (engine/surface.js, added with batch S14) cuts a layer in two.
+// R3 (2026-11-21): engine/cloth.js (flag) went with its tests; the helpers listed above that are still modules stay.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { Surface, tilt, lean, leanRoom, cropped, ellipseIn } from '../../engine/surface.js';
@@ -15,7 +16,6 @@ import { clippedIn, insetIn } from '../../engine/shapes.js';
 import { squircleIn } from '../../engine/solids.js';
 import { chunks, rays, steps } from '../../engine/fx.js';
 import { MARKS, markIn, drawMark } from '../../engine/marks.js';
-import { flag } from '../../engine/cloth.js';
 import { ramp, col } from '../../engine/color.js';
 import { PI } from '../../engine/motion.js';
 
@@ -176,47 +176,6 @@ test('the skull keeps two eye holes at 7 px and 9 px', () => {
     }
     assert.ok(holes >= 2, `${size}px skull has ${holes} hole pixels`);
   }
-});
-
-// ---- flag ---------------------------------------------------------------------
-
-const fly = (g, t, extra = {}) => flag(g, { x: 10, y: 6, length: 18, height: 12, t, paint: ramp('#3f6fd1'), ...extra });
-
-test('flag: the hoist column stays on the pole and the loop closes', () => {
-  for (const shape of ['banner', 'pennant', 'swallowtail']) {
-    const frames = ts.slice(0, 8).map((t) => { const g = new Surface(40, 32); fly(g, t, { shape }); return g; });
-    for (const g of frames) {
-      assert.ok(g.get(10, 6) && g.get(10, 17), `${shape}: the hoist column runs from y to y + height - 1`);
-      assert.ok(!g.get(9, 10), `${shape}: nothing left of the hoist`);
-    }
-    const wrap = new Surface(40, 32); fly(wrap, 1, { shape });
-    assert.ok(same(wrap, frames[0]), `${shape}: t = 1 equals t = 0`);
-    assert.ok(!same(frames[0], frames[2]), `${shape}: it moves`);
-  }
-});
-
-test('flag: the three shapes have different outlines', () => {
-  const draw = (shape) => { const g = new Surface(40, 32); fly(g, 0, { shape, amp: 0 }); return g; };
-  const b = draw('banner'), p = draw('pennant'), s = draw('swallowtail');
-  assert.equal(lit(b), 18 * 12);
-  assert.ok(lit(p) < lit(b) * 0.7, 'a pennant tapers');
-  assert.ok(lit(s) < lit(b) && lit(s) > lit(p), 'a swallowtail has a notch cut out');
-  assert.ok(!s.get(27, 12) && s.get(27, 6) && s.get(27, 17), 'the notch is at the fly end, between two tails');
-  assert.ok(p.get(27, 11) || p.get(27, 12), 'the pennant ends in a point at mid height');
-});
-
-test('flag: more amp moves the fly end further; marks ride the cloth; it reports where the cloth is', () => {
-  const span = (amp) => { let lo = 99, hi = -99; for (const t of ts) { const g = new Surface(40, 40); const f = flag(g, { x: 10, y: 14, length: 18, height: 10, t, amp, paint: ramp('#c9423a') }); lo = Math.min(lo, f.offset(1)); hi = Math.max(hi, f.offset(1)); } return hi - lo; };
-  assert.ok(span(3) > span(1));
-  const g = new Surface(40, 32);
-  const f = fly(g, 0.3, { amp: 3, marks: [{ inside: (px, py) => Math.abs(px - 19) < 2 && Math.abs(py - 12) < 2, paint: '#f2c230' }] });
-  const gold = col('#f2c230');
-  const ys = [];
-  for (let y = 0; y < 32; y++) for (let x = 0; x < 40; x++) if (g.get(x, y) === gold) ys.push(y);
-  assert.ok(ys.length >= 8, `the mark is printed (${ys.length} px)`);
-  const [ax, ay] = f.at(0.5, 0.5);
-  assert.ok(Math.abs(ax - 19) <= 1 && Math.abs(ay - (12 + f.offset(0.5))) <= 1, `at(0.5, 0.5) is the middle of the waving cloth: ${ax}, ${ay}`);
-  assert.ok(g.get(Math.floor(ax), Math.floor(ay)), 'and that pixel is cloth');
 });
 
 // ---- clippedIn ------------------------------------------------------------------

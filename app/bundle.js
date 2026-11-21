@@ -259,7 +259,7 @@ export async function packageFiles({ items, theme = null, scale = 1, catalog = n
       themeOf.set(a, ti);
       programOf.set(a, sprite);
       if (studio) {
-        // the library file of a studio sprite, beside its sheet: drop it into sprites/ to make it part of the library
+        // the file of a studio sprite, beside its sheet, to keep as a copy (the library takes only data sprites made with /sprite-forge, so it is not for sprites/)
         a.madeIn = 'studio';
         a.source = `sprites/${folder}/${studio.file.name}`;
         files.push({ name: a.source, data: enc.encode(studio.file.text) });

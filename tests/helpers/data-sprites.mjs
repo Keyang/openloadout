@@ -82,7 +82,8 @@ export const asFile = (def) => `${JSON.stringify(def, null, 2)}\n`;
 /**
  * A scratch project: copies of the framework folders, sprites/ sounds/ bundles/ pieces/ (empty unless given), and:
  *   data     { '<id>': definition | text } written as sprites/<id>.json
- *   code     ids of code sprites to copy as sprites/<id>.js: the frozen copy (tests/fixtures/code-sprites/) first, else the real project's file
+ *   code     ids of code sprites to copy as sprites/<id>.js from the frozen copy (tests/fixtures/code-sprites/): only for a test that
+ *            wants to see the build, the loader or the quality run REFUSE a code file in sprites/ (build item R4a); they load none
  *   sounds   ids of the real project's sounds to copy, or { '<id>': patch }
  *   pieces   true: the two test pieces of tests/fixtures/pieces/pieces (with their pins)
  *   files    { '<relative path>': text } anything else
@@ -93,7 +94,7 @@ export function dataProject({ data = {}, code = [], sounds = [], pieces = false,
   for (const d of FRAMEWORK) fs.cpSync(path.join(ROOT, d), path.join(root, d), { recursive: true });
   for (const d of ['sprites', 'sounds', 'bundles', 'pieces']) fs.mkdirSync(path.join(root, d), { recursive: true });
   for (const [id, def] of Object.entries(data)) fs.writeFileSync(path.join(root, 'sprites', `${id}.json`), typeof def === 'string' ? def : asFile(def));
-  // a code sprite, frozen copy first as codeSprite reads it (tests/helpers/library.mjs), imports put back for sprites/
+  // a code sprite, as codeSprite reads it (tests/helpers/library.mjs), imports put back for sprites/: the project then holds a file the build refuses
   for (const id of code) fs.writeFileSync(path.join(root, 'sprites', `${id}.js`), codeSpriteAsFile(id));
   if (Array.isArray(sounds)) for (const id of sounds) fs.copyFileSync(path.join(ROOT, 'sounds', `${id}.json`), path.join(root, 'sounds', `${id}.json`));
   else for (const [id, patch] of Object.entries(sounds)) fs.writeFileSync(path.join(root, 'sounds', `${id}.json`), JSON.stringify(patch));

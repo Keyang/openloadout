@@ -1,0 +1,81 @@
+{
+ "about": "The standard clip table of the code rig rigs/humanoid.js (H.clipsFor of the base's standard clips: frames, loop, and fps at the middle speed) and its list of poses (H.POSES), recorded 2026-11-21 before R2b deleted the rig, for tests/unit/pieces-person-side.test.mjs.",
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "loop": true,
+   "fps": 7.3500000000000005
+  },
+  "walk": {
+   "frames": 8,
+   "loop": true,
+   "fps": 10.5
+  },
+  "run": {
+   "frames": 8,
+   "loop": true,
+   "fps": 14.700000000000001
+  },
+  "jump": {
+   "frames": 8,
+   "loop": false,
+   "fps": 11.55
+  },
+  "attack": {
+   "frames": 8,
+   "loop": false,
+   "fps": 13.65
+  },
+  "shoot": {
+   "frames": 6,
+   "loop": false,
+   "fps": 14.700000000000001
+  },
+  "cast": {
+   "frames": 8,
+   "loop": false,
+   "fps": 10.5
+  },
+  "block": {
+   "frames": 6,
+   "loop": false,
+   "fps": 10.5
+  },
+  "hurt": {
+   "frames": 4,
+   "loop": false,
+   "fps": 9.450000000000001
+  },
+  "die": {
+   "frames": 8,
+   "loop": false,
+   "fps": 10.5
+  },
+  "victory": {
+   "frames": 8,
+   "loop": true,
+   "fps": 8.4
+  },
+  "talk": {
+   "frames": 8,
+   "loop": true,
+   "fps": 7.3500000000000005
+  }
+ },
+ "poses": [
+  "idle",
+  "walk",
+  "run",
+  "jump",
+  "attack",
+  "punch",
+  "thrust",
+  "shoot",
+  "cast",
+  "block",
+  "hurt",
+  "die",
+  "victory",
+  "talk"
+ ]
+}

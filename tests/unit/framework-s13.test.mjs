@@ -8,14 +8,13 @@
 //                      arch           one broad rise across the 320 px: the limb of a planet, the arc of its ring
 //                      starField      stars that keep their places when their number changes, and twinkle
 //                      nebula         a soft cloud patch in two tones that wraps
+// R3 (2026-11-21): engine/space.js (spaceLook, arch, starField, nebula, lighterThan, noDarkerThan) went with its tests; the shafts and tiles tests stay.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { Surface } from '../../engine/surface.js';
 import { col, brightness } from '../../engine/color.js';
 import { PALETTES, applyColour } from '../../engine/theme.js';
 import { DEPTH_KINDS, dashedRim, shaftWall, depthFill, trussIn, cableRun } from '../../engine/shafts.js';
-import { spaceLook, arch, starField, nebula } from '../../engine/space.js';
-
 const VOID = '#141a33', LINE = '#333564', LIP = '#7c8ca5', AMBER = '#f2a030';
 const lit = (g) => g.data.reduce((n, v) => n + (v ? 1 : 0), 0);
 const same = (a, b) => a.data.every((v, i) => v === b.data[i]);
@@ -122,125 +121,12 @@ test('cableRun: hangs straight down, and leans more the further down it is', () 
   assert.deepEqual(cableRun(10, 2, 12, -4).at(-1), [6, 14]);
 });
 
-// ---- engine/space.js -------------------------------------------------------------------------------
-
-test('spaceLook: three dark bands, the lightest last, a step of value apart', () => {
-  for (const sky of ['#434d6d', '#566182', '#6660b6', '#6b7896', '#a87894']) {
-    const look = spaceLook(sky, VOID);
-    assert.equal(look.bands.length, 3);
-    for (let i = 1; i < 3; i++) assert.ok(brightness(look.bands[i]) - brightness(look.bands[i - 1]) >= 0.03, `${sky}: ${look.bands}`);
-    assert.ok(brightness(look.bands[0]) < 0.17 && brightness(look.bands[2]) < 0.4, `${sky}: space stays dark (${look.bands})`);
-    assert.equal(look.air, look.bands[2]);
-    assert.equal(new Set(applyColour(Uint32Array.from(look.bands.map(col)), { palette: PALETTES[0].name })).size >= 2, true, 'a palette keeps the top and the bottom apart');
-  }
-});
-
-test('arch: one rise across the layer that repeats every 320 px', () => {
-  const limb = arch({ base: 172, height: 30, at: 200 });
-  assert.equal(limb(200), 142);
-  assert.ok(Math.abs(limb(40) - 172) < 1e-9, 'lowest half way round');
-  for (const x of [0, 13.5, 160, 319.5]) {
-    assert.ok(Math.abs(limb(x) - limb(x + 320)) < 1e-9);
-    assert.ok(limb(x) >= 142 && limb(x) <= 172);
-  }
-  assert.ok(Math.abs(limb(190) - limb(210)) < 1e-9, 'the same on both sides of its top');
-  const flat = arch({ base: 172, height: 30, at: 200, power: 2 });
-  assert.ok(flat(120) > limb(120), 'a higher power makes a narrower rise');
-});
-
-test('starField: stars keep their places as their number grows, wrap, and are never one pixel', () => {
-  const colours = { dim: '#697586', bright: '#e8ecf2', heart: '#ffffff' };
-  const draw = (count, t = null, extra = {}) => { const g = new Surface(320, 180); starField(g, { count, seed: 4, top: 4, bottom: 120, colours, t, ...extra }); return g; };
-  const few = draw(20), many = draw(60);
-  assert.ok(lit(many) > lit(few) * 2);
-  for (let i = 0; i < few.data.length; i++) if (few.data[i]) assert.ok(many.data[i], 'a star of the few is gone among the many');
-  assert.ok(same(draw(20), few), 'the same every time');
-  const b = many.bounds();
-  assert.ok(b.y0 >= 4 && b.y1 < 120, `rows ${b.y0}..${b.y1}`);
-  for (const g of [many, draw(60, 0.25), draw(60, 0.5)]) {
-    const on = (x, y) => y >= 0 && y < 180 && g.data[y * 320 + ((x + 320) % 320)] !== 0;
-    for (let y = 0; y < 180; y++) for (let x = 0; x < 320; x++) if (on(x, y)) assert.ok(on(x - 1, y) || on(x + 1, y) || on(x, y - 1) || on(x, y + 1), `a single pixel at ${x},${y}`);
-  }
-  // a star that hangs over the right edge comes back in on the left
-  const edge = new Surface(320, 180);
-  starField(edge, { count: 400, seed: 2, top: 0, bottom: 180, colours, plus: 1, big: 1 });
-  let left = 0, right = 0;
-  for (let y = 0; y < 180; y++) { if (edge.data[y * 320]) left++; if (edge.data[y * 320 + 319]) right++; }
-  assert.ok(left > 0 && right > 0, 'stars reach both edges');
-});
-
-test('starField: twinkling changes the frames, closes the loop, and can be switched off', () => {
-  const colours = { dim: '#697586', bright: '#e8ecf2', heart: '#ffffff' };
-  const draw = (t, twinkle) => { const g = new Surface(320, 180); starField(g, { count: 40, seed: 9, colours, t, twinkle }); return g; };
-  assert.ok(!same(draw(0, 0.6), draw(0.5, 0.6)));
-  assert.ok(same(draw(0, 0.6), draw(1, 0.6)));
-  assert.ok(same(draw(0, 0), draw(0.5, 0)), 'no star twinkles');
-  assert.ok(same(draw(null, 0.6), draw(0.5, 0)), 'no time: the stars at rest');
-});
-
-test('nebula: a patch in two or three tones that stays in its box and wraps', () => {
-  const tones = { base: '#3a3f6e', light: '#56589a' };
-  const g = new Surface(320, 180);
-  nebula(g, 160, 70, 150, 70, tones, 3);
-  const b = g.bounds();
-  assert.ok(b.x0 >= 160 - 76 && b.x1 <= 160 + 76 && b.y0 >= 70 - 36 && b.y1 <= 70 + 36, JSON.stringify(b));
-  assert.ok(b.x1 - b.x0 > 90 && b.y1 - b.y0 > 36, `it fills most of its box (${JSON.stringify(b)})`);
-  const count = (s, hex) => s.data.reduce((n, v) => n + (v === col(hex) ? 1 : 0), 0);
-  assert.ok(count(g, tones.base) > 600 && count(g, tones.light) > 300, `${count(g, tones.base)} / ${count(g, tones.light)}`);
-  assert.equal(lit(g), count(g, tones.base) + count(g, tones.light));
-  const three = new Surface(320, 180);
-  nebula(three, 160, 70, 150, 70, { ...tones, core: '#8a8ad0' }, 3);
-  assert.ok(count(three, '#8a8ad0') > 40 && count(three, '#8a8ad0') < count(three, tones.light), 'a small bright heart');
-  assert.equal(lit(three), lit(g), 'the heart adds no outline');
-  const over = new Surface(320, 180);
-  nebula(over, 300, 70, 150, 70, tones, 3);
-  assert.ok(over.get(319, 70) && over.get(4, 70), 'it comes back in on the left');
-  const other = new Surface(320, 180);
-  nebula(other, 160, 70, 150, 70, tones, 4);
-  assert.ok(!same(g, other), 'another seed, another nebula');
-});
-
 // ---- added with batch S13, fix round 1 -------------------------------------------------------------------
-//   engine/space.js    lighterThan    a shape's colour moved lighter until it is clear of what is behind it (never darker)
-//                      noDarkerThan   a tone lifted to a least brightness: the darkest tone of a backdrop, clear of the ink
 //   engine/tiles.js    RIM_PIECES, the decal place 'rim'   something that hangs from a block's north edge: scattered over
 //                                     the pieces that have that edge, never over a fill
 
-const { lighterThan, noDarkerThan } = await import('../../engine/space.js');
 const { blockClips, decoClips, classifyTiles, pickDecal, layoutTiles, pieceOf, DECAL_CHANCE, RIM_PIECES, FACE_PIECES } = await import('../../engine/tiles.js');
 const { INK, tone } = await import('../../engine/color.js');
-
-test('lighterThan: a clear step of value above everything behind it, a different colour under every palette, and never darker', () => {
-  const band = '#2e3653', dark = '#191f39';
-  const under = (hex) => PALETTES.map((pal) => applyColour(new Uint32Array([col(hex)]), { palette: pal.name })[0]);
-  for (const c of ['#2e3653', '#2c3350', '#3f456d', '#2fb3a8', '#141a33', '#6660b6']) {
-    const out = lighterThan(c, [band], { also: [dark] });
-    assert.ok(brightness(out) >= brightness(c) - 1e-9, `${c} went darker: ${out}`);
-    assert.ok(brightness(out) - brightness(band) >= 0.08 - 1e-9, `${c} -> ${out} is not a step above the band`);
-    const mine = under(out), theirs = under(band);
-    assert.ok(mine.every((m, k) => m !== theirs[k]), `${c} -> ${out} turns into the band under a palette`);
-    assert.equal(lighterThan(c, [band], { also: [dark] }), out, 'the same every time');
-  }
-  assert.equal(lighterThan('#2fb3a8', [], {}), '#2fb3a8', 'nothing behind it: unchanged');
-  // `also` asks for the step of value only, and a smaller step is a fainter shape
-  const faint = lighterThan('#2f3754', [], { also: [band], step: 0.06 });
-  assert.ok(brightness(faint) - brightness(band) >= 0.06 - 1e-9 && brightness(faint) < brightness(lighterThan('#2f3754', [band])) + 1e-9);
-  const clear = lighterThan('#e8ecf2', [band]);
-  assert.equal(clear, '#e8ecf2', 'a colour that is already clear comes back unchanged');
-});
-
-test('noDarkerThan: lifts a tone that is as dark as the ink, keeps its hue, and leaves a lighter one alone', () => {
-  for (const c of ['#002a54', '#160743', '#000000', INK, tone('#2f8186', -2)]) {
-    const out = noDarkerThan(c);
-    assert.ok(brightness(out) >= 0.18, `${c} -> ${out} (${brightness(out)})`);
-    assert.ok(brightness(out) < 0.2, `${c} -> ${out}: lifted no further than it has to be`);
-    assert.ok(brightness(out) > brightness(INK) + 0.04, 'clear of the ink');
-  }
-  const [r, g, b] = [1, 3, 5].map((i) => parseInt(noDarkerThan('#002a54').slice(i, i + 2), 16));
-  assert.ok(b > g && g > r, 'a dark blue is still a blue');
-  assert.equal(noDarkerThan('#566182'), '#566182');
-  assert.ok(brightness(noDarkerThan('#141a33', 0.3)) >= 0.3, 'another floor');
-});
 
 const HOLES = { 'floor-fill': {}, ...blockClips('pit', { kind: 'hole', narrow: true, fills: 3 }), ...decoClips('pit', ['rim', { place: 'rim', label: 'Cables' }, 'on']), ...decoClips('floor', ['on']) };
 const DECK = [

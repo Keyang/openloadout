@@ -174,10 +174,11 @@ test('tools/tilemap.mjs --map draws a map written as letters, and says what it c
 });
 test('tools/tilemap.mjs lays out a top-down room for a top-down tileset', () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'loadout-map-'));
-  const out = execFileSync(process.execPath, [path.join(root, 'tools/tilemap.mjs'), '--file', path.join(root, 'tests/fixtures/quality/sprite-files/q-room-tiles.js'), '--out', dir], { encoding: 'utf8' });
+  // (a library data tileset by its id: the tool takes no code file since build item R4a, and the old code fixture q-room-tiles.js only fed the tile helper's own test above)
+  const out = execFileSync(process.execPath, [path.join(root, 'tools/tilemap.mjs'), 'tiles-dungeon', '--out', dir], { encoding: 'utf8' });
   assert.match(out, /top-down room/);
   assert.ok(!/note:/.test(out), out);
-  const b = fs.readFileSync(path.join(dir, 'q-room-tiles-map.png'));
+  const b = fs.readFileSync(path.join(dir, 'tiles-dungeon-map.png'));
   assert.deepEqual([b.readUInt32BE(16), b.readUInt32BE(20)], [18 * 32 * 2, 12 * 32 * 2]);
   fs.rmSync(dir, { recursive: true, force: true });
 });

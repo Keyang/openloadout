@@ -4,15 +4,15 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { failureReport } from '../../tools/lib/quality-run.mjs';
 
-const ok = { kind: 'sprite', file: 'sprites/fine.js', id: 'fine', name: 'Fine', ok: true, errors: [], warnings: ['a warning'] };
-const empty = { kind: 'sprite', file: 'sprites/glow-crate.js', id: 'glow-crate', name: 'Glow crate', ok: false, errors: ['idle frame 0 / default: nothing drawn (and 22 more)'], warnings: [] };
+const ok = { kind: 'sprite', file: 'sprites/fine.json', id: 'fine', name: 'Fine', ok: true, errors: [], warnings: ['a warning'] };
+const empty = { kind: 'sprite', file: 'sprites/glow-crate.json', id: 'glow-crate', name: 'Glow crate', ok: false, errors: ['idle frame 0 / default: nothing drawn (and 22 more)'], warnings: [] };
 const two = { kind: 'sound', file: 'sounds/soft-chime.json', id: 'soft-chime', name: 'Soft chime', ok: false, errors: ['silent: nothing is heard', 'clips: the loudest moment is cut off'], warnings: [] };
 
 test('says which file, what is wrong and what to do, for each asset that failed and no other', () => {
   const text = failureReport([ok, empty, two]).join('\n');
   assert.doesNotMatch(text, /fine/i, 'an asset that passed is not listed');
   // which file, with the name a person knows it by
-  assert.match(text, /sprites\/glow-crate\.js/);
+  assert.match(text, /sprites\/glow-crate\.json/);
   assert.match(text, /Glow crate/);
   assert.match(text, /sounds\/soft-chime\.json/);
   assert.match(text, /Soft chime/);
@@ -37,9 +37,9 @@ test('explains the short forms a finding uses, when one is there', () => {
 });
 
 test('a file that cannot be opened, and a checker that broke, get their own advice', () => {
-  const broken = { kind: 'sprite', file: 'sprites/typo.js', id: 'typo', ok: false, errors: ['cannot be loaded: Unexpected token \'}\''], warnings: [] };
+  const broken = { kind: 'sprite', file: 'sprites/typo.json', id: 'typo', ok: false, errors: ['cannot be loaded: Unexpected token \'}\''], warnings: [] };
   const badJson = { kind: 'sound', file: 'sounds/typo.json', id: 'typo', ok: false, errors: ['cannot be read: Unexpected end of JSON input'], warnings: [] };
-  const crashed = { kind: 'sprite', file: 'sprites/unlucky.js', id: 'unlucky.js', ok: false, errors: ['checker crashed: boom'], warnings: [] };
+  const crashed = { kind: 'sprite', file: 'sprites/unlucky.json', id: 'unlucky.json', ok: false, errors: ['checker crashed: boom'], warnings: [] };
   const a = failureReport([broken]).join('\n');
   assert.match(a, /mistake/i);
   assert.ok(a.includes('node tools/check.mjs typo'));

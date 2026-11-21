@@ -1,7 +1,7 @@
 // Data sprites as library files (docs/data-sprites.md, build item B9; section 10 DQ1: a data sprite is sprites/<id>.json).
-// tools/lib/assets.mjs loads sprites/*.json through engine/data-sprite.js next to the code files (.js), and the
-// catalogue (tools/lib/catalog.mjs) makes their rows like any sprite's, with the definition's `rev`. Every test works in
-// a scratch project (tests/helpers/data-sprites.mjs), never in the real sprites/.
+// tools/lib/assets.mjs loads sprites/*.json through engine/data-sprite.js (a code file in sprites/ is refused since build
+// item R4a: tests/unit/assets-refuse-code.test.mjs), and the catalogue (tools/lib/catalog.mjs) makes their rows like any
+// sprite's, with the definition's `rev`. Every test works in a scratch project (tests/helpers/data-sprites.mjs), never in the real sprites/.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -14,16 +14,15 @@ import { dataProject, coinDef, badgeDef, tuftDef, asFile, ROOT } from '../helper
 const solid = (g) => g.data.filter((v) => v >>> 24).length;
 const rejects = (p, re) => assert.rejects(p, (e) => { assert.match(e.message, re); return true; });
 
-test('loadSprites finds sprites/<id>.json beside the code files, sorted by id, as ordinary sprites', async () => {
-  const root = dataProject({ data: { badge: badgeDef(), 'tuft-pot': tuftDef() }, code: ['coin'], pieces: true });
+test('loadSprites finds sprites/<id>.json, sorted by id, as ordinary sprites', async () => {
+  const root = dataProject({ data: { badge: badgeDef(), 'tuft-pot': tuftDef() }, pieces: true });
   const list = await loadSprites(root);
-  assert.deepEqual(list.map((s) => s.id), ['badge', 'coin', 'tuft-pot']);
-  assert.deepEqual(list.map((s) => s.file), ['sprites/badge.json', 'sprites/coin.js', 'sprites/tuft-pot.json']);
-  const [badge, coin, tuft] = list;
+  assert.deepEqual(list.map((s) => s.id), ['badge', 'tuft-pot']);
+  assert.deepEqual(list.map((s) => s.file), ['sprites/badge.json', 'sprites/tuft-pot.json']);
+  const [badge, tuft] = list;
   assert.equal(badge.data, true);
-  assert.equal(coin.data, undefined, 'a code file is not marked as data');
+  assert.equal(tuft.data, true);
   assert.match(badge.rev, /^[0-9a-f]{12}$/);
-  assert.equal(coin.rev, undefined);
   for (const s of [badge, tuft]) {
     assert.equal(typeof s.def.render, 'function');
     assert.equal(s.def.id, s.id);
@@ -32,7 +31,7 @@ test('loadSprites finds sprites/<id>.json beside the code files, sorted by id, a
   assert.deepEqual(Object.keys(badge.def.params).sort(), ['picture', 'plate', 'sign']);
   // loadAssets carries them unchanged
   const all = await loadAssets(root);
-  assert.deepEqual(all.sprites.map((s) => s.id), ['badge', 'coin', 'tuft-pot']);
+  assert.deepEqual(all.sprites.map((s) => s.id), ['badge', 'tuft-pot']);
 });
 
 test('a data file is drawn by the project it is in: its own engine/ and pieces/', async () => {
@@ -54,9 +53,9 @@ test('a data file that is not JSON, names another id, or fails its check stops t
   await rejects(loadSprites(dataProject({ data: { badge: 'export default {}' } })), /sprites\/badge\.json: not valid JSON/);
 });
 
-test('one id cannot have both a code file and a data file', async () => {
+test('a code file beside the data file of its id is refused, naming the code file (R4a)', async () => {
   const root = dataProject({ data: { coin: coinDef() }, code: ['coin'] });
-  await rejects(loadSprites(root), /sprites\/coin\.js and sprites\/coin\.json/);
+  await rejects(loadSprites(root), /^sprites\/coin\.js: a code sprite.*sprites\/coin\.json.*\/sprite-forge/);
 });
 
 test('a library data file is checked strictly: gaps in meta and sounds that do not exist are errors', async () => {
@@ -75,12 +74,11 @@ test('a piece the definition names that is not in pieces/ stops the load, naming
   await rejects(loadSprites(dataProject({ data: { 'tuft-pot': tuftDef() } })), /sprites\/tuft-pot\.json: .*part:test-tuft@1/);
 });
 
-test('a version 1 studio definition saved as .json loads too', async () => {
+test('a version 1 studio definition saved as .json is refused: the library takes version 2 only (R4a)', async () => {
   const newt = JSON.parse(fs.readFileSync(path.join(ROOT, 'tests', 'fixtures', 'studio', 'newt.json'), 'utf8'));
-  const [s] = await loadSprites(dataProject({ data: { [newt.id]: newt }, sounds: [...new Set(Object.values(newt.clips).flatMap((c) => (c.sounds ?? []).map((x) => x.sound)))] }));
-  assert.equal(s.id, newt.id);
-  assert.equal(s.data, true);
-  assert.ok(solid(renderFrame(s.def, s.def.preview, 0, defaultParams(s.def))) > 20);
+  assert.equal(newt.version, 1);
+  await rejects(loadSprites(dataProject({ data: { [newt.id]: newt }, sounds: [...new Set(Object.values(newt.clips).flatMap((c) => (c.sounds ?? []).map((x) => x.sound)))] })),
+    /^sprites\/moss-newt\.json: not a data sprite of format "loadout-sprite", version 2 \(found format "loadout-sprite", version 1\).*\/sprite-forge/);
 });
 
 test('rev is a short hash of the definition: spacing and key order do not change it, a changed value does', () => {
@@ -104,15 +102,15 @@ test('loadDataSprite loads one data file by path, inside the project or out of i
   await rejects(loadDataSprite(root, path.join(root, 'sprites', 'nothing.json')), /nothing\.json/);
 });
 
-test('findSpriteFile and spriteIds know both kinds of file', () => {
+test('findSpriteFile and spriteIds know the data files only: a code file is no sprite (R4a)', () => {
   // an index file is never a sprite (its name is written in pieces: tests/unit/catalog-no-lists.test.mjs looks for the old list's name)
   const index = ['sprites/', 'index', '.json'].join('');
   const root = dataProject({ data: { badge: badgeDef() }, code: ['coin'], files: { 'sprites/_shared.js': 'export const X = 1;\n', [index]: '{}' } });
   assert.equal(findSpriteFile(root, 'badge'), path.join(root, 'sprites', 'badge.json'));
-  assert.equal(findSpriteFile(root, 'coin'), path.join(root, 'sprites', 'coin.js'));
+  assert.equal(findSpriteFile(root, 'coin'), null, 'the code file coin.js is not a sprite');
   assert.equal(findSpriteFile(root, 'nothing'), null);
   assert.equal(findSpriteFile(root, '../engine/sprite'), null, 'only a sprite id, never a path');
-  assert.deepEqual(spriteIds(root), ['badge', 'coin']);
+  assert.deepEqual(spriteIds(root), ['badge']);
 });
 
 test('the catalogue row of a data sprite is a sprite row like any other, with src sprites/<id>.json and its rev', async () => {

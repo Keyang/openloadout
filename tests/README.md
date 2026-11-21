@@ -51,3 +51,13 @@ Tips:
 - Audio cannot be heard. Test state (button text, no error). Browsers need a real click before audio starts, so click; do not call functions.
 - Pick elements by role and visible text, as a person would. Do not count on exact numbers of sprites or sounds: assets get added. Use "at least".
 - Music takes a while to start or render: give those waits 30 seconds.
+
+## Tests that hold a redraw or a generator to old code that is gone
+
+The old drawing code is deleted (docs/data-sprites.md section 5, R2b and R3), so a test that compared a redraw or a generator with it reads a record made while the code was still there, never the code:
+
+- **A code sprite** (`codeSprite(id)` in `tests/helpers/library.mjs`): the frozen copy in `tests/fixtures/code-sprites/` while there is one, else a sprite replayed from `tests/fixtures/code-replay/<id>.json` (`tests/helpers/code-replay.mjs`: what the code drew and answered in each call the tests made; a call it does not hold fails, naming the clip, frame and settings). A test that needs a setting nobody recorded cannot be written against a deleted copy: test the library asset.
+- **A helper module** a generator test compared with (`tests/helpers/old-replay.mjs`, `tests/fixtures/old-code/<test>.json`): the test calls `OLD.surface(w, h)` or `OLD.value()` where it once called the module, in the same order, and the record answers. Run the test file whole (`node --test <file>`), not with `--test-name-pattern`: the record is read in the order of the calls.
+- Other records (`tests/fixtures/code-frames/`, `redraw-pixels/`, `redraw-frames/`, `person-side/code-*.json`) are read by name in the test that uses them.
+
+A record is only as good as its proof: each was shown to fail when the redraw it guards is broken in a scratch copy (listed in the removal report).

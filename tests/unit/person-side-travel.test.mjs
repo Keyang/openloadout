@@ -5,8 +5,7 @@
 //   - the copy is the Hero and only that more; it validates on base:person-side@7, and Bounce and Stride are in use
 //   - at the middle of both sliders every frame of every clip draws exactly as the Hero without them
 //   - the poses: at each end of Bounce and Stride the walk's and the run's crouch or lift, foot travel, foot lift and arm
-//     swing grow or shrink by the code rig's own ratio (rigs/humanoid.js pose(), what tests/fixtures/code-sprites/knight.js
-//     draws), within 2%
+//     swing grow or shrink by the code rig's own ratio (rigs/humanoid.js pose(), recorded in tests/fixtures/person-side/code-moves.json), within 2%
 //   - the pixels: against the frozen code knight at Bounce 0 and 1 and Stride 0 and 1, the walk and the run change the
 //     same way (the body's up-and-down travel with Bounce, the feet's spread with Stride), each end close to the code's
 //   - Stride leaves the idle alone, as in the code
@@ -19,7 +18,6 @@ import { makeDataSprite } from '../../engine/data-sprite.js';
 import { renderFrame, cleanParams } from '../../engine/sprite.js';
 import { createPieceStore, pieceRegistry } from '../../engine/pieces.js';
 import { compileKeys, sampleKeys, framePhase } from '../../rigs/keypose.js';
-import * as H from '../../rigs/humanoid.js';
 import { codeSprite } from '../helpers/library.mjs';
 import { checkSprite } from '../../quality/sprite.js';   // F5 review fix: the copy passes the quality bar
 
@@ -77,11 +75,12 @@ function dataMoves(clip, settings) {
   const poses = Array.from({ length: c.frames }, (_, f) => sampleKeys(comp, framePhase(c, f), { loop: c.loop }));
   return { body: range(poses.map((p) => p.root[1])), step: range(poses.map((p) => p.ik.legF[0])), lift: range(poses.map((p) => p.ik.legF[1])), arm: range(poses.map((p) => p.bones.armF)) };
 }
-/** The code rig's travel of the same: crouch (walk) or lift (run), front foot across and up, front arm swing. */
+/** The code rig's travel of the same: crouch (walk) or lift (run), front foot across and up, front arm swing (recorded from rigs/humanoid.js pose(), deleted by R2b: tests/fixtures/person-side/code-moves.json). */
+const CODE_MOVES = json('tests/fixtures/person-side/code-moves.json').moves;
 function codeMoves(clip, { bounce = 0.5, stride = 0.5 }) {
-  const m = { bounce, stride, armed: true };
-  const poses = Array.from({ length: 8 }, (_, f) => H.pose(clip, f / 8, m));
-  return { body: range(poses.map((p) => (clip === 'run' ? p.lift : p.crouch))), step: range(poses.map((p) => p.footF.x)), lift: range(poses.map((p) => p.footF.y)), arm: range(poses.map((p) => p.armF.a)) };
+  const m = CODE_MOVES[clip][`${bounce},${stride}`];
+  assert.ok(m, `code-moves.json holds no ${clip} at Bounce ${bounce}, Stride ${stride}`);
+  return m;
 }
 
 for (const clip of ['walk', 'run']) {

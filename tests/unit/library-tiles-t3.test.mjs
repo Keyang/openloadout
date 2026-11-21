@@ -12,7 +12,8 @@ import fs from 'node:fs';
 import { tileRules } from '../../engine/tile-rules.js';
 import { classifyTiles } from '../../engine/tiles.js';
 import { cleanParams, defaultParams, renderFrame } from '../../engine/sprite.js';
-import { ROOT, codeSprite, librarySprite } from '../helpers/library.mjs';
+import { ROOT, codeSprite, librarySprite, codeSpriteFile } from '../helpers/library.mjs';
+import { hasReplay } from '../helpers/code-replay.mjs';
 import { T3_IDS, written } from '../helpers/ports/tiles-t3.mjs';
 
 const pair = async (id) => ({ code: await codeSprite(id), data: await librarySprite(id) });
@@ -21,7 +22,7 @@ test('each is a data file now, and its code file is gone', () => {
   for (const id of T3_IDS) {
     assert.ok(fs.existsSync(`${ROOT}/sprites/${id}.json`), `sprites/${id}.json`);
     assert.equal(fs.existsSync(`${ROOT}/sprites/${id}.js`), false, `sprites/${id}.js is deleted`);
-    assert.ok(fs.existsSync(`${ROOT}/tests/fixtures/code-sprites/${id}.js`), `the frozen copy of ${id}`);
+    assert.ok(codeSpriteFile(id) !== null || hasReplay(id), `the frozen copy of ${id}, or its recorded replay (tiles-hive: engine/hive.js went in R3)`);
   }
 });
 

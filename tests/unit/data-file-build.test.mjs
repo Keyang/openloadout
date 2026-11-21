@@ -1,7 +1,9 @@
-// The build's check of studio library files (docs/studio.md 2.4, item S7; Contract 14 rule 8): tools/lib/assets.mjs,
-// which the build, the checkers and the tests use to find sprites, takes a studio file written by
-// tools/lib/data-file.mjs like any sprite, and refuses, before importing it, a file that carries the studio comment but
-// is not exactly the fixed form, with a plain message naming the file. Runs on a temporary sprites/ folder, never the real one.
+// The build and the studio's library file form (docs/studio.md 2.4, item S7; Contract 14 rule 8). Until build item R4a the
+// build took a studio file, sprites/<id>.js, written by tools/lib/data-file.mjs, and checked its fixed form before it
+// imported it. Since R4a (every sprite is data; docs/data-sprites.md section 5) tools/lib/assets.mjs takes no code file
+// at all: a studio file in sprites/ is refused like any program, with the same message (the file's name, what to make
+// instead, the /sprite-forge skill), and is never imported. The writer (tools/lib/data-file.mjs) and its form are still
+// tested in data-file-form.test.mjs, for the studio's own download. Runs on a temporary sprites/ folder, never the real one.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -31,53 +33,37 @@ const make = (files) => { const r = rootWith(files); roots.push(r); return r; };
 const newtFile = writeDataFile(newt);
 const beetleFile = writeDataFile(beetle);
 
-test('data-file build: a studio file in sprites/ is found and loaded like any sprite', async () => {
-  const root = make({ [newtFile.name]: newtFile.text, [beetleFile.name]: beetleFile.text });
-  const got = await loadSprites(root);
-  assert.deepEqual(got.map((s) => s.id), ['dung-beetle', 'moss-newt']);
-  assert.equal(got[1].file, 'sprites/moss-newt.js');
-  assert.equal(got[1].def.name, 'Moss newt');
-  assert.equal(typeof got[1].def.render, 'function');
-});
+/** What every refusal says for a file `rel`: its name first, then what to make instead and how. */
+const refused = (rel, id) => (e) => {
+  assert.ok(e.message.startsWith(`${rel}:`), e.message);
+  assert.match(e.message, /code sprite/);
+  assert.ok(e.message.includes(`sprites/${id}.json`), e.message);
+  assert.match(e.message, /\/sprite-forge/);
+  return true;
+};
 
-test('data-file build: a studio file with code added after the JSON is refused before it runs, naming the file', async () => {
-  globalThis.__dataFileBuildRan = undefined;
-  const tampered = newtFile.text.replace(/\}\);\n$/, '}, (globalThis.__dataFileBuildRan = 1));\n');
-  const root = make({ [newtFile.name]: tampered });
-  await assert.rejects(loadSprites(root), (e) => {
-    assert.ok(e.message.startsWith('sprites/moss-newt.js:'), e.message);
-    assert.match(e.message, /studio/i);
-    assert.match(e.message, /JSON/);
+test('data-file build: a studio file in sprites/ is refused, naming it and the way to make it as data', async () => {
+  assert.equal(newtFile.ok, true);
+  assert.equal(beetleFile.ok, true);
+  const root = make({ [newtFile.name]: newtFile.text });
+  await assert.rejects(loadSprites(root), refused('sprites/moss-newt.js', 'moss-newt'));
+  await assert.rejects(loadSprites(make({ [newtFile.name]: newtFile.text, [beetleFile.name]: beetleFile.text })), (e) => {
+    assert.ok(e.message.startsWith('sprites/dung-beetle.js, sprites/moss-newt.js:'), e.message);
+    assert.match(e.message, /code sprites/);
     return true;
   });
-  assert.equal(globalThis.__dataFileBuildRan, undefined, 'the tampered file never ran');
 });
 
-test('data-file build: a line of code after the call is refused, and so is code before the comment', async () => {
+test('data-file build: a studio file with code added to it, or under another file name, is refused the same way and never runs', async () => {
   globalThis.__dataFileBuildRan = undefined;
-  for (const text of [`${newtFile.text}globalThis.__dataFileBuildRan = 1;\n`, `globalThis.__dataFileBuildRan = 1;\n${newtFile.text}`]) {
-    const root = make({ [newtFile.name]: text });
-    await assert.rejects(loadSprites(root), /^Error: sprites\/moss-newt\.js: .*studio/i);
-  }
-  assert.equal(globalThis.__dataFileBuildRan, undefined);
+  const tampered = newtFile.text.replace(/\}\);\n$/, '}, (globalThis.__dataFileBuildRan = 1));\n');
+  await assert.rejects(loadSprites(make({ [newtFile.name]: tampered })), refused('sprites/moss-newt.js', 'moss-newt'));
+  await assert.rejects(loadSprites(make({ [newtFile.name]: `globalThis.__dataFileBuildRan = 1;\n${newtFile.text}` })), refused('sprites/moss-newt.js', 'moss-newt'));
+  await assert.rejects(loadSprites(make({ 'other-newt.js': newtFile.text })), refused('sprites/other-newt.js', 'other-newt'));
+  assert.equal(globalThis.__dataFileBuildRan, undefined, 'a code file is never imported');
 });
 
-test('data-file build: a studio file whose definition has library gaps is refused (strict is for library files)', async () => {
-  const gap = structuredClone(newt); delete gap.meta.license;
-  const w = writeDataFile(gap);
-  assert.equal(w.ok, true);
-  const root = make({ [w.name]: w.text });
-  await assert.rejects(loadSprites(root), (e) => /^sprites\/moss-newt\.js: /.test(e.message) && /licen/i.test(e.message));
-});
-
-test('data-file build: a studio file under another file name is refused, naming both ids', async () => {
-  const root = make({ 'other-newt.js': newtFile.text });
-  await assert.rejects(loadSprites(root), (e) => e.message.startsWith('sprites/other-newt.js:') && /moss-newt/.test(e.message));
-});
-
-test('data-file build: ordinary sprite files are not affected', async () => {
-  // an ordinary code sprite: the old code coin, frozen (tests/helpers/library.mjs), as the library's own are redrawn as data
-  const root = make({ 'coin.js': codeSpriteAsFile('coin'), [newtFile.name]: newtFile.text });
-  const got = await loadSprites(root);
-  assert.equal(got.length, 2);
+test('data-file build: an ordinary code sprite (the frozen code coin) is refused too', async () => {
+  const root = make({ 'coin.js': codeSpriteAsFile('coin') });
+  await assert.rejects(loadSprites(root), refused('sprites/coin.js', 'coin'));
 });

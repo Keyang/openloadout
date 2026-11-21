@@ -208,7 +208,7 @@ export const STUDIO_PIVOTS = Object.freeze(Object.fromEntries(FRAME_SIZES.map(([
 /** The pattern of a name inside a definition (bones, shapes, slots, parts, clips, keys of controls): a lowercase letter, then letters, digits and dashes, at most 40. */
 export const ID_PATTERN = /^[a-z][a-zA-Z0-9-]{0,39}$/;
 
-/** The pattern of a sprite's own id (its file name, sprites/<id>.js): lowercase letters, digits and dashes, at most 40. */
+/** The pattern of a sprite's own id (its file name, sprites/<id>.json; a studio draft's <id>.js): lowercase letters, digits and dashes, at most 40. */
 export const SPRITE_ID_PATTERN = /^[a-z][a-z0-9-]{0,39}$/;
 
 /** Names no id may take, because every object already has them (constructor, toString, ...) or they reach its prototype. A frozen list: the check uses its own copy. */

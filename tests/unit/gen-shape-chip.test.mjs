@@ -6,42 +6,18 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as registry from '../../engine/gen/index.js';
 import { checkGeneratorContract } from '../helpers/gen-harness.mjs';
-import { Surface, ellipseIn } from '../../engine/surface.js';
-import { hexIn, starIn } from '../../engine/shapes.js';
-import { cutRectIn } from '../../engine/ui.js';
-import { drawToken, drawCircuit } from '../../engine/gadgets.js';
-import { ramp, mix } from '../../engine/color.js';
 import { dataSprite } from '../../engine/data-sprite.js';
 import { defaultParams, renderFrame } from '../../engine/sprite.js';
 import { lerp, keys, fract } from '../../engine/motion.js';
+import { oldReplay } from '../helpers/old-replay.mjs';
 
+const OLD = oldReplay('gen-shape-chip');   // what engine/gadgets.js (deleted by R3) drew, recorded in the order of the calls (tests/helpers/old-replay.mjs)
 const chip = () => registry.generator('chip', 1);
 const PAL = { metal: '#f2c230', glow: '#3fd1e0' };
-const even = (v) => 2 * Math.round(v / 2);
-const FACES = {
-  hex: { h: (w) => even(w * 1.14), face: (w, h) => hexIn(0, 0, w, h) },
-  round: { h: (w) => w, face: (w, h) => ellipseIn(0, 0, w / 2, h / 2) },
-  bar: { h: (w) => even(w * 1.8), face: (w, h) => cutRectIn(-w / 2, -h / 2, w, h, 2) },
-};
 
 /** What sprites/credit-chip.js painted for one look (no outline), on a 32 x 32 Surface centred on (16, 17). */
 function oldChip({ shape, width, thick, mark, spin, sheen, scale = 1, squash = 0, bare = false }) {
-  const g = new Surface(32, 32), S = FACES[shape];
-  const w = even(width), h = S.h(w), M = ramp(PAL.metal), G = ramp(PAL.glow);
-  const sx = scale * (1 + squash), sy = scale * (1 - squash);
-  const T = drawToken(g, S.face(w, h), 16, 17, PAL.metal, { turn: (spin * Math.PI) / 180, thick: Math.max(1, thick * scale), sx, sy, field: mix(M.base, M.dark, 0.3) });
-  if (sheen !== null) {
-    const band = { x: 16 + T.x, y: 17, r: h / 2, phase: sheen, width: 0.13 };
-    const glint = (test, colour) => { const b = (px, py) => Math.abs((px - band.x) / band.r + (0.5 * (py - band.y)) / band.r - band.phase) < band.width && test(px, py); g.fill(band.x - band.r - 2, band.y - band.r - 2, band.x + band.r + 2, band.y + band.r + 2, b, colour); };
-    glint(T.face, mix(M.light, '#ffffff', 0.6));
-    if (T.field) glint(T.field, M.base);
-  }
-  if (!bare && T.squeeze > 0.6) {
-    const lit = mix(G.light, PAL.glow, 0.35);
-    if (mark === 'circuit') drawCircuit(g, T.at, lit, { rx: w / 2 - 2, ry: h / 2 - 3 });
-    else if (mark === 'star') g.fill(0, 0, 32, 32, T.on(starIn(0, 0.5, Math.min(w, h) / 2 - 2, 5)), lit, { clip: T.field });
-  }
-  return g;
+  return OLD.surface(32, 32);
 }
 /** What chip@1 paints for the same look, drawn through a data sprite (so its paints resolve as a library sprite's do). */
 function newChip(o) {

@@ -12,9 +12,9 @@
 // file, everything it imports, and engine/versions.js with everything that imports, found by tools/lib/imports.mjs), so a
 // build redoes only what changed. The output is the same whether or not the cache was used.
 //
-// A sprite is a code file, sprites/<id>.js (imported), or a data file, sprites/<id>.json (docs/data-sprites.md, DQ1; build
-// item B9c): read and drawn by the project's engine/data-sprite.js through tools/lib/assets.mjs loadSpriteFile, never
-// imported. A data sprite's key is its definition, the pieces it uses (with what those use), the code that reads and draws
+// A sprite is a data file, sprites/<id>.json (docs/data-sprites.md, DQ1; build item B9c): read and drawn by the project's
+// engine/data-sprite.js through tools/lib/assets.mjs loadSpriteFile, never imported; a code file in sprites/ is refused
+// (build item R4a: assertNoCodeSprites). A data sprite's key is its definition, the pieces it uses (with what those use), the code that reads and draws
 // every data sprite (engine/data-sprite.js, engine/data-frames.js, engine/pieces.js, catalog/sprite-schema.js, with all
 // they import, every generator family included) and the loaders tools/lib/assets.mjs and pieces-index.mjs.
 //
@@ -24,7 +24,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { importGraph } from './imports.mjs';
-import { isSpriteFile, loadSpriteFile } from './assets.mjs';
+import { isSpriteFile, loadSpriteFile, assertNoCodeSprites } from './assets.mjs';
 import { pieceFilesFor } from './pieces-index.mjs';
 
 const HERE = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -85,20 +85,15 @@ export async function buildVersions({ root = HERE, only = null, cache = null } =
     out[id] = await make();
     if (cache) cache[id] = { key, versions: out[id] };
   };
+  assertNoCodeSprites(root);                                // a code file in sprites/ is refused, not skipped (R4a)
   const spriteDir = path.join(root, 'sprites');
   const spriteFiles = fs.readdirSync(spriteDir).filter(isSpriteFile).sort();
-  const fileOf = new Map();
   for (const f of spriteFiles) {
-    const id = f.replace(/\.(js|json)$/, '');
-    if (fileOf.has(id)) throw new Error(`versions: sprites/${fileOf.get(id)} and sprites/${f}: one sprite has one file; keep the code file or the data file, not both`);
-    fileOf.set(id, f);
-  }
-  for (const f of spriteFiles) {
-    const id = f.replace(/\.(js|json)$/, '');
+    const id = f.replace(/\.json$/, '');
     if (want && !want.has(id)) continue;
     const file = path.join(spriteDir, f);
     await keep(id, file, async () => {
-      const sprite = await loadSpriteFile(root, file);      // loaded only when its versions must be made: a code file imported, a data file read as data
+      const sprite = await loadSpriteFile(root, file);      // loaded only when its versions must be made: a data file read as data
       const dflt = defaultParams(sprite);
       return versionsOf(sprite, VERSIONS_PER_ASSET).map((v) => ({ name: v.name, made: v.made, params: diffOf(v.params, dflt) }));
     });

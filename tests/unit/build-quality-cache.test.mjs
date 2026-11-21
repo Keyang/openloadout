@@ -1,5 +1,8 @@
-// The quality cache (tools/lib/quality-run.mjs) keys each asset on the files it really loads: its own file, the
-// modules it imports (followed through their imports), and the checker's code. These tests prove both halves:
+// The quality cache (tools/lib/quality-run.mjs) keys each asset on the files it really loads. A sound is keyed on its own
+// file, the checker's code (quality/sound.js and what it imports, found from the source text), the metadata rules and the
+// worker; a sprite, since build item R4a, is a data file keyed on its definition, the generators and pieces it names and the
+// code that draws and checks it (tests/unit/assets-data-keys.test.mjs holds that half, and assets-refuse-code.test.mjs
+// that a code sprite is refused). These tests prove both halves of the rule for what remains here:
 //   - a change to anything an asset uses checks it again (a stale pass is never served);
 //   - a change to anything else leaves its cached result alone (so one edit does not re-check the whole library).
 // They run on a small made-up project, so they take a moment and never touch the real cache.
@@ -14,23 +17,15 @@ import { isSpriteFile } from '../../tools/lib/assets.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 
-const sprite = (id, imports, value, extra = '') => `${imports}\nexport default { id: '${id}', name: '${id}', value: ${value}, clips: { idle: {} }, render() {}${extra} };\n`;
 const FILES = {
-  // the checker: a sprite fails when its value is over 5, a sound when its level is over the sound engine's limit
+  // the checkers: a sound fails when its level is over the sound engine's limit; the sprite checker is only here because the worker loads it
   'quality/sprite.js': "import { round } from '../engine/maths.js';\nexport function checkSprite(def) { const v = round(def.value); return { errors: v > 5 ? [`value ${v} is over 5`] : [], warnings: [], metrics: { v } }; }\n",
   'quality/sound.js': "import { MAX } from '../sound/limits.js';\nexport function checkSound(patch) { return { errors: patch.level > MAX ? [`level ${patch.level} is over ${MAX}`] : [], warnings: [], notes: [], metrics: {} }; }\n",
   'catalog/schema.js': 'export function validateMeta() { return { ok: true, errors: [] }; }\n',
   'engine/maths.js': 'export const round = (v) => Math.round(v);\n',
-  'engine/base.js': 'export const BASE = 1;\n',
-  'engine/other.js': 'export const OTHER = 2;\n',
   'engine/unused.js': 'export const UNUSED = 0;\n',
   'sound/limits.js': 'export const MAX = 3;\n',
-  'rigs/tall.js': "import { BASE } from '../engine/base.js';\nexport const size = BASE + 1;\n",
-  'rigs/short.js': "import { OTHER } from '../engine/other.js';\nexport const size = OTHER;\n",
-  'sprites/_shared.js': 'export const NUDGE = 0;\n',
-  // "one" stands on the tall rig, uses the shared helper and plays the sound "beep"; "two" stands on the short rig
-  'sprites/one.js': sprite('one', "import { size } from '../rigs/tall.js';\nimport { NUDGE } from './_shared.js';", 'size + NUDGE', ", sounds: { idle: [{ sound: 'beep', frame: 0 }] }"),
-  'sprites/two.js': sprite('two', "import { size } from '../rigs/short.js';", 'size'),
+  'sound/other.js': 'export const OTHER = 2;\n',
   'sounds/beep.json': '{ "id": "beep", "name": "Beep", "level": 1 }\n',
   'sounds/hum.json': '{ "id": "hum", "name": "Hum", "level": 1 }\n',
 };
@@ -41,6 +36,7 @@ function project() {
     fs.mkdirSync(path.dirname(path.join(root, rel)), { recursive: true });
     fs.writeFileSync(path.join(root, rel), text);
   }
+  fs.mkdirSync(path.join(root, 'sprites'));
   return root;
 }
 const edit = (root, rel, from, to) => {
@@ -56,60 +52,43 @@ async function run(root) {
 }
 async function fresh() {
   const root = project();
-  assert.deepEqual(await run(root), { checked: ['beep', 'hum', 'one', 'two'], failed: [] }, 'the first run checks everything');
+  assert.deepEqual(await run(root), { checked: ['beep', 'hum'], failed: [] }, 'the first run checks everything');
   assert.deepEqual(await run(root), { checked: [], failed: [] }, 'the second run checks nothing');
   return root;
 }
 
-test('a change to a module behind an asset checks that asset again, and it now fails: no stale pass', async () => {
+test('a change to a module behind a sound checks that sound again, and it now fails: no stale pass', async () => {
   const root = await fresh();
-  // engine/base.js is two steps from sprites/one.js (one -> rigs/tall.js -> engine/base.js) and nothing else uses it
-  edit(root, 'engine/base.js', 'BASE = 1', 'BASE = 9');
-  assert.deepEqual(await run(root), { checked: ['one'], failed: ['one'] });
-  assert.deepEqual(await run(root), { checked: [], failed: ['one'] }, 'the failure is cached too, and still reported');
-  edit(root, 'engine/base.js', 'BASE = 9', 'BASE = 1');
-  assert.deepEqual(await run(root), { checked: ['one'], failed: [] });
-});
-
-test('a change to a rig checks only the sprites on that rig', async () => {
-  const root = await fresh();
-  edit(root, 'rigs/short.js', 'size = OTHER', 'size = OTHER + 7');
-  assert.deepEqual(await run(root), { checked: ['two'], failed: ['two'] });
-  edit(root, 'rigs/tall.js', 'BASE + 1', 'BASE + 2');
-  assert.deepEqual(await run(root), { checked: ['one'], failed: ['two'] });
-});
-
-test('a change to a shared helper in sprites/ checks only the sprites that import it', async () => {
-  const root = await fresh();
-  edit(root, 'sprites/_shared.js', 'NUDGE = 0', 'NUDGE = 8');
-  assert.deepEqual(await run(root), { checked: ['one'], failed: ['one'] });
+  edit(root, 'sound/limits.js', 'MAX = 3', 'MAX = 0');                               // a module the sound checker imports: every sound
+  assert.deepEqual(await run(root), { checked: ['beep', 'hum'], failed: ['beep', 'hum'] });
+  assert.deepEqual(await run(root), { checked: [], failed: ['beep', 'hum'] }, 'the failure is cached too, and still reported');
+  edit(root, 'sound/limits.js', 'MAX = 0', 'MAX = 3');
+  assert.deepEqual(await run(root), { checked: ['beep', 'hum'], failed: [] });
 });
 
 test('a change to the asset\'s own file checks only that asset', async () => {
   const root = await fresh();
-  edit(root, 'sprites/two.js', 'value: size', 'value: size + 6');
-  assert.deepEqual(await run(root), { checked: ['two'], failed: ['two'] });
   edit(root, 'sounds/hum.json', '"level": 1', '"level": 4');
-  assert.deepEqual(await run(root), { checked: ['hum'], failed: ['hum', 'two'] });
+  assert.deepEqual(await run(root), { checked: ['hum'], failed: ['hum'] });
+  edit(root, 'sounds/beep.json', '"level": 1', '"level": 2');
+  assert.deepEqual(await run(root), { checked: ['beep'], failed: ['hum'] });
 });
 
 test('a change nothing uses, and a new file nothing uses, check nothing again', async () => {
   const root = await fresh();
   edit(root, 'engine/unused.js', 'UNUSED = 0', 'UNUSED = 1');
+  edit(root, 'sound/other.js', 'OTHER = 2', 'OTHER = 3');
   fs.writeFileSync(path.join(root, 'engine', 'brand-new.js'), 'export const NEW = 1;\n');
-  fs.writeFileSync(path.join(root, 'rigs', 'brand-new.js'), "import { NEW } from '../engine/brand-new.js';\nexport const size = NEW;\n");
-  fs.writeFileSync(path.join(root, 'sprites', '_other-helper.js'), 'export const x = 1;\n');
+  fs.writeFileSync(path.join(root, 'sound', 'brand-new.js'), "import { NEW } from '../engine/brand-new.js';\nexport const x = NEW;\n");
   assert.deepEqual(await run(root), { checked: [], failed: [] });
 });
 
 test('a change to the checker\'s own code checks every asset of that kind, and only that kind', async () => {
   const root = await fresh();
   edit(root, 'quality/sprite.js', 'v > 5', 'v > 1');
-  assert.deepEqual(await run(root), { checked: ['one', 'two'], failed: ['one', 'two'] }, 'the sprite checker changed');
-  edit(root, 'engine/maths.js', 'Math.round(v)', 'Math.round(v) - 2');               // a module the sprite checker imports
-  assert.deepEqual(await run(root), { checked: ['one', 'two'], failed: [] }, 'a module the sprite checker imports changed');
-  edit(root, 'sound/limits.js', 'MAX = 3', 'MAX = 0');                               // a module the sound checker imports
-  assert.deepEqual(await run(root), { checked: ['beep', 'hum'], failed: ['beep', 'hum'] }, 'a module the sound checker imports changed');
+  assert.deepEqual(await run(root), { checked: [], failed: [] }, 'the sprite checker is no part of a sound\'s key');
+  edit(root, 'engine/maths.js', 'Math.round(v)', 'Math.round(v) - 2');               // a module only the sprite checker imports
+  assert.deepEqual(await run(root), { checked: [], failed: [] });
   edit(root, 'quality/sound.js', 'patch.level > MAX', 'patch.level > MAX + 5');
   assert.deepEqual(await run(root), { checked: ['beep', 'hum'], failed: [] }, 'the sound checker changed');
 });
@@ -117,61 +96,38 @@ test('a change to the checker\'s own code checks every asset of that kind, and o
 test('a change to the metadata rules checks everything again', async () => {
   const root = await fresh();
   edit(root, 'catalog/schema.js', 'ok: true', 'ok:  true');
-  assert.deepEqual(await run(root), { checked: ['beep', 'hum', 'one', 'two'], failed: [] });
+  assert.deepEqual(await run(root), { checked: ['beep', 'hum'], failed: [] });
 });
 
-test('a change to a sound checks that sound and the sprites that play it', async () => {
-  const root = await fresh();
-  edit(root, 'sounds/beep.json', '"level": 1', '"level": 2');
-  assert.deepEqual(await run(root), { checked: ['beep', 'one'], failed: [] });
-});
-
-test('a module with an import that cannot be followed makes its sprites depend on the whole framework', async () => {
+test('a module with an import that cannot be followed makes its sounds depend on the whole framework', async () => {
   const root = project();
-  edit(root, 'rigs/short.js', 'export const size', 'export const later = (name) => import(name);\nexport const size');
-  assert.deepEqual((await run(root)).checked, ['beep', 'hum', 'one', 'two']);
+  edit(root, 'sound/limits.js', 'export const MAX', 'export const later = (name) => import(name);\nexport const MAX');
+  assert.deepEqual((await run(root)).checked, ['beep', 'hum']);
   edit(root, 'engine/unused.js', 'UNUSED = 0', 'UNUSED = 1');
-  assert.deepEqual(await run(root), { checked: ['two'], failed: [] }, 'two may load anything, so any framework change checks it again; one is untouched');
+  assert.deepEqual(await run(root), { checked: ['beep', 'hum'], failed: [] }, 'a sound may load anything, so any framework change checks it again');
 });
 
-test('an import of a file that does not exist yet is part of the key: creating the file checks the sprite again', async () => {
-  const root = project();
-  fs.writeFileSync(path.join(root, 'sprites', 'three.js'), sprite('three', "import { size } from '../rigs/coming.js';", 'size'));
-  const first = await runQuality({ root, sprites: ['three'], sounds: [] });
-  assert.match(first.results[0].errors[0], /cannot be loaded/);
-  assert.equal((await runQuality({ root, sprites: ['three'], sounds: [] })).results[0].cached, true);
-  fs.writeFileSync(path.join(root, 'rigs', 'coming.js'), 'export const size = 1;\n');
-  const after = (await runQuality({ root, sprites: ['three'], sounds: [] })).results[0];
-  assert.equal(after.cached, false);
-  assert.deepEqual(after.errors, []);
-});
-
-test('assetFiles lists what a key covers', () => {
+test('assetFiles lists what a key covers, and refuses a sprite that is not a data file (R4a)', () => {
   const root = project();
   const rel = (list) => list.map((f) => path.relative(root, f).split(path.sep).join('/')).filter((f) => !f.startsWith('..'));
-  assert.deepEqual(rel(assetFiles(root, 'sprite', path.join(root, 'sprites', 'one.js')).files),
-    ['catalog/schema.js', 'engine/base.js', 'engine/maths.js', 'quality/sprite.js', 'rigs/tall.js', 'sprites/_shared.js', 'sprites/one.js']);
   assert.deepEqual(rel(assetFiles(root, 'sound', path.join(root, 'sounds', 'beep.json')).files),
     ['catalog/schema.js', 'quality/sound.js', 'sound/limits.js', 'sounds/beep.json']);
+  fs.writeFileSync(path.join(root, 'sprites', 'one.js'), 'export default {};\n');
+  assert.throws(() => assetFiles(root, 'sprite', path.join(root, 'sprites', 'one.js')), { message: /^sprites\/one\.js: a code sprite/ });
 });
 
 test('on the real project: a key covers the asset and the checker, and is narrower than the whole framework', () => {
   const rel = (f) => path.relative(ROOT, f).split(path.sep).join('/');
-  // a code file or a data file (docs/data-sprites.md, DQ1): a data file's key is its definition, the pieces and generators it names and the code that draws it
+  // a sprite is a data file (docs/data-sprites.md, DQ1): its key is its definition, the pieces and generators it names and the code that draws it
   const spriteFiles = fs.readdirSync(path.join(ROOT, 'sprites')).filter(isSpriteFile).sort();
-  const framework = ['engine', 'rigs'].flatMap((d) => fs.readdirSync(path.join(ROOT, d)).filter((f) => f.endsWith('.js')).map((f) => `${d}/${f}`));
-  const usedBy = Object.fromEntries(framework.map((f) => [f, 0]));
+  assert.ok(spriteFiles.length > 0);
   for (const f of spriteFiles) {
     const { files, open } = assetFiles(ROOT, 'sprite', path.join(ROOT, 'sprites', f));
     const list = files.map(rel);
     assert.equal(open, false, `sprites/${f}: every import can be followed`);
-    for (const need of [`sprites/${f}`, 'quality/sprite.js', 'catalog/schema.js', 'engine/sprite.js']) assert.ok(list.includes(need), `sprites/${f}: its key covers ${need}`);
+    for (const need of [`sprites/${f}`, 'quality/sprite.js', 'catalog/schema.js', 'engine/data-sprite.js']) assert.ok(list.includes(need), `sprites/${f}: its key covers ${need}`);
     assert.ok(!list.includes('quality/sound.js'), `sprites/${f}: the sound checker is not behind a sprite`);
-    for (const x of list) if (x in usedBy) usedBy[x]++;
   }
-  // the point of per-asset keys: most framework files are behind only some of the sprites
-  const narrow = framework.filter((f) => usedBy[f] < spriteFiles.length);
-  assert.ok(narrow.length > framework.length / 2, `${narrow.length} of ${framework.length} framework files are behind only some sprites`);
   const sound = fs.readdirSync(path.join(ROOT, 'sounds')).filter((f) => f.endsWith('.json') && !f.startsWith('_')).sort()[0];
   const list = assetFiles(ROOT, 'sound', path.join(ROOT, 'sounds', sound)).files.map(rel);
   assert.ok(list.includes(`sounds/${sound}`) && list.includes('quality/sound.js'));

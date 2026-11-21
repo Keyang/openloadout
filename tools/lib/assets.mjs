@@ -3,17 +3,19 @@
 // a file in bundles/ is a bundle, a file bundles/specs/<id>.plan.json is the plan of a kit.
 // Used by the build, the checkers and the tests.
 //
-// DATA SPRITES (docs/data-sprites.md, build item B9; section 10 DQ1: data sprites are sprites/<id>.json). A sprite is
-// either a code file, sprites/<id>.js (a program, or the studio's fixed data wrapper, docs/studio.md 2.4), or a data
-// file, sprites/<id>.json: one loadout-sprite definition (version 2, or version 1), JSON only. Both kinds live side by
-// side until the removals (section 5); one id has one file. A data file is never imported: it is read as JSON, the
-// pieces it names are read from the project's pieces/ (engine/pieces.js, tools/lib/pieces-index.mjs), and it is drawn by
+// DATA SPRITES ONLY (docs/data-sprites.md, build item B9; section 10 DQ1: data sprites are sprites/<id>.json; build item
+// R4a: the build refuses code sprites, Keyang: "completely get rid of the code-drawing way"). A sprite is one data file,
+// sprites/<id>.json: one loadout-sprite definition of version 2, JSON only. Any code file in sprites/ (<id>.js, a helper
+// _x.js, an index.js, .mjs, .cjs, .jsx, .ts, any letter case) is refused by every function here that lists, finds or loads sprites, with one message
+// that names the file and says how to make the sprite as data (codeSpriteRefusal: the /sprite-forge skill); a code file
+// is never imported, whatever its id, old or new. A data file of another format or version is refused the same way.
+// A data file is never imported: it is read as JSON, the pieces it names are read from the project's pieces/ (engine/pieces.js, tools/lib/pieces-index.mjs), and it is drawn by
 // the project's own engine/data-sprite.js dataSprite, checked as a library file (strict: gaps in meta are errors; a
 // sound cue must name a sound in sounds/). So the build, the catalogue, the pictures, search, tools/check.mjs and
 // tools/render.mjs take it like any sprite. Its catalogue row carries `rev`, a short hash of its definition (dataRev).
 // The file goes through the project's catalog/sprite-schema.js parseSpriteJson first (Contract 15 rule 6: 128 KB, nesting
 // and __proto__ refused before anything else runs on it; a file over 128 KB is not even read), and the sprite drawn
-// takes any frame number, as a code sprite does (engine/data-frames.js framesInClip, the one app/catalog.js uses).
+// takes any frame number (engine/data-frames.js framesInClip, the one app/catalog.js uses).
 //
 // pieces/ in the build: piecesProblems(root) is what the validate step refuses (an invalid piece file, a released
 // version whose content changed or whose file is gone; Contract 15 rule 5), and refreshDataPictures removes the
@@ -22,30 +24,75 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { checkDataFile } from './data-file.mjs';
 import { canonicalJson, nodePieceReader, buildPiecesIndex, checkPins, readPins, pieceFilesFor } from './pieces-index.mjs';
 import * as ownFrames from '../../engine/data-frames.js';
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 
 const isAsset = (f, ext) => f.endsWith(ext) && !f.startsWith('_') && f !== 'index.js' && f !== 'index.json';
-/** Is this file name (in sprites/) a sprite: a code file <id>.js or a data file <id>.json, not a helper (_*) or an index. */
-export const isSpriteFile = (f) => isAsset(f, '.js') || isAsset(f, '.json');
-const idOfFile = (f) => f.replace(/\.(js|json)$/, '');
+/** Is this file name (in sprites/) a sprite: a data file <id>.json, not a helper (_*) or an index. A code file is not a sprite: see isCodeSpriteFile. */
+export const isSpriteFile = (f) => isAsset(f, '.json');
+/** Is this file name (in sprites/) a code file: .js, .jsx, .mjs, .mts, .cjs, .cts, .ts or .tsx in any letter case, a program of any name (<id>.js, _helper.js, index.js), which the build refuses. */
+export const isCodeSpriteFile = (f) => /\.(m?[jt]sx?|c[jt]s)$/i.test(f);
+const idOfFile = (f) => f.replace(/\.json$/, '');
 const SPRITE_ID = /^[a-z0-9][a-z0-9-]*$/;
 
-/** The file of a sprite by its id: sprites/<id>.js or sprites/<id>.json as an absolute path (the code file when both exist), or null. Only a plain id, never a path. */
-export function findSpriteFile(root = ROOT, id) {
-  if (typeof id !== 'string' || !SPRITE_ID.test(id)) return null;
-  for (const ext of ['.js', '.json']) { const f = path.join(root, 'sprites', `${id}${ext}`); if (fs.existsSync(f)) return f; }
-  return null;
+/**
+ * The refusal of a code sprite, one sentence that starts with the file's name: what it is, what to make instead and how
+ * (the /sprite-forge skill). Arguments: rel (the file as the message names it, such as "sprites/x.js"; several files
+ * may be joined with ", " and the message then says "code sprites"). Returns the message; the build, the loader and the
+ * quality run throw it, so a maker meets the same words everywhere.
+ */
+export function codeSpriteRefusal(rel) {
+  const files = String(rel).split(', ');
+  const ids = files.map((f) => path.basename(f).replace(/\.[^.]*$/, '').replace(/^_(was-)?/, ''));
+  const what = files.length === 1 ? 'a code sprite' : 'code sprites';
+  const target = files.length === 1 ? `one file sprites/${ids[0]}.json` : `one file sprites/<id>.json for each (${ids.map((i) => `sprites/${i}.json`).join(', ')})`;
+  return `${rel}: ${what}. Loadout takes sprites as data only: ${target} (format "loadout-sprite", version 2) that names shapes, pixel stamps and framework generators, with no drawing code and nothing to run. `
+    + `Make it with the /sprite-forge skill (skills/sprite-forge/SKILL.md; to redo an old sprite, redraw it as data under the same id)`
+    + (files.every((f) => /(^|[\\/])sprites[\\/][^\\/]+$/.test(f)) ? `, then take ${files.length === 1 ? 'this file' : 'these files'} out of sprites/.` : `; ${files.length === 1 ? 'this file is' : 'these files are'} not a sprite of the library, so it stays outside sprites/.`);
 }
 
-/** Every sprite id of a project, code and data files alike, sorted (for "Known: ..." lists). */
+/** The error every refusal of a code sprite throws (its message is codeSpriteRefusal's), so a command line can print it plainly and exit 1 (tools/check.mjs). */
+export class CodeSpriteError extends Error {
+  constructor(rel) { super(codeSpriteRefusal(rel)); this.name = 'CodeSpriteError'; }
+}
+
+/** The code files in a project's sprites/, as file names, sorted ([] when there are none): every one of them is refused. Arguments: root (the project). */
+export function codeSpriteFiles(root = ROOT) {
+  const dir = path.join(root, 'sprites');
+  return fs.existsSync(dir) ? fs.readdirSync(dir).filter(isCodeSpriteFile).sort() : [];
+}
+
+/** Throws codeSpriteRefusal naming every code file in the project's sprites/ (nothing when there is none). Arguments: root (the project). */
+export function assertNoCodeSprites(root = ROOT) {
+  const files = codeSpriteFiles(root);
+  if (files.length) throw new CodeSpriteError(files.map((f) => `sprites/${f}`).join(', '));
+}
+
+/**
+ * For a lookup by id that found no data file: throws codeSpriteRefusal when sprites/<id>.js (or .jsx, .mjs, .mts, .cjs, .cts, .ts, .tsx) is there,
+ * so a maker who checks or renders an old code sprite by id gets the way to make it as data, not "Unknown sprite". Nothing
+ * when there is no such file or the id is not a plain id. Arguments: root (the project), id.
+ */
+export function refuseCodeId(root = ROOT, id) {
+  if (typeof id !== 'string' || !SPRITE_ID.test(id)) return;
+  const dir = path.join(root, 'sprites');
+  for (const ext of ['js', 'jsx', 'mjs', 'mts', 'cjs', 'cts', 'ts', 'tsx']) if (fs.existsSync(path.join(dir, `${id}.${ext}`))) throw new CodeSpriteError(`sprites/${id}.${ext}`);
+}
+
+/** The file of a sprite by its id: sprites/<id>.json as an absolute path, or null. Only a plain id, never a path. A code file is never found (see codeSpriteRefusal). */
+export function findSpriteFile(root = ROOT, id) {
+  if (typeof id !== 'string' || !SPRITE_ID.test(id)) return null;
+  const f = path.join(root, 'sprites', `${id}.json`);
+  return fs.existsSync(f) ? f : null;
+}
+
+/** Every sprite id of a project (its data files), sorted (for "Known: ..." lists). */
 export function spriteIds(root = ROOT) {
   const dir = path.join(root, 'sprites');
   if (!fs.existsSync(dir)) return [];
-  return [...new Set(fs.readdirSync(dir).filter(isSpriteFile).map(idOfFile))].sort();
+  return fs.readdirSync(dir).filter(isSpriteFile).map(idOfFile).sort();
 }
 
 /** The revision of a data sprite's definition: 12 hex characters of SHA-256 over its canonical JSON, so spacing and key order do not count (docs/data-sprites.md 2.8). */
@@ -104,6 +151,10 @@ async function readDataSprite(root, file, { soundIds } = {}) {
   const proto = parsed.warnings.find((w) => /__proto__/.test(w));
   if (proto) throw new Error(`${rel}: ${proto}; take them out of the file`);
   const value = parsed.value;
+  // the library takes one form: format "loadout-sprite", version 2 (R4a); a version 1 definition is the studio's, never a library file
+  if (value?.format !== 'loadout-sprite' || value?.version !== 2) {
+    throw new Error(`${rel}: not a data sprite of format "loadout-sprite", version 2 (found format ${JSON.stringify(value?.format)}, version ${JSON.stringify(value?.version)}). Make it as data with the /sprite-forge skill (skills/sprite-forge/SKILL.md).`);
+  }
   const got = await store.loadFor(value);
   if (!got.ok) throw new Error(`${rel}: a piece it uses could not be loaded: ${got.errors.slice(0, 6).join('; ')}`);
   let def;
@@ -121,20 +172,18 @@ export async function loadDataSprite(root = ROOT, file, opts = {}) {
 }
 
 /**
- * Loads one sprite file of either kind (build item B9c): a data file (.json) with loadDataSprite and the engine and
- * pieces of the project at root, a code file (.js) imported. With findSpriteFile it is how a tool loads a sprite by id
- * (tools/scene.mjs, tools/tilemap.mjs, tools/lib/versions-build.mjs). Returns the sprite (what defineSprite returns);
- * throws an Error that starts with the file's name. Arguments: root, file (absolute, or relative to root), opts (as loadDataSprite takes them).
+ * Loads one sprite file (build item B9c; R4a): a data file (.json) with loadDataSprite and the engine and pieces of the
+ * project at root. A code file (.js and the like) is refused with codeSpriteRefusal, never imported. With findSpriteFile
+ * it is how a tool loads a sprite by id (tools/scene.mjs, tools/tilemap.mjs, tools/lib/versions-build.mjs). Returns the
+ * sprite (what defineSprite returns); throws an Error that starts with the file's name. Arguments: root, file (absolute,
+ * or relative to root), opts (as loadDataSprite takes them).
  */
 export async function loadSpriteFile(root = ROOT, file, opts = {}) {
   const abs = path.resolve(root, file);
   if (abs.endsWith('.json')) return loadDataSprite(root, abs, opts);
   const rel = abs.startsWith(path.resolve(root) + path.sep) ? path.relative(root, abs).split(path.sep).join('/') : abs;
-  if (!fs.existsSync(abs)) throw new Error(`${rel}: there is no such file`);
-  let def;
-  try { def = (await import(pathToFileURL(abs).href)).default; } catch (e) { throw new Error(`${rel}: ${e.message}`); }
-  if (!def || typeof def.render !== 'function') throw new Error(`${rel}: the default export is not a sprite`);
-  return def;
+  if (isCodeSpriteFile(abs)) throw new CodeSpriteError(rel);
+  throw new Error(`${rel}: not a sprite file; a sprite is a data file sprites/<id>.json (format "loadout-sprite", version 2), made with the /sprite-forge skill`);
 }
 
 /**
@@ -209,37 +258,22 @@ function readJSON(abs, rel) {
 }
 
 /**
- * [{ id, file, def }] — def is what defineSprite returned. Sorted by file name. A data file (sprites/<id>.json) also
- * has data: true and rev (dataRev of its definition). Throws naming the file for one that cannot be loaded, and for an
- * id that has both a code file and a data file.
+ * [{ id, file, def, data: true, rev }] — def is what defineSprite returned, rev the dataRev of the definition. Sorted by
+ * file name. Every sprite is a data file, sprites/<id>.json. Throws naming the file for one that cannot be loaded, and
+ * (R4a) for any code file in sprites/, before anything is loaded: codeSpriteRefusal, naming every such file; no code
+ * file is ever imported.
  */
 export async function loadSprites(root = ROOT) {
+  assertNoCodeSprites(root);
   const dir = path.join(root, 'sprites');
   const out = [];
   const names = fs.readdirSync(dir).filter(isSpriteFile).sort();
-  const seen = new Map();
+  const soundIds = names.length ? soundIdsOf(root) : null;
   for (const f of names) {
     const id = idOfFile(f);
-    if (seen.has(id)) throw new Error(`sprites/${seen.get(id)} and sprites/${f}: one sprite has one file; keep the code file or the data file, not both`);
-    seen.set(id, f);
-  }
-  const soundIds = names.some((f) => f.endsWith('.json')) ? soundIdsOf(root) : null;
-  for (const f of names) {
-    const file = path.join(dir, f);
-    if (f.endsWith('.json')) {
-      const id = f.slice(0, -5);
-      const { def, value } = await readDataSprite(root, file, { soundIds });
-      if (def.id !== id) throw new Error(`sprites/${f}: "id" must be "${id}" (found ${def.id})`);
-      out.push({ id, file: `sprites/${f}`, def, data: true, rev: dataRev(value) });
-      continue;
-    }
-    let def;
-    // a file made in the studio must be exactly its data form before it is run (docs/studio.md 2.4); throws naming the file
-    checkDataFile(fs.readFileSync(file, 'utf8'), `sprites/${f}`);
-    try { def = (await import(pathToFileURL(file).href)).default; } catch (e) { throw new Error(`sprites/${f}: ${e.message}`); }
-    const id = f.slice(0, -3);
-    if (!def || def.id !== id) throw new Error(`sprites/${f}: the default export must be a sprite whose id is "${id}" (found ${def && def.id})`);
-    out.push({ id, file: `sprites/${f}`, def });
+    const { def, value } = await readDataSprite(root, path.join(dir, f), { soundIds });
+    if (def.id !== id) throw new Error(`sprites/${f}: "id" must be "${id}" (found ${def.id})`);
+    out.push({ id, file: `sprites/${f}`, def, data: true, rev: dataRev(value) });
   }
   return out;
 }

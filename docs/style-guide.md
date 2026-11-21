@@ -238,7 +238,7 @@ Frames per second are at `speed` 0.5. **Every animated clip's `fps` is `(p) => b
 
 Every enemy has at least `idle`, one way of moving (`walk`, `hop` or `fly`), `attack` (or `shoot` or `cast`), `hurt` and `die`. Every player character has at least `idle`, `walk`, `attack` (or `shoot` or `cast`), `hurt` and `die`; side-view players also `run` and `jump`. Clips start from and end on the idle pose, except `hurt` (starts on the recoil), `die` (ends on the remains) and `shoot` (starts with the arm already half raised; it still ends on idle).
 
-**Settled by the review of the side-view poses** (the rigs draw these; see the rig's header and its worked example, `sprites/knight.js`):
+**Settled by the review of the side-view poses** (the rigs draw these; see the rig's header and its worked example, `sprites/knight.json`):
 
 - **A fallen body lies face up:** in the last frames of `die` the head, and any headgear on it, is turned to face up, not pressed into the ground.
 - **In `victory` no arm crosses the face.** The raised weapon or fist goes up beside or behind the head.
@@ -350,7 +350,7 @@ Rules:
 7. The held item is drawn **behind** the body in `_up` clips and **in front** in `_down` and `_side`; the off-hand item swaps sides. The top-down rig does this for you.
 8. Diagonals are not drawn.
 
-**Settled by the review of the top-down rig** (the rig does these for a character built on it; a creature drawn without the rig must do them itself; see the rig's header and its worked example, `sprites/hero-walker.js`):
+**Settled by the review of the top-down rig** (the rig does these for a character built on it; a creature drawn without the rig must do them itself; see the rig's header and its worked example, `sprites/hero-walker.json`):
 
 - **Legs show below a cape in `_up` clips**, by at least 4 px: the back view is never a legless bell.
 - **The held item stays visible in every `_up` clip:** the hand comes out to the side, so the weapon is not hidden behind the body.
@@ -500,7 +500,7 @@ So: give a top-down wall a wall word in its prefix (a hive wall is `wall-*`, not
 
 ## 7. Backgrounds
 
-A background is one sprite with `meta.type: 'background'`, frame 320x180, drawn with the backdrop helper (`engine/backdrop.js`, section 14).
+A background is one sprite with `meta.type: 'background'`, frame 320x180, drawn with the backdrop generators (`engine/gen/backdrop.js`, `engine/gen/scenery.js`, section 14), which call the helpers of `engine/backdrop.js`.
 
 | Rule | What to do |
 |---|---|
@@ -516,10 +516,10 @@ A background is one sprite with `meta.type: 'background'`, frame 320x180, drawn 
 | Not repeating too soon | **`mid` and `near` do not repeat a shape more often than every 160 px**: at most two of the same tower, arch or tree clump across the 320 px, or the scroll reads as a pattern |
 | Repeating | No landmark so distinctive that the 320 px repeat is obvious: no single castle, moon or tree in `mid` or `near`. One sun, moon or far landmark is allowed in `far`, which scrolls slowest |
 | Scroll speeds | Say them in the `blurb`: far 0.1, mid 0.4, near 0.7 of the camera's speed |
-| Battle backdrops | `near` is the ground the fighters stand on: opaque from row 132 down; fighters' feet stand on row 150. **The standing band is calm:** the rows round the feet (146 to 153) carry no marks, tufts or joints strong enough to cut through a fighter's legs; scuffs and paving go above and below it. Everything a battle backdrop is furnished with (trees, fences, arches, pillars, torches and their light patches, paved floors, the calm band) is in `engine/scenery.js`; the worked examples are `sprites/bg-battle-field.js` and `sprites/bg-battle-dungeon.js` |
+| Battle backdrops | `near` is the ground the fighters stand on: opaque from row 132 down; fighters' feet stand on row 150. **The standing band is calm:** the rows round the feet (146 to 153) carry no marks, tufts or joints strong enough to cut through a fighter's legs; scuffs and paving go above and below it. Everything a battle backdrop is furnished with (trees, fences, arches, pillars, torches and their light patches, paved floors, the calm band) is in the scenery generators (`engine/gen/scenery.js`; `engine/scenery.js` was deleted in R3); the worked examples are `sprites/bg-battle-field.json` and `sprites/bg-battle-dungeon.json` |
 | Controls | 6 to 8: see section 10 |
 
-**How to build one** (from the builder of the first two; the worked examples are `sprites/bg-forest.js` and `sprites/bg-castle.js`, the helper is `engine/backdrop.js`):
+**How to build one** (from the builder of the first two; the worked examples are `sprites/bg-forest.json` and `sprites/bg-castle.json`, which are data: they name the generators of `engine/gen/backdrop.js` and `engine/gen/scenery.js`, and the rules below are written in the words of the helpers those generators call, `engine/backdrop.js`, so read each rule as what the generator's arguments must achieve, never as code to write):
 
 1. **Every edge is an outline function, filled with `fillBelow`** (or `fillBetween`). Use `ridge`, `treeline`, `battlements`, `highest` and `shifted`; never draw a shape across to x = 320 by hand, because that is where the wrap breaks.
 2. **Scatter with `scatter(count, seed, { stable: true })`**, so a Density or Clouds slider adds things to the ones already there instead of reshuffling them all.
@@ -545,7 +545,7 @@ All of them: `INK` outline; 1 px empty border; no words or letters drawn (digits
 
 ### What the review of the first interface sprites settled
 
-The helper is `engine/ui.js`; the worked examples are `sprites/ui-dialogue.js`, `sprites/ui-battle-menu.js`, `sprites/ui-bars-rpg.js` and `sprites/ui-damage-digits.js`.
+The generators are `engine/gen/ui.js`, which call the helpers of `engine/ui.js`; the worked examples (data files that name those generators) are `sprites/ui-dialogue.json`, `sprites/ui-battle-menu.json`, `sprites/ui-bars-rpg.json` and `sprites/ui-damage-digits.json`.
 
 | Subject | Rule |
 |---|---|
@@ -575,7 +575,7 @@ Parts are Contract 3: what a sprite holds or wears, each with settings of its ow
 
 **Find out what a body offers before you write anything.** `node tools/piece.mjs` lists the shared pieces (bases, parts, held things) and `node tools/piece.mjs <piece>` prints one's slots and arguments, `--sheet` draws it; `node skills/sprite-forge/context.mjs generators` lists the named generators. (`node tools/rig.mjs`, which printed the code rigs' descriptions, was deleted in R2 with the code rigs that draw.)
 
-**The worked example is `sprites/rogue-battler.js`**, written as a definition (Contract 13: which rig, proportions and colours, which clips, which parts with their controls) on `rigs/humanoid-figure.js`, with no drawing code of its own. Write a new character that way. **The Hero (`sprites/knight.js`) and the Wizard (`sprites/wizard.js`) are older sprites that still hold their own drawing**: copy their `parts`, `when` and sound declarations if you like, not their structure.
+**The worked example is `sprites/rogue-battler.json`**, written as a definition (Contract 13 and 15: which base piece it extends, proportions and colours, which clips, which parts with their controls), with no drawing code of its own. Every sprite is written that way: since build item R4a the build refuses a sprite with drawing code, so there is no other form to copy. The Hero (`sprites/knight.json`) and the Wizard (`sprites/wizard.json`) are data too, on `base:person-side`.
 
 **Who must declare parts**
 
@@ -613,7 +613,7 @@ Rules:
 - A part of a sprite that is not on a rig (a creature's horns, a prop's lock) is drawn by its own function from an attach point, a direction and its settings, and is attached to a joint every frame.
 - A part set to `none` leaves nothing behind: no empty hand held out, no gap in the outline, **and no frame left empty** (section 4).
 - **A part's sound goes with the part, and that takes a `when` on the cue.** Taking a part off hides its settings by itself (the part's `none` does that), but it does nothing to the sprite's sounds: a blade's slash would still play over a bare fist. Every cue that belongs to a part, or to one option of it, carries `when` (section 11), and the specification writes it out.
-- A part gets its own colour setting (`<part>Colour`) only when no sprite colour already covers it. `metal` covers weapons, shields and helmets; `trim` covers capes and scarves. **A sprite colour that only shows on parts is not in effect when all of those parts are off, and must say so with `when`** (section 10): `metal` on a character whose only metal is a weapon and a helmet is the standard case, and `sprites/knight.js` shows it.
+- A part gets its own colour setting (`<part>Colour`) only when no sprite colour already covers it. `metal` covers weapons, shields and helmets; `trim` covers capes and scarves. **A sprite colour that only shows on parts is not in effect when all of those parts are off, and must say so with `when`** (section 10): `metal` on a character whose only metal is a weapon and a helmet is the standard case, and `sprites/knight.json` shows it.
 - Headgear either leaves the things other controls change in view (a helmet open at the face shows skin; a hat sits above the fringe), or the hidden control declares `when`. A control that is hidden and does not say so is reported by the checker as dead.
 - A sprite with parts exports `sockets(clip, t, p)`. Socket names: `hand`, `offhand`, `head`, `back`, `feet`, plus `tail` where there is one, **`muzzle`** on anything that shoots (where the projectile and the muzzle flash appear) and **`tip`** on a cursor or pointer (its hot spot: section 8).
 
@@ -950,14 +950,14 @@ The helpers are the framework (Contract 11). When an asset needs generic code a 
 | For | Modules | Worked example |
 |---|---|---|
 | Colours | `engine/palettes.js` (the three palettes of section 3 and `swatches`), `engine/color.js` (`ramp`, `tone`, `mix`, `pick`) | any sprite |
-| Characters, side view | `base:person-side` and its part pieces (`pieces/`); `rigs/humanoid.js` with `rigs/humanoid-figure.js` is the old code rig, still there while its last callers are (`docs/architecture.md` Contract 13); `node tools/piece.mjs` | `sprites/knight.json` |
+| Characters, side view | `base:person-side` and its part pieces (`pieces/`); the code rig that drew it (`rigs/humanoid.js`, `humanoid-figure.js`) was deleted in R2b, 2026-11-21 (`docs/architecture.md` Contract 13); `node tools/piece.mjs` | `sprites/knight.json` |
 | Characters, top-down | the base pieces `base:person-topdown*` with the `part:topdown-*` and `held:topdown-*` pieces (`pieces/`; the top-down rig `rigs/topdown.js` was deleted in R2); `node tools/piece.mjs` | `sprites/hero-walker.json` |
 | Other bodies | the creature and robot generators (`engine/gen/creatures.js`, `creature-c1.js`, `robots.js`; the rigs they were ported from were deleted in R2); `node skills/sprite-forge/context.mjs generators` | the creature or boss that uses each |
-| Tilesets | `engine/tiles.js` (pieces, picker, classifier), with material modules such as `engine/ground.js`, `engine/paving.js`, `engine/water.js`, `engine/plating.js`; `tools/tilemap.mjs`, `tools/scene.mjs` | `sprites/tiles-forest.js` (side view), `sprites/tiles-station-walls.js` (top-down walls) |
-| Backgrounds | `engine/backdrop.js`, `engine/scenery.js` (battle screens), `engine/space.js` | `sprites/bg-forest.js`, `sprites/bg-battle-dungeon.js` |
-| Interface and icons | `engine/ui.js`, `engine/ui-wood.js`, `engine/glyphs.js`, `engine/icons.js`, `engine/faces.js` (portraits) | `sprites/ui-dialogue.js`, `sprites/ui-bars-rpg.js` |
-| Effects and projectiles | `engine/fx.js` (every effect and projectile is built from it, so they all share one look), `engine/bursts.js`, `engine/blast.js`, `engine/spells.js`, `engine/shots.js` | `sprites/hit-spark.js`, `sprites/fx-fire-spell.js` |
-| Props and pickups | `engine/pickups.js`, `engine/breaking.js`, `engine/buildings.js`, `engine/gadgets.js`, `engine/foliage.js` | `sprites/gem.js`, `sprites/crate.js`, `sprites/cottage.js` |
+| Tilesets | `engine/tiles.js` (pieces, picker, classifier), with material modules such as `engine/ground.js`, `engine/paving.js`, `engine/water.js`, `engine/plating.js`; `tools/tilemap.mjs`, `tools/scene.mjs` | `sprites/tiles-forest.json` (side view), `sprites/tiles-station-walls.json` (top-down walls) |
+| Backgrounds | `engine/backdrop.js`; the generators `engine/gen/backdrop.js`, `engine/gen/scenery.js` (battle screens), `engine/gen/grid.js` (`engine/scenery.js` and `engine/space.js` were deleted in R3, 2026-11-21) | `sprites/bg-forest.json`, `sprites/bg-battle-dungeon.json` |
+| Interface and icons | `engine/ui.js`; the generators `engine/gen/ui-*.js`, `icon*.js`, `faces.js` (portraits) (the modules `ui-wood`, `ui-skins`, `glyphs`, `icons*`, `faces` were deleted in R3) | `sprites/ui-dialogue.json`, `sprites/ui-bars-rpg.json` |
+| Effects and projectiles | `engine/fx.js` (every effect and projectile is built from it, so they all share one look); the behaviours in `engine/gen/fx-*.js` (`bursts`, `blast`, `spells`, `shots` were deleted in R3) | `sprites/hit-spark.json`, `sprites/fx-fire-spell.json` |
+| Props and pickups | `engine/pickups.js`, `engine/breaking.js`, `engine/buildings.js`; the generators `engine/gen/prize-items.js`, `world-props.js`, `props-p5.js` (`gadgets`, `foliage` were deleted in R3) | `sprites/gem.json`, `sprites/crate.json`, `sprites/cottage.json` |
 | Music | `sound/compose.js` (the kit), `tools/compose/kit.mjs` (its command line) | `tools/compose/thornwood_overworld.mjs` |
 
 The exact call names are in each module's header and its worked example; this guide does not repeat them.

@@ -7,26 +7,20 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as registry from '../../engine/gen/index.js';
 import { checkGeneratorContract } from '../helpers/gen-harness.mjs';
-import { Surface, ellipseIn, polyIn, rectIn, capsuleIn } from '../../engine/surface.js';
+import { Surface } from '../../engine/surface.js';
 import { INK } from '../../engine/color.js';
-import { iconFit, iconTidy, iconBold, iconPaint } from '../../engine/icons.js';
-import { iconBadge } from '../../engine/icons-badge.js';
-import { iconBadgeStem, BADGE_STEM_TIP } from '../../engine/icons-badge-stem.js';
-import { glyphPicture, drawGlyph } from '../../engine/glyphs.js';
 import { paintColour } from '../../engine/data-rules.js';
 import { drawList } from '../../engine/draw-list.js';
+import { oldReplay } from '../helpers/old-replay.mjs';
+
+const OLD = oldReplay('gen-icon-badges');   // what the modules that are gone (engine/icons.js, icons-badge.js, icons-badge-stem.js, glyphs.js) drew, recorded in the order of the calls (tests/helpers/old-replay.mjs)
 
 const HEX = { ink: INK, body: '#c9423a', accent: '#7a4f33', face: '#f0ead8', pale: '#a8a4a0' };
-const boxIn = (x0, y0, x1, y1) => rectIn(x0, y0, x1 - x0, y1 - y0);
 const box = (x0, y0, x1, y1, paint) => ({ kind: 'poly', points: [[x0, y0], [x1, y0], [x1, y1], [x0, y1]], paint });
 
 // three pictures as the map marks' badge style drew them, each as code and as data (pen generators' calls)
 const PICTURES = {
   flag: {
-    code: (u, pen) => {
-      iconPaint(u, pen, [boxIn(-8.4, -9.6, -6, 11.5), ellipseIn(-7.2, -10, 1.8, 1.6)], HEX.accent, { soft: 0 });
-      iconPaint(u, pen, polyIn([[-6, -9.6], [10.6, -5], [-6, -0.4]]), HEX.body, { soft: 0, rim: INK });
-    },
     data: [
       { gen: 'icon.body', v: 1, shapes: [box(-8.4, -9.6, -6, 11.5, 'accent'), { kind: 'ellipse', at: [-7.2, -10], r: [1.8, 1.6], paint: 'accent' }], paint: 'accent', soft: 0 },
       { gen: 'icon.rim', v: 1, shapes: [{ kind: 'poly', points: [[-6, -9.6], [10.6, -5], [-6, -0.4]], paint: 'body' }], paint: 'ink' },
@@ -34,11 +28,9 @@ const PICTURES = {
     ],
   },
   dig: {
-    code: (u, pen) => iconPaint(u, pen, [capsuleIn(-8.2, -8.2, 8.2, 8.2, 2.9), capsuleIn(-8.2, 8.2, 8.2, -8.2, 2.9)], HEX.body, { soft: 0 }),
     data: [{ gen: 'icon.body', v: 1, shapes: [{ gen: 'taper', v: 1, from: [-8.2, -8.2], to: [8.2, 8.2], r0: 2.9, paint: 'body' }, { gen: 'taper', v: 1, from: [-8.2, 8.2], to: [8.2, -8.2], r0: 2.9, paint: 'body' }], paint: 'body', soft: 0 }],
   },
   here: {
-    code: (u, pen) => { const [x0] = pen.pt(0, 0), o = (Math.floor(x0) + 0.5 - x0) / pen.k; iconPaint(u, pen, polyIn([[o - 10, -8], [o + 10, -8], [o, 10]]), HEX.body, { soft: 0 }); },
     data: [{ gen: 'icon.body', v: 1, shapes: [{ kind: 'poly', points: [[-10, -8], [10, -8], [0, 10]], paint: 'body' }], paint: 'body', soft: 0 }],
     snap: true,
   },
@@ -57,25 +49,10 @@ const TOWN_DATA = TOWN.map((l) => {
   return { kind: 'stamp', at: [0, 0], rows: l.rows.map((r) => r.padEnd(w, '.')), key };   // a stamp's rows are all one length
 });
 
+const BADGE_STEM_TIP = 11.5;   // what engine/icons-badge-stem.js said: how far down the pin's tip reaches at full size (deleted by R3)
 const tipOf = (size) => BADGE_STEM_TIP - (BADGE_STEM_TIP - 7.8) * Math.max(0, 1 - 2 * size);
 function codeBadge({ size, bold, shine }, { picture, glyph }) {
-  const g = new Surface(32, 32);
-  iconFit(g, { size, tilt: false, angle: 0, shade: false, shine }, (s, pen0) => {
-    const { plate } = iconBadgeStem(s, pen0, { colour: HEX.body, face: HEX.face, tip: tipOf(size) });
-    iconTidy(s).outline(INK);
-    if (glyph) {
-      const u = new Surface(s.w, s.h), [cx, cy] = pen0.pt(plate.x, plate.y);
-      const pics = glyph.map((l) => ({ ...l, pic: glyphPicture(l.rows) }));
-      const w = Math.max(...pics.map((l) => l.pic.w)), h = Math.max(...pics.map((l) => l.pic.h));
-      const x0 = Math.round(cx - w / 2), y0 = Math.round(cy - h / 2);
-      for (const l of pics) drawGlyph(u, l.pic, x0, y0, { main: HEX[l.main], second: HEX[l.second || l.main], shine });
-      u.outline(INK);
-      s.blit(u);
-      return;
-    }
-    iconBadge(s, pen0, plate, (u, inner) => picture.code(u, bold ? iconBold(inner, 0.15) : inner));
-  });
-  return g;
+  return OLD.surface(32, 32);
 }
 function genBadge({ size, bold, shine }, args) {
   const r = registry.runGenerator({ gen: 'icon.badge', v: 1, size, tip: tipOf(size), paint: 'body', face: 'face', shiny: shine, pinGrow: bold ? 0.15 : 0, grow: bold ? 0.5 : 0, ...args }, { size: [32, 32] });
@@ -109,8 +86,7 @@ test('icon.badge@1 draws a badge pin with hand-set layers on the plate as the co
 
 test('icon.badge@1 with no pin draws the picture alone as iconFit drew it, tidied and inked, bold or not', () => {
   for (const [name, p] of Object.entries(PICTURES).filter(([n]) => n !== 'here')) for (const look of LOOKS) {   // (here moves itself on a pin only)
-    const want = new Surface(32, 32);
-    iconFit(want, { size: look.size, tilt: false, angle: 0, shade: false, shine: look.shine }, (s, pen) => { p.code(s, look.bold ? iconBold(pen) : pen); iconTidy(s).outline(INK); });
+    const want = OLD.surface(32, 32);
     const got = genBadge(look, { draw: p.data, pin: false });
     assert.deepEqual(differ(want, got).slice(0, 6), [], `${name} alone ${JSON.stringify(look)}: pixels differ`);
   }

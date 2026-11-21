@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // The site build. Finds every asset by scanning sprites/, sounds/ and bundles/, then:
 //
-//   validate    every asset's meta and every bundle (exit 1 with what to fix)
+//   validate    every asset's meta and every bundle (exit 1 with what to fix); a code file in sprites/ is refused here, naming it
+//               and the /sprite-forge skill (every sprite is a data file sprites/<id>.json, build item R4a)
 //   quality     quality/sprite.js and quality/sound.js over every asset (exit 1 with which file, what is wrong, what to do)
 //   framework   generated/api.json, framework.js, api.md
 //   pieces      generated/pieces.json, when the project has pieces/ (every piece file is checked in validate)
@@ -23,7 +24,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { ROOT, loadAssets, piecesProblems, refreshDataPictures } from './lib/assets.mjs';
+import { ROOT, loadAssets, piecesProblems, refreshDataPictures, isSpriteFile } from './lib/assets.mjs';
 import { buildCatalog } from './lib/catalog.mjs';
 import { writeImages } from './lib/thumbs.mjs';
 import { validateMeta, validateBundle } from '../catalog/schema.js';
@@ -262,7 +263,9 @@ if (has('--dist')) {
     fs.rmSync(dist, { recursive: true, force: true });
     fs.mkdirSync(dist, { recursive: true });
     const copied = [];
-    for (const p of DIST) if (exists(p)) { fs.cpSync(path.join(root, p), path.join(dist, p), { recursive: true }); copied.push(p); }
+    // sprites/ ships the sprite data files only, the ones the build validates (isSpriteFile: <id>.json, not _*.json or index.json): a README, a picture, a page or an unvalidated .json left in it stays out of the site (R4a)
+    const only = (p) => p !== 'sprites' ? undefined : (src) => { const r = path.relative(path.join(root, 'sprites'), src); return r === '' || (!r.includes(path.sep) && isSpriteFile(r)); };
+    for (const p of DIST) if (exists(p)) { fs.cpSync(path.join(root, p), path.join(dist, p), { recursive: true, filter: only(p) }); copied.push(p); }
     return `${copied.length} folders and files -> ${rel(dist)}`;
   });
 }

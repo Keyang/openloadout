@@ -1,6 +1,6 @@
 // Advice in the studio (docs/studio.md sections 4 and 6; Contract 14 rule 7; item S12). A studio sprite is not held to
 // the quality bar: it goes in the bag, plays and downloads whatever the bar says. The bar (quality/sprite.js checkSprite)
-// is offered as advice, "what the library would ask before taking it", in everyday words; and the pixel-art rules of
+// is offered as advice, "what the quality bar would ask of a library sprite", in everyday words; and the pixel-art rules of
 // docs/studio.md section 4 are measured here and shown next to what they are about:
 //   - a shape too thin to draw (under 2 pixels thick it breaks into stairs when it turns): the shape, on its bone;
 //   - stray single pixels (a drawn pixel with nothing drawn beside it) and speckle (a few pixels that show on one frame
@@ -317,6 +317,6 @@ export async function barAdvice(def, { sounds = null } = {}) {
   }
   return {
     ok: true, items, asks: items.filter((i) => i.level === 'ask').length, tips: items.filter((i) => i.level === 'tip').length,
-    note: 'Advice only: it goes in your bag, plays and downloads whatever this says. These are what the library would ask before taking it as a file of its own.',
+    note: 'Advice only: it goes in your bag, plays and downloads whatever this says. These are what the quality bar a library sprite is held to would ask; a studio file is not a library file (the library takes only data sprites made with the /sprite-forge skill).',
   };
 }

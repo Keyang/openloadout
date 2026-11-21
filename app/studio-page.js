@@ -1,7 +1,7 @@
 // The studio, #/studio and #/studio/<draft>?mode=rig|animate|frames|sprite&clip=walk&frame=3 (docs/studio.md section 5;
 // docs/architecture.md Contract 14; build plan item S9). Make a sprite from a starting body: change its bones and
 // shapes, pose key frames, set frames, speed, looping and the anchor, name and colour it; it is kept on this computer as
-// you go and downloads as a file for the library or a sheet. The pieces are in app/studio/: drafts.js (keeping, through app/studio-store.js), keep.js (checking a change, following the bag),
+// you go and downloads as a studio file to keep or a sheet. The pieces are in app/studio/: drafts.js (keeping, through app/studio-store.js), keep.js (checking a change, following the bag),
 // history.js (undo), edit.js (every change, pure), draw.js (pictures and files), stage.js (the picture), panes.js (the
 // four tabs), editor.js (the editing page), home.js (the first page). Styles: app/css/studio.css.
 import { el, header } from './ui.js';

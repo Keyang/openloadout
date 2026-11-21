@@ -1,12 +1,13 @@
 // The changes the bundle specifications ask of the five reused sprites (kit-platformer-fantasy, batch P00):
 // knight: die, block, victory, and a landing thud; wizard: die, victory, talk; slime, bat, wolf: die.
+// (R2b, 2026-11-21: the history tests that held the five code files' old clips to the pixels they drew before this
+// change went with the code rig they ran on, rigs/humanoid.js: they read the frozen code copies, never the library asset.)
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { defaultParams, cleanParams, renderFrame, renderSheet, frameSockets, clipFps, partList, cueInEffect } from '../../engine/sprite.js';
 import { col, ramp, farRamp } from '../../engine/color.js';
-import * as H from '../../rigs/humanoid.js';
-import { librarySprite, codeSprite } from '../helpers/library.mjs';   // the library asset, a code file or a data file (tests/helpers/library.mjs)
+import { librarySprite } from '../helpers/library.mjs';   // the library asset, a code file or a data file (tests/helpers/library.mjs)
 const knight = await librarySprite('knight');
 const wizard = await librarySprite('wizard');
 const slime = await librarySprite('slime');
@@ -19,6 +20,8 @@ const frames = (s, clip) => Array.from({ length: s.clips[clip].frames }, (_, f) 
 const diff = (a, b) => { let n = 0; for (let i = 0; i < a.data.length; i++) if (a.data[i] !== b.data[i]) n++; return n; };
 const opaque = (g) => g.data.reduce((n, v) => n + (v ? 1 : 0), 0);
 const box = (g) => { const b = g.bounds(); return b && { ...b, w: b.x1 - b.x0 + 1, h: b.y1 - b.y0 + 1 }; };
+const GROUND = 58;                                             // the row the side-view people's feet rest above (the ground cut of base:person-side)
+const headR = (p) => 4.6 + (6.6 - 4.6) * (p.head ?? 0.5);       // a person's head radius at Head (what rigs/humanoid.js dims() gave, R2b)
 const sound = (id) => JSON.parse(fs.readFileSync(new URL(`../../sounds/${id}.json`, import.meta.url), 'utf8'));
 
 /** The checker's tested settings: default, all sliders low, all high, each option of each choice, each on/off flipped. */
@@ -36,63 +39,6 @@ function testedLooks(s) {
   }
   return out;
 }
-
-function clipHashes(s, p, clips) {
-  const out = {};
-  for (const clip of clips) {
-    let h = 2166136261;
-    for (const f of frames(s, clip)) for (const v of renderFrame(s, clip, f, p).data) { h = Math.imul(h ^ (v & 0xffff), 16777619); h = Math.imul(h ^ (v >>> 16), 16777619); }
-    out[clip] = (h >>> 0).toString(16).padStart(8, '0');
-  }
-  return out;
-}
-
-// ---- what was there before is untouched -------------------------------------------------------
-// History tests of the P00 change: the code files' old clips drew the same pixels after it as before. They are about
-// that code, so they read the frozen copies (tests/fixtures/code-sprites/, codeSprite), not the library asset: a data
-// redraw of these five may differ by a few pixels and is held to docs/data-sprites.md's tolerance by its own batch.
-// Every other test in this file is an acceptance check on the library asset, whatever its file kind.
-const CODE = { knight: await codeSprite('knight'), wizard: await codeSprite('wizard'), slime: await codeSprite('slime'), bat: await codeSprite('bat'), wolf: await codeSprite('wolf') };
-
-// Recorded on 2026-11-18 from the sprites as they were before this change (one hash per clip over all its frames).
-const LOOKS = {
-  knight: { default: {}, tall: { height: 1, build: 1, head: 1 }, spear: { weapon: 'spear', headgear: 'crown', cape: 'tattered', hairStyle: 'long' }, bare: { weapon: 'none', headgear: 'none', cape: 'none', height: 0, build: 0, head: 0 } },
-  wizard: { default: {}, tall: { height: 1, build: 1, head: 1 }, hood: { hat: 'hood', beard: 'none', staff: 'crook' }, small: { height: 0, build: 0, head: 0, hat: 'wide', beard: 'short', staff: 'crystal' } },
-  slime: { default: {}, big: { size: 1, shape: 1, topping: 'crown', eyes: 'one' }, small: { size: 0, shape: 0, topping: 'horns', shine: false } },
-  bat: { default: {}, big: { size: 1, span: 1, ears: 1, wing: 'round', eyes: 'one' }, small: { size: 0, span: 0, ears: 0, wing: 'sharp', fangs: false } },
-  wolf: { default: {}, big: { size: 1, legs: 1, snout: 1, fluff: 1, tail: 'curled', markings: 'mask', ears: 'tall' }, small: { size: 0, legs: 0, snout: 0, fluff: 0, tail: 'brush', markings: 'plain', ears: 'floppy' } },
-};
-const BEFORE = {
-  'knight default': { idle: '64393393', walk: 'f7129018', run: '573fc90f', jump: 'f091cb3f', attack: '7ba7388c', hurt: '2c9e259f' },
-  'knight tall': { idle: '7c9900d3', walk: '74fdedb3', run: '59e473bc', jump: '3e48263b', attack: '91087212', hurt: '9250057b' },
-  'knight spear': { idle: 'a0e0aade', walk: '9d675f96', run: '15d5f73b', jump: 'd783eff9', attack: 'bf81d0ac', hurt: '08924831' },
-  'knight bare': { idle: '41451655', walk: '52f3db72', run: 'f77d66f9', jump: 'dcea080e', attack: 'da26d58f', hurt: 'a64f006a' },
-  'wizard default': { idle: '62caf596', walk: '9a882e74', run: '47a03e43', jump: 'b59d6947', cast: '418da5d5', hurt: '426887cc' },
-  'wizard tall': { idle: 'c31d188e', walk: 'ece6d761', run: 'd23842f6', jump: '44b4f949', cast: 'f04b79ee', hurt: '2fc1289f' },
-  'wizard hood': { idle: 'd901a544', walk: 'f4bb8a16', run: '8a4f2d64', jump: '029b09d7', cast: '0ed57d35', hurt: '26f4d1ce' },
-  'wizard small': { idle: 'a4c2b390', walk: '0511b312', run: '443ee4da', jump: 'c96fa298', cast: '286608a0', hurt: '91a0569b' },
-  'slime default': { idle: '2446b81d', hop: '70406a7b', attack: 'd6404981', hurt: '6fcf6b05' },
-  'slime big': { idle: 'fa9bde3d', hop: '18408929', attack: '5e7133d9', hurt: 'e34282c5' },
-  'slime small': { idle: '3c5b6395', hop: '16a0f9bf', attack: '4226a161', hurt: 'd868af3e' },
-  'bat default': { idle: '0b168dd5', fly: 'fee57c54', attack: '90d6a8b5', hurt: '6aa3b0c6' },
-  'bat big': { idle: '923376e1', fly: 'b6c7e4e3', attack: 'c0f1d7ec', hurt: 'a8323ff7' },
-  'bat small': { idle: '2c1d2998', fly: 'a9188fc1', attack: 'aa1b88de', hurt: '7c5a86cb' },
-  'wolf default': { idle: 'c712e414', walk: 'ec75ada8', run: 'e0ead629', attack: 'f3fefd3b', hurt: 'b1ce39dd' },
-  'wolf big': { idle: 'f1fc382f', walk: 'a6cab6d0', run: '53ed62a9', attack: '6426f230', hurt: 'cd5b08d9' },
-  'wolf small': { idle: '13420505', walk: '5307101a', run: 'a9db7f22', attack: '3580e843', hurt: '85b8a8c9' },
-};
-
-test("the Hero's default idle, walk and run frames are pixel-identical to before", () => {
-  const got = clipHashes(CODE.knight, defaultParams(CODE.knight), ['idle', 'walk', 'run']);
-  assert.deepEqual(got, { idle: '64393393', walk: 'f7129018', run: '573fc90f' });
-});
-
-test('every clip the five sprites had before draws exactly what it drew before, in several looks', () => {
-  for (const [id, s] of Object.entries(CODE)) for (const [name, over] of Object.entries(LOOKS[id])) {
-    const want = BEFORE[`${id} ${name}`];
-    assert.deepEqual(clipHashes(s, look(s, over), Object.keys(want)), want, `${id}, ${name} look`);
-  }
-});
 
 test('the old clips keep their order, frame counts and loop settings; the new ones come after', () => {
   const had = { knight: ['idle', 'walk', 'run', 'jump', 'attack', 'hurt'], wizard: ['idle', 'walk', 'run', 'jump', 'cast', 'hurt'], slime: ['idle', 'hop', 'attack', 'hurt'], bat: ['idle', 'fly', 'attack', 'hurt'], wolf: ['idle', 'walk', 'run', 'attack', 'hurt'] };
@@ -239,7 +185,7 @@ test('Hero: block raises the guard, victory raises the weapon and hops, and both
     assert.ok(v[0].hand.y - Math.min(...v.map((x) => x.hand.y)) > 8, `victory: the hand rises only ${(v[0].hand.y - Math.min(...v.map((x) => x.hand.y))).toFixed(1)} px, ${JSON.stringify(over)}`);
     const tops = frames(knight, 'victory').map((f) => renderFrame(knight, 'victory', f, p).bounds().y0);
     assert.ok(tops[0] - Math.min(...tops) >= 3, `victory: the picture does not grow upward, ${JSON.stringify(over)}`);
-    assert.ok(Math.max(...v.map((x) => H.GROUND - x.feet.y)) >= 2, `victory: no hop, ${JSON.stringify(over)}`);
+    assert.ok(Math.max(...v.map((x) => GROUND - x.feet.y)) >= 2, `victory: no hop, ${JSON.stringify(over)}`);
   }
 });
 
@@ -286,7 +232,7 @@ test('Hero: in block the weapon is drawn upright in front of the body', () => {
 test('Hero: the cape ends lying on the ground under the body, as long as the cape is', () => {
   const onRows = (over) => {
     const p = look(knight, { headgear: 'none', trim: '#e6c545', ...over });                // a trim colour nothing else in this look uses
-    return pixelsOf(renderFrame(knight, 'die', 7, p), tones(p.trim)).filter(([, y]) => y >= H.GROUND - 2 && y < H.GROUND);
+    return pixelsOf(renderFrame(knight, 'die', 7, p), tones(p.trim)).filter(([, y]) => y >= GROUND - 2 && y < GROUND);
   };
   // the belt is the same colour and crosses those rows: what is there with no cape is not cape
   const belt = new Set(onRows({ cape: 'none' }).map(([x, y]) => `${x},${y}`));
@@ -295,28 +241,28 @@ test('Hero: the cape ends lying on the ground under the body, as long as the cap
   for (const kind of ['plain', 'tattered']) {
     const onGround = cape({ cape: kind });
     assert.ok(onGround.length >= 16 && span(onGround) >= 12, `${kind}: ${onGround.length} cape pixels along the ground, ${span(onGround)} px long`);
-    assert.ok(onGround.every(([, y]) => y >= H.GROUND - 2), `${kind}: the cape is not on the ground rows`);
+    assert.ok(onGround.every(([, y]) => y >= GROUND - 2), `${kind}: the cape is not on the ground rows`);
   }
   assert.ok(belt.size <= 4, `with no cape there are ${belt.size} trim pixels on the ground rows`);
   assert.ok(span(cape({ cape: 'plain', capeLength: 1.5 })) > span(cape({ cape: 'plain', capeLength: 0.4 })) + 4, 'a longer cape does not lie longer');
   assert.notDeepEqual(cape({ cape: 'plain' }), cape({ cape: 'tattered' }), 'a tattered cape lies the same as a plain one');
   // standing, there is none of it down there
-  assert.equal(pixelsOf(renderFrame(knight, 'idle', 0, look(knight, { headgear: 'none', trim: '#e6c545' })), tones('#e6c545')).filter(([, y]) => y >= H.GROUND - 2).length, 0);
+  assert.equal(pixelsOf(renderFrame(knight, 'idle', 0, look(knight, { headgear: 'none', trim: '#e6c545' })), tones('#e6c545')).filter(([, y]) => y >= GROUND - 2).length, 0);
 });
 
 test('lying down, the Hero and the Wizard face up and what they wear on the head lies back with it', () => {
   // Hero: the helmet's plume, on top of the head when he stands, is behind the head (to the left) when he lies
   const kp = look(knight, { cape: 'none', trim: '#e6c545' });
-  const plume = (clip, f) => { const g = renderFrame(knight, clip, f, kp), pts = pixelsOf(g, tones(kp.trim)).filter(([, y]) => y < H.GROUND - 2); const hd = frameSockets(knight, clip, f, kp).head; return [pts.reduce((a, q) => a + q[0], 0) / pts.length - hd.x, pts.reduce((a, q) => a + q[1], 0) / pts.length - hd.y, pts.length]; };
+  const plume = (clip, f) => { const g = renderFrame(knight, clip, f, kp), pts = pixelsOf(g, tones(kp.trim)).filter(([, y]) => y < GROUND - 2); const hd = frameSockets(knight, clip, f, kp).head; return [pts.reduce((a, q) => a + q[0], 0) / pts.length - hd.x, pts.reduce((a, q) => a + q[1], 0) / pts.length - hd.y, pts.length]; };
   const up = plume('idle', 0), down = plume('die', 7);
   assert.ok(up[2] >= 4 && down[2] >= 4, 'no plume');
   // the head socket is the top of the head: the plume stays by it, and the socket itself has moved from above to behind
   assert.ok(Math.hypot(up[0], up[1]) < 6 && Math.hypot(down[0], down[1]) < 6, `the plume is ${Math.hypot(down[0], down[1]).toFixed(1)} px from the top of the lying head`);
-  const kd = H.dims(kp), dieHead = frameSockets(knight, 'die', 7, kp).head, back = frameSockets(knight, 'die', 7, kp).back;
-  assert.ok(dieHead.x < back.x - kd.headR && dieHead.y > H.GROUND - 2 * kd.headR - 3, `the top of the head is at ${dieHead.x.toFixed(1)},${dieHead.y.toFixed(1)}`);
+  const kd = { headR: headR(kp) }, dieHead = frameSockets(knight, 'die', 7, kp).head, back = frameSockets(knight, 'die', 7, kp).back;
+  assert.ok(dieHead.x < back.x - kd.headR && dieHead.y > GROUND - 2 * kd.headR - 3, `the top of the head is at ${dieHead.x.toFixed(1)},${dieHead.y.toFixed(1)}`);
   // Wizard: the hat points along the ground behind him: lying, the hat is wider than it is tall and nothing stands above head height
   for (const hat of ['pointed', 'crooked', 'wide', 'hood']) for (const over of [{}, { height: 1, build: 1, head: 1 }, { height: 0, build: 0, head: 0 }]) {
-    const p = look(wizard, { ...over, hat }), d = H.dims(p);
+    const p = look(wizard, { ...over, hat }), d = { headR: headR(p) };
     const b = box(renderFrame(wizard, 'die', 7, p));
     assert.ok(b.h <= 2 * d.headR + 8, `wizard, ${hat}, ${JSON.stringify(over)}: lying he is ${b.h} px tall; a hat still stands on his head`);      // a wide brim stands on edge
     const stand = box(renderFrame(wizard, 'idle', 0, p));

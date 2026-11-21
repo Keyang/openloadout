@@ -14,12 +14,12 @@ import { Surface } from '../../engine/surface.js';
 import { ramp, col } from '../../engine/color.js';
 import { paintColour } from '../../engine/data-rules.js';
 import * as FX from '../../engine/fx.js';
-import * as BURSTS from '../../engine/bursts.js';
-import * as SPELLS from '../../engine/spells.js';
-import { fallField } from '../../engine/weather.js';
-import { trailPuffs } from '../../engine/shots.js';
-import { mistBank } from '../../engine/mist.js';
 import { rippleVersion } from '../../engine/ripples.js';
+
+import { oldReplay } from '../helpers/old-replay.mjs';
+const OLD = oldReplay('gen-b12c-fx');
+/** The old code's picture: a new Surface of `size` with what the module that is gone drew on it (tests/fixtures/old-code/gen-b12c-fx.json, in the order of the calls). */
+const old = (size) => OLD.surface(size[0], size[1]);
 
 const RAD = Math.PI / 180;
 const HEX = { p0: '#ffffff', p1: '#f0ead8', p2: '#f1c584', p3: '#f2a030', p4: '#8a5410', s0: '#c2c9d6', s1: '#9aa6c0', s2: '#6b7896', g0: '#4f9d57', g1: '#c98a4a', w: '#ffffff', b: '#241e2e', m: '#7fe0a0' };
@@ -291,40 +291,39 @@ test('flame@1 draws what engine/fx.js flame draws: a torch, a fireball with a he
 test('embers@1 draws what engine/bursts.js embers draws', () => {
   const size = [48, 48];
   for (const o of [{ at: [24, 24], count: 8, r0: 4, r1: 16, paints: P4 }, { at: [24, 24], count: 10, r0: 6, r1: 26, size: 3, tail: 4, gravity: 4, turn: 30, seed: 2, paints: P5 }, { at: [4, 44], count: 6, r1: 30, hold: 0.3, paints: ['p1', 'p3'] }]) {
-    sameOverTime(TS, (t) => [drawn({ gen: 'embers', v: 1, ...o }, { t, loop: false }, size), code(size, (g) => BURSTS.embers(g, { t, x: o.at[0], y: o.at[1], count: o.count, r0: o.r0 ?? 0, r1: o.r1, size: o.size ?? 2, hold: o.hold ?? 0.6, tail: o.tail ?? 3, gravity: o.gravity ?? 0, turn: (o.turn ?? 0) * RAD, seed: o.seed ?? 0, colours: hexes(o.paints) }))], `embers ${o.count}`);
+    sameOverTime(TS, (t) => [drawn({ gen: 'embers', v: 1, ...o }, { t, loop: false }, size), old(size)], `embers ${o.count}`);
   }
 });
 
 test('spark.ring@1 draws what engine/bursts.js sparkRing draws, in every style', () => {
   const size = [40, 40];
   for (const style of ['plus', 'diamond', 'dot']) for (const o of [{ at: [19.5, 19.5], count: 6, r0: 4, r1: 13, reach: 2, paints: P4 }, { at: [20, 22], count: 8, r0: 3, r1: 30, rise: 4, squash: 0.8, reach: 4, turn: 20, seed: 4, paints: P5, core: 'p0', full: true }]) {
-    sameOverTime(TS, (t) => [drawn({ gen: 'spark.ring', v: 1, ...o, style }, { t, loop: false }, size), code(size, (g) => BURSTS.sparkRing(g, { t, x: o.at[0], y: o.at[1], count: o.count, r0: o.r0, r1: o.r1, rise: o.rise ?? 0, squash: o.squash ?? 1, style, reach: o.reach, turn: (o.turn ?? 0) * RAD, seed: o.seed ?? 0, colours: hexes(o.paints), core: o.core ? HEX[o.core] : undefined, full: o.full }))], `spark.ring ${style} ${o.count}`);
+    sameOverTime(TS, (t) => [drawn({ gen: 'spark.ring', v: 1, ...o, style }, { t, loop: false }, size), old(size)], `spark.ring ${style} ${o.count}`);
   }
 });
 
 test('blast.ball@1 draws what engine/bursts.js blastBall draws: scallops, spikes, a ring with gaps', () => {
   const size = [48, 48];
   for (const o of [{ at: [24, 24], r: 12, bumps: 7, bump: 0.18, paints: P4 }, { at: [24, 24], r: 16, hole: 9, gaps: 0.3, seed: 3, paints: ['p2', 'p3', 'p4'] }, { at: [24.5, 24.5], r: 13, bumps: 6, bump: 0.3, points: true, turn: 20, heat: 0.8, paints: P5 }, { at: [3, 3], r: 30, bumps: 0, paints: ['p1'] }]) {
-    same(drawn({ gen: 'blast.ball', v: 1, ...o }, {}, size), code(size, (g) => BURSTS.blastBall(g, { x: o.at[0], y: o.at[1], r: o.r, hole: o.hole ?? 0, bumps: o.bumps ?? 7, bump: o.bump ?? 0.15, points: o.points ?? false, turn: (o.turn ?? 0) * RAD, heat: o.heat ?? 0.5, gaps: o.gaps ?? 0, seed: o.seed ?? 0, colours: hexes(o.paints) })), `blast.ball ${JSON.stringify(o).slice(0, 50)}`);
+    same(drawn({ gen: 'blast.ball', v: 1, ...o }, {}, size), old(size), `blast.ball ${JSON.stringify(o).slice(0, 50)}`);
   }
 });
 
 test('puff.ring@1 draws what engine/bursts.js puffRing draws, joined or apart', () => {
   const size = [48, 48];
   for (const o of [{ at: [24, 24], count: 6, r0: 4, r1: 14, size: 4, paints: S3 }, { at: [24, 26], count: 7, r0: 6, r1: 18, size: 5, hold: 0.2, rise: 4, lobes: 3, seed: 2, paints: S3 }, { at: [24, 24], count: 5, r0: 3, r1: 12, size: 4, apart: true, turn: 30, uneven: 1, paints: S3 }, { at: [6, 40], count: 8, r0: 10, r1: 30, size: 6, last: 2, cool: 0.4, paints: ['s0', 's2'] }]) {
-    sameOverTime(TS, (t) => [drawn({ gen: 'puff.ring', v: 1, ...o }, { t, loop: false }, size), code(size, (g) => BURSTS.puffRing(g, { t, x: o.at[0], y: o.at[1], count: o.count, r0: o.r0, r1: o.r1, size: o.size, end: o.last ?? 0.8, hold: o.hold ?? 0, rise: o.rise ?? 0, cool: o.cool ?? 0.8, uneven: o.uneven ?? 0.5, apart: o.apart ?? false, lobes: o.lobes ?? 1, turn: (o.turn ?? 0) * RAD, seed: o.seed ?? 0, colours: hexes(o.paints) }))], `puff.ring ${JSON.stringify(o).slice(0, 50)}`);
+    sameOverTime(TS, (t) => [drawn({ gen: 'puff.ring', v: 1, ...o }, { t, loop: false }, size), old(size)], `puff.ring ${JSON.stringify(o).slice(0, 50)}`);
   }
 });
 
 test('bolt@1 draws what engine/spells.js bolt draws from `at`, `length` px along `angle`, with forks; flicker re-rolls it', () => {
   const size = [48, 64];
   for (const o of [{ at: [24, 2], length: 56, angle: 0, paints: P4 }, { at: [26, 3], length: 58, angle: -10, zigzag: 4, sway: 5, width: 3, forks: 2, seed: 3, paints: P5 }, { at: [4, 30], length: 40, angle: 80, width: 2, lead: 0.7, fade: 0.2, taper: 0.6, seed: 1, kinks: 3, forks: 1, forkLength: 0.5, forkAngle: 60, paints: P4 }]) {
-    const a = (o.angle ?? 0) * RAD, x1 = o.at[0] + Math.sin(a) * o.length, y1 = o.at[1] + Math.cos(a) * o.length;
-    same(drawn({ gen: 'bolt', v: 1, ...o }, {}, size), code(size, (g) => SPELLS.bolt(g, { x0: o.at[0], y0: o.at[1], x1, y1, kinks: o.kinks ?? 6, zigzag: o.zigzag ?? 3, sway: o.sway ?? 0, width: o.width ?? 3, from: o.fade ?? 0, to: o.lead ?? 1, taper: o.taper ?? 0, forks: o.forks ?? 0, forkLength: o.forkLength ?? 0.3, forkAngle: (o.forkAngle ?? 40) * RAD, seed: o.seed ?? 0, colours: hexes(o.paints) })), `bolt ${o.seed}`);
+      same(drawn({ gen: 'bolt', v: 1, ...o }, {}, size), old(size), `bolt ${o.seed}`);
   }
   // flicker 4: the path takes seed + 0, 1, 2, 3 over the clip
   for (const [t, k] of [[0, 0], [0.3, 1], [0.6, 2], [0.9, 3]]) {
-    same(drawn({ gen: 'bolt', v: 1, at: [24, 2], length: 56, seed: 5, flicker: 4, paints: P4 }, { t, loop: true }, size), code(size, (g) => SPELLS.bolt(g, { x0: 24, y0: 2, x1: 24, y1: 58, seed: 5 + k, colours: hexes(P4) })), `bolt flicker t ${t}`);
+    same(drawn({ gen: 'bolt', v: 1, at: [24, 2], length: 56, seed: 5, flicker: 4, paints: P4 }, { t, loop: true }, size), old(size), `bolt flicker t ${t}`);
   }
 });
 
@@ -332,7 +331,7 @@ test('swirl@1 draws what engine/spells.js swirl draws, gathering in or flung out
   const size = [48, 48];
   for (const o of [{ at: [24, 24], count: 8, r0: 15, r1: 1, paints: P4 }, { at: [24, 24], count: 10, loop: true, r0: 6, r1: 18, turns: -0.6, squash: 0.6, size: 1, tail: 3, seed: 2, paints: P5 }, { at: [5, 5], count: 6, r0: 20, r1: 2, tail: 0, stagger: 0.7, paints: ['p1', 'p3'] }]) {
     const loop = o.loop ?? false;
-    sameOverTime(TS, (t) => [drawn({ gen: 'swirl', v: 1, ...o }, { t, loop: loop && t < 1 }, size), code(size, (g) => SPELLS.swirl(g, { t, x: o.at[0], y: o.at[1], count: o.count, seed: o.seed ?? 0, loop, stagger: o.stagger ?? 0.4, r0: o.r0, r1: o.r1, turns: o.turns ?? 0.5, squash: o.squash ?? 1, size: o.size ?? 2, tail: o.tail ?? 2, colours: hexes(o.paints) }))], `swirl ${o.count}`);
+    sameOverTime(TS, (t) => [drawn({ gen: 'swirl', v: 1, ...o }, { t, loop: loop && t < 1 }, size), old(size)], `swirl ${o.count}`);
   }
 });
 
@@ -340,29 +339,28 @@ test('motes@1 draws what engine/spells.js motes draws, in every shape', () => {
   const size = [48, 56];
   for (const shape of ['dot', 'plus', 'leaf', 'star', 'heart']) for (const o of [{ at: [24, 48], count: 6, rise: 34, paints: ['m', 'p1', 'p3', 'p4'] }, { at: [24, 50], count: 5, loop: false, rise: 40, width: 18, size: 9, seed: 2, paints: P4 }, { at: [8, 6], count: 4, rise: 18, size: 5, sway: 2, loop: false, stagger: 0.8, paints: ['p2', 'p4'] }]) {
     const loop = o.loop ?? true;
-    sameOverTime(TS, (t) => [drawn({ gen: 'motes', v: 1, ...o, shape }, { t, loop: loop && t < 1 }, size), code(size, (g) => SPELLS.motes(g, { t, x: o.at[0], y: o.at[1], count: o.count, seed: o.seed ?? 0, loop, stagger: o.stagger ?? 0.5, rise: o.rise, width: o.width ?? 16, size: o.size ?? 7, shape, sway: o.sway ?? 1.5, colours: hexes(o.paints) }))], `motes ${shape} ${o.count}`);
+    sameOverTime(TS, (t) => [drawn({ gen: 'motes', v: 1, ...o, shape }, { t, loop: loop && t < 1 }, size), old(size)], `motes ${shape} ${o.count}`);
   }
 });
 
 test('fall.field@1 draws what engine/weather.js fallField draws, every shape, wrapping round its period', () => {
   const size = [64, 64];
-  const SLANT = { none: 0, left: -1, right: 1 };
   for (const shape of ['dot', 'streak', 'flake', 'leaf', 'petal', 'seed', 'ash', 'grain']) for (const o of [{ cols: 8, rows: 2, size: 3, paints: ['s0'] }, { cols: 6, rows: 3, laps: 2, slant: 'right', sway: 2, swayCycles: 2, turns: 2, size: 4, paints: ['g0', 'g1'], rim: 'b', seed: 3, shift: [17, 23] }, { cols: 10, rows: 2, axis: 'right', slant: 'left', size: 2, alt: 'ash', altSize: 3, paints: ['g1', 's1'], core: 'p3', coreEvery: 2 }]) {
-    sameOverTime([0, 0.3, 0.75, 1], (t) => [drawn({ gen: 'fall.field', v: 1, at: [1, 1], ...o, shape }, { t, loop: true }, size), code(size, (g) => fallField(g, { t, cols: o.cols, rows: o.rows, laps: o.laps ?? 1, slant: SLANT[o.slant ?? 'none'], sway: o.sway ?? 0, swayCycles: o.swayCycles ?? 1, turns: o.turns ?? 1, axis: o.axis === 'right' ? 'x' : 'y', ...(o.alt ? { shapes: [shape, { shape: o.alt, size: o.altSize }] } : { shape }), size: o.size, colours: hexes(o.paints), rim: o.rim ? HEX[o.rim] : undefined, core: o.core ? HEX[o.core] : undefined, coreEvery: o.coreEvery ?? 0, seed: o.seed ?? 0, period: 62, origin: 1, shift: o.shift ?? [0, 0] }))], `fall.field ${shape} ${o.cols}`);
+    sameOverTime([0, 0.3, 0.75, 1], (t) => [drawn({ gen: 'fall.field', v: 1, at: [1, 1], ...o, shape }, { t, loop: true }, size), old(size)], `fall.field ${shape} ${o.cols}`);
   }
 });
 
 test('trail.puffs@1 draws what engine/shots.js trailPuffs draws', () => {
   const size = [40, 32];
   for (const o of [{ at: [28, 16], count: 3, paints: ['s0', 's1'] }, { at: [30, 16], count: 4, angle: -80, dist: 12, size: 6, spread: 1.2, seed: 4, paints: ['s0', 's2'] }, { at: [16, 20], count: 2, angle: 180, dist: 8, size: 3, cycles: 2, paints: ['s1'] }]) {
-    sameOverTime([0, 0.2, 0.45, 0.7, 0.95], (t) => [drawn({ gen: 'trail.puffs', v: 1, ...o }, { t, loop: true }, size), code(size, (g) => trailPuffs(g, { t, x: o.at[0], y: o.at[1], count: o.count, angle: (o.angle ?? -90) * RAD, dist: o.dist ?? 9, size: o.size ?? 4, spread: o.spread ?? 0.6, cycles: o.cycles ?? 1, seed: o.seed ?? 0, colours: hexes(o.paints) }))], `trail.puffs ${o.count}`);
+    sameOverTime([0, 0.2, 0.45, 0.7, 0.95], (t) => [drawn({ gen: 'trail.puffs', v: 1, ...o }, { t, loop: true }, size), old(size)], `trail.puffs ${o.count}`);
   }
 });
 
 test('mist@1 draws what engine/mist.js mistBank draws: one body, one rim, every shape', () => {
   const size = [64, 56];
   for (const shape of ['round', 'wispy', 'chunky']) for (const o of [{ at: [6, 44], width: 52, count: 5, paints: S3 }, { at: [4, 48], width: 56, count: 6, dist: 10, rise: 3, lift: 4, size: 5, floor: 50, seed: 2, angle: -90, paints: S3 }, { at: [10, 30], width: 20, count: 4, size: 4, lobes: 3, stretch: 2, cycles: 2, floor: 20, paints: S3 }]) {
-    sameOverTime([0, 0.25, 0.5, 0.75], (t) => [drawn({ gen: 'mist', v: 1, ...o, shape }, { t, loop: true }, size), code(size, (g) => mistBank(g, { t, x0: o.at[0], x1: o.at[0] + o.width, y: o.at[1], count: o.count, dist: o.dist ?? 8, angle: (o.angle ?? 90) * RAD, rise: o.rise ?? 3, lift: o.lift ?? 0, size: o.size ?? 4, shape, lobes: o.lobes ?? 2, stretch: o.stretch ?? 1, floor: o.floor ?? null, cycles: o.cycles ?? 1, seed: o.seed ?? 0, colours: hexes(o.paints) }))], `mist ${shape} ${o.count}`);
+    sameOverTime([0, 0.25, 0.5, 0.75], (t) => [drawn({ gen: 'mist', v: 1, ...o, shape }, { t, loop: true }, size), old(size)], `mist ${shape} ${o.count}`);
   }
 });
 

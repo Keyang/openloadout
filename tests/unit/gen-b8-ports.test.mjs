@@ -19,7 +19,6 @@ import { lerp, fract, PI } from '../../engine/motion.js';
 import { chunks as fxChunks } from '../../engine/fx.js';
 import { collectBurst, gleam as pickupGleam, drawGem, glint as pickupGlint } from '../../engine/pickups.js';
 import { starPoints, GEM_CUTS } from '../../engine/shapes.js';
-import { iconPen, iconPaint, iconLine, ICON_LEAN } from '../../engine/icons.js';
 import { leafIn } from '../../engine/creature.js';
 import { renderFrame, defaultParams } from '../../engine/sprite.js';
 import { paintColour } from '../../engine/data-rules.js';
@@ -28,6 +27,8 @@ import { runGenerator } from '../../engine/gen/index.js';
 import coinSprite from '../fixtures/code-sprites/coin.js';     // the code files as they were before P1 redrew them as data
 import crateSprite from '../fixtures/code-sprites/crate.js';
 
+import { oldReplay } from '../helpers/old-replay.mjs';
+const OLD = oldReplay('gen-b8-ports');   // what engine/icons.js (deleted by R3) drew and answered, recorded in the order of the calls (tests/helpers/old-replay.mjs)
 const DEG = 180 / PI;
 const run = (node, ctx = {}) => {
   const r = runGenerator(node, ctx);
@@ -134,6 +135,8 @@ test('pickup.burst@1 paints engine/pickups.js collectBurst; gleam@1 paints engin
   }
 });
 
+const ICON_LEAN = Math.atan(0.5);   // the lean of an icon, as engine/icons.js had it (deleted by R3)
+
 test('icon.paint@1 and icon.line@1 paint what engine/icons.js iconPaint and iconLine paint through the same pen', () => {
   const hex = { body: '#c9423a', cap: '#7a4f33', leaf: '#3f8a4f' };
   const cases = [
@@ -146,14 +149,12 @@ test('icon.paint@1 and icon.line@1 paint what engine/icons.js iconPaint and icon
   ];
   for (const [i, c] of cases.entries()) for (const [angle, scale, shade, shine] of [[ICON_LEAN, 1, true, true], [-ICON_LEAN / 2, 0.83, false, true], [0, 1.17, true, false]]) {
     const paint = c.paint ?? 'body';
-    const pen = iconPen({ tilt: true, angle, scale, shade, shine, cx: 16, cy: 16, span: [1, 1] });
-    const want = iconPaint(new Surface(32, 32), pen, c.tests, ramp(hex[paint]), c.opt);
+    const want = OLD.surface(32, 32);
     const prims = run({ gen: 'icon.paint', v: 1, shapes: c.shapes, paint, ...c.args, scale, turn: angle * DEG, soften: shade, shiny: shine }, { size: [32, 32] });
     same(draw(32, 32, prims, hex), want, `icon.paint case ${i} angle ${angle.toFixed(2)} scale ${scale}`);
   }
   for (const pts of [[[4.4, -3.6], [3.6, 0], [4.4, 3.4]], [[-3.2, -0.6], [-0.2, 0]], [[-7, -0.4], [-4.9, 1]]]) {
-    const pen = iconPen({ tilt: true, angle: ICON_LEAN, scale: 1.05, cx: 16, cy: 16, span: [1, 1] });
-    const want = iconLine(new Surface(32, 32), pen, pts, '#5a2a2a');
+    const want = OLD.surface(32, 32);
     const prims = run({ gen: 'icon.line', v: 1, path: pts.flat(), paint: 'crease', scale: 1.05, turn: ICON_LEAN * DEG }, { size: [32, 32] });
     same(draw(32, 32, prims, { crease: '#5a2a2a' }), want, `icon.line ${JSON.stringify(pts)}`);
   }

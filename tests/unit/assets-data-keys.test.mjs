@@ -33,10 +33,10 @@ test('the tools take framesInClip from engine/, not from the site\'s app/catalog
   assert.equal(C.framesInClip, E.framesInClip);
 });
 
-test('a change to engine/data-frames.js re-checks the data sprites, and only them', async () => {
-  const root = dataProject({ data: { coin: coinDef() }, code: ['crate'] });
+test('a change to engine/data-frames.js re-checks the data sprites', async () => {
+  const root = dataProject({ data: { coin: coinDef() } });
   const run = async () => (await runQuality({ root, sprites: undefined, sounds: [], workers: 2 })).results.filter((r) => !r.cached).map((r) => r.id).sort();
-  assert.deepEqual(await run(), ['coin', 'crate']);
+  assert.deepEqual(await run(), ['coin']);
   assert.deepEqual(await run(), []);
   fs.appendFileSync(path.join(root, 'engine', 'data-frames.js'), '\n// changed\n');
   assert.deepEqual(await run(), ['coin']);
@@ -54,9 +54,9 @@ console.log(JSON.stringify({ refreshed, made: made.sort() }));`;
   return JSON.parse(r.stdout.trim().split('\n').pop());
 }
 
-test('a change to catalog/sprite-schema.js redraws the pictures of every data sprite, pieces or not, and no code sprite\'s', () => {
-  const root = dataProject({ data: { badge: badgeDef() }, code: ['crate'] });
-  assert.deepEqual(picturesStep(root), { refreshed: [], made: ['badge', 'crate'] });
+test('a change to catalog/sprite-schema.js redraws the pictures of every data sprite, pieces or not', () => {
+  const root = dataProject({ data: { badge: badgeDef() } });
+  assert.deepEqual(picturesStep(root), { refreshed: [], made: ['badge'] });
   assert.deepEqual(picturesStep(root), { refreshed: [], made: [] });
   fs.appendFileSync(path.join(root, 'catalog', 'sprite-schema.js'), '\n// changed\n');
   assert.deepEqual(picturesStep(root), { refreshed: ['badge'], made: ['badge'] });
@@ -79,25 +79,15 @@ test('the picture key of a data sprite is the same in any checkout: no absolute 
   assert.deepEqual(a, b);
 });
 
-// review round 3, issue 4: checkSprite now runs the data checks itself (quality/sprite.js imports quality/data-checks.js,
-// which imports engine/data-sprite.js and so every generator family). They look only at version 2 data sprites, so a
-// code sprite's key holds quality/data-checks.js but not what it imports: editing a generator re-checks no code sprite.
-test('a code sprite\'s quality key holds quality/data-checks.js, but not engine/data-sprite.js or any generator', async () => {
-  const { assetFiles } = await import('../../tools/lib/quality-run.mjs');
-  const root = dataProject({ code: ['crate'] });
-  const mine = rel(root, assetFiles(root, 'sprite', path.join(root, 'sprites', 'crate.js')).files);
-  assert.ok(mine.includes('quality/sprite.js') && mine.includes('quality/data-checks.js'), mine.join(', '));
-  assert.ok(!mine.includes('engine/data-sprite.js'), mine.join(', '));
-  assert.ok(!mine.some((f) => f.startsWith('engine/gen/')), mine.join(', '));
-});
-
-test('a change to a generator family re-checks the data sprites naming it and no code sprite', async () => {
-  const root = dataProject({ data: { coin: coinDef(), badge: badgeDef() }, code: ['crate'] });
+// (A code sprite's quality key, which held quality/data-checks.js but not what it imports, is gone with the code sprites, build
+// item R4a: tests/unit/assets-refuse-code.test.mjs holds that a code file is refused by assetFiles and the quality run.)
+test('a change to a generator family re-checks the data sprites naming it', async () => {
+  const root = dataProject({ data: { coin: coinDef(), badge: badgeDef() } });
   const run = async () => (await runQuality({ root, sprites: undefined, sounds: [], workers: 2 })).results.filter((r) => !r.cached).map((r) => r.id).sort();
-  assert.deepEqual(await run(), ['badge', 'coin', 'crate']);
-  const fx = fs.readdirSync(path.join(root, 'engine', 'gen')).find((f) => fs.readFileSync(path.join(root, 'engine', 'gen', f), 'utf8').includes("'twinkle'"));
-  assert.ok(fx, 'the family file of twinkle@1');
+  assert.deepEqual(await run(), ['badge', 'coin']);
+  const fx = fs.readdirSync(path.join(root, 'engine', 'gen')).find((f) => fs.readFileSync(path.join(root, 'engine', 'gen', f), 'utf8').includes("id: 'twinkle', v: 1"));
+  assert.ok(fx, 'the family file that declares twinkle@1');
   fs.appendFileSync(path.join(root, 'engine', 'gen', fx), '\n// changed\n');
   const again = await run();
-  assert.ok(!again.includes('crate'), again.join(', '));
+  assert.ok(again.includes('coin'), again.join(', '));      // the coin names twinkle@1; the badge does not
 });

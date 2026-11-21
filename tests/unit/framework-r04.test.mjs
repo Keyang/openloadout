@@ -5,13 +5,12 @@
 //                      from the top right on all four edges
 //   engine/foliage.js  tree parts: a crown of leaf masses, tufts round its outside, leaf marks, a trunk with root
 //                      flares, a fir tier, falling leaves
+// R3 (2026-11-21): engine/foliage.js (the tree parts) went with its tests; the engine/tiles.js tests stay.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { TILE, BLOCK_PIECES, NARROW_PIECES, blockJoins, drawBlock, drawSoftBlock, edgeWave, bandCell, bandStone } from '../../engine/tiles.js';
 import { Surface } from '../../engine/surface.js';
 import { col, INK } from '../../engine/color.js';
-import { CROWN_SHAPES, crownLobes, crownTufts, crownIn, leafMarks, trunkIn, tierIn, leafFall } from '../../engine/foliage.js';
-
 const SAND = '#ecda95', RIM = '#a05c37', SHADE = '#c9a06a', BANK = '#7fbf5a';
 const piece = (draw, name, material, t = 0) => { const g = new Surface(TILE, TILE); draw(g, name, material, t); return g; };
 const column = (g, x) => Array.from({ length: TILE }, (_, y) => g.get(x, y));
@@ -118,119 +117,7 @@ test('drawSoftBlock: outside() paints what is beyond the outline, t reaches the 
   assert.ok(bank >= 20, `${bank} px of bank`);
 });
 
-// ---- engine/foliage.js -----------------------------------------------------------------------------------
-
-test('crownLobes: one leaf mass per lobe, inside the box asked for, the same every time, moved by sway', () => {
-  assert.deepEqual([...CROWN_SHAPES], ['round', 'wide', 'layered']);
-  for (const shape of CROWN_SHAPES) {
-    const a = crownLobes({ cx: 32, cy: 30, w: 52, h: 40, shape }), b = crownLobes({ cx: 32, cy: 30, w: 52, h: 40, shape });
-    assert.deepEqual(a, b);
-    assert.ok(a.length >= 3 && a.length <= 8, `${shape}: ${a.length} lobes`);
-    const x0 = Math.min(...a.map((l) => l.x - l.rx)), x1 = Math.max(...a.map((l) => l.x + l.rx));
-    const y0 = Math.min(...a.map((l) => l.y - l.ry)), y1 = Math.max(...a.map((l) => l.y + l.ry));
-    assert.ok(x0 >= 32 - 26 - 0.01 && x1 <= 32 + 26 + 0.01 && y0 >= 30 - 20 - 0.01 && y1 <= 30 + 20 + 0.01, `${shape}: inside its box`);
-    assert.ok(x1 - x0 >= 52 * 0.85 && y1 - y0 >= 40 * 0.85, `${shape}: fills its box`);
-    const moved = crownLobes({ cx: 32, cy: 30, w: 52, h: 40, shape, sway: 2, t: 0.25 });
-    assert.ok(moved.some((l, i) => Math.round(l.x) !== Math.round(a[i].x)), `${shape}: sway moves a lobe a whole pixel`);
-    const offsets = new Set(moved.map((l, i) => Math.round((l.x - a[i].x) * 10)));
-    assert.ok(offsets.size > 1, `${shape}: the lobes move out of step`);
-  }
-  assert.notDeepEqual(crownLobes({ cx: 32, cy: 30, w: 52, h: 40, shape: 'round' }), crownLobes({ cx: 32, cy: 30, w: 52, h: 40, shape: 'wide' }));
-});
-
-test('crownIn: one shape test for the whole crown, true in a lobe and false outside all of them', () => {
-  const lobes = crownLobes({ cx: 32, cy: 30, w: 52, h: 40, shape: 'round' });
-  const inside = crownIn(lobes);
-  for (const l of lobes) assert.ok(inside(l.x, l.y));
-  assert.ok(!inside(1, 1) && !inside(63, 79));
-  // growing the crown by 2 px takes in a point just above its topmost mass
-  const top = lobes.reduce((a, b) => (a.y - a.ry < b.y - b.ry ? a : b));
-  assert.ok(crownIn(lobes, 2)(top.x, top.y - top.ry - 1.5) && !inside(top.x, top.y - top.ry - 1.5));
-});
-
-test('crownTufts: small masses on the outside of the crown only, the same every time, riding on their mass', () => {
-  const lobes = crownLobes({ cx: 32, cy: 30, w: 52, h: 40, shape: 'round' });
-  const tufts = crownTufts(lobes, { size: 4 });
-  assert.deepEqual(tufts, crownTufts(lobes, { size: 4 }));
-  assert.ok(tufts.length >= 8, `${tufts.length} tufts`);
-  const plain = new Surface(64, 80).fill(0, 0, 64, 80, crownIn(lobes), '#4f9d57');
-  const tufted = new Surface(64, 80).fill(0, 0, 64, 80, crownIn([...tufts, ...lobes]), '#4f9d57');
-  const more = count(tufted) - count(plain);
-  assert.ok(more >= 30 && more <= count(plain) * 0.25, `the tufts add ${more} px to the outline`);
-  for (const t of tufts) assert.ok(t.rx >= 2.5 && t.rx <= 5.5, 'small');
-  // with sway the tufts move with the masses: the crown keeps its tufted outline
-  const moved = crownLobes({ cx: 32, cy: 30, w: 52, h: 40, shape: 'round', sway: 2, t: 0.25 });
-  assert.equal(crownTufts(moved, { size: 4 }).length > 0, true);
-});
-
-test('leafMarks: lit clumps towards the top right of each mass and dark creases between masses, all inside the crown', () => {
-  const lobes = crownLobes({ cx: 32, cy: 30, w: 52, h: 40, shape: 'round' });
-  const g = new Surface(64, 80), body = '#4f9d57', light = '#90ce87', dark = '#287e43';
-  g.fill(0, 0, 64, 80, crownIn(lobes), body);
-  const before = count(g);
-  leafMarks(g, lobes, { light, dark });
-  assert.equal(count(g), before, 'no mark outside the crown');
-  const inside = crownIn(lobes);
-  let lit = 0, shaded = 0, litUp = 0;
-  for (let y = 0; y < 80; y++) for (let x = 0; x < 64; x++) {
-    if (g.get(x, y) === col(light)) { lit++; const l = lobes.findLast((m) => ((x + 0.5 - m.x) / m.rx) ** 2 + ((y + 0.5 - m.y) / m.ry) ** 2 <= 1); if (x - y > l.x - l.y) litUp++; }
-    if (g.get(x, y) === col(dark)) { shaded++; assert.ok(inside(x + 2.5, y - 1.5), `a crease at ${x},${y} has more crown beyond it: the crown's own outline stays in the light`); }
-  }
-  assert.ok(lit >= 12 && shaded >= 12, `${lit} light and ${shaded} dark pixels`);
-  assert.ok(litUp > lit * 0.7, 'most lit pixels lie up and to the right of the middle of their mass: the light comes from the top right');
-  const again = new Surface(64, 80);
-  again.fill(0, 0, 64, 80, crownIn(lobes), body);
-  leafMarks(again, lobes, { light, dark });
-  assert.deepEqual([...again.data], [...g.data]);
-  const sparse = new Surface(64, 80);
-  sparse.fill(0, 0, 64, 80, crownIn(lobes), body);
-  leafMarks(sparse, lobes, { light, dark, amount: 0.2 });
-  assert.ok(sparse.data.filter((v) => v === col(light)).length < lit);
-});
-
-test('trunkIn: as wide as asked at the top, flaring into roots at the foot, standing on its base row', () => {
-  const inside = trunkIn(32, 76, 8, 20, { flare: 4 });
-  const width = (y) => { let n = 0; for (let x = 0; x < 64; x++) if (inside(x + 0.5, y + 0.5)) n++; return n; };
-  assert.equal(width(58), 8);
-  assert.ok(width(75) >= 8 + 6, `the foot is ${width(75)} px wide`);
-  assert.equal(width(76), 0);
-  assert.equal(width(55), 0);
-  for (let y = 57; y < 75; y++) assert.ok(width(y + 1) >= width(y), 'never narrower further down');
-});
-
-test('tierIn: a fir tier with a point at the top and a jagged lower edge, the same every time', () => {
-  const inside = tierIn(24, 20, 44, 16, { teeth: 5, seed: 3 });
-  const g = new Surface(48, 80).fill(0, 0, 48, 80, inside, '#357a4c');
-  const b = g.bounds();
-  assert.ok(b.y0 <= 21 && b.y1 >= 42 && b.y1 <= 44, `rows ${b.y0} to ${b.y1}`);
-  assert.ok(b.x1 - b.x0 >= 28 && b.x1 - b.x0 <= 32, `spans ${b.x1 - b.x0 + 1} px`);
-  const widthAt = (y) => row48(g, y).filter(Boolean).length;
-  assert.ok(widthAt(22) <= 6 && widthAt(36) >= 20, 'narrow at the top, wide lower down');
-  // jagged: along the lower edge the lowest drawn row dips into a tooth and comes back, once per tooth
-  const low = Array.from({ length: 48 }, (_, x) => { for (let y = 79; y >= 0; y--) if (g.get(x, y)) return y; return -1; }).filter((y) => y >= 0);
-  let teeth = 0;
-  for (let i = 1; i < low.length - 1; i++) { let j = i; while (j < low.length - 1 && low[j + 1] === low[i]) j++; if (low[i] > low[i - 1] && j < low.length - 1 && low[i] > low[j + 1]) teeth++; i = j; }
-  assert.ok(teeth >= 4, `${teeth} teeth along the lower edge`);
-  const again = new Surface(48, 80).fill(0, 0, 48, 80, tierIn(24, 20, 44, 16, { teeth: 5, seed: 3 }), '#357a4c');
-  assert.deepEqual([...again.data], [...g.data]);
-});
 const row48 = (g, y) => Array.from({ length: g.w }, (_, x) => g.get(x, y));
-
-test('leafFall: leaves leave the crown one after another, fall inside the box, and the last frame keeps some', () => {
-  const box = [1, 1, 62, 78];
-  const at = (t) => { const g = new Surface(64, 80); leafFall(g, { t, count: 4, x: 32, y: 30, spread: 20, floor: 75, colours: ['#90ce87', '#4f9d57'], box }); return g; };
-  assert.equal(count(at(0)), 0, 'nothing has left the crown yet');
-  for (const t of [0.2, 0.4, 0.6, 0.8, 1]) {
-    const g = at(t), b = g.bounds();
-    assert.ok(b, `t ${t}: leaves in the air`);
-    assert.ok(b.x0 >= 1 && b.y0 >= 1 && b.x1 <= 62 && b.y1 <= 78, `t ${t}: inside the box`);
-  }
-  const mid = at(0.5).bounds(), end = at(1);
-  assert.ok(end.bounds().y1 > mid.y1, 'they fall');
-  assert.ok(count(end) >= 8, 'the last frame keeps the leaves on the ground');
-  assert.ok(end.bounds().y1 <= 75);
-  assert.deepEqual([...at(0.6).data], [...at(0.6).data]);
-});
 
 // ---- engine/tiles.js: marks in an edge band that have a top and a bottom ------------------------------------
 

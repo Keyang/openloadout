@@ -40,7 +40,7 @@
 //     ]
 //   }
 // Tilesets: the first one to use a clip name keeps it, and the first tileset's floor lies under every cell (put the
-// tileset that has the ground first). A sprite is named by its id (sprites/<id>.js or sprites/<id>.json) or by a path to a sprite file.
+// tileset that has the ground first). A sprite is named by its id (sprites/<id>.json) or by a path to a sprite file (a data file; a code file is refused).
 // Props are painted after the tiles, in the order of their pivot rows (the smaller y first), so a hero below a tree's
 // foot stands in front of it and one above it stands behind: what a game that sorts by the pivot row shows. A prop's
 // clip defaults to the sprite's first clip, its frame to 0. What cannot be placed is printed as a note.
@@ -58,20 +58,21 @@ import { TILE, classifyTiles, layoutTiles } from '../engine/tiles.js';
 import { readMap } from '../engine/maptext.js';
 import { THEME_PRESETS, applyColour, spriteMaterials, mergeMaterials } from '../engine/theme.js';
 import { col } from '../engine/color.js';
-import { findSpriteFile, loadSpriteFile } from './lib/assets.mjs';
+import { findSpriteFile, loadSpriteFile, refuseCodeId } from './lib/assets.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 /**
- * Loads a sprite by its id (sprites/<id>.js, or the data file sprites/<id>.json) or by a path to a sprite file of either
- * kind (tools/lib/assets.mjs findSpriteFile and loadSpriteFile); throws for one that does not exist.
+ * Loads a sprite by its id (the data file sprites/<id>.json) or by a path to a data file (tools/lib/assets.mjs findSpriteFile
+ * and loadSpriteFile; a code file is refused, build item R4a); throws for one that does not exist.
  * Arguments: name: the id or the path. base: the folder a relative path is read from (default: the working folder).
  * project: the project whose sprites/ an id is looked up in and whose engine draws a data file (default: this one).
  */
 export async function loadSprite(name, base = process.cwd(), project = root) {
   const isPath = name.includes('/') || name.includes(path.sep) || /\.(m?js|json)$/.test(name);
   const file = isPath ? path.resolve(base, name) : findSpriteFile(project, name);
-  if (!file || !fs.existsSync(file)) throw new Error(`scene: no sprite "${name}" (looked for ${isPath ? file : `sprites/${name}.js and sprites/${name}.json in ${project}`})`);
+  if (!isPath && !file) refuseCodeId(project, name);   // an id that exists only as a code file: the refusal, with the way to make it as data
+  if (!file || !fs.existsSync(file)) throw new Error(`scene: no sprite "${name}" (looked for ${isPath ? file : `sprites/${name}.json in ${project}`})`);
   return loadSpriteFile(project, file);
 }
 

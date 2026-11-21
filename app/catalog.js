@@ -251,7 +251,9 @@ export function loadSprite(id) {
   if (mine && mine.row.kind === 'sprite') return Promise.resolve(typeof mine.definition.whenReady === 'function' ? mine.definition.whenReady() : null).then(() => mine.definition);
   if (!sprites.has(id)) {
     if (catalog && assetById(id)?.kind !== 'sprite') return Promise.reject(new Error(`"${id}" is not a sprite on this site`));
-    // a data sprite (src sprites/<id>.json; docs/data-sprites.md, build item B9) is fetched and drawn by framework code, never imported
+    // a data sprite (src sprites/<id>.json; docs/data-sprites.md, build item B9) is fetched and drawn by framework code, never imported.
+    // (A row with no .json src falls back to importing sprites/<id>.js. The build writes none since R4a, which refuses code sprites, so this is a seam
+    // only the tests use (tests/helpers/code-standin.mjs, tests/e2e/parts.spec.mjs); it goes with them, not before.)
     const src = assetById(id)?.src;
     const p = (typeof src === 'string' && src.endsWith('.json') ? loadDataFile(src) : import(`../sprites/${id}.js`).then((m) => m.default))
       .then((s) => { arrived.set(id, s); return s; });

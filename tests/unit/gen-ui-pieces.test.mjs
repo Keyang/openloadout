@@ -16,12 +16,12 @@ import { checkGeneratorContract } from '../helpers/gen-harness.mjs';
 import { UI_MEASURES, measurePiece, UI_PIECES } from '../../engine/gen/ui-pieces.js';
 import { roundRows, cutRows, rowsArea, UI_STYLES, UI_STATES } from '../../engine/gen/ui-shapes.js';
 import { panel9, roundRectIn, cutRectIn, highlight, barOpening, PANEL_STYLES } from '../../engine/ui.js';
-import { woodButton } from '../../engine/ui-wood.js';
-import { skinBarOpening, skinKnob, skinSlider } from '../../engine/ui-skins.js';
 import { Surface } from '../../engine/surface.js';
 import { drawList } from '../../engine/draw-list.js';
 import { paintHex } from '../../engine/resolve.js';
 
+import { oldReplay } from '../helpers/old-replay.mjs';
+const OLD = oldReplay('gen-ui-pieces');   // what engine/ui-wood.js and engine/ui-skins.js (deleted by R3) drew and answered, recorded in the order of the calls (tests/helpers/old-replay.mjs)
 const PAINTS = { face: 'face', frame: 'frame', accent: 'accent' };
 const CASES = {
   'ui.panel@1': [
@@ -135,7 +135,7 @@ test('ui.panel measures panel9: the inner text area in every look, border, corne
 test('ui.button measures the wood button: text area and slice in every state, border and corner (ui-buttons-wood)', () => {
   const ui = registry.generator('ui.button', 1);
   for (const state of ['normal', 'hover', 'pressed', 'disabled']) for (const border of [0, 0.5, 1]) for (const corner of [0, 1]) for (const style of ['plank', 'carved', 'stone']) {
-    const { text } = woodButton(new Surface(96, 32), 1, 1, 94, 30, state, { face: '#a06a3c', frame: '#7a4f33', style, border, corner });
+    const text = OLD.value();
     const lip = state === 'pressed' ? 0 : 2;
     const m = measurePiece(ui, { at: [1, 1], size: [94, 30], bevel: 'wood', cut: style === 'carved' ? 'cut' : 'round', border: 1 + border * 2, corner: corner * 4, state, lip }, ctx([96, 32]));
     assert.deepEqual(m.textArea, { ...text, edge: { x: 48, y: 2 + (state === 'pressed' ? 2 : 0) } }, `${state} ${style} b${border}`);
@@ -146,7 +146,7 @@ test('ui.button measures the wood button: text area and slice in every state, bo
 test('ui.bar measures the housing\'s opening (skinBarOpening, barOpening) and the bars\' slice; the slider and knob theirs', () => {
   const bar = registry.generator('ui.bar', 1);
   for (const border of [1, 2, 3]) for (const caps of [0, 3]) {
-    const o = skinBarOpening(1, 1, 62, 14, 'flat', { borderPx: border, caps });
+    const o = OLD.value();
     assert.deepEqual(o, barOpening(1, 1, 62, 14, { borderPx: border, caps }));
     for (const layer of ['housing', 'fill']) {
       const m = measurePiece(bar, { at: [1, 1], size: [62, 14], border, caps, layer }, ctx([64, 16]));
@@ -157,10 +157,10 @@ test('ui.bar measures the housing\'s opening (skinBarOpening, barOpening) and th
   const slider = measurePiece(registry.generator('ui.slider', 1), { at: [1, 1], size: [62, 14] }, ctx([64, 16]));
   assert.deepEqual(slider.slice, { left: 8, top: 8, right: 8, bottom: 8 });
   for (const size of [10, 12, 14]) {
-    const { rect } = skinKnob(new Surface(64, 16), 32, 8, size, 'flat', { face: '#3f5068', frame: '#f0ead8' });
+    const rect = OLD.value();
     assert.deepEqual(measurePiece(registry.generator('ui.knob', 1), { at: [32, 8], size }, ctx([64, 16])).slice, { rect });
   }
-  const r = skinSlider(new Surface(64, 16), 1, 1, 62, 14, 'flat', { frame: '#f0ead8' }).rail;
+  const r = OLD.value();
   const prims = registry.runGenerator({ gen: 'ui.slider', v: 1, at: [1, 1], size: [62, 14], frame: 'frame', back: 'face' }).primitives;
   const g = new Surface(64, 16);
   drawList(g, prims, { palette: { frame: '#f0ead8', face: '#3f5068' } });
@@ -225,7 +225,7 @@ test('the wood textures stay out of the flat middle (the text area is one colour
 });
 
 test('a bar fill covers its share of the opening and nothing outside it; the flash fades over a clip that does not loop', () => {
-  const o = skinBarOpening(1, 1, 62, 14, 'flat', { borderPx: 2 });
+  const o = OLD.value();
   const g = draw({ gen: 'ui.bar', v: 1, at: [1, 1], size: [62, 14], layer: 'fill', value: 0.5, fill: 'fill' }, [64, 16]);
   const b = box(g);
   assert.deepEqual(b, { x0: o.x, y0: o.y, x1: o.x + Math.round(o.w * 0.5) - 1, y1: o.y + o.h - 1 });
@@ -294,8 +294,7 @@ test('the wooden board is woodButton\'s, pixel for pixel: the frame band\'s lowe
   for (const [face, frame] of [['#a06a3c', '#7a4f33'], ['#3f6fd1', '#f2c230'], ['#c9423a', '#c2c9d6']]) {
     for (const state of ['normal', 'hover', 'pressed']) for (const style of ['plank', 'carved']) for (const border of [0, 0.5, 1]) for (const corner of [0, 0.25, 0.5, 1]) for (const nails of [false, true]) {
       const opts = { border, corner, nails, grain: 0.5 };
-      const old = new Surface(96, 32);
-      woodButton(old, 1, 1, 94, 30, state, { face, frame, style, border, corner, texture: 0.5, nails });
+      const old = OLD.surface(96, 32);
       const g = woodNew(woodCall(style, state, opts), { face, frame, ...SURE });
       const off = [];
       for (let i = 0; i < old.data.length; i++) if (old.data[i] !== g.data[i]) off.push(`${i % 96},${Math.floor(i / 96)}`);
@@ -306,8 +305,7 @@ test('the wooden board is woodButton\'s, pixel for pixel: the frame band\'s lowe
 
 test('the stone style is a greyed slab: woodButton\'s stone within a few levels, its stain grey', () => {
   for (const state of ['normal', 'hover', 'pressed']) for (const border of [0, 1]) for (const corner of [0, 1]) {
-    const old = new Surface(96, 32);
-    woodButton(old, 1, 1, 94, 30, state, { face: '#a06a3c', frame: '#7a4f33', style: 'stone', border, corner, texture: 1, nails: true });
+    const old = OLD.surface(96, 32);
     const g = woodNew(woodCall('stone', state, { border, corner, nails: true, grain: 1 }), { face: '#a06a3c', frame: '#7a4f33', ...SURE });
     let worst = 0;
     for (let i = 0; i < old.data.length; i++) {

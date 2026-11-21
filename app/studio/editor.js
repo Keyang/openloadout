@@ -201,7 +201,7 @@ export function editorPage(app, { id, entry, drafts, kept, query, studio = siteS
   const toBagBtn = el('button', { type: 'button', class: 'btn btn-primary add-btn', 'data-act': 'to-bag', onclick: () => putInBag() }, 'Put in my bag');
   const download = menuButton('Download', () => [
     { label: 'Sheet picture (PNG)', onclick: () => downloadSheet() },
-    { label: `File for the library (${S.def.id}.js)`, onclick: () => downloadFile() },
+    { label: `Studio file to keep (${S.def.id}.js)`, onclick: () => downloadFile() },
     { label: 'Sheet and its animation list (ZIP)', onclick: () => downloadZip() },
   ], { up: true, right: true, cls: 'btn', act: 'download' });
   const foot = el('div', { class: 'rx-foot st-foot' }, savedBox, playBtn, toBagBtn, download, bagNote);
@@ -469,7 +469,7 @@ export function editorPage(app, { id, entry, drafts, kept, query, studio = siteS
     const f = await libraryFile(S.def, assetById(S.def.id) ? [S.def.id] : undefined);
     if (!f.ok) { say(`The file could not be made: ${f.errors[0]}`); return; }
     saveBlob(new Blob([f.text], { type: 'text/javascript' }), f.name);
-    say(`${f.name} downloaded. Put it in the library's sprites folder to add it there.`);
+    say(`${f.name} downloaded, as your own copy. The library no longer takes studio files: it takes data sprites made with the /sprite-forge skill.`);
   }
   async function sheetPng() {
     const s = sheetOf(S.def);
@@ -494,7 +494,7 @@ export function editorPage(app, { id, entry, drafts, kept, query, studio = siteS
     const f = await libraryFile(S.def);
     if (f.ok) files.push({ name: f.name, data: enc.encode(f.text) });
     saveBlob(zip(files), `${S.def.id}.zip`);
-    say(`${S.def.id}.zip downloaded: the sheet, its animation list and the file for the library.`);
+    say(`${S.def.id}.zip downloaded: the sheet, its animation list and your studio file to keep.`);
   }
 
   // ---- the keyboard (docs/studio.md section 5) ----

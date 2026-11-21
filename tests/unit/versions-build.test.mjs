@@ -43,11 +43,11 @@ test('the same input gives the same file, and a cache hit gives exactly what mak
 
 test('the cache key covers the asset file and everything it and engine/versions.js load', () => {
   const graph = importGraph({ root: ROOT });
-  // a code sprite's key (the code knight and wizard, frozen first: tests/helpers/library.mjs), whose imports are followed
-  const file = codeSpriteFile('knight');
+  // a code sprite's key (the frozen code crate and slime: tests/helpers/library.mjs), whose imports are followed
+  const file = codeSpriteFile('crate');
   const { files } = graph.closure([file, path.join(ROOT, 'engine', 'versions.js')]);
   assert.ok(files.includes(file), path.relative(ROOT, file));
-  for (const f of ['engine/versions.js', 'engine/sprite.js', 'rigs/humanoid.js', 'engine/materials.js']) assert.ok(files.includes(path.join(ROOT, f)), f);
+  for (const f of ['engine/versions.js', 'engine/sprite.js', 'engine/color.js', 'engine/materials.js']) assert.ok(files.includes(path.join(ROOT, f)), f);
   assert.equal(versionsKey(graph, file, ROOT), versionsKey(graph, file, ROOT));
-  assert.notEqual(versionsKey(graph, file, ROOT), versionsKey(graph, codeSpriteFile('wizard'), ROOT));
+  assert.notEqual(versionsKey(graph, file, ROOT), versionsKey(graph, codeSpriteFile('slime'), ROOT));
 });

@@ -1,0 +1,249 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "q-good",
+ "name": "Q good",
+ "blurb": "A small gem that passes the bar, for the command-line and cache tests.",
+ "meta": {
+  "type": "pickup",
+  "role": "items/pickup",
+  "themes": [
+   "fantasy"
+  ],
+  "gameTypes": [
+   "platformer"
+  ],
+  "view": "front",
+  "words": [
+   "gem",
+   "jewel",
+   "crystal",
+   "diamond",
+   "collect",
+   "treasure"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  16,
+  16
+ ],
+ "pivot": [
+  8,
+  15
+ ],
+ "grounded": false,
+ "preview": "shine",
+ "styles": [
+  "pixel"
+ ],
+ "palette": [
+  {
+   "id": "stone",
+   "label": "Colour",
+   "default": "#3f6fd1",
+   "material": "magic",
+   "swatches": [
+    "#3f6fd1",
+    "#c9423a",
+    "#4f9d57"
+   ]
+  },
+  {
+   "id": "shine",
+   "default": "#ffffff",
+   "material": "light",
+   "detail": true
+  }
+ ],
+ "controls": [
+  {
+   "key": "size",
+   "kind": "range",
+   "label": "Size",
+   "lo": "Small",
+   "hi": "Big",
+   "default": 0.5
+  },
+  {
+   "key": "shape",
+   "kind": "choice",
+   "label": "Shape",
+   "options": [
+    "round",
+    "tall"
+   ],
+   "default": "round"
+  },
+  {
+   "key": "stone",
+   "kind": "colour",
+   "label": "Colour"
+  },
+  {
+   "key": "glint",
+   "kind": "toggle",
+   "label": "Glint",
+   "default": true
+  }
+ ],
+ "body": {
+  "pictures": {
+   "nodes": [
+    {
+     "id": "gem",
+     "parent": null,
+     "at": [
+      8,
+      8
+     ]
+    }
+   ],
+   "draw": [
+    {
+     "id": "face",
+     "kind": "ellipse",
+     "on": "gem",
+     "at": [
+      0,
+      0
+     ],
+     "r": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         2
+        ],
+        [
+         1,
+         4
+        ]
+       ]
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         2
+        ],
+        [
+         1,
+         4
+        ]
+       ]
+      }
+     ],
+     "paint": "stone",
+     "shade": 1,
+     "light": 1,
+     "when": {
+      "shape": [
+       "round"
+      ]
+     }
+    },
+    {
+     "id": "tall",
+     "kind": "ellipse",
+     "on": "gem",
+     "at": [
+      0,
+      0
+     ],
+     "r": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         2
+        ],
+        [
+         1,
+         4
+        ]
+       ]
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         3
+        ],
+        [
+         1,
+         5
+        ]
+       ]
+      }
+     ],
+     "paint": "stone",
+     "shade": 1,
+     "light": 1,
+     "when": {
+      "shape": [
+       "tall"
+      ]
+     }
+    },
+    {
+     "id": "spark",
+     "kind": "rect",
+     "on": "gem",
+     "at": [
+      -2,
+      -2
+     ],
+     "paint": "shine",
+     "when": {
+      "glint": [
+       true
+      ]
+     },
+     "size": [
+      2,
+      2
+     ]
+    },
+    {
+     "kind": "outline",
+     "paint": "ink"
+    }
+   ]
+  }
+ },
+ "clips": {
+  "shine": {
+   "frames": 4,
+   "fps": 6,
+   "loop": true,
+   "keys": [
+    {
+     "t": 0,
+     "root": [
+      0,
+      0
+     ]
+    },
+    {
+     "t": 0.5,
+     "root": [
+      0,
+      -1
+     ]
+    },
+    {
+     "t": 1,
+     "root": [
+      0,
+      0
+     ]
+    }
+   ]
+  }
+ }
+}

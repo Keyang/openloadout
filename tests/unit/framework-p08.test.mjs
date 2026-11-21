@@ -5,13 +5,13 @@
 //   engine/growth.js  mossCap (a cap of moss drawn on a shape), mushroom, sapling (things standing on a point that turn with it)
 //   engine/creature.js  hornFit (the longest a horn can be without leaving a box; added in fix round 1)
 // R2: rigs/bigbody.js went: the tests of the big-body rig are deleted; those of the engine helpers (engine/rock.js and the rest) stay.
+// R3 (2026-11-21): engine/growth.js went (mossCap, mushroom, sapling) with its tests; the engine/rock.js and engine/creature.js tests stay.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { Surface, ellipseIn, rectIn } from '../../engine/surface.js';
 import { col } from '../../engine/color.js';
 import { PI } from '../../engine/motion.js';
 import { seam, capIn, crack } from '../../engine/rock.js';
-import { mossCap, mushroom, sapling } from '../../engine/growth.js';
 import { ramp } from '../../engine/color.js';
 import { hornPath, hornIn, hornFit } from '../../engine/creature.js';
 
@@ -101,56 +101,6 @@ test('crack runs the asked way for about the asked length, one pixel wide, and s
   const forked = new Surface(48, 48);
   crack(forked, 24, 6, 0, 20, '#333344', { seed: 3 });
   assert.ok(lit(forked) > lit(g), 'a long crack has a side branch');
-});
-
-// ---- engine/growth.js -----------------------------------------------------------------
-
-test('mossCap: three tones with a light top row, and a line of shadow on the shape under it', () => {
-  const stone = ramp('#8f97a8'), moss = ramp('#a4c44a');
-  const block = rectIn(6, 12, 20, 14);
-  const g = new Surface(32, 32).rect(6, 12, 20, 14, stone.base);
-  mossCap(g, block, [0, 0, 31, 31], moss, { under: stone.dark, depth: 3, rise: 0, ragged: 0 });
-  for (let x = 6; x < 26; x++) {
-    assert.equal(g.get(x, 12), col(moss.light), `column ${x}: light top row`);
-    assert.equal(g.get(x, 15), col(stone.dark), `column ${x}: shadow under the cap`);
-    assert.equal(g.get(x, 16), col(stone.base), `column ${x}: stone below that`);
-  }
-  assert.ok(count(g, moss.dark) > 0 && count(g, moss.base) > 0, 'the cap is shaded');
-  const plain = new Surface(32, 32).rect(6, 12, 20, 14, stone.base);
-  mossCap(plain, block, [0, 0, 31, 31], moss, { depth: 3, rise: 0, ragged: 0 });
-  assert.equal(count(plain, stone.dark), 0, 'no shadow line unless asked for');
-});
-
-test('mushroom: a stalk with a wider cap on top, growing the way it is told, and smaller or absent where there is no room', () => {
-  const g = new Surface(32, 32);
-  assert.equal(mushroom(g, 16, 24, PI, { height: 5, cap: 4, paint: ramp('#a4c44a'), stalk: '#f0ead8' }), true);
-  const b = g.bounds();
-  assert.ok(b.y1 <= 24 && b.y0 <= 17, `it stands up from its root (${b.y0}..${b.y1})`);
-  const width = (y) => { let n = 0; for (let x = 0; x < 32; x++) if (g.get(x, y)) n++; return n; };
-  assert.ok(width(b.y0 + 2) >= 6 && width(23) <= 3, 'the cap is wider than the stalk');
-  const side = new Surface(32, 32);
-  mushroom(side, 10, 16, PI / 2, { height: 5, cap: 4, paint: '#a4c44a' });
-  assert.ok(side.bounds().x1 >= 17 && side.bounds().x0 >= 9, 'turned to the right, it grows to the right');
-  const edge = new Surface(32, 32);
-  mushroom(edge, 16, 8, PI, { height: 5, cap: 4, paint: '#a4c44a' });
-  assert.ok(edge.bounds() === null || edge.bounds().y0 >= 2, 'near the top of the frame it is smaller, and stays inside');
-  assert.equal(mushroom(new Surface(32, 32), 16, 3, PI, { height: 5, cap: 4 }), false, 'with no room at all it is left out');
-});
-
-test('sapling: a stem about as tall as asked with leaves at the top; it bends with sway and stays in its box', () => {
-  const draw = (o) => { const g = new Surface(48, 48); const drawn = sapling(g, 24, 40, PI, { length: 15, leaf: 3, paint: ramp('#3f8a4f'), wood: '#7a4f33', ...o }); return { g, drawn }; };
-  const { g, drawn } = draw({});
-  assert.equal(drawn, true);
-  const b = g.bounds();
-  assert.ok(b.y0 >= 19 && b.y0 <= 24, `the leaves top out about 15 px + a clump above the root (${b.y0})`);
-  assert.ok(count(g, '#7a4f33') >= 8, 'a stem');
-  assert.ok(b.x1 - b.x0 >= 7, 'leaves either side');
-  const bent = draw({ sway: 0.25 }).g, back = draw({ sway: -0.25 }).g;
-  const mid = (s) => { const q = s.bounds(); return (q.x0 + q.x1) / 2; };
-  assert.ok(mid(bent) < mid(g) - 1 && mid(back) > mid(g) + 1, 'sway bends it one way or the other');
-  const boxed = draw({ box: [10, 30, 38, 46] });
-  assert.ok(boxed.drawn === false || boxed.g.bounds().y0 >= 29, 'in a low box it is shorter or left out');
-  assert.equal(draw({ box: [22, 38, 26, 42] }).drawn, false);
 });
 
 // ---- engine/creature.js: hornFit (fix round 1) ------------------------------------------

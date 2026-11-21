@@ -11,7 +11,7 @@
 //     tone      { of, by }                         engine/color.js tone(of, by): lighter (by > 0) or darker
 //     mix       { of, with, amount }               engine/color.js mix(of, with, amount): 0 is of, 1 is with
 //     standOut  { against, from: [c] }             engine/color.js pick(against, ...from): the one that stands out most
-//     apart     { of, from: [c | [c, least]], least? }   rigs/humanoid-figure.js apart(): kept clear, by lightness, of
+//     apart     { of, from: [c | [c, least]], least? }   engine/data-rules.js apart(): kept clear, by lightness, of
 //                                                  what it lies next to (the Rogue's trim on his tunic)
 //     bandTone  { of, under: [c], least? }         engine/tones.js bandTone(): the tone a thin band is painted in on cloth
 //     ramp      { of, tone: light|base|dark|deep } one tone of engine/color.js ramp(of)
@@ -43,9 +43,8 @@
 //
 // Pure: no DOM, no Node, no clock, no randomness. Runs unchanged in the browser and in Node.
 
-import { tone, ramp, mix, pick } from './color.js';
+import { tone, ramp, mix, pick, brightness } from './color.js';
 import { bandTone } from './tones.js';
-import { apart } from '../rigs/humanoid-figure.js';
 import { textureTone, textureLight } from './tiles.js';   // build item B15b: the tilesets' texture tones (tiles.js does not import this module)
 import { faceRamps } from './solids.js';   // migration batch M3: faceTone, the faces of a solid lit from above (solids.js does not import this module)
 import { stoneShade } from './paving.js';   // migration batch M5: stoneShade, a paving's darker stones and joints (paving.js does not import this module)
@@ -54,6 +53,22 @@ import { lifted, grey, ifLight } from './look-tones.js';   // migration batch M9
 import { shadeTo } from './bulkhead.js';   // migration batch P5: shadeTo, the station machines' recess metal and the blast door's frame (bulkhead.js does not import this module)
 import { brightness as shadeBrightness } from './color.js';   // migration batch P5: the brightness shadeTo's target is worked out from
 import { raisedGround } from './ground.js';   // build item T2: raisedGround, the meadow's path and the shore's bank (ground.js does not import this module)
+
+/**
+ * Returns a colour that can be told from the colours lying next to it by how light it is: the colour itself when it differs from each of them in brightness by enough, otherwise the nearest lighter or darker tone of it that does.
+ * Arguments: colour (hex), from (what it lies against: a hex, a list of them, or a list of [hex, least] pairs where one neighbour needs more room than another), least (the smallest difference in brightness, 0 to 1, that is left alone; default 0.15).
+ */
+export function apart(colour, from, least = 0.15) {   // moved here from rigs/humanoid-figure.js (R2b), word for word: the `apart` colour rule is this
+  const others = (Array.isArray(from) ? from : [from]).map((f) => (Array.isArray(f) ? [brightness(f[0]), f[1]] : [brightness(f), least]));
+  const spare = (c) => Math.min(...others.map(([b, room]) => Math.abs(brightness(c) - b) - room));      // 0 or more: far enough from every neighbour
+  let best = colour;
+  for (let step = 0; step <= 8; step++) for (const way of step ? [1, -1] : [1]) {
+    const c = step ? tone(colour, way * step * 0.15) : colour;
+    if (spare(c) >= 0) return c;
+    if (spare(c) > spare(best) + 1e-9) best = c;
+  }
+  return best;
+}
 import { pavingTone } from './paving.js';     // build item T2: pavingTone, the village's paving (paving.js does not import this module)
 
 const HEX = /^#[0-9a-fA-F]{6}$/;
@@ -76,7 +91,7 @@ export const COLOUR_RULES = Object.freeze({
   tone: Object.freeze({ about: 'A lighter (by above 0) or darker (by below 0) tone of a colour: engine/color.js tone.', args: Object.freeze({ of: arg('colour'), by: arg('number', { min: -3, max: 3 }) }) }),
   mix: Object.freeze({ about: 'A blend of two colours, amount 0 (all of) to 1 (all with): engine/color.js mix.', args: Object.freeze({ of: arg('colour'), with: arg('colour'), amount: arg('number', { min: 0, max: 1 }) }) }),
   standOut: Object.freeze({ about: 'Whichever of a few colours stands out most, by lightness, against another (eyes, markings): engine/color.js pick.', args: Object.freeze({ against: arg('colour'), from: arg('colours', { most: 4 }) }) }),
-  apart: Object.freeze({ about: 'A colour kept clear, by how light it is, of the colours it lies next to: rigs/humanoid-figure.js apart.', args: Object.freeze({ of: arg('colour'), from: arg('colours', { most: 4, pairs: true }), least: arg('number', { min: 0, max: 1, optional: true }) }) }),
+  apart: Object.freeze({ about: 'A colour kept clear, by how light it is, of the colours it lies next to: engine/data-rules.js apart.', args: Object.freeze({ of: arg('colour'), from: arg('colours', { most: 4, pairs: true }), least: arg('number', { min: 0, max: 1, optional: true }) }) }),
   bandTone: Object.freeze({ about: 'The tone of a colour that a thin band (a belt, a strap) is painted in so it stands clear of the cloth under it: engine/tones.js bandTone.', args: Object.freeze({ of: arg('colour'), under: arg('colours', { most: 4 }), least: arg('number', { min: 0, max: 1, optional: true }) }) }),
   ramp: Object.freeze({ about: 'One tone of the three-tone ramp of a colour (light, base, dark, deep): engine/color.js ramp.', args: Object.freeze({ of: arg('colour'), tone: arg('word', { values: Object.freeze(['light', 'base', 'dark', 'deep']) }) }) }),
   choose: Object.freeze({ about: 'One of two colours by the settings: then while they match when (as a control\'s when reads them), else otherwise.', args: Object.freeze({ when: arg('when'), then: arg('colour'), else: arg('colour') }) }),

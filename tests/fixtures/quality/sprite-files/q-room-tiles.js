@@ -1,8 +1,7 @@
 // A top-down tileset made with the tile helper: the worked example for the top-down kits, and a fixture of the
 // tile tests. A floor, a path laid over it (a second ground), a wall with a front face, and a pit: the three kinds
-// of top-down block (docs/style-guide.md, section 6). Look at it with
-//   node tools/tilemap.mjs --file tests/fixtures/quality/sprite-files/q-room-tiles.js
-// which builds a room with a doorway in two walls, a pillar, a wall one tile wide and a wall one tile deep.
+// of top-down block (docs/style-guide.md, section 6). It is a code file kept only as the fixture of tests/unit/tiles-sprites.test.mjs
+// (the tile helper's own test): since build item R4a no tool takes a code sprite, so tools/tilemap.mjs no longer draws it.
 //
 // What to copy:
 //   - one material per block, built from the controls; the helper draws every piece (drawBlock)

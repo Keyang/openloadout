@@ -15,7 +15,7 @@
 //                                               -> out/<id>-map-crop.png: for looking closely at one join
 //   node tools/tilemap.mjs <id> --scatter       scatter the decals by the helper's rule (pickDecal), as a game or the
 //                                               playground would, instead of the fixed spots of the sample map
-//   node tools/tilemap.mjs --file path/to/sprite.js    a tileset that is not in sprites/ (a code file, or a data file .json)
+//   node tools/tilemap.mjs --file path/to/sprite.json  a tileset that is not in sprites/ (a data file)
 //   --view side|top-down (default: the tileset's meta.view)   --scale 3   --bg '#8fd0f0'   --out <folder>
 //
 // Which piece goes in which cell is decided by layoutTiles in engine/tiles.js, the same code the playground
@@ -37,7 +37,7 @@ import { renderFrame, defaultParams, cleanParams } from '../engine/sprite.js';
 import { TILE, classifyTiles, layoutTiles, pieceOf } from '../engine/tiles.js';
 import { readMap } from '../engine/maptext.js';
 import { hexToRgb } from '../engine/color.js';
-import { findSpriteFile, loadSpriteFile } from './lib/assets.mjs';
+import { findSpriteFile, loadSpriteFile, refuseCodeId } from './lib/assets.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -47,11 +47,12 @@ const id = args.find((a, i) => !a.startsWith('--') && !(i > 0 && args[i - 1].sta
 const sets = {};
 args.forEach((a, i) => { if (a === '--set') { const [k, ...v] = args[i + 1].split('='); sets[k] = v.join('='); } });
 
-// a tileset by its id (sprites/<id>.js or sprites/<id>.json) or by a path to a file of either kind (tools/lib/assets.mjs)
+// a tileset by its id (sprites/<id>.json) or by a path to a data file (tools/lib/assets.mjs; a code file is refused)
 async function load(name, file) {
   if (!name && !file) { console.error('usage: node tools/tilemap.mjs <id> [--look low|high] [--set key=value] [--with <id>] [--map file]'); process.exit(1); }
   const f = file ? path.resolve(file) : findSpriteFile(root, name);
-  if (!f || !fs.existsSync(f)) { console.error(`No tileset at ${f ?? `sprites/${name}.js or sprites/${name}.json`}`); process.exit(1); }
+  if (!file && !f) { try { refuseCodeId(root, name); } catch (e) { console.error(e.message); process.exit(1); } }   // an id that exists only as a code file
+  if (!f || !fs.existsSync(f)) { console.error(`No tileset at ${f ?? `sprites/${name}.json`}`); process.exit(1); }
   try { return await loadSpriteFile(root, f); } catch (e) { console.error(e.message); process.exit(1); }
 }
 const sprite = await load(id, flag('file'));

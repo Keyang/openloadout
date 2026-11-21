@@ -18,14 +18,14 @@ import { loadSprite as sceneSprite } from '../../tools/scene.mjs';
 
 const rejects = (p, re) => assert.rejects(p, (e) => { assert.match(e.message, re); return true; });
 
-test('loadSpriteFile loads either kind of sprite file by path: a code file imported, a data file read as data', async () => {
+test('loadSpriteFile loads a sprite file by path: a data file read as data; a code file is refused, never imported (R4a)', async () => {
   const root = dataProject({ data: { badge: badgeDef() }, code: ['slime'] });
   const data = await loadSpriteFile(root, findSpriteFile(root, 'badge'));
   assert.equal(data.id, 'badge');
   assert.equal(typeof data.render, 'function');
   assert.equal(data.name, (await loadDataSprite(root, 'sprites/badge.json')).name);
-  const code = await loadSpriteFile(root, findSpriteFile(root, 'slime'));
-  assert.equal(code.id, 'slime');
+  assert.equal(findSpriteFile(root, 'slime'), null, 'the code file is no sprite');
+  await rejects(loadSpriteFile(root, path.join(root, 'sprites', 'slime.js')), /^sprites\/slime\.js: a code sprite.*sprites\/slime\.json.*\/sprite-forge/);
   // relative to the project, and out of it
   assert.equal((await loadSpriteFile(root, 'sprites/badge.json')).id, 'badge');
   const elsewhere = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'loose-')), 'loose.json');
@@ -38,9 +38,9 @@ test('loadSpriteFile loads either kind of sprite file by path: a code file impor
 // ---- the ready-made versions (generated/versions.json) ----------------------------------------------------------
 
 test('buildVersions makes the versions of a data sprite, as versionsOf does for the sprite it draws', async () => {
-  const root = dataProject({ data: { coin: coinDef(), badge: badgeDef() }, code: ['slime'] });
+  const root = dataProject({ data: { coin: coinDef(), badge: badgeDef() } });
   const out = await buildVersions({ root });
-  assert.deepEqual(Object.keys(out), ['badge', 'coin', 'slime']);
+  assert.deepEqual(Object.keys(out), ['badge', 'coin']);
   const [{ versionsOf }, { defaultParams, cleanParams }] = await Promise.all([
     import(pathToFileURL(path.join(root, 'engine', 'versions.js')).href), import(pathToFileURL(path.join(root, 'engine', 'sprite.js')).href)]);
   for (const id of ['coin', 'badge']) {
@@ -66,9 +66,10 @@ test('a data sprite that cannot be drawn stops the versions, naming its file', a
   await rejects(buildVersions({ root }), /sprites\/badge\.json: .*no-such-thing/);
 });
 
-test('one sprite has one file: a code file and a data file of one id are refused', async () => {
+test('a code file in sprites/ stops the versions, naming it, whether its id has a data file or not (R4a)', async () => {
   const root = dataProject({ data: { slime: coinDef('slime') }, code: ['slime'] });
-  await rejects(buildVersions({ root }), /sprites\/slime\.js and sprites\/slime\.json/);
+  await rejects(buildVersions({ root }), /^sprites\/slime\.js: a code sprite.*\/sprite-forge/);
+  await rejects(buildVersions({ root: dataProject({ data: { coin: coinDef() }, code: ['slime'] }) }), /^sprites\/slime\.js: a code sprite/);
 });
 
 test('a data sprite\'s versions are keyed on its definition, the pieces it uses and the code that draws it', () => {
@@ -91,14 +92,16 @@ test('a data sprite\'s versions are keyed on its definition, the pieces it uses 
 // ---- tools/scene.mjs and tools/tilemap.mjs ----------------------------------------------------------------------
 
 test('scene.mjs loads a data sprite by path, and by id from the sprites/ of a project', async () => {
-  const root = dataProject({ data: { badge: badgeDef() }, code: ['slime'] });
+  const root = dataProject({ data: { badge: badgeDef() } });
   const byPath = await sceneSprite(path.join(root, 'sprites', 'badge.json'));
   assert.equal(byPath.id, 'badge');
   assert.equal((await sceneSprite('sprites/badge.json', root)).id, 'badge');
   assert.equal((await sceneSprite('badge', process.cwd(), root)).id, 'badge');
-  assert.equal((await sceneSprite('slime', process.cwd(), root)).id, 'slime');
-  await rejects(sceneSprite('nothing', process.cwd(), root), /no sprite "nothing".*sprites\/nothing\.js.*sprites\/nothing\.json/);
-  // the real project's sprites still load by id, of either kind
+  await rejects(sceneSprite('nothing', process.cwd(), root), /no sprite "nothing".*sprites\/nothing\.json/);
+  // a code file in a project is refused by path (R4a)
+  fs.writeFileSync(path.join(root, 'sprites', 'old.js'), 'export default {};\n');
+  await rejects(sceneSprite(path.join(root, 'sprites', 'old.js')), /^sprites\/old\.js: a code sprite|old\.js: a code sprite/);
+  // the real project's sprites load by id
   assert.equal((await sceneSprite('slime')).id, 'slime');
   const real = fs.readdirSync(path.join(ROOT, 'sprites')).find((f) => f.endsWith('.json') && !f.startsWith('_'));
   if (real) assert.equal((await sceneSprite(real.slice(0, -5))).id, real.slice(0, -5));
@@ -122,7 +125,7 @@ test('tilemap.mjs draws a data sprite given by path', () => {
 
 // ---- tools/bundles-from-plans.mjs ------------------------------------------------------------------------------
 
-test('bundles-from-plans counts a data file as the sprite a plan names, and asks for a data file for one still to come', () => {
+test('bundles-from-plans counts a data file as the sprite a plan names, and asks for a data file for one still to come; a code file is not one', () => {
   const real = path.join(ROOT, 'bundles', 'specs');
   const planFile = fs.readdirSync(real).filter((f) => f.endsWith('.plan.json')).sort()[0];
   const plan = JSON.parse(fs.readFileSync(path.join(real, planFile), 'utf8'));
@@ -133,8 +136,8 @@ test('bundles-from-plans counts a data file as the sprite a plan names, and asks
   for (const d of ['engine', 'sound', 'rigs']) fs.cpSync(path.join(ROOT, d), path.join(dir, d), { recursive: true });   // rigs/: engine/data-rules.js, which engine/sprite.js imports (build item F3), needs it
   for (const d of ['sprites', 'sounds']) fs.mkdirSync(path.join(dir, d));
   const sprites = idsOf(plan.sprites);
-  // half the sprites as data files, half as code files (the tool only asks whether a sprite's file is there)
-  sprites.forEach((id, i) => fs.writeFileSync(path.join(dir, 'sprites', `${id}.${i % 2 ? 'json' : 'js'}`), ''));
+  // every sprite as a data file (the tool only asks whether a sprite's file is there)
+  sprites.forEach((id) => fs.writeFileSync(path.join(dir, 'sprites', `${id}.json`), ''));
   for (const id of [...idsOf(plan.sounds), ...idsOf(plan.music)]) fs.writeFileSync(path.join(dir, 'sounds', `${id}.json`), '{}');
   const run = () => spawnSync(process.execPath, [path.join(ROOT, 'tools', 'bundles-from-plans.mjs'), '--root', dir, '--check'], { encoding: 'utf8', timeout: 60_000 });
   const ok = run();
@@ -145,4 +148,6 @@ test('bundles-from-plans counts a data file as the sprite a plan names, and asks
   const r = run();
   assert.equal(r.status, 1, r.stdout + r.stderr);
   assert.match(r.stdout, new RegExp(`${plan.id}: not written, 1 asset still to come: sprites/${gone}\\.json`));
+  fs.writeFileSync(path.join(dir, 'sprites', `${gone}.js`), '');      // a code file does not stand in for the data file
+  assert.equal(run().status, 1);
 });
