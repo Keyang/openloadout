@@ -20,6 +20,11 @@ const idsOf = (list) => (list ?? []).map((x) => (typeof x === 'string' ? x : x.i
 const KINDS = [['sprites', 'sprite'], ['sounds', 'sound'], ['music', 'music']];
 const words = { sprites: 'sprites', sounds: 'sounds', music: 'music tracks' };
 
+/** Whether a kit has no player character by design: its plan says \`view: 'none'\` (a fixed screen, such as a falling-block puzzle). Such a kit's playground is checked for opening and painting, not for a keyboard-moved character. Argument: the kit's plan. */
+export function playerless(plan) {
+  return plan?.view === 'none';
+}
+
 /** Every kit: [{ id, plan, bundle }] where bundle is the catalogue's entry, or null when the catalogue has none. plans: as loadPlans() returns them. */
 export function kitsOf(catalog, plans) {
   return plans.map(({ id, plan }) => ({ id, plan, bundle: catalog.bundles.find((b) => b.id === id) ?? null }));

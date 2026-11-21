@@ -3,7 +3,7 @@
 // that is too small, a kit the catalogue does not list, and fewer than three kits.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { kitsOf, kitProblems, setProblems, sizeProblems, isFullKit, MIN_KITS } from '../helpers/kits.mjs';
+import { kitsOf, kitProblems, setProblems, sizeProblems, isFullKit, playerless, MIN_KITS } from '../helpers/kits.mjs';
 import { KIT_SIZE, SMALL_KIT_SIZE, KIT_SIZE_MOST, kitSize, loadPlans, ROOT } from '../../tools/lib/assets.mjs';
 
 const many = (prefix, n) => Array.from({ length: n }, (_, i) => `${prefix}-${i}`);
@@ -228,4 +228,14 @@ test('every plan on disk is inside the size it is held to, and the acceptance te
   assert.match(spec, /sizeProblems\(bundle, kit\.plan\)/);
   assert.doesNotMatch(spec, /sizeProblems\(bundle\)/);
   assert.match(spec, /kitSize\(kit\.plan\)/, 'its message names the plan\'s size');
+});
+
+test('a kit whose plan says view "none" has no player by design; every other kit has one', () => {
+  assert.equal(playerless({ view: 'none' }), true);
+  for (const view of ['side', 'top-down', 'front']) assert.equal(playerless({ view }), false, view);
+  assert.equal(playerless({}), false);
+  assert.equal(playerless(undefined), false);
+  const gridline = loadPlans(ROOT).find((k) => k.id === 'kit-puzzle-gridline');
+  assert.equal(playerless(gridline.plan), true, 'the falling-block puzzle has no player');
+  for (const { id, plan } of loadPlans(ROOT).filter((k) => k.id !== 'kit-puzzle-gridline')) assert.equal(playerless(plan), false, `${id} has a player`);
 });

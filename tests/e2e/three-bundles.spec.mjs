@@ -20,7 +20,7 @@
 import path from 'node:path';
 import { test, expect as baseExpect, openRoute, waitForDrawn, canvasStats, collectErrors } from '../helpers/test.mjs';
 import { ROOT as HERE, readCatalogue, catalogueOf, playReady, playState } from '../helpers/acceptance.mjs';
-import { kitsOf, kitProblems, setProblems, sizeProblems, MIN_KITS } from '../helpers/kits.mjs';
+import { kitsOf, kitProblems, setProblems, sizeProblems, playerless, MIN_KITS } from '../helpers/kits.mjs';
 import { loadPlans, kitSize } from '../../tools/lib/assets.mjs';
 
 // Many builders share this machine: anything the page is waited for gets 20 seconds, not the usual 5.
@@ -82,6 +82,13 @@ for (const { id } of PLANS) {
     const scene = page.locator('canvas.play-stage');
     await expect(scene).toBeVisible();
     await page.getByRole('button', { name: 'Mute', exact: true }).click();      // the music would start on the first key press; it is not what is tested here
+    if (playerless(kit.plan)) {
+      // a kit with no player by design (its plan says view "none": a fixed screen): the playground opens and paints its scene, with no character to move
+      await expect.poll(async () => { const s = await canvasStats(scene); return s.opaque === s.width * s.height; }, { message: 'the whole scene is painted', timeout: 30_000 }).toBe(true);
+      await page.getByRole('button', { name: 'Unmute', exact: true }).click();
+      expect(watch.errors, 'errors in the playground').toEqual([]);
+      return;
+    }
     const start = await playState(page);
     expect(start.player, `${id}: the playground has a character to play`).toBeTruthy();
     expect(bundle.sprites, 'the character is one of the kit\'s sprites').toContain(start.player.id);
